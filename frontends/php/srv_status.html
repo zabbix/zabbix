@@ -15,7 +15,7 @@
 ?>
 <?
 	$now=time();
-	$result=DBselect("select serviceid,name from services order by name");
+	$result=DBselect("select serviceid,name,triggerid from services order by name");
 	echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";
 	echo "\n";
 	echo "<tr><td><b>Service</b></td></tr>";
@@ -50,26 +50,36 @@
 		}
 //		echo "<td><a href=\"srv_status.html?serviceid=".$row["serviceid"]."\">".$row["name"]."</a></td>";
 		$childs=get_num_of_service_childs($row["serviceid"]);
+		if(isset($row["triggerid"]))
+		{
+			$trigger=select_trigger_by_triggerid($row["triggerid"]);
+			$description="[TRIGGER] ".$trigger["description"];
+		}
+		else
+		{
+			$trigger_link="";
+			$description=$row["name"];
+		}
 		if(isset($serviceid))
 		{
 			if($childs == 0)
 			{
-				echo "<td> - ".$row["name"]."</td>";
+				echo "<td> - $description</td>";
 			}
 			else
 			{
-				echo "<td><a href=\"srv_status.html?serviceid=".$row["serviceid"]."\"> - [$childs]".$row["name"]."</a></td>";
+				echo "<td><a href=\"srv_status.html?serviceid=".$row["serviceid"]."\"> - $description</a></td>";
 			}
 		}
 		else
 		{
 			if($childs == 0)
 			{
-				echo "<td>".$row["name"]."</td>";
+				echo "<td>$description</td>";
 			}
 			else
 			{
-				echo "<td><a href=\"srv_status.html?serviceid=".$row["serviceid"]."\">[$childs] ".$row["name"]."</a></td>";
+				echo "<td><a href=\"srv_status.html?serviceid=".$row["serviceid"]."\"> $description</a></td>";
 			}
 		}
 		echo "</tr>"; 

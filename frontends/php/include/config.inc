@@ -940,15 +940,40 @@
 	}
 
 
+	function	delete_service($serviceid)
+	{
+		$sql="delete from services_links where servicedownid=$serviceid or serviceupid=$serviceid";
+		$result=DBexecute($sql);
+		if(!$result)
+		{
+			return	$result;
+		}
+		$sql="delete from services where serviceid=$serviceid";
+		return DBexecute($sql);
+	}
+
+	function	update_service($serviceid,$name,$triggerid,$linktrigger)
+	{
+		if( isset($linktrigger)&&($linktrigger=="on") )
+		{
+			$sql="update services set name='$name',triggerid=$triggerid,status=0 where serviceid=$serviceid";
+		}
+		else
+		{
+			$sql="update services set name='$name',triggerid=NULL,status=0 where serviceid=$serviceid";
+		}
+		return	DBexecute($sql);
+	}
+
 	function	add_service($name,$triggerid,$linktrigger)
 	{
 		if( isset($linktrigger)&&($linktrigger=="on") )
 		{
-			$sql="insert into services (serviceid,name,triggerid) values (NULL,'$name',$triggerid)";
+			$sql="insert into services (serviceid,name,triggerid,status) values (NULL,'$name',$triggerid,0)";
 		}
 		else
 		{
-			$sql="insert into services (serviceid,name) values (NULL,'$name')";
+			$sql="insert into services (serviceid,name,status) values (NULL,'$name',0)";
 		}
 		return	DBexecute($sql);
 	}
@@ -2253,7 +2278,8 @@
 
 	function	show_footer()
 	{
-		echo "<table border=0 cellpadding=1 cellspacing=5 width=\"100%\" align=center>";
+		echo "<br>";
+		echo "<table border=0 cellpadding=1 cellspacing=0 width=\"100%\" align=center>";
 		echo "<tr>";
 		echo "<td bgcolor=\"#000000\">";
 		echo "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\" width=\"100%\" bgcolor=\"#666666\">";
@@ -2263,6 +2289,8 @@
 		echo "</font>";
 		echo "</td></tr>";
 		echo "</table>";
+		echo "</td>";
+		echo "</tr>";
 		echo "</table>";
 
 		echo "</body>";
