@@ -88,15 +88,6 @@
 		echo "<a name=\"form\"></a>";
 		echo "<form method=\"get\" action=\"screenedit.php\">";
 
-		{
-                	$screenitemid=0;
-                	$resource=0;
-                	$resourceid=0;
-                	$width=500;
-                	$height=100;
-			$resource=@iif(isset($HTTP_GET_VARS["resource"]),$HTTP_GET_VARS["resource"],0);
-		}
-
 		$iresult=DBSelect("select * from screens_items where screenid=$screenid and x=$c and y=$r");
         	if(DBnum_rows($iresult)>0)
         	{
@@ -106,26 +97,40 @@
 			$resourceid=$irow["resourceid"];
 			$width=$irow["width"];
 			$height=$irow["height"];
-			$found=1;
         	}
+		else
+		{
+        		$screenitemid=0;
+			$resource=0;
+			$resourceid=0;
+			$width=500;
+			$height=100;
+		}
 
 		if(isset($HTTP_GET_VARS["x"])&&($HTTP_GET_VARS["x"]==$c)&&($HTTP_GET_VARS["y"]==$r))
 		{
+			$resource=@iif(isset($HTTP_GET_VARS["resource"]),$HTTP_GET_VARS["resource"],$resource);
+			$resourceid=@iif(isset($HTTP_GET_VARS["resource"]),$HTTP_GET_VARS["resourceid"],$resourceid);
+			$screenitemid=@iif(isset($HTTP_GET_VARS["screenitemid"]),$HTTP_GET_VARS["screenitemid"],$screenitemid);
+			$width=@iif(isset($HTTP_GET_VARS["width"]),$HTTP_GET_VARS["width"],$width);
+			$height=@iif(isset($HTTP_GET_VARS["height"]),$HTTP_GET_VARS["height"],$height);
+
         		show_table2_header_begin();
-        		echo "Screen item configuration";
+        		echo "Screen cell configuration";
 
         		echo "<input name=\"screenid\" type=\"hidden\" value=$screenid>";
 			echo "<input name=\"x\" type=\"hidden\" value=$c>";
 			echo "<input name=\"y\" type=\"hidden\" value=$r>";
 //			echo "<input name=\"resourceid\" type=\"hidden\" value=$resourceid>";
-//			echo "<input name=\"resource\" type=\"hidden\" value='$resource'>";
+			echo "<input name=\"resource\" type=\"hidden\" value='$resource'>";
 
 			show_table2_v_delimiter();
 			echo "Resource";
 			show_table2_h_delimiter();
 			echo "<select name=\"resource\" size=1 onChange=\"submit()\">";
-			echo "<OPTION VALUE='1' ".iif($resource==1,"selected","").">Simple graph";
 			echo "<OPTION VALUE='0' ".iif($resource==0,"selected","").">Graph";
+			echo "<OPTION VALUE='1' ".iif($resource==1,"selected","").">Simple graph";
+			echo "<OPTION VALUE='2' ".iif($resource==2,"selected","").">Map";
 			echo "</SELECT>";
 
 			if($resource == 1)
@@ -167,7 +172,7 @@
 				echo "Map";
 				show_table2_h_delimiter();
 				$result=DBselect("select sysmapid,name from sysmaps order by name");
-				echo "<select name=\"sysmapid\" size=1>";
+				echo "<select name=\"resourceid\" size=1>";
 				echo "<OPTION VALUE='0'>(none)";
 				for($i=0;$i<DBnum_rows($result);$i++)
 				{
@@ -216,6 +221,10 @@
 		else if( ($screenitemid!=0) && ($resource==1) )
 		{
 			echo "<a href=screenedit.php?register=edit&screenid=$screenid&x=$c&y=$r><img src='chart.php?itemid=$resourceid&width=$width&height=$height&period=3600' border=0></a>";
+		}
+		else if( ($screenitemid!=0) && ($resource==2) )
+		{
+			echo "<a href=screenedit.php?register=edit&screenid=$screenid&x=$c&y=$r><img src='map.php?noedit=1&sysmapid=$resourceid&width=$width&height=$height&period=3600' border=0></a>";
 		}
 		else
 		{

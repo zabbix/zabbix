@@ -59,7 +59,11 @@
   
 #	ImageFilledRectangle($im,0,0,$width,$height,$black);
 	ImageFilledRectangle($im,0,0,$width,$height,$white);
-	ImageRectangle($im,0,0,$width-1,$height-1,$black);
+
+	if(!isset($HTTP_GET_VARS["sysmapid"]))
+	{
+		ImageRectangle($im,0,0,$width-1,$height-1,$black);
+	}
 
 	if(!check_right("Network map","R",$HTTP_GET_VARS["sysmapid"]))
 	{
