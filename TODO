@@ -29,6 +29,7 @@ Not ready yet:
 
  OTHER:
 
+ - get rid of "Bad protocol identification '0'" when doing ssh check
  - ability to execute command on server monitored
  - support for tcp_ping[] which returns number of ms spent
  - new host name should not contain space and other character not allowed by trigger expression
