@@ -49,7 +49,7 @@ void    DBconnect( void )
  * Execute SQL statement. For non-select statements only.
  * If fails, program terminates.
  */ 
-void	DBexecute(char *query)
+int	DBexecute(char *query)
 {
 
 #ifdef	USE_MYSQL
@@ -58,7 +58,7 @@ void	DBexecute(char *query)
 	if( mysql_query(&mysql,query) != 0 )
 	{
 		syslog(LOG_ERR, "Query failed:%s", mysql_error(&mysql) );
-		exit( FAIL );
+		return FAIL;
 	}
 #endif
 #ifdef	USE_POSTGRESQL
@@ -71,15 +71,18 @@ void	DBexecute(char *query)
 	if( result==NULL)
 	{
 		syslog(LOG_ERR, "Query failed:%s", "Result is NULL" );
-		exit( FAIL );
+		PQclear(result);
+		return FAIL;
 	}
 	if( PQresultStatus(result) != PGRES_COMMAND_OK)
 	{
 		syslog(LOG_ERR, "Query failed:%s", PQresStatus(PQresultStatus(result)) );
-		exit( FAIL );
+		PQclear(result);
+		return FAIL;
 	}
 	PQclear(result);
 #endif
+	return	SUCCEED;
 }
 
 /*
