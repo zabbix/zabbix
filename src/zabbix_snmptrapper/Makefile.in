@@ -2,7 +2,7 @@
 
 all:
 
-	@CC@ -o ../../bin/zabbix_snmptrapper @CFLAGS@ -I../../include zabbix_snmptrapper.c @LIBS@
+	@CC@ -o ../../bin/zabbix_snmptrapper @CFLAGS@ -I../../include ../../include/cfg.c ../../include/log.c zabbix_snmptrapper.c @LIBS@
 
 clean:
 	rm -f *.o 
