@@ -297,11 +297,11 @@
 
 	if(!isset($sort)||(isset($sort) && $sort=="priority"))
 	{
-		echo "<TD WIDTH=9% ALIGN=CENTER><B>PRIORITY</B></TD>";
+		echo "<TD WIDTH=9% ALIGN=CENTER><B>SEVERITY</B></TD>";
 	}
 	else
 	{
-		echo "<TD ALIGN=CENTER><B><A HREF=\"tr_status.php?sort=priority&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">Priority</a>";
+		echo "<TD ALIGN=CENTER><B><A HREF=\"tr_status.php?sort=priority&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">Severity</a>";
 	}
 	if($noactions=='true')
 		echo "<TD WIDTH=12% ALIGN=CENTER>";

@@ -4,9 +4,7 @@ Not ready yet:
 
  - Tree like in old Zabbix
  - SNMP trapping
- - Think about BACKUP for HISTORY
  - Triggers comment. Hide right should work.
- - Agent for Windows (can we use nsclient?)
  - Reports:
   - more customizable (graphs timerange: 1 mont, etc)
   - availability report for IT Services
@@ -22,24 +20,18 @@ Not ready yet:
  IT SERVICES:
 
  - make IT Services stable
- - think about service node types (some nodes will automatically register
-   problem)
 
  OTHER:
 
  - check for function parameters in evaluate_simple_expression
  - make links different if something is already registered (as for medias,
    actions, etc)
- - get rid of problems with ' and "
- - high level Zabbix schema on paper !
  - permissions for all *.php (charts, graphs , hosts, etc etc )
- - add numeric constants to trigger expressions
  - update function.lastvalue to NULL when trigger's status becomes
    UNKNOWN (done?)
  - update trigger status to unknown if cannot evaluate function 
  - do not dump "Expression cannot be evaluated" in case if function.lastvalue
    is NULL
- - rename "Alerts" to "Notification" (Alexei)
 
  TO TEST:
 
@@ -58,9 +50,18 @@ Not ready yet:
   - different sound files for different severity
   - distributed monitoring
   - LDAP authorisation (should work with MSWindows LDAP)
+  - Agent for Windows (can we use nsclient?)
+  - rename "Alerts" to "Notification" (Alexei)
+  - add numeric constants to trigger expressions
+  - get rid of problems with ' and "
+  - high level Zabbix schema on paper !
+  - Think about BACKUP for HISTORY
+  - think about service node types (some nodes will automatically register
+   problem)
 
 Changes for 1.0beta6:
 
+ - Priority was renamed to Severity (Alexei)
  - added graph to availability report (Alexei)
  - added frontends/php/chart4.php (Alexei)
  - availability report will not show trigger expressions (Alexei)
