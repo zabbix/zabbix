@@ -173,17 +173,19 @@
 		echo("<b>Period:</b>&nbsp;");
 
 		$hour=3600;
-		foreach(array(1,2,4,8,12,24) as $count){
-			$tmp=$hour*$count;
-			echo("[<A HREF=\"charts.php?period=$tmp".url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">");
-			echo($count."h</A>]&nbsp;");
+		
+		$a=array("1h"=>3600,"2h"=>2*3600,"4h"=>4*3600,"8h"=>8*3600,"12h"=>12*3600,
+			"24h"=>24*3600,"week"=>7*24*3600,"month"=>31*24*3600,"year"=>365*24*3600);
+		foreach($a as $label=>$sec){
+			echo("[-<A HREF=\"charts.php?period=$sec".url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">");
+			echo($label."</A>+]&nbsp;");
 		}
 
-		echo("[<A HREF=\"charts.php?period=".(7*24*3600).url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">week</A>]&nbsp;");
-		echo("[<A HREF=\"charts.php?period=".(30*24*3600).url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">month</A>]&nbsp;");
-		echo("[<A HREF=\"charts.php?period=".(365*24*3600).url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">year</A>]&nbsp;");
+//		echo("[<A HREF=\"charts.php?period=".(7*24*3600).url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">week</A>]&nbsp;");
+//		echo("[<A HREF=\"charts.php?period=".(30*24*3600).url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">month</A>]&nbsp;");
+//		echo("[<A HREF=\"charts.php?period=".(365*24*3600).url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">year</A>]&nbsp;");
 
-/*            echo("or&nbsp;");
+/*		echo("or&nbsp;");
 		$tmp=$HTTP_GET_VARS["period"]+$hour;
 		echo("[<A HREF=\"charts.php?period=$tmp".url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">");
 		echo("+1h</A>]&nbsp;");
@@ -200,35 +202,41 @@
 			echo("[-1h]&nbsp;");
 		}*/
 
-		echo(" <b>Back:</b>&nbsp;");
-
-		$day=24;
-		foreach(array(0,1,2,7,14) as $count){
-			$tmp=$day*$count;
-			echo("[<A HREF=\"charts.php?from=$tmp".url_param("graphid").url_param("period").url_param("keep").url_param("fullscreen")."\">");
-			echo($count."d</A>]&nbsp;");
-		}
-            
-		if(isset($HTTP_GET_VARS["keep"]))
-		{
-			echo(" <b>Keep&nbsp;period:</b>&nbsp;");
-			if($HTTP_GET_VARS["keep"] == 1)
-			{
-				echo("[<A HREF=\"charts.php?keep=0".url_param("graphid").url_param("from").url_param("period").url_param("fullscreen")."\">On</a>]");
-			}
-			else
-			{
-				echo("[<A HREF=\"charts.php?keep=1".url_param("graphid").url_param("from").url_param("period").url_param("fullscreen")."\">Off</a>]");
-			}
-		}
 		echo("</div>");
 
 	echo "</TD>";
 	echo "<TD BGCOLOR=#FFFFFF WIDTH=15% ALIGN=RIGHT>";
-//		echo("<div align=right>");
+		echo(" <b>Keep&nbsp;period:</b>&nbsp;");
+		if($HTTP_GET_VARS["keep"] == 1)
+		{
+			echo("[<A HREF=\"charts.php?keep=0".url_param("graphid").url_param("from").url_param("period").url_param("fullscreen")."\">On</a>]");
+		}
+		else
+		{
+			echo("[<A HREF=\"charts.php?keep=1".url_param("graphid").url_param("from").url_param("period").url_param("fullscreen")."\">Off</a>]");
+		}
+	echo "</TD>";
+	echo "</TR>";
+	echo "<TR BGCOLOR=#FFFFFF>";
+	echo "<TD>";
+		echo("<div align=left>");
+		echo("<b>Move:</b>&nbsp;");
+
+		$day=24;
+		foreach(array(0,1,2,7,14) as $count){
+			$tmp=$day*$count;
+			echo("[-<A HREF=\"charts.php?from=$tmp".url_param("graphid").url_param("period").url_param("keep").url_param("fullscreen")."\">");
+			echo($count."d</A>+]&nbsp;");
+		}
+            
+		echo("</div>");
+	echo "</TD>";
+	echo "<TD BGCOLOR=#FFFFFF WIDTH=15% ALIGN=RIGHT>";
+//		echo("<div align=left>");
 		echo "<form method=\"put\" action=\"charts.php\">";
 		echo "<input name=\"graphid\" type=\"hidden\" value=\"".$HTTP_GET_VARS["graphid"]."\" size=12>";
-		echo "<input name=\"stime\"  value=\"yyyymmdd\" size=8>";
+		echo "<input name=\"stime\" class=\"biginput\" value=\"yyyymmdd\" size=8>";
+		echo "&nbsp;";
 		echo "<input class=\"button\" type=\"submit\" name=\"action\" value=\"go\">";
 		echo "</form>";
 //		echo("</div>");
