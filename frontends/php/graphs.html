@@ -1,12 +1,12 @@
 <?
 	include "include/config.inc";
-	$page["title"] = "System maps";
-	$page["file"] = "sysmaps.html";
+	$page["title"] = "Graphs";
+	$page["file"] = "graphs.html";
 	show_header($page["title"],0);
 ?>
 
 <?
-	show_table_header("CONFIGURATION OF SYSTEM MAPS");
+	show_table_header("CONFIGURATION OF GRAPHS");
 	echo "<br>";
 ?>
 
@@ -15,21 +15,21 @@
 	{
 		if($register=="add")
 		{
-			add_sysmap($name,$width,$height);
+			add_graph($name,$width,$height);
 		}
 		if($register=="update")
 		{
-			update_sysmap($sysmapid,$name,$width,$height);
+			update_graph($graphid,$name,$width,$height);
 		}
 		if($register=="delete")
 		{
-			delete_sysmap($sysmapid);
+			delete_graph($graphid);
 		}
 	}
 ?>
 
 <?
-	show_table_header("SYSTEM MAPS");
+	show_table_header("GRAPHS");
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Name</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Width</B></TD>";
@@ -37,7 +37,7 @@
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
-	$result=DBselect("select s.sysmapid,s.name,s.width,s.height from sysmaps s order by s.name");
+	$result=DBselect("select g.graphid,g.name,g.width,g.height from graphs g order by g.name");
 	echo "<CENTER>";
 	$col=0;
 	for($i=0;$i<DBnum_rows($result);$i++)
@@ -52,14 +52,14 @@
 			$col=1;
 		}
 	
-		$sysmapid_=DBget_field($result,$i,0);
+		$graphid_=DBget_field($result,$i,0);
 		$name_=DBget_field($result,$i,1);
 		$width_=DBget_field($result,$i,2);
 		$height_=DBget_field($result,$i,3);
-		echo "<TD><a href=\"sysmap.html?sysmapid=$sysmapid_\">$name_</a></TD>";
+		echo "<TD><a href=\"graph.html?graphid=$graphid_\">$name_</a></TD>";
 		echo "<TD>$width_</TD>";
 		echo "<TD>$height_</TD>";
-		echo "<TD><A HREF=\"sysmaps.html?sysmapid=$sysmapid_#form\">Change</A> - <A HREF=\"sysmaps.html?register=delete&sysmapid=$sysmapid_\">Delete</A></TD>";
+		echo "<TD><A HREF=\"graphs.html?graphid=$graphid_#form\">Change</A> - <A HREF=\"graphs.html?register=delete&graphid=$graphid_\">Delete</A></TD>";
 		echo "</TR>";
 	}
 	echo "</TABLE>";
@@ -68,9 +68,9 @@
 <?
 	echo "<a name=\"form\"></a>";
 
-	if(isset($sysmapid))
+	if(isset($graphid))
 	{
-		$result=DBselect("select s.sysmapid,s.name,s.width,s.height from sysmaps s where sysmapid=$sysmapid");
+		$result=DBselect("select g.graphid,g.name,g.width,g.height from graphs g where graphid=$graphid");
 		$name=DBget_field($result,0,1);
 		$width=DBget_field($result,0,2);
 		$height=DBget_field($result,0,3);
@@ -84,13 +84,13 @@
 
 	echo "<br>";
 	show_table2_header_begin();
-	echo "New system map";
+	echo "New graph";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"sysmaps.html\">";
-	if(isset($sysmapid))
+	echo "<form method=\"post\" action=\"graphs.html\">";
+	if(isset($graphid))
 	{
-		echo "<input name=\"sysmapid\" type=\"hidden\" value=$sysmapid>";
+		echo "<input name=\"graphid\" type=\"hidden\" value=$graphid>";
 	}
 	echo "Name";
 	show_table2_h_delimiter();
@@ -108,7 +108,7 @@
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
-	if(isset($sysmapid))
+	if(isset($graphid))
 	{
 		echo "<input type=\"submit\" name=\"register\" value=\"update\">";
 	}
