@@ -292,6 +292,21 @@ insert into items_template (itemtemplateid,platformid,description,key_,delay)
 	values (37,1,'The number of interrupts per second, including the clock','system[interrupts]', 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
 	values (38,1,'The number of context switches per second','system[switches]', 30);
+insert into items_template (itemtemplateid,platformid,description,key_,delay)
+	values (39,1,'Email (SMTP) server is running','net[listen_25]', 60);
+insert into items_template (itemtemplateid,platformid,description,key_,delay)
+	values (40,1,'FTP server is running','net[listen_21]', 60);
+insert into items_template (itemtemplateid,platformid,description,key_,delay)
+	values (41,1,'SSH server is running','net[listen_22]', 60);
+insert into items_template (itemtemplateid,platformid,description,key_,delay)
+	values (42,1,'Telnet server is running','net[listen_23]', 60);
+insert into items_template (itemtemplateid,platformid,description,key_,delay)
+	values (43,1,'WEB server is running','net[listen_80]', 60);
+insert into items_template (itemtemplateid,platformid,description,key_,delay)
+	values (44,1,'POP3 server is running','net[listen_110]', 60);
+insert into items_template (itemtemplateid,platformid,description,key_,delay)
+	values (45,1,'IMAP server is running','net[listen_143]', 60);
+
 
 --
 -- Table structure for table 'triggers_template'
@@ -352,6 +367,21 @@ insert into triggers_template (triggertemplateid,itemtemplateid,description,expr
 	values (26,26,'Low free disk space on /opt','{:.last(0)}<1000000000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (27,27,'Host have just been restarted','{:.last(0)}<600');
+insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+	values (39,39,'Email (SMTP) server is down','{:.last(0)}<1');
+insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+	values (40,40,'FTP server is down','{:.last(0)}<1');
+insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+	values (41,41,'SSH server is down','{:.last(0)}<1');
+insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+	values (42,42,'Telnet server is down','{:.last(0)}<1');
+insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+	values (43,43,'WEB server is down','{:.last(0)}<1');
+insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+	values (43,43,'POP3 server is down','{:.last(0)}<1');
+insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+	values (44,44,'IMAP server is down','{:.last(0)}<1');
+
 
 --
 -- Table structure for table 'media'
