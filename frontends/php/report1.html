@@ -1,0 +1,77 @@
+<?
+	include "include/config.inc";
+	$page["title"] = "Status of Zabbix";
+	$page["file"] = "report1.html";
+	show_header($page["title"],0);
+?>
+
+<?
+	show_table_header("STATUS OF ZABBIX");
+
+	echo "<TABLE BORDER=0 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TR><TD WIDTH=\"10%\"><B>Parameter</B></TD>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>Value</B></TD>";
+	echo "</TR>";
+
+	$stats=get_stats();
+?>
+
+	<tr bgcolor="#eeeeee">
+	<td>Is zabbix_sucker running ?</td>
+	<?
+		$str="No";
+		if(exec("ps -aef|grep zabbix_sucker|grep -v grep|wc -l")>0)
+		{
+			$str="Yes";
+		}
+	?>
+	<td><? echo $str; ?></td>
+	</tr>
+
+	<tr bgcolor="#dddddd">
+	<td>Is zabbix_alarmer running ?</td>
+	<?
+		$str="No";
+		if(exec("ps -aef|grep zabbix_alarmer|grep -v grep|wc -l")>0)
+		{
+			$str="Yes";
+		}
+	?>
+	<td><? echo $str; ?></td>
+	</tr>
+
+	<tr bgcolor="#eeeeee">
+	<td>Number of values stored in table history</td>
+	<td><? echo $stats["history_count"]; ?></td>
+	</tr>
+
+	<tr bgcolor="#dddddd">
+	<td>Period of time stored in table history</td>
+	<td><b>From:</b><? echo date("y/m/d H:i:s",$stats["history_min_clock"]); ?> <b>till:</b><? echo date("y/m/d H:i:s",$stats["history_max_clock"]); ?> </td>
+	</tr>
+
+	<tr bgcolor="#eeeeee">
+	<td>Number of triggers</td>
+	<td><? echo $stats["triggers_count"]; ?></td>
+	</tr>
+
+	<tr bgcolor="#dddddd">
+	<td>Number of items</td>
+	<td><? echo $stats["items_count"]; ?></td>
+	</tr>
+
+	<tr bgcolor="#eeeeee">
+	<td>Number of users</td>
+	<td><? echo $stats["users_count"]; ?></td>
+	</tr>
+
+	<tr bgcolor="#dddddd">
+	<td>Number of hosts</td>
+	<td><? echo $stats["hosts_count"]; ?></td>
+	</tr>
+
+	</table>
+
+<?
+	show_footer();
+?>
