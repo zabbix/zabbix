@@ -753,7 +753,7 @@ float	SHAREDMEM(void)
 		return FAIL;
 	}
 #else
-#ifdef HAVE_SYS_VMMETER_H
+#ifdef HAVE_SYS_VMMETER_VMTOTAL
 	int mib[2],len;
 	struct vmtotal v;
 
@@ -800,7 +800,7 @@ float	TOTALMEM(void)
 		return FAIL;
 	}
 #else
-#ifdef HAVE_SYS_VMMETER_H
+#ifdef HAVE_SYS_VMMETER_VMTOTAL
 	int mib[2],len;
 	struct vmtotal v;
 
@@ -867,7 +867,7 @@ float	FREEMEM(void)
 		return FAIL;
 	}
 #else
-#ifdef HAVE_SYS_VMMETER_H
+#ifdef HAVE_SYS_VMMETER_VMTOTAL
 	int mib[2],len;
 	struct vmtotal v;
 
