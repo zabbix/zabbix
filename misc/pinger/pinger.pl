@@ -1,21 +1,18 @@
 #!/usr/bin/perl
 
-$dead_hosts = `cat /home/monitor/hosts | fping -u`;
+$hosts = `cat /home/zabbix/pinger/hosts | fping`;
 
-foreach $host (split(/\n/,$dead_hosts))
+foreach $host (split(/\n/,$hosts))
 {
-	$cmd="/home/monitor/monitor/src/mon_sender/mon_sender arsenal 10001 $host:alive 0"; 
+	if($host=~/^((.)*) is alive$/)
+	{
+		$cmd="/home/zabbix/bin/zabbix_sender arsenal 10001 $1:alive 1"; 
+	}
+	else
+	{
+		$host=~/^((.)*) is((.)*)$/;
+		$cmd="/home/zabbix/bin/zabbix_sender arsenal 10001 $1:alive 0"; 
+	}
 	print $cmd,"\n";
 	system( $cmd );	
 }
-
-$alive_hosts = `cat /home/monitor/hosts | fping -a`;
-
-foreach $host (split(/\n/,$alive_hosts))
-{
-	$cmd="/home/monitor/monitor/src/mon_sender/mon_sender arsenal 10001 $host:alive 1"; 
-	print $cmd,"\n";
-	system( $cmd );	
-}
-
-
