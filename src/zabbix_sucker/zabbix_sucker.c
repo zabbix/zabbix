@@ -1285,6 +1285,7 @@ int main(int argc, char **argv)
 	}
 	else if(sucker_num == 1)
 	{
+		zabbix_log( LOG_LEVEL_WARNING, "Mailer PID [%d]",getpid());
 /* Second instance of zabbix_suckerd sends alerts to users */
 		main_alerter_loop();
 	}	
