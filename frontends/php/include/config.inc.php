@@ -1715,6 +1715,7 @@ echo "</head>";
 <tr><td class="horizontal_menu" height=24 colspan=9><b>
 <?php
 	$i=0;
+	if(isset($active_level1))
 	foreach($menu[$active_level1]["level2"] as $label=>$sub)
 	{
 // Check permissions
