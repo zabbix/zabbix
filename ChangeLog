@@ -1,5 +1,16 @@
 Not ready yet:
 
+ HBLV:
+
+ - Availability report for IT Services
+ - Services: Link to trigger (wrong name)
+ - Tree like in old Zabbix
+ - SNMP trapping
+ - Support for nodata
+ - Think about BACKUP for HISTORY
+ - Triggers comment. Hide right should work.
+
+
  DISTRIBUTED MONITORING:
 
  - leave for 1.0beta7
