@@ -20,10 +20,10 @@
 	echo "</tr>";
 	echo "\n";
 	$col=0;
-	if(isset($serviceid))
+	if(isset($HTTP_GET_VARS["serviceid"]))
 	{
 		echo "<tr bgcolor=#EEEEEE>";
-		$service=get_service_by_serviceid($serviceid);
+		$service=get_service_by_serviceid($HTTP_GET_VARS["serviceid"]);
 		echo "<td><b><a href=\"srv_status.php?serviceid=".$service["serviceid"]."\">".$service["name"]."</a></b></td>";
 		echo "<td>".get_service_status_description($service["status"])."</td>";
 		echo "<td>&nbsp;</td>";
@@ -32,11 +32,11 @@
 	}
 	while($row=DBfetch($result))
 	{
-		if(!isset($serviceid) && service_has_parent($row["serviceid"]))
+		if(!isset($HTTP_GET_VARS["serviceid"]) && service_has_parent($row["serviceid"]))
 		{
 			continue;
 		}
-		if(isset($serviceid) && service_has_no_this_parent($serviceid,$row["serviceid"]))
+		if(isset($HTTP_GET_VARS["serviceid"]) && service_has_no_this_parent($HTTP_GET_VARS["serviceid"],$row["serviceid"]))
 		{
 			continue;
 		}
@@ -44,7 +44,7 @@
 		{
 			continue;
 		}
-		if(isset($serviceid)&&($serviceid==$row["serviceid"]))
+		if(isset($HTTP_GET_VARS["serviceid"])&&($HTTP_GET_VARS["serviceid"]==$row["serviceid"]))
 		{
 			echo "<tr bgcolor=#99AABB>";
 		}
@@ -69,7 +69,7 @@
 			$trigger_link="";
 			$description=$row["name"];
 		}
-		if(isset($serviceid))
+		if(isset($HTTP_GET_VARS["serviceid"]))
 		{
 			if($childs == 0)
 			{

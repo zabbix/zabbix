@@ -48,11 +48,14 @@ Not ready yet:
 
  TO TEST:
 
+  - all forms
   - validation of trigger expressions in PHP frontend
   - nodata() for trapped parameters
   - everything for PostgreSQL
 
 Changes for 1.0beta6:
+
+ - added table service_alarms (Alexei)
 
  - fixed problem with parsing of trigger expressions. [.-.] changed
  to - (Alexei)
