@@ -54,12 +54,12 @@
 	echo "<input name=\"smtp_email\" value=\"".$config["smtp_email"]."\"size=40>";
 
 	show_table2_v_delimiter();
-	echo "Do not keep alerts older than (in sec)";
+	echo "Do not keep alerts older than (in days)";
 	show_table2_h_delimiter();
 	echo "<input name=\"alert_history\" value=\"".$config["alert_history"]."\"size=8>";
 
 	show_table2_v_delimiter();
-	echo "Do not keep alarms older than (in sec)";
+	echo "Do not keep alarms older than (in days)";
 	show_table2_h_delimiter();
 	echo "<input name=\"alarm_history\" value=\"".$config["alarm_history"]."\"size=8>";
 

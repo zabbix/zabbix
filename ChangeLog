@@ -1,6 +1,6 @@
 Not ready yet:
 
-[ CORE. Apply patch for DB unavailability ]]
+[ CORE. Apply patch for DB unavailability ]
 
 [ HB. Authorisation without user name/password ]
 [ CORE. Support for Service Tree ] 
@@ -8,11 +8,7 @@ Not ready yet:
 [ CORE. Change trigger status in case if host/item status is changed ]
 [ PHP. Navigation by time period for graphs and trends ]
 
-[ CORE. Support for automake ]
-
 [ TESTING. Define procedure for regression testing ]
-
-[ CORE. Get rid of all numerics constants in the code ]
 
 [ PHP. Show triggers by userid ]
 [ PHP. Split include/common.inc ]
@@ -20,11 +16,6 @@ Not ready yet:
 
 [ CORE. Change sleep to usleep in zabbix_suckerd ]
 [ CORE. Make one suckerd to send emails ]
-
-[ DOCS. All parameters should contain section "How can be used" in the Manual ]
-
-[ HB. zabbix_suckerd core dumps occasionally ]
-[ HB. SNMP code core dumps occasionally ]
 
 [ DOCS. SNMP with missing MIB files can be used by:
 snmpget -On localhost public enterprises.ucdavis.memory.memTotalSwap.0]
@@ -34,6 +25,8 @@ snmpget -On localhost public enterprises.ucdavis.memory.memTotalSwap.0]
 
 Changes for 1.0beta4:
 
+ - housekeeping period for alarms and alerts to be set in days (Alexei)
+ - created directory upgrades/dbpatches/1.0beta3_to_1.0beta4 (Alexei)
  - more anvanced algorithm for updating disable_until field (Alexei)
  - problem with "Lost connection to DB" solved (Alexei)
  - function DBis_empty(), code cleanup (Alexei)
