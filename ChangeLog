@@ -1,5 +1,6 @@
 Changes for 1.0alpha11:
 
+ - added support for swap[free] and swap[total] for Solaris (Alexei)
  - added define HAVE_PROC_LOADAVG (Alexei)
  - parameter tcp_count is not supported anymore (Alexei)
  - no warnings for bcopy anymore under Solaris (Alexei)
