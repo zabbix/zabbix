@@ -1,3 +1,7 @@
+Changes for 1.0beta10:
+
+ - fixed compilation of the agent under FreeBSD (Alexei)
+
 Changes for 1.0beta9:
 
  - added severity to media definition (Alexei)

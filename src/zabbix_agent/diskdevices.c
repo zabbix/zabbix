@@ -47,9 +47,10 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
-
 /* for minor(), major() under Solaris */
-#include <sys/sysmacros.h>
+#ifdef HAVE_SYS_SYSMACROS_H
+	#include <sys/sysmacros.h>
+#endif
 
 /* Required for getpwuid */
 #include <pwd.h>
