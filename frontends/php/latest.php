@@ -110,7 +110,7 @@
 #		echo "<a href=\"latest.php?hostid=$hostid\">$host</a>";
 #		show_table3_v_delimiter();
 
-		echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" cellspacing=1 cellpadding=3>";
+		echo "<TABLE BORDER=0 COLS=4 WIDTH=100% cellspacing=1 cellpadding=3>";
 		cr();
 		echo "<TR BGCOLOR=\"CCCCCC\">";
 		cr();
@@ -135,29 +135,29 @@
 		}
 		if(isset($sort)&&($sort=="lastcheck"))
 		{
-			echo "<TD WIDTH=\"12%\"><B>LAST CHECK</B></TD>";
+			echo "<TD WIDTH=12%><B>LAST CHECK</B></TD>";
 		}
 		else
 		{
 			if(isset($select))
 			{
-				echo "<TD WIDTH=\"12%\"><B><a href=\"latest.php?select=$select&sort=lastcheck\">Last check</B></TD>";
+				echo "<TD WIDTH=12%><B><a href=\"latest.php?select=$select&sort=lastcheck\">Last check</B></TD>";
 			}
 			else
 			{
-				echo "<TD WIDTH=\"12%\"><B><a href=\"latest.php?hostid=$hostid&sort=lastcheck\">Last check</B></TD>";
+				echo "<TD WIDTH=12%><B><a href=\"latest.php?hostid=$hostid&sort=lastcheck\">Last check</B></TD>";
 			}
 		}
 		cr();
-		echo "<TD WIDTH=\"10%\" NOSAVE><B>Last value</B></TD>"; 
+		echo "<TD WIDTH=10%><B>Last value</B></TD>"; 
 		cr();
-		echo "<TD WIDTH=\"5%\" NOSAVE><B>Change</B></TD>"; 
+		echo "<TD WIDTH=5%><B>Change</B></TD>"; 
 		cr();
-		echo "<TD WIDTH=\"5%\" NOSAVE><center><B>History</B></center></TD>";
+		echo "<TD WIDTH=5% align=center><B>History</B></TD>";
 		cr();
-		echo "<TD WIDTH=\"5%\" NOSAVE><center><B>Trends</B></center></TD>";
+		echo "<TD WIDTH=5% align=center><B>Trends</B></TD>";
 		cr();
-		echo "<TD WIDTH=\"5%\" NOSAVE><center><B>Compare</B></center></TD>";
+		echo "<TD WIDTH=5% align=center><B>Compare</B></TD>";
 		cr();
 		echo "</TR>";
 		cr();
@@ -217,12 +217,11 @@
 
 			if(!isset($row["lastclock"]))
 			{
-				echo "<center>-</center>";
+				echo "<div align=center>-</div>";
 			}
 			else
 			{
 				echo date("d M H:i:s",$row["lastclock"]);
-//				echo date("H:i:s",$row["lastclock"]);
 			}
 			echo "</font></td>";
 
@@ -246,7 +245,7 @@
 			}
 			else
 			{
-				echo "<td><center>-</center></td>";
+				echo "<td align=center>-</td>";
 			}
 			if( isset($row["lastvalue"]) && isset($row["prevvalue"]) && $row["lastvalue"]-$row["prevvalue"] != 0 )
 			{
@@ -254,31 +253,31 @@
 			}
 			else
 			{
-				echo "<td><center>-</center></td>";
+				echo "<td align=center>-</td>";
 			}
 			if($row["value_type"]==0)
 			{
-				echo "<td><center><a href=\"history.php?action=showhistory&itemid=".$row["itemid"]."\">Show</a></center></td>";
+				echo "<td align=center><a href=\"history.php?action=showhistory&itemid=".$row["itemid"]."\">Show</a></td>";
 			}
 			else
 			{
-				echo "<td><center><a href=\"history.php?action=showvalues&period=3600&itemid=".$row["itemid"]."\">Show</a></center></td>";
+				echo "<td align=center><a href=\"history.php?action=showvalues&period=3600&itemid=".$row["itemid"]."\">Show</a></td>";
 			}
 			if($row["value_type"]==0)
 			{
-				echo "<td><center><a href=\"trends.php?itemid=".$row["itemid"]."\">Show</a></center></td>";
+				echo "<td align=center><a href=\"trends.php?itemid=".$row["itemid"]."\">Show</a></td>";
 			}
 			else
 			{
-				echo "<td><center>Show</center></td>";
+				echo "<td align=center>Show</td>";
 			}
 			if($row["value_type"]==0)
 			{
-				echo "<td><center><a href=\"compare.php?itemid=".$row["itemid"]."\">Show</a></center></td>";
+				echo "<td align=center><a href=\"compare.php?itemid=".$row["itemid"]."\">Show</a></td>";
 			}
 			else
 			{
-				echo "<td><center>Show</center></td>";
+				echo "<td align=center>Show</td>";
 			}
 			echo "</tr>";
 		}

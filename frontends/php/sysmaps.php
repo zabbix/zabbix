@@ -43,16 +43,15 @@
 
 <?
 	show_table_header("NETWORK MAPS");
-	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Id</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Name</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Width</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Height</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Actions</B></TD>";
+	echo "<TABLE BORDER=0 align=center COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TD WIDTH=10% NOSAVE><B>Id</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Name</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Width</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Height</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
 	$result=DBselect("select s.sysmapid,s.name,s.width,s.height from sysmaps s order by s.name");
-	echo "<CENTER>";
 	$col=0;
 	while($row=DBfetch($result))
 	{

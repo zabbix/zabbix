@@ -1,3 +1,6 @@
+/* Define if you havnt socklen_t type */
+#undef socklen_t
+
 /* Define if filesystem /proc exists */
 #undef HAVE_PROC
 

@@ -49,12 +49,11 @@
 	}
 	$result=DBselect($sql);
 
-	echo "<CENTER>";
-	echo "<TABLE WIDTH=100% BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TABLE WIDTH=100% align=center BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR>";
-	echo "<TD width=\"20%\"><b>Time</b></TD>";
+	echo "<TD width=20%><b>Time</b></TD>";
 	echo "<TD><b>Description</b></TD>";
-	echo "<TD width=\"10%\"><b>Value</b></TD>";
+	echo "<TD width=10%><b>Value</b></TD>";
 	echo "</TR>";
 	$col=0;
 	$i=0;
@@ -99,7 +98,7 @@
 ?>
 </FONT>
 </TR>
-</TABLE></CENTER>
+</TABLE>
 
 <?
 	show_footer();

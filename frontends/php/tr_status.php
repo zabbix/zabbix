@@ -239,10 +239,10 @@
 			if($priority==4) $p4=$count;
 			if($priority==5) $p5=$count;
 		}
-		echo "\n<TABLE BORDER=0 COLS=6 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=0>";
+		echo "\n<TABLE BORDER=0 COLS=6 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=0>";
 		echo "<TR ALIGN=CENTER>";
 		echo "<TD><B>Not classified: $p0</B></TD>";
-		echo "<TD><B>Just information: $p1</B></TD>";
+		echo "<TD><B>Information: $p1</B></TD>";
 		echo "<TD><B>Warning: $p2</B></TD>";
 		echo "<TD BGCOLOR=#DDAAAA><B>Average: $p3</B></TD>";
 		echo "<TD BGCOLOR=#FF8888><B>High: $p4</B></TD>";
@@ -255,7 +255,7 @@
 		show_table_header("<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&fullscreen=1&sort=$sort\">TRIGGERS $time</A>");
 	}
   
-	echo "<TABLE BORDER=0 COLS=5 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TABLE BORDER=0 COLS=5 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 
 	echo "<TR ALIGN=CENTER>";
 	if(isset($fullscreen))
@@ -277,20 +277,20 @@
 	if($compact!='true') {echo "<BR><FONT SIZE=-1>Expression</FONT></B>";}
 	echo "</TD>";
 
-	echo "<TD WIDTH=\"5%\"><B>Status</B></TD>";
+	echo "<TD WIDTH=5%><B>Status</B></TD>";
 
 	if(!isset($sort)||(isset($sort) && $sort=="priority"))
 	{
-		echo "<TD WIDTH=\"9%\" ALIGN=CENTER><B>PRIORITY</B></TD>";
+		echo "<TD WIDTH=9% ALIGN=CENTER><B>PRIORITY</B></TD>";
 	}
 	else
 	{
 		echo "<TD ALIGN=CENTER><B><A HREF=\"tr_status.php?sort=priority&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">Priority</a>";
 	}
 	if($noactions=='true')
-		echo "<TD WIDTH=\"12%\" ALIGN=CENTER>";
+		echo "<TD WIDTH=12% ALIGN=CENTER>";
 	else
-		echo "<TD WIDTH=\"5%\" ALIGN=CENTER>";
+		echo "<TD WIDTH=5% ALIGN=CENTER>";
 
 	if(isset($sort) && $sort=="lastchange")
 	{
@@ -304,9 +304,9 @@
    
 	if($noactions!='true')
 	{  
-		echo "<TD WIDTH=\"8%\" NOSAVE><B>Actions</B></TD>";
+		echo "<TD WIDTH=8% NOSAVE><B>Actions</B></TD>";
 	}
-	echo "<TD WIDTH=\"9%\"><B>Comments</B></TD>";
+	echo "<TD WIDTH=9%><B>Comments</B></TD>";
 	echo "</TR>\n";
 
 	if(isset($hostid))
@@ -391,15 +391,25 @@
 			echo "<BR><FONT COLOR=\"#000000\" SIZE=-2>".explode_exp($row["expression"],1)."</FONT>";
 		}
 		echo "</TD>";
-		if($row["value"]==0)
-			{ echo "<TD ALIGN=CENTER><FONT COLOR=\"00AA00\">FALSE</FONT></TD>";}
-		else if($row["value"]==2)
-			{  echo "<TD ALIGN=CENTER><FONT COLOR=\"AAAAAA\">UNKNOWN</FONT></TD>"; }
+		if( (time(NULL)-$row["lastchange"])<60)
+		{
+			$blink1="<blink>";
+			$blink2="</blink>";
+		}
 		else
-			{  echo "<TD ALIGN=CENTER><FONT COLOR=\"AA0000\">TRUE</FONT></TD>"; }
+		{
+			$blink1="";
+			$blink2="";
+		}
+		if($row["value"]==0)
+			{ echo "<TD ALIGN=CENTER>$blink1<FONT COLOR=\"00AA00\">FALSE</FONT>$blink2</TD>";}
+		else if($row["value"]==2)
+			{  echo "<TD ALIGN=CENTER>$blink1<FONT COLOR=\"AAAAAA\">UNKNOWN</FONT>$blink2</TD>"; }
+		else
+			{  echo "<TD ALIGN=CENTER>$blink1<FONT COLOR=\"AA0000\">TRUE</FONT>$blink2</TD>"; }
 
 		if($row["priority"]==0)		echo "<TD ALIGN=CENTER>Not classified</TD>";
-		elseif($row["priority"]==1)	echo "<TD ALIGN=CENTER>Just information</TD>";
+		elseif($row["priority"]==1)	echo "<TD ALIGN=CENTER>Information</TD>";
 		elseif($row["priority"]==2)	echo "<TD ALIGN=CENTER>Warning</TD>";
 		elseif($row["priority"]==3)	echo "<TD ALIGN=CENTER BGCOLOR=#DDAAAA>Average</TD>";
 		elseif($row["priority"]==4)	echo "<TD ALIGN=CENTER BGCOLOR=#FF8888>High</TD>";

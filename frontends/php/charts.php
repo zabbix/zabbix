@@ -87,13 +87,13 @@
 	}
 
 	show_table_header($map);
-	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TABLE BORDER=0 align=center COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR BGCOLOR=#EEEEEE>";
 	echo "<TR BGCOLOR=#DDDDDD>";
 	echo "<TD ALIGN=CENTER>";
 	if(isset($graphid))
 	{
-		echo "<IMG ALIGH=CENTER SRC=\"chart2.php?graphid=$graphid&period=$period&from=$from\">";
+		echo "<IMG SRC=\"chart2.php?graphid=$graphid&period=$period&from=$from\">";
 	}
 	else
 	{
@@ -105,7 +105,7 @@
 
 	if(isset($graphid)&&(!isset($fullscreen)))
 	{
-		echo("<center>");
+		echo("<div align=center>");
 		echo("<hr>");
 		$tmp=$from+12*14;
 		echo("[<A HREF=\"charts.php?graphid=$graphid&from=$tmp&period=$period\">");
@@ -165,7 +165,7 @@
 		{
 			echo("[Week forward]");
 		}
-		echo("</center>");
+		echo("</div>");
 	}
 	
 ?>

@@ -240,7 +240,7 @@ void	update_functions(DB_ITEM *item)
 /*
  * Send email
  */ 
-int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,char *mailsubject,char *mailbody)
+int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,char *mailsubject,char *mailbody)
 {
 	int	s;
 	int	i,e;
@@ -728,10 +728,11 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 			if(trigger.value != TRIGGER_VALUE_TRUE)
 			{
 				now = time(NULL);
-				sprintf(sql,"update triggers set value=%d, lastchange=%d where triggerid=%d",TRIGGER_VALUE_TRUE,now,trigger.triggerid);
+				DBupdate_trigger_value(trigger.triggerid,TRIGGER_VALUE_TRUE,now);
+/*				sprintf(sql,"update triggers set value=%d, lastchange=%d where triggerid=%d",TRIGGER_VALUE_TRUE,now,trigger.triggerid);
 				DBexecute(sql);
 
-				DBadd_alarm(trigger.triggerid, TRIGGER_VALUE_TRUE, now);
+				DBadd_alarm(trigger.triggerid, TRIGGER_VALUE_TRUE, now);*/
 			}
 			if((trigger.value == TRIGGER_VALUE_FALSE)
 			||
@@ -755,10 +756,12 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 			if(trigger.value != TRIGGER_VALUE_FALSE)
 			{
 				now = time(NULL);
-				sprintf(sql,"update triggers set value=%d, lastchange=%d where triggerid=%d",TRIGGER_VALUE_FALSE,now,trigger.triggerid);
+				DBupdate_trigger_value(trigger.triggerid,TRIGGER_VALUE_FALSE,now);
+
+/*				sprintf(sql,"update triggers set value=%d, lastchange=%d where triggerid=%d",TRIGGER_VALUE_FALSE,now,trigger.triggerid);
 				DBexecute(sql);
 
-				DBadd_alarm(trigger.triggerid, TRIGGER_VALUE_FALSE,now);
+				DBadd_alarm(trigger.triggerid, TRIGGER_VALUE_FALSE,now);*/
 			}
 
 			if((trigger.value == TRIGGER_VALUE_TRUE)

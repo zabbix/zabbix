@@ -47,7 +47,7 @@
 	$result=DBselect("select name from sysmaps where sysmapid=$sysmapid");
 	$map=DBget_field($result,0,0);
 	show_table_header($map);
-	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR BGCOLOR=#DDDDDD>";
 	echo "<TD ALIGN=CENTER>";
 	if(isset($sysmapid))
@@ -77,17 +77,16 @@
 	echo "</TABLE>";
 
 	show_table_header("DISPLAYED HOSTS");
-	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Host</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Label</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>X</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Y</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Icon</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Actions</B></TD>";
+	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TD WIDTH=10% NOSAVE><B>Host</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Label</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>X</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Y</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Icon</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
 	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,sh.icon from sysmaps_hosts sh,hosts h where sh.sysmapid=$sysmapid and h.hostid=sh.hostid order by h.host");
-	echo "<CENTER>";
 	$col=0;
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
@@ -123,14 +122,13 @@
 
 <?
 	show_table_header("CONNECTORS");
-	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Host 1</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Host 2</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Actions</B></TD>";
+	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TD WIDTH=10% NOSAVE><B>Host 1</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Host 2</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
 	$result=DBselect("select linkid,shostid1,shostid2 from sysmaps_links where sysmapid=$sysmapid order by linkid");
-	echo "<CENTER>";
 	$col=0;
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{

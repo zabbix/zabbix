@@ -1,5 +1,7 @@
 /*#define TESTTEST*/
 
+#define	IT_HELPDESK
+
 #ifndef ZABBIX_COMMON_H
 #define ZABBIX_COMMON_H
  

@@ -354,7 +354,7 @@ int	latest_alarm(int triggerid, int status)
 	return ret;
 }
 
-int	DBadd_alarm(int triggerid,int status,int clock)
+int	add_alarm(int triggerid,int status,int clock)
 {
 	char	sql[MAX_STRING_LEN+1];
 
@@ -374,16 +374,25 @@ int	DBadd_alarm(int triggerid,int status,int clock)
 	return SUCCEED;
 }
 
-int	update_trigger_value(int triggerid,int value,int clock)
+#ifdef	IT_HELPDESK
+void	update_problems(int triggerid, int value, int clock)
+{
+}
+#endif
+
+int	DBupdate_trigger_value(int triggerid,int value,int clock)
 {
 	char	sql[MAX_STRING_LEN+1];
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value()");
-	DBadd_alarm(triggerid,value,clock);
+	add_alarm(triggerid,value,clock);
 
-	sprintf(sql,"update triggers set value=%d where triggerid=%d",value,triggerid);
-	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
+	sprintf(sql,"update triggers set value=%d,lastchange=%d where triggerid=%d",value,clock,triggerid);
 	DBexecute(sql);
+
+#ifdef	IT_HELPDESK
+	update_problems(triggerid,value,clock);
+#endif
 
 	zabbix_log(LOG_LEVEL_DEBUG,"End of update_trigger_value()");
 	return SUCCEED;
@@ -406,7 +415,7 @@ void update_triggers_status_to_unknown(int hostid,int clock)
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 		triggerid=atoi(DBget_field(result,i,0));
-		update_trigger_value(triggerid,TRIGGER_VALUE_UNKNOWN,clock);
+		DBupdate_trigger_value(triggerid,TRIGGER_VALUE_UNKNOWN,clock);
 	}
 
 	DBfree_result(result);
@@ -450,7 +459,7 @@ void DBupdate_triggers_status_after_restart(void)
 		lastchange=atoi(DBget_field(result2,0,0));
 		DBfree_result(result2);
 
-		update_trigger_value(triggerid,TRIGGER_VALUE_UNKNOWN,lastchange);
+		DBupdate_trigger_value(triggerid,TRIGGER_VALUE_UNKNOWN,lastchange);
 	}
 
 	DBfree_result(result);

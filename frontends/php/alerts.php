@@ -49,13 +49,12 @@
 	}
 	$result=DBselect($sql);
 
-	echo "<CENTER>";
-	echo "<TABLE WIDTH=100% BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TABLE WIDTH=100% align=center BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR>";
-	echo "<TD WIDTH=\"10%\"><b>Time</b></TD>";
-	echo "<TD WIDTH=\"5%\"><b>Type</b></TD>";
-	echo "<TD WIDTH=\"5%\"><b>Status</b></TD>";
-	echo "<TD WIDTH=\"15%\"><b>Recipient(s)</b></TD>";
+	echo "<TD WIDTH=10%><b>Time</b></TD>";
+	echo "<TD WIDTH=5%><b>Type</b></TD>";
+	echo "<TD WIDTH=5%><b>Status</b></TD>";
+	echo "<TD WIDTH=15%><b>Recipient(s)</b></TD>";
 	echo "<TD><b>Subject</b></TD>";
 	echo "<TD><b>Message</b></TD>";
 	echo "</TR>";
@@ -96,19 +95,20 @@
 			echo "<TD><font color=\"AA0000\">not sent</font></TD>";
 		}
 		echo "<TD>".$row["sendto"]."</TD>";
-		echo "<TD>".$row["subject"]."</TD>";
+		echo "<TD><pre>".$row["subject"]."</pre></TD>";
 		echo "<TD>";
-		for($i=0;$i<strlen($row["message"]);$i++)
-		{
-			if($row["message"][$i]=="\n")
-			{
-				echo "<br>";
-			}
-			else
-			{
-				echo $row["message"][$i];
-			}
-		}
+		echo "<pre>".$row["message"]."</pre>";;
+//		for($i=0;$i<strlen($row["message"]);$i++)
+//		{
+//			if($row["message"][$i]=="\n")
+//			{
+//				echo "<br>";
+//			}
+//			else
+//			{
+//				echo $row["message"][$i];
+//			}
+//		}
 		echo "</TD>";
 		echo "</TR>";
 	}
@@ -116,7 +116,7 @@
 ?>
 </FONT>
 </TR>
-</TABLE></CENTER>
+</TABLE>
 
 <?
 	show_footer();

@@ -39,15 +39,10 @@
 	}
 	else
 	{
-		echo "<center>";
+		echo "<div align=center>";
 		echo "Press <a href=\"index.php?reconnect=1\">here</a> to disconnect/reconnect";
-		echo "</center>";
+		echo "</div>";
 	}	
-//	echo "<center>";
-//	echo "<font face=\"arial,helvetica\" size=2>";
-//	echo "Connected as ".$USER_DETAILS["alias"]."</b>";
-//	echo "</font>";
-//	echo "</center>";
 ?>
 
 <?

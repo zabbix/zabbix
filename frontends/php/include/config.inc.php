@@ -5,6 +5,14 @@
 	$USER_DETAILS	="";
 	$ERROR_MSG	="";
 
+	function	get_media_count_by_userid($userid)
+	{
+		$sql="select count(*) as cnt from media where userid=$userid";
+		$result=DBselect($sql);
+		$row=DBfetch($result);
+		return $row["cnt"]; 
+	}
+
 	function	check_right($right,$permission,$id)
 	{
 		global $USER_DETAILS;
@@ -586,12 +594,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 ?>
 
-	<table border=0 cellspacing=0 cellpadding=0 width="100%" bgcolor=000000>
+	<table border=0 cellspacing=0 cellpadding=0 width=100% bgcolor=000000>
 	<tr>
 	<td valign="top">
-		<table width="100%" border=0 cellspacing=1 cellpadding=3>
+		<table width=100% border=0 cellspacing=1 cellpadding=3>
 		<tr>
-		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Host","R",0))
@@ -610,7 +618,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 			</font>
 		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
+		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
 			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Host","R",0))
@@ -628,7 +636,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 			</font>
 		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
+		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
 			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Host","R",0))
@@ -646,7 +654,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 			</font>
 		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
+		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
 			<font face="Arial,Helvetica" size=2>
 				<a href="latestalarms.php">
 <?
@@ -662,7 +670,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 			</font>
 		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 			<font face="Arial,Helvetica" size=2>
 				<a href="alerts.php">
 <?
@@ -677,7 +685,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 			</font>
 		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 			<font face="Arial,Helvetica" size=2>
 				<a href="maps.php">
 <?
@@ -692,7 +700,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 			</font>
 		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 			<font face="Arial,Helvetica" size=2>
 				<a href="charts.php">
 <?
@@ -708,7 +716,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			</font>
 		</td>
 
-		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Service","R",0))
@@ -727,9 +735,28 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			</font>
 		</td>
 
+		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
+			<font face="Arial,Helvetica" size=2>
+<?
+				if(check_right("Helpdesk","R",0))
+				{
+					echo "<a href=\"helpdesk.php\">";
+				}
+				if($page["file"]=="helpdesk.php")
+				{
+					echo "<b>[IT HELPDESK]</b></a>";
+				}
+				else
+				{
+					echo "IT HELPDESK</a>";
+				}
+?>
+			</font>
+		</td>
 		</tr>
+
 		<tr>
-		<td colspan=2 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
 			<font face="Arial,Helvetica" size=2>
 				<a href="index.php">
 <?
@@ -744,7 +771,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 			</font>
 		</td>
-		<td colspan=2 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
 			<font face="Arial,Helvetica" size=2>
 				<a href="about.php">
 <?
@@ -759,7 +786,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 			</font>
 		</td>
-		<td colspan=2 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
 			<font face="Arial,Helvetica" size=2>
 				<a href="report1.php">
 <?
@@ -774,7 +801,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 			</font>
 		</td>
-		<td colspan=2 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=3 bgcolor=FFFFFF align=center valign=top width=15%>
 			<font face="Arial,Helvetica" size=2>
 				<a href="report2.php">
 <?
@@ -808,7 +835,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 ?>
 		<tr>
-		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Configuration of Zabbix","U",0))
@@ -826,7 +853,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 			</font>
 		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
+		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
 			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("User","U",0))
@@ -845,7 +872,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 			</font>
 		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
+		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
 			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Host","U",0))
@@ -863,7 +890,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 			</font>
 		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
+		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
 			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Host","U",0))
@@ -881,7 +908,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 			</font>
 		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Host","U",0))
@@ -900,7 +927,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 			</font>
 		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Network map","U",0))
@@ -919,7 +946,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 			</font>
 		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Graph","U",0))
@@ -939,7 +966,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			</font>
 		</td>
 
-		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Service","U",0))
@@ -957,6 +984,26 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 			</font>
 		</td>
+
+		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
+			<font face="Arial,Helvetica" size=2>
+<?
+				if(check_right("Helpdesk","U",0))
+				{
+					echo "<a href=\"helpdesk.php\">";
+				}
+				if($page["file"]=="helpdesk.php")
+				{
+					echo "<b>[IT HELPDESK]</b></a>";
+				}
+				else
+				{
+					echo "IT HELPDESK</a>";
+				}
+?>
+			</font>
+		</td>
+
 		</tr>
 <?
 // THird row
@@ -1296,6 +1343,39 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
 
+	# Return TRUE if triggerid is a reason why the service is not OK
+	# Warning: recursive function
+	function	does_service_depend_on_the_service($serviceid,$serviceid2)
+	{
+#		echo "Serviceid:$serviceid Triggerid:$serviceid2<br>";
+		$service=get_service_by_serviceid($serviceid);
+#		echo "Service status:".$service["status"]."<br>";
+		if($service["status"]==0)
+		{
+			return	FALSE;
+		}
+		if($serviceid==$serviceid2)
+		{
+			if($service["status"]>0)
+			{
+				return TRUE;
+			}
+			
+		}
+
+		$sql="select serviceupid from services_links where servicedownid=$serviceid2 and soft=0";
+#		echo $sql."<br>";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			if(does_service_depend_on_the_service($serviceid,$row["serviceupid"]) == TRUE)
+			{
+				return	TRUE;
+			}
+		}
+		return	FALSE;
+	}
+
 	function	service_has_parent($serviceid)
 	{
 		$sql="select count(*) from services_links where servicedownid=$serviceid";
@@ -1366,7 +1446,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	add_host_to_services($hostid,$serviceid)
 	{
-		$sql="select t.triggerid,t.description from triggers t,hosts h,items i,functions f where h.hostid=$hostid and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid";
+		$sql="select distinct t.triggerid,t.description from triggers t,hosts h,items i,functions f where h.hostid=$hostid and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
@@ -2300,15 +2380,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	show_table2_header_begin()
 	{
-		echo "<center>";
-		cr();
-		echo "<table border=0 cellspacing=0 cellpadding=0 width=\"50%\" bgcolor=000000>";
+		echo "<table border=0 align=center cellspacing=0 cellpadding=0 width=50% bgcolor=000000>";
 		cr();
 		echo "<tr>";
 		cr();
 		echo "<td valign=\"top\">";
 		cr();
-		echo "<table width=\"100%\" border=0 cellspacing=1 cellpadding=3>";
+		echo "<table width=100% border=0 cellspacing=1 cellpadding=3>";
 		cr();
 		echo "<tr>";
 		cr();
@@ -2320,13 +2398,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	show_table_header_begin()
 	{
-		echo "<table border=0 cellspacing=0 cellpadding=0 width=\"100%\" bgcolor=000000>";
+		echo "<table border=0 align=center cellspacing=0 cellpadding=0 width=100% bgcolor=000000>";
 		cr();
 		echo "<tr>";
 		cr();
 		echo "<td valign=\"top\">";
 		cr();
-		echo "<table width=\"100%\" border=0 cellspacing=1 cellpadding=3>";
+		echo "<table width=100% border=0 cellspacing=1 cellpadding=3>";
 		cr();
 		echo "<tr>";
 		cr();
@@ -2351,8 +2429,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "</tr>";
 		cr();
 		echo "</table>";
-		cr();
-		echo "</center>";
 		cr();
 	}
 
@@ -2536,7 +2612,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 //		echo("<hr>");
 		echo "<center>";
-		echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+		echo "<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 		echo "<TR BGCOLOR=#EEEEEE>";
 		echo "<TR BGCOLOR=#DDDDDD>";
 		echo "<TD ALIGN=CENTER>";
@@ -2922,6 +2998,55 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		show_table2_header_end();
 	}
 
+	# Insert form for Problem
+	function	insert_problem_form($problemid)
+	{
+		echo "<br>";
+
+		show_table2_header_begin();
+		echo "Problem definition";
+		show_table2_v_delimiter();
+		echo "<form method=\"post\" action=\"helpdesk.php\">";
+		echo "<input name=\"problemid\" type=hidden value=$problemid size=8>";
+		echo "Description";
+		show_table2_h_delimiter();
+		echo "<input name=\"description\" value=\"$description\" size=70>";
+
+		show_table2_v_delimiter();
+		echo "Priority";
+		show_table2_h_delimiter();
+		echo "<SELECT NAME=\"priority\" size=\"1\">";
+		echo "<OPTION VALUE=\"0\" "; if($priority==0) echo "SELECTED"; echo ">Not classified";
+		echo "<OPTION VALUE=\"1\" "; if($priority==1) echo "SELECTED"; echo ">Information";
+		echo "<OPTION VALUE=\"2\" "; if($priority==2) echo "SELECTED"; echo ">Warning";
+		echo "<OPTION VALUE=\"3\" "; if($priority==3) echo "SELECTED"; echo ">Average";
+		echo "<OPTION VALUE=\"4\" "; if($priority==4) echo "SELECTED"; echo ">High";
+		echo "<OPTION VALUE=\"5\" "; if($priority==5) echo "SELECTED"; echo ">Disaster";
+		echo "</SELECT>";
+
+		show_table2_v_delimiter();
+		echo "Status";
+		show_table2_h_delimiter();
+		echo "<SELECT NAME=\"status\" value=\"$status\" size=\"1\">";
+		echo "<OPTION VALUE=\"0\"";
+		if($status==0) echo "SELECTED";
+		echo ">Opened";
+		echo "<OPTION VALUE=\"1\"";
+		if($status==1) echo "SELECTED";
+		echo ">Closed";
+		echo "</SELECT>";
+
+		show_table2_v_delimiter2();
+		echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+		if(isset($problemid))
+		{
+			echo "<input type=\"submit\" name=\"register\" value=\"update\">";
+			echo "<input type=\"submit\" name=\"register\" value=\"delete\">";
+		}
+
+		show_table2_header_end();
+	}
+
 	# Insert form for Trigger
 	function	insert_trigger_form($hostid,$triggerid)
 	{
@@ -2975,7 +3100,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		show_table2_h_delimiter();
 		echo "<SELECT NAME=\"priority\" size=\"1\">";
 		echo "<OPTION VALUE=\"0\" "; if($priority==0) echo "SELECTED"; echo ">Not classified";
-		echo "<OPTION VALUE=\"1\" "; if($priority==1) echo "SELECTED"; echo ">Just for information";
+		echo "<OPTION VALUE=\"1\" "; if($priority==1) echo "SELECTED"; echo ">Information";
 		echo "<OPTION VALUE=\"2\" "; if($priority==2) echo "SELECTED"; echo ">Warning";
 		echo "<OPTION VALUE=\"3\" "; if($priority==3) echo "SELECTED"; echo ">Average";
 		echo "<OPTION VALUE=\"4\" "; if($priority==4) echo "SELECTED"; echo ">High";
@@ -3090,16 +3215,16 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		global $USER_DETAILS;
 
 		echo "<br>";
-		echo "<table border=0 cellpadding=1 cellspacing=0 width=\"100%\" align=center>";
+		echo "<table border=0 cellpadding=1 cellspacing=0 width=100% align=center>";
 		echo "<tr>";
 		echo "<td bgcolor=\"#000000\">";
-		echo "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\" width=\"100%\" bgcolor=\"#666666\">";
+		echo "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\" width=100% bgcolor=\"#666666\">";
 		echo "<tr><td align=center>";
 		echo "<font face=\"Arial,Helvetica\" size=1>";
 		echo "<a href=\"http://zabbix.sourceforge.net\">ZABBIX</a> Copyright 2000,2001,2002 by <a href=\"mailto:alex@gobbo.caves.lv\">Alexei Vladishev</a>";
 		echo "</font>";
 		echo "</td>";
-		echo "<td align=right width=\"15%\">";
+		echo "<td align=right width=15%>";
 		echo "<font size=-1>| Connected as ".$USER_DETAILS["alias"];
 		echo "</td>";
 		echo "</tr>";

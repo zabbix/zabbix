@@ -68,8 +68,8 @@
 	echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";
 	echo "<tr>";
 	echo "<td><b>Service</b></td>";
-	echo "<td width=\"20%\"><b>Status calculation</b></td>";
-	echo "<td width=\"10%\"><b>Actions</b></td>";
+	echo "<td width=20%><b>Status calculation</b></td>";
+	echo "<td width=10%><b>Actions</b></td>";
 	echo "</tr>";
 
 	$col=0;

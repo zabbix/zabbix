@@ -722,7 +722,7 @@ A
 connection to ISP provider
 \layout Enumerate
 
-disk space o volume /data on server 
+disk space on volume /data on server 
 \series bold 
 A
 \layout Enumerate
@@ -801,6 +801,9 @@ AIX 4.3
 \layout Itemize
 
 FreeBSD 4.3
+\layout Itemize
+
+SCO OpenServer 5.0.5
 \layout Standard
 
 Note that 
@@ -11163,61 +11166,145 @@ The menu item is used to set global
 Zabbix
 \series default 
  parameters.
-\layout Description
-
-SMTP\SpecialChar ~
-SERVER
 \layout Standard
 
-Host name or IP address of SMTP server that will be used for sending emails.
-\layout Description
 
-Value\SpecialChar ~
-for\SpecialChar ~
-SMTP\SpecialChar ~
-HELO\SpecialChar ~
-authentification
+\begin_inset  Tabular
+<lyxtabular version="2" rows="4" columns="3">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
+<column alignment="left" valignment="top" leftline="false" rightline="true" width="10cm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
 \layout Standard
 
-Usually address of 
-\series bold 
-Zabbix
-\series default 
- server.
+Field
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
 \layout Standard
 
-Example: 
-\emph on 
-zabbix.sf.net
-\layout Description
+Mandatory
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
 
-Zabbix\SpecialChar ~
-email\SpecialChar ~
-address\SpecialChar ~
-to\SpecialChar ~
-send\SpecialChar ~
-emals\SpecialChar ~
-from
 \layout Standard
 
-Email address which will be used to fill field From: for all emails that
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+SMTP server
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Yes
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+IP address or name of SMTP server.
  
 \series bold 
-Zabbix
+Zabbix 
 \series default 
- will send.
-\layout Description
+sends all messages via this server.
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
 
-Password\SpecialChar ~
-required?
 \layout Standard
 
-If checked, user authorisation will be required for accessing any menu item
- of 
+Value for SMTP HELO auth.
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+No
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Usually set to domain name.
+ If not specified, 
 \series bold 
 Zabbix
 \series default 
- WEB front-end.
+ will not use HELO authentification.
+ Example: 
+\emph on 
+sourceforge.net.
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+
+\series bold 
+Zabbix
+\series default 
+ email address
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Yes
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+\align left 
+
+\series bold 
+Zabbix 
+\series default 
+uses this address as source address for all emails.
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
 \layout Subsubsection
 
 Reports
@@ -15976,6 +16063,62 @@ Browser should be configured to accept cookies.
 Zabbix 
 \series default 
 uses cookies to store session-related information.
+\layout Subsection
+
+Undefined references to 
+\emph on 
+compress 
+\emph default 
+and 
+\emph on 
+uncompress
+\layout Standard
+
+
+\family typewriter 
+\emph on 
+/usr/lib/libmysqlclient.a(my_compress.o): In function `my_uncompress':
+\layout Standard
+
+
+\family typewriter 
+\emph on 
+my_compress.o(.text+0xa1): undefined reference to `uncompress'
+\layout Standard
+
+
+\family typewriter 
+\emph on 
+/usr/lib/libmysqlclient.a(my_compress.o): In function `my_compress_alloc':
+\layout Standard
+
+
+\family typewriter 
+\emph on 
+my_compress.o(.text+0x138): undefined reference to `compress'
+\newline 
+
+\layout Itemize
+
+These messages indicate that 
+\emph on 
+./configure
+\emph default 
+ is unable to find 
+\emph on 
+libz
+\emph default 
+ installed.
+ The problem should appear only in case if flag 
+\emph on 
+--enable-static 
+\emph default 
+is specified.
+ Install package 
+\emph on 
+libz-dev 
+\emph default 
+package to ged rid of the problem.
 \layout Section
 
 How Zabbix Compares to Other Monitoring Software
@@ -16047,6 +16190,12 @@ Improved WEB interface
 \layout Subsection
 
 TODO (1.0 stable)
+\layout Itemize
+
+support for IT helpdesk
+\layout Itemize
+
+timeout for sending alerts
 \layout Itemize
 
 
@@ -16315,6 +16464,18 @@ ALEXANDER KALIMULIN
 \layout Standard
 
 Help with various issues related to C, C functions, etc
+\layout Itemize
+
+
+\noun on 
+ALEXANDER KIRHENSTEIN
+\layout Standard
+
+Suggested fixes to make 
+\series bold 
+Zabbix 
+\series default 
+work under SCO.
 \layout Itemize
 
 

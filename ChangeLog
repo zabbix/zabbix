@@ -1,10 +1,58 @@
 Not ready yet:
 
- - startup scripts
- - permissions for charts, graphs ,etc etc 
+ DISTRIBUTED MONITORING:
+
+ - leave for 1.0beta7
+
+ IT HELPDESK:
+
+ - responsible person (group of persons) for each problem
+ - update patch and schema for PostgreSQL. Test it!
+ - IT Helpdesk's problems to be connected to Services only (?)
+ - module structure for Zabbix. Some modules (as Services, Helpdesk) should be
+ made separate.
+
+ IT SERVICES:
+
+ - make IT Services stable
+ - think about service node types (some nodes will automatically register
+   problem)
+
+ OTHER:
+
+ - make links different if something is already registered (as for medias,
+   actions, etc)
+ - get rid of problems with ' and "
+ - add host groups (one to one or one to many?)
+ - add user groups
+ - high level Zabbix schema on paper !
+ - permissions for all *.php (charts, graphs , hosts, etc etc )
+ - add numeric constants to trigger expressions
+ - show who is online somewhere (in User config form?)
 
 Changes for 1.0beta6:
 
+ - added housekeeping procedure for table sessions (Alexei)
+ - changed width=\"X%\" to width=X% in *.php (Alexei)
+ - Status of a trigger will blink if it was changes during last 60
+ seconds (Alexei)
+ - Zabbix daemons to update triggers.lastchange when triggers.values 
+ is changed (Alexei)
+ - added misc/init.d/debian/zabbix-[suckerd|trapperd] (Alexei)
+ - removed misc/init.d/debian/zabbix-server (Alexei)
+ - send_email() will timeout after 10 seconds (Alexei)
+ - DBadd_alarm() renamed to add_alarm() (Alexei)
+ - support for SCO OpenServer (Alexei). Thanks to Alexender Kirhenstein.
+ - ./configure will correctly define socklen_t (Alexei) 
+ - <center> changed to <div align=center> (Alexei)
+ - reason of problem in screen IT Services (Alexei) 
+ - added frontends.php/helpdesk.php (Alexei)
+ - added tables: problems, problems_comments,categories (Alexei)
+ - added "...#form" to button Change in form Configuration of Users (Alexei)
+ - "Just for information" changed to "Information" (Alexei)
+ - fixed ./configure to correctly find zlib (Alexei)
+ - housekeeping to delete no more than HousekeepingFrequency*3600 records
+ from table history and history_str at once (MySQL only) (Alexei)
  - changed definition of functions.lastvalue to allow NULL (Alexei)
  - added upgrades/dbpatches/1.0beta5_to_1.0beta6/ with patches (Alexei)
  - added misc/init.d/debian/zabbix_agent (Alexei)
