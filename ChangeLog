@@ -1,5 +1,6 @@
 Changes for 1.1alpha2:
 
+ - support for cpu[idleX], cpu[userX], cpu[niceX], cpu[systemX] (Alexei)
  - fix for custom multiplier (Alexei)
  - use checkbox instead of lists in users.php (Alexei)
  - removed thread-related configuration options from configure.in (Alexei)
