@@ -1,5 +1,6 @@
-1.0beta11:
+1.0beta12:
 
+ - make session expiration time configurable in config.php
  - start&end time in time navigation
 
  - different colors and line styles for map connectors
