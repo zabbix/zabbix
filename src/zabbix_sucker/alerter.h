@@ -30,6 +30,6 @@ extern	char	*CONFIG_ALERT_SCRIPTS_PATH;
 
 extern	void	signal_handler( int sig );
 
-int alerter_loop();
+int main_alerter_loop();
 
 #endif

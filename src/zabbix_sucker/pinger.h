@@ -20,7 +20,7 @@
 #ifndef ZABBIX_PINGER_H
 #define ZABBIX_PINGER_H
 
-extern	int	CONFIG_SENDER_FREQUENCY;
+extern	int	CONFIG_PINGER_FREQUENCY;
 extern	char	*CONFIG_DBHOST;
 extern	char	*CONFIG_DBNAME;
 extern	char	*CONFIG_DBUSER;
@@ -30,6 +30,6 @@ extern	char	*CONFIG_ALERT_SCRIPTS_PATH;
 
 extern	void	signal_handler( int sig );
 
-int pinger_loop();
+int main_pinger_loop();
 
 #endif
