@@ -36,6 +36,20 @@ int	getPROC(char *file,int lineno,int fieldno, double *value);
 int	BUFFERSMEM(const char *cmd, const char *parameter,double  *value);
 int	CACHEDMEM(const char *cmd, const char *parameter,double  *value);
 int	CKSUM(const char *cmd, const char *filename,double  *value);
+
+int	CPUIDLE1(const char *cmd, const char *parameter,double  *value);
+int	CPUIDLE5(const char *cmd, const char *parameter,double  *value);
+int	CPUIDLE15(const char *cmd, const char *parameter,double  *value);
+int	CPUUSER1(const char *cmd, const char *parameter,double  *value);
+int	CPUUSER5(const char *cmd, const char *parameter,double  *value);
+int	CPUUSER15(const char *cmd, const char *parameter,double  *value);
+int	CPUNICE1(const char *cmd, const char *parameter,double  *value);
+int	CPUNICE5(const char *cmd, const char *parameter,double  *value);
+int	CPUNICE15(const char *cmd, const char *parameter,double  *value);
+int	CPUSYSTEM1(const char *cmd, const char *parameter,double  *value);
+int	CPUSYSTEM5(const char *cmd, const char *parameter,double  *value);
+int	CPUSYSTEM15(const char *cmd, const char *parameter,double  *value);
+
 int	FILESIZE(const char *cmd, const char *filename,double  *value);
 int	DISKTOTAL(const char *cmd, const char *mountPoint,double  *value);
 int	DISKFREE(const char *cmd, const char *mountPoint,double  *value);

@@ -90,7 +90,11 @@ void	report_stats_cpustat(FILE *file, int now)
 		cpu_nice=0,
 		cpu_nice1=0,
 		cpu_nice5=0,
-		cpu_nice15=0;
+		cpu_nice15=0,
+		cpu_sum=0,
+		cpu_sum1=0,
+		cpu_sum5=0,
+		cpu_sum15=0;
 
 	int	i;
 
@@ -129,6 +133,7 @@ void	report_stats_cpustat(FILE *file, int now)
 			cpu_user=cpustat.cpu_user[i];
 			cpu_nice=cpustat.cpu_nice[i];
 			cpu_system=cpustat.cpu_system[i];
+			cpu_sum=cpu_idle+cpu_user+cpu_nice+cpu_system;
 		}
 		if(cpustat.clock[i]==time1)
 		{
@@ -136,6 +141,7 @@ void	report_stats_cpustat(FILE *file, int now)
 			cpu_user1=cpustat.cpu_user[i];
 			cpu_nice1=cpustat.cpu_nice[i];
 			cpu_system1=cpustat.cpu_system[i];
+			cpu_sum1=cpu_idle1+cpu_user1+cpu_nice1+cpu_system1;
 		}
 		if(cpustat.clock[i]==time5)
 		{
@@ -143,6 +149,7 @@ void	report_stats_cpustat(FILE *file, int now)
 			cpu_user5=cpustat.cpu_user[i];
 			cpu_nice5=cpustat.cpu_nice[i];
 			cpu_system5=cpustat.cpu_system[i];
+			cpu_sum5=cpu_idle5+cpu_user5+cpu_nice5+cpu_system5;
 		}
 		if(cpustat.clock[i]==time15)
 		{
@@ -150,11 +157,12 @@ void	report_stats_cpustat(FILE *file, int now)
 			cpu_user15=cpustat.cpu_user[i];
 			cpu_nice15=cpustat.cpu_nice[i];
 			cpu_system15=cpustat.cpu_system[i];
+			cpu_sum15=cpu_idle15+cpu_user15+cpu_nice15+cpu_system15;
 		}
 	}
 	if((cpu_idle!=0)&&(cpu_idle1!=0))
 	{
-		fprintf(file,"cpu[idle1] %f\n", (float)((cpu_idle-cpu_idle1)/(now-time1)));
+		fprintf(file,"cpu[idle1] %f\n", 100*(float)((cpu_idle-cpu_idle1)/(cpu_sum-cpu_sum1)));
 	}
 	else
 	{
@@ -162,7 +170,7 @@ void	report_stats_cpustat(FILE *file, int now)
 	}
 	if((cpu_idle!=0)&&(cpu_idle5!=0))
 	{
-		fprintf(file,"cpu[idle5] %f\n",(float)((cpu_idle-cpu_idle5)/(now-time5)));
+		fprintf(file,"cpu[idle5] %f\n",100*(float)((cpu_idle-cpu_idle5)/(cpu_sum-cpu_sum5)));
 	}
 	else
 	{
@@ -170,7 +178,7 @@ void	report_stats_cpustat(FILE *file, int now)
 	}
 	if((cpu_idle!=0)&&(cpu_idle15!=0))
 	{
-		fprintf(file,"cpu[idle15] %f\n", (float)((cpu_idle-cpu_idle15)/(now-time15)));
+		fprintf(file,"cpu[idle15] %f\n", 100*(float)((cpu_idle-cpu_idle15)/((cpu_sum-cpu_sum15))));
 	}
 	else
 	{
@@ -179,7 +187,7 @@ void	report_stats_cpustat(FILE *file, int now)
 
 	if((cpu_user!=0)&&(cpu_user1!=0))
 	{
-		fprintf(file,"cpu[user1] %f\n", (float)((cpu_user-cpu_user1)/(now-time1)));
+		fprintf(file,"cpu[user1] %f\n", 100*(float)((cpu_user-cpu_user1)/((cpu_sum-cpu_sum1))));
 	}
 	else
 	{
@@ -187,7 +195,7 @@ void	report_stats_cpustat(FILE *file, int now)
 	}
 	if((cpu_user!=0)&&(cpu_user5!=0))
 	{
-		fprintf(file,"cpu[user5] %f\n", (float)((cpu_user-cpu_user5)/(now-time5)));
+		fprintf(file,"cpu[user5] %f\n", 100*(float)((cpu_user-cpu_user5)/((cpu_sum-cpu_sum5))));
 	}
 	else
 	{
@@ -195,7 +203,7 @@ void	report_stats_cpustat(FILE *file, int now)
 	}
 	if((cpu_user!=0)&&(cpu_user15!=0))
 	{
-		fprintf(file,"cpu[user15] %f\n", (float)((cpu_user-cpu_user15)/(now-time15)));
+		fprintf(file,"cpu[user15] %f\n", 100*(float)((cpu_user-cpu_user15)/((cpu_sum-cpu_sum15))));
 	}
 	else
 	{
@@ -204,7 +212,7 @@ void	report_stats_cpustat(FILE *file, int now)
 
 	if((cpu_nice!=0)&&(cpu_nice1!=0))
 	{
-		fprintf(file,"cpu[nice1] %f\n", (float)((cpu_nice-cpu_nice1)/(now-time1)));
+		fprintf(file,"cpu[nice1] %f\n", 100*(float)((cpu_nice-cpu_nice1)/((cpu_sum-cpu_sum1))));
 	}
 	else
 	{
@@ -212,7 +220,7 @@ void	report_stats_cpustat(FILE *file, int now)
 	}
 	if((cpu_nice!=0)&&(cpu_nice5!=0))
 	{
-		fprintf(file,"cpu[nice5] %f\n", (float)((cpu_nice-cpu_nice5)/(now-time5)));
+		fprintf(file,"cpu[nice5] %f\n", 100*(float)((cpu_nice-cpu_nice5)/((cpu_sum-cpu_sum5))));
 	}
 	else
 	{
@@ -220,7 +228,7 @@ void	report_stats_cpustat(FILE *file, int now)
 	}
 	if((cpu_nice!=0)&&(cpu_nice15!=0))
 	{
-		fprintf(file,"cpu[nice15] %f\n", (float)((cpu_nice-cpu_nice15)/(now-time15)));
+		fprintf(file,"cpu[nice15] %f\n", 100*(float)((cpu_nice-cpu_nice15)/((cpu_sum-cpu_sum15))));
 	}
 	else
 	{
@@ -229,7 +237,7 @@ void	report_stats_cpustat(FILE *file, int now)
 
 	if((cpu_system!=0)&&(cpu_system1!=0))
 	{
-		fprintf(file,"cpu[system1] %f\n", (float)((cpu_system-cpu_system1)/(now-time1)));
+		fprintf(file,"cpu[system1] %f\n", 100*(float)((cpu_system-cpu_system1)/((cpu_sum-cpu_sum1))));
 	}
 	else
 	{
@@ -237,7 +245,7 @@ void	report_stats_cpustat(FILE *file, int now)
 	}
 	if((cpu_system!=0)&&(cpu_system5!=0))
 	{
-		fprintf(file,"cpu[system5] %f\n", (float)((cpu_system-cpu_system5)/(now-time5)));
+		fprintf(file,"cpu[system5] %f\n", 100*(float)((cpu_system-cpu_system5)/((cpu_sum-cpu_sum5))));
 	}
 	else
 	{
@@ -245,7 +253,7 @@ void	report_stats_cpustat(FILE *file, int now)
 	}
 	if((cpu_system!=0)&&(cpu_system15!=0))
 	{
-		fprintf(file,"cpu[system15] %f\n", (float)((cpu_system-cpu_system15)/(now-time15)));
+		fprintf(file,"cpu[system15] %f\n", 100*(float)((cpu_system-cpu_system15)/((cpu_sum-cpu_sum15))));
 	}
 	else
 	{
@@ -309,7 +317,7 @@ void	collect_stats_cpustat(FILE *outfile)
 
 		s=line;
 
-		sscanf(s,"%f %f %f %f",&cpu_user, &cpu_nice, &cpu_system, &cpu_idle);
+		sscanf(s,"cpu %f %f %f %f",&cpu_user, &cpu_nice, &cpu_system, &cpu_idle);
 		add_values_cpustat(now,cpu_user, cpu_system, cpu_nice, cpu_idle);
 		break;
 	}
