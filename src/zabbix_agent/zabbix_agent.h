@@ -1,4 +1,4 @@
-#ifndef MON_MONAGENT_H
-#define MON_MONAGENT_H
+#ifndef ZABBIX_MONAGENT_H
+#define ZABBIX_MONAGENT_H
 
 #endif
