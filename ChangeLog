@@ -14,11 +14,11 @@ Hope this helps.
 
 Not ready yet:
 
- - some emails are missing
  - solution for problems with template-based hosts must be proposed
 
 Changes for 1.0beta5:
 
+ - empty result for DBselect is always checked (Alexei)
  - fixed send_email(). According to RFC, DATA should be sent with followed 
  EOL (Alexei)
  - fixed memory leak in main_alerter_loop(). Added DBfree_result(). (Alexei) 

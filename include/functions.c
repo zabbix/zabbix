@@ -257,7 +257,8 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 	struct sockaddr_in myaddr_in;
 	struct sockaddr_in servaddr_in;
 
-	char	*OK_250="250 OK";
+	char	*OK_220="220";
+	char	*OK_250="250";
 
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL");
 
@@ -290,8 +291,25 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 		return FAIL;
 	}
 
+	memset(c,0,MAX_STRING_LEN+1);
+	i=sizeof(struct sockaddr_in);
+	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);
+	if(i == -1)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Error receiving initial infor from SMTP server.");
+		close(s);
+		return FAIL;
+	}
+	if(strncmp(OK_220,c,strlen(OK_220)) != 0)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "No welcome message 220* [%s]", c);
+		close(s);
+		return FAIL;
+	}
+
 	if(strlen(smtp_helo) != 0)
 	{
+		memset(c,0,MAX_STRING_LEN+1);
 		sprintf(c,"HELO %s\n",smtp_helo);
 		e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 		if(e == -1)
@@ -301,6 +319,7 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 			return FAIL;
 		}
 				
+		memset(c,0,MAX_STRING_LEN+1);
 		i=sizeof(struct sockaddr_in);
 		i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);
 		if(i == -1)
@@ -311,12 +330,13 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 		}
 		if(strncmp(OK_250,c,strlen(OK_250)) != 0)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Wrong answer on HELO [%s]", c);
+			zabbix_log(LOG_LEVEL_ERR, "Wrong answer on HELO [%s]",c);
 			close(s);
 			return FAIL;
 		}
 	}
 			
+	memset(c,0,MAX_STRING_LEN+1);
 	sprintf(c,"MAIL FROM: %s\n",smtp_email);
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e == -1)
@@ -325,6 +345,8 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 		close(s);
 		return FAIL;
 	}
+
+	memset(c,0,MAX_STRING_LEN+1);
 	i=sizeof(struct sockaddr_in);
 	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);
 	if(i == -1)
@@ -340,6 +362,7 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 		return FAIL;
 	}
 			
+	memset(c,0,MAX_STRING_LEN+1);
 	sprintf(c,"RCPT TO: <%s>\n",mailto);
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e == -1)
@@ -348,6 +371,7 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 		close(s);
 		return FAIL;
 	}
+	memset(c,0,MAX_STRING_LEN+1);
 	i=sizeof(struct sockaddr_in);
 	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);
 	if(i == -1)
@@ -363,6 +387,7 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 		return FAIL;
 	}
 	
+	memset(c,0,MAX_STRING_LEN+1);
 	sprintf(c,"DATA\n");
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e == -1)
@@ -371,6 +396,7 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 		close(s);
 		return FAIL;
 	}
+	memset(c,0,MAX_STRING_LEN+1);
 	i=sizeof(struct sockaddr_in);
 	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);
 	if(i == -1)
@@ -386,6 +412,7 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 		return FAIL;
 	}
 
+	memset(c,0,MAX_STRING_LEN+1);
 	sprintf(c,"Subject: %s\n%s",mailsubject, mailbody);
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e == -1)
@@ -395,6 +422,7 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 		return FAIL;
 	}
 
+	memset(c,0,MAX_STRING_LEN+1);
 	sprintf(c,"\n.\n");
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e == -1)
@@ -403,6 +431,7 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 		close(s);
 		return FAIL;
 	}
+	memset(c,0,MAX_STRING_LEN+1);
 	i=sizeof(struct sockaddr_in);
 	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);
 	if(i == -1)
@@ -418,6 +447,7 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 		return FAIL;
 	}
 	
+	memset(c,0,MAX_STRING_LEN+1);
 	sprintf(c,"\n");
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e ==- 1)
@@ -426,6 +456,7 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 		close(s);
 		return FAIL;
 	}
+	memset(c,0,MAX_STRING_LEN+1);
 	i=sizeof(struct sockaddr_in);
 	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);
 	if(i == -1)
@@ -435,6 +466,7 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 		return FAIL;
 	}
 	
+	memset(c,0,MAX_STRING_LEN+1);
 	sprintf(c,"QUIT\n");
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e == -1)
@@ -522,6 +554,13 @@ void	apply_actions(int triggerid,int good)
 	sprintf(sql,"select actionid,userid,delay,subject,message from actions where triggerid=%d and good=%d and nextcheck<=%d",triggerid,good,now);
 	result = DBselect(sql);
 
+	if(DBis_empty(result) == SUCCEED)
+	{
+		zabbix_log( LOG_LEVEL_DEBUG, "No actions applied.");
+		DBfree_result(result);
+		return;
+	}
+
 	rows = DBnum_rows(result);
 
 	for(i=0;i<rows;i++)
@@ -561,41 +600,48 @@ void	update_serv(int serviceid)
 	sprintf(sql,"select l.serviceupid,s.algorithm from services_links l,services s where s.serviceid=l.serviceupid and l.servicedownid=%d",serviceid);
 	result=DBselect(sql);
 	status=0;	
-	for(i=0;i<DBnum_rows(result);i++)
+	if(DBis_empty(result) != SUCCEED)
 	{
-		serviceupid=atoi(DBget_field(result,i,0));
-		algorithm=atoi(DBget_field(result,i,1));
-		if(SERVICE_ALGORITHM_NONE == algorithm)
+		for(i=0;i<DBnum_rows(result);i++)
 		{
-/* Do nothing */
-		}
-		else if(SERVICE_ALGORITHM_MAX == algorithm)
-		{
-			sprintf(sql,"select status from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
-			result2=DBselect(sql);
-			for(j=0;j<DBnum_rows(result2);j++)
+			serviceupid=atoi(DBget_field(result,i,0));
+			algorithm=atoi(DBget_field(result,i,1));
+			if(SERVICE_ALGORITHM_NONE == algorithm)
 			{
-				if(atoi(DBget_field(result2,j,0))>status)
-				{
-					status=atoi(DBget_field(result2,j,0));
-				}
+/* Do nothing */
 			}
-			sprintf(sql,"update services set status=%d where serviceid=%d",status,atoi(DBget_field(result,i,0)));
-			DBexecute(sql);
-			DBfree_result(result2);
+			else if(SERVICE_ALGORITHM_MAX == algorithm)
+			{
+				sprintf(sql,"select status from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
+				result2=DBselect(sql);
+				for(j=0;j<DBnum_rows(result2);j++)
+				{
+					if(atoi(DBget_field(result2,j,0))>status)
+					{
+						status=atoi(DBget_field(result2,j,0));
+					}
+				}
+				sprintf(sql,"update services set status=%d where serviceid=%d",status,atoi(DBget_field(result,i,0)));
+				DBexecute(sql);
+				DBfree_result(result2);
+			}
+			else
+			{
+				zabbix_log( LOG_LEVEL_ERR, "Unknown calculation algorithm of service status [%d]", algorithm);
+			}
 		}
-		else
-		{
-			zabbix_log( LOG_LEVEL_ERR, "Unknown calculation algorithm of service status [%d]", algorithm);
-		}
-	}
+	}	
 	DBfree_result(result);
 
 	sprintf(sql,"select serviceupid from services_links where servicedownid=%d",serviceid);
 	result=DBselect(sql);
-	for(i=0;i<DBnum_rows(result);i++)
+
+	if(DBis_empty(result) != SUCCEED)
 	{
-		update_serv(atoi(DBget_field(result,i,0)));
+		for(i=0;i<DBnum_rows(result);i++)
+		{
+			update_serv(atoi(DBget_field(result,i,0)));
+		}
 	}
 	DBfree_result(result);
 }
