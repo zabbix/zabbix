@@ -30,6 +30,20 @@
 		return str_replace(" ","&nbsp;",$str);;
 	}
 
+	function url1_param($parameter)
+	{
+		global $HTTP_GET_VARS;
+	
+		if(isset($HTTP_GET_VARS[$parameter]))
+		{
+			return "$parameter=".$HTTP_GET_VARS[$parameter];
+		}
+		else
+		{
+			return "";
+		}
+	}
+
 	function url_param($parameter)
 	{
 		global $HTTP_GET_VARS;
@@ -487,6 +501,24 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			}
 		}
 		return	$ok;
+	}
+
+	function	get_scope_description($scope)
+	{
+		$desc="Unknown";
+		if($scope==2)
+		{
+			$desc="All";
+		}
+		elseif($scope==1)
+		{
+			$desc="Host";
+		}
+		elseif($scope==0)
+		{
+			$desc="Trigger";
+		}
+		return $desc;
 	}
 
 	function	get_service_status_description($status)
