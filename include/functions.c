@@ -2123,12 +2123,11 @@ int	get_lastvalue(char *value,char *host,char *key,char *function,char *paramete
 	DB_RESULT *result;
 
         char	sql[MAX_STRING_LEN];
-	char	*s;
 	int	res;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In get_lastvalue()" );
 
-	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.prevvalue,i.lastvalue,i.value_type,i.multiplier,i.units from items i,hosts h where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", host, key );
+	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula from items i,hosts h where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", host, key );
 	result = DBselect(sql);
 
 	if(DBnum_rows(result) == 0)
@@ -2139,7 +2138,9 @@ int	get_lastvalue(char *value,char *host,char *key,char *function,char *paramete
 		return FAIL;
 	}
 
-        item.itemid=atoi(DBget_field(result,0,0));
+	DBget_item_from_db(&item,result, 0);
+
+/*	item.itemid=atoi(DBget_field(result,0,0));
 	s=DBget_field(result,0,1);
 	if(s==NULL)
 	{
@@ -2166,6 +2167,7 @@ int	get_lastvalue(char *value,char *host,char *key,char *function,char *paramete
 
         item.multiplier=atoi(DBget_field(result,0,4));
         item.units=DBget_field(result,0,5);
+*/
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Itemid:%d", item.itemid );
 
