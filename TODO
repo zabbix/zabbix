@@ -1,6 +1,5 @@
 1.0:
 
- - simple check returns 0 in case of HTTP (not http!)
  - zabbix to write log to the item (for example: log when item becomes unsupported)
  - navigation bar for all graphs and screens
 
