@@ -150,6 +150,7 @@ COMMAND	commands[AGENT_MAX_USER_COMMANDS]=
 	{"check_service[ssh]"	,CHECK_SERVICE_SSH, 	0, 0},
 	{"check_service[smtp]"	,CHECK_SERVICE_SMTP, 	0, 0},
 	{"check_service[ftp]"	,CHECK_SERVICE_FTP, 	0, 0},
+	{"check_service[http]"	,CHECK_SERVICE_HTTP, 	0, 0},
 	{"check_service[pop]"	,CHECK_SERVICE_POP, 	0, 0},
 	{"check_service[nntp]"	,CHECK_SERVICE_NNTP, 	0, 0},
 	{"check_service[imap]"	,CHECK_SERVICE_IMAP, 	0, 0},
@@ -203,12 +204,12 @@ void	process(char *command,char *value)
 	int	i;
 	char	*n,*l,*r;
 	float	(*function)();
-	char	*(*function_str)();
+	char	*(*function_str)() = NULL;
 	char	*parameter = NULL;
 	char	key[MAX_STRING_LEN+1];
 	char	param[1024];
 	char	cmd[1024];
-	char	*res2;
+	char	*res2 = NULL;
 	int	ret_str=0;
 
 	for( p=command+strlen(command)-1; p>command && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
@@ -1398,6 +1399,11 @@ float	CHECK_SERVICE_SMTP(void)
 float	CHECK_SERVICE_FTP(void)
 {
 	return	tcp_expect("127.0.0.1",21,"220","");
+}
+
+float	CHECK_SERVICE_HTTP(void)
+{
+	return	tcp_expect("127.0.0.1",80,NULL,"");
 }
 
 float	CHECK_SERVICE_POP(void)

@@ -19,15 +19,7 @@
 <?
 	if(isset($register) && ($register=="update"))
 	{
-		if(isset($password_required) && ($password_required=="true"))
-		{
-			$password_required="1";
-		}
-		else
-		{
-			$password_required="0";
-		}
-		$result=update_config($smtp_server,$smtp_helo,$smtp_email,$password_required,$alarm_history,$alert_history);
+		$result=update_config($smtp_server,$smtp_helo,$smtp_email,$alarm_history,$alert_history);
 		show_messages($result, "Configuration updated", "Configuation was NOT updated");
 	}
 ?>
@@ -60,13 +52,6 @@
 	echo "ZABBIX email address to send alarms from";
 	show_table2_h_delimiter();
 	echo "<input name=\"smtp_email\" value=\"".$config["smtp_email"]."\"size=40>";
-
-	show_table2_v_delimiter();
-	echo "Password required ?";
-	show_table2_h_delimiter();
-	echo "<input type=\"checkbox\" ";
-	if($config["password_required"]==1) { echo "checked "; }
-	echo "name=\"password_required\"  VALUE=\"true\">";
 
 	show_table2_v_delimiter();
 	echo "Do not keep alerts older than (in sec)";

@@ -13,6 +13,16 @@
 	PGconn	*conn;
 #endif
 
+void	DBclose(void)
+{
+#ifdef	HAVE_MYSQL
+	mysql_close(&mysql);
+#endif
+#ifdef	HAVE_PGSQL
+	PQfinish(conn);
+#endif
+}
+
 /*
  * Connect to database.
  * If fails, program terminates.

@@ -27,7 +27,7 @@
 
 	while($row=DBfetch($result))
 	{
-        	if(!check_right("Host","R",$row["hostid"]))
+		if(!check_right("Host","R",$row["hostid"]))
 		{
 			continue;
 		}
@@ -126,7 +126,11 @@
 		$result=DBselect("select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and i.status in (0,2) and h.hostid=$hostid $sort");
 		while($row=DBfetch($result))
 		{
-        		if(check_right("Item","H",$row["itemid"]))
+        		if(!check_right("Item","R",$row["itemid"]))
+			{
+				continue;
+			}
+        		if(!check_right("Host","R",$row["hostid"]))
 			{
 				continue;
 			}

@@ -81,7 +81,7 @@
 		$col=0;
 		while($row=DBfetch($result))
 		{
-        		if(check_right("Item","H",$row["itemid"]))
+        		if(!check_right("Item","R",$row["itemid"]))
 			{
 				continue;
 			}

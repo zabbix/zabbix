@@ -15,10 +15,13 @@
 ?>
 <?
 	$now=time();
-	$result=DBselect("select serviceid,name,triggerid from services order by name");
+	$result=DBselect("select serviceid,name,triggerid,status from services order by name");
 	echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";
 	echo "\n";
-	echo "<tr><td><b>Service</b></td></tr>";
+	echo "<tr>";
+	echo "<td><b>Service</b></td>";
+	echo "<td><b>Status</b></td>";
+	echo "</tr>";
 	echo "\n";
 	$col=0;
 	if(isset($serviceid))
@@ -26,6 +29,7 @@
 		echo "<tr bgcolor=#EEEEEE>";
 		$service=get_service_by_serviceid($serviceid);
 		echo "<td><b><a href=\"srv_status.php?serviceid=".$service["serviceid"]."\">".$service["name"]."</a></b></td>";
+		echo "<td>".$service["status"]."</td>";
 		echo "</tr>"; 
 		$col++;
 	}
@@ -82,6 +86,7 @@
 				echo "<td><a href=\"srv_status.php?serviceid=".$row["serviceid"]."\"> $description</a></td>";
 			}
 		}
+		echo "<td>".$row["status"]."</td>";
 		echo "</tr>"; 
 	}
 	echo "</table>";
