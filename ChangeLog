@@ -1,5 +1,6 @@
 Changes for 1.0beta7:
 
+ - improved performance of pinger.pl (Alexei)
  - added support of ':','\' for flexible parameters (example, cksum[c:\a.bat])
    (Alexei)
  - added copyright notice to source files (Alexei)
