@@ -1,4 +1,4 @@
-<?
+<?php
 	$page["title"] = "High-level representation of monitored data";
 	$page["file"] = "srv_status.php";
 
@@ -6,7 +6,7 @@
 	show_header($page["title"],30,0);
 ?>
  
-<?
+<?php
 	show_table_header("IT SERVICES");
 
 	if(isset($HTTP_GET_VARS["serviceid"])&&isset($HTTP_GET_VARS["showgraph"]))
@@ -138,6 +138,6 @@
 	echo "</table>";
 ?>
 
-<?
+<?php
 	show_footer();
 ?>

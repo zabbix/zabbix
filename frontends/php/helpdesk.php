@@ -1,18 +1,18 @@
-<?
+<?php
 	include "include/config.inc.php";
 	$page["title"] = "Helpdesk";
 	$page["file"] = "helpdesk.php";
 	show_header($page["title"],0,0);
 ?>
 
-<?
+<?php
 	show_table_header_begin();
 	echo "IT HELPDESK";
  
 	show_table_v_delimiter(); 
 ?>
 
-<?
+<?php
         if(isset($start)&&($start<=0))
         {
                 unset($start);
@@ -38,7 +38,7 @@
 
 
 <FONT COLOR="#000000">
-<?
+<?php
 	if(!isset($start))
 	{
 		$sql="select problemid,clock,status,description,priority,userid,triggerid,lastupdate,categoryid from problems where status=0 order by clock,priority limit 1000";
@@ -140,11 +140,11 @@
 	echo "</TABLE>";
 ?>
 
-<?
+<?php
 		echo "<a name=\"form\"></a>";
 		insert_problem_form($HTTP_GET_VARS["problemid"]);
 ?>
 
-<?
+<?php
 	show_footer();
 ?>

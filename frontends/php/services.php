@@ -1,4 +1,4 @@
-<?
+<?php
 	$page["title"] = "High-level representation of monitored data";
 	$page["file"] = "services.php";
 
@@ -6,7 +6,7 @@
 	show_header($page["title"],0,0);
 ?>
 
-<?
+<?php
 	if(!check_right("Service","U",0))
 	{
 		show_table_header("<font color=\"AA0000\">No permissions !</font>");
@@ -15,7 +15,7 @@
 	}
 ?>
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["register"]))
 	{
 		if($HTTP_GET_VARS["register"]=="update")
@@ -60,7 +60,7 @@
 	}
 ?>
 
-<?
+<?php
 	show_table_header("IT SERVICES");
 
 	$now=time();
@@ -140,7 +140,7 @@
 	echo "</table>";
 ?>
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["serviceid"]))
 	{
 		show_table_header("LINKS");
@@ -177,7 +177,7 @@
 	}
 ?>
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["serviceid"]))
 	{
 		$result=DBselect("select serviceid,triggerid,name,algorithm from services where serviceid=".$HTTP_GET_VARS["serviceid"]);
@@ -277,7 +277,7 @@
 	show_table2_header_end();
 ?>
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["serviceid"]))
 	{
 		$result=DBselect("select serviceid,triggerid,name from services where serviceid=".$HTTP_GET_VARS["serviceid"]);
@@ -336,7 +336,7 @@
 	show_table2_header_end();
 ?>
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["serviceid"]))
 	{
 
@@ -368,6 +368,6 @@
 
 ?>
 
-<?
+<?php
 	show_footer();
 ?>

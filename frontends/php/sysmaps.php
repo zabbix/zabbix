@@ -1,11 +1,11 @@
-<?
+<?php
 	include "include/config.inc.php";
 	$page["title"] = "Network maps";
 	$page["file"] = "sysmaps.php";
 	show_header($page["title"],0,0);
 ?>
 
-<?
+<?php
 	if(!check_right("Network map","U",0))
 	{
 		show_table_header("<font color=\"AA0000\">No permissions !</font>");
@@ -14,7 +14,7 @@
 	}
 ?>
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["register"]))
 	{
 		if($HTTP_GET_VARS["register"]=="add")
@@ -36,12 +36,12 @@
 	}
 ?>
 
-<?
+<?php
 	show_table_header("CONFIGURATION OF NETWORK MAPS");
 	echo "<br>";
 ?>
 
-<?
+<?php
 	show_table_header("NETWORK MAPS");
 	echo "<TABLE BORDER=0 align=center COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TD WIDTH=3% NOSAVE><B>Id</B></TD>";
@@ -80,7 +80,7 @@
 	echo "</TABLE>";
 ?>
 
-<?
+<?php
 	echo "<a name=\"form\"></a>";
 
 	if(isset($HTTP_GET_VARS["sysmapid"]))
@@ -131,6 +131,6 @@
 	show_table2_header_end();
 ?>
 
-<?
+<?php
 	show_footer();
 ?>

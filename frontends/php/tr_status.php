@@ -1,10 +1,10 @@
-<?
+<?php
 	$page["title"] = "Status of triggers";
 	$page["file"] = "tr_status.php";
 
 	include "include/config.inc.php";
 ?>
-<?
+<?php
 	$tr_hash=calc_trigger_hash();
 	setcookie("triggers_hash",$tr_hash,time()+1800);
 
@@ -40,7 +40,7 @@
 
 //	echo "$tr_hash<br>$triggers_hash<br>".$old[1]."<br>".$new[1];
 ?>
-<?
+<?php
 	$refresh=10;
 	if(!isset($HTTP_GET_VARS["onlytrue"]))
 	{
@@ -55,7 +55,7 @@
 		show_header($page["title"],$refresh,0);
 	}
 ?>
-<?
+<?php
 	if(!check_right("Host","R",0))
 	{
 		show_table_header("<font color=\"AA0000\">No permissions !</font>");
@@ -69,14 +69,14 @@
 		exit;
 	}
 ?>
-<?
+<?php
 	if(isset($audio))
 	{
 		echo "<BGSOUND src=\"audio/$audio\" loop=0>";
 	}
 ?>                                                                                                             
 
-<?
+<?php
  
 	if(!isset($HTTP_GET_VARS["sort"]))
 	{
@@ -112,7 +112,7 @@
 	}
 ?>
 
-<?
+<?php
 	if(!isset($HTTP_GET_VARS["select"]))
 	{
 		$select="";
@@ -174,7 +174,7 @@
 		show_table_v_delimiter();
 ?>
 
-<?
+<?php
 		if(isset($HTTP_GET_VARS["hostid"]))
 		{
 			$cond="&hostid=".$HTTP_GET_VARS["hostid"];
@@ -473,6 +473,6 @@
 	show_table_header("Total:$col");
 ?>
 
-<?
+<?php
 	show_footer();
 ?>

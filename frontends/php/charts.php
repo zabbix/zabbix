@@ -1,4 +1,4 @@
-<?
+<?php
 	include "include/config.inc.php";
 	$page["title"] = "User defined graphs";
 	$page["file"] = "charts.php";
@@ -18,7 +18,7 @@
 	}
 ?>
 
-<?
+<?php
 	if(!isset($HTTP_GET_VARS["fullscreen"]))
 	{
 		show_table_header_begin();
@@ -59,7 +59,7 @@
 
 ?>
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["graphid"]))
 	{
 		$result=DBselect("select name from graphs where graphid=".$HTTP_GET_VARS["graphid"]);
@@ -172,6 +172,6 @@
 	
 ?>
 
-<?
+<?php
 	show_footer();
 ?>

@@ -1,11 +1,11 @@
-<?
+<?php
 	include "include/config.inc.php";
 	$page["title"] = "Configuration of network map";
 	$page["file"] = "sysmap.php";
 	show_header($page["title"],0,0);
 ?>
 
-<?
+<?php
 	if(!check_right("Network map","U",$HTTP_GET_VARS["sysmapid"]))
 	{
 		show_table_header("<font color=\"AA0000\">No permissions !</font>");
@@ -14,12 +14,12 @@
 	}
 ?>
 
-<?
+<?php
 	show_table_header("CONFIGURATION OF NETWORK MAP");
 	echo "<br>";
 ?>
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["register"]))
 	{
 		if($HTTP_GET_VARS["register"]=="add")
@@ -52,7 +52,7 @@
 	}
 ?>
 
-<?
+<?php
 	$result=DBselect("select name from sysmaps where sysmapid=".$HTTP_GET_VARS["sysmapid"]);
 	$map=DBget_field($result,0,0);
 	show_table_header($map);
@@ -129,7 +129,7 @@
 	echo "</TABLE>";
 ?>
 
-<?
+<?php
 	show_table_header("CONNECTORS");
 	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TD WIDTH=10% NOSAVE><B>Host 1</B></TD>";
@@ -168,7 +168,7 @@
 	echo "</TABLE>";
 ?>
 
-<?
+<?php
 	echo "<br>";
 	echo "<a name=\"form\"></a>";
 
@@ -267,7 +267,7 @@
 	show_table2_header_end();
 ?>
 
-<?
+<?php
 	echo "<br>";
 	show_table2_header_begin();
 	echo "New connector";
@@ -313,6 +313,6 @@
 	show_table2_header_end();
 ?>
 
-<?
+<?php
 	show_footer();
 ?>

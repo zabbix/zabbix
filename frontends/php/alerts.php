@@ -1,18 +1,18 @@
-<?
+<?php
 	include "include/config.inc.php";
 	$page["title"] = "Alert history";
 	$page["file"] = "alerts.php";
 	show_header($page["title"],30,0);
 ?>
 
-<?
+<?php
 	show_table_header_begin();
 	echo "ALERT HISTORY";
  
 	show_table_v_delimiter(); 
 ?>
 
-<?
+<?php
         if(isset($start)&&($start<=0))
         {
                 unset($start);
@@ -38,7 +38,7 @@
 
 
 <FONT COLOR="#000000">
-<?
+<?php
 	if(!isset($start))
 	{
 		$sql="select a.alertid,a.clock,a.type,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries from alerts a,actions ac where a.actionid=ac.actionid order by a.clock desc limit 1000";
@@ -118,6 +118,6 @@
 </TR>
 </TABLE>
 
-<?
+<?php
 	show_footer();
 ?>

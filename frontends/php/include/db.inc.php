@@ -1,4 +1,4 @@
-<?
+<?php
 
 	$DB_TYPE	="POSTGRESQL";
 //	$DB_TYPE	="MYSQL";
