@@ -66,6 +66,44 @@
 ?>
 
 <?php
+	show_table_header("CONFIGURATION OF HOST GROUPS");
+?>
+
+
+<?php
+	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TR><TD WIDTH=3%><B>Id</B></TD>";
+	echo "<TD><B>Name</B></TD>";
+	echo "<TD WIDTH=10%><B>Actions</B></TD>";
+	echo "</TR>";
+
+	$result=DBselect("select groupid,name from groups order by name");
+	$col=0;
+	while($row=DBfetch($result))
+	{
+//		if(!check_right("User group","R",$row["usrgrpid"]))
+//		{
+//			continue;
+//		}
+		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
+		echo "<TD>".$row["groupid"]."</TD>";
+		echo "<TD>".$row["name"]."</TD>";
+		echo "<TD>";
+		echo "<A HREF=\"hosts.php?groupid=".$row["groupid"]."#form\">Change</A>";
+		echo "</TD>";
+		echo "</TR>";
+	}
+	if(DBnum_rows($result)==0)
+	{
+			echo "<TR BGCOLOR=#EEEEEE>";
+			echo "<TD COLSPAN=3 ALIGN=CENTER>-No host groups defined-</TD>";
+			echo "<TR>";
+	}
+	echo "</TABLE>";
+	echo "<br>";
+?>
+
+<?php
 	show_table_header_begin();
 	echo "CONFIGURATION OF HOSTS";
 	show_table_v_delimiter();
@@ -204,6 +242,11 @@
 	}
 	echo "</TABLE>";
 }
+?>
+
+<?
+	echo "<br>";
+	insert_hostgroups_form($HTTP_GET_VARS["groupid"]);
 ?>
 
 <?php

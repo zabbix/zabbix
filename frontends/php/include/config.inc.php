@@ -499,6 +499,23 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	"$priorities,$md5sum";
 	}
 
+	function	get_group_by_groupid($groupid)
+	{
+		global	$ERROR_MSG;
+
+		$sql="select * from groups where groupid=$groupid"; 
+		$result=DBselect($sql);
+		if(DBnum_rows($result) == 1)
+		{
+			return	DBfetch($result);	
+		}
+		else
+		{
+			$ERROR_MSG="No groups with groupid=[$groupid]";
+		}
+		return	$result;
+	}
+
 	function	get_action_by_actionid($actionid)
 	{
 		global	$ERROR_MSG;
@@ -3806,6 +3823,74 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 </BODY>
 </HTML>
 <?php
+	}
+
+	# Insert form for Host Groups
+	function	insert_hostgroups_form($groupid)
+	{
+		global  $HTTP_GET_VARS;
+
+		if(isset($groupid))
+		{
+			$groupid=get_group_by_groupid($groupid);
+	
+			$name=$groupid["name"];
+		}
+		else
+		{
+			$name="";
+		}
+
+		show_table2_header_begin();
+		echo "Host group";
+
+		show_table2_v_delimiter();
+		echo "<form method=\"get\" action=\"hosts.php\">";
+		if(isset($usrgrpid))
+		{
+			echo "<input name=\"groupid\" type=\"hidden\" value=\"$groupid\" size=8>";
+		}
+		echo "Group name";
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=30>";
+
+		show_table2_v_delimiter();
+		echo "Hosts";
+		show_table2_h_delimiter();
+		echo "<select multiple class=\"biginput\" name=\"hosts[]\" size=\"5\">";
+		$result=DBselect("select distinct hostid,host from hosts order by host");
+		while($row=DBfetch($result))
+		{
+			if(isset($HTTP_GET_VARS["groupid"]))
+			{
+				$sql="select count(*) as count from hosts_groups where hostid=".$row["hostid"]." and groupid=".$HTTP_GET_VARS["groupid"];
+				$result2=DBselect($sql);
+				$row2=DBfetch($result2);
+				if($row2["count"]==0)
+				{
+					echo "<option value=\"".$row["hostid"]."\">".$row["host"];
+				}
+				else
+				{
+					echo "<option value=\"".$row["hostid"]."\" selected>".$row["host"];
+				}
+			}
+			else
+			{
+				echo "<option value=\"".$row["hostid"]."\">".$row["host"];
+			}
+		}
+		echo "</select>";
+
+		show_table2_v_delimiter2();
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add group\">";
+		if(isset($HTTP_GET_VARS["usrgrpid"]))
+		{
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update group\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete group\" onClick=\"return Confirm('Delete selected group?');\">";
+		}
+		echo "</form>";
+		show_table2_header_end();
 	}
 
 	# Insert form for User Groups
