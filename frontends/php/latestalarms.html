@@ -1,0 +1,89 @@
+<?
+	include "config.inc";
+	$title = "Latest alarms";
+	show_header($title,10);
+?>
+
+<?
+	show_table_header_begin();
+	echo "HISTORY OF ALARMS";
+ 
+	show_table_v_delimiter();
+?>
+
+<?
+	if(isset($limit))
+	{
+		echo "[<A HREF=\"latestalarms.html\">";
+		echo "Show last 50</A>]";
+	}
+	else 
+	{
+		echo "[<A HREF=\"latestalarms.html?limit=200\">";
+		echo "Show last 200</A>]";
+	}
+
+	show_table_header_end();
+	echo "<br>";
+
+	show_table_header("ALARMS");
+?>
+
+<FONT COLOR="#000000">
+<?
+	if(isset($limit))
+	{
+		$sql="select t.description,a.clock,a.istrue,t.triggerid from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit $limit";
+	}
+	else
+	{
+		$sql="select t.description,a.clock,a.istrue,t.triggerid from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit $limit 50";
+	}
+	$result=mysql_query($sql,$mysql);
+
+	echo "<CENTER>";
+	echo "<TABLE WIDTH=100% BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TR>";
+	echo "<TD width=\"20%\"><b>Time</b></TD>";
+	echo "<TD><b>Description</b></TD>";
+	echo "<TD width=\"10%\"><b>Status</b></TD>";
+	echo "</TR>";
+	while($row=mysql_fetch_row($result))
+	{
+		$description=$row[0];
+		$clock=$row[1];
+		$istrue=$row[2];
+		$triggerid_=$row[3];
+
+		if($col==1)
+		{
+			echo "<tr bgcolor=#DDDDDD>";
+			$col=0;
+		}
+		else
+		{
+			echo "<tr bgcolor=#EEEEEE>";
+			$col=1;
+		}
+
+		echo "<TD>",date("Y.M.d H:i:s",$clock),"</TD>";
+		echo "<TD><a href=\"alarms.html?triggerid=$triggerid_\">$description</a></TD>";
+		if($istrue==0)
+		{
+			echo "<TD><font color=\"00AA00\">OFF</font></TD>";
+		}
+		else
+		{
+			echo "<TD><font color=\"AA0000\">ON</font></TD>";
+		}
+		echo "</TR>";
+	}
+	echo "</TABLE><BR>";
+?>
+</FONT>
+</TR>
+</TABLE></CENTER>
+
+<?
+	show_footer();
+?>

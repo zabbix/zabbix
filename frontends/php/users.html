@@ -1,0 +1,90 @@
+<?
+	include "config.inc";
+	$title = "Users";
+	show_header($title,0);
+?>
+
+<?
+	show_table_header("CONFIGURATION OF USERS");
+	echo "<br>";
+?>
+
+<?
+	if($register=="add")
+	{
+		$result=add_user($name,$surname,$alias);
+	}
+	if($register=="delete")
+	{
+		delete_user($userid);
+	}
+?>
+
+<?
+	show_table_header("USERS");
+	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TR><TD WIDTH=\"10%\"><B>Alias</B></TD>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>Name</B></TD>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>Surname</B></TD>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>Actions</B></TD>";
+	echo "</TR>";
+
+	$result=mysql_query("select userid,alias,name,surname from users order by alias",$mysql);
+	echo "<CENTER>";
+	while($row=mysql_fetch_row($result))
+	{
+		if($col==1)
+		{
+			echo "<TR BGCOLOR=#EEEEEE>";
+			$col=0;
+		} else
+		{
+			echo "<TR BGCOLOR=#DDDDDD>";
+			$col=1;
+		}
+	
+		$alias=$row[1];
+		$name=$row[2];
+		$surname=$row[3];
+		$userid=$row[0];
+		echo "<TD>$alias</TD>";
+		echo "<TD>$name</TD>";
+		echo "<TD>$surname</TD>";
+		echo "<TD><A HREF=\"media.html?userid=$userid\">Media</A> - <A HREF=\"users.html?register=delete&userid=$userid\">Delete</A>";
+		echo "</TD>";
+		echo "</TR>";
+	}
+	echo "</TABLE>";
+?>
+
+<?
+	echo "<br>";
+
+	show_table2_header_begin();
+	echo "New user";
+
+	show_table2_v_delimiter();
+	echo "<form method=\"post\" action=\"users.html\">";
+	echo "Alias";
+	show_table2_h_delimiter();
+	echo "<input name=\"alias\" size=20>";
+
+	show_table2_v_delimiter();
+	echo "Name";
+	show_table2_h_delimiter();
+	echo "<input name=\"name\" size=20>";
+
+	show_table2_v_delimiter();
+	echo "Surname";
+	show_table2_h_delimiter();
+	echo "<input name=\"surname\" size=20>";
+
+	show_table2_v_delimiter2();
+	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+
+	show_table2_header_end();
+?>
+
+<?
+	show_footer();
+?>

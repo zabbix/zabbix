@@ -1,0 +1,55 @@
+<?
+	include "config.inc";
+	$title = "Configuration of Zabbix";
+	show_header($title,0);
+?>
+
+<?
+	show_table_header("CONFIGURATION OF ZABBIX");
+	echo "<br>";
+?>
+
+<?
+	if($register=="update")
+	{
+		update_config($smtp_server,$smtp_helo,$smtp_email);
+	}
+?>
+
+<?
+	$result=mysql_query("select smtp_server,smtp_helo,smtp_email from config",$mysql);
+	$row=mysql_fetch_row($result);
+	$smtp_server=$row[0];
+	$smtp_helo=$row[1];
+	$smtp_email=$row[2];
+?>
+
+<?
+	show_table2_header_begin();
+	echo "Configuration";
+
+	show_table2_v_delimiter();
+	echo "<form method=\"post\" action=\"config.html\">";
+	echo "SMTP server";
+	show_table2_h_delimiter();
+	echo "<input name=\"smtp_server\" value=\"$smtp_server\"size=40>";
+
+	show_table2_v_delimiter();
+	echo "Value from SMTP HELO authentification";
+	show_table2_h_delimiter();
+	echo "<input name=\"smtp_helo\" value=\"$smtp_helo\"size=40>";
+
+	show_table2_v_delimiter();
+	echo "ZABBIX email address to send alarms from";
+	show_table2_h_delimiter();
+	echo "<input name=\"smtp_email\" value=\"$smtp_email\"size=40>";
+
+	show_table2_v_delimiter2();
+	echo "<input type=\"submit\" name=\"register\" value=\"update\">";
+
+	show_table2_header_end();
+?>
+
+<?
+	show_footer();
+?>

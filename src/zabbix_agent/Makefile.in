@@ -1,0 +1,10 @@
+# Build rules
+
+all:
+
+	@CC@ @LIBS@ @CFLAGS@ -I../../include zabbix_agent.c sysinfo.c -o zabbix_agent -Wall
+	strip zabbix_agent
+
+clean:
+	rm -fv *.o 
+

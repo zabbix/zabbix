@@ -1,0 +1,171 @@
+<?
+	include "config.inc";
+	$title = "Actions";
+	show_header($title,0);
+?>
+
+<?
+	if($register=="add")
+	{
+		add_action( $triggerid, $userid, $good, $delay, $subject, $message );
+	}
+	if($register=="update")
+	{
+		update_action( $actionid, $userid, $good, $delay, $subject, $message );
+	}
+	if($register=="delete")
+	{
+		delete_action($actionid);
+	}
+?>
+
+<?
+	if(!isset($description))
+	{
+		$sql="select description, expression from triggers where triggerid=$triggerid";
+		$result=mysql_query($sql,$mysql);
+		$row=mysql_fetch_row($result);
+		$description=$row[0];    
+		$expression=$row[1];    
+	}
+
+?>
+ 
+<?
+	$expression=explode_exp($expression,1);
+	show_table_header("$description<BR>$expression");
+?>
+
+<hr>
+
+<?
+	$sql="select a.actionid,a.triggerid,u.alias,a.good,a.delay,a.subject,a.message from actions a,users u where a.userid=u.userid and a.triggerid=$triggerid order by u.alias, a.good desc";
+	$result=mysql_query($sql,$mysql);
+
+	echo "<CENTER>";
+	echo "<TABLE BORDER=0 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TR>";
+	echo "<TD><b>Send to</b></TD>";
+	echo "<TD><b>When trigger</b></TD>";
+	echo "<TD><b>Delay</b></TD>";                            
+	echo "<TD><b>Subject</b></TD>";
+	echo "<TD><b>Message</b></TD>";
+	echo "<TD><b>Actions</b></TD>";                               
+	echo "</TR>";
+	while($row=mysql_fetch_row($result))
+	{
+		$actid=$row[0];
+		$good="OFF";
+		if($row[3])
+		{
+			$good="ON";
+		}
+		$to=$row[2];
+		$delay=$row[4];
+		$subject=$row[5];
+		$msg=$row[6];
+
+		if($actionid==$actid)
+		{
+			echo "<TR BGCOLOR=#FFDDDD>";
+			$col=$col+1;
+			$sactid=$actid;
+			$sgood=$good;
+			$sto=$to;
+			$sdelay=$delay;
+			$ssubject=$subject;
+			$smsg=$msg;
+		} 
+		else
+		{
+			if($col==1) 
+			{
+				echo "<TR BGCOLOR=#EEEEEE>";
+				$col=0;
+			} else
+			{
+				echo "<TR BGCOLOR=#DDDDDD>";
+				$col=1;
+			}
+		}
+  
+		echo "<TD>$to</TD>";
+		echo "<TD>$good</TD>";
+		echo "<TD>$delay</TD>";
+		echo "<TD>$subject</TD>";
+		echo "<TD>$msg</TD>";
+		echo "<TD>";
+		echo " <A HREF=\"actions.html?register=edit&actionid=$actid&triggerid=$triggerid\">Edit</A>";
+		echo ", <A HREF=\"actions.html?register=delete&actionid=$actid&triggerid=$triggerid\">Delete</A>";
+		echo "</TD></TR>";
+	}
+	echo "</TABLE>";
+?>
+</font>
+</tr>
+</table></center>
+
+<?
+	echo "<br>";
+	show_table2_header_begin();
+	echo "New action";
+
+	show_table2_v_delimiter();
+	echo "<form method=\"post\" action=\"actions.html\">";
+	echo "<input name=\"triggerid\" type=\"hidden\" value=$triggerid>";
+	echo "<input name=\"actionid\" type=\"hidden\" value=$sactid>";
+	echo "Send to";
+	show_table2_h_delimiter();
+	echo "<SELECT NAME=\"userid\" SIZE=\"1\">";
+
+	$sql="select userid,alias from users order by alias";
+	$result=mysql_query($sql,$mysql);
+	while($row=mysql_fetch_row($result))
+	{
+		$id=$row[0];
+		$name=$row[1];
+		if($name==$sto)
+		{
+			echo "<option value=\"$id\" SELECTED>$name";
+		}
+		else
+		{
+			echo "<option value=\"$id\">$name";
+		}
+	}
+	echo "</select>";
+
+	show_table2_v_delimiter();
+	echo "When trigger becomes";
+	show_table2_h_delimiter();
+	echo "<select name=\"good\" size=1>";
+	echo "<OPTION VALUE=\"1\""; if($sgood=="ON") echo "SELECTED"; echo ">ON";
+	echo "<OPTION VALUE=\"0\""; if($sgood=="OFF") echo "SELECTED"; echo ">OFF";
+	echo "</SELECT>";
+
+	show_table2_v_delimiter();
+	echo "Delay";
+	show_table2_h_delimiter();
+	echo "<input name=\"delay\" value=\"300\" size=5>";
+
+	show_table2_v_delimiter();
+	echo "Subject";
+	show_table2_h_delimiter();
+	echo "<input name=\"subject\" size=50>";
+
+	show_table2_v_delimiter();
+	echo "Message";
+	show_table2_h_delimiter();
+	echo "<input name=\"message\" size=50>";
+
+	show_table2_v_delimiter2();
+	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+	if(isset($actionid))
+	{
+		echo "<input type=\"submit\" name=\"register\" value=\"update\">";
+	}
+
+	show_table2_header_end();
+
+	show_footer();
+?>
