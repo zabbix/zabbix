@@ -1,5 +1,6 @@
 Changes for 1.1alpha3:
 
+ - on common process for sucker and trapper: zabbix_server (Alexei)
  - removed column items.lastdelete (Alexei)
  - do not use items.lastdelete in housekeeping process (Alexei)
  - do not draw straight lines in graphs if no data (Alexei)
