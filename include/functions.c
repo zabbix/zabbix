@@ -1298,6 +1298,7 @@ void	process_new_value(DB_ITEM *item,char *value)
 	double	value_double;
 	char	*e;
 
+	now = time(NULL);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_new_value()");
 	value_double=strtod(value,&e);
@@ -1306,7 +1307,19 @@ void	process_new_value(DB_ITEM *item,char *value)
 	{
 		if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
 		{
-			DBadd_history(item->itemid,value_double);
+			/* Should we store delta or original value? */
+			if(item->delta == 0)
+			{
+				DBadd_history(item->itemid,value_double);
+			}
+			else
+			{
+				/* Save delta */
+				if(item->prevorgvalue_null == 0)
+				{
+					DBadd_history(item->itemid, (value_double - item->prevorgvalue)/(now-item->lastclock));
+				}
+			}
 		}
 		else
 		{
@@ -1314,22 +1327,44 @@ void	process_new_value(DB_ITEM *item,char *value)
 		}
 	}
 
-	now = time(NULL);
 
-	if((item->prevvalue_null == 1) || (strcmp(value,item->lastvalue_str) != 0) || (strcmp(item->prevvalue_str,item->lastvalue_str) != 0) )
+	if(item->delta ==0)
 	{
-		sprintf(sql,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=%d",now+item->delay,value,now,item->itemid);
+		if((item->prevvalue_null == 1) || (strcmp(value,item->lastvalue_str) != 0) || (strcmp(item->prevvalue_str,item->lastvalue_str) != 0) )
+		{
+			sprintf(sql,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=%d",now+item->delay,value,now,item->itemid);
+			item->prevvalue=item->lastvalue;
+			item->lastvalue=value_double;
+			item->prevvalue_str=item->lastvalue_str;
+	/* Risky !!!*/
+			item->lastvalue_str=value;
+			item->prevvalue_null=item->lastvalue_null;
+			item->lastvalue_null=0;
+		}
+		else
+		{
+			sprintf(sql,"update items set nextcheck=%d,lastclock=%d where itemid=%d",now+item->delay,now,item->itemid);
+		}
+	}
+	/* Logic for delta */
+	else
+	{
+		if(item->prevorgvalue_null == 0)
+		{
+			sprintf(sql,"update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",now+item->delay,value_double,(value_double - item->prevorgvalue)/(now-item->lastclock),now,item->itemid);
+		}
+		else
+		{
+			sprintf(sql,"update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",now+item->delay,value_double,now,item->itemid);
+		}
+
 		item->prevvalue=item->lastvalue;
-		item->lastvalue=value_double;
+		item->lastvalue=(value_double - item->prevorgvalue)/(now-item->lastclock);
 		item->prevvalue_str=item->lastvalue_str;
-/* Risky !!!*/
+	/* Risky !!!*/
 		item->lastvalue_str=value;
 		item->prevvalue_null=item->lastvalue_null;
 		item->lastvalue_null=0;
-	}
-	else
-	{
-		sprintf(sql,"update items set nextcheck=%d,lastclock=%d where itemid=%d",now+item->delay,now,item->itemid);
 	}
 	DBexecute(sql);
 
