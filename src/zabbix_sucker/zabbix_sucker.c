@@ -418,7 +418,7 @@ int get_values(void)
 				sprintf(c,"insert into history (itemid,clock,value) values (%d,%d,%g)",item.itemid,now,value);
 				DBexecute(c);
 
-				sprintf(c,"update items set NextCheck=%d+%d,PrevValue=LastValue,LastValue=%f,LastClock=%d where ItemId=%d",now,item.delay,value,now,item.itemid);
+				sprintf(c,"update items set NextCheck=%d,PrevValue=LastValue,LastValue=%f,LastClock=%d where ItemId=%d",now+item.delay,value,now,item.itemid);
 				DBexecute(c);
 
 				if( update_functions( item.itemid ) == FAIL)
@@ -470,7 +470,7 @@ int housekeeping_items()
 		item.history=atoi(DBget_field(result,i,2));
 
 		now = time(NULL);
-		sprintf	(c,"delete from history where ItemId=%d and Clock<%d-%d",item.itemid,now,item.history);
+		sprintf	(c,"delete from history where ItemId=%d and Clock<%d",item.itemid,now-item.history);
 		DBexecute(c);
 	
 		now = time(NULL);
