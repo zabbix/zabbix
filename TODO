@@ -1,5 +1,5 @@
 TOP PRIORITY:
-
+ - proofread Zabbix Manual  - Ted Rolle <ted@users.sourceforge.net>
  - BUG.
 First and foremost, there are definitions in the PostgreSQL schema that
 define columns as "int4" with "99.9" ( a floating point number ) as a
