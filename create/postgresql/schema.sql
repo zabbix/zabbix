@@ -75,7 +75,6 @@ CREATE TABLE triggers (
   expression		varchar(255)	DEFAULT '' NOT NULL,
   description		varchar(255)	DEFAULT '' NOT NULL,
   istrue		int4		DEFAULT '0' NOT NULL,
-  lastcheck		int4		DEFAULT '0' NOT NULL,
   priority		int2		DEFAULT '0' NOT NULL,
   lastchange		int4		DEFAULT '0' NOT NULL,
   dep_level		int2		DEFAULT '0' NOT NULL,

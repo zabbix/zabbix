@@ -184,29 +184,60 @@ int	evaluate_DIFF(float *diff,int itemid,int parameter)
 	return SUCCEED;
 }
 
-int	evaluate_FUNCTION(float *value,int itemid,char *function,int parameter)
+int	evaluate_FUNCTION(float *value,DB_ITEM *item,char *function,int parameter)
 {
 	int	ret  = SUCCEED;
 
 	if(strcmp(function,"last")==0)
 	{
-		ret = evaluate_LAST(value,itemid,parameter);
+		if(item->lastvalue_null==1)
+		{
+			ret = FAIL;
+		}
+		else
+		{
+			*value=item->lastvalue;
+		}
+/*		ret = evaluate_LAST(value,item->itemid,parameter);*/
 	}
 	else if(strcmp(function,"prev")==0)
 	{
-		ret = evaluate_PREV(value,itemid,parameter);
+		if(item->prevvalue_null==1)
+		{
+			ret = FAIL;
+		}
+		else
+		{
+			*value=item->prevvalue;
+		}
+/*		ret = evaluate_PREV(value,item->itemid,parameter);*/
 	}
 	else if(strcmp(function,"min")==0)
 	{
-		ret = evaluate_MIN(value,itemid,parameter);
+		ret = evaluate_MIN(value,item->itemid,parameter);
 	}
 	else if(strcmp(function,"max")==0)
 	{
-		ret = evaluate_MAX(value,itemid,parameter);
+		ret = evaluate_MAX(value,item->itemid,parameter);
 	}
 	else if(strcmp(function,"diff")==0)
 	{
-		ret = evaluate_DIFF(value,itemid,parameter);
+		if((item->lastvalue_null==1)||(item->prevvalue_null==1))
+		{
+			ret = FAIL;
+		}
+		else
+		{
+			if(cmp_double(item->lastvalue, item->prevvalue) == 0)
+			{
+				*value=0;
+			}
+			else
+			{
+				*value=1;
+			}
+		}
+/*		ret = evaluate_DIFF(value,item->itemid,parameter);*/
 	}
 	else
 	{
@@ -223,7 +254,8 @@ int	evaluate_FUNCTION(float *value,int itemid,char *function,int parameter)
  * Flag: 0 - id==itemid
  * 	 1 - id==sucker_num
  * */
-int	update_functions( int id, int flag )
+/*void	update_functions( DB_ITEM items[] )*/
+void	update_functions( DB_ITEM *item )
 {
 	DB_FUNCTION	function;
 	DB_RESULT	*result;
@@ -231,54 +263,63 @@ int	update_functions( int id, int flag )
 	float		value;
 	int		ret=SUCCEED;
 	int		i,rows;
+	char		*s;
 
-	if(flag==0)
-	{
-		sprintf(c,"select function,parameter,itemid from functions where itemid=%d group by 1,2,3 order by 1,2,3",id );
-	}
-	else
-	{
-		sprintf(c,"select function,parameter,itemid from functions where itemid%%%d=%d group by 1,2,3 order by 1,2,3", SUCKER_FORKS-1,id-1);
-	}
+/*	for(row=0;items[row].itemid!=0;row++)
+	{*/
+/*		sprintf(c,"select function,parameter,itemid from functions where itemid=%d group by 1,2,3 order by 1,2,3",items[row].itemid );*/
+/*		sprintf(c,"select function,parameter,itemid,lastvalue from functions where itemid%%%d=%d group by 1,2,3 order by 1,2,3",SUCKER_FORKS-1,sucker_num-1);*/
+		sprintf(c,"select function,parameter,itemid,lastvalue from functions where itemid=%d group by 1,2,3 order by 1,2,3",item->itemid);
 
-	result = DBselect(c);
-	rows=DBnum_rows(result);
+		result = DBselect(c);
+		rows=DBnum_rows(result);
 
-	if((result==NULL)||(rows==0))
-	{
-		syslog( LOG_NOTICE, "No functions to update.");
-		DBfree_result(result);
-		return SUCCEED; 
-	}
-
-	for(i=0;i<rows;i++)
-	{
-		function.function=DBget_field(result,i,0);
-		function.parameter=atoi(DBget_field(result,i,1));
-		function.itemid=atoi(DBget_field(result,i,2));
-
-		syslog( LOG_DEBUG, "ItemId:%d Evaluating %s(%d)\n",function.itemid,function.function,function.parameter);
-
-		ret = evaluate_FUNCTION(&value,function.itemid,function.function,function.parameter);
-		if( FAIL == ret)	
+		if((result==NULL)||(rows==0))
 		{
-			syslog( LOG_WARNING, "Evaluation failed for function:%s\n",function.function);
+			syslog( LOG_NOTICE, "No functions to update.");
 			DBfree_result(result);
-			return FAIL;
+			return;
+			/*continue;*/
 		}
-		syslog( LOG_DEBUG, "Result:%f\n",value);
-		if (ret == SUCCEED)
+
+		for(i=0;i<rows;i++)
 		{
-			sprintf(c,"update functions set lastvalue=%f where itemid=%d and function='%s' and parameter=%d", value, function.itemid, function.function, function.parameter );
-//			printf("%s\n",c);
-			DBexecute(c);
+			function.function=DBget_field(result,i,0);
+			function.parameter=atoi(DBget_field(result,i,1));
+			function.itemid=atoi(DBget_field(result,i,2));
+			s=DBget_field(result,i,3);
+			if(s==NULL)
+			{
+				function.lastvalue_null=1;
+			}
+			else
+			{
+				function.lastvalue_null=0;
+				function.lastvalue=atof(DBget_field(result,i,3));
+			}
+
+			syslog( LOG_DEBUG, "ItemId:%d Evaluating %s(%d)\n",function.itemid,function.function,function.parameter);
+
+			ret = evaluate_FUNCTION(&value,item,function.function,function.parameter);
+			if( FAIL == ret)	
+			{
+				syslog( LOG_WARNING, "Evaluation failed for function:%s\n",function.function);
+				continue;
+			}
+			syslog( LOG_DEBUG, "Result:%f\n",value);
+			if (ret == SUCCEED)
+			{
+				if((function.lastvalue_null == 1)||(cmp_double(function.lastvalue,value)==1))
+				{
+					sprintf(c,"update functions set lastvalue=%f where itemid=%d and function='%s' and parameter=%d", value, function.itemid, function.function, function.parameter );
+					DBexecute(c);
+				}
+			}
 		}
-	}
-
-	DBfree_result(result);
-	return ret;
+	
+		DBfree_result(result);
+/*	}*/
 }
-
 
 int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,char *mailsubject,char *mailbody)
 {
@@ -572,21 +613,14 @@ void	apply_actions(int triggerid,int good)
 
 		send_to_user(action.actionid,action.userid,smtp_server,smtp_helo,smtp_email,action.subject,action.message);
 		now = time(NULL);
-		sprintf(c,"update actions set nextcheck=%d+%d where actionid=%d",now,action.delay,action.actionid);
+		sprintf(c,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
 		DBexecute(c);
 	}
 	syslog( LOG_DEBUG, "Actions applied for trigger %d %d\n", triggerid, good );
 	DBfree_result(result);
 }
 
-/*void	update_triggers(int itemid)*/
-/*void	update_triggers(int sucker_num)*/
-
-/*
- * Flag: 0 - id==itemid
- * 	 1 - id==sucker_num
- * */
-void	update_triggers( int id, int flag )
+void	update_triggers( int flag, int sucker_num, int lastclock )
 {
 	char c[1024];
 	char exp[8192];
@@ -597,13 +631,13 @@ void	update_triggers( int id, int flag )
 	int	i,rows;
 	int	now;
 
-	if(flag==0)
+	if(flag == 0)
 	{
-		sprintf(c,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f where t.istrue!=2 and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.istrue,t.dep_level",id);
+		sprintf(c,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and i.lastclock<=%d and t.istrue!=2 and f.triggerid=t.triggerid and f.itemid%%%d=%d group by t.triggerid,t.expression,t.istrue,t.dep_level",lastclock,SUCKER_FORKS-1,sucker_num-1);
 	}
 	else
 	{
-		sprintf(c,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f where t.istrue!=2 and f.triggerid=t.triggerid and f.itemid%%%d=%d group by t.triggerid,t.expression,t.istrue,t.dep_level order by t.dep_level desc", SUCKER_FORKS-1,id-1);
+		sprintf(c,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.istrue!=2 and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.istrue,t.dep_level",sucker_num);
 	}
 
 	result = DBselect(c);
@@ -612,8 +646,7 @@ void	update_triggers( int id, int flag )
 
 	if(rows == 0)
 	{
-		syslog( LOG_DEBUG, "No triggers to update, returning..." );
-
+		syslog( LOG_NOTICE, "No triggers to update" );
 		DBfree_result(result);
 		return;
 	}
@@ -630,9 +663,9 @@ void	update_triggers( int id, int flag )
 			continue;
 		}
 
-		now = time(NULL);
+/*		now = time(NULL);
 		sprintf(c,"update triggers set lastcheck=%d where triggerid=%d",now,trigger.triggerid);
-		DBexecute(c);
+		DBexecute(c);*/
 
 		if((b==1)&&(trigger.istrue!=1))
 		{
@@ -671,12 +704,12 @@ void	update_triggers( int id, int flag )
 
 int	get_lastvalue(float *Result,char *host,char *key,char *function,char *parameter)
 {
+	DB_ITEM	item;
 	DB_RESULT *result;
 
         char	c[128];
         int	rows;
 	int	parm;
-	int	itemid;
 
 	sprintf( c, "select i.itemid from items i,hosts h where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", host, key );
 	result = DBselect(c);
@@ -689,12 +722,116 @@ int	get_lastvalue(float *Result,char *host,char *key,char *function,char *parame
 		return FAIL;	
 	}
 
-        itemid=atoi(DBget_field(result,0,0));
-	syslog(LOG_DEBUG, "Itemid:%d", itemid );
+        item.itemid=atoi(DBget_field(result,0,0));
+	syslog(LOG_DEBUG, "Itemid:%d", item.itemid );
         DBfree_result(result);
 
 	parm=atoi(parameter);
-	evaluate_FUNCTION(Result,itemid,function,parm);
+	evaluate_FUNCTION(Result,&item,function,parm);
 
         return SUCCEED;
+}
+
+/* For zabbix_trapper(d) */
+int	process_data(char *server,char *key, double value)
+{
+	char	sql[1024];
+
+	DB_RESULT       *result;
+	DB_ITEM	item;
+	char	*s;
+
+/*	sprintf(sql,"select i.itemid,i.lastvalue from items i,hosts h where h.status=0 and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=2;",server,key);*/
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue from items i,hosts h where h.status=0 and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=2", server, key);
+	result = DBselect(sql);
+
+	if(result==NULL)
+	{
+		DBfree_result(result);
+		return  FAIL;
+	}
+	if(DBnum_rows(result)==0)
+	{
+		DBfree_result(result);
+		return  FAIL;
+	}
+
+	if( DBget_field(result,0,0) == NULL )
+	{
+		DBfree_result(result);
+		return  FAIL;
+	}
+	
+	item.itemid=atoi(DBget_field(result,0,0));
+	item.key=DBget_field(result,0,1);
+	item.host=DBget_field(result,0,2);
+	item.port=atoi(DBget_field(result,0,3));
+	item.delay=atoi(DBget_field(result,0,4));
+	item.description=DBget_field(result,0,5);
+	item.nextcheck=atoi(DBget_field(result,0,6));
+	item.type=atoi(DBget_field(result,0,7));
+	item.snmp_community=DBget_field(result,0,8);
+	item.snmp_oid=DBget_field(result,0,9);
+	item.useip=atoi(DBget_field(result,0,10));
+	item.ip=DBget_field(result,0,11);
+	item.history=atoi(DBget_field(result,0,12));
+	s=DBget_field(result,0,13);
+	if(s==NULL)
+	{
+		item.lastvalue_null=1;
+	}
+	else
+	{
+		item.lastvalue_null=0;
+		item.lastvalue=atof(s);
+	}
+	s=DBget_field(result,0,14);
+	if(s==NULL)
+	{
+		item.prevvalue_null=1;
+	}
+	else
+	{
+		item.prevvalue_null=0;
+		item.prevvalue=atof(s);
+	}
+
+	process_new_value(&item,value);
+
+	update_triggers( 1, item.itemid, 0 );
+ 
+	DBfree_result(result);
+
+	return SUCCEED;
+}
+
+void	process_new_value(DB_ITEM *item,double value)
+{
+	int 	now;
+	char	c[1024];
+
+	now = time(NULL);
+
+	if(item->history>0)
+	{
+		sprintf(c,"insert into history (itemid,clock,value) values (%d,%d,%g)",item->itemid,now,value);
+		DBexecute(c);
+	}
+
+/*	if((item->lastvalue_null != 1)&&(item->prevvalue_null != 1)&&cmp_double(value,item->lastvalue) == 0)*/
+	if((item->prevvalue_null == 1) || (cmp_double(value,item->lastvalue) != 0) || (cmp_double(item->prevvalue,item->lastvalue) != 0) )
+	{
+		sprintf(c,"update items set NextCheck=%d,PrevValue=LastValue,LastValue=%f,LastClock=%d where ItemId=%d",now+item->delay,value,now,item->itemid);
+		item->prevvalue=item->lastvalue;
+		item->lastvalue=value;
+		item->prevvalue_null=0;
+		item->lastvalue_null=0;
+	}
+	else
+	{
+		sprintf(c,"update items set NextCheck=%d,LastClock=%d where ItemId=%d",now+item->delay,now,item->itemid);
+	}
+	DBexecute(c);
+
+	update_functions( item );
 }

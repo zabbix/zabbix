@@ -643,6 +643,11 @@ Check sum of given file.
 
 Size of given file.
 
+- proc_cnt[*]
+
+Number of processes called "*" running. Standart set of supported processes is: apache,inetd,syslogd,sshd,zabbix_agentd,zabbix_suckerd,
+zabbix_trapperd.
+
 - swap[free]
 
 Free swap space.
@@ -795,8 +800,6 @@ tcp_count			|	X      |	X      |      X      |      -      |      -      |     X 
 
 net[listen_23]			|	X      |	X      |      -      |      -      |      -      |     -     |
 net[listen_80]			|	X      |	X      |      -      |      -      |      -      |     -     |
-net[listen_110]			|	X      |	X      |      -      |      -      |      -      |     -     |
-net[listen_143]			|	X      |	X      |      -      |      -      |      -      |     -     |
 
 service_check[ftp]		|	X      |	X      |      ?      |      ?      |      ?      |     ?     |
 service_check[ssh]		|	X      |	X      |      ?      |      ?      |      ?      |     ?     |
@@ -804,6 +807,8 @@ service_check[smtp]		|	X      |	X      |      ?      |      ?      |      ?     
 service_check[pop]		|	X      |	X      |      ?      |      ?      |      ?      |     ?     |
 service_check[nntp]		|	X      |	X      |      ?      |      ?      |      ?      |     ?     |
 service_check[imap]		|	X      |	X      |      ?      |      ?      |      ?      |     ?     |
+
+proc_cnt[apache]		|	X      |	X      |      -      |      -      |      -      |     -     |
 
 6. Chapter 6 (Upgrading)
 
@@ -866,6 +871,17 @@ Do not forget to apply DB patches.
 Do not forget to apply DB patches.
 
 Note that parameters net[listen_*] will be replaced by check_service[*] (for example, net[listen_25] -> check_service[smtp]).
+
+6.4 Zabbix 1.0alpha11
+
+Do not forget to apply DB patches.
+
+PostgreSQL users:
+
+Please, delete column triggers.lastcheck manually by reloading whole table.
+Unfortunately, PostgreSQL does not support "alter table triggers drop lastcheck".
+
+New set of parameters appeared in this release: proc_cnt[*]
 
 7. Chapter 7 (Misc)
 

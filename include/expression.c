@@ -8,6 +8,15 @@
 #include "common.h"
 #include "db.h"
 
+int	cmp_double(double a,double b)
+{
+	if(fabs(a-b)<0.000001)
+	{
+		return	0;
+	}
+	return	1;
+}
+
 int	is_float(char *c)
 {
 	int i;
