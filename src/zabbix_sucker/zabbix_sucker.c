@@ -114,7 +114,7 @@ void	daemon_init(void)
 	}
 
 	openlog("zabbix_suckerd",LOG_PID,LOG_USER);
-/*	ret=setlogmask(LOG_UPTO(LOG_DEBUG));*/
+/*	setlogmask(LOG_UPTO(LOG_DEBUG));	*/
 	setlogmask(LOG_UPTO(LOG_WARNING));
 }
 
@@ -464,7 +464,9 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 
 	if( (*result==0) && (c==e) )
 	{
-		return	FAIL;
+		syslog( LOG_WARNING, "Got empty string from [%s]. Parameter [%s]",item->host, item->key);
+		syslog( LOG_WARNING, "Assuming that agent dropped connection because of access permissions");
+		return	NETWORK_ERROR;
 	}
 	if( *result<0 )
 	{
