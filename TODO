@@ -1,7 +1,6 @@
 1.1alpha7:
 
  - Develop hard-linked templates
- - Fix graphs with values >4GB
 
 ZABBIX 1.1:
 
