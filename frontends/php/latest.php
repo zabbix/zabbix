@@ -57,6 +57,7 @@
 	show_table3_header_begin();
 	echo "&nbsp;".S_LATEST_DATA;
 	show_table3_h_delimiter(60);
+	echo "<span style=\"float:right\">";
 	echo "<form name=\"form2\" method=\"get\" action=\"latest.php\">";
 	echo S_GROUP."&nbsp;";
 	echo "<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
@@ -128,6 +129,7 @@
 	echo nbsp(" ");
   	echo "<input class=\"button\" type=\"submit\" name=\"do\" value=\"select\">";
 	echo "</form>";
+	echo "</span>";
 	show_table_header_end();
 ?>
 

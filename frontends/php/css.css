@@ -81,6 +81,7 @@ td.sub_menu
 	border-left-style: solid;
 	border-right-style: solid;
 	border-bottom-style: solid;
+	vertical-align: middle;
 }
 
 td.horizontal_menu
@@ -103,10 +104,8 @@ td.horizontal_menu
 
 td.horizontal_menu_n
 {
-#	background-color: #6d88ad;
-#	background-color: #778899;
-	background-color: #AAAAAA;
-	border-color: #888888;
+	background: #AAAAAA url(images/gradients/menu_not_active.gif) repeat-x top left;
+	border-color: #AAAAAA;
 	border-width:1px;
 	border-top-style: solid;
 	border-left-style: solid;
