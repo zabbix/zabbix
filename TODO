@@ -10,6 +10,7 @@ BUGS:
  - graphs and maps are not displayed properly sometimes
  - BUG. Agent return unsupported in case if UserParameter ends by timeout.
  - add protection from IT Service loop
+ - mass-adding of actions
 
 PERFORMANCE IMPROVEMENTS:
 
