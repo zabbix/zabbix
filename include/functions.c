@@ -554,7 +554,7 @@ void	apply_actions(int triggerid,int good)
 {
 	DB_RESULT *result;
 	
-	ACTION action;
+	DB_ACTION action;
 
 	char c[1024];
 
