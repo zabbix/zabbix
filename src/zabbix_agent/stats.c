@@ -48,7 +48,7 @@ float     received[60*15];
 */
 
 
-INTERFACE interfaces[8]=
+INTERFACE interfaces[MAX_INTERFACE]=
 {
 	{0}
 };
@@ -61,7 +61,7 @@ void	init_stat()
 	char	interface[MAX_STRING_LEN+1];
 	int	i,j,j1;
 
-	for(i=0;i<128;i++)
+	for(i=0;i<MAX_INTERFACE;i++)
 	{
 		interfaces[i].interface=0;
 		for(j=0;j<60*15;j++)
@@ -126,7 +126,7 @@ void	report_stat(int now)
 		return;
 	}
 
-	for(i=0;i<128;i++)
+	for(i=0;i<MAX_INTERFACE;i++)
 	{
 		if(interfaces[i].interface==0)
 		{
@@ -248,7 +248,7 @@ void	add_values(int now,char *interface,float value_sent,float value_received)
 
 /*	printf("Add_values [%s] [%f] [%f]\n",interface,value_sent,value_received);*/
 
-	for(i=0;i<128;i++)
+	for(i=0;i<MAX_INTERFACE;i++)
 	{
 		if(0 == strcmp(interfaces[i].interface,interface))
 		{
