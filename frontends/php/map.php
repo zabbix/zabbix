@@ -40,7 +40,7 @@
 
 	check_authorisation();
 
-	$im = imagecreate($width,$height); 
+	$im = imagecreatetruecolor($width,$height); 
   
 	$red=ImageColorAllocate($im,255,0,0); 
 	$darkred=ImageColorAllocate($im,150,0,0); 
@@ -184,6 +184,8 @@
 
 		$img=$icons[$icon];
 
+//		imagecolortransparent ($img, imagecolorat ($img, 0, 0));
+//		imagecolortransparent ($img, 0, 0, 0);
 		ImageCopy($im,$img,$x,$y,0,0,ImageSX($img),ImageSY($img));
 
 		$x1=$x+ImageSX($img)/2-ImageFontWidth(2)*strlen($label)/2;
