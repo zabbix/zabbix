@@ -2,9 +2,13 @@
 #
 # zabbix_agentd_ctl 
 #
-# control script to stop/start/restart zabbix_suckerd
+# control script to stop/start/restart zabbix_agentd
 # author: charlie collins
 # date: 01.21.2002
+#
+# revised 09.21.2003
+# (setup for Red Hat 7.3 with Zabbix 1.0 beta)
+# (should work for other Red Hat and Sys V style init machines as well)
 #
 # (modeled after apache style control scripts)
 # (this script can be placed in init.d and respective runlevel for startup usage)
@@ -30,8 +34,8 @@
 
 # base zabbix dir
 BASEDIR=/opt/zabbix
-# PID file (PID FILE NOT CURRENTLY SET - NEEDS TO BE, THIS IS FOR FUTURE USE)
-PIDFILE=$BASEDIR/bin/zabbix_agentd.pid
+# pid file (as of 1.0 beta 10)
+PIDFILE=/var/tmp/zabbix_agentd.pid
 # binary file
 ZABBIX_AGENTD=$BASEDIR/bin/zabbix_agentd
 
@@ -46,11 +50,6 @@ ARGV="$@"
 if [ "x$ARGV" = "x" ] ; then 
     ARGS="help"
 fi
-
-# establish PIDs
-# for now - ultimately PIDFILE should be implemented and managed in zabbix_agentd binary 
-# output all process ids to PIDFILE manually
-ps -ef | awk '/zabbix_agentd/ && !/zabbix_agentd_ctl/ && !/awk/ {print $2}' > $PIDFILE
 
 
 # perform action based on args

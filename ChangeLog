@@ -1,5 +1,7 @@
 Changes for 1.0beta11:
 
+ - updated RedHat start-up scripts in misc/init.d/redhat. Thanks
+ to Charlie. (Alexei)
  - fix for flexible SNMP port name (Alexei)
  - fixed permissions of PHP screens (Alexei)
  - period in graphs. Thanks to Igor Micko. (Alexei)
