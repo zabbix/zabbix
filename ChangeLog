@@ -1,7 +1,8 @@
 Changes for 1.0:
 
+ - added template 'Application.MySQL' (Alexei)
  - added button "add items from template" (Alexei)
- - added template Host.SNMP. Thanks to Kenneth Durrant. (Alexei)
+ - added template 'Host.SNMP'. Thanks to Kenneth Durrant. (Alexei)
  - fixed host statistics in report1.php (Alexei)
  - templates were renamed to "Host.Unix", "Host.Win32" and "Host.Standalone" (Alexei)
  - fixed problem with undefined socklen_t under Solaris (Alexei)
