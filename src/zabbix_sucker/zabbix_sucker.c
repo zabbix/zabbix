@@ -299,12 +299,11 @@ int	get_value_SNMP(int version,double *result,char *result_str,DB_ITEM *item)
 	{
 		session.peername = item->host;
 	}
-	zabbix_log( LOG_LEVEL_DEBUG, "Peername [%s]", session.peername);
 	session.community = item->snmp_community;
-	zabbix_log( LOG_LEVEL_DEBUG, "Community [%s]", session.community);
-	zabbix_log( LOG_LEVEL_DEBUG, "OID [%s]", item->snmp_oid);
 	session.community_len = strlen(session.community);
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP() 0.1");
+
+	zabbix_log( LOG_LEVEL_DEBUG, "SNMP [%s@%s:%d]",session.community, session.peername, session.remote_port);
+	zabbix_log( LOG_LEVEL_DEBUG, "OID [%s]", item->snmp_oid);
 
 	SOCK_STARTUP;
 	ss = snmp_open(&session);
