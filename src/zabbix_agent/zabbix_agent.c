@@ -26,18 +26,20 @@ COMMAND	commands[]=
 	{"tmp_free"	,DF, "/tmp"},
 	{"usr_free"	,DF, "/usr"},
 	{"home_free"	,DF, "/home"},
+	{"var_free"	,DF, "/var"},
 	{"root_inode"	,INODE, "/"},
 	{"opt_inode"	,INODE, "/opt"},
 	{"tmp_inode"	,INODE, "/tmp"},
 	{"usr_inode"	,INODE, "/usr"},
 	{"home_inode"	,INODE, "/home"},
-	{"md5sum_inetd"	,EXECUTE, "md5sum /etc/inetd.conf |cut -b0-32|tr 'abcdef' 'ABCDEF'|bc|cut -b0-8"},
-	{"md5sum_kernel",EXECUTE, "md5sum /vmlinuz |cut -b0-32|tr 'abcdef' 'ABCDEF'|bc|cut -b0-8"},
-	{"md5sum_passwd",EXECUTE, "md5sum /etc/passwd |cut -b0-32|tr 'abcdef' 'ABCDEF'|bc|cut -b0-8"},
-	{"mon_history"	,EXECUTE, "echo 'select count(*) from history'|mysql monitor -uroot|tail -1"},
-	{"mon_sucker_load"	,EXECUTE, "ps aux|grep mon_sucker|grep -v grep|cut -b16-20"},
-	{"mon_alarmer_load"	,EXECUTE, "ps aux|grep mon_alarmer|grep -v grep|cut -b16-20"},
-	{"proccount"	,EXECUTE, "cat /proc/loadavg|cut -f2 -d'/'|cut -f1 -d' '"},
+	{"var_inode"	,INODE, "/var"},
+	{"cksum_inetd"	,EXECUTE, "cksum /etc/inetd.conf |cut -f1 -d' '"},
+	{"cksum_kernel"	,EXECUTE, "cksum /vmlinuz |cut -f1 -d' '"},
+	{"cksum_passwd"	,EXECUTE, "cksum /etc/passwd |cut -f1 -d' '"},
+//	{"mon_history"	,EXECUTE, "echo 'select count(*) from history'|mysql monitor -uroot|tail -1"},
+//	{"mon_sucker_load"	,EXECUTE, "ps aux|grep mon_sucker|grep -v grep|cut -b16-20"},
+//	{"mon_alarmer_load"	,EXECUTE, "ps aux|grep mon_alarmer|grep -v grep|cut -b16-20"},
+	{"proccount"	,EXECUTE, "echo /proc/[0-9]*|wc -w"},
 	{"ping"		,PING, 0},
 	{"procidle"	,EXECUTE, "vmstat 1 1|tail -1|awk {'print $16'}"},
 	{"procload"	,PROCLOAD, 0},
@@ -47,6 +49,10 @@ COMMAND	commands[]=
 	{"procsystem"	,EXECUTE, "vmstat 1 1|tail -1|awk {'print $15'}"},
 	{"procuser"	,EXECUTE, "vmstat 1 1|tail -1|awk {'print $14'}"},
 	{"swapfree"	,SWAPFREE, 0},
+//	{"block_bi"	,EXECUTE, "vmstat 1 2|tail -1|cut -b45-50"},
+//	{"block_bo"	,EXECUTE, "vmstat 1 2|tail -1|cut -b51-56"},
+//	{"swap_si"	,EXECUTE, "vmstat 1 2|tail -1|cut -b37-40"},
+//	{"swap_so"	,EXECUTE, "vmstat 1 2|tail -1|cut -b41-44"},
 	{"syslog_size"	,FILESIZE, "/var/log/syslog"},
 	{"tcp_count"	,EXECUTE, "netstat -tn|grep EST|wc -l"},
 	{"users"	,EXECUTE, "who|wc -l"},
@@ -122,6 +128,8 @@ int	main()
 	signal( SIGTERM, signal_handler );
 	signal( SIGALRM, signal_handler );
 
+	alarm(AGENT_TIMEOUT);
+
 	s=(char *) malloc( 1024 );
 
 	fgets(s,1024,stdin);
@@ -150,9 +158,7 @@ int	main()
 
 	if( function !=0 )
 	{
-		alarm(AGENT_TIMEOUT);
 		result=function(parameter);
-		alarm(0);
 		printf("%f",result);
 	}
 	else
@@ -162,5 +168,7 @@ int	main()
 	fflush(stdout);
 
 	free(s);
+	alarm(0);
+
 	return SUCCEED;
 }

@@ -162,17 +162,19 @@ insert into items_template (itemtemplateid,platformid,description,key_,delay)
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
 	values (18,1,"Number of established TCP connections","tcp_count", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (19,1,"Md5sum of /etc/inetd.conf","md5sum_inetd", 600);
+	values (19,1,"Checksum of /etc/inetd.conf","cksum_inetd", 600);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (20,1,"Md5sum of /vmlinuz","md5sum_kernel", 600);
+	values (20,1,"Checksum of /vmlinuz","cksum_kernel", 600);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (21,1,"Md5sum of /etc/passwd","md5sum_passwd", 600);
+	values (21,1,"Checksum of /etc/passwd","cksum_passwd", 600);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
 	values (22,1,"Ping of server","ping", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
 	values (23,1,"Free disk space on /home","home_free", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
 	values (24,1,"Free number of inodes on /home","home_inode", 30);
+insert into items_template (itemtemplateid,platformid,description,key_,delay)
+	values (25,1,"Free disk space on /var","var_free", 30);
 
 #
 # Table structure for table 'triggers_template'
@@ -227,6 +229,8 @@ insert into triggers_template (triggertemplateid,itemtemplateid,description,expr
 	values (23,23,"Low free disk space on /home","{:.last(0)}<1000000000");
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (24,24,"Low number of free inodes on /home","{:.last(0)}<1000000000");
+insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+	values (25,25,"Low free disk space on /var","{:.last(0)}<1000000000");
 
 #
 # Table structure for table 'items'
