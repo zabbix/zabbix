@@ -44,4 +44,6 @@
 	define("TRIGGER_VALUE_FALSE",0);
 	define("TRIGGER_VALUE_TRUE",1);
 	define("TRIGGER_VALUE_UNKNOWN",2);
-?>
+
+	define("RECIPIENT_TYPE_USER",0);
+	define("RECIPIENT_TYPE_GROUP",1);
