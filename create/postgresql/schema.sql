@@ -1,20 +1,6 @@
 \connect zabbix
 
 --
--- Table structure for table 'sysmaps'
---
-
-CREATE TABLE sysmaps (
-  sysmapid		serial,
-  name			varchar(128)	DEFAULT '' NOT NULL,
-  width			int4		DEFAULT '0' NOT NULL,
-  height		int4		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (sysmapid)
-);
-
-CREATE UNIQUE INDEX sysmaps_name on sysmaps (name);
-
---
 -- Table structure for table 'hosts'
 --
 
@@ -235,6 +221,63 @@ CREATE TABLE media (
   active		int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (mediaid),
   FOREIGN KEY (userid) REFERENCES users
+);
+
+--
+-- Table structure for table 'sysmaps'
+--
+
+CREATE TABLE sysmaps (
+  sysmapid		serial,
+  name			varchar(128)	DEFAULT '' NOT NULL,
+  width			int4		DEFAULT '0' NOT NULL,
+  height		int4		DEFAULT '0' NOT NULL,
+  PRIMARY KEY (sysmapid)
+);
+
+CREATE UNIQUE INDEX sysmaps_name on sysmaps (name);
+
+--
+-- Table structure for table 'sysmaps_hosts'
+--
+
+CREATE TABLE sysmaps_links (
+  linkid		serial,
+  sysmapid		int4		DEFAULT '0' NOT NULL,
+  shostid1		int4		DEFAULT '0' NOT NULL,
+  shostid2		int4		DEFAULT '0' NOT NULL,
+  PRIMARY KEY (linkid),
+  FOREIGN KEY (sysmapid) REFERENCES sysmaps,
+  FOREIGN KEY (shostid1) REFERENCES items,
+  FOREIGN KEY (shostid2) REFERENCES items
+);
+
+--
+-- Table structure for table 'graphs'
+--
+
+CREATE TABLE graphs (
+  graphid		serial,
+  name			varchar(128)	DEFAULT '' NOT NULL,
+  width			int4		DEFAULT '0' NOT NULL,
+  height		int4		DEFAULT '0' NOT NULL,
+  PRIMARY KEY (graphid),
+  UNIQUE (name)
+);
+
+CREATE UNIQUE INDEX graphs_name on graphs (name);
+
+--
+-- Table structure for table 'graphs_items'
+--
+
+CREATE TABLE graphs_items (
+  gitemid		serial,
+  graphid		int4		DEFAULT '0' NOT NULL,
+  itemid		int4		DEFAULT '0' NOT NULL,
+  PRIMARY KEY (gitemid),
+  FOREIGN KEY (graphid) REFERENCES graphs,
+  FOREIGN KEY (itemid) REFERENCES items
 );
 
 VACUUM ANALYZE;
