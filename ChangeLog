@@ -1,5 +1,6 @@
 Changes for 1.0beta11:
 
+ - date in graphs (Alexei)
  - no refresh for charts.php if period is set (Alexei)
  - new navigation for charts.php. Thanks to Igor Micko. (Alexei)
  - fixed snmptrap.sh (Alexei)
