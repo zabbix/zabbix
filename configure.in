@@ -12,7 +12,7 @@ AC_PROG_CC
 
 dnl Checks for libraries.
 AC_CHECK_LIB(crypto, main)
-AC_CHECK_LIB(snmp, main, "-lcrypto")
+AC_CHECK_LIB(snmp, main, LIBS="-lsnmp $LIBS")
 AC_CHECK_LIB(socket, main)
 AC_CHECK_LIB(nsl, main)
 
