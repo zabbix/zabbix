@@ -139,7 +139,7 @@
 				show_table2_v_delimiter();
 				echo nbsp(S_PARAMETER);
 				show_table2_h_delimiter();
-				$result=DBselect("select h.host,i.description,i.itemid from hosts h,items i where h.hostid=i.hostid and h.status in (0,2) and i.status=0 order by h.host,i.description");
+				$result=DBselect("select h.host,i.description,i.itemid from hosts h,items i where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 order by h.host,i.description");
 				echo "<select name=\"resourceid\" size=1>";
 				echo "<OPTION VALUE='0'>(none)";
 				for($i=0;$i<DBnum_rows($result);$i++)
@@ -157,7 +157,7 @@
 				show_table2_v_delimiter();
 				echo nbsp(S_PARAMETER);
 				show_table2_h_delimiter();
-				$result=DBselect("select h.host,i.description,i.itemid from hosts h,items i where h.hostid=i.hostid and h.status in (0,2) and i.status=0 order by h.host,i.description");
+				$result=DBselect("select h.host,i.description,i.itemid from hosts h,items i where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 order by h.host,i.description");
 				echo "<select name=\"resourceid\" size=1>";
 				echo "<OPTION VALUE='0'>(none)";
 				for($i=0;$i<DBnum_rows($result);$i++)
