@@ -47,7 +47,7 @@
 	$result=DBselect("select name,cols,rows from screens where scid=$scid");
 	$row=DBfetch($result);
 	show_table_header($row["name"]);
-	echo "<TABLE BORDER=1 COLS=".$row["cols"]." align=center WIDTH=100% BGCOLOR=\"#CCCCCC\"";
+	echo "<TABLE BORDER=1 COLS=".$row["cols"]." align=center WIDTH=100% BGCOLOR=\"#FFFFFF\"";
         for($r=0;$r<$row["rows"];$r++)
 	{
 	echo "<TR>";
@@ -128,7 +128,7 @@
 		}
 		else if($graphid!=0)
 		{
-			echo "<a href=screenedit.php?register=edit&scid=$scid&x=$c&y=$r><img src='chart2.php?graphid=$graphid&width=$width&height=$height&period=3600'></a>";
+			echo "<a href=screenedit.php?register=edit&scid=$scid&x=$c&y=$r><img src='chart2.php?graphid=$graphid&width=$width&height=$height&period=3600' border=0></a>";
 		}
 		else
 		{
