@@ -268,7 +268,7 @@ int	evaluate_FUNCTION(float *value,int itemid,char *function,int parameter)
 
 int	update_functions( int itemid )
 {
-	FUNCTION	function;
+	DB_FUNCTION	function;
 	DB_RESULT	*result;
 	char		c[1024];
 	float		value;
@@ -509,7 +509,7 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 
 void	send_to_user(int actionid,int userid,char *smtp_server,char *smtp_helo,char *smtp_email,char *subject,char *message)
 {
-	MEDIA media;
+	DB_MEDIA media;
 	char c[1024];
 	DB_RESULT *result;
 
@@ -611,7 +611,7 @@ void	update_triggers(int itemid)
 	char c[1024];
 	char exp[8192];
 	int b;
-	TRIGGER trigger;
+	DB_TRIGGER trigger;
 	DB_RESULT *result;
 
 	int	i,rows;

@@ -57,6 +57,7 @@ int	DBexecute(char *query)
 
 	if( mysql_query(&mysql,query) != 0 )
 	{
+		syslog( LOG_ERR, "Query::%s",query);
 		syslog(LOG_ERR, "Query failed:%s", mysql_error(&mysql) );
 		return FAIL;
 	}
@@ -96,6 +97,7 @@ DB_RESULT *DBselect(char *query)
 
 	if( mysql_query(&mysql,query) != 0 )
 	{
+		syslog( LOG_ERR, "Query::%s",query);
 		syslog(LOG_ERR, "Query failed:%s", mysql_error(&mysql) );
 		exit( FAIL );
 	}
