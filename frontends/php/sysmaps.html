@@ -52,16 +52,18 @@
 		$name=DBget_field($result,$i,1);
 		$width=DBget_field($result,$i,2);
 		$height=DBget_field($result,$i,3);
-		echo "<TD><a href=\"sysmaps.html?sysmapid=$sysmapid\">$name</a></TD>";
+		echo "<TD><a href=\"sysmap.html?sysmapid=$sysmapid\">$name</a></TD>";
 		echo "<TD>$width</TD>";
 		echo "<TD>$height</TD>";
-		echo "<TD><A HREF=\"sysmaps.html?register=delete&sysmapid=$sysmapid\">Delete</A></TD>";
+		echo "<TD><A HREF=\"sysmaps.html?sysmapid=$sysmapid#form\">Change</A> - <A HREF=\"sysmaps.html?register=delete&sysmapid=$sysmapid\">Delete</A></TD>";
 		echo "</TR>";
 	}
 	echo "</TABLE>";
 ?>
 
 <?
+	echo "<a name=\"form\"></a>";
+
 	echo "<br>";
 	show_table2_header_begin();
 	echo "New system map";
