@@ -5,6 +5,6 @@ all:
 	@CC@ -o ../../bin/zabbix_sender @CFLAGS@ -I../../include zabbix_sender.c @LIBS@
 
 clean:
-	rm -fv *.o 
-	rm -fv ../../bin/zabbix_sender
+	rm -f *.o 
+	rm -f ../../bin/zabbix_sender
 

@@ -6,7 +6,7 @@ all:
 	@CC@ -o ../../bin/zabbix_agentd @CFLAGS@ -I../../include zabbix_agentd.c sysinfo.c stats.c interfaces.c diskdevices.c ../../include/log.c ../../include/cfg.c ../../include/security.c -Wall @LIBS@
 
 clean:
-	rm -fv *.o 
-	rm -fv ../../bin/zabbix_agent
-	rm -fv ../../bin/zabbix_agentd
+	rm -f *.o 
+	rm -f ../../bin/zabbix_agent
+	rm -f ../../bin/zabbix_agentd
 

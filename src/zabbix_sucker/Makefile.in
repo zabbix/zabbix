@@ -8,6 +8,6 @@ all:
 	@CC@ -o ../../bin/zabbix_suckerd @CFLAGS@ -I../../include $(INCLUDE) zabbix_sucker.c ../../include/db.c ../../include/functions.c ../../include/expression.c ../../include/cfg.c ../../include/log.c ../../include/security.c ../zabbix_agent/sysinfo.c alerter.c pinger.c -Wall $(LIBS) 
 
 clean:
-	rm -fv *.o 
-	rm -fv ../../bin/zabbix_suckerd
+	rm -f *.o 
+	rm -f ../../bin/zabbix_suckerd
 
