@@ -143,6 +143,10 @@ insert into items_template (itemtemplateid,description,key_,delay)
 	values (61,'Number of running processes zabbix_suckerd','proc_cnt[zabbix_suckerd]', 60);
 insert into items_template (itemtemplateid,description,key_,delay)
 	values (62,'Number of running processes zabbix_trapperd','proc_cnt[zabbix_trapperd]', 60);
+insert into items_template (itemtemplateid,description,key_,delay)
+	values (63,'Maximum number of processes','kern[maxproc]', 1800);
+insert into items_template (itemtemplateid,description,key_,delay)
+	values (64,'Maximum number of opened files','kern[maxfiles]', 1800);
 
 --
 -- Data for table triggers_template
@@ -230,4 +234,8 @@ insert into triggers_template (triggertemplateid,itemtemplateid,description,expr
 	values (61,61,'Zabbix_suckerd is not running on %s','{:.last(0)}<1');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (62,62,'Zabbix_trapperd is not running on %s','{:.last(0)}<1');
+insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+	values (63,63,'Configured max number of processes is too low on %s','{:.last(0)}<256');
+insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+	values (64,64,'Configured max number of opened files is too low on %s','{:.last(0)}<512');
 

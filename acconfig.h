@@ -4,8 +4,20 @@
 /* Define if file /proc/loadavg exists */
 #undef HAVE_PROC_LOADAVG
 
+/* Define if function sysctl accepts KERN_BOOTTIME */
+#undef HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME
+
+/* Define if function sysctl accepts KERN_MAXPROC */
+#undef HAVE_FUNCTION_SYSCTL_KERN_MAXPROC
+
+/* Define if function sysctl accepts KERN_MAXFILES */
+#undef HAVE_FUNCTION_SYSCTL_KERN_MAXFILES
+
 /* Define if function setproctitle() exists */
 #undef HAVE_FUNCTION_SETPROCTITLE
+
+/* Define if functions seteuid() and setegid() exist */
+#undef HAVE_FUNCTION_SETEUID
 
 /* Define if file /proc/1/status exists */
 #undef HAVE_PROC_1_STATUS

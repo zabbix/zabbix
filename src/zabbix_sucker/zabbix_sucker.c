@@ -32,6 +32,7 @@
 #endif
 
 #include "common.h"
+#include "cfg.h"
 #include "db.h"
 #include "functions.h"
 #include "expression.h"
@@ -41,7 +42,7 @@ static	pid_t	*pids=NULL;
 int	sucker_num=0;
 int	CONFIG_SUCKERD_FORKS		=SUCKER_FORKS;
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
-char	*CONFIG_PID_FILE		= NULL;
+static	char	*CONFIG_PID_FILE		= NULL;
 char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
@@ -57,13 +58,16 @@ void	uninit(void)
 		{
 			for(i=0;i<CONFIG_SUCKERD_FORKS-1;i++)
 			{
-				kill(pids[i],SIGTERM);
+				if(kill(pids[i],SIGTERM) !=0 )
+				{
+					syslog( LOG_WARNING, "Cannot kill process. PID=[%d] [%m]", pids[i]);
+				}
 			}
 		}
 
 		if(unlink(CONFIG_PID_FILE) != 0)
 		{
-			syslog( LOG_WARNING, "Cannot remove PID file [%s]",
+			syslog( LOG_WARNING, "Cannot remove PID file [%s] [%m]",
 				CONFIG_PID_FILE);
 		}
 	}
@@ -117,15 +121,15 @@ void	daemon_init(void)
 			fprintf(stderr,"Cannot setgid or setuid to zabbix");
 			exit(FAIL);
 		}
-/*
-Is not supported on HP-UX
 
+#ifdef HAVE_FUNCTION_SETEUID
 		if( (setegid(pwd->pw_gid) ==-1) || (seteuid(pwd->pw_uid) == -1) )
 		{
 			fprintf(stderr,"Cannot setegid or seteuid to zabbix");
 			exit(FAIL);
 		}
-*/
+#endif
+
 	}
 
 	if( (pid = fork()) != 0 )
@@ -165,7 +169,11 @@ void	create_pid_file(void)
 	{
 		syslog( LOG_CRIT, "File [%s] exists. Is zabbix_agentd already running ?",
 			CONFIG_PID_FILE);
-		fclose(f);
+		if(fclose(f) != 0)
+		{
+			syslog( LOG_WARNING, "Cannot close file [%s] [%m]",
+			CONFIG_PID_FILE);
+		}
 		exit(-1);
 	}
 
@@ -173,14 +181,40 @@ void	create_pid_file(void)
 
 	if( f == NULL)
 	{
-		syslog( LOG_CRIT, "Cannot create PID file [%s]. Errno [%d]",
-			CONFIG_PID_FILE, errno);
+		syslog( LOG_CRIT, "Cannot create PID file [%s] [%m]",
+			CONFIG_PID_FILE);
 		uninit();
 		exit(-1);
 	}
 
 	fprintf(f,"%d",getpid());
-	fclose(f);
+	if(fclose(f) != 0)
+	{
+		syslog( LOG_WARNING, "Cannot close file [%s] [%m]",
+		CONFIG_PID_FILE);
+	}
+}
+
+void	init_config(void)
+{
+	struct cfg_line cfg[]=
+	{
+/*		 PARAMETER	,VAR	,FUNC,	TYPE(0i,1s),MANDATORY,MIN,MAX	*/
+		{"StartSuckers",&CONFIG_SUCKERD_FORKS,0,TYPE_INT,PARM_OPT,2,255},
+		{"HousekeepingFrequency",&CONFIG_HOUSEKEEPING_FREQUENCY,0,TYPE_INT,PARM_OPT,1,24},
+		{"PidFile",&CONFIG_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
+		{"DBName",&CONFIG_DBNAME,0,TYPE_STRING,PARM_OPT,0,0},
+		{"DBUser",&CONFIG_DBUSER,0,TYPE_STRING,PARM_OPT,0,0},
+		{"DBPassword",&CONFIG_DBPASSWORD,0,TYPE_STRING,PARM_OPT,0,0},
+		{0}
+	};
+	parse_cfg_file("/etc/zabbix/zabbix_suckerd.conf",cfg);
+/*	syslog( LOG_WARNING, "PidFile [%d]", CONFIG_PID_FILE);
+	syslog( LOG_WARNING, "PidFile [%d]", &CONFIG_PID_FILE);
+	syslog( LOG_WARNING, "PidFile [%s]", &CONFIG_PID_FILE);*/
+	syslog( LOG_WARNING, "PidFile [%s]", CONFIG_PID_FILE);
+	
+	
 }
 
 void	process_config_file(void)
@@ -436,7 +470,7 @@ int	get_value_SNMPv1(double *result,DB_ITEM *item)
 }
 #endif
 
-int	get_value_zabbix(double *result,DB_ITEM *item)
+int	get_value_zabbix(double *result,char **result_str,DB_ITEM *item)
 {
 	int	s;
 	int	i;
@@ -474,7 +508,7 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 	s=socket(AF_INET,SOCK_STREAM,0);
 	if(s==0)
 	{
-		syslog( LOG_WARNING, "Cannot create socket" );
+		syslog(LOG_WARNING, "Cannot create socket [%m]");
 		return	FAIL;
 	}
  
@@ -493,7 +527,7 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 				syslog( LOG_WARNING, "No route to host [%s]",item->host );
 				break;
 			default:
-				syslog( LOG_WARNING, "Cannot connect to [%s]. Errno [%d]",item->host,errno);
+				syslog( LOG_WARNING, "Cannot connect to [%s] [%m]",item->host);
 		} 
 		close(s);
 		return	NETWORK_ERROR;
@@ -508,7 +542,7 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 				syslog( LOG_WARNING, "Timeout while sending data to [%s]",item->host );
 				break;
 			default:
-				syslog( LOG_WARNING, "Error while sending data to [%s]. Errno [%d]",item->host,errno);
+				syslog( LOG_WARNING, "Error while sending data to [%s] [%m]",item->host);
 		} 
 		close(s);
 		return	FAIL;
@@ -527,7 +561,7 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 					close(s);
 					return	NETWORK_ERROR;
 			default:
-				syslog( LOG_WARNING, "Error while receiving data from [%s]. Errno [%d]",item->host,errno);
+				syslog( LOG_WARNING, "Error while receiving data from [%s] [%m]",item->host);
 		} 
 		close(s);
 		return	FAIL;
@@ -535,7 +569,7 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
  
 	if( close(s)!=0 )
 	{
-		syslog(LOG_WARNING, "Problem with close" );
+		syslog(LOG_WARNING, "Problem with close [%m]");
 	}
 	c[i-1]=0;
 
@@ -561,10 +595,14 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 		}
 	}
 
+	*result_str=strdup(c);
+
+	syslog(LOG_DEBUG, "RESULT_STR [%s]", c );
+
 	return SUCCEED;
 }
 
-int	get_value(double *result,DB_ITEM *item)
+int	get_value(double *result,char **result_str,DB_ITEM *item)
 {
 	int res;
 
@@ -579,7 +617,7 @@ int	get_value(double *result,DB_ITEM *item)
 
 	if(item->type == ITEM_TYPE_ZABBIX)
 	{
-		res=get_value_zabbix(result,item);
+		res=get_value_zabbix(result,result_str,item);
 	}
 #ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
 	else if(item->type == ITEM_TYPE_SNMP)
@@ -633,6 +671,7 @@ int get_minnextcheck(int now)
 int get_values(void)
 {
 	double		value;
+	char		*value_str;
 	char		c[1024];
  
 	DB_RESULT	*result;
@@ -647,7 +686,7 @@ int get_values(void)
 
 	now = time(NULL);
 
-	sprintf(c,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-1,sucker_num-1);
+	sprintf(c,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-1,sucker_num-1);
 	result = DBselect(c);
 
 	rows = DBnum_rows(result);
@@ -695,12 +734,14 @@ int get_values(void)
 		}
 		item.hostid=atoi(DBget_field(result,i,15));
 		host_status=atoi(DBget_field(result,i,16));
+		item.value_type=atoi(DBget_field(result,i,17));
 
-		res = get_value(&value,&item);
+		res = get_value(&value,&value_str,&item);
+		syslog( LOG_DEBUG, "GOT VALUE [%s]", value_str );
 		
 		if(res == SUCCEED )
 		{
-			process_new_value(&item,value);
+			process_new_value(&item,value_str);
 			if(2 == host_status)
 			{
 				host_status=0;
@@ -774,7 +815,10 @@ int housekeeping_history(int now)
 		item.lastdelete=atoi(DBget_field(result,i,1));
 		item.history=atoi(DBget_field(result,i,2));
 
-		sprintf	(c,"delete from history where ItemId=%d and Clock<%d",item.itemid,now-item.history);
+/* To be rewritten. Only one delete depending on item.value_type */
+		sprintf	(c,"delete from history where itemid=%d and clock<%d",item.itemid,now-item.history);
+		DBexecute(c);
+		sprintf	(c,"delete from history_str where itemid=%d and clock<%d",item.itemid,now-item.history);
 		DBexecute(c);
 	
 		sprintf(c,"update items set LastDelete=%d where ItemId=%d",now,item.itemid);
@@ -923,6 +967,9 @@ int main(int argc, char **argv)
 	sigaction(SIGCHLD, &phan, NULL);
 
 	process_config_file();
+
+/* process_config_file to be removed */
+/*	init_config();*/
 
 	create_pid_file();
 

@@ -1,9 +1,11 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(src/zabbix_sucker/zabbix_sucker.c)
-AM_INIT_AUTOMAKE(PACKAGE,all)
 
-AM_CONFIG_HEADER(include/config.h)
+dnl AM_INIT_AUTOMAKE(PACKAGE,all)
+
 AC_PROG_MAKE_SET
+
+dnl AM_CONFIG_HEADER(include/config.h)
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -24,7 +26,8 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   mtent.h fcntl.h sys/param.h sys/mount.h arpa/inet.h \
   sys/vfs.h sys/pstat.h sys/sysinfo.h sys/statvfs.h \
   sys/socket.h sys/loadavg.h netinet/in.h arpa/inet.h \
-  sys/swap.h sys/vmmeter.h strings.h sys/sysctl.h vm/vm_param.h)
+  sys/swap.h sys/vmmeter.h strings.h sys/sysctl.h vm/vm_param.h \
+  sys/time.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -166,6 +169,85 @@ AC_TRY_COMPILE([#include <sys/sysinfo.h>],
 sysinfo.totalswap=0;
 ],
 AC_DEFINE(HAVE_SYSINFO_TOTALSWAP)
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for function sysctl (KERN_BOOTTIME)
+AC_MSG_CHECKING(for function sysctl (KERN_BOOTTIME))
+AC_TRY_COMPILE(
+[
+	#include <sys/types.h>
+	#include <sys/sysctl.h>
+	#include <unistd.h>
+	#include <time.h>
+	#include <sys/time.h>
+],
+[
+	struct timeval uptime;
+        int     mib[2],len;
+        int     now;
+
+        mib[0]=CTL_KERN;
+        mib[1]=KERN_BOOTTIME;
+        len=sizeof(uptime);
+        sysctl(mib,2,&uptime,&len,0,0);
+],
+AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME)
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for function sysctl (KERN_MAXFILES)
+AC_MSG_CHECKING(for function sysctl (KERN_MAXFILES))
+AC_TRY_COMPILE(
+[
+	#include <sys/types.h>
+	#include <sys/sysctl.h>
+],
+[
+        int     mib[2],len;
+        int     maxfiles;
+
+        mib[0]=CTL_KERN;
+        mib[1]=KERN_MAXFILES;
+        len=sizeof(maxfiles);
+        sysctl(mib,2,&maxfiles,&len,0,0);
+],
+AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_MAXFILES)
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for function sysctl (KENR_MAXPROC)
+AC_MSG_CHECKING(for function sysctl (KERN_MAXPROC))
+AC_TRY_COMPILE(
+[
+	#include <sys/types.h>
+	#include <sys/sysctl.h>
+],
+[
+        int     mib[2],len;
+        int     maxproc;
+
+        mib[0]=CTL_KERN;
+        mib[1]=KERN_MAXPROC;
+        len=sizeof(maxproc);
+        sysctl(mib,2,&maxproc,&len,0,0);
+],
+AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_MAXPROC)
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for function seteuid()
+AC_MSG_CHECKING(for function seteuid())
+AC_TRY_COMPILE(
+[
+	#include <sys/types.h>
+	#include <unistd.h>
+],
+[
+	seteuid(0);
+	setegid(0);
+],
+AC_DEFINE(HAVE_FUNCTION_SETEUID)
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -380,6 +462,8 @@ else
 fi
 
 AC_SUBST(SUBDIRS)
+
+AC_CONFIG_HEADER(include/config.h)
 
 AC_OUTPUT(Makefile src/zabbix_sender/Makefile src/zabbix_agent/Makefile \
        	src/zabbix_sucker/Makefile src/zabbix_trapper/Makefile)

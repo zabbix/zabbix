@@ -190,6 +190,17 @@ CREATE TABLE history (
 );
 
 #
+# Table structure for table 'history_str'
+#
+
+CREATE TABLE history_str (
+  itemid int(4) DEFAULT '0' NOT NULL,
+  clock int(4) DEFAULT '0' NOT NULL,
+  value blob,
+  PRIMARY KEY (itemid,clock)
+);
+
+#
 # Table structure for table 'hosts'
 #
 
@@ -252,6 +263,7 @@ CREATE TABLE items (
 	lastclock	int(4) DEFAULT NULL,
 	prevvalue	double(16,4) DEFAULT NULL,
 	status		int(4) DEFAULT '0' NOT NULL,
+	value_type	int(4) DEFAULT '0' NOT NULL,
 	PRIMARY KEY	(itemid),
 	UNIQUE		shortname (hostid,key_),
 	KEY		(hostid),
