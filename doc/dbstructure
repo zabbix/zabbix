@@ -145,7 +145,7 @@ STRUCTURE
 	lastvalue	double	; Last value retrieved from host 
 	lastclock	int	; Time when last value was retrieved
 	prevvalue	double	; Previous last value
-	status		int	; Status of item. 0 - active, 1 - disabled, 2 - traper, 
+	status		int	; Status of item. 0 - active, 1 - disabled, 2 - trapper, 
 				; 3 - not supported by agent 
 
 

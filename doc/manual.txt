@@ -17,12 +17,13 @@
 3.2 zabbix_agent
 3.3 zabbix_agentd
 3.4 zabbix_trapper
-3.5 zabbix_sender
-3.6 Database
-3.7 WEB-based frontend
-3.8.1 Reports
-3.8.1.1 Status of Zabbix
-3.8.1.2 Availability report
+3.5 zabbix_trapperd
+3.6 zabbix_sender
+3.7 Database
+3.8 WEB-based frontend
+3.9.1 Reports
+3.9.1.1 Status of Zabbix
+3.9.1.2 Availability report
 
 4. Chapter 4 (Installation)
 
@@ -78,7 +79,7 @@ Additionally, Zabbix is useful tool for monitoring integrity of servers to avoid
 attempts.
 Stored data is useful source of information for capacity planning.
 
-Flexible notification mechanism allows to configure e-mail based alerms
+Flexible notification mechanism allows to configure e-mail based alerts
 for virtually any pre-defined events. The alarms help to prevent
 possible problems before they actually happen.
 
@@ -111,9 +112,11 @@ The following are amongst the features that Zabbix offer:
 2.1 Performance monitoring
 
 One of most important use of Zabbix is performance monitoring. Processor load, number of running processes,
-number of processes, disk activity, status of wap space, memory availability  - that is only part
-of system parameters Zabbix is able to monitor. Zabbix provides a system (e.g. database, an application) administrator
+number of processes, disk activity, status of swap space, memory availability  - that is only part
+of system parameters Zabbix is able to monitor. Zabbix provides a system (database, an application) administrator
 with latest information about performance of server being monitored.
+
+Trends help identify bottlenecks in performance of the system. 
 
 2.2 Alarming users
 
@@ -131,7 +134,7 @@ So, you add action for this trigger. When the trigger expression becomes true, y
 
 2.3 Integrity checking
 
-Zabbix can easily be used for servers' integrity checking. All mission critical configuration files,
+Zabbix can easily be used for servers' integrity checking. All critical configuration files,
 binaries, kernel, scripts, web server HTML pages can be monitored by Zabbix to be alarmed in case of any modifications
 made on these files.
 
@@ -141,15 +144,15 @@ All values of monitored parameters Zabbix stores in database. The collected data
 
 2.5 Capacity planning
 
-Looking at graph of process load (disk usage,database activity, ...)  for period of several weeks (or monthes), 
+Looking at trends of process load (disk usage,database activity, ...)  for period of several weeks (or monthes), 
 system administrator can clearly see when next hardware upgrade should be made.
 
 3. Chapter 3 (Structure)
 
-Zabbix has basically client-server architecture. Zabbix server periodically
+Zabbix basically has client-server architecture. Zabbix server (zabbix_suckerd) periodically
 gets most recent information of parameters for monitored host. It connects to 
 an agent placed on the host, asks for specific information (for example, processor load). Agent
-gives the information back to server and server, in its turn, stores received
+provides server with requisted information and the server, in its turn, stores received
 value in the database.
 
 It is also possible to use trapping method. In tis case, monitored host sends information
@@ -166,11 +169,14 @@ zabbix_suckerd
 DESCRIPTION
 
 The process periodically connects to agents (either Zabbix native or SNMP) to get updated information on parameters being
-monitored.  Also, the process periodically re-calculates status of triggers. It sends alerts to users
+monitored.  Also, the process re-calculates status of triggers. It sends alerts to users
 if required.
 
 By default, zabbix_suckerd forks ten copies of itself. It means that Zabbix will be able to get ten monitored parameters
 simultaneously. Modify parameter SUCKER_FORKS in include/common.h if ten is not enough for you. 
+
+One process zabbix_suckerd is used for housekeeping purposes only. It periodically (by default, hourly) deletes outdated information 
+from table history.
 
 No switches are supported by zabbix_suckerd.
 
@@ -196,7 +202,7 @@ during 3 seconds, it kills himself.
 When connection to zabbix_agent is made, the agent reads /etc/zabbix/zabbix_agent.conf file. This file should exist and contain
 IP address of Zabbix server. Connections from other IPs are rejected.
 
-If possible, use zabbix_agentd. It does not require extra fork() and exec() calls for every connection.
+If possible, use zabbix_agentd. The process does not require extra fork() and exec() calls for every connection.
 
 3.3 zabbix_agentd
 
@@ -211,7 +217,7 @@ DESCRIPTION
 The process runs on host being monitored. zabbix_agentd provides requested information to 
 zabbix_suckerd. 
 
-When executed, it forks himself. Load is balanced between each copy (dafault is ten).
+When executed, it forks himself. Load is balanced between each copy of the process (default is ten).
 
 When connection to zabbix_agentd is made, the agent reads /etc/zabbix/zabbix_agent.conf file. This file should exist and contain
 IP address of Zabbix server. Connections from other IPs are rejected.
@@ -232,9 +238,32 @@ zabbix_trapper
 DESCRIPTION
 
 The process is made to support traping. It constantly waits for connections from zabbix_sender
-agents.  
+agents.
 
-3.5 zabbix_sender
+If possible, use zabbix_trapperd. The process does not require extra fork() and exec() calls for every connection. Additionally, it does
+not require daemon inetd.
+
+3.5 zabbix_trapperd
+
+Zabbix server process (daemon).
+
+SYNOPSIS
+
+zabbix_trapperd
+
+DESCRIPTION
+
+The process collects information passed by active agents (zabbix_sender).
+
+By default, zabbix_trapperd forks ten copies of itself.
+Modify parameter TRAPPERD_FORKS in include/common.h if ten is not enough for you. 
+
+No switches are supported by zabbix_trapperd.
+
+The process is run as daemon under non-priveledged user account, usually zabbix. Syslog is used to store
+debug information for the process.
+
+3.6 zabbix_sender
 
 The Zabbix agent (trapping).
 
@@ -258,21 +287,21 @@ zabbix_sender zabbix.abcde.com 10001 db.abcde.com:procload 2.34
 It means, that zabbix_sender will send information about processor load on host db.abcde.com
 to Zabbix server located at zabbix.acbde.com. Processor load is 2.34.
 
-3.6 Database
+3.7 Database
 
 Database used by Zabbix play most important role. The database is the only source
 of configuration parameters and it stores all history of monitored values.
 
-Zabbix performance highly depends on officiency and speed of used database.
+Zabbix performance highly depends on efficiency and speed of used database.
  
-3.7 WEB-based frontend
+3.8 WEB-based frontend
 
 The frontend provides convinient and platform independed way for accessing Zabbix.
 Information provided by the frontend can be either graphical (e.g. graph on disk space
 usage) or text format. Text representation of monitored parameters is made to allow
 easy way for export Zabbix data to other analytical tools.
 
-3.7.1 Reports
+3.8.1 Reports
 
 Zabbix reports represent collected information in structured way. All reports are produced
 in HTML format.
@@ -281,7 +310,7 @@ Note that report generation could be very time consuming operation. Additionally
 use MySQL or ay other database with table locking, zabbix_suckerd and zabbix_trapper will
 wait until the report is finished.
 
-3.7.1.1 Status of Zabbix
+3.8.1.1 Status of Zabbix
 
 This report gives general information about Zabbix server including:
 
@@ -289,7 +318,7 @@ This report gives general information about Zabbix server including:
  - are main Zabbix processes running ?
  - other information
 
-3.7.1.2 Availability report
+3.8.1.2 Availability report
 
 This report calculates amount of time a trigger spent in true and false states. 
 
@@ -646,14 +675,14 @@ net[listen_143]			|	X      |	X      |      -      |      -      |      -      | 
 6. Chapter 6 (Upgrading)
 
 Upgrade procedure is quite simple. New binaries and frontend
-should be installed according to latest installation guide.
+should be installed according to latest installation incstuctions.
 
 In order to update database structure, the following steps
 should be performed. Note that before applying database patches,
 all Zabbix processes must be stopped. Also, the process can take
 from 0 seconds (if no patches required) up to several hours. 
 
-For business-critical installations database backup is required !
+For production installations database backup is required !
 
 Step 1. cd upgrades/dbpatches/
 Step 2. In case, if you need to upgrade existing 1.0alpha3 version to 1.0alpha4 version. 
