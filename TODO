@@ -5,6 +5,7 @@
  - hardlinked templates (several templates, one host)
  - escalation and repeated notifications
  - take advantage of PHP OOP (everything in classes)
+ - improve WEB site to provide understanding of Zabbix and its concepts
 
  - add selection of MIN/MAX/AVG for graphs
  - make sure all screens looks good in case of hundreds of servers/groups
