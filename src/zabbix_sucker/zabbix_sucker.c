@@ -44,6 +44,7 @@ static	int	CONFIG_SUCKERD_FORKS		=SUCKER_FORKS;
 static	int	CONFIG_NOTIMEWAIT		=0;
 static	int	CONFIG_TIMEOUT			=SUCKER_TIMEOUT;
 static	int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
+static	int	CONFIG_DISABLE_HOUSEKEEPING	= 0;
 static	int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 static	char	*CONFIG_PID_FILE		= NULL;
 static	char	*CONFIG_LOG_FILE		= NULL;
@@ -204,6 +205,7 @@ void	init_config(void)
 		{"HousekeepingFrequency",&CONFIG_HOUSEKEEPING_FREQUENCY,0,TYPE_INT,PARM_OPT,1,24},
 		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
 		{"NoTimeWait",&CONFIG_NOTIMEWAIT,0,TYPE_INT,PARM_OPT,0,1},
+		{"DisableHousekeeping",&CONFIG_DISABLE_HOUSEKEEPING,0,TYPE_INT,PARM_OPT,0,1},
 		{"DebugLevel",&CONFIG_LOG_LEVEL,0,TYPE_INT,PARM_OPT,0,4},
 		{"PidFile",&CONFIG_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"LogFile",&CONFIG_LOG_FILE,0,TYPE_STRING,PARM_OPT,0,0},
@@ -311,9 +313,9 @@ int	get_value_SNMPv1(double *result,DB_ITEM *item)
 				char *sp = (char *)malloc(1 + vars->val_len);
 				memcpy(sp, vars->val.string, vars->val_len);
 				sp[vars->val_len] = '\0';
-/*			zabbix_log( LOG_LEVEL_WARNING, "value #%d is a string: %s\n", count++, sp);
-			*result=strtod(sp,&e);
-			zabbix_log( LOG_LEVEL_WARNING, "Type:%d", vars->type);
+				zabbix_log( LOG_LEVEL_WARNING, "value #%d is a string: %s\n", count++, sp);
+				zabbix_log( LOG_LEVEL_WARNING, "Type:%d", vars->type);
+/*			*result=strtod(sp,&e);
 			zabbix_log( LOG_LEVEL_WARNING, "Value #%d is an integer: %d", count++, *vars->val.integer);*/
 				*result=*vars->val.integer;
 				free(sp);
@@ -775,6 +777,18 @@ int main_housekeeping_loop()
 {
 	int	now;
 
+	if(CONFIG_DISABLE_HOUSEKEEPING == 1)
+	{
+		for(;;)
+		{
+/* Do nothing */
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+			setproctitle("do nothing");
+#endif
+			sleep(3600);
+		}
+	}
+
 	now = time(NULL);
 
 	for(;;)
@@ -913,7 +927,7 @@ int main(int argc, char **argv)
 	init_snmp("zabbix_suckerd");
 #endif
 
-	if(sucker_num == 0)
+	if( sucker_num == 0)
 	{
 /* First instance of zabbix_suckerd does housekeeping procedures */
 		main_housekeeping_loop();

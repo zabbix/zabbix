@@ -15,6 +15,7 @@ Not ready yet:
 
 Changes for 1.0beta4:
 
+ - support for DisableHousekeeping for zabbix_suckerd (Alexei)
  - protection from items.delay set to 0 (Alexei)
  - values provided by an agent can be less than zero (Alexei)
 
