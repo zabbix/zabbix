@@ -396,6 +396,7 @@ CREATE TABLE graphs_items (
   graphid		int4		DEFAULT '0' NOT NULL,
   itemid		int4		DEFAULT '0' NOT NULL,
   drawtype		int4		DEFAULT '0' NOT NULL,
+  sortorder		int4		DEFAULT '0' NOT NULL,
   color			varchar(32)	DEFAULT 'Dark Green' NOT NULL,
   PRIMARY KEY (gitemid),
   FOREIGN KEY (graphid) REFERENCES graphs,
