@@ -344,7 +344,7 @@ int get_minnextcheck(void)
 	}
 
 	count = atoi(DBget_field(result,0,0));
-	res = atoi(DBget_field(result,0,0));
+	res = atoi(DBget_field(result,0,1));
 
 	if( count == 0 )
 	{

@@ -1257,8 +1257,6 @@
 			$till=date("d M - H:i:s",$till);   
 		}
 
-		echo "<center>";
-
 		if (!isset($period))
 		{ 
 			$period=3600;
@@ -1270,7 +1268,9 @@
 			show_table_header("TILL $till ($tmp HOURs)");
 		}
 		echo("<hr>");
+		echo "<center>";
 		echo "<IMG SRC=\"chart.html?itemid=$itemid&period=$period&from=$from\">"; 
+		echo "</center>";
 		echo("<hr>");
 
  

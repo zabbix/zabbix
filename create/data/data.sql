@@ -149,8 +149,6 @@ insert into triggers_template (triggertemplateid,itemtemplateid,description,expr
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (21,21,'/passwd has been changed','{:.diff(0)}>0');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (22,22,'No ping from server','{:.nodata(60)}>0');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (23,23,'Low free disk space on /home','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (24,24,'Low number of free inodes on /home','{:.last(0)}<10000');
