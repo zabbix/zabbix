@@ -19,7 +19,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   mtent.h fcntl.h sys/param.h sys/mount.h arpa/inet.h \
   sys/vfs.h sys/pstat.h sys/sysinfo.h sys/statvfs.h \
   sys/socket.h sys/loadavg.h netinet/in.h arpa/inet.h \
-  sys/swap.h strings.h)
+  sys/swap.h sys/vmmeter.h strings.h sys/sysctl.h vm/vm_param.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
