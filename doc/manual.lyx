@@ -44,6 +44,60 @@ The document is Reference Manual for Zabbix version 1.0.
 
 \layout Section
 
+Introduction
+\layout Subsection
+
+Purpose of this document
+\layout Standard
+
+The purpose of this document is to provide a comprehensive introduction
+ and overview of 
+\emph on 
+ZABBIX
+\emph default 
+, its architecture, the features it offers and their functions.
+\layout Subsection
+
+What you should already know
+\layout Standard
+
+No particular technical knowledge is required, although an understanding
+ of UNIX is essential.
+\layout Subsection
+
+Who should use this document
+\layout Standard
+
+Anyone involved in installation and administration of 
+\emph on 
+ZABBIX
+\emph default 
+, and anyone else wishing to goin an insight into how it works.
+\layout Subsection
+
+Structure of this document
+\layout Description
+
+Part1 Overview of the
+\emph on 
+ ZABBIX
+\emph default 
+ system
+\layout Description
+
+Part2 Installation and configuration guide
+\layout Description
+
+Appendix
+\layout Part
+
+Overview of the
+\emph on 
+ ZABBIX 
+\emph default 
+system
+\layout Section
+
 Document conventions
 \layout Standard
 
@@ -56,7 +110,7 @@ uses the typographical conventions shown in the following table.
 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="6" columns="2">
+<lyxtabular version="2" rows="7" columns="2">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
@@ -105,6 +159,26 @@ Name of file or directory, emphasis
 \layout Standard
 
 
+\emph on 
+ZABBIX
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Zabbix
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+
 \series bold 
 bold text
 \end_inset 
@@ -114,7 +188,7 @@ bold text
 
 \layout Standard
 
-Zabbix, program names
+Programs, applications
 \end_inset 
 </cell>
 </row>
@@ -186,7 +260,9 @@ Shell commands
 
 \layout Section
 
-General Information Zabbix
+Overview of 
+\emph on 
+ZABBIX
 \layout Subsection
 
 What is Zabbix
@@ -288,6 +364,14 @@ end.
  
 \latex no_latex 
 The web-based front end means that the health of your servers can be assessed
+\latex default 
+
+\begin_inset Info
+Accessed?
+\end_inset 
+
+
+\latex no_latex 
  from any location.
 
 \latex default 
@@ -343,7 +427,7 @@ support for both polling and trapping mechanisms
 \latex no_latex 
 server software for Linux
 \latex default 
-, Solaris, HP-UX, AIX, FreeBSD, OpenBSD
+, Solaris, HP-UX, AIX, FreeBSD, OpenBSD, OS X
 \layout Itemize
 
 
@@ -353,11 +437,20 @@ agents (client software) for Linux
 , Solaris,
 \latex no_latex 
  HP-UX, AIX, FreeBSD, OpenBSD
+\latex default 
+, OS X
 \layout Itemize
 
 
 \latex no_latex 
 secure user authorisation
+\latex default 
+
+\begin_inset Info
+Change next four lines to high level definitions
+\end_inset 
+
+
 \layout Itemize
 
 flexible user permissions
@@ -380,6 +473,11 @@ highly efficient agents
 \newline 
 Most of other software for monitoring does not have fast agents.
  Forks, etc, etc ...
+\begin_inset Info
+No forks()
+\end_inset 
+
+
 \layout Itemize
 
 very simple configuration
@@ -435,7 +533,11 @@ Zabbix
 \latex default 
  
 \latex no_latex 
-The latest version of the manual will always be available at
+The latest version of the manual 
+\latex default 
+is
+\latex no_latex 
+ available at
 \latex default 
  
 \family typewriter 
@@ -654,6 +756,13 @@ Add an action to email your account, you will get email notification anytime
 \emph default 
 \latex no_latex 
  is changed.
+\latex default 
+
+\begin_inset Info
+The section should ve moved to another location
+\end_inset 
+
+
 \layout Subsection
 
 Logging Services
@@ -677,15 +786,7 @@ Viewing trends of process load, disk usage, database activity, or other
  next hardware upgrade should be made.
 \layout Subsection
 
-Managing dependencies between IT resources
-\begin_float footnote 
-\layout Standard
-
-IT Services is experimental feature that should not be used in production
- systems until 
-\series bold 
-Zabbix 1.0beta5
-\end_float 
+High level view of IT recources and services
 \layout Standard
 
 High level service tree allows create dependencies between various IT resource.
@@ -752,6 +853,30 @@ Example: If several critical services offered by IT department depends on,
  arrays to eliminate possible risks.
 \layout Subsection
 
+IT Helpdesk
+\layout Standard
+
+
+\emph on 
+ZABBIX 
+\emph default 
+includes module called 
+\begin_inset Quotes eld
+\end_inset 
+
+IT Helpdesk
+\begin_inset Quotes erd
+\end_inset 
+
+.
+ The module is repository of IT-related problems that can be registered
+ either automatically by 
+\emph on 
+ZABBIX 
+\emph default 
+itself or by user.
+\layout Subsection
+
 Other
 \layout Itemize
 
@@ -759,6 +884,9 @@ availability analysis
 \layout Itemize
 
 graphical representation of collected information
+\layout Part
+
+Installation and configuration guide
 \layout Section
 
 Installing Zabbix
@@ -780,6 +908,16 @@ Zabbix
 \layout Subsection
 
 Requirements
+\layout Standard
+
+Due to security requirements and mission-critical nature of monitoring server,
+ UNIX is the only operating system that can consistently deliver the necessary
+ high performance, fault tolerance and resilience.
+ 
+\emph on 
+ZABBIX
+\emph default 
+ operates on market leading versions.
 \layout Subsubsection
 
 Supported Platforms
@@ -821,6 +959,14 @@ Zabbix
 Software Requirements
 \layout Standard
 
+
+\emph on 
+ZABBIX 
+\emph default 
+is built around modern Apache WEB server, MySQL or PostgreSQL database engine,
+ and PHP scripting language.
+\layout Standard
+
 The following software is required to run 
 \series bold 
 Zabbix
@@ -849,7 +995,7 @@ MySQL or PostgreSQL development files (headers and libraries)
 \begin_float footnote 
 \layout Standard
 
-Usually provided in mysql-dev or postgresql-dev packages.
+Usually provided as part of mysql-dev or postgresql-dev packages.
 \end_float 
 \layout Itemize
 
@@ -878,10 +1024,10 @@ GNU Make
 
 WEB browser on client side (support for HTML and PNG images required).
  MS Explorer (5.xx and 6.xx), Mozilla 1.x and Netscape 4.7x work perfectly.
- Note that cookies must be enabled.
+ Note that cookies and JavaScript must be enabled.
 \layout Itemize
 
-UCD-SNMP library and header files.
+NET-SNMP (or UCD-SNMP) library and header files.
  Required for support of SNMP agents.
  
 \emph on 
@@ -946,7 +1092,7 @@ These results are predictable.
 \end_float 
 \layout Itemize
 
-no need to constantly run command "
+no need to constantly run resource-hungry command "
 \family typewriter 
 \emph on 
 vacuum
@@ -955,8 +1101,13 @@ vacuum
 " MySQL
 \layout Standard
 
-MySQL MyISAM table is not a best choice because of lack of row-level locking.
+MySQL MyISAM table type is not a best choice because of lack of row-level
+ locking.
  So, InnoDB is recommended.
+ InnoDB uses row level locking.
+ Therefore, most of SQL statements can be executed simultaneously without
+ delay.
+ As a result, performance of InnoDB is better than MyISAM.
  For more information about MySQL see 
 \begin_inset LatexCommand \cite{key-1}
 
@@ -975,6 +1126,11 @@ zabbix_suckerd
 \emph on 
 HousekeepingFrequency
 \emph default 
+
+\begin_inset Info
+Link to definition of parameter
+\end_inset 
+
 ) execute command 
 \family typewriter 
 \emph on 
@@ -1015,7 +1171,7 @@ Each
 \series bold 
 Zabbix 
 \series default 
-daemon process required one connection to a database server.
+daemon process requires several connections to a database server.
  Amount of memory allocated for the connection depends on configuration
  of the database engine.
  Note that 
@@ -1114,6 +1270,11 @@ upgrades
 \layout Subsection
 
 Installation procedure
+\begin_inset Info
+Simplify!
+\end_inset 
+
+
 \layout Standard
 
 Basic installation of 
@@ -1378,6 +1539,11 @@ Other common directories are
 Configure 
 \emph on 
 /etc/services
+\begin_inset Info
+Add information about using of different port numbers
+\end_inset 
+
+
 \newline 
 
 \emph default 
@@ -1679,6 +1845,11 @@ Zabbix
  comes pre-configured with an administrative account: Enter the username
  'Admin' and leave the password field empty.
  
+\begin_inset Info
+Change this section
+\end_inset 
+
+
 \newline 
 Add the configuration of your SMTP server of choice.
 \newline 
@@ -1756,9 +1927,12 @@ Click on the "MAPS" link to set up a network map.
  A map will help you quickly identify any problems with your monitored machines.
  
 \newline 
-Finally, click on the "GRAPHS" link to set up a graph.
+Click on the "GRAPHS" link to set up a graph.
  A graph provides quick historical statistics on one or more monitored statistic
 s.
+\newline 
+Finally, do not forget to set up IT Services to get high level vew of servers
+ and applications.
 \newline 
 Once you have an initial configuration created, run 
 \series bold 
@@ -1834,21 +2008,7 @@ Zabbix
 \series default 
  sources.
 \newline 
-On Linux, use command 
-\family typewriter 
-\emph on 
-
-\newline 
-
-\newline 
-tar -xvzf <zabbix.tar.gz>
-\family default 
-\emph default 
-
-\newline 
-
-\newline 
-On other systems, try 
+Use command 
 \family typewriter 
 \emph on 
 
@@ -1913,6 +2073,11 @@ make
 \newline 
 Copy created binaries from bin/ to /opt/zabbix/bin or any other directory
  
+\begin_inset Info
+Highlight directories
+\end_inset 
+
+
 \newline 
 Other common directories are /usr/local/bin or /usr/local/zabbix/bin.
 \layout Enumerate
@@ -2111,6 +2276,11 @@ Zabbix
 
 \end_float 
  is also safe choice.
+\begin_inset Info
+Add information about FreeBSD 4.6
+\end_inset 
+
+
 \layout Subsection
 
 Platform specific notes
@@ -2119,7 +2289,8 @@ Platform specific notes
 FreeBSD
 \layout Standard
 
-Default FreeBSD settings cannot handle amount of TCP connections 
+Default FreeBSD settings (at least, FreeBSD 4.4) cannot handle amount of
+ TCP connections 
 \series bold 
 Zabbix
 \series default 
@@ -2138,7 +2309,11 @@ zabbix_trapperd.conf
 \emph default 
 .
  This will greatly decrease number of sockets in TIME_WAIT state.
- 
+ As an alternative solution, kernel parameters can be tuned using 
+\series bold 
+sysctl
+\series default 
+ mechanism.
 \layout Section
 
 Upgrading
@@ -3652,6 +3827,14 @@ misc/init.d/debian/zabbix_agent
 \layout Section
 
 Zabbix Architecture
+\layout Standard
+
+
+\begin_inset Info
+High-level picture must be here
+\end_inset 
+
+
 \layout Subsection
 
 Overview
@@ -4026,6 +4209,11 @@ Zabbix
 \layout Subsubsection
 
 PostgreSQL Notes
+\begin_inset Info
+Rewrite. VACUUM is already included into housekeeping
+\end_inset 
+
+
 \layout Standard
 
 
@@ -4099,6 +4287,17 @@ You can use the command
 \family typewriter 
 \emph default 
 echo "vacuum verbose analyze"|psql zabbix
+\layout Subsubsection
+
+MySQL Notes
+\layout Standard
+
+
+\begin_inset Info
+MyISAM vs InnoDB
+\end_inset 
+
+
 \layout Subsection
 
 Zabbix Processes
@@ -4396,7 +4595,11 @@ s
 zabbix_agentd.conf
 \emph default 
 \latex no_latex 
- file must exist and contain the IP address of 
+ file must exist and contain the IP address
+\latex default 
+ (or list of IP addresses)
+\latex no_latex 
+ of 
 \series bold 
 \latex default 
 Zabbix
@@ -4460,6 +4663,16 @@ Syslog
 or a file 
 \latex no_latex 
 is used to store debug information for the process.
+\layout Standard
+
+\SpecialChar ~
+
+\layout Standard
+
+List of supported parameters can be extended by using configuration file
+ parameter 
+\emph on 
+UserParameter.
 \layout Paragraph
 
 zabbix_trapperd
@@ -5177,7 +5390,7 @@ zabbix_suckerd
 zabbix
 \emph default 
 .
- Possible parameters:
+ Supported parameters:
 \layout Standard
 
 
@@ -5744,7 +5957,7 @@ zabbix_agentd
 zabbix
 \emph default 
 .
- Possible parameters:
+ Supported parameters:
 \layout Standard
 
 
@@ -6107,7 +6320,7 @@ zabbix_agent
 zabbix
 \emph default 
 .
- Possible parameters:
+ Supported parameters:
 \layout Standard
 
 
@@ -6295,7 +6508,7 @@ zabbix_trapper
 zabbix
 \emph default 
 .
- Possible parameters:
+ Supported parameters:
 \layout Standard
 
 
@@ -6681,7 +6894,7 @@ zabbix_trapperd
  zabbix
 \emph default 
 .
- Possible parameters:
+ Supported parameters:
 \layout Standard
 
 
@@ -7272,7 +7485,12 @@ nodata 1- if no data received during last
 \emph on 
 parameter 
 \emph default 
-seconds, 0 - otherwise
+seconds, 0 - otherwise.
+ The function can be used for item type trapper 
+\emph on 
+only
+\emph default 
+.
 \layout Standard
 
 Note that all above functions (except 
@@ -7391,8 +7609,11 @@ Finally,
 \emph default 
 '
 \latex no_latex 
- means that the trigger is true whenever the most recent procload measurement
- from 
+ means that the trigger is true whenever the most recent proc
+\latex default 
+essor 
+\latex no_latex 
+load measurement from 
 \emph on 
 \latex default 
 sourceforge.net
@@ -8256,7 +8477,11 @@ system[uptime]
 \latex default 
  
 \latex no_latex 
-System's uptime.
+System's uptime
+\latex default 
+ in seconds
+\latex no_latex 
+.
 \layout Description
 
 
@@ -8355,18 +8580,24 @@ snmpget -On localhost public enterprises.ucdavis.memory.memTotalSwap.0
 \layout Subsection
 
 Supported Parameters by Platform
+\begin_inset Info
+Sort required
+\end_inset 
+
+
 \layout Standard
 
 
 \size footnotesize 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="50" columns="7">
+<lyxtabular version="2" rows="50" columns="8">
 <features rotate="false" islongtable="true" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="15mm" special="">
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="15mm" special="">
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="18mm" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="15mm" special="">
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="15mm" special="">
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="15mm" special="">
 <column alignment="left" valignment="top" leftline="true" rightline="true" width="15mm" special="">
@@ -8417,6 +8648,14 @@ Solaris 5.8 (Ultra-60)
 \layout Standard
 
 HP-UX 11.00 (9000/800)
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+MacOS X
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -8487,6 +8726,14 @@ X
 
 \lang english
 X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -8561,6 +8808,14 @@ X
 -
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -8631,6 +8886,14 @@ X
 
 \lang english
 -
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -8705,6 +8968,14 @@ X
 -
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -8775,6 +9046,14 @@ X
 
 \lang english
 -
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -8849,6 +9128,14 @@ X
 X
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -8907,6 +9194,14 @@ X
 \layout Standard
 
 X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -8979,6 +9274,14 @@ X
 X
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -9037,6 +9340,14 @@ X
 \layout Standard
 
 X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -9107,6 +9418,14 @@ X
 
 \lang english
 X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -9181,6 +9500,14 @@ X
 X
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -9251,6 +9578,14 @@ X
 
 \lang english
 X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -9325,6 +9660,14 @@ X
 X
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -9395,6 +9738,14 @@ X
 
 \lang english
 -
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -9469,6 +9820,14 @@ X
 -
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -9539,6 +9898,14 @@ X
 
 \lang english
 -
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -9613,6 +9980,14 @@ X
 -
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -9683,6 +10058,14 @@ X
 
 \lang english
 -
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -9757,6 +10140,14 @@ X
 X
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -9827,6 +10218,14 @@ X
 
 \lang english
 X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -9901,6 +10300,14 @@ X
 X
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -9973,6 +10380,14 @@ X
 X
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -10031,6 +10446,14 @@ X
 \layout Standard
 
 X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -10101,6 +10524,14 @@ X
 
 \lang english
 X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -10175,6 +10606,14 @@ X
 X
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -10245,6 +10684,14 @@ X
 
 \lang english
 X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -10319,6 +10766,14 @@ X
 -
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -10389,6 +10844,14 @@ X
 
 \lang english
 -
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -10463,6 +10926,14 @@ X
 -
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -10533,6 +11004,14 @@ X
 
 \lang english
 -
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -10607,6 +11086,14 @@ X
 -
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -10677,6 +11164,14 @@ X
 
 \lang english
 X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -10751,6 +11246,14 @@ X
 X
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -10821,6 +11324,14 @@ X
 
 \lang english
 X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -10895,6 +11406,14 @@ X
 -
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -10967,6 +11486,14 @@ X
 -
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -11035,6 +11562,14 @@ X
 
 \lang english
 -
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -11109,6 +11644,14 @@ X
 X
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -11167,6 +11710,14 @@ X
 \layout Standard
 
 X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -11239,6 +11790,14 @@ X
 X
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -11299,6 +11858,14 @@ X
 -
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -11355,6 +11922,14 @@ X
 \layout Standard
 
 -
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -11415,6 +11990,14 @@ X
 -
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -11471,6 +12054,14 @@ X
 \layout Standard
 
 -
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -11531,6 +12122,14 @@ X
 -
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -11587,6 +12186,14 @@ X
 \layout Standard
 
 -
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -11647,6 +12254,14 @@ X
 -
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -11703,6 +12318,14 @@ X
 \layout Standard
 
 -
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -11775,6 +12398,14 @@ X
 -
 \end_inset 
 </cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+?
+\end_inset 
+</cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -11803,8 +12434,7 @@ Configuration file
 \emph on 
 misc/conf/zabbix_agentd.conf
 \emph default 
- contains list of user defined parameters that can be used for monitoring
- of MySQL.
+ contains list of parameters that can be used for monitoring of MySQL.
 \newline 
 
 \layout Standard
@@ -11914,12 +12544,29 @@ mysql[version] Version of MySQL
 \layout Standard
 
 Example: mysql Ver 11.16 Distrib 3.23.49, for pc-linux-gnu (i686)
+\layout Subsection
+
+IMAP servers
+\layout Subsection
+
+FTP servers
+\layout Subsection
+
+POP3 servers
+\layout Subsection
+
+NNTP servers
 \layout Section
 
 Getting Maximum Performance from Zabbix
 \layout Subsection
 
 Real world configuration
+\begin_inset Info
+New benchmark needed
+\end_inset 
+
+
 \layout Standard
 
 Server with 
@@ -11998,12 +12645,50 @@ Use latest (stable!) version of OS
 \layout Itemize
 
 Exclude unnecessary functionality from kernel
+\layout Itemize
+
+Tune kernel parameters
 \layout Subsubsection
 
 Zabbix configuration parameters
 \layout Standard
 
-Many parameters may be changed to get optimal performance ...
+Many parameters may be tuned to get optimal performance.
+\layout Standard
+
+
+\series bold 
+zabbix_suckerd
+\layout Description
+
+StartSuckers General rule - keep this parameter as low as possible.
+ Every additional instance of 
+\series bold 
+zabbix_suckerd
+\series default 
+ adds know overhead, in the same time, parallelism is increased.
+ Optimal number of instances is achieved when queue contains minimum number
+ of parameters (ideally, 0 at any given moment).
+\layout Description
+
+DebugLevel Optimal value is '3'.
+\layout Description
+
+DBSocket MySQL only.
+ It is recommended to use 
+\series bold 
+DBSocket
+\series default 
+ for connection to the database.
+ That is fastest and most secure way.
+\layout Standard
+
+
+\series bold 
+zabbix_trapperd
+\layout Description
+
+DBConnectOnEach Should not be set if you want to get maximum performance.
 \layout Subsubsection
 
 Database Engine
@@ -12349,6 +13034,11 @@ Startup scripts
 \layout Subsection
 
 pinger.pl
+\begin_inset Info
+Should be rewritten to use mass send
+\end_inset 
+
+
 \layout Standard
 
 The script can be found in 
@@ -16996,6 +17686,13 @@ Browser should be configured to accept cookies.
 Zabbix 
 \series default 
 uses cookies to store session-related information.
+\layout Itemize
+
+During initial installation, no 
+\emph on 
+data.sql 
+\emph default 
+loaded into database.
 \layout Subsection
 
 Undefined references to 
@@ -17084,10 +17781,42 @@ HP OpenView
 WhatsUp Gold
 \layout Itemize
 
+Windows SMS
+\layout Itemize
+
 ...
 \layout Section
 
 Zabbix in the future
+\layout Standard
+
+The sections contains list of improvements planned to be included into future
+ releases of 
+\emph on 
+ZABBIX.
+\layout Subsection
+
+This manual TODO
+\layout Itemize
+
+Add 
+\begin_inset Quotes eld
+\end_inset 
+
+To be finished...
+\begin_inset Quotes erd
+\end_inset 
+
+ to all unfinished sections
+\layout Itemize
+
+Rename 
+\series bold 
+Zabbix
+\series default 
+ to 
+\emph on 
+ZABBIX
 \layout Subsection
 
 TODO (1.1 stable)
@@ -17142,7 +17871,7 @@ all
 \series bold 
 Zabbix 
 \series default 
-errors and warning to be numbered and documented
+errors and warnings to be numbered and documented and explained
 \layout Itemize
 
 better support for SNMP (send and receive SNMP traps)
@@ -17162,9 +17891,6 @@ change tigger status to
 UNKNOWN
 \emph default 
  when status of a host is changed
-\layout Itemize
-
-Look at IPFC (AndrisM)
 \layout Itemize
 
 network map.
@@ -17195,6 +17921,30 @@ add support for Kb,bytes,kps, etc
 \layout Itemize
 
 improve functionality of IT Services
+\layout Itemize
+
+dlopen/dlsym for agents
+\layout Itemize
+
+native agent for MS Windows
+\layout Itemize
+
+
+\series bold 
+zabbix_suckerd
+\series default 
+ to support ICMP pings
+\layout Itemize
+
+
+\emph on 
+ZABBIX 
+\emph default 
+to monitor servers without 
+\series bold 
+zabbix_agentd
+\series default 
+ installed
 \layout Section
 
 Support of Zabbix
@@ -17231,13 +17981,17 @@ feature requests can be viewed and registered at
 
 \layout Itemize
 
-Email address of author and main developer of 
+Email address of 
+\noun on 
+Alexei Vladishev
+\noun default 
+,author and main developer of 
 \series bold 
 Zabbix
 \series default 
- - 
+ is
 \family typewriter 
-alex@gobbo.caves.lv
+ alex@gobbo.caves.lv
 \layout Subsection
 
 Commercial support
@@ -17322,7 +18076,13 @@ ant
 \latex default 
 s
 \latex no_latex 
- to thank the guys from sourceforge.net for providing hosting for
+ to thank the guys from 
+\family typewriter 
+\latex default 
+sourceforge.net
+\family default 
+\latex no_latex 
+ for providing hosting for
 \latex default 
  
 \latex no_latex 
@@ -17522,7 +18282,7 @@ Fixes in SQL statements of WEB frontend.
 Supporters to Zabbix
 \layout Section
 
-Glossary
+Glossary of terms
 \layout Standard
 
 
