@@ -416,16 +416,37 @@ int	get_value_SNMP(int version,double *result,char *result_str,DB_ITEM *item)
 
 int	get_value_SIMPLE(double *result,char *result_str,DB_ITEM *item)
 {
-	char	*e;
+	char	*e,*t;
 	char	c[MAX_STRING_LEN+1];
+	char	s[MAX_STRING_LEN+1];
 
-	if(item->useip==1)
+	/* The code is ugly. I would rewrite it. Alexei		*/
+	/* Assumption: host name does not contain '_perf'	*/
+	if(NULL == strstr(item->key,"_perf"))
 	{
-		sprintf(c,"check_service[%s,%s]",item->key,item->ip);
+		if(item->useip==1)
+		{
+			sprintf(c,"check_service[%s,%s]",item->key,item->ip);
+		}
+		else
+		{
+			sprintf(c,"check_service[%s,%s]",item->key,item->host);
+		}
 	}
 	else
 	{
-		sprintf(c,"check_service[%s,%s]",item->key,item->host);
+		strncpy(s,item->key,MAX_STRING_LEN);
+		t=strstr(item->key,"_perf");
+		s[t]=0;
+		
+		if(item->useip==1)
+		{
+			sprintf(c,"check_service_perf[%s,%s]",s,item->ip);
+		}
+		else
+		{
+			sprintf(c,"check_service_perf[%s,%s]",s,item->host);
+		}
 	}
 
 

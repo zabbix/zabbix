@@ -1,5 +1,6 @@
 Changes for 1.0beta10:
 
+ - support for simple checks :smtp_perf, ftp_perf, ssh_perf, etc. (Alexei)
  - fixed nasty bug in getting SNMP parameters. Thanks to Igor Micko.
  (Alexei)
  - added support for diskused[*] (Alexei)

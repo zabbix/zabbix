@@ -1,6 +1,5 @@
 1.0beta10:
 
- - performance items for simple checks
  - UserParameter does not appear in the log
  - allow creation of PID file as 'root'. Required for RedHat RPMs.
  - add MRTG-like graphs + periodic recalculation of aggregate functions
