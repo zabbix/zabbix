@@ -794,7 +794,7 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
 	float	value_float_abs;
 	char	suffix[MAX_STRING_LEN];
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Function [%s]",function);
+	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() Function [%s] flag [%d]",function,flag);
 
 	if(strcmp(function,"last")==0)
 	{
@@ -809,7 +809,7 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
 				zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 1");
 				snprintf(value,MAX_STRING_LEN-1,"%f",item->lastvalue);
 				del_zeroes(value);
-				zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 2");
+				zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 2 value [%s]", value);
 			}
 			else
 			{
@@ -1003,7 +1003,9 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
 		{
 			value_float=value_float*atof(item->formula);
 		}
+
 		value_float_abs=abs(value_float);
+
 		if(value_float_abs<1024)
 		{
 			strscpy(suffix,"");
