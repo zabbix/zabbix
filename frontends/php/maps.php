@@ -119,9 +119,9 @@
 	show_table_header($map);
 */
 
-	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR BGCOLOR=#EEEEEE>";
-	echo "<TR BGCOLOR=#DDDDDD>";
+	echo "<TABLE BORDER=0 align=center WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TR BGCOLOR=\"#EEEEEE\">";
+	echo "<TR BGCOLOR=\"#DDDDDD\">";
 	echo "<TD ALIGN=CENTER>";
 	if(isset($_GET["sysmapid"]))
 	{
