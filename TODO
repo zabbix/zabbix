@@ -1,7 +1,6 @@
-1.0beta10:
+1.0beta11:
 
  - finish src/zabbix_snmptrapper
-
  - links to Zabbix frontend in alert emails
  - user groups
  - zabbix to write log to the item (for example: log when item becomes unsupported)
