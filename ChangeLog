@@ -4,7 +4,7 @@ TODO:
 
 Not ready yet:
 
- HBLV:
+ HB:
 
  - Tree like in old Zabbix
  - SNMP trapping
@@ -12,19 +12,12 @@ Not ready yet:
   - more customizable (graphs timerange: 1 mont, etc)
   - availability report for IT Services
 
- IT HELPDESK:
-
- - responsible person (group of persons) for each problem
- - update patch and schema for PostgreSQL. Test it!
- - module structure for Zabbix. Some modules (as Services, Helpdesk) should be
- made separate.
-
  OTHER:
 
  - check for function parameters in evaluate_simple_expression
  - make links different if something is already registered (as for medias,
    actions, etc)
- - update trigger status to unknown if cannot evaluate function 
+ - update trigger status to UNKNOWN if cannot evaluate function 
  - do not dump "Expression cannot be evaluated" in case if function.lastvalue
    is NULL
 
@@ -37,6 +30,7 @@ Not ready yet:
 
  LATER:
 
+ - IT Helpdesk
   - show who is online somewhere (in User config form?)
   - setup demo site
   - add host groups (one to one or one to many?)
@@ -97,7 +91,6 @@ Changes for 1.0beta6:
  - <center> changed to <div align=center> (Alexei)
  - reason of problem in screen IT Services (Alexei) 
  - added frontends.php/helpdesk.php (Alexei)
- - added tables: problems, problems_comments,categories (Alexei)
  - added "...#form" to button Change in form Configuration of Users (Alexei)
  - "Just for information" changed to "Information" (Alexei)
  - fixed ./configure to correctly find zlib (Alexei)
