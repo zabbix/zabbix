@@ -1,10 +1,11 @@
 1.0:
 
- - zabbix to write log to the item (for example: log when item becomes unsupported)
+ - improve actions.php to make selection of trigger, host, hosts on the top
  - navigation bar for all graphs and screens
 
 LATER:
 
+ - zabbix to write log to the item (for example: log when item becomes unsupported)
  - add SNMP-based template
  - support for UDP-based checks (DNS, etc)
  - 'clone' for graphs and screens
