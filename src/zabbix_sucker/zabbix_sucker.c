@@ -1,3 +1,5 @@
+#define syslog zabbix_log
+
 #include "config.h"
 
 #include <stdio.h>
@@ -36,6 +38,7 @@
 #include "db.h"
 #include "functions.h"
 #include "expression.h"
+#include "log.h"
 
 static	pid_t	*pids=NULL;
 
@@ -159,6 +162,8 @@ void	daemon_init(void)
 	openlog("zabbix_suckerd",LOG_PID,LOG_USER);
 /*	setlogmask(LOG_UPTO(LOG_DEBUG));	*/
 	setlogmask(LOG_UPTO(LOG_WARNING));
+
+	zabbix_open_log(LOG_TYPE_FILE,0,"/tmp/tmp.zzz");
 }
 
 void	create_pid_file(void)
