@@ -147,47 +147,49 @@
 ?>
 
 <?php
-	show_table_header_begin();
-	echo S_CONFIGURATION_OF_HOSTS_BIG;
-	show_table_v_delimiter();
-
-	if(isset($_GET["groupid"]))
+	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
 	{
-//		echo "all ";
-		echo "<a href='hosts.php'>".S_ALL_SMALL."</a> ";
+		unset($_GET["groupid"]);
 	}
-	else
-	{
-		echo "<b>[<a href='hosts.php'>".S_ALL_SMALL."</a>]</b> ";
-	}
-
-	$result=DBselect("select groupid,name from groups order by name");
-
-	while($row=DBfetch($result))
-	{
-//		if(!check_right("Host","R",$row["hostid"]))
-//		{
-//			continue;
-//		}
-		if( isset($_GET["groupid"]) && ($_GET["groupid"] == $row["groupid"]) )
-		{
-			echo "<b>[";
-		}
-		echo "<a href='hosts.php?groupid=".$row["groupid"]."'>".$row["name"]."</a>";
-		if(isset($_GET["groupid"]) && ($_GET["groupid"] == $row["groupid"]) )
-		{
-			echo "]</b>";
-		}
-		echo " ";
-	}
-
-	show_table_header_end();
-	echo "<br>";
 ?>
 
 <?php
 	if(!isset($_GET["hostid"]))
 {
+
+	$h1="&nbsp;".S_CONFIGURATION_OF_HOSTS_BIG;
+
+	$h2_form1="<form name=\"form2\" method=\"get\" action=\"latest.php\">";
+
+
+	$h2=S_GROUP."&nbsp;";
+	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
+	$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["groupid"])," selected","").">".S_ALL_SMALL;
+	$result=DBselect("select groupid,name from groups order by name");
+	while($row=DBfetch($result))
+	{
+// Check if at least one host with read permission exists for this group
+		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.hostid=i.hostid and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
+		$cnt=0;
+		while($row2=DBfetch($result2))
+		{
+			if(!check_right("Host","R",$row2["hostid"]))
+			{
+				continue;
+			}
+			$cnt=1; break;
+		}
+		if($cnt!=0)
+		{
+			$h2=$h2."<option value=\"".$row["groupid"]."\" ".iif(isset($_GET["groupid"])&&($_GET["groupid"]==$row["groupid"]),"selected","").">".$row["name"];
+		}
+	}
+	$h2=$h2."</select>";
+
+	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"hosts.php\">", "</form>");
+?>
+
+<?php
 	table_begin();
 	table_header(array(S_ID,S_HOST,S_IP,S_PORT,S_STATUS,S_ACTIONS));
 

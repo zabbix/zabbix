@@ -140,27 +140,22 @@
 ?>
 
 <?php
-	show_table3_header_begin();
-	echo S_CONFIGURATION_OF_ITEMS_BIG;;
-	show_table3_h_delimiter(40);
-
-// Start of new code
-	echo "<form name=\"form2\" method=\"get\" action=\"items.php\">";
+	$h1=S_CONFIGURATION_OF_ITEMS_BIG;;
 
 	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
 	{
 		unset($_GET["groupid"]);
 	}
 
-	echo S_GROUP."&nbsp;";
-	echo "<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
-	echo "<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_ALL_SMALL;
+	$h2=S_GROUP."&nbsp;";
+	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
+	$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_ALL_SMALL;
 
 	$result=DBselect("select groupid,name from groups order by name");
 	while($row=DBfetch($result))
 	{
 // Check if at least one host with read permission exists for this group
-		$result2=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg where h.status in (0,2) and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
+		$result2=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg where hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
 		$cnt=0;
 		while($row2=DBfetch($result2))
 		{
@@ -172,22 +167,22 @@
 		}
 		if($cnt!=0)
 		{
-			echo "<option value=\"".$row["groupid"]."\" ".iif(isset($_GET["groupid"])&&($_GET["groupid"]==$row["groupid"]),"selected","").">".$row["name"];
+			$h2=$h2."<option value=\"".$row["groupid"]."\" ".iif(isset($_GET["groupid"])&&($_GET["groupid"]==$row["groupid"]),"selected","").">".$row["name"];
 		}
 	}
-	echo "</select>";
+	$h2=$h2."</select>";
 
-	echo "&nbsp;".S_HOST."&nbsp;";
-	echo "<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
-	echo "<option value=\"0\" ".iif(!isset($_GET["hostid"]),"selected","").">".S_SELECT_HOST_DOT_DOT_DOT;
+	$h2=$h2."&nbsp;".S_HOST."&nbsp;";
+	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
+	$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["hostid"]),"selected","").">".S_SELECT_HOST_DOT_DOT_DOT;
 
 	if(isset($_GET["groupid"]))
 	{
-		$sql="select h.hostid,h.host from hosts h,hosts_groups hg where h.status in (0,2) and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+		$sql="select h.hostid,h.host from hosts h,hosts_groups hg where hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
 	}
 	else
 	{
-		$sql="select h.hostid,h.host from hosts h where h.status in (0,2) group by h.hostid,h.host order by h.host";
+		$sql="select h.hostid,h.host from hosts h group by h.hostid,h.host order by h.host";
 	}
 
 	$result=DBselect($sql);
@@ -197,14 +192,14 @@
 		{
 			continue;
 		}
-		echo "<option value=\"".$row["hostid"]."\"".iif(isset($_GET["hostid"])&&($_GET["hostid"]==$row["hostid"]),"selected","").">".$row["host"];
+		$h2=$h2."<option value=\"".$row["hostid"]."\"".iif(isset($_GET["hostid"])&&($_GET["hostid"]==$row["hostid"]),"selected","").">".$row["host"];
 	}
-	echo "</select>";
+	$h2=$h2."</select>";
 
-	echo "</form>";
-// end of new code
+	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"items.php\">", "</form>");
+?>
 
-	show_table_header_end();
+<?php
 
 	$lasthost="";
 	if(isset($_GET["hostid"])&&!isset($_GET["type"])) 

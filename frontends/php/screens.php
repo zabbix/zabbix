@@ -39,8 +39,6 @@
 ?>
 
 <?php
-		show_table3_header_begin();
-
 		if(isset($_GET["screenid"])&&($_GET["screenid"]==0))
 		{
 			unset($_GET["screenid"]);
@@ -59,18 +57,16 @@
 			$map=S_SELECT_SCREEN_TO_DISPLAY;
 		}
 
-		echo S_SCREENS_BIG.nbsp(" / ").$map;
-// Start of new code
-		show_table3_h_delimiter();
-		echo "<form name=\"form2\" method=\"get\" action=\"screens.php\">";
+		$h1=S_SCREENS_BIG.nbsp(" / ").$map;
 
+		$h2="";
 		if(isset($_GET["fullscreen"]))
 		{
-			echo "<input name=\"fullscreen\" type=\"hidden\" value=".$_GET["fullscreen"].">";
+			$h2=$h2."<input name=\"fullscreen\" type=\"hidden\" value=".$_GET["fullscreen"].">";
 		}
 
-		echo "<select class=\"biginput\" name=\"screenid\" onChange=\"submit()\">";
-		echo "<option value=\"0\" ".iif(!isset($_GET["screenid"]),"selected","").">".S_SELECT_SCREEN_DOT_DOT_DOT;
+		$h2=$h2."<select class=\"biginput\" name=\"screenid\" onChange=\"submit()\">";
+		$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["screenid"]),"selected","").">".S_SELECT_SCREEN_DOT_DOT_DOT;
 
 		$result=DBselect("select screenid,name from screens order by name");
 		while($row=DBfetch($result))
@@ -79,12 +75,11 @@
 			{
 				continue;
 			}
-			echo "<option value=\"".$row["screenid"]."\" ".iif(isset($_GET["screenid"])&&($_GET["screenid"]==$row["screenid"]),"selected","").">".$row["name"];
+			$h2=$h2."<option value=\"".$row["screenid"]."\" ".iif(isset($_GET["screenid"])&&($_GET["screenid"]==$row["screenid"]),"selected","").">".$row["name"];
 		}
-		echo "</select>";
-		echo "</form>";
-		show_table_header_end();
-// End of new code
+		$h2=$h2."</select>";
+
+		show_header2($h1,$h2,"<form name=\"form2\" method=\"get\" action=\"screens.php\">","</form>");
 ?>
 
 <?php

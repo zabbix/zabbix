@@ -48,22 +48,21 @@
 ?>
 
 <?php
-	show_table3_header_begin();
-	echo "&nbsp;".S_HISTORY_OF_EVENTS_BIG;
-	show_table3_h_delimiter(20);
-	echo "<form name=\"form2\" method=\"get\" action=\"latestalarms.php\">";
+	$h1="&nbsp;".S_HISTORY_OF_EVENTS_BIG;
+
+	$h2="";
 	if(isset($_GET["start"]))
 	{
-		echo "<input class=\"biginput\" name=\"start\" type=hidden value=".$_GET["start"]." size=8>";
-  		echo "<input class=\"button\" type=\"submit\" name=\"do\" value=\"<< Prev 100\">";
+		$h2=$h2."<input class=\"biginput\" name=\"start\" type=hidden value=".$_GET["start"]." size=8>";
+  		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"do\" value=\"<< Prev 100\">";
 	}
 	else
 	{
-  		echo "<input class=\"button\" type=\"submit\" disabled name=\"do\" value=\"<< Prev 100\">";
+  		$h2=$h2."<input class=\"button\" type=\"submit\" disabled name=\"do\" value=\"<< Prev 100\">";
 	}
-  	echo "<input class=\"button\" type=\"submit\" name=\"do\" value=\"Next 100 >>\">";
-	echo "</form>";
-	show_table_header_end();
+  	$h2=$h2."<input class=\"button\" type=\"submit\" name=\"do\" value=\"Next 100 >>\">";
+	show_header2($h1,$h2,"<form name=\"form2\" method=\"get\" action=\"latestalarms.php\">","</form>");
+
 ?>
 
 <FONT COLOR="#000000">
