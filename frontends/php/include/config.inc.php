@@ -139,6 +139,15 @@
 
 		return "$s $u$units";
 	}
+
+	function	get_template_permission_str($num)
+	{
+		$str="&nbsp;";
+		if(($num&1)==1)	$str=$str.S_ADD."&nbsp;";
+		if(($num&2)==2)	$str=$str.S_UPDATE."&nbsp;";
+		if(($num&4)==4)	$str=$str.S_DELETE."&nbsp;";
+		return $str;
+	}
 	
 	function	get_media_count_by_userid($userid)
 	{
