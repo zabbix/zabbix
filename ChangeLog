@@ -1,5 +1,6 @@
 Changes for 1.0beta13:
 
+ - fixes for screens.php (Alexei)
  - fixes for screenedit.php (Alexei)
  - added parameter DisablePinger (Alexei)
  - correct processing of RCPT TO responses from SMTP servers
