@@ -28,12 +28,12 @@
 	{
 		$hostid_=DBget_field($result,$i,0);
 		$host=DBget_field($result,$i,1);
-		if($hostid == $hostid_)
+		if( isset($hostid) && ($hostid == $hostid_) )
 		{
 			echo "<b>[";
 		}
 		echo "<a href='latest.html?hostid=$hostid_'>$host</a>";
-		if($hostid == $hostid_)
+		if(isset($hostid) && ($hostid == $hostid_) )
 		{
 			echo "]</b>";
 		}
@@ -53,6 +53,7 @@
 		$where="where h.hostid=i.hostid and h.status=0";
 	}
 
+	$col=0;
 	$result=DBselect("select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid from items i,hosts h $where order by h.host,i.description");
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
@@ -83,69 +84,69 @@
 			cr();
 			echo "</TR>";
 			cr();
-	}
-	$lasthost=$host;
-	if($col==1)
-	{
-		echo "<tr bgcolor=#DDDDDD>";
-		$col=0;
-	} else
-	{
-		echo "<tr bgcolor=#EEEEEE>";
-		$col=1;
-	}
-	$prevvalue=DBget_field($result,$i,4);
-	$description=DBget_field($result,$i,2);
-	$lastvalue=DBget_field($result,$i,3);
-	$lastclock=DBget_field($result,$i,5);
-	if($lastclock==NULL)
-	{
-		$lastclock="<center>-</center>";
-	}
-	else
-	{
-		$lastclock=date("H:i:s",$lastclock);
-	}
-	$itemid=DBget_field($result,$i,1);
-	$status=DBget_field($result,$i,6);
-	$dif=$lastvalue-$prevvalue;
-	echo "<td>$description</td>";
-	echo "<td>";
-	if($status==2)
-	{
-		echo "<font color=\"#FF6666\">";
-	}
-	elseif($status!=0)
-	{
-		echo "<font color=\"#666666\">";
-	}
-
-	echo "$lastclock</td>\n";
-	if($lastvalue!=NULL)
-	{
-		if(round($lastvalue)==$lastvalue)
-		{ 
-			echo "<td>"; printf("%.0f",$lastvalue); echo "</td>";
+		}
+		$lasthost=$host;
+		if($col==1)
+		{
+			echo "<tr bgcolor=#DDDDDD>";
+			$col=0;
+		} else
+		{
+			echo "<tr bgcolor=#EEEEEE>";
+			$col=1;
+		}
+		$prevvalue=DBget_field($result,$i,4);
+		$description=DBget_field($result,$i,2);
+		$lastvalue=DBget_field($result,$i,3);
+		$lastclock=DBget_field($result,$i,5);
+		if($lastclock==NULL)
+		{
+			$lastclock="<center>-</center>";
 		}
 		else
-		{ 
-			echo "<td>"; printf("%.2f",$lastvalue); echo "</td>";
+		{
+			$lastclock=date("H:i:s",$lastclock);
 		}
-	}
-	else
-	{
-		echo "<td><center>-</center></td>";
-	}
-	if( $dif != 0 )
-	{
-		echo "<td>$dif</td>";
-	}
-	else
-	{
-		echo "<td><center>-</center></td>";
-	}
-	echo "<td><center><a href=\"history.html?action=showhistory&itemid=$itemid\">Show</a></center></td>";
-	echo "</tr>";
+		$itemid=DBget_field($result,$i,1);
+		$status=DBget_field($result,$i,6);
+		$dif=$lastvalue-$prevvalue;
+		echo "<td>$description</td>";
+		echo "<td>";
+		if($status==2)
+		{
+			echo "<font color=\"#FF6666\">";
+		}
+		elseif($status!=0)
+		{
+			echo "<font color=\"#666666\">";
+		}
+
+		echo "$lastclock</td>\n";
+		if($lastvalue!=NULL)
+		{
+			if(round($lastvalue)==$lastvalue)
+			{ 
+				echo "<td>"; printf("%.0f",$lastvalue); echo "</td>";
+			}
+			else
+			{ 
+				echo "<td>"; printf("%.2f",$lastvalue); echo "</td>";
+			}
+		}
+		else
+		{
+			echo "<td><center>-</center></td>";
+		}
+		if( $dif != 0 )
+		{
+			echo "<td>$dif</td>";
+		}
+		else
+		{
+			echo "<td><center>-</center></td>";
+		}
+		echo "<td><center><a href=\"history.html?action=showhistory&itemid=$itemid\">Show</a></center></td>";
+		echo "</tr>";
 	}
 	echo "</table>";
 ?>

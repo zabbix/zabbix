@@ -20,19 +20,16 @@
 	}
 	else
 	{
-		if((!$Expression)||(!$Description)||(!$Priority))
-		{
-			$result=DBselect("select expression,description,priority from triggers where triggerid=$triggerid");
+		$result=DBselect("select expression,description,priority from triggers where triggerid=$triggerid");
 
-			if(!isset($Expression)) $Expression=DBget_field($result,0,0);
-			if(!isset($Description)) $Description=DBget_field($result,0,1);
-			if(!isset($Priority)) $Priority=DBget_field($result,0,2);
-		}
+		$Expression=DBget_field($result,0,0);
+		$Description=DBget_field($result,0,1);
+		$Priority=DBget_field($result,0,2);
 	}
 ?>
 
 <?
-	if($limit=="NO")
+	if(isset($limit) && ($limit=="NO"))
 	{
 		echo "[<A HREF=\"alarms.html?triggerid=$triggerid&limit=30\">";
 		echo "Show only last 100</A>]";
