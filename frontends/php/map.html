@@ -74,9 +74,8 @@
 	}
 
 # Draw hosts
-	$img=ImageCreateFromPNG("images/sysmaps/host.png");
 
-	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status from sysmaps_hosts sh,hosts h where sh.sysmapid=$sysmapid and h.hostid=sh.hostid");
+	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status,sh.icon from sysmaps_hosts sh,hosts h where sh.sysmapid=$sysmapid and h.hostid=sh.hostid");
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		$host=DBget_field($result,$i,0);
@@ -87,6 +86,9 @@
 		$x=DBget_field($result,$i,5);
 		$y=DBget_field($result,$i,6);
 		$status=DBget_field($result,$i,7);
+		$icon=DBget_field($result,$i,8);
+
+		$img=ImageCreateFromPNG("images/sysmaps/$icon.png");
 
 		ImageCopy($im,$img,$x,$y,0,0,ImageSX($img),ImageSY($img));
 
@@ -128,9 +130,8 @@
 
 #		ImageFilledRectangle($im,$x+ImageSX($img)/2-ImageFontWidth(2)*strlen($label)/2-2, $y+ImageSY($img),$x+ImageSX($img)/2+ImageFontWidth(2)*strlen($label)/2, $y+ImageSY($img)+ImageFontHeight(2),$white);
 #		ImageString($im, 2, $x+ImageSX($img)/2-ImageFontWidth(2)*strlen($label)/2, $y+ImageSY($img)+ImageFontHeight(2), $label,$color);
-
+		ImageDestroy($img); 
 	}
-	ImageDestroy($img); 
 
 	ImageString($im,0,$width-147,$height-10, "http://zabbix.sourceforge.net", $gray);
 

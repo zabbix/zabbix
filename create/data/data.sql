@@ -1,4 +1,10 @@
 --
+-- Data for table help
+--
+
+insert into help (helpid,topic,description) values (1,"What is SMTP server ?","... Example help text ...");
+
+--
 -- Data for table config
 --
 
@@ -109,6 +115,10 @@ insert into items_template (itemtemplateid,description,key_,delay)
 	values (44,'POP3 server is running','net[listen_110]', 60);
 insert into items_template (itemtemplateid,description,key_,delay)
 	values (45,'IMAP server is running','net[listen_143]', 60);
+insert into items_template (itemtemplateid,description,key_,delay)
+	values (46,'Checksum of /usr/sbin/sshd','cksum[/usr/sbin/sshd]', 600);
+insert into items_template (itemtemplateid,description,key_,delay)
+	values (47,'Checksum of /usr/bin/ssh','cksum[/usr/bin/ssh]', 600);
 
 --
 -- Data for table triggers_template
@@ -172,3 +182,7 @@ insert into triggers_template (triggertemplateid,itemtemplateid,description,expr
 	values (44,44,'POP3 server is down on %s','{:.last(0)}<1');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (45,45,'IMAP server is down on %s','{:.last(0)}<1');
+insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+	values (46,46,'/usr/sbin/sshd has been changed on server %s','{:.diff(0)}>0');
+insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+	values (47,47,'/usr/bin/shd has been changed on server %s','{:.diff(0)}>0');

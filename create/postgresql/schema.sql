@@ -1,6 +1,18 @@
 \connect zabbix
 
 --
+-- Table structure for table 'help'
+--
+
+CREATE TABLE help (
+  helpid	serial,
+  topic		varchar(128)	DEFAULT '' NOT NULL,
+  description	text		DEFAULT '' NOT NULL,
+  PRIMARY KEY (helpid)
+);
+
+
+--
 -- Table structure for table 'hosts'
 --
 
