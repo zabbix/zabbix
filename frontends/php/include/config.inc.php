@@ -3567,9 +3567,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	        $result=DBselect($sql);
 		if(DBget_field($result,0,0)>0)
 		{
-	       		$sql="select clock from service_alarms where serviceid=$serviceid and clock=".DBget_field($result,0,1);
+	       		$sql="select value from service_alarms where serviceid=$serviceid and clock=".DBget_field($result,0,1);
 		        $result2=DBselect($sql);
-			$value=DBget_field($result,0,0);
+			$value=DBget_field($result2,0,0);
 		}
 		else
 		{
@@ -3581,33 +3581,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	function	calculate_service_availability($serviceid,$period_start,$period_end)
 	{
 	       	$sql="select count(*),min(clock),max(clock) from service_alarms where serviceid=$serviceid and clock>=$period_start and clock<=$period_end";
-//		echo " $sql<br>";
 		
-/*	        $result=DBselect($sql);
-		if(DBget_field($result,0,0)>0)
-		{
-			$min=DBget_field($result,0,1);
-			$max=DBget_field($result,0,2);
-		}
-		else
-		{
-			$ret["true_time"]=0;
-			$ret["false_time"]=1;
-			$ret["true"]=0;
-			$ret["false"]=100;
-			return $ret;
-		}*/
-
 		$sql="select clock,value from service_alarms where serviceid=$serviceid and clock>=$period_start and clock<=$period_end";
-//		echo " $sql<br>";
 		$result=DBselect($sql);
 
-//		echo $sql,"<br>";
-
 // -1,0,1
-		$state=-1;
-		$true_time=0;
-		$false_time=0;
+		$state=get_last_service_value($serviceid,$period_start);
+		$problem_time=0;
+		$ok_time=0;
 		$time=$period_start;
 		for($i=0;$i<DBnum_rows($result);$i++)
 		{
@@ -3617,81 +3598,60 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$diff=$clock-$time;
 
 			$time=$clock;
-#state=0,1 (FALSE), >1 TRUE 
+#state=0,1 (OK), >1 PROBLEMS 
 
-			if($state==-1)
+			if($state<=1)
 			{
-				$state=$value;
-				if($state <= 1)
-				{
-					$true_time+=$diff;
-				}
-				else
-				{
-					$false_time+=$diff;
-				}
-			}
-			else if($state<=1)
-			{
-				$true_time+=$diff;
+				$ok_time+=$diff;
 				$state=$value;
 			}
 			else
 			{
-				$false_time+=$diff;
+				$problem_time+=$diff;
 				$state=$value;
 			}
 		}
-//		echo $true_time,"-",$false_time,"<br>";
+//		echo $problem_time,"-",$ok_time,"<br>";
 
 		if(DBnum_rows($result)==0)
 		{
 			if(get_last_service_value($serviceid,$period_start)<=1)
 			{
-				$false_time=$period_end-$period_start;
+				$ok_time=$period_end-$period_start;
 			}
 			else
 			{
-				$true_time=$period_end-$period_start;
+				$problem_time=$period_end-$period_start;
 			}
 		}
 		else
 		{
 			if($state<=1)
 			{
-				$false_time=$false_time+$period_end-$time;
+				$ok_time=$ok_time+$period_end-$time;
 			}
 			else
 			{
-				$true_time=$true_time+$period_end-$time;
-			}
-			$clock=DBget_field($result,0,0);
-			if(get_last_service_value($serviceid,$period_start)<=1)
-			{
-				$false_time=$clock-$period_start;
-			}
-			else
-			{
-				$true_time=$clock-$period_start;
+				$problem_time=$problem_time+$period_end-$time;
 			}
 		}
 
-//		echo $true_time,"-",$false_time,"<br>";
+//		echo $problem_time,"-",$ok_time,"<br>";
 
-		$total_time=$true_time+$false_time;
+		$total_time=$problem_time+$ok_time;
 		if($total_time==0)
 		{
-			$ret["true_time"]=0;
-			$ret["false_time"]=0;
-			$ret["true"]=0;
-			$ret["false"]=0;
+			$ret["problem_time"]=0;
+			$ret["ok_time"]=0;
+			$ret["problem"]=0;
+			$ret["ok"]=0;
 		}
 		else
 		{
-			$ret["true_time"]=$true_time;
-			$ret["false_time"]=$false_time;
-			$ret["true"]=(100*$true_time)/$total_time;
-			$ret["false"]=(100*$false_time)/$total_time;
+			$ret["problem_time"]=$problem_time;
+			$ret["ok_time"]=$ok_time;
+			$ret["problem"]=(100*$problem_time)/$total_time;
+			$ret["ok"]=(100*$ok_time)/$total_time;
 		}
 		return $ret;
 	}
