@@ -28,7 +28,7 @@
 	{
 		$nomenu=1;
 	}
-	if(isset($HTTP_GET_VARS["graphid"]) && !isset($HTTP_GET_VARS["period"]))
+	if(isset($HTTP_GET_VARS["graphid"]) && !isset($HTTP_GET_VARS["period"]) && !isset($HTTP_GET_VARS["stime"]))
 	{
 		show_header($page["title"],30,$nomenu);
 	}
