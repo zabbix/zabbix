@@ -8,7 +8,6 @@ BUGS:
 
  - BUG. zabbix_suckerd is crashing after EMAIL15
  - graphs and maps are not displayed properly sometimes
- - BUG. zabbix_sucker should accept parameter regardless of "\n" at the end of line 
  - BUG. Agent return unsupported in case if UserParameter ends by timeout.
  - add protection from IT Service loop
 
@@ -50,6 +49,7 @@ the agent with a predefined API that can return values to suckerd.
 
 Not ready yet:
 
+ - BUG. zabbix_sucker should accept parameter regardless of "\n" at the end of line 
  - update docs related to WIN32 agent
  - get rid of long select lists in user forms 
  - do not send notifications at certain periods of time. Do not monitor services at certain periods of time.
