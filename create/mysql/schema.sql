@@ -217,6 +217,7 @@ CREATE TABLE hosts (
   status int(4) DEFAULT '0' NOT NULL,
 -- If status=UNREACHABLE, host will not be checked until  
   disable_until int(4) DEFAULT '0' NOT NULL,
+  network_errors int(4) DEFAULT '0' NOT NULL,
   PRIMARY KEY (hostid),
   KEY (status)
 );

@@ -660,12 +660,13 @@ int get_values(void)
 	char		*s;
 
 	int	host_status;
+	int	network_errors;
 
 	now = time(NULL);
 #ifdef TESTTEST
 	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and h.hostid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-3,sucker_num-3,SERVER_STATUS_KEY);
 #else
-	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=%d and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, ITEM_STATUS_ACTIVE, now, CONFIG_SUCKERD_FORKS-3,sucker_num-3,SERVER_STATUS_KEY);
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors from items i,hosts h where i.nextcheck<=%d and i.status=%d and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, ITEM_STATUS_ACTIVE, now, CONFIG_SUCKERD_FORKS-3,sucker_num-3,SERVER_STATUS_KEY);
 #endif
 	result = DBselect(sql);
 
@@ -710,12 +711,21 @@ int get_values(void)
 		host_status=atoi(DBget_field(result,i,16));
 		item.value_type=atoi(DBget_field(result,i,17));
 
+		network_errors=atoi(DBget_field(result,i,18));
+
 		res = get_value(&value,value_str,&item);
 		zabbix_log( LOG_LEVEL_DEBUG, "GOT VALUE [%s]", value_str );
 		
 		if(res == SUCCEED )
 		{
 			process_new_value(&item,value_str);
+
+			if(network_errors>0)
+			{
+				sprintf(sql,"update hosts set network_errors=0 where hostid=%d", item.hostid);
+				DBexecute(sql);
+			}
+
 			if(HOST_STATUS_UNREACHABLE == host_status)
 			{
 				host_status=HOST_STATUS_MONITORED;
@@ -742,9 +752,21 @@ int get_values(void)
 		}
 		else if(res == NETWORK_ERROR)
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Host [%s] will be checked after [%d] seconds", item.host, DELAY_ON_NETWORK_FAILURE );
-			DBupdate_host_status(item.hostid,HOST_STATUS_UNREACHABLE,now);
-			update_key_status(item.hostid,HOST_STATUS_UNREACHABLE);	
+			network_errors++;
+			if(network_errors>=3)
+			{
+				zabbix_log( LOG_LEVEL_WARNING, "Host [%s] will be checked after [%d] seconds", item.host, DELAY_ON_NETWORK_FAILURE );
+				DBupdate_host_status(item.hostid,HOST_STATUS_UNREACHABLE,now);
+				update_key_status(item.hostid,HOST_STATUS_UNREACHABLE);	
+
+				sprintf(sql,"update hosts set network_errors=3 where hostid=%d", item.hostid);
+				DBexecute(sql);
+			}
+			else
+			{
+				sprintf(sql,"update hosts set network_errors=%d where hostid=%d", network_errors, item.hostid);
+				DBexecute(sql);
+			}
 
 			break;
 		}

@@ -58,6 +58,9 @@ Not ready yet:
 
 Changes for 1.0beta6:
 
+ - status will be changed to UNCREACHABLE only in case of three network errors
+ (Alexei)
+ - added column hosts.network_errors (Alexei)
  - support for parameters netloadin[*] and netloadout[*] (Alexei)
  - added src/zabbix_agent/stats.c and stats.h (Alexei)
  - added parameter StatFile to zabbix_agentd.conf (Alexei)
