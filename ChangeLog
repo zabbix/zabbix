@@ -1,5 +1,6 @@
 Changes for 1.0beta7:
 
+ - Show-Show-Show renamed to Graph-Trend-Compare in latest.html (Alexei)
  - fixed buffer overflow in zabbix_log(). (Alexei)
  - availability reports for trapper-based triggers (Alexei)
  - fixed possible zabbix_suckerd crash. It may happen if socket() returns 0.
