@@ -1,5 +1,6 @@
 Changes for 1.0beta10:
 
+ - new draw type for graphs: Dot (Alexei)
  - improved media maintenance form (Alexei)
  - added sort order for custom graphs (Alexei)
  - added column graphs_items.sortorder (Alexei)
