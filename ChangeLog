@@ -1,5 +1,6 @@
 Changes for 1.0beta8:
 
+ - very basic support for SNMP trapping (Alexei)
  - added misc/snmptrap/snmptrap.sh (Alexei)
  - group selection for Item configuration form (Alexei)
  - added support for SLA level in IT Services (Alexei)
