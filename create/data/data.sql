@@ -130,7 +130,7 @@ insert into items_template (itemtemplateid,description,key_,delay)
 insert into items_template (itemtemplateid,description,key_,delay)
 	values (55,'Number of running processes inetd','proc_cnt[inetd]', 60);
 insert into items_template (itemtemplateid,description,key_,delay)
-	values (56,'Number of running processes apache','proc_cnt[apache]', 60);
+	values (56,'Number of running processes apache','proc_cnt[httpd]', 60);
 insert into items_template (itemtemplateid,description,key_,delay)
 	values (57,'Number of running processes mysqld','proc_cnt[mysqld]', 60);
 insert into items_template (itemtemplateid,description,key_,delay)
