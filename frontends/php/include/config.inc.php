@@ -2659,7 +2659,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Add Media definition
 
-	function	add_media( $userid, $mediatypeid, $sendto, $severity)
+	function	add_media( $userid, $mediatypeid, $sendto, $severity, $active)
 	{
 		$c=count($severity);
 		$s=0;
@@ -2667,7 +2667,21 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 			$s=$s|pow(2,(int)$severity[$i]);
 		}
-		$sql="insert into media (userid,mediatypeid,sendto,active,severity) values ($userid,'$mediatypeid','$sendto',0,$s)";
+		$sql="insert into media (userid,mediatypeid,sendto,active,severity) values ($userid,'$mediatypeid','$sendto',$active,$s)";
+		return	DBexecute($sql);
+	}
+
+	# Update Media definition
+
+	function	update_media($mediaid, $userid, $mediatypeid, $sendto, $severity, $active)
+	{
+		$c=count($severity);
+		$s=0;
+		for($i=0;$i<$c;$i++)
+		{
+			$s=$s|pow(2,(int)$severity[$i]);
+		}
+		$sql="update media set userid=$userid, mediatypeid=$mediatypeid, sendto='$sendto', active=$active,severity=$s where mediaid=$mediaid";
 		return	DBexecute($sql);
 	}
 
