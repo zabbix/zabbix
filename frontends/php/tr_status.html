@@ -9,6 +9,34 @@
 <?
 	show_table_header_begin();
 	echo "STATUS OF TRIGGERS";
+
+
+        show_table_v_delimiter();
+?>
+ 
+<?
+        $result=mysql_query("select hostid,host from hosts order by host",$mysql);
+        if(isset($hostid))
+        {
+                echo "<A HREF=\"tr_status.html\">all</A>  ";
+        }
+        else
+        {
+                echo "<b>[<A HREF=\"tr_status.html\">all</A>]</b>  ";
+        }
+        while($row=mysql_fetch_row($result))
+        {
+                $hid=$row[0];
+                $host=$row[1];
+                if($hid == $hostid)
+                {
+                        echo "<b>[<A HREF=\"tr_status.html?hostid=$hid\">$host</A>]</b>  ";
+                }
+                else
+                {
+                        echo "<A HREF=\"tr_status.html?hostid=$hid\">$host</A>  ";
+                }
+        }
  
 	show_table_v_delimiter();
 ?>
@@ -47,21 +75,7 @@
 	{
 		echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=false\">Show Details</A>] ";
 	}
-	echo "[<A HREF=\"tr_status.html?noactions=false&onlytrue=false&showselected=true\">Select</A>] ";
-
   
-	if($showselected=='true')
-	{
-		echo	"<form method=\"get\" action=\"tr_status.html\">";
-		echo	"Where <b>Description</b> like <input name=\"only\" type=\"text\" value=\"$only\">";
-		echo	"<INPUT NAME=\"noactions\" TYPE=\"HIDDEN\" value=\"$noactions\"> ";
-		echo	"<INPUT NAME=\"showselected\" TYPE=\"HIDDEN\" value=\"true\"> ";
-//		echo	"<INPUT TYPE=\"IMAGE\" SRC=\"img/enter.gif\"VALUE=\"Show\" BORDER=0 ALT=\"Show\"";
-		echo	"<input type=\"submit\" name=\"register\" value=\"Show\">";
-		echo	"</form>";
-		if($only==$asdfasdf) $only="abcdef";
-		$onlywheredesc=" where description like \"%$only%\" ";
-	}
 	show_table_header_end();
 	
 	echo "<br>";
@@ -90,13 +104,23 @@
 	}
 	echo "</TR>\n";
 
-	if($onlytrue=='true')
+	if(isset($hostid))
 	{
-		$result=mysql_query("select triggerid,istrue,description,lastcheck,expression,priority,lastchange,comments from triggers where istrue=1 order by priority desc, description",$mysql);
+		$cond=" and h.hostid=$hostid ";
 	}
 	else
 	{
-		$result=mysql_query("select triggerid,istrue,description,lastcheck,expression,priority,lastchange,comments from triggers $onlywheredesc order by description,priority",$mysql);
+		$cond="";
+	}
+
+
+	if($onlytrue=='true')
+	{
+		$result=mysql_query("select t.triggerid,t.istrue,t.description,t.lastcheck,t.expression,t.priority,t.lastchange,t.comments from triggers t,hosts h,items i,functions f  where t.istrue=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid $cond order by t.priority desc, t.description",$mysql);
+	}
+	else
+	{
+		$result=mysql_query("select t.triggerid,t.istrue,t.description,t.lastcheck,t.expression,t.priority,t.lastchange,t.comments from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid $cond order by t.priority desc, t.description",$mysql);
 	}
 	$trigcount=0;
 	$i=0;

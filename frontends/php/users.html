@@ -23,6 +23,13 @@
 	{
 		delete_user($userid);
 	}
+	if($register=="update")
+	{
+		if($password1==$password2)
+		{
+			update_user($userid,$groupid,$name,$surname,$alias,$password1);
+		}
+	}
 ?>
 
 <?
@@ -53,12 +60,12 @@
 		$name=$row[2];
 		$surname=$row[3];
 		$group=$row[4];
-		$userid=$row[0];
+		$userid_=$row[0];
 		echo "<TD>$group</TD>";
 		echo "<TD>$alias</TD>";
 		echo "<TD>$name</TD>";
 		echo "<TD>$surname</TD>";
-		echo "<TD><A HREF=\"media.html?userid=$userid\">Media</A> - <A HREF=\"users.html?register=delete&userid=$userid\">Delete</A>";
+		echo "<TD><A HREF=\"users.html?register=change&userid=$userid_\">Change</A> - <A HREF=\"media.html?userid=$userid_\">Media</A>";
 		echo "</TD>";
 		echo "</TR>";
 	}
@@ -68,52 +75,7 @@
 <?
 	echo "<br>";
 
-	show_table2_header_begin();
-	echo "New user";
-
-	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"users.html\">";
-	echo "Alias";
-	show_table2_h_delimiter();
-	echo "<input name=\"alias\" size=20>";
-
-	show_table2_v_delimiter();
-	echo "Name";
-	show_table2_h_delimiter();
-	echo "<input name=\"name\" size=20>";
-
-	show_table2_v_delimiter();
-	echo "Surname";
-	show_table2_h_delimiter();
-	echo "<input name=\"surname\" size=20>";
-
-	show_table2_v_delimiter();
-	echo "User group";
-	show_table2_h_delimiter();
-	echo "<select name=\"groupid\">";
-	$result=mysql_query("select groupid,name from groups order by name",$mysql);
-	while($row=mysql_fetch_row($result))
-	{
-		$groupid=$row[0];
-		$name=$row[1];
-		echo "<option value=\"$groupid\">$name";
-	}
-	echo "</select>";
-
-	show_table2_v_delimiter();
-	echo "Password";
-	show_table2_h_delimiter();
-	echo "<input type=\"password\" name=\"password1\" size=20>";
-
-	show_table2_v_delimiter();
-	echo "Password (once again)";
-	show_table2_h_delimiter();
-	echo "<input type=\"password\" name=\"password2\" size=20>";
-
-	show_table2_v_delimiter2();
-	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
-
-	show_table2_header_end();
+	insert_user_form($userid);
 ?>
 
 <?

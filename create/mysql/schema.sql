@@ -313,3 +313,5 @@ CREATE TABLE users (
   UNIQUE (alias)
 );
 
+insert into users (userid,groupid,alias,name,surname,passwd) values (1,1,'Admin','Zabbix','Administrator','');
+
