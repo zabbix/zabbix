@@ -50,8 +50,26 @@
 
 #include "housekeeper.h"
 
+/* Remove items having status 'deleted' */
+int housekeeping_items(void)
+{
+	char		sql[MAX_STRING_LEN+1];
+	DB_RESULT	*result;
+	int		i,itemid;
+
+	sprintf(sql,"select itemid from items where status=%d", ITEM_STATUS_DELETED);
+	result = DBselect(sql);
+	for(i=0;i<DBnum_rows(result);i++)
+	{
+		itemid=atoi(DBget_field(result,i,0));
+		DBdelete_item(itemid);
+	}
+	DBfree_result(result);
+	return SUCCEED;
+}
+
 /* Remove hosts having status 'deleted' */
-int housekeeping_hosts(int now)
+int housekeeping_hosts(void)
 {
 	char		sql[MAX_STRING_LEN+1];
 	DB_RESULT	*result;
@@ -203,7 +221,12 @@ int main_housekeeper_loop()
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("housekeeper [removing deleted hosts]");
 #endif
-		housekeeping_hosts(now);
+		housekeeping_hosts();
+
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("housekeeper [removing deleted items]");
+#endif
+		housekeeping_items();
 
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("housekeeper [removing old values]");
