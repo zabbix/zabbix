@@ -3,6 +3,7 @@
  - navigation bar for all graphs and screens
  - make support for "Clone"
  - add SNMP-based template
+ - add a simple generic tcp check
 
 LATER:
 
