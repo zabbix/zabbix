@@ -7,7 +7,6 @@ ZABBIX 1.1:
  - anvanced SNMP trapper
  - hard-linked templates
  - more supported parameters under FreeBSD, HP-UX and Solaris (cpu times, network stats)
- - agent proxy
 
  - disk stats under Linux 2.6.x
  - handle unavailability of MySQL gracefully
