@@ -423,6 +423,10 @@
 	define("S_MENU_AUDIT",				"AUDIT");
 
 //	queue.php
+	define("S_OVERVIEW",				"Overview");
+	define("S_OVERVIEW_BIG",			"OVERVIEW");
+
+//	queue.php
 	define("S_QUEUE_BIG",				"QUEUE");
 	define("S_QUEUE_OF_ITEMS_TO_BE_UPDATED_BIG",	"QUEUE OF ITEMS TO BE UPDATED");
 	define("S_NEXT_CHECK",				"Next check");
