@@ -1,5 +1,6 @@
 Changes for 1.0alpha10:
 
+ - check for filesystem /proc in configure.in
  - table "Supported parameters by platform" added to manual.txt
  - removed recommendation of PostgreSQL from manual.txt
  - use of /proc was changed to native calls to sysinfo where possible
