@@ -52,18 +52,39 @@
 
 		function initColors()
 		{
-			$this->colors["Red"]=ImageColorAllocate($this->im,255,0,0); 
-			$this->colors["Dark Red"]=ImageColorAllocate($this->im,150,0,0); 
-			$this->colors["Green"]=ImageColorAllocate($this->im,0,255,0); 
-			$this->colors["Dark Green"]=ImageColorAllocate($this->im,0,150,0); 
-			$this->colors["Blue"]=ImageColorAllocate($this->im,0,0,255); 
-			$this->colors["Dark Blue"]=ImageColorAllocate($this->im,0,0,150); 
-			$this->colors["Yellow"]=ImageColorAllocate($this->im,255,255,0); 
-			$this->colors["Dark Yellow"]=ImageColorAllocate($this->im,150,150,0); 
-			$this->colors["Cyan"]=ImageColorAllocate($this->im,0,255,255); 
-			$this->colors["Black"]=ImageColorAllocate($this->im,0,0,0); 
-			$this->colors["Gray"]=ImageColorAllocate($this->im,150,150,150); 
-			$this->colors["White"]=ImageColorAllocate($this->im,255,255,255); 
+			if(function_exists("ImageColorExactAlpha")&&function_exists("ImageCreateTrueColor"))
+			{
+				$this->colors["Red"]=		ImageColorExactAlpha($this->im,255,0,0,50); 
+				$this->colors["Dark Red"]=	ImageColorExactAlpha($this->im,150,0,0,50); 
+				$this->colors["Green"]=		ImageColorExactAlpha($this->im,0,255,0,50); 
+				$this->colors["Dark Green"]=	ImageColorExactAlpha($this->im,0,150,0,50); 
+				$this->colors["Blue"]=		ImageColorExactAlpha($this->im,0,0,255,50); 
+				$this->colors["Dark Blue"]=	ImageColorExactAlpha($this->im,0,0,150,50); 
+				$this->colors["Yellow"]=	ImageColorExactAlpha($this->im,255,255,0,50); 
+				$this->colors["Dark Yellow"]=	ImageColorExactAlpha($this->im,150,150,0,50); 
+				$this->colors["Cyan"]=		ImageColorExactAlpha($this->im,0,255,255,50); 
+				$this->colors["Black"]=		ImageColorExactAlpha($this->im,0,0,0,50); 
+				$this->colors["Gray"]=		ImageColorExactAlpha($this->im,150,150,150,50);
+
+				$this->colors["White"]=			ImageColorAllocate($this->im,255,255,255);
+				$this->colors["Dark Red No Alpha"]=	ImageColorAllocate($this->im,150,0,0); 
+				$this->colors["Black No Alpha"]=	ImageColorAllocate($this->im,0,0,0); 
+			}
+			else
+			{
+				$this->colors["Red"]=ImageColorAllocate($this->im,255,0,0); 
+				$this->colors["Dark Red"]=ImageColorAllocate($this->im,150,0,0); 
+				$this->colors["Green"]=ImageColorAllocate($this->im,0,255,0); 
+				$this->colors["Dark Green"]=ImageColorAllocate($this->im,0,150,0); 
+				$this->colors["Blue"]=ImageColorAllocate($this->im,0,0,255); 
+				$this->colors["Dark Blue"]=ImageColorAllocate($this->im,0,0,150); 
+				$this->colors["Yellow"]=ImageColorAllocate($this->im,255,255,0); 
+				$this->colors["Dark Yellow"]=ImageColorAllocate($this->im,150,150,0); 
+				$this->colors["Cyan"]=ImageColorAllocate($this->im,0,255,255); 
+				$this->colors["Black"]=ImageColorAllocate($this->im,0,0,0); 
+				$this->colors["Gray"]=ImageColorAllocate($this->im,150,150,150); 
+				$this->colors["White"]=ImageColorAllocate($this->im,255,255,255);
+			}
 		}
 
 		function Graph()
@@ -160,10 +181,10 @@
 
 		function drawSmallRectangle()
 		{
-			DashedLine($this->im,$this->shiftX+1,$this->shiftY,$this->shiftX+1,$this->sizeY+$this->shiftY,$this->colors["Black"]);
-			DashedLine($this->im,$this->shiftX+1,$this->shiftY,$this->shiftX+$this->sizeX,$this->shiftY,$this->colors["Black"]);
-			DashedLine($this->im,$this->shiftX+$this->sizeX,$this->shiftY,$this->shiftX+$this->sizeX,$this->sizeY+$this->shiftY,$this->colors["Black"]);
-			DashedLine($this->im,$this->shiftX+1,$this->shiftY+$this->sizeY,$this->shiftX+$this->sizeX,$this->sizeY+$this->shiftY,$this->colors["Black"]);
+			DashedLine($this->im,$this->shiftX+1,$this->shiftY,$this->shiftX+1,$this->sizeY+$this->shiftY,$this->colors["Black No Alpha"]);
+			DashedLine($this->im,$this->shiftX+1,$this->shiftY,$this->shiftX+$this->sizeX,$this->shiftY,$this->colors["Black No Alpha"]);
+			DashedLine($this->im,$this->shiftX+$this->sizeX,$this->shiftY,$this->shiftX+$this->sizeX,$this->sizeY+$this->shiftY,$this->colors["Black No Alpha"]);
+			DashedLine($this->im,$this->shiftX+1,$this->shiftY+$this->sizeY,$this->shiftX+$this->sizeX,$this->sizeY+$this->shiftY,$this->colors["Black No Alpha"]);
 		}
 
 		function drawRectangle()
@@ -171,7 +192,7 @@
 			ImageFilledRectangle($this->im,0,0,$this->sizeX+$this->shiftX+61,$this->sizeY+$this->shiftY+62+12*$this->num+8,$this->colors["White"]);
 			if($this->border==1)
 			{
-				ImageRectangle($this->im,0,0,imagesx($this->im)-1,imagesy($this->im)-1,$this->colors["Black"]);
+				ImageRectangle($this->im,0,0,imagesx($this->im)-1,imagesy($this->im)-1,$this->colors["Black No Alpha"]);
 			}
 		}
 
@@ -213,7 +234,7 @@
 
 
 			$x=imagesx($this->im)/2-ImageFontWidth(4)*strlen($str)/2;
-			ImageString($this->im, 4,$x,1, $str , $this->colors["Dark Red"]);
+			ImageString($this->im, 4,$x,1, $str , $this->colors["Dark Red No Alpha"]);
 		}
 
 		function setHeader($header)
@@ -240,13 +261,13 @@
 				$old_day=-1;
 				for($i=0;$i<=24;$i++)
 				{
-					ImageStringUp($this->im, 1,$i*$this->sizeX/24+$this->shiftX-3, $this->sizeY+$this->shiftY+57, date("      H:i",$this->from_time+$i*$this->period/24) , $this->colors["Black"]);
+					ImageStringUp($this->im, 1,$i*$this->sizeX/24+$this->shiftX-3, $this->sizeY+$this->shiftY+57, date("      H:i",$this->from_time+$i*$this->period/24) , $this->colors["Black No Alpha"]);
 
 					$new_day=date("d",$this->from_time+$i*$this->period/24);
 					if( ($old_day != $new_day) ||($i==24))
 					{
 						$old_day=$new_day;
-						ImageStringUp($this->im, 1,$i*$this->sizeX/24+$this->shiftX-3, $this->sizeY+$this->shiftY+57, date("m.d H:i",$this->from_time+$i*$this->period/24) , $this->colors["Dark Red"]);
+						ImageStringUp($this->im, 1,$i*$this->sizeX/24+$this->shiftX-3, $this->sizeY+$this->shiftY+57, date("m.d H:i",$this->from_time+$i*$this->period/24) , $this->colors["Dark Red No Alpha"]);
 
 					}
 				}
@@ -267,7 +288,7 @@
 		{
 			$this->drawGrid();
 
-			ImageString($this->im, 2,$this->sizeX/2-50,                $this->sizeY+$this->shiftY+3, "NO DATA FOUND FOR THIS PERIOD" , $this->colors["Dark Red"]);
+			ImageString($this->im, 2,$this->sizeX/2-50,                $this->sizeY+$this->shiftY+3, "NO DATA FOUND FOR THIS PERIOD" , $this->colors["Dark Red No Alpha"]);
 			ImageStringUp($this->im,0,imagesx($this->im)-10,imagesy($this->im)-50, "http://www.zabbix.org", $this->colors["Gray"]);
 			ImagePng($this->im); 
 			ImageDestroy($this->im); 
@@ -292,7 +313,7 @@
 			for($i=0;$i<$this->num;$i++)
 			{
 				ImageFilledRectangle($this->im,$this->shiftX,$this->sizeY+$this->shiftY+62+12*$i,$this->shiftX+5,$this->sizeY+$this->shiftY+5+62+12*$i,$this->colors[$this->items[$i]["color"]]);
-				ImageRectangle($this->im,$this->shiftX,$this->sizeY+$this->shiftY+62+12*$i,$this->shiftX+5,$this->sizeY+$this->shiftY+5+62+12*$i,$this->colors["Black"]);
+				ImageRectangle($this->im,$this->shiftX,$this->sizeY+$this->shiftY+62+12*$i,$this->shiftX+5,$this->sizeY+$this->shiftY+5+62+12*$i,$this->colors["Black No Alpha"]);
 
 				$str=sprintf("%s: %s [min:%s max:%s last:%s]",
 					str_pad($this->items[$i]["host"],$max_host_len," "),
@@ -301,7 +322,7 @@
 					convert_units(max($this->max[$i]),$this->items[$i]["units"],$this->items[$i]["multiplier"]),
 					convert_units($this->getLastValue($i),$this->items[$i]["units"],$this->items[$i]["multiplier"]));
 	
-				ImageString($this->im, 2,$this->shiftX+9,$this->sizeY+$this->shiftY+(62-5)+12*$i,$str, $this->colors["Black"]);
+				ImageString($this->im, 2,$this->shiftX+9,$this->sizeY+$this->shiftY+(62-5)+12*$i,$str, $this->colors["Black No Alpha"]);
 			}
 		}
 
@@ -445,7 +466,14 @@
 
 			check_authorisation();
 		
-			$this->im = imagecreate($this->sizeX+$this->shiftX+61,$this->sizeY+$this->shiftY+62+12*$this->num+8);
+			if(function_exists("ImageColorExactAlpha")&&function_exists("ImageCreateTrueColor"))
+			{
+				$this->im = ImageCreateTrueColor($this->sizeX+$this->shiftX+61,$this->sizeY+$this->shiftY+62+12*$this->num+8);
+			}
+			else
+			{
+				$this->im = imagecreate($this->sizeX+$this->shiftX+61,$this->sizeY+$this->shiftY+62+12*$this->num+8);
+			}
 
 			$this->initColors();
 			$this->drawRectangle();
@@ -489,7 +517,7 @@
 								$y2=$this->sizeY*($this->avg[$item][$j]-$minY)/($maxY-$minY);
 								$y2=$this->sizeY-$y2;
 
-								$this->drawElement($item, $x1+$this->shiftX,$y1+$this->shiftY,$x2+$this->shiftX,$y2+$this->shiftY);
+								$this->drawElement($item, $x1+$this->shiftX,$y1+$this->shiftY,$x2+$this->shiftX+1,$y2+$this->shiftY);
 								break;
 							}
 						}
@@ -501,12 +529,12 @@
 			{
 				for($i=0;$i<=6;$i++)
 				{
-					ImageString($this->im, 1, $this->sizeX+5+$this->shiftX, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, convert_units($this->sizeY*$i/6*($maxY-$minY)/$this->sizeY+$minY,$this->items[0]["units"],$this->items[0]["multiplier"]) , $this->colors["Dark Red"]);
+					ImageString($this->im, 1, $this->sizeX+5+$this->shiftX, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, convert_units($this->sizeY*$i/6*($maxY-$minY)/$this->sizeY+$minY,$this->items[0]["units"],$this->items[0]["multiplier"]) , $this->colors["Dark Red No Alpha"]);
 				}
 			}
 			else
 			{
-				ImageString($this->im, 2,$this->sizeX/2 -50,$this->sizeY+$this->shiftY+3, "NO DATA FOR THIS PERIOD" , $this->colors["Dark Red"]);
+				ImageString($this->im, 2,$this->sizeX/2 -50,$this->sizeY+$this->shiftY+3, "NO DATA FOR THIS PERIOD" , $this->colors["Dark Red No Alpha"]);
 			}
 
 			$this->drawLogo();
