@@ -65,16 +65,22 @@ AC_MSG_RESULT(no))
 
 dnl Check for vmtotal in sys/vmmeter.h
 AC_MSG_CHECKING(for vmtotal in struct sys/vmmeter.h)
-AC_TRY_COMPILE([#include <sys/vmmeter.h>],
+AC_TRY_COMPILE(
 [
-        int mib[2],len;
-        struct vmtotal v;
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/sysctl.h>
+#include <vm/vm_param.h>
+#include <sys/vmmeter.h>
+],
+[	int mib[2],len;
+	struct vmtotal v;
 
-        len=sizeof(struct vmtotal);
-        mib[0]=CTL_VM;
-        mib[1]=VM_METER;
+	len=sizeof(struct vmtotal);
+	mib[0]=CTL_VM;
+	mib[1]=VM_METER;
 
-        sysctl(mib,2,&v,&len,NULL,0);
+	sysctl(mib,2,&v,&len,NULL,0);
 ],
 AC_DEFINE(HAVE_SYS_VMMETER_VMTOTAL)
 AC_MSG_RESULT(yes),
