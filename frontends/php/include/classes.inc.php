@@ -364,7 +364,7 @@
 		{
 			$now = time(NULL);
 			$this->to_time=$now-3600*$this->from;
-			$this->from_time=$this->to_time-$this->period-3600*$this->from;
+			$this->from_time=$this->to_time-$this->period;
 		
 			$p=$this->to_time-$this->from_time;
 			$z=$p-$this->from_time%$p;
