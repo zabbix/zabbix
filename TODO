@@ -11,7 +11,6 @@ HIGH PRIORITY:
 
  - BUG. zabbix_sucker should accept parameter regardless of "\n" at the end of line 
  - BUG. Agent return unsupported in case if UserParameter ends by timeout.
- - mass updates/inserts (add items and triggers for all hosts at once)
  - support for net-snmp
  - get rid of long select lists in user forms 
  - SNMP trapping
@@ -61,6 +60,7 @@ the agent with a predefined API that can return values to suckerd.
 Not ready yet:
 
  - decrease number of TCP connections between server and agent
+ - add triggers for all hosts at once
  - check Rickard's multithreaded agent
  - check new Mariusz patches
  - improve performance of Alarms and Alerts in PHP frontend
