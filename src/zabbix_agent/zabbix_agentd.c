@@ -81,7 +81,7 @@ void    daemon_init(void)
 	}
 
         openlog("zabbix_agentd",LOG_PID,LOG_USER);
-//	setlogmask(LOG_UPTO(LOG_DEBUG));
+/*	setlogmask(LOG_UPTO(LOG_DEBUG)); */
 	setlogmask(LOG_UPTO(LOG_WARNING));
 
 	if(setpriority(PRIO_PROCESS,0,5)!=0)
@@ -120,7 +120,7 @@ int	check_security(int sockfd)
 		sname=inet_ntoa(name.sin_addr);
 		if(strcmp(sname, host_allowed)!=0)
 		{
-			syslog( LOG_WARNING, "Connection from [%s] rejected",sname);
+			syslog( LOG_WARNING, "Connection from [%s] rejected. Allowed server is [%s] ",sname, host_allowed);
 			return	FAIL;
 		}
 	}
@@ -137,44 +137,40 @@ void	process_child(int sockfd)
         static struct  sigaction phan;
 
 	phan.sa_handler = &signal_handler; /* set up sig handler using sigaction() */
-	sigemptyset(&phan.sa_mask);  /* just block alarm signal */
+	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = 0;
 	sigaction(SIGALRM, &phan, NULL);
 
-//	for(;;)
+	alarm(AGENT_TIMEOUT);
+
+	syslog( LOG_DEBUG, "Before read()");
+	if( (nread = read(sockfd, line, 1024)) < 0)
 	{
-		alarm(AGENT_TIMEOUT);
-//
-
-
-		syslog( LOG_DEBUG, "Before read()");
-		if( (nread = read(sockfd, line, 1024)) < 0)
+		if(errno == EINTR)
 		{
-			if(errno == EINTR)
-			{
-				syslog( LOG_DEBUG, "read() failed. Timeout.");
-			}
-			else
-			{
-				syslog( LOG_DEBUG, "read() failed.");
-			}
-			syslog( LOG_DEBUG, "After read() 1");
-			return;
+			syslog( LOG_DEBUG, "Read timeout");
 		}
-		syslog( LOG_DEBUG, "After read() 2");
-
-		line[nread-1]=0;
-
-//		printf("Got line:{%s}\n",line);
-
-		syslog( LOG_DEBUG, "Got line:%s", line);
-		res=process(line);
-		sprintf(result,"%f",res);
-		syslog( LOG_DEBUG, "Sending back:%s", result);
-		write(sockfd,result,strlen(result));
-
+		else
+		{
+			syslog( LOG_DEBUG, "read() failed.");
+		}
+		syslog( LOG_DEBUG, "After read() 1");
 		alarm(0);
+		return;
 	}
+	syslog( LOG_DEBUG, "After read() 2 [%d]",nread);
+
+	line[nread-1]=0;
+
+	syslog( LOG_DEBUG, "Got line:%s", line);
+
+	res=process(line);
+
+	sprintf(result,"%f",res);
+	syslog( LOG_DEBUG, "Sending back:%s", result);
+	write(sockfd,result,strlen(result));
+
+	alarm(0);
 }
 
 int	tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
@@ -184,7 +180,7 @@ int	tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
 
 	if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
-		syslog( LOG_CRIT, "socket()");
+		syslog( LOG_CRIT, "Unable to create socket");
 		exit(1);
 	}
 
@@ -195,13 +191,13 @@ int	tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
 
 	if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 	{
-		syslog( LOG_CRIT, "bind()");
+		syslog( LOG_CRIT, "Cannot bind to port %d. Another zabbix_agentd already running ?",10000);
 		exit(1);
 	}
 
 	if(listen(sockfd, LISTENQ) != 0)
 	{
-		syslog( LOG_CRIT, "listen()");
+		syslog( LOG_CRIT, "Listen failed");
 		exit(1);
 	}
 
@@ -209,61 +205,6 @@ int	tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
 
 	return	sockfd;
 }
-
-/*
-int	tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
-{
-	int		listenfd, n;
-	const int	on=1;
-	struct addrinfo	hints, *res, *ressave;
-
-	bzero(&hints,sizeof(struct addrinfo));
-	hints.ai_flags = AI_PASSIVE;
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-
-	if( (n = getaddrinfo(host,serv, &hints, &res)) != 0)
-	{
-		syslog( LOG_CRIT, "getaddrinfo()");
-		exit(1);
-	}
-
-	ressave = res;
-
-	do {
-		listenfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-		if( listenfd <0)
-				continue;
-		if(setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) !=0 )
-		{
-			syslog( LOG_CRIT, "setsockopt()");
-			exit(1);
-		}
-		if(bind(listenfd,res->ai_addr,res->ai_addrlen) == 0)
-			break;
-		close(listenfd);
-	} while ((res = res ->ai_next) != NULL);
-
-	if (res == NULL)
-	{
-		syslog( LOG_CRIT, "tcp_listen()");
-		exit(1);
-	}
-
-	if(listen(listenfd, LISTENQ) !=0 )
-	{
-		syslog( LOG_CRIT, "listen()");
-		exit(1);
-	}
-
-	if(addrlenp)
-		*addrlenp = res->ai_addrlen;
-
-	freeaddrinfo(ressave);
-
-	return	(listenfd);
-}
-*/
 
 void	child_main(int i,int listenfd, int addrlen)
 {
@@ -273,7 +214,7 @@ void	child_main(int i,int listenfd, int addrlen)
 
 	cliaddr=malloc(addrlen);
 
-	printf("child %ld started\n",(long)getpid());
+	syslog( LOG_WARNING, "zabbix_agentd %ld started",(long)getpid());
 
 	for(;;)
 	{
@@ -316,11 +257,9 @@ int	main()
 
 	daemon_init();
 
-	phan.sa_handler = &signal_handler; /* set up sig handler using sigaction() */
-	sigemptyset(&phan.sa_mask);  /* just block alarm signal */
+	phan.sa_handler = &signal_handler;
+	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = 0;
-//	phan.sa_flags = SA_RESTART;
-//	phan.sa_flags = SA_ONESHOT;
 	sigaction(SIGINT, &phan, NULL);
 	sigaction(SIGQUIT, &phan, NULL);
 	sigaction(SIGTERM, &phan, NULL);
@@ -343,7 +282,7 @@ int	main()
 	for(i = 0; i< AGENTD_FORKS; i++)
 	{
 		pids[i] = child_make(i, listenfd, addrlen);
-		syslog( LOG_WARNING, "zabbix_agentd #%d started", pids[i]);
+/*		syslog( LOG_WARNING, "zabbix_agentd #%d started", pids[i]);*/
 	}
 
 	for(;;)

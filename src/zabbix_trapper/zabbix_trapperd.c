@@ -37,15 +37,14 @@ void	signal_handler( int sig )
 	if( SIGALRM == sig )
 	{
 		signal( SIGALRM, signal_handler );
- 
-//		fprintf(stderr,"Timeout while executing operation.");
+		syslog( LOG_WARNING, "Timeout while answering request");
 	}
  
 	if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
 	{
-//		fprintf(stderr,"\nGot QUIT or INT or TERM signal. Exiting..." );
+		syslog( LOG_WARNING, "Got signal. Exiting ...");
+		exit( FAIL );
 	}
-	exit( FAIL );
 }
 
 int	process(char *s)
@@ -109,6 +108,10 @@ void    daemon_init(void)
 	{
 		close(i);
 	}
+
+	openlog("zabbix_trapperd",LOG_PID,LOG_USER);
+/*	setlogmask(LOG_UPTO(LOG_DEBUG));*/ 
+	setlogmask(LOG_UPTO(LOG_WARNING));
 }
 
 void	process_child(int sockfd)
@@ -123,43 +126,40 @@ void	process_child(int sockfd)
 	phan.sa_flags = 0;
 	sigaction(SIGALRM, &phan, NULL);
 
-//	for(;;)
-//	{
-//		sigfunc = signal( SIGALRM, signal_handler );
-		alarm(TRAPPER_TIMEOUT);
+	alarm(TRAPPER_TIMEOUT);
 
-		if( (nread = read(sockfd, line, 1024)) < 0)
+	syslog( LOG_DEBUG, "Before read()");
+	if( (nread = read(sockfd, line, 1024)) < 0)
+	{
+		if(errno == EINTR)
 		{
-			if(errno == EINTR)
-			{
-				syslog( LOG_WARNING, "Timeout while waiting for parameter");
-			}
-			else
-			{
-				syslog( LOG_DEBUG, "read() error");
-			}
-			return;
-		}
-
-		alarm(0);
-//		signal(SIGALRM, sigfunc);
-
-		line[nread-1]=0;
-
-//		printf("Got line:{%s}\n",line);
-
-		syslog( LOG_DEBUG, "Got line:%s", line);
-		if( SUCCEED == process(line) )
-		{
-			sprintf(result,"OK\n");
+			syslog( LOG_DEBUG, "Read timeout");
 		}
 		else
 		{
-			sprintf(result,"NOT OK\n");
+			syslog( LOG_DEBUG, "read() failed");
 		}
-		syslog( LOG_DEBUG, "Sending back:%s", result);
-		write(sockfd,result,strlen(result));
-//	}
+		syslog( LOG_DEBUG, "After read() 1");
+		alarm(0);
+		return;
+	}
+
+	syslog( LOG_DEBUG, "After read() 2 [%d]",nread);
+
+	line[nread-1]=0;
+
+	syslog( LOG_DEBUG, "Got line:%s", line);
+	if( SUCCEED == process(line) )
+	{
+		sprintf(result,"OK\n");
+	}
+	else
+	{
+		sprintf(result,"NOT OK\n");
+	}
+	syslog( LOG_DEBUG, "Sending back:%s", result);
+	write(sockfd,result,strlen(result));
+	alarm(0);
 }
 
 int	tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
@@ -169,7 +169,7 @@ int	tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
 
 	if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
-		syslog( LOG_CRIT, "socket()");
+		syslog( LOG_CRIT, "Cannot create socket");
 		exit(1);
 	}
 
@@ -180,13 +180,13 @@ int	tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
 
 	if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 	{
-		syslog( LOG_CRIT, "bind()");
+		syslog( LOG_CRIT, "Cannot bind to port %d. Another zabbix_trapperd running ?",10001);
 		exit(1);
 	}
 	
 	if(listen(sockfd, LISTENQ) !=0 )
 	{
-		syslog( LOG_CRIT, "listen()");
+		syslog( LOG_CRIT, "listen() failed");
 		exit(1);
 	}
 
@@ -195,60 +195,6 @@ int	tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
 	return  sockfd;
 }
 
-/*
-int	tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
-{
-	int		listenfd, n;
-	const int	on=1;
-	struct addrinfo	hints, *res, *ressave;
-
-	bzero(&hints,sizeof(struct addrinfo));
-	hints.ai_flags = AI_PASSIVE;
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-
-	if( (n = getaddrinfo(host,serv, &hints, &res)) != 0)
-	{
-		syslog( LOG_CRIT, "getaddrinfo()");
-		exit(1);
-	}
-
-	ressave = res;
-
-	do {
-		listenfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-		if( listenfd <0)
-				continue;
-		if(setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) !=0 )
-		{
-			syslog( LOG_CRIT, "setsockopt()");
-			exit(1);
-		}
-		if(bind(listenfd,res->ai_addr,res->ai_addrlen) == 0)
-			break;
-		close(listenfd);
-	} while ((res = res ->ai_next) != NULL);
-
-	if (res == NULL)
-	{
-		syslog( LOG_CRIT, "tcp_listen()");
-		exit(1);
-	}
-
-	if(listen(listenfd, LISTENQ) !=0 )
-	{
-		syslog( LOG_CRIT, "listen()");
-		exit(1);
-	}
-
-	if(addrlenp)
-		*addrlenp = res->ai_addrlen;
-
-	freeaddrinfo(ressave);
-
-	return	(listenfd);
-}
-*/
 void	child_main(int i,int listenfd, int addrlen)
 {
 	int	connfd;
@@ -257,7 +203,8 @@ void	child_main(int i,int listenfd, int addrlen)
 
 	cliaddr=malloc(addrlen);
 
-//	printf("child %ld started\n",(long)getpid());
+	syslog( LOG_WARNING, "zabbix_trapperd %ld started",(long)getpid());
+
 	DBconnect();
 
 	for(;;)
@@ -291,10 +238,11 @@ int	main()
 {
 	int		listenfd;
 	socklen_t	addrlen;
-	int		i, ret;
+	int		i;
 
 	char		host[128];
 	char		*port="10001";
+
 	static struct  sigaction phan;
 
 	daemon_init();
@@ -305,15 +253,6 @@ int	main()
 	sigaction(SIGINT, &phan, NULL);
 	sigaction(SIGQUIT, &phan, NULL);
 	sigaction(SIGTERM, &phan, NULL);
-
-	signal( SIGINT,  signal_handler );
-	signal( SIGQUIT, signal_handler );
-	signal( SIGTERM, signal_handler );
-//	signal( SIGALRM, signal_handler );
-
-        openlog("zabbix_trapperd",LOG_PID,LOG_USER);
-//	ret=setlogmask(LOG_UPTO(LOG_DEBUG));
-	ret=setlogmask(LOG_UPTO(LOG_WARNING));
 
 	syslog( LOG_WARNING, "zabbix_trapperd started");
 
@@ -330,7 +269,7 @@ int	main()
 	for(i = 0; i< TRAPPERD_FORKS; i++)
 	{
 		pids[i] = child_make(i, listenfd, addrlen);
-		syslog( LOG_WARNING, "zabbix_trapperd #%d started", pids[i]);
+/*		syslog( LOG_WARNING, "zabbix_trapperd #%d started", pids[i]);*/
 	}
 
 	for(;;)
