@@ -40,12 +40,12 @@ void	signal_handler( int sig )
 	{
 		signal( SIGALRM, signal_handler );
  
-//		fprintf(stderr,"Timeout while executing operation.");
+/*		fprintf(stderr,"Timeout while executing operation.");*/
 	}
  
 	if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
 	{
-//		fprintf(stderr,"\nGot QUIT or INT or TERM signal. Exiting..." );
+/*		fprintf(stderr,"\nGot QUIT or INT or TERM signal. Exiting..." );*/
 	}
 	exit( FAIL );
 }
@@ -108,7 +108,7 @@ void	process_config_file(void)
 			}
 			else
 			{
-//				zabbix_log( LOG_LEVEL_CRIT, "Wrong DebugLevel in line %d", lineno);
+/*				zabbix_log( LOG_LEVEL_CRIT, "Wrong DebugLevel in line %d", lineno);*/
 				fclose(file);
 				exit(1);
 			}
@@ -176,10 +176,6 @@ int	main()
 
 	alarm(CONFIG_TIMEOUT);
 
-//	openlog("zabbix_trapper",LOG_PID,LOG_USER);
-	//	ret=setlogmask(LOG_UPTO(LOG_DEBUG));
-//	ret=setlogmask(LOG_UPTO(LOG_WARNING));
-
 	if(CONFIG_LOG_FILE == NULL)
 	{
 		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
@@ -212,8 +208,8 @@ int	main()
 	{
 		return FAIL;
 	}
-//	???
-//	value=atof(value_string);
+/*	???
+	value=atof(value_string);*/
 
 
 	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);

@@ -156,11 +156,6 @@ void	daemon_init(void)
 	{
 		close(i);
 	}
-
-/*	openlog("zabbix_suckerd",LOG_PID,LOG_USER);
-	setlogmask(LOG_UPTO(LOG_DEBUG));	
-	setlogmask(LOG_UPTO(LOG_WARNING));*/
-
 }
 
 void	create_pid_file(void)
@@ -206,13 +201,19 @@ void	init_config(void)
 /*		 PARAMETER	,VAR	,FUNC,	TYPE(0i,1s),MANDATORY,MIN,MAX	*/
 		{"StartSuckers",&CONFIG_SUCKERD_FORKS,0,TYPE_INT,PARM_OPT,2,255},
 		{"HousekeepingFrequency",&CONFIG_HOUSEKEEPING_FREQUENCY,0,TYPE_INT,PARM_OPT,1,24},
+		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
+		{"NoTimeWait",&CONFIG_NOTIMEWAIT,0,TYPE_INT,PARM_OPT,0,1},
+		{"DebugLevel",&CONFIG_LOG_LEVEL,0,TYPE_INT,PARM_OPT,1,3},
 		{"PidFile",&CONFIG_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
+		{"LogFile",&CONFIG_LOG_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBName",&CONFIG_DBNAME,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBUser",&CONFIG_DBUSER,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBPassword",&CONFIG_DBPASSWORD,0,TYPE_STRING,PARM_OPT,0,0},
+		{"DBSocket",&CONFIG_DBSOCKET,0,TYPE_STRING,PARM_OPT,0,0},
 		{0}
 	};
 	parse_cfg_file("/etc/zabbix/zabbix_suckerd.conf",cfg);
+	printf("CONFIG_PID_FILE [%s]\n",CONFIG_PID_FILE);
 /*	zabbix_log( LOG_LEVEL_WARNING, "PidFile [%d]", CONFIG_PID_FILE);
 	zabbix_log( LOG_LEVEL_WARNING, "PidFile [%d]", &CONFIG_PID_FILE);
 	zabbix_log( LOG_LEVEL_WARNING, "PidFile [%s]", &CONFIG_PID_FILE);*/
@@ -1009,7 +1010,9 @@ int main(int argc, char **argv)
 	sigaction(SIGTERM, &phan, NULL);
 	sigaction(SIGCHLD, &phan, NULL);
 
-	process_config_file();
+/*	process_config_file();*/
+/* process_config_file to be removed */
+	init_config();
 
 	if(CONFIG_LOG_FILE == NULL)
 	{
@@ -1019,9 +1022,6 @@ int main(int argc, char **argv)
 	{
 		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
 	}
-
-/* process_config_file to be removed */
-/*	init_config();*/
 
 	create_pid_file();
 

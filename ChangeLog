@@ -1,5 +1,7 @@
 Not ready yet:
 
+[ Common parser (cfg.c) ]
+
 [ Update task status on SF ]
 
 [ Support for flexible permissions ]
@@ -11,14 +13,14 @@ Not ready yet:
 [ All parameters should contain section "How can be used" in the Manual ]
 [ PHP to support non-numeric values ]
 [ Support for system[proccount] on FreeBSD ]
-[ Patches for PostgreSQL& MySQL ]
-[ Common parser (cfg.c) ]
+[ Agent to support several hosts in parameter Server ]
 
 Changes for 1.0beta3:
 
+ - added directory upgrades/dbpatches/1.0beta2_to_1.0beta3 (Alexei)
+
  - correct handling of timeout situations for zabbix_agentd (Alexei)
  - added support for non-syslog logging (Alexei)
- 
  - added parameter LogFile for zabbix_trapper (Alexei)
  - added parameter LogFile for zabbix_trapperd (Alexei)
  - added parameter LogFile for zabbix_agentd (Alexei)
