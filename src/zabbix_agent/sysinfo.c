@@ -291,6 +291,38 @@ void	add_user_parameter(char *key,char *command)
 	}
 }
 
+
+void    escape_string(char *from, char *to, int maxlen)
+{
+	int     i,ptr;
+	char    *f;
+
+	ptr=0;
+	f=(char *)strdup(from);
+	for(i=0;f[i]!=0;i++)
+	{
+		if( (f[i]=='\'') || (f[i]=='\\'))
+		{
+			if(ptr>maxlen-1)        break;
+			to[ptr]='\\';
+			if(ptr+1>maxlen-1)      break;
+			to[ptr+1]=f[i];
+			ptr+=2;
+		}
+		else
+		{
+			if(ptr>maxlen-1)        break;
+			to[ptr]=f[i];
+			ptr++;
+		}
+	}
+	free(f);
+
+	to[ptr]=0;
+	to[maxlen-1]=0;
+}
+
+
 void	test_parameters(void)
 {
 	int	i;
@@ -308,7 +340,6 @@ void	test_parameters(void)
 }
 
 /* This messy function must be rewritten!
- * Command has the following format: "key[|proxy[:port]]"
  */
 void	process(char *command,char *value)
 {
@@ -320,9 +351,6 @@ void	process(char *command,char *value)
 	int	(*function_str)();
 	char	*parameter = NULL;
 	char	key[MAX_STRING_LEN];
-	char	proxy[MAX_STRING_LEN];
-	char	port[MAX_STRING_LEN];
-	int	port_int;
 	char	param[1024];
 	char	cmd[1024];
 	char	*res2 = NULL;
@@ -334,44 +362,6 @@ void	process(char *command,char *value)
 	if( (p[1]=='\r') || (p[1]=='\n') ||(p[1]==' '))
 	{
 		p[1]=0;
-	}
-
-	n=strchr(command,'|');
-	if(NULL != n)
-	{
-		n[0]=0;
-		strscpy(proxy,n);
-		n=strchr(proxy,':');
-		if(NULL != n)
-		{
-			strscpy(port,n);
-			n[0]=0;
-		}
-		else
-		{
-			port[0]=0;
-		}
-	}
-	else
-	{
-		proxy[0]=0;
-		port[0]=0;
-	}
-
-/* Use this agent as a proxy */
-	if(0 != proxy[0])
-	{
-		if(0 == port[0])
-		{
-			port_int=10050;
-		}
-		else
-		{
-			port_int=atoi(port);
-		}
-/* Must be fixed !!! */
-		forward_request(proxy,command,port_int,value);
-		return;
 	}
 
 	for(i=0;;i++)
@@ -452,7 +442,16 @@ void	process(char *command,char *value)
 	}
 	else
 	{
-		i=function_str(command,parameter,&res2);
+		/* Special processing for EXECUTE_STR, it has more parameters */
+		if(function_str == EXECUTE_STR)
+		{
+			i=function_str(command,commands[i].parameter,parameter,&res2);
+		}
+		else
+		{
+			i=function_str(command,parameter,&res2);
+		}
+
 		if(i==SYSINFO_RET_FAIL)
 		{
 			result = NOTSUPPORTED;
@@ -2417,12 +2416,21 @@ int	VERSION(const char *cmd, const char *parameter,char  **value)
 	return	SYSINFO_RET_OK;
 }
 
-int	EXECUTE_STR(const char *cmd, const char *command,char  **value)
+int	EXECUTE_STR(const char *cmd, const char *command, const char *parameter, char  **value)
 {
 	FILE	*f;
 	static	char	c[MAX_STRING_LEN];
+	static	char	full_cmd[MAX_STRING_LEN];
 
-	f=popen( command,"r");
+	strscpy(full_cmd,command);
+	if(parameter != NULL)
+	{
+		strncat(full_cmd," \"",MAX_STRING_LEN);
+		strncat(full_cmd,parameter,MAX_STRING_LEN);
+		strncat(full_cmd,"\"",MAX_STRING_LEN);
+	}
+
+	f=popen(full_cmd,"r");
 	if(f==0)
 	{
 		switch (errno)
