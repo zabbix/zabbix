@@ -37,12 +37,12 @@ td.form_row_r
 
 td.form_row_first
 {
+	background: #5C7099 url(images/gradients/table_head.gif) repeat-x top left;
 	color: #FFFFFF;
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:10px;
 	font-weight: bold;
 #	background-color: #6d88ad;
-	background-color: #6d88ad;
 	border-color: #222255;
 #	border-color: #888888;
 	border-width:1px;
@@ -57,8 +57,8 @@ td.form_row_last
 	color: #FFFFFF;
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:10px;
-#	background-color: #8dA8Cd;
-	background-color: #6d88ad;
+#	background-color: #6d88ad;
+	background: #5C7099 url(images/gradients/table_head.gif) repeat-x top left;
 	border-color: #222255;
 #	border-color: #888888;
 	border-width:1px;
@@ -73,7 +73,7 @@ td.sub_menu
 	color: #FFFFFF;
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:10px;
-#	background-color: #778899;
+	background: #5C7099 url(images/gradients/table_head.gif) repeat-x top left;
 	background-color: #6d88ad;
 	border-color: #000000;
 	border-width:0px;
@@ -91,7 +91,8 @@ td.horizontal_menu
 #	background-color: #6d88ad;
 #	background-color: #778899;
 #	background-color: #42429C;
-	background-color: #4d688d;
+#	background-color: #4d688d;
+	background: #5C7099 url(images/gradients/table_head.gif) repeat-x top left;
 	border-color: #000000;
 	border-width:0px;
 	border-top-style: solid;
