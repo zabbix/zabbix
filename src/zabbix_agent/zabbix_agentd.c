@@ -226,7 +226,7 @@ void    init_config(void)
 		{"ListenPort",&CONFIG_LISTEN_PORT,0,TYPE_INT,PARM_OPT,1024,32767},
 		{"DebugLevel",&CONFIG_LOG_LEVEL,0,TYPE_INT,PARM_OPT,0,4},
 		{"StartAgents",&CONFIG_AGENTD_FORKS,0,TYPE_INT,PARM_OPT,1,16},
-		{"UserParameter",0,(void *)&add_parameter,0,0,0,0},
+		{"UserParameter",0,&add_parameter,0,0,0,0},
 		{0}
 	};
 	parse_cfg_file("/etc/zabbix/zabbix_agentd.conf",cfg);
