@@ -72,15 +72,8 @@
 		show_table_header($row["host"]);
 
 		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.value from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.status=0 and t.triggerid=f.triggerid and h.hostid=".$_GET["hostid"]." and h.status in (0,2) and i.status=0 order by h.host, t.description");
-		echo "<TABLE BORDER=0 COLS=3 WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
-		echo "<TR BGCOLOR=\"#CCCCCC\">";
-		echo "<TD><B>".S_DESCRIPTION."</B></TD>";
-//		echo "<TD><B>Expression</B></TD>";
-		echo "<TD WIDTH=5%><B>".S_TRUE."</B></TD>";
-		echo "<TD WIDTH=5%><B>".S_FALSE."</B></TD>";
-		echo "<TD WIDTH=5%><B>".S_UNKNOWN."</B></TD>";
-		echo "<TD WIDTH=5%><B>".S_GRAPH."</B></TD>";
-		echo "</TR>\n";
+		table_begin();
+		table_header(array(S_DESCRIPTION,S_TRUE,S_FALSE,S_UNKNOWN,S_GRAPH));
 		$col=0;
 		while($row=DBfetch($result))
 		{
@@ -90,35 +83,25 @@
 			}
 			$lasthost=$row["host"];
 
-		        if($col++%2 == 1)	{ echo "<TR BGCOLOR=#DDDDDD>"; }
-			else			{ echo "<TR BGCOLOR=#EEEEEE>"; }
-
-//			$description=$row["description"];
-
-//			if( strstr($description,"%s"))
-//			{
-				$description=expand_trigger_description($row["triggerid"]);
-//			}
-			echo "<TD><a href=\"alarms.php?triggerid=".$row["triggerid"]."\">$description</a></TD>";
-//			$description=rawurlencode($row["description"]);
+			$description=expand_trigger_description($row["triggerid"]);
+			$description="<a href=\"alarms.php?triggerid=".$row["triggerid"]."\">$description</a>";
 	
-//			echo "<TD>".explode_exp($row["expression"],1)."</TD>";
 			$availability=calculate_availability($row["triggerid"],0,0);
-			echo "<TD><font color=\"AA0000\">";
-			printf("%.4f%%",$availability["true"]);
-			echo "</font></TD>";
-			echo "<TD><font color=\"00AA00\">";
-			printf("%.4f%%",$availability["false"]);
-			echo "</font></TD>";
-			echo "<TD>";
-			printf("%.4f%%",$availability["unknown"]);
-			echo "</TD>";
-			echo "<TD>";
-			echo "<a href=\"report2.php?hostid=".$_GET["hostid"]."&triggerid=".$row["triggerid"]."\">".S_SHOW."</a>";
-			echo "</TD>";
-			echo "</TR>\n";
+
+			$true=array("value"=>sprintf("%.4f%%",$availability["true"]), "class"=>"on");
+			$false=array("value"=>sprintf("%.4f%%",$availability["false"]), "class"=>"off");
+			$unknown=array("value"=>sprintf("%.4f%%",$availability["unknown"]), "class"=>"unknown");
+			$actions="<a href=\"report2.php?hostid=".$_GET["hostid"]."&triggerid=".$row["triggerid"]."\">".S_SHOW."</a>";
+
+			table_row(array(
+				$description,
+				$true,
+				$false,
+				$unknown,
+				$actions
+				),$col++);
 		}
-		echo "</table>\n";
+		table_end();
 	}
 ?>
 

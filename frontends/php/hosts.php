@@ -108,40 +108,33 @@
 
 
 <?php
-	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
-	echo "<TR BGCOLOR=\"#CCCCCC\"><TD WIDTH=3%><B>".S_ID."</B></TD>";
-	echo "<TD WIDTH=10%><B>".S_NAME."</B></TD>";
-	echo "<TD><B>".S_MEMBERS."</B></TD>";
-	echo "<TD WIDTH=10%><B>".S_ACTIONS."</B></TD>";
-	echo "</TR>";
+	table_begin();
+	table_header(array(S_ID,S_NAME,S_MEMBERS,S_ACTIONS));
 
 	$result=DBselect("select groupid,name from groups order by name");
 	$col=0;
 	while($row=DBfetch($result))
 	{
-//		if(!check_right("User group","R",$row["usrgrpid"]))
-//		{
-//			continue;
-//		}
-		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
-		else 		{ echo "<TR BGCOLOR=#DDDDDD>"; }
-		echo "<TD>".$row["groupid"]."</TD>";
-		echo "<TD>".$row["name"]."</TD>";
-		echo "<TD>";
+		$members=array("hide"=>1,"value"=>"");
 		$result1=DBselect("select distinct h.host from hosts h, hosts_groups hg where h.hostid=hg.hostid and hg.groupid=".$row["groupid"]." order by host");
 		for($i=0;$i<DBnum_rows($result1);$i++)
 		{
-			echo DBget_field($result1,$i,0);
+			$members["hide"]=0;
+			$members["value"]=$members["value"].DBget_field($result1,$i,0);
 			if($i<DBnum_rows($result1)-1)
 			{
-				echo ",&nbsp;";
+				$members["value"]=$members["value"].",&nbsp;";
 			}
 		}
-		echo "&nbsp;</TD>";
-		echo "<TD>";
-		echo "<A HREF=\"hosts.php?groupid=".$row["groupid"]."#form\">".S_CHANGE."</A>";
-		echo "</TD>";
-		echo "</TR>";
+		$members["value"]=$members["value"]."&nbsp;";
+		$actions="<A HREF=\"hosts.php?groupid=".$row["groupid"]."#form\">".S_CHANGE."</A>";
+
+		table_row(array(
+			$row["groupid"],
+			$row["name"],
+			$members,
+			$actions
+			),$col++);
 	}
 	if(DBnum_rows($result)==0)
 	{
@@ -149,7 +142,7 @@
 			echo "<TD COLSPAN=4 ALIGN=CENTER>".S_NO_HOST_GROUPS_DEFINED."</TD>";
 			echo "<TR>";
 	}
-	echo "</TABLE>";
+	table_end();
 	echo "<br>";
 ?>
 
@@ -195,16 +188,8 @@
 <?php
 	if(!isset($_GET["hostid"]))
 {
-	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
-	echo "<TR BGCOLOR=\"#CCCCCC\">";
-	echo "<TD WIDTH=3% NOSAVE><B>".S_ID."</B></TD>";
-	echo "<TD><B>".S_HOST."</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>".S_IP."</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>".S_PORT."</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>".S_STATUS."</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>".S_ACTIONS."</B></TD>";
-	echo "</TR>";
-
+	table_begin();
+	table_header(array(S_ID,S_HOST,S_IP,S_PORT,S_STATUS,S_ACTIONS));
 
 	if(isset($_GET["groupid"]))
 	{
@@ -223,75 +208,76 @@
 		{
 			continue;
 		}
-		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
-		else 		{ echo "<TR BGCOLOR=#DDDDDD>"; }
-	
-		echo "<TD>".$row["hostid"]."</TD>";
-		echo "<TD><a href=\"items.php?hostid=".$row["hostid"]."\">".$row["host"]."</a></TD>";
+		$host="<a href=\"items.php?hostid=".$row["hostid"]."\">".$row["host"]."</a>";
+
 		if($row["useip"]==1)
 		{
-			echo "<TD>".$row["ip"]."</TD>";
+			$ip=$row["ip"];
 		}
 		else
 		{
-			echo "<TD>-</TD>";
+			$ip="-";
 		}
-		echo "<TD>".$row["port"]."</TD>";
-		echo "<TD>";
         	if(check_right("Host","U",$row["hostid"]))
 		{
 			if($row["status"] == 0)	
-				echo "<a href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=1\"><font color=\"00AA00\">".S_MONITORED."</font></a>";
+				$status=array("value"=>"<a href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=1\">".S_MONITORED."</a>","class"=>"off");
 			else if($row["status"] == 1)
-				echo "<a href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=0\"><font color=\"AA0000\">".S_NOT_MONITORED."</font></a>";
+				$status=array("value"=>"<a href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=0\">".S_NOT_MONITORED."</a>","class"=>"on");
 			else if($row["status"] == 2)
-				echo "<font color=\"AAAAAA\">".S_UNREACHABLE."</font>";
+				$status=array("value"=>S_UNREACHABLE,"class"=>"unknown");
 			else if($row["status"] == 3)
-				echo "<font color=\"AAAAAA\">".S_TEMPLATE."</font>";
+				$status=array("value"=>S_TEMPLATE,"class"=>"unknown");
 			else if($row["status"] == HOST_STATUS_DELETED)
-				echo "<font color=\"AAAAAA\">".S_DELETED."</font>";
+				$status=array("value"=>S_DELETED,"class"=>"unknown");
 			else
-				echo S_UNKNOWN;
+				$status=S_UNKNOWN;
 		}
 		else
 		{
 			if($row["status"] == 0)	
-				echo "<font color=\"00AA00\">".S_MONITORED."</font>";
+				$status=array("value"=>S_MONITORED,"class"=>"off");
 			else if($row["status"] == 1)
-				echo "<font color=\"AA0000\">".S_NOT_MONITORED."</font>";
+				$status=array("value"=>S_NOT_MONITORED,"class"=>"on");
 			else if($row["status"] == 2)
-				echo "<font color=\"AAAAAA\">".S_UNREACHABLE."</font>";
+				$status=array("value"=>S_UNREACHABLE,"class"=>"unknown");
 			else if($row["status"] == 3)
-				echo "<font color=\"AAAAAA\">".S_TEMPLATE."</font>";
+				$status=array("value"=>S_TEMPLATE,"class"=>"unknown");
 			else if($row["status"] == HOST_STATUS_DELETED)
-				echo "<font color=\"AAAAAA\">".S_DELETED."</font>";
+				$status=array("value"=>S_DELETED,"class"=>"unknown");
 			else
-				echo S_UNKNOWN;
+				$status=S_UNKNOWN;
 		}
-		echo "</TD>";
         	if(check_right("Host","U",$row["hostid"]))
 		{
 			if($row["status"] != HOST_STATUS_DELETED)
 			{
 				if(isset($_GET["groupid"]))
 				{
-					echo "<TD><A HREF=\"hosts.php?register=change&hostid=".$row["hostid"]."&groupid=".$_GET["groupid"]."#form\">".S_CHANGE."</A></TD>";
+					$actions="<A HREF=\"hosts.php?register=change&hostid=".$row["hostid"]."&groupid=".$_GET["groupid"]."#form\">".S_CHANGE."</A>";
 				}
 				else
 				{
-					echo "<TD><A HREF=\"hosts.php?register=change&hostid=".$row["hostid"]."#form\">".S_CHANGE."</A></TD>";
+					$actions="<A HREF=\"hosts.php?register=change&hostid=".$row["hostid"]."#form\">".S_CHANGE."</A>";
 				}
 			}
 			else
 			{
-					echo "<TD>&nbsp;</TD>";
+					$actions="&nbsp;";
 			}
 		}
 		else
 		{
-			echo "<TD>".S_CHANGE."</TD>";
+			$actions=S_CHANGE;
 		}
-		echo "</TR>";
+		table_row(array(
+			$row["hostid"],
+			$host,
+			$ip,
+			$row["port"],
+			$status,
+			$actions
+			),$col++);
 	}
 	if(DBnum_rows($result)==0)
 	{
@@ -299,7 +285,7 @@
 			echo "<TD COLSPAN=6 ALIGN=CENTER>".S_NO_HOSTS_DEFINED."</TD>";
 			echo "<TR>";
 	}
-	echo "</TABLE>";
+	table_end();
 }
 ?>
 
