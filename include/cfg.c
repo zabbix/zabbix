@@ -31,7 +31,6 @@ int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 	char	*value;
 	int	lineno;
 	int	i,var;
-	int	*pointer;
 	char	**c;
 	int	(*func)();
 

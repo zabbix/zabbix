@@ -29,7 +29,7 @@ int	is_float(char *c)
 	int i;
 	int dot=-1;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Starting is_float:%s", c );
+	zabbix_log(LOG_LEVEL_DEBUG, "Starting is_float:[%s]", c );
 	for(i=0;i<strlen(c);i++)
 	{
 		if((c[i]>='0')&&(c[i]<='9'))
@@ -316,7 +316,7 @@ int	evaluate(int *result,char *exp)
 		}
 		if( r == -1 )
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot find left bracket [(]. Expression:%s", exp );
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot find left bracket [(]. Expression:[%s]", exp );
 			return	FAIL;
 		}
 		for(i=l+1;i<r;i++)
@@ -327,30 +327,30 @@ int	evaluate(int *result,char *exp)
 
 		if( evaluate_simple( &value, simple ) != SUCCEED )
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Unable to evaluate simple expression [%s]", simple );
+			zabbix_log( LOG_LEVEL_WARNING, "Unable to evaluate simple expression1 [%s]", simple );
 			return	FAIL;
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Expression1:%s", exp );
+		zabbix_log(LOG_LEVEL_DEBUG, "Expression1:[%s]", exp );
 
 		exp[l]='%';
 		exp[l+1]='f';
 		exp[l+2]=' ';
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Expression2:%s", exp );
+		zabbix_log(LOG_LEVEL_DEBUG, "Expression2:[%s]", exp );
 
 		for(i=l+3;i<=r;i++) exp[i]=' ';
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Expression3:%s", exp );
+		zabbix_log(LOG_LEVEL_DEBUG, "Expression3:[%s]", exp );
 
 		sprintf(res,exp,value);
 		strncpy(exp,res, MAX_STRING_LEN);
 		delete_spaces(res);
-		zabbix_log(LOG_LEVEL_DEBUG, "Expression4:%s", res );
+		zabbix_log(LOG_LEVEL_DEBUG, "Expression4:[%s]", res );
 	}
 	if( evaluate_simple( &value, res ) != SUCCEED )
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Unable to evaluate simple expression [%s]", simple );
+		zabbix_log(LOG_LEVEL_WARNING, "Unable to evaluate simple expression2 [%s]", simple );
 		return	FAIL;
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "Evaluate end:[%f]", value );
@@ -369,14 +369,14 @@ int	substitute_macros(char *exp)
 	char	key[MAX_STRING_LEN+1];
 	char	function[MAX_STRING_LEN+1];
 	char	parameter[MAX_STRING_LEN+1];
-	char	value[MAX_STRING_LEN+1];
+	static	char	value[MAX_STRING_LEN+1];
 	int	i,j;
 	int	r,l;
 	int	r1,l1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "BEGIN substitute_macros" );
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Expression1:%s", exp );
+	zabbix_log( LOG_LEVEL_DEBUG, "Expression1:[%s]", exp );
 
 	while( find_char(exp,'{') != FAIL )
 	{
@@ -385,13 +385,13 @@ int	substitute_macros(char *exp)
 
 		if( r == FAIL )
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Cannot find right bracket. Expression:%s", exp );
+			zabbix_log( LOG_LEVEL_WARNING, "Cannot find right bracket. Expression:[%s]", exp );
 			return	FAIL;
 		}
 
 		if( r < l )
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Right bracket is before left one. Expression:%s", exp );
+			zabbix_log( LOG_LEVEL_WARNING, "Right bracket is before left one. Expression:[%s]", exp );
 			return	FAIL;
 		}
 
@@ -456,7 +456,7 @@ int	substitute_macros(char *exp)
 		exp[l+1]='s';
 		exp[l+2]=' ';
 
-		zabbix_log( LOG_LEVEL_DEBUG, "Expression2:%s", exp );
+		zabbix_log( LOG_LEVEL_DEBUG, "Expression2:[%s]", exp );
 
 		for(i=l+3;i<=r;i++) exp[i]=' ';
 
@@ -474,12 +474,12 @@ int	substitute_macros(char *exp)
 		}
 		exp[j]=0;
 
-		zabbix_log( LOG_LEVEL_DEBUG, "Expression3:%s", exp );
+		zabbix_log( LOG_LEVEL_DEBUG, "Expression3:[%s]", exp );
 
 		sprintf(res,exp,value);
 		strncpy(exp,res, MAX_STRING_LEN);
 /*		delete_spaces(exp); */
-		zabbix_log( LOG_LEVEL_DEBUG, "Expression4:%s", exp );
+		zabbix_log( LOG_LEVEL_DEBUG, "Expression4:[%s]", exp );
 	}
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Result expression:%s", exp );
@@ -505,12 +505,12 @@ int	substitute_functions(char *exp)
 		r=find_char(exp,'}');
 		if( r == FAIL )
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Cannot find right bracket. Expression:%s", exp );
+			zabbix_log( LOG_LEVEL_WARNING, "Cannot find right bracket. Expression:[%s]", exp );
 			return	FAIL;
 		}
 		if( r < l )
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Right bracket is before left one. Expression:%s", exp );
+			zabbix_log( LOG_LEVEL_WARNING, "Right bracket is before left one. Expression:[%s]", exp );
 			return	FAIL;
 		}
 
@@ -527,24 +527,24 @@ int	substitute_functions(char *exp)
 		}
 
 
-		zabbix_log( LOG_LEVEL_DEBUG, "Expression1:%s", exp );
+		zabbix_log( LOG_LEVEL_DEBUG, "Expression1:[%s]", exp );
 
 		exp[l]='%';
 		exp[l+1]='f';
 		exp[l+2]=' ';
 
-		zabbix_log( LOG_LEVEL_DEBUG, "Expression2:%s", exp );
+		zabbix_log( LOG_LEVEL_DEBUG, "Expression2:[%s]", exp );
 
 		for(i=l+3;i<=r;i++) exp[i]=' ';
 
-		zabbix_log( LOG_LEVEL_DEBUG, "Expression3:%s", exp );
+		zabbix_log( LOG_LEVEL_DEBUG, "Expression3:[%s]", exp );
 
 		sprintf(res,exp,value);
 		strncpy(exp,res, MAX_STRING_LEN);
 		delete_spaces(exp);
-		zabbix_log( LOG_LEVEL_DEBUG, "Expression4:%s", exp );
+		zabbix_log( LOG_LEVEL_DEBUG, "Expression4:[%s]", exp );
 	}
-	zabbix_log( LOG_LEVEL_DEBUG, "Expression:%s", exp );
+	zabbix_log( LOG_LEVEL_DEBUG, "Expression:[%s]", exp );
 	zabbix_log( LOG_LEVEL_DEBUG, "END substitute_functions" );
 	return SUCCEED;
 }

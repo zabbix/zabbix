@@ -1,24 +1,27 @@
 Not ready yet:
 
 [ Fix DebugLevel ]
-[ Update task status on SF ]
 
+[ Support for automake ]
 [ Support for Service Tree ] 
 [ Support for flexible permissions ]
 
 [ Make Zabbix compile by cc ]
 
-[ Show diff instead of real values ]
-[ Show triggers by userid ]
+[ PHP. Change algorithm for audible notification ]
+[ PHP. Show time legend for graphs ]
+[ PHP. Show diff instead of real values ]
+[ PHP. Show triggers by userid ]
+[ PHP. Support for template-based new hosts ]
+
 [ Add support for new trigger statuses: MODIFIED/NOTSUPORTED ]
 [ All parameters should contain section "How can be used" in the Manual ]
-[ PHP to support non-numeric values ]
-[ Change algorithm for audible notification ]
 
 Changes for 1.0beta3:
 
+ - improved update_triggers() (Alexei)
+ - fixed get_lastvalue() (Alexei)
  - minor changes in include/cfg.c (Alexei)
-
  - column functions.lastvalue changed to varchar(255) (Alexei)
  - column items.lastvalue changed to varchar(255) (Alexei)
  - column items.prevvalue changed to varchar(255) (Alexei)

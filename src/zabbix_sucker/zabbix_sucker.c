@@ -353,7 +353,7 @@ int	get_value_SNMPv1(double *result,DB_ITEM *item)
 }
 #endif
 
-int	get_value_zabbix(double *result,char **result_str,DB_ITEM *item)
+int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
 {
 	int	s;
 	int	i;
@@ -490,14 +490,14 @@ int	get_value_zabbix(double *result,char **result_str,DB_ITEM *item)
 		}
 	}
 
-	*result_str=strdup(c);
+	strncpy(result_str,c,MAX_STRING_LEN);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "RESULT_STR [%s]", c );
 
 	return SUCCEED;
 }
 
-int	get_value(double *result,char **result_str,DB_ITEM *item)
+int	get_value(double *result,char *result_str,DB_ITEM *item)
 {
 	int res;
 
@@ -566,7 +566,7 @@ int get_minnextcheck(int now)
 int get_values(void)
 {
 	double		value;
-	char		*value_str;
+	char		value_str[MAX_STRING_LEN+1];
 	char		sql[MAX_STRING_LEN+1];
  
 	DB_RESULT	*result;
@@ -627,7 +627,9 @@ int get_values(void)
 		else
 		{
 			item.lastvalue_null=0;
+			item.lastvalue_str=s;
 			item.lastvalue=atof(s);
+//			item.lastvalue_str=DBget_field(result,i,13);
 		}
 		s=DBget_field(result,i,14);
 		if(s==NULL)
@@ -637,13 +639,15 @@ int get_values(void)
 		else
 		{
 			item.prevvalue_null=0;
+			item.prevvalue_str=s;
 			item.prevvalue=atof(s);
+//			item.prevvalue_str=DBget_field(result,i,14);
 		}
 		item.hostid=atoi(DBget_field(result,i,15));
 		host_status=atoi(DBget_field(result,i,16));
 		item.value_type=atoi(DBget_field(result,i,17));
 
-		res = get_value(&value,&value_str,&item);
+		res = get_value(&value,value_str,&item);
 		zabbix_log( LOG_LEVEL_DEBUG, "GOT VALUE [%s]", value_str );
 		
 		if(res == SUCCEED )

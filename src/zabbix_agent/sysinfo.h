@@ -1,7 +1,7 @@
 #ifndef MON_SYSINFO_H
 #define MON_SYSINFO_H
  
-char	*process(char *command);
+void	process(char *command, char *value);
 
 void    add_user_parameter(char *key,char *command);
 void	test_parameters(void);
