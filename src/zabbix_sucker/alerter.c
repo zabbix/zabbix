@@ -27,6 +27,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+#include <sys/wait.h>
+
 #include <string.h>
 
 #ifdef HAVE_NETDB_H
@@ -52,8 +54,10 @@
 int send_alert(DB_ALERT	*alert,DB_MEDIATYPE *mediatype)
 {
 	int res=FAIL;
+	struct	sigaction phan;
+	int	pid;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In send_alert()");
+	zabbix_log( LOG_LEVEL_ERR, "In send_alert()");
 
 	if(mediatype->type==ALERT_TYPE_EMAIL)
 	{
@@ -62,15 +66,34 @@ int send_alert(DB_ALERT	*alert,DB_MEDIATYPE *mediatype)
 	else if(mediatype->type==ALERT_TYPE_EXEC)
 	{
 /*		if(-1 == execl(CONFIG_ALERT_SCRIPTS_PATH,mediatype->exec_path,alert->sendto,alert->subject,alert->message))*/
-		zabbix_log( LOG_LEVEL_DEBUG, "Before execl([%s],[%s])",CONFIG_ALERT_SCRIPTS_PATH,mediatype->exec_path);
-		if(-1 == execlp("/home/zabbix/bin/","lmt.sh"))
+		zabbix_log( LOG_LEVEL_ERR, "Before execl([%s],[%s])",CONFIG_ALERT_SCRIPTS_PATH,mediatype->exec_path);
+
+/*		phan.sa_handler = &signal_handler;*/
+		signal( SIGCHLD, SIG_IGN );
+
+/*		sigemptyset(&phan.sa_mask);
+		phan.sa_flags = 0;
+		sigaction(SIGCHLD, &phan, NULL);*/
+
+/*		if(-1 == execl("/home/zabbix/bin/lmt.sh","lmt.sh",alert->sendto,alert->subject,alert->message,(char *)0))*/
+
+		pid=fork();
+		if(0 != pid)
 		{
-			zabbix_log( LOG_LEVEL_ERR, "Error executing [%s] in [%s] [%m]", mediatype->exec_path,CONFIG_ALERT_SCRIPTS_PATH);
-			res = FAIL;
+			waitpid(pid,NULL,0);
 		}
 		else
 		{
-			res = SUCCEED;
+			if(-1 == execl("/bin/sh","-c","/home/zabbix/bin/lmt.sh",alert->sendto,alert->subject,alert->message,(char *)0))
+			{
+				zabbix_log( LOG_LEVEL_ERR, "Error executing [%s] in [%s] [%m]", mediatype->exec_path,CONFIG_ALERT_SCRIPTS_PATH);
+				res = FAIL;
+			}
+			else
+			{
+				res = SUCCEED;
+			}
+			exit(0);
 		}
 	}
 	else
