@@ -1,6 +1,13 @@
 Not ready yet:
 
+ - startup scripts
  - permissions for charts, graphs ,etc etc 
+
+Changes for 1.0beta6:
+
+ - changed definition of functions.lastvalue to allow NULL (Alexei)
+ - added upgrades/dbpatches/1.0beta5_to_1.0beta6/ with patches (Alexei)
+ - added misc/init.d/debian/zabbix_agent (Alexei)
 
 Changes for 1.0beta5:
 

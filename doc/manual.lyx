@@ -343,7 +343,7 @@ support for both polling and trapping mechanisms
 \latex no_latex 
 server software for Linux
 \latex default 
-, Solaris, HP-UX, AIX, FreeBSD, Open BSD
+, Solaris, HP-UX, AIX, FreeBSD, OpenBSD
 \layout Itemize
 
 
@@ -352,7 +352,7 @@ agents (client software) for Linux
 \latex default 
 , Solaris,
 \latex no_latex 
- HP-UX, AIX, FreeBSD, Open BSD
+ HP-UX, AIX, FreeBSD, OpenBSD
 \layout Itemize
 
 
@@ -689,7 +689,7 @@ Zabbix 1.0beta5
 \layout Standard
 
 High level service tree allows create dependencies between various IT resource.
- Such representation of monitored data makes possible answer to the following
+ Such representation of monitored data makes possible answers to the following
  questions:
 \layout Itemize
 
@@ -1079,6 +1079,16 @@ include
 - 
 \emph on 
 misc
+\layout Standard
+
+\SpecialChar ~
+-
+\emph on 
+misc/init.d
+\layout Standard
+
+\SpecialChar ~
+The directory contains startup scripts.
 \layout Standard
 
 - 
@@ -16026,17 +16036,24 @@ Centralised monitoring of log files
 \series bold 
 Zabbix 
 \series default 
-to periodically generate and send by email set of standard reports in PDF
- format
+to periodically generate and send by email set of standard reports in PDF/HTML/P
+S format
 \layout Itemize
 
 Graphs to be included into alert's email
+\layout Itemize
+
+Improved WEB interface
 \layout Subsection
 
 TODO (1.0 stable)
 \layout Itemize
 
-functions.lastvalue should contain NULL at the beginning
+
+\emph on 
+./configure
+\emph default 
+ to correctly find SNMP libraries and headers (RedHat)
 \layout Itemize
 
 more reports
@@ -16052,9 +16069,6 @@ errors and warning to be numbered and documented
 better support for SNMP (send and receive SNMP traps)
 \layout Itemize
 
-improved WEB interface
-\layout Itemize
-
 fix permissions for graphs, etc
 \layout Itemize
 
@@ -16067,14 +16081,14 @@ regression tests
 same time navigator for all graphs
 \layout Itemize
 
-change definitions in db.h to allow substitution of macros (char *item.zzz
- -> char item.zzz[MAX_STRING_LEN+1])
-\layout Itemize
-
 add safe wrapper functions for strncat, strcpy, etc
 \layout Itemize
 
-change tigger status to UNKNOWN when status of a host is changed
+change tigger status to 
+\emph on 
+UNKNOWN
+\emph default 
+ when status of a host is changed
 \layout Itemize
 
 Look at IPFC (AndrisM)
@@ -16084,32 +16098,35 @@ network map.
  Connect an icon to a trigger/service
 \layout Itemize
 
-fix proc_cnt[*]
+fix 
+\emph on 
+proc_cnt[*]
 \layout Itemize
 
-create one universal chart.php to be used for graphs, charts, and trends
+create one universal 
+\emph on 
+chart.php
+\emph default 
+ to be used for graphs, charts, and trends
 \layout Itemize
 
 add MRTG-like graphs
 \layout Itemize
 
-add support for check_service[ldap]
+add support for 
+\emph on 
+check_service[ldap]
 \layout Itemize
 
 add support for Kb,bytes,kps, etc
 \layout Itemize
 
-add new screenshots to zabbix.sf.net
-\layout Itemize
-
-add pie-graphs to alerts
+add new screenshots to 
+\emph on 
+zabbix.sf.net
 \layout Itemize
 
 add graph for availability report
-\layout Itemize
-
-fix incorrect (?) calculation of complex expressions (a&b&c) where b is
- unknown.
 \layout Itemize
 
 improve functionality of IT Services

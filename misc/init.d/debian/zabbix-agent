@@ -1,13 +1,13 @@
 #! /bin/sh
 #
-# Zabbix daemon start/stop script.
+# Zabbix agent start/stop script.
 #
 # Written by Alexei Vladishev <alex@gobbo.caves.lv>.
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin:/home/zabbix/bin
-DAEMON=/home/zabbix/bin/zabbix_suckerd
-NAME=zabbix_suckerd
-DESC="Zabbix sucker daemon"
+DAEMON=/home/zabbix/bin/zabbix_agentd
+NAME=zabbix_agentd
+DESC="Zabbix agent"
 
 test -f $DAEMON || exit 0
 
