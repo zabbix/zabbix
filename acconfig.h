@@ -1,6 +1,9 @@
 /* Define if you havnt socklen_t type */
 #undef socklen_t
 
+/* Define if you want to use LDAP */
+#undef HAVE_LDAP
+
 /* Define if filesystem /proc exists */
 #undef HAVE_PROC
 
