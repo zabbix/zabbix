@@ -1604,6 +1604,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	</td>
 	</tr>
 	</table>
+	</p>
+
+	<p>
+	<table width=100%>
+	<tr><td class="horizontal_menu" height=24 colspan=9><b><a href="http://www.zabbix.com/index.php" class="highlight">Latest data</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="http://www.zabbix.com/news.php" class="highlight">Triggers</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="http://www.zabbix.com/support.php" class="highlight">Queue</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="http://www.zabbix.com/download.php" class="highlight">Alarms</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="http://www.zabbix.com/documentation.php" class="highlight">Alerts</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="http://www.zabbix.com/forum" class="highlight">Maps</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="http://www.zabbix.com/screenshots.php" class="highlight">Graphs</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="http://www.zabbix.com/users.php" class="highlight">Screens</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="http://www.zabbix.com/contribute.php" class="highlight">IT Services</a></b></td></tr>
+	<tr><td class="horizontal_menu" height=24 colspan=9><b><a href="http://www.zabbix.com/index.php" class="highlight">Latest data</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="http://www.zabbix.com/news.php" class="highlight">Triggers</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="http://www.zabbix.com/support.php" class="highlight">Queue</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="http://www.zabbix.com/download.php" class="highlight">Alarms</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="http://www.zabbix.com/documentation.php" class="highlight">Alerts</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="http://www.zabbix.com/forum" class="highlight">Maps</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="http://www.zabbix.com/screenshots.php" class="highlight">Graphs</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="http://www.zabbix.com/users.php" class="highlight">Screens</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="http://www.zabbix.com/contribute.php" class="highlight">IT Services</a></b></td></tr>
+	</table>
 
 	</p>
 
@@ -3958,6 +3965,16 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "</table>";
 
 		echo "</p>";
+?>
+	<p>
+	<table border=1 width=100% bgcolor="#000000" cellpadding=0 cellspacing=0>
+	<tr>
+	<td class="horizontal_menu" height=24><b><a href="http://www.zabbix.com/index.php" class="highlight">ZABBIX 1.1alpha1 Copyright 2001-2004 by Alexei Vladishev</a></b></td>
+	<td class="horizontal_menu" height=24><b><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="http://www.zabbix.com/news.php" class="highlight">Connected as guest</a></b></td>
+	</tr>
+	</table>
+	</p>
+<?php
 
 		echo "</body>";
 	}
