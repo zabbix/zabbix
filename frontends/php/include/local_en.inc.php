@@ -25,7 +25,7 @@
 
 //	about.php
 	define("S_ABOUT_ZABBIX",			"About ZABBIX");
-	define("S_INFORMATION_ABOUT_ZABBIX",		"Information about ZABBIX (v1.1alpha6)");
+	define("S_INFORMATION_ABOUT_ZABBIX",		"Information about ZABBIX (v1.1alpha7)");
 	define("S_HOMEPAGE_OF_ZABBIX",			"Homepage of ZABBIX");
 	define("S_HOMEPAGE_OF_ZABBIX_DETAILS",		"This is home page of ZABBIX.");
 	define("S_LATEST_ZABBIX_MANUAL",		"Latest ZABBIX Manual");
@@ -192,7 +192,7 @@
 	define("S_COMPARE",				"Compare");
 
 //	Footer
-	define("S_ZABBIX_VER",				"ZABBIX 1.1alpha6");
+	define("S_ZABBIX_VER",				"ZABBIX 1.1alpha7");
 	define("S_COPYRIGHT_BY",			"Copyright 2001-2005 by ");
 	define("S_CONNECTED_AS",			"Connected as");
 	define("S_ALEXEI_VLADISHEV",			"Alexei Vladishev");
