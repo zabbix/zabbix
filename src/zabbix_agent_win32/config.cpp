@@ -84,6 +84,38 @@ static BOOL AddPerformanceCounter(char *args)
 
 
 //
+// Parse Server=... parameter
+//
+
+static int ParseServerList(char *args,int sourceLine)
+{
+   char *sptr,*eptr;
+   int errors=0;
+
+   for(sptr=args;(sptr!=(char *)1)&&(confServerCount<MAX_SERVERS);sptr=eptr+1)
+   {
+      eptr=strchr(sptr,',');
+      if (eptr!=NULL)
+         *eptr=0;
+
+      confServerAddr[confServerCount]=inet_addr(sptr);
+      if (confServerAddr[confServerCount]==INADDR_NONE)
+      {
+         errors++;
+         if (optStandalone)  
+            printf("Error in configuration file, line %d: invalid server's IP address (%s)\n",sourceLine,sptr);
+      }
+      else
+      {
+         confServerCount++;
+      }
+   }
+
+   return errors;
+}
+
+
+//
 // Read configuration
 //
 
@@ -140,13 +172,10 @@ BOOL ReadConfig(void)
       }
       else if (!stricmp(buffer,"Server"))
       {
-         confServerAddr=inet_addr(ptr);
-         if (confServerAddr==INADDR_NONE)
-         {
-            errors++;
-            if (optStandalone)  
-               printf("Error in configuration file, line %d: invalid server's IP address (%s)\n",sourceLine,ptr);
-         }
+         int rc;
+
+         if ((rc=ParseServerList(ptr,sourceLine))>0)
+            errors+=rc;
       }
       else if (!stricmp(buffer,"ListenPort"))
       {
