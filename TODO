@@ -1,5 +1,6 @@
 ZABBIX 1.1:
 
+ - fix custom multiplier, it does not correctly update lastvalue and lastvalue_str
  - RPM for RedHat EL
  - get rid of extra warning messages in W32 agent
  - escalation
