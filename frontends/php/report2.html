@@ -30,17 +30,15 @@
 
 	$lasthost="";
 	$col=0;
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
 	{
-		$hostid_=DBget_field($result,$i,0);
-		$host=DBget_field($result,$i,1);
-		if($lasthost!=$host)
+		if($lasthost!=$row["host"])
 		{
 			if($lasthost!="")
 			{
 				echo "</TABLE><BR>";
 			}
-			show_table_header("$host");
+			show_table_header($row["host"]);
 			echo "<TABLE BORDER=0 COLS=3 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 			echo "<TR>";
 			echo "<TD><B>Description</B></TD>";
@@ -49,26 +47,16 @@
 			echo "<TD WIDTH=\"5%\"><B>False (%)</B></TD>";
 			echo "</TR>\n";
 		}
-		$lasthost=$host;
+		$lasthost=$row["host"];
 
-	        if($col==1)
-	        {
-	                echo "<TR BGCOLOR=#DDDDDD>";
-	                $col=0;
-	        } else
-	        {
-	                echo "<TR BGCOLOR=#EEEEEE>";
-	                $col=1;
-	        }
-		$description=DBget_field($result,$i,4);
-		$triggerid_=DBget_field($result,$i,2);
-		$expression=DBget_field($result,$i,3);
-		$istrue=DBget_field($result,$i,5);
-		echo "<TD>$description</TD>";
-		$description=rawurlencode($description);
+	        if($col++%2 == 1)	{ echo "<TR BGCOLOR=#DDDDDD>"; }
+		else			{ echo "<TR BGCOLOR=#EEEEEE>"; }
 
-		echo "<TD>".explode_exp($expression,1)."</TD>";
-		$availability=calculate_availability($triggerid_);
+		echo "<TD>".$row["description"]."</TD>";
+		$description=rawurlencode($row["description"]);
+
+		echo "<TD>".explode_exp($row["expression"],1)."</TD>";
+		$availability=calculate_availability($row["triggerid"]);
 		echo "<TD>";
 		printf("%.4f%%",$availability["true"]);
 		echo "</TD>";

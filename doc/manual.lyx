@@ -1295,6 +1295,9 @@ Status of Triggers
 
 \layout Itemize
 
+Added sort criteria for sorting at some forms
+\layout Itemize
+
 IMPORTANT.
  Algorith for unreachble hosts changed.
  In case of network problems host will be disabled for the next 120 seconds

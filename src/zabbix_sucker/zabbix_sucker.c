@@ -41,7 +41,7 @@ void	signal_handler( int sig )
 	{
 		signal( SIGALRM, signal_handler );
  
-		syslog( LOG_WARNING, "Timeout while executing operation." );
+		syslog( LOG_DEBUG, "Timeout while executing operation." );
 	}
  
 	if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
@@ -246,7 +246,17 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 
 	if( connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
-		syslog( LOG_WARNING, "Cannot connect to [%s]",item->host );
+		switch (errno)
+		{
+			case EINTR:
+				syslog( LOG_WARNING, "Timeout while connecting to [%s]",item->host );
+				break;
+			case EHOSTUNREACH:
+				syslog( LOG_WARNING, "No route to host [%s]",item->host );
+				break;
+			default:
+				syslog( LOG_WARNING, "Cannot connect to [%s]. Errno [%d]",item->host,errno);
+		} 
 		close(s);
 		return	NETWORK_ERROR;
 	}
@@ -254,7 +264,14 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 	sprintf(c,"%s\n",item->key);
 	if( sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
-		syslog(LOG_WARNING, "Problem with sendto" );
+		switch (errno)
+		{
+			case EINTR:
+				syslog( LOG_WARNING, "Timeout while sending data to [%s]",item->host );
+				break;
+			default:
+				syslog( LOG_WARNING, "Error while sending data to [%s]. Errno [%d]",item->host,errno);
+		} 
 		close(s);
 		return	FAIL;
 	} 
@@ -263,7 +280,14 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 	i=recvfrom(s,c,1023,0,(struct sockaddr *)&servaddr_in,&i);
 	if(i==-1)
 	{
-		syslog( LOG_WARNING, "Problem with recvfrom [%d]",errno );
+		switch (errno)
+		{
+			case EINTR:
+				syslog( LOG_WARNING, "Timeout while receiving data from [%s]",item->host );
+				break;
+			default:
+				syslog( LOG_WARNING, "Error while receiving data from [%s]. Errno [%d]",item->host,errno);
+		} 
 		close(s);
 		return	FAIL;
 	}

@@ -45,7 +45,6 @@
 <?
 	$result=DBselect("select hostid,host from hosts order by host");
 	while($row=DBfetch($result))
-//	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		if(isset($hostid) && ($hostid == $row["hostid"]))
 		{
@@ -59,7 +58,6 @@
 		echo " ";
 	}
 	show_table_header_end();
-	echo "<br>";
 
 	$lasthost="";
 	if(isset($hostid)&&!isset($itemid)) 
@@ -67,101 +65,83 @@
 		$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.lastdelete,i.nextcheck,h.hostid from hosts h,items i where h.hostid=i.hostid and h.hostid=$hostid order by h.host,i.key_,i.description");
 		echo "<CENTER>";
 		$col=0;
-		for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 		{
-			$host=DBget_field($result,$i,0);
-			$itemid_=DBget_field($result,$i,2);
-			$hostid_=DBget_field($result,$i,12);
-	//		echo "\n<br><hr><b>=$host= =$lasthost=</b>\n";
-			if($lasthost!=$host)
+			if($lasthost != $row["host"])
 			{
-				if($lasthost!="")
+				if($lasthost != "")
 				{
 					echo "</TABLE><BR>";
 				}
-				show_table_header("<A HREF='items.html?hostid=$hostid_'>$host</A>");
+				echo "<br>";
+				show_table_header("<A HREF='items.html?hostid=".$row["hostid"]."'>".$row["host"]."</A>");
 				echo "<TABLE BORDER=0 COLS=13  WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-				cr();
 				echo "<TR>";
-				cr();
 				echo "<TD WIDTH=\"10%\" NOSAVE><B>Host</B></TD>";
-				cr();
 				echo "<TD WIDTH=\"10%\" NOSAVE><B>Key</B></TD>";
-				cr();
-				echo "<TD WIDTH=\"10%\" ><B>Description</B></TD>";
-				cr();
-				echo "<TD WIDTH=\"5%\" NOSAVE><B>Delay</B></TD>";
-				cr();
-				echo "<TD WIDTH=\"5%\" NOSAVE><B>History</B></TD>";
-				cr();
+				echo "<TD WIDTH=\"10%\" NOSAVE><B>Description</B></TD>";
+				echo "<TD WIDTH=\"5%\"  NOSAVE><B>Delay</B></TD>";
+				echo "<TD WIDTH=\"5%\"  NOSAVE><B>History</B></TD>";
 				echo "<TD><B>Shortname</B></TD>";
-				cr();
 				echo "<TD WIDTH=\"5%\" NOSAVE><B>Status</B></TD>";
-				cr();
 				echo "<TD WIDTH=\"5%\" NOSAVE><B>Actions</B></TD>";
-				cr();
 				echo "</TR>";
-				cr();
 			}
-			$lasthost=$host;
-		        if($col==1)
-		        {
-		                echo "<TR BGCOLOR=#DDDDDD>";
-				cr();
-		                $col=0;
-		        } else
-		        {
-		                echo "<TR BGCOLOR=#EEEEEE>";
-		                $col=1;
-		        }
-			$host=DBget_field($result,$i,0);
-			$port=DBget_field($result,$i,4);
-			$delay=DBget_field($result,$i,5);
-			$history=DBget_field($result,$i,6);
-			$key=DBget_field($result,$i,1);
-			$shortname=$host.':'.$key;
-			$description=DBget_field($result,$i,3);
-			$lastvalue=DBget_field($result,$i,7);
-			$lastclock=date("y/m/d H:i:s",DBget_field($result,$i,9));
-			$itemid_=DBget_field($result,$i,2);
-			$status=DBget_field($result,$i,9);
-			echo "<TD>$host</TD>";
-			echo "<TD>$key</TD>";
-			echo "<TD>$description</TD>";
-			$description=rawurlencode($description);
-			echo "<TD>$delay</TD>";
-			echo "<TD>$history</TD>";
-			echo "<TD>$shortname</TD>";
+			$lasthost=$row["host"];
+		        if($col++%2 == 1)	{ echo "<TR BGCOLOR=#DDDDDD>"; }
+			else			{ echo "<TR BGCOLOR=#EEEEEE>"; }
+
+			echo "<TD>".$row["host"]."</TD>";
+			echo "<TD>".$row["key_"]."</TD>";
+			echo "<TD>".$row["description"]."</TD>";
+			echo "<TD>".$row["delay"]."</TD>";
+			echo "<TD>".$row["history"]."</TD>";
+			echo "<TD>".$row["host"].":".$row["key_"]."</TD>";
 	
 			echo "<td align=center>";
 			if(isset($hostid))
 			{
-				if($status==0)		echo "<a href=\"items.html?itemid=$itemid_&hostid=$hostid&register=changestatus&status=1\">Active</a>";
-				elseif($status==1)	echo "<a href=\"items.html?itemid=$itemid_&hostid=$hostid&register=changestatus&status=0\">Not active</a>";
-				elseif($status==2)	echo "Trapper";
-				elseif($status==3)	echo "Not supported";
-				elseif($status==10)	echo "Autodisabled";
-				else echo "<TD ALIGN=CENTER><B>$status</B> Unknown</TD>";
+				switch($row["status"])
+				{
+					case 0:
+						echo "<a href=\"items.html?itemid=".$row["itemid"]."&hostid=$hostid&register=changestatus&status=1\">Active</a>";
+						break;
+					case 1:
+						echo "<a href=\"items.html?itemid=$itemid_&hostid=".$row["hostid"]."&register=changestatus&status=0\">Not active</a>";
+						break;
+					case 2:
+						echo "Trapper";
+						break;
+					case 3:
+						echo "Not supported";
+						break;
+					default:
+						echo "<B>$status</B> Unknown";
+				}
 			}
 			else
 			{
-				if($status==0)		echo "<a href=\"items.html?itemid=$itemid_&register=changestatus&status=1\">Active</a>";
-				elseif($status==1)	echo "<a href=\"items.html?itemid=$itemid_&register=changestatus&status=0\">Not active</a>";
-				elseif($status==2)	echo "Trapper";
-				elseif($status==3)	echo "Not supported";
-				elseif($status==10)	echo "Autodisabled";
-				else echo "<TD ALIGN=CENTER><B>$status</B> Unknown</TD>";
+				switch($row["status"])
+				{
+					case 0:
+						echo "<a href=\"items.html?itemid=".$row["itemid"]."&register=changestatus&status=1\">Active</a>";
+						break;
+					case 1:
+						echo "<a href=\"items.html?itemid=".$row["itemid"]."&register=changestatus&status=0\">Not active</a>";
+						break;
+					case 2:
+						echo "Trapper";
+						break;
+					case 3:
+						echo "Not supported";
+						break;
+					default:
+						echo "<B>$status</B> Unknown";
+				}
 			}
 			echo "</td>";
 	
-			if(isset($hostid_))
-			{
-				echo "<TD><A HREF=\"items.html?hostid=$hostid_&itemid=$itemid_#form\">Change</A></TD>";
-			}
-			else
-			{
-				echo "<TD><A HREF=\"items.html?itemid=$itemid_#form\">Change</A></TD>";
-			}
+			echo "<TD><A HREF=\"items.html?itemid=".$row["itemid"]."#form\">Change</A></TD>";
 			echo "</TR>";
 		}
 		echo "</TABLE>";

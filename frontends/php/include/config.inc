@@ -73,6 +73,15 @@
 		return	$host;
 	}
 
+	function	get_num_of_service_childs($serviceid)
+	{
+		global	$ERROR_MSG;
+
+		$sql="select count(*) from services_links where serviceupid=$serviceid";
+		$result=DBselect($sql);
+		return	DBget_field($result,0,0);
+	}
+
 	function	get_service_by_serviceid($serviceid)
 	{
 		global	$ERROR_MSG;
@@ -492,11 +501,11 @@
 <?
 				if($page["file"]=="srv_status.html")
 				{
-					echo "<b>[SERVICES]</b></a>";
+					echo "<b>[IT SERVICES]</b></a>";
 				}
 				else
 				{
-					echo "SERVICES</a>";
+					echo "IT SERVICES</a>";
 				}
 ?>
 			</font>
@@ -665,11 +674,11 @@
 <?
 				if($page["file"]=="services.html")
 				{
-					echo "<b>[SERVICES]</b></a>";
+					echo "<b>[IT SERVICES]</b></a>";
 				}
 				else
 				{
-					echo "SERVICES</a>";
+					echo "IT SERVICES</a>";
 				}
 ?>
 			</font>
