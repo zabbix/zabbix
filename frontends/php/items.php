@@ -201,7 +201,8 @@
 
 <?php
 
-	if(isset($_GET["hostid"])&&!isset($_GET["type"])) 
+	if(isset($_GET["hostid"])) 
+//	if(isset($_GET["hostid"])&&!isset($_GET["type"])) 
 	{
 		table_begin();
 		table_header(array(S_ID,S_KEY,S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,S_ERROR,S_ACTIONS));
@@ -260,7 +261,7 @@
 			}
 	
         		$actions=iif(check_right("Item","U",$row["itemid"]),
-				"<A HREF=\"items.php?register=change&itemid=".$row["itemid"]."#form\">".S_CHANGE."</A>",
+				"<A HREF=\"items.php?register=change&itemid=".$row["itemid"].url_param("hostid").url_param("groupid")."#form\">".S_CHANGE."</A>",
 				S_CHANGE);
 
 			if($row["error"] == "")
