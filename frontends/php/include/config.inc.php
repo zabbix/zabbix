@@ -1939,11 +1939,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 		elseif($scope==1)
 		{
-			$sql="select h.hostid from triggers t,hosts h,functions f,items i where f.triggerid=t.triggerid and t.hostid=h.hostid and h.hostid=i.itemid and i.itemid=f.itemid and t.triggerid=$triggerid";
+			$sql="select h.hostid from triggers t,hosts h,functions f,items i where f.triggerid=t.triggerid and h.hostid=i.hostid and i.itemid=f.itemid and t.triggerid=$triggerid";
+//			echo "$sql<br>";
 			$result=DBselect($sql);
 			while($row=DBfetch($result))
 			{
 				$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message,scope,severity,recipient) values (".$row["hostid"].",$id,$good,$delay,0,'*Automatically generated*','*Automatically generated*',$scope,$severity,$recipient)";
+//				echo "$sql<br>";
 				DBexecute($sql);
 			}
 			return TRUE;
