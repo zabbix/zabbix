@@ -1,4 +1,5 @@
 1.1:
+ - remove icmpping and others from the QUEUE
  - hardlinked templates (several templates, one host)
  - escalation and repeated notifications
 
