@@ -3,7 +3,7 @@
         $page["file"] = "items.html";
 
         include "include/config.inc";
-	show_header($page["title"],0);
+	show_header($page["title"],0,0);
 ?>
 
 <?
@@ -24,6 +24,7 @@
 		if($register=="delete")
 		{
 			delete_item($itemid);
+			unset($itemid);
 		}
 	}
 ?>

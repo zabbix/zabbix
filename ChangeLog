@@ -1,7 +1,8 @@
 Changes for 1.0alpha7:
 
- - fixed bug with getting processor load on Linux
+ - fullscreen mode for Network Maps and graphs
 
+ - fixed bug with getting processor load on Linux
  - added /upgrades/dbpatches/1.0alpha6_to_1.0alpha7
  - changes in manual.txt
  - fixed bug with lost status of trigger
