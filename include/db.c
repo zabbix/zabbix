@@ -29,6 +29,12 @@
 #include "log.h"
 #include "common.h"
 
+static	char	DB_HOST[MAX_STRING_LEN+1];
+static	char	DB_NAME[MAX_STRING_LEN+1];
+static	char	DB_USER[MAX_STRING_LEN+1];
+static	char	DB_PASSWORD[MAX_STRING_LEN+1];
+static	char	DB_SOCKET[MAX_STRING_LEN+1];
+
 #ifdef	HAVE_MYSQL
 	MYSQL	mysql;
 #endif
@@ -48,23 +54,29 @@ void	DBclose(void)
 }
 
 /*
- * Connect to database.
+ * Connect to the database.
  * If fails, program terminates.
  */ 
 void    DBconnect(char *dbhost, char *dbname, char *dbuser, char *dbpassword, char *dbsocket)
 {
+	strncpy(DB_HOST, dbhost, MAX_STRING_LEN);
+	strncpy(DB_NAME, dbname, MAX_STRING_LEN);
+	strncpy(DB_USER, dbuser, MAX_STRING_LEN);
+	strncpy(DB_PASSWORD, dbpassword, MAX_STRING_LEN);
+	strncpy(DB_SOCKET, dbsocket, MAX_STRING_LEN);
+
 /*	zabbix_log(LOG_LEVEL_ERR, "[%s] [%s] [%s]\n",dbname, dbuser, dbpassword ); */
 #ifdef	HAVE_MYSQL
 /* For MySQL >3.22.00 */
 /*	if( ! mysql_connect( &mysql, NULL, dbuser, dbpassword ) )*/
 	mysql_init(&mysql);
-	if( ! mysql_real_connect( &mysql, dbhost, dbuser, dbpassword, dbname, 3306, dbsocket,0 ) )
+	if( ! mysql_real_connect( &mysql, DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, 3306, DB_SOCKET,0 ) )
 	{
 		fprintf(stderr, "Failed to connect to database: Error: %s\n",mysql_error(&mysql) );
 		zabbix_log(LOG_LEVEL_ERR, "Failed to connect to database: Error: %s",mysql_error(&mysql) );
 		exit( FAIL );
 	}
-	if( mysql_select_db( &mysql, dbname ) != 0 )
+	if( mysql_select_db( &mysql, DB_NAME ) != 0 )
 	{
 		fprintf(stderr, "Failed to select database: Error: %s\n",mysql_error(&mysql) );
 		zabbix_log(LOG_LEVEL_ERR, "Failed to select database: Error: %s",mysql_error(&mysql) );
@@ -74,13 +86,13 @@ void    DBconnect(char *dbhost, char *dbname, char *dbuser, char *dbpassword, ch
 #ifdef	HAVE_PGSQL
 /*	conn = PQsetdb(pghost, pgport, pgoptions, pgtty, dbName); */
 /*	conn = PQsetdb(NULL, NULL, NULL, NULL, dbname);*/
-	conn = PQsetdbLogin(dbhost, NULL, NULL, NULL, dbname, dbuser, dbpassword );
+	conn = PQsetdbLogin(DB_HOST, NULL, NULL, NULL, DB_NAME, DB_USER, DB_PASSWORD );
 
 /* check to see that the backend connection was successfully made */
 	if (PQstatus(conn) == CONNECTION_BAD)
 	{
-		fprintf(stderr, "Connection to database '%s' failed.\n", dbname);
-		zabbix_log(LOG_LEVEL_ERR, "Connection to database '%s' failed.\n", dbname);
+		fprintf(stderr, "Connection to database '%s' failed.\n", DB_NAME);
+		zabbix_log(LOG_LEVEL_ERR, "Connection to database '%s' failed.\n", DB_NAME);
 		fprintf(stderr, "%s\n", PQerrorMessage(conn));
 		zabbix_log(LOG_LEVEL_ERR, "%s", PQerrorMessage(conn));
 		exit(FAIL);
