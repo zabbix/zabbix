@@ -94,10 +94,9 @@ void    DBconnect(char *dbhost, char *dbname, char *dbuser, char *dbpassword, ch
  */ 
 int	DBexecute(char *query)
 {
-
+/*	zabbix_set_log_level(LOG_LEVEL_DEBUG);*/
+	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
 #ifdef	HAVE_MYSQL
-	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s\n",query); 
-/*	zabbix_log( LOG_LEVEL_WARNING, "Executing query:%s\n",query)*/;
 
 	if( mysql_query(&mysql,query) != 0 )
 	{
@@ -108,8 +107,6 @@ int	DBexecute(char *query)
 #endif
 #ifdef	HAVE_PGSQL
 	PGresult	*result;
-
-	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s\n",query);
 
 	result = PQexec(conn,query);
 
@@ -129,6 +126,7 @@ int	DBexecute(char *query)
 	}
 	PQclear(result);
 #endif
+/*	zabbix_set_log_level(LOG_LEVEL_WARNING);*/
 	return	SUCCEED;
 }
 
@@ -138,8 +136,9 @@ int	DBexecute(char *query)
  */ 
 DB_RESULT *DBselect(char *query)
 {
+/*	zabbix_set_log_level(LOG_LEVEL_DEBUG);*/
+	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
 #ifdef	HAVE_MYSQL
-	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s\n",query);
 /*	zabbix_log( LOG_LEVEL_WARNING, "Executing query:%s\n",query);*/
 
 	if( mysql_query(&mysql,query) != 0 )
@@ -148,12 +147,12 @@ DB_RESULT *DBselect(char *query)
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", mysql_error(&mysql) );
 		exit( FAIL );
 	}
+/*	zabbix_set_log_level(LOG_LEVEL_WARNING);*/
 	return	mysql_store_result(&mysql);
 #endif
 #ifdef	HAVE_PGSQL
 	PGresult	*result;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s\n",query);
 	result = PQexec(conn,query);
 
 	if( result==NULL)
