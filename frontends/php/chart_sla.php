@@ -79,6 +79,6 @@
 	ImageString($im, 2,1,1, $s , $white);
 	$s=sprintf("%2.2f%%", $problem);
 	ImageString($im, 2,$sizeX-45,1, $s , $white);
-	ImagePng($im); 
+	ImageOut($im); 
 	ImageDestroy($im); 
 ?>

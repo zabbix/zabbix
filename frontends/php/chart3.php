@@ -98,7 +98,7 @@
 	{
 //		show_table_header("<font color=\"AA0000\">No permissions !</font>");
 //		show_footer();
-		ImagePng($im); 
+		ImageOut($im); 
 		ImageDestroy($im); 
 		exit;
 	}
@@ -301,6 +301,6 @@
 	$end_time=time(NULL);
 	ImageString($im, 0,imagesx($im)-100,imagesy($im)-12,"Generated in ".($end_time-$start_time)." sec", $gray);
 
-	ImagePng($im); 
+	ImageOut($im); 
 	ImageDestroy($im); 
 ?>

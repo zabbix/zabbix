@@ -184,7 +184,7 @@
 
 		function setWidth($width)
 		{
-// Avoid sizeX==0, to prevent division bu zero later
+// Avoid sizeX==0, to prevent division by zero later
 			if($width>0)
 			{
 				$this->sizeX=$width;
@@ -321,7 +321,7 @@
 			{
 				$this->drawGrid();
 				ImageString($this->im, 2,$this->sizeX/2 -50,$this->sizeY+$this->shiftY+3, "NO PERMISSIONS" , $this->colors["Dark Red No Alpha"]);
-				ImagePng($this->im); 
+				ImageOut($this->im); 
 				ImageDestroy($this->im); 
 				exit;
 			}
@@ -333,7 +333,7 @@
 
 			ImageString($this->im, 2,$this->sizeX/2-50,                $this->sizeY+$this->shiftY+3, "NO DATA FOUND FOR THIS PERIOD" , $this->colors["Dark Red No Alpha"]);
 			ImageStringUp($this->im,0,imagesx($this->im)-10,imagesy($this->im)-50, "http://www.zabbix.com", $this->colors["Gray"]);
-			ImagePng($this->im); 
+			ImageOut($this->im); 
 			ImageDestroy($this->im); 
 			exit;
 		}
@@ -434,7 +434,7 @@
 				unset($maxY);
 				for($i=0;$i<$this->num;$i++)
 				{
-					if(!isset($maxY))
+					if(!isset($maxY)&&(isset($this->max[$i])))
 					{
 						if(count($this->max[$i])>0)
 						{
@@ -628,7 +628,7 @@
 			$str=sprintf("%0.2f",($end_time-$start_time));
 			ImageString($this->im, 0,imagesx($this->im)-120,imagesy($this->im)-12,"Generated in $str sec", $this->colors["Gray"]);
 
-			ImagePng($this->im); 
+			ImageOut($this->im); 
 			ImageDestroy($this->im); 
 		}
 	}

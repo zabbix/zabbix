@@ -1,5 +1,10 @@
 Changes for 1.1alpha1:
 
+ - different icons depending on a triger status for sysmaps (Alexei)
+ - added column sysmaps_hosts.icon_on (Alexei)
+ - hierarchial maps (Alexei)
+ - added column sysmaps_hosts.url (Alexei)
+ - upgrades/dbpatches/1.0_to_1.1alpha1/data/images/ (Alexei)
  - added support for custom multiplier (Alexei)
  - added column items.formula (Alexei)
  - added support of SNMPv3 (Alexei)

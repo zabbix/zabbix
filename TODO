@@ -3,28 +3,28 @@ DONE:
 TELECENTRS
 
 1. Support for custom multipliers.
+2. Background image for system maps
+3. Hierarcy for system maps
 5. Support for SNMPv3.
 
 ZABBIX 1.1
 
  - custom multiplier
  - support of SNMPv3
-
-
-
+ - hierarchial maps
 
 --------------------------------------------
 
 ZABBIX 1.1:
 
  - RPM for RedHat EL
+ - get rid of extra warning messages in W32 agent
  - escalation
  - execution of commands on monitored hosts in case of pre-defined events
  - repeated notifications
  - monitoring of log files
  - audit log
  - new defaul port numbers to avoid confusion with WebMin
- - hierarchial maps
  - anvanced SNMP trapper
  - hard-linked templates
  - passing of parameters to user-defined commands (agent)
@@ -44,12 +44,6 @@ TKOM:
  - wider service testing possibilities
 
 TELECENTRS:
-
-
-2. Background image for system maps
-
-3. Hierarcy for system maps
-Integration of system maps and IT Services required.
 
 4. SNMP traps. Make possible action definition for the SNMP trap-related
  events.
@@ -84,7 +78,6 @@ I found that if I use the fully qualified name of my host, all simple checks
 are working, but they failed if I simply use the hostname.
 
  - add icons to a map by clicking mouse
- - different icons depending on a triger status for sysmaps
  - optionally support map generation in JPEG. PNG images are huge!
  - make w32 agent not to write warnings in case of timeout (HB)
  - security-related issues
@@ -140,9 +133,7 @@ trigger wihout actions, etc etc
 
  - implement complex SLA calculation (donwtimes, working/non-working hours), etc. See
 forum Open Discussion for more info.
- - overlib: context sensitive help in PHP frontend
  - add selection of MIN/MAX/AVG for graphs
- - use oop approach for new development
  - rewrite validation and evaluation of expressions (i.e. make >-1 work)
  - support for 'Clone' (graphs and screens)
  - add support of interface statistics under Solaris and FreeBSD
@@ -151,7 +142,6 @@ forum Open Discussion for more info.
  - infrastructure for reports
  - stacked graphs
 
- - man pages for all daemons
  - icmppingsec->icmppingmsec
  - disk size is not correct after evaluating macros in the message
  - add support for real 'delta' (last-previous)
