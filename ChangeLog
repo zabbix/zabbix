@@ -1,5 +1,6 @@
 Changes for 1.1alpha7:
 
+ - added frontends/php/include/items.inc.php (Alexei)
  - Overview and Details mode for screen Queue (Alexei)
 
 Changes for 1.1alpha6:
