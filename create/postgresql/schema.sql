@@ -396,6 +396,9 @@ CREATE TABLE graphs (
   name			varchar(128)	DEFAULT '' NOT NULL,
   width			int4		DEFAULT '0' NOT NULL,
   height		int4		DEFAULT '0' NOT NULL,
+  yaxistype		int2		DEFAULT '0' NOT NULL,
+  yaxismin		float8		DEFAULT '0' NOT NULL,
+  yaxismax		float8		DEFAULT '0' NOT NULL,
   PRIMARY KEY (graphid),
   UNIQUE (name)
 );

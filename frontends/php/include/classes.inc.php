@@ -30,6 +30,10 @@
 		var $shiftY;
 		var $border;
 
+		var $yaxistype;
+		var $yaxismin;
+		var $yaxismax;
+
 		// items[num].data.min[max|avg]
 		var $items;
 		// $idnum[$num] is itemid
@@ -103,6 +107,7 @@
 			$this->border=1;
 			$this->num=0;
 			$this->nodata=1;
+			$this->yaxistype=GRAPH_YAXIS_TYPE_CALCULATED;
 
 			$this->count=array();
 			$this->min=array();
@@ -147,6 +152,21 @@
 		function setPeriod($period)
 		{
 			$this->period=$period;
+		}
+
+		function setYAxisMin($yaxismin)
+		{
+			$this->yaxismin=$yaxismin;
+		}
+
+		function setYAxisMax($yaxismax)
+		{
+			$this->yaxismax=$yaxismax;
+		}
+
+		function setYAxisType($yaxistype)
+		{
+			$this->yaxistype=$yaxistype;
 		}
 
 		function setSTime($stime)
@@ -390,65 +410,85 @@
 		}
 
 // Calculation of maximum Y
+		function calculateMinY()
+		{
+			if($this->yaxistype==GRAPH_YAXIS_TYPE_FIXED)
+			{
+				return $this->yaxismin;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+
+// Calculation of maximum Y
 		function calculateMaxY()
 		{
-			unset($maxY);
-			for($i=0;$i<$this->num;$i++)
+			if($this->yaxistype==GRAPH_YAXIS_TYPE_FIXED)
 			{
-				if(!isset($maxY))
+				return $this->yaxismax;
+			}
+			else
+			{
+				unset($maxY);
+				for($i=0;$i<$this->num;$i++)
 				{
-					if(count($this->max[$i])>0)
+					if(!isset($maxY))
 					{
-						$maxY=max($this->max[$i]);
+						if(count($this->max[$i])>0)
+						{
+							$maxY=max($this->max[$i]);
+						}
 					}
+					else
+					{
+						$maxY=@iif($maxY<max($this->max[$i]),max($this->max[$i]),$maxY);
+					}
+				}
+	
+				if($maxY>0)
+				{
+					$exp = floor(log10($maxY));
+					$mant = $maxY/pow(10,$exp);
 				}
 				else
 				{
-					$maxY=@iif($maxY<max($this->max[$i]),max($this->max[$i]),$maxY);
+					$exp=0;
+					$mant=0;
 				}
+	
+				$mant=(floor($mant*1.1*10/6)+1)*6/10;
+	
+	/*			if($mant<1.5)
+				{
+					$mant=1.5;
+				}
+				elseif($mant<2)
+				{
+					$mant=2;
+				}
+				elseif($mant<3)
+				{
+					$mant=3;
+				}
+				elseif($mant<5)
+				{
+					$mant=5;
+				}
+				elseif($mant<8)
+				{
+					$mant=8;
+				}
+				else
+				{
+					$mant=10;
+				}
+	*/
+				$maxY = $mant*pow(10,$exp);
+	
+				return $maxY;
 			}
-
-			if($maxY>0)
-			{
-				$exp = floor(log10($maxY));
-				$mant = $maxY/pow(10,$exp);
-			}
-			else
-			{
-				$exp=0;
-				$mant=0;
-			}
-
-			$mant=(floor($mant*1.1*10/6)+1)*6/10;
-
-/*			if($mant<1.5)
-			{
-				$mant=1.5;
-			}
-			elseif($mant<2)
-			{
-				$mant=2;
-			}
-			elseif($mant<3)
-			{
-				$mant=3;
-			}
-			elseif($mant<5)
-			{
-				$mant=5;
-			}
-			elseif($mant<8)
-			{
-				$mant=8;
-			}
-			else
-			{
-				$mant=10;
-			}
-*/
-			$maxY = $mant*pow(10,$exp);
-
-			return $maxY;
 		}
 
 		function selectData()
@@ -539,7 +579,7 @@
 			$maxX=900;
 			$minX=0;
 
-			$minY=0;
+			$minY=$this->calculateMinY();
 			$maxY=$this->calculateMaxY();
 
 			for($item=0;$item<$this->num;$item++)

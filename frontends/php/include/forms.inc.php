@@ -737,4 +737,88 @@
 		echo "</form>";
 		show_table2_header_end();
 	}
+
+	function	insert_graph_form()
+	{
+		global  $_GET;
+
+		$name=@iif(isset($_GET["name"]),$_GET["name"],"");
+		$width=@iif(isset($_GET["width"]),$_GET["width"],900);
+		$height=@iif(isset($_GET["height"]),$_GET["height"],200);
+		$yaxistype=@iif(isset($_GET["yaxistype"]),$_GET["yaxistype"],GRAPH_YAXIS_TYPE_CALCULATED);
+		$yaxismin=@iif(isset($_GET["yaxismin"]),$_GET["yaxismin"],0.00);
+		$yaxismax=@iif(isset($_GET["yaxismax"]),$_GET["yaxismax"],100.00);
+
+		if(isset($_GET["graphid"])&&!isset($_GET["name"]))
+		{
+			$result=DBselect("select g.graphid,g.name,g.width,g.height,g.yaxistype,g.yaxismin,g.yaxismax from graphs g where graphid=".$_GET["graphid"]);
+			$row=DBfetch($result);
+			$name=$row["name"];
+			$width=$row["width"];
+			$height=$row["height"];
+			$yaxistype=$row["yaxistype"];
+			$yaxismin=$row["yaxismin"];
+			$yaxismax=$row["yaxismax"];
+		}
+
+		echo "<br>";
+		show_table2_header_begin();
+		echo S_GRAPH;
+
+		show_table2_v_delimiter();
+		echo "<form method=\"get\" action=\"graphs.php\">";
+		if(isset($_GET["graphid"]))
+		{
+			echo "<input class=\"biginput\" name=\"graphid\" type=\"hidden\" value=".$_GET["graphid"].">";
+		}
+		echo S_NAME; 
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=32>";
+
+		show_table2_v_delimiter();
+		echo S_WIDTH;
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"width\" size=5 value=\"$width\">";
+
+		show_table2_v_delimiter();
+		echo S_HEIGHT;
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"height\" size=5 value=\"$height\">";
+
+		show_table2_v_delimiter();
+		echo S_YAXIS_TYPE;
+		show_table2_h_delimiter();
+		echo "<SELECT class=\"biginput\" NAME=\"yaxistype\" size=\"1\" onChange=\"submit()\">";
+		echo "<OPTION VALUE=\"0\" "; if($yaxistype==GRAPH_YAXIS_TYPE_CALCULATED)	echo "SELECTED"; echo ">".S_CALCULATED;
+		echo "<OPTION VALUE=\"1\" "; if($yaxistype==GRAPH_YAXIS_TYPE_FIXED)		echo "SELECTED"; echo ">".S_FIXED;
+		echo "</SELECT>";
+
+		if($yaxistype == GRAPH_YAXIS_TYPE_FIXED)
+		{
+			show_table2_v_delimiter();
+			echo S_YAXIS_MIN_VALUE;
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"yaxismin\" size=5 value=\"$yaxismin\">";
+
+			show_table2_v_delimiter();
+			echo S_YAXIS_MAX_VALUE;
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"yaxismax\" size=5 value=\"$yaxismax\">";
+		}
+		else
+		{
+			echo "<input class=\"biginput\" name=\"yaxismin\" type=hidden value=\"$yaxismin\">";
+			echo "<input class=\"biginput\" name=\"yaxismax\" type=hidden value=\"$yaxismax\">";
+		}
+
+		show_table2_v_delimiter2();
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
+		if(isset($_GET["graphid"]))
+		{
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('".S_DELETE_GRAPH_Q."');\">";
+		}
+
+		show_table2_header_end();
+	}
 ?>
