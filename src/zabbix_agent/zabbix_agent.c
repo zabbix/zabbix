@@ -1,3 +1,5 @@
+/* #define TEST */
+
 #include "config.h"
 
 #include <stdlib.h>
@@ -139,6 +141,30 @@ int	main()
 	int	i;
 	float	(*function)();
 	char	*parameter = NULL;
+
+#ifdef TEST
+	i=0;
+	for(;;)
+	{
+		if( commands[i].key == 0)
+		{
+			exit(0);
+		}
+		function=commands[i].function;
+		parameter=commands[i].parameter;
+
+		result=function(parameter);
+		if( result == FAIL )
+		{
+			printf("%s - NOT SUPPORTED\n",commands[i].key);
+		}
+		else
+		{
+			printf("%s\t - %f\n",commands[i].key,result);
+		}
+		i++;
+	}
+#endif
 
 	if(check_security() == FAIL)
 	{
