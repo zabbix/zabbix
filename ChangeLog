@@ -1,5 +1,6 @@
 Changes for 1.0:
 
+ - fixed problem with undefined socklen_t under Solaris (Alexei)
  - show user groups in the list of users. Thanks to Igor (Alexei)
  - fixed sql statement in trigger definition form (Alexei)
  - changed all versions from 1.0beta14 to 1.0 (Alexei)
