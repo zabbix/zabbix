@@ -139,11 +139,11 @@ int main(int argc, char **argv)
 {
 	int	port;
 	int	ret=SUCCEED;
-	char	line[MAX_STRING_LEN+1];
-	char	port_str[MAX_STRING_LEN+1];
-	char	zabbix_server[MAX_STRING_LEN+1];
-	char	server_key[MAX_STRING_LEN+1];
-	char	value[MAX_STRING_LEN+1];
+	char	line[MAX_STRING_LEN];
+	char	port_str[MAX_STRING_LEN];
+	char	zabbix_server[MAX_STRING_LEN];
+	char	server_key[MAX_STRING_LEN];
+	char	value[MAX_STRING_LEN];
 	char	*s;
 
 	signal( SIGINT,  signal_handler );
@@ -170,13 +170,13 @@ int main(int argc, char **argv)
 			alarm(SENDER_TIMEOUT);
 
 			s=(char *)strtok(line," ");
-			strncpy(zabbix_server,s,MAX_STRING_LEN);
+			strscpy(zabbix_server,s);
 			s=(char *)strtok(NULL," ");
-			strncpy(port_str,s,MAX_STRING_LEN);
+			strscpy(port_str,s);
 			s=(char *)strtok(NULL," ");
-			strncpy(server_key,s,MAX_STRING_LEN);
+			strscpy(server_key,s);
 			s=(char *)strtok(NULL," ");
-			strncpy(value,s,MAX_STRING_LEN);
+			strscpy(value,s);
 			ret = send_value(zabbix_server,atoi(port_str),server_key,value);
 
 			alarm(0);

@@ -50,7 +50,7 @@ int	evaluate_COUNT(char *value,DB_ITEM	*item,int parameter)
 {
 	DB_RESULT	*result;
 
-	char		sql[MAX_STRING_LEN+1];
+	char		sql[MAX_STRING_LEN];
 	int		now;
 	int		res = SUCCEED;
 
@@ -71,7 +71,7 @@ int	evaluate_COUNT(char *value,DB_ITEM	*item,int parameter)
 	}
 	else
 	{
-		strncpy(value,DBget_field(result,0,0),MAX_STRING_LEN);
+		strcpy(value,DBget_field(result,0,0));
 	}
 	DBfree_result(result);
 
@@ -85,7 +85,7 @@ int	evaluate_SUM(char *value,DB_ITEM	*item,int parameter)
 {
 	DB_RESULT	*result;
 
-	char		sql[MAX_STRING_LEN+1];
+	char		sql[MAX_STRING_LEN];
 	int		now;
 	int		res = SUCCEED;
 
@@ -106,7 +106,7 @@ int	evaluate_SUM(char *value,DB_ITEM	*item,int parameter)
 	}
 	else
 	{
-		strncpy(value,DBget_field(result,0,0),MAX_STRING_LEN);
+		strcpy(value,DBget_field(result,0,0));
 	}
 	DBfree_result(result);
 
@@ -120,7 +120,7 @@ int	evaluate_AVG(char *value,DB_ITEM	*item,int parameter)
 {
 	DB_RESULT	*result;
 
-	char		sql[MAX_STRING_LEN+1];
+	char		sql[MAX_STRING_LEN];
 	int		now;
 	int		res = SUCCEED;
 
@@ -141,7 +141,7 @@ int	evaluate_AVG(char *value,DB_ITEM	*item,int parameter)
 	}
 	else
 	{
-		strncpy(value,DBget_field(result,0,0),MAX_STRING_LEN);
+		strcpy(value,DBget_field(result,0,0));
 	}
 	DBfree_result(result);
 
@@ -155,7 +155,7 @@ int	evaluate_MIN(char *value,DB_ITEM	*item,int parameter)
 {
 	DB_RESULT	*result;
 
-	char		sql[MAX_STRING_LEN+1];
+	char		sql[MAX_STRING_LEN];
 	int		now;
 	int		res = SUCCEED;
 
@@ -176,7 +176,7 @@ int	evaluate_MIN(char *value,DB_ITEM	*item,int parameter)
 	}
 	else
 	{
-		strncpy(value,DBget_field(result,0,0),MAX_STRING_LEN);
+		strcpy(value,DBget_field(result,0,0));
 	}
 	DBfree_result(result);
 
@@ -190,7 +190,7 @@ int	evaluate_MAX(char *value,DB_ITEM *item,int parameter)
 {
 	DB_RESULT	*result;
 
-	char		sql[MAX_STRING_LEN+1];
+	char		sql[MAX_STRING_LEN];
 	int		now;
 	int		res = SUCCEED;
 
@@ -211,7 +211,7 @@ int	evaluate_MAX(char *value,DB_ITEM *item,int parameter)
 	}
 	else
 	{
-		strncpy(value,DBget_field(result,0,0),MAX_STRING_LEN);
+		strcpy(value,DBget_field(result,0,0));
 	}
 	DBfree_result(result);
 
@@ -225,7 +225,7 @@ int	evaluate_DELTA(char *value,DB_ITEM *item,int parameter)
 {
 	DB_RESULT	*result;
 
-	char		sql[MAX_STRING_LEN+1];
+	char		sql[MAX_STRING_LEN];
 	int		now;
 	int		res = SUCCEED;
 
@@ -246,7 +246,7 @@ int	evaluate_DELTA(char *value,DB_ITEM *item,int parameter)
 	}
 	else
 	{
-		strncpy(value,DBget_field(result,0,0),MAX_STRING_LEN);
+		strcpy(value,DBget_field(result,0,0));
 	}
 	DBfree_result(result);
 
@@ -281,9 +281,9 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 			else
 			{
 /*				*value=strdup(item->lastvalue_str);*/
-			zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 3 [%s] [%s]",value,item->lastvalue_str);
-				strncpy(value,item->lastvalue_str,MAX_STRING_LEN);
-			zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 4");
+				zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 3 [%s] [%s]",value,item->lastvalue_str);
+				strcpy(value,item->lastvalue_str);
+				zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 4");
 			}
 		}
 	}
@@ -301,7 +301,7 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 			}
 			else
 			{
-				strncpy(value,item->prevvalue_str,MAX_STRING_LEN);
+				strcpy(value,item->prevvalue_str);
 			}
 		}
 	}
@@ -467,8 +467,8 @@ void	update_functions(DB_ITEM *item)
 {
 	DB_FUNCTION	function;
 	DB_RESULT	*result;
-	char		sql[MAX_STRING_LEN+1];
-	char		value[MAX_STRING_LEN+1];
+	char		sql[MAX_STRING_LEN];
+	char		value[MAX_STRING_LEN];
 	int		ret=SUCCEED;
 	int		i;
 
@@ -512,7 +512,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 {
 	int	s;
 	int	i,e;
-	char	c[MAX_STRING_LEN+1];
+	char	c[MAX_STRING_LEN];
 	struct hostent *hp;
 
 	struct sockaddr_in myaddr_in;
@@ -568,7 +568,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL5");
 
-	memset(c,0,MAX_STRING_LEN+1);
+	memset(c,0,MAX_STRING_LEN);
 /*	i=sizeof(struct sockaddr_in);
 	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);*/
 	i=read(s,c,MAX_STRING_LEN);
@@ -588,7 +588,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 
 	if(strlen(smtp_helo) != 0)
 	{
-		memset(c,0,MAX_STRING_LEN+1);
+		memset(c,0,MAX_STRING_LEN);
 		sprintf(c,"HELO %s\r\n",smtp_helo);
 /*		e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
 		e=write(s,c,strlen(c)); 
@@ -600,7 +600,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 			return FAIL;
 		}
 				
-		memset(c,0,MAX_STRING_LEN+1);
+		memset(c,0,MAX_STRING_LEN);
 /*		i=sizeof(struct sockaddr_in);
 		i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);*/
 		i=read(s,c,MAX_STRING_LEN);
@@ -619,7 +619,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 		}
 	}
 			
-	memset(c,0,MAX_STRING_LEN+1);
+	memset(c,0,MAX_STRING_LEN);
 /*	sprintf(c,"MAIL FROM: %s\r\n",smtp_email);*/
 	sprintf(c,"MAIL FROM: <%s>\r\n",smtp_email);
 /*	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
@@ -632,7 +632,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 		return FAIL;
 	}
 
-	memset(c,0,MAX_STRING_LEN+1);
+	memset(c,0,MAX_STRING_LEN);
 /*	i=sizeof(struct sockaddr_in);
 	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);*/
 	i=read(s,c,MAX_STRING_LEN);
@@ -650,7 +650,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 		return FAIL;
 	}
 			
-	memset(c,0,MAX_STRING_LEN+1);
+	memset(c,0,MAX_STRING_LEN);
 	sprintf(c,"RCPT TO: <%s>\r\n",mailto);
 /*	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
 	e=write(s,c,strlen(c)); 
@@ -661,7 +661,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 		close(s);
 		return FAIL;
 	}
-	memset(c,0,MAX_STRING_LEN+1);
+	memset(c,0,MAX_STRING_LEN);
 /*	i=sizeof(struct sockaddr_in);
 	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);*/
 	i=read(s,c,MAX_STRING_LEN);
@@ -680,7 +680,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 		return FAIL;
 	}
 	
-	memset(c,0,MAX_STRING_LEN+1);
+	memset(c,0,MAX_STRING_LEN);
 	sprintf(c,"DATA\r\n");
 /*	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
 	e=write(s,c,strlen(c)); 
@@ -691,7 +691,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 		close(s);
 		return FAIL;
 	}
-	memset(c,0,MAX_STRING_LEN+1);
+	memset(c,0,MAX_STRING_LEN);
 /*	i=sizeof(struct sockaddr_in);
 	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);*/
 	i=read(s,c,MAX_STRING_LEN);
@@ -709,7 +709,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 		return FAIL;
 	}
 
-	memset(c,0,MAX_STRING_LEN+1);
+	memset(c,0,MAX_STRING_LEN);
 /*	sprintf(c,"Subject: %s\r\n%s",mailsubject, mailbody);*/
 	sprintf(c,"From:<%s>\r\nTo:<%s>\r\nSubject: %s\r\n\r\n%s",smtp_email,mailto,mailsubject, mailbody);
 /*	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
@@ -721,7 +721,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 		return FAIL;
 	}
 
-	memset(c,0,MAX_STRING_LEN+1);
+	memset(c,0,MAX_STRING_LEN);
 	sprintf(c,"\r\n.\r\n");
 /*	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
 	e=write(s,c,strlen(c)); 
@@ -732,7 +732,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 		close(s);
 		return FAIL;
 	}
-	memset(c,0,MAX_STRING_LEN+1);
+	memset(c,0,MAX_STRING_LEN);
 /*	i=sizeof(struct sockaddr_in);
 	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);*/
 	i=read(s,c,MAX_STRING_LEN);
@@ -750,7 +750,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 		return FAIL;
 	}
 	
-	memset(c,0,MAX_STRING_LEN+1);
+	memset(c,0,MAX_STRING_LEN);
 	sprintf(c,"QUIT\r\n");
 /*	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
 	e=write(s,c,strlen(c)); 
@@ -774,7 +774,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 void	send_to_user_medias(DB_TRIGGER *trigger,DB_ACTION *action, int userid)
 {
 	DB_MEDIA media;
-	char sql[MAX_STRING_LEN+1];
+	char sql[MAX_STRING_LEN];
 	DB_RESULT *result;
 
 	int	i;
@@ -806,7 +806,7 @@ void	send_to_user_medias(DB_TRIGGER *trigger,DB_ACTION *action, int userid)
  */ 
 void	send_to_user(DB_TRIGGER *trigger,DB_ACTION *action)
 {
-	char sql[MAX_STRING_LEN+1];
+	char sql[MAX_STRING_LEN];
 	DB_RESULT *result;
 
 	int	i;
@@ -872,7 +872,7 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 	
 	DB_ACTION action;
 
-	char sql[MAX_STRING_LEN+1];
+	char sql[MAX_STRING_LEN];
 
 	int	i;
 	int	now;
@@ -913,8 +913,8 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 		action.actionid=atoi(DBget_field(result,i,0));
 		action.userid=atoi(DBget_field(result,i,1));
 		action.delay=atoi(DBget_field(result,i,2));
-		strncpy(action.subject,DBget_field(result,i,3),MAX_STRING_LEN);
-		strncpy(action.message,DBget_field(result,i,4),MAX_STRING_LEN);
+		strscpy(action.subject,DBget_field(result,i,3));
+		strscpy(action.message,DBget_field(result,i,4));
 		action.scope=atoi(DBget_field(result,i,5));
 		action.severity=atoi(DBget_field(result,i,6));
 		action.recipient=atoi(DBget_field(result,i,7));
@@ -942,7 +942,7 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 				continue;
 			}
 			DBfree_result(result2);
-			strncpy(action.subject,trigger->description,MAX_STRING_LEN);
+			strscpy(action.subject,trigger->description);
 			if(1==good)
 			{
 				strncat(action.subject," (ON)", MAX_STRING_LEN);
@@ -951,7 +951,7 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 			{
 				strncat(action.subject," (OFF)", MAX_STRING_LEN);
 			}
-			strncpy(action.message,action.subject,MAX_STRING_LEN);
+			strscpy(action.message,action.subject);
 
 /*			substitute_hostname(trigger->triggerid,action.message);
 			substitute_hostname(trigger->triggerid,action.subject);*/
@@ -964,7 +964,7 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 				continue;
 			}
 /* -- */
-			strncpy(action.subject,trigger->description,MAX_STRING_LEN);
+			strscpy(action.subject,trigger->description);
 			if(1==good)
 			{
 				strncat(action.subject," (ON)", MAX_STRING_LEN);
@@ -973,7 +973,7 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 			{
 				strncat(action.subject," (OFF)", MAX_STRING_LEN);
 			}
-			strncpy(action.message,action.subject,MAX_STRING_LEN);
+			strscpy(action.message,action.subject);
 
 /*			substitute_hostname(trigger->triggerid,action.message);
 			substitute_hostname(trigger->triggerid,action.subject);*/
@@ -996,7 +996,7 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
  */
 void	update_serv(int serviceid)
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 	int	i;
 	int	status;
 	int	serviceupid, algorithm;
@@ -1071,7 +1071,7 @@ void	update_serv(int serviceid)
 
 void	update_services(int triggerid, int status)
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 	int	i;
 
 	DB_RESULT *result;
@@ -1097,8 +1097,8 @@ void	update_services(int triggerid, int status)
 */ 
 void	update_triggers(int itemid)
 {
-	char	sql[MAX_STRING_LEN+1];
-	char	exp[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
+	char	exp[MAX_STRING_LEN];
 	int	b;
 	int	now;
 	DB_TRIGGER	trigger;
@@ -1125,7 +1125,7 @@ void	update_triggers(int itemid)
 
 		trigger.value=atoi(DBget_field(result,i,5));
 		trigger.description=DBget_field(result,i,6);
-		strncpy(exp, trigger.expression, MAX_STRING_LEN);
+		strscpy(exp, trigger.expression);
 		if( evaluate_expression(&b, exp) != 0 )
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated.",trigger.expression);
@@ -1200,7 +1200,7 @@ int	get_lastvalue(char *value,char *host,char *key,char *function,char *paramete
 	DB_ITEM	item;
 	DB_RESULT *result;
 
-        char	sql[MAX_STRING_LEN+1];
+        char	sql[MAX_STRING_LEN];
 	char	*s;
 	int	res;
 
@@ -1256,7 +1256,7 @@ int	get_lastvalue(char *value,char *host,char *key,char *function,char *paramete
 /* int	process_data(char *server,char *key, double value)*/
 int	process_data(int sockfd,char *server,char *key,char *value)
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 
 	DB_RESULT       *result;
 	DB_ITEM	item;
@@ -1330,7 +1330,7 @@ int	process_data(int sockfd,char *server,char *key,char *value)
 void	process_new_value(DB_ITEM *item,char *value)
 {
 	int 	now;
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 	double	value_double;
 	char	*e;
 

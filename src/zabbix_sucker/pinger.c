@@ -54,7 +54,7 @@
 
 int	process_value(char *key, char *ip, char *value)
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 
 	DB_RESULT       *result;
 	DB_ITEM	item;
@@ -124,7 +124,7 @@ int	process_value(char *key, char *ip, char *value)
 
 int create_host_file(void)
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 	FILE	*f;
 	int	i,now;
 
@@ -166,9 +166,9 @@ int create_host_file(void)
 int	do_ping(void)
 {
 	FILE	*f;
-	char	ip[MAX_STRING_LEN+1];
-	char	str[MAX_STRING_LEN+1];
-	char	tmp[MAX_STRING_LEN+1];
+	char	ip[MAX_STRING_LEN];
+	char	str[MAX_STRING_LEN];
+	char	tmp[MAX_STRING_LEN];
 	double	mseconds;
 	char	*c;
 	int	alive;

@@ -149,7 +149,7 @@ int	find_char(char *str,char c)
 int	evaluate_simple (double *result,char *exp)
 {
 	double	value1,value2;
-	char	first[MAX_STRING_LEN+1],second[MAX_STRING_LEN+1];
+	char	first[MAX_STRING_LEN],second[MAX_STRING_LEN];
 	int	i,j,l;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Evaluating simple expression [%s]", exp );
@@ -166,7 +166,7 @@ int	evaluate_simple (double *result,char *exp)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "| is found" );
 		l=find_char(exp,'|');
-		strncpy( first, exp, MAX_STRING_LEN );
+		strscpy( first, exp );
 		first[l]=0;
 		j=0;
 /*		for(i=l+1;i<(int)strlen(exp);i++)*/
@@ -203,7 +203,7 @@ int	evaluate_simple (double *result,char *exp)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "& is found" );
 		l=find_char(exp,'&');
-		strncpy( first, exp, MAX_STRING_LEN );
+		strscpy( first, exp );
 		first[l]=0;
 		j=0;
 /*		for(i=l+1;i<(int)strlen(exp);i++)*/
@@ -238,7 +238,7 @@ int	evaluate_simple (double *result,char *exp)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "> is found" );
 		l=find_char(exp,'>');
-		strncpy(first, exp, MAX_STRING_LEN);
+		strscpy(first, exp);
 		first[l]=0;
 		j=0;
 /*		for(i=l+1;i<(int)strlen(exp);i++)*/
@@ -272,7 +272,7 @@ int	evaluate_simple (double *result,char *exp)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "< is found" );
 		l=find_char(exp,'<');
-		strncpy(first, exp, MAX_STRING_LEN);
+		strscpy(first, exp);
 		first[l]=0;
 		j=0;
 /*		for(i=l+1;i<(int)strlen(exp);i++)*/
@@ -308,7 +308,7 @@ int	evaluate_simple (double *result,char *exp)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "* is found" );
 		l=find_char(exp,'*');
-		strncpy(first, exp, MAX_STRING_LEN);
+		strscpy(first, exp);
 		first[l]=0;
 		j=0;
 /*		for(i=l+1;i<(int)strlen(exp);i++)*/
@@ -335,7 +335,7 @@ int	evaluate_simple (double *result,char *exp)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "/ is found" );
 		l=find_char(exp,'/');
-		strncpy(first, exp, MAX_STRING_LEN);
+		strscpy(first, exp);
 		first[l]=0;
 		j=0;
 /*		for(i=l+1;i<(int)strlen(exp);i++)*/
@@ -370,7 +370,7 @@ int	evaluate_simple (double *result,char *exp)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "+ is found" );
 		l=find_char(exp,'+');
-		strncpy(first, exp, MAX_STRING_LEN);
+		strscpy(first, exp);
 		first[l]=0;
 		j=0;
 /*		for(i=l+1;i<(int)strlen(exp);i++)*/
@@ -397,7 +397,7 @@ int	evaluate_simple (double *result,char *exp)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "- is found" );
 		l=find_char(exp,'-');
-		strncpy(first, exp, MAX_STRING_LEN);
+		strscpy(first, exp);
 		first[l]=0;
 		j=0;
 /*		for(i=l+1;i<(int)strlen(exp);i++)*/
@@ -424,7 +424,7 @@ int	evaluate_simple (double *result,char *exp)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "= is found" );
 		l=find_char(exp,'=');
-		strncpy(first, exp, MAX_STRING_LEN);
+		strscpy(first, exp);
 		first[l]=0;
 		j=0;
 /*		for(i=l+1;i<(int)strlen(exp);i++)*/
@@ -458,7 +458,7 @@ int	evaluate_simple (double *result,char *exp)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "# is found" );
 		l=find_char(exp,'#');
-		strncpy(first, exp, MAX_STRING_LEN);
+		strscpy(first, exp);
 		first[l]=0;
 		j=0;
 /*		for(i=l+1;i<(int)strlen(exp);i++)*/
@@ -502,13 +502,13 @@ int	evaluate_simple (double *result,char *exp)
 int	evaluate(int *result,char *exp)
 {
 	double	value;
-	char	res[MAX_STRING_LEN+1];
-	char	simple[MAX_STRING_LEN+1];
+	char	res[MAX_STRING_LEN];
+	char	simple[MAX_STRING_LEN];
 	int	i,l,r;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate([%s])",exp);
 
-	strncpy( res,exp,MAX_STRING_LEN );
+	strscpy( res,exp );
 
 	while( find_char( exp, ')' ) != FAIL )
 	{
@@ -552,7 +552,7 @@ int	evaluate(int *result,char *exp)
 		for(i=l+3;i<=r;i++) exp[i]=' ';
 
 		sprintf(res,exp,value);
-		strncpy(exp,res, MAX_STRING_LEN);
+		strcpy(exp,res);
 		delete_spaces(res);
 		zabbix_log(LOG_LEVEL_DEBUG, "Expression4:[%s]", res );
 	}
@@ -572,9 +572,9 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 {
 	int	found = SUCCEED;
 	char	*s;
-	char	sql[MAX_STRING_LEN+1];
-	char	str[MAX_STRING_LEN+1];
-	char	tmp[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
+	char	str[MAX_STRING_LEN];
+	char	tmp[MAX_STRING_LEN];
 
 	time_t  now;
 	struct  tm      *tm;
@@ -585,7 +585,7 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 
 	while (found == SUCCEED)
 	{
-		strncpy(str, exp, MAX_STRING_LEN);
+		strscpy(str, exp);
 
 
 		if( (s = strstr(str,"{HOSTNAME}")) != NULL )
@@ -596,18 +596,18 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 			if(DBnum_rows(result) == 0)
 			{
 				zabbix_log( LOG_LEVEL_ERR, "No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
-				strncpy(tmp, "*UNKNOWN*", MAX_STRING_LEN);
+				strscpy(tmp, "*UNKNOWN*");
 				DBfree_result(result);
 			}
 			else
 			{
-				strncpy(tmp,DBget_field(result,0,1), MAX_STRING_LEN);
+				strscpy(tmp,DBget_field(result,0,1));
 
 				DBfree_result(result);
 			}
 
 			s[0]=0;
-			strncpy(exp, str, MAX_STRING_LEN);
+			strcpy(exp, str);
 			strncat(exp, tmp, MAX_STRING_LEN);
 			strncat(exp, s+strlen("{HOSTNAME}"), MAX_STRING_LEN);
 
@@ -620,7 +620,7 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 			sprintf(tmp,"%.4d.%.2d.%.2d",tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday);
 
 			s[0]=0;
-			strncpy(exp, str, MAX_STRING_LEN);
+			strcpy(exp, str);
 			strncat(exp, tmp, MAX_STRING_LEN);
 			strncat(exp, s+strlen("{DATE}"), MAX_STRING_LEN);
 
@@ -633,7 +633,7 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 			sprintf(tmp,"%.2d:%.2d:%.2d",tm->tm_hour,tm->tm_min,tm->tm_sec);
 
 			s[0]=0;
-			strncpy(exp, str, MAX_STRING_LEN);
+			strcpy(exp, str);
 			strncat(exp, tmp, MAX_STRING_LEN);
 			strncat(exp, s+strlen("{TIME}"), MAX_STRING_LEN);
 
@@ -653,13 +653,13 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
  */
 int	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 {
-	char	res[MAX_STRING_LEN+1];
-	char	macro[MAX_STRING_LEN+1];
-	char	host[MAX_STRING_LEN+1];
-	char	key[MAX_STRING_LEN+1];
-	char	function[MAX_STRING_LEN+1];
-	char	parameter[MAX_STRING_LEN+1];
-	static	char	value[MAX_STRING_LEN+1];
+	char	res[MAX_STRING_LEN];
+	char	macro[MAX_STRING_LEN];
+	char	host[MAX_STRING_LEN];
+	char	key[MAX_STRING_LEN];
+	char	function[MAX_STRING_LEN];
+	char	parameter[MAX_STRING_LEN];
+	static	char	value[MAX_STRING_LEN];
 	int	i;
 	int	r,l;
 	int	r1,l1;
@@ -753,7 +753,7 @@ int	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 		zabbix_log( LOG_LEVEL_DEBUG, "Value5 [%s]", exp );
 
 		sprintf(res,exp,value);
-		strncpy(exp,res, MAX_STRING_LEN);
+		strcpy(exp,res);
 /*		delete_spaces(exp); */
 		zabbix_log( LOG_LEVEL_DEBUG, "Expression4:[%s]", exp );
 	}
@@ -769,8 +769,8 @@ int	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 int	substitute_functions(char *exp)
 {
 	double	value;
-	char	functionid[MAX_STRING_LEN+1];
-	char	res[MAX_STRING_LEN+1];
+	char	functionid[MAX_STRING_LEN];
+	char	res[MAX_STRING_LEN];
 	int	i,l,r;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "BEGIN substitute_functions (%s)", exp);
@@ -820,7 +820,7 @@ int	substitute_functions(char *exp)
 		zabbix_log( LOG_LEVEL_DEBUG, "Expression3:[%s]", exp );
 
 		sprintf(res,exp,value);
-		strncpy(exp,res, MAX_STRING_LEN);
+		strcpy(exp,res);
 		delete_spaces(exp);
 		zabbix_log( LOG_LEVEL_DEBUG, "Expression4:[%s]", exp );
 	}

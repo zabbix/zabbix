@@ -249,8 +249,8 @@ void    daemon_init(void)
 void	process_child(int sockfd)
 {
 	ssize_t	nread;
-	char	line[MAX_STRING_LEN+1];
-	char	result[MAX_STRING_LEN+1];
+	char	line[MAX_STRING_LEN];
+	char	result[MAX_STRING_LEN];
 	static struct  sigaction phan;
 
 	phan.sa_handler = &signal_handler;

@@ -33,7 +33,7 @@
 #include "common.h"
 
 static	FILE *log_file = NULL;
-static	char log_filename[MAX_STRING_LEN+1];
+static	char log_filename[MAX_STRING_LEN];
 
 static	int log_type = LOG_TYPE_UNDEFINED;
 static	int log_level;
@@ -62,7 +62,7 @@ int zabbix_open_log(int type,int level, const char *filename)
 			return	FAIL;
 		}
 		log_type = LOG_TYPE_FILE;
-		strncpy(log_filename,filename,MAX_STRING_LEN);
+		strscpy(log_filename,filename);
 		fclose(log_file);
 	}
 	else
@@ -81,14 +81,14 @@ void zabbix_set_log_level(int level)
 
 void zabbix_log(int level, const char *fmt, ...)
 {
-	char	str[MAX_STRING_LEN+1];
-	char	str2[MAX_STRING_LEN+1];
+	char	str[MAX_STRING_LEN];
+	char	str2[MAX_STRING_LEN];
 	time_t	t;
 	struct	tm	*tm;
 	va_list ap;
 
 	struct stat	buf;
-	char	filename_old[MAX_STRING_LEN+1];
+	char	filename_old[MAX_STRING_LEN];
 
 	if( (level>log_level) || (level == LOG_LEVEL_EMPTY))
 	{
@@ -129,7 +129,7 @@ void zabbix_log(int level, const char *fmt, ...)
 		{
 			if(buf.st_size>1024*1024)
 			{
-				strncpy(filename_old,log_filename,MAX_STRING_LEN);
+				strscpy(filename_old,log_filename);
 				strcat(filename_old,".old");
 				if(rename(log_filename,filename_old) != 0)
 				{

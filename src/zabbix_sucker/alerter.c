@@ -62,7 +62,7 @@ int send_alert(DB_ALERT	*alert,DB_MEDIATYPE *mediatype)
 	struct	sigaction phan;
 	int	pid;
 
-	char	full_path[MAX_STRING_LEN+1];
+	char	full_path[MAX_STRING_LEN];
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In send_alert()");
 
@@ -92,7 +92,7 @@ int send_alert(DB_ALERT	*alert,DB_MEDIATYPE *mediatype)
 		}
 		else
 		{
-			strncpy(full_path,CONFIG_ALERT_SCRIPTS_PATH,MAX_STRING_LEN);
+			strscpy(full_path,CONFIG_ALERT_SCRIPTS_PATH);
 			strncat(full_path,"/",MAX_STRING_LEN);
 			strncat(full_path,mediatype->exec_path,MAX_STRING_LEN);
 			zabbix_log( LOG_LEVEL_DEBUG, "Before executing [%s] [%m]", full_path);
@@ -124,7 +124,7 @@ int send_alert(DB_ALERT	*alert,DB_MEDIATYPE *mediatype)
 
 int main_alerter_loop()
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 
 	int	i,res;
 

@@ -294,7 +294,7 @@ int     DBget_function_result(double *result,char *functionid)
 	DB_RESULT *dbresult;
 	int		res = SUCCEED;
 
-        char	sql[MAX_STRING_LEN+1];
+        char	sql[MAX_STRING_LEN];
 
 /* 0 is added to distinguish between lastvalue==NULL and empty result */
 	sprintf( sql, "select 0,lastvalue from functions where functionid=%s", functionid );
@@ -322,7 +322,7 @@ int     DBget_function_result(double *result,char *functionid)
 /* SUCCEED if latest alarm with triggerid has this status */
 int	DBget_prev_trigger_value(int triggerid)
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 	int	clock;
 	int	value;
 
@@ -376,7 +376,7 @@ int	DBget_prev_trigger_value(int triggerid)
 /* Rewrite required to simplify logic ?*/
 int	latest_alarm(int triggerid, int status)
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 	int	clock;
 	DB_RESULT	*result;
 	int ret = FAIL;
@@ -419,7 +419,7 @@ int	latest_alarm(int triggerid, int status)
 /* Rewrite required to simplify logic ?*/
 int	latest_service_alarm(int serviceid, int status)
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 	int	clock;
 	DB_RESULT	*result;
 	int ret = FAIL;
@@ -460,7 +460,7 @@ int	latest_service_alarm(int serviceid, int status)
 
 int	add_alarm(int triggerid,int status,int clock)
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_alarm()");
 
@@ -480,7 +480,7 @@ int	add_alarm(int triggerid,int status,int clock)
 
 int	DBadd_service_alarm(int serviceid,int status,int clock)
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_service_alarm()");
 
@@ -506,7 +506,7 @@ void	update_problems(int triggerid, int value, int clock)
 
 int	DBupdate_trigger_value(int triggerid,int value,int clock)
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value()");
 	add_alarm(triggerid,value,clock);
@@ -531,7 +531,7 @@ int	DBupdate_trigger_value(int triggerid,int value,int clock)
 void update_triggers_status_to_unknown(int hostid,int clock)
 {
 	int	i;
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 	int	triggerid;
 
 	DB_RESULT	*result;
@@ -556,7 +556,7 @@ void update_triggers_status_to_unknown(int hostid,int clock)
 
 void  DBdelete_service(int serviceid)
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 
 	sprintf(sql,"delete from services_links where servicedownid=%d or serviceupid=%d", serviceid, serviceid);
 	DBexecute(sql);
@@ -567,7 +567,7 @@ void  DBdelete_service(int serviceid)
 void  DBdelete_services_by_triggerid(int triggerid)
 {
 	int	i, serviceid;
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 	DB_RESULT	*result;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBdelete_services_by_triggerid(%d)", triggerid);
@@ -586,7 +586,7 @@ void  DBdelete_services_by_triggerid(int triggerid)
 
 void  DBdelete_trigger(int triggerid)
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 
 	sprintf(sql,"delete from trigger_depends where triggerid_down=%d or triggerid_up=%d", triggerid, triggerid);
 	DBexecute(sql);
@@ -608,7 +608,7 @@ void  DBdelete_trigger(int triggerid)
 void  DBdelete_triggers_by_itemid(int itemid)
 {
 	int	i, triggerid;
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 	DB_RESULT	*result;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBdelete_triggers_by_itemid(%d)", itemid);
@@ -630,7 +630,7 @@ void  DBdelete_triggers_by_itemid(int itemid)
 
 void DBdelete_trends_by_itemid(int itemid)
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 
 	sprintf(sql,"delete from trends where itemid=%d", itemid);
 	DBexecute(sql);
@@ -638,7 +638,7 @@ void DBdelete_trends_by_itemid(int itemid)
 
 void DBdelete_history_by_itemid(int itemid)
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 
 	sprintf(sql,"delete from history where itemid=%d", itemid);
 	DBexecute(sql);
@@ -648,7 +648,7 @@ void DBdelete_history_by_itemid(int itemid)
 
 void DBdelete_item(int itemid)
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBdelete_item(%d)", itemid);
 
@@ -665,7 +665,7 @@ void DBdelete_item(int itemid)
 void DBdelete_host(int hostid)
 {
 	int	i, itemid;
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 	DB_RESULT	*result;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBdelete_host(%d)", hostid);
@@ -691,7 +691,7 @@ void DBdelete_host(int hostid)
 void DBupdate_triggers_status_after_restart(void)
 {
 	int	i;
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 	int	triggerid, lastchange;
 	int	now;
 
@@ -735,7 +735,7 @@ void DBupdate_triggers_status_after_restart(void)
 void DBupdate_host_status(int hostid,int status,int clock)
 {
 	DB_RESULT	*result;
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 	int	disable_until;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In update_host_status()");
@@ -808,7 +808,7 @@ void DBupdate_host_status(int hostid,int status,int clock)
 
 int	DBupdate_item_status_to_notsupported(int itemid)
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBupdate_item_status_to_notsupported()");
 
@@ -822,7 +822,7 @@ int	DBupdate_item_status_to_notsupported(int itemid)
 int	DBadd_trend(int itemid, double value, int clock)
 {
 	DB_RESULT	*result;
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 	int	hour;
 	int	num;
 	double	value_min, value_avg, value_max;	
@@ -860,7 +860,7 @@ int	DBadd_trend(int itemid, double value, int clock)
 
 int	DBadd_history(int itemid, double value, int clock)
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history()");
 
@@ -874,7 +874,7 @@ int	DBadd_history(int itemid, double value, int clock)
 
 int	DBadd_history_str(int itemid, char *value, int clock)
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_str()");
 
@@ -887,7 +887,7 @@ int	DBadd_history_str(int itemid, char *value, int clock)
 int	DBget_items_count(void)
 {
 	int	res;
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 	DB_RESULT	*result;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_items_count()");
@@ -913,7 +913,7 @@ int	DBget_items_count(void)
 int	DBget_triggers_count(void)
 {
 	int	res;
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 	DB_RESULT	*result;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_triggers_count()");
@@ -939,7 +939,7 @@ int	DBget_triggers_count(void)
 int	DBget_items_unsupported_count(void)
 {
 	int	res;
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 	DB_RESULT	*result;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_items_unsupported_count()");
@@ -965,7 +965,7 @@ int	DBget_items_unsupported_count(void)
 int	DBget_history_count(void)
 {
 	int	res;
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 	DB_RESULT	*result;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_history_count()");
@@ -991,7 +991,7 @@ int	DBget_history_count(void)
 int	DBget_trends_count(void)
 {
 	int	res;
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 	DB_RESULT	*result;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_trends_count()");
@@ -1017,7 +1017,7 @@ int	DBget_trends_count(void)
 int	DBget_queue_count(void)
 {
 	int	res;
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 	DB_RESULT	*result;
 	int	now;
 
@@ -1045,7 +1045,7 @@ int	DBget_queue_count(void)
 int	DBadd_alert(int actionid, int mediatypeid, char *sendto, char *subject, char *message)
 {
 	int	now;
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_alert()");
 
@@ -1068,7 +1068,7 @@ void	DBvacuum(void)
 			"stats",
 			NULL};
 
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 	char	*table;
 	int	i;
 #ifdef HAVE_FUNCTION_SETPROCTITLE
