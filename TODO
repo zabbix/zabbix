@@ -4,6 +4,7 @@
  - start&end time in time navigation
  - add Igor's patches
  - add Charlea RedHat startup scripts
+
  - different colors and line styles for map connectors
 
  - mess with user groups when running under root
