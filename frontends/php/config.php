@@ -284,32 +284,20 @@
 		table_begin();
 		table_header(array(S_ID,S_DESCRIPTION_SMALL,S_ACTIONS));
 
-		$result=DBselect("select mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path from media_type mt order by mt.type");
+		$result=DBselect("select escalationid, name from escalations order by name");
 		$col=0;
 		while($row=DBfetch($result))
 		{
-			if($row["type"]==0)
-			{
-				$type=S_EMAIL;
-			}
-			else if($row["type"]==1)
-			{
-				$type=S_SCRIPT;
-			}
-			else
-			{
-				$type=S_UNKNOWN;
-			}
-			$actions="<a href=\"config.php?config=1&register=change&mediatypeid=".$row["mediatypeid"]."\">".S_CHANGE."</a>";
+			$actions="<a href=\"config.php?config=2&register=change&escalationid=".$row["escalationid"]."\">".S_CHANGE."</a>";
 			table_row(array(
-				$row["mediatypeid"],
-				$row["description"],
+				$row["escalationid"],
+				$row["name"],
 				$actions),$col++);
 		}
 		if(DBnum_rows($result)==0)
 		{
 				echo "<TR BGCOLOR=#EEEEEE>";
-				echo "<TD COLSPAN=4 ALIGN=CENTER>".S_NO_MEDIA_TYPES_DEFINED."</TD>";
+				echo "<TD COLSPAN=3 ALIGN=CENTER>".S_NO_ESCALATION_RULES_DEFINED."</TD>";
 				echo "<TR>";
 		}
 		table_end();
