@@ -1,7 +1,5 @@
 1.0:
 
- - check simple check FTP under Mandrake 9.0: https://sourceforge.net/forum/message.php?msg_id=2410500
-
 Under Solaris:
 
 -I/home/spath/net-snmp-5.0.9/include/net-snmp
@@ -14,6 +12,7 @@ and
 should read
 -L/home/spath/net-snmp-5.0.9/lib
 
+ - check simple check FTP under Mandrake 9.0: https://sourceforge.net/forum/message.php?msg_id=2410500
  - improve actions.php to make selection of trigger, host, hosts on the top
  - navigation bar for all graphs and screens
  - make support for "Clone"

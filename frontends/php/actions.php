@@ -140,8 +140,14 @@
 
 		if($row["scope"] == 1)
 		{
-			$sql="select * from actions a,triggers t,hosts h,functions f,items i where a.triggerid=t.triggerid and f.triggerid=t.triggerid and i.itemid=f.itemid and h.hostid=i.hostid and t.triggerid=".$HTTP_GET_VARS["triggerid"]." and a.scope=1";
-			echo $sql;
+//			$sql="select * from actions a,triggers t,hosts h,functions f,items i where a.triggerid=t.triggerid and f.triggerid=t.triggerid and i.itemid=f.itemid and h.hostid=i.hostid and t.triggerid=".$HTTP_GET_VARS["triggerid"]." and a.scope=1";
+			$sql="select h.hostid  from triggers t,hosts h,functions f,items i where f.triggerid=t.triggerid and i.itemid=f.itemid and h.hostid=i.hostid and t.triggerid=".$HTTP_GET_VARS["triggerid"];
+//			echo $sql;
+			$result2=DBselect($sql);
+			if(DBnum_rows($result2)==0)	continue;
+			$row2=DBfetch($result2);
+			$sql="select * from actions a,triggers t,hosts h,functions f,items i where a.triggerid=t.triggerid and f.triggerid=t.triggerid and i.itemid=f.itemid and h.hostid=i.hostid and t.triggerid=".$row["triggerid"]." and a.scope=1 and h.hostid=".$row2["hostid"];
+//			echo $sql;
 			$result2=DBselect($sql);
 			if(DBnum_rows($result2)==0)	continue;
 		}
