@@ -881,7 +881,6 @@
 			$yaxismax=$row["yaxismax"];
 		}
 
-		echo "<br>";
 		show_table2_header_begin();
 		echo S_GRAPH;
 

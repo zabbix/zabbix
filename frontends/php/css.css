@@ -146,6 +146,16 @@ td,tr
 	color: #00AA00;
 }
 
+A.off:link
+{
+	color: #00AA00;
+}
+
+A.on:link
+{
+	color: #AA0000;
+}
+
 .on
 {
 	color: #AA0000;
@@ -199,19 +209,19 @@ A.footer
 	color:#CCCCCC;
 }
 
-	A {font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10pt}
-   	A:link {color:black; text-decoration: none; }
-	A:visited {color:black; text-decoration: none; }
-	A:hover {color:black; text-decoration: underline; }
-	A:active {color:black; text-decoration: underline;}
+A {font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10pt}
+A:link {color:black; text-decoration: none; }
+A:visited {color:black; text-decoration: none; }
+A:hover {color:black; text-decoration: underline; }
+A:active {color:black; text-decoration: underline;}
 
-	P {font-family:Verdana, Arial, Helvetica, sans-serif;font-size:8pt; }
-   	P:link {color:black; text-decoration: underline; }
-	P:visited {color:black; text-decoration: none; }
-	P:hover {color:black; text-decoration: none;}
-	P:active {color:black; text-decoration: underline;}
-	p.uppercase {text-transform: uppercase}
-	p.margin {margin-left: 10pt}
+P {font-family:Verdana, Arial, Helvetica, sans-serif;font-size:8pt; }
+P:link {color:black; text-decoration: underline; }
+P:visited {color:black; text-decoration: none; }
+P:hover {color:black; text-decoration: none;}
+P:active {color:black; text-decoration: underline;}
+p.uppercase {text-transform: uppercase}
+p.margin {margin-left: 10pt}
 	
 	
 	
