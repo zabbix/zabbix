@@ -755,7 +755,7 @@ int	evaluate_FUNCTION_thread(MYSQL *database, char *value,DB_ITEM *item,char *fu
 			value_float=value_float/(1024*1024*1024);
 		}
 		zabbix_log( LOG_LEVEL_WARNING, "Value [%s] [%f] Suffix [%s] Units [%s]",value,value_float,suffix,item->units);
-		if(cmp_double(round(value_float), value_float) == 0)
+		if(cmp_double((double)round(value_float), value_float) == 0)
 		{
                 	snprintf(value, MAX_STRING_LEN-1, "%.0f %s%s", value_float, suffix, item->units);
 		}
@@ -1014,7 +1014,7 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
 			value_float=value_float/(1024*1024*1024);
 		}
 		zabbix_log( LOG_LEVEL_WARNING, "Value [%s] [%f] Suffix [%s] Units [%s]",value,value_float,suffix,item->units);
-		if(cmp_double(round(value_float), value_float) == 0)
+		if(cmp_double((double)round(value_float), value_float) == 0)
 		{
                 	snprintf(value, MAX_STRING_LEN-1, "%.0f %s%s", value_float, suffix, item->units);
 		}

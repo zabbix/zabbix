@@ -1,5 +1,6 @@
 Changes for 1.1alpha1:
 
+ - new include/snprintf.[c|h] (Alexei)
  - send date as part of email alerts (Alexei)
  - added SuSE 9.1 startup scripts. Thanks to A.Tophofen. (Alexei)
  - change of architecture to multi-threaded model (Alexei)
