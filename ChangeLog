@@ -1,5 +1,6 @@
 Changes for 1.1alpha3:
 
+ - added special item zabbix[log] (Alexei)
  - calculate items.nextcheck as nextcheck+delay (Alexei)
  - fixed time navigation for user-defined graphs (Alexei)
  - added link to ZABBIX manual from all forms (Alexei)
