@@ -1323,7 +1323,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
-			$serviceid2=add_service($row["description"],$row["triggerid"],"on");
+			$serviceid2=add_service($row["description"],$row["triggerid"],"on",0);
 			add_service_link($serviceid2,$serviceid,0);
 		}
 		return	1;
@@ -2994,12 +2994,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<tr>";
 		echo "<td bgcolor=\"#000000\">";
 		echo "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\" width=\"100%\" bgcolor=\"#666666\">";
-		echo "<tr><td align=center width=\"90%\">";
+		echo "<tr><td align=center>";
 		echo "<font face=\"Arial,Helvetica\" size=1>";
 		echo "<a href=\"http://zabbix.sourceforge.net\">ZABBIX</a> Copyright 2000,2001,2002 by <a href=\"mailto:alex@gobbo.caves.lv\">Alexei Vladishev</a>";
 		echo "</font>";
 		echo "</td>";
-		echo "<td align=right>";
+		echo "<td align=right width=\"15%\">";
 		echo "<font size=-1>| Connected as ".$USER_DETAILS["alias"];
 		echo "</td>";
 		echo "</tr>";
