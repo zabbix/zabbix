@@ -1,3 +1,8 @@
+Changes for 1.0beta2:
+
+ - fix of parameter Server in zabbix_agentd.conf (Alexei)
+ - fix of System Map image (Alexei)
+
 Changes for 1.0beta1:
 
  - added startup scripts for RedHat. Thanks to Charlie Collins. (Alexei) 
