@@ -60,7 +60,7 @@
 #	ImageFilledRectangle($im,0,0,$width,$height,$black);
 	ImageFilledRectangle($im,0,0,$width,$height,$white);
 
-	if(!isset($HTTP_GET_VARS["sysmapid"]))
+	if(!isset($HTTP_GET_VARS["border"]))
 	{
 		ImageRectangle($im,0,0,$width-1,$height-1,$black);
 	}
