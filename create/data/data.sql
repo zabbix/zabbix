@@ -168,6 +168,7 @@ INSERT INTO items VALUES (10087,0,'','',161,10001,'Outgoing traffic on interface
 INSERT INTO items VALUES (10088,0,'','',161,10001,'Outgoing traffic on interface eth1 (5min)','netloadout5[eth1]',10,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
 INSERT INTO items VALUES (10089,0,'','',161,10001,'Outgoing traffic on interface eth1 (15min)','netloadout15[eth1]',20,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
 
+
 INSERT INTO items VALUES (10400,0,'','',161,10001,'Number of read operations on disk hda (1min)','disk_read_ops1[hda]',5,30,0,0,NULL,NULL,NULL,0,0,'','',0);
 INSERT INTO items VALUES (10401,0,'','',161,10001,'Number of read operations on disk hda (5min)','disk_read_ops5[hda]',10,30,0,0,NULL,NULL,NULL,0,0,'','',0);
 INSERT INTO items VALUES (10402,0,'','',161,10001,'Number of read operations on disk hda (15min)','disk_read_ops15[hda]',20,30,0,0,NULL,NULL,NULL,0,0,'','',0);
@@ -181,6 +182,14 @@ INSERT INTO items VALUES (10408,0,'','',161,10001,'Number of read operations on 
 INSERT INTO items VALUES (10409,0,'','',161,10001,'Number of write operations on disk hdb (1min)','disk_write_ops1[hdb]',5,30,0,0,NULL,NULL,NULL,0,0,'','',0);
 INSERT INTO items VALUES (10410,0,'','',161,10001,'Number of write operations on disk hdb (5min)','disk_write_ops5[hdb]',10,30,0,0,NULL,NULL,NULL,0,0,'','',0);
 INSERT INTO items VALUES (10411,0,'','',161,10001,'Number of write operations on disk hdb (15min)','disk_write_ops15[hdb]',20,30,0,0,NULL,NULL,NULL,0,0,'','',0);
+INSERT INTO items VALUES (10412,0,'','',161,10001,'Used disk space on /','diskused[/]',30,30,0,0,NULL,NULL,NULL,0,0,'','bytes',1);
+INSERT INTO items VALUES (10413,0,'','',161,10001,'Used disk space on /opt','diskused[/opt]',30,30,0,0,NULL,NULL,NULL,0,0,'','bytes',1);
+INSERT INTO items VALUES (10414,0,'','',161,10001,'Used disk space on /var','diskused[/var]',30,30,0,0,NULL,NULL,NULL,0,0,'','bytes',1);
+INSERT INTO items VALUES (10415,0,'','',161,10001,'Used disk space on /tmp','diskused[/tmp]',30,30,0,0,NULL,NULL,NULL,0,0,'','bytes',1);
+INSERT INTO items VALUES (10416,0,'','',161,10001,'Used disk space on /usr','diskused[/usr]',30,30,0,0,NULL,NULL,NULL,0,0,'','bytes',1);
+INSERT INTO items VALUES (10417,0,'','',161,10001,'Used disk space on /home','diskused[/home]',30,30,0,0,NULL,NULL,NULL,0,0,'','bytes',1);
+
+
 
 INSERT INTO items VALUES (10090,0,'','',161,10002,'Free memory','memory[free]',30,30,0,0,NULL,NULL,NULL,0,0,'','bytes',0);
 INSERT INTO items VALUES (10091,0,'','',161,10002,'Free disk space on c:','diskfree[c:]',30,30,0,0,NULL,NULL,NULL,0,0,'','bytes',1);
