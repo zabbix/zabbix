@@ -45,7 +45,6 @@
 
 #include "functions.h"
 #include "expression.h"
-#include "email.h"
 
 /* Delete trailing zeroes */
 /* 10.0100 -> 10.01, 10. -> 10 */

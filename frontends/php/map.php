@@ -251,12 +251,12 @@
 			else if($count>1)
 			{
 				$color=$red;
-				$label=$count." problems";
+				$label=$count." ".S_PROBLEMS_SMALL;
 			}
 			else
 			{
 				$color=$darkgreen;
-				$label="OK";
+				$label=S_OK_BIG;
 			}
 		}
 		$x1=$x+ImageSX($img)/2-ImageFontWidth(2)*strlen($label)/2;
@@ -269,7 +269,7 @@
 #		ImageDestroy($img);
 	}
 
-	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, "http://www.zabbix.com", $gray);
+	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, S_ZABBIX_URL, $gray);
 
 	ImagePng($im);
 	ImageDestroy($im);

@@ -20,14 +20,14 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = "Alert history";
+	$page["title"] = S_ALERT_HISTORY;
 	$page["file"] = "alerts.php";
 	show_header($page["title"],30,0);
 ?>
 
 <?php
 	show_table_header_begin();
-	echo "ALERT HISTORY";
+	echo S_ALERT_HISTORY_BIG;
  
 	show_table_v_delimiter(); 
 ?>
@@ -42,18 +42,20 @@
                 echo "[<A HREF=\"alerts.php?start=".($HTTP_GET_VARS["start"]-100)."\">";
                 echo "Show previous 100</A>] ";
                 echo "[<A HREF=\"alerts.php?start=".($HTTP_GET_VARS["start"]+100)."\">";
-                echo "Show next 100</A>]";
+                echo S_SHOW_NEXT_100;
+		echo "</A>]";
         }
         else
         {
                 echo "[<A HREF=\"alerts.php?start=100\">";
-                echo "Show next 100</A>]";
+                echo S_SHOW_NEXT_100;
+		echo "</A>]";
         }
 
 	show_table_header_end();
 	echo "<br>";
 
-	show_table_header("ALERTS");
+	show_table_header(S_ALERTS_BIG);
 ?>
 
 
@@ -76,12 +78,12 @@
 
 	echo "<TABLE WIDTH=100% align=center BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR>";
-	echo "<TD WIDTH=10%><b>Time</b></TD>";
-	echo "<TD WIDTH=5%><b>Type</b></TD>";
-	echo "<TD WIDTH=5%><b>Status</b></TD>";
-	echo "<TD WIDTH=15%><b>Recipient(s)</b></TD>";
-	echo "<TD><b>Subject</b></TD>";
-	echo "<TD><b>Message</b></TD>";
+	echo "<TD WIDTH=10%><b>".S_TIME."</b></TD>";
+	echo "<TD WIDTH=5%><b>".S_TYPE."</b></TD>";
+	echo "<TD WIDTH=5%><b>".S_STATUS."</b></TD>";
+	echo "<TD WIDTH=15%><b>".S_RECIPIENTS."</b></TD>";
+	echo "<TD><b>".S_SUBJECT."</b></TD>";
+	echo "<TD><b>".S_MESSAGE."</b></TD>";
 	echo "</TR>";
 	$col=0;
 	$zzz=0;
@@ -121,11 +123,11 @@
 		echo "<TD>".$row["description"]."</TD>";
 		if($row["status"] == 1)
 		{
-			echo "<TD><font color=\"00AA00\">sent</font></TD>";
+			echo "<TD><font color=\"00AA00\">".S_SENT."</font></TD>";
 		}
 		else
 		{
-			echo "<TD><font color=\"AA0000\">not sent</font></TD>";
+			echo "<TD><font color=\"AA0000\">".S_NOT_SENT."</font></TD>";
 		}
 		echo "<TD>".htmlspecialchars($row["sendto"])."</TD>";
 		echo "<TD><pre>".htmlspecialchars($row["subject"])."</pre></TD>";
@@ -149,7 +151,7 @@
 	if(DBnum_rows($result)==0)
 	{
 			echo "<TR BGCOLOR=#EEEEEE>";
-			echo "<TD COLSPAN=6 ALIGN=CENTER>-No alerts-</TD>";
+			echo "<TD COLSPAN=6 ALIGN=CENTER>".S_NO_ALERTS."</TD>";
 			echo "<TR>";
 	}
 	echo "</TABLE>";

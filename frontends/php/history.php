@@ -70,7 +70,7 @@
 
 	if(!check_right("Item","R",$HTTP_GET_VARS["itemid"]))
 	{
-		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_footer();
 		exit;
 	}
@@ -103,51 +103,51 @@
 	echo("<DIV ALIGN=CENTER>");
 	if($HTTP_GET_VARS["action"] =="showhistory")
 	{
-		echo("<b>[<A HREF=\"history.php?action=showhistory&itemid=".$HTTP_GET_VARS["itemid"]."\">Last hour graph</A>]</b> ");
+		echo("<b>[<A HREF=\"history.php?action=showhistory&itemid=".$HTTP_GET_VARS["itemid"]."\">".S_LAST_HOUR_GRAPH."</A>]</b> ");
 	}
 	else
 	{
 		$item=get_item_by_itemid($HTTP_GET_VARS["itemid"]);
 		if($item["value_type"] == 0)
 		{
-			echo("<A HREF=\"history.php?action=showhistory&itemid=".$HTTP_GET_VARS["itemid"]."\">Last hour graph</A> ");
+			echo("<A HREF=\"history.php?action=showhistory&itemid=".$HTTP_GET_VARS["itemid"]."\">".S_LAST_HOUR_GRAPH."</A> ");
 		}
 	}
 	if($HTTP_GET_VARS["action"] =="showhistory2")
 	{
-		echo("<b>[<A HREF=\"history.php?action=showhistory2&itemid=".$HTTP_GET_VARS["itemid"]."\">Last hour graph (diff)</A>]</b> ");
+		echo("<b>[<A HREF=\"history.php?action=showhistory2&itemid=".$HTTP_GET_VARS["itemid"]."\">".S_LAST_HOUR_GRAPH_DIFF."</A>]</b> ");
 	}
 	else
 	{
 		$item=get_item_by_itemid($HTTP_GET_VARS["itemid"]);
 		if($item["value_type"] == 0)
 		{
-			echo("<A HREF=\"history.php?action=showhistory2&itemid=".$HTTP_GET_VARS["itemid"]."\">Last hour graph (diff)</A> ");
+			echo("<A HREF=\"history.php?action=showhistory2&itemid=".$HTTP_GET_VARS["itemid"]."\">".S_LAST_HOUR_GRAPH_DIFF."</A> ");
 		}
 	}
 	if($HTTP_GET_VARS["action"] =="showvalues")
 	{
-		echo("<b>[<A HREF=\"history.php?action=showvalues&itemid=".$HTTP_GET_VARS["itemid"]."&period=3600\">Values of last hour</A>]</b> ");
+		echo("<b>[<A HREF=\"history.php?action=showvalues&itemid=".$HTTP_GET_VARS["itemid"]."&period=3600\">".S_VALUES_OF_LAST_HOUR."</A>]</b> ");
 	}
 	else
 	{
-		echo("<A HREF=\"history.php?action=showvalues&itemid=".$HTTP_GET_VARS["itemid"]."&period=3600\">Values of last hour</A> ");
+		echo("<A HREF=\"history.php?action=showvalues&itemid=".$HTTP_GET_VARS["itemid"]."&period=3600\">".S_VALUES_OF_LAST_HOUR."</A> ");
 	}
 	if($HTTP_GET_VARS["action"] =="showfreehist")
 	{
-		echo("<b>[<A HREF=\"history.php?action=showfreehist&itemid=".$HTTP_GET_VARS["itemid"]."\">Values of specified period</A>]</b> ");
+		echo("<b>[<A HREF=\"history.php?action=showfreehist&itemid=".$HTTP_GET_VARS["itemid"]."\">".S_VALUES_OF_SPECIFIED_PERIOD."</A>]</b> ");
 	}
 	else
 	{
-		echo("<A HREF=\"history.php?action=showfreehist&itemid=".$HTTP_GET_VARS["itemid"]."\">Values of specified period</A> ");
+		echo("<A HREF=\"history.php?action=showfreehist&itemid=".$HTTP_GET_VARS["itemid"]."\">".S_VALUES_OF_SPECIFIED_PERIOD."</A> ");
 	}
 	if($HTTP_GET_VARS["action"] =="showplaintxt")
 	{
-		echo("<b>[<A HREF=\"history.php?action=showplaintxt&itemid=".$HTTP_GET_VARS["itemid"]."\">Values in plain text format</A>]</b> ");
+		echo("<b>[<A HREF=\"history.php?action=showplaintxt&itemid=".$HTTP_GET_VARS["itemid"]."\">".S_VALUES_IN_PLAIN_TEXT_FORMAT."</A>]</b> ");
 	}
 	else
 	{
-		echo("<A HREF=\"history.php?action=showplaintxt&itemid=".$HTTP_GET_VARS["itemid"]."\">Values in plaint text format</A> ");
+		echo("<A HREF=\"history.php?action=showplaintxt&itemid=".$HTTP_GET_VARS["itemid"]."\">".S_VALUES_IN_PLAIN_TEXT_FORMAT."</A> ");
 	}
 	echo("</DIV>\n");
 	show_table_header_end();
@@ -191,8 +191,8 @@
 
 		echo "<TABLE BORDER=0 COLS=2 ALIGN=CENTER WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 		echo "<TR>";
-		echo "<TD><B>Clock</B></TD>";
-		echo "<TD><B>Value</B></TD>";
+		echo "<TD><B>".S_CLOCK."</B></TD>";
+		echo "<TD><B>".S_VALUE."</B></TD>";
 		echo "</TR>";
 
 		$item=get_item_by_itemid($HTTP_GET_VARS["itemid"]);

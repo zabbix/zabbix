@@ -48,3 +48,4 @@
 
 	define("RECIPIENT_TYPE_USER",0);
 	define("RECIPIENT_TYPE_GROUP",1);
+?>

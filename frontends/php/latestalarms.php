@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	$page["title"] = "Latest alarms";
+	$page["title"] = S_LATEST_ALARMS;
 	$page["file"] = "latestalarms.php";
 
 	include "include/config.inc.php";
@@ -28,7 +28,7 @@
 
 <?php
 	show_table_header_begin();
-	echo "HISTORY OF ALARMS";
+	echo S_HISTORY_OF_ALARMS_BIG;
  
 	show_table_v_delimiter();
 ?>
@@ -41,20 +41,23 @@
 	if(isset($HTTP_GET_VARS["start"]))
 	{
 		echo "[<A HREF=\"latestalarms.php?start=".($HTTP_GET_VARS["start"]-100)."\">";
-		echo "Show previous 100</A>] ";
+		echo S_SHOW_PREVIOUS_100;
+		echo "</A>] ";
 		echo "[<A HREF=\"latestalarms.php?start=".($HTTP_GET_VARS["start"]+100)."\">";
-		echo "Show next 100</A>]";
+		echo S_SHOW_NEXT_100;
+		echo "</A>]";
 	}
 	else 
 	{
 		echo "[<A HREF=\"latestalarms.php?start=100\">";
-		echo "Show next 100</A>]";
+		echo S_SHOW_NEXT_100;
+		echo "</A>]";
 	}
 
 	show_table_header_end();
 	echo "<br>";
 
-	show_table_header("ALARMS");
+	show_table_header(S_ALARMS_BIG);
 ?>
 
 <FONT COLOR="#000000">
@@ -76,10 +79,10 @@
 
 	echo "<TABLE WIDTH=100% align=center BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR>";
-	echo "<TD width=20%><b>Time</b></TD>";
-	echo "<TD><b>Description</b></TD>";
-	echo "<TD width=10%><b>Value</b></TD>";
-	echo "<TD width=10%><b>Severity</b></TD>";
+	echo "<TD width=20%><b>".S_TIME."</b></TD>";
+	echo "<TD><b>".S_DESCRIPTION."</b></TD>";
+	echo "<TD width=10%><b>".S_VALUE."</b></TD>";
+	echo "<TD width=10%><b>".S_SEVERITY."</b></TD>";
 	echo "</TR>";
 	$col=0;
 	$i=0;
@@ -109,22 +112,22 @@
 //		echo "<TD><a href=\"alarms.php?triggerid=".$row["triggerid"]."\">".htmlspecialchars($description)."</a></TD>";
 		if($row["value"] == 0)
 		{
-			echo "<TD><font color=\"00AA00\">OFF</font></TD>";
+			echo "<TD><font color=\"00AA00\">".S_OFF."</font></TD>";
 		}
 		elseif($row["value"] == 1)
 		{
-			echo "<TD><font color=\"AA0000\">ON</font></TD>";
+			echo "<TD><font color=\"AA0000\">".S_ON."</font></TD>";
 		}
 		else
 		{
-			echo "<TD><font color=\"AAAAAA\">UNKNOWN</font></TD>";
+			echo "<TD><font color=\"AAAAAA\">".S_UNKNOWN_BIG."</font></TD>";
 		}
-		if($row["priority"]==0)         echo "<TD ALIGN=CENTER>Not classified</TD>";
-		elseif($row["priority"]==1)     echo "<TD ALIGN=CENTER>Information</TD>";
-		elseif($row["priority"]==2)     echo "<TD ALIGN=CENTER>Warning</TD>";
-		elseif($row["priority"]==3)     echo "<TD ALIGN=CENTER BGCOLOR=#DDAAAA>Average</TD>";
-		elseif($row["priority"]==4)     echo "<TD ALIGN=CENTER BGCOLOR=#FF8888>High</TD>";
-		elseif($row["priority"]==5)     echo "<TD ALIGN=CENTER BGCOLOR=RED>Disaster !!!</TD>";
+		if($row["priority"]==0)         echo "<TD ALIGN=CENTER>".S_NOT_CLASSIFIED."</TD>";
+		elseif($row["priority"]==1)     echo "<TD ALIGN=CENTER>".S_INFORMATION."</TD>";
+		elseif($row["priority"]==2)     echo "<TD ALIGN=CENTER>".S_WARNING."</TD>";
+		elseif($row["priority"]==3)     echo "<TD ALIGN=CENTER BGCOLOR=#DDAAAA>".S_AVERAGE."</TD>";
+		elseif($row["priority"]==4)     echo "<TD ALIGN=CENTER BGCOLOR=#FF8888>".S_HIGH."</TD>";
+		elseif($row["priority"]==5)     echo "<TD ALIGN=CENTER BGCOLOR=RED>".S_DISASTER."</TD>";
 		else                            echo "<TD ALIGN=CENTER><B>".$row["priority"]."</B></TD>";
 		echo "</TR>";
 		cr();
