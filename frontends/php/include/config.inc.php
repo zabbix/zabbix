@@ -4039,6 +4039,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
                 return  DBexecute($sql);
         }
 
+        function delete_screen_item($screenitemid)
+        {
+                $sql="idelete from screens_items where screenitemid=$screenitemid";
+                return  DBexecute($sql);
+        }
+
 
         function get_drawtype_description($drawtype)
         {
