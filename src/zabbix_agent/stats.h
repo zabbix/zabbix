@@ -22,6 +22,7 @@
 
 #include "interfaces.h"
 #include "diskdevices.h"
+#include "cpustat.h"
 
 void	collect_statistics();
 
