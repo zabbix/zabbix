@@ -1310,17 +1310,24 @@
 		echo "</select>";
 
 		show_table2_v_delimiter();
-		echo "Type (0-Zabbix,1-SNMPv1)";
+		echo "Type";
 		show_table2_h_delimiter();
-		echo "<input name=\"type\" value=\"$type\" size=1>";
-
+		echo "<SELECT NAME=\"type\" value=\"$type\" size=\"1\">";
+		echo "<OPTION VALUE=\"0\"";
+		if($type==0) echo "SELECTED";
+		echo ">Zabbix agent";
+		echo "<OPTION VALUE=\"1\"";
+		if($type==1) echo "SELECTED";
+		echo ">SNMPv1 agent";
+		echo "</SELECT>";
+ 
 		show_table2_v_delimiter();
-		echo "SNMP community";
+		echo "SNMP community (for SNMP only)";
 		show_table2_h_delimiter();
 		echo "<input name=\"snmp_community\" value=\"$snmp_community\" size=16>";
 
 		show_table2_v_delimiter();
-		echo "SNMP OID";
+		echo "SNMP OID (for SNMP only)";
 		show_table2_h_delimiter();
 		echo "<input name=\"snmp_oid\" value=\"$snmp_oid\" size=40>";
 
