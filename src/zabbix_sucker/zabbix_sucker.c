@@ -94,7 +94,7 @@
 
 #ifdef ZABBIX_THREADS
 struct poller_answer {
-        int	status; /* 0 - not received 1 - received */
+        int	status; /* 0 - not received 1 - in processing 2 - received */
         int	itemid;
         int	ret;
 	double	value;
@@ -1076,6 +1076,10 @@ int get_values(void)
 		res = requests[i].ret;
 		value = requests[i].value;
 		strscpy(value_str,requests[i].value_str);
+		if(requests[i].status != 2)
+		{
+			zabbix_log( LOG_LEVEL_WARNING, "sucker: ERROR status [%d] expected [2]", requests[i].status );
+		}
 /*		res = get_value(&value,value_str,&item);*/
 #else
 		res = get_value(&value,value_str,&item);
@@ -1307,6 +1311,8 @@ void *main_poller_loop()
 				if(requests[i].status == 0)
 				{
 //					zabbix_log( LOG_LEVEL_WARNING, "poller: itemid [%d]", atoi(DBget_field(shared_result,i,0)) );
+					if(requests[i].status!=0)
+						zabbix_log( LOG_LEVEL_WARNING, "poller: ERROR status [%d] must be [0] host [%s] key  [%s]", requests[num].status, item.host, item.key);
 					requests[i].status = 1;
 					/* we should retrieve info from shared_result here */
 					itemid=atoi(DBget_field(shared_result,i,0));
@@ -1341,13 +1347,18 @@ void *main_poller_loop()
 				item.value_type=atoi(DBget_field(shared_result,num,17));
 				item.snmp_port=atoi(DBget_field(shared_result,num,19));
 
+				if(requests[num].status!=1)
+					zabbix_log( LOG_LEVEL_WARNING, "poller: ERROR status [%d] must be [1] host [%s] key  [%s]", requests[num].status, item.host, item.key);
 				ret = get_value(&requests[num].value,requests[num].value_str,&item);
 				/* end of do logic */
 
 				pthread_mutex_lock (&poller_mutex);
 				requests[num].ret = ret;
 				if(requests[num].status!=1)
-					zabbix_log( LOG_LEVEL_WARNING, "poller: ERROR status [%d] host [%s] key  [%s]", requests[num].status, item.host, item.key);
+				{
+					zabbix_log( LOG_LEVEL_WARNING, "poller: ERROR2 status [%d] must be [1] host [%s] key [%s] num [%d] processed [%d] request_count [%d]", requests[num].status, item.host, item.key, num, processed, request_count);
+					zabbix_log( LOG_LEVEL_WARNING, "poller: ERROR2 host2 [%s] item.host [%s]", DBget_field(shared_result,num,2), item.host);
+				}
 				requests[num].status = 2;
 				answer_count++;
 //				zabbix_log( LOG_LEVEL_WARNING, "poller: answer count [%d] request count [%d]", answer_count, request_count);
