@@ -1,4 +1,17 @@
 #
+# Table structure for table 'sysmaps'
+#
+
+CREATE TABLE sysmaps (
+  sysmapid		int(4)		NOT NULL auto_increment,
+  name			varchar(128)	DEFAULT '' NOT NULL,
+  width			int(4)		DEFAULT '0' NOT NULL,
+  height		int(4)		DEFAULT '0' NOT NULL,
+  PRIMARY KEY (sysmapid),
+  UNIQUE (name)
+);
+
+#
 # Table structure for table 'config'
 #
 
