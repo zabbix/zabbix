@@ -1,5 +1,6 @@
 HIGH PRIORITY:
 
+ - test everythinkg under Explorer. Especially Graphs,Charts and Maps.
  - add ZBX_ERROR and ZBX_NOTSUPPORTED
  - improve performance of Alarms and Alerts in PHP frontend
  - BUG. Agent return unsupported in case if UserParameter ends by timeout.
