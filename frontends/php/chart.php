@@ -193,17 +193,17 @@
 	}
 
 	$startTime=$minX;
-	if (($maxX-$maxY) < 300)
+	if (($maxX-$minX) < 300)
 		$precTime=10;
-	elseif (($maxX-$maxY) < 3600 )
+	elseif (($maxX-$minX) < 3600 )
 		$precTime=60;
 	else
 		$precTime=300;
 
-	if (($maxX-$maxY) < 1200 )
+	if (($maxX-$minX) < 1200 )
 		$dateForm="H:i:s";
 	else
-		$dateForm="H:i";
+		$dateForm="H:i:s";
 
 	$correctTime=$startTime % $precTime;
 	$stepTime=ceil(ceil(($maxX-$minX)/20)/$precTime)*(1.0*$precTime);
@@ -235,11 +235,13 @@
 		}
 		for($j=$stepTime-$correctTime;$j<=($maxX-$minX);$j+=$stepTime)
 		{
-			ImageStringUp($im,0,$shiftX+($sizeX*$j)/($maxX-$minX),$shiftY+$sizeY+43,date($dateForm,$startTime+$j),$black);
+			ImageStringUp($im,0,$shiftX+($sizeX*$j)/($maxX-$minX),$shiftY+$sizeY+53,date($dateForm,$startTime+$j),$black);
 		}
 
-		ImageString($im, 1,10,                $sizeY+$shiftY+3, date("dS of F Y",$minX) , $darkred);
-		ImageString($im, 1,$sizeX+$shiftX-90,$sizeY+$shiftY+3, date("dS of F Y",$maxX) , $darkred);
+//		ImageString($im, 1,10,                $sizeY+$shiftY+3, date("dS of F Y",$minX) , $darkred);
+//		ImageString($im, 1,$sizeX+$shiftX-90,$sizeY+$shiftY+3, date("dS of F Y",$maxX) , $darkred);
+		ImageString($im, 1,10,                $sizeY+$shiftY+5, date("dS of F Y H:i:s",$minX) , $darkred);
+		ImageString($im, 1,$sizeX+$shiftX-148,$sizeY+$shiftY+5, date("dS of F Y H:i:s",$maxX) , $darkred);
 	}
 	else
 	{
