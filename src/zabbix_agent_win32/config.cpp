@@ -212,6 +212,23 @@ BOOL ReadConfig(void)
                       sourceLine);
          }
       }
+      else if (!stricmp(buffer,"MaxCollectorProcessingTime"))
+      {
+         int tm;
+
+         tm=atoi(ptr);
+         if ((tm>0)&&(tm<=500))
+         {
+            confMaxProcTime=tm;
+         }
+         else
+         {
+            errors++;
+            if (optStandalone)
+               printf("Error in configuration file, line %d: invalid collector sample processing time value (%d milliseconds)\n",
+                      sourceLine,tm);
+         }
+      }
       else if ((!stricmp(buffer,"PidFile"))||(!stricmp(buffer,"NoTimeWait"))||
                (!stricmp(buffer,"StartAgents"))||(!stricmp(buffer,"DebugLevel")))
       {
