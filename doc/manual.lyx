@@ -24,13 +24,13 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.08)
+Zabbix Reference Manual for version 1.0 (draft v1.09)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-20 January 2002
+22 January 2002
 \layout Abstract
 
 The document is Reference Manual for Zabbix version 1.0.
@@ -1888,7 +1888,7 @@ Zabix
  processes.
  See 
 \emph on 
-misc/conv/ 
+misc/conf/ 
 \emph default 
 for examples.
 \layout Itemize
@@ -3226,7 +3226,7 @@ Description
 
 \layout Standard
 
-HousekeepingFrequency
+HousekeepingFrequencyServer
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -3329,41 +3329,7 @@ Debug level
 
 \layout Standard
 
-DBName
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Yes
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
--
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-\align left 
-Database name
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-DBUser
+DBuser
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -3382,7 +3348,7 @@ No
 NULL
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -3391,7 +3357,7 @@ User name for connecting to the database
 \end_inset 
 </cell>
 </row>
-<row topline="true" bottomline="true" newpage="false">
+<row topline="true" bottomline="false" newpage="false">
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -3416,12 +3382,46 @@ No
 NULL
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
 
 User's password
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+DBName
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Yes
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Database name
 \end_inset 
 </cell>
 </row>
@@ -3824,9 +3824,9 @@ zabbix_trapper
 <lyxtabular version="2" rows="5" columns="4">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
-<column alignment="center" valignment="top" leftline="false" rightline="true" width="" special="">
-<column alignment="left" valignment="top" leftline="false" rightline="true" width="8cm" special="">
 <row topline="true" bottomline="true" newpage="false">
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
@@ -3836,7 +3836,7 @@ zabbix_trapper
 Parameter
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -3844,7 +3844,7 @@ Parameter
 Mandatory
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -3852,7 +3852,7 @@ Mandatory
 Default value
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -3870,7 +3870,7 @@ Description
 DebugLevel
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -3878,7 +3878,7 @@ DebugLevel
 No
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -3886,12 +3886,12 @@ No
 2
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
 
-Debug level 
+Debug level
 \end_inset 
 </cell>
 </row>
@@ -3904,7 +3904,7 @@ Debug level
 DBName
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -3912,7 +3912,7 @@ DBName
 Yes
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -3920,11 +3920,11 @@ Yes
 -
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
-\align left 
+
 Database name
 \end_inset 
 </cell>
@@ -3938,7 +3938,7 @@ Database name
 DBUser
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -3946,7 +3946,7 @@ DBUser
 No
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -3954,7 +3954,7 @@ No
 NULL
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -3972,7 +3972,7 @@ User name for connecting to the database
 DBPassword
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -3980,7 +3980,7 @@ DBPassword
 No
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -3988,7 +3988,7 @@ No
 NULL
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -4028,9 +4028,9 @@ zabbix_trapperd
 <lyxtabular version="2" rows="6" columns="4">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
-<column alignment="center" valignment="top" leftline="false" rightline="true" width="" special="">
-<column alignment="left" valignment="top" leftline="false" rightline="true" width="8cm" special="">
 <row topline="true" bottomline="true" newpage="false">
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
@@ -4040,7 +4040,7 @@ zabbix_trapperd
 Parameter
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -4048,7 +4048,7 @@ Parameter
 Mandatory
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -4056,7 +4056,7 @@ Mandatory
 Default value
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -4074,7 +4074,7 @@ Description
 DebugLevel
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -4082,7 +4082,7 @@ DebugLevel
 No
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -4090,12 +4090,12 @@ No
 2
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
 
-Debug level 
+Debug level
 \end_inset 
 </cell>
 </row>
@@ -4108,7 +4108,7 @@ Debug level
 StartTrappers
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -4116,7 +4116,7 @@ StartTrappers
 No
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -4124,7 +4124,7 @@ No
 5
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -4142,7 +4142,7 @@ Number of trappers to start
 DBName
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -4150,7 +4150,7 @@ DBName
 Yes
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -4158,11 +4158,11 @@ Yes
 -
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
-\align left 
+
 Database name
 \end_inset 
 </cell>
@@ -4176,7 +4176,7 @@ Database name
 DBUser
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -4184,7 +4184,7 @@ DBUser
 No
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -4192,7 +4192,7 @@ No
 NULL
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -4210,7 +4210,7 @@ User name for connecting to the database
 DBPassword
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -4218,7 +4218,7 @@ DBPassword
 No
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -4226,7 +4226,7 @@ No
 NULL
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -4265,22 +4265,14 @@ You can use them to create complex logical tests regarding monitored statistics.
 The following operators are supported for triggers:
 \layout Description
 
+> more than
+\layout Description
+
+< less than
+\layout Description
+
 = is equal.
  The operator is defined as A=B <=> (A>B-0.000001) and (A<B+0.000001)
-\layout Description
-
-
-\latex no_latex 
->
-\latex default 
- 
-\latex no_latex 
-more than
-\layout Description
-
-
-\latex no_latex 
-< less than
 \layout Description
 
 
@@ -5068,33 +5060,27 @@ Supported Parameters by Platform
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="15mm" special="">
 <column alignment="left" valignment="top" leftline="true" rightline="true" width="15mm" special="">
 <row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
 
-
-\lang english
-Parameter/sysem
+Parameter/system
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
-\align center 
 
-\lang english
-Debian Woody(i386)
+Debian Woody (i386)
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
-\align center 
 
-\lang english
 Debian Potato (i386)
 \end_inset 
 </cell>
@@ -5102,24 +5088,15 @@ Debian Potato (i386)
 \begin_inset Text
 
 \layout Standard
-\align center 
 
-\lang english
-FreeBSD 4.3
-\layout Standard
-\align center 
-
-\lang english
-(i386)
+FreeBSD 4.3 (i386)
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
-\align center 
 
-\lang english
 Solaris 5.8 (Ultra-60)
 \end_inset 
 </cell>
@@ -5127,20 +5104,16 @@ Solaris 5.8 (Ultra-60)
 \begin_inset Text
 
 \layout Standard
-\align center 
 
-\lang english
-HP-UX 11.00 (9000/ 800)
+HP-UX 11.00 (9000/800)
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
-\align center 
 
-\lang english
-AIX 4.3 (PowerPC)
+AIX 4.3 (Power PC)
 \end_inset 
 </cell>
 </row>
@@ -8196,7 +8169,8 @@ Zabbix
 \layout Subsection
 
 CONFIG 
-\newline 
+\layout Standard
+
 The table contains global configuration parameters.
 \layout Description
 
@@ -8404,8 +8378,9 @@ alerts
 
 \layout Subsection
 
-GRAPHS_ITEMS 
-\newline 
+GRAPHS_ITEMS
+\layout Standard
+
 The table contains list of monitored items belonging to graph.
 \layout Description
 
@@ -8553,8 +8528,9 @@ Color
 
 \layout Subsection
 
-GRAPHS 
-\newline 
+GRAPHS
+\layout Standard
+
 The table contains list of user-defined graphs (charts).
 \layout Description
 
@@ -8702,8 +8678,9 @@ Graph height
 
 \layout Subsection
 
-SYSMAPS_LINKS 
-\newline 
+SYSMAPS_LINKS
+\layout Standard
+
 The table contains list of connectors between hosts diplayed on network
  map.
 \layout Description
@@ -8852,8 +8829,9 @@ ID of second host
 
 \layout Subsection
 
-SYSMAPS_HOSTS 
-\newline 
+SYSMAPS_HOSTS
+\layout Standard
+
 The table contains definition of host displayed on network map.
 \layout Description
 
@@ -9053,8 +9031,9 @@ Coordinate Y
 
 \layout Subsection
 
-SYSMAPS 
-\newline 
+SYSMAPS
+\layout Standard
+
 The table contains list of defined network maps
 \layout Description
 
@@ -9202,8 +9181,9 @@ Height of the map
 
 \layout Subsection
 
-ACTIONS 
-\newline 
+ACTIONS
+\layout Standard
+
 The table contains list of actions to be applied if trigger change its state.
  
 \layout Standard
@@ -9455,8 +9435,9 @@ Time when the message should be send next time
 
 \layout Subsection
 
-GROUPS 
-\newline 
+GROUPS
+\layout Standard
+
 This table contains list of user groups.
 \layout Description
 
@@ -9552,8 +9533,9 @@ Unique name of the group
 
 \layout Subsection
 
-ALARMS 
-\newline 
+ALARMS
+\layout Standard
+
 This table contains history of changes of trigger states.
  When a trigger changes its state, new record is added to the table.
 \layout Description
@@ -9676,8 +9658,9 @@ If '1' - the trigger became true, '0' - otherwise
 
 \layout Subsection
 
-FUNCTIONS 
-\newline 
+FUNCTIONS
+\layout Standard
+
 The table contains list of simple functions used in trigger expressions.
 \layout Description
 
@@ -9878,8 +9861,9 @@ Parameter to the function.
 
 \layout Subsection
 
-HISTORY 
-\newline 
+HISTORY
+\layout Standard
+
 This table contains history of values of items.
 \layout Standard
 
@@ -10001,8 +9985,9 @@ Value of the item at specific time
 
 \layout Subsection
 
-ITEMS 
-\newline 
+ITEMS
+\layout Standard
+
 This table contains definitions of monitored items.
 \layout Description
 
@@ -10453,8 +10438,9 @@ Status of the item: 0 - active, 1 - disabled, 2 - trapped, 3 - not supported
 
 \layout Subsection
 
-MEDIA 
-\newline 
+MEDIA
+\layout Standard
+
 This table contains list of available medias for given user.
 \layout Description
 
@@ -10628,8 +10614,9 @@ Status of the media: 0 - active, 1 - disabled
 
 \layout Subsection
 
-TRIGGERS 
-\newline 
+TRIGGERS
+\layout Standard
+
 The table contains list of triggers.
 \layout Description
 
@@ -10907,8 +10894,9 @@ Comments
 
 \layout Subsection
 
-USERS 
-\newline 
+USERS
+\layout Standard
+
 The table contains list of Zabbix's users.
  
 \layout Description
@@ -11109,8 +11097,9 @@ MD5 hash of user's password
 
 \layout Subsection
 
-HOSTS 
-\newline 
+HOSTS
+\layout Standard
+
 The table contains list of monitored Hosts
 \layout Description
 
@@ -11258,8 +11247,9 @@ In case if status is unreachabe, do not check host until this time
 
 \layout Subsection
 
-ITEMS_TEMPLATE 
-\newline 
+ITEMS_TEMPLATE
+\layout Standard
+
 The table contains list of supported items.
 \layout Description
 
@@ -11407,8 +11397,9 @@ How often the key should be sent
 
 \layout Subsection
 
-TRIGGERS_TEMPLATE 
-\newline 
+TRIGGERS_TEMPLATE
+\layout Standard
+
 The table contains sample list of triggers for each template item.
 \layout Standard
 
@@ -11556,8 +11547,9 @@ Expression for the trigger
 
 \layout Subsection
 
-SERVICES 
-\newline 
+SERVICES
+\layout Standard
+
 The table contains user-defined list of services.
 \layout Standard
 
@@ -11705,8 +11697,9 @@ Trigger ID, if the service is linked to the trigger
 
 \layout Subsection
 
-SERVICES_LINKS 
-\newline 
+SERVICES_LINKS
+\layout Standard
+
 The table contains links between services.
 \layout Standard
 
@@ -11949,6 +11942,14 @@ OLIVER SIEGMAR
 \layout Standard
 
 Fixes in SQL statements of WEB frontend.
+\layout Itemize
+
+
+\noun on 
+CHARLIE COLLINS
+\layout Standard
+
+Startup scripts.
 \layout Subsection
 
 Supporters to Zabbix
