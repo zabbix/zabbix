@@ -2295,6 +2295,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return 0;
 		}
 
+ 		if (!eregi('^([0-9a-zA-Z\_\.-]+)$', $host, &$arr)) 
+		{
+			$ERROR_MSG="Hostname should contain 0-9a-zA-Z_.- characters only";
+			return 0;
+		}
+
 		if(($template=="true") && ($host_templateid!=0))
 		{
 			$ERROR_MSG="Choose either 'Add zabbix_agent parameters' or 'Use host as template' option";
@@ -2341,6 +2347,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		if(!check_right("Host","U",$hostid))
 		{
 			$ERROR_MSG="Insufficient permissions";
+			return 0;
+		}
+
+ 		if (!eregi('^([0-9a-zA-Z\_\.-]+)$', $host, &$arr)) 
+		{
+			$ERROR_MSG="Hostname should contain 0-9a-zA-Z_.- characters only";
 			return 0;
 		}
 

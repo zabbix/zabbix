@@ -1,6 +1,8 @@
 #ifndef ZABBIX_STATS_H
 #define ZABBIX_STATS_H
 
+#define	MAX_INTERFACE	8
+
 #define INTERFACE struct interface_type
 INTERFACE
 {

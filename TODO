@@ -8,7 +8,6 @@ HIGH PRIORITY:
    is NULL
  - support fo netload under other platforms
  - support for disk loads
- - new host name should not contain space and other character not allowed by trigger expression
  - better monitoring of log files
  - IT Helpdesk
  - SNMP trapping
