@@ -152,15 +152,15 @@
 			echo "<TD>";
 			if($row["status"] == 1)
 			{
-				echo "<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=0&hostid=".$row["hostid"]."\">Disabled</a>";
+				echo "<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=0&hostid=".$row["hostid"]."\"><font color=\"AA0000\">Disabled</font></a>";
 			}
 			else if($row["status"] == 2)
 			{
-				echo "<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=1&hostid=".$row["hostid"]."\">Unknown</a>";
+				echo "<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=1&hostid=".$row["hostid"]."\"><font color=\"AAAAAA\">Unknown</font></a>";
 			}
 			else
 			{
-				echo "<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=1&hostid=".$row["hostid"]."\">Enabled</a>";
+				echo "<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=1&hostid=".$row["hostid"]."\"><font color=\"00AA00\">Enabled</font></a>";
 			}
 			$expression=rawurlencode($row["expression"]);
 			echo "</TD>";

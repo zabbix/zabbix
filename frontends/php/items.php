@@ -181,46 +181,46 @@
 
 			
 			echo "<td align=center>";
-			if(isset($HTTP_GET_VARS["hostid"]))
-			{
+#			if(isset($HTTP_GET_VARS["hostid"]))
+#			{
 				switch($row["status"])
 				{
 					case 0:
-						echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$HTTP_GET_VARS["hostid"]."&register=changestatus&status=1\">Active</a>";
+						echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$HTTP_GET_VARS["hostid"]."&register=changestatus&status=1\"><font color=\"00AA00\">Active</font></a>";
 						break;
 					case 1:
-						echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$HTTP_GET_VARS["hostid"]."&register=changestatus&status=0\">Not active</a>";
+						echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$HTTP_GET_VARS["hostid"]."&register=changestatus&status=0\"><font color=\"AA0000\">Not active</font></a>";
 						break;
 #					case 2:
 #						echo "Trapper";
 #						break;
 					case 3:
-						echo "Not supported";
+						echo "<font color=\"AAAAAA\">Not supported</font>";
 						break;
 					default:
 						echo "<B>$status</B> Unknown";
 				}
-			}
-			else
-			{
-				switch($row["status"])
-				{
-					case 0:
-						echo "<a href=\"items.php?itemid=".$row["itemid"]."&register=changestatus&status=1\">Active</a>";
-						break;
-					case 1:
-						echo "<a href=\"items.php?itemid=".$row["itemid"]."&register=changestatus&status=0\">Not active</a>";
-						break;
-					case 2:
-						echo "Trapper";
-						break;
-					case 3:
-						echo "Not supported";
-						break;
-					default:
-						echo "<B>$status</B> Unknown";
-				}
-			}
+#			}
+#			else
+#			{
+#				switch($row["status"])
+#				{
+#					case 0:
+#						echo "<a href=\"items.php?itemid=".$row["itemid"]."&register=changestatus&status=1\">Active</a>";
+#						break;
+#					case 1:
+#						echo "<a href=\"items.php?itemid=".$row["itemid"]."&register=changestatus&status=0\">Not active</a>";
+#						break;
+#					case 2:
+#						echo "Trapper";
+#						break;
+#					case 3:
+#						echo "Not supported";
+#						break;
+#					default:
+#						echo "<B>$status</B> Unknown";
+#				}
+#			}
 			echo "</td>";
 	
         		if(check_right("Item","U",$row["itemid"]))

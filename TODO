@@ -1,23 +1,22 @@
-BUGS:
+TOP PRIORITY:
 
  - update docs related to WIN32 agent
  - personalisation (remember default port number for hosts)
  - mass update for triggers (activate, deactivate)
- - BUG. zabbix_suckerd is crashing after EMAIL4
- - BUG! Lots of Evaluation of expression ... failed. Must be fixed.
- - graphs and maps are not displayed properly sometimes
-
-FUTURE REQUESTS:
-
  - improve graphing capabilities
-
-HIGH PRIORITY:
-
- - BUG. zabbix_sucker should accept parameter regardless of "\n" at the end of line 
- - BUG. Agent return unsupported in case if UserParameter ends by timeout.
  - support for net-snmp
  - get rid of long select lists in user forms 
  - SNMP trapping
+
+BUGS:
+
+ - BUG. zabbix_suckerd is crashing after EMAIL4
+ - BUG! Lots of Evaluation of expression ... failed. Must be fixed.
+ - graphs and maps are not displayed properly sometimes
+ - BUG. zabbix_sucker should accept parameter regardless of "\n" at the end of line 
+ - BUG. Agent return unsupported in case if UserParameter ends by timeout.
+ - improper handling of special characters i.e. ',", etc
+ - add protection from IT Service loop
 
 PERFORMANCE IMPROVEMENTS:
 
@@ -44,11 +43,6 @@ DIFFERENT TASKS:
  - add UserParameter without restart of an agent
  - write white-paper
  - prepare Power Point presentation
-
-REGISTERED BUGS:
-
- - improper handling of special characters i.e. ',", etc
- - graphs and maps not displayed sometimes
 
 TODO:
 
@@ -79,7 +73,6 @@ HB:
  - BUG. history graph goes left
  - Graphs for specified period and date and time
  - personalisation (refresh rate, graph size, default graph period, etc)
- - add protection from IT Service loop
 
  - Tree like in old Zabbix
  - LDAP authorisation (should work with MSWindows LDAP)
@@ -98,11 +91,9 @@ HB:
  PLUS:
 
 - Network discovery daemon (?)
-- Native Windows GUI (in version 2.0 ?)
 - backup/restore scripts for server. Backup all (DB, configs, etc).
 - Network topology database
 - Automatic network map generation from topology database
-- Audit log
 - Support for MD5 checksums
 
  OTHER:
