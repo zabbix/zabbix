@@ -1,4 +1,4 @@
-1.0beta12:
+1.0beta14:
 
  - add zabbix[unixtime] and lastupdate() to get rid of nodata()
  - check return code for alert scripts
