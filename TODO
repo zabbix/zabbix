@@ -1,5 +1,9 @@
 1.0beta14:
 
+ - 'clone' for graphs and screens
+ - add screens and graphs to host templates
+ - action to work in both cases (ON->OFF or OFF->ON). New macro, {RECOVERED}, ON->OFF='RECOVERED',
+ OFF->ON - "" to be in default subject
  - preserve selected host group between different screens (trigger maintenance, host maintenance)
  - add zabbix[unixtime] and lastupdate() and tick() to get rid of nodata()
  - check return code for alert scripts
