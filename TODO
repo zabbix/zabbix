@@ -1,5 +1,6 @@
 1.0beta10:
 
+ - fix problem with missing includes (-I in zabbix_suckerd Makefile)
  - allow creation of PID file as 'root'. Required for RedHat RPMs.
  - add MRTG-like graphs + periodic recalculation of aggregate functions
  - why '-lsnmp' added to the agent's Makefile
