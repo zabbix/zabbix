@@ -2354,6 +2354,38 @@ echo "</head>";
 		
 	}
 
+	function	add_image($name,$imagetype,$files)
+	{
+		global	$ERROR_MSG;
+
+		if(isset($files))
+		{
+			if($files["image"]["error"]==0)
+			if($files["image"]["size"]<1024*1024)
+			{
+				$image=addslashes(fread(fopen($files["image"]["tmp_name"],"r"),filesize($files["image"]["tmp_name"])));
+				$sql="insert into images (name,imagetype,image) values ('$name',$imagetype,'$image')";
+				return	DBexecute($sql);
+			}
+			else
+			{
+				$ERROR_MSG="Image size must be less than 1Mb";
+				return FALSE;
+			}
+		}
+		else
+		{
+			$ERROR_MSG="Select image to download";
+			return FALSE;
+		}
+	}
+
+	function	delete_image($imageid)
+	{
+		$sql="delete from images where imageid=$imageid";
+		return	DBexecute($sql);
+	}
+
 	function	add_service_link($servicedownid,$serviceupid,$softlink)
 	{
 		global	$ERROR_MSG;
