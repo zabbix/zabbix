@@ -2142,6 +2142,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
 
+	# Delete from Trends
+
+	function	delete_trends_by_itemid( $itemid )
+	{
+		$sql="delete from trends where itemid=$itemid";
+		return	DBexecute($sql);
+	}
+
 	function	delete_trigger_dependency($triggerid_down,$triggerid_up)
 	{
 
@@ -2338,6 +2346,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 			return	$result;
 		}
+		$result=delete_trends_by_itemid($itemid);
 		$result=delete_history_by_itemid($itemid);
 		$sql="delete from graphs_items where itemid=$itemid";
 		if(!$result)
