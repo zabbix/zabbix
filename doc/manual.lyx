@@ -1457,6 +1457,19 @@ killall -HUP inetd
 \layout Enumerate
 
 Configure WEB interface
+\begin_float footnote 
+\layout Standard
+
+
+\series bold 
+Zabbix
+\series default 
+ fronend uses <? ?> syntax for PHP code.
+ Thi smay require additional configuration of 
+\emph on 
+php.ini
+\end_float 
+
 \newline 
 As user zabbix (or whatever you decided to name your dedicated 
 \series bold 
