@@ -2473,6 +2473,25 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
 
+	function	delete_groups_by_hostid($hostid)
+	{
+		$sql="select groupid from hosts_groups where hostid=$hostid";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			$sql="delete from hosts_groups where hostid=$hostid and groupid=".$row["groupid"];
+			DBexecute($sql);
+			$sql="select count(*) as count from hosts_groups where groupid=".$row["groupid"];
+			$result2=DBselect($sql);
+			$row2=DBfetch($result2);
+			if($row2["count"]==0)
+			{
+				$sql="delete from groups where groupid=".$row["groupid"];
+				DBexecute($sql);
+			}
+		}
+	}
+
 	# Delete Host
 
 	function	delete_host($hostid)
@@ -2490,6 +2509,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				return	FALSE;
 			}
 		}
+		delete_groups_by_hostid($hostid);
 		$sql="delete from hosts where hostid=$hostid";
 		return	DBexecute($sql);
 	}
