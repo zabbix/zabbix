@@ -180,3 +180,34 @@ int     DBget_function_result(float *Result,char *FunctionID)
 
         return SUCCEED;
 }
+
+
+int	DBget_lastvalue(float *Result,char *host,char *key,char *function,char *parameter)
+{
+	DB_RESULT *result;
+
+        char	c[128];
+        int	rows;
+
+	sprintf( c, "select i.lastvalue from functions f,items i,hosts h where i.itemid=f.itemid and h.host='%s' and h.hostid=i.hostid and i.key_='%s' and f.function='%s' and f.parameter=%s", host, key, function, parameter );
+	syslog(LOG_WARNING, "Query:%s",c );
+	result = DBselect(c);
+
+	if(result == NULL)
+	{
+        	DBfree_result(result);
+		syslog(LOG_WARNING, "Query failed" );
+		return FAIL;	
+	}
+        rows = DBnum_rows(result);
+	if(rows == 0)
+	{
+        	DBfree_result(result);
+		syslog(LOG_WARNING, "Query failed" );
+		return FAIL;	
+	}
+        *Result=atof(DBget_field(result,0,0));
+        DBfree_result(result);
+
+        return SUCCEED;
+}
