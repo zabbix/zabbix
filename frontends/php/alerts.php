@@ -60,8 +60,14 @@
 	echo "<TD><b>Message</b></TD>";
 	echo "</TR>";
 	$col=0;
+	$zzz=0;
 	while($row=DBfetch($result))
 	{
+		$zzz++;	
+		if(isset($start)&&($zzz<$start))
+		{
+			continue;
+		}
 		if(!check_right_on_trigger("R",$row["triggerid"]))
                 {
 			continue;
