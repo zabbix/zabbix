@@ -33,7 +33,7 @@
 
 <FONT COLOR="#000000">
 <?
-	$sql="select alertid,clock,type,sendto,subject,message from alerts order by clock desc $limit";
+	$sql="select a.alertid,a.clock,a.type,a.sendto,a.subject,a.message,ac.triggerid from alerts a,actions ac where a.actionid=ac.actionid order by a.clock desc $limit";
 	$result=mysql_query($sql,$mysql);
 
 	echo "<CENTER>";
@@ -66,8 +66,9 @@
 		$sendto=$row[3];
 		$subject=$row[4];
 		$message=$row[5];
+		$triggerid=$row[6];
 
-		echo "<TD>".date("Y.M.d H:i:s",$clock)."</TD>";
+		echo "<TD><a href=\"alarms.html?triggerid=$triggerid\">".date("Y.M.d H:i:s",$clock)."</a></TD>";
 		echo "<TD>$type</TD>";
 		echo "<TD>$sendto</TD>";
 		echo "<TD>$subject</TD>";
