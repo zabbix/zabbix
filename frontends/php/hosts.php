@@ -190,6 +190,23 @@
 ?>
 
 <?php
+	$host=@iif(isset($HTTP_GET_VARS["host"]),$HTTP_GET_VARS["host"],"");
+	$port=@iif(isset($HTTP_GET_VARS["port"]),$HTTP_GET_VARS["port"],get_profile("HOST_PORT",10000));
+	$status=@iif(isset($HTTP_GET_VARS["status"]),$HTTP_GET_VARS["status"],0);
+	$useip=@iif(isset($HTTP_GET_VARS["useip"]),$HTTP_GET_VARS["useip"],"off");
+	$newgroup=@iif(isset($HTTP_GET_VARS["newgroup"]),$HTTP_GET_VARS["newgroup"],"");
+	$ip=@iif(isset($HTTP_GET_VARS["ip"]),$HTTP_GET_VARS["ip"],"");
+	$host_templateid=@iif(isset($HTTP_GET_VARS["host_templateid"]),$HTTP_GET_VARS["host_templateid"],"");
+
+	if($useip!="on")
+	{
+		$useip="";
+	}
+	else
+	{
+		$useip="checked";
+	}
+
 	if(isset($HTTP_GET_VARS["register"]) && ($HTTP_GET_VARS["register"] == "change"))
 	{
 		$result=DBselect("select host,port,status,useip,ip from hosts where hostid=".$HTTP_GET_VARS["hostid"]); 
@@ -210,20 +227,6 @@
 	}
 	else
 	{
-		$host=@iif(isset($HTTP_GET_VARS["host"]),$HTTP_GET_VARS["host"],"");
-		$port=@iif(isset($HTTP_GET_VARS["port"]),$HTTP_GET_VARS["port"],get_profile("HOST_PORT",10000));
-		$status=@iif(isset($HTTP_GET_VARS["status"]),$HTTP_GET_VARS["status"],0);
-		$useip=@iif(isset($HTTP_GET_VARS["useip"]),$HTTP_GET_VARS["useip"],"off");
-		$ip=@iif(isset($HTTP_GET_VARS["ip"]),$HTTP_GET_VARS["ip"],"");
-
-		if($useip!="on")
-		{
-			$useip="";
-		}
-		else
-		{
-			$useip="checked";
-		}
 	}
 
 
@@ -277,7 +280,7 @@
 	show_table2_v_delimiter();
 	echo "New group";
 	show_table2_h_delimiter();
-	echo "<input class=\"biginput\" name=\"newgroup\" value=\"\" size=20>";
+	echo "<input class=\"biginput\" name=\"newgroup\" size=20 value=\"$newgroup\">";
 
 	show_table2_v_delimiter();
 	echo "Use IP address";
@@ -334,7 +337,15 @@
 	$result=DBselect("select host,hostid from hosts order by host");
 	while($row=DBfetch($result))
 	{
-		echo "<option value=\"".$row["hostid"]."\">".$row["host"];
+		if($host_templateid == $row["hostid"])
+		{
+			echo "<option value=\"".$row["hostid"]."\" selected>".$row["host"];
+		}
+		else
+		{
+			echo "<option value=\"".$row["hostid"]."\">".$row["host"];
+		}
+		
 	}
 	echo "</select>";
 

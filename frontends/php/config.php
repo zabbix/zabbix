@@ -128,7 +128,7 @@
 			echo "<td>Unknown</td>";
 		}
 		echo "<td>".$row["description"]."</td>";
-		echo "<td><a href=\"config.php?mediatypeid=".$row["mediatypeid"]."\">Change</a></td>";
+		echo "<td><a href=\"config.php?register=change&mediatypeid=".$row["mediatypeid"]."\">Change</a></td>";
 		echo "</tr>";
 	}
 	echo "</TABLE>";
@@ -143,7 +143,7 @@
 	$smtp_email=@iif(isset($HTTP_GET_VARS["smtp_email"]),$HTTP_GET_VARS["smtp_email"],"zabbix@localhost");
 	$exec_path=@iif(isset($HTTP_GET_VARS["exec_path"]),$HTTP_GET_VARS["exec_path"],"");
 
-	if(isset($HTTP_GET_VARS["mediatypeid"]) && !isset($HTTP_GET_VARS["type"]))
+	if(isset($HTTP_GET_VARS["register"]) && ($HTTP_GET_VARS["register"] == "change"))
 	{
 		$result=DBselect("select mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path from media_type where mediatypeid=".$HTTP_GET_VARS["mediatypeid"]);
 		$mediatypeid=DBget_field($result,0,0);
