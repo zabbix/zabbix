@@ -33,6 +33,7 @@ void    DBconnect( char *dbname, char *dbuser, char *dbpassword, char *dbsocket)
 #ifdef	HAVE_MYSQL
 /* For MySQL >3.22.00 */
 /*	if( ! mysql_connect( &mysql, NULL, dbuser, dbpassword ) )*/
+	mysql_init(&mysql);
 	if( ! mysql_real_connect( &mysql, NULL, dbuser, dbpassword, dbname, 3306, dbsocket,0 ) )
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Failed to connect to database: Error: %s\n",mysql_error(&mysql) );
@@ -158,7 +159,6 @@ char	*DBget_field(DB_RESULT *result, int rownum, int fieldnum)
 		zabbix_log(LOG_LEVEL_ERR, "Error while mysql_fetch_row():[%s]", mysql_error(&mysql) );
 		exit(FAIL);
 	}
-	zabbix_log(LOG_LEVEL_DEBUG, "Got field:%s", row[fieldnum] );
 	return row[fieldnum];
 #endif
 #ifdef	HAVE_PGSQL
@@ -169,7 +169,7 @@ char	*DBget_field(DB_RESULT *result, int rownum, int fieldnum)
 /*
  * Return SUCCEED if result conains no records
  */ 
-int	DBis_empty(DB_RESULT *result)
+/*int	DBis_empty(DB_RESULT *result)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In DBis_empty");
 	if(result == NULL)
@@ -180,27 +180,47 @@ int	DBis_empty(DB_RESULT *result)
 	{
 		return	SUCCEED;
 	}
-/* This is necessary to exclude situations like
- * atoi(DBget_field(result,0,0). This lead to coredump.
- */
 	if(DBget_field(result,0,0) == 0)
 	{
 		return	SUCCEED;
 	}
 
 	return FAIL;
-}
+}*/
 
 /*
  * Get number of selected records.
  */ 
 int	DBnum_rows(DB_RESULT *result)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In DBnum_rows");
 #ifdef	HAVE_MYSQL
-	return mysql_num_rows(result);
+	int rows;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In DBnum_rows");
+	if(result == NULL)
+	{
+		return	0;
+	}
+/* Order is important ! */
+	rows = mysql_num_rows(result);
+	if(rows == 0)
+	{
+		return	0;
+	}
+	
+/* This is necessary to exclude situations like
+ * atoi(DBget_field(result,0,0). This leads to coredump.
+ */
+/* This is required for empty results for count(*), etc */
+	if(DBget_field(result,0,0) == 0)
+	{
+		return	0;
+	}
+	zabbix_log(LOG_LEVEL_DEBUG, "Result of DBnum_rows [%d]", rows);
+	return rows;
 #endif
 #ifdef	HAVE_PGSQL
+	zabbix_log(LOG_LEVEL_DEBUG, "In DBnum_rows");
 	return PQntuples(result);
 #endif
 }
@@ -210,24 +230,26 @@ int	DBnum_rows(DB_RESULT *result)
  */ 
 int     DBget_function_result(float *result,char *functionid)
 {
-	DB_RESULT *res;
+	DB_RESULT *dbresult;
+	int		res = SUCCEED;
 
         char	sql[MAX_STRING_LEN+1];
 
 	sprintf( sql, "select lastvalue from functions where functionid=%s", functionid );
-	res = DBselect(sql);
+	dbresult = DBselect(sql);
 
-	if(DBis_empty(res) == SUCCEED)
+	if(DBnum_rows(dbresult) == 0)
 	{
-        	DBfree_result(res);
 		zabbix_log(LOG_LEVEL_WARNING, "Query failed for functionid:[%s]", functionid );
-		return FAIL;	
+		res = FAIL;
 	}
+	else
+	{
+        	*result=atof(DBget_field(dbresult,0,0));
+	}
+        DBfree_result(dbresult);
 
-        *result=atof(DBget_field(res,0,0));
-        DBfree_result(res);
-
-        return SUCCEED;
+        return res;
 }
 
 /* SUCCEED if latest alarm with triggerid has this status */
@@ -245,7 +267,7 @@ int	DBget_prev_trigger_value(int triggerid)
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
-	if(DBis_empty(result) == SUCCEED)
+	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
 		DBfree_result(result);
@@ -258,7 +280,7 @@ int	DBget_prev_trigger_value(int triggerid)
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
-	if(DBis_empty(result) == SUCCEED)
+	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
 		DBfree_result(result);
@@ -271,7 +293,7 @@ int	DBget_prev_trigger_value(int triggerid)
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
-	if(DBis_empty(result) == SUCCEED)
+	if(DBnum_rows(result) == SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Result of [%s] is empty", sql );
 		DBfree_result(result);
@@ -284,6 +306,7 @@ int	DBget_prev_trigger_value(int triggerid)
 }
 
 /* SUCCEED if latest alarm with triggerid has this status */
+/* Rewrite required to simplify logic ?*/
 int	latest_alarm(int triggerid, int status)
 {
 	char	sql[MAX_STRING_LEN+1];
@@ -298,16 +321,14 @@ int	latest_alarm(int triggerid, int status)
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
-	if(DBis_empty(result) == SUCCEED)
+	if(DBnum_rows(result) == 0)
         {
                 zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
                 ret = FAIL;
         }
 	else
 	{
-	zabbix_log(LOG_LEVEL_DEBUG,"In latest_alarm(0)");
 		clock=atoi(DBget_field(result,0,0));
-	zabbix_log(LOG_LEVEL_DEBUG,"In latest_alarm(1)");
 		DBfree_result(result);
 
 		sprintf(sql,"select value from alarms where triggerid=%d and clock=%d",triggerid,clock);
@@ -362,7 +383,7 @@ int	update_trigger_value(int triggerid,int value,int clock)
 	return SUCCEED;
 }
 
-int update_triggers_status_to_unknown(int hostid,int clock)
+void update_triggers_status_to_unknown(int hostid,int clock)
 {
 	int	i;
 	char	sql[MAX_STRING_LEN+1];
@@ -376,13 +397,6 @@ int update_triggers_status_to_unknown(int hostid,int clock)
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
-	if( DBis_empty(result) == SUCCEED )
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "No triggers to update for hostid=[%d]",hostid);
-		DBfree_result(result);
-		return FAIL; 
-	}
-
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 		triggerid=atoi(DBget_field(result,i,0));
@@ -392,10 +406,10 @@ int update_triggers_status_to_unknown(int hostid,int clock)
 	DBfree_result(result);
 	zabbix_log(LOG_LEVEL_DEBUG,"End of update_triggers_status_to_unknown()");
 
-	return SUCCEED; 
+	return; 
 }
 
-int DBupdate_triggers_status_after_restart(void)
+void DBupdate_triggers_status_after_restart(void)
 {
 	int	i;
 	char	sql[MAX_STRING_LEN+1];
@@ -413,13 +427,6 @@ int DBupdate_triggers_status_after_restart(void)
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
-	if( DBis_empty(result) == SUCCEED )
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "No triggers to update");
-		DBfree_result(result);
-		return FAIL; 
-	}
-
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 		triggerid=atoi(DBget_field(result,i,0));
@@ -427,7 +434,7 @@ int DBupdate_triggers_status_after_restart(void)
 		sprintf(sql,"select min(i.nextcheck+i.delay) from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.nextcheck<>0 and t.triggerid=%d and i.status<>%d",triggerid,ITEM_STATUS_TRAPPED);
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		result2 = DBselect(sql);
-		if( DBis_empty(result2) == SUCCEED )
+		if( DBnum_rows(result2) == 0 )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "No triggers to update (2)");
 			DBfree_result(result2);
@@ -443,10 +450,10 @@ int DBupdate_triggers_status_after_restart(void)
 	DBfree_result(result);
 	zabbix_log(LOG_LEVEL_DEBUG,"End of DBupdate_triggers_after_restart()");
 
-	return SUCCEED; 
+	return; 
 }
 
-int DBupdate_host_status(int hostid,int status,int clock)
+void DBupdate_host_status(int hostid,int status,int clock)
 {
 	DB_RESULT	*result;
 	char	sql[MAX_STRING_LEN+1];
@@ -458,11 +465,11 @@ int DBupdate_host_status(int hostid,int status,int clock)
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
-	if( DBis_empty(result) == SUCCEED)
+	if(DBnum_rows(result) == 0)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "No host with hostid=[%d]",hostid);
+		zabbix_log(LOG_LEVEL_ERR, "Cannot select host with hostid [%d]",hostid);
 		DBfree_result(result);
-		return FAIL; 
+		return;
 	}
 
 	disable_until = atoi(DBget_field(result,0,1));
@@ -477,7 +484,7 @@ int DBupdate_host_status(int hostid,int status,int clock)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Host already has status [%d]",status);
 			DBfree_result(result);
-			return FAIL;
+			return;
 		}
 	}
 
@@ -511,13 +518,13 @@ int DBupdate_host_status(int hostid,int status,int clock)
 	else
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Unknown host status [%d]", status);
-		return FAIL;
+		return;
 	}
 
 	update_triggers_status_to_unknown(hostid,clock);
 	zabbix_log(LOG_LEVEL_DEBUG,"End of update_host_status()");
 
-	return SUCCEED;
+	return;
 }
 
 int	DBupdate_item_status_to_notsupported(int itemid)

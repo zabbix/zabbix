@@ -1,3 +1,5 @@
+/*#define TESTTEST*/
+
 #ifndef ZABBIX_COMMON_H
 #define ZABBIX_COMMON_H
  
@@ -8,7 +10,7 @@
 #define	TIMEOUT_ERROR	(-4)
 
 #define	MAXFD	64
-#define MAX_STRING_LEN	1024
+#define MAX_STRING_LEN	4096
 
 /* Item types */
 #define ITEM_TYPE_ZABBIX	0

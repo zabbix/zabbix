@@ -13,6 +13,11 @@
                 show_footer();
                 exit;
         }
+	if(isset($select))
+	{
+		unset($hostid);
+	}
+	
         if(isset($hostid)&&!check_right("Host","R",$hostid))
         {
                 show_table_header("<font color=\"AA0000\">No permissions !</font
@@ -51,6 +56,26 @@
 	}
 
 	echo "</font>";
+	if(!isset($hostid)&&isset($select_form)&&!isset($select))
+	{
+		show_table_v_delimiter();
+		echo "<form name=\"form1\" method=\"get\" action=\"latest.php?select=true\">
+	  	<input type=\"text\" name=\"select\" value=\"$txt_select\">
+	  	<input type=\"submit\" name=\"Select\" value=\"Select\">
+		</form>";
+	}
+	else
+	{
+		show_table_v_delimiter();
+		if(isset($select))
+		{
+			echo "<b>[<a href='latest.php?select_form=1'>Select</a>]</b>";
+		}
+		else
+		{
+			echo "[<a href='latest.php?select_form=1'>Select</a>]";
+		}
+	}
 	show_table_header_end();
 
 	if(!isset($sort))
@@ -67,13 +92,20 @@
 		}
 	}
 
-	if(isset($hostid))
+	if(isset($hostid)||isset($select))
 	{
-		$result=DBselect("select host from hosts where hostid=$hostid");
-		$host=DBget_field($result,0,0);
 
 		echo "<br>";
-		show_table_header("<a href=\"latest.php?hostid=$hostid\">$host</a>");
+		if(!isset($select))
+		{
+			$result=DBselect("select host from hosts where hostid=$hostid");
+			$host=DBget_field($result,0,0);
+			show_table_header("<a href=\"latest.php?hostid=$hostid\">$host</a>");
+		}
+		else
+		{
+			show_table_header("Description is like *$select*");
+		}
 #		show_table_header_begin();
 #		echo "<a href=\"latest.php?hostid=$hostid\">$host</a>";
 #		show_table3_v_delimiter();
@@ -82,13 +114,24 @@
 		cr();
 		echo "<TR BGCOLOR=\"CCCCCC\">";
 		cr();
+		if(isset($select))
+		{
+			echo "<TD><B>Host</B></TD>";
+		}
 		if(!isset($sort)||(isset($sort)&&($sort=="description")))
 		{
 			echo "<TD><B>DESCRIPTION</B></TD>";
 		}
 		else
 		{
-			echo "<TD><B><a href=\"latest.php?hostid=$hostid&sort=description\">Description</B></TD>";
+			if(isset($select))
+			{
+				echo "<TD><B><a href=\"latest.php?select=$select&sort=description\">Description</B></TD>";
+			}
+			else
+			{
+				echo "<TD><B><a href=\"latest.php?hostid=$hostid&sort=description\">Description</B></TD>";
+			}
 		}
 		if(isset($sort)&&($sort=="lastcheck"))
 		{
@@ -96,7 +139,14 @@
 		}
 		else
 		{
-			echo "<TD WIDTH=\"12%\"><B><a href=\"latest.php?hostid=$hostid&sort=lastcheck\">Last check</B></TD>";
+			if(isset($select))
+			{
+				echo "<TD WIDTH=\"12%\"><B><a href=\"latest.php?select=$select&sort=lastcheck\">Last check</B></TD>";
+			}
+			else
+			{
+				echo "<TD WIDTH=\"12%\"><B><a href=\"latest.php?hostid=$hostid&sort=lastcheck\">Last check</B></TD>";
+			}
 		}
 		cr();
 		echo "<TD WIDTH=\"10%\" NOSAVE><B>Last value</B></TD>"; 
@@ -132,7 +182,14 @@
 		{
 			$sort="order by i.description";
 		}
-		$result=DBselect("select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and i.status in (0,2) and h.hostid=$hostid $sort");
+		if(isset($select))
+		{
+			$result=DBselect("select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and i.status in (0,2) and i.description like '%$select%' $sort");
+		}
+		else
+		{
+			$result=DBselect("select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and i.status in (0,2) and h.hostid=$hostid $sort");
+		}
 		while($row=DBfetch($result))
 		{
         		if(!check_right("Item","R",$row["itemid"]))
@@ -146,6 +203,10 @@
 			if($col++%2 == 1)	{ echo "<tr bgcolor=#DDDDDD>"; }
 			else			{ echo "<tr bgcolor=#EEEEEE>"; }
 
+			if(isset($select))
+			{
+				echo "<td>".$row["host"]."</td>";
+			}
 			echo "<td>".$row["description"]."</td>";
 
 			echo "<td>";

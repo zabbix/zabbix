@@ -7,6 +7,8 @@
 #	type
 #	trendavg
 
+	$start_time=time(NULL);
+
 	if(!isset($type))
 	{
 		$type="week";
@@ -22,7 +24,7 @@
 	}
 	else if($type == "year")
 	{
-		$period=365*30*24*3600;
+		$period=365*24*3600;
 	}
 	else
 	{
@@ -37,8 +39,6 @@
 	$shiftYup=13;
 	$shiftYdown=7+15*2;
 
-	$nodata=1;	
-
 
 //	Header( "Content-type:  text/html"); 
 	Header( "Content-type:  image/png"); 
@@ -51,11 +51,14 @@
 	$green=ImageColorAllocate($im,0,255,0); 
 	$darkgreen=ImageColorAllocate($im,0,150,0); 
 	$blue=ImageColorAllocate($im,0,0,255); 
+	$darkblue=ImageColorAllocate($im,0,0,150); 
 	$yellow=ImageColorAllocate($im,255,255,0); 
+	$darkyellow=ImageColorAllocate($im,150,150,0); 
 	$cyan=ImageColorAllocate($im,0,255,255); 
 	$black=ImageColorAllocate($im,0,0,0); 
 	$gray=ImageColorAllocate($im,150,150,150); 
 	$white=ImageColorAllocate($im,255,255,255); 
+	$bg=ImageColorAllocate($im,6+6*16,7+7*16,8+8*16);
 
 	$x=imagesx($im); 
 	$y=imagesy($im);
@@ -65,21 +68,46 @@
 
 	$now = time(NULL);
 	$to_time=$now;
-	$from_time=$to_time-14*24*3600;
+	$from_time=$to_time-$period;
+	$from_time_now=$to_time-24*3600;
 
 	$count=array();
 	$min=array();
 	$max=array();
 	$avg=array();
 
+if($DB_TYPE=="MYSQL")
+{
+	$sql="select round(900*((clock+3*3600)%(24*3600))/(24*3600)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid=$itemid and clock>$from_time and clock<$to_time group by round(900*((clock+3*3600)%(24*3600))/(24*3600))";
+//	echo $sql."<br>";
+	$result=DBselect($sql);
+	while($row=DBfetch($result))
+	{
+		$i=$row["i"];
+
+		$max[$i]=$row["max"];
+		$min[$i]=$row["min"];
+		$avg[$i]=$row["avg"];
+		$count[$i]=$row["count"];
+	}
+
+	$count_now=array();
+	$avg_now=array();
+	$result=DBselect("select round(900*((clock+3*3600)%(24*3600))/(24*3600)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid=$itemid and clock>$from_time_now and clock<$to_time group by round(900*((clock+3*3600)%(24*3600))/(24*3600))");
+	while($row=DBfetch($result))
+	{
+		$i=$row["i"];
+		$avg_now[$i]=$row["avg"];
+		$count_now[$i]=$row["count"];
+	}
+}
+else
+{
 	$result=DBselect("select clock,value from history where itemid=$itemid and clock>$from_time and clock<$to_time");
 	while($row=DBfetch($result))
 	{
 		$value=$row["value"];
 		$i=intval( 900*(($row["clock"]+3*3600)%(24*3600))/(24*3600));
-//		$value=$i;
-//		if($i==0) echo "B:",date("dS of F Y h:i:s A",$row["clock"]),"<br>";
-//		if($i==899) echo "E:",date("dS of F Y h:i:s A",$row["clock"]),"<br>";
 
 		if( (!isset($max[$i])) || ($max[$i]<$value))
 		{
@@ -102,19 +130,15 @@
 		{
 			$avg[$i]=$value;
 		}
-		$nodata=0;
 	}
 
 	$count_now=array();
 	$avg_now=array();
-	$to_time=$now;
-	$from_time=$to_time-$period;
-	$result=DBselect("select clock,value from history where itemid=$itemid and clock>$from_time and clock<$to_time");
+	$result=DBselect("select clock,value from history where itemid=$itemid and clock>$from_time_now and clock<$to_time");
 	while($row=DBfetch($result))
 	{
 		$value=$row["value"];
 		$i=intval( 900*(($row["clock"]+3*3600)%(24*3600))/(24*3600));
-//		$i=intval( 900*(($to_time-$row["clock"]+75600)%(24*3600))/(24*3600));
 //		echo (mktime(0, 0, 0, 07, 27,2002)-75600)%(24*3600),"<br>";
 
 		if(isset($count_now[$i]))
@@ -134,6 +158,7 @@
 			$avg_now[$i]=$value;
 		}
 	}
+}
 
 	for($i=0;$i<=$sizeY;$i+=$sizeY/5)
 	{
@@ -143,19 +168,23 @@
 	for($i=0;$i<=$sizeX;$i+=$sizeX/24)
 	{
 		ImageDashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
-		if($nodata == 0)
-		{
-			ImageString($im, 1,$i+$shiftX-11, $sizeY+$shiftYup+5, date("H:i",-3*3600+24*3600*$i/900) , $black);
-		}
+		ImageString($im, 1,$i+$shiftX-11, $sizeY+$shiftYup+5, date("H:i",-3*3600+24*3600*$i/900) , $black);
 	}
 
 	unset($maxY);
 	unset($minY);
 
-	if($nodata == 0)
+	$maxY=max($avg);
+	$tmp=max($avg_now);
+	if($tmp>$maxY)
 	{
-		$maxY=max($avg);
-		$minY=min($avg);
+		$maxY=$tmp;
+	}
+	$minY=min($avg);
+	$tmp=min($avg_now);
+	if($tmp<$minY)
+	{
+		$minY=$tmp;
 	}
 
 	$maxX=900;
@@ -167,6 +196,18 @@
 		{
 			if($count[$i]>0)
 			{
+/*				if(!isset($trendavg))
+				{
+					$x1=$sizeX*($i-$minX)/($maxX-$minX);
+					$y1=$sizeY*($max[$i]-$minY)/($maxY-$minY);
+					$x2=$sizeX*($i-$minX)/($maxX-$minX);
+					$y2=$sizeY*($min[$i]-$minY)/($maxY-$minY);
+					$y1=$sizeY-$y1;
+					$y2=$sizeY-$y2;
+
+					ImageLine($im,$x1+$shiftX,$y1+$shiftYup,$x2+$shiftX,$y2+$shiftYup,$bg);
+				}*/
+
 /*				if(!isset($trendavg))
 				{
 					$x1=$sizeX*($i-$minX)/($maxX-$minX);
@@ -214,6 +255,7 @@
 					$y2=$sizeY-$y2;
 	
 					ImageLine($im,$x1+$shiftX,$y1+$shiftYup,$x2+$shiftX,$y2+$shiftYup,$darkred);
+//					ImageLine($im,$x1+$shiftX-1,$y1+$shiftYup,$x2+$shiftX-1,$y2+$shiftYup,$darkred);
 				}
 			}
 
@@ -260,12 +302,15 @@
 
 	ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*1,$shiftX+5,$sizeY+$shiftYup+15+9+15*1,$darkred);
 	ImageRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*1,$shiftX+5,$sizeY+$shiftYup+15+9+15*1,$black);
-	ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*1+15, "Average today", $black);
+	ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*1+15, "Average for last 24 hours", $black);
 
 //	ImageString($im, 1,$shiftX, $sizeY+$shiftY+15, "AVG (LAST WEEK)" , $darkgreen);
 //	ImageString($im, 1,$shiftX+80, $sizeY+$shiftY+15, "AVG (TODAY)" , $darkred);
 
-	ImageStringUp($im,0,2*$shiftX+$sizeX+40,$sizeY+$shiftYup+$shiftYdown, "http://zabbix.sourceforge.net", $gray);
+	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, "http://zabbix.sourceforge.net", $gray);
+
+	$end_time=time(NULL);
+	ImageString($im, 0,imagesx($im)-100,imagesy($im)-12,"Generated in ".($end_time-$start_time)." sec", $gray);
 
 	ImagePng($im); 
 	ImageDestroy($im); 

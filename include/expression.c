@@ -249,6 +249,118 @@ int	evaluate_simple (float *result,char *exp)
 		zabbix_log(LOG_LEVEL_DEBUG, "Result [%f]",*result );
 		return SUCCEED;
 	}
+	else if( find_char(exp,'*') != FAIL )
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "* is found" );
+		l=find_char(exp,'*');
+		strncpy(first, exp, MAX_STRING_LEN);
+		first[l]=0;
+		j=0;
+		for(i=l+1;i<strlen(exp);i++)
+		{
+			second[j]=exp[i];
+			j++;
+		}
+		second[j]=0;
+		if( evaluate_simple(&value1,first) == FAIL )
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", first );
+			return FAIL;
+		}
+		if( evaluate_simple(&value2,second) == FAIL )
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", second );
+			return FAIL;
+		}
+		*result=value1*value2;
+		return SUCCEED;
+	}
+	else if( find_char(exp,'/') != FAIL )
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "/ is found" );
+		l=find_char(exp,'/');
+		strncpy(first, exp, MAX_STRING_LEN);
+		first[l]=0;
+		j=0;
+		for(i=l+1;i<strlen(exp);i++)
+		{
+			second[j]=exp[i];
+			j++;
+		}
+		second[j]=0;
+		if( evaluate_simple(&value1,first) == FAIL )
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", first );
+			return FAIL;
+		}
+		if( evaluate_simple(&value2,second) == FAIL )
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", second );
+			return FAIL;
+		}
+		if(cmp_double(value2,0) == 0)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Division by zero. Cannot evaluate expression [%s/%s]", first,second );
+			return FAIL;
+		}
+		else
+		{
+			*result=value1/value2;
+		}
+		return SUCCEED;
+	}
+	else if( find_char(exp,'+') != FAIL )
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "+ is found" );
+		l=find_char(exp,'+');
+		strncpy(first, exp, MAX_STRING_LEN);
+		first[l]=0;
+		j=0;
+		for(i=l+1;i<strlen(exp);i++)
+		{
+			second[j]=exp[i];
+			j++;
+		}
+		second[j]=0;
+		if( evaluate_simple(&value1,first) == FAIL )
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", first );
+			return FAIL;
+		}
+		if( evaluate_simple(&value2,second) == FAIL )
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", second );
+			return FAIL;
+		}
+		*result=value1+value2;
+		return SUCCEED;
+	}
+	else if( find_char(exp,'-') != FAIL )
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "- is found" );
+		l=find_char(exp,'-');
+		strncpy(first, exp, MAX_STRING_LEN);
+		first[l]=0;
+		j=0;
+		for(i=l+1;i<strlen(exp);i++)
+		{
+			second[j]=exp[i];
+			j++;
+		}
+		second[j]=0;
+		if( evaluate_simple(&value1,first) == FAIL )
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", first );
+			return FAIL;
+		}
+		if( evaluate_simple(&value2,second) == FAIL )
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", second );
+			return FAIL;
+		}
+		*result=value1-value2;
+		return SUCCEED;
+	}
 	else if( find_char(exp,'=') != FAIL )
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "= is found" );
@@ -366,13 +478,11 @@ int	substitute_macros(char *exp)
 	char	function[MAX_STRING_LEN+1];
 	char	parameter[MAX_STRING_LEN+1];
 	static	char	value[MAX_STRING_LEN+1];
-	int	i,j;
+	int	i;
 	int	r,l;
 	int	r1,l1;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "BEGIN substitute_macros" );
-
-	zabbix_log( LOG_LEVEL_DEBUG, "Expression1:[%s]", exp );
+	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_macros([%s])",exp);
 
 	while( find_char(exp,'{') != FAIL )
 	{
@@ -442,18 +552,23 @@ int	substitute_macros(char *exp)
 		} 
 		parameter[r1]=0;
 
+		zabbix_log( LOG_LEVEL_DEBUG, "Parameter:%s", parameter );
+
 		i=get_lastvalue(value,host,key,function,parameter);
 		zabbix_log( LOG_LEVEL_DEBUG, "Value3 [%s]", value );
-/*		exp[l]='%';
+
+
+		zabbix_log( LOG_LEVEL_DEBUG, "Value4 [%s]", exp );
+		exp[l]='%';
 		exp[l+1]='s';
-		exp[l+2]=' ';
 
-		for(i=l+3;i<=r;i++)
-		{
-			exp[i]=' ';
-		}*/
+		zabbix_log( LOG_LEVEL_DEBUG, "Value41 [%s]", exp+l+2 );
+		zabbix_log( LOG_LEVEL_DEBUG, "Value42 [%s]", exp+r+1 );
+		strcpy(exp+l+2,exp+r+1);
 
-		j=0;
+		zabbix_log( LOG_LEVEL_DEBUG, "Value5 [%s]", exp );
+
+/*		j=0;
 		for(i=0;i<strlen(exp);i++)
 		{
 			if( (i>=l+3) && (i<=r) )
@@ -465,7 +580,7 @@ int	substitute_macros(char *exp)
 				exp[j]='s';
 			j++;
 		}
-		exp[j]=0;
+		exp[j]=0;*/
 
 		sprintf(res,exp,value);
 		strncpy(exp,res, MAX_STRING_LEN);

@@ -24,13 +24,13 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.26)
+Zabbix Reference Manual for version 1.0 (draft v1.27)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-26 July 2002
+1 August 2002
 \layout Abstract
 
 The document is Reference Manual for Zabbix version 1.0.
@@ -3241,6 +3241,11 @@ Theory of operations
 Data exchange protocol
 \layout Standard
 
+
+\series bold 
+zabbix_suckerd zabbix_agent(d)
+\layout Standard
+
 Server ->[key]->Agent
 \layout Standard
 
@@ -3257,6 +3262,17 @@ Details !
 \end_inset 
 
 
+\layout Standard
+
+
+\series bold 
+zabbix_sender zabbix_trapper(d)
+\layout Standard
+
+Sender ->[server:key:value]->Trapper
+\layout Standard
+
+Trapper->[OK]->Sender
 \layout Subsection
 
 Database
@@ -6344,6 +6360,18 @@ You can use them to create complex logical tests regarding monitored statistics.
 The following operators are supported for triggers:
 \layout Description
 
+- minus
+\layout Description
+
++ plus
+\layout Description
+
+/ division
+\layout Description
+
+* multiplication
+\layout Description
+
 > more than
 \layout Description
 
@@ -7030,6 +7058,47 @@ diskfree[/]
 
 
 \latex no_latex 
+disk
+\latex default 
+total
+\latex no_latex 
+[*]
+\latex default 
+ 
+\latex no_latex 
+Amount of 
+\latex default 
+total
+\latex no_latex 
+ disk space for given volume
+\latex default 
+ (in Kb)
+\latex no_latex 
+.
+
+\latex default 
+ In case of mounted volume, total disk space for local file system is returned.
+\layout Standard
+
+E
+\latex no_latex 
+xample:
+\layout Standard
+
+
+\emph on 
+disktotal[/]
+\emph default 
+\latex no_latex 
+ - returns 
+\latex default 
+total
+\latex no_latex 
+ disk space for root volume.
+\layout Description
+
+
+\latex no_latex 
 filesize[*]
 \latex default 
  
@@ -7067,6 +7136,36 @@ inodefree[/var]
 \emph default 
 \latex no_latex 
  - returns number of free inodes for volume /var
+\layout Description
+
+
+\latex no_latex 
+inode
+\latex default 
+total
+\latex no_latex 
+[*]
+\latex default 
+ Total n
+\latex no_latex 
+umber of inodes for given volume.
+\layout Standard
+
+
+\latex no_latex 
+Example:
+\layout Standard
+
+
+\emph on 
+inodetotal[/var]
+\emph default 
+\latex no_latex 
+ - returns number 
+\latex default 
+of 
+\latex no_latex 
+inodes for volume /var
 \layout Description
 
 kern[maxfiles] Maximum number of opened files supported by OS.
@@ -7379,7 +7478,7 @@ Supported Parameters by Platform
 \size footnotesize 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="42" columns="7">
+<lyxtabular version="2" rows="44" columns="7">
 <features rotate="false" islongtable="true" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="15mm" special="">
@@ -7884,6 +7983,64 @@ X
 
 \layout Standard
 
+disktotal[*]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
 
 \lang english
 inodefree[*]
@@ -7946,6 +8103,64 @@ X
 
 
 \lang english
+X
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+inodetotal[*]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
 X
 \end_inset 
 </cell>
@@ -15436,14 +15651,22 @@ Problems and Common Errors
 \layout Subsection
 
 Authentication failed in case if user name and password is correct
-\layout Standard
+\layout Itemize
 
 Check system date on both 
 \series bold 
 Zabbix 
 \series default 
 server and client machine where WEB browser is running.
- The dfference should not be more than 20 minutes.
+ The difference should not be more than 20 minutes.
+\layout Itemize
+
+Browser should be configured to accept cookies.
+ 
+\series bold 
+Zabbix 
+\series default 
+uses cookies to store session-related information.
 \layout Section
 
 How Zabbix Compares to Other Monitoring Software
@@ -15480,31 +15703,24 @@ WhatsUp Gold
 \layout Section
 
 Zabbix in the future
+\layout Subsection
+
+TODO (1.1 stable)
 \layout Itemize
 
 Distributed monitoring
 \layout Itemize
 
-Better support for SNMP
-\layout Itemize
-
-Improved WEB interface
+Get rid of Apache and PHP (2.0?)
 \layout Itemize
 
 Native agent for MS platforms
 \layout Itemize
 
-Data encryption
+Data encryption (SSL)
 \layout Itemize
 
 Centralised monitoring of log files
-\layout Itemize
-
-All 
-\series bold 
-Zabbix 
-\series default 
-errors and warning to be numbered and documented
 \layout Itemize
 
 
@@ -15516,6 +15732,91 @@ to periodically generate and send by email set of standard reports in PDF
 \layout Itemize
 
 Graphs to be included into alert's email
+\layout Subsection
+
+TODO (1.0 stable)
+\layout Itemize
+
+functions.lastvalue should contain NULL at the beginning
+\layout Itemize
+
+more reports
+\layout Itemize
+
+all 
+\series bold 
+Zabbix 
+\series default 
+errors and warning to be numbered and documented
+\layout Itemize
+
+better support for SNMP (send and receive SNMP traps)
+\layout Itemize
+
+improved WEB interface
+\layout Itemize
+
+fix permissions for graphs, etc
+\layout Itemize
+
+monitoring of log files, Support for string=string.
+\layout Itemize
+
+regression tests
+\layout Itemize
+
+same time navigator for all graphs
+\layout Itemize
+
+change definitions in db.h to allow substitution of macros (char *item.zzz
+ -> char item.zzz[MAX_STRING_LEN+1])
+\layout Itemize
+
+add safe wrapper functions for strncat, strcpy, etc
+\layout Itemize
+
+change tigger status to UNKNOWN when status of a host is changed
+\layout Itemize
+
+Look at IPFC (AndrisM)
+\layout Itemize
+
+network map.
+ Connect an icon to a trigger/service
+\layout Itemize
+
+fix proc_cnt[*]
+\layout Itemize
+
+create one universal chart.php to be used for graphs, charts, and trends
+\layout Itemize
+
+add MRTG-like graphs
+\layout Itemize
+
+add support for /,*,+,- in expressions
+\layout Itemize
+
+add support for check_service[ldap]
+\layout Itemize
+
+add support for Kb,bytes,kps, etc
+\layout Itemize
+
+add new screenshots to zabbix.sf.net
+\layout Itemize
+
+add pie-graphs to alerts
+\layout Itemize
+
+add graph for availability report
+\layout Itemize
+
+fix incorrect (?) calculation of complex expressions (a&b&c) where b is
+ unknown.
+\layout Itemize
+
+improve functionality of IT Services
 \layout Section
 
 Support of Zabbix
@@ -18920,6 +19221,7 @@ Pass
 \layout Standard
 
 
+\size footnotesize 
 \emph on 
 configure 
 \emph default 
@@ -18931,6 +19233,8 @@ exists
 
 \layout Standard
 
+
+\size footnotesize 
 Pass
 \end_inset 
 </cell>
@@ -18980,6 +19284,8 @@ No error/warning messages
 
 \layout Standard
 
+
+\size footnotesize 
 Pass
 \end_inset 
 </cell>
@@ -19029,6 +19335,8 @@ No error/warning messages
 
 \layout Standard
 
+
+\size footnotesize 
 Pass
 \end_inset 
 </cell>
@@ -19080,6 +19388,8 @@ No error/warning messages
 
 \layout Standard
 
+
+\size footnotesize 
 Pass
 \end_inset 
 </cell>
@@ -19127,6 +19437,8 @@ No error/warning messages
 
 \layout Standard
 
+
+\size footnotesize 
 Pass
 \end_inset 
 </cell>
@@ -19533,6 +19845,7 @@ Load data into PostgreSQL
 
 \layout Standard
 
+1015
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
