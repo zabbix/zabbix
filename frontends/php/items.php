@@ -247,10 +247,10 @@
 			switch($row["status"])
 			{
 				case 0:
-					$status=array("value"=>"<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$_GET["hostid"]."&register=changestatus&status=1\">".S_ACTIVE."</a>","class"=>"off");
+					$status=array("value"=>"<a class=\"off\" href=\"items.php?itemid=".$row["itemid"]."&hostid=".$_GET["hostid"]."&register=changestatus&status=1\">".S_ACTIVE."</a>","class"=>"off");
 					break;
 				case 1:
-					$status=array("value"=>"<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$_GET["hostid"]."&register=changestatus&status=0\">".S_NOT_ACTIVE."</a>","class"=>"on");
+					$status=array("value"=>"<a class=\"on\" href=\"items.php?itemid=".$row["itemid"]."&hostid=".$_GET["hostid"]."&register=changestatus&status=0\">".S_NOT_ACTIVE."</a>","class"=>"on");
 					break;
 				case 3:
 					$status=array("value"=>S_NOT_SUPPORTED,"class"=>"unknown");
