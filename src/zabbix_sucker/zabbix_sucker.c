@@ -552,7 +552,7 @@ int main(int argc, char **argv)
 	phan.sa_handler = &signal_handler; /* set up sig handler using sigaction() */
 	sigemptyset(&phan.sa_mask);  /* just block alarm signal */
 	phan.sa_flags = 0;
-	phan.sa_flags = SA_RESTART;
+//	phan.sa_flags = SA_RESTART;
 	sigaction(SIGALRM, &phan, NULL);
 
 
