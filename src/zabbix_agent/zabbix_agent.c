@@ -58,16 +58,16 @@ COMMAND	commands[]=
 
 	{"system[interrupts]"		,EXECUTE, "vmstat -n 1 2|tail -1|cut -b57-61"},
 	{"system[switches]"		,EXECUTE, "vmstat -n 1 2|tail -1|cut -b62-67"},
+	{"system[procload]"		,PROCLOAD, 0},
+	{"system[procload5]"		,PROCLOAD5, 0},
+	{"system[procload15]"		,PROCLOAD15, 0},
+	{"system[proccount]"		,EXECUTE, "echo /proc/[0-9]*|wc -w"},
+	{"system[procrunning]"		,EXECUTE, "cat /proc/loadavg|cut -f1 -d'/'|cut -f4 -d' '"},
+	{"system[uptime]"		,UPTIME, 0},
+	{"system[users]"		,EXECUTE, "who|wc -l"},
 
-	{"proccount"			,EXECUTE, "echo /proc/[0-9]*|wc -w"},
 	{"ping"				,PING, 0},
-	{"procload"			,PROCLOAD, 0},
-	{"procload5"			,PROCLOAD5, 0},
-	{"procload15"			,PROCLOAD15, 0},
-	{"procrunning"			,EXECUTE, "cat /proc/loadavg|cut -f1 -d'/'|cut -f4 -d' '"},
 	{"tcp_count"			,EXECUTE, "netstat -tn|grep EST|wc -l"},
-	{"users"			,EXECUTE, "who|wc -l"},
-	{"uptime"			,UPTIME, 0},
 	{0				,0}
 	};
 

@@ -162,21 +162,21 @@ insert into items_template (itemtemplateid,platformid,description,key_,delay)
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
 	values (8,1,"Free number of inodes on /usr","inodefree[/usr]", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (9,1,"Number of processes","proccount", 30);
+	values (9,1,"Number of processes","system[proccount]", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (10,1,"Processor load","procload", 10);
+	values (10,1,"Processor load","system[procload]", 10);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (11,1,"Processor load5","procload5", 30);
+	values (11,1,"Processor load5","system[procload5]", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (12,1,"Processor load15","procload15", 60);
+	values (12,1,"Processor load15","system[procload15]", 60);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (13,1,"Number of running processes","procrunning", 30);
+	values (13,1,"Number of running processes","system[procrunning]", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
 	values (14,1,"Free swap space (Kb)","swap[free]", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
 	values (16,1,"Size of /var/log/syslog","filesize[/var/log/syslog]", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (17,1,"Number of users connected","users", 30);
+	values (17,1,"Number of users connected","system[users]", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
 	values (18,1,"Number of established TCP connections","tcp_count", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
@@ -196,7 +196,7 @@ insert into items_template (itemtemplateid,platformid,description,key_,delay)
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
 	values (26,1,"Free disk space on /opt","diskfree[/opt]", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (27,1,"Host uptime (in sec)","uptime", 300);
+	values (27,1,"Host uptime (in sec)","system[uptime]", 300);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
 	values (28,1,"Total memory (kB)","memory[total]", 1800);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
