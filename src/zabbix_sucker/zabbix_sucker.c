@@ -14,6 +14,8 @@
 
 #include <syslog.h>
 
+#include "config.h"
+
 /* Required for SNMP support*/
 #ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
 
@@ -310,6 +312,7 @@ int	get_value(double *result,DB_ITEM *item)
 #endif
 	else
 	{
+		syslog(LOG_WARNING, "Not supported item type:%d",item->type);
 		*result=NOTSUPPORTED;
 		return SUCCEED;
 	}
