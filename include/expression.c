@@ -28,6 +28,58 @@
 #include "db.h"
 #include "log.h"
 
+/*
+ * Delete all right spaces from given string
+ */ 
+void	rtrim_spaces(char *c)
+{
+	int i,len;
+
+	len=strlen(c);
+	for(i=len-1;i>=0;i--)
+	{
+		if( c[i] == ' ')
+		{
+			c[i]=0;
+		}
+		else	break;
+	}
+}
+
+/*
+ * Delete all left spaces from given string
+ */ 
+void	ltrim_spaces(char *c)
+{
+	int i,len,spaces;
+
+/* Number of left spaces */
+	spaces=0;
+	for(i=0;c[i]!=0;i++)
+	{
+		if( c[i] == ' ')
+		{
+			spaces++;
+		}
+		else	break;
+	}
+	for(i=0;c[i+spaces]!=0;i++)
+	{
+		c[i]=c[i+spaces];
+	}
+
+	c[strlen(c)-spaces]=0;
+}
+
+/*
+ * Delete all left and right spaces from given string
+ */ 
+void	lrtrim_spaces(char *c)
+{
+	ltrim_spaces(c);
+	rtrim_spaces(c);
+}
+
 /* Convert string to double. This function supports prefixes 'K', 'M', 'G' */
 double	str2double(char *str)
 {
@@ -153,6 +205,9 @@ int	evaluate_simple (double *result,char *exp)
 	int	i,j,l;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Evaluating simple expression [%s]", exp );
+
+/* Remove left and right spaces */
+	lrtrim_spaces(exp);
 
 	if( is_double(exp) == SUCCEED )
 	{
