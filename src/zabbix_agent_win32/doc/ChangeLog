@@ -1,3 +1,8 @@
+1.0.0-beta15
+
+* Fixed bug with memory[xxx] counters on systems with more than 2GB of memory
+
+
 1.0.0-beta11
 
 * Fixed bug in GetCounterName() function which causes agent crash on
