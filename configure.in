@@ -412,6 +412,9 @@ AC_TYPE_SIGNAL
 AC_REPLACE_FUNCS(getloadavg)
 AC_CHECK_FUNCS(socket strtod)
 AC_CHECK_FUNCS(snprintf)
+AC_CHECK_FUNCS(vasprintf)
+AC_CHECK_FUNCS(asprintf)
+AC_CHECK_FUNCS(vsnprintf)
 
 dnl Check if we want to compile everything with static
 AC_ARG_ENABLE(static,[
