@@ -159,7 +159,7 @@ STRUCTURE
 
 	mediaid	int	; Unique media ID
 	userid	int	; User ID
-	type	varchar	; Type of media: EMAIL, EITEMS, EMEDIA
+	type	varchar	; Type of media: 0 - EMAIL
 	sendto	varchar	; Address to send email
 	active	int	; Status of media. 0 - active, 1 - disbaled
 
@@ -179,6 +179,7 @@ STRUCTURE
 	lastcheck	int	; Time when trigger expression was recalculated 
 	priority	int	; 
 	lastchange	int	; Time when istrue was changed
+	dep_level	int	; Dependency level. The number shows how many triggers depend on this trigger.
 	comments	blob	; Comments
 
 

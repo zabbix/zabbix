@@ -78,11 +78,25 @@ CREATE TABLE triggers (
   lastcheck		int4		DEFAULT '0' NOT NULL,
   priority		int2		DEFAULT '0' NOT NULL,
   lastchange		int4		DEFAULT '0' NOT NULL,
+  dep_level		int2		DEFAULT '0' NOT NULL,
   comments		text,
   PRIMARY KEY (triggerid)
 );
 
 CREATE INDEX triggers_istrue on triggers (istrue);
+
+--
+-- Table structure for table 'trigger_depends'
+--
+
+CREATE TABLE trigger_depends (
+  triggerid_down	int4	DEFAULT '0' NOT NULL,
+  triggerid_up		int4	DEFAULT '0' NOT NULL,
+  PRIMARY KEY		(triggerid_down, triggerid_up)
+);
+
+CREATE INDEX trigger_depends_down on trigger_depends (triggerid_down);
+CREATE INDEX trigger_depends_up   on trigger_depends (triggerid_up);
 
 --
 -- Table structure for table 'users'
