@@ -266,7 +266,7 @@ int	DBget_prev_trigger_value(int triggerid)
 
 	if(DBis_empty(result) == SUCCEED)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Result of [%s] is empty", sql );
+		zabbix_log(LOG_LEVEL_DEBUG, "Result of [%s] is empty", sql );
 		DBfree_result(result);
 		return TRIGGER_VALUE_UNKNOWN;
 	}

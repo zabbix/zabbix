@@ -1,11 +1,10 @@
 <?
 
-//	$DB_TYPE	="POSTGRESQL";
-	$DB_TYPE	="MYSQL";
+	$DB_TYPE	="POSTGRESQL";
+//	$DB_TYPE	="MYSQL";
 	$DB_SERVER	="localhost";
 	$DB_DATABASE	="zabbix";
-//	$DB_USER	="zabbix";
-	$DB_USER	="root";
+	$DB_USER	="zabbix";
 	$DB_PASSWORD	="";
 
 	$USER_DETAILS	="";
@@ -17,7 +16,7 @@
 	}
 	if($DB_TYPE == "POSTGRESQL")
 	{
-		$DB=pg_pconnect("host=$DB_SERVER dbname=$DB_DATABASE user=$DB_USER password=$DB_PASSWORD");
+		$DB=pg_pconnect("host='$DB_SERVER' dbname='$DB_DATABASE' user='$DB_USER' password='$DB_PASSWORD'");
 		if(!$DB)
 		{
 			echo "Error connecting to database";

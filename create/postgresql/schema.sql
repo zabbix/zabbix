@@ -65,11 +65,11 @@ CREATE TABLE config (
 -- Table structure for table 'groups'
 --
 
-CREATE TABLE groups (
-  groupid		serial,
-  name			varchar(64)	DEFAULT '' NOT NULL,
-  PRIMARY KEY (groupid)
-);
+--CREATE TABLE groups (
+--  groupid		serial,
+--  name			varchar(64)	DEFAULT '' NOT NULL,
+--  PRIMARY KEY (groupid)
+--);
 
 --
 -- Table structure for table 'triggers'
@@ -80,7 +80,8 @@ CREATE TABLE triggers (
   expression		varchar(255)	DEFAULT '' NOT NULL,
   description		varchar(255)	DEFAULT '' NOT NULL,
   url			varchar(255)	DEFAULT '' NOT NULL,
-  istrue		int4		DEFAULT '0' NOT NULL,
+  status		int4		DEFAULT '0' NOT NULL,
+  value			int4		DEFAULT '0' NOT NULL,
   priority		int2		DEFAULT '0' NOT NULL,
   lastchange		int4		DEFAULT '0' NOT NULL,
   dep_level		int2		DEFAULT '0' NOT NULL,
@@ -109,13 +110,11 @@ CREATE INDEX trigger_depends_up   on trigger_depends (triggerid_up);
 
 CREATE TABLE users (
   userid		serial,
-  groupid		int4		NOT NULL DEFAULT '0',
   alias			varchar(100)	DEFAULT '' NOT NULL,
   name			varchar(100)	DEFAULT '' NOT NULL,
   surname		varchar(100)	DEFAULT '' NOT NULL,
   passwd		char(32)	DEFAULT '' NOT NULL,
-  PRIMARY KEY (userid),
-  FOREIGN KEY (groupid) REFERENCES groups
+  PRIMARY KEY (userid)
 );
 
 CREATE UNIQUE INDEX users_alias on users (alias);
@@ -146,6 +145,8 @@ CREATE TABLE alerts (
   alertid		serial,
   actionid		int4		DEFAULT '0' NOT NULL,
   clock			int4		DEFAULT '0' NOT NULL,
+  status		int4		DEFAULT '0' NOT NULL,
+  retries		int4		DEFAULT '0' NOT NULL,
   type			varchar(10)	DEFAULT '' NOT NULL,
   sendto		varchar(100)	DEFAULT '' NOT NULL,
   subject		varchar(255)	DEFAULT '' NOT NULL,
@@ -156,6 +157,7 @@ CREATE TABLE alerts (
 
 CREATE INDEX alerts_actionid on alerts (actionid);
 CREATE INDEX alerts_clock on alerts (clock);
+CREATE INDEX alerts_status_retires on alerts (status,retries);
 
 --
 -- Table structure for table 'alarms'
@@ -166,6 +168,7 @@ CREATE TABLE alarms (
   triggerid		int4		DEFAULT '0' NOT NULL,
   clock			int4		DEFAULT '0' NOT NULL,
   istrue		int4		DEFAULT '0' NOT NULL,
+  value			int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (alarmid),
   FOREIGN KEY (triggerid) REFERENCES triggers
 );
@@ -341,6 +344,7 @@ CREATE TABLE services (
   serviceid		serial,
   name			varchar(128)	DEFAULT '' NOT NULL,
   status		int2		DEFAULT '0' NOT NULL,
+  algorithm		int2		DEFAULT '0' NOT NULL,
   triggerid		int4,
   PRIMARY KEY (serviceid)
 );
@@ -369,5 +373,14 @@ CREATE TABLE rights (
   id                    int4,
   PRIMARY KEY (rightid)
 );
+
+CREATE TABLE sessions (
+	sessionid	varchar(32)	DEFAULT '' NOT NULL,
+	userid		int4		DEFAULT '0' NOT NULL,
+	lastaccess	int4		DEFAULT '0' NOT NULL,
+	PRIMARY KEY (sessionid),
+	FOREIGN KEY (userid) REFERENCES users
+);
+
 
 VACUUM ANALYZE;
