@@ -28,6 +28,8 @@ CREATE TABLE services (
   status		int(1)		DEFAULT '0' NOT NULL,
   algorithm		int(1)		DEFAULT '0' NOT NULL,
   triggerid		int(4),
+  showsla		int(1)		DEFAULT '0' NOT NULL,
+  goodsla		int(4)		DEFAULT '99.9' NOT NULL,
   PRIMARY KEY (serviceid)
 ) type=InnoDB;
 

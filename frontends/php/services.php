@@ -20,12 +20,12 @@
 	{
 		if($HTTP_GET_VARS["register"]=="update")
 		{
-			$result=@update_service($HTTP_GET_VARS["serviceid"],$HTTP_GET_VARS["name"],$HTTP_GET_VARS["triggerid"],$HTTP_GET_VARS["linktrigger"],$HTTP_GET_VARS["algorithm"]);
+			$result=@update_service($HTTP_GET_VARS["serviceid"],$HTTP_GET_VARS["name"],$HTTP_GET_VARS["triggerid"],$HTTP_GET_VARS["linktrigger"],$HTTP_GET_VARS["algorithm"],$HTTP_GET_VARS["showsla"],$HTTP_GET_VARS["goodsla"]);
 			show_messages($result,"Service updated","Cannot update service");
 		}
 		if($HTTP_GET_VARS["register"]=="add")
 		{
-			$result=@add_service($HTTP_GET_VARS["serviceid"],$HTTP_GET_VARS["name"],$HTTP_GET_VARS["triggerid"],$HTTP_GET_VARS["linktrigger"],$HTTP_GET_VARS["algorithm"]);
+			$result=@add_service($HTTP_GET_VARS["serviceid"],$HTTP_GET_VARS["name"],$HTTP_GET_VARS["triggerid"],$HTTP_GET_VARS["linktrigger"],$HTTP_GET_VARS["algorithm"],$HTTP_GET_VARS["showsla"],$HTTP_GET_VARS["goodsla"]);
 			show_messages($result,"Service added","Cannot add service");
 		}
 		if($HTTP_GET_VARS["register"]=="add server")
@@ -180,14 +180,18 @@
 <?php
 	if(isset($HTTP_GET_VARS["serviceid"]))
 	{
-		$result=DBselect("select serviceid,triggerid,name,algorithm from services where serviceid=".$HTTP_GET_VARS["serviceid"]);
+		$result=DBselect("select serviceid,triggerid,name,algorithm,showsla,goodsla from services where serviceid=".$HTTP_GET_VARS["serviceid"]);
 		$triggerid=DBget_field($result,0,1);
 		$name=DBget_field($result,0,2);
 		$algorithm=DBget_field($result,0,3);
+		$showsla=DBget_field($result,0,4);
+		$goodsla=DBget_field($result,0,5);
 	}
 	else
 	{
 		$name="";
+		$showsla=0;
+		$goodsla=99.05;
 		unset($HTTP_GET_VARS["triggerid"]);
 	}
 
@@ -230,6 +234,23 @@
 		echo "<OPTION VALUE='1' SELECTED>MAX";
 	}
 	echo "</SELECT>";
+
+        show_table2_v_delimiter();
+        echo "Show SLA";
+        show_table2_h_delimiter();
+	if($showsla==1)
+	{
+        	echo "<INPUT class=\"biginput\" TYPE=\"CHECKBOX\" NAME=\"showsla\" VALUE=\"true\" CHECKED>";
+	}
+	else
+	{
+        	echo "<INPUT class=\"biginput\" TYPE=\"CHECKBOX\" NAME=\"showsla\">";
+	}
+
+	show_table2_v_delimiter();
+	echo "Acceptable SLA (in %)";
+	show_table2_h_delimiter();
+	echo "<input class=\"biginput\" name=\"goodsla\" value=\"$goodsla\" size=6>";
 
         show_table2_v_delimiter();
         echo "Link to trigger ?";

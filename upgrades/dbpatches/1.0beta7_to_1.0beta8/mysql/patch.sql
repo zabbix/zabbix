@@ -15,3 +15,6 @@ CREATE TABLE profiles (
 ) type=InnoDB;
 
 alter table items add snmp_port	int(4) DEFAULT '161' NOT NULL;
+alter table services add showsla int(1) DEFAULT '0' NOT NULL;
+alter table services add goodsla int(4) DEFAULT '99.9' NOT NULL;
+
