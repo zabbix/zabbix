@@ -2372,6 +2372,12 @@ void	process_new_value(DB_ITEM *item,char *value)
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_new_value()");
 	value_double=strtod(value,&e);
 
+	if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (item->multiplier == ITEM_MULTIPLIER_USE))
+	{
+		multiplier = strtod(item->formula,&e);
+		value_double = value_double * multiplier;
+	}
+
 	if(item->history>0)
 	{
 		if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
