@@ -25,19 +25,22 @@ TKOM:
 
 TELECENTRS:
 
- - rus/lat characters for graphs
  - show/hide host labels in maps (show: label/hostname/nothing) Title: label+hostname
- - clickable map in map configuration
- - hard-linked templates (graphs for new hosts to be added automatically)
- - add/update item -> return o the list of items for the same host/group
  - update status when host is created
+ - add/update item -> return to the list of items for the same host/group
 
+Later:
+ - hard-linked templates (graphs for new hosts to be added automatically)
+ - clickable map in map configuration
+ - rus/lat characters for graphs
 <?
 print_r($_POST);
 ?>
 <form method="POST" action="">
 <input type="image" src="images/image.jpg" name="imgname">
 </form>
+
+END OF TELECENTRS
 
 4. SNMP traps. Make possible action definition for the SNMP trap-related
  events.
