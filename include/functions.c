@@ -535,7 +535,7 @@ void	send_to_user(int actionid,int userid,char *smtp_server,char *smtp_helo,char
 				syslog( LOG_DEBUG, "Email sending to %s %s Subject:%s Message:%s to %d\n", media.type, media.sendto, subject, message, userid );
 				if( FAIL == send_mail(smtp_server,smtp_helo,smtp_email,media.sendto,subject,message))
 				{
-					syslog( LOG_ERR, "Error sending email to %s Subject:%s to %d\n", media.sendto, subject, userid );
+					syslog( LOG_ERR, "Error sending email to '%s' Subject:'%s' to userid:%d\n", media.sendto, subject, userid );
 				}
 				now = time(NULL);
 				sprintf(c,"insert into alerts (alertid,actionid,clock,type,sendto,subject,message) values (NULL,%d,%d,'%s','%s','%s','%s');",actionid,now,media.type,media.sendto,subject,message);
@@ -680,4 +680,39 @@ void	update_triggers(int itemid)
 		}
 	}
 	DBfree_result(result);
+}
+
+int	get_lastvalue(float *Result,char *host,char *key,char *function,char *parameter)
+{
+	DB_RESULT *result;
+
+        char	c[128];
+        int	rows;
+	int	parm;
+	int	itemid;
+
+	sprintf( c, "select i.itemid from items i,hosts h where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", host, key );
+	result = DBselect(c);
+
+	if(result == NULL)
+	{
+        	DBfree_result(result);
+		syslog(LOG_WARNING, "Query failed" );
+		return FAIL;	
+	}
+        rows = DBnum_rows(result);
+	if(rows == 0)
+	{
+        	DBfree_result(result);
+		syslog(LOG_WARNING, "Query failed" );
+		return FAIL;	
+	}
+        itemid=atoi(DBget_field(result,0,0));
+	syslog(LOG_DEBUG, "Itemid:%d", itemid );
+        DBfree_result(result);
+
+	parm=atoi(parameter);
+	evaluate_FUNCTION(Result,itemid,function,parm);
+
+        return SUCCEED;
 }

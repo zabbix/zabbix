@@ -294,7 +294,7 @@ int main_loop()
 		now=time(NULL);
 		get_values();
 
-		syslog( LOG_WARNING, "Spent %d seconds while updating values", (int)time(NULL)-now );
+		syslog( LOG_DEBUG, "Spent %d seconds while updating values", (int)time(NULL)-now );
 
 		nextcheck=get_minnextcheck();
 		syslog( LOG_DEBUG, "Nextcheck:%d Time:%d", nextcheck, (int)time(NULL) );
