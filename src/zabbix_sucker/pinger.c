@@ -72,7 +72,7 @@ int create_host_file(void)
 	}
 
 	now=time(NULL);
-	sprintf(sql,"select h.useip,h.ip,h.host from hosts h where (h.status=%d or (h.status=%d and h.disable_until<=%d))", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now);
+	sprintf(sql,"select distinct h.useip,h.ip,h.host from hosts h,items i where i.hostid=h.hostid and (h.status=%d or (h.status=%d and h.disable_until<=%d)) and i.key_='icmpping' and i.type=%d and i.status=%d", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, ITEM_TYPE_SIMPLE, ITEM_STATUS_ACTIVE);
 	result = DBselect(sql);
 		
 	for(i=0;i<DBnum_rows(result);i++)
@@ -85,10 +85,10 @@ int create_host_file(void)
 		{
 			fprintf(f,"%s\n",host.ip);
 		}
-		else
+/*		else
 		{
 			fprintf(f,"%s\n",host.host);
-		}
+		}*/
 	}
 	DBfree_result(result);
 
@@ -105,7 +105,7 @@ int	do_ping(void)
 
 	zabbix_log( LOG_LEVEL_ERR, "In do_ping()");
 
-	f=popen("cat /tmp/zabbix_suckerd.pinger|/usr/sbin/fping|cut -f1 -d' ' >/tmp/zabbix_suckerd.pinger_ok","r");
+	f=popen("cat /tmp/zabbix_suckerd.pinger|/usr/sbin/fping|cut -f1 -d' '","r");
 	if(f==0)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Cannot execute /usr/sbin/fping [%s]",
@@ -121,7 +121,6 @@ int	do_ping(void)
 
 	pclose(f);
 
-	unlink("/tmp/zabbix_suckerd.pinger");
 
 	return	SUCCEED;
 }
@@ -143,6 +142,7 @@ int main_pinger_loop(void)
 		{
 			ret = do_ping();
 		}
+		unlink("/tmp/zabbix_suckerd.pinger");
 
 		DBclose();
 #ifdef HAVE_FUNCTION_SETPROCTITLE
