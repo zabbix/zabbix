@@ -9,11 +9,6 @@
 <?
 	show_table_header("IT SERVICES");
 
-	echo "<br>";
-
-	show_table_header("SERVICES");
-?>
-<?
 	$now=time();
 	$result=DBselect("select serviceid,name,triggerid,status from services order by name");
 	echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";

@@ -6,6 +6,10 @@ update config set alarm_history=alarm_history/(24*3600);
 alter table triggers add status int(4) DEFAULT '0' NOT NULL;
 alter table triggers add value int(4) DEFAULT '0' NOT NULL;
 
+alter table alerts add status int(4) DEFAULT '0' NOT NULL;
+alter table alerts add retries int(4) DEFAULT '0' NOT NULL;
+create index status_retries on alerts (status,retries);
+
 alter table items add trapper_hosts varchar(255) DEFAULT '' NOT NULL;
 
 update triggers set status=0 where istrue in (0,1,3);
@@ -22,3 +26,5 @@ alter table alarms add value int(4) DEFAULT '0' NOT NULL;
 update alarms set value=0 where istrue in (0);
 update alarms set value=1 where istrue in (1);
 update alarms set value=2 where istrue not in (0,1);
+
+alter table services add algorithm int(1) DEFAULT '0' NOT NULL;

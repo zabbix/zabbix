@@ -15,6 +15,9 @@
 #define ITEM_TYPE_SNMP		1
 #define ITEM_TYPE_TRAPPER	2
 
+/* Alert types */
+#define ALERT_TYPE_EMAIL	"EMAIL"
+
 /* Item statuses */
 #define ITEM_STATUS_ACTIVE	0
 #define ITEM_STATUS_DISABLED	1
@@ -45,6 +48,10 @@
 /* Media statuses */
 #define MEDIA_STATUS_ACTIVE	0
 #define MEDIA_STATUS_DISABLED	1
+
+/* Algorithms for service status calculation */
+#define SERVICE_ALGORITHM_NONE	0
+#define SERVICE_ALGORITHM_MAX	1
 
 #define	AGENTD_FORKS	5
 
