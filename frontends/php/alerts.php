@@ -112,10 +112,10 @@
 		{
 			echo "<TD><font color=\"AA0000\">not sent</font></TD>";
 		}
-		echo "<TD>".$row["sendto"]."</TD>";
-		echo "<TD><pre>".$row["subject"]."</pre></TD>";
+		echo "<TD>".htmlspecialchars($row["sendto"])."</TD>";
+		echo "<TD><pre>".htmlspecialchars($row["subject"])."</pre></TD>";
 		echo "<TD>";
-		echo "<pre>".$row["message"]."</pre>";;
+		echo "<pre>".htmlspecialchars($row["message"])."</pre>";;
 //		for($i=0;$i<strlen($row["message"]);$i++)
 //		{
 //			if($row["message"][$i]=="\n")
