@@ -45,6 +45,18 @@ insert into users (userid,alias,name,surname,passwd) values (1,'Admin','Zabbix',
 insert into users (userid,alias,name,surname,passwd) values (2,'guest','Default','User','d41d8cd98f00b204e9800998ecf8427e');
 
 --
+-- Data for table usrgrp
+--
+
+insert into usrgrp (usrgrpid, name) values (NULL, 'UNIX administrators');
+insert into usrgrp (usrgrpid, name) values (NULL, 'Database administrators');
+insert into usrgrp (usrgrpid, name) values (NULL, 'Network administrators');
+insert into usrgrp (usrgrpid, name) values (NULL, 'Security specialists');
+insert into usrgrp (usrgrpid, name) values (NULL, 'WEB administrators');
+insert into usrgrp (usrgrpid, name) values (NULL, 'Head of IT department');
+insert into usrgrp (usrgrpid, name) values (NULL, 'Zabbix administrators');
+
+--
 -- Data for table rights
 --
 
