@@ -98,7 +98,7 @@ CREATE TABLE alerts (
   type			varchar(10)	DEFAULT '' NOT NULL,
   sendto		varchar(100)	DEFAULT '' NOT NULL,
   subject		varchar(255)	DEFAULT '' NOT NULL,
-  message		varchar(255)	DEFAULT '' NOT NULL,
+  message		blob		DEFAULT '' NOT NULL,
   PRIMARY KEY (alertid),
   INDEX (actionid),
   KEY clock (clock)
@@ -115,7 +115,7 @@ CREATE TABLE actions (
   good			int(4)		DEFAULT '0' NOT NULL,
   delay			int(4)		DEFAULT '0' NOT NULL,
   subject		varchar(255)	DEFAULT '' NOT NULL,
-  message		varchar(255)	DEFAULT '' NOT NULL,
+  message		blob		DEFAULT '' NOT NULL,
   nextcheck		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (actionid),
   KEY (triggerid)

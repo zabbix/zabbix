@@ -61,7 +61,12 @@ CC = @CC@
 PACKAGE = @PACKAGE@
 VERSION = @VERSION@
 
-SUBDIRS = src/zabbix_agent src/zabbix_sender src/zabbix_sucker src/zabbix_trapper
+HAVE_MYSQL = @HAVE_MYSQL@
+HAVE_PGSQL = @HAVE_PGSQL@
+
+SUBDIRS = @SUBDIRS@
+#SUBDIRS = src/zabbix_agent src/zabbix_sender src/zabbix_sucker src/zabbix_trapper
+
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ./src/config.h ./src/config.h
 CONFIG_CLEAN_FILES = 
