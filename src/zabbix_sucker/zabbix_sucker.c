@@ -689,6 +689,7 @@ int update_host_status(int hostid,int status)
 	DB_RESULT	*result;
 	char	sql[MAX_STRING_LEN+1];
 	int	now;
+	int	disable_until;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In update_host_status()");
 
@@ -704,6 +705,8 @@ int update_host_status(int hostid,int status)
 	}
 
 	now=time(NULL);
+
+	disable_until = atoi(DBget_field(result,0,1));
 
 	if(status == atoi(DBget_field(result,0,0)))
 	{
@@ -735,7 +738,14 @@ int update_host_status(int hostid,int status)
 	}
 	else if(status==HOST_STATUS_UNREACHABLE)
 	{
-		sprintf(sql,"update hosts set status=%d,disable_until=%d where hostid=%d",HOST_STATUS_UNREACHABLE,now+DELAY_ON_NETWORK_FAILURE,hostid);
+		if(disable_until+DELAY_ON_NETWORK_FAILURE>now)
+		{
+			sprintf(sql,"update hosts set status=%d,disable_until=disable_until+%d where hostid=%d",HOST_STATUS_UNREACHABLE,DELAY_ON_NETWORK_FAILURE,hostid);
+		}
+		else
+		{
+			sprintf(sql,"update hosts set status=%d,disable_until=%d where hostid=%d",HOST_STATUS_UNREACHABLE,now+DELAY_ON_NETWORK_FAILURE,hostid);
+		}
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		DBexecute(sql);
 	}
