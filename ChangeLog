@@ -1,5 +1,6 @@
 Changes for 1.1alpha1:
 
+ - agent will return ZBX_UNSUPPORTED in case if execute command returned EOL only (Alexei)
  - support of diskfree_perc[],diskused_perc[], inodefree_perc[]. (Alexei)
  - support of check_service[ldap] and check_service_perf[ldap]. Thanks to Andreas Brenk. (Alexei)
  - fixed incorrect setting of ICMP-related triggers to UNKNOWN state (Alexei) 
