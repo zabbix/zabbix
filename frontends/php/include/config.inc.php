@@ -906,6 +906,24 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				}
 ?>
 		</td>
+		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
+<?php
+				if(check_right("Screen","R",0))
+				{
+					echo "<a href=\"screens.php\">";
+				}
+?>
+<?php
+				if($page["file"]=="screens.php")
+				{
+					echo "<b>[SCREENS]</b></a>";
+				}
+				else
+				{
+					echo "SCREENS</a>";
+				}
+?>
+		</td>
 
 		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
 <?php
@@ -1003,6 +1021,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			check_right("Host","U",0)
 			||
 			check_right("Graph","U",0)
+			||
+			check_right("Screen","U",0)
 			||
 			check_right("Network map","U",0)
 			||
@@ -1125,6 +1145,23 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				else
 				{
 					echo "GRAPHS</a>";
+				}
+?>
+		</td>
+		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
+<?php
+				if(check_right("Screen","U",0))
+				{
+					echo "<a href=\"screenconf.php\">";
+				}
+				if(	($page["file"]=="screenedit.php")||
+					($page["file"]=="screenconf.php"))
+				{
+					echo "<b>[SCREENS]</b></a>";
+				}
+				else
+				{
+					echo "SCREENS</a>";
 				}
 ?>
 		</td>
