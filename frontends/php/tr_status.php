@@ -250,10 +250,6 @@
 	}
 	if(isset($_GET["select"]))
 	{
-		echo $_GET["select"];
-	}
-	if(isset($_GET["select"]))
-	{
   		$h2=$h2."<input class=\"biginput\" type=\"text\" name=\"select\" value=\"".$_GET["select"]."\">";
 	}
 	else
