@@ -1,11 +1,11 @@
-<?
+<?php
 	include "include/config.inc.php";
 	$page["title"] = "Latest values";
 	$page["file"] = "latest.php";
 	show_header($page["title"],0,0);
 ?>
 
-<?
+<?php
         if(!check_right("Host","R",0))
         {
                 show_table_header("<font color=\"AA0000\">No permissions !</font
@@ -27,7 +27,7 @@
         }
 ?>
 
-<?
+<?php
 	show_table_header_begin();
 	echo "LATEST DATA";
 
@@ -340,6 +340,6 @@
 	}
 ?>
 
-<?
+<?php
 	show_footer();
 ?>

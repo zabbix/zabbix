@@ -1,4 +1,4 @@
-<?
+<?php
 	$page["title"] = "Users";
 	$page["file"] = "users.php";
 
@@ -6,7 +6,7 @@
 	show_header($page["title"],0,0);
 ?>
 
-<?
+<?php
         if(!check_right("User","U",0))
         {
                 show_table_header("<font color=\"AA0000\">No permissions !</font
@@ -16,7 +16,7 @@
         }
 ?>
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["register"]))
 	{
 		if($HTTP_GET_VARS["register"]=="add")
@@ -63,11 +63,11 @@
 	}
 ?>
 
-<?
+<?php
 	show_table_header("CONFIGURATION OF USERS");
 ?>
 
-<?
+<?php
 	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR><TD WIDTH=3%><B>Id</B></TD>";
 	echo "<TD WIDTH=10%><B>Alias</B></TD>";
@@ -113,7 +113,7 @@
 	echo "</TABLE>";
 ?>
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["userid"]))
 	{
 	echo "<br>";
@@ -168,12 +168,12 @@
 	}
 ?>
 
-<?
+<?php
 	echo "<br>";
 
 	@insert_user_form($HTTP_GET_VARS["userid"]);
 ?>
 
-<?
+<?php
 	show_footer();
 ?>

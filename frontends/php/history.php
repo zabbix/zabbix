@@ -1,4 +1,4 @@
-<?
+<?php
 	$page["file"]="history.php";
 
 	include "include/config.inc.php";
@@ -53,7 +53,7 @@
 
 ?>
 
-<?
+<?php
 	if($HTTP_GET_VARS["action"]=="plaintext")
 	{
 		$from=mktime($fromhour,$frommin,0,$frommonth,$fromday,$fromyear);
@@ -64,7 +64,7 @@
 
 ?>
 
-<?
+<?php
 	show_table_header_begin();
 	$item=get_item_by_itemid($HTTP_GET_VARS["itemid"]);
 	if($item["value_type"] == 0)

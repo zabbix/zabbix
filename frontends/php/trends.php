@@ -1,11 +1,11 @@
-<?
+<?php
 	include "include/config.inc.php";
 	$page["title"] = "Latest values";
 	$page["file"] = "latest.php";
 	show_header($page["title"],0,0);
 ?>
 
-<?
+<?php
 	if(!check_right("Item","R",$HTTP_GET_VARS["itemid"]))
 	{
 		show_table_header("<font color=\"AA0000\">No permissions !</font>");
@@ -14,7 +14,7 @@
 	}
 ?>
 
-<?
+<?php
 	show_table_header_begin();
 	$result=DBselect("select i.description,h.host,h.hostid from items i,hosts h where i.hostid=h.hostid and i.itemid=".$HTTP_GET_VARS["itemid"]);
 	$description=DBget_field($result,0,0);
@@ -85,7 +85,7 @@
 	echo "<br>";
 ?>
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["itemid"])&&isset($HTTP_GET_VARS["type"]))
 	{
 		show_table_header(strtoupper($HTTP_GET_VARS["type"]));
@@ -126,6 +126,6 @@
 
 ?>
 
-<?
+<?php
 	show_footer();
 ?>

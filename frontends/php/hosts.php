@@ -1,11 +1,11 @@
-<?
+<?php
 	include "include/config.inc.php";
 	$page["title"] = "Hosts";
 	$page["file"] = "hosts.php";
 	show_header($page["title"],0,0);
 ?>
 
-<?
+<?php
 	if(!check_right("Host","U",0))
 	{
 		show_table_header("<font color=\"AA0000\">No permissions !</font>");
@@ -14,7 +14,7 @@
 	}
 ?>
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["register"]))
 	{
 		if($HTTP_GET_VARS["register"]=="add")
@@ -44,11 +44,11 @@
 	}
 ?>
 
-<?
+<?php
 	show_table_header("CONFIGURATION OF HOSTS");
 ?>
 
-<?
+<?php
 	if(!isset($HTTP_GET_VARS["hostid"]))
 {
 	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
@@ -112,7 +112,7 @@
 }
 ?>
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["register"]) && ($HTTP_GET_VARS["register"] == "change"))
 	{
 		$result=DBselect("select host,port,status,useip,ip from hosts where hostid=".$HTTP_GET_VARS["hostid"]); 
@@ -247,6 +247,6 @@
 	show_table2_header_end();
 ?>
 
-<?
+<?php
 	show_footer();
 ?>

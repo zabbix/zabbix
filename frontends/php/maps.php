@@ -1,4 +1,4 @@
-<?
+<?php
 	include "include/config.inc.php";
 	$page["title"] = "Network maps";
 	$page["file"] = "maps.php";
@@ -18,7 +18,7 @@
 	}
 ?>
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["sysmapid"])&&!check_right("Network map","R",$HTTP_GET_VARS["sysmapid"]))
 	{
 		show_table_header("<font color=\"AA0000\">No permissions !</font>");
@@ -27,7 +27,7 @@
 	}
 ?>
 
-<?
+<?php
 	if(!isset($HTTP_GET_VARS["fullscreen"]))
 	{
 		show_table_header_begin();
@@ -66,7 +66,7 @@
 	}
 ?>
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["sysmapid"]))
 	{
 		$result=DBselect("select name from sysmaps where sysmapid=".$HTTP_GET_VARS["sysmapid"]);
@@ -124,6 +124,6 @@
 	echo "</TABLE>";
 ?>
 
-<?
+<?php
 	show_footer();
 ?>

@@ -1,4 +1,4 @@
-<?
+<?php
 	$page["title"] = "Configuration of triggers";
 	$page["file"] = "triggers.php";
 
@@ -6,7 +6,7 @@
 	show_header($page["title"],0,0);
 ?>
 
-<?
+<?php
         if(!check_right("Host","U",0))
         {
                 show_table_header("<font color=\"AA0000\">No permissions !</font
@@ -17,7 +17,7 @@
 ?>
 
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["register"]))
 	{
 		if($HTTP_GET_VARS["register"]=="add dependency")
@@ -78,13 +78,13 @@
 	}
 ?>
 
-<?
+<?php
 	show_table_header_begin();
 	echo "CONFIGURATION OF TRIGGERS";
 	show_table_v_delimiter();
 ?>
 
-<?
+<?php
 	$result=DBselect("select hostid,host from hosts order by host");
 	while($row=DBfetch($result))
 	{
@@ -105,7 +105,7 @@
 	show_table_header_end();
 ?>
 
-<?
+<?php
 
 	if(isset($HTTP_GET_VARS["hostid"])&&!isset($HTTP_GET_VARS["triggerid"]))
 	{
@@ -182,7 +182,7 @@
 	}
 ?>
 
-<?
+<?php
 	$result=DBselect("select count(*) from hosts");
 	if(DBget_field($result,0,0)>0)
 	{
@@ -191,6 +191,6 @@
 	} 
 ?>
 
-<?
+<?php
 	show_footer();
 ?>

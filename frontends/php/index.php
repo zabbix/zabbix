@@ -1,4 +1,4 @@
-<?
+<?php
 	$page["title"]="Zabbix main page";
 	$page["file"]="index.php";
 
@@ -77,7 +77,7 @@
 	show_header($page["title"],0,0);
 ?>
 
-<?
+<?php
 	if(!isset($sessionid))
 	{
 //		echo "-",$HTTP_COOKIE_VARS["sessionid"],"-<br>";
@@ -91,6 +91,6 @@
 	}	
 ?>
 
-<?
+<?php
 	show_footer();
 ?>

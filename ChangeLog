@@ -1,5 +1,7 @@
 Changes for 1.0beta7:
 
+ - all <? ?> were changed to <?php ?>. No changes in php.ini required anymore.
+   (Alexei)
  - added Zabbix agent for WIN32 platforms. Thanks to Victor Kirhenstein. (Alexei) 
  - fixed coredump in get_lstvalue(). Thanks to Rickard Plars. (Alexei)
  - delay renamed to "Update interval (in sec)" in item definition form
