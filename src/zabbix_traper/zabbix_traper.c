@@ -119,7 +119,7 @@ int	process_data(char *server,char *key, double value)
 
 	DBexecute(sql);
 
-	updateFunctions( itemid );
+	update_functions( itemid );
  
 	DBfree_result(result);
 

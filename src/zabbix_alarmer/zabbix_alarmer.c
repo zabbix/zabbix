@@ -42,7 +42,7 @@ void    daemon_init(void)
 	}
 }
 
-void	SendMail(char *smtp_server,char *smtp_helo,char *smtp_email,char *MailTo,char *MailSubject,char *MailBody)
+void	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,char *mailsubject,char *mailbody)
 {
 	int s;
 	int i,e;
@@ -92,20 +92,20 @@ void	SendMail(char *smtp_server,char *smtp_helo,char *smtp_email,char *MailTo,ch
 	i=recvfrom(s,c,1023,0,(struct sockaddr *)&servaddr_in,&i);
 	if(i==-1) perror("Error receiving answer on MAIL FROM request.");
 	
-	sprintf(c,"RCPT TO: <%s>\n",MailTo);
+	sprintf(c,"RCPT TO: <%s>\n",mailto);
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e==-1) perror("Error sending RCPT TO to mailserver.");
 	i=sizeof(struct sockaddr_in);
 	i=recvfrom(s,c,1023,0,(struct sockaddr *)&servaddr_in,&i);
 	if(i==-1) perror("Error receiving answer on RCPT TO request.");
 	
-	sprintf(c,"DATA\nSubject: %s\n",MailSubject);
+	sprintf(c,"DATA\nSubject: %s\n",mailsubject);
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e==-1) perror("Error sending DATA to mailserver.");
 	i=sizeof(struct sockaddr_in);
 	i=recvfrom(s,c,1023,0,(struct sockaddr *)&servaddr_in,&i);
 	if(i==-1) perror("Error receiving answer on DATA request.");
-	sprintf(c,"%s\n",MailBody);
+	sprintf(c,"%s\n",mailbody);
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e==-1) perror("Error sending MailBody to mailserver.");
 	sprintf(c,".\n");
@@ -129,51 +129,51 @@ void	SendMail(char *smtp_server,char *smtp_helo,char *smtp_email,char *MailTo,ch
 	free(c); 
 }
 
-void	SendToUser(int UserId,char *smtp_server,char *smtp_helo,char *smtp_email,char *Subject,char *Message)
+void	send_to_user(int userid,char *smtp_server,char *smtp_helo,char *smtp_email,char *subject,char *message)
 {
-	MEDIA Media;
+	MEDIA media;
 	char c[1024];
 	DB_RESULT *result;
 
 	DB_ROW row;
 
-	sprintf(c,"select type,sendto,active from media where userid=%d",UserId);
+	sprintf(c,"select type,sendto,active from media where userid=%d",userid);
 	DBexecute(c);
 
 	result = DBget_result();
 
 	while ( (row = DBfetch_row(result)) )
 	{
-		Media.Active=atoi(row[2]);
-		dbg_write( dbg_proginfo, "ACTIVE=%d or %s\n", Media.Active, row[2] );
-		if(Media.Active!=1) // If media is enabled (active)
+		media.active=atoi(row[2]);
+		dbg_write( dbg_proginfo, "ACTIVE=%d or %s\n", media.active, row[2] );
+		if(media.active!=1) // If media is enabled (active)
 		{
-			Media.Type=row[0];
-			Media.SendTo=row[1]; 
+			media.type=row[0];
+			media.sendto=row[1]; 
 
-			if(strcmp(Media.Type,"EMAIL")==0)
+			if(strcmp(media.type,"EMAIL")==0)
 			{
-				dbg_write( dbg_proginfo, "Email sending to %s %s Subject:%s Message:%s to %d\n", Media.Type, Media.SendTo, Subject, Message, UserId );
-				SendMail(smtp_server,smtp_helo,smtp_email,Media.SendTo,Subject,Message);
-				sprintf(c,"insert into alerts (alertid,clock,type,sendto,subject,message) values (NULL,unix_timestamp(),'%s','%s','%s','%s');",Media.Type,Media.SendTo,Subject,Message);
+				dbg_write( dbg_proginfo, "Email sending to %s %s Subject:%s Message:%s to %d\n", media.type, media.sendto, subject, message, userid );
+				send_mail(smtp_server,smtp_helo,smtp_email,media.sendto,subject,message);
+				sprintf(c,"insert into alerts (alertid,clock,type,sendto,subject,message) values (NULL,unix_timestamp(),'%s','%s','%s','%s');",media.type,media.sendto,subject,message);
 				DBexecute(c);
 			} 
 			else
 			{
-				dbg_write( dbg_syserr, "Type %s is not supported yet", Media.Type );
+				dbg_write( dbg_syserr, "Type %s is not supported yet", media.type );
 			}
 		}
 	}
 	DBfree_result(result);
 }
 
-void	ApplyActions(int TriggerId,int Good)
+void	apply_actions(int triggerid,int good)
 {
 	DB_RESULT *result;
 	
 	DB_ROW row;
 
-	ACTION Action;
+	ACTION action;
 
 	char c[1024];
 
@@ -196,7 +196,7 @@ void	ApplyActions(int TriggerId,int Good)
 
 	DBfree_result(result);
 
-	sprintf(c,"select actionid,userid,delay,subject,message from actions where triggerid=%d and good=%d and nextcheck<=unix_timestamp()",TriggerId,Good);
+	sprintf(c,"select actionid,userid,delay,subject,message from actions where triggerid=%d and good=%d and nextcheck<=unix_timestamp()",triggerid,good);
 	DBexecute(c);
 
 	result = DBget_result();
@@ -205,20 +205,20 @@ void	ApplyActions(int TriggerId,int Good)
 	{
 		dbg_write( dbg_proginfo, "Fetched:%s %s %s %s %s\n",row[0],row[1],row[2],row[3],row[4]);
 
-		Action.ActionId=atoi(row[0]);
-		Action.UserId=atoi(row[1]);
-		Action.Delay=atoi(row[2]);
-		Action.Subject=row[3];
-		Action.Message=row[4];
+		action.actionid=atoi(row[0]);
+		action.userid=atoi(row[1]);
+		action.delay=atoi(row[2]);
+		action.subject=row[3];
+		action.message=row[4];
 
-		SubstituteFunctions(&*Action.Message);
-		SubstituteFunctions(&*Action.Subject); 
+		substitute_functions(&*action.message);
+		substitute_functions(&*action.subject); 
 
-		SendToUser(Action.UserId,smtp_server,smtp_helo,smtp_email,Action.Subject,Action.Message);
-		sprintf(c,"update actions set nextcheck=unix_timestamp()+%d where actionid=%d",Action.Delay,Action.ActionId);
+		send_to_user(action.userid,smtp_server,smtp_helo,smtp_email,action.subject,action.message);
+		sprintf(c,"update actions set nextcheck=unix_timestamp()+%d where actionid=%d",action.delay,action.actionid);
 		DBexecute(c);
 	}
-	dbg_write( dbg_proginfo, "Actions applied for trigger %d %d\n", TriggerId, Good );
+	dbg_write( dbg_proginfo, "Actions applied for trigger %d %d\n", triggerid, good );
 	DBfree_result(result);
 }
 
@@ -227,7 +227,7 @@ void	update_triggers(void)
 	char c[1024];
 	char exp[8192];
 	int b;
-	TRIGGER Trigger;
+	TRIGGER trigger;
 	DB_RESULT *result;
 	DB_ROW row;
 
@@ -245,46 +245,46 @@ void	update_triggers(void)
 	while ( (row = DBfetch_row(result)) )
 	{
 		dbg_write( dbg_proginfo, "Fetched: TrId[%s] Exp[%s] IsTrue[%s]\n", row[0], row[1], row[2] );
-		Trigger.TriggerId=atoi(row[0]);
-		Trigger.Expression=row[1];
-		Trigger.IsTrue=atoi(row[2]);
-		strcpy(exp, Trigger.Expression);
-		if( EvaluateExpression(&b, exp) != 0 )
+		trigger.triggerid=atoi(row[0]);
+		trigger.expression=row[1];
+		trigger.istrue=atoi(row[2]);
+		strcpy(exp, trigger.expression);
+		if( evaluate_expression(&b, exp) != 0 )
 		{
-			dbg_write( dbg_syswarn, "Expression %s - SUX.",Trigger.Expression);
+			dbg_write( dbg_syswarn, "Expression %s - SUX.",trigger.expression);
 			continue;
 		}
 
-		sprintf(c,"update triggers set lastcheck=unix_timestamp() where triggerid=%d",Trigger.TriggerId);
+		sprintf(c,"update triggers set lastcheck=unix_timestamp() where triggerid=%d",trigger.triggerid);
 
 		DBexecute(c);
 
 
-		if((b==1)&&(Trigger.IsTrue!=1))
+		if((b==1)&&(trigger.istrue!=1))
 		{
-			sprintf(c,"update triggers set IsTrue=1, lastchange=unix_timestamp() where triggerid=%d",Trigger.TriggerId);
+			sprintf(c,"update triggers set IsTrue=1, lastchange=unix_timestamp() where triggerid=%d",trigger.triggerid);
 			DBexecute(c);
 
-			sprintf(c,"insert into alarms(triggerid,clock,istrue) values(%d,unix_timestamp(),1)",Trigger.TriggerId);
+			sprintf(c,"insert into alarms(triggerid,clock,istrue) values(%d,unix_timestamp(),1)",trigger.triggerid);
 			DBexecute(c);
 
-			ApplyActions(Trigger.TriggerId,1);
+			apply_actions(trigger.triggerid,1);
 
-			sprintf(c,"update actions set nextcheck=0 where triggerid=%d and good=0",Trigger.TriggerId);
+			sprintf(c,"update actions set nextcheck=0 where triggerid=%d and good=0",trigger.triggerid);
 			DBexecute(c);
 		}
 
-		if((b==0)&&(Trigger.IsTrue!=0))
+		if((b==0)&&(trigger.istrue!=0))
 		{
-			sprintf(c,"update triggers set IsTrue=0, lastchange=unix_timestamp() where triggerid=%d",Trigger.TriggerId);
+			sprintf(c,"update triggers set IsTrue=0, lastchange=unix_timestamp() where triggerid=%d",trigger.triggerid);
 			DBexecute(c);
 
-			sprintf(c,"insert into alarms(triggerid,clock,istrue) values(%d,unix_timestamp(),0)",Trigger.TriggerId);
+			sprintf(c,"insert into alarms(triggerid,clock,istrue) values(%d,unix_timestamp(),0)",trigger.triggerid);
 			DBexecute(c);
 
-			ApplyActions(Trigger.TriggerId,0);
+			apply_actions(trigger.triggerid,0);
 
-			sprintf(c,"update actions set nextcheck=0 where triggerid=%d and good=1",Trigger.TriggerId);
+			sprintf(c,"update actions set nextcheck=0 where triggerid=%d and good=1",trigger.triggerid);
 			DBexecute(c);
 		}
 	}

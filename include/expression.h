@@ -1,8 +1,8 @@
 #ifndef MON_EXPRESSION_H
 #define MON_EXPRESSION_H
 
-int	FindChar(char *str,char c);
-int	SubstituteFunctions(char *exp);
-int     EvaluateExpression (int *Result,char *expression);
+int	find_char(char *str,char c);
+int	substitute_functions(char *exp);
+int     evaluate_expression (int *result,char *expression);
 
 #endif

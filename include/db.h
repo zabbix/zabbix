@@ -19,54 +19,54 @@
 
 ITEM
 {
-	int     ItemId;
-	char    *Description;
-	char    *Key;
-	char    *Host;
-	char    *ShortName;
-	int     Port;
-	int     Delay;
-	int     History;
-	time_t  LastDelete;
-	time_t  LastCheck;
+	int     itemid;
+	char    *description;
+	char    *key;
+	char    *host;
+	char    *shortname;
+	int     port;
+	int     delay;
+	int     history;
+	time_t  lastdelete;
+	time_t  lastcheck;
 };
  
 FUNCTION
 {
-	int     FunctionId;
-	int     ItemId;
-	int     TriggerId;
-	double  LastValue;
-	char    *Function;
-	int     Parameter;
+	int     functionid;
+	int     itemid;
+	int     triggerid;
+	double  lastvalue;
+	char    *function;
+	int     parameter;
 };
 
 MEDIA
 {
-	int	MediaId;
-	char	*Type;
-	char	*SendTo;
-	int	Active;
+	int	mediaid;
+	char	*type;
+	char	*sendto;
+	int	active;
 };
 
 ACTION
 {
-	int	ActionId;
-	int	TriggerId;
-	int	UserId;
-	int	Good;
-	int	Delay;
-	int	LastCheck;
-	char	*Subject;
-	char	*Message;
+	int	actionid;
+	int	triggerid;
+	int	userid;
+	int	good;
+	int	delay;
+	int	lastcheck;
+	char	*subject;
+	char	*message;
 };
 
 TRIGGER
 {
-	int	TriggerId;
-	char	*Expression;
-	char	*Description;
-	int	IsTrue;
+	int	triggerid;
+	char	*expression;
+	char	*description;
+	int	istrue;
 };
 
 void    DBconnect( void );
