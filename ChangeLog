@@ -1,5 +1,6 @@
 Changes for 1.0beta11:
 
+ - fixes for agent. Error checking for opendir() (Alexei)
  - fix for syslog logging of zabbix_trapperd (Alexei)
  - added table users_groups, usrgrp (Alexei)
  - monitoring of CPU and mainboard temperature under Linux (Alexei)
