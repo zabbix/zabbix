@@ -28,7 +28,7 @@
 ?>
 
 <?php
-        if(!check_right("User","U",0))
+        if(!check_anyright("User","U"))
         {
                 show_table_header("<font color=\"AA0000\">No permissions !</font
 >");

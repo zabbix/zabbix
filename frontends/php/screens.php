@@ -51,7 +51,7 @@
 		$result=DBselect("select screenid,name,cols,rows from screens order by name");
 		while($row=DBfetch($result))
 		{
-			if(!check_right("Screen","R",$row["screenid"]))
+			if(!check_right("Screen","U",$row["screenid"]))
 			{
 				continue;
 			}

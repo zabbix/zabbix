@@ -28,7 +28,7 @@
 ?>
 
 <?php
-        if(!check_right("Host","U",0))
+        if(!check_anyright("Host","U"))
         {
                 show_table_header("<font color=\"AA0000\">No permissions !</font
 >");
@@ -178,7 +178,7 @@
 //	$result=DBselect("select hostid,host from hosts order by host");
 	while($row=DBfetch($result))
 	{
-        	if(!check_right("Host","R",$row["hostid"]))
+        	if(!check_right("Host","U",$row["hostid"]))
         	{
 			continue;
 		}
