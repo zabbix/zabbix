@@ -142,7 +142,7 @@
 
 <?
 		echo "<a name=\"form\"></a>";
-		insert_problem_form($problemid);
+		insert_problem_form($HTTP_GET_VARS["problemid"]);
 ?>
 
 <?
