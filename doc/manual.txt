@@ -505,11 +505,11 @@ Example: Use check_port[80] to check either WEB server accepts connections.
 PARAMETER / SYSTEM          | Debian Woody | Debian Potato | FreeBSD 4.3 | Solaris 5.8 | HP-UX 11.00 |  AIX 4.3  |
                             |    (i386)    |      (i386)   |    (i386)   | (Ultra-60)  |  9000/800   | (PowerPC) |
 ----------------------------------------------------------------------------------------------------------------------
-memory[total]               |       X      |        X      |      -      |      -      |      x      |     -     |
-memory[shared]              |       X      |        X      |      -      |      -      |      -      |     -     |
+memory[total]               |       X      |        X      |      X      |      -      |      x      |     -     |
+memory[shared]              |       X      |        X      |      X      |      -      |      -      |     -     |
 memory[buffers]             |       X      |        X      |      -      |      -      |      -      |     -     |
 memory[cached]              |       X      |        X      |      -      |      -      |      -      |     -     |
-memory[free]                |       X      |        X      |      -      |      -      |      x      |     -     |
+memory[free]                |       X      |        X      |      X      |      -      |      x      |     -     |
 
 diskfree[*]                 |       X      |        X      |      X      |      X      |      X      |     X     |
 
