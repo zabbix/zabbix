@@ -459,11 +459,11 @@
 				if(	($page["file"]=="sysmaps.html")||
 					($page["file"]=="sysmap.html"))
 				{
-					echo "<b>[SYSTEM MAPS]</b></a>";
+					echo "<b>[NETWORK MAPS]</b></a>";
 				}
 				else
 				{
-					echo "SYSTEM MAPS</a>";
+					echo "NETWORK MAPS</a>";
 				}
 ?>
 			</font>
@@ -723,6 +723,8 @@
 
 	function	delete_graph($graphid)
 	{
+		$sql="delete from graphs_items where graphid=$graphid";
+		$result=DBexecute($sql);
 		$sql="delete from graphs where graphid=$graphid";
 		$result=DBexecute($sql);
 	}
@@ -815,6 +817,8 @@
 
 		delete_triggers_functions_by_itemid($itemid);
 		delete_history_by_itemid($itemid);
+		$sql="delete from graphs_items where itemid=$itemid";
+		$result=DBexecute($sql);
 		$sql="delete from items where itemid=$itemid";
 		$result=DBexecute($sql);
 	}
