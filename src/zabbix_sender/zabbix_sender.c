@@ -79,7 +79,7 @@ int	send_value(char *server,int port,char *shortname,char *value)
 	servaddr_in.sin_port=htons(port);
 
 	s=socket(AF_INET,SOCK_STREAM,0);
-	if(s==0)
+	if(s == -1)
 	{
 		return	FAIL;
 	}

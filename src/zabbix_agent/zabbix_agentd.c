@@ -309,6 +309,7 @@ void	process_child(int sockfd)
 	ssize_t	nread;
 	char	line[MAX_STRING_LEN+1];
 	char	result[MAX_STRING_LEN+1];
+	int	i;
 
         static struct  sigaction phan;
 
@@ -344,7 +345,12 @@ void	process_child(int sockfd)
 	process(line,result);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Sending back:%s", result);
-	write(sockfd,result,strlen(result));
+	i=write(sockfd,result,strlen(result));
+	if(i == -1)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Error writing to socket [%s]",
+			strerror(errno));
+	}
 
 	alarm(0);
 }
@@ -356,7 +362,7 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 
 	struct linger ling;
 
-	if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+	if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
 		zabbix_log( LOG_LEVEL_CRIT, "Unable to create socket");
 		exit(1);

@@ -322,7 +322,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 
 	s=socket(AF_INET,SOCK_STREAM,0);
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL4");
-	if(s==0)
+	if(s == -1)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot create socket");
 		return FAIL;

@@ -32,6 +32,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#include <time.h>
+
 /* No warning for bzero */
 #include <string.h>
 #include <strings.h>
@@ -292,9 +294,6 @@ void	collect_stat()
 	char	line[MAX_STRING_LEN+1];
 	int	i,j;
 	int	i1,j1;
-	char	a[MAX_STRING_LEN+1];
-	char	b[MAX_STRING_LEN+1];
-	char	*token;
 	char	interface[MAX_STRING_LEN+1];
 	FILE	*file;
 	int	now;

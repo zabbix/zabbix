@@ -73,6 +73,7 @@
 	echo "<TD WIDTH=10%><B>Alias</B></TD>";
 	echo "<TD WIDTH=10%><B>Name</B></TD>";
 	echo "<TD WIDTH=10%><B>Surname</B></TD>";
+	echo "<TD WIDTH=10%><B>Is online?</B></TD>";
 	echo "<TD WIDTH=10%><B>Actions</B></TD>";
 	echo "</TR>";
 
@@ -91,6 +92,17 @@
 		echo "<TD>".$row["alias"]."</TD>";
 		echo "<TD>".$row["name"]."</TD>";
 		echo "<TD>".$row["surname"]."</TD>";
+		$sql="select count(*) as count from sessions where userid=".$row["userid"]." and lastaccess-600<".time();
+		$result2=DBselect($sql);
+		$row2=DBfetch($result2);
+		if($row2["count"]>0)
+		{
+			echo "<TD><font color=\"00AA00\">Yes</font></TD>";
+		}
+		else
+		{
+			echo "<TD><font color=\"AA0000\">No</font></TD>";
+		}
 		echo "<TD>";
         	if(check_right("User","U",$row["userid"]))
 		{
