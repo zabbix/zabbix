@@ -2871,7 +2871,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 //			echo "<IMG SRC=\"chart.php?itemid=$itemid&period=$period&from=$from\">";
 			echo "<script language=\"JavaScript\">";
 //			echo "document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&width=\"+(document.width-108)+\"'>\")";
-			echo "document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&width='+(document.width-108)+'>'\")";
+			echo "document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&width=\"+(document.width-108)+\"'>\")";
 			echo "</script>";
 		}
 		else

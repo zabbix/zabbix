@@ -41,8 +41,14 @@
 
 #include <time.h>
 
+/* NET-SNMP is used */
+#ifdef HAVE_NETSNMP
+	#include <net-snmp/net-snmp-config.h>
+	#include <net-snmp/net-snmp-includes.h>
+#endif
+
 /* Required for SNMP support*/
-#ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
+#ifdef HAVE_UCDSNMP
 	#include <ucd-snmp/ucd-snmp-config.h>
 	#include <ucd-snmp/ucd-snmp-includes.h>
 	#include <ucd-snmp/system.h>
@@ -254,7 +260,7 @@ void	init_config(void)
 	}
 }
 
-#ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
+#ifdef HAVE_SNMP
 int	get_value_SNMP(int version,double *result,char *result_str,DB_ITEM *item)
 {
 	struct snmp_session session, *ss;
@@ -592,7 +598,7 @@ int	get_value(double *result,char *result_str,DB_ITEM *item)
 	}
 	else if(item->type == ITEM_TYPE_SNMPv1)
 	{
-#ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
+#ifdef HAVE_SNMP
 		res=get_value_SNMP(SNMP_VERSION_1,result,result_str,item);
 #else
 		zabbix_log(LOG_LEVEL_WARNING, "Support of SNMP parameters was no compiled in");
@@ -601,7 +607,7 @@ int	get_value(double *result,char *result_str,DB_ITEM *item)
 	}
 	else if(item->type == ITEM_TYPE_SNMPv2c)
 	{
-#ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
+#ifdef HAVE_SNMP
 		res=get_value_SNMP(SNMP_VERSION_2c,result,result_str,item);
 #else
 		zabbix_log(LOG_LEVEL_WARNING, "Support of SNMP parameters was no compiled in");
@@ -1284,7 +1290,7 @@ int main(int argc, char **argv)
 
 	zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started",sucker_num);
 
-#ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
+#ifdef HAVE_SNMP
 	init_snmp("zabbix_suckerd");
 #endif
 
