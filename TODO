@@ -62,7 +62,6 @@ LS:
  - check permissions for zabbix_agentd when started under root
  - add item to group (not to all)
  - update host from template
- - more macros. %s -> {HOSTNAME}
 
 change(N) - raznica mezhdu poslednim i na N vremeni ranee poluchennim
 znacheniem;
@@ -152,6 +151,7 @@ BUGS:
 PERFORMANCE IMPROVEMENTS:
 
  - remove lastvalue, lastclock, prevvalue from table ITEMS
+ - is there any need to update datta of table FUNCTIONS? Can it be done in memory only?
 
 DIFFERENT TASKS:
 
@@ -164,7 +164,6 @@ DIFFERENT TASKS:
  - audit log
  - backup/restore scripts for server. Backup all (DB, configs, etc).
  - IT Helpdesk
- - high-performance, optimised zabbix_suckerd and zabbix_trapperd
  - personalisation (refresh rate, graph size, default graph period, etc)
  - encryption
  - automated report generation
@@ -202,14 +201,10 @@ I made changes to the PHP frontend and zabbix_sucker.c to enable the user to spe
  - add triggers for all hosts at once
  - check Rickard's multithreaded agent
  - check new Mariusz patches
- - default user name for DB acess should be the same (root)
  - add support for downtimes, user availablity, etc
- - get rid of false warning messages (like unable to insert ...)
- - BUG. Avoid situations when PID file is not deleted.
 
 HB:
 
- - test everything under Explorer and Netscape. Especially Graphs,Charts and Maps.
  - BUG. history graph goes left
  - personalisation (refresh rate, graph size, default graph period, etc)
 
@@ -245,20 +240,15 @@ WIN32 Agent:
  - support for complex reports
  - support for check_service[samba]
  - ability to execute command on server monitored
- - support for tcp_ping[] which returns number of ms spent
  - support for OS X (network loads, disk loads)
  - check for function parameters in evaluate_simple_expression
- - make links look different if something is already registered (as for medias,
-   actions, etc)
  - update trigger status to UNKNOWN if cannot evaluate function 
 
  LATER:
 
  - setup demo site
- - add user groups
  - different sound files for different severity
  - rename "Alerts" to "Notifications"
- - add numeric constants to trigger expressions
  - think about service node types (some nodes will automatically register
   problem)
  - restructure sources (no C files in include/, move some sources into lib, etc)
