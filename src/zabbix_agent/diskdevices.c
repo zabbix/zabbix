@@ -61,7 +61,7 @@
 
 DISKDEVICE diskdevices[MAX_DISKDEVICES];
 
-void	init_stats()
+void	init_stats_diskdevices()
 {
 	FILE	*file;
 	char	*s;
@@ -107,7 +107,7 @@ void	init_stats()
 	fclose(file);
 }
 
-void	report_stats(FILE *file, int now)
+void	report_stats_diskdevices(FILE *file, int now)
 {
 	int	time=0,
 		time1=0,
@@ -173,27 +173,24 @@ void	report_stats(FILE *file, int now)
 			{
 				read_io_ops[0]=diskdevices[i].read_io_ops[j];
 				write_io_ops[0]=diskdevices[i].write_io_ops[j];
-				received=diskdevices[i].received[j];
 			}
 			if(diskdevices[i].clock[j]==time1)
 			{
 				read_io_ops[1]=diskdevices[i].read_io_ops[j];
 				write_io_ops[1]=diskdevices[i].write_io_ops[j];
-				received1=diskdevices[i].received[j];
 			}
 			if(diskdevices[i].clock[j]==time5)
 			{
 				read_io_ops[2]=diskdevices[i].read_io_ops[j];
 				write_io_ops[2]=diskdevices[i].write_io_ops[j];
-				received5=diskdevices[i].received[j];
 			}
 			if(diskdevices[i].clock[j]==time15)
 			{
 				read_io_ops[3]=diskdevices[i].read_io_ops[j];
 				write_io_ops[3]=diskdevices[i].write_io_ops[j];
-				received15=diskdevices[i].received[j];
 			}
 		}
+
 		if((read_io_ops[0]!=0)&&(read_io_ops[1]!=0))
 		{
 			fprintf(file,"netloadout1[%s] %f\n", diskdevices[i].device, (float)((read_io_ops[0]-read_io_ops[1])/(now-time1)));
@@ -219,6 +216,32 @@ void	report_stats(FILE *file, int now)
 			fprintf(file,"netloadout15[%s] 0\n", diskdevices[i].device);
 		}
 
+		if((write_io_ops[0]!=0)&&(write_io_ops[1]!=0))
+		{
+			fprintf(file,"netloadout1[%s] %f\n", diskdevices[i].device, (float)((write_io_ops[0]-write_io_ops[1])/(now-time1)));
+		}
+		else
+		{
+			fprintf(file,"netloadout1[%s] 0\n", diskdevices[i].device);
+		}
+		if((write_io_ops[0]!=0)&&(write_io_ops[2]!=0))
+		{
+			fprintf(file,"netloadout5[%s] %f\n", diskdevices[i].device, (float)((write_io_ops[0]-write_io_ops[2])/(now-time5)));
+		}
+		else
+		{
+			fprintf(file,"netloadout5[%s] 0\n", diskdevices[i].device);
+		}
+		if((write_io_ops[0]!=0)&&(write_io_ops[3]!=0))
+		{
+			fprintf(file,"netloadout15[%s] %f\n", diskdevices[i].device, (float)((write_io_ops[0]-write_io_ops[3])/(now-time15)));
+		}
+		else
+		{
+			fprintf(file,"netloadout15[%s] 0\n", diskdevices[i].device);
+		}
+
+/*
 		if((received!=0)&&(received1!=0))
 		{
 			fprintf(file,"netloadin1[%s] %f\n", diskdevices[i].interface, (float)((received-received1)/(now-time1)));
@@ -242,13 +265,13 @@ void	report_stats(FILE *file, int now)
 		else
 		{
 			fprintf(file,"netloadin15[%s] 0\n", diskdevices[i].interface);
-		}
+		}*/
 	}
 
 }
 
 
-void	add_values(int now,char *interface,float value_sent,float value_received)
+void	add_values_diskdevices(int now,char *device,float read_io_ops,float write_io_ops)
 {
 	int i,j;
 
@@ -256,15 +279,15 @@ void	add_values(int now,char *interface,float value_sent,float value_received)
 
 	for(i=0;i<MAX_DISKDEVICES;i++)
 	{
-		if(0 == strcmp(diskdevices[i].interface,interface))
+		if(0 == strcmp(diskdevices[i].device,device))
 		{
 			for(j=0;j<15*60;j++)
 			{
 				if(diskdevices[i].clock[j]<now-15*60)
 				{
 					diskdevices[i].clock[j]=now;
-					diskdevices[i].sent[j]=value_sent;
-					diskdevices[i].received[j]=value_received;
+					diskdevices[i].read_io_ops[j]=read_io_ops;
+					diskdevices[i].write_io_ops[j]=write_io_ops;
 					break;
 				}
 			}
@@ -290,7 +313,7 @@ void	collect_stats_diskdevices(FILE *outfile)
 
 	if( 0 == initialised)
 	{
-		init_stats();
+		init_stats_diskdevices();
 		initialised=1;
 	}
 
@@ -335,7 +358,7 @@ void	collect_stats_diskdevices(FILE *outfile)
 			{
 /*				printf("Sent [%s]\n",s);*/
 				sent=atof(s);
-				add_values(now,interface,sent,received);
+				add_values_diskdevices(now,interface,sent,received);
 			}
 			j++;
 		}
@@ -343,5 +366,5 @@ void	collect_stats_diskdevices(FILE *outfile)
 	}
 	fclose(file);
 
-	report_stats(outfile, now);
+	report_stats_diskdevices(outfile, now);
 }
