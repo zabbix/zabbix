@@ -9,10 +9,10 @@ Noe ready yet:
 
 Changes for 1.0beta3:
 
+ - support for experimental parameter NoTimeWait (Alexei)
  - diskfree[*] to return free disk space in Kb (Alexei)
  - support for non-numeric parameters (Alexei)
  - common parser function for configuration files (Alexei)
-
  - added file include/cfg.h and include/cfg.c (Alexei)
  - support for system[uptime] on FreeBSD (Alexei)
  - support for kern[maxfiles] on FreeBSD (Alexei)
@@ -21,7 +21,6 @@ Changes for 1.0beta3:
  - added table history_str (Alexei)
  - added column value_type to table items (Alexei)
  - removed(?) support for automake (Alexei)
-
  - partial support for automake (Alexei)
  - parent process will terminate childs if one of the childs died
  (Alexei)

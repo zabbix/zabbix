@@ -41,6 +41,7 @@ static	pid_t	*pids=NULL;
 
 int	sucker_num=0;
 int	CONFIG_SUCKERD_FORKS		=SUCKER_FORKS;
+int	CONFIG_NOTIMEWAIT		=0;
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
 static	char	*CONFIG_PID_FILE		= NULL;
 char	*CONFIG_DBNAME			= NULL;
@@ -270,6 +271,17 @@ void	process_config_file(void)
 			}
 			CONFIG_SUCKERD_FORKS=i;
 		}
+		else if(strcmp(parameter,"NoTimeWait")==0)
+		{
+			i=atoi(value);
+			if( (i<0) || (i>1) )
+			{
+				syslog( LOG_CRIT, "Wrong value of NoTimeWait in line %d. Should be either 0 or 1", lineno);
+				fclose(file);
+				exit(1);
+			}
+			CONFIG_NOTIMEWAIT=i;
+		}
 		else if(strcmp(parameter,"HousekeepingFrequency")==0)
 		{
 			i=atoi(value);
@@ -482,8 +494,9 @@ int	get_value_zabbix(double *result,char **result_str,DB_ITEM *item)
 	struct sockaddr_in myaddr_in;
 	struct sockaddr_in servaddr_in;
 
-	syslog( LOG_DEBUG, "%10s%25s", item->host, item->key );
+	struct linger ling;
 
+	syslog( LOG_DEBUG, "%10s%25s", item->host, item->key );
 
 	servaddr_in.sin_family=AF_INET;
 	if(item->useip==1)
@@ -506,6 +519,16 @@ int	get_value_zabbix(double *result,char **result_str,DB_ITEM *item)
 	servaddr_in.sin_port=htons(item->port);
 
 	s=socket(AF_INET,SOCK_STREAM,0);
+
+	if(CONFIG_NOTIMEWAIT == 1)
+	{
+		ling.l_onoff=1;
+		ling.l_linger=0;
+		if(setsockopt(s,SOL_SOCKET,SO_LINGER,&ling,sizeof(ling))==-1)
+		{
+			syslog(LOG_WARNING, "Cannot setsockopt SO_LINGER [%m]");
+		}
+	}
 	if(s==0)
 	{
 		syslog(LOG_WARNING, "Cannot create socket [%m]");
@@ -566,7 +589,7 @@ int	get_value_zabbix(double *result,char **result_str,DB_ITEM *item)
 		close(s);
 		return	FAIL;
 	}
- 
+
 	if( close(s)!=0 )
 	{
 		syslog(LOG_WARNING, "Problem with close [%m]");
