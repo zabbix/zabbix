@@ -1,5 +1,7 @@
 Changes for 1.0beta13:
 
+ - deleted host to be renamed to "<host> [DELETED]"
+ (Alexei)
  - added function now() (Alexei)
  - fixed action maintenance screen (Alexei)
  - redesigned availablity chart (Alexei)

@@ -3045,7 +3045,16 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	delete_host($hostid)
 	{
-		$sql="update hosts set status=".HOST_STATUS_DELETED." where hostid=$hostid";
+		global $DB_TYPE;
+
+		if($DB_TYPE=="MYSQL")
+		{
+			$sql="update hosts set status=".HOST_STATUS_DELETED.",host=concat(host,\" [DELETED]\") where hostid=$hostid";
+		}
+		else
+		{
+			$sql="update hosts set status=".HOST_STATUS_DELETED.",host=host||' [DELETED]' where hostid=$hostid";
+		}
 		return	DBexecute($sql);
 
 //		$sql="select itemid from items where hostid=$hostid";
