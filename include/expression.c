@@ -628,7 +628,8 @@ int	substitute_functions(char *exp)
 
 		if( DBget_function_result( &value, functionid ) != SUCCEED )
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Unable to get value by functionid [%s]", functionid );
+/* It may happen because of functions.lastvalue is NULL, so this is not warning  */
+			zabbix_log( LOG_LEVEL_DEBUG, "Unable to get value for functionid [%s]", functionid );
 			return	FAIL;
 		}
 

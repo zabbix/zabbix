@@ -184,7 +184,7 @@ CREATE TABLE functions (
   functionid		serial,
   itemid		int4		DEFAULT '0' NOT NULL,
   triggerid		int4		DEFAULT '0' NOT NULL,
-  lastvalue		varchar(255)	DEFAULT '0.0000' NOT NULL,
+  lastvalue		varchar(255),
   function		varchar(10)	DEFAULT '' NOT NULL,
   parameter		int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (functionid),
