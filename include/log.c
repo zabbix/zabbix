@@ -4,6 +4,7 @@
 #include <syslog.h>
 
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #include <time.h>
@@ -12,6 +13,7 @@
 #include "common.h"
 
 static	FILE *log_file = NULL;
+static	char log_filename[MAX_STRING_LEN+1];
 
 static	int log_type = LOG_TYPE_UNDEFINED;
 static	int log_level;
@@ -39,6 +41,7 @@ int zabbix_open_log(int type,int level, const char *filename)
 			return	FAIL;
 		}
 		log_type = LOG_TYPE_FILE;
+		strncpy(log_filename,filename,MAX_STRING_LEN);
 	}
 	else
 	{
@@ -55,6 +58,9 @@ void zabbix_log(int level, const char *fmt, ...)
 	time_t	t;
 	struct	tm	*tm;
 	va_list ap;
+
+	struct stat	buf;
+	char	filename_old[MAX_STRING_LEN+1];
 
 	if( (level>log_level) || (level == LOG_LEVEL_EMPTY))
 	{
@@ -82,6 +88,26 @@ void zabbix_log(int level, const char *fmt, ...)
 		fprintf(log_file,"%s",str2);
 		fflush(log_file);
 		va_end(ap);
+
+
+		if(stat(log_filename,&buf) == 0)
+		{
+			if(buf.st_size>1024*1024)
+			{
+				fclose(log_file);
+				strncpy(filename_old,log_filename,MAX_STRING_LEN);
+				strcat(filename_old,".old");
+				if(rename(log_filename,filename_old) != 0)
+				{
+/*					exit(1);*/
+				}
+				log_file = fopen(log_filename,"a+");
+				if(log_file == NULL)
+				{
+/*					exit(1);*/
+				}
+			}
+		}
 	}
 	else
 	{

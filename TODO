@@ -32,7 +32,6 @@ Not ready yet:
  - support for OS X (network loads, disk loads)
  - support fo netload under other platforms
  - support for disk loads
- - log rotating for trace files
  - agent to send something back in case of timeout (?)
  - check for function parameters in evaluate_simple_expression
  - make links different if something is already registered (as for medias,
