@@ -1,5 +1,6 @@
 1.0beta10:
 
+ - add &nbsp; to forms and other places
  - fix evaluation of trigger expressions
  - fix pinger
  - finish src/zabbix_snmptrapper

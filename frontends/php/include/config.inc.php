@@ -25,6 +25,11 @@
 	$USER_DETAILS	="";
 	$ERROR_MSG	="";
 
+	function	nbsp($str)
+	{
+		return str_replace(" ","&nbsp;",$str);;
+	}
+
 	function getmicrotime()
 	{
 		list($usec, $sec) = explode(" ",microtime()); 
@@ -1566,6 +1571,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		$sql="update triggers set status=$status where triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
+
 
 	# Update Item status
 
@@ -3355,17 +3361,17 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		if(($type==1)||($type==4))
 		{ 
 			show_table2_v_delimiter();
-			echo "SNMP community";
+			echo nbsp("SNMP community");
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"snmp_community\" value=\"$snmp_community\" size=16>";
 
 			show_table2_v_delimiter();
-			echo "SNMP OID";
+			echo nbsp("SNMP OID");
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"snmp_oid\" value=\"$snmp_oid\" size=40>";
 
 			show_table2_v_delimiter();
-			echo "SNMP port";
+			echo nbsp("SNMP port");
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"snmp_port\" value=\"$snmp_port\" size=5>";
 		}
@@ -3407,7 +3413,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		if($type!=2)
 		{
 			show_table2_v_delimiter();
-			echo "Update interval (in sec)";
+			echo nbsp("Update interval (in sec)");
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"delay\" value=\"$delay\" size=5>";
 		}
@@ -3417,7 +3423,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 
 		show_table2_v_delimiter();
-		echo "Keep history (in days)";
+		echo nbsp("Keep history (in days)");
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"history\" value=\"$history\" size=8>";
 
@@ -3440,7 +3446,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "</SELECT>";
 
 		show_table2_v_delimiter();
-		echo "Type of information";
+		echo nbsp("Type of information");
 		show_table2_h_delimiter();
 		echo "<SELECT class=\"biginput\" NAME=\"value_type\" value=\"$value_type\" size=\"1\">";
 		echo "<OPTION VALUE=\"0\"";
@@ -3454,7 +3460,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		if($type==2)
 		{
 			show_table2_v_delimiter();
-			echo "Allowed hosts";
+			echo nbsp("Allowed hosts");
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"trapper_hosts\" value=\"$trapper_hosts\" size=40>";
 		}
@@ -3613,7 +3619,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<input class=\"biginput\" type=\"password\" name=\"password1\" value=\"$password\" size=20>";
 
 		show_table2_v_delimiter();
-		echo "Password (once again)";
+		echo nbsp("Password (once again)");
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" type=\"password\" name=\"password2\" value=\"$password\" size=20>";
 
