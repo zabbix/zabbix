@@ -34,12 +34,13 @@
 	#include "libpq-fe.h"
 #endif
 
-#define DB_ITEM struct item_type
-#define DB_TRIGGER struct trigger_type
-#define DB_ACTION struct action_type
-#define DB_ALERT struct alert_type
-#define DB_FUNCTION struct function_type
-#define DB_MEDIA struct media_type
+#define DB_ITEM		struct item_type
+#define DB_TRIGGER	struct trigger_type
+#define DB_ACTION	struct action_type
+#define DB_ALERT	struct alert_type
+#define DB_FUNCTION	struct function_type
+#define DB_MEDIA	struct media_type
+#define DB_MEDIATYPE	struct mediatype_type
 
 #ifdef HAVE_MYSQL
 	#define	DB_RESULT	MYSQL_RES
@@ -97,9 +98,21 @@ DB_FUNCTION
 DB_MEDIA
 {
 	int	mediaid;
-	char	*type;
+/*	char	*type;*/
+	int	mediatypeid;
 	char	*sendto;
 	int	active;
+};
+
+DB_MEDIATYPE
+{
+	int	mediatypeid;
+	int	type;
+	char	*description;
+	char	*smtp_server;
+	char	*smtp_helo;
+	char	*smtp_email;
+	char	*exec_path;
 };
 
 DB_TRIGGER
@@ -131,7 +144,8 @@ DB_ALERT
 	int	alertid;
 	int 	actionid;
 	int 	clock;
-	char	*type;
+/*	char	*type;*/
+	int	mediatypeid;
 	char	*sendto;
 	char	*subject;
 	char	*message;
@@ -155,7 +169,7 @@ int	DBupdate_item_status_to_notsupported(int itemid);
 int	DBadd_history(int itemid, double value);
 int	DBadd_history_str(int itemid, char *value);
 int	DBadd_service_alarm(int serviceid,int status,int clock);
-int	DBadd_alert(int actionid, char *type, char *sendto, char *subject, char *message);
+int	DBadd_alert(int actionid, int mediatypeid, char *sendto, char *subject, char *message);
 void	DBupdate_triggers_status_after_restart(void);
 int	DBget_prev_trigger_value(int triggerid);
 int	DBupdate_trigger_value(int triggerid,int value,int clock);

@@ -157,7 +157,8 @@ CREATE TABLE alerts (
   alertid		int(4)		NOT NULL auto_increment,
   actionid		int(4)		DEFAULT '0' NOT NULL,
   clock			int(4)		DEFAULT '0' NOT NULL,
-  type			varchar(10)	DEFAULT '' NOT NULL,
+--  type		varchar(10)	DEFAULT '' NOT NULL,
+  mediatypeid		int(4)		DEFAULT '0' NOT NULL,
   sendto		varchar(100)	DEFAULT '' NOT NULL,
   subject		varchar(255)	DEFAULT '' NOT NULL,
   message		blob		DEFAULT '' NOT NULL,
@@ -166,7 +167,8 @@ CREATE TABLE alerts (
   PRIMARY KEY (alertid),
   INDEX (actionid),
   KEY clock (clock),
-  KEY status_retries (status, retries)
+  KEY status_retries (status, retries),
+  KEY mediatypeid (mediatypeid)
 ) type=InnoDB;
 
 --
@@ -297,11 +299,12 @@ CREATE TABLE media (
 	mediaid		int(4) NOT NULL auto_increment,
 	userid		int(4) DEFAULT '0' NOT NULL,
 --	type		varchar(10) DEFAULT '' NOT NULL,
-	mediatypeid	int(4) DEFAULT '' NOT NULL,
+	mediatypeid	int(4) DEFAULT '0' NOT NULL,
 	sendto		varchar(100) DEFAULT '' NOT NULL,
 	active		int(4) DEFAULT '0' NOT NULL,
 	PRIMARY KEY	(mediaid),
-	KEY		(userid)
+	KEY		(userid),
+	KEY		(mediatypeid)
 ) type=InnoDB;
 
 --
@@ -315,8 +318,8 @@ CREATE TABLE media_type (
 	smtp_server	varchar(255)	DEFAULT '' NOT NULL,
 	smtp_helo	varchar(255)	DEFAULT '' NOT NULL,
 	smtp_email	varchar(255)	DEFAULT '' NOT NULL,
-	PRIMARY KEY	(mediaid),
-	KEY		(userid)
+	exec_path	varchar(255)	DEFAULT '' NOT NULL,
+	PRIMARY KEY	(mediatypeid)
 ) type=InnoDB;
 
 --

@@ -1,7 +1,10 @@
 Changes for 1.0beta9:
 
+ - added src/zabbix_sucker/alerter.h (Alexei)
+ - added src/zabbix_sucker/alerter.c (Alexei)
+ - removed column alerts.type, added column alerts.mediatypeid (Alexei)
  - added table media_type (Alexei)
- - added column media.type, added column media.mediatypeid (Alexei)
+ - removed column media.type, added column media.mediatypeid (Alexei)
  - removed columns config.(smtp_server,smtp_helo,smtp_email) (Alexei)
  - added columns actions.scope and actions.severity (Alexei)
  - added support of global alerts limited by triggers severity (Alexei)

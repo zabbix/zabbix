@@ -728,7 +728,7 @@ int	DBget_history_count(void)
 	return res;
 }
 
-int	DBadd_alert(int actionid, char *type, char *sendto, char *subject, char *message)
+int	DBadd_alert(int actionid, int mediatypeid, char *sendto, char *subject, char *message)
 {
 	int	now;
 	char	sql[MAX_STRING_LEN+1];
@@ -736,7 +736,7 @@ int	DBadd_alert(int actionid, char *type, char *sendto, char *subject, char *mes
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_alert()");
 
 	now = time(NULL);
-	sprintf(sql,"insert into alerts (alertid,actionid,clock,type,sendto,subject,message,status,retries) values (NULL,%d,%d,'%s','%s','%s','%s',0,0)",actionid,now,type,sendto,subject,message);
+	sprintf(sql,"insert into alerts (alertid,actionid,clock,mediatypeid,sendto,subject,message,status,retries) values (NULL,%d,%d,%d,'%s','%s','%s',0,0)",actionid,now,mediatypeid,sendto,subject,message);
 	DBexecute(sql);
 
 	return SUCCEED;

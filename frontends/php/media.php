@@ -7,7 +7,7 @@
 ?>
 
 <?php
-        if(!check_right("User","R",$HTTP_GET_VARS["userid"]))
+        if(!check_right("User","U",$HTTP_GET_VARS["userid"]))
         {
                 show_table_header("<font color=\"AA0000\">No permissions !</font
 >");
@@ -32,7 +32,7 @@
 		}
 		elseif($HTTP_GET_VARS["register"]=="add")
 		{
-			$result=add_media( $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["type"], $HTTP_GET_VARS["sendto"]);
+			$result=add_media( $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["mediatypeid"], $HTTP_GET_VARS["sendto"]);
 			show_messages($result,"Media added","Cannot add media");
 		}
 		elseif($HTTP_GET_VARS["register"]=="delete")
@@ -50,7 +50,7 @@
 
 <FONT COLOR="#000000">
 <?php
-	$sql="select mediaid,type,sendto,active from media where userid=".$HTTP_GET_VARS["userid"]." order by type,sendto";
+	$sql="select m.mediaid,mt.description,m.sendto,m.active from media m,media_type mt where m.mediatypeid=mt.mediatypeid and m.userid=".$HTTP_GET_VARS["userid"]." order by mt.type,m.sendto";
 	$result=DBselect($sql);
 
 	echo "<TABLE BORDER=0 WIDTH=100% align=center BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
@@ -74,16 +74,9 @@
 			$col=1;
 		}
 		$mediaid=DBget_field($result,$i,0);
-		$type_=DBget_field($result,$i,1);
+		$description=DBget_field($result,$i,1);
 		echo "<TD>";
-		if($type_=="EMAIL")
-		{
-			echo "E-mail";
-		}
-		else
-		{
-			echo $type_;
-		}
+		echo $description;
 		echo "</TD>";
 		echo "<TD>",DBget_field($result,$i,2),"</TD>";
 		echo "<TD>";
@@ -117,8 +110,13 @@
 	echo "<input name=\"userid\" type=\"hidden\" value=".$HTTP_GET_VARS["userid"].">";
 	echo "Type";
 	show_table2_h_delimiter();
-	echo "<select class=\"biginput\" name=\"type\" size=1>";
-	echo "<OPTION VALUE=\"EMAIL\">E-mail";
+	echo "<select class=\"biginput\" name=\"mediatypeid\" size=1>";
+	$sql="select mediatypeid,description from media_type order by type";
+	$result=DBselect($sql);
+	while($row=DBfetch($result))
+	{
+		echo "<OPTION VALUE=\"".$row["mediatypeid"]."\">".$row["description"];
+	}
 	echo "</SELECT>";
 
 	show_table2_v_delimiter();
