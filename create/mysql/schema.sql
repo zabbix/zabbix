@@ -87,6 +87,10 @@ CREATE TABLE sysmaps_links (
   shostid2		int(4)		DEFAULT '0' NOT NULL,
  -- may be NULL 
   triggerid		int(4),
+  drawtype_off		int(4)		DEFAULT '0' NOT NULL,
+  color_off		varchar(32)	DEFAULT 'Black' NOT NULL,
+  drawtype_on		int(4)		DEFAULT '0' NOT NULL,
+  color_on		varchar(32)	DEFAULT 'Dark Red' NOT NULL,
   PRIMARY KEY (linkid)
 ) type=InnoDB;
 
