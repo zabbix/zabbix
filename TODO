@@ -1,5 +1,6 @@
 1.0beta11:
 
+ - optimise update_trigger_status_after_restart()
  - special item. (last-prev)/time 
  - special item which returns time!
  - mess with user groups when running under root
