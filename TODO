@@ -4,6 +4,10 @@
  - make support for "Clone"
  - add SNMP-based template
  - add a simple generic tcp check
+ - check bug with trapper receiving value with ":"
+ - add "Add from template" feature
+ - add "Application.MySQL" template
+ - rename existing template to "Host.Unix", "Host.Win32"
 
 LATER:
 
