@@ -392,6 +392,7 @@
 	define("S_SCREENS_BIG",				"SCREENS");
 	define("S_NO_SCREENS_TO_DISPLAY",		"No screens to display");
 	define("S_SELECT_SCREEN_TO_DISPLAY",		"Select screen to display");
+	define("S_SELECT_SCREEN_DOT_DOT_DOT",		"Select screen ...");
 
 //	services.php
 	define("S_IT_SERVICES",				"IT services");
