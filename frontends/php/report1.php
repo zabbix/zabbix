@@ -96,8 +96,8 @@
 	</tr>
 
 	<tr bgcolor="#dddddd">
-	<td>Number of hosts (monitored/not monitored)</td>
-	<td><?php echo $stats["hosts_count"],"(",$stats["hosts_count_monitored"],"/",$stats["hosts_count_not_monitored"],")"; ?></td>
+	<td>Number of hosts (monitored/not monitored/templates)</td>
+	<td><?php echo $stats["hosts_count"],"(",$stats["hosts_count_monitored"],"/",$stats["hosts_count_not_monitored"],"/",$stats["hosts_count_template"],")"; ?></td>
 	</tr>
 
 	</table>
