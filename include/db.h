@@ -206,4 +206,6 @@ int	DBget_history_count(void);
 int	DBget_trends_count(void);
 int	DBget_triggers_count(void);
 int	DBget_queue_count(void);
+
+void    DBescape_string(char *from, char *to, int maxlen);
 #endif

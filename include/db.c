@@ -875,10 +875,12 @@ int	DBadd_history(int itemid, double value, int clock)
 int	DBadd_history_str(int itemid, char *value, int clock)
 {
 	char	sql[MAX_STRING_LEN];
+	char	value_esc[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_str()");
 
-	snprintf(sql,sizeof(sql)-1,"insert into history_str (clock,itemid,value) values (%d,%d,'%s')",clock,itemid,value);
+	DBescape_string(value,value_esc,MAX_STRING_LEN);
+	snprintf(sql,sizeof(sql)-1,"insert into history_str (clock,itemid,value) values (%d,%d,'%s')",clock,itemid,value_esc);
 	DBexecute(sql);
 
 	return SUCCEED;
@@ -1046,13 +1048,19 @@ int	DBadd_alert(int actionid, int mediatypeid, char *sendto, char *subject, char
 {
 	int	now;
 	char	sql[MAX_STRING_LEN];
+	char	sendto_esc[MAX_STRING_LEN];
+	char	subject_esc[MAX_STRING_LEN];
+	char	message_esc[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_alert()");
 
 	now = time(NULL);
 /* Does not work on PostgreSQL */
 /*	snprintf(sql,sizeof(sql)-1,"insert into alerts (alertid,actionid,clock,mediatypeid,sendto,subject,message,status,retries) values (NULL,%d,%d,%d,'%s','%s','%s',0,0)",actionid,now,mediatypeid,sendto,subject,message);*/
-	snprintf(sql,sizeof(sql)-1,"insert into alerts (actionid,clock,mediatypeid,sendto,subject,message,status,retries) values (%d,%d,%d,'%s','%s','%s',0,0)",actionid,now,mediatypeid,sendto,subject,message);
+	DBescape_string(sendto,sendto_esc,MAX_STRING_LEN);
+	DBescape_string(subject,subject_esc,MAX_STRING_LEN);
+	DBescape_string(message,message_esc,MAX_STRING_LEN);
+	snprintf(sql,sizeof(sql)-1,"insert into alerts (actionid,clock,mediatypeid,sendto,subject,message,status,retries) values (%d,%d,%d,'%s','%s','%s',0,0)",actionid,now,mediatypeid,sendto_esc,subject_esc,message_esc);
 	DBexecute(sql);
 
 	return SUCCEED;
@@ -1087,4 +1095,34 @@ void	DBvacuum(void)
 #ifdef	HAVE_MYSQL
 	/* Nothing to do */
 #endif
+}
+
+void    DBescape_string(char *from, char *to, int maxlen)
+{
+	int	i,ptr;
+	char	*f;
+
+	ptr=0;
+	f=(char *)strdup(from);
+	for(i=0;f[i]!=0;i++)
+	{
+		if( (f[i]=='\'') || (f[i]=='\\'))
+		{
+			if(ptr>maxlen-1)	break;
+			to[ptr]='\\';
+			if(ptr+1>maxlen-1)	break;
+			to[ptr+1]=f[i];
+			ptr+=2;
+		}
+		else
+		{
+			if(ptr>maxlen-1)	break;
+			to[ptr]=f[i];
+			ptr++;
+		}
+	}
+	free(f);
+
+	to[ptr]=0;
+	to[maxlen-1]=0;
 }
