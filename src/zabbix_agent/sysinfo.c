@@ -66,7 +66,7 @@
 #ifdef HAVE_ARPA_INET_H
 	#include <arpa/inet.h>
 #endif
-/* OpenBSD */
+/* OpenBSD/Solaris */
 #ifdef HAVE_SYS_PARAM_H
 	#include <sys/param.h>
 #endif
@@ -1679,7 +1679,46 @@ double	UPTIME(void)
 
 	return (double)(now-uptime.tv_sec);
 #else
+/* Solaris */
+#ifdef HAVE_KSTAT_H
+	kstat_ctl_t   *kc;
+	kstat_t       *kp;
+	kstat_named_t *kn;
+
+	long          hz;
+	long          secs;
+
+	hz = sysconf(_SC_CLK_TCK);
+
+	/* open kstat */
+	kc = kstat_open();
+	if (0 == kc)
+	{
+		return FAIL;
+	}
+
+	/* read uptime counter */
+	kp = kstat_lookup(kc, "unix", 0, "system_misc");
+	if (0 == kp)
+	{
+		kstat_close(kc);
+		return FAIL;
+	}
+
+	if(-1 == kstat_read(kc, kp, 0))
+	{
+		kstat_close(kc);
+		return FAIL;
+	}
+	kn = (kstat_named_t*)kstat_data_lookup(kp, "clk_intr");
+	secs = kn->value.ul / hz;
+
+	/* close kstat */
+	kstat_close(kc);
+	return (double)secs;
+#else
 	return	FAIL;
+#endif
 #endif
 #endif
 }

@@ -1,5 +1,7 @@
 Changes for 1.0beta11:
 
+ - support of system[uptime] for Solaris. Thanks to Franky Van
+ Liedekerke. (Alexei)
  - fix for disk space calculation. Use statvfs' f_frsize instead
  of f_bsize. Thanks to Franky Van Liedekerke. (Alexei)
  - restrict host status change from Unreachable (Alexei)
