@@ -138,7 +138,7 @@
 	else
 	{
 		$host="";
-		$port=10000;
+		$port=get_profile("HOST_PORT",10000);
 		$status=0;
 		$useip="";
 		$ip="";
