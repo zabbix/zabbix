@@ -448,7 +448,7 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 		return FAIL;
 	}
 	
-	memset(c,0,MAX_STRING_LEN+1);
+/*	memset(c,0,MAX_STRING_LEN+1);
 	sprintf(c,"\n");
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e ==- 1)
@@ -465,7 +465,7 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 		zabbix_log(LOG_LEVEL_ERR, "Error receiving answer on \\n request.");
 		close(s);
 		return FAIL;
-	}
+	}*/
 	
 	memset(c,0,MAX_STRING_LEN+1);
 	sprintf(c,"QUIT\n");

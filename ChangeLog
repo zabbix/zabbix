@@ -23,6 +23,7 @@ Not ready yet:
 
 Changes for 1.0beta5:
 
+ - more fixes to send_email() (Alexei)
  - fixed crash in case if MySQL server gone (support for signal PIPE) (Alexei)
  Thanks to Arturs.
  - fixed duplicate triggers in Availability Report (Alexei)
