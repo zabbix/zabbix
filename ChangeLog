@@ -1,5 +1,6 @@
 Changes for 1.1alpha1:
 
+ - added support of zabbix[history_str] (Alexei)
  - use $_GET, $_POST, $_COOKIE to be PHP5-compatible. Thanks to Martin MOHNHAUP. (Alexei)
  - added table 'images' (Alexei)
  - added small icons for maps (Alexei)
