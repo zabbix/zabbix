@@ -17,6 +17,10 @@
 		{
 			add_sysmap($name,$width,$height);
 		}
+		if($register=="update")
+		{
+			update_sysmap($sysmapid,$name,$width,$height);
+		}
 		if($register=="delete")
 		{
 			delete_sysmap($sysmapid);
@@ -48,14 +52,14 @@
 			$col=1;
 		}
 	
-		$sysmapid=DBget_field($result,$i,0);
-		$name=DBget_field($result,$i,1);
-		$width=DBget_field($result,$i,2);
-		$height=DBget_field($result,$i,3);
-		echo "<TD><a href=\"sysmap.html?sysmapid=$sysmapid\">$name</a></TD>";
-		echo "<TD>$width</TD>";
-		echo "<TD>$height</TD>";
-		echo "<TD><A HREF=\"sysmaps.html?sysmapid=$sysmapid#form\">Change</A> - <A HREF=\"sysmaps.html?register=delete&sysmapid=$sysmapid\">Delete</A></TD>";
+		$sysmapid_=DBget_field($result,$i,0);
+		$name_=DBget_field($result,$i,1);
+		$width_=DBget_field($result,$i,2);
+		$height_=DBget_field($result,$i,3);
+		echo "<TD><a href=\"sysmap.html?sysmapid=$sysmapid_\">$name_</a></TD>";
+		echo "<TD>$width_</TD>";
+		echo "<TD>$height_</TD>";
+		echo "<TD><A HREF=\"sysmaps.html?sysmapid=$sysmapid_#form\">Change</A> - <A HREF=\"sysmaps.html?register=delete&sysmapid=$sysmapid_\">Delete</A></TD>";
 		echo "</TR>";
 	}
 	echo "</TABLE>";
@@ -64,28 +68,50 @@
 <?
 	echo "<a name=\"form\"></a>";
 
+	if(isset($sysmapid))
+	{
+		$result=DBselect("select s.sysmapid,s.name,s.width,s.height from sysmaps s where sysmapid=$sysmapid");
+		$name=DBget_field($result,0,1);
+		$width=DBget_field($result,0,2);
+		$height=DBget_field($result,0,3);
+	}
+	else
+	{
+		$name="";
+		$width=800;
+		$height=600;
+	}
+
 	echo "<br>";
 	show_table2_header_begin();
 	echo "New system map";
 
 	show_table2_v_delimiter();
 	echo "<form method=\"post\" action=\"sysmaps.html\">";
+	if(isset($sysmapid))
+	{
+		echo "<input name=\"sysmapid\" type=\"hidden\" value=$sysmapid>";
+	}
 	echo "Name";
 	show_table2_h_delimiter();
-	echo "<input name=\"name\" size=20>";
+	echo "<input name=\"name\" value=\"$name\" size=20>";
 
 	show_table2_v_delimiter();
 	echo "Width";
 	show_table2_h_delimiter();
-	echo "<input name=\"width\" size=5 value=\"800\">";
+	echo "<input name=\"width\" size=5 value=\"$width\">";
 
 	show_table2_v_delimiter();
 	echo "Height";
 	show_table2_h_delimiter();
-	echo "<input name=\"height\" size=5 value=\"600\">";
+	echo "<input name=\"height\" size=5 value=\"$height\">";
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+	if(isset($sysmapid))
+	{
+		echo "<input type=\"submit\" name=\"register\" value=\"update\">";
+	}
 
 	show_table2_header_end();
 ?>
