@@ -1,5 +1,6 @@
 Changes for 1.1alpha1:
 
+ - increased max number of network interfaces to 16 for zabbix_agentd (Alexei)
  - added command line parameters -c <config> and -h to zabbix_trapperd (Alexei)
  - added command line parameters -c <config> and -h to zabbix_agentd (Alexei)
  - added command line parameters -c <config> and -h to zabbix_suckerd (Alexei)

@@ -46,7 +46,6 @@ TRUE and will stay there until the fault has been cleared.
  - add tabs to all screens where required
  - check all screens if they are user friendly and present information in the best possible way
  - possibility (a button) to recheck unsupported parameters
- - increase number of network interfaces in zabbix agent
  - add advanced task scheduler/executor to ZABBIX
  - agent incorrectly returns amount of free/available memory on HP-UX (must be 24GB)
  - add failure (timeouts, network errors, etc) reasons to items and hosts
