@@ -89,69 +89,70 @@
 ?>
 
 <?php
-	show_table_header_begin();
 	$item=get_item_by_itemid($_GET["itemid"]);
+
 	if($item["value_type"] == 0)
 	{
-		echo "<A HREF='latest.php?hostid=$hostid'>$host</A> : <a href='trends.php?itemid=".$_GET["itemid"]."'>$description</a>";
+		$h1="<A HREF='latest.php?hostid=$hostid'>$host</A> : <a href='trends.php?itemid=".$_GET["itemid"]."'>$description</a>";
 	}
 	else
 	{
-		echo "<A HREF='latest.php?hostid=$hostid'>$host</A> : $description";
+		$h1="<A HREF='latest.php?hostid=$hostid'>$host</A> : $description";
 	}
-	show_table_v_delimiter();
-	echo("<DIV ALIGN=CENTER>");
+
+	show_table_header($h1);
+
+	$h1="";
 	if($_GET["action"] =="showhistory")
 	{
-		echo("<b>[<A HREF=\"history.php?action=showhistory&itemid=".$_GET["itemid"]."\">".S_LAST_HOUR_GRAPH."</A>]</b> ");
+		$h1=$h1."<b>[<A HREF=\"history.php?action=showhistory&itemid=".$_GET["itemid"]."\">".S_LAST_HOUR_GRAPH."</A>]</b> ";
 	}
 	else
 	{
 		$item=get_item_by_itemid($_GET["itemid"]);
 		if($item["value_type"] == 0)
 		{
-			echo("<A HREF=\"history.php?action=showhistory&itemid=".$_GET["itemid"]."\">".S_LAST_HOUR_GRAPH."</A> ");
+			$h1=$h1."<A HREF=\"history.php?action=showhistory&itemid=".$_GET["itemid"]."\">".S_LAST_HOUR_GRAPH."</A> ";
 		}
 	}
 	if($_GET["action"] =="showhistory2")
 	{
-		echo("<b>[<A HREF=\"history.php?action=showhistory2&itemid=".$_GET["itemid"]."\">".S_LAST_HOUR_GRAPH_DIFF."</A>]</b> ");
+		$h1=$h1."<b>[<A HREF=\"history.php?action=showhistory2&itemid=".$_GET["itemid"]."\">".S_LAST_HOUR_GRAPH_DIFF."</A>]</b> ";
 	}
 	else
 	{
 		$item=get_item_by_itemid($_GET["itemid"]);
 		if($item["value_type"] == 0)
 		{
-			echo("<A HREF=\"history.php?action=showhistory2&itemid=".$_GET["itemid"]."\">".S_LAST_HOUR_GRAPH_DIFF."</A> ");
+			$h1=$h1."<A HREF=\"history.php?action=showhistory2&itemid=".$_GET["itemid"]."\">".S_LAST_HOUR_GRAPH_DIFF."</A> ";
 		}
 	}
 	if($_GET["action"] =="showvalues")
 	{
-		echo("<b>[<A HREF=\"history.php?action=showvalues&itemid=".$_GET["itemid"]."&period=3600\">".S_VALUES_OF_LAST_HOUR."</A>]</b> ");
+		$h1=$h1."<b>[<A HREF=\"history.php?action=showvalues&itemid=".$_GET["itemid"]."&period=3600\">".S_VALUES_OF_LAST_HOUR."</A>]</b> ";
 	}
 	else
 	{
-		echo("<A HREF=\"history.php?action=showvalues&itemid=".$_GET["itemid"]."&period=3600\">".S_VALUES_OF_LAST_HOUR."</A> ");
+		$h1=$h1."<A HREF=\"history.php?action=showvalues&itemid=".$_GET["itemid"]."&period=3600\">".S_VALUES_OF_LAST_HOUR."</A> ";
 	}
 	if($_GET["action"] =="showfreehist")
 	{
-		echo("<b>[<A HREF=\"history.php?action=showfreehist&itemid=".$_GET["itemid"]."\">".S_VALUES_OF_SPECIFIED_PERIOD."</A>]</b> ");
+		$h1=$h1."<b>[<A HREF=\"history.php?action=showfreehist&itemid=".$_GET["itemid"]."\">".S_VALUES_OF_SPECIFIED_PERIOD."</A>]</b> ";
 	}
 	else
 	{
-		echo("<A HREF=\"history.php?action=showfreehist&itemid=".$_GET["itemid"]."\">".S_VALUES_OF_SPECIFIED_PERIOD."</A> ");
+		$h1=$h1."<A HREF=\"history.php?action=showfreehist&itemid=".$_GET["itemid"]."\">".S_VALUES_OF_SPECIFIED_PERIOD."</A> ";
 	}
 	if($_GET["action"] =="showplaintxt")
 	{
-		echo("<b>[<A HREF=\"history.php?action=showplaintxt&itemid=".$_GET["itemid"]."\">".S_VALUES_IN_PLAIN_TEXT_FORMAT."</A>]</b> ");
+		$h1=$h1."<b>[<A HREF=\"history.php?action=showplaintxt&itemid=".$_GET["itemid"]."\">".S_VALUES_IN_PLAIN_TEXT_FORMAT."</A>]</b> ";
 	}
 	else
 	{
-		echo("<A HREF=\"history.php?action=showplaintxt&itemid=".$_GET["itemid"]."\">".S_VALUES_IN_PLAIN_TEXT_FORMAT."</A> ");
+		$h1=$h1."<A HREF=\"history.php?action=showplaintxt&itemid=".$_GET["itemid"]."\">".S_VALUES_IN_PLAIN_TEXT_FORMAT."</A> ";
 	}
-	echo("</DIV>\n");
-	show_table_header_end();
-	echo("<br>");
+	show_table_header($h1);
+	echo	"<br>";
 
 	if($_GET["action"]=="showfreehist")
 	{
