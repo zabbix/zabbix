@@ -1315,7 +1315,7 @@ void	process_new_value(DB_ITEM *item,char *value)
 			else
 			{
 				/* Save delta */
-				if(item->prevorgvalue_null == 0)
+				if((item->prevorgvalue_null == 0) && (item->lastvalue <= value_double) )
 				{
 					DBadd_history(item->itemid, (value_double - item->prevorgvalue)/(now-item->lastclock));
 				}
@@ -1349,7 +1349,7 @@ void	process_new_value(DB_ITEM *item,char *value)
 	/* Logic for delta */
 	else
 	{
-		if(item->prevorgvalue_null == 0)
+		if((item->prevorgvalue_null == 0) && (item->lastvalue <= value_double) )
 		{
 			sprintf(sql,"update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",now+item->delay,value_double,(value_double - item->prevorgvalue)/(now-item->lastclock),now,item->itemid);
 		}
