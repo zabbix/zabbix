@@ -12,6 +12,7 @@ trigger wihout actions, etc etc
  it possible after adding triger to go back to triggers of this host page ?
 
  - background image for maps
+ - zabbix thinks that host is unrechable if it receives string for numeric item
 
  - overlib: context sensitive help in PHP frontend
  - add selection of MIN/MAX/AVG for graphs
