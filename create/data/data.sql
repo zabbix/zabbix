@@ -119,6 +119,8 @@ insert into items_template (itemtemplateid,description,key_,delay)
 	values (46,'Checksum of /usr/sbin/sshd','cksum[/usr/sbin/sshd]', 600);
 insert into items_template (itemtemplateid,description,key_,delay)
 	values (47,'Checksum of /usr/bin/ssh','cksum[/usr/bin/ssh]', 600);
+insert into items_template (itemtemplateid,description,key_,delay)
+	values (48,'Checksum of /etc/services','cksum[/etc/services]', 600);
 
 --
 -- Data for table triggers_template
@@ -185,4 +187,6 @@ insert into triggers_template (triggertemplateid,itemtemplateid,description,expr
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (46,46,'/usr/sbin/sshd has been changed on server %s','{:.diff(0)}>0');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (47,47,'/usr/bin/shd has been changed on server %s','{:.diff(0)}>0');
+	values (47,47,'/usr/bin/sshd has been changed on server %s','{:.diff(0)}>0');
+insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+	values (48,48,'/etc/services has been changed on server %s','{:.diff(0)}>0');
