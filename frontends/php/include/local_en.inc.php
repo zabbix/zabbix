@@ -391,8 +391,7 @@
 	define("S_STATUS_OF_ZABBIX",			"Status of ZABBIX");
 	define("S_STATUS_OF_ZABBIX_BIG",		"STATUS OF ZABBIX");
 	define("S_VALUE",				"Value");
-	define("S_ZABBIX_SUCKERD_IS_RUNNING",		"zabbix_suckerd is running");
-	define("S_ZABBIX_TRAPPERD_IS_RUNNING",		"zabbix_trapperd is running");
+	define("S_ZABBIX_SERVER_IS_RUNNING",		"ZABBIX server is running");
 	define("S_NUMBER_OF_VALUES_STORED",		"Number of values stored");
 	define("S_NUMBER_OF_TRENDS_STORED",		"Number of trends stored");
 	define("S_NUMBER_OF_ALARMS",			"Number of alarms");
