@@ -432,6 +432,8 @@ int	evaluate(int *result,char *exp)
 	char	simple[MAX_STRING_LEN+1];
 	int	i,l,r;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate([%s])",exp);
+
 	strncpy( res,exp,MAX_STRING_LEN );
 
 	while( find_char( exp, ')' ) != FAIL )
@@ -627,7 +629,7 @@ int	substitute_functions(char *exp)
 	char	res[MAX_STRING_LEN+1];
 	int	i,l,r;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "BEGIN substitute_functions" );
+	zabbix_log(LOG_LEVEL_DEBUG, "BEGIN substitute_functions (%s)", exp);
 
 	while( find_char(exp,'{') != FAIL )
 	{
@@ -688,6 +690,8 @@ int	substitute_functions(char *exp)
  */ 
 int	evaluate_expression(int *result,char *expression)
 {
+	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_expression(%s)", expression );
+
 	delete_spaces(expression);
 	if( substitute_functions(expression) == SUCCEED)
 	{

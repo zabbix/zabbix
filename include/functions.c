@@ -247,6 +247,8 @@ void	update_functions(DB_ITEM *item)
 	int		ret=SUCCEED;
 	int		i;
 
+	zabbix_log( LOG_LEVEL_DEBUG, "In update_finctions(%d)",item->itemid);
+
 	sprintf(sql,"select function,parameter,itemid from functions where itemid=%d group by 1,2,3 order by 1,2,3",item->itemid);
 
 	result = DBselect(sql);
@@ -617,7 +619,7 @@ void	apply_actions(int triggerid,int good)
 	int	i;
 	int	now;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In apply_actions()");
+	zabbix_log( LOG_LEVEL_DEBUG, "In apply_actions(%d,%d)",triggerid, good);
 
 	if(good==1)
 	{
@@ -767,6 +769,8 @@ void	update_triggers(int itemid)
 
 	int	i;
 /*	int	prevvalue;*/
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In update_triggers (%d)", itemid);
 
 /* Does not work for PostgreSQL */
 /*		sprintf(sql,"select t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.dep_level",TRIGGER_STATUS_ENABLED,sucker_num);*/
