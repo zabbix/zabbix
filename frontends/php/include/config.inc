@@ -975,6 +975,12 @@
 		$result=DBexecute($sql);
 	}
 
+	function	delete_link($linkid)
+	{
+		$sql="delete from sysmaps_links where linkid=$linkid";
+		$result=DBexecute($sql);
+	}
+
 	# Add Host to system map
 
 	function add_host_to_sysmap($sysmapid,$hostid,$label,$x,$y)
