@@ -1,5 +1,7 @@
 Changes for 1.0beta8:
 
+ - all sendto() and recvfrom() were changed to write() and read() in function
+ send_mail() (Alexei)
  - fixed bug in host addition procedure when template host is used (Alexei) 
  - different colors for different status of items, triggers, users
  (Alexei)
