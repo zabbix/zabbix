@@ -628,12 +628,13 @@ void	update_serv(int serviceid)
 	int	i,j;
 	int	status;
 	int	serviceupid, algorithm;
+	int	now;
 
 	DB_RESULT *result,*result2;
 
 	sprintf(sql,"select l.serviceupid,s.algorithm from services_links l,services s where s.serviceid=l.serviceupid and l.servicedownid=%d",serviceid);
 	result=DBselect(sql);
-	status=0;	
+	status=0;
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 		serviceupid=atoi(DBget_field(result,i,0));
@@ -653,9 +654,12 @@ void	update_serv(int serviceid)
 					status=atoi(DBget_field(result2,j,0));
 				}
 			}
+			DBfree_result(result2);
+
+			now=time(NULL);
+			DBadd_service_alarm(atoi(DBget_field(result,i,0)),status,now);
 			sprintf(sql,"update services set status=%d where serviceid=%d",status,atoi(DBget_field(result,i,0)));
 			DBexecute(sql);
-			DBfree_result(result2);
 		}
 		else
 		{
@@ -741,10 +745,6 @@ void	update_triggers(int itemid)
 			{
 				now = time(NULL);
 				DBupdate_trigger_value(trigger.triggerid,TRIGGER_VALUE_TRUE,now);
-/*				sprintf(sql,"update triggers set value=%d, lastchange=%d where triggerid=%d",TRIGGER_VALUE_TRUE,now,trigger.triggerid);
-				DBexecute(sql);
-
-				DBadd_alarm(trigger.triggerid, TRIGGER_VALUE_TRUE, now);*/
 			}
 			if((trigger.value == TRIGGER_VALUE_FALSE)
 			||
@@ -769,11 +769,6 @@ void	update_triggers(int itemid)
 			{
 				now = time(NULL);
 				DBupdate_trigger_value(trigger.triggerid,TRIGGER_VALUE_FALSE,now);
-
-/*				sprintf(sql,"update triggers set value=%d, lastchange=%d where triggerid=%d",TRIGGER_VALUE_FALSE,now,trigger.triggerid);
-				DBexecute(sql);
-
-				DBadd_alarm(trigger.triggerid, TRIGGER_VALUE_FALSE,now);*/
 			}
 
 			if((trigger.value == TRIGGER_VALUE_TRUE)
