@@ -155,6 +155,8 @@ void	process_config_file(void)
 		syslog( LOG_CRIT, "DBName not in config file");
 		exit(1);
 	}
+	// Check, if we are able to connect
+	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD);
 }
 
 int	process(char *s)
