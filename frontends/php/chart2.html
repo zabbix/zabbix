@@ -163,7 +163,8 @@
 		ImageString($im, 2,$sizeX/2 -50,                $sizeY+$shiftYup+3, "NO DATA FOR THIS PERIOD" , $red);
 	}
 
-	ImageString($im,0,$shiftX+$sizeX-85,$sizeY+$shiftYup+25, "http://zabbix.sourceforge.net", $gray);
+#	ImageString($im,0,$shiftX+$sizeX-85,$sizeY+$shiftYup+25, "http://zabbix.sourceforge.net", $gray);
+	ImageStringUp($im,0,2*$shiftX+$sizeX+40,$sizeY+$shiftYdown+$shiftYup, "http://zabbix.sourceforge.net", $gray);
 
 	ImagePng($im); 
 	ImageDestroy($im); 

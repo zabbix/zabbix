@@ -2,9 +2,11 @@
 
 all:
 
-	@CC@ -o ../../bin/zabbix_agent @CFLAGS@ -I../../include zabbix_agent.c sysinfo.c -Wall @LIBS@
+	@CC@ -o ../../bin/zabbix_agent  @CFLAGS@ -I../../include zabbix_agent.c sysinfo.c -Wall @LIBS@
+	@CC@ -o ../../bin/zabbix_agentd @CFLAGS@ -I../../include zabbix_agentd.c sysinfo.c -Wall @LIBS@
 
 clean:
 	rm -fv *.o 
 	rm -fv ../../../zabbix_agent
+	rm -fv ../../../zabbix_agentd
 

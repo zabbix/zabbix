@@ -5,11 +5,11 @@
 #include "db.h"
 #include "common.h"
 
-#ifdef	USE_MYSQL
+#ifdef	HAVE_MYSQL
 	MYSQL	mysql;
 #endif
 
-#ifdef	USE_POSTGRESQL
+#ifdef	HAVE_PGSQL
 	PGconn	*conn;
 #endif
 
@@ -19,7 +19,7 @@
  */ 
 void    DBconnect( void )
 {
-#ifdef	USE_MYSQL
+#ifdef	HAVE_MYSQL
 	if( ! mysql_connect( &mysql, NULL, DB_USER, DB_PASSWD ) )
 	{
 		syslog(LOG_ERR, "Failed to connect to database: Error: %s\n",mysql_error(&mysql) );
@@ -31,7 +31,7 @@ void    DBconnect( void )
 		exit( FAIL );
 	}
 #endif
-#ifdef	USE_POSTGRESQL
+#ifdef	HAVE_PGSQL
 /*	conn = PQsetdb(pghost, pgport, pgoptions, pgtty, dbName); */
 	conn = PQsetdb(NULL, NULL, NULL, NULL, DB_NAME);
 
@@ -52,7 +52,7 @@ void    DBconnect( void )
 int	DBexecute(char *query)
 {
 
-#ifdef	USE_MYSQL
+#ifdef	HAVE_MYSQL
 	syslog( LOG_DEBUG, "Executing query:%s\n",query);
 
 	if( mysql_query(&mysql,query) != 0 )
@@ -62,7 +62,7 @@ int	DBexecute(char *query)
 		return FAIL;
 	}
 #endif
-#ifdef	USE_POSTGRESQL
+#ifdef	HAVE_PGSQL
 	PGresult	*result;
 
 	syslog( LOG_DEBUG, "Executing query:%s\n",query);
@@ -92,7 +92,7 @@ int	DBexecute(char *query)
  */ 
 DB_RESULT *DBselect(char *query)
 {
-#ifdef	USE_MYSQL
+#ifdef	HAVE_MYSQL
 	syslog( LOG_DEBUG, "Executing query:%s\n",query);
 
 	if( mysql_query(&mysql,query) != 0 )
@@ -103,7 +103,7 @@ DB_RESULT *DBselect(char *query)
 	}
 	return	mysql_store_result(&mysql);
 #endif
-#ifdef	USE_POSTGRESQL
+#ifdef	HAVE_PGSQL
 	PGresult	*result;
 
 	syslog( LOG_DEBUG, "Executing query:%s\n",query);
@@ -128,7 +128,7 @@ DB_RESULT *DBselect(char *query)
  */ 
 char	*DBget_field(DB_RESULT *result, int rownum, int fieldnum)
 {
-#ifdef	USE_MYSQL
+#ifdef	HAVE_MYSQL
 	MYSQL_ROW	row;
 
 	mysql_data_seek(result, rownum);
@@ -136,7 +136,7 @@ char	*DBget_field(DB_RESULT *result, int rownum, int fieldnum)
 	syslog(LOG_DEBUG, "Got field:%s", row[fieldnum] );
 	return row[fieldnum];
 #endif
-#ifdef	USE_POSTGRESQL
+#ifdef	HAVE_PGSQL
 	return PQgetvalue(result, rownum, fieldnum);
 #endif
 }
@@ -146,10 +146,10 @@ char	*DBget_field(DB_RESULT *result, int rownum, int fieldnum)
  */ 
 int	DBnum_rows(DB_RESULT *result)
 {
-#ifdef	USE_MYSQL
+#ifdef	HAVE_MYSQL
 	return mysql_num_rows(result);
 #endif
-#ifdef	USE_POSTGRESQL
+#ifdef	HAVE_PGSQL
 	return PQntuples(result);
 #endif
 }

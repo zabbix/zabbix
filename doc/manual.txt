@@ -13,15 +13,16 @@
 2.5 Capacity planning
 
 3. Chapter 3 (Structure)
-3.1 zabbix_sucker
+3.1 zabbix_suckerd
 3.2 zabbix_agent
-3.3 zabbix_trapper
-3.4 zabbix_sender
-3.5 Database
-3.6 WEB-based frontend
-3.6.1 Reports
-3.6.1.1 Status of Zabbix
-3.6.1.2 Availability report
+3.3 zabbix_agentd
+3.4 zabbix_trapper
+3.5 zabbix_sender
+3.6 Database
+3.7 WEB-based frontend
+3.8.1 Reports
+3.8.1.1 Status of Zabbix
+3.8.1.2 Availability report
 
 4. Chapter 4 (Installation)
 
@@ -151,13 +152,13 @@ value in the database.
 It is also possible to use trapping method. In tis case, monitored host sends information
 to Zabbix server.
 
-3.1 zabbix_sucker
+3.1 zabbix_suckerd
 
 The Zabbix server process.
 
 SYNOPSIS
 
-zabbix_sucker
+zabbix_suckerd
 
 DESCRIPTION
 
@@ -165,17 +166,17 @@ The process periodically connects to agents (either Zabbix native or SNMP) to ge
 monitored.  Also, the process periodically re-calculates status of triggers. It sends alerts to users
 if required.
 
-By default, zabbix_sucker forks ten copies of itself. It means that Zabbix will be able to get ten monitored parameters
+By default, zabbix_suckerd forks ten copies of itself. It means that Zabbix will be able to get ten monitored parameters
 simultaneously. Modify parameter SUCKER_FORKS in include/common.h if ten is not enough for you. 
 
-No switches are supported by zabbix_sucker.
+No switches are supported by zabbix_suckerd.
 
 The process is run as daemon under non-priveledged user account, usually zabbix. Syslog is used to store
 debug information for the process.
 
 3.2 zabbix_agent
 
-The Zabbix agent.
+The Zabbix agent (called from inetd).
 
 SYNOPSIS
 
@@ -184,15 +185,40 @@ zabbix_agent
 DESCRIPTION
 
 The process lives on host being monitored. zabbix_agent provides requested information to 
-zabbix_sucker. zabbix_agent is called from inetd daemon.
+zabbix_suckerd. zabbix_agent is made to be used with INETD daemon.
 
 Execution time of the process is limited. If agent was not able to get information 
 during 3 seconds, it kills himself. 
 
-When executed, it reads /etc/zabbix/zabbix_agent.conf file. This file should exist and contain
+When connection to zabbix_agent is made, the agent reads /etc/zabbix/zabbix_agent.conf file. This file should exist and contain
 IP address of Zabbix server. Connections from other IPs are rejected.
 
-3.3 zabbix_trapper
+If possible, use zabbix_agentd. It does not require extra fork() and exec() calls for every connection.
+
+3.3 zabbix_agentd
+
+Standalone Zabbix agent (daemon).
+
+SYNOPSIS
+
+zabbix_agentd
+
+DESCRIPTION
+
+The process runs on host being monitored. zabbix_agentd provides requested information to 
+zabbix_suckerd. 
+
+When executed, it forks himself. Load is balanced between each copy (dafault is ten).
+
+When connection to zabbix_agentd is made, the agent reads /etc/zabbix/zabbix_agent.conf file. This file should exist and contain
+IP address of Zabbix server. Connections from other IPs are rejected.
+
+No switches are supported by zabbix_agentd.
+
+The process is run as daemon under non-priveledged user account, usually zabbix. Syslog is used to store
+debug information for the process.
+
+3.4 zabbix_trapper
 
 The Zabbix server process.
 
@@ -205,7 +231,7 @@ DESCRIPTION
 The process is made to support traping. It constantly waits for connections from zabbix_sender
 agents.  
 
-3.4 zabbix_sender
+3.5 zabbix_sender
 
 The Zabbix agent (trapping).
 
@@ -229,30 +255,30 @@ zabbix_sender zabbix.abcde.com 10001 db.abcde.com:procload 2.34
 It means, that zabbix_sender will send information about processor load on host db.abcde.com
 to Zabbix server located at zabbix.acbde.com. Processor load is 2.34.
 
-3.5 Database
+3.6 Database
 
 Database used by Zabbix play most important role. The database is the only source
 of configuration parameters and it stores all history of monitored values.
 
 Zabbix performance highly depends on officiency and speed of used database.
  
-3.6 WEB-based frontend
+3.7 WEB-based frontend
 
 The frontend provides convinient and platform independed way for accessing Zabbix.
 Information provided by the frontend can be either graphical (e.g. graph on disk space
 usage) or text format. Text representation of monitored parameters is made to allow
 easy way for export Zabbix data to other analytical tools.
 
-3.6.1 Reports
+3.7.1 Reports
 
 Zabbix reports represent collected information in structured way. All reports are produced
 in HTML format.
 
 Note that report generation could be very time consuming operation. Additionally, if you
-use MySQL or ay other database with table locking, zabbix_sucker and zabbix_trapper will
+use MySQL or ay other database with table locking, zabbix_suckerd and zabbix_trapper will
 wait until the report is finished.
 
-3.6.1.1 Status of Zabbix
+3.7.1.1 Status of Zabbix
 
 This report gives general information about Zabbix server including:
 
@@ -260,7 +286,7 @@ This report gives general information about Zabbix server including:
  - are main Zabbix processes running ?
  - other information
 
-3.6.1.2 Availability report
+3.7.1.2 Availability report
 
 This report calculates amount of time a trigger spent in true and false states. 
 
@@ -302,7 +328,7 @@ However, Zabbix can work on previous versions of Apache, MySQL, PostgreSQL as we
 Debian Potato and Debian Woody are development and testing platforms I currently use.
 
 I've tried to run Zabbix on PostgreSQL 6.5x with no luck. PostgreSQL crashes after
-one-tree minutes of zabbix_sucker running. So, PostgreSQL version 7.0.2 or later is strongly
+one-tree minutes of zabbix_suckerd running. So, PostgreSQL version 7.0.2 or later is strongly
 recommended.
 
 For small installations MySQL is best choice. However, if you plan to monitor more than
@@ -369,21 +395,11 @@ cat data.sql|psql -U <username> zabbix
 
 4.2.4 Configure include/db.h
 
-Use this for MySQL database:
-#define USE_MYSQL 1
-
-or
-
-Use this for PostgreSQL:
-#define USE_POSTGRESQL 1
-
-Parameters used regardless of database type:
+Change the following parameters:
 
 #define DB_NAME         "zabbix"
-#define DB_USER         ""
-#define DB_PASSWD       ""
-
-Change these values.
+#define DB_USER         "zabbix"
+#define DB_PASSWD       "password"
 
 4.2.5 Configure and compile the source code for your system.
 
@@ -403,10 +419,14 @@ zabbix_trap     10001/tcp
 
 4.2.8 Configure /etc/inetd.conf
 
-Add the following lines to /etc/inetd.conf:
+Add the following line to /etc/inetd.conf:
+
+zabbix_trap         stream  tcp     nowait.3600    zabbix /opt/zabbix/bin/zabbix_trapper
+
+If you plan to use zabbix_agent (zabbix_agentd does not require this!), the following line must be added as well:
 
 zabbix_agent        stream  tcp     nowait.3600    zabbix /opt/zabbix/bin/zabbix_agent
-zabbix_trap         stream  tcp     nowait.3600    zabbix /opt/zabbix/bin/zabbix_trapper
+
 
 4.2.9 Restart inetd
 
@@ -468,9 +488,13 @@ to "Not monitored". List of possible parameers for the host will be automaticall
 
  - Configure TRIGGERS
 
- - Run zabbix_sucker
+ - Run zabbix_suckerd
 
-/opt/zabbix/bin/zabbix_sucker
+/opt/zabbix/bin/zabbix_suckerd
+
+ - Run zabbix_agentd
+
+You should not run zabbix_agentd this if you use zabbix_agent !
 
 Define actions for triggers you are interested in. Note, that you can always use
 macros in both email subject and email body. 

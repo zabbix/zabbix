@@ -148,9 +148,10 @@ CREATE TABLE alarms (
   clock			int4		DEFAULT '0' NOT NULL,
   istrue		int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (alarmid),
-  FOREIGN KEY (triggerid) REFERENCES triggers,
-  KEY (triggerid, clock)
+  FOREIGN KEY (triggerid) REFERENCES triggers
 );
+
+CREATE INDEX alarms_triggerid_clock on alarms (triggerid, clock);
 
 --
 -- Table structure for table 'functions'
@@ -248,6 +249,7 @@ CREATE TABLE sysmaps_hosts (
   shostid		serial,
   sysmapid		int4		DEFAULT '0' NOT NULL,
   hostid		int4		DEFAULT '0' NOT NULL,
+  icon			varchar(32)	DEFAULT 'Server' NOT NULL,
   label			varchar(128)	DEFAULT '' NOT NULL,
   x			int4		DEFAULT '0' NOT NULL,
   y			int4		DEFAULT '0' NOT NULL,

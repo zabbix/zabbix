@@ -43,6 +43,7 @@ CREATE TABLE sysmaps_hosts (
   shostid		int(4)		NOT NULL auto_increment,
   sysmapid		int(4)		DEFAULT '0' NOT NULL,
   hostid		int(4)		DEFAULT '0' NOT NULL,
+  icon			varchar(32)	DEFAULT 'Server' NOT NULL,
   label			varchar(128)	DEFAULT '' NOT NULL,
   x			int(4)		DEFAULT '0' NOT NULL,
   y			int(4)		DEFAULT '0' NOT NULL,
