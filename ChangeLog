@@ -1,5 +1,7 @@
 Changes for 1.0beta12:
 
+ - fixed UserParameter when it replaces existing one. Thanks to
+ Sbastien "Slix" Linard. (Alexei) 
  - fixed PostgreSQL schema (Alexei)
 
 Changes for 1.0beta11:
