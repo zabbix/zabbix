@@ -1,7 +1,6 @@
 ZABBIX 1.1:
 
  - RPM for RedHat EL
- - get rid of extra warning messages in W32 agent
  - escalation and repeated notifications
  - execution of commands on monitored hosts in case of pre-defined events
  - monitoring of log files
