@@ -38,6 +38,7 @@ td.form_row_first
 	color: #FFFFFF;
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:10px;
+	font-weight: bold;
 #	background-color: #8dA8Cd;
 	background-color: #6d88ad;
 	border-color: #888888;
@@ -100,11 +101,11 @@ td.horizontal_menu_n
 #	background-color: #6d88ad;
 #	background-color: #778899;
 	background-color: #AAAAAA;
-	border-color: #000000;
+	border-color: #888888;
 	border-width:1px;
-	border-top-style: dotted;
-	border-left-style: dotted;
-	border-right-style: dotted;
+	border-top-style: solid;
+	border-left-style: solid;
+	border-right-style: solid;
 }
 
 span.divider
