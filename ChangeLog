@@ -1,5 +1,7 @@
 Changes for 1.0beta8:
 
+ - assured uniqueness of host names (Alexei)
+ - added upgrades/dbpatches/1.0beta7_to_1.0beta8/ with patches (Alexei)
  - mass update for triggers (activate, deactivate, delete) (Alexei)
  - all sendto() and recvfrom() were changed to write() and read() in function
  send_mail() (Alexei)

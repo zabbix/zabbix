@@ -36,6 +36,7 @@ CREATE TABLE hosts (
 );
 
 CREATE INDEX hosts_status on hosts (status);
+CREATE UNIQUE INDEX hosts_host on hosts (host);
 
 --
 -- Table structure for table 'items'
