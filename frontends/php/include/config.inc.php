@@ -4281,7 +4281,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 	       		$sql="select value from service_alarms where serviceid=$serviceid and clock=".DBget_field($result,0,1);
 		        $result2=DBselect($sql);
-			$value=DBget_field($result2,0,0);
+// Assuring that we get very latest service value. There could be several with the same timestamp
+//			$value=DBget_field($result2,0,0);
+			for($i=0;$i<DBnum_rows($result2);$i++)
+			{
+				$value=DBget_field($result2,$i,0);
+			}
 		}
 		else
 		{
