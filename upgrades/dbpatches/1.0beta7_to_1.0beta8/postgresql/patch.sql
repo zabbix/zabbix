@@ -14,3 +14,5 @@ CREATE TABLE profiles (
 
 CREATE INDEX profiles_userid on profiles (userid);
 CREATE UNIQUE INDEX profiles_userid_idx on profiles (userid,idx);
+
+alter table items add snmp_port int4 DEFAULT '161' NOT NULL;

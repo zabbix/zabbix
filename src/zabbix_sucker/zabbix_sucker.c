@@ -273,6 +273,7 @@ int	get_value_SNMP(int version,double *result,char *result_str,DB_ITEM *item)
 
 	snmp_sess_init( &session );
 	session.version = version;
+	session.remote_port = item->snmp_port;
 	if(item->useip == 1)
 	{
 		session.peername = item->ip;
@@ -745,9 +746,9 @@ int get_values(void)
 
 	now = time(NULL);
 #ifdef TESTTEST
-	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and h.hostid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-3,sucker_num-3,SERVER_STATUS_KEY);
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,i.snmp_port from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and h.hostid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-3,sucker_num-3,SERVER_STATUS_KEY);
 #else
-	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors from items i,hosts h where i.nextcheck<=%d and i.status=%d and i.type not in (%d) and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, now, CONFIG_SUCKERD_FORKS-3,sucker_num-3,SERVER_STATUS_KEY);
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port from items i,hosts h where i.nextcheck<=%d and i.status=%d and i.type not in (%d) and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, now, CONFIG_SUCKERD_FORKS-3,sucker_num-3,SERVER_STATUS_KEY);
 #endif
 	result = DBselect(sql);
 
@@ -793,6 +794,7 @@ int get_values(void)
 		item.value_type=atoi(DBget_field(result,i,17));
 
 		network_errors=atoi(DBget_field(result,i,18));
+		item.snmp_port=atoi(DBget_field(result,i,18));
 
 		res = get_value(&value,value_str,&item);
 		zabbix_log( LOG_LEVEL_DEBUG, "GOT VALUE [%s]", value_str );

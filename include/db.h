@@ -65,6 +65,7 @@ DB_ITEM
 	char    *shortname;
 	char    *snmp_community;
 	char    *snmp_oid;
+	int     snmp_port;
 	char	*trapper_hosts;
 	int     port;
 	int     delay;

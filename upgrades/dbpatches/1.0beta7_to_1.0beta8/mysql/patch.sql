@@ -13,3 +13,5 @@ CREATE TABLE profiles (
   KEY (userid),
   UNIQUE (userid,idx)
 ) type=InnoDB;
+
+alter table items add snmp_port	int(4) DEFAULT '161' NOT NULL;

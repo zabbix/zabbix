@@ -1450,7 +1450,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Update Item definition
 
-	function	update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts)
+	function	update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port)
 	{
 		global	$ERROR_MSG;
 
@@ -1465,7 +1465,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return 0;
 		}
 
-		$sql="update items set description='$description',key_='$key',hostid=$hostid,delay=$delay,history=$history,lastdelete=0,nextcheck=0,status=$status,type=$type,snmp_community='$snmp_community',snmp_oid='$snmp_oid',value_type=$value_type,trapper_hosts='$trapper_hosts' where itemid=$itemid";
+		if( ($snmp_port<1)||($snmp_port>65535))
+		{
+			$ERROR_MSG="Invalid SNMP port";
+			return 0;
+		}
+
+		$sql="update items set description='$description',key_='$key',hostid=$hostid,delay=$delay,history=$history,lastdelete=0,nextcheck=0,status=$status,type=$type,snmp_community='$snmp_community',snmp_oid='$snmp_oid',value_type=$value_type,trapper_hosts='$trapper_hosts',snmp_port=$snmp_port where itemid=$itemid";
 		return	DBexecute($sql);
 	}
 
@@ -1811,7 +1817,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Add Item definition
 
-	function	add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts)
+	function	add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port)
 	{
 		global	$ERROR_MSG;
 
@@ -1827,10 +1833,17 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return 0;
 		}
 
+		if( ($snmp_port<1)||($snmp_port>65535))
+		{
+			$ERROR_MSG="Invalid SNMP port";
+			return 0;
+		}
+
+
 		$key=addslashes($key);
 		$description=addslashes($description);
 
-		$sql="insert into items (description,key_,hostid,delay,history,lastdelete,nextcheck,status,type,snmp_community,snmp_oid,value_type,trapper_hosts) values ('$description','$key',$hostid,$delay,$history,0,0,$status,$type,'$snmp_community','$snmp_oid',$value_type,'$trapper_hosts')";
+		$sql="insert into items (description,key_,hostid,delay,history,lastdelete,nextcheck,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port) values ('$description','$key',$hostid,$delay,$history,0,0,$status,$type,'$snmp_community','$snmp_oid',$value_type,'$trapper_hosts',$snmp_port)";
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"items","itemid");
 	}
@@ -2929,7 +2942,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		if(isset($itemid))
 		{
-			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts from items i,hosts h where i.itemid=$itemid and h.hostid=i.hostid");
+			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.snmp_port from items i,hosts h where i.itemid=$itemid and h.hostid=i.hostid");
 		
 			$description=DBget_field($result,0,0);
 			$key=DBget_field($result,0,1);
@@ -2943,6 +2956,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$snmp_oid=DBget_field($result,0,9);
 			$value_type=DBget_field($result,0,10);
 			$trapper_hosts=DBget_field($result,0,11);
+			$snmp_port=DBget_field($result,0,12);
 		}
 		else
 		{
@@ -2958,6 +2972,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$snmp_oid="interfaces.ifTable.ifEntry.ifInOctets.1";
 			$value_type=0;
 			$trapper_hosts="";
+			$snmp_port=161;
 		}
 
 		echo "<br>";
@@ -3042,6 +3057,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "SNMP OID (for SNMP only)";
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"snmp_oid\" value=\"$snmp_oid\" size=40>";
+
+		show_table2_v_delimiter();
+		echo "SNMP port (for SNMP only)";
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"snmp_port\" value=\"$snmp_port\" size=5>";
 
 		show_table2_v_delimiter();
 		echo "Key";
