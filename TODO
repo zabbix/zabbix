@@ -10,7 +10,6 @@ HIGH PRIORITY:
  - support fo netload under other platforms
  - support for disk loads
  - new host name should not contain space and other character not allowed by trigger expression
- - add information about php.ini (<? ?> and <PHP PHP>) to Zabbix Manual
  - better monitoring of log files
  - check --enable-static for all platforms
 
