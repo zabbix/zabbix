@@ -3,18 +3,18 @@
 	$page["file"] = "tr_status.html";
 
 	include "include/config.inc";
-	show_header($page["title"],10,0);
+	if(isset($fullscreen))
+	{
+		show_header($page["title"],10,1);
+	}
+	else
+	{
+		show_header($page["title"],10,0);
+	}
 ?>                                                                                                             
 
 <?
-	show_table_header_begin();
-	echo "STATUS OF TRIGGERS";
-
-
-        show_table_v_delimiter();
-?>
  
-<?
 	if(!isset($onlytrue))
 	{
 		$onlytrue='false';
@@ -28,74 +28,90 @@
 		$compact='false';
 	}
 ?>
+
 <?
-        $result=DBselect("select hostid,host from hosts order by host");
-        if(isset($hostid))
-        {
-                echo "<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact\">all</A>  ";
-        }
-        else
-        {
-                echo "<b>[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact\">all</A>]</b>  ";
-        }
-	for($i=0;$i<DBnum_rows($result);$i++)
-        {
-                $hid=DBget_field($result,$i,0);
-                $host=DBget_field($result,$i,1);
-                if(isset($hostid) && ($hid == $hostid))
-                {
-                        echo "<b>[<A HREF=\"tr_status.html?hostid=$hid&onlytrue=$onlytrue&noactions=$noactions&compact=$compact\">$host</A>]</b>  ";
-                }
-                else
-                {
-                        echo "<A HREF=\"tr_status.html?hostid=$hid&onlytrue=$onlytrue&noactions=$noactions&compact=$compact\">$host</A>  ";
-                }
-        }
- 
-	show_table_v_delimiter();
+
+
+	if(!isset($fullscreen))
+	{
+		show_table_header_begin();
+		echo "STATUS OF TRIGGERS";
+	        show_table_v_delimiter();
+
+	        $result=DBselect("select hostid,host from hosts order by host");
+	        if(isset($hostid))
+	        {
+	                echo "<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact\">all</A>  ";
+	        }
+	        else
+	        {
+	                echo "<b>[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact\">all</A>]</b>  ";
+	        }
+		for($i=0;$i<DBnum_rows($result);$i++)
+	        {
+	                $hid=DBget_field($result,$i,0);
+	                $host=DBget_field($result,$i,1);
+	                if(isset($hostid) && ($hid == $hostid))
+	                {
+	                        echo "<b>[<A HREF=\"tr_status.html?hostid=$hid&onlytrue=$onlytrue&noactions=$noactions&compact=$compact\">$host</A>]</b>  ";
+	                }
+	                else
+	                {
+	                        echo "<A HREF=\"tr_status.html?hostid=$hid&onlytrue=$onlytrue&noactions=$noactions&compact=$compact\">$host</A>  ";
+	                }
+	        }
+	 
+		show_table_v_delimiter();
 ?>
 
-<A NAME="top"></A>
 <?
-	if(isset($hostid))
-	{
-		$cond="&hostid=$hostid";
-	}
-	else
-	{
-		$cond="";
-	}
+		if(isset($hostid))
+		{
+			$cond="&hostid=$hostid";
+		}
+		else
+		{
+			$cond="";
+		}
 
-	if($onlytrue!='true')
-	{
-		echo "[<A HREF=\"tr_status.html?onlytrue=true&noactions=$noactions&compact=$compact$cond\">Show only true</a>] ";
-	}
-	else
-	{
-		echo "[<A HREF=\"tr_status.html?noactions=$noactions&compact=$compact$cond\">Show all triggers</A>] ";
-	}
-	if($noactions!='true')
-	{
-		echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=true&compact=$compact$cond\">Hide Actions</A>] ";
-	}
-	else
-	{
-		echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=false&compact=$compact$cond\">Show Actions</A>] ";
-	}
-	if($compact!='true')
-	{
-		echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=true$cond\">Hide Details</A>] ";
-	}
-	else
-	{
-		echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=false$cond\">Show Details</A>] ";
-	}
+		if($onlytrue!='true')
+		{
+			echo "[<A HREF=\"tr_status.html?onlytrue=true&noactions=$noactions&compact=$compact$cond\">Show only true</a>] ";
+		}
+		else
+		{
+			echo "[<A HREF=\"tr_status.html?noactions=$noactions&compact=$compact$cond\">Show all triggers</A>] ";
+		}
+		if($noactions!='true')
+		{
+			echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=true&compact=$compact$cond\">Hide Actions</A>] ";
+		}
+		else
+		{
+			echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=false&compact=$compact$cond\">Show Actions</A>] ";
+		}
+		if($compact!='true')
+		{
+			echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=true$cond\">Hide Details</A>] ";
+		}
+		else
+		{
+			echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=false$cond\">Show Details</A>] ";
+		}
   
-	show_table_header_end();
+		show_table_header_end();
+		echo "<br>";
+	}
 	
-	echo "<br>";
-   
-	show_table_header("TRIGGERS");
+  
+  	if(isset($fullscreen))
+	{
+		show_table_header("<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact\">TRIGGERS</A>");
+	}
+	else
+	{
+		show_table_header("<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&fullscreen=1\">TRIGGERS</A>");
+	}
   
 	echo "\n<TABLE BORDER=0 COLS=5 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR ALIGN=CENTER>";
