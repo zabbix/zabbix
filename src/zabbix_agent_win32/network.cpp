@@ -48,6 +48,7 @@ LONG H_CheckTcpPort(char *cmd,char *arg,double *value)
    }
    else
    {
+      *arg_port=0;
       arg_port++;
       arg_host=instance;
    }
