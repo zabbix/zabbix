@@ -17,6 +17,11 @@
 	#include <sys/mount.h>
 #endif
 
+/* HP-UX */
+#ifdef HAVE_SYS_PSTAT_H
+	#include <sys/pstat.h>
+#endif
+
 #include <string.h>
 
 #include "common.h"
@@ -141,12 +146,65 @@ float	SHAREDMEM(void)
 
 float	TOTALMEM(void)
 {
+#ifdef HAVE_SYS_PSTAT_H
+	struct	pst_static pst;
+	long	page;
+
+	if(pstat_getstatic(&pst, sizeof(pst), (size_t)1, 0) == -1)
+	{
+		return FAIL;
+	}
+	else
+	{
+		/* Get page size */	
+		page = pst.page_size;
+		/* Total physical memory in bytes */	
+		return page*pst.physical_memory;
+	}
+#else
 	return getPROC("/proc/meminfo",4,2);
+#endif
 }
 
 float	FREEMEM(void)
 {
+#ifdef HAVE_SYS_PSTAT_H
+	struct	pst_static pst;
+	struct	pst_dynamic dyn;
+	long	page;
+
+	if(pstat_getstatic(&pst, sizeof(pst), (size_t)1, 0) == -1)
+	{
+		return FAIL;
+	}
+	else
+	{
+		/* Get page size */	
+		page = pst.page_size;
+//		return pst.physical_memory;
+
+		if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
+		{
+			return FAIL;
+		}
+		else
+		{
+//cout<<"total virtual memory allocated is " << dyn.psd_vm << "
+//pages, " << dyn.psd_vm * page << " bytes" << endl;
+//cout<<"active virtual memory is " << dyn.psd_avm <<" pages, " <<
+//dyn.psd_avm * page << " bytes" << endl;
+//cout<<"total real memory is " << dyn.psd_rm << " pages, " <<
+//dyn.psd_rm * page << " bytes" << endl;
+//cout<<"active real memory is " << dyn.psd_arm << " pages, " <<
+//dyn.psd_arm * page << " bytes" << endl;
+//cout<<"free memory is " << dyn.psd_free << " pages, " <<
+		/* Free memory in bytes */	
+			return dyn.psd_free * page;
+		}
+	}
+#else
 	return getPROC("/proc/meminfo",5,2);
+#endif
 }
 
 float	UPTIME(void)

@@ -13,7 +13,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(stdio.h stdlib.h string.h signal.h errno.h \
   unistd.h mntent.h fcntl.h sys/stat.h sys/socket.h \
   sys/types.h sys/param.h sys/mount.h netinet/in.h arpa/inet.h \
-  sys/vfs.h)
+  sys/vfs.h sys/pstat.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_PID_T
