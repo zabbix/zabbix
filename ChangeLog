@@ -1,10 +1,16 @@
 Changes for 1.0alpha12:
 
+ - added columns alert_history and alarm_history to table config (Alexei)
+ - added link from graphs to trends and vs (Alexei)
+ - housekeeping process in zabbix_suckerd will also delete old records from tables
+   alerts and alarms (Alexei)
+ - added directory upgrades/dbpatches/1.0alpha11_to_1.0alpha12 (Alexei)
+ - added index on column "clock" for table alarms (Alexei)
+
  - cleanup of all *.html files (Alexei)
  - removed doc/dbstructure (Alexei)
  - removed doc/manual.txt (Alexei)
  - minor changes in manual.lyx (Alexei)
-
  - added version (draft 1.01) to manual.lyx
  - character '-' can be used to form server name (Alexei)
  - fixed dependencies in functions that delete information for zabbix tables (Alexei)

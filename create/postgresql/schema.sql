@@ -53,7 +53,9 @@ CREATE TABLE config (
   smtp_server		varchar(255)	DEFAULT '' NOT NULL,
   smtp_helo		varchar(255)	DEFAULT '' NOT NULL,
   smtp_email		varchar(255)	DEFAULT '' NOT NULL,
-  password_required	int4		DEFAULT '0' NOT NULL
+  password_required	int4		DEFAULT '0' NOT NULL,
+  alert_history		int4		DEFAULT '0' NOT NULL,
+  alarm_history		int4		DEFAULT '0' NOT NULL
 );
 
 --
@@ -165,6 +167,7 @@ CREATE TABLE alarms (
 );
 
 CREATE INDEX alarms_triggerid_clock on alarms (triggerid, clock);
+CREATE INDEX alarms_clock on alarms (clock);
 
 --
 -- Table structure for table 'functions'

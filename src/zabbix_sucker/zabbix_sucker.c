@@ -283,7 +283,7 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 	}
 	if( *result<0 )
 	{
-		if( *result == NOTSUPPORTED)
+		if( cmp_double(*result,NOTSUPPORTED) == 0)
 		{
 			return SUCCEED;
 		}
@@ -454,7 +454,7 @@ int get_values(void)
 	return SUCCEED;
 }
 
-int housekeeping_items()
+int housekeeping_items(int now)
 {
 	char		c[1024];
 	DB_ITEM		item;
@@ -462,9 +462,6 @@ int housekeeping_items()
 	DB_RESULT	*result;
 
 	int		i,rows;
-	int		now;
-
-	now = time(NULL);
 
 	sprintf(c,"select i.itemid,i.lastdelete,i.history from items i where i.lastdelete<=%d", now);
 	result = DBselect(c);
@@ -483,11 +480,9 @@ int housekeeping_items()
 		item.lastdelete=atoi(DBget_field(result,i,1));
 		item.history=atoi(DBget_field(result,i,2));
 
-		now = time(NULL);
 		sprintf	(c,"delete from history where ItemId=%d and Clock<%d",item.itemid,now-item.history);
 		DBexecute(c);
 	
-		now = time(NULL);
 		sprintf(c,"update items set LastDelete=%d where ItemId=%d",now,item.itemid);
 		DBexecute(c);
 	}
@@ -495,11 +490,53 @@ int housekeeping_items()
 	return SUCCEED;
 }
 
+int housekeeping_alerts(int now)
+{
+	char		c[1024];
+	int		alert_history;
+	DB_RESULT	*result;
+
+	sprintf(c,"select alert_history from config");
+	result = DBselect(c);
+
+	alert_history=atoi(DBget_field(result,0,0));
+
+	sprintf	(c,"delete from alerts where clock<%d",now-alert_history);
+	DBexecute(c);
+
+	DBfree_result(result);
+	return SUCCEED;
+}
+
+int housekeeping_alarms(int now)
+{
+	char		c[1024];
+	int		alarm_history;
+	DB_RESULT	*result;
+
+	sprintf(c,"select alarm_history from config");
+	result = DBselect(c);
+
+	alarm_history=atoi(DBget_field(result,0,0));
+
+	sprintf	(c,"delete from alarms where clock<%d",now-alarm_history);
+	DBexecute(c);
+	
+	DBfree_result(result);
+	return SUCCEED;
+}
+
 int main_housekeeping_loop()
 {
+	int	now;
+
+	now = time(NULL);
+
 	for(;;)
 	{
-		housekeeping_items();
+		housekeeping_items(now);
+		housekeeping_alarms(now);
+		housekeeping_alerts(now);
 		syslog( LOG_DEBUG, "Sleeping for %d seconds", SUCKER_HK);
 		sleep(SUCKER_HK);
 	}

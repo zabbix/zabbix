@@ -28,6 +28,29 @@
 		return	$trigger;
 	}
 
+	function	select_config()
+	{
+		global	$ERROR_MSG;
+
+		$sql="select smtp_server,smtp_helo,smtp_email,password_required,alarm_history,alert_history from config";
+		$result=DBselect($sql);
+
+		if(DBnum_rows($result) == 1)
+		{
+			$config["smtp_server"]=DBget_field($result,0,0);
+			$config["smtp_helo"]=DBget_field($result,0,1);
+			$config["smtp_email"]=DBget_field($result,0,2);
+			$config["password_required"]=DBget_field($result,0,3);
+			$config["alarm_history"]=DBget_field($result,0,4);
+			$config["alert_history"]=DBget_field($result,0,5);
+		}
+		else
+		{
+			$ERROR_MSG="Unable to select configuration";
+		}
+		return	$config;
+	}
+
 	function	select_host_by_hostid($hostid)
 	{
 		global	$ERROR_MSG;
@@ -1355,9 +1378,9 @@
 
 	# Update configuration
 
-	function	update_config($smtp_server,$smtp_helo,$smtp_email,$password_required)
+	function	update_config($smtp_server,$smtp_helo,$smtp_email,$password_required,$alarm_history,$alert_history)
 	{
-		$sql="update config set smtp_server='$smtp_server',smtp_helo='$smtp_helo',smtp_email='$smtp_email',password_required=$password_required";
+		$sql="update config set smtp_server='$smtp_server',smtp_helo='$smtp_helo',smtp_email='$smtp_email',password_required=$password_required,alarm_history=$alarm_history,alert_history=$alert_history";
 		return	DBexecute($sql);
 	}
 

@@ -24,7 +24,7 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.02)
+Zabbix Reference Manual for version 1.0 (draft v1.03)
 \layout Author
 
 ALEXEI VLADISHEV
@@ -1199,6 +1199,53 @@ IMPORTANT.
 tcp_count
 \series default 
  is not supported anymore.
+\layout Subsubsection
+
+Zabbix 1.0alpha12
+\layout Itemize
+
+Do not forget to apply DB patches
+\layout Itemize
+
+Note that character '-' can be used in host names
+\layout Itemize
+
+Note that if parameter is defined as 
+\series bold 
+parameter[*]
+\series default 
+, you can pass any string as 
+\series bold 
+'*'
+\series default 
+.
+\layout Itemize
+
+Note that new parameter 
+\series bold 
+check_port[*]
+\series default 
+ added.
+ 
+\series bold 
+'*'
+\series default 
+ is any port number.
+\layout Itemize
+
+Note that new operator 
+\series bold 
+'='
+\series default 
+ added.
+\layout Itemize
+
+Note that Zabbix manual will be distributed in the followinf formats: LyX,
+ PS, PDF and plain text.
+\layout Itemize
+
+Zabbix 1.0alpha12 is latest alpha version.
+ Next Zabbix version will be called 1.0beta1.
 \layout Subsection
 
 ChangeLog
@@ -1631,7 +1678,51 @@ h.
 One zabbix_suckerd process is used for housekeeping purposes only.\SpecialChar ~
  The housekeepi
 ng process periodically (hourly, by default) deletes outdated information
- from table history.
+ from 
+\latex default 
+the following tables: 
+\series bold 
+history
+\series default 
+, 
+\series bold 
+alarms
+\series default 
+ and 
+\series bold 
+alerts
+\series default 
+\latex no_latex 
+.
+\layout Standard
+
+Constant SUCKER_HK from 
+\shape italic 
+include/common.h
+\shape default 
+ defines how often housekeping process executes.
+\layout Standard
+
+Housekeeping process will delete all records from table 
+\series bold 
+alarms
+\series default 
+ older than value defined in Zabbix configuration.
+ 
+\layout Standard
+
+Housekeeping process will delete all records from table 
+\series bold 
+alerts
+\series default 
+ older than value defined in Zabbix configuration.
+ 
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
 \layout Standard
 
 
@@ -5974,6 +6065,213 @@ Database structure
 \layout Standard
 
 The section describes structure of tables of Zabbix database.
+\layout Description
+
+CONFIG The table contains global configuration parameters.
+\layout Description
+
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="7" columns="3">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Column name
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Type
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+smtp_server
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Name of SMTP server
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+smtp_helo
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+HELO string used for SMTP server
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+smtp_email
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Email address used by Zabbix
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+password_required
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Is password required for non-admin menu items
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+alarm_history
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Zabbix will not store records in table
+\series bold 
+ alarms
+\series default 
+ older than this value
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+alert_history
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Zabbix will not store records in table 
+\series bold 
+alerts
+\series default 
+ older than this value
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
 \layout Description
 
 GRAPHS_ITEMS The table contains list of monitored items belonging to graph.

@@ -22,6 +22,12 @@
 /* Housekeeping frequency */
 #define	SUCKER_HK	3600
 
+/* Keep alrt history (in sec) */
+#define	ALERT_HISTORY	12*31*24*3600
+
+/* Keep alarm history (in sec) */
+#define	ALARM_HISTORY	12*31*24*3600
+
 #define	SUCKER_TIMEOUT	5
 #define	AGENT_TIMEOUT	3
 
