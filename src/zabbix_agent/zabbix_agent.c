@@ -1,3 +1,5 @@
+#include "config.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -85,21 +87,21 @@ int	check_security(void)
 	int	i;
 	int	file;
 
-	config=(char *)malloc(16);
-
-	file=open("/etc/zabbix/zabbix_agent.conf",O_RDONLY);
-	if(file == -1)
+	if(getpeername(0,  (struct sockaddr *)&name, (size_t *)&i) == 0)
 	{
-		return FAIL;
-	}
-	i=read(file, config, 16);
-	config[i-1]=0;
-	close(file);
+		config=(char *)malloc(16);
 
-	i=sizeof(struct sockaddr_in);
+		file=open("/etc/zabbix/zabbix_agent.conf",O_RDONLY);
+		if(file == -1)
+		{
+			return FAIL;
+		}
+		i=read(file, config, 16);
+		config[i-1]=0;
+		close(file);
 
-	if(getpeername(0,  &name, &i) == 0)
-	{
+		i=sizeof(struct sockaddr_in);
+
 		sname=inet_ntoa(name.sin_addr);
 		if(strcmp(sname,config)!=0)
 		{
