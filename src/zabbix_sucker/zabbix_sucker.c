@@ -438,9 +438,12 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 	{
 		switch (errno)
 		{
-			case EINTR:
-				syslog( LOG_WARNING, "Timeout while receiving data from [%s]",item->host );
-				break;
+			case 	EINTR:
+					syslog( LOG_WARNING, "Timeout while receiving data from [%s]",item->host );
+					break;
+			case	ECONNRESET:
+					close(s);
+					return	NETWORK_ERROR;
 			default:
 				syslog( LOG_WARNING, "Error while receiving data from [%s]. Errno [%d]",item->host,errno);
 		} 
