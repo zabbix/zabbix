@@ -109,6 +109,7 @@
 	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR><TD WIDTH=3%><B>Id</B></TD>";
 	echo "<TD><B>Name</B></TD>";
+	echo "<TD><B>Members</B></TD>";
 	echo "<TD WIDTH=10%><B>Actions</B></TD>";
 	echo "</TR>";
 
@@ -121,8 +122,21 @@
 			continue;
 		}
 		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
+		else		{ echo "<TR BGCOLOR=#DDDDDD>"; }
 		echo "<TD>".$row["usrgrpid"]."</TD>";
 		echo "<TD>".$row["name"]."</TD>";
+		echo "<TD>";
+		$result1=DBselect("select distinct u.alias from users u,users_groups ug where u.userid=ug.userid and ug.usrgrpid=".$row["usrgrpid"]." order by alias");
+		for($i=0;$i<DBnum_rows($result1);$i++)
+//		while($row1=DBfetch($result1))
+		{
+			echo DBget_field($result1,$i,0);
+			if($i<DBnum_rows($result1)-1)
+			{
+				echo ", ";
+			}
+		}
+		echo "</TD>";
 		echo "<TD>";
 		echo "<A HREF=\"users.php?usrgrpid=".$row["usrgrpid"]."#form\">Change</A>";
 		echo "</TD>";
