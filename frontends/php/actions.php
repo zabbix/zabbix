@@ -107,7 +107,7 @@
 ?>
 
 <?php
-	if(isset($HTTP_GET_VARS["scope"])&&($HTTP_GET_VARS["scope"]==2))
+/*	if(isset($HTTP_GET_VARS["scope"])&&($HTTP_GET_VARS["scope"]==2))
 	{
 		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.recipient,a.scope from actions a order by a.scope desc";
 	}
@@ -118,8 +118,9 @@
 	else
 	{
 		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.recipient,a.scope from actions a where (a.triggerid=".$HTTP_GET_VARS["triggerid"]." and a.scope=0) or (a.scope=2 or a.scope=1) order by a.recipient desc";
-	}
+	}*/
 //	echo $sql;
+	$sql="select actionid,userid,delay,subject,message,scope,severity,recipient,good,triggerid from actions where (scope=0 and triggerid=".$HTTP_GET_VARS["triggerid"].") or scope=1 or scope=2";
 	$result=DBselect($sql);
 
 	echo "<div align=center>";
@@ -139,7 +140,7 @@
 
 		if($row["scope"] == 1)
 		{
-			$sql="select * from actions a,triggers t,hosts h,functions f,items i where a.triggerid=t.triggerid and f.triggerid=t.triggerid and i.itemid=f.itemid and h.hostid=i.hostid and t.triggerid=".$row["triggerid"]." and a.scope=1";
+			$sql="select * from actions a,triggers t,hosts h,functions f,items i where a.triggerid=t.triggerid and f.triggerid=t.triggerid and i.itemid=f.itemid and h.hostid=i.hostid and t.triggerid=".$HTTP_GET_VARS["triggerid"]." and a.scope=1";
 			echo $sql;
 			$result2=DBselect($sql);
 			if(DBnum_rows($result2)==0)	continue;
