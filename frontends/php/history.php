@@ -19,6 +19,10 @@
 	{
 		show_header("$host:$description",$beforenextcheck,0);
 	}
+	if($action=="showhistory2")
+	{
+		show_header("$host:$description",0,0);
+	}
 	if($action=="showvalues")
 	{
 		show_header("$host:$description",0,0);
@@ -67,6 +71,18 @@
 		if($item["value_type"] == 0)
 		{
 			echo("<A HREF=\"history.php?action=showhistory&itemid=$itemid\">Last hour graph</A> ");
+		}
+	}
+	if($action =="showhistory2")
+	{
+		echo("<b>[<A HREF=\"history.php?action=showhistory2&itemid=$itemid\">Last hour graph (diff)</A>]</b> ");
+	}
+	else
+	{
+		$item=get_item_by_itemid($itemid);
+		if($item["value_type"] == 0)
+		{
+			echo("<A HREF=\"history.php?action=showhistory2&itemid=$itemid\">Last hour graph (diff)</A> ");
 		}
 	}
 	if($action =="showvalues")
@@ -177,8 +193,16 @@
 
 	if($action=="showhistory")
 	{
-		@show_history($itemid,$from,$period);
+		@show_history($itemid,$from,$period,0);
 		show_footer();
 		exit;
 	}
+
+	if($action=="showhistory2")
+	{
+		@show_history($itemid,$from,$period,1);
+		show_footer();
+		exit;
+	}
+
 ?>
