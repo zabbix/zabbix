@@ -14,7 +14,7 @@ suckerd and agentd)
  - escalation
  - agents to execute command
  - add alerts to host templates
- - add pinger (eping) to zabbix_sucker
+ - add pinger (fping) to zabbix_sucker
 
  - improve graphing capabilities (MRTG like graphs)
  - monitoring of log files
@@ -128,7 +128,6 @@ DIFFERENT TASKS:
  - auto-discovery
  - Native Windows GUI
  - distributed monitoring
- - use JS in forms
  - audit log
  - backup/restore scripts for server. Backup all (DB, configs, etc).
  - IT Helpdesk
@@ -212,7 +211,6 @@ WIN32 Agent:
  - support for netload under other platforms
  - round MIN/MAX/AVG numbers for graphs
  - calculate MIN value for graphs (do not use '0')
- - use JS in forms
  - make kstat structure local (instead of static)
  - collect network and other statistics using kstat()
  - apply Mariusz's patches
