@@ -9,6 +9,20 @@
 <?
 	show_table_header("IT SERVICES");
 
+	if(isset($HTTP_GET_VARS["serviceid"])&&isset($HTTP_GET_VARS["showgraph"]))
+	{
+		echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+		echo "<TR BGCOLOR=#EEEEEE>";
+		echo "<TR BGCOLOR=#DDDDDD>";
+		echo "<TD ALIGN=CENTER>";
+		echo "<IMG SRC=\"chart5.php?serviceid=".$HTTP_GET_VARS["serviceid"]."\" border=0>";
+		echo "</TD>";
+		echo "</TR>";
+		echo "</TABLE>";
+		show_footer();
+		exit;
+	}
+
 	$now=time();
 	$result=DBselect("select serviceid,name,triggerid,status from services order by name");
 	echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";
@@ -17,6 +31,7 @@
 	echo "<td><b>Service</b></td>";
 	echo "<td width=10%><b>Status</b></td>";
 	echo "<td width=30%><b>Reason</b></td>";
+	echo "<td width=5%><b>Graph</b></td>";
 	echo "</tr>";
 	echo "\n";
 	$col=0;
@@ -27,6 +42,7 @@
 		echo "<td><b><a href=\"srv_status.php?serviceid=".$service["serviceid"]."\">".$service["name"]."</a></b></td>";
 		echo "<td>".get_service_status_description($service["status"])."</td>";
 		echo "<td>&nbsp;</td>";
+		echo "<td>-</td>";
 		echo "</tr>"; 
 		$col++;
 	}
@@ -116,6 +132,7 @@
 			}
 			echo "</td>";
 		}
+		echo "<td><a href=\"srv_status.php?serviceid=".$row["serviceid"]."&showgraph=1\">Show</a></td>";
 		echo "</tr>"; 
 	}
 	echo "</table>";
