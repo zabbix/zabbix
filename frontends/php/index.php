@@ -1,6 +1,6 @@
 <?
 	$page["title"]="Zabbix main page";
-	$page["file"]="index.html";
+	$page["file"]="index.php";
 
 	include "include/config.inc";
 

@@ -1,6 +1,6 @@
 <?
 	$page["title"]="Actions";
-	$page["file"]="actions.html";
+	$page["file"]="actions.php";
 
 	include "include/config.inc";
 	show_header($page["title"],0,0);
@@ -79,8 +79,8 @@
 		echo "<TD>".$row["subject"]."</TD>";
 		echo "<TD>".$row["message"]."</TD>";
 		echo "<TD>";
-		echo " <A HREF=\"actions.html?register=edit&actionid=".$row["actionid"]."&triggerid=".$row["triggerid"]."\">Edit</A>";
-		echo ", <A HREF=\"actions.html?register=delete&actionid=".$row["actionid"]."&triggerid=".$row["triggerid"]."\">Delete</A>";
+		echo " <A HREF=\"actions.php?register=edit&actionid=".$row["actionid"]."&triggerid=".$row["triggerid"]."\">Edit</A>";
+		echo ", <A HREF=\"actions.php?register=delete&actionid=".$row["actionid"]."&triggerid=".$row["triggerid"]."\">Delete</A>";
 		echo "</TD></TR>";
 	}
 	echo "</TABLE>";
@@ -128,7 +128,7 @@
 	echo "New action";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"actions.html\">";
+	echo "<form method=\"post\" action=\"actions.php\">";
 	echo "<input name=\"triggerid\" type=\"hidden\" value=$triggerid>";
 	if(isset($actionid))
 	{

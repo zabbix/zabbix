@@ -1,6 +1,6 @@
 <?
 	$page["title"] = "Media";
-	$page["file"] = "media.html";
+	$page["file"] = "media.php";
 
 	include "include/config.inc";
 	show_header($page["title"],0,0);
@@ -80,15 +80,15 @@
 		echo "<TD>";
 		if(DBget_field($result,$i,3)==0) 
 		{
-			echo "<a href=\"media.html?register=disable&mediaid=$mediaid&userid=$userid\">Enabled</A>";
+			echo "<a href=\"media.php?register=disable&mediaid=$mediaid&userid=$userid\">Enabled</A>";
 		}
 		else
 		{
-			echo "<a href=\"media.html?register=enable&mediaid=$mediaid&userid=$userid\">Disabled</A>";
+			echo "<a href=\"media.php?register=enable&mediaid=$mediaid&userid=$userid\">Disabled</A>";
 		}
 		echo "</TD>";
 		echo "<TD>";
-		echo "<A HREF=\"media.html?register=delete&mediaid=$mediaid&userid=$userid\">Delete</A>";
+		echo "<A HREF=\"media.php?register=delete&mediaid=$mediaid&userid=$userid\">Delete</A>";
 		echo "</TD>";
 		echo "</TR>";
 	}
@@ -105,7 +105,7 @@
 	echo "New media";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"media.html\">";
+	echo "<form method=\"post\" action=\"media.php\">";
 	echo "<input name=\"userid\" type=\"hidden\" value=$userid>";
 	echo "Type";
 	show_table2_h_delimiter();

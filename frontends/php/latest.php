@@ -1,7 +1,7 @@
 <?
 	include "include/config.inc";
 	$page["title"] = "Latest values";
-	$page["file"] = "latest.html";
+	$page["file"] = "latest.php";
 	show_header($page["title"],0,0);
 ?>
 
@@ -21,7 +21,7 @@
 		{
 			echo "<b>[";
 		}
-		echo "<a href='latest.html?hostid=".$row["hostid"]."'>".$row["host"]."</a>";
+		echo "<a href='latest.php?hostid=".$row["hostid"]."'>".$row["host"]."</a>";
 		if(isset($hostid) && ($hostid == $row["hostid"]) )
 		{
 			echo "]</b>";
@@ -52,9 +52,9 @@
 		$host=DBget_field($result,0,0);
 
 		echo "<br>";
-		show_table_header("<a href=\"latest.html?hostid=$hostid\">$host</a>");
+		show_table_header("<a href=\"latest.php?hostid=$hostid\">$host</a>");
 #		show_table_header_begin();
-#		echo "<a href=\"latest.html?hostid=$hostid\">$host</a>";
+#		echo "<a href=\"latest.php?hostid=$hostid\">$host</a>";
 #		show_table3_v_delimiter();
 
 		echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" cellspacing=1 cellpadding=3>";
@@ -67,7 +67,7 @@
 		}
 		else
 		{
-			echo "<TD><B><a href=\"latest.html?hostid=$hostid&sort=description\">Description</B></TD>";
+			echo "<TD><B><a href=\"latest.php?hostid=$hostid&sort=description\">Description</B></TD>";
 		}
 		if(isset($sort)&&($sort=="lastcheck"))
 		{
@@ -75,7 +75,7 @@
 		}
 		else
 		{
-			echo "<TD WIDTH=\"12%\"><B><a href=\"latest.html?hostid=$hostid&sort=lastcheck\">Last check</B></TD>";
+			echo "<TD WIDTH=\"12%\"><B><a href=\"latest.php?hostid=$hostid&sort=lastcheck\">Last check</B></TD>";
 		}
 		cr();
 		echo "<TD WIDTH=\"10%\" NOSAVE><B>Last value</B></TD>"; 
@@ -157,8 +157,8 @@
 			{
 				echo "<td><center>-</center></td>";
 			}
-			echo "<td><center><a href=\"history.html?action=showhistory&itemid=".$row["itemid"]."\">Show</a></center></td>";
-			echo "<td><center><a href=\"trends.html?itemid=".$row["itemid"]."\">Show</a></center></td>";
+			echo "<td><center><a href=\"history.php?action=showhistory&itemid=".$row["itemid"]."\">Show</a></center></td>";
+			echo "<td><center><a href=\"trends.php?itemid=".$row["itemid"]."\">Show</a></center></td>";
 			echo "</tr>";
 		}
 		echo "</table>";

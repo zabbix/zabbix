@@ -3,6 +3,7 @@ Changes for 1.0beta2:
 (Add reconnect in case if server gone)
 (net_listen[] should be unsupported)
 
+ - all *.html documents were renamed to *.php (Alexei)
  - clean compilation on HP-UX 11.xx (Alexei)
  - change host status to Unreachable if agent drops connection (Alexei)
  - added #include <time.h> into db.h (Alexei)

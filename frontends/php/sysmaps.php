@@ -1,7 +1,7 @@
 <?
 	include "include/config.inc";
 	$page["title"] = "Network maps";
-	$page["file"] = "sysmaps.html";
+	$page["file"] = "sysmaps.php";
 	show_header($page["title"],0,0);
 ?>
 
@@ -60,10 +60,10 @@
 		$name_=DBget_field($result,$i,1);
 		$width_=DBget_field($result,$i,2);
 		$height_=DBget_field($result,$i,3);
-		echo "<TD><a href=\"sysmap.html?sysmapid=$sysmapid_\">$name_</a></TD>";
+		echo "<TD><a href=\"sysmap.php?sysmapid=$sysmapid_\">$name_</a></TD>";
 		echo "<TD>$width_</TD>";
 		echo "<TD>$height_</TD>";
-		echo "<TD><A HREF=\"sysmaps.html?sysmapid=$sysmapid_#form\">Change</A> - <A HREF=\"sysmaps.html?register=delete&sysmapid=$sysmapid_\">Delete</A></TD>";
+		echo "<TD><A HREF=\"sysmaps.php?sysmapid=$sysmapid_#form\">Change</A> - <A HREF=\"sysmaps.php?register=delete&sysmapid=$sysmapid_\">Delete</A></TD>";
 		echo "</TR>";
 	}
 	echo "</TABLE>";
@@ -91,7 +91,7 @@
 	echo "New system map";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"sysmaps.html\">";
+	echo "<form method=\"post\" action=\"sysmaps.php\">";
 	if(isset($sysmapid))
 	{
 		echo "<input name=\"sysmapid\" type=\"hidden\" value=$sysmapid>";

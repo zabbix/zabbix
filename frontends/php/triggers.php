@@ -1,6 +1,6 @@
 <?
 	$page["title"] = "Configuration of triggers";
-	$page["file"] = "triggers.html";
+	$page["file"] = "triggers.php";
 
 	include "include/config.inc";
 	show_header($page["title"],0,0);
@@ -79,11 +79,11 @@
 	{
 		if(isset($hostid) && ($row["hostid"] == $hostid))
 		{
-			echo "<b>[<A HREF=\"triggers.html?hostid=".$row["hostid"]."\">".$row["host"]."</A>]</b>  ";
+			echo "<b>[<A HREF=\"triggers.php?hostid=".$row["hostid"]."\">".$row["host"]."</A>]</b>  ";
 		}
 		else
 		{
-			echo "<A HREF=\"triggers.html?hostid=".$row["hostid"]."\">".$row["host"]."</A>  ";
+			echo "<A HREF=\"triggers.php?hostid=".$row["hostid"]."\">".$row["host"]."</A>  ";
 		}
 	}
 
@@ -107,7 +107,7 @@
 					echo "</TABLE><BR>";
 				}
 				echo "<br>";
-				show_table_header("<A HREF='triggers.html?hostid=".$row["hostid"]."'>".$row["host"]."</A>");
+				show_table_header("<A HREF='triggers.php?hostid=".$row["hostid"]."'>".$row["host"]."</A>");
 				echo "<TABLE BORDER=0 COLS=3 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 				echo "<TR>";
 				echo "<TD><B>Description</B></TD>";
@@ -127,25 +127,25 @@
 			echo "<TD>";
 			if($row["istrue"] == 2)
 			{
-				echo "<a href=\"triggers.html?register=changestatus&triggerid=".$row["triggerid"]."&status=0&hostid=".$row["hostid"]."\">Disabled</a>";
+				echo "<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=0&hostid=".$row["hostid"]."\">Disabled</a>";
 			}
 			else
 			{
-				echo "<a href=\"triggers.html?register=changestatus&triggerid=".$row["triggerid"]."&status=2&hostid=".$row["hostid"]."\">Enabled</a>";
+				echo "<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=2&hostid=".$row["hostid"]."\">Enabled</a>";
 			}
 			$expression=rawurlencode($row["expression"]);
 			echo "</TD>";
 			echo "<TD>";
 			if(isset($hostid))
 			{
-				echo "<A HREF=\"triggers.html?triggerid=".$row["triggerid"]."&hostid=".$row["hostid"]."#form\">Change</A> ";
+				echo "<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."&hostid=".$row["hostid"]."#form\">Change</A> ";
 			}
 			else
 			{
-				echo "<A HREF=\"triggers.html?triggerid=".$row["triggerid"]."#form\">Change</A> ";
+				echo "<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."#form\">Change</A> ";
 			}
-//			echo "-<A HREF=\"actions.html?triggerid=".$row["triggerid"]."&description=".$row["description"]."\">ShowActions</A>";
-			echo "-<A HREF=\"actions.html?triggerid=".$row["triggerid"]."\">ShowActions</A>";
+//			echo "-<A HREF=\"actions.php?triggerid=".$row["triggerid"]."&description=".$row["description"]."\">ShowActions</A>";
+			echo "-<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">ShowActions</A>";
 			echo "</TD>";
 			echo "</TR>\n";
 		}

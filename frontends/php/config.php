@@ -1,6 +1,6 @@
 <?
 	$page["title"] = "Configuration of Zabbix";
-	$page["file"] = "config.html";
+	$page["file"] = "config.php";
 
 	include "include/config.inc";
 	show_header($page["title"],0,0);
@@ -36,7 +36,7 @@
 	echo "Configuration";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"config.html\">";
+	echo "<form method=\"post\" action=\"config.php\">";
 	echo "SMTP server";
 	show_table2_h_delimiter();
 	echo "<input name=\"smtp_server\" value=\"".$config["smtp_server"]."\"size=40>";
