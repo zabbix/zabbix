@@ -1096,7 +1096,7 @@ void	update_functions_thread(MYSQL *database, DB_ITEM *item)
 	int		ret=SUCCEED;
 	int		i;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In update_finctions(%d)",item->itemid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In update_functions(%d)",item->itemid);
 
 	snprintf(sql,sizeof(sql)-1,"select function,parameter,itemid from functions where itemid=%d group by 1,2,3 order by 1,2,3",item->itemid);
 
@@ -1142,7 +1142,7 @@ void	update_functions(DB_ITEM *item)
 	int		ret=SUCCEED;
 	int		i;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In update_finctions(%d)",item->itemid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In update_functions(%d)",item->itemid);
 
 	snprintf(sql,sizeof(sql)-1,"select function,parameter,itemid from functions where itemid=%d group by 1,2,3 order by 1,2,3",item->itemid);
 
