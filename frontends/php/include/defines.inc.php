@@ -1,4 +1,7 @@
 <?php
+	define("ITEM_VALUE_TYPE_FLOAT",0);
+	define("ITEM_VALUE_TYPE_STR",1);
+
 	define("ITEM_STATUS_ACTIVE",0);
 	define("ITEM_STATUS_DISABLED",1);
 	define("ITEM_STATUS_NOTSUPPORTED",3);

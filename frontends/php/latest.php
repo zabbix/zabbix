@@ -280,7 +280,7 @@
 					}
 					else
 					{
-						echo "<td>"; echo substr($row["lastvalue"],0,20)," ..."; echo "</td>";
+						echo "<td>"; echo htmlspecialchars(substr($row["lastvalue"],0,20)." ..."); echo "</td>";
 					}
 				}
 				else
