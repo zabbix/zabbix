@@ -203,7 +203,7 @@ void	init_config(void)
 	static struct cfg_line cfg[]=
 	{
 /*		 PARAMETER	,VAR	,FUNC,	TYPE(0i,1s),MANDATORY,MIN,MAX	*/
-		{"StartSuckers",&CONFIG_SUCKERD_FORKS,0,TYPE_INT,PARM_OPT,3,255},
+		{"StartSuckers",&CONFIG_SUCKERD_FORKS,0,TYPE_INT,PARM_OPT,4,255},
 		{"HousekeepingFrequency",&CONFIG_HOUSEKEEPING_FREQUENCY,0,TYPE_INT,PARM_OPT,1,24},
 		{"SenderFrequency",&CONFIG_SENDER_FREQUENCY,0,TYPE_INT,PARM_OPT,5,3600},
 		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
@@ -550,9 +550,9 @@ int get_minnextcheck(int now)
 		1 == NOT MONITORED
 		2 == UNREACHABLE */ 
 #ifdef TESTTEST
-	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and h.hostid%%%d=%d and i.key_<>'%s'",now,CONFIG_SUCKERD_FORKS-2,sucker_num-2,SERVER_STATUS_KEY);
+	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and h.hostid%%%d=%d and i.key_<>'%s'",now,CONFIG_SUCKERD_FORKS-3,sucker_num-3,SERVER_STATUS_KEY);
 #else
-	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and i.itemid%%%d=%d and i.key_<>'%s'",now,CONFIG_SUCKERD_FORKS-2,sucker_num-2,SERVER_STATUS_KEY);
+	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=%d and i.itemid%%%d=%d and i.key_<>'%s'", now, ITEM_STATUS_ACTIVE, CONFIG_SUCKERD_FORKS-3,sucker_num-3,SERVER_STATUS_KEY);
 #endif
 	result = DBselect(sql);
 
@@ -638,7 +638,7 @@ void update_key_status(int hostid,int host_status)
 		sprintf(value_str,"%d",host_status);
 
 		process_new_value(&item,value_str);
-		update_triggers(0, 1, item.itemid, 0 );
+		update_triggers(item.itemid);
 	}
 
 	DBfree_result(result);
@@ -662,9 +662,9 @@ int get_values(void)
 
 	now = time(NULL);
 #ifdef TESTTEST
-	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and h.hostid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-2,sucker_num-2,SERVER_STATUS_KEY);
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and h.hostid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-3,sucker_num-3,SERVER_STATUS_KEY);
 #else
-	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-2,sucker_num-2,SERVER_STATUS_KEY);
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=%d and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, ITEM_STATUS_ACTIVE, now, CONFIG_SUCKERD_FORKS-3,sucker_num-3,SERVER_STATUS_KEY);
 #endif
 	result = DBselect(sql);
 
@@ -755,12 +755,10 @@ int get_values(void)
 
 		if(res ==  SUCCEED)
 		{
-		        update_triggers(0, 1, item.itemid, 0 );
+		        update_triggers(item.itemid);
 		}
 
 	}
-
-/*	update_triggers( CONFIG_SUCKERD_FORKS, 0, sucker_num, now );*/
 
 	DBfree_result(result);
 	return SUCCEED;
@@ -949,6 +947,49 @@ int main_alerter_loop()
 	}
 }
 
+int main_nodata_loop()
+{
+	char	sql[MAX_STRING_LEN+1];
+	int	i,now;
+
+	int	itemid,functionid;
+	char	*parameter;
+
+	DB_RESULT	*result;
+
+	for(;;)
+	{
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("updating nodata() functions");
+#endif
+		DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+
+		now=time(NULL);
+		sprintf(sql,"select distinct f.itemid,f.functionid,f.parameter from functions f, items i,hosts h where h.hostid=i.hostid and (h.status=0 or (h.status=2 and h.disable_until<%d)) and i.itemid=f.itemid and f.function='nodata' and i.lastclock+f.parameter<=%d and i.status in (%d,%d) and f.lastvalue<>1", now, now, ITEM_STATUS_ACTIVE, ITEM_STATUS_TRAPPED);
+		result = DBselect(sql);
+
+		for(i=0;i<DBnum_rows(result);i++)
+		{
+			itemid=atoi(DBget_field(result,i,0));
+			functionid=atoi(DBget_field(result,i,1));
+			parameter=DBget_field(result,i,2);
+
+			sprintf(sql,"update functions set lastvalue='1' where itemid=%d and function='nodata' and parameter='%s'" , itemid, parameter );
+			DBexecute(sql);
+
+			update_triggers(itemid);
+		}
+
+		DBfree_result(result);
+		DBclose();
+
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("sleeping for 30 sec");
+#endif
+		sleep(30);
+	}
+}
+
 int main_housekeeping_loop()
 {
 	int	now;
@@ -1125,6 +1166,11 @@ int main(int argc, char **argv)
 	{
 /* Second instance of zabbix_suckerd sends alerts to users */
 		main_alerter_loop();
+	}	
+	else if(sucker_num == 2)
+	{
+/* Third instance of zabbix_suckerd periodically re-calculates 'nodata' functions */
+		main_nodata_loop();
 	}	
 	else
 	{

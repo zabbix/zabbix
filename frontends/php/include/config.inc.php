@@ -376,7 +376,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 // Before str()
 // 		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.\,]+)\.((diff)|(min)|(max)|(last)|(prev))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
 //		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.\,]+)\.((diff)|(min)|(max)|(last)|(prev)|(str))\(([0-9a-zA-Z\.\_\/\,]+)\)\}$', $expression, &$arr)) 
- 		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.\,]+)\.([a-z]{3,4})\(([0-9a-zA-Z\_\/\.\,]+)\)\}$', $expression, &$arr)) 
+ 		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.\,]+)\.([a-z]{3,6})\(([0-9a-zA-Z\_\/\.\,]+)\)\}$', $expression, &$arr)) 
 		{
 			$host=$arr[1];
 			$key=$arr[2];
@@ -401,6 +401,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				($function!="min") &&
 				($function!="max") &&
 				($function!="prev")&&
+				($function!="nodata")&&
 				($function!="str"))
 			{
 				$ERROR_MSG="Unknown function [$function]";
@@ -1453,7 +1454,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		if( isset($linktrigger)&&($linktrigger=="on") )
 		{
-			$sql="insert into services (name,triggerid,status,algorithm) values ('$name',$triggerid,0,$algorithm)";
+			$trigger=get_trigger_by_triggerid($triggerid);
+			$description=$trigger["description"];
+			if( strstr($description,"%s"))
+			{
+				$description=expand_trigger_description($triggerid);
+			}
+			$sql="insert into services (name,triggerid,status,algorithm) values ('$description',$triggerid,0,$algorithm)";
 		}
 		else
 		{
