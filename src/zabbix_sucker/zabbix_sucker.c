@@ -37,6 +37,8 @@
 #include <errno.h>
 
 #include <time.h>
+/* getopt() */
+#include <unistd.h>
 
 #include "cfg.h"
 #include "pid.h"
@@ -126,6 +128,7 @@ int	CONFIG_PINGER_FREQUENCY		= 60;
 int	CONFIG_DISABLE_PINGER		= 0;
 int	CONFIG_DISABLE_HOUSEKEEPING	= 0;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
+char	*CONFIG_FILE			= NULL;
 char	*CONFIG_PID_FILE		= NULL;
 char	*CONFIG_LOG_FILE		= NULL;
 char	*CONFIG_ALERT_SCRIPTS_PATH	= NULL;
@@ -263,6 +266,16 @@ void	daemon_init(void)
 	}
 }
 
+void usage(char *prog)
+{
+	printf("zabbix_suckerd - ZABBIX poller v1.1\n");
+	printf("Usage: %s [-h] [-c <file>]\n", prog);
+	printf("\nOptions:\n");
+	printf("  -c <file>   Specify configuration file\n");
+	printf("  -h          Help\n");
+	exit(-1);
+}
+
 void	init_config(void)
 {
 	static struct cfg_line cfg[]=
@@ -293,7 +306,12 @@ void	init_config(void)
 		{0}
 	};
 
-	parse_cfg_file("/etc/zabbix/zabbix_suckerd.conf",cfg);
+	if(CONFIG_FILE == NULL)
+	{
+		CONFIG_FILE=strdup("/etc/zabbix/zabbix_suckerd.conf");
+	}
+
+	parse_cfg_file(CONFIG_FILE,cfg);
 
 	if(CONFIG_DBNAME == NULL)
 	{
@@ -1567,6 +1585,7 @@ void	init_threads(void)
 
 int main(int argc, char **argv)
 {
+	char	ch;
 	int	i;
 	pid_t	pid;
 
@@ -1574,6 +1593,20 @@ int main(int argc, char **argv)
 #ifdef	ZBX_POLLER
 	key_t	key;
 #endif
+
+/* Parse the command-line. */
+	while ((ch = getopt(argc, argv, "c:h")) != EOF)
+	switch ((char) ch) {
+		case 'c':
+			CONFIG_FILE = optarg;
+			break;
+		case 'h':
+			usage(argv[0]);
+			break;
+		default:
+			usage(argv[0]);
+			break;
+        }
 
 	init_config();
 
