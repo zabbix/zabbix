@@ -633,7 +633,7 @@ int get_values(void)
 			}
 
 /*			if(HOST_STATUS_UNREACHABLE == item.host_status)*/
-			if(HOST_AVAILABLE_FALSE == item.host_available)
+			if(HOST_AVAILABLE_TRUE != item.host_available)
 			{
 				item.host_available=HOST_AVAILABLE_TRUE;
 				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
@@ -659,7 +659,7 @@ int get_values(void)
 			DBupdate_item_status_to_notsupported(item.itemid, error);
 #endif
 /*			if(HOST_STATUS_UNREACHABLE == item.host_status)*/
-			if(HOST_AVAILABLE_FALSE == item.host_available)
+			if(HOST_AVAILABLE_TRUE != item.host_available)
 			{
 				item.host_available=HOST_AVAILABLE_TRUE;
 				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
