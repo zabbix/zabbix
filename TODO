@@ -99,7 +99,6 @@ HB:
 
 - Network discovery daemon (?)
 - Native Windows GUI (in version 2.0 ?)
-- Use UDP instead of TCP as transport protocol (?)
 - backup/restore scripts for server. Backup all (DB, configs, etc).
 - Network topology database
 - Automatic network map generation from topology database
