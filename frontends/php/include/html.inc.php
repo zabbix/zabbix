@@ -76,6 +76,7 @@
 
 		while(list($num,$element)=each($elements))
 		{
+			if(!$element)	continue;
 			if(is_array($element))
 			{
 				echo "<td class=\"".$element["class"]."\">".$element["value"]."</td>";
