@@ -1,5 +1,6 @@
 Changes after 1.0alpha2:
 
+ - fixed NODATA function
  - fixed bug with trigger updating in PHP frontend
  - added check for SMTP, FTP, SSH, TELNET, WEB, POP3, and IMAP 
    servers availability

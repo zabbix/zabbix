@@ -7,6 +7,16 @@
 #	period
 #	from
 
+	if(!isset($period))
+	{
+		$period=0;
+	}
+
+	if(!isset($from))
+	{
+		$from=0;
+	}
+
 	$sizeX=900;
 	$sizeY=200;
 
@@ -96,7 +106,7 @@
 			ImageString($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftY, $i*($maxY-$minY)/$sizeY+$minY , $red);
 		}
 
-		date("dS of F Y h:i:s A",$row[0]);
+//		date("dS of F Y h:i:s A",DBget_field($result,0,0));
 
 		ImageString($im, 1,10,                $sizeY+$shiftY+5, date("dS of F Y h:i:s A",$minX) , $red);
 		ImageString($im, 1,$sizeX+$shiftX-168,$sizeY+$shiftY+5, date("dS of F Y h:i:s A",$maxX) , $red);

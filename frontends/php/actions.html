@@ -16,10 +16,12 @@
 		if($register=="update")
 		{
 			update_action( $actionid, $userid, $good, $delay, $subject, $message );
+			unset($actionid);
 		}
 		if($register=="delete")
 		{
 			delete_action($actionid);
+			unset($actionid);
 		}
 	}
 ?>
