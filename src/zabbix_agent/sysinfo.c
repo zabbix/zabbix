@@ -92,8 +92,7 @@
 #include "common.h"
 #include "sysinfo.h"
 
-
-COMMAND	commands[512]=
+COMMAND	commands[AGENT_MAX_USER_COMMANDS]=
 	{
 	{"proc_cnt[*]"			,PROCCNT, "inetd"},
 
@@ -161,7 +160,7 @@ void	add_user_parameter(char *key,char *command)
 {
 	int i;
 
-	for(i=0;;i++)
+	for(i=0;i<AGENT_MAX_USER_COMMANDS;i++)
 	{
 		if( commands[i].key == 0)
 		{
