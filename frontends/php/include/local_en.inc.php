@@ -438,6 +438,13 @@
 	define("S_NEXT_CHECK",				"Next check");
 	define("S_THE_QUEUE_IS_EMPTY",			"The queue is empty");
 	define("S_TOTAL",				"Total");
+	define("S_COUNT",				"Count");
+	define("S_5_SECONDS",				"5 seconds");
+	define("S_10_SECONDS",				"10 seconds");
+	define("S_30_SECONDS",				"30 seconds");
+	define("S_1_MINUTE",				"1 minute");
+	define("S_5_MINUTES",				"5 minutes");
+	define("S_MORE_THAN_5_MINUTES",			"More than 5 minutes");
 
 //	report1.php
 	define("S_STATUS_OF_ZABBIX",			"Status of ZABBIX");
