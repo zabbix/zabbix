@@ -1762,6 +1762,33 @@ echo "</head>";
 		}
 	}
 
+	# Show screen cell containing plain text values
+	function	show_screen_plaintext($itemid)
+	{
+		$item=get_item_by_itemid($itemid);
+		if($item["value_type"]==0)
+		{
+			$sql="select clock,value from history where itemid=$itemid order by clock desc limit 25";
+		}
+		else
+		{
+			$sql="select clock,value from history_str where itemid=$itemid order by clock desc limit 25";
+		}
+                $result=DBselect($sql);
+
+		table_begin();
+		table_header(array(S_CLOCK,$item["description"]));
+		$col=0;
+		while($row=DBfetch($result))
+		{
+			table_row(array(
+				date("d M H:i:s",$row["clock"]),
+				$row["value"],
+				),$col++);
+		}
+		table_end();
+	}
+
 	# Show values in plain text
 
 	function	show_plaintext($itemid, $from, $till)
