@@ -47,6 +47,10 @@
 #define ITEM_VALUE_TYPE_FLOAT	0
 #define ITEM_VALUE_TYPE_STR	1
 
+/* Recipient types for actions */
+#define RECIPIENT_TYPE_USER	0
+#define RECIPIENT_TYPE_GROUP	1
+
 /* Special item key used for storing server status */
 #define SERVER_STATUS_KEY	"status"
 /* Special item key used for ICMP pings */
