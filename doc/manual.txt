@@ -576,71 +576,71 @@ Similiar expressions could be useful to monitor changes in important files, such
 
 5.3 Supported parameters by platform
 
-PARAMETER			| DEBIAN WOODY | Solaris | HP-UX 11.00 | FreeBSD
-				|    (i386)    | 
+PARAMETER			| Debian Woody | Debian Potato | HP-UX 11.00 | FreeBSD
+				|    (i386)    |      (i386)   | 
 ---------------------------------------------------------------------------------------
-memory[total]			|	X      |
-memory[shared]			|	X      |
-memory[buffers]			|	X      |
-memory[cached]			|	X      |
-memory[free]			|	X      |
+memory[total]			|	X      |	X      |
+memory[shared]			|	X      |	X      |
+memory[buffers]			|	X      |	X      |
+memory[cached]			|	X      |	X      |
+memory[free]			|	X      |	X      |
 
-diskfree[/]			|	X      |
-diskfree[/opt]			|	X      |
-diskfree[/tmp]			|	X      |
-diskfree[/usr]			|	X      |
-diskfree[/home]			|	X      |
-diskfree[/var]			|	X      |
+diskfree[/]			|	X      |	X      |
+diskfree[/opt]			|	X      |	X      |
+diskfree[/tmp]			|	X      |	X      |
+diskfree[/usr]			|	X      |	X      |
+diskfree[/home]			|	X      |	X      |
+diskfree[/var]			|	X      |	X      |
 
-inodefree[/]			|	X      |
-inodefree[/opt]			|	X      |
-inodefree[/tmp]			|	X      |
-inodefree[/usr]			|	X      |
-inodefree[/home]		|	X      |
-inodefree[/var]			|	X      |
+inodefree[/]			|	X      |	X      |
+inodefree[/opt]			|	X      |	X      |
+inodefree[/tmp]			|	X      |	X      |
+inodefree[/usr]			|	X      |	X      |
+inodefree[/home]		|	X      |	X      |
+inodefree[/var]			|	X      |	X      |
 
-cksum[/etc/inetd_conf]		|	X      |
-cksum[/etc/services]		|	X      |
-cksum[/vmlinuz]			|	X      |
-cksum[/etc/passwd]		|	X      |
-cksum[/usr/sbin/sshd]		|	X      |
-cksum[/usr/bin/ssh]		|	X      |
-      
-filesize[/var/log/syslog]	|	X      |
+cksum[/etc/inetd_conf]		|	X      |	X      |
+cksum[/etc/services]		|	X      |	X      |
+cksum[/vmlinuz]			|	X      |	X      |
+cksum[/etc/passwd]		|	X      |	X      |
+cksum[/usr/sbin/sshd]		|	X      |	X      |
+cksum[/usr/bin/ssh]		|	X      |	X      |
+      	
+filesize[/var/log/syslog]	|	X      |	X      |
 
-swap[free]			|	X      |
-swap[total]			|	X      |
+swap[free]			|	X      |	X      |
+swap[total]			|	X      |	X      |
 
-swap[in]			|	X      |
-swap[out]			|	X      |
+swap[in]			|	X      |	X      |
+swap[out]			|	X      |	X      |
 
-system[interrupts]		|	X      |
-system[switches]		|	X      |
+system[interrupts]		|	X      |	X      |
+system[switches]		|	X      |	X      |
 
-io[disk_io]			|	X      |
-io[disk_rio]			|	X      |
-io[disk_wio]			|	X      |
-io[disk_rblk]			|	X      |
-io[disk_wblk]			|	X      |
+io[disk_io]			|	X      |	X      |
+io[disk_rio]			|	X      |	X      |
+io[disk_wio]			|	X      |	X      |
+io[disk_rblk]			|	X      |	X      |
+io[disk_wblk]			|	X      |	X      |
 
-system[procload]		|	X      |
-system[procload5]		|	X      |
-system[procload15]		|	X      |
-system[proccount]		|	X      |
-system[procrunning]		|	X      |
-system[uptime]			|	X      |
-system[users]			|	X      |
+system[procload]		|	X      |	X      |
+system[procload5]		|	X      |	X      |
+system[procload15]		|	X      |	X      |
+system[proccount]		|	X      |	X      |
+system[procrunning]		|	X      |	X      |
+system[uptime]			|	X      |	X      |
+system[users]			|	X      |	X      |
 
-ping				|	X      |
-tcp_count			|	X      |
+ping				|	X      |	X      |
+tcp_count			|	X      |	X      |
 
-net[listen_21]			|	X      |
-net[listen_22]			|	X      |
-net[listen_23]			|	X      |
-net[listen_25]			|	X      |
-net[listen_80]			|	X      |
-net[listen_110]			|	X      |
-net[listen_143]			|	X      |
+net[listen_21]			|	X      |	X      |
+net[listen_22]			|	X      |	X      |
+net[listen_23]			|	X      |	X      |
+net[listen_25]			|	X      |	X      |
+net[listen_80]			|	X      |	X      |
+net[listen_110]			|	X      |	X      |
+net[listen_143]			|	X      |	X      |
 
 
 6. Chapter 6 (Upgrading)
