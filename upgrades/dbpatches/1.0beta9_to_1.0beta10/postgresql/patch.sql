@@ -1,3 +1,7 @@
+alter table items add  units           varchar(10)     DEFAULT '' NOT NULL;
+
+update items set units='bps' where key_ like "netload%";
+
 CREATE TABLE stats (
   itemid                int4            DEFAULT '0' NOT NULL,
   year                  int4            DEFAULT '0' NOT NULL,
