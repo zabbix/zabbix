@@ -2522,6 +2522,11 @@ double	CHECK_SERVICE_PERF(char *service_and_ip_and_port)
 		if(port == 0)	port=143;
 		result=tcp_expect(ip,port,"* OK","a1 LOGOUT\n");
 	}
+	else if(strcmp(service,"tcp") == 0)
+	{
+		if(port == 0)	port=80;
+		result=tcp_expect(ip,port,NULL,"");
+	}
 	else
 	{
 		result=0;
@@ -2665,6 +2670,11 @@ double	CHECK_SERVICE(char *service_and_ip_and_port)
 	{
 		if(port == 0)	port=143;
 		result=tcp_expect(ip,port,"* OK","a1 LOGOUT\n");
+	}
+	else if(strcmp(service,"tcp") == 0)
+	{
+		if(port == 0)	port=80;
+		result=tcp_expect(ip,port,NULL,"");
 	}
 	else
 	{
