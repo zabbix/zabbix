@@ -1,4 +1,15 @@
 #
+# Table structure for table 'help'
+#
+
+CREATE TABLE help (
+  helpid		int(4)		NOT NULL auto_increment,
+  topic			varchar(128)	DEFAULT '' NOT NULL,
+  description		text		DEFAULT '' NOT NULL,
+  PRIMARY KEY (helpid)
+);
+
+#
 # Table structure for table 'graphs_items'
 #
 
@@ -9,7 +20,6 @@ CREATE TABLE graphs_items (
   color			varchar(32)	DEFAULT 'Dark Green' NOT NULL,
   PRIMARY KEY (gitemid)
 );
-# Foreign keys
 
 #
 # Table structure for table 'graphs'
@@ -23,7 +33,6 @@ CREATE TABLE graphs (
   PRIMARY KEY (graphid),
   UNIQUE (name)
 );
-# Foreign keys
 
 #
 # Table structure for table 'sysmaps_links'
@@ -36,7 +45,6 @@ CREATE TABLE sysmaps_links (
   shostid2		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (linkid)
 );
-# Foreign keys
 
 #
 # Table structure for table 'sysmaps_hosts'
