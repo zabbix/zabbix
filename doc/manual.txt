@@ -1,21 +1,33 @@
 1. Chapter 1 (Introduction)
 
-1.1 About the manual
-1.2 What is Zabbix ?
-1.3 What front end are available for Zabbix ?
-1.4 What databases can be used with Zabbix ?
-1.5 What does Zabbix offer ?
-1.6 What does Zabbix consist of ?
+1.1 About the manuaL
+1.2 Acknowledgements
+1.3 What is Zabbix ?
+1.4 What does Zabbix offer ?
 
-2. Chapter 2 (Installation)
+2. Chapter 2 (Structure)
+2.1 zabbix_sucker
+2.2 zabbix_alarmer
+2.3 zabbix_agent
+2.4 zabbix_traper
+2.5 zabbix_sender
+2.6 Database
+2.7 WEB-based frontend
 
-2.1 What platforms are supported by Zabbix ?
-2.2 Before you start
-2.3 Installation procedure
+3. Chapter 2 (Installation)
 
-3. Chapter 3 (Adminitration)
-3.1 Zabbix configuration
-3.2 Expressions for triggers
+3.1 Requirements
+3.2 Installation procedure
+
+4. Chapter 3 (Administration)
+4.1 Zabbix configuration
+4.2 Expressions for triggers
+
+5. Misc
+5.1 pinger.pl
+
+Appendix A (Item configuration examples)
+Appendix B (Trigger configuration examples)
 
 - Chapter 1 (Introduction)
 
@@ -25,81 +37,191 @@ This manual is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
 
-1.2 What is Zabbix ?
+This manual is part of Zabbix software.
 
-Zabbix was created by Alexei Vladishev. It is software for monitoring
-of network and servers. It has flexible notification mechanism. All 
-monitored parameters (such as process load, free disk space, etc)
-can be viewed in either graphical or text way. 
+The latest version of the manual will always be available at
 
-1.3 What frontends are available for Zabbix ?
+http://zabbix.sourceforge.net
 
-Currently, Zabbix has PHP-based WEB interface.
+1.2 Acknowledgements
 
-1.4 What databases can be used with Zabbix ?
+I want to thank guys from sourceforge.net for providing hosting for
+te project. 
 
-MySQL is the only database supported by Zabbix. Support for other
-databases (PostgreSQL,Oracle, etc) is coming soon.
+I also want to thank all the Zabbix users who have sent corrections and suggestions. 
+This sort of feedback helps me make the software better.
+
+1.3 What is Zabbix ?
+
+Zabbix was created by Alexei Vladishev, (alex@gobbo.caves.lv).
+
+Zabbix is software for monitoring various parameters of network and 
+servers. Polling and trapping are supported. All monitored parameters are stored 
+in Zabbix database.  It allows great reporting and data visualisation possibilities.
+Stored data is useful source of information for capacity planning.
+
+Flexible notification mechanism allows to configure e-mail based alerms
+for virtually any pre-defined events. The alarms help to prevent
+possible problems.
+
+Web-based frontend is used to provide fast and efficient way for Zabbix
+configuration.
+
+Properly configured Zabbix plays most important role in monitoring of IT infrastructure
+for companies with even more than hundred servers to monitor. 
+
+The Zabbix software is free for use. However, if support is an issue for you,
+that is an option as well. Please, contact alex@gobbo.caves.lv to get additional
+information on available support levels. 
+
+The latest version of Zabbix can be found at http://zabbix.sourceforge.net.
 
 1.5 What does Zabbix offer ?
 
 The following are amongst the features that Zabbix offer:
 
- - Zabbix agent for Linux
- - Zabbix's server side for Linux
+ - Support for both polling and traping mechanism
+ - agents for Linux (HP-UX, AIX, FreeBSD are coming soon)
+ - server side is running under Linux (other UNIX variantsto be supported soon)
+ - user authorisation mechanism
+ - two user groups: "Administrators" and "Zabbix users"
  - WEB-based interface
  - E-mail notification in case of predefined events
- - Support for both polling and traping mechanism
 
-1.6 What does Zabbix consist of ?
+2. Chapter 2 (Structure)
 
-Zabbix consists of seven main components:
+Zabbix has basically client-server architecture. Zabbix server periodically
+gets most recent information of parameters for monitored host. It connects to 
+an agent placed on the host, asks for specific information (for example, processor load). Agent
+gives the information back to server and server, in its turn, stores received
+value in the database.
 
-- database
+It is also possible to use trapping method. In tis case, monitored host sends information
+to Zabbix.
 
-Zabbix uses database to store everything from configuration parameters
-to values received from agents.
+2.1 zabbix_sucker
 
-- end user interface
+The Zabbix server process.
 
-- "zabbix_sucker"
+SYNOPSIS
 
-The process periodically connects to agents to get updated information
-on monitored parameters.
+zabbix_sucker
 
-- "zabbix_agent"
+DESCRIPTION
 
-The process lives on monitored server. zabbix_sucker connects to the zabbix_agent
-to get latest values of monitored parameters.
+The process periodically connects to agents to get updated information on parameters being
+monitored.
 
-- "zabbix_alarmer"
+No switches are supported by zabbix_sucker.
 
-The process is used to calculate expressions used for triggers and send
-alarms to users.
+The process is run as daemon under non-priveledged user account, usually zabbix.
 
-- "zabbix_sender"
+2.2 zabbix_alarmer
 
-The process is used to send values to Zabbix.
+The Zabbix server process.
 
-- "zabbix_traper"
+SYNOPSIS
 
-The process receives values sent by zabbix_sender.
+zabbix_alarmer
 
-2. Chapter 2 (Installation)
+DESCRIPTION
 
-2.1 What platforms are supported by Zabbix ?
+The process periodically re-calculates status of triggers. It also sends alerts to users
+if required.
 
-Zabbix server side supports the following platforms:
+The process is run as daemon under non-priveledged user account.
+
+2.3 zabbix_agent
+
+The Zabbix agent.
+
+SYNOPSIS
+
+zabbix_agent
+
+DESCRIPTION
+
+The process lives on host being monitored. zabbix_agent provides requisted information to zabbix_sucker. zabbix_agent is called by inetd daemon.
+
+Execution time of the process is limited. If agent was not able to get information 
+during 3 seconds, it kills himself. 
+
+When executed, it reads /etc/zabbix/zabbix_agent.conf file. This file should exist and contain
+IP address of Zabbix server. Connections from other IPs are rejected.
+
+2.4 zabbix_traper
+
+The Zabbix server process.
+
+SYNOPSIS
+
+zabbix_traper
+
+DESCRIPTION
+
+The process is made to support tarping. It constantly waits for connections from zabbix_sender
+agents.  
+
+2.5 zabbix_sender
+
+The Zabbix agent (trapping).
+
+SYNOPSIS
+
+zabbix_sender zabbix_server port host:key value
+
+DESCRIPTION
+
+The process, when executed, sends information to Zabbix.
+
+	zabbix_server	Name or IP address of Zabbix server to connect.
+	port		Port number to connect to Zabbix. It is port number of zabbix_traper process.
+	host:key	Host name and key for value.
+	value		Value for parameter "host:key". Float number. 
+
+EXAMPLE:
+
+zabbix_sender zabbix.abcde.com 10001 db.abcde.com:procload 2.34
+
+It means, that zabbix_sender will send information about processor load on host db.abcde.com
+to Zabbix server zabbix.acbde.com. Processor load is 2.34.
+
+2.6 Database
+
+Database used by Zabbix is very important. The database is the only source
+of configuration parameters and it stores all history of monitored values.
+
+Zabbix performance higihly depends on officiency and speed of used database.
+ 
+2.7 WEB-based frontend
+
+The frontend provides convinient and platform independed way for accessing Zabbix.
+Information provided by the frontend can be either graphical (e.g. graph on disk space
+usage) or text format. Text representation of monitored parameters is made to allow
+easy way for export Zabbix data to other analytical tools.
+
+3. Chapter 2 (Installation)
+
+3.1 Requirements
+
+Zabbix server processes support the following platforms:
 
  - Linux 2.xx
+ - Support for HP-UX, AIX,i FreeBSD coming soon
 
-Agents are available for the following platforms:
+Zabbix agents are available for the following platforms:
 
  - Linux 2.xx
+ - Support for HP-UX, AIX,i FreeBSD coming soon
 
-2.2 Before you start
+Zabbix requires the following software to run properly:
 
-Building Zabbix requires GNU make. It will not work with other make programs.
+ - Apache 1.3.12
+ - MySQL 3.22
+ - PHP (4.0) compiled as Apache module with GD (for PNG images) support
+ - GNU make
+
+Memory requirements:
 
 Zabbix requires both physical (suprise!) and disk memory. 64 Mb of physical 
 memory and 50 Mb of free disk memory is good start point.
@@ -108,9 +230,9 @@ parameters. If you're planning to keep long history of monitored parameters,
 you should think of even a couple of gigabytes to store the history in 
 the database. 
 
-2.3 Installation procedure
+3.2 Installation procedure
 
- - Create the Zabbix superuser account. 
+Create the Zabbix superuser account: 
 
 This is the user the server will run on.  For production use you should create 
 a separate, unprivileged account ("zabbix" is commonly used).
@@ -118,7 +240,13 @@ a separate, unprivileged account ("zabbix" is commonly used).
 Running Zabbix as "root","bin", or any other account with special rights is a 
 security risk. Do not do it ! 
 
- - Create the Zabbix database.
+
+Untar Zabbix sources:
+
+On Linux, use command tar -xvzf <zabbix_archive.tgz>
+
+
+Create the Zabbix database:
 
 For MySQL:
 
@@ -129,13 +257,14 @@ mysql -u<username> -p<password>
 cd create/mysql
 cat schema.sql |mysql zabbix -u<username> -p<password>
 
+
  - Configure include/db.h
 
 #define DB_NAME         ""
 #define DB_USER         ""
 #define DB_PASSWD       ""
 
-Change these values.    
+Change these values.
 
  - Configure the source code for you system.
 
@@ -183,26 +312,33 @@ killall -HUP inetd
 
 As zabbix:
 
-mkdir /home/zabbix/html
-cp frontends/php/* /home/zabbix/html/
 
-Change these values in config.inc:
+Change these values in frontends/php/include/config.inc:
 
-        $DB_SERVER      ="";
+        $DB_SERVER      ="localhost";
         $DB_DATABASE    ="zabbix";
         $DB_USER        ="";
         $DB_PWD         =""
 
-3.1 Zabbix configuration
+mkdir /home/zabbix/html
+cp -R frontends/php/* /home/zabbix/html/
+
+4. Chapter 3 (Administration)
+
+4.1 Zabbix configuration
 
  - Use WEB browser to configure Zabbix (http://localhost/~zabbix)
  - Click on "CONFIG"
+
+Enter "Admin" as login name and leave password field empty.
 
 Set up SMTP parameters. 
 
  - Click on "USERS"
 
-Add yourself to list of users.
+Add yourself to list of Zabbix users. Do not forget to select "Administrators" group.
+
+Delete default "Admin" user.
 
  - Set up available Medias for the user (Click on "Media")
 
@@ -215,18 +351,18 @@ to "Not monitored".
 
  - Configure TRIGGERS
 
-Defined actions for triggers you are interested in.
-
-- Create /etc/zabbix/zabbix_agent.conf
-
-Put IP address of Zabbix server here.
-
  - Run zabbix_sucker and zabbix_alarmer
 
 /opt/zabbix/bin/zabbix_alarmer
 /opt/zabbix/bin/zabbix_sucker
 
-3.2 Expressions for triggers
+Define actions for triggers you are interested in.
+
+- Create /etc/zabbix/zabbix_agent.conf
+
+Put IP address of Zabbix server here.
+
+4. Chapter 3 (Administration)
 
 The following operators supported for triggers:
 
@@ -268,7 +404,7 @@ Example 2:
 
 More complex example:
 
-({sourceforge.net:procload.last(0)>5}) | ({sourceforge.net:procload.min(600)}>2)
+({sourceforge.net:procload.last(0)}>5) | ({sourceforge.net:procload.min(600)}>2)
 
 The expression becomes true when either current processor load is more
 than 5 or it was more than 2 during last 10 minutes.
