@@ -5,7 +5,6 @@ BUGS:
 FUTURE REQUESTS:
 
  - improve graphing capabilities
- - SNMP v2
  - do not send notifications at certain periods of time. Do not monitor services at certain periods of time.
 
 HIGH PRIORITY:
@@ -25,7 +24,7 @@ DIFFERENT TASKS:
 
  - better monitoring of log files
  - SNMP trapping
- - SNMP v2,v3
+ - SNMP v3
  - auto-discovery
  - Native Windows GUI
  - distributed monitoring

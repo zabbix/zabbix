@@ -1,5 +1,6 @@
 Changes for 1.0beta7:
 
+ - mass insert and delete for items. (Alexei)
  - support for SNMPv2. New item type introduced. (Alexei)
  - improvements in housekeeping procedure (Alexei)
  - improvements for chart.php (Alexei)
