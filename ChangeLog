@@ -1,5 +1,6 @@
 Changes for 1.0beta13:
 
+ - added parameter CONFIG_DISABLE_PINGER (Alexei)
  - correct processing of RCPT TO responses from SMTP servers
  (Alexei)
  - correct processing of unsupported internal checks (Alexei)

@@ -222,28 +222,41 @@ int main_pinger_loop(void)
 {
 	int ret = SUCCEED;
 
-	for(;;)
+	if(1 == CONFIG_DISABLE_PINGER)
 	{
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("connecting to the database");
-#endif
-		DBconnect();
-
-		ret = create_host_file();
-
-		if( SUCCEED == ret)
+		for(;;)
 		{
-			ret = do_ping();
+			pause();
 		}
-		unlink("/tmp/zabbix_suckerd.pinger");
-
-		DBclose();
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("pinger [sleeping for %d seconds]", CONFIG_PINGER_FREQUENCY);
-#endif
-		sleep(CONFIG_PINGER_FREQUENCY);
 	}
-
+	else
+	{
+		for(;;)
+		{
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+			setproctitle("connecting to the database");
+#endif
+			DBconnect();
+	
+			ret = create_host_file();
+	
+			if( SUCCEED == ret)
+			{
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+				setproctitle("pinging hosts");
+#endif
+				ret = do_ping();
+			}
+			unlink("/tmp/zabbix_suckerd.pinger");
+	
+			DBclose();
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+			setproctitle("pinger [sleeping for %d seconds]", CONFIG_PINGER_FREQUENCY);
+#endif
+			sleep(CONFIG_PINGER_FREQUENCY);
+		}
+	}
+	
 	/* Never reached */
 	return ret;
 }
