@@ -168,25 +168,29 @@
 		$item=get_item_by_itemid($graph_item["itemid"]);
 
 		$sql="select hostid,templateid,graphs from hosts_templates where templateid=".$item["hostid"];
-		echo $sql,"<br>";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
 			if($row["graphs"]&4 == 0)	continue;
 
 			$sql="select i.itemid from items i where i.key_='".$item["key_"]."' and i.hostid=".$row["hostid"];
-			echo $sql,"<br>";
 			$result2=DBselect($sql);
 			if(DBnum_rows($result2)==0)	continue;
 			$row2=DBfetch($result2);
 			$itemid=$row2["itemid"];
 
-			$sql="select distinct gi.gitemid from graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and i.itemid=$itemid";
-			echo $sql,"<br>";
+			$sql="select distinct gi.gitemid,gi.graphid from graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and i.itemid=$itemid";
 			$result2=DBselect($sql);
 			while($row2=DBfetch($result2))
 			{
 				delete_graphs_item($row2["gitemid"]);
+				$sql="select count(*) as count from graphs_items where graphid=".$row2["graphid"];
+				$result3=DBselect($sql);
+				$row3=DBfetch($result3);
+				if($row3["count"]==0)
+				{
+					delete_graph($row2["graphid"]);
+				}
 			}
 		}
 	}
