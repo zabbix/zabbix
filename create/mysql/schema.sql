@@ -334,6 +334,17 @@ CREATE TABLE users (
 );
 
 --
+-- Table structure for table 'sessions'
+--
+
+CREATE TABLE sessions (
+  sessionid		varchar(32)	NOT NULL DEFAULT '',
+  userid		int(4)		NOT NULL DEFAULT '0',
+  lastaccess		int(4)		NOT NULL DEFAULT '0',
+  PRIMARY KEY (sessionid)
+);
+
+--
 -- Table structure for table 'rights'
 --
 
