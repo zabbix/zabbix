@@ -58,7 +58,7 @@
 			if(validate_expression($expression)==0)
 			{
 				if(isset($disabled))	{ $istrue=2; }
-				else			{ $istrue=0; }
+				else			{ $istrue=3; }
 				
 				$result=add_trigger($expression,$description,$priority,$istrue,$comments,$url);
 				show_messages($result,"Trigger added","Cannot add trigger");
@@ -146,7 +146,7 @@
 			echo "<TD>";
 			if($row["istrue"] == 2)
 			{
-				echo "<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=0&hostid=".$row["hostid"]."\">Disabled</a>";
+				echo "<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=3&hostid=".$row["hostid"]."\">Disabled</a>";
 			}
 			else
 			{

@@ -349,9 +349,11 @@ CREATE TABLE services (
 --
 
 CREATE TABLE services_links (
+  linkid		serial,
   serviceupid		int4		DEFAULT '0' NOT NULL,
   servicedownid		int4		DEFAULT '0' NOT NULL,
-  soft			int2		DEFAULT '0' NOT NULL
+  soft			int2		DEFAULT '0' NOT NULL,
+  PRIMARY KEY (linkid)
 );
 
 CREATE INDEX services_links_serviceupid on services_links (serviceupid);

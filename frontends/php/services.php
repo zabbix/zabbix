@@ -105,6 +105,43 @@
 <?
 	if(isset($serviceid))
 	{
+		show_table_header("LINKS");
+		echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";
+		echo "<tr>";
+		echo "<td><b>Service 1</b></td>";
+		echo "<td><b>Service 2</b></td>";
+		echo "<td><b>Soft/hard link</b></td>";
+		echo "<td><b>Actions</b></td>";
+		echo "</tr>";
+		$sql="select servicedownid,serviceupid,soft from services_links where serviceupid=$serviceid or servicedownid=$serviceid";
+		$result=DBselect($sql);
+		$col=0;
+		while($row=DBfetch($result))
+		{
+			if($col++%2==0)	{ echo "<tr bgcolor=#EEEEEE>"; }
+			else		{ echo "<tr bgcolor=#DDDDDD>"; }
+			$service=get_service_by_serviceid($row["serviceupid"]);
+			echo "<td>".$service["name"]."</td>";
+			$service=get_service_by_serviceid($row["servicedownid"]);
+			echo "<td>".$service["name"]."</td>";
+			if($row["soft"] == 0)
+			{	
+				echo "<td>Hard</td>";
+			}
+			else
+			{
+				echo "<td>Soft</td>";
+			}
+			echo "<td><a href=\"services.php?register=delete_link?\">".$service["name"]."</td>";
+			echo "</tr>";
+		}
+		echo "</table>";
+	}
+?>
+
+<?
+	if(isset($serviceid))
+	{
 		$result=DBselect("select serviceid,triggerid,name from services where serviceid=$serviceid");
 		$triggerid=DBget_field($result,0,1);
 		$name=DBget_field($result,0,2);
