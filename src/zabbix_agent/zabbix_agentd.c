@@ -134,16 +134,28 @@ void	process_child(int sockfd)
 	char	result[1024];
 	double	res;
 
+	struct  sigaction phan;
+
 	for(;;)
 	{
-//		sigfunc = signal( SIGALRM, signal_handler );
-//		alarm(AGENT_TIMEOUT);
+		phan.sa_handler = &signal_handler; /* set up sig handler using sigaction() */
+		sigemptyset(&phan.sa_mask);  /* just block alarm signal */
+		phan.sa_flags = 0;
+//      phan.sa_flags = SA_RESTART;
+		sigaction(SIGALRM, &phan, NULL);
+		alarm(AGENT_TIMEOUT);
+//
+
 
 		if( (nread = read(sockfd, line, 1024)) == 0)
+		{
+			syslog( LOG_DEBUG, "read() faied. Timeout ?\n");
 			return;
+		}
 
-//		alarm(0);
-//		signal(SIGALRM, sigfunc);
+	        phan.sa_handler = SIG_IGN; /* just ignore signal now */
+	        sigaction(SIGALRM, &phan, NULL);
+
 
 		line[nread-1]=0;
 
