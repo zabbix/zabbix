@@ -1,6 +1,10 @@
+Changes for 1.0beta3:
+
+ - proc_cnt[apache] was changed to proc_cnt[httpd] (Alexei)
+
 Changes for 1.0beta2:
 
- - changes in manuxl.lyx (Alexei)
+ - changes in manual.lyx (Alexei)
  - added parameter ListenPort to zabbix_agentd and zabbix_trapperd
  (Alexei)
  - all *.html documents were renamed to *.php (Alexei)
