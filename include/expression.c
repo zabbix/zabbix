@@ -50,7 +50,8 @@ int	is_double(char *c)
 	int dot=-1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Starting is_double:[%s]", c );
-	for(i=0;i<(int)strlen(c);i++)
+/*	for(i=0;i<(int)strlen(c);i++)*/
+	for(i=0;c[i]!=0;i++)
 	{
 		if((c[i]>='0')&&(c[i]<='9'))
 		{
@@ -84,7 +85,8 @@ void	delete_spaces(char *c)
 	zabbix_log( LOG_LEVEL_DEBUG, "Before deleting spaces:%s", c );
 
 	j=0;
-	for(i=0;i<(int)strlen(c);i++)
+/*	for(i=0;i<(int)strlen(c);i++)*/
+	for(i=0;c[i]!=0;i++)
 	{
 		if( c[i] != ' ')
 		{
@@ -106,7 +108,8 @@ int	find_char(char *str,char c)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Before find_char:%s[%c]", str, c );
 
-	for(i=0;i<(int)strlen(str);i++)
+/*	for(i=0;i<(int)strlen(str);i++)*/
+	for(i=0;str[i]!=0;i++)
 	{
 		if(str[i]==c) return i;
 	}
@@ -138,7 +141,8 @@ int	evaluate_simple (double *result,char *exp)
 		strncpy( first, exp, MAX_STRING_LEN );
 		first[l]=0;
 		j=0;
-		for(i=l+1;i<(int)strlen(exp);i++)
+/*		for(i=l+1;i<(int)strlen(exp);i++)*/
+		for(i=l+1;exp[i]!=0;i++)
 		{
 			second[j]=exp[i];
 			j++;
@@ -174,7 +178,8 @@ int	evaluate_simple (double *result,char *exp)
 		strncpy( first, exp, MAX_STRING_LEN );
 		first[l]=0;
 		j=0;
-		for(i=l+1;i<(int)strlen(exp);i++)
+/*		for(i=l+1;i<(int)strlen(exp);i++)*/
+		for(i=l+1;exp[i]!=0;i++)
 		{
 			second[j]=exp[i];
 			j++;
@@ -208,7 +213,8 @@ int	evaluate_simple (double *result,char *exp)
 		strncpy(first, exp, MAX_STRING_LEN);
 		first[l]=0;
 		j=0;
-		for(i=l+1;i<(int)strlen(exp);i++)
+/*		for(i=l+1;i<(int)strlen(exp);i++)*/
+		for(i=l+1;exp[i]!=0;i++)
 		{
 			second[j]=exp[i];
 			j++;
@@ -241,7 +247,8 @@ int	evaluate_simple (double *result,char *exp)
 		strncpy(first, exp, MAX_STRING_LEN);
 		first[l]=0;
 		j=0;
-		for(i=l+1;i<(int)strlen(exp);i++)
+/*		for(i=l+1;i<(int)strlen(exp);i++)*/
+		for(i=l+1;exp[i]!=0;i++)
 		{
 			second[j]=exp[i];
 			j++;
@@ -276,7 +283,8 @@ int	evaluate_simple (double *result,char *exp)
 		strncpy(first, exp, MAX_STRING_LEN);
 		first[l]=0;
 		j=0;
-		for(i=l+1;i<(int)strlen(exp);i++)
+/*		for(i=l+1;i<(int)strlen(exp);i++)*/
+		for(i=l+1;exp[i]!=0;i++)
 		{
 			second[j]=exp[i];
 			j++;
@@ -302,7 +310,8 @@ int	evaluate_simple (double *result,char *exp)
 		strncpy(first, exp, MAX_STRING_LEN);
 		first[l]=0;
 		j=0;
-		for(i=l+1;i<(int)strlen(exp);i++)
+/*		for(i=l+1;i<(int)strlen(exp);i++)*/
+		for(i=l+1;exp[i]!=0;i++)
 		{
 			second[j]=exp[i];
 			j++;
@@ -336,7 +345,8 @@ int	evaluate_simple (double *result,char *exp)
 		strncpy(first, exp, MAX_STRING_LEN);
 		first[l]=0;
 		j=0;
-		for(i=l+1;i<(int)strlen(exp);i++)
+/*		for(i=l+1;i<(int)strlen(exp);i++)*/
+		for(i=l+1;exp[i]!=0;i++)
 		{
 			second[j]=exp[i];
 			j++;
@@ -362,7 +372,8 @@ int	evaluate_simple (double *result,char *exp)
 		strncpy(first, exp, MAX_STRING_LEN);
 		first[l]=0;
 		j=0;
-		for(i=l+1;i<(int)strlen(exp);i++)
+/*		for(i=l+1;i<(int)strlen(exp);i++)*/
+		for(i=l+1;exp[i]!=0;i++)
 		{
 			second[j]=exp[i];
 			j++;
@@ -388,7 +399,8 @@ int	evaluate_simple (double *result,char *exp)
 		strncpy(first, exp, MAX_STRING_LEN);
 		first[l]=0;
 		j=0;
-		for(i=l+1;i<(int)strlen(exp);i++)
+/*		for(i=l+1;i<(int)strlen(exp);i++)*/
+		for(i=l+1;exp[i]!=0;i++)
 		{
 			second[j]=exp[i];
 			j++;
@@ -593,20 +605,6 @@ int	substitute_macros(char *exp)
 		strcpy(exp+l+2,exp+r+1);
 
 		zabbix_log( LOG_LEVEL_DEBUG, "Value5 [%s]", exp );
-
-/*		j=0;
-		for(i=0;i<(int)strlen(exp);i++)
-		{
-			if( (i>=l+3) && (i<=r) )
-				continue;
-			exp[j]=exp[i];
-			if(i==l)
-				exp[j]='%';
-			if(i==l+1)
-				exp[j]='s';
-			j++;
-		}
-		exp[j]=0;*/
 
 		sprintf(res,exp,value);
 		strncpy(exp,res, MAX_STRING_LEN);
