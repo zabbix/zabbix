@@ -213,6 +213,7 @@
 
 		if(@gettype($icons["$icon"])!="resource")
 		{
+/*
 			if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
 			{
 				$icons[$icon]=ImageCreateFromPNG("images/sysmaps/$icon.png");
@@ -220,6 +221,17 @@
 			else
 			{
 				$icons[$icon]=ImageCreateFromPNG("images/sysmaps/old/$icon.png");
+			}
+*/
+			$sql="select image from images where imagetype=1 and name='$icon'";
+			$result2=DBselect($sql);
+			if(DBnum_rows($result2)!=1)
+			{
+				$icons[$icon] = imagecreatetruecolor(48,48);
+			}
+			else
+			{
+				$icons[$icon]=ImageCreateFromString(DBget_field($result2,0,0));
 			}
 		}
 
