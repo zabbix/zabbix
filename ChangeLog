@@ -85,7 +85,7 @@ Changes for 1.0beta6:
  (Alexei)
  - added housekeeping procedure for table sessions (Alexei)
  - changed width=\"X%\" to width=X% in *.php (Alexei)
- - Status of a trigger will blink if it was changes during last 60
+ - Status of a trigger will blink if it was changes during last 300
  seconds (Alexei)
  - Zabbix daemons to update triggers.lastchange when triggers.values 
  is changed (Alexei)
