@@ -442,6 +442,7 @@
 			$from_time=$to_time-$this->period;
 		
 			$count=array();
+			for($i=0;$i<900;$i++) $count[$i]=0;
 			$min=array();
 			$max=array();
 			$avg=array();
