@@ -2453,7 +2453,7 @@ int	DISK_WBLK(const char *cmd, const char *parameter,double  *value)
 
 int	VERSION(const char *cmd, const char *parameter,char  **value)
 {
-	static	char	version[]="1.1alpha6\n";
+	static	char	version[]="1.1alpha7\n";
 
 	*value=strdup(version);
 	return	SYSINFO_RET_OK;
