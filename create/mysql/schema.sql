@@ -174,7 +174,7 @@ CREATE TABLE functions (
   functionid		int(4)		NOT NULL auto_increment,
   itemid		int(4)		DEFAULT '0' NOT NULL,
   triggerid		int(4)		DEFAULT '0' NOT NULL,
-  lastvalue		varchar(255)	DEFAULT '0.0000' NOT NULL,
+  lastvalue		varchar(255),
   function		varchar(10)	DEFAULT '' NOT NULL,
   parameter		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (functionid),

@@ -235,17 +235,23 @@ int     DBget_function_result(float *result,char *functionid)
 
         char	sql[MAX_STRING_LEN+1];
 
-	sprintf( sql, "select lastvalue from functions where functionid=%s", functionid );
+/* 0 is added to distinguish between lastvalue==NULL and empty result */
+	sprintf( sql, "select 0,lastvalue from functions where functionid=%s", functionid );
 	dbresult = DBselect(sql);
 
 	if(DBnum_rows(dbresult) == 0)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Query failed for functionid:[%s]", functionid );
+		zabbix_log(LOG_LEVEL_WARNING, "No function for functionid:[%s]", functionid );
+		res = FAIL;
+	}
+	else if(DBget_field(dbresult,0,1) == NULL)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "function.lastvalue==NULL [%s]", functionid );
 		res = FAIL;
 	}
 	else
 	{
-        	*result=atof(DBget_field(dbresult,0,0));
+        	*result=atof(DBget_field(dbresult,0,1));
 	}
         DBfree_result(dbresult);
 
