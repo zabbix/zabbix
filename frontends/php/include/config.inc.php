@@ -3782,11 +3782,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	function	show_table_header($title)
 	{
 ?>
-	<table class="menu" width="100%" cellspacing=0 cellpadding=1>
-	<tr>
-	<td class="sub_menu" height=24 colspan=9><?php echo $title; ?></td>
-	</tr>
-	</table>
+<table class="menu" width="100%" cellspacing=0 cellpadding=1>
+<tr>
+<td class="sub_menu" height=24 colspan=9><?php echo $title; ?></td>
+</tr>
+</table>
 <?php
 	}
 
@@ -4060,19 +4060,18 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		global $USER_DETAILS;
 
 ?>
-	<p>
-	<table class="menu" width="100%" cellspacing=0 cellpadding=5>
-	<tr>
-	<td class="horizontal_menu" height=24 colspan=9 align=center><b><?php echo "<a href=\"http://www.zabbix.com\" class=\"highlight\">".S_ZABBIX_VER."</a>&nbsp;".S_COPYRIGHT_BY."<a href=\"mailto:alex@gobbo.caves.lv\" class=\"highlight\">".S_ALEXEI_VLADISHEV."</a>"; ?></b></td>
-	<td class="horizontal_menu" height=24 colspan=9 align=right><b><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><?php echo " ".S_CONNECTED_AS."&nbsp;".$USER_DETAILS["alias"];?></b></td>
-	</tr>
-	</table>
-	</p>
+<p>
+<table class="menu" width="100%" cellspacing=0 cellpadding=5>
+<tr>
+<td class="horizontal_menu" height=24 colspan=9 align=center><b><?php echo "<a href=\"http://www.zabbix.com\" class=\"highlight\">".S_ZABBIX_VER."</a>&nbsp;".S_COPYRIGHT_BY."<a href=\"mailto:alex@gobbo.caves.lv\" class=\"highlight\">".S_ALEXEI_VLADISHEV."</a>"; ?></b></td>
+<td class="horizontal_menu" height=24 colspan=9 align=right><b><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><?php echo " ".S_CONNECTED_AS."&nbsp;".$USER_DETAILS["alias"];?></b></td>
+</tr>
+</table>
+</p>
 
-	</p>
+</p>
+</body>
 <?php
-
-		echo "</body>";
 	}
 
 	function	get_stats()
