@@ -35,8 +35,8 @@
 	$sizeY=200;
 
 	$shiftX=12;
-	$shiftYup=13;
-	$shiftYdown=7+15*3;
+	$shiftYup=17;
+	$shiftYdown=25+15*3;
 
 
 //	Header( "Content-type:  text/html"); 
@@ -62,8 +62,21 @@
 	$x=imagesx($im); 
 	$y=imagesy($im);
   
-	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10,$white);
+//	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10,$white);
+	ImageFilledRectangle($im,0,0,$x,$y,$white);
 	ImageRectangle($im,0,0,$x-1,$y-1,$black);
+
+	$trigger=get_trigger_by_triggerid($HTTP_GET_VARS["triggerid"]);
+	$str=$trigger["description"];
+
+	if( strstr($str,"%s"))
+	{
+		$str=expand_trigger_description($HTTP_GET_VARS["triggerid"]);
+	}
+
+	$str=$str." (year ".date("Y").")";
+	$x=imagesx($im)/2-ImageFontWidth(4)*strlen($str)/2;
+	ImageString($im, 4,$x,1, $str , $darkred);
 
 	$now = time(NULL);
 	$to_time=$now;
@@ -75,8 +88,8 @@
 	for($i=0;$i<52;$i++)
 	{
 		$year=date("Y");
-		$period_start=mktime(0,0,0,0,0,$year)+7*24*3600*$i;
-		$period_end=mktime(0,0,0,0,0,$year)+7*24*3600*($i+1);
+		$period_start=mktime(0,0,0,1,1,$year)+7*24*3600*$i;
+		$period_end=mktime(0,0,0,1,1,$year)+7*24*3600*($i+1);
 		$stat=calculate_availability($HTTP_GET_VARS["triggerid"],$period_start,$period_end);
 		
 		$true[$i]=$stat["true"];
@@ -90,10 +103,13 @@
 		ImageDashedLine($im,$shiftX,$i+$shiftYup,$sizeX+$shiftX,$i+$shiftYup,$gray);
 	}
 
+	$j=0;
 	for($i=0;$i<=$sizeX;$i+=$sizeX/52)
 	{
 		ImageDashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
-		ImageString($im, 1,$i+$shiftX-11, $sizeY+$shiftYup+5, date("H:i",-3*3600+24*3600*$i/900) , $black);
+		$period_start=mktime(0,0,0,1,1,$year)+7*24*3600*$j;
+		ImageStringUp($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, date("d.M",$period_start) , $black);
+		$j++;
 	}
 
 	$maxY=100;
@@ -118,6 +134,9 @@
 
 		ImageLine($im,$x1+$shiftX,$y1+$shiftYup,$x2+$shiftX,$y2+$shiftYup,$darkred);
 
+		ImageRectangle($im,$x1+$shiftX-1,$y1+$shiftYup-1,$x1+$shiftX+1,$y1+$shiftYup+1,$darkred);
+		ImageRectangle($im,$x2+$shiftX-1,$y2+$shiftYup-1,$x2+$shiftX+1,$y2+$shiftYup+1,$darkred);
+
 		$x1=(900/52)*$sizeX*($i-$minX)/($maxX-$minX);
 		$y1=$sizeY*($false[$i]-$minY)/($maxY-$minY);
 		$x2=(900/52)*$sizeX*($i-$minX-1)/($maxX-$minX);
@@ -126,6 +145,9 @@
 		$y2=$sizeY-$y2;
 
 		ImageLine($im,$x1+$shiftX,$y1+$shiftYup,$x2+$shiftX,$y2+$shiftYup,$darkgreen);
+
+		ImageRectangle($im,$x1+$shiftX-1,$y1+$shiftYup-1,$x1+$shiftX+1,$y1+$shiftYup+1,$darkgreen);
+		ImageRectangle($im,$x2+$shiftX-1,$y2+$shiftYup-1,$x2+$shiftX+1,$y2+$shiftYup+1,$darkgreen);
 
 		$x1=(900/52)*$sizeX*($i-$minX)/($maxX-$minX);
 		$y1=$sizeY*($unknown[$i]-$minY)/($maxY-$minY);
@@ -136,6 +158,9 @@
 
 		ImageLine($im,$x1+$shiftX,$y1+$shiftYup,$x2+$shiftX,$y2+$shiftYup,$darkyellow);
 
+		ImageRectangle($im,$x1+$shiftX-1,$y1+$shiftYup-1,$x1+$shiftX+1,$y1+$shiftYup+1,$darkyellow);
+		ImageRectangle($im,$x2+$shiftX-1,$y2+$shiftYup-1,$x2+$shiftX+1,$y2+$shiftYup+1,$darkyellow);
+
 #			ImageStringUp($im, 1, $x1+10, $sizeY+$shiftYup+15, $i , $red);
 	}
 
@@ -144,17 +169,17 @@
 		ImageString($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftYup, $i*($maxY-$minY)/$sizeY+$minY , $darkred);
 	}
 
-	ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*0,$shiftX+5,$sizeY+$shiftYup+15+9+15*0,$darkgreen);
-	ImageRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*0,$shiftX+5,$sizeY+$shiftYup+15+9+15*0,$black);
-	ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*0+15, "FALSE (%)", $black);
+	ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*0,$shiftX+5,$sizeY+$shiftYup+35+9+15*0,$darkgreen);
+	ImageRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*0,$shiftX+5,$sizeY+$shiftYup+35+9+15*0,$black);
+	ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*0+35, "FALSE (%)", $black);
 
-	ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*1,$shiftX+5,$sizeY+$shiftYup+15+9+15*1,$darkred);
-	ImageRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*1,$shiftX+5,$sizeY+$shiftYup+15+9+15*1,$black);
-	ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*1+15, "TRUE (%)", $black);
+	ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+35+9+15*1,$darkred);
+	ImageRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+15+9+35*1,$black);
+	ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*1+35, "TRUE (%)", $black);
 
-	ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*2,$shiftX+5,$sizeY+$shiftYup+15+9+15*2,$darkyellow);
-	ImageRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*2,$shiftX+5,$sizeY+$shiftYup+15+9+15*2,$black);
-	ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*2+15, "UNKNOWN (%)", $black);
+	ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*2,$shiftX+5,$sizeY+$shiftYup+35+9+15*2,$darkyellow);
+	ImageRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*2,$shiftX+5,$sizeY+$shiftYup+35+9+15*2,$black);
+	ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*2+35, "UNKNOWN (%)", $black);
 
 	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, "http://zabbix.sourceforge.net", $gray);
 
