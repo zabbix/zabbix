@@ -270,7 +270,7 @@
 	echo "Icon";
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"icon\" size=1>";
-	$icons=array();
+/*	$icons=array();
 	if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
 	{
 		$icons[0]="Server";
@@ -291,17 +291,20 @@
 		$icons[2]="Printer";
 		$icons[3]="Hub";
 		$num=4;
-	}
-	for($i=0;$i<$num;$i++)
+	}*/
+	$result=DBselect("select name from images where imagetype=1 order by name");
+/*	for($i=0;$i<$num;$i++)*/
+	for($i=0;$i<DBnum_rows($result);$i++)
 	{
-		if(isset($HTTP_GET_VARS["shostid"]) && ($icon==$icons[$i]))
+		$name=DBget_field($result,$i,0);
+		if(isset($HTTP_GET_VARS["shostid"]) && ($icon==$name))
 //		if(isset($HTTP_GET_VARS["hostid"]) && ($HTTP_GET_VARS["icon"]==$icons[$i]))
 		{
-			echo "<OPTION VALUE='".$icons[$i]."' SELECTED>".$icons[$i];
+			echo "<OPTION VALUE='".$name."' SELECTED>".$name;
 		}
 		else
 		{
-			echo "<OPTION VALUE='".$icons[$i]."'>".$icons[$i];
+			echo "<OPTION VALUE='".$name."'>".$name;
 		}
 	}
 	echo "</SELECT>";
