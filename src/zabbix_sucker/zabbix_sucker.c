@@ -722,7 +722,7 @@ int get_values(void)
 
 			if(network_errors>0)
 			{
-				sprintf(sql,"update hosts set network_errors=0 where hostid=%d", item.hostid);
+				sprintf(sql,"update hosts set network_errors=0 where hostid=%d and network_errors>0", item.hostid);
 				DBexecute(sql);
 			}
 
