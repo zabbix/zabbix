@@ -575,6 +575,33 @@ int get_minnextcheck(int now)
 	return	res;
 }
 
+int update_host_status(int hostid,int status)
+{
+	char	sql[MAX_STRING_LEN+1];
+	int	now;
+
+	now=time(NULL);
+
+	if(status==0)
+	{
+		sprintf(sql,"update hosts set status=0 where hostid=%d",hostid);
+		DBexecute(sql);
+	}
+	else if(status==2)
+	{
+		sprintf(sql,"update hosts set status=2,disable_until=%d where hostid=%d",now+DELAY_ON_NETWORK_FAILURE,hostid);
+		DBexecute(sql);
+	}
+	else
+	{
+		zabbix_log( LOG_LEVEL_ERR, "Unknown host status [%d]", status);
+		return FAIL;
+	}
+
+
+	return SUCCEED;
+}
+
 int get_values(void)
 {
 	double		value;
@@ -655,8 +682,7 @@ int get_values(void)
 			{
 				host_status=0;
 				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
-				sprintf(sql,"update hosts set status=0 where hostid=%d",item.hostid);
-				DBexecute(sql);
+				update_host_status(item.hostid,0);
 
 				break;
 			}
@@ -670,8 +696,7 @@ int get_values(void)
 			{
 				host_status=0;
 				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
-				sprintf(sql,"update hosts set status=0 where hostid=%d",item.hostid);
-				DBexecute(sql);
+				update_host_status(item.hostid,0);
 
 				break;
 			}
@@ -679,9 +704,7 @@ int get_values(void)
 		else if(res == NETWORK_ERROR)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Host [%s] will be checked after [%d] seconds", item.host, DELAY_ON_NETWORK_FAILURE );
-			now=time(NULL);
-			sprintf(sql,"update hosts set status=2,disable_until=%d where hostid=%d",now+DELAY_ON_NETWORK_FAILURE,item.hostid);
-			DBexecute(sql);
+			update_host_status(item.hostid,2);
 
 			break;
 		}
