@@ -1,5 +1,6 @@
 1.0:
 
+ - disk size is not correct after evaluating macros in the message
  - check if zabbix sends alerts for diskused[/] triggers 
  - add support of interface statistics under Solaris and FreeBSD
  - add support for real 'delta' (last-previous)
