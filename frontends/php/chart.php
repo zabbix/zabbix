@@ -30,7 +30,7 @@
 	Header( "Content-type:  image/png"); 
 	Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 
-	$im = imagecreate($sizeX+$shiftX+61,$sizeY+2*$shiftY+10); 
+	$im = imagecreate($sizeX+$shiftX+61,$sizeY+2*$shiftY+40); 
   
 	$red=ImageColorAllocate($im,255,0,0); 
 	$green=ImageColorAllocate($im,0,255,0); 
@@ -44,7 +44,7 @@
 	$x=imagesx($im); 
 	$y=imagesy($im);
   
-	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+2*$shiftY+10,$black);
+	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+2*$shiftY+40,$black);
 
 	for($i=0;$i<=$sizeY;$i+=50)
 	{
@@ -114,9 +114,13 @@
 		{
 			ImageString($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftY, $i*($maxY-$minY)/$sizeY+$minY , $red);
 		}
+		for($i=0;$i<=$sizeX;$i+=50)
+		{
+			ImageStringUp($im,0,$i+$shiftX-3,$shiftY+$sizeY+50,date("H:i:s",$i*($maxX-$minX)/$sizeX+$minX),$red);
+		}
 
-		ImageString($im, 1,10,                $sizeY+$shiftY+5, date("dS of F Y h:i:s A",$minX) , $red);
-		ImageString($im, 1,$sizeX+$shiftX-168,$sizeY+$shiftY+5, date("dS of F Y h:i:s A",$maxX) , $red);
+		ImageString($im, 1,10,                $sizeY+$shiftY+3, date("dS of F Y",$minX) , $red);
+		ImageString($im, 1,$sizeX+$shiftX-90,$sizeY+$shiftY+3, date("dS of F Y",$maxX) , $red);
 	}
 	else
 	{

@@ -7,7 +7,6 @@ Not ready yet:
 
 [ CORE. Make Zabbix compile by cc ]
 
-[ PHP. Show time legend for graphs ]
 [ PHP. Show diff instead of real values ]
 [ PHP. Show triggers by userid ]
 
@@ -17,7 +16,8 @@ Not ready yet:
 
 Changes for 1.0beta3:
 
- - ialready existing hosts can be used as template from new host (Alexei)
+ - added time legend for simple graph (Alexei)
+ - already existing hosts can be used as template from new host (Alexei)
  - new algorithm for audible notification in screen "Status of Triggers"
  (Alexei)
  - changed definition of DebugLevel (Alexei)
