@@ -126,6 +126,10 @@
 		{
 			echo S_MEDIA_TYPE;
 		}
+		else if($row["resource"]==AUDIT_RESOURCE_HOST)
+		{
+			echo S_HOST;
+		}
 		else
 		{
 			echo S_UNKNOWN_RESOURCE;

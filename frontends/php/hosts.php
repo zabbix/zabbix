@@ -43,6 +43,8 @@
 		{
 			$result=add_host($_GET["host"],$_GET["port"],$_GET["status"],$_GET["useip"],$_GET["ip"],$_GET["host_templateid"],$_GET["newgroup"],$_GET["groups"]);
 			show_messages($result, S_HOST_ADDED, S_CANNOT_ADD_HOST);
+			if($result)
+				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_HOST,"Host [".addslashes($_GET["host"])."] IP [".$_GET["ip"]."] Status [".$_GET["status"]."]");
 			unset($_GET["hostid"]);
 		}
 		if($_GET["register"]=="add items from template")
@@ -55,12 +57,19 @@
 		{
 			$result=@update_host($_GET["hostid"],$_GET["host"],$_GET["port"],$_GET["status"],$_GET["useip"],$_GET["ip"],$_GET["newgroup"],$_GET["groups"]);
 			show_messages($result, S_HOST_UPDATED, S_CANNOT_UPDATE_HOST);
+			if($result)
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,"Host [".addslashes($_GET["host"])."] IP [".$_GET["ip"]."] Status [".$_GET["status"]."]");
 			unset($_GET["hostid"]);
 		}
 		if($_GET["register"]=="changestatus")
 		{
+			$host=get_host_by_hostid($_GET["hostid"]);
 			$result=update_host_status($_GET["hostid"],$_GET["status"]);
 			show_messages($result,S_HOST_STATUS_UPDATED,S_CANNOT_UPDATE_HOST_STATUS);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,"Old status [".$host["status"]."] New status [$status]");
+			}
 			unset($_GET["hostid"]);
 		}
 		if($_GET["register"]=="delete")

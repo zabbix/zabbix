@@ -45,21 +45,38 @@
 		{
 			$result=update_config($_GET["alarm_history"],$_GET["alert_history"]);
 			show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Alarm history [".$_GET["alarm_history"]."] alert history [".$_GET["alert_history"]."]");
+			}
 		}
 		if($_GET["register"]=="add")
 		{
 			$result=add_mediatype($_GET["type"],$_GET["description"],$_GET["smtp_server"],$_GET["smtp_helo"],$_GET["smtp_email"],$_GET["exec_path"]);
 			show_messages($result, S_ADDED_NEW_MEDIA_TYPE, S_NEW_MEDIA_TYPE_WAS_NOT_ADDED);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_MEDIA_TYPE,"Media type [".addslashes($_GET["description"])."]");
+			}
 		}
 		if($_GET["register"]=="update media")
 		{
 			$result=update_mediatype($_GET["mediatypeid"],$_GET["type"],$_GET["description"],$_GET["smtp_server"],$_GET["smtp_helo"],$_GET["smtp_email"],$_GET["exec_path"]);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MEDIA_TYPE,"Media type [".addslashes($_GET["description"])."]");
+			}
 			show_messages($result, S_MEDIA_TYPE_UPDATED, S_MEDIA_TYPE_WAS_NOT_UPDATED);
 		}
 		if($_GET["register"]=="delete")
 		{
+			$mediatype=get_mediatype_by_mediatypeid($_GET["mediatypeid"]);
 			$result=delete_mediatype($_GET["mediatypeid"]);
 			show_messages($result, S_MEDIA_TYPE_DELETED, S_MEDIA_TYPE_WAS_NOT_DELETED);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MEDIA_TYPE,"Media type [".$mediatype["description"]."]");
+			}
 			unset($_GET["mediatypeid"]);
 		}
 	}
