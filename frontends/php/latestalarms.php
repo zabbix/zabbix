@@ -73,7 +73,12 @@
 		else		{ echo "<tr bgcolor=#EEEEEE>"; }
 
 		echo "<TD>",date("Y.M.d H:i:s",$row["clock"]),"</TD>";
-		echo "<TD><a href=\"alarms.php?triggerid=".$row["triggerid"]."\">".$row["description"]."</a></TD>";
+		$description=$row["description"];
+		if( strstr($description,"%s"))
+		{
+			$description=expand_trigger_description($row["triggerid"]);
+		}
+		echo "<TD><a href=\"alarms.php?triggerid=".$row["triggerid"]."\">$description</a></TD>";
 		if($row["value"] == 0)
 		{
 			echo "<TD><font color=\"00AA00\">OFF</font></TD>";
