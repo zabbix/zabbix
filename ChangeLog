@@ -1,5 +1,6 @@
 Changes for 1.1alpha6:
 
+ - fixed mouse navigation for multiple maps in one screen (Alexei)
  - configurable timestamp format in local_en.inc.php (Alexei)
  - support for no labels and no status in network maps (Alexei)
  - fix for startup of housekeeping process (Alexei)

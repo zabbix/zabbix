@@ -131,7 +131,7 @@
 			else if($resource == 2)
 			{
 				echo get_map_imagemap($resourceid);
-				echo "<img src='map.php?sysmapid=$resourceid&noedit=true&border=1' border=0 usemap=#links>";
+				echo "<img src='map.php?sysmapid=$resourceid&noedit=true&border=1' border=0 usemap=#links$resourceid>";
 			}
 			else if($resource == 3)
 			{
