@@ -446,6 +446,11 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 			ret = FAIL;
 		}
 	}
+	else if(strcmp(function,"now")==0)
+	{
+		now=time(NULL);
+                sprintf(value,"%d",now);
+	}
 	else
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Unsupported function:%s",function);

@@ -819,6 +819,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				($function!="nodata")&&
 				($function!="time")&&
 				($function!="date")&&
+				($function!="now")&&
 				($function!="str"))
 			{
 				$ERROR_MSG="Unknown function [$function]";

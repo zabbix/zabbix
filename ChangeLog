@@ -1,5 +1,6 @@
 Changes for 1.0beta13:
 
+ - added function now() (Alexei)
  - fixed action maintenance screen (Alexei)
  - redesigned availablity chart (Alexei)
  - support for zabbix[trends] (Alexei)
