@@ -1,5 +1,3 @@
-/*#define	TEST_PARAMETERS*/
-
 #include "config.h"
 
 #include <stdlib.h>
