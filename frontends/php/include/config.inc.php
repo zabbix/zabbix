@@ -2378,15 +2378,15 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
 
-	function	update_graph_item($gitemid,$itemid,$color,$drawtype)
+	function	update_graph_item($gitemid,$itemid,$color,$drawtype,$sortorder)
 	{
-		$sql="update graphs_items set itemid=$itemid,color='$color',drawtype=$drawtype where gitemid=$gitemid";
+		$sql="update graphs_items set itemid=$itemid,color='$color',drawtype=$drawtype,sortorder=$sortorder where gitemid=$gitemid";
 		return	DBexecute($sql);
 	}
 
-	function	add_item_to_graph($graphid,$itemid,$color,$drawtype)
+	function	add_item_to_graph($graphid,$itemid,$color,$drawtype,$sortorder)
 	{
-		$sql="insert into graphs_items (graphid,itemid,color,drawtype) values ($graphid,$itemid,'$color',$drawtype)";
+		$sql="insert into graphs_items (graphid,itemid,color,drawtype,sortorder) values ($graphid,$itemid,'$color',$drawtype,$sortorder)";
 		return	DBexecute($sql);
 	}
 
