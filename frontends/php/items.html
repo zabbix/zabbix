@@ -146,12 +146,24 @@
 		echo "<TD>$shortname</TD>";
 
 		echo "<td align=center>";
-		if($status==0)		echo "<a href=\"items.html?itemid=$itemid_&register=changestatus&status=1\">Active</a>";
-		elseif($status==1)	echo "<a href=\"items.html?itemid=$itemid_&register=changestatus&status=0\">Not active</a>";
-		elseif($status==2)	echo "Trapper";
-		elseif($status==3)	echo "Not supported";
-		elseif($status==10)	echo "Autodisabled";
-		else echo "<TD ALIGN=CENTER><B>$status</B> Unknown</TD>";
+		if(isset($hostid))
+		{
+			if($status==0)		echo "<a href=\"items.html?itemid=$itemid_&hostid=$hostid&register=changestatus&status=1\">Active</a>";
+			elseif($status==1)	echo "<a href=\"items.html?itemid=$itemid_&hostid=$hostid&register=changestatus&status=0\">Not active</a>";
+			elseif($status==2)	echo "Trapper";
+			elseif($status==3)	echo "Not supported";
+			elseif($status==10)	echo "Autodisabled";
+			else echo "<TD ALIGN=CENTER><B>$status</B> Unknown</TD>";
+		}
+		else
+		{
+			if($status==0)		echo "<a href=\"items.html?itemid=$itemid_&register=changestatus&status=1\">Active</a>";
+			elseif($status==1)	echo "<a href=\"items.html?itemid=$itemid_&register=changestatus&status=0\">Not active</a>";
+			elseif($status==2)	echo "Trapper";
+			elseif($status==3)	echo "Not supported";
+			elseif($status==10)	echo "Autodisabled";
+			else echo "<TD ALIGN=CENTER><B>$status</B> Unknown</TD>";
+		}
 		echo "</td>";
 
 		if(isset($hostid_))
