@@ -57,10 +57,10 @@ void	process_config_file(void)
 	int	lineno;
 
 
-	file=fopen("/etc/zabbix/zabbix_trapperd.conf","r");
+	file=fopen("/etc/zabbix/zabbix_trapper.conf","r");
 	if(NULL == file)
 	{
-		syslog( LOG_CRIT, "Cannot open /etc/zabbix/zabbix_trapperd.conf");
+		syslog( LOG_CRIT, "Cannot open /etc/zabbix/zabbix_trapper.conf");
 		exit(1);
 	}
 
