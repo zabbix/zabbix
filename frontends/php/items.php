@@ -2,7 +2,7 @@
         $page["title"] = "Configuration of items";
         $page["file"] = "items.php";
 
-        include "include/config.inc";
+        include "include/config.inc.php";
 	show_header($page["title"],0,0);
 ?>
 
@@ -21,7 +21,7 @@
 	{
 		if($register=="update")
 		{
-			$result=update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type);
+			$result=update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts);
 			show_messages($result,"Item updated","Cannot update item");
 			unset($itemid);
 		}
@@ -33,7 +33,7 @@
 		}
 		if($register=="add")
 		{
-			$result=add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type);
+			$result=add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts);
 			show_messages($result,"Item added","Cannot add item");
 			unset($itemid);
 		}
@@ -184,7 +184,7 @@
 	if(DBget_field($result,0,0)>0)
 	{
 		echo "<a name=\"form\"></a>";
-		@insert_item_form($itemid);
+		insert_item_form($itemid);
 	}
 ?>
 

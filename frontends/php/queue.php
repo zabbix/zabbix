@@ -2,7 +2,7 @@
 	$page["title"] = "Information about monitoring server";
 	$page["file"] = "queue.php";
 
-	include "include/config.inc";
+	include "include/config.inc.php";
 	show_header($page["title"],10,0);
 ?>
  

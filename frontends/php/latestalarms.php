@@ -2,7 +2,7 @@
 	$page["title"] = "Latest alarms";
 	$page["file"] = "latestalarms.php";
 
-	include "include/config.inc";
+	include "include/config.inc.php";
 	show_header($page["title"],30,0);
 ?>
 

@@ -1,5 +1,5 @@
 <?
-	include "include/config.inc";
+	include "include/config.inc.php";
 	$page["title"] = "Alert history";
 	$page["file"] = "alerts.php";
 	show_header($page["title"],30,0);

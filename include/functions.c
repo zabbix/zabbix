@@ -18,6 +18,7 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
+#include "security.h"
 
 #include "functions.h"
 #include "expression.h"
@@ -761,7 +762,7 @@ int	get_lastvalue(char *value,char *host,char *key,char *function,char *paramete
 
 /* For zabbix_trapper(d) */
 /* int	process_data(char *server,char *key, double value)*/
-int	process_data(char *server,char *key,char *value)
+int	process_data(int sockfd,char *server,char *key,char *value)
 {
 	char	sql[MAX_STRING_LEN+1];
 
@@ -769,10 +770,19 @@ int	process_data(char *server,char *key,char *value)
 	DB_ITEM	item;
 	char	*s;
 
-	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type from items i,hosts h where h.status in (0,2) and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d", server, key, ITEM_TYPE_TRAPPER);
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_data()");
+
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts from items i,hosts h where h.status in (0,2) and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d", server, key, ITEM_TYPE_TRAPPER);
 	result = DBselect(sql);
 
 	if(DBis_empty(result) == SUCCEED)
+	{
+		DBfree_result(result);
+		return  FAIL;
+	}
+
+	item.trapper_hosts=DBget_field(result,0,16);
+	if(check_security(sockfd,item.trapper_hosts,1) == FAIL)
 	{
 		DBfree_result(result);
 		return  FAIL;

@@ -1,12 +1,12 @@
 <?
-	include "include/config.inc";
+	include "include/config.inc.php";
 	$page["title"] = "Hosts";
 	$page["file"] = "hosts.php";
 	show_header($page["title"],0,0);
 ?>
 
 <?
-        if(!check_right("Host","W",0))
+        if(!check_right("Host","R",0))
         {
                 show_table_header("<font color=\"AA0000\">No permissions !</font
 >");

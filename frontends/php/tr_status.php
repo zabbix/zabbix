@@ -2,7 +2,7 @@
 	$page["title"] = "Status of triggers";
 	$page["file"] = "tr_status.php";
 
-	include "include/config.inc";
+	include "include/config.inc.php";
 ?>
 <?
 	$tr_hash=calc_trigger_hash();
