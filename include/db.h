@@ -16,6 +16,7 @@
 #define DB_ITEM struct item_type
 #define DB_TRIGGER struct trigger_type
 #define DB_ACTION struct action_type
+#define DB_ALERT struct alert_type
 #define DB_FUNCTION struct function_type
 #define DB_MEDIA struct media_type
 
@@ -100,6 +101,18 @@ DB_ACTION
 	char    *message;
 };
 
+DB_ALERT
+{
+	int	alertid;
+	int 	actionid;
+	int 	clock;
+	char	*type;
+	char	*sendto;
+	char	*subject;
+	char	*message;
+	int	status;
+	int	retries;
+};
 
 void    DBconnect( char *dbname, char *dbuser, char *dbpassword, char *dbsocket);
 void    DBclose(void);
@@ -119,6 +132,6 @@ int	DBadd_history_str(int itemid, char *value);
 int	DBadd_alarm(int triggerid, int status,int clock);
 int	DBadd_alert(int actionid, char *type, char *sendto, char *subject, char *message);
 int	DBupdate_triggers_status_after_restart(void);
-
+int	DBget_prev_trigger_value(int triggerid);
 
 #endif

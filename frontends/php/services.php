@@ -11,12 +11,12 @@
 	{
 		if($register=="update")
 		{
-			$result=@update_service($serviceid,$name,$triggerid,$linktrigger);
+			$result=@update_service($serviceid,$name,$triggerid,$linktrigger,$algorithm);
 			show_messages($result,"Service updated","Cannot update service");
 		}
 		if($register=="add")
 		{
-			$result=@add_service($name,$triggerid,$linktrigger);
+			$result=@add_service($name,$triggerid,$linktrigger,$algorithm);
 			show_messages($result,"Service added","Cannot add service");
 		}
 		if($register=="add server")
@@ -49,16 +49,12 @@
 <?
 	show_table_header("IT SERVICES");
 
-	echo "<br>";
-
-	show_table_header("SERVICES");
-?>
-<?
 	$now=time();
-	$result=DBselect("select serviceid,name from services order by name");
+	$result=DBselect("select serviceid,name,algorithm from services order by name");
 	echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";
 	echo "<tr>";
 	echo "<td><b>Service</b></td>";
+	echo "<td width=\"20%\"><b>Status calculation</b></td>";
 	echo "<td width=\"10%\"><b>Actions</b></td>";
 	echo "</tr>";
 
@@ -68,6 +64,18 @@
 		echo "<tr bgcolor=#EEEEEE>";
 		$service=get_service_by_serviceid($serviceid);
 		echo "<td><b><a href=\"services.php?serviceid=".$service["serviceid"]."#form\">".$service["name"]."</a></b></td>";
+		if($service["algorithm"] == SERVICE_ALGORITHM_NONE)
+		{
+			echo "<td>none</td>";
+		}
+		else if($service["algorithm"] == SERVICE_ALGORITHM_MAX)
+		{
+			echo "<td>MAX of childs</td>";
+		}
+		else
+		{
+			echo "<td>unknown</td>";
+		}
 		echo "<td><a href=\"services.php?serviceid=".$service["serviceid"]."&register=delete\">Delete</a></td>";
 		echo "</tr>"; 
 		$col++;
@@ -99,6 +107,18 @@
 		else
 		{
 			echo "<td><a href=\"services.php?serviceid=".$row["serviceid"]."#form\">".$row["name"]." [$childs]</a></td>";
+		}
+		if($row["algorithm"] == SERVICE_ALGORITHM_NONE)
+		{
+			echo "<td>none</td>";
+		}
+		else if($row["algorithm"] == SERVICE_ALGORITHM_MAX)
+		{
+			echo "<td>MAX of childs</td>";
+		}
+		else
+		{
+			echo "<td>unknown</td>";
 		}
 		echo "<td><a href=\"services.php?serviceid=".$row["serviceid"]."&register=delete\">Delete</a></td>";
 		echo "</tr>";
@@ -146,9 +166,10 @@
 <?
 	if(isset($serviceid))
 	{
-		$result=DBselect("select serviceid,triggerid,name from services where serviceid=$serviceid");
+		$result=DBselect("select serviceid,triggerid,name,algorithm from services where serviceid=$serviceid");
 		$triggerid=DBget_field($result,0,1);
 		$name=DBget_field($result,0,2);
+		$algorithm=DBget_field($result,0,3);
 	}
 	else
 	{
@@ -170,6 +191,31 @@
 	echo "Name";
 	show_table2_h_delimiter();
 	echo "<input name=\"name\" value=\"$name\" size=32>";
+
+	show_table2_v_delimiter();
+	echo "Status calculation algorithm";
+	show_table2_h_delimiter();
+	$result=DBselect("select triggerid,description from triggers order by description");
+	echo "<select name=\"algorithm\" size=1>";
+	if(isset($algorithm))
+	{
+		if($algorithm == SERVICE_ALGORITHM_NONE)
+		{
+			echo "<OPTION VALUE='0' SELECTED>Do not calculate";
+			echo "<OPTION VALUE='1'>MAX";
+		}
+		if($algorithm == SERVICE_ALGORITHM_MAX)
+		{
+			echo "<OPTION VALUE='1'>Do not calculate";
+			echo "<OPTION VALUE='0' SELECTED>MAX";
+		}
+	}
+	else
+	{
+		echo "<OPTION VALUE='0' SELECTED>Do not calculate";
+		echo "<OPTION VALUE='1'>MAX";
+	}
+	echo "</SELECT>";
 
         show_table2_v_delimiter();
         echo "Link to trigger ?";
@@ -202,6 +248,7 @@
                 }
         }
         echo "</SELECT>";
+
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
 	if(isset($serviceid))

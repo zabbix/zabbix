@@ -35,7 +35,7 @@
 
 <FONT COLOR="#000000">
 <?
-	$sql="select a.alertid,a.clock,a.type,a.sendto,a.subject,a.message,ac.triggerid from alerts a,actions ac where a.actionid=ac.actionid order by a.clock desc $limit";
+	$sql="select a.alertid,a.clock,a.type,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries from alerts a,actions ac where a.actionid=ac.actionid order by a.clock desc $limit";
 	$result=DBselect($sql);
 
 	echo "<CENTER>";
@@ -43,6 +43,7 @@
 	echo "<TR>";
 	echo "<TD WIDTH=\"10%\"><b>Time</b></TD>";
 	echo "<TD WIDTH=\"5%\"><b>Type</b></TD>";
+	echo "<TD WIDTH=\"5%\"><b>Status</b></TD>";
 	echo "<TD WIDTH=\"15%\"><b>Send to</b></TD>";
 	echo "<TD><b>Subject</b></TD>";
 	echo "<TD><b>Message</b></TD>";
@@ -67,9 +68,29 @@
 		{
 			echo "<TD>Unknown media type</TD>";
 		}
+		if($row["status"] == 1)
+		{
+			echo "<TD><font color=\"00AA00\">sent</font></TD>";
+		}
+		else
+		{
+			echo "<TD><font color=\"AA0000\">not sent</font></TD>";
+		}
 		echo "<TD>".$row["sendto"]."</TD>";
 		echo "<TD>".$row["subject"]."</TD>";
-		echo "<TD>".$row["message"]."</TD>";
+		echo "<TD>";
+		for($i=0;$i<strlen($row["message"]);$i++)
+		{
+			if($row["message"][$i]=="\n")
+			{
+				echo "<br>";
+			}
+			else
+			{
+				echo $row["message"][$i];
+			}
+		}
+		echo "</TD>";
 		echo "</TR>";
 	}
 	echo "</TABLE>";

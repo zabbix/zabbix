@@ -224,6 +224,59 @@ int     DBget_function_result(float *result,char *functionid)
 }
 
 /* SUCCEED if latest alarm with triggerid has this status */
+int	DBget_prev_trigger_value(int triggerid)
+{
+	char	sql[MAX_STRING_LEN+1];
+	int	clock;
+	int	value;
+
+	DB_RESULT	*result;
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_prev_trigger_value()");
+
+	sprintf(sql,"select max(clock) from alarms where triggerid=%d",triggerid);
+	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
+	result = DBselect(sql);
+
+	if(DBis_empty(result) == SUCCEED)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
+		DBfree_result(result);
+		return TRIGGER_VALUE_UNKNOWN;
+	}
+	clock=atoi(DBget_field(result,0,0));
+	DBfree_result(result);
+
+	sprintf(sql,"select max(clock) from alarms where triggerid=%d and clock<%d",triggerid,clock);
+	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
+	result = DBselect(sql);
+
+	if(DBis_empty(result) == SUCCEED)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
+		DBfree_result(result);
+		return TRIGGER_VALUE_UNKNOWN;
+	}
+	clock=atoi(DBget_field(result,0,0));
+	DBfree_result(result);
+
+	sprintf(sql,"select value from alarms where triggerid=%d and clock=%d",triggerid,clock);
+	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
+	result = DBselect(sql);
+
+	if(DBis_empty(result) == SUCCEED)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Result of [%s] is empty", sql );
+		DBfree_result(result);
+		return TRIGGER_VALUE_UNKNOWN;
+	}
+	value=atoi(DBget_field(result,0,0));
+	DBfree_result(result);
+
+	return value;
+}
+
+/* SUCCEED if latest alarm with triggerid has this status */
 int	latest_alarm(int triggerid, int status)
 {
 	char	sql[MAX_STRING_LEN+1];
@@ -235,12 +288,12 @@ int	latest_alarm(int triggerid, int status)
 	zabbix_log(LOG_LEVEL_DEBUG,"In latest_alarm()");
 
 	sprintf(sql,"select max(clock) from alarms where triggerid=%d",triggerid);
-		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
+	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
 	if(DBis_empty(result) == SUCCEED)
         {
-                zabbix_log(LOG_LEVEL_DEBUG, "Result for MIN is empty" );
+                zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
                 ret = FAIL;
         }
 	else
@@ -509,7 +562,7 @@ int	DBadd_alert(int actionid, char *type, char *sendto, char *subject, char *mes
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_alert()");
 
 	now = time(NULL);
-	sprintf(sql,"insert into alerts (alertid,actionid,clock,type,sendto,subject,message) values (NULL,%d,%d,'%s','%s','%s','%s')",actionid,now,type,sendto,subject,message);
+	sprintf(sql,"insert into alerts (alertid,actionid,clock,type,sendto,subject,message,status,retries) values (NULL,%d,%d,'%s','%s','%s','%s',0,0)",actionid,now,type,sendto,subject,message);
 	DBexecute(sql);
 
 	return SUCCEED;

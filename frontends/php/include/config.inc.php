@@ -1,4 +1,5 @@
 <?
+	include 	"include/defines.inc.php";
 	include 	"include/db.inc.php";
 
 	$USER_DETAILS	="";
@@ -1289,28 +1290,28 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return DBexecute($sql);
 	}
 
-	function	update_service($serviceid,$name,$triggerid,$linktrigger)
+	function	update_service($serviceid,$name,$triggerid,$linktrigger,$algorithm)
 	{
 		if( isset($linktrigger)&&($linktrigger=="on") )
 		{
-			$sql="update services set name='$name',triggerid=$triggerid,status=0 where serviceid=$serviceid";
+			$sql="update services set name='$name',triggerid=$triggerid,status=0,algorithm=$algorithm where serviceid=$serviceid";
 		}
 		else
 		{
-			$sql="update services set name='$name',triggerid=NULL,status=0 where serviceid=$serviceid";
+			$sql="update services set name='$name',triggerid=NULL,status=0,algorithm=$algorithm where serviceid=$serviceid";
 		}
 		return	DBexecute($sql);
 	}
 
-	function	add_service($name,$triggerid,$linktrigger)
+	function	add_service($name,$triggerid,$linktrigger,$algorithm)
 	{
 		if( isset($linktrigger)&&($linktrigger=="on") )
 		{
-			$sql="insert into services (serviceid,name,triggerid,status) values (NULL,'$name',$triggerid,0)";
+			$sql="insert into services (serviceid,name,triggerid,status,algorithm) values (NULL,'$name',$triggerid,0,$algorithm)";
 		}
 		else
 		{
-			$sql="insert into services (serviceid,name,status) values (NULL,'$name',0)";
+			$sql="insert into services (serviceid,name,status,algorithm) values (NULL,'$name',0,$algorithm)";
 		}
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"services","serviceid");
