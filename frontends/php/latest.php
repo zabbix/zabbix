@@ -333,6 +333,7 @@
 				echo "<td align=center>Compare</td>";
 			}
 			echo "</tr>";
+			cr();
 		}
 		echo "</table>";
 		show_table_header_end();

@@ -1,5 +1,11 @@
 Changes for 1.0beta9:
 
+ - added EOL character to make HTML source more readable (Alexei)
+ - added new column "severity" to history of alarms (Alexei)
+ - status of triggers. If Select is used, no refresh (Alexei)
+ - support for MIN algorithm for IT Services (Alexei)
+ - support for timeticks for SNMP values. Thanks to Daniel
+ Ester. (Alexei)
  - fixed pinger.pl (Alexei)
  - user-defined parameters will overwrite already existing
  (Alexei)

@@ -111,6 +111,7 @@
 //		}
 		echo "</TD>";
 		echo "</TR>";
+		cr();
 	}
 	echo "</TABLE>";
 ?>

@@ -37,7 +37,8 @@
 		echo "<td>".date("m.d.Y H:i:s",$row["nextcheck"])."</td>";
 		echo "<td>".$row["host"]."</td>";
 		echo "<td>".$row["description"]."</td>";
-		echo "</tr>"; 
+		echo "</tr>";
+		cr();
 	}
 	echo "</table>";
 ?>

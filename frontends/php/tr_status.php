@@ -42,7 +42,7 @@
 ?>
 <?php
 	$refresh=10;
-	if(!isset($HTTP_GET_VARS["onlytrue"]))
+	if(!isset($HTTP_GET_VARS["onlytrue"])||isset($HTTP_GET_VARS["txt_select"]))
 	{
 		$refresh=0;
 	}
@@ -467,6 +467,7 @@
 			echo "<TD ALIGN=CENTER><A HREF=\"tr_comments.php?triggerid=".$row["triggerid"]."\">Add</a></TD>";
 		}
 		if($row["value"] == 0)	echo "</TR>\n";
+		cr();
 	}
 	echo "</TABLE>";
 
