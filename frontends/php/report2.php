@@ -32,6 +32,10 @@
 	$col=0;
 	while($row=DBfetch($result))
 	{
+		if(!check_right_on_trigger("R",$row["triggerid"])) 
+		{
+			continue;
+		}
 		if($lasthost!=$row["host"])
 		{
 			if($lasthost!="")
