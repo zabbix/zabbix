@@ -1,5 +1,6 @@
 1.0:
 
+ - apply Fabricio patches
  - get rid of .0000000 in alert messages
  - add SNMP-based template
  - fix all reported bugs
