@@ -30,7 +30,7 @@ dnl Checks for programs.
 AC_PROG_CC
 
 dnl Checks for libraries.
-AC_CHECK_LIB(crypto, main)
+dnl Check for crypto moved under SNMP
 dnl Why I had -lsnmp before ???
 dnl AC_CHECK_LIB(snmp, main, LIBS="-lsnmp $LIBS")
 dnl Required for AIX when -lsnmp is used
@@ -520,7 +520,9 @@ AC_ARG_WITH(pgsql,
    	fi
     PGSQL_INCLUDE=-I$PGSQL_INCDIR
     PGSQL_LFLAGS="-L$PGSQL_LIBDIR -lpq"
-    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt, LIBS="-lcrypt $LIBS"))
+dnl To avoid linking of crypt with the agent
+dnl    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt, LIBS="-lcrypt $LIBS"))
+    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  PGSQL_LFLAGS="-lcrypt $PGSQL_LFLAGS"))
 
     AC_DEFINE(HAVE_PGSQL)
     AC_MSG_RESULT(yes)
@@ -576,8 +578,12 @@ What SNMP package do you want to use (please select only one):
     		AC_MSG_ERROR(Invalid NET-SNMP directory - unable to find net-snmp-includes.h under $withval)
 		fi
    	fi
+
+    AC_CHECK_LIB(crypto, main,  SNMP_LFLAGS="-lcrypto $SNMP_LFLAGS")
+
     SNMP_INCLUDE=-I$SNMP_INCDIR
-    SNMP_LFLAGS="-L$SNMP_LIBDIR -lnetsnmp"
+    SNMP_LFLAGS="-L$SNMP_LIBDIR -lnetsnmp $SNMP_LFLAGS"
+
 
     AC_DEFINE(HAVE_NETSNMP)
     AC_DEFINE(HAVE_SNMP)
@@ -632,8 +638,10 @@ AC_ARG_WITH(ucd-snmp,
     		AC_MSG_ERROR(Invalid UCD-SNMP directory - unable to find ucd-snmp-config.h under $withval)
 		fi
    	fi
+    AC_CHECK_LIB(crypto, main,  SNMP_LFLAGS="-lcrypto $SNMP_LFLAGS")
+
     SNMP_INCLUDE=-I$SNMP_INCDIR
-    SNMP_LFLAGS="-L$SNMP_LIBDIR -lsnmp"
+    SNMP_LFLAGS="-L$SNMP_LIBDIR -lsnmp $SNMP_LFLAGS"
 
     AC_DEFINE(HAVE_UCDSNMP)
     AC_DEFINE(HAVE_SNMP)
