@@ -322,11 +322,11 @@ int get_minnextcheck(void)
 	char		c[1024];
 
 	DB_RESULT	*result;
-	char		*field;
 
 	int		res;
+	int		count;
 
-	sprintf(c,"select min(nextcheck) from items i,hosts h where i.status=0 and h.status=0 and h.hostid=i.hostid and i.status=0 and i.itemid%%%d=%d",SUCKER_FORKS,sucker_num);
+	sprintf(c,"select count(*),min(nextcheck) from items i,hosts h where i.status=0 and h.status=0 and h.hostid=i.hostid and i.status=0 and i.itemid%%%d=%d",SUCKER_FORKS,sucker_num);
 	result = DBselect(c);
 
 	if(result==NULL)
@@ -338,21 +338,22 @@ int get_minnextcheck(void)
 
 	if(DBnum_rows(result)==0)
 	{
-		syslog( LOG_DEBUG, "No items to update for minnextcheck.");
+		syslog( LOG_DEBUG, "Num_rows is 0.");
 		DBfree_result(result);
 		return	FAIL;
 	}
 
-	field = DBget_field(result,0,0);
-	if( field == NULL )
+	count = atoi(DBget_field(result,0,0));
+	res = atoi(DBget_field(result,0,0));
+
+	if( count == 0 )
 	{
+		syslog( LOG_DEBUG, "No records for get_minnextcheck");
 		DBfree_result(result);
 		return	FAIL;
 	}
 
-	res=atoi(field);
 	DBfree_result(result);
-
 	return	res;
 }
 
