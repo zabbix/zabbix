@@ -3964,31 +3964,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		global $USER_DETAILS;
 
-		echo "<p>";
-
-		echo "<table border=0 cellpadding=1 cellspacing=0 width=100% align=center>";
-		echo "<tr>";
-		echo "<td bgcolor=\"#000000\">";
-		echo "<table border=\"0\" cellspacing=\"0\" cellpadding=\"1\" width=100% bgcolor=\"#666666\">";
-		echo "<tr><td align=center>";
-		echo "<a href=\"http://www.zabbix.com\">".S_ZABBIX_VER."</a>&nbsp;".S_COPYRIGHT_BY."<a href=\"mailto:alex@gobbo.caves.lv\">".S_ALEXEI_VLADISHEV."</a>";
-		echo "</td>";
-		echo "<td align=right width=15%>";
-		echo "| ".S_CONNECTED_AS."&nbsp;".$USER_DETAILS["alias"];
-		echo "</td>";
-		echo "</tr>";
-		echo "</table>";
-		echo "</td>";
-		echo "</tr>";
-		echo "</table>";
-
-		echo "</p>";
 ?>
 	<p>
-	<table border=1 width=100% bgcolor="#000000" cellpadding=0 cellspacing=0>
+	<table class="menu" width="100%" cellspacing=0 cellpadding=5>
 	<tr>
-	<td class="horizontal_menu" height=24><b><a href="http://www.zabbix.com/index.php" class="highlight">ZABBIX 1.1alpha1 Copyright 2001-2004 by Alexei Vladishev</a></b></td>
-	<td class="horizontal_menu" height=24><b><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="http://www.zabbix.com/news.php" class="highlight">Connected as guest</a></b></td>
+	<td class="horizontal_menu" height=24 colspan=9 align=center><b><?php echo "<a href=\"http://www.zabbix.com\" class=\"highlight\">".S_ZABBIX_VER."</a>&nbsp;".S_COPYRIGHT_BY."<a href=\"mailto:alex@gobbo.caves.lv\" class=\"highlight\">".S_ALEXEI_VLADISHEV."</a>"; ?></b></td>
+	<td class="horizontal_menu" height=24 colspan=9 align=right><b><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><?php echo " ".S_CONNECTED_AS."&nbsp;".$USER_DETAILS["alias"];?></b></td>
 	</tr>
 	</table>
 	</p>
