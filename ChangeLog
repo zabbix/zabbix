@@ -15,6 +15,9 @@ Not ready yet:
 
 Changes for 1.0beta4:
 
+ - fixed check for SNMP library in configure.in (Alexei)
+ - template host set to empty in Host definition form (Alexei)
+ - changes in the Manual (Alexei)
  - support for DisableHousekeeping for zabbix_suckerd (Alexei)
  - protection from items.delay set to 0 (Alexei)
  - values provided by an agent can be less than zero (Alexei)
