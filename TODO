@@ -21,6 +21,7 @@ HIGH PRIORITY:
  - IT Helpdesk
  - SNMP trapping
  - personalisation (refresh rate, graph size, default graph period, etc)
+ - BUG. When W2000 with SNMP agent restarted, items will becomes Not Supported
 
 REGISTERED BUGS:
 
