@@ -42,6 +42,7 @@ int zabbix_open_log(int type,int level, const char *filename)
 		}
 		log_type = LOG_TYPE_FILE;
 		strncpy(log_filename,filename,MAX_STRING_LEN);
+		fclose(log_file);
 	}
 	else
 	{
@@ -85,8 +86,14 @@ void zabbix_log(int level, const char *fmt, ...)
 		vsprintf(str,fmt,ap);
 		strncat(str,"\n",MAX_STRING_LEN);
 		strncat(str2,str,MAX_STRING_LEN);
+
+		log_file = fopen(log_filename,"a+");
+		if(log_file == NULL)
+		{
+			return;
+		}
 		fprintf(log_file,"%s",str2);
-		fflush(log_file);
+		fclose(log_file);
 		va_end(ap);
 
 
@@ -94,15 +101,9 @@ void zabbix_log(int level, const char *fmt, ...)
 		{
 			if(buf.st_size>1024*1024)
 			{
-				fclose(log_file);
 				strncpy(filename_old,log_filename,MAX_STRING_LEN);
 				strcat(filename_old,".old");
 				if(rename(log_filename,filename_old) != 0)
-				{
-/*					exit(1);*/
-				}
-				log_file = fopen(log_filename,"a+");
-				if(log_file == NULL)
 				{
 /*					exit(1);*/
 				}
