@@ -1,5 +1,6 @@
 Changes for 1.0beta14:
 
+ - changed css.css to follow W3C standard (Alexei)
  - changed DB schema. Dropped foreign key for table actions (Alexei)
  - fixed handling of special chars in adding from templates (Alexei)
  - fixed output of special characters in maps (Alexei)
