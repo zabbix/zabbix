@@ -53,6 +53,27 @@ TELECENTRS:
 
 OTHER:
 
+Escalation:
+* Nabor pravil izmenenija prioriteta triggera/... s techeniem vremeni.
+* Nabor pravil ustanavlivaetsja na sled.urovnjah: sistema, host, user,
+trigger.
+* Prioritetnostj nabrov pravil (naprimer)v porjadke ubivanija: user,
+trigger, host, sistema.
+* Nabor pravil ustanavlivaetsja dlja kazhdogo 'severity' otdeljno,
+** prichem trigger sleduet svoemu naboru v zavisimosti ot ego originaljnogo
+'severity'.
+
+! * Ponjatie: urovenj eskalacii - skoljkim urovnjam admin.ierarhii
+proishodit posil alerta - vishe originaljnogo.
+
+Variant pravil:
+* povtor alerta - zaderzhka vo vremeni: PA - proishodit povtor posilki
+alerta ispoljzuja tekuschee znachenie 'severity' i urovnja ;
+* izmenenie severity - zadaem kolichestvo PA, cherez kotoroe Severity++;
+** samo soboi vishe Disaster ne stanet :)
+* izmenenie urovnja eskalacii:  zadaem kolichestvo PA, cherez kotoroe
+urovenj eskalacii++;
+
 >  Atradu liekas, ka vienu bug: tad, ja updeito Host statusu zem Host, tad trigeris par "Host unreachable" pazuud, jo ir statusaa "unknown", bet pie alarms neparaadas
 >, ka tas buutu mainijis savu statusu.
 
