@@ -775,7 +775,7 @@
 		echo "<input class=\"biginput\" type=\"password\" name=\"password\" value=\"\" size=20>";
 
 		show_table2_v_delimiter2();
-		echo "<input class=\"button\" class=\"button\" type=\"submit\" name=\"register\" value=\"Enter\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Enter\">";
 		show_table2_header_end();
 	}
 
