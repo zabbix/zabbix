@@ -1973,7 +1973,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
-			$serviceid2=add_service($serviceid,$row["description"],$row["triggerid"],"on",0,"off",99);
+			$serviceid2=add_service($serviceid,$row["description"],$row["triggerid"],"on",0,"off",99,0);
 //			add_service_link($serviceid2,$serviceid,0);
 		}
 		return	1;
