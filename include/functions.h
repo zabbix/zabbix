@@ -3,7 +3,7 @@
 
 #include "db.h"
 
-void    update_triggers (int suckers, int flag,int sucker_num,int lastclock);
+void    update_triggers (int itemid);
 int	get_lastvalue(char *value,char *host,char *key,char *function,char *parameter);
 int	process_data(int sockfd,char *server,char *key, char *value);
 void	process_new_value(DB_ITEM *item,char *value);
