@@ -5,7 +5,6 @@
  - finish src/zabbix_snmptrapper
  - fix PostgreSQL schema
  - improve screens (add maps, all in one table, etc)
- - show last value in graphs
 
  - links to Zabbix frontend in alert emails
  - user groups
