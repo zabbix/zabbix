@@ -28,6 +28,27 @@
 #include "db.h"
 #include "log.h"
 
+/* Convert string to double. This function supports prefixes 'K', 'M', 'G' */
+double	str2double(char *str)
+{
+	if(str[strlen(str)-1] == 'K')
+	{
+		str[strlen(str)-1] = 0;
+		return (double)1024*atof(str);
+	}
+	else if(str[strlen(str)-1] == 'M')
+	{
+		str[strlen(str)-1] = 0;
+		return (double)1024*1024*atof(str);
+	}
+	else if(str[strlen(str)-1] == 'G')
+	{
+		str[strlen(str)-1] = 0;
+		return (double)1024*1024*1024*atof(str);
+	}
+	return atof(str);
+}
+
 /*
  * Return 0 if arguments are equal (differs less than 0.000001), 1 - otherwise
  */
@@ -41,8 +62,9 @@ int	cmp_double(double a,double b)
 }
 
 /*
- * Return SUCCEED if parameter has format X.X or X, where X is [0..9]{1,n}
+ * Return SUCCEED if parameter has format X.X<prefix> or X, where X is [0..9]{1,n}
  * In other words, parameter is float number :)
+ * Prefix: K,M,G (kilo, mega, giga)
  */
 int	is_double(char *c)
 {
@@ -50,7 +72,6 @@ int	is_double(char *c)
 	int dot=-1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Starting is_double:[%s]", c );
-/*	for(i=0;i<(int)strlen(c);i++)*/
 	for(i=0;c[i]!=0;i++)
 	{
 		if((c[i]>='0')&&(c[i]<='9'))
@@ -66,6 +87,11 @@ int	is_double(char *c)
 			{
 				continue;
 			}
+		}
+		/* Last digit is prefix 'K', 'M', 'G' */
+		if( ((c[i]=='K')||(c[i]=='M')||(c[i]=='M')) && (i == (int)strlen(c)-1))
+		{
+			continue;
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "It is NOT double" );
@@ -130,7 +156,9 @@ int	evaluate_simple (double *result,char *exp)
 
 	if( is_double(exp) == SUCCEED )
 	{
-		*result=atof(exp);
+/*		*result=atof(exp);*/
+/* str2double support prefixes */
+		*result=str2double(exp);
 		return SUCCEED;
 	}
 
