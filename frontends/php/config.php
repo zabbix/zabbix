@@ -80,12 +80,12 @@
 
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"config.php\">";
-	echo "Do not keep alerts older than (in days)";
+	echo nbsp("Do not keep alerts older than (in days)");
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"alert_history\" value=\"".$config["alert_history"]."\" size=8>";
 
 	show_table2_v_delimiter();
-	echo "Do not keep alarms older than (in days)";
+	echo nbsp("Do not keep alarms older than (in days)");
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"alarm_history\" value=\"".$config["alarm_history"]."\" size=8>";
 
@@ -194,17 +194,17 @@
 		echo "<input class=\"biginput\" name=\"exec_path\" type=\"hidden\" value=\"$exec_path\">";
 
 		show_table2_v_delimiter();
-		echo "SMTP server";
+		echo nbsp("SMTP server");
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"smtp_server\" value=\"".$smtp_server."\" size=30>";
 
 		show_table2_v_delimiter();
-		echo "SMTP helo";
+		echo nbsp("SMTP helo");
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"smtp_helo\" value=\"".$smtp_helo."\" size=30>";
 
 		show_table2_v_delimiter();
-		echo "SMTP email";
+		echo nbsp("SMTP email");
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"smtp_email\" value=\"".$smtp_email."\" size=30>";
 	}

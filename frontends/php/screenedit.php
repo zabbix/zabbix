@@ -153,7 +153,7 @@
 			if($resource == 0)
 			{
 				show_table2_v_delimiter();
-				echo "Graph name";
+				echo nbsp("Graph name");
 				show_table2_h_delimiter();
 				$result=DBselect("select h.host,i.description,i.itemid from hosts h,items i where h.hostid=i.hostid and h.status in (0,2) and i.status=0 order by h.host,i.description");
 				echo "<select name=\"itemid\" size=1>";
@@ -175,7 +175,7 @@
 			if($resource == 1)
 			{
 				show_table2_v_delimiter();
-				echo "Graph name";
+				echo nbsp("Graph name");
 				show_table2_h_delimiter();
 				$result=DBselect("select graphid,name from graphs order by name");
 				echo "<select name=\"graphid\" size=1>";

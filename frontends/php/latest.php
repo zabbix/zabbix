@@ -320,14 +320,14 @@
 				if($row["lastvalue"]-$row["prevvalue"]<0)
 				{
 					$str=convert_units($row["lastvalue"]-$row["prevvalue"],$row["units"],$row["multiplier"]);
-					$str=str_replace(" ","&nbsp;",$str);
+					$str=nbsp($str);
 					echo "<td>$str</td>";
 //					printf("<td>%0.2f</td>",$row["lastvalue"]-$row["prevvalue"]);
 				}
 				else
 				{
 					$str="+".convert_units($row["lastvalue"]-$row["prevvalue"],$row["units"],$row["multiplier"]);
-					$str=str_replace(" ","&nbsp;",$str);
+					$str=nbsp($str);
 					echo "<td>$str</td>";
 //					printf("<td>+%0.2f</td>",$row["lastvalue"]-$row["prevvalue"]);
 				}

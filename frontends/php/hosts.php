@@ -278,12 +278,12 @@
 	echo "</select>";
 
 	show_table2_v_delimiter();
-	echo "New group";
+	echo nbsp("New group");
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"newgroup\" size=20 value=\"$newgroup\">";
 
 	show_table2_v_delimiter();
-	echo "Use IP address";
+	echo nbsp("Use IP address");
 	show_table2_h_delimiter();
 	echo "<INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"useip\" $useip onChange=\"submit()\">";
 
@@ -329,7 +329,7 @@
 	echo "</select>";
 
 	show_table2_v_delimiter();
-	echo "Use the host as a template";
+	echo nbsp("Use the host as a template");
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"host_templateid\" size=\"1\">";
 	echo "<option value=\"0\" selected>...";
