@@ -903,6 +903,7 @@ double	PROCCNT(const char * procname)
 
 			if(sscanf(line,"%s\t%s\n",name1,name2)==2)
                         {
+				/* For Linux only */
                                 if(strcmp(name1,"Name:") == 0)
                                 {
                                         if(strcmp(procname,name2)==0)
@@ -910,11 +911,16 @@ double	PROCCNT(const char * procname)
                                                 proccount++;
                                         }
                                 }
-                                else
+				/* Assuming that this is FreeBSD. First field is process name */
+				else if(strcmp(procname,name1)==0)
+				{
+					proccount++;
+				}
+/*                                else
                                 {
                                         closedir(dir);
                                         return  FAIL;
-                                }
+                                }*/
                         }
                         else
                         {

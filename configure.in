@@ -675,9 +675,9 @@ AC_OUTPUT(Makefile src/zabbix_sender/Makefile src/zabbix_agent/Makefile\
 
 echo
 echo "***********************************************************"
-echo "*            Now run make                                 *"
+echo "*            Now run 'make'                               *"
 echo "*                                                         *"
 echo "*            Thank you for using Zabbix!                  *"
-echo "*          <http://www.zabbix.org>                        *"
+echo "*              <http://www.zabbix.org>                    *"
 echo "***********************************************************"
 echo
