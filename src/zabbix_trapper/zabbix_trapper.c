@@ -24,6 +24,7 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
+#include "cfg.h"
 #include "functions.h"
 
 int	CONFIG_TIMEOUT		= TRAPPER_TIMEOUT;
@@ -50,7 +51,30 @@ void	signal_handler( int sig )
 	exit( FAIL );
 }
 
+void    init_config(void)
+{
+        static struct cfg_line cfg[]=
+        {
+/*               PARAMETER      ,VAR    ,FUNC,  TYPE(0i,1s),MANDATORY,MIN,MAX
+*/
+                {"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
+                {"DebugLevel",&CONFIG_LOG_LEVEL,0,TYPE_INT,PARM_OPT,1,3},
+                {"LogFile",&CONFIG_LOG_FILE,0,TYPE_STRING,PARM_OPT,0,0},
+                {"DBName",&CONFIG_DBNAME,0,TYPE_STRING,PARM_MAND,0,0},
+                {"DBUser",&CONFIG_DBUSER,0,TYPE_STRING,PARM_OPT,0,0},
+                {"DBPassword",&CONFIG_DBPASSWORD,0,TYPE_STRING,PARM_OPT,0,0},
+                {"DBSocket",&CONFIG_DBSOCKET,0,TYPE_STRING,PARM_OPT,0,0},
+                {0}
+	};
+	parse_cfg_file("/etc/zabbix/zabbix_trapper.conf",cfg);
 
+	if(CONFIG_DBNAME == NULL)
+	{
+		zabbix_log( LOG_LEVEL_CRIT, "DBName not in config file");
+		exit(1);
+	}
+}
+      
 void	process_config_file(void)
 {
 	FILE	*file;
@@ -185,7 +209,8 @@ int	main()
 		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
 	}
 
-	process_config_file();
+/*	process_config_file();*/
+	init_config();
 	
 	fgets(s,MAX_STRING_LEN,stdin);
 	for( p=s+strlen(s)-1; p>s && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );

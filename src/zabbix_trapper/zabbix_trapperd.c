@@ -27,6 +27,7 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
+#include "cfg.h"
 #include "functions.h"
 
 #define	LISTENQ 1024
@@ -39,6 +40,7 @@ int	CONFIG_TRAPPERD_FORKS		= TRAPPERD_FORKS;
 int	CONFIG_LISTEN_PORT		= 10001;
 int	CONFIG_TIMEOUT			= TRAPPER_TIMEOUT;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
+int	CONFIG_NOTIMEWAIT		= 0;
 char	*CONFIG_PID_FILE		= NULL;
 char	*CONFIG_LOG_FILE		= NULL;
 char	*CONFIG_DBNAME			= NULL;
@@ -118,6 +120,38 @@ void	signal_handler( int sig )
 	else
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Got signal [%d]. Ignoring ...", sig);
+	}
+}
+
+void    init_config(void)
+{
+	static struct cfg_line cfg[]=
+	{
+/*               PARAMETER      ,VAR    ,FUNC,  TYPE(0i,1s),MANDATORY,MIN,MAX
+*/
+		{"StartTrappers",&CONFIG_TRAPPERD_FORKS,0,TYPE_INT,PARM_OPT,2,255},
+		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
+		{"ListenPort",&CONFIG_LISTEN_PORT,0,TYPE_INT,PARM_OPT,1024,32768},
+		{"DebugLevel",&CONFIG_LOG_LEVEL,0,TYPE_INT,PARM_OPT,1,3},
+		{"PidFile",&CONFIG_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
+		{"LogFile",&CONFIG_LOG_FILE,0,TYPE_STRING,PARM_OPT,0,0},
+		{"DBName",&CONFIG_DBNAME,0,TYPE_STRING,PARM_MAND,0,0},
+		{"DBUser",&CONFIG_DBUSER,0,TYPE_STRING,PARM_OPT,0,0},
+		{"DBPassword",&CONFIG_DBPASSWORD,0,TYPE_STRING,PARM_OPT,0,0},
+		{"DBSocket",&CONFIG_DBSOCKET,0,TYPE_STRING,PARM_OPT,0,0},
+		{"NoTimeWait",&CONFIG_NOTIMEWAIT,0,TYPE_INT,PARM_OPT,0,1},
+		{0}
+	};
+
+	parse_cfg_file("/etc/zabbix/zabbix_trapperd.conf",cfg);
+	if(CONFIG_DBNAME == NULL)
+	{
+		zabbix_log( LOG_LEVEL_CRIT, "DBName not in config file");
+		exit(1);
+	}
+	if(CONFIG_PID_FILE == NULL)
+	{
+		CONFIG_PID_FILE=strdup("/tmp/zabbix_trapperd.pid");
 	}
 }
 
@@ -412,11 +446,22 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 {
 	int	sockfd;
 	struct	sockaddr_in      serv_addr;
+	struct linger ling;
 
 	if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
 		zabbix_log( LOG_LEVEL_CRIT, "Cannot create socket");
 		exit(1);
+	}
+
+	if(CONFIG_NOTIMEWAIT == 1)
+	{
+		ling.l_onoff=1;
+		ling.l_linger=0;
+		if(setsockopt(sockfd,SOL_SOCKET,SO_LINGER,&ling,sizeof(ling))==-1)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot setsockopt SO_LINGER [%s]", strerror(errno));
+		}
 	}
 
 	bzero((char *) &serv_addr, sizeof(serv_addr));
@@ -498,7 +543,8 @@ int	main()
 
 	daemon_init();
 
-	process_config_file();
+/*	process_config_file(); */
+	init_config();
 
 	if(CONFIG_LOG_FILE == NULL)
 	{

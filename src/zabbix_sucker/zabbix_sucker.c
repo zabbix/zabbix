@@ -39,6 +39,7 @@
 static	pid_t	*pids=NULL;
 
 static	int	sucker_num=0;
+
 static	int	CONFIG_SUCKERD_FORKS		=SUCKER_FORKS;
 static	int	CONFIG_NOTIMEWAIT		=0;
 static	int	CONFIG_TIMEOUT			=SUCKER_TIMEOUT;
@@ -166,7 +167,7 @@ void	create_pid_file(void)
 	f = fopen(CONFIG_PID_FILE, "r");
 	if(f != NULL)
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "File [%s] exists. Is zabbix_agentd already running ?",
+		zabbix_log( LOG_LEVEL_CRIT, "File [%s] exists. Is zabbix_suckerd already running ?",
 			CONFIG_PID_FILE);
 		if(fclose(f) != 0)
 		{
@@ -206,163 +207,14 @@ void	init_config(void)
 		{"DebugLevel",&CONFIG_LOG_LEVEL,0,TYPE_INT,PARM_OPT,1,3},
 		{"PidFile",&CONFIG_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"LogFile",&CONFIG_LOG_FILE,0,TYPE_STRING,PARM_OPT,0,0},
-		{"DBName",&CONFIG_DBNAME,0,TYPE_STRING,PARM_OPT,0,0},
+		{"DBName",&CONFIG_DBNAME,0,TYPE_STRING,PARM_MAND,0,0},
 		{"DBUser",&CONFIG_DBUSER,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBPassword",&CONFIG_DBPASSWORD,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBSocket",&CONFIG_DBSOCKET,0,TYPE_STRING,PARM_OPT,0,0},
 		{0}
 	};
+
 	parse_cfg_file("/etc/zabbix/zabbix_suckerd.conf",cfg);
-	printf("CONFIG_PID_FILE [%s]\n",CONFIG_PID_FILE);
-/*	zabbix_log( LOG_LEVEL_WARNING, "PidFile [%d]", CONFIG_PID_FILE);
-	zabbix_log( LOG_LEVEL_WARNING, "PidFile [%d]", &CONFIG_PID_FILE);
-	zabbix_log( LOG_LEVEL_WARNING, "PidFile [%s]", &CONFIG_PID_FILE);*/
-	zabbix_log( LOG_LEVEL_WARNING, "PidFile [%s]", CONFIG_PID_FILE);
-	
-	
-}
-
-void	process_config_file(void)
-{
-	FILE	*file;
-	char	line[1024+1];
-	char	parameter[1024+1];
-	char	*value;
-	int	lineno;
-	int	i;
-
-
-	file=fopen("/etc/zabbix/zabbix_suckerd.conf","r");
-	if(NULL == file)
-	{
-		zabbix_log( LOG_LEVEL_CRIT, "Cannot open /etc/zabbix/zabbix_suckerd.conf");
-		exit(1);
-	}
-
-	lineno=0;
-	while(fgets(line,1024,file) != NULL)
-	{
-		lineno++;
-
-		if(line[0]=='#')	continue;
-		if(strlen(line)==1)	continue;
-
-		strcpy(parameter,line);
-
-		value=strstr(line,"=");
-
-		if(NULL == value)
-		{
-			zabbix_log( LOG_LEVEL_CRIT, "Error in line [%s] Line %d", line, lineno);
-			fclose(file);
-			exit(1);
-		}
-		value++;
-		value[strlen(value)-1]=0;
-
-		parameter[value-line-1]=0;
-
-		zabbix_log( LOG_LEVEL_DEBUG, "Parameter [%s] Value [%s]", parameter, value);
-
-		if(strcmp(parameter,"StartSuckers")==0)
-		{
-			i=atoi(value);
-			if( (i<2) || (i>255) )
-			{
-				zabbix_log( LOG_LEVEL_CRIT, "Wrong value of StartAgents in line %d. Should be between 2 and 255.", lineno);
-				fclose(file);
-				exit(1);
-			}
-			CONFIG_SUCKERD_FORKS=i;
-		}
-		else if(strcmp(parameter,"Timeout")==0)
-		{
-			i=atoi(value);
-			if( (i<1) || (i>30) )
-			{
-				zabbix_log( LOG_LEVEL_CRIT, "Wrong value of Timeout in line %d. Should be between 1 and 30.", lineno);
-				fclose(file);
-				exit(1);
-			}
-			CONFIG_TIMEOUT=i;
-		}
-		else if(strcmp(parameter,"NoTimeWait")==0)
-		{
-			i=atoi(value);
-			if( (i<0) || (i>1) )
-			{
-				zabbix_log( LOG_LEVEL_CRIT, "Wrong value of NoTimeWait in line %d. Should be either 0 or 1", lineno);
-				fclose(file);
-				exit(1);
-			}
-			CONFIG_NOTIMEWAIT=i;
-		}
-		else if(strcmp(parameter,"HousekeepingFrequency")==0)
-		{
-			i=atoi(value);
-			if( (i<1) || (i>24) )
-			{
-				zabbix_log( LOG_LEVEL_CRIT, "Wrong value of HousekeepingFrequency in line %d. Should be between 1 and 24.", lineno);
-				fclose(file);
-				exit(1);
-			}
-			CONFIG_HOUSEKEEPING_FREQUENCY=i;
-		}
-		else if(strcmp(parameter,"DebugLevel")==0)
-		{
-			if(strcmp(value,"1") == 0)
-			{
-				CONFIG_LOG_LEVEL=LOG_LEVEL_CRIT;
-			}
-			else if(strcmp(value,"2") == 0)
-			{
-				CONFIG_LOG_LEVEL=LOG_LEVEL_WARNING;
-			}
-			else if(strcmp(value,"3") == 0)
-			{
-				CONFIG_LOG_LEVEL=LOG_LEVEL_DEBUG;
-			}
-			else
-			{
-				zabbix_log( LOG_LEVEL_CRIT, "Wrong DebugLevel in line %d", lineno);
-				fclose(file);
-				exit(1);
-			}
-		}
-		else if(strcmp(parameter,"PidFile")==0)
-		{
-			CONFIG_PID_FILE=strdup(value);
-		}
-		else if(strcmp(parameter,"LogFile")==0)
-		{
-			CONFIG_LOG_FILE=strdup(value);
-		}
-		else if(strcmp(parameter,"DBName")==0)
-		{
-			CONFIG_DBNAME=strdup(value);
-		}
-		else if(strcmp(parameter,"DBUser")==0)
-		{
-			CONFIG_DBUSER=strdup(value);
-		}
-		else if(strcmp(parameter,"DBPassword")==0)
-		{
-			CONFIG_DBPASSWORD=strdup(value);
-		}
-		else if(strcmp(parameter,"DBSocket")==0)
-		{
-			CONFIG_DBSOCKET=strdup(value);
-		}
-		else
-		{
-			zabbix_log( LOG_LEVEL_CRIT, "Unsupported parameter [%s] Line %d", parameter, lineno);
-			fclose(file);
-			exit(1);
-		}
-	}
-	fclose(file);
-	
-
 
 	if(CONFIG_DBNAME == NULL)
 	{
@@ -729,8 +581,13 @@ int get_values(void)
 
 	now = time(NULL);
 
-	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-1,sucker_num-1);
+#ifdef PERF
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid order by i.nextcheck", now, now);
 
+#else
+
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-1,sucker_num-1);
+#endif
 	result = DBselect(sql);
 
 	rows = DBnum_rows(result);
@@ -744,6 +601,12 @@ int get_values(void)
 	for(i=0;i<rows;i++)
 	{
 		item.itemid=atoi(DBget_field(result,i,0));
+#ifdef PERF
+		if(item.itemid%(CONFIG_SUCKERD_FORKS-1)!=sucker_num-1)
+		{
+			continue;
+		}
+#endif
 		item.key=DBget_field(result,i,1);
 		item.host=DBget_field(result,i,2);
 		item.port=atoi(DBget_field(result,i,3));
