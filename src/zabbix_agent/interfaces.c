@@ -61,7 +61,7 @@
 
 INTERFACE interfaces[MAX_INTERFACE];
 
-void	init_stats()
+void	init_stats_interfaces()
 {
 	FILE	*file;
 	char	*s;
@@ -107,7 +107,7 @@ void	init_stats()
 	fclose(file);
 }
 
-void	report_stats(FILE *file, int now)
+void	report_stats_interfaces(FILE *file, int now)
 {
 	int	time=0,
 		time1=0,
@@ -239,7 +239,7 @@ void	report_stats(FILE *file, int now)
 }
 
 
-void	add_values(int now,char *interface,float value_sent,float value_received)
+void	add_values_interfaces(int now,char *interface,float value_sent,float value_received)
 {
 	int i,j;
 
@@ -281,7 +281,7 @@ void	collect_stats_interfaces(FILE *outfile)
 
 	if( 0 == initialised)
 	{
-		init_stats();
+		init_stats_interfaces();
 		initialised=1;
 	}
 
@@ -326,7 +326,7 @@ void	collect_stats_interfaces(FILE *outfile)
 			{
 /*				printf("Sent [%s]\n",s);*/
 				sent=atof(s);
-				add_values(now,interface,sent,received);
+				add_values_interfaces(now,interface,sent,received);
 			}
 			j++;
 		}
@@ -334,5 +334,5 @@ void	collect_stats_interfaces(FILE *outfile)
 	}
 	fclose(file);
 
-	report_stats(outfile, now);
+	report_stats_interfaces(outfile, now);
 }
