@@ -13,6 +13,8 @@ Hope this helps.
 
 Changes for 1.0beta5:
 
+ - fixed send_email(). According to RFC, DATA should be sent with followed 
+ EOL (Alexei)
  - fixed memory leak in main_alerter_loop(). Added DBfree_result(). (Alexei) 
  - fixed missing close of socket in case if connection to SMTP server
  is rejected (Alexei)
