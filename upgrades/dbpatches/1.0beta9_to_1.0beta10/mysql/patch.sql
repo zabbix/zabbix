@@ -28,18 +28,8 @@ CREATE TABLE stats (
   PRIMARY KEY (itemid,year,month,day,hour)
 ) type=InnoDB;
 
---
--- Table structure for table 'screens_graphs'
---
-
-CREATE TABLE screens_graphs (
-  screengraphid		int(4)		NOT NULL auto_increment,
-  screenid		int(4)		DEFAULT '0' NOT NULL,
-  itemid		int(4)		DEFAULT '0' NOT NULL,
-  width			int(4)		DEFAULT '320' NOT NULL,
-  height		int(4)		DEFAULT '200' NOT NULL,
-  x			int(4)		DEFAULT '0' NOT NULL,
-  y			int(4)		DEFAULT '0' NOT NULL,
-  PRIMARY KEY  (screengraphid)
-) TYPE=InnoDB;
+alter table screens_items add  resource		int(4)	DEFAULT '0' NOT NULL;
+alter table screens_items add  resourceid	int(4)	DEFAULT '0' NOT NULL;
+update screens_items set resourceid=graphid, resource=0;
+alter table screens_items drop graphid;
 

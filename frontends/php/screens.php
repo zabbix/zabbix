@@ -119,28 +119,22 @@
 		{
 			$irow=DBfetch($iresult);
 			$screenitemid=$irow["screenitemid"];
-			$graphid=$irow["graphid"];
-			$width=$irow["width"];
-			$height=$irow["height"];
-		}
-		$sql="select * from screens_graphs where screenid=$screenid and x=$c and y=$r";
-		$iresult=DBSelect($sql);
-		if(DBnum_rows($iresult)>0)
-		{
-			$irow=DBfetch($iresult);
-			$screengraphid=$irow["screengraphid"];
-			$itemid=$irow["itemid"];
+			$resource=$irow["resource"];
+			$resourceid=$irow["resourceid"];
 			$width=$irow["width"];
 			$height=$irow["height"];
 		}
 
-		if($graphid!=0)
+		if($resourceid!=0)
 		{
-			echo "<a href=charts.php?graphid=$graphid><img src='chart2.php?graphid=$graphid&width=$width&height=$height&period=3600&noborder=1' border=0></a>";
-		}
-		if($itemid!=0)
-		{
-			echo "<a href=history.php?action=showhistory&itemid=$itemid><img src='chart.php?itemid=$itemid&width=$width&height=$height&period=3600&noborder=1' border=0></a>";
+			if($resource == 0)
+			{
+				echo "<a href=charts.php?graphid=$resourceid><img src='chart2.php?graphid=$resourceid&width=$width&height=$height&period=3600&noborder=1' border=0></a>";
+			}
+			else if($resource == 1)
+			{
+				echo "<a href=history.php?action=showhistory&itemid=$resourceid><img src='chart.php?itemid=$resourceid&width=$width&height=$height&period=3600&noborder=1' border=0></a>";
+			}
 		}
 		echo "</form>\n";
 		echo "</TD>";

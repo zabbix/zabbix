@@ -34,18 +34,9 @@ CREATE TABLE stats (
   PRIMARY KEY (itemid,year,month,day,hour)
 );
 
---
--- Table structure for table 'screens_graphs'
---
-
-CREATE TABLE screens_graphs (
-  screengraphid		serial,
-  screenid		int4		DEFAULT '0' NOT NULL,
-  itemid		int4		DEFAULT '0' NOT NULL,
-  width			int4		DEFAULT '320' NOT NULL,
-  height		int4		DEFAULT '200' NOT NULL,
-  x			int4		DEFAULT '0' NOT NULL,
-  y			int4		DEFAULT '0' NOT NULL,
-  PRIMARY KEY  (screengraphid)
-);
-
+alter table screens_items add  resourceid       int4;
+alter table screens_items alter resourceid set default '0';
+alter table screens_items add  resource         int4;
+alter table screens_items alter resource set default '0';
+update screens_items set resourceid=graphid, resource=0;
+alter table screens_items drop graphid;
