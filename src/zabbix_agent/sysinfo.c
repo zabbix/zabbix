@@ -131,11 +131,11 @@ void	test_parameters(void)
 		result = function(parameter);
 		if( result == FAIL )
 		{
-			printf("UNSUPPORTED Key: %s\n",key);
+			printf("\tUNSUPPORTED Key: %s\n",key);
 		}
 		else
 		{
-			printf("SUPPORTED Key: %s\n",key);
+			printf("SUPPORTED Key: %s [%f]\n",key,result);
 		}
 
 		i++;
