@@ -158,7 +158,7 @@ COMMAND	commands[AGENT_MAX_USER_COMMANDS]=
 
 	{"check_port[*]"	,CHECK_PORT, 	0, "80"},
 
-	{"check_service[*]"	,CHECK_SERVICE, 	0, "ssh,22"},
+	{"check_service[*]"	,CHECK_SERVICE, 	0, "ssh,127.0.0.1,22"},
 
 	{0}
 	};
@@ -1556,57 +1556,85 @@ float	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose)
 	}
 }
 
-/* Service is either service name or service name plus port */
-/* Example check_service[ssh], check_service[smtp,29]	*/
-float	CHECK_SERVICE(char *service)
+/* Example check_service[ssh], check_service[smtp,29],check_service[ssh,127.0.0.1,22]*/
+/* check_service[ssh,127.0.0.1,ssh] */
+float	CHECK_SERVICE(char *service_and_ip_and_port)
 {
-	char	*c;
+	char	*c,*c1;
 	int	port=0;
-	char	name[MAX_STRING_LEN+1];
+	char	service[MAX_STRING_LEN+1];
+	char	ip[MAX_STRING_LEN+1];
+	char	port_str[MAX_STRING_LEN+1];
 
-	c=strchr(service,',');
-	strncpy(name,service,MAX_STRING_LEN);
+	c=strchr(service_and_ip_and_port,',');
+	strncpy(service,service_and_ip_and_port,MAX_STRING_LEN);
 
 	if(c != NULL)
 	{
-		port=atoi(c+1);
-		name[c-service]=0;
+		strncpy(ip,c+1,MAX_STRING_LEN);
+		service[c-service_and_ip_and_port]=0;
+
+		c1=strchr(ip,',');
+		
+		if(c1!=NULL)
+		{
+			strncpy(port_str,c1+1,MAX_STRING_LEN);
+			ip[c1-ip]=0;
+			port=atoi(port_str);
+		}
+		else
+		{
+			if(strchr(ip,'.')==NULL)
+			{
+				strncpy(port_str,ip,MAX_STRING_LEN);
+				port=atoi(port_str);
+				strcpy(ip,"127.0.0.1");
+			}
+		}
+	}
+	else
+	{
+		strcpy(ip,"127.0.0.1");
 	}
 
-	if(strcmp(name,"ssh") == 0)
+/*	printf("IP:[%s]",ip);
+	printf("Service:[%s]",service);
+	printf("Port:[%d]",port);*/
+
+	if(strcmp(service,"ssh") == 0)
 	{
 		if(port == 0)	port=22;
-		return	tcp_expect("127.0.0.1",port,"SSH","0\n");
+		return	tcp_expect(ip,port,"SSH","0\n");
 	}
-	if(strcmp(name,"smtp") == 0)
+	if(strcmp(service,"smtp") == 0)
 	{
 		if(port == 0)	port=25;
-		return	tcp_expect("127.0.0.1",port,"220","QUIT\n");
+		return	tcp_expect(ip,port,"220","QUIT\n");
 	}
-	if(strcmp(name,"ftp") == 0)
+	if(strcmp(service,"ftp") == 0)
 	{
 		if(port == 0)	port=21;
-		return	tcp_expect("127.0.0.1",port,"220","");
+		return	tcp_expect(ip,port,"220","");
 	}
-	if(strcmp(name,"http") == 0)
+	if(strcmp(service,"http") == 0)
 	{
 		if(port == 0)	port=80;
-		return	tcp_expect("127.0.0.1",port,NULL,"");
+		return	tcp_expect(ip,port,NULL,"");
 	}
-	if(strcmp(name,"pop") == 0)
+	if(strcmp(service,"pop") == 0)
 	{
 		if(port == 0)	port=110;
-		return	tcp_expect("127.0.0.1",port,"+OK","");
+		return	tcp_expect(ip,port,"+OK","");
 	}
-	if(strcmp(name,"nntp") == 0)
+	if(strcmp(service,"nntp") == 0)
 	{
 		if(port == 0)	port=119;
-		return	tcp_expect("127.0.0.1",port,"220","");
+		return	tcp_expect(ip,port,"220","");
 	}
-	if(strcmp(name,"imap") == 0)
+	if(strcmp(service,"imap") == 0)
 	{
 		if(port == 0)	port=143;
-		return	tcp_expect("127.0.0.1",port,"* OK","a1 LOGOUT\n");
+		return	tcp_expect(ip,port,"* OK","a1 LOGOUT\n");
 	}
 
 	return FAIL;

@@ -1,5 +1,6 @@
 Changes for 1.0beta6:
 
+ - added support for check_service(service,ip,port) (Alexei)
  - added support for check_port(ip,port) (Alexei)
  - fixed check_right(). Thanks to Daniel Higgins. (Alexei)
  - more changes to send_email(). Thanks to Daniel Higgins. (Alexei)
