@@ -235,7 +235,9 @@
 
 <?php
 	echo "<br>";
+	insert_usergroups_form($HTTP_GET_VARS["usrgrpid"]);
 
+	echo "<br>";
 	@insert_user_form($HTTP_GET_VARS["userid"]);
 ?>
 
