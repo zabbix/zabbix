@@ -1,5 +1,6 @@
 Changes for 1.0:
 
+ - small fix in latestalarms.php (Alexei)
  - added support for simple check 'tcp,<port>' (Alexei)
  - added template 'Application.MySQL' (Alexei)
  - added button "add items from template" (Alexei)
