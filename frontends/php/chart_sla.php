@@ -72,7 +72,7 @@
 	$false=$stat["false"];
 
 	ImageFilledRectangle($im,$sizeX-$sizeX*$true/100,0,$sizeX,$sizeY,$darkred);
-	ImageString($im, 2,1,1, $true , $darkred);
+	ImageString($im, 2,1,1, "$true | $false" , $darkred);
 	ImagePng($im); 
 	ImageDestroy($im); 
 
