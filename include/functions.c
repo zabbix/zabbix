@@ -470,9 +470,9 @@ void	apply_actions(int triggerid,int good)
 			if(atoi(DBget_field(result,0,0))>0)
 			{
 				zabbix_log( LOG_LEVEL_DEBUG, "Will not apply actions");
+				DBfree_result(result);
+				return;
 			}
-			DBfree_result(result);
-			return;
 		}
 		DBfree_result(result);
 	}
@@ -844,6 +844,7 @@ void	process_new_value(DB_ITEM *item,char *value)
 	char	*e;
 
 
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_new_value()");
 	value_double=strtod(value,&e);
 
 	if(item->history>0)
