@@ -310,27 +310,27 @@
 			}
 			if($row["value_type"]==0)
 			{
-				echo "<td align=center><a href=\"history.php?action=showhistory&itemid=".$row["itemid"]."\">Show</a></td>";
+				echo "<td align=center><a href=\"history.php?action=showhistory&itemid=".$row["itemid"]."\">Graph</a></td>";
 			}
 			else
 			{
-				echo "<td align=center><a href=\"history.php?action=showvalues&period=3600&itemid=".$row["itemid"]."\">Show</a></td>";
+				echo "<td align=center><a href=\"history.php?action=showvalues&period=3600&itemid=".$row["itemid"]."\">Graph</a></td>";
 			}
 			if($row["value_type"]==0)
 			{
-				echo "<td align=center><a href=\"trends.php?itemid=".$row["itemid"]."\">Show</a></td>";
+				echo "<td align=center><a href=\"trends.php?itemid=".$row["itemid"]."\">Trend</a></td>";
 			}
 			else
 			{
-				echo "<td align=center>Show</td>";
+				echo "<td align=center>Trend</td>";
 			}
 			if($row["value_type"]==0)
 			{
-				echo "<td align=center><a href=\"compare.php?itemid=".$row["itemid"]."\">Show</a></td>";
+				echo "<td align=center><a href=\"compare.php?itemid=".$row["itemid"]."\">Compare</a></td>";
 			}
 			else
 			{
-				echo "<td align=center>Show</td>";
+				echo "<td align=center>Compare</td>";
 			}
 			echo "</tr>";
 		}
