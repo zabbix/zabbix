@@ -12,6 +12,8 @@ ZABBIX 1.1:
  - more supported parameters under FreeBSD, HP-UX and Solaris (cpu times, network stats)
  - agent proxy
 
+ - check if trigger related SQL statements contains status=active, dependency does not work
+
 TKOM:
 
  - alarms forwarding to external systems (using SNMP traps, for example)
