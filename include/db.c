@@ -828,13 +828,28 @@ int	DBadd_alert(int actionid, int mediatypeid, char *sendto, char *subject, char
 
 void	DBvacuum(void)
 {
+
 #ifdef	HAVE_PGSQL
+	char *table_for_housekeeping[]={	"services", "services_links", "graphs_items", "graphs", "sysmaps_links",
+			"sysmaps_hosts", "sysmaps", "config", "groups", "hosts_groups", "alerts",
+			"actions", "alarms", "functions", "history", "history_str", "hosts",
+			"items", "media", "media_type", "triggers", "trigger_depends", "users",
+			"sessions", "rights", "service_alarms", "profiles", "screens", "screens_items",
+			"screens_graphs", "stats",
+			NULL};
+
 	char	sql[MAX_STRING_LEN+1];
+	char	*table;
+	int	i;
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 	setproctitle("housekeeper [vacuum DB]");
 #endif
-	sprintf(sql,"vacuum analyze");
-	DBexecute(sql);
+	i=0;
+	while (NULL != (table = table_for_housekeeping[i++]))
+	{
+		sprintf(sql,"vacuum analyze %s", table);
+		DBexecute(sql);
+	}
 #endif
 
 #ifdef	HAVE_MYSQL
