@@ -1,5 +1,5 @@
 Name: zabbix
-Version: 1.0beta9
+Version: 1.0beta10
 Release: 1
 Group: System Environment/Daemons
 License: LGPL
@@ -124,6 +124,9 @@ install -m 755 misc/init.d/redhat/8.0/zabbix_agentd %{buildroot}%{_sysconfdir}/r
 %attr(0755,root,root) %{_libdir}/%{name}/php
 
 %changelog
+* Alexei Vladishev <alex@gobbo.caves.lv>
+- update to 1.0beta10 
+
 * Tue Jun 01 2003 Harald Holzer <hholzer@may.co.at>
 - update to 1.0beta9
 - move phpfrontend config to /etc/zabbix

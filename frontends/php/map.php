@@ -66,11 +66,12 @@
 
 # Draw connectors 
 
-	$result=DBselect("select shostid1,shostid2 from sysmaps_links where sysmapid=".$HTTP_GET_VARS["sysmapid"]);
+	$result=DBselect("select shostid1,shostid2,triggerid from sysmaps_links where sysmapid=".$HTTP_GET_VARS["sysmapid"]);
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		$shostid1=DBget_field($result,$i,0);
 		$shostid2=DBget_field($result,$i,1);
+		$triggerid=DBget_field($result,$i,2);
 
 		$result1=DBselect("select x,y from sysmaps_hosts where shostid=$shostid1");
 		$x1=DBget_field($result1,0,0);
@@ -80,7 +81,22 @@
 		$x2=DBget_field($result1,0,0);
 		$y2=DBget_field($result1,0,1);
 
-		ImageLine($im,$x1+16,$y1+16,$x2+16,$y2+16,$black);
+		if(isset($triggerid))
+		{
+			$trigger=get_trigger_by_triggerid($triggerid);
+			if($trigger["value"] == TRIGGER_VALUE_TRUE)
+			{
+				ImageLine($im,$x1+16,$y1+16,$x2+16,$y2+16,$red);
+			}
+			else
+			{
+				ImageLine($im,$x1+16,$y1+16,$x2+16,$y2+16,$black);
+			}
+		}
+		else
+		{
+			ImageLine($im,$x1+16,$y1+16,$x2+16,$y2+16,$black);
+		}
 	}
 
 # Draw hosts

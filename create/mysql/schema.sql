@@ -84,6 +84,8 @@ CREATE TABLE sysmaps_links (
   sysmapid		int(4)		DEFAULT '0' NOT NULL,
   shostid1		int(4)		DEFAULT '0' NOT NULL,
   shostid2		int(4)		DEFAULT '0' NOT NULL,
+ -- may be NULL 
+  triggerid		int(4),
   PRIMARY KEY (linkid)
 ) type=InnoDB;
 
@@ -505,6 +507,8 @@ CREATE TABLE stats (
   month			int(4)		DEFAULT '0' NOT NULL,
   day			int(4)		DEFAULT '0' NOT NULL,
   hour			int(4)		DEFAULT '0' NOT NULL,
-  value			double(16,4)	DEFAULT '0.0000' NOT NULL,
-  PRIMARY KEY (itemid,year,month,day,hour),
+  value_max		double(16,4)	DEFAULT '0.0000' NOT NULL,
+  value_min		double(16,4)	DEFAULT '0.0000' NOT NULL,
+  value_avg		double(16,4)	DEFAULT '0.0000' NOT NULL,
+  PRIMARY KEY (itemid,year,month,day,hour)
 ) type=InnoDB;

@@ -64,7 +64,7 @@ int create_host_file(void)
 
 	if( f == NULL)
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "Cannot hosts file [%s] [%s]",
+		zabbix_log( LOG_LEVEL_ERR, "Cannot hosts file [%s] [%s]",
 		"/tmp/zabbix_suckerd.pinger", strerror(errno));
 		return FAIL;
 	}
@@ -95,8 +95,58 @@ int create_host_file(void)
 	return SUCCEED;
 }
 
+
+int	do_ping(void)
+{
+	FILE	*f;
+	static	char	c[MAX_STRING_LEN+1];
+
+	f=popen("/usr/sbin/fping ...","r");
+	if(f==0)
+	{
+		zabbix_log( LOG_LEVEL_ERR, "Cannot execute /usr/sbin/fping [%s]",
+			strerror(errno));
+		return FAIL;
+	}
+
+	fgets(c,MAX_STRING_LEN,f);
+
+	pclose(f);
+
+	return	SUCCEED;
+}
+
+int	update_items(void)
+{
+	char	sql[MAX_STRING_LEN+1];
+	int	i,now;
+
+	now=time(NULL);
+	sprintf(sql,"select h.useip,h.ip,h.host from hosts h where (h.status=%d or (h.status=%d and h.disable_until<=%d))", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now);
+	result = DBselect(sql);
+		
+	for(i=0;i<DBnum_rows(result);i++)
+	{
+		host.useip=atoi(DBget_field(result,i,0));
+		host.ip=DBget_field(result,i,1);
+		host.host=DBget_field(result,i,2);
+
+		if(HOST_USE_IP == host.useip)
+		{
+			fprintf(f,"%s\n",host.ip);
+		}
+		else
+		{
+			fprintf(f,"%s\n",host.host);
+		}
+	}
+	DBfree_result(result);
+}
+
 int main_pinger_loop(void)
 {
+	int ret = SUCCEED;
+
 	for(;;)
 	{
 #ifdef HAVE_FUNCTION_SETPROCTITLE
@@ -104,11 +154,17 @@ int main_pinger_loop(void)
 #endif
 		DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
 
-		create_host_file();
+		ret = create_host_file();
 
-/*		do_ping();
+		if( SUCCEED == ret)
+		{
+			ret = do_ping();
+		}
 
-		update_items();*/
+		if( SUCCEED == ret)
+		{
+			ret = update_items();
+		}
 
 		DBclose();
 #ifdef HAVE_FUNCTION_SETPROCTITLE
@@ -116,4 +172,7 @@ int main_pinger_loop(void)
 #endif
 		sleep(CONFIG_PINGER_FREQUENCY);
 	}
+
+	/* Never reached */
+	return ret;
 }

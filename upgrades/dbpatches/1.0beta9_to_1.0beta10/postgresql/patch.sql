@@ -1,5 +1,6 @@
 alter table items add  units           varchar(10)     DEFAULT '' NOT NULL;
 alter table items add  multiplier      int4            DEFAULT '' NOT NULL;
+alter table sysmaps_links add triggerid int4;
 
 update items set units='bps' where key_ like "netload%";
 update items set units='bytes' where key_ like "memory[%]";
@@ -16,6 +17,8 @@ CREATE TABLE stats (
   month                 int4            DEFAULT '0' NOT NULL,
   day                   int4            DEFAULT '0' NOT NULL,
   hour                  int4            DEFAULT '0' NOT NULL,
-  value                 float8          DEFAULT '0.0000' NOT NULL,
-  PRIMARY KEY (itemid,year,month,day,hour),
+  value_max		float8		DEFAULT '0.0000' NOT NULL,
+  value_min		float8		DEFAULT '0.0000' NOT NULL,
+  value_avg		float8		DEFAULT '0.0000' NOT NULL,
+  PRIMARY KEY (itemid,year,month,day,hour)
 );
