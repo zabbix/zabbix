@@ -877,7 +877,7 @@ int housekeeping_history(int now)
 	int		i;
 
 /* How lastdelete is used ??? */
-	sprintf(sql,"select i.itemid,i.lastdelete,i.history from items i where i.lastdelete<=%d", now);
+	sprintf(sql,"select itemid,lastdelete,history,delay from items where lastdelete<=%d", now);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
@@ -885,15 +885,21 @@ int housekeeping_history(int now)
 		item.itemid=atoi(DBget_field(result,i,0));
 		item.lastdelete=atoi(DBget_field(result,i,1));
 		item.history=atoi(DBget_field(result,i,2));
+		item.delay=atoi(DBget_field(result,i,3));
+
+		if(item.delay==0)
+		{
+			item.delay=1;
+		}
 
 #ifdef HAVE_MYSQL
-		sprintf	(sql,"delete from history where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,CONFIG_HOUSEKEEPING_FREQUENCY*3600);
+		sprintf	(sql,"delete from history where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
 #else
 		sprintf	(sql,"delete from history where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
 #endif
 		DBexecute(sql);
 #ifdef HAVE_MYSQL
-		sprintf	(sql,"delete from history_str where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,CONFIG_HOUSEKEEPING_FREQUENCY*3600);
+		sprintf	(sql,"delete from history_str where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
 #else
 		sprintf	(sql,"delete from history_str where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
 #endif

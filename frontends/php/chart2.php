@@ -111,7 +111,6 @@
 	$from_time = time(NULL)-$HTTP_GET_VARS["period"]-3600*$HTTP_GET_VARS["from"];
 	$to_time   = time(NULL)-3600*$HTTP_GET_VARS["from"];
 
-
 	$len=array();
 	$x=array();
 	$y=array();
@@ -157,13 +156,6 @@
 	{
 		$maxY = $HTTP_GET_VARS["force_maxy"];
 	}
-
-	if(!isset($maxY))
-	{
-		$maxY=1;
-	}
-
-	$maxY=1;
 
 	$my_exp = floor(log10($maxY));
 	$my_mant = $maxY/pow(10,$my_exp);
@@ -262,15 +254,15 @@
 	{
 		ImageDashedLine($im,$shiftX,$i/$my_steps*$sizeY+$shiftYup,$sizeX+$shiftX,$i/$my_steps*$sizeY+$shiftYup,$gray);
 	}
+	for($j=$stepTime-$correctTime;$j<=($maxX-$minX);$j+=$stepTime)
+	{
+		ImageDashedLine($im,$shiftX+($sizeX*$j)/($maxX-$minX),$shiftYup,$shiftX+($sizeX*$j)/($maxX-$minX),$sizeY+$shiftYup,$gray);
+	}
 
 
 
 	if($nodata == 0)
 	{
-		for($j=$stepTime-$correctTime;$j<=($maxX-$minX);$j+=$stepTime)
-		{
-			ImageDashedLine($im,$shiftX+($sizeX*$j)/($maxX-$minX),$shiftYup,$shiftX+($sizeX*$j)/($maxX-$minX),$sizeY+$shiftYup,$gray);
-		}
 		for($i=0;$i<=$my_steps;$i++)
 		{
 			ImageString($im, 1, $sizeX+5+$shiftX, $i/$my_steps*$sizeY+$shiftYup-4, $maxY-$i/$my_steps*($maxY-$minY) , $darkred);

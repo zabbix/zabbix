@@ -75,14 +75,19 @@
 		exit;
 	}
 
-	for($i=0;$i<=$sizeY;$i+=$sizeY/5)
-	{
-		ImageDashedLine($im,$shiftX,$i+$shiftY,$sizeX+$shiftX,$i+$shiftY,$gray);
-	}
-	for($i=0;$i<=$sizeX;$i+=$sizeX/24)
-	{
-		ImageDashedLine($im,$i+$shiftX,$shiftY,$i+$shiftX,$sizeY+$shiftY,$gray);
-	}
+//	for($i=0;$i<=$sizeY;$i+=$sizeY/5)
+//	{
+//		ImageDashedLine($im,$shiftX,$i+$shiftY,$sizeX+$shiftX,$i+$shiftY,$gray);
+//	}
+//	for($i=0;$i<=$sizeX;$i+=$sizeX/24)
+//	{
+//		ImageDashedLine($im,$i+$shiftX,$shiftY,$i+$shiftX,$sizeY+$shiftY,$gray);
+//	}
+	ImageDashedLine($im,$shiftX+1,$shiftY,$shiftX+1,$sizeY+$shiftY,$black);
+	ImageDashedLine($im,$shiftX+1,$shiftY,$shiftX+$sizeX,$shiftY,$black);
+	ImageDashedLine($im,$shiftX+$sizeX,$shiftY,$shiftX+$sizeX,$sizeY+$shiftY,$black);
+	ImageDashedLine($im,$shiftX+1,$shiftY+$sizeY,$shiftX+$sizeX,$sizeY+$shiftY,$black);
+
 	$item=get_item_by_itemid($HTTP_GET_VARS["itemid"]);
 	$host=get_host_by_hostid($item["hostid"]);
 
@@ -111,6 +116,42 @@
 		unset($minX);
 		unset($minY);
 	}
+
+	$my_exp = floor(log10($maxY));
+	$my_mant = $maxY/pow(10,$my_exp);
+
+	if ($my_mant < 1.5 )
+	{
+		$my_mant = 1.5;
+		$my_steps = 5;
+	}
+	elseif($my_mant < 2 )
+	{
+		$my_mant = 2;
+		$my_steps = 4;
+	}
+	elseif($my_mant < 3 )
+	{
+		$my_mant = 3;
+		$my_steps = 6;
+	}
+	elseif($my_mant < 5 )
+	{
+		$my_mant = 5;
+		$my_steps = 5;
+	}
+	elseif($my_mant < 8 )
+	{
+		$my_mant = 8;
+		$my_steps = 4;
+	}
+	else
+	{
+		$my_mant = 10;
+		$my_steps = 5;
+	}
+	$maxY = $my_mant*pow(10,$my_exp);
+	$minY = 0;
 	
 //	echo "MIN/MAX:",$minX," - ",$maxX," - ",$minY," - ",$maxY,"<Br>";
 
@@ -144,15 +185,50 @@
 		}
 	}
 
+	$startTime=$minX;
+	if (($maxX-$maxY) < 300)
+		$precTime=10;
+	elseif (($maxX-$maxY) < 3600 )
+		$precTime=60;
+	else
+		$precTime=300;
+
+	if (($maxX-$maxY) < 1200 )
+		$dateForm="H:i:s";
+	else
+		$dateForm="H:i";
+
+	$correctTime=$startTime % $precTime;
+	$stepTime=ceil(ceil(($maxX-$minX)/20)/$precTime)*(1.0*$precTime);
+
+	for($i=1;$i<$my_steps;$i++)
+	{
+		ImageDashedLine($im,$shiftX,$i/$my_steps*$sizeY+$shiftY,$sizeX+$shiftX,$i/$my_steps*$sizeY+$shiftY,$gray);
+	}
+	for($j=$stepTime-$correctTime;$j<=($maxX-$minX);$j+=$stepTime)
+	{
+		ImageDashedLine($im,$shiftX+($sizeX*$j)/($maxX-$minX),$shiftY,$shiftX+($sizeX*$j)/($maxX-$minX),$sizeY+$shiftY,$gray);
+	}
+
+
 	if($nodata == 0)
 	{
-		for($i=0;$i<=$sizeY;$i+=$sizeY/5)
+//		for($i=0;$i<=$sizeY;$i+=$sizeY/5)
+//		{
+//			ImageString($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftY, $i*($maxY-$minY)/$sizeY+$minY , $darkred);
+//		}
+//		for($i=0;$i<=$sizeX;$i+=$sizeX/24)
+//		{
+//			ImageStringUp($im,0,$i+$shiftX-3,$shiftY+$sizeY+50,date("H:i:s",$i*($maxX-$minX)/$sizeX+$minX),$black);
+//		}
+
+		for($i=0;$i<=$my_steps;$i++)
 		{
-			ImageString($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftY, $i*($maxY-$minY)/$sizeY+$minY , $darkred);
+			ImageString($im, 1, $sizeX+5+$shiftX, $i/$my_steps*$sizeY+$shiftY-4, $maxY-$i/$my_steps*($maxY-$minY) , $darkred);
 		}
-		for($i=0;$i<=$sizeX;$i+=$sizeX/24)
+		for($j=$stepTime-$correctTime;$j<=($maxX-$minX);$j+=$stepTime)
 		{
-			ImageStringUp($im,0,$i+$shiftX-3,$shiftY+$sizeY+50,date("H:i:s",$i*($maxX-$minX)/$sizeX+$minX),$black);
+			ImageStringUp($im,0,$shiftX+($sizeX*$j)/($maxX-$minX),$shiftY+$sizeY+43,date($dateForm,$startTime+$j),$black);
 		}
 
 		ImageString($im, 1,10,                $sizeY+$shiftY+3, date("dS of F Y",$minX) , $darkred);
