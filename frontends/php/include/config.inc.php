@@ -3739,8 +3739,7 @@ echo "</head>";
 <?php
 		if($help!="")
 		{
-			echo "&nbsp;<a href=\"http://www.zabbix.com/manual/v1.1/web.$help.php\">?</a>&nbsp;";
-			cr();
+			echo "<a style=\"float:right\" href=\"http://www.zabbix.com/manual/v1.1/web.$help.php\">?</a>";
 		}
 	}
 
@@ -4065,7 +4064,7 @@ echo "</head>";
 	# Show in plain text
 	function	show_plaintxt($itemid,$period)
 	{
-		show_form_begin("history.plain");
+		show_form_begin("history.plaim");
 		echo "Data in plain text format";
 
 		show_table2_v_delimiter();
