@@ -348,9 +348,7 @@ void	child_main(int i,int listenfd, int addrlen)
 {
 	int	connfd;
 	socklen_t	clilen;
-	struct sockaddr *cliaddr;
-
-	cliaddr=malloc(addrlen);
+	struct sockaddr cliaddr;
 
 	zabbix_log( LOG_LEVEL_WARNING, "zabbix_trapperd %ld started",(long)getpid());
 
@@ -362,7 +360,7 @@ void	child_main(int i,int listenfd, int addrlen)
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("waiting for connection");
 #endif
-		connfd=accept(listenfd,cliaddr, &clilen);
+		connfd=accept(listenfd,&cliaddr, &clilen);
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("processing data");
 #endif

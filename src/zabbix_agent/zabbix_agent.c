@@ -107,18 +107,10 @@ int	check_security(void)
 	return	FAIL;
 }
 
-char	*process_input()
-{
-	char	s[1024];
-
-	fgets(s,1024,stdin);
-
-	return	process(s);
-}
-
 int	main()
 {
-	char	*res;
+	char	s[MAX_STRING_LEN+1];
+	char	value[MAX_STRING_LEN+1];
 
 #ifdef	TEST_PARAMETERS
 	init_config();
@@ -140,9 +132,10 @@ int	main()
 		exit(FAIL);
 	}
 
-	res=process_input();
+	fgets(s,MAX_STRING_LEN,stdin);
+	process(s,value);
 
-	printf("%s\n",res);
+	printf("%s\n",value);
 
 	fflush(stdout);
 

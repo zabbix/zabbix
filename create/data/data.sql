@@ -244,4 +244,9 @@ insert into triggers_template (triggertemplateid,itemtemplateid,description,expr
 	values (63,63,'Configured max number of processes is too low on %s','{:.last(0)}<256');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (64,64,'Configured max number of opened files is too low on %s','{:.last(0)}<512');
-
+insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+	values (65,65,'Hostname was changed on %s','{:.diff(0)}>0');
+insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+	values (66,66,'Host information was changed on %s','{:.diff(0)}>0');
+insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+	values (67,67,'Version of zabbix_agent(d) was changed on %s','{:.diff(0)}>0');
