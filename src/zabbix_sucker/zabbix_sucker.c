@@ -14,6 +14,9 @@
 	#include <netdb.h>
 #endif
 
+/* Required for getpwuid */
+#include <pwd.h>
+
 #include <signal.h>
 #include <errno.h>
 
@@ -34,6 +37,8 @@
 #include "expression.h"
 
 int	sucker_num=0;
+int	CONFIG_SUCKER_FORKS		=SUCKER_FORKS;
+int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
 
 void	signal_handler( int sig )
 {
@@ -51,10 +56,47 @@ void	signal_handler( int sig )
 	}
 }
 
+/* Am I root ? 0 - no */
+int	is_root()
+{
+	int	res=0;
+
+	if( (getuid()==0) || (getuid()==0) )
+	{
+		res = 1;
+	}
+
+	return	res;
+}
+
 void	daemon_init(void)
 {
-	int	i;
-	pid_t	pid;
+	int		i;
+	pid_t		pid;
+	struct passwd	*pwd;
+
+	if(is_root() !=0)
+	{
+		pwd = getpwnam("zabbix");
+		if ( pwd == NULL )
+		{
+			fprintf(stderr,"User zabbix does not exist.\n");
+			fprintf(stderr, "Cannot run as root !\n");
+			exit(FAIL);
+		}
+
+		if( (setgid(pwd->pw_gid) ==-1) || (setuid(pwd->pw_uid) == -1) )
+		{
+			fprintf(stderr,"Cannot setgid or setuid to zabbix");
+			exit(FAIL);
+		}
+
+		if( (setegid(pwd->pw_gid) ==-1) || (seteuid(pwd->pw_uid) == -1) )
+		{
+			fprintf(stderr,"Cannot setegid or seteuid to zabbix");
+			exit(FAIL);
+		}
+	}
 
 	if( (pid = fork()) != 0 )
 	{
@@ -77,6 +119,104 @@ void	daemon_init(void)
 	{
 		close(i);
 	}
+
+	openlog("zabbix_suckerd",LOG_PID,LOG_USER);
+/*	ret=setlogmask(LOG_UPTO(LOG_DEBUG));*/
+	setlogmask(LOG_UPTO(LOG_WARNING));
+}
+
+void	process_config_file(void)
+{
+	FILE	*file;
+	char	line[1024];
+	char	parameter[1024];
+	char	*value;
+	int	lineno;
+	int	i;
+
+	file=fopen("/etc/zabbix/zabbix_suckerd.conf","r");
+	if(NULL == file)
+	{
+		syslog( LOG_CRIT, "Cannot open /etc/zabbix/zabbix_suckerd.conf");
+		exit(1);
+	}
+
+	lineno=1;
+	while(fgets(line,1024,file) != NULL)
+	{
+		if(line[0]=='#')	continue;
+		if(strlen(line)==1)	continue;
+
+		strcpy(parameter,line);
+
+		value=strstr(line,"=");
+
+		if(NULL == value)
+		{
+			syslog( LOG_CRIT, "Error in line [%s] Line %d", line, lineno);
+			fclose(file);
+			exit(1);
+		}
+		value++;
+		value[strlen(value)-1]=0;
+
+		parameter[value-line-1]=0;
+
+		syslog( LOG_DEBUG, "Parameter [%s] Value [%s]", parameter, value);
+
+		if(strcmp(parameter,"StartSuckers")==0)
+		{
+			i=atoi(value);
+			if( (i<2) || (i>255) )
+			{
+				syslog( LOG_CRIT, "Wrong value of StartAgents in line %d. Should be between 2 and 255.", lineno);
+				fclose(file);
+				exit(1);
+			}
+			CONFIG_SUCKER_FORKS=i;
+		}
+		else if(strcmp(parameter,"HousekeepingFrequency")==0)
+		{
+			i=atoi(value);
+			if( (i<1) || (i>24) )
+			{
+				syslog( LOG_CRIT, "Wrong value of HousekeepingFrequency in line %d. Should be between 1 and 24.", lineno);
+				fclose(file);
+				exit(1);
+			}
+			CONFIG_HOUSEKEEPING_FREQUENCY=i;
+		}
+		else if(strcmp(parameter,"DebugLevel")==0)
+		{
+			if(strcmp(value,"1") == 0)
+			{
+				setlogmask(LOG_UPTO(LOG_CRIT));
+			}
+			else if(strcmp(value,"2") == 0)
+			{
+				setlogmask(LOG_UPTO(LOG_WARNING));
+			}
+			else if(strcmp(value,"3") == 0)
+			{
+				setlogmask(LOG_UPTO(LOG_DEBUG));
+			}
+			else
+			{
+				syslog( LOG_CRIT, "Wrong DebugLevel in line %d", lineno);
+				fclose(file);
+				exit(1);
+			}
+		}
+		else
+		{
+			syslog( LOG_CRIT, "Unsupported parameter [%s] Line %d", parameter, lineno);
+			fclose(file);
+			exit(1);
+		}
+
+		lineno++;
+	}
+	fclose(file);
 }
 
 #ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
@@ -362,7 +502,7 @@ int get_minnextcheck(int now)
 	int		res;
 	int		count;
 
-	sprintf(c,"select count(*),min(nextcheck) from items i,hosts h where i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and i.itemid%%%d=%d",now,SUCKER_FORKS-1,sucker_num-1);
+	sprintf(c,"select count(*),min(nextcheck) from items i,hosts h where i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and i.itemid%%%d=%d",now,CONFIG_SUCKER_FORKS-1,sucker_num-1);
 	result = DBselect(c);
 
 	if(result==NULL)
@@ -411,7 +551,7 @@ int get_values(void)
 
 	now = time(NULL);
 
-	sprintf(c,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, now, SUCKER_FORKS-1,sucker_num-1);
+	sprintf(c,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, now, CONFIG_SUCKER_FORKS-1,sucker_num-1);
 	result = DBselect(c);
 
 	rows = DBnum_rows(result);
@@ -595,8 +735,8 @@ int main_housekeeping_loop()
 		housekeeping_items(now);
 		housekeeping_alarms(now);
 		housekeeping_alerts(now);
-		syslog( LOG_DEBUG, "Sleeping for %d seconds", SUCKER_HK);
-		sleep(SUCKER_HK);
+		syslog( LOG_DEBUG, "Sleeping for %d hours", CONFIG_HOUSEKEEPING_FREQUENCY);
+		sleep(3600*CONFIG_HOUSEKEEPING_FREQUENCY);
 	}
 }
 
@@ -641,7 +781,6 @@ int main_sucker_loop()
 
 int main(int argc, char **argv)
 {
-	int 	ret;
 	int	i;
 
 	struct	sigaction phan;
@@ -655,7 +794,9 @@ int main(int argc, char **argv)
 	sigaction(SIGQUIT, &phan, NULL);
 	sigaction(SIGTERM, &phan, NULL);
 
-	for(i=1;i<SUCKER_FORKS;i++)
+	process_config_file();
+
+	for(i=1;i<CONFIG_SUCKER_FORKS;i++)
 	{
 		if(fork() == 0)
 		{
@@ -665,10 +806,6 @@ int main(int argc, char **argv)
 			break;
 		}
 	}
-
-	openlog("zabbix_suckerd",LOG_PID,LOG_USER);
-/*	ret=setlogmask(LOG_UPTO(LOG_DEBUG));*/
-	ret=setlogmask(LOG_UPTO(LOG_WARNING));
 
 	syslog( LOG_WARNING, "zabbix_suckerd #%d started",sucker_num);
 

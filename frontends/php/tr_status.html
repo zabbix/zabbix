@@ -9,13 +9,13 @@
 	setcookie("active_triggers",$count,time()+1800);
 
 //	Number of trigger decreased
-	if(!isset($active_triggers)||($count<$active_triggers))
+	if(isset($active_triggers)&&($count<$active_triggers))
 	{
 		$audio="warning_on.wav";
 
 	}
 //	Number of trigger increased
-	if(!isset($active_triggers)||($count>$active_triggers))
+	if(isset($active_triggers)&&($count>$active_triggers))
 	{
 		$audio="warning_off.wav";
 	}

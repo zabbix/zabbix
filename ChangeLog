@@ -2,6 +2,9 @@ Changes for 1.0beta1:
 (Add support for PostgreSQL and patches)
 (Add description of new tables and column URL to the manual)
 
+ - added file misc/conf/zabbix_suckerd.conf (Alexei)
+ - added misc/init.d/debian/zabbix-server (Alexei)
+ - zabbix_suckerd cannot be ran as root (Alexei)
  - added column URL to table triggers (Alexei)
  - character '.' can be used in definition of monitored paramaters
  (Alexei)
