@@ -92,7 +92,7 @@
 #include "sysinfo.h"
 
 
-COMMAND	commands[]=
+COMMAND	commands[512]=
 	{
 	{"proc_cnt[*]"			,PROCCNT, "inetd"},
 
@@ -155,6 +155,33 @@ COMMAND	commands[]=
 	{"check_service[imap]"		,CHECK_SERVICE_IMAP, 0},
 	{0				,0}
 	};
+
+void	add_user_parameter(char *key,char *command)
+{
+	int i;
+
+	printf("[%s]\n",key);
+
+	for(i=0;;i++)
+	{
+		if( commands[i].key == 0)
+		{
+			commands[i].key=(char *)malloc(strlen(key)+1);
+			strcpy(commands[i].key,key);
+
+			commands[i].function=&EXECUTE;
+
+			commands[i].parameter=(char *)malloc(strlen(command)+1);
+			strcpy(commands[i].parameter,command);
+
+			commands[i+1].key = 0;
+			
+			break;
+		}
+	}
+
+
+}
 
 void	test_parameters(void)
 {

@@ -3,6 +3,7 @@
  
 float	process(char *command);
 
+void    add_user_parameter(char *key,char *command);
 void	test_parameters(void);
 
 float   CKSUM(const char * filename);
