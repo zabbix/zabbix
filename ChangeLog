@@ -1,5 +1,6 @@
 Changes for 1.0beta13:
 
+ - redesigned availability chart (Alexei)
  - fix for get_last_service_value(). Thanks to Sebastien
  "Slix" Linard. (Alexei)
  - fix for chart_sla.php. Thanks to Sebastien "Slix"
