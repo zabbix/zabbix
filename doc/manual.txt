@@ -323,7 +323,7 @@ Remember, the more physical memory you have, the faster database and Zabbix work
 
 Basic installation of Zabbix usually takes no more than 15 minutes. However, to make
 process more enjoyable, I would suggest to make cup of tea (or coffee) for yourself.
-Ready ? Then let us start ...
+Ready ? Let us start ...
 
 4.2.1 Create the Zabbix superuser account: 
 
@@ -434,6 +434,20 @@ Change these values in frontends/php/include/db.inc:
 mkdir /home/zabbix/html
 cp -R frontends/php/* /home/zabbix/html/
 
+4.2.11 Configure Apache
+
+By default, Apache does not recognize *.html files as PHP scripts. Add the following
+line to Apache configuration files to make Apache think that every *.html file
+is actually PHP script that should be interpreted:
+
+AddType application/x-httpd-php .html
+
+4.2.12 Configure /etc/zabbix/zabbix_agent.conf
+
+You need to configure this file for every host having zabbix_agent installed.
+The file should contain IP address of Zabbix server. Connections from other
+hosts will be denied.
+
 5. Chapter 5 (Administration)
 
 5.1 Zabbix configuration
@@ -474,9 +488,9 @@ Processor load on www.sf.net is {www.sf.net:system[procload].last(0)}
 
 In this case, you will receive message with subject like "Processor load on www.sf.net is 0.85".
 
-- Create /etc/zabbix/zabbix_agent.conf
+- Create at least one Network Map
 
-Put IP address of Zabbix server here.
+The map will greately help you quickly identify where a problem is.
 
 5.2 Expressions for triggers
 
