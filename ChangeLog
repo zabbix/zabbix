@@ -1,5 +1,6 @@
 Changes for 1.0beta14:
 
+ - removed primary keys for both 'history' and 'history_str' (Alexei)
  - added support for system[proccount] under FreeBSD (Alexei)
  - remove trailing zeroes in function evaluation routines (Alexei)
  - added support for proc_cnt[*] under FreeBSD (Alexei)
@@ -18,13 +19,11 @@ Changes for 1.0beta14:
  - fixed selection of "Dark Yellow" for graphs and map links (Alexei)
  - fixed removal of trigger dependency (Alexei)
  - added substitution of macros for all actions (Alexei)
- - added escaping of 'special' characters before SQL insert statements
- (Alexei)
+ - added escaping of 'special' characters before SQL insert statements (Alexei)
  - fixed removal of sysmaps hosts and links when deleting item (Alexei)
  - fixed Use IP address in host definition form (Alexei)
  - fixed audio in Status of Triggers (Alexei)
- - fixed change of action subject if it contains special characters
- (Alexei)
+ - fixed change of action subject if it contains special characters (Alexei)
  - fixed creation of actions from templates (Alexei)
  - Battery.png has been renamed to UPS.png (Alexei)
  - fixed removal of an item under PostgreSQL (Alexei)
