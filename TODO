@@ -1,5 +1,6 @@
 HIGH PRIORITY:
 
+ - monitoring of servers without Zabbix agent installed
  - rewrite pinger.pl to use mass-send
  - check Rickard's multythreaded agent
  - check new Mariusz patches
