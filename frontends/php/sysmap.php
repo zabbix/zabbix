@@ -297,10 +297,10 @@
 	echo "<input class=\"biginput\" name=\"y\" size=5 value=\"$y\">";
 
 	show_table2_v_delimiter2();
-	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
 	if(isset($HTTP_GET_VARS["shostid"]))
 	{
-		echo "<input type=\"submit\" name=\"register\" value=\"update\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
 	}
 
 	show_table2_header_end();
@@ -367,7 +367,7 @@
 	        echo "</SELECT>";
 
 		show_table2_v_delimiter2();
-		echo "<input type=\"submit\" name=\"register\" value=\"add link\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add link\">";
 		show_table2_header_end();
 	}
 ?>

@@ -246,7 +246,7 @@
 					if( ($old_day != $new_day) ||($i==24))
 					{
 						$old_day=$new_day;
-						ImageStringUp($this->im, 1,$i*$this->sizeX/24+$this->shiftX-3, $this->sizeY+$this->shiftY+57, date("m.d",$this->from_time+$i*$this->period/24) , $this->colors["Dark Red"]);
+						ImageStringUp($this->im, 1,$i*$this->sizeX/24+$this->shiftX-3, $this->sizeY+$this->shiftY+57, date("m.d H:i",$this->from_time+$i*$this->period/24) , $this->colors["Dark Red"]);
 
 					}
 				}

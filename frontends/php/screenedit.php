@@ -204,12 +204,12 @@
 			}
 
 			show_table2_v_delimiter2();
-			echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
 			if($resourceid!=0) 
 			{ 
-				echo "<input type=\"submit\" name=\"register\" value=\"update\">";
+				echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
 			}
-			echo "<input type=\"submit\" name=\"register\" value=\"delete\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\">";
 
 			show_table2_header_end();
 		}

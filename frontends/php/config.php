@@ -90,7 +90,7 @@
 	echo "<input class=\"biginput\" name=\"alarm_history\" value=\"".$config["alarm_history"]."\" size=8>";
 
 	show_table2_v_delimiter2();
-	echo "<input type=\"submit\" name=\"register\" value=\"update\">";
+	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
 
 	show_table2_header_end();
 ?>
@@ -221,12 +221,12 @@
 	}
 
 	show_table2_v_delimiter2();
-	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
 
 	if(isset($mediatypeid))
 	{
-		echo "<input type=\"submit\" name=\"register\" value=\"update media\">";
-		echo "<input type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected media?');\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update media\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected media?');\">";
 	}
 
 	show_table2_header_end();
