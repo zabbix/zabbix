@@ -155,7 +155,6 @@ forum Open Discussion for more info.
  - infrastructure for reports
  - stacked graphs
 
- - icmppingsec->icmppingmsec
  - disk size is not correct after evaluating macros in the message
  - fix evaluation of complex trigger expressions (diskpercentage)
  - check if alert and service alert is added after host become reachable again
