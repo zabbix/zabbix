@@ -1713,13 +1713,14 @@ char	*EXECUTE_STR(char *command)
 
 	if(NULL == fgets(c,MAX_STRING_LEN,f))
 	{
-		pclose(f);
 		switch (errno)
 		{
 			case	EINTR:
+				pclose(f);
 /* (char *) to avoid compiler warning */
 				return (char *)TIMEOUT_ERROR;
 			default:
+				pclose(f);
 				return NULL;
 		}
 	}
