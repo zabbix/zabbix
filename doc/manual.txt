@@ -137,8 +137,8 @@ All values of monitored parameters Zabbix stores in database. The collected data
 
 2.5 Capacity planning
 
-Looking at graph of process load (disk usage,database activity, ...)  for period of several weeks (or monthes), system administrator
-can clearly see when next hardware upgrade should be made.
+Looking at graph of process load (disk usage,database activity, ...)  for period of several weeks (or monthes), 
+system administrator can clearly see when next hardware upgrade should be made.
 
 3. Chapter 3 (Structure)
 
@@ -161,9 +161,12 @@ zabbix_sucker
 
 DESCRIPTION
 
-The process periodically connects to agents (either Zavvix native or SNMP) to get updated information on parameters being
+The process periodically connects to agents (either Zabbix native or SNMP) to get updated information on parameters being
 monitored.  Also, the process periodically re-calculates status of triggers. It sends alerts to users
 if required.
+
+By default, zabbix_sucker forks ten copies of itself. It means that Zabbix will be able to get ten monitored parameters
+simultaneously. Modify parameter SUCKER_FORKS in include/common.h if ten is not enough for you. 
 
 No switches are supported by zabbix_sucker.
 
