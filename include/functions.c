@@ -1005,10 +1005,11 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
 	{
 		value_float=atof(value);
 		/* Custom multiplier? */
+/*
 		if(item->multiplier == 1)
 		{
 			value_float=value_float*atof(item->formula);
-		}
+		}*/
 
 		value_float_abs=abs(value_float);
 
@@ -2243,6 +2244,7 @@ void	process_new_value_thread(MYSQL *database, DB_ITEM *item,char *value)
 {
 	int 	now;
 	char	sql[MAX_STRING_LEN];
+	char	value_str[MAX_STRING_LEN];
 	char	value_esc[MAX_STRING_LEN];
 	double	value_double;
 	double	multiplier;
@@ -2250,13 +2252,16 @@ void	process_new_value_thread(MYSQL *database, DB_ITEM *item,char *value)
 
 	now = time(NULL);
 
+	strscpy(value_str, value);
+
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_new_value()");
-	value_double=strtod(value,&e);
+	value_double=strtod(value_str,&e);
 
 	if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (item->multiplier == ITEM_MULTIPLIER_USE))
 	{
 		multiplier = strtod(item->formula,&e);
 		value_double = value_double * multiplier;
+		snprintf(value_str,sizeof(value_str)-1,"%f",value_double);
 	}
 
 	if(item->history>0)
@@ -2294,22 +2299,22 @@ void	process_new_value_thread(MYSQL *database, DB_ITEM *item,char *value)
 		}
 		else
 		{
-			DBadd_history_str_thread(database, item->itemid,value,now);
+			DBadd_history_str_thread(database, item->itemid,value_str,now);
 		}
 	}
 
 
 	if(item->delta == ITEM_STORE_AS_IS)
 	{
-		if((item->prevvalue_null == 1) || (strcmp(value,item->lastvalue_str) != 0) || (strcmp(item->prevvalue_str,item->lastvalue_str) != 0) )
+		if((item->prevvalue_null == 1) || (strcmp(value_str,item->lastvalue_str) != 0) || (strcmp(item->prevvalue_str,item->lastvalue_str) != 0) )
 		{
-			DBescape_string(value,value_esc,MAX_STRING_LEN);
+			DBescape_string(value_str,value_esc,MAX_STRING_LEN);
 			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=%d",now+item->delay,value_esc,now,item->itemid);
 			item->prevvalue=item->lastvalue;
 			item->lastvalue=value_double;
 			item->prevvalue_str=item->lastvalue_str;
 	/* Risky !!!*/
-			item->lastvalue_str=value;
+			item->lastvalue_str=value_str;
 			item->prevvalue_null=item->lastvalue_null;
 			item->lastvalue_null=0;
 		}
@@ -2334,7 +2339,7 @@ void	process_new_value_thread(MYSQL *database, DB_ITEM *item,char *value)
 		item->lastvalue=(value_double - item->prevorgvalue)/(now-item->lastclock);
 		item->prevvalue_str=item->lastvalue_str;
 	/* Risky !!!*/
-		item->lastvalue_str=value;
+		item->lastvalue_str=value_str;
 		item->prevvalue_null=item->lastvalue_null;
 		item->lastvalue_null=0;
 	}
@@ -2354,7 +2359,7 @@ void	process_new_value_thread(MYSQL *database, DB_ITEM *item,char *value)
 		item->lastvalue=(value_double - item->prevorgvalue);
 		item->prevvalue_str=item->lastvalue_str;
 	/* Risky !!!*/
-		item->lastvalue_str=value;
+		item->lastvalue_str=value_str;
 		item->prevvalue_null=item->lastvalue_null;
 		item->lastvalue_null=0;
 	}
@@ -2369,19 +2374,23 @@ void	process_new_value(DB_ITEM *item,char *value)
 	int 	now;
 	char	sql[MAX_STRING_LEN];
 	char	value_esc[MAX_STRING_LEN];
+	char	value_str[MAX_STRING_LEN];
 	double	value_double;
 	double	multiplier;
 	char	*e;
 
 	now = time(NULL);
 
+	strscpy(value_str, value);
+
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_new_value()");
-	value_double=strtod(value,&e);
+	value_double=strtod(value_str,&e);
 
 	if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (item->multiplier == ITEM_MULTIPLIER_USE))
 	{
 		multiplier = strtod(item->formula,&e);
 		value_double = value_double * multiplier;
+		snprintf(value_str,sizeof(value_str)-1,"%f",value_double);
 	}
 
 	if(item->history>0)
@@ -2419,22 +2428,21 @@ void	process_new_value(DB_ITEM *item,char *value)
 		}
 		else
 		{
-			DBadd_history_str(item->itemid,value,now);
+			DBadd_history_str(item->itemid,value_str,now);
 		}
 	}
 
-
 	if(item->delta ==0)
 	{
-		if((item->prevvalue_null == 1) || (strcmp(value,item->lastvalue_str) != 0) || (strcmp(item->prevvalue_str,item->lastvalue_str) != 0) )
+		if((item->prevvalue_null == 1) || (strcmp(value_str,item->lastvalue_str) != 0) || (strcmp(item->prevvalue_str,item->lastvalue_str) != 0) )
 		{
-			DBescape_string(value,value_esc,MAX_STRING_LEN);
+			DBescape_string(value_str,value_esc,MAX_STRING_LEN);
 			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=%d",now+item->delay,value_esc,now,item->itemid);
 			item->prevvalue=item->lastvalue;
 			item->lastvalue=value_double;
 			item->prevvalue_str=item->lastvalue_str;
 	/* Risky !!!*/
-			item->lastvalue_str=value;
+			item->lastvalue_str=value_str;
 			item->prevvalue_null=item->lastvalue_null;
 			item->lastvalue_null=0;
 		}
@@ -2459,7 +2467,7 @@ void	process_new_value(DB_ITEM *item,char *value)
 		item->lastvalue=(value_double - item->prevorgvalue)/(now-item->lastclock);
 		item->prevvalue_str=item->lastvalue_str;
 	/* Risky !!!*/
-		item->lastvalue_str=value;
+		item->lastvalue_str=value_str;
 		item->prevvalue_null=item->lastvalue_null;
 		item->lastvalue_null=0;
 	}
@@ -2479,7 +2487,7 @@ void	process_new_value(DB_ITEM *item,char *value)
 		item->lastvalue=(value_double - item->prevorgvalue);
 		item->prevvalue_str=item->lastvalue_str;
 	/* Risky !!!*/
-		item->lastvalue_str=value;
+		item->lastvalue_str=value_str;
 		item->prevvalue_null=item->lastvalue_null;
 		item->lastvalue_null=0;
 	}
