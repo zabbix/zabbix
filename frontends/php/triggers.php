@@ -298,9 +298,9 @@
 		}
 		echo "</table>";
 		show_table2_header_begin();
-		echo "<input type=\"submit\" name=\"register\" value=\"enable selected\" onClick=\"return Confirm('Enable selected triggers?');\">";
-		echo "<input type=\"submit\" name=\"register\" value=\"disable selected\" onClick=\"return Confirm('Disable selected triggers?');\">";
-		echo "<input type=\"submit\" name=\"register\" value=\"delete selected\" onClick=\"return Confirm('Delete selected triggers?');\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"enable selected\" onClick=\"return Confirm('Enable selected triggers?');\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"disable selected\" onClick=\"return Confirm('Disable selected triggers?');\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete selected\" onClick=\"return Confirm('Delete selected triggers?');\">";
 		show_table2_header_end();
 		echo "</form>";
 	}

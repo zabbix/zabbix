@@ -214,11 +214,11 @@
 	echo "</select>";
 
 	show_table2_v_delimiter2();
-	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
 	if(isset($mediaid))
 	{
-		echo "<input type=\"submit\" name=\"register\" value=\"update\">";
-		echo "<input type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected media?');\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected media?');\">";
 	}
 
 	show_table2_header_end();

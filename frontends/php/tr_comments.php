@@ -64,7 +64,7 @@
 	echo "<textarea name=\"comments\" cols=100 ROWS=\"25\" wrap=\"soft\">$comments</TEXTAREA>";
 
 	show_table2_v_delimiter2();
-	echo "<input type=\"submit\" name=\"register\" value=\"update\">";
+	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
 
 	show_table2_header_end();
 ?>

@@ -125,7 +125,7 @@
 		show_table_v_delimiter();
 		echo "<form name=\"form1\" method=\"get\" action=\"latest.php?select=true\">
 	  	<input class=\"biginput\" type=\"text\" name=\"select\" value=\"".$HTTP_GET_VARS["txt_select"]."\">
-	  	<input type=\"submit\" name=\"Select\" value=\"Select\">
+	  	<input class=\"button\" type=\"submit\" name=\"Select\" value=\"Select\">
 		</form>";
 	}
 	else

@@ -3141,7 +3141,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 		echo "</select>";
 
-		echo "<input type=\"submit\" name=\"action\" value=\"showhistory\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"action\" value=\"showhistory\">";
 
 		echo "</form>";
 	}
@@ -3243,7 +3243,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		show_table2_v_delimiter2();
 		echo "Press ";
-		echo "<input type=\"submit\" name=\"action\" value=\"showvalues\"> to see values in plain text";
+		echo "<input class=\"button\" type=\"submit\" name=\"action\" value=\"showvalues\"> to see values in plain text";
 
 		show_table2_header_end();
 
@@ -3279,7 +3279,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		show_table2_v_delimiter2();
 		echo "Press to see data in ";
-		echo "<input type=\"submit\" name=\"action\" value=\"plaintext\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"action\" value=\"plaintext\">";
 
 		show_table2_header_end();
 
@@ -3515,12 +3515,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
  
 		show_table2_v_delimiter2();
-		echo "<input type=\"submit\" name=\"register\" value=\"add\">";
-		echo "<input type=\"submit\" name=\"register\" value=\"add to all hosts\" onClick=\"return Confirm('Add item to all hosts?');\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add to all hosts\" onClick=\"return Confirm('Add item to all hosts?');\">";
 		if(isset($HTTP_GET_VARS["itemid"]))
 		{
-			echo "<input type=\"submit\" name=\"register\" value=\"update\">";
-			echo "<input type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected item?');\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected item?');\">";
 		}
  
 		show_table2_header_end();
@@ -3583,7 +3583,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<input class=\"biginput\" name=\"id\" value=\"0\" size=4>";
 
 		show_table2_v_delimiter2();
-		echo "<input type=\"submit\" name=\"register\" value=\"add permission\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add permission\">";
 		show_table2_header_end();
 	}
 
@@ -3609,7 +3609,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<input class=\"biginput\" type=\"password\" name=\"password\" value=\"\" size=20>";
 
 		show_table2_v_delimiter2();
-		echo "<input type=\"submit\" name=\"register\" value=\"Enter\">";
+		echo "<input class=\"button\" class=\"button\" type=\"submit\" name=\"register\" value=\"Enter\">";
 		show_table2_header_end();
 	}
 
@@ -3669,11 +3669,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<input class=\"biginput\" type=\"password\" name=\"password2\" value=\"$password\" size=20>";
 
 		show_table2_v_delimiter2();
-		echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
 		if(isset($userid))
 		{
-			echo "<input type=\"submit\" name=\"register\" value=\"update\">";
-			echo "<input type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected user?');\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected user?');\">";
 		}
 
 		show_table2_header_end();
@@ -3718,11 +3718,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "</SELECT>";
 
 		show_table2_v_delimiter2();
-		echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
 		if(isset($problemid))
 		{
-			echo "<input type=\"submit\" name=\"register\" value=\"update\">";
-			echo "<input type=\"submit\" name=\"register\" value=\"delete\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\">";
 		}
 
 		show_table2_header_end();
@@ -3807,11 +3807,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
  
 		show_table2_v_delimiter2();
-		echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
 		if(isset($triggerid))
 		{
-			echo "<input type=\"submit\" name=\"register\" value=\"update\">";
-			echo "<input type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete trigger?');\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete trigger?');\">";
 		}
 
 		if(isset($triggerid))
@@ -3856,10 +3856,10 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			show_table2_v_delimiter2();
 			if(isset($triggerid))
 			{
-				echo "<input type=\"submit\" name=\"register\" value=\"add dependency\">";
+				echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add dependency\">";
 				if(DBnum_rows($result1)>0)
 				{
-					echo "<input type=\"submit\" name=\"register\" value=\"delete dependency\">";
+					echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete dependency\">";
 				}
 			}
 		}

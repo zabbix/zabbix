@@ -246,8 +246,8 @@
 			show_table_v_delimiter();
 			echo "<form name=\"form1\" method=\"get\" action=\"tr_status.php?select=true\">
   			<input class=\"biginput\" type=\"text\" name=\"txt_select\" value=\"$txt_select\">
-  			<input type=\"submit\" name=\"btnSelect\" value=\"Select\">
-  			<input type=\"submit\" name=\"btnSelect\" value=\"Inverse select\">
+  			<input class=\"button\" type=\"submit\" name=\"btnSelect\" value=\"Select\">
+  			<input class=\"button\" type=\"submit\" name=\"btnSelect\" value=\"Inverse select\">
 			<INPUT NAME=\"compact\" TYPE=\"HIDDEN\" value=\"$compact\">
 			<INPUT NAME=\"onlytrue\" TYPE=\"HIDDEN\" value=\"$onlytrue\">
 			<INPUT NAME=\"noactions\" TYPE=\"HIDDEN\" value=\"$noactions\">			
