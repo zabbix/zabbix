@@ -487,7 +487,6 @@ min	- MIN value for period of time, parameter - time in sec
 max	- MAX value for period of time, parameter - time in sec
 diff	- 1 - if last and previous values are different, 0 - otherwise
 prev	- previous value, parameter is ignored
-nodata	- 1, if no values were received for "parameter" seconds
 
 Simplest useful expression might look as:
 
