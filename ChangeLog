@@ -1,3 +1,7 @@
+Changes for 1.1alpha8:
+
+ - fixed memory[total] for HP-UX when >4GB of memory (Alexei)
+
 Changes for 1.1alpha7:
 
  - fixed memory[free] for HP-UX when >4GB of memory (Alexei)

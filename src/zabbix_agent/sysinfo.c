@@ -1802,7 +1802,7 @@ int	TOTALMEM(const char *cmd, const char *parameter,double  *value)
 		/* Get page size */	
 		page = pst.page_size;
 		/* Total physical memory in bytes */	
-		*value=page*pst.physical_memory;
+		*value=(double)page*pst.physical_memory;
 		return SYSINFO_RET_OK;
 	}
 #else
