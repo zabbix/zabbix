@@ -63,6 +63,8 @@ CREATE TABLE items (
   trapper_hosts		varchar(255)	DEFAULT '' NOT NULL,
   units			varchar(10)	DEFAULT '' NOT NULL,
   multiplier		int4		DEFAULT '0' NOT NULL,
+  delta			int1		DEFAULT '0' NOT NULL,
+  prevorgvalue		float8		DEFAULT '0.0',
   PRIMARY KEY (itemid),
   FOREIGN KEY (hostid) REFERENCES hosts
 );
