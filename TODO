@@ -1,7 +1,6 @@
 HIGH PRIORITY:
 
  - rewrite pinger.pl to use mass-send
- - include typa=INNODB into schema.sql for MySQL
  - check Rickard's multythreaded agent
  - check new Mariusz patches
  - support ':' between [] (example, diskspace[c:])

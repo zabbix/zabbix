@@ -1,5 +1,7 @@
 Changes for 1.0beta7:
 
+ - create/mysql/schema.sql will create tables with type=InnoDB by default
+ (Alexei)
  - added upgrades/dbpatches/1.0beta6_to_1.0beta7/ with patches (Alexei)
  - added item type TRAPPER (Alexei) 
  - fixes for PostgreSQL (Alexei)
