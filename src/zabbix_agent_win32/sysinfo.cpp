@@ -21,7 +21,6 @@
 **/
 
 #include "zabbixw32.h"
-#include <psapi.h>
 
 
 //
@@ -195,27 +194,34 @@ static LONG H_ProcCountSpecific(char *cmd,char *arg,double *value)
 
 static LONG H_MemoryInfo(char *cmd,char *arg,double *value)
 {
-   MEMORYSTATUS ms;
-//   PERFORMANCE_INFORMATION pfi;
+   if (!strcmp(cmd,"memory[cached]"))
+   {
+      PERFORMANCE_INFORMATION pfi;
 
-/*   if (!strcmp(cmd,"memory[cached]"))
-      GetPerformanceInfo(&pfi,sizeof(PERFORMANCE_INFORMATION));
-   else*/
+      if (imp_GetPerformanceInfo==NULL)
+         return SYSINFO_RC_NOTSUPPORTED;
+
+      imp_GetPerformanceInfo(&pfi,sizeof(PERFORMANCE_INFORMATION));
+      *value=(double)pfi.SystemCache*(double)pfi.PageSize;
+   }
+   else
+   {
+      MEMORYSTATUS ms;
+
       GlobalMemoryStatus(&ms);
 
-   if (!strcmp(cmd,"memory[total]"))
-      *value=(double)ms.dwTotalPhys;
-   else if (!strcmp(cmd,"memory[free]"))
-      *value=(double)ms.dwAvailPhys;
-/*   else if (!strcmp(cmd,"memory[cached]"))
-      *value=(double)pfi.SystemCache*(double)pfi.PageSize;*/
-   else if (!strcmp(cmd,"swap[total]"))
-      *value=(double)ms.dwTotalPageFile;
-   else if (!strcmp(cmd,"swap[free]"))
-      *value=(double)ms.dwAvailPageFile;
-   else
-      return SYSINFO_RC_NOTSUPPORTED;
-
+      if (!strcmp(cmd,"memory[total]"))
+         *value=(double)ms.dwTotalPhys;
+      else if (!strcmp(cmd,"memory[free]"))
+         *value=(double)ms.dwAvailPhys;
+      else if (!strcmp(cmd,"swap[total]"))
+         *value=(double)ms.dwTotalPageFile;
+      else if (!strcmp(cmd,"swap[free]"))
+         *value=(double)ms.dwAvailPageFile;
+      else
+         return SYSINFO_RC_NOTSUPPORTED;
+   }
+   
    return SYSINFO_RC_SUCCESS;
 }
 
@@ -325,20 +331,22 @@ static LONG H_PerfCounter(char *cmd,char *arg,double *value)
 
    if (PdhOpenQuery(NULL,0,&query)!=ERROR_SUCCESS)
    {
-      WriteLog("PdhOpenQuery failed\r\n");
+      WriteLog(MSG_PDH_OPEN_QUERY_FAILED,EVENTLOG_ERROR_TYPE,"s",
+               GetSystemErrorText(GetLastError()));
       return SYSINFO_RC_ERROR;
    }
 
    if (PdhAddCounter(query,counterName,0,&counter)!=ERROR_SUCCESS)
    {
-      WriteLog("PdhAddCounter(%s) failed\r\n",counterName);
+      WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"s",counterName);
       PdhCloseQuery(query);
       return SYSINFO_RC_NOTSUPPORTED;
    }
 
    if (PdhCollectQueryData(query)!=ERROR_SUCCESS)
    {
-      WriteLog("PdhCollectQueryData failed\r\n");
+      WriteLog(MSG_PDH_COLLECT_QUERY_DATA_FAILED,EVENTLOG_ERROR_TYPE,"s",
+               GetSystemErrorText(GetLastError()));
       PdhCloseQuery(query);
       return SYSINFO_RC_ERROR;
    }
@@ -398,7 +406,7 @@ static LONG H_MD5Hash(char *cmd,char *arg,char **value)
    hFileMapping=CreateFileMapping(hFile,NULL,PAGE_READONLY,0,0,NULL);
    if (hFileMapping==NULL)
    {
-      WriteLog("CreateFileMapping(%s) failed [%s]\r\n",
+      WriteLog(MSG_FILE_MAP_FAILED,EVENTLOG_ERROR_TYPE,"ss",
                fileName,GetSystemErrorText(GetLastError()));
       CloseHandle(hFile);
       return SYSINFO_RC_ERROR;
@@ -408,7 +416,7 @@ static LONG H_MD5Hash(char *cmd,char *arg,char **value)
    data=(unsigned char *)MapViewOfFile(hFileMapping,FILE_MAP_READ,0,0,0);
    if (data==NULL)
    {
-      WriteLog("MapViewOfFile(%s) failed [%s]\r\n",
+      WriteLog(MSG_MAP_VIEW_FAILED,EVENTLOG_ERROR_TYPE,"ss",
                fileName,GetSystemErrorText(GetLastError()));
       CloseHandle(hFileMapping);
       CloseHandle(hFile);
@@ -452,7 +460,7 @@ static LONG H_CRC32(char *cmd,char *arg,double *value)
    hFileMapping=CreateFileMapping(hFile,NULL,PAGE_READONLY,0,0,NULL);
    if (hFileMapping==NULL)
    {
-      WriteLog("CreateFileMapping(%s) failed [%s]\r\n",
+      WriteLog(MSG_FILE_MAP_FAILED,EVENTLOG_ERROR_TYPE,"ss",
                fileName,GetSystemErrorText(GetLastError()));
       CloseHandle(hFile);
       return SYSINFO_RC_ERROR;
@@ -462,7 +470,7 @@ static LONG H_CRC32(char *cmd,char *arg,double *value)
    data=(unsigned char *)MapViewOfFile(hFileMapping,FILE_MAP_READ,0,0,0);
    if (data==NULL)
    {
-      WriteLog("MapViewOfFile(%s) failed [%s]\r\n",
+      WriteLog(MSG_MAP_VIEW_FAILED,EVENTLOG_ERROR_TYPE,"ss",
                fileName,GetSystemErrorText(GetLastError()));
       CloseHandle(hFileMapping);
       CloseHandle(hFile);
@@ -673,8 +681,8 @@ void ProcessCommand(char *received_cmd,char *result)
          strcpy(result,"ZBX_ERROR\n");
          break;
       default:
-         strcpy(result,"ZBX_ERROR\n");
-         WriteLog("Internal error: unexpected iRC=%d in ProcessCommand(%s)\r\n",iRC,received_cmd);
+         strcpy(result,"ZBX_ERROR\n"); // MSG_UNEXPECETD_IRC
+         WriteLog(MSG_UNEXPECTED_IRC,EVENTLOG_ERROR_TYPE,"ds",iRC,received_cmd);
          break;
    }
 }

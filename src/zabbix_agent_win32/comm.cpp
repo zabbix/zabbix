@@ -85,14 +85,14 @@ static void CommThread(void *param)
 	timeout.tv_usec=0;
 	if (select(sock+1,&rdfs,NULL,NULL,&timeout)==0)
 	{
-		WriteLog("Timed out waiting for server command\r\n");
+		WriteLog(MSG_COMMAND_TIMEOUT,EVENTLOG_WARNING_TYPE,NULL);
       goto end_session;
 	}
 
    rc=recv(sock,rq.cmd,MAX_ZABBIX_CMD_LEN,0);
    if (rc<=0)
    {
-      WriteLog("recv() failed [%s]\r\n",strerror(errno));
+      WriteLog(MSG_RECV_ERROR,EVENTLOG_ERROR_TYPE,"s",strerror(errno));
       goto end_session;
    }
 
@@ -102,7 +102,7 @@ static void CommThread(void *param)
    if (WaitForSingleObject(hThread,confTimeout)==WAIT_TIMEOUT)
    {
       strcpy(rq.result,"ZBX_ERROR\n");
-      WriteLog("Timed out while processing request (%s)\r\n",rq.cmd);
+      WriteLog(MSG_REQUEST_TIMEOUT,EVENTLOG_WARNING_TYPE,"s",rq.cmd);
    }
    send(sock,rq.result,strlen(rq.result),0);
 
@@ -135,7 +135,7 @@ void ListenerThread(void *)
    // Create socket
    if ((sock=socket(AF_INET,SOCK_STREAM,0))==-1)
    {
-      WriteLog("Cannot open socket: %s\r\n",GetSystemErrorText(WSAGetLastError()));
+      WriteLog(MSG_SOCKET_ERROR,EVENTLOG_ERROR_TYPE,"s",GetSystemErrorText(WSAGetLastError()));
       exit(1);
    }
 
@@ -148,13 +148,12 @@ void ListenerThread(void *)
    // Bind socket
    if (bind(sock,(struct sockaddr *)&servAddr,sizeof(struct sockaddr_in))!=0)
    {
-      WriteLog("Cannot bind socket: %s\r\n",GetSystemErrorText(WSAGetLastError()));
+      WriteLog(MSG_BIND_ERROR,EVENTLOG_ERROR_TYPE,"s",GetSystemErrorText(WSAGetLastError()));
       exit(1);
    }
 
    // Set up queue
    listen(sock,SOMAXCONN);
-   WriteLog("Accepting connections on port %d\r\n",confListenPort);
 
    // Wait for connection requests
    while(1)
@@ -162,7 +161,7 @@ void ListenerThread(void *)
       iSize=sizeof(struct sockaddr_in);
       if ((sockClient=accept(sock,(struct sockaddr *)&servAddr,&iSize))==-1)
       {
-         WriteLog("accept() error: %s\n",GetSystemErrorText(WSAGetLastError()));
+         WriteLog(MSG_ACCEPT_ERROR,EVENTLOG_ERROR_TYPE,"s",GetSystemErrorText(WSAGetLastError()));
          closesocket(sock);
          exit(1);
       }

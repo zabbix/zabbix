@@ -27,8 +27,10 @@
 #include <process.h>
 #include <stdio.h>
 #include <pdh.h>
+#include <psapi.h>
 #include "../../include/common.h"
 #include "md5.h"
+#include "messages.h"
 
 
 //
@@ -40,9 +42,10 @@
 #else
 #define DEBUG_SUFFIX
 #endif
-#define AGENT_VERSION         "1.0.0-beta8(rc3)" DEBUG_SUFFIX
+#define AGENT_VERSION         "1.0.0-beta8(rc4)" DEBUG_SUFFIX
 
 #define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
+#define ZABBIX_EVENT_SOURCE   "Zabbix Win32 Agent"
 
 #define COMMAND_TIMEOUT       5
 
@@ -122,9 +125,12 @@ void ZabbixRemoveService(void);
 void ZabbixStartService(void);
 void ZabbixStopService(void);
 
+void ZabbixInstallEventSource(char *path);
+void ZabbixRemoveEventSource(void);
+
 void InitLog(void);
 void CloseLog(void);
-void WriteLog(char *format,...);
+void WriteLog(DWORD msg,WORD wType,char *format...);
 
 BOOL Initialize(void);
 void Shutdown(void);
@@ -147,7 +153,9 @@ void ExpandAlias(char *orig,char *expanded);
 
 extern DWORD dwTlsLogPrefix;
 extern HANDLE eventShutdown;
+
 extern BOOL optStandalone;
+extern BOOL optUseEventLog;
 
 extern char confFile[];
 extern char logFile[];
@@ -170,5 +178,6 @@ extern double statMaxCollectorTime;
 
 extern DWORD (__stdcall *imp_GetGuiResources)(HANDLE,DWORD);
 extern BOOL (__stdcall *imp_GetProcessIoCounters)(HANDLE,PIO_COUNTERS);
+extern BOOL (__stdcall *imp_GetPerformanceInfo)(PPERFORMANCE_INFORMATION,DWORD);
 
 #endif
