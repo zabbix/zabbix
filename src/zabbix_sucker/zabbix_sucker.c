@@ -440,6 +440,10 @@ int	get_value_INTERNAL(double *result,char *result_str,DB_ITEM *item)
 	{
 		*result=DBget_items_count();
 	}
+	else if(strcmp(item->key,"zabbix[items_unsupported]")==0)
+	{
+		*result=DBget_items_unsupported_count();
+	}
 	else if(strcmp(item->key,"zabbix[history]")==0)
 	{
 		*result=DBget_history_count();
