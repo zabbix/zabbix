@@ -20,7 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = S_LATEST_VALUES;
+	$page["title"] = S_OVERVIEW;
 	$page["file"] = "overview.php";
 	show_header($page["title"],0,0);
 ?>
@@ -54,7 +54,7 @@
 ?>
 
 <?php
-	$h1="&nbsp;".S_LATEST_DATA;
+	$h1="&nbsp;".S_OVERVIEW_BIG;
 
 	$h2=S_GROUP."&nbsp;";
 	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
