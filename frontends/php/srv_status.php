@@ -24,14 +24,14 @@
 	}
 
 	$now=time();
-	$result=DBselect("select serviceid,name,triggerid,status from services order by name");
+	$result=DBselect("select serviceid,name,triggerid,status,showsla from services order by name");
 	echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";
 	echo "\n";
 	echo "<tr>";
 	echo "<td width=40%><b>Service</b></td>";
 	echo "<td width=10%><b>Status</b></td>";
 	echo "<td><b>Reason</b></td>";
-	echo "<td width=20%><b>SLA</b></td>";
+	echo "<td width=20%><b>SLA (last 7 days)</b></td>";
 	echo "<td width=5%><b>Graph</b></td>";
 	echo "</tr>";
 	echo "\n";
@@ -43,6 +43,14 @@
 		echo "<td><b><a href=\"srv_status.php?serviceid=".$service["serviceid"]."\">".$service["name"]."</a></b></td>";
 		echo "<td>".get_service_status_description($service["status"])."</td>";
 		echo "<td>&nbsp;</td>";
+		if($service["showsla"]==1)
+		{
+			echo "<td><img src=\"chart_sla.php?serviceid=".$service["serviceid"]."\"></td>";
+		}
+		else
+		{
+			echo "<td>-</td>";
+		}
 		echo "<td>-</td>";
 		echo "</tr>"; 
 		$col++;
@@ -133,7 +141,14 @@
 			}
 			echo "</td>";
 		}
-		echo "<td><img src=\"chart_sla.php?serviceid=".$row["serviceid"]."\"></td>";
+		if($row["showsla"]==1)
+		{
+			echo "<td><img src=\"chart_sla.php?serviceid=".$row["serviceid"]."\"></td>";
+		}
+		else
+		{
+			echo "<td>-</td>";
+		}
 		echo "<td><a href=\"srv_status.php?serviceid=".$row["serviceid"]."&showgraph=1\">Show</a></td>";
 		echo "</tr>"; 
 	}

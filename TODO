@@ -1,9 +1,9 @@
 TOP PRIORITY:
 
+ - check SNMP port number
  - improve graphing capabilities
  - support for net-snmp
  - SNMP trapping
- - support for SLA level in IT Services 
 
 BUGS:
 
