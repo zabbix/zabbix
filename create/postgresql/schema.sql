@@ -282,18 +282,18 @@ insert into items_template (itemtemplateid,platformid,description,key_,delay)
 	values (31,1,'Cached memory (kB)','memory[cached]', 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
 	values (32,1,'Total swap space (Kb)','swap[total]', 1800);
-insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (33,1,'Amount of memory swapped in from disk (kB/s)','swap[in]', 30);
-insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (34,1,'Amount of memory swapped to disk (kB/s)','swap[out]', 30);
-insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (35,1,'Blocks sent to a block device (blocks/s)','io[in]', 30);
-insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (36,1,'Blocks received from a block device (blocks/s)','io[out]', 30);
-insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (37,1,'The number of interrupts per second, including the clock','system[interrupts]', 30);
-insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (38,1,'The number of context switches per second','system[switches]', 30);
+--insert into items_template (itemtemplateid,platformid,description,key_,delay)
+--	values (33,1,'Amount of memory swapped in from disk (kB/s)','swap[in]', 30);
+--insert into items_template (itemtemplateid,platformid,description,key_,delay)
+--	values (34,1,'Amount of memory swapped to disk (kB/s)','swap[out]', 30);
+--insert into items_template (itemtemplateid,platformid,description,key_,delay)
+--	values (35,1,'Blocks sent to a block device (blocks/s)','io[in]', 30);
+--insert into items_template (itemtemplateid,platformid,description,key_,delay)
+--	values (36,1,'Blocks received from a block device (blocks/s)','io[out]', 30);
+--insert into items_template (itemtemplateid,platformid,description,key_,delay)
+--	values (37,1,'The number of interrupts per second, including the clock','system[interrupts]', 30);
+--insert into items_template (itemtemplateid,platformid,description,key_,delay)
+--	values (38,1,'The number of context switches per second','system[switches]', 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
 	values (39,1,'Email (SMTP) server is running','net[listen_25]', 60);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
