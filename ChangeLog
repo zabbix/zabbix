@@ -28,7 +28,6 @@ Not ready yet:
 
  OTHER:
 
- - \n change to \r\n in send_email() (Alexei)
  - check for function parameters in evaluate_simple_expression
  - make links different if something is already registered (as for medias,
    actions, etc)
@@ -56,8 +55,8 @@ Not ready yet:
 
 Changes for 1.0beta6:
 
+ - \n change to \r\n in send_email() (Alexei)
  - added table service_alarms (Alexei)
-
  - fixed problem with parsing of trigger expressions. [.-.] changed
  to - (Alexei)
  - support for function nodata() added (Alexei)
