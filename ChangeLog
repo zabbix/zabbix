@@ -1,5 +1,6 @@
 Changes for 1.0beta9:
 
+ - different styles for user-defined graphs (Alexei)
  - cached memory in bytes (not in Kb as before) (Alexei)
  - show current and planned SLA in IT Services screen (Alexei)
  - added sort order by sortorder for IT Services (Alexei)

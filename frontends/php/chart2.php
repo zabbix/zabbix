@@ -47,7 +47,7 @@
 
 	check_authorisation();
 
-	$result2=DBselect("select gi.itemid,i.description,gi.color,h.host from graphs_items gi,items i,hosts h where gi.itemid=i.itemid and gi.graphid=".$HTTP_GET_VARS["graphid"]." and i.hostid=h.hostid order by gi.gitemid");
+	$result2=DBselect("select gi.itemid,i.description,gi.color,h.host,gi.drawtype from graphs_items gi,items i,hosts h where gi.itemid=i.itemid and gi.graphid=".$HTTP_GET_VARS["graphid"]." and i.hostid=h.hostid order by gi.gitemid");
 
 	$shiftX=10;
 	$shiftYup=17;
@@ -119,6 +119,7 @@
 	$y=array();
 	$desc=array();
 	$color=array();
+	$drawtype=array();
 
 	unset($maxX);
 	unset($maxY);
@@ -131,6 +132,7 @@
 		$desc[$item]=DBget_field($result2,$item,1);
 		$color[$item]=DBget_field($result2,$item,2);
 		$host[$item]=DBget_field($result2,$item,3);
+		$drawtype[$item]=DBget_field($result2,$item,4);
 
 		$result=DBselect("select clock,value from history where itemid=$itemid and clock>$from_time and clock<$to_time order by clock");
 		$len[$item]=0;
@@ -205,7 +207,33 @@
 	}
 	$maxY = $my_mant*pow(10,$my_exp);
 	$minY = 0;
+/*
+	$startTime=$minX;
+	if (($maxX-$minX) < 300)
+		$precTime=10;
+	elseif (($maxX-$minX) < 3600 )
+		$precTime=60;
+	else
+		$precTime=300;
 
+	if (($maxX-$minX) < 1200 )
+		$dateForm="H:i:s";
+	else
+		$dateForm="H:i:s";
+
+	$correctTime=$startTime % $precTime;
+	$stepTime=ceil(ceil(($maxX-$minX)/20)/$precTime)*(1.0*$precTime);
+
+	for($i=1;$i<$my_steps;$i++)
+	{
+		ImageDashedLine($im,$shiftX,$i/$my_steps*$sizeY+$shiftYup,$sizeX+$shiftX,$i/$my_steps*$sizeY+$shiftYup,$gray);
+	}
+	for($j=$stepTime-$correctTime;$j<=($maxX-$minX);$j+=$stepTime)
+	{
+		ImageDashedLine($im,$shiftX+($sizeX*$j)/($maxX-$minX),$shiftYup,$shiftX+($sizeX*$j)/($maxX-$minX),$sizeY+$shiftYup,$gray);
+	}
+
+*/
 //	$result2=DBselect("select itemid from graphs_items where graphid=".$HTTP_GET_VARS["graphid"]);
 	for($item=0;$item<DBnum_rows($result2);$item++)
 	{
@@ -225,7 +253,29 @@
 				$y2=$sizeY-$y2;
 
 	//		echo $x1," - ",$x2," - ",$y1," - ",$y2,"<Br>";
-				ImageLine($im,$x1+$shiftX,$y1+$shiftYup,$x2+$shiftX,$y2+$shiftYup,$colors[$color[$item]]);
+				if($drawtype[$item]==1)
+				{
+					$a[0]=$x1+$shiftX;
+					$a[1]=$y1+$shiftYup;
+					$a[2]=$x1+$shiftX;
+					$a[3]=$shiftYup+$sizeY;
+					$a[4]=$x2+$shiftX;
+					$a[5]=$shiftYup+$sizeY;
+					$a[6]=$x2+$shiftX;
+					$a[7]=$y2+$shiftYup;
+
+					ImageFilledPolygon($im,$a,4,$colors[$color[$item]]);
+				}
+				else if($drawtype[$item]==2)
+				{
+					ImageLine($im,$x1+$shiftX,$y1+$shiftYup,$x2+$shiftX,$y2+$shiftYup,$colors[$color[$item]]);
+					ImageLine($im,$x1+$shiftX,$y1+$shiftYup+1,$x2+$shiftX,$y2+$shiftYup+1,$colors[$color[$item]]);
+				}
+// default or '0'
+				else
+				{
+					ImageLine($im,$x1+$shiftX,$y1+$shiftYup,$x2+$shiftX,$y2+$shiftYup,$colors[$color[$item]]);
+				}
 
 				$itemMin=min($y[$item][$i+1], $itemMin);
 				$itemMax=max($y[$item][$i+1], $itemMax);
@@ -278,7 +328,6 @@
 	{
 		ImageDashedLine($im,$shiftX+($sizeX*$j)/($maxX-$minX),$shiftYup,$shiftX+($sizeX*$j)/($maxX-$minX),$sizeY+$shiftYup,$gray);
 	}
-
 
 
 	if($nodata == 0)
