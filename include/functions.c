@@ -870,7 +870,7 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 		}
 		else if(ACTION_SCOPE_HOST==action.scope)
 		{
-			sprintf(sql,"select * from actions a,triggers t,hosts h,functions f,items i where a.triggerid=t.triggerid and f.triggerid=t.triggerid and i.itemid=f.itemid and h.hostid=i.hostid and a.scope=%d",ACTION_SCOPE_HOSTS);
+			sprintf(sql,"select * from actions a,triggers t,hosts h,functions f,items i where a.triggerid=t.triggerid and f.triggerid=t.triggerid and i.itemid=f.itemid and h.hostid=i.hostid and a.scope=%d",ACTION_SCOPE_HOST);
 			result2 = DBselect(sql);
 			if(DBnum_rows(result2)==0)
 			{
