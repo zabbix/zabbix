@@ -34,6 +34,7 @@ TKOM:
 
 OTHER:
 
+ - get rid of net[listen_*] in templates
  - use assert() for critical functions
  - check if simple checks  (FTP, SMTP!) works correctly when host name (not IP) is used
 I found that if I use the fully qualified name of my host, all simple checks
