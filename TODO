@@ -43,7 +43,6 @@ With some research I've discovered that if I disable the SNMP item (which
 is obviously failing to get to the router) the icmpping trigger comes up as
 TRUE and will stay there until the fault has been cleared.
 
- - add information about integration with OpenView to the manual
  - add tabs to all screens where required
  - check all screens if they are user friendly and present information in the best possible way
  - possibility (a button) to recheck unsupported parameters
