@@ -26,6 +26,12 @@
 ?>
 
 <?php
+	define("SHOW_TRIGGERS",0);
+	define("SHOW_DATA",1);
+?>
+
+
+<?php
         if(!check_anyright("Host","R"))
         {
                 show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
@@ -95,7 +101,7 @@
 		$_GET["sort"]="description";
 	}
 
-	if(isset($_GET["groupid"])&&isset($_GET["type"])&&($_GET["type"]==1))
+	if(isset($_GET["groupid"])&&isset($_GET["type"])&&($_GET["type"]==SHOW_DATA))
 	{
 		table_begin();
 		$header=array("&nbsp;");
@@ -162,7 +168,7 @@
 		}
 		table_end();
 	}
-	else if(isset($_GET["groupid"])&&isset($_GET["type"])&&($_GET["type"]==0))
+	else if(isset($_GET["groupid"])&&isset($_GET["type"])&&($_GET["type"]==SHOW_TRIGGERS))
 	{
 		table_begin();
 		$header=array("&nbsp;");
@@ -234,13 +240,7 @@
 	}
 	else
 	{
-		echo "<TABLE BORDER=0 align=center WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-		echo "<TR BGCOLOR=\"#DDDDDD\">";
-		echo "<TD ALIGN=CENTER>";
-		echo "...";
-		echo "</TD>";
-		echo "</TR>";
-		echo "</TABLE>";
+		table_nodata();
 	}
 ?>
 
