@@ -23,6 +23,116 @@
 	include_once 	"include/db.inc.php";
 	include_once 	"include/local_en.inc.php";
 
+	# Insert host template form
+	function	insert_template_form($hosttemplateid)
+	{
+		if(isset($hosttemplateid))
+		{
+			$result=DBselect("select u.alias,u.name,u.surname,u.passwd,u.url from users u where u.userid=$userid");
+
+			$row=DBfetch($result);
+	
+			$hostid=$row["hostid"];
+			$host=get_host_by_hostid($hostid);
+			$templateid=$row["templateid"];
+			$template=get_host_by_hostid($templateid);
+			$items=$row["items"];
+			$triggers=$row["triggers"];
+			$actions=$row["actions"];
+			$graphs=$row["graphs"];
+			$screens=$row["screens"];
+		}
+		else
+		{
+			$hostid=0;
+			$templateid=0;
+			$items=7;
+			$triggers=7;
+			$actions=7;
+			$graphs=7;
+			$screens=7;
+		}
+
+		$col=0;
+
+		show_form_begin("hosts");
+		echo S_TEMPLATE;
+
+		show_table2_v_delimiter($col++);
+		echo "<form method=\"get\" action=\"hosts.php\">";
+		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_GET["config"]."\" size=8>";
+		if(isset($hosttemplateid))
+		{
+			echo "<input class=\"biginput\" name=\"hosttemplateid\" type=\"hidden\" value=\"$hosttemplateid\" size=8>";
+		}
+		if($hostid!=0)
+		{
+			echo "<input class=\"biginput\" name=\"hostid\" type=\"hidden\" value=\"$hostid\" size=8>";
+		}
+		echo S_TEMPLATE;
+		show_table2_h_delimiter();
+		echo "<select class=\"biginput\" name=\"templateid\" value=\"3\">";
+	        $result=DBselect("select hostid,host from hosts order by host");
+		while($row=DBfetch($result))
+	        {
+			if($templateid==$row["hostid"])
+			{
+	                	echo "<option value=\"".$row["hostid"]."\" selected>".$row["host"];
+			}
+			else
+			{
+	                	echo "<option value=\"".$row["hostid"]."\">".$row["host"];
+			}
+	        }
+		echo "</select>";
+
+
+		show_table2_v_delimiter($col++);
+		echo S_ITEMS;
+		show_table2_h_delimiter();
+		echo "<input type=checkbox checked name=\"items_add\" \">".S_ADD;
+		echo "<input type=checkbox checked name=\"items_update\" \">".S_UPDATE;
+		echo "<input type=checkbox checked name=\"items_delete\" \">".S_DELETE;
+
+		show_table2_v_delimiter($col++);
+		echo S_TRIGGERS;
+		show_table2_h_delimiter();
+		echo "<input type=checkbox checked name=\"triggers_add\" \">".S_ADD;
+		echo "<input type=checkbox checked name=\"triggers_update\" \">".S_UPDATE;
+		echo "<input type=checkbox checked name=\"triggers_delete\" \">".S_DELETE;
+
+		show_table2_v_delimiter($col++);
+		echo S_ACTIONS;
+		show_table2_h_delimiter();
+		echo "<input type=checkbox checked name=\"actions_add\" \">".S_ADD;
+		echo "<input type=checkbox checked name=\"actions_update\" \">".S_UPDATE;
+		echo "<input type=checkbox checked name=\"actions_delete\" \">".S_DELETE;
+
+		show_table2_v_delimiter($col++);
+		echo S_GRAPHS;
+		show_table2_h_delimiter();
+		echo "<input type=checkbox checked name=\"graphs_add\" \">".S_ADD;
+		echo "<input type=checkbox checked name=\"graphs_update\" \">".S_UPDATE;
+		echo "<input type=checkbox checked name=\"graphs_delete\" \">".S_DELETE;
+
+		show_table2_v_delimiter($col++);
+		echo S_SCREENS;
+		show_table2_h_delimiter();
+		echo "<input type=checkbox checked name=\"screens_add\" \">".S_ADD;
+		echo "<input type=checkbox checked name=\"screens_update\" \">".S_UPDATE;
+		echo "<input type=checkbox checked name=\"screens_delete\" \">".S_DELETE;
+
+		show_table2_v_delimiter2($col++);
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add linkage\">";
+		if(isset($userid))
+		{
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update linkage\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete linkage\" onClick=\"return Confirm('Delete selected linkage?');\">";
+		}
+
+		show_table2_header_end();
+	}
+
 	# Insert form for User
 	function	insert_user_form($userid)
 	{
@@ -53,6 +163,7 @@
 
 		show_table2_v_delimiter($col++);
 		echo "<form method=\"get\" action=\"users.php\">";
+		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_GET["config"]."\" size=8>";
 		if(isset($userid))
 		{
 			echo "<input class=\"biginput\" name=\"userid\" type=\"hidden\" value=\"$userid\" size=8>";
