@@ -50,6 +50,24 @@
 
 #include "housekeeper.h"
 
+/* Remove hosts having status 'deleted' */
+int housekeeping_hosts(int now)
+{
+	char		sql[MAX_STRING_LEN+1];
+	DB_RESULT	*result;
+	int		i,hostid;
+
+	sprintf(sql,"select hostid from hosts where status=%d", HOST_STATUS_DELETED);
+	result = DBselect(sql);
+	for(i=0;i<DBnum_rows(result);i++)
+	{
+		hostid=atoi(DBget_field(result,i,0));
+		DBdelete_host(hostid);
+	}
+	DBfree_result(result);
+	return SUCCEED;
+}
+
 int housekeeping_history(int now)
 {
 	char		sql[MAX_STRING_LEN+1];
@@ -182,7 +200,10 @@ int main_housekeeper_loop()
 #endif
 		DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
 
-		DBvacuum();
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("housekeeper [removing deleted hosts]");
+#endif
+		housekeeping_hosts(now);
 
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("housekeeper [removing old values]");
@@ -203,6 +224,11 @@ int main_housekeeper_loop()
 		setproctitle("housekeeper [removing old sessions]");
 #endif
 		housekeeping_sessions(now);
+
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("housekeeper [vacuuming database]");
+#endif
+		DBvacuum();
 
 		zabbix_log( LOG_LEVEL_DEBUG, "Sleeping for %d hours", CONFIG_HOUSEKEEPING_FREQUENCY);
 
