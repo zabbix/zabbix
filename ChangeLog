@@ -1,4 +1,4 @@
-Noe ready yet:
+Not ready yet:
 
 [ Better validation of trigger expressions ]
 [ Support for nodata() ] 
@@ -15,8 +15,8 @@ Noe ready yet:
 
 Changes for 1.0beta3:
 
+ - added partial support for non-syslog logging (Alexei)
  - added files include/log.h and include/log.c (Alexei)
-
  - solved problem with getpeername() (Alexei)
  - support for parameter Timeout for zabbix_trapper (Alexei)
  - support for parameter Timeout for zabbix_trapperd (Alexei)
