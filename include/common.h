@@ -8,8 +8,8 @@
 #define	MAXFD	64
 
 
-#define	SUCKER_DELAY	5
-#define	ALARMER_DELAY	1
+#define	SUCKER_DELAY	10
+#define	ALARMER_DELAY	10
 
 #define	SUCKER_TIMEOUT	5
 #define	AGENT_TIMEOUT	3
