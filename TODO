@@ -1,5 +1,6 @@
 1.0beta10:
 
+ - performance items for simple checks
  - UserParameter does not appear in the log
  - add support for diskused[*]
  - allow creation of PID file as 'root'. Required for RedHat RPMs.
