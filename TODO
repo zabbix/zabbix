@@ -64,7 +64,6 @@ HB:
  - test everything under Explorer and Netscape. Especially Graphs,Charts and Maps.
  - BUG. history graph goes left
  - Graphs for specified period and date and time
- - Check Housekeeping procedure
  - personalisation (refresh rate, graph size, default graph period, etc)
  - add protection from IT Service loop
  - add severity to pre-defined triggers 
