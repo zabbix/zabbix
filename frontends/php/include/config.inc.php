@@ -3020,7 +3020,8 @@ echo "</head>";
 		}
 
 		$sql="insert into graphs (name,width,height,yaxistype,yaxismin,yaxismax) values ('$name',$width,$height,$yaxistype,$yaxismin,$yaxismax)";
-		return	DBexecute($sql);
+		$result=DBexecute($sql);
+		return DBinsert_id($result,"graphs","graphid");
 	}
 
 	function	update_graph_item($gitemid,$itemid,$color,$drawtype,$sortorder)
@@ -3556,6 +3557,29 @@ echo "</head>";
 //					echo "$sql<br>";
 					$result4=DBexecute($sql);
 					$actionid=DBinsert_id($result4,"actions","actionid");
+				}
+			}
+		}
+
+		# Add graphs
+		$sql="select distinct g.graphid from graphs g,items i, hosts h,graphs_items gi where h.hostid=$templateid and i.hostid=h.hostid and gi.itemid=i.itemid and g.graphid=gi.graphid";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			$graph=get_graph_by_graphid($row["graphid"]);
+			$graphid=add_graph($graph["name"],$graph["width"],$graph["height"],$graph["yaxistype"],$graph["yaxismin"],$graph["yaxismax"]);
+			$sql="select distinct gi.gitemid from graphs_items gi,graphs g,items i,hosts h  where gi.itemid=i.itemid and h.hostid=$templateid and i.hostid=h.hostid and g.graphid=gi.graphid and gi.itemid=i.itemid and g.graphid=".$graph["graphid"];
+			$result2=DBselect($sql);
+			while($row=DBfetch($result2))
+			{
+				$gitem=get_graphitem_by_gitemid($row["gitemid"]);
+				$item=get_item_by_itemid($gitem["itemid"]);
+				$sql="select * from items where key_='".$item["key_"]."' and hostid=$hostid";
+				$result3=DBselect($sql);
+				if(DBnum_rows($result3)==1)
+				{
+					$row2=DBfetch($result3);
+					add_item_to_graph($graphid,$row2["itemid"],$gitem["color"],$gitem["drawtype"],$gitem["sortorder"]);
 				}
 			}
 		}

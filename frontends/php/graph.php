@@ -174,7 +174,7 @@
 
 	echo S_PARAMETER;
 	show_table2_h_delimiter();
-	$result=DBselect("select h.host,i.description,i.itemid from hosts h,items i where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE." order by h.host,i.description");
+	$result=DBselect("select h.host,i.description,i.itemid from hosts h,items i where h.hostid=i.hostid and h.status in(".HOST_STATUS_MONITORED.",".HOST_STATUS_TEMPLATE.") and i.status=".ITEM_STATUS_ACTIVE." order by h.host,i.description");
 	echo "<select name=\"itemid\" size=1>";
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
