@@ -2,27 +2,15 @@
 
 #include "errno.h"
 
-/* For bcopy */
-#ifdef HAVE_STRING_H
-	#include <string.h>
-#endif
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
 #ifdef HAVE_STRINGS_H
 	#include <strings.h>
-#endif
-#ifdef HAVE_STDIO_H
-	#include <stdio.h>
-#endif
-#ifdef HAVE_STDLIB_H
-	#include <stdlib.h>
-#endif
-#ifdef HAVE_UNISTD_H
-	#include <unistd.h>
-#endif
-#ifdef HAVE_SYS_STAT_H
-	#include <sys/stat.h>
-#endif
-#ifdef HAVE_SYS_TYPES_H
-	#include <sys/types.h>
 #endif
 #ifdef HAVE_FCNTL_H
 	#include <fcntl.h>
@@ -88,12 +76,19 @@
 #ifdef HAVE_SYS_VMMETER_H
 	#include <sys/vmmeter.h>
 #endif
+/* FreeBSD */
+#ifdef HAVE_SYS_TIME_H
+	#include <sys/time.h>
+#endif
 
 #include "common.h"
 #include "sysinfo.h"
 
 COMMAND	commands[AGENT_MAX_USER_COMMANDS]=
 	{
+	{"kern[maxfiles]"		,KERNEL_MAXFILES, 0},
+	{"kern[maxproc]"		,KERNEL_MAXPROC, 0},
+
 	{"proc_cnt[*]"			,PROCCNT, "inetd"},
 
 	{"memory[total]"		,TOTALMEM, 0},
@@ -868,6 +863,51 @@ float	FREEMEM(void)
 #endif
 }
 
+float	KERNEL_MAXFILES(void)
+{
+#ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXFILES
+	int	mib[2],len;
+	int	maxfiles;
+
+	mib[0]=CTL_KERN;
+	mib[1]=KERN_MAXFILES;
+
+	len=sizeof(maxfiles);
+
+	if(sysctl(mib,2,&maxfiles,&len,NULL,0) != 0)
+	{
+		return	FAIL;
+	}
+
+	return (float)(maxfiles);
+#else
+	return	FAIL;
+#endif
+}
+
+float	KERNEL_MAXPROC(void)
+{
+#ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXPROC
+	int	mib[2],len;
+	int	maxproc;
+
+	mib[0]=CTL_KERN;
+	mib[1]=KERN_MAXPROC;
+
+	len=sizeof(maxproc);
+
+	if(sysctl(mib,2,&maxproc,&len,NULL,0) != 0)
+	{
+		return	FAIL;
+/*		printf("Errno [%m]");*/
+	}
+
+	return (float)(maxproc);
+#else
+	return	FAIL;
+#endif
+}
+
 float	UPTIME(void)
 {
 #ifdef HAVE_SYSINFO_UPTIME
@@ -882,7 +922,28 @@ float	UPTIME(void)
 		return FAIL;
 	}
 #else
+#ifdef HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME
+	int	mib[2],len;
+	struct timeval	uptime;
+	int	now;
+
+	mib[0]=CTL_KERN;
+	mib[1]=KERN_BOOTTIME;
+
+	len=sizeof(uptime);
+
+	if(sysctl(mib,2,&uptime,&len,NULL,0) != 0)
+	{
+		return	FAIL;
+/*		printf("Errno [%m]\n");*/
+	}
+
+	now=time(NULL);
+
+	return (float)(now-uptime.tv_sec);
+#else
 	return	FAIL;
+#endif
 #endif
 }
 

@@ -147,7 +147,6 @@ int	main()
 {
 	char	*s,*p;
 	char	*server,*key,*value_string;
-	double	value;
 
 	int	ret=SUCCEED;
 
@@ -187,16 +186,21 @@ int	main()
 	{
 		return FAIL;
 	}
-	value=atof(value_string);
+//	???
+//	value=atof(value_string);
 
 
 	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
 
-	ret=process_data(server,key,value);
+	ret=process_data(server,key,value_string);
 
 	alarm(0);
 
 	if(SUCCEED == ret)
+	{
+		printf("OK\n");
+	}
+	else
 	{
 		printf("OK\n");
 	}
