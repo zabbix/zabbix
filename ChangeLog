@@ -1,5 +1,6 @@
 Changes for 1.0beta10:
 
+ - support of proc_cnt[*] under Solaris. Thanks to Marc Ledent (Alexei)
  - fixed sysinfo() result. Multiplication to mem_unit required (Alexei)
  - better reporting in case of different startup errors (Alexei)
  - added include/pid.c and include/pid.h (Alexei)

@@ -49,7 +49,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   sys/vfs.h sys/pstat.h sys/sysinfo.h sys/statvfs.h \
   sys/socket.h sys/loadavg.h netinet/in.h arpa/inet.h \
   sys/swap.h sys/vmmeter.h strings.h sys/sysctl.h vm/vm_param.h \
-  sys/time.h kstat.h sys/syscall.h sys/sysmacros.h)
+  sys/time.h kstat.h sys/syscall.h sys/sysmacros.h sys/procfs.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -80,6 +80,15 @@ AC_MSG_CHECKING(for file /proc/1/status)
 if test -r /proc/1/status; then
 	AC_MSG_RESULT(yes)
 	AC_DEFINE(HAVE_PROC_1_STATUS)
+else
+	AC_MSG_RESULT(no)
+fi
+
+dnl Check for file /proc/0/psinfo (Solaris)
+AC_MSG_CHECKING(for file /proc/0/psinfo)
+if test -r /proc/0/psinfo; then
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(HAVE_PROC_0_PSINFO)
 else
 	AC_MSG_RESULT(no)
 fi
