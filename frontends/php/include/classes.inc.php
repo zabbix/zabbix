@@ -339,6 +339,10 @@
 			$this->checkPermissions();
 
 			$this->SelectData();
+			if($this->nodata==1)
+			{
+				$this->noDataFound();
+			}
 
 			$this->drawGrid();
 		
