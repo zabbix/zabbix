@@ -231,7 +231,20 @@ float	PROCLOAD(void)
 		return FAIL;	
 	}
 #else
+#ifdef	HAVE_SYS_PSTAT_H
+	struct	pst_dynamic dyn;
+
+	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
+	{
+		return FAIL;
+	}
+	else
+	{
+		return dyn.psd_avg_1_min;
+	}
+#else
 	return	getPROC("/proc/loadavg",1,1);
+#endif
 #endif
 }
 
@@ -249,7 +262,20 @@ float	PROCLOAD5(void)
 		return FAIL;	
 	}
 #else
+#ifdef	HAVE_SYS_PSTAT_H
+	struct	pst_dynamic dyn;
+
+	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
+	{
+		return FAIL;
+	}
+	else
+	{
+		return dyn.psd_avg_5_min;
+	}
+#else
 	return	getPROC("/proc/loadavg",1,2);
+#endif
 #endif
 }
 
@@ -267,7 +293,20 @@ float	PROCLOAD15(void)
 		return FAIL;	
 	}
 #else
+#ifdef	HAVE_SYS_PSTAT_H
+	struct	pst_dynamic dyn;
+
+	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
+	{
+		return FAIL;
+	}
+	else
+	{
+		return dyn.psd_avg_5_min;
+	}
+#else
 	return	getPROC("/proc/loadavg",1,3);
+#endif
 #endif
 }
 
