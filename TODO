@@ -28,6 +28,7 @@ Not ready yet:
 
  OTHER:
 
+ - log rotating for trace files
  - agent to send something back in case of timeout (?)
  - check for function parameters in evaluate_simple_expression
  - make links different if something is already registered (as for medias,
