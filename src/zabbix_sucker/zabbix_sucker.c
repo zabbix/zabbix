@@ -657,7 +657,7 @@ int get_values(void)
 		else if(res == NOTSUPPORTED)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Parameter [%s] is not supported by agent on host [%s]", item.key, item.host );
-			DBupdate_item_status_to_unsupported(item.itemid);
+			DBupdate_item_status_to_notsupported(item.itemid);
 			if(HOST_STATUS_UNREACHABLE == host_status)
 			{
 				host_status=HOST_STATUS_MONITORED;
