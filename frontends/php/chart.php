@@ -71,7 +71,12 @@
 
 		function setWidth($width)
 		{
-			$this->width=$width;
+			$this->sizeX=$width;
+		}
+
+		function setHeight($height)
+		{
+			$this->sizeY=$height;
 		}
 
 		function setBorder($border)
@@ -617,6 +622,10 @@
 	if(isset($HTTP_GET_VARS["width"]))
 	{
 		$graph->setWidth($HTTP_GET_VARS["width"]);
+	}
+	if(isset($HTTP_GET_VARS["height"]))
+	{
+		$graph->setHeight($HTTP_GET_VARS["height"]);
 	}
 	if(isset($HTTP_GET_VARS["border"]))
 	{

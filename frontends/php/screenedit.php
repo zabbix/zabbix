@@ -43,13 +43,16 @@
 		if($HTTP_GET_VARS["register"]=="delete")
 		{
 			$result=delete_screen_item($HTTP_GET_VARS["screenitemid"]);
+			$result=delete_screen_graph($HTTP_GET_VARS["screengraphid"]);
 			show_messages($result,"Item deleted","Cannot delete item");
-			unset($gitemid);
+			unset($HTTP_GET_VARS["x"]);
 		}
                 if($HTTP_GET_VARS["register"]=="update")
                 {
                         $result=update_screen_item($HTTP_GET_VARS["screenitemid"],$HTTP_GET_VARS["graphid"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
+                        $result=update_screen_graph($HTTP_GET_VARS["screengraphid"],$HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
                         show_messages($result,"Item updated","Cannot update item");
+			unset($HTTP_GET_VARS["x"]);
                 }
 		unset($HTTP_GET_VARS["register"]);
 
@@ -210,7 +213,7 @@
 
 			show_table2_v_delimiter2();
 			echo "<input type=\"submit\" name=\"register\" value=\"add\">";
-			if($screenitemid!=0) 
+			if(($screenitemid!=0)||($screengraphid!=0)) 
 			{ 
 				echo "<input type=\"submit\" name=\"register\" value=\"update\">";
 			}
