@@ -34,6 +34,18 @@ TKOM:
 
 OTHER:
 
+ - security-related issues
+
+There are still quite a few strcpy calls made against non-const user, database, or remote supplied data, in both the src/* and include/* directories.
+
+printf calls w/o static format specifiers...
+in src and include:
+grep -R printf * | grep -v "\%\|Makefile\|Binary"
+
+extensive use of atoi rather than something w/ bounds checking like strtol.
+
+Most of the signal handlers all need to delay or block signals to avoid signal race conditions, as they call non-reentrant functions.
+
  -support of Oracle
  - check if Zabbix send alert while initial unknown->true state change
 
