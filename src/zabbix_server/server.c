@@ -511,8 +511,6 @@ void zabbix_syslog(const char *fmt, ...)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In zabbix_log()");
 
-
-
 	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula from items i,hosts h where h.hostid=i.hostid and i.key_='%s' and i.value_type=%d", SERVER_ZABBIXLOG_KEY,ITEM_VALUE_TYPE_STR);
 	result = DBselect(sql);
 
@@ -686,6 +684,7 @@ int get_values(void)
 			{
 				item.host_status=HOST_STATUS_MONITORED;
 				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
+				zabbix_syslog("Enabling host [%s]", item.host );
 #ifdef ZABBIX_THREADS
 				DBupdate_host_status_thread(database, item.hostid,HOST_STATUS_MONITORED,now,error);
 				update_key_status_thread(database, item.hostid,HOST_STATUS_MONITORED);
@@ -700,6 +699,7 @@ int get_values(void)
 		else if(res == NOTSUPPORTED)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Parameter [%s] is not supported by agent on host [%s]", item.key, item.host );
+			zabbix_syslog("Parameter [%s] is not supported by agent on host [%s]", item.key, item.host );
 #ifdef ZABBIX_THREADS
 			DBupdate_item_status_to_notsupported_thread(database, item.itemid, error);
 #else
@@ -709,6 +709,7 @@ int get_values(void)
 			{
 				item.host_status=HOST_STATUS_MONITORED;
 				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
+				zabbix_syslog("Enabling host [%s]", item.host );
 #ifdef ZABBIX_THREADS
 				DBupdate_host_status_thread(database, item.hostid,HOST_STATUS_MONITORED,now,error);
 				update_key_status_thread(database, item.hostid,HOST_STATUS_MONITORED);	
@@ -726,6 +727,7 @@ int get_values(void)
 			if(item.host_network_errors>=3)
 			{
 				zabbix_log( LOG_LEVEL_WARNING, "Host [%s] will be checked after [%d] seconds", item.host, DELAY_ON_NETWORK_FAILURE );
+				zabbix_syslog("Host [%s] will be checked after [%d] seconds", item.host, DELAY_ON_NETWORK_FAILURE );
 #ifdef ZABBIX_THREADS
 				DBupdate_host_status_thread(database, item.hostid,HOST_STATUS_UNREACHABLE,now,error);
 				update_key_status_thread(database,item.hostid,HOST_STATUS_UNREACHABLE);	
@@ -757,6 +759,7 @@ int get_values(void)
 		else if(res == AGENT_ERROR)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Getting value of [%s] from host [%s] failed (ZBX_ERROR)", item.key, item.host );
+			zabbix_syslog("Getting value of [%s] from host [%s] failed (ZBX_ERROR)", item.key, item.host );
 			zabbix_log( LOG_LEVEL_WARNING, "The value is not stored in database.");
 
 			break;
@@ -764,6 +767,7 @@ int get_values(void)
 		else
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Getting value of [%s] from host [%s] failed", item.key, item.host );
+			zabbix_syslog("Getting value of [%s] from host [%s] failed", item.key, item.host );
 			zabbix_log( LOG_LEVEL_WARNING, "The value is not stored in database.");
 		}
 
@@ -1209,6 +1213,7 @@ void	process_trapper_child(int sockfd)
 	if( write(sockfd,result,strlen(result)) == -1)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Error sending result back [%s]",strerror(errno));
+		zabbix_syslog("Trapper: error sending result back [%s]",strerror(errno));
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "After write()");
 	alarm(0);
