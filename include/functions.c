@@ -908,6 +908,12 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 		}
 		else if(ACTION_SCOPE_HOSTS==action.scope)
 		{
+/* Added in Zabbix 1.0beta10 */
+			if(trigger->priority<action.severity)
+			{
+				continue;
+			}
+/* -- */
 			strncpy(action.subject,trigger->description,MAX_STRING_LEN);
 			if(1==good)
 			{
