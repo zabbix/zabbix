@@ -103,11 +103,11 @@ int	process_value(char *key, char *host, char *value)
 	/* IP address? */
 	if(is_ip(host) == SUCCEED)
 	{
-		snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta,i.units,i.multiplier from items i,hosts h where h.status in (%d,%d) and h.hostid=i.hostid and h.ip='%s' and i.key_='%s' and i.status=%d and i.type=%d", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, host, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_SIMPLE);
+		snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta,i.units,i.multiplier,i.formula from items i,hosts h where h.status in (%d,%d) and h.hostid=i.hostid and h.ip='%s' and i.key_='%s' and i.status=%d and i.type=%d", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, host, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_SIMPLE);
 	}
 	else
 	{
-		snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta,i.units,i.multiplier from items i,hosts h where h.status in (%d,%d) and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type=%d", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, host, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_SIMPLE);
+		snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta,i.units,i.multiplier,i.formula from items i,hosts h where h.status in (%d,%d) and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type=%d", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, host, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_SIMPLE);
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
 #ifdef ZABBIX_THREADS
@@ -163,6 +163,7 @@ int	process_value(char *key, char *host, char *value)
 
 	item.units=DBget_field(result,0,18);
 	item.multiplier=atoi(DBget_field(result,0,19));
+	item.formula=DBget_field(result,0,20);
 
 #ifdef ZABBIX_THREADS
 	process_new_value_thread(database,&item,value);
