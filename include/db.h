@@ -1,4 +1,4 @@
-#define USE_POSTGRESQL 1
+#define USE_MYSQL 1
 
 #ifndef MON_DB_H
 #define MON_DB_H
@@ -12,7 +12,7 @@
 #endif
 
 #define	DB_NAME		"zabbix"
-#define	DB_USER		"zabbix"
+#define	DB_USER		"root"
 #define	DB_PASSWD	""
 
 #define ITEM struct item_type
