@@ -106,7 +106,7 @@ void	signal_handler( int sig )
 		signal( SIGALRM, signal_handler );
 		zabbix_log( LOG_LEVEL_WARNING, "Timeout while answering request");
 	}
-	else if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
+	else if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig || SIGPIPE == sig )
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Got signal. Exiting ...");
 		uninit();
