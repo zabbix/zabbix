@@ -114,12 +114,8 @@
 
 
 <?php
-	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
-	echo "<TR BGCOLOR=\"#CCCCCC\"><TD WIDTH=3%><B>".S_ID."</B></TD>";
-	echo "<TD><B>".S_NAME."</B></TD>";
-	echo "<TD><B>".S_MEMBERS."</B></TD>";
-	echo "<TD WIDTH=10%><B>".S_ACTIONS."</B></TD>";
-	echo "</TR>";
+	table_begin();
+	table_header(array(S_ID,S_NAME,S_MEMBERS,S_ACTIONS));
 
 	$result=DBselect("select usrgrpid,name from usrgrp order by name");
 	$col=0;
@@ -129,26 +125,23 @@
 		{
 			continue;
 		}
-		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
-		else		{ echo "<TR BGCOLOR=#DDDDDD>"; }
-		echo "<TD>".$row["usrgrpid"]."</TD>";
-		echo "<TD>".$row["name"]."</TD>";
-		echo "<TD>";
 		$result1=DBselect("select distinct u.alias from users u,users_groups ug where u.userid=ug.userid and ug.usrgrpid=".$row["usrgrpid"]." order by alias");
+		$users="&nbsp;";
 		for($i=0;$i<DBnum_rows($result1);$i++)
-//		while($row1=DBfetch($result1))
 		{
-			echo DBget_field($result1,$i,0);
+			$users=$users.DBget_field($result1,$i,0);
 			if($i<DBnum_rows($result1)-1)
 			{
-				echo ", ";
+				$users=$users.", ";
 			}
 		}
-		echo "</TD>";
-		echo "<TD>";
-		echo "<A HREF=\"users.php?usrgrpid=".$row["usrgrpid"]."#form\">Change</A>";
-		echo "</TD>";
-		echo "</TR>";
+		$actions="<A HREF=\"users.php?usrgrpid=".$row["usrgrpid"]."#form\">Change</A>";
+		table_row(array(
+			$row["usrgrpid"],
+			$row["name"],
+			$users,
+			$actions
+			),$col++);
 	}
 	if(DBnum_rows($result)==0)
 	{
@@ -156,7 +149,7 @@
 			echo "<TD COLSPAN=3 ALIGN=CENTER>".S_NO_USER_GROUPS_DEFINED."</TD>";
 			echo "<TR>";
 	}
-	echo "</TABLE>";
+	table_end();
 	echo "<br>";
 ?>
 
@@ -165,14 +158,8 @@
 ?>
 
 <?php
-	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
-	echo "<TR BGCOLOR=\"#CCCCCC\"><TD WIDTH=3%><B>".S_ID."</B></TD>";
-	echo "<TD WIDTH=10%><B>".S_ALIAS."</B></TD>";
-	echo "<TD WIDTH=10%><B>".S_NAME."</B></TD>";
-	echo "<TD WIDTH=10%><B>".S_SURNAME."</B></TD>";
-	echo "<TD WIDTH=10%><B>".S_IS_ONLINE_Q."</B></TD>";
-	echo "<TD WIDTH=10%><B>".S_ACTIONS."</B></TD>";
-	echo "</TR>";
+	table_begin();
+	table_header(array(S_ID,S_ALIAS,S_NAME,S_SURNAME,S_IS_ONLINE_Q,S_ACTIONS));
 
 	$result=DBselect("select u.userid,u.alias,u.name,u.surname from users u order by u.alias");
 	$col=0;
@@ -182,37 +169,39 @@
 		{
 			continue;
 		}
-		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
-		else		{ echo "<TR BGCOLOR=#DDDDDD>"; }
 	
-		echo "<TD>".$row["userid"]."</TD>";
-		echo "<TD>".$row["alias"]."</TD>";
-		echo "<TD>".$row["name"]."</TD>";
-		echo "<TD>".$row["surname"]."</TD>";
 		$sql="select count(*) as count from sessions where userid=".$row["userid"]." and lastaccess-600<".time();
 		$result2=DBselect($sql);
 		$row2=DBfetch($result2);
-		iif_echo($row2["count"]>0,
-			"<TD><font color=\"00AA00\">".S_YES."</font></TD>",
-			"<TD><font color=\"AA0000\">".S_NO."</font></TD>");
-		echo "<TD>";
+		if($row2["count"]>0)
+			$online=array("value"=>S_YES,"class"=>"on");
+		else
+			$online=array("value"=>S_NO,"class"=>"off");
+
         	if(check_right("User","U",$row["userid"]))
 		{
 			if(get_media_count_by_userid($row["userid"])>0)
 			{
-				echo "<A HREF=\"users.php?register=change&userid=".$row["userid"]."#form\">".S_CHANGE."</A> - <A HREF=\"media.php?userid=".$row["userid"]."\"><b>M</b>edia</A>";
+				$actions="<A HREF=\"users.php?register=change&userid=".$row["userid"]."#form\">".S_CHANGE."</A> - <A HREF=\"media.php?userid=".$row["userid"]."\"><b>M</b>edia</A>";
 			}
 			else
 			{
-				echo "<A HREF=\"users.php?register=change&userid=".$row["userid"]."#form\">".S_CHANGE."</A> - <A HREF=\"media.php?userid=".$row["userid"]."\">".S_MEDIA."</A>";
+				$actions="<A HREF=\"users.php?register=change&userid=".$row["userid"]."#form\">".S_CHANGE."</A> - <A HREF=\"media.php?userid=".$row["userid"]."\">".S_MEDIA."</A>";
 			}
 		}
 		else
 		{
-			echo S_CHANGE." - ".S_MEDIA;
+			$actions=S_CHANGE." - ".S_MEDIA;
 		}
-		echo "</TD>";
-		echo "</TR>";
+
+		table_row(array(
+			$row["userid"],
+			$row["alias"],
+			$row["name"],
+			$row["surname"],
+			$online,
+			$actions
+			),$col++);
 	}
 	if(DBnum_rows($result)==0)
 	{
@@ -220,7 +209,7 @@
 			echo "<TD COLSPAN=6 ALIGN=CENTER>".S_NO_USERS_DEFINED."</TD>";
 			echo "<TR>";
 	}
-	echo "</TABLE>";
+	table_end();
 ?>
 
 <?php
@@ -229,49 +218,42 @@
 	echo "<br>";
 	echo "<a name=\"form\"></a>";
 	show_table_header("USER PERMISSIONS");
-	echo "<TABLE BORDER=0 align=center COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR><TD WIDTH=10%><B>".S_PERMISSION."</B></TD>";
-	echo "<TD WIDTH=10%><B>".S_RIGHT."</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>".S_RESOURCE_NAME."</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>".S_ACTIONS."</B></TD>";
-	echo "</TR>";
+
+	table_begin();
+	table_header(array(S_PERMISSION,S_RIGHT,S_RESOURCE_NAME,S_ACTIONS));
 	$result=DBselect("select rightid,name,permission,id from rights where userid=".$_GET["userid"]." order by name,permission,id");
 	$col=0;
 	while($row=DBfetch($result))
 	{
-//        	if(!check_right("User","R",$row["userid"]))
-//		{
-//			continue;
-//		}
-		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
-		else		{ echo "<TR BGCOLOR=#DDDDDD>"; }
-	
-		echo "<TD>".$row["name"]."</TD>";
 		if($row["permission"]=="R")
 		{
-			echo "<TD>".S_READ_ONLY."</TD>";
+			$permission=S_READ_ONLY;
 		}
 		else if($row["permission"]=="U")
 		{
-			echo "<TD>".S_READ_WRITE."</TD>";
+			$permission=S_READ_WRITE;
 		}
 		else if($row["permission"]=="H")
 		{
-			echo "<TD>".S_HIDE."</TD>";
+			$permission=S_HIDE;
 		}
 		else if($row["permission"]=="A")
 		{
-			echo "<TD>".S_ADD."</TD>";
+			$permission=S_ADD;
 		}
 		else
 		{
-			echo "<TD>".$row["permission"]."</TD>";
+			$permission=$row["permission"];
 		}
-		echo "<TD>".get_resource_name($row["name"],$row["id"])."</TD>";
-		echo "<TD><A HREF=users.php?userid=".$_GET["userid"]."&rightid=".$row["rightid"]."&register=delete_permission>".S_DELETE."</A></TD>";
+		$actions="<A HREF=users.php?userid=".$_GET["userid"]."&rightid=".$row["rightid"]."&register=delete_permission>".S_DELETE."</A>";
+		table_row(array(
+			$row["name"],
+			$permission,
+			get_resource_name($row["name"],$row["id"]),
+			$actions
+		),$col++);
 	}
-	echo "</TR>";
-	echo "</TABLE>";
+	table_end();
 
 	insert_permissions_form($_GET["userid"]);
 
