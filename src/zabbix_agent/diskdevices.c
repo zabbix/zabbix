@@ -68,7 +68,7 @@
 
 DISKDEVICE diskdevices[MAX_DISKDEVICES];
 
-int	get_device_name(char *device,int mjr,int mnr)
+int	get_device_name(char *device,int mjr,int diskno)
 {
 	DIR	*dir;
 	struct	dirent *entries;
@@ -84,10 +84,14 @@ int	get_device_name(char *device,int mjr,int mnr)
 		if(stat(filename,&buf)==0)
 		{
 /*			printf("%s %d %d\n",filename,major(buf.st_rdev),minor(buf.st_rdev));*/
-			if(S_ISBLK(buf.st_mode)&&(mjr==major(buf.st_rdev))&&(mnr==minor(buf.st_rdev)))
+			if(S_ISBLK(buf.st_mode)&&(mjr==major(buf.st_rdev))&&(0 == minor(buf.st_rdev)))
 			{
+				/* We've gor /dev/hda here */
 				strcpy(device,entries->d_name);
-/*				printf("%s [%d %d] %d %d\n",filename,mjr, mnr, major(buf.st_rdev),minor(buf.st_rdev));*/
+				/* diskno specifies a,b,c,d,e,f,g,h etc */
+				device[strlen(device)-1] = (char)((int)'a' + (int)diskno);
+
+/*				printf("%s [%d %d] %d %d\n",filename,mjr, diskno, major(buf.st_rdev),minor(buf.st_rdev));*/
 				closedir(dir);
 				return 0;
 			}
@@ -104,7 +108,7 @@ void	init_stats_diskdevices()
 	char	line[1024+1];
 	char	device[1024+1];
 	int	i,j;
-	int	major,minor;
+	int	major,diskno;
 	int	noinfo;
 	int	read_io_ops;
 	int	blks_read;
@@ -147,15 +151,15 @@ void	init_stats_diskdevices()
 	
 			strncpy(device,s,s2-s);
 			device[s2-s]=0;
-			sscanf(device,"(%d,%d):(%d,%d,%d,%d,%d)",&major,&minor,&noinfo,&read_io_ops,&blks_read,&write_io_ops,&blks_write);
-/*			printf("Major:[%d] Minor:[%d] read_io_ops[%d]\n",major,minor,read_io_ops);*/
+			sscanf(device,"(%d,%d):(%d,%d,%d,%d,%d)",&major,&diskno,&noinfo,&read_io_ops,&blks_read,&write_io_ops,&blks_write);
+/*			printf("Major:[%d] Minor:[%d] read_io_ops[%d]\n",major,diskno,read_io_ops);*/
 	
-			if(get_device_name(device,major,minor)==0)
+			if(get_device_name(device,major,diskno)==0)
 			{
 /*				printf("Device:%s\n",device);*/
 				diskdevices[i].device=strdup(device);
 				diskdevices[i].major=major;
-				diskdevices[i].minor=minor;
+				diskdevices[i].diskno=diskno;
 				i++;
 			}
 			s=s2;
@@ -410,7 +414,7 @@ void	report_stats_diskdevices(FILE *file, int now)
 }
 
 
-void	add_values_diskdevices(int now,int major,int minor,float read_io_ops,float blks_read,float write_io_ops,float blks_write)
+void	add_values_diskdevices(int now,int major,int diskno,float read_io_ops,float blks_read,float write_io_ops,float blks_write)
 {
 	int i,j;
 
@@ -418,7 +422,7 @@ void	add_values_diskdevices(int now,int major,int minor,float read_io_ops,float 
 
 	for(i=0;i<MAX_DISKDEVICES;i++)
 	{
-		if((diskdevices[i].major==major)&&(diskdevices[i].minor==minor))
+		if((diskdevices[i].major==major)&&(diskdevices[i].diskno==diskno))
 		{
 			for(j=0;j<15*60;j++)
 			{
@@ -446,7 +450,7 @@ void	collect_stats_diskdevices(FILE *outfile)
 	int	i;
 	char	device[MAX_STRING_LEN+1];
 	int	now;
-	int	major,minor;
+	int	major,diskno;
 	int	noinfo;
 	int	read_io_ops;
 	int	blks_read;
@@ -491,9 +495,9 @@ void	collect_stats_diskdevices(FILE *outfile)
 	
 			strncpy(device,s,s2-s);
 			device[s2-s]=0;
-			sscanf(device,"(%d,%d):(%d,%d,%d,%d,%d)",&major,&minor,&noinfo,&read_io_ops,&blks_read,&write_io_ops,&blks_write);
-/*			printf("Major:[%d] Minor:[%d] read_io_ops[%d]\n",major,minor,read_io_ops);*/
-			add_values_diskdevices(now,major,minor,read_io_ops,blks_read,write_io_ops,blks_write);
+			sscanf(device,"(%d,%d):(%d,%d,%d,%d,%d)",&major,&diskno,&noinfo,&read_io_ops,&blks_read,&write_io_ops,&blks_write);
+/*			printf("Major:[%d] Minor:[%d] read_io_ops[%d]\n",major,diskno,read_io_ops);*/
+			add_values_diskdevices(now,major,diskno,read_io_ops,blks_read,write_io_ops,blks_write);
 	
 			s=s2;
 		}
