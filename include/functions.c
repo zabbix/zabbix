@@ -14,14 +14,14 @@
 #include "db.h"
 #include "debug.h"
 
-int	evaluate_LAST(float *Result,int ItemId,int Parameter)
+int	evaluate_LAST(float *last,int itemid,int parameter)
 {
 	DB_RESULT	*result;
 	DB_ROW		row;
 
 	char		c[1024];
 
-	sprintf(c,"select lastvalue from items where itemid=%d and lastvalue is not null", ItemId );
+	sprintf(c,"select lastvalue from items where itemid=%d and lastvalue is not null", itemid );
 	DBexecute(c);
 
 	result = DBget_result();
@@ -41,21 +41,21 @@ int	evaluate_LAST(float *Result,int ItemId,int Parameter)
 		DBfree_result(result);
 		return	FAIL;
 	}
-	*Result=atof(row[0]);
+	*last=atof(row[0]);
 
 	DBfree_result(result);
 
 	return SUCCEED;
 }
 
-int	evaluate_MIN(float *Result,int ItemId,int Parameter)
+int	evaluate_MIN(float *min,int itemid,int parameter)
 {
 	DB_RESULT	*result;
 	DB_ROW		row;
 
 	char		c[1024];
 
-	sprintf(c,"select min(value) from history where clock>unix_timestamp()-%d and itemid=%d",Parameter,ItemId);
+	sprintf(c,"select min(value) from history where clock>unix_timestamp()-%d and itemid=%d",parameter,itemid);
 	DBexecute(c);
 
 	result = DBget_result();
@@ -78,21 +78,21 @@ int	evaluate_MIN(float *Result,int ItemId,int Parameter)
 		DBfree_result(result);
 		return	FAIL;
 	}
-	*Result=atof(row[0]);
+	*min=atof(row[0]);
 
 	DBfree_result(result);
 
 	return SUCCEED;
 }
 
-int	evaluate_MAX(float *Result,int ItemId,int Parameter)
+int	evaluate_MAX(float *max,int itemid,int parameter)
 {
 	DB_RESULT	*result;
 	DB_ROW		row;
 
 	char		c[1024];
 
-	sprintf(c,"select max(value) from history where clock>unix_timestamp()-%d and itemid=%d",Parameter,ItemId);
+	sprintf(c,"select max(value) from history where clock>unix_timestamp()-%d and itemid=%d",parameter,itemid);
 	DBexecute(c);
 
 	result = DBget_result();
@@ -112,21 +112,21 @@ int	evaluate_MAX(float *Result,int ItemId,int Parameter)
 		DBfree_result(result);
 		return	FAIL;
 	}	
-	*Result=atof(row[0]);
+	*max=atof(row[0]);
 
 	DBfree_result(result);
 
 	return SUCCEED;
 }
 
-int	evaluate_PREV(float *Result,int ItemId,int Parameter)
+int	evaluate_PREV(float *prev,int itemid,int parameter)
 {
 	DB_RESULT	*result;
 	DB_ROW		row;
 
 	char		c[1024];
 
-	sprintf(c,"select prevvalue from items where itemid=%d and prevvalue is not null", ItemId );
+	sprintf(c,"select prevvalue from items where itemid=%d and prevvalue is not null", itemid );
 	DBexecute(c);
 
 	result = DBget_result();
@@ -146,50 +146,50 @@ int	evaluate_PREV(float *Result,int ItemId,int Parameter)
 		DBfree_result(result);
 		return	FAIL;
 	}
-	*Result=atof(row[0]);
+	*prev=atof(row[0]);
 
 	DBfree_result(result);
 
 	return SUCCEED;
 }
 
-int	evaluate_DIFF(float *Result,int ItemId,int Parameter)
+int	evaluate_DIFF(float *diff,int itemid,int parameter)
 {
 	float	prev,last;
-	float	diff;
+	float	tmp;
 
-	if(evaluate_PREV(&prev,ItemId,Parameter) == FAIL)
+	if(evaluate_PREV(&prev,itemid,parameter) == FAIL)
 	{
 		return FAIL;
 	}
 
-	if(evaluate_LAST(&last,ItemId,Parameter) == FAIL)
+	if(evaluate_LAST(&last,itemid,parameter) == FAIL)
 	{
 		return FAIL;
 	}
 	
-	diff=last-prev;
+	tmp=last-prev;
 
-	if((diff<0.000001)&&(diff>-0.000001))
+	if((tmp<0.000001)&&(tmp>-0.000001))
 	{
-		*Result=0;
+		*diff=0;
 	}
 	else
 	{
-		*Result=1;
+		*diff=1;
 	}
 
 	return SUCCEED;
 }
 
-int	evaluate_NODATA(float *Result,int ItemId,int Parameter)
+int	evaluate_NODATA(float *nodata,int itemid,int parameter)
 {
 	DB_RESULT	*result;
 	DB_ROW		row;
 
 	char		c[1024];
 
-	sprintf(c,"select value from history where itemid=%d and clock>unix_timestamp()-%d limit 1",ItemId,Parameter);
+	sprintf(c,"select value from history where itemid=%d and clock>unix_timestamp()-%d limit 1",itemid,parameter);
 	DBexecute(c);
 
 	result = DBget_result();
@@ -204,10 +204,10 @@ int	evaluate_NODATA(float *Result,int ItemId,int Parameter)
 		return	FAIL;
 	}
 	row = DBfetch_row(result);
-	*Result=0;
+	*nodata=0;
 	if(row == NULL)
 	{
-		*Result=1;
+		*nodata=1;
 	}
 
 	DBfree_result(result);
@@ -215,16 +215,16 @@ int	evaluate_NODATA(float *Result,int ItemId,int Parameter)
 	return SUCCEED;
 }
 
-int	updateFunctions( int ItemId )
+int	update_functions( int itemid )
 {
-	FUNCTION	Function;
+	FUNCTION	function;
 	DB_RESULT	*result;
 	DB_ROW		row;
 	char		c[1024];
 	float		value;
 	int		ret=SUCCEED;
 
-	sprintf(c,"select function,parameter from functions where itemid=%d group by 1,2 order by 1,2",ItemId );
+	sprintf(c,"select function,parameter from functions where itemid=%d group by 1,2 order by 1,2",itemid );
 	DBexecute(c);
 
 	result = DBget_result();
@@ -237,43 +237,43 @@ int	updateFunctions( int ItemId )
 
 	while ( (row = DBfetch_row(result)) != NULL )
 	{
-		Function.Function=row[0];
-		Function.Parameter=atoi(row[1]);
-		dbg_write( dbg_proginfo, "ItemId:%d Evaluating %s(%d)\n",ItemId,Function.Function,Function.Parameter);
-		if(strcmp(Function.Function,"last")==0)
+		function.function=row[0];
+		function.parameter=atoi(row[1]);
+		dbg_write( dbg_proginfo, "ItemId:%d Evaluating %s(%d)\n",itemid,function.function,function.parameter);
+		if(strcmp(function.function,"last")==0)
 		{
-			ret = evaluate_LAST(&value,ItemId,Function.Parameter);
+			ret = evaluate_LAST(&value,itemid,function.parameter);
 		}
-		else if(strcmp(Function.Function,"prev")==0)
+		else if(strcmp(function.function,"prev")==0)
 		{
-			ret = evaluate_PREV(&value,ItemId,Function.Parameter);
+			ret = evaluate_PREV(&value,itemid,function.parameter);
 		}
-		else if(strcmp(Function.Function,"nodata")==0)
+		else if(strcmp(function.function,"nodata")==0)
 		{
-			ret = evaluate_NODATA(&value,ItemId,Function.Parameter);
+			ret = evaluate_NODATA(&value,itemid,function.parameter);
 		}
-		else if(strcmp(Function.Function,"min")==0)
+		else if(strcmp(function.function,"min")==0)
 		{
-			ret = evaluate_MIN(&value,ItemId,Function.Parameter);
+			ret = evaluate_MIN(&value,itemid,function.parameter);
 		}
-		else if(strcmp(Function.Function,"max")==0)
+		else if(strcmp(function.function,"max")==0)
 		{
-			ret = evaluate_MAX(&value,ItemId,Function.Parameter);
+			ret = evaluate_MAX(&value,itemid,function.parameter);
 		}
-		else if(strcmp(Function.Function,"diff")==0)
+		else if(strcmp(function.function,"diff")==0)
 		{
-			ret = evaluate_DIFF(&value,ItemId,Function.Parameter);
+			ret = evaluate_DIFF(&value,itemid,function.parameter);
 		}
 		else
 		{
-			dbg_write( dbg_syswarn, "Unknown function:%s\n",Function.Function);
+			dbg_write( dbg_syswarn, "Unknown function:%s\n",function.function);
 			DBfree_result(result);
 			return FAIL;
 		}
 		dbg_write( dbg_proginfo, "Result:%f\n",value);
 		if (ret == SUCCEED)
 		{
-			sprintf(c,"update functions set lastvalue=%f where itemid=%d and function='%s' and parameter=%d", value, ItemId, Function.Function, Function.Parameter );
+			sprintf(c,"update functions set lastvalue=%f where itemid=%d and function='%s' and parameter=%d", value, itemid, function.function, function.parameter );
 //			printf("%s\n",c);
 			DBexecute(c);
 		}
