@@ -14,6 +14,8 @@ trigger wihout actions, etc etc
  - background image for maps
  - zabbix thinks that host is unrechable if it receives string for numeric item
 
+ - think about implementation of sinchronised items like cpu[usr], cpu[sys], cpu[idle]
+
  - overlib: context sensitive help in PHP frontend
  - add selection of MIN/MAX/AVG for graphs
  - make sure all screens looks good in case of hundreds of servers/groups
