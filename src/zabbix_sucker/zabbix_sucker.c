@@ -403,7 +403,7 @@ int	get_value_SNMP(int version,double *result,char *result_str,DB_ITEM *item)
 		else if(status == STAT_TIMEOUT)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Timeout while connecting to [%s]",
-					session->peername);
+					session.peername);
 			snmp_sess_perror("snmpget", ss);
 			ret = NETWORK_ERROR;
 		}
