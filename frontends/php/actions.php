@@ -46,7 +46,7 @@
 		}
 		if($HTTP_GET_VARS["register"]=="update")
 		{
-			$result=update_action( $HTTP_GET_VARS["actionid"], $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["good"], $HTTP_GET_VARS["delay"], $HTTP_GET_VARS["subject"], $HTTP_GET_VARS["message"],$HTTP_GET_VARS["scope"],$HTTP_GET_VARS["severity"],$HTTP_GET_VARS["recipient"],$HTTP_GET_VARS["usrgrpid"]);
+			$result=update_action( $HTTP_GET_VARS["actionid"], $HTTP_GET_VARS["triggerid"], $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["good"], $HTTP_GET_VARS["delay"], $HTTP_GET_VARS["subject"], $HTTP_GET_VARS["message"],$HTTP_GET_VARS["scope"],$HTTP_GET_VARS["severity"],$HTTP_GET_VARS["recipient"],$HTTP_GET_VARS["usrgrpid"]);
 			show_messages($result,"Action updated","Cannot update action");
 			unset($HTTP_GET_VARS["actionid"]);
 		}
@@ -60,7 +60,7 @@
 ?>
 
 <?php
-	show_table_header_begin();
+/*	show_table_header_begin();
 	echo "CONFIGURATION OF ACTIONS";
 	show_table_v_delimiter();
 
@@ -92,7 +92,7 @@
 	}
 
 	show_table_header_end();
-	echo "<br>";
+	echo "<br>";*/
 ?>
 
 <?php
@@ -186,7 +186,7 @@
 //		echo "<pre>".htmlspecialchars($row["message"])."</pre>";
 //		echo "</TD>";
 		echo "<TD>";
-		echo " <A HREF=\"actions.php?register=edit&actionid=".$row["actionid"]."&triggerid=".$row["triggerid"]."#form\">Change</A>";
+		echo " <A HREF=\"actions.php?register=edit&actionid=".$row["actionid"]."&triggerid=".$HTTP_GET_VARS["triggerid"]."#form\">Change</A>";
 		echo "</TD></TR>";
 	}
 	if(DBnum_rows($result)==0)
