@@ -281,7 +281,11 @@ int	do_ping(void)
 	return	SUCCEED;
 }
 
-int main_pinger_loop(void)
+#ifdef ZABBIX_THREADS
+void *main_pinger_loop()
+#else
+int main_pinger_loop()
+#endif
 {
 	int ret = SUCCEED;
 
@@ -321,5 +325,4 @@ int main_pinger_loop(void)
 	}
 	
 	/* Never reached */
-	return ret;
 }

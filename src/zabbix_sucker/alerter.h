@@ -30,6 +30,10 @@ extern	char	*CONFIG_ALERT_SCRIPTS_PATH;
 
 extern	void	signal_handler( int sig );
 
+#ifdef ZABBIX_THREADS
+void *main_alerter_loop();
+#else
 int main_alerter_loop();
+#endif
 
 #endif

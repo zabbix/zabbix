@@ -21,10 +21,18 @@
 #ifndef ZABBIX_EXPRESSION_H
 #define ZABBIX_EXPRESSION_H
 
+#include "common.h"
+#include "db.h"
+
 int	cmp_double(double a,double b);
 int	find_char(char *str,char c);
 int	substitute_functions(char *exp);
 int	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp);
 int     evaluate_expression (int *result,char *expression);
 
+#ifdef ZABBIX_THREADS
+int	substitute_macros_thread(MYSQL *database, DB_TRIGGER *trigger, DB_ACTION *action, char *exp);
+int	evaluate_expression_thread(MYSQL *database, int *result,char *expression);
+#endif
+	
 #endif

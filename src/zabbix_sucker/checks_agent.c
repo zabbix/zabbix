@@ -23,7 +23,7 @@ int	get_value_agent(double *result,char *result_str,DB_ITEM *item)
 {
 	int	s;
 	int	len;
-	static	char	c[MAX_STRING_LEN];
+	char	c[MAX_STRING_LEN];
 	char	*e;
 
 	struct hostent *hp;
@@ -32,7 +32,7 @@ int	get_value_agent(double *result,char *result_str,DB_ITEM *item)
 
 	struct linger ling;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "%10s%25s", item->host, item->key );
+	zabbix_log( LOG_LEVEL_DEBUG, "get_value_agent: host[%s] ip[%s] key [%s]", item->host, item->ip, item->key );
 
 	servaddr_in.sin_family=AF_INET;
 	if(item->useip==1)
@@ -140,7 +140,7 @@ int	get_value_agent(double *result,char *result_str,DB_ITEM *item)
 	/* The section should be improved */
 	if( (*result==0) && (c==e) && (item->value_type==0) && (strcmp(c,"ZBX_NOTSUPPORTED") != 0) && (strcmp(c,"ZBX_ERROR") != 0) )
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Got empty string from [%s]. Parameter [%s]", item->host, item->key);
+		zabbix_log( LOG_LEVEL_WARNING, "Got empty string from [%s] IP [%s] Parameter [%s]", item->host, item->ip, item->key);
 		zabbix_log( LOG_LEVEL_WARNING, "Assuming that agent dropped connection because of access permissions");
 		return	NETWORK_ERROR;
 	}

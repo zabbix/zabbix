@@ -20,6 +20,8 @@
 
 /*#define TESTTEST*/
 
+#define	ZABBIX_THREADS
+
 #define	IT_HELPDESK
 
 #ifndef ZABBIX_COMMON_H
