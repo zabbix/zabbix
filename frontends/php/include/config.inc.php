@@ -548,18 +548,21 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			unset($sessionid);
 		}
 
-		$sql="select u.userid,u.alias,u.name,u.surname from sessions s,users u where s.sessionid='$sessionid' and s.userid=u.userid and s.lastaccess-600<".time();
-		$result=DBselect($sql);
-		if(DBnum_rows($result)==1)
+		if(isset($sessionid))
 		{
-			setcookie("sessionid",$sessionid,time()+3600);
-			$sql="update sessions set lastaccess=".time()." where sessionid='$sessionid'";
-			DBexecute($sql);
-			$USER_DETAILS["userid"]=DBget_field($result,0,0);
-			$USER_DETAILS["alias"]=DBget_field($result,0,1);
-			$USER_DETAILS["name"]=DBget_field($result,0,2);
-			$USER_DETAILS["surname"]=DBget_field($result,0,3);
-			return;
+			$sql="select u.userid,u.alias,u.name,u.surname from sessions s,users u where s.sessionid='$sessionid' and s.userid=u.userid and s.lastaccess-600<".time();
+			$result=DBselect($sql);
+			if(DBnum_rows($result)==1)
+			{
+				setcookie("sessionid",$sessionid,time()+3600);
+				$sql="update sessions set lastaccess=".time()." where sessionid='$sessionid'";
+				DBexecute($sql);
+				$USER_DETAILS["userid"]=DBget_field($result,0,0);
+				$USER_DETAILS["alias"]=DBget_field($result,0,1);
+				$USER_DETAILS["name"]=DBget_field($result,0,2);
+				$USER_DETAILS["surname"]=DBget_field($result,0,3);
+				return;
+			}
 		}
 
                 $sql="select u.userid,u.alias,u.name,u.surname from users u where u.alias='guest'";
