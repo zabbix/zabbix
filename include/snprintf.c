@@ -171,7 +171,8 @@ static size_t dopr(char *buffer, size_t maxlen, const char *format, va_list args
 	size_t currlen;
 	va_list args;
 
-	VA_COPY(args, args_in);
+/*	VA_COPY(args, args_in);*/
+	va_copy(args, args_in);
 	
 	state = DP_S_DEFAULT;
 	currlen = flags = cflags = min = 0;
