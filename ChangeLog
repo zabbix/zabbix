@@ -1,5 +1,6 @@
 Changes for 1.0beta11:
 
+ - fixed division by zero and infinite loop in graphs (Alexei)
  - fixes for agent. Error checking for opendir() (Alexei)
  - fix for syslog logging of zabbix_trapperd (Alexei)
  - added table users_groups, usrgrp (Alexei)
