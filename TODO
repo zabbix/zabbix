@@ -1,10 +1,13 @@
 1.0beta10:
 
+ - performance of graphs: get rid of MIN,MAX
+ - user groups
+ - test on non-Linux platforms
+ - test install and upgrade procedure for 1.0beta10
  - write error message in case of PID file and LOG file errors
- - Graphs: Edit and change order it lines
+ - Graphs: change order it lines
  - support for proc_cnt() under Solaris
  - zabbix to write log to the item (for example: log when item becomes unsupported)
- - full screen/normal screen. Period, from must be preserved
  - strings items for graphs
  - date&time in alert emails
  - support of '-' in trigger expressions (...>-1)
@@ -24,9 +27,7 @@ suckerd and agentd)
  - add alerts to host templates
  - add pinger (fping) to zabbix_sucker
 
- - fix problem when graph is broken if one parameter is unavailable
- - improve screens (add maps, simple graphs, etc)
- - improve graphing capabilities (MRTG like graphs)
+ - improve screens (add maps, etc)
  - monitoring of log files
  - [10] Refresh stop ability. At least for graphs and triggers being selected.
  - [10] IT Services. Show downtimes for weeks.
@@ -36,7 +37,6 @@ suckerd and agentd)
 
 LS:
 
- - sdelatj legendu graphov v vide tablici
  - graphs. Dobavljatj item so smescheniem vo vremeni
  - check permissions for zabbix_agentd when started under root
  - add item to group (not to all)
@@ -107,7 +107,6 @@ Vel viens wishlists ir pie "IT Services", pielikt pie
 LS:
 
  - why SNMP does not work though firewall? It establishes connection to UDP port 3. WHy?
- - item links to other item in order to show all of them on one graph
  - daily weekly monthly graphs
  - detailed description for items
 
@@ -126,7 +125,6 @@ TOP PRIORITY:
 
 BUGS:
 
- - graphs and maps are not displayed properly sometimes
  - add protection from IT Service looping
  - BUG. No horizontal lines. Replace ImageDashedLine() to gdImageLine() plus
    ImageSetStyle()
@@ -222,7 +220,6 @@ WIN32 Agent:
  OTHER:
 
  - support for netload under other platforms
- - round MIN/MAX/AVG numbers for graphs
  - calculate MIN value for graphs (do not use '0')
  - make kstat structure local (instead of static)
  - collect network and other statistics using kstat()

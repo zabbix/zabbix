@@ -118,6 +118,7 @@
 	$x=array();
 	$y=array();
 	$desc=array();
+	$iids=array();
 	$color=array();
 	$drawtype=array();
 
@@ -129,6 +130,7 @@
 	for($item=0;$item<DBnum_rows($result2);$item++)
 	{
 		$itemid=DBget_field($result2,$item,0);
+		$iids[$item]=$itemid;
 		$desc[$item]=DBget_field($result2,$item,1);
 		$color[$item]=DBget_field($result2,$item,2);
 		$host[$item]=DBget_field($result2,$item,3);
@@ -172,7 +174,7 @@
 		$maxY = $HTTP_GET_VARS["force_maxy"];
 	}
 
-	$my_exp = floor(log10($maxY));
+	$my_exp=iif($maxY!=0,floor(log10($maxY)),0);
 	$my_mant = $maxY/pow(10,$my_exp);
 
 	if ($my_mant < 1.5 )
@@ -292,7 +294,19 @@
 		}
 		ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*$item+45,$shiftX+5,$sizeY+$shiftYup+15+9+15*$item+45,$colors[$color[$item]]);
 		ImageRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*$item+45,$shiftX+5,$sizeY+$shiftYup+15+9+15*$item+45,$black);
-		$str=sprintf("%s: %s [min:%.2f, avg:%.2f, max:%.2f]", $host[$item], $desc[$item], $itemMin, $itemAvg, $itemMax);
+//		ImageString($im, 1, $sizeX+5+$shiftX, $i/$my_steps*$sizeY+$shiftYup-4, convert_units($maxY-$i/$my_steps*($maxY-$minY),$z["units"],$z["multiplier"]) , $darkred);
+//		$str=sprintf("%s: %s [min:%.2f, avg:%.2f, max:%.2f]", $host[$item], $desc[$item], $itemMin, $itemAvg, $itemMax);
+		$max_host_len=0;
+		$max_desc_len=0;
+		for($i=0;$i<DBnum_rows($result2);$i++)
+		{
+			$z=get_item_by_itemid($iids[$i]);
+			$h=get_host_by_hostid($z["hostid"]);
+			if(strlen($h["host"])>$max_host_len)		$max_host_len=strlen($h["host"]);
+			if(strlen($z["description"])>$max_desc_len)	$max_desc_len=strlen($z["description"]);
+		}
+		$i=get_item_by_itemid($iids[$item]);
+		$str=sprintf("%s: %s [last:%s min:%s avg:%s max:%s]", str_pad($host[$item],$max_post_len," "), str_pad($desc[$item],$max_desc_len," "), convert_units($y[$item][$len[$item]-1],$i["units"],$i["multiplier"]), convert_units($itemMin,$i["units"],$i["multiplier"]), convert_units($itemAvg,$i["units"],$i["multiplier"]), convert_units($itemMax,$i["units"],$i["multiplier"]));
 		if($width>600)
 		{
 			ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*$item+15+45,$str, $black);
