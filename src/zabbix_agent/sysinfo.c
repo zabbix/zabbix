@@ -134,7 +134,9 @@ COMMAND	commands[]=
 	{"system[procload5]"		,PROCLOAD5, 0},
 	{"system[procload15]"		,PROCLOAD15, 0},
 	{"system[proccount]"		,PROCCOUNT, 0},
+#ifdef HAVE_PROC_LOADAVG
 	{"system[procrunning]"		,EXECUTE, "cat /proc/loadavg|cut -f1 -d'/'|cut -f4 -d' '"},
+#endif
 	{"system[uptime]"		,UPTIME, 0},
 	{"system[users]"		,EXECUTE, "who|wc -l"},
 
@@ -628,7 +630,7 @@ float	PROCLOAD(void)
 		return dyn.psd_avg_1_min;
 	}
 #else
-#ifdef HAVE_PROC
+#ifdef HAVE_PROC_LOADAVG
 	return	getPROC("/proc/loadavg",1,1);
 #else
 	return	FAIL;
@@ -663,7 +665,7 @@ float	PROCLOAD5(void)
 		return dyn.psd_avg_5_min;
 	}
 #else
-#ifdef	HAVE_PROC
+#ifdef	HAVE_PROC_LOADAVG
 	return	getPROC("/proc/loadavg",1,2);
 #else
 	return	FAIL;
@@ -698,7 +700,7 @@ float	PROCLOAD15(void)
 		return dyn.psd_avg_5_min;
 	}
 #else
-#ifdef	HAVE_PROC
+#ifdef	HAVE_PROC_LOADAVG
 	return	getPROC("/proc/loadavg",1,3);
 #else
 	return	FAIL;
