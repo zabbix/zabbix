@@ -51,19 +51,40 @@ What is Zabbix
 \layout Standard
 
 
+\series bold 
+Zabbix
+\series default 
 \latex no_latex 
-Zabbix was created by Alexei Vladishev, (alex@gobbo.caves.lv).
+ was created by 
+\noun on 
+\latex default 
+Alexei Vladishev
+\noun default 
+\latex no_latex 
+, (
+\family typewriter 
+\latex default 
+alex@gobbo.caves.lv
+\family default 
+\latex no_latex 
+).
 
 \latex default 
  
+\series bold 
+Zabbix
+\series default 
 \latex no_latex 
-Zabbix is software that monitors numerous parameters of a network and the
- servers on that network.
+ is software that monitors numerous parameters of a network and the servers
+ on that network.
 
 \latex default 
  
+\series bold 
+Zabbix
+\series default 
 \latex no_latex 
-Zabbix is a useful tool for monitoring the health and integrity of servers.
+ is a useful tool for monitoring the health and integrity of servers.
 
 \latex default 
  
@@ -78,20 +99,38 @@ ll monitored parameters are stored in a database.
 
 \latex default 
  
+\series bold 
+Zabbix
+\series default 
 \latex no_latex 
-Zabbix offers excellent reporting and data visualisation features based
- on the stored data, making Zabbix useful for capacity planning.
+ offers excellent reporting and data visualisation features based on the
+ stored data, making 
+\series bold 
+\latex default 
+Zabbix
+\series default 
+\latex no_latex 
+ useful for capacity planning.
+
+\latex default 
+ 
+\series bold 
+Zabbix
+\series default 
+\latex no_latex 
+ supports both polling and trapping.
 
 \latex default 
  
 \latex no_latex 
-Zabbix supports both polling and trapping.
-
+All 
+\series bold 
 \latex default 
- 
+Zabbix
+\series default 
 \latex no_latex 
-All Zabbix reports and statistics, as well as configuration parameters,
- are accessed through a web-based front-end.
+ reports and statistics, as well as configuration parameters, are accessed
+ through a web-based front-end.
 
 \latex default 
  
@@ -102,13 +141,22 @@ The web-based front end means that the health of your servers can be assessed
 \latex default 
  
 \latex no_latex 
-Properly configured, Zabbix can play an important role in monitoring IT
- infrastructure for companies with even hundreds of servers to monitor.
+Properly configured, 
+\series bold 
+\latex default 
+Zabbix
+\series default 
+\latex no_latex 
+ can play an important role in monitoring IT infrastructure for companies
+ with even hundreds of servers to monitor.
 
 \latex default 
  
+\series bold 
+Zabbix
+\series default 
 \latex no_latex 
-Zabbix is free of cost.
+ is free of cost.
 
 \latex default 
  
@@ -118,21 +166,41 @@ If support is an issue for you, several options are available as well.
 \latex default 
  
 \latex no_latex 
-Please, contact alex@gobbo.caves.lv to get additional information on available
- support levels.
+Please, contact 
+\family typewriter 
+\latex default 
+alex@gobbo.caves.lv
+\family default 
+\latex no_latex 
+ to get additional information on available support levels.
 
 \latex default 
  
 \latex no_latex 
-The latest version of Zabbix can be found at http://zabbix.sourceforge.net.
+The latest version of 
+\series bold 
+\latex default 
+Zabbix
+\series default 
+\latex no_latex 
+ can be found at 
+\family typewriter 
+\latex default 
+http://zabbix.sourceforge.net
+\family default 
+\latex no_latex 
+.
 \layout Subsection
 
 What does Zabbix offer
 \layout Standard
 
 
+\series bold 
+Zabbix
+\series default 
 \latex no_latex 
-Zabbix offers:
+ offers:
 \layout Itemize
 
 
@@ -191,14 +259,56 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 \latex default 
  
 \latex no_latex 
-This manual is part of Zabbix software.
+This manual is part of 
+\series bold 
+\latex default 
+Zabbix
+\series default 
+\latex no_latex 
+ software.
 
 \latex default 
  
 \latex no_latex 
 The latest version of the manual will always be available at
 \latex default 
- http://zabbix.sourceforge.net
+ 
+\family typewriter 
+http://zabbix.sourceforge.net
+\layout Subsection
+
+Main Goals and Principles of Zabbix Development
+\layout Standard
+
+There are several goals Zabbix is trying to achieve:
+\layout Itemize
+
+become recognized Open Source monitoring tool
+\layout Itemize
+
+create 
+\series bold 
+Zabbix
+\series default 
+ user group, which helps making the software even better
+\layout Standard
+
+Main principles of Zabbix development:
+\layout Itemize
+
+be user friendly
+\layout Itemize
+
+keep things simple
+\layout Itemize
+
+use as less resources as possible
+\layout Itemize
+
+be as fast as possible
+\layout Itemize
+
+document every single aspect of the software
 \layout Section
 
 Use of Zabbix
@@ -258,13 +368,29 @@ WEB browser on client side (support for HTML and PNG images required).
 
 UCD-SNMP library and header files.
  Required for support of SNMP agents.
- Optional.
+ 
+\emph on 
+Optional
+\emph default 
+.
 \layout Standard
 
-Zabbix may work on previous versions of Apache, MySQL, PostgreSQL as well.
- I've tried to run Zabbix on PostgreSQL 6.5x with no luck.
+
+\series bold 
+Zabbix
+\series default 
+ may work on previous versions of Apache, MySQL, PostgreSQL as well.
+ I've tried to run 
+\series bold 
+Zabbix
+\series default 
+ on PostgreSQL 6.5x with no luck.
  PostgreSQL crashes after one to three minutes of zabbix_suckerd running.
- So, PostgreSQL version 7.0.2 or later is strongly recommended.
+ So, PostgreSQL version 7.0.2 or later is 
+\emph on 
+strongly
+\emph default 
+ recommended.
 \layout Paragraph
 
 PostgreSQL vs MySQL
@@ -306,21 +432,37 @@ Zabbix is not tested with MySQL's InnoDB database structure.
 \layout Standard
 
 If you do use PostgreSQL, performance can be significantly improved by executing
- the VACUUM command on the Zabbix database.
+ the VACUUM command on the 
+\series bold 
+Zabbix
+\series default 
+ database.
 \layout Standard
 
 I would suggest execution of VACUUM, at least after the following events
 \layout Itemize
 
-Zabbix is installed - 10000 records in table "history" 
+
+\series bold 
+Zabbix
+\series default 
+ is installed - 10000 records in table "history" 
 \layout Itemize
 
-patches applied on Zabbix database
+patches applied on 
+\series bold 
+Zabbix
+\series default 
+ database
 \layout Standard
 
-For heavily loaded Zabbix servers, hourly execution of "VACUUM ANALYZE"
- for all tables except "history" is strongly recommended! You can use the
- command 'echo "vacuum verbose analyze"|psql zabbix'.
+For heavily loaded 
+\series bold 
+Zabbix
+\series default 
+ servers, hourly execution of "VACUUM ANALYZE" for all tables except "history"
+ is strongly recommended! You can use the command 'echo "vacuum verbose
+ analyze"|psql zabbix'.
  For more information about PostgreSQL see 
 \begin_inset LatexCommand \cite{key-2}
 
@@ -332,7 +474,11 @@ For heavily loaded Zabbix servers, hourly execution of "VACUUM ANALYZE"
 Memory requirements
 \layout Standard
 
-Zabbix requires both physical (surprise!) and disk memory.
+
+\series bold 
+Zabbix
+\series default 
+ requires both physical (surprise!) and disk memory.
  32 Mb of physical memory and 20 Mb of free disk memory could be good starting
  point.
  However, the amount of required disk memory obviously depends on the number
@@ -343,269 +489,453 @@ Zabbix requires both physical (surprise!) and disk memory.
 \layout Standard
 
 Remember, the more physical memory you have, the faster the database (and
- therefore Zabbix) works!
+ therefore 
+\series bold 
+Zabbix
+\series default 
+) works!
 \layout Subsection
 
 Installation procedure
 \layout Standard
 
-Basic installation of Zabbix usually takes no more than 15 minutes.
+Basic installation of 
+\series bold 
+Zabbix
+\series default 
+ usually takes no more than 15 minutes.
  However, to make the process more enjoyable, I would suggest you make a
  cup of tea (or coffee) for yourself.
  Ready? 
-\layout Standard
+\layout Enumerate
 
-1.2.1 Create the Zabbix superuser account 
-\layout Standard
-
+Create the 
+\series bold 
+Zabbix
+\series default 
+ superuser account.
+\newline 
 This is the user the server will run as.
  For production use you should create a dedicated unprivileged account ("zabbix"
  is commonly used).
-\layout Standard
-
-Running Zabbix as "root," "bin," or any other account with special rights
- is a security risk.
+ Running 
+\series bold 
+Zabbix
+\series default 
+ as "root," "bin," or any other account with special rights is a security
+ risk.
  Do not do it! 
-\layout Standard
+\layout Enumerate
 
-1.2.2 Untar Zabbix sources
-\layout Standard
+Untar 
+\series bold 
+Zabbix
+\series default 
+ sources.
+\newline 
+On Linux, use command 
+\emph on 
+tar -xvzf <zabbix.tar.gz>
+\emph default 
+.
+ On other systems, try 
+\emph on 
+gunzip zabbix.tar.gz; tar xvf zabbix.tar
+\layout Enumerate
 
-On Linux, use command tar -xvzf <zabbix.tar.gz>.
-\layout Standard
+Create the Zabbix database.
+\newline 
 
-On other systems, try
-\layout Standard
-
-gunzip zabbix.tar.gz tar xvf zabbix.tar
-\layout Standard
-
-1.2.3 Create the Zabbix database
-\layout Standard
-
-Zabbix comes with SQL scripts used to create the required database schema
- and also to insert a default configuration.
+\series bold 
+Zabbix
+\series default 
+ comes with SQL scripts used to create the required database schema and
+ also to insert a default configuration.
  There are separate scripts for MySQL and PostgreSQL.
-\layout Standard
+ 
+\newline 
 
-For MySQL:
-\layout Standard
+\newline 
+For MySQL: 
+\newline 
 
-mysql -u<username> -p<password> > create database zabbix; >quit;
-\layout Standard
+\emph on 
+mysql -u<username> -p<password> 
+\newline 
+>create database zabbix; 
+\newline 
+>quit; 
+\newline 
+cd create/mysql 
+\newline 
+cat schema.sql |mysql zabbix -u<username> -p<password> 
+\newline 
+cd create/data 
+\newline 
+cat data.sql |mysql zabbix -u<username> -p<password> 
+\emph default 
 
-cd create/mysql cat schema.sql |mysql zabbix -u<username> -p<password> cd
- create/data cat data.sql |mysql zabbix -u<username> -p<password>
-\layout Standard
+\newline 
 
+\newline 
 For PostgreSQL:
-\layout Standard
+\newline 
 
-psql -U <username> > create database zabbix; > 
+\emph on 
+psql -U <username> 
+\newline 
+> create database zabbix; 
+\newline 
+> 
 \backslash 
-q
-\layout Standard
+q 
+\newline 
+cd create/postgresql 
+\newline 
+cat schema.sql|psql -U <username> zabbix 
+\newline 
+cd create/data 
+\newline 
+cat data.sql|psql -U <username> zabbix
+\layout Enumerate
 
-cd create/postgresql cat schema.sql|psql -U <username> zabbix cd create/data
- cat data.sql|psql -U <username> zabbix
-\layout Standard
-
-1.2.4 Configure include/db.h
-\layout Standard
-
+Configure include/db.h
+\newline 
 Change the following parameters:
-\layout Standard
+\newline 
+#define DB_NAME "zabbix" 
+\newline 
+#define DB_USER "zabbix" 
+\newline 
+#define DB_PASSWD "password"
+\layout Enumerate
 
-#define DB_NAME "zabbix" #define DB_USER "zabbix" #define DB_PASSWD "password"
-\layout Standard
-
-1.2.5 Configure and compile the source code for your system
-\layout Standard
-
+Configure and compile the source code for your system
+\newline 
 The sources must be compiled for both the server (monitoring machine) as
  well as the clients (monitored machines).
  
-\layout Standard
-
+\newline 
 To configure the source for the server, you must specify which database
  will be used.
-\layout Standard
+\newline 
 
-./configure --with-mysql # for MySQL or ./configure --with-pgsql # for PostgreSQL
- make
-\layout Standard
+\emph on 
+./configure --with-mysql # for MySQL 
+\emph default 
 
+\newline 
+or 
+\newline 
+
+\emph on 
+./configure --with-pgsql # for PostgreSQL make
+\newline 
+
+\newline 
+
+\emph default 
 However, if you want to compile client binaries only, run:
-\layout Standard
+\newline 
 
+\emph on 
 ./configure make
-\layout Standard
+\newline 
 
-1.2.6 Copy created binaries from bin/ to /opt/zabbix/bin or any other directory
- 
-\layout Standard
+\emph default 
+Copy created binaries from 
+\emph on 
+bin/
+\emph default 
+ to 
+\emph on 
+/opt/zabbix/bin
+\emph default 
+ or any other directory 
+\newline 
+Other common directories are 
+\emph on 
+/usr/local/bin
+\emph default 
+ or 
+\emph on 
+/usr/local/zabbix/bin
+\emph default 
+.
+\layout Enumerate
 
-Other common directories are /usr/local/bin or /usr/local/zabbix/bin.
-\layout Standard
+Configure 
+\emph on 
+/etc/services
+\newline 
 
-1.2.7 Configure /etc/services
-\layout Standard
+\emph default 
+On the client (monitored) machines, add the following lines to 
+\emph on 
+/etc/services
+\emph default 
+:
+\newline 
 
-On the client (monitored) machines, add the following lines to /etc/services:
-\layout Standard
+\emph on 
+zabbix_agent 10000/tcp 
+\newline 
+zabbix_trap 10001/tcp 
+\layout Enumerate
 
-zabbix_agent 10000/tcp zabbix_trap 10001/tcp 
-\layout Standard
+Configure 
+\emph on 
+/etc/inetd.conf
+\newline 
 
-1.2.8 Configure /etc/inetd.conf
-\layout Standard
-
+\emph default 
 If you are going to use trapping instead of the recommended client-server
- approach (see manual for more details), add the following line to /etc/inetd.con
-f:
-\layout Standard
+ approach, add the following line to 
+\emph on 
+/etc/inetd.conf
+\emph default 
+:
+\newline 
 
+\emph on 
 zabbix_trap stream tcp nowait.3600 zabbix /opt/zabbix/bin/zabbix_trapper
-\layout Standard
+\newline 
 
-If you plan to use zabbix_agent instead of the recommended zabbix_agentd
- (again, see manual for more details), the following line must be added:
-\layout Standard
+\emph default 
+If you plan to use 
+\series bold 
+zabbix_agent
+\series default 
+ instead of the recommended 
+\series bold 
+zabbix_agentd
+\series default 
+, the following line must be added:
+\newline 
 
+\emph on 
 zabbix_agent stream tcp nowait.3600 zabbix /opt/zabbix/bin/zabbix_agent
-\layout Standard
+\layout Enumerate
 
-1.2.9 Restart inetd
-\layout Standard
+Restart 
+\series bold 
+inetd
+\newline 
 
+\series default 
+\emph on 
 killall -HUP inetd
-\layout Standard
+\layout Enumerate
 
-1.2.10 Configure WEB interface
-\layout Standard
+Configure WEB interface
+\newline 
+As user zabbix (or whatever you decided to name your dedicated 
+\series bold 
+Zabbix
+\series default 
+ account), do the following:
+\newline 
+Change these values in 
+\emph on 
+frontends/php/include/db.inc
+\emph default 
+: 
+\newline 
+$DB_TYPE ="POSTGRESQL"; /* Or "MYSQL" for MySQL */ 
+\newline 
+$DB_SERVER ="localhost"; 
+\newline 
+$DB_DATABASE ="zabbix"; 
+\newline 
+$DB_USER =""; 
+\newline 
+$DB_PWD =""
+\newline 
 
-As user zabbix (or whatever you decided to name your dedicated Zabbix account
- in step 1.2.1), do the following:
-\layout Standard
-
-Change these values in frontends/php/include/db.inc: $DB_TYPE ="POSTGRESQL";
- /* Or "MYSQL" for MySQL */ $DB_SERVER ="localhost"; $DB_DATABASE ="zabbix";
- $DB_USER =""; $DB_PWD =""
-\layout Standard
-
+\newline 
 Copy the PHP source files to a place where your web server can get to it.
- Perhaps /home/zabbix/html or /home/zabbix/public_html or /var/www/html/zabbix,
- etc.
- For example, mkdir /home/zabbix/html cp -R frontends/php/* /home/zabbix/html/
-\layout Standard
+ Perhaps 
+\emph on 
+/home/zabbix/html
+\emph default 
+ or 
+\emph on 
+/home/zabbix/public_html
+\emph default 
+ or 
+\emph on 
+/var/www/html/zabbix
+\emph default 
+, etc.
+ For example, 
+\newline 
 
-1.2.11 Configure Apache
-\layout Standard
+\emph on 
+mkdir /home/zabbix/html 
+\newline 
+cp -R frontends/php/* 
+\newline 
+/home/zabbix/html/
+\layout Enumerate
 
+Configure Apache
+\newline 
 By default, Apache does not recognize *.html files as PHP scripts.
  Add the following line to Apache configuration files to make Apache think
  that every *.html file is actually PHP script that should be interpreted:
-\layout Standard
+\newline 
 
+\emph on 
 AddType application/x-httpd-php .html
-\layout Standard
+\layout Enumerate
 
-1.2.12 Configure /etc/zabbix/zabbix_agent.conf
-\layout Standard
+Configure 
+\emph on 
+/etc/zabbix/zabbix_agent.conf
+\newline 
 
-You need to configure this file for every host having zabbix_agent installed.
- The file should contain IP address of Zabbix server.
+\emph default 
+You need to configure this file for every host having 
+\series bold 
+zabbix_agent
+\series default 
+ installed.
+ The file should contain IP address of 
+\series bold 
+Zabbix
+\series default 
+ server.
  Connections from other hosts will be denied.
-\layout Standard
+ 
+\emph on 
+Note
+\emph default 
+, that no end of line character should present in the file.
+\layout Enumerate
 
-1.3 Initial Configuration
-\layout Standard
-
-Once your Zabbix installation is complete, you will need to configure Zabbix.
+Initial Configuration
+\newline 
+Once your 
+\series bold 
+Zabbix
+\series default 
+ installation is complete, you will need to configure 
+\series bold 
+Zabbix
+\series default 
+.
  Point your web browser to the location you installed the PHP scripts to.
- (For example, if you copied the PHP files to /home/zabbix/public_html or
- /home/zabbix/html, point your browser to http://localhost/~zabbix)
-\layout Standard
-
+ (For example, if you copied the PHP files to 
+\emph on 
+/home/zabbix/public_html
+\emph default 
+ or 
+\emph on 
+/home/zabbix/html
+\emph default 
+, point your browser to 
+\family typewriter 
+http://localhost/~zabbix
+\family default 
+)
+\newline 
 Once there, click on the CONFIG link.
  You will be prompted for a username and password.
  Zabbix comes pre-configured with an administrative account: Enter the username
  'Admin' and leave the password field empty.
  
-\layout Standard
-
+\newline 
 Add the configuration of your SMTP server of choice.
-\layout Standard
-
+\newline 
 Next, click on the "USERS" link.
  Add yourself to list of Zabbix users.
  Don't forget to select "Administrators" group.
  After you create your account, click the "Media" link beside your account
  listing, and add your email address.
-\layout Standard
-
+\newline 
 Next, delete the default Admin user.
-\layout Standard
-
+\newline 
 Click on the 'HOSTS' link to add new hosts to be monitored.
  For each host you add, be sure that you've installed the agent software
  on the host.
  If you have not yet done this, set the status to "Not monitored".
  When a host is added, a list of all possible parameters for the host will
  be automatically added.
-\layout Standard
-
+\newline 
 After you've added your desired hosts, click on the "ITEMS" link to modify
  the details of the monitored parameters.
  You may disable or delete monitored parameters or change how often the
  parameters are checked.
  
-\layout Standard
-
+\newline 
 Next, click on the 'TRIGGERS' link to change the triggers relating to monitored
  parameters.
  You can change threshold values, disable or delete triggers, and set up
  actions (email notification).
  
-\layout Standard
-
+\newline 
 When you set up an email notification, you may modify the subject and message
  body as you wish.
  You can use macros in both email subject and email body.
  For example, the subject for a warning message could look like:
-\layout Standard
+\newline 
 
+\emph on 
 Processor load on www.sf.net is {www.sf.net:system[procload].last(0)}
-\layout Standard
+\newline 
 
-In this case, you will receive message with subject like "Processor load
- on www.sf.net is 0.85".
-\layout Standard
+\emph default 
+In this case, you will receive message with subject like 
+\emph on 
+"Processor load on www.sf.net is 0.85"
+\emph default 
 
+\newline 
 Click on the "MAPS" link to set up a network map.
  A map will help you quickly identify any problems with your monitored machines.
  
-\layout Standard
-
+\newline 
 Finally, click on the "GRAPHS" link to set up a graph.
  A graph provides quick historical statistics on one or more monitored statistic
 s.
-\layout Standard
+\newline 
+Once you have an initial configuration created, run 
+\series bold 
+zabbix_suckerd
+\series default 
+ on the server machine:
+\newline 
 
-Once you have an initial configuration created, run zabbix_suckerd on the
- server machine:
-\layout Standard
-
+\emph on 
 /opt/zabbix/bin/zabbix_suckerd
-\layout Standard
+\newline 
 
-and run zabbix_agentd on all monitored machines 
-\layout Standard
+\emph default 
+and run 
+\series bold 
+zabbix_agentd
+\series default 
+ on all monitored machines 
+\newline 
 
+\emph on 
 /opt/zabbix/bin/zabbix_agentd
-\layout Standard
+\newline 
 
-You should not run zabbix_agentd if you have chosen to use zabbix_agent!
+\emph default 
+You 
+\emph on 
+should
+\emph default 
+ not run 
+\series bold 
+zabbix_agentd
+\series default 
+ if you have chosen to use 
+\series bold 
+zabbix_agent
+\series default 
+!
 \layout Subsection
 
 Development Environment 
@@ -624,8 +954,11 @@ The upgrade procedure is quite simple.
  New binaries and frontend should be installed according to latest installation
  instructions.
  In order to update database structure, the following steps should be performed.
- Note that before applying database patches, all Zabbix processes must be
- stopped.
+ Note that before applying database patches, all 
+\series bold 
+Zabbix
+\series default 
+ processes must be stopped.
  Also, the process can take from 0 seconds (if no patches required) up to
  several hours.
  For production installations database backup is required !
@@ -644,12 +977,16 @@ Go to the upgrades/dbpatches directory.
  Depending on which database you use:
 \layout Standard
 
+
+\emph on 
 cd mysql cat patch.sql |mysql zabbix -u<username> -p<password>
 \layout Standard
 
 or
 \layout Standard
 
+
+\emph on 
 cd postgresql cat patch.sql|psql -U <username> zabbix
 \layout Standard
 
@@ -660,41 +997,94 @@ Zabbix releases
 \layout Subsubsection
 
 Zabbix 1.0alpha8
-\layout Standard
+\layout Itemize
 
-- Note that zabbix_sucker has been renamed to zabbix_suckerd.
-\layout Standard
+Note that 
+\series bold 
+zabbix_sucker
+\series default 
+ has been renamed to 
+\series bold 
+zabbix_suckerd
+\series default 
+.
+\layout Itemize
 
-- Replace zabbix_agent with zabbix_agentd.
- zabbix_agentd runs much faster than the 'old' zabbix_agent.
- Moreover, if you do not run inetd, zabbix_agentd is the only choice :)
-\layout Standard
+Replace 
+\series bold 
+zabbix_agent
+\series default 
+ with 
+\series bold 
+zabbix_agentd
+\series default 
+.
+ 
+\series bold 
+zabbix_agentd
+\series default 
+ runs much faster than the 'old' 
+\series bold 
+zabbix_agent
+\series default 
+.
+ Moreover, if you do not run inetd, 
+\series bold 
+zabbix_agentd
+\series default 
+ is the only choice.
+\layout Itemize
 
-- PostgreSQL does not support modifying the structure of table fields.
+PostgreSQL does not support modifying the structure of table fields.
  Therefore, please change the definition of the following fields (MySQL
- code): alter table users modify passwd char(32) default '' not null; alter
- table actions modify message text default '' not null; alter table alerts
- modify message text default '' not null;
-\layout Standard
+ code):
+\newline 
 
-- Try to use IP address in host definition.
- This unloads DNS and makes zabbix_suckerd faster.
+\emph on 
+alter table users modify passwd char(32) default '' not null;
+\newline 
+alter table actions modify message text default '' not null;
+\newline 
+alter table alerts modify message text default '' not null;
+\layout Itemize
+
+Try to use IP addresses in host definitions.
+ This unloads DNS and makes 
+\series bold 
+zabbix_suckerd
+\series default 
+ faster.
 \layout Subsubsection
 
 Zabbix 1.0alpha9
-\layout Standard
+\layout Itemize
 
-- Don't forget to apply DB patches.
+Don't forget to apply DB patches.
 \layout Subsubsection
 
 Zabbix 1.0alpha10
-\layout Standard
+\layout Itemize
 
-- Don't forget to apply DB patches.
-\layout Standard
+Don't forget to apply DB patches.
+\layout Itemize
 
-- Note that parameters net[listen_*] will be replaced by check_service[*]
- (for example, net[listen_25] -> check_service[smtp]).
+Note that parameters 
+\series bold 
+net[listen_*]
+\series default 
+ will be replaced by 
+\series bold 
+check_service[*]
+\series default 
+ (for example, 
+\series bold 
+net[listen_25]
+\series default 
+ -> 
+\series bold 
+check_service[smtp]
+\series default 
+).
 \layout Subsubsection
 
 Zabbix 1.0alpha11
@@ -705,15 +1095,24 @@ Do not forget to apply DB patches.
 
 PostgreSQL users: Please delete the column "triggers.lastcheck" manually
  by reloading whole table.
- Unfortunately, PostgreSQL does not support "alter table triggers drop lastcheck
-".
+ Unfortunately, PostgreSQL does not support 
+\emph on 
+"alter table triggers drop lastcheck"
+\emph default 
+.
 \layout Itemize
 
-New set of parameters appeared in this release: proc_cnt[*]
+New set of parameters appeared in this release: 
+\series bold 
+proc_cnt[*]
 \layout Itemize
 
 IMPORTANT.
- Parameter tcp_count is not supported anymore.
+ Parameter 
+\series bold 
+tcp_count
+\series default 
+ is not supported anymore.
 \layout Subsection
 
 ChangeLog
@@ -724,22 +1123,45 @@ Perfomance Monitoring
 
 
 \latex no_latex 
-One of most important uses of Zabbix is performance monitoring.
+One of most important uses of 
+\series bold 
+\latex default 
+Zabbix
+\series default 
+\latex no_latex 
+ is performance monitoring.
 
 \latex default 
  
 \latex no_latex 
 Processor load, number of running processes, number of processes, disk activity,
  status of swap space, and memory availability are some of the numerous
- system parameters Zabbix is able to monitor.
- Zabbix provides a system administrator with timely information about performanc
-e of a server.
+ system parameters 
+\series bold 
+\latex default 
+Zabbix
+\series default 
+\latex no_latex 
+ is able to monitor.
+ 
+\series bold 
+\latex default 
+Zabbix
+\series default 
+\latex no_latex 
+ provides a system administrator with timely information about performance
+ of a server.
 
 \latex default 
  
 \latex no_latex 
-In addition, Zabbix can produce trend graphs to help identify bottlenecks
- in system performance.
+In addition, 
+\series bold 
+\latex default 
+Zabbix
+\series default 
+\latex no_latex 
+ can produce trend graphs to help identify bottlenecks in system performance.
  
 \layout Subsection
 
@@ -750,8 +1172,14 @@ H
 \latex no_latex 
 aving performance monitoring is good, but it is almost useless without a
  powerful notification mechanism.
- With Zabbix, an administrator can define virtually any possible condition
- for a trigger, using flexible expressions.
+ With 
+\series bold 
+\latex default 
+Zabbix
+\series default 
+\latex no_latex 
+, an administrator can define virtually any possible condition for a trigger,
+ using flexible expressions.
 
 \latex default 
  
@@ -765,21 +1193,48 @@ Any time these expressions become true, an alert will be emailed to any
 
 
 \latex no_latex 
-For example, suppose you wish to be notified when /etc/passwd is changed
- by someone.
- You define a trigger with expression {sourceforge.net:cksum[/etc/passwd].diff(0)}
->0.
+For example, suppose you wish to be notified when 
+\emph on 
+\latex default 
+/etc/passwd
+\emph default 
+\latex no_latex 
+ is changed by someone.
+ You define a trigger with expression 
+\emph on 
+\latex default 
+{sourceforge.net:cksum[/etc/passwd].diff(0)}>0
+\emph default 
+\latex no_latex 
+.
 
 \latex default 
  
 \latex no_latex 
-The "diff" function is true when the current value received by Zabbix is
- different than the previous value.
+The "
+\series bold 
+\latex default 
+diff
+\series default 
+\latex no_latex 
+" function is true when the current value received by 
+\series bold 
+\latex default 
+Zabbix
+\series default 
+\latex no_latex 
+ is different than the previous value.
 
 \latex default 
  
 \latex no_latex 
-Therefore, this expression will be true whenever /etc/passwd is changed.
+Therefore, this expression will be true whenever 
+\emph on 
+\latex default 
+/etc/passwd
+\emph default 
+\latex no_latex 
+ is changed.
 
 \latex default 
  
@@ -791,22 +1246,37 @@ Next, you define one or more actions that will be performed when the trigger
  
 \latex no_latex 
 Add an action to email your account, you will get email notification anytime
- /etc/passwd is changed.
+ 
+\emph on 
+\latex default 
+/etc/passwd
+\emph default 
+\latex no_latex 
+ is changed.
 \layout Subsection
 
 Integrity Checking
 \layout Standard
 
 
+\series bold 
+Zabbix
+\series default 
 \latex no_latex 
-Zabbix can easily be used for servers integrity monitoring.
+ can easily be used for servers integrity monitoring.
 
 \latex default 
  
 \latex no_latex 
 All critical configuration files, binaries, kernel, scripts, and web server
- HTML pages can be monitored by Zabbix so that the administrator can be
- alerted to modifications made to these files.
+ HTML pages can be monitored by 
+\series bold 
+\latex default 
+Zabbix
+\series default 
+\latex no_latex 
+ so that the administrator can be alerted to modifications made to these
+ files.
 \layout Subsection
 
 Logging Services
@@ -837,19 +1307,42 @@ Overview
 \layout Standard
 
 
+\series bold 
+Zabbix
+\series default 
 \latex no_latex 
-Zabbix is structured in a client-server architecture.
- The Zabbix server (zabbix_suckerd) periodically connects to an agent placed
- on the monitored host, asks for specific information (processor load, free
- memory, available inodes, etc).
+ is structured in a client-server architecture.
+ The 
+\series bold 
+\latex default 
+Zabbix
+\series default 
+\latex no_latex 
+ server (
+\series bold 
+\latex default 
+zabbix_suckerd
+\series default 
+\latex no_latex 
+) periodically connects to an agent placed on the monitored host, asks for
+ specific information (processor load, free memory, available inodes, etc).
  The agent provides the server with the requested information and the server,
  in turn, stores the received values in the database
 \latex default 
 .
  
+\series bold 
+Zabbix
+\series default 
 \latex no_latex 
-Zabbix also supports the use of a trapping method.
- In this case, the monitored host sends information to Zabbix server.
+ also supports the use of a trapping method.
+ In this case, the monitored host sends information to 
+\series bold 
+\latex default 
+Zabbix
+\series default 
+\latex no_latex 
+ server.
 \layout Subsection
 
 Database
@@ -857,9 +1350,18 @@ Database
 
 
 \latex no_latex 
-Database use plays a very important role in the Zabbix application.\SpecialChar ~
- The entire
- history of received parameter values is stored in the database.
+Database use plays a very important role in the 
+\series bold 
+\latex default 
+Zabbix
+\series default 
+\latex no_latex 
+ application.
+
+\latex default 
+ 
+\latex no_latex 
+The entire history of received parameter values is stored in the database.
 
 \latex default 
  
@@ -869,9 +1371,18 @@ In addition, the database is the sole source of configuration parameters
 
 \latex default 
  
+\series bold 
+Zabbix
+\series default 
 \latex no_latex 
-Zabbix performance depends highly on the efficiency and speed of the database
- used by Zabbix.
+ performance depends highly on the efficiency and speed of the database
+ used by 
+\series bold 
+\latex default 
+Zabbix
+\series default 
+\latex no_latex 
+.
 \layout Subsubsection
 
 PostgreSQL Notes
@@ -881,55 +1392,63 @@ PostgreSQL Notes
 \latex no_latex 
 Performance of PostgreSQL can be significantly improved by executing the
  VACUUM command on the Zabbix database.
-\layout Standard
 
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+\latex default 
+ 
 \latex no_latex 
 I would suggest execution of VACUUM at least after the following events:
+\layout Itemize
+
+
+\series bold 
+Zabbix
+\series default 
+\latex no_latex 
+ is installed
+\layout Itemize
+
+
+\latex no_latex 
+10000 records in table "history"
+\layout Itemize
+
+
+\latex no_latex 
+patches applied on 
+\series bold 
+\latex default 
+Zabbix
+\series default 
+\latex no_latex 
+ database
 \layout Standard
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+For heavily loaded 
+\series bold 
+\latex default 
+Zabbix
+\series default 
 \latex no_latex 
-\SpecialChar ~
-- Zabbix is installed
-\layout Standard
-
-
+ servers, hourly execution of "VACUUM ANALYZE" for all tables except "history"
+ is 
+\emph on 
+\latex default 
+strongly
+\emph default 
 \latex no_latex 
-\SpecialChar ~
-- 10000 records in table "history"
-\layout Standard
-
-
+ recommended!
+\latex default 
+ 
 \latex no_latex 
-\SpecialChar ~
-- patches applied on Zabbix database
-\layout Standard
-
-
+You can use the command 
+\emph on 
+\latex default 
+'echo "vacuum verbose analyze"|psql zabbix'
+\emph default 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-For heavily loaded Zabbix servers, hourly execution of "VACUUM ANALYZE"
- for all tables except "history" is strongly recommended!\SpecialChar ~
- You can use the
- command 'echo "vacuum verbose analyze"|psql zabbix'.
+.
 \layout Subsection
 
 Zabbix Processes
@@ -940,7 +1459,13 @@ zabbix_suckerd
 
 
 \latex no_latex 
-The Zabbix server process.
+The 
+\series bold 
+\latex default 
+Zabbix
+\series default 
+\latex no_latex 
+ server process.
 \layout Standard
 
 
@@ -5320,6 +5845,8 @@ This sort of feedback helps me make the software better.
 Developers of Zabbix
 \layout Itemize
 
+
+\noun on 
 Alexei Vladishev 
 \layout Standard
 
@@ -5329,18 +5856,24 @@ Has written most of Zabbix code including PHP frontend.
 Contributors to Zabbix
 \layout Itemize
 
+
+\noun on 
 Kaspars Cikmacs
 \layout Standard
 
 Lots of new ideas based on real expirience of using Zabbix.
 \layout Itemize
 
+
+\noun on 
 Michal Suszycki
 \layout Standard
 
 Help with autoconf issues.
 \layout Itemize
 
+
+\noun on 
 Mike Hoolehan
 \layout Standard
 
