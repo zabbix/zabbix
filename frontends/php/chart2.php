@@ -86,7 +86,10 @@
 	$y=imagesy($im);
 
 	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10+50,$white);
-	ImageRectangle($im,0,0,$x-1,$y-1,$black);
+	if(!isset($HTTP_GET_VARS["noborder"]))
+	{
+		ImageRectangle($im,0,0,$x-1,$y-1,$black);
+	}
 //	ImageRectangle($im,$shiftX+1,$shiftYup,$shiftX+$sizeX,$shiftYup+$sizeY, $black );
 
 	ImageDashedLine($im,$shiftX+1,$shiftYup,$shiftX+1,$sizeY+$shiftYup,$black);

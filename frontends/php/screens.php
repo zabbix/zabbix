@@ -94,7 +94,7 @@
 
                 if($graphid!=0)
                 {
-                        echo "<a href=charts.php?graphid=$graphid><img src='chart2.php?graphid=$graphid&width=$width&height=$height&period=3600' border=0></a>";
+                        echo "<a href=charts.php?graphid=$graphid><img src='chart2.php?graphid=$graphid&width=$width&height=$height&period=3600&noborder=1' border=0></a>";
                 }
                 echo "</form>\n";
                echo "</TD>";
