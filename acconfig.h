@@ -7,6 +7,9 @@
 /* Define if filesystem /proc exists */
 #undef HAVE_PROC
 
+/* Define if sys/resource.h has function setpriority() */
+#undef HAVE_SYS_RESOURCE_SETPRIORITY
+
 /* Define if file /proc/net/dev exists */
 #undef HAVE_PROC_NET_DEV
 
