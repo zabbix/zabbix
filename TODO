@@ -1,6 +1,5 @@
 1.0beta10:
 
- - add confirmation screen for Updates and Deletes
  - add all supported items to templates (data.sql)
  - performance of graphs: get rid of MIN,MAX
  - user groups

@@ -4,6 +4,7 @@
 
 	include "include/config.inc.php";
 	show_header($page["title"],0,0);
+	insert_confirm_javascript();
 ?>
 
 <?php
@@ -51,6 +52,7 @@
 <?php
 	$config=select_config();
 ?>
+
 
 <?php
 	show_table2_header_begin();
@@ -205,7 +207,7 @@
 	if(isset($mediatypeid))
 	{
 		echo "<input type=\"submit\" name=\"register\" value=\"update media\">";
-		echo "<input type=\"submit\" name=\"register\" value=\"delete\">";
+		echo "<input type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected media?');\">";
 	}
 
 	show_table2_header_end();

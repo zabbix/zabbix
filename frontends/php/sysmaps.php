@@ -3,6 +3,7 @@
 	$page["title"] = "Network maps";
 	$page["file"] = "sysmaps.php";
 	show_header($page["title"],0,0);
+	insert_confirm_javascript();
 ?>
 
 <?php
@@ -31,7 +32,7 @@
 		{
 			$result=delete_sysmap($HTTP_GET_VARS["sysmapid"]);
 			show_messages($result,"Network map deleted","Cannot delete network map");
-			unset($sysmapid);
+			unset($HTTP_GET_VARS["sysmapid"]);
 		}
 	}
 ?>
@@ -74,7 +75,7 @@
 		echo "<TD><a href=\"sysmap.php?sysmapid=".$row["sysmapid"]."\">".$row["name"]."</a></TD>";
 		echo "<TD>".$row["width"]."</TD>";
 		echo "<TD>".$row["height"]."</TD>";
-		echo "<TD><A HREF=\"sysmaps.php?sysmapid=".$row["sysmapid"]."#form\">Change</A> - <A HREF=\"sysmaps.php?register=delete&sysmapid=".$row["sysmapid"]."\">Delete</A></TD>";
+		echo "<TD><A HREF=\"sysmaps.php?sysmapid=".$row["sysmapid"]."#form\">Change</A></TD>";
 		echo "</TR>";
 	}
 	echo "</TABLE>";
@@ -126,6 +127,7 @@
 	if(isset($HTTP_GET_VARS["sysmapid"]))
 	{
 		echo "<input type=\"submit\" name=\"register\" value=\"update\">";
+		echo "<input type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete system map?');\">";
 	}
 
 	show_table2_header_end();

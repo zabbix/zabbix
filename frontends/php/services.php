@@ -4,6 +4,7 @@
 
 	include "include/config.inc.php";
 	show_header($page["title"],0,0);
+	insert_confirm_javascript();
 ?>
 
 <?php
@@ -69,7 +70,6 @@
 	echo "<tr>";
 	echo "<td><b>Service</b></td>";
 	echo "<td width=20%><b>Status calculation</b></td>";
-	echo "<td width=10%><b>Actions</b></td>";
 	echo "</tr>";
 
 	$col=0;
@@ -94,7 +94,6 @@
 		{
 			echo "<td>unknown</td>";
 		}
-		echo "<td><a href=\"services.php?serviceid=".$service["serviceid"]."&register=delete\">Delete</a></td>";
 		echo "</tr>"; 
 		$col++;
 	}
@@ -325,6 +324,7 @@
 	if(isset($HTTP_GET_VARS["serviceid"]))
 	{
 		echo "<input type=\"submit\" name=\"register\" value=\"update\">";
+		echo "<input type=\"submit\" name=\"register\" value=\"delete\"  onClick=\"return Confirm('Delete service?');\">";
 	}
 
 	show_table2_header_end();
