@@ -843,7 +843,7 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 
 	now = time(NULL);
 
-	sprintf(sql,"select actionid,userid,delay,subject,message,scope,severity from actions where (scope=%d and triggerid=%d and good=%d and nextcheck<=%d) or (scope=%d) or (scope=%d)",ACTION_SCOPE_TRIGGER,trigger->triggerid,good,now,ACTION_SCOPE_HOST,ACTION_SCOPE_HOSTS);
+	sprintf(sql,"select actionid,userid,delay,subject,message,scope,severity from actions where (scope=%d and triggerid=%d and good=%d and nextcheck<=%d) or (scope=%d and good=%d) or (scope=%d and good=%d)",ACTION_SCOPE_TRIGGER,trigger->triggerid,good,now,ACTION_SCOPE_HOST,good,ACTION_SCOPE_HOSTS,good);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
@@ -860,17 +860,19 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 		action.scope=atoi(DBget_field(result,i,5));
 		action.severity=atoi(DBget_field(result,i,6));
 
+
 		if(ACTION_SCOPE_TRIGGER==action.scope)
 		{
 			substitute_hostname(trigger->triggerid,action.message);
 			substitute_hostname(trigger->triggerid,action.subject);
-		
+
 			substitute_macros(action.message);
 			substitute_macros(action.subject);
 		}
 		else if(ACTION_SCOPE_HOST==action.scope)
 		{
 			sprintf(sql,"select * from actions a,triggers t,hosts h,functions f,items i where a.triggerid=t.triggerid and f.triggerid=t.triggerid and i.itemid=f.itemid and h.hostid=i.hostid and a.scope=%d",ACTION_SCOPE_HOST);
+/*			zabbix_log( LOG_LEVEL_WARNING, "[%s]",sql);*/
 			result2 = DBselect(sql);
 			if(DBnum_rows(result2)==0)
 			{
@@ -879,7 +881,7 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 			}
 			DBfree_result(result2);
 			strncpy(action.subject,trigger->description,MAX_STRING_LEN);
-			if(0==good)
+			if(1==good)
 			{
 				strncat(action.subject," (ON)", MAX_STRING_LEN);
 			}
@@ -888,11 +890,14 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 				strncat(action.subject," (OFF)", MAX_STRING_LEN);
 			}
 			strncpy(action.message,action.subject,MAX_STRING_LEN);
+
+			substitute_hostname(trigger->triggerid,action.message);
+			substitute_hostname(trigger->triggerid,action.subject);
 		}
 		else if(ACTION_SCOPE_HOSTS==action.scope)
 		{
 			strncpy(action.subject,trigger->description,MAX_STRING_LEN);
-			if(0==good)
+			if(1==good)
 			{
 				strncat(action.subject," (ON)", MAX_STRING_LEN);
 			}
@@ -901,6 +906,9 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 				strncat(action.subject," (OFF)", MAX_STRING_LEN);
 			}
 			strncpy(action.message,action.subject,MAX_STRING_LEN);
+
+			substitute_hostname(trigger->triggerid,action.message);
+			substitute_hostname(trigger->triggerid,action.subject);
 		}
 		else
 		{
