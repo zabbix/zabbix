@@ -1612,10 +1612,25 @@ float	CHECK_SERVICE(char *service)
 	return FAIL;
 }
 
-float	CHECK_PORT(char *port)
+float	CHECK_PORT(char *ip_and_port)
 {
-	int i;
+	char	*c;
+	int	port=0;
+	char	ip[MAX_STRING_LEN+1];
 
-	i=atoi(port);
-	return	tcp_expect("127.0.0.1",i,NULL,"");
+	c=strchr(ip_and_port,',');
+	strncpy(ip,ip_and_port,MAX_STRING_LEN);
+
+	if(c != NULL)
+	{
+		port=atoi(c+1);
+		ip[c-ip_and_port]=0;
+	}
+	else
+	{
+		port=atoi(ip_and_port);
+		strcpy(ip,"127.0.0.1");
+	}
+
+	return	tcp_expect(ip,port,NULL,"");
 }
