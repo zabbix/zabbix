@@ -571,7 +571,7 @@
 
 		$lastchange="<A HREF=\"alarms.php?triggerid=".$row["triggerid"]."\">".date("d M H:i:s",$row["lastchange"])."</a>";
 
-		$actions=FALSE;
+		$actions=array("hide"=>1);
 		if($noactions!='true')
 		{
 			$actions="<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">".S_SHOW_ACTIONS."</A> - ";
@@ -585,7 +585,7 @@
 				$actions=$actions."<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."#form\">".S_CHANGE."</A>";
 			}
 		}
-		$comments=FALSE;
+		$comments=array("hide"=>1);;
 		if($row["comments"] != "")
 		{
 			$comments="<A HREF=\"tr_comments.php?triggerid=".$row["triggerid"]."\">".S_SHOW."</a>";

@@ -119,35 +119,31 @@
 ?>
 
 <?php
-	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
-	echo "<TR BGCOLOR=\"#CCCCCC\"><TD WIDTH=3%><B>".S_ID."</B></TD>";
-	echo "<TD WIDTH=10%><B>".S_TYPE."</B></TD>";
-	echo "<TD><B>".S_DESCRIPTION_SMALL."</B></TD>";
-	echo "<TD WIDTH=10%><B>".S_ACTIONS."</B></TD>";
-	echo "</TR>";
+	table_begin();
+	table_header(array(S_ID,S_TYPE,S_DESCRIPTION_SMALL,S_ACTIONS));
 
 	$result=DBselect("select mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path from media_type mt order by mt.type");
 	$col=0;
 	while($row=DBfetch($result))
 	{
-		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
-		else		{ echo "<TR BGCOLOR=#DDDDDD>"; }
-		echo "<td>".$row["mediatypeid"]."</td>";
 		if($row["type"]==0)
 		{
-			echo "<td>".S_EMAIL."</td>";
+			$type=S_EMAIL;
 		}
 		else if($row["type"]==1)
 		{
-			echo "<td>".S_SCRIPT."</td>";
+			$type=S_SCRIPT;
 		}
 		else
 		{
-			echo "<td>".S_UNKNOWN."</td>";
+			$type=S_UNKNOWN;
 		}
-		echo "<td>".$row["description"]."</td>";
-		echo "<td><a href=\"config.php?register=change&mediatypeid=".$row["mediatypeid"]."\">".S_CHANGE."</a></td>";
-		echo "</tr>";
+		$actions="<a href=\"config.php?register=change&mediatypeid=".$row["mediatypeid"]."\">".S_CHANGE."</a>";
+		table_row(array(
+			$row["mediatypeid"],
+			$type,
+			$row["description"],
+			$actions),$col++);
 	}
 	if(DBnum_rows($result)==0)
 	{
@@ -155,7 +151,7 @@
 			echo "<TD COLSPAN=4 ALIGN=CENTER>".S_NO_MEDIA_TYPES_DEFINED."</TD>";
 			echo "<TR>";
 	}
-	echo "</TABLE>";
+	table_end();
 	echo"<br>";
 ?>
 
