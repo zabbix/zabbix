@@ -28,7 +28,7 @@
 ?>
 
 <?php
-        if(!check_right("Configuration of Zabbix","U",0))
+        if(!check_anyright("Configuration of Zabbix","U"))
         {
                 show_table_header("<font color=\"AA0000\">No permissions !</font
 >");

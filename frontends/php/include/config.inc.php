@@ -116,6 +116,96 @@
 		return $row["cnt"]; 
 	}
 
+	function	check_anyright($right,$permission)
+	{
+		global $USER_DETAILS;
+
+		$sql="select permission from rights where name='Default permission' and userid=".$USER_DETAILS["userid"];
+		$result=DBselect($sql);
+
+		$default_permission="H";
+		if(DBnum_rows($result)>0)
+		{
+			$default_permission="";
+			while($row=DBfetch($result))
+			{
+				$default_permission=$default_permission.$row["permission"];
+			}
+		}
+# default_permission
+
+		$sql="select permission from rights where name='$right' and id!=0 and userid=".$USER_DETAILS["userid"];
+		$result=DBselect($sql);
+
+		$all_permissions="";
+		if(DBnum_rows($result)>0)
+		{
+			while($row=DBfetch($result))
+			{
+				$all_permissions=$all_permissions.$row["permission"];
+			}
+		}
+# all_permissions
+
+//		echo "$all_permissions|$default_permission<br>";
+
+		switch ($permission) {
+			case 'A':
+				if(strstr($all_permissions,"A"))
+				{
+					return 1;
+				}
+				if(strstr($default_permission,"H"))
+				{
+					return 0;
+				}
+				else if(strstr($default_permission,"A"))
+				{
+					return 1;
+				}
+				break;
+			case 'R':
+				if(strstr($all_permissions,"R"))
+				{
+					return 1;
+				}
+				else if(strstr($all_permissions,"U"))
+				{
+					return 1;
+				}
+				if(strstr($default_permission,"H"))
+				{
+					return 0;
+				}
+				else if(strstr($default_permission,"R"))
+				{
+					return 1;
+				}
+				else if(strstr($default_permission,"U"))
+				{
+					return 1;
+				}
+				break;
+			case 'U':
+				if(strstr($all_permissions,"U"))
+				{
+					return 1;
+				}
+				if(strstr($default_permission,"H"))
+				{
+					return 0;
+				}
+				else if(strstr($default_permission,"U"))
+				{
+					return 1;
+				}
+				break;
+			default:
+				return 0;
+		}
+		return 0;
+	}
+
 	function	check_right($right,$permission,$id)
 	{
 		global $USER_DETAILS;
@@ -930,7 +1020,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		<tr>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 <?php
-				if(check_right("Host","R",0))
+				if(check_anyright("Host","R"))
 				{
 					echo "<a href=\"latest.php\">";
 				}
@@ -947,7 +1037,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
 <?php
-				if(check_right("Host","R",0))
+				if(check_anyright("Host","R"))
 				{
 					echo "<a href=\"tr_status.php?notitle=true&onlytrue=true&noactions=true&compact=true\">";
 				}
@@ -963,7 +1053,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
 <?php
-				if(check_right("Host","R",0))
+				if(check_anyright("Host","R"))
 				{
 					echo "<a href=\"queue.php\">";
 				}
@@ -979,7 +1069,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
 <?php
-				if(check_right("Default permission","R",0))
+				if(check_anyright("Default permission","R"))
 				{
 					echo "<a href=\"latestalarms.php\">";
 				}
@@ -998,7 +1088,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 <?php
-				if(check_right("Default permission","R",0))
+				if(check_anyright("Default permission","R"))
 				{
 					echo "<a href=\"alerts.php\">";
 				}
@@ -1016,7 +1106,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 <?php
-				if(check_right("Network map","R",0))
+				if(check_anyright("Network map","R"))
 				{
 					echo "<a href=\"maps.php\">";
 				}
@@ -1034,7 +1124,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 <?php
-				if(check_right("Graph","R",0))
+				if(check_anyright("Graph","R"))
 				{
 					echo "<a href=\"charts.php\">";
 				}
@@ -1052,7 +1142,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 <?php
-				if(check_right("Screen","R",0))
+				if(check_anyright("Screen","R"))
 				{
 					echo "<a href=\"screens.php\">";
 				}
@@ -1071,7 +1161,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 <?php
-				if(check_right("Service","R",0))
+				if(check_anyright("Service","R"))
 				{
 					echo "<a href=\"srv_status.php\">";
 				}
@@ -1103,7 +1193,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
 <?php
-				if(check_right("Default permission","R",0))
+				if(check_anyright("Default permission","R"))
 				{
 					echo "<a href=\"about.php\">";
 				}
@@ -1121,7 +1211,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
 <?php
-				if(check_right("Default permission","R",0))
+				if(check_anyright("Default permission","R"))
 				{
 					echo "<a href=\"report1.php\">";
 				}
@@ -1139,7 +1229,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=3 bgcolor=FFFFFF align=center valign=top width=15%>
 <?php
-				if(check_right("Host","R",0))
+				if(check_anyright("Host","R"))
 				{
 					echo "<a href=\"report2.php\">";
 				}
@@ -1158,19 +1248,19 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</tr>
 <?php
 // Third row
-		if(	check_right("Configuration of Zabbix","U",0)
+		if(	check_anyright("Configuration of Zabbix","U")
 			||
-			check_right("User","U",0)
+			check_anyright("User","U")
 			||
-			check_right("Host","U",0)
+			check_anyright("Host","U")
 			||
-			check_right("Graph","U",0)
+			check_anyright("Graph","U")
 			||
-			check_right("Screen","U",0)
+			check_anyright("Screen","U")
 			||
-			check_right("Network map","U",0)
+			check_anyright("Network map","U")
 			||
-			check_right("Service","U",0)
+			check_anyright("Service","U")
 		)
 		{
 
@@ -1178,7 +1268,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		<tr>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 <?php
-				if(check_right("Configuration of Zabbix","U",0))
+				if(check_anyright("Configuration of Zabbix","U"))
 				{
 					echo "<a href=\"config.php\">";
 				}
@@ -1194,7 +1284,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
 <?php
-				if(check_right("User","U",0))
+				if(check_anyright("User","U"))
 				{
 					echo "<a href=\"users.php\">";
 				}
@@ -1211,7 +1301,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
 <?php
-				if(check_right("Host","U",0))
+				if(check_anyright("Host","U"))
 				{
 					echo "<a href=\"hosts.php\">";
 				}
@@ -1227,7 +1317,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
 <?php
-				if(check_right("Host","U",0))
+				if(check_anyright("Host","U"))
 				{
 					echo "<a href=\"items.php\">";
 				}
@@ -1243,7 +1333,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 <?php
-				if(check_right("Host","U",0))
+				if(check_anyright("Host","U"))
 				{
 					echo "<a href=\"triggers.php\">";
 				}
@@ -1260,7 +1350,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 <?php
-				if(check_right("Network map","U",0))
+				if(check_anyright("Network map","U"))
 				{
 					echo "<a href=\"sysmaps.php\">";
 				}
@@ -1277,7 +1367,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 <?php
-				if(check_right("Graph","U",0))
+				if(check_anyright("Graph","U"))
 				{
 					echo "<a href=\"graphs.php\">";
 				}
@@ -1294,7 +1384,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 <?php
-				if(check_right("Screen","U",0))
+				if(check_anyright("Screen","U"))
 				{
 					echo "<a href=\"screenconf.php\">";
 				}
@@ -1312,7 +1402,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 <?php
-				if(check_right("Service","U",0))
+				if(check_anyright("Service","U"))
 				{
 					echo "<a href=\"services.php\">";
 				}
