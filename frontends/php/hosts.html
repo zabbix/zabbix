@@ -72,6 +72,8 @@
 			echo "<a href=\"hosts.html?hostid=$hostid_&register=changestatus&status=1\">Monitored</a>";
 		else if($status_ == 1)
 			echo "<a href=\"hosts.html?hostid=$hostid_&register=changestatus&status=0\">Not monitored</a>";
+		else if($status_ == 2)
+			echo "Unreachable";
 		else
 			echo "Unknown";
 		echo "</TD>";

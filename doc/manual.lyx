@@ -1282,6 +1282,20 @@ Status of Triggers
 \end_inset 
 
 
+\layout Itemize
+
+Added audible notification to form 
+\begin_inset Quotes eld
+\end_inset 
+
+Status of Triggers
+\begin_inset Quotes erd
+\end_inset 
+
+
+\layout Itemize
+
+?????
 \layout Subsection
 
 ChangeLog
@@ -1687,12 +1701,17 @@ The zabbix_suckerd process periodically connects to agents (either Zabbix
 \layout Standard
 
 If zabbix_suckerd is unable to get value from an agent because of network
- problems, the value will be checked next time only after DELAY_ON_NETWORK_ERROR
- (defined in 
+ problems, the 
+\shape italic 
+host
+\shape default 
+ will be checked next time only after DELAY_ON_NETWORK_ERROR (defined in
+ 
 \shape italic 
 include/common.h
 \shape default 
 , default value is 120) seconds.
+ Host status will be updated to UNREACHABLE.
 \layout Standard
 
 If an agent does not support requested parameter, zabbix_suckerd will change
@@ -9044,7 +9063,7 @@ HOSTS The table contains list of monitored Hosts
 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="4" columns="3">
+<lyxtabular version="2" rows="5" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
@@ -9141,7 +9160,7 @@ status
 
 \layout Standard
 
-vint
+int
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -9149,7 +9168,33 @@ vint
 
 \layout Standard
 
-Host status: 0 - monitored, 1 - not monitored
+Host status: 0 - monitored, 1 - not monitored, 2 - unreachable
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+disabled_until
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+In case if status is unreachabe, do not check host until this time
 \end_inset 
 </cell>
 </row>

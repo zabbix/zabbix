@@ -1,5 +1,10 @@
 Changes for 1.0beta1:
 
+ - in case of network error, zabbix_suckerd will not try to request any parameters
+ from the host during next 120 seconds (Alexei)
+ - added directory upgrades/dbpatches/1.0alpha12_to_1.0beta1 (Alexei)
+ - added column disabled_until to table hosts (Alexei)
+
  - modified SQL statements in both report2.html and graph2.html. Thanks
 to Oliver Siegmar. (Alexei) 
  - added support of audible notification (Alexei)

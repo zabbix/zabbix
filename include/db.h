@@ -35,6 +35,7 @@
 DB_ITEM
 {
 	int     itemid;
+	int     hostid;
 	int     type;
 	char    *description;
 	char    *key;
