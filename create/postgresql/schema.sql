@@ -164,6 +164,8 @@ CREATE TABLE actions (
   actionid		serial,
   triggerid		int4		DEFAULT '0' NOT NULL,
   userid		int4		DEFAULT '0' NOT NULL,
+  scope			int4		DEFAULT '0' NOT NULL,
+  severity		int4		DEFAULT '0' NOT NULL,
   good			int4		DEFAULT '0' NOT NULL,
   delay			int4		DEFAULT '0' NOT NULL,
   subject		varchar(255)	DEFAULT '' NOT NULL,

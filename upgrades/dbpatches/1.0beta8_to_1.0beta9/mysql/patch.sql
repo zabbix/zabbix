@@ -3,6 +3,9 @@ alter table services add sortorder int(4) default '0' not null;
 
 alter table graphs_items add drawtype int(4) default '0' not null;
 
+alter table actions add scope int(4) default '0' not null;
+alter table actions add severity int(4) default '0' not null;
+
 --
 -- Table structure for table 'screens'
 --
