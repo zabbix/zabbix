@@ -4,6 +4,7 @@ TOP PRIORITY:
  - support for net-snmp
  - SNMP trapping
  - support for SLA level in IT Services 
+ - different port number for SNMP requests
 
 BUGS:
 
