@@ -85,9 +85,9 @@ int	get_value_SNMPv1(double *result,DB_ITEM *item)
 	int status;
 
 /*
-*      * Initialize the SNMP library
-*           */
+	Initialize the SNMP library
 	init_snmp("zabbix_sucker");
+*/
 
 /*
 *      * Initialize a "session" that defines who we're going to talk to
@@ -496,6 +496,8 @@ int main(int argc, char **argv)
 	ret=setlogmask(LOG_UPTO(LOG_WARNING));
 
 	syslog( LOG_WARNING, "zabbix_sucker #%d started",sucker_num);
+
+	init_snmp("zabbix_sucker");
 
 	DBconnect();
 
