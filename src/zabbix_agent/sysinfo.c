@@ -595,7 +595,7 @@ float	DF(const char * mountPoint)
 		return  FAIL;
 	}
 
-	return  s.f_bsize*s.f_bavail;
+	return  s.f_bavail * (s.f_bsize / 1024.0);
 #else
 	struct statfs   s;
 	long            blocks_used;

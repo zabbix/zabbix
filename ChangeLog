@@ -9,6 +9,7 @@ Noe ready yet:
 
 Changes for 1.0beta3:
 
+ - diskfree[*] to return free disk space in Kb (Alexei)
  - support for non-numeric parameters (Alexei)
  - common parser function for configuration files (Alexei)
 
