@@ -305,7 +305,8 @@ void	process(char *command,char *value)
 		{
 			port_int=atoi(port);
 		}
-		forward_request(proxy,command,port_int,value);
+/* Must be fixed !!! */
+/*		forward_request(proxy,command,port_int,value);*/
 		return;
 	}
 
@@ -1638,6 +1639,7 @@ double	EXECUTE(char *command)
 	return	result;
 }
 
+/*
 void	forward_request(char *proxy,char *command,int port,char *value);
 {
 	char	*haddr;
@@ -1697,6 +1699,7 @@ void	forward_request(char *proxy,char *command,int port,char *value);
 		return	0;
 	}
 }
+*/
 
 double	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose)
 {
