@@ -45,7 +45,6 @@ I found that if I use the fully qualified name of my host, all simple checks
 are working, but they failed if I simply use the hostname.
 
  - add icons to a map by clicking mouse
- - implement fixed range for graphs (Y axis)
  - different icons depending on a triger status for sysmaps
  - optionally support map generation in JPEG. PNG images are huge!
  - make w32 agent not to write warnings in case of timeout (HB)
