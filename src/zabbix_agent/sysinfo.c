@@ -1883,7 +1883,7 @@ int	FREEMEM(const char *cmd, const char *parameter,double  *value)
 */
 		/* Free memory in bytes */
 
-			*value=dyn.psd_free * page;
+			*value=(double)dyn.psd_free * page;
 			return SYSINFO_RET_OK;
 		}
 	}
