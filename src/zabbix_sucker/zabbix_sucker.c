@@ -816,30 +816,19 @@ void update_key_status(int hostid,int host_status)
 	DBfree_result(result);
 }
 
-int trend(void)
+void	trend(void)
 {
-	double		value;
-	char		value_str[MAX_STRING_LEN+1];
 	char		sql[MAX_STRING_LEN+1];
  
 	DB_RESULT	*result,*result2;
 
 	int		i,j;
-	int		now;
-	int		res;
-	DB_ITEM		item;
-	char		*s;
-
-	int	host_status;
-	int	network_errors;
-
-	now = time(NULL);
 
 	sprintf(sql,"select itemid from items");
 	result2 = DBselect(sql);
 	for(i=0;i<DBnum_rows(result2);i++)
 	{
-		sprintf(sql,"select clock-clock%3600, count(*),min(value),avg(value),max(value) from history where itemid=%d group by 1",atoi(DBget_field(result2,i,0)));
+		sprintf(sql,"select clock-clock%%3600, count(*),min(value),avg(value),max(value) from history where itemid=%d group by 1",atoi(DBget_field(result2,i,0)));
 		result = DBselect(sql);
 	
 		for(j=0;j<DBnum_rows(result);j++)
