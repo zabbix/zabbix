@@ -350,11 +350,15 @@ void	child_main(int i,int listenfd, int addrlen)
 	socklen_t	clilen;
 	struct sockaddr cliaddr;
 
+	zabbix_log( LOG_LEVEL_DEBUG, "In child_main()");
+
 	zabbix_log( LOG_LEVEL_WARNING, "zabbix_trapperd %ld started",(long)getpid());
 
 	if(0 == CONFIG_CONNECTONEACH)
 	{
+		zabbix_log( LOG_LEVEL_DEBUG, "Before DBconnect()");
 		DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+		zabbix_log( LOG_LEVEL_DEBUG, "After DBconnect()");
 	}
 
 	for(;;)
@@ -363,7 +367,9 @@ void	child_main(int i,int listenfd, int addrlen)
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("waiting for connection");
 #endif
+		zabbix_log( LOG_LEVEL_DEBUG, "Before accept()");
 		connfd=accept(listenfd,&cliaddr, &clilen);
+		zabbix_log( LOG_LEVEL_DEBUG, "After accept()");
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("processing data");
 #endif
