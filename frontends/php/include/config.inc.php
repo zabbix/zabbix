@@ -2152,25 +2152,40 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	delete_trigger_dependency($triggerid_down,$triggerid_up)
 	{
+// Why this was here?
+//		$sql="select count(*) from trigger_depends where triggerid_down=$triggerid_up and triggerid_up=$triggerid_down";
+//		$result=DBexecute($sql);
+//		if(DBget_field($result,0,0)>0)
+//		{
+//			return	FALSE;
+//		}
 
-		$sql="select count(*) from trigger_depends where triggerid_down=$triggerid_up and triggerid_up=$triggerid_down";
-		$result=DBexecute($sql);
-		if(DBget_field($result,0,0)>0)
-		{
-			return	FALSE;
-		}
+// It was wrong - was deleting all dependencies
+//		$sql="select triggerid_down,triggerid_up from trigger_depends where triggerid_up=$triggerid_up or triggerid_down=$triggerid_down";
+//		$result=DBexecute($sql);
+//		for($i=0;$i<DBnum_rows($result);$i++)
+//		{
+//			$down=DBget_field($result,$i,0);
+//			$up=DBget_field($result,$i,1);
+//			$sql="delete from trigger_depends where triggerid_up=$up and triggerid_down=$down";
+//			DBexecute($sql);
+//			$sql="update triggers set dep_level=dep_level-1 where triggerid=$up";
+//			DBexecute($sql);
+//		}
 
-		$sql="select triggerid_down,triggerid_up from trigger_depends where triggerid_up=$triggerid_up or triggerid_down=$triggerid_down";
+		$sql="select triggerid_down,triggerid_up from trigger_depends where triggerid_up=$triggerid_up and triggerid_down=$triggerid_down";
 		$result=DBexecute($sql);
 		for($i=0;$i<DBnum_rows($result);$i++)
 		{
 			$down=DBget_field($result,$i,0);
 			$up=DBget_field($result,$i,1);
-			$sql="delete from trigger_depends where triggerid_up=$up and triggerid_down=$down";
-			DBexecute($sql);
 			$sql="update triggers set dep_level=dep_level-1 where triggerid=$up";
 			DBexecute($sql);
 		}
+
+		$sql="delete from trigger_depends where triggerid_up=$triggerid_up and triggerid_down=$triggerid_down";
+		DBexecute($sql);
+
 		return	TRUE;
 	}
 
