@@ -1,5 +1,6 @@
 Changes for 1.0alpha11:
 
+ - fixed nasty bug with situations when trigger looses its status
  - global variable $ERROR_MSG will show details of operation failure
  - fixed both zabbix_trapper and zabbix_trapper to correctly change status of triggers
 
