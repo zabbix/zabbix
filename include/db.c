@@ -1405,18 +1405,18 @@ void DBupdate_triggers_status_after_restart(void)
 }
 
 #ifdef ZABBIX_THREADS
-void DBupdate_host_status_thread(MYSQL *database, int hostid,int status,int clock,char *error)
+void DBupdate_host_availability_thread(MYSQL *database, int hostid,int available,int clock,char *error)
 {
 	DB_RESULT	*result;
 	char	sql[MAX_STRING_LEN];
 	char	error_esc[MAX_STRING_LEN];
 	int	disable_until;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In update_host_status()");
+	zabbix_log(LOG_LEVEL_DEBUG,"In update_host_availability()");
 
 	DBescape_string(error,error_esc,MAX_STRING_LEN);
 
-	snprintf(sql,sizeof(sql)-1,"select status,disable_until from hosts where hostid=%d",hostid);
+	snprintf(sql,sizeof(sql)-1,"select available,disable_until from hosts where hostid=%d",hostid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect_thread(database, sql);
 
@@ -1430,15 +1430,15 @@ void DBupdate_host_status_thread(MYSQL *database, int hostid,int status,int cloc
 
 	disable_until = atoi(DBget_field(result,0,1));
 
-	if(status == atoi(DBget_field(result,0,0)))
+	if(available == atoi(DBget_field(result,0,0)))
 	{
-		if((status==HOST_STATUS_UNREACHABLE) 
+		if((availability==HOST_AVAILABLE_FALSE) 
 		&&(clock+DELAY_ON_NETWORK_FAILURE>disable_until) )
 		{
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Host already has status [%d]",status);
+			zabbix_log(LOG_LEVEL_DEBUG, "Host already has availability [%d]", available);
 			DBfree_result(result);
 			return;
 		}
@@ -1446,57 +1446,51 @@ void DBupdate_host_status_thread(MYSQL *database, int hostid,int status,int cloc
 
 	DBfree_result(result);
 
-	if(status==HOST_STATUS_MONITORED)
+	if(available==HOST_AVAILABLE_TRUE)
 	{
-		snprintf(sql,sizeof(sql)-1,"update hosts set status=%d,error='' where hostid=%d",HOST_STATUS_MONITORED,hostid);
+		snprintf(sql,sizeof(sql)-1,"update hosts set available=%d,error='' where hostid=%d",HOST_AVAILABLE_TRUE,hostid);
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		DBexecute_thread(database,sql);
 	}
-	else if(status==HOST_STATUS_NOT_MONITORED)
-	{
-		snprintf(sql,sizeof(sql)-1,"update hosts set status=%d,error='' where hostid=%d",HOST_STATUS_NOT_MONITORED,hostid);
-		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
-		DBexecute_thread(database,sql);
-	}
-	else if(status==HOST_STATUS_UNREACHABLE)
+	else if(available==HOST_AVAILABLE_FALSE)
 	{
 		if(disable_until+DELAY_ON_NETWORK_FAILURE>clock)
 		{
-			snprintf(sql,sizeof(sql)-1,"update hosts set status=%d,disable_until=disable_until+%d,error='%s' where hostid=%d",HOST_STATUS_UNREACHABLE,DELAY_ON_NETWORK_FAILURE,error_esc,hostid);
+			snprintf(sql,sizeof(sql)-1,"update hosts set available=%d,disable_until=disable_until+%d,error='%s' where hostid=%d",HOST_AVAILABLE_FALSE,DELAY_ON_NETWORK_FAILURE,error_esc,hostid);
 		}
 		else
 		{
-			snprintf(sql,sizeof(sql)-1,"update hosts set status=%d,disable_until=%d,error='%s' where hostid=%d",HOST_STATUS_UNREACHABLE,clock+DELAY_ON_NETWORK_FAILURE,error_esc,hostid);
+			snprintf(sql,sizeof(sql)-1,"update hosts set available=%d,disable_until=%d,error='%s' where hostid=%d",HOST_AVAILABLE_FALSE,clock+DELAY_ON_NETWORK_FAILURE,error_esc,hostid);
 		}
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		DBexecute_thread(database,sql);
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Unknown host status [%d] for hostid [%d]", status, hostid);
-		zabbix_syslog("Unknown host status [%d] for hostid [%d]", status, hostid);
+		zabbix_log( LOG_LEVEL_ERR, "Unknown host availability [%d] for hostid [%d]", availability, hostid);
+		zabbix_syslog("Unknown host availability [%d] for hostid [%d]", availability, hostid);
 		return;
 	}
 
 	update_triggers_status_to_unknown_thread(database,hostid,clock);
-	zabbix_log(LOG_LEVEL_DEBUG,"End of update_host_status()");
+	zabbix_log(LOG_LEVEL_DEBUG,"End of update_host_availability()");
 
 	return;
 }
 #endif
 
-void DBupdate_host_status(int hostid,int status,int clock, char *error)
+void DBupdate_host_availability(int hostid,int available,int clock, char *error)
 {
 	DB_RESULT	*result;
 	char	sql[MAX_STRING_LEN];
 	char	error_esc[MAX_STRING_LEN];
 	int	disable_until;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In update_host_status()");
+	zabbix_log(LOG_LEVEL_DEBUG,"In update_host_availability()");
 
 	DBescape_string(error,error_esc,MAX_STRING_LEN);
 
-	snprintf(sql,sizeof(sql)-1,"select status,disable_until from hosts where hostid=%d",hostid);
+	snprintf(sql,sizeof(sql)-1,"select available,disable_until from hosts where hostid=%d",hostid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
@@ -1510,15 +1504,15 @@ void DBupdate_host_status(int hostid,int status,int clock, char *error)
 
 	disable_until = atoi(DBget_field(result,0,1));
 
-	if(status == atoi(DBget_field(result,0,0)))
+	if(available == atoi(DBget_field(result,0,0)))
 	{
-		if((status==HOST_STATUS_UNREACHABLE) 
+		if((available==HOST_AVAILABLE_FALSE) 
 		&&(clock+DELAY_ON_NETWORK_FAILURE>disable_until) )
 		{
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Host already has status [%d]",status);
+			zabbix_log(LOG_LEVEL_DEBUG, "Host already has availability [%d]",available);
 			DBfree_result(result);
 			return;
 		}
@@ -1526,40 +1520,34 @@ void DBupdate_host_status(int hostid,int status,int clock, char *error)
 
 	DBfree_result(result);
 
-	if(status==HOST_STATUS_MONITORED)
+	if(available==HOST_AVAILABLE_TRUE)
 	{
-		snprintf(sql,sizeof(sql)-1,"update hosts set status=%d where hostid=%d",HOST_STATUS_MONITORED,hostid);
+		snprintf(sql,sizeof(sql)-1,"update hosts set available=%d where hostid=%d",HOST_AVAILABLE_TRUE,hostid);
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		DBexecute(sql);
 	}
-	else if(status==HOST_STATUS_NOT_MONITORED)
-	{
-		snprintf(sql,sizeof(sql)-1,"update hosts set status=%d where hostid=%d",HOST_STATUS_NOT_MONITORED,hostid);
-		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
-		DBexecute(sql);
-	}
-	else if(status==HOST_STATUS_UNREACHABLE)
+	else if(available==HOST_AVAILABLE_FALSE)
 	{
 		if(disable_until+DELAY_ON_NETWORK_FAILURE>clock)
 		{
-			snprintf(sql,sizeof(sql)-1,"update hosts set status=%d,disable_until=disable_until+%d,error='%s' where hostid=%d",HOST_STATUS_UNREACHABLE,DELAY_ON_NETWORK_FAILURE,error_esc,hostid);
+			snprintf(sql,sizeof(sql)-1,"update hosts set available=%d,disable_until=disable_until+%d,error='%s' where hostid=%d",HOST_AVAILABLE_FALSE,DELAY_ON_NETWORK_FAILURE,error_esc,hostid);
 		}
 		else
 		{
-			snprintf(sql,sizeof(sql)-1,"update hosts set status=%d,disable_until=%d,error='%s' where hostid=%d",HOST_STATUS_UNREACHABLE,clock+DELAY_ON_NETWORK_FAILURE,error_esc,hostid);
+			snprintf(sql,sizeof(sql)-1,"update hosts set available=%d,disable_until=%d,error='%s' where hostid=%d",HOST_AVAILABLE_FALSE,clock+DELAY_ON_NETWORK_FAILURE,error_esc,hostid);
 		}
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		DBexecute(sql);
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Unknown host status [%d] for hostid [%d]", status, hostid);
-		zabbix_syslog("Unknown host status [%d] for hostid [%d]", status, hostid);
+		zabbix_log( LOG_LEVEL_ERR, "Unknown host availability [%d] for hostid [%d]", available, hostid);
+		zabbix_syslog("Unknown host availability [%d] for hostid [%d]", available, hostid);
 		return;
 	}
 
 	update_triggers_status_to_unknown(hostid,clock);
-	zabbix_log(LOG_LEVEL_DEBUG,"End of update_host_status()");
+	zabbix_log(LOG_LEVEL_DEBUG,"End of update_host_availability()");
 
 	return;
 }
@@ -2354,5 +2342,6 @@ void	DBget_item_from_db(DB_ITEM *item,DB_RESULT *result, int row)
 	item->snmpv3_authpassphrase = DBget_field(result,i,27);
 	item->snmpv3_privpassphrase = DBget_field(result,i,28);
 	item->formula = DBget_field(result,i,29);
+	item->host_status=atoi(DBget_field(result,i,30));
 }
 
