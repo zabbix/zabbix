@@ -48,6 +48,12 @@
 #ifdef HAVE_SYS_STATVFS_H
 	#include <sys/statvfs.h>
 #endif
+/* Solaris */
+#ifdef HAVE_SYS_PROCFS_H
+/* This is needed to access the correct procfs.h definitions */
+	#define _STRUCTURED_PROC 1
+	#include <sys/procfs.h>
+#endif
 #ifdef HAVE_SYS_LOADAVG_H
 	#include <sys/loadavg.h>
 #endif
@@ -710,7 +716,55 @@ double	PROCCNT(const char * procname)
 	closedir(dir);
 	return	(double)proccount;
 #else
+#ifdef	HAVE_PROC_0_PSINFO
+	DIR	*dir;
+	struct	dirent *entries;
+	struct	stat buf;
+	char	filename[MAX_STRING_LEN+1];
+
+	int	fd;
+/* In the correct procfs.h, the structure name is psinfo_t */
+	psinfo_t psinfo;
+
+	int	proccount=0;
+
+	dir=opendir("/proc");
+	while((entries=readdir(dir))!=NULL)
+	{
+		strncpy(filename,"/proc/",MAX_STRING_LEN);	
+		strncat(filename,entries->d_name,MAX_STRING_LEN);
+		strncat(filename,"/psinfo",MAX_STRING_LEN);
+
+		if(stat(filename,&buf)==0)
+		{
+			fd = open (filename, O_RDONLY);
+			if (fd != -1)
+			{
+				if (read (fd, &psinfo, sizeof(psinfo)) == -1)
+				{
+					closedir(dir);
+					return FAIL;
+				}
+				else
+				{
+					if(strcmp(procname,psinfo.pr_fname)==0)
+					{
+						proccount++;
+					}
+				}
+				close (fd);
+			}
+			else
+			{
+				continue;
+			}
+		}
+	}
+	closedir(dir);
+	return	(double)proccount;
+#else
 	return	FAIL;
+#endif
 #endif
 }
 
