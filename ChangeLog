@@ -13,6 +13,9 @@ Hope this helps.
 
 Changes for 1.0beta5:
 
+ - fixed missing close of socket in case if connection to SMTP server
+ is rejected (Alexei)
+
 Changes for 1.0beta4:
 
  - ./configure will find libz  to solve problem with MySQL (Alexei)
