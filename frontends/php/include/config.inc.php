@@ -514,7 +514,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		if(DBnum_rows($result)==1)
 		{
 			setcookie("sessionid",$sessionid,time()+3600);
-			$sql="update sessions set lastaccess=".time()." where sessionid=$sessionid";
+			$sql="update sessions set lastaccess=".time()." where sessionid='$sessionid'";
 			DBexecute($sql);
 			$USER_DETAILS["userid"]=DBget_field($result,0,0);
 			$USER_DETAILS["alias"]=DBget_field($result,0,1);
@@ -1466,7 +1466,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	delete_history_by_itemid( $itemid )
 	{
-
+		$sql="delete from history_str where itemid=$itemid";
+		DBexecute($sql);
 		$sql="delete from history where itemid=$itemid";
 		return	DBexecute($sql);
 	}

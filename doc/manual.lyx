@@ -837,6 +837,14 @@ Apache
 MySQL 3.22 or later or - PostgreSQL 7.0.2 or later
 \layout Itemize
 
+MySQL or PostgreSQL development files (headers and libraries)
+\begin_float footnote 
+\layout Standard
+
+Usually provided in mysql-dev or postgresql-dev packages.
+\end_float 
+\layout Itemize
+
 PHP
 \begin_float footnote 
 \layout Standard

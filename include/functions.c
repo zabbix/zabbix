@@ -615,7 +615,10 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 	}
 	else
 	{
-		sprintf(sql,"select t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.dep_level",TRIGGER_STATUS_ENABLED,sucker_num);
+/* Does not work for PostgreSQL */
+/*		sprintf(sql,"select t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.dep_level",TRIGGER_STATUS_ENABLED,sucker_num);*/
+/* Is it correct SQL? */
+		sprintf(sql,"select distinct t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d",TRIGGER_STATUS_ENABLED,sucker_num);
 	}
 
 	result = DBselect(sql);
@@ -637,7 +640,7 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 		strncpy(exp, trigger.expression, MAX_STRING_LEN);
 		if( evaluate_expression(&b, exp) != 0 )
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Expression [%s] - SUX.",trigger.expression);
+			zabbix_log( LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated.",trigger.expression);
 			continue;
 		}
 
