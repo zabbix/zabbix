@@ -1,5 +1,6 @@
 Changes for 1.0beta10:
 
+ - check if there is problem with script execution
  - fix to enable use of abschange() (Alexei)
  - cosmetic change of "LATEST VALUES" screen (Alexei)
  - support for simple checks :smtp_perf, ftp_perf, ssh_perf, etc. (Alexei)
