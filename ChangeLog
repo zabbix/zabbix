@@ -1,7 +1,11 @@
 Changes for 1.0alpha8:
 
- - added src/zabbix_sucker/acconfig.h and src/zabbix_trapper/acconfig.h
+ - added bin/
+ - removed src/.../acconfig.h
+ - removed src/.../configure.in
+ - added Makefile.in,acconfig.h,configure.in
 
+ - added src/zabbix_sucker/acconfig.h and src/zabbix_trapper/acconfig.h
  - parameters net[listen_??] will use /proc filesystem
  - parameter system[proccount] uses call to sysinfo() function
  - removed calls to command strip from all Makefile.in
@@ -16,7 +20,6 @@ Changes for 1.0alpha8:
  - improved performance of network map
  - added column icon to table sysmaps_hosts
  - added images Hub.png, Notebook.png, Printer.png, Router.png, Server.png, host.png
- - created table help
  - new monitored parameters: cksum[/usr/sbin/sshd], cksum[/usr/bin/ssh]
  - a color for each parameter of graph can be defined
  - warning in functions evaluate_DIFF has been eliminated

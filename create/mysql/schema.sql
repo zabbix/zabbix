@@ -1,15 +1,4 @@
 #
-# Table structure for table 'help'
-#
-
-CREATE TABLE help (
-  helpid		int(4)		NOT NULL auto_increment,
-  topic			varchar(128)	DEFAULT '' NOT NULL,
-  description		text		DEFAULT '' NOT NULL,
-  PRIMARY KEY (helpid)
-);
-
-#
 # Table structure for table 'graphs_items'
 #
 
