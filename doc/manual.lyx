@@ -24,7 +24,7 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.01)
+Zabbix Reference Manual for version 1.0 (draft v1.02)
 \layout Author
 
 ALEXEI VLADISHEV
@@ -2269,7 +2269,7 @@ The following operators are supported for triggers:
 \layout Description
 
 = is equal.
- The operator is defined as A=B <=> (A>B-0.000001)&(A<B+0.00001)
+ The operator is defined as A=B <=> (A>B-0.000001)&(A<B+0.000001)
 \layout Description
 
 
