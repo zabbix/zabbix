@@ -35,6 +35,9 @@
 #include <sys/socket.h>
 #include <errno.h>
 
+/* Functions: pow() */
+#include <math.h>
+
 #include "common.h"
 #include "db.h"
 #include "log.h"
@@ -289,11 +292,15 @@ int	evaluate_DELTA(char *value,DB_ITEM *item,int parameter)
 /*
  * Evaluate function (avg,min,max,prev,last,diff,str,change,abschange,delta,time,date)
  */ 
-int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
+int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, int flag)
 {
 	int	ret  = SUCCEED;
 	time_t  now;
 	struct  tm      *tm;
+	
+	float	value_float;
+	float	value_float_abs;
+	char	suffix[MAX_STRING_LEN];
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Function [%s]",function);
 
@@ -494,6 +501,48 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 		ret = FAIL;
 	}
 
+	/* Add suffix: 1000000 -> 1 MB */
+	if( (EVALUATE_FUNCTION_SUFFIX == flag) && (ITEM_VALUE_TYPE_FLOAT == item->value_type) &&
+		(SUCCEED == ret) && strlen(item->units)>0)
+	{
+		value_float=atof(value);
+		value_float=value_float*pow(1024,item->multiplier);
+		value_float_abs=abs(value_float);
+		if(value_float_abs<1024)
+		{
+			strscpy(suffix,"");
+		}
+		else if(value_float_abs<1024*1024)
+		{
+			strscpy(suffix,"K");
+			value_float=value_float/1024;
+		}
+		else if(value_float_abs<1024*1024*1024)
+		{
+			strscpy(suffix,"M");
+			value_float=value_float/(1024*1024);
+		}
+		else
+		{
+			strscpy(suffix,"G");
+			value_float=value_float/(1024*1024*1024);
+		}
+		zabbix_log( LOG_LEVEL_WARNING, "Value [%s] [%f] Suffix [%s] Units [%s]",value,value_float,suffix,item->units);
+		if(cmp_double(round(value_float), value_float) == 0)
+		{
+                	snprintf(value, MAX_STRING_LEN-1, "%.0f %s%s", value_float, suffix, item->units);
+		}
+		else
+		{
+                	snprintf(value, MAX_STRING_LEN-1, "%.2f %s%s", value_float, suffix, item->units);
+		}
+	}
+	else
+	{
+		if( (EVALUATE_FUNCTION_SUFFIX == flag))
+			zabbix_log( LOG_LEVEL_WARNING, "Hmm [%d] [%d] [%d] [%s]", flag, item->value_type, ret, item->units);
+	}
+
 	zabbix_log( LOG_LEVEL_DEBUG, "End of evaluate_FUNCTION. Result [%s]",value);
 	return ret;
 }
@@ -526,7 +575,7 @@ void	update_functions(DB_ITEM *item)
 		zabbix_log( LOG_LEVEL_DEBUG, "ZZZ (%l)\n",value);
 
 
-		ret = evaluate_FUNCTION(value,item,function.function,function.parameter);
+		ret = evaluate_FUNCTION(value,item,function.function,function.parameter, EVALUATE_FUNCTION_NORMAL);
 		if( FAIL == ret)	
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "Evaluation failed for function:%s\n",function.function);
@@ -995,7 +1044,7 @@ int	get_lastvalue(char *value,char *host,char *key,char *function,char *paramete
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In get_lastvalue()" );
 
-	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.prevvalue,i.lastvalue,i.value_type from items i,hosts h where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", host, key );
+	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.prevvalue,i.lastvalue,i.value_type,i.multiplier,i.units from items i,hosts h where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", host, key );
 	result = DBselect(sql);
 
 	if(DBnum_rows(result) == 0)
@@ -1030,11 +1079,14 @@ int	get_lastvalue(char *value,char *host,char *key,char *function,char *paramete
 	}
         item.value_type=atoi(DBget_field(result,0,3));
 
+        item.multiplier=atoi(DBget_field(result,0,4));
+        item.units=DBget_field(result,0,5);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "Itemid:%d", item.itemid );
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Before evaluate_FUNCTION()" );
 
-	res = evaluate_FUNCTION(value,&item,function,parameter);
+	res = evaluate_FUNCTION(value,&item,function,parameter, EVALUATE_FUNCTION_SUFFIX);
 
 /* Cannot call DBfree_result until evaluate_FUNC */
 	DBfree_result(result);
@@ -1053,7 +1105,7 @@ int	process_data(int sockfd,char *server,char *key,char *value)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_data()");
 
-	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta from items i,hosts h where h.status in (0,2) and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type=%d", server, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
+	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta,i.units,i.multiplier from items i,hosts h where h.status in (0,2) and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type=%d", server, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
 	result = DBselect(sql);
 
 	if(DBnum_rows(result) == 0)
@@ -1106,6 +1158,8 @@ int	process_data(int sockfd,char *server,char *key,char *value)
 	}
 	item.value_type=atoi(DBget_field(result,0,15));
 	item.delta=atoi(DBget_field(result,0,17));
+	item.units=DBget_field(result,0,18);
+	item.multiplier=atoi(DBget_field(result,0,19));
 
 	process_new_value(&item,value);
 

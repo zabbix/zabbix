@@ -1,5 +1,6 @@
 Changes for 1.1alpha1:
 
+ - show metrics (3.01 Gb) in alert messages (Alexei)
  - added support for configurable after-login screen (Alexei)
  - added column users.url (Alexei)
  - email routines moved to email.c (Alexei)

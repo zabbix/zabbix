@@ -99,8 +99,10 @@ DB_ITEM
 	time_t  lastdelete;
 	time_t  lastcheck;
 	time_t	nextcheck;
-	int     value_type;
-	int     delta;
+	int	value_type;
+	int	delta;
+	int	multiplier;
+	char	*units;
 };
  
 DB_FUNCTION
