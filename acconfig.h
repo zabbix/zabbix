@@ -10,6 +10,9 @@
 /* Define if file /proc/loadavg exists */
 #undef HAVE_PROC_LOADAVG
 
+/* Define if function sysconf is in unistd.h */
+#undef HAVE_UNISTD_SYSCONF
+
 /* Define if function sysctl accepts KERN_BOOTTIME */
 #undef HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME
 

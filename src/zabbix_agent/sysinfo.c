@@ -1196,6 +1196,10 @@ double	SHAREDMEM(void)
 
 double	TOTALMEM(void)
 {
+/* Solaris */
+#ifdef HAVE_UNISTD_SYSCONF
+	return (double)sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGESIZE);
+#else
 #ifdef HAVE_SYS_PSTAT_H
 	struct	pst_static pst;
 	long	page;
@@ -1240,10 +1244,15 @@ double	TOTALMEM(void)
 #endif
 #endif
 #endif
+#endif
 }
 
 double	FREEMEM(void)
 {
+/* Solaris */
+#ifdef HAVE_UNISTD_SYSCONF
+	return (double)sysconf(_SC_AVPHYS_PAGES)*sysconf(_SC_PAGESIZE);
+#else
 #ifdef HAVE_SYS_PSTAT_H
 	struct	pst_static pst;
 	struct	pst_dynamic dyn;
@@ -1306,6 +1315,7 @@ double	FREEMEM(void)
 	return (double)(v.t_free<<2);
 #else
 	return	FAIL;
+#endif
 #endif
 #endif
 #endif
