@@ -344,13 +344,15 @@ int	check_security(int sockfd)
 	struct	sockaddr_in name;
 	int	i;
 
+	i=sizeof(name);
+
 	if(getpeername(sockfd,  (struct sockaddr *)&name, (size_t *)&i) == 0)
 	{
 		i=sizeof(struct sockaddr_in);
 
 		sname=inet_ntoa(name.sin_addr);
 
-		syslog( LOG_WARNING, "Connection from [%s]. Allowed server is [%s] ",sname, CONFIG_HOST_ALLOWED);
+		syslog( LOG_DEBUG, "Connection from [%s]. Allowed server is [%s] ",sname, CONFIG_HOST_ALLOWED);
 		if(strcmp(sname, CONFIG_HOST_ALLOWED)!=0)
 		{
 			syslog( LOG_WARNING, "Connection from [%s] rejected. Allowed server is [%s] ",sname, CONFIG_HOST_ALLOWED);
@@ -359,9 +361,9 @@ int	check_security(int sockfd)
 	}
 	else
 	{
-/*		syslog( LOG_WARNING, "Error getpeername [%m]");
+		syslog( LOG_WARNING, "Error getpeername [%m]");
 		syslog( LOG_WARNING, "Connection rejected");
-		return FAIL;*/
+		return FAIL;
 	}
 	return	SUCCEED;
 }
