@@ -220,6 +220,9 @@ cpu_util15[<instance>]
 Average specific CPU utilization (in percents) for last 15 minutes, where
 <instance> is zero-based CPU number
 
+diskused[<instance>]
+Number of used bytes on specific drive.
+
 md5_hash[<file name>]
 MD5 hash of specified file (returned as string). Agent will return UNSUPPORTED
 if file is larger than 64MB.
