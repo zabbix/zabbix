@@ -25,7 +25,7 @@
 		}
 		if($HTTP_GET_VARS["register"]=="update")
 		{
-			$result=update_host($HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["host"],$HTTP_GET_VARS["port"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["useip"],$HTTP_GET_VARS["ip"],$HTTP_GET_VARS["newgroup"],$HTTP_GET_VARS["groups"]);
+			$result=@update_host($HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["host"],$HTTP_GET_VARS["port"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["useip"],$HTTP_GET_VARS["ip"],$HTTP_GET_VARS["newgroup"],$HTTP_GET_VARS["groups"]);
 			show_messages($result,"Host details updated","Cannot update host details");
 			unset($HTTP_GET_VARS["hostid"]);
 		}
@@ -45,7 +45,42 @@
 ?>
 
 <?php
-	show_table_header("CONFIGURATION OF HOSTS");
+	show_table_header_begin();
+	echo "CONFIGURATION OF HOSTS";
+	show_table_v_delimiter();
+
+	if(isset($HTTP_GET_VARS["groupid"]))
+	{
+//		echo "all ";
+		echo "<a href='hosts.php'>all</a> ";
+	}
+	else
+	{
+		echo "<b>[<a href='hosts.php'>all</a>]</b> ";
+	}
+
+	$result=DBselect("select groupid,name from groups order by name");
+
+	while($row=DBfetch($result))
+	{
+//		if(!check_right("Host","R",$row["hostid"]))
+//		{
+//			continue;
+//		}
+		if( isset($HTTP_GET_VARS["groupid"]) && ($HTTP_GET_VARS["groupid"] == $row["groupid"]) )
+		{
+			echo "<b>[";
+		}
+		echo "<a href='hosts.php?groupid=".$row["groupid"]."'>".$row["name"]."</a>";
+		if(isset($HTTP_GET_VARS["groupid"]) && ($HTTP_GET_VARS["groupid"] == $row["groupid"]) )
+		{
+			echo "]</b>";
+		}
+		echo " ";
+	}
+
+	show_table_header_end();
+	echo "<br>";
 ?>
 
 <?php
@@ -60,7 +95,17 @@
 	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
-	$result=DBselect("select h.hostid,h.host,h.port,h.status from hosts h order by h.host");
+
+	if(isset($HTTP_GET_VARS["groupid"]))
+	{
+		$sql="select h.hostid,h.host,h.port,h.status from hosts h,hosts_groups hg where hg.groupid=".$HTTP_GET_VARS["groupid"]." and hg.hostid=h.hostid order by h.host";
+	}
+	else
+	{
+		$sql="select h.hostid,h.host,h.port,h.status from hosts h order by h.host";
+	}
+	$result=DBselect($sql);
+
 	$col=0;
 	while($row=DBfetch($result))
 	{
@@ -104,7 +149,14 @@
 		echo "</TD>";
         	if(check_right("Host","U",$row["hostid"]))
 		{
-			echo "<TD><A HREF=\"hosts.php?register=change&hostid=".$row["hostid"]."#form\">Change</A></TD>";
+			if(isset($HTTP_GET_VARS["groupid"]))
+			{
+				echo "<TD><A HREF=\"hosts.php?register=change&hostid=".$row["hostid"]."&groupid=".$HTTP_GET_VARS["groupid"]."#form\">Change</A></TD>";
+			}
+			else
+			{
+				echo "<TD><A HREF=\"hosts.php?register=change&hostid=".$row["hostid"]."#form\">Change</A></TD>";
+			}
 		}
 		else
 		{
@@ -154,6 +206,10 @@
 	if(isset($HTTP_GET_VARS["hostid"]))
 	{
 		echo "<input class=\"biginput\" name=\"hostid\" type=\"hidden\" value=\"".$HTTP_GET_VARS["hostid"]."\">";
+	}
+	if(isset($HTTP_GET_VARS["groupid"]))
+	{
+		echo "<input class=\"biginput\" name=\"groupid\" type=\"hidden\" value=\"".$HTTP_GET_VARS["groupid"]."\">";
 	}
 	echo "Host";
 	show_table2_h_delimiter();

@@ -1,5 +1,6 @@
 Changes for 1.0beta8:
 
+ - group selection for Item configuration form (Alexei)
  - added support for SLA level in IT Services (Alexei)
  - added fields services.showsla and services.goodsla (Alexei)
  - added field items.snmp_port (Alexei)
