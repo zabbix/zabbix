@@ -24,6 +24,7 @@
 $ZABBIX_SERVER="zabbix";
 $ZABBIX_PORT="10001";
 $HOST_FILE="hosts";
+$KEY="alive";
 $TMP_FILE="/tmp/zabbix.pinger.tmp";
 
 $ZABBIX_SENDER="zabbix_sender";
@@ -40,12 +41,12 @@ foreach $host (split(/\n/,$hosts))
 {
 	if($host=~/^((.)*) is alive$/)
 	{
-		$str="$ZABBIX_SERVER $ZABBIX_PORT $1:alive 1"; 
+		$str="$ZABBIX_SERVER $ZABBIX_PORT $1:$KEY 1"; 
 	}
 	else
 	{
 		$host=~/^((.)*) is((.)*)$/;
-		$str="$ZABBIX_SERVER $ZABBIX_PORT $1:alive 0"; 
+		$str="$ZABBIX_SERVER $ZABBIX_PORT $1:$KEY 0"; 
 	}
 	printf F "%s\n",$str;
 }
