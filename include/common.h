@@ -21,7 +21,7 @@
 #define	TRAPPERD_FORKS	5
 
 #define	SUCKER_FORKS	11
-#define	SUCKER_DELAY	0
+#define	SUCKER_DELAY	60
 
 #define	SUCKER_TIMEOUT	5
 /* Delay on network failure*/
