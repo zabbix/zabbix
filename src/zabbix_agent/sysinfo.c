@@ -133,6 +133,8 @@ COMMAND	commands[]=
 	{"net[listen_23]"		,TCP_LISTEN, "0017"},
 	{"net[listen_80]"		,TCP_LISTEN, "0050"},
 
+	{"check_port[*]"		,CHECK_PORT, "80"},
+
 	{"check_service[ssh]"		,CHECK_SERVICE_SSH, 0},
 	{"check_service[smtp]"		,CHECK_SERVICE_SMTP, 0},
 	{"check_service[ftp]"		,CHECK_SERVICE_FTP, 0},
@@ -971,9 +973,15 @@ float	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose)
 		return	0;
 	}
 
+	if( expect == NULL)
+	{
+		close(s);
+		return	1;
+	}
+
 	memset(&c, 0, 1024);
 	recv(s, c, 1024, 0);
-	if (strncmp(c, expect, strlen(expect)) == 0)
+	if ( strncmp(c, expect, strlen(expect)) == 0 )
 	{
 		send(s,sendtoclose,strlen(sendtoclose),0);
 		close(s);
@@ -1015,4 +1023,12 @@ float	CHECK_SERVICE_NNTP(void)
 float	CHECK_SERVICE_IMAP(void)
 {
 	return	tcp_expect("127.0.0.1",143,"* OK","a1 LOGOUT\n");
+}
+
+float	CHECK_PORT(char *port)
+{
+	int i;
+
+	i=atoi(port);
+	return	tcp_expect("127.0.0.1",i,NULL,"");
 }
