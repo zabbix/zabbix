@@ -581,42 +581,53 @@ int get_minnextcheck(int now)
 /* SUCCEED if latest alarm with triggerid has this status */
 int	latest_alarm(int triggerid, int status)
 {
-	int	rows;
 	char	sql[MAX_STRING_LEN+1];
 	int	clock;
-
 	DB_RESULT	*result;
+	int ret = FAIL;
 
-	sprintf(sql,"select max(clock) from alarms where triggerid=%d",triggerid);;
+
+	zabbix_log(LOG_LEVEL_WARNING,"In latest_alarm()");
+
+	sprintf(sql,"select max(clock) from alarms where triggerid=%d",triggerid);
+		zabbix_log(LOG_LEVEL_WARNING,"SQL [%s]",sql);
 	result = DBselect(sql);
 
-	rows=DBnum_rows(result);
-
-	if( (result!=NULL) && (rows==1) )
+	if((result==NULL)||(DBnum_rows(result)==0)||(DBget_field(result,0,0) == NULL))
+        {
+                zabbix_log(LOG_LEVEL_DEBUG, "Result for MIN is empty" );
+                ret = FAIL;
+        }
+	else
 	{
+	zabbix_log(LOG_LEVEL_WARNING,"In latest_alarm(0)");
 		clock=atoi(DBget_field(result,0,0));
+	zabbix_log(LOG_LEVEL_WARNING,"In latest_alarm(1)");
 		DBfree_result(result);
 
 		sprintf(sql,"select istrue from alarms where triggerid=%d and clock=%d",triggerid,clock);
+		zabbix_log(LOG_LEVEL_WARNING,"SQL [%s]",sql);
 		result = DBselect(sql);
 		if(DBnum_rows(result)==1)
 		{
 			if(atoi(DBget_field(result,0,0)) == status)
 			{
-				DBfree_result(result);
-				return SUCCEED;
+				ret = SUCCEED;
 			}
 		}
 	}
+
 	DBfree_result(result);
 
-	return FAIL;
+	return ret;
 }
 
 int	add_alarm(int triggerid, int status)
 {
 	int	now;
 	char	sql[MAX_STRING_LEN+1];
+
+	zabbix_log(LOG_LEVEL_WARNING,"In add_alarm()");
 
 	if(latest_alarm(triggerid,status) == SUCCEED)
 	{
@@ -625,7 +636,10 @@ int	add_alarm(int triggerid, int status)
 
 	now=time(NULL);
 	sprintf(sql,"insert into alarms(triggerid,clock,istrue) values(%d,%d,%d)",triggerid,now,status);
+	zabbix_log(LOG_LEVEL_WARNING,"SQL [%s]",sql);
 	DBexecute(sql);
+
+	zabbix_log(LOG_LEVEL_WARNING,"End of add_alarm()");
 	
 	return SUCCEED;
 }
@@ -634,11 +648,14 @@ int	update_trigger_status(int triggerid,int status)
 {
 	char	sql[MAX_STRING_LEN+1];
 
+	zabbix_log(LOG_LEVEL_WARNING,"In update_trigger_status()");
 	add_alarm(triggerid,status);
 
 	sprintf(sql,"update triggers set istrue=%d where triggerid=%d",status,triggerid);
+	zabbix_log(LOG_LEVEL_WARNING,"SQL [%s]",sql);
 	DBexecute(sql);
 
+	zabbix_log(LOG_LEVEL_WARNING,"End of update_trigger_status()");
 	return SUCCEED;
 }
 
@@ -650,7 +667,10 @@ int update_triggers_status_to_unknown(int hostid)
 
 	DB_RESULT	*result;
 
+	zabbix_log(LOG_LEVEL_WARNING,"In update_triggers_status_to_unknown()");
+
 	sprintf(sql,"select distinct t.triggerid from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.hostid=%d",hostid);
+	zabbix_log(LOG_LEVEL_WARNING,"SQL [%s]",sql);
 	result = DBselect(sql);
 
 	rows=DBnum_rows(result);
@@ -669,6 +689,7 @@ int update_triggers_status_to_unknown(int hostid)
 	}
 
 	DBfree_result(result);
+	zabbix_log(LOG_LEVEL_WARNING,"End of update_triggers_status_to_unknown()");
 
 	return SUCCEED; 
 }
@@ -679,7 +700,10 @@ int update_host_status(int hostid,int status)
 	char	sql[MAX_STRING_LEN+1];
 	int	now;
 
+	zabbix_log(LOG_LEVEL_WARNING,"In update_host_status()");
+
 	sprintf(sql,"select status,disable_until from hosts where hostid=%d",hostid);
+	zabbix_log(LOG_LEVEL_WARNING,"SQL [%s]",sql);
 	result = DBselect(sql);
 
 	if( (result==NULL) || (DBnum_rows(result)==0) )
@@ -699,7 +723,7 @@ int update_host_status(int hostid,int status)
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Host already has status [%d]",status);
+			zabbix_log(LOG_LEVEL_WARNING, "Host already has status [%d]",status);
 			DBfree_result(result);
 			return FAIL;
 		}
@@ -710,16 +734,19 @@ int update_host_status(int hostid,int status)
 	if(status==HOST_STATUS_MONITORED)
 	{
 		sprintf(sql,"update hosts set status=%d where hostid=%d",HOST_STATUS_MONITORED,hostid);
+		zabbix_log(LOG_LEVEL_WARNING,"SQL [%s]",sql);
 		DBexecute(sql);
 	}
 	else if(status==HOST_STATUS_NOT_MONITORED)
 	{
 		sprintf(sql,"update hosts set status=%d where hostid=%d",HOST_STATUS_NOT_MONITORED,hostid);
+		zabbix_log(LOG_LEVEL_WARNING,"SQL [%s]",sql);
 		DBexecute(sql);
 	}
 	else if(status==HOST_STATUS_UNREACHABLE)
 	{
 		sprintf(sql,"update hosts set status=%d,disable_until=%d where hostid=%d",HOST_STATUS_UNREACHABLE,now+DELAY_ON_NETWORK_FAILURE,hostid);
+		zabbix_log(LOG_LEVEL_WARNING,"SQL [%s]",sql);
 		DBexecute(sql);
 	}
 	else
@@ -729,6 +756,7 @@ int update_host_status(int hostid,int status)
 	}
 
 	update_triggers_status_to_unknown(hostid);
+	zabbix_log(LOG_LEVEL_WARNING,"End of update_host_status()");
 
 	return SUCCEED;
 }
