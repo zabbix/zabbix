@@ -282,6 +282,9 @@
 	define("S_HOST_GROUP",				"Host group");
 	define("S_HOST_GROUPS",				"Host groups");
 	define("S_UPDATE",				"Update");
+	define("S_AVAILABILITY",			"Availability");
+	define("S_AVAILABLE",				"Available");
+	define("S_NOT_AVAILABLE",			"Not available");
 
 //	items.php
 	define("S_CONFIGURATION_OF_ITEMS",		"Configuration of items");
