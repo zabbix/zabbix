@@ -40,7 +40,7 @@
 </TR>
 <TR BGCOLOR=#EEEEEE>
 <TD ALIGN=LEFT>
-	<font face="Helvetica">Forums</font><br>
+	<font face="Helvetica"><a href="http://sourceforge.net/forum/?group_id=23494">Forums</a></font><br>
 </TD>
 <TD>
 	Zabbix-related discussion.
