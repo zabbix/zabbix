@@ -189,12 +189,22 @@
 	}
 	else
 	{
-		$host="";
-		$port=get_profile("HOST_PORT",10000);
-		$status=0;
-		$useip="";
-		$ip="";
+		$host=@iif(isset($HTTP_GET_VARS["host"]),$HTTP_GET_VARS["host"],"");
+		$port=@iif(isset($HTTP_GET_VARS["port"]),$HTTP_GET_VARS["port"],get_profile("HOST_PORT",10000));
+		$status=@iif(isset($HTTP_GET_VARS["status"]),$HTTP_GET_VARS["status"],0);
+		$useip=@iif(isset($HTTP_GET_VARS["useip"]),$HTTP_GET_VARS["useip"],"off");
+		$ip=@iif(isset($HTTP_GET_VARS["ip"]),$HTTP_GET_VARS["ip"],"");
+
+		if($useip!="on")
+		{
+			$useip="";
+		}
+		else
+		{
+			$useip="checked";
+		}
 	}
+
 
 	echo "<br>";
 	echo "<a name=\"form\"></a>";
@@ -202,7 +212,7 @@
 	echo "Host details";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"get\" action=\"hosts.php\">";
+	echo "<form method=\"get\" action=\"hosts.php#form\">";
 	if(isset($HTTP_GET_VARS["hostid"]))
 	{
 		echo "<input class=\"biginput\" name=\"hostid\" type=\"hidden\" value=\"".$HTTP_GET_VARS["hostid"]."\">";
@@ -251,12 +261,19 @@
 	show_table2_v_delimiter();
 	echo "Use IP address";
 	show_table2_h_delimiter();
-	echo "<INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"useip\" $useip>";
+	echo "<INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"useip\" $useip onChange=\"submit()\">";
 
-	show_table2_v_delimiter();
-	echo "IP address";
-	show_table2_h_delimiter();
-	echo "<input class=\"biginput\" name=\"ip\" value=\"$ip\" size=15>";
+	if($useip=="checked")
+	{
+		show_table2_v_delimiter();
+		echo "IP address";
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"ip\" value=\"$ip\" size=15>";
+	}
+	else
+	{
+		echo "<input class=\"biginput\" type=\"hidden\"name=\"ip\" value=\"$ip\" size=15>";
+	}
 
 	show_table2_v_delimiter();
 	echo "Port";
