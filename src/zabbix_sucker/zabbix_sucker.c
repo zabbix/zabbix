@@ -300,6 +300,13 @@ int	get_value(double *result,DB_ITEM *item)
 {
 	int res;
 
+	struct	sigaction phan;
+
+	phan.sa_handler = &signal_handler;
+	sigemptyset(&phan.sa_mask);
+	phan.sa_flags = 0;
+	sigaction(SIGALRM, &phan, NULL);
+
 	alarm(SUCKER_TIMEOUT);
 
 	if(item->type == ITEM_TYPE_ZABBIX)
@@ -619,7 +626,6 @@ int main(int argc, char **argv)
 	phan.sa_handler = &signal_handler; /* set up sig handler using sigaction() */
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = 0;
-	sigaction(SIGALRM, &phan, NULL);
 	sigaction(SIGINT, &phan, NULL);
 	sigaction(SIGQUIT, &phan, NULL);
 	sigaction(SIGTERM, &phan, NULL);
