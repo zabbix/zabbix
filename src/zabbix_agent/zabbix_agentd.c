@@ -476,7 +476,14 @@ int	main()
 	setproctitle("main process");
 #endif
 
+#ifdef HAVE_PROC_NET_DEV
 	collect_statistics();
+#else
+	for(;;)
+	{
+		pause();
+	}
+#endif
 
 	return SUCCEED;
 }
