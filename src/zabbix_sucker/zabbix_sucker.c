@@ -692,7 +692,7 @@ int get_minnextcheck(int now)
 #ifdef TESTTEST
 	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and i.type not in (%d) and h.hostid%%%d=%d and i.key_<>'%s'", now, ITEM_TYPE_TRAPPER, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY);
 #else
-	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=%d and i.type not in (%d) and i.itemid%%%d=%d and i.key_<>'%s' and i.key_<>'%s'", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY);
+	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where (h.status=%d or (h.status=%d and h.disable_until<%d)) and h.hostid=i.hostid and i.status=%d and i.type not in (%d) and i.itemid%%%d=%d and i.key_<>'%s' and i.key_<>'%s'", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY);
 #endif
 	result = DBselect(sql);
 
@@ -805,7 +805,7 @@ int get_values(void)
 #ifdef TESTTEST
 	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,i.snmp_port from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and h.hostid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY);
 #else
-	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port from items i,hosts h where i.nextcheck<=%d and i.status=%d and i.type not in (%d) and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d and i.key_<>'%s' and i.key_<>'%s' order by i.nextcheck", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, now, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY);
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port from items i,hosts h where i.nextcheck<=%d and i.status=%d and i.type not in (%d) and (h.status=%d or (h.status=%d and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d and i.key_<>'%s' and i.key_<>'%s' order by i.nextcheck", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY);
 #endif
 	result = DBselect(sql);
 
@@ -1062,9 +1062,9 @@ int main_nodata_loop()
 
 		now=time(NULL);
 #ifdef HAVE_PGSQL
-		sprintf(sql,"select distinct f.itemid,f.functionid,f.parameter from functions f, items i,hosts h where h.hostid=i.hostid and (h.status=0 or (h.status=2 and h.disable_until<%d)) and i.itemid=f.itemid and f.function='nodata' and i.lastclock+f.parameter::text::integer<=%d and i.status=%d and i.type=%d and f.lastvalue<>1", now, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
+		sprintf(sql,"select distinct f.itemid,f.functionid,f.parameter from functions f, items i,hosts h where h.hostid=i.hostid and (h.status=%d or (h.status=%d and h.disable_until<%d)) and i.itemid=f.itemid and f.function='nodata' and i.lastclock+f.parameter::text::integer<=%d and i.status=%d and i.type=%d and f.lastvalue<>1", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
 #else
-		sprintf(sql,"select distinct f.itemid,f.functionid,f.parameter from functions f, items i,hosts h where h.hostid=i.hostid and (h.status=0 or (h.status=2 and h.disable_until<%d)) and i.itemid=f.itemid and f.function='nodata' and i.lastclock+f.parameter<=%d and i.status=%d and i.type=%d and f.lastvalue<>1", now, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
+		sprintf(sql,"select distinct f.itemid,f.functionid,f.parameter from functions f, items i,hosts h where h.hostid=i.hostid and (h.status=%d or (h.status=%d and h.disable_until<%d)) and i.itemid=f.itemid and f.function='nodata' and i.lastclock+f.parameter<=%d and i.status=%d and i.type=%d and f.lastvalue<>1", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
 #endif
 		result = DBselect(sql);
 

@@ -67,6 +67,7 @@
 #define HOST_STATUS_NOT_MONITORED	1
 #define HOST_STATUS_UNREACHABLE	2
 #define HOST_STATUS_TEMPLATE	3
+#define HOST_STATUS_DELETED	4
 
 /* Use host IP or host name */
 #define HOST_USE_HOSTNAME	0

@@ -2785,22 +2785,25 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	delete_host($hostid)
 	{
-		$sql="select itemid from items where hostid=$hostid";
-		$result=DBselect($sql);
-		if(!$result)
-		{
-			return	$result;
-		}
-		for($i=0;$i<DBnum_rows($result);$i++)
-		{
-			if(!delete_item(DBget_field($result,$i,0)))
-			{
-				return	FALSE;
-			}
-		}
-		delete_groups_by_hostid($hostid);
-		$sql="delete from hosts where hostid=$hostid";
+		$sql="update hosts set status=".HOST_STATUS_DELETED." where hostid=$hostid";
 		return	DBexecute($sql);
+
+//		$sql="select itemid from items where hostid=$hostid";
+//		$result=DBselect($sql);
+//		if(!$result)
+//		{
+//			return	$result;
+//		}
+//		for($i=0;$i<DBnum_rows($result);$i++)
+//		{
+//			if(!delete_item(DBget_field($result,$i,0)))
+//			{
+//				return	FALSE;
+//			}
+//		}
+//		delete_groups_by_hostid($hostid);
+//		$sql="delete from hosts where hostid=$hostid";
+//		return	DBexecute($sql);
 	}
 
 	# Delete User permission
