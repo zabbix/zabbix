@@ -1,5 +1,7 @@
 Changes for 1.0beta10:
 
+ - fix to show HTML characters of string items in Latest Values and
+ History  (Alexei)
  - added disk statistics to data.sql (Alexei)
  - popup confirmation screen for deletes and updates (Alexei)
  - buttons "Activate selected" and "Disable selected" in item

@@ -1232,7 +1232,6 @@ int main(int argc, char **argv)
 	sigaction(SIGINT, &phan, NULL);
 	sigaction(SIGQUIT, &phan, NULL);
 	sigaction(SIGTERM, &phan, NULL);
-	sigaction(SIGCHLD, &phan, NULL);
 
 	if(CONFIG_LOG_FILE == NULL)
 	{
@@ -1295,11 +1294,11 @@ int main(int argc, char **argv)
 	{
 /* Fourth instance of zabbix_suckerd periodically pings hosts */
 		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started. ICMP pinger.",sucker_num);
-		for(;;) sleep(3600);
-/*		main_pinger_loop();*/
+		main_pinger_loop();
 	}
 	else
 	{
+		sigaction(SIGCHLD, &phan, NULL);
 		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started. Sucker.",sucker_num);
 		main_sucker_loop();
 	}

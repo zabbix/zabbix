@@ -201,7 +201,14 @@
 			$value=DBget_field($result,$i,1);
 			$clock=date("Y.M.d H:i:s",$clock);
 			echo "<TD>$clock</TD>";
-			echo "<TD>$value</TD>";
+			if($item["value_type"]==ITEM_VALUE_TYPE_FLOAT)
+			{
+				echo "<TD>$value</TD>";
+			}
+			else
+			{
+				echo "<TD>".htmlspecialchars($value)."</TD>";
+			}
 			echo "</TR>";
 		}
 		echo "</TABLE>";        
