@@ -1,6 +1,5 @@
 HIGH PRIORITY:
 
- - fix Select in Status of Triggers
  - mass updates/inserts (add items and triggers for all hosts at once)
  - support for net-snmp
  - LDAP authorisation (should work with MSWindows LDAP)
