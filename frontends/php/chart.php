@@ -1,260 +1,597 @@
 <?php 
 	include "include/config.inc.php";
 
-#	PARAMETERS:
-	
-#	itemid
-#	period
-#	from
-
-	if(isset($HTTP_GET_VARS["period"]))
+	class	Graph
 	{
-		$period=$HTTP_GET_VARS["period"];
-	}
-	else
-	{
-		$period=3600;
-	}
+		var $period;
+		var $from;
+		var $sizeX;
+		var $sizeY;
+		var $itemid;
+		var $shiftX;
+		var $shiftY;
+		var $border;
 
-	if(isset($HTTP_GET_VARS["from"]))
-	{
-		$from=$HTTP_GET_VARS["from"];
-	}
-	else
-	{
-		$from=0;
-	}
+		var $item;
 
-	if(isset($HTTP_GET_VARS["width"])&&$HTTP_GET_VARS["width"]>0)
-	{
-		$sizeX=$HTTP_GET_VARS["width"];
-	}
-	else
-	{
-		$sizeX=900;
-	}
+		var $colors;
+		var $im;
 
-	$sizeY=200;
+		function initColors()
+		{
+			$this->colors["Red"]=ImageColorAllocate($this->im,255,0,0); 
+			$this->colors["Dark Red"]=ImageColorAllocate($this->im,150,0,0); 
+			$this->colors["Green"]=ImageColorAllocate($this->im,0,255,0); 
+			$this->colors["Dark Green"]=ImageColorAllocate($this->im,0,150,0); 
+			$this->colors["Blue"]=ImageColorAllocate($this->im,0,0,255); 
+			$this->colors["Yellow"]=ImageColorAllocate($this->im,255,255,0); 
+			$this->colors["Dark Yellow"]=ImageColorAllocate($this->im,150,150,0); 
+			$this->colors["Cyan"]=ImageColorAllocate($this->im,0,255,255); 
+			$this->colors["Black"]=ImageColorAllocate($this->im,0,0,0); 
+			$this->colors["Gray"]=ImageColorAllocate($this->im,150,150,150); 
+			$this->colors["White"]=ImageColorAllocate($this->im,255,255,255); 
+		}
 
-	$shiftX=10;
-	$shiftY=17;
+		function Graph($itemid)
+		{
+			$this->period=3600;
+			$this->from=0;
+			$this->sizeX=900;
+			$this->sizeY=200;
+			$this->shiftX=10;
+			$this->shiftY=17;
+			$this->border=1;
+			$this->itemid=$itemid;
 
-	$nodata=1;	
+			$this->item=get_item_by_itemid($this->itemid);
+			$host=get_host_by_hostid($this->item["hostid"]);
+			$this->item["host"]=$host["host"];
+		}
 
 
-//	Header( "Content-type:  text/html"); 
-	Header( "Content-type:  image/png"); 
-	Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
+		function setPeriod($period)
+		{
+			$this->period=$period;
+		}
 
-	check_authorisation();
+		function setFrom($from)
+		{
+			$this->from=$from;
+		}
 
-	$im = imagecreate($sizeX+$shiftX+61,$sizeY+2*$shiftY+40); 
-  
-	$red=ImageColorAllocate($im,255,0,0); 
-	$darkred=ImageColorAllocate($im,150,0,0); 
-	$green=ImageColorAllocate($im,0,255,0); 
-	$darkgreen=ImageColorAllocate($im,0,150,0); 
-	$blue=ImageColorAllocate($im,0,0,255); 
-	$yellow=ImageColorAllocate($im,255,255,0); 
-	$cyan=ImageColorAllocate($im,0,255,255); 
-	$black=ImageColorAllocate($im,0,0,0); 
-	$gray=ImageColorAllocate($im,150,150,150); 
-	$white=ImageColorAllocate($im,255,255,255); 
+		function setWidth($width)
+		{
+			$this->width=$width;
+		}
 
-	$x=imagesx($im); 
-	$y=imagesy($im);
-  
-	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+2*$shiftY+40,$white);
-	if(!isset($HTTP_GET_VARS["noborder"]))
-	{
-		ImageRectangle($im,0,0,$x-1,$y-1,$black);
-	}
-	if(!check_right("Item","R",$HTTP_GET_VARS["itemid"]))
-	{
-//		show_table_header("<font color=\"AA0000\">No permissions !</font>");
-//		show_footer();
-		ImagePng($im); 
-		ImageDestroy($im); 
-		exit;
-	}
+		function setBorder($border)
+		{
+			$this->border=$border;
+		}
 
-//	for($i=0;$i<=$sizeY;$i+=$sizeY/5)
-//	{
-//		ImageDashedLine($im,$shiftX,$i+$shiftY,$sizeX+$shiftX,$i+$shiftY,$gray);
-//	}
-//	for($i=0;$i<=$sizeX;$i+=$sizeX/24)
-//	{
-//		ImageDashedLine($im,$i+$shiftX,$shiftY,$i+$shiftX,$sizeY+$shiftY,$gray);
-//	}
-//	$style=array($white,$white,$white,$white,$white,$white,$black,$black,$black,$black,$black,$black,$black);
-//	ImageSetStyle($im,$style);
-	ImageDashedLine($im,$shiftX+1,$shiftY,$shiftX+1,$sizeY+$shiftY,$black);
-	ImageDashedLine($im,$shiftX+1,$shiftY,$shiftX+$sizeX,$shiftY,$black);
-	ImageDashedLine($im,$shiftX+$sizeX,$shiftY,$shiftX+$sizeX,$sizeY+$shiftY,$black);
-	ImageDashedLine($im,$shiftX+1,$shiftY+$sizeY,$shiftX+$sizeX,$sizeY+$shiftY,$black);
+		function drawRectangle()
+		{
+			ImageFilledRectangle($this->im,0,0,$this->sizeX+$this->shiftX+61,$this->sizeY+2*$this->shiftY+40,$this->colors["White"]);
+			if($this->border==1)
+			{
+				ImageRectangle($this->im,0,0,imagesx($this->im)-1,imagesy($this->im)-1,$this->colors["Black"]);
+			}
+			ImageDashedLine($this->im,$this->shiftX+1,$this->shiftY,$this->shiftX+1,$this->sizeY+$this->shiftY,$this->colors["Black"]);
+			ImageDashedLine($this->im,$this->shiftX+1,$this->shiftY,$this->shiftX+$this->sizeX,$this->shiftY,$this->colors["Black"]);
+			ImageDashedLine($this->im,$this->shiftX+$this->sizeX,$this->shiftY,$this->shiftX+$this->sizeX,$this->sizeY+$this->shiftY,$this->colors["Black"]);
+			ImageDashedLine($this->im,$this->shiftX+1,$this->shiftY+$this->sizeY,$this->shiftX+$this->sizeX,$this->sizeY+$this->shiftY,$this->colors["Black"]);
+		}
 
-	$item=get_item_by_itemid($HTTP_GET_VARS["itemid"]);
-	$host=get_host_by_hostid($item["hostid"]);
+		function drawHeader()
+		{
+			$str=$this->item["host"].":".$this->item["description"];
+			$x=imagesx($this->im)/2-ImageFontWidth(4)*strlen($str)/2;
+			ImageString($this->im, 4,$x,1, $str , $this->colors["Dark Red"]);
+		}
 
-	$str=$host["host"].":".$item["description"];
-	$x=imagesx($im)/2-ImageFontWidth(4)*strlen($str)/2;
-	ImageString($im, 4,$x,1, $str , $darkred);
-//	ImageString($im, 4,$sizeX/2-50,1, $host["host"].":".$item["description"] , $darkred);
+		function noDataFound()
+		{
+			ImageString($this->im, 2,$this->sizeX/2-50,                $this->sizeY+$this->shiftY+3, "NO DATA FOUND FOR THIS PERIOD" , $this->colors["Dark Red"]);
+			ImageStringUp($this->im,0,imagesx($this->im)-10,imagesy($this->im)-50, "http://zabbix.sourceforge.net", $this->colors["Gray"]);
+			ImagePng($this->im); 
+			ImageDestroy($this->im); 
+		}
 
-	$from_time = time(NULL)-$period-3600*$from;
-	$to_time   = time(NULL)-3600*$from;
-	$result=DBselect("select count(clock),min(clock),max(clock),min(value),max(value) from history where itemid=".$HTTP_GET_VARS["itemid"]." and clock>$from_time and clock<$to_time ");
-	$count=DBget_field($result,0,0);
-	if($count>0)
-	{
-		$nodata=0;
-		$minX=DBget_field($result,0,1);
-		$maxX=DBget_field($result,0,2);
-		$minY=DBget_field($result,0,3);
-		$maxY=DBget_field($result,0,4);
+		function drawLogo()
+		{
+			ImageStringUp($this->im,0,imagesx($this->im)-10,imagesy($this->im)-50, "http://zabbix.sourceforge.net", $this->colors["Gray"]);
+		}
+
+		function Draw()
+		{
+			$this->im = imagecreate($this->sizeX+$this->shiftX+61,$this->sizeY+2*$this->shiftY+40);
+			$nodata=1;
+
+//			Header( "Content-type:  text/html"); 
+			Header( "Content-type:  image/png"); 
+			Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
+
+			check_authorisation();
 		
-	}
-	else
-	{
-		unset($maxX);
-		unset($maxY);
-		unset($minX);
-		unset($minY);
+			$this->im = imagecreate($this->sizeX+$this->shiftX+61,$this->sizeY+2*$this->shiftY+40);
 
-		ImageString($im, 2,$sizeX/2-50,                $sizeY+$shiftY+3, "NO DATA FOUND FOR THIS PERIOD" , $darkred);
-		ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, "http://zabbix.sourceforge.net", $gray);
+			$this->initColors();
+			$this->drawRectangle();
+			$this->drawHeader();
 
-		ImagePng($im); 
-		ImageDestroy($im); 
-		exit;
-	}
+			if(!check_right("Item","R",$this->itemid))
+			{
+				ImagePng($this->im); 
+				ImageDestroy($this->im); 
+				exit;
+			}
 
-	$my_exp = floor(log10($maxY));
-	$my_mant = $maxY/pow(10,$my_exp);
+			$from_time = time(NULL)-$this->period-3600*$this->from;
+			$to_time   = time(NULL)-3600*$this->from;
+			$result=DBselect("select count(clock),min(clock),max(clock),min(value),max(value) from history where itemid=".$this->itemid." and clock>$from_time and clock<$to_time ");
+			$count=DBget_field($result,0,0);
+			if($count>0)
+			{
+				$nodata=0;
+				$minX=DBget_field($result,0,1);
+				$maxX=DBget_field($result,0,2);
+				$minY=DBget_field($result,0,3);
+				$maxY=DBget_field($result,0,4);
+		
+			}
+			else
+			{
+				$this->noDataFound();
+				exit;
+			}
 
-	if ($my_mant < 1.5 )
-	{
-		$my_mant = 1.5;
-		$my_steps = 5;
-	}
-	elseif($my_mant < 2 )
-	{
-		$my_mant = 2;
-		$my_steps = 4;
-	}
-	elseif($my_mant < 3 )
-	{
-		$my_mant = 3;
-		$my_steps = 6;
-	}
-	elseif($my_mant < 5 )
-	{
-		$my_mant = 5;
-		$my_steps = 5;
-	}
-	elseif($my_mant < 8 )
-	{
-		$my_mant = 8;
-		$my_steps = 4;
-	}
-	else
-	{
-		$my_mant = 10;
-		$my_steps = 5;
-	}
-	$maxY = $my_mant*pow(10,$my_exp);
-	$minY = 0;
+			$my_exp = floor(log10($maxY));
+			$my_mant = $maxY/pow(10,$my_exp);
+
+			if ($my_mant < 1.5 )
+			{
+				$my_mant = 1.5;
+				$my_steps = 5;
+			}
+			elseif($my_mant < 2 )
+			{
+				$my_mant = 2;
+				$my_steps = 4;
+			}
+			elseif($my_mant < 3 )
+			{
+				$my_mant = 3;
+				$my_steps = 6;
+			}
+			elseif($my_mant < 5 )
+			{
+				$my_mant = 5;
+				$my_steps = 5;
+			}
+			elseif($my_mant < 8 )
+			{
+				$my_mant = 8;
+				$my_steps = 4;
+			}
+			else
+			{
+				$my_mant = 10;
+				$my_steps = 5;
+			}
+			$maxY = $my_mant*pow(10,$my_exp);
+			$minY = 0;
 	
 //	echo "MIN/MAX:",$minX," - ",$maxX," - ",$minY," - ",$maxY,"<Br>";
 
-	if(isset($minX)&&($minX!=$maxX)&&($minY!=$maxY))
-	{
-		$result=DBselect("select clock,value from history where itemid=".$HTTP_GET_VARS["itemid"]." and clock>$from_time and clock<$to_time order by clock");
-		for($i=0;$i<DBnum_rows($result)-1;$i++)
+			if(isset($minX)&&($minX!=$maxX)&&($minY!=$maxY))
+			{
+				$result=DBselect("select clock,value from history where itemid=".$this->itemid." and clock>$from_time and clock<$to_time order by clock");
+				for($i=0;$i<DBnum_rows($result)-1;$i++)
+				{
+					$x=DBget_field($result,$i,0);
+					$x_next=DBget_field($result,$i+1,0);
+					$y=DBget_field($result,$i,1);
+					$y_next=DBget_field($result,$i+1,1);
+
+					$x1=$this->sizeX*($x-$minX)/($maxX-$minX);
+					$y1=$this->sizeY*($y-$minY)/($maxY-$minY);
+					$x2=$this->sizeX*($x_next-$minX)/($maxX-$minX);
+					$y2=$this->sizeY*($y_next-$minY)/($maxY-$minY);
+
+					$y1=$this->sizeY-$y1;
+					$y2=$this->sizeY-$y2;
+
+					ImageLine($this->im,$x1+$this->shiftX,$y1+$this->shiftY,$x2+$this->shiftX,$y2+$this->shiftY,$this->colors["Dark Green"]);
+//					ImageSetPixel($this->im,$x2+$this->shiftX,$y2+$this->shiftY-1,$this->colors["Dark Red"]);
+				}
+			}
+			else
+			{
+				if(isset($minX))
+				{
+					ImageLine($this->im,$this->shiftX,$this->shiftY+$this->sizeY/2,$this->sizeX+$this->shiftX,$this->shiftY+$this->sizeY/2,$this->colors["Dark Green"]);
+				}
+			}
+
+			$startTime=$minX;
+			if (($maxX-$minX) < 300)
+				$precTime=10;
+			elseif (($maxX-$minX) < 3600 )
+				$precTime=60;
+			else
+				$precTime=300;
+		
+			if (($maxX-$minX) < 1200 )
+				$dateForm="H:i:s";
+			else
+				$dateForm="H:i:s";
+		
+			$correctTime=$startTime % $precTime;
+			$stepTime=ceil(ceil(($maxX-$minX)/20)/$precTime)*(1.0*$precTime);
+
+			for($i=1;$i<$my_steps;$i++)
+			{
+				ImageDashedLine($this->im,$this->shiftX,$i/$my_steps*$this->sizeY+$this->shiftY,$this->sizeX+$this->shiftX,$i/$my_steps*$this->sizeY+$this->shiftY,$this->colors["Gray"]);
+			}
+			for($j=$stepTime-$correctTime;$j<=($maxX-$minX);$j+=$stepTime)
+			{
+				ImageDashedLine($this->im,$this->shiftX+($this->sizeX*$j)/($maxX-$minX),$this->shiftY,$this->shiftX+($this->sizeX*$j)/($maxX-$minX),$this->sizeY+$this->shiftY,$this->colors["Gray"]);
+			}
+
+		
+			if($nodata == 0)
+			{
+				for($i=0;$i<=$my_steps;$i++)
+				{
+					ImageString($this->im, 1, $this->sizeX+5+$this->shiftX, $i/$my_steps*$this->sizeY+$this->shiftY-4, convert_units($maxY-$i/$my_steps*($maxY-$minY),$this->item["units"],$this->item["multiplier"]) , $this->colors["Dark Red"]);
+				}
+				for($j=$stepTime-$correctTime;$j<=($maxX-$minX);$j+=$stepTime)
+				{
+					ImageStringUp($this->im,0,$this->shiftX+($this->sizeX*$j)/($maxX-$minX),$this->shiftY+$this->sizeY+53,date($dateForm,$startTime+$j),$this->colors["Black"]);
+				}
+		
+				ImageString($this->im, 1,10,                $this->sizeY+$this->shiftY+5, date("dS of F Y H:i:s",$minX) , $this->colors["Dark Red"]);
+				ImageString($this->im, 1,$this->sizeX+$this->shiftX-148,$this->sizeY+$this->shiftY+5, date("dS of F Y H:i:s",$maxX) , $this->colors["Dark Red"]);
+			}
+			else
+			{
+				ImageString($this->im, 2,$this->sizeX/2-50,                $this->sizeY+$this->shiftY+3, "NO DATA FOUND FOR THIS PERIOD" , $this->colors["Dark Red"]);
+			}
+		
+			$this->drawLogo();
+			
+		
+			ImagePng($this->im); 
+			ImageDestroy($this->im); 
+		}
+
+		function Draw2()
 		{
-			$x=DBget_field($result,$i,0);
-			$x_next=DBget_field($result,$i+1,0);
-			$y=DBget_field($result,$i,1);
-			$y_next=DBget_field($result,$i+1,1);
+			$this->im = imagecreate($this->sizeX+$this->shiftX+61,$this->sizeY+2*$this->shiftY+40);
+			$nodata=1;
 
-			$x1=$sizeX*($x-$minX)/($maxX-$minX);
-			$y1=$sizeY*($y-$minY)/($maxY-$minY);
-			$x2=$sizeX*($x_next-$minX)/($maxX-$minX);
-			$y2=$sizeY*($y_next-$minY)/($maxY-$minY);
+			Header( "Content-type:  text/html"); 
+//			Header( "Content-type:  image/png"); 
+			Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 
-			$y1=$sizeY-$y1;
-			$y2=$sizeY-$y2;
+			check_authorisation();
+		
+			$this->im = imagecreate($this->sizeX+$this->shiftX+61,$this->sizeY+2*$this->shiftY+40);
 
-			ImageLine($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX,$y2+$shiftY,$darkgreen);
-//			ImageSetPixel($im,$x2+$shiftX,$y2+$shiftY-1,$darkred);
+			$this->initColors();
+			$this->drawRectangle();
+			$this->drawHeader();
+
+			if(!check_right("Item","R",$this->itemid))
+			{
+				ImagePng($this->im); 
+				ImageDestroy($this->im); 
+				exit;
+			}
+
+			$from_time = time(NULL)-$this->period-3600*$this->from;
+			$to_time   = time(NULL)-3600*$this->from;
+
+			for($i=0;$i<=$this->sizeX;$i+=$this->sizeX/24)
+			{
+//				ImageDashedLine($this->im,$i+$this->shiftX,$this->shiftY,$i+$this->shiftX,$this->sizeY+$this->shiftY,$this->colors["Gray"]);
+				$label_format="H:i";
+				ImageString($this->im, 1,$i+$this->shiftX-11, $this->sizeY+$this->shiftY+5, date($label_format,$from_time+$this->period*($i/$this->sizeX)) , $this->colors["Black"]);
+			}
+
+			$p=$to_time-$from_time;
+			$z=$from_time%$p;
+			$count=array();
+			$min=array();
+			$max=array();
+			$avg=array();
+
+			$sql="select round(900*((clock+$z)%($p))/($p)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid=".$this->itemid ." and clock>$from_time and clock<$to_time group by round(900*((clock+$z)%($p))/($p))";
+			$result=DBselect($sql);
+			while($row=DBfetch($result))
+			{
+				$i=$row["i"];
+				$count[$i]=$row["count"];
+				$min[$i]=$row["min"];
+				$max[$i]=$row["max"];
+				$avg[$i]=$row["avg"];
+				$nodata=0;
+			}
+
+			if($nodata!=0)
+			{
+				$this->noDataFound();
+				exit;
+			}
+
+//	echo "MIN/MAX:",$minX," - ",$maxX," - ",$minY," - ",$maxY,"<Br>";
+	$minX=0;
+	$maxX=900;
+	$maxY=max($avg);
+	$minY=min($avg);
+
+	if(isset($minY)&&($maxY)&&($minX!=$maxX)&&($minY!=$maxY))
+	{
+		for($i=0;$i<900;$i++)
+		{
+			if($count[$i]>0)
+			{
+				$x1=$this->sizeX*($i-$minX)/($maxX-$minX);
+				$y1=$this->sizeY*($avg[$i]-$minY)/($maxY-$minY);
+				$x1=$this->sizeX-$x1;
+				$y1=$this->sizeY-$y1;
+
+				for($j=$i-1;$j>=0;$j--)
+				{
+					if($count[$j]>0)
+					{
+						$x2=$this->sizeX*($j-$minX)/($maxX-$minX);
+						$y2=$this->sizeY*($avg[$j]-$minY)/($maxY-$minY);
+						$x2=$this->sizeX-$x2;
+						$y2=$this->sizeY-$y2;
+						ImageLine($this->im,$x1+$this->shiftX,$y1+$this->shiftY,$x2+$this->shiftX,$y2+$this->shiftY,$this->colors["Dark Green"]);
+						break;
+					}
+				}
+			}
+//			echo $this->sizeX*($i-$minX)/($maxX-$minX),":",$y1,"<br>";
 		}
 	}
-	else
-	{
-		if(isset($minX))
+
+			$startTime=$minX;
+			if (($maxX-$minX) < 300)
+				$precTime=10;
+			elseif (($maxX-$minX) < 3600 )
+				$precTime=60;
+			else
+				$precTime=300;
+		
+			if (($maxX-$minX) < 1200 )
+				$dateForm="H:i:s";
+			else
+				$dateForm="H:i:s";
+		
+			$correctTime=$startTime % $precTime;
+			$stepTime=ceil(ceil(($maxX-$minX)/20)/$precTime)*(1.0*$precTime);
+
+/*			for($i=1;$i<$my_steps;$i++)
+			{
+				ImageDashedLine($this->im,$this->shiftX,$i/$my_steps*$this->sizeY+$this->shiftY,$this->sizeX+$this->shiftX,$i/$my_steps*$this->sizeY+$this->shiftY,$this->colors["Gray"]);
+			}
+			for($j=$stepTime-$correctTime;$j<=($maxX-$minX);$j+=$stepTime)
+			{
+				ImageDashedLine($this->im,$this->shiftX+($this->sizeX*$j)/($maxX-$minX),$this->shiftY,$this->shiftX+($this->sizeX*$j)/($maxX-$minX),$this->sizeY+$this->shiftY,$this->colors["Gray"]);
+			}*/
+
+		
+			if($nodata == 0)
+			{
+/*				for($i=0;$i<=$my_steps;$i++)
+				{
+					ImageString($this->im, 1, $this->sizeX+5+$this->shiftX, $i/$my_steps*$this->sizeY+$this->shiftY-4, convert_units($maxY-$i/$my_steps*($maxY-$minY),$this->item["units"],$this->item["multiplier"]) , $this->colors["Dark Red"]);
+				}*/
+				for($j=$stepTime-$correctTime;$j<=($maxX-$minX);$j+=$stepTime)
+				{
+//					ImageStringUp($this->im,0,$this->shiftX+($this->sizeX*$j)/($maxX-$minX),$this->shiftY+$this->sizeY+53,date($dateForm,$startTime+$j),$this->colors["Black"]);
+				}
+		
+//				ImageString($this->im, 1,10,                $this->sizeY+$this->shiftY+5, date("dS of F Y H:i:s",$minX) , $this->colors["Dark Red"]);
+//				ImageString($this->im, 1,$this->sizeX+$this->shiftX-148,$this->sizeY+$this->shiftY+5, date("dS of F Y H:i:s",$maxX) , $this->colors["Dark Red"]);
+			}
+			else
+			{
+				ImageString($this->im, 2,$this->sizeX/2-50,                $this->sizeY+$this->shiftY+3, "NO DATA FOUND FOR THIS PERIOD" , $this->colors["Dark Red"]);
+			}
+		
+			$this->drawLogo();
+			
+		
+			ImagePng($this->im); 
+			ImageDestroy($this->im); 
+		}
+
+		function Draw3()
 		{
-			ImageLine($im,$shiftX,$shiftY+$sizeY/2,$sizeX+$shiftX,$shiftY+$sizeY/2,$darkgreen);
+			$start_time=time(NULL);
+
+			$this->im = imagecreate($this->sizeX+$this->shiftX+61,$this->sizeY+2*$this->shiftY+40);
+			$nodata=1;
+
+//			Header( "Content-type:  text/html"); 
+			Header( "Content-type:  image/png"); 
+			Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
+
+			check_authorisation();
+		
+			$this->im = imagecreate($this->sizeX+$this->shiftX+61,$this->sizeY+2*$this->shiftY+40);
+
+			$this->initColors();
+			$this->drawRectangle();
+			$this->drawHeader();
+			if(!check_right("Item","R",$this->itemid))
+			{
+				ImagePng($this->im); 
+				ImageDestroy($this->im); 
+				exit;
+			}
+
+			$now = time(NULL);
+//			$to_time=$now-$now%$this->period;
+			$to_time=$now;
+//			$from_time=$to_time-17*$this->period;
+			$from_time=$to_time-$this->period;
+		
+			$count=array();
+			$min=array();
+			$max=array();
+			$avg=array();
+			$p=$to_time-$from_time;
+//			$z=$from_time%$p;
+			$z=$p-$from_time%$p;
+			$sql="select round(900*((clock+$z)%($p))/($p)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid=".$this->item["itemid"]." and clock>=$from_time and clock<=$to_time group by round(900*((clock+$z)%($p))/($p))";
+//			$sql="select round(900*((clock+3*3600)%(3600))/(3600)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid=".$this->item["itemid"]." and clock>=$from_time and clock<=$to_time group by round(900*((clock+3*3600)%($p))/($p))";
+//			echo $sql,"<br>";
+//			echo $to_time-$from_time,"<br>";
+
+			$result=DBselect($sql);
+			while($row=DBfetch($result))
+			{
+				$i=$row["i"];
+				$count[$i]=$row["count"];
+				$min[$i]=$row["min"];
+				$max[$i]=$row["max"];
+				$avg[$i]=$row["avg"];
+				$nodata=0;
+			}
+		
+		
+			for($i=0;$i<=$this->sizeY;$i+=$this->sizeY/6)
+			{
+				ImageDashedLine($this->im,$this->shiftX,$i+$this->shiftY,$this->sizeX+$this->shiftX,$i+$this->shiftY,$this->colors["Gray"]);
+			}
+		
+			for($i=0;$i<=$this->sizeX;$i+=$this->sizeX/24)
+			{
+				ImageDashedLine($this->im,$i+$this->shiftX,$this->shiftY,$i+$this->shiftX,$this->sizeY+$this->shiftY,$this->colors["Gray"]);
+				if($nodata == 0)
+				{
+					$label_format="H:i";
+					ImageString($this->im, 1,$i+$this->shiftX-11, $this->sizeY+$this->shiftY+5, date($label_format,$from_time+$i*$this->period/$this->sizeX) , $this->colors["Black"]);
+//					echo $from_time," ",$to_time," ",$from_time+$i*$this->period/$this->sizeX,"<br>";
+				}
+			}
+		
+			$maxX=900;
+			$minX=0;
+			$maxY=max($max);
+			$minY=min($min);
+			$minY=0;
+//			$maxY=30000;
+		#	echo "MIN/MAX:",$minX," - ",$maxX," - ",$minY," - ",$maxY,"<Br>";
+		
+			if(isset($minY)&&($maxY)&&($minX!=$maxX)&&($minY!=$maxY))
+			{
+				for($i=0;$i<900;$i++)
+				{
+					if($count[$i]>0)
+					{
+						$x1=$this->sizeX*($i-$minX)/($maxX-$minX);
+						$y1=$this->sizeY*($max[$i]-$minY)/($maxY-$minY);
+						$y1=$this->sizeY-$y1;
+						for($j=$i-1;$j>=0;$j--)
+						{
+							if($count[$j]>0)
+							{
+								$x2=$this->sizeX*($j-$minX)/($maxX-$minX);
+								$y2=$this->sizeY*($max[$j]-$minY)/($maxY-$minY);
+								$y2=$this->sizeY-$y2;
+								ImageLine($this->im,$x1+$this->shiftX,$y1+$this->shiftY,$x2+$this->shiftX,$y2+$this->shiftY,$this->colors["Dark Red"]);
+								break;
+							}
+						}
+
+						$x1=$this->sizeX*($i-$minX)/($maxX-$minX);
+						$y1=$this->sizeY*($avg[$i]-$minY)/($maxY-$minY);
+						$y1=$this->sizeY-$y1;
+						for($j=$i-1;$j>=0;$j--)
+						{
+							if($count[$j]>0)
+							{
+								$x2=$this->sizeX*($j-$minX)/($maxX-$minX);
+								$y2=$this->sizeY*($avg[$j]-$minY)/($maxY-$minY);
+								$y2=$this->sizeY-$y2;
+								ImageLine($this->im,$x1+$this->shiftX,$y1+$this->shiftY,$x2+$this->shiftX,$y2+$this->shiftY,$this->colors["Dark Yellow"]);
+								break;
+							}
+						}
+
+						$x1=$this->sizeX*($i-$minX)/($maxX-$minX);
+						$y1=$this->sizeY*($min[$i]-$minY)/($maxY-$minY);
+						$y1=$this->sizeY-$y1;
+						for($j=$i-1;$j>=0;$j--)
+						{
+							if($count[$j]>0)
+							{
+								$x2=$this->sizeX*($j-$minX)/($maxX-$minX);
+								$y2=$this->sizeY*($min[$j]-$minY)/($maxY-$minY);
+								$y2=$this->sizeY-$y2;
+								ImageLine($this->im,$x1+$this->shiftX,$y1+$this->shiftY,$x2+$this->shiftX,$y2+$this->shiftY,$this->colors["Dark Green"]);
+								break;
+							}
+						}
+					}
+				}
+			}
+		
+			if($nodata == 0)
+			{
+				for($i=0;$i<=$this->sizeY;$i+=$this->sizeY/6)
+				{
+					ImageString($this->im, 1, $this->sizeX+5+$this->shiftX, $this->sizeY-$i-4+$this->shiftY, convert_units($i*($maxY-$minY)/$this->sizeY+$minY,$this->item["units"],$this->item["multiplier"]) , $this->colors["Dark Red"]);
+				}
+		
+		//		date("dS of F Y h:i:s A",DBget_field($result,0,0));
+		
+		//		ImageString($im, 1,10,                $sizeY+$shiftY+5, date("dS of F Y h:i:s A",$minX) , $red);
+		//		ImageString($im, 1,$sizeX+$shiftX-168,$sizeY+$shiftY+5, date("dS of F Y h:i:s A",$maxX) , $red);
+			}
+			else
+			{
+				ImageString($this->im, 2,$this->sizeX/2 -50,$this->sizeY+$this->shiftY+3, "NO DATA FOR THIS PERIOD" , $this->colors["Dark Red"]);
+			}
+		
+			ImageString($this->im, 1,$this->shiftX, $this->sizeY+$this->shiftY+15, "MIN" , $this->colors["Dark Green"]);
+			ImageString($this->im, 1,$this->shiftX+20, $this->sizeY+$this->shiftY+15, "AVG" , $this->colors["Dark Yellow"]);
+			ImageString($this->im, 1,$this->shiftX+40, $this->sizeY+$this->shiftY+15, "MAX" , $this->colors["Dark Red"]);
+		
+			ImageStringUp($this->im,0,imagesx($this->im)-10,imagesy($this->im)-50, "http://zabbix.sourceforge.net", $this->colors["Gray"]);
+		
+			$end_time=time(NULL);
+			ImageString($this->im, 0,imagesx($this->im)-100,imagesy($this->im)-12,"Generated in ".($end_time-$start_time)." sec", $this->colors["Gray"]);
+		
+			ImagePng($this->im); 
+			ImageDestroy($this->im); 
 		}
 	}
-
-	$startTime=$minX;
-	if (($maxX-$minX) < 300)
-		$precTime=10;
-	elseif (($maxX-$minX) < 3600 )
-		$precTime=60;
-	else
-		$precTime=300;
-
-	if (($maxX-$minX) < 1200 )
-		$dateForm="H:i:s";
-	else
-		$dateForm="H:i:s";
-
-	$correctTime=$startTime % $precTime;
-	$stepTime=ceil(ceil(($maxX-$minX)/20)/$precTime)*(1.0*$precTime);
-
-	for($i=1;$i<$my_steps;$i++)
+		
+	$graph=new Graph($HTTP_GET_VARS["itemid"]);
+	if(isset($HTTP_GET_VARS["period"]))
 	{
-		ImageDashedLine($im,$shiftX,$i/$my_steps*$sizeY+$shiftY,$sizeX+$shiftX,$i/$my_steps*$sizeY+$shiftY,$gray);
+		$graph->setPeriod($HTTP_GET_VARS["period"]);
 	}
-	for($j=$stepTime-$correctTime;$j<=($maxX-$minX);$j+=$stepTime)
+	if(isset($HTTP_GET_VARS["from"]))
 	{
-		ImageDashedLine($im,$shiftX+($sizeX*$j)/($maxX-$minX),$shiftY,$shiftX+($sizeX*$j)/($maxX-$minX),$sizeY+$shiftY,$gray);
+		$graph->setFrom($HTTP_GET_VARS["from"]);
+	}
+	if(isset($HTTP_GET_VARS["width"]))
+	{
+		$graph->setWidth($HTTP_GET_VARS["width"]);
+	}
+	if(isset($HTTP_GET_VARS["border"]))
+	{
+		$graph->setBorder(0);
 	}
 
-
-	if($nodata == 0)
-	{
-//		for($i=0;$i<=$sizeY;$i+=$sizeY/5)
-//		{
-//			ImageString($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftY, $i*($maxY-$minY)/$sizeY+$minY , $darkred);
-//		}
-//		for($i=0;$i<=$sizeX;$i+=$sizeX/24)
-//		{
-//			ImageStringUp($im,0,$i+$shiftX-3,$shiftY+$sizeY+50,date("H:i:s",$i*($maxX-$minX)/$sizeX+$minX),$black);
-//		}
-
-		for($i=0;$i<=$my_steps;$i++)
-		{
-			ImageString($im, 1, $sizeX+5+$shiftX, $i/$my_steps*$sizeY+$shiftY-4, convert_units($maxY-$i/$my_steps*($maxY-$minY),$item["units"],$item["multiplier"]) , $darkred);
-		}
-		for($j=$stepTime-$correctTime;$j<=($maxX-$minX);$j+=$stepTime)
-		{
-			ImageStringUp($im,0,$shiftX+($sizeX*$j)/($maxX-$minX),$shiftY+$sizeY+53,date($dateForm,$startTime+$j),$black);
-		}
-
-//		ImageString($im, 1,10,                $sizeY+$shiftY+3, date("dS of F Y",$minX) , $darkred);
-//		ImageString($im, 1,$sizeX+$shiftX-90,$sizeY+$shiftY+3, date("dS of F Y",$maxX) , $darkred);
-		ImageString($im, 1,10,                $sizeY+$shiftY+5, date("dS of F Y H:i:s",$minX) , $darkred);
-		ImageString($im, 1,$sizeX+$shiftX-148,$sizeY+$shiftY+5, date("dS of F Y H:i:s",$maxX) , $darkred);
-	}
-	else
-	{
-		ImageString($im, 2,$sizeX/2-50,                $sizeY+$shiftY+3, "NO DATA FOUND FOR THIS PERIOD" , $darkred);
-	}
-
-	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, "http://zabbix.sourceforge.net", $gray);
-
-	ImagePng($im); 
-	ImageDestroy($im); 
+	$graph->Draw3();
 ?>
+

@@ -202,13 +202,13 @@
 		$showsla=0;
 		$goodsla=99.05;
 		$sortorder=0;
-		unset($HTTP_GET_VARS["triggerid"]);
+		unset($triggerid);
 	}
 
 	echo "<br>";
 	echo "<a name=\"form\"></a>";
 	show_table2_header_begin();
-	echo "New service";
+	echo "Service";
 
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"services.php\">";
@@ -277,7 +277,7 @@
         show_table2_v_delimiter();
         echo "Link to trigger ?";
         show_table2_h_delimiter();
-	if(isset($HTTP_GET_VARS["triggerid"])&&($HTTP_GET_VARS["triggerid"]!=""))
+	if(isset($triggerid)&&($triggerid!=""))
 	{
         	echo "<INPUT class=\"biginput\" TYPE=\"CHECKBOX\" NAME=\"linktrigger\" VALUE=\"on\" CHECKED>";
 	}
@@ -318,7 +318,10 @@
 
 
 	show_table2_v_delimiter2();
-	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+	if(!isset($triggerid)||($triggerid==""))
+	{
+		echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+	}
 	if(isset($HTTP_GET_VARS["serviceid"]))
 	{
 		echo "<input type=\"submit\" name=\"register\" value=\"update\">";

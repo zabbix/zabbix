@@ -64,13 +64,22 @@
 	{
 		$result=DBselect("select name from graphs where graphid=".$HTTP_GET_VARS["graphid"]);
 		$row=DBfetch($result);
+		$str="";
+		if(isset($HTTP_GET_VARS["from"]))
+		{
+			$str=$str."&from=".$HTTP_GET_VARS["from"];
+		}
+		if(isset($HTTP_GET_VARS["period"]))
+		{
+			$str=$str."&period=".$HTTP_GET_VARS["period"];
+		}
 		if(isset($HTTP_GET_VARS["fullscreen"]))
 		{
-			$map="<a href=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."\">".$row["name"]."</a>";
+			$map="<a href=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."$str\">".$row["name"]."</a>";
 		}
 		else
 		{
-			$map="<a href=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&fullscreen=1\">".$row["name"]."</a>";
+			$map="<a href=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&fullscreen=1$str\">".$row["name"]."</a>";
 		}
 	}
 	else
