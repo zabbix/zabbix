@@ -175,6 +175,29 @@
 			}
 		}
 
+		function period2str($period)
+		{
+			$minute=60; $hour=$minute*60; $day=$hour*24;
+			$str.=" ( ";
+
+			$days=floor($this->period/$day);
+			$hours=floor(($this->period%$day)/$hour);
+			$minutes=floor((($this->period%$day)%$hour)/$minute);
+			$str.=($days>0 ? $days."d" : "").($hours>0 ?  $hours."h" : "").($minutes>0 ? $minutes."m" : "");
+			$str.=" history ";
+
+			$hour=1; $day=$hour*24;
+			$days=floor($this->from/$day);
+			$hours=floor(($this->from%$day)/$hour);
+			$minutes=floor((($this->from%$day)%$hour)/$minute);
+			$str.=($days>0 ? $days."d" : "").($hours>0 ?  $hours."h" : "").($minutes>0 ? $minutes."m" : "");
+			$str.=($days+$hours+$minutes>0 ? " in past " : "");
+
+			$str.=")";
+
+			return $str;
+		}
+
 		function drawHeader()
 		{
 			if(!isset($this->header))
@@ -185,6 +208,10 @@
 			{
 				$str=$this->header;
 			}
+
+			$str=$str.$this->period2str($this->period);
+
+
 			$x=imagesx($this->im)/2-ImageFontWidth(4)*strlen($str)/2;
 			ImageString($this->im, 4,$x,1, $str , $this->colors["Dark Red"]);
 		}
