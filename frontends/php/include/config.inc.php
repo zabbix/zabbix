@@ -2155,7 +2155,7 @@ echo "</head>";
 
 	# Update Item definition
 
-	function	update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula)
+	function	update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends)
 	{
 		global	$ERROR_MSG;
 
@@ -2187,7 +2187,7 @@ echo "</head>";
 		$snmpv3_authpassphrase=addslashes($snmpv3_authpassphrase);
 		$snmpv3_privpassphrase=addslashes($snmpv3_privpassphrase);
 
-		$sql="update items set description='$description',key_='$key',hostid=$hostid,delay=$delay,history=$history,nextcheck=0,status=$status,type=$type,snmp_community='$snmp_community',snmp_oid='$snmp_oid',value_type=$value_type,trapper_hosts='$trapper_hosts',snmp_port=$snmp_port,units='$units',multiplier=$multiplier,delta=$delta,snmpv3_securityname='$snmpv3_securityname',snmpv3_securitylevel=$snmpv3_securitylevel,snmpv3_authpassphrase='$snmpv3_authpassphrase',snmpv3_privpassphrase='$snmpv3_privpassphrase',formula='$formula' where itemid=$itemid";
+		$sql="update items set description='$description',key_='$key',hostid=$hostid,delay=$delay,history=$history,nextcheck=0,status=$status,type=$type,snmp_community='$snmp_community',snmp_oid='$snmp_oid',value_type=$value_type,trapper_hosts='$trapper_hosts',snmp_port=$snmp_port,units='$units',multiplier=$multiplier,delta=$delta,snmpv3_securityname='$snmpv3_securityname',snmpv3_securitylevel=$snmpv3_securitylevel,snmpv3_authpassphrase='$snmpv3_authpassphrase',snmpv3_privpassphrase='$snmpv3_privpassphrase',formula='$formula',trends=$trends where itemid=$itemid";
 		return	DBexecute($sql);
 	}
 
@@ -2642,7 +2642,7 @@ echo "</head>";
 
 	# Add Item definition
 
-	function	add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula)
+	function	add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends)
 	{
 		global	$ERROR_MSG;
 
@@ -2683,7 +2683,7 @@ echo "</head>";
 		$snmpv3_authpassphrase=addslashes($snmpv3_authpassphrase);
 		$snmpv3_privpassphrase=addslashes($snmpv3_privpassphrase);
 
-		$sql="insert into items (description,key_,hostid,delay,history,nextcheck,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula) values ('$description','$key',$hostid,$delay,$history,0,$status,$type,'$snmp_community','$snmp_oid',$value_type,'$trapper_hosts',$snmp_port,'$units',$multiplier,$delta,'$snmpv3_securityname',$snmpv3_securitylevel,'$snmpv3_authpassphrase','$snmpv3_privpassphrase','$formula')";
+		$sql="insert into items (description,key_,hostid,delay,history,nextcheck,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula,trends) values ('$description','$key',$hostid,$delay,$history,0,$status,$type,'$snmp_community','$snmp_oid',$value_type,'$trapper_hosts',$snmp_port,'$units',$multiplier,$delta,'$snmpv3_securityname',$snmpv3_securitylevel,'$snmpv3_authpassphrase','$snmpv3_privpassphrase','$formula',$trends)";
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"items","itemid");
 	}
@@ -3123,7 +3123,7 @@ echo "</head>";
 		while($row=DBfetch($result))
 		{
 			$item=get_item_by_itemid($row["itemid"]);
-			$itemid=add_item($item["description"],$item["key_"],$hostid,$item["delay"],$item["history"],$item["status"],$item["type"],$item["snmp_community"],$item["snmp_oid"],$item["value_type"],"",$item["snmp_port"],$item["units"],$item["multiplier"],$item["delta"],$item["snmpv3_securityname"],$item["snmpv3_securitylevel"],$item["snmpv3_authpassphrase"],$item["snmpv3_privpassphrase"],$item["formula"]);
+			$itemid=add_item($item["description"],$item["key_"],$hostid,$item["delay"],$item["history"],$item["status"],$item["type"],$item["snmp_community"],$item["snmp_oid"],$item["value_type"],"",$item["snmp_port"],$item["units"],$item["multiplier"],$item["delta"],$item["snmpv3_securityname"],$item["snmpv3_securitylevel"],$item["snmpv3_authpassphrase"],$item["snmpv3_privpassphrase"],$item["formula"],$item["trends"]);
 
 			$sql="select distinct t.triggerid from triggers t,functions f where f.itemid=".$row["itemid"]." and f.triggerid=t.triggerid";
 			$result2=DBselect($sql);

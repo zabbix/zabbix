@@ -1,5 +1,6 @@
 Changes for 1.1alpha5:
 
+ - fixed unmodified item parameter "Keep trends (in days)" (Alexei)
  - fixed support of negative values for SNMP integers (Alexei)
  - added support of functiona dayofweek() for triggers (Alexei)
  - configurable format of icon labels for maps (Alexei)
