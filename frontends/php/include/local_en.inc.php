@@ -240,6 +240,12 @@
 	define("S_CANNOT_UPDATE_HOST_STATUS",		"Cannot update host status");
 	define("S_HOST_DELETED",			"Host deleted");
 	define("S_CANNOT_DELETE_HOST",			"Cannot delete host");
+	define("S_TEMPLATE_LINKAGE_ADDED",		"Template linkage added");
+	define("S_CANNOT_ADD_TEMPLATE_LINKAGE",		"Cannot add template linkage");
+	define("S_TEMPLATE_LINKAGE_UPDATED",		"Template linkage updated");
+	define("S_CANNOT_UPDATE_TEMPLATE_LINKAGE",	"Cannot update template linkage");
+	define("S_TEMPLATE_LINKAGE_DELETED",		"Template linkage deleted");
+	define("S_CANNOT_DELETE_TEMPLATE_LINKAGE",	"Cannot delete template linkage");
 	define("S_CONFIGURATION_OF_HOSTS_AND_HOST_GROUPS","CONFIGURATION OF HOSTS AND HOST GROUPS");
 	define("S_HOST_GROUPS_BIG",			"HOST GROUPS");
 	define("S_NO_HOST_GROUPS_DEFINED",		"No host groups defined");

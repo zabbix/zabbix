@@ -2996,6 +2996,27 @@ echo "</head>";
 		return	DBexecute($sql);
 	}
 
+	# Add host-template linkage
+	function add_template_linkage($hostid,$templateid,$items,$triggers,$actions,$graphs,$screens)
+	{
+		$sql="insert into hosts_templates (hostid,templateid,items,triggers,actions,graphs,screens) values ($hostid,$templateid,$items,$triggers,$actions,$graphs,$screens)";
+		return	DBexecute($sql);
+	}
+
+	# Update host-template linkage
+	function update_template_linkage($hosttemplateid,$hostid,$templateid,$items,$triggers,$actions,$graphs,$screens)
+	{
+		$sql="update hosts_templates set hostid=$hostid,templateid=$templateid,items=$items,triggers=$triggers,actions=$actions,graphs=$graphs,screens=$screens where hosttemplateid=$hosttemplateid";
+		return	DBexecute($sql);
+	}
+
+	# Delete host-template linkage
+	function delete_template_linkage($hosttemplateid)
+	{
+		$sql="delete from hosts_templates where hosttemplateid=$hosttemplateid";
+		return	DBexecute($sql);
+	}
+
 	# Add Host to system map
 
 	function add_host_to_sysmap($sysmapid,$hostid,$label,$x,$y,$icon,$url,$icon_on)

@@ -39,6 +39,62 @@
 <?php
 	if(isset($_GET["register"]))
 	{
+		if($_GET["register"]=="add linkage")
+		{	
+			$items=0;
+			if(isset($_GET["items_add"]))		$items=$items|1;
+			if(isset($_GET["items_update"]))	$items=$items|2;
+			if(isset($_GET["items_delete"]))	$items=$items|4;
+			$triggers=0;
+			if(isset($_GET["triggers_add"]))	$triggers=$triggers|1;
+			if(isset($_GET["triggers_update"]))	$triggers=$triggers|2;
+			if(isset($_GET["triggers_delete"]))	$triggers=$triggers|4;
+			$actions=0;
+			if(isset($_GET["actions_add"]))	$actions=$actions|1;
+			if(isset($_GET["actions_update"]))	$actions=$actions|2;
+			if(isset($_GET["actions_delete"]))	$actions=$actions|4;
+			$graphs=0;
+			if(isset($_GET["graphs_add"]))		$graphs=$graphs|1;
+			if(isset($_GET["graphs_update"]))	$graphs=$graphs|2;
+			if(isset($_GET["graphs_delete"]))	$graphs=$graphs|4;
+			$screens=0;
+			if(isset($_GET["screens_add"]))		$screens=$screens|1;
+			if(isset($_GET["screens_update"]))	$screens=$screens|2;
+			if(isset($_GET["screens_delete"]))	$screens=$screens|4;
+			$result=add_template_linkage($_GET["hostid"],$_GET["templateid"],$items,$triggers,$actions,$graphs,$screens);
+			show_messages($result, S_TEMPLATE_LINKAGE_ADDED, S_CANNOT_ADD_TEMPLATE_LINKAGE);
+		}
+		if($_GET["register"]=="update linkage")
+		{	
+			$items=0;
+			if(isset($_GET["items_add"]))		$items=$items|1;
+			if(isset($_GET["items_update"]))	$items=$items|2;
+			if(isset($_GET["items_delete"]))	$items=$items|4;
+			$triggers=0;
+			if(isset($_GET["triggers_add"]))	$triggers=$triggers|1;
+			if(isset($_GET["triggers_update"]))	$triggers=$triggers|2;
+			if(isset($_GET["triggers_delete"]))	$triggers=$triggers|4;
+			$actions=0;
+			if(isset($_GET["actions_add"]))	$actions=$actions|1;
+			if(isset($_GET["actions_update"]))	$actions=$actions|2;
+			if(isset($_GET["actions_delete"]))	$actions=$actions|4;
+			$graphs=0;
+			if(isset($_GET["graphs_add"]))		$graphs=$graphs|1;
+			if(isset($_GET["graphs_update"]))	$graphs=$graphs|2;
+			if(isset($_GET["graphs_delete"]))	$graphs=$graphs|4;
+			$screens=0;
+			if(isset($_GET["screens_add"]))		$screens=$screens|1;
+			if(isset($_GET["screens_update"]))	$screens=$screens|2;
+			if(isset($_GET["screens_delete"]))	$screens=$screens|4;
+			$result=update_template_linkage($_GET["hosttemplateid"],$_GET["hostid"],$_GET["templateid"],$items,$triggers,$actions,$graphs,$screens);
+			show_messages($result, S_TEMPLATE_LINKAGE_UPDATED, S_CANNOT_UPDATE_TEMPLATE_LINKAGE);
+		}
+		if($_GET["register"]=="delete linkage")
+		{
+			$result=delete_template_linkage($_GET["hosttemplateid"]);
+			show_messages($result, S_TEMPLATE_LINKAGE_DELETED, S_CANNOT_DELETE_TEMPLATE_LINKAGE);
+			unset($_GET["hosttemplateid"]);
+		}	
 		if($_GET["register"]=="add")
 		{
 			$groups=array();
@@ -158,6 +214,7 @@
 
 	$h2=S_GROUP."&nbsp;";
 	$h2=$h2."<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_GET["config"]."\">";
+	$h2=$h2."<input class=\"biginput\" name=\"hostid\" type=\"hidden\" value=\"".$_GET["hostid"]."\">";
 	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
 	$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_ALL_SMALL;
 
@@ -268,7 +325,7 @@
 		table_begin();
 		table_header(array(S_HOST,S_TEMPLATE,S_ITEMS,S_TRIGGERS,S_ACTIONS,S_GRAPHS,S_SCREENS,S_ACTIONS));
 
-		$result=DBselect("select hostid,templateid,items,triggers,actions,graphs,screens from hosts_templates where hostid=".$_GET["hostid"]);
+		$result=DBselect("select hosttemplateid,hostid,templateid,items,triggers,actions,graphs,screens from hosts_templates where hostid=".$_GET["hostid"]);
 		$col=0;
 		while($row=DBfetch($result))
 		{
@@ -276,7 +333,7 @@
 			$template=get_host_by_hostid($row["templateid"]);
 //		$members=array("hide"=>1,"value"=>"");
 #			$actions="<A HREF=\"hosts.php?config=".$_GET["config"]."&groupid=".$row["groupid"]."#form\">".S_CHANGE."</A>";
-			$actions="ZZZ";
+			$actions="<a href=\"hosts.php?config=2&hostid=".$row["hostid"]."&hosttemplateid=".$row["hosttemplateid"]."\">".S_CHANGE."</a>";
 
 			table_row(array(
 				$host["host"],
@@ -299,7 +356,7 @@
 	}
 	if(isset($_GET["hostid"])&&$_GET["config"]==2)
 	{
-		insert_template_form($_GET["hosttemplateid"]);
+		insert_template_form($_GET["hostid"], $_GET["hosttemplateid"]);
 	}
 ?>
 
