@@ -162,7 +162,7 @@
 	}
 	echo "<br>";
 	show_table2_header_begin();
-	echo "New action";
+	echo nbsp("New action");
 
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"actions.php\">";
@@ -171,7 +171,7 @@
 	{
 		echo "<input name=\"actionid\" type=\"hidden\" value=".$HTTP_GET_VARS["actionid"].">";
 	}
-	echo "Send message to";
+	echo nbsp("Send message to");
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"userid\" size=\"1\">";
 
@@ -191,7 +191,7 @@
 	echo "</select>";
 
 	show_table2_v_delimiter();
-	echo "When trigger becomes";
+	echo nbsp("When trigger becomes");
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"good\" size=1>";
 	echo "<OPTION VALUE=\"1\""; if($good==1) echo "SELECTED"; echo ">ON";
@@ -223,7 +223,7 @@
 	echo "</SELECT>";
 
 	show_table2_v_delimiter();
-	echo "Send if trigger's severity equal or more than (for host-based scope only)";
+	echo nbsp("Use if trigger's severity equal or more than<br>(for host-based scope only)");
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"severity\" size=1>";
 	echo "<OPTION VALUE=\"0\" "; if($severity==0) echo "SELECTED"; echo ">Not classified";

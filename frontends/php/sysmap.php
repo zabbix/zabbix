@@ -287,12 +287,12 @@
 	echo "<input class=\"biginput\" name=\"label\" size=32 value=\"$label\">";
 
 	show_table2_v_delimiter();
-	echo "Coordinate X";
+	echo nbsp("Coordinate X");
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"x\" size=5 value=\"$x\">";
 
 	show_table2_v_delimiter();
-	echo "Coordinate Y";
+	echo nbsp("Coordinate Y");
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"y\" size=5 value=\"$y\">";
 
@@ -316,7 +316,7 @@
 
 		show_table2_v_delimiter();
 		echo "<form method=\"post\" action=\"sysmap.php?sysmapid=".$HTTP_GET_VARS["sysmapid"]."\">";
-		echo "Host 1";
+		echo nbsp("Host 1");
 		show_table2_h_delimiter();
 //		$result=DBselect("select shostid,label from sysmaps_hosts where sysmapid=".$HTTP_GET_VARS["sysmapid"]." order by label");
 		echo "<select class=\"biginput\" name=\"shostid1\" size=1>";
@@ -337,7 +337,7 @@
 
 		show_table2_v_delimiter();
 //		echo "<form method=\"get\" action=\"sysmap.php?sysmapid=".$HTTP_GET_VARS["sysmapid"].">";
-		echo "Host 2";
+		echo nbsp("Host 2");
 		show_table2_h_delimiter();
 		echo "<select class=\"biginput\" name=\"shostid2\" size=1>";
 		for($i=0;$i<DBnum_rows($result);$i++)
@@ -349,7 +349,7 @@
 		echo "</SELECT>";
 
 		show_table2_v_delimiter();
-		echo "Link status indicator";
+		echo nbsp("Link status indicator");
 		show_table2_h_delimiter();
 	        $result=DBselect("select triggerid,description from triggers order by description");
 	        echo "<select class=\"biginput\" name=\"triggerid\" size=1>";

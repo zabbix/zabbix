@@ -199,7 +199,7 @@
 	echo "</SELECT>";
 
 	show_table2_v_delimiter();
-	echo "Sort order (0->100)";
+	echo nbsp("Sort order (0->100)");
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"sortorder\" value=\"$sortorder\" size=3>";
 

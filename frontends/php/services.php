@@ -239,7 +239,7 @@
 	echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=32>";
 
 	show_table2_v_delimiter();
-	echo "Status calculation algorithm";
+	echo nbsp("Status calculation algorithm");
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"algorithm\" size=1>";
 //	if(isset($HTTP_GET_VARS["algorithm"]))
@@ -275,7 +275,7 @@
 	echo "</SELECT>";
 
         show_table2_v_delimiter();
-        echo "Show SLA";
+        echo nbsp("Show SLA");
         show_table2_h_delimiter();
 	if($showsla==1)
 	{
@@ -288,12 +288,12 @@
 	}
 
 	show_table2_v_delimiter();
-	echo "Acceptable SLA (in %)";
+	echo nbsp("Acceptable SLA (in %)");
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"goodsla\" value=\"$goodsla\" size=6>";
 
         show_table2_v_delimiter();
-        echo "Link to trigger ?";
+        echo nbsp("Link to trigger ?");
         show_table2_h_delimiter();
 	if(isset($triggerid)&&($triggerid!=""))
 	{
@@ -330,7 +330,7 @@
         echo "</SELECT>";
 
 	show_table2_v_delimiter();
-	echo "Sort order (0->999)";
+	echo nbsp("Sort order (0->999)");
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"sortorder\" value=\"$sortorder\" size=3>";
 
@@ -364,7 +364,7 @@
 
 	echo "<br>";
 	show_table2_header_begin();
-	echo "Link to ...";
+	echo nbsp("Link to ...");
 
 	show_table2_v_delimiter();
 	echo "<form method=\"post\" action=\"services.php\">";
@@ -390,7 +390,7 @@
         echo "</SELECT>";
 
         show_table2_v_delimiter();
-        echo "Soft link ?";
+        echo nbsp("Soft link ?");
         show_table2_h_delimiter();
 //	if(isset($HTTP_GET_VARS["softlink"])&&($HTTP_GET_VARS["triggerid"]!=""))
 //	{
@@ -414,7 +414,7 @@
 
 	echo "<br>";
 	show_table2_header_begin();
-	echo "Add server details";
+	echo nbsp("Add server details");
 
 	show_table2_v_delimiter();
 	echo "<form method=\"post\" action=\"services.php\">";

@@ -175,12 +175,12 @@
 	echo "</SELECT>";
 
 	show_table2_v_delimiter();
-	echo "Send to";
+	echo nbsp("Send to");
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"sendto\" size=20 value='$sendto'>";
 
 	show_table2_v_delimiter();
-	echo "Use if severity";
+	echo nbsp("Use if severity");
 	show_table2_h_delimiter();
 	echo "<select multiple class=\"biginput\" name=\"severity[]\" size=\"5\">";
 	$selected=iif( (1&$severity) == 1,"selected","");
