@@ -142,10 +142,14 @@
 				if(DBnum_rows($result2)==1)
 				{
 					$row2=DBfetch($result2);
-					if($row2["value_type"] == 0)
-						$value=nbsp(convert_units($row2["lastvalue"],$row2["units"]));
+					if(!isset($row2["lastvalue"]))	$value="-";
 					else
-						$value=nbsp(htmlspecialchars(substr($row2["lastvalue"],0,20)." ..."));
+					{
+						if($row2["value_type"] == 0)
+							$value=nbsp(convert_units($row2["lastvalue"],$row2["units"]));
+						else
+							$value=nbsp(htmlspecialchars(substr($row2["lastvalue"],0,20)." ..."));
+					}
 				}
 				else
 				{
@@ -157,7 +161,6 @@
 			table_row($rows, $col++);
 		}
 		table_end();
-		show_table_header_end();
 	}
 	else if(isset($_GET["groupid"])&&isset($_GET["type"])&&($_GET["type"]==0))
 	{
@@ -228,7 +231,6 @@
 			table_row($rows, $col++);
 		}
 		table_end();
-		show_table_header_end();
 	}
 	else
 	{
