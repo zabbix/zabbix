@@ -48,6 +48,15 @@ Not ready yet:
  - Reports:
   - more customizable (graphs time range: 1 mont, etc)
 
+ WIN32 Agent:
+
+- Support for timeout parameter
+- Support for user-configurable data collection (like CPU utilization, but
+  for any performance counter)
+- Support for external program execution
+- API for sub-agents
+- Add logging to system log
+
  OTHER:
 
  - round MIN/MAX/AVG numbers for graphs

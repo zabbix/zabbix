@@ -1,0 +1,95 @@
+
+                     ZabbixW32 version 1.0.0-alpha2
+
+******************************************************************************
+
+
+About
+-----
+
+ZabbixW32 is Zabbix agent for Win32 systems. It will work on Windows NT 4.0,
+Windows 2000 and Windows XP. ZabbixW32 doesn't supposed to work on other
+Windows platforms.
+
+
+Installation
+------------
+
+Installation is very simple and includes 3 steps:
+
+1. Unpack ZabbixW32.exe
+2. Create configuration file c:\zabbix_agentd.conf (it has the same syntax as
+   for UNIX agent).
+3. Run command "ZabbixW32.exe install" to install Zabbix agent as service.
+
+Now you can use Control Panel to start agent's service or run
+"ZabbixW32.exe start".
+
+
+Command line syntax
+-------------------
+
+Usage: zabbixw32 [options] [command]
+
+Where possible commands are:
+   standalone      : Run in standalone mode
+   start           : Start Zabbix Win32 Agent service
+   stop            : Stop Zabbix Win32 Agent service
+   install         : Install Zabbix Win32 Agent as service
+   remove          : Remove previously installed Zabbix Win32 Agent service
+   help            : Display help information
+   version         : Display version information
+
+And possible options are:
+   --config <file> : Specify alternate configuration file
+                     (default is C:\zabbix_agentd.conf)
+
+
+Parameters supported by Zabbix Win32 Agent
+------------------------------------------
+
+I. Zabbix standard parameters
+
+diskfree[<path>]	<path> can be normal Windows path, like C:\, or UNC
+disktotal[<path>]       <path> can be normal Windows path, like C:\, or UNC
+memory[free]
+memory[total]
+ping
+proc_cnt[<process_name>]
+swap[free]
+swap[total]
+system[hostname]
+system[proccount]
+system[procload]
+system[procload5]
+system[procload15]
+version[zabbix_agent]
+
+
+II. Win32-specific parameters
+                             
+cpu_util		Average CPU(s) utilization (in percents) for
+                        last minute
+cpu_util5		Average CPU(s) utilization (in percents) for
+                        last 5 minutes
+cpu_util15		Average CPU(s) utilization (in percents) for
+                        last 15 minutes
+cpu_util[<instance>]	Average specific CPU utilization (in percents) for last
+                        minute, where <instance> is zero-based CPU number
+cpu_util5[<instance>]	Average specific CPU utilization (in percents) for last
+                        5 minutes, where <instance> is zero-based CPU number
+cpu_util15[<instance>]	Average specific CPU utilization (in percents) for last
+                        15 minutes, where <instance> is zero-based CPU number
+service_state[<srv>]	State of service <srv>. The following states can be
+         		returned:
+			   0 - Running
+			   1 - Paused
+			   2 - Start pending
+			   3 - Pause pending
+			   4 - Continue pending
+			   5 - Stop pending
+			   6 - Stopped
+			   7 - Unknown
+			 255 - SCM communication error
+			Please not that <srv> should be service name,
+			not display name! 
