@@ -16,7 +16,7 @@
 	echo "<tr>";
 	echo "<td><b>Service</b></td>";
 	echo "<td width=10%><b>Status</b></td>";
-	echo "<td width=20%><b>Reason</b></td>";
+	echo "<td width=30%><b>Reason</b></td>";
 	echo "</tr>";
 	echo "\n";
 	$col=0;
