@@ -418,7 +418,6 @@ int	main()
 
 	if( FAIL == create_pid_file(CONFIG_PID_FILE))
 	{
-		uninit();
 		return -1;
 	}
 
