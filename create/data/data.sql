@@ -17,7 +17,12 @@ insert into config (smtp_server,smtp_helo,smtp_email,alert_history,alarm_history
 
 insert into users (userid,alias,name,surname,passwd) values (1,'Admin','Zabbix','Administrator','d41d8cd98f00b204e9800998ecf8427e');
 
-insert into users (userid,alias,name,surname,passwd) values (2,'guest','Default','User','d41d8cd98f00b204e9800998ecf8427e');
+--
+-- Data for table rights
+--
+
+insert into rights (rightid,userid,name,permission,id) values (1,1,"Default permission","U",0);
+insert into rights (rightid,userid,name,permission,id) values (2,1,"Default permission","A",0);
 
 --
 -- Data for table items_template 

@@ -24,8 +24,11 @@
 		$default_permission="H";
 		if(DBnum_rows($result)>0)
 		{
-			$row=DBfetch($result);
-			$default_permission=$row["permission"];
+			$default_permission="";
+			while($row=DBfetch($result))
+			{
+				$default_permission=$default_permission.$row["permission"];
+			}
 		}
 
 		if($permission=='R')
@@ -48,15 +51,19 @@
 		}
 		else
 		{
-			if(($default_permission=="R")&&($permission=="R"))
+			if(strstr($default_permission,"A")&&($permission=="A"))
 			{
 				return 1;
 			}
-			if(($default_permission=="U")&&($permission=="R"))
+			if(strstr($default_permission,"R")&&($permission=="R"))
 			{
 				return 1;
 			}
-			if(($default_permission=="U")&&($permission=="U"))
+			if(strstr($default_permission,"U")&&($permission=="R"))
+			{
+				return 1;
+			}
+			if(strstr($default_permission,"U")&&($permission=="U"))
 			{
 				return 1;
 			}
@@ -1099,6 +1106,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	update_trigger_status($triggerid,$status)
 	{
+		global	$ERROR_MSG;
+
+		if(!check_right_on_trigger("U",$triggerid))
+		{
+                        $ERROR_MSG="Insufficient permissions";
+                        return 0;
+		}
 		add_alarm($triggerid,3);
 		$sql="update triggers set istrue=$status where triggerid=$triggerid";
 		return	DBexecute($sql);
@@ -1108,6 +1122,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	update_item_status($itemid,$status)
 	{
+		global	$ERROR_MSG;
+
+                if(!check_right("Item","U",0))
+		{
+                        $ERROR_MSG="Insufficient permissions";
+                        return 0;
+		}
 		$sql="update items set status=$status where itemid=$itemid";
 		return	DBexecute($sql);
 	}
@@ -1147,6 +1168,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	add_action( $triggerid, $userid, $good, $delay, $subject, $message )
 	{
+		global	$ERROR_MSG;
+
+		if(!check_right_on_trigger("A",$triggerid))
+		{
+                        $ERROR_MSG="Insufficient permissions";
+                        return 0;
+		}
+
 		$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message) values ($triggerid,$userid,$good,$delay,0,'$subject','$message')";
 		return	DBexecute($sql);
 	}
@@ -1497,9 +1526,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		$sql="select max(clock) from alarms";
 		$result=DBselect($sql);
-		if(DBnum_rows($result) == 1)
+		$row=DBfetch($result);
+		if($row[0]!="")
 		{
-			$row=DBfetch($result);
 			$sql="select istrue from alarms where clock=".$row[0];
 			$result=DBselect($sql);
 			if(DBnum_rows($result) == 1)
@@ -1511,6 +1540,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				}
 			}
 		}
+
 		$now=time();
 		$sql="insert into alarms(triggerid,clock,istrue) values($triggerid,$now,$istrue)";
 		return	DBexecute($sql);
@@ -1585,6 +1615,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	update_trigger($triggerid,$expression,$description,$priority,$istrue,$comments,$url)
 	{
+		global	$ERROR_MSG;
+
+		if(!check_right_on_trigger("U",$triggerid))
+		{
+                        $ERROR_MSG="Insufficient permissions";
+                        return 0;
+		}
 
 		$result=delete_function_by_triggerid($triggerid);
 		if(!$result)
@@ -1697,6 +1734,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	update_graph($graphid,$name,$width,$height)
 	{
+		global	$ERROR_MSG;
+
+		if(!check_right("Graph","U",0))
+		{
+			$ERROR_MSG="Insufficient permissions";
+			return 0;
+		}
+
 		$sql="update graphs set name='$name',width=$width,height=$height where graphid=$graphid";
 		return	DBexecute($sql);
 	}
@@ -1721,6 +1766,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	add_graph($name,$width,$height)
 	{
+		global	$ERROR_MSG;
+
+		if(!check_right("Graph","A",0))
+		{
+			$ERROR_MSG="Insufficient permissions";
+			return 0;
+		}
+
 		$sql="insert into graphs (name,width,height) values ('$name',$width,$height)";
 		return	DBexecute($sql);
 	}

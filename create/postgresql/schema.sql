@@ -360,4 +360,13 @@ CREATE INDEX services_links_serviceupid on services_links (serviceupid);
 CREATE INDEX services_links_servicedownid on services_links (servicedownid);
 CREATE UNIQUE INDEX services_links_upidownid on services_links (serviceupid, servicedownid);
 
+CREATE TABLE rights (
+  rightid               serial,
+  userid                int4		DEFAULT '' NOT NULL,
+  name                  char(255)	DEFAULT '' NOT NULL,
+  permission            char(1)		DEFAULT '' NOT NULL,
+  id                    int4,
+  PRIMARY KEY (rightid)
+);
+
 VACUUM ANALYZE;
