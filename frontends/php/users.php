@@ -150,7 +150,6 @@
 			echo "<TR>";
 	}
 	table_end();
-	echo "<br>";
 ?>
 
 <?php
@@ -215,7 +214,6 @@
 <?php
 	if(isset($_GET["userid"]))
 	{
-	echo "<br>";
 	echo "<a name=\"form\"></a>";
 	show_table_header("USER PERMISSIONS");
 
@@ -261,10 +259,8 @@
 ?>
 
 <?php
-	echo "<br>";
 	@insert_usergroups_form($_GET["usrgrpid"]);
 
-	echo "<br>";
 	@insert_user_form($_GET["userid"]);
 ?>
 
