@@ -1,4 +1,4 @@
-#define USE_MYSQL 1
+#define USE_POSTGRESQL 1
 
 #ifndef MON_DB_H
 #define MON_DB_H
