@@ -167,6 +167,7 @@
 			($page["file"]=="latestalarms.html")||
 			($page["file"]=="alerts.html")||
 			($page["file"]=="history.html")||
+			($page["file"]=="maps.html")||
 			($page["file"]=="index.html"))
 		{
 			$sql="select password_required from config";
@@ -874,6 +875,14 @@
 		}
 	}
 
+	# Update System Map
+
+	function	update_sysmap($sysmapid,$name,$width,$height)
+	{
+		$sql="update sysmaps set name='$name',width=$width,height=$height where sysmapid=$sysmapid";
+		$result=DBexecute($sql);
+	}
+
 	# Add System Map
 
 	function	add_sysmap($name,$width,$height)
@@ -893,6 +902,12 @@
 	function add_host_to_sysmap($sysmapid,$hostid,$label,$x,$y)
 	{
 		$sql="insert into sysmaps_hosts (sysmapid,hostid,label,x,y) values ($sysmapid,$hostid,'$label',$x,$y)";
+		$result=DBexecute($sql);
+	}
+
+	function	update_sysmap_host($shostid,$sysmapid,$hostid,$label,$x,$y)
+	{
+		$sql="update sysmaps_hosts set hostid=$hostid,label='$label',x=$x,y=$y where shostid=$shostid";
 		$result=DBexecute($sql);
 	}
 

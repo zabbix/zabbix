@@ -6,6 +6,8 @@
 #	sysmapid
 #	noedit
 
+	$grid=50;
+
 	$result=DBselect("select name,width,height from sysmaps where sysmapid=$sysmapid");
 
 	$name=DBget_field($result,0,0);
@@ -37,12 +39,12 @@
 
 	if(!isset($noedit))
 	{
-		for($x=32;$x<$width;$x+=32)
+		for($x=$grid;$x<$width;$x+=$grid)
 		{
 			ImageDashedLine($im,$x,0,$x,$height,$black);
 			ImageString($im, 2, $x+2,2, $x , $black);
 		}
-		for($y=32;$y<$height;$y+=32)
+		for($y=$grid;$y<$height;$y+=$grid)
 		{
 			ImageDashedLine($im,0,$y,$width,$y,$black);
 			ImageString($im, 2, 2,$y+2, $y , $black);
