@@ -267,7 +267,7 @@ int	latest_alarm(int triggerid, int status)
 	return ret;
 }
 
-int	add_alarm(int triggerid, int status)
+int	DBadd_alarm(int triggerid, int status)
 {
 	int	now;
 	char	sql[MAX_STRING_LEN+1];
@@ -294,7 +294,7 @@ int	update_trigger_status(int triggerid,int status)
 	char	sql[MAX_STRING_LEN+1];
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_status()");
-	add_alarm(triggerid,status);
+	DBadd_alarm(triggerid,status);
 
 	sprintf(sql,"update triggers set istrue=%d where triggerid=%d",status,triggerid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
@@ -364,7 +364,7 @@ int DBupdate_host_status(int hostid,int status)
 	if(status == atoi(DBget_field(result,0,0)))
 	{
 		if((status==HOST_STATUS_UNREACHABLE) 
-		&&(now+DELAY_ON_NETWORK_FAILURE>atoi(DBget_field(result,0,1))) )
+		&&(now+DELAY_ON_NETWORK_FAILURE>disable_until) )
 		{
 		}
 		else
@@ -410,6 +410,61 @@ int DBupdate_host_status(int hostid,int status)
 
 	update_triggers_status_to_unknown(hostid);
 	zabbix_log(LOG_LEVEL_DEBUG,"End of update_host_status()");
+
+	return SUCCEED;
+}
+
+int	DBupdate_item_status_to_notsupported(int itemid)
+{
+	char	sql[MAX_STRING_LEN+1];
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBupdate_item_status_to_notsupported()");
+
+	sprintf(sql,"update items set status=%d where itemid=%d",ITEM_STATUS_NOTSUPPORTED,itemid);
+	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
+	DBexecute(sql);
+
+	return SUCCEED;
+}
+
+int	DBadd_history(int itemid, double value)
+{
+	int	now;
+	char	sql[MAX_STRING_LEN+1];
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In add_history()");
+
+	now=time(NULL);
+	sprintf(sql,"insert into history (clock,itemid,value) values (%d,%d,%g)",now,itemid,value);
+	DBexecute(sql);
+
+	return SUCCEED;
+}
+
+int	DBadd_history_str(int itemid, char *value)
+{
+	int	now;
+	char	sql[MAX_STRING_LEN+1];
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_str()");
+
+	now=time(NULL);
+	sprintf(sql,"insert into history_str (clock,itemid,value) values (%d,%d,'%s')",now,itemid,value);
+	DBexecute(sql);
+
+	return SUCCEED;
+}
+
+int	DBadd_alert(int actionid, char *type, char *sendto, char *subject, char *message)
+{
+	int	now;
+	char	sql[MAX_STRING_LEN+1];
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In add_alert()");
+
+	now = time(NULL);
+	sprintf(sql,"insert into alerts (alertid,actionid,clock,type,sendto,subject,message) values (NULL,%d,%d,'%s','%s','%s','%s')",actionid,now,type,sendto,subject,message);
+	DBexecute(sql);
 
 	return SUCCEED;
 }

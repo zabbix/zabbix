@@ -24,13 +24,13 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.20)
+Zabbix Reference Manual for version 1.0 (draft v1.21)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-26 May 2002
+02 June 2002
 \layout Abstract
 
 The document is Reference Manual for Zabbix version 1.0.
@@ -1188,6 +1188,16 @@ or
 
 \newline 
 
+\begin_float footnote 
+\layout Standard
+
+Use flag --enable-static to statically link libraries.
+ If you plan to distribute compiled binaries among different servers, you
+ must use this flag to make these binaries work without required libraries.
+\end_float 
+
+\emph on 
+
 \newline 
 
 \emph default 
@@ -1718,6 +1728,17 @@ You want to compile client binaries only:
 
 \newline 
 ./configure
+\begin_float footnote 
+\layout Standard
+
+Use flag --enable-static to statically link libraries.
+ If you plan to distribute compiled binaries among different servers, you
+ must use this flag to make these binaries work without required libraries.
+\end_float 
+
+\family typewriter 
+\emph on 
+
 \newline 
 
 \family default 

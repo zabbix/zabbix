@@ -420,7 +420,6 @@ void	send_to_user(int actionid,int userid,char *smtp_server,char *smtp_helo,char
 	DB_RESULT *result;
 
 	int	i;
-	int	now;
 
 	sprintf(sql,"select type,sendto,active from media where active=%d and userid=%d",MEDIA_STATUS_ACTIVE,userid);
 	result = DBselect(sql);
@@ -445,9 +444,7 @@ void	send_to_user(int actionid,int userid,char *smtp_server,char *smtp_helo,char
 			{
 				zabbix_log( LOG_LEVEL_ERR, "Error sending email to '%s' Subject:'%s' to userid:%d\n", media.sendto, subject, userid );
 			}
-			now = time(NULL);
-			sprintf(sql,"insert into alerts (alertid,actionid,clock,type,sendto,subject,message) values (NULL,%d,%d,'%s','%s','%s','%s');",actionid,now,media.type,media.sendto,subject,message);
-			DBexecute(sql);
+			DBadd_alert(actionid,media.type,media.sendto,subject,message);
 		} 
 		else
 		{
@@ -524,8 +521,6 @@ void	apply_actions(int triggerid,int good)
 
 		substitute_macros(action.message);
 		substitute_macros(action.subject); 
-/*		substitute_macros(&*action.message);
-		substitute_macros(&*action.subject); */
 
 		send_to_user(action.actionid,action.userid,smtp_server,smtp_helo,smtp_email,action.subject,action.message);
 		now = time(NULL);
@@ -577,19 +572,26 @@ void	update_serv(int serviceid)
 /*
  * Recursive function!
  */
-void	update_services(int triggerid, int istrue)
+void	update_services(int triggerid, int status)
 {
 	char	sql[MAX_STRING_LEN+1];
 	int	i;
 
 	DB_RESULT *result;
 
-	sprintf(sql,"update services set status=%d where triggerid=%d",istrue,triggerid);
+	sprintf(sql,"update services set status=%d where triggerid=%d",status,triggerid);
 	DBexecute(sql);
 
 
 	sprintf(sql,"select serviceid from services where triggerid=%d", triggerid);
 	result = DBselect(sql);
+
+	if(DBis_empty(result) == SUCCEED)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "No service for this triggerid [%d [%d]", triggerid);
+		DBfree_result(result);
+		return;
+	}
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
@@ -605,42 +607,42 @@ void	update_services(int triggerid, int istrue)
 */ 
 void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 {
-	char sql[MAX_STRING_LEN+1];
-	char exp[MAX_STRING_LEN+1];
-	int b;
-	DB_TRIGGER trigger;
-	DB_RESULT *result;
-
-	int	i,rows;
+	char	sql[MAX_STRING_LEN+1];
+	char	exp[MAX_STRING_LEN+1];
+	int	b;
 	int	now;
+	DB_TRIGGER	trigger;
+	DB_RESULT	*result;
+
+	int	i;
 
 	if(flag == 0)
 	{
 		now=time(NULL);
 /* Added table hosts to eliminate unnecessary update of triggers */
-		sprintf(sql,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f,items i,hosts h where i.hostid=h.hostid and i.status<>3 and i.itemid=f.itemid and i.lastclock<=%d and t.istrue!=2 and f.triggerid=t.triggerid and f.itemid%%%d=%d and (h.status=0 or (h.status=2 and h.disable_until<%d)) group by t.triggerid,t.expression,t.istrue,t.dep_level",lastclock,suckers-1,sucker_num-1,now);
+		sprintf(sql,"select t.triggerid,t.expression,t.istrue,t.dep_level,t.priority from triggers t,functions f,items i,hosts h where i.hostid=h.hostid and i.status<>3 and i.itemid=f.itemid and i.lastclock<=%d and t.istrue!=2 and f.triggerid=t.triggerid and f.itemid%%%d=%d and (h.status=0 or (h.status=2 and h.disable_until<%d)) group by t.triggerid,t.expression,t.istrue,t.dep_level",lastclock,suckers-1,sucker_num-1,now);
 	}
 	else
 	{
-		sprintf(sql,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.istrue!=2 and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.istrue,t.dep_level",sucker_num);
+		sprintf(sql,"select t.triggerid,t.expression,t.istrue,t.dep_level,t.priority from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.istrue!=2 and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.istrue,t.dep_level",sucker_num);
 	}
 
 	result = DBselect(sql);
 
-	rows = DBnum_rows(result);
-
-	if(rows == 0)
+	if(DBis_empty(result) == SUCCEED)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "No triggers to update" );
 		DBfree_result(result);
 		return;
 	}
-	for(i=0;i<rows;i++)
+
+	for(i=0;i<DBnum_rows(result);i++)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "Fetched: TrId[%s] Exp[%s] IsTrue[%s]\n", DBget_field(result,i,0),DBget_field(result,i,1),DBget_field(result,i,2));
 		trigger.triggerid=atoi(DBget_field(result,i,0));
 		trigger.expression=DBget_field(result,i,1);
 		trigger.istrue=atoi(DBget_field(result,i,2));
+		trigger.priority=atoi(DBget_field(result,i,4));
 		strncpy(exp, trigger.expression, MAX_STRING_LEN);
 		if( evaluate_expression(&b, exp) != 0 )
 		{
@@ -655,10 +657,8 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 				now = time(NULL);
 				sprintf(sql,"update triggers set istrue=%d, lastchange=%d where triggerid=%d",TRIGGER_STATUS_TRUE,now,trigger.triggerid);
 				DBexecute(sql);
-	
-				now = time(NULL);
-				sprintf(sql,"insert into alarms(triggerid,clock,istrue) values(%d,%d,%d)",trigger.triggerid,now,TRIGGER_STATUS_TRUE);
-				DBexecute(sql);
+
+				DBadd_alarm(trigger.triggerid, TRIGGER_STATUS_FALSE);
 			}
 			if(trigger.istrue==TRIGGER_STATUS_FALSE)
 			{
@@ -668,7 +668,7 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 				sprintf(sql,"update actions set nextcheck=0 where triggerid=%d and good=0",trigger.triggerid);
 				DBexecute(sql);
 
-				update_services(trigger.triggerid, 1);
+				update_services(trigger.triggerid, trigger.priority);
 			}
 		}
 
@@ -680,9 +680,7 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 				sprintf(sql,"update triggers set istrue=%d, lastchange=%d where triggerid=%d",TRIGGER_STATUS_FALSE,now,trigger.triggerid);
 				DBexecute(sql);
 
-				now = time(NULL);
-				sprintf(sql,"insert into alarms(triggerid,clock,istrue) values(%d,%d,%d)",trigger.triggerid,now,TRIGGER_STATUS_FALSE);
-				DBexecute(sql);
+				DBadd_alarm(trigger.triggerid, TRIGGER_STATUS_FALSE);
 			}
 
 			if(trigger.istrue==TRIGGER_STATUS_TRUE)
@@ -833,20 +831,22 @@ void	process_new_value(DB_ITEM *item,char *value)
 	double	value_double;
 	char	*e;
 
-	now = time(NULL);
 
 	value_double=strtod(value,&e);
 
 	if(item->history>0)
 	{
 		if(item->value_type==0)
-			sprintf(sql,"insert into history (itemid,clock,value) \
-				values (%d,%d,%g)",item->itemid,now,value_double);
+		{
+			DBadd_history(item->itemid,value_double);
+		}
 		else
-			sprintf(sql,"insert into history_str (itemid,clock,value) 
-				values (%d,%d,'%s')",item->itemid,now,value);
-		DBexecute(sql);
+		{
+			DBadd_history_str(item->itemid,value);
+		}
 	}
+
+	now = time(NULL);
 
 	if((item->prevvalue_null == 1) || (strcmp(value,item->lastvalue_str) != 0) || (strcmp(item->prevvalue_str,item->lastvalue_str) != 0) )
 	{
