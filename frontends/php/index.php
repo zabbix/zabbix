@@ -48,6 +48,8 @@
 
 	if(isset($reconnect))
 	{
+		$sql="delete from sessions where sessionid='$sessionid'";
+		DBexecute($sql);
 		setcookie("sessionid",$sessionid,time()-3600);
 		unset($sessionid);
 	}
@@ -65,6 +67,8 @@
 			$USER_DETAILS["surname"]=DBget_field($result,0,3);
 			$sessionid=md5(time().$password.$name.rand(0,10000000));
 			setcookie("sessionid",$sessionid,time()+3600);
+// Required !
+			$HTTP_COOKIE_VARS["sessionid"]=$sessionid;
 			$sql="insert into sessions (sessionid,userid,lastaccess) values ('$sessionid',".$USER_DETAILS["userid"].",".time().")";
 			DBexecute($sql);
 		}
