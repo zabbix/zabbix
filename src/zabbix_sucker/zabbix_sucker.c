@@ -61,26 +61,29 @@
 #include "expression.h"
 #include "log.h"
 
+#include "alerter.h"
+
 #include "../zabbix_agent/sysinfo.h"
 
 static	pid_t	*pids=NULL;
 
 static	int	sucker_num=0;
 
-static	int	CONFIG_SUCKERD_FORKS		=SUCKER_FORKS;
-static	int	CONFIG_NOTIMEWAIT		=0;
-static	int	CONFIG_TIMEOUT			=SUCKER_TIMEOUT;
-static	int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
-static	int	CONFIG_SENDER_FREQUENCY		= 30;
-static	int	CONFIG_DISABLE_HOUSEKEEPING	= 0;
-static	int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
-static	char	*CONFIG_PID_FILE		= NULL;
-static	char	*CONFIG_LOG_FILE		= NULL;
-static	char	*CONFIG_DBHOST			= NULL;
-static	char	*CONFIG_DBNAME			= NULL;
-static	char	*CONFIG_DBUSER			= NULL;
-static	char	*CONFIG_DBPASSWORD		= NULL;
-static	char	*CONFIG_DBSOCKET		= NULL;
+int	CONFIG_SUCKERD_FORKS		=SUCKER_FORKS;
+int	CONFIG_NOTIMEWAIT		=0;
+int	CONFIG_TIMEOUT			=SUCKER_TIMEOUT;
+int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
+int	CONFIG_SENDER_FREQUENCY		= 30;
+int	CONFIG_DISABLE_HOUSEKEEPING	= 0;
+int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
+char	*CONFIG_PID_FILE		= NULL;
+char	*CONFIG_LOG_FILE		= NULL;
+char	*CONFIG_ALERT_SCRIPTS_PATH	= NULL;
+char	*CONFIG_DBHOST			= NULL;
+char	*CONFIG_DBNAME			= NULL;
+char	*CONFIG_DBUSER			= NULL;
+char	*CONFIG_DBPASSWORD		= NULL;
+char	*CONFIG_DBSOCKET		= NULL;
 
 void	uninit(void)
 {
@@ -239,6 +242,7 @@ void	init_config(void)
 		{"DebugLevel",&CONFIG_LOG_LEVEL,0,TYPE_INT,PARM_OPT,0,4},
 		{"PidFile",&CONFIG_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"LogFile",&CONFIG_LOG_FILE,0,TYPE_STRING,PARM_OPT,0,0},
+		{"AlertScriptsPath",&CONFIG_ALERT_SCRIPTS_PATH,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBHost",&CONFIG_DBHOST,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBName",&CONFIG_DBNAME,0,TYPE_STRING,PARM_MAND,0,0},
 		{"DBUser",&CONFIG_DBUSER,0,TYPE_STRING,PARM_OPT,0,0},
@@ -257,6 +261,10 @@ void	init_config(void)
 	if(CONFIG_PID_FILE == NULL)
 	{
 		CONFIG_PID_FILE=strdup("/tmp/zabbix_suckerd.pid");
+	}
+	if(CONFIG_ALERT_SCRIPTS_PATH == NULL)
+	{
+		CONFIG_ALERT_SCRIPTS_PATH=strdup("/home/zabbix/bin");
 	}
 }
 
@@ -345,7 +353,7 @@ int	get_value_SNMP(int version,double *result,char *result_str,DB_ITEM *item)
 				(vars->type == ASN_GAUGE)
 			)
 			{
-				*result=*vars->val.integer;
+				*result=(long)*vars->val.integer;
 				/*
 				 * This solves situation when large numbers are stored as negative values
 				 * http://sourceforge.net/tracker/index.php?func=detail&aid=700145&group_id=23494&atid=378683
@@ -1016,95 +1024,6 @@ int housekeeping_alarms(int now)
 	return res;
 }
 
-int main_alerter_loop()
-{
-	char	smtp_server[MAX_STRING_LEN+1];
-	char	smtp_helo[MAX_STRING_LEN+1];
-	char	smtp_email[MAX_STRING_LEN+1];
-
-	char	sql[MAX_STRING_LEN+1];
-
-	int	i,res;
-
-	struct	sigaction phan;
-
-	DB_RESULT	*result;
-	DB_ALERT	alert;
-
-	for(;;)
-	{
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("connecting to the database");
-#endif
-		DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
-
-		sprintf(sql,"select smtp_server,smtp_helo,smtp_email from config");
-		result = DBselect(sql);
-		if(DBnum_rows(result) == 0)
-		{
-			zabbix_log( LOG_LEVEL_ERR, "No records in table 'config'.");
-			DBfree_result(result);
-			exit (FAIL);
-		}
-		strncpy(smtp_server,DBget_field(result,0,0), MAX_STRING_LEN);
-		strncpy(smtp_helo,DBget_field(result,0,1), MAX_STRING_LEN);
-		strncpy(smtp_email,DBget_field(result,0,2), MAX_STRING_LEN);
-		DBfree_result(result);
-
-		sprintf(sql,"select alertid,type,sendto,subject,message,status,retries from alerts where status=0 and retries<3 order by clock");
-		result = DBselect(sql);
-
-		for(i=0;i<DBnum_rows(result);i++)
-		{
-			alert.alertid=atoi(DBget_field(result,i,0));
-			alert.type=DBget_field(result,i,1);
-			alert.sendto=DBget_field(result,i,2);
-			alert.subject=DBget_field(result,i,3);
-			alert.message=DBget_field(result,i,4);
-			alert.status=atoi(DBget_field(result,i,5));
-			alert.retries=atoi(DBget_field(result,i,6));
-
-			if(strcmp(alert.type,ALERT_TYPE_EMAIL)==0)
-			{
-
-				phan.sa_handler = &signal_handler;
-				sigemptyset(&phan.sa_mask);
-				phan.sa_flags = 0;
-				sigaction(SIGALRM, &phan, NULL);
-
-				/* Hardcoded value */
-				alarm(10);
-				res = send_email(smtp_server,smtp_helo,smtp_email,alert.sendto,alert.subject,alert.message);
-				alarm(0);
-				if(FAIL == res)
-				{
-					zabbix_log( LOG_LEVEL_ERR, "Error sending email to '%s' Subject:'%s'", alert.sendto, alert.subject);
-					sprintf(sql,"update alerts set retries=retries+1 where alertid=%d", alert.alertid);
-					DBexecute(sql);
-				}
-				else
-				{
-					sprintf(sql,"update alerts set status=1 where alertid=%d", alert.alertid);
-					DBexecute(sql);
-				}
-			}
-			else
-			{
-					sprintf(sql,"update alerts set retries=3 where alertid=%d", alert.alertid);
-					DBexecute(sql);
-					zabbix_log( LOG_LEVEL_ERR, "Unsupported type of alert [%s] Alert ID [%d]", alert.type, alert.alertid );
-			}
-		}	
-		DBfree_result(result);
-
-		DBclose();
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("sender [sleeping for %d seconds]", CONFIG_SENDER_FREQUENCY);
-#endif
-		sleep(CONFIG_SENDER_FREQUENCY);
-	}
-}
-
 int main_nodata_loop()
 {
 	char	sql[MAX_STRING_LEN+1];
@@ -1320,13 +1239,13 @@ int main(int argc, char **argv)
 
 	if( sucker_num == 0)
 	{
-/* First instance of zabbix_suckerd does housekeeping procedures */
+/* First instance of zabbix_suckerd performs housekeeping procedures */
 		main_housekeeping_loop();
 	}
 	else if(sucker_num == 1)
 	{
 /* Second instance of zabbix_suckerd sends alerts to users */
-		main_alerter_loop();
+		alerter_loop();
 	}	
 	else if(sucker_num == 2)
 	{
