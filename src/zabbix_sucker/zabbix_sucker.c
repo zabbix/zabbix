@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
 
@@ -76,7 +77,7 @@ int	get_value(double *result,char *key,char *host,int port)
 	struct sockaddr_in myaddr_in;
 	struct sockaddr_in servaddr_in;
 
-	syslog( LOG_DEBUG, "%10s%25s\t", host, key );
+	syslog( LOG_DEBUG, "%10s%25s", host, key );
 
 	servaddr_in.sin_family=AF_INET;
 	hp=gethostbyname(host);
@@ -169,14 +170,13 @@ int get_minnextcheck(void)
 	char		c[1024];
 
 	DB_RESULT	*result;
-	DB_ROW		row;
+	char		*field;
 
 	int		res;
 
 	sprintf(c,"select min(nextcheck) from items i,hosts h where i.status=0 and h.status=0 and h.hostid=i.hostid and i.status=0");
-	DBexecute(c);
+	result = DBselect(c);
 
-	result = DBget_result();
 	if(result==NULL)
 	{
 		syslog(LOG_DEBUG, "No items to update for minnextcheck.");
@@ -190,14 +190,14 @@ int get_minnextcheck(void)
 		return	FAIL;
 	}
 
-	row = DBfetch_row(result);
-	if( row[0] == NULL )
+	field = DBget_field(result,0,0);
+	if( field == NULL )
 	{
 		DBfree_result(result);
 		return	FAIL;
 	}
 
-	res=atoi(row[0]);
+	res=atoi(field);
 	DBfree_result(result);
 
 	return	res;
@@ -210,29 +210,33 @@ int get_values(void)
 	ITEM		item;
  
 	DB_RESULT	*result;
-	DB_ROW		row;
 
-	sprintf(c,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.history,i.lastdelete from items i,hosts h where i.nextcheck<=unix_timestamp() and i.status=0 and h.status=0 and h.hostid=i.hostid order by i.nextcheck");
-	DBexecute(c);
+	int		i,rows;
+	int		now;
 
-	result = DBget_result();
+	now = time(NULL);
+
+	sprintf(c,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.history,i.lastdelete from items i,hosts h where i.nextcheck<=%d and i.status=0 and h.status=0 and h.hostid=i.hostid order by i.nextcheck", now);
+	result = DBselect(c);
+
 	if(result==NULL)
 	{
 		syslog( LOG_DEBUG, "No items to update.");
 		DBfree_result(result);
 		return SUCCEED; 
 	}
-	while ( (row = DBfetch_row(result)) != NULL )
+	rows = DBnum_rows(result);
+
+	for(i=0;i<rows;i++)
 	{
-		item.itemid=atoi(row[0]);
-		item.key=row[1];
-		item.host=row[2];
-		item.port=atoi(row[3]);
-		item.delay=atoi(row[4]);
-		item.description=row[5];
-		item.history=atoi(row[6]);
-		item.lastdelete=atoi(row[7]);
-		item.shortname=row[8];
+		item.itemid=atoi(DBget_field(result,i,0));
+		item.key=DBget_field(result,i,1);
+		item.host=DBget_field(result,i,2);
+		item.port=atoi(DBget_field(result,i,3));
+		item.delay=atoi(DBget_field(result,i,4));
+		item.description=DBget_field(result,i,5);
+		item.history=atoi(DBget_field(result,i,6));
+		item.lastdelete=atoi(DBget_field(result,i,7));
 
 		if( get_value(&value,item.key,item.host,item.port) == SUCCEED )
 		{
@@ -243,10 +247,11 @@ int get_values(void)
 			}
 			else
 			{
-				sprintf(c,"insert into history (itemid,clock,value) values (%d,unix_timestamp(),%g)",item.itemid,value);
+				now = time(NULL);
+				sprintf(c,"insert into history (itemid,clock,value) values (%d,%d,%g)",item.itemid,now,value);
 				DBexecute(c);
 
-				sprintf(c,"update items set NextCheck=unix_timestamp()+%d,PrevValue=LastValue,LastValue=%f,LastClock=unix_timestamp() where ItemId=%d",item.delay,value,item.itemid);
+				sprintf(c,"update items set NextCheck=%d+%d,PrevValue=LastValue,LastValue=%f,LastClock=%d where ItemId=%d",now,item.delay,value,now,item.itemid);
 				DBexecute(c);
 
 				if( update_functions( item.itemid ) == FAIL)
@@ -263,10 +268,12 @@ int get_values(void)
 
 		if(item.lastdelete+3600<time(NULL))
 		{
-			sprintf	(c,"delete from history where ItemId=%d and Clock<unix_timestamp()-%d",item.itemid,item.history);
+			now = time(NULL);
+			sprintf	(c,"delete from history where ItemId=%d and Clock<%d-%d",item.itemid,now,item.history);
 			DBexecute(c);
 	
-			sprintf(c,"update items set LastDelete=unix_timestamp() where ItemId=%d",item.itemid);
+			now = time(NULL);
+			sprintf(c,"update items set LastDelete=%d where ItemId=%d",now,item.itemid);
 			DBexecute(c);
 		}
 	}
@@ -276,8 +283,7 @@ int get_values(void)
 
 int main_loop()
 {
-	time_t now;
-
+	int	now;
 	int	nextcheck,sleeptime;
 
 	for(;;)
@@ -285,10 +291,10 @@ int main_loop()
 		now=time(NULL);
 		get_values();
 
-		syslog( LOG_DEBUG, "Spent %d seconds while updating values", time(NULL)-now );
+		syslog( LOG_DEBUG, "Spent %d seconds while updating values", (int)time(NULL)-now );
 
 		nextcheck=get_minnextcheck();
-		syslog( LOG_DEBUG, "Nextcheck:%d Time:%d", nextcheck,time(NULL) );
+		syslog( LOG_DEBUG, "Nextcheck:%d Time:%d", nextcheck, (int)time(NULL) );
 
 		if( FAIL == nextcheck)
 		{
@@ -326,7 +332,7 @@ int main(int argc, char **argv)
 
 
 	openlog("zabbix_sucker",LOG_PID,LOG_USER);
-//      ret=setlogmask(LOG_UPTO(LOG_DEBUG));
+//	ret=setlogmask(LOG_UPTO(LOG_DEBUG));
 	ret=setlogmask(LOG_UPTO(LOG_WARNING));
 
 	syslog( LOG_WARNING, "zabbix_sucker started");
