@@ -43,7 +43,6 @@ With some research I've discovered that if I disable the SNMP item (which
 is obviously failing to get to the router) the icmpping trigger comes up as
 TRUE and will stay there until the fault has been cleared.
 
-
  - add information about integration with OpenView to the manual
  - add tabs to all screens where required
  - check all screens if they are user friendly and present information in the best possible way
@@ -52,7 +51,6 @@ TRUE and will stay there until the fault has been cleared.
  - add advanced task scheduler/executor to ZABBIX
  - agent incorrectly returns amount of free/available memory on HP-UX (must be 24GB)
  - add failure (timeouts, network errors, etc) reasons to items and hosts
- - use getopt() from unistd.h for config paths
  - get rid of net[listen_*] in templates
  - use assert() for critical functions
  - check if simple checks  (FTP, SMTP!) works correctly when host name (not IP) is used
@@ -74,9 +72,6 @@ grep -R printf * | grep -v "\%\|Makefile\|Binary"
 extensive use of atoi rather than something w/ bounds checking like strtol.
 
 Most of the signal handlers all need to delay or block signals to avoid signal race conditions, as they call non-reentrant functions.
-
- - check snprintf() from http://www.ijs.si/software/snprintf/. Better implementation of sprintf?
- -support of Oracle
 
  - in user administration, add many resources from a list (not by one ID)
  - availability report for day/week/month/etc
