@@ -782,11 +782,13 @@ float	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose)
 	s = socket(AF_INET, SOCK_STREAM, 0);
 	if (s == -1)
 	{
+		close(s);
 		return	0;
 	}
 
 	if (connect(s, (struct sockaddr *) &addr, addrlen) == -1)
 	{
+		close(s);
 		return	0;
 	}
 
