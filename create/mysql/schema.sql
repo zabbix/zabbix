@@ -31,12 +31,14 @@ insert into groups (groupid,name) values (2,"Zabbix user");
 
 CREATE TABLE alerts (
   alertid		int(4)		NOT NULL auto_increment,
+  actionid		int(4)		DEFAULT '0' NOT NULL,
   clock			int(4)		DEFAULT '0' NOT NULL,
   type			varchar(10)	DEFAULT '' NOT NULL,
   sendto		varchar(100)	DEFAULT '' NOT NULL,
   subject		varchar(255)	DEFAULT '' NOT NULL,
   message		varchar(255)	DEFAULT '' NOT NULL,
   PRIMARY KEY (alertid),
+  INDEX (actionid),
   KEY clock (clock)
 );
 

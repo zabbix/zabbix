@@ -129,7 +129,7 @@ void	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	free(c); 
 }
 
-void	send_to_user(int userid,char *smtp_server,char *smtp_helo,char *smtp_email,char *subject,char *message)
+void	send_to_user(int actionid,int userid,char *smtp_server,char *smtp_helo,char *smtp_email,char *subject,char *message)
 {
 	MEDIA media;
 	char c[1024];
@@ -155,7 +155,7 @@ void	send_to_user(int userid,char *smtp_server,char *smtp_helo,char *smtp_email,
 			{
 				dbg_write( dbg_proginfo, "Email sending to %s %s Subject:%s Message:%s to %d\n", media.type, media.sendto, subject, message, userid );
 				send_mail(smtp_server,smtp_helo,smtp_email,media.sendto,subject,message);
-				sprintf(c,"insert into alerts (alertid,clock,type,sendto,subject,message) values (NULL,unix_timestamp(),'%s','%s','%s','%s');",media.type,media.sendto,subject,message);
+				sprintf(c,"insert into alerts (alertid,actionid,clock,type,sendto,subject,message) values (NULL,%d,unix_timestamp(),'%s','%s','%s','%s');",actionid,media.type,media.sendto,subject,message);
 				DBexecute(c);
 			} 
 			else
@@ -214,7 +214,7 @@ void	apply_actions(int triggerid,int good)
 		substitute_functions(&*action.message);
 		substitute_functions(&*action.subject); 
 
-		send_to_user(action.userid,smtp_server,smtp_helo,smtp_email,action.subject,action.message);
+		send_to_user(action.actionid,action.userid,smtp_server,smtp_helo,smtp_email,action.subject,action.message);
 		sprintf(c,"update actions set nextcheck=unix_timestamp()+%d where actionid=%d",action.delay,action.actionid);
 		DBexecute(c);
 	}
