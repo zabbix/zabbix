@@ -37,6 +37,26 @@
 			show_messages($result,"Item added","Cannot add item");
 			unset($HTTP_GET_VARS["itemid"]);
 		}
+		if($HTTP_GET_VARS["register"]=="add to all hosts")
+		{
+			$result=DBselect("select hostid,host from hosts order by host");
+			$hosts_ok="";
+			$hosts_notok="";
+			while($row=DBfetch($result))
+			{
+				$result2=add_item($HTTP_GET_VARS["description"],$HTTP_GET_VARS["key"],$row["hostid"],$HTTP_GET_VARS["delay"],$HTTP_GET_VARS["history"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["type"],$HTTP_GET_VARS["snmp_community"],$HTTP_GET_VARS["snmp_oid"],$HTTP_GET_VARS["value_type"],$HTTP_GET_VARS["trapper_hosts"]);
+				if($result2)
+				{
+					$hosts_ok=$hosts_ok." ".$row["host"];
+				}
+				else
+				{
+					$hosts_notok=$hosts_notok." ".$row["host"];
+				}
+			}
+			show_messages(TRUE,"Items added]<br>[Success for '$hosts_ok']<br>[Failed for '$hosts_notok'","Cannot add item");
+			unset($HTTP_GET_VARS["itemid"]);
+		}
 		if($HTTP_GET_VARS["register"]=="delete")
 		{
 			$result=delete_item($HTTP_GET_VARS["itemid"]);
@@ -49,12 +69,12 @@
 			while($row=DBfetch($result))
 			{
 // $$ is correct here
-				if(isset($$row["itemid"]))
+				if(isset($HTTP_GET_VARS[$row["itemid"]]))
 				{
 					$result2=delete_item($row["itemid"]);
 				}
 			}
-			show_messages($result2,"Items deleted","Cannot delete items");
+			show_messages(TRUE,"Items deleted","Cannot delete items");
 		}
 	}
 ?>
