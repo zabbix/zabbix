@@ -39,7 +39,6 @@ TOP PRIORITY:
  - set sort priorities for IT Services
  - support of fetch_html[*]
  - link map's line to a trigger
- - monitoring of disk I/O
  - restructure sources
  - support for automake
  - ability to add a library of  userwritten c-functions with dlopen/dlsym to
@@ -157,7 +156,6 @@ WIN32 Agent:
  OTHER:
 
  - support for netload under other platforms
- - support for disk loads
  - round MIN/MAX/AVG numbers for graphs
  - calculate MIN value for graphs (do not use '0')
  - use JS in forms
