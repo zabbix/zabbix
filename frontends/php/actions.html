@@ -144,7 +144,7 @@
 			$host=DBget_field($result,$i,1);
 			$key=DBget_field($result,$i,2);
 			$message=$message."$description: \{$host:$key.last(0)}  (latest value)\n";
-			$message=$message."$description: \{$host:$key.max(300)} (maxumum value for last 5 min)\n";
+			$message=$message."$description: \{$host:$key.max(300)} (maximum value for last 5 min)\n";
 			$message=$message."$description: \{$host:$key.min(300)} (minimum value for last 5 min)\n\n";
 		}
 		$message=$message."---------End--------\n";

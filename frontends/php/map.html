@@ -111,12 +111,12 @@
 		}
 		else
 		{
-			$result1=DBselect("select count(*) from items i,functions f,triggers t,hosts h where h.hostid=i.hostid and i.hostid=$hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.istrue=1 and h.status=0");
+			$result1=DBselect("select count(*) from items i,functions f,triggers t,hosts h where h.hostid=i.hostid and i.hostid=$hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.istrue=1 and h.status=0 and i.status=0");
 			$count=DBget_field($result1,0,0);
 			if($count==1)
 			{
 				$color=$red;
-				$result1=DBselect("select t.description from items i,functions f,triggers t,hosts h where h.hostid=i.hostid and i.hostid=$hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.istrue=1 and h.status=0");
+				$result1=DBselect("select t.description from items i,functions f,triggers t,hosts h where h.hostid=i.hostid and i.hostid=$hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.istrue=1 and h.status=0 and i.status=0");
 				$label=DBget_field($result1,0,0);
 			}
 			else if($count>1)
