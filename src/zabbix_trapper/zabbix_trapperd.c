@@ -221,7 +221,7 @@ int	tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
 
 	if( (n = getaddrinfo(host,serv, &hints, &res)) != 0)
 	{
-		perror("getaddrinfo()");
+		syslog( LOG_CRIT, "getaddrinfo()");
 		exit(1);
 	}
 
@@ -233,7 +233,7 @@ int	tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
 				continue;
 		if(setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) !=0 )
 		{
-			perror("setsockopt()");
+			syslog( LOG_CRIT, "setsockopt()");
 			exit(1);
 		}
 		if(bind(listenfd,res->ai_addr,res->ai_addrlen) == 0)
@@ -243,13 +243,13 @@ int	tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
 
 	if (res == NULL)
 	{
-		perror("tcp_listen");
+		syslog( LOG_CRIT, "tcp_listen()");
 		exit(1);
 	}
 
 	if(listen(listenfd, LISTENQ) !=0 )
 	{
-		perror("listen()");
+		syslog( LOG_CRIT, "listen()");
 		exit(1);
 	}
 

@@ -108,6 +108,42 @@
   	if(isset($fullscreen))
 	{
 		show_table_header("<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact\">TRIGGERS $time</A>");
+
+		$cond="";
+		if(isset($hostid))
+		{
+			$cond=" and h.hostid=$hostid ";
+		}
+		if($onlytrue=='true')
+		{
+			$result=DBselect("select t.priority,count(*) from triggers t,hosts h,items i,functions f  where t.istrue=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status in (0,2) $cond group by 1");
+		}
+		else
+		{
+			$result=DBselect("select t.priority,count(*) from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status in (0,2) $cond group by 1");
+		}
+		$p0=$p1=$p2=$p3=$p4=$p5=0;
+		for($i=0;$i<DBnum_rows($result);$i++)
+		{
+			$priority=DBget_field($result,$i,0);
+			$count=DBget_field($result,$i,1);
+			if($priority==0) $p0=$count;
+			if($priority==1) $p1=$count;
+			if($priority==2) $p2=$count;
+			if($priority==3) $p3=$count;
+			if($priority==4) $p4=$count;
+			if($priority==5) $p5=$count;
+		}
+		echo "\n<TABLE BORDER=0 COLS=6 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=0>";
+		echo "<TR ALIGN=CENTER>";
+		echo "<TD><B>Not classified: $p0</B></TD>";
+		echo "<TD><B>Just information: $p1</B></TD>";
+		echo "<TD><B>Warning: $p2</B></TD>";
+		echo "<TD BGCOLOR=#DDAAAA><B>Average: $p3</B></TD>";
+		echo "<TD BGCOLOR=#FF8888><B>High: $p4</B></TD>";
+		echo "<TD BGCOLOR=RED><B>Disaster: $p5</B></TD>";
+		echo "</TR>";
+		echo "</TABLE>";
 	}
 	else
 	{
@@ -192,8 +228,6 @@
 		{ echo "<TD ALIGN=CENTER><FONT COLOR=\"00AA00\">FALSE</FONT></TD>";}
 		elseif($istrue==2)
 		{ echo "<TD ALIGN=CENTER><FONT COLOR=\"777777\">DISABLED</FONT></TD>";  }
-		elseif($istrue==3)
-		{ echo "<TD ALIGN=CENTER><FONT COLOR=\"777777\">MODIFIED</FONT></TD>";  }
 		else 
 		{  echo "<TD ALIGN=CENTER><FONT COLOR=\"AA0000\">TRUE</FONT></TD>"; }
 

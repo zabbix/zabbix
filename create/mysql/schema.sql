@@ -222,11 +222,11 @@ CREATE TABLE items (
 	lastclock	int(4) DEFAULT NULL,
 	prevvalue	double(16,4) DEFAULT NULL,
 	status		int(4) DEFAULT '0' NOT NULL,
-	PRIMARY KEY (itemid),
-	UNIQUE shortname (hostid,key_),
-	KEY (hostid),
-	KEY (nextcheck),
-	KEY (status)
+	PRIMARY KEY	(itemid),
+	UNIQUE		shortname (hostid,key_),
+	KEY		(hostid),
+	KEY		(nextcheck),
+	KEY		(status)
 );
 
 #
@@ -234,13 +234,13 @@ CREATE TABLE items (
 #
 
 CREATE TABLE media (
-  mediaid int(4) NOT NULL auto_increment,
-  userid int(4) DEFAULT '0' NOT NULL,
-  type varchar(10) DEFAULT '' NOT NULL,
-  sendto varchar(100) DEFAULT '' NOT NULL,
-  active int(4) DEFAULT '0' NOT NULL,
-  PRIMARY KEY (mediaid),
-  KEY (userid)
+	mediaid		int(4) NOT NULL auto_increment,
+	userid		int(4) DEFAULT '0' NOT NULL,
+	type		varchar(10) DEFAULT '' NOT NULL,
+	sendto		varchar(100) DEFAULT '' NOT NULL,
+	active		int(4) DEFAULT '0' NOT NULL,
+	PRIMARY KEY	(mediaid),
+	KEY		(userid)
 );
 
 #
@@ -248,16 +248,28 @@ CREATE TABLE media (
 #
 
 CREATE TABLE triggers (
-  triggerid int(4) NOT NULL auto_increment,
-  expression varchar(255) DEFAULT '' NOT NULL,
-  description varchar(255) DEFAULT '' NOT NULL,
-  istrue int(4) DEFAULT '0' NOT NULL,
-  lastcheck int(4) DEFAULT '0' NOT NULL,
-  priority int(2) DEFAULT '0' NOT NULL,
-  lastchange int(4) DEFAULT '0' NOT NULL,
-  comments blob,
-  PRIMARY KEY (triggerid),
-  KEY (istrue)
+	triggerid	int(4) NOT NULL auto_increment,
+	expression	varchar(255) DEFAULT '' NOT NULL,
+	description	varchar(255) DEFAULT '' NOT NULL,
+	istrue		int(4) DEFAULT '0' NOT NULL,
+	lastcheck	int(4) DEFAULT '0' NOT NULL,
+	priority	int(2) DEFAULT '0' NOT NULL,
+	lastchange	int(4) DEFAULT '0' NOT NULL,
+	comments	blob,
+	PRIMARY KEY	(triggerid),
+	KEY		(istrue)
+);
+
+#
+# Table structure for table 'trigger_depends'
+#
+
+CREATE TABLE trigger_depends (
+	triggerid_down	int(4) DEFAULT '0' NOT NULL,
+	triggerid_up	int(4) DEFAULT '0' NOT NULL,
+	PRIMARY KEY	(triggerid_down, triggerid_up),
+	KEY		(triggerid_down),
+	KEY		(triggerid_up)
 );
 
 #

@@ -20,7 +20,7 @@
 			{
 				$now=mktime();
 				if(isset($disabled))	{ $istrue=2; }
-				else			{ $istrue=3; }
+				else			{ $istrue=0; }
 	
 				$result=update_trigger($triggerid,$expression,$description,$priority,$istrue,$comments);
 				show_messages($result,"Trigger updated","Cannot update trigger");
