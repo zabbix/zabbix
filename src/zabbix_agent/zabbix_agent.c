@@ -70,89 +70,6 @@ void    init_config(void)
 	};
 
 	parse_cfg_file("/etc/zabbix/zabbix_agent.conf",cfg);
-
-}
-   
-
-void	process_config_file(void)
-{
-	FILE	*file;
-	char	line[1024];
-	char	parameter[1024];
-	char	*value;
-	char	*value2;
-	int	lineno;
-	int	i;
-
-	file=fopen("/etc/zabbix/zabbix_agent.conf","r");
-	if(NULL == file)
-	{
-/*		syslog( LOG_CRIT, "Cannot open /etc/zabbix/zabbix_agentd.conf");*/
-		exit(1);
-	}
-
-	lineno=0;
-	while(fgets(line,1024,file) != NULL)
-	{
-		lineno++;
-
-		if(line[0]=='#')	continue;
-		if(strlen(line)==1)	continue;
-
-		strcpy(parameter,line);
-
-		value=strstr(line,"=");
-
-		if(NULL == value)
-		{
-/*			syslog( LOG_CRIT, "Error in line [%s] Line %d", line, lineno);*/
-			fclose(file);
-			exit(1);
-		}
-		value++;
-		value[strlen(value)-1]=0;
-
-		parameter[value-line-1]=0;
-
-/*		syslog( LOG_DEBUG, "Parameter [%s] Value [%s]", parameter, value);*/
-
-		if(strcmp(parameter,"Server")==0)
-		{
-			CONFIG_HOSTS_ALLOWED=strdup(value);
-		}
-		else if(strcmp(parameter,"Timeout")==0)
-		{
-			i=atoi(value);
-			if( (i<1) || (i>30) )
-			{
-/*				syslog( LOG_CRIT, "Wrong value of Timeout in line %d. Should be between 1 or 30.", lineno);*/
-				fclose(file);
-				exit(1);
-			}
-			CONFIG_TIMEOUT=i;
-		}
-		else if(strcmp(parameter,"UserParameter")==0)
-		{
-			value2=strstr(value,",");
-			if(NULL == value2)
-			{
-/*				syslog( LOG_CRIT, "Error in line [%s] Line %d Symbol ',' expected", line, lineno);*/
-				fclose(file);
-				exit(1);
-			}
-			value2[0]=0;
-			value2++;
-/*			syslog( LOG_WARNING, "Added user-defined parameter [%s] Command [%s]", value, value2);*/
-			add_user_parameter(value, value2);
-		}
-		else
-		{
-/*			syslog( LOG_CRIT, "Unsupported parameter [%s] Line %d", parameter, lineno);*/
-			fclose(file);
-			exit(1);
-		}
-	}
-	fclose(file);
 }
 
 int	check_security(void)
@@ -204,7 +121,7 @@ int	main()
 	char	*res;
 
 #ifdef	TEST_PARAMETERS
-	process_config_file();
+	init_config();
 	test_parameters();
 	return	SUCCEED;
 #endif

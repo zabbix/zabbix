@@ -119,7 +119,7 @@
 		$till=time(NULL)-$from*3600;
 		$hours=$period/3600;
 
-		show_table_header("Showing history of $period seconds($hours h)<BR>[from: ".date("d M - H:i:s",$time)."] [till: ".date("d M - H:i:s",$till)."]");
+		show_table_header("Showing history of $period seconds($hours h)<BR>[from: ".date("Y.M.d H:i:s",$time)."] [till: ".date("Y.M.d H:i:s",$till)."]");
 
 		echo "<TABLE BORDER=0 COLS=2 ALIGN=CENTER WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 		echo "<TR>";
@@ -150,7 +150,7 @@
 			}
 			$clock=DBget_field($result,$i,0);
 			$value=DBget_field($result,$i,1);
-			$clock=date("d M - H:i:s",$clock);
+			$clock=date("Y.M.d H:i:s",$clock);
 			echo "<TD>$clock</TD>";
 			echo "<TD>$value</TD>";
 			echo "</TR>";

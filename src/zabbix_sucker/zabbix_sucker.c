@@ -204,7 +204,7 @@ void	init_config(void)
 		{"HousekeepingFrequency",&CONFIG_HOUSEKEEPING_FREQUENCY,0,TYPE_INT,PARM_OPT,1,24},
 		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
 		{"NoTimeWait",&CONFIG_NOTIMEWAIT,0,TYPE_INT,PARM_OPT,0,1},
-		{"DebugLevel",&CONFIG_LOG_LEVEL,0,TYPE_INT,PARM_OPT,1,3},
+		{"DebugLevel",&CONFIG_LOG_LEVEL,0,TYPE_INT,PARM_OPT,0,5},
 		{"PidFile",&CONFIG_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"LogFile",&CONFIG_LOG_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBName",&CONFIG_DBNAME,0,TYPE_STRING,PARM_MAND,0,0},
@@ -728,7 +728,7 @@ int housekeeping_history(int now)
 		sprintf	(sql,"delete from history_str where itemid=%d and clock<%d",item.itemid,now-item.history);
 		DBexecute(sql);
 	
-		sprintf(sql,"update items set LastDelete=%d where ItemId=%d",now,item.itemid);
+		sprintf(sql,"update items set lastdelete=%d where itemid=%d",now,item.itemid);
 		DBexecute(sql);
 	}
 	DBfree_result(result);
