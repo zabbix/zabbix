@@ -88,16 +88,22 @@
 	$from_time_now=$to_time-24*3600;
 
 	$count_now=array();
-	$true=array();
+	$problem=array();
+
+	$year=date("Y");
+	$start=mktime(0,0,0,1,1,$year);
+
+	$wday=date("w",$start);
+	if($wday==0) $wday=7;
+	$start=$start-($wday-1)*24*3600;
 	for($i=0;$i<52;$i++)
 	{
-		$year=date("Y");
-		$period_start=mktime(0,0,0,1,1,$year)+7*24*3600*$i;
-		$period_end=mktime(0,0,0,1,1,$year)+7*24*3600*($i+1);
+		$period_start=$start+7*24*3600*$i;
+		$period_end=$start+7*24*3600*($i+1);
 		$stat=calculate_service_availability($HTTP_GET_VARS["serviceid"],$period_start,$period_end);
 		
-		$true[$i]=$stat["true"];
-		$false[$i]=$stat["false"];
+		$problem[$i]=$stat["problem"];
+		$ok[$i]=$stat["ok"];
 		$count_now[$i]=1;
 	}
 
@@ -110,13 +116,13 @@
 	for($i=0;$i<=$sizeX;$i+=$sizeX/52)
 	{
 		ImageDashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
-		$period_start=mktime(0,0,0,1,1,$year)+7*24*3600*$j;
+		$period_start=$start+7*24*3600*$j;
 		ImageStringUp($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, date("d.M",$period_start) , $black);
 		$j++;
 	}
 
 	$maxY=100;
-	$tmp=max($true);
+	$tmp=max($problem);
 	if($tmp>$maxY)
 	{
 		$maxY=$tmp;
@@ -129,9 +135,9 @@
 	for($i=1;$i<52;$i++)
 	{
 		$x1=(900/52)*$sizeX*($i-$minX)/($maxX-$minX);
-		$y1=$sizeY*($true[$i]-$minY)/($maxY-$minY);
+		$y1=$sizeY*($problem[$i]-$minY)/($maxY-$minY);
 		$x2=(900/52)*$sizeX*($i-$minX-1)/($maxX-$minX);
-		$y2=$sizeY*($true[$i-1]-$minY)/($maxY-$minY);
+		$y2=$sizeY*($problem[$i-1]-$minY)/($maxY-$minY);
 		$y1=$sizeY-$y1;
 		$y2=$sizeY-$y2;
 
@@ -141,9 +147,9 @@
 		ImageRectangle($im,$x2+$shiftX-1,$y2+$shiftYup-1,$x2+$shiftX+1,$y2+$shiftYup+1,$darkred);
 
 		$x1=(900/52)*$sizeX*($i-$minX)/($maxX-$minX);
-		$y1=$sizeY*($false[$i]-$minY)/($maxY-$minY);
+		$y1=$sizeY*($ok[$i]-$minY)/($maxY-$minY);
 		$x2=(900/52)*$sizeX*($i-$minX-1)/($maxX-$minX);
-		$y2=$sizeY*($false[$i-1]-$minY)/($maxY-$minY);
+		$y2=$sizeY*($ok[$i-1]-$minY)/($maxY-$minY);
 		$y1=$sizeY-$y1;
 		$y2=$sizeY-$y2;
 

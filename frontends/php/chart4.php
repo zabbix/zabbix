@@ -97,11 +97,18 @@
 
 	$count_now=array();
 	$true=array();
+
+	$year=date("Y");
+	$start=mktime(0,0,0,1,1,$year);
+
+	$wday=date("w",$start);
+	if($wday==0) $wday=7;
+	$start=$start-($wday-1)*24*3600;
+
 	for($i=0;$i<52;$i++)
 	{
-		$year=date("Y");
-		$period_start=mktime(0,0,0,1,1,$year)+7*24*3600*$i;
-		$period_end=mktime(0,0,0,1,1,$year)+7*24*3600*($i+1);
+		$period_start=$start+7*24*3600*$i;
+		$period_end=$start+7*24*3600*($i+1);
 		$stat=calculate_availability($HTTP_GET_VARS["triggerid"],$period_start,$period_end);
 		
 		$true[$i]=$stat["true"];
@@ -119,7 +126,7 @@
 	for($i=0;$i<=$sizeX;$i+=$sizeX/52)
 	{
 		ImageDashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
-		$period_start=mktime(0,0,0,1,1,$year)+7*24*3600*$j;
+		$period_start=$start+7*24*3600*$j;
 		ImageStringUp($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, date("d.M",$period_start) , $black);
 		$j++;
 	}

@@ -1,5 +1,6 @@
 Changes for 1.0beta9:
 
+ - fixed calculate_service_availability() (Alexei)
  - added report3.php (Alexei)
  - color statuses in media.php (Alexei)
  - fixed data.sql (Alexei)

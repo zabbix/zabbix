@@ -93,10 +93,10 @@
 
 			echo "<td>"; echo  date("d M Y",$period_start); echo "</td>";
 			echo "<td>"; echo  date("d M Y",$period_end); echo "</td>";
-			$t=sprintf("%2.2f%%",$stat["true"]);
-			$t_time=sprintf("%dd %dh %dm",$stat["true_time"]/(24*3600),($stat["true_time"]%(24*3600))/3600,($stat["true_time"]%(3600))/(60));
-			$f=sprintf("%2.2f%%",$stat["false"]);
-			$f_time=sprintf("%dd %dh %dm",$stat["false_time"]/(24*3600),($stat["false_time"]%(24*3600))/3600,($stat["false_time"]%(3600))/(60));
+			$t=sprintf("%2.2f%%",$stat["problem"]);
+			$t_time=sprintf("%dd %dh %dm",$stat["problem_time"]/(24*3600),($stat["problem_time"]%(24*3600))/3600,($stat["problem_time"]%(3600))/(60));
+			$f=sprintf("%2.2f%%",$stat["ok"]);
+			$f_time=sprintf("%dd %dh %dm",$stat["ok_time"]/(24*3600),($stat["ok_time"]%(24*3600))/3600,($stat["ok_time"]%(3600))/(60));
 			echo "<td>"; echo "<font color=\"00AA00\">$f_time</font>" ; echo "</td>";
 			echo "<td>"; echo "<font color=\"AA0000\">$t_time</a>" ; echo "</td>";
 			echo "<td>"; echo "<font color=\"00AA00\">$f</font>/<font color=\"AA0000\">$t</font>" ; echo "</td>";
