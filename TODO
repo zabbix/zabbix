@@ -5,7 +5,7 @@
  - finish src/zabbix_snmptrapper
  - fix PostgreSQL schema
  - improve screens (add maps, all in one table, etc)
- - calculate maxY in graphs and show last value
+ - show last value in graphs
 
  - links to Zabbix frontend in alert emails
  - user groups
