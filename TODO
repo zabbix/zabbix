@@ -5,7 +5,7 @@ HIGH PRIORITY:
  - rewrite pinger.pl to use mass-send
  - check Rickard's multythreaded agent
  - check new Mariusz patches
- - support ':' between [] (example, diskspace[c:])
+ - support ':','\' between [] (example, diskspace[c:])
  - add/evaluate Windows agent
  - BUG. Avoid situations when PID file is not deleted.
  - BUG. Map does not show host status in case of trigger based on trapper
