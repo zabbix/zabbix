@@ -1,12 +1,9 @@
 1.0beta10:
 
- - improve item definition form
  - finish src/zabbix_snmptrapper
- - add complete support for SNMP trapping
  - fix PostgreSQL schema
  - test on non-Linux platforms
  - test install and upgrade procedure for 1.0beta10
- - write error message in case of PID file and LOG file errors
  - improve screens (add maps, all in one table, etc)
  - improve graphs
  - Graphs: change order of lines
@@ -27,6 +24,7 @@ suckerd and agentd)
  - escalation
  - agents to execute command
  - add alerts to host templates
+ - add complete support for SNMP trapping
 
  - monitoring of log files
  - [10] Refresh stop ability. At least for graphs and triggers being selected.
