@@ -752,7 +752,7 @@ int get_values(void)
 			zabbix_log( LOG_LEVEL_WARNING, "The value is not stored in database.");
 		}
 
-		if(res != NETWORK_ERROR)
+		if(res ==  SUCCEED)
 		{
 		        update_triggers(0, 1, item.itemid, 0 );
 		}

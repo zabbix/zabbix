@@ -1240,6 +1240,18 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
 
+	# "Processor load on %s is 5" to "Processor load on www.sf.net is 5"
+	function	expand_trigger_description($triggerid)
+	{
+		$sql="select distinct t.description,h.host from triggers t,functions f,items i,hosts h where t.triggerid=$triggerid and f.triggerid=t.triggerid and f.itemid=i.itemid and i.hostid=h.hostid";
+		$result=DBselect($sql);
+		$row=DBfetch($result);
+
+		$description=str_replace("%s",$row["host"],$row["description"]);
+
+		return $description;
+	}
+
 	function	update_trigger_value_to_unknown_by_hostid($hostid)
 	{
 		$sql="select distinct t.triggerid from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.hostid=$hostid";
@@ -1867,7 +1879,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 						break;
 					}
 				}
-				$description=sprintf($description,$host);
+#				$description=sprintf($description,$host);
 
 				add_trigger($expression,$description,0,0,"","");
 			}
@@ -1975,6 +1987,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	add_using_host_template($hostid,$host_templateid)
 	{
+		$host=get_host_by_hostid($hostid);
 		$sql="select itemid from items where hostid=$host_templateid";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
@@ -1988,7 +2001,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			{
 				$trigger=get_trigger_by_triggerid($row2["triggerid"]);
 // Cannot use add_trigger here
-				$sql="insert into triggers  (description,priority,status,comments,url,value) values ('".$trigger["description"]."',".$trigger["priority"].",".$trigger["status"].",'".$trigger["comments"]."','".$trigger["url"]."',2)";
+				$description=$trigger["description"];
+#				$description=str_replace("%s",$host["host"],$description);	
+				$sql="insert into triggers  (description,priority,status,comments,url,value) values ('$description',".$trigger["priority"].",".$trigger["status"].",'".$trigger["comments"]."','".$trigger["url"]."',2)";
 				$result4=DBexecute($sql);
 				$triggerid=DBinsert_id($result4,"triggers","triggerid");
 
@@ -3010,6 +3025,10 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			{
 				$depid=DBget_field($result1,$i,0);
 				$depdescr=DBget_field($result1,$i,1);
+				if( strstr($depdescr,"%s"))
+				{
+					$depdescr=expand_trigger_description($depid);
+				}
 				echo "<OPTION VALUE=\"$depid\">$depdescr";
 			}
 			echo "</SELECT>";
@@ -3024,6 +3043,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			{
 				$depid=DBget_field($result,$i,0);
 				$depdescr=DBget_field($result,$i,1);
+
+				if( strstr($depdescr,"%s"))
+				{
+					$depdescr=expand_trigger_description($depid);
+				}
 				echo "<OPTION VALUE=\"$depid\">$depdescr";
 			}
 			echo "</SELECT>";
