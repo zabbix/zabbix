@@ -11,6 +11,8 @@ Not ready yet:
 [ DOCS. All parameters should contain section "How can be used" in the Manual ]
 
 Changes for 1.0beta4:
+
+ - disabled experimental code by commenting #define PERF (Alexei)
  - improvements in SNMP handling for zabbix_suckerd (Alexei)
  - fixed check for SNMP library in configure.in (Alexei)
  - template host set to empty in Host definition form (Alexei)
