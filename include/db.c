@@ -25,15 +25,20 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <string.h>
+#include <strings.h>
+
 #include "db.h"
 #include "log.h"
 #include "common.h"
 
-static	char	DB_HOST[MAX_STRING_LEN+1];
-static	char	DB_NAME[MAX_STRING_LEN+1];
-static	char	DB_USER[MAX_STRING_LEN+1];
-static	char	DB_PASSWORD[MAX_STRING_LEN+1];
-static	char	DB_SOCKET[MAX_STRING_LEN+1];
+/* 0 - not connected yet, 1 - connected to the DB */
+static	int	DB_connected = 0;
+static	char	DB_host[MAX_STRING_LEN+1];
+static	char	DB_name[MAX_STRING_LEN+1];
+static	char	DB_user[MAX_STRING_LEN+1];
+static	char	DB_password[MAX_STRING_LEN+1];
+static	char	DB_socket[MAX_STRING_LEN+1];
 
 #ifdef	HAVE_MYSQL
 	MYSQL	mysql;
@@ -51,6 +56,7 @@ void	DBclose(void)
 #ifdef	HAVE_PGSQL
 	PQfinish(conn);
 #endif
+	DB_connected = 0;
 }
 
 /*
@@ -59,45 +65,75 @@ void	DBclose(void)
  */ 
 void    DBconnect(char *dbhost, char *dbname, char *dbuser, char *dbpassword, char *dbsocket)
 {
-	strncpy(DB_HOST, dbhost, MAX_STRING_LEN);
-	strncpy(DB_NAME, dbname, MAX_STRING_LEN);
-	strncpy(DB_USER, dbuser, MAX_STRING_LEN);
-	strncpy(DB_PASSWORD, dbpassword, MAX_STRING_LEN);
-	strncpy(DB_SOCKET, dbsocket, MAX_STRING_LEN);
+	int i;
 
-/*	zabbix_log(LOG_LEVEL_ERR, "[%s] [%s] [%s]\n",dbname, dbuser, dbpassword ); */
+	strncpy(DB_host, dbhost, MAX_STRING_LEN);
+	strncpy(DB_name, dbname, MAX_STRING_LEN);
+	strncpy(DB_user, dbuser, MAX_STRING_LEN);
+	strncpy(DB_password, dbpassword, MAX_STRING_LEN);
+	strncpy(DB_socket, dbsocket, MAX_STRING_LEN);
+
+	/* Already connected. Disconnect first. */
+	if(1 == DB_connected)
+	{
+		DBclose();
+	}
+
+	for(i=0;i<20;i++)
+	{
+		/*	zabbix_log(LOG_LEVEL_ERR, "[%s] [%s] [%s]\n",dbname, dbuser, dbpassword ); */
 #ifdef	HAVE_MYSQL
-/* For MySQL >3.22.00 */
-/*	if( ! mysql_connect( &mysql, NULL, dbuser, dbpassword ) )*/
-	mysql_init(&mysql);
-	if( ! mysql_real_connect( &mysql, DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, 3306, DB_SOCKET,0 ) )
-	{
-		fprintf(stderr, "Failed to connect to database: Error: %s\n",mysql_error(&mysql) );
-		zabbix_log(LOG_LEVEL_ERR, "Failed to connect to database: Error: %s",mysql_error(&mysql) );
-		exit( FAIL );
-	}
-	if( mysql_select_db( &mysql, DB_NAME ) != 0 )
-	{
-		fprintf(stderr, "Failed to select database: Error: %s\n",mysql_error(&mysql) );
-		zabbix_log(LOG_LEVEL_ERR, "Failed to select database: Error: %s",mysql_error(&mysql) );
-		exit( FAIL );
-	}
+	/* For MySQL >3.22.00 */
+	/*	if( ! mysql_connect( &mysql, NULL, dbuser, dbpassword ) )*/
+		mysql_init(&mysql);
+		if( ! mysql_real_connect( &mysql, DB_host, DB_user, DB_password, DB_name, 3306, DB_socket,0 ) )
+		{
+			fprintf(stderr, "Failed to connect to database: Error: %s\n",mysql_error(&mysql) );
+			zabbix_log(LOG_LEVEL_ERR, "Failed to connect to database: Error: %s",mysql_error(&mysql) );
+		}
+		else
+		{
+			if( mysql_select_db( &mysql, DB_name ) != 0 )
+			{
+				fprintf(stderr, "Failed to select database: Error: %s\n",mysql_error(&mysql) );
+				zabbix_log(LOG_LEVEL_ERR, "Failed to select database: Error: %s",mysql_error(&mysql) );
+				exit( FAIL );
+			}
+			else
+			{
+				DB_connected = 1;
+			}
+		}
 #endif
 #ifdef	HAVE_PGSQL
 /*	conn = PQsetdb(pghost, pgport, pgoptions, pgtty, dbName); */
 /*	conn = PQsetdb(NULL, NULL, NULL, NULL, dbname);*/
-	conn = PQsetdbLogin(DB_HOST, NULL, NULL, NULL, DB_NAME, DB_USER, DB_PASSWORD );
+		conn = PQsetdbLogin(DB_host, NULL, NULL, NULL, DB_name, DB_user, DB_password );
 
 /* check to see that the backend connection was successfully made */
-	if (PQstatus(conn) == CONNECTION_BAD)
-	{
-		fprintf(stderr, "Connection to database '%s' failed.\n", DB_NAME);
-		zabbix_log(LOG_LEVEL_ERR, "Connection to database '%s' failed.\n", DB_NAME);
-		fprintf(stderr, "%s\n", PQerrorMessage(conn));
-		zabbix_log(LOG_LEVEL_ERR, "%s", PQerrorMessage(conn));
-		exit(FAIL);
-	}
+		if (PQstatus(conn) == CONNECTION_BAD)
+		{
+			fprintf(stderr, "Connection to database '%s' failed.\n", DB_name);
+			zabbix_log(LOG_LEVEL_ERR, "Connection to database '%s' failed.\n", DB_name);
+			fprintf(stderr, "%s\n", PQerrorMessage(conn));
+			zabbix_log(LOG_LEVEL_ERR, "%s", PQerrorMessage(conn));
+		}
+		else
+		{
+			DB_connected = 1;
+		}
 #endif
+		fprintf(stderr, "Will retry to connect to the database after 30 seconds\n");
+		zabbix_log(LOG_LEVEL_ERR, "Failed to connect to database: Error: %s",mysql_error(&mysql) );
+		sleep(30);
+	}
+
+	if(0 == DB_connected)
+	{
+		fprintf(stderr, "Database is not available. Giving up.\n");
+		zabbix_log(LOG_LEVEL_ERR, "Database is not available. Giving up." );
+		exit( FAIL );
+	}
 }
 
 /*
