@@ -1,5 +1,6 @@
 Changes for 1.1alpha3:
 
+ - fixes for PHP5 (Alexei)
  - fix for crash of zabbix_suckerd (Alexei)
 
 Changes for 1.1alpha2:

@@ -47,7 +47,7 @@
 			{
 				if(isset($_GET[$row["groupid"]]))
 				{
-					$groups=array_merge($groups,$row["groupid"]);
+					$groups=array_merge($groups,array($row["groupid"]));
 				}
 			}
 			$result=add_host($_GET["host"],$_GET["port"],$_GET["status"],$_GET["useip"],$_GET["ip"],$_GET["host_templateid"],$_GET["newgroup"],$groups);
@@ -70,7 +70,7 @@
 			{
 				if(isset($_GET[$row["groupid"]]))
 				{
-					$groups=array_merge($groups,$row["groupid"]);
+					$groups=array_merge($groups,array($row["groupid"]));
 				}
 			}
 			$result=@update_host($_GET["hostid"],$_GET["host"],$_GET["port"],$_GET["status"],$_GET["useip"],$_GET["ip"],$_GET["newgroup"],$groups);
