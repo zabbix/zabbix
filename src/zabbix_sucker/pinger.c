@@ -175,7 +175,7 @@ int	do_ping(void)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In do_ping()");
 
-	sprintf(str,"cat /tmp/zabbix_suckerd.pinger|%s -e",CONFIG_FPING_LOCATION);
+	sprintf(str,"cat /tmp/zabbix_suckerd.pinger|%s -e 2>/dev/null",CONFIG_FPING_LOCATION);
 	
 	f=popen(str,"r");
 	if(f==0)
