@@ -407,7 +407,7 @@
 			echo "<BR><FONT COLOR=\"#000000\" SIZE=-2>".explode_exp($row["expression"],1)."</FONT>";
 		}
 		echo "</TD>";
-		if( (time(NULL)-$row["lastchange"])<60)
+		if( (time(NULL)-$row["lastchange"])<300)
 		{
 			$blink1="<blink>";
 			$blink2="</blink>";
