@@ -162,8 +162,8 @@ AC_DEFINE(HAVE_UNISTD_SYSCONF)
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
-dnl Check for function va_copy in stdarg.h
-AC_MSG_CHECKING(for function va_copy() in stdarg.h)
+dnl Check for macro __va_copy in stdarg.h
+AC_MSG_CHECKING(for macro __va_copy() in stdarg.h)
 AC_TRY_COMPILE(
 [
 #include <stdarg.h>
@@ -172,12 +172,11 @@ AC_TRY_COMPILE(
 	va_list	src,dst;
 
 	
-	va_copy(dst,src);
+	__va_copy(dst,src);
 ],
-AC_DEFINE(HAVE_VA_COPY)
+AC_DEFINE(HAVE___VA_COPY)
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
-
 
 dnl Check for vmtotal in sys/vmmeter.h
 AC_MSG_CHECKING(for vmtotal in struct sys/vmmeter.h)
