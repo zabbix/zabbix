@@ -269,6 +269,13 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 
 	SOCK_STARTUP;
 	ss = snmp_open(&session);
+
+	if(ss == NULL)
+	{
+		SOCK_CLEANUP;
+		zabbix_log( LOG_LEVEL_WARNING, "Error: snmp_open()");
+		return FAIL;
+	}
 	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMPv1() 0.2");
 
 	pdu = snmp_pdu_create(SNMP_MSG_GET);
