@@ -1,6 +1,5 @@
 1.1alpha7:
 
- - Fix simple checks
  - Develop hard-linked templates
  - Fix graphs with values >4GB
 

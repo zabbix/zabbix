@@ -1296,6 +1296,8 @@ int main(int argc, char **argv)
 			break;
         }
 
+	init_metrics();
+
 	init_config();
 
 	daemon_init();
