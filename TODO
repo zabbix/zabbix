@@ -1,10 +1,24 @@
 1.0:
 
+Under Solaris:
+
+-I/home/spath/net-snmp-5.0.9/include/net-snmp
+should read
+-I/home/spath/net-snmp-5.0.9/include
+        
+and
+
+-L/home/spath/net-snmp-5.0.9/lib/net-snmp
+should read
+-L/home/spath/net-snmp-5.0.9/lib
+
+ - document that --enable-static does not work on Solaris
  - test on HP-UX, AIX and Solaris
  - on the sysmap, a < in the trigger title shows up as &lt; 
  - delete sysmaps when deleting host
  - improve actions.php to make selection of trigger, host, hosts on the top
  - navigation bar for all graphs and screens
+ - make support for "Clone"
 
 LATER:
 
