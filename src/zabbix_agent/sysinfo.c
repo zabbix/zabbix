@@ -206,6 +206,7 @@ COMMAND	commands[AGENT_MAX_USER_COMMANDS]=
 	{"check_port[*]"	,CHECK_PORT, 	0, "80"},
 
 	{"check_service[*]"	,CHECK_SERVICE, 	0, "ssh,127.0.0.1,22"},
+	{"check_service_perf[*]",CHECK_SERVICE_PERF, 	0, "ssh,127.0.0.1,22"},
 
 	{0}
 	};
@@ -1975,7 +1976,7 @@ int	check_ssh(char	*hostname, short port)
 
 /* Example check_service[ssh], check_service[smtp,29],check_service[ssh,127.0.0.1,22]*/
 /* check_service[ssh,127.0.0.1,ssh] */
-double	CHECK_SERVICE(char *service_and_ip_and_port)
+double	CHECK_SERVICE_PERF(char *service_and_ip_and_port)
 {
 	char	*c,*c1;
 	int	port=0;
@@ -2077,6 +2078,96 @@ double	CHECK_SERVICE(char *service_and_ip_and_port)
 	{
 		return (double)result;
 	}
+}
+
+/* Example check_service[ssh], check_service[smtp,29],check_service[ssh,127.0.0.1,22]*/
+/* check_service[ssh,127.0.0.1,ssh] */
+double	CHECK_SERVICE(char *service_and_ip_and_port)
+{
+	char	*c,*c1;
+	int	port=0;
+	char	service[MAX_STRING_LEN+1];
+	char	ip[MAX_STRING_LEN+1];
+	char	port_str[MAX_STRING_LEN+1];
+
+	int	result;
+
+	c=strchr(service_and_ip_and_port,',');
+	strncpy(service,service_and_ip_and_port,MAX_STRING_LEN);
+
+	if(c != NULL)
+	{
+		strncpy(ip,c+1,MAX_STRING_LEN);
+		service[c-service_and_ip_and_port]=0;
+
+		c1=strchr(ip,',');
+		
+		if(c1!=NULL)
+		{
+			strncpy(port_str,c1+1,MAX_STRING_LEN);
+			ip[c1-ip]=0;
+			port=atoi(port_str);
+		}
+		else
+		{
+			if(strchr(ip,'.')==NULL)
+			{
+				strncpy(port_str,ip,MAX_STRING_LEN);
+				port=atoi(port_str);
+				strcpy(ip,"127.0.0.1");
+			}
+		}
+	}
+	else
+	{
+		strcpy(ip,"127.0.0.1");
+	}
+
+/*	printf("IP:[%s]",ip);
+	printf("Service:[%s]",service);
+	printf("Port:[%d]",port);*/
+
+	if(strcmp(service,"ssh") == 0)
+	{
+		if(port == 0)	port=22;
+		result=check_ssh(ip,port);
+	}
+	else if(strcmp(service,"smtp") == 0)
+	{
+		if(port == 0)	port=25;
+		result=tcp_expect(ip,port,"220","QUIT\n");
+	}
+	else if(strcmp(service,"ftp") == 0)
+	{
+		if(port == 0)	port=21;
+		result=tcp_expect(ip,port,"220","");
+	}
+	else if(strcmp(service,"http") == 0)
+	{
+		if(port == 0)	port=80;
+		result=tcp_expect(ip,port,NULL,"");
+	}
+	else if(strcmp(service,"pop") == 0)
+	{
+		if(port == 0)	port=110;
+		result=tcp_expect(ip,port,"+OK","");
+	}
+	else if(strcmp(service,"nntp") == 0)
+	{
+		if(port == 0)	port=119;
+		result=tcp_expect(ip,port,"220","");
+	}
+	else if(strcmp(service,"imap") == 0)
+	{
+		if(port == 0)	port=143;
+		result=tcp_expect(ip,port,"* OK","a1 LOGOUT\n");
+	}
+	else
+	{
+		result=FAIL;
+	}
+
+	return (double)result;
 }
 
 double	CHECK_PORT(char *ip_and_port)

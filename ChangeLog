@@ -1,5 +1,6 @@
 Changes for 1.0beta9:
 
+ - added support for check_service_perf[*] (Alexei)
  - added parameter AlertScriptsPath to zabbix_suckerd (Alexei)
  - added support for alternative medias (Alexei)
  - added src/zabbix_sucker/alerter.h (Alexei)
