@@ -1,13 +1,8 @@
 HIGH PRIORITY:
 
- - BUG. history graph goes left
- - Graphs for specified period and date and time
- - Check Housekeeping procedure
-
 * - add severity to pre-defined triggers 
 * - BUG. zabbix_sucker should accept parameter regardless of "\n" at the end of line 
 * - BUG. Agent return unsupported in case if UserParameter ends by timeout.
- - test everything under Explorer and Netscape. Especially Graphs,Charts and Maps.
  - mass updates/inserts (add items and triggers for all hosts at once)
 * - support for net-snmp
  - get rid of long select lists in user forms 
@@ -69,6 +64,11 @@ Not ready yet:
  - BUG. Avoid situations when PID file is not deleted.
 
 HB:
+
+ - test everything under Explorer and Netscape. Especially Graphs,Charts and Maps.
+ - BUG. history graph goes left
+ - Graphs for specified period and date and time
+ - Check Housekeeping procedure
 
  - Tree like in old Zabbix
  - LDAP authorisation (should work with MSWindows LDAP)
