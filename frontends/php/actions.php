@@ -108,13 +108,17 @@
 			echo "<TD>".$groupd["name"]."</TD>";
 		}
   
-		if($row["good"])
+		if($row["good"] == 1)
 		{
 			echo "<TD><FONT COLOR=\"#AA0000\">ON</FONT></TD>";
 		}
-		else
+		else if($row["good"] == 0)
 		{
 			echo "<TD><FONT COLOR=\"#00AA00\">OFF</FONT></TD>";
+		}
+		else if($row["good"] == 2)
+		{
+			echo "<TD><FONT COLOR=\"#AA0000\">ON</FONT>/<FONT COLOR=\"#00AA00\">OFF</FONT></TD>";
 		}
 		echo "<TD>".htmlspecialchars($row["delay"])."</TD>";
 		echo "<TD>".htmlspecialchars($row["subject"])."</TD>";
@@ -252,6 +256,7 @@
 	echo "<select class=\"biginput\" name=\"good\" size=1>";
 	echo "<OPTION VALUE=\"1\""; if($good==1) echo "SELECTED"; echo ">ON";
 	echo "<OPTION VALUE=\"0\""; if($good==0) echo "SELECTED"; echo ">OFF";
+	echo "<OPTION VALUE=\"2\""; if($good==2) echo "SELECTED"; echo ">ON or OFF";
 	echo "</SELECT>";
 
 	show_table2_v_delimiter();
