@@ -17,7 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,7 +36,10 @@
 #include <signal.h>
 #include <time.h>
 
+#include "config.h"
 #include "common.h"
+#include "log.h"
+#include "cfg.h"
 
 int     CONFIG_SUCKERD_FORKS            =SUCKER_FORKS;
 int     CONFIG_NOTIMEWAIT               =0;

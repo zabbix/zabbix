@@ -164,21 +164,25 @@ void	daemon_init(void)
 			fprintf(stderr, "Cannot run as root !\n");
 			exit(FAIL);
 		}
+		if( (setgid(pwd->pw_gid) ==-1) || (setuid(pwd->pw_uid) == -1) )
+		{
+			fprintf(stderr,"Cannot setgid or setuid to zabbix [%s]", strerror(errno));
+			exit(FAIL);
+		}
 
 #ifdef HAVE_FUNCTION_SETEUID
-		if( (setegid(pwd->pw_gid) ==-1) || (seteuid(pwd->pw_uid) == -1) )
+		if( setegid(pwd->pw_gid) ==-1)
 		{
-			fprintf(stderr,"Cannot setegid or seteuid to zabbix");
+			fprintf(stderr,"Cannot setegid to zabbix [%s]\n", strerror(errno));
+			exit(FAIL);
+		}
+		if( seteuid(pwd->pw_uid) ==-1)
+		{
+			fprintf(stderr,"Cannot seteuid to zabbix [%s]\n", strerror(errno));
 			exit(FAIL);
 		}
 #endif
-
-		if( (setgid(pwd->pw_gid) ==-1) || (setuid(pwd->pw_uid) == -1) )
-		{
-			fprintf(stderr,"Cannot setgid or setuid to zabbix");
-			exit(FAIL);
-		}
-
+/*		fprintf(stderr,"UID [%d] GID [%d] EUID[%d] GUID[%d]\n", getuid(), getgid(), geteuid(), getegid());*/
 
 	}
 

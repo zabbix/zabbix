@@ -1,26 +1,25 @@
 1.0beta10:
 
  - finish src/zabbix_snmptrapper
- - links to Zabbix frontend in alert emails
+ - add complete support for SNMP trapping
  - fix PostgreSQL schema
- - add all supported items to templates (data.sql)
- - user groups
  - test on non-Linux platforms
  - test install and upgrade procedure for 1.0beta10
  - write error message in case of PID file and LOG file errors
- - Graphs: change order of lines
  - support for proc_cnt() under Solaris
+ - improve screens (add maps, etc)
+ - improve graphs
+
+ - links to Zabbix frontend in alert emails
+ - user groups
+ - Graphs: change order of lines
  - zabbix to write log to the item (for example: log when item becomes unsupported)
  - strings items for graphs
  - date&time in alert emails
  - support of '-' in trigger expressions (...>-1)
  - UserParameter does not appear in the log
- - allow creation of PID file as 'root'. Required for RedHat RPMs.
  - add MRTG-like graphs + periodic recalculation of aggregate functions
- - why '-lsnmp' added to the agent's Makefile
  - add support for agent forwarding (proxy)
- - proofread Zabbix Manual  - Ted Rolle <ted@users.sourceforge.net>
- - add complete support for SNMP trapping
  - ability to add a library of  userwritten c-functions with dlopen/dlsym to
 the agent with a predefined API that can return values to suckerd (for both 
 suckerd and agentd)
@@ -28,9 +27,7 @@ suckerd and agentd)
  - escalation
  - agents to execute command
  - add alerts to host templates
- - add pinger (fping) to zabbix_sucker
 
- - improve screens (add maps, etc)
  - monitoring of log files
  - [10] Refresh stop ability. At least for graphs and triggers being selected.
  - [10] IT Services. Show downtimes for weeks.
