@@ -27,14 +27,14 @@ void	DBclose(void)
  * Connect to database.
  * If fails, program terminates.
  */ 
-void    DBconnect( char *dbname, char *dbuser, char *dbpassword, char *dbsocket)
+void    DBconnect(char *dbhost, char *dbname, char *dbuser, char *dbpassword, char *dbsocket)
 {
 /*	zabbix_log(LOG_LEVEL_ERR, "[%s] [%s] [%s]\n",dbname, dbuser, dbpassword ); */
 #ifdef	HAVE_MYSQL
 /* For MySQL >3.22.00 */
 /*	if( ! mysql_connect( &mysql, NULL, dbuser, dbpassword ) )*/
 	mysql_init(&mysql);
-	if( ! mysql_real_connect( &mysql, NULL, dbuser, dbpassword, dbname, 3306, dbsocket,0 ) )
+	if( ! mysql_real_connect( &mysql, dbhost, dbuser, dbpassword, dbname, 3306, dbsocket,0 ) )
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Failed to connect to database: Error: %s\n",mysql_error(&mysql) );
 		exit( FAIL );
@@ -48,7 +48,7 @@ void    DBconnect( char *dbname, char *dbuser, char *dbpassword, char *dbsocket)
 #ifdef	HAVE_PGSQL
 /*	conn = PQsetdb(pghost, pgport, pgoptions, pgtty, dbName); */
 /*	conn = PQsetdb(NULL, NULL, NULL, NULL, dbname);*/
-	conn = PQsetdbLogin(NULL, NULL, NULL, NULL, dbname, dbuser, dbpassword );
+	conn = PQsetdbLogin(dbhost, NULL, NULL, NULL, dbname, dbuser, dbpassword );
 
 /* check to see that the backend connection was successfully made */
 	if (PQstatus(conn) == CONNECTION_BAD)
