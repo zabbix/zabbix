@@ -318,7 +318,7 @@
 			}
 			else
 			{
-				echo "<td align=center><a href=\"history.php?action=showvalues&period=3600&itemid=".$row["itemid"]."\">Graph</a></td>";
+				echo "<td align=center><a href=\"history.php?action=showvalues&period=3600&itemid=".$row["itemid"]."\">History</a></td>";
 			}
 			if($row["value_type"]==0)
 			{
@@ -326,7 +326,7 @@
 			}
 			else
 			{
-				echo "<td align=center>Trend</td>";
+				echo "<td align=center>-</td>";
 			}
 			if($row["value_type"]==0)
 			{
@@ -334,7 +334,7 @@
 			}
 			else
 			{
-				echo "<td align=center>Compare</td>";
+				echo "<td align=center>-</td>";
 			}
 			echo "</tr>";
 			cr();
