@@ -17,8 +17,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
+/*
 #define ZBX_POLLER	1
-
+*/
 
 #include "config.h"
 
@@ -290,8 +291,6 @@ int	get_value(double *result,char *result_str,DB_ITEM *item)
 
 	struct	sigaction phan;
 
-	zabbix_log( LOG_LEVEL_ERR, "GET VALUE HOST[%s] PORT[%d] KEY[%s]", item->host, item->port, item->key);
-
 	phan.sa_handler = &signal_handler;
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = 0;
@@ -462,6 +461,7 @@ void	trend(void)
 	DBfree_result(result2);
 }
 
+#ifdef ZBX_POLLER
 int poller(void)
 {
 	struct poller_request_buf request;
@@ -781,6 +781,7 @@ int get_values_new(void)
 	DBfree_result(result);
 	return SUCCEED;
 }
+#endif
 
 int get_values(void)
 {
@@ -1026,10 +1027,10 @@ int main_sucker_loop()
 		get_values();
 #endif
 
-		zabbix_log( LOG_LEVEL_ERR, "Spent %d seconds while updating values", (int)time(NULL)-now );
+		zabbix_log( LOG_LEVEL_DEBUG, "Spent %d seconds while updating values", (int)time(NULL)-now );
 
 		nextcheck=get_minnextcheck(now);
-		zabbix_log( LOG_LEVEL_ERR, "Nextcheck:%d Time:%d", nextcheck, (int)time(NULL) );
+		zabbix_log( LOG_LEVEL_DEBUG, "Nextcheck:%d Time:%d", nextcheck, (int)time(NULL) );
 
 		if( FAIL == nextcheck)
 		{
@@ -1049,7 +1050,7 @@ int main_sucker_loop()
 			{
 				sleeptime = SUCKER_DELAY;
 			}
-			zabbix_log( LOG_LEVEL_ERR, "Sleeping for %d seconds",
+			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
 					sleeptime );
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 			setproctitle("sucker [sleeping for %d seconds]", 
@@ -1059,7 +1060,7 @@ int main_sucker_loop()
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_ERR, "No sleeping" );
+			zabbix_log( LOG_LEVEL_DEBUG, "No sleeping" );
 		}
 	}
 }

@@ -34,7 +34,9 @@
 
 #define	MAXFD	64
 
+/*
 #define ZBX_POLLER
+*/
 
 #ifdef ZBX_POLLER
 	#define MAX_STRING_LEN	800
