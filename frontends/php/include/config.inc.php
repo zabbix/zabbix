@@ -313,7 +313,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		global	$ERROR_MSG;
 
-		$sql="select * from screens where scid=$screenid"; 
+		$sql="select * from screens where screenid=$screenid"; 
 		$result=DBselect($sql);
 		if(DBnum_rows($result) == 1)
 		{
@@ -4001,7 +4001,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
                 return  DBexecute($sql);
         }
 
-        function        update_screen($scid,$name,$cols,$rows)
+        function        update_screen($screenid,$name,$cols,$rows)
         {
                 global  $ERROR_MSG;
 
@@ -4011,38 +4011,38 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
                         return 0;
                 }
 
-                $sql="update screens set name='$name',cols=$cols,rows=$rows where scid=$scid";
+                $sql="update screens set name='$name',cols=$cols,rows=$rows where screenid=$screenid";
                 return  DBexecute($sql);
         }
 
-        function        delete_screen($scid)
+        function        delete_screen($screenid)
         {
-                $sql="delete from screens_items where scid=$scid";
+                $sql="delete from screens_items where screenid=$screenid";
                 $result=DBexecute($sql);
                 if(!$result)
                 {
                         return  $result;
                 }
-                $sql="delete from screens where scid=$scid";
+                $sql="delete from screens where screenid=$screenid";
                 return  DBexecute($sql);
         }
 
-        function add_screen_item($scid,$x,$y,$graphid,$width,$height)
+        function add_screen_item($screenid,$x,$y,$graphid,$width,$height)
         {
-                $sql="insert into screens_items (scid,x,y,graphid,width,height) values ($scid,$x,$y,$graphid,$width,$height)";
+                $sql="insert into screens_items (screenid,x,y,graphid,width,height) values ($screenid,$x,$y,$graphid,$width,$height)";
                 return  DBexecute($sql);
         }
 
-        function update_screen_item($scitemid,$graphid,$width,$height)
+        function update_screen_item($screenitemid,$graphid,$width,$height)
         {
-                $sql="update screens_items set graphid=$graphid,width=$width,height=$height where scitemid=$scitemid";
+                $sql="update screens_items set graphid=$graphid,width=$width,height=$height where screenitemid=$screenitemid";
                 return  DBexecute($sql);
         }
 
 
-        function delete_screen_item($scitemid)
+        function delete_screen_item($screenitemid)
         {
-                $sql="delete from screens_items where scitemid=$scitemid";
+                $sql="delete from screens_items where screenitemid=$screenitemid";
                 return  DBexecute($sql);
         }
 ?>

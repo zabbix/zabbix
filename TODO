@@ -1,3 +1,17 @@
+1.0beta9:
+
+ - add support for agent forwarding (proxy)
+ - proofread Zabbix Manual  - Ted Rolle <ted@users.sourceforge.net>
+ - add complete support for SNMP trapping
+ - improve graphing capabilities (MRTG like graphs)
+ - improve user-defined graphs
+ - link map's line to a trigger
+ - ability to add a library of  userwritten c-functions with dlopen/dlsym to
+the agent with a predefined API that can return values to suckerd (for both 
+suckerd and agentd)
+ - monitoring of log files
+ - [10] Refresh stop ability. At least for graphs and triggers being selected.
+
 HP:
 
  - use profiles instead of passing parameters using POST
@@ -25,29 +39,18 @@ Vel viens wishlists ir pie "IT Services", pielikt pie
  - [9] ... the history to be used to see who did changes and who wrote specific parts
  of comments to know who is in charge for the instructions
  - [9] ... find outdated instructions to initiate its renewal (review)
- - [10] Refresh stop ability. At least for graphs and triggers being selected.
 
 TOP PRIORITY:
 
  - fix update of 'status'. When added it never gets updated, if server is already unreachable.
- - add support for agent forwarding (proxy)
- - proofread Zabbix Manual  - Ted Rolle <ted@users.sourceforge.net>
  - pay attention to Solaris agent
  - better viewing of trigger dependencies
- - add complete support for SNMP trapping
  - do not show "all" if no groups defined
  - add more checks for forms (check all possible wrong values)
- - improve user-defined graphs
  - check Rickard's active(?) agent
- - improve graphing capabilities (MRTG like graphs)
- - monitoring of log files
  - support of fetch_html[*]
- - link map's line to a trigger
  - restructure sources
  - support for automake
- - ability to add a library of  userwritten c-functions with dlopen/dlsym to
-the agent with a predefined API that can return values to suckerd (for both 
-suckerd and agentd)
  - zabbix_agentd to support processor load, swap[*] and memory[*] onder AIX
 
 BUGS:
