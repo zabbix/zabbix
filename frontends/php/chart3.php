@@ -76,8 +76,6 @@
 	$max=array();
 	$avg=array();
 
-if($DB_TYPE=="MYSQL")
-{
 	$sql="select round(900*((clock+3*3600)%(24*3600))/(24*3600)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid=$itemid and clock>$from_time and clock<$to_time group by 1";
 //	echo $sql."<br>";
 	$result=DBselect($sql);
@@ -100,65 +98,6 @@ if($DB_TYPE=="MYSQL")
 		$avg_now[$i]=$row["avg"];
 		$count_now[$i]=$row["count"];
 	}
-}
-else
-{
-	$result=DBselect("select clock,value from history where itemid=$itemid and clock>$from_time and clock<$to_time");
-	while($row=DBfetch($result))
-	{
-		$value=$row["value"];
-		$i=intval( 900*(($row["clock"]+3*3600)%(24*3600))/(24*3600));
-
-		if( (!isset($max[$i])) || ($max[$i]<$value))
-		{
-			$max[$i]=$value;
-		}
-		if(!isset($min[$i]) || ($min[$i]>$value))	$min[$i]=$value;
-		if(isset($count[$i]))
-		{
-			$count[$i]++;
-		}
-		else
-		{
-			$count[$i]=1;
-		};
-		if(isset($avg[$i]))
-		{
-			$avg[$i]=($value+($count[$i]-1)*$avg[$i])/$count[$i];
-		}
-		else
-		{
-			$avg[$i]=$value;
-		}
-	}
-
-	$count_now=array();
-	$avg_now=array();
-	$result=DBselect("select clock,value from history where itemid=$itemid and clock>$from_time_now and clock<$to_time");
-	while($row=DBfetch($result))
-	{
-		$value=$row["value"];
-		$i=intval( 900*(($row["clock"]+3*3600)%(24*3600))/(24*3600));
-//		echo (mktime(0, 0, 0, 07, 27,2002)-75600)%(24*3600),"<br>";
-
-		if(isset($count_now[$i]))
-		{
-			$count_now[$i]++;
-		}
-		else
-		{
-			$count_now[$i]=1;
-		};
-		if(isset($avg_now[$i]))
-		{
-			$avg_now[$i]=($value+($count_now[$i]-1)*$avg_now[$i])/$count_now[$i];
-		}
-		else
-		{
-			$avg_now[$i]=$value;
-		}
-	}
-}
 
 	for($i=0;$i<=$sizeY;$i+=$sizeY/5)
 	{

@@ -34,7 +34,7 @@ int	evaluate_MIN(char *value,DB_ITEM	*item,int parameter)
 	int		now;
 	int		res = SUCCEED;
 
-	if(item->value_type != 0)
+	if(item->value_type != ITEM_VALUE_TYPE_FLOAT)
 	{
 		return	FAIL;
 	}
@@ -69,7 +69,7 @@ int	evaluate_MAX(char *value,DB_ITEM *item,int parameter)
 	int		now;
 	int		res = SUCCEED;
 
-	if(item->value_type != 0)
+	if(item->value_type != ITEM_VALUE_TYPE_FLOAT)
 	{
 		return	FAIL;
 	}
@@ -94,9 +94,9 @@ int	evaluate_MAX(char *value,DB_ITEM *item,int parameter)
 }
 
 /*
- * Evaluate function (min,max,prev,last,diff)
+ * Evaluate function (min,max,prev,last,diff,str)
  */ 
-int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,int parameter)
+int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 {
 	int	ret  = SUCCEED;
 
@@ -110,7 +110,7 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,int parameter)
 		}
 		else
 		{
-			if(item->value_type==0)
+			if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
 			{
 			zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 1");
 				sprintf(value,"%f",item->lastvalue);
@@ -133,7 +133,7 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,int parameter)
 		}
 		else
 		{
-			if(item->value_type==0)
+			if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
 			{
 				sprintf(value,"%f",item->prevvalue);
 			}
@@ -145,11 +145,11 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,int parameter)
 	}
 	else if(strcmp(function,"min")==0)
 	{
-		ret = evaluate_MIN(value,item,parameter);
+		ret = evaluate_MIN(value,item,atoi(parameter));
 	}
 	else if(strcmp(function,"max")==0)
 	{
-		ret = evaluate_MAX(value,item,parameter);
+		ret = evaluate_MAX(value,item,atoi(parameter));
 	}
 	else if(strcmp(function,"diff")==0)
 	{
@@ -159,7 +159,7 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,int parameter)
 		}
 		else
 		{
-			if(item->value_type==0)
+			if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
 			{
 				if(cmp_double(item->lastvalue, item->prevvalue) == 0)
 				{
@@ -174,15 +174,32 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,int parameter)
 			{
 				if(strcmp(item->lastvalue_str, item->prevvalue_str) == 0)
 				{
-/*					*value=strdup("0");*/
 					strcpy(value,"0");
 				}
 				else
 				{
-/*					*value=strdup("1");*/
 					strcpy(value,"1");
 				}
 			}
+		}
+	}
+	else if(strcmp(function,"str")==0)
+	{
+		if(item->value_type==ITEM_VALUE_TYPE_STR)
+		{
+			if(strstr(item->lastvalue_str, parameter) == NULL)
+			{
+				strcpy(value,"0");
+			}
+			else
+			{
+				strcpy(value,"1");
+			}
+
+		}
+		else
+		{
+			ret = FAIL;
 		}
 	}
 	else
@@ -213,7 +230,7 @@ void	update_functions(DB_ITEM *item)
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 		function.function=DBget_field(result,i,0);
-		function.parameter=atoi(DBget_field(result,i,1));
+		function.parameter=DBget_field(result,i,1);
 		function.itemid=atoi(DBget_field(result,i,2));
 
 		zabbix_log( LOG_LEVEL_DEBUG, "ItemId:%d Evaluating %s(%d)\n",function.itemid,function.function,function.parameter);
@@ -229,7 +246,7 @@ void	update_functions(DB_ITEM *item)
 		zabbix_log( LOG_LEVEL_DEBUG, "Result:%f\n",value);
 		if (ret == SUCCEED)
 		{
-			sprintf(sql,"update functions set lastvalue='%s' where itemid=%d and function='%s' and parameter=%d", value, function.itemid, function.function, function.parameter );
+			sprintf(sql,"update functions set lastvalue='%s' where itemid=%d and function='%s' and parameter='%s'", value, function.itemid, function.function, function.parameter );
 			DBexecute(sql);
 		}
 	}
@@ -792,7 +809,6 @@ int	get_lastvalue(char *value,char *host,char *key,char *function,char *paramete
 	DB_RESULT *result;
 
         char	sql[MAX_STRING_LEN+1];
-	int	parm;
 	char	*s;
 	int	res;
 
@@ -835,10 +851,9 @@ int	get_lastvalue(char *value,char *host,char *key,char *function,char *paramete
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Itemid:%d", item.itemid );
 
-	parm=atoi(parameter);
 	zabbix_log(LOG_LEVEL_DEBUG, "Before evaluate_FUNCTION()" );
 
-	res = evaluate_FUNCTION(value,&item,function,parm);
+	res = evaluate_FUNCTION(value,&item,function,parameter);
 
 /* Cannot call DBfree_result until evaluate_FUNC */
 	DBfree_result(result);
@@ -932,7 +947,7 @@ void	process_new_value(DB_ITEM *item,char *value)
 
 	if(item->history>0)
 	{
-		if(item->value_type==0)
+		if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
 		{
 			DBadd_history(item->itemid,value_double);
 		}
