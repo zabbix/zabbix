@@ -24,13 +24,13 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.28)
+Zabbix Reference Manual for version 1.0 (draft v1.29)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-2 August 2002
+5 September 2002
 \layout Abstract
 
 The document is Reference Manual for Zabbix version 1.0.
@@ -955,14 +955,8 @@ vacuum
 " MySQL
 \layout Standard
 
-MySQL MyISAM table is not a best choice because of lack of row locking.
+MySQL MyISAM table is not a best choice because of lack of row-level locking.
  So, InnoDB is recommended.
-\begin_float footnote 
-\layout Standard
-
-Zabbix is not tested with MySQL's InnoDB database structure.
- The recommendation was made based on information available on Internet.
-\end_float 
  For more information about MySQL see 
 \begin_inset LatexCommand \cite{key-1}
 
@@ -11127,6 +11121,18 @@ rebuild MySQL or PostgreSQL from sources to get maximum performance
 
 follow performance tuning instructions taken from MySQL or PostgreSQL documentat
 ion
+\layout Itemize
+
+for MySQL, use InnoDB table structure
+\begin_float footnote 
+\layout Standard
+
+
+\series bold 
+Zabbix 
+\series default 
+works at least 1.5 times (comparing to MyISAM) if InnoDB is used.
+\end_float 
 \layout Section
 
 Zabbix Frontends
