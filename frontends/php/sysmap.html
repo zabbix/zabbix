@@ -1,0 +1,226 @@
+<?
+	include "include/config.inc";
+	$page["title"] = "Configuration of system map";
+	$page["file"] = "sysmap.html";
+	show_header($page["title"],0);
+?>
+
+<?
+	show_table_header("CONFIGURATION OF SYSTEM MAP");
+	echo "<br>";
+?>
+
+<?
+	if(isset($register))
+	{
+		if($register=="add")
+		{
+			add_host_to_sysmap($sysmapid,$hostid,$label,$x,$y);
+		}
+		if($register=="add link")
+		{
+			add_link($sysmapid,$shostid1,$shostid2);
+		}
+		if($register=="delete")
+		{
+			delete_sysmaps_host($shostid);
+		}
+	}
+?>
+
+<?
+	$result=DBselect("select name from sysmaps where sysmapid=$sysmapid");
+	$map=DBget_field($result,0,0);
+	show_table_header($map);
+	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TR BGCOLOR=#DDDDDD>";
+	echo "<TD ALIGN=CENTER>";
+	echo "<IMG SRC=\"map.html?noedit=1&sysmapid=$sysmapid\">";
+	echo "</TD>";
+	echo "</TR>";
+	echo "</TABLE>";
+
+	show_table_header("DISPLAYED HOSTS");
+	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>Host</B></TD>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>Label</B></TD>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>X</B></TD>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>Y</B></TD>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>Actions</B></TD>";
+	echo "</TR>";
+
+	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y from sysmaps_hosts sh,hosts h where sh.sysmapid=$sysmapid and h.hostid=sh.hostid");
+	echo "<CENTER>";
+	$col=0;
+	for($i=0;$i<DBnum_rows($result);$i++)
+	{
+		if($col==1)
+		{
+			echo "<TR BGCOLOR=#EEEEEE>";
+			$col=0;
+		} else
+		{
+			echo "<TR BGCOLOR=#DDDDDD>";
+			$col=1;
+		}
+	
+		$host=DBget_field($result,$i,0);
+		$shostid=DBget_field($result,$i,1);
+		$sysmapid=DBget_field($result,$i,2);
+		$hostid=DBget_field($result,$i,3);
+		$label=DBget_field($result,$i,4);
+		$x=DBget_field($result,$i,5);
+		$y=DBget_field($result,$i,6);
+
+		echo "<TD>$host</TD>";
+		echo "<TD><a href=\"sysmap.html?sysmapid=$sysmapid\">$label</a></TD>";
+		echo "<TD>$x</TD>";
+		echo "<TD>$y</TD>";
+		echo "<TD><A HREF=\"sysmap.html?register=delete&sysmapid=$sysmapid&shostid=$shostid\">Delete</A></TD>";
+		echo "</TR>";
+	}
+	echo "</TABLE>";
+?>
+
+<?
+	show_table_header("CONNECTORS");
+	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>ID</B></TD>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>Host 1</B></TD>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>Host 2</B></TD>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>Actions</B></TD>";
+	echo "</TR>";
+
+	$result=DBselect("select linkid,shostid1,shostid2 from sysmaps_links order by linkid");
+	echo "<CENTER>";
+	$col=0;
+	for($i=0;$i<DBnum_rows($result);$i++)
+	{
+		if($col==1)
+		{
+			echo "<TR BGCOLOR=#EEEEEE>";
+			$col=0;
+		} else
+		{
+			echo "<TR BGCOLOR=#DDDDDD>";
+			$col=1;
+		}
+	
+		$linkid=DBget_field($result,$i,0);
+		$shostid1=DBget_field($result,$i,1);
+		$shostid2=DBget_field($result,$i,2);
+
+		$result1=DBselect("select label from sysmaps_hosts where shostid=$shostid1");
+		$label1=DBget_field($result1,0,0);
+		$result1=DBselect("select label from sysmaps_hosts where shostid=$shostid2");
+		$label2=DBget_field($result1,0,0);
+
+		echo "<TD>$linkid</TD>";
+		echo "<TD>$label1</TD>";
+		echo "<TD>$label2</TD>";
+		echo "<TD><A HREF=\"sysmap.html?register=delete_link&linkid=$linkid\">Delete</A></TD>";
+		echo "</TR>";
+	}
+	echo "</TABLE>";
+?>
+
+
+
+
+
+
+
+
+<?
+	echo "<br>";
+	show_table2_header_begin();
+	echo "New host to display";
+
+	show_table2_v_delimiter();
+	echo "<form method=\"post\" action=\"sysmap.html?sysmapid=$sysmapid\">";
+	echo "Host";
+	show_table2_h_delimiter();
+	$result=DBselect("select hostid,host from hosts order by host");
+	echo "<select name=\"hostid\" size=1>";
+	for($i=0;$i<DBnum_rows($result);$i++)
+	{
+		$hostid=DBget_field($result,$i,0);
+		$host=DBget_field($result,$i,1);
+		echo "<OPTION VALUE='$hostid'>$host";
+	}
+	echo "</SELECT>";
+
+	show_table2_v_delimiter();
+	echo "Label";
+	show_table2_h_delimiter();
+	echo "<input name=\"label\" size=32 value=\"\">";
+
+	show_table2_v_delimiter();
+	echo "Coordinate X";
+	show_table2_h_delimiter();
+	echo "<input name=\"x\" size=5 value=\"0\">";
+
+	show_table2_v_delimiter();
+	echo "Coordinate Y";
+	show_table2_h_delimiter();
+	echo "<input name=\"y\" size=5 value=\"0\">";
+
+	show_table2_v_delimiter2();
+	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+
+	show_table2_header_end();
+?>
+
+
+
+
+
+
+
+
+
+
+
+
+<?
+	echo "<br>";
+	show_table2_header_begin();
+	echo "New connector";
+
+	show_table2_v_delimiter();
+	echo "<form method=\"post\" action=\"sysmap.html?sysmapid=$sysmapid\">";
+	echo "Host 1";
+	show_table2_h_delimiter();
+	$result=DBselect("select shostid,label from sysmaps_hosts where sysmapid=$sysmapid order by label");
+	echo "<select name=\"shostid1\" size=1>";
+	for($i=0;$i<DBnum_rows($result);$i++)
+	{
+		$shostid=DBget_field($result,$i,0);
+		$label=DBget_field($result,$i,1);
+		echo "<OPTION VALUE='$shostid'>$label";
+	}
+	echo "</SELECT>";
+
+	show_table2_v_delimiter();
+	echo "<form method=\"post\" action=\"sysmap.html?sysmapid=$sysmapid\">";
+	echo "Host 2";
+	show_table2_h_delimiter();
+	$result=DBselect("select shostid,label from sysmaps_hosts where sysmapid=$sysmapid order by label");
+	echo "<select name=\"shostid2\" size=1>";
+	for($i=0;$i<DBnum_rows($result);$i++)
+	{
+		$shostid=DBget_field($result,$i,0);
+		$label=DBget_field($result,$i,1);
+		echo "<OPTION VALUE='$shostid'>$label";
+	}
+	echo "</SELECT>";
+
+	show_table2_v_delimiter2();
+	echo "<input type=\"submit\" name=\"register\" value=\"add link\">";
+
+	show_table2_header_end();
+?>
+
+<?
+	show_footer();
+?>

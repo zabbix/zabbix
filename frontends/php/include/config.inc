@@ -303,9 +303,24 @@
 ?>
 			</font>
 		</td>
+		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
+			<font face="Arial,Helvetica" size=2>
+				<a href="maps.html">
+<?
+				if($page["file"]=="maps.html")
+				{
+					echo "<b>[NETWORK MAPS]</b></a>";
+				}
+				else
+				{
+					echo "NETWORK MAPS</a>";
+				}
+?>
+			</font>
+		</td>
 		</tr>
 		<tr>
-		<td colspan=2 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=3 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
 				<a href="report1.html">
 <?
@@ -665,6 +680,10 @@
 	{
 		$sql="delete from sysmaps where sysmapid=$sysmapid";
 		$result=DBexecute($sql);
+		$sql="delete from sysmaps_hosts where sysmapid=$sysmapid";
+		$result=DBexecute($sql);
+		$sql="delete from sysmaps_links where sysmapid=$sysmapid";
+		$result=DBexecute($sql);
 	}
 
 	# Delete Action by userid
@@ -863,6 +882,20 @@
 		$result=DBexecute($sql);
 	}
 
+	function	add_link($sysmapid,$shostid1,$shostid2)
+	{
+		$sql="insert into sysmaps_links (sysmapid,shostid1,shostid2) values ($sysmapid,$shostid1,$shostid2)";
+		$result=DBexecute($sql);
+	}
+
+	# Add Host to system map
+
+	function add_host_to_sysmap($sysmapid,$hostid,$label,$x,$y)
+	{
+		$sql="insert into sysmaps_hosts (sysmapid,hostid,label,x,y) values ($sysmapid,$hostid,'$label',$x,$y)";
+		$result=DBexecute($sql);
+	}
+
 	# Add Host definition
 
 	function	add_host($host,$port,$status)
@@ -921,6 +954,16 @@
 	function	disactivate_media($mediaid)
 	{
 		$sql="update media set active=1 where mediaid=$mediaid";
+		$result=DBexecute($sql);
+	}
+
+	# Delete Host from sysmap definition
+
+	function	delete_sysmaps_host($shostid)
+	{
+		$sql="delete from sysmaps_hosts where shostid=$shostid";
+		$result=DBexecute($sql);
+		$sql="delete from sysmaps_links where shostid1=$shostid or shostid2=$shostid";
 		$result=DBexecute($sql);
 	}
 
