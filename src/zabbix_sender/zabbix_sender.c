@@ -80,7 +80,7 @@ int	send_value(char *monserver,int port,char *shortname,char *value)
 		return	FAIL;
 	} 
 	i=sizeof(struct sockaddr_in);
-	i=recvfrom(s,result,1023,0,(struct sockaddr *)&servaddr_in,&i);
+	i=recvfrom(s,result,1023,0,(struct sockaddr *)&servaddr_in,(size_t *)&i);
 	if(s==-1)
 	{
 		perror("recfrom");
