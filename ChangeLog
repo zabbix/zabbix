@@ -13,6 +13,7 @@ Not ready yet:
 [ Add support for new trigger statuses: MODIFIED/NOTSUPORTED ]
 [ All parameters should contain section "How can be used" in the Manual ]
 [ PHP to support non-numeric values ]
+[ Change algorithm for audible notification ]
 
 Changes for 1.0beta3:
 
