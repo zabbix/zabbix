@@ -6,6 +6,7 @@ Error
 Critical
 Panic
 
+ - fix screenedit.php permissions 
  - macro {IPADDRESS}
  - localisation (one file with defines for each language)
 
