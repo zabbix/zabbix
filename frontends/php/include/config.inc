@@ -177,7 +177,7 @@
 		global $PHP_AUTH_USER,$PHP_AUTH_PW;
 		global $USER_DETAILS;
 
-		$passwd=bin2hex(mhash (MHASH_MD5, $PHP_AUTH_PW));
+		$passwd=md5($PHP_AUTH_PW);
 
 		$sql="select g.groupid,u.userid,u.alias,u.name,u.surname from users u,groups g where u.alias='$PHP_AUTH_USER' and u.passwd='$passwd' and u.groupid=g.groupid";
 		$result=DBselect($sql);
@@ -993,7 +993,7 @@
 		}
 		else
 		{
-			$passwd=bin2hex(mhash (MHASH_MD5,$passwd));
+			$passwd=md5($passwd);
 			$sql="update users set groupid=$groupid,name='$name',surname='$surname',alias='$alias',passwd='$passwd' where userid=$userid";
 		}
 		return DBexecute($sql);
@@ -1004,7 +1004,7 @@
 
 	function	add_user($groupid,$name,$surname,$alias,$passwd)
 	{
-		$passwd=bin2hex(mhash (MHASH_MD5,$passwd));
+		$passwd=md5($passwd);
 		$sql="insert into users (groupid,name,surname,alias,passwd) values ($groupid,'$name','$surname','$alias','$passwd')";
 		return DBexecute($sql);
 	}
