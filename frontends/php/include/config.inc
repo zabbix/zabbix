@@ -1115,7 +1115,7 @@
 
 	function	add_host($host,$port,$status,$template,$useip,$ip)
 	{
-		if($useip=="true")
+		if($useip=="on")
 		{
 			$useip=1;
 		}
@@ -1138,6 +1138,22 @@
 		}
 		return	$result;
 	}
+
+	function	update_host($hostid,$host,$port,$status,$useip,$ip)
+	{
+		if($useip=="on")
+		{
+			$useip=1;
+		}
+		else
+		{
+			$useip=0;
+		}
+		$sql="update hosts set host='$host',port=$port,status=$status,useip=$useip,ip='$ip' where hostid=$hostid";
+		$result=DBexecute($sql);
+		return	$result;
+	}
+
 
 	# Add Media definition
 
