@@ -472,7 +472,8 @@ void update_key_status_thread(MYSQL *database, int hostid,int host_status)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In update_key_status()");
 
-	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,i.status from items i,hosts h where h.hostid=i.hostid and h.hostid=%d and i.key_='%s'", hostid,SERVER_STATUS_KEY);
+/*	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,i.status from items i,hosts h where h.hostid=i.hostid and h.hostid=%d and i.key_='%s'", hostid,SERVER_STATUS_KEY);*/
+	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula from items i,hosts h where h.hostid=i.hostid and h.hostid=%d and i.key_='%s'", hostid,SERVER_STATUS_KEY);
 	result = DBselect_thread(database, sql);
 
 	if( DBnum_rows(result) == 0)
@@ -481,7 +482,8 @@ void update_key_status_thread(MYSQL *database, int hostid,int host_status)
 	}
 	else
 	{
-		item.itemid=atoi(DBget_field(result,0,0));
+		DBget_item_from_db(&item,result,0);
+/*		item.itemid=atoi(DBget_field(result,0,0));
 		item.key=DBget_field(result,0,1);
 		item.host=DBget_field(result,0,2);
 		item.port=atoi(DBget_field(result,0,3));
@@ -518,7 +520,7 @@ void update_key_status_thread(MYSQL *database, int hostid,int host_status)
 		}
 		item.hostid=atoi(DBget_field(result,0,15));
 		item.value_type=atoi(DBget_field(result,0,17));
-		item.delta=atoi(DBget_field(result,0,18));
+		item.delta=atoi(DBget_field(result,0,18));*/
 	
 		snprintf(value_str,sizeof(value_str)-1,"%d",host_status);
 
@@ -535,14 +537,14 @@ void update_key_status(int hostid,int host_status)
 {
 	char		sql[MAX_STRING_LEN];
 	char		value_str[MAX_STRING_LEN];
-	char		*s;
 
 	DB_ITEM		item;
 	DB_RESULT	*result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In update_key_status()");
 
-	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,i.status from items i,hosts h where h.hostid=i.hostid and h.hostid=%d and i.key_='%s'", hostid,SERVER_STATUS_KEY);
+/*	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,i.status from items i,hosts h where h.hostid=i.hostid and h.hostid=%d and i.key_='%s'", hostid,SERVER_STATUS_KEY);*/
+	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula from items i,hosts h where h.hostid=i.hostid and h.hostid=%d and i.key_='%s'", hostid,SERVER_STATUS_KEY);
 	result = DBselect(sql);
 
 	if( DBnum_rows(result) == 0)
@@ -551,6 +553,8 @@ void update_key_status(int hostid,int host_status)
 	}
 	else
 	{
+		DBget_item_from_db(&item,result,0);
+/*
 		item.itemid=atoi(DBget_field(result,0,0));
 		item.key=DBget_field(result,0,1);
 		item.host=DBget_field(result,0,2);
@@ -589,6 +593,7 @@ void update_key_status(int hostid,int host_status)
 		item.hostid=atoi(DBget_field(result,0,15));
 		item.value_type=atoi(DBget_field(result,0,17));
 		item.delta=atoi(DBget_field(result,0,18));
+*/
 	
 		snprintf(value_str,sizeof(value_str)-1,"%d",host_status);
 
@@ -624,328 +629,6 @@ void	trend(void)
 	DBfree_result(result2);
 }
 
-#ifdef ZBX_POLLER
-int poller(void)
-{
-	struct poller_request_buf request;
-	struct poller_answer_buf answer;
-
-	DB_ITEM		item;
-
-	for(;;)
-	{
-		zabbix_log( LOG_LEVEL_ERR, "Poller: Waiting for a request" );
-		if(-1 == msgrcv(requests_queue,&request,sizeof(request),1,0))
-		{
-			zabbix_log( LOG_LEVEL_ERR, "Error doing msgrcv()" );
-		}
-		zabbix_log( LOG_LEVEL_ERR, "Got value for polling. Type [%d] Port [%d] IP [%s] Use IP [%d] Value type [%d] Key [%s]", request.type, request.port, request.ip,request.useip,request.value_type, request.key );
-
-		item.type = request.type;
-		item.value_type = request.value_type;
-		item.port = request.port;
-		item.useip = request.useip;
-		item.snmp_port = request.snmp_port;
-		item.key=request.key;
-		item.host=request.host;
-		item.ip=request.ip;
-		item.snmp_community=request.snmp_community;
-//		item.snmp_oid=buf.snmp_oid;
-
-		answer.mtype = 1;
-		answer.ret = get_value(&answer.value,answer.value_str,&item);
-
-		zabbix_log( LOG_LEVEL_ERR, "Poller: Sending result back" );
-		if(-1 == msgsnd(answers_queue, &answer, sizeof(answer), 0))
-		{
-			zabbix_log( LOG_LEVEL_ERR, "Poller: Error doing msgsnd()" );
-		}
-		zabbix_log( LOG_LEVEL_ERR, "Poller: Sending result back ... done" );
-	}
-}
-
-int get_values_new(void)
-{
-	double		value;
-	char		value_str[MAX_STRING_LEN];
-	char		sql[MAX_STRING_LEN];
- 
-	DB_RESULT	*result;
-
-	int		i,j;
-	int		now;
-	int		res;
-	DB_ITEM		item;
-	char		*s;
-
-	int	host_status;
-	int	network_errors;
-
-	struct poller_request_buf request;
-	struct poller_answer_buf answer;
-
-	now = time(NULL);
-
-#ifdef ZBX_POLLER
-	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier from items i,hosts h where i.nextcheck<=%d and i.status=%d and i.type not in (%d) and (h.status=%d or (h.status=%d and h.disable_until<=%d)) and h.hostid=i.hostid and i.key_<>'%s' and i.key_<>'%s' and i.key_<>'%s' order by i.nextcheck limit 50", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY);
-#else
-	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier from items i,hosts h where i.nextcheck<=%d and i.status=%d and i.type not in (%d) and (h.status=%d or (h.status=%d and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d and i.key_<>'%s' and i.key_<>'%s' and i.key_<>'%s' order by i.nextcheck", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY);
-#endif
-	result = DBselect(sql);
-
-	for(i=0;i<DBnum_rows(result);i++)
-	{
-		item.itemid=atoi(DBget_field(result,i,0));
-		item.key=DBget_field(result,i,1);
-		item.host=DBget_field(result,i,2);
-		item.port=atoi(DBget_field(result,i,3));
-		item.delay=atoi(DBget_field(result,i,4));
-		item.description=DBget_field(result,i,5);
-		item.nextcheck=atoi(DBget_field(result,i,6));
-		item.type=atoi(DBget_field(result,i,7));
-		item.snmp_community=DBget_field(result,i,8);
-		item.snmp_oid=DBget_field(result,i,9);
-		item.useip=atoi(DBget_field(result,i,10));
-		item.ip=DBget_field(result,i,11);
-		item.history=atoi(DBget_field(result,i,12));
-		s=DBget_field(result,i,13);
-		if(s==NULL)
-		{
-			item.lastvalue_null=1;
-		}
-		else
-		{
-			item.lastvalue_null=0;
-			item.lastvalue_str=s;
-			item.lastvalue=atof(s);
-		}
-		s=DBget_field(result,i,14);
-		if(s==NULL)
-		{
-			item.prevvalue_null=1;
-		}
-		else
-		{
-			item.prevvalue_null=0;
-			item.prevvalue_str=s;
-			item.prevvalue=atof(s);
-		}
-		item.hostid=atoi(DBget_field(result,i,15));
-		host_status=atoi(DBget_field(result,i,16));
-		item.value_type=atoi(DBget_field(result,i,17));
-
-		network_errors=atoi(DBget_field(result,i,18));
-		item.snmp_port=atoi(DBget_field(result,i,19));
-		item.delta=atoi(DBget_field(result,i,20));
-
-		s=DBget_field(result,i,21);
-		if(s==NULL)
-		{
-			item.prevorgvalue_null=1;
-		}
-		else
-		{
-			item.prevorgvalue_null=0;
-			item.prevorgvalue=atof(s);
-		}
-		s=DBget_field(result,i,22);
-		if(s==NULL)
-		{
-			item.lastclock=0;
-		}
-		else
-		{
-			item.lastclock=atoi(s);
-		}
-
-		item.units=DBget_field(result,i,23);
-		item.multiplier=atoi(DBget_field(result,i,24));
-
-		request.mtype = 1;
-		request.num = i;
-		request.type = item.type;
-		request.value_type = item.value_type;
-		request.port = item.port;
-		request.useip = item.useip;
-		request.snmp_port = item.snmp_port;
-
-		strncpy(request.key, item.key, MAX_ITEM_KEY_LEN);
-		strncpy(request.host, item.host, MAX_HOST_HOST_LEN);
-		strncpy(request.ip, item.ip, MAX_ITEM_IP_LEN);
-		strncpy(request.snmp_community, item.snmp_community, MAX_ITEM_SNMP_COMMUNITY_LEN);
-//		strncpy(buf.snmp_oid, item.snmp_oid, MAX_ITEM_SNMP_OID_LEN);
-
-		if(-1 == msgsnd(requests_queue, &request, sizeof(request), 0))
-		{
-			zabbix_log( LOG_LEVEL_ERR, "Get values: Error doing msgsnd(%d) [%m]", sizeof(request) );
-		}
-		zabbix_log( LOG_LEVEL_ERR, "Putting value [%d] into requests_queue. Msg size [%d]", i, sizeof(request));
-	}
-
-	for(i=0;i<DBnum_rows(result);i++)
-	{
-		if(-1 == msgrcv(answers_queue,&answer,sizeof(answer),1,0))
-		{
-			zabbix_log( LOG_LEVEL_ERR, "Error doing msgrcv() [%m]" );
-		}
-		zabbix_log( LOG_LEVEL_ERR, "Getting value from answers_queue. Res [%d] Num [%d]", answer.ret, answer.num );
-
-		j=answer.num;
-		res = answer.ret;
-
-		item.itemid=atoi(DBget_field(result,j,0));
-		item.key=DBget_field(result,j,1);
-		item.host=DBget_field(result,j,2);
-		item.port=atoi(DBget_field(result,j,3));
-		item.delay=atoi(DBget_field(result,j,4));
-		item.description=DBget_field(result,j,5);
-		item.nextcheck=atoi(DBget_field(result,j,6));
-		item.type=atoi(DBget_field(result,j,7));
-		item.snmp_community=DBget_field(result,j,8);
-		item.snmp_oid=DBget_field(result,j,9);
-		item.useip=atoi(DBget_field(result,j,10));
-		item.ip=DBget_field(result,j,11);
-		item.history=atoi(DBget_field(result,j,12));
-
-		s=DBget_field(result,j,13);
-		if(s==NULL)
-		{
-			item.lastvalue_null=1;
-		}
-		else
-		{
-			item.lastvalue_null=0;
-			item.lastvalue_str=s;
-			item.lastvalue=atof(s);
-		}
-		s=DBget_field(result,j,14);
-		if(s==NULL)
-		{
-			item.prevvalue_null=1;
-		}
-		else
-		{
-			item.prevvalue_null=0;
-			item.prevvalue_str=s;
-			item.prevvalue=atof(s);
-		}
-		item.hostid=atoi(DBget_field(result,j,15));
-		host_status=atoi(DBget_field(result,j,16));
-		item.value_type=atoi(DBget_field(result,j,17));
-
-		network_errors=atoi(DBget_field(result,j,18));
-		item.snmp_port=atoi(DBget_field(result,j,19));
-		item.delta=atoi(DBget_field(result,j,20));
-
-		s=DBget_field(result,j,21);
-		if(s==NULL)
-		{
-			item.prevorgvalue_null=1;
-		}
-		else
-		{
-			item.prevorgvalue_null=0;
-			item.prevorgvalue=atof(s);
-		}
-		s=DBget_field(result,j,22);
-		if(s==NULL)
-		{
-			item.lastclock=0;
-		}
-		else
-		{
-			item.lastclock=atoi(s);
-		}
-
-		item.units=DBget_field(result,j,23);
-		item.multiplier=atoi(DBget_field(result,j,24));
-
-		strncpy(value_str,answer.value_str, MAX_STRING_LEN);
-		value = answer.value;
-
-//		res = get_value(&value,value_str,&item);
-		zabbix_log( LOG_LEVEL_ERR, "GOT VALUE [%s]", value_str );
-		
-		if(res == SUCCEED )
-		{
-			process_new_value(&item,value_str);
-
-			if(network_errors>0)
-			{
-				snprintf(sql,sizeof(sql)-1,"update hosts set network_errors=0 where hostid=%d and network_errors>0", item.hostid);
-				DBexecute(sql);
-			}
-
-			if(HOST_STATUS_UNREACHABLE == host_status)
-			{
-				host_status=HOST_STATUS_MONITORED;
-				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
-				DBupdate_host_status(item.hostid,HOST_STATUS_MONITORED,now);
-				update_key_status(item.hostid,HOST_STATUS_MONITORED);	
-
-				break;
-			}
-		}
-		else if(res == NOTSUPPORTED)
-		{
-			zabbix_log( LOG_LEVEL_WARNING, "Parameter [%s] is not supported by agent on host [%s]", item.key, item.host );
-			DBupdate_item_status_to_notsupported(item.itemid);
-			if(HOST_STATUS_UNREACHABLE == host_status)
-			{
-				host_status=HOST_STATUS_MONITORED;
-				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
-				DBupdate_host_status(item.hostid,HOST_STATUS_MONITORED,now);
-				update_key_status(item.hostid,HOST_STATUS_MONITORED);	
-
-				break;
-			}
-		}
-		else if(res == NETWORK_ERROR)
-		{
-			network_errors++;
-			if(network_errors>=3)
-			{
-				zabbix_log( LOG_LEVEL_WARNING, "Host [%s] will be checked after [%d] seconds", item.host, DELAY_ON_NETWORK_FAILURE );
-				DBupdate_host_status(item.hostid,HOST_STATUS_UNREACHABLE,now);
-				update_key_status(item.hostid,HOST_STATUS_UNREACHABLE);	
-
-				snprintf(sql,sizeof(sql)-1,"update hosts set network_errors=3 where hostid=%d", item.hostid);
-				DBexecute(sql);
-			}
-			else
-			{
-				snprintf(sql,sizeof(sql)-1,"update hosts set network_errors=%d where hostid=%d", network_errors, item.hostid);
-				DBexecute(sql);
-			}
-
-			break;
-		}
-/* Possibly, other logic required? */
-		else if(res == AGENT_ERROR)
-		{
-			zabbix_log( LOG_LEVEL_WARNING, "Getting value of [%s] from host [%s] failed (ZBX_ERROR)", item.key, item.host );
-			zabbix_log( LOG_LEVEL_WARNING, "The value is not stored in database.");
-
-			break;
-		}
-		else
-		{
-			zabbix_log( LOG_LEVEL_WARNING, "Getting value of [%s] from host [%s] failed", item.key, item.host );
-			zabbix_log( LOG_LEVEL_WARNING, "The value is not stored in database.");
-		}
-
-		if(res ==  SUCCEED)
-		{
-		        update_triggers(item.itemid);
-		}
-
-	}
-
-	DBfree_result(result);
-	return SUCCEED;
-}
-#endif
-
 #ifdef ZABBIX_THREADS
 int get_values(MYSQL *database)
 #else
@@ -962,10 +645,6 @@ int get_values(void)
 	int		now;
 	int		res;
 	DB_ITEM		item;
-	char		*s;
-
-	int	host_status;
-	int	network_errors;
 
 	now = time(NULL);
 
@@ -1032,6 +711,9 @@ int get_values(void)
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
+
+		DBget_item_from_db(&item,result, i);
+/*
 		item.itemid=atoi(DBget_field(result,i,0));
 		item.key=DBget_field(result,i,1);
 		item.host=DBget_field(result,i,2);
@@ -1068,7 +750,7 @@ int get_values(void)
 			item.prevvalue=atof(s);
 		}
 		item.hostid=atoi(DBget_field(result,i,15));
-		host_status=atoi(DBget_field(result,i,16));
+		item.host_status=atoi(DBget_field(result,i,16));
 		item.value_type=atoi(DBget_field(result,i,17));
 
 		network_errors=atoi(DBget_field(result,i,18));
@@ -1103,6 +785,7 @@ int get_values(void)
 		item.snmpv3_authpassphrase = DBget_field(result,i,27);
 		item.snmpv3_privpassphrase = DBget_field(result,i,28);
 		item.formula = DBget_field(result,i,29);
+*/
 
 #ifdef ZABBIX_THREADS
 		res = requests[i].ret;
@@ -1126,7 +809,7 @@ int get_values(void)
 			process_new_value(&item,value_str);
 #endif
 
-			if(network_errors>0)
+			if(item.host_network_errors>0)
 			{
 				snprintf(sql,sizeof(sql)-1,"update hosts set network_errors=0 where hostid=%d and network_errors>0", item.hostid);
 #ifdef ZABBIX_THREADS
@@ -1136,9 +819,9 @@ int get_values(void)
 #endif
 			}
 
-			if(HOST_STATUS_UNREACHABLE == host_status)
+			if(HOST_STATUS_UNREACHABLE == item.host_status)
 			{
-				host_status=HOST_STATUS_MONITORED;
+				item.host_status=HOST_STATUS_MONITORED;
 				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
 #ifdef ZABBIX_THREADS
 				DBupdate_host_status_thread(database, item.hostid,HOST_STATUS_MONITORED,now);
@@ -1159,9 +842,9 @@ int get_values(void)
 #else
 			DBupdate_item_status_to_notsupported(item.itemid);
 #endif
-			if(HOST_STATUS_UNREACHABLE == host_status)
+			if(HOST_STATUS_UNREACHABLE == item.host_status)
 			{
-				host_status=HOST_STATUS_MONITORED;
+				item.host_status=HOST_STATUS_MONITORED;
 				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
 #ifdef ZABBIX_THREADS
 				DBupdate_host_status_thread(database, item.hostid,HOST_STATUS_MONITORED,now);
@@ -1176,8 +859,8 @@ int get_values(void)
 		}
 		else if(res == NETWORK_ERROR)
 		{
-			network_errors++;
-			if(network_errors>=3)
+			item.host_network_errors++;
+			if(item.host_network_errors>=3)
 			{
 				zabbix_log( LOG_LEVEL_WARNING, "Host [%s] will be checked after [%d] seconds", item.host, DELAY_ON_NETWORK_FAILURE );
 #ifdef ZABBIX_THREADS
@@ -1197,7 +880,7 @@ int get_values(void)
 			}
 			else
 			{
-				snprintf(sql,sizeof(sql)-1,"update hosts set network_errors=%d where hostid=%d", network_errors, item.hostid);
+				snprintf(sql,sizeof(sql)-1,"update hosts set network_errors=%d where hostid=%d", item.host_network_errors, item.hostid);
 #ifdef ZABBIX_THREADS
 				DBexecute_thread(database, sql);
 #else

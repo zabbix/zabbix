@@ -2241,3 +2241,83 @@ void    DBescape_string(char *from, char *to, int maxlen)
 	to[ptr]=0;
 	to[maxlen-1]=0;
 }
+
+void	DBget_item_from_db(DB_ITEM *item,DB_RESULT *result, int row)
+{
+	char	*s;
+	int	i;
+
+	i=row;
+
+	item->itemid=atoi(DBget_field(result,i,0));
+	item->key=DBget_field(result,i,1);
+	item->host=DBget_field(result,i,2);
+	item->port=atoi(DBget_field(result,i,3));
+	item->delay=atoi(DBget_field(result,i,4));
+	item->description=DBget_field(result,i,5);
+	item->nextcheck=atoi(DBget_field(result,i,6));
+	item->type=atoi(DBget_field(result,i,7));
+	item->snmp_community=DBget_field(result,i,8);
+	item->snmp_oid=DBget_field(result,i,9);
+	item->useip=atoi(DBget_field(result,i,10));
+	item->ip=DBget_field(result,i,11);
+	item->history=atoi(DBget_field(result,i,12));
+	s=DBget_field(result,i,13);
+	if(s==NULL)
+	{
+		item->lastvalue_null=1;
+	}
+	else
+	{
+		item->lastvalue_null=0;
+		item->lastvalue_str=s;
+		item->lastvalue=atof(s);
+	}
+	s=DBget_field(result,i,14);
+	if(s==NULL)
+	{
+		item->prevvalue_null=1;
+	}
+	else
+	{
+		item->prevvalue_null=0;
+		item->prevvalue_str=s;
+		item->prevvalue=atof(s);
+	}
+	item->hostid=atoi(DBget_field(result,i,15));
+	item->host_status=atoi(DBget_field(result,i,16));
+	item->value_type=atoi(DBget_field(result,i,17));
+
+	item->host_network_errors=atoi(DBget_field(result,i,18));
+	item->snmp_port=atoi(DBget_field(result,i,19));
+	item->delta=atoi(DBget_field(result,i,20));
+
+	s=DBget_field(result,i,21);
+	if(s==NULL)
+	{
+		item->prevorgvalue_null=1;
+	}
+	else
+	{
+		item->prevorgvalue_null=0;
+		item->prevorgvalue=atof(s);
+	}
+	s=DBget_field(result,i,22);
+	if(s==NULL)
+	{
+		item->lastclock=0;
+	}
+	else
+	{
+		item->lastclock=atoi(s);
+	}
+
+	item->units=DBget_field(result,i,23);
+	item->multiplier=atoi(DBget_field(result,i,24));
+
+	item->snmpv3_securityname = DBget_field(result,i,25);
+	item->snmpv3_securitylevel = atoi(DBget_field(result,i,26));
+	item->snmpv3_authpassphrase = DBget_field(result,i,27);
+	item->snmpv3_privpassphrase = DBget_field(result,i,28);
+	item->formula = DBget_field(result,i,29);
+}

@@ -993,6 +993,10 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
 		ret = FAIL;
 	}
 
+	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() pre-7");
+	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 7 Formula [%s]", item->formula);
+	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 7 Value [%s]", value);
+	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 7 Units [%s]", item->units);
 	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 7 Value [%s] Units [%s] Formula [%s]", value, item->units, item->formula);
 
 	/* Add suffix: 1000000 -> 1 MB */
@@ -1075,8 +1079,6 @@ void	update_functions_thread(MYSQL *database, DB_ITEM *item)
 		function.itemid=atoi(DBget_field(result,i,2));
 
 		zabbix_log( LOG_LEVEL_DEBUG, "ItemId:%d Evaluating %s(%d)\n",function.itemid,function.function,function.parameter);
-		zabbix_log( LOG_LEVEL_DEBUG, "ZZZ (%l)\n",value);
-
 
 		ret = evaluate_FUNCTION_thread(database,value,item,function.function,function.parameter, EVALUATE_FUNCTION_NORMAL);
 		if( FAIL == ret)	
@@ -1084,7 +1086,7 @@ void	update_functions_thread(MYSQL *database, DB_ITEM *item)
 			zabbix_log( LOG_LEVEL_DEBUG, "Evaluation failed for function:%s\n",function.function);
 			continue;
 		}
-		zabbix_log( LOG_LEVEL_DEBUG, "Result:%f\n",value);
+		zabbix_log( LOG_LEVEL_DEBUG, "Result of evaluate_FUNCTION [%s]\n",value);
 		if (ret == SUCCEED)
 		{
 			DBescape_string(value,value_esc,MAX_STRING_LEN);
@@ -1123,8 +1125,6 @@ void	update_functions(DB_ITEM *item)
 		function.itemid=atoi(DBget_field(result,i,2));
 
 		zabbix_log( LOG_LEVEL_DEBUG, "ItemId:%d Evaluating %s(%d)\n",function.itemid,function.function,function.parameter);
-		zabbix_log( LOG_LEVEL_DEBUG, "ZZZ (%l)\n",value);
-
 
 		ret = evaluate_FUNCTION(value,item,function.function,function.parameter, EVALUATE_FUNCTION_NORMAL);
 		if( FAIL == ret)	
@@ -1132,7 +1132,7 @@ void	update_functions(DB_ITEM *item)
 			zabbix_log( LOG_LEVEL_DEBUG, "Evaluation failed for function:%s\n",function.function);
 			continue;
 		}
-		zabbix_log( LOG_LEVEL_DEBUG, "Result:%f\n",value);
+		zabbix_log( LOG_LEVEL_DEBUG, "Result of evaluate_FUNCTION [%s]\n",value);
 		if (ret == SUCCEED)
 		{
 			DBescape_string(value,value_esc,MAX_STRING_LEN);
@@ -2172,7 +2172,7 @@ int	process_data(int sockfd,char *server,char *key,char *value)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_data()");
 
-	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta,i.units,i.multiplier from items i,hosts h where h.status in (0,2) and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type=%d", server, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
+	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta,i.units,i.multiplier,i.formula from items i,hosts h where h.status in (0,2) and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type=%d", server, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
 	result = DBselect(sql);
 
 	if(DBnum_rows(result) == 0)
@@ -2227,6 +2227,7 @@ int	process_data(int sockfd,char *server,char *key,char *value)
 	item.delta=atoi(DBget_field(result,0,17));
 	item.units=DBget_field(result,0,18);
 	item.multiplier=atoi(DBget_field(result,0,19));
+	item.formula=DBget_field(result,0,20);
 
 	process_new_value(&item,value);
 
