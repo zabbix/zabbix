@@ -1,6 +1,6 @@
 Changes for 1.0beta1:
-(snmptrap -v 1 127.0.0.1 public '' localhost 3 0 '' interfaces.ifTable.ifEntry.ifIndex.1 i 1)
 
+ - added startup scripts for RedHat. Thanks to Charlie Collins. (Alexei) 
  - disabled unfinished "IT SERVICES" functionality  (Alexei)
  - support for parameter Server in zabbix_agent.conf (Alexei)
  - added sample zabbix_trapper(d).conf to misc/conf (Alexei)
