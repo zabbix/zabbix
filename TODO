@@ -1,7 +1,6 @@
 1.0beta12:
 
  - no way to delete or rename host group
- - update item does not work (multiplier)
  - change %s to {HOSTNAME}, {DATE},{TIME}, etc
  - add zabbix[unixtime] and lastupdate() to get rid of nodata()
  - check return code for alert scripts
