@@ -104,4 +104,17 @@
 	{
 		echo "<td $attr>$text</td>";
 	}
+
+	function table_nodata($text="...")
+	{
+		cr();
+		echo "<TABLE BORDER=0 align=center WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+		echo "<TR BGCOLOR=\"#DDDDDD\">";
+		echo "<TD ALIGN=CENTER>";
+		echo $text;
+		echo "</TD>";
+		echo "</TR>";
+		echo "</TABLE>";
+		cr();
+	}
 ?>
