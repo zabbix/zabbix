@@ -1245,7 +1245,7 @@ float	CHECK_SERVICE_SSH(void)
 
 float	CHECK_SERVICE_SMTP(void)
 {
-	return	tcp_expect("127.0.0.1",25,"220","");
+	return	tcp_expect("127.0.0.1",25,"220","QUIT\n");
 }
 
 float	CHECK_SERVICE_FTP(void)
