@@ -1,6 +1,7 @@
 Not ready yet:
 
 [ CORE. Investigate why new alarm added for unreachanbel host ]
+[ CORE. Investigate why trigger change its status from disabled to FALSE or TRUE ]
 
 [ HB. Authorisation without user name/password ]
 [ CORE. Support for Service Tree ] 
