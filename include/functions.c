@@ -2365,6 +2365,7 @@ void	process_new_value(DB_ITEM *item,char *value)
 	char	sql[MAX_STRING_LEN];
 	char	value_esc[MAX_STRING_LEN];
 	double	value_double;
+	double	multiplier;
 	char	*e;
 
 	now = time(NULL);
