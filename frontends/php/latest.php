@@ -100,7 +100,7 @@
 		{
 			$result=DBselect("select host from hosts where hostid=".$HTTP_GET_VARS["hostid"]);
 			$host=DBget_field($result,0,0);
-			show_table_header("<a href=\"latest.php?hostid=$hostid\">$host</a>");
+			show_table_header("<a href=\"latest.php?hostid=".$HTTP_GET_VARS["hostid"]."\">$host</a>");
 		}
 		else
 		{

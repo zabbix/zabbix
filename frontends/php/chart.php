@@ -7,12 +7,20 @@
 #	period
 #	from
 
-	if(!isset($period))
+	if(isset($HTTP_GET_VARS["period"]))
+	{
+		$period=$HTTP_GET_VARS["period"];
+	}
+	else
 	{
 		$period=3600;
 	}
 
-	if(!isset($from))
+	if(isset($from))
+	{
+		$from=$HTTP_GET_VARS["from"];
+	}
+	else
 	{
 		$from=0;
 	}
@@ -57,7 +65,7 @@
 	{
 		ImageDashedLine($im,$i+$shiftX,$shiftY,$i+$shiftX,$sizeY+$shiftY,$gray);
 	}
-	$item=get_item_by_itemid($itemid);
+	$item=get_item_by_itemid($HTTP_GET_VARS["itemid"]);
 	$host=get_host_by_hostid($item["hostid"]);
 
 	$str=$host["host"].":".$item["description"];
@@ -67,7 +75,7 @@
 
 	$from_time = time(NULL)-$period-3600*$from;
 	$to_time   = time(NULL)-3600*$from;
-	$result=DBselect("select count(clock),min(clock),max(clock),min(value),max(value) from history where itemid=$itemid and clock>$from_time and clock<$to_time ");
+	$result=DBselect("select count(clock),min(clock),max(clock),min(value),max(value) from history where itemid=".$HTTP_GET_VARS["itemid"]." and clock>$from_time and clock<$to_time ");
 	$count=DBget_field($result,0,0);
 	if($count>0)
 	{
@@ -90,7 +98,7 @@
 
 	if(isset($minX)&&($minX!=$maxX)&&($minY!=$maxY))
 	{
-		$result=DBselect("select clock,value from history where itemid=$itemid and clock>$from_time and clock<$to_time order by clock");
+		$result=DBselect("select clock,value from history where itemid=".$HTTP_GET_VARS["itemid"]." and clock>$from_time and clock<$to_time order by clock");
 		for($i=0;$i<DBnum_rows($result)-1;$i++)
 		{
 			$x=DBget_field($result,$i,0);
