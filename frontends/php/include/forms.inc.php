@@ -24,11 +24,11 @@
 	include_once 	"include/local_en.inc.php";
 
 	# Insert host template form
-	function	insert_template_form($hosttemplateid)
+	function	insert_template_form($hostid, $hosttemplateid)
 	{
 		if(isset($hosttemplateid))
 		{
-			$result=DBselect("select u.alias,u.name,u.surname,u.passwd,u.url from users u where u.userid=$userid");
+			$result=DBselect("select * from hosts_templates  where hosttemplateid=$hosttemplateid");
 
 			$row=DBfetch($result);
 	
@@ -61,6 +61,7 @@
 		show_table2_v_delimiter($col++);
 		echo "<form method=\"get\" action=\"hosts.php\">";
 		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_GET["config"]."\" size=8>";
+		echo "<input class=\"biginput\" name=\"hostid\" type=\"hidden\" value=\"".$_GET["hostid"]."\" size=8>";
 		if(isset($hosttemplateid))
 		{
 			echo "<input class=\"biginput\" name=\"hosttemplateid\" type=\"hidden\" value=\"$hosttemplateid\" size=8>";
@@ -90,41 +91,41 @@
 		show_table2_v_delimiter($col++);
 		echo S_ITEMS;
 		show_table2_h_delimiter();
-		echo "<input type=checkbox checked name=\"items_add\" \">".S_ADD;
-		echo "<input type=checkbox checked name=\"items_update\" \">".S_UPDATE;
-		echo "<input type=checkbox checked name=\"items_delete\" \">".S_DELETE;
+		echo "<input type=checkbox ".iif((1&$items)==1,"checked","")." name=\"items_add\" \">".S_ADD;
+		echo "<input type=checkbox ".iif((2&$items)==2,"checked","")." name=\"items_update\" \">".S_UPDATE;
+		echo "<input type=checkbox ".iif((4&$items)==4,"checked","")." name=\"items_delete\" \">".S_DELETE;
 
 		show_table2_v_delimiter($col++);
 		echo S_TRIGGERS;
 		show_table2_h_delimiter();
-		echo "<input type=checkbox checked name=\"triggers_add\" \">".S_ADD;
-		echo "<input type=checkbox checked name=\"triggers_update\" \">".S_UPDATE;
-		echo "<input type=checkbox checked name=\"triggers_delete\" \">".S_DELETE;
+		echo "<input type=checkbox ".iif((1&$triggers)==1,"checked","")." name=\"triggers_add\" \">".S_ADD;
+		echo "<input type=checkbox ".iif((2&$triggers)==2,"checked","")." name=\"triggers_update\" \">".S_UPDATE;
+		echo "<input type=checkbox ".iif((4&$triggers)==4,"checked","")." name=\"triggers_delete\" \">".S_DELETE;
 
 		show_table2_v_delimiter($col++);
 		echo S_ACTIONS;
 		show_table2_h_delimiter();
-		echo "<input type=checkbox checked name=\"actions_add\" \">".S_ADD;
-		echo "<input type=checkbox checked name=\"actions_update\" \">".S_UPDATE;
-		echo "<input type=checkbox checked name=\"actions_delete\" \">".S_DELETE;
+		echo "<input type=checkbox ".iif((1&$actions)==1,"checked","")." name=\"actions_add\" \">".S_ADD;
+		echo "<input type=checkbox ".iif((2&$actions)==2,"checked","")." name=\"actions_update\" \">".S_UPDATE;
+		echo "<input type=checkbox ".iif((4&$actions)==4,"checked","")." name=\"actions_delete\" \">".S_DELETE;
 
 		show_table2_v_delimiter($col++);
 		echo S_GRAPHS;
 		show_table2_h_delimiter();
-		echo "<input type=checkbox checked name=\"graphs_add\" \">".S_ADD;
-		echo "<input type=checkbox checked name=\"graphs_update\" \">".S_UPDATE;
-		echo "<input type=checkbox checked name=\"graphs_delete\" \">".S_DELETE;
+		echo "<input type=checkbox ".iif((1&$graphs)==1,"checked","")." name=\"graphs_add\" \">".S_ADD;
+		echo "<input type=checkbox ".iif((2&$graphs)==2,"checked","")." name=\"graphs_update\" \">".S_UPDATE;
+		echo "<input type=checkbox ".iif((4&$graphs)==4,"checked","")." name=\"graphs_delete\" \">".S_DELETE;
 
 		show_table2_v_delimiter($col++);
 		echo S_SCREENS;
 		show_table2_h_delimiter();
-		echo "<input type=checkbox checked name=\"screens_add\" \">".S_ADD;
-		echo "<input type=checkbox checked name=\"screens_update\" \">".S_UPDATE;
-		echo "<input type=checkbox checked name=\"screens_delete\" \">".S_DELETE;
+		echo "<input type=checkbox ".iif((1&$screens)==1,"checked","")." name=\"screens_add\" \">".S_ADD;
+		echo "<input type=checkbox ".iif((2&$screens)==2,"checked","")." name=\"screens_update\" \">".S_UPDATE;
+		echo "<input type=checkbox ".iif((4&$screens)==4,"checked","")." name=\"screens_delete\" \">".S_DELETE;
 
 		show_table2_v_delimiter2($col++);
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add linkage\">";
-		if(isset($userid))
+		if(isset($hosttemplateid))
 		{
 			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update linkage\">";
 			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete linkage\" onClick=\"return Confirm('Delete selected linkage?');\">";
