@@ -136,7 +136,7 @@ void ZabbixCreateService(char *execName)
    }
 
    service=CreateService(mgr,ZABBIX_SERVICE_NAME,"Zabbix Win32 Agent",GENERIC_READ,SERVICE_WIN32_OWN_PROCESS,
-                         SERVICE_DEMAND_START,SERVICE_ERROR_NORMAL,execName,NULL,NULL,NULL,NULL,NULL);
+                         SERVICE_AUTO_START,SERVICE_ERROR_NORMAL,execName,NULL,NULL,NULL,NULL,NULL);
    if (service==NULL)
    {
       DWORD code=GetLastError();

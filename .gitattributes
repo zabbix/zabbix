@@ -7,3 +7,5 @@ frontends/php/images/sysmaps/Printer.png svneol=native#unset
 frontends/php/images/sysmaps/Router.png svneol=native#unset
 frontends/php/images/sysmaps/Server.png svneol=native#unset
 frontends/php/images/sysmaps/Workstation.png svneol=native#unset
+src/zabbix_agent_win32/Debug/ZabbixW32.exe -text
+src/zabbix_agent_win32/Release/ZabbixW32.exe -text
