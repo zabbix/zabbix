@@ -116,11 +116,13 @@
 		{
 			echo "<TD><FONT COLOR=\"#00AA00\">OFF</FONT></TD>";
 		}
-		echo "<TD>".$row["delay"]."</TD>";
-		echo "<TD>".$row["subject"]."</TD>";
-		echo "<TD>".$row["message"]."</TD>";
+		echo "<TD>".htmlspecialchars($row["delay"])."</TD>";
+		echo "<TD>".htmlspecialchars($row["subject"])."</TD>";
 		echo "<TD>";
-		echo " <A HREF=\"actions.php?register=edit&actionid=".$row["actionid"]."&triggerid=".$row["triggerid"]."\">Change</A>";
+		echo "<pre>".htmlspecialchars($row["message"])."</pre>";
+		echo "</TD>";
+		echo "<TD>";
+		echo " <A HREF=\"actions.php?register=edit&actionid=".$row["actionid"]."&triggerid=".$row["triggerid"]."#form\">Change</A>";
 		echo "</TD></TR>";
 	}
 	if(DBnum_rows($result)==0)
@@ -137,6 +139,8 @@
 </div>
 
 <?php
+	echo "<a name=\"form\"></a>";
+
 	if(isset($HTTP_GET_VARS["actionid"]))
 	{
 		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.scope,a.severity,a.recipient from actions a where a.actionid=".$HTTP_GET_VARS["actionid"];
