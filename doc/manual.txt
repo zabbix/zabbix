@@ -562,7 +562,7 @@ check_service[pop]          |       X      |        X      |      X      |      
 check_service[nntp]         |       X      |        X      |      X      |      X      |      X      |     X     |
 check_service[imap]         |       X      |        X      |      X      |      X      |      X      |     X     |
 
-check_port[imap]            |       X      |        X      |      X      |      X      |      X      |     X     |
+check_port[*]               |       X      |        X      |      X      |      X      |      X      |     X     |
 
 proc_cnt[*]                 |       X      |        X      |      -      |      -      |      -      |     -     |
 
