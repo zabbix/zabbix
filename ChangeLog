@@ -1,5 +1,6 @@
 Changes for 1.1alpha7:
 
+ - hard-linked templates works when deleting a trigger (Alexei)
  - hard-linked templates works when adding a trigger (Alexei)
  - no warning about uninitialised function_str (Alexei)
  - fixed simple checks (Alexei)

@@ -140,6 +140,7 @@
 		}
 		if($_GET["register"]=="delete")
 		{
+			delete_trigger_from_templates($_GET["triggerid"]);
 			$result=delete_trigger($_GET["triggerid"]);
 			show_messages($result, S_TRIGGER_DELETED, S_CANNOT_DELETE_TRIGGER);
 			unset($_GET["triggerid"]);
