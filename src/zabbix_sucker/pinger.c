@@ -86,7 +86,11 @@ int	is_ip(char *ip)
 	return res;
 }
 
+#ifdef ZABBIX_THREADS
+int	process_value(MYSQL *database, char *key, char *host, char *value)
+#else
 int	process_value(char *key, char *host, char *value)
+#endif
 {
 	char	sql[MAX_STRING_LEN];
 
@@ -106,7 +110,11 @@ int	process_value(char *key, char *host, char *value)
 		snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta from items i,hosts h where h.status in (%d,%d) and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type=%d", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, host, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_SIMPLE);
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
+#ifdef ZABBIX_THREADS
+	result = DBselect_thread(database, sql);
+#else
 	result = DBselect(sql);
+#endif
 
 	if(DBnum_rows(result) == 0)
 	{
@@ -153,18 +161,24 @@ int	process_value(char *key, char *host, char *value)
 	item.trapper_hosts=DBget_field(result,0,16);
 	item.delta=atoi(DBget_field(result,0,17));
 
+#ifdef ZABBIX_THREADS
+	process_new_value_thread(database,&item,value);
+	update_triggers_thread(database,item.itemid);
+#else
 	process_new_value(&item,value);
-
 	update_triggers(item.itemid);
+#endif
  
 	DBfree_result(result);
 
 	return SUCCEED;
 }
 
-
-
+#ifdef ZABBIX_THREADS
+int create_host_file(MYSQL *database)
+#else
 int create_host_file(void)
+#endif
 {
 	char	sql[MAX_STRING_LEN];
 	FILE	*f;
@@ -187,7 +201,11 @@ int create_host_file(void)
 	now=time(NULL);
 	/* Select hosts monitored by IP */
 	snprintf(sql,sizeof(sql)-1,"select distinct h.ip from hosts h,items i where i.hostid=h.hostid and (h.status=%d or (h.status=%d and h.disable_until<=%d)) and (i.key_='%s' or i.key_='%s') and i.type=%d and i.status=%d and h.useip=1", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, ITEM_TYPE_SIMPLE, ITEM_STATUS_ACTIVE);
+#ifdef ZABBIX_THREADS
+	result = DBselect_thread(database, sql);
+#else
 	result = DBselect(sql);
+#endif
 		
 	for(i=0;i<DBnum_rows(result);i++)
 	{
@@ -202,7 +220,11 @@ int create_host_file(void)
 
 	/* Select hosts monitored by hostname */
 	snprintf(sql,sizeof(sql)-1,"select distinct h.host from hosts h,items i where i.hostid=h.hostid and (h.status=%d or (h.status=%d and h.disable_until<=%d)) and (i.key_='%s' or i.key_='%s') and i.type=%d and i.status=%d and h.useip=0", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, ITEM_TYPE_SIMPLE, ITEM_STATUS_ACTIVE);
+#ifdef ZABBIX_THREADS
+	result = DBselect_thread(database, sql);
+#else
 	result = DBselect(sql);
+#endif
 		
 	for(i=0;i<DBnum_rows(result);i++)
 	{
@@ -220,7 +242,11 @@ int create_host_file(void)
 }
 
 
+#ifdef ZABBIX_THREADS
+int	do_ping(MYSQL *database)
+#else
 int	do_ping(void)
+#endif
 {
 	FILE	*f;
 	char	ip[MAX_STRING_LEN];
@@ -264,13 +290,22 @@ int	do_ping(void)
 			zabbix_log( LOG_LEVEL_DEBUG, "IP [%s] alive [%d]", ip, alive);
 			if(0 == alive)
 			{
+#ifdef ZABBIX_THREADS
+				process_value(database,SERVER_ICMPPING_KEY,ip,"0");
+#else
 				process_value(SERVER_ICMPPING_KEY,ip,"0");
+#endif
 			}
 			else
 			{
 				snprintf(tmp,sizeof(tmp)-1,"%f",mseconds/1000);
+#ifdef ZABBIX_THREADS
+				process_value(database,SERVER_ICMPPING_KEY,ip,"1");
+				process_value(database,SERVER_ICMPPINGSEC_KEY,ip,tmp);
+#else
 				process_value(SERVER_ICMPPING_KEY,ip,"1");
 				process_value(SERVER_ICMPPINGSEC_KEY,ip,tmp);
+#endif
 			}
 		}
 	}
@@ -289,6 +324,11 @@ int main_pinger_loop()
 {
 	int ret = SUCCEED;
 
+#ifdef ZABBIX_THREADS
+	DB_HANDLE	database;
+#endif
+
+
 	if(1 == CONFIG_DISABLE_PINGER)
 	{
 		for(;;)
@@ -303,20 +343,41 @@ int main_pinger_loop()
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 			setproctitle("connecting to the database");
 #endif
+
+#ifdef ZABBIX_THREADS
+			DBconnect_thread(&database);
+#else
 			DBconnect();
+#endif
 	
+	zabbix_set_log_level(LOG_LEVEL_DEBUG);
+#ifdef ZABBIX_THREADS
+			ret = create_host_file(&database);
+#else
 			ret = create_host_file();
+#endif
 	
 			if( SUCCEED == ret)
 			{
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 				setproctitle("pinging hosts");
 #endif
+
+#ifdef ZABBIX_THREADS
+				ret = do_ping(&database);
+#else
 				ret = do_ping();
+#endif
 			}
 			unlink("/tmp/zabbix_suckerd.pinger");
 	
+	zabbix_set_log_level(LOG_LEVEL_WARNING);
+#ifdef ZABBIX_THREADS
+			DBclose_thread(&database);
+#else
 			DBclose();
+#endif
+
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 			setproctitle("pinger [sleeping for %d seconds]", CONFIG_PINGER_FREQUENCY);
 #endif
