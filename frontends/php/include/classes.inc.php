@@ -114,6 +114,11 @@
 			$this->items[$this->itemids[$itemid]]["color"]=$color;
 		}
 
+		function setDrawtype($itemid,$drawtype)
+		{
+			$this->items[$this->itemids[$itemid]]["drawtype"]=$drawtype;
+		}
+
 		function setPeriod($period)
 		{
 			$this->period=$period;

@@ -66,6 +66,7 @@
 	{
 		$graph->addItem(DBget_field($result,$i,0));
 		$graph->setColor(DBget_field($result,$i,0), DBget_field($result,$i,2));
+		$graph->setDrawtype(DBget_field($result,$i,0), DBget_field($result,$i,4));
 	}
 
 	$graph->Draw();
