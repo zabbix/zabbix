@@ -47,6 +47,7 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item)
 	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP()");
 
 	assert((item->type == ITEM_TYPE_SNMPv1)||(item->type == ITEM_TYPE_SNMPv2c));
+	assert((item->type == ITEM_TYPE_SNMPv1)||(item->type == ITEM_TYPE_SNMPv2c)||(item->type == ITEM_TYPE_SNMPv3));
 
 	snmp_sess_init( &session );
 /*	session.version = version;*/
@@ -83,8 +84,44 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item)
 		session.peername = item->host;
 	#endif
 	}
-	session.community = item->snmp_community;
-	session.community_len = strlen(session.community);
+
+	if( (session.version == SNMP_VERSION_1) || (item->type == ITEM_TYPE_SNMPv2c))
+	{
+		session.community = item->snmp_community;
+		session.community_len = strlen(session.community);
+	}
+	else if(session.version == SNMP_VERSION_3)
+	{
+		/* set the SNMPv3 user name */
+		session.securityName = strdup("myuser");
+		session.securityNameLen = strlen(session.securityName);
+
+		/* set the security level to authenticated, but not encrypted */
+		session.securityLevel = SNMP_SEC_LEVEL_AUTHNOPRIV;
+
+		/* set the authentication method to MD5 */
+		session.securityAuthProto = usmHMACMD5AuthProtocol;
+		session.securityAuthProtoLen = sizeof(usmHMACMD5AuthProtocol)/sizeof(oid);
+		session.securityAuthKeyLen = USM_AUTH_KU_LEN;
+
+		/* set the authentication key to a MD5 hashed version of our
+		passphrase "The UCD Demo Password" (which must be at least 8
+		characters long) */
+		if (generate_Ku(session.securityAuthProto,
+				session.securityAuthProtoLen,
+				(u_char *) our_v3_passphrase, strlen(our_v3_passphrase),
+				session.securityAuthKey,
+				&session.securityAuthKeyLen) != SNMPERR_SUCCESS)
+		{
+			zabbix_log( LOG_LEVEL_ERR, "Error generating Ku from authentication pass phrase.");
+			return FAIL;
+		}
+	}
+	else
+	{
+		zabbix_log( LOG_LEVEL_ERR, "Error in get_value_SNMP. Unsupported session.version [%d]", session.version);
+		return FAIL;
+	}
 
 	zabbix_log( LOG_LEVEL_DEBUG, "SNMP [%s@%s:%d]",session.community, session.peername, session.remote_port);
 	zabbix_log( LOG_LEVEL_DEBUG, "OID [%s]", item->snmp_oid);
