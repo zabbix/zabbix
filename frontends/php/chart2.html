@@ -88,10 +88,15 @@
 	$desc=array();
 	$color=array();
 
-	$maxX=-1000000000;
-	$maxY=-1000000000;
-	$minX=1000000000;
-	$minY=1000000000;
+//	$maxX=-1000000000;
+//	$maxY=-1000000000;
+//	$minX=1000000000;
+//	$minY=1000000000;
+
+	unset($maxX);
+	unset($maxY);
+	unset($minX);
+	unset($minY);
 
 	for($item=0;$item<DBnum_rows($result2);$item++)
 	{
@@ -109,10 +114,10 @@
 			$x[$item][$len[$item]]=DBget_field($result,$i,0);
 			$y[$item][$len[$item]]=DBget_field($result,$i,1);;
 	//		echo $row[0]," - ",$y[$len],"<Br>";
-			if($x[$item][$len[$item]]>$maxX) { $maxX=$x[$item][$len[$item]]; }
-			if($x[$item][$len[$item]]<$minX) { $minX=$x[$item][$len[$item]]; }
-			if($y[$item][$len[$item]]>$maxY) { $maxY=$y[$item][$len[$item]]; }
-			if($y[$item][$len[$item]]<$minY) { $minY=$y[$item][$len[$item]]; }
+			if((!isset($maxX))||($x[$item][$len[$item]]>$maxX))	{ $maxX=$x[$item][$len[$item]]; }
+			if((!isset($minX))||($x[$item][$len[$item]]<$minX))	{ $minX=$x[$item][$len[$item]]; }
+			if((!isset($maxY))||($y[$item][$len[$item]]>$maxY))	{ $maxY=$y[$item][$len[$item]]; }
+			if((!isset($minY))||($y[$item][$len[$item]]<$minY))	{ $minY=$y[$item][$len[$item]]; }
 			$len[$item]++;
 		}
 	}
