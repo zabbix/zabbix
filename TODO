@@ -4,13 +4,15 @@ TOP PRIORITY:
  - improve graphing capabilities
  - support for net-snmp
  - SNMP trapping
+ - support for SLA level in IT Services 
 
 BUGS:
 
+ - Edit Action. Always 'Admin'.
  - BUG. zabbix_suckerd is crashing after EMAIL15
  - graphs and maps are not displayed properly sometimes
  - BUG. Agent return unsupported in case if UserParameter ends by timeout.
- - add protection from IT Service loop
+ - add protection from IT Service looping
  - mass-adding of actions
  - BUG. No horizontal lines. Replace ImageDashedLine() to gdImageLine() plus
    ImageSetStyle()
