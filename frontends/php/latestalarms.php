@@ -42,7 +42,7 @@
 	$sql="select max(alarmid) as max from alarms";
 	$result=DBselect($sql);
 	$row=DBfetch($result);
-	$maxalarmid=$row["max"];
+	$maxalarmid=@iif(DBnum_rows($result)>0,$row["max"],0);
 
 	if(!isset($HTTP_GET_VARS["start"]))
 	{
