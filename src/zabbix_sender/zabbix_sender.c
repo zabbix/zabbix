@@ -28,7 +28,7 @@ void    signal_handler( int sig )
  
 	if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
 	{
-//              fprintf(stderr,"\nGot QUIT or INT or TERM signal. Exiting..." );
+/*		fprintf(stderr,"\nGot QUIT or INT or TERM signal. Exiting..." ); */
 	}
 	exit( FAIL );
 }

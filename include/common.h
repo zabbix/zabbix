@@ -4,6 +4,7 @@
 #define	SUCCEED		0
 #define	FAIL		(-1)
 #define	NOTSUPPORTED	(-2)
+#define	NETWORK_ERROR	(-3)
 
 #define	MAXFD	64
 
@@ -22,13 +23,10 @@
 /* Housekeeping frequency */
 #define	SUCKER_HK	3600
 
-/* Keep alrt history (in sec) */
-#define	ALERT_HISTORY	12*31*24*3600
-
-/* Keep alarm history (in sec) */
-#define	ALARM_HISTORY	12*31*24*3600
-
 #define	SUCKER_TIMEOUT	5
+/* Delay on network failure*/
+#define DELAY_ON_NETWORK_FAILURE 2*60
+
 #define	AGENT_TIMEOUT	3
 
 #define	SENDER_TIMEOUT	5

@@ -1244,6 +1244,14 @@ Note that Zabbix manual will be distributed in the followinf formats: LyX,
  PS, PDF and plain text.
 \layout Itemize
 
+Note that in case of network problems (DNS failure, broken connection, etc)
+ zabbix_suckerd will wait 120 seconds (defined in 
+\shape italic 
+include/common.h
+\shape default 
+) before requesting same parameter next time.
+\layout Itemize
+
 Zabbix 1.0alpha12 is latest alpha version.
  Next Zabbix version will be called 1.0beta1.
 \layout Subsection
@@ -1650,6 +1658,20 @@ The zabbix_suckerd process periodically connects to agents (either Zabbix
  the process sends alerts to users if required.
 \layout Standard
 
+If zabbix_suckerd is unable to get value from an agent because of network
+ problems, the value will be checked next time only after DELAY_ON_NETWORK_ERROR
+ (defined in 
+\shape italic 
+include/common.h
+\shape default 
+, default value is 120) seconds.
+\layout Standard
+
+If an agent does not support requested parameter, zabbix_suckerd will change
+ status of the parameter to NONSUPPORTED and will not try to get its value
+ anymore.
+\layout Standard
+
 
 \latex no_latex 
 \SpecialChar ~
@@ -1680,7 +1702,7 @@ One zabbix_suckerd process is used for housekeeping purposes only.\SpecialChar ~
 ng process periodically (hourly, by default) deletes outdated information
  from 
 \latex default 
-the following tables: 
+the tables 
 \series bold 
 history
 \series default 
@@ -2667,6 +2689,28 @@ Similiar expressions could be useful to monitor changes in important files,
 \layout Subsection
 
 Monitored Parameters
+\layout Subsubsection
+
+Flexible and non-flexible parameters
+\layout Standard
+
+Flexible parameter is parameter which accepts argument.
+\layout Standard
+
+For example, 
+\latex no_latex 
+diskfree[*]
+\latex default 
+ is flexible parameter.
+ '*' is any string that will be passed as argument of the parameter.
+ diskfree[/], diskfree[/opt] - correct definitions.
+\layout Standard
+
+Note that argument cannot contain character '.'.
+ Hopefully, this limitation will be eliminated in future versions of Zabbix.
+\layout Subsubsection
+
+List of supported parameters
 \layout Description
 
 

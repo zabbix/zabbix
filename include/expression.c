@@ -21,7 +21,8 @@ int	cmp_double(double a,double b)
 }
 
 /*
- * Return SUCEED if parameter has format X.X or X, where X is [0..9]{1,n}
+ * Return SUCCEED if parameter has format X.X or X, where X is [0..9]{1,n}
+ * In other words, parameter is float number :)
  */
 int	is_float(char *c)
 {
@@ -93,6 +94,10 @@ int	find_char(char *str,char c)
 	return	FAIL;
 }
 
+/*
+ * Evaluate simple expression
+ * Simple expression is either float number or <float> <operator> <float>
+ */ 
 int	evaluate_simple (float *result,char *exp)
 {
 	float	value1,value2;
@@ -286,6 +291,9 @@ int	evaluate_simple (float *result,char *exp)
 	return SUCCEED;
 }
 
+/*
+ * Evaluate expression. Example of input expression: ({15}>10)|({123}=1) 
+ */ 
 int	evaluate(int *result,char *exp)
 {
 	float	value;
@@ -479,7 +487,7 @@ int	substitute_macros(char *exp)
 }
 
 /*
- * Translate "{15}>10" to "6.456>10" 
+ * Translate "({15}>10)|({123}=0)" to "(6.456>10)|(0=0)" 
  */
 int	substitute_functions(char *exp)
 {
@@ -540,6 +548,9 @@ int	substitute_functions(char *exp)
 	return SUCCEED;
 }
 
+/*
+ * Evaluate complex expression. Example: ({127.0.0.1:system[procload].last(0)}>1)|({127.0.0.1:system[procload].max(300)}>3)
+ */ 
 int	evaluate_expression (int *result,char *expression)
 {
 	delete_spaces(expression);
