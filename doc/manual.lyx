@@ -24,13 +24,13 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.19)
+Zabbix Reference Manual for version 1.0 (draft v1.20)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-25 May 2002
+26 May 2002
 \layout Abstract
 
 The document is Reference Manual for Zabbix version 1.0.
@@ -56,7 +56,7 @@ uses the typographical convensions shown in the following table.
 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="5" columns="2">
+<lyxtabular version="2" rows="6" columns="2">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
@@ -94,7 +94,7 @@ italic text
 
 \layout Standard
 
-File names, ...
+File names, emphasis
 \end_inset 
 </cell>
 </row>
@@ -114,7 +114,7 @@ bold text
 
 \layout Standard
 
-Zabbix program names, ...
+Zabbix, program names
 \end_inset 
 </cell>
 </row>
@@ -124,6 +124,9 @@ Zabbix program names, ...
 
 \layout Standard
 
+
+\noun on 
+name
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -131,6 +134,27 @@ Zabbix program names, ...
 
 \layout Standard
 
+Names and surnames
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+email
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Email addresses
 \end_inset 
 </cell>
 </row>
@@ -140,6 +164,10 @@ Zabbix program names, ...
 
 \layout Standard
 
+
+\family typewriter 
+\emph on 
+script
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -147,6 +175,7 @@ Zabbix program names, ...
 
 \layout Standard
 
+Commands
 \end_inset 
 </cell>
 </row>
@@ -312,18 +341,18 @@ support for both polling and trapping mechanisms
 
 
 \latex no_latex 
+server software for Linux
+\latex default 
+, Solaris, HP-UX, AIX, FreeBSD, Open BSD
+\layout Itemize
+
+
+\latex no_latex 
 agents (client software) for Linux
 \latex default 
 , Solaris,
 \latex no_latex 
  HP-UX, AIX, FreeBSD, Open BSD
-\layout Itemize
-
-
-\latex no_latex 
-server software for Linux
-\latex default 
-, Solaris, HP-UX, AIX, FreeBSD, Open BSD
 \layout Itemize
 
 
@@ -610,6 +639,82 @@ Capacity planning
 Viewing trends of process load, disk usage, database activity, or other
  important metrics allows a system administrator to clearly see when the
  next hardware upgrade should be made.
+\layout Subsection
+
+Manging dependencies between IT resources
+\layout Standard
+
+High level service tree allows create dependecies between various IT resource.
+ Such representation of monitored data makes possible answer to the following
+ questions:
+\layout Itemize
+
+What IT services depends on availability of resource 
+\series bold 
+X
+\series default 
+?
+\layout Standard
+
+Example: If processor load is too high on server 
+\series bold 
+A
+\series default 
+, then these IT services will be affected: Oracle server, WEB banking, Online
+ transaction processing, etc.
+\layout Itemize
+
+What resources specific IT service depends on?
+\layout Standard
+
+Example: WEB portan depends on the following recources:
+\layout Enumerate
+
+processor load on server 
+\series bold 
+A
+\layout Enumerate
+
+connection to ISP provider
+\layout Enumerate
+
+disk space o volume /data on server 
+\series bold 
+A
+\layout Enumerate
+
+availability of Oracle DB engine on server 
+\series bold 
+B
+\layout Enumerate
+
+speed of execution of user requests
+\layout Enumerate
+
+availability of Apache server on server 
+\series bold 
+C
+\layout Enumerate
+
+etc etc
+\layout Standard
+
+Such dependency tree helps identify weak points in IT infrastructure.
+\layout Standard
+
+Example: If several critical services offered by IT department depends on,
+ for example, availability of disk space on some server, then it's time
+ to think about distribution of the volume across different servers or disk
+ arrays to eliminate possible risks.
+\layout Subsection
+
+Other
+\layout Itemize
+
+availability analysis
+\layout Itemize
+
+graphical representation of collected information
 \layout Section
 
 Installing Zabbix
@@ -652,6 +757,13 @@ AIX 4.3
 \layout Itemize
 
 FreeBSD 4.3
+\layout Standard
+
+Note that 
+\series bold 
+Zabbix
+\series default 
+ may work on other Unix-like operating systems.
 \layout Subsubsection
 
 Software Requirements
@@ -662,9 +774,6 @@ The following software is required to run
 Zabbix
 \series default 
 :
-\layout Itemize
-
-GNU C Compiler, GCC
 \layout Itemize
 
 Apache 1.3.12 or later
@@ -779,14 +888,13 @@ If you do use PostgreSQL, performance can be significantly improved by executing
 Zabbix
 \series default 
  database.
- For more information on the VACUUM command please see the PostgreSQL documentat
-ion - 
-\lang english
-
-\begin_inset LatexCommand \url[Description of the Vacuum command]{http://www.postgresql.org/idocs/index.php?sql-vacuum.html}
+ For more information on the VACUUM command please see 
+\begin_inset LatexCommand \cite{key-2}
 
 \end_inset 
 
+
+\lang english
 .
 \layout Standard
 
@@ -812,8 +920,13 @@ For heavily loaded
 Zabbix
 \series default 
  servers, hourly execution of "VACUUM ANALYZE" for all tables except "history"
- is strongly recommended! You can use the command 'echo "vacuum verbose
- analyze"|psql zabbix'.
+ is strongly recommended! You can use the command '
+\family typewriter 
+\emph on 
+echo "vacuum verbose analyze"|psql zabbix
+\family default 
+\emph default 
+'.
  For more information about PostgreSQL see 
 \begin_inset LatexCommand \cite{key-2}
 
@@ -829,7 +942,7 @@ Memory Requirements
 \series bold 
 Zabbix
 \series default 
- requires both physical (surprise!) and disk memory.
+ requires both physical and disk memory.
  32 Mb of physical memory and 20 Mb of free disk memory could be good starting
  point.
  However, the amount of required disk memory obviously depends on the number
@@ -874,6 +987,14 @@ Zabbix distribution
 - doc
 \layout Standard
 
+\SpecialChar ~
+The directory contains this 
+\emph on 
+Manual 
+\emph default 
+in different formats
+\layout Standard
+
 - src
 \layout Standard
 
@@ -900,9 +1021,6 @@ Basic installation of
 Zabbix
 \series default 
  usually takes no more than 15 minutes.
- However, to make the process more enjoyable, I would suggest you make a
- cup of tea (or coffee) for yourself.
- Ready? 
 \layout Subsubsection
 
 Server side
@@ -915,8 +1033,11 @@ Zabbix
  superuser account.
 \newline 
 This is the user the server will run as.
- For production use you should create a dedicated unprivileged account ("zabbix"
- is commonly used).
+ For production use you should create a dedicated unprivileged account ("
+\emph on 
+zabbix
+\emph default 
+" is commonly used).
  Running 
 \series bold 
 Zabbix
@@ -945,17 +1066,28 @@ Zabbix
 \series default 
  sources.
 \newline 
-On Linux, use command 
+On Linux, use command
 \family typewriter 
 \emph on 
-tar -xvzf <zabbix.tar.gz>
+
+\newline 
+
+\newline 
+tar -xvzf <zabbix.tar.gz
 \family default 
 \emph default 
-.
- On other systems, try 
+>
+\newline 
+
+\newline 
+On other systems, try
 \family typewriter 
 \emph on 
-gunzip zabbix.tar.gz; tar xvf zabbix.tar
+
+\newline 
+
+\newline 
+gunzip zabbix.tar.gz; tar -xvf zabbix.tar
 \layout Enumerate
 
 Create the 
@@ -1042,7 +1174,11 @@ To configure the source for the server, you must specify which database
 \emph default 
 
 \newline 
+
+\newline 
 or 
+\newline 
+
 \newline 
 
 \family typewriter 
@@ -1060,14 +1196,20 @@ However, if you want to compile client binaries only, run:
 
 \family typewriter 
 \emph on 
+
+\newline 
 ./configure 
 \newline 
 
 \family default 
 \emph default 
+
+\newline 
 Make everything:
 \family typewriter 
 \emph on 
+
+\newline 
 
 \newline 
 make
@@ -1076,6 +1218,8 @@ make
 \newline 
 
 \emph default 
+
+\newline 
 Copy created binaries from 
 \emph on 
 bin/
@@ -1114,6 +1258,8 @@ The step is not real requirement.
 
 \family typewriter 
 \emph on 
+
+\newline 
 zabbix_agent 10000/tcp 
 \newline 
 zabbix_trap 10001/tcp 
@@ -1135,12 +1281,16 @@ If you are going to use non-daemon versions of Zabbix trapper, add the following
 
 \family typewriter 
 \emph on 
+
+\newline 
 zabbix_trap stream tcp nowait.3600 zabbix /opt/zabbix/bin/zabbix_trapper
 \family default 
 
 \newline 
 
 \emph default 
+
+\newline 
 If you plan to use 
 \series bold 
 zabbix_agent
@@ -1154,6 +1304,8 @@ zabbix_agentd
 
 \family typewriter 
 \emph on 
+
+\newline 
 zabbix_agent stream tcp nowait.3600 zabbix /opt/zabbix/bin/zabbix_agent
 \layout Enumerate
 
@@ -1165,6 +1317,8 @@ inetd
 \family typewriter 
 \series default 
 \emph on 
+
+\newline 
 killall -HUP inetd
 \layout Enumerate
 
@@ -1186,6 +1340,7 @@ frontends/php/include/db.inc
 \newline 
 
 \family typewriter 
+\emph on 
 $DB_TYPE ="POSTGRESQL"; /* Or "MYSQL" for MySQL */ 
 \newline 
 $DB_SERVER ="localhost"; 
@@ -1196,6 +1351,7 @@ $DB_USER ="";
 \newline 
 $DB_PWD =""
 \family default 
+\emph default 
 
 \newline 
 
@@ -1270,7 +1426,9 @@ Zabbix
 \series default 
  server.
  Connections from other hosts will be denied.
- You may take 
+ 
+\newline 
+You may take 
 \emph on 
 misc/conf/zabbix_agentd.conf
 \emph default 
@@ -1290,7 +1448,16 @@ For small installations (five monitored hosts), default parameters are fine.
 Zabbix
 \series default 
 .
- See section Performance Tuning for details.
+ See section 
+\emph on 
+
+\begin_inset LatexCommand \vref{Performance tuning}
+
+\end_inset 
+
+
+\emph default 
+ for more details.
  
 \newline 
 You may take 
@@ -1314,7 +1481,12 @@ For small installations (up to ten monitored hosts), default parameters
 Zabbix
 \series default 
 .
- See section Performance Tuning for more details.
+ See section 
+\begin_inset LatexCommand \vref{Performance tuning}
+
+\end_inset 
+
+ for more details.
  
 \newline 
 You may take 
@@ -1388,7 +1560,7 @@ add
  After you create your account, click the "Media" link beside your account
  listing, and add your email address.
 \newline 
-Next, delete the default Admin user.
+Next, delete the default Admin user or specify password.
 \newline 
 Click on the 'HOSTS' link to add new hosts to be monitored.
  For each host you add, be sure that you've installed the agent software
@@ -1511,13 +1683,24 @@ Zabbix
 On Linux, use command 
 \family typewriter 
 \emph on 
+
+\newline 
+
+\newline 
 tar -xvzf <zabbix.tar.gz>
 \family default 
 \emph default 
-.
- On other systems, try 
+
+\newline 
+
+\newline 
+On other systems, try 
 \family typewriter 
 \emph on 
+
+\newline 
+
+\newline 
 gunzip zabbix.tar.gz; tar xvf zabbix.tar
 \layout Enumerate
 
@@ -1532,22 +1715,30 @@ You want to compile client binaries only:
 
 \family typewriter 
 \emph on 
+
+\newline 
 ./configure
 \newline 
 
 \family default 
 \emph default 
+
+\newline 
 Build agent:
 \newline 
 
 \family typewriter 
 \emph on 
+
+\newline 
 make
 \family default 
 
 \newline 
 
 \emph default 
+
+\newline 
 Copy created binaries from 
 \emph on 
 bin/
@@ -1586,6 +1777,8 @@ The step is not real requirement.
 
 \family typewriter 
 \emph on 
+
+\newline 
 zabbix_agent 10000/tcp 
 \newline 
 zabbix_trap 10001/tcp 
@@ -1614,6 +1807,8 @@ zabbix_agentd
 
 \family typewriter 
 \emph on 
+
+\newline 
 zabbix_agent stream tcp nowait.3600 zabbix /opt/zabbix/bin/zabbix_agent
 \layout Enumerate
 
@@ -1625,6 +1820,8 @@ inetd
 \family typewriter 
 \series default 
 \emph on 
+
+\newline 
 killall -HUP inetd
 \layout Enumerate
 
@@ -1729,7 +1926,11 @@ Zabbix
  OS, go for Debian Linux - you will get better support.
 \layout Standard
 
-Zabbix 1.0beta3 was developed and tested on FreeBSD 4.4.
+
+\series bold 
+Zabbix
+\series default 
+ 1.0beta4 was developed and tested on FreeBSD 4.4.
  Thus, FreeBSD is also safe choise.
 \layout Subsection
 
@@ -1790,7 +1991,7 @@ upgrades/dbpatches
  (e.g.
  
 \shape italic 
-1.0alpha11_to_1.0beta
+1.0beta3_to_1.0beta
 \shape default 
 4).
  Enter the directory corresponding to your upgrade (if you are upgrading
@@ -1805,9 +2006,13 @@ upgrades/dbpatches
 \family typewriter 
 \emph on 
 cd mysql; cat patch.sql |mysql zabbix -u<username> -p<password>
+\newline 
+
 \layout Standard
 
 or
+\newline 
+
 \layout Standard
 
 
@@ -2372,6 +2577,7 @@ to
 Zabbix
 \series default 
  is written in C.
+ WEB frontend is written in PHP.
 \layout Subsection
 
 Server Approach Modes
@@ -2451,10 +2657,7 @@ zabbix_agent
 
 In this case the traditional sense of client is turned around.
  The client is actually the server.
- That is to say 
-\layout Standard
-
-that the connection is made 
+ That is to say that the connection is made 
 \emph on 
 from
 \emph default 
@@ -2523,6 +2726,16 @@ Theory of operations
 \layout Subsubsection
 
 Data exchange protocol
+\layout Standard
+
+Server ->[key]->Agent
+\layout Standard
+
+Agent->[result]->Server
+\layout Standard
+
+If received result is equal to '-1' then the agent does not support processing
+ of required parameter.
 \layout Standard
 
 
@@ -2639,10 +2852,14 @@ strongly
 You can use the command 
 \emph on 
 \latex default 
-'echo "vacuum verbose analyze"|psql zabbix'
+
+\newline 
+
+\newline 
+
+\family typewriter 
 \emph default 
-\latex no_latex 
-.
+echo "vacuum verbose analyze"|psql zabbix
 \layout Subsection
 
 Zabbix Processes
@@ -2695,7 +2912,7 @@ zabbix_suckerd
 \emph on 
 include/common.h
 \emph default 
-, default value is 120 seconds.) Host status will be changed to UNREACHABLE.
+, default value is 60 seconds.) Host status will be changed to UNREACHABLE.
 \layout Standard
 
 \SpecialChar ~
@@ -2774,7 +2991,19 @@ zabbix_suckerd
 \series default 
  process is used for housekeeping purposes only.
  The housekeeping process periodically (hourly, by default) deletes outdated
- information from the tables history, alarms and alerts.
+ information from the tables 
+\emph on 
+history
+\emph default 
+, 
+\emph on 
+alarms
+\emph default 
+ and 
+\emph on 
+alerts
+\emph default 
+.
 \layout Standard
 
 \SpecialChar ~
@@ -2840,7 +3069,11 @@ The
 zabbix_suckerd
 \series default 
  process is run as a daemon under a non-priveledged user account, usually
- zabbix.
+ 
+\emph on 
+zabbix
+\emph default 
+.
 \layout Standard
 
 \SpecialChar ~
@@ -2931,7 +3164,11 @@ Zabbix
 \series default 
 \latex no_latex 
  server.
- Connections from other IPs are rejected.
+ Connections from other IP
+\latex default 
+ addresses
+\latex no_latex 
+ are rejected.
 \layout Standard
 
 
@@ -2961,7 +3198,13 @@ abbix_agentd
 
 \latex no_latex 
 The process is run as daemon under non-priveledged user account, usually
- zabbix.\SpecialChar ~
+ 
+\emph on 
+\latex default 
+zabbix
+\emph default 
+\latex no_latex 
+.
  
 \layout Standard
 
@@ -3027,7 +3270,13 @@ include/common.h
 
 
 \latex no_latex 
-No command-line switches are supported by zabbix_trapperd.
+No command-line switches are supported by 
+\series bold 
+\latex default 
+zabbix_trapperd
+\series default 
+\latex no_latex 
+.
 \layout Standard
 
 
@@ -3039,9 +3288,13 @@ No command-line switches are supported by zabbix_trapperd.
 
 \latex no_latex 
 The process is run as daemon under non-priveledged user account, usually
- zabbix.\SpecialChar ~
-\SpecialChar ~
  
+\emph on 
+\latex default 
+zabbix
+\emph default 
+\latex no_latex 
+.
 \layout Standard
 
 
@@ -3073,9 +3326,8 @@ The
 zabbix_agent
 \series default 
 \latex no_latex 
- process resides on the host being monitored.\SpecialChar ~
- Its purpose it to provide requested
- information to 
+ process resides on the host being monitored.
+ Its purpose it to provide requested information to 
 \series bold 
 \latex default 
 zabbix_suckerd
@@ -3147,7 +3399,7 @@ zabbix_agent.conf
 Zabbix
 \emph default 
  server.
- Connections from other IPs are rejected.
+ Connections from other IP addresses are rejected.
  
 \layout Standard
 
@@ -3462,13 +3714,13 @@ Zabbix
  server located at 
 \emph on 
 \latex default 
-zabbix.acbde.com
+zabbix.abcde.com
 \emph default 
 \latex no_latex 
-.\SpecialChar ~
+.
 
 \latex default 
-Value of
+ Value of
 \latex no_latex 
  
 \latex default 
@@ -3491,6 +3743,28 @@ For example, number of emails waiting for delivery may be defined as:
 
 \emph on 
 UserParameter: mailq,echo /var/spool/mail/* | wc -w
+\newline 
+
+\layout Standard
+
+See 
+\emph on 
+misc/conf/zabbix_agentd.conf
+\emph default 
+ for already predefined (but commented) user-defined parameters.
+\layout Subsection
+
+Monitoring of MS Windows servers
+\layout Itemize
+
+using SNMP
+\layout Itemize
+
+using 
+\series bold 
+zabbix_sender
+\series default 
+ compiled under CygWin
 \layout Section
 
 Zabbix Configuration
@@ -3556,14 +3830,6 @@ client\SpecialChar ~
 - 
 \series bold 
 zabbix_agent
-\layout Standard
-
-\SpecialChar ~
-
-\layout Standard
-
-\SpecialChar ~
-
 \layout Subsubsection
 
 Listen mode server
@@ -3657,13 +3923,17 @@ The file contains configuration parameters for
 zabbix_suckerd
 \series default 
 .
- The file must exist and it should have read permissions for user zabbix.
+ The file must exist and it should have read permissions for user 
+\emph on 
+zabbix
+\emph default 
+.
  Possible parameters:
 \layout Standard
 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="12" columns="4">
+<lyxtabular version="2" rows="13" columns="4">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
@@ -4022,6 +4292,44 @@ User name for connecting to the database
 
 \layout Standard
 
+DBSocket
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+No
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+DB socket name.
+ Used for non-TCP connection to MySQL database.
+ Example: 
+\emph on 
+/tmp/mysql.sock
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
 DBPassword
 \end_inset 
 </cell>
@@ -4107,7 +4415,11 @@ The file contains configuration parameters for
 zabbix_agentd
 \series default 
 .
- The file must exist and it should have read permissions for user zabbix.
+ The file must exist and it should have read permissions for user 
+\emph on 
+zabbix
+\emph default 
+.
  Possible parameters:
 \layout Standard
 
@@ -4466,7 +4778,11 @@ The file contains configuration parameters for
 zabbix_agent
 \series default 
 .
- The file must exist and it should have read permissions for user zabbix.
+ The file must exist and it should have read permissions for user 
+\emph on 
+zabbix
+\emph default 
+.
  Possible parameters:
 \layout Standard
 
@@ -4650,13 +4966,17 @@ The file contains configuration parameters for
 zabbix_trapper
 \series default 
 .
- The file must exist and it should have read permissions for user zabbix.
+ The file must exist and it should have read permissions for user 
+\emph on 
+zabbix
+\emph default 
+.
  Possible parameters:
 \layout Standard
 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="8" columns="4">
+<lyxtabular version="2" rows="9" columns="4">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
@@ -4875,6 +5195,44 @@ Database name
 
 \layout Standard
 
+DBSocket
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+No
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+DB socket name.
+ Used for non-TCP connection to MySQL database.
+ Example: 
+\emph on 
+/tmp/mysql.sock
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
 DBUser
 \end_inset 
 </cell>
@@ -4960,13 +5318,17 @@ The file contains configuration parameters for
 zabbix_trapperd
 \series default 
 .
- The file must exist and it should have read permissions for user zabbix.
+ The file must exist and it should have read permissions for user
+\emph on 
+ zabbix
+\emph default 
+.
  Possible parameters:
 \layout Standard
 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="11" columns="4">
+<lyxtabular version="2" rows="12" columns="4">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
@@ -5244,6 +5606,44 @@ Yes
 \layout Standard
 
 Database name
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+DBSocket
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+No
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+DB socket name.
+ Used for non-TCP connection to MySQL database.
+ Example: 
+\emph on 
+/tmp/mysql.sock
 \end_inset 
 </cell>
 </row>
@@ -5647,7 +6047,13 @@ Example 3:
 
 
 \latex no_latex 
-Use of diff function.
+Use of 
+\series bold 
+\latex default 
+diff
+\series default 
+\latex no_latex 
+ function.
 \layout Standard
 
 
@@ -6237,8 +6643,15 @@ heck_port[80]
  to check either WEB server accepts connections.
 \layout Description
 
-version[zabbix_agent] Returns version of zabbix_agent(d) running on the
- server
+version[zabbix_agent] Returns version of 
+\series bold 
+zabbix_agent
+\series default 
+(
+\series bold 
+d
+\series default 
+) running on the server
 \layout Standard
 
 
@@ -9327,6 +9740,11 @@ Zabbix
 \layout Subsection
 
 Performance tuning
+\begin_inset LatexCommand \label{Performance tuning}
+
+\end_inset 
+
+
 \layout Standard
 
 Performance of 
@@ -9343,6 +9761,14 @@ Use fastest processor available
 \layout Itemize
 
 SCSI is better than IDE
+\begin_float footnote 
+\layout Standard
+
+Performance of IDE disks may be significantly improved by using utility
+ 
+\series bold 
+hdparm.
+\end_float 
 \layout Itemize
 
 Use fast Ethernet adapter
@@ -9361,6 +9787,9 @@ Exclude unnecessary functionality from kernel
 \layout Subsubsection
 
 Zabbix configuration parameters
+\layout Standard
+
+Many parameters may be changed to get optimal performance ...
 \layout Subsubsection
 
 Database Engine
@@ -9444,7 +9873,7 @@ SMTP\SpecialChar ~
 SERVER
 \layout Standard
 
-Name or IP address of SMTP server that will be used for sending emails.
+Host name or IP address of SMTP server that will be used for sending emails.
 \layout Description
 
 Value\SpecialChar ~
@@ -9461,7 +9890,9 @@ Zabbix
  server.
 \layout Standard
 
-Example: zabbix.sf.net
+Example: 
+\emph on 
+zabbix.sf.net
 \layout Description
 
 Zabbix\SpecialChar ~
@@ -9509,7 +9940,19 @@ x reports represent collected information in structured way.
 \latex no_latex 
 Report generation can be a very time consuming operation.
  Additionally, if you use MySQL or ay other database with table locking,
- zabbix_suckerd and zabbix_trapper will wait until the report is finished.
+ 
+\series bold 
+\latex default 
+zabbix_suckerd
+\series default 
+\latex no_latex 
+ and 
+\series bold 
+\latex default 
+zabbix_trapperd
+\series default 
+\latex no_latex 
+ will wait until the report is finished.
 \layout Paragraph
 
 Status of Zabbix
@@ -9594,7 +10037,7 @@ pinger.pl
 
 The script can be found in 
 \emph on 
-misc/scripts.
+misc/pinger.
  
 \emph default 
 \latex no_latex 
@@ -13417,12 +13860,21 @@ Problems and Common Errors
 \layout Section
 
 How Zabbix Compares to Other Monitoring Software
+\layout Subsection
+
+Open Source monitoring software
 \layout Itemize
 
 BigBrother
 \layout Itemize
 
 Nagios
+\layout Itemize
+
+...
+\layout Subsection
+
+Commercial monitoring software
 \layout Itemize
 
 SysOrb
@@ -13441,6 +13893,9 @@ Why choose Zabbix ?
 \layout Itemize
 
 highly efficient agents
+\newline 
+Most of other software for monitoring does not have fast agents.
+ Forks, etc, etc ...
 \layout Itemize
 
 very simple configuration
@@ -13465,6 +13920,9 @@ visualisation capabilities
 \layout Itemize
 
 housekeeping procedure
+\layout Itemize
+
+very low latency (usually less than 1 second)
 \layout Section
 
 Zabbix in the future
@@ -13483,6 +13941,21 @@ Native agent for MS platforms
 \layout Section
 
 Support of Zabbix
+\layout Subsection
+
+Free support
+\layout Itemize
+
+mailing lists
+\layout Itemize
+
+forums
+\layout Itemize
+
+alex@gobbo.caves.lv
+\layout Subsection
+
+Commercial support
 \layout Standard
 
 
@@ -13498,34 +13971,21 @@ Please, contact
 alex@gobbo.caves.lv
 \family default 
 \latex no_latex 
- to get additional information on available support levels.
-
+ to get additional information on available 
 \latex default 
- 
+commercial 
 \latex no_latex 
-The latest version of 
-\series bold 
-\latex default 
-Zabbix
-\series default 
-\latex no_latex 
- can be found at 
-\family typewriter 
-\latex default 
-http://zabbix.sourceforge.net
-\family default 
-\latex no_latex 
-.
+support levels.
 \layout Section
 
 Credits
 \layout Standard
 
-Zabbix
+
 \series bold 
- team
+Zabbix 
 \series default 
- w
+team w
 \latex no_latex 
 ant
 \latex default 
@@ -13578,6 +14038,9 @@ Zabbix
 \layout Subsection
 
 Contributors to Zabbix
+\layout Standard
+
+In alphabetical order:
 \layout Itemize
 
 
@@ -13597,7 +14060,7 @@ Zabbix
 Michal Suszycki
 \layout Standard
 
-Help with autoconf issues.
+Help with autoconf and automake issues.
 \layout Itemize
 
 
@@ -13643,7 +14106,7 @@ CHARLIE COLLINS
 \layout Standard
 
 Startup scripts.
- Significant improvements for the Manual.
+ Significant improvements of the Manual.
  Thanks Charlie!
 \layout Itemize
 
@@ -13670,6 +14133,14 @@ DENIS USTIMENKO
 \layout Standard
 
 Support for quering SNMP parameters by IP address.
+\layout Itemize
+
+
+\noun on 
+EVGENY ...
+\layout Standard
+
+Many suggestions for improvements.
 \layout Subsection
 
 Supporters to Zabbix
