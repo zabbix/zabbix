@@ -217,9 +217,9 @@ CREATE TABLE functions (
 --
 
 CREATE TABLE history (
-  itemid int(4) DEFAULT '0' NOT NULL,
-  clock int(4) DEFAULT '0' NOT NULL,
-  value double(16,4) DEFAULT '0.0000' NOT NULL,
+  itemid		int(4)		DEFAULT '0' NOT NULL,
+  clock			int(4)		DEFAULT '0' NOT NULL,
+  value			double(16,4)	DEFAULT '0.0000' NOT NULL,
   PRIMARY KEY (itemid,clock)
 ) type=InnoDB;
 
@@ -228,9 +228,9 @@ CREATE TABLE history (
 --
 
 CREATE TABLE history_str (
-  itemid int(4) DEFAULT '0' NOT NULL,
-  clock int(4) DEFAULT '0' NOT NULL,
-  value varchar(255) DEFAULT '' NOT NULL,
+  itemid		int(4)		DEFAULT '0' NOT NULL,
+  clock			int(4)		DEFAULT '0' NOT NULL,
+  value			varchar(255)	DEFAULT '' NOT NULL,
   PRIMARY KEY (itemid,clock)
 ) type=InnoDB;
 
@@ -239,45 +239,19 @@ CREATE TABLE history_str (
 --
 
 CREATE TABLE hosts (
-  hostid int(4) NOT NULL auto_increment,
-  host varchar(64) DEFAULT '' NOT NULL,
-  useip int(1) DEFAULT '1' NOT NULL,
-  ip   varchar(15) DEFAULT '127.0.0.1' NOT NULL,
-  port int(4) DEFAULT '0' NOT NULL,
-  status int(4) DEFAULT '0' NOT NULL,
--- If status=UNREACHABLE, host will not be checked until  
-  disable_until int(4) DEFAULT '0' NOT NULL,
-  network_errors int(4) DEFAULT '0' NOT NULL,
-  PRIMARY KEY (hostid),
-  KEY (status)
+	hostid		int(4)		NOT NULL auto_increment,
+	host		varchar(64)	DEFAULT '' NOT NULL,
+	useip		int(1)		DEFAULT '1' NOT NULL,
+	ip		varchar(15)	DEFAULT '127.0.0.1' NOT NULL,
+	port		int(4)		DEFAULT '0' NOT NULL,
+	status		int(4)		DEFAULT '0' NOT NULL,
+-- If status=UNREACHABLE, host will not be checked until this time
+	disable_until	int(4)		DEFAULT '0' NOT NULL,
+	network_errors	int(4)		DEFAULT '0' NOT NULL,
+	PRIMARY KEY	(hostid),
+	UNIQUE		(host),
+	KEY		(status)
 ) type=InnoDB;
-
---
--- Table structure for table 'items_template'
---
-
---CREATE TABLE items_template (
---  itemtemplateid int(4) NOT NULL,
---  description varchar(255) DEFAULT '' NOT NULL,
---  key_ varchar(64) DEFAULT '' NOT NULL,
---  delay int(4) DEFAULT '0' NOT NULL,
---  value_type int(4) DEFAULT '0' NOT NULL,
---  PRIMARY KEY (itemtemplateid),
---  UNIQUE (key_)
---) type=InnoDB;
-
---
--- Table structure for table 'triggers_template'
---
-
---CREATE TABLE triggers_template (
---  triggertemplateid int(4) NOT NULL,
---  itemtemplateid int(4) NOT NULL,
---  description varchar(255) DEFAULT '' NOT NULL,
---  expression varchar(255) DEFAULT '' NOT NULL,
---  PRIMARY KEY (triggertemplateid),
---  KEY (itemtemplateid)
---) type=InnoDB;
 
 --
 -- Table structure for table 'items'
