@@ -572,8 +572,11 @@ VACUUM command on Zabbix database.
 I would suggest execute VACUUM, at lease, after the following events:
 
  - Zabbix is installed
- - 10000 records in tbale "history"
+ - 10000 records in table "history"
  - patches applied on Zabbix database
+
+For heavy loaded Zabbix servers, hourly execution of "VACUUM ANALYZE" for all tables except "history"
+is strongly recommended !
 
 Command:
 
