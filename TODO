@@ -34,6 +34,7 @@ Not ready yet:
  - dashed grid somethimes is out of rectangle for graphs
  - calculate MIN value for graphs (do not use '0')
  - use JS in forms
+ - make kstat structure local (instead of static)
  - collect network and other statistics using kstat()
  - apply Mariusz's patches
  - link map's line to a trigger
