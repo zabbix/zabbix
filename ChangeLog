@@ -1,5 +1,6 @@
 Changes for 1.1alpha5:
 
+ - added link to ZABBIX Manual v1.1 into page header (Alexei)
  - fixed evaluation of nodata(). Thanks to Igor Micko. (Alexei)
  - fixed time selection for custom graphs (Alexei)
  - configurable format of map output (png, jpg) (Alexei)

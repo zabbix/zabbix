@@ -183,6 +183,25 @@ td.top_header_left
 	padding: 0;
 }
 
+td.top_header_right
+{
+	text-align: right;
+	background-color: #FFFFFF;
+	border-color: #AAAAAA;
+	border-width:1px;
+	border-right-style: solid;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	vertical-align: middle;
+}
+
+a.small_font
+{
+	color: #000000;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 9pt;
+}
+
 table.menu
 {
 	background-color: #FFFFFF;
