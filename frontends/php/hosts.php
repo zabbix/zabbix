@@ -126,7 +126,7 @@
 		$_GET["config"]=0;
 	}
 
-	$h1=S_CONFIGURATION_OF_HOST_GROUPS;
+	$h1=S_CONFIGURATION_OF_HOSTS_AND_HOST_GROUPS;
 
 #	$h2=S_GROUP."&nbsp;";
 	$h2="";
@@ -143,7 +143,7 @@
 	if($_GET["config"]==1)
 	{
 		echo "<br>";
-		show_table_header(S_CONFIGURATION_OF_HOST_GROUPS);
+		show_table_header(S_HOST_GROUPS_BIG);
 		table_begin();
 		table_header(array(S_ID,S_NAME,S_MEMBERS,S_ACTIONS));
 
@@ -194,7 +194,7 @@
 	if(!isset($_GET["hostid"])&&($_GET["config"]==0))
 {
 
-	$h1="&nbsp;".S_CONFIGURATION_OF_HOSTS_BIG;
+	$h1="&nbsp;".S_HOSTS_BIG;
 
 	$h2_form1="<form name=\"form2\" method=\"get\" action=\"latest.php\">";
 
