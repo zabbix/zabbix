@@ -322,7 +322,7 @@ void	process(char *command,char *value)
 			port_int=atoi(port);
 		}
 /* Must be fixed !!! */
-		forward_request(proxy,command,port_int,value);
+/*		forward_request(proxy,command,port_int,value);*/
 		return;
 	}
 
@@ -1764,7 +1764,7 @@ double	EXECUTE(char *command)
 
 	return	result;
 }
-
+/*
 void	forward_request(char *proxy,char *command,int port,char *value)
 {
 	char	*haddr;
@@ -1824,6 +1824,8 @@ void	forward_request(char *proxy,char *command,int port,char *value)
 		return	0;
 	}
 }
+*/
+
 
 /* 
  * 0 - NOT OK
