@@ -43,7 +43,7 @@
 #else
 #define DEBUG_SUFFIX
 #endif
-#define AGENT_VERSION         "1.0.0-beta9" DEBUG_SUFFIX
+#define AGENT_VERSION         "1.0.0-beta10(rc1)" DEBUG_SUFFIX
 
 #define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
 #define ZABBIX_EVENT_SOURCE   "Zabbix Win32 Agent"
@@ -59,6 +59,12 @@
 #define MAX_ALIAS_NAME        120
 #define MAX_COUNTER_NAME      (MAX_ALIAS_NAME-12)
 
+// Performance Counter Indexes
+#define PCI_SYSTEM				2
+#define PCI_PROCESSOR			238
+#define PCI_PROCESSOR_TIME		6
+#define PCI_PROCESSOR_QUEUE_LENGTH	44
+#define PCI_SYSTEM_UP_TIME		674
 
 //
 // Application flags
@@ -114,6 +120,17 @@ struct USER_COUNTER
 
 
 //
+// Performance Countername structure
+//
+
+struct PERFCOUNTER
+{
+	PERFCOUNTER *next;
+	DWORD pdhIndex;
+	char name[MAX_COUNTER_NAME + 1];
+};
+
+//
 // Subagent information structure
 //
 
@@ -161,6 +178,7 @@ void ZabbixStopService(void);
 void ZabbixInstallEventSource(char *path);
 void ZabbixRemoveEventSource(void);
 
+char *GetCounterName(DWORD index);
 void InitLog(void);
 void CloseLog(void);
 void WriteLog(DWORD msg,WORD wType,char *format...);
@@ -200,6 +218,7 @@ extern DWORD confMaxProcTime;
 extern USER_COUNTER *userCounterList;
 extern SUBAGENT *subagentList;
 extern SUBAGENT_NAME *subagentNameList;
+extern PERFCOUNTER *perfCounterList;
 
 extern double statProcUtilization[];
 extern double statProcUtilization5[];
