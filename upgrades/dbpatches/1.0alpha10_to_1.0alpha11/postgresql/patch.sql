@@ -32,3 +32,5 @@ insert into triggers_template (triggertemplateid,itemtemplateid,description,expr
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (62,62,'Zabbix_trapperd is not running on %s','{:.last(0)}<1');
 
+delete from triggers_template where triggertemplateid=18;
+delete from items_template where itemtemplateid=18;

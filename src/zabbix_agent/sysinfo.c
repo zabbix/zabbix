@@ -139,7 +139,7 @@ COMMAND	commands[]=
 	{"system[users]"		,EXECUTE, "who|wc -l"},
 
 	{"ping"				,PING, 0},
-	{"tcp_count"			,EXECUTE, "netstat -tn|grep EST|wc -l"},
+/*	{"tcp_count"			,EXECUTE, "netstat -tn|grep EST|wc -l"}, */
 
 	{"net[listen_23]"		,TCP_LISTEN, "0017"},
 	{"net[listen_80]"		,TCP_LISTEN, "0050"},

@@ -33,3 +33,6 @@ insert into triggers_template (triggertemplateid,itemtemplateid,description,expr
 	values (62,62,'Zabbix_trapperd is not running on %s','{:.last(0)}<1');
 
 alter table triggers drop lastcheck;
+
+delete from triggers_template where triggertemplateid=18;
+delete from items_template where itemtemplateid=18;
