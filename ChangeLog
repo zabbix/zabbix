@@ -1,5 +1,16 @@
 Changes for 1.0beta2:
+(Add thanks to for Andris ...)
+(Is connection via Unix socket faster ?)
+(Add reconnect in case if server gone)
+(net_listen[] should be unsupported)
 
+ - added #include <time.h> into db.h (Alexei)
+ - added support for connection to MySQL via Unix socket (Alexei)
+ - configure to find PostgreSQL in /usr/local/lib and  
+/usr/local/include/pgsql (Alexei)
+ - added set of user-defined parameters for monitoring MySQL
+servers. See misc/conf/zabbix_agent(d).conf (Alexei)
+ - check_service[smtp] will send QUIT. (Charlie)
  - clean compilation on FreeBSD (Alexei)
  - clean compilation on Solaris (Alexei)
  - check_service[smtp] will send QUIT. Thanks to Charlie. (Alexei)
@@ -9,7 +20,7 @@ Changes for 1.0beta2:
 
 Changes for 1.0beta1:
 
- - added startup scripts for RedHat. Thanks to Charlie Collins. (Alexei) 
+ - added startup scripts for RedHat. (Charlie Collins) 
  - disabled unfinished "IT SERVICES" functionality  (Alexei)
  - support for parameter Server in zabbix_agent.conf (Alexei)
  - added sample zabbix_trapper(d).conf to misc/conf (Alexei)

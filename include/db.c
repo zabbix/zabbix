@@ -17,11 +17,13 @@
  * Connect to database.
  * If fails, program terminates.
  */ 
-void    DBconnect( char *dbname, char *dbuser, char *dbpassword)
+void    DBconnect( char *dbname, char *dbuser, char *dbpassword, char *dbsocket)
 {
 /*	syslog(LOG_ERR, "[%s] [%s] [%s]\n",dbname, dbuser, dbpassword ); */
 #ifdef	HAVE_MYSQL
-	if( ! mysql_connect( &mysql, NULL, dbuser, dbpassword ) )
+/* For MySQL >3.22.00 */
+/*	if( ! mysql_connect( &mysql, NULL, dbuser, dbpassword ) )*/
+	if( ! mysql_real_connect( &mysql, NULL, dbuser, dbpassword, dbname, 0, dbsocket,0 ) )
 	{
 		syslog(LOG_ERR, "Failed to connect to database: Error: %s\n",mysql_error(&mysql) );
 		exit( FAIL );
