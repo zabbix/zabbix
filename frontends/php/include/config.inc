@@ -979,6 +979,7 @@
 		}
 
 		$expression=implode_exp($expression,$triggerid);
+		if($istrue != 2) $istrue="istrue";
 		$sql="update triggers set expression='$expression',description='$description',priority=$priority,istrue=$istrue,comments='$comments' where triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
@@ -1877,6 +1878,7 @@
 		echo "<INPUT TYPE=\"CHECKBOX\" ";
 		if($istrue==2) { echo " CHECKED "; }
 		echo "NAME=\"disabled\"  VALUE=\"true\">";
+
  
 		show_table2_v_delimiter2();
 		echo "<input type=\"submit\" name=\"register\" value=\"add\">";
@@ -1885,6 +1887,46 @@
 			echo "<input type=\"submit\" name=\"register\" value=\"update\">";
 			echo "<input type=\"submit\" name=\"register\" value=\"delete\">";
 		}
+
+		if(isset($triggerid))
+		{
+			show_table2_v_delimiter();
+			echo "Dependencies";
+			show_table2_h_delimiter();
+			$sql="select t.triggerid,t.description from triggers t,trigger_depends d where t.triggerid=d.triggerid_up and d.triggerid_down=$triggerid";
+			$result=DBselect($sql);
+			echo "<SELECT NAME=\"priority\" size=\"1\">";
+			for($i=0;$i<DBnum_rows($result);$i++)
+			{
+				$depid=DBget_field($result,$i,0);
+				$depdescr=DBget_field($result,$i,1);
+				echo "<OPTION VALUE=\"$depid\">$depdescr";
+			}
+			echo "</SELECT>";
+
+			show_table2_v_delimiter();
+			echo "New dependency";
+			show_table2_h_delimiter();
+			$sql="select t.triggerid,t.description from triggers t where t.triggerid!=$triggerid order by t.description";
+			$result=DBselect($sql);
+			echo "<SELECT NAME=\"priority\" size=\"1\">";
+			for($i=0;$i<DBnum_rows($result);$i++)
+			{
+				$depid=DBget_field($result,$i,0);
+				$depdescr=DBget_field($result,$i,1);
+				echo "<OPTION VALUE=\"$depid\">$depdescr";
+			}
+			echo "</SELECT>";
+
+			show_table2_v_delimiter2();
+			if(isset($triggerid))
+			{
+				echo "<input type=\"submit\" name=\"register\" value=\"add dependency\">";
+				echo "<input type=\"submit\" name=\"register\" value=\"delete dependency\">";
+			}
+		}
+
+		echo "</form>";
 		show_table2_header_end();
 	}
 
