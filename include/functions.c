@@ -498,7 +498,6 @@ void	apply_actions(int triggerid,int good)
 		zabbix_log( LOG_LEVEL_DEBUG, "Check dependencies");
 
 		sprintf(sql,"select count(*) from trigger_depends d,triggers t where d.triggerid_down=%d and d.triggerid_up=t.triggerid and t.istrue=1",triggerid);
-		zabbix_log( LOG_LEVEL_DEBUG, "SQL:%s",sql);
 		result = DBselect(sql);
 		i=atoi(DBget_field(result,0,0));
 		zabbix_log( LOG_LEVEL_DEBUG, "I:%d",i);
@@ -560,13 +559,11 @@ void	update_serv(int serviceid)
 	DB_RESULT *result,*result2;
 
 	sprintf(sql,"select serviceupid from services_links where servicedownid=%d",serviceid);
-	zabbix_log( LOG_LEVEL_WARNING,"SQL [%s]",sql);
 	result=DBselect(sql);
 	status=0;	
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 		sprintf(sql,"select status from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",atoi(DBget_field(result,i,0)));
-		zabbix_log( LOG_LEVEL_WARNING,"SQL [%s]",sql);
 		result2=DBselect(sql);
 		for(j=0;j<DBnum_rows(result2);j++)
 		{
@@ -576,7 +573,6 @@ void	update_serv(int serviceid)
 			}
 		}
 		sprintf(sql,"update services set status=%d where serviceid=%d",status,atoi(DBget_field(result,i,0)));
-		zabbix_log( LOG_LEVEL_WARNING,"SQL [%s]",sql);
 		DBexecute(sql);
 
 		DBfree_result(result2);
@@ -584,7 +580,6 @@ void	update_serv(int serviceid)
 	DBfree_result(result);
 
 	sprintf(sql,"select serviceupid from services_links where servicedownid=%d",serviceid);
-	zabbix_log( LOG_LEVEL_WARNING,"SQL [%s]",sql);
 	result=DBselect(sql);
 	for(i=0;i<DBnum_rows(result);i++)
 	{
@@ -604,12 +599,10 @@ void	update_services(int triggerid, int istrue)
 	DB_RESULT *result;
 
 	sprintf(sql,"update services set status=%d where triggerid=%d",istrue,triggerid);
-	zabbix_log( LOG_LEVEL_WARNING,"SQL [%s]",sql);
 	DBexecute(sql);
 
 
 	sprintf(sql,"select serviceid from services where triggerid=%d", triggerid);
-	zabbix_log( LOG_LEVEL_WARNING,"SQL [%s]",sql);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)

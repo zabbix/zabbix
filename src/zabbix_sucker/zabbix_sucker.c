@@ -248,7 +248,6 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 
 	snmp_sess_init( &session );
 	session.version = SNMP_VERSION_1;
-	session.timeout=500000;
 	if(item->useip==1)
 	{
 		session.peername = item->ip;
@@ -258,7 +257,6 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 		session.peername = item->host;
 	}
 	zabbix_log( LOG_LEVEL_WARNING, "Peername [%s]", session.peername);
-	zabbix_log( LOG_LEVEL_WARNING, "Timeout [%d]", session.timeout);
 	session.community = item->snmp_community;
 	zabbix_log( LOG_LEVEL_WARNING, "Community [%s]", session.community);
 	zabbix_log( LOG_LEVEL_WARNING, "OID [%s]", item->snmp_oid);
@@ -304,26 +302,28 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 			int count=1;
 			zabbix_log( LOG_LEVEL_WARNING, "AV loop()");
 
-/*		if (vars->type == ASN_OCTET_STR) */
-
 			if(	(vars->type == ASN_INTEGER) ||
 				(vars->type == ASN_UINTEGER)||
 				(vars->type == ASN_COUNTER) ||
 				(vars->type == ASN_GAUGE)
 			)
 			{
-				char *sp = (char *)malloc(1 + vars->val_len);
-				memcpy(sp, vars->val.string, vars->val_len);
-				sp[vars->val_len] = '\0';
-				zabbix_log( LOG_LEVEL_WARNING, "value #%d is a string: %s\n", count++, sp);
-				zabbix_log( LOG_LEVEL_WARNING, "Type:%d", vars->type);
 				*result=*vars->val.integer;
 				sprintf(result_str,"%d",*vars->val.integer);
-				free(sp);
+			}
+			else if(vars->type == ASN_OCTET_STR)
+			{
+				memcpy(result_str,vars->val.string,vars->val_len);
+				result_str[vars->val_len] = '\0';
+				if(item->type == 0)
+				{
+					ret = NOTSUPPORTED;
+				}
 			}
 			else
 			{
-				zabbix_log( LOG_LEVEL_WARNING,"value #%d is NOT an integer!\n", count++);
+				zabbix_log( LOG_LEVEL_WARNING,"value #%d has unknow type", count++);
+				ret  = NOTSUPPORTED;
 			}
 		}
 	}
@@ -333,6 +333,14 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Error in packet\nReason: %s\n",
 			snmp_errstring(response->errstat));
+			if(response->errstat == SNMP_ERR_NOSUCHNAME)
+			{
+				ret=NOTSUPPORTED;
+			}
+			else
+			{
+				ret=FAIL;
+			}
 		}
 		else
 		{
@@ -340,8 +348,8 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 			zabbix_log( LOG_LEVEL_WARNING, "Error [%d]",
 					status);
 			snmp_sess_perror("snmpget", ss);
+			ret=FAIL;
 		}
-		ret = FAIL;
 	}
 
 /*
