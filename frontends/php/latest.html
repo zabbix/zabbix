@@ -82,6 +82,8 @@
 			cr();
 			echo "<TD WIDTH=\"10%\" NOSAVE><center><B>History</B></center></TD>";
 			cr();
+			echo "<TD WIDTH=\"10%\" NOSAVE><center><B>Trends</B></center></TD>";
+			cr();
 			echo "</TR>";
 			cr();
 		}
@@ -146,6 +148,7 @@
 			echo "<td><center>-</center></td>";
 		}
 		echo "<td><center><a href=\"history.html?action=showhistory&itemid=$itemid\">Show</a></center></td>";
+		echo "<td><center><a href=\"trends.html?itemid=$itemid\">Show</a></center></td>";
 		echo "</tr>";
 	}
 	echo "</table>";
