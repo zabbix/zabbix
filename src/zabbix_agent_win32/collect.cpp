@@ -21,13 +21,13 @@
 **/
 
 #include "zabbixw32.h"
-#include <pdh.h>
 
 
 //
 // Global variables
 //
 
+USER_COUNTER *userCounterList=NULL;
 float statProcUtilization[MAX_CPU+1];
 float statProcUtilization5[MAX_CPU+1];
 float statProcUtilization15[MAX_CPU+1];
@@ -58,6 +58,8 @@ void CollectorThread(void *)
    PDH_STATUS status;
    SYSTEM_INFO sysInfo;
    DWORD i,cpuHistoryIdx,cpuQueueHistoryIdx;
+   USER_COUNTER *cptr;
+   PDH_STATISTICS statData;
 
    TlsSetValue(dwTlsLogPrefix,"Collector: ");   // Set log prefix for collector thread
    GetSystemInfo(&sysInfo);
@@ -115,13 +117,27 @@ void CollectorThread(void *)
    memset(cpuQueueHistory,0,sizeof(LONG)*900);
    cpuQueueHistoryIdx=0;
 
+   // Add user counters to query
+   for(cptr=userCounterList;cptr!=NULL;cptr=cptr->next)
+   {
+      if (PdhAddCounter(query,cptr->counterPath,0,&cptr->handle)!=ERROR_SUCCESS)
+      {
+         cptr->interval=-1;   // Flag for unsupported counters
+         cptr->lastValue=NOTSUPPORTED;
+         WriteLog("Unable to add user-defined counter %s=\"%s\" to query\r\n",
+                  cptr->name,cptr->counterPath);
+      }
+   }
+
    // Data collection loop
    WriteLog("Initialization complete\r\n");
    do
    {
       LONG sum;
       int j,n;
+      DWORD dwTicksStart,dwTicksElapsed;
 
+      dwTicksStart=GetTickCount();
       if ((status=PdhCollectQueryData(query))!=ERROR_SUCCESS)
          WriteLog("PdhCollectQueryData failed (status=%08X)\r\n",status);
 
@@ -193,6 +209,22 @@ void CollectorThread(void *)
       cpuQueueHistoryIdx++;
       if (cpuQueueHistoryIdx==900)
          cpuQueueHistoryIdx=0;
+
+      // Process user-defined counters
+      for(cptr=userCounterList;cptr!=NULL;cptr=cptr->next)
+         if (cptr->interval>0)      // Active counter?
+         {
+            PdhGetRawCounterValue(cptr->handle,NULL,&cptr->rawValueArray[cptr->currPos++]);
+            if (cptr->currPos==cptr->interval)
+               cptr->currPos=0;
+            PdhComputeCounterStatistics(cptr->handle,PDH_FMT_DOUBLE,cptr->currPos,
+                                        cptr->interval,cptr->rawValueArray,&statData);
+            cptr->lastValue=(float)statData.mean.doubleValue;
+         }
+
+      dwTicksElapsed=GetTickCount()-dwTicksStart;
+      if (dwTicksElapsed>100)
+         WriteLog("Processing took more then 100 milliseconds (%d milliseconds)\r\n",dwTicksElapsed);
    }
    while(WaitForSingleObject(eventShutdown,1000)==WAIT_TIMEOUT);
 

@@ -24,6 +24,66 @@
 
 
 //
+// Parse PerfCounter=... parameter and add new performance counter
+// Argument is a config file parameter value which should have the following syntax:
+//    <key>,"<counter path>",<time interval>
+// Returns TRUE on success and FALSE otherwise
+//
+
+static BOOL AddPerformanceCounter(char *args)
+{
+   char *ptr1,*ptr2,*eptr,buffer[MAX_ALIAS_NAME];
+   USER_COUNTER *counter;
+   int i;
+
+   ptr1=strchr(args,',');
+   if (ptr1==NULL)
+      return FALSE;     // Invalid syntax
+
+   *ptr1=0;
+   ptr1++;
+   StrStrip(args);
+   StrStrip(ptr1);
+   if (*ptr1!='"')
+      return FALSE;     // Invalid syntax
+   ptr1++;
+   ptr2=strchr(ptr1,'"');
+   if (ptr2==NULL)
+      return FALSE;     // Invalid syntax
+   *ptr2=0;
+   ptr2++;
+   StrStrip(ptr2);
+   if (*ptr2!=',')
+      return FALSE;     // Invalid syntax
+   ptr2++;
+   StrStrip(ptr2);
+
+   i=strtol(ptr2,&eptr,10);
+   if ((*eptr!=0)||     // Not a decimal number
+       (i<1)||(i>1800)) // Interval value out of range
+      return FALSE;     // Invalid syntax
+
+   // Add internal alias
+   sprintf(buffer,"__usercnt{%s}",args);
+   if (!AddAlias(args,buffer))
+      return FALSE;
+
+   counter=(USER_COUNTER *)malloc(sizeof(USER_COUNTER));
+   memset(counter,0,sizeof(USER_COUNTER));
+
+   strncpy(counter->name,args,MAX_COUNTER_NAME-1);
+   strncpy(counter->counterPath,ptr1,MAX_PATH-1);
+   counter->interval=i;
+   counter->rawValueArray=(PDH_RAW_COUNTER *)malloc(sizeof(PDH_RAW_COUNTER)*counter->interval);
+
+   // Add to the list
+   counter->next=userCounterList;
+   userCounterList=counter;
+   return TRUE;
+}
+
+
+//
 // Read configuration
 //
 
@@ -103,6 +163,53 @@ BOOL ReadConfig(void)
          else
          {
             confListenPort=(WORD)n;
+         }
+      }
+      else if (!stricmp(buffer,"Alias"))
+      {
+         char *sep;
+
+         sep=strchr(ptr,':');
+         if (sep==NULL)
+         {
+            errors++;
+            if (optStandalone)
+               printf("Error in configuration file, line %d: invalid alias syntax\n",sourceLine);
+         }
+         else
+         {
+            *sep=0;
+            sep++;
+            StrStrip(ptr);
+            StrStrip(sep);
+            AddAlias(ptr,sep);
+         }
+      }
+      else if (!stricmp(buffer,"Timeout"))
+      {
+         int tm;
+
+         tm=atoi(ptr);
+         if ((tm>0)&&(tm<=30))
+         {
+            confTimeout=tm*1000;    // Convert to milliseconds
+         }
+         else
+         {
+            errors++;
+            if (optStandalone)
+               printf("Error in configuration file, line %d: invalid timeout value (%d seconds)\n",
+                      sourceLine,tm);
+         }
+      }
+      else if (!stricmp(buffer,"PerfCounter"))
+      {
+         if (!AddPerformanceCounter(ptr))
+         {
+            errors++;
+            if (optStandalone)
+               printf("Error in configuration file, line %d: invalid performance counter specification\n",
+                      sourceLine);
          }
       }
       else if ((!stricmp(buffer,"PidFile"))||(!stricmp(buffer,"NoTimeWait"))||
