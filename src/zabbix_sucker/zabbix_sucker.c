@@ -280,6 +280,8 @@ int	get_value_SNMP(int version,double *result,char *result_str,DB_ITEM *item)
 	struct variable_list *vars;
 	int status;
 
+	unsigned char *ip;
+
 	int ret=SUCCEED;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP()");
@@ -371,10 +373,19 @@ int	get_value_SNMP(int version,double *result,char *result_str,DB_ITEM *item)
 				/*sprintf(result_str,"%ld",(long)*vars->val.integer);*/
 				snprintf(result_str,MAX_STRING_LEN-1,"%lu",(long)*vars->val.integer);
 			}
-			else if( (vars->type == ASN_OCTET_STR) || (vars->type == ASN_IPADDRESS))
+			else if(vars->type == ASN_OCTET_STR)
 			{
 				memcpy(result_str,vars->val.string,vars->val_len);
 				result_str[vars->val_len] = '\0';
+				if(item->type == 0)
+				{
+					ret = NOTSUPPORTED;
+				}
+			}
+			else if(vars->type == ASN_IPADDRESS)
+			{
+				ip = vars->val.string;
+				snprintf(result_str,MAX_STRING_LEN-1,"%d.%d.%d.%d",ip[0],ip[1],ip[2],ip[3]);
 				if(item->type == 0)
 				{
 					ret = NOTSUPPORTED;
