@@ -144,6 +144,14 @@
 			$this->border=$border;
 		}
 
+		function drawSmallRectangle()
+		{
+			ImageDashedLine($this->im,$this->shiftX+1,$this->shiftY,$this->shiftX+1,$this->sizeY+$this->shiftY,$this->colors["Black"]);
+			ImageDashedLine($this->im,$this->shiftX+1,$this->shiftY,$this->shiftX+$this->sizeX,$this->shiftY,$this->colors["Black"]);
+			ImageDashedLine($this->im,$this->shiftX+$this->sizeX,$this->shiftY,$this->shiftX+$this->sizeX,$this->sizeY+$this->shiftY,$this->colors["Black"]);
+			ImageDashedLine($this->im,$this->shiftX+1,$this->shiftY+$this->sizeY,$this->shiftX+$this->sizeX,$this->sizeY+$this->shiftY,$this->colors["Black"]);
+		}
+
 		function drawRectangle()
 		{
 			ImageFilledRectangle($this->im,0,0,$this->sizeX+$this->shiftX+61,$this->sizeY+2*$this->shiftY+40,$this->colors["White"]);
@@ -151,10 +159,6 @@
 			{
 				ImageRectangle($this->im,0,0,imagesx($this->im)-1,imagesy($this->im)-1,$this->colors["Black"]);
 			}
-			ImageDashedLine($this->im,$this->shiftX+1,$this->shiftY,$this->shiftX+1,$this->sizeY+$this->shiftY,$this->colors["Black"]);
-			ImageDashedLine($this->im,$this->shiftX+1,$this->shiftY,$this->shiftX+$this->sizeX,$this->shiftY,$this->colors["Black"]);
-			ImageDashedLine($this->im,$this->shiftX+$this->sizeX,$this->shiftY,$this->shiftX+$this->sizeX,$this->sizeY+$this->shiftY,$this->colors["Black"]);
-			ImageDashedLine($this->im,$this->shiftX+1,$this->shiftY+$this->sizeY,$this->shiftX+$this->sizeX,$this->sizeY+$this->shiftY,$this->colors["Black"]);
 		}
 
 		function drawHeader()
@@ -178,15 +182,20 @@
 
 		function drawGrid()
 		{
-			for($i=0;$i<=$this->sizeY;$i+=$this->sizeY/6)
+			$this->drawSmallRectangle();
+			for($i=$this->sizeY/6;$i<=5*$this->sizeY/6;$i+=$this->sizeY/6)
 			{
 				ImageDashedLine($this->im,$this->shiftX,$i+$this->shiftY,$this->sizeX+$this->shiftX,$i+$this->shiftY,$this->colors["Gray"]);
 			}
 		
-			for($i=0;$i<=$this->sizeX;$i+=$this->sizeX/24)
+			for($i=$this->sizeX/24;$i<=23*$this->sizeX/24;$i+=$this->sizeX/24)
 			{
 				ImageDashedLine($this->im,$i+$this->shiftX,$this->shiftY,$i+$this->shiftX,$this->sizeY+$this->shiftY,$this->colors["Gray"]);
-				if($this->nodata == 0)
+			}
+// Some data exists, so draw time line
+			if($this->nodata==0)
+			{
+				for($i=0;$i<=$this->sizeX;$i+=$this->sizeX/24)
 				{
 					ImageStringUp($this->im, 1,$i+$this->shiftX-3, $this->sizeY+$this->shiftY+29, date($this->date_format,$this->from_time+$i*$this->period/$this->sizeX) , $this->colors["Black"]);
 				}
@@ -205,10 +214,13 @@
 
 		function noDataFound()
 		{
+			$this->drawGrid();
+
 			ImageString($this->im, 2,$this->sizeX/2-50,                $this->sizeY+$this->shiftY+3, "NO DATA FOUND FOR THIS PERIOD" , $this->colors["Dark Red"]);
 			ImageStringUp($this->im,0,imagesx($this->im)-10,imagesy($this->im)-50, "http://zabbix.sourceforge.net", $this->colors["Gray"]);
 			ImagePng($this->im); 
 			ImageDestroy($this->im); 
+			exit;
 		}
 
 		function drawLogo()
@@ -319,6 +331,11 @@
 			$this->drawRectangle();
 			$this->drawHeader();
 			$this->checkPermissions();
+
+			if($this->num==0)
+			{
+				$this->noDataFound();
+			}
 
 			$this->SelectData();
 
