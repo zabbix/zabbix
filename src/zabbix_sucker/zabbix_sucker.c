@@ -816,6 +816,42 @@ void update_key_status(int hostid,int host_status)
 	DBfree_result(result);
 }
 
+int trend(void)
+{
+	double		value;
+	char		value_str[MAX_STRING_LEN+1];
+	char		sql[MAX_STRING_LEN+1];
+ 
+	DB_RESULT	*result,*result2;
+
+	int		i,j;
+	int		now;
+	int		res;
+	DB_ITEM		item;
+	char		*s;
+
+	int	host_status;
+	int	network_errors;
+
+	now = time(NULL);
+
+	sprintf(sql,"select itemid from items");
+	result2 = DBselect(sql);
+	for(i=0;i<DBnum_rows(result2);i++)
+	{
+		sprintf(sql,"select clock-clock%3600, count(*),min(value),avg(value),max(value) from history where itemid=%d group by 1",atoi(DBget_field(result2,i,0)));
+		result = DBselect(sql);
+	
+		for(j=0;j<DBnum_rows(result);j++)
+		{
+			sprintf(sql,"insert into trends (itemid, clock, num, value_min, value_avg, value_max) values (%d,%d,%d,%g,%g,%g)",atoi(DBget_field(result2,i,0)), atoi(DBget_field(result,j,0)),atoi(DBget_field(result,j,1)),atof(DBget_field(result,j,2)),atof(DBget_field(result,j,3)),atof(DBget_field(result,j,4)));
+			DBexecute(sql);
+		}
+		DBfree_result(result);
+	}
+	DBfree_result(result2);
+}
+
 int get_values(void)
 {
 	double		value;
@@ -1123,8 +1159,14 @@ int main(int argc, char **argv)
 /* Need to set trigger status to UNKNOWN since last run */
 	DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
 	DBupdate_triggers_status_after_restart();
-	DBclose();
 
+/*#define CALC_TREND*/
+
+#ifdef CALC_TREND
+	trend();
+	return 0;
+#endif
+	DBclose();
 	pids=calloc(CONFIG_SUCKERD_FORKS-1,sizeof(pid_t));
 
 	for(i=1;i<CONFIG_SUCKERD_FORKS;i++)
