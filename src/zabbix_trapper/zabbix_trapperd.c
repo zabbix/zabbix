@@ -38,6 +38,7 @@ int	parent=0;
 
 int	CONFIG_TRAPPERD_FORKS		= TRAPPERD_FORKS;
 int	CONFIG_LISTEN_PORT		= 10001;
+int	CONFIG_TIMEOUT			= TRAPPER_TIMEOUT;
 char	*CONFIG_PID_FILE		= NULL;
 char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBUSER			= NULL;
@@ -171,6 +172,17 @@ void	process_config_file(void)
 				exit(1);
 			}
 			CONFIG_TRAPPERD_FORKS=i;
+		}
+		else if(strcmp(parameter,"Timeout")==0)
+		{
+			i=atoi(value);
+			if( (i<1) || (i>30) )
+			{
+				syslog( LOG_CRIT, "Wrong value of Timeout in line %d. Should be between 1 and 30.", lineno);
+				fclose(file);
+				exit(1);
+			}
+			CONFIG_TIMEOUT=i;
 		}
 		else if(strcmp(parameter,"ListenPort")==0)
 		{
@@ -353,7 +365,7 @@ void	process_child(int sockfd)
 	phan.sa_flags = 0;
 	sigaction(SIGALRM, &phan, NULL);
 
-	alarm(TRAPPER_TIMEOUT);
+	alarm(CONFIG_TIMEOUT);
 
 	syslog( LOG_DEBUG, "Before read()");
 	if( (nread = read(sockfd, line, 1024)) < 0)

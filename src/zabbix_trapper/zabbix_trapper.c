@@ -27,6 +27,7 @@
 #include "db.h"
 #include "functions.h"
 
+int	CONFIG_TIMEOUT		= TRAPPER_TIMEOUT;
 char	*CONFIG_DBNAME		= NULL;
 char	*CONFIG_DBUSER		= NULL;
 char	*CONFIG_DBPASSWORD	= NULL;
@@ -56,7 +57,7 @@ void	process_config_file(void)
 	char	parameter[1024];
 	char	*value;
 	int	lineno;
-
+	int	i;
 
 	file=fopen("/etc/zabbix/zabbix_trapper.conf","r");
 	if(NULL == file)
@@ -111,6 +112,17 @@ void	process_config_file(void)
 				exit(1);
 			}
 		}
+		else if(strcmp(parameter,"Timeout")==0)
+		{
+			i=atoi(value);
+			if( (i<1) || (i>30) )
+			{
+				syslog( LOG_CRIT, "Wrong value of Timeout in line %d. Should be between 1 and 30.", lineno);
+				fclose(file);
+				exit(1);
+			}
+			CONFIG_TIMEOUT=i;
+		}
 		else if(strcmp(parameter,"DBName")==0)
 		{
 			CONFIG_DBNAME=strdup(value);
@@ -157,7 +169,7 @@ int	main()
 
 	s=(char *) malloc( 1024 );
 
-	alarm(TRAPPER_TIMEOUT);
+	alarm(CONFIG_TIMEOUT);
 
 	openlog("zabbix_trapper",LOG_PID,LOG_USER);
 	//	ret=setlogmask(LOG_UPTO(LOG_DEBUG));
