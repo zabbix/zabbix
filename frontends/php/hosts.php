@@ -149,16 +149,16 @@
 	echo "<form method=\"get\" action=\"hosts.php\">";
 	if(isset($HTTP_GET_VARS["hostid"]))
 	{
-		echo "<input name=\"hostid\" type=\"hidden\" value=\"".$HTTP_GET_VARS["hostid"]."\">";
+		echo "<input class=\"biginput\" name=\"hostid\" type=\"hidden\" value=\"".$HTTP_GET_VARS["hostid"]."\">";
 	}
 	echo "Host";
 	show_table2_h_delimiter();
-	echo "<input name=\"host\" value=\"$host\" size=20>";
+	echo "<input class=\"biginput\" name=\"host\" value=\"$host\" size=20>";
 
 	show_table2_v_delimiter();
 	echo "Groups";
 	show_table2_h_delimiter();
-	echo "<select multiple name=\"groups[]\" size=\"5\">";
+	echo "<select multiple class=\"biginput\" name=\"groups[]\" size=\"5\">";
 	$result=DBselect("select distinct groupid,name from groups order by name");
 	while($row=DBfetch($result))
 	{
@@ -186,27 +186,27 @@
 	show_table2_v_delimiter();
 	echo "New group";
 	show_table2_h_delimiter();
-	echo "<input name=\"newgroup\" value=\"\" size=20>";
+	echo "<input class=\"biginput\" name=\"newgroup\" value=\"\" size=20>";
 
 	show_table2_v_delimiter();
 	echo "Use IP address";
 	show_table2_h_delimiter();
-	echo "<INPUT TYPE=\"CHECKBOX\" NAME=\"useip\" $useip>";
+	echo "<INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"useip\" $useip>";
 
 	show_table2_v_delimiter();
 	echo "IP address";
 	show_table2_h_delimiter();
-	echo "<input name=\"ip\" value=\"$ip\" size=15>";
+	echo "<input class=\"biginput\" name=\"ip\" value=\"$ip\" size=15>";
 
 	show_table2_v_delimiter();
 	echo "Port";
 	show_table2_h_delimiter();
-	echo "<input name=\"port\" size=5 value=\"$port\">";
+	echo "<input class=\"biginput\" name=\"port\" size=6 value=\"$port\">";
 
 	show_table2_v_delimiter();
 	echo "Status";
 	show_table2_h_delimiter();
-	echo "<select name=\"status\" size=\"1\">";
+	echo "<select class=\"biginput\" name=\"status\" size=\"1\">";
 	if($status==0)
 	{
 		echo "<option value=\"0\" selected>Monitored";
@@ -222,12 +222,12 @@
 	show_table2_v_delimiter();
 	echo "Add parameters supported by zabbix_agent";
 	show_table2_h_delimiter();
-	echo "<INPUT NAME=\"template\" TYPE=\"CHECKBOX\"  VALUE=\"true\" CHECKED>";
+	echo "<INPUT class=\"biginput\" NAME=\"template\" TYPE=\"CHECKBOX\"  VALUE=\"true\" CHECKED>";
 
 	show_table2_v_delimiter();
 	echo "Use the host as a template";
 	show_table2_h_delimiter();
-	echo "<select name=\"host_templateid\" size=\"1\">";
+	echo "<select class=\"biginput\" name=\"host_templateid\" size=\"1\">";
 	echo "<option value=\"0\" selected>...";
 	$result=DBselect("select host,hostid from hosts order by host");
 	while($row=DBfetch($result))

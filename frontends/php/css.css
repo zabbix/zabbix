@@ -1,4 +1,5 @@
-body {
+body
+{
         background-color:#778899;
         margin: 3px 3px 3px 3px;
         padding: 0px 0px 0px 0px;
@@ -37,3 +38,13 @@ body {
 	.img {border-color: #black  ; border-width:1px;}
 	img.top {vertical-align:text-top}
 	img.bottom {vertical-align:text-bottom}
+
+.biginput
+{
+	font-family: Verdana, Helvetica, Geneva;
+	font-size: 10px;
+	border: solid;
+	border-width: 1px;
+	border-color: gray;
+	background-color: white;
+}

@@ -2960,15 +2960,15 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
  
 		show_table2_v_delimiter();
 		echo "<form method=\"get\" action=\"items.php\">";
-		echo "<input name=\"itemid\" type=hidden value=$itemid size=8>";
+		echo "<input class=\"biginput\" name=\"itemid\" type=hidden value=$itemid size=8>";
 		echo "Description";
 		show_table2_h_delimiter();
-		echo "<input name=\"description\" value=\"$description\"size=40>";
+		echo "<input class=\"biginput\" name=\"description\" value=\"$description\"size=40>";
 
 		show_table2_v_delimiter();
 		echo "Host";
 		show_table2_h_delimiter();
-		echo "<select name=\"hostid\" value=\"3\">";
+		echo "<select class=\"biginput\" name=\"hostid\" value=\"3\">";
 	        $result=DBselect("select hostid,host from hosts order by host");
 	        for($i=0;$i<DBnum_rows($result);$i++)
 	        {
@@ -2988,7 +2988,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		show_table2_v_delimiter();
 		echo "Type";
 		show_table2_h_delimiter();
-		echo "<SELECT NAME=\"type\" value=\"$type\" size=\"1\">";
+		echo "<SELECT class=\"biginput\" NAME=\"type\" value=\"$type\" size=\"1\">";
 		echo "<OPTION VALUE=\"0\"";
 		if($type==0) echo "SELECTED";
 		echo ">Zabbix agent";
@@ -3000,32 +3000,32 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		show_table2_v_delimiter();
 		echo "SNMP community (for SNMP only)";
 		show_table2_h_delimiter();
-		echo "<input name=\"snmp_community\" value=\"$snmp_community\" size=16>";
+		echo "<input class=\"biginput\" name=\"snmp_community\" value=\"$snmp_community\" size=16>";
 
 		show_table2_v_delimiter();
 		echo "SNMP OID (for SNMP only)";
 		show_table2_h_delimiter();
-		echo "<input name=\"snmp_oid\" value=\"$snmp_oid\" size=40>";
+		echo "<input class=\"biginput\" name=\"snmp_oid\" value=\"$snmp_oid\" size=40>";
 
 		show_table2_v_delimiter();
 		echo "Key";
 		show_table2_h_delimiter();
-		echo "<input name=\"key\" value=\"$key\" size=40>";
+		echo "<input class=\"biginput\" name=\"key\" value=\"$key\" size=40>";
 
 		show_table2_v_delimiter();
 		echo "Delay";
 		show_table2_h_delimiter();
-		echo "<input name=\"delay\" value=\"$delay\" size=5>";
+		echo "<input class=\"biginput\" name=\"delay\" value=\"$delay\" size=5>";
 
 		show_table2_v_delimiter();
 		echo "Keep history (in days)";
 		show_table2_h_delimiter();
-		echo "<input name=\"history\" value=\"$history\" size=8>";
+		echo "<input class=\"biginput\" name=\"history\" value=\"$history\" size=8>";
 
 		show_table2_v_delimiter();
 		echo "Status";
 		show_table2_h_delimiter();
-		echo "<SELECT NAME=\"status\" value=\"$status\" size=\"1\">";
+		echo "<SELECT class=\"biginput\" NAME=\"status\" value=\"$status\" size=\"1\">";
 		echo "<OPTION VALUE=\"0\"";
 		if($status==0) echo "SELECTED";
 		echo ">Monitored";
@@ -3043,7 +3043,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		show_table2_v_delimiter();
 		echo "Type of information";
 		show_table2_h_delimiter();
-		echo "<SELECT NAME=\"value_type\" value=\"$value_type\" size=\"1\">";
+		echo "<SELECT class=\"biginput\" NAME=\"value_type\" value=\"$value_type\" size=\"1\">";
 		echo "<OPTION VALUE=\"0\"";
 		if($value_type==0) echo "SELECTED";
 		echo ">Numeric";
@@ -3055,7 +3055,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		show_table2_v_delimiter();
 		echo "Allowed hosts (for trapper item only)";
 		show_table2_h_delimiter();
-		echo "<input name=\"trapper_hosts\" value=\"$trapper_hosts\" size=40>";
+		echo "<input class=\"biginput\" name=\"trapper_hosts\" value=\"$trapper_hosts\" size=40>";
  
 		show_table2_v_delimiter2();
 		echo "<input type=\"submit\" name=\"register\" value=\"add\">";
@@ -3183,31 +3183,31 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<form method=\"get\" action=\"users.php\">";
 		if(isset($userid))
 		{
-			echo "<input name=\"userid\" type=\"hidden\" value=\"$userid\" size=8>";
+			echo "<input class=\"biginput\" name=\"userid\" type=\"hidden\" value=\"$userid\" size=8>";
 		}
 		echo "Alias";
 		show_table2_h_delimiter();
-		echo "<input name=\"alias\" value=\"$alias\" size=20>";
+		echo "<input class=\"biginput\" name=\"alias\" value=\"$alias\" size=20>";
 
 		show_table2_v_delimiter();
 		echo "Name";
 		show_table2_h_delimiter();
-		echo "<input name=\"name\" value=\"$name\" size=20>";
+		echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=20>";
 
 		show_table2_v_delimiter();
 		echo "Surname";
 		show_table2_h_delimiter();
-		echo "<input name=\"surname\" value=\"$surname\" size=20>";
+		echo "<input class=\"biginput\" name=\"surname\" value=\"$surname\" size=20>";
 
 		show_table2_v_delimiter();
 		echo "Password";
 		show_table2_h_delimiter();
-		echo "<input type=\"password\" name=\"password1\" value=\"$password\" size=20>";
+		echo "<input class=\"biginput\" type=\"password\" name=\"password1\" value=\"$password\" size=20>";
 
 		show_table2_v_delimiter();
 		echo "Password (once again)";
 		show_table2_h_delimiter();
-		echo "<input type=\"password\" name=\"password2\" value=\"$password\" size=20>";
+		echo "<input class=\"biginput\" type=\"password\" name=\"password2\" value=\"$password\" size=20>";
 
 		show_table2_v_delimiter2();
 		echo "<input type=\"submit\" name=\"register\" value=\"add\">";
@@ -3307,20 +3307,20 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 			echo "<form method=\"get\" action=\"triggers.php\">";
 		}
-		echo "<input name=\"triggerid\" type=hidden value=$triggerid size=8>";
+		echo "<input class=\"biginput\" name=\"triggerid\" type=hidden value=$triggerid size=8>";
 		echo "Description";
 		show_table2_h_delimiter();
-		echo "<input name=\"description\" value=\"$description\" size=70>";
+		echo "<input class=\"biginput\" name=\"description\" value=\"$description\" size=70>";
 
 		show_table2_v_delimiter();
 		echo "Expression";
 		show_table2_h_delimiter();
-		echo "<input name=\"expression\" value=\"$expression\" size=70>";
+		echo "<input class=\"biginput\" name=\"expression\" value=\"$expression\" size=70>";
 
 		show_table2_v_delimiter();
 		echo "Severity";
 		show_table2_h_delimiter();
-		echo "<SELECT NAME=\"priority\" size=\"1\">";
+		echo "<SELECT class=\"biginput\" NAME=\"priority\" size=\"1\">";
 		echo "<OPTION VALUE=\"0\" "; if($priority==0) echo "SELECTED"; echo ">Not classified";
 		echo "<OPTION VALUE=\"1\" "; if($priority==1) echo "SELECTED"; echo ">Information";
 		echo "<OPTION VALUE=\"2\" "; if($priority==2) echo "SELECTED"; echo ">Warning";
@@ -3332,17 +3332,17 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		show_table2_v_delimiter();
 		echo "Comments";
 		show_table2_h_delimiter();
- 		echo "<TEXTAREA NAME=\"comments\" COLS=70 ROWS=\"7\" WRAP=\"SOFT\">$comments</TEXTAREA>";
+ 		echo "<TEXTAREA class=\"biginput\" NAME=\"comments\" COLS=70 ROWS=\"7\" WRAP=\"SOFT\">$comments</TEXTAREA>";
 
 		show_table2_v_delimiter();
 		echo "URL";
 		show_table2_h_delimiter();
-		echo "<input name=\"url\" value=\"$url\" size=70>";
+		echo "<input class=\"biginput\" name=\"url\" value=\"$url\" size=70>";
 
 		show_table2_v_delimiter();
 		echo "Disabled";
 		show_table2_h_delimiter();
-		echo "<INPUT TYPE=\"CHECKBOX\" ";
+		echo "<INPUT class=\"biginput\" TYPE=\"CHECKBOX\" ";
 		if($status==1) { echo " CHECKED "; }
 		echo "NAME=\"disabled\"  VALUE=\"true\">";
 
@@ -3362,7 +3362,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			show_table2_h_delimiter();
 			$sql="select t.triggerid,t.description from triggers t,trigger_depends d where t.triggerid=d.triggerid_up and d.triggerid_down=$triggerid";
 			$result1=DBselect($sql);
-			echo "<SELECT NAME=\"dependency\" size=\"1\">";
+			echo "<SELECT class=\"biginput\" NAME=\"dependency\" size=\"1\">";
 			for($i=0;$i<DBnum_rows($result1);$i++)
 			{
 				$depid=DBget_field($result1,$i,0);
@@ -3380,7 +3380,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			show_table2_h_delimiter();
 			$sql="select t.triggerid,t.description from triggers t where t.triggerid!=$triggerid order by t.description";
 			$result=DBselect($sql);
-			echo "<SELECT NAME=\"depid\" size=\"1\">";
+			echo "<SELECT class=\"biginput\" NAME=\"depid\" size=\"1\">";
 			for($i=0;$i<DBnum_rows($result);$i++)
 			{
 				$depid=DBget_field($result,$i,0);
