@@ -34,6 +34,8 @@ TKOM:
 
 OTHER:
 
+ - different icons depending on a triger status for sysmaps
+ - optionally support map generation in JPEG. PNG images are huge!
  - make w32 agent not to write warnings in case of timeout (HB)
  - security-related issues
 
