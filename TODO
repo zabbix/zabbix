@@ -51,6 +51,7 @@ extensive use of atoi rather than something w/ bounds checking like strtol.
 
 Most of the signal handlers all need to delay or block signals to avoid signal race conditions, as they call non-reentrant functions.
 
+ - check snprintf() from http://www.ijs.si/software/snprintf/. Better implementation of sprintf?
  -support of Oracle
 
 I think that i found a bug in zabbix_suckerd.
