@@ -29,7 +29,7 @@ Call to PdhOpenQuery() failed: %1
 MessageId=
 SymbolicName=MSG_PDH_ADD_COUNTER_FAILED
 Language=English
-Unable to add performance counter "%1" to query
+Unable to add performance counter "%1" to query: %2
 .
 
 MessageId=
@@ -41,7 +41,7 @@ Call to PdhCollectQueryData() failed: %1
 MessageId=
 SymbolicName=MSG_USERDEF_COUNTER_FAILED
 Language=English
-Unable to add user-defined counter "%1" (expanded to "%2") to query
+Unable to add user-defined counter "%1" (expanded to "%2") to query: %3
 .
 
 MessageId=
@@ -138,6 +138,12 @@ MessageId=
 SymbolicName=MSG_UNEXPECTED_IRC
 Language=English
 Internal error: unexpected iRC=%1 in ProcessCommand("%2")
+.
+
+MessageId=
+SymbolicName=MSG_TOO_MANY_ERRORS
+Language=English
+Too many consecutive errors on accept() call
 .
 
 ;#endif

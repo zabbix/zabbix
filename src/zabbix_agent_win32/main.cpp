@@ -129,6 +129,7 @@ BOOL Initialize(void)
 
    // Start TCP/IP listener and collector threads
    _beginthread(CollectorThread,0,NULL);
+   Sleep(1500);   // Allow collector thread to initialize
    _beginthread(ListenerThread,0,NULL);
 
    return TRUE;
