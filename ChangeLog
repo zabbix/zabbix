@@ -1,5 +1,7 @@
 Changes for 1.0beta11:
 
+ - added translation of special HTML characters in history of
+ alerts and alarms (Alexei)
  - fixed calculation of graph width under MS Explorer (Alexei)
  - fixed interpretation of parameter 'from' for graphs (Alexei)
  - removed references to screens_graphs (Alexei)

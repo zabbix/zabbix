@@ -105,7 +105,7 @@
 		{
 			$description=expand_trigger_description($row["triggerid"]);
 		}
-		echo "<TD><a href=\"alarms.php?triggerid=".$row["triggerid"]."\">$description</a></TD>";
+		echo "<TD><a href=\"alarms.php?triggerid=".$row["triggerid"]."\">".htmlspecialchars($description)."</a></TD>";
 		if($row["value"] == 0)
 		{
 			echo "<TD><font color=\"00AA00\">OFF</font></TD>";
