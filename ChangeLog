@@ -1,5 +1,6 @@
 Changes for 1.0alpha10:
 
+ - "Not monitored" will not be displayed
  - Calls to mhash() changed to md5(), thus eliminating use of mhash module.
  - Added missing line in zabbix_suckerd. Now it reads items.snmp_oid from DB.
 
