@@ -120,6 +120,13 @@
 		echo "</TD>";
 		echo "</TR>";
 	}
+	if(DBnum_rows($result)==0)
+	{
+		echo "<TR BGCOLOR=#EEEEEE>";
+		echo "<TD COLSPAN=4 ALIGN=CENTER>-No media defined-</TD>";
+		echo "<TR>";
+	}
+
 	echo "</TABLE>";
 ?>
 </FONT>
