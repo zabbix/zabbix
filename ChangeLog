@@ -1,5 +1,6 @@
 Changes for 1.0beta13:
 
+ - housekeeper to delete hosts_groups entries (Alexei)
  - deleted host to be renamed to "<host> [DELETED]"
  (Alexei)
  - added function now() (Alexei)
