@@ -84,7 +84,7 @@
 				}
 				$str=$str."&keep=".$HTTP_GET_VARS["keep"];
 			}
-			echo "<a href='charts.php?graphid=".$row["graphid"].$str."'>".$row["name"]."</a>";
+			echo "<a href='charts.php?graphid=".$row["graphid"].url_param("stime").$str."'>".$row["name"]."</a>";
 // END - IGMI - keep support
 //			echo "<a href='charts.php?graphid=".$row["graphid"]."'>".$row["name"]."</a>";
 			if(isset($HTTP_GET_VARS["graphid"]) && ($HTTP_GET_VARS["graphid"] == $row["graphid"]) )
@@ -182,18 +182,18 @@
 			if($HTTP_GET_VARS["period"]>$sec)
 			{
 				$tmp=$HTTP_GET_VARS["period"]-$sec;
-				echo("<A HREF=\"charts.php?period=$tmp".url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">-</A>");
+				echo("<A HREF=\"charts.php?period=$tmp".url_param("graphid").url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">-</A>");
 			}
 			else
 			{
 				echo "-";
 			}
 
-			echo("<A HREF=\"charts.php?period=$sec".url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">");
+			echo("<A HREF=\"charts.php?period=$sec".url_param("graphid").url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">");
 			echo($label."</A>");
 
 			$tmp=$HTTP_GET_VARS["period"]+$sec;
-			echo("<A HREF=\"charts.php?period=$tmp".url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">+</A>");
+			echo("<A HREF=\"charts.php?period=$tmp".url_param("graphid").url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">+</A>");
 
 			echo "]&nbsp;";
 		}
@@ -236,6 +236,8 @@
 	echo "</TR>";
 	echo "<TR BGCOLOR=#FFFFFF>";
 	echo "<TD>";
+	if(isset($HTTP_GET_VARS["stime"]))
+	{
 		echo("<div align=left>");
 		echo("<b>Move:</b>&nbsp;");
 
@@ -243,7 +245,36 @@
 		$a=array("1h"=>1,"2h"=>2,"4h"=>4,"8h"=>8,"12h"=>12,
 			"24h"=>24,"week"=>7*24,"month"=>31*24,"year"=>365*24);
 		foreach($a as $label=>$hours)
-//		foreach(array(0,1,2,7,14) as $count){
+		{
+			echo "[";
+
+			$stime=$HTTP_GET_VARS["stime"];
+			$tmp=mktime(substr($stime,8,2),substr($stime,10,2),0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
+			$tmp=$tmp-3600*$hours;
+			$tmp=date("YmdHi",$tmp);
+			echo("<A HREF=\"charts.php?stime=$tmp".url_param("graphid").url_param("period").url_param("keep").url_param("fullscreen")."\">-</A>");
+
+			echo($label);
+
+			$stime=$HTTP_GET_VARS["stime"];
+			$tmp=mktime(substr($stime,8,2),substr($stime,10,2),0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
+			$tmp=$tmp+3600*$hours;
+			$tmp=date("YmdHi",$tmp);
+			echo("<A HREF=\"charts.php?stime=$tmp".url_param("graphid").url_param("period").url_param("keep").url_param("fullscreen")."\">+</A>");
+
+			echo "]&nbsp;";
+		}
+		echo("</div>");
+	}
+	else
+	{
+		echo("<div align=left>");
+		echo("<b>Move:</b>&nbsp;");
+
+		$day=24;
+		$a=array("1h"=>1,"2h"=>2,"4h"=>4,"8h"=>8,"12h"=>12,
+			"24h"=>24,"week"=>7*24,"month"=>31*24,"year"=>365*24);
+		foreach($a as $label=>$hours)
 		{
 			echo "[";
 			$tmp=$HTTP_GET_VARS["from"]+$hours;
@@ -263,14 +294,22 @@
 
 			echo "]&nbsp;";
 		}
-            
 		echo("</div>");
+	}
 	echo "</TD>";
 	echo "<TD BGCOLOR=#FFFFFF WIDTH=15% ALIGN=RIGHT>";
 //		echo("<div align=left>");
 		echo "<form method=\"put\" action=\"charts.php\">";
 		echo "<input name=\"graphid\" type=\"hidden\" value=\"".$HTTP_GET_VARS["graphid"]."\" size=12>";
-		echo "<input name=\"stime\" class=\"biginput\" value=\"yyyymmdd\" size=8>";
+		echo "<input name=\"period\" type=\"hidden\" value=\"".(9*3600)."\" size=12>";
+		if(isset($HTTP_GET_VARS["stime"]))
+		{
+			echo "<input name=\"stime\" class=\"biginput\" value=\"".$HTTP_GET_VARS["stime"]."\" size=12>";
+		}
+		else
+		{
+			echo "<input name=\"stime\" class=\"biginput\" value=\"yyyymmddhhmm\" size=12>";
+		}
 		echo "&nbsp;";
 		echo "<input class=\"button\" type=\"submit\" name=\"action\" value=\"go\">";
 		echo "</form>";
