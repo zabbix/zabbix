@@ -383,7 +383,14 @@
 //                $name_=DBget_field($result,$i,2);
 //		if( strstr($name_,"%s"))
 //		{
-			$name_=expand_trigger_description(DBget_field($result,$i,1));
+			if(DBget_field($result,$i,1)>0)
+			{
+				$name_=expand_trigger_description(DBget_field($result,$i,1));
+			}
+			else
+			{
+				$name_=DBget_field($result,$i,2);
+			}
 //		}
 		echo "<OPTION VALUE='$servicedownid_'>$name_";
         }
