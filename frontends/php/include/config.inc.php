@@ -2271,6 +2271,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return 0;
 		}
 
+		$sql="select * from hosts where host='$host'";
+		$result=DBexecute($sql);
+		if(DBnum_rows($result)>0)
+		{
+			$ERROR_MSG="Host '$host' already exists";
+			return 0;
+		}
+
 		if( isset($useip) && ($useip=="on") )
 		{
 			$useip=1;
@@ -2315,6 +2323,15 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$ERROR_MSG="Hostname should contain 0-9a-zA-Z_.- characters only";
 			return 0;
 		}
+
+		$sql="select * from hosts where host='$host' and hostid<>$hostid";
+		$result=DBexecute($sql);
+		if(DBnum_rows($result)>0)
+		{
+			$ERROR_MSG="Host '$host' already exists";
+			return 0;
+		}
+
 
 		if($useip=="on")
 		{
