@@ -21,8 +21,8 @@ insert into users (userid,alias,name,surname,passwd) values (1,'Admin','Zabbix',
 -- Data for table rights
 --
 
-insert into rights (rightid,userid,name,permission,id) values (1,1,"Default permission","U",0);
-insert into rights (rightid,userid,name,permission,id) values (2,1,"Default permission","A",0);
+insert into rights (rightid,userid,name,permission,id) values (1,1,'Default permission','U',0);
+insert into rights (rightid,userid,name,permission,id) values (2,1,'Default permission','A',0);
 
 --
 -- Data for table items_template 
