@@ -252,7 +252,7 @@ AC_MSG_RESULT(no))
 
 dnl Check for function setproctitle()
 AC_MSG_CHECKING(for function setproctitle())
-AC_TRY_COMPILE(
+AC_TRY_LINK(
 [
 	#include <sys/types.h>
 	#include <unistd.h>
