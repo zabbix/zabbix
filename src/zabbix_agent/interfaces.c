@@ -328,7 +328,7 @@ void	collect_stats_interfaces(FILE *outfile)
 	int	i1,j1;
 	char	interface[MAX_STRING_LEN+1];
 	int	now;
-	float	received,sent;
+	float	received=0,sent;
 
 	/* Must be static */
 	static	int initialised=0;
