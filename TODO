@@ -1,5 +1,6 @@
 1.0beta9:
 
+ - add severity to media definition.
  - redefine check_service()
  - alternative medias. Add table media_type.
  - add support for agent forwarding (proxy)
