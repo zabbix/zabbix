@@ -526,25 +526,25 @@ What SNMP package do you want to use (please select only one):
 			SNMP_INCDIR=/usr/include/net-snmp
 			SNMP_LIBDIR=/usr/lib/net-snmp
 		elif test -f /usr/include/net-snmp-includes.h; then
-			MYSQL_INCDIR=/usr/include
-			MYSQL_LIBDIR=/usr/lib
+			SNMP_INCDIR=/usr/include
+			SNMP_LIBDIR=/usr/lib
 		elif test -f /usr/local/include/net-snmp/net-snmp-includes.h; then
-			MYSQL_INCDIR=/usr/local/include/net-snmp
-			MYSQL_LIBDIR=/usr/local/lib/net-snmp
+			SNMP_INCDIR=/usr/local/include/net-snmp
+			SNMP_LIBDIR=/usr/local/lib/net-snmp
 		elif test -f /usr/local/include/net-snmp-includes.h; then
-			MYSQL_INCDIR=/usr/local/include
-			MYSQL_LIBDIR=/usr/local/lib
+			SNMP_INCDIR=/usr/local/include
+			SNMP_LIBDIR=/usr/local/lib
 		else
     		AC_MSG_RESULT(no)
     		AC_MSG_ERROR(Invalid NET-SNMP directory - unable to find net-snmp-includes.h)
 		fi
    	else
 		if test -f $withval/include/net-snmp/net-snmp-includes.h; then
-   			MYSQL_INCDIR=$withval/include/net-snmp
-   			MYSQL_LIBDIR=$withval/lib/net-snmp
+   			SNMP_INCDIR=$withval/include/net-snmp
+   			SNMP_LIBDIR=$withval/lib/net-snmp
 		elif test -f $withval/include/net-snmp-includes.h; then
-   			MYSQL_INCDIR=$withval/include
-   			MYSQL_LIBDIR=$withval/lib
+   			SNMP_INCDIR=$withval/include
+   			SNMP_LIBDIR=$withval/lib
 		else
     		AC_MSG_RESULT(no)
     		AC_MSG_ERROR(Invalid NET-SNMP directory - unable to find net-snmp-includes.h under $withval)
@@ -582,25 +582,25 @@ AC_ARG_WITH(ucd-snmp,
 			SNMP_INCDIR=/usr/include/ucd-snmp
 			SNMP_LIBDIR=/usr/lib/ucd-snmp
 		elif test -f /usr/include/ucd-snmp-config.h; then
-			MYSQL_INCDIR=/usr/include
-			MYSQL_LIBDIR=/usr/lib
+			SNMP_INCDIR=/usr/include
+			SNMP_LIBDIR=/usr/lib
 		elif test -f /usr/local/include/ucd-snmp/ucd-snmp-config.h; then
-			MYSQL_INCDIR=/usr/local/include/ucd-snmp
-			MYSQL_LIBDIR=/usr/local/lib/ucd-snmp
+			SNMP_INCDIR=/usr/local/include/ucd-snmp
+			SNMP_LIBDIR=/usr/local/lib/ucd-snmp
 		elif test -f /usr/local/include/ucd-snmp-config.h; then
-			MYSQL_INCDIR=/usr/local/include
-			MYSQL_LIBDIR=/usr/local/lib
+			SNMP_INCDIR=/usr/local/include
+			SNMP_LIBDIR=/usr/local/lib
 		else
     		AC_MSG_RESULT(no)
     		AC_MSG_ERROR(Invalid UCD-SNMP directory - unable to find ucd-snmp-config.h)
 		fi
    	else
 		if test -f $withval/include/ucd-snmp/ucd-snmp-config.h; then
-   			MYSQL_INCDIR=$withval/include/ucd-snmp
-   			MYSQL_LIBDIR=$withval/lib/ucd-snmp
+   			SNMP_INCDIR=$withval/include/ucd-snmp
+   			SNMP_LIBDIR=$withval/lib/ucd-snmp
 		elif test -f $withval/include/ucd-snmp-config.h; then
-   			MYSQL_INCDIR=$withval/include
-   			MYSQL_LIBDIR=$withval/lib
+   			SNMP_INCDIR=$withval/include
+   			SNMP_LIBDIR=$withval/lib
 		else
     		AC_MSG_RESULT(no)
     		AC_MSG_ERROR(Invalid UCD-SNMP directory - unable to find ucd-snmp-config.h under $withval)
