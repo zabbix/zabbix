@@ -46,6 +46,8 @@ BOOL AddAlias(char *name,char *value)
 
    // Create new structure and add it to the list
    alias=(ALIAS *)malloc(sizeof(ALIAS));
+   if (alias==NULL)
+      return FALSE;
    memset(alias,0,sizeof(ALIAS));
    strncpy(alias->name,name,MAX_ALIAS_NAME-1);
    alias->value=(char *)malloc(strlen(value)+1);
