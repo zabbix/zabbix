@@ -254,11 +254,13 @@ int	evaluate_DELTA(char *value,DB_ITEM *item,int parameter)
 }
 
 /*
- * Evaluate function (avg,min,max,prev,last,diff,str,change,abschange,delta)
+ * Evaluate function (avg,min,max,prev,last,diff,str,change,abschange,delta,time,date)
  */ 
 int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 {
 	int	ret  = SUCCEED;
+	time_t  now;
+	struct  tm      *tm;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Function [%s]",function);
 
@@ -330,6 +332,18 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 	else if(strcmp(function,"nodata")==0)
 	{
 		strcpy(value,"0");
+	}
+	else if(strcmp(function,"date")==0)
+	{
+		now=time(NULL);
+                tm=localtime(&now);
+                sprintf(value,"%.4d%.2d%.2d",tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday);
+	}
+	else if(strcmp(function,"time")==0)
+	{
+		now=time(NULL);
+                tm=localtime(&now);
+                sprintf(value,"%.2d%.2d%.2d",tm->tm_hour,tm->tm_min,tm->tm_sec);
 	}
 	else if(strcmp(function,"abschange")==0)
 	{
