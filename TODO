@@ -6,6 +6,18 @@ Error
 Critical
 Panic
 
+Triggers - v ih spiske videljatj trigera u kotorih estj 'depends on'.
+* K primeru, posle virazhenija pistaj tekst v skobkah (depends on) ili inim
+metodom !
+
+Kak naschet dopolnenij k time & date:
+* tipa weekday, month, day, year, hour, minute, ...
+* osobenno weekday polezno - dabi ne podnimatj triggeri po vihodnim :)
+
+Nu i k 'str' dodlstj csjakie vsjakosti tipa
+* substr, length, poisk pozicii simvola/podstroki (FIND/SEARCH v Excel),
+podscet kolichestva simvola (tipa skoljko tam zapjatih)...
+
  - check_NNTP should expect 200 not 220
  - separate login.php and index.php
  - add gaps to graph when no data present
