@@ -593,6 +593,7 @@
 
 		$functionid='';
 		$exp='';
+		$state='';
 		for($i=0;$i<strlen($expression);$i++)
 		{
 			if($expression[$i] == '{')
