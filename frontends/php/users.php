@@ -47,6 +47,8 @@
 			{
 				$result=add_user($_GET["name"],$_GET["surname"],$_GET["alias"],$_GET["password1"],$_GET["url"]);
 				show_messages($result, S_USER_ADDED, S_CANNOT_ADD_USER);
+				if($result)
+					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_USER,"User alias [".addslashes($_GET["alias"])."] name [".addslashes($_GET["name"])."] surname [".addslashes($_GET["surname"])."]]");
 			}
 			else
 			{
@@ -55,8 +57,11 @@
 		}
 		if($_GET["register"]=="delete")
 		{
+			$user=get_user_by_userid($_GET["userid"]);
 			$result=delete_user($_GET["userid"]);
 			show_messages($result, S_USER_DELETED, S_CANNOT_DELETE_USER);
+			if($result)
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,"User alias [".$user["alias"]."] name [".$user["name"]."] surname [".$user["surname"]."]");
 			unset($userid);
 		}
 		if($_GET["register"]=="delete_permission")
@@ -76,6 +81,8 @@
 			{
 				$result=update_user($_GET["userid"],$_GET["name"],$_GET["surname"],$_GET["alias"],$_GET["password1"],$_GET["url"]);
 				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
+				if($result)
+					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,"User alias [".addslashes($_GET["alias"])."] name [".addslashes($_GET["name"])."] surname [".addslashes($_GET["surname"])."]]");
 			}
 			else
 			{

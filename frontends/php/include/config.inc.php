@@ -1893,7 +1893,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		$sql="select status from hosts where hostid=$hostid";
 		$result=DBselect($sql);
-		if($status != DBget_field($result,0,0))
+		$old_status=DBget_field($result,0,0);
+		if($status != $old_status)
 		{
 			update_trigger_value_to_unknown_by_hostid($hostid);
 			$sql="update hosts set status=$status where hostid=$hostid and status not in (".HOST_STATUS_UNREACHABLE.",".HOST_STATUS_DELETED.")";
@@ -2657,8 +2658,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return 0;
 		}
 
-		add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,"User alias [$alias] name [$name] surname [$surname]");
-
 		if($passwd=="")
 		{
 			$sql="update users set name='$name',surname='$surname',alias='$alias',url='$url' where userid=$userid";
@@ -2691,7 +2690,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return 0;
 		}
 		
-		add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_USER,"User alias [$alias] name [$name] surname [$surname]");
 
 		$passwd=md5($passwd);
 		$sql="insert into users (name,surname,alias,passwd,url) values ('$name','$surname','$alias','$passwd','$url')";
@@ -3096,6 +3094,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 			$useip=0;
 		}
+
+
 		$sql="insert into hosts (host,port,status,useip,ip,disable_until) values ('$host',$port,$status,$useip,'$ip',0)";
 		$result=DBexecute($sql);
 		if(!$result)
@@ -3155,6 +3155,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 		$sql="update hosts set host='$host',port=$port,useip=$useip,ip='$ip' where hostid=$hostid";
 		$result=DBexecute($sql);
+
+
 		update_host_status($hostid, $status);
 		update_host_groups($hostid,$groups);
 		if($newgroup != "")
@@ -3201,8 +3203,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	delete_mediatype($mediatypeid)
 	{
-		$mediatype=get_mediatype_by_mediatypeid($mediatypeid);
-		add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MEDIA_TYPE,"Media type [".$mediatype["description"]."]");
 
 		delete_media_by_mediatypeid($mediatypeid);
 		delete_alerts_by_mediatypeid($mediatypeid);
@@ -3215,7 +3215,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	function	update_mediatype($mediatypeid,$type,$description,$smtp_server,$smtp_helo,$smtp_email,$exec_path)
 	{
 		$description=addslashes($description);
-		add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MEDIA_TYPE,"Media type [$description]");
 		$sql="update media_type set type=$type,description='$description',smtp_server='$smtp_server',smtp_helo='$smtp_helo',smtp_email='$smtp_email',exec_path='$exec_path' where mediatypeid=$mediatypeid";
 		return	DBexecute($sql);
 	}
@@ -3225,7 +3224,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	function	add_mediatype($type,$description,$smtp_server,$smtp_helo,$smtp_email,$exec_path)
 	{
 		$description=addslashes($description);
-		add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_MEDIA_TYPE,"Media type [$description]");
 		$sql="insert into media_type (type,description,smtp_server,smtp_helo,smtp_email,exec_path) values ($type,'$description','$smtp_server','$smtp_helo','$smtp_email','$exec_path')";
 		return	DBexecute($sql);
 	}
@@ -3293,7 +3291,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return	0;
 		}
 
-		add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Alarm history [$alarm_history] alert history [$alert_history]");
 
 //		$sql="update config set smtp_server='$smtp_server',smtp_helo='$smtp_helo',smtp_email='$smtp_email',alarm_history=$alarm_history,alert_history=$alert_history";
 		$sql="update config set alarm_history=$alarm_history,alert_history=$alert_history";
@@ -3439,8 +3436,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return	0;
 		}
 
-		$user=get_user_by_userid($userid);
-		add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,"User alias [".$user["alias"]."] name [".$user["name"]."] surname [".$user["surname"]."]");
 
 		delete_media_by_userid($userid);
 		delete_actions_by_userid($userid);
