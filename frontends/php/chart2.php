@@ -306,7 +306,7 @@
 			if(strlen($z["description"])>$max_desc_len)	$max_desc_len=strlen($z["description"]);
 		}
 		$i=get_item_by_itemid($iids[$item]);
-		$str=sprintf("%s: %s [last:%s min:%s avg:%s max:%s]", str_pad($host[$item],$max_post_len," "), str_pad($desc[$item],$max_desc_len," "), convert_units($y[$item][$len[$item]-1],$i["units"],$i["multiplier"]), convert_units($itemMin,$i["units"],$i["multiplier"]), convert_units($itemAvg,$i["units"],$i["multiplier"]), convert_units($itemMax,$i["units"],$i["multiplier"]));
+		$str=sprintf("%s: %s [last:%s min:%s avg:%s max:%s]", str_pad($host[$item],$max_host_len," "), str_pad($desc[$item],$max_desc_len," "), convert_units($y[$item][$len[$item]-1],$i["units"],$i["multiplier"]), convert_units($itemMin,$i["units"],$i["multiplier"]), convert_units($itemAvg,$i["units"],$i["multiplier"]), convert_units($itemMax,$i["units"],$i["multiplier"]));
 		if($width>600)
 		{
 			ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*$item+15+45,$str, $black);
