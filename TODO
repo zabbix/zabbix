@@ -25,11 +25,12 @@ TKOM:
 
 TELECENTRS:
 
- + show/hide host labels in maps (show: label/hostname/nothing) Title: label+hostname
+ + show/hide host labels in maps (show: label/hostname/nothing)
  + update status when host is created
  + add/update item -> return to the list of items for the same host/group
 
 Later:
+ - in maps: Title: label+hostname
  - hard-linked templates (graphs for new hosts to be added automatically)
  - clickable map in map configuration
  - rus/lat characters for graphs
