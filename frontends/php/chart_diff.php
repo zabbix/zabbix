@@ -25,7 +25,15 @@
 		$from=$HTTP_GET_VARS["from"];
 	}
 
-	$sizeX=900;
+	if(isset($HTTP_GET_VARS["width"]))
+	{
+		$sizeX=$HTTP_GET_VARS["width"];
+	}
+	else
+	{
+		$sizeX=200;
+	}
+
 	$sizeY=200;
 
 	$shiftX=10;
