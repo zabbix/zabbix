@@ -114,7 +114,7 @@ INSERT INTO items VALUES (10021,0,'','',161,10001,'Free disk space on /home','di
 INSERT INTO items VALUES (10022,0,'','',161,10001,'Free number of inodes on /home','inodefree[/home]',60,30,0,0,NULL,NULL,NULL,0,0,'','',0,0,NULL);
 INSERT INTO items VALUES (10023,0,'','',161,10001,'Free disk space on /var','diskfree[/var]',30,30,0,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL);
 INSERT INTO items VALUES (10024,0,'','',161,10001,'Free disk space on /opt','diskfree[/opt]',30,30,0,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL);
-INSERT INTO items VALUES (10025,0,'','',161,10001,'Host uptime (in sec)','system[uptime]',300,30,0,0,NULL,NULL,NULL,0,0,'','',0,0,NULL);
+INSERT INTO items VALUES (10025,0,'','',161,10001,'Host uptime (in sec)','system[uptime]',300,30,0,0,NULL,NULL,NULL,0,0,'','s',0,0,NULL);
 INSERT INTO items VALUES (10026,0,'','',161,10001,'Total memory','memory[total]',1800,30,0,0,NULL,NULL,NULL,0,0,'','B',0,0,NULL);
 INSERT INTO items VALUES (10027,0,'','',161,10001,'Shared memory','memory[shared]',30,30,0,0,NULL,NULL,NULL,0,0,'','B',0,0,NULL);
 INSERT INTO items VALUES (10028,0,'','',161,10001,'Buffers memory','memory[buffers]',30,30,0,0,NULL,NULL,NULL,0,0,'','B',0,0,NULL);
@@ -217,7 +217,7 @@ INSERT INTO items VALUES (10103,0,'','',161,10002,'Free swap space','swap[free]'
 INSERT INTO items VALUES (10104,0,'','',161,10002,'Size of c:\\msdos.sys','filesize[c:\\msdos.sys]',30,30,0,0,NULL,NULL,NULL,0,0,'','',0,0,NULL);
 INSERT INTO items VALUES (10106,0,'','',161,10002,'Checksum of c:\\autoexec.bat','cksum[c:\\autoexec.bat]',600,30,0,0,NULL,NULL,NULL,0,0,'','',0,0,NULL);
 INSERT INTO items VALUES (10109,0,'','',161,10002,'Ping to the server (TCP)','ping',30,30,0,0,NULL,NULL,NULL,0,0,'','',0,0,NULL);
-INSERT INTO items VALUES (10114,0,'','',161,10002,'Host uptime (in sec)','system[uptime]',300,30,0,0,NULL,NULL,NULL,0,0,'','',0,0,NULL);
+INSERT INTO items VALUES (10114,0,'','',161,10002,'Host uptime (in sec)','system[uptime]',300,30,0,0,NULL,NULL,NULL,0,0,'','s',0,0,NULL);
 INSERT INTO items VALUES (10115,0,'','',161,10002,'Total memory','memory[total]',1800,30,0,0,NULL,NULL,NULL,0,0,'','B',0,0,NULL);
 INSERT INTO items VALUES (10119,0,'','',161,10002,'Total swap space','swap[total]',1800,30,0,0,NULL,NULL,NULL,0,0,'','B',0,0,NULL);
 INSERT INTO items VALUES (10137,0,'','',161,10002,'Number of running processes apache','proc_cnt[httpd]',60,30,0,0,NULL,NULL,NULL,0,0,'','',0,0,NULL);
