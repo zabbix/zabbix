@@ -1,5 +1,10 @@
 1.0beta9:
 
+ - alert on Host and Hosts level (add Scope to alerts). If host(s) then 
+limit to Severity > <severity>
+ - redefine check_service()
+ - alternative medias !
+
  - add support for agent forwarding (proxy)
  - proofread Zabbix Manual  - Ted Rolle <ted@users.sourceforge.net>
  - add complete support for SNMP trapping
