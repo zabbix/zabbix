@@ -22,7 +22,7 @@
 
 //	about.php
 	define("S_ABOUT_ZABBIX",			"About ZABBIX");
-	define("S_INFORMATION_ABOUT_ZABBIX",		"Information about ZABBIX (v1.1alpha2)");
+	define("S_INFORMATION_ABOUT_ZABBIX",		"Information about ZABBIX (v1.1alpha5)");
 	define("S_HOMEPAGE_OF_ZABBIX",			"Homepage of ZABBIX");
 	define("S_HOMEPAGE_OF_ZABBIX_DETAILS",		"This is home page of ZABBIX.");
 	define("S_LATEST_ZABBIX_MANUAL",		"Latest ZABBIX Manual");
@@ -157,6 +157,8 @@
 	define("S_SMTP_EMAIL",				"SMTP email");
 	define("S_SCRIPT_NAME",				"Script name");
 	define("S_DELETE_SELECTED_MEDIA",		"Delete selected media?");
+	define("S_HOUSEKEEPER",				"Housekeeper");
+	define("S_MEDIA_TYPES",				"Media types");
 
 //	Latest values
 	define("S_LATEST_VALUES",			"Latest values");
@@ -170,7 +172,7 @@
 	define("S_COMPARE",				"Compare");
 
 //	Footer
-	define("S_ZABBIX_VER",				"ZABBIX 1.1alpha4");
+	define("S_ZABBIX_VER",				"ZABBIX 1.1alpha5");
 	define("S_COPYRIGHT_BY",			"Copyright 2001-2004 by ");
 	define("S_CONNECTED_AS",			"Connected as");
 	define("S_ALEXEI_VLADISHEV",			"Alexei Vladishev");

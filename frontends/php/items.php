@@ -140,7 +140,7 @@
 ?>
 
 <?php
-	$h1=S_CONFIGURATION_OF_ITEMS_BIG;;
+	$h1=S_CONFIGURATION_OF_ITEMS_BIG;
 
 	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
 	{
