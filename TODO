@@ -1,8 +1,11 @@
 TOP PRIORITY:
 
+ - add complete support for SNMP trapping
+ - do not show "all" if no groups defined
+ - add more checks for forms (where possible)
+ - improve user-defined graphs
  - check Rickard's active(?) agent
  - improve graphing capabilities
- - support for net-snmp
  - monitoring of log files
  - show last 20% in SLA bar
  - show current and planned SLA in IT Services screen
