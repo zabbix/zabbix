@@ -34,7 +34,14 @@
 	{
 		$width=DBget_field($result,0,1);
 	}
-	$height=DBget_field($result,0,2);
+	if(isset($HTTP_GET_VARS["height"])&&$HTTP_GET_VARS["height"]>0)
+	{
+		$height=$HTTP_GET_VARS["height"];
+	}
+	else
+	{
+		$height=DBget_field($result,0,2);
+	}
 
 	$sizeX=$width;
 	$sizeY=$height;
