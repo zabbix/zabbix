@@ -96,6 +96,10 @@
 				{
 					return 1;
 				}
+				else if(strstr($id_permission,"U"))
+				{
+					return 1;
+				}
 				if(strstr($group_permission,"H"))
 				{
 					return 0;
@@ -104,11 +108,19 @@
 				{
 					return 1;
 				}
+				else if(strstr($group_permission,"U"))
+				{
+					return 1;
+				}
 				if(strstr($default_permission,"H"))
 				{
 					return 0;
 				}
 				else if(strstr($default_permission,"R"))
+				{
+					return 1;
+				}
+				else if(strstr($default_permission,"U"))
 				{
 					return 1;
 				}

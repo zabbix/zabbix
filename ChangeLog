@@ -1,5 +1,6 @@
 Changes for 1.0beta6:
 
+ - fixed check_right(). Thanks to Daniel Higgins. (Alexei)
  - more changes to send_email(). Thanks to Daniel Higgins. (Alexei)
  - added file TODO (Alexei)
  - status will be changed to UNCREACHABLE only in case of three network errors
