@@ -1827,6 +1827,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return 0;
 		}
 
+		$key=addslashes($key);
 		$description=addslashes($description);
 
 		$sql="insert into items (description,key_,hostid,delay,history,lastdelete,nextcheck,status,type,snmp_community,snmp_oid,value_type,trapper_hosts) values ('$description','$key',$hostid,$delay,$history,0,0,$status,$type,'$snmp_community','$snmp_oid',$value_type,'$trapper_hosts')";
@@ -1951,7 +1952,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 //			return	0;
 //		}
 
-		$description=addslashes($description);
+#		$description=addslashes($description);
 		$sql="insert into triggers  (description,priority,status,comments,url,value) values ('$description',$priority,$status,'$comments','$url',2)";
 #		echo $sql,"<br>";
 		$result=DBexecute($sql);
@@ -3313,7 +3314,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$trigger=get_trigger_by_triggerid($triggerid);
 	
 			$expression=explode_exp($trigger["expression"],0);
-			$description=$trigger["description"];
+			$description=htmlspecialchars(stripslashes($trigger["description"]));
 			$priority=$trigger["priority"];
 			$status=$trigger["status"];
 			$comments=$trigger["comments"];

@@ -179,7 +179,7 @@
 		        if($col++%2 == 1)	{ echo "<TR BGCOLOR=#DDDDDD>"; }
 			else			{ echo "<TR BGCOLOR=#EEEEEE>"; }
 
-			$description=$row["description"];
+			$description=stripslashes(htmlspecialchars($row["description"]));
 
 			if( strstr($description,"%s"))
 			{
