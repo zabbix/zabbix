@@ -115,6 +115,10 @@ SOURCE=.\md5.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\procinfo.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\service.cpp
 # End Source File
 # Begin Source File
