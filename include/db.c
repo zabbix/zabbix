@@ -645,6 +645,9 @@ void DBdelete_host(int hostid)
 	}
 	DBfree_result(result);
 
+	sprintf(sql,"delete from hosts_groups where hostid=%d", hostid);
+	DBexecute(sql);
+
 	sprintf(sql,"delete from hosts where hostid=%d", hostid);
 	DBexecute(sql);
 
