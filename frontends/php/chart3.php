@@ -5,24 +5,23 @@
 	
 #	itemid
 #	type
-#	trendavg
 
 	$start_time=time(NULL);
 
-	if(!isset($type))
+	if(!isset($HTTP_GET_VARS["type"]))
 	{
-		$type="week";
+		$HTTP_GET_VARS["type"]="week";
 	}
 
-	if($type == "month")
+	if($HTTP_GET_VARS["type"] == "month")
 	{
 		$period=30*24*3600;
 	}
-	else if($type == "week")
+	else if($HTTP_GET_VARS["type"] == "week")
 	{
 		$period=7*24*3600;
 	}
-	else if($type == "year")
+	else if($HTTP_GET_VARS["type"] == "year")
 	{
 		$period=365*24*3600;
 	}
@@ -76,7 +75,7 @@
 	$max=array();
 	$avg=array();
 
-	$sql="select round(900*((clock+3*3600)%(24*3600))/(24*3600)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid=$itemid and clock>$from_time and clock<$to_time group by 1";
+	$sql="select round(900*((clock+3*3600)%(24*3600))/(24*3600)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid=".$HTTP_GET_VARS["itemid"]." and clock>$from_time and clock<$to_time group by 1";
 //	echo $sql."<br>";
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
@@ -91,7 +90,7 @@
 
 	$count_now=array();
 	$avg_now=array();
-	$result=DBselect("select round(900*((clock+3*3600)%(24*3600))/(24*3600)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid=$itemid and clock>$from_time_now and clock<$to_time group by 1");
+	$result=DBselect("select round(900*((clock+3*3600)%(24*3600))/(24*3600)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid=".$HTTP_GET_VARS["itemid"]." and clock>$from_time_now and clock<$to_time group by 1");
 	while($row=DBfetch($result))
 	{
 		$i=$row["i"];
@@ -131,9 +130,10 @@
 
 	if(isset($minY)&&($maxY)&&($minX!=$maxX)&&($minY!=$maxY))
 	{
+		$nodata=0;
 		for($i=0;$i<900;$i++)
 		{
-			if($count[$i]>0)
+			if(isset($count[$i])&&$count[$i]>0)
 			{
 /*				if(!isset($trendavg))
 				{
@@ -180,7 +180,7 @@
 					ImageLine($im,$x1+$shiftX,$y1+$shiftYup,$x2+$shiftX,$y2+$shiftYup,$green);
 				}*/
 			}
-			if(($count_now[$i]>0)&&($count_now[$i-1]>0))
+			if(isset($count_now[$i])&&isset($count_now[$i-1])&&($count_now[$i]>0)&&($count_now[$i-1]>0))
 			{
 				if($i>0)
 				{
@@ -218,7 +218,7 @@
 //	ImageDashedLine($im,$x1+$shiftX,$y1+$shiftYup,$x2+$shiftX,$y2+$shiftYup,$black);
 	ImageDashedLine($im,$x1+$shiftX,$shiftYup,$x2+$shiftX,$sizeY+$shiftYup,$black);
 
-	if($nodata == 0)
+	if(isset($nodata)&&($nodata == 0))
 	{
 		for($i=0;$i<=$sizeY;$i+=$sizeY/5)
 		{
@@ -237,11 +237,11 @@
 
 	ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*0,$shiftX+5,$sizeY+$shiftYup+15+9+15*0,$darkgreen);
 	ImageRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*0,$shiftX+5,$sizeY+$shiftYup+15+9+15*0,$black);
-	if($type=="year")
+	if($HTTP_GET_VARS["type"]=="year")
 	{
 		ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*0+15, "Average for last 365 days", $black);
 	}
-	else if($type=="month")
+	else if($HTTP_GET_VARS["type"]=="month")
 	{
 		ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*0+15, "Average for last 30 days", $black);
 	}
