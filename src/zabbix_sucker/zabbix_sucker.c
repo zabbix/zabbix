@@ -74,122 +74,122 @@ void	daemon_init(void)
 
 int	get_value_SNMPv1(double *result,DB_ITEM *item)
 {
-    struct snmp_session session, *ss;
-    struct snmp_pdu *pdu;
-    struct snmp_pdu *response;
+	struct snmp_session session, *ss;
+	struct snmp_pdu *pdu;
+	struct snmp_pdu *response;
 
-    oid anOID[MAX_OID_LEN];
-    size_t anOID_len = MAX_OID_LEN;
+	oid anOID[MAX_OID_LEN];
+	size_t anOID_len = MAX_OID_LEN;
 
-    struct variable_list *vars;
-    int status;
+	struct variable_list *vars;
+	int status;
 
-    /*
-     *      * Initialize the SNMP library
-     *           */
-    init_snmp("zabbix_sucker");
+/*
+*      * Initialize the SNMP library
+*           */
+	init_snmp("zabbix_sucker");
 
-    /*
-     *      * Initialize a "session" that defines who we're going to talk to
-     *           */
-    snmp_sess_init( &session );                   /* set up defaults */
-    session.version = SNMP_VERSION_1;
-    session.peername = item->host;
-/*"ucd-snmp.ucdavis.edu";*/
-    session.community = item->snmp_community;
-/*"demopublic";*/
-    session.community_len = strlen(session.community);
+/*
+*      * Initialize a "session" that defines who we're going to talk to
+*           */
+	snmp_sess_init( &session );                   /* set up defaults */
+	session.version = SNMP_VERSION_1;
+	session.peername = item->host;
+	session.community = item->snmp_community;
+	session.community_len = strlen(session.community);
 
-    /*
-     *      * Open the session
-     *           */
-    SOCK_STARTUP;
-    ss = snmp_open(&session);                     /* establish the session */
+/*
+*      * Open the session
+*           */
+	SOCK_STARTUP;
+	ss = snmp_open(&session);                     /* establish the session */
 
-    /*
-     *      * Create the PDU for the data for our request.
-     *           *   1) We're going to GET the system.sysDescr.0 node.
-     *                */
-    pdu = snmp_pdu_create(SNMP_MSG_GET);
-    read_objid(item->snmp_oid, anOID, &anOID_len);
+/*
+*      * Create the PDU for the data for our request.
+*           *   1) We're going to GET the system.sysDescr.0 node.
+*                */
+	pdu = snmp_pdu_create(SNMP_MSG_GET);
+	read_objid(item->snmp_oid, anOID, &anOID_len);
 /*    read_objid(".1.3.6.1.2.1.1.1.0", anOID, &anOID_len); */
 
 #if OTHER_METHODS
-    get_node("sysDescr.0", anOID, &anOID_len);
-    read_objid(".1.3.6.1.2.1.1.1.0", anOID, &anOID_len);
-    read_objid("system.sysDescr.0", anOID, &anOID_len);
+	get_node("sysDescr.0", anOID, &anOID_len);
+	read_objid(".1.3.6.1.2.1.1.1.0", anOID, &anOID_len);
+	read_objid("system.sysDescr.0", anOID, &anOID_len);
 #endif
 
-    snmp_add_null_var(pdu, anOID, anOID_len);
+	snmp_add_null_var(pdu, anOID, anOID_len);
   
-    /*
-     *      * Send the Request out.
-     *           */
-    status = snmp_synch_response(ss, pdu, &response);
+/* Send the Request out */
+	status = snmp_synch_response(ss, pdu, &response);
 
-    /*
-     *      * Process the response.
-     *           */
-    if (status == STAT_SUCCESS && response->errstat == SNMP_ERR_NOERROR) {
-      /*
-       *        * SUCCESS: Print the result variables
-       *               */
-
-      for(vars = response->variables; vars; vars = vars->next_variable)
-        print_variable(vars->name, vars->name_length, vars);
-
-      /* manipuate the information ourselves */
-	for(vars = response->variables; vars; vars = vars->next_variable)
+/* Process the response */
+	if (status == STAT_SUCCESS && response->errstat == SNMP_ERR_NOERROR)
 	{
-		int count=1;
+/* SUCCESS: Print the result variables */
+
+		for(vars = response->variables; vars; vars = vars->next_variable)
+		{
+			print_variable(vars->name, vars->name_length, vars);
+		}
+
+/* manipuate the information ourselves */
+		for(vars = response->variables; vars; vars = vars->next_variable)
+		{
+			int count=1;
 //		if (vars->type == ASN_OCTET_STR)
 //		syslog( LOG_WARNING, "Type:%d", vars->type);
-		if(	(vars->type == ASN_INTEGER ) ||
+			if(	(vars->type == ASN_INTEGER ) ||
 			(vars->type == ASN_UINTEGER ) ||
 			(vars->type == ASN_COUNTER ) ||
 			(vars->type == ASN_GAUGE )
-		)
-		{
-			char *sp = (char *)malloc(1 + vars->val_len);
-			memcpy(sp, vars->val.string, vars->val_len);
-			sp[vars->val_len] = '\0';
+			)
+			{
+				char *sp = (char *)malloc(1 + vars->val_len);
+				memcpy(sp, vars->val.string, vars->val_len);
+				sp[vars->val_len] = '\0';
 //			syslog( LOG_WARNING, "value #%d is a string: %s\n", count++, sp);
 //			*result=strtod(sp,&e);
 //			syslog( LOG_WARNING, "Type:%d", vars->type);
 //			syslog( LOG_WARNING, "Value #%d is an integer: %d", count++, *vars->val.integer);
-			*result=*vars->val.integer;
-			free(sp);
+				*result=*vars->val.integer;
+				free(sp);
+			}
+			else
+			{
+				syslog( LOG_WARNING,"value #%d is NOT an integer!\n", count++);
+			}
+		}
+	}
+	else
+	{
+/* FAILURE: print what went wrong! */
+
+		if (status == STAT_SUCCESS)
+		{
+			syslog( LOG_WARNING, "Error in packet\nReason: %s\n",
+			snmp_errstring(response->errstat));
 		}
 		else
 		{
-			syslog( LOG_WARNING,"value #%d is NOT an integer!\n", count++);
+			snmp_sess_perror("snmpget", ss);
 		}
 	}
-    } else {
-      /*
-       *        * FAILURE: print what went wrong!
-       *               */
 
-      if (status == STAT_SUCCESS)
-	syslog( LOG_WARNING, "Error in packet\nReason: %s\n",
-                snmp_errstring(response->errstat));
-      else
-        snmp_sess_perror("snmpget", ss);
+/*
+*      * Clean up:
+*      *  1) free the response.
+*      *  2) close the session.
+*      */
+	if (response)
+	{
+		snmp_free_pdu(response);
+	}
+	snmp_close(ss);
 
-    }
-
-    /*
-     *      * Clean up:
-     *           *  1) free the response.
-     *                *  2) close the session.
-     *                     */
-    if (response)
-      snmp_free_pdu(response);
-    snmp_close(ss);
-
-    SOCK_CLEANUP;
-    return SUCCEED;
-} /* main() */
+	SOCK_CLEANUP;
+	return SUCCEED;
+}
 
 int	get_value_zabbix(double *result,DB_ITEM *item)
 {
