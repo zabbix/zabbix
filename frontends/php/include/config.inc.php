@@ -3258,7 +3258,24 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		global  $HTTP_GET_VARS;
 
-		if(isset($HTTP_GET_VARS["itemid"]))
+		$description=@iif(isset($HTTP_GET_VARS["description"]),$HTTP_GET_VARS["description"],"");
+		$key=@iif(isset($HTTP_GET_VARS["key"]),$HTTP_GET_VARS["key"],"");
+		$host=@iif(isset($HTTP_GET_VARS["host"]),$HTTP_GET_VARS["host"],"");
+		$port=@iif(isset($HTTP_GET_VARS["port"]),$HTTP_GET_VARS["port"],10000);
+		$delay=@iif(isset($HTTP_GET_VARS["delay"]),$HTTP_GET_VARS["delay"],30);
+		$history=@iif(isset($HTTP_GET_VARS["history"]),$HTTP_GET_VARS["history"],365);
+		$status=@iif(isset($HTTP_GET_VARS["status"]),$HTTP_GET_VARS["status"],0);
+		$type=@iif(isset($HTTP_GET_VARS["type"]),$HTTP_GET_VARS["type"],0);
+		$snmp_community=@iif(isset($HTTP_GET_VARS["snmp_community"]),$HTTP_GET_VARS["snmp_community"],"public");
+		$snmp_oid=@iif(isset($HTTP_GET_VARS["snmp_oid"]),$HTTP_GET_VARS["snmp_oid"],"interfaces.ifTable.ifEntry.ifInOctets.1");
+		$value_type=@iif(isset($HTTP_GET_VARS["value_type"]),$HTTP_GET_VARS["value_type"],0);
+		$trapper_hosts=@iif(isset($HTTP_GET_VARS["trapper_hosts"]),$HTTP_GET_VARS["trapper_hosts"],"");
+		$snmp_port=@iif(isset($HTTP_GET_VARS["snmp_port"]),$HTTP_GET_VARS["snmp_port"],161);
+		$units=@iif(isset($HTTP_GET_VARS["units"]),$HTTP_GET_VARS["units"],'');
+		$multiplier=@iif(isset($HTTP_GET_VARS["multiplier"]),$HTTP_GET_VARS["multiplier"],0);
+		$hostid=@iif(isset($HTTP_GET_VARS["hostid"]),$HTTP_GET_VARS["hostid"],0);
+
+		if(isset($HTTP_GET_VARS["register"])&&($HTTP_GET_VARS["register"] == "change"))
 		{
 			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.snmp_port,i.units,i.multiplier,h.hostid from items i,hosts h where i.itemid=".$HTTP_GET_VARS["itemid"]." and h.hostid=i.hostid");
 		
@@ -3269,7 +3286,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$delay=DBget_field($result,0,4);
 			$history=DBget_field($result,0,5);
 			$status=DBget_field($result,0,6);
-			$type=DBget_field($result,0,7);
+			$type=iif(isset($HTTP_GET_VARS["type"]),isset($HTTP_GET_VARS["type"]),DBget_field($result,0,7));
 			$snmp_community=DBget_field($result,0,8);
 			$snmp_oid=DBget_field($result,0,9);
 			$value_type=DBget_field($result,0,10);
@@ -3278,25 +3295,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$units=DBget_field($result,0,13);
 			$multiplier=DBget_field($result,0,14);
 			$hostid=DBget_field($result,0,15);
-		}
-		else
-		{
-			$description=@iif(isset($HTTP_GET_VARS["description"]),$HTTP_GET_VARS["description"],"");
-			$key=@iif(isset($HTTP_GET_VARS["key"]),$HTTP_GET_VARS["key"],"");
-			$host=@iif(isset($HTTP_GET_VARS["host"]),$HTTP_GET_VARS["host"],"");
-			$port=@iif(isset($HTTP_GET_VARS["port"]),$HTTP_GET_VARS["port"],10000);
-			$delay=@iif(isset($HTTP_GET_VARS["delay"]),$HTTP_GET_VARS["delay"],30);
-			$history=@iif(isset($HTTP_GET_VARS["history"]),$HTTP_GET_VARS["history"],365);
-			$status=@iif(isset($HTTP_GET_VARS["status"]),$HTTP_GET_VARS["status"],0);
-			$type=@iif(isset($HTTP_GET_VARS["type"]),$HTTP_GET_VARS["type"],0);
-			$snmp_community=@iif(isset($HTTP_GET_VARS["snmp_community"]),$HTTP_GET_VARS["snmp_community"],"public");
-			$snmp_oid=@iif(isset($HTTP_GET_VARS["snmp_oid"]),$HTTP_GET_VARS["snmp_oid"],"interfaces.ifTable.ifEntry.ifInOctets.1");
-			$value_type=@iif(isset($HTTP_GET_VARS["value_type"]),$HTTP_GET_VARS["value_type"],0);
-			$trapper_hosts=@iif(isset($HTTP_GET_VARS["trapper_hosts"]),$HTTP_GET_VARS["trapper_hosts"],"");
-			$snmp_port=@iif(isset($HTTP_GET_VARS["snmp_port"]),$HTTP_GET_VARS["snmp_port"],161);
-			$units=@iif(isset($HTTP_GET_VARS["units"]),$HTTP_GET_VARS["units"],'');
-			$multiplier=@iif(isset($HTTP_GET_VARS["multiplier"]),$HTTP_GET_VARS["multiplier"],0);
-			$hostid=@iif(isset($HTTP_GET_VARS["hostid"]),$HTTP_GET_VARS["hostid"],0);
 		}
 
 		echo "<br>";

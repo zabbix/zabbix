@@ -53,10 +53,12 @@ char    *CONFIG_PID_FILE                = NULL;
 char    *CONFIG_LOG_FILE                = NULL;
 char    *CONFIG_ALERT_SCRIPTS_PATH      = NULL;
 char    *CONFIG_DBHOST                  = NULL;
-char    *CONFIG_DBNAME                  = NULL;
-char    *CONFIG_DBUSER                  = NULL;
-char    *CONFIG_DBPASSWORD              = NULL;
-char    *CONFIG_DBSOCKET                = NULL;
+char    *CONFIG_DBNAME			= NULL;
+char    *CONFIG_DBUSER			= NULL;
+char    *CONFIG_DBPASSWORD		= NULL;
+char    *CONFIG_DBSOCKET		= NULL;
+char    *CONFIG_SERVER			= NULL;
+int     CONFIG_SERVER_PORT		= 10001;
 
 void    signal_handler( int sig )
 {
@@ -95,10 +97,12 @@ void	init_config(void)
 		{"DBUser",&CONFIG_DBUSER,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBPassword",&CONFIG_DBPASSWORD,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBSocket",&CONFIG_DBSOCKET,0,TYPE_STRING,PARM_OPT,0,0},
+		{"Server",&CONFIG_SERVER,0,TYPE_STRING,PARM_MAND,0,0},
+		{"ServerPort",&CONFIG_SERVER_PORT,0,TYPE_INT,PARM_OPT,1,65535},
 		{0}
 	};
 
-	parse_cfg_file("/etc/zabbix/zabbix_suckerd.conf",cfg);
+	parse_cfg_file("/etc/zabbix/zabbix_snmptrapper.conf",cfg);
 
 	if(CONFIG_DBNAME == NULL)
 	{
@@ -146,13 +150,6 @@ int	send_value(char *server,int port,char *shortname,char *value)
 		return	FAIL;
 	}
 
-/*	ling.l_onoff=1;*/
-/*	ling.l_linger=0;*/
-/*	if(setsockopt(s,SOL_SOCKET,SO_LINGER,&ling,sizeof(ling))==-1)*/
-/*	{*/
-/* Ignore */
-/*	}*/
- 
 	myaddr_in.sin_family = AF_INET;
 	myaddr_in.sin_port=0;
 	myaddr_in.sin_addr.s_addr=INADDR_ANY;
@@ -206,7 +203,18 @@ int main(int argc, char **argv)
 	char	zabbix_server[MAX_STRING_LEN+1];
 	char	server_key[MAX_STRING_LEN+1];
 	char	value[MAX_STRING_LEN+1];
-	char	*s;
+	char	str[MAX_STRING_LEN+1];
+
+	char	*hostname;
+	char	*ip;
+	char	*uptime;
+	char	*oid;
+	char	*address;
+	char	*community;
+	char	*enterprise;
+
+	printf("The binary is no ready yet! To be available in Zabbix 1.0beta11.\n");
+	exit(-1);
 
 	signal( SIGINT,  signal_handler );
 	signal( SIGQUIT, signal_handler );
@@ -234,39 +242,33 @@ int main(int argc, char **argv)
 	$ZABBIX_SERVER $ZABBIX_PORT $HOST:$KEY "$str"
 */
 
-	if(argc == 5)
+	init_config();
+
+	if(argc == 6)
 	{
+		hostname =	argv[1];
+		ip =		argv[2];
+		uptime =	argv[3];
+		oid =		argv[4];
+		address =	argv[5];
+		community =	argv[6];
+		enterprise =	argv[7];
+
+
 		port=atoi(argv[2]);
 
-		alarm(SENDER_TIMEOUT);
+		alarm(SNMPTRAPPER_TIMEOUT);
 
-		ret = send_value(argv[1],port,argv[3],argv[4]);
+		sprintf(str,"%s(%s)", hostname, ip);
+
+		ret = send_value(CONFIG_SERVER, CONFIG_SERVER_PORT, argv[3],argv[4]);
 
 		alarm(0);
 	}
 /* No parameters are given */	
-	else if(argc == 1)
-	{
-		while(fgets(line,MAX_STRING_LEN,stdin) != NULL)
-		{
-/*			printf("[%s]\n",line);*/
-			alarm(SENDER_TIMEOUT);
-
-			s=(char *)strtok(line," ");
-			strncpy(zabbix_server,s,MAX_STRING_LEN);
-			s=(char *)strtok(NULL," ");
-			strncpy(port_str,s,MAX_STRING_LEN);
-			s=(char *)strtok(NULL," ");
-			strncpy(server_key,s,MAX_STRING_LEN);
-			s=(char *)strtok(NULL," ");
-			strncpy(value,s,MAX_STRING_LEN);
-			ret = send_value(zabbix_server,atoi(port_str),server_key,value);
-
-			alarm(0);
-		}
-	}
 	else
 	{
+		printf("Number of parameters given [%d], expected [7]\n", argc);
 		printf("Usage: zabbix_sender <Zabbix server> <port> <server:key> <value>\n");
 		printf("If no arguments are given, zabbix_sender expects list of parameters\n");
 		printf("from standard input.\n");
