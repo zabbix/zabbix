@@ -34,6 +34,7 @@
 5.2 Expressions for triggers
 
 6. Chapter 6 (Upgrading)
+6.1 Zabbix 1.0alpha8
 
 7. Chapter 7 (Misc)
 7.1 pinger.pl
@@ -597,7 +598,32 @@ Step 3. Depending on your database engine:
 	cd postgresql
 	cat patch.sql|psql -U <username> zabbix
 
+Step 4. Read version-specific notes in this chapter.
+
 That is all. Zabbix database is ready. Start Zabbix server processes using usual procedure. 
+
+6.1 Zabbix 1.0alpha8
+
+ - Install mhash module for PHP
+ - Note that zabbix_sucker renamed to zabbix_suckerd
+
+ - Replace zabbix_agent with zabbix_agentd
+
+zabbix_agentd runs much faster than 'old' zabbix_agent. Moreover, if
+you do not run inetd, zabbix_agentd is the only choice :)
+
+ - PostgreSQL notes.
+
+PostgreSQL does not support modifying of structure of table field.
+Thus, please, change definition of the following fields (MySQL code):
+
+alter table users modify passwd char(32) default '' not null;
+alter table actions modify message text default '' not null;
+alter table alerts modify message text default '' not null;
+
+ - Try to use IP address in host definition
+
+This unloads DNS and makes zabbix_suckerd faster.
 
 7. Chapter 7 (Misc)
 
