@@ -1,5 +1,6 @@
 Changes for 1.0beta11:
 
+ - fix of /proc/stat interpretation in diskdevice.c (Alexei)
  - support of system[uptime] for Solaris. Thanks to Franky Van
  Liedekerke. (Alexei)
  - fix for disk space calculation. Use statvfs' f_frsize instead
