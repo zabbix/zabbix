@@ -119,6 +119,8 @@
 #include "common.h"
 #include "sysinfo.h"
 
+#include "md5.h"
+
 void	forward_request(char *proxy,char *command,int port,char *value);
 
 COMMAND	commands[AGENT_MAX_USER_COMMANDS]=
@@ -146,6 +148,8 @@ COMMAND	commands[AGENT_MAX_USER_COMMANDS]=
 	{"inodetotal[*]"	,INODETOTAL, 		0, "/"},
 
 	{"cksum[*]"		,CKSUM, 		0, "/etc/services"},
+
+	{"md5sum[*]"		,0, 			MD5SUM, "/etc/services"},
 
 	{"filesize[*]"		,FILESIZE, 		0, "/etc/passwd"},
 
@@ -287,8 +291,8 @@ void	process(char *command,char *value)
 	double	result=0;
 	int	i;
 	char	*n,*l,*r;
-	double	(*function)();
-	char	*(*function_str)() = NULL;
+	int	(*function)();
+	int	(*function_str)();
 	char	*parameter = NULL;
 	char	key[MAX_STRING_LEN];
 	char	proxy[MAX_STRING_LEN];
@@ -298,6 +302,7 @@ void	process(char *command,char *value)
 	char	cmd[1024];
 	char	*res2 = NULL;
 	int	ret_str=0;
+	double	value_double;
 
 	for( p=command+strlen(command)-1; p>command && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
 
@@ -333,7 +338,7 @@ void	process(char *command,char *value)
 	{
 		if(0 == port[0])
 		{
-			port_int=10000;
+			port_int=10050;
 		}
 		else
 		{
@@ -346,6 +351,7 @@ void	process(char *command,char *value)
 
 	for(i=0;;i++)
 	{
+		/* End of array? */
 		if( commands[i].key == 0)
 		{
 			function=0;
@@ -378,6 +384,7 @@ void	process(char *command,char *value)
 				if(function==0)
 				{
 					function_str=commands[i].function_str;
+					/* Command returns string, not double */
 					ret_str=1;
 				}
 #ifdef TEST_PARAMETERS
@@ -408,8 +415,7 @@ void	process(char *command,char *value)
 	{
 		if(function != 0)
 		{
-			result = function(parameter);
-			if( result == FAIL )
+			if(SYSINFO_RET_FAIL == function(command,parameter,&value_double))
 			{
 				result = NOTSUPPORTED;
 			}
@@ -421,13 +427,13 @@ void	process(char *command,char *value)
 	}
 	else
 	{
-		res2=function_str(parameter);
-		if(res2==NULL)
+		i=function_str(command,parameter,&res2);
+		if(i==SYSINFO_RET_FAIL)
 		{
 			result = NOTSUPPORTED;
 		}
 /* (int) to avoid compiler's warning */
-		else if((int)res2==TIMEOUT_ERROR)
+		else if(i==SYSINFO_RET_TIMEOUT)
 		{
 			result = TIMEOUT_ERROR;
 		}
@@ -447,14 +453,65 @@ void	process(char *command,char *value)
 	{
 		if(ret_str==0)
 		{
-			snprintf(value,MAX_STRING_LEN-1,"%f",result);
+			snprintf(value,MAX_STRING_LEN-1,"%f",value_double);
 		}
 		else
 		{
 			snprintf(value,MAX_STRING_LEN-1,"%s",res2);
+			free(res2);
 		}
 	}
 
+}
+
+/* MD5 sum calculation */
+
+int	MD5SUM(const char *cmd, const char *filename, char **value)
+{
+	int	fd;
+	int	i,nr;
+	struct stat	buf_stat;
+
+        md5_state_t state;
+	u_char	buf[16 * 1024];
+
+	unsigned char	hashText[MD5_DIGEST_SIZE*2+1];
+	unsigned char	hash[MD5_DIGEST_SIZE];
+
+	if(stat(filename,&buf_stat) != 0)
+	{
+		/* Cannot stat() file */
+		return	SYSINFO_RET_FAIL;
+	}
+
+	if(buf_stat.st_size > 64*1024*1024)
+	{
+		/* Will not calculate MD5 for files larger than 64M */
+		return	SYSINFO_RET_FAIL;
+	}
+
+	fd=open(filename,O_RDONLY);
+	if(fd == -1)
+	{
+		return	SYSINFO_RET_FAIL;
+	}
+
+        md5_init(&state);
+	while ((nr = read(fd, buf, sizeof(buf))) > 0)
+	{
+        	md5_append(&state,(const md5_byte_t *)buf,nr);
+	}
+        md5_finish(&state,(md5_byte_t *)hash);
+
+	close(fd);
+
+/* Convert MD5 hash to text form */
+	for(i=0;i<MD5_DIGEST_SIZE;i++)
+		sprintf(&hashText[i<<1],"%02x",hash[i]);
+
+	*value=strdup(hashText);
+
+	return SYSINFO_RET_OK;
 }
 
 /* Code for cksum is based on code from cksum.c */
@@ -523,7 +580,7 @@ static u_long crctab[] = {
  * on failure.  Errno is set on failure.
  */
 
-double	CKSUM(const char * filename)
+int	CKSUM(const char *cmd, const char *filename,double  *value)
 {
 	register u_char *p;
 	register int nr;
@@ -535,7 +592,7 @@ double	CKSUM(const char * filename)
 	fd=open(filename,O_RDONLY);
 	if(fd == -1)
 	{
-		return	FAIL;
+		return	SYSINFO_RET_FAIL;
 	}
 
 #define	COMPUTE(var, ch)	(var) = (var) << 8 ^ crctab[(var) >> 24 ^ (ch)]
@@ -552,7 +609,7 @@ double	CKSUM(const char * filename)
 	
 	if (nr < 0)
 	{
-		return	FAIL;
+		return	SYSINFO_RET_FAIL;
 	}
 
 	clen = len;
@@ -564,7 +621,9 @@ double	CKSUM(const char * filename)
 
 	cval = ~crc;
 
-	return	(double)cval;
+	*value=(double)cval;
+
+	return	SYSINFO_RET_OK;
 }
 
 int
@@ -653,19 +712,19 @@ point them all to the same buffer */
 #endif
 #endif
 
-double   FILESIZE(const char * filename)
+int	FILESIZE(const char *cmd, const char *filename,double  *value)
 {
 	struct stat	buf;
 
 	if(stat(filename,&buf) == 0)
 	{
-		return	buf.st_size;
+		*value=(double)buf.st_size;
+		return SYSINFO_RET_OK;
 	}
-
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 }
 
-double	SENSOR_TEMP1(void)
+int	SENSOR_TEMP1(const char *cmd, const char *param,double  *value)
 {
 	DIR	*dir;
 	struct	dirent *entries;
@@ -679,7 +738,7 @@ double	SENSOR_TEMP1(void)
 	dir=opendir("/proc/sys/dev/sensors");
 	if(NULL == dir)
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 	while((entries=readdir(dir))!=NULL)
@@ -701,20 +760,21 @@ double	SENSOR_TEMP1(void)
 			if(sscanf(line,"%lf\t%lf\t%lf\n",&d1, &d2, &d3) == 3)
 			{
 				closedir(dir);
-				return  d3;
+				*value=d3;
+				return  SYSINFO_RET_OK;
 			}
 			else
 			{
 				closedir(dir);
-				return  FAIL;
+				return  SYSINFO_RET_FAIL;
 			}
 		}
 	}
 	closedir(dir);
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 }
 
-double	SENSOR_TEMP2(void)
+int	SENSOR_TEMP2(const char *cmd, const char *param,double  *value)
 {
 	DIR	*dir;
 	struct	dirent *entries;
@@ -728,7 +788,7 @@ double	SENSOR_TEMP2(void)
 	dir=opendir("/proc/sys/dev/sensors");
 	if(NULL == dir)
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 	while((entries=readdir(dir))!=NULL)
@@ -750,20 +810,21 @@ double	SENSOR_TEMP2(void)
 			if(sscanf(line,"%lf\t%lf\t%lf\n",&d1, &d2, &d3) == 3)
 			{
 				closedir(dir);
-				return  d3;
+				*value=d3;
+				return  SYSINFO_RET_OK;
 			}
 			else
 			{
 				closedir(dir);
-				return  FAIL;
+				return  SYSINFO_RET_FAIL;
 			}
 		}
 	}
 	closedir(dir);
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 }
 
-double	SENSOR_TEMP3(void)
+int	SENSOR_TEMP3(const char *cmd, const char *param,double  *value)
 {
 	DIR	*dir;
 	struct	dirent *entries;
@@ -777,7 +838,7 @@ double	SENSOR_TEMP3(void)
 	dir=opendir("/proc/sys/dev/sensors");
 	if(NULL == dir)
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 	while((entries=readdir(dir))!=NULL)
@@ -799,20 +860,21 @@ double	SENSOR_TEMP3(void)
 			if(sscanf(line,"%lf\t%lf\t%lf\n",&d1, &d2, &d3) == 3)
 			{
 				closedir(dir);
-				return  d3;
+				*value=d3;
+				return  SYSINFO_RET_OK;
 			}
 			else
 			{
 				closedir(dir);
-				return  FAIL;
+				return  SYSINFO_RET_FAIL;
 			}
 		}
 	}
 	closedir(dir);
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 }
 
-double	PROCCNT(const char * procname)
+int	PROCCNT(const char *cmd, const char *procname,double  *value)
 {
 #ifdef	HAVE_PROC_0_PSINFO
 	DIR	*dir;
@@ -829,7 +891,7 @@ double	PROCCNT(const char * procname)
 	dir=opendir("/proc");
 	if(NULL == dir)
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 	while((entries=readdir(dir))!=NULL)
@@ -846,7 +908,7 @@ double	PROCCNT(const char * procname)
 				if (read (fd, &psinfo, sizeof(psinfo)) == -1)
 				{
 					closedir(dir);
-					return FAIL;
+					return SYSINFO_RET_FAIL;
 				}
 				else
 				{
@@ -864,7 +926,8 @@ double	PROCCNT(const char * procname)
 		}
 	}
 	closedir(dir);
-	return	(double)proccount;
+	*value=(double)proccount;
+	return	SYSINFO_RET_OK;
 #else
 #ifdef	HAVE_PROC_1_STATUS
 	DIR	*dir;
@@ -882,7 +945,7 @@ double	PROCCNT(const char * procname)
 	dir=opendir("/proc");
 	if(NULL == dir)
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 	while((entries=readdir(dir))!=NULL)
@@ -926,25 +989,26 @@ double	PROCCNT(const char * procname)
 /*                                else
                                 {
                                         closedir(dir);
-                                        return  FAIL;
+                                        return  SYSINFO_RET_FAIL;
                                 }*/
                         }
                         else
                         {
                                 closedir(dir);
-                                return  FAIL;
+                                return  SYSINFO_RET_FAIL;
                         }
 		}
 	}
 	closedir(dir);
-	return	(double)proccount;
+	*value=(double)proccount;
+	return SYSINFO_RET_OK;
 #else
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 #endif
 }
 
-double	get_stat(const char *key)
+int	get_stat(const char *key, double *value)
 {
 	FILE	*f;
 	char	line[MAX_STRING_LEN];
@@ -954,7 +1018,7 @@ double	get_stat(const char *key)
 	f=fopen("/tmp/zabbix_agentd.tmp","r");
 	if(f==NULL)
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 	while(fgets(line,MAX_STRING_LEN,f))
 	{
@@ -963,189 +1027,191 @@ double	get_stat(const char *key)
 			if(strcmp(name1,key) == 0)
 			{
 				fclose(f);
-				return atof(name2);
+				*value=atof(name2);
+				return SYSINFO_RET_OK;
 			}
 		}
 
 	}
 	fclose(f);
-	return FAIL;
+	return SYSINFO_RET_FAIL;
 }
 
-double	DISKREADOPS1(char *device)
+int	DISKREADOPS1(const char *cmd, const char *device,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_read_ops1[%s]",device);
 
-	return	get_stat(key);
+	return	get_stat(key,value);
 }
 
-double	DISKREADOPS5(char *device)
+int	DISKREADOPS5(const char *cmd, const char *device,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_read_ops5[%s]",device);
 
-	return	get_stat(key);
+	return	get_stat(key,value);
 }
 
-double	DISKREADOPS15(char *device)
+int	DISKREADOPS15(const char *cmd, const char *device,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_read_ops15[%s]",device);
 
-	return	get_stat(key);
+	return	get_stat(key,value);
 }
 
-double	DISKREADBLKS1(char *device)
+int	DISKREADBLKS1(const char *cmd, const char *device,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_read_blks1[%s]",device);
 
-	return	get_stat(key);
+	return	get_stat(key,value);
 }
 
-double	DISKREADBLKS5(char *device)
+int	DISKREADBLKS5(const char *cmd, const char *device,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_read_blks5[%s]",device);
 
-	return	get_stat(key);
+	return	get_stat(key,value);
 }
 
-double	DISKREADBLKS15(char *device)
+int	DISKREADBLKS15(const char *cmd, const char *device,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_read_blks15[%s]",device);
 
-	return	get_stat(key);
+	return	get_stat(key,value);
 }
 
-double	DISKWRITEOPS1(char *device)
+int	DISKWRITEOPS1(const char *cmd, const char *device,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_write_ops1[%s]",device);
 
-	return	get_stat(key);
+	return	get_stat(key,value);
 }
 
-double	DISKWRITEOPS5(char *device)
+int	DISKWRITEOPS5(const char *cmd, const char *device,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_write_ops5[%s]",device);
 
-	return	get_stat(key);
+	return	get_stat(key,value);
 }
 
-double	DISKWRITEOPS15(char *device)
+int	DISKWRITEOPS15(const char *cmd, const char *device,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_write_ops15[%s]",device);
 
-	return	get_stat(key);
+	return	get_stat(key,value);
 }
 
-double	DISKWRITEBLKS1(char *device)
+int	DISKWRITEBLKS1(const char *cmd, const char *device,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_write_blks1[%s]",device);
 
-	return	get_stat(key);
+	return	get_stat(key,value);
 }
 
-double	DISKWRITEBLKS5(char *device)
+int	DISKWRITEBLKS5(const char *cmd, const char *device,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_write_blks5[%s]",device);
 
-	return	get_stat(key);
+	return	get_stat(key,value);
 }
 
-double	DISKWRITEBLKS15(char *device)
+int	DISKWRITEBLKS15(const char *cmd, const char *device,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_write_blks15[%s]",device);
 
-	return	get_stat(key);
+	return	get_stat(key,value);
 }
 
-double	NETLOADIN1(char *interface)
+int	NETLOADIN1(const char *cmd, const char *interface,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"netloadin1[%s]",interface);
 
-	return	get_stat(key);
+	return	get_stat(key,value);
 }
 
-double	NETLOADIN5(char *interface)
+int	NETLOADIN5(const char *cmd, const char *interface,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"netloadin5[%s]",interface);
 
-	return	get_stat(key);
+	return	get_stat(key,value);
 }
 
-double	NETLOADIN15(char *interface)
+int	NETLOADIN15(const char *cmd, const char *interface,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"netloadin15[%s]",interface);
 
-	return	get_stat(key);
+	return	get_stat(key,value);
 }
 
-double	NETLOADOUT1(char *interface)
+int	NETLOADOUT1(const char *cmd, const char *interface,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"netloadout1[%s]",interface);
 
-	return	get_stat(key);
+	return	get_stat(key,value);
 }
 
-double	NETLOADOUT5(char *interface)
+int	NETLOADOUT5(const char *cmd, const char *interface,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"netloadout5[%s]",interface);
 
-	return	get_stat(key);
+	return	get_stat(key,value);
 }
 
-double	NETLOADOUT15(char *interface)
+int	NETLOADOUT15(const char *cmd, const char *interface,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"netloadout15[%s]",interface);
 
-	return	get_stat(key);
+	return	get_stat(key,value);
 }
 
 
-double	INODE(const char * mountPoint)
+int	INODE(const char *cmd, const char *mountPoint,double  *value)
 {
 #ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
 
 	if ( statvfs( (char *)mountPoint, &s) != 0 )
 	{
-		return  FAIL;
+		return  SYSINFO_RET_FAIL;
 	}
 
-	return  s.f_favail;
+	*value=s.f_favail;
+	return SYSINFO_RET_OK;
 #else
 	struct statfs   s;
 	long            blocks_used;
@@ -1153,7 +1219,7 @@ double	INODE(const char * mountPoint)
 
 	if ( statfs( (char *)mountPoint, &s) != 0 ) 
 	{
-		return	FAIL;
+		return	SYSINFO_RET_FAIL;
 	}
         
 	if ( s.f_blocks > 0 ) {
@@ -1169,24 +1235,26 @@ double	INODE(const char * mountPoint)
 		,blocks_percent_used
 		,mountPoint);
 */
-		return s.f_ffree;
+		*value=s.f_ffree;
+		return SYSINFO_RET_OK;
 
 	}
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 }
 
-double	INODETOTAL(const char * mountPoint)
+int	INODETOTAL(const char *cmd, const char *mountPoint,double  *value)
 {
 #ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
 
 	if ( statvfs( (char *)mountPoint, &s) != 0 )
 	{
-		return  FAIL;
+		return  SYSINFO_RET_FAIL;
 	}
 
-	return  s.f_files;
+	*value=s.f_files;
+	return SYSINFO_RET_OK;
 #else
 	struct statfs   s;
 	long            blocks_used;
@@ -1194,7 +1262,7 @@ double	INODETOTAL(const char * mountPoint)
 
 	if ( statfs( (char *)mountPoint, &s) != 0 ) 
 	{
-		return	FAIL;
+		return	SYSINFO_RET_FAIL;
 	}
         
 	if ( s.f_blocks > 0 ) {
@@ -1210,25 +1278,27 @@ double	INODETOTAL(const char * mountPoint)
 		,blocks_percent_used
 		,mountPoint);
 */
-		return s.f_files;
+		*value=s.f_files;
+		return SYSINFO_RET_OK;
 
 	}
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 }
 
-double	DISKFREE(const char * mountPoint)
+int	DISKFREE(const char *cmd, const char *mountPoint,double  *value)
 {
 #ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
 
 	if ( statvfs( (char *)mountPoint, &s) != 0 )
 	{
-		return  FAIL;
+		return  SYSINFO_RET_FAIL;
 	}
 
 /*	return  s.f_bavail * (s.f_bsize / 1024.0);*/
-	return  s.f_bavail * (s.f_frsize / 1024.0);
+	*value=s.f_bavail * (s.f_frsize / 1024.0);
+	return SYSINFO_RET_OK;
 #else
 	struct statfs   s;
 	long            blocks_used;
@@ -1236,7 +1306,7 @@ double	DISKFREE(const char * mountPoint)
 
 	if ( statfs( (char *)mountPoint, &s) != 0 )
 	{
-		return	FAIL;
+		return	SYSINFO_RET_FAIL;
 	}
         
 	if ( s.f_blocks > 0 ) {
@@ -1252,26 +1322,28 @@ double	DISKFREE(const char * mountPoint)
 		,blocks_percent_used
 		,mountPoint);
 */
-		return s.f_bavail * (s.f_bsize / 1024.0);
+		*value=s.f_bavail * (s.f_bsize / 1024.0);
+		return SYSINFO_RET_OK;
 
 	}
 
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 }
 
-double	DISKUSED(const char * mountPoint)
+int	DISKUSED(const char *cmd, const char *mountPoint,double  *value)
 {
 #ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
 
 	if ( statvfs( (char *)mountPoint, &s) != 0 )
 	{
-		return  FAIL;
+		return  SYSINFO_RET_FAIL;
 	}
 
 /*	return  (s.f_blocks-s.f_bavail) * (s.f_bsize / 1024.0);*/
-	return  (s.f_blocks-s.f_bavail) * (s.f_frsize / 1024.0);
+	*value=(s.f_blocks-s.f_bavail) * (s.f_frsize / 1024.0);
+	return SYSINFO_RET_OK;
 #else
 	struct statfs   s;
 	long            blocks_used;
@@ -1279,7 +1351,7 @@ double	DISKUSED(const char * mountPoint)
 
 	if ( statfs( (char *)mountPoint, &s) != 0 )
 	{
-		return	FAIL;
+		return	SYSINFO_RET_FAIL;
 	}
         
 	if ( s.f_blocks > 0 ) {
@@ -1295,22 +1367,23 @@ double	DISKUSED(const char * mountPoint)
 		,blocks_percent_used
 		,mountPoint);
 */
-		return blocks_used * (s.f_bsize / 1024.0);
+		*value=blocks_used * (s.f_bsize / 1024.0);
+		return SYSINFO_RET_OK;
 
 	}
 
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 }
 
-double	DISKTOTAL(const char * mountPoint)
+int	DISKTOTAL(const char *cmd, const char *mountPoint,double  *value)
 {
 #ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
 
 	if ( statvfs( (char *)mountPoint, &s) != 0 )
 	{
-		return  FAIL;
+		return  SYSINFO_RET_FAIL;
 	}
 
 /*	return  s.f_blocks * (s.f_bsize / 1024.0);*/
@@ -1322,7 +1395,7 @@ double	DISKTOTAL(const char * mountPoint)
 
 	if ( statfs( (char *)mountPoint, &s) != 0 )
 	{
-		return	FAIL;
+		return	SYSINFO_RET_FAIL;
 	}
         
 	if ( s.f_blocks > 0 ) {
@@ -1338,15 +1411,16 @@ double	DISKTOTAL(const char * mountPoint)
 		,blocks_percent_used
 		,mountPoint);
 */
-		return s.f_blocks * (s.f_bsize / 1024.0);
+		*value=s.f_blocks * (s.f_bsize / 1024.0);
+		return SYSINFO_RET_OK;
 
 	}
 
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 }
 
-double	TCP_LISTEN(const char *porthex)
+int	TCP_LISTEN(const char *cmd, const char *porthex,double  *value)
 {
 #ifdef HAVE_PROC
 	FILE	*f;
@@ -1360,7 +1434,7 @@ double	TCP_LISTEN(const char *porthex)
 	f=fopen("/proc/net/tcp","r");
 	if(NULL == f)
 	{
-		return	FAIL;
+		return	SYSINFO_RET_FAIL;
 	}
 
 	while (NULL!=fgets(c,MAX_STRING_LEN,f))
@@ -1368,19 +1442,21 @@ double	TCP_LISTEN(const char *porthex)
 		if(NULL != strstr(c,pattern))
 		{
 			fclose(f);
-			return 1;
+			*value=1;
+			return SYSINFO_RET_OK;
 		}
 	}
 	fclose(f);
 
-	return	0;
+	*value=0;
+	return SYSINFO_RET_OK;
 #else
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 }
 
 #ifdef	HAVE_PROC
-double	getPROC(char *file,int lineno,int fieldno)
+int	getPROC(char *file,int lineno,int fieldno, double *value)
 {
 	FILE	*f;
 	char	*t;
@@ -1391,7 +1467,7 @@ double	getPROC(char *file,int lineno,int fieldno)
 	f=fopen(file,"r");
 	if(NULL == f)
 	{
-		return	FAIL;
+		return	SYSINFO_RET_FAIL;
 	}
 	for(i=1;i<=lineno;i++)
 	{	
@@ -1406,11 +1482,12 @@ double	getPROC(char *file,int lineno,int fieldno)
 
 	sscanf(t, "%lf", &result );
 
-	return	result;
+	*value=result;
+	return SYSINFO_RET_OK;
 }
 #endif
 
-double	CACHEDMEM(void)
+int	CACHEDMEM(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_PROC
 /* Get CACHED memory in bytes */
@@ -1420,12 +1497,12 @@ double	CACHEDMEM(void)
 	FILE	*f;
 	char	*t;
 	char	c[MAX_STRING_LEN];
-	double	result = FAIL;
+	double	result = SYSINFO_RET_FAIL;
 
 	f=fopen("/proc/meminfo","r");
 	if(NULL == f)
 	{
-		return	FAIL;
+		return	SYSINFO_RET_FAIL;
 	}
 	while(NULL!=fgets(c,MAX_STRING_LEN,f))
 	{
@@ -1439,13 +1516,14 @@ double	CACHEDMEM(void)
 	}
 	fclose(f);
 
-	return	result;
+	*value=result;
+	return SYSINFO_RET_OK;
 #else
-	return FAIL;
+	return SYSINFO_RET_FAIL;
 #endif
 }
 
-double	BUFFERSMEM(void)
+int	BUFFERSMEM(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_SYSINFO_BUFFERRAM
 	struct sysinfo info;
@@ -1453,21 +1531,22 @@ double	BUFFERSMEM(void)
 	if( 0 == sysinfo(&info))
 	{
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		return	(double)info.bufferram * (double)info.mem_unit;
+		*value=(double)info.bufferram * (double)info.mem_unit;
 #else
-		return	(double)info.bufferram;
+		*value=(double)info.bufferram;
 #endif
+		return SYSINFO_RET_OK;
 	}
 	else
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 #else
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 }
 
-double	SHAREDMEM(void)
+int	SHAREDMEM(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_SYSINFO_SHAREDRAM
 	struct sysinfo info;
@@ -1475,14 +1554,15 @@ double	SHAREDMEM(void)
 	if( 0 == sysinfo(&info))
 	{
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		return	(double)info.sharedram * (double)info.mem_unit;
+		*value=(double)info.sharedram * (double)info.mem_unit;
 #else
-		return	(double)info.sharedram;
+		*value=(double)info.sharedram;
 #endif
+		return SYSINFO_RET_OK;
 	}
 	else
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 #else
 #ifdef HAVE_SYS_VMMETER_VMTOTAL
@@ -1495,18 +1575,20 @@ double	SHAREDMEM(void)
 
 	sysctl(mib,2,&v,&len,NULL,0);
 
-	return (double)(v.t_armshr<<2);
+	*value=(double)(v.t_armshr<<2);
+	return SYSINFO_RET_OK;
 #else
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 #endif
 }
 
-double	TOTALMEM(void)
+int	TOTALMEM(const char *cmd, const char *parameter,double  *value)
 {
 /* Solaris */
 #ifdef HAVE_UNISTD_SYSCONF
-	return (double)sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGESIZE);
+	*value=(double)sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGESIZE);
+	return SYSINFO_RET_OK;
 #else
 #ifdef HAVE_SYS_PSTAT_H
 	struct	pst_static pst;
@@ -1514,14 +1596,15 @@ double	TOTALMEM(void)
 
 	if(pstat_getstatic(&pst, sizeof(pst), (size_t)1, 0) == -1)
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 	else
 	{
 		/* Get page size */	
 		page = pst.page_size;
 		/* Total physical memory in bytes */	
-		return page*pst.physical_memory;
+		*value=page*pst.physical_memory;
+		return SYSINFO_RET_OK;
 	}
 #else
 #ifdef HAVE_SYSINFO_TOTALRAM
@@ -1530,14 +1613,15 @@ double	TOTALMEM(void)
 	if( 0 == sysinfo(&info))
 	{
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		return	(double)info.totalram * (double)info.mem_unit;
+		*value=(double)info.totalram * (double)info.mem_unit;
 #else
-		return	(double)info.totalram;
+		*value=(double)info.totalram;
 #endif
+		return SYSINFO_RET_OK;
 	}
 	else
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 #else
 #ifdef HAVE_SYS_VMMETER_VMTOTAL
@@ -1550,20 +1634,22 @@ double	TOTALMEM(void)
 
 	sysctl(mib,2,&v,&len,NULL,0);
 
-	return (double)(v.t_rm<<2);
+	*value=(double)(v.t_rm<<2);
+	return SYSINFO_RET_OK;
 #else
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 #endif
 #endif
 #endif
 }
 
-double	FREEMEM(void)
+int	FREEMEM(const char *cmd, const char *parameter,double  *value)
 {
 /* Solaris */
 #ifdef HAVE_UNISTD_SYSCONF
-	return (double)sysconf(_SC_AVPHYS_PAGES)*sysconf(_SC_PAGESIZE);
+	*value=(double)sysconf(_SC_AVPHYS_PAGES)*sysconf(_SC_PAGESIZE);
+	return SYSINFO_RET_OK;
 #else
 #ifdef HAVE_SYS_PSTAT_H
 	struct	pst_static pst;
@@ -1572,7 +1658,7 @@ double	FREEMEM(void)
 
 	if(pstat_getstatic(&pst, sizeof(pst), (size_t)1, 0) == -1)
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 	else
 	{
@@ -1582,7 +1668,7 @@ double	FREEMEM(void)
 
 		if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
 		{
-			return FAIL;
+			return SYSINFO_RET_FAIL;
 		}
 		else
 		{
@@ -1598,7 +1684,8 @@ double	FREEMEM(void)
 */
 		/* Free memory in bytes */
 
-			return dyn.psd_free * page;
+			*value=dyn.psd_free * page;
+			return SYSINFO_RET_OK;
 		}
 	}
 #else
@@ -1608,14 +1695,15 @@ double	FREEMEM(void)
 	if( 0 == sysinfo(&info))
 	{
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		return	(double)info.freeram * (double)info.mem_unit;
+		*value=(double)info.freeram * (double)info.mem_unit;
 #else
-		return	(double)info.freeram;
+		*value=(double)info.freeram;
 #endif
+		return SYSINFO_RET_OK;
 	}
 	else
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 #else
 #ifdef HAVE_SYS_VMMETER_VMTOTAL
@@ -1628,16 +1716,17 @@ double	FREEMEM(void)
 
 	sysctl(mib,2,&v,&len,NULL,0);
 
-	return (double)(v.t_free<<2);
+	*value=(double)(v.t_free<<2);
+	return SYSINFO_RET_OK;
 #else
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 #endif
 #endif
 #endif
 }
 
-double	KERNEL_MAXFILES(void)
+int	KERNEL_MAXFILES(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXFILES
 	int	mib[2],len;
@@ -1650,16 +1739,17 @@ double	KERNEL_MAXFILES(void)
 
 	if(sysctl(mib,2,&maxfiles,(size_t *)&len,NULL,0) != 0)
 	{
-		return	FAIL;
+		return	SYSINFO_RET_FAIL;
 	}
 
-	return (double)(maxfiles);
+	*value=(double)(maxfiles);
+	return SYSINFO_RET_OK;
 #else
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 }
 
-double	KERNEL_MAXPROC(void)
+int	KERNEL_MAXPROC(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXPROC
 	int	mib[2],len;
@@ -1672,28 +1762,30 @@ double	KERNEL_MAXPROC(void)
 
 	if(sysctl(mib,2,&maxproc,(size_t *)&len,NULL,0) != 0)
 	{
-		return	FAIL;
+		return	SYSINFO_RET_FAIL;
 /*		printf("Errno [%m]");*/
 	}
 
-	return (double)(maxproc);
+	*value=(double)(maxproc);
+	return SYSINFO_RET_OK;
 #else
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 }
 
-double	UPTIME(void)
+int	UPTIME(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_SYSINFO_UPTIME
 	struct sysinfo info;
 
 	if( 0 == sysinfo(&info))
 	{
-		return	(double)info.uptime;
+		*value=(double)info.uptime;
+		return SYSINFO_RET_OK;
 	}
 	else
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 #else
 #ifdef HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME
@@ -1708,13 +1800,14 @@ double	UPTIME(void)
 
 	if(sysctl(mib,2,&uptime,(size_t *)&len,NULL,0) != 0)
 	{
-		return	FAIL;
+		return	SYSINFO_RET_FAIL;
 /*		printf("Errno [%m]\n");*/
 	}
 
 	now=time(NULL);
 
-	return (double)(now-uptime.tv_sec);
+	*value=(double)(now-uptime.tv_sec);
+	return SYSINFO_RET_OK;
 #else
 /* Solaris */
 #ifdef HAVE_KSTAT_H
@@ -1731,7 +1824,7 @@ double	UPTIME(void)
 	kc = kstat_open();
 	if (0 == kc)
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 	/* read uptime counter */
@@ -1739,44 +1832,47 @@ double	UPTIME(void)
 	if (0 == kp)
 	{
 		kstat_close(kc);
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 	if(-1 == kstat_read(kc, kp, 0))
 	{
 		kstat_close(kc);
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 	kn = (kstat_named_t*)kstat_data_lookup(kp, "clk_intr");
 	secs = kn->value.ul / hz;
 
 	/* close kstat */
 	kstat_close(kc);
-	return (double)secs;
+	*value=(double)secs;
+	reutrn SYSINFO_RET_OK;
 #else
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 #endif
 #endif
 }
 
-double	PING(void)
+int	PING(const char *cmd, const char *parameter,double  *value)
 {
-	return	1;
+	*value=1;
+	return SYSINFO_RET_OK;
 }
 
-double	PROCLOAD(void)
+int	PROCLOAD(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_GETLOADAVG
 	double	load[3];
 
 	if(getloadavg(load, 3))
 	{
-		return load[0];	
+		*value=load[0];
+		return SYSINFO_RET_OK;
 	}
 	else
 	{
-		return FAIL;	
+		return SYSINFO_RET_FAIL;	
 	}
 #else
 #ifdef	HAVE_SYS_PSTAT_H
@@ -1784,15 +1880,16 @@ double	PROCLOAD(void)
 
 	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 	else
 	{
-		return dyn.psd_avg_1_min;
+		*value=(double)dyn.psd_avg_1_min;
+		return SYSINFO_RET_OK;
 	}
 #else
 #ifdef HAVE_PROC_LOADAVG
-	return	getPROC("/proc/loadavg",1,1);
+	return	getPROC("/proc/loadavg",1,1,value);
 #else
 #ifdef HAVE_KSTAT_H
 	static kstat_ctl_t *kc = NULL;
@@ -1801,35 +1898,37 @@ double	PROCLOAD(void)
 
 	if (!kc && !(kc = kstat_open()))
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 	if (!(ks = kstat_lookup(kc, "unix", 0, "system_misc")) ||
 		kstat_read(kc, ks, 0) == -1 ||
 		!(kn = kstat_data_lookup(ks,"avenrun_1min")))
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
-        return kn->value.ul/256.0;
+        *value=(double)kn->value.ul/256.0;
+	return SYSINFO_RET_OK;
 #else
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 #endif
 #endif
 #endif
 }
 
-double	PROCLOAD5(void)
+int	PROCLOAD5(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_GETLOADAVG
 	double	load[3];
 
 	if(getloadavg(load, 3))
 	{
-		return load[1];	
+		*value=load[1];
+		return SYSINFO_RET_OK;
 	}
 	else
 	{
-		return FAIL;	
+		return SYSINFO_RET_FAIL;	
 	}
 #else
 #ifdef	HAVE_SYS_PSTAT_H
@@ -1837,15 +1936,16 @@ double	PROCLOAD5(void)
 
 	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 	else
 	{
-		return dyn.psd_avg_5_min;
+		*value=(double)dyn.psd_avg_5_min;
+		return SYSINFO_RET_OK;
 	}
 #else
 #ifdef	HAVE_PROC_LOADAVG
-	return	getPROC("/proc/loadavg",1,2);
+	return	getPROC("/proc/loadavg",1,2,value);
 #else
 #ifdef HAVE_KSTAT_H
 	static kstat_ctl_t *kc = NULL;
@@ -1854,35 +1954,37 @@ double	PROCLOAD5(void)
 
 	if (!kc && !(kc = kstat_open()))
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 	if (!(ks = kstat_lookup(kc, "unix", 0, "system_misc")) ||
 		kstat_read(kc, ks, 0) == -1 ||
 		!(kn = kstat_data_lookup(ks,"avenrun_5min")))
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
-        return kn->value.ul/256.0;
+        *value=(double)kn->value.ul/256.0;
+	return SYSINFO_RET_OK;
 #else
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 #endif
 #endif
 #endif
 }
 
-double	PROCLOAD15(void)
+int	PROCLOAD15(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_GETLOADAVG
 	double	load[3];
 
 	if(getloadavg(load, 3))
 	{
-		return load[2];	
+		*value=load[2];	
+		return SYSINFO_RET_OK;
 	}
 	else
 	{
-		return FAIL;	
+		return SYSINFO_RET_FAIL;	
 	}
 #else
 #ifdef	HAVE_SYS_PSTAT_H
@@ -1890,15 +1992,16 @@ double	PROCLOAD15(void)
 
 	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 	else
 	{
-		return dyn.psd_avg_15_min;
+		*value=(double)dyn.psd_avg_15_min;
+		return SYSINFO_RET_OK;
 	}
 #else
 #ifdef	HAVE_PROC_LOADAVG
-	return	getPROC("/proc/loadavg",1,3);
+	return	getPROC("/proc/loadavg",1,3,value);
 #else
 #ifdef HAVE_KSTAT_H
 	static kstat_ctl_t *kc = NULL;
@@ -1907,24 +2010,25 @@ double	PROCLOAD15(void)
 
 	if (!kc && !(kc = kstat_open()))
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 	if (!(ks = kstat_lookup(kc, "unix", 0, "system_misc")) ||
 		kstat_read(kc, ks, 0) == -1 ||
 		!(kn = kstat_data_lookup(ks,"avenrun_15min")))
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
-        return kn->value.ul/256.0;
+        *value=(double)kn->value.ul/256.0;
+	return SYSINFO_RET_OK;
 #else
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 #endif
 #endif
 #endif
 }
 
-double	SWAPFREE(void)
+int	SWAPFREE(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_SYSINFO_FREESWAP
 	struct sysinfo info;
@@ -1932,14 +2036,15 @@ double	SWAPFREE(void)
 	if( 0 == sysinfo(&info))
 	{
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		return	(double)info.freeswap * (double)info.mem_unit;
+		*value=(double)info.freeswap * (double)info.mem_unit;
 #else
-		return	(double)info.freeswap;
+		*value=(double)info.freeswap;
 #endif
+		return SYSINFO_RET_OK;
 	}
 	else
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 /* Solaris */
 #else
@@ -1948,25 +2053,27 @@ double	SWAPFREE(void)
 
 	get_swapinfo(&swaptotal,&swapfree);
 
-	return	swapfree;
+	*value=swapfree;
+	return SYSINFO_RET_OK;
 #else
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 #endif
 }
 
-double	PROCCOUNT(void)
+int	PROCCOUNT(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_SYSINFO_PROCS
 	struct sysinfo info;
 
 	if( 0 == sysinfo(&info))
 	{
-		return	info.procs;
+		*value=(double)info.procs;
+		return SYSINFO_RET_OK;
 	}
 	else
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 #else
 #ifdef	HAVE_PROC_0_PSINFO
@@ -1984,7 +2091,7 @@ double	PROCCOUNT(void)
 	dir=opendir("/proc");
 	if(NULL == dir)
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 	while((entries=readdir(dir))!=NULL)
@@ -2001,7 +2108,7 @@ double	PROCCOUNT(void)
 				if (read (fd, &psinfo, sizeof(psinfo)) == -1)
 				{
 					closedir(dir);
-					return FAIL;
+					return SYSINFO_RET_FAIL;
 				}
 				else
 				{
@@ -2016,7 +2123,8 @@ double	PROCCOUNT(void)
 		}
 	}
 	closedir(dir);
-	return	(double)proccount;
+	*value=(double)proccount;
+	return SYSINFO_RET_OK;
 #else
 #ifdef	HAVE_PROC_1_STATUS
 	DIR	*dir;
@@ -2032,7 +2140,7 @@ double	PROCCOUNT(void)
 	dir=opendir("/proc");
 	if(NULL == dir)
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 	while((entries=readdir(dir))!=NULL)
@@ -2057,15 +2165,16 @@ double	PROCCOUNT(void)
 		}
 	}
 	closedir(dir);
-	return	(double)proccount;
+	*value=(double)proccount;
+	return SYSINFO_RET_OK;
 #else
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 #endif
 #endif
 }
 
-double	SWAPTOTAL(void)
+int	SWAPTOTAL(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_SYSINFO_TOTALSWAP
 	struct sysinfo info;
@@ -2073,14 +2182,15 @@ double	SWAPTOTAL(void)
 	if( 0 == sysinfo(&info))
 	{
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		return	(double)info.totalswap * (double)info.mem_unit;
+		*value=(double)info.totalswap * (double)info.mem_unit;
 #else
-		return	(double)info.totalswap;
+		*value=(double)info.totalswap;
 #endif
+		return SYSINFO_RET_OK;
 	}
 	else
 	{
-		return FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 /* Solaris */
 #else
@@ -2089,66 +2199,68 @@ double	SWAPTOTAL(void)
 
 	get_swapinfo(&swaptotal,&swapfree);
 
-	return	swaptotal;
+	*value=(double)swaptotal;
+	return SYSINFO_RET_OK;
 #else
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 #endif
 }
 
-double	DISK_IO(void)
+int	DISK_IO(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef	HAVE_PROC
-	return	getPROC("/proc/stat",2,2);
+	return	getPROC("/proc/stat",2,2,value);
 #else
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 }
 
-double	DISK_RIO(void)
+int	DISK_RIO(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef	HAVE_PROC
-	return	getPROC("/proc/stat",3,2);
+	return	getPROC("/proc/stat",3,2,value);
 #else
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 }
 
-double	DISK_WIO(void)
+int	DISK_WIO(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef	HAVE_PROC
-	return	getPROC("/proc/stat",4,2);
+	return	getPROC("/proc/stat",4,2,value);
 #else
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 }
 
-double	DISK_RBLK(void)
+int	DISK_RBLK(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef	HAVE_PROC
-	return	getPROC("/proc/stat",5,2);
+	return	getPROC("/proc/stat",5,2,value);
 #else
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 }
 
-double	DISK_WBLK(void)
+int	DISK_WBLK(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef	HAVE_PROC
-	return	getPROC("/proc/stat",6,2);
+	return	getPROC("/proc/stat",6,2,value);
 #else
-	return	FAIL;
+	return	SYSINFO_RET_FAIL;
 #endif
 }
 
-char	*VERSION(void)
+int	VERSION(const char *cmd, const char *parameter,char  **value)
 {
 	static	char	version[]="1.1alpha1\n";
 
-	return	version;
+	*value=strdup(version);
+	return	SYSINFO_RET_OK;
 }
 
-char	*EXECUTE_STR(char *command)
+int	EXECUTE_STR(const char *cmd, const char *command,char  **value)
 {
 	FILE	*f;
 	static	char	c[MAX_STRING_LEN];
@@ -2160,9 +2272,9 @@ char	*EXECUTE_STR(char *command)
 		{
 			case	EINTR:
 /* (char *) to avoid compiler warning */
-				return (char *)TIMEOUT_ERROR;
+				return SYSINFO_RET_TIMEOUT;
 			default:
-				return NULL;
+				return SYSINFO_RET_FAIL;
 		}
 	}
 
@@ -2173,10 +2285,10 @@ char	*EXECUTE_STR(char *command)
 			case	EINTR:
 				pclose(f);
 /* (char *) to avoid compiler warning */
-				return (char *)TIMEOUT_ERROR;
+				return SYSINFO_RET_TIMEOUT;
 			default:
 				pclose(f);
-				return NULL;
+				return SYSINFO_RET_FAIL;
 		}
 	}
 
@@ -2186,16 +2298,17 @@ char	*EXECUTE_STR(char *command)
 		{
 			case	EINTR:
 /* (char *) to avoid compiler warning */
-				return (char *)TIMEOUT_ERROR;
+				return SYSINFO_RET_TIMEOUT;
 			default:
-				return NULL;
+				return SYSINFO_RET_FAIL;
 		}
 	}
 
-	return	c;
+	*value=strdup(c);
+	return	SYSINFO_RET_OK;
 }
 
-double	EXECUTE(char *command)
+int	EXECUTE(const char *cmd, const char *command,double *value)
 {
 	FILE	*f;
 	double	result;
@@ -2207,9 +2320,9 @@ double	EXECUTE(char *command)
 		switch (errno)
 		{
 			case	EINTR:
-				return TIMEOUT_ERROR;
+				return SYSINFO_RET_TIMEOUT;
 			default:
-				return FAIL;
+				return SYSINFO_RET_FAIL;
 		}
 	}
 
@@ -2219,9 +2332,9 @@ double	EXECUTE(char *command)
 		switch (errno)
 		{
 			case	EINTR:
-				return TIMEOUT_ERROR;
+				return SYSINFO_RET_TIMEOUT;
 			default:
-				return FAIL;
+				return SYSINFO_RET_FAIL;
 		}
 	}
 
@@ -2230,15 +2343,16 @@ double	EXECUTE(char *command)
 		switch (errno)
 		{
 			case	EINTR:
-				return TIMEOUT_ERROR;
+				return SYSINFO_RET_TIMEOUT;
 			default:
-				return FAIL;
+				return SYSINFO_RET_FAIL;
 		}
 	}
 
 	sscanf(c, "%lf", &result );
 
-	return	result;
+	*value=result;
+	return	SYSINFO_RET_OK;
 }
 
 void	forward_request(char *proxy,char *command,int port,char *value)
@@ -2306,7 +2420,7 @@ void	forward_request(char *proxy,char *command,int port,char *value)
  * 0 - NOT OK
  * 1 - OK
  * */
-int	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose)
+int	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose, int *value_int)
 {
 	char	*haddr;
 	char	c[1024];
@@ -2321,7 +2435,8 @@ int	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose)
 	host = gethostbyname(hostname);
 	if(host == NULL)
 	{
-		return	0;
+		*value_int = 0;
+		return SYSINFO_RET_OK;
 	}
 
 	haddr=host->h_addr;
@@ -2337,19 +2452,22 @@ int	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose)
 	if (s == -1)
 	{
 		close(s);
-		return	0;
+		*value_int = 0;
+		return SYSINFO_RET_OK;
 	}
 
 	if (connect(s, (struct sockaddr *) &addr, addrlen) == -1)
 	{
 		close(s);
-		return	0;
+		*value_int = 0;
+		return SYSINFO_RET_OK;
 	}
 
 	if( expect == NULL)
 	{
 		close(s);
-		return	1;
+		*value_int = 1;
+		return SYSINFO_RET_OK;
 	}
 
 	memset(&c, 0, 1024);
@@ -2358,21 +2476,23 @@ int	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose)
 	{
 		send(s,sendtoclose,strlen(sendtoclose),0);
 		close(s);
-		return	1;
+		*value_int = 1;
+		return SYSINFO_RET_OK;
 	}
 	else
 	{
 		send(s,sendtoclose,strlen(sendtoclose),0);
 		close(s);
-		return	0;
+		*value_int = 0;
+		return SYSINFO_RET_OK;
 	}
 }
 
 /* 
- * 0 - NOT OK
- * 1 - OK
+ *  0- NOT OK
+ *  1 - OK
  * */
-int	check_ssh(char	*hostname, short port)
+int	check_ssh(char	*hostname, short port, int *value)
 {
 	char	*haddr;
 	char	c[MAX_STRING_LEN];
@@ -2390,7 +2510,8 @@ int	check_ssh(char	*hostname, short port)
 	host = gethostbyname(hostname);
 	if(host == NULL)
 	{
-		return	0;
+		*value=0;
+		return	SYSINFO_RET_OK;
 	}
 
 	haddr=host->h_addr;
@@ -2405,13 +2526,15 @@ int	check_ssh(char	*hostname, short port)
 	if (s == -1)
 	{
 		close(s);
-		return	0;
+		*value=0;
+		return	SYSINFO_RET_OK;
 	}
 
 	if (connect(s, (struct sockaddr *) &addr, addrlen) == -1)
 	{
 		close(s);
-		return	0;
+		*value=0;
+		return	SYSINFO_RET_OK;
 	}
 
 	memset(&c, 0, 1024);
@@ -2430,19 +2553,21 @@ int	check_ssh(char	*hostname, short port)
 /*		printf("[%s]\n",out);*/
 
 		close(s);
-		return	1;
+		*value=1;
+		return	SYSINFO_RET_OK;
 	}
 	else
 	{
 		send(s,"0\n",2,0);
 		close(s);
-		return	0;
+		*value=0;
+		return	SYSINFO_RET_OK;
 	}
 }
 
 /* Example check_service[ssh], check_service[smtp,29],check_service[ssh,127.0.0.1,22]*/
 /* check_service[ssh,127.0.0.1,ssh] */
-double	CHECK_SERVICE_PERF(char *service_and_ip_and_port)
+int	CHECK_SERVICE_PERF(const char *cmd, const char *service_and_ip_and_port,double  *value)
 {
 	char	*c,*c1;
 	int	port=0;
@@ -2454,6 +2579,7 @@ double	CHECK_SERVICE_PERF(char *service_and_ip_and_port)
 	struct timezone tz1,tz2;
 
 	int	result;
+	int	value_int;
 
 	long	exec_time;
 
@@ -2497,65 +2623,67 @@ double	CHECK_SERVICE_PERF(char *service_and_ip_and_port)
 	if(strcmp(service,"ssh") == 0)
 	{
 		if(port == 0)	port=22;
-		result=check_ssh(ip,port);
+		result=check_ssh(ip,port,&value_int);
 	}
 	else if(strcmp(service,"smtp") == 0)
 	{
 		if(port == 0)	port=25;
-		result=tcp_expect(ip,port,"220","QUIT\n");
+		result=tcp_expect(ip,port,"220","QUIT\n",&value_int);
 	}
 	else if(strcmp(service,"ftp") == 0)
 	{
 		if(port == 0)	port=21;
-		result=tcp_expect(ip,port,"220","");
+		result=tcp_expect(ip,port,"220","",&value_int);
 	}
 	else if(strcmp(service,"http") == 0)
 	{
 		if(port == 0)	port=80;
-		result=tcp_expect(ip,port,NULL,"");
+		result=tcp_expect(ip,port,NULL,"",&value_int);
 	}
 	else if(strcmp(service,"pop") == 0)
 	{
 		if(port == 0)	port=110;
-		result=tcp_expect(ip,port,"+OK","");
+		result=tcp_expect(ip,port,"+OK","",&value_int);
 	}
 	else if(strcmp(service,"nntp") == 0)
 	{
 		if(port == 0)	port=119;
 /* 220 is incorrect */
 /*		result=tcp_expect(ip,port,"220","");*/
-		result=tcp_expect(ip,port,"200","");
+		result=tcp_expect(ip,port,"200","",&value_int);
 	}
 	else if(strcmp(service,"imap") == 0)
 	{
 		if(port == 0)	port=143;
-		result=tcp_expect(ip,port,"* OK","a1 LOGOUT\n");
+		result=tcp_expect(ip,port,"* OK","a1 LOGOUT\n",&value_int);
 	}
 	else if(strcmp(service,"tcp") == 0)
 	{
 		if(port == 0)	port=80;
-		result=tcp_expect(ip,port,NULL,"");
+		result=tcp_expect(ip,port,NULL,"",&value_int);
 	}
 	else
 	{
-		result=0;
+		return SYSINFO_RET_FAIL;
 	}
 
-	if(1 == result)
+	if(1 == value_int)
 	{
 		gettimeofday(&t2,&tz2);
    		exec_time=(t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec);
-		return (double)exec_time/1000000;
+		*value=(double)exec_time/1000000;
+		return SYSINFO_RET_OK;
 	}
 	else
 	{
-		return (double)result;
+		*value=0;
+		return SYSINFO_RET_OK;
 	}
 }
 
 /* Example check_service[ssh], check_service[smtp,29],check_service[ssh,127.0.0.1,22]*/
 /* check_service[ssh,127.0.0.1,ssh] */
-double	CHECK_SERVICE(char *service_and_ip_and_port)
+int	CHECK_SERVICE(const char *cmd, const char *service_and_ip_and_port,double  *value)
 {
 	int	port=0;
 	char	service[MAX_STRING_LEN];
@@ -2565,6 +2693,7 @@ double	CHECK_SERVICE(char *service_and_ip_and_port)
 	char	*s;
 
 	int	result;
+	int	value_int;
 
 	/* Default IP address */
 	strscpy(ip,"127.0.0.1");
@@ -2648,57 +2777,61 @@ double	CHECK_SERVICE(char *service_and_ip_and_port)
 	if(strcmp(service,"ssh") == 0)
 	{
 		if(port == 0)	port=22;
-		result=check_ssh(ip,port);
+		result=check_ssh(ip,port,&value_int);
 	}
 	else if(strcmp(service,"smtp") == 0)
 	{
 		if(port == 0)	port=25;
-		result=tcp_expect(ip,port,"220","QUIT\n");
+		result=tcp_expect(ip,port,"220","QUIT\n",&value_int);
 	}
 	else if(strcmp(service,"ftp") == 0)
 	{
 		if(port == 0)	port=21;
-		result=tcp_expect(ip,port,"220","");
+		result=tcp_expect(ip,port,"220","",&value_int);
 	}
 	else if(strcmp(service,"http") == 0)
 	{
 		if(port == 0)	port=80;
-		result=tcp_expect(ip,port,NULL,"");
+		result=tcp_expect(ip,port,NULL,"",&value_int);
 	}
 	else if(strcmp(service,"pop") == 0)
 	{
 		if(port == 0)	port=110;
-		result=tcp_expect(ip,port,"+OK","");
+		result=tcp_expect(ip,port,"+OK","",&value_int);
 	}
 	else if(strcmp(service,"nntp") == 0)
 	{
 		if(port == 0)	port=119;
 /* 220 is incorrect */
 /*		result=tcp_expect(ip,port,"220","");*/
-		result=tcp_expect(ip,port,"200","");
+		result=tcp_expect(ip,port,"200","",&value_int);
 	}
 	else if(strcmp(service,"imap") == 0)
 	{
 		if(port == 0)	port=143;
-		result=tcp_expect(ip,port,"* OK","a1 LOGOUT\n");
+		result=tcp_expect(ip,port,"* OK","a1 LOGOUT\n",&value_int);
 	}
 	else if(strcmp(service,"tcp") == 0)
 	{
 		if(port == 0)	port=80;
-		result=tcp_expect(ip,port,NULL,"");
+		result=tcp_expect(ip,port,NULL,"",&value_int);
 	}
 	else
 	{
-		result=FAIL;
+		result=SYSINFO_RET_FAIL;
 	}
 
-	return (double)result;
+	*value=(double)value_int;
+
+	return result;
 }
 
-double	CHECK_PORT(char *ip_and_port)
+int	CHECK_PORT(const char *cmd, const char *ip_and_port,double  *value)
 {
 	char	*c;
 	int	port=0;
+	int	value_int;
+	int	result;
 	char	ip[MAX_STRING_LEN];
 
 	c=strchr(ip_and_port,',');
@@ -2715,5 +2848,7 @@ double	CHECK_PORT(char *ip_and_port)
 		strcpy(ip,"127.0.0.1");
 	}
 
-	return	tcp_expect(ip,port,NULL,"");
+	result = tcp_expect(ip,port,NULL,"",&value_int);
+	*value = (double)value_int;
+	return result;
 }

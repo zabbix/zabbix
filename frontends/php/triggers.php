@@ -257,7 +257,23 @@
 				$description=expand_trigger_description($row["triggerid"]);
 //			}
 			echo "<TD><INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"".$row["triggerid"]."\"> ".$row["triggerid"]."</TD>";
-			echo "<TD>$description</TD>";
+			echo "<TD>";
+			echo $description;
+			$sql="select t.triggerid,t.description from triggers t,trigger_depends d where t.triggerid=d.triggerid_up and d.triggerid_down=".$row["triggerid"];
+			$result1=DBselect($sql);
+			if(DBnum_rows($result1)>0)
+			{
+				echo "<p><strong>".S_DEPENDS_ON."</strong>:&nbsp;<br>";
+				for($i=0;$i<DBnum_rows($result1);$i++)
+				{
+					$depid=DBget_field($result1,$i,0);
+					$depdescr=expand_trigger_description($depid);
+					echo "$depdescr<br>";
+				}
+				echo "</p>";
+			}
+			echo "</TD>";
+
 	
 			echo "<TD>".explode_exp($row["expression"],1)."</TD>";
 

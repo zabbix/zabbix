@@ -21,22 +21,22 @@
 <?php
 
 //	about.php
-	define("S_ABOUT_ZABBIX",			"About Zabbix");
-	define("S_INFORMATION_ABOUT_ZABBIX",		"Information about Zabbix (v1.1alpha1)");
-	define("S_HOMEPAGE_OF_ZABBIX",			"Homepage of Zabbix");
-	define("S_HOMEPAGE_OF_ZABBIX_DETAILS",		"This is home page of Zabbix.");
-	define("S_LATEST_ZABBIX_MANUAL",		"Latest Zabbix Manual");
+	define("S_ABOUT_ZABBIX",			"About ZABBIX");
+	define("S_INFORMATION_ABOUT_ZABBIX",		"Information about ZABBIX (v1.1alpha1)");
+	define("S_HOMEPAGE_OF_ZABBIX",			"Homepage of ZABBIX");
+	define("S_HOMEPAGE_OF_ZABBIX_DETAILS",		"This is home page of ZABBIX.");
+	define("S_LATEST_ZABBIX_MANUAL",		"Latest ZABBIX Manual");
 	define("S_LATEST_ZABBIX_MANUAL_DETAILS",	"Latest version of the Manual.");
 	define("S_DOWNLOADS",				"Downloads");
-	define("S_DOWNLOADS_DETAILS",			"Latest Zabbix release can be found here.");
+	define("S_DOWNLOADS_DETAILS",			"Latest ZABBIX release can be found here.");
 	define("S_FEATURE_REQUESTS",			"Feature requests");
 	define("S_FEATURE_REQUESTS_DETAILS",		"If you need additional functionality, go here.");
 	define("S_FORUMS",				"Forums");
-	define("S_FORUMS_DETAILS",			"Zabbix-related discussion.");
+	define("S_FORUMS_DETAILS",			"ZABBIX-related discussion.");
 	define("S_BUG_REPORTS",				"Bug reports");
-	define("S_BUG_REPORTS_DETAILS",			"Bug in Zabbix ? Please, report it.");
+	define("S_BUG_REPORTS_DETAILS",			"Bug in ZABBIX ? Please, report it.");
 	define("S_MAILING_LISTS",			"Mailing lists");
-	define("S_MAILING_LISTS_DETAILS",		"Zabbix-related mailing lists.");
+	define("S_MAILING_LISTS_DETAILS",		"ZABBIX-related mailing lists.");
 
 //	actions.php
 	define("S_ACTIONS",				"Actions");
@@ -136,7 +136,7 @@
 	define("S_YELLOW",				"Dark yellow");
 
 //	config.php
-	define("S_CONFIGURATION_OF_ZABBIX",		"Configuration of Zabbix");
+	define("S_CONFIGURATION_OF_ZABBIX",		"Configuration of ZABBIX");
 	define("S_CONFIGURATION_OF_ZABBIX_BIG",		"CONFIGURATION OF ZABBIX");
 	define("S_CONFIGURATION_UPDATED",		"Configuration updated");
 	define("S_CONFIGURATION_WAS_NOT_UPDATED",	"Configuration was not updated");
@@ -269,12 +269,12 @@
 	define("S_HISTORY",				"History");
 	define("S_TRENDS",				"Trends");
 	define("S_SHORT_NAME",				"Short name");
-	define("S_ZABBIX_AGENT",			"Zabbix agent");
+	define("S_ZABBIX_AGENT",			"ZABBIX agent");
 	define("S_SNMPV1_AGENT",			"SNMPv1 agent");
-	define("S_ZABBIX_TRAPPER",			"Zabbix trapper");
+	define("S_ZABBIX_TRAPPER",			"ZABBIX trapper");
 	define("S_SIMPLE_CHECK",			"Simple check");
 	define("S_SNMPV2_AGENT",			"SNMPv2 agent");
-	define("S_ZABBIX_INTERNAL",			"Zabbix internal");
+	define("S_ZABBIX_INTERNAL",			"ZABBIX internal");
 	define("S_ZABBIX_UNKNOWN",			"Unknown");
 	define("S_ACTIVE",				"Active");
 	define("S_NOT_ACTIVE",				"Not active");
@@ -363,6 +363,7 @@
 	define("S_MENU_USERS",				"USERS");
 	define("S_MENU_HOSTS",				"HOSTS");
 	define("S_MENU_ITEMS",				"ITEMS");
+	define("S_MENU_AUDIT",				"AUDIT");
 
 //	queue.php
 	define("S_QUEUE_BIG",				"QUEUE");
@@ -372,7 +373,7 @@
 	define("S_TOTAL",				"Total");
 
 //	report1.php
-	define("S_STATUS_OF_ZABBIX",			"Status of Zabbix");
+	define("S_STATUS_OF_ZABBIX",			"Status of ZABBIX");
 	define("S_STATUS_OF_ZABBIX_BIG",		"STATUS OF ZABBIX");
 	define("S_VALUE",				"Value");
 	define("S_ZABBIX_SUCKERD_IS_RUNNING",		"zabbix_suckerd is running");
@@ -498,6 +499,7 @@
 	define("S_CHANGE",				"Change");
 	define("S_TRIGGER_UPDATED",			"Trigger updated");
 	define("S_CANNOT_UPDATE_TRIGGER",		"Cannot update trigger");
+	define("S_DEPENDS_ON",				"Depends on");
 
 //	tr_comments.php
 	define("S_TRIGGER_COMMENTS",			"Trigger comments");
@@ -562,4 +564,16 @@
 	define("S_PASSWORD",				"Password");
 	define("S_PASSWORD_ONCE_AGAIN",			"Password (once again)");
 	define("S_URL_AFTER_LOGIN",			"URL (after login)");
+
+//	audit.php
+	define("S_AUDIT_LOG",				"Audit log");
+	define("S_AUDIT_LOG_BIG",			"AUDIT LOG");
+	define("S_ACTION",				"Action");
+	define("S_DETAILS",				"Details");
+	define("S_UNKNOWN_ACTION",			"Unknown action");
+	define("S_ADDED",				"Added");
+	define("S_UPDATED",				"Updated");
+	define("S_LOGGED_IN",				"Logged in");
+	define("S_LOGGED_OUT",				"Logged out");
+	define("S_MEDIA_TYPE",				"Media type");
 ?>

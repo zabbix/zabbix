@@ -399,6 +399,22 @@ CREATE TABLE users (
 ) type=InnoDB;
 
 --
+-- Table structure for table 'audit'
+--
+
+CREATE TABLE audit (
+  auditid		int(4)		NOT NULL auto_increment,
+  userid		int(4)		DEFAULT '0' NOT NULL,
+  clock			int(4)		DEFAULT '0' NOT NULL,
+  action		int(4)		DEFAULT '0' NOT NULL,
+  resource		int(4)		DEFAULT '0' NOT NULL,
+  details		varchar(128)	DEFAULT '0' NOT NULL,
+  PRIMARY KEY (auditid),
+  UNIQUE (userid,clock),
+  KEY (clock)
+) type=InnoDB;
+
+--
 -- Table structure for table 'sessions'
 --
 

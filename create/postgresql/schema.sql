@@ -169,6 +169,23 @@ CREATE TABLE users (
 CREATE UNIQUE INDEX users_alias on users (alias);
 
 --
+-- Table structure for table 'audit'
+--
+
+CREATE TABLE audit (
+  auditid		serial,
+  userid		int4		DEFAULT '0' NOT NULL,
+  clock			int4		DEFAULT '0' NOT NULL,
+  action		int4		DEFAULT '0' NOT NULL,
+  resource		int4		DEFAULT '0' NOT NULL,
+  details		varchar(128)	DEFAULT '0' NOT NULL,
+  PRIMARY KEY (auditid)
+);
+
+CREATE UNIQUE INDEX audit_userid_clock on audit (userid,clock);
+CREATE INDEX audit_clock on audit (clock);
+
+--
 -- Table structure for table 'actions'
 --
 

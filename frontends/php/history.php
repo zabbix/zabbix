@@ -189,8 +189,8 @@
 
 		show_table_header("Showing history of ".$_GET["period"]." seconds($hours h)<BR>[from: ".date("Y.M.d H:i:s",$time)."] [till: ".date("Y.M.d H:i:s",$till)."]");
 
-		echo "<TABLE BORDER=0 COLS=2 ALIGN=CENTER WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-		echo "<TR>";
+		echo "<TABLE BORDER=0 COLS=2 ALIGN=CENTER WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
+		echo "<TR BGCOLOR=\"#CCCCCC\">";
 		echo "<TD><B>".S_CLOCK."</B></TD>";
 		echo "<TD><B>".S_VALUE."</B></TD>";
 		echo "</TR>";
