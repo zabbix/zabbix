@@ -73,7 +73,9 @@ CREATE TABLE config (
   smtp_server		varchar(255)	DEFAULT '' NOT NULL,
   smtp_helo		varchar(255)	DEFAULT '' NOT NULL,
   smtp_email		varchar(255)	DEFAULT '' NOT NULL,
-  password_required	int(1)		DEFAULT '0' NOT NULL
+  password_required	int(1)		DEFAULT '0' NOT NULL,
+  alert_history		int(4)		DEFAULT '0' NOT NULL,
+  alarm_history		int(4)		DEFAULT '0' NOT NULL
 );
 
 #
@@ -131,7 +133,8 @@ CREATE TABLE alarms (
   clock			int(4)		DEFAULT '0' NOT NULL,
   istrue		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (alarmid),
-  KEY (triggerid,clock)
+  KEY (triggerid,clock),
+  KEY (clock)
 );
 
 #
