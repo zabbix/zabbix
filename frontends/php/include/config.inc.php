@@ -3629,8 +3629,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		cr();
 		echo "</tr>";
 		cr();
-		if($rownum%2 == 1)	{ echo "<TR BGCOLOR=#DDDDDD>"; }
-		else			{ echo "<TR BGCOLOR=#CCCCCC>"; }
+		if($rownum%2 == 1)	{ echo "<TR BGCOLOR=#DFDFDF>"; }
+		else			{ echo "<TR BGCOLOR=#D8D8D8>"; }
 		cr();
 //		echo "<td colspan=1 bgcolor=CCCCCC align=left valign=\"top\">";
 		echo "<td class=\"form_row_l\" height=24>";
