@@ -131,6 +131,12 @@
 		echo "<td><a href=\"config.php?register=change&mediatypeid=".$row["mediatypeid"]."\">Change</a></td>";
 		echo "</tr>";
 	}
+	if(DBnum_rows($result)==0)
+	{
+			echo "<TR BGCOLOR=#EEEEEE>";
+			echo "<TD COLSPAN=4 ALIGN=CENTER>-No media types defined-</TD>";
+			echo "<TR>";
+	}
 	echo "</TABLE>";
 	echo"<br>";
 ?>

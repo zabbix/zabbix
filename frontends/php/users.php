@@ -112,6 +112,12 @@
 		echo "</TD>";
 		echo "</TR>";
 	}
+	if(DBnum_rows($result)==0)
+	{
+			echo "<TR BGCOLOR=#EEEEEE>";
+			echo "<TD COLSPAN=3 ALIGN=CENTER>-No user groups defined-</TD>";
+			echo "<TR>";
+	}
 	echo "</TABLE>";
 	echo "<br>";
 ?>
@@ -174,6 +180,12 @@
 		}
 		echo "</TD>";
 		echo "</TR>";
+	}
+	if(DBnum_rows($result)==0)
+	{
+			echo "<TR BGCOLOR=#EEEEEE>";
+			echo "<TD COLSPAN=6 ALIGN=CENTER>-No users defined-</TD>";
+			echo "<TR>";
 	}
 	echo "</TABLE>";
 ?>
