@@ -21,7 +21,7 @@
 #include "checks_internal.h"
 
 #ifdef ZABBIX_THREADS
-int	get_value_internal(double *result,char *result_str,DB_ITEM *item)
+int	get_value_internal(double *result,char *result_str,DB_ITEM *item,char *error,int max_error_len)
 {
 	DB_HANDLE	database;
 
@@ -58,6 +58,8 @@ int	get_value_internal(double *result,char *result_str,DB_ITEM *item)
 	else
 	{
 		DBclose_thread(&database);
+		zabbix_log( LOG_LEVEL_WARNING, "Internal check [%s] is not supported", item->key);
+		snprintf(error,max_error_len-1,"Internal check [%s] is not supported", item->key);
 		return NOTSUPPORTED;
 	}
 
@@ -71,7 +73,7 @@ int	get_value_internal(double *result,char *result_str,DB_ITEM *item)
 }
 
 #else
-int	get_value_internal(double *result,char *result_str,DB_ITEM *item)
+int	get_value_internal(double *result,char *result_str,DB_ITEM *item,char *error,int max_error_len)
 {
 	if(strcmp(item->key,"zabbix[triggers]")==0)
 	{
@@ -103,6 +105,8 @@ int	get_value_internal(double *result,char *result_str,DB_ITEM *item)
 	}
 	else
 	{
+		zabbix_log( LOG_LEVEL_WARNING, "Internal check [%s] is not supported", item->key);
+		snprintf(error,max_error_len-1,"Internal check [%s] is not supported", item->key);
 		return NOTSUPPORTED;
 	}
 

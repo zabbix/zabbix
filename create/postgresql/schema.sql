@@ -32,6 +32,7 @@ CREATE TABLE hosts (
   status		int4		DEFAULT '0'		NOT NULL,
   disable_until		int4		DEFAULT '0'		NOT NULL,
   network_errors	int4		DEFAULT '0'		NOT NULL,
+  error			varchar(128)	DEFAULT ''		NOT NULL,
   PRIMARY KEY (hostid)
 );
 
@@ -72,6 +73,7 @@ CREATE TABLE items (
   snmpv3_authpassphrase	varchar(64)	DEFAULT '' NOT NULL,
   snmpv3_privpassphrase	varchar(64)	DEFAULT '' NOT NULL,
   formula		varchar(255)	DEFAULT '{.last(0)}' NOT NULL,
+  error			varchar(128)	DEFAULT '' NOT NULL,
   PRIMARY KEY (itemid),
   FOREIGN KEY (hostid) REFERENCES hosts
 );
@@ -233,13 +235,14 @@ CREATE TABLE alerts (
   alertid		serial,
   actionid		int4		DEFAULT '0' NOT NULL,
   clock			int4		DEFAULT '0' NOT NULL,
-  status		int4		DEFAULT '0' NOT NULL,
-  retries		int4		DEFAULT '0' NOT NULL,
 --  type		varchar(10)	DEFAULT '' NOT NULL,
   mediatypeid		int4		DEFAULT '0' NOT NULL,
   sendto		varchar(100)	DEFAULT '' NOT NULL,
   subject		varchar(255)	DEFAULT '' NOT NULL,
   message		text		DEFAULT '' NOT NULL,
+  status		int4		DEFAULT '0' NOT NULL,
+  retries		int4		DEFAULT '0' NOT NULL,
+  error			varchar(128)	DEFAULT '' NOT NULL,
   PRIMARY KEY (alertid),
   FOREIGN KEY (actionid) REFERENCES actions,
   FOREIGN KEY (mediatypeid) REFERENCES media_type

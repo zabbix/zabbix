@@ -225,7 +225,7 @@
 	}
 
 	echo "<a name=\"form\"></a>";
-	show_table2_header_begin();
+	show_form_begin("services.service");
 	echo S_SERVICE;
 	$col=0;
 
@@ -363,7 +363,7 @@
 		unset($_GET["triggerid"]);
 	}
 
-	show_table2_header_begin();
+	show_form_begin("services.link");
 	echo nbsp(S_LINK_TO);
 	$col=0;
 
@@ -420,7 +420,7 @@
 	if(isset($_GET["serviceid"]))
 	{
 
-	show_table2_header_begin();
+	show_form_begin("services.server");
 	echo nbsp(S_ADD_SERVER_DETAILS);
 	$col=0;
 

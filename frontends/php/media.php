@@ -141,7 +141,7 @@
 		$active=0;
 	}
 
-	show_table2_header_begin();
+	show_form_begin("media.media");
 	echo S_NEW_MEDIA;
 
 	$col=0;

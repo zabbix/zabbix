@@ -110,7 +110,7 @@
 		$rows=1;
 	}
 
-	show_table2_header_begin();
+	show_form_begin("screenconf.screen");
 	echo S_SCREEN;
 	$col=0;
 

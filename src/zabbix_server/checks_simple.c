@@ -19,7 +19,7 @@
 
 #include "checks_simple.h"
 
-int	get_value_simple(double *result,char *result_str,DB_ITEM *item)
+int	get_value_simple(double *result,char *result_str,DB_ITEM *item,char *error, int max_error_len)
 {
 	char	*e,*t;
 	char	c[MAX_STRING_LEN];
@@ -61,6 +61,7 @@ int	get_value_simple(double *result,char *result_str,DB_ITEM *item)
 	if(strcmp(result_str,"ZBX_NOTSUPPORTED\n") == 0)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Simple check [%s] is not supported", c);
+		snprintf(error,max_error_len-1,"Simple check [%s] is not supported", c);
 		ret = NOTSUPPORTED;
 	}
 	else

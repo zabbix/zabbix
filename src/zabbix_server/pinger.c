@@ -298,8 +298,10 @@ int	do_ping(void)
 			{
 #ifdef ZABBIX_THREADS
 				process_value(database,SERVER_ICMPPING_KEY,ip,"0");
+				process_value(database,SERVER_ICMPPINGSEC_KEY,ip,"0");
 #else
 				process_value(SERVER_ICMPPING_KEY,ip,"0");
+				process_value(SERVER_ICMPPINGSEC_KEY,ip,"0");
 #endif
 			}
 			else

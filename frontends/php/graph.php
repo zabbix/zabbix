@@ -161,7 +161,7 @@
 		$sortorder=0;
 	}
 
-	show_table2_header_begin();
+	show_form_begin("graph.item");
 	echo S_NEW_ITEM_FOR_THE_GRAPH;
 
 	show_table2_v_delimiter();

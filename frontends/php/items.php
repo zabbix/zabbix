@@ -204,10 +204,10 @@
 	if(isset($_GET["hostid"])&&!isset($_GET["type"])) 
 	{
 		table_begin();
-		table_header(array(S_ID,S_KEY,S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),S_HISTORY,S_TRENDS,S_SHORT_NAME,S_TYPE,S_STATUS,S_ACTIONS));
+		table_header(array(S_ID,S_KEY,S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,S_ERROR,S_ACTIONS));
 		echo "<form method=\"get\" action=\"items.php\">";
 		echo "<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_GET["hostid"]." size=8>";
-		$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.nextcheck,h.hostid,i.type,i.trends from hosts h,items i where h.hostid=i.hostid and h.hostid=".$_GET["hostid"]." order by h.host,i.key_,i.description");
+		$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.nextcheck,h.hostid,i.type,i.trends,i.error from hosts h,items i where h.hostid=i.hostid and h.hostid=".$_GET["hostid"]." order by h.host,i.key_,i.description");
 		$col=0;
 		while($row=DBfetch($result))
 		{
@@ -263,6 +263,15 @@
 				"<A HREF=\"items.php?register=change&itemid=".$row["itemid"]."#form\">".S_CHANGE."</A>",
 				S_CHANGE);
 
+			if($row["error"] == "")
+			{
+				$error=array("value"=>"&nbsp;","class"=>"off");
+			}
+			else
+			{
+				$error=array("value"=>$row["error"],"class"=>"on");
+			}
+
 			table_row(array(
 				$input,
 				$row["key_"],
@@ -270,14 +279,14 @@
 				$row["delay"],
 				$row["history"],
 				$row["trends"],
-				$row["host"].":".$row["key_"],
 				$type,
 				$status,
+				$error,
 				$actions
 				),$col++);
 		}
 		table_end();
-		show_table2_header_begin();
+		show_form_begin();
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Activate selected\" onClick=\"return Confirm('".S_ACTIVATE_SELECTED_ITEMS_Q."');\">";
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Disable selected\" onClick=\"return Confirm('".S_DISABLE_SELECTED_ITEMS_Q."');\">";
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Delete selected\" onClick=\"return Confirm('".S_DELETE_SELECTED_ITEMS_Q."');\">";

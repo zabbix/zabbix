@@ -2398,12 +2398,12 @@ void	process_new_value(DB_ITEM *item,char *value)
 		if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
 		{
 			/* Should we store delta or original value? */
-			if(item->delta == 0)
+			if(item->delta == ITEM_STORE_AS_IS)
 			{
 				DBadd_history(item->itemid,value_double,now);
 			}
 			/* Delta as speed of change */
-			else if(item->delta == 1)
+			else if(item->delta == ITEM_STORE_SPEED_PER_SECOND)
 			{
 				/* Save delta */
 				if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
@@ -2412,7 +2412,7 @@ void	process_new_value(DB_ITEM *item,char *value)
 				}
 			}
 			/* Real delta: simple difference between values */
-			else if(item->delta == 2)
+			else if(item->delta == ITEM_STORE_SIMPLE_CHANGE)
 			{
 				/* Save delta */
 				if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
@@ -2432,7 +2432,7 @@ void	process_new_value(DB_ITEM *item,char *value)
 		}
 	}
 
-	if(item->delta ==0)
+	if(item->delta == ITEM_STORE_AS_IS)
 	{
 		if((item->prevvalue_null == 1) || (strcmp(value_str,item->lastvalue_str) != 0) || (strcmp(item->prevvalue_str,item->lastvalue_str) != 0) )
 		{
@@ -2452,7 +2452,7 @@ void	process_new_value(DB_ITEM *item,char *value)
 		}
 	}
 	/* Logic for delta as speed of change */
-	else if(item->delta == 1)
+	else if(item->delta == ITEM_STORE_SPEED_PER_SECOND)
 	{
 		if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
 		{
@@ -2472,7 +2472,7 @@ void	process_new_value(DB_ITEM *item,char *value)
 		item->lastvalue_null=0;
 	}
 	/* Real delta: simple difference between values */
-	else if(item->delta == 2)
+	else if(item->delta == ITEM_STORE_SIMPLE_CHANGE)
 	{
 		if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
 		{

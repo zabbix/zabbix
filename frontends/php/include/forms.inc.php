@@ -48,7 +48,7 @@
 
 		$col=0;
 
-		show_table2_header_begin();
+		show_form_begin("users.user");
 		echo S_USER;
 
 		show_table2_v_delimiter($col++);
@@ -159,7 +159,7 @@
 			$formula=DBget_field($result,0,22);
 		}
 
-		show_table2_header_begin();
+		show_form_begin("items.item");
 		echo S_ITEM;
 
 		$col=0; 
@@ -443,7 +443,7 @@
 			$name="";
 		}
 
-		show_table2_header_begin();
+		show_form_begin("hosts.group");
 		echo S_HOST_GROUP;
 
 		show_table2_v_delimiter($col++);
@@ -513,7 +513,7 @@
 			$name="";
 		}
 
-		show_table2_header_begin();
+		show_form_begin("users.group");
 		echo S_USER_GROUP;
 
 		show_table2_v_delimiter($col++);
@@ -595,9 +595,7 @@
 	# Insert form for User permissions
 	function	insert_permissions_form($userid)
 	{
-		echo "<br>";
-
-		show_table2_header_begin();
+		show_form_begin("users.permission");
 		echo "New permission";
 
 		show_table2_v_delimiter();
@@ -647,7 +645,7 @@
 
 		$col=0;
 
-		show_table2_header_begin();
+		show_form_begin("index.login");
 		echo "Login";
 
 		show_table2_v_delimiter($col++);
@@ -672,9 +670,7 @@
 	# Insert form for Problem
 	function	insert_problem_form($problemid)
 	{
-		echo "<br>";
-
-		show_table2_header_begin();
+		show_form_begin();
 		echo "Problem definition";
 		show_table2_v_delimiter();
 		echo "<form method=\"post\" action=\"helpdesk.php\">";
@@ -744,7 +740,7 @@
 			$url="";
 		}
 
-		show_table2_header_begin();
+		show_form_begin("triggers.trigger");
 		echo "Trigger configuration";
  
 		show_table2_v_delimiter($col++);
@@ -881,7 +877,7 @@
 			$yaxismax=$row["yaxismax"];
 		}
 
-		show_table2_header_begin();
+		show_form_begin("graphs.graph");
 		echo S_GRAPH;
 
 		show_table2_v_delimiter();
