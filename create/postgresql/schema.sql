@@ -378,9 +378,9 @@ insert into triggers_template (triggertemplateid,itemtemplateid,description,expr
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (43,43,'WEB server is down','{:.last(0)}<1');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (43,43,'POP3 server is down','{:.last(0)}<1');
+	values (44,44,'POP3 server is down','{:.last(0)}<1');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (44,44,'IMAP server is down','{:.last(0)}<1');
+	values (45,45,'IMAP server is down','{:.last(0)}<1');
 
 
 --
