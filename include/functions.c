@@ -151,6 +151,10 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 	{
 		ret = evaluate_MAX(value,item,atoi(parameter));
 	}
+	else if(strcmp(function,"nodata")==0)
+	{
+		strcpy(value,"0");
+	}
 	else if(strcmp(function,"diff")==0)
 	{
 		if((item->lastvalue_null==1)||(item->prevvalue_null==1))
@@ -696,7 +700,7 @@ void	update_services(int triggerid, int status)
 /*
 * Re-calculate values of triggers
 */ 
-void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
+void	update_triggers(int itemid)
 {
 	char	sql[MAX_STRING_LEN+1];
 	char	exp[MAX_STRING_LEN+1];
@@ -708,19 +712,10 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 	int	i;
 	int	prevvalue;
 
-	if(flag == 0)
-	{
-		now=time(NULL);
-/* Added table hosts to eliminate unnecessary update of triggers */
-		sprintf(sql,"select t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value from triggers t,functions f,items i,hosts h where i.hostid=h.hostid and i.status<>3 and i.itemid=f.itemid and i.lastclock<=%d and t.status=%d and f.triggerid=t.triggerid and f.itemid%%%d=%d and (h.status=0 or (h.status=2 and h.disable_until<%d)) group by t.triggerid,t.expression,t.dep_level",lastclock,TRIGGER_STATUS_ENABLED,suckers-1,sucker_num-1,now);
-	}
-	else
-	{
 /* Does not work for PostgreSQL */
 /*		sprintf(sql,"select t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.dep_level",TRIGGER_STATUS_ENABLED,sucker_num);*/
 /* Is it correct SQL? */
-		sprintf(sql,"select distinct t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d",TRIGGER_STATUS_ENABLED,sucker_num);
-	}
+	sprintf(sql,"select distinct t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value from triggers t,functions f,items i where i.status<>%d and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d",ITEM_STATUS_NOTSUPPORTED, TRIGGER_STATUS_ENABLED, itemid);
 
 	result = DBselect(sql);
 
@@ -927,7 +922,7 @@ int	process_data(int sockfd,char *server,char *key,char *value)
 
 	process_new_value(&item,value);
 
-	update_triggers(0, 1, item.itemid, 0 );
+	update_triggers(item.itemid);
  
 	DBfree_result(result);
 

@@ -4804,7 +4804,7 @@ No
 
 \layout Standard
 
-Number of zabbix_suckerd to start (3-255)
+Number of zabbix_suckerd to start (4-255)
 \end_inset 
 </cell>
 </row>
@@ -6776,6 +6776,13 @@ previous value, parameter is ignored
 
 str find string in last (most recent) value, parameter - string to find.
  1 - found, 0 - otherwise
+\layout Description
+
+nodata 1- if no data received during last 
+\emph on 
+parameter 
+\emph default 
+seconds, 0 - otherwise
 \layout Standard
 
 Note that all above functions (except 

@@ -3,13 +3,10 @@ Not ready yet:
  HBLV:
 
  - Availability report for IT Services
- - Services: Link to trigger (wrong name)
  - Tree like in old Zabbix
  - SNMP trapping
- - Support for nodata
  - Think about BACKUP for HISTORY
  - Triggers comment. Hide right should work.
-
 
  DISTRIBUTED MONITORING:
 
@@ -31,7 +28,7 @@ Not ready yet:
 
  OTHER:
 
- - why Zabbix write Host ... will b checked after 60 seconds after the host was enabled ?
+ - check for function parameters in evaluate_simple_expression
  - make links different if something is already registered (as for medias,
    actions, etc)
  - get rid of problems with ' and "
@@ -40,19 +37,27 @@ Not ready yet:
  - high level Zabbix schema on paper !
  - permissions for all *.php (charts, graphs , hosts, etc etc )
  - add numeric constants to trigger expressions
- - support for .str(string) in trigger expressions. Type of
-   functions.parameter needs tp be changed
  - show who is online somewhere (in User config form?)
  - setup demo site
- - test carefully all trigger expression forms
  - update function.lastvalue to NULL when trigger's status becomes
    UNKNOWN (done?)
  - update trigger status to unknown if cannot evaluate function 
  - do not dump "Expression cannot be evaluated" in case if function.lastvalue
    is NULL
 
+ TO TEST:
+
+  - validation of trigger expressions in PHP frontend
+  - nodata() for trapped parameters
+  - everything for PostgreSQL
+
 Changes for 1.0beta6:
 
+ - support for function nodata() added (Alexei)
+ - minimum number of zabbix_suckerd that can be started is 4 (Alexei)
+ - simplified function update_triggers(). (Alexei)
+ - fixed situation when Service is linked to a trigger. Service name is
+   correct now. (Alexei)
  - support for new trigger function: str() (Alexei)
  - changed type of functions.parameter to varchar(255) (Alexei)
  - additional colors for graphs (Alexei)
