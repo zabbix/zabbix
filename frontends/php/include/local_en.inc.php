@@ -237,10 +237,11 @@
 	define("S_CANNOT_UPDATE_HOST_STATUS",		"Cannot update host status");
 	define("S_HOST_DELETED",			"Host deleted");
 	define("S_CANNOT_DELETE_HOST",			"Cannot delete host");
-	define("S_CONFIGURATION_OF_HOST_GROUPS",	"CONFIGURATION OF HOST GROUPS");
+	define("S_CONFIGURATION_OF_HOSTS_AND_HOST_GROUPS","CONFIGURATION OF HOSTS AND HOST GROUPS");
+	define("S_HOST_GROUPS_BIG",			"HOST GROUPS");
 	define("S_NO_HOST_GROUPS_DEFINED",		"No host groups defined");
 	define("S_NO_HOSTS_DEFINED",			"No hosts defined");
-	define("S_CONFIGURATION_OF_HOSTS_BIG",		"CONFIGURATION OF HOSTS");
+	define("S_HOSTS_BIG",				"HOSTS");
 	define("S_HOST",				"Host");
 	define("S_IP",					"IP");
 	define("S_PORT",				"Port");
@@ -579,8 +580,10 @@
 	define("S_CANNOT_UPDATE_GROUP",			"Cannot update group");
 	define("S_GROUP_DELETED",			"Group deleted");
 	define("S_CANNOT_DELETE_GROUP",			"Cannot delete group");
-	define("S_CONFIGURATION_OF_USER_GROUPS_BIG",	"CONFIGURATION OF USER GROUPS");
-	define("S_CONFIGURATION_OF_USERS_BIG",		"CONFIGURATION OF USERS");
+	define("S_CONFIGURATION_OF_USERS_AND_USER_GROUPS","CONFIGURATION OF USERS AND USER GROUPS");
+	define("S_USER_GROUPS_BIG",			"USER GROUPS");
+	define("S_USERS_BIG",				"USERS");
+	define("S_USER_GROUPS",				"User groups");
 	define("S_MEMBERS",				"Members");
 	define("S_NO_USER_GROUPS_DEFINED",		"No user groups defined");
 	define("S_ALIAS",				"Alias");

@@ -129,110 +129,132 @@
 ?>
 
 <?php
-	show_table_header(S_CONFIGURATION_OF_USER_GROUPS_BIG);
 ?>
 
-
 <?php
-	table_begin();
-	table_header(array(S_ID,S_NAME,S_MEMBERS,S_ACTIONS));
-
-	$result=DBselect("select usrgrpid,name from usrgrp order by name");
-	$col=0;
-	while($row=DBfetch($result))
+	if(!isset($_GET["config"]))
 	{
-		if(!check_right("User group","R",$row["usrgrpid"]))
-		{
-			continue;
-		}
-		$result1=DBselect("select distinct u.alias from users u,users_groups ug where u.userid=ug.userid and ug.usrgrpid=".$row["usrgrpid"]." order by alias");
-		$users="&nbsp;";
-		for($i=0;$i<DBnum_rows($result1);$i++)
-		{
-			$users=$users.DBget_field($result1,$i,0);
-			if($i<DBnum_rows($result1)-1)
-			{
-				$users=$users.", ";
-			}
-		}
-		$actions="<A HREF=\"users.php?usrgrpid=".$row["usrgrpid"]."#form\">Change</A>";
-		table_row(array(
-			$row["usrgrpid"],
-			$row["name"],
-			$users,
-			$actions
-			),$col++);
+		$_GET["config"]=0;
 	}
-	if(DBnum_rows($result)==0)
-	{
-			echo "<TR BGCOLOR=#EEEEEE>";
-			echo "<TD COLSPAN=3 ALIGN=CENTER>".S_NO_USER_GROUPS_DEFINED."</TD>";
-			echo "<TR>";
-	}
-	table_end();
+
+	$h1=S_CONFIGURATION_OF_USERS_AND_USER_GROUPS;
+
+#	$h2=S_GROUP."&nbsp;";
+	$h2="";
+	$h2=$h2."<select class=\"biginput\" name=\"config\" onChange=\"submit()\">";
+	$h2=$h2."<option value=\"0\" ".iif(isset($_GET["config"])&&$_GET["config"]==0,"selected","").">".S_USERS;
+	$h2=$h2."<option value=\"1\" ".iif(isset($_GET["config"])&&$_GET["config"]==1,"selected","").">".S_USER_GROUPS;
+	$h2=$h2."</select>";
+
+	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"users.php\">", "</form>");
 ?>
 
 <?php
-	show_table_header(S_CONFIGURATION_OF_USERS_BIG);
-?>
-
-<?php
-	table_begin();
-	table_header(array(S_ID,S_ALIAS,S_NAME,S_SURNAME,S_IS_ONLINE_Q,S_ACTIONS));
-
-	$result=DBselect("select u.userid,u.alias,u.name,u.surname from users u order by u.alias");
-	$col=0;
-	while($row=DBfetch($result))
+	if($_GET["config"]==1)
 	{
-		if(!check_right("User","R",$row["userid"]))
-		{
-			continue;
-		}
+		echo "<br>";
+		show_table_header(S_USER_GROUPS_BIG);
+		table_begin();
+		table_header(array(S_ID,S_NAME,S_MEMBERS,S_ACTIONS));
 	
-		$sql="select count(*) as count from sessions where userid=".$row["userid"]." and lastaccess-600<".time();
-		$result2=DBselect($sql);
-		$row2=DBfetch($result2);
-		if($row2["count"]>0)
-			$online=array("value"=>S_YES,"class"=>"on");
-		else
-			$online=array("value"=>S_NO,"class"=>"off");
-
-        	if(check_right("User","U",$row["userid"]))
+		$result=DBselect("select usrgrpid,name from usrgrp order by name");
+		$col=0;
+		while($row=DBfetch($result))
 		{
-			if(get_media_count_by_userid($row["userid"])>0)
+			if(!check_right("User group","R",$row["usrgrpid"]))
 			{
-				$actions="<A HREF=\"users.php?register=change&userid=".$row["userid"]."#form\">".S_CHANGE."</A> - <A HREF=\"media.php?userid=".$row["userid"]."\"><b>M</b>edia</A>";
+				continue;
+			}
+			$result1=DBselect("select distinct u.alias from users u,users_groups ug where u.userid=ug.userid and ug.usrgrpid=".$row["usrgrpid"]." order by alias");
+			$users="&nbsp;";
+			for($i=0;$i<DBnum_rows($result1);$i++)
+			{
+				$users=$users.DBget_field($result1,$i,0);
+				if($i<DBnum_rows($result1)-1)
+				{
+					$users=$users.", ";
+				}
+			}
+			$actions="<A HREF=\"users.php?config=".$_GET["config"]."&usrgrpid=".$row["usrgrpid"]."#form\">".S_CHANGE."</A>";
+			table_row(array(
+				$row["usrgrpid"],
+				$row["name"],
+				$users,
+				$actions
+				),$col++);
+		}
+		if(DBnum_rows($result)==0)
+		{
+				echo "<TR BGCOLOR=#EEEEEE>";
+				echo "<TD COLSPAN=3 ALIGN=CENTER>".S_NO_USER_GROUPS_DEFINED."</TD>";
+				echo "<TR>";
+		}
+		table_end();
+	}
+?>
+
+<?php
+	if($_GET["config"]==0)
+	{
+		echo "<br>";
+		show_table_header(S_USERS_BIG);
+		table_begin();
+		table_header(array(S_ID,S_ALIAS,S_NAME,S_SURNAME,S_IS_ONLINE_Q,S_ACTIONS));
+	
+		$result=DBselect("select u.userid,u.alias,u.name,u.surname from users u order by u.alias");
+		$col=0;
+		while($row=DBfetch($result))
+		{
+			if(!check_right("User","R",$row["userid"]))
+			{
+				continue;
+			}
+		
+			$sql="select count(*) as count from sessions where userid=".$row["userid"]." and lastaccess-600<".time();
+			$result2=DBselect($sql);
+			$row2=DBfetch($result2);
+			if($row2["count"]>0)
+				$online=array("value"=>S_YES,"class"=>"on");
+			else
+				$online=array("value"=>S_NO,"class"=>"off");
+	
+	        	if(check_right("User","U",$row["userid"]))
+			{
+				if(get_media_count_by_userid($row["userid"])>0)
+				{
+					$actions="<A HREF=\"users.php?register=change&config=".$_GET["config"]."&userid=".$row["userid"]."#form\">".S_CHANGE."</A> - <A HREF=\"media.php?userid=".$row["userid"]."\"><b>M</b>edia</A>";
+				}
+				else
+				{
+					$actions="<A HREF=\"users.php?register=change&config=".$_GET["config"]."&userid=".$row["userid"]."#form\">".S_CHANGE."</A> - <A HREF=\"media.php?userid=".$row["userid"]."\">".S_MEDIA."</A>";
+				}
 			}
 			else
 			{
-				$actions="<A HREF=\"users.php?register=change&userid=".$row["userid"]."#form\">".S_CHANGE."</A> - <A HREF=\"media.php?userid=".$row["userid"]."\">".S_MEDIA."</A>";
+				$actions=S_CHANGE." - ".S_MEDIA;
 			}
+	
+			table_row(array(
+				$row["userid"],
+				$row["alias"],
+				$row["name"],
+				$row["surname"],
+				$online,
+				$actions
+				),$col++);
 		}
-		else
+		if(DBnum_rows($result)==0)
 		{
-			$actions=S_CHANGE." - ".S_MEDIA;
+				echo "<TR BGCOLOR=#EEEEEE>";
+				echo "<TD COLSPAN=6 ALIGN=CENTER>".S_NO_USERS_DEFINED."</TD>";
+				echo "<TR>";
 		}
-
-		table_row(array(
-			$row["userid"],
-			$row["alias"],
-			$row["name"],
-			$row["surname"],
-			$online,
-			$actions
-			),$col++);
+		table_end();
 	}
-	if(DBnum_rows($result)==0)
-	{
-			echo "<TR BGCOLOR=#EEEEEE>";
-			echo "<TD COLSPAN=6 ALIGN=CENTER>".S_NO_USERS_DEFINED."</TD>";
-			echo "<TR>";
-	}
-	table_end();
 ?>
 
 <?php
-	if(isset($_GET["userid"]))
+	if(isset($_GET["userid"])&&($_GET["config"]==0))
 	{
 	echo "<a name=\"form\"></a>";
 	show_table_header("USER PERMISSIONS");
@@ -279,9 +301,15 @@
 ?>
 
 <?php
-	@insert_usergroups_form($_GET["usrgrpid"]);
+	if($_GET["config"]==1)
+	{
+		@insert_usergroups_form($_GET["usrgrpid"]);
+	}
 
-	@insert_user_form($_GET["userid"]);
+	if($_GET["config"]==0)
+	{
+		@insert_user_form($_GET["userid"]);
+	}
 ?>
 
 <?php
