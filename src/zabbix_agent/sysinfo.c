@@ -1141,7 +1141,7 @@ float	EXECUTE(char *command)
 	f=popen( command,"r");
 	if(f==0)
 	{
-		switch errno
+		switch (errno)
 		{
 			case	EINTR:
 				return TIMEOUT_ERROR;
@@ -1153,7 +1153,7 @@ float	EXECUTE(char *command)
 	if(NULL == fgets(c,1024,f))
 	{
 		pclose(f);
-		switch errno
+		switch (errno)
 		{
 			case	EINTR:
 				return TIMEOUT_ERROR;
@@ -1164,7 +1164,7 @@ float	EXECUTE(char *command)
 
 	if(pclose(f) != 0)
 	{
-		switch errno
+		switch (errno)
 		{
 			case	EINTR:
 				return TIMEOUT_ERROR;
