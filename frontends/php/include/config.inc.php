@@ -2955,6 +2955,26 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	        }
 		echo "</select>";
 
+/*		show_table2_v_delimiter();
+		echo "Host";
+		show_table2_h_delimiter();
+		echo "<select multiple class=\"biginput\" name=\"hostid[]\" size=\"5\">";
+	        $result=DBselect("select hostid,host from hosts order by host");
+	        for($i=0;$i<DBnum_rows($result);$i++)
+	        {
+	                $hostid_=DBget_field($result,$i,0);
+	                $host_=DBget_field($result,$i,1);
+			if($host==$host_)
+			{
+	                	echo "<option value=\"$hostid_\" selected>$host_";
+			}
+			else
+			{
+	                	echo "<option value=\"$hostid_\">$host_";
+			}
+	        }
+		echo "</select>";*/
+
 		show_table2_v_delimiter();
 		echo "Type";
 		show_table2_h_delimiter();
@@ -3038,6 +3058,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
  
 		show_table2_v_delimiter2();
 		echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+		echo "<input type=\"submit\" name=\"register\" value=\"add to all hosts\">";
 		if(isset($itemid))
 		{
 			echo "<input type=\"submit\" name=\"register\" value=\"update\">";
