@@ -278,7 +278,7 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 	i=sizeof(struct sockaddr_in);
 
 	i=recvfrom(s,c,1023,0,(struct sockaddr *)&servaddr_in,&i);
-	if(i==-1)
+	if(i == -1)
 	{
 		switch (errno)
 		{
@@ -309,6 +309,7 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 	{
 		if( cmp_double(*result,NOTSUPPORTED) == 0)
 		{
+			syslog(LOG_WARNING, "NOTSUPPORTED1 [%s]", c );
 			return NOTSUPPORTED;
 		}
 		else

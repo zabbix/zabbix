@@ -156,7 +156,7 @@
 
 //		echo "Validating simple:$expression<br>";
 //		if (eregi('^\{([0-9a-zA-Z\_\.]+)\:([0-9a-zA-Z\_]+)\.((diff)|(min)|(max)|(last)|(nodata))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
-		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/]+)\.((diff)|(min)|(max)|(last)|(prev))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
+		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.]+)\.((diff)|(min)|(max)|(last)|(prev))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
 		{
 			$host=$arr[1];
 			$key=$arr[2];
@@ -777,10 +777,10 @@
 			}
 			if( ($expression[$i] == '}')&&($state=="") )
 			{
-#				echo "HOST:$host<BR>";
-#				echo "KEY:$key<BR>";
-#				echo "FUNCTION:$function<BR>";
-#				echo "PARAMETER:$parameter<BR>";
+//				echo "HOST:$host<BR>";
+//				echo "KEY:$key<BR>";
+//				echo "FUNCTION:$function<BR>";
+//				echo "PARAMETER:$parameter<BR>";
 				$state='';
 		
 				$sql="select i.itemid from items i,hosts h where i.key_='$key' and h.host='$host' and h.hostid=i.hostid";
@@ -842,6 +842,14 @@
 				if($state == "KEY")
 				{
 					$state="FUNCTION";
+					continue;
+				}
+				// Support for '.' in KEY
+				if($state == "FUNCTION")
+				{
+					$state="FUNCTION";
+					$key=$key.".".$function;
+					$function="";
 					continue;
 				}
 			}
