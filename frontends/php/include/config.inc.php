@@ -19,8 +19,8 @@
 **/
 ?>
 <?php
-	include 	"include/defines.inc.php";
-	include 	"include/db.inc.php";
+	include_once 	"include/defines.inc.php";
+	include_once 	"include/db.inc.php";
 
 	$USER_DETAILS	="";
 	$ERROR_MSG	="";
@@ -2616,7 +2616,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Update User definition
 
-	function	update_user($userid,$name,$surname,$alias,$passwd)
+	function	update_user($userid,$name,$surname,$alias,$passwd, $url)
 	{
 		global	$ERROR_MSG;
 
@@ -2628,12 +2628,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		if($passwd=="")
 		{
-			$sql="update users set name='$name',surname='$surname',alias='$alias' where userid=$userid";
+			$sql="update users set name='$name',surname='$surname',alias='$alias',url='$url' where userid=$userid";
 		}
 		else
 		{
 			$passwd=md5($passwd);
-			$sql="update users set name='$name',surname='$surname',alias='$alias',passwd='$passwd' where userid=$userid";
+			$sql="update users set name='$name',surname='$surname',alias='$alias',passwd='$passwd',url='$url' where userid=$userid";
 		}
 		return DBexecute($sql);
 	}
@@ -2648,7 +2648,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Add User definition
 
-	function	add_user($name,$surname,$alias,$passwd)
+	function	add_user($name,$surname,$alias,$passwd,$url)
 	{
 		global	$ERROR_MSG;
 
@@ -2659,7 +2659,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 
 		$passwd=md5($passwd);
-		$sql="insert into users (name,surname,alias,passwd) values ('$name','$surname','$alias','$passwd')";
+		$sql="insert into users (name,surname,alias,passwd,url) values ('$name','$surname','$alias','$passwd','$url')";
 		return DBexecute($sql);
 	}
 
@@ -4287,72 +4287,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		show_table2_v_delimiter2();
 		echo "<input class=\"button\" class=\"button\" type=\"submit\" name=\"register\" value=\"Enter\">";
-		show_table2_header_end();
-	}
-
-
-	# Insert form for User
-	function	insert_user_form($userid)
-	{
-		if(isset($userid))
-		{
-			$result=DBselect("select u.alias,u.name,u.surname,u.passwd from users u where u.userid=$userid");
-	
-			$alias=DBget_field($result,0,0);
-			$name=DBget_field($result,0,1);
-			$surname=DBget_field($result,0,2);
-#			$password=DBget_field($result,0,3);
-			$password="";
-		}
-		else
-		{
-			$alias="";
-			$name="";
-			$surname="";
-			$password="";
-		}
-
-		show_table2_header_begin();
-		echo "User";
-
-		show_table2_v_delimiter();
-		echo "<form method=\"get\" action=\"users.php\">";
-		if(isset($userid))
-		{
-			echo "<input class=\"biginput\" name=\"userid\" type=\"hidden\" value=\"$userid\" size=8>";
-		}
-		echo "Alias";
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"alias\" value=\"$alias\" size=20>";
-
-		show_table2_v_delimiter();
-		echo "Name";
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=20>";
-
-		show_table2_v_delimiter();
-		echo "Surname";
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"surname\" value=\"$surname\" size=20>";
-
-		show_table2_v_delimiter();
-		echo "Password";
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" type=\"password\" name=\"password1\" value=\"$password\" size=20>";
-
-		show_table2_v_delimiter();
-		echo nbsp("Password (once again)");
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" type=\"password\" name=\"password2\" value=\"$password\" size=20>";
-
-		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
-		if(isset($userid))
-		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected user?');\">";
-		}
-
 		show_table2_header_end();
 	}
 
