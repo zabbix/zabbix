@@ -2699,6 +2699,65 @@ inodetotal[*]
 \layout Itemize
 
 Host selection for availability report
+\layout Subsubsection
+
+Zabbix 1.0beta6
+\layout Itemize
+
+
+\emph on 
+register_globals
+\emph default 
+ can be set to 
+\emph on 
+off
+\emph default 
+ in 
+\emph on 
+php.ini
+\layout Itemize
+
+new table 
+\emph on 
+service_alarms
+\layout Itemize
+
+support for function 
+\emph on 
+nodata()
+\layout Itemize
+
+support for function 
+\emph on 
+str()
+\layout Itemize
+
+IMPORTANT.
+ Minimum number of 
+\series bold 
+zabbix_suckerd
+\series default 
+ is 4
+\layout Itemize
+
+additional colors for graphs
+\layout Itemize
+
+status of a trigger will blink if it was changes during last 300 seconds
+\layout Itemize
+
+added 
+\emph on 
+misc/init.d/debian/zabbix-[suckerd|trapperd]
+\layout Itemize
+
+support for SCO OpenServer
+\layout Itemize
+
+reason of problem in screen IT Services
+\layout Itemize
+
+IMPORTANT Added IT Helpdesk (experimental, do not use for live systems)
 \layout Subsection
 
 ChangeLog
@@ -3153,6 +3212,305 @@ DBfree_result()
 \layout Itemize
 
 fixed missing close of socket in case if connection to SMTP server is rejected
+\layout Subsubsection
+
+Zabbix 1.0beta6
+\layout Itemize
+
+if trigger status is UNKNOWN, set function.lastvalue to NULL
+\layout Itemize
+
+fixed permission check for all *.php
+\layout Itemize
+
+Priority was renamed to Severity
+\layout Itemize
+
+added graph to availability report
+\layout Itemize
+
+added 
+\emph on 
+frontends/php/chart4.php
+\layout Itemize
+
+availability report will not show trigger expressions
+\layout Itemize
+
+added creation of table 
+\emph on 
+sessions
+\emph default 
+ to migration scripts for 1.0beta4
+\layout Itemize
+
+no dependency on 
+\emph on 
+register_globals
+\emph default 
+ in 
+\emph on 
+php.ini
+\layout Itemize
+
+
+\series bold 
+zabbix_suckerd
+\series default 
+ to write "
+\emph on 
+Connection reset by peer
+\emph default 
+" to 
+\emph on 
+LogFile
+\layout Itemize
+
+
+\emph on 
+
+\backslash 
+n
+\emph default 
+ change to 
+\emph on 
+
+\backslash 
+r
+\backslash 
+n
+\emph default 
+ in 
+\emph on 
+send_email()
+\layout Itemize
+
+added table 
+\emph on 
+service_alarms
+\layout Itemize
+
+fixed problem with parsing of trigger expressions.
+ 
+\emph on 
+[.-.]
+\emph default 
+ changed to 
+\emph on 
+-
+\layout Itemize
+
+support for function 
+\emph on 
+nodata()
+\emph default 
+ added
+\layout Itemize
+
+minimum number of 
+\series bold 
+zabbix_suckerd
+\series default 
+ that can be started is 4
+\layout Itemize
+
+simplified function 
+\series bold 
+update_triggers()
+\layout Itemize
+
+fixed situation when a Service is linked to a trigger.
+ Service name is correct now.
+\layout Itemize
+
+support for new trigger function 
+\emph on 
+str()
+\layout Itemize
+
+changed type of 
+\emph on 
+functions.parameter
+\emph default 
+ to 
+\emph on 
+varchar(255)
+\layout Itemize
+
+additional colors for graphs
+\layout Itemize
+
+in 
+\emph on 
+chart3.php
+\emph default 
+: 
+\emph on 
+group by <complex expression>
+\emph default 
+ changed to 
+\emph on 
+group by 1
+\layout Itemize
+
+added housekeeping procedure for table 
+\emph on 
+sessions
+\layout Itemize
+
+changed 
+\emph on 
+width=
+\backslash 
+"X%
+\backslash 
+"
+\emph default 
+ to 
+\emph on 
+width=X%
+\emph default 
+ in 
+\emph on 
+*.php
+\layout Itemize
+
+status of a trigger will blink if it was changes during last 300 seconds
+\layout Itemize
+
+
+\series bold 
+Zabbix
+\series default 
+ daemons to update 
+\emph on 
+triggers.lastchange
+\emph default 
+ when 
+\emph on 
+triggers.value
+\emph default 
+ is changed
+\layout Itemize
+
+added 
+\emph on 
+misc/init.d/debian/zabbix-[suckerd|trapperd]
+\layout Itemize
+
+removed 
+\emph on 
+misc/init.d/debian/zabbix-server
+\layout Itemize
+
+
+\emph on 
+send_email()
+\emph default 
+ will timeout after 10 seconds
+\layout Itemize
+
+
+\emph on 
+DBadd_alarm()
+\emph default 
+ renamed to 
+\emph on 
+add_alarm()
+\layout Itemize
+
+support for SCO OpenServer.
+ Thanks to Alexender Kirhenstein.
+\layout Itemize
+
+
+\emph on 
+./configure
+\emph default 
+ will correctly define 
+\emph on 
+socklen_t
+\layout Itemize
+
+
+\emph on 
+<center>
+\emph default 
+ changed to 
+\emph on 
+<div align=center>
+\layout Itemize
+
+reason of problem in screen IT Services
+\layout Itemize
+
+added 
+\emph on 
+frontends/php/helpdesk.php
+\layout Itemize
+
+added tables: 
+\emph on 
+problems, problems_comments,categories
+\layout Itemize
+
+added "
+\emph on 
+...#form
+\emph default 
+" to button Change in form Configuration of Users
+\layout Itemize
+
+"
+\emph on 
+Just for information
+\emph default 
+" changed to "
+\emph on 
+Information
+\emph default 
+"
+\layout Itemize
+
+fixed 
+\emph on 
+./configure
+\emph default 
+ to correctly find zlib
+\layout Itemize
+
+housekeeping to delete no more than 
+\emph on 
+HousekeepingFrequency*3600
+\emph default 
+ records from table 
+\emph on 
+history
+\emph default 
+ and 
+\emph on 
+history_str
+\emph default 
+ at once (MySQL only)
+\layout Itemize
+
+changed definition of 
+\emph on 
+functions.lastvalue
+\emph default 
+ to allow NULL
+\layout Itemize
+
+added 
+\emph on 
+upgrades/dbpatches/1.0beta5_to_1.0beta6/
+\emph default 
+ with patches
+\layout Itemize
+
+added 
+\emph on 
+misc/init.d/debian/zabbix_agent
 \layout Section
 
 Zabbix Architecture

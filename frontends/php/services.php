@@ -226,8 +226,8 @@
 	}
 	else
 	{
-		echo "<OPTION VALUE='0' SELECTED>Do not calculate";
-		echo "<OPTION VALUE='1'>MAX";
+		echo "<OPTION VALUE='0'>Do not calculate";
+		echo "<OPTION VALUE='1' SELECTED>MAX";
 	}
 	echo "</SELECT>";
 
