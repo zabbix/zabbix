@@ -42,13 +42,14 @@ int	parent=0;
 /* Number of processed requests */
 int	stats_request=0;
 
-static	char	*CONFIG_HOST_ALLOWED=NULL;
-static	char	*CONFIG_PID_FILE=NULL;
-static	char	*CONFIG_LOG_FILE=NULL;
-static	int	CONFIG_AGENTD_FORKS=AGENTD_FORKS;
-static	int	CONFIG_NOTIMEWAIT=0;
-static	int	CONFIG_TIMEOUT=AGENT_TIMEOUT;
-static	int	CONFIG_LISTEN_PORT=10000;
+static	char	*CONFIG_HOST_ALLOWED		= NULL;
+static	char	*CONFIG_PID_FILE		= NULL;
+static	char	*CONFIG_LOG_FILE		= NULL;
+static	int	CONFIG_AGENTD_FORKS		= AGENTD_FORKS;
+static	int	CONFIG_NOTIMEWAIT		= 0;
+static	int	CONFIG_TIMEOUT			= AGENT_TIMEOUT;
+static	int	CONFIG_LISTEN_PORT		= 10000;
+static	int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 
 void	uninit(void)
 {
@@ -91,6 +92,10 @@ void	signal_handler( int sig )
 		zabbix_log( LOG_LEVEL_WARNING, "One child process died. Exiting ...");
 		uninit();
 		exit( FAIL );
+	}
+	else if( SIGPIPE == sig)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Got SIGPIPE. Where it came from???");
 	}
 	else
 	{
@@ -155,14 +160,6 @@ void    daemon_init(void)
 /*        openlog("zabbix_agentd",LOG_LEVEL_PID,LOG_USER);
 	setlogmask(LOG_UPTO(LOG_WARNING));*/
 
-	if(CONFIG_LOG_FILE == NULL)
-	{
-		zabbix_open_log(LOG_TYPE_SYSLOG,LOG_LEVEL_WARNING,NULL);
-	}
-	else
-	{
-		zabbix_open_log(LOG_TYPE_FILE,LOG_LEVEL_WARNING,CONFIG_LOG_FILE);
-	}
 
 	if(setpriority(PRIO_PROCESS,0,5)!=0)
 	{
@@ -301,17 +298,15 @@ void	process_config_file(void)
 		{
 			if(strcmp(value,"1") == 0)
 			{
-//				setlogmask(LOG_LEVEL_UPTO(LOG_CRIT));
+				CONFIG_LOG_LEVEL=LOG_LEVEL_CRIT;
 			}
 			else if(strcmp(value,"2") == 0)
 			{
-//				setlogmask(LOG_UPTO(LOG_WARNING));
+				CONFIG_LOG_LEVEL=LOG_LEVEL_WARNING;
 			}
 			else if(strcmp(value,"3") == 0)
 			{
-//				setlogmask(LOG_UPTO(LOG_DEBUG));
-				zabbix_log( LOG_LEVEL_WARNING, "DebugLevel -[%s]",value);
-				zabbix_log( LOG_LEVEL_DEBUG, "DebugLevel --[%s]",value);
+				CONFIG_LOG_LEVEL=LOG_LEVEL_DEBUG;
 			}
 			else
 			{
@@ -535,8 +530,18 @@ int	main()
 	sigaction(SIGINT, &phan, NULL);
 	sigaction(SIGQUIT, &phan, NULL);
 	sigaction(SIGTERM, &phan, NULL);
+	sigaction(SIGPIPE, &phan, NULL);
 
 	process_config_file();
+
+	if(CONFIG_LOG_FILE == NULL)
+	{
+		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
+	}
+	else
+	{
+		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
+	}
 
 	create_pid_file();
 

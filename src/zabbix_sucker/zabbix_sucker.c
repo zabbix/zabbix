@@ -43,6 +43,7 @@ static	int	CONFIG_SUCKERD_FORKS		=SUCKER_FORKS;
 static	int	CONFIG_NOTIMEWAIT		=0;
 static	int	CONFIG_TIMEOUT			=SUCKER_TIMEOUT;
 static	int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
+static	int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 static	char	*CONFIG_PID_FILE		= NULL;
 static	char	*CONFIG_LOG_FILE		= NULL;
 static	char	*CONFIG_DBNAME			= NULL;
@@ -200,7 +201,7 @@ void	create_pid_file(void)
 
 void	init_config(void)
 {
-	struct cfg_line cfg[]=
+	static struct cfg_line cfg[]=
 	{
 /*		 PARAMETER	,VAR	,FUNC,	TYPE(0i,1s),MANDATORY,MIN,MAX	*/
 		{"StartSuckers",&CONFIG_SUCKERD_FORKS,0,TYPE_INT,PARM_OPT,2,255},
@@ -310,15 +311,15 @@ void	process_config_file(void)
 		{
 			if(strcmp(value,"1") == 0)
 			{
-//				setlogmask(LOG_LEVEL_UPTO(LOG_CRIT));
+				CONFIG_LOG_LEVEL=LOG_LEVEL_CRIT;
 			}
 			else if(strcmp(value,"2") == 0)
 			{
-//				setlogmask(LOG_LEVEL_UPTO(LOG_WARNING));
+				CONFIG_LOG_LEVEL=LOG_LEVEL_WARNING;
 			}
 			else if(strcmp(value,"3") == 0)
 			{
-//				setlogmask(LOG_UPTO(LOG_DEBUG));
+				CONFIG_LOG_LEVEL=LOG_LEVEL_DEBUG;
 			}
 			else
 			{
@@ -728,6 +729,7 @@ int get_values(void)
 	now = time(NULL);
 
 	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-1,sucker_num-1);
+
 	result = DBselect(sql);
 
 	rows = DBnum_rows(result);
@@ -1011,11 +1013,11 @@ int main(int argc, char **argv)
 
 	if(CONFIG_LOG_FILE == NULL)
 	{
-		zabbix_open_log(LOG_TYPE_SYSLOG,LOG_LEVEL_WARNING,NULL);
+		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
 	}
 	else
 	{
-		zabbix_open_log(LOG_TYPE_FILE,LOG_LEVEL_WARNING,CONFIG_LOG_FILE);
+		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
 	}
 
 /* process_config_file to be removed */

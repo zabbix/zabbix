@@ -27,6 +27,7 @@
 #include "functions.h"
 
 int	CONFIG_TIMEOUT		= TRAPPER_TIMEOUT;
+int	CONFIG_LOG_LEVEL	= LOG_LEVEL_WARNING;
 char	*CONFIG_LOG_FILE	= NULL;
 char	*CONFIG_DBNAME		= NULL;
 char	*CONFIG_DBUSER		= NULL;
@@ -95,15 +96,15 @@ void	process_config_file(void)
 		{
 			if(strcmp(value,"1") == 0)
 			{
-//				setlogmask(LOG_UPTO(LOG_CRIT));
+				CONFIG_LOG_LEVEL=LOG_LEVEL_CRIT;
 			}
 			else if(strcmp(value,"2") == 0)
 			{
-//				setlogmask(LOG_UPTO(LOG_WARNING));
+				CONFIG_LOG_LEVEL=LOG_LEVEL_WARNING;
 			}
 			else if(strcmp(value,"3") == 0)
 			{
-//				setlogmask(LOG_UPTO(LOG_DEBUG));
+				CONFIG_LOG_LEVEL=LOG_LEVEL_DEBUG;
 			}
 			else
 			{
@@ -181,11 +182,11 @@ int	main()
 
 	if(CONFIG_LOG_FILE == NULL)
 	{
-		zabbix_open_log(LOG_TYPE_SYSLOG,LOG_LEVEL_WARNING,NULL);
+		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
 	}
 	else
 	{
-		zabbix_open_log(LOG_TYPE_FILE,LOG_LEVEL_WARNING,CONFIG_LOG_FILE);
+		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
 	}
 
 	process_config_file();
