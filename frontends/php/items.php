@@ -76,7 +76,7 @@
 	$lasthost="";
 	if(isset($HTTP_GET_VARS["hostid"])&&!isset($HTTP_GET_VARS["itemid"])) 
 	{
-		$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.lastdelete,i.nextcheck,h.hostid from hosts h,items i where h.hostid=i.hostid and h.hostid=".$HTTP_GET_VARS["hostid"]." order by h.host,i.key_,i.description");
+		$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.lastdelete,i.nextcheck,h.hostid,i.type from hosts h,items i where h.hostid=i.hostid and h.hostid=".$HTTP_GET_VARS["hostid"]." order by h.host,i.key_,i.description");
 		$col=0;
 		while($row=DBfetch($result))
 		{
@@ -101,6 +101,7 @@
 				echo "<TD WIDTH=5%  NOSAVE><B>Delay</B></TD>";
 				echo "<TD WIDTH=5%  NOSAVE><B>History</B></TD>";
 				echo "<TD><B>Shortname</B></TD>";
+				echo "<TD WIDTH=5% NOSAVE><B>Type</B></TD>";
 				echo "<TD WIDTH=5% NOSAVE><B>Status</B></TD>";
 				echo "<TD WIDTH=5% NOSAVE><B>Actions</B></TD>";
 				echo "</TR>";
@@ -118,6 +119,25 @@
 			echo "<TD>".$row["host"].":".$row["key_"]."</TD>";
 	
 			echo "<td align=center>";
+			switch($row["type"])
+			{
+				case 0:
+					echo "Zabbix agent";
+					break;
+				case 1:
+					echo "SNMPv1 agent";
+					break;
+				case 2:
+					echo "Zabbix trapper";
+					break;
+				default:
+					echo "Unknown";
+					break;
+			}
+			echo "</td>";
+
+			
+			echo "<td align=center>";
 			if(isset($HTTP_GET_VARS["hostid"]))
 			{
 				switch($row["status"])
@@ -128,9 +148,9 @@
 					case 1:
 						echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$HTTP_GET_VARS["hostid"]."&register=changestatus&status=0\">Not active</a>";
 						break;
-					case 2:
-						echo "Trapper";
-						break;
+#					case 2:
+#						echo "Trapper";
+#						break;
 					case 3:
 						echo "Not supported";
 						break;
