@@ -116,17 +116,34 @@ void	process_child(int sockfd)
 	ssize_t	nread;
 	char	line[1024];
 	char	result[1024];
-//	void	*sigfunc;
+	static struct  sigaction phan;
 
-	for(;;)
-	{
+	daemon_init();
+
+	phan.sa_handler = &signal_handler;
+	sigemptyset(&phan.sa_mask);
+	phan.sa_flags = 0;
+	sigaction(SIGINT, &phan, NULL);
+	sigaction(SIGQUIT, &phan, NULL);
+	sigaction(SIGTERM, &phan, NULL);
+
+	signal( SIGINT,  signal_handler );
+	signal( SIGQUIT, signal_handler );
+	signal( SIGTERM, signal_handler );
+//	signal( SIGALRM, signal_handler );
+
+//	for(;;)
+//	{
 //		sigfunc = signal( SIGALRM, signal_handler );
-//		alarm(AGENT_TIMEOUT);
+		alarm(AGENT_TIMEOUT);
 
-		if( (nread = read(sockfd, line, 1024)) == 0)
+		if( (nread = read(sockfd, line, 1024)) < 0)
+		{
+			syslog( LOG_DEBUG, "Sending back:%s", result);
 			return;
+		}
 
-//		alarm(0);
+		alarm(0);
 //		signal(SIGALRM, sigfunc);
 
 		line[nread-1]=0;
@@ -144,7 +161,7 @@ void	process_child(int sockfd)
 		}
 		syslog( LOG_DEBUG, "Sending back:%s", result);
 		write(sockfd,result,strlen(result));
-	}
+//	}
 }
 
 int	tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
@@ -280,8 +297,16 @@ int	main()
 
 	char		host[128];
 	char		*port="10001";
-	
+	static struct  sigaction phan;
+
 	daemon_init();
+
+	phan.sa_handler = &signal_handler;
+	sigemptyset(&phan.sa_mask);
+	phan.sa_flags = 0;
+	sigaction(SIGINT, &phan, NULL);
+	sigaction(SIGQUIT, &phan, NULL);
+	sigaction(SIGTERM, &phan, NULL);
 
 	signal( SIGINT,  signal_handler );
 	signal( SIGQUIT, signal_handler );
