@@ -1,5 +1,6 @@
 Changes for 1.1alpha5:
 
+ - fixed evaluation of nodata(). Thanks to Igor Micko. (Alexei)
  - fixed time selection for custom graphs (Alexei)
  - configurable format of map output (png, jpg) (Alexei)
  - special processing of 'b' and 'bps' (bytes). Take 1000 for Kilos (Alexei)
