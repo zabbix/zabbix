@@ -22,7 +22,6 @@
 
 #include "zabbixw32.h"
 #include <psapi.h>
-#include <pdh.h>
 
 
 //
@@ -332,11 +331,33 @@ static float H_PerfCounter(char *cmd,char *arg)
 
 
 //
+// Handler for user counters
+//
+
+static float H_UserCounter(char *cmd,char *arg)
+{
+   USER_COUNTER *counter;
+   char *ptr1,*ptr2;
+
+   ptr1=strchr(cmd,'{');
+   ptr2=strchr(cmd,'}');
+   ptr1++;
+   *ptr2=0;
+   for(counter=userCounterList;counter!=NULL;counter=counter->next)
+      if (!strcmp(counter->name,ptr1))
+         return counter->lastValue;
+
+   return NOTSUPPORTED;
+}
+
+
+//
 // Parameters and handlers
 //
 
 static AGENT_COMMAND commands[]=
 {
+   { "__usercnt{*}",H_UserCounter,NULL,NULL },
    { "cpu_util",H_ProcUtil,NULL,(char *)0x00 },
    { "cpu_util5",H_ProcUtil,NULL,(char *)0x01 },
    { "cpu_util15",H_ProcUtil,NULL,(char *)0x02 },
@@ -365,12 +386,15 @@ static AGENT_COMMAND commands[]=
 // Command processing function
 //
 
-void ProcessCommand(char *cmd,char *result)
+void ProcessCommand(char *received_cmd,char *result)
 {
    int i;
    float fResult=NOTSUPPORTED;
-   char *strResult=NULL;
+   char *strResult=NULL,cmd[MAX_ZABBIX_CMD_LEN];
 
+   ExpandAlias(received_cmd,cmd);
+
+   // Find match for command
    for(i=0;;i++)
    {
       if (commands[i].name[0]==0)
