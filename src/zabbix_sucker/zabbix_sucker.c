@@ -244,7 +244,7 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 
 	int ret=SUCCEED;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In get_value_SNMPv1()");
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMPv1()");
 
 	snmp_sess_init( &session );
 	session.version = SNMP_VERSION_1;
@@ -256,16 +256,16 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 	{
 		session.peername = item->host;
 	}
-	zabbix_log( LOG_LEVEL_WARNING, "Peername [%s]", session.peername);
+	zabbix_log( LOG_LEVEL_DEBUG, "Peername [%s]", session.peername);
 	session.community = item->snmp_community;
-	zabbix_log( LOG_LEVEL_WARNING, "Community [%s]", session.community);
-	zabbix_log( LOG_LEVEL_WARNING, "OID [%s]", item->snmp_oid);
+	zabbix_log( LOG_LEVEL_DEBUG, "Community [%s]", session.community);
+	zabbix_log( LOG_LEVEL_DEBUG, "OID [%s]", item->snmp_oid);
 	session.community_len = strlen(session.community);
-	zabbix_log( LOG_LEVEL_WARNING, "In get_value_SNMPv1() 0.1");
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMPv1() 0.1");
 
 	SOCK_STARTUP;
 	ss = snmp_open(&session);
-	zabbix_log( LOG_LEVEL_WARNING, "In get_value_SNMPv1() 0.2");
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMPv1() 0.2");
 
 	pdu = snmp_pdu_create(SNMP_MSG_GET);
 	read_objid(item->snmp_oid, anOID, &anOID_len);
@@ -277,20 +277,20 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 #endif
 
 	snmp_add_null_var(pdu, anOID, anOID_len);
-	zabbix_log( LOG_LEVEL_WARNING, "In get_value_SNMPv1() 0.3");
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMPv1() 0.3");
   
 /* Send the Request out */
 	status = snmp_synch_response(ss, pdu, &response);
-	zabbix_log( LOG_LEVEL_WARNING, "Status send [%d]", status);
-	zabbix_log( LOG_LEVEL_WARNING, "In get_value_SNMPv1() 0.4");
+	zabbix_log( LOG_LEVEL_DEBUG, "Status send [%d]", status);
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMPv1() 0.4");
 
 /* Process the response */
-	zabbix_log( LOG_LEVEL_WARNING, "In get_value_SNMPv1() 1");
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMPv1() 1");
 	if (status == STAT_SUCCESS && response->errstat == SNMP_ERR_NOERROR)
 	{
 /* SUCCESS: Print the result variables */
 
-	zabbix_log( LOG_LEVEL_WARNING, "In get_value_SNMPv1() 2");
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMPv1() 2");
 		for(vars = response->variables; vars; vars = vars->next_variable)
 		{
 			print_variable(vars->name, vars->name_length, vars);
@@ -300,7 +300,7 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 		for(vars = response->variables; vars; vars = vars->next_variable)
 		{
 			int count=1;
-			zabbix_log( LOG_LEVEL_WARNING, "AV loop()");
+			zabbix_log( LOG_LEVEL_DEBUG, "AV loop()");
 
 			if(	(vars->type == ASN_INTEGER) ||
 				(vars->type == ASN_UINTEGER)||
@@ -344,7 +344,6 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Error!");
 			zabbix_log( LOG_LEVEL_WARNING, "Error [%d]",
 					status);
 			snmp_sess_perror("snmpget", ss);
