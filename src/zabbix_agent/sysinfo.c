@@ -1950,6 +1950,18 @@ double	SWAPFREE(void)
 
 double	PROCCOUNT(void)
 {
+#ifdef HAVE_SYSINFO_PROCS
+	struct sysinfo info;
+
+	if( 0 == sysinfo(&info))
+	{
+		return	info.procs;
+	}
+	else
+	{
+		return FAIL;
+	}
+#else
 #ifdef	HAVE_PROC_0_PSINFO
 	DIR	*dir;
 	struct	dirent *entries;
@@ -1999,19 +2011,49 @@ double	PROCCOUNT(void)
 	closedir(dir);
 	return	(double)proccount;
 #else
-#ifdef HAVE_SYSINFO_PROCS
-	struct sysinfo info;
+#ifdef	HAVE_PROC_1_STATUS
+	DIR	*dir;
+	struct	dirent *entries;
+	struct	stat buf;
+	char	filename[MAX_STRING_LEN];
+	char	line[MAX_STRING_LEN];
 
-	if( 0 == sysinfo(&info))
-	{
-		return	info.procs;
-	}
-	else
+	FILE	*f;
+
+	int	proccount=0;
+
+	dir=opendir("/proc");
+	if(NULL == dir)
 	{
 		return FAIL;
 	}
+
+	while((entries=readdir(dir))!=NULL)
+	{
+		strscpy(filename,"/proc/");	
+		strncat(filename,entries->d_name,MAX_STRING_LEN);
+		strncat(filename,"/status",MAX_STRING_LEN);
+
+		if(stat(filename,&buf)==0)
+		{
+			f=fopen(filename,"r");
+			if(f==NULL)
+			{
+				continue;
+			}
+			/* This check can be skipped. No need to read anything from this file. */
+			if(NULL != fgets(line,MAX_STRING_LEN,f))
+			{
+				proccount++;
+			}
+			fclose(f);
+		}
+	}
+	closedir(dir);
+	return	(double)proccount;
 #else
 	return	FAIL;
+#endif
 #endif
 #endif
 }
