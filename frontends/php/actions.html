@@ -126,7 +126,7 @@
 	{
 		$good=1;
 		$delay=30;
-		$subject="";
+		$subject=$description;
 		$message="";
 	}
 	echo "<br>";
@@ -182,7 +182,7 @@
 	show_table2_v_delimiter();
 	echo "Message";
 	show_table2_h_delimiter();
-	echo "<input name=\"message\" value=\"$message\" size=50>";
+ 	echo "<textarea name=\"message\" cols=50 ROWS=\"5\" wrap=\"soft\">$message</TEXTAREA>";
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";

@@ -1,8 +1,9 @@
 Changes for 1.0alpha8:
 
+ - status of triggers will not be shown for disabled and not-supported parameters
+
  - fixed availability report
  - optimization of chart.html
-
  - added trend.html
  - added trends.html
  - improved performance of network map
