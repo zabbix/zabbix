@@ -5,6 +5,14 @@
 	include "include/config.inc.php";
 	show_header($page["title"],0,0);
 ?>
+<?
+	if(!check_right("Trigger comment","R",$HTTP_GET_VARS["triggerid"]))
+	{
+		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+		show_footer();
+		exit;
+	}
+?>
 
 <?
 	show_table_header("TRIGGER COMMENTS");

@@ -13,8 +13,140 @@
 		return $row["cnt"]; 
 	}
 
-/* Rewrite ! */
 	function	check_right($right,$permission,$id)
+	{
+		global $USER_DETAILS;
+
+		$sql="select permission from rights where name='Default permission' and userid=".$USER_DETAILS["userid"];
+		$result=DBselect($sql);
+
+		$default_permission="H";
+		if(DBnum_rows($result)>0)
+		{
+			$default_permission="";
+			while($row=DBfetch($result))
+			{
+				$default_permission=$default_permission.$row["permission"];
+			}
+		}
+# default_permission
+
+		$sql="select permission from rights where name='$right' and id=0 and userid=".$USER_DETAILS["userid"];
+		$result=DBselect($sql);
+
+		$group_permission="";
+		if(DBnum_rows($result)>0)
+		{
+			while($row=DBfetch($result))
+			{
+				$group_permission=$group_permission.$row["permission"];
+			}
+		}
+# group_permission
+
+		$id_permission="";
+		if($id!=0)
+		{
+			$sql="select permission from rights where name='$right' and id=$id and userid=".$USER_DETAILS["userid"];
+			$result=DBselect($sql);
+			if(DBnum_rows($result)>0)
+			{
+				while($row=DBfetch($result))
+				{
+					$id_permission=$id_permission.$row["permission"];
+				}
+			}
+		}
+# id_permission
+//		echo "$id_permission|$group_permission|$default_permission<br>";
+
+		switch ($permission) {
+			case 'A':
+				if(strstr($id_permission,"H"))
+				{
+					return 0;
+				}
+				else if(strstr($id_permission,"A"))
+				{
+					return 1;
+				}
+				if(strstr($group_permission,"H"))
+				{
+					return 0;
+				}
+				else if(strstr($group_permission,"A"))
+				{
+					return 1;
+				}
+				if(strstr($default_permission,"H"))
+				{
+					return 0;
+				}
+				else if(strstr($default_permission,"A"))
+				{
+					return 1;
+				}
+				break;
+			case 'R':
+				if(strstr($id_permission,"H"))
+				{
+					return 0;
+				}
+				else if(strstr($id_permission,"R"))
+				{
+					return 1;
+				}
+				if(strstr($group_permission,"H"))
+				{
+					return 0;
+				}
+				else if(strstr($group_permission,"R"))
+				{
+					return 1;
+				}
+				if(strstr($default_permission,"H"))
+				{
+					return 0;
+				}
+				else if(strstr($default_permission,"R"))
+				{
+					return 1;
+				}
+				break;
+			case 'U':
+				if(strstr($id_permission,"H"))
+				{
+					return 0;
+				}
+				else if(strstr($id_permission,"U"))
+				{
+					return 1;
+				}
+				if(strstr($group_permission,"H"))
+				{
+					return 0;
+				}
+				else if(strstr($group_permission,"U"))
+				{
+					return 1;
+				}
+				if(strstr($default_permission,"H"))
+				{
+					return 0;
+				}
+				else if(strstr($default_permission,"U"))
+				{
+					return 1;
+				}
+				break;
+			default:
+				return 0;
+		}
+		return 0;
+	}
+
+
+/*	function	check_right($right,$permission,$id)
 	{
 		global $USER_DETAILS;
 
@@ -80,6 +212,7 @@
 			return	0;
 		}
 	}
+*/
 
 	function	check_right_on_trigger($permission,$triggerid)
 	{
@@ -690,7 +823,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
 			<font face="Arial,Helvetica" size=2>
-				<a href="latestalarms.php">
+<?
+				if(check_right("Default permission","R",0))
+				{
+					echo "<a href=\"latestalarms.php\">";
+				}
+?>
 <?
 				if(($page["file"]=="latestalarms.php") ||
 					($page["file"]=="alarms.php"))
@@ -706,7 +844,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 			<font face="Arial,Helvetica" size=2>
-				<a href="alerts.php">
+<?
+				if(check_right("Default permission","R",0))
+				{
+					echo "<a href=\"alerts.php\">";
+				}
+?>
 <?
 				if($page["file"]=="alerts.php")
 				{
@@ -721,7 +864,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 			<font face="Arial,Helvetica" size=2>
-				<a href="maps.php">
+<?
+				if(check_right("Network map","R",0))
+				{
+					echo "<a href=\"maps.php\">";
+				}
+?>
 <?
 				if($page["file"]=="maps.php")
 				{
@@ -736,7 +884,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 			<font face="Arial,Helvetica" size=2>
-				<a href="charts.php">
+<?
+				if(check_right("Graph","R",0))
+				{
+					echo "<a href=\"charts.php\">";
+				}
+?>
 <?
 				if($page["file"]=="charts.php")
 				{
@@ -807,7 +960,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
 			<font face="Arial,Helvetica" size=2>
-				<a href="about.php">
+<?
+				if(check_right("Default permission","R",0))
+				{
+					echo "<a href=\"about.php\">";
+				}
+?>
 <?
 				if($page["file"]=="about.php")
 				{
@@ -822,7 +980,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
 			<font face="Arial,Helvetica" size=2>
-				<a href="report1.php">
+<?
+				if(check_right("Default permission","R",0))
+				{
+					echo "<a href=\"report1.php\">";
+				}
+?>
 <?
 				if($page["file"]=="report1.php")
 				{
@@ -837,7 +1000,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=3 bgcolor=FFFFFF align=center valign=top width=15%>
 			<font face="Arial,Helvetica" size=2>
-				<a href="report2.php">
+<?
+				if(check_right("Host","R",0))
+				{
+					echo "<a href=\"report2.php\">";
+				}
+?>
 <?
 				if($page["file"]=="report2.php")
 				{
