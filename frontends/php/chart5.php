@@ -90,7 +90,7 @@
 
 //	if(!check_right_on_trigger("R",$_GET["triggerid"]))
 //	{
-//		ImagePng($im); 
+//		ImageOut($im); 
 //		ImageDestroy($im); 
 //		exit;
 //	}
@@ -225,6 +225,6 @@
 	$end_time=time(NULL);
 	ImageString($im, 0,imagesx($im)-100,imagesy($im)-12,"Generated in ".($end_time-$start_time)." sec", $gray);
 
-	ImagePng($im); 
+	ImageOut($im); 
 	ImageDestroy($im); 
 ?>

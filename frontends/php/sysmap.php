@@ -44,12 +44,12 @@
 	{
 		if($_GET["register"]=="add")
 		{
-			$result=add_host_to_sysmap($_GET["sysmapid"],$_GET["hostid"],$_GET["label"],$_GET["x"],$_GET["y"],$_GET["icon"]);
+			$result=add_host_to_sysmap($_GET["sysmapid"],$_GET["hostid"],$_GET["label"],$_GET["x"],$_GET["y"],$_GET["icon"],$_GET["url"],$_GET["icon_on"]);
 			show_messages($result,"Host added","Cannot add host");
 		}
 		if($_GET["register"]=="update")
 		{
-			$result=update_sysmap_host($_GET["shostid"],$_GET["sysmapid"],$_GET["hostid"],$_GET["label"],$_GET["x"],$_GET["y"],$_GET["icon"]);
+			$result=update_sysmap_host($_GET["shostid"],$_GET["sysmapid"],$_GET["hostid"],$_GET["label"],$_GET["x"],$_GET["y"],$_GET["icon"],$_GET["url"],$_GET["icon_on"]);
 			show_messages($result,"Host updated","Cannot update host");
 		}
 		if($_GET["register"]=="add link")
@@ -219,18 +219,23 @@
 
 	if(isset($_GET["shostid"]))
 	{
-		$result=DBselect("select hostid,label,x,y,icon from sysmaps_hosts where shostid=".$_GET["shostid"]);
+		$result=DBselect("select hostid,label,x,y,icon,url,icon_on from sysmaps_hosts where shostid=".$_GET["shostid"]);
 		$hostid=DBget_field($result,0,0);
 		$label=DBget_field($result,0,1);
 		$x=DBget_field($result,0,2);
 		$y=DBget_field($result,0,3);
 		$icon=DBget_field($result,0,4);
+		$url=DBget_field($result,0,5);
+		$icon_on=DBget_field($result,0,6);
 	}
 	else
 	{
 		$label="";
 		$x=0;
 		$y=0;
+		$icon="";
+		$url="";
+		$icon_on="";
 	}
 
 	show_table2_header_begin();
@@ -267,38 +272,33 @@
 	echo "</SELECT>";
 
 	show_table2_v_delimiter();
-	echo "Icon";
+	echo "Icon (OFF)";
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"icon\" size=1>";
-/*	$icons=array();
-	if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
-	{
-		$icons[0]="Server";
-		$icons[1]="Workstation";
-		$icons[2]="Notebook";
-		$icons[3]="Printer";
-		$icons[4]="Hub";
-		$icons[5]="UPS";
-		$icons[6]="Network";
-		$icons[7]="Phone";
-		$icons[8]="Satellite";
-		$num=9;
-	}
-	else
-	{
-		$icons[0]="Server";
-		$icons[1]="Workstation";
-		$icons[2]="Printer";
-		$icons[3]="Hub";
-		$num=4;
-	}*/
 	$result=DBselect("select name from images where imagetype=1 order by name");
-/*	for($i=0;$i<$num;$i++)*/
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		$name=DBget_field($result,$i,0);
 		if(isset($_GET["shostid"]) && ($icon==$name))
-//		if(isset($_GET["hostid"]) && ($_GET["icon"]==$icons[$i]))
+		{
+			echo "<OPTION VALUE='".$name."' SELECTED>".$name;
+		}
+		else
+		{
+			echo "<OPTION VALUE='".$name."'>".$name;
+		}
+	}
+	echo "</SELECT>";
+
+	show_table2_v_delimiter();
+	echo "Icon (ON)";
+	show_table2_h_delimiter();
+	echo "<select class=\"biginput\" name=\"icon_on\" size=1>";
+	$result=DBselect("select name from images where imagetype=1 order by name");
+	for($i=0;$i<DBnum_rows($result);$i++)
+	{
+		$name=DBget_field($result,$i,0);
+		if(isset($_GET["shostid"]) && ($icon_on==$name))
 		{
 			echo "<OPTION VALUE='".$name."' SELECTED>".$name;
 		}
@@ -323,6 +323,11 @@
 	echo nbsp("Coordinate Y");
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"y\" size=5 value=\"$y\">";
+
+	show_table2_v_delimiter();
+	echo nbsp("URL");
+	show_table2_h_delimiter();
+	echo "<input class=\"biginput\" name=\"url\" size=64 value=\"$url\">";
 
 	show_table2_v_delimiter2();
 	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";

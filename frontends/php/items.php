@@ -40,6 +40,17 @@
 ?>
 
 <?php
+	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
+	{
+		unset($_GET["groupid"]);
+	}
+	if(isset($_GET["hostid"])&&($_GET["hostid"]==0))
+	{
+		unset($_GET["hostid"]);
+	}
+?>
+
+<?php
 	if(isset($_GET["register"]))
 	{
 		if($_GET["register"]=="update")
@@ -129,9 +140,9 @@
 ?>
 
 <?php
-	show_table_header_begin();
+	show_table3_header_begin();
 	echo S_CONFIGURATION_OF_ITEMS_BIG;;
-	show_table_v_delimiter();
+	show_table3_h_delimiter(40);
 
 // Start of new code
 	echo "<form name=\"form2\" method=\"get\" action=\"items.php\">";
@@ -168,10 +179,16 @@
 
 	echo "&nbsp;".S_HOST."&nbsp;";
 	echo "<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
+	echo "<option value=\"0\" ".iif(!isset($_GET["hostid"]),"selected","").">".S_SELECT_HOST_DOT_DOT_DOT;
 
-	$sql=iif(isset($_GET["groupid"]),
-		"select h.hostid,h.host from hosts h,hosts_groups hg where h.status in (0,2) and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host",
-		"select h.hostid,h.host from hosts h where h.status in (0,2) group by h.hostid,h.host order by h.host");
+	if(isset($_GET["groupid"]))
+	{
+		$sql="select h.hostid,h.host from hosts h,hosts_groups hg where h.status in (0,2) and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+	}
+	else
+	{
+		$sql="select h.hostid,h.host from hosts h where h.status in (0,2) group by h.hostid,h.host order by h.host";
+	}
 
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
@@ -206,8 +223,8 @@
 				{
 					echo "</TABLE><BR>";
 				}
-				echo "<br>";
-				show_table_header("<A HREF='items.php?hostid=".$row["hostid"]."'>".$row["host"]."</A>");
+//				echo "<br>";
+//				show_table_header("<A HREF='items.php?hostid=".$row["hostid"]."'>".$row["host"]."</A>");
 				echo "<form method=\"get\" action=\"items.php\">";
 				echo "<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_GET["hostid"]." size=8>";
 				echo "<TABLE BORDER=0 COLS=13  align=center WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
@@ -217,7 +234,7 @@
 //				echo "<TD WIDTH=10% NOSAVE><B>".S_HOST."</B></TD>";
 				echo "<TD WIDTH=10% NOSAVE><B>".S_KEY."</B></TD>";
 				echo "<TD WIDTH=10% NOSAVE><B>".S_DESCRIPTION."</B></TD>";
-				echo "<TD WIDTH=5%  NOSAVE><B>".S_UPDATE_INTERVAL."</B></TD>";
+				echo "<TD WIDTH=5%  NOSAVE><B>".nbsp(S_UPDATE_INTERVAL)."</B></TD>";
 				echo "<TD WIDTH=5%  NOSAVE><B>".S_HISTORY."</B></TD>";
 				echo "<TD WIDTH=5%  NOSAVE><B>".S_TRENDS."</B></TD>";
 				echo "<TD><B>".S_SHORT_NAME."</B></TD>";

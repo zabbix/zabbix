@@ -28,13 +28,12 @@
 
 	$grid=50;
 
-	$result=DBselect("select name,width,height,use_background,background from sysmaps where sysmapid=".$_GET["sysmapid"]);
+	$result=DBselect("select name,width,height,background from sysmaps where sysmapid=".$_GET["sysmapid"]);
 
 	$name=DBget_field($result,0,0);
 	$width=DBget_field($result,0,1);
 	$height=DBget_field($result,0,2);
-	$use_background=DBget_field($result,0,3);
-	$background=DBget_field($result,0,4);
+	$background=DBget_field($result,0,3);
 
 //	Header( "Content-type:  text/html"); 
 	Header( "Content-type:  image/png"); 
@@ -80,14 +79,27 @@
 	$y=imagesy($im);
   
 #	ImageFilledRectangle($im,0,0,$width,$height,$black);
-	if($use_background==1)
+	if($background!="")
 	{
-		$back=ImageCreateFromString($background);
-		ImageCopy($im,$back,0,0,0,0,imagesx($back),imagesy($back));
+		$sql="select image from images where imagetype=2 and name='$background'";
+		$result2=DBselect($sql);
+		if(DBnum_rows($result2)==1)
+		{
+			$back=ImageCreateFromString(DBget_field($result2,0,0));
+			ImageCopy($im,$back,0,0,0,0,imagesx($back),imagesy($back));
+		}
+		else
+		{
+			ImageFilledRectangle($im,0,0,$width,$height,$white);
+			$x=imagesx($im)/2-ImageFontWidth(4)*strlen($name)/2;
+			ImageString($im, 4,$x,1, $name , $colors["Dark Red"]);
+		}
 	}
 	else
 	{
 		ImageFilledRectangle($im,0,0,$width,$height,$white);
+		$x=imagesx($im)/2-ImageFontWidth(4)*strlen($name)/2;
+		ImageString($im, 4,$x,1, $name , $colors["Dark Red"]);
 	}
 
 	if(!isset($_GET["border"]))
@@ -95,15 +107,15 @@
 		ImageRectangle($im,0,0,$width-1,$height-1,$colors["Black"]);
 	}
 
-	$x=imagesx($im)/2-ImageFontWidth(4)*strlen($name)/2;
-	ImageString($im, 4,$x,1, $name , $colors["Dark Red"]);
+//	$x=imagesx($im)/2-ImageFontWidth(4)*strlen($name)/2;
+//	ImageString($im, 4,$x,1, $name , $colors["Dark Red"]);
 
 	$str=date("m.d.Y H:i:s",time(NULL));
 	ImageString($im, 0,imagesx($im)-120,imagesy($im)-12,"$str", $gray);
 
 	if(!check_right("Network map","R",$_GET["sysmapid"]))
 	{
-		ImagePng($im); 
+		ImageOut($im); 
 		ImageDestroy($im); 
 		exit();
 	}
@@ -137,22 +149,41 @@
 		$color_on=DBget_field($result,$i,5);
 		$drawtype_on=DBget_field($result,$i,6);
 
-		$result1=DBselect("select x,y from sysmaps_hosts where shostid=$shostid1");
+		$result1=DBselect("select x,y,icon from sysmaps_hosts where shostid=$shostid1");
 		$x1=DBget_field($result1,0,0);
 		$y1=DBget_field($result1,0,1);
+		$image1=get_image_by_name(1,DBget_field($result1,0,2));
 
-		$result1=DBselect("select x,y from sysmaps_hosts where shostid=$shostid2");
+		$result1=DBselect("select x,y,icon from sysmaps_hosts where shostid=$shostid2");
 		$x2=DBget_field($result1,0,0);
 		$y2=DBget_field($result1,0,1);
+		$image2=get_image_by_name(1,DBget_field($result1,0,2));
 
-		if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
+// Get image dimensions
+
+		if($image1!=0)
 		{
-			$size=48/2;
+			$icon=ImageCreateFromString($image1["image"]);
+			$sizex1=imagesx($icon);
+			$sizey1=imagesx($icon);
 		}
 		else
 		{
-			$size=32/2;
+			$sizex1=0;
+			$sizey1=0;
 		}
+		if($image2!=0)
+		{
+			$icon=ImageCreateFromString($image2["image"]);
+			$sizex2=imagesx($icon);
+			$sizey2=imagesx($icon);
+		}
+		else
+		{
+			$sizex2=0;
+			$sizey2=0;
+		}
+
 		if(isset($triggerid))
 		{
 			$trigger=get_trigger_by_triggerid($triggerid);
@@ -160,45 +191,45 @@
 			{
 				if($drawtype_on == GRAPH_DRAW_TYPE_BOLDLINE)
 				{
-					ImageLine($im,$x1+$size,$y1+$size,$x2+$size,$y2+$size,$colors[$color_on]);
-					ImageLine($im,$x1+$size,$y1+$size+1,$x2+$size,$y2+$size+1,$colors[$color_on]);
+					ImageLine($im,$x1+$sizex1/2,$y1+$sizey1/2,$x2+$sizex2/2,$y2+$sizey2/2,$colors[$color_on]);
+					ImageLine($im,$x1+$sizex1/2,$y1+$sizey1/2+1,$x2+$sizex2/2,$y2+$sizey2/2+1,$colors[$color_on]);
 				}
 				else if($drawtype_on == GRAPH_DRAW_TYPE_DASHEDLINE)
 				{
-					DashedLine($im,$x1+$size,$y1+$size,$x2+$size,$y2+$size,$colors[$color_on]);
+					DashedLine($im,$x1+$sizex1/2,$y1+$sizey1/2,$x2+$sizex2/2,$y2+$sizey2/2,$colors[$color_on]);
 				}
 				else
 				{
-					ImageLine($im,$x1+$size,$y1+$size,$x2+$size,$y2+$size,$colors[$color_on]);
+					ImageLine($im,$x1+$sizex1/2,$y1+$sizey1/2,$x2+$sizex2/2,$y2+$sizey2/2,$colors[$color_on]);
 				}
 			}
 			else
 			{
 				if($drawtype_off == GRAPH_DRAW_TYPE_BOLDLINE)
 				{
-					ImageLine($im,$x1+$size,$y1+$size,$x2+$size,$y2+$size,$colors[$color_off]);
-					ImageLine($im,$x1+$size,$y1+$size+1,$x2+$size,$y2+$size+1,$colors[$color_off]);
+					ImageLine($im,$x1+$sizex1/2,$y1+$sizey1/2,$x2+$sizex2/2,$y2+$sizey2/2,$colors[$color_off]);
+					ImageLine($im,$x1+$sizex1/2,$y1+$sizey1/2+1,$x2+$sizex2/2,$y2+$sizey2/2+1,$colors[$color_off]);
 				}
 				else if($drawtype_off == GRAPH_DRAW_TYPE_DASHEDLINE)
 				{
-					DashedLine($im,$x1+$size,$y1+$size,$x2+$size,$y2+$size,$colors[$color_off]);
+					DashedLine($im,$x1+$sizex1/2,$y1+$sizey1/2,$x2+$sizex2/2,$y2+$sizey2/2,$colors[$color_off]);
 				}
 				else
 				{
-					ImageLine($im,$x1+$size,$y1+$size+1,$x2+$size,$y2+$size+1,$colors[$color_off]);
+					ImageLine($im,$x1+$sizex1/2,$y1+$sizey1/2+1,$x2+$sizex2/2,$y2+$sizey2/2+1,$colors[$color_off]);
 				}
 			}
 		}
 		else
 		{
-			ImageLine($im,$x1+$size,$y1+$size,$x2+$size,$y2+$size,$colors["Black"]);
+			ImageLine($im,$x1+$sizex1/2,$y1+$sizey1/2,$x2+$sizex2/2,$y2+$sizey2/2,$colors["Black"]);
 		}
 	}
 
 # Draw hosts
 
 	$icons=array();
-	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status,sh.icon from sysmaps_hosts sh,hosts h where sh.sysmapid=".$_GET["sysmapid"]." and h.hostid=sh.hostid");
+	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status,sh.icon,sh.icon_on from sysmaps_hosts sh,hosts h where sh.sysmapid=".$_GET["sysmapid"]." and h.hostid=sh.hostid");
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		$host=DBget_field($result,$i,0);
@@ -210,6 +241,16 @@
 		$y=DBget_field($result,$i,6);
 		$status=DBget_field($result,$i,7);
 		$icon=DBget_field($result,$i,8);
+		$icon_on=DBget_field($result,$i,9);
+
+
+		$result1=DBselect("select count(distinct t.triggerid) from items i,functions f,triggers t,hosts h where h.hostid=i.hostid and i.hostid=$hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.value=1 and t.status=0 and h.status in (0,2) and i.status=0");
+		$count=DBget_field($result1,0,0);
+
+		if( ($status!=1)&&($count>0))
+		{
+			$icon=$icon_on;
+		}
 
 		if(@gettype($icons["$icon"])!="resource")
 		{
@@ -254,8 +295,6 @@
 		}
 		else
 		{
-			$result1=DBselect("select count(distinct t.triggerid) from items i,functions f,triggers t,hosts h where h.hostid=i.hostid and i.hostid=$hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.value=1 and t.status=0 and h.status in (0,2) and i.status=0");
-			$count=DBget_field($result1,0,0);
 			if($count==1)
 			{
 				$result1=DBselect("select distinct t.description,t.triggerid, t.priority from items i,functions f,triggers t,hosts h where h.hostid=i.hostid and i.hostid=$hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.value=1 and t.status=0 and h.status in (0,2) and i.status=0");
@@ -293,6 +332,6 @@
 
 	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, S_ZABBIX_URL, $gray);
 
-	ImagePng($im);
+	ImageOut($im);
 	ImageDestroy($im);
 ?>

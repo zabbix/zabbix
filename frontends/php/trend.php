@@ -104,7 +104,7 @@
 
 	if(!check_right("Item","R",$_GET["itemid"]))
 	{
-		ImagePng($im); 
+		ImageOut($im); 
 		ImageDestroy($im); 
 		exit;
 	}
@@ -278,6 +278,6 @@ else
 	$end_time=time(NULL);
 	ImageString($im, 0,imagesx($im)-100,imagesy($im)-12,"Generated in ".($end_time-$start_time)." sec", $gray);
 
-	ImagePng($im); 
+	ImageOut($im); 
 	ImageDestroy($im); 
 ?>

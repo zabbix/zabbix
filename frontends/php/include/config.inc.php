@@ -683,6 +683,20 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	$graph;
 	}
 
+	function	get_image_by_name($imagetype,$name)
+	{
+		$sql="select * from images where imagetype=$imagetype and name='$name'"; 
+		$result=DBselect($sql);
+		if(DBnum_rows($result) == 1)
+		{
+			return	DBfetch($result);	
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
 	function	get_item_by_itemid($itemid)
 	{
 		global	$ERROR_MSG;
@@ -2665,7 +2679,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Update System Map
 
-	function	update_sysmap($sysmapid,$name,$width,$height)
+	function	update_sysmap($sysmapid,$name,$width,$height,$background)
 	{
 		global	$ERROR_MSG;
 
@@ -2675,7 +2689,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return 0;
 		}
 
-		$sql="update sysmaps set name='$name',width=$width,height=$height where sysmapid=$sysmapid";
+		$sql="update sysmaps set name='$name',width=$width,height=$height,background='$background' where sysmapid=$sysmapid";
 		return	DBexecute($sql);
 	}
 
@@ -2719,7 +2733,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return 0;
 		}
 
-		$sql="insert into sysmaps (name,width,height,background) values ('$name',$width,$height,load_file('".$background["tmp_name"]."'))";
+		$sql="insert into sysmaps (name,width,height,background) values ('$name',$width,$height,'$background'))";
 		return	DBexecute($sql);
 	}
 
@@ -2744,15 +2758,15 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Add Host to system map
 
-	function add_host_to_sysmap($sysmapid,$hostid,$label,$x,$y,$icon)
+	function add_host_to_sysmap($sysmapid,$hostid,$label,$x,$y,$icon,$url,$icon_on)
 	{
-		$sql="insert into sysmaps_hosts (sysmapid,hostid,label,x,y,icon) values ($sysmapid,$hostid,'$label',$x,$y,'$icon')";
+		$sql="insert into sysmaps_hosts (sysmapid,hostid,label,x,y,icon,url) values ($sysmapid,$hostid,'$label',$x,$y,'$icon','$url','$icon_on')";
 		return	DBexecute($sql);
 	}
 
-	function	update_sysmap_host($shostid,$sysmapid,$hostid,$label,$x,$y,$icon)
+	function	update_sysmap_host($shostid,$sysmapid,$hostid,$label,$x,$y,$icon,$url,$icon_on)
 	{
-		$sql="update sysmaps_hosts set hostid=$hostid,label='$label',x=$x,y=$y,icon='$icon' where shostid=$shostid";
+		$sql="update sysmaps_hosts set hostid=$hostid,label='$label',x=$x,y=$y,icon='$icon',url='$url',icon_on='$icon_on' where shostid=$shostid";
 		return	DBexecute($sql);
 	}
 
@@ -2774,7 +2788,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		while($row=DBfetch($result))
 		{
 			$item=get_item_by_itemid($row["itemid"]);
-			$itemid=add_item($item["description"],$item["key_"],$hostid,$item["delay"],$item["history"],$item["status"],$item["type"],$item["snmp_community"],$item["snmp_oid"],$item["value_type"],"",161,$item["units"],$item["multiplier"],$item["delta"]);
+			$itemid=add_item($item["description"],$item["key_"],$hostid,$item["delay"],$item["history"],$item["status"],$item["type"],$item["snmp_community"],$item["snmp_oid"],$item["value_type"],"",161,$item["units"],$item["multiplier"],$item["delta"],$item["snmpv3_securityname"],$item["snmpv3_securitylevel"],$item["snmpv3_authpassphrase"],$item["snmpv3_privpassphrase"],$item["formula"]);
 
 			$sql="select distinct t.triggerid from triggers t,functions f where f.itemid=".$row["itemid"]." and f.triggerid=t.triggerid";
 			$result2=DBselect($sql);
@@ -4394,7 +4408,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	function get_map_imagemap($sysmapid)
 	{
 		$map="\n<map name=links>";
-		$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status from sysmaps_hosts sh,hosts h where sh.sysmapid=$sysmapid and h.hostid=sh.hostid");
+		$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status,sh.icon,sh.url from sysmaps_hosts sh,hosts h where sh.sysmapid=$sysmapid and h.hostid=sh.hostid");
 		for($i=0;$i<DBnum_rows($result);$i++)
 		{
 			$host=DBget_field($result,$i,0);
@@ -4405,17 +4419,33 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$x=DBget_field($result,$i,5);
 			$y=DBget_field($result,$i,6);
 			$status=DBget_field($result,$i,7);
+			$icon=DBget_field($result,$i,8);
+			$url=DBget_field($result,$i,9);
 
 			if( ($status==0)||($status==2))
 			{
-				if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
+				$sql="select image from images where imagetype=1 and name='$icon'";
+				$result2=DBselect($sql);
+				if(DBnum_rows($result2)==1)
+				{
+					$back=ImageCreateFromString(DBget_field($result2,0,0));
+					$sizex = imagesx($back);
+					$sizey = imagesy($back);
+					if($url=="")
+					{
+						$url="tr_status.php?hostid=$hostid&noactions=true&onlytrue=true&compact=true";
+					}
+					$map=$map."\n<area shape=rect coords=$x,$y,".($x+$sizex).",".($y+$sizey)." href=\"$url\" alt=\"$host\">";
+				}
+
+/*				if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
 				{
 					$map=$map."\n<area shape=rect coords=$x,$y,".($x+48).",".($y+48)." href=\"tr_status.php?hostid=$hostid&noactions=true&onlytrue=true&compact=true\" alt=\"$host\">";
 				}
 				else
 				{
 					$map=$map."\n<area shape=rect coords=$x,$y,".($x+32).",".($y+32)." href=\"tr_status.php?hostid=$hostid&noactions=true&onlytrue=true&compact=true\" alt=\"$host\">";
-				}
+				}*/
 			}
 		}
 		$map=$map."\n</map>";
@@ -4578,5 +4608,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	echo "</TD>";
 	echo "</TR>";
 	echo "</TABLE>";
+	}
+
+	function ImageOut($image)
+	{
+//		ImageJPEG($image);
+		ImagePNG($image);
 	}
 ?>
