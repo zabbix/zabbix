@@ -4,6 +4,9 @@ Not ready yet:
 [ CORE. Investigate why trigger change its status from disabled to FALSE or TRUE ]
 
 [ HB. Authorisation without user name/password ]
+[ HB. Verify parameters before using them in SQL ]
+[ HB. Check IP addresses for trapped parameters ]
+[ HB. Authorisation without user name/password ]
 [ CORE. Support for Service Tree ] 
 [ CORE. If Zabbix is restarted change triggers status to UNKNOWN ]
 [ CORE. Change trigger status in case if host/item status is changed ]
