@@ -555,7 +555,6 @@ float	PROCCNT(const char * procname)
 
 		if(stat(filename,&buf)==0)
 		{
-			fflush(stdout);
 			f=fopen(filename,"r");
 			if(f==NULL)
 			{

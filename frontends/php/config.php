@@ -44,7 +44,7 @@
 	echo "<input name=\"smtp_server\" value=\"".$config["smtp_server"]."\"size=40>";
 
 	show_table2_v_delimiter();
-	echo "Value from SMTP HELO authentification";
+	echo "Value for SMTP HELO authentification (can be empty)";
 	show_table2_h_delimiter();
 	echo "<input name=\"smtp_helo\" value=\"".$config["smtp_helo"]."\"size=40>";
 
