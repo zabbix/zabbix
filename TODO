@@ -2,12 +2,18 @@
 
  - apply Fabricio patches
  - get rid of .0000000 in alert messages
+ - support for m,h and d in graphs and in latest values if monitored value in seconds
+ - cannot use "." as key in trigger expressions
+ - action to work in both cases (ON->OFF or OFF->ON). New macro, {RECOVERED}, ON->OFF='RECOVERED',
+ OFF->ON - "" to be in default subject
+ - navigation bar for all graphs and screens
+
+LATER:
+
  - add SNMP-based template
  - support for UDP-based checks (DNS, etc)
  - 'clone' for graphs and screens
  - add screens and graphs to host templates
- - action to work in both cases (ON->OFF or OFF->ON). New macro, {RECOVERED}, ON->OFF='RECOVERED',
- OFF->ON - "" to be in default subject
  - preserve selected host group between different screens (trigger maintenance, host maintenance)
  - add zabbix[unixtime] and lastupdate() and tick() to get rid of nodata()
  - check return code for alert scripts
@@ -23,9 +29,7 @@ latest trigger (item type  = TRAPPER)
  status of the trigger could help. 
 
  - when zabbix cannot evaluate expression it does not change status to UNKNOWN but adds ALARM (UNKNOWN) 
- - cannot use "." as key in trigger expressions
  - preset time for graphs
- - support for m,h and d in graphs and in latest values if monitored value in seconds
 
  - finish src/zabbix_snmptrapper
  - links to Zabbix frontend in alert emails
