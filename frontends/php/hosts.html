@@ -15,7 +15,7 @@
 	{
 		if($register=="add")
 		{
-			add_host($host,$port,$status,$template);
+			add_host($host,$port,$status,$template,$useip,$ip);
 		}
 		if($register=="changestatus")
 		{
@@ -83,6 +83,17 @@
 	echo "Host";
 	show_table2_h_delimiter();
 	echo "<input name=\"host\" size=20>";
+
+	show_table2_v_delimiter();
+	echo "Use IP address";
+	show_table2_h_delimiter();
+	echo "<INPUT TYPE=\"CHECKBOX\"";
+	echo " NAME=\"useip\"  VALUE=\"true\">";
+
+	show_table2_v_delimiter();
+	echo "IP address";
+	show_table2_h_delimiter();
+	echo "<input name=\"ip\" size=15>";
 
 	show_table2_v_delimiter();
 	echo "Port";
