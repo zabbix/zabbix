@@ -75,22 +75,19 @@
 
 <?
 	$result=DBselect("select hostid,host from hosts order by host");
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
 	{
-		$hid=DBget_field($result,$i,0);
-		$host=DBget_field($result,$i,1);
-		if(isset($hostid) && ($hid == $hostid))
+		if(isset($hostid) && ($row["hostid"] == $hostid))
 		{
-			echo "<b>[<A HREF=\"triggers.html?hostid=$hid\">$host</A>]</b>  ";
+			echo "<b>[<A HREF=\"triggers.html?hostid=".$row["hostid"]."\">".$row["host"]."</A>]</b>  ";
 		}
 		else
 		{
-			echo "<A HREF=\"triggers.html?hostid=$hid\">$host</A>  ";
+			echo "<A HREF=\"triggers.html?hostid=".$row["hostid"]."\">".$row["host"]."</A>  ";
 		}
 	}
 
 	show_table_header_end();
-	echo "<br>";
 ?>
 
 <?
@@ -101,17 +98,16 @@
 		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.istrue from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=$hostid order by h.host,t.description");
 		$lasthost="";
 		$col=0;
-		for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 		{
-			$hostid_=DBget_field($result,$i,0);
-			$host=DBget_field($result,$i,1);
-			if($lasthost!=$host)
+			if($lasthost!=$row["host"])
 			{
 				if($lasthost!="")
 				{
 					echo "</TABLE><BR>";
 				}
-				show_table_header("<A HREF='triggers.html?hostid=$hostid_'>$host</A>");
+				echo "<br>";
+				show_table_header("<A HREF='triggers.html?hostid=".$row["hostid"]."'>".$row["host"]."</A>");
 				echo "<TABLE BORDER=0 COLS=3 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 				echo "<TR>";
 				echo "<TD><B>Description</B></TD>";
@@ -120,46 +116,36 @@
 				echo "<TD WIDTH=\"15%\" NOSAVE><B>Actions</B></TD>";
 				echo "</TR>\n";
 			}
-			$lasthost=$host;
+			$lasthost=$row["host"];
 	
-		        if($col==1)
-		        {
-		                echo "<TR BGCOLOR=#DDDDDD>";
-		                $col=0;
-		        } else
-		        {
-		                echo "<TR BGCOLOR=#EEEEEE>";
-		                $col=1;
-		        }
-			$triggerid_=DBget_field($result,$i,2);
-			$expression=DBget_field($result,$i,3);
-			$description=DBget_field($result,$i,4);
-			$istrue=DBget_field($result,$i,5);
-			echo "<TD>$description</TD>";
-			$description=rawurlencode($description);
+		        if($col++%2 == 1)	{ echo "<TR BGCOLOR=#DDDDDD>"; }
+			else			{ echo "<TR BGCOLOR=#EEEEEE>"; }
+
+			echo "<TD>".$row["description"]."</TD>";
 	
-			echo "<TD>".explode_exp($expression,1)."</TD>";
+			echo "<TD>".explode_exp($row["expression"],1)."</TD>";
 			echo "<TD>";
-			if($istrue == 2)
+			if($row["istrue"] == 2)
 			{
-				echo "<a href=\"triggers.html?register=changestatus&triggerid=$triggerid_&status=0&hostid=$hostid_\">Disabled";
+				echo "<a href=\"triggers.html?register=changestatus&triggerid=".$row["triggerid"]."&status=0&hostid=".$row["hostid"]."\">Disabled</a>";
 			}
 			else
 			{
-				echo "<a href=\"triggers.html?register=changestatus&triggerid=$triggerid_&status=2&hostid=$hostid_\">Enabled";
+				echo "<a href=\"triggers.html?register=changestatus&triggerid=".$row["triggerid"]."&status=2&hostid=".$row["hostid"]."\">Enabled</a>";
 			}
-			$expression=rawurlencode($expression);
+			$expression=rawurlencode($row["expression"]);
 			echo "</TD>";
 			echo "<TD>";
 			if(isset($hostid))
 			{
-				echo "<A HREF=\"triggers.html?triggerid=$triggerid_&hostid=$hostid#form\">Change</A> ";
+				echo "<A HREF=\"triggers.html?triggerid=".$row["triggerid"]."&hostid=".$row["hostid"]."#form\">Change</A> ";
 			}
 			else
 			{
-				echo "<A HREF=\"triggers.html?triggerid=$triggerid_#form\">Change</A> ";
+				echo "<A HREF=\"triggers.html?triggerid=".$row["triggerid"]."#form\">Change</A> ";
 			}
-			echo "-<A HREF=\"actions.html?triggerid=$triggerid_&description=$description\">ShowActions</A>";
+//			echo "-<A HREF=\"actions.html?triggerid=".$row["triggerid"]."&description=".$row["description"]."\">ShowActions</A>";
+			echo "-<A HREF=\"actions.html?triggerid=".$row["triggerid"]."\">ShowActions</A>";
 			echo "</TD>";
 			echo "</TR>\n";
 		}

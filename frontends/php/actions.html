@@ -55,49 +55,32 @@
 	$col=0;
 	while($row=DBfetch($result))
 	{
-		$actid=DBget_field($result,$i,0);
-		$good="OFF";
-		if(DBget_field($result,$i,3))
-		{
-			$good="ON";
-		}
-		$to=DBget_field($result,$i,2);
-		$delay=DBget_field($result,$i,4);
-		$subject=DBget_field($result,$i,5);
-		$msg=DBget_field($result,$i,6);
-
-		if(isset($actionid) && ($actionid==$actid))
+		if(isset($actionid) && ($actionid==$row["actionid"]))
 		{
 			echo "<TR BGCOLOR=#FFDDDD>";
-			$col=$col+1;
-			$sactid=$actid;
-			$sgood=$good;
-			$sto=$to;
-			$sdelay=$delay;
-			$ssubject=$subject;
-			$smsg=$msg;
+			$col++;
 		} 
 		else
 		{
-			if($col==1) 
-			{
-				echo "<TR BGCOLOR=#EEEEEE>";
-				$col=0;
-			} else
-			{
-				echo "<TR BGCOLOR=#DDDDDD>";
-				$col=1;
-			}
+			if($col++%2 == 1)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
+			else			{ echo "<TR BGCOLOR=#DDDDDD>"; }
 		}
   
-		echo "<TD>$to</TD>";
-		echo "<TD>$good</TD>";
-		echo "<TD>$delay</TD>";
-		echo "<TD>$subject</TD>";
-		echo "<TD>$msg</TD>";
+		echo "<TD>".$row["alias"]."</TD>";
+		if($row["good"])
+		{
+			echo "<TD>ON</TD>";
+		}
+		else
+		{
+			echo "<TD>OFF</TD>";
+		}
+		echo "<TD>".$row["delay"]."</TD>";
+		echo "<TD>".$row["subject"]."</TD>";
+		echo "<TD>".$row["message"]."</TD>";
 		echo "<TD>";
-		echo " <A HREF=\"actions.html?register=edit&actionid=$actid&triggerid=$triggerid\">Edit</A>";
-		echo ", <A HREF=\"actions.html?register=delete&actionid=$actid&triggerid=$triggerid\">Delete</A>";
+		echo " <A HREF=\"actions.html?register=edit&actionid=".$row["actionid"]."&triggerid=".$row["triggerid"]."\">Edit</A>";
+		echo ", <A HREF=\"actions.html?register=delete&actionid=".$row["actionid"]."&triggerid=".$row["triggerid"]."\">Delete</A>";
 		echo "</TD></TR>";
 	}
 	echo "</TABLE>";
@@ -133,7 +116,6 @@
 		$result=DBselect($sql);
 		$message="<INSERT YOUR MESSAGE HERE>\n\n------Latest data------\n\n";
 		while($row=DBfetch($result))
-//		for($i=0;$i<DBnum_rows($result);$i++)
 		{
 			$message=$message.$row["description"].": \{".$row["host"].":".$row["key_"].".last(0)}  (latest value)\n";
 			$message=$message.$row["description"].": \{".$row["host"].":".$row["key_"].".max(300)} (maximum value for last 5 min)\n";
@@ -158,17 +140,15 @@
 
 	$sql="select userid,alias from users order by alias";
 	$result=DBselect($sql);
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
 	{
-		$id=DBget_field($result,$i,0);
-		$name=DBget_field($result,$i,1);
-		if(isset($sto) && ($name==$sto))
+		if(isset($sto) && ($row["name"] == $sto))
 		{
-			echo "<option value=\"$id\" SELECTED>$name";
+			echo "<option value=\"".$row["userid"]."\" SELECTED>".$row["alias"];
 		}
 		else
 		{
-			echo "<option value=\"$id\">$name";
+			echo "<option value=\"".$row["userid"]."\">".$row["alias"];
 		}
 	}
 	echo "</select>";

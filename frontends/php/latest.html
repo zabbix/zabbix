@@ -56,9 +56,22 @@
 		cr();
 		echo "<TR BGCOLOR=\"CCCCCC\">";
 		cr();
-		echo "<TD><B>Description</B></TD>";
-		cr();
-		echo "<TD WIDTH=\"10%\" NOSAVE><B>Last check</B></TD>";
+		if(!isset($sort)||(isset($sort)&&($sort=="description")))
+		{
+			echo "<TD><B>DESCRIPTION</B></TD>";
+		}
+		else
+		{
+			echo "<TD><B><a href=\"latest.html?hostid=$hostid&sort=description\">Description</B></TD>";
+		}
+		if(isset($sort)&&($sort=="lastcheck"))
+		{
+			echo "<TD WIDTH=\"10%\"><B>LAST CHECK</B></TD>";
+		}
+		else
+		{
+			echo "<TD WIDTH=\"10%\"><B><a href=\"latest.html?hostid=$hostid&sort=lastcheck\">Last check</B></TD>";
+		}
 		cr();
 		echo "<TD WIDTH=\"10%\" NOSAVE><B>Last value</B></TD>"; 
 		cr();
@@ -71,77 +84,80 @@
 		echo "</TR>";
 		cr();
 
-
 		$col=0;
-		$result=DBselect("select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and h.hostid=$hostid order by h.host,i.description");
-		for($i=0;$i<DBnum_rows($result);$i++)
+		if(isset($sort))
 		{
-			$host=DBget_field($result,$i,0);
-			$itemid=DBget_field($result,$i,1);
-			$hostid=DBget_field($result,$i,7);
+			switch ($sort)
+			{
+				case "description":
+					$sort="order by i.description";
+					break;
+				case "lastcheck":
+					$sort="order by i.lastclock";
+					break;
+				default:
+					$sort="order by i.description";
+					break;
+			}
+		}
+		else
+		{
+			$sort="";
+		}
+		$result=DBselect("select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and h.hostid=$hostid $sort");
+		while($row=DBfetch($result))
+		{
+			if($col++%2 == 1)	{ echo "<tr bgcolor=#DDDDDD>"; }
+			else			{ echo "<tr bgcolor=#EEEEEE>"; }
 
+			echo "<td>".$row["description"]."</td>";
 
-			if($col==1)
-			{
-				echo "<tr bgcolor=#DDDDDD>";
-				$col=0;
-			} else
-			{
-				echo "<tr bgcolor=#EEEEEE>";
-				$col=1;
-			}
-			$prevvalue=DBget_field($result,$i,4);
-			$description=DBget_field($result,$i,2);
-			$lastvalue=DBget_field($result,$i,3);
-			$lastclock=DBget_field($result,$i,5);
-			if($lastclock==NULL)
-			{
-				$lastclock="<center>-</center>";
-			}
-			else
-			{
-				$lastclock=date("H:i:s",$lastclock);
-			}
-			$itemid=DBget_field($result,$i,1);
-			$status=DBget_field($result,$i,6);
-			$dif=$lastvalue-$prevvalue;
-			echo "<td>$description</td>";
 			echo "<td>";
-			if($status==2)
+			if($row["status"] == 2)
 			{
 				echo "<font color=\"#FF6666\">";
 			}
-			elseif($status!=0)
+			elseif($row["status"] != 0)
 			{
 				echo "<font color=\"#666666\">";
 			}
-	
-			echo "$lastclock</td>\n";
-			if($lastvalue!=NULL)
+
+			if(!isset($row["lastclock"]))
 			{
-				if(round($lastvalue)==$lastvalue)
-				{ 
-					echo "<td>"; printf("%.0f",$lastvalue); echo "</td>";
-				}
-				else
-				{ 
-					echo "<td>"; printf("%.2f",$lastvalue); echo "</td>";
-				}
+				echo "<center>-</center>";
 			}
 			else
 			{
-			echo "<td><center>-</center></td>";
+				echo date("d M H:i:s",$row["lastclock"]);
+//				echo date("H:i:s",$row["lastclock"]);
 			}
-			if( $dif != 0 )
+			echo "</font></td>";
+
+			if(isset($row["lastvalue"]))
 			{
-				echo "<td>$dif</td>";
+				if(round($row["lastvalue"])==$row["lastvalue"])
+				{ 
+					echo "<td>"; printf("%.0f",$row["lastvalue"]); echo "</td>";
+				}
+				else
+				{ 
+					echo "<td>"; printf("%.2f",$row["lastvalue"]); echo "</td>";
+				}
 			}
 			else
 			{
 				echo "<td><center>-</center></td>";
 			}
-			echo "<td><center><a href=\"history.html?action=showhistory&itemid=$itemid\">Show</a></center></td>";
-			echo "<td><center><a href=\"trends.html?itemid=$itemid\">Show</a></center></td>";
+			if( isset($row["lastvalue"]) && isset($row["prevvalue"]) && $row["lastvalue"]-$row["prevvalue"] != 0 )
+			{
+				echo "<td>".($row["lastvalue"]-$row["prevvalue"])."</td>";
+			}
+			else
+			{
+				echo "<td><center>-</center></td>";
+			}
+			echo "<td><center><a href=\"history.html?action=showhistory&itemid=".$row["itemid"]."\">Show</a></center></td>";
+			echo "<td><center><a href=\"trends.html?itemid=".$row["itemid"]."\">Show</a></center></td>";
 			echo "</tr>";
 		}
 		echo "</table>";

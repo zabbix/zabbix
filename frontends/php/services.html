@@ -16,6 +16,10 @@
 		}
 		if($register=="add link")
 		{
+			if(!isset($softlink))
+			{
+				$softlink=0;
+			}
 			$result=add_service_link($servicedownid,$serviceupid,$softlink);
 			show_messages($result,"Service link added","Cannot add service link");
 		}
@@ -23,7 +27,7 @@
 ?>
 
 <?
-	show_table_header("IT's SERVICES");
+	show_table_header("IT SERVICES");
 
 	echo "<br>";
 
@@ -65,13 +69,14 @@
 			if($col++%2==0)	{ echo "<tr bgcolor=#EEEEEE>"; }
 			else		{ echo "<tr bgcolor=#DDDDDD>"; }
 		}
+		$childs=get_num_of_service_childs($row["serviceid"]);
 		if(isset($serviceid))
 		{
 			echo "<td><a href=\"services.html?serviceid=".$row["serviceid"]."#form\"> - ".$row["name"]."</a></td>";
 		}
 		else
-			echo "<td><a href=\"services.html?serviceid=".$row["serviceid"]."#form\">".$row["name"]."</a></td>";
 		{
+			echo "<td><a href=\"services.html?serviceid=".$row["serviceid"]."#form\">[$childs] ".$row["name"]."</a></td>";
 		}
 		echo "</tr>"; 
 	}
@@ -169,17 +174,17 @@
 	if(isset($serviceid))
 	{
 		echo "<input name=\"serviceid\" type=\"hidden\" value=$serviceid>";
-		echo "<input name=\"servicedownid\" type=\"hidden\" value=$serviceid>";
+		echo "<input name=\"serviceupid\" type=\"hidden\" value=$serviceid>";
 	}
 	echo "Name";
 	show_table2_h_delimiter();
 	$result=DBselect("select serviceid,triggerid,name from services order by name");
-        echo "<select name=\"serviceupid\" size=1>";
+        echo "<select name=\"servicedownid\" size=1>";
         for($i=0;$i<DBnum_rows($result);$i++)
         {
-                $serviceupid_=DBget_field($result,$i,0);
+                $servicedownid_=DBget_field($result,$i,0);
                 $name_=DBget_field($result,$i,2);
-		echo "<OPTION VALUE='$serviceupid_'>$name_";
+		echo "<OPTION VALUE='$servicedownid_'>$name_";
         }
         echo "</SELECT>";
 
