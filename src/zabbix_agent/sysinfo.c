@@ -160,8 +160,6 @@ void	add_user_parameter(char *key,char *command)
 {
 	int i;
 
-	printf("[%s]\n",key);
-
 	for(i=0;;i++)
 	{
 		if( commands[i].key == 0)

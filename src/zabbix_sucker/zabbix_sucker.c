@@ -256,7 +256,7 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 	{
 		syslog(LOG_WARNING, "Problem with sendto" );
 		close(s);
-		return	NETWORK_ERROR;
+		return	FAIL;
 	} 
 	i=sizeof(struct sockaddr_in);
 
@@ -265,7 +265,7 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 	{
 		syslog( LOG_WARNING, "Problem with recvfrom [%d]",errno );
 		close(s);
-		return	NETWORK_ERROR;
+		return	FAIL;
 	}
  
 	if( close(s)!=0 )

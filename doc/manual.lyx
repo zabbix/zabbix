@@ -1312,6 +1312,11 @@ IMPORTANT.
 misc/conf/zabbix_agentd.conf
 \shape default 
  for example.
+\layout Itemize
+
+IMPORTANT.
+ Default number of forked zabbix_agentd was changed to 5 (previous value
+ was 10).
 \layout Subsection
 
 ChangeLog

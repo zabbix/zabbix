@@ -97,6 +97,7 @@ void	process_config_file(void)
 	char	line[1024];
 	char	parameter[1024];
 	char	*value;
+	char	*value2;
 	int	lineno;
 
 	file=fopen("/etc/zabbix/zabbix_agentd.conf","r");
@@ -157,8 +158,17 @@ void	process_config_file(void)
 		}
 		else if(strcmp(parameter,"UserParameter")==0)
 		{
-			add_user_parameter("system[test]","who|wc -l");
-			syslog( LOG_CRIT, "ZZZ");
+			value2=strstr(value,",");
+			if(NULL == value2)
+			{
+				syslog( LOG_CRIT, "Error in line [%s] Line %d Symbol ',' expected", line, lineno);
+				fclose(file);
+				exit(1);
+			}
+			value2[0]=0;
+			value2++;
+			syslog( LOG_WARNING, "Added user-defined parameter [%s] Command [%s]", value, value2);
+//			add_user_parameter("system[test]","who|wc -l");
 		}
 		else
 		{
