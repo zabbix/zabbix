@@ -1,8 +1,8 @@
 <?
 	$DB_SERVER	="localhost";
 	$DB_DATABASE	="zabbix";
-	$DB_USER	="<user>";
-	$DB_PASSWORD	="<password>";
+	$DB_USER	="root";
+	$DB_PASSWORD	="";
 
 	$mysql=mysql_pconnect($DB_SERVER,$DB_USER,$DB_PASSWORD);
 	mysql_select_db($DB_DATABASE);
