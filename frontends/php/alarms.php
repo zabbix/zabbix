@@ -91,29 +91,24 @@
 	$sql="select clock,value,triggerid from alarms where triggerid=".$_GET["triggerid"]." order by clock desc $limit";
 	$result=DBselect($sql);
 
-	echo "<TABLE WIDTH=100% align=center BORDER=0 BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
-	echo "<TR BGCOLOR=\"#CCCCCC\">";
-	table_td("<B>".S_TIME."</B>","");
-	table_td("<B>".S_STATUS."</B>","");
-	table_td("<B>".S_DURATION."</B>","");
-	table_td("<B>".S_SUM."</B>","");
-	table_td("<B>%</B>","");
-	echo "</TR>";
+	table_begin();
+	table_header(array(S_TIME,S_STATUS,S_DURATION,S_SUM,"%"));
 	$truesum=0;
 	$falsesum=0;
 	$dissum=0;
 	$clock=mktime();
+	$col=0;
 	while($row=DBfetch($result))
 	{
 		$lclock=$clock;
 		$clock=$row["clock"];
 		$leng=$lclock-$row["clock"];
 
-		if($row["value"]==0)		{ echo "<TR BGCOLOR=#EEFFEE>"; }
-		elseif($row["value"]==2)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
-		else				{ echo "<TR BGCOLOR=#FFDDDD>"; }
+//		if($row["value"]==0)		{ echo "<TR BGCOLOR=#EEFFEE>"; }
+//		elseif($row["value"]==2)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
+//		else				{ echo "<TR BGCOLOR=#FFDDDD>"; }
 
-		table_td(date("Y.M.d H:i:s",$row["clock"]),"");
+//		table_td(date("Y.M.d H:i:s",$row["clock"]),"");
 		if($row["value"]==1)
 		{
 			$istrue=S_TRUE_BIG;
@@ -143,7 +138,7 @@
 		$proc=round($proc*100)/100;
 		$proc="$proc%";
  
-		table_td("<B>$istrue</B>","");
+//		table_td("<B>$istrue</B>","");
 		if($leng>60*60*24)
 		{
 			$leng= round(($leng/(60*60*24))*10)/10;
@@ -184,12 +179,19 @@
 			$sum="$sum secs";
 		}
   
-		table_td($leng,"");
-		table_td($sum,"");
-		table_td($proc,"");
-		echo "</TR>";
+//		table_td($leng,"");
+//		table_td($sum,"");
+//		table_td($proc,"");
+//		echo "</TR>";
+		table_row(array(
+			date("Y.M.d H:i:s",$row["clock"]),
+			$istrue,
+			$leng,
+			$sum,
+			$proc
+			),$col++);
 	}
-	echo "</TABLE>";
+	table_end();
 ?>
 
 <?php

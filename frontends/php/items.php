@@ -229,72 +229,66 @@
 				table_header(array(S_ID,S_KEY,S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),S_HISTORY,S_TRENDS,S_SHORT_NAME,S_TYPE,S_STATUS,S_ACTIONS));
 			}
 			$lasthost=$row["host"];
-		        iif_echo($col++%2 == 1,
-				"<TR BGCOLOR=#DDDDDD>",
-				"<TR BGCOLOR=#EEEEEE>");
 
-			echo "<TD><INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"".$row["itemid"]."\"> ".$row["itemid"]."</TD>";
-//			echo "<TD>".$row["itemid"]."</TD>";
-//			echo "<TD>".$row["host"]."</TD>";
-			echo "<TD>".$row["key_"]."</TD>";
-			echo "<TD>".$row["description"]."</TD>";
-			echo "<TD>".$row["delay"]."</TD>";
-			echo "<TD>".$row["history"]."</TD>";
-			echo "<TD>".$row["trends"]."</TD>";
-			echo "<TD>".$row["host"].":".$row["key_"]."</TD>";
-	
-			echo "<td align=center>";
+			$input="<INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"".$row["itemid"]."\"> ".$row["itemid"];
+
 			switch($row["type"])
 			{
 				case 0:
-					echo S_ZABBIX_AGENT;
+					$type=S_ZABBIX_AGENT;
 					break;
 				case 1:
-					echo S_SNMPV1_AGENT;
+					$type=S_SNMPV1_AGENT;
 					break;
 				case 2:
-					echo S_ZABBIX_TRAPPER;
+					$type=S_ZABBIX_TRAPPER;
 					break;
 				case 3:
-					echo S_SIMPLE_CHECK;
+					$type=S_SIMPLE_CHECK;
 					break;
 				case 4:
-					echo S_SNMPV2_AGENT;
+					$type=S_SNMPV2_AGENT;
 					break;
 				case 5:
-					echo S_ZABBIX_INTERNAL;
+					$type=S_ZABBIX_INTERNAL;
 					break;
 				default:
-					echo S_UNKNOWN;
+					$type=S_UNKNOWN;
 					break;
 			}
-			echo "</td>";
 
 			
-			echo "<td align=center>";
 			switch($row["status"])
 			{
 				case 0:
-					echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$_GET["hostid"]."&register=changestatus&status=1\"><font color=\"00AA00\">".S_ACTIVE."</font></a>";
+					$status=array("value"=>"<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$_GET["hostid"]."&register=changestatus&status=1\">".S_ACTIVE."</a>","class"=>"off");
 					break;
 				case 1:
-					echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$_GET["hostid"]."&register=changestatus&status=0\"><font color=\"AA0000\">".S_NOT_ACTIVE."</font></a>";
+					$status=array("value"=>"<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$_GET["hostid"]."&register=changestatus&status=0\">".S_NOT_ACTIVE."</a>","class"=>"on");
 					break;
-#				case 2:
-#					echo "Trapper";
-#					break;
 				case 3:
-					echo "<font color=\"AAAAAA\">".S_NOT_SUPPORTED."</font>";
+					$status=array("value"=>S_NOT_SUPPORTED,"class"=>"unknown");
 					break;
 				default:
-					echo S_UNKNOWN;
+					$status=S_UNKNOWN;
 			}
-			echo "</td>";
 	
-        		iif_echo(check_right("Item","U",$row["itemid"]),
-				"<TD><A HREF=\"items.php?register=change&itemid=".$row["itemid"]."#form\">".S_CHANGE."</A></TD>",
-				"<TD>".S_CHANGE."</TD>");
-			echo "</TR>";
+        		$actions=iif(check_right("Item","U",$row["itemid"]),
+				"<A HREF=\"items.php?register=change&itemid=".$row["itemid"]."#form\">".S_CHANGE."</A>",
+				S_CHANGE);
+
+			table_row(array(
+				$input,
+				$row["key_"],
+				$row["description"],
+				$row["delay"],
+				$row["history"],
+				$row["trends"],
+				$row["host"].":".$row["key_"],
+				$type,
+				$status,
+				$actions
+				),$col++);
 		}
 		table_end();
 		show_table2_header_begin();

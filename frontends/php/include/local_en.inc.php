@@ -319,6 +319,15 @@
 	define("S_LAST_CHECK_BIG",			"LAST CHECK");
 	define("S_LAST_VALUE",				"Last value");
 
+//	sysmap.php
+	define("S_LABEL",				"Label");
+	define("S_X",					"X");
+	define("S_Y",					"Y");
+	define("S_ICON",				"Icon");
+	define("S_HOST_1",				"Host 1");
+	define("S_HOST_2",				"Host 2");
+	define("S_LINK_STATUS_INDICATOR",		"Link status indicator");
+
 //	map.php
 	define("S_OK_BIG",				"OK");
 	define("S_PROBLEMS_SMALL",			"problems");
