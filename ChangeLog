@@ -1,5 +1,6 @@
 Changes for 1.0beta1:
 
+(Patches for services and services_links required. Support for PostgreSQL)
  - added srv_status.html and services.html (Alexei)
  - added table services and services_links (Alexei)
  - support for parameter StartAgents in zabbix_agentd.conf (Alexei)
