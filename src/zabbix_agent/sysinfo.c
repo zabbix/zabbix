@@ -592,10 +592,12 @@ crc_buf2(p, clen, cval)
 /* Solaris. */
 #ifndef HAVE_SYSINFO_FREESWAP
 #ifdef HAVE_SYS_SWAP_SWAPTABLE
-void get_swapinfo(int *total, int *fr)
+void get_swapinfo(double *total, double *fr)
 {
 	register int cnt, i, page_size;
-	register int t, f;
+/* Support for >2Gb */
+/*	register int t, f;*/
+	double	t, f;
 	struct swaptable *swt;
 	struct swapent *ste;
 	static char path[256];
@@ -1907,11 +1909,11 @@ double	SWAPFREE(void)
 /* Solaris */
 #else
 #ifdef HAVE_SYS_SWAP_SWAPTABLE
-	int swaptotal,swapfree;
+	double swaptotal,swapfree;
 
 	get_swapinfo(&swaptotal,&swapfree);
 
-	return	(double)swapfree;
+	return	swapfree;
 #else
 	return	FAIL;
 #endif
@@ -1956,11 +1958,11 @@ double	SWAPTOTAL(void)
 /* Solaris */
 #else
 #ifdef HAVE_SYS_SWAP_SWAPTABLE
-	int swaptotal,swapfree;
+	double swaptotal,swapfree;
 
 	get_swapinfo(&swaptotal,&swapfree);
 
-	return	(double)swaptotal;
+	return	swaptotal;
 #else
 	return	FAIL;
 #endif
