@@ -36,7 +36,7 @@
 
 static pid_t *pids;
 
-char	host_allowed[16];
+char	*config_host_allowed=NULL;
 
 void	signal_handler( int sig )
 {
@@ -81,7 +81,7 @@ void    daemon_init(void)
 	}
 
         openlog("zabbix_agentd",LOG_PID,LOG_USER);
-/*	setlogmask(LOG_UPTO(LOG_DEBUG)); */
+	/*	setlogmask(LOG_UPTO(LOG_DEBUG)); */
 	setlogmask(LOG_UPTO(LOG_WARNING));
 
 	if(setpriority(PRIO_PROCESS,0,5)!=0)
@@ -91,20 +91,85 @@ void    daemon_init(void)
 
 }
 
-void	init_security(void)
+void	process_config_file(void)
 {
-	int file;
-	int	i;
+	FILE	*file;
+	char	line[1024];
+	char	parameter[1024];
+	char	*value;
+	int	lineno;
 
-	file=open("/etc/zabbix/zabbix_agent.conf",O_RDONLY);
-	if(file == -1)
+	file=fopen("/etc/zabbix/zabbix_agentd.conf","r");
+	if(NULL == file)
 	{
-		syslog( LOG_CRIT, "Cannot open /etc/zabbix/zabbix_agent.conf");
+		syslog( LOG_CRIT, "Cannot open /etc/zabbix/zabbix_agentd.conf");
 		exit(1);
 	}
-	i=read(file, host_allowed, 16);
-	host_allowed[i-1]=0;
-	close(file);
+
+	lineno=1;
+	while(fgets(line,1024,file) != NULL)
+	{
+		if(line[0]=='#')	continue;
+		if(strlen(line)==1)	continue;
+
+		strcpy(parameter,line);
+
+		value=strstr(line,"=");
+
+		if(NULL == value)
+		{
+			syslog( LOG_CRIT, "Error in line [%s] Line %d", line, lineno);
+			fclose(file);
+			exit(1);
+		}
+		value++;
+		value[strlen(value)-1]=0;
+
+		parameter[value-line-1]=0;
+
+		syslog( LOG_DEBUG, "Parameter [%s] Value [%s]", parameter, value);
+
+		if(strcmp(parameter,"Server")==0)
+		{
+			config_host_allowed=(char *)malloc(strlen(value));
+			strcpy(config_host_allowed,value);
+		}
+		else if(strcmp(parameter,"DebugLevel")==0)
+		{
+			if(strcmp(value,"1") == 0)
+			{
+				setlogmask(LOG_UPTO(LOG_CRIT));
+			}
+			else if(strcmp(value,"2") == 0)
+			{
+				setlogmask(LOG_UPTO(LOG_WARNING));
+			}
+			else if(strcmp(value,"3") == 0)
+			{
+				setlogmask(LOG_UPTO(LOG_DEBUG));
+			}
+			else
+			{
+				syslog( LOG_CRIT, "Wrong DebugLevel in line %d", lineno);
+				fclose(file);
+				exit(1);
+			}
+		}
+		else if(strcmp(parameter,"UserParameter")==0)
+		{
+			add_user_parameter("system[test]","who|wc -l");
+			syslog( LOG_CRIT, "ZZZ");
+		}
+		else
+		{
+			syslog( LOG_CRIT, "Unsupported parameter [%s] Line %d", parameter, lineno);
+			fclose(file);
+			exit(1);
+		}
+
+		lineno++;
+	}
+	fclose(file);
 }
 
 int	check_security(int sockfd)
@@ -118,9 +183,10 @@ int	check_security(int sockfd)
 		i=sizeof(struct sockaddr_in);
 
 		sname=inet_ntoa(name.sin_addr);
-		if(strcmp(sname, host_allowed)!=0)
+
+		if(strcmp(sname, config_host_allowed)!=0)
 		{
-			syslog( LOG_WARNING, "Connection from [%s] rejected. Allowed server is [%s] ",sname, host_allowed);
+			syslog( LOG_WARNING, "Connection from [%s] rejected. Allowed server is [%s] ",sname, config_host_allowed);
 			return	FAIL;
 		}
 	}
@@ -264,8 +330,7 @@ int	main()
 	sigaction(SIGQUIT, &phan, NULL);
 	sigaction(SIGTERM, &phan, NULL);
 
-
-	init_security();
+	process_config_file();
 
 	syslog( LOG_WARNING, "zabbix_agentd started");
 

@@ -1295,7 +1295,23 @@ Status of Triggers
 
 \layout Itemize
 
-?????
+IMPORTANT.
+ Algorith for unreachble hosts changed.
+ In case of network problems host will be disabled for the next 120 seconds
+ (defined in 
+\shape italic 
+include/common.h
+\shape default 
+).
+\layout Itemize
+
+IMPORTANT.
+ Name and format of configuration file of zabbix_agentd has been changed.
+ See 
+\shape italic 
+misc/conf/zabbix_agentd.conf
+\shape default 
+ for example.
 \layout Subsection
 
 ChangeLog
@@ -2016,7 +2032,11 @@ When executed, the zabbix_agentd process forks himself (ten times by default).\S
 
 \latex no_latex 
 When a connection to zabbix_agent is made, the agent reads /etc/zabbix/zabbix_ag
-ent.conf in order to determine if the connection is coming from an authorized
+ent
+\latex default 
+d
+\latex no_latex 
+.conf in order to determine if the connection is coming from an authorized
  server.\SpecialChar ~
  The zabbix_agent.conf file must exist and contain the IP address
  of Zabbix server.
@@ -2056,6 +2076,30 @@ The process is run as daemon under non-priveledged user account, usually
 
 \latex no_latex 
 Syslog is used to store debug information for the process.
+\layout Description
+
+/etc/zabbix/zabbix_agentd.conf
+\layout Standard
+
+The file contains configuration parameters for zabbix_agentd.
+ Possible parameters:
+\layout Itemize
+
+Server=<IP address of Zabbix server>
+\layout Itemize
+
+DebugLevel=<debug level>
+\layout Itemize
+
+UserParameter=<key>,<shell command>
+\layout Standard
+
+Example: UserParameter=users,who|wc -l
+\layout Standard
+
+\layout Standard
+
+Example configuration file can be found at misc/conf/zabbix_agentd.conf
 \layout Subsubsection
 
 zabbix_trapper
