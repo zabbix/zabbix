@@ -83,12 +83,15 @@ void	daemon_init(void)
 			fprintf(stderr,"Cannot setgid or setuid to zabbix");
 			exit(FAIL);
 		}
+/*
+Is not supported on HP-UX
 
 		if( (setegid(pwd->pw_gid) ==-1) || (seteuid(pwd->pw_uid) == -1) )
 		{
 			fprintf(stderr,"Cannot setegid or seteuid to zabbix");
 			exit(FAIL);
 		}
+*/
 	}
 
 	if( (pid = fork()) != 0 )

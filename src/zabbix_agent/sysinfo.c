@@ -415,25 +415,9 @@ crc_buf2(p, clen, cval)
 	return (0);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* Solaris. The code is stolen from www.deja.com */
 #ifndef HAVE_SYSINFO_FREESWAP
-#ifdef HAVE_SYS_SWAP_H
+#ifdef HAVE_SYS_SWAP_SWAPTABLE
 void get_swapinfo(int *total, int *fr)
 {
     register int cnt, i;
@@ -1027,7 +1011,7 @@ float	SWAPFREE(void)
 	}
 /* Solaris */
 #else
-#ifdef HAVE_SYS_SWAP_H
+#ifdef HAVE_SYS_SWAP_SWAPTABLE
 	int swaptotal,swapfree;
 
 	get_swapinfo(&swaptotal,&swapfree);
@@ -1072,7 +1056,7 @@ float	SWAPTOTAL(void)
 	}
 /* Solaris */
 #else
-#ifdef HAVE_SYS_SWAP_H
+#ifdef HAVE_SYS_SWAP_SWAPTABLE
 	int swaptotal,swapfree;
 
 	get_swapinfo(&swaptotal,&swapfree);
