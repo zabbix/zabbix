@@ -577,10 +577,36 @@ int get_minnextcheck(int now)
 
 int update_host_status(int hostid,int status)
 {
+	DB_RESULT	*result;
 	char	sql[MAX_STRING_LEN+1];
 	int	now;
 
+	sprintf(sql,"select status,disable_until from hosts where hostid=%d",hostid);
+	result = DBselect(sql);
+
+	if( (result==NULL) || (DBnum_rows(result)==0) )
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "No host with hostid=[%d]",hostid);
+		DBfree_result(result);
+		return FAIL; 
+	}
+
 	now=time(NULL);
+
+	if(status == atoi(DBget_field(result,0,0)))
+	{
+		if((status==2) && (now+DELAY_ON_NETWORK_FAILURE>=atoi(DBget_field(result,0,1))) )
+		{
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Host already has status [%d]",status);
+			DBfree_result(result);
+			return FAIL;
+		}
+	}
+
+	DBfree_result(result);
 
 	if(status==0)
 	{
@@ -620,7 +646,7 @@ int get_values(void)
 
 	now = time(NULL);
 
-	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-1,sucker_num-1);
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-1,sucker_num-1);
 	result = DBselect(sql);
 
 	rows = DBnum_rows(result);
