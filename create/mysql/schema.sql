@@ -256,28 +256,28 @@ CREATE TABLE hosts (
 -- Table structure for table 'items_template'
 --
 
-CREATE TABLE items_template (
-  itemtemplateid int(4) NOT NULL,
-  description varchar(255) DEFAULT '' NOT NULL,
-  key_ varchar(64) DEFAULT '' NOT NULL,
-  delay int(4) DEFAULT '0' NOT NULL,
-  value_type int(4) DEFAULT '0' NOT NULL,
-  PRIMARY KEY (itemtemplateid),
-  UNIQUE (key_)
-) type=InnoDB;
+--CREATE TABLE items_template (
+--  itemtemplateid int(4) NOT NULL,
+--  description varchar(255) DEFAULT '' NOT NULL,
+--  key_ varchar(64) DEFAULT '' NOT NULL,
+--  delay int(4) DEFAULT '0' NOT NULL,
+--  value_type int(4) DEFAULT '0' NOT NULL,
+--  PRIMARY KEY (itemtemplateid),
+--  UNIQUE (key_)
+--) type=InnoDB;
 
 --
 -- Table structure for table 'triggers_template'
 --
 
-CREATE TABLE triggers_template (
-  triggertemplateid int(4) NOT NULL,
-  itemtemplateid int(4) NOT NULL,
-  description varchar(255) DEFAULT '' NOT NULL,
-  expression varchar(255) DEFAULT '' NOT NULL,
-  PRIMARY KEY (triggertemplateid),
-  KEY (itemtemplateid)
-) type=InnoDB;
+--CREATE TABLE triggers_template (
+--  triggertemplateid int(4) NOT NULL,
+--  itemtemplateid int(4) NOT NULL,
+--  description varchar(255) DEFAULT '' NOT NULL,
+--  expression varchar(255) DEFAULT '' NOT NULL,
+--  PRIMARY KEY (triggertemplateid),
+--  KEY (itemtemplateid)
+--) type=InnoDB;
 
 --
 -- Table structure for table 'items'

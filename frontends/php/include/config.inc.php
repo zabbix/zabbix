@@ -2073,45 +2073,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return DBexecute($sql);
 	}
 
-	# Add Items and Triggers from template
-
-	function	add_from_templates($hostid,$host)
-	{
-		$result=DBselect("select itemtemplateid,description,key_,delay,value_type from items_template");
-		for($i=0;$i<DBnum_rows($result);$i++) 
-		{
-			$itemtemplateid=DBget_field($result,$i,0);
-			$description=DBget_field($result,$i,1);
-			$key=DBget_field($result,$i,2);
-			$delay=DBget_field($result,$i,3);
-			$value_type=DBget_field($result,$i,4);
-
-			$itemid=add_item($description,$key,$hostid,$delay,30,0,0,"","",$value_type,'');
-
-			$result2=DBselect("select triggertemplateid,description,expression from triggers_template where itemtemplateid=$itemtemplateid");
-			for($j=0;$j<DBnum_rows($result2);$j++)
-			{
-				$itemtemplateid=DBget_field($result2,$j,0);
-				$description=DBget_field($result2,$j,1);
-				$expression=DBget_field($result2,$j,2);
-
-				for($z=0;$z<strlen($expression);$z++)
-				{
-					if($expression[$z] == ':')
-					{
-						$expression=substr($expression,0,$z)."$host:$key".substr($expression,$z+1);
-						
-						break;
-					}
-				}
-#				$description=sprintf($description,$host);
-
-				add_trigger($expression,$description,0,0,"","");
-			}
-		}
-		return	TRUE;
-	}
-
 	# Update Graph
 
 	function	update_graph($graphid,$name,$width,$height)
@@ -2285,7 +2246,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Add Host definition
 
-	function	add_host($host,$port,$status,$template,$useip,$ip,$host_templateid,$newgroup,$groups)
+	function	add_host($host,$port,$status,$useip,$ip,$host_templateid,$newgroup,$groups)
 	{
 		global	$ERROR_MSG;
 
@@ -2299,12 +2260,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 			$ERROR_MSG="Hostname should contain 0-9a-zA-Z_.- characters only";
 			return 0;
-		}
-
-		if(($template=="true") && ($host_templateid!=0))
-		{
-			$ERROR_MSG="Choose either 'Add zabbix_agent parameters' or 'Use host as template' option";
-			return	0;
 		}
 
 		if( isset($useip) && ($useip=="on") )
@@ -2324,10 +2279,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		
 		$hostid=DBinsert_id($result,"hosts","hostid");
 
-		if($template=="true")
-		{
-			$result=add_from_templates($hostid,$host);
-		}
 		if($host_templateid != 0)
 		{
 			$result=add_using_host_template($hostid,$host_templateid);
