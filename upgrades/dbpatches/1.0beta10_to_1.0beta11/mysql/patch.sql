@@ -18,3 +18,11 @@ CREATE TABLE users_groups (
   userid		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (usrgrpid,userid)
 ) type=InnoDB;
+
+insert into usrgrp (usrgrpid, name) values (NULL, 'UNIX administrators');  
+insert into usrgrp (usrgrpid, name) values (NULL, 'Database administrators');
+insert into usrgrp (usrgrpid, name) values (NULL, 'Network administrators');
+insert into usrgrp (usrgrpid, name) values (NULL, 'Security specialists');
+insert into usrgrp (usrgrpid, name) values (NULL, 'WEB administrators');
+insert into usrgrp (usrgrpid, name) values (NULL, 'Head of IT department');  
+insert into usrgrp (usrgrpid, name) values (NULL, 'Zabbix administrators');  
