@@ -1,5 +1,4 @@
 Changes for 1.0beta1:
-(Add support for PostgreSQL and patches)
 (Add description of new tables and column URL to the manual)
 (snmptrap -v 1 127.0.0.1 public '' localhost 3 0 '' interfaces.ifTable.ifEntry.ifIndex.1 i 1)
 
