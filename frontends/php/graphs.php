@@ -20,23 +20,23 @@
 ?>
 
 <?
-	if(isset($register))
+	if(isset($HTTP_GET_VARS["register"]))
 	{
-		if($register=="add")
+		if($HTTP_GET_VARS["register"]=="add")
 		{
-			$result=add_graph($name,$width,$height);
+			$result=add_graph($HTTP_GET_VARS["name"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
 			show_messages($result,"Graph added","Cannot add graph");
 		}
-		if($register=="update")
+		if($HTTP_GET_VARS["register"]=="update")
 		{
-			$result=update_graph($graphid,$name,$width,$height);
+			$result=update_graph($HTTP_GET_VARS["graphid"],$HTTP_GET_VARS["name"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
 			show_messages($result,"Graph updated","Cannot update graph");
 		}
-		if($register=="delete")
+		if($HTTP_GET_VARS["register"]=="delete")
 		{
-			$result=delete_graph($graphid);
+			$result=delete_graph($HTTP_GET_VARS["graphid"]);
 			show_messages($result,"Graph deleted","Cannot delete graph");
-			unset($graphid);
+			unset($HTTP_GET_VARS["graphid"]);
 		}
 	}
 ?>
@@ -76,9 +76,9 @@
 <?
 	echo "<a name=\"form\"></a>";
 
-	if(isset($graphid))
+	if(isset($HTTP_GET_VARS["graphid"]))
 	{
-		$result=DBselect("select g.graphid,g.name,g.width,g.height from graphs g where graphid=$graphid");
+		$result=DBselect("select g.graphid,g.name,g.width,g.height from graphs g where graphid=".$HTTP_GET_VARS["graphid"]);
 		$row=DBfetch($result);
 		$name=$row["name"];
 		$width=$row["width"];
@@ -96,10 +96,10 @@
 	echo "New graph";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"graphs.php\">";
-	if(isset($graphid))
+	echo "<form method=\"get\" action=\"graphs.php\">";
+	if(isset($HTTP_GET_VARS["graphid"]))
 	{
-		echo "<input name=\"graphid\" type=\"hidden\" value=$graphid>";
+		echo "<input name=\"graphid\" type=\"hidden\" value=".$HTTP_GET_VARS["graphid"].">";
 	}
 	echo "Name";
 	show_table2_h_delimiter();
@@ -117,7 +117,7 @@
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
-	if(isset($graphid))
+	if(isset($HTTP_GET_VARS["graphid"]))
 	{
 		echo "<input type=\"submit\" name=\"register\" value=\"update\">";
 	}

@@ -17,11 +17,11 @@
 ?>
 
 <?
-	if(isset($HTTP_POST_VARS["register"]) && ($HTTP_POST_VARS["register"]=="update"))
+	if(isset($HTTP_GET_VARS["register"]) && ($HTTP_GET_VARS["register"]=="update"))
 	{
-		$result=update_config($HTTP_POST_VARS["smtp_server"],$HTTP_POST_VARS["smtp_helo"],
-			$HTTP_POST_VARS["smtp_email"],$HTTP_POST_VARS["alarm_history"],
-			$HTTP_POST_VARS["alert_history"]);
+		$result=update_config($HTTP_GET_VARS["smtp_server"],$HTTP_GET_VARS["smtp_helo"],
+			$HTTP_GET_VARS["smtp_email"],$HTTP_GET_VARS["alarm_history"],
+			$HTTP_GET_VARS["alert_history"]);
 		show_messages($result, "Configuration updated", "Configuation was NOT updated");
 	}
 ?>
@@ -40,7 +40,7 @@
 	echo "Configuration";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"config.php\">";
+	echo "<form method=\"get\" action=\"config.php\">";
 	echo "SMTP server";
 	show_table2_h_delimiter();
 	echo "<input name=\"smtp_server\" value=\"".$config["smtp_server"]."\"size=40>";
