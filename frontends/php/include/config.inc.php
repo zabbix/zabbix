@@ -3114,11 +3114,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	}
 
 	# Insert form for Item information
-	function	insert_item_form($itemid)
+	function	insert_item_form()
 	{
-		if(isset($itemid))
+		global  $HTTP_GET_VARS;
+
+		if(isset($HTTP_GET_VARS["itemid"]))
 		{
-			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.snmp_port from items i,hosts h where i.itemid=$itemid and h.hostid=i.hostid");
+			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.snmp_port from items i,hosts h where i.itemid=".$HTTP_GET_VARS["itemid"]." and h.hostid=i.hostid");
 		
 			$description=DBget_field($result,0,0);
 			$key=DBget_field($result,0,1);
@@ -3136,19 +3138,19 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 		else
 		{
-			$description="";
-			$key="";
-			$host="";
-			$port=10000;
-			$delay=30;
-			$history=365;
-			$status=0;
-			$type=0;
-			$snmp_community="public";
-			$snmp_oid="interfaces.ifTable.ifEntry.ifInOctets.1";
-			$value_type=0;
-			$trapper_hosts="";
-			$snmp_port=161;
+			$description=@iif(isset($HTTP_GET_VARS["description"]),$HTTP_GET_VARS["description"],"");
+			$key=@iif(isset($HTTP_GET_VARS["key"]),$HTTP_GET_VARS["key"],"");
+			$host=@iif(isset($HTTP_GET_VARS["host"]),$HTTP_GET_VARS["host"],"");
+			$port=@iif(isset($HTTP_GET_VARS["port"]),$HTTP_GET_VARS["port"],10000);
+			$delay=@iif(isset($HTTP_GET_VARS["delay"]),$HTTP_GET_VARS["delay"],30);
+			$history=@iif(isset($HTTP_GET_VARS["history"]),$HTTP_GET_VARS["history"],365);
+			$status=@iif(isset($HTTP_GET_VARS["status"]),$HTTP_GET_VARS["status"],0);
+			$type=@iif(isset($HTTP_GET_VARS["type"]),$HTTP_GET_VARS["type"],0);
+			$snmp_community=@iif(isset($HTTP_GET_VARS["snmp_community"]),$HTTP_GET_VARS["snmp_community"],"public");
+			$snmp_oid=@iif(isset($HTTP_GET_VARS["snmp_oid"]),$HTTP_GET_VARS["snmp_oid"],"interfaces.ifTable.ifEntry.ifInOctets.1");
+			$value_type=@iif(isset($HTTP_GET_VARS["value_type"]),$HTTP_GET_VARS["value_type"],0);
+			$trapper_hosts=@iif(isset($HTTP_GET_VARS["trapper_hosts"]),$HTTP_GET_VARS["trapper_hosts"],"");
+			$snmp_port=@iif(isset($HTTP_GET_VARS["snmp_port"]),$HTTP_GET_VARS["snmp_port"],161);
 		}
 
 		echo "<br>";
@@ -3158,7 +3160,10 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
  
 		show_table2_v_delimiter();
 		echo "<form method=\"get\" action=\"items.php\">";
-		echo "<input class=\"biginput\" name=\"itemid\" type=hidden value=$itemid size=8>";
+		if(isset($HTTP_GET_VARS["itemid"]))
+		{
+			echo "<input class=\"biginput\" name=\"itemid\" type=hidden value=".$HTTP_GET_VARS["itemid"].">";
+		}
 		echo "Description";
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"description\" value=\"$description\"size=40>";
@@ -3183,30 +3188,10 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	        }
 		echo "</select>";
 
-/*		show_table2_v_delimiter();
-		echo "Host";
-		show_table2_h_delimiter();
-		echo "<select multiple class=\"biginput\" name=\"hostid[]\" size=\"5\">";
-	        $result=DBselect("select hostid,host from hosts order by host");
-	        for($i=0;$i<DBnum_rows($result);$i++)
-	        {
-	                $hostid_=DBget_field($result,$i,0);
-	                $host_=DBget_field($result,$i,1);
-			if($host==$host_)
-			{
-	                	echo "<option value=\"$hostid_\" selected>$host_";
-			}
-			else
-			{
-	                	echo "<option value=\"$hostid_\">$host_";
-			}
-	        }
-		echo "</select>";*/
-
 		show_table2_v_delimiter();
 		echo "Type";
 		show_table2_h_delimiter();
-		echo "<SELECT class=\"biginput\" NAME=\"type\" value=\"$type\" size=\"1\">";
+		echo "<SELECT class=\"biginput\" NAME=\"type\" value=\"$type\" size=\"1\" onChange=\"submit()\">";
 		echo "<OPTION VALUE=\"0\"";
 		if($type==0) echo "SELECTED";
 		echo ">Zabbix agent";
@@ -3226,31 +3211,47 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		if($type==5) echo "SELECTED";
 		echo ">Zabbix internal";
 		echo "</SELECT>";
- 
-		show_table2_v_delimiter();
-		echo "SNMP community (for SNMP only)";
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"snmp_community\" value=\"$snmp_community\" size=16>";
 
-		show_table2_v_delimiter();
-		echo "SNMP OID (for SNMP only)";
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"snmp_oid\" value=\"$snmp_oid\" size=40>";
+		if(($type==1)||($type==4))
+		{ 
+			show_table2_v_delimiter();
+			echo "SNMP community";
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"snmp_community\" value=\"$snmp_community\" size=16>";
 
-		show_table2_v_delimiter();
-		echo "SNMP port (for SNMP only)";
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"snmp_port\" value=\"$snmp_port\" size=5>";
+			show_table2_v_delimiter();
+			echo "SNMP OID";
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"snmp_oid\" value=\"$snmp_oid\" size=40>";
+
+			show_table2_v_delimiter();
+			echo "SNMP port";
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"snmp_port\" value=\"$snmp_port\" size=5>";
+		}
+		else
+		{
+			echo "<input class=\"biginput\" name=\"snmp_community\" type=hidden value=\"$snmp_community\">";
+			echo "<input class=\"biginput\" name=\"snmp_oid\" type=hidden value=\"$snmp_oid\">";
+			echo "<input class=\"biginput\" name=\"snmp_port\" type=hidden value=\"$snmp_port\">";
+		}
 
 		show_table2_v_delimiter();
 		echo "Key";
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"key\" value=\"$key\" size=40>";
 
-		show_table2_v_delimiter();
-		echo "Update interval (in sec)";
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"delay\" value=\"$delay\" size=5>";
+		if($type!=2)
+		{
+			show_table2_v_delimiter();
+			echo "Update interval (in sec)";
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"delay\" value=\"$delay\" size=5>";
+		}
+		else
+		{
+			echo "<input class=\"biginput\" name=\"delay\" type=hidden value=\"$delay\">";
+		}
 
 		show_table2_v_delimiter();
 		echo "Keep history (in days)";
@@ -3287,15 +3288,22 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo ">Character";
 		echo "</SELECT>";
 
-		show_table2_v_delimiter();
-		echo "Allowed hosts (for trapper item only)";
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"trapper_hosts\" value=\"$trapper_hosts\" size=40>";
+		if($type==2)
+		{
+			show_table2_v_delimiter();
+			echo "Allowed hosts";
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"trapper_hosts\" value=\"$trapper_hosts\" size=40>";
+		}
+		else
+		{
+			echo "<input class=\"biginput\" name=\"trapper_hosts\" type=hidden value=\"$trapper_hosts\">";
+		}
  
 		show_table2_v_delimiter2();
 		echo "<input type=\"submit\" name=\"register\" value=\"add\">";
 		echo "<input type=\"submit\" name=\"register\" value=\"add to all hosts\">";
-		if(isset($itemid))
+		if(isset($HTTP_GET_VARS["itemid"]))
 		{
 			echo "<input type=\"submit\" name=\"register\" value=\"update\">";
 			echo "<input type=\"submit\" name=\"register\" value=\"delete\">";
