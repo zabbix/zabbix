@@ -10,17 +10,17 @@
 
 	$start_time=time(NULL);
 
-	if(!isset($period))
+	if(!isset($HTTP_GET_VARS["period"]))
 	{
-		$period=0;
+		$HTTP_GET_VARS["period"]=0;
 	}
 
-	if(!isset($from))
+	if(!isset($HTTP_GET_VARS["from"]))
 	{
-		$from=0;
+		$HTTP_GET_VARS["from"]=0;
 	}
 
-	$result=DBselect("select name,width,height from graphs where graphid=$graphid");
+	$result=DBselect("select name,width,height from graphs where graphid=".$HTTP_GET_VARS["graphid"]);
 
 	$name=DBget_field($result,0,0);
 	$width=DBget_field($result,0,1);
@@ -35,7 +35,7 @@
 	Header( "Content-type:  image/png"); 
 	Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 
-	$result2=DBselect("select gi.itemid,i.description,gi.color,h.host from graphs_items gi,items i,hosts h where gi.itemid=i.itemid and gi.graphid=$graphid and i.hostid=h.hostid order by gi.gitemid");
+	$result2=DBselect("select gi.itemid,i.description,gi.color,h.host from graphs_items gi,items i,hosts h where gi.itemid=i.itemid and gi.graphid=".$HTTP_GET_VARS["graphid"]." and i.hostid=h.hostid order by gi.gitemid");
 
 	$shiftX=10;
 	$shiftYup=17;
@@ -85,13 +85,13 @@
 		ImageDashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
 	}
 
-	$graph=get_graph_by_graphid($graphid);
+	$graph=get_graph_by_graphid($HTTP_GET_VARS["graphid"]);
 	$str=$graph["name"];
 	$x=imagesx($im)/2-ImageFontWidth(4)*strlen($str)/2;
 	ImageString($im, 4,$x,1, $str , $darkred);
 
-	$from_time = time(NULL)-$period-3600*$from;
-	$to_time   = time(NULL)-3600*$from;
+	$from_time = time(NULL)-$HTTP_GET_VARS["period"]-3600*$HTTP_GET_VARS["from"];
+	$to_time   = time(NULL)-3600*$HTTP_GET_VARS["from"];
 
 
 	$len=array();
@@ -112,7 +112,7 @@
 		$color[$item]=DBget_field($result2,$item,2);
 		$host[$item]=DBget_field($result2,$item,3);
 	
-		$result=DBselect("select clock,value from history where itemid=$itemid and clock>$from_time and clock<$to_time order by clock");
+		$result=DBselect("select clock,value from history where itemid=".$HTTP_GET_VARS["itemid"]." and clock>$from_time and clock<$to_time order by clock");
 		$len[$item]=0;
 		$x[$item]=array();
 		$y[$item]=array();
@@ -132,7 +132,7 @@
 
 //	echo "MIN/MAX:",$minX," - ",$maxX," - ",$minY," - ",$maxY,"<Br>";
 
-//	$result2=DBselect("select itemid from graphs_items where graphid=$graphid");
+//	$result2=DBselect("select itemid from graphs_items where graphid=".$HTTP_GET_VARS["graphid"]);
 	for($item=0;$item<DBnum_rows($result2);$item++)
 	{
 		if(isset($minX)&&isset($minY)&&($minX!=$maxX)&&($minY!=$maxY))

@@ -72,7 +72,7 @@
 	echo "New item for graph";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"get\" action=\"graph.php?graphid=".$HTTP_GET_VARS["graphid"].">";
+	echo "<form method=\"get\" action=\"graph.php?graphid=".$HTTP_GET_VARS["graphid"]."\">";
 	if(isset($HTTP_GET_VARS["gitemid"]))
 	{
 		echo "<input name=\"gitemid\" type=\"hidden\" value=".$HTTP_GET_VARS["gitemid"].">";

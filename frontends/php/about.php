@@ -27,7 +27,7 @@
 </TR>
 <TR BGCOLOR=#EEEEEE>
 <TD ALIGN=LEFT>
-	<font face="Helvetica"><a href="http://sourceforge.net/tracker/?atid=378686&group_id=23494&func=browse">Feature request</a></font><br>
+	<font face="Helvetica"><a href="http://sourceforge.net/tracker/?atid=378686&group_id=23494&func=browse">Feature requests</a></font><br>
 </TD>
 <TD>
 	If you need additional functionality, go here.
