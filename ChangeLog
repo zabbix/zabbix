@@ -1,5 +1,6 @@
 Changes for 1.0beta13:
 
+ - added table 'trends' (Alexei)
  - cosmetic changes for IT Services screen (Alexei)
  - change of color schema for SLA graphs and report (Alexei)
  - redesigned availability chart (Alexei)
