@@ -350,6 +350,7 @@ void	process(char *command,char *value)
 	int	(*function)();
 	int	(*function_str)();
 	char	*parameter = NULL;
+	char	*cmd_line_param = NULL;
 	char	key[MAX_STRING_LEN];
 	char	param[1024];
 	char	cmd[1024];
@@ -373,6 +374,7 @@ void	process(char *command,char *value)
 			break;
 		}
 
+		cmd_line_param = NULL;
 		strcpy(key, commands[i].key);
 
 		if( (n = strstr(key,"[*]")) != NULL)
@@ -405,6 +407,7 @@ void	process(char *command,char *value)
 #ifdef TEST_PARAMETERS
 				parameter=commands[i].parameter;
 #else
+				cmd_line_param = param;
 				parameter=param;
 #endif
 				break;
@@ -445,7 +448,7 @@ void	process(char *command,char *value)
 		/* Special processing for EXECUTE_STR, it has more parameters */
 		if(function_str == EXECUTE_STR)
 		{
-			i=function_str(command,commands[i].parameter,parameter,&res2);
+			i=function_str(command,commands[i].parameter,cmd_line_param,&res2);
 		}
 		else
 		{
