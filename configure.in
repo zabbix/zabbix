@@ -673,6 +673,55 @@ dnl   			SNMP_LIBDIR=$withval/lib/ucd-snmp
 AC_SUBST(SNMP_LFLAGS)
 AC_SUBST(SNMP_INCLUDE)
 
+AC_MSG_CHECKING(for LDAP support)
+AC_ARG_WITH(ldap,
+[
+If you want to check LDAP servers:
+  --with-ldap[=DIR]       Include LDAP support.  DIR is the LDAP
+			base install directory, default is to search 
+			through a number of common places for the
+			LDAP files.],
+[
+  if test "$withval" != "no"; then
+       if test "$withval" = "yes"; then
+               if test -f /usr/local/openldap/include/ldap.h; then
+                       LDAP_INCDIR=/usr/local/openldap/include/
+                       LDAP_LIBDIR=/usr/local/openldap/lib/
+               elif test -f /usr/include/ldap.h; then
+                       LDAP_INCDIR=/usr/include
+                       LDAP_LIBDIR=/usr/lib
+               elif test -f /usr/local/include/ldap.h; then
+                       LDAP_INCDIR=/usr/local/include
+                       LDAP_LIBDIR=/usr/local/lib
+               else
+               AC_MSG_RESULT(no)
+               AC_MSG_ERROR(Invalid LDAP directory - unable to find ldap.h)
+               fi
+       else
+               if test -f $withval/include/ldap.h; then
+                       LDAP_INCDIR=$withval/include
+                       LDAP_LIBDIR=$withval/lib
+               else
+               AC_MSG_RESULT(no)
+               AC_MSG_ERROR(Invalid LDAP directory - unable to find ldap.h under $withval)
+               fi
+       fi
+
+    LDAP_INCLUDE=-I$LDAP_INCDIR
+    LDAP_LFLAGS="-L$LDAP_LIBDIR -lldap $LDAP_LFLAGS"
+
+
+    AC_DEFINE(HAVE_LDAP)
+    AC_MSG_RESULT(yes)
+
+  else
+       AC_MSG_RESULT(no)
+  fi
+],[
+  AC_MSG_RESULT(no)
+])
+AC_SUBST(LDAP_LFLAGS)
+AC_SUBST(LDAP_INCLUDE)
 
 if test "$have_db" != "yes"; then
 	echo "configure: No database selected! Use --with-XXX where XXX is your preferred database type";

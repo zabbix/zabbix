@@ -116,6 +116,10 @@
 	#include <kstat.h>
 #endif
 
+#ifdef HAVE_LDAP
+	#include <ldap.h>
+#endif
+
 #include "common.h"
 #include "sysinfo.h"
 
@@ -2488,6 +2492,65 @@ int	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose, int *
 	}
 }
 
+#ifdef HAVE_LDAP
+int    check_ldap(char *hostname, short port,int *value)
+{
+	int rc;
+	LDAP *ldap;
+	LDAPMessage *res;
+	LDAPMessage *msg;
+
+	char *base = "";
+	int scope = LDAP_SCOPE_BASE;
+	char *filter="(objectClass=*)";
+	int attrsonly=0;
+	char *attrs[2];
+
+	attrs[0] = "namingContexts";
+	attrs[1] = NULL;
+
+	BerElement *ber;
+	char *attr=NULL;
+	char **valRes=NULL;
+
+	ldap = ldap_init(hostname, port);
+	if ( !ldap )
+	{
+		*value=0;
+		return	SYSINFO_RET_OK;
+	}
+
+	rc = ldap_search_s(ldap, base, scope, filter, attrs, attrsonly, &res);
+	if( rc != 0 )
+	{
+		*value=0;
+		return	SYSINFO_RET_OK;
+	}
+
+	msg = ldap_first_entry(ldap, res);
+	if( !msg )
+	{
+		*value=0;
+		return	SYSINFO_RET_OK;
+	}
+       
+	attr = ldap_first_attribute (ldap, msg, &ber);
+	valRes = ldap_get_values( ldap, msg, attr );
+
+	ldap_value_free(valRes);
+	ldap_memfree(attr);
+	if (ber != NULL) {
+		ber_free(ber, 0);
+	}
+	ldap_msgfree(res);
+	ldap_unbind(ldap);
+       
+	*value=1;
+	return	SYSINFO_RET_OK;
+}
++#endif
+
+
 /* 
  *  0- NOT OK
  *  1 - OK
@@ -2625,6 +2688,13 @@ int	CHECK_SERVICE_PERF(const char *cmd, const char *service_and_ip_and_port,doub
 		if(port == 0)	port=22;
 		result=check_ssh(ip,port,&value_int);
 	}
+#ifdef HAVE_LDAP
+	else if(strcmp(service,"ldap") == 0)
+	{
+		if(port == 0)   port=389;
+		result=check_ldap(ip,port,&value_int);
+	}
+#endif
 	else if(strcmp(service,"smtp") == 0)
 	{
 		if(port == 0)	port=25;
@@ -2779,6 +2849,13 @@ int	CHECK_SERVICE(const char *cmd, const char *service_and_ip_and_port,double  *
 		if(port == 0)	port=22;
 		result=check_ssh(ip,port,&value_int);
 	}
+#ifdef HAVE_LDAP
+	else if(strcmp(service,"ldap") == 0)
+	{
+		if(port == 0)   port=389;
+		result=check_ldap(ip,port,&value_int);
+	}
+#endif
 	else if(strcmp(service,"smtp") == 0)
 	{
 		if(port == 0)	port=25;
