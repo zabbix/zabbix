@@ -26,6 +26,8 @@
 DISKDEVICE
 {
 	char    *device;
+	int	major;
+	int	minor;
 	int	clock[60*15];
 	float	read_io_ops[60*15];
 	float	blks_read[60*15];

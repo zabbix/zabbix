@@ -142,6 +142,22 @@ COMMAND	commands[AGENT_MAX_USER_COMMANDS]=
 	{"netloadout5[*]"	,NETLOADOUT5, 		0, "lo"},
 	{"netloadout15[*]"	,NETLOADOUT15, 		0, "lo"},
 
+	{"disk_read_ops1[*]"	,DISKREADOPS1, 		0, "hda"},
+	{"disk_read_ops5[*]"	,DISKREADOPS5, 		0, "hda"},
+	{"disk_read_ops15[*]"	,DISKREADOPS15,		0, "hda"},
+
+	{"disk_read_blks1[*]"	,DISKREADBLKS1,		0, "hda"},
+	{"disk_read_blks5[*]"	,DISKREADBLKS5,		0, "hda"},
+	{"disk_read_blks15[*]"	,DISKREADBLKS15,	0, "hda"},
+
+	{"disk_write_ops1[*]"	,DISKWRITEOPS1, 	0, "hda"},
+	{"disk_write_ops5[*]"	,DISKWRITEOPS5, 	0, "hda"},
+	{"disk_write_ops15[*]"	,DISKWRITEOPS15,	0, "hda"},
+
+	{"disk_write_blks1[*]"	,DISKWRITEBLKS1,	0, "hda"},
+	{"disk_write_blks5[*]"	,DISKWRITEBLKS5,	0, "hda"},
+	{"disk_write_blks15[*]"	,DISKWRITEBLKS15,	0, "hda"},
+
 	{"swap[free]"		,SWAPFREE, 		0, 0},
 	{"swap[total]"		,SWAPTOTAL, 		0, 0},
 
@@ -687,7 +703,7 @@ double	PROCCNT(const char * procname)
 #endif
 }
 
-double	get_netstat(const char *key)
+double	get_stat(const char *key)
 {
 	FILE	*f;
 	char	line[MAX_STRING_LEN+1];
@@ -715,13 +731,121 @@ double	get_netstat(const char *key)
 	return FAIL;
 }
 
+double	DISKREADOPS1(char *device)
+{
+	char	key[MAX_STRING_LEN+1];
+
+	sprintf(key,"disk_read_ops1[%s]",device);
+
+	return	get_stat(key);
+}
+
+double	DISKREADOPS5(char *device)
+{
+	char	key[MAX_STRING_LEN+1];
+
+	sprintf(key,"disk_read_ops5[%s]",device);
+
+	return	get_stat(key);
+}
+
+double	DISKREADOPS15(char *device)
+{
+	char	key[MAX_STRING_LEN+1];
+
+	sprintf(key,"disk_read_ops15[%s]",device);
+
+	return	get_stat(key);
+}
+
+double	DISKREADBLKS1(char *device)
+{
+	char	key[MAX_STRING_LEN+1];
+
+	sprintf(key,"disk_read_blks1[%s]",device);
+
+	return	get_stat(key);
+}
+
+double	DISKREADBLKS5(char *device)
+{
+	char	key[MAX_STRING_LEN+1];
+
+	sprintf(key,"disk_read_blks5[%s]",device);
+
+	return	get_stat(key);
+}
+
+double	DISKREADBLKS15(char *device)
+{
+	char	key[MAX_STRING_LEN+1];
+
+	sprintf(key,"disk_read_blks15[%s]",device);
+
+	return	get_stat(key);
+}
+
+double	DISKWRITEOPS1(char *device)
+{
+	char	key[MAX_STRING_LEN+1];
+
+	sprintf(key,"disk_write_ops1[%s]",device);
+
+	return	get_stat(key);
+}
+
+double	DISKWRITEOPS5(char *device)
+{
+	char	key[MAX_STRING_LEN+1];
+
+	sprintf(key,"disk_write_ops5[%s]",device);
+
+	return	get_stat(key);
+}
+
+double	DISKWRITEOPS15(char *device)
+{
+	char	key[MAX_STRING_LEN+1];
+
+	sprintf(key,"disk_write_ops15[%s]",device);
+
+	return	get_stat(key);
+}
+
+double	DISKWRITEBLKS1(char *device)
+{
+	char	key[MAX_STRING_LEN+1];
+
+	sprintf(key,"disk_write_blks1[%s]",device);
+
+	return	get_stat(key);
+}
+
+double	DISKWRITEBLKS5(char *device)
+{
+	char	key[MAX_STRING_LEN+1];
+
+	sprintf(key,"disk_write_blks5[%s]",device);
+
+	return	get_stat(key);
+}
+
+double	DISKWRITEBLKS15(char *device)
+{
+	char	key[MAX_STRING_LEN+1];
+
+	sprintf(key,"disk_write_blks15[%s]",device);
+
+	return	get_stat(key);
+}
+
 double	NETLOADIN1(char *interface)
 {
 	char	key[MAX_STRING_LEN+1];
 
 	sprintf(key,"netloadin1[%s]",interface);
 
-	return	get_netstat(key);
+	return	get_stat(key);
 }
 
 double	NETLOADIN5(char *interface)
@@ -730,7 +854,7 @@ double	NETLOADIN5(char *interface)
 
 	sprintf(key,"netloadin5[%s]",interface);
 
-	return	get_netstat(key);
+	return	get_stat(key);
 }
 
 double	NETLOADIN15(char *interface)
@@ -739,7 +863,7 @@ double	NETLOADIN15(char *interface)
 
 	sprintf(key,"netloadin15[%s]",interface);
 
-	return	get_netstat(key);
+	return	get_stat(key);
 }
 
 double	NETLOADOUT1(char *interface)
@@ -748,7 +872,7 @@ double	NETLOADOUT1(char *interface)
 
 	sprintf(key,"netloadout1[%s]",interface);
 
-	return	get_netstat(key);
+	return	get_stat(key);
 }
 
 double	NETLOADOUT5(char *interface)
@@ -757,7 +881,7 @@ double	NETLOADOUT5(char *interface)
 
 	sprintf(key,"netloadout5[%s]",interface);
 
-	return	get_netstat(key);
+	return	get_stat(key);
 }
 
 double	NETLOADOUT15(char *interface)
@@ -766,7 +890,7 @@ double	NETLOADOUT15(char *interface)
 
 	sprintf(key,"netloadout15[%s]",interface);
 
-	return	get_netstat(key);
+	return	get_stat(key);
 }
 
 
