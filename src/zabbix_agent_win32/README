@@ -29,6 +29,14 @@ Installation is very simple and includes 3 steps:
 Now you can use Control Panel to start agent's service or run
 "ZabbixW32.exe start".
 
+Windows NT 4.0 Note:
+ZabbixW32 uses PDH (Performance Data Helper) API to gather various system
+information, so PDH.DLL is needed. This DLL is not supplied with Windows NT 4.0
+by default, so you need to download and install it by yourself. Microsoft
+Knowledge Base article number 284996 describes this in detail and contains a 
+download link. You can find this article at 
+http://support.microsoft.com/default.aspx?scid=kb;en-us;284996
+
 
 Command line syntax
 -------------------
@@ -42,6 +50,10 @@ Where possible commands are:
    stop            : Stop Zabbix Win32 Agent service
    install         : Install Zabbix Win32 Agent as service
    remove          : Remove previously installed Zabbix Win32 Agent service
+   install-events  : Install Zabbix Win32 Agent as event source for Event Log
+                     This is done automatically when service is being installed
+   remove-events   : Remove Zabbix Win32 Agent event source
+                     This is done automatically when service is being removed
    help            : Display help information
    version         : Display version information
 
@@ -65,7 +77,9 @@ ListenPort = <port_number>
   Sets TCP port number for incoming connections.
 
 LogFile = <path>
-  Sets the agent's log file.
+  Sets the agent's log file. If this parameter is omitted, Event Log will
+  be used. You can also specify Event Log as a target for logging implicitly
+  by setting <path> to "{EventLog}" (without quotes).
 
 Timeout = <number>
   Sets the request processing timeout (in seconds). If server request will
