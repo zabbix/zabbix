@@ -130,10 +130,10 @@
 	define("S_DARK_GREEN",				"Dark green");
 	define("S_DARK_RED",				"Dark red");
 	define("S_DARK_YELLOW",				"Dark yellow");
-	define("S_GREEN",				"Dark green");
-	define("S_RED",					"Dark red");
-	define("S_WHITE",				"Dark white");
-	define("S_YELLOW",				"Dark yellow");
+	define("S_GREEN",				"Green");
+	define("S_RED",					"Red");
+	define("S_WHITE",				"White");
+	define("S_YELLOW",				"Yellow");
 
 //	config.php
 	define("S_CONFIGURATION_OF_ZABBIX",		"Configuration of ZABBIX");
