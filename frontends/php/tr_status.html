@@ -103,14 +103,15 @@
 		echo "<br>";
 	}
 	
-  
+ 
+ 	$time=date("[H:i:s]",time());
   	if(isset($fullscreen))
 	{
-		show_table_header("<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact\">TRIGGERS</A>");
+		show_table_header("<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact\">TRIGGERS $time</A>");
 	}
 	else
 	{
-		show_table_header("<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&fullscreen=1\">TRIGGERS</A>");
+		show_table_header("<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&fullscreen=1\">TRIGGERS $time</A>");
 	}
   
 	echo "\n<TABLE BORDER=0 COLS=5 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
