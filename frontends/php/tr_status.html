@@ -133,6 +133,7 @@
 	{  
 		echo "<TD WIDTH=\"8%\" NOSAVE><B>Actions</B></TD>";
 	}
+	echo "<TD WIDTH=\"9%\"><B>Comments</B></TD>";
 	echo "</TR>\n";
 
 	if(isset($hostid))
@@ -224,6 +225,14 @@
 				echo "<A HREF=\"triggers.html?triggerid=$triggerid#form\">Change</A>";
 			}
 			echo "</TD>";
+		}
+		if($comments!="")
+		{
+			echo "<TD ALIGN=CENTER><A HREF=\"tr_comments.html?triggerid=$triggerid\">Show</a></TD>";
+		}
+		else
+		{
+			echo "<TD ALIGN=CENTER><A HREF=\"tr_comments.html?triggerid=$triggerid\">Add</a></TD>";
 		}
 		if($istrue==0)	echo "</TR>\n";
 	}
