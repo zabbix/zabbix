@@ -151,7 +151,7 @@
 	if(isset($HTTP_GET_VARS["graphid"]))
 	{
 		echo "<script language=\"JavaScript\">";
-		echo "document.write(\"<IMG SRC='chart2.php?graphid=".$HTTP_GET_VARS["graphid"]."&period=".$HTTP_GET_VARS["period"]."&from=".$HTTP_GET_VARS["from"]."&width=\"+(document.width-108)+\"'>\")";
+		echo "document.write(\"<IMG SRC='chart2.php?graphid=".$HTTP_GET_VARS["graphid"].url_param("stime")."&period=".$HTTP_GET_VARS["period"]."&from=".$HTTP_GET_VARS["from"]."&width=\"+(document.width-108)+\"'>\")";
 		echo "</script>";
 	}
 	else
@@ -232,7 +232,7 @@
 //		echo("<div align=right>");
 		echo "<form method=\"put\" action=\"charts.php\">";
 		echo "<input name=\"graphid\" type=\"hidden\" value=\"".$HTTP_GET_VARS["graphid"]."\" size=12>";
-		echo "<input name=\"sdate\"  value=\"yyyymmdd\" size=8>";
+		echo "<input name=\"stime\"  value=\"yyyymmdd\" size=8>";
 		echo "<input class=\"button\" type=\"submit\" name=\"action\" value=\"go\">";
 		echo "</form>";
 //		echo("</div>");
