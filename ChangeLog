@@ -1,5 +1,6 @@
 Changes for 1.0beta9:
 
+ - fixed addition of host triggers into IT Service tree (Alexei)
  - support of '(' and ')' in item keys (Alexei)
  - fixed dark blue color for user-defined chart (Alexei)
  - removed DOS style EOL from RedHat startup scripts (Alexei)
