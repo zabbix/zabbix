@@ -4281,9 +4281,21 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
                 return  DBexecute($sql);
         }
 
+        function update_screen_graph($screengraphid,$itemid,$width,$height)
+        {
+                $sql="update screens_graphs set itemid=$itemid,width=$width,height=$height where screengraphid=$screengraphid";
+                return  DBexecute($sql);
+        }
+
         function delete_screen_item($screenitemid)
         {
                 $sql="delete from screens_items where screenitemid=$screenitemid";
+                return  DBexecute($sql);
+        }
+
+        function delete_screen_graph($screengraphid)
+        {
+                $sql="delete from screens_graphs where screengraphid=$screengraphid";
                 return  DBexecute($sql);
         }
 
