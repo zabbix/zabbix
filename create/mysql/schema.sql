@@ -7,8 +7,7 @@ CREATE TABLE services (
   name			varchar(128)	DEFAULT '' NOT NULL,
   status		int(1)		DEFAULT '0' NOT NULL,
   triggerid		int(4),
-  PRIMARY KEY (serviceid),
-  KEY (triggerid)
+  PRIMARY KEY (serviceid)
 );
 
 #

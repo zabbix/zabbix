@@ -331,8 +331,6 @@ CREATE TABLE services (
   PRIMARY KEY (serviceid)
 );
 
-CREATE INDEX services_triggerid on services (triggerid);
-
 --
 -- Table structure for table 'services_links'
 --
