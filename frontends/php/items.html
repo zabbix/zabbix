@@ -11,7 +11,7 @@
 	{
 		if($register=="update")
 		{
-			update_item($itemid,$description,$key,$hostid,$delay,$history,$status);
+			update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid);
 		}
 		if($register=="changestatus")
 		{
@@ -19,7 +19,7 @@
 		}
 		if($register=="add")
 		{
-			add_item($description,$key,$hostid,$delay,$history,$status);
+			add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid);
 		}
 		if($register=="delete")
 		{

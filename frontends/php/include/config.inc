@@ -621,9 +621,9 @@
 
 	# Update Item definition
 
-	function	update_item($itemid,$description,$key,$hostid,$delay,$history,$status)
+	function	update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid)
 	{
-		$sql="update items set description='$description',key_='$key',hostid=$hostid,delay=$delay,history=$history,lastdelete=0,nextcheck=0,status=$status where itemid=$itemid";
+		$sql="update items set description='$description',key_='$key',hostid=$hostid,delay=$delay,history=$history,lastdelete=0,nextcheck=0,status=$status,type=$type,snmp_community='$snmp_community',snmp_oid='$snmp_oid' where itemid=$itemid";
 		$result=DBexecute($sql);
 	}
 
@@ -670,9 +670,9 @@
 
 	# Add Item definition
 
-	function	add_item($description,$key,$hostid,$delay,$history,$status)
+	function	add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid)
 	{
-		$sql="insert into items (description,key_,hostid,delay,history,lastdelete,nextcheck,status) values ('$description','$key',$hostid,$delay,$history,0,0,$status)";
+		$sql="insert into items (description,key_,hostid,delay,history,lastdelete,nextcheck,status,type,snmp_community,snmp_oid) values ('$description','$key',$hostid,$delay,$history,0,0,$status,$type,'$snmp_community','$snmp_oid')";
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"items","itemid");
 	}
@@ -1250,7 +1250,7 @@
 	{
 		if(isset($itemid))
 		{
-			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status from items i,hosts h where i.itemid=$itemid and h.hostid=i.hostid");
+			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid from items i,hosts h where i.itemid=$itemid and h.hostid=i.hostid");
 		
 			$description=DBget_field($result,0,0);
 			$key=DBget_field($result,0,1);
@@ -1259,6 +1259,9 @@
 			$delay=DBget_field($result,0,4);
 			$history=DBget_field($result,0,5);
 			$status=DBget_field($result,0,6);
+			$type=DBget_field($result,0,7);
+			$snmp_community=DBget_field($result,0,8);
+			$snmp_oid=DBget_field($result,0,9);
 		}
 		else
 		{
@@ -1269,6 +1272,9 @@
 			$delay=30;
 			$history=30*24*3600;
 			$status=0;
+			$type=0;
+			$snmp_community="public";
+			$snmp_oid="interfaces.ifTable.ifEntry.ifInOctets.1";
 		}
 
 		echo "<br>";
@@ -1304,19 +1310,34 @@
 		echo "</select>";
 
 		show_table2_v_delimiter();
+		echo "Type (0-Zabbix,1-SNMPv1)";
+		show_table2_h_delimiter();
+		echo "<input name=\"type\" value=\"$type\" size=1>";
+
+		show_table2_v_delimiter();
+		echo "SNMP community";
+		show_table2_h_delimiter();
+		echo "<input name=\"snmp_community\" value=\"$snmp_community\" size=16>";
+
+		show_table2_v_delimiter();
+		echo "SNMP OID";
+		show_table2_h_delimiter();
+		echo "<input name=\"snmp_oid\" value=\"$snmp_oid\" size=40>";
+
+		show_table2_v_delimiter();
 		echo "Key";
 		show_table2_h_delimiter();
-		echo "<input name=\"key\" value=\"$key\"size=40>";
+		echo "<input name=\"key\" value=\"$key\" size=40>";
 
 		show_table2_v_delimiter();
 		echo "Delay";
 		show_table2_h_delimiter();
-		echo "<input name=\"delay\" value=\"$delay\"size=5>";
+		echo "<input name=\"delay\" value=\"$delay\" size=5>";
 
 		show_table2_v_delimiter();
 		echo "History";
 		show_table2_h_delimiter();
-		echo "<input name=\"history\" value=\"$history\"size=8>";
+		echo "<input name=\"history\" value=\"$history\" size=8>";
 
 		show_table2_v_delimiter();
 		echo "Status";
