@@ -11,49 +11,49 @@
 ?>
 
 <?
-	if(isset($register))
+	if(isset($HTTP_GET_VARS["register"]))
 	{
-		if($register=="add")
+		if($HTTP_GET_VARS["register"]=="add")
 		{
-			$result=add_host_to_sysmap($sysmapid,$hostid,$label,$x,$y,$icon);
+			$result=add_host_to_sysmap($HTTP_GET_VARS["sysmapid"],$HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["label"],$HTTP_GET_VARS["x"],$HTTP_GET_VARS["y"],$HTTP_GET_VARS["icon"]);
 			show_messages($result,"Host added","Cannot add host");
 		}
-		if($register=="update")
+		if($HTTP_GET_VARS["register"]=="update")
 		{
-			$result=update_sysmap_host($shostid,$sysmapid,$hostid,$label,$x,$y,$icon);
+			$result=update_sysmap_host($HTTP_GET_VARS["shostid"],$HTTP_GET_VARS["sysmapid"],$HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["label"],$HTTP_GET_VARS["x"],$HTTP_GET_VARS["y"],$HTTP_GET_VARS["icon"]);
 			show_messages($result,"Host updated","Cannot update host");
 		}
-		if($register=="add link")
+		if($HTTP_GET_VARS["register"]=="add link")
 		{
-			$result=add_link($sysmapid,$shostid1,$shostid2);
+			$result=add_link($HTTP_GET_VARS["sysmapid"],$HTTP_GET_VARS["shostid1"],$HTTP_GET_VARS["shostid2"]);
 			show_messages($result,"Link added","Cannot add link");
 		}
-		if($register=="delete_link")
+		if($HTTP_GET_VARS["register"]=="delete_link")
 		{
-			$result=delete_link($linkid);
+			$result=delete_link($HTTP_GET_VARS["linkid"]);
 			show_messages($result,"Link deleted","Cannot delete link");
-			unset($linkid);
+			unset($HTTP_GET_VARS["linkid"]);
 		}
-		if($register=="delete")
+		if($HTTP_GET_VARS["register"]=="delete")
 		{
-			$result=delete_sysmaps_host($shostid);
+			$result=delete_sysmaps_host($HTTP_GET_VARS["shostid"]);
 			show_messages($result,"Host deleted","Cannot delete host");
-			unset($shostid);
+			unset($HTTP_GET_VARS["shostid"]);
 		}
 	}
 ?>
 
 <?
-	$result=DBselect("select name from sysmaps where sysmapid=$sysmapid");
+	$result=DBselect("select name from sysmaps where sysmapid=".$HTTP_GET_VARS["sysmapid"]);
 	$map=DBget_field($result,0,0);
 	show_table_header($map);
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR BGCOLOR=#DDDDDD>";
 	echo "<TD ALIGN=CENTER>";
-	if(isset($sysmapid))
+	if(isset($HTTP_GET_VARS["sysmapid"]))
 	{
 		$map="\n<map name=links>";
-		$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status from sysmaps_hosts sh,hosts h where sh.sysmapid=$sysmapid and h.hostid=sh.hostid");
+		$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status from sysmaps_hosts sh,hosts h where sh.sysmapid=".$HTTP_GET_VARS["sysmapid"]." and h.hostid=sh.hostid");
 		for($i=0;$i<DBnum_rows($result);$i++)
 		{
 			$host_=DBget_field($result,$i,0);
@@ -69,7 +69,7 @@
 		}
 		$map=$map."\n</map>";
 		echo $map;
-		echo "<IMG SRC=\"map.php?sysmapid=$sysmapid\" border=0 usemap=#links>";
+		echo "<IMG SRC=\"map.php?sysmapid=".$HTTP_GET_VARS["sysmapid"]." border=0 usemap=#links>";
 	}
 
 	echo "</TD>";
@@ -86,7 +86,7 @@
 	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
-	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,sh.icon from sysmaps_hosts sh,hosts h where sh.sysmapid=$sysmapid and h.hostid=sh.hostid order by h.host");
+	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,sh.icon from sysmaps_hosts sh,hosts h where sh.sysmapid=".$HTTP_GET_VARS["sysmapid"]." and h.hostid=sh.hostid order by h.host");
 	$col=0;
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
@@ -128,7 +128,7 @@
 	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
-	$result=DBselect("select linkid,shostid1,shostid2 from sysmaps_links where sysmapid=$sysmapid order by linkid");
+	$result=DBselect("select linkid,shostid1,shostid2 from sysmaps_links where sysmapid=".$HTTP_GET_VARS["sysmapid"]." order by linkid");
 	$col=0;
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
@@ -153,7 +153,7 @@
 
 		echo "<TD>$label1</TD>";
 		echo "<TD>$label2</TD>";
-		echo "<TD><A HREF=\"sysmap.php?sysmapid=$sysmapid&register=delete_link&linkid=$linkid\">Delete</A></TD>";
+		echo "<TD><A HREF=\"sysmap.php?sysmapid=".$HTTP_GET_VARS["sysmapid"]."&register=delete_link&linkid=$linkid\">Delete</A></TD>";
 		echo "</TR>";
 	}
 	echo "</TABLE>";
@@ -163,9 +163,9 @@
 	echo "<br>";
 	echo "<a name=\"form\"></a>";
 
-	if(isset($shostid))
+	if(isset($HTTP_GET_VARS["shostid"]))
 	{
-		$result=DBselect("select hostid,label,x,y,icon from sysmaps_hosts where shostid=$shostid");
+		$result=DBselect("select hostid,label,x,y,icon from sysmaps_hosts where shostid=".$HTTP_GET_VARS["shostid"]);
 		$hostid=DBget_field($result,0,0);
 		$label=DBget_field($result,0,1);
 		$x=DBget_field($result,0,2);
@@ -183,10 +183,10 @@
 	echo "New host to display";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"sysmap.php?sysmapid=$sysmapid\">";
-	if(isset($shostid))
+	echo "<form method=\"get\" action=\"sysmap.php?sysmapid=".$HTTP_GET_VARS["sysmapid"].">";
+	if(isset($HTTP_GET_VARS["shostid"]))
 	{
-		echo "<input name=\"shostid\" type=\"hidden\" value=$shostid>";
+		echo "<input name=\"shostid\" type=\"hidden\" value=".$HTTP_GET_VARS["shostid"].">";
 	}
 	echo "Host";
 	show_table2_h_delimiter();
@@ -196,7 +196,7 @@
 	{
 		$hostid_=DBget_field($result,$i,0);
 		$host_=DBget_field($result,$i,1);
-		if(isset($hostid) && ($hostid==$hostid_))
+		if(isset($HTTP_GET_VARS["hostid"]) && ($HTTP_GET_VARS["hostid"]==$hostid_))
 		{
 			echo "<OPTION VALUE='$hostid_' SELECTED>$host_";
 		}
@@ -218,7 +218,7 @@
 	$icons[3]="Hub";
 	for($i=0;$i<4;$i++)
 	{
-		if(isset($hostid) && ($icon==$icons[$i]))
+		if(isset($HTTP_GET_VARS["hostid"]) && ($HTTP_GET_VARS["icon"]==$icons[$i]))
 		{
 			echo "<OPTION VALUE='".$icons[$i]."' SELECTED>".$icons[$i];
 		}
@@ -246,7 +246,7 @@
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
-	if(isset($shostid))
+	if(isset($HTTP_GET_VARS["shostid"]))
 	{
 		echo "<input type=\"submit\" name=\"register\" value=\"update\">";
 	}
@@ -260,16 +260,16 @@
 	echo "New connector";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"sysmap.php?sysmapid=$sysmapid\">";
+	echo "<form method=\"post\" action=\"sysmap.php?sysmapid=".$HTTP_GET_VARS["sysmapid"].">";
 	echo "Host 1";
 	show_table2_h_delimiter();
-	$result=DBselect("select shostid,label from sysmaps_hosts where sysmapid=$sysmapid order by label");
+	$result=DBselect("select shostid,label from sysmaps_hosts where sysmapid=".$HTTP_GET_VARS["sysmapid"]." order by label");
 	echo "<select name=\"shostid1\" size=1>";
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		$shostid_=DBget_field($result,$i,0);
 		$label=DBget_field($result,$i,1);
-		if(isset($shostid)&&($shostid==$shostid_))
+		if(isset($HTTP_GET_VARS["shostid"])&&($HTTP_GET_VARS["shostid"]==$shostid_))
 		{
 			echo "<OPTION VALUE='$shostid_' SELECTED>$label";
 		}
@@ -281,10 +281,10 @@
 	echo "</SELECT>";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"sysmap.php?sysmapid=$sysmapid\">";
+	echo "<form method=\"get\" action=\"sysmap.php?sysmapid=".$HTTP_GET_VARS["sysmapid"].">";
 	echo "Host 2";
 	show_table2_h_delimiter();
-	$result=DBselect("select shostid,label from sysmaps_hosts where sysmapid=$sysmapid order by label");
+	$result=DBselect("select shostid,label from sysmaps_hosts where sysmapid=".$HTTP_GET_VARS["sysmapid"]." order by label");
 	echo "<select name=\"shostid2\" size=1>";
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{

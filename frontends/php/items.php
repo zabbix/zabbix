@@ -17,29 +17,29 @@
 ?>
 
 <?
-	if(isset($register))
+	if(isset($HTTP_GET_VARS["register"]))
 	{
-		if($register=="update")
+		if($HTTP_GET_VARS["register"]=="update")
 		{
-			$result=update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts);
+			$result=update_item($HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["description"],$HTTP_GET_VARS["key"],$HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["delay"],$HTTP_GET_VARS["history"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["type"],$HTTP_GET_VARS["snmp_community"],$HTTP_GET_VARS["snmp_oid"],$HTTP_GET_VARS["value_type"],$HTTP_GET_VARS["trapper_hosts"]);
 			show_messages($result,"Item updated","Cannot update item");
 			unset($itemid);
 		}
-		if($register=="changestatus")
+		if($HTTP_GET_VARS["register"]=="changestatus")
 		{
-			$result=update_item_status($itemid,$status);
+			$result=update_item_status($HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["status"]);
 			show_messages($result,"Status of item changed","Cannot change item status");
-			unset($itemid);
+			unset($HTTP_GET_VARS["itemid"]);
 		}
-		if($register=="add")
+		if($HTTP_GET_VARS["register"]=="add")
 		{
-			$result=add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts);
+			$result=add_item($HTTP_GET_VARS["description"],$HTTP_GET_VARS["key"],$HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["delay"],$HTTP_GET_VARS["history"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["type"],$HTTP_GET_VARS["snmp_community"],$HTTP_GET_VARS["snmp_oid"],$HTTP_GET_VARS["value_type"],$HTTP_GET_VARS["trapper_hosts"]);
 			show_messages($result,"Item added","Cannot add item");
-			unset($itemid);
+			unset($HTTP_GET_VARS["itemid"]);
 		}
-		if($register=="delete")
+		if($HTTP_GET_VARS["register"]=="delete")
 		{
-			$result=delete_item($itemid);
+			$result=delete_item($HTTP_GET_VARS["itemid"]);
 			show_messages($result,"Item deleted","Cannot delete item");
 			unset($itemid);
 		}
@@ -60,12 +60,12 @@
         	{
 			continue;
 		}
-		if(isset($hostid) && ($hostid == $row["hostid"]))
+		if(isset($HTTP_GET_VARS["hostid"]) && ($HTTP_GET_VARS["hostid"] == $row["hostid"]))
 		{
 			echo "<b>[";
 		}
 		echo "<A HREF=\"items.php?hostid=".$row["hostid"]."\">".$row["host"]."</A>";
-		if(isset($hostid) && ($hostid == $row["hostid"]))
+		if(isset($HTTP_GET_VARS["hostid"]) && ($HTTP_GET_VARS["hostid"] == $row["hostid"]))
 		{
 			echo "]</b>";
 		}
@@ -74,9 +74,9 @@
 	show_table_header_end();
 
 	$lasthost="";
-	if(isset($hostid)&&!isset($itemid)) 
+	if(isset($HTTP_GET_VARS["hostid"])&&!isset($HTTP_GET_VARS["itemid"])) 
 	{
-		$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.lastdelete,i.nextcheck,h.hostid from hosts h,items i where h.hostid=i.hostid and h.hostid=$hostid order by h.host,i.key_,i.description");
+		$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.lastdelete,i.nextcheck,h.hostid from hosts h,items i where h.hostid=i.hostid and h.hostid=".$HTTP_GET_VARS["hostid"]." order by h.host,i.key_,i.description");
 		$col=0;
 		while($row=DBfetch($result))
 		{
@@ -118,15 +118,15 @@
 			echo "<TD>".$row["host"].":".$row["key_"]."</TD>";
 	
 			echo "<td align=center>";
-			if(isset($hostid))
+			if(isset($HTTP_GET_VARS["hostid"]))
 			{
 				switch($row["status"])
 				{
 					case 0:
-						echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=$hostid&register=changestatus&status=1\">Active</a>";
+						echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$HTTP_GET_VARS["hostid"]."&register=changestatus&status=1\">Active</a>";
 						break;
 					case 1:
-						echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$row["hostid"]."&register=changestatus&status=0\">Not active</a>";
+						echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$HTTP_GET_VARS["hostid"]."&register=changestatus&status=0\">Not active</a>";
 						break;
 					case 2:
 						echo "Trapper";
@@ -183,7 +183,7 @@
 	if(DBget_field($result,0,0)>0)
 	{
 		echo "<a name=\"form\"></a>";
-		insert_item_form($itemid);
+		insert_item_form($HTTP_GET_VARS["itemid"]);
 	}
 ?>
 

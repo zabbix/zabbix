@@ -2202,6 +2202,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$useip=0;
 		}
 		$sql="update hosts set host='$host',port=$port,status=$status,useip=$useip,ip='$ip' where hostid=$hostid";
+		echo $sql;
 		$result=DBexecute($sql);
 		return	$result;
 	}
@@ -2783,7 +2784,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "Item configuration";
  
 		show_table2_v_delimiter();
-		echo "<form method=\"post\" action=\"items.php\">";
+		echo "<form method=\"get\" action=\"items.php\">";
 		echo "<input name=\"itemid\" type=hidden value=$itemid size=8>";
 		echo "Description";
 		show_table2_h_delimiter();
@@ -2913,7 +2914,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "New permission";
 
 		show_table2_v_delimiter();
-		echo "<form method=\"post\" action=\"users.php\">";
+		echo "<form method=\"get\" action=\"users.php\">";
 		if(isset($userid))
 		{
 			echo "<input name=\"userid\" type=\"hidden\" value=\"$userid\" size=8>";
@@ -3000,7 +3001,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "New user";
 
 		show_table2_v_delimiter();
-		echo "<form method=\"post\" action=\"users.php\">";
+		echo "<form method=\"get\" action=\"users.php\">";
 		if(isset($userid))
 		{
 			echo "<input name=\"userid\" type=\"hidden\" value=\"$userid\" size=8>";
@@ -3121,11 +3122,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		show_table2_v_delimiter();
 		if(isset($hostid))
 		{
-			echo "<form method=\"post\" action=\"triggers.php?hostid=$hostid\">";
+			echo "<form method=\"get\" action=\"triggers.php?hostid=$hostid\">";
 		}
 		else
 		{
-			echo "<form method=\"post\" action=\"triggers.php\">";
+			echo "<form method=\"get\" action=\"triggers.php\">";
 		}
 		echo "<input name=\"triggerid\" type=hidden value=$triggerid size=8>";
 		echo "Description";
