@@ -269,9 +269,16 @@
 	echo "<select name=\"shostid1\" size=1>";
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
-		$shostid=DBget_field($result,$i,0);
+		$shostid_=DBget_field($result,$i,0);
 		$label=DBget_field($result,$i,1);
-		echo "<OPTION VALUE='$shostid'>$label";
+		if(isset($shostid)&&($shostid==$shostid_))
+		{
+			echo "<OPTION VALUE='$shostid_' SELECTED>$label";
+		}
+		else
+		{
+			echo "<OPTION VALUE='$shostid_'>$label";
+		}
 	}
 	echo "</SELECT>";
 
@@ -283,9 +290,9 @@
 	echo "<select name=\"shostid2\" size=1>";
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
-		$shostid=DBget_field($result,$i,0);
+		$shostid_=DBget_field($result,$i,0);
 		$label=DBget_field($result,$i,1);
-		echo "<OPTION VALUE='$shostid'>$label";
+		echo "<OPTION VALUE='$shostid_'>$label";
 	}
 	echo "</SELECT>";
 
