@@ -551,32 +551,70 @@ void	apply_actions(int triggerid,int good)
 	DBfree_result(result);
 }
 
+void	update_serv(int serviceid)
+{
+	char	sql[MAX_STRING_LEN+1];
+	int	i,j;
+	int	status;
+
+	DB_RESULT *result,*result2;
+
+	sprintf(sql,"select serviceupid from services_links where servicedownid=%d",serviceid);
+	zabbix_log( LOG_LEVEL_WARNING,"SQL [%s]",sql);
+	result=DBselect(sql);
+	status=0;	
+	for(i=0;i<DBnum_rows(result);i++)
+	{
+		sprintf(sql,"select status from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",atoi(DBget_field(result,i,0)));
+		zabbix_log( LOG_LEVEL_WARNING,"SQL [%s]",sql);
+		result2=DBselect(sql);
+		for(j=0;j<DBnum_rows(result2);j++)
+		{
+			if(atoi(DBget_field(result2,j,0))>status)
+			{
+				status=atoi(DBget_field(result2,j,0));
+			}
+		}
+		sprintf(sql,"update services set status=%d where serviceid=%d",status,atoi(DBget_field(result,i,0)));
+		zabbix_log( LOG_LEVEL_WARNING,"SQL [%s]",sql);
+		DBexecute(sql);
+
+		DBfree_result(result2);
+	}
+	DBfree_result(result);
+
+	sprintf(sql,"select serviceupid from services_links where servicedownid=%d",serviceid);
+	zabbix_log( LOG_LEVEL_WARNING,"SQL [%s]",sql);
+	result=DBselect(sql);
+	for(i=0;i<DBnum_rows(result);i++)
+	{
+		update_serv(atoi(DBget_field(result,i,0)));
+	}
+	DBfree_result(result);
+}
+
 /*
  * Recursive function!
  */
 void	update_services(int triggerid, int istrue)
 {
 	char	sql[MAX_STRING_LEN+1];
-	int	i,rows;
+	int	i;
 
 	DB_RESULT *result;
 
+	sprintf(sql,"update services set status=%d where triggerid=%d",istrue,triggerid);
+	zabbix_log( LOG_LEVEL_WARNING,"SQL [%s]",sql);
+	DBexecute(sql);
 
-	sprintf(sql,"select serviceupid from services_links where servicedownid=%d", triggerid);
 
+	sprintf(sql,"select serviceid from services where triggerid=%d", triggerid);
+	zabbix_log( LOG_LEVEL_WARNING,"SQL [%s]",sql);
 	result = DBselect(sql);
 
-	rows = DBnum_rows(result);
-
-	if(rows == 0)
+	for(i=0;i<DBnum_rows(result);i++)
 	{
-		DBfree_result(result);
-		return;
-	}
-
-	for(i=0;i<rows;i++)
-	{
-		update_services(atoi(DBget_field(result,i,0)), istrue);
+		update_serv(atoi(DBget_field(result,i,0)));
 	}
 
 	DBfree_result(result);
@@ -584,74 +622,74 @@ void	update_services(int triggerid, int istrue)
 }
 
 /*
- * Re-calculate values of triggers
- */ 
+* Re-calculate values of triggers
+*/ 
 void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 {
-	char sql[MAX_STRING_LEN+1];
-	char exp[MAX_STRING_LEN+1];
-	int b;
-	DB_TRIGGER trigger;
-	DB_RESULT *result;
+char sql[MAX_STRING_LEN+1];
+char exp[MAX_STRING_LEN+1];
+int b;
+DB_TRIGGER trigger;
+DB_RESULT *result;
 
-	int	i,rows;
-	int	now;
+int	i,rows;
+int	now;
 
-	if(flag == 0)
-	{
-		now=time(NULL);
+if(flag == 0)
+{
+	now=time(NULL);
 /* Added table hosts to eliminate unnecessary update of triggers */
-		sprintf(sql,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f,items i,hosts h where i.hostid=h.hostid and i.status<>3 and i.itemid=f.itemid and i.lastclock<=%d and t.istrue!=2 and f.triggerid=t.triggerid and f.itemid%%%d=%d and (h.status=0 or (h.status=2 and h.disable_until<%d)) group by t.triggerid,t.expression,t.istrue,t.dep_level",lastclock,suckers-1,sucker_num-1,now);
-	}
-	else
+	sprintf(sql,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f,items i,hosts h where i.hostid=h.hostid and i.status<>3 and i.itemid=f.itemid and i.lastclock<=%d and t.istrue!=2 and f.triggerid=t.triggerid and f.itemid%%%d=%d and (h.status=0 or (h.status=2 and h.disable_until<%d)) group by t.triggerid,t.expression,t.istrue,t.dep_level",lastclock,suckers-1,sucker_num-1,now);
+}
+else
+{
+	sprintf(sql,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.istrue!=2 and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.istrue,t.dep_level",sucker_num);
+}
+
+result = DBselect(sql);
+
+rows = DBnum_rows(result);
+
+if(rows == 0)
+{
+	zabbix_log( LOG_LEVEL_DEBUG, "No triggers to update" );
+	DBfree_result(result);
+	return;
+}
+for(i=0;i<rows;i++)
+{
+	zabbix_log( LOG_LEVEL_DEBUG, "Fetched: TrId[%s] Exp[%s] IsTrue[%s]\n", DBget_field(result,i,0),DBget_field(result,i,1),DBget_field(result,i,2));
+	trigger.triggerid=atoi(DBget_field(result,i,0));
+	trigger.expression=DBget_field(result,i,1);
+	trigger.istrue=atoi(DBget_field(result,i,2));
+	strncpy(exp, trigger.expression, MAX_STRING_LEN);
+	if( evaluate_expression(&b, exp) != 0 )
 	{
-		sprintf(sql,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.istrue!=2 and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.istrue,t.dep_level",sucker_num);
+		zabbix_log( LOG_LEVEL_WARNING, "Expression [%s] - SUX.",trigger.expression);
+		continue;
 	}
 
-	result = DBselect(sql);
-
-	rows = DBnum_rows(result);
-
-	if(rows == 0)
+	if(b==1)
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "No triggers to update" );
-		DBfree_result(result);
-		return;
-	}
-	for(i=0;i<rows;i++)
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Fetched: TrId[%s] Exp[%s] IsTrue[%s]\n", DBget_field(result,i,0),DBget_field(result,i,1),DBget_field(result,i,2));
-		trigger.triggerid=atoi(DBget_field(result,i,0));
-		trigger.expression=DBget_field(result,i,1);
-		trigger.istrue=atoi(DBget_field(result,i,2));
-		strncpy(exp, trigger.expression, MAX_STRING_LEN);
-		if( evaluate_expression(&b, exp) != 0 )
+		if(trigger.istrue!=TRIGGER_STATUS_TRUE)
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Expression [%s] - SUX.",trigger.expression);
-			continue;
+			now = time(NULL);
+			sprintf(sql,"update triggers set istrue=%d, lastchange=%d where triggerid=%d",TRIGGER_STATUS_TRUE,now,trigger.triggerid);
+			DBexecute(sql);
+
+			now = time(NULL);
+			sprintf(sql,"insert into alarms(triggerid,clock,istrue) values(%d,%d,%d)",trigger.triggerid,now,TRIGGER_STATUS_TRUE);
+			DBexecute(sql);
 		}
-
-		if(b==1)
+		if(trigger.istrue==TRIGGER_STATUS_FALSE)
 		{
-			if(trigger.istrue!=TRIGGER_STATUS_TRUE)
-			{
-				now = time(NULL);
-				sprintf(sql,"update triggers set istrue=%d, lastchange=%d where triggerid=%d",TRIGGER_STATUS_TRUE,now,trigger.triggerid);
-				DBexecute(sql);
+			now = time(NULL);
+			apply_actions(trigger.triggerid,1);
 
-				now = time(NULL);
-				sprintf(sql,"insert into alarms(triggerid,clock,istrue) values(%d,%d,%d)",trigger.triggerid,now,TRIGGER_STATUS_TRUE);
-				DBexecute(sql);
-			}
-			if(trigger.istrue==TRIGGER_STATUS_FALSE)
-			{
-				now = time(NULL);
-				apply_actions(trigger.triggerid,1);
+			sprintf(sql,"update actions set nextcheck=0 where triggerid=%d and good=0",trigger.triggerid);
+			DBexecute(sql);
 
-				sprintf(sql,"update actions set nextcheck=0 where triggerid=%d and good=0",trigger.triggerid);
-				DBexecute(sql);
-
-				update_services(trigger.triggerid, 1);
+			update_services(trigger.triggerid, 1);
 			}
 		}
 
