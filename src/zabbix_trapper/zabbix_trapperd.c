@@ -144,26 +144,6 @@ int	process(char *s)
 	return ret;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 void    daemon_init(void)
 {
 	int     i;
@@ -349,9 +329,9 @@ int	main()
 
 	listenfd = tcp_listen(host,port,&addrlen);
 
-	pids = calloc(10, sizeof(pid_t));
+	pids = calloc(TRAPPERD_FORKS, sizeof(pid_t));
 
-	for(i = 0; i< 10; i++)
+	for(i = 0; i< TRAPPERD_FORKS; i++)
 	{
 		pids[i] = child_make(i, listenfd, addrlen);
 		syslog( LOG_WARNING, "zabbix_trapperd #%d started", pids[i]);

@@ -267,9 +267,9 @@ int	main()
 
 	listenfd = tcp_listen(host,port,&addrlen);
 
-	pids = calloc(10, sizeof(pid_t));
+	pids = calloc(AGENTD_FORKS, sizeof(pid_t));
 
-	for(i = 0; i< 10; i++)
+	for(i = 0; i< AGENTD_FORKS; i++)
 	{
 		pids[i] = child_make(i, listenfd, addrlen);
 		syslog( LOG_WARNING, "zabbix_agentd #%d started", pids[i]);

@@ -7,6 +7,6 @@ all:
 
 clean:
 	rm -fv *.o 
-	rm -fv ../../../zabbix_agent
-	rm -fv ../../../zabbix_agentd
+	rm -fv ../../bin/zabbix_agent
+	rm -fv ../../bin/zabbix_agentd
 

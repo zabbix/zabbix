@@ -30,6 +30,8 @@ float	TCP_LISTEN(const char *porthex);
 float	UPTIME(void);
 float	EXECUTE(char *command);
 
+float	CHECK_SERVICE_SSH(void);
+
 #define COMMAND struct command_type
 COMMAND
 {

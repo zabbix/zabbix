@@ -100,7 +100,7 @@ insert into items_template (itemtemplateid,description,key_,delay)
 insert into items_template (itemtemplateid,description,key_,delay)
 	values (40,'FTP server is running','net[listen_21]', 60);
 insert into items_template (itemtemplateid,description,key_,delay)
-	values (41,'SSH server is running','net[listen_22]', 60);
+	values (41,'SSH server is running','check_service[ssh]', 60);
 insert into items_template (itemtemplateid,description,key_,delay)
 	values (42,'Telnet server is running','net[listen_23]', 60);
 insert into items_template (itemtemplateid,description,key_,delay)
