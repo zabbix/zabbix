@@ -26,7 +26,7 @@ extern	char	*CONFIG_DBNAME;
 extern	char	*CONFIG_DBUSER;
 extern	char	*CONFIG_DBPASSWORD;
 extern	char	*CONFIG_DBSOCKET;
-extern	char	*CONFIG_ALERT_SCRIPTS_PATH;
+extern	char	*CONFIG_FPING_LOCATION;
 
 extern	void	signal_handler( int sig );
 
