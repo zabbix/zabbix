@@ -115,29 +115,29 @@ insert into items_template (itemtemplateid,description,key_,delay)
 --
 
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (1,1,'Lack of free memory','{:.last(0)}<1000000');
+	values (1,1,'Lack of free memory','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (2,2,'Low free disk space on /','{:.last(0)}<100000000');
+	values (2,2,'Low free disk space on /','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (3,3,'Low free disk space on /tmp','{:.last(0)}<100000000');
+	values (3,3,'Low free disk space on /tmp','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (4,4,'Low free disk space on /usr','{:.last(0)}<100000000');
+	values (4,4,'Low free disk space on /usr','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (5,5,'Low number of free inodes on /','{:.last(0)}<100000000');
+	values (5,5,'Low number of free inodes on /','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (6,6,'Low number of free inodes on /opt','{:.last(0)}<100000000');
+	values (6,6,'Low number of free inodes on /opt','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (7,7,'Low number of free inodes on /tmp','{:.last(0)}<100000000');
+	values (7,7,'Low number of free inodes on /tmp','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (8,8,'Low number of free inodes on /usr','{:.last(0)}<100000000');
+	values (8,8,'Low number of free inodes on /usr','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (9,9,'Too many processes running','{:.last(0)}>500');
+	values (9,9,'Too many processes running','{:.last(0)}>300');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (10,10,'Processor load is too high','{:.last(0)}>5');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (13,13,'Too many processes running','{:.last(0)}>10');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (14,14,'Lack of free swap space','{:.last(0)}<100000000');
+	values (14,14,'Lack of free swap space','{:.last(0)}<100000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (17,17,'Too may users connected','{:.last(0)}>50');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
@@ -151,13 +151,13 @@ insert into triggers_template (triggertemplateid,itemtemplateid,description,expr
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (22,22,'No ping from server','{:.nodata(60)}>0');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (23,23,'Low free disk space on /home','{:.last(0)}<100000000');
+	values (23,23,'Low free disk space on /home','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (24,24,'Low number of free inodes on /home','{:.last(0)}<100000000');
+	values (24,24,'Low number of free inodes on /home','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (25,25,'Low free disk space on /var','{:.last(0)}<100000000');
+	values (25,25,'Low free disk space on /var','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (26,26,'Low free disk space on /opt','{:.last(0)}<100000000');
+	values (26,26,'Low free disk space on /opt','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (27,27,'Host have just been restarted','{:.last(0)}<600');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
