@@ -1,5 +1,6 @@
 Changes for 1.0beta7:
 
+ - basic support for log rotating (Alexei)
  - added additional error checks in get_value_snmp() (Alexei)
 
 Changes for 1.0beta6:
