@@ -34,6 +34,7 @@ TKOM:
 
 OTHER:
 
+ - in user administration, add many resources from a list (not by one ID)
  - availability report for day/week/month/etc
  - add housekeeping for trends
  - check if items delay works
