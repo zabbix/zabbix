@@ -1,5 +1,6 @@
 Changes for 1.0beta10:
 
+ - improved performance of Alarm and Alert History (Alexei)
  - added support for units (Mb, Kb, Gb, etc) (Alexei)
  - added column items.multiplier (Alexei)
  - added column items.units (Alexei)
