@@ -1,5 +1,6 @@
 Changes for 1.1alpha2:
 
+ - do not reference ZABBIX logo from www.zabbix.com (Alexei)
  - fixed addition of network maps (Alexei)
 
 Changes for 1.1alpha1:
