@@ -186,7 +186,6 @@ latest trigger (item type  = TRAPPER)
  - finish src/zabbix_snmptrapper
  - links to Zabbix frontend in alert emails
  - strings items for graphs
- - UserParameter does not appear in the log
  - ability to add a library of  userwritten c-functions with dlopen/dlsym to
 the agent with a predefined API that can return values to suckerd (for both 
 suckerd and agentd)
