@@ -89,12 +89,12 @@ int	is_double(char *c)
 			}
 		}
 		/* Last digit is prefix 'K', 'M', 'G' */
-		if( ((c[i]=='K')||(c[i]=='M')||(c[i]=='M')) && (i == (int)strlen(c)-1))
+		if( ((c[i]=='K')||(c[i]=='M')||(c[i]=='G')) && (i == (int)strlen(c)-1))
 		{
 			continue;
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "It is NOT double" );
+		zabbix_log(LOG_LEVEL_DEBUG, "It is NOT double [%s]",c );
 		return FAIL;
 	}
 	zabbix_log(LOG_LEVEL_DEBUG, "It is double" );
