@@ -27,7 +27,7 @@
 ?>
 
 <?php
-	if(!check_right("Network map","U",0))
+	if(!check_anyright("Network map","U"))
 	{
 		show_table_header("<font color=\"AA0000\">No permissions !</font>");
 		show_footer();
@@ -76,7 +76,7 @@
 	$col=0;
 	while($row=DBfetch($result))
 	{
-	        if(!check_right("Network map","R",$row["sysmapid"]))
+	        if(!check_right("Network map","U",$row["sysmapid"]))
 	        {
 	                continue;
 	        }
