@@ -41,7 +41,6 @@ TOP PRIORITY:
  - check Rickard's active(?) agent
  - improve graphing capabilities (MRTG like graphs)
  - monitoring of log files
- - show current and planned SLA in IT Services screen
  - support of fetch_html[*]
  - link map's line to a trigger
  - restructure sources
