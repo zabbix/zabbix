@@ -99,7 +99,7 @@
 		$cond="";
 	}
 
-	$result=DBselect("select h.hostid,h.host,t.triggerid,t.expression,t.description,t.istrue from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid $cond order by h.host,t.description");
+	$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.istrue from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid $cond order by h.host,t.description");
 	$lasthost="";
 	$col=0;
 	for($i=0;$i<DBnum_rows($result);$i++)
