@@ -17,13 +17,9 @@ suckerd and agentd)
 
 LS:
 
-sum(N) - summa znachenii za interval vremeni N;
-
 change(N) - raznica mezhdu poslednim i na N vremeni ranee poluchennim
 znacheniem;
 abschange(N) = abs(change(N));
-
-count(N) - kolichestvo udacnih izmerenij za interval vremeni N;
 
 trend(N) - linejnaja aproksimacija sled.znachenija po interval vremeni N;
 trend(N,M) - tozhe, no ne sled.znachenie, a vpered na interval vremeni M;
@@ -36,6 +32,26 @@ scitivanij !!!!!
 
 nu i massu matematicheskih mozhno - dlja super-advanced chuvakov:
 * SQRT, LOG, LOG10, trigonometricheskie, ...
+
+ - show host groups in "Status of Triggers"
+ - if 'Update', then default action (button 'Enter') must be Update
+ - do not check SNMP port existance if Item is not SNMP
+ - items/triggers definition screens. Add group of hosts.
+ - host groups (delete, rename)
+ - add item to host group
+ - add descriptions to items
+ - link host (group) to template
+
+graphs:
+
+ - 2000->2K
+ - min value (0 or automatic)
+ - customisation of font size
+ - link items to show them in one graph (network in/out) 
+
+ - snmp oid symbolic representation
+ - periodically check unsupported items (NxInterval). Can be configurable.
+ - Latest values->Host->[Show not monitored]
 
 HP:
 
