@@ -13,6 +13,11 @@ Not ready yet:
 
 [ DOCS. All parameters should contain section "How can be used" in the Manual ]
 
+Changes for 1.0beta4:
+
+ - protection from items.delay set to 0 (Alexei)
+ - values provided by an agent can be less than zero (Alexei)
+
 Changes for 1.0beta3:
 
  - support for chart showing diff instead of real values (Alexei)
