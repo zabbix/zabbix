@@ -1,5 +1,6 @@
 Changes for 1.0beta11:
 
+ - fix for flexible SNMP port name (Alexei)
  - fixed permissions of PHP screens (Alexei)
  - period in graphs. Thanks to Igor Micko. (Alexei)
  - date in graphs (Alexei)
