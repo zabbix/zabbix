@@ -107,7 +107,7 @@ img.bottom
 .button
 {
 	font-family: Verdana, Helvetica, Geneva;
-	font-size: 12px;
+	font-size: 10px;
 	border: solid;
 	border-width: 1px;
 	border-color: gray;
@@ -118,7 +118,7 @@ img.bottom
 .button:hover
 {
 	font-family: Verdana, Helvetica, Geneva;
-	font-size: 12px;
+	font-size: 10px;
 	text-decoration: underline;
 	border: solid;
 	border-width: 1px;
