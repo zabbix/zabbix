@@ -521,10 +521,75 @@ void update_triggers_status_to_unknown(int hostid,int clock)
 	return; 
 }
 
+void  DBdelete_trigger(int triggerid)
+{
+	sprintf(sql,"delete from trigger_depends where triggerid_down=%d or triggerid_up=%d", triggerid, triggerid);
+	DBexecute(sql);
+	sprintf(sql,"delete from functions where triggerid=%d", triggerid);
+	DBexecute(sql);
+	sprintf(sql,"delete from alarms where triggerid=%d", triggerid);
+	DBexecute(sql);
+	sprintf(sql,"delete from actions where triggerid=%d", triggerid);
+	DBexecute(sql);
+
+	DBdelete_services_by_triggerid(triggerid);
+
+	sprintf(sql,"update sysmaps_links set triggerid=NULL where triggerid=%d", triggerid);
+	DBexecute(sql);
+	sprintf(sql,"delete from triggers where triggerid=%d", triggerid);
+	DBexecute(sql);
+}
+
+void  DBdelete_triggers_by_itemid(int itemid)
+{
+	int	i, triggerid;
+	char	sql[MAX_STRING_LEN+1];
+	DB_RESULT	*result;
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBdelete_triggers_by_itemid(%d)", itemid);
+	sprintf(sql,"select triggerid from functions where itemid=%d", itemid);
+	result = DBselect(sql);
+
+	for(i=0;i<DBnum_rows(result);i++)
+	{
+		triggerid=atoi(DBget_field(result,i,0));
+		DBdelete_trigger(triggerid);
+	}
+	DBfree_result(result);
+
+	sprintf(sql,"delete from functions where itemid=%d", itemid);
+	DBexecute(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG,"End of DBdelete_triggers_by_itemid(%d)", itemid);
+}
+}
+
+void DBdelete_history_by_itemid(int itemid)
+{
+	sprintf(sql,"delete from history where itemid=%d", itemid);
+	DBexecute(sql);
+	sprintf(sql,"delete from history_str where itemid=%d", itemid);
+	DBexecute(sql);
+}
+
+void DBdelete_item(int itemid)
+{
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBdelete_item(%d)", itemid);
+
+	DBdelete_triggers_by_itemid(itemid);
+	DBdelete_history_by_itemid(itemid);
+
+	sprintf(sql,"delete from items where itemid=%d", itemid);
+	DBexecute(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG,"End of DBdelete_item(%d)", itemid);
+}
+
 void DBdelete_host(int hostid)
 {
 	int	i, itemid;
 	char	sql[MAX_STRING_LEN+1];
+	DB_RESULT	*result;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBdelete_host(%d)", hostid);
 	sprintf(sql,"select itemid from items where hostid=%d", hostid);
@@ -537,7 +602,7 @@ void DBdelete_host(int hostid)
 	}
 	DBfree_result(result);
 
-	sprintf(sql,"delete hosts where hostid=%d", hostid);
+	sprintf(sql,"delete from hosts where hostid=%d", hostid);
 	DBexecute(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG,"End of DBdelete_host(%d)", hostid);
