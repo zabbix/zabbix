@@ -53,6 +53,9 @@ TELECENTRS:
 
 OTHER:
 
+>  Atradu liekas, ka vienu bug: tad, ja updeito Host statusu zem Host, tad trigeris par "Host unreachable" pazuud, jo ir statusaa "unknown", bet pie alarms neparaadas
+>, ka tas buutu mainijis savu statusu.
+
  - negative values in graphs
 
 We're currently using Zabbix to monitor about 350 routers at our remote
