@@ -2,7 +2,7 @@
 
 all:
 
-	@CC@ @LIBS@ @CFLAGS@ -ggdb -I /usr/include/mysql -I../../include  -L/usr/lib/mysql zabbix_alarmer.c ../../include/expression.c ../../include/db.c -o zabbix_alarmer -Wall
+	@CC@ -o zabbix_alarmer @CFLAGS@ -ggdb -I /usr/include/mysql -I../../include  -L/usr/lib/mysql zabbix_alarmer.c ../../include/expression.c ../../include/db.c -Wall @LIBS@
 	strip zabbix_alarmer
 
 clean:
