@@ -1,18 +1,18 @@
 Changes for 1.0alpha11:
 
- - simplified tcp_listen procedure in zabbix_trapperd.c
- - simplified tcp_listen procedure in zabbix_agentd.c
- - no full list of triggers and items will be shown
- - deleted column triggers.lastcheck
- - fixed PostgreSQL upgrade patch to 1.0alpha10
- - if item.history==0, not values will be added to table history for this item
- - added directory upgrades/dbpatches/1.0alpha10_to_1.0alpha11/
-
- - added set of keys proc_cnt[*]
- - when pressing Acive in list of items, [all] selected unstead of [Server]. Fixed.
- - some triggers have incorrect status. Fixed.
- - global variable $ERROR_MSG will show details of operation failure
- - fixed both zabbix_trapper and zabbix_trapper to correctly change status of triggers
+ - changes in documentation (Mike)
+ - simplified tcp_listen procedure in zabbix_trapperd.c (Alexei)
+ - simplified tcp_listen procedure in zabbix_agentd.c (Alexei)
+ - no full list of triggers and items will be shown (Alexei)
+ - deleted column triggers.lastcheck (Alexei)
+ - fixed PostgreSQL upgrade patch to 1.0alpha10 (Alexei)
+ - if item.history==0, not values will be added to table history for this item (Alexei)
+ - added directory upgrades/dbpatches/1.0alpha10_to_1.0alpha11/ (Alexei)
+ - added set of keys proc_cnt[*] (Alexei)
+ - when pressing Acive in list of items, [all] selected unstead of [Server]. Fixed. (Alexei)
+ - some triggers have incorrect status. Fixed. (Alexei)
+ - global variable $ERROR_MSG will show details of operation failure (Alexei)
+ - fixed both zabbix_trapper and zabbix_trapper to correctly change status of triggers (Alexei)
 
 Changes for 1.0alpha10:
 
