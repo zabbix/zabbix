@@ -33,7 +33,14 @@
 #define	AGENT_ERROR	(-5)
 
 #define	MAXFD	64
-#define MAX_STRING_LEN	4096
+
+#define ZBX_POLLER
+
+#ifdef ZBX_POLLER
+	#define MAX_STRING_LEN	800
+#else
+	#define MAX_STRING_LEN	4096
+#endif
 
 /* Item types */
 #define ITEM_TYPE_ZABBIX	0
