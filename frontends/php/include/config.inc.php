@@ -2215,7 +2215,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$useip=0;
 		}
 		$sql="update hosts set host='$host',port=$port,status=$status,useip=$useip,ip='$ip' where hostid=$hostid";
-		echo $sql;
 		$result=DBexecute($sql);
 		return	$result;
 	}
