@@ -8,7 +8,6 @@ TOP PRIORITY:
 
 BUGS:
 
- - Edit Action. Always 'Admin'.
  - BUG. zabbix_suckerd is crashing after EMAIL15
  - graphs and maps are not displayed properly sometimes
  - BUG. Agent return unsupported in case if UserParameter ends by timeout.

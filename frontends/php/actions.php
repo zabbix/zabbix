@@ -149,15 +149,15 @@
 	}
 	echo "Send message to";
 	show_table2_h_delimiter();
-	echo "<SELECT class=\"biginput\" NAME=\"userid\" SIZE=\"1\">";
+	echo "<select class=\"biginput\" name=\"userid\" size=\"1\">";
 
 	$sql="select userid,alias from users order by alias";
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
 	{
-		if(isset($HTTP_GET_VARS["uid"]) && ($row["userid"] == $HTTP_GET_VARS["uid"]))
+		if(isset($uid) && ($row["userid"] == $uid))
 		{
-			echo "<option value=\"".$row["userid"]."\" SELECTED>".$row["alias"];
+			echo "<option value=\"".$row["userid"]."\" selected>".$row["alias"];
 		}
 		else
 		{
