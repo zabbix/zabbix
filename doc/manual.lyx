@@ -24,13 +24,13 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.17)
+Zabbix Reference Manual for version 1.0 (draft v1.18)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-19 May 2002
+24 May 2002
 \layout Abstract
 
 The document is Reference Manual for Zabbix version 1.0.
@@ -38,6 +38,119 @@ The document is Reference Manual for Zabbix version 1.0.
 
 
 \begin_inset LatexCommand \tableofcontents{}
+
+\end_inset 
+
+
+\layout Section
+
+Document conventions
+\layout Standard
+
+The 
+\emph on 
+Zabbix Manual 
+\emph default 
+uses the typographical convensions shown in the following table.
+\layout Standard
+
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="5" columns="2">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Convention
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+
+\emph on 
+italic text
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+File names, ...
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+
+\series bold 
+bold text
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Zabbix program names, ...
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
 
 \end_inset 
 
@@ -173,36 +286,12 @@ Zabbix
 
 \latex default 
  
-\latex no_latex 
-If support is an issue for you, several options are available as well.
-
-\latex default 
- 
-\latex no_latex 
-Please, contact 
-\family typewriter 
-\latex default 
-alex@gobbo.caves.lv
-\family default 
-\latex no_latex 
- to get additional information on available support levels.
-
-\latex default 
- 
-\latex no_latex 
-The latest version of 
 \series bold 
-\latex default 
-Zabbix
+Zabbix 
 \series default 
-\latex no_latex 
- can be found at 
-\family typewriter 
-\latex default 
-http://zabbix.sourceforge.net
-\family default 
-\latex no_latex 
-.
+is written and distributed under the GPL General Public License which means
+ that its source code is freely distributed and available for the general
+ public.
 \layout Subsection
 
 What does Zabbix offer
@@ -404,8 +493,11 @@ Zabbix
 \latex default 
  
 \latex no_latex 
-Any time these expressions become true, an alert will be emailed to any
- addresses defined by the administrator.
+Any time these expressions become true
+\latex default 
+ (or false)
+\latex no_latex 
+, an alert will be emailed to any addresses defined by the administrator.
 
 \latex default 
  
@@ -570,6 +662,9 @@ The following software is required to run
 Zabbix
 \series default 
 :
+\layout Itemize
+
+GNU C Compiler, GCC
 \layout Itemize
 
 Apache 1.3.12 or later
@@ -744,12 +839,57 @@ Zabbix
  to store the history in the database.
 \layout Standard
 
+Each 
+\series bold 
+Zabbix 
+\series default 
+daemon process required one connection to a database server.
+ Amount of memory allocated for the connection depends on configuration
+ of the database engine.
+ Note that 
+\series bold 
+zabbix_trapperd
+\series default 
+ can be configured so that connection to the database will only be made
+ during process of new value.
+ See description of parameter 
+\emph on 
+DBConnectOnEach.
+\layout Standard
+
 Remember, the more physical memory you have, the faster the database (and
  therefore 
 \series bold 
 Zabbix
 \series default 
 ) works!
+\layout Subsection
+
+Structure of Zabbix distribution
+\layout Standard
+
+Zabbix distribution
+\layout Standard
+
+- doc
+\layout Standard
+
+- src
+\layout Standard
+
+- include
+\layout Standard
+
+- misc
+\layout Standard
+
+- frontends
+\layout Standard
+
+- create
+\layout Standard
+
+- upgrades
 \layout Subsection
 
 Installation procedure
@@ -1355,7 +1495,11 @@ Create the Zabbix account.
 This is the user the agent will run as.
  For production use you should create a dedicated unprivileged account ("zabbix"
  is commonly used).
- Zabbix agents has protection against running as root.
+ Zabbix agents has protection against running under 
+\emph on 
+root
+\emph default 
+ account.
 \layout Enumerate
 
 Untar 
@@ -1587,6 +1731,34 @@ Zabbix
 
 Zabbix 1.0beta3 was developed and tested on FreeBSD 4.4.
  Thus, FreeBSD is also safe choise.
+\layout Subsection
+
+Platform specific notes
+\layout Subsubsection
+
+FreeBSD
+\layout Standard
+
+Default FreeBSD settings cannot handle amount of TCP connections 
+\series bold 
+Zabbix
+\series default 
+ is able to generate.
+ To solve this issue, define 
+\emph on 
+NoTimeWait 
+\emph default 
+parameter in both 
+\emph on 
+zabbix_suckerd.conf
+\emph default 
+ and 
+\emph on 
+zabbix_trapperd.conf
+\emph default 
+.
+ This will greatly decrease number of sockets in TIME_WAIT state.
+ 
 \layout Section
 
 Upgrading
@@ -2168,6 +2340,17 @@ to
 \emph default 
  the server.
  
+\layout Standard
+
+\SpecialChar ~
+
+\layout Standard
+
+
+\series bold 
+Zabbix
+\series default 
+ is written in C.
 \layout Subsection
 
 Server Approach Modes
@@ -2316,6 +2499,9 @@ zabbix_trapper
 \layout Subsection
 
 Theory of operations
+\layout Subsubsection
+
+Data exchange protocol
 \layout Standard
 
 
@@ -3223,7 +3409,7 @@ EXAMPLE:
 \layout Standard
 
 
-\latex no_latex 
+\emph on 
 zabbix_sender zabbix.abcde.com 10001 db.abcde.com:procload 2.34
 \layout Standard
 
@@ -3252,7 +3438,13 @@ db.abcde.com
 Zabbix
 \series default 
 \latex no_latex 
- server located at zabbix.acbde.com.\SpecialChar ~
+ server located at 
+\emph on 
+\latex default 
+zabbix.acbde.com
+\emph default 
+\latex no_latex 
+.\SpecialChar ~
 
 \latex default 
 Value of
@@ -3270,11 +3462,14 @@ Extending Zabbix agents
 Zabbix agents can be easily extended by using configuration parameter 
 \emph on 
 UserParameter.
-\begin_inset Info
-More information required
-\end_inset 
+ 
+\emph default 
+For example, number of emails waiting for delivery may be defined as:
+\layout Standard
 
 
+\emph on 
+UserParameter: mailq,echo /var/spool/mail/* | wc -w
 \layout Section
 
 Zabbix Configuration
@@ -3420,6 +3615,15 @@ Zabbix
 \series default 
  processes can be configured by changing appropriate configuration files.
  After a change was made, restart of the process required.
+\layout Standard
+
+All 
+\series bold 
+Zabbix
+\series default 
+ configuration files are stored in directory 
+\emph on 
+/etc/zabbix/.
 \layout Subsubsection
 
 
@@ -4086,6 +4290,8 @@ No
 
 \layout Standard
 
+
+\emph on 
 /tmp/zabbix_agentd.pid
 \end_inset 
 </cell>
@@ -4901,6 +5107,8 @@ No
 
 \layout Standard
 
+
+\emph on 
 /tmp/zabbix_trapperd.pid
 \end_inset 
 </cell>
@@ -5232,7 +5440,11 @@ Note that all above functions (except
 \series bold 
 diff
 \series default 
-) cannot be used for non-numeric parameters!
+) 
+\emph on 
+cannot
+\emph default 
+ be used for non-numeric parameters!
 \layout Standard
 
 
@@ -5470,6 +5682,9 @@ Similiar expressions could be useful to monitor changes in important files,
 \emph default 
 \latex no_latex 
 , etc.
+\layout Subsubsection
+
+Grammar (BNF form)
 \layout Subsection
 
 Monitored Parameters
@@ -5633,7 +5848,7 @@ xample:
 \layout Standard
 
 
-\latex no_latex 
+\emph on 
 filesize[/var/log/syslog]
 \layout Description
 
@@ -6014,7 +6229,9 @@ string value.
 \latex no_latex 
 Example
 \latex default 
- of returned value: 1.0beta3
+ of returned value: 
+\emph on 
+1.0beta3
 \layout Description
 
 system[hostname] Returns host name.
@@ -6056,6 +6273,21 @@ Example
 \emph on 
 FreeBSD localhost 4.4-RELEASE FreeBSD 4.4-RELEASE #0: Tue Sep 18 11:57:08
  PDT 2001 murray@builder.FreeBSD.org:/usr/src/sys/compile/GENERIC i386
+\layout Subsubsection
+
+SNMP parameters
+\layout Standard
+
+When defining SNMP parameter, the following field must be filled:
+\layout Standard
+
+Community: public
+\layout Standard
+
+Oid: 1.2.3.45.6.7.8.0
+\layout Standard
+
+Key: <Unique string to be used as reference to triggers>
 \layout Subsection
 
 Supported Parameters by Platform
@@ -9110,6 +9342,9 @@ Zabbix configuration parameters
 Database Engine
 \layout Itemize
 
+use stable release of a database engine
+\layout Itemize
+
 rebuild MySQL or PostgreSQL from sources to get maximum performance
 \layout Itemize
 
@@ -9160,18 +9395,12 @@ Menu
 \layout Standard
 \added_space_bottom 0.3cm 
 Most of pages contain menu that visibly consists of three rows.
- First row is accessible for any 
+ First row contains end-user functionality.
+ Second and third row is area for 
 \series bold 
 Zabbix
 \series default 
- users.
- Administrator priveledges required to access items of second and third
- menu' rows.
- Third row is area for 
-\series bold 
-Zabbix
-\series default 
- administrators.
+ administration.
  
 \layout Paragraph
 
@@ -9333,10 +9562,17 @@ Assuming you have been monitoring the web server and have the "WEB server
 Zabbix utilities
 \layout Subsection
 
+Startup scripts
+\layout Subsection
+
 pinger.pl
 \layout Standard
 
-
+The script can be found in 
+\emph on 
+misc/scripts.
+ 
+\emph default 
 \latex no_latex 
 The script is used to periodically s
 \latex default 
@@ -9353,7 +9589,7 @@ nd ICMP pings to list of servers.
 \layout Standard
 
 
-\latex no_latex 
+\emph on 
 zabbix_sender <server> <port> <host>:alive 0
 \layout Standard
 
@@ -9375,7 +9611,7 @@ otherwise:
 \layout Standard
 
 
-\latex no_latex 
+\emph on 
 zabbix_sender <server> <port> <host>:alive 1
 \layout Standard
 
@@ -9415,6 +9651,9 @@ The section describes structure of tables of
 Zabbix
 \series default 
  database.
+\layout Subsection
+
+Diagram
 \layout Subsection
 
 CONFIG 
@@ -13159,7 +13398,7 @@ How Zabbix Compares to Other Monitoring Software
 BigBrother
 \layout Itemize
 
-Netsaint
+Nagios
 \layout Itemize
 
 SysOrb
@@ -13174,17 +13413,111 @@ WhatsUp Gold
 ...
 \layout Section
 
-Credits
+Why choose Zabbix ?
+\layout Itemize
+
+highly efficient agents
+\layout Itemize
+
+very simple configuration
+\layout Itemize
+
+all information (configuration, gathered data) is stored in SQL database
+\layout Itemize
+
+high-level service tree
+\layout Itemize
+
+very easy setup
+\layout Itemize
+
+support for SNMP
+\layout Itemize
+
+visualisation capabilities
+\layout Itemize
+
+housekeeping procedure
+\layout Section
+
+Zabbix in the future
+\layout Itemize
+
+Distributed monitoring
+\layout Itemize
+
+Better support for SNMP
+\layout Itemize
+
+Improved WEB interface
+\layout Itemize
+
+Native agent for MS platforms
+\layout Section
+
+Support of Zabbix
 \layout Standard
 
 
 \latex no_latex 
-I want to thank the guys from sourceforge.net for providing hosting for
+If support is an issue for you, several options are available as well.
+
+\latex default 
+ 
+\latex no_latex 
+Please, contact 
+\family typewriter 
+\latex default 
+alex@gobbo.caves.lv
+\family default 
+\latex no_latex 
+ to get additional information on available support levels.
+
+\latex default 
+ 
+\latex no_latex 
+The latest version of 
+\series bold 
+\latex default 
+Zabbix
+\series default 
+\latex no_latex 
+ can be found at 
+\family typewriter 
+\latex default 
+http://zabbix.sourceforge.net
+\family default 
+\latex no_latex 
+.
+\layout Section
+
+Credits
+\layout Standard
+
+Zabbix
+\series bold 
+ team
+\series default 
+ w
+\latex no_latex 
+ant
+\latex default 
+s
+\latex no_latex 
+ to thank the guys from sourceforge.net for providing hosting for
 \latex default 
  
 \latex no_latex 
 the project.
- I also want to thank all the 
+ 
+\latex default 
+Ou team
+\latex no_latex 
+ also want
+\latex default 
+s
+\latex no_latex 
+ to thank all the 
 \series bold 
 \latex default 
 Zabbix
@@ -13195,7 +13528,11 @@ Zabbix
 \latex default 
  
 \latex no_latex 
-This sort of feedback helps me make the software better.
+This sort of feedback helps 
+\latex default 
+us
+\latex no_latex 
+ make the software better.
 \layout Subsection
 
 Developers of Zabbix
@@ -13309,6 +13646,9 @@ Support for quering SNMP parameters by IP address.
 \layout Subsection
 
 Supporters to Zabbix
+\layout Section
+
+Glossary
 \layout Section
 
 GNU General Public License
