@@ -639,6 +639,25 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 
 			found = SUCCEED;
 		}
+		else if( (s = strstr(str,"{STATUS}")) != NULL )
+		{
+			/* This is old value */
+			if(trigger->value == TRIGGER_VALUE_TRUE)
+			{
+				snprintf(tmp,sizeof(tmp)-1,"OFF");
+			}
+			else
+			{
+				snprintf(tmp,sizeof(tmp)-1,"ON");
+			}
+
+			s[0]=0;
+			strcpy(exp, str);
+			strncat(exp, tmp, MAX_STRING_LEN);
+			strncat(exp, s+strlen("{STATUS}"), MAX_STRING_LEN);
+
+			found = SUCCEED;
+		}
 		else
 		{
 			found = FAIL;
@@ -651,6 +670,9 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 /*
  * Translate "{127.0.0.1:system[procload].last(0)}" to "1.34" 
  */
+/*
+ * Make this function more secure. Get rid of snprintf. Utilise substr()
+*/
 int	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 {
 	char	res[MAX_STRING_LEN];

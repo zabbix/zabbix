@@ -3,9 +3,7 @@
  - apply Fabricio patches
  - get rid of .0000000 in alert messages
  - add SNMP-based template
- - fix all reported bugs
  - support for UDP-based checks (DNS, etc)
- - test trigger scopes
  - 'clone' for graphs and screens
  - add screens and graphs to host templates
  - action to work in both cases (ON->OFF or OFF->ON). New macro, {RECOVERED}, ON->OFF='RECOVERED',
