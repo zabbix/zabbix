@@ -125,7 +125,7 @@ void	report_stat(int now)
 
 	int	i,j;
 
-	file=fopen("/tmp/zabbix_agentd.tmp","w");
+	file=fopen("/tmp/zabbix_agentd.tmp2","w");
 	if(NULL == file)
 	{
 		fprintf(stderr, "Cannot file [%s] [%m]\n","/proc/net/dev");
@@ -244,6 +244,7 @@ void	report_stat(int now)
 	}
 
 	fclose(file);
+	rename("/tmp/zabbix_agentd.tmp2","/tmp/zabbix_agentd.tmp");
 }
 
 
