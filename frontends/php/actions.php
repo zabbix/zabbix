@@ -149,7 +149,7 @@
 	}
 	echo "Send message to";
 	show_table2_h_delimiter();
-	echo "<SELECT NAME=\"userid\" SIZE=\"1\">";
+	echo "<SELECT class=\"biginput\" NAME=\"userid\" SIZE=\"1\">";
 
 	$sql="select userid,alias from users order by alias";
 	$result=DBselect($sql);
@@ -169,7 +169,7 @@
 	show_table2_v_delimiter();
 	echo "When trigger becomes";
 	show_table2_h_delimiter();
-	echo "<select name=\"good\" size=1>";
+	echo "<select class=\"biginput\" name=\"good\" size=1>";
 	echo "<OPTION VALUE=\"1\""; if($good==1) echo "SELECTED"; echo ">ON";
 	echo "<OPTION VALUE=\"0\""; if($good==0) echo "SELECTED"; echo ">OFF";
 	echo "</SELECT>";
@@ -177,17 +177,17 @@
 	show_table2_v_delimiter();
 	echo "Delay";
 	show_table2_h_delimiter();
-	echo "<input name=\"delay\" value=\"$delay\" size=5>";
+	echo "<input class=\"biginput\" name=\"delay\" value=\"$delay\" size=5>";
 
 	show_table2_v_delimiter();
 	echo "Subject";
 	show_table2_h_delimiter();
-	echo "<input name=\"subject\" value=\"$subject\" size=70>";
+	echo "<input class=\"biginput\" name=\"subject\" value=\"$subject\" size=70>";
 
 	show_table2_v_delimiter();
 	echo "Message";
 	show_table2_h_delimiter();
- 	echo "<textarea name=\"message\" cols=70 ROWS=\"7\" wrap=\"soft\">$message</TEXTAREA>";
+ 	echo "<textarea class=\"biginput\" name=\"message\" cols=70 ROWS=\"7\" wrap=\"soft\">$message</TEXTAREA>";
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
