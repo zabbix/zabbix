@@ -39,6 +39,7 @@ AC_CHECK_LIB(socket, main)
 #Solaris SNMP requires this
 AC_CHECK_LIB(kstat, main)
 AC_CHECK_LIB(nsl, main)
+AC_CHECK_LIB(pthread, pthread_exit, LIBS="-pthread $LIBS")
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -464,7 +465,7 @@ What DBMS do you want to use (please select only one):
 		fi
    	fi
     MYSQL_INCLUDE=-I$MYSQL_INCDIR
-    MYSQL_LFLAGS="-L$MYSQL_LIBDIR -lmysqlclient"
+    MYSQL_LFLAGS="-L$MYSQL_LIBDIR -lmysqlclient_r"
 
     AC_DEFINE(HAVE_MYSQL)
     AC_MSG_RESULT(yes)
