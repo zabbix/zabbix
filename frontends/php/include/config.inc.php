@@ -477,7 +477,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$color="#223344";
 		}
 		echo "<center>";
-		echo "<font face='Helvetica' size=+1 color='$color'>";
+//		echo "<font size=+1 color='$color'>";
 		if($ERROR_MSG=="")
 		{
 			echo "<b>[$msg]</b>";
@@ -486,7 +486,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 			echo "<b>[$msg. $ERROR_MSG]</b>";
 		}
-		echo "</font>";
+//		echo "</font>";
 		echo "</center><br>";
 	}
 
@@ -768,7 +768,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	}
 	echo "<head>";
 ?>
-	<body bgcolor="#778899" text="#000000" link="#000000" vlink="#000000" topmargin=4 leftmargin=0 rightmargin=0 marginheight=4>
+	<body>
 <?
 		if($nomenu == 0)
 		{
@@ -780,7 +780,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		<table width=100% border=0 cellspacing=1 cellpadding=3>
 		<tr>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Host","R",0))
 				{
@@ -796,10 +795,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					echo "LATEST VALUES</a>";
 				}
 ?>
-			</font>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
-			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Host","R",0))
 				{
@@ -814,10 +811,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					echo "STATUS OF TRIGGERS</a>";
 				}
 ?>
-			</font>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
-			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Host","R",0))
 				{
@@ -832,10 +827,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					echo "QUEUE</a>";
 				}
 ?>
-			</font>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
-			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Default permission","R",0))
 				{
@@ -853,10 +846,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					echo "ALARMS</a>";
 				}
 ?>
-			</font>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Default permission","R",0))
 				{
@@ -873,10 +864,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					echo "ALERT HISTORY</a>";
 				}
 ?>
-			</font>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Network map","R",0))
 				{
@@ -893,10 +882,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					echo "NETWORK MAPS</a>";
 				}
 ?>
-			</font>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Graph","R",0))
 				{
@@ -913,11 +900,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					echo "GRAPHS</a>";
 				}
 ?>
-			</font>
 		</td>
 
 		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
-			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Service","R",0))
 				{
@@ -932,12 +917,10 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					echo "IT SERVICES</a>";
 				}
 ?>
-			</font>
 		</td>
 
 		<tr>
 		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
-			<font face="Arial,Helvetica" size=2>
 				<a href="index.php">
 <?
 				if($page["file"]=="index.php")
@@ -949,10 +932,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					echo "HOME</a>";
 				}
 ?>
-			</font>
 		</td>
 		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
-			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Default permission","R",0))
 				{
@@ -969,10 +950,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					echo "ABOUT</a>";
 				}
 ?>
-			</font>
 		</td>
 		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
-			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Default permission","R",0))
 				{
@@ -989,10 +968,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					echo "STATUS OF ZABBIX</a>";
 				}
 ?>
-			</font>
 		</td>
 		<td colspan=3 bgcolor=FFFFFF align=center valign=top width=15%>
-			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Host","R",0))
 				{
@@ -1009,7 +986,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					echo "AVAILABILITY REPORT</a>";
 				}
 ?>
-			</font>
 		</td>
 		</tr>
 <?
@@ -1031,7 +1007,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 		<tr>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Configuration of Zabbix","U",0))
 				{
@@ -1046,10 +1021,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					echo "CONFIG</a>";
 				}
 ?>
-			</font>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
-			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("User","U",0))
 				{
@@ -1065,10 +1038,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					echo "USERS</a>";
 				}
 ?>
-			</font>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
-			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Host","U",0))
 				{
@@ -1083,10 +1054,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					echo "HOSTS</a>";
 				}
 ?>
-			</font>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
-			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Host","U",0))
 				{
@@ -1101,10 +1070,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					echo "ITEMS</a>";
 				}
 ?>
-			</font>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Host","U",0))
 				{
@@ -1120,10 +1087,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					echo "TRIGGERS</a>";
 				}
 ?>
-			</font>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Network map","U",0))
 				{
@@ -1139,10 +1104,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					echo "NETWORK MAPS</a>";
 				}
 ?>
-			</font>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Graph","U",0))
 				{
@@ -1158,11 +1121,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					echo "GRAPHS</a>";
 				}
 ?>
-			</font>
 		</td>
 
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Service","U",0))
 				{
@@ -1177,7 +1138,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					echo "IT SERVICES</a>";
 				}
 ?>
-			</font>
 		</td>
 
 		</tr>
@@ -2547,31 +2507,31 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	show_table_h_delimiter()
 	{
-		echo "</font>";
+//		echo "</font>";
 		cr();
 		echo "</td>";
 		cr();
 		echo "<td colspan=1 bgcolor=FFFFFF align=center valign=\"top\">";
 		cr();
-		echo "	<font face=\"Arial,Helvetica\" size=2>";
+//		echo "	<font size=2>";
 		cr();
 	}
 
 	function	show_table2_h_delimiter()
 	{
-		echo "</font>";
+//		echo "</font>";
 		cr();
 		echo "</td>";
 		cr();
 		echo "<td colspan=1 bgcolor=CCCCCC align=left valign=\"top\">";
 		cr();
-		echo "	<font face=\"Arial,Helvetica\" size=-1>";
+//		echo "	<font size=-1>";
 		cr();
 	}
 
 	function	show_table_v_delimiter()
 	{
-		echo "</font>";
+//		echo "</font>";
 		cr();
 		echo "</td>";
 		cr();
@@ -2581,13 +2541,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		cr();
 		echo "<td colspan=1 bgcolor=FFFFFF align=center valign=\"top\">";
 		cr();
-		echo "<font face=\"Arial,Helvetica\" size=2>";
+//		echo "<font size=2>";
 		cr();
 	}
 
 	function	show_table2_v_delimiter()
 	{
-		echo "</font>";
+//		echo "</font>";
 		cr();
 		echo "</td>";
 		cr();
@@ -2597,13 +2557,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		cr();
 		echo "<td colspan=1 bgcolor=CCCCCC align=left valign=\"top\">";
 		cr();
-		echo "<font face=\"Arial,Helvetica\" size=-1>";
+//		echo "<font size=-1>";
 		cr();
 	}
 
 	function	show_table3_v_delimiter()
 	{
-		echo "</font>";
+//		echo "</font>";
 		cr();
 		echo "</td>";
 		cr();
@@ -2613,14 +2573,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		cr();
 		echo "<td colspan=1 bgcolor=99AABB align=left valign=\"top\">";
 		cr();
-		echo "<font face=\"Arial,Helvetica\" size=-1>";
+//		echo "<font size=-1>";
 		cr();
 	}
 
 
 	function	show_table2_v_delimiter2()
 	{
-		echo "</font>";
+//		echo "</font>";
 		cr();
 		echo "</td>";
 		cr();
@@ -2630,7 +2590,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		cr();
 		echo "<td colspan=2 bgcolor=\"99AABB\" align=right valign=\"top\">";
 		cr();
-		echo "<font face=\"Arial,Helvetica\" size=-1>";
+//		echo "<font size=-1>";
 		cr();
 	}
 
@@ -2650,7 +2610,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		cr();
 		echo "<td colspan=2 bgcolor=99AABB align=center valign=\"top\">";
 		cr();
-		echo "	<font face=\"Arial,Helvetica\" size=+1>";
+//		echo "	<font size=+1>";
 		cr();
 	}
 
@@ -2668,13 +2628,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		cr();
 		echo "<td colspan=1 bgcolor=99AABB align=center valign=\"top\">";
 		cr();
-		echo "	<font face=\"Arial,Helvetica\" size=+1>";
+//		echo "	<font size=+1>";
 		cr();
 	}
 
 	function	show_table2_header_end()
 	{
-		echo "	</font>";
+//		echo "	</font>";
 		cr();
 		echo "</td>";
 		cr();
@@ -2692,7 +2652,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	show_table_header_end()
 	{
-		echo "	</font>";
+//		echo "	</font>";
 		cr();
 		echo "</td>";
 		cr();
@@ -3458,9 +3418,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<td bgcolor=\"#000000\">";
 		echo "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\" width=\"100%\" bgcolor=\"#666666\">";
 		echo "<tr><td align=center>";
-		echo "<font face=\"Arial,Helvetica\" size=1>";
+//		echo "<font size=1>";
 		echo "<a href=\"http://zabbix.sourceforge.net\">ZABBIX</a> Copyright 2000,2001,2002 by <a href=\"mailto:alex@gobbo.caves.lv\">Alexei Vladishev</a>";
-		echo "</font>";
+//		echo "</font>";
 		echo "</td>";
 		echo "</tr>";
 		echo "</table>";
@@ -3482,12 +3442,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<td bgcolor=\"#000000\">";
 		echo "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\" width=100% bgcolor=\"#666666\">";
 		echo "<tr><td align=center>";
-		echo "<font face=\"Arial,Helvetica\" size=1>";
+//		echo "<font size=1>";
 		echo "<a href=\"http://zabbix.sourceforge.net\">ZABBIX</a> Copyright 2000,2001,2002 by <a href=\"mailto:alex@gobbo.caves.lv\">Alexei Vladishev</a>";
-		echo "</font>";
+//		echo "</font>";
 		echo "</td>";
 		echo "<td align=right width=15%>";
-		echo "<font size=-1>| Connected as ".$USER_DETAILS["alias"];
+		echo "| Connected as ".$USER_DETAILS["alias"];
 		echo "</td>";
 		echo "</tr>";
 		echo "</table>";

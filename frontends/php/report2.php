@@ -20,8 +20,6 @@
 
 	show_table_v_delimiter();
 
-	echo "<font size=2>";
-
 	$result=DBselect("select h.hostid,h.host from hosts h,items i where h.status in (0,2) and h.hostid=i.hostid group by h.hostid,h.host order by h.host");
 
 	while($row=DBfetch($result))
@@ -42,7 +40,6 @@
 		echo " ";
 	}
 
-	echo "</font>";
 	show_table_header_end();
 ?>
 

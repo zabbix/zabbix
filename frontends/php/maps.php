@@ -35,8 +35,6 @@
 
 		show_table_v_delimiter();
 
-		echo "<font size=2>";
-
 		$lasthost="";
 		$result=DBselect("select sysmapid,name from sysmaps order by name");
 
@@ -63,7 +61,6 @@
 			echo "No maps to display";
 		}
 
-		echo "</font>";
 		show_table_header_end();
 		echo "<br>";
 	}

@@ -25,8 +25,6 @@
 
 	show_table_v_delimiter();
 
-	echo "<font size=2>";
-
 	if(isset($HTTP_GET_VARS["type"])&&$HTTP_GET_VARS["type"]=="12hours")
 	{
 		echo "<b>[<a href='trends.php?itemid=".$HTTP_GET_VARS["itemid"]."&type=12hours'>12hours</a>]</b> ";
