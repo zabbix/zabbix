@@ -71,20 +71,20 @@
 		}
 		if(isset($sort)&&($sort=="lastcheck"))
 		{
-			echo "<TD WIDTH=\"10%\"><B>LAST CHECK</B></TD>";
+			echo "<TD WIDTH=\"12%\"><B>LAST CHECK</B></TD>";
 		}
 		else
 		{
-			echo "<TD WIDTH=\"10%\"><B><a href=\"latest.html?hostid=$hostid&sort=lastcheck\">Last check</B></TD>";
+			echo "<TD WIDTH=\"12%\"><B><a href=\"latest.html?hostid=$hostid&sort=lastcheck\">Last check</B></TD>";
 		}
 		cr();
 		echo "<TD WIDTH=\"10%\" NOSAVE><B>Last value</B></TD>"; 
 		cr();
 		echo "<TD WIDTH=\"5%\" NOSAVE><B>Change</B></TD>"; 
 		cr();
-		echo "<TD WIDTH=\"10%\" NOSAVE><center><B>History</B></center></TD>";
+		echo "<TD WIDTH=\"5%\" NOSAVE><center><B>History</B></center></TD>";
 		cr();
-		echo "<TD WIDTH=\"10%\" NOSAVE><center><B>Trends</B></center></TD>";
+		echo "<TD WIDTH=\"5%\" NOSAVE><center><B>Trends</B></center></TD>";
 		cr();
 		echo "</TR>";
 		cr();
@@ -109,7 +109,7 @@
 		{
 			$sort="order by i.description";
 		}
-		$result=DBselect("select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and h.hostid=$hostid $sort");
+		$result=DBselect("select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and i.status in (0,2) and h.hostid=$hostid $sort");
 		while($row=DBfetch($result))
 		{
 			if($col++%2 == 1)	{ echo "<tr bgcolor=#DDDDDD>"; }
@@ -121,10 +121,6 @@
 			if($row["status"] == 2)
 			{
 				echo "<font color=\"#FF6666\">";
-			}
-			elseif($row["status"] != 0)
-			{
-				echo "<font color=\"#666666\">";
 			}
 
 			if(!isset($row["lastclock"]))
