@@ -39,7 +39,7 @@ static HANDLE mutexLogAccess;
 
 void InitLog(void)
 {
-   if (optUseEventLog)
+   if (dwFlags & AF_USE_EVENT_LOG)
    {
       hLog=RegisterEventSource(NULL,ZABBIX_EVENT_SOURCE);
    }
@@ -72,7 +72,7 @@ void InitLog(void)
 
 void CloseLog(void)
 {
-   if (optUseEventLog)
+   if (dwFlags & AF_USE_EVENT_LOG)
    {
       DeregisterEventSource(hLog);
    }
@@ -104,19 +104,19 @@ static void WriteLogToFile(char *message)
    loc=localtime(&t);
    strftime(buffer,32,"[%d-%b-%Y %H:%M:%S] ",loc);
    WriteFile(hLog,buffer,strlen(buffer),&size,NULL);
-   if (optStandalone)
+   if (IsStandalone())
       printf("%s",buffer);
 
    prefix=(char *)TlsGetValue(dwTlsLogPrefix);
    if (prefix!=NULL)    // Thread has it's log prefix
    {
       WriteFile(hLog,prefix,strlen(prefix),&size,NULL);
-      if (optStandalone)
+      if (IsStandalone())
          printf("%s",prefix);
    }
 
    WriteFile(hLog,message,strlen(message),&size,NULL);
-   if (optStandalone)
+   if (IsStandalone())
       printf("%s",message);
 
    ReleaseMutex(mutexLogAccess);
@@ -193,7 +193,7 @@ void WriteLog(DWORD msg,WORD wType,char *format...)
       va_end(args);
    }
 
-   if (optUseEventLog)
+   if (dwFlags & AF_USE_EVENT_LOG)
    {
       ReportEvent(hLog,wType,0,msg,NULL,numStrings,0,(const char **)strings,NULL);
    }

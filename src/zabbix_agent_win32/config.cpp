@@ -102,7 +102,7 @@ static int ParseServerList(char *args,int sourceLine)
       if (confServerAddr[confServerCount]==INADDR_NONE)
       {
          errors++;
-         if (optStandalone)  
+         if (IsStandalone())  
             printf("Error in configuration file, line %d: invalid server's IP address (%s)\n",sourceLine,sptr);
       }
       else
@@ -125,13 +125,13 @@ BOOL ReadConfig(void)
    char *ptr,buffer[4096];
    int sourceLine=0,errors=0;
 
-   if (optStandalone)
+   if (IsStandalone())
       printf("Using configuration file \"%s\"\n",confFile);
 
    cfg=fopen(confFile,"r");
    if (cfg==NULL)
    {
-      if (optStandalone)
+      if (IsStandalone())
          printf("Unable to open configuration file: %s\n",strerror(errno));
       return FALSE;
    }
@@ -156,7 +156,7 @@ BOOL ReadConfig(void)
       if (ptr==NULL)
       {
          errors++;
-         if (optStandalone)
+         if (IsStandalone())
             printf("Syntax error in configuration file, line %d\n",sourceLine);
          continue;
       }
@@ -169,11 +169,11 @@ BOOL ReadConfig(void)
       {
          if (!stricmp(ptr,"{EventLog}"))
          {
-            optUseEventLog=TRUE;
+            dwFlags|=AF_USE_EVENT_LOG;
          }
          else
          {
-            optUseEventLog=FALSE;
+            dwFlags&=~AF_USE_EVENT_LOG;
             memset(logFile,0,MAX_PATH);
             strncpy(logFile,ptr,MAX_PATH-1);
          }
@@ -194,7 +194,7 @@ BOOL ReadConfig(void)
          {
             confListenPort=10000;
             errors++;
-            if (optStandalone)
+            if (IsStandalone())
                printf("Error in configuration file, line %d: invalid port number (%s)\n",sourceLine,ptr);
          }
          else
@@ -210,7 +210,7 @@ BOOL ReadConfig(void)
          if (sep==NULL)
          {
             errors++;
-            if (optStandalone)
+            if (IsStandalone())
                printf("Error in configuration file, line %d: invalid alias syntax\n",sourceLine);
          }
          else
@@ -234,7 +234,7 @@ BOOL ReadConfig(void)
          else
          {
             errors++;
-            if (optStandalone)
+            if (IsStandalone())
                printf("Error in configuration file, line %d: invalid timeout value (%d seconds)\n",
                       sourceLine,tm);
          }
@@ -244,7 +244,7 @@ BOOL ReadConfig(void)
          if (!AddPerformanceCounter(ptr))
          {
             errors++;
-            if (optStandalone)
+            if (IsStandalone())
                printf("Error in configuration file, line %d: invalid performance counter specification\n",
                       sourceLine);
          }
@@ -261,10 +261,17 @@ BOOL ReadConfig(void)
          else
          {
             errors++;
-            if (optStandalone)
+            if (IsStandalone())
                printf("Error in configuration file, line %d: invalid collector sample processing time value (%d milliseconds)\n",
                       sourceLine,tm);
          }
+      }
+      else if (!stricmp(buffer,"LogUnresolvedSymbols"))
+      {
+         if ((!stricmp(ptr,"1"))||(!stricmp(ptr,"yes"))||(!stricmp(ptr,"true")))
+            dwFlags|=AF_LOG_UNRESOLVED_SYMBOLS;
+         else
+            dwFlags&=~AF_LOG_UNRESOLVED_SYMBOLS;
       }
       else if ((!stricmp(buffer,"PidFile"))||(!stricmp(buffer,"NoTimeWait"))||
                (!stricmp(buffer,"StartAgents"))||(!stricmp(buffer,"DebugLevel")))
@@ -274,12 +281,12 @@ BOOL ReadConfig(void)
       else
       {
          errors++;
-         if (optStandalone)
+         if (dwFlags & AF_STANDALONE)
             printf("Error in configuration file, line %d: unknown option \"%s\"\n",sourceLine,buffer);
       }
    }
 
-   if ((optStandalone)&&(!errors))
+   if ((IsStandalone())&&(!errors))
       printf("Configuration file OK\n");
 
    fclose(cfg);

@@ -32,10 +32,9 @@ DWORD dwTlsLogPrefix;
 HANDLE eventShutdown;
 HANDLE eventCollectorStarted;
 
-BOOL optStandalone=FALSE;
-BOOL optUseEventLog=TRUE;
+DWORD dwFlags=AF_USE_EVENT_LOG;
 char confFile[MAX_PATH]="C:\\zabbix_agentd.conf";
-char logFile[MAX_PATH]="C:\\zabbix_agentd.log";
+char logFile[MAX_PATH]="{EventLog}";
 WORD confListenPort=10000;
 DWORD confServerAddr[MAX_SERVERS];
 DWORD confServerCount=0;
@@ -56,7 +55,7 @@ static FARPROC GetProcAddressAndLog(HMODULE hModule,LPCSTR procName)
    FARPROC ptr;
 
    ptr=GetProcAddress(hModule,procName);
-   if (ptr==NULL)
+   if ((ptr==NULL)&&(dwFlags & AF_LOG_UNRESOLVED_SYMBOLS))
       WriteLog(MSG_NO_FUNCTION,EVENTLOG_WARNING_TYPE,"s",procName);
    return ptr;
 }
@@ -162,7 +161,7 @@ void Main(void)
 {
    WriteLog(MSG_AGENT_STARTED,EVENTLOG_INFORMATION_TYPE,NULL);
 
-   if (optStandalone)
+   if (IsStandalone())
    {
       int ch;
 
@@ -198,7 +197,7 @@ int main(int argc,char *argv[])
    if (!ReadConfig())
       return 1;
 
-   if (!optStandalone)
+   if (!IsStandalone())
    {
       InitService();
    }
