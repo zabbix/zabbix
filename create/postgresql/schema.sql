@@ -315,6 +315,7 @@ CREATE TABLE media (
   mediatypeid		int4		DEFAULT '0' NOT NULL,
   sendto		varchar(100)	DEFAULT '' NOT NULL,
   active		int4		DEFAULT '0' NOT NULL,
+  severity		int4		DEFAULT '63' NOT NULL,
   PRIMARY KEY (mediaid),
   FOREIGN KEY (userid) REFERENCES users,
   FOREIGN KEY (mediatypeid) REFERENCES media_type,

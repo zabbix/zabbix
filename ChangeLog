@@ -1,5 +1,7 @@
 Changes for 1.0beta9:
 
+ - added severity to media definition (Alexei)
+ - add media.severity (Alexei)
  - added support for check_service_perf[*] (Alexei)
  - added parameter AlertScriptsPath to zabbix_suckerd (Alexei)
  - added support for alternative medias (Alexei)
