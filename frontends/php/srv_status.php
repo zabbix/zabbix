@@ -21,6 +21,7 @@
 	echo "<tr>";
 	echo "<td><b>Service</b></td>";
 	echo "<td><b>Status</b></td>";
+	echo "<td><b>Actions</b></td>";
 	echo "</tr>";
 	echo "\n";
 	$col=0;
@@ -52,12 +53,11 @@
 			if($col++%2==0)	{ echo "<tr bgcolor=#EEEEEE>"; }
 			else		{ echo "<tr bgcolor=#DDDDDD>"; }
 		}
-//		echo "<td><a href=\"srv_status.php?serviceid=".$row["serviceid"]."\">".$row["name"]."</a></td>";
 		$childs=get_num_of_service_childs($row["serviceid"]);
 		if(isset($row["triggerid"]))
 		{
 			$trigger=get_trigger_by_triggerid($row["triggerid"]);
-			$description="[TRIGGER] ".$trigger["description"];
+			$description="[<a href=\"alarms.php?triggerid=".$row["triggerid"]."\">TRIGGER</a>] ".$trigger["description"];
 		}
 		else
 		{
@@ -72,7 +72,7 @@
 			}
 			else
 			{
-				echo "<td><a href=\"srv_status.php?serviceid=".$row["serviceid"]."\"> - $description</a></td>";
+				echo "<td> - <a href=\"srv_status.php?serviceid=".$row["serviceid"]."\">$description</a></td>";
 			}
 		}
 		else
@@ -87,6 +87,7 @@
 			}
 		}
 		echo "<td>".$row["status"]."</td>";
+		echo "<td>[Root of the problem]</td>";
 		echo "</tr>"; 
 	}
 	echo "</table>";
