@@ -1,5 +1,6 @@
 Changes for 1.0alpha10:
 
+ - All calculations are made in C code instead of SQL statements
  - Housekeping now runs as separate process, however it's part of zabix_suckerd
  - "Not monitored" will not be displayed
  - Calls to mhash() changed to md5(), thus eliminating use of mhash module.

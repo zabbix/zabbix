@@ -62,7 +62,7 @@ int	evaluate_MIN(float *min,int itemid,int parameter)
 
 	now=time(NULL);
 
-	sprintf(c,"select min(value) from history where clock>%d-%d and itemid=%d",now,parameter,itemid);
+	sprintf(c,"select min(value) from history where clock>%d and itemid=%d",now-parameter,itemid);
 	syslog(LOG_WARNING, "SQL:%s", c );
 
 	result = DBselect(c);
@@ -98,7 +98,7 @@ int	evaluate_MAX(float *max,int itemid,int parameter)
 
 	now=time(NULL);
 
-	sprintf(c,"select max(value) from history where clock>%d-%d and itemid=%d",now,parameter,itemid);
+	sprintf(c,"select max(value) from history where clock>%d and itemid=%d",now-parameter,itemid);
 
 	result = DBselect(c);
 	if((result==NULL)||(DBnum_rows(result)==0))
