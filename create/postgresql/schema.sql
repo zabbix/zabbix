@@ -186,7 +186,7 @@ CREATE TABLE functions (
   triggerid		int4		DEFAULT '0' NOT NULL,
   lastvalue		varchar(255),
   function		varchar(10)	DEFAULT '' NOT NULL,
-  parameter		int4		DEFAULT '0' NOT NULL,
+  parameter		varchar(255)	DEFAULT '0' NOT NULL,
   PRIMARY KEY (functionid),
   FOREIGN KEY (itemid) REFERENCES items,
   FOREIGN KEY (triggerid) REFERENCES triggers
@@ -382,5 +382,19 @@ CREATE TABLE sessions (
 	FOREIGN KEY (userid) REFERENCES users
 );
 
+--
+-- Table structure for table 'services_alarms'
+--
+
+CREATE TABLE service_alarms (
+  servicealarmid	serial,
+  serviceid		int4		DEFAULT '0' NOT NULL,
+  clock			int4		DEFAULT '0' NOT NULL,
+  value			int4		DEFAULT '0' NOT NULL,
+  PRIMARY KEY (servicealarmid)
+);
+
+CREATE INDEX services_alarms_serviceid_clock on service_alarms (serviceid,clock);
+CREATE INDEX services_alarms_clock on service_alarms (clock);
 
 VACUUM ANALYZE;
