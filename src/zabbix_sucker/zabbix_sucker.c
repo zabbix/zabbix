@@ -1225,7 +1225,7 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-/*	zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd started");*/
+	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_suckerd...");
 
 /* Need to set trigger status to UNKNOWN since last run */
 	DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
@@ -1253,7 +1253,6 @@ int main(int argc, char **argv)
 	init_snmp("zabbix_suckerd");
 #endif
 
-	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_suckerd...");
 	if( sucker_num == 0)
 	{
 		sigaction(SIGCHLD, &phan, NULL);
