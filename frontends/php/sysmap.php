@@ -275,13 +275,14 @@
 	{
 		$icons[0]="Server";
 		$icons[1]="Workstation";
-		$icons[2]="Printer";
-		$icons[3]="Hub";
-		$icons[4]="UPS";
-		$icons[5]="Network";
-		$icons[6]="Phone";
-		$icons[7]="Satellite";
-		$num=8;
+		$icons[2]="Notebook";
+		$icons[3]="Printer";
+		$icons[4]="Hub";
+		$icons[5]="UPS";
+		$icons[6]="Network";
+		$icons[7]="Phone";
+		$icons[8]="Satellite";
+		$num=9;
 	}
 	else
 	{
