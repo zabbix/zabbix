@@ -184,8 +184,6 @@ int	process(char *s)
 	{
 		return FAIL;
 	}
-/*	???
-	value=atof(value_string);*/
 
 	ret=process_data(server,key,value_string);
 
@@ -298,7 +296,12 @@ void	process_child(int sockfd)
 		sprintf(result,"NOT OK\n");
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "Sending back:%s", result);
-	write(sockfd,result,strlen(result));
+	zabbix_log( LOG_LEVEL_DEBUG, "Sockfd [%d]", sockfd);
+	if( write(sockfd,result,strlen(result)) == -1)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Error sending result back [%s]",strerror(errno));
+	}
+	zabbix_log( LOG_LEVEL_DEBUG, "After write()");
 	alarm(0);
 }
 
