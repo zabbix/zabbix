@@ -16,7 +16,7 @@
 		}
 		if($register=="add link")
 		{
-			$result=add_service_link($servicedownid,$serviceupid);
+			$result=add_service_link($servicedownid,$serviceupid,$softlink);
 			show_messages($result,"Service link added","Cannot add service link");
 		}
 	}
@@ -36,29 +36,43 @@
 	echo "\n";
 	echo "<tr><td><b>Service</b></td></tr>";
 	echo "\n";
-	$col=0;
-	for($i=0;$i<DBnum_rows($result);$i++)
-	{
-		$serviceid_=DBget_field($result,$i,0);
-		$name_=DBget_field($result,$i,1);
 
-		if(isset($serviceid)&&($serviceid==$serviceid_))
+	$col=0;
+	if(isset($serviceid))
+	{
+		echo "<tr bgcolor=#EEEEEE>";
+		$service=get_service_by_serviceid($serviceid);
+		echo "<td><b><a href=\"services.html?serviceid=".$service["serviceid"]."#form\">".$service["name"]."</a></b></td>";
+		echo "</tr>"; 
+		$col++;
+	}
+	while($row=DBfetch($result))
+	{
+		if(!isset($serviceid) && service_has_parent($row["serviceid"]))
+		{
+			continue;
+		}
+		if(isset($serviceid) && service_has_no_this_parent($serviceid,$row["serviceid"]))
+		{
+			continue;
+		}
+		if(isset($serviceid)&&($serviceid==$row["serviceid"]))
 		{
 			echo "<tr bgcolor=#99AABB>";
 		}
 		else
 		{
-			if($col==1)
-			{
-				echo "<tr bgcolor=#EEEEEE>";
-				$col=0;
-			} else
-			{
-				echo "<tr bgcolor=#DDDDDD>";
-				$col=1;
-			}
+			if($col++%2==0)	{ echo "<tr bgcolor=#EEEEEE>"; }
+			else		{ echo "<tr bgcolor=#DDDDDD>"; }
 		}
-		echo "<td><a href=\"services.html?serviceid=$serviceid_\">$name_</a></td>";
+		if(isset($serviceid))
+		{
+			echo "<td><a href=\"services.html?serviceid=".$row["serviceid"]."#form\"> - ".$row["name"]."</a></td>";
+		}
+		else
+			echo "<td><a href=\"services.html?serviceid=".$row["serviceid"]."#form\">".$row["name"]."</a></td>";
+		{
+		}
 		echo "</tr>"; 
 	}
 	echo "</table>";
@@ -78,6 +92,7 @@
 	}
 
 	echo "<br>";
+	echo "<a name=\"form\"></a>";
 	show_table2_header_begin();
 	echo "New service";
 
@@ -94,9 +109,9 @@
         show_table2_v_delimiter();
         echo "Link to trigger ?";
         show_table2_h_delimiter();
-	if(isset($linktrigger)&&($triggerid!=""))
+	if(isset($triggerid)&&($triggerid!=""))
 	{
-        	echo "<INPUT TYPE=\"CHECKBOX\" NAME=\"linktrigger\" VALUE=\"true\">";
+        	echo "<INPUT TYPE=\"CHECKBOX\" NAME=\"linktrigger\" VALUE=\"true\" CHECKED>";
 	}
 	else
 	{

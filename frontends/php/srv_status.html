@@ -21,28 +21,18 @@
 	echo "<tr><td><b>Service</b></td></tr>";
 	echo "\n";
 	$col=0;
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
 	{
-		$serviceid_=DBget_field($result,$i,0);
-		$name_=DBget_field($result,$i,1);
-
-		if(isset($serviceid)&&($serviceid==$serviceid_))
+		if(isset($serviceid)&&($serviceid==$row["serviceid"]))
 		{
 			echo "<tr bgcolor=#99AABB>";
 		}
 		else
 		{
-			if($col==1)
-			{
-				echo "<tr bgcolor=#EEEEEE>";
-				$col=0;
-			} else
-			{
-				echo "<tr bgcolor=#DDDDDD>";
-				$col=1;
-			}
+			if($col++%2==0)	{ echo "<tr bgcolor=#EEEEEE>"; }
+			else		{ echo "<tr bgcolor=#DDDDDD>"; }
 		}
-		echo "<td><a href=\"srv_status.html?serviceid=$serviceid_\">$name_</a></td>";
+		echo "<td><a href=\"srv_status.html?serviceid=".$row["serviceid"]."\">".$row["name"]."</a></td>";
 		echo "</tr>"; 
 	}
 	echo "</table>";
