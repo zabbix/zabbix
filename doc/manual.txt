@@ -5,26 +5,33 @@
 1.3 What is Zabbix ?
 1.4 What does Zabbix offer ?
 
-2. Chapter 2 (Structure)
-2.1 zabbix_sucker
-2.2 zabbix_alarmer
-2.3 zabbix_agent
-2.4 zabbix_trapper
-2.5 zabbix_sender
-2.6 Database
-2.7 WEB-based frontend
+2. Chapter 2 (Use of Zabbix)
+2.1 Performance monitoring
+2.2 Alarming users
+2.3 Integrity checking
+2.4 Logging services
+2.5 Capacity planning
 
-3. Chapter 3 (Installation)
+3. Chapter 3 (Structure)
+3.1 zabbix_sucker
+3.2 zabbix_alarmer
+3.3 zabbix_agent
+3.4 zabbix_trapper
+3.5 zabbix_sender
+3.6 Database
+3.7 WEB-based frontend
 
-3.1 Requirements
-3.2 Installation procedure
+4. Chapter 4 (Installation)
 
-4. Chapter 4 (Administration)
-4.1 Zabbix configuration
-4.2 Expressions for triggers
+4.1 Requirements
+4.2 Installation procedure
 
-5. Chapter 5 (Misc)
-5.1 pinger.pl
+5. Chapter 5 (Administration)
+5.1 Zabbix configuration
+5.2 Expressions for triggers
+
+6. Chapter 6 (Misc)
+6.1 pinger.pl
 
 Appendix A (Item configuration examples)
 Appendix B (Trigger configuration examples)
@@ -69,7 +76,7 @@ possible problems before they actually happen.
 Web-based frontend is used to provide fast and efficient way for Zabbix
 configuration and administration.
 
-Properly configured Zabbix plays most important role in monitoring of IT infrastructure
+Properly configured Zabbix can play most important role in monitoring of IT infrastructure
 for companies with even more than hundred of servers to monitor. 
 
 The Zabbix software is free for use. However, if support is an issue for you,
@@ -90,7 +97,45 @@ The following are amongst the features that Zabbix offer:
  - WEB-based interface
  - E-mail notification in case of predefined events
 
-2. Chapter 2 (Structure)
+2. Chapter 2 (Use of Zabbix)
+
+2.1 Performance monitoring
+
+One of most important use of Zabbix is performance monitoring. Processor load, number of running processes,
+number of processes, disk activity, status of wap space, memory availability  - that is only part
+of system parameters Zabbix is able to monitor. Zabbix provides a system (e.g. database, an application) administrator
+with latest information about performance of server being monitored.
+
+2.2 Alarming users
+
+Having performance monitoring is good, but it is almost useless without powerfull notification mechanism. Using Zabbix, 
+you can define virtually any possible condition for a trigger. How ? Using expressions !
+
+Look, how it works.
+
+Suppose, you wish to be notified when file /etc/passwd is changed by someone. You define
+trigger with expression {sourceforget.net:cksum[/etc/passwd].diff(0)}>0. This expression becomes
+true, when current value of checksum for /etc/passwd will be different with previously
+gotten checksum.
+Then, you define list of actions for the trigger. All you want is getting Email about this event.
+So, you add action for this trigger. When the trigger expression becomes true, you will get Email notification.
+
+2.3 Integrity checking
+
+Zabbix can easily be used for servers' integrity checking. All mission critical configuration files,
+binaries, kernel, scripts, web server HTML pages can be monitored by Zabbix to be alarmed in case of any modifications
+made on these files.
+
+2.4 Logging services
+
+All values of monitored parameters Zabbix stores in database. The collected data can be used later for any purposes.
+
+2.5 Capacity planning
+
+Looking at graph of process load (disk usage,database activity, ...)  for period of several weeks (or monthes), system administrator
+can clearly see when next hardware upgrade should be made.
+
+3. Chapter 3 (Structure)
 
 Zabbix has basically client-server architecture. Zabbix server periodically
 gets most recent information of parameters for monitored host. It connects to 
@@ -101,7 +146,7 @@ value in the database.
 It is also possible to use trapping method. In tis case, monitored host sends information
 to Zabbix server.
 
-2.1 zabbix_sucker
+3.1 zabbix_sucker
 
 The Zabbix server process.
 
@@ -119,7 +164,7 @@ No switches are supported by zabbix_sucker.
 The process is run as daemon under non-priveledged user account, usually zabbix. Syslog is used to store
 debug information for the process.
 
-2.2 zabbix_alarmer
+3.2 zabbix_alarmer
 
 The Zabbix server process.
 
@@ -135,7 +180,7 @@ if required.
 The process is run as daemon under non-priveledged user account. Syslog is used to store debug information
 for the process.
 
-2.3 zabbix_agent
+3.3 zabbix_agent
 
 The Zabbix agent.
 
@@ -154,7 +199,7 @@ during 3 seconds, it kills himself.
 When executed, it reads /etc/zabbix/zabbix_agent.conf file. This file should exist and contain
 IP address of Zabbix server. Connections from other IPs are rejected.
 
-2.4 zabbix_trapper
+3.4 zabbix_trapper
 
 The Zabbix server process.
 
@@ -167,7 +212,7 @@ DESCRIPTION
 The process is made to support traping. It constantly waits for connections from zabbix_sender
 agents.  
 
-2.5 zabbix_sender
+3.5 zabbix_sender
 
 The Zabbix agent (trapping).
 
@@ -191,23 +236,23 @@ zabbix_sender zabbix.abcde.com 10001 db.abcde.com:procload 2.34
 It means, that zabbix_sender will send information about processor load on host db.abcde.com
 to Zabbix server located at zabbix.acbde.com. Processor load is 2.34.
 
-2.6 Database
+3.6 Database
 
 Database used by Zabbix play most important role. The database is the only source
 of configuration parameters and it stores all history of monitored values.
 
 Zabbix performance highly depends on officiency and speed of used database.
  
-2.7 WEB-based frontend
+3.7 WEB-based frontend
 
 The frontend provides convinient and platform independed way for accessing Zabbix.
 Information provided by the frontend can be either graphical (e.g. graph on disk space
 usage) or text format. Text representation of monitored parameters is made to allow
 easy way for export Zabbix data to other analytical tools.
 
-3. Chapter 3 (Installation)
+4. Chapter 4 (Installation)
 
-3.1 Requirements
+4.1 Requirements
 
 Zabbix server processes support the following platforms:
 
@@ -229,6 +274,8 @@ Zabbix requires the following software to run properly:
  - PHP 4.0 or later, compiled as Apache module with GD (for PNG images) with support of PostgreSQL or MySQL
  - GNU make
 
+However, Zabbix can work on previous versions of Apache, MySQL, PostgreSQL as well. 
+
 Memory requirements:
 
 Zabbix requires both physical (suprise!) and disk memory. 64 Mb of physical 
@@ -240,9 +287,9 @@ the database.
 
 Remember, the more memory you have, the faster database and Zabbix works !
 
-3.2 Installation procedure
+4.2 Installation procedure
 
-3.2.1 Create the Zabbix superuser account: 
+4.2.1 Create the Zabbix superuser account: 
 
 This is the user the server will run on.  For production use you should create 
 a separate, unprivileged account ("zabbix" is commonly used).
@@ -251,12 +298,12 @@ Running Zabbix as "root","bin", or any other account with special rights is a
 security risk. Do not do it ! 
 
 
-3.2.2 Untar Zabbix sources:
+4.2.2 Untar Zabbix sources:
 
 On Linux, use command tar -xvzf <zabbix.tar.gz>
 
 
-3.2.3 Create the Zabbix database:
+4.2.3 Create the Zabbix database:
 
 For MySQL:
 
@@ -278,7 +325,7 @@ cd create/postgresql
 cat schema.sql|psql -U <username> zabbix
 
 
-3.2.4 Configure include/db.h
+4.2.4 Configure include/db.h
 
 Use this for MySQL database:
 #define USE_MYSQL 1
@@ -296,7 +343,7 @@ Parameters used regardless of database type:
 
 Change these values.
 
-3.2.5 Configure and compile the source code for your system.
+4.2.5 Configure and compile the source code for your system.
 
 cd src/zabbix_sucker
 ./configure
@@ -318,27 +365,27 @@ cd src/zabbix_sender
 ./configure
 make
 
-3.2.6 Copy binaries to /opt/zabbix/bin or any other directory. 
+4.2.6 Copy binaries to /opt/zabbix/bin or any other directory. 
 
-3.2.7 Configure /etc/services
+4.2.7 Configure /etc/services
 
 Add the following lines to /etc/services:
 
 zabbix_agent    10000/tcp
 zabbix_trap     10001/tcp 
 
-3.2.8 Configure /etc/inetd.conf
+4.2.8 Configure /etc/inetd.conf
 
 Add the following lines to /etc/inetd.conf:
 
 zabbix_agent        stream  tcp     nowait.3600    zabbix /opt/zabbix/bin/zabbix_agent
 zabbix_trap         stream  tcp     nowait.3600    zabbix /opt/zabbix/bin/zabbix_trapper
 
-3.2.9 Restart inetd
+4.2.9 Restart inetd
 
 killall -HUP inetd
 
-3.2.10 Configure WEB interface
+4.2.10 Configure WEB interface
 
 As zabbix:
 
@@ -352,9 +399,9 @@ Change these values in frontends/php/include/db.inc:
 mkdir /home/zabbix/html
 cp -R frontends/php/* /home/zabbix/html/
 
-4. Chapter 4 (Administration)
+5. Chapter 5 (Administration)
 
-4.1 Zabbix configuration
+5.1 Zabbix configuration
 
  - Use WEB browser to configure Zabbix (http://localhost/~zabbix)
  - Click on "CONFIG"
@@ -391,7 +438,7 @@ Define actions for triggers you are interested in.
 
 Put IP address of Zabbix server here.
 
-4.2 Expressions for triggers
+5.2 Expressions for triggers
 
 The following operators supported for triggers:
 
@@ -433,7 +480,7 @@ Example 2:
 
 More complex example:
 
-({sourceforge.net:procload.last(0)}>5) | ({sourceforge.net:procload.min(600)}>2)
+({sourceforge.net:system[procload].last(0)}>5) | ({sourceforge.net:system[procload].min(600)}>2)
 
 The expression becomes true when either current processor load is more
 than 5 or it was more than 2 during last 10 minutes.
@@ -442,20 +489,20 @@ Example 3:
 
 Use of diff function.
 
-({sourceforge.net:passwd_md5sum.diff(0)})>0
+({sourceforge.net:cksum[/etc/passwd].diff(0)})>0
 
-The expression becomes true when previous value of MD5 sum of /etc/passwd
+The expression becomes true when previous value of checksum of /etc/passwd
 differs from last one.
 
 Similiar expressions could be useful to monitor changes in important files, such as
 /etc/passwd, /etc/inetd.conf, /kernel, etc.
 
-5. Chapter 5 (Misc)
+6. Chapter 6 (Misc)
 
-5.1 pinger.pl
+6.1 pinger.pl
 
 The script is used to periodically sind ICMP pings to list of servers. In case, if it does
-not receive responce from host it executes:
+not receive responce from host, it executes:
 
 zabbix_server <server> <port> <host>:alive 0
 
@@ -463,4 +510,5 @@ otherwise:
 
 zabbix_server <server> <port> <host>:alive 1
 
-The script is usually called from cron.
+The script is usually called from cron. Configure the script before use. Change location for "hosts"
+file. You must have fping installed to successfully run the script.
