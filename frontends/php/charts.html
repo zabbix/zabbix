@@ -28,19 +28,15 @@
 
 		echo "<font size=2>";
 
-		$lasthost="";
 		$result=DBselect("select graphid,name from graphs order by name");
-
-		for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 		{
-			$graphid_=DBget_field($result,$i,0);
-			$name=DBget_field($result,$i,1);
-			if( isset($graphid) && ($graphid == $graphid_) )
+			if( isset($graphid) && ($graphid == $row["graphid"]) )
 			{
 				echo "<b>[";
 			}
-			echo "<a href='charts.html?graphid=$graphid_'>$name</a>";
-			if(isset($graphid) && ($graphid == $graphid_) )
+			echo "<a href='charts.html?graphid=".$row["graphid"]."'>".$row["name"]."</a>";
+			if(isset($graphid) && ($graphid == $row["graphid"]) )
 			{
 				echo "]</b>";
 			}
@@ -63,14 +59,14 @@
 	if(isset($graphid))
 	{
 		$result=DBselect("select name from graphs where graphid=$graphid");
-		$map=DBget_field($result,0,0);
+		$row=DBfetch($result);
 		if(isset($fullscreen))
 		{
-			$map="<a href=\"charts.html?graphid=$graphid\">".$map."</a>";
+			$map="<a href=\"charts.html?graphid=$graphid\">".$row["name"]."</a>";
 		}
 		else
 		{
-			$map="<a href=\"charts.html?graphid=$graphid&fullscreen=1\">".$map."</a>";
+			$map="<a href=\"charts.html?graphid=$graphid&fullscreen=1\">".$row["name"]."</a>";
 		}
 	}
 	else

@@ -44,16 +44,15 @@
 
 <?
 	$result=DBselect("select hostid,host from hosts order by host");
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
+//	for($i=0;$i<DBnum_rows($result);$i++)
 	{
-		$hid=DBget_field($result,$i,0);
-		$host=DBget_field($result,$i,1);
-		if(isset($hostid) && ($hostid == $hid))
+		if(isset($hostid) && ($hostid == $row["hostid"]))
 		{
 			echo "<b>[";
 		}
-		echo "<A HREF=\"items.html?hostid=$hid\">$host</A>";
-		if(isset($hostid) && ($hostid == $hid))
+		echo "<A HREF=\"items.html?hostid=".$row["hostid"]."\">".$row["host"]."</A>";
+		if(isset($hostid) && ($hostid == $row["hostid"]))
 		{
 			echo "]</b>";
 		}

@@ -77,17 +77,15 @@
 	        {
 	                echo "<b>[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact\">all</A>]</b>  ";
 	        }
-		for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 	        {
-	                $hid=DBget_field($result,$i,0);
-	                $host=DBget_field($result,$i,1);
-	                if(isset($hostid) && ($hid == $hostid))
+	                if(isset($hostid) && ($row["hostid"] == $hostid))
 	                {
-	                        echo "<b>[<A HREF=\"tr_status.html?hostid=$hid&onlytrue=$onlytrue&noactions=$noactions&compact=$compact\">$host</A>]</b>  ";
+	                        echo "<b>[<A HREF=\"tr_status.html?hostid=".$row["hostid"]."&onlytrue=$onlytrue&noactions=$noactions&compact=$compact\">".$row["host"]."</A>]</b>  ";
 	                }
 	                else
 	                {
-	                        echo "<A HREF=\"tr_status.html?hostid=$hid&onlytrue=$onlytrue&noactions=$noactions&compact=$compact\">$host</A>  ";
+	                        echo "<A HREF=\"tr_status.html?hostid=".$row["hostid"]."&onlytrue=$onlytrue&noactions=$noactions&compact=$compact\">".$row["host"]."</A>  ";
 	                }
 	        }
 	 

@@ -49,35 +49,25 @@
 	$result=DBselect("select h.hostid,h.host,h.port,h.status from hosts h order by h.host");
 	echo "<CENTER>";
 	$col=0;
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
+//	for($i=0;$i<DBnum_rows($result);$i++)
 	{
-		if($col==1)
-		{
-			echo "<TR BGCOLOR=#EEEEEE>";
-			$col=0;
-		} else
-		{
-			echo "<TR BGCOLOR=#DDDDDD>";
-			$col=1;
-		}
+		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
+		else 		{ echo "<TR BGCOLOR=#DDDDDD>"; }
 	
-		$hostid_=DBget_field($result,$i,0);
-		$host_=DBget_field($result,$i,1);
-		$port_=DBget_field($result,$i,2);
-		$status_=DBget_field($result,$i,3);
-		echo "<TD><a href=\"items.html?hostid=$hostid_\">$host_</a></TD>";
-		echo "<TD>$port_</TD>";
+		echo "<TD><a href=\"items.html?hostid=".$row["hostid"]."\">".$row["host"]."</a></TD>";
+		echo "<TD>".$row["port"]."</TD>";
 		echo "<TD>";
-		if($status_ == 0)	
-			echo "<a href=\"hosts.html?hostid=$hostid_&register=changestatus&status=1\">Monitored</a>";
-		else if($status_ == 1)
-			echo "<a href=\"hosts.html?hostid=$hostid_&register=changestatus&status=0\">Not monitored</a>";
-		else if($status_ == 2)
+		if($row["status"] == 0)	
+			echo "<a href=\"hosts.html?hostid=".$row["hostid"]."&register=changestatus&status=1\">Monitored</a>";
+		else if($row["status"] == 1)
+			echo "<a href=\"hosts.html?hostid=".$row["hostid"]."&register=changestatus&status=0\">Not monitored</a>";
+		else if($row["status"] == 2)
 			echo "Unreachable";
 		else
 			echo "Unknown";
 		echo "</TD>";
-		echo "<TD><A HREF=\"hosts.html?register=change&hostid=$hostid_#form\">Change</A></TD>";
+		echo "<TD><A HREF=\"hosts.html?register=change&hostid=".$row["hostid"]."#form\">Change</A></TD>";
 		echo "</TR>";
 	}
 	echo "</TABLE>";

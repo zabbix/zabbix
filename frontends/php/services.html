@@ -167,6 +167,19 @@
 		echo "<OPTION VALUE='$serviceupid_'>$name_";
         }
         echo "</SELECT>";
+
+        show_table2_v_delimiter();
+        echo "Soft link ?";
+        show_table2_h_delimiter();
+	if(isset($softlink)&&($triggerid!=""))
+	{
+        	echo "<INPUT TYPE=\"CHECKBOX\" NAME=\"softlink\" VALUE=\"true\">";
+	}
+	else
+	{
+        	echo "<INPUT TYPE=\"CHECKBOX\" NAME=\"softlink\">";
+	}
+
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add link\">";
 

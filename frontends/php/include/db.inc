@@ -61,6 +61,22 @@
 		}
 	}
 
+	function	DBfetch($result)
+	{
+		global $DB_TYPE;
+
+		if($DB_TYPE == "MYSQL")
+		{
+			$row=mysql_fetch_array($result);
+			return $row;
+		}
+		if($DB_TYPE == "POSTGRESQL")
+		{
+			$row=pg_fetch_array($result);
+			return $row;
+		}
+	}
+
 	function	DBget_field($result,$rownum,$fieldnum)
 	{
 		global $DB_TYPE;
