@@ -20,12 +20,12 @@
 	{
 		if($HTTP_GET_VARS["register"]=="add")
 		{
-			$result=add_action( $HTTP_GET_VARS["triggerid"], $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["good"], $HTTP_GET_VARS["delay"], $HTTP_GET_VARS["subject"], $HTTP_GET_VARS["message"] );
+			$result=add_action( $HTTP_GET_VARS["triggerid"], $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["good"], $HTTP_GET_VARS["delay"], $HTTP_GET_VARS["subject"], $HTTP_GET_VARS["message"],$HTTP_GET_VARS["scope"],$HTTP_GET_VARS["severity"]);
 			show_messages($result,"Action added","Cannot add action");
 		}
 		if($HTTP_GET_VARS["register"]=="update")
 		{
-			$result=update_action( $HTTP_GET_VARS["actionid"], $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["good"], $HTTP_GET_VARS["delay"], $HTTP_GET_VARS["subject"], $HTTP_GET_VARS["message"] );
+			$result=update_action( $HTTP_GET_VARS["actionid"], $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["good"], $HTTP_GET_VARS["delay"], $HTTP_GET_VARS["subject"], $HTTP_GET_VARS["message"],$HTTP_GET_VARS["scope"],$HTTP_GET_VARS["severity"]);
 			show_messages($result,"Action updated","Cannot update action");
 			unset($HTTP_GET_VARS["actionid"]);
 		}
@@ -105,7 +105,7 @@
 
 	if(isset($HTTP_GET_VARS["actionid"]))
 	{
-		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid from actions a where a.actionid=".$HTTP_GET_VARS["actionid"];
+		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.scope,a.severity from actions a where a.actionid=".$HTTP_GET_VARS["actionid"];
 		$result=DBselect($sql);
 
 		$actionid=DBget_field($result,0,0);
@@ -115,6 +115,8 @@
 		$subject=DBget_field($result,0,4);
 		$message=DBget_field($result,0,5);
 		$uid=DBget_field($result,0,6);
+		$scope=DBget_field($result,0,7);
+		$severity=DBget_field($result,0,8);
 	}
 	else
 	{
@@ -124,6 +126,8 @@
 		$good=1;
 		$delay=30;
 		$subject=$description;
+		$scope=0;
+		$severity=0;
 
 		$sql="select i.description, h.host, i.key_ from hosts h, items i,functions f where f.triggerid=".$HTTP_GET_VARS["triggerid"]." and h.hostid=i.hostid and f.itemid=i.itemid order by i.description";
 		$result=DBselect($sql);
@@ -188,6 +192,27 @@
 	echo "Message";
 	show_table2_h_delimiter();
  	echo "<textarea class=\"biginput\" name=\"message\" cols=70 ROWS=\"7\" wrap=\"soft\">$message</TEXTAREA>";
+
+	show_table2_v_delimiter();
+	echo "Scope";
+	show_table2_h_delimiter();
+	echo "<select class=\"biginput\" name=\"scope\" size=1>";
+	echo "<OPTION VALUE=\"0\""; if($scope==0) echo "SELECTED"; echo ">This trigger only";
+	echo "<OPTION VALUE=\"1\""; if($scope==1) echo "SELECTED"; echo ">All triggers of this host";
+	echo "<OPTION VALUE=\"2\""; if($scope==2) echo "SELECTED"; echo ">All triggers";
+	echo "</SELECT>";
+
+	show_table2_v_delimiter();
+	echo "Send if trigger's severity equal or more than (for host-based scope only)";
+	show_table2_h_delimiter();
+	echo "<select class=\"biginput\" name=\"severity\" size=1>";
+	echo "<OPTION VALUE=\"0\" "; if($severity==0) echo "SELECTED"; echo ">Not classified";
+	echo "<OPTION VALUE=\"1\" "; if($severity==1) echo "SELECTED"; echo ">Information";
+	echo "<OPTION VALUE=\"2\" "; if($severity==2) echo "SELECTED"; echo ">Warning";
+	echo "<OPTION VALUE=\"3\" "; if($severity==3) echo "SELECTED"; echo ">Average";
+	echo "<OPTION VALUE=\"4\" "; if($severity==4) echo "SELECTED"; echo ">High";
+	echo "<OPTION VALUE=\"5\" "; if($severity==5) echo "SELECTED"; echo ">Disaster";
+	echo "</SELECT>";
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
