@@ -171,6 +171,7 @@
 	define("S_IMAGES_BIG",				"IMAGES");
 	define("S_NO_IMAGES_DEFINED",			"No images defined");
 	define("S_BACKGROUND",				"Background");
+	define("S_UPLOAD",				"Upload");
 
 //	Latest values
 	define("S_LATEST_VALUES",			"Latest values");
