@@ -131,12 +131,15 @@
 			$rows=array(nbsp($row["description"]));
 			foreach($hosts as $hostid)
 			{
-				$sql="select lastvalue,units from items where hostid=$hostid and description='".$row["description"]."'";
+				$sql="select value_type,lastvalue,units from items where hostid=$hostid and description='".$row["description"]."'";
 				$result2=DBselect($sql);
 				if(DBnum_rows($result2)==1)
 				{
 					$row2=DBfetch($result2);
-					$value=convert_units($row2["lastvalue"],$row2["units"]);
+					if($row2["value_type"] == 0)
+						$value=nbsp(convert_units($row2["lastvalue"],$row2["units"]));
+					else
+						$value=nbsp(htmlspecialchars(substr($row2["lastvalue"],0,20)." ..."));
 				}
 				else
 				{
