@@ -1,5 +1,7 @@
 Changes for 1.0beta7:
 
+ - basic support of mass sending of information for zabbix_sender
+ (Alexei)
  - support fo JavaScript required now (Alexei)
  - automatic resize of all graphs depending on screen size (Alexei)
  - got rid of message "Bad protocol identification '0'" when doing check_service[ssh]
