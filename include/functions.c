@@ -234,11 +234,11 @@ int	update_functions( int id, int flag )
 
 	if(flag==0)
 	{
-		sprintf(c,"select function,parameter,itemid from functions where itemid=%d group by 1,2 order by 1,2",id );
+		sprintf(c,"select function,parameter,itemid from functions where itemid=%d group by 1,2,3 order by 1,2,3",id );
 	}
 	else
 	{
-		sprintf(c,"select function,parameter,itemid from functions where itemid%%%d=%d group by 1,2 order by 1,2", SUCKER_FORKS-1,id-1);
+		sprintf(c,"select function,parameter,itemid from functions where itemid%%%d=%d group by 1,2,3 order by 1,2,3", SUCKER_FORKS-1,id-1);
 	}
 
 	result = DBselect(c);
