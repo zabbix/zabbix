@@ -1,6 +1,7 @@
 Changes for 1.0alpha12:
 
- - fixed broken customized graphs, file chart2.html. (Alexei)
+ - zabbix_agentd will lower scheduling priority to 5 (Alexei)
+ - fixed broken customized graphs, file chart2.html (Alexei)
 
 Changes for 1.0alpha11:
 

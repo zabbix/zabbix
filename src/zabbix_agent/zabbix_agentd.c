@@ -24,6 +24,10 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+/* For setpriority */
+#include <sys/time.h>
+#include <sys/resource.h>
+
 #include "common.h"
 #include "sysinfo.h"
 #include "zabbix_agent.h"
@@ -75,6 +79,16 @@ void    daemon_init(void)
 	{
 		close(i);
 	}
+
+        openlog("zabbix_agentd",LOG_PID,LOG_USER);
+//	setlogmask(LOG_UPTO(LOG_DEBUG));
+	setlogmask(LOG_UPTO(LOG_WARNING));
+
+	if(setpriority(PRIO_PROCESS,0,5)!=0)
+	{
+		syslog( LOG_WARNING, "Unable to set process priority to 5. Leaving default.");
+	}
+
 }
 
 void	init_security(void)
@@ -273,7 +287,7 @@ int	main()
 {
 	int		listenfd;
 	socklen_t	addrlen;
-	int		i, ret;
+	int		i;
 
 	char		host[128];
 	char		*port="10000";
@@ -287,9 +301,6 @@ int	main()
 
 	init_security();
 
-        openlog("zabbix_agentd",LOG_PID,LOG_USER);
-//	ret=setlogmask(LOG_UPTO(LOG_DEBUG));
-	ret=setlogmask(LOG_UPTO(LOG_WARNING));
 
 	syslog( LOG_WARNING, "zabbix_agentd started");
 
