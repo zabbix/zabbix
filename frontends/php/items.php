@@ -150,6 +150,9 @@
 				case 3:
 					echo "Simple check";
 					break;
+				case 4:
+					echo "SNMPv2 agent";
+					break;
 				default:
 					echo "Unknown";
 					break;

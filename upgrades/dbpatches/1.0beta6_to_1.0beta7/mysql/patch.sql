@@ -4,6 +4,27 @@ drop table items_template;
 drop table triggers_template;
 
 --
+-- Table structure for table 'groups'
+--
+
+CREATE TABLE groups (
+  groupid		int(4)		NOT NULL auto_increment,
+  name			varchar(64)	DEFAULT '' NOT NULL,
+  PRIMARY KEY (groupid),
+  UNIQUE (name)
+) type=InnoDB;
+
+--
+-- Table structure for table 'hosts_groups'
+--
+
+CREATE TABLE hosts_groups (
+  hostid		int(4)		DEFAULT '0' NOT NULL,
+  groupid		int(4)		DEFAULT '0' NOT NULL,
+  PRIMARY KEY (hostid,groupid)
+) type=InnoDB;
+
+--
 -- Data for table hosts 
 --
 

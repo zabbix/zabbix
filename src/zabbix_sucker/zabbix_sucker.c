@@ -255,7 +255,7 @@ void	init_config(void)
 }
 
 #ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
-int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
+int	get_value_SNMP(int version,double *result,char *result_str,DB_ITEM *item)
 {
 	struct snmp_session session, *ss;
 	struct snmp_pdu *pdu;
@@ -269,10 +269,10 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 
 	int ret=SUCCEED;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMPv1()");
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP()");
 
 	snmp_sess_init( &session );
-	session.version = SNMP_VERSION_1;
+	session.version = version;
 	if(item->useip == 1)
 	{
 		session.peername = item->ip;
@@ -286,7 +286,7 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 	zabbix_log( LOG_LEVEL_DEBUG, "Community [%s]", session.community);
 	zabbix_log( LOG_LEVEL_DEBUG, "OID [%s]", item->snmp_oid);
 	session.community_len = strlen(session.community);
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMPv1() 0.1");
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP() 0.1");
 
 	SOCK_STARTUP;
 	ss = snmp_open(&session);
@@ -297,7 +297,7 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 		zabbix_log( LOG_LEVEL_WARNING, "Error: snmp_open()");
 		return FAIL;
 	}
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMPv1() 0.2");
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP() 0.2");
 
 	pdu = snmp_pdu_create(SNMP_MSG_GET);
 	read_objid(item->snmp_oid, anOID, &anOID_len);
@@ -309,18 +309,18 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 #endif
 
 	snmp_add_null_var(pdu, anOID, anOID_len);
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMPv1() 0.3");
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP() 0.3");
   
 	status = snmp_synch_response(ss, pdu, &response);
 	zabbix_log( LOG_LEVEL_DEBUG, "Status send [%d]", status);
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMPv1() 0.4");
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP() 0.4");
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMPv1() 1");
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP() 1");
 
 	if (status == STAT_SUCCESS && response->errstat == SNMP_ERR_NOERROR)
 	{
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMPv1() 2");
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP() 2");
 /*		for(vars = response->variables; vars; vars = vars->next_variable)
 		{
 			print_variable(vars->name, vars->name_length, vars);
@@ -589,10 +589,19 @@ int	get_value(double *result,char *result_str,DB_ITEM *item)
 	{
 		res=get_value_zabbix(result,result_str,item);
 	}
-	else if(item->type == ITEM_TYPE_SNMP)
+	else if(item->type == ITEM_TYPE_SNMPv1)
 	{
 #ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
-		res=get_value_SNMPv1(result,result_str,item);
+		res=get_value_SNMP(SNMP_VERSION_1,result,result_str,item);
+#else
+		zabbix_log(LOG_LEVEL_WARNING, "Support of SNMP parameters was no compiled in");
+		res=NOTSUPPORTED;
+#endif
+	}
+	else if(item->type == ITEM_TYPE_SNMPv2c)
+	{
+#ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
+		res=get_value_SNMP(SNMP_VERSION_2c,result,result_str,item);
 #else
 		zabbix_log(LOG_LEVEL_WARNING, "Support of SNMP parameters was no compiled in");
 		res=NOTSUPPORTED;
