@@ -24,13 +24,13 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.05)
+Zabbix Reference Manual for version 1.0 (draft v1.06)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-15 January 2002
+20 January 2002
 \layout Abstract
 
 The document is Reference Manual for Zabbix version 1.0.
@@ -636,19 +636,6 @@ cd create/data
 cat data.sql|psql -U <username> zabbix
 \layout Enumerate
 
-Configure include/db.h
-\newline 
-Change the following parameters:
-\newline 
-
-\family typewriter 
-#define DB_NAME "zabbix" 
-\newline 
-#define DB_USER "zabbix" 
-\newline 
-#define DB_PASSWD "password"
-\layout Enumerate
-
 Configure and compile the source code for your system
 \newline 
 The sources must be compiled for both the server (monitoring machine) as
@@ -886,7 +873,7 @@ misc/conf/zabbix_agent.conf
 
 Configure 
 \emph on 
-/etc/zabbix/zabbix_agent.conf
+/etc/zabbix/zabbix_agentd.conf
 \newline 
 
 \emph default 
@@ -914,7 +901,26 @@ Configure
 \newline 
 
 \emph default 
-For very small installations (five monitored hosts), default parameters
+For small installations (five monitored hosts), default parameters are fine.
+ However, you should change default parameters to get maximum performance
+ from Zabbix.
+ See section Performance Tuning for details.
+ 
+\newline 
+You may take 
+\emph on 
+misc/conf/zabbix_suckerd.conf 
+\emph default 
+as example.
+\layout Enumerate
+
+Configure 
+\emph on 
+/etc/zabbix/zabbix_trapperd.conf
+\newline 
+
+\emph default 
+For small installations (up to ten monitored hosts), default parameters
  are fine.
  However, you should change default parameters to get maximum performance
  from Zabbix.
@@ -1352,7 +1358,7 @@ Added sort criteria for sorting at some forms
 
 IMPORTANT.
  Algorith for unreachble hosts changed.
- In case of network problems host will be disabled for the next 120 seconds
+ In case of network problems host will be disabled for the next 60 seconds
  (defined in 
 \shape italic 
 include/common.h
@@ -1361,12 +1367,16 @@ include/common.h
 \layout Itemize
 
 IMPORTANT.
- Name and format of configuration file of zabbix_agentd has been changed.
+ Name and format of configuration files for zabbix_agent(d) have been changed.
  See 
 \shape italic 
 misc/conf/zabbix_agentd.conf
 \shape default 
- for example.
+ and 
+\shape italic 
+isc/conf/zabbix_agent.conf
+\shape default 
+ for examples.
 \layout Itemize
 
 IMPORTANT.
@@ -1448,6 +1458,30 @@ Any time these expressions become true, an alert will be emailed to any
 
 \latex default 
  
+\layout Subsection
+
+Integrity Checking
+\layout Standard
+
+
+\series bold 
+Zabbix
+\series default 
+\latex no_latex 
+ can easily be used for servers integrity monitoring.
+
+\latex default 
+ 
+\latex no_latex 
+All critical configuration files, binaries, kernel, scripts, and web server
+ HTML pages can be monitored by 
+\series bold 
+\latex default 
+Zabbix
+\series default 
+\latex no_latex 
+ so that the administrator can be alerted to modifications made to these
+ files.
 \layout Standard
 
 
@@ -1512,30 +1546,6 @@ Add an action to email your account, you will get email notification anytime
 \emph default 
 \latex no_latex 
  is changed.
-\layout Subsection
-
-Integrity Checking
-\layout Standard
-
-
-\series bold 
-Zabbix
-\series default 
-\latex no_latex 
- can easily be used for servers integrity monitoring.
-
-\latex default 
- 
-\latex no_latex 
-All critical configuration files, binaries, kernel, scripts, and web server
- HTML pages can be monitored by 
-\series bold 
-\latex default 
-Zabbix
-\series default 
-\latex no_latex 
- so that the administrator can be alerted to modifications made to these
- files.
 \layout Subsection
 
 Logging Services
@@ -1768,16 +1778,35 @@ DESCRIPTION
 
 
 \latex no_latex 
-The zabbix_suckerd process periodically connects to agents (either Zabbix
+The 
+\series bold 
+\latex default 
+zabbix_suckerd
+\series default 
+\latex no_latex 
+ process periodically connects to agents (either 
+\series bold 
+\latex default 
+Zabbix
+\series default 
+\latex no_latex 
  native or SNMP) to get the values of parameters being monitored.\SpecialChar ~
  After receiving
- the values, the process recalculates the status of Zabbix triggers.\SpecialChar ~
- Also,
- the process sends alerts to users if required.
+ the values, the process recalculates the status of 
+\series bold 
+\latex default 
+Zabbix
+\series default 
+\latex no_latex 
+ triggers.\SpecialChar ~
+ Also, the process sends alerts to users if required.
 \layout Standard
 
-If zabbix_suckerd is unable to get value from an agent because of network
- problems, the 
+If 
+\series bold 
+zabbix_suckerd
+\series default 
+ is unable to get value from an agent because of network problems, the 
 \shape italic 
 host
 \shape default 
@@ -1786,13 +1815,16 @@ host
 \shape italic 
 include/common.h
 \shape default 
-, default value is 120) seconds.
- Host status will be updated to UNREACHABLE.
+, default value is 60) seconds.
+ Host status will be changed to UNREACHABLE.
 \layout Standard
 
-If an agent does not support requested parameter, zabbix_suckerd will change
- status of the parameter to NONSUPPORTED and will not try to get its value
- anymore.
+If an agent does not support requested parameter, 
+\series bold 
+zabbix_suckerd
+\series default 
+ will change status of the parameter to NONSUPPORTED and will not try to
+ get its value anymore.
 \layout Standard
 
 
@@ -1803,12 +1835,34 @@ If an agent does not support requested parameter, zabbix_suckerd will change
 
 
 \latex no_latex 
-By default, zabbix_suckerd forks ten copies of itself.\SpecialChar ~
- This means that Zabbix
- will be able to get ten monitored parameters simultaneously.\SpecialChar ~
- To modify the
- number of forked processes, change the parameter SUCKER_FORKS in include/common.
-h.
+By default, 
+\series bold 
+\latex default 
+zabbix_suckerd
+\series default 
+\latex no_latex 
+ forks 
+\latex default 
+five
+\latex no_latex 
+ copies of itself.\SpecialChar ~
+ This means that Zabbix will be able to get 
+\latex default 
+five
+\latex no_latex 
+ monitored parameters simultaneously.\SpecialChar ~
+ To modify the number of forked processes,
+ change the parameter 
+\emph on 
+\latex default 
+StartSuckers
+\emph default 
+ in 
+\emph on 
+/etc/zabbix/zabbix_suckerd.conf
+\emph default 
+\latex no_latex 
+.
  
 \latex default 
 Note that each forked process requires connection to database.
@@ -1823,10 +1877,15 @@ Note that each forked process requires connection to database.
 
 
 \latex no_latex 
-One zabbix_suckerd process is used for housekeeping purposes only.\SpecialChar ~
- The housekeepi
-ng process periodically (hourly, by default) deletes outdated information
- from 
+One 
+\series bold 
+\latex default 
+zabbix_suckerd
+\series default 
+\latex no_latex 
+ process is used for housekeeping purposes only.\SpecialChar ~
+ The housekeeping process
+ periodically (hourly, by default) deletes outdated information from 
 \latex default 
 the tables 
 \series bold 
@@ -1888,7 +1947,13 @@ alerts
 
 
 \latex no_latex 
-No command line switches are supported by zabbix_suckerd.
+No command line switches are supported by 
+\series bold 
+\latex default 
+zabbix_suckerd
+\series default 
+\latex no_latex 
+.
 \layout Standard
 
 
@@ -1899,8 +1964,16 @@ No command line switches are supported by zabbix_suckerd.
 
 
 \latex no_latex 
-The zabbix_suckerd process is run as a daemon under a non-priveledged user
- account, usually zabbix.\SpecialChar ~
+The 
+\series bold 
+\latex default 
+zabbix_suckerd
+\series default 
+\latex no_latex 
+ process is run as a daemon under a non-priveledged user account, usually
+ zabbix.
+
+\latex default 
  
 \layout Standard
 
@@ -1913,200 +1986,6 @@ The zabbix_suckerd process is run as a daemon under a non-priveledged user
 
 \latex no_latex 
 Syslog is used to store debug information for the process.
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-/etc/zabbix/zabbix_suckerd.conf
-\layout Standard
-
-The file contains configuration parameters for zabbix_suckerd.
- The file must exist and it should have read permissions for user zabbix.
- Possible parameters:
-\layout Standard
-
-
-\begin_inset  Tabular
-<lyxtabular version="2" rows="5" columns="4">
-<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
-<column alignment="center" valignment="top" leftline="false" rightline="true" width="" special="">
-<column alignment="left" valignment="top" leftline="false" rightline="true" width="8cm" special="">
-<row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Parameter
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Mandatory
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Default value
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Description
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-StartSuckersAgents
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-No
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-5
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Number of zabbix_suckerd to start
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-DebugLevel
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-No
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-2
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Debug level 
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-\align left 
-\end_inset 
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset 
-
-
-\layout Standard
-
-Example configuration file can be found at misc/conf/zabbix_agentd.conf
 \layout Subsubsection
 
 zabbix_agent
@@ -2187,11 +2066,27 @@ Execution time of the process is limited.
 
 
 \latex no_latex 
-When a connection to zabbix_agent is made, the agent reads /etc/zabbix/zabbix_ag
-ent.conf in order to determine if the connection is coming from an authorized
- server.\SpecialChar ~
- The zabbix_agent.conf file must exist and contain the IP address
- of Zabbix server.
+When a connection to
+\series bold 
+\latex default 
+ zabbix_agent
+\series default 
+\latex no_latex 
+ is made, the agent reads 
+\emph on 
+\latex default 
+/etc/zabbix/zabbix_agent.conf
+\emph default 
+\latex no_latex 
+ in order to determine if the connection is coming from an authorized server.\SpecialChar ~
+
+ The 
+\emph on 
+\latex default 
+zabbix_agent.conf
+\emph default 
+\latex no_latex 
+ file must exist and contain the IP address of Zabbix server.
  Connections from other IPs are rejected.
  
 \layout Standard
@@ -2202,12 +2097,39 @@ ent.conf in order to determine if the connection is coming from an authorized
 
 \layout Standard
 
-
+U
 \latex no_latex 
-If possible, use of zabbix_agentd (see below) instead of zabbix_agent is
- recommended.\SpecialChar ~
- The zabbix_agentd process does not require extra fork() and
- exec() calls for every connection.
+se of 
+\series bold 
+\latex default 
+zabbix_agentd
+\series default 
+\latex no_latex 
+ (see below) instead of 
+\series bold 
+\latex default 
+zabbix_agent
+\series default 
+\latex no_latex 
+ is 
+\emph on 
+\latex default 
+strongly
+\emph default 
+ 
+\latex no_latex 
+recommended.\SpecialChar ~
+ The 
+\series bold 
+\latex default 
+zabbix_agentd
+\series default 
+\latex no_latex 
+ process does not require extra fork() and exec() calls for every connection
+\latex default 
+, no frequent parsing of configuration file is required as well
+\latex no_latex 
+.
 \layout Subsubsection
 
 zabbix_agentd
@@ -2236,7 +2158,7 @@ SYNOPSIS
 \layout Standard
 
 
-\latex no_latex 
+\series bold 
 zabbix_agentd
 \layout Standard
 
@@ -2259,10 +2181,27 @@ DESCRIPTION
 
 
 \latex no_latex 
-The zabbix_agentd process resides on the host being monitored.
- Its purpose is to provide request information to zabbix_suckerd.\SpecialChar ~
- This is
- the daemon version of the zabbix_agent process.\SpecialChar ~
+The 
+\series bold 
+\latex default 
+zabbix_agentd
+\series default 
+\latex no_latex 
+ process resides on the host being monitored.
+ Its purpose is to provide request information to 
+\series bold 
+\latex default 
+zabbix_suckerd
+\series default 
+\latex no_latex 
+.\SpecialChar ~
+ This is the daemon version of the 
+\series bold 
+\latex default 
+zabbix_agent
+\series default 
+\latex no_latex 
+ process.\SpecialChar ~
  
 \layout Standard
 
@@ -2274,8 +2213,17 @@ The zabbix_agentd process resides on the host being monitored.
 
 
 \latex no_latex 
-When executed, the zabbix_agentd process forks himself (ten times by default).\SpecialChar ~
-
+When executed, the 
+\series bold 
+\latex default 
+zabbix_agentd
+\series default 
+\latex no_latex 
+ process forks himself (
+\latex default 
+five
+\latex no_latex 
+ times by default).\SpecialChar ~
  Load is balanced between each copy of the process.
 \layout Standard
 
@@ -2287,15 +2235,28 @@ When executed, the zabbix_agentd process forks himself (ten times by default).\S
 
 
 \latex no_latex 
-When a connection to zabbix_agent is made, the agent reads /etc/zabbix/zabbix_ag
-ent
+When a connection to 
+\series bold 
 \latex default 
-d
+zabbix_agentd
+\series default 
 \latex no_latex 
-.conf in order to determine if the connection is coming from an authorized
- server.\SpecialChar ~
- The zabbix_agent.conf file must exist and contain the IP address
- of Zabbix server.
+ is made, the agent 
+\latex default 
+dete
+\latex no_latex 
+rmine
+\latex default 
+s
+\latex no_latex 
+ if the connection is coming from an authorized server.\SpecialChar ~
+ The 
+\emph on 
+\latex default 
+zabbix_agentd.conf
+\emph default 
+\latex no_latex 
+ file must exist and contain the IP address of Zabbix server.
  Connections from other IPs are rejected.
 \layout Standard
 
@@ -2307,7 +2268,14 @@ d
 
 
 \latex no_latex 
-No command-line switches supported by zabbix_agentd.
+No command-line switches supported by 
+\latex default 
+z
+\series bold 
+abbix_agentd
+\series default 
+\latex no_latex 
+.
 \layout Standard
 
 
@@ -2332,208 +2300,6 @@ The process is run as daemon under non-priveledged user account, usually
 
 \latex no_latex 
 Syslog is used to store debug information for the process.
-\layout Description
-
-/etc/zabbix/zabbix_agentd.conf
-\layout Standard
-
-The file contains configuration parameters for zabbix_agentd.
- The file must exist and it should have read permissions for user zabbix.
- Possible parameters:
-\layout Standard
-
-
-\begin_inset  Tabular
-<lyxtabular version="2" rows="5" columns="4">
-<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
-<column alignment="center" valignment="top" leftline="false" rightline="true" width="" special="">
-<column alignment="left" valignment="top" leftline="false" rightline="true" width="8cm" special="">
-<row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Parameter
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Mandatory
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Default value
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Description
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Server
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Yes
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
--
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-IP address of Zabbix server
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-StartAgents
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-No
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-5
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Number of agents to start
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-DebugLevel
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-No
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-2
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Debug level 
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-UserParameter
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-No
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
--
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-\align left 
-User-defined parameter to monitor.
-\newline 
-Value has form <key>,<shell command>
-\newline 
-Example:
-\newline 
-UserParameter=users,who|wc -l
-\end_inset 
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset 
-
-
-\layout Standard
-
-Example configuration file can be found at misc/conf/zabbix_agentd.conf
 \layout Subsubsection
 
 zabbix_trapper
@@ -2894,6 +2660,499 @@ In this example, zabbix_sender will send information about processor load
 Zabbix Configuration
 \layout Subsection
 
+Configuration files
+\layout Subsubsection
+
+
+\emph on 
+/etc/zabbix/zabbix_suckerd.conf
+\layout Standard
+
+The file contains configuration parameters for 
+\series bold 
+zabbix_suckerd
+\series default 
+.
+ The file must exist and it should have read permissions for user zabbix.
+ Possible parameters:
+\layout Standard
+
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="7" columns="4">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
+<column alignment="center" valignment="top" leftline="false" rightline="true" width="" special="">
+<column alignment="left" valignment="top" leftline="false" rightline="true" width="8cm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Parameter
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Mandatory
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Default value
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+HousekeepingFrequency
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+No
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+1
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+The parameter defines how often the daemon must perform housekeeping procedure
+ (in hours)
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+StartSuckers
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+No
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+5
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Number of zabbix_suckerd to start
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+DebugLevel
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+No
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+2
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Debug level 
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+DBName
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Yes
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+\align left 
+Database name
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+DBUser
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+No
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+NULL
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+User name for connecting to the database
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+DBPassword
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+No
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+NULL
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+User's password
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Standard
+
+Example configuration file can be found at 
+\emph on 
+misc/conf/zabbix_agentd.conf
+\layout Subsubsection
+
+
+\emph on 
+/etc/zabbix/zabbix_agentd.conf
+\layout Standard
+
+The file contains configuration parameters for 
+\series bold 
+zabbix_agentd
+\series default 
+.
+ The file must exist and it should have read permissions for user zabbix.
+ Possible parameters:
+\layout Standard
+
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="5" columns="4">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
+<column alignment="center" valignment="top" leftline="false" rightline="true" width="" special="">
+<column alignment="left" valignment="top" leftline="false" rightline="true" width="8cm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Parameter
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Mandatory
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Default value
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Server
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Yes
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+IP address of Zabbix server.
+ Connections from other IP addresses will be rejected.
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+StartAgents
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+No
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+5
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Number of agents to start
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+DebugLevel
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+No
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+2
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Debug level 
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+UserParameter
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+No
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+\align left 
+User-defined parameter to monitor.
+\newline 
+Value has form 
+\emph on 
+<key>,<shell command>
+\emph default 
+
+\newline 
+Example:
+\newline 
+
+\emph on 
+UserParameter=users,who|wc -l
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Standard
+
+Example configuration file can be found at 
+\emph on 
+misc/conf/zabbix_agentd.conf
+\layout Subsection
+
 Expression for triggers
 \layout Standard
 
@@ -3235,19 +3494,15 @@ diskfree[*]
  is flexible parameter.
  '*' is any string that will be passed as argument of the parameter.
  diskfree[/], diskfree[/opt] - correct definitions.
-\layout Standard
-
-Note that argument cannot contain character '.'.
- Hopefully, this limitation will be eliminated in future versions of Zabbix.
 \layout Subsubsection
 
 List of supported parameters
-\layout Description
+\layout Standard
 
 
-\latex no_latex 
+\series bold 
 memory[total]
-\latex default 
+\series default 
  
 \latex no_latex 
 Total amount of installed physical memory.
@@ -6435,6 +6690,45 @@ Server with Zabbix 1.0alpha12 installed (Linux 2.2, MySQL, Celeron/300Mhz,
 \layout Subsection
 
 Performance tuning
+\layout Standard
+
+Performance of Zabbix can be significantly improved by tuning:
+\layout Subsubsection
+
+Hardware
+\layout Itemize
+
+Use fastest processor available
+\layout Itemize
+
+SCSI is better than IDE
+\layout Itemize
+
+Use fast Ethernet adapter
+\layout Itemize
+
+Having more memory is always better
+\layout Subsubsection
+
+Operating System
+\layout Itemize
+
+Use latest (stable!) version of OS
+\layout Itemize
+
+Exclude unnecessary functionality from kernel
+\layout Subsubsection
+
+Zabbix configuration parameters
+\layout Subsubsection
+
+Database Engine
+\layout Itemize
+
+rebuild MySQL or PostgreSQL from sources to get maximum performance
+\layout Itemize
+
+follow performanc tuning instructions fro MySQL or PostgreSQL
 \layout Section
 
 Zabbix Frontends
@@ -6465,10 +6759,18 @@ Menu
 \layout Standard
 \added_space_bottom 0.3cm 
 Most of pages contain menu that visibly consists of three rows.
- First row is accessible for any Zabbix users.
+ First row is accessible for any 
+\series bold 
+Zabbix
+\series default 
+ users.
  Administrator priveledges required to access items of second and third
  menu' rows.
- Third row is area for Zabbix administrators.
+ Third row is area for 
+\series bold 
+Zabbix
+\series default 
+ administrators.
  
 \layout Paragraph
 
@@ -6494,7 +6796,11 @@ HELO\SpecialChar ~
 authentification
 \layout Standard
 
-Usually address of Zabbix server.
+Usually address of 
+\series bold 
+Zabbix
+\series default 
+ server.
 \layout Standard
 
 Example: zabbix.sf.net
@@ -6510,7 +6816,11 @@ from
 \layout Standard
 
 Email address which will be used to fill field From: for all emails that
- Zabbix will send.
+ 
+\series bold 
+Zabbix
+\series default 
+ will send.
 \layout Description
 
 Password\SpecialChar ~
@@ -6518,15 +6828,22 @@ required?
 \layout Standard
 
 If checked, user authorisation will be required for accessing any menu item
- of Zabbix WEB front-end.
+ of 
+\series bold 
+Zabbix
+\series default 
+ WEB front-end.
 \layout Subsubsection
 
 Reports
 \layout Standard
 
 
+\series bold 
+Zabbi
+\series default 
 \latex no_latex 
-Zabbix reports represent collected information in structured way.
+x reports represent collected information in structured way.
  All reports are produced in HTML format.
 
 \latex default 
@@ -6673,20 +6990,22 @@ Database structure
 \layout Standard
 
 The section describes structure of tables of Zabbix database.
-\layout Description
+\layout Subsection
 
-CONFIG The table contains global configuration parameters.
+CONFIG 
+\newline 
+The table contains global configuration parameters.
 \layout Description
 
 
 \begin_inset  Tabular
 <lyxtabular version="2" rows="7" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
 <row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -6880,20 +7199,22 @@ alerts
 \end_inset 
 
 
-\layout Description
+\layout Subsection
 
-GRAPHS_ITEMS The table contains list of monitored items belonging to graph.
+GRAPHS_ITEMS 
+\newline 
+The table contains list of monitored items belonging to graph.
 \layout Description
 
 
 \begin_inset  Tabular
 <lyxtabular version="2" rows="5" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
 <row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -7027,20 +7348,22 @@ Color
 \end_inset 
 
 
-\layout Description
+\layout Subsection
 
-GRAPHS The table contains list of user-defined graphs (charts).
+GRAPHS 
+\newline 
+The table contains list of user-defined graphs (charts).
 \layout Description
 
 
 \begin_inset  Tabular
 <lyxtabular version="2" rows="5" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
 <row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -7174,17 +7497,19 @@ Graph height
 \end_inset 
 
 
-\layout Description
+\layout Subsection
 
-SYSMAPS_LINKS The table contains list of connectors between hosts diplayed
- on network map.
+SYSMAPS_LINKS 
+\newline 
+The table contains list of connectors between hosts diplayed on network
+ map.
 \layout Description
 
 
 \begin_inset  Tabular
 <lyxtabular version="2" rows="5" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
 <row topline="true" bottomline="true" newpage="false">
@@ -7214,7 +7539,7 @@ Description
 </cell>
 </row>
 <row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -7322,17 +7647,18 @@ ID of second host
 \end_inset 
 
 
-\layout Description
+\layout Subsection
 
-SYSMAPS_HOSTS The table contains definition of host displayed on network
- map.
+SYSMAPS_HOSTS 
+\newline 
+The table contains definition of host displayed on network map.
 \layout Description
 
 
 \begin_inset  Tabular
 <lyxtabular version="2" rows="7" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
 <row topline="true" bottomline="true" newpage="false">
@@ -7362,7 +7688,7 @@ Description
 </cell>
 </row>
 <row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -7522,16 +7848,18 @@ Coordinate Y
 \end_inset 
 
 
-\layout Description
+\layout Subsection
 
-SYSMAPS The table contains list of defined network maps
+SYSMAPS 
+\newline 
+The table contains list of defined network maps
 \layout Description
 
 
 \begin_inset  Tabular
 <lyxtabular version="2" rows="5" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
 <row topline="true" bottomline="true" newpage="false">
@@ -7587,7 +7915,7 @@ Unique network map ID
 </cell>
 </row>
 <row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -7669,10 +7997,11 @@ Height of the map
 \end_inset 
 
 
-\layout Description
+\layout Subsection
 
-ACTIONS The table contains list of actions to be applied if trigger change
- its state.
+ACTIONS 
+\newline 
+The table contains list of actions to be applied if trigger change its state.
  
 \layout Standard
 
@@ -7680,7 +8009,7 @@ ACTIONS The table contains list of actions to be applied if trigger change
 \begin_inset  Tabular
 <lyxtabular version="2" rows="9" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
 <row topline="true" bottomline="true" newpage="false">
@@ -7736,7 +8065,7 @@ Unique action ID
 </cell>
 </row>
 <row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -7921,16 +8250,18 @@ Time when the message should be send next time
 \end_inset 
 
 
-\layout Description
+\layout Subsection
 
-GROUPS This table contains list of user groups.
+GROUPS 
+\newline 
+This table contains list of user groups.
 \layout Description
 
 
 \begin_inset  Tabular
 <lyxtabular version="2" rows="3" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
 <row topline="true" bottomline="true" newpage="false">
@@ -7960,7 +8291,7 @@ Description
 </cell>
 </row>
 <row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -8016,9 +8347,11 @@ Unique name of the group
 \end_inset 
 
 
-\layout Description
+\layout Subsection
 
-ALARMS This table contains history of changes of trigger states.
+ALARMS 
+\newline 
+This table contains history of changes of trigger states.
  When a trigger changes its state, new record is added to the table.
 \layout Description
 
@@ -8026,7 +8359,7 @@ ALARMS This table contains history of changes of trigger states.
 \begin_inset  Tabular
 <lyxtabular version="2" rows="4" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
 <row topline="true" bottomline="true" newpage="false">
@@ -8056,7 +8389,7 @@ Description
 </cell>
 </row>
 <row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -8138,17 +8471,18 @@ If '1' - the trigger became true, '0' - otherwise
 \end_inset 
 
 
-\layout Description
+\layout Subsection
 
-FUNCTIONS The table contains list of simple functions used in trigger expression
-s.
+FUNCTIONS 
+\newline 
+The table contains list of simple functions used in trigger expressions.
 \layout Description
 
 
 \begin_inset  Tabular
 <lyxtabular version="2" rows="7" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
 <row topline="true" bottomline="true" newpage="false">
@@ -8178,7 +8512,7 @@ Description
 </cell>
 </row>
 <row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -8339,16 +8673,18 @@ Parameter to the function.
 \end_inset 
 
 
-\layout Description
+\layout Subsection
 
-HISTORY This table contains history of values of items.
+HISTORY 
+\newline 
+This table contains history of values of items.
 \layout Standard
 
 
 \begin_inset  Tabular
 <lyxtabular version="2" rows="4" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
 <row topline="true" bottomline="true" newpage="false">
@@ -8378,7 +8714,7 @@ Description
 </cell>
 </row>
 <row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -8460,16 +8796,18 @@ Value of the item at specific time
 \end_inset 
 
 
-\layout Description
+\layout Subsection
 
-ITEMS This table contains definitions of monitored items.
+ITEMS 
+\newline 
+This table contains definitions of monitored items.
 \layout Description
 
 
 \begin_inset  Tabular
 <lyxtabular version="2" rows="16" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
 <row topline="true" bottomline="true" newpage="false">
@@ -8499,7 +8837,7 @@ Description
 </cell>
 </row>
 <row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -8551,7 +8889,7 @@ Type of item: 0 - Zabbix, 1 - SNMPv1
 </cell>
 </row>
 <row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -8910,16 +9248,18 @@ Status of the item: 0 - active, 1 - disabled, 2 - trapped, 3 - not supported
 \end_inset 
 
 
-\layout Description
+\layout Subsection
 
-MEDIA This table contains list of available medias for given user.
+MEDIA 
+\newline 
+This table contains list of available medias for given user.
 \layout Description
 
 
 \begin_inset  Tabular
 <lyxtabular version="2" rows="6" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
 <row topline="true" bottomline="true" newpage="false">
@@ -8975,7 +9315,7 @@ Unique media ID
 </cell>
 </row>
 <row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -9083,16 +9423,18 @@ Status of the media: 0 - active, 1 - disabled
 \end_inset 
 
 
-\layout Description
+\layout Subsection
 
-TRIGGERS The table contains list of triggers.
+TRIGGERS 
+\newline 
+The table contains list of triggers.
 \layout Description
 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="9" columns="3">
+<lyxtabular version="2" rows="10" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
 <row topline="true" bottomline="true" newpage="false">
@@ -9122,7 +9464,7 @@ Description
 </cell>
 </row>
 <row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -9169,7 +9511,33 @@ varchar
 
 \layout Standard
 
-Expression for the trigger
+Trigger's expression
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+url
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+URL
 \end_inset 
 </cell>
 </row>
@@ -9334,9 +9702,11 @@ Comments
 \end_inset 
 
 
-\layout Description
+\layout Subsection
 
-USERS The table contains list of Zabbix's users.
+USERS 
+\newline 
+The table contains list of Zabbix's users.
  
 \layout Description
 
@@ -9344,7 +9714,7 @@ USERS The table contains list of Zabbix's users.
 \begin_inset  Tabular
 <lyxtabular version="2" rows="7" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
 <row topline="true" bottomline="true" newpage="false">
@@ -9374,7 +9744,7 @@ Description
 </cell>
 </row>
 <row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -9534,16 +9904,18 @@ MD5 hash of user's password
 \end_inset 
 
 
-\layout Description
+\layout Subsection
 
-HOSTS The table contains list of monitored Hosts
+HOSTS 
+\newline 
+The table contains list of monitored Hosts
 \layout Description
 
 
 \begin_inset  Tabular
 <lyxtabular version="2" rows="5" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
 <row topline="true" bottomline="true" newpage="false">
@@ -9573,7 +9945,7 @@ Description
 </cell>
 </row>
 <row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -9650,13 +10022,13 @@ Host status: 0 - monitored, 1 - not monitored, 2 - unreachable
 \end_inset 
 </cell>
 </row>
-<row topline="true" bottomline="true" newpage="false">
+<row topline="false" bottomline="true" newpage="false">
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
 
-disabled_until
+disable_until
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -9681,16 +10053,18 @@ In case if status is unreachabe, do not check host until this time
 \end_inset 
 
 
-\layout Description
+\layout Subsection
 
-ITEMS_TEMPLATE The table contains list of supported items.
+ITEMS_TEMPLATE 
+\newline 
+The table contains list of supported items.
 \layout Description
 
 
 \begin_inset  Tabular
 <lyxtabular version="2" rows="5" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
 <row topline="true" bottomline="true" newpage="false">
@@ -9746,7 +10120,7 @@ Unique ID of item template
 </cell>
 </row>
 <row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -9828,21 +10202,22 @@ How often the key should be sent
 \end_inset 
 
 
-\layout Description
+\layout Subsection
 
-TRIGGERS_TEMPLATE The table contains sample list of triggers for each template
- item.
+TRIGGERS_TEMPLATE 
+\newline 
+The table contains sample list of triggers for each template item.
 \layout Standard
 
 
 \begin_inset  Tabular
 <lyxtabular version="2" rows="5" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
 <row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -9967,7 +10342,279 @@ varchar
 
 \layout Standard
 
-pression for the trigger
+Expression for the trigger
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Subsection
+
+SERVICES 
+\newline 
+The table contains user-defined list of services.
+\layout Standard
+
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="5" columns="3">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Column name
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Type
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+serviceid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Unique ID of service
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+name
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Service name
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+status
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Status of the service
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+triggerid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Trigger ID, if the service is linked to the trigger
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Subsection
+
+SERVICES_LINKS 
+\newline 
+The table contains links between services.
+\layout Standard
+
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="4" columns="3">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Column name
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Type
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+serviceupid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+ID of higher level service
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+servicedownid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+ID of lower level service
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+soft
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+0 - hard link, 1 - soft link
 \end_inset 
 </cell>
 </row>
@@ -10038,7 +10685,7 @@ Help with autoconf issues.
 Mike Hoolehan
 \layout Standard
 
-Helping with making the Reference Manual correct and understandable.
+Help with making the Zabbix Manual correct and understandable.
  
 \layout Itemize
 
