@@ -1,6 +1,5 @@
 1.0beta14:
 
- - different colors and line styles for map connectors
  - start&end time in time navigation
 
  - add zabbix[unixtime] and lastupdate() to get rid of nodata()
