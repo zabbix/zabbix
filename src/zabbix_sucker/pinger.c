@@ -51,8 +51,42 @@
 
 #include "pinger.h"
 
+/* Could be improved */
+int	is_ip(char *ip)
+{
+	int i;
+	char c;
+	int dots=0;
+	int res = SUCCEED;
 
-int	process_value(char *key, char *ip, char *value)
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_ip([%s])", ip);
+
+	for(i=0;ip[i]!=0;i++)
+	{
+		c=ip[i];
+		if( (c>='0') && (c<='9'))
+		{
+			continue;
+		}
+		else if(c=='.')
+		{
+			dots++;
+		}
+		else
+		{
+			res = FAIL;
+			break;
+		}
+	}
+	if( dots!=3)
+	{
+		res = FAIL;
+	}
+	zabbix_log( LOG_LEVEL_DEBUG, "End of process_ip([%d])", res);
+	return res;
+}
+
+int	process_value(char *key, char *host, char *value)
 {
 	char	sql[MAX_STRING_LEN];
 
@@ -60,9 +94,17 @@ int	process_value(char *key, char *ip, char *value)
 	DB_ITEM	item;
 	char	*s;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In process_ip()");
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_value()");
 
-	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta from items i,hosts h where h.status in (%d,%d) and h.hostid=i.hostid and h.ip='%s' and i.key_='%s' and i.status=%d and i.type=%d", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, ip, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_SIMPLE);
+	/* IP address? */
+	if(is_ip(host) == SUCCEED)
+	{
+		snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta from items i,hosts h where h.status in (%d,%d) and h.hostid=i.hostid and h.ip='%s' and i.key_='%s' and i.status=%d and i.type=%d", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, host, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_SIMPLE);
+	}
+	else
+	{
+		snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta from items i,hosts h where h.status in (%d,%d) and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type=%d", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, host, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_SIMPLE);
+	}
 	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
 	result = DBselect(sql);
 
@@ -143,6 +185,7 @@ int create_host_file(void)
 	}
 
 	now=time(NULL);
+	/* Select hosts monitored by IP */
 	snprintf(sql,sizeof(sql)-1,"select distinct h.ip from hosts h,items i where i.hostid=h.hostid and (h.status=%d or (h.status=%d and h.disable_until<=%d)) and (i.key_='%s' or i.key_='%s') and i.type=%d and i.status=%d and h.useip=1", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, ITEM_TYPE_SIMPLE, ITEM_STATUS_ACTIVE);
 	result = DBselect(sql);
 		
@@ -154,6 +197,20 @@ int create_host_file(void)
 		fprintf(f,"%s\n",host.ip);
 
 		zabbix_log( LOG_LEVEL_DEBUG, "IP [%s]", host.ip);
+	}
+	DBfree_result(result);
+
+	/* Select hosts monitored by hostname */
+	snprintf(sql,sizeof(sql)-1,"select distinct h.host from hosts h,items i where i.hostid=h.hostid and (h.status=%d or (h.status=%d and h.disable_until<=%d)) and (i.key_='%s' or i.key_='%s') and i.type=%d and i.status=%d and h.useip=0", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, ITEM_TYPE_SIMPLE, ITEM_STATUS_ACTIVE);
+	result = DBselect(sql);
+		
+	for(i=0;i<DBnum_rows(result);i++)
+	{
+		host.host=DBget_field(result,i,0);
+
+		fprintf(f,"%s\n",host.host);
+
+		zabbix_log( LOG_LEVEL_DEBUG, "HOSTNAME [%s]", host.host);
 	}
 	DBfree_result(result);
 
