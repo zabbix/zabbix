@@ -118,7 +118,9 @@
 	show_table2_header_begin();
 	echo "New system map";
 
-	show_table2_v_delimiter();
+	$col=0;
+
+	show_table2_v_delimiter($col++);
 	echo "<form method=\"get\" enctype=\"multipart/form-data\" action=\"sysmaps.php\">";
 	if(isset($_GET["sysmapid"]))
 	{
@@ -128,17 +130,17 @@
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=32>";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo "Width";
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"width\" size=5 value=\"$width\">";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo "Height";
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"height\" size=5 value=\"$height\">";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo "Background image";
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"background\" size=1>";

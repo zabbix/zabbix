@@ -1611,13 +1611,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	$menu=array(
 		"view"=>array(
 				"label"=>"View",
-				"pages"=>array("latest.php","tr_status.php","queue.php","latestalarms.php","alerts.php","maps.php","charts.php","screens.php","srv_status.php"),
+				"pages"=>array("latest.php","tr_status.php","queue.php","latestalarms.php","alerts.php","maps.php","charts.php","screens.php","srv_status.php","alarms.php"),
 				"level2"=>array(
 					array("label"=>"Latest data","url"=>"latest.php"),
 					array("label"=>"Triggers","url"=>"tr_status.php?onlytrue=true&noactions=true&compact=true"),
 					array("label"=>"Queue","url"=>"queue.php"),
-					array("label"=>"Actions","url"=>"latestalarms.php"),
-					array("label"=>"Alerts","url"=>"alerts.php"),
+					array("label"=>"Events","url"=>"latestalarms.php"),
+					array("label"=>"Actions","url"=>"alerts.php"),
 					array("label"=>"Maps","url"=>"maps.php"),
 					array("label"=>"Graphs","url"=>"charts.php"),
 					array("label"=>"Screens","url"=>"screens.php"),
@@ -1626,14 +1626,15 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				),
 		"reports"=>array(
 				"label"=>"Reports",
-				"pages"=>array("report2.php"),
+				"pages"=>array("report1.php","report2.php"),
 				"level2"=>array(
+					array("label"=>"Status of ZABBIX","url"=>"report1.php"),
 					array("label"=>"Availability report","url"=>"report2.php")
 					)
 				),
 		"configuration"=>array(
 				"label"=>"Configuration",
-				"pages"=>array("config.php","users.php","audit.php","hosts.php","items.php","triggers.php","sysmaps.php","graphs.php","screenconf.php","services.php","sysmap.php","media.php"),
+				"pages"=>array("config.php","users.php","audit.php","hosts.php","items.php","triggers.php","sysmaps.php","graphs.php","screenconf.php","services.php","sysmap.php","media.php","screenedit.php","actions.php"),
 				"level2"=>array(
 					array("label"=>"General","url"=>"config.php"),
 					array("label"=>"Users","url"=>"users.php"),

@@ -163,8 +163,9 @@
 
 		show_table2_header_begin();
 		echo S_ITEM;
- 
-		show_table2_v_delimiter();
+
+		$col=0; 
+		show_table2_v_delimiter($col++);
 		echo "<form method=\"get\" action=\"items.php\">";
 		if(isset($_GET["itemid"]))
 		{
@@ -174,7 +175,7 @@
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"description\" value=\"$description\"size=40>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo S_HOST;
 		show_table2_h_delimiter();
 		echo "<select class=\"biginput\" name=\"hostid\" value=\"3\">";
@@ -194,7 +195,7 @@
 	        }
 		echo "</select>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo S_TYPE;
 		show_table2_h_delimiter();
 
@@ -231,17 +232,17 @@
 
 		if(($type==ITEM_TYPE_SNMPV1)||($type==ITEM_TYPE_SNMPV2C))
 		{ 
-			show_table2_v_delimiter();
+			show_table2_v_delimiter($col++);
 			echo nbsp(S_SNMP_COMMUNITY);
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"snmp_community\" value=\"$snmp_community\" size=16>";
 
-			show_table2_v_delimiter();
+			show_table2_v_delimiter($col++);
 			echo nbsp(S_SNMP_OID);
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"snmp_oid\" value=\"$snmp_oid\" size=40>";
 
-			show_table2_v_delimiter();
+			show_table2_v_delimiter($col++);
 			echo nbsp(S_SNMP_PORT);
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"snmp_port\" value=\"$snmp_port\" size=5>";
@@ -253,17 +254,17 @@
 		}
 		else if($type==ITEM_TYPE_SNMPV3)
 		{
-			show_table2_v_delimiter();
+			show_table2_v_delimiter($col++);
 			echo nbsp(S_SNMP_OID);
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"snmp_oid\" value=\"$snmp_oid\" size=40>";
 
-			show_table2_v_delimiter();
+			show_table2_v_delimiter($col++);
 			echo nbsp(S_SNMPV3_SECURITY_NAME);
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"snmpv3_securityname\" value=\"$snmpv3_securityname\" size=64>";
 
-			show_table2_v_delimiter();
+			show_table2_v_delimiter($col++);
 			echo nbsp(S_SNMPV3_SECURITY_LEVEL);
 			show_table2_h_delimiter();
 			echo "<SELECT class=\"biginput\" NAME=\"snmpv3_securitylevel\" value=\"$snmpv3_securitylevel\" size=\"1\">";
@@ -281,17 +282,17 @@
 
 			echo "</SELECT>";
 
-			show_table2_v_delimiter();
+			show_table2_v_delimiter($col++);
 			echo nbsp(S_SNMPV3_AUTH_PASSPHRASE);
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"snmpv3_authpassphrase\" value=\"$snmpv3_authpassphrase\" size=64>";
 
-			show_table2_v_delimiter();
+			show_table2_v_delimiter($col++);
 			echo nbsp(S_SNMPV3_PRIV_PASSPHRASE);
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"snmpv3_privpassphrase\" value=\"$snmpv3_privpassphrase\" size=64>";
 
-			show_table2_v_delimiter();
+			show_table2_v_delimiter($col++);
 			echo nbsp(S_SNMP_PORT);
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"snmp_port\" value=\"$snmp_port\" size=5>";
@@ -310,17 +311,17 @@
 			echo "<input class=\"biginput\" name=\"snmpv3_privpassphrase\" type=hidden value=\"$snmpv3_privpassphrase\">";
 		}
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo S_KEY;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"key\" value=\"$key\" size=40>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo S_UNITS;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"units\" value=\"$units\" size=10>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo S_USE_MULTIPLIER;
 		show_table2_h_delimiter();
 		echo "<SELECT class=\"biginput\" NAME=\"multiplier\" value=\"$multiplier\" size=\"1\" onChange=\"submit()\">";
@@ -330,7 +331,7 @@
 
 		if($multiplier == 1)
 		{
-			show_table2_v_delimiter();
+			show_table2_v_delimiter($col++);
 			echo nbsp(S_CUSTOM_MULTIPLIER);
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"formula\" value=\"$formula\" size=40>";
@@ -342,7 +343,7 @@
 
 		if($type!=2)
 		{
-			show_table2_v_delimiter();
+			show_table2_v_delimiter($col++);
 			echo nbsp(S_UPDATE_INTERVAL_IN_SEC);
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"delay\" value=\"$delay\" size=5>";
@@ -352,17 +353,17 @@
 			echo "<input class=\"biginput\" name=\"delay\" type=hidden value=\"$delay\">";
 		}
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo nbsp(S_KEEP_HISTORY_IN_DAYS);
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"history\" value=\"$history\" size=8>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo nbsp(S_KEEP_TRENDS_IN_DAYS);
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"trends\" value=\"$trends\" size=8>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo S_STATUS;
 		show_table2_h_delimiter();
 		echo "<SELECT class=\"biginput\" NAME=\"status\" value=\"$status\" size=\"1\">";
@@ -380,7 +381,7 @@
 		echo ">".S_NOT_SUPPORTED;
 		echo "</SELECT>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo nbsp(S_TYPE_OF_INFORMATION);
 		show_table2_h_delimiter();
 		echo "<SELECT class=\"biginput\" NAME=\"value_type\" value=\"$value_type\" size=\"1\">";
@@ -392,7 +393,7 @@
 		echo ">".S_CHARACTER;
 		echo "</SELECT>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo nbsp(S_STORE_VALUE);
 		show_table2_h_delimiter();
 		echo "<SELECT class=\"biginput\" NAME=\"delta\" value=\"$delta\" size=\"1\">";
@@ -403,7 +404,7 @@
 
 		if($type==2)
 		{
-			show_table2_v_delimiter();
+			show_table2_v_delimiter($col++);
 			echo nbsp(S_ALLOWED_HOSTS);
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"trapper_hosts\" value=\"$trapper_hosts\" size=40>";
@@ -431,6 +432,8 @@
 	{
 		global  $_GET;
 
+		$col=0;
+
 		if(isset($groupid))
 		{
 			$groupid=get_group_by_groupid($groupid);
@@ -445,7 +448,7 @@
 		show_table2_header_begin();
 		echo S_HOST_GROUP;
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo "<form method=\"get\" action=\"hosts.php\">";
 		if(isset($_GET["groupid"]))
 		{
@@ -455,7 +458,7 @@
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=30>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo S_HOSTS;
 		show_table2_h_delimiter();
 		echo "<select multiple class=\"biginput\" name=\"hosts[]\" size=\"5\">";
@@ -499,6 +502,8 @@
 	{
 		global  $_GET;
 
+		$col=0;
+
 		if(isset($usrgrpid))
 		{
 			$usrgrp=get_usergroup_by_usrgrpid($usrgrpid);
@@ -513,7 +518,7 @@
 		show_table2_header_begin();
 		echo S_USER_GROUP;
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo "<form method=\"get\" action=\"users.php\">";
 		if(isset($usrgrpid))
 		{
@@ -523,7 +528,7 @@
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=30>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo S_USERS;
 		show_table2_h_delimiter();
 		echo "<select multiple class=\"biginput\" name=\"users[]\" size=\"5\">";
@@ -615,10 +620,12 @@
 	{
 		global	$_GET;
 
+		$col=0;
+
 		show_table2_header_begin();
 		echo "Login";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo "<form method=\"post\" action=\"index.php\">";
 
 		echo "Login name";
@@ -626,7 +633,7 @@
 //		echo "<input name=\"name\" value=\"".$_GET["name"]."\" size=20>";
 		echo "<input class=\"biginput\" name=\"name\" value=\"\" size=20>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo "Password";
 		show_table2_h_delimiter();
 //		echo "<input type=\"password\" name=\"password\" value=\"$password\" size=20>";
@@ -689,6 +696,8 @@
 	# Insert form for Trigger
 	function	insert_trigger_form($hostid,$triggerid)
 	{
+		$col=0;
+
 		if(isset($triggerid))
 		{
 			$trigger=get_trigger_by_triggerid($triggerid);
@@ -715,7 +724,7 @@
 		show_table2_header_begin();
 		echo "Trigger configuration";
  
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		if(isset($hostid))
 		{
 			echo "<form method=\"get\" action=\"triggers.php?hostid=$hostid\">";
@@ -729,12 +738,12 @@
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"description\" value=\"$description\" size=70>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo "Expression";
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"expression\" value=\"$expression\" size=70>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo "Severity";
 		show_table2_h_delimiter();
 		echo "<SELECT class=\"biginput\" NAME=\"priority\" size=\"1\">";
@@ -746,17 +755,17 @@
 		echo "<OPTION VALUE=\"5\" "; if($priority==5) echo "SELECTED"; echo ">Disaster";
 		echo "</SELECT>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo "Comments";
 		show_table2_h_delimiter();
  		echo "<TEXTAREA class=\"biginput\" NAME=\"comments\" COLS=70 ROWS=\"7\" WRAP=\"SOFT\">$comments</TEXTAREA>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo "URL";
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"url\" value=\"$url\" size=70>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo "Disabled";
 		show_table2_h_delimiter();
 		echo "<INPUT TYPE=\"CHECKBOX\" ";
