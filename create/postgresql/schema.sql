@@ -385,6 +385,7 @@ CREATE TABLE services (
   triggerid		int4,
   showsla		int4		DEFAULT '0' NOT NULL,
   goodsla		float8		DEFAULT '99.9' NOT NULL,
+  sortorder		int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (serviceid)
 );
 
@@ -450,5 +451,32 @@ CREATE TABLE profiles (
 
 CREATE INDEX profiles_userid on profiles (userid);
 CREATE UNIQUE INDEX profiles_userid_idx on profiles (userid,idx);
+
+--
+-- Table structure for table 'screens'
+--
+
+CREATE TABLE screens (
+  screenid		serial,
+  name			varchar(255)	DEFAULT 'Screen' NOT NULL,
+  cols			int4		DEFAULT '1' NOT NULL,
+  rows			int4		DEFAULT '1' NOT NULL,
+  PRIMARY KEY  (screenid)
+);
+
+--
+-- Table structure for table 'screens_items'
+--
+
+CREATE TABLE screens_items (
+  screenitemid		serial,
+  screenid		int4		DEFAULT '0' NOT NULL,
+  graphid		int4		DEFAULT '0' NOT NULL,
+  width			int4		DEFAULT '320' NOT NULL,
+  height		int4		DEFAULT '200' NOT NULL,
+  x			int4		DEFAULT '0' NOT NULL,
+  y			int4		DEFAULT '0' NOT NULL,
+  PRIMARY KEY  (screenitemid)
+);
 
 VACUUM ANALYZE;

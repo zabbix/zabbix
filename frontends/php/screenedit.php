@@ -11,7 +11,7 @@
 ?>
 
 <?php
-	if(!check_right("Screen","R",$HTTP_GET_VARS["scid"]))
+	if(!check_right("Screen","R",$HTTP_GET_VARS["screenid"]))
 	{
 		show_table_header("<font color=\"AA0000\">No permissions !</font>");
 		show_footer();
@@ -24,18 +24,22 @@
 	{
 		if($HTTP_GET_VARS["register"]=="add")
 		{
-			$result=add_screen_item($HTTP_GET_VARS["scid"],$HTTP_GET_VARS["x"],$HTTP_GET_VARS["y"],$HTTP_GET_VARS["graphid"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
+			if(isset($HTTP_GET_VARS["screenitemid"]))
+			{
+				delete_screen_item($HTTP_GET_VARS["screenitemid"]);
+			}
+			$result=add_screen_item($HTTP_GET_VARS["screenid"],$HTTP_GET_VARS["x"],$HTTP_GET_VARS["y"],$HTTP_GET_VARS["graphid"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
 			show_messages($result,"Item added","Cannot add item");
 		}
 		if($HTTP_GET_VARS["register"]=="delete")
 		{
-			$result=delete_screen_item($HTTP_GET_VARS["scitemid"]);
+			$result=delete_screen_item($HTTP_GET_VARS["screenitemid"]);
 			show_messages($result,"Item deleted","Cannot delete item");
 			unset($gitemid);
 		}
                 if($HTTP_GET_VARS["register"]=="update")
                 {
-                        $result=update_screen_item($HTTP_GET_VARS["scitemid"],$HTTP_GET_VARS["graphid"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
+                        $result=update_screen_item($HTTP_GET_VARS["screenitemid"],$HTTP_GET_VARS["graphid"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
                         show_messages($result,"Item updated","Cannot update item");
                 }
 
@@ -43,8 +47,8 @@
 ?>
 
 <?php
-	$scid=$HTTP_GET_VARS["scid"];
-	$result=DBselect("select name,cols,rows from screens where scid=$scid");
+	$screenid=$HTTP_GET_VARS["screenid"];
+	$result=DBselect("select name,cols,rows from screens where screenid=$screenid");
 	$row=DBfetch($result);
 	show_table_header($row["name"]);
 	echo "<TABLE BORDER=1 COLS=".$row["cols"]." align=center WIDTH=100% BGCOLOR=\"#FFFFFF\"";
@@ -57,32 +61,32 @@
 
 		echo "<a name=\"form\"></a>";
 		echo "<form method=\"get\" action=\"screenedit.php\">";
-		$iresult=DBSelect("select * from screens_items where scid=$scid and x=$c and y=$r");
+		$iresult=DBSelect("select * from screens_items where screenid=$screenid and x=$c and y=$r");
         	if($iresult)
         	{
         		$irow=DBfetch($iresult);
-        		$scitemid=$irow["scitemid"];
+        		$screenitemid=$irow["screenitemid"];
 			$graphid=$irow["graphid"];
 			$width=$irow["width"];
 			$height=$irow["height"];
         	}
 		else
 		{
-                	$scitemid=0;
+                	$screenitemid=0;
                 	$graphid=0;
                 	$width=100;
                 	$height=50;
 		}
 
-		if(($HTTP_GET_VARS["register"]=="edit")&&($HTTP_GET_VARS["x"]==$c)&&($HTTP_GET_VARS["y"]==$r))
+		if(isset($HTTP_GET_VARS["register"])&&($HTTP_GET_VARS["register"]=="edit")&&($HTTP_GET_VARS["x"]==$c)&&($HTTP_GET_VARS["y"]==$r))
 		{
         		show_table2_header_begin();
         		echo "Screen item configuration";
         		show_table2_v_delimiter();
-        		echo "<input name=\"scid\" type=\"hidden\" value=$scid>";
+        		echo "<input name=\"screenid\" type=\"hidden\" value=$screenid>";
 			echo "<input name=\"x\" type=\"hidden\" value=$c>";
 			echo "<input name=\"y\" type=\"hidden\" value=$r>";
-			echo "<input name=\"scitemid\" type=\"hidden\" value=$scitemid>";
+			echo "<input name=\"screenitemid\" type=\"hidden\" value=$screenitemid>";
 
 			echo "Graph name";
 			show_table2_h_delimiter();
@@ -118,7 +122,7 @@
 
 			show_table2_v_delimiter2();
 			echo "<input type=\"submit\" name=\"register\" value=\"add\">";
-			if($scitemid!=0) 
+			if($screenitemid!=0) 
 			{ 
 				echo "<input type=\"submit\" name=\"register\" value=\"update\">";
 			}
@@ -128,11 +132,11 @@
 		}
 		else if($graphid!=0)
 		{
-			echo "<a href=screenedit.php?register=edit&scid=$scid&x=$c&y=$r><img src='chart2.php?graphid=$graphid&width=$width&height=$height&period=3600' border=0></a>";
+			echo "<a href=screenedit.php?register=edit&screenid=$screenid&x=$c&y=$r><img src='chart2.php?graphid=$graphid&width=$width&height=$height&period=3600' border=0></a>";
 		}
 		else
 		{
-			echo "<a href=screenedit.php?register=edit&scid=$scid&x=$c&y=$r>Empty</a>";
+			echo "<a href=screenedit.php?register=edit&screenid=$screenid&x=$c&y=$r>Empty</a>";
 		}
 		echo "</form>\n";
         

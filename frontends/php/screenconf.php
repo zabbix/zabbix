@@ -29,14 +29,14 @@
 		}
 		if($HTTP_GET_VARS["register"]=="update")
 		{
-			$result=update_screen($HTTP_GET_VARS["scid"],$HTTP_GET_VARS["name"],$HTTP_GET_VARS["cols"],$HTTP_GET_VARS["rows"]);
+			$result=update_screen($HTTP_GET_VARS["screenid"],$HTTP_GET_VARS["name"],$HTTP_GET_VARS["cols"],$HTTP_GET_VARS["rows"]);
 			show_messages($result,"Screen updated","Cannot update screen");
 		}
 		if($HTTP_GET_VARS["register"]=="delete")
 		{
-			$result=delete_screen($HTTP_GET_VARS["scid"]);
+			$result=delete_screen($HTTP_GET_VARS["screenid"]);
 			show_messages($result,"Screen deleted","Cannot delete screen");
-			unset($HTTP_GET_VARS["scid"]);
+			unset($HTTP_GET_VARS["screenid"]);
 		}
 	}
 ?>
@@ -51,23 +51,23 @@
 	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
-	$result=DBselect("select scid,name,cols,rows from screens order by name");
+	$result=DBselect("select screenid,name,cols,rows from screens order by name");
 	$col=0;
 	while($row=DBfetch($result))
 	{
-		if(!check_right("Screen","R",$row["scid"]))
+		if(!check_right("Screen","R",$row["screenid"]))
 		{
 			continue;
 		}
 		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
 		else		{ echo "<TR BGCOLOR=#DDDDDD>"; }
 	
-		echo "<TD>".$row["scid"]."</TD>";
-		echo "<TD><a href=\"screenedit.php?scid=".$row["scid"]."\">".$row["name"]."</a></TD>";
+		echo "<TD>".$row["screenid"]."</TD>";
+		echo "<TD><a href=\"screenedit.php?screenid=".$row["screenid"]."\">".$row["name"]."</a></TD>";
 		echo "<TD>".$row["cols"]."</TD>";
 		echo "<TD>".$row["rows"]."</TD>";
-		echo "<TD><A HREF=\"screenconf.php?scid=".$row["scid"]."#form\">Change</A> - ";
-		echo "<A HREF=\"screenconf.php?register=delete&scid=".$row["scid"]."\">Delete</A></TD>";
+		echo "<TD><A HREF=\"screenconf.php?screenid=".$row["screenid"]."#form\">Change</A> - ";
+		echo "<A HREF=\"screenconf.php?register=delete&screenid=".$row["screenid"]."\">Delete</A></TD>";
 		echo "</TR>";
 	}
 	echo "</TABLE>";
@@ -76,9 +76,9 @@
 <?php
 	echo "<a name=\"form\"></a>";
 
-	if(isset($HTTP_GET_VARS["scid"]))
+	if(isset($HTTP_GET_VARS["screenid"]))
 	{
-		$result=DBselect("select scid,name,cols,rows from screens g where scid=".$HTTP_GET_VARS["scid"]);
+		$result=DBselect("select screenid,name,cols,rows from screens g where screenid=".$HTTP_GET_VARS["screenid"]);
 		$row=DBfetch($result);
 		$name=$row["name"];
 		$cols=$row["cols"];
@@ -97,9 +97,9 @@
 
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"screenconf.php\">";
-	if(isset($HTTP_GET_VARS["scid"]))
+	if(isset($HTTP_GET_VARS["screenid"]))
 	{
-		echo "<input class=\"biginput\" name=\"scid\" type=\"hidden\" value=".$HTTP_GET_VARS["scid"].">";
+		echo "<input class=\"biginput\" name=\"screenid\" type=\"hidden\" value=".$HTTP_GET_VARS["screenid"].">";
 	}
 	echo "Name";
 	show_table2_h_delimiter();
@@ -117,7 +117,7 @@
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
-	if(isset($HTTP_GET_VARS["scid"]))
+	if(isset($HTTP_GET_VARS["screenid"]))
 	{
 		echo "<input type=\"submit\" name=\"register\" value=\"update\">";
 	}
