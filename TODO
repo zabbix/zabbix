@@ -1,5 +1,6 @@
 1.0beta12:
 
+ - add zabbix[unixtime] and lastupdate() to get rid of nodata()
  - check return code for alert scripts
  - add support for function unixtime()
  - parameter to disable fping
