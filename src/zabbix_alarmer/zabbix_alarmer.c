@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 #include <sys/stat.h>
+#include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <signal.h>
@@ -136,27 +137,29 @@ void	send_to_user(int actionid,int userid,char *smtp_server,char *smtp_helo,char
 	char c[1024];
 	DB_RESULT *result;
 
-	DB_ROW row;
+	int	i,rows;
+	int	now;
 
 	sprintf(c,"select type,sendto,active from media where userid=%d",userid);
-	DBexecute(c);
+	result = DBselect(c);
 
-	result = DBget_result();
+	rows=DBnum_rows(result);
 
-	while ( (row = DBfetch_row(result)) )
+	for(i=0;i<rows;i++)
 	{
-		media.active=atoi(row[2]);
-		syslog( LOG_DEBUG, "ACTIVE=%d or %s\n", media.active, row[2] );
+		media.active=atoi(DBget_field(result,i,2));
+		syslog( LOG_DEBUG, "ACTIVE=%d or %s\n", media.active, DBget_field(result,i,2) );
 		if(media.active!=1) // If media is enabled (active)
 		{
-			media.type=row[0];
-			media.sendto=row[1]; 
+			media.type=DBget_field(result,i,0);
+			media.sendto=DBget_field(result,i,1);
 
 			if(strcmp(media.type,"EMAIL")==0)
 			{
 				syslog( LOG_DEBUG, "Email sending to %s %s Subject:%s Message:%s to %d\n", media.type, media.sendto, subject, message, userid );
 				send_mail(smtp_server,smtp_helo,smtp_email,media.sendto,subject,message);
-				sprintf(c,"insert into alerts (alertid,actionid,clock,type,sendto,subject,message) values (NULL,%d,unix_timestamp(),'%s','%s','%s','%s');",actionid,media.type,media.sendto,subject,message);
+				now = time(NULL);
+				sprintf(c,"insert into alerts (alertid,actionid,clock,type,sendto,subject,message) values (NULL,%d,%d,'%s','%s','%s','%s');",actionid,now,media.type,media.sendto,subject,message);
 				DBexecute(c);
 			} 
 			else
@@ -172,8 +175,6 @@ void	apply_actions(int triggerid,int good)
 {
 	DB_RESULT *result;
 	
-	DB_ROW row;
-
 	ACTION action;
 
 	char c[1024];
@@ -182,41 +183,44 @@ void	apply_actions(int triggerid,int good)
 		smtp_helo[256],
 		smtp_email[256];
 
+	int	i,rows;
+	int	now;
+
 	syslog( LOG_DEBUG, "Applying actions");
 
 	/* Get smtp_server and smtp_helo from config */
 	sprintf(c,"select smtp_server,smtp_helo,smtp_email from config");
-	DBexecute(c);
-	result = DBget_result();
+	result = DBselect(c);
 
-	row = DBfetch_row(result);
-
-	strcpy(smtp_server,row[0]);
-	strcpy(smtp_helo,row[1]);
-	strcpy(smtp_email,row[2]);
+	strcpy(smtp_server,DBget_field(result,0,0));
+	strcpy(smtp_helo,DBget_field(result,0,1));
+	strcpy(smtp_email,DBget_field(result,0,2));
 
 	DBfree_result(result);
 
-	sprintf(c,"select actionid,userid,delay,subject,message from actions where triggerid=%d and good=%d and nextcheck<=unix_timestamp()",triggerid,good);
-	DBexecute(c);
+	now = time(NULL);
 
-	result = DBget_result();
+	sprintf(c,"select actionid,userid,delay,subject,message from actions where triggerid=%d and good=%d and nextcheck<=%d",triggerid,good,now);
+	result = DBselect(c);
 
-	while ( (row = DBfetch_row(result)) )
+	rows = DBnum_rows(result);
+
+	for(i=0;i<rows;i++)
 	{
-		syslog( LOG_DEBUG, "Fetched:%s %s %s %s %s\n",row[0],row[1],row[2],row[3],row[4]);
+		syslog( LOG_DEBUG, "Fetched:%s %s %s %s %s\n",DBget_field(result,i,0),DBget_field(result,i,1),DBget_field(result,i,2),DBget_field(result,i,3),DBget_field(result,i,4));
 
-		action.actionid=atoi(row[0]);
-		action.userid=atoi(row[1]);
-		action.delay=atoi(row[2]);
-		action.subject=row[3];
-		action.message=row[4];
+		action.actionid=atoi(DBget_field(result,i,0));
+		action.userid=atoi(DBget_field(result,i,1));
+		action.delay=atoi(DBget_field(result,i,2));
+		action.subject=DBget_field(result,i,3);
+		action.message=DBget_field(result,i,4);
 
 //		substitute_functions(&*action.message);
 //		substitute_functions(&*action.subject); 
 
 		send_to_user(action.actionid,action.userid,smtp_server,smtp_helo,smtp_email,action.subject,action.message);
-		sprintf(c,"update actions set nextcheck=unix_timestamp()+%d where actionid=%d",action.delay,action.actionid);
+		now = time(NULL);
+		sprintf(c,"update actions set nextcheck=%d+%d where actionid=%d",now,action.delay,action.actionid);
 		DBexecute(c);
 	}
 	syslog( LOG_DEBUG, "Actions applied for trigger %d %d\n", triggerid, good );
@@ -230,27 +234,29 @@ void	update_triggers(void)
 	int b;
 	TRIGGER trigger;
 	DB_RESULT *result;
-	DB_ROW row;
+
+	int	i,rows;
+	int	now;
 
 	sprintf(c,"select triggerid,expression,istrue from triggers where istrue!=2 order by triggerid");
 
-	DBexecute(c);
+	result = DBselect(c);
 
-	result = DBget_result();
+	rows = DBnum_rows(result);
 
-	if(DBnum_rows(result)==0)
+	if(rows == 0)
 	{
 		syslog( LOG_DEBUG, "Zero, so returning..." );
 
 		DBfree_result(result);
 		return;
-	} 
-	while ( (row = DBfetch_row(result)) )
+	}
+	for(i=0;i<rows;i++)
 	{
-		syslog( LOG_DEBUG, "Fetched: TrId[%s] Exp[%s] IsTrue[%s]\n", row[0], row[1], row[2] );
-		trigger.triggerid=atoi(row[0]);
-		trigger.expression=row[1];
-		trigger.istrue=atoi(row[2]);
+		syslog( LOG_DEBUG, "Fetched: TrId[%s] Exp[%s] IsTrue[%s]\n", DBget_field(result,i,0),DBget_field(result,i,1),DBget_field(result,i,2));
+		trigger.triggerid=atoi(DBget_field(result,i,0));
+		trigger.expression=DBget_field(result,i,1);
+		trigger.istrue=atoi(DBget_field(result,i,2));
 		strcpy(exp, trigger.expression);
 		if( evaluate_expression(&b, exp) != 0 )
 		{
@@ -258,17 +264,18 @@ void	update_triggers(void)
 			continue;
 		}
 
-		sprintf(c,"update triggers set lastcheck=unix_timestamp() where triggerid=%d",trigger.triggerid);
-
+		now = time(NULL);
+		sprintf(c,"update triggers set lastcheck=%d where triggerid=%d",now,trigger.triggerid);
 		DBexecute(c);
-
 
 		if((b==1)&&(trigger.istrue!=1))
 		{
-			sprintf(c,"update triggers set IsTrue=1, lastchange=unix_timestamp() where triggerid=%d",trigger.triggerid);
+			now = time(NULL);
+			sprintf(c,"update triggers set IsTrue=1, lastchange=%d where triggerid=%d",now,trigger.triggerid);
 			DBexecute(c);
 
-			sprintf(c,"insert into alarms(triggerid,clock,istrue) values(%d,unix_timestamp(),1)",trigger.triggerid);
+			now = time(NULL);
+			sprintf(c,"insert into alarms(triggerid,clock,istrue) values(%d,%d,1)",trigger.triggerid,now);
 			DBexecute(c);
 
 			apply_actions(trigger.triggerid,1);
@@ -279,10 +286,12 @@ void	update_triggers(void)
 
 		if((b==0)&&(trigger.istrue!=0))
 		{
-			sprintf(c,"update triggers set IsTrue=0, lastchange=unix_timestamp() where triggerid=%d",trigger.triggerid);
+			now = time(NULL);
+			sprintf(c,"update triggers set IsTrue=0, lastchange=%d where triggerid=%d",now,trigger.triggerid);
 			DBexecute(c);
 
-			sprintf(c,"insert into alarms(triggerid,clock,istrue) values(%d,unix_timestamp(),0)",trigger.triggerid);
+			now = time(NULL);
+			sprintf(c,"insert into alarms(triggerid,clock,istrue) values(%d,%d,0)",trigger.triggerid,now);
 			DBexecute(c);
 
 			apply_actions(trigger.triggerid,0);
@@ -296,7 +305,7 @@ void	update_triggers(void)
 
 int	main()
 {
-	time_t	now,diff;
+	int	now,diff;
 	int 	ret;
 
 	daemon_init();

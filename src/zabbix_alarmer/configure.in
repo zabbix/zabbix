@@ -7,13 +7,14 @@ AC_PROG_CC
 dnl Checks for libraries.
 dnl Replace `main' with a function in -lmysqlclient:
 AC_CHECK_LIB(mysqlclient, main)
+AC_CHECK_LIB(pq, main)
 AC_CHECK_LIB(m, main)
 
 dnl Checks for header files.
 AC_HEADER_STDC
 
 AC_CHECK_HEADERS(stdio.h stdlib.h unistd.h netdb.h signal.h \
-  syslog.h time.h sys/stat.h netinet/in.h)
+  syslog.h time.h sys/stat.h netinet/in.h sys/socket.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_PID_T

@@ -9,7 +9,7 @@
 
 
 #define	SUCKER_DELAY	5
-#define	ALARMER_DELAY	5
+#define	ALARMER_DELAY	1
 
 #define	SUCKER_TIMEOUT	5
 #define	AGENT_TIMEOUT	3

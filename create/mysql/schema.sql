@@ -83,8 +83,8 @@ CREATE TABLE functions (
   parameter int(4) DEFAULT '0' NOT NULL,
   PRIMARY KEY (functionid),
   KEY itemid (itemid),
-  KEY triggerid (itemid),
-  KEY itemidfunctionparameter (itemid,function,parameter)
+  KEY triggerid (triggerid),
+  UNIQUE itemidfunctionparameter (itemid,function,parameter)
 );
 
 #
