@@ -83,6 +83,8 @@
 //	{
 //		ImageDashedLine($im,$i+$shiftX,$shiftY,$i+$shiftX,$sizeY+$shiftY,$gray);
 //	}
+//	$style=array($white,$white,$white,$white,$white,$white,$black,$black,$black,$black,$black,$black,$black);
+//	ImageSetStyle($im,$style);
 	ImageDashedLine($im,$shiftX+1,$shiftY,$shiftX+1,$sizeY+$shiftY,$black);
 	ImageDashedLine($im,$shiftX+1,$shiftY,$shiftX+$sizeX,$shiftY,$black);
 	ImageDashedLine($im,$shiftX+$sizeX,$shiftY,$shiftX+$sizeX,$sizeY+$shiftY,$black);
