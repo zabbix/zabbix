@@ -6,6 +6,7 @@ Error
 Critical
 Panic
 
+ - check_NNTP should expect 200 not 220
  - separate login.php and index.php
  - add gaps to graph when no data present
  - make Zabbix reset nextcheck for items when updating or adding a trigger
