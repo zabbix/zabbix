@@ -1,5 +1,6 @@
 Changes for 1.0beta10:
 
+ - fixed snmptrap.sh (Alexei)
  - improved performance of simple graphs (Alexei)
  - minor fixes to eliminate compiler's warnings (Alexei)
  - fix to show HTML characters of string items in Latest Values and
