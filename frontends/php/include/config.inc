@@ -7,7 +7,7 @@
 	{
 		if(!$bool)
 		{
-			$msg=$errmsg;
+			$msg="ERROR:".$errmsg;
 			$color="#AA0000";
 		}
 		else
@@ -643,14 +643,13 @@
 				$itemid=DBget_field($res,0,0);
 #				echo "ITEMID:$itemid<BR>";
 	
-#				$sql="select functionid from functions where function='$function' and parameter=$parameter";
+#				$sql="select functionid,count(*) from functions where function='$function' and parameter=$parameter group by 1";
 #				echo $sql,"<Br>";
-#				$res=mysql_query($sql,$mysql);
-#				$row=mysql_fetch_row($res);
-
-#				if($row)
+#				$res=DBselect($sql);
+#
+#				if(DBget_field($res,0,1)>0)
 #				{
-#					$functionid=$row[0];
+#					$functionid=DBget_field($res,0,0);
 #				}
 #				else
 #				{
@@ -659,6 +658,7 @@
 					$res=DBexecute($sql);
 					if(!$res)
 					{
+#						echo "ERROR<br>";
 						return	$res;
 					}
 					$functionid=DBinsert_id($res,"functions","functionid");
@@ -927,6 +927,7 @@
 	{
 		$description=addslashes($description);
 		$sql="insert into triggers  (description,priority,istrue,comments) values ('$description',$priority,$istrue,'$comments')";
+#		echo $sql,"<br>";
 		$result=DBexecute($sql);
 		if(!$result)
 		{
@@ -934,9 +935,11 @@
 		}
  
 		$triggerid=DBinsert_id($result,"triggers","triggerid");
+#		echo $triggerid,"<br>";
  
 		$expression=implode_exp($expression,$triggerid);
 		$sql="update triggers set expression='$expression' where triggerid=$triggerid";
+#		echo $sql,"<br>";
 		return	DBexecute($sql);
 	}
 

@@ -169,9 +169,8 @@ CREATE TABLE functions (
   FOREIGN KEY (triggerid) REFERENCES triggers
 );
 
-CREATE INDEX functions_itemid on functions (itemid);
 CREATE INDEX funtions_triggerid on functions (triggerid);
-CREATE UNIQUE INDEX functions_i_f_p on functions (itemid,function,parameter);
+CREATE INDEX functions_i_f_p on functions (itemid,function,parameter);
 
 --
 -- Table structure for table 'history'

@@ -10,15 +10,18 @@
 	{
 		if($register=="add")
 		{
-			add_sysmap($name,$width,$height);
+			$result=add_sysmap($name,$width,$height);
+			show_messages($result,"Network map added","Cannot add network map");
 		}
 		if($register=="update")
 		{
-			update_sysmap($sysmapid,$name,$width,$height);
+			$result=update_sysmap($sysmapid,$name,$width,$height);
+			show_messages($result,"Network map updated","Cannot update network map");
 		}
 		if($register=="delete")
 		{
-			delete_sysmap($sysmapid);
+			$result=delete_sysmap($sysmapid);
+			show_messages($result,"Network map deleted","Cannot delete network map");
 			unset($sysmapid);
 		}
 	}

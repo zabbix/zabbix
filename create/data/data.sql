@@ -147,7 +147,7 @@ insert into triggers_template (triggertemplateid,itemtemplateid,description,expr
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (8,8,'Low number of free inodes on %s\'s volume /usr','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (9,9,'Too many processes running on %s','{:.last(0)}>300');
+	values (9,9,'Too many processes on %s','{:.last(0)}>300');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (10,10,'Processor load is too high on %s','{:.last(0)}>5');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
@@ -191,6 +191,6 @@ insert into triggers_template (triggertemplateid,itemtemplateid,description,expr
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (46,46,'/usr/sbin/sshd has been changed on server %s','{:.diff(0)}>0');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (47,47,'/usr/bin/sshd has been changed on server %s','{:.diff(0)}>0');
+	values (47,47,'/usr/bin/ssh has been changed on server %s','{:.diff(0)}>0');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (48,48,'/etc/services has been changed on server %s','{:.diff(0)}>0');

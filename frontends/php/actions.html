@@ -11,16 +11,19 @@
 	{
 		if($register=="add")
 		{
-			add_action( $triggerid, $userid, $good, $delay, $subject, $message );
+			$result=add_action( $triggerid, $userid, $good, $delay, $subject, $message );
+			show_messages($result,"Action added","Cannot add action");
 		}
 		if($register=="update")
 		{
-			update_action( $actionid, $userid, $good, $delay, $subject, $message );
+			$result=update_action( $actionid, $userid, $good, $delay, $subject, $message );
+			show_messages($result,"Action updated","Cannot update action");
 			unset($actionid);
 		}
 		if($register=="delete")
 		{
-			delete_action($actionid);
+			$result=delete_action($actionid);
+			show_messages($result,"Action deleted","Cannot delete action");
 			unset($actionid);
 		}
 	}

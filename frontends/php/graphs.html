@@ -15,15 +15,18 @@
 	{
 		if($register=="add")
 		{
-			add_graph($name,$width,$height);
+			$result=add_graph($name,$width,$height);
+			show_messages($result,"Graph added","Cannot add graph");
 		}
 		if($register=="update")
 		{
-			update_graph($graphid,$name,$width,$height);
+			$result=update_graph($graphid,$name,$width,$height);
+			show_messages($result,"Graph updated","Cannot update graph");
 		}
 		if($register=="delete")
 		{
-			delete_graph($graphid);
+			$result=delete_graph($graphid);
+			show_messages($result,"Graph deleted","Cannot delete graph");
 			unset($graphid);
 		}
 	}
