@@ -1,5 +1,6 @@
 HIGH PRIORITY:
 
+ - add item type Zabbix trapper (PHP frontend)
  - mass updates/inserts (add items and triggers for all hosts at once)
  - support for net-snmp
  - LDAP authorisation (should work with MSWindows LDAP)
