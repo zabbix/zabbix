@@ -1,5 +1,7 @@
 TOP PRIORITY:
 
+ - add detailed descriptio of 'status' into the Manual
+ - fix update of 'status'. When added it never gets aupdates, if server is already unrechable.
  - support for high performance DB engines like Berkeley DB
  - add support for agent forwarding (proxy)
  - proofread Zabbix Manual  - Ted Rolle <ted@users.sourceforge.net>
