@@ -1,4 +1,7 @@
 1.1:
+ - add support of redirect of index.php on per user basis (add login.php)
+ - add IP addresses to the list of hosts
+ - add host names to the list of host groups
  - proc_cnt[zabbix_asgentd] does not work correctly? 7 instead of 6.
  - remove icmpping and others from the QUEUE
  - hardlinked templates (several templates, one host)
