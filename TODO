@@ -1,6 +1,5 @@
 1.0beta12:
 
- - trigger key cannot contain dash
  - no way to delete or rename host group
  - update item does not work (multiplier)
  - change %s to {HOSTNAME}, {DATE},{TIME}, etc
