@@ -1,5 +1,8 @@
 Changes for 1.0beta10:
 
+ - removed column graphid from table screens_items (Alexei)
+ - added columns resource and resourceid to table screens_items
+ (Alexei)
  - non breakable space in PHP forms (Alexei)
  - new draw type for graphs: Dot (Alexei)
  - improved media maintenance form (Alexei)
@@ -44,7 +47,6 @@ Changes for 1.0beta10:
  - added check for kstat library for ./configure (Alexei)
  - added support for zabbix[queue] (Alexei)
  - added basic support for simple graphs in screens (Alexei)
- - added table screens_graphs (Alexei)
  - dynamic form hosts.php (Alexei)
  - fixed 'make clean' under Solaris (rm -fv -> rm -f) (Alexei)
  - link map's connector to a trigger

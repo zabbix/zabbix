@@ -4310,11 +4310,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
                 return  DBexecute($sql);
         }
 
-        function add_screen_item($screenid,$x,$y,$graphid,$width,$height)
+        function add_screen_item($resource,$screenid,$x,$y,$resourceid,$width,$height)
         {
                 $sql="delete from screens_items where screenid=$screenid and x=$x and y=$y";
                 DBexecute($sql);
-                $sql="insert into screens_items (screenid,x,y,graphid,width,height) values ($screenid,$x,$y,$graphid,$width,$height)";
+                $sql="insert into screens_items (resource,screenid,x,y,resourceid,width,height) values ($resource,$screenid,$x,$y,$resourceid,$width,$height)";
                 return  DBexecute($sql);
         }
 
