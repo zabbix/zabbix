@@ -20,7 +20,7 @@
 	}
 	else
 	{
-		$trigger=select_trigger_by_triggerid($triggerid);
+		$trigger=get_trigger_by_triggerid($triggerid);
 
 		$Expression=$trigger["expression"];
 		$Description=$trigger["description"];

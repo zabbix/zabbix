@@ -4,23 +4,31 @@
 
 	include "include/config.inc";
 
-	$result=DBselect("select count(*) from triggers t,hosts h,items i,functions f  where t.istrue=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status in (0,2) order by t.triggerid");
-	$count=DBget_field($result,0,0);
-	setcookie("active_triggers",$count,time()+1800);
+	$tr_hash=calc_trigger_hash();
+	setcookie("triggers_hash",$tr_hash,time()+1800);
+
+	if(!isset($triggers_hash))
+	{
+		$triggers_hash="0,0";
+	}
+
+	$new=explode(",",$tr_hash);
+	$old=explode(",",$triggers_hash);
 
 //	Number of trigger decreased
-	if(isset($active_triggers)&&($count<$active_triggers))
+	if(($old[1]!=$new[1])&&($new[0]<$old[0]))
 	{
-		echo "<tr>OFF<tr>";
+//		echo "<tr>OFF<tr>";
 		$audio="warning_off.wav";
 	}
 //	Number of trigger increased
-	if(isset($active_triggers)&&($count>$active_triggers))
+	if(($old[1]!=$new[1])&&($new[0]>=$old[0]))
 	{
-		echo "<tr>ON<tr>";
+//		echo "<tr>ON<tr>";
 		$audio="warning_on.wav";
 	}
 
+//	echo "$tr_hash<br>$triggers_hash<br>".$old[1]."<br>".$new[1];
 
 	$refresh=10;
 	if(!isset($onlytrue))

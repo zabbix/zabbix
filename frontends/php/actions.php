@@ -30,7 +30,7 @@
 ?>
 
 <?
-	$trigger=select_trigger_by_triggerid($triggerid);
+	$trigger=get_trigger_by_triggerid($triggerid);
 	$expression=explode_exp($trigger["expression"],1);
 	$description=$trigger["description"];
 	show_table_header("$description<BR>$expression");
@@ -106,7 +106,7 @@
 	}
 	else
 	{
-		$trigger=select_trigger_by_triggerid($triggerid);
+		$trigger=get_trigger_by_triggerid($triggerid);
 		$description=$trigger["description"];
 
 		$good=1;
@@ -118,9 +118,9 @@
 		$message="<INSERT YOUR MESSAGE HERE>\n\n------Latest data------\n\n";
 		while($row=DBfetch($result))
 		{
-			$message=$message.$row["description"].": \{".$row["host"].":".$row["key_"].".last(0)}  (latest value)\n";
-			$message=$message.$row["description"].": \{".$row["host"].":".$row["key_"].".max(300)} (maximum value for last 5 min)\n";
-			$message=$message.$row["description"].": \{".$row["host"].":".$row["key_"].".min(300)} (minimum value for last 5 min)\n\n";
+			$message=$message.$row["description"].": {".$row["host"].":".$row["key_"].".last(0)}  (latest value)\n";
+			$message=$message.$row["description"].": {".$row["host"].":".$row["key_"].".max(300)} (maximum value for last 5 min)\n";
+			$message=$message.$row["description"].": {".$row["host"].":".$row["key_"].".min(300)} (minimum value for last 5 min)\n\n";
 		}
 		$message=$message."---------End--------\n";
 	}
