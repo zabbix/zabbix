@@ -7010,6 +7010,9 @@ Amount of unused disk space for given volume
  (in Kb)
 \latex no_latex 
 .
+
+\latex default 
+ In case of mounted volume, unused disk space for local file system is returned.
 \layout Standard
 
 E
@@ -15707,10 +15710,26 @@ Support for quering SNMP parameters by IP address.
 
 
 \noun on 
-EVGENY ...
+EUGENY BACULA
 \layout Standard
 
 Many suggestions for improvements.
+\layout Itemize
+
+
+\noun on 
+JEFF REDDING
+\layout Standard
+
+Support for non-GCC compilers
+\layout Itemize
+
+
+\noun on 
+JOSH KONKOL
+\layout Standard
+
+Help with testing
 \layout Itemize
 
 
@@ -15739,6 +15758,14 @@ Status of Triggers
 \end_inset 
 
 
+\layout Itemize
+
+
+\noun on 
+LUKAS MACURA
+\layout Standard
+
+Many ideas
 \layout Itemize
 
 
