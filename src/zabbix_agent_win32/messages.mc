@@ -188,4 +188,10 @@ Language=English
 Unable to open existing temporary file: %1
 .
 
+MessageId=
+SymbolicName=MSG_DNS_LOOKUP_FAILED
+Language=English
+DNS lookup failed for host %1
+.
+
 ;#endif

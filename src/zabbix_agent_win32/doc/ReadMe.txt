@@ -141,6 +141,8 @@ Parameters supported by Zabbix Win32 Agent
 
 I. Zabbix standard parameters
 
+check_port[<port>]
+check_port[<host>,<port>]
 cksum[<path>]		<path> can be normal Windows path, like C:\, or UNC.
 			Agent will return UNSUPPORTED if file is larger than
 			64MB.

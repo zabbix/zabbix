@@ -3,6 +3,7 @@
 * Added API for subagents
 * Disk free space and total size now returned in bytes
 * Added support for external program execution (UserParameter)
+* Added support for check_port[] parameter
 
 
 1.0.0-beta8
