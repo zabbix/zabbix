@@ -675,6 +675,11 @@ double	SENSOR_TEMP1(void)
 	FILE	*f;
 
 	dir=opendir("/proc/sys/dev/sensors");
+	if(NULL == dir)
+	{
+		return FAIL;
+	}
+
 	while((entries=readdir(dir))!=NULL)
 	{
 		strncpy(filename,"/proc/sys/dev/sensors/",MAX_STRING_LEN);	
@@ -719,6 +724,11 @@ double	SENSOR_TEMP2(void)
 	FILE	*f;
 
 	dir=opendir("/proc/sys/dev/sensors");
+	if(NULL == dir)
+	{
+		return FAIL;
+	}
+
 	while((entries=readdir(dir))!=NULL)
 	{
 		strncpy(filename,"/proc/sys/dev/sensors/",MAX_STRING_LEN);	
@@ -763,6 +773,11 @@ double	SENSOR_TEMP3(void)
 	FILE	*f;
 
 	dir=opendir("/proc/sys/dev/sensors");
+	if(NULL == dir)
+	{
+		return FAIL;
+	}
+
 	while((entries=readdir(dir))!=NULL)
 	{
 		strncpy(filename,"/proc/sys/dev/sensors/",MAX_STRING_LEN);	
@@ -811,6 +826,11 @@ double	PROCCNT(const char * procname)
 	int	proccount=0;
 
 	dir=opendir("/proc");
+	if(NULL == dir)
+	{
+		return FAIL;
+	}
+
 	while((entries=readdir(dir))!=NULL)
 	{
 		strncpy(filename,"/proc/",MAX_STRING_LEN);	
@@ -865,6 +885,11 @@ double	PROCCNT(const char * procname)
 	int	proccount=0;
 
 	dir=opendir("/proc");
+	if(NULL == dir)
+	{
+		return FAIL;
+	}
+
 	while((entries=readdir(dir))!=NULL)
 	{
 		strncpy(filename,"/proc/",MAX_STRING_LEN);	
