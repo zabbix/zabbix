@@ -1,5 +1,6 @@
 Changes for 1.0beta9:
 
+ - fixed dark blue color for user-defined chart (Alexei)
  - removed DOS style EOL from RedHat startup scripts (Alexei)
  - IT service to be hard-linked when added (Alexei)
  - fixed calculate_service_availability() (Alexei)
