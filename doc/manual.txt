@@ -649,7 +649,7 @@ file. You must have fping installed to successfully run the script.
 Performance of PostgreSQL can be significantly improved by executing
 VACUUM command on Zabbix database.
 
-I would suggest execute VACUUM, at lease, after the following events:
+I would suggest execute VACUUM, at least, after the following events:
 
  - Zabbix is installed
  - 10000 records in table "history"
