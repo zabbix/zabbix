@@ -15,6 +15,7 @@
  - custom multiplier
  - calculate MIN value for graphs (do not use '0')
  - infrastructure for reports
+ - stacked graphs
 
  - man pages for all daemons
  - icmppingsec->icmppingmsec
