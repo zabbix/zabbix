@@ -352,7 +352,8 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	}
 			
 	memset(c,0,MAX_STRING_LEN+1);
-	sprintf(c,"MAIL FROM: %s\r\n",smtp_email);
+/*	sprintf(c,"MAIL FROM: %s\r\n",smtp_email);*/
+	sprintf(c,"MAIL FROM:<%s>\r\n",smtp_email);
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e == -1)
 	{
@@ -428,7 +429,8 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	}
 
 	memset(c,0,MAX_STRING_LEN+1);
-	sprintf(c,"Subject: %s\r\n%s",mailsubject, mailbody);
+/*	sprintf(c,"Subject: %s\r\n%s",mailsubject, mailbody);*/
+	sprintf(c,"From:<%s>\r\nTo:<%s>\r\nSubject: %s\r\n\r\n%s",smtp_email,mailto,mailsubject, mailbody);
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e == -1)
 	{
