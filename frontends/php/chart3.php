@@ -69,7 +69,7 @@
 
 	$now = time(NULL);
 	$to_time=$now;
-	$from_time=$to_time-24*3600;
+	$from_time=$to_time-7*24*3600;
 
 	$count=array();
 	$min=array();
@@ -80,36 +80,17 @@
 	while($row=DBfetch($result))
 	{
 		$value=$row["value"];
-		$i=intval(900*($from_time-$row["clock"])/($from_time-$to_time));
+		$i=intval( 900*($from_time-$row["clock"])/($from_time-$to_time));
 
 		if( (!isset($max[$i])) || ($max[$i]<$value))
 		{
 			$max[$i]=$value;
 		}
 		if(!isset($min[$i]) || ($min[$i]>$value))	$min[$i]=$value;
-//		$min[$i]=0;
 		$avg[$i]=0;
-//		$max[$i]=$row["value"];
-//		echo "$from_time $to_time ".$row["clock"]," ",($from_time-$row["clock"])/($from_time-$to_time),"<br>";
-//		echo intval(900*($from_time-$row["clock"])/($from_time-$to_time)),"<br>";
-//		$max[$row["clock"]%900]=$row["value"];
-//		$avg[$row["clock"]%900]=$row["value"];
 		$count[$i]=1;
+		$nodata=0;
 	}
-	$nodata=0;
-
-/*	for($i=0;$i<900;$i++)
-	{
-		$result=DBselect("select count(value),min(value),max(value),avg(value) from history where itemid=$itemid and clock>$from_time+$i*($to_time-$from_time)/(900-50) and clock<$from_time+($i+1)*($to_time-$from_time)/(900-50)");
-		$count[$i]=DBget_field($result,0,0);
-		if($count[$i]>0)
-		{
-			$min[$i]=DBget_field($result,0,1);
-			$max[$i]=DBget_field($result,0,2);
-			$avg[$i]=DBget_field($result,0,3);
-			$nodata=0;
-		}
-	}*/
 
 	for($i=0;$i<=$sizeY;$i+=50)
 	{

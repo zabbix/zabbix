@@ -1,28 +1,14 @@
-Things to check:
-
-Read and respond to this message at:
-http://sourceforge.net/forum/message.php?msg_id=1615663
-By: jkonkol
-
-Yes fixing the correct server time fixed my authentication problem.
-Specifically it was set 6 hours earlier than the computer I was using the frontend
-on.  So when zabbix would check to see if I had been connected for longer than
-600 seconds it would always fail.
-
-Hope this helps.
-
-
 Not ready yet:
 
+ - fix proc_cnt[*]
  - get rid of %s in alerts,alarms, etc
  - add MRTG-like graphs
- - HELO can be empty
  - add support for /,*,+,- in expressions
-
- - disabled triggers still send emails. Test on Zabbix.
+ - check triggers added for db and db-2
 
 Changes for 1.0beta5:
 
+ - host selection for availability report (Alexei)
  - more fixes to send_email() (Alexei)
  - fixed crash in case if MySQL server gone (support for signal PIPE) (Alexei)
  Thanks to Arturs.
