@@ -476,7 +476,7 @@ int	substitute_macros(char *exp)
 
 		sprintf(res,exp,value);
 		strncpy(exp,res, MAX_STRING_LEN);
-//		delete_spaces(exp);
+/*		delete_spaces(exp); */
 		zabbix_log( LOG_LEVEL_DEBUG, "Expression4:%s", exp );
 	}
 

@@ -33,7 +33,7 @@ int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 	int	lineno;
 	int	i,var;
 	int	*pointer;
-	char	*c;
+	char	**c;
 
 
 	file=fopen(cfg_file,"r");
@@ -65,7 +65,7 @@ int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 
 		parameter[value-line-1]=0;
 
-//		syslog( LOG_WARNING, "Parameter [%s] Value [%s]", parameter, value);
+/*		syslog( LOG_WARNING, "Parameter [%s] Value [%s]", parameter, value);*/
 
 		i=0;
 		while(cfg[i].parameter != 0)
@@ -92,11 +92,8 @@ int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 				else
 				{
 /* Can this be done without "c" ? */ 
-	/*				c=(char *)cfg[i].variable;
-					syslog( LOG_WARNING, "ZZZ [%d] [%s]", *c, *c);
-					*c=strdup(value);
-					syslog( LOG_WARNING, "ZZZ [%d] [%s]", c, *c);*/
-//					syslog( LOG_WARNING, "Parameter [%s] [%s]", parameter, *c);
+					c=(char *)cfg[i].variable;
+					*c=(char *)strdup(value);
 				}
 			}
 			i++;
