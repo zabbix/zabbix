@@ -18,7 +18,6 @@ the agent with a predefined API that can return values to suckerd.
 Not ready yet:
 
  - agent to send something back in case of timeout
- - change status of a host to UNREACHABLE in case of THREE network errors only
  - monitoring of services for different interfaces
  - get rid of false warning messages (like unable to insert ...)
 
