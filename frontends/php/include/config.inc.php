@@ -3214,7 +3214,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		if(isset($HTTP_GET_VARS["itemid"]))
 		{
-			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.snmp_port,i.units,i.multiplier from items i,hosts h where i.itemid=".$HTTP_GET_VARS["itemid"]." and h.hostid=i.hostid");
+			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.snmp_port,i.units,i.multiplier,h.hostid from items i,hosts h where i.itemid=".$HTTP_GET_VARS["itemid"]." and h.hostid=i.hostid");
 		
 			$description=DBget_field($result,0,0);
 			$key=DBget_field($result,0,1);
@@ -3231,6 +3231,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$snmp_port=DBget_field($result,0,12);
 			$units=DBget_field($result,0,13);
 			$multiplier=DBget_field($result,0,14);
+			$hostid=DBget_field($result,0,15);
 		}
 		else
 		{
@@ -3249,6 +3250,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$snmp_port=@iif(isset($HTTP_GET_VARS["snmp_port"]),$HTTP_GET_VARS["snmp_port"],161);
 			$units=@iif(isset($HTTP_GET_VARS["units"]),$HTTP_GET_VARS["units"],'');
 			$multiplier=@iif(isset($HTTP_GET_VARS["multiplier"]),$HTTP_GET_VARS["multiplier"],0);
+			$hostid=@iif(isset($HTTP_GET_VARS["hostid"]),$HTTP_GET_VARS["hostid"],0);
 		}
 
 		echo "<br>";
@@ -3275,7 +3277,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	        {
 	                $hostid_=DBget_field($result,$i,0);
 	                $host_=DBget_field($result,$i,1);
-			if($host==$host_)
+			if($hostid==$hostid_)
 			{
 	                	echo "<option value=\"$hostid_\" selected>$host_";
 			}
