@@ -4,8 +4,6 @@
  - get rid of .0000000 in alert messages
  - support for m,h and d in graphs and in latest values if monitored value in seconds
  - cannot use "." as key in trigger expressions
- - action to work in both cases (ON->OFF or OFF->ON). New macro, {RECOVERED}, ON->OFF='RECOVERED',
- OFF->ON - "" to be in default subject
  - navigation bar for all graphs and screens
 
 LATER:
