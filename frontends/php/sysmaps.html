@@ -1,0 +1,93 @@
+<?
+	include "include/config.inc";
+	$page["title"] = "System maps";
+	$page["file"] = "sysmaps.html";
+	show_header($page["title"],0);
+?>
+
+<?
+	show_table_header("CONFIGURATION OF SYSTEM MAPS");
+	echo "<br>";
+?>
+
+<?
+	if(isset($register))
+	{
+		if($register=="add")
+		{
+			add_sysmap($name,$width,$height);
+		}
+		if($register=="delete")
+		{
+			delete_sysmap($sysmapid);
+		}
+	}
+?>
+
+<?
+	show_table_header("SYSTEM MAPS");
+	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>Name</B></TD>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>Width</B></TD>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>Height</B></TD>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>Actions</B></TD>";
+	echo "</TR>";
+
+	$result=DBselect("select s.sysmapid,s.name,s.width,s.height from sysmaps s order by s.name");
+	echo "<CENTER>";
+	$col=0;
+	for($i=0;$i<DBnum_rows($result);$i++)
+	{
+		if($col==1)
+		{
+			echo "<TR BGCOLOR=#EEEEEE>";
+			$col=0;
+		} else
+		{
+			echo "<TR BGCOLOR=#DDDDDD>";
+			$col=1;
+		}
+	
+		$sysmapid=DBget_field($result,$i,0);
+		$name=DBget_field($result,$i,1);
+		$width=DBget_field($result,$i,2);
+		$height=DBget_field($result,$i,3);
+		echo "<TD><a href=\"sysmaps.html?sysmapid=$sysmapid\">$name</a></TD>";
+		echo "<TD>$width</TD>";
+		echo "<TD>$height</TD>";
+		echo "<TD><A HREF=\"sysmaps.html?register=delete&sysmapid=$sysmapid\">Delete</A></TD>";
+		echo "</TR>";
+	}
+	echo "</TABLE>";
+?>
+
+<?
+	echo "<br>";
+	show_table2_header_begin();
+	echo "New system map";
+
+	show_table2_v_delimiter();
+	echo "<form method=\"post\" action=\"sysmaps.html\">";
+	echo "Name";
+	show_table2_h_delimiter();
+	echo "<input name=\"name\" size=20>";
+
+	show_table2_v_delimiter();
+	echo "Width";
+	show_table2_h_delimiter();
+	echo "<input name=\"width\" size=5 value=\"800\">";
+
+	show_table2_v_delimiter();
+	echo "Height";
+	show_table2_h_delimiter();
+	echo "<input name=\"height\" size=5 value=\"600\">";
+
+	show_table2_v_delimiter2();
+	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+
+	show_table2_header_end();
+?>
+
+<?
+	show_footer();
+?>

@@ -414,6 +414,22 @@
 ?>
 			</font>
 		</td>
+		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
+			<font face="Arial,Helvetica" size=2>
+				<a href="sysmaps.html">
+<?
+				if(	($page["file"]=="sysmaps.html")||
+					($page["file"]=="<change>.html"))
+				{
+					echo "<b>[SYSTEM MAPS]</b></a>";
+				}
+				else
+				{
+					echo "SYSTEM MAPS</a>";
+				}
+?>
+			</font>
+		</td>
 		</tr>
 		</table>
 	</td>
@@ -643,6 +659,14 @@
 		$result=DBexecute($sql);
 	}
 
+	# Delete System Map
+
+	function	delete_sysmap( $sysmapid )
+	{
+		$sql="delete from sysmaps where sysmapid=$sysmapid";
+		$result=DBexecute($sql);
+	}
+
 	# Delete Action by userid
 
 	function	delete_actions_by_userid( $userid )
@@ -829,6 +853,14 @@
 				add_trigger($expression,$description,0,0,"");
 			}
 		}
+	}
+
+	# Add System Map
+
+	function	add_sysmap($name,$width,$height)
+	{
+		$sql="insert into sysmaps (name,width,height) values ('$name',$width,$height)";
+		$result=DBexecute($sql);
 	}
 
 	# Add Host definition

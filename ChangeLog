@@ -1,3 +1,8 @@
+Changes for 1.0alpha7:
+
+ - added file frontends/php/sysmaps.html
+ - added table sysmaps
+
 Changes for 1.0alpha6:
 
  - error in PHP frontend in Host definition form 
