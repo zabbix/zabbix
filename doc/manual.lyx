@@ -24,13 +24,13 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.11)
+Zabbix Reference Manual for version 1.0 (draft v1.12)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-19 March 2002
+14 April 2002
 \layout Abstract
 
 The document is Reference Manual for Zabbix version 1.0.
@@ -44,7 +44,7 @@ The document is Reference Manual for Zabbix version 1.0.
 
 \layout Section
 
-General Information About Zabbix
+General Information Zabbix
 \layout Subsection
 
 What is Zabbix
@@ -544,6 +544,9 @@ Requirements
 \layout Subsubsection
 
 Supported Platforms
+\layout Standard
+
+Zabbix is tested on the following platforms: 
 \layout Itemize
 
 Linux 2.xx
@@ -1048,18 +1051,6 @@ mkdir /home/zabbix/html
 cp -R frontends/php/* 
 \newline 
 /home/zabbix/html/
-\layout Enumerate
-
-Configure Apache
-\newline 
-By default, Apache does not recognize *.html files as PHP scripts.
- Add the following line to Apache configuration files to make Apache think
- that every *.html file is actually PHP script that should be interpreted:
-\newline 
-
-\family typewriter 
-\emph on 
-AddType application/x-httpd-php .html
 \layout Enumerate
 
 Configure 
@@ -4735,6 +4726,8 @@ diff
  
 \latex no_latex 
 1 - if last and previous values are different, 0 - otherwise
+\latex default 
+.
 \layout Description
 
 
@@ -4744,6 +4737,13 @@ prev
  
 \latex no_latex 
 previous value, parameter is ignored
+\layout Standard
+
+Note that all above functions (except 
+\series bold 
+diff
+\series default 
+) cannot be used for non-numeric parameters!
 \layout Standard
 
 
@@ -5464,6 +5464,66 @@ heck_port[80]
 \emph default 
 \latex no_latex 
  to check either WEB server accepts connections.
+\layout Description
+
+version[zabbix_agent] Returns version of zabbix_agent(d) running on the
+ server
+\layout Standard
+
+
+\latex no_latex 
+Result:
+\latex default 
+string value.
+ 
+\layout Standard
+
+
+\latex no_latex 
+Example
+\latex default 
+ of returned value: 1.0beta3
+\layout Description
+
+system[hostname] Returns host name.
+\layout Standard
+
+
+\latex no_latex 
+Result:
+\latex default 
+string value.
+ 
+\layout Standard
+
+
+\latex no_latex 
+Example
+\latex default 
+ of returned value: 
+\emph on 
+www.sf.net
+\layout Description
+
+system[uname] Returns detailed host information.
+\layout Standard
+
+
+\latex no_latex 
+Result:
+\latex default 
+string value.
+ 
+\layout Standard
+
+
+\latex no_latex 
+Example
+\latex default 
+ of returned value: 
+\emph on 
+FreeBSD localhost 4.4-RELEASE FreeBSD 4.4-RELEASE #0: Tue Sep 18 11:57:08
+ PDT 2001 murray@builder.FreeBSD.org:/usr/src/sys/compile/GENERIC i386
 \layout Subsection
 
 Supported Parameters by Platform
