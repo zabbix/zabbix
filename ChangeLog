@@ -1,3 +1,7 @@
+Changes for 1.0beta12:
+
+ - fixed PostgreSQL schema (Alexei)
+
 Changes for 1.0beta11:
 
  - added support for user groups (Alexei)
