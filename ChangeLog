@@ -1,5 +1,6 @@
 Changes for 1.0beta11:
 
+ - period in graphs. Thanks to Igor Micko. (Alexei)
  - date in graphs (Alexei)
  - no refresh for charts.php if period is set (Alexei)
  - new navigation for charts.php. Thanks to Igor Micko. (Alexei)
