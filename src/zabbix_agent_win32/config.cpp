@@ -303,6 +303,10 @@ BOOL ReadConfig(void)
                       sourceLine,tm);
          }
       }
+      else if (!stricmp(buffer,"LogLevel"))
+      {
+         g_dwLogLevel = strtoul(buffer, NULL, 0);
+      }
       else if (!stricmp(buffer,"PerfCounter"))
       {
          if (!AddPerformanceCounter(ptr))

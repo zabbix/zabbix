@@ -135,6 +135,9 @@ void WriteLog(DWORD msg,WORD wType,char *format...)
    int numStrings=0;
    DWORD error;
 
+   if (!((DWORD)wType & g_dwLogLevel))
+      return;
+
    memset(strings,0,sizeof(char *)*16);
 
    if (format!=NULL)

@@ -1,5 +1,5 @@
 
-                     ZabbixW32 version 1.0.0-beta15
+                     ZabbixW32 version 1.0.1
 
 ******************************************************************************
 
@@ -80,6 +80,14 @@ LogFile = <path>
   Sets the agent's log file. If this parameter is omitted, Event Log will
   be used. You can also specify Event Log as a target for logging implicitly
   by setting <path> to "{EventLog}" (without quotes).
+
+LogLevel = <mask>
+  Sets log level. It's an or'ed value of the following flags:
+    0x01 - Log critical messages
+    0x02 - Log warning messages
+    0x04 - Log informational messages
+  Default value is 0x07, which means "log all messages". Value can be either
+  in decimal or hexadecimal form.
 
 Timeout = <number>
   Sets the request processing timeout (in seconds). If server request will
