@@ -64,14 +64,8 @@
 
 <?php
 	show_table_header("SCREENS");
-	echo "<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
-	echo "<TR BGCOLOR=\"#CCCCCC\">";
-	echo "<TD WIDTH=5% NOSAVE><B>".S_ID."</B></TD>";
-	echo "<TD><B>".S_NAME."</B></TD>";
-	echo "<TD WIDTH=5% NOSAVE><B>".S_COLUMNS."</B></TD>";
-	echo "<TD WIDTH=5% NOSAVE><B>".S_ROWS."</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>".S_ACTIONS."</B></TD>";
-	echo "</TR>";
+	table_begin();
+	table_header(array(S_ID,S_NAME,S_COLUMNS,S_ROWS,S_ACTIONS));
 
 	$result=DBselect("select screenid,name,cols,rows from screens order by name");
 	$col=0;
@@ -81,15 +75,13 @@
 		{
 			continue;
 		}
-		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
-		else		{ echo "<TR BGCOLOR=#DDDDDD>"; }
-	
-		echo "<TD>".$row["screenid"]."</TD>";
-		echo "<TD><a href=\"screenedit.php?screenid=".$row["screenid"]."\">".$row["name"]."</a></TD>";
-		echo "<TD>".$row["cols"]."</TD>";
-		echo "<TD>".$row["rows"]."</TD>";
-		echo "<TD><A HREF=\"screenconf.php?screenid=".$row["screenid"]."#form\">".S_CHANGE."</A></TD>";
-		echo "</TR>";
+		table_row(array(
+			$row["screenid"],
+			"<a href=\"screenedit.php?screenid=".$row["screenid"]."\">".$row["name"]."</a>",
+			$row["cols"],
+			$row["rows"],
+			"<A HREF=\"screenconf.php?screenid=".$row["screenid"]."#form\">".S_CHANGE."</A>"
+			),$col++);
 	}
 	if(DBnum_rows($result)==0)
 	{
@@ -97,7 +89,7 @@
 			echo "<TD COLSPAN=5 ALIGN=CENTER>".S_NO_SCREENS_DEFINED."</TD>";
 			echo "<TR>";
 	}
-	echo "</TABLE>";
+	table_end();
 ?>
 
 <?php
