@@ -124,7 +124,8 @@ int housekeeping_history_and_trends(int now)
 	int		i;
 
 /* How lastdelete is used ??? */
-	snprintf(sql,sizeof(sql)-1,"select itemid,lastdelete,history,delay,trends from items where lastdelete<=%d", now);
+/*	snprintf(sql,sizeof(sql)-1,"select itemid,lastdelete,history,delay,trends from items where lastdelete<=%d", now);*/
+	snprintf(sql,sizeof(sql)-1,"select itemid,history,delay,trends from items");
 #ifdef ZABBIX_THREADS
 	result = DBselect_thread(database, sql);
 #else
@@ -134,10 +135,9 @@ int housekeeping_history_and_trends(int now)
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 		item.itemid=atoi(DBget_field(result,i,0));
-		item.lastdelete=atoi(DBget_field(result,i,1));
-		item.history=atoi(DBget_field(result,i,2));
-		item.delay=atoi(DBget_field(result,i,3));
-		item.trends=atoi(DBget_field(result,i,4));
+		item.history=atoi(DBget_field(result,i,1));
+		item.delay=atoi(DBget_field(result,i,2));
+		item.trends=atoi(DBget_field(result,i,3));
 
 		if(item.delay==0)
 		{
@@ -179,12 +179,13 @@ int housekeeping_history_and_trends(int now)
 #else
 		DBexecute(sql);
 #endif
-		snprintf(sql,sizeof(sql)-1,"update items set lastdelete=%d where itemid=%d",now,item.itemid);
+/*		snprintf(sql,sizeof(sql)-1,"update items set lastdelete=%d where itemid=%d",now,item.itemid);
 #ifdef ZABBIX_THREADS
 		DBexecute_thread(database,sql);
 #else
 		DBexecute(sql);
 #endif
+*/
 	}
 	DBfree_result(result);
 	return SUCCEED;
