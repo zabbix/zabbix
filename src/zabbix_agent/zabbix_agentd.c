@@ -39,8 +39,9 @@
 
 static	pid_t	*pids;
 
-char	*config_host_allowed=NULL;
-int	config_agentd_forks=AGENTD_FORKS;
+char	*CONFIG_HOST_ALLOWED=NULL;
+int	CONFIG_AGENTD_FORKS=AGENTD_FORKS;
+int	CONFIG_LISTEN_PORT=10000;
 
 void	signal_handler( int sig )
 {
@@ -139,9 +140,11 @@ void	process_config_file(void)
 		exit(1);
 	}
 
-	lineno=1;
+	lineno=0;
 	while(fgets(line,1024,file) != NULL)
 	{
+		lineno++;
+
 		if(line[0]=='#')	continue;
 		if(strlen(line)==1)	continue;
 
@@ -164,7 +167,7 @@ void	process_config_file(void)
 
 		if(strcmp(parameter,"Server")==0)
 		{
-			config_host_allowed=strdup(value);
+			CONFIG_HOST_ALLOWED=strdup(value);
 		}
 		else if(strcmp(parameter,"StartAgents")==0)
 		{
@@ -175,7 +178,18 @@ void	process_config_file(void)
 				fclose(file);
 				exit(1);
 			}
-			config_agentd_forks=i;
+			CONFIG_AGENTD_FORKS=i;
+		}
+		else if(strcmp(parameter,"ListenPort")==0)
+		{
+			i=atoi(value);
+			if( (i<=1024) || (i>32767) )
+			{
+				syslog( LOG_CRIT, "Wrong value of ListenPort in line %d. Should be between 1024 and 32767.", lineno);
+				fclose(file);
+				exit(1);
+			}
+			CONFIG_LISTEN_PORT=i;
 		}
 		else if(strcmp(parameter,"DebugLevel")==0)
 		{
@@ -219,7 +233,6 @@ void	process_config_file(void)
 			exit(1);
 		}
 
-		lineno++;
 	}
 	fclose(file);
 }
@@ -236,9 +249,9 @@ int	check_security(int sockfd)
 
 		sname=inet_ntoa(name.sin_addr);
 
-		if(strcmp(sname, config_host_allowed)!=0)
+		if(strcmp(sname, CONFIG_HOST_ALLOWED)!=0)
 		{
-			syslog( LOG_WARNING, "Connection from [%s] rejected. Allowed server is [%s] ",sname, config_host_allowed);
+			syslog( LOG_WARNING, "Connection from [%s] rejected. Allowed server is [%s] ",sname, CONFIG_HOST_ALLOWED);
 			return	FAIL;
 		}
 	}
@@ -291,7 +304,7 @@ void	process_child(int sockfd)
 	alarm(0);
 }
 
-int	tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
+int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 {
 	int			sockfd;
 	struct sockaddr_in	serv_addr;
@@ -305,11 +318,11 @@ int	tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
 	bzero((char *) &serv_addr, sizeof(serv_addr));
 	serv_addr.sin_family      = AF_INET;
 	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	serv_addr.sin_port        = htons(10000);
+	serv_addr.sin_port        = htons(port);
 
 	if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 	{
-		syslog( LOG_CRIT, "Cannot bind to port %d. Another zabbix_agentd already running ?",10000);
+		syslog( LOG_CRIT, "Cannot bind to port %d. Another zabbix_agentd already running ?", port);
 		exit(1);
 	}
 
@@ -369,7 +382,6 @@ int	main()
 	int		i;
 
 	char		host[128];
-	char		*port="10000";
 
         static struct  sigaction phan;
 
@@ -392,11 +404,11 @@ int	main()
 		exit(FAIL);
 	}
 
-	listenfd = tcp_listen(host,port,&addrlen);
+	listenfd = tcp_listen(host,CONFIG_LISTEN_PORT,&addrlen);
 
-	pids = calloc(config_agentd_forks, sizeof(pid_t));
+	pids = calloc(CONFIG_AGENTD_FORKS, sizeof(pid_t));
 
-	for(i = 0; i<config_agentd_forks; i++)
+	for(i = 0; i<CONFIG_AGENTD_FORKS; i++)
 	{
 		pids[i] = child_make(i, listenfd, addrlen);
 /*		syslog( LOG_WARNING, "zabbix_agentd #%d started", pids[i]);*/
