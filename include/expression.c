@@ -369,10 +369,10 @@ int	substitute_macros(char *exp)
 	char	key[MAX_STRING_LEN+1];
 	char	function[MAX_STRING_LEN+1];
 	char	parameter[MAX_STRING_LEN+1];
+	char	value[MAX_STRING_LEN+1];
 	int	i,j;
 	int	r,l;
 	int	r1,l1;
-	char	*value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "BEGIN substitute_macros" );
 
@@ -448,7 +448,9 @@ int	substitute_macros(char *exp)
 
 		zabbix_log( LOG_LEVEL_DEBUG, "Parameter:%s", parameter );
 
-		get_lastvalue(&value,host,key,function,parameter);
+		zabbix_log( LOG_LEVEL_DEBUG, "Before get_lastvalue()" );
+		i=get_lastvalue(value,host,key,function,parameter);
+		zabbix_log( LOG_LEVEL_DEBUG, "After get_lastvalue(%d)", i );
 
 		exp[l]='%';
 		exp[l+1]='s';
@@ -478,7 +480,6 @@ int	substitute_macros(char *exp)
 		strncpy(exp,res, MAX_STRING_LEN);
 /*		delete_spaces(exp); */
 		zabbix_log( LOG_LEVEL_DEBUG, "Expression4:%s", exp );
-		free(value);
 	}
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Result expression:%s", exp );

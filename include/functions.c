@@ -25,7 +25,7 @@
 /*
  * Evaluate function MIN
  */ 
-int	evaluate_MIN(char **value,DB_ITEM	*item,int parameter)
+int	evaluate_MIN(char *value,DB_ITEM	*item,int parameter)
 {
 	DB_RESULT	*result;
 
@@ -59,7 +59,8 @@ int	evaluate_MIN(char **value,DB_ITEM	*item,int parameter)
 		return	FAIL;
 	}
 
-	*value=strdup(field);
+/*	*value=strdup(field);*/
+	strncpy(value,field,MAX_STRING_LEN);
 
 	DBfree_result(result);
 
@@ -69,7 +70,7 @@ int	evaluate_MIN(char **value,DB_ITEM	*item,int parameter)
 /*
  * Evaluate function MAX
  */ 
-int	evaluate_MAX(char **value,DB_ITEM *item,int parameter)
+int	evaluate_MAX(char *value,DB_ITEM *item,int parameter)
 {
 	DB_RESULT	*result;
 
@@ -103,7 +104,8 @@ int	evaluate_MAX(char **value,DB_ITEM *item,int parameter)
 		return	FAIL;
 	}
 	
-	*value=strdup(field);
+/*	*value=strdup(field);*/
+	strncpy(value,field,MAX_STRING_LEN);
 
 	DBfree_result(result);
 
@@ -113,7 +115,7 @@ int	evaluate_MAX(char **value,DB_ITEM *item,int parameter)
 /*
  * Evaluate function (min,max,prev,last,diff)
  */ 
-int	evaluate_FUNCTION(char **value,DB_ITEM *item,char *function,int parameter)
+int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,int parameter)
 {
 	int	ret  = SUCCEED;
 
@@ -129,12 +131,17 @@ int	evaluate_FUNCTION(char **value,DB_ITEM *item,char *function,int parameter)
 		{
 			if(item->value_type==0)
 			{
-				*value=(char *)malloc(MAX_STRING_LEN+1);
-				sprintf(*value,"%f",item->lastvalue);
+/*				*value=(char *)malloc(MAX_STRING_LEN+1);*/
+			zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 1");
+				sprintf(value,"%f",item->lastvalue);
+			zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 2");
 			}
 			else
 			{
-				*value=strdup(item->lastvalue_str);
+/*				*value=strdup(item->lastvalue_str);*/
+			zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 3");
+				strncpy(value,item->lastvalue_str,MAX_STRING_LEN);
+			zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 4");
 			}
 		}
 	}
@@ -148,12 +155,13 @@ int	evaluate_FUNCTION(char **value,DB_ITEM *item,char *function,int parameter)
 		{
 			if(item->value_type==0)
 			{
-				*value=(char *)malloc(MAX_STRING_LEN+1);
-				sprintf(*value,"%f",item->prevvalue);
+/*				*value=(char *)malloc(MAX_STRING_LEN+1);*/
+				sprintf(value,"%f",item->prevvalue);
 			}
 			else
 			{
-				*value=strdup(item->prevvalue_str);
+/*				*value=strdup(item->prevvalue_str);*/
+				strncpy(value,item->lastvalue_str,MAX_STRING_LEN);
 			}
 		}
 	}
@@ -177,22 +185,26 @@ int	evaluate_FUNCTION(char **value,DB_ITEM *item,char *function,int parameter)
 			{
 				if(cmp_double(item->lastvalue, item->prevvalue) == 0)
 				{
-					*value=strdup("0");
+//					*value=strdup("0");
+					strcpy(value,"0");
 				}
 				else
 				{
-					*value=strdup("1");
+//					*value=strdup("1");
+					strcpy(value,"1");
 				}
 			}
 			else
 			{
 				if(strcmp(item->lastvalue_str, item->prevvalue_str) == 0)
 				{
-					*value=strdup("0");
+/*					*value=strdup("0");*/
+					strcpy(value,"0");
 				}
 				else
 				{
-					*value=strdup("1");
+/*					*value=strdup("1");*/
+					strcpy(value,"1");
 				}
 			}
 		}
@@ -214,7 +226,7 @@ void	update_functions(DB_ITEM *item)
 	DB_FUNCTION	function;
 	DB_RESULT	*result;
 	char		sql[MAX_STRING_LEN+1];
-	char		*value;
+	char		value[MAX_STRING_LEN+1];
 	int		ret=SUCCEED;
 	int		i,rows;
 
@@ -238,7 +250,7 @@ void	update_functions(DB_ITEM *item)
 
 		zabbix_log( LOG_LEVEL_DEBUG, "ItemId:%d Evaluating %s(%d)\n",function.itemid,function.function,function.parameter);
 
-		ret = evaluate_FUNCTION(&value,item,function.function,function.parameter);
+		ret = evaluate_FUNCTION(value,item,function.function,function.parameter);
 		if( FAIL == ret)	
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "Evaluation failed for function:%s\n",function.function);
@@ -250,7 +262,6 @@ void	update_functions(DB_ITEM *item)
 			sprintf(sql,"update functions set lastvalue='%s' where itemid=%d and function='%s' and parameter=%d", value, function.itemid, function.function, function.parameter );
 			DBexecute(sql);
 		}
-		free(value);
 	}
 
 	DBfree_result(result);
@@ -672,7 +683,7 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 	DBfree_result(result);
 }
 
-int	get_lastvalue(char **value,char *host,char *key,char *function,char *parameter)
+int	get_lastvalue(char *value,char *host,char *key,char *function,char *parameter)
 {
 	DB_ITEM	item;
 	DB_RESULT *result;
@@ -697,7 +708,9 @@ int	get_lastvalue(char **value,char *host,char *key,char *function,char *paramet
         DBfree_result(result);
 
 	parm=atoi(parameter);
+	zabbix_log(LOG_LEVEL_DEBUG, "Before evaluate_FUNCTION()" );
 	evaluate_FUNCTION(value,&item,function,parm);
+	zabbix_log(LOG_LEVEL_DEBUG, "After evaluate_FUNCTION()" );
 
         return SUCCEED;
 }
