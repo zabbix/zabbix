@@ -1064,7 +1064,7 @@ void	DBvacuum(void)
 #ifdef	HAVE_PGSQL
 	char *table_for_housekeeping[]={"services", "services_links", "graphs_items", "graphs", "sysmaps_links",
 			"sysmaps_hosts", "sysmaps", "config", "groups", "hosts_groups", "alerts",
-			"actions", "alarms", "functions", "history", "history_str", "hosts",
+			"actions", "alarms", "functions", "history", "history_str", "hosts", "trends",
 			"items", "media", "media_type", "triggers", "trigger_depends", "users",
 			"sessions", "rights", "service_alarms", "profiles", "screens", "screens_items",
 			"stats",
