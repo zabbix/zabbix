@@ -498,8 +498,8 @@
 		
 			$maxX=900;
 			$minX=0;
-			$maxY=max($max);
-			$minY=min($min);
+			$maxY=@iif(count($max)>0,max($max),0);
+			$minY=@iif(count($min)>0,min($min),0);
 			$minY=0;
 //			$maxY=30000;
 		#	echo "MIN/MAX:",$minX," - ",$maxX," - ",$minY," - ",$maxY,"<Br>";
