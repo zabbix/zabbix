@@ -134,17 +134,34 @@ void	process_child(int sockfd)
 	char	result[1024];
 	double	res;
 
+        static struct  sigaction phan;
+
+	phan.sa_handler = &signal_handler; /* set up sig handler using sigaction() */
+	sigemptyset(&phan.sa_mask);  /* just block alarm signal */
+	phan.sa_flags = 0;
+	sigaction(SIGALRM, &phan, NULL);
+
 //	for(;;)
 	{
 		alarm(AGENT_TIMEOUT);
 //
 
 
-		if( (nread = read(sockfd, line, 1024)) == 0)
+		syslog( LOG_DEBUG, "Before read()");
+		if( (nread = read(sockfd, line, 1024)) < 0)
 		{
-			syslog( LOG_DEBUG, "read() faied. Timeout ?\n");
+			if(errno == EINTR)
+			{
+				syslog( LOG_DEBUG, "read() failed. Timeout.");
+			}
+			else
+			{
+				syslog( LOG_DEBUG, "read() failed.");
+			}
+			syslog( LOG_DEBUG, "After read() 1");
 			return;
 		}
+		syslog( LOG_DEBUG, "After read() 2");
 
 		alarm(0);
 
@@ -295,7 +312,7 @@ int	main()
 	char		host[128];
 	char		*port="10000";
 
-        struct  sigaction phan;
+        static struct  sigaction phan;
 
 	daemon_init();
 
@@ -303,7 +320,11 @@ int	main()
 	sigemptyset(&phan.sa_mask);  /* just block alarm signal */
 	phan.sa_flags = 0;
 //	phan.sa_flags = SA_RESTART;
-	sigaction(SIGALRM, &phan, NULL);
+//	phan.sa_flags = SA_ONESHOT;
+	sigaction(SIGINT, &phan, NULL);
+	sigaction(SIGQUIT, &phan, NULL);
+	sigaction(SIGTERM, &phan, NULL);
+
 
 	init_security();
 

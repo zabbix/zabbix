@@ -1,11 +1,10 @@
 Changes for 1.0alpha12:
 
+ - more changes in timeout handling (Alexei)
  - changes in doc/manual.lyx (Alexei)
-
  - doc/manual.lyx created (Alexei)
  - no SA_RESTART flag for sigaction() (Alexei)
  - signal() was changed to sigaction() (Alexei)
- - more changes in timeout handling (Alexei)
  - changes in timeout handling (Alexei)
  - added support for cksum[*], "*" can be any filename (Alexei)
  - cksum[] does not call external program "cksum" anymore (Alexei)
