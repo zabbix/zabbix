@@ -206,8 +206,8 @@
 		}
 		if($algorithm == SERVICE_ALGORITHM_MAX)
 		{
-			echo "<OPTION VALUE='1'>Do not calculate";
-			echo "<OPTION VALUE='0' SELECTED>MAX";
+			echo "<OPTION VALUE='0'>Do not calculate";
+			echo "<OPTION VALUE='1' SELECTED>MAX";
 		}
 	}
 	else
