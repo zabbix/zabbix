@@ -1,5 +1,6 @@
 Changes for 1.0beta1:
 
+ - modified SQL statement in tr_status.html. Thanks to Oliver Siegmar. (Alexei) 
  - added support of audible notification (Alexei)
  - select criteria in form "Status of Triggers". Thanks to Lauris
 Stiglics. (Alexei)
