@@ -478,14 +478,15 @@
 		{
 			if($row["status"] != HOST_STATUS_DELETED)
 			{
-				if(isset($_GET["groupid"]))
+					$actions="<A HREF=\"hosts.php?register=change&hostid=".$row["hostid"].url_param("groupid").url_param("config")."#form\">".S_CHANGE."</A>";
+/*				if(isset($_GET["groupid"]))
 				{
 					$actions="<A HREF=\"hosts.php?register=change&config=".$_GET["config"]."&hostid=".$row["hostid"]."&groupid=".$_GET["groupid"]."#form\">".S_CHANGE."</A>";
 				}
 				else
 				{
 					$actions="<A HREF=\"hosts.php?register=change&config=".$_GET["config"]."&hostid=".$row["hostid"]."#form\">".S_CHANGE."</A>";
-				}
+				}*/
 			}
 			else
 			{
