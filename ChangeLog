@@ -1,5 +1,6 @@
 Changes for 1.0beta7:
 
+ - fixed coredump in get_lstvalue(). Thanks to Rickard Plars. (Alexei)
  - delay renamed to "Update interval (in sec)" in item definition form
  (Alexei)
  - create/mysql/schema.sql will create tables with type=InnoDB by default
