@@ -183,8 +183,8 @@
 
 		$day=24;
 // $a already defined
-//		$a=array("1h"=>1,"2h"=>2,"4h"=>4,"8h"=>8,"12h"=>12,
-//			"24h"=>24,"week"=>7*24,"month"=>31*24,"year"=>365*24);
+		$a=array("1h"=>1,"2h"=>2,"4h"=>4,"8h"=>8,"12h"=>12,
+			"24h"=>24,"week"=>7*24,"month"=>31*24,"year"=>365*24);
 		foreach($a as $label=>$hours)
 		{
 			echo "[";
@@ -214,8 +214,8 @@
 
 		$day=24;
 // $a already defined
-//		$a=array("1h"=>1,"2h"=>2,"4h"=>4,"8h"=>8,"12h"=>12,
-//			"24h"=>24,"week"=>7*24,"month"=>31*24,"year"=>365*24);
+		$a=array("1h"=>1,"2h"=>2,"4h"=>4,"8h"=>8,"12h"=>12,
+			"24h"=>24,"week"=>7*24,"month"=>31*24,"year"=>365*24);
 		foreach($a as $label=>$hours)
 		{
 			echo "[";

@@ -1,5 +1,6 @@
 Changes for 1.1alpha3:
 
+ - fixed time navigation for user-defined graphs (Alexei)
  - added link to ZABBIX manual from all forms (Alexei)
  - icmppingsec to return '0' if cannot ping (Alexei)
  - added error reason for unsupported items (Alexei)
