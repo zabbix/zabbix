@@ -143,7 +143,7 @@
 		}
 		if($row["showsla"]==1)
 		{
-			echo "<td><img src=\"chart_sla.php?serviceid=".$row["serviceid"]."\"></td>";
+			echo "<td><a href=\"report3.php?serviceid=".$row["serviceid"]."&year=".date("Y")."\"><img src=\"chart_sla.php?serviceid=".$row["serviceid"]."\" border=0></td>";
 		}
 		else
 		{
