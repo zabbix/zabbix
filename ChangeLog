@@ -1,5 +1,6 @@
 Changes for 1.1alpha5:
 
+ - keep host selection when adding/deleting/updating item (Alexei)
  - fix for complation of the agent under Solaris (Alexei)
  - do not use hardcoded port 161 when adding from template (Alexei)
  - changed logic update host.available instead of host.status (Alexei)
