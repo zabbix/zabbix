@@ -1,5 +1,6 @@
 Changes for 1.0beta8:
 
+ - Fixed "STATUS OF ZABBIX". Command was changed to 'ps aux' (Alexei)
  - personalisation (remember default port number for hosts) (Alexei)
  - added table 'profiles' (Alexei)
  - assured uniqueness of host names (Alexei)
