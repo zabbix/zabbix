@@ -37,7 +37,6 @@ int	evaluate_MIN(float *min,int itemid,int parameter)
 	now=time(NULL);
 
 	sprintf(c,"select min(value) from history where clock>%d and itemid=%d",now-parameter,itemid);
-	syslog(LOG_WARNING, "SQL:%s", c );
 
 	result = DBselect(c);
 	if((result==NULL)||(DBnum_rows(result)==0))
@@ -106,6 +105,8 @@ int	evaluate_FUNCTION(float *value,DB_ITEM *item,char *function,int parameter)
 {
 	int	ret  = SUCCEED;
 
+	syslog( LOG_DEBUG, "Function [%s]\n",function);
+
 	if(strcmp(function,"last")==0)
 	{
 		if(item->lastvalue_null==1)
@@ -156,7 +157,7 @@ int	evaluate_FUNCTION(float *value,DB_ITEM *item,char *function,int parameter)
 	}
 	else
 	{
-		syslog( LOG_WARNING, "Unknown function:%s\n",function);
+		syslog( LOG_WARNING, "Unsupported function:%s",function);
 		ret = FAIL;
 	}
 	return ret;
@@ -184,7 +185,6 @@ void	update_functions(DB_ITEM *item)
 		syslog( LOG_NOTICE, "No functions to update.");
 		DBfree_result(result);
 		return;
-		/*continue;*/
 	}
 
 	for(i=0;i<rows;i++)
@@ -198,7 +198,7 @@ void	update_functions(DB_ITEM *item)
 		ret = evaluate_FUNCTION(&value,item,function.function,function.parameter);
 		if( FAIL == ret)	
 		{
-			syslog( LOG_WARNING, "Evaluation failed for function:%s\n",function.function);
+			syslog( LOG_DEBUG, "Evaluation failed for function:%s\n",function.function);
 			continue;
 		}
 		syslog( LOG_DEBUG, "Result:%f\n",value);
@@ -644,7 +644,6 @@ int	process_data(char *server,char *key, double value)
 	DB_ITEM	item;
 	char	*s;
 
-/*	sprintf(sql,"select i.itemid,i.lastvalue from items i,hosts h where h.status=0 and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=2;",server,key);*/
 	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue from items i,hosts h where h.status=0 and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=2", server, key);
 	result = DBselect(sql);
 
@@ -726,7 +725,7 @@ void	process_new_value(DB_ITEM *item,double value)
 		sprintf(c,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue=%f,lastclock=%d where itemid=%d",now+item->delay,value,now,item->itemid);
 		item->prevvalue=item->lastvalue;
 		item->lastvalue=value;
-		item->prevvalue_null=0;
+		item->prevvalue_null=item->lastvalue_null;
 		item->lastvalue_null=0;
 	}
 	else

@@ -55,8 +55,8 @@ insert into items_template (itemtemplateid,description,key_,delay)
 	values (17,'Number of users connected','system[users]', 30);
 --insert into items_template (itemtemplateid,description,key_,delay)
 --	values (18,'Number of established TCP connections','tcp_count', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (19,'Checksum of /etc/inetd.conf','cksum[/etc/inetd_conf]', 600);
+--insert into items_template (itemtemplateid,description,key_,delay)
+--	values (19,'Checksum of /etc/inetd.conf','cksum[/etc/inetd_conf]', 600);
 insert into items_template (itemtemplateid,description,key_,delay)
 	values (20,'Checksum of /vmlinuz','cksum[/vmlinuz]', 600);
 insert into items_template (itemtemplateid,description,key_,delay)
@@ -176,8 +176,8 @@ insert into triggers_template (triggertemplateid,itemtemplateid,description,expr
 	values (17,17,'Too may users connected on server %s','{:.last(0)}>50');
 --insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 --	values (18,18,'Too may established TCP connections on server %s','{:.last(0)}>500');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (19,19,'/etc/inetd.conf has been changed on server %s','{:.diff(0)}>0');
+--insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+--	values (19,19,'/etc/inetd.conf has been changed on server %s','{:.diff(0)}>0');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (20,20,'/vmlinuz has been changed on server %s','{:.diff(0)}>0');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
