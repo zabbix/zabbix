@@ -37,6 +37,8 @@ snmpget -On localhost public enterprises.ucdavis.memory.memTotalSwap.0]
 
 Changes for 1.0beta4:
 
+ - advanced change of host status in zabbix_suckerd (Alexei)
+
  - added support of UserParameter(s) returning non-numeric values (Alexei) 
  - doc/manual.lyx will not be included in Zabbix release (Alexei)
  - chnages to make Zabbix compile in non-GCC environments (Alexei)
