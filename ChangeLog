@@ -28,7 +28,7 @@ Not ready yet:
 
  OTHER:
 
- - add "connection reset by peer"
+ - add table sessions to patches for beta4?
  - check for function parameters in evaluate_simple_expression
  - make links different if something is already registered (as for medias,
    actions, etc)
