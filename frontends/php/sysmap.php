@@ -114,105 +114,56 @@
 	echo "</TABLE>";
 
 	show_table_header("DISPLAYED HOSTS");
-	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
-	echo "<TR BGCOLOR=\"#CCCCCC\">";
-	echo "<TD WIDTH=10% NOSAVE><B>Host</B></TD>";
-	echo "<TD><B>Label</B></TD>";
-	echo "<TD WIDTH=5% NOSAVE><B>X</B></TD>";
-	echo "<TD WIDTH=5% NOSAVE><B>Y</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>Icon</B></TD>";
-	echo "<TD WIDTH=15% NOSAVE><B>Actions</B></TD>";
-	echo "</TR>";
+	table_begin();
+	table_header(array(S_HOST,S_LABEL,S_X,S_Y,S_ICON,S_ACTIONS));
 
 	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,sh.icon from sysmaps_hosts sh,hosts h where sh.sysmapid=".$_GET["sysmapid"]." and h.hostid=sh.hostid order by h.host");
 	$col=0;
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
 	{
-		if($col==1)
-		{
-			echo "<TR BGCOLOR=#EEEEEE>";
-			$col=0;
-		} else
-		{
-			echo "<TR BGCOLOR=#DDDDDD>";
-			$col=1;
-		}
-	
-		$host=DBget_field($result,$i,0);
-		$shostid_=DBget_field($result,$i,1);
-		$sysmapid_=DBget_field($result,$i,2);
-		$hostid_=DBget_field($result,$i,3);
-		$label_=DBget_field($result,$i,4);
-		$x_=DBget_field($result,$i,5);
-		$y_=DBget_field($result,$i,6);
-		$icon_=DBget_field($result,$i,7);
-
-		echo "<TD>$host</TD>";
-		echo "<TD>$label_</TD>";
-		echo "<TD>$x_</TD>";
-		echo "<TD>$y_</TD>";
-		echo "<TD>".nbsp($icon_)."</TD>";
-		echo "<TD><A HREF=\"sysmap.php?sysmapid=$sysmapid_&shostid=$shostid_#form\">Change</A> - <A HREF=\"sysmap.php?register=delete&sysmapid=$sysmapid_&shostid=$shostid_\">Delete</A></TD>";
-		echo "</TR>";
+		table_row(array(
+			$row["host"],
+			$row["label"],
+			$row["x"],
+			$row["y"],
+			nbsp($row["icon"]),
+			"<A HREF=\"sysmap.php?sysmapid=".$row["sysmapid"]."&shostid=".$row["shostid"]."#form\">Change</A> - <A HREF=\"sysmap.php?register=delete&sysmapid=".$row["sysmapid"]."&shostid=".$row["shostid"]."\">Delete</A>"
+			),$col++);
 	}
-	echo "</TABLE>";
+	table_end();
 ?>
 
 <?php
 	show_table_header("CONNECTORS");
-	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
-	echo "<TR BGCOLOR=\"#CCCCCC\">";
-	echo "<TD WIDTH=10% NOSAVE><B>Host 1</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>Host 2</B></TD>";
-	echo "<TD><B>Link status indicator</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
-	echo "</TR>";
+	table_begin();
+	table_header(array(S_HOST_1,S_HOST_2,S_LINK_STATUS_INDICATOR,S_ACTIONS));
 
 	$result=DBselect("select linkid,shostid1,shostid2,triggerid from sysmaps_links where sysmapid=".$_GET["sysmapid"]." order by linkid");
 	$col=0;
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
 	{
-		if($col==1)
-		{
-			echo "<TR BGCOLOR=#EEEEEE>";
-			$col=0;
-		} else
-		{
-			echo "<TR BGCOLOR=#DDDDDD>";
-			$col=1;
-		}
-	
-		$linkid=DBget_field($result,$i,0);
-		$shostid1=DBget_field($result,$i,1);
-		$shostid2=DBget_field($result,$i,2);
-		$triggerid=DBget_field($result,$i,3);
-
-		$result1=DBselect("select label from sysmaps_hosts where shostid=$shostid1");
+		$result1=DBselect("select label from sysmaps_hosts where shostid=".$row["shostid1"]);
 		$label1=DBget_field($result1,0,0);
-		$result1=DBselect("select label from sysmaps_hosts where shostid=$shostid2");
+		$result1=DBselect("select label from sysmaps_hosts where shostid=".$row["shostid2"]);
 		$label2=DBget_field($result1,0,0);
 
-		if(isset($triggerid))
+		if(isset($row["triggerid"]))
 		{
-//			$trigger=get_trigger_by_triggerid($triggerid);
-//			$description=$trigger["description"];
-//			if( strstr($description,"%s"))
-//			{
-				$description=expand_trigger_description($triggerid);
-//			}
+			$description=expand_trigger_description($row["triggerid"]);
 		}
 		else
 		{
 			$description="-";
 		}
 
-		echo "<TD>$label1</TD>";
-		echo "<TD>$label2</TD>";
-		echo "<TD>$description</TD>";
-		echo "<TD><A HREF=\"sysmap.php?sysmapid=".$_GET["sysmapid"]."&register=delete_link&linkid=$linkid\">Delete</A></TD>";
-		echo "</TR>";
+		table_row(array(
+			$label1,
+			$label2,
+			$description,
+			"<A HREF=\"sysmap.php?sysmapid=".$_GET["sysmapid"]."&register=delete_link&linkid=".$row["linkid"]."\">Delete</A>"
+			),$col++);
 	}
-	echo "</TABLE>";
+	table_end();
 ?>
 
 <?php
