@@ -847,7 +847,7 @@ int get_values(void)
 		item.value_type=atoi(DBget_field(result,i,17));
 
 		network_errors=atoi(DBget_field(result,i,18));
-		item.snmp_port=atoi(DBget_field(result,i,18));
+		item.snmp_port=atoi(DBget_field(result,i,19));
 
 		res = get_value(&value,value_str,&item);
 		zabbix_log( LOG_LEVEL_DEBUG, "GOT VALUE [%s]", value_str );
