@@ -98,11 +98,11 @@
 
 	for($i=0;$i<=$sizeY;$i+=$sizeY/5)
 	{
-		ImageDashedLine($im,$shiftX,$i+$shiftY,$sizeX+$shiftX,$i+$shiftY,$gray);
+		DashedLine($im,$shiftX,$i+$shiftY,$sizeX+$shiftX,$i+$shiftY,$gray);
 	}
 	for($i=0;$i<=$sizeX;$i+=$sizeX/24)
 	{
-		ImageDashedLine($im,$i+$shiftX,$shiftY,$i+$shiftX,$sizeY+$shiftY,$gray);
+		DashedLine($im,$i+$shiftX,$shiftY,$i+$shiftX,$sizeY+$shiftY,$gray);
 	}
 	$item=get_item_by_itemid($HTTP_GET_VARS["itemid"]);
 	$host=get_host_by_hostid($item["hostid"]);
@@ -163,7 +163,7 @@
 		}
 		$y1=$sizeY*(-$minY)/($maxY-$minY);
 		$y1=$sizeY-$y1;
-		ImageDashedLine($im,$shiftX,$y1+$shiftY,$sizeX+$shiftX,$y1+$shiftY,$darkred);
+		DashedLine($im,$shiftX,$y1+$shiftY,$sizeX+$shiftX,$y1+$shiftY,$darkred);
 		for($i=0;$i<DBnum_rows($result)-3;$i++)
 		{
 			$x=DBget_field($result,$i,0);

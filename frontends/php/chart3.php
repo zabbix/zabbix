@@ -139,12 +139,12 @@
 
 	for($i=0;$i<=$sizeY;$i+=$sizeY/5)
 	{
-		ImageDashedLine($im,$shiftX,$i+$shiftYup,$sizeX+$shiftX,$i+$shiftYup,$gray);
+		DashedLine($im,$shiftX,$i+$shiftYup,$sizeX+$shiftX,$i+$shiftYup,$gray);
 	}
 
 	for($i=0;$i<=$sizeX;$i+=$sizeX/24)
 	{
-		ImageDashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
+		DashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
 		ImageString($im, 1,$i+$shiftX-11, $sizeY+$shiftYup+5, date("H:i",-3*3600+24*3600*$i/900) , $black);
 	}
 
@@ -254,8 +254,7 @@
 	$y1=$sizeY-$y1;
 	$y2=$sizeY-$y2;
 
-//	ImageDashedLine($im,$x1+$shiftX,$y1+$shiftYup,$x2+$shiftX,$y2+$shiftYup,$black);
-	ImageDashedLine($im,$x1+$shiftX,$shiftYup,$x2+$shiftX,$sizeY+$shiftYup,$black);
+	DashedLine($im,$x1+$shiftX,$shiftYup,$x2+$shiftX,$sizeY+$shiftYup,$black);
 
 	if(isset($nodata)&&($nodata == 0))
 	{

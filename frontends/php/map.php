@@ -76,12 +76,12 @@
 	{
 		for($x=$grid;$x<$width;$x+=$grid)
 		{
-			ImageDashedLine($im,$x,0,$x,$height,$black);
+			DashedLine($im,$x,0,$x,$height,$black);
 			ImageString($im, 2, $x+2,2, $x , $black);
 		}
 		for($y=$grid;$y<$height;$y+=$grid)
 		{
-			ImageDashedLine($im,0,$y,$width,$y,$black);
+			DashedLine($im,0,$y,$width,$y,$black);
 			ImageString($im, 2, 2,$y+2, $y , $black);
 		}
 

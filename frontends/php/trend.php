@@ -154,12 +154,12 @@ else
 
 	for($i=0;$i<=$sizeY;$i+=$sizeY/5)
 	{
-		ImageDashedLine($im,$shiftX,$i+$shiftY,$sizeX+$shiftX,$i+$shiftY,$gray);
+		DashedLine($im,$shiftX,$i+$shiftY,$sizeX+$shiftX,$i+$shiftY,$gray);
 	}
 
 	for($i=0;$i<=$sizeX;$i+=$sizeX/24)
 	{
-		ImageDashedLine($im,$i+$shiftX,$shiftY,$i+$shiftX,$sizeY+$shiftY,$gray);
+		DashedLine($im,$i+$shiftX,$shiftY,$i+$shiftX,$sizeY+$shiftY,$gray);
 		if($nodata == 0)
 		{
 			ImageString($im, 1,$i+$shiftX-11, $sizeY+$shiftY+5, date($label_format,$from_time+$period*($i/50)) , $black);
