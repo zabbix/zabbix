@@ -37,7 +37,7 @@ td.form_row_r
 
 td.form_row_first
 {
-	background: #5C7099 url(images/gradients/table_head.gif) repeat-x top left;
+	background: #5C7099 url(images/gradients/table_head2.gif) repeat-x top left;
 	color: #FFFFFF;
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:10px;
@@ -58,7 +58,7 @@ td.form_row_last
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:10px;
 #	background-color: #6d88ad;
-	background: #5C7099 url(images/gradients/table_head.gif) repeat-x top left;
+	background: #5C7099 url(images/gradients/table_head2.gif) repeat-x top left;
 	border-color: #222255;
 #	border-color: #888888;
 	border-width:1px;
@@ -73,7 +73,7 @@ td.sub_menu
 	color: #FFFFFF;
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:10px;
-	background: #5C7099 url(images/gradients/table_head.gif) repeat-x top left;
+	background: #5C7099 url(images/gradients/table_head2.gif) repeat-x top left;
 	background-color: #6d88ad;
 	border-color: #000000;
 	border-width:0px;
@@ -275,7 +275,8 @@ img.bottom
 	border: solid;
 	border-width: 1px;
 	border-color: gray;
-	background-color: #dddddd;
+#	background-color: #dddddd;
+	background: gray url(images/gradients/button.gif) repeat-x top left;
 	margin-right:5px;
 }
 
