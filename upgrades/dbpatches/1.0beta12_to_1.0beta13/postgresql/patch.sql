@@ -20,4 +20,4 @@ update actions set message=replace(message,'%s','{HOSTNAME}');
 alter table sysmaps_links add  drawtype_off	int4		DEFAULT '0' NOT NULL;
 alter table sysmaps_links add  color_off	varchar(32)	DEFAULT 'Black' NOT NULL;
 alter table sysmaps_links add  drawtype_on	int4		DEFAULT '0' NOT NULL;
-alter table sysmaps_links add  color_on		varchar(32)	DEFAULT 'Dark Red' NOT NULL;
+alter table sysmaps_links add  color_on		varchar(32)	DEFAULT 'Red' NOT NULL;
