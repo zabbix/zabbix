@@ -488,6 +488,7 @@
 ?>
 			</font>
 		</td>
+<? /*?>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
 				<a href="srv_status.html">
@@ -503,6 +504,7 @@
 ?>
 			</font>
 		</td>
+<? */?>
 		</tr>
 		<tr>
 		<td colspan=2 bgcolor=FFFFFF align=center valign="top" width="15%">
@@ -535,7 +537,7 @@
 ?>
 			</font>
 		</td>
-		<td colspan=3 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=2 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
 				<a href="report2.html">
 <?
@@ -661,6 +663,7 @@
 ?>
 			</font>
 		</td>
+<? /*?>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
 				<a href="services.html">
@@ -676,6 +679,7 @@
 ?>
 			</font>
 		</td>
+<?*/?>
 		</tr>
 		</table>
 	</td>
