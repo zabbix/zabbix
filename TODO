@@ -12,6 +12,7 @@ and
 should read
 -L/home/spath/net-snmp-5.0.9/lib
 
+ - check screen permissions where needed
  - document that --enable-static does not work on Solaris
  - test on HP-UX, AIX and Solaris
  - on the sysmap, a < in the trigger title shows up as &lt; 
