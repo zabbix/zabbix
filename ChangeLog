@@ -1,5 +1,7 @@
 Changes for 1.0beta7:
 
+ - fixed selection of icon and host in sysmap.php. Thanks to Sébastien "slix"
+   Liénard. (Alexei)
  - monitoring of servers without Zabbix agent installed. New item type: Simple
    Check. (Alexei)
  - improved performance of pinger.pl (Alexei)

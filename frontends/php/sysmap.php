@@ -209,7 +209,8 @@
 	{
 		$hostid_=DBget_field($result,$i,0);
 		$host_=DBget_field($result,$i,1);
-		if(isset($HTTP_GET_VARS["hostid"]) && ($HTTP_GET_VARS["hostid"]==$hostid_))
+		if(isset($HTTP_GET_VARS["shostid"]) && ($hostid==$hostid_))
+//		if(isset($HTTP_GET_VARS["hostid"]) && ($HTTP_GET_VARS["hostid"]==$hostid_))
 		{
 			echo "<OPTION VALUE='$hostid_' SELECTED>$host_";
 		}
@@ -231,7 +232,8 @@
 	$icons[3]="Hub";
 	for($i=0;$i<4;$i++)
 	{
-		if(isset($HTTP_GET_VARS["hostid"]) && ($HTTP_GET_VARS["icon"]==$icons[$i]))
+		if(isset($HTTP_GET_VARS["shostid"]) && ($icon==$icons[$i]))
+//		if(isset($HTTP_GET_VARS["hostid"]) && ($HTTP_GET_VARS["icon"]==$icons[$i]))
 		{
 			echo "<OPTION VALUE='".$icons[$i]."' SELECTED>".$icons[$i];
 		}
