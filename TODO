@@ -1,5 +1,7 @@
 HIGH PRIORITY:
 
+ - add notification to all trigers of the hist
+ - BUG. Problems with backslashes when adding host from template
  - test everythinkg under Explorer. Especially Graphs,Charts and Maps.
  - add ZBX_ERROR and ZBX_NOTSUPPORTED
  - improve performance of Alarms and Alerts in PHP frontend
