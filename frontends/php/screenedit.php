@@ -81,7 +81,7 @@
 	echo "<TR>";
 	for($c=0;$c<$row["cols"];$c++)
 	{
-		echo "<TD align=\"center\">\n";
+		echo "<TD align=\"center\" valign=\"top\">\n";
 
 		echo "<a name=\"form\"></a>";
 		echo "<form method=\"get\" action=\"screenedit.php\">";

@@ -233,8 +233,16 @@
 			$str=$str.$this->period2str($this->period);
 
 
-			$x=imagesx($this->im)/2-ImageFontWidth(4)*strlen($str)/2;
-			ImageString($this->im, 4,$x,1, $str , $this->colors["Dark Red No Alpha"]);
+			if($this->sizeX < 300)
+			{
+				$fontnum = 2;
+			}
+			else
+			{
+				$fontnum = 4;
+			}
+			$x=imagesx($this->im)/2-ImageFontWidth($fontnum)*strlen($str)/2;
+			ImageString($this->im, $fontnum,$x,1, $str , $this->colors["Dark Red No Alpha"]);
 		}
 
 		function setHeader($header)
