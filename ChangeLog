@@ -1,5 +1,6 @@
 Changes for 1.0beta8:
 
+ - mass update for triggers (activate, deactivate, delete) (Alexei)
  - all sendto() and recvfrom() were changed to write() and read() in function
  send_mail() (Alexei)
  - fixed bug in host addition procedure when template host is used (Alexei) 
