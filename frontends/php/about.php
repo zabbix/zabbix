@@ -33,7 +33,7 @@
 	If you need additional functionality, go here.
 </TD>
 </TR>
-<TR BGCOLOR=#EEEEEE>
+<TR BGCOLOR=#DDDDDD>
 <TD ALIGN=LEFT>
 	<font face="Helvetica"><a href="http://sourceforge.net/forum/?group_id=23494">Forums</a></font><br>
 </TD>
@@ -41,7 +41,7 @@
 	Zabbix-related discussion.
 </TD>
 </TR>
-<TR BGCOLOR=#DDDDDD>
+<TR BGCOLOR=#EEEEEE>
 <TD ALIGN=LEFT>
 	<font face="Helvetica"><a href="http://sourceforge.net/tracker/?group_id=23494&atid=378683">Bug reports</a></font><br>
 </TD>
@@ -49,7 +49,7 @@
 	Bug in Zabbix ? Please, report it.
 </TD>
 </TR>
-<TR BGCOLOR=#EEEEEE>
+<TR BGCOLOR=#DDDDDD>
 <TD ALIGN=LEFT>
 	<font face="Helvetica"><a href="http://sourceforge.net/mail/?group_id=23494">Mailing lists</a></font><br>
 </TD>
