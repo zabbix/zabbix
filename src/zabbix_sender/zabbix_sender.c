@@ -101,7 +101,7 @@ int	send_value(char *server,int port,char *shortname,char *value)
 		return	FAIL;
 	}
 
-	sprintf(tosend,"%s:%s\n",shortname,value);
+	snprintf(tosend,sizeof(tosend)-1,"%s:%s\n",shortname,value);
 
 	if( sendto(s,tosend,strlen(tosend),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{

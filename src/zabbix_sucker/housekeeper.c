@@ -57,7 +57,7 @@ int housekeeping_items(void)
 	DB_RESULT	*result;
 	int		i,itemid;
 
-	sprintf(sql,"select itemid from items where status=%d", ITEM_STATUS_DELETED);
+	snprintf(sql,sizeof(sql)-1,"select itemid from items where status=%d", ITEM_STATUS_DELETED);
 	result = DBselect(sql);
 	for(i=0;i<DBnum_rows(result);i++)
 	{
@@ -75,7 +75,7 @@ int housekeeping_hosts(void)
 	DB_RESULT	*result;
 	int		i,hostid;
 
-	sprintf(sql,"select hostid from hosts where status=%d", HOST_STATUS_DELETED);
+	snprintf(sql,sizeof(sql)-1,"select hostid from hosts where status=%d", HOST_STATUS_DELETED);
 	result = DBselect(sql);
 	for(i=0;i<DBnum_rows(result);i++)
 	{
@@ -96,7 +96,7 @@ int housekeeping_history(int now)
 	int		i;
 
 /* How lastdelete is used ??? */
-	sprintf(sql,"select itemid,lastdelete,history,delay from items where lastdelete<=%d", now);
+	snprintf(sql,sizeof(sql)-1,"select itemid,lastdelete,history,delay from items where lastdelete<=%d", now);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
@@ -112,19 +112,19 @@ int housekeeping_history(int now)
 		}
 
 #ifdef HAVE_MYSQL
-		sprintf	(sql,"delete from history where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
+		snprintf(sql,sizeof(sql)-1,"delete from history where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
 #else
-		sprintf	(sql,"delete from history where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
+		snprintf(sql,sizeof(sql)-1,"delete from history where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
 #endif
 		DBexecute(sql);
 #ifdef HAVE_MYSQL
-		sprintf	(sql,"delete from history_str where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
+		snprintf(sql,sizeof(sql)-1,"delete from history_str where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
 #else
-		sprintf	(sql,"delete from history_str where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
+		snprintf(sql,sizeof(sql)-1,"delete from history_str where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
 #endif
 		DBexecute(sql);
 	
-		sprintf(sql,"update items set lastdelete=%d where itemid=%d",now,item.itemid);
+		snprintf(sql,sizeof(sql)-1,"update items set lastdelete=%d where itemid=%d",now,item.itemid);
 		DBexecute(sql);
 	}
 	DBfree_result(result);
@@ -135,7 +135,7 @@ int housekeeping_sessions(int now)
 {
 	char	sql[MAX_STRING_LEN];
 
-	sprintf	(sql,"delete from sessions where lastaccess<%d",now-24*3600);
+	snprintf(sql,sizeof(sql)-1,"delete from sessions where lastaccess<%d",now-24*3600);
 	DBexecute(sql);
 
 	return SUCCEED;
@@ -148,7 +148,7 @@ int housekeeping_alerts(int now)
 	DB_RESULT	*result;
 	int		res = SUCCEED;
 
-	sprintf(sql,"select alert_history from config");
+	snprintf(sql,sizeof(sql)-1,"select alert_history from config");
 	result = DBselect(sql);
 
 	if(DBnum_rows(result) == 0)
@@ -160,7 +160,7 @@ int housekeeping_alerts(int now)
 	{
 		alert_history=atoi(DBget_field(result,0,0));
 
-		sprintf	(sql,"delete from alerts where clock<%d",now-24*3600*alert_history);
+		snprintf(sql,sizeof(sql)-1,"delete from alerts where clock<%d",now-24*3600*alert_history);
 		DBexecute(sql);
 	}
 
@@ -175,7 +175,7 @@ int housekeeping_alarms(int now)
 	DB_RESULT	*result;
 	int		res = SUCCEED;
 
-	sprintf(sql,"select alarm_history from config");
+	snprintf(sql,sizeof(sql)-1,"select alarm_history from config");
 	result = DBselect(sql);
 	if(DBnum_rows(result) == 0)
 	{
@@ -186,7 +186,7 @@ int housekeeping_alarms(int now)
 	{
 		alarm_history=atoi(DBget_field(result,0,0));
 
-		sprintf	(sql,"delete from alarms where clock<%d",now-24*3600*alarm_history);
+		snprintf(sql,sizeof(sql)-1,"delete from alarms where clock<%d",now-24*3600*alarm_history);
 		DBexecute(sql);
 	}
 	

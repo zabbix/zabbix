@@ -437,21 +437,21 @@ void	process(char *command,char *value)
 	{
 /* New protocol */
 /*			sprintf(value,"%f",result);*/
-		sprintf(value,"%s","ZBX_NOTSUPPORTED\n");
+		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_NOTSUPPORTED\n");
 	}
 	else if(result==TIMEOUT_ERROR)
 	{
-		sprintf(value,"%s","ZBX_ERROR\n");
+		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_ERROR\n");
 	}
 	else
 	{
 		if(ret_str==0)
 		{
-			sprintf(value,"%f",result);
+			snprintf(value,MAX_STRING_LEN-1,"%f",result);
 		}
 		else
 		{
-			sprintf(value,"%s",res2);
+			snprintf(value,MAX_STRING_LEN-1,"%s",res2);
 		}
 	}
 
@@ -963,7 +963,7 @@ double	DISKREADOPS1(char *device)
 {
 	char	key[MAX_STRING_LEN];
 
-	sprintf(key,"disk_read_ops1[%s]",device);
+	snprintf(key,sizeof(key)-1,"disk_read_ops1[%s]",device);
 
 	return	get_stat(key);
 }
@@ -972,7 +972,7 @@ double	DISKREADOPS5(char *device)
 {
 	char	key[MAX_STRING_LEN];
 
-	sprintf(key,"disk_read_ops5[%s]",device);
+	snprintf(key,sizeof(key)-1,"disk_read_ops5[%s]",device);
 
 	return	get_stat(key);
 }
@@ -981,7 +981,7 @@ double	DISKREADOPS15(char *device)
 {
 	char	key[MAX_STRING_LEN];
 
-	sprintf(key,"disk_read_ops15[%s]",device);
+	snprintf(key,sizeof(key)-1,"disk_read_ops15[%s]",device);
 
 	return	get_stat(key);
 }
@@ -990,7 +990,7 @@ double	DISKREADBLKS1(char *device)
 {
 	char	key[MAX_STRING_LEN];
 
-	sprintf(key,"disk_read_blks1[%s]",device);
+	snprintf(key,sizeof(key)-1,"disk_read_blks1[%s]",device);
 
 	return	get_stat(key);
 }
@@ -999,7 +999,7 @@ double	DISKREADBLKS5(char *device)
 {
 	char	key[MAX_STRING_LEN];
 
-	sprintf(key,"disk_read_blks5[%s]",device);
+	snprintf(key,sizeof(key)-1,"disk_read_blks5[%s]",device);
 
 	return	get_stat(key);
 }
@@ -1008,7 +1008,7 @@ double	DISKREADBLKS15(char *device)
 {
 	char	key[MAX_STRING_LEN];
 
-	sprintf(key,"disk_read_blks15[%s]",device);
+	snprintf(key,sizeof(key)-1,"disk_read_blks15[%s]",device);
 
 	return	get_stat(key);
 }
@@ -1017,7 +1017,7 @@ double	DISKWRITEOPS1(char *device)
 {
 	char	key[MAX_STRING_LEN];
 
-	sprintf(key,"disk_write_ops1[%s]",device);
+	snprintf(key,sizeof(key)-1,"disk_write_ops1[%s]",device);
 
 	return	get_stat(key);
 }
@@ -1026,7 +1026,7 @@ double	DISKWRITEOPS5(char *device)
 {
 	char	key[MAX_STRING_LEN];
 
-	sprintf(key,"disk_write_ops5[%s]",device);
+	snprintf(key,sizeof(key)-1,"disk_write_ops5[%s]",device);
 
 	return	get_stat(key);
 }
@@ -1035,7 +1035,7 @@ double	DISKWRITEOPS15(char *device)
 {
 	char	key[MAX_STRING_LEN];
 
-	sprintf(key,"disk_write_ops15[%s]",device);
+	snprintf(key,sizeof(key)-1,"disk_write_ops15[%s]",device);
 
 	return	get_stat(key);
 }
@@ -1044,7 +1044,7 @@ double	DISKWRITEBLKS1(char *device)
 {
 	char	key[MAX_STRING_LEN];
 
-	sprintf(key,"disk_write_blks1[%s]",device);
+	snprintf(key,sizeof(key)-1,"disk_write_blks1[%s]",device);
 
 	return	get_stat(key);
 }
@@ -1053,7 +1053,7 @@ double	DISKWRITEBLKS5(char *device)
 {
 	char	key[MAX_STRING_LEN];
 
-	sprintf(key,"disk_write_blks5[%s]",device);
+	snprintf(key,sizeof(key)-1,"disk_write_blks5[%s]",device);
 
 	return	get_stat(key);
 }
@@ -1062,7 +1062,7 @@ double	DISKWRITEBLKS15(char *device)
 {
 	char	key[MAX_STRING_LEN];
 
-	sprintf(key,"disk_write_blks15[%s]",device);
+	snprintf(key,sizeof(key)-1,"disk_write_blks15[%s]",device);
 
 	return	get_stat(key);
 }
@@ -1071,7 +1071,7 @@ double	NETLOADIN1(char *interface)
 {
 	char	key[MAX_STRING_LEN];
 
-	sprintf(key,"netloadin1[%s]",interface);
+	snprintf(key,sizeof(key)-1,"netloadin1[%s]",interface);
 
 	return	get_stat(key);
 }
@@ -1080,7 +1080,7 @@ double	NETLOADIN5(char *interface)
 {
 	char	key[MAX_STRING_LEN];
 
-	sprintf(key,"netloadin5[%s]",interface);
+	snprintf(key,sizeof(key)-1,"netloadin5[%s]",interface);
 
 	return	get_stat(key);
 }
@@ -1089,7 +1089,7 @@ double	NETLOADIN15(char *interface)
 {
 	char	key[MAX_STRING_LEN];
 
-	sprintf(key,"netloadin15[%s]",interface);
+	snprintf(key,sizeof(key)-1,"netloadin15[%s]",interface);
 
 	return	get_stat(key);
 }
@@ -1098,7 +1098,7 @@ double	NETLOADOUT1(char *interface)
 {
 	char	key[MAX_STRING_LEN];
 
-	sprintf(key,"netloadout1[%s]",interface);
+	snprintf(key,sizeof(key)-1,"netloadout1[%s]",interface);
 
 	return	get_stat(key);
 }
@@ -1107,7 +1107,7 @@ double	NETLOADOUT5(char *interface)
 {
 	char	key[MAX_STRING_LEN];
 
-	sprintf(key,"netloadout5[%s]",interface);
+	snprintf(key,sizeof(key)-1,"netloadout5[%s]",interface);
 
 	return	get_stat(key);
 }
@@ -1116,7 +1116,7 @@ double	NETLOADOUT15(char *interface)
 {
 	char	key[MAX_STRING_LEN];
 
-	sprintf(key,"netloadout15[%s]",interface);
+	snprintf(key,sizeof(key)-1,"netloadout15[%s]",interface);
 
 	return	get_stat(key);
 }
@@ -2177,7 +2177,7 @@ void	forward_request(char *proxy,char *command,int port,char *value)
 	host = gethostbyname(proxy);
 	if(host == NULL)
 	{
-		sprintf(value,"%s","ZBX_NETWORK_ERROR\n");
+		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_NETWORK_ERROR\n");
 		return;
 	}
 
@@ -2192,21 +2192,21 @@ void	forward_request(char *proxy,char *command,int port,char *value)
 	s = socket(AF_INET, SOCK_STREAM, 0);
 	if (s == -1)
 	{
-		sprintf(value,"%s","ZBX_NOTSUPPORTED\n");
+		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_NOTSUPPORTED\n");
 		close(s);
 		return;
 	}
 
 	if (connect(s, (struct sockaddr *) &addr, addrlen) == -1)
 	{
-		sprintf(value,"%s","ZBX_NETWORK_ERROR\n");
+		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_NETWORK_ERROR\n");
 		close(s);
 		return;
 	}
 
 	if(write(s,command,strlen(command)) == -1)
 	{
-		sprintf(value,"%s","ZBX_NETWORK_ERROR\n");
+		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_NETWORK_ERROR\n");
 		close(s);
 		return;
 	}
@@ -2214,7 +2214,7 @@ void	forward_request(char *proxy,char *command,int port,char *value)
 	memset(&c, 0, 1024);
 	if(read(s, c, 1024) == -1)
 	{
-		sprintf(value,"%s","ZBX_ERROR\n");
+		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_ERROR\n");
 		close(s);
 		return;
 	}
@@ -2345,7 +2345,7 @@ int	check_ssh(char	*hostname, short port)
 
 /*		printf("[%s] [%s]\n",ssh_proto, ssh_server);*/
 
-		sprintf (out, "SSH-%s-%s\r\n", ssh_proto, "zabbix_agent");
+		snprintf(out,sizeof(out)-1,"SSH-%s-%s\r\n", ssh_proto, "zabbix_agent");
 		send(s,out,strlen(out),0);
 
 /*		printf("[%s]\n",out);*/
