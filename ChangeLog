@@ -1,7 +1,7 @@
 Changes for 1.0beta7:
 
  - support fo JavaScript required now (Alexei)
- - automatic resize of user-defined graphs depending on screen size (Alexei)
+ - automatic resize of all graphs depending on screen size (Alexei)
  - got rid of message "Bad protocol identification '0'" when doing check_service[ssh]
  (Alexei)
  - performance improvements for zabbix_suckerd (Alexei)
