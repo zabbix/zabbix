@@ -17,7 +17,6 @@ So functions.c should look
 
 
  - change %s to {HOSTNAME}, {DATE},{TIME}, etc
- - graceful processing of database loss
  - add zabbix[unixtime] and lastupdate() to get rid of nodata()
  - check return code for alert scripts
  - add support for function unixtime()

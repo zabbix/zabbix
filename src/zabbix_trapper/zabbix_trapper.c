@@ -148,7 +148,7 @@ int	main()
 /*	???
 	value=atof(value_string);*/
 
-	DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+	DBconnect();
 	ret=process_data(0,server,key,value_string);
 
 	alarm(0);

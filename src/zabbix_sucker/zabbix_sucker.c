@@ -1026,7 +1026,7 @@ int main_nodata_loop()
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("updating nodata() functions");
 #endif
-		DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+		DBconnect();
 
 		now=time(NULL);
 #ifdef HAVE_PGSQL
@@ -1063,7 +1063,7 @@ int main_sucker_loop()
 	int	now;
 	int	nextcheck,sleeptime;
 
-	DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+	DBconnect();
 	for(;;)
 	{
 #ifdef HAVE_FUNCTION_SETPROCTITLE
@@ -1146,7 +1146,7 @@ int main(int argc, char **argv)
 	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_suckerd...");
 
 /* Need to set trigger status to UNKNOWN since last run */
-	DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+	DBconnect();
 	DBupdate_triggers_status_after_restart();
 
 /*#define CALC_TREND*/

@@ -139,7 +139,7 @@ int main_alerter_loop()
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("connecting to the database");
 #endif
-		DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+		DBconnect();
 
 		sprintf(sql,"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path from alerts a,media_type mt where a.status=0 and a.retries<3 and a.mediatypeid=mt.mediatypeid order by a.clock");
 		result = DBselect(sql);
