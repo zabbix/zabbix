@@ -46,7 +46,7 @@
 
 <?
 	show_table_header_begin();
-	echo "<A HREF='latest.html?hostid=$hostid'>$host</A> : $description";
+	echo "<A HREF='latest.html?hostid=$hostid'>$host</A> : <a href='trends.html?itemid=$itemid'>$description</a>";
 	show_table_v_delimiter();
 	echo("<DIV ALIGN=CENTER>");
 	if($action =="showhistory")

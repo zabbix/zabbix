@@ -132,7 +132,7 @@ void	process_child(int sockfd)
 		{
 			if(errno == EINTR)
 			{
-				syslog( LOG_DEBUG, "Timeout while waiting for parameter");
+				syslog( LOG_WARNING, "Timeout while waiting for parameter");
 			}
 			else
 			{
