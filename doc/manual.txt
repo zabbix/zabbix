@@ -387,27 +387,12 @@ Change these values.
 
 4.2.5 Configure and compile the source code for your system.
 
-cd src/zabbix_sucker
 ./configure --with-mysql  # for MySQL
  or
 ./configure --with-pgsql  # for PostgreSQL
 make
 
-cd src/zabbix_agent
-./configure
-make
-
-cd src/zabbix_trapper
-./configure --with-mysql  # for MySQL
- or
-./configure --with-pgsql  # for PostgreSQL
-make
-
-cd src/zabbix_sender
-./configure
-make
-
-4.2.6 Copy binaries to /opt/zabbix/bin or any other directory. 
+4.2.6 Copy created binaries from bin/ to /opt/zabbix/bin or any other directory. 
 
 4.2.7 Configure /etc/services
 

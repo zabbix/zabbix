@@ -1,19 +1,20 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(zabbix_trapper.c)
+AC_INIT(src/zabbix_sucker/zabbix_sucker.c)
 
 dnl Checks for programs.
 AC_PROG_CC
 
 dnl Checks for libraries.
-dnl Replace `main' with a function in -lmysqlclient:
-dnl #AC_CHECK_LIB(mysqlclient, main)
-dnl #AC_CHECK_LIB(pq, main)
+AC_CHECK_LIB(snmp, main)
 
 dnl Checks for header files.
 AC_HEADER_STDC
-
-AC_CHECK_HEADERS(stdio.h stdlib.h unistd.h netdb.h signal.h \
-  time.h syslog.h sys/types.h sys/stat.h netinet/in.h)
+AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
+  syslog.h time.h errno.h sys/types.h sys/stat.h netinet/in.h \
+  sys/socket.h ucd-snmp/ucd-snmp-config.h ucd-snmp/system.h \
+  ucd-snmp/ucd-snmp-includes.h \
+  mtent.h fcntl.h sys/param.h sys/mount.h arpa/inet.h \
+  sys/vfs.h sys/pstat.h sys/sysinfo.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -136,8 +137,9 @@ if test "$have_db" != "yes"; then
 echo
 fi
 
-AC_CONFIG_HEADER(config.h)
-AC_OUTPUT(Makefile)
+AC_CONFIG_HEADER(include/config.h)
+AC_OUTPUT(Makefile src/zabbix_sender/Makefile src/zabbix_agent/Makefile \
+        src/zabbix_sucker/Makefile src/zabbix_trapper/Makefile)
 
 echo
 echo "***********************************************************"
@@ -147,3 +149,4 @@ echo "*            Thank you for using Zabbix !                 *"
 echo "*          <http://zabbix.sourceforge.net>                *"
 echo "***********************************************************"
 echo
+
