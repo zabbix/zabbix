@@ -61,6 +61,10 @@
 		if($DB_TYPE == "MYSQL")
 		{
 			$result=mysql_query($query,$DB);
+			if(!$result)
+			{
+				echo "Error in query [$query] [".mysql_error()."]";
+			}
 			return $result;
 		}
 		if($DB_TYPE == "POSTGRESQL")

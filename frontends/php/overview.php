@@ -143,7 +143,7 @@
 			$rows=array(nbsp($row["description"]));
 			foreach($hosts as $hostid)
 			{
-				$sql="select value_type,lastvalue,units from items where hostid=$hostid and description='".$row["description"]."'";
+				$sql="select itemid,value_type,lastvalue,units from items where hostid=$hostid and description='".$row["description"]."'";
 				$result2=DBselect($sql);
 				if(DBnum_rows($result2)==1)
 				{
@@ -151,10 +151,22 @@
 					if(!isset($row2["lastvalue"]))	$value="-";
 					else
 					{
-						if($row2["value_type"] == 0)
-							$value=nbsp(convert_units($row2["lastvalue"],$row2["units"]));
+						$sql="select t.triggerid from triggers t, items i, functions f where i.hostid=$hostid and i.itemid=".$row2["itemid"]." and i.itemid=f.itemid and t.priority>1 and t.triggerid=f.triggerid and t.value=".TRIGGER_VALUE_TRUE;
+						$result3=DBselect($sql);
+						if(DBnum_rows($result3)>0)
+						{
+							if($row2["value_type"] == 0)
+								$value=array("value"=>nbsp(convert_units($row2["lastvalue"],$row2["units"])),"class"=>"high");
+							else
+								$value=array("value"=>nbsp(htmlspecialchars(substr($row2["lastvalue"],0,20)." ...")),"class"=>"high");
+						}
 						else
-							$value=nbsp(htmlspecialchars(substr($row2["lastvalue"],0,20)." ..."));
+						{
+							if($row2["value_type"] == 0)
+								$value=nbsp(convert_units($row2["lastvalue"],$row2["units"]));
+							else
+								$value=nbsp(htmlspecialchars(substr($row2["lastvalue"],0,20)." ..."));
+						}
 					}
 				}
 				else
@@ -210,7 +222,7 @@
 			$rows=array(nbsp($row["description"]));
 			foreach($hosts as $hostid)
 			{
-				$sql="select t.status,t.value from triggers t,functions f,items i where f.triggerid=t.triggerid and i.itemid=f.itemid and i.hostid=$hostid and t.description='".addslashes($row["description"])."'";
+				$sql="select t.status,t.value,t.lastchange from triggers t,functions f,items i where f.triggerid=t.triggerid and i.itemid=f.itemid and i.hostid=$hostid and t.description='".addslashes($row["description"])."'";
 				$result2=DBselect($sql);
 				if(DBnum_rows($result2)==1)
 				{
@@ -219,6 +231,8 @@
 					{
 						if($row2["value"] == TRIGGER_VALUE_FALSE)
 							$value=array("value"=>"&nbsp;","class"=>"normal");
+						else if($row2["value"] == TRIGGER_VALUE_UNKNOWN)
+							$value=array("value"=>"&nbsp;","class"=>"unknown_trigger");
 						else
 							$value=array("value"=>"&nbsp;","class"=>"high");
 					}
