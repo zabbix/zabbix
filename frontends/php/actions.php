@@ -172,6 +172,35 @@
 	}
 	echo nbsp("Send message to");
 	show_table2_h_delimiter();
+	echo "<select class=\"biginput\" name=\"whom\" size=\"1\">";
+
+	echo "<option value=\"user\" selected>Group";
+	echo "<option value=\"group\">User";
+	echo "</select>";
+
+	show_table2_v_delimiter();
+	echo nbsp("Group");
+	show_table2_h_delimiter();
+	echo "<select class=\"biginput\" name=\"usrgrpid\" size=\"1\">";
+
+	$sql="select usrgrpid,name from usrgrp order by name";
+	$result=DBselect($sql);
+	while($row=DBfetch($result))
+	{
+		if(isset($usrgrpid) && ($row["usrgrpid"] == $usrgrpid))
+		{
+			echo "<option value=\"".$row["usrgrpid"]."\" selected>".$row["name"];
+		}
+		else
+		{
+			echo "<option value=\"".$row["usrgrpid"]."\">".$row["name"];
+		}
+	}
+	echo "</select>";
+
+	show_table2_v_delimiter();
+	echo nbsp("User");
+	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"userid\" size=\"1\">";
 
 	$sql="select userid,alias from users order by alias";
@@ -198,7 +227,7 @@
 	echo "</SELECT>";
 
 	show_table2_v_delimiter();
-	echo "Delay";
+	echo nbsp("Delay between messages (in sec)");
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"delay\" value=\"$delay\" size=5>";
 
