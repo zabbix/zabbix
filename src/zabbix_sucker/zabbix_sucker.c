@@ -371,25 +371,26 @@ int get_values(void)
 {
 	double		value;
 	char		c[1024];
-	DB_ITEM		item;
  
 	DB_RESULT	*result;
 
 	int		i,rows;
 	int		now;
+	DB_ITEM		item;
+	char		*s;
 
 	now = time(NULL);
 
-	sprintf(c,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip from items i,hosts h where i.nextcheck<=%d and i.status=0 and h.status=0 and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, SUCKER_FORKS-1,sucker_num-1);
+	sprintf(c,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue from items i,hosts h where i.nextcheck<=%d and i.status=0 and h.status=0 and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, SUCKER_FORKS-1,sucker_num-1);
 	result = DBselect(c);
 
-	if(result==NULL)
+	rows = DBnum_rows(result);
+	if( (result==NULL) || (rows == 0))
 	{
 		syslog( LOG_DEBUG, "No items to update.");
 		DBfree_result(result);
 		return SUCCEED; 
 	}
-	rows = DBnum_rows(result);
 
 	for(i=0;i<rows;i++)
 	{
@@ -405,31 +406,39 @@ int get_values(void)
 		item.snmp_oid=DBget_field(result,i,9);
 		item.useip=atoi(DBget_field(result,i,10));
 		item.ip=DBget_field(result,i,11);
+		item.history=atoi(DBget_field(result,i,12));
+		s=DBget_field(result,i,13);
+		if(s==NULL)
+		{
+			item.lastvalue_null=1;
+		}
+		else
+		{
+			item.lastvalue_null=0;
+			item.lastvalue=atof(s);
+		}
+		s=DBget_field(result,i,14);
+		if(s==NULL)
+		{
+			item.prevvalue_null=1;
+		}
+		else
+		{
+			item.prevvalue_null=0;
+			item.prevvalue=atof(s);
+		}
+
 
 		if( get_value(&value,&item) == SUCCEED )
 		{
-			if( value == NOTSUPPORTED)
+			if( cmp_double(value,NOTSUPPORTED) == 0)
 			{
 				sprintf(c,"update items set status=3 where itemid=%d",item.itemid);
 				DBexecute(c);
 			}
 			else
 			{
-				now = time(NULL);
-				sprintf(c,"insert into history (itemid,clock,value) values (%d,%d,%g)",item.itemid,now,value);
-				DBexecute(c);
-
-				sprintf(c,"update items set NextCheck=%d,PrevValue=LastValue,LastValue=%f,LastClock=%d where ItemId=%d",now+item.delay,value,now,item.itemid);
-				DBexecute(c);
-
-				/*	
-				if( update_functions( item.itemid ) == FAIL)
-				{
-					syslog( LOG_WARNING, "Updating simple functions failed" );
-				}
-
-				update_triggers( item.itemid );
-				*/
+				process_new_value(&item,value);
 			}
 		}
 		else
@@ -439,15 +448,7 @@ int get_values(void)
 		}
 	}
 
-	if(rows>0)
-	{
-		if( update_functions( sucker_num, 1 ) == FAIL)
-		{
-			syslog( LOG_WARNING, "Updating simple functions failed" );
-		}
-
-		update_triggers( sucker_num, 1 );
-	}
+	update_triggers( 0, sucker_num, now );
 
 	DBfree_result(result);
 	return SUCCEED;

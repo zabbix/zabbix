@@ -48,67 +48,6 @@ void	signal_handler( int sig )
 	exit( FAIL );
 }
 
-int	process_data(char *server,char *key, double value)
-{
-	char	sql[1024];
-	int	itemid;
-	double	lastvalue;
-	int	now;
-
-	DB_RESULT       *result;
-
-	sprintf(sql,"select i.itemid,i.lastvalue from items i,hosts h where h.status=0 and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=2;",server,key);
-	result = DBselect(sql);
-	 
-	if(result==NULL)
-	{
-		DBfree_result(result);
-		return  FAIL;
-	}
-	if(DBnum_rows(result)==0)
-	{
-		DBfree_result(result);
-		return  FAIL;
-	}
-
-	if( DBget_field(result,0,0) == NULL )
-	{
-		DBfree_result(result);
-		return  FAIL;
-	}
-
-	itemid=atoi(DBget_field(result,0,0));
-
-	now = time(NULL);
-	sprintf(sql,"insert into history (itemid,clock,value) values (%d,%d,%g);",itemid,now,value);
-	DBexecute(sql);
-
-	if(NULL == DBget_field(result,0,1))
-	{
-		now = time(NULL);
-		sprintf(sql,"update items set lastvalue=%g,lastclock=%d where itemid=%d;",value,now,itemid);
-	}
-	else
-	{
-		lastvalue=atof(DBget_field(result,0,1));
-		now = time(NULL);
-		sprintf(sql,"update items set prevvalue=%g,lastvalue=%g,lastclock=%d where itemid=%d;",lastvalue,value,now,itemid);
-	}
-
-	DBexecute(sql);
-
-	if( update_functions( itemid, 0 ) == FAIL)
-	{
-		return FAIL;
-	}
-
-	update_triggers( itemid, 0 );
- 
-	DBfree_result(result);
-
-	return SUCCEED;
-}
-
 int	process(char *s)
 {
 	char	*p;

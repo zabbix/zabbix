@@ -235,6 +235,7 @@ float   FILESIZE(const char * filename)
 
 float	PROCCNT(const char * procname)
 {
+#ifdef	HAVE_PROC_1_STATUS
 	DIR	*dir;
 	struct	dirent *entries;
 	struct	stat buf;
@@ -281,6 +282,9 @@ float	PROCCNT(const char * procname)
 	}
 	closedir(dir);
 	return	(float)proccount;
+#else
+	return	FAIL;
+#endif
 }
 
 float	INODE(const char * mountPoint)

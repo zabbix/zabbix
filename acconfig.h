@@ -1,6 +1,9 @@
 /* Define if filesystem /proc exists */
 #undef HAVE_PROC
 
+/* Define if file /proc/1/status exists */
+#undef HAVE_PROC_1_STATUS
+
 /* Define if structure sysinfo has bufferram */
 #undef HAVE_SYSINFO_BUFFERRAM
 

@@ -47,6 +47,10 @@ DB_ITEM
 	int     port;
 	int     delay;
 	int     history;
+	double	lastvalue;
+	int     lastvalue_null;
+	double	prevvalue;
+	int     prevvalue_null;
 	time_t  lastdelete;
 	time_t  lastcheck;
 	time_t	nextcheck;
@@ -58,6 +62,7 @@ DB_FUNCTION
 	int     itemid;
 	int     triggerid;
 	double  lastvalue;
+	int	lastvalue_null;
 	char    *function;
 	int     parameter;
 };
