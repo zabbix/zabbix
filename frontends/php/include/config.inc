@@ -1133,6 +1133,16 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
 
+	function	update_trigger_status_to_unknown_by_hostid($hostid)
+	{
+		$sql="select distinct t.triggerid from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.hostid=$hostid";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			update_trigger_status($row["triggerid"],3);
+		}
+	}
+
 	# Update Host status
 
 	function	update_host_status($hostid,$status)
@@ -1144,8 +1154,18 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
                         return 0;
                 }
 
-		$sql="update hosts set status=$status where hostid=$hostid";
-		return	DBexecute($sql);
+		$sql="select status from hosts where hostid=$hostid";
+		$result=DBselect($sql);
+		if($status != DBget_field($result,0,0))
+		{
+			update_trigger_status_to_unknown_by_hostid($hostid);
+			$sql="update hosts set status=$status where hostid=$hostid";
+			return	DBexecute($sql);
+		}
+		else
+		{
+			return 1;
+		}
 	}
 
 	# Update Item definition
@@ -1528,12 +1548,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	add_alarm($triggerid,$istrue)
 	{
-		$sql="select max(clock) from alarms";
+		$sql="select max(clock) from alarms where triggerid=$triggerid";
 		$result=DBselect($sql);
 		$row=DBfetch($result);
 		if($row[0]!="")
 		{
-			$sql="select istrue from alarms where clock=".$row[0];
+			$sql="select istrue from alarms where triggerid=$triggerid and clock=".$row[0];
 			$result=DBselect($sql);
 			if(DBnum_rows($result) == 1)
 			{

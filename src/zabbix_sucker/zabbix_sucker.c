@@ -332,7 +332,7 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 		if (status == STAT_SUCCESS)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Error in packet\nReason: %s\n",
-			snmp_errstring(response->errstat));
+				snmp_errstring(response->errstat));
 			if(response->errstat == SNMP_ERR_NOSUCHNAME)
 			{
 				ret=NOTSUPPORTED;
@@ -592,13 +592,7 @@ int get_values(void)
 
 	now = time(NULL);
 
-#ifdef PERF
-	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid order by i.nextcheck", now, now);
-
-#else
-
 	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-1,sucker_num-1);
-#endif
 	result = DBselect(sql);
 
 	rows = DBnum_rows(result);
@@ -612,12 +606,6 @@ int get_values(void)
 	for(i=0;i<rows;i++)
 	{
 		item.itemid=atoi(DBget_field(result,i,0));
-#ifdef PERF
-		if(item.itemid%(CONFIG_SUCKERD_FORKS-1)!=sucker_num-1)
-		{
-			continue;
-		}
-#endif
 		item.key=DBget_field(result,i,1);
 		item.host=DBget_field(result,i,2);
 		item.port=atoi(DBget_field(result,i,3));
