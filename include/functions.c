@@ -476,7 +476,7 @@ void	apply_actions(int triggerid,int good)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "Check dependencies");
 
-		sprintf(sql,"select count(*) from trigger_depends d,triggers t where d.triggerid_down=%d and d.triggerid_up=t.triggerid and t.istrue=%d",triggerid, TRIGGER_STATUS_TRUE);
+		sprintf(sql,"select count(*) from trigger_depends d,triggers t where d.triggerid_down=%d and d.triggerid_up=t.triggerid and t.value=%d",triggerid, TRIGGER_VALUE_TRUE);
 		result = DBselect(sql);
 		if(DBis_empty(result) == FAIL)
 		{
@@ -620,11 +620,11 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 	{
 		now=time(NULL);
 /* Added table hosts to eliminate unnecessary update of triggers */
-		sprintf(sql,"select t.triggerid,t.expression,t.istrue,t.dep_level,t.priority from triggers t,functions f,items i,hosts h where i.hostid=h.hostid and i.status<>3 and i.itemid=f.itemid and i.lastclock<=%d and t.istrue!=2 and f.triggerid=t.triggerid and f.itemid%%%d=%d and (h.status=0 or (h.status=2 and h.disable_until<%d)) group by t.triggerid,t.expression,t.istrue,t.dep_level",lastclock,suckers-1,sucker_num-1,now);
+		sprintf(sql,"select t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value from triggers t,functions f,items i,hosts h where i.hostid=h.hostid and i.status<>3 and i.itemid=f.itemid and i.lastclock<=%d and t.status=%d and f.triggerid=t.triggerid and f.itemid%%%d=%d and (h.status=0 or (h.status=2 and h.disable_until<%d)) group by t.triggerid,t.expression,t.dep_level",lastclock,TRIGGER_STATUS_ENABLED,suckers-1,sucker_num-1,now);
 	}
 	else
 	{
-		sprintf(sql,"select t.triggerid,t.expression,t.istrue,t.dep_level,t.priority from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.istrue!=2 and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.istrue,t.dep_level",sucker_num);
+		sprintf(sql,"select t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.dep_level",TRIGGER_STATUS_ENABLED,sucker_num);
 	}
 
 	result = DBselect(sql);
@@ -638,11 +638,11 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Fetched: TrId[%s] Exp[%s] IsTrue[%s]\n", DBget_field(result,i,0),DBget_field(result,i,1),DBget_field(result,i,2));
 		trigger.triggerid=atoi(DBget_field(result,i,0));
 		trigger.expression=DBget_field(result,i,1);
-		trigger.istrue=atoi(DBget_field(result,i,2));
+		trigger.status=atoi(DBget_field(result,i,2));
 		trigger.priority=atoi(DBget_field(result,i,4));
+		trigger.value=atoi(DBget_field(result,i,5));
 		strncpy(exp, trigger.expression, MAX_STRING_LEN);
 		if( evaluate_expression(&b, exp) != 0 )
 		{
@@ -652,15 +652,15 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 
 		if(b==1)
 		{
-			if(trigger.istrue!=TRIGGER_STATUS_TRUE)
+			if(trigger.value != TRIGGER_VALUE_TRUE)
 			{
 				now = time(NULL);
-				sprintf(sql,"update triggers set istrue=%d, lastchange=%d where triggerid=%d",TRIGGER_STATUS_TRUE,now,trigger.triggerid);
+				sprintf(sql,"update triggers set value=%d, lastchange=%d where triggerid=%d",TRIGGER_VALUE_TRUE,now,trigger.triggerid);
 				DBexecute(sql);
 
-				DBadd_alarm(trigger.triggerid, TRIGGER_STATUS_FALSE);
+				DBadd_alarm(trigger.triggerid, TRIGGER_VALUE_FALSE);
 			}
-			if(trigger.istrue==TRIGGER_STATUS_FALSE)
+			if(trigger.value == TRIGGER_VALUE_FALSE)
 			{
 				now = time(NULL);
 				apply_actions(trigger.triggerid,1);
@@ -674,16 +674,16 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 
 		if(b==0)
 		{
-			if(trigger.istrue!=TRIGGER_STATUS_FALSE)
+			if(trigger.value != TRIGGER_VALUE_FALSE)
 			{
 				now = time(NULL);
-				sprintf(sql,"update triggers set istrue=%d, lastchange=%d where triggerid=%d",TRIGGER_STATUS_FALSE,now,trigger.triggerid);
+				sprintf(sql,"update triggers set value=%d, lastchange=%d where triggerid=%d",TRIGGER_VALUE_FALSE,now,trigger.triggerid);
 				DBexecute(sql);
 
-				DBadd_alarm(trigger.triggerid, TRIGGER_STATUS_FALSE);
+				DBadd_alarm(trigger.triggerid, TRIGGER_VALUE_FALSE);
 			}
 
-			if(trigger.istrue==TRIGGER_STATUS_TRUE)
+			if(trigger.value == TRIGGER_VALUE_TRUE)
 			{
 				apply_actions(trigger.triggerid,0);
 

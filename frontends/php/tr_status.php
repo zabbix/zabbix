@@ -215,7 +215,7 @@
 
 		if($onlytrue=='true')
 		{
-			$sql="select t.priority,count(*) from triggers t,hosts h,items i,functions f  where t.istrue=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.description $select_cond and i.status in (0,2) $cond group by 1";
+			$sql="select t.priority,count(*) from triggers t,hosts h,items i,functions f  where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.description $select_cond and i.status in (0,2) $cond group by 1";
 		}
 		else
 		{
@@ -335,11 +335,11 @@
 
 	if($onlytrue=='true')
 	{
-		$result=DBselect("select distinct t.triggerid,t.istrue,t.description,t.expression,t.priority,t.lastchange,t.comments,t.url from triggers t,hosts h,items i,functions f  where t.istrue=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.description $select_cond and t.triggerid=f.triggerid and i.status in (0,2) $cond $sort");
+		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f  where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and t.description $select_cond and t.triggerid=f.triggerid and i.status in (0,2) $cond $sort");
 	}
 	else
 	{
-		$result=DBselect("select distinct t.triggerid,t.istrue,t.description,t.expression,t.priority,t.lastchange,t.comments,t.url from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.description $select_cond and i.status in (0,2) $cond $sort");
+		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.description $select_cond and i.status in (0,2) $cond $sort");
 	}
 	$col=0;
 	while($row=DBfetch($result))
@@ -351,7 +351,7 @@
 
 // Check for dependencies
 
-		$sql="select count(*) from trigger_depends d, triggers t where d.triggerid_down=".$row["triggerid"]." and d.triggerid_up=t.triggerid and t.istrue=1";
+		$sql="select count(*) from trigger_depends d, triggers t where d.triggerid_down=".$row["triggerid"]." and d.triggerid_up=t.triggerid and t.value=1";
 		$result2=DBselect($sql);
 
 		if(DBget_field($result2,0,0)>0)
@@ -379,16 +379,10 @@
 			echo "<BR><FONT COLOR=\"#000000\" SIZE=-2>".explode_exp($row["expression"],1)."</FONT>";
 		}
 		echo "</TD>";
-		if($row["istrue"]==0)
+		if($row["value"]==0)
 			{ echo "<TD ALIGN=CENTER><FONT COLOR=\"00AA00\">FALSE</FONT></TD>";}
-		elseif($row["istrue"]==2)
-			{ echo "<TD ALIGN=CENTER><FONT COLOR=\"777777\">DISABLED</FONT></TD>";  }
-		elseif($row["istrue"]==1)
-			{  echo "<TD ALIGN=CENTER><FONT COLOR=\"AA0000\">TRUE</FONT></TD>"; }
-		elseif($row["istrue"]==3)
-			{  echo "<TD ALIGN=CENTER><FONT COLOR=\"AA0000\">UNKNOWN</FONT></TD>"; }
 		else
-			{  echo "<TD ALIGN=CENTER><FONT COLOR=\"AA0000\">Error !</FONT></TD>"; }
+			{  echo "<TD ALIGN=CENTER><FONT COLOR=\"AA0000\">TRUE</FONT></TD>"; }
 
 		if($row["priority"]==0)		echo "<TD ALIGN=CENTER>Not classified</TD>";
 		elseif($row["priority"]==1)	echo "<TD ALIGN=CENTER>Just information</TD>";
@@ -424,7 +418,7 @@
 		{
 			echo "<TD ALIGN=CENTER><A HREF=\"tr_comments.php?triggerid=".$row["triggerid"]."\">Add</a></TD>";
 		}
-		if($row["istrue"] == 0)	echo "</TR>\n";
+		if($row["value"] == 0)	echo "</TR>\n";
 	}
 	echo "</TABLE>";
 
