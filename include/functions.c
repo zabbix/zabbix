@@ -395,8 +395,8 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 			
 	memset(c,0,MAX_STRING_LEN+1);
 /*	sprintf(c,"MAIL FROM: %s\r\n",smtp_email);*/
-	sprintf(c,"MAIL FROM:<%s>\r\n",smtp_email);
-	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
+	sprintf(c,"MAIL FROM: <%s>\r\n",smtp_email);
+/*	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
 	e=write(s,c,strlen(c)); 
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL9");
 	if(e == -1)
