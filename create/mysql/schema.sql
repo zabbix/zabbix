@@ -9,7 +9,7 @@ CREATE TABLE services (
   algorithm		int(1)		DEFAULT '0' NOT NULL,
   triggerid		int(4),
   PRIMARY KEY (serviceid)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'services_links'
@@ -24,7 +24,7 @@ CREATE TABLE services_links (
   KEY (serviceupid),
   KEY (servicedownid),
   UNIQUE (serviceupid,servicedownid)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'graphs_items'
@@ -36,7 +36,7 @@ CREATE TABLE graphs_items (
   itemid		int(4)		DEFAULT '0' NOT NULL,
   color			varchar(32)	DEFAULT 'Dark Green' NOT NULL,
   PRIMARY KEY (gitemid)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'graphs'
@@ -49,7 +49,7 @@ CREATE TABLE graphs (
   height		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (graphid),
   UNIQUE (name)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'sysmaps_links'
@@ -61,7 +61,7 @@ CREATE TABLE sysmaps_links (
   shostid1		int(4)		DEFAULT '0' NOT NULL,
   shostid2		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (linkid)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'sysmaps_hosts'
@@ -76,7 +76,7 @@ CREATE TABLE sysmaps_hosts (
   x			int(4)		DEFAULT '0' NOT NULL,
   y			int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (shostid)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'sysmaps'
@@ -89,7 +89,7 @@ CREATE TABLE sysmaps (
   height		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (sysmapid),
   UNIQUE (name)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'config'
@@ -102,7 +102,7 @@ CREATE TABLE config (
 --  password_required	int(1)		DEFAULT '0' NOT NULL,
   alert_history		int(4)		DEFAULT '0' NOT NULL,
   alarm_history		int(4)		DEFAULT '0' NOT NULL
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'groups'
@@ -113,7 +113,7 @@ CREATE TABLE groups (
   name			varchar(64)	DEFAULT '' NOT NULL,
   PRIMARY KEY (groupid),
   UNIQUE (name)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'hosts_groups'
@@ -123,7 +123,7 @@ CREATE TABLE hosts_groups (
   hostid		int(4)		DEFAULT '0' NOT NULL,
   groupid		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (hostid,groupid)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'alerts'
@@ -143,7 +143,7 @@ CREATE TABLE alerts (
   INDEX (actionid),
   KEY clock (clock),
   KEY status_retries (status, retries)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'actions'
@@ -160,7 +160,7 @@ CREATE TABLE actions (
   nextcheck		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (actionid),
   KEY (triggerid)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'alarms'
@@ -174,7 +174,7 @@ CREATE TABLE alarms (
   PRIMARY KEY (alarmid),
   KEY (triggerid,clock),
   KEY (clock)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'functions'
@@ -190,7 +190,7 @@ CREATE TABLE functions (
   PRIMARY KEY (functionid),
   KEY triggerid (triggerid),
   KEY itemidfunctionparameter (itemid,function,parameter)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'history'
@@ -201,7 +201,7 @@ CREATE TABLE history (
   clock int(4) DEFAULT '0' NOT NULL,
   value double(16,4) DEFAULT '0.0000' NOT NULL,
   PRIMARY KEY (itemid,clock)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'history_str'
@@ -212,7 +212,7 @@ CREATE TABLE history_str (
   clock int(4) DEFAULT '0' NOT NULL,
   value varchar(255) DEFAULT '' NOT NULL,
   PRIMARY KEY (itemid,clock)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'hosts'
@@ -230,7 +230,7 @@ CREATE TABLE hosts (
   network_errors int(4) DEFAULT '0' NOT NULL,
   PRIMARY KEY (hostid),
   KEY (status)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'items_template'
@@ -244,7 +244,7 @@ CREATE TABLE items_template (
   value_type int(4) DEFAULT '0' NOT NULL,
   PRIMARY KEY (itemtemplateid),
   UNIQUE (key_)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'triggers_template'
@@ -257,7 +257,7 @@ CREATE TABLE triggers_template (
   expression varchar(255) DEFAULT '' NOT NULL,
   PRIMARY KEY (triggertemplateid),
   KEY (itemtemplateid)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'items'
@@ -286,7 +286,7 @@ CREATE TABLE items (
 	KEY		(hostid),
 	KEY		(nextcheck),
 	KEY		(status)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'media'
@@ -300,7 +300,7 @@ CREATE TABLE media (
 	active		int(4) DEFAULT '0' NOT NULL,
 	PRIMARY KEY	(mediaid),
 	KEY		(userid)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'triggers'
@@ -320,7 +320,7 @@ CREATE TABLE triggers (
 	PRIMARY KEY	(triggerid),
 	KEY		(status),
 	KEY		(value)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'trigger_depends'
@@ -332,7 +332,7 @@ CREATE TABLE trigger_depends (
 	PRIMARY KEY	(triggerid_down, triggerid_up),
 	KEY		(triggerid_down),
 	KEY		(triggerid_up)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'users'
@@ -346,7 +346,7 @@ CREATE TABLE users (
   passwd		char(32)	DEFAULT '' NOT NULL,
   PRIMARY KEY (userid),
   UNIQUE (alias)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'sessions'
@@ -357,7 +357,7 @@ CREATE TABLE sessions (
   userid		int(4)		NOT NULL DEFAULT '0',
   lastaccess		int(4)		NOT NULL DEFAULT '0',
   PRIMARY KEY (sessionid)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'rights'
@@ -370,7 +370,7 @@ CREATE TABLE rights (
   permission		char(1)		DEFAULT '' NOT NULL,
   id			int(4),
   PRIMARY KEY (rightid)
-);
+) type=InnoDB;
 
 --
 -- Table structure for table 'problems'
@@ -390,7 +390,7 @@ CREATE TABLE rights (
 --   KEY (status),
 --   KEY (categoryid),
 --   KEY (priority)
--- );
+-- ) type=InnoDB;
 
 --
 -- Table structure for table 'categories'
@@ -400,7 +400,7 @@ CREATE TABLE rights (
 --   categoryid		int(4)		NOT NULL auto_increment,
 --   descripion		varchar(64)	DEFAULT '' NOT NULL,
 --   PRIMARY KEY (categoryid)
--- );
+-- ) type=InnoDB;
 
 --
 -- Table structure for table 'problems_categories'
@@ -415,7 +415,7 @@ CREATE TABLE rights (
 --   comment		blob,
 --   PRIMARY KEY (commentid),
 --   KEY (problemid,clock)
--- );
+-- ) type=InnoDB;
 
 --
 -- Table structure for table 'service_alarms'
@@ -429,4 +429,4 @@ CREATE TABLE service_alarms (
   PRIMARY KEY (servicealarmid),
   KEY (serviceid,clock),
   KEY (clock)
-);
+) type=InnoDB;
