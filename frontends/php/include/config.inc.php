@@ -3554,6 +3554,7 @@ echo "</head>";
 	function	show_form_begin($help="")
 	{
 ?>
+<p align=center>
 <table class="form" width="50%" cellspacing=0 cellpadding=1>
 <tr>
 <td class="form_row_first" height=24 colspan=2>
