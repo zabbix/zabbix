@@ -64,7 +64,6 @@ void CollectorThread(void *)
    USER_COUNTER *cptr;
    PDH_STATISTICS statData;
 
-   TlsSetValue(dwTlsLogPrefix,"Collector: ");   // Set log prefix for collector thread
    GetSystemInfo(&sysInfo);
 
    memset(collectorTimesHistory,0,sizeof(DWORD)*60);

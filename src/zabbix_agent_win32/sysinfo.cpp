@@ -672,10 +672,37 @@ void ProcessCommand(char *received_cmd,char *result)
    double fResult=NOTSUPPORTED;
    char *strResult=NULL,cmd[MAX_ZABBIX_CMD_LEN];
    LONG iRC=SYSINFO_RC_NOTSUPPORTED;
+   SUBAGENT *sbi;
+   BOOL isSubagentCommand=FALSE;
 
    ExpandAlias(received_cmd,cmd);
 
-   // Find match for command
+   // Find match for command in subagents
+   for(sbi=subagentList;sbi!=NULL;sbi=sbi->next)
+   {
+      for(i=0;;i++)
+      {
+         if (sbi->cmdList[i].name[0]==0)
+            break;
+
+         if (MatchString(sbi->cmdList[i].name,cmd))
+         {
+            if (sbi->cmdList[i].handler_float!=NULL)
+            {
+               iRC=sbi->cmdList[i].handler_float(cmd,&fResult);
+            }
+            else
+            {
+               if (sbi->cmdList[i].handler_string!=NULL)
+                  iRC=sbi->cmdList[i].handler_string(cmd,&strResult);
+            }
+            isSubagentCommand=TRUE;
+            goto finish_cmd_processing;
+         }
+      }
+   }
+
+   // Find match for command in internal command list
    for(i=0;;i++)
    {
       if (commands[i].name[0]==0)
@@ -696,6 +723,7 @@ void ProcessCommand(char *received_cmd,char *result)
       }
    }
 
+finish_cmd_processing:;
    switch(iRC)
    {
       case SYSINFO_RC_SUCCESS:
@@ -707,7 +735,10 @@ void ProcessCommand(char *received_cmd,char *result)
          {
             strncpy(result,strResult,MAX_STRING_LEN-1);
             strcat(result,"\n");
-            free(strResult);
+            if (isSubagentCommand)
+               zfree(strResult);
+            else
+               free(strResult);
          }
          statProcessedRequests++;
          break;
@@ -720,7 +751,7 @@ void ProcessCommand(char *received_cmd,char *result)
          statFailedRequests++;
          break;
       default:
-         strcpy(result,"ZBX_ERROR\n"); // MSG_UNEXPECETD_IRC
+         strcpy(result,"ZBX_ERROR\n");
          WriteLog(MSG_UNEXPECTED_IRC,EVENTLOG_ERROR_TYPE,"ds",iRC,received_cmd);
          statFailedRequests++;
          break;

@@ -146,4 +146,28 @@ Language=English
 Too many consecutive errors on accept() call
 .
 
+MessageId=
+SymbolicName=MSG_LOAD_FAILED
+Language=English
+Failed to load subagent module "%1": %2
+.
+
+MessageId=
+SymbolicName=MSG_NO_ENTRY_POINTS
+Language=English
+Unable to find all required exportable functions in subagent module "%1"
+.
+
+MessageId=
+SymbolicName=MSG_SUBAGENT_INIT_FAILED
+Language=English
+Subagent "%1" initialization failed (initialization function return code %2)
+.
+
+MessageId=
+SymbolicName=MSG_SUBAGENT_LOADED
+Language=English
+Subagent "%1" loaded successfully
+.
+
 ;#endif

@@ -92,7 +92,7 @@ void CloseLog(void)
 
 static void WriteLogToFile(char *message)
 {
-   char *prefix,buffer[64];
+   char buffer[64];
    DWORD size;
    time_t t;
    struct tm *loc;
@@ -106,14 +106,6 @@ static void WriteLogToFile(char *message)
    WriteFile(hLog,buffer,strlen(buffer),&size,NULL);
    if (IsStandalone())
       printf("%s",buffer);
-
-   prefix=(char *)TlsGetValue(dwTlsLogPrefix);
-   if (prefix!=NULL)    // Thread has it's log prefix
-   {
-      WriteFile(hLog,prefix,strlen(prefix),&size,NULL);
-      if (IsStandalone())
-         printf("%s",prefix);
-   }
 
    WriteFile(hLog,message,strlen(message),&size,NULL);
    if (IsStandalone())

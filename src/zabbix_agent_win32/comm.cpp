@@ -65,7 +65,6 @@ static BOOL IsValidServerAddr(DWORD addr)
 
 static unsigned int __stdcall ProcessingThread(void *arg)
 {
-   TlsSetValue(dwTlsLogPrefix,"ProcessingThread: ");
    ProcessCommand(((REQUEST *)arg)->cmd,((REQUEST *)arg)->result);
    return 0;
 }
@@ -85,7 +84,6 @@ static void CommThread(void *param)
    HANDLE hThread=NULL;
    unsigned int tid;
 
-   TlsSetValue(dwTlsLogPrefix,"CommThread: ");   // Set log prefix for communication thread
    sock=(SOCKET)param;
 
    // Wait for command from server
@@ -140,8 +138,6 @@ void ListenerThread(void *)
    SOCKET sock,sockClient;
    struct sockaddr_in servAddr;
    int iSize,errorCount=0;
-
-   TlsSetValue(dwTlsLogPrefix,"Listener: ");   // Set log prefix for listener thread
 
    // Create socket
    if ((sock=socket(AF_INET,SOCK_STREAM,0))==-1)
