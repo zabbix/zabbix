@@ -257,6 +257,8 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 	struct sockaddr_in myaddr_in;
 	struct sockaddr_in servaddr_in;
 
+	char	*OK_250="250 OK";
+
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL");
 
 	servaddr_in.sin_family=AF_INET;
@@ -287,23 +289,32 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 		close(s);
 		return FAIL;
 	}
-		
-	sprintf(c,"HELO %s\n",smtp_helo);
-	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
-	if(e == -1)
+
+	if(strlen(smtp_helo) != 0)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Error sending HELO to mailserver.");
-		close(s);
-		return FAIL;
-	}
-			
-	i=sizeof(struct sockaddr_in);
-	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);
-	if(i == -1)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Error receiving answer on HELO request.");
-		close(s);
-		return FAIL;
+		sprintf(c,"HELO %s\n",smtp_helo);
+		e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
+		if(e == -1)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "Error sending HELO to mailserver.");
+			close(s);
+			return FAIL;
+		}
+				
+		i=sizeof(struct sockaddr_in);
+		i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);
+		if(i == -1)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "Error receiving answer on HELO request.");
+			close(s);
+			return FAIL;
+		}
+		if(strncmp(OK_250,c,strlen(OK_250)) != 0)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "Wrong answer on HELO [%s]", c);
+			close(s);
+			return FAIL;
+		}
 	}
 			
 	sprintf(c,"MAIL FROM: %s\n",smtp_email);
@@ -319,6 +330,12 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 	if(i == -1)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Error receiving answer on MAIL FROM request.");
+		close(s);
+		return FAIL;
+	}
+	if(strncmp(OK_250,c,strlen(OK_250)) != 0)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Wrong answer on MAIL FROM [%s]", c);
 		close(s);
 		return FAIL;
 	}
@@ -339,8 +356,14 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 		close(s);
 		return FAIL;
 	}
+	if(strncmp(OK_250,c,strlen(OK_250)) != 0)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Wrong answer on RCPT TO [%s]", c);
+		close(s);
+		return FAIL;
+	}
 	
-	sprintf(c,"DATA\nSubject: %s\n",mailsubject);
+	sprintf(c,"DATA\n");
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e == -1)
 	{
@@ -356,15 +379,23 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 		close(s);
 		return FAIL;
 	}
-	sprintf(c,"%s\n",mailbody);
-	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
-	if(e == -1)
+	if(strncmp(OK_250,c,strlen(OK_250)) != 0)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Error sending mail body to mailserver.");
+		zabbix_log(LOG_LEVEL_ERR, "Wrong answer on DATA [%s]", c);
 		close(s);
 		return FAIL;
 	}
-	sprintf(c,".\n");
+
+	sprintf(c,"Subject: %s\n%s",mailsubject, mailbody);
+	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
+	if(e == -1)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Error sending mail subject and body to mailserver.");
+		close(s);
+		return FAIL;
+	}
+
+	sprintf(c,"\n.\n");
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e == -1)
 	{
@@ -377,6 +408,12 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 	if(i == -1)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Error receivng answer on . request.");
+		close(s);
+		return FAIL;
+	}
+	if(strncmp(OK_250,c,strlen(OK_250)) != 0)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Wrong answer on end of data [%s]", c);
 		close(s);
 		return FAIL;
 	}
