@@ -48,6 +48,7 @@
 #include "db.h"
 #include "functions.h"
 #include "log.h"
+#include "email.h"
 
 #include "alerter.h"
 
