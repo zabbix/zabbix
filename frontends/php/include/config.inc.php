@@ -30,6 +30,7 @@
 	include_once 	"include/html.inc.php";
 
 	include_once 	"include/audit.inc.php";
+	include_once 	"include/hosts.inc.php";
 	include_once 	"include/users.inc.php";
 	include_once 	"include/graphs.inc.php";
 	include_once 	"include/items.inc.php";
