@@ -1,3 +1,7 @@
+Changes for 1.0beta13:
+
+ - proper timeout handling for SNMP connect (Alexei)
+
 Changes for 1.0beta12:
 
  - fixed add services (Alexei)
