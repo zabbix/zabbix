@@ -993,6 +993,8 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
 		ret = FAIL;
 	}
 
+	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 7 Value [%s] Units [%s] Formula [%s]", value, item->units, item->formula);
+
 	/* Add suffix: 1000000 -> 1 MB */
 	if( (EVALUATE_FUNCTION_SUFFIX == flag) && (ITEM_VALUE_TYPE_FLOAT == item->value_type) &&
 		(SUCCEED == ret) && strlen(item->units)>0)
