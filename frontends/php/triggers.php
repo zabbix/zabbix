@@ -128,8 +128,9 @@
 				if(isset($_GET["disabled"]))	{ $status=1; }
 				else			{ $status=0; }
 				
-				$result=add_trigger($_GET["expression"],$_GET["description"],$_GET["priority"],$status,$_GET["comments"],$_GET["url"]);
-				show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
+				$triggerid=add_trigger($_GET["expression"],$_GET["description"],$_GET["priority"],$status,$_GET["comments"],$_GET["url"]);
+				add_trigger_to_templates($triggerid);
+				show_messages($triggerid, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 			}
 			else
 			{
