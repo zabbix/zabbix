@@ -1,5 +1,6 @@
 Changes for 1.0beta14:
 
+ - do not link crypt and crypto to the agent (Alexei)
  - fixed report1.php to work under FreeBSD (Alexei)
  - fixed displaying of string value in the Latest Values (Alexei)
  - fixed simple check when port specified. Order of IP and PORT is
