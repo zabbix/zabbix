@@ -80,7 +80,8 @@ STRUCTURE
 ---------
 
 	itemid		int	; Unique item ID
-	hostid		id	; Host ID
+	type		int	; Type of item: 0 - Zabbix, 1 - SNMPv1
+	hostid		int	; Host ID
 	description	varchar ; Description of the item
 	key_		varchar ; Key to be sent to host
 	delay		int	; How often we retrieve this item (in sec)
