@@ -1,7 +1,3 @@
-TODO:
-
- - IT Helpdesk's problems to be connected to Services only (?)
-
 Not ready yet:
 
  HB:
@@ -10,7 +6,6 @@ Not ready yet:
  - SNMP trapping
  - Reports:
   - more customizable (graphs timerange: 1 mont, etc)
-  - availability report for IT Services
 
  OTHER:
 
@@ -50,6 +45,7 @@ Not ready yet:
 
 Changes for 1.0beta6:
 
+ - availability graph for IT Services (Alexei)
  - improvement in user rights handling routines (Alexei)
  - if trigger status is UNKNOWN, set function.lastvalue to NULL (Alexei)
  - fixed permission check for all *.php (Alexei)

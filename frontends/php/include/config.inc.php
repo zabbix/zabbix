@@ -3475,6 +3475,104 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return $stat;
 	}
 
+	function	calculate_service_availability($serviceid,$period_start,$period_end)
+	{
+	       	$sql="select count(*),min(clock),max(clock) from service_alarms where serviceid=$serviceid and clock>=$period_start and clock<=$period_end";
+		
+	        $result=DBselect($sql);
+		if(DBget_field($result,0,0)>0)
+		{
+			$min=DBget_field($result,0,1);
+			$max=DBget_field($result,0,2);
+		}
+		else
+		{
+			$ret["true_time"]=0;
+			$ret["false_time"]=1;
+			$ret["true"]=0;
+			$ret["false"]=100;
+			return $ret;
+		}
+
+		$sql="select clock,value from service_alarms where serviceid=$serviceid and clock>=$min and clock<=$max";
+//		echo " $sql<br>";
+		$result=DBselect($sql);
+
+//		echo $sql,"<br>";
+
+// -1,0,1
+		$state=-1;
+		$true_time=0;
+		$false_time=0;
+		$time=$min;
+		for($i=0;$i<DBnum_rows($result);$i++)
+		{
+			$clock=DBget_field($result,$i,0);
+			$value=DBget_field($result,$i,1);
+
+			$diff=$clock-$time;
+
+			$time=$clock;
+#state=0,1 (FALSE), >1 TRUE 
+
+			if($state==-1)
+			{
+				$state=$value;
+				if($state <= 1)
+				{
+					$true_time+=$diff;
+				}
+				else
+				{
+					$false_time+=$diff;
+				}
+			}
+			else if($state<=1)
+			{
+				$true_time+=$diff;
+				$state=$value;
+			}
+			else
+			{
+				$false_time+=$diff;
+				$state=$value;
+			}
+		}
+
+		if(DBnum_rows($result)==0)
+		{
+			$false_time=$max-$min;
+		}
+		else
+		{
+			if($state<=1)
+			{
+				$false_time=$false_time+$max-$time;
+			}
+			else
+			{
+				$true_time=$true_time+$max-$time;
+			}
+		}
+
+		$total_time=$true_time+$false_time;
+		if($total_time==0)
+		{
+			$ret["true_time"]=0;
+			$ret["false_time"]=0;
+			$ret["true"]=0;
+			$ret["false"]=0;
+		}
+		else
+		{
+			$ret["true_time"]=$true_time;
+			$ret["false_time"]=$false_time;
+			$ret["true"]=(100*$true_time)/$total_time;
+			$ret["false"]=(100*$false_time)/$total_time;
+		}
+		return $ret;
+	}
+
 	// If $period_start=$period_end=0, then take maximum period
 	function	calculate_availability($triggerid,$period_start,$period_end)
 	{
