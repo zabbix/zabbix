@@ -3586,18 +3586,18 @@ echo "</head>";
 	function	show_header2($h1, $h2, $h2_form1, $h2_form2)
 	{
 ?>
+	<?php echo $h2_form1; ?>
 	<table class="menu" cellspacing=0 cellpadding=1 width="100%">
 	<tr>
 	<td class="sub_menu" height=24 align=left>
 	<?php echo $h1; ?>
 	</td>
-	<?php echo $h2_form1; ?>
 	<td class="sub_menu" height=24 align=right>
 	<?php echo $h2; ?>
 	</td>
-	<?php echo $h2_form2; ?>
 	</tr>
 	</table>
+	<?php echo $h2_form2; ?>
 <?php
 	}
 
@@ -3922,7 +3922,7 @@ echo "</head>";
 		global $USER_DETAILS;
 
 ?>
-</p>
+<p>
 <table class="menu" width="100%" cellspacing=0 cellpadding=5>
 <tr>
 <td class="horizontal_menu" height=24 colspan=9 align=center><b><?php echo "<a href=\"http://www.zabbix.com\" class=\"highlight\">".S_ZABBIX_VER."</a>&nbsp;".S_COPYRIGHT_BY."<a href=\"mailto:alex@gobbo.caves.lv\" class=\"highlight\">".S_ALEXEI_VLADISHEV."</a>"; ?></b></td>
