@@ -4,6 +4,7 @@
  - remove icmpping and others from the QUEUE
  - hardlinked templates (several templates, one host)
  - escalation and repeated notifications
+ - take advantage of PHP OOP (everything in classes)
 
  - add selection of MIN/MAX/AVG for graphs
  - make sure all screens looks good in case of hundreds of servers/groups
