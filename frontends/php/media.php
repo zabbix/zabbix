@@ -88,51 +88,31 @@
 	show_table_header(S_MEDIA_BIG);
 ?>
 
-<FONT COLOR="#000000">
 <?php
 	$sql="select m.mediaid,mt.description,m.sendto,m.active from media m,media_type mt where m.mediatypeid=mt.mediatypeid and m.userid=".$_GET["userid"]." order by mt.type,m.sendto";
 	$result=DBselect($sql);
 
-	echo "<TABLE BORDER=0 WIDTH=100% align=center BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR>";
-	echo "<TD><B>".S_TYPE."</B></TD>";
-	echo "<TD><B>".S_SEND_TO."</B></TD>";
-	echo "<TD><B>".S_STATUS."</B></TD>";
-	echo "<TD><B>".S_ACTIONS."</B></TD>";
-	echo "</TR>";
+	table_begin();
+	table_header(array(S_TYPE, S_SEND_TO,S_STATUS,S_ACTIONS));
 
 	$col=0;
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
 	{
-		if($col==1)
+		if($row["active"]==0) 
 		{
-			echo "<TR BGCOLOR=#DDDDDD>";
-			$col=0;
-		} else
-		{
-			echo "<TR BGCOLOR=#EEEEEE>";
-			$col=1;
-		}
-		$mediaid=DBget_field($result,$i,0);
-		$description=DBget_field($result,$i,1);
-		echo "<TD>";
-		echo $description;
-		echo "</TD>";
-		echo "<TD>",DBget_field($result,$i,2),"</TD>";
-		echo "<TD>";
-		if(DBget_field($result,$i,3)==0) 
-		{
-			echo "<a href=\"media.php?register=disable&mediaid=$mediaid&userid=".$_GET["userid"]."\"><font color=\"00AA00\">".S_ENABLED."</font></A>";
+			$status="<a href=\"media.php?register=disable&mediaid=".$row["mediaid"]."&userid=".$_GET["userid"]."\"><font color=\"00AA00\">".S_ENABLED."</font></A>";
 		}
 		else
 		{
-			echo "<a href=\"media.php?register=enable&mediaid=$mediaid&userid=".$_GET["userid"]."\"><font color=\"AA0000\">".S_DISABLED."</font></A>";
+			$status="<a href=\"media.php?register=enable&mediaid=".$row["mediaid"]."&userid=".$_GET["userid"]."\"><font color=\"AA0000\">".S_DISABLED."</font></A>";
 		}
-		echo "</TD>";
-		echo "<TD>";
-		echo "<A HREF=\"media.php?register=change&mediaid=$mediaid&userid=".$_GET["userid"]."\">".S_CHANGE."</A>";
-		echo "</TD>";
-		echo "</TR>";
+		$actions="<A HREF=\"media.php?register=change&mediaid=".$row["mediaid"]."&userid=".$_GET["userid"]."\">".S_CHANGE."</A>";
+		table_row(array(
+			$row["description"],
+			$row["sendto"],
+			$status,
+			$actions
+			),$col++);
 	}
 	if(DBnum_rows($result)==0)
 	{
@@ -140,12 +120,8 @@
 		echo "<TD COLSPAN=4 ALIGN=CENTER>".S_NO_MEDIA_DEFINED."</TD>";
 		echo "<TR>";
 	}
-
-	echo "</TABLE>";
+	table_end();
 ?>
-</FONT>
-</TR>
-</TABLE>
 
 <?php
 	if(isset($_GET["mediaid"]))

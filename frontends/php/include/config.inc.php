@@ -1142,12 +1142,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 
 ?>
-	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-	<html>
-	<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-	<meta name="Author" content="Alexei Vladishev">
-	<link rel="stylesheet" href="css.css">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="Author" content="Alexei Vladishev">
+<link rel="stylesheet" href="css.css">
 
 <?php
 	if($USER_DETAILS['alias']=='guest')
@@ -1164,11 +1164,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<title>$title</title>";
 	}
 
-	echo "</head>";
+echo "</head>";
 ?>
 
 
-	<body>
+<body>
 <?php
 		if($nomenu == 0)
 		{
@@ -1658,14 +1658,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		);
 ?>
 
-	<table border=0 cellspacing=0 cellpadding=5 width="100%" bgcolor="#FFFFFF">
-	<tr>
-	<td width="118" height="31" class="top_header_left"><img width="118" height="31" src="images/general/zabbix.png" border="0" alt="ZABBIX"></td>
-	</tr>
-	</table>
+<table border=0 cellspacing=0 cellpadding=5 width="100%" bgcolor="#FFFFFF">
+<tr>
+<td width="118" height="31" class="top_header_left"><img width="118" height="31" src="images/general/zabbix.png" border="0" alt="ZABBIX"></td>
+</tr>
+</table>
 
-	<table class="menu" cellspacing=0 cellpadding=5>
-	<tr>
+<table class="menu" cellspacing=0 cellpadding=5>
+<tr>
 <?php
 	$i=0;
 	foreach($menu as $label=>$sub)
@@ -1686,10 +1686,10 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		$i++;
 	}
 ?>
-	</tr>
-	</table>
-	<table class="menu" width=100% cellspacing=0 cellpadding=5>
-	<tr><td class="horizontal_menu" height=24 colspan=9><b>
+</tr>
+</table>
+<table class="menu" width=100% cellspacing=0 cellpadding=5>
+<tr><td class="horizontal_menu" height=24 colspan=9><b>
 <?php
 	$i=0;
 	foreach($menu[$active_level1]["level2"] as $label=>$sub)
@@ -1702,8 +1702,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	}
 ?>
 </b></td>
-	</table>
-	<p>
+</table>
+<p>
 
 
 <?php

@@ -66,7 +66,6 @@
 	show_table_header_end();
 ?>
 
-<FONT COLOR="#000000">
 <?php
 	$sql="select max(auditid) as max from audit";
 	$result=DBselect($sql);
@@ -155,9 +154,6 @@
 	}
 	table_end();
 ?>
-</FONT>
-</TR>
-</TABLE>
 
 <?php
 	show_footer();
