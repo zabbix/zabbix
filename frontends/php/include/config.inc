@@ -3,6 +3,34 @@
 
 	$USER_DETAILS	="";
 
+	function	show_messages($bool,$msg,$errmsg)
+	{
+		if(!$bool)
+		{
+			$msg=$errmsg;
+			$color="#AA0000";
+		}
+		else
+		{
+			$color="#000000";
+		}
+		echo "<center>";
+		echo "<font face='Helvetica' size=+1 color='$color'>";
+		echo "<b>[$msg]</b>";
+		echo "</font>";
+		echo "</center><br>";
+	}
+
+	function	show_message($msg)
+	{
+		show_messages(TRUE,$msg,'');
+	}
+
+	function	show_error_message($msg)
+	{
+		show_messages(FALSE,'',$msg);
+	}
+
 	function	validate_float($str)
 	{
 //		echo "Validating float:$str<br>";
@@ -629,6 +657,10 @@
 					$sql="insert into functions (itemid,triggerid,function,parameter) values ($itemid,$triggerid,'$function',$parameter)";
 #					echo $sql,"<Br>";
 					$res=DBexecute($sql);
+					if(!$res)
+					{
+						return	$res;
+					}
 					$functionid=DBinsert_id($res,"functions","functionid");
 #				}
 #				echo "FUNCTIONID:$functionid<BR>";
@@ -695,7 +727,7 @@
 	{
 		$comments=addslashes($comments);
 		$sql="update triggers set comments='$comments' where triggerid=$triggerid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Update Trigger status
@@ -703,7 +735,7 @@
 	function	update_trigger_status($triggerid,$status)
 	{
 		$sql="update triggers set istrue=$status where triggerid=$triggerid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Update Item status
@@ -711,7 +743,7 @@
 	function	update_item_status($itemid,$status)
 	{
 		$sql="update items set status=$status where itemid=$itemid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Update Host status
@@ -719,7 +751,7 @@
 	function	update_host_status($hostid,$status)
 	{
 		$sql="update hosts set status=$status where hostid=$hostid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Update Item definition
@@ -727,7 +759,7 @@
 	function	update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid)
 	{
 		$sql="update items set description='$description',key_='$key',hostid=$hostid,delay=$delay,history=$history,lastdelete=0,nextcheck=0,status=$status,type=$type,snmp_community='$snmp_community',snmp_oid='$snmp_oid' where itemid=$itemid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Add Action
@@ -735,7 +767,7 @@
 	function	add_action( $triggerid, $userid, $good, $delay, $subject, $message )
 	{
 		$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message) values ($triggerid,$userid,$good,$delay,0,'$subject','$message')";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Update Action
@@ -743,13 +775,13 @@
 	function	update_action( $actionid, $userid, $good, $delay, $subject, $message )
 	{
 		$sql="update actions set userid=$userid,good=$good,delay=$delay,nextcheck=0,subject='$subject',message='$message' where actionid=$actionid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	function	delete_graphs_item($gitemid)
 	{
 		$sql="delete from graphs_items where gitemid=$gitemid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Delete Graph
@@ -758,8 +790,12 @@
 	{
 		$sql="delete from graphs_items where graphid=$graphid";
 		$result=DBexecute($sql);
+		if(!$result)
+		{
+			return	$result;
+		}
 		$sql="delete from graphs where graphid=$graphid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Delete System Map
@@ -768,10 +804,18 @@
 	{
 		$sql="delete from sysmaps where sysmapid=$sysmapid";
 		$result=DBexecute($sql);
+		if(!$result)
+		{
+			return	$result;
+		}
 		$sql="delete from sysmaps_hosts where sysmapid=$sysmapid";
 		$result=DBexecute($sql);
+		if(!$result)
+		{
+			return	$result;
+		}
 		$sql="delete from sysmaps_links where sysmapid=$sysmapid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Delete Action by userid
@@ -779,7 +823,7 @@
 	function	delete_actions_by_userid( $userid )
 	{
 		$sql="delete from actions where userid=$userid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Delete Action
@@ -787,7 +831,7 @@
 	function	delete_action( $actionid )
 	{
 		$sql="delete from actions where actionid=$actionid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Delete from History
@@ -796,7 +840,7 @@
 	{
 
 		$sql="delete from history where itemid=$itemid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Add Item definition
@@ -813,19 +857,19 @@
 	function	delete_function_by_triggerid($triggerid)
 	{
 		$sql="delete from functions where triggerid=$triggerid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	function	delete_actions_by_triggerid($triggerid)
 	{
 		$sql="delete from actions where triggerid=$triggerid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	function	delete_alarms_by_triggerid($triggerid)
 	{
 		$sql="delete from alarms where triggerid=$triggerid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Delete Function and Trigger definitions by itemid
@@ -839,7 +883,7 @@
 			delete_trigger(DBget_field($result,$i,0));
 		}
 		$sql="delete from functions where itemid=$itemid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 
 	}
 
@@ -848,12 +892,24 @@
 	function	delete_item($itemid)
 	{
 
-		delete_triggers_functions_by_itemid($itemid);
-		delete_history_by_itemid($itemid);
+		$result=delete_triggers_functions_by_itemid($itemid);
+		if(!$result)
+		{
+			return	$result;
+		}
+		$result=delete_history_by_itemid($itemid);
 		$sql="delete from graphs_items where itemid=$itemid";
+		if(!$result)
+		{
+			return	$result;
+		}
 		$result=DBexecute($sql);
+		if(!$result)
+		{
+			return	$result;
+		}
 		$sql="delete from items where itemid=$itemid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Add alarm
@@ -862,7 +918,7 @@
 	{
 		$now=time();
 		$sql="insert into alarms(triggerid,clock,istrue) values($triggerid,$now,$istrue)";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Add Trigger definition
@@ -871,42 +927,57 @@
 	{
 		$description=addslashes($description);
 		$sql="insert into triggers  (description,priority,istrue,comments) values ('$description',$priority,$istrue,'$comments')";
-#		echo $sql,"<Br>";
 		$result=DBexecute($sql);
+		if(!$result)
+		{
+			return	$result;
+		}
  
 		$triggerid=DBinsert_id($result,"triggers","triggerid");
  
 		$expression=implode_exp($expression,$triggerid);
 		$sql="update triggers set expression='$expression' where triggerid=$triggerid";
-#		echo $sql,"<Br>";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Delete Trigger definition
 
 	function	delete_trigger($triggerid)
 	{
-		delete_function_by_triggerid($triggerid);
-		delete_alarms_by_triggerid($triggerid);
-		delete_actions_by_triggerid($triggerid);
+		$result=delete_function_by_triggerid($triggerid);
+		if(!$result)
+		{
+			return	$result;
+		}
+		$result=delete_alarms_by_triggerid($triggerid);
+		if(!$result)
+		{
+			return	$result;
+		}
+		$result=delete_actions_by_triggerid($triggerid);
+		if(!$result)
+		{
+			return	$result;
+		}
 
 		$sql="delete from triggers where triggerid=$triggerid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Update Trigger definition
 
 	function	update_trigger($triggerid,$expression,$description,$priority,$istrue,$comments)
 	{
-#		delete_trigger($triggerid);
-#		$triggerid=add_trigger($expression,$description,$priority,$istrue,$comments);
 
-		delete_function_by_triggerid($triggerid);
+		$result=delete_function_by_triggerid($triggerid);
+		if(!$result)
+		{
+			return	$result;
+		}
 
 		$expression=implode_exp($expression,$triggerid);
 		$sql="update triggers set expression='$expression',description='$description',priority=$priority,istrue=$istrue,comments='$comments' where triggerid=$triggerid";
-#		echo $sql,"<Br>";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Update User definition
@@ -922,8 +993,7 @@
 			$passwd=bin2hex(mhash (MHASH_MD5,$passwd));
 			$sql="update users set groupid=$groupid,name='$name',surname='$surname',alias='$alias',passwd='$passwd' where userid=$userid";
 		}
-		$result=DBexecute($sql);
-		return	$result;
+		return DBexecute($sql);
 	}
 
 
@@ -933,9 +1003,7 @@
 	{
 		$passwd=bin2hex(mhash (MHASH_MD5,$passwd));
 		$sql="insert into users (groupid,name,surname,alias,passwd) values ($groupid,'$name','$surname','$alias','$passwd')";
-		$result=DBexecute($sql);
-
-		return	$result;
+		return DBexecute($sql);
 	}
 
 	# Add Items and Triggers from template
@@ -973,6 +1041,7 @@
 				add_trigger($expression,$description,0,0,"");
 			}
 		}
+		return	TRUE;
 	}
 
 	# Update Graph
@@ -980,7 +1049,7 @@
 	function	update_graph($graphid,$name,$width,$height)
 	{
 		$sql="update graphs set name='$name',width=$width,height=$height where graphid=$graphid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Update System Map
@@ -988,7 +1057,7 @@
 	function	update_sysmap($sysmapid,$name,$width,$height)
 	{
 		$sql="update sysmaps set name='$name',width=$width,height=$height where sysmapid=$sysmapid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Add Graph
@@ -996,13 +1065,13 @@
 	function	add_graph($name,$width,$height)
 	{
 		$sql="insert into graphs (name,width,height) values ('$name',$width,$height)";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	function	add_item_to_graph($graphid,$itemid,$color)
 	{
 		$sql="insert into graphs_items (graphid,itemid,color) values ($graphid,$itemid,'$color')";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Add System Map
@@ -1010,19 +1079,19 @@
 	function	add_sysmap($name,$width,$height)
 	{
 		$sql="insert into sysmaps (name,width,height) values ('$name',$width,$height)";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	function	add_link($sysmapid,$shostid1,$shostid2)
 	{
 		$sql="insert into sysmaps_links (sysmapid,shostid1,shostid2) values ($sysmapid,$shostid1,$shostid2)";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	function	delete_link($linkid)
 	{
 		$sql="delete from sysmaps_links where linkid=$linkid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Add Host to system map
@@ -1030,13 +1099,13 @@
 	function add_host_to_sysmap($sysmapid,$hostid,$label,$x,$y,$icon)
 	{
 		$sql="insert into sysmaps_hosts (sysmapid,hostid,label,x,y,icon) values ($sysmapid,$hostid,'$label',$x,$y,'$icon')";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	function	update_sysmap_host($shostid,$sysmapid,$hostid,$label,$x,$y,$icon)
 	{
 		$sql="update sysmaps_hosts set hostid=$hostid,label='$label',x=$x,y=$y,icon='$icon' where shostid=$shostid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Add Host definition
@@ -1053,13 +1122,18 @@
 		}
 		$sql="insert into hosts (host,port,status,useip,ip) values ('$host',$port,$status,$useip,'$ip')";
 		$result=DBexecute($sql);
+		if(!$result)
+		{
+			return	$result;
+		}
+		
 		$hostid=DBinsert_id($result,"hosts","hostid");
 
 		if($template=="true")
 		{
-			add_from_templates($hostid,$host);
+			$result=add_from_templates($hostid,$host);
 		}
-
+		return	$result;
 	}
 
 	# Add Media definition
@@ -1067,7 +1141,7 @@
 	function	add_media( $userid, $type, $sendto)
 	{
 		$sql="insert into media (userid,type,sendto,active) values ($userid,'$type','$sendto',0)";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Delete Media definition
@@ -1075,7 +1149,7 @@
 	function	delete_media($mediaid)
 	{
 		$sql="delete from media where mediaid=$mediaid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Delete Media definition by userid
@@ -1083,7 +1157,7 @@
 	function	delete_media_by_userid($userid)
 	{
 		$sql="delete from media where userid=$userid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Update configuration
@@ -1091,7 +1165,7 @@
 	function	update_config($smtp_server,$smtp_helo,$smtp_email,$password_required)
 	{
 		$sql="update config set smtp_server='$smtp_server',smtp_helo='$smtp_helo',smtp_email='$smtp_email',password_required=$password_required";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 
@@ -1100,7 +1174,7 @@
 	function	activate_media($mediaid)
 	{
 		$sql="update media set active=0 where mediaid=$mediaid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Disactivate Media
@@ -1108,7 +1182,7 @@
 	function	disactivate_media($mediaid)
 	{
 		$sql="update media set active=1 where mediaid=$mediaid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Delete Host from sysmap definition
@@ -1117,8 +1191,12 @@
 	{
 		$sql="delete from sysmaps_hosts where shostid=$shostid";
 		$result=DBexecute($sql);
+		if(!$result)
+		{
+			return	$result;
+		}
 		$sql="delete from sysmaps_links where shostid1=$shostid or shostid2=$shostid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Delete Host
@@ -1127,13 +1205,19 @@
 	{
 		$sql="select itemid from items where hostid=$hostid";
 		$result=DBselect($sql);
+		if(!$result)
+		{
+			return	$result;
+		}
 		for($i=0;$i<DBnum_rows($result);$i++)
 		{
-			delete_item(DBget_field($result,$i,0));
+			if(!delete_item(DBget_field($result,$i,0)))
+			{
+				return	FALSE;
+			}
 		}
-
 		$sql="delete from hosts where hostid=$hostid";
-		$result=DBexecute($sql);
+		return	DBexecute($sql);
 	}
 
 	# Delete User definition
@@ -1144,7 +1228,7 @@
 		delete_actions_by_userid($userid);
 
 		$sql="delete from users where userid=$userid";
-		$result=DBexecute($sql);
+		return DBexecute($sql);
 	}
 
 	function	show_table_h_delimiter()
