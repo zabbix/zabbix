@@ -1,5 +1,6 @@
 1.0:
 
+ - icmppingsec->icmppingmsec
  - disk size is not correct after evaluating macros in the message
  - add support of interface statistics under Solaris and FreeBSD
  - add support for real 'delta' (last-previous)
