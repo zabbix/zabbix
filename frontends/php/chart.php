@@ -16,6 +16,7 @@
 
 		var $colors;
 		var $im;
+		var $date_format;
 
 		function initColors()
 		{
@@ -46,6 +47,8 @@
 			$this->item=get_item_by_itemid($this->itemid);
 			$host=get_host_by_hostid($this->item["hostid"]);
 			$this->item["host"]=$host["host"];
+
+			$this->date_format="H:i";
 		}
 
 
@@ -476,8 +479,7 @@
 				ImageDashedLine($this->im,$i+$this->shiftX,$this->shiftY,$i+$this->shiftX,$this->sizeY+$this->shiftY,$this->colors["Gray"]);
 				if($nodata == 0)
 				{
-					$label_format="H:i";
-					ImageString($this->im, 1,$i+$this->shiftX-11, $this->sizeY+$this->shiftY+5, date($label_format,$from_time+$i*$this->period/$this->sizeX) , $this->colors["Black"]);
+					ImageStringUp($this->im, 1,$i+$this->shiftX-3, $this->sizeY+$this->shiftY+29, date($this->date_format,$from_time+$i*$this->period/$this->sizeX) , $this->colors["Black"]);
 //					echo $from_time," ",$to_time," ",$from_time+$i*$this->period/$this->sizeX,"<br>";
 				}
 			}
@@ -550,20 +552,41 @@
 				{
 					ImageString($this->im, 1, $this->sizeX+5+$this->shiftX, $this->sizeY-$i-4+$this->shiftY, convert_units($i*($maxY-$minY)/$this->sizeY+$minY,$this->item["units"],$this->item["multiplier"]) , $this->colors["Dark Red"]);
 				}
-		
-		//		date("dS of F Y h:i:s A",DBget_field($result,0,0));
-		
-		//		ImageString($im, 1,10,                $sizeY+$shiftY+5, date("dS of F Y h:i:s A",$minX) , $red);
-		//		ImageString($im, 1,$sizeX+$shiftX-168,$sizeY+$shiftY+5, date("dS of F Y h:i:s A",$maxX) , $red);
 			}
 			else
 			{
 				ImageString($this->im, 2,$this->sizeX/2 -50,$this->sizeY+$this->shiftY+3, "NO DATA FOR THIS PERIOD" , $this->colors["Dark Red"]);
 			}
+
+{
+//		ImageFilledRectangle($this->im,$this->shiftX,$this->sizeY+$this->shiftY+25*(0)+20,$this->shiftX+5,$this->sizeY+$this->shiftY+9+25*(0)+20,$this->colors["Dark Green"]);
+//		ImageRectangle($this->im,$this->shiftX,$this->sizeY+$this->shiftY+25*(0)+20,$this->shiftX+5,$this->sizeY+$this->shiftY+9+25*(0)+20,$this->colors["Black"]);
+/*		ImageRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*$item+45,$shiftX+5,$sizeY+$shiftYup+15+9+15*$item+45,$black);
+		$max_host_len=0;
+		$max_desc_len=0;
+		for($i=0;$i<DBnum_rows($result2);$i++)
+		{
+			$z=get_item_by_itemid($iids[$i]);
+			$h=get_host_by_hostid($z["hostid"]);
+			if(strlen($h["host"])>$max_host_len)		$max_host_len=strlen($h["host"]);
+			if(strlen($z["description"])>$max_desc_len)	$max_desc_len=strlen($z["description"]);
+		}
+		$i=get_item_by_itemid($iids[$item]);
+		$str=sprintf("%s: %s [last:%s min:%s avg:%s max:%s]", str_pad($host[$item],$max_host_len," "), str_pad($desc[$item],$max_desc_len," "), convert_units($y[$item][$len[$item]-1],$i["units"],$i["multiplier"]), convert_units($itemMin,$i["units"],$i["multiplier"]), convert_units($itemAvg,$i["units"],$i["multiplier"]), convert_units($itemMax,$i["units"],$i["multiplier"]));
+		if($width>600)
+		{
+			ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*$item+15+45,$str, $black);
+		}
+		else
+		{
+			ImageString($im, 0,$shiftX+9,$sizeY+$shiftYup+15*$item+17+45,$str, $black);
+		}
+	}*/
+}
 		
-			ImageString($this->im, 1,$this->shiftX, $this->sizeY+$this->shiftY+15, "MIN" , $this->colors["Dark Green"]);
-			ImageString($this->im, 1,$this->shiftX+20, $this->sizeY+$this->shiftY+15, "AVG" , $this->colors["Dark Yellow"]);
-			ImageString($this->im, 1,$this->shiftX+40, $this->sizeY+$this->shiftY+15, "MAX" , $this->colors["Dark Red"]);
+			ImageString($this->im, 1,$this->shiftX, $this->sizeY+$this->shiftY+35, "MIN" , $this->colors["Dark Green"]);
+			ImageString($this->im, 1,$this->shiftX+20, $this->sizeY+$this->shiftY+35, "AVG" , $this->colors["Dark Yellow"]);
+			ImageString($this->im, 1,$this->shiftX+40, $this->sizeY+$this->shiftY+35, "MAX" , $this->colors["Dark Red"]);
 		
 			ImageStringUp($this->im,0,imagesx($this->im)-10,imagesy($this->im)-50, "http://zabbix.sourceforge.net", $this->colors["Gray"]);
 		
