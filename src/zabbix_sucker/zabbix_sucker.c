@@ -556,7 +556,7 @@ int get_minnextcheck(int now)
 	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and i.itemid%%%d=%d",now,CONFIG_SUCKERD_FORKS-1,sucker_num-1);
 	result = DBselect(sql);
 
-	if( (result==NULL) || (DBnum_rows(result)==0) )
+	if( DBis_empty(result) == SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "No items to update for minnextcheck.");
 		DBfree_result(result);
@@ -593,7 +593,7 @@ int	latest_alarm(int triggerid, int status)
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
-	if((result==NULL)||(DBnum_rows(result)==0)||(DBget_field(result,0,0) == NULL))
+	if(DBis_empty(result) == SUCCEED)
         {
                 zabbix_log(LOG_LEVEL_DEBUG, "Result for MIN is empty" );
                 ret = FAIL;
@@ -661,7 +661,7 @@ int	update_trigger_status(int triggerid,int status)
 
 int update_triggers_status_to_unknown(int hostid)
 {
-	int	i,rows;
+	int	i;
 	char	sql[MAX_STRING_LEN+1];
 	int	triggerid;
 
@@ -673,16 +673,14 @@ int update_triggers_status_to_unknown(int hostid)
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
-	rows=DBnum_rows(result);
-
-	if( (result==NULL) || (rows==0) )
+	if( DBis_empty(result) == SUCCEED )
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "No triggers to update for hostid=[%d]",hostid);
 		DBfree_result(result);
 		return FAIL; 
 	}
 
-	for(i=0;i<rows;i++)
+	for(i=0;i<DBnum_rows(result);i++)
 	{
 		triggerid=atoi(DBget_field(result,i,0));
 		update_trigger_status(triggerid,TRIGGER_STATUS_UNKNOWN);
@@ -706,7 +704,7 @@ int update_host_status(int hostid,int status)
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
-	if( (result==NULL) || (DBnum_rows(result)==0) )
+	if( DBis_empty(result) == SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "No host with hostid=[%d]",hostid);
 		DBfree_result(result);
@@ -769,7 +767,7 @@ int get_values(void)
  
 	DB_RESULT	*result;
 
-	int		i,rows;
+	int		i;
 	int		now;
 	int		res;
 	DB_ITEM		item;
@@ -782,15 +780,14 @@ int get_values(void)
 	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-1,sucker_num-1);
 	result = DBselect(sql);
 
-	rows = DBnum_rows(result);
-	if( (result==NULL) || (rows == 0))
+	if( DBis_empty(result) == SUCCEED)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "No items to update.");
 		DBfree_result(result);
 		return SUCCEED; 
 	}
 
-	for(i=0;i<rows;i++)
+	for(i=0;i<DBnum_rows(result);i++)
 	{
 		item.itemid=atoi(DBget_field(result,i,0));
 		item.key=DBget_field(result,i,1);
@@ -887,20 +884,19 @@ int housekeeping_history(int now)
 
 	DB_RESULT	*result;
 
-	int		i,rows;
+	int		i;
 
 	sprintf(sql,"select i.itemid,i.lastdelete,i.history from items i where i.lastdelete<=%d", now);
 	result = DBselect(sql);
 
-	if(result==NULL)
+	if(DBis_empty(result) == SUCCEED)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "No items to delete.");
 		DBfree_result(result);
 		return SUCCEED; 
 	}
-	rows = DBnum_rows(result);
 
-	for(i=0;i<rows;i++)
+	for(i=0;i<DBnum_rows(result);i++)
 	{
 		item.itemid=atoi(DBget_field(result,i,0));
 		item.lastdelete=atoi(DBget_field(result,i,1));

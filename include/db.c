@@ -162,6 +162,30 @@ char	*DBget_field(DB_RESULT *result, int rownum, int fieldnum)
 }
 
 /*
+ * Return SUCCEED if result conains no records
+ */ 
+int	DBis_empty(DB_RESULT *result)
+{
+	if(result == NULL)
+	{
+		return	SUCCEED;
+	}
+	if(DBnum_rows(result) == 0)
+	{
+		return	SUCCEED;
+	}
+/* This is necessary to exclude situations like
+ * atoi(DBget_field(result,0,0). This lead to coredump.
+ */
+	if(DBget_field(result,0,0) == 0)
+	{
+		return	SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/*
  * Get number of selected records.
  */ 
 int	DBnum_rows(DB_RESULT *result)
