@@ -17,6 +17,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include <syslog.h>
+
 #include "common.h"
 #include "db.h"
 #include "functions.h"
@@ -149,6 +151,10 @@ int	main()
 
 	alarm(TRAPER_TIMEOUT);
 
+	openlog("zabbix_traper",LOG_PID,LOG_USER);
+	//	ret=setlogmask(LOG_UPTO(LOG_DEBUG));
+	ret=setlogmask(LOG_UPTO(LOG_WARNING));
+	
 	fgets(s,1024,stdin);
 	for( p=s+strlen(s)-1; p>s && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
 	p[1]=0;
