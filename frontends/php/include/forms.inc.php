@@ -159,7 +159,7 @@
 
 		$col=0;
 
-		show_form_begin("users");
+		show_form_begin("users.users");
 		echo S_USER;
 
 		show_table2_v_delimiter($col++);
@@ -625,7 +625,7 @@
 			$name="";
 		}
 
-		show_form_begin("users");
+		show_form_begin("users.groups");
 		echo S_USER_GROUP;
 
 		show_table2_v_delimiter($col++);
@@ -707,7 +707,7 @@
 	# Insert form for User permissions
 	function	insert_permissions_form($userid)
 	{
-		show_form_begin("users.permission");
+		show_form_begin("users.users");
 		echo "New permission";
 
 		show_table2_v_delimiter();
