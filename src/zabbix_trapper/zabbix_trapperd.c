@@ -39,6 +39,7 @@ int	CONFIG_TRAPPERD_FORKS		= TRAPPERD_FORKS;
 int	CONFIG_LISTEN_PORT		= 10001;
 int	CONFIG_TIMEOUT			= TRAPPER_TIMEOUT;
 char	*CONFIG_PID_FILE		= NULL;
+char	*CONFIG_LOG_FILE		= NULL;
 char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
@@ -219,6 +220,10 @@ void	process_config_file(void)
 		{
 			CONFIG_PID_FILE=strdup(value);
 		}
+		else if(strcmp(parameter,"LogFile")==0)
+		{
+			CONFIG_LOG_FILE=strdup(value);
+		}
 		else if(strcmp(parameter,"DBName")==0)
 		{
 			CONFIG_DBNAME=strdup(value);
@@ -351,7 +356,14 @@ void    daemon_init(void)
 	setlogmask(LOG_UPTO(LOG_DEBUG));*
 	setlogmask(LOG_UPTO(LOG_WARNING));*/
 
-	zabbix_open_log(LOG_TYPE_FILE,LOG_LEVEL_WARNING,"/tmp/tmp.zzz");
+	if(CONFIG_LOG_FILE == NULL)
+	{
+		zabbix_open_log(LOG_TYPE_FILE,LOG_LEVEL_WARNING,NULL);
+	}
+	else
+	{
+		zabbix_open_log(LOG_TYPE_FILE,LOG_LEVEL_WARNING,CONFIG_LOG_FILE);
+	}
 
 }
 
