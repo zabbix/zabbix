@@ -23,6 +23,7 @@
 	$page["file"] = "users.php";
 
 	include "include/config.inc.php";
+	include "include/forms.inc.php";
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();
 ?>
@@ -44,7 +45,7 @@
 		{
 			if($HTTP_GET_VARS["password1"]==$HTTP_GET_VARS["password2"])
 			{
-				$result=add_user($HTTP_GET_VARS["name"],$HTTP_GET_VARS["surname"],$HTTP_GET_VARS["alias"],$HTTP_GET_VARS["password1"]);
+				$result=add_user($HTTP_GET_VARS["name"],$HTTP_GET_VARS["surname"],$HTTP_GET_VARS["alias"],$HTTP_GET_VARS["password1"],$HTTP_GET_VARS["url"]);
 				show_messages($result, "User added", "Cannot add user");
 			}
 			else
@@ -73,7 +74,7 @@
 		{
 			if($HTTP_GET_VARS["password1"]==$HTTP_GET_VARS["password2"])
 			{
-				$result=update_user($HTTP_GET_VARS["userid"],$HTTP_GET_VARS["name"],$HTTP_GET_VARS["surname"],$HTTP_GET_VARS["alias"],$HTTP_GET_VARS["password1"]);
+				$result=update_user($HTTP_GET_VARS["userid"],$HTTP_GET_VARS["name"],$HTTP_GET_VARS["surname"],$HTTP_GET_VARS["alias"],$HTTP_GET_VARS["password1"],$HTTP_GET_VARS["url"]);
 				show_messages($result, "Information successfully updated", "Cannot update information");
 			}
 			else

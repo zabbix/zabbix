@@ -1,5 +1,4 @@
 1.1:
- - add support of redirect of index.php on per user basis (add login.php)
  - remove icmpping and others from the QUEUE
  - hardlinked templates (several templates, one host)
  - escalation and repeated notifications
