@@ -1,4 +1,3 @@
-* Support for check_port[*] parameter
 * Support for check_service[*] parameter
 * Installation program
 * Possibility to store configuration in registry

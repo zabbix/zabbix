@@ -57,7 +57,6 @@ LONG H_Execute(char *cmd,char *arg,char **value)
    si.cb=sizeof(STARTUPINFO);
    si.dwFlags=STARTF_USESTDHANDLES;
    si.hStdInput=GetStdHandle(STD_INPUT_HANDLE);
-//   si.hStdOutput=GetStdHandle(STD_OUTPUT_HANDLE);
    si.hStdOutput=hOutput;
    si.hStdError=GetStdHandle(STD_ERROR_HANDLE);
 
