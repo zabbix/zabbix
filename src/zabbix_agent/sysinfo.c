@@ -812,6 +812,58 @@ double	SENSOR_TEMP3(void)
 
 double	PROCCNT(const char * procname)
 {
+#ifdef	HAVE_PROC_0_PSINFO
+	DIR	*dir;
+	struct	dirent *entries;
+	struct	stat buf;
+	char	filename[MAX_STRING_LEN+1];
+
+	int	fd;
+/* In the correct procfs.h, the structure name is psinfo_t */
+	psinfo_t psinfo;
+
+	int	proccount=0;
+
+	dir=opendir("/proc");
+	if(NULL == dir)
+	{
+		return FAIL;
+	}
+
+	while((entries=readdir(dir))!=NULL)
+	{
+		strncpy(filename,"/proc/",MAX_STRING_LEN);	
+		strncat(filename,entries->d_name,MAX_STRING_LEN);
+		strncat(filename,"/psinfo",MAX_STRING_LEN);
+
+		if(stat(filename,&buf)==0)
+		{
+			fd = open (filename, O_RDONLY);
+			if (fd != -1)
+			{
+				if (read (fd, &psinfo, sizeof(psinfo)) == -1)
+				{
+					closedir(dir);
+					return FAIL;
+				}
+				else
+				{
+					if(strcmp(procname,psinfo.pr_fname)==0)
+					{
+						proccount++;
+					}
+				}
+				close (fd);
+			}
+			else
+			{
+				continue;
+			}
+		}
+	}
+	closedir(dir);
+	return	(double)proccount;
+#else
 #ifdef	HAVE_PROC_1_STATUS
 	DIR	*dir;
 	struct	dirent *entries;
@@ -867,58 +919,6 @@ double	PROCCNT(const char * procname)
                                 closedir(dir);
                                 return  FAIL;
                         }
-		}
-	}
-	closedir(dir);
-	return	(double)proccount;
-#else
-#ifdef	HAVE_PROC_0_PSINFO
-	DIR	*dir;
-	struct	dirent *entries;
-	struct	stat buf;
-	char	filename[MAX_STRING_LEN+1];
-
-	int	fd;
-/* In the correct procfs.h, the structure name is psinfo_t */
-	psinfo_t psinfo;
-
-	int	proccount=0;
-
-	dir=opendir("/proc");
-	if(NULL == dir)
-	{
-		return FAIL;
-	}
-
-	while((entries=readdir(dir))!=NULL)
-	{
-		strncpy(filename,"/proc/",MAX_STRING_LEN);	
-		strncat(filename,entries->d_name,MAX_STRING_LEN);
-		strncat(filename,"/psinfo",MAX_STRING_LEN);
-
-		if(stat(filename,&buf)==0)
-		{
-			fd = open (filename, O_RDONLY);
-			if (fd != -1)
-			{
-				if (read (fd, &psinfo, sizeof(psinfo)) == -1)
-				{
-					closedir(dir);
-					return FAIL;
-				}
-				else
-				{
-					if(strcmp(procname,psinfo.pr_fname)==0)
-					{
-						proccount++;
-					}
-				}
-				close (fd);
-			}
-			else
-			{
-				continue;
-			}
 		}
 	}
 	closedir(dir);
