@@ -55,7 +55,7 @@ int create_host_file(void)
 {
 	char	sql[MAX_STRING_LEN+1];
 	FILE	*f;
-	int	now;
+	int	i,now;
 
 	DB_HOST	host;
 	DB_RESULT	*result;
@@ -65,9 +65,8 @@ int create_host_file(void)
 	if( f == NULL)
 	{
 		zabbix_log( LOG_LEVEL_CRIT, "Cannot hosts file [%s] [%s]",
-		"/tmp/zabbix_agentd.pinger", strerror(errno));
-		uninit();
-		exit(-1);
+		"/tmp/zabbix_suckerd.pinger", strerror(errno));
+		return FAIL;
 	}
 
 	now=time(NULL);
@@ -82,19 +81,21 @@ int create_host_file(void)
 
 		if(HOST_USE_IP == host.useip)
 		{
-			fprintf(f,"%d",host.ip);
+			fprintf(f,"%s\n",host.ip);
 		}
 		else
 		{
-			fprintf(f,"%d",host.host);
+			fprintf(f,"%s\n",host.host);
 		}
 	}
 	DBfree_result(result);
 
 	fclose(f);
+
+	return SUCCEED;
 }
 
-int pinger_loop(void)
+int main_pinger_loop(void)
 {
 	for(;;)
 	{
@@ -102,8 +103,6 @@ int pinger_loop(void)
 		setproctitle("connecting to the database");
 #endif
 		DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
-
-		now=time(NULL);
 
 		create_host_file();
 

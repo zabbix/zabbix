@@ -62,6 +62,7 @@
 #include "log.h"
 
 #include "alerter.h"
+#include "pinger.h"
 
 #include "../zabbix_agent/sysinfo.h"
 
@@ -74,6 +75,7 @@ int	CONFIG_NOTIMEWAIT		=0;
 int	CONFIG_TIMEOUT			=SUCKER_TIMEOUT;
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
 int	CONFIG_SENDER_FREQUENCY		= 30;
+int	CONFIG_PINGER_FREQUENCY		= 60;
 int	CONFIG_DISABLE_HOUSEKEEPING	= 0;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 char	*CONFIG_PID_FILE		= NULL;
@@ -233,9 +235,10 @@ void	init_config(void)
 	static struct cfg_line cfg[]=
 	{
 /*		 PARAMETER	,VAR	,FUNC,	TYPE(0i,1s),MANDATORY,MIN,MAX	*/
-		{"StartSuckers",&CONFIG_SUCKERD_FORKS,0,TYPE_INT,PARM_OPT,4,255},
+		{"StartSuckers",&CONFIG_SUCKERD_FORKS,0,TYPE_INT,PARM_OPT,5,255},
 		{"HousekeepingFrequency",&CONFIG_HOUSEKEEPING_FREQUENCY,0,TYPE_INT,PARM_OPT,1,24},
 		{"SenderFrequency",&CONFIG_SENDER_FREQUENCY,0,TYPE_INT,PARM_OPT,5,3600},
+		{"PingerFrequency",&CONFIG_PINGER_FREQUENCY,0,TYPE_INT,PARM_OPT,10,3600},
 		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
 		{"NoTimeWait",&CONFIG_NOTIMEWAIT,0,TYPE_INT,PARM_OPT,0,1},
 		{"DisableHousekeeping",&CONFIG_DISABLE_HOUSEKEEPING,0,TYPE_INT,PARM_OPT,0,1},
@@ -679,9 +682,9 @@ int get_minnextcheck(int now)
 		1 == NOT MONITORED
 		2 == UNREACHABLE */ 
 #ifdef TESTTEST
-	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and i.type not in (%d) and h.hostid%%%d=%d and i.key_<>'%s'", now, ITEM_TYPE_TRAPPER, CONFIG_SUCKERD_FORKS-3,sucker_num-3,SERVER_STATUS_KEY);
+	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and i.type not in (%d) and h.hostid%%%d=%d and i.key_<>'%s'", now, ITEM_TYPE_TRAPPER, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY);
 #else
-	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=%d and i.type not in (%d) and i.itemid%%%d=%d and i.key_<>'%s'", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, CONFIG_SUCKERD_FORKS-3,sucker_num-3,SERVER_STATUS_KEY);
+	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=%d and i.type not in (%d) and i.itemid%%%d=%d and i.key_<>'%s'", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY);
 #endif
 	result = DBselect(sql);
 
@@ -792,9 +795,9 @@ int get_values(void)
 
 	now = time(NULL);
 #ifdef TESTTEST
-	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,i.snmp_port from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and h.hostid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-3,sucker_num-3,SERVER_STATUS_KEY);
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,i.snmp_port from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and h.hostid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY);
 #else
-	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port from items i,hosts h where i.nextcheck<=%d and i.status=%d and i.type not in (%d) and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, now, CONFIG_SUCKERD_FORKS-3,sucker_num-3,SERVER_STATUS_KEY);
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port from items i,hosts h where i.nextcheck<=%d and i.status=%d and i.type not in (%d) and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, now, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY);
 #endif
 	result = DBselect(sql);
 
@@ -1253,13 +1256,18 @@ int main(int argc, char **argv)
 	else if(sucker_num == 1)
 	{
 /* Second instance of zabbix_suckerd sends alerts to users */
-		alerter_loop();
-	}	
+		main_alerter_loop();
+	}
 	else if(sucker_num == 2)
 	{
 /* Third instance of zabbix_suckerd periodically re-calculates 'nodata' functions */
 		main_nodata_loop();
-	}	
+	}
+	else if(sucker_num == 3)
+	{
+/* Fourth instance of zabbix_suckerd periodically pings hosts */
+		main_pinger_loop();
+	}
 	else
 	{
 		main_sucker_loop();

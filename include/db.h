@@ -34,6 +34,7 @@
 	#include "libpq-fe.h"
 #endif
 
+#define DB_HOST		struct host_type
 #define DB_ITEM		struct item_type
 #define DB_TRIGGER	struct trigger_type
 #define DB_ACTION	struct action_type
@@ -52,7 +53,7 @@
 	#define	DBfree_result	PQclear
 #endif
 
-DB_ITEM
+DB_HOST
 {
 	int     hostid;
 	char    *host;
