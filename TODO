@@ -2,6 +2,7 @@
 
  - Fix simple checks
  - Develop hard-linked templates
+ - Fix graphs with values >4GB
 
 ZABBIX 1.1:
 
