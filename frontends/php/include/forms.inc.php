@@ -528,7 +528,7 @@
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=30>";
 
-		show_table2_v_delimiter($col++);
+/*		show_table2_v_delimiter($col++);
 		echo S_USERS;
 		show_table2_h_delimiter();
 		echo "<select multiple class=\"biginput\" name=\"users[]\" size=\"5\">";
@@ -554,7 +554,34 @@
 				echo "<option value=\"".$row["userid"]."\">".$row["alias"];
 			}
 		}
-		echo "</select>";
+		echo "</select>";*/
+
+		show_table2_v_delimiter($col++);
+		echo S_USERS;
+		show_table2_h_delimiter();
+		$result=DBselect("select distinct userid,alias from users order by alias");
+		while($row=DBfetch($result))
+		{
+			if(isset($_GET["usrgrpid"]))
+			{
+				$sql="select count(*) as count from users_groups where userid=".$row["userid"]." and usrgrpid=".$_GET["usrgrpid"];
+				$result2=DBselect($sql);
+				$row2=DBfetch($result2);
+				if($row2["count"]==0)
+				{
+					echo "<input type=checkbox name=\"".$row["userid"]."\" \">".$row["alias"];
+				}
+				else
+				{
+					echo "<input type=checkbox checked name=\"".$row["userid"]."\" \">".$row["alias"];
+				}
+			}
+			else
+			{
+				echo "<input type=checkbox name=\"".$row["userid"]."\" \">".$row["alias"];
+			}
+			echo "<br>";
+		}
 
 		show_table2_v_delimiter2();
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add group\">";
