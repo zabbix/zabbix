@@ -7,7 +7,6 @@
  - test on non-Linux platforms
  - test install and upgrade procedure for 1.0beta10
  - write error message in case of PID file and LOG file errors
- - support for proc_cnt() under Solaris
  - improve screens (add maps, all in one table, etc)
  - improve graphs
  - Graphs: change order of lines
