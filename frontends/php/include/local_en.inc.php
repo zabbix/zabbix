@@ -381,6 +381,7 @@
 	define("S_ICON_LABEL_TYPE",			"Icon label type");
 	define("S_HOST_LABEL",				"Host label");
 	define("S_HOST_NAME",				"Host name");
+	define("S_STATUS_ONLY",				"Status only");
 	define("S_NOTHING",				"Nothing");
 
 //	media.php
@@ -623,6 +624,7 @@
 	define("S_USER_GROUPS",				"User groups");
 	define("S_MEMBERS",				"Members");
 	define("S_TEMPLATES",				"Templates");
+	define("S_HOSTS_TEMPLATES_LINKAGE",		"Hosts/templates linkage");
 	define("S_CONFIGURATION_OF_TEMPLATES_LINKAGE",	"CONFIGURATION OF TEMPLATES LINKAGE");
 	define("S_LINKED_TEMPLATES_BIG",		"LINKED TEMPLATES");
 	define("S_NO_USER_GROUPS_DEFINED",		"No user groups defined");

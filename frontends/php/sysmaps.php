@@ -169,28 +169,40 @@
 		echo "<OPTION VALUE='0' SELECTED>".S_HOST_LABEL;
 		echo "<OPTION VALUE='1'>".S_IP_ADDRESS;
 		echo "<OPTION VALUE='2'>".S_HOST_NAME;
-		echo "<OPTION VALUE='3'>".S_NOTHING;
+		echo "<OPTION VALUE='3'>".S_STATUS_ONLY;
+		echo "<OPTION VALUE='4'>".S_NOTHING;
 	}
 	else if($label_type==1)
 	{
 		echo "<OPTION VALUE='0'>".S_HOST_LABEL;
 		echo "<OPTION VALUE='1' SELECTED>".S_IP_ADDRESS;
 		echo "<OPTION VALUE='2'>".S_HOST_NAME;
-		echo "<OPTION VALUE='3'>".S_NOTHING;
+		echo "<OPTION VALUE='3'>".S_STATUS_ONLY;
+		echo "<OPTION VALUE='4'>".S_NOTHING;
 	}
 	else if($label_type==2)
 	{
 		echo "<OPTION VALUE='0'>".S_HOST_LABEL;
 		echo "<OPTION VALUE='1'>".S_IP_ADDRESS;
 		echo "<OPTION VALUE='2' SELECTED>".S_HOST_NAME;
-		echo "<OPTION VALUE='3'>".S_NOTHING;
+		echo "<OPTION VALUE='3'>".S_STATUS_ONLY;
+		echo "<OPTION VALUE='4'>".S_NOTHING;
 	}
 	else if($label_type==3)
 	{
 		echo "<OPTION VALUE='0'>".S_HOST_LABEL;
 		echo "<OPTION VALUE='1'>".S_IP_ADDRESS;
 		echo "<OPTION VALUE='2'>".S_HOST_NAME;
-		echo "<OPTION VALUE='3' SELECTED>".S_NOTHING;
+		echo "<OPTION VALUE='3' SELECTED>".S_STATUS_ONLY;
+		echo "<OPTION VALUE='4'>".S_NOTHING;
+	}
+	else if($label_type==4)
+	{
+		echo "<OPTION VALUE='0'>".S_HOST_LABEL;
+		echo "<OPTION VALUE='1'>".S_IP_ADDRESS;
+		echo "<OPTION VALUE='2'>".S_HOST_NAME;
+		echo "<OPTION VALUE='3'>".S_STATUS_ONLY;
+		echo "<OPTION VALUE='4' SELECTED>".S_NOTHING;
 	}
 	echo "</SELECT>";
 
