@@ -66,31 +66,36 @@
 	</tr>
 
 	<tr bgcolor="#dddddd">
+	<td>Number of trends stored</td>
+	<td><?php echo $stats["trends_count"]; ?></td>
+	</tr>
+
+	<tr bgcolor="#eeeeee">
 	<td>Number of alarms</td>
 	<td><?php echo $stats["alarms_count"]; ?></td>
 	</tr>
 
-	<tr bgcolor="#eeeeee">
+	<tr bgcolor="#dddddd">
 	<td>Number of alerts</td>
 	<td><?php echo $stats["alerts_count"]; ?></td>
 	</tr>
 
-	<tr bgcolor="#dddddd">
+	<tr bgcolor="#eeeeee">
 	<td>Number of triggers (enabled/disabled)</td>
 	<td><?php echo $stats["triggers_count"],"(",$stats["triggers_count_enabled"],"/",$stats["triggers_count_disabled"],")"; ?></td>
 	</tr>
 
-	<tr bgcolor="#eeeeee">
+	<tr bgcolor="#dddddd">
 	<td>Number of items (active/trapper/not active/not supported)</td>
 	<td><?php echo $stats["items_count"],"(",$stats["items_count_active"],"/",$stats["items_count_trapper"],"/",$stats["items_count_not_active"],"/",$stats["items_count_not_supported"],")"; ?></td>
 	</tr>
 
-	<tr bgcolor="#dddddd">
+	<tr bgcolor="#eeeeee">
 	<td>Number of users</td>
 	<td><?php echo $stats["users_count"]; ?></td>
 	</tr>
 
-	<tr bgcolor="#eeeeee">
+	<tr bgcolor="#dddddd">
 	<td>Number of hosts (monitored/not monitored)</td>
 	<td><?php echo $stats["hosts_count"],"(",$stats["hosts_count_monitored"],"/",$stats["hosts_count_not_monitored"],")"; ?></td>
 	</tr>
