@@ -1,29 +1,23 @@
 Changes for 1.0beta13:
 
+ - do not show group having no hosts in Latest Values (Alexei) 
  - better management of host groups (Alexei)
- - added support of macro {HOSTNAME}, removed support of
- %s (Alexei)
- - added support of macros {DATE} and {TIME} in alerts
- (Alexei)
- - fixed selection of multiplier in item definition form
- (Alexei)
+ - added support of macro {HOSTNAME}, removed support of %s (Alexei)
+ - added support of macros {DATE} and {TIME} in alerts (Alexei)
+ - fixed selection of multiplier in item definition form (Alexei)
  - support for 'icmppingsec' (Alexei)
- - added support of symbol '-' in trigger expressions
- (Alexei)
- - added information about table 'trends' to 'Status of
- Zabbix' screen (Alexei)
+ - added support of symbol '-' in trigger expressions (Alexei)
+ - added information about table 'trends' to 'Status of Zabbix' screen (Alexei)
  - transparency for graphs on GD 2.x platforms (Alexei)
  - added timestamp and header to maps (Alexei)
  - fixes for screens.php (Alexei)
  - fixes for screenedit.php (Alexei)
  - added parameter DisablePinger (Alexei)
- - correct processing of RCPT TO responses from SMTP servers
- (Alexei)
+ - correct processing of RCPT TO responses from SMTP servers (Alexei)
  - correct processing of unsupported internal checks (Alexei)
  - processing of DB stopped situations for MySQL (Alexei)
  - housekeeper to delete hosts_groups entries (Alexei)
- - deleted host to be renamed to "<host> [DELETED]"
- (Alexei)
+ - deleted host to be renamed to "<host> [DELETED]" (Alexei)
  - added function now() (Alexei)
  - fixed action maintenance screen (Alexei)
  - redesigned availablity chart (Alexei)
@@ -32,10 +26,8 @@ Changes for 1.0beta13:
  - cosmetic changes for IT Services screen (Alexei)
  - change of color schema for SLA graphs and report (Alexei)
  - redesigned IT Service availability chart (Alexei)
- - fix for get_last_service_value(). Thanks to Sebastien
- "Slix" Linard. (Alexei)
- - fix for chart_sla.php. Thanks to Sebastien "Slix"
- Linard. (Alexei)
+ - fix for get_last_service_value(). Thanks to Sebastien "Slix" Linard. (Alexei)
+ - fix for chart_sla.php. Thanks to Sebastien "Slix" Linard. (Alexei)
  - proper timeout handling for SNMP connect (Alexei)
 
 Changes for 1.0beta12:

@@ -71,14 +71,28 @@
 //		{
 //			continue;
 //		}
-		if( isset($HTTP_GET_VARS["groupid"]) && ($HTTP_GET_VARS["groupid"] == $row["groupid"]) )
+		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status in (0,2) and h.hostid=i.hostid and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
+		$cnt=0;
+		while($row2=DBfetch($result2))
 		{
-			echo "<b>[";
+			if(!check_right("Host","R",$row2["hostid"]))
+			{
+				continue;
+			}
+			$cnt++;
 		}
-		echo "<a href='latest.php?groupid=".$row["groupid"]."'>".$row["name"]."</a>";
-		if(isset($HTTP_GET_VARS["groupid"]) && ($HTTP_GET_VARS["groupid"] == $row["groupid"]) )
+		
+		if($cnt>0)
 		{
-			echo "]</b>";
+			if( isset($HTTP_GET_VARS["groupid"]) && ($HTTP_GET_VARS["groupid"] == $row["groupid"]) )
+			{
+				echo "<b>[";
+			}
+			echo "<a href='latest.php?groupid=".$row["groupid"]."'>".$row["name"]."</a>";
+			if(isset($HTTP_GET_VARS["groupid"]) && ($HTTP_GET_VARS["groupid"] == $row["groupid"]) )
+			{
+				echo "]</b>";
+			}
 		}
 		echo " ";
 	}
