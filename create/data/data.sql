@@ -28,7 +28,7 @@ insert into config (alert_history,alarm_history) values (365,365);
 --
 -- Data for table media_type
 --
-insert into media_type (mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path) values (0,0,'Email','localhost','localhost','zabbix@localhost','');
+insert into media_type (mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path) values (1,0,'Email','localhost','localhost','zabbix@localhost','');
 
 --
 -- Data for table groups
