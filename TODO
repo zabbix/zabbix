@@ -6,7 +6,8 @@
  - support for PREFIX/zabbix/etc (configuration files)
  - trapper item. Source->Alarms do not grow when last status is unknown for
 latest trigger (item type  = TRAPPER)
- - SNMP traps. Condition to switch expression off.
+ - SNMP traps. Condition to switch expression off. New function which would return
+ status of the trigger could help. 
 
  - trigger expression for ON->OFF state
  - cannot use "." as key in trigger expressions
