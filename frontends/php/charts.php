@@ -146,7 +146,6 @@
 
 	show_table_header($map);
 	echo "<TABLE BORDER=0 align=center COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR BGCOLOR=#EEEEEE>";
 	echo "<TR BGCOLOR=#DDDDDD>";
 	echo "<TD ALIGN=CENTER>";
 	if(isset($HTTP_GET_VARS["graphid"]))
@@ -166,7 +165,10 @@
 	if(isset($HTTP_GET_VARS["graphid"])/*&&(!isset($HTTP_GET_VARS["fullscreen"]))*/)
 	{
 // BEGIN - IGMI - just another way of navigation
-		echo("<div align=center>");
+	echo "<TABLE BORDER=0 align=center COLS=2 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TR BGCOLOR=#FFFFFF>";
+	echo "<TD ALIGN=LEFT>";
+		echo("<div align=left>");
 
 		echo("<b>Set&nbsp;Period:</b>&nbsp;(&nbsp;");
 
@@ -223,8 +225,21 @@
 				echo("<A HREF=\"charts.php?keep=1".url_param("graphid").url_param("from").url_param("period").url_param("fullscreen")."\">Off</a>");
 			}
 		}
-
 		echo("</div>");
+
+	echo "</TD>";
+	echo "<TD BGCOLOR=#FFFFFF WIDTH=15% ALIGN=RIGHT>";
+//		echo("<div align=right>");
+		echo "<form method=\"put\" action=\"charts.php\">";
+		echo "<input name=\"graphid\" type=\"hidden\" value=\"".$HTTP_GET_VARS["graphid"]."\" size=12>";
+		echo "<input name=\"sdate\"  value=\"yyyymmdd\" size=8>";
+		echo "<input class=\"button\" type=\"submit\" name=\"action\" value=\"go\">";
+		echo "</form>";
+//		echo("</div>");
+	echo "</TD>";
+	echo "</TR>";
+	echo "</TABLE>";
+
 // END - IGMI - just another way of navigation
 	}
 	
