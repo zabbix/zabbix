@@ -113,26 +113,7 @@
 	echo "<TD ALIGN=CENTER>";
 	if(isset($HTTP_GET_VARS["sysmapid"]))
 	{
-		$map="\n<map name=links>";
-		$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status from sysmaps_hosts sh,hosts h where sh.sysmapid=".$HTTP_GET_VARS["sysmapid"]." and h.hostid=sh.hostid");
-		for($i=0;$i<DBnum_rows($result);$i++)
-		{
-			$host=DBget_field($result,$i,0);
-			$shostid=DBget_field($result,$i,1);
-			$sysmapid=DBget_field($result,$i,2);
-			$hostid=DBget_field($result,$i,3);
-			$label=DBget_field($result,$i,4);
-			$x=DBget_field($result,$i,5);
-			$y=DBget_field($result,$i,6);
-			$status=DBget_field($result,$i,7);
-
-			if( ($status==0)||($status==2))
-			{
-				$map=$map."\n<area shape=rect coords=$x,$y,".($x+32).",".($y+32)." href=\"tr_status.php?hostid=$hostid&noactions=true&onlytrue=true&compact=true\" alt=\"$host\">";
-			}
-		}
-		$map=$map."\n</map>";
-		echo $map;
+		echo get_map_imagemap($HTTP_GET_VARS["sysmapid"]);
 		echo "<IMG SRC=\"map.php?noedit=1&sysmapid=".$HTTP_GET_VARS["sysmapid"]."\" border=0 usemap=#links>";
 	}
 	else

@@ -4328,13 +4328,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
         function update_screen_item($screenitemid,$resource,$resourceid,$width,$height)
         {
-                $sql="update screens_items set resource=$resourceid,resourceid=$resourceid,width=$width,height=$height where screenitemid=$screenitemid";
-                return  DBexecute($sql);
-        }
-
-        function update_screen_graph($screengraphid,$itemid,$width,$height)
-        {
-                $sql="update screens_graphs set itemid=$itemid,width=$width,height=$height where screengraphid=$screengraphid";
+                $sql="update screens_items set resource=$resource,resourceid=$resourceid,width=$width,height=$height where screenitemid=$screenitemid";
                 return  DBexecute($sql);
         }
 
@@ -4379,6 +4373,30 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "	}";
 		echo "}";
 		echo "</SCRIPT>";
+	}
+
+	function get_map_imagemap($sysmapid)
+	{
+		$map="\n<map name=links>";
+		$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status from sysmaps_hosts sh,hosts h where sh.sysmapid=$sysmapid and h.hostid=sh.hostid");
+		for($i=0;$i<DBnum_rows($result);$i++)
+		{
+			$host=DBget_field($result,$i,0);
+			$shostid=DBget_field($result,$i,1);
+			$sysmapid=DBget_field($result,$i,2);
+			$hostid=DBget_field($result,$i,3);
+			$label=DBget_field($result,$i,4);
+			$x=DBget_field($result,$i,5);
+			$y=DBget_field($result,$i,6);
+			$status=DBget_field($result,$i,7);
+
+			if( ($status==0)||($status==2))
+			{
+				$map=$map."\n<area shape=rect coords=$x,$y,".($x+32).",".($y+32)." href=\"tr_status.php?hostid=$hostid&noactions=true&onlytrue=true&compact=true\" alt=\"$host\">";
+			}
+		}
+		$map=$map."\n</map>";
+		return $map;
 	}
 
 ?>

@@ -1,6 +1,5 @@
 1.0beta10:
 
- - test screenedit, screens.php
  - fix form 'edit actions'
  - fix pinger
  - finish src/zabbix_snmptrapper
