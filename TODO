@@ -1,5 +1,6 @@
 1.0:
 
+ - trigger UNKNOWN does not change status to FALSE (it's ok for TRUE)
  - fix --with-net-snmp and --with-ucd-snmp
  - see severity in trigger listing for a host
  - change logic for actions: scope =1 (triggerid=hostid), 2 (triggerid = NULL)
