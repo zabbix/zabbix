@@ -1611,6 +1611,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	$menu=array(
 		"view"=>array(
 				"label"=>"View",
+				"pages"=>array("latest.php","tr_status.php","queue.php","latestalarms.php","alerts.php","maps.php","charts.php","screens.php","srv_status.php"),
 				"level2"=>array(
 					array("label"=>"Latest data","url"=>"latest.php"),
 					array("label"=>"Triggers","url"=>"tr_status.php?onlytrue=true&noactions=true&compact=true.php"),
@@ -1625,12 +1626,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				),
 		"reports"=>array(
 				"label"=>"Reports",
+				"pages"=>array("report2.php"),
 				"level2"=>array(
 					array("label"=>"Availability report","url"=>"report2.php")
 					)
 				),
 		"configuration"=>array(
 				"label"=>"Configuration",
+				"pages"=>array("config.php","users.php","audit.php","hosts.php","items.php","triggers.php","sysmaps.php","graphs.php","screenconf.php","services.php"),
 				"level2"=>array(
 					array("label"=>"General","url"=>"config.php"),
 					array("label"=>"Users","url"=>"users.php"),
@@ -1646,6 +1649,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				),
 		"login"=>array(
 				"label"=>"Login",
+				"pages"=>array("index.php"),
 				"level2"=>array(
 					array("label"=>"Login","url"=>"index.php"),
 					)
@@ -1665,10 +1669,19 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	$i=0;
 	foreach($menu as $label=>$sub)
 	{
-		if($i==0)
-			echo "<td class=\"horizontal_menu\" height=24 colspan=9><b><a href=\"http://www.zabbix.com/index.php\" class=\"highlight\">".$sub["label"]."</a></b></td>";
+		$active=0;
+		foreach($sub["pages"] as $label2)
+		{
+			if($page["file"]==$label2)
+			{
+				$active=1;
+				$active_level1=$label;
+			}
+		}
+		if($active==1)
+			echo "<td class=\"horizontal_menu\" height=24 colspan=9><b><a href=\"".$sub["level2"][0]["url"]."\" class=\"highlight\">".$sub["label"]."</a></b></td>";
 		else
-			echo "<td class=\"horizontal_menu_n\" height=24 colspan=9><b><a href=\"http://www.zabbix.com/index.php\" class=\"highlight\">".$sub["label"]."</a></b></td>";
+			echo "<td class=\"horizontal_menu_n\" height=24 colspan=9><b><a href=\"".$sub["level2"][0]["url"]."\" class=\"highlight\">".$sub["label"]."</a></b></td>";
 		$i++;
 	}
 ?>
@@ -1678,7 +1691,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	<tr><td class="horizontal_menu" height=24 colspan=9><b>
 <?php
 	$i=0;
-	foreach($menu["view"]["level2"] as $label=>$sub)
+	foreach($menu[$active_level1]["level2"] as $label=>$sub)
 	{
 		if($i==0)
 			echo "<a href=\"".$sub["url"]."\" class=\"highlight\">".$sub["label"]."</a><span class=\"divider\">&nbsp;&nbsp;|&nbsp;&nbsp;</span>";
