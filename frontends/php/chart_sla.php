@@ -50,7 +50,6 @@
 	$white=ImageColorAllocate($im,255,255,255); 
 
 	ImageFilledRectangle($im,0,0,$sizeX,$sizeY,ImageColorAllocate($im,120,200,120));
-	ImageRectangle($im,0,0,$sizeX-1,$sizeY-1,$black);
 
 	$now=time(NULL);
 	$period_start=$now-7*24*3600;
@@ -73,6 +72,8 @@
 
 	ImageFilledRectangle($im,$sizeX-$sizeX*$p/20,1,$sizeX-2,$sizeY-2,ImageColorAllocate($im,200,120,120));
 	ImageLine($im,$sizeX*$g/20,1,$sizeX*$g/20,$sizeY-1,$yellow);
+
+	ImageRectangle($im,0,0,$sizeX-1,$sizeY-1,$black);
 
 	$s=sprintf("%2.2f%%",$ok);
 	ImageString($im, 2,1,1, $s , $white);
