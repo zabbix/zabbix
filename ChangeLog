@@ -1,5 +1,6 @@
 Changes for 1.0beta13:
 
+ - support for icmppingsec (Alexei)
  - added support of symbol '-' in trigger expressions
  (Alexei)
  - added information about table 'trends' to 'Status of
