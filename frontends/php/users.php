@@ -2,7 +2,7 @@
 	$page["title"] = "Users";
 	$page["file"] = "users.php";
 
-	include "include/config.inc";
+	include "include/config.inc.php";
 	show_header($page["title"],0,0);
 ?>
 

@@ -265,6 +265,7 @@ CREATE TABLE items (
 	prevvalue	varchar(255) DEFAULT NULL,
 	status		int(4) DEFAULT '0' NOT NULL,
 	value_type	int(4) DEFAULT '0' NOT NULL,
+	trapper_hosts	varchar(255) DEFAULT '' NOT NULL,
 	PRIMARY KEY	(itemid),
 	UNIQUE		shortname (hostid,key_),
 	KEY		(hostid),

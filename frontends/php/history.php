@@ -1,7 +1,7 @@
 <?
 	$page["file"]="history.php";
 
-	include "include/config.inc";
+	include "include/config.inc.php";
 
 	$now=time();
 

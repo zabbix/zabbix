@@ -101,7 +101,7 @@ int	main()
 	}
 
 	init_config();
-	
+
 	fgets(s,MAX_STRING_LEN,stdin);
 	for( p=s+strlen(s)-1; p>s && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
 	p[1]=0;
@@ -126,18 +126,12 @@ int	main()
 /*	???
 	value=atof(value_string);*/
 
-
 	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
-
-	ret=process_data(server,key,value_string);
+	ret=process_data(0,server,key,value_string);
 
 	alarm(0);
 
 	if(SUCCEED == ret)
-	{
-		printf("OK\n");
-	}
-	else
 	{
 		printf("OK\n");
 	}

@@ -1,5 +1,5 @@
 <?
-	include "include/config.inc";
+	include "include/config.inc.php";
 	$page["title"] = "Configuration of graph";
 	$page["file"] = "graph.php";
 	show_header($page["title"],0,0);

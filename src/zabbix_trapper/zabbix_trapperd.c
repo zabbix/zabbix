@@ -157,14 +157,12 @@ void    init_config(void)
 	}
 }
 
-int	process(char *s)
+int	process(int sockfd,char *s)
 {
 	char	*p;
 	char	*server,*key,*value_string;
 
 	int	ret=SUCCEED;
-
-	return	SUCCEED;
 
 	for( p=s+strlen(s)-1; p>s && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
 	p[1]=0;
@@ -187,7 +185,7 @@ int	process(char *s)
 		return FAIL;
 	}
 
-	ret=process_data(server,key,value_string);
+	ret=process_data(sockfd,server,key,value_string);
 
 	return ret;
 }
@@ -289,7 +287,7 @@ void	process_child(int sockfd)
 	line[nread-1]=0;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Got line:%s", line);
-	if( SUCCEED == process(line) )
+	if( SUCCEED == process(sockfd,line) )
 	{
 		sprintf(result,"OK\n");
 	}

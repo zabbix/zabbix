@@ -1,5 +1,5 @@
 <?
-	include "include/config.inc";
+	include "include/config.inc.php";
 	$page["title"] = "Configuration of network map";
 	$page["file"] = "sysmap.php";
 	show_header($page["title"],0,0);

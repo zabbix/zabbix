@@ -1,5 +1,5 @@
 <? 
-	include "include/config.inc";
+	include "include/config.inc.php";
 
 #	PARAMETERS:
 	

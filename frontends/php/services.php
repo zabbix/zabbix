@@ -2,7 +2,7 @@
 	$page["title"] = "High-level representation of monitored data";
 	$page["file"] = "services.php";
 
-	include "include/config.inc";
+	include "include/config.inc.php";
 	show_header($page["title"],0,0);
 ?>
 

@@ -21,6 +21,7 @@
 
 #include "common.h"
 #include "cfg.h"
+#include "log.h"
 #include "sysinfo.h"
 #include "zabbix_agent.h"
 
@@ -69,7 +70,7 @@ void    init_config(void)
 
 	parse_cfg_file("/etc/zabbix/zabbix_agent.conf",cfg);
 }
-
+/*
 int	check_security(void)
 {
 	char	*sname;
@@ -98,12 +99,11 @@ int	check_security(void)
 	}
         else
 	{
-/*		syslog( LOG_WARNING, "Error getpeername [%m]");*/
-/*		syslog( LOG_WARNING, "Connection rejected");*/
 		return FAIL;
 	}
 	return	FAIL;
 }
+*/
 
 int	main()
 {
@@ -123,9 +123,12 @@ int	main()
 
 	init_config();
 
+/* Do not create debug files */
+	zabbix_open_log(LOG_TYPE_SYSLOG,LOG_LEVEL_EMPTY,NULL);
+
 	alarm(CONFIG_TIMEOUT);
 
-	if(check_security() == FAIL)
+	if(check_security(0,CONFIG_HOSTS_ALLOWED,0) == FAIL)
 	{
 		exit(FAIL);
 	}
