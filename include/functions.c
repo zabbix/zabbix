@@ -588,7 +588,7 @@ void	update_services(int triggerid, int status)
 
 	if(DBis_empty(result) == SUCCEED)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "No service for this triggerid [%d [%d]", triggerid);
+		zabbix_log( LOG_LEVEL_WARNING, "No service for this triggerid [%d]", triggerid);
 		DBfree_result(result);
 		return;
 	}
@@ -658,7 +658,7 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 				sprintf(sql,"update triggers set value=%d, lastchange=%d where triggerid=%d",TRIGGER_VALUE_TRUE,now,trigger.triggerid);
 				DBexecute(sql);
 
-				DBadd_alarm(trigger.triggerid, TRIGGER_VALUE_FALSE);
+				DBadd_alarm(trigger.triggerid, TRIGGER_VALUE_TRUE);
 			}
 			if(trigger.value == TRIGGER_VALUE_FALSE)
 			{
