@@ -662,6 +662,35 @@ void DBdelete_item(int itemid)
 	zabbix_log(LOG_LEVEL_DEBUG,"End of DBdelete_item(%d)", itemid);
 }
 
+void DBdelete_sysmaps_links_by_shostid(int shostid)
+{
+	char	sql[MAX_STRING_LEN];
+
+	snprintf(sql,sizeof(sql)-1,"delete from sysmaps_links where shostid1=%d or shostid2=%d", shostid, shostid);
+	DBexecute(sql);
+}
+
+void DBdelete_sysmaps_hosts_by_hostid(int hostid)
+{
+	int	i, shostid;
+	char	sql[MAX_STRING_LEN];
+	DB_RESULT	*result;
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBdelete_sysmaps_hosts(%d)", hostid);
+	snprintf(sql,sizeof(sql)-1,"select shostid from sysmaps_hosts where hostid=%d", hostid);
+	result = DBselect(sql);
+
+	for(i=0;i<DBnum_rows(result);i++)
+	{
+		shostid=atoi(DBget_field(result,i,0));
+		DBdelete_sysmaps_links_by_shostid(shostid);
+	}
+	DBfree_result(result);
+
+	snprintf(sql,sizeof(sql)-1,"delete from sysmaps_hosts where hostid=%d", hostid);
+	DBexecute(sql);
+}
+
 void DBdelete_host(int hostid)
 {
 	int	i, itemid;
@@ -678,6 +707,8 @@ void DBdelete_host(int hostid)
 		DBdelete_item(itemid);
 	}
 	DBfree_result(result);
+
+	DBdelete_sysmaps_hosts_by_hostid(hostid);
 
 	snprintf(sql,sizeof(sql)-1,"delete from hosts_groups where hostid=%d", hostid);
 	DBexecute(sql);
