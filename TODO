@@ -1,6 +1,5 @@
 1.0:
 
- - apply Fabricio patches
  - get rid of .0000000 in alert messages
  - support for m,h and d in graphs and in latest values if monitored value in seconds
  - cannot use "." as key in trigger expressions
