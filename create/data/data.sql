@@ -63,6 +63,7 @@ INSERT INTO rights VALUES (3,2,'Default permission','R',0);
 INSERT INTO hosts VALUES (10001,'Host.Unix',0,'',10000,3,0,0);
 INSERT INTO hosts VALUES (10002,'Host.Win32',0,'',10000,3,0,0);
 INSERT INTO hosts VALUES (10004,'Host.Standalone',0,'',10000,3,0,0);
+INSERT INTO hosts VALUES (10003,'Application.MySQL',0,'',10000,3,0,0);
 INSERT INTO hosts VALUES (10007,'Host.SNMP',0,'',161,3,0,0);
 
 --
@@ -77,7 +78,9 @@ INSERT INTO groups VALUES (1,'Templates');
 
 INSERT INTO hosts_groups VALUES (10001,1);
 INSERT INTO hosts_groups VALUES (10002,1);
+INSERT INTO hosts_groups VALUES (10003,1);
 INSERT INTO hosts_groups VALUES (10004,1);
+INSERT INTO hosts_groups VALUES (10007,1);
 
 --
 -- Dumping data for table `items`
@@ -215,6 +218,15 @@ INSERT INTO items VALUES (10156,0,'','',161,10002,'Total disk space on c:','disk
 INSERT INTO items VALUES (10359,0,'','',161,10002,'Total disk space on d:','disktotal[d:]',3600,7,0,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL);
 INSERT INTO items VALUES (10357,0,'','',161,10002,'Checksum of c:\\config.sys','cksum[c:\\config.sys]',600,7,0,0,NULL,NULL,NULL,0,0,'','',0,0,NULL);
 INSERT INTO items VALUES (10358,0,'','',161,10002,'Free disk space on d:','diskfree[d:]',30,7,0,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL);
+
+
+INSERT INTO items VALUES (10200,0,'','',161,10003,'MySQL is alive','mysql[ping]',60,7,0,0,NULL,NULL,NULL,0,0,'','',0,0,NULL);
+INSERT INTO items VALUES (10201,0,'','',161,10003,'MySQL uptime','mysql[uptime]',60,7,0,0,NULL,NULL,NULL,0,0,'','s',0,0,NULL);
+INSERT INTO items VALUES (10202,0,'','',161,10003,'MySQL number of threads','mysql[threads]',60,7,0,0,NULL,NULL,NULL,0,0,'','',0,0,NULL);
+INSERT INTO items VALUES (10203,0,'','',161,10003,'MySQL queries per second','mysql[qps]',60,7,0,0,NULL,NULL,NULL,0,0,'','qps',0,0,NULL);
+INSERT INTO items VALUES (10204,0,'','',161,10003,'MySQL number of slow queries','mysql[slowqueries]',60,7,0,0,NULL,NULL,NULL,0,0,'','',0,0,NULL);
+INSERT INTO items VALUES (10205,0,'','',161,10003,'MySQL version','version[mysql]',600,7,0,0,NULL,NULL,NULL,0,1,'','',0,0,NULL);
+
 INSERT INTO items VALUES (10298,3,'','',161,10004,'Email (SMTP) server is running','smtp',60,7,0,0,NULL,NULL,NULL,0,0,'','',0,0,NULL);
 INSERT INTO items VALUES (10299,3,'','',161,10004,'FTP server is running','ftp',60,7,0,0,NULL,NULL,NULL,0,0,'','',0,0,NULL);
 INSERT INTO items VALUES (10300,3,'','',161,10004,'SSH server is running','ssh',60,7,0,0,NULL,NULL,NULL,0,0,'','',0,0,NULL);
