@@ -42,7 +42,7 @@
 #else
 #define DEBUG_SUFFIX
 #endif
-#define AGENT_VERSION         "1.0.0-beta8(rc5)" DEBUG_SUFFIX
+#define AGENT_VERSION         "1.0.0-beta8(rc6)" DEBUG_SUFFIX
 
 #define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
 #define ZABBIX_EVENT_SOURCE   "Zabbix Win32 Agent"
@@ -154,6 +154,7 @@ void ExpandAlias(char *orig,char *expanded);
 
 extern DWORD dwTlsLogPrefix;
 extern HANDLE eventShutdown;
+extern HANDLE eventCollectorStarted;
 
 extern BOOL optStandalone;
 extern BOOL optUseEventLog;
@@ -176,6 +177,10 @@ extern double statProcLoad5;
 extern double statProcLoad15;
 extern double statAvgCollectorTime;
 extern double statMaxCollectorTime;
+extern double statAcceptedRequests;
+extern double statRejectedRequests;
+extern double statTimedOutRequests;
+extern double statAcceptErrors;
 
 extern DWORD (__stdcall *imp_GetGuiResources)(HANDLE,DWORD);
 extern BOOL (__stdcall *imp_GetProcessIoCounters)(HANDLE,PIO_COUNTERS);

@@ -35,6 +35,16 @@ struct REQUEST
 
 
 //
+// Global data
+//
+
+double statAcceptedRequests=0;
+double statRejectedRequests=0;
+double statTimedOutRequests=0;
+double statAcceptErrors=0;
+
+
+//
 // Validates server's address
 //
 
@@ -103,6 +113,7 @@ static void CommThread(void *param)
    {
       strcpy(rq.result,"ZBX_ERROR\n");
       WriteLog(MSG_REQUEST_TIMEOUT,EVENTLOG_WARNING_TYPE,"s",rq.cmd);
+      statTimedOutRequests++;
    }
    send(sock,rq.result,strlen(rq.result),0);
 
@@ -135,7 +146,7 @@ void ListenerThread(void *)
    // Create socket
    if ((sock=socket(AF_INET,SOCK_STREAM,0))==-1)
    {
-      WriteLog(MSG_SOCKET_ERROR,EVENTLOG_ERROR_TYPE,"s",GetSystemErrorText(WSAGetLastError()));
+      WriteLog(MSG_SOCKET_ERROR,EVENTLOG_ERROR_TYPE,"e",WSAGetLastError());
       exit(1);
    }
 
@@ -148,7 +159,7 @@ void ListenerThread(void *)
    // Bind socket
    if (bind(sock,(struct sockaddr *)&servAddr,sizeof(struct sockaddr_in))!=0)
    {
-      WriteLog(MSG_BIND_ERROR,EVENTLOG_ERROR_TYPE,"s",GetSystemErrorText(WSAGetLastError()));
+      WriteLog(MSG_BIND_ERROR,EVENTLOG_ERROR_TYPE,"e",WSAGetLastError());
       exit(1);
    }
 
@@ -164,8 +175,9 @@ void ListenerThread(void *)
          int error=WSAGetLastError();
 
          if (error!=WSAEINTR)
-            WriteLog(MSG_ACCEPT_ERROR,EVENTLOG_ERROR_TYPE,"s",GetSystemErrorText(error));
+            WriteLog(MSG_ACCEPT_ERROR,EVENTLOG_ERROR_TYPE,"e",error);
          errorCount++;
+         statAcceptErrors++;
          if (errorCount>1000)
          {
             WriteLog(MSG_TOO_MANY_ERRORS,EVENTLOG_WARNING_TYPE,NULL);
@@ -178,10 +190,12 @@ void ListenerThread(void *)
 
       if (IsValidServerAddr(servAddr.sin_addr.S_un.S_addr))
       {
+         statAcceptedRequests++;
          _beginthread(CommThread,0,(void *)sockClient);
       }
       else     // Unauthorized connection
       {
+         statRejectedRequests++;
          shutdown(sockClient,2);
          closesocket(sockClient);
       }

@@ -131,7 +131,7 @@ Unable to create mapping for file "%1": %2
 MessageId=
 SymbolicName=MSG_MAP_VIEW_FAILED
 Language=English
-MapViewOfFile(%1) failed: %2
+MapViewOfFile("%1") failed: %2
 .
 
 MessageId=

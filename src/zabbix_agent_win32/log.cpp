@@ -133,13 +133,15 @@ static void WriteLogToFile(char *message)
 //             s - String
 //             d - Decimal integer
 //             x - Hex integer
+//             e - System error code (will appear in log as textual description)
 //
 
 void WriteLog(DWORD msg,WORD wType,char *format...)
 {
    va_list args;
-   char *strings[16];
+   char *strings[16],*msgBuf;
    int numStrings=0;
+   DWORD error;
 
    memset(strings,0,sizeof(char *)*16);
 
@@ -161,6 +163,26 @@ void WriteLog(DWORD msg,WORD wType,char *format...)
             case 'x':
                strings[numStrings]=(char *)malloc(16);
                sprintf(strings[numStrings],"0x%08X",va_arg(args,DWORD));
+               break;
+            case 'e':
+               error=va_arg(args,DWORD);
+               if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+                                 FORMAT_MESSAGE_FROM_SYSTEM | 
+                                 FORMAT_MESSAGE_IGNORE_INSERTS,
+                                 NULL,error,
+                                 MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT), // Default language
+                                 (LPSTR)&msgBuf,0,NULL)>0)
+               {
+                  msgBuf[strcspn(msgBuf,"\r\n")]=0;
+                  strings[numStrings]=(char *)malloc(strlen(msgBuf)+1);
+                  strcpy(strings[numStrings],msgBuf);
+                  LocalFree(msgBuf);
+               }
+               else
+               {
+                  strings[numStrings]=(char *)malloc(64);
+                  sprintf(strings[numStrings],"MSG 0x%08X - Unable to find message text",error);
+               }
                break;
             default:
                strings[numStrings]=(char *)malloc(32);
