@@ -1,11 +1,63 @@
 Description of database structure
 =================================
 
-The table contains list of actions to be applied if trigger
-change its state. 
+Table GRAPHS_ITEMS
+==================
+
+The table contains list of monitored items belonging to graph.
+
+gitemid		int	; Unique ID
+graphid		int	; Graph ID
+itemid		int	; Item ID
+color		varchar	; Color
+
+Table GRAPHS
+============
+
+The table contains list of defined graphs.
+
+graphid		int	; Unique Graph ID
+name		varchar	; Name of the graph
+width		int	; Width of the graph
+height		int	; Height of the graph
+
+Table SYSMAPS_LINKS
+===================
+
+The table contains list of connectors between hosts diplayed on network map.
+
+linkid		int	; Unique link ID
+sysmapid	int	; Network map ID
+shostid1	int	; ID of first host
+shostid2	int	; ID of second host
+
+Table SYSMAPS_HOSTS
+===================
+
+The table contains definition of host displayed on network map.
+
+shostid		int	; Unique ID
+sysmapid	int	; Network map ID
+hostid		int	; Host ID
+label		varchar	; Label displayed under host icon
+x		int	; Coordinate X
+y		int	; Coordinate Y
+
+Table SYSMAPS
+=============
+
+The table contains list of defined network maps
+
+sysmapid	int	; Unique network Map ID
+name		varchar	; Name of network map
+width		int	; Width of the network map
+height		int	; Height of the network map
 
 Table ACTIONS
 =============
+
+The table contains list of actions to be applied if trigger
+change its state. 
 
 actionid	int	; Unique action ID
 triggerid	int	; Trigger ID
