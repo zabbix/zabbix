@@ -40,12 +40,12 @@
 	{
 		if($_GET["register"]=="add")
 		{
-			$result=add_sysmap($_GET["name"],$_GET["width"],$_GET["height"],$_GET["background"]);
+			$result=add_sysmap($_GET["name"],$_GET["width"],$_GET["height"],$_GET["background"],$_GET["label_type"]);
 			show_messages($result,"Network map added","Cannot add network map");
 		}
 		if($_GET["register"]=="update")
 		{
-			$result=update_sysmap($_GET["sysmapid"],$_GET["name"],$_GET["width"],$_GET["height"],$_GET["background"]);
+			$result=update_sysmap($_GET["sysmapid"],$_GET["name"],$_GET["width"],$_GET["height"],$_GET["background"],$_GET["label_type"]);
 			show_messages($result,"Network map updated","Cannot update network map");
 		}
 		if($_GET["register"]=="delete")
@@ -98,11 +98,13 @@
 
 	if(isset($_GET["sysmapid"]))
 	{
-		$result=DBselect("select s.sysmapid,s.name,s.width,s.height,s.background from sysmaps s where sysmapid=".$_GET["sysmapid"]);
-		$name=DBget_field($result,0,1);
-		$width=DBget_field($result,0,2);
-		$height=DBget_field($result,0,3);
-		$background=DBget_field($result,0,4);
+		$result=DBselect("select * from sysmaps where sysmapid=".$_GET["sysmapid"]);
+		$row=DBfetch($result);
+		$name=$row["name"];
+		$width=$row["width"];
+		$height=$row["height"];
+		$background=$row["background"];
+		$label_type=$row["label_type"];
 	}
 	else
 	{
@@ -110,6 +112,7 @@
 		$width=800;
 		$height=600;
 		$background="";
+		$label_type=0;
 	}
 
 	show_form_begin("sysmaps.map");
@@ -123,22 +126,22 @@
 	{
 		echo "<input class=\"biginput\" name=\"sysmapid\" type=\"hidden\" value=".$_GET["sysmapid"].">";
 	}
-	echo "Name";
+	echo S_NAME;
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=32>";
 
 	show_table2_v_delimiter($col++);
-	echo "Width";
+	echo S_WIDTH;
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"width\" size=5 value=\"$width\">";
 
 	show_table2_v_delimiter($col++);
-	echo "Height";
+	echo S_HEIGHT;
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"height\" size=5 value=\"$height\">";
 
 	show_table2_v_delimiter($col++);
-	echo "Background image";
+	echo S_BACKGROUND_IMAGE;
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"background\" size=1>";
 	$result=DBselect("select name from images where imagetype=2 order by name");
@@ -147,7 +150,6 @@
 	{
 		$name=DBget_field($result,$i,0);
 		if(isset($_GET["sysmapid"]) && ($background==$name))
-//		if(isset($_GET["hostid"]) && ($_GET["icon"]==$icons[$i]))
 		{
 			echo "<OPTION VALUE='".$name."' SELECTED>".$name;
 		}
@@ -155,6 +157,40 @@
 		{
 			echo "<OPTION VALUE='".$name."'>".$name;
 		}
+	}
+	echo "</SELECT>";
+
+	show_table2_v_delimiter($col++);
+	echo S_ICON_LABEL_TYPE;
+	show_table2_h_delimiter();
+	echo "<select class=\"biginput\" name=\"label_type\" size=1>";
+	if($label_type==0)
+	{
+		echo "<OPTION VALUE='0' SELECTED>".S_HOST_LABEL;
+		echo "<OPTION VALUE='1'>".S_IP_ADDRESS;
+		echo "<OPTION VALUE='2'>".S_HOST_NAME;
+		echo "<OPTION VALUE='3'>".S_NOTHING;
+	}
+	else if($label_type==1)
+	{
+		echo "<OPTION VALUE='0'>".S_HOST_LABEL;
+		echo "<OPTION VALUE='1' SELECTED>".S_IP_ADDRESS;
+		echo "<OPTION VALUE='2'>".S_HOST_NAME;
+		echo "<OPTION VALUE='3'>".S_NOTHING;
+	}
+	else if($label_type==2)
+	{
+		echo "<OPTION VALUE='0'>".S_HOST_LABEL;
+		echo "<OPTION VALUE='1'>".S_IP_ADDRESS;
+		echo "<OPTION VALUE='2' SELECTED>".S_HOST_NAME;
+		echo "<OPTION VALUE='3'>".S_NOTHING;
+	}
+	else if($label_type==3)
+	{
+		echo "<OPTION VALUE='0'>".S_HOST_LABEL;
+		echo "<OPTION VALUE='1'>".S_IP_ADDRESS;
+		echo "<OPTION VALUE='2'>".S_HOST_NAME;
+		echo "<OPTION VALUE='3' SELECTED>".S_NOTHING;
 	}
 	echo "</SELECT>";
 
