@@ -238,7 +238,7 @@ int	main()
 	socklen_t	addrlen;
 	int		i, ret;
 
-	char		*host="127.0.0.1";
+	char		host[128];
 	char		*port="10000";
 	
 	daemon_init();
@@ -255,6 +255,12 @@ int	main()
 	ret=setlogmask(LOG_UPTO(LOG_WARNING));
 
 	syslog( LOG_WARNING, "zabbix_agentd started");
+
+	if(gethostname(host,127) != 0)
+	{
+		syslog( LOG_CRIT, "gethostname() failed");
+		exit(FAIL);
+	}
 
 	listenfd = tcp_listen(host,port,&addrlen);
 
