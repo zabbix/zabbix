@@ -279,7 +279,7 @@
         show_table2_h_delimiter();
 	if(isset($HTTP_GET_VARS["triggerid"])&&($HTTP_GET_VARS["triggerid"]!=""))
 	{
-        	echo "<INPUT class=\"biginput\" TYPE=\"CHECKBOX\" NAME=\"linktrigger\" VALUE=\"true\" CHECKED>";
+        	echo "<INPUT class=\"biginput\" TYPE=\"CHECKBOX\" NAME=\"linktrigger\" VALUE=\"on\" CHECKED>";
 	}
 	else
 	{
