@@ -1,5 +1,6 @@
 Changes for 1.0beta12:
 
+ - data.sql was modified to include usrgrp records (Alexei)
  - fixed update of special items 'status'. Thanks to
  Sebastien "Slix" Linard. (Alexei) 
  - fixes for graph time navigation (Alexei)
