@@ -112,7 +112,7 @@
 		}
 		elseif($row["status"]==3)
 		{
-			$istrue="MODIFIED";
+			$istrue="UNKNOWN";
 			$dissum=$dissum+$leng;
 			$sum=$dissum;
 		}

@@ -1099,6 +1099,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	update_trigger_status($triggerid,$status)
 	{
+		add_alarm($triggerid,3);
 		$sql="update triggers set istrue=$status where triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
@@ -1494,6 +1495,22 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	add_alarm($triggerid,$istrue)
 	{
+		$sql="select max(clock) from alarms";
+		$result=DBselect($sql);
+		if(DBnum_rows($result) == 1)
+		{
+			$row=DBfetch($result);
+			$sql="select istrue from alarms where clock=".$row[0];
+			$result=DBselect($sql);
+			if(DBnum_rows($result) == 1)
+			{
+				$row=DBfetch($result);
+				if($row["istrue"] == $istrue)
+				{
+					return 0;
+				}
+			}
+		}
 		$now=time();
 		$sql="insert into alarms(triggerid,clock,istrue) values($triggerid,$now,$istrue)";
 		return	DBexecute($sql);
@@ -1505,11 +1522,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		global	$ERROR_MSG;
 
-		if(!check_right("Trigger","A",0))
-		{
-			$ERROR_MSG="Insufficient permissions";
-			return	0;
-		}
+//		if(!check_right("Trigger","A",0))
+//		{
+//			$ERROR_MSG="Insufficient permissions";
+//			return	0;
+//		}
 
 		$description=addslashes($description);
 		$sql="insert into triggers  (description,priority,istrue,comments,url) values ('$description',$priority,$istrue,'$comments','$url')";
@@ -1522,6 +1539,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
  
 		$triggerid=DBinsert_id($result,"triggers","triggerid");
 #		echo $triggerid,"<br>";
+		add_alarm($triggerid,3);
  
 		$expression=implode_exp($expression,$triggerid);
 		$sql="update triggers set expression='$expression' where triggerid=$triggerid";
@@ -1575,7 +1593,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 
 		$expression=implode_exp($expression,$triggerid);
-		if($istrue != 2) $istrue="istrue";
+		if($istrue != 2)
+		{
+			$istrue="istrue";
+		}
+		else
+		{
+			add_alarm($triggerid,3);
+		}
 		$sql="update triggers set expression='$expression',description='$description',priority=$priority,istrue=$istrue,comments='$comments',url='$url' where triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
@@ -2612,7 +2637,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$expression="";
 			$description="";
 			$priority=0;
-			$istrue=0;
+			$istrue=3;
 			$comments="";
 			$url="";
 		}
@@ -2817,6 +2842,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		$state=-1;
 		$true_time=0;
 		$false_time=0;
+		$unknown_time=0;
 		$time=$min;
 		$max=time();
 		for($i=0;$i<DBnum_rows($result);$i++)
@@ -2839,6 +2865,10 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				{
 					$true_time+=$diff;
 				}
+				if($state == 3)
+				{
+					$unknown_time+=$diff;
+				}
 			}
 			else if($state==0)
 			{
@@ -2848,6 +2878,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			else if($state==1)
 			{
 				$true_time+=$diff;
+				$state=$istrue;
+			}
+			else if($state==3)
+			{
+				$unknown_time+=$diff;
 				$state=$istrue;
 			}
 		}
@@ -2862,16 +2897,24 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			{
 				$false_time=$false_time+$max-$time;
 			}
-			else
+			elseif($state==1)
 			{
 				$true_time=$true_time+$max-$time;
 			}
+			elseif($state==3)
+			{
+				$unknown_time=$unknown_time+$max-$time;
+			}
+
 		}
 
+		$total_time=$true_time+$false_time+$unknown_time;
 		$ret["true_time"]=$true_time;
 		$ret["false_time"]=$false_time;
-		$ret["true"]=(100*$true_time)/($true_time+$false_time);
-		$ret["false"]=(100*$false_time)/($true_time+$false_time);
+		$ret["unknown_time"]=$unknown_time;
+		$ret["true"]=(100*$true_time)/$total_time;
+		$ret["false"]=(100*$false_time)/$total_time;
+		$ret["unknown"]=(100*$unknown_time)/$total_time;
 		return $ret;
 	}
 

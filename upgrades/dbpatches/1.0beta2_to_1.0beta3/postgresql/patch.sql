@@ -15,6 +15,16 @@ CREATE TABLE history_str (
 );
 
 drop table groups;
+drop table services_links;
+
+CREATE TABLE services_links (
+  linkid                serial,
+  serviceupid           int4            DEFAULT '0' NOT NULL,
+  servicedownid         int4            DEFAULT '0' NOT NULL,
+  soft                  int2            DEFAULT '0' NOT NULL,
+  PRIMARY KEY (linkid)
+);
+
 alter table users drop groupid;
 alter table config drop password_required;
 
