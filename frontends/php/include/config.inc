@@ -1017,6 +1017,13 @@
 
 	function	delete_trigger($triggerid)
 	{
+		$sql="select count(*) from trigger_depends where triggerid_down=$triggerid or triggerid_up=$triggerid";
+		$result=DBexecute($sql);
+		if(DBget_field($result,0,0)>0)
+		{
+			return	FALSE;
+		}
+
 		$result=delete_function_by_triggerid($triggerid);
 		if(!$result)
 		{
