@@ -51,8 +51,8 @@
 			$result=DBselect("select name from screens where screenid=".$_GET["screenid"]);
 			$map=DBget_field($result,0,0);
 			$map=iif(isset($_GET["fullscreen"]),
-				"<a href=\"screens.php?screenid=".$_GET["sysmapid"]."\">".$map."</a>",
-				"<a href=\"screens.php?screenid=".$_GET["sysmapid"]."&fullscreen=1\">".$map."</a>");
+				"<a href=\"screens.php?screenid=".$_GET["screenid"]."\">".$map."</a>",
+				"<a href=\"screens.php?screenid=".$_GET["screenid"]."&fullscreen=1\">".$map."</a>");
 		}
 		else
 		{
