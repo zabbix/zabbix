@@ -29,6 +29,8 @@ Not ready yet:
 
  OTHER:
 
+ - support fo netload under other platforms
+ - support for disk loads
  - log rotating for trace files
  - agent to send something back in case of timeout (?)
  - check for function parameters in evaluate_simple_expression
