@@ -62,17 +62,17 @@
 <?php
 	if(isset($HTTP_GET_VARS["screenid"]))
 	{
-          $screenid=$HTTP_GET_VARS["screenid"];
-          $result=DBselect("select name,cols,rows from screens where screenid=$screenid");
-          $row=DBfetch($result);
-	if(isset($HTTP_GET_VARS["fullscreen"]))
-	{
-		$map="<a href=\"screens.php?screenid=".$HTTP_GET_VARS["screenid"]."\">".$row["name"]."</a>";
-	}
-	else
-	{
-		$map="<a href=\"screens.php?screenid=".$HTTP_GET_VARS["screenid"]."&fullscreen=1\">".$row["name"]."</a>";
-	}
+		$screenid=$HTTP_GET_VARS["screenid"];
+		$result=DBselect("select name,cols,rows from screens where screenid=$screenid");
+		$row=DBfetch($result);
+		if(isset($HTTP_GET_VARS["fullscreen"]))
+		{
+			$map="<a href=\"screens.php?screenid=".$HTTP_GET_VARS["screenid"]."\">".$row["name"]."</a>";
+		}
+		else
+		{
+			$map="<a href=\"screens.php?screenid=".$HTTP_GET_VARS["screenid"]."&fullscreen=1\">".$row["name"]."</a>";
+		}
 	show_table_header($map);
           echo "<TABLE BORDER=1 COLS=".$row["cols"]." align=center WIDTH=100% BGCOLOR=\"#FFFFFF\"";
           for($r=0;$r<$row["rows"];$r++)
@@ -84,29 +84,46 @@
 
                 echo "<a name=\"form\"></a>";
                 echo "<form method=\"get\" action=\"screenedit.php\">";
-                $iresult=DBSelect("select * from screens_items where screenid=$screenid and x=$c and y=$r");
-                if($iresult)
-                {
-                        $irow=DBfetch($iresult);
-                        $screenitemid=$irow["screenitemid"];
-                        $graphid=$irow["graphid"];
-                        $width=$irow["width"];
-                        $height=$irow["height"];
-                }
-                else
-                {
-                        $screenitemid=0;
-                        $graphid=0;
-                        $width=100;
-                        $height=50;
-                }
 
-                if($graphid!=0)
-                {
-                        echo "<a href=charts.php?graphid=$graphid><img src='chart2.php?graphid=$graphid&width=$width&height=$height&period=3600&noborder=1' border=0></a>";
-                }
-                echo "</form>\n";
-               echo "</TD>";
+		{
+			$screenitemid=0;
+			$graphid=0;
+			$itemid=0;
+			$width=100;
+			$height=50;
+		}
+
+		$sql="select * from screens_items where screenid=$screenid and x=$c and y=$r";
+		$iresult=DBSelect($sql);
+		if(DBnum_rows($iresult)>0)
+		{
+			$irow=DBfetch($iresult);
+			$screenitemid=$irow["screenitemid"];
+			$graphid=$irow["graphid"];
+			$width=$irow["width"];
+			$height=$irow["height"];
+		}
+		$sql="select * from screens_graphs where screenid=$screenid and x=$c and y=$r";
+		$iresult=DBSelect($sql);
+		if(DBnum_rows($iresult)>0)
+		{
+			$irow=DBfetch($iresult);
+			$screengraphid=$irow["screengraphid"];
+			$itemid=$irow["itemid"];
+			$width=$irow["width"];
+			$height=$irow["height"];
+		}
+
+		if($graphid!=0)
+		{
+			echo "<a href=charts.php?graphid=$graphid><img src='chart2.php?graphid=$graphid&width=$width&height=$height&period=3600&noborder=1' border=0></a>";
+		}
+		if($itemid!=0)
+		{
+			echo "<a href=history.php?action=showhistory&itemid=$itemid><img src='chart.php?itemid=$itemid&width=$width&height=$height&period=3600&noborder=1' border=0></a>";
+		}
+		echo "</form>\n";
+		echo "</TD>";
           }
           echo "</TR>\n";
           }

@@ -65,7 +65,10 @@
 	$y=imagesy($im);
   
 	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+2*$shiftY+40,$white);
-	ImageRectangle($im,0,0,$x-1,$y-1,$black);
+	if(!isset($HTTP_GET_VARS["noborder"]))
+	{
+		ImageRectangle($im,0,0,$x-1,$y-1,$black);
+	}
 	if(!check_right("Item","R",$HTTP_GET_VARS["itemid"]))
 	{
 //		show_table_header("<font color=\"AA0000\">No permissions !</font>");
