@@ -506,6 +506,8 @@ int main(int argc, char **argv)
 	{
 		if(fork() == 0)
 		{
+			/* Do not start all processes at once */
+			sleep(1);
 			sucker_num=i;
 			break;
 		}

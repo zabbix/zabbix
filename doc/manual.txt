@@ -408,6 +408,11 @@ Change the following parameters:
 ./configure --with-pgsql  # for PostgreSQL
 make
 
+If you want to compile client binaries only, run:
+
+./configure
+make
+
 4.2.6 Copy created binaries from bin/ to /opt/zabbix/bin or any other directory. 
 
 4.2.7 Configure /etc/services
@@ -423,7 +428,7 @@ Add the following line to /etc/inetd.conf:
 
 zabbix_trap         stream  tcp     nowait.3600    zabbix /opt/zabbix/bin/zabbix_trapper
 
-If you plan to use zabbix_agent (zabbix_agentd does not require this!), the following line must be added as well:
+If you plan to use zabbix_agent (zabbix_agentd does not require this!), the following line must be added:
 
 zabbix_agent        stream  tcp     nowait.3600    zabbix /opt/zabbix/bin/zabbix_agent
 

@@ -115,6 +115,16 @@ insert into items_template (itemtemplateid,description,key_,delay)
 	values (47,'Checksum of /usr/bin/ssh','cksum[/usr/bin/ssh]', 600);
 insert into items_template (itemtemplateid,description,key_,delay)
 	values (48,'Checksum of /etc/services','cksum[/etc/services]', 600);
+insert into items_template (itemtemplateid,description,key_,delay)
+	values (49,'Number of disks read/write operations','io[disk_io]', 30);
+insert into items_template (itemtemplateid,description,key_,delay)
+	values (50,'Number of disks read operations','io[disk_rio]', 30);
+insert into items_template (itemtemplateid,description,key_,delay)
+	values (51,'Number of disks write operations','io[disk_wio]', 30);
+insert into items_template (itemtemplateid,description,key_,delay)
+	values (52,'Number of block read from disks','io[disk_rblk]', 30);
+insert into items_template (itemtemplateid,description,key_,delay)
+	values (53,'Number of block written to disks','io[disk_wblk]', 30);
 
 --
 -- Data for table triggers_template

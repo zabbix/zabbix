@@ -71,12 +71,15 @@ COMMAND	commands[]=
   	{"swap[in]"			,EXECUTE, "vmstat -n 1 2|tail -1|cut -b37-40"},
 	{"swap[out]"			,EXECUTE, "vmstat -n 1 2|tail -1|cut -b41-44"},
 
-	{"io[in]"			,EXECUTE, "vmstat -n 1 2|tail -1|cut -b45-50"},
-	{"io[out]"			,EXECUTE, "vmstat -n 1 2|tail -1|cut -b51-56"},
-
 	{"system[interrupts]"		,EXECUTE, "vmstat -n 1 2|tail -1|cut -b57-61"},
 	{"system[switches]"		,EXECUTE, "vmstat -n 1 2|tail -1|cut -b62-67"},
 ***************************************/
+
+	{"io[disk_io]"			,DISK_IO,  0},
+	{"io[disk_rio]"			,DISK_RIO, 0},
+	{"io[disk_wio]"			,DISK_WIO, 0},
+	{"io[disk_rblk]"		,DISK_RBLK, 0},
+	{"io[disk_wblk]"		,DISK_WBLK, 0},
 
 	{"system[procload]"		,PROCLOAD, 0},
 	{"system[procload5]"		,PROCLOAD5, 0},
@@ -89,8 +92,6 @@ COMMAND	commands[]=
 	{"ping"				,PING, 0},
 	{"tcp_count"			,EXECUTE, "netstat -tn|grep EST|wc -l"},
 
-/*	{"net[listen_21]"		,EXECUTE, "netstat -lnt|grep -v grep|grep ':21 '|wc -l"}, */
-/*	{"net[listen_21]"		,EXECUTE, "cat /proc/net/tcp|grep '0015 00000000:0000 0A'|wc -l"}, */
 	{"net[listen_21]"		,TCP_LISTEN, "0015"},
 	{"net[listen_22]"		,TCP_LISTEN, "0016"},
 	{"net[listen_23]"		,TCP_LISTEN, "0017"},
@@ -484,6 +485,31 @@ float	PROCCOUNT(void)
 float	SWAPTOTAL(void)
 {
 	return	getPROC("/proc/meminfo",9,2);
+}
+
+float	DISK_IO(void)
+{
+	return	getPROC("/proc/stat",2,2);
+}
+
+float	DISK_RIO(void)
+{
+	return	getPROC("/proc/stat",3,2);
+}
+
+float	DISK_WIO(void)
+{
+	return	getPROC("/proc/stat",4,2);
+}
+
+float	DISK_RBLK(void)
+{
+	return	getPROC("/proc/stat",5,2);
+}
+
+float	DISK_WBLK(void)
+{
+	return	getPROC("/proc/stat",6,2);
 }
 
 float	EXECUTE(char *command)

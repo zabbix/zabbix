@@ -1766,7 +1766,7 @@
 		show_table2_v_delimiter();
 		echo "Comments";
 		show_table2_h_delimiter();
- 		echo "<TEXTAREA NAME=\"comments\" COLS=54 ROWS=\"5\" WRAP=\"SOFT\">$comments</TEXTAREA>";
+ 		echo "<TEXTAREA NAME=\"comments\" COLS=70 ROWS=\"7\" WRAP=\"SOFT\">$comments</TEXTAREA>";
 
 		show_table2_v_delimiter();
 		echo "Disabled";
