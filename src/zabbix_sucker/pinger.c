@@ -62,7 +62,7 @@ int	process_ip(char *ip, char *value)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_ip()");
 
-	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts from items i,hosts h where h.status in (0,2) and h.hostid=i.hostid and h.ip='%s' and i.key_='icmpping' and i.status=%d and i.type=%d", ip, ITEM_STATUS_ACTIVE, ITEM_TYPE_SIMPLE);
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts from items i,hosts h where h.status in (%d,%d) and h.hostid=i.hostid and h.ip='%s' and i.key_='icmpping' and i.status=%d and i.type=%d", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, ip, ITEM_STATUS_ACTIVE, ITEM_TYPE_SIMPLE);
 	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
 	result = DBselect(sql);
 
