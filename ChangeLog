@@ -1,11 +1,11 @@
 Changes for 1.0beta2:
-(Add thanks to for Andris ...)
 (Is connection via Unix socket faster ?)
 (Add reconnect in case if server gone)
 (net_listen[] should be unsupported)
 
  - added #include <time.h> into db.h (Alexei)
- - added support for connection to MySQL via Unix socket (Alexei)
+ - added support for connection to MySQL via Unix socket. Thanks to Arturs
+ Aboltins (Alexei)
  - configure to find PostgreSQL in /usr/local/lib and  
 /usr/local/include/pgsql (Alexei)
  - added set of user-defined parameters for monitoring MySQL
