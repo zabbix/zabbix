@@ -19,6 +19,9 @@
 /* Define if function sysconf is in unistd.h */
 #undef HAVE_UNISTD_SYSCONF
 
+/* Define if function va_copy is in stdarg.h */
+#undef HAVE_VA_COPY
+
 /* Define if function sysctl accepts KERN_BOOTTIME */
 #undef HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME
 
