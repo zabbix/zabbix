@@ -63,6 +63,7 @@ void CollectorThread(void *)
    DWORD i,cpuHistoryIdx,cpuQueueHistoryIdx,collectorTimesIdx,dwSleepTime;
    USER_COUNTER *cptr;
    PDH_STATISTICS statData;
+   char counterPath[MAX_COUNTER_PATH * 2 + 50];
 
    GetSystemInfo(&sysInfo);
 
@@ -81,18 +82,18 @@ void CollectorThread(void *)
       return;
    }
 
-   if ((status=PdhAddCounter(query,"\\Processor(_Total)\\% Processor Time",0,&cntCpuUsage[0]))!=ERROR_SUCCESS)
+   sprintf((char *) &counterPath, "\\%s(_Total)\\%s", GetCounterName(PCI_PROCESSOR), GetCounterName(PCI_PROCESSOR_TIME));
+
+   if ((status=PdhAddCounter(query,(char *) &counterPath, 0, &cntCpuUsage[0]))!=ERROR_SUCCESS)
    {
       WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"ss",
-               "\\Processor(_Total)\\%% Processor Time",GetPdhErrorText(status));
+               (char *) &counterPath, GetPdhErrorText(status));
       PdhCloseQuery(query);
       return;
    }
    for(i=0;i<sysInfo.dwNumberOfProcessors;i++)
    {
-      char counterPath[256];
-
-      sprintf(counterPath,"\\Processor(%d)\\%% Processor Time",i);
+      sprintf((char *) &counterPath,"\\%s(%d)\\%s", GetCounterName(PCI_PROCESSOR), i, GetCounterName(PCI_PROCESSOR_TIME));
       if ((status=PdhAddCounter(query,counterPath,0,&cntCpuUsage[i+1]))!=ERROR_SUCCESS)
       {
          WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"ss",
@@ -114,11 +115,13 @@ void CollectorThread(void *)
 
    cpuHistoryIdx=0;
 
+   sprintf((char *) &counterPath, "\\%s\\%s", GetCounterName(PCI_SYSTEM), GetCounterName(PCI_PROCESSOR_QUEUE_LENGTH));
+
    // Prepare for CPU execution queue usage collection
-   if ((status=PdhAddCounter(query,"\\System\\Processor Queue Length",0,&cntCpuQueue))!=ERROR_SUCCESS)
+   if ((status=PdhAddCounter(query,(char *) &counterPath,0,&cntCpuQueue))!=ERROR_SUCCESS)
    {
       WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"ss",
-               "\\System\\Processor Queue Length",GetPdhErrorText(status));
+               (char *) &counterPath,GetPdhErrorText(status));
       PdhCloseQuery(query);
       return;
    }

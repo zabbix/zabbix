@@ -42,6 +42,7 @@ DWORD confMaxProcTime=100; // 100 milliseconds is default acceptable collector s
 
 SUBAGENT *subagentList;    // List of loaded subagents
 SUBAGENT_NAME *subagentNameList=NULL;
+PERFCOUNTER *perfCounterList=NULL;
 
 DWORD (__stdcall *imp_GetGuiResources)(HANDLE,DWORD);
 BOOL (__stdcall *imp_GetProcessIoCounters)(HANDLE,PIO_COUNTERS);
@@ -148,6 +149,40 @@ static BOOL LoadSubAgent(char *name,char *cmdLine)
    return TRUE;
 }
 
+char *GetCounterName(DWORD index)
+{
+	PERFCOUNTER	*counterName;
+	DWORD		dwSize;
+	char		hostname[MAX_COMPUTERNAME_LENGTH+3];
+
+	counterName = perfCounterList;
+	while(counterName!=NULL)
+	{
+		if (counterName->pdhIndex == index) break;
+		counterName = counterName->next;
+	}
+	if (counterName == NULL)
+	{
+		counterName = (PERFCOUNTER *) malloc(sizeof(PERFCOUNTER));
+		memset(counterName,0, sizeof(PERFCOUNTER));
+		counterName->pdhIndex = index;
+		counterName->next = perfCounterList;
+
+		sprintf(hostname, "\\\\");
+		dwSize = MAX_COMPUTERNAME_LENGTH;
+		GetComputerName((char *) &hostname + 2, &dwSize);
+
+		dwSize = MAX_COUNTER_PATH;
+		if (PdhLookupPerfNameByIndex((char *) &hostname, index, (char *) &counterName->name, &dwSize)==ERROR_SUCCESS)
+		{
+			perfCounterList = counterName;
+		} else {
+			free (counterName);
+			return NULL;
+		}
+	}
+	return (char *) &counterName->name;
+}
 
 //
 // Initialization routine
@@ -157,6 +192,7 @@ BOOL Initialize(void)
 {
    WSAData sockInfo;
    int i;
+   char counterPath[MAX_COUNTER_PATH * 2 + 50];
 
    // Initialize Windows Sockets API
    WSAStartup(0x0002,&sockInfo);
@@ -184,7 +220,8 @@ BOOL Initialize(void)
    eventCollectorStarted=CreateEvent(NULL,TRUE,FALSE,NULL);
 
    // Internal command aliases
-   AddAlias("system[uptime]","perf_counter[\\System\\System Up Time]");
+   sprintf((char *) &counterPath,"perf_counter[\\%s\\%s]", GetCounterName(PCI_SYSTEM), GetCounterName(PCI_SYSTEM_UP_TIME));
+   AddAlias("system[uptime]",(char *) &counterPath);
 
    // Start TCP/IP listener and collector threads
    _beginthread(CollectorThread,0,NULL);
