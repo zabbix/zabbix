@@ -158,7 +158,8 @@ CREATE TABLE alarms (
   clock			int4		DEFAULT '0' NOT NULL,
   istrue		int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (alarmid),
-  FOREIGN KEY (triggerid) REFERENCES triggers
+  FOREIGN KEY (triggerid) REFERENCES triggers,
+  KEY (triggerid, clock)
 );
 
 --
