@@ -41,11 +41,11 @@
 <?php
 	if(!isset($HTTP_GET_VARS["start"]))
 	{
-		$sql="select a.alertid,a.clock,a.type,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries from alerts a,actions ac where a.actionid=ac.actionid order by a.clock desc limit 500";
+		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries from alerts a,actions ac,media_type mt where a.actionid=ac.actionid and mt.mediatypeid=a.mediatypeid order by a.clock desc limit 500";
 	}
 	else
 	{
-		$sql="select a.alertid,a.clock,a.type,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries from alerts a,actions ac where a.actionid=ac.actionid order by a.clock desc limit ".($HTTP_GET_VARS["start"]+500);
+		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries from alerts a,actions ac,media_type mt where a.actionid=ac.actionid and mt.mediatypeid=a.mediatypeid order by a.clock desc limit ".($HTTP_GET_VARS["start"]+500);
 	}
 	$result=DBselect($sql);
 
@@ -78,14 +78,7 @@
 		if($col>100)	break;
 
 		echo "<TD><a href=\"alarms.php?triggerid=".$row["triggerid"]."\">".date("Y.M.d H:i:s",$row["clock"])."</a></TD>";
-		if($row["type"]=="EMAIL")
-		{
-			echo "<TD>E-mail</TD>";
-		}
-		else
-		{
-			echo "<TD>Unknown media type</TD>";
-		}
+		echo "<TD>".$row["description"]."</TD>";
 		if($row["status"] == 1)
 		{
 			echo "<TD><font color=\"00AA00\">sent</font></TD>";
