@@ -261,9 +261,16 @@ void	init_config(void)
 #ifdef HAVE_SNMP
 int	get_value_SNMP(int version,double *result,char *result_str,DB_ITEM *item)
 {
+
+	#define NEW_APPROACH
+
 	struct snmp_session session, *ss;
 	struct snmp_pdu *pdu;
 	struct snmp_pdu *response;
+
+	#ifdef NEW_APPROACH
+	char temp[255];
+	#endif
 
 	oid anOID[MAX_OID_LEN];
 	size_t anOID_len = MAX_OID_LEN;
@@ -278,13 +285,25 @@ int	get_value_SNMP(int version,double *result,char *result_str,DB_ITEM *item)
 	snmp_sess_init( &session );
 	session.version = version;
 	session.remote_port = item->snmp_port;
+
+
 	if(item->useip == 1)
 	{
+	#ifdef NEW_APPROACH
+		sprintf(temp, "%s:%d", item->ip, item->snmp_port);
+		session.peername = temp;
+	#else
 		session.peername = item->ip;
+	#endif
 	}
 	else
 	{
+	#ifdef NEW_APPROACH
+		sprintf(temp, "%s:%d", item->host, item->snmp_port);
+		session.peername = temp;
+	#else
 		session.peername = item->host;
+	#endif
 	}
 	session.community = item->snmp_community;
 	session.community_len = strlen(session.community);
