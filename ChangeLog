@@ -1,8 +1,10 @@
 Changes for 1.0alpha12:
 
+ - added support for cksum[*], "*" can be any filename (Alexei)
+ - cksum[] does not call external program "cksum" anymore (Alexei)
+
  - added support for memory[free], memory[total] and memory[shared]
    for FreeBSD (Alexei)
-
  - minor fixes in doc/manual.txt (Alexei)
  - minor fixes in INSTALL (Alexei)
  - added support for check_port[*], which tries to connect to the port (Aelxei)
