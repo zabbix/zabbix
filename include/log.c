@@ -18,7 +18,13 @@ static	int log_level;
 
 int zabbix_open_log(int type,int level, const char *filename)
 {
+/* Just return if we do not want to write debug */
 	log_level = level;
+	if(level == LOG_LEVEL_EMPTY)
+	{
+		return	SUCCEED;
+	}
+
 	if(type == LOG_TYPE_SYSLOG)
 	{
         	openlog("zabbix_suckerd",LOG_PID,LOG_USER);
@@ -50,7 +56,7 @@ void zabbix_log(int level, const char *fmt, ...)
 	struct	tm	*tm;
 	va_list ap;
 
-	if(level<log_level)
+	if( (level>log_level) || (level == LOG_LEVEL_EMPTY))
 	{
 		return;
 	}

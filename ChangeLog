@@ -1,23 +1,26 @@
 Not ready yet:
 
-[ Fix DebugLevel ]
+[ CORE. Support for automake ]
 
-[ Support for automake ]
-[ Support for Service Tree ] 
-[ Support for flexible permissions ]
+[ CORE. Support for Service Tree ] 
+[ CORE. Support for flexible permissions ]
 
-[ Make Zabbix compile by cc ]
+[ CORE. Make Zabbix compile by cc ]
 
-[ PHP. Change algorithm for audible notification ]
 [ PHP. Show time legend for graphs ]
 [ PHP. Show diff instead of real values ]
 [ PHP. Show triggers by userid ]
-[ PHP. Support for template-based new hosts ]
 
-[ Add support for new trigger statuses: MODIFIED/NOTSUPORTED ]
-[ All parameters should contain section "How can be used" in the Manual ]
+[ CORE. Add support for new trigger statuses: MODIFIED/NOTSUPORTED ]
+
+[ DOCS. All parameters should contain section "How can be used" in the Manual ]
 
 Changes for 1.0beta3:
+
+ - ialready existing hosts can be used as template from new host (Alexei)
+ - new algorithm for audible notification in screen "Status of Triggers"
+ (Alexei)
+ - changed definition of DebugLevel (Alexei)
 
  - improved update_triggers() (Alexei)
  - fixed get_lastvalue() (Alexei)
@@ -25,7 +28,6 @@ Changes for 1.0beta3:
  - column functions.lastvalue changed to varchar(255) (Alexei)
  - column items.lastvalue changed to varchar(255) (Alexei)
  - column items.prevvalue changed to varchar(255) (Alexei)
- - changed definition of DebugLevel (Alexei)
  - support for version[zabbix_agent] (Alexei)
  - better validation of trigger expressions in validate_expression
  (Alexei)
