@@ -54,7 +54,8 @@ CREATE TABLE items (
   delay			int4		DEFAULT '0' NOT NULL,
   history		int4		DEFAULT '90' NOT NULL,
   trends		int4		DEFAULT '365' NOT NULL,
-  lastdelete		int4		DEFAULT '0' NOT NULL,
+-- lastdelete is no longer required
+--  lastdelete		int4		DEFAULT '0' NOT NULL,
   nextcheck		int4		DEFAULT '0' NOT NULL,
   lastvalue		varchar(255)	DEFAULT NULL,
   lastclock		int4		DEFAULT NULL,
