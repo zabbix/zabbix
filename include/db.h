@@ -15,11 +15,11 @@
 #define	DB_USER		"root"
 #define	DB_PASSWD	""
 
-#define ITEM struct item_type
-#define TRIGGER struct trigger_type
+#define DB_ITEM struct item_type
+#define DB_TRIGGER struct trigger_type
 #define DB_ACTION struct action_type
-#define FUNCTION struct function_type
-#define MEDIA struct media_type
+#define DB_FUNCTION struct function_type
+#define DB_MEDIA struct media_type
 
 #ifdef USE_MYSQL
 	#define	DB_RESULT	MYSQL_RES
@@ -32,7 +32,7 @@
 #endif
 
 
-ITEM
+DB_ITEM
 {
 	int     itemid;
 	int     type;
@@ -50,7 +50,7 @@ ITEM
 	time_t	nextcheck;
 };
  
-FUNCTION
+DB_FUNCTION
 {
 	int     functionid;
 	int     itemid;
@@ -60,7 +60,7 @@ FUNCTION
 	int     parameter;
 };
 
-MEDIA
+DB_MEDIA
 {
 	int	mediaid;
 	char	*type;
@@ -68,7 +68,7 @@ MEDIA
 	int	active;
 };
 
-TRIGGER
+DB_TRIGGER
 {
 	int	triggerid;
 	char	*expression;
