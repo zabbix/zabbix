@@ -193,6 +193,14 @@
 
 	if($action=="showhistory")
 	{
+		if(!isset($from))
+		{
+			$from=0;
+		}
+		if(!isset($period))
+		{
+			$period=3600;
+		}
 		@show_history($itemid,$from,$period,0);
 		show_footer();
 		exit;

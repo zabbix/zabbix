@@ -10,14 +10,12 @@ Not ready yet (later versions):
 
 Not ready yet (1.0beta4):
 
-[ CORE. Support for Service Tree ] 
-[ CORE. PostgreSQL ]
-[ PHP. Division by zero in Report2 ]
-
 [ PHP. Navigation by time period for graphs and trends ]
 
 Changes for 1.0beta4:
 
+ - support for service tree (Alexei)
+ - vacuuming as part of housekeeping process for PostgreSQL (Alexei)
  - many improvements for PostgreSQL support (Alexei)
  - added item which reflects host status (0-normal, 2-unreachable) (Alexei)
  - fixed function apply_actions() (Alexei)
