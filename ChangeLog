@@ -29,6 +29,7 @@ Not ready yet:
  - permissions for all *.php (charts, graphs , hosts, etc etc )
  - add numeric constants to trigger expressions
  - show who is online somewhere (in User config form?)
+ - setup demo site
 
 Changes for 1.0beta6:
 
