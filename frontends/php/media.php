@@ -89,11 +89,11 @@
 		echo "<TD>";
 		if(DBget_field($result,$i,3)==0) 
 		{
-			echo "<a href=\"media.php?register=disable&mediaid=$mediaid&userid=".$HTTP_GET_VARS["userid"]."\">Enabled</A>";
+			echo "<a href=\"media.php?register=disable&mediaid=$mediaid&userid=".$HTTP_GET_VARS["userid"]."\"><font color=\"00AA00\">Enabled</font></A>";
 		}
 		else
 		{
-			echo "<a href=\"media.php?register=enable&mediaid=$mediaid&userid=".$HTTP_GET_VARS["userid"]."\">Disabled</A>";
+			echo "<a href=\"media.php?register=enable&mediaid=$mediaid&userid=".$HTTP_GET_VARS["userid"]."\"><font color=\"AA0000\">Disabled</font></A>";
 		}
 		echo "</TD>";
 		echo "<TD>";
