@@ -150,7 +150,7 @@
 	define("S_CONFIGURATION",			"Configuration");
 	define("S_DO_NOT_KEEP_ALERTS_OLDER_THAN",	"Do not keep alerts older than (in days)");
 	define("S_DO_NOT_KEEP_ALARMS_OLDER_THAN",	"Do not keep alarms older than (in days)");
-	define("S_AVAILABLE_MEDIA_TYPES",		"AVAILABLE MEDIA TYPES");
+	define("S_MEDIA_TYPES_BIG",			"MEDIA TYPES");
 	define("S_NO_MEDIA_TYPES_DEFINED",		"No media types defined");
 	define("S_SMTP_SERVER",				"SMTP server");
 	define("S_SMTP_HELO",				"SMTP helo");
@@ -165,6 +165,11 @@
 	define("S_NO_ESCALATION_DETAILS",		"No escalation details");
 	define("S_ESCALATION_DETAILS_BIG",		"ESCALATION DETAILS");
 	define("S_STEP",				"Step");
+	define("S_IMAGES",				"Images");
+	define("S_IMAGE",				"Image");
+	define("S_IMAGES_BIG",				"IMAGES");
+	define("S_NO_IMAGES_DEFINED",			"No images defined");
+	define("S_BACKGROUND",				"Background");
 
 //	Latest values
 	define("S_LATEST_VALUES",			"Latest values");
