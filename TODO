@@ -1,5 +1,8 @@
 HIGH PRIORITY:
 
+ - BUG. Map does not show host status in case of trigger based on trapper
+ - BUG. WHen ran first time, some triggers becomes TRUE (like files was changed)
+ - default user name for DB acess should be the same (root)
  - mass updates/inserts (add items and triggers for all hosts at once)
  - support for net-snmp
  - LDAP authorisation (should work with MSWindows LDAP)
