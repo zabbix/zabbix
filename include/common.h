@@ -30,6 +30,7 @@
 #define	NOTSUPPORTED	(-2)
 #define	NETWORK_ERROR	(-3)
 #define	TIMEOUT_ERROR	(-4)
+#define	AGENT_ERROR	(-5)
 
 #define	MAXFD	64
 #define MAX_STRING_LEN	4096
@@ -60,6 +61,7 @@
 #define HOST_STATUS_MONITORED	0
 #define HOST_STATUS_NOT_MONITORED	1
 #define HOST_STATUS_UNREACHABLE	2
+#define HOST_STATUS_TEMPLATE	3
 
 /* Trigger statuses */
 /*#define TRIGGER_STATUS_FALSE	0

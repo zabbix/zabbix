@@ -98,7 +98,7 @@
 				echo "<TD WIDTH=10% NOSAVE><B>Host</B></TD>";
 				echo "<TD WIDTH=10% NOSAVE><B>Key</B></TD>";
 				echo "<TD WIDTH=10% NOSAVE><B>Description</B></TD>";
-				echo "<TD WIDTH=5%  NOSAVE><B>Delay</B></TD>";
+				echo "<TD WIDTH=5%  NOSAVE><B>Update interval</B></TD>";
 				echo "<TD WIDTH=5%  NOSAVE><B>History</B></TD>";
 				echo "<TD><B>Shortname</B></TD>";
 				echo "<TD WIDTH=5% NOSAVE><B>Type</B></TD>";

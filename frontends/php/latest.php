@@ -8,8 +8,7 @@
 <?php
         if(!check_right("Host","R",0))
         {
-                show_table_header("<font color=\"AA0000\">No permissions !</font
->");
+                show_table_header("<font color=\"AA0000\">No permissions !</font>");
                 show_footer();
                 exit;
         }
@@ -20,8 +19,7 @@
 	
         if(isset($HTTP_GET_VARS["hostid"])&&!check_right("Host","R",$HTTP_GET_VARS["hostid"]))
         {
-                show_table_header("<font color=\"AA0000\">No permissions !</font
->");
+                show_table_header("<font color=\"AA0000\">No permissions !</font>");
                 show_footer();
                 exit;
         }
@@ -37,7 +35,8 @@
 
 	if(isset($HTTP_GET_VARS["groupid"]))
 	{
-		echo "all ";
+//		echo "all ";
+		echo "<a href='latest.php'>all</a> ";
 	}
 	else
 	{

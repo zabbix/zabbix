@@ -27,64 +27,64 @@ void	process(char *command, char *value);
 
 void    add_user_parameter(char *key,char *command);
 void	test_parameters(void);
-float	getPROC(char *file,int lineno,int fieldno);
+double	getPROC(char *file,int lineno,int fieldno);
 
-float	BUFFERSMEM(void);
-float	CACHEDMEM(void);
-float	CKSUM(const char * filename);
-float	FILESIZE(const char * filename);
-float	DISKFREE(const char * mountPoint);
-float	DISKTOTAL(const char * mountPoint);
-float	DISK_IO(void);
-float	DISK_RIO(void);
-float	DISK_WIO(void);
-float	DISK_RBLK(void);
-float	DISK_WBLK(void);
-float	FREEMEM(void);
-float	INODE(const char * mountPoint);
-float	INODETOTAL(const char * mountPoint);
-float	KERNEL_MAXPROC(void);
-float	KERNEL_MAXFILES(void);
-float	NETLOADIN1(char *interface);
-float	NETLOADIN5(char *interface);
-float	NETLOADIN15(char *interface);
-float	NETLOADOUT1(char *interface);
-float	NETLOADOUT5(char *interface);
-float	NETLOADOUT15(char *interface);
-float	PING(void);
-float	SHAREDMEM(void);
-float	TOTALMEM(void);
-float	PROCCNT(const char *procname);
-float	PROCCOUNT(void);
-float	PROCLOAD(void);
-float	PROCLOAD5(void);
-float	PROCLOAD15(void);
-float	SWAPFREE(void);
-float	SWAPTOTAL(void);
-float	TCP_LISTEN(const char *porthex);
-float	UPTIME(void);
+double	BUFFERSMEM(void);
+double	CACHEDMEM(void);
+double	CKSUM(const char * filename);
+double	FILESIZE(const char * filename);
+double	DISKFREE(const char * mountPoint);
+double	DISKTOTAL(const char * mountPoint);
+double	DISK_IO(void);
+double	DISK_RIO(void);
+double	DISK_WIO(void);
+double	DISK_RBLK(void);
+double	DISK_WBLK(void);
+double	FREEMEM(void);
+double	INODE(const char * mountPoint);
+double	INODETOTAL(const char * mountPoint);
+double	KERNEL_MAXPROC(void);
+double	KERNEL_MAXFILES(void);
+double	NETLOADIN1(char *interface);
+double	NETLOADIN5(char *interface);
+double	NETLOADIN15(char *interface);
+double	NETLOADOUT1(char *interface);
+double	NETLOADOUT5(char *interface);
+double	NETLOADOUT15(char *interface);
+double	PING(void);
+double	SHAREDMEM(void);
+double	TOTALMEM(void);
+double	PROCCNT(const char *procname);
+double	PROCCOUNT(void);
+double	PROCLOAD(void);
+double	PROCLOAD5(void);
+double	PROCLOAD15(void);
+double	SWAPFREE(void);
+double	SWAPTOTAL(void);
+double	TCP_LISTEN(const char *porthex);
+double	UPTIME(void);
 
-float	EXECUTE(char *command);
+double	EXECUTE(char *command);
 char	*EXECUTE_STR(char *command);
 char	*VERSION(void);
 
-float	CHECK_SERVICE(char *service);
+double	CHECK_SERVICE(char *service);
 
-/*float	CHECK_SERVICE_SSH(void);
-float	CHECK_SERVICE_SMTP(void);
-float	CHECK_SERVICE_FTP(void);
-float	CHECK_SERVICE_HTTP(void);
-float	CHECK_SERVICE_POP(void);
-float	CHECK_SERVICE_NNTP(void);
-float	CHECK_SERVICE_IMAP(void);*/
+/*double	CHECK_SERVICE_SSH(void);
+double	CHECK_SERVICE_SMTP(void);
+double	CHECK_SERVICE_FTP(void);
+double	CHECK_SERVICE_HTTP(void);
+double	CHECK_SERVICE_POP(void);
+double	CHECK_SERVICE_NNTP(void);
+double	CHECK_SERVICE_IMAP(void);*/
 
-float	CHECK_PORT(char *ip_and_port);
+double	CHECK_PORT(char *ip_and_port);
 
 #define COMMAND struct command_type
 COMMAND
 {
 	char	*key;
-        float   (*function)();
+	double   (*function)();
         char    *(*function_str)();
 	char	*parameter;
 };

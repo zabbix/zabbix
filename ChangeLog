@@ -1,5 +1,27 @@
 Changes for 1.0beta7:
 
+ - fixed possible zabbix_suckerd crash. It may happen if socket() returns 0.
+   (Alexei)
+ - added new Host status - Template(3). )Alexei)
+ - fixed group "all" in latest.php (Alexei)
+ - do not dump "Expression cannot be evaluated" in case if function.lastvalue
+   is NULL. Logic was changed a bit, but the message is still there. (Alexei)
+ - show who is online in User config form. (Alexei)
+ - when ran first time, some triggers becomes TRUE (like files was changed).
+   This is already fixed. This bug does not exist. (Alexei)
+ - fixed bug in queue.php select statement. Trapper type will not be
+   selected. (Alexei)
+ - when W2000 with SNMP agent restarted, items will becomes Not Supported.
+   There is no such bug in CVS code anymore. (Alexei)
+ - map will show host status in case of trigger based on trapper (Alexei)
+ - fixed bug in zabbix_suckerd's select statements. Trapper type will not be
+   selected. (Alexei)
+ - new protocol for Zabbix agents, Support for ZBX_ERROR and ZBX_NOTSUPPORTED.
+   (Alexei)
+ - about.hph: version of Zabbix was changed to 1.0beta7 (Alexei)
+ - items.php: "Delay" renamed to "Update interval". (Alexei)
+ - fixed precision issues in zabbix_agent(d) and zabbix_suckerd. All floats
+   converted to double. (Alexei)
  - fixed selection of icon and host in sysmap.php. Thanks to Sébastien "slix"
    Liénard. (Alexei)
  - monitoring of servers without Zabbix agent installed. New item type: Simple

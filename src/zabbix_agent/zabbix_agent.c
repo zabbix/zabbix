@@ -42,6 +42,7 @@
 #include "cfg.h"
 #include "log.h"
 #include "sysinfo.h"
+#include "security.h"
 #include "zabbix_agent.h"
 
 static	char	*CONFIG_HOSTS_ALLOWED	= NULL;

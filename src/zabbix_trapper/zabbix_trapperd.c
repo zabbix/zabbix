@@ -333,7 +333,7 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 	struct	sockaddr_in      serv_addr;
 	struct linger ling;
 
-	if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+	if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
 		zabbix_log( LOG_LEVEL_CRIT, "Cannot create socket");
 		exit(1);

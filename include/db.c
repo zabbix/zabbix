@@ -252,7 +252,7 @@ int	DBnum_rows(DB_RESULT *result)
 /*
  * Get function value.
  */ 
-int     DBget_function_result(float *result,char *functionid)
+int     DBget_function_result(double *result,char *functionid)
 {
 	DB_RESULT *dbresult;
 	int		res = SUCCEED;

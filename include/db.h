@@ -146,7 +146,7 @@ DB_RESULT	*DBselect(char *query);
 char		*DBget_field(DB_RESULT *result, int rownum, int fieldnum);
 int		DBnum_rows(DB_RESULT *result);
 
-int	DBget_function_result(float *result,char *functionid);
+int	DBget_function_result(double *result,char *functionid);
 void	DBupdate_host_status(int hostid,int status,int clock);
 int	DBupdate_item_status_to_notsupported(int itemid);
 int	DBadd_history(int itemid, double value);

@@ -38,4 +38,6 @@ INTERFACE
 	int	received_load15;*/
 };
 
+void	collect_statistics();
+
 #endif
