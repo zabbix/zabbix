@@ -55,9 +55,11 @@ Configuration file
 
 Zabbix Win32 agent suports the following configuration parameters:
 
-Server = <ip_address>
-  Sets IP address of Zabbix server. Agent will accept connections only from
-  this address.
+Server = <ip_address>[,<ip_address>[,<ip_address> ...]]
+  Sets IP address(es) of Zabbix server(s). Agent will accept connections only
+  from this address(es). To specify multiple servers, you can either write
+  their addresses in one line separated by commans, or create multiple
+  "Server = ..." lines.
 
 ListenPort = <port_number>
   Sets TCP port number for incoming connections.

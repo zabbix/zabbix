@@ -35,12 +35,13 @@
 // Common constants
 //
 
-#define AGENT_VERSION         "1.0.0-beta7"
+#define AGENT_VERSION         "1.0.0-beta8(rc1)"
 
 #define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
 
 #define COMMAND_TIMEOUT       5
 
+#define MAX_SERVERS           32
 #define MAX_ZABBIX_CMD_LEN    MAX_STRING_LEN
 #define MAX_CPU               16
 #define MAX_PARAMETERS        256
@@ -140,7 +141,8 @@ extern BOOL optStandalone;
 
 extern char confFile[];
 extern char logFile[];
-extern DWORD confServerAddr;
+extern DWORD confServerAddr[];
+extern DWORD confServerCount;
 extern WORD confListenPort;
 extern DWORD confTimeout;
 extern DWORD confMaxProcTime;

@@ -35,6 +35,21 @@ struct REQUEST
 
 
 //
+// Validates server's address
+//
+
+static BOOL IsValidServerAddr(DWORD addr)
+{
+   DWORD i;
+
+   for(i=0;i<confServerCount;i++)
+      if (addr==confServerAddr[i])
+         return TRUE;
+   return FALSE;
+}
+
+
+//
 // Request processing thread
 //
 
@@ -139,9 +154,7 @@ void ListenerThread(void *)
 
    // Set up queue
    listen(sock,SOMAXCONN);
-   WriteLog("Accepting connections on port %d from %d.%d.%d.%d\r\n",
-            confListenPort,confServerAddr & 255,(confServerAddr >> 8) & 255,
-            (confServerAddr >> 16) & 255,confServerAddr >> 24);
+   WriteLog("Accepting connections on port %d\r\n",confListenPort);
 
    // Wait for connection requests
    while(1)
@@ -153,7 +166,7 @@ void ListenerThread(void *)
          closesocket(sock);
          exit(1);
       }
-      if (servAddr.sin_addr.S_un.S_addr==confServerAddr)
+      if (IsValidServerAddr(servAddr.sin_addr.S_un.S_addr))
       {
          _beginthread(CommThread,0,(void *)sockClient);
       }
