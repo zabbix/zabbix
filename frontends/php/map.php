@@ -40,7 +40,14 @@
 
 	check_authorisation();
 
-	$im = imagecreatetruecolor($width,$height); 
+	if(function_exists("imagecreatetruecolor"))
+	{
+		$im = imagecreatetruecolor($width,$height);
+	}
+	else
+	{
+		$im = imagecreate($width,$height);
+	}
   
 	$red=ImageColorAllocate($im,255,0,0); 
 	$darkred=ImageColorAllocate($im,150,0,0); 
@@ -128,6 +135,14 @@
 		$x2=DBget_field($result1,0,0);
 		$y2=DBget_field($result1,0,1);
 
+		if(function_exists("imagecreatetruecolor"))
+		{
+			$size=48/2;
+		}
+		else
+		{
+			$size=32/2;
+		}
 		if(isset($triggerid))
 		{
 			$trigger=get_trigger_by_triggerid($triggerid);
@@ -135,29 +150,29 @@
 			{
 				if($drawtype_on == GRAPH_DRAW_TYPE_BOLDLINE)
 				{
-					ImageLine($im,$x1+16,$y1+16,$x2+16,$y2+16,$colors[$color_on]);
-					ImageLine($im,$x1+16,$y1+16+1,$x2+16,$y2+16+1,$colors[$color_on]);
+					ImageLine($im,$x1+$size,$y1+$size,$x2+$size,$y2+$size,$colors[$color_on]);
+					ImageLine($im,$x1+$size,$y1+$size+1,$x2+$size,$y2+$size+1,$colors[$color_on]);
 				}
 				else
 				{
-					ImageLine($im,$x1+16,$y1+16,$x2+16,$y2+16,$colors[$color_on]);
+					ImageLine($im,$x1+$size,$y1+$size,$x2+$size,$y2+$size,$colors[$color_on]);
 				}
 			}
 			else
 			{
 				if($drawtype_off == GRAPH_DRAW_TYPE_BOLDLINE)
 				{
-					ImageLine($im,$x1+16,$y1+16,$x2+16,$y2+16,$colors[$color_off]);
+					ImageLine($im,$x1+$size,$y1+$size,$x2+$size,$y2+$size,$colors[$color_off]);
 				}
 				else
 				{
-					ImageLine($im,$x1+16,$y1+16+1,$x2+16,$y2+16+1,$colors[$color_off]);
+					ImageLine($im,$x1+$size,$y1+$size+1,$x2+$size,$y2+$size+1,$colors[$color_off]);
 				}
 			}
 		}
 		else
 		{
-			ImageLine($im,$x1+16,$y1+16,$x2+16,$y2+16,$colors["Black"]);
+			ImageLine($im,$x1+$size,$y1+$size,$x2+$size,$y2+$size,$colors["Black"]);
 		}
 	}
 
@@ -179,7 +194,14 @@
 
 		if(@gettype($icons["$icon"])!="resource")
 		{
-			$icons[$icon]=ImageCreateFromPNG("images/sysmaps/$icon.png");
+			if(function_exists("imagecreatetruecolor"))
+			{
+				$icons[$icon]=ImageCreateFromPNG("images/sysmaps/$icon.png");
+			}
+			else
+			{
+				$icons[$icon]=ImageCreateFromPNG("images/sysmaps/old/$icon.png");
+			}
 		}
 
 		$img=$icons[$icon];
