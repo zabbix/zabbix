@@ -813,6 +813,13 @@ int housekeeping_alerts(int now)
 	sprintf(sql,"select alert_history from config");
 	result = DBselect(sql);
 
+	if(DBis_empty(result) == SUCCEED)
+	{
+		zabbix_log( LOG_LEVEL_ERR, "No records in table 'config'.");
+		DBfree_result(result);
+		exit (FAIL);
+	}
+
 	alert_history=atoi(DBget_field(result,0,0));
 
 	sprintf	(sql,"delete from alerts where clock<%d",now-24*3600*alert_history);
@@ -830,6 +837,12 @@ int housekeeping_alarms(int now)
 
 	sprintf(sql,"select alarm_history from config");
 	result = DBselect(sql);
+	if(DBis_empty(result) == SUCCEED)
+	{
+		zabbix_log( LOG_LEVEL_ERR, "No records in table 'config'.");
+		DBfree_result(result);
+		exit (FAIL);
+	}
 
 	alarm_history=atoi(DBget_field(result,0,0));
 
@@ -862,6 +875,12 @@ int main_alerter_loop()
 
 		sprintf(sql,"select smtp_server,smtp_helo,smtp_email from config");
 		result = DBselect(sql);
+		if(DBis_empty(result) == SUCCEED)
+		{
+			zabbix_log( LOG_LEVEL_ERR, "No records in table 'config'.");
+			DBfree_result(result);
+			exit (FAIL);
+		}
 		strncpy(smtp_server,DBget_field(result,0,0), MAX_STRING_LEN);
 		strncpy(smtp_helo,DBget_field(result,0,1), MAX_STRING_LEN);
 		strncpy(smtp_email,DBget_field(result,0,2), MAX_STRING_LEN);
@@ -870,37 +889,40 @@ int main_alerter_loop()
 		sprintf(sql,"select alertid,type,sendto,subject,message,status,retries from alerts where status=0 and retries<3 order by clock");
 		result = DBselect(sql);
 
-		for(i=0;i<DBnum_rows(result);i++)
-		{
-			alert.alertid=atoi(DBget_field(result,i,0));
-			alert.type=DBget_field(result,i,1);
-			alert.sendto=DBget_field(result,i,2);
-			alert.subject=DBget_field(result,i,3);
-			alert.message=DBget_field(result,i,4);
-			alert.status=atoi(DBget_field(result,i,5));
-			alert.retries=atoi(DBget_field(result,i,6));
-
-			if(strcmp(alert.type,ALERT_TYPE_EMAIL)==0)
+		if(DBis_empty(result) != SUCCEED)
+		{	
+			for(i=0;i<DBnum_rows(result);i++)
 			{
-				if(FAIL == send_mail(smtp_server,smtp_helo,smtp_email,alert.sendto,alert.subject,alert.message))
+				alert.alertid=atoi(DBget_field(result,i,0));
+				alert.type=DBget_field(result,i,1);
+				alert.sendto=DBget_field(result,i,2);
+				alert.subject=DBget_field(result,i,3);
+				alert.message=DBget_field(result,i,4);
+				alert.status=atoi(DBget_field(result,i,5));
+				alert.retries=atoi(DBget_field(result,i,6));
+
+				if(strcmp(alert.type,ALERT_TYPE_EMAIL)==0)
 				{
-					zabbix_log( LOG_LEVEL_ERR, "Error sending email to '%s' Subject:'%s'", alert.sendto, alert.subject);
-					sprintf(sql,"update alerts set retries=retries+1 where alertid=%d", alert.alertid);
-					DBexecute(sql);
+					if(FAIL == send_mail(smtp_server,smtp_helo,smtp_email,alert.sendto,alert.subject,alert.message))
+					{
+						zabbix_log( LOG_LEVEL_ERR, "Error sending email to '%s' Subject:'%s'", alert.sendto, alert.subject);
+						sprintf(sql,"update alerts set retries=retries+1 where alertid=%d", alert.alertid);
+						DBexecute(sql);
+					}
+					else
+					{
+						sprintf(sql,"update alerts set status=1 where alertid=%d", alert.alertid);
+						DBexecute(sql);
+					}
 				}
 				else
 				{
-					sprintf(sql,"update alerts set status=1 where alertid=%d", alert.alertid);
-					DBexecute(sql);
+						sprintf(sql,"update alerts set retries=3 where alertid=%d", alert.alertid);
+						DBexecute(sql);
+						zabbix_log( LOG_LEVEL_ERR, "Unsupported type of alert [%s] Alert ID [%d]", alert.type, alert.alertid );
 				}
 			}
-			else
-			{
-					sprintf(sql,"update alerts set retries=3 where alertid=%d", alert.alertid);
-					DBexecute(sql);
-					zabbix_log( LOG_LEVEL_ERR, "Unsupported type of alert [%s] Alert ID [%d]", alert.type, alert.alertid );
-			}
-		}
+		}	
 		DBfree_result(result);
 
 		DBclose();
