@@ -65,6 +65,15 @@
           $scid=$HTTP_GET_VARS["scid"];
           $result=DBselect("select name,cols,rows from screens where scid=$scid");
           $row=DBfetch($result);
+	if(isset($HTTP_GET_VARS["fullscreen"]))
+	{
+		$map="<a href=\"screens.php?scid=".$HTTP_GET_VARS["scid"]."\">".$row["name"]."</a>";
+	}
+	else
+	{
+		$map="<a href=\"screens.php?scid=".$HTTP_GET_VARS["scid"]."&fullscreen=1\">".$row["name"]."</a>";
+	}
+	show_table_header($map);
           echo "<TABLE BORDER=1 COLS=".$row["cols"]." align=center WIDTH=100% BGCOLOR=\"#FFFFFF\"";
           for($r=0;$r<$row["rows"];$r++)
           {
