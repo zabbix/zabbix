@@ -145,14 +145,14 @@ void    daemon_init(void)
 		}
 		if( (setgid(pwd->pw_gid) ==-1) || (setuid(pwd->pw_uid) == -1) )
 		{
-			fprintf(stderr,"Cannot setgid or setuid to zabbix [%s]\n", strerrno(errno));
+			fprintf(stderr,"Cannot setgid or setuid to zabbix [%s]\n", strerror(errno));
 			exit(FAIL);
 		}
 
 #ifdef HAVE_FUNCTION_SETEUID
 		if( (setegid(pwd->pw_gid) ==-1) || (seteuid(pwd->pw_uid) == -1) )
 		{
-			fprintf(stderr,"Cannot setegid or seteuid to zabbix [%s]\n", strerrno(errno));
+			fprintf(stderr,"Cannot setegid or seteuid to zabbix [%s]\n", strerror(errno));
 			exit(FAIL);
 		}
 #endif

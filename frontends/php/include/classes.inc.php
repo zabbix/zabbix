@@ -286,7 +286,7 @@
 			}
 			$str=substr($str,0,strlen($str)-1);
 
-			$sql="select itemid,round(900*((clock+$z)%($p))/($p)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid in ($str) and clock>=".$this->from_time." and clock<=".$this->to_time." group by itemid,round(900*((clock+$z)%($p))/($p))";
+			$sql="select itemid,round(900*((clock+$z)%($p))/($p),0) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid in ($str) and clock>=".$this->from_time." and clock<=".$this->to_time." group by itemid,round(900*((clock+$z)%($p))/($p),0)";
 //			echo $sql;
 
 			$result=DBselect($sql);
