@@ -131,9 +131,9 @@
 		                echo "<TR BGCOLOR=#EEEEEE>";
 		                $col=1;
 		        }
-			$description=DBget_field($result,$i,4);
 			$triggerid_=DBget_field($result,$i,2);
 			$expression=DBget_field($result,$i,3);
+			$description=DBget_field($result,$i,4);
 			$istrue=DBget_field($result,$i,5);
 			echo "<TD>$description</TD>";
 			$description=rawurlencode($description);

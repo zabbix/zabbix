@@ -4,6 +4,52 @@
 	$USER_DETAILS	="";
 	$ERROR_MSG	="";
 
+	function	select_trigger_by_triggerid($triggerid)
+	{
+		global	$ERROR_MSG;
+
+		$sql="select triggerid,expression,description,istrue,priority,lastchange,dep_level,comments from triggers where triggerid=$triggerid";
+		$result=DBselect($sql);
+		if(DBnum_rows($result) == 1)
+		{
+			$trigger["groupid"]=DBget_field($result,0,0);
+			$trigger["expression"]=DBget_field($result,0,1);
+			$trigger["description"]=DBget_field($result,0,2);
+			$trigger["istrue"]=DBget_field($result,0,3);
+			$trigger["priority"]=DBget_field($result,0,4);
+			$trigger["lastchange"]=DBget_field($result,0,5);
+			$trigger["dep_level"]=DBget_field($result,0,6);
+			$trigger["comments"]=DBget_field($result,0,7);
+		}
+		else
+		{
+			$ERROR_MSG="No trigger with triggerid=[$triggerid]";
+		}
+		return	$trigger;
+	}
+
+	function	select_host_by_hostid($hostid)
+	{
+		global	$ERROR_MSG;
+
+		$sql="select hostid,host,useip,ip,port,status from hosts where hostid=$hostid";
+		$result=DBselect($sql);
+		if(DBnum_rows($result) == 1)
+		{
+			$host["hostid"]=DBget_field($result,0,0);
+			$host["host"]=DBget_field($result,0,1);
+			$host["useip"]=DBget_field($result,0,2);
+			$host["ip"]=DBget_field($result,0,3);
+			$host["port"]=DBget_field($result,0,4);
+			$host["status"]=DBget_field($result,0,5);
+		}
+		else
+		{
+			$ERROR_MSG="No host with hostid=[$hostid]";
+		}
+		return	$host;
+	}
+
 	function	show_messages($bool,$msg,$errmsg)
 	{
 		global	$ERROR_MSG;
@@ -1007,7 +1053,7 @@
 		$sql="select hostid from items where itemid=$itemid";
 		$result=DBselect($sql);
 		$hostid=DBget_field($result,0,0);
-		delete_sysmaps_hosts($hostid);
+		delete_sysmaps_host($hostid);
 
 		$result=delete_triggers_by_itemid($itemid);
 		if(!$result)
@@ -1243,7 +1289,7 @@
 
 	function	add_host($host,$port,$status,$template,$useip,$ip)
 	{
-		if($useip=="on")
+		if( isset($useip) && ($useip=="on") )
 		{
 			$useip=1;
 		}
@@ -1433,6 +1479,23 @@
 		echo "<font face=\"Arial,Helvetica\" size=-1>";
 		cr();
 	}
+
+	function	show_table3_v_delimiter()
+	{
+		echo "</font>";
+		cr();
+		echo "</td>";
+		cr();
+		echo "</tr>";
+		cr();
+		echo "<tr>";
+		cr();
+		echo "<td colspan=1 bgcolor=99AABB align=left valign=\"top\">";
+		cr();
+		echo "<font face=\"Arial,Helvetica\" size=-1>";
+		cr();
+	}
+
 
 	function	show_table2_v_delimiter2()
 	{
@@ -1939,15 +2002,13 @@
 	{
 		if(isset($triggerid))
 		{
-			$result=DBselect("select expression,description,priority,istrue,comments from triggers where triggerid=$triggerid");
+			$trigger=select_trigger_by_triggerid($triggerid);
 	
-			$expression=DBget_field($result,0,0);
-			$expression=explode_exp($expression,0);
-
-			$description=DBget_field($result,0,1);
-			$priority=DBget_field($result,0,2);
-			$istrue=DBget_field($result,0,3);
-			$comments=DBget_field($result,0,4);
+			$expression=explode_exp($trigger["expression"],0);
+			$description=$trigger["description"];
+			$priority=$trigger["priority"];
+			$istrue=$trigger["istrue"];
+			$comments=$trigger["comments"];
 		}
 		else
 		{

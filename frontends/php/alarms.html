@@ -20,11 +20,11 @@
 	}
 	else
 	{
-		$result=DBselect("select expression,description,priority from triggers where triggerid=$triggerid");
+		$trigger=select_trigger_by_triggerid($triggerid);
 
-		$Expression=DBget_field($result,0,0);
-		$Description=DBget_field($result,0,1);
-		$Priority=DBget_field($result,0,2);
+		$Expression=$trigger["expression"];
+		$Description=$trigger["description"];
+		$Priority=$trigger["priority"];
 	}
 ?>
 
