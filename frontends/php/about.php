@@ -29,62 +29,17 @@
 	show_table_header(S_INFORMATION_ABOUT_ZABBIX);
 ?>
 
-<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR="#AAAAAA" cellspacing=1 cellpadding=3>
-<TR BGCOLOR=#EEEEEE>
-<TD ALIGN=LEFT>
-	<font face="Helvetica"><a href="http://www.zabbix.com"><?php echo S_HOMEPAGE_OF_ZABBIX; ?></a></font><br>
-</TD>
-<TD ALIGN=LEFT>
-<?php echo S_HOMEPAGE_OF_ZABBIX_DETAILS; ?>
-</TD>
-</TR>
-<TR BGCOLOR=#DDDDDD>
-<TD ALIGN=LEFT>
-	<font face="Helvetica"><a href="http://www.zabbix.com/manual.php"><?php echo S_LATEST_ZABBIX_MANUAL; ?></a></font><br>
-</TD>
-<TD>
-<?php echo S_LATEST_ZABBIX_MANUAL_DETAILS; ?>
-</TR>
-<TR BGCOLOR=#EEEEEE>
-<TD ALIGN=LEFT>
-	<font face="Helvetica"><a href="http://sourceforge.net/project/showfiles.php?group_id=23494&release_id=40630"><?php echo S_DOWNLOADS; ?></a></font><br>
-</TD>
-<TD>
-<?php echo S_DOWNLOADS_DETAILS; ?>
-</TR>
-<TR BGCOLOR=#DDDDDD>
-<TD ALIGN=LEFT>
-	<font face="Helvetica"><a href="http://sourceforge.net/tracker/?atid=378686&group_id=23494&func=browse"><?php echo S_FEATURE_REQUESTS; ?></a></font><br>
-</TD>
-<TD>
-<?php echo S_FEATURE_REQUESTS_DETAILS; ?>
-</TD>
-</TR>
-<TR BGCOLOR=#EEEEEE>
-<TD ALIGN=LEFT>
-	<font face="Helvetica"><a href="http://sourceforge.net/forum/?group_id=23494"><?php echo S_FORUMS; ?></a></font><br>
-</TD>
-<TD>
-<?php echo S_FORUMS_DETAILS; ?>
-</TD>
-</TR>
-<TR BGCOLOR=#DDDDDD>
-<TD ALIGN=LEFT>
-	<font face="Helvetica"><a href="http://sourceforge.net/tracker/?group_id=23494&atid=378683"><?php echo S_BUG_REPORTS; ?></a></font><br>
-</TD>
-<TD>
-<?php echo S_BUG_REPORTS_DETAILS; ?>
-</TD>
-</TR>
-<TR BGCOLOR=#EEEEEE>
-<TD ALIGN=LEFT>
-	<font face="Helvetica"><a href="http://sourceforge.net/mail/?group_id=23494"><?php echo S_MAILING_LISTS; ?></a></font><br>
-</TD>
-<TD>
-<?php echo S_MAILING_LISTS_DETAILS; ?>
-</TD>
-</TR>
-</TABLE>
+<?php
+	table_begin();
+	table_row(array("<a href=\"http://www.zabbix.com\">".S_HOMEPAGE_OF_ZABBIX."</a>", S_HOMEPAGE_OF_ZABBIX_DETAILS),0);
+	table_row(array("<a href=\"http://www.zabbix.com/manual.php\">".S_LATEST_ZABBIX_MANUAL."</a>", S_LATEST_ZABBIX_MANUAL_DETAILS),1);
+	table_row(array("<a href=\"http://sourceforge.net/project/showfiles.php?group_id=23494&release_id=40630\">".S_DOWNLOADS."</a>", S_DOWNLOADS_DETAILS),2);
+	table_row(array("<a href=\"http://sourceforge.net/tracker/?atid=378686&group_id=23494&func=browse\">".S_FEATURE_REQUESTS."</a>", S_FEATURE_REQUESTS_DETAILS), 3);
+	table_row(array("<a href=\"http://www.zabbix.com/forum\">".S_FORUMS."</a>", S_FORUMS_DETAILS),4);
+	table_row(array("<a href=\"http://sourceforge.net/tracker/?group_id=23494&atid=378683\">".S_BUG_REPORTS."</a>", S_BUG_REPORTS_DETAILS),5);
+	table_row(array("<a href=\"http://sourceforge.net/mail/?group_id=23494\">".S_MAILING_LISTS."</a>", S_MAILING_LISTS_DETAILS),6);
+	table_end();
+?>
 
 <?php
 	show_footer();
