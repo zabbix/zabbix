@@ -1,4 +1,4 @@
-Changes after 1.0alpha2:
+Changes for 1.0alpha3:
 
  - fixed NODATA function
  - fixed bug with trigger updating in PHP frontend

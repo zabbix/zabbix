@@ -42,7 +42,7 @@ COMMAND	commands[]=
 	{"inodefree[/home]"		,INODE, "/home"},
 	{"inodefree[/var]"		,INODE, "/var"},
 
-	{"cksum[/etc/inetd.conf]"	,EXECUTE, "cksum /etc/inetd.conf |cut -f1 -d' '"},
+	{"cksum[/etc/inetd_conf]"	,EXECUTE, "cksum /etc/inetd.conf |cut -f1 -d' '"},
 	{"cksum[/vmlinuz]"		,EXECUTE, "cksum /vmlinuz |cut -f1 -d' '"},
 	{"cksum[/etc/passwd]"		,EXECUTE, "cksum /etc/passwd |cut -f1 -d' '"},
 
