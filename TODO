@@ -31,7 +31,6 @@ LS:
 
  - sdelatj legendu graphov v vide tablici
  - graphs. Dobavljatj item so smescheniem vo vremeni
- - rename St of Triggers to Triggers, etc
  - check permissions for zabbix_agentd when started under root
  - add item to group (not to all)
  - update host from template

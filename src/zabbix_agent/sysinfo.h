@@ -35,6 +35,7 @@ double	CKSUM(const char * filename);
 double	FILESIZE(const char * filename);
 double	DISKFREE(const char * mountPoint);
 double	DISKTOTAL(const char * mountPoint);
+double	DISKUSED(const char * mountPoint);
 double	DISK_IO(void);
 double	DISK_RIO(void);
 double	DISK_WIO(void);
