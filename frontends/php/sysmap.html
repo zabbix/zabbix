@@ -1,12 +1,12 @@
 <?
 	include "include/config.inc";
-	$page["title"] = "Configuration of system map";
+	$page["title"] = "Configuration of network map";
 	$page["file"] = "sysmap.html";
 	show_header($page["title"],0);
 ?>
 
 <?
-	show_table_header("CONFIGURATION OF SYSTEM MAP");
+	show_table_header("CONFIGURATION OF NETWORK MAP");
 	echo "<br>";
 ?>
 
@@ -39,7 +39,28 @@
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR BGCOLOR=#DDDDDD>";
 	echo "<TD ALIGN=CENTER>";
-	echo "<IMG SRC=\"map.html?sysmapid=$sysmapid\">";
+	if(isset($sysmapid))
+	{
+		$map="\n<map name=links>";
+		$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status from sysmaps_hosts sh,hosts h where sh.sysmapid=$sysmapid and h.hostid=sh.hostid");
+		for($i=0;$i<DBnum_rows($result);$i++)
+		{
+			$host_=DBget_field($result,$i,0);
+			$shostid_=DBget_field($result,$i,1);
+			$sysmapid_=DBget_field($result,$i,2);
+			$hostid_=DBget_field($result,$i,3);
+			$label_=DBget_field($result,$i,4);
+			$x_=DBget_field($result,$i,5);
+			$y_=DBget_field($result,$i,6);
+			$status_=DBget_field($result,$i,7);
+
+			$map=$map."\n<area shape=rect coords=$x_,$y_,".($x_+32).",".($y_+32)." href=\"sysmap.html?sysmapid=$sysmapid_&shostid=$shostid_#form\" alt=\"$host_\">";
+		}
+		$map=$map."\n</map>";
+		echo $map;
+		echo "<IMG SRC=\"map.html?sysmapid=$sysmapid\" border=0 usemap=#links>";
+	}
+
 	echo "</TD>";
 	echo "</TR>";
 	echo "</TABLE>";

@@ -248,8 +248,24 @@ CREATE TABLE sysmaps_links (
   shostid2		int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (linkid),
   FOREIGN KEY (sysmapid) REFERENCES sysmaps,
-  FOREIGN KEY (shostid1) REFERENCES items,
-  FOREIGN KEY (shostid2) REFERENCES items
+  FOREIGN KEY (shostid1) REFERENCES sysmaps_hosts,
+  FOREIGN KEY (shostid2) REFERENCES sysmaps_hosts
+);
+
+--
+-- Table structure for table 'sysmaps_hosts'
+--
+
+CREATE TABLE sysmaps_hosts (
+  shostid		serial,
+  sysmapid		int4		DEFAULT '0' NOT NULL,
+  hostid		int4		DEFAULT '0' NOT NULL,
+  label			varchar(128)	DEFAULT '' NOT NULL,
+  x			int4		DEFAULT '0' NOT NULL,
+  y			int4		DEFAULT '0' NOT NULL,
+  PRIMARY KEY (shostid),
+  FOREIGN KEY (sysmapid) REFERENCES sysmaps,
+  FOREIGN KEY (hostid) REFERENCES hosts
 );
 
 --
