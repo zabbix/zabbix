@@ -29,6 +29,8 @@ Not ready yet:
 
  OTHER:
 
+ - apply Mariusz's patches
+ - link map's line to a trigger
  - BUG. Check why check_service[nntp] is 1
  - support for complex reports
  - mass updates/inserts
@@ -56,7 +58,6 @@ Not ready yet:
  - IT Helpdesk
  - show who is online somewhere (in User config form?)
  - setup demo site
- - add host groups (one to one or one to many?)
  - add user groups
  - look for cool icons
  - different sound files for different severity
