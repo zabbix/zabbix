@@ -28,12 +28,14 @@
 
 	$grid=50;
 
-	$result=DBselect("select name,width,height,background from sysmaps where sysmapid=".$_GET["sysmapid"]);
+	$result=DBselect("select * from sysmaps where sysmapid=".$_GET["sysmapid"]);
+	$row=DBfetch($result);
 
-	$name=DBget_field($result,0,0);
-	$width=DBget_field($result,0,1);
-	$height=DBget_field($result,0,2);
-	$background=DBget_field($result,0,3);
+	$name=$row["name"];
+	$width=$row["width"];
+	$height=$row["height"];
+	$background=$row["background"];
+	$label_type=$row["label_type"];
 
 //	Header( "Content-type:  text/html"); 
 	if(MAP_OUTPUT_FORMAT == "JPG")	Header( "Content-type:  image/jpeg"); 
@@ -230,7 +232,7 @@
 # Draw hosts
 
 	$icons=array();
-	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status,sh.icon,sh.icon_on from sysmaps_hosts sh,hosts h where sh.sysmapid=".$_GET["sysmapid"]." and h.hostid=sh.hostid");
+	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status,sh.icon,sh.icon_on,h.ip from sysmaps_hosts sh,hosts h where sh.sysmapid=".$_GET["sysmapid"]." and h.hostid=sh.hostid");
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		$host=DBget_field($result,$i,0);
@@ -243,6 +245,7 @@
 		$status=DBget_field($result,$i,7);
 		$icon=DBget_field($result,$i,8);
 		$icon_on=DBget_field($result,$i,9);
+		$ip=DBget_field($result,$i,10);
 
 
 		$result1=DBselect("select count(distinct t.triggerid) from items i,functions f,triggers t,hosts h where h.hostid=i.hostid and i.hostid=$hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.value=1 and t.status=0 and h.status=".HOST_STATUS_MONITORED." and i.status=0");
@@ -283,12 +286,27 @@
 //		imagecolortransparent ($img, 0, 0, 0);
 		ImageCopy($im,$img,$x,$y,0,0,ImageSX($img),ImageSY($img));
 
-		if($label!="")
+		$first_line="";
+		if($label_type==MAP_LABEL_TYPE_HOSTNAME)
 		{
-			$x1=$x+ImageSX($img)/2-ImageFontWidth(2)*strlen($label)/2;
+			$first_line=$host;
+		}
+		else if($label_type==MAP_LABEL_TYPE_HOSTLABEL)
+		{
+			$first_line=$label;
+		}
+		else if($label_type==MAP_LABEL_TYPE_IP)
+		{
+			$first_line=$ip;
+		}
+
+		if($first_line!="")
+		{
+
+			$x1=$x+ImageSX($img)/2-ImageFontWidth(2)*strlen($first_line)/2;
 			$y1=$y+ImageSY($img);
-			ImageFilledRectangle($im,$x1-2, $y1,$x1+ImageFontWidth(2)*strlen($label), $y1+ImageFontHeight(2),$white);
-			ImageString($im, 2, $x1, $y1, $label,$black);
+			ImageFilledRectangle($im,$x1-2, $y1,$x1+ImageFontWidth(2)*strlen($first_line), $y1+ImageFontHeight(2),$white);
+			ImageString($im, 2, $x1, $y1, $first_line,$black);
 		}
 
 		if($status == HOST_STATUS_NOT_MONITORED)
@@ -325,7 +343,11 @@
 			}
 		}
 		$x1=$x+ImageSX($img)/2-ImageFontWidth(2)*strlen($label)/2;
-		$y1=$y+ImageSY($img)+ImageFontHeight(2);
+		$y1=$y+ImageSY($img);
+		if($first_line!="")
+		{
+			$y1=$y1+ImageFontHeight(2);
+		}
 		ImageFilledRectangle($im,$x1-2, $y1,$x1+ImageFontWidth(2)*strlen($label), $y1+ImageFontHeight(2),$white);
 		ImageString($im, 2, $x1, $y1, $label,$color);
 

@@ -1,5 +1,7 @@
 Changes for 1.1alpha5:
 
+ - configurable format of icon labels for maps (Alexei)
+ - added column sysmaps.label_type (Alexei)
  - keep host selection when adding/deleting/updating item (Alexei)
  - fix for complation of the agent under Solaris (Alexei)
  - do not use hardcoded port 161 when adding from template (Alexei)
