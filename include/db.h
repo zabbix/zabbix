@@ -52,6 +52,13 @@
 	#define	DBfree_result	PQclear
 #endif
 
+DB_ITEM
+{
+	int     hostid;
+	char    *host;
+	int     useip;
+	char    *ip;
+};
 
 DB_ITEM
 {

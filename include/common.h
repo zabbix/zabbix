@@ -66,6 +66,10 @@
 #define HOST_STATUS_UNREACHABLE	2
 #define HOST_STATUS_TEMPLATE	3
 
+/* Use host IP or host name */
+#define HOST_USE_HOSTNAME	0
+#define HOST_USE_IP		1
+
 /* Trigger statuses */
 /*#define TRIGGER_STATUS_FALSE	0
 #define TRIGGER_STATUS_TRUE	1
