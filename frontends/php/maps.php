@@ -100,7 +100,7 @@
 			$y=DBget_field($result,$i,6);
 			$status=DBget_field($result,$i,7);
 
-			if($status==0)
+			if( ($status==0)||($status==2))
 			{
 				$map=$map."\n<area shape=rect coords=$x,$y,".($x+32).",".($y+32)." href=\"tr_status.php?hostid=$hostid&noactions=true&onlytrue=true&compact=true\" alt=\"$host\">";
 			}

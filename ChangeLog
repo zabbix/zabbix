@@ -22,8 +22,8 @@ snmpget -On localhost public enterprises.ucdavis.memory.memTotalSwap.0]
 
 Changes for 1.0beta4:
 
+ - unreachable hosts will be clickable in system maps (Alexei)
  - fixed double posting of the same trigger status into alarms (Alexei) 
-
  - fixed macros substitution in email alerts (Alexei)
  - removed option -Wall from all Makefiles (Alexei)
  - removed "//" comments from Zabbix code (Alexei)
