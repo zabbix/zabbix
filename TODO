@@ -1,7 +1,8 @@
 1.0beta11:
 
+ - special item which returns time!
  - mess with user groups when running under root
- - suport for PREFIX/zabbix/etc (configuration files)
+ - support for PREFIX/zabbix/etc (configuration files)
  - trapper item. Source->Alarms do not grow when last status is unknown for
 latest trigger (item type  = TRAPPER)
  - SNMP traps. Condition to switch expression off.
