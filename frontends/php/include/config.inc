@@ -1726,6 +1726,8 @@
 		echo "</td></tr>";
 		echo "</table>";
 		echo "</table>";
+
+		echo "</body>";
 	}
 
 	function	get_stats()

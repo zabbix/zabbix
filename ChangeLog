@@ -1,5 +1,6 @@
 Changes for 1.0alpha7:
 
+ - all these tables are added to PostgreSQL
  - added table graphs_items
  - lowered default values for triggers
  - added file frontends/php/chart2.html
