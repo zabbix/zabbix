@@ -6,13 +6,17 @@
 #include "common.h"
 
 #ifdef	USE_MYSQL
-MYSQL	mysql;
+	MYSQL	mysql;
 #endif
 
 #ifdef	USE_POSTGRESQL
-PGconn	*conn;
+	PGconn	*conn;
 #endif
 
+/*
+ * Connect to database.
+ * If fails, program terminates.
+ */ 
 void    DBconnect( void )
 {
 #ifdef	USE_MYSQL
@@ -29,18 +33,22 @@ void    DBconnect( void )
 #endif
 #ifdef	USE_POSTGRESQL
 /*	conn = PQsetdb(pghost, pgport, pgoptions, pgtty, dbName); */
-	conn = PQsetdb(NULL, NULL, NULL, NULL, "zabbix");
+	conn = PQsetdb(NULL, NULL, NULL, NULL, DB_NAME);
 
 /* check to see that the backend connection was successfully made */
 	if (PQstatus(conn) == CONNECTION_BAD)
 	{
-		syslog(LOG_ERR, "Connection to database '%s' failed.\n", "zabbix");
+		syslog(LOG_ERR, "Connection to database '%s' failed.\n", DB_NAME);
 		syslog(LOG_ERR, "%s", PQerrorMessage(conn));
 		exit(FAIL);
 	}
 #endif
 }
 
+/*
+ * Execute SQL statement. For non-select statements only.
+ * If fails, program terminates.
+ */ 
 void	DBexecute(char *query)
 {
 
@@ -74,6 +82,10 @@ void	DBexecute(char *query)
 #endif
 }
 
+/*
+ * Execute SQL statement. For select statements only.
+ * If fails, program terminates.
+ */ 
 DB_RESULT *DBselect(char *query)
 {
 #ifdef	USE_MYSQL
@@ -106,6 +118,9 @@ DB_RESULT *DBselect(char *query)
 #endif
 }
 
+/*
+ * Get value for given row and field. Must be called after DBselect.
+ */ 
 char	*DBget_field(DB_RESULT *result, int rownum, int fieldnum)
 {
 #ifdef	USE_MYSQL
@@ -121,6 +136,9 @@ char	*DBget_field(DB_RESULT *result, int rownum, int fieldnum)
 #endif
 }
 
+/*
+ * Get number of selected records.
+ */ 
 int	DBnum_rows(DB_RESULT *result)
 {
 #ifdef	USE_MYSQL
@@ -131,6 +149,9 @@ int	DBnum_rows(DB_RESULT *result)
 #endif
 }
 
+/*
+ * Get function value.
+ */ 
 int     DBget_function_result(float *Result,char *FunctionID)
 {
 	DB_RESULT *result;

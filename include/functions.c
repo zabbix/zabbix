@@ -230,6 +230,42 @@ int	evaluate_NODATA(float *nodata,int itemid,int parameter)
 	return SUCCEED;
 }
 
+int	evaluate_FUNCTION(float *value,int itemid,char *function,int parameter)
+{
+	int	ret  = SUCCEED;
+
+	if(strcmp(function,"last")==0)
+	{
+		ret = evaluate_LAST(value,itemid,parameter);
+	}
+	else if(strcmp(function,"prev")==0)
+	{
+		ret = evaluate_PREV(value,itemid,parameter);
+	}
+	else if(strcmp(function,"nodata")==0)
+	{
+		ret = evaluate_NODATA(value,itemid,parameter);
+	}
+	else if(strcmp(function,"min")==0)
+	{
+		ret = evaluate_MIN(value,itemid,parameter);
+	}
+	else if(strcmp(function,"max")==0)
+	{
+		ret = evaluate_MAX(value,itemid,parameter);
+	}
+	else if(strcmp(function,"diff")==0)
+	{
+		ret = evaluate_DIFF(value,itemid,parameter);
+	}
+	else
+	{
+		syslog( LOG_WARNING, "Unknown function:%s\n",function);
+		ret = FAIL;
+	}
+	return ret;
+}
+
 int	update_functions( int itemid )
 {
 	FUNCTION	function;
@@ -262,31 +298,9 @@ int	update_functions( int itemid )
 		function.function=DBget_field(result,i,0);
 		function.parameter=atoi(DBget_field(result,i,1));
 		syslog( LOG_DEBUG, "ItemId:%d Evaluating %s(%d)\n",itemid,function.function,function.parameter);
-		if(strcmp(function.function,"last")==0)
-		{
-			ret = evaluate_LAST(&value,itemid,function.parameter);
-		}
-		else if(strcmp(function.function,"prev")==0)
-		{
-			ret = evaluate_PREV(&value,itemid,function.parameter);
-		}
-		else if(strcmp(function.function,"nodata")==0)
-		{
-			ret = evaluate_NODATA(&value,itemid,function.parameter);
-		}
-		else if(strcmp(function.function,"min")==0)
-		{
-			ret = evaluate_MIN(&value,itemid,function.parameter);
-		}
-		else if(strcmp(function.function,"max")==0)
-		{
-			ret = evaluate_MAX(&value,itemid,function.parameter);
-		}
-		else if(strcmp(function.function,"diff")==0)
-		{
-			ret = evaluate_DIFF(&value,itemid,function.parameter);
-		}
-		else
+		ret = evaluate_FUNCTION(&value,itemid,function.function,function.parameter);
+
+		if( FAIL == ret)	
 		{
 			syslog( LOG_WARNING, "Unknown function:%s\n",function.function);
 			DBfree_result(result);
@@ -306,13 +320,12 @@ int	update_functions( int itemid )
 }
 
 
-void	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,char *mailsubject,char *mailbody)
+int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,char *mailsubject,char *mailbody)
 {
-	int s;
-	int i,e;
-	char *c;
+	int	s;
+	int	i,e;
+	char	*c;
 	struct hostent *hp;
-//	struct servent *sp;
 
 	struct sockaddr_in myaddr_in;
 	struct sockaddr_in servaddr_in;
@@ -323,74 +336,175 @@ void	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	hp=gethostbyname(smtp_server);
 	if(hp==NULL)
 	{
-		perror("Cannot get IP for mailserver.");
+		syslog(LOG_ERR, "Cannot get IP for mailserver.");
+		return FAIL;
 	}
 
 	servaddr_in.sin_addr.s_addr=((struct in_addr *)(hp->h_addr))->s_addr;
-
 	servaddr_in.sin_port=htons(25);
 
 	s=socket(AF_INET,SOCK_STREAM,0);
-	if(s==0) perror("socket");
-
+	if(s==0)
+	{
+		syslog(LOG_ERR, "Socket error.");
+		return FAIL;
+	}
+	
 	myaddr_in.sin_family = AF_INET;
 	myaddr_in.sin_port=0;
 	myaddr_in.sin_addr.s_addr=INADDR_ANY;
 
-	if(connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in))==-1) perror("Connect");
-
+	if( connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
+	{
+		syslog(LOG_ERR, "Connect error.");
+		return FAIL;
+	}
+		
 	c=(char *)malloc(1024);
-	if(c==NULL) perror("Cannot allocate memory.");
+	if(c == NULL)
+	{
+		syslog(LOG_ERR, "Malloc error.");
+		close(s);
+		return FAIL;
+	}
+
 	sprintf(c,"HELO %s\n",smtp_helo);
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
-	if(e==-1) perror("Error sending HELO to mailserver.");
-	
+	if(e == -1)
+	{
+		syslog(LOG_ERR, "Error sending HELO to mailserver.");
+		close(s);
+		free(c);
+		return FAIL;
+	}
+			
 	i=sizeof(struct sockaddr_in);
 	i=recvfrom(s,c,1023,0,(struct sockaddr *)&servaddr_in,&i);
-	if(i==-1) perror("Error receiving data answer on HELO reqest.");
-	
+	if(i == -1)
+	{
+		syslog(LOG_ERR, "Error receiving answer on HELO request.");
+		close(s);
+		free(c);
+		return FAIL;
+	}
+			
 	sprintf(c,"MAIL FROM: %s\n",smtp_email);
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
-	if(e==-1) perror("Error sending MAIL FROM to mailserver.");
+	if(e == -1)
+	{
+		syslog(LOG_ERR, "Error sending MAIL FROM to mailserver.");
+		close(s);
+		free(c);
+		return FAIL;
+	}
 	i=sizeof(struct sockaddr_in);
 	i=recvfrom(s,c,1023,0,(struct sockaddr *)&servaddr_in,&i);
-	if(i==-1) perror("Error receiving answer on MAIL FROM request.");
-	
+	if(i == -1)
+	{
+		syslog(LOG_ERR, "Error receiving answer on MAIL FROM request.");
+		close(s);
+		free(c);
+		return FAIL;
+	}
+			
 	sprintf(c,"RCPT TO: <%s>\n",mailto);
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
-	if(e==-1) perror("Error sending RCPT TO to mailserver.");
+	if(e == -1)
+	{
+		syslog(LOG_ERR, "Error sending RCPT TO to mailserver.");
+		close(s);
+		free(c);
+		return FAIL;
+	}
 	i=sizeof(struct sockaddr_in);
 	i=recvfrom(s,c,1023,0,(struct sockaddr *)&servaddr_in,&i);
-	if(i==-1) perror("Error receiving answer on RCPT TO request.");
+	if(i == -1)
+	{
+		syslog(LOG_ERR, "Error receiving answer on RCPT TO request.");
+		close(s);
+		free(c);
+		return FAIL;
+	}
 	
 	sprintf(c,"DATA\nSubject: %s\n",mailsubject);
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
-	if(e==-1) perror("Error sending DATA to mailserver.");
+	if(e == -1)
+	{
+		syslog(LOG_ERR, "Error sending DATA to mailserver.");
+		close(s);
+		free(c);
+		return FAIL;
+	}
 	i=sizeof(struct sockaddr_in);
 	i=recvfrom(s,c,1023,0,(struct sockaddr *)&servaddr_in,&i);
-	if(i==-1) perror("Error receiving answer on DATA request.");
+	if(i == -1)
+	{
+		syslog(LOG_ERR, "Error receivng answer on DATA request.");
+		close(s);
+		free(c);
+		return FAIL;
+	}
 	sprintf(c,"%s\n",mailbody);
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
-	if(e==-1) perror("Error sending MailBody to mailserver.");
+	if(e == -1)
+	{
+		syslog(LOG_ERR, "Error sending mail body to mailserver.");
+		close(s);
+		free(c);
+		return FAIL;
+	}
 	sprintf(c,".\n");
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
-	if(e==-1) perror("Error sending . to mailserver.");
+	if(e == -1)
+	{
+		syslog(LOG_ERR, "Error sending . to mailserver.");
+		close(s);
+		free(c);
+		return FAIL;
+	}
 	i=sizeof(struct sockaddr_in);
 	i=recvfrom(s,c,1023,0,(struct sockaddr *)&servaddr_in,&i);
+	if(i == -1)
+	{
+		syslog(LOG_ERR, "Error receivng answer on . request.");
+		close(s);
+		free(c);
+		return FAIL;
+	}
 	
 	sprintf(c,"\n");
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
-	if(e==-1) perror("Error sending \\n to mailserver.");
+	if(e ==- 1)
+	{
+		syslog(LOG_ERR, "Error sending \\n to mailserver.");
+		close(s);
+		free(c);
+		return FAIL;
+	}
 	i=sizeof(struct sockaddr_in);
 	i=recvfrom(s,c,1023,0,(struct sockaddr *)&servaddr_in,&i);
-	if(i==-1) perror("Error receiving answer on \\n request.");
+	if(i == -1)
+	{
+		syslog(LOG_ERR, "Error receivng answer on \\n request.");
+		close(s);
+		free(c);
+		return FAIL;
+	}
 	
 	sprintf(c,"QUIT\n");
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
-	if(e==-1) perror("Error sending QUIT to mailserver.");
-	
+	if(e == -1)
+	{
+		syslog(LOG_ERR, "Error sending QUIT to mailserver.");
+		close(s);
+		free(c);
+		return FAIL;
+	}
+
 	close(s);
 	free(c); 
+	
+	return SUCCEED;
 }
 
 void	send_to_user(int actionid,int userid,char *smtp_server,char *smtp_helo,char *smtp_email,char *subject,char *message)
@@ -419,7 +533,10 @@ void	send_to_user(int actionid,int userid,char *smtp_server,char *smtp_helo,char
 			if(strcmp(media.type,"EMAIL")==0)
 			{
 				syslog( LOG_DEBUG, "Email sending to %s %s Subject:%s Message:%s to %d\n", media.type, media.sendto, subject, message, userid );
-				send_mail(smtp_server,smtp_helo,smtp_email,media.sendto,subject,message);
+				if( FAIL == send_mail(smtp_server,smtp_helo,smtp_email,media.sendto,subject,message))
+				{
+					syslog( LOG_ERR, "Error sending email to %s Subject:%s to %d\n", media.sendto, subject, userid );
+				}
 				now = time(NULL);
 				sprintf(c,"insert into alerts (alertid,actionid,clock,type,sendto,subject,message) values (NULL,%d,%d,'%s','%s','%s','%s');",actionid,now,media.type,media.sendto,subject,message);
 				DBexecute(c);
@@ -477,8 +594,8 @@ void	apply_actions(int triggerid,int good)
 		action.subject=DBget_field(result,i,3);
 		action.message=DBget_field(result,i,4);
 
-//		substitute_functions(&*action.message);
-//		substitute_functions(&*action.subject); 
+		substitute_macros(&*action.message);
+		substitute_macros(&*action.subject); 
 
 		send_to_user(action.actionid,action.userid,smtp_server,smtp_helo,smtp_email,action.subject,action.message);
 		now = time(NULL);

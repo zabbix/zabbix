@@ -1,3 +1,10 @@
+Changes for 1.0alpha5:
+
+ - fixed zabbix_trapper. Added update_functions (itemid).
+ - finally (!) removed include/sysinfo.h
+ - source code became more structured
+ - call to perror was changed to syslog where necessary 
+ 
 Changes for 1.0alpha4:
 
  - fixed EXECUTE function in sysinfo.c
