@@ -1222,8 +1222,16 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	show_plaintext($itemid, $from, $till)
 	{
-		$sql="select clock,value from history where itemid=$itemid and clock>$from and clock<$till order by clock";
-		$result=DBselect($sql);
+		$item=get_item_by_itemid($itemid);
+		if($item["value_type"]==0)
+		{
+			$sql="select clock,value from history where itemid=$itemid and clock>$from and clock<$till order by clock";
+		}
+		else
+		{
+			$sql="select clock,value from history_str where itemid=$itemid and clock>$from and clock<$till order by clock";
+		}
+                $result=DBselect($sql);
 
 		echo "<PRE>\n";
 		for($i=0;$i<DBnum_rows($result);$i++)
