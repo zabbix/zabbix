@@ -15,15 +15,19 @@ td.horizontal_menu
 	background-color: #556677;
 	border-color: #000000;
 	border-width:0px;
-	border-style: solid;
+	border-top-style: solid;
+	border-left-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
 }
 
 td.horizontal_menu_n
 {
-	background-color: #778899;
+	background-color: #AAAAAA;
 	border-color: #000000;
-	border-width:0px;
-	border-style: solid;
+	border-width:1px;
+	border-top-style: dotted;
+	border-right-style: dotted;
 }
 
 span.divider
@@ -80,11 +84,18 @@ td,tr
 	background-color: #DDAAAA;
 }
 
+td.top_header_left
+{
+	background-color: #FFFFFF;
+	vertical-align: middle;
+	padding: 0;
+}
+
 table.menu
 {
 	background-color: #FFFFFF;
 	color: #000000;
-	border: 1px solid #000000;
+	border: 0px solid #000000;
 }
 
 .tborder
