@@ -1,3 +1,7 @@
+Changes for 1.0beta11:
+
+ - new hos status: 'deleted' (Alexei)
+
 Changes for 1.0beta10:
 
  - removed script misc/pinger/ (Alexei)
