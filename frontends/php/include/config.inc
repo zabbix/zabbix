@@ -807,7 +807,7 @@
 			$key=DBget_field($result,$i,2);
 			$delay=DBget_field($result,$i,3);
 
-			$itemid=add_item($description,$key,$hostid,$delay,24*3600,0);
+			$itemid=add_item($description,$key,$hostid,$delay,24*3600,0,0,"","");
 
 			$result2=DBselect("select triggertemplateid,description,expression from triggers_template where itemtemplateid=$itemtemplateid");
 			for($j=0;$j<DBnum_rows($result2);$j++)
