@@ -1,7 +1,7 @@
 <?
 	include "include/config.inc";
 	$page["title"] = "Alert history";
-	$page["file"] = "alerts.html";
+	$page["file"] = "alerts.php";
 	show_header($page["title"],30,0);
 ?>
 
@@ -15,13 +15,13 @@
 <?
 	if(isset($limit)&&($limit==200))
 	{
-		echo "[<A HREF=\"alerts.html?limit=50\">";
+		echo "[<A HREF=\"alerts.php?limit=50\">";
 		echo "Show last 50</A>]";
 		$limit=" limit 50";
 	}
 	else 
 	{
-		echo "[<A HREF=\"alerts.html?limit=200\">";
+		echo "[<A HREF=\"alerts.php?limit=200\">";
 		echo "Show last 200</A>]";
 		$limit=" limit 200";
 	}
@@ -53,7 +53,7 @@
 		if($col++%2==0)	{ echo "<tr bgcolor=#DDDDDD>"; }
 		else		{ echo "<tr bgcolor=#EEEEEE>"; }
 
-		echo "<TD><a href=\"alarms.html?triggerid=".$row["triggerid"]."\">".date("Y.M.d H:i:s",$row["clock"])."</a></TD>";
+		echo "<TD><a href=\"alarms.php?triggerid=".$row["triggerid"]."\">".date("Y.M.d H:i:s",$row["clock"])."</a></TD>";
 		if($row["type"]=="EMAIL")
 		{
 			echo "<TD>E-mail</TD>";

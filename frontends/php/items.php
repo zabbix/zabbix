@@ -1,6 +1,6 @@
 <?
         $page["title"] = "Configuration of items";
-        $page["file"] = "items.html";
+        $page["file"] = "items.php";
 
         include "include/config.inc";
 	show_header($page["title"],0,0);
@@ -50,7 +50,7 @@
 		{
 			echo "<b>[";
 		}
-		echo "<A HREF=\"items.html?hostid=".$row["hostid"]."\">".$row["host"]."</A>";
+		echo "<A HREF=\"items.php?hostid=".$row["hostid"]."\">".$row["host"]."</A>";
 		if(isset($hostid) && ($hostid == $row["hostid"]))
 		{
 			echo "]</b>";
@@ -74,7 +74,7 @@
 					echo "</TABLE><BR>";
 				}
 				echo "<br>";
-				show_table_header("<A HREF='items.html?hostid=".$row["hostid"]."'>".$row["host"]."</A>");
+				show_table_header("<A HREF='items.php?hostid=".$row["hostid"]."'>".$row["host"]."</A>");
 				echo "<TABLE BORDER=0 COLS=13  WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 				echo "<TR>";
 				echo "<TD WIDTH=\"10%\" NOSAVE><B>Host</B></TD>";
@@ -104,10 +104,10 @@
 				switch($row["status"])
 				{
 					case 0:
-						echo "<a href=\"items.html?itemid=".$row["itemid"]."&hostid=$hostid&register=changestatus&status=1\">Active</a>";
+						echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=$hostid&register=changestatus&status=1\">Active</a>";
 						break;
 					case 1:
-						echo "<a href=\"items.html?itemid=$itemid_&hostid=".$row["hostid"]."&register=changestatus&status=0\">Not active</a>";
+						echo "<a href=\"items.php?itemid=$itemid_&hostid=".$row["hostid"]."&register=changestatus&status=0\">Not active</a>";
 						break;
 					case 2:
 						echo "Trapper";
@@ -124,10 +124,10 @@
 				switch($row["status"])
 				{
 					case 0:
-						echo "<a href=\"items.html?itemid=".$row["itemid"]."&register=changestatus&status=1\">Active</a>";
+						echo "<a href=\"items.php?itemid=".$row["itemid"]."&register=changestatus&status=1\">Active</a>";
 						break;
 					case 1:
-						echo "<a href=\"items.html?itemid=".$row["itemid"]."&register=changestatus&status=0\">Not active</a>";
+						echo "<a href=\"items.php?itemid=".$row["itemid"]."&register=changestatus&status=0\">Not active</a>";
 						break;
 					case 2:
 						echo "Trapper";
@@ -141,7 +141,7 @@
 			}
 			echo "</td>";
 	
-			echo "<TD><A HREF=\"items.html?itemid=".$row["itemid"]."#form\">Change</A></TD>";
+			echo "<TD><A HREF=\"items.php?itemid=".$row["itemid"]."#form\">Change</A></TD>";
 			echo "</TR>";
 		}
 		echo "</TABLE>";

@@ -1,7 +1,7 @@
 <?
 	include "include/config.inc";
 	$page["title"] = "Availability report";
-	$page["file"] = "report2.html";
+	$page["file"] = "report2.php";
 	show_header($page["title"],0,0);
 ?>
 
@@ -9,7 +9,7 @@
 	if(!isset($yes))
 	{
 		echo "<center>";
-		echo "<a href=\"report2.html?yes=1\">";
+		echo "<a href=\"report2.php?yes=1\">";
 		echo "Click here to run report";
 		echo "</a>";
 		echo "</center>";

@@ -1,6 +1,6 @@
 <?
 	$page["title"] = "Status of triggers";
-	$page["file"] = "tr_status.html";
+	$page["file"] = "tr_status.php";
 
 	include "include/config.inc";
 
@@ -75,21 +75,21 @@
 	        $result=DBselect("select hostid,host from hosts where status in (0,2) order by host");
 	        if(isset($hostid))
 	        {
-	                echo "<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">all</A>  ";
+	                echo "<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">all</A>  ";
 	        }
 	        else
 	        {
-	                echo "<b>[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">all</A>]</b>  ";
+	                echo "<b>[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">all</A>]</b>  ";
 	        }
 		while($row=DBfetch($result))
 	        {
 	                if(isset($hostid) && ($row["hostid"] == $hostid))
 	                {
-	                        echo "<b>[<A HREF=\"tr_status.html?hostid=".$row["hostid"]."&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">".$row["host"]."</A>]</b>  ";
+	                        echo "<b>[<A HREF=\"tr_status.php?hostid=".$row["hostid"]."&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">".$row["host"]."</A>]</b>  ";
 	                }
 	                else
 	                {
-	                        echo "<A HREF=\"tr_status.html?hostid=".$row["hostid"]."&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">".$row["host"]."</A>  ";
+	                        echo "<A HREF=\"tr_status.php?hostid=".$row["hostid"]."&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">".$row["host"]."</A>  ";
 	                }
 	        }
 	 
@@ -108,38 +108,38 @@
 
 		if($onlytrue!='true')
 		{
-			echo "[<A HREF=\"tr_status.html?onlytrue=true&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond\">Show only true</a>] ";
+			echo "[<A HREF=\"tr_status.php?onlytrue=true&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond\">Show only true</a>] ";
 		}
 		else
 		{
-			echo "[<A HREF=\"tr_status.html?noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond\">Show all triggers</A>] ";
+			echo "[<A HREF=\"tr_status.php?noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond\">Show all triggers</A>] ";
 		}
 		if($noactions!='true')
 		{
-			echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=true&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond\">Hide Actions</A>] ";
+			echo "[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=true&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond\">Hide Actions</A>] ";
 		}
 		else
 		{
-			echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=false&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond\">Show Actions</A>] ";
+			echo "[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=false&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond\">Show Actions</A>] ";
 		}
 		if($compact!='true')
 		{
-			echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=true&select=$select&txt_select=$txt_select&sort=$sort$cond\">Hide Details</A>] ";
+			echo "[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=true&select=$select&txt_select=$txt_select&sort=$sort$cond\">Hide Details</A>] ";
 		}
 		else
 		{
-			echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=false&select=$select&txt_select=$txt_select&sort=$sort$cond\">Show Details</A>] ";
+			echo "[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=false&select=$select&txt_select=$txt_select&sort=$sort$cond\">Show Details</A>] ";
 		}
 		
 		if($select!='true')
 		{
-			echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=true&txt_select=$txt_select&sort=$sort$cond\">Select</A>] ";
+			echo "[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=true&txt_select=$txt_select&sort=$sort$cond\">Select</A>] ";
 		}
 		else
 		{
-			echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=false&sort=$sort$cond\">Hide Select</A>] "; 
+			echo "[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=false&sort=$sort$cond\">Hide Select</A>] "; 
 			show_table_v_delimiter();
-			echo "<form name=\"form1\" method=\"get\" action=\"tr_status.html?select=true\">
+			echo "<form name=\"form1\" method=\"get\" action=\"tr_status.php?select=true\">
   			<input type=\"text\" name=\"txt_select\" value=\"$txt_select\">
   			<input type=\"submit\" name=\"btnSelect\" value=\"Select\">
 			<INPUT NAME=\"compact\" TYPE=\"HIDDEN\" value=\"$compact\">
@@ -156,7 +156,7 @@
  	$time=date("[H:i:s]",time());
   	if(isset($fullscreen))
 	{
-		show_table_header("<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">TRIGGERS $time</A>");
+		show_table_header("<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">TRIGGERS $time</A>");
 
 		$cond="";
 		if(isset($hostid))
@@ -196,7 +196,7 @@
 	}
 	else
 	{
-		show_table_header("<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&fullscreen=1&sort=$sort\">TRIGGERS $time</A>");
+		show_table_header("<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&fullscreen=1&sort=$sort\">TRIGGERS $time</A>");
 	}
   
 	echo "<TABLE BORDER=0 COLS=5 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
@@ -216,7 +216,7 @@
 	}
 	else
 	{
-		echo "<TD ALIGN=LEFT><B><A HREF=\"tr_status.html?sort=description&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">Description</a>";
+		echo "<TD ALIGN=LEFT><B><A HREF=\"tr_status.php?sort=description&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">Description</a>";
 	}
 	if($compact!='true') {echo "<BR><FONT SIZE=-1>Expression</FONT></B>";}
 	echo "</TD>";
@@ -229,7 +229,7 @@
 	}
 	else
 	{
-		echo "<TD ALIGN=CENTER><B><A HREF=\"tr_status.html?sort=priority&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">Priority</a>";
+		echo "<TD ALIGN=CENTER><B><A HREF=\"tr_status.php?sort=priority&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">Priority</a>";
 	}
 	if($noactions=='true')
 		echo "<TD WIDTH=\"12%\" ALIGN=CENTER>";
@@ -242,7 +242,7 @@
 	}
 	else
 	{
-		echo "<B><A HREF=\"tr_status.html?sort=lastchange&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">Last change</a>";
+		echo "<B><A HREF=\"tr_status.php?sort=lastchange&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">Last change</a>";
 	}
 	echo "</TD>";
    
@@ -339,31 +339,31 @@
 		elseif($row["priority"]==5)	echo "<TD ALIGN=CENTER BGCOLOR=RED>Disaster !!!</TD>";
 		else				echo "<TD ALIGN=CENTER><B>".$row["priority"]."</B></TD>";
 
-		echo "<TD ALIGN=CENTER><A HREF=\"alarms.html?triggerid=".$row["triggerid"]."\">".date("d M H:i:s",$row["lastchange"])."</a>";
+		echo "<TD ALIGN=CENTER><A HREF=\"alarms.php?triggerid=".$row["triggerid"]."\">".date("d M H:i:s",$row["lastchange"])."</a>";
 		echo "</TD>";
 
 		if($noactions!='true')
 		{
 			echo "<TD>";
-			echo "<A HREF=\"actions.html?triggerid=".$row["triggerid"]."\">Show actions</A> - ";
-			echo "<A HREF=\"alarms.html?triggerid=".$row["triggerid"]."\">History</A> - ";
+			echo "<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">Show actions</A> - ";
+			echo "<A HREF=\"alarms.php?triggerid=".$row["triggerid"]."\">History</A> - ";
 			if(isset($hostid))
 			{
-				echo "<A HREF=\"triggers.html?hostid=$hostid&triggerid=".$row["triggerid"]."#form\">Change</A>";
+				echo "<A HREF=\"triggers.php?hostid=$hostid&triggerid=".$row["triggerid"]."#form\">Change</A>";
 			}
 			else
 			{
-				echo "<A HREF=\"triggers.html?triggerid=".$row["triggerid"]."#form\">Change</A>";
+				echo "<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."#form\">Change</A>";
 			}
 			echo "</TD>";
 		}
 		if($row["comments"] != "")
 		{
-			echo "<TD ALIGN=CENTER><A HREF=\"tr_comments.html?triggerid=".$row["triggerid"]."\">Show</a></TD>";
+			echo "<TD ALIGN=CENTER><A HREF=\"tr_comments.php?triggerid=".$row["triggerid"]."\">Show</a></TD>";
 		}
 		else
 		{
-			echo "<TD ALIGN=CENTER><A HREF=\"tr_comments.html?triggerid=".$row["triggerid"]."\">Add</a></TD>";
+			echo "<TD ALIGN=CENTER><A HREF=\"tr_comments.php?triggerid=".$row["triggerid"]."\">Add</a></TD>";
 		}
 		if($row["istrue"] == 0)	echo "</TR>\n";
 	}

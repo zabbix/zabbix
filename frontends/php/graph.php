@@ -1,7 +1,7 @@
 <?
 	include "include/config.inc";
 	$page["title"] = "Configuration of graph";
-	$page["file"] = "graph.html";
+	$page["file"] = "graph.php";
 	show_header($page["title"],0,0);
 ?>
 
@@ -34,7 +34,7 @@
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR BGCOLOR=#DDDDDD>";
 	echo "<TD ALIGN=CENTER>";
-	echo "<IMG SRC=\"chart2.html?graphid=$graphid&period=3600&from=0\">";
+	echo "<IMG SRC=\"chart2.php?graphid=$graphid&period=3600&from=0\">";
 	echo "</TD>";
 	echo "</TR>";
 	echo "</TABLE>";
@@ -57,9 +57,9 @@
 		else		{ echo "<TR BGCOLOR=#DDDDDD>"; }
 
 		echo "<TD>".$row["host"]."</TD>";
-		echo "<TD><a href=\"chart.html?itemid=".$row["itemid"]."&period=3600&from=0\">".$row["description"]."</a></TD>";
+		echo "<TD><a href=\"chart.php?itemid=".$row["itemid"]."&period=3600&from=0\">".$row["description"]."</a></TD>";
 		echo "<TD>".$row["color"]."</TD>";
-		echo "<TD><A HREF=\"graph.html?register=delete&graphid=$graphid&gitemid=".$row["gitemid"]."\">Delete</A></TD>";
+		echo "<TD><A HREF=\"graph.php?register=delete&graphid=$graphid&gitemid=".$row["gitemid"]."\">Delete</A></TD>";
 		echo "</TR>";
 	}
 	echo "</TABLE>";
@@ -73,7 +73,7 @@
 	echo "New item for graph";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"graph.html?graphid=$graphid\">";
+	echo "<form method=\"post\" action=\"graph.php?graphid=$graphid\">";
 	if(isset($gitemid))
 	{
 		echo "<input name=\"gitemid\" type=\"hidden\" value=$gitemid>";

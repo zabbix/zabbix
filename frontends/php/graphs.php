@@ -1,7 +1,7 @@
 <?
 	include "include/config.inc";
 	$page["title"] = "Graphs";
-	$page["file"] = "graphs.html";
+	$page["file"] = "graphs.php";
 	show_header($page["title"],0,0);
 ?>
 
@@ -49,11 +49,11 @@
 		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
 		else		{ echo "<TR BGCOLOR=#DDDDDD>"; }
 	
-		echo "<TD><a href=\"graph.html?graphid=".$row["graphid"]."\">".$row["name"]."</a></TD>";
+		echo "<TD><a href=\"graph.php?graphid=".$row["graphid"]."\">".$row["name"]."</a></TD>";
 		echo "<TD>".$row["width"]."</TD>";
 		echo "<TD>".$row["height"]."</TD>";
-		echo "<TD><A HREF=\"graphs.html?graphid=".$row["graphid"]."#form\">Change</A> - ";
-		echo "<A HREF=\"graphs.html?register=delete&graphid=".$row["graphid"]."\">Delete</A></TD>";
+		echo "<TD><A HREF=\"graphs.php?graphid=".$row["graphid"]."#form\">Change</A> - ";
+		echo "<A HREF=\"graphs.php?register=delete&graphid=".$row["graphid"]."\">Delete</A></TD>";
 		echo "</TR>";
 	}
 	echo "</TABLE>";
@@ -82,7 +82,7 @@
 	echo "New graph";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"graphs.html\">";
+	echo "<form method=\"post\" action=\"graphs.php\">";
 	if(isset($graphid))
 	{
 		echo "<input name=\"graphid\" type=\"hidden\" value=$graphid>";

@@ -1,7 +1,7 @@
 <?
 	include "include/config.inc";
 	$page["title"] = "User defined graphs";
-	$page["file"] = "charts.html";
+	$page["file"] = "charts.php";
 
 	$nomenu=0;
 	if(isset($fullscreen))
@@ -35,7 +35,7 @@
 			{
 				echo "<b>[";
 			}
-			echo "<a href='charts.html?graphid=".$row["graphid"]."'>".$row["name"]."</a>";
+			echo "<a href='charts.php?graphid=".$row["graphid"]."'>".$row["name"]."</a>";
 			if(isset($graphid) && ($graphid == $row["graphid"]) )
 			{
 				echo "]</b>";
@@ -62,11 +62,11 @@
 		$row=DBfetch($result);
 		if(isset($fullscreen))
 		{
-			$map="<a href=\"charts.html?graphid=$graphid\">".$row["name"]."</a>";
+			$map="<a href=\"charts.php?graphid=$graphid\">".$row["name"]."</a>";
 		}
 		else
 		{
-			$map="<a href=\"charts.html?graphid=$graphid&fullscreen=1\">".$row["name"]."</a>";
+			$map="<a href=\"charts.php?graphid=$graphid&fullscreen=1\">".$row["name"]."</a>";
 		}
 	}
 	else
@@ -89,7 +89,7 @@
 	echo "<TD ALIGN=CENTER>";
 	if(isset($graphid))
 	{
-		echo "<IMG SRC=\"chart2.html?graphid=$graphid&period=$period&from=$from\">";
+		echo "<IMG SRC=\"chart2.php?graphid=$graphid&period=$period&from=$from\">";
 	}
 	else
 	{
@@ -104,25 +104,25 @@
 		echo("<center>");
 		echo("<hr>");
 		$tmp=$from+12*14;
-		echo("[<A HREF=\"charts.html?graphid=$graphid&from=$tmp&period=$period\">");
+		echo("[<A HREF=\"charts.php?graphid=$graphid&from=$tmp&period=$period\">");
 		echo("Week back</A>] ");
 
 		$tmp=$from+12;
-		echo("[<A HREF=\"charts.html?graphid=$graphid&from=$tmp&period=$period\">");
+		echo("[<A HREF=\"charts.php?graphid=$graphid&from=$tmp&period=$period\">");
 		echo("12h back</A>] ");
 		
 		$tmp=$from+1;
-		echo("[<A HREF=\"charts.html?graphid=$graphid&from=$tmp&period=$period\">");
+		echo("[<A HREF=\"charts.php?graphid=$graphid&from=$tmp&period=$period\">");
 		echo("1h back</A>] ");
 
 		$tmp=$period+3600;
-		echo("[<A HREF=\"charts.html?graphid=$graphid&from=$from&period=$tmp\">");
+		echo("[<A HREF=\"charts.php?graphid=$graphid&from=$from&period=$tmp\">");
 		echo("+1h</A>] ");
 
 		if ($period>3600) 
 		{
 			$tmp=$period-3600;
-			echo("[<A HREF=\"charts.html?graphid=$graphid&from=$from&period=$tmp\">");
+			echo("[<A HREF=\"charts.php?graphid=$graphid&from=$from&period=$tmp\">");
 			echo("-1h</A>] ");
 		}
 		else
@@ -133,7 +133,7 @@
 		if ($from>0) // HOUR FORWARD
 		{
 			$tmp=$from-1;
-			echo("[<A HREF=\"charts.html?graphid=$graphid&from=$tmp&period=$period\">");
+			echo("[<A HREF=\"charts.php?graphid=$graphid&from=$tmp&period=$period\">");
 			echo("1h forward</A>] ");
 		}
 		else
@@ -143,7 +143,7 @@
 		if (isset($From) && ($From>0))
 		{
 			$tmp=$from-12;
-			echo("[<A HREF=\"charts.html?graphid=$graphid&from=$tmp&period=$period\">");
+			echo("[<A HREF=\"charts.php?graphid=$graphid&from=$tmp&period=$period\">");
 			echo("12h forward</A>] ");
 		}
 		else
@@ -154,7 +154,7 @@
 		if (isset($From) && ($From>0))
 		{
 			$tmp=$from-12*14;
-			echo("[<A HREF=\"charts.html?graphid=$graphid&from=$tmp&period=$period\">");
+			echo("[<A HREF=\"charts.php?graphid=$graphid&from=$tmp&period=$period\">");
 			echo("Week forward</A>] ");
 		}
 		else

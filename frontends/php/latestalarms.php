@@ -1,6 +1,6 @@
 <?
 	$page["title"] = "Latest alarms";
-	$page["file"] = "latestalarms.html";
+	$page["file"] = "latestalarms.php";
 
 	include "include/config.inc";
 	show_header($page["title"],30,0);
@@ -16,12 +16,12 @@
 <?
 	if(isset($limit))
 	{
-		echo "[<A HREF=\"latestalarms.html\">";
+		echo "[<A HREF=\"latestalarms.php\">";
 		echo "Show last 50</A>]";
 	}
 	else 
 	{
-		echo "[<A HREF=\"latestalarms.html?limit=200\">";
+		echo "[<A HREF=\"latestalarms.php?limit=200\">";
 		echo "Show last 200</A>]";
 	}
 
@@ -57,7 +57,7 @@
 		else		{ echo "<tr bgcolor=#EEEEEE>"; }
 
 		echo "<TD>",date("Y.M.d H:i:s",$row["clock"]),"</TD>";
-		echo "<TD><a href=\"alarms.html?triggerid=".$row["triggerid"]."\">".$row["description"]."</a></TD>";
+		echo "<TD><a href=\"alarms.php?triggerid=".$row["triggerid"]."\">".$row["description"]."</a></TD>";
 		if($row["istrue"] == 0)
 		{
 			echo "<TD><font color=\"00AA00\">OFF</font></TD>";

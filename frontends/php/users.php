@@ -1,6 +1,6 @@
 <?
 	$page["title"] = "Users";
-	$page["file"] = "users.html";
+	$page["file"] = "users.php";
 
 	include "include/config.inc";
 	show_header($page["title"],0,0);
@@ -70,7 +70,7 @@
 		echo "<TD>".$row["alias"]."</TD>";
 		echo "<TD>".$row["name"]."</TD>";
 		echo "<TD>".$row["surname"]."</TD>";
-		echo "<TD><A HREF=\"users.html?register=change&userid=".$row["userid"]."\">Change</A> - <A HREF=\"media.html?userid=".$row["userid"]."\">Media</A>";
+		echo "<TD><A HREF=\"users.php?register=change&userid=".$row["userid"]."\">Change</A> - <A HREF=\"media.php?userid=".$row["userid"]."\">Media</A>";
 		echo "</TD>";
 		echo "</TR>";
 	}

@@ -1,7 +1,7 @@
 <?
 	include "include/config.inc";
 	$page["title"] = "Hosts";
-	$page["file"] = "hosts.html";
+	$page["file"] = "hosts.php";
 	show_header($page["title"],0,0);
 ?>
 
@@ -56,19 +56,19 @@
 		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
 		else 		{ echo "<TR BGCOLOR=#DDDDDD>"; }
 	
-		echo "<TD><a href=\"items.html?hostid=".$row["hostid"]."\">".$row["host"]."</a></TD>";
+		echo "<TD><a href=\"items.php?hostid=".$row["hostid"]."\">".$row["host"]."</a></TD>";
 		echo "<TD>".$row["port"]."</TD>";
 		echo "<TD>";
 		if($row["status"] == 0)	
-			echo "<a href=\"hosts.html?hostid=".$row["hostid"]."&register=changestatus&status=1\">Monitored</a>";
+			echo "<a href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=1\">Monitored</a>";
 		else if($row["status"] == 1)
-			echo "<a href=\"hosts.html?hostid=".$row["hostid"]."&register=changestatus&status=0\">Not monitored</a>";
+			echo "<a href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=0\">Not monitored</a>";
 		else if($row["status"] == 2)
 			echo "Unreachable";
 		else
 			echo "Unknown";
 		echo "</TD>";
-		echo "<TD><A HREF=\"hosts.html?register=change&hostid=".$row["hostid"]."#form\">Change</A></TD>";
+		echo "<TD><A HREF=\"hosts.php?register=change&hostid=".$row["hostid"]."#form\">Change</A></TD>";
 		echo "</TR>";
 	}
 	echo "</TABLE>";
@@ -108,7 +108,7 @@
 	echo "Host details";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"hosts.html\">";
+	echo "<form method=\"post\" action=\"hosts.php\">";
 	if(isset($hostid))
 	{
 		echo "<input name=\"hostid\" type=\"hidden\" value=$hostid>";
