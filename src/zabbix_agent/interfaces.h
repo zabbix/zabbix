@@ -17,12 +17,20 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_STATS_H
-#define ZABBIX_STATS_H
+#ifndef ZABBIX_INTERFACES_H
+#define ZABBIX_INTERFACES_H
 
-#include "interfaces.h"
-#include "diskdevices.h"
+#define	MAX_INTERFACE	8
 
-void	collect_statistics();
+#define INTERFACE struct interface_type
+INTERFACE
+{
+	char    *interface;
+	int	clock[60*15];
+	float	sent[60*15];
+	float	received[60*15];
+};
+
+void	collect_stats_interfaces(FILE *outfile);
 
 #endif
