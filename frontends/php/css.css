@@ -72,6 +72,13 @@ td,tr
 	background-color: #DDAAAA;
 }
 
+table.menu
+{
+	background-color: #FFFFFF;
+	color: #000000;
+	border: 1px solid #000000;
+}
+
 .tborder
 {
 	background-color: #AAAAAA;
