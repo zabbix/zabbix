@@ -27,6 +27,7 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
+#include "zlog.h"
 
 /*
  * Delete all right spaces from given string
@@ -234,6 +235,7 @@ int	evaluate_simple (double *result,char *exp)
 		if( evaluate_simple(&value1,first) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
+			zabbix_syslog("Cannot evaluate expression [%s]", first );
 			return FAIL;
 		}
 		if( value1 == 1)
@@ -244,6 +246,7 @@ int	evaluate_simple (double *result,char *exp)
 		if( evaluate_simple(&value2,second) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
+			zabbix_syslog("Cannot evaluate expression [%s]", second );
 			return FAIL;
 		}
 		if( value2 == 1)
@@ -272,11 +275,13 @@ int	evaluate_simple (double *result,char *exp)
 		if( evaluate_simple(&value1,first) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
+			zabbix_syslog("Cannot evaluate expression [%s]", first );
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
+			zabbix_syslog("Cannot evaluate expression [%s]", second );
 			return FAIL;
 		}
 		if( (value1 == 1) && (value2 == 1) )
@@ -306,11 +311,13 @@ int	evaluate_simple (double *result,char *exp)
 		if( evaluate_simple(&value1,first) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
+			zabbix_syslog("Cannot evaluate expression [%s]", first );
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
+			zabbix_syslog("Cannot evaluate expression [%s]", second );
 			return FAIL;
 		}
 		if( value1 > value2 )
@@ -341,11 +348,13 @@ int	evaluate_simple (double *result,char *exp)
 		if( evaluate_simple(&value1,first) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
+			zabbix_syslog("Cannot evaluate expression [%s]", first );
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
+			zabbix_syslog("Cannot evaluate expression [%s]", second );
 			return FAIL;
 		}
 		if( value1 < value2 )
@@ -376,11 +385,13 @@ int	evaluate_simple (double *result,char *exp)
 		if( evaluate_simple(&value1,first) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
+			zabbix_syslog("Cannot evaluate expression [%s]", first );
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
+			zabbix_syslog("Cannot evaluate expression [%s]", second );
 			return FAIL;
 		}
 		*result=value1*value2;
@@ -403,16 +414,19 @@ int	evaluate_simple (double *result,char *exp)
 		if( evaluate_simple(&value1,first) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
+			zabbix_syslog("Cannot evaluate expression [%s]", first );
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
+			zabbix_syslog("Cannot evaluate expression [%s]", second );
 			return FAIL;
 		}
 		if(cmp_double(value2,0) == 0)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Division by zero. Cannot evaluate expression [%s/%s]", first,second );
+			zabbix_syslog("Division by zero. Cannot evaluate expression [%s/%s]", first,second );
 			return FAIL;
 		}
 		else
@@ -438,11 +452,13 @@ int	evaluate_simple (double *result,char *exp)
 		if( evaluate_simple(&value1,first) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
+			zabbix_syslog("Cannot evaluate expression [%s]", first );
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
+			zabbix_syslog("Cannot evaluate expression [%s]", second );
 			return FAIL;
 		}
 		*result=value1+value2;
@@ -465,11 +481,13 @@ int	evaluate_simple (double *result,char *exp)
 		if( evaluate_simple(&value1,first) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
+			zabbix_syslog("Cannot evaluate expression [%s]", first );
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
+			zabbix_syslog("Cannot evaluate expression [%s]", second );
 			return FAIL;
 		}
 		*result=value1-value2;
@@ -492,11 +510,13 @@ int	evaluate_simple (double *result,char *exp)
 		if( evaluate_simple(&value1,first) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
+			zabbix_syslog("Cannot evaluate expression [%s]", first );
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
+			zabbix_syslog("Cannot evaluate expression [%s]", second );
 			return FAIL;
 		}
 		if( cmp_double(value1,value2) ==0 )
@@ -526,11 +546,13 @@ int	evaluate_simple (double *result,char *exp)
 		if( evaluate_simple(&value1,first) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
+			zabbix_syslog("Cannot evaluate expression [%s]", first );
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
+			zabbix_syslog("Cannot evaluate expression [%s]", second );
 			return FAIL;
 		}
 		if( cmp_double(value1,value2) != 0 )
@@ -580,6 +602,7 @@ int	evaluate(int *result,char *exp)
 		if( r == -1 )
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot find left bracket [(]. Expression:[%s]", exp );
+			zabbix_syslog("Cannot find left bracket [(]. Expression:[%s]", exp );
 			return	FAIL;
 		}
 		for(i=l+1;i<r;i++)
@@ -592,6 +615,7 @@ int	evaluate(int *result,char *exp)
 		{
 			/* Changed to LOG_LEVEL_DEBUG */
 			zabbix_log( LOG_LEVEL_DEBUG, "Unable to evaluate simple expression1 [%s]", simple );
+			zabbix_syslog("Unable to evaluate simple expression1 [%s]", simple );
 			return	FAIL;
 		}
 
@@ -614,6 +638,7 @@ int	evaluate(int *result,char *exp)
 	if( evaluate_simple( &value, res ) != SUCCEED )
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Unable to evaluate simple expression2 [%s]", simple );
+		zabbix_syslog("Unable to evaluate simple expression2 [%s]", simple );
 		return	FAIL;
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "Evaluate end:[%lf]", value );
@@ -653,6 +678,7 @@ void	substitute_simple_macros_thread(MYSQL *database, DB_TRIGGER *trigger, DB_AC
 			if(DBnum_rows(result) == 0)
 			{
 				zabbix_log( LOG_LEVEL_ERR, "No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
 				strscpy(tmp, "*UNKNOWN*");
 				DBfree_result(result);
 			}
@@ -678,6 +704,7 @@ void	substitute_simple_macros_thread(MYSQL *database, DB_TRIGGER *trigger, DB_AC
 			if(DBnum_rows(result) == 0)
 			{
 				zabbix_log( LOG_LEVEL_ERR, "No IP address in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				zabbix_syslog("No IP address in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
 				strscpy(tmp, "*UNKNOWN IP*");
 				DBfree_result(result);
 			}
@@ -781,6 +808,7 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 			if(DBnum_rows(result) == 0)
 			{
 				zabbix_log( LOG_LEVEL_ERR, "No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
 				strscpy(tmp, "*UNKNOWN*");
 				DBfree_result(result);
 			}
@@ -806,6 +834,7 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 			if(DBnum_rows(result) == 0)
 			{
 				zabbix_log( LOG_LEVEL_ERR, "No IP address in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				zabbix_syslog("No IP address in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
 				strscpy(tmp, "*UNKNOWN IP*");
 				DBfree_result(result);
 			}
@@ -909,12 +938,14 @@ int	substitute_macros_thread(MYSQL *database, DB_TRIGGER *trigger, DB_ACTION *ac
 		if( r == FAIL )
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Cannot find right bracket. Expression:[%s]", exp );
+			zabbix_syslog("Cannot find right bracket. Expression:[%s]", exp );
 			return	FAIL;
 		}
 
 		if( r < l )
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Right bracket is before left one. Expression:[%s]", exp );
+			zabbix_syslog("Right bracket is before left one. Expression:[%s]", exp );
 			return	FAIL;
 		}
 
@@ -1035,12 +1066,14 @@ int	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 		if( r == FAIL )
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Cannot find right bracket. Expression:[%s]", exp );
+			zabbix_syslog("Cannot find right bracket. Expression:[%s]", exp );
 			return	FAIL;
 		}
 
 		if( r < l )
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Right bracket is before left one. Expression:[%s]", exp );
+			zabbix_syslog("Right bracket is before left one. Expression:[%s]", exp );
 			return	FAIL;
 		}
 
@@ -1149,11 +1182,13 @@ int	substitute_functions_thread(MYSQL *database, char *exp)
 		if( r == FAIL )
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Cannot find right bracket. Expression:[%s]", exp );
+			zabbix_syslog("Cannot find right bracket. Expression:[%s]", exp );
 			return	FAIL;
 		}
 		if( r < l )
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Right bracket is before left one. Expression:[%s]", exp );
+			zabbix_syslog("Right bracket is before left one. Expression:[%s]", exp );
 			return	FAIL;
 		}
 
@@ -1167,6 +1202,7 @@ int	substitute_functions_thread(MYSQL *database, char *exp)
 		{
 /* It may happen because of functions.lastvalue is NULL, so this is not warning  */
 			zabbix_log( LOG_LEVEL_DEBUG, "Unable to get value for functionid [%s]", functionid );
+			zabbix_syslog("Unable to get value for functionid [%s]", functionid );
 			return	FAIL;
 		}
 
@@ -1216,11 +1252,13 @@ int	substitute_functions(char *exp)
 		if( r == FAIL )
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Cannot find right bracket. Expression:[%s]", exp );
+			zabbix_syslog("Cannot find right bracket. Expression:[%s]", exp );
 			return	FAIL;
 		}
 		if( r < l )
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Right bracket is before left one. Expression:[%s]", exp );
+			zabbix_syslog("Right bracket is before left one. Expression:[%s]", exp );
 			return	FAIL;
 		}
 
@@ -1234,6 +1272,7 @@ int	substitute_functions(char *exp)
 		{
 /* It may happen because of functions.lastvalue is NULL, so this is not warning  */
 			zabbix_log( LOG_LEVEL_DEBUG, "Unable to get value for functionid [%s]", functionid );
+			zabbix_syslog("Unable to get value for functionid [%s]", functionid );
 			return	FAIL;
 		}
 
@@ -1281,6 +1320,7 @@ int	evaluate_expression_thread(MYSQL *database, int *result,char *expression)
 		}
 	}
 	zabbix_log(LOG_LEVEL_WARNING, "Evaluation of expression [%s] failed", expression );
+	zabbix_syslog("Evaluation of expression [%s] failed", expression );
 	return FAIL;
 }
 #endif
@@ -1301,6 +1341,7 @@ int	evaluate_expression(int *result,char *expression)
 		}
 	}
 	zabbix_log(LOG_LEVEL_WARNING, "Evaluation of expression [%s] failed", expression );
+	zabbix_syslog("Evaluation of expression [%s] failed", expression );
 	return FAIL;
 }
 
