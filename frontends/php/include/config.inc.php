@@ -3544,6 +3544,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	function	calculate_service_availability($serviceid,$period_start,$period_end)
 	{
 	       	$sql="select count(*),min(clock),max(clock) from service_alarms where serviceid=$serviceid and clock>=$period_start and clock<=$period_end";
+//		echo " $sql<br>";
 		
 	        $result=DBselect($sql);
 		if(DBget_field($result,0,0)>0)
@@ -3553,6 +3554,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 		else
 		{
+//	       		$sql="select max(clock) from service_alarms where serviceid=$serviceid and clock<$period_start";
+//	        	$result=DBselect($sql);
+		
 			$ret["true_time"]=0;
 			$ret["false_time"]=1;
 			$ret["true"]=0;
@@ -3620,6 +3624,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				$true_time=$true_time+$max-$time;
 			}
 		}
+
+		echo $true_time,"-",$false_time;
 
 		$total_time=$true_time+$false_time;
 		if($total_time==0)
