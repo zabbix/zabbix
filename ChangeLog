@@ -1,5 +1,6 @@
 Changes for 1.1alpha2:
 
+ - fixed audit log for graph elements (Alexei)
  - do not reference ZABBIX logo from www.zabbix.com (Alexei)
  - fixed addition of network maps (Alexei)
 
