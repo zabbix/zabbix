@@ -16,3 +16,5 @@ CREATE INDEX profiles_userid on profiles (userid);
 CREATE UNIQUE INDEX profiles_userid_idx on profiles (userid,idx);
 
 alter table items add snmp_port int4 DEFAULT '161' NOT NULL;
+alter table services add showsla int4 DEFAULT '0' NOT NULL;
+alter table services add goodsla int4 DEFAULT '99.9' NOT NULL;

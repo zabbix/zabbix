@@ -1565,21 +1565,39 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return DBexecute($sql);
 	}
 
-	function	update_service($serviceid,$name,$triggerid,$linktrigger,$algorithm)
+	function	update_service($serviceid,$name,$triggerid,$linktrigger,$algorithm,$showsla,$goodsla)
 	{
 		if( isset($linktrigger)&&($linktrigger=="on") )
 		{
-			$sql="update services set name='$name',triggerid=$triggerid,status=0,algorithm=$algorithm where serviceid=$serviceid";
+			// No mistake here
+			$triggerid=$triggerid;
 		}
 		else
 		{
-			$sql="update services set name='$name',triggerid=NULL,status=0,algorithm=$algorithm where serviceid=$serviceid";
+			$triggerid='NULL';
 		}
+		if( isset($showsla)&&($showsla=="on") )
+		{
+			$showsla=1;
+		}
+		else
+		{
+			$showsla=0;
+		}
+		$sql="update services set name='$name',triggerid=$triggerid,status=0,algorithm=$algorithm,showsla=$showsla,goodsla=$goodsla where serviceid=$serviceid";
 		return	DBexecute($sql);
 	}
 
-	function	add_service($serviceid,$name,$triggerid,$linktrigger,$algorithm)
+	function	add_service($serviceid,$name,$triggerid,$linktrigger,$algorithm,$showsla,$goodsla)
 	{
+		if( isset($showsla)&&($showsla=="on") )
+		{
+			$showsla=1;
+		}
+		else
+		{
+			$showsla=0;
+		}
 		if( isset($linktrigger)&&($linktrigger=="on") )
 		{
 			$trigger=get_trigger_by_triggerid($triggerid);
@@ -1589,11 +1607,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				$description=expand_trigger_description($triggerid);
 			}
 			$description=addslashes($description);
-			$sql="insert into services (name,triggerid,status,algorithm) values ('$description',$triggerid,0,$algorithm)";
+			$sql="insert into services (name,triggerid,status,algorithm,showsla,goodsla) values ('$description',$triggerid,0,$algorithm,$showsla,$goodsla)";
 		}
 		else
 		{
-			$sql="insert into services (name,status,algorithm) values ('$name',0,$algorithm)";
+			$sql="insert into services (name,status,algorithm,showsla,goodsla) values ('$name',0,$algorithm,$showsla,$goodsla)";
 		}
 		$result=DBexecute($sql);
 		if(!$result)
@@ -3541,12 +3559,31 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return $stat;
 	}
 
+	function	get_last_service_value($serviceid,$clock)
+	{
+	       	$sql="select count(*),max(clock) from service_alarms where serviceid=$serviceid and clock<=$clock";
+//		echo " $sql<br>";
+		
+	        $result=DBselect($sql);
+		if(DBget_field($result,0,0)>0)
+		{
+	       		$sql="select clock from service_alarms where serviceid=$serviceid and clock=".DBget_field($result,0,1);
+		        $result2=DBselect($sql);
+			$value=DBget_field($result,0,0);
+		}
+		else
+		{
+			$value=0;
+		}
+		return $value;
+	}
+
 	function	calculate_service_availability($serviceid,$period_start,$period_end)
 	{
 	       	$sql="select count(*),min(clock),max(clock) from service_alarms where serviceid=$serviceid and clock>=$period_start and clock<=$period_end";
 //		echo " $sql<br>";
 		
-	        $result=DBselect($sql);
+/*	        $result=DBselect($sql);
 		if(DBget_field($result,0,0)>0)
 		{
 			$min=DBget_field($result,0,1);
@@ -3554,17 +3591,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 		else
 		{
-//	       		$sql="select max(clock) from service_alarms where serviceid=$serviceid and clock<$period_start";
-//	        	$result=DBselect($sql);
-		
 			$ret["true_time"]=0;
 			$ret["false_time"]=1;
 			$ret["true"]=0;
 			$ret["false"]=100;
 			return $ret;
-		}
+		}*/
 
-		$sql="select clock,value from service_alarms where serviceid=$serviceid and clock>=$min and clock<=$max";
+		$sql="select clock,value from service_alarms where serviceid=$serviceid and clock>=$period_start and clock<=$period_end";
 //		echo " $sql<br>";
 		$result=DBselect($sql);
 
@@ -3574,7 +3608,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		$state=-1;
 		$true_time=0;
 		$false_time=0;
-		$time=$min;
+		$time=$period_start;
 		for($i=0;$i<DBnum_rows($result);$i++)
 		{
 			$clock=DBget_field($result,$i,0);
@@ -3608,24 +3642,41 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				$state=$value;
 			}
 		}
+//		echo $true_time,"-",$false_time,"<br>";
 
 		if(DBnum_rows($result)==0)
 		{
-			$false_time=$max-$min;
+			if(get_last_service_value($serviceid,$period_start)<=1)
+			{
+				$false_time=$period_end-$period_start;
+			}
+			else
+			{
+				$true_time=$period_end-$period_start;
+			}
 		}
 		else
 		{
 			if($state<=1)
 			{
-				$false_time=$false_time+$max-$time;
+				$false_time=$false_time+$period_end-$time;
 			}
 			else
 			{
-				$true_time=$true_time+$max-$time;
+				$true_time=$true_time+$period_end-$time;
+			}
+			$clock=DBget_field($result,0,0);
+			if(get_last_service_value($serviceid,$period_start)<=1)
+			{
+				$false_time=$clock-$period_start;
+			}
+			else
+			{
+				$true_time=$clock-$period_start;
 			}
 		}
 
-		echo $true_time,"-",$false_time;
+//		echo $true_time,"-",$false_time,"<br>";
 
 		$total_time=$true_time+$false_time;
 		if($total_time==0)
