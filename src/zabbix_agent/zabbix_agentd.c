@@ -66,6 +66,7 @@ int	parent=0;
 int	stats_request=0;
 
 static	char	*CONFIG_HOSTS_ALLOWED		= NULL;
+static	char	*CONFIG_FILE			= NULL;
 static	char	*CONFIG_PID_FILE		= NULL;
 static	char	*CONFIG_LOG_FILE		= NULL;
 /*static	char	*CONFIG_STAT_FILE		= NULL;*/
@@ -209,6 +210,16 @@ int     add_parameter(char *value)
 	return  SUCCEED;
 }
 
+void usage(char *prog)
+{
+	printf("zabbix_agentd - ZABBIX agent (daemon) v1.1\n");
+	printf("Usage: %s [-h] [-c <file>]\n", prog);
+	printf("\nOptions:\n");
+	printf("  -c <file>   Specify configuration file\n");
+	printf("  -h          Help\n");
+	exit(-1);
+}
+
 void    init_config(void)
 {
 	struct cfg_line cfg[]=
@@ -228,7 +239,14 @@ void    init_config(void)
 		{"UserParameter",0,&add_parameter,0,0,0,0},
 		{0}
 	};
-	parse_cfg_file("/etc/zabbix/zabbix_agentd.conf",cfg);
+
+	if(CONFIG_FILE == NULL)
+	{
+		CONFIG_FILE=strdup("/etc/zabbix/zabbix_agentd.conf");
+	}
+
+	parse_cfg_file(CONFIG_FILE,cfg);
+
 	if(CONFIG_PID_FILE == NULL)
 	{
 		CONFIG_PID_FILE=strdup("/tmp/zabbix_agentd.pid");
@@ -385,15 +403,30 @@ pid_t	child_make(int i,int listenfd, int addrlen)
 	return 0;
 }
 
-int	main()
+int	main(int argc, char **argv)
 {
 	int		listenfd;
 	socklen_t	addrlen;
 	int		i;
 
 	char		host[128];
+	char		ch;
 
         static struct  sigaction phan;
+
+/* Parse the command-line. */
+	while ((ch = getopt(argc, argv, "c:h")) != EOF)
+		switch ((char) ch) {
+		case 'c':
+			CONFIG_FILE = optarg;
+			break;
+		case 'h':
+			usage(argv[0]);
+			break;
+		default:
+			usage(argv[0]);
+			break;
+	}
 
 	init_config();
 	daemon_init();
