@@ -1,5 +1,6 @@
 Changes for 1.0beta7:
 
+ - availability reports for trapper-based triggers (Alexei)
  - fixed possible zabbix_suckerd crash. It may happen if socket() returns 0.
    (Alexei)
  - added new Host status - Template(3). )Alexei)
