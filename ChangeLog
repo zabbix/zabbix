@@ -1,5 +1,6 @@
 Changes for 1.0beta13:
 
+ - fixed sending of alerts when PostgreSQL is used (Alexei)
  - sprintf() was replaced with snprintf() (Alexei)
  - fix for prefixes K,M and G (Alexei)
  - strncpy() was replaced with secure strscpy() where possible (Alexei)
