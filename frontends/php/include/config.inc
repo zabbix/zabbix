@@ -149,7 +149,9 @@
 		global $PHP_AUTH_USER,$PHP_AUTH_PW;
 		global $USER_DETAILS;
 
-		$sql="select g.groupid,u.userid,u.alias,u.name,u.surname from users u,groups g where u.alias='$PHP_AUTH_USER' and u.passwd='$PHP_AUTH_PW' and u.groupid=g.groupid";
+		$passwd=bin2hex(mhash (MHASH_MD5, $PHP_AUTH_PW));
+
+		$sql="select g.groupid,u.userid,u.alias,u.name,u.surname from users u,groups g where u.alias='$PHP_AUTH_USER' and u.passwd='$passwd' and u.groupid=g.groupid";
 		$result=DBselect($sql);
 		if(DBnum_rows($result)==1)
 		{
@@ -163,6 +165,7 @@
 
 		if(	($page["file"]=="latest.html")||
 			($page["file"]=="tr_status.html")||
+			($page["file"]=="tr_comments.html")||
 			($page["file"]=="queue.html")||
 			($page["file"]=="latestalarms.html")||
 			($page["file"]=="alarms.html")||
@@ -183,11 +186,11 @@
 				return;
 			}
 
-			$sql="select count(*) from users u,groups g where u.alias='$PHP_AUTH_USER' and u.passwd='$PHP_AUTH_PW' and u.groupid=g.groupid and (g.groupid=1 or g.groupid=2)";
+			$sql="select count(*) from users u,groups g where u.alias='$PHP_AUTH_USER' and u.passwd='$passwd' and u.groupid=g.groupid and (g.groupid=1 or g.groupid=2)";
 		}
 		else
 		{
-			$sql="select count(*) from users u,groups g where u.alias='$PHP_AUTH_USER' and u.passwd='$PHP_AUTH_PW' and u.groupid=g.groupid and g.groupid=1";
+			$sql="select count(*) from users u,groups g where u.alias='$PHP_AUTH_USER' and u.passwd='$passwd' and u.groupid=g.groupid and g.groupid=1";
 		}
 		$result=DBselect($sql);
 
@@ -908,9 +911,17 @@
 
 	# Update User definition
 
-	function	update_user($userid,$groupid,$name,$surname,$alias,$password)
+	function	update_user($userid,$groupid,$name,$surname,$alias,$passwd)
 	{
-		$sql="update users set groupid=$groupid,name='$name',surname='$surname',alias='$alias',passwd='$password' where userid=$userid";
+		if($passwd=="")
+		{
+			$sql="update users set groupid=$groupid,name='$name',surname='$surname',alias='$alias' where userid=$userid";
+		}
+		else
+		{
+			$passwd=bin2hex(mhash (MHASH_MD5,$passwd));
+			$sql="update users set groupid=$groupid,name='$name',surname='$surname',alias='$alias',passwd='$passwd' where userid=$userid";
+		}
 		$result=DBexecute($sql);
 		return	$result;
 	}
@@ -920,6 +931,7 @@
 
 	function	add_user($groupid,$name,$surname,$alias,$passwd)
 	{
+		$passwd=bin2hex(mhash (MHASH_MD5,$passwd));
 		$sql="insert into users (groupid,name,surname,alias,passwd) values ($groupid,'$name','$surname','$alias','$passwd')";
 		$result=DBexecute($sql);
 
@@ -1606,7 +1618,8 @@
 			$alias=DBget_field($result,0,0);
 			$name=DBget_field($result,0,1);
 			$surname=DBget_field($result,0,2);
-			$password=DBget_field($result,0,3);
+#			$password=DBget_field($result,0,3);
+			$password="";
 			$groupid_=DBget_field($result,0,4);
 		}
 		else

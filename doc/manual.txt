@@ -289,7 +289,10 @@ Zabbix requires the following software to run properly:
   - MySQL 3.22 or later
   or
   - PostgreSQL 7.0.2 or later
- - PHP 4.0 or later, compiled as Apache module with GD (for PNG images) with support of PostgreSQL or MySQL
+ - PHP 4.0 or later, compiled as Apache module with 
+ 	- GD module (for PNG images)
+	- MySQL of PostgreSQL module
+	- mhash module (encrypted passwords)
  - GNU make
  - WEB browser on client side (support for HTML and PNG images required). MS Explorer and Netscape work perfectly.
  - UCD-SNMP library and header files. Required for support of SNMP agents. Optional.
