@@ -1,4 +1,16 @@
 #
+# Table structure for table 'graphs_items'
+#
+
+CREATE TABLE graphs_items (
+  gitemid		int(4)		NOT NULL auto_increment,
+  graphid		int(4)		DEFAULT '0' NOT NULL,
+  itemid		int(4)		DEFAULT '0' NOT NULL,
+  PRIMARY KEY (gitemid)
+);
+# Foreign keys
+
+#
 # Table structure for table 'graphs'
 #
 
@@ -10,6 +22,7 @@ CREATE TABLE graphs (
   PRIMARY KEY (graphid),
   UNIQUE (name)
 );
+# Foreign keys
 
 #
 # Table structure for table 'sysmaps_hosts'
