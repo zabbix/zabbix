@@ -1,3 +1,20 @@
+TODO:
+
+After using zabbix for a week monitoring 4 linux and 1 sun machine I have a
+small wish-list:
+
+- PHP front end
+ 1. Add items for all hosts at once
+ 2. Add triggers for all hosts at once
+
+- Agent
+ 1. An API so that I can build and active agent into
+    the centralized monitoring point of my application.
+ 2. max/min/average values during the poll pause along with last value to catch
+CPU spikes otherwise invisible (have had these problems with BMC Patrol).
+ 3. Ability to add a library of  userwritten c-functions with dlopen/dlsym to
+the agent with a predefined API that can return values to suckerd.
+
 Not ready yet:
 
  - network monitoring + monitoring of services for different interfaces
