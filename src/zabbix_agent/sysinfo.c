@@ -1397,7 +1397,7 @@ float	DISK_WBLK(void)
 
 char	*VERSION(void)
 {
-	static	char	version[]="1.0beta6\n";
+	static	char	version[]="1.0beta7\n";
 
 	return	version;
 }

@@ -24,13 +24,13 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.30)
+Zabbix Reference Manual for version 1.0 (draft v1.31)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-22 September 2002
+07 October 2002
 \layout Abstract
 
 The document is Reference Manual for Zabbix version 1.0.
@@ -1207,7 +1207,22 @@ Zabbix
 \newline 
 
 \newline 
-For MySQL: 
+For MySQL:
+\begin_float footnote 
+\layout Standard
+
+In order to use InnoDB type of table, schema.sql should be manually modified.
+ Each table definition should be in form 
+\begin_inset Quotes eld
+\end_inset 
+
+create table <table name> (<table definition>) type=InnoDB
+\begin_inset Quotes erd
+\end_inset 
+
+.
+\end_float 
+ 
 \newline 
 
 \newline 
