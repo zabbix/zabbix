@@ -25,6 +25,8 @@
 #include "sysinfo.h"
 #include "zabbix_agent.h"
 
+char	*config_host_allowed=NULL;
+
 void	signal_handler( int sig )
 {
 	if( SIGALRM == sig )
@@ -38,31 +40,91 @@ void	signal_handler( int sig )
 	exit( FAIL );
 }
 
+void	process_config_file(void)
+{
+	FILE	*file;
+	char	line[1024];
+	char	parameter[1024];
+	char	*value;
+	char	*value2;
+	int	lineno;
+
+	file=fopen("/etc/zabbix/zabbix_agent.conf","r");
+	if(NULL == file)
+	{
+//		syslog( LOG_CRIT, "Cannot open /etc/zabbix/zabbix_agentd.conf");
+		exit(1);
+	}
+
+	lineno=1;
+	while(fgets(line,1024,file) != NULL)
+	{
+		if(line[0]=='#')	continue;
+		if(strlen(line)==1)	continue;
+
+		strcpy(parameter,line);
+
+		value=strstr(line,"=");
+
+		if(NULL == value)
+		{
+//			syslog( LOG_CRIT, "Error in line [%s] Line %d", line, lineno);
+			fclose(file);
+			exit(1);
+		}
+		value++;
+		value[strlen(value)-1]=0;
+
+		parameter[value-line-1]=0;
+
+//		syslog( LOG_DEBUG, "Parameter [%s] Value [%s]", parameter, value);
+
+		if(strcmp(parameter,"Server")==0)
+		{
+			config_host_allowed=(char *)malloc(strlen(value));
+			strcpy(config_host_allowed,value);
+		}
+		else if(strcmp(parameter,"UserParameter")==0)
+		{
+			value2=strstr(value,",");
+			if(NULL == value2)
+			{
+//				syslog( LOG_CRIT, "Error in line [%s] Line %d Symbol ',' expected", line, lineno);
+				fclose(file);
+				exit(1);
+			}
+			value2[0]=0;
+			value2++;
+//			syslog( LOG_WARNING, "Added user-defined parameter [%s] Command [%s]", value, value2);
+			add_user_parameter(value, value2);
+		}
+		else
+		{
+//			syslog( LOG_CRIT, "Unsupported parameter [%s] Line %d", parameter, lineno);
+			fclose(file);
+			exit(1);
+		}
+
+		lineno++;
+	}
+	fclose(file);
+}
+
 int	check_security(void)
 {
 	char	*sname;
 	char	*config;
 	struct	sockaddr_in name;
 	int	i;
-	int	file;
 
 	if(getpeername(0,  (struct sockaddr *)&name, (size_t *)&i) == 0)
 	{
 		config=(char *)malloc(16);
 
-		file=open("/etc/zabbix/zabbix_agent.conf",O_RDONLY);
-		if(file == -1)
-		{
-			return FAIL;
-		}
-		i=read(file, config, 16);
-		config[i-1]=0;
-		close(file);
-
 		i=sizeof(struct sockaddr_in);
 
 		sname=inet_ntoa(name.sin_addr);
-		if(strcmp(sname,config)!=0)
+		if(strcmp(sname,config_host_allowed)!=0)
 		{
 			return	FAIL;
 		}
@@ -85,10 +147,6 @@ int	main()
 	test_parameters();
 	return	SUCCEED;
 #endif
-	if(check_security() == FAIL)
-	{
-		exit(FAIL);
-	}
 
 	signal( SIGINT,  signal_handler );
 	signal( SIGQUIT, signal_handler );
@@ -96,6 +154,13 @@ int	main()
 	signal( SIGALRM, signal_handler );
 
 	alarm(AGENT_TIMEOUT);
+
+	process_config_file();
+
+	if(check_security() == FAIL)
+	{
+		exit(FAIL);
+	}
 
 	printf("%f\n",process_input());
 
