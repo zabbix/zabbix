@@ -59,6 +59,10 @@
 
 <?
 	$Expression=explode_exp($Expression,1);
+	if( strstr($Description,"%s"))
+	{
+		$Description=expand_trigger_description($trigger["triggerid"]);
+	}
 	show_table_header("$Description<BR><font size=-1>$Expression</font>");
 ?>
 

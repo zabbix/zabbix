@@ -545,36 +545,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		exit;
 	}
 
-//	function	check_authorisation()
-//	{
-//		global	$reconnect;	
-//		global	$page;
-//		global	$PHP_AUTH_USER,$PHP_AUTH_PW;
-//		global	$USER_DETAILS;
-//
-//		$passwd=md5($PHP_AUTH_PW);
-//
-//		$sql="select u.userid,u.alias,u.name,u.surname from users u where u.alias='$PHP_AUTH_USER' and u.passwd='$passwd'";
-//		$result=DBselect($sql);
-//		if(DBnum_rows($result)==1)
-//		{
-//			$USER_DETAILS["userid"]=DBget_field($result,0,0);
-//			$USER_DETAILS["alias"]=DBget_field($result,0,1);
-//			$USER_DETAILS["name"]=DBget_field($result,0,2);
-//			$USER_DETAILS["surname"]=DBget_field($result,0,3);
-//		}
-//
-//		if(DBnum_rows($result)!=1)
-//		{
-//			Header("WWW-authenticate: basic realm=\"Zabbix\"");
-//			Header("HTTP/1.0 401 Unauthorized");
-//
-//			echo "Try to contact Zabbix Administrator to get additional rights :-)\n";
-//			exit;
-//		}
-//	}
-
-	
 	# Header for HTML pages
 
 	function	show_header($title,$refresh,$nomenu)
@@ -1244,6 +1214,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	function	expand_trigger_description($triggerid)
 	{
 		$sql="select distinct t.description,h.host from triggers t,functions f,items i,hosts h where t.triggerid=$triggerid and f.triggerid=t.triggerid and f.itemid=i.itemid and i.hostid=h.hostid";
+//		echo $sql;
 		$result=DBselect($sql);
 		$row=DBfetch($result);
 
@@ -2546,8 +2517,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$tmp=$period/3600;
 			show_table_header("TILL $till ($tmp HOURs)");
 		}
-		echo("<hr>");
+//		echo("<hr>");
 		echo "<center>";
+		echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+		echo "<TR BGCOLOR=#EEEEEE>";
+		echo "<TR BGCOLOR=#DDDDDD>";
+		echo "<TD ALIGN=CENTER>";
 
 		if($diff==0)
 		{
@@ -2557,6 +2532,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 			echo "<IMG SRC=\"chart_diff.php?itemid=$itemid&period=$period&from=$from\">";
 		}
+		echo "</TD>";
+		echo "</TR>";
+		echo "</TABLE>";
 		echo "</center>";
 		echo("<hr>");
 		insert_time_navigator($itemid,$period,$from);

@@ -171,6 +171,7 @@ char	*DBget_field(DB_RESULT *result, int rownum, int fieldnum)
  */ 
 int	DBis_empty(DB_RESULT *result)
 {
+	zabbix_log(LOG_LEVEL_DEBUG, "In DBis_empty");
 	if(result == NULL)
 	{
 		return	SUCCEED;
@@ -195,6 +196,7 @@ int	DBis_empty(DB_RESULT *result)
  */ 
 int	DBnum_rows(DB_RESULT *result)
 {
+	zabbix_log(LOG_LEVEL_DEBUG, "In DBnum_rows");
 #ifdef	HAVE_MYSQL
 	return mysql_num_rows(result);
 #endif

@@ -36,10 +36,10 @@
 	$result2=DBselect("select gi.itemid,i.description,gi.color,h.host from graphs_items gi,items i,hosts h where gi.itemid=i.itemid and gi.graphid=$graphid and i.hostid=h.hostid order by gi.gitemid");
 
 	$shiftX=10;
-	$shiftYup=10;
+	$shiftYup=13;
 	$shiftYdown=7+15*DBnum_rows($result2);
 
-	$im = imagecreate($sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10); 
+	$im = imagecreate($sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10+50); 
   
 	$red=ImageColorAllocate($im,255,0,0); 
 	$darkred=ImageColorAllocate($im,150,0,0); 
@@ -68,16 +68,20 @@
 	$x=imagesx($im); 
 	$y=imagesy($im);
   
-	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10,$black);
+	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10+50,$white);
+	ImageRectangle($im,0,0,$x-1,$y-1,$black);
 
-	for($i=0;$i<=$sizeY;$i+=50)
+	for($i=0;$i<=$sizeY;$i+=$sizeY/5)
 	{
-		ImageDashedLine($im,$shiftX,$i+$shiftYup,$sizeX+$shiftX,$i+$shiftYup,$darkgreen);
+		ImageDashedLine($im,$shiftX,$i+$shiftYup,$sizeX+$shiftX,$i+$shiftYup,$gray);
 	}
-	for($i=0;$i<=$sizeX;$i+=50)
+	for($i=0;$i<=$sizeX;$i+=$sizeX/24)
 	{
-		ImageDashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$darkgreen);
+		ImageDashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
 	}
+
+	$graph=get_graph_by_graphid($graphid);
+	ImageString($im, 4,$sizeX/2-50,-1, $graph["name"] , $darkred);
 
 	$from_time = time(NULL)-$period-3600*$from;
 	$to_time   = time(NULL)-3600*$from;
@@ -149,21 +153,26 @@
 		}
 #		ImageFilledRectangle($im,$shiftX+200*$item,$sizeY+$shiftYup+19,$shiftX+200*$item+5,$sizeY+$shiftYup+15+9,$colors[$color[$item]]);
 #		ImageString($im, 2,$shiftX+200*$item+9,$sizeY+$shiftYup+15, $desc[$item], $gray);
-		ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*$item,$shiftX+5,$sizeY+$shiftYup+15+9+15*$item,$colors[$color[$item]]);
-		ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*$item+15, $host[$item].": ".$desc[$item], $gray);
+		ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*$item+45,$shiftX+5,$sizeY+$shiftYup+15+9+15*$item+45,$colors[$color[$item]]);
+		ImageRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*$item+45,$shiftX+5,$sizeY+$shiftYup+15+9+15*$item+45,$black);
+		ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*$item+15+45, $host[$item].": ".$desc[$item], $black);
 	}
 
 	if($nodata == 0)
 	{
-		for($i=0;$i<=$sizeY;$i+=50)
+		for($i=0;$i<=$sizeY;$i+=$sizeY/5)
 		{
-			ImageString($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftYup, $i*($maxY-$minY)/$sizeY+$minY , $red);
+			ImageString($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftYup, $i*($maxY-$minY)/$sizeY+$minY , $darkred);
+		}
+		for($i=0;$i<=$sizeX;$i+=$sizeX/24)
+		{
+			ImageStringUp($im,0,$i+$shiftX-3,$shiftYup+$sizeY+53,date("H:i:s",$i*($maxX-$minX)/$sizeX+$minX),$black);
 		}
 
 //		date("dS of F Y h:i:s A",DBget_field($result,0,0));
 
-		ImageString($im, 1,10,                $sizeY+$shiftYup+5, date("dS of F Y h:i:s A",$minX) , $red);
-		ImageString($im, 1,$sizeX+$shiftX-168,$sizeY+$shiftYup+5, date("dS of F Y h:i:s A",$maxX) , $red);
+		ImageString($im, 1,10,                $sizeY+$shiftYup+5, date("dS of F Y h:i:s A",$minX) , $darkred);
+		ImageString($im, 1,$sizeX+$shiftX-168,$sizeY+$shiftYup+5, date("dS of F Y h:i:s A",$maxX) , $darkred);
 	}
 	else
 	{
