@@ -17,8 +17,60 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
+#include "common.h"
 #include "checks_internal.h"
 
+#ifdef ZABBIX_THREADS
+int	get_value_internal(double *result,char *result_str,DB_ITEM *item)
+{
+	DB_HANDLE	database;
+
+	DBconnect_thread(&database);
+
+	if(strcmp(item->key,"zabbix[triggers]")==0)
+	{
+		*result=DBget_triggers_count_thread(&database);
+	}
+	else if(strcmp(item->key,"zabbix[items]")==0)
+	{
+		*result=DBget_items_count_thread(&database);
+	}
+	else if(strcmp(item->key,"zabbix[items_unsupported]")==0)
+	{
+		*result=DBget_items_unsupported_count_thread(&database);
+	}
+	else if(strcmp(item->key,"zabbix[history]")==0)
+	{
+		*result=DBget_history_count_thread(&database);
+	}
+	else if(strcmp(item->key,"zabbix[history_str]")==0)
+	{
+		*result=DBget_history_str_count_thread(&database);
+	}
+	else if(strcmp(item->key,"zabbix[trends]")==0)
+	{
+		*result=DBget_trends_count_thread(&database);
+	}
+	else if(strcmp(item->key,"zabbix[queue]")==0)
+	{
+		*result=DBget_queue_count_thread(&database);
+	}
+	else
+	{
+		DBclose_thread(&database);
+		return NOTSUPPORTED;
+	}
+
+	snprintf(result_str,MAX_STRING_LEN-1,"%f",*result);
+
+	zabbix_log( LOG_LEVEL_DEBUG, "INTERNAL [%s] [%f]", result_str, *result);
+
+	DBclose_thread(&database);
+
+	return SUCCEED;
+}
+
+#else
 int	get_value_internal(double *result,char *result_str,DB_ITEM *item)
 {
 	if(strcmp(item->key,"zabbix[triggers]")==0)
@@ -59,3 +111,4 @@ int	get_value_internal(double *result,char *result_str,DB_ITEM *item)
 	zabbix_log( LOG_LEVEL_DEBUG, "INTERNAL [%s] [%f]", result_str, *result);
 	return SUCCEED;
 }
+#endif

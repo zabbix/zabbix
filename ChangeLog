@@ -1,5 +1,6 @@
 Changes for 1.1alpha1:
 
+ - change of architecture to multi-threaded model (Alexei)
  - fixed typo: getuid() -> getgid() in daemon_init() (Alexei)
  - added housekeeping of trends (Alexei)
  - added column items.trends (Alexei)
