@@ -233,9 +233,10 @@ else
 
 	if($nodata == 0)
 	{
+		$item=get_item_by_itemid($HTTP_GET_VARS["itemid"]);
 		for($i=0;$i<=$sizeY;$i+=$sizeY/5)
 		{
-			ImageString($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftY, $i*($maxY-$minY)/$sizeY+$minY , $darkred);
+			ImageString($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftY, convert_units($i*($maxY-$minY)/$sizeY+$minY,$item["units"],$item["multiplier"]) , $darkred);
 		}
 
 //		date("dS of F Y h:i:s A",DBget_field($result,0,0));

@@ -334,7 +334,15 @@
 	{
 		for($i=0;$i<=$my_steps;$i++)
 		{
-			ImageString($im, 1, $sizeX+5+$shiftX, $i/$my_steps*$sizeY+$shiftYup-4, $maxY-$i/$my_steps*($maxY-$minY) , $darkred);
+			if(isset($itemid))
+			{
+				$z=get_item_by_itemid($itemid);
+				ImageString($im, 1, $sizeX+5+$shiftX, $i/$my_steps*$sizeY+$shiftYup-4, convert_units($maxY-$i/$my_steps*($maxY-$minY),$z["units"],$z["multiplier"]) , $darkred);
+			}
+			else
+			{
+				ImageString($im, 1, $sizeX+5+$shiftX, $i/$my_steps*$sizeY+$shiftYup-4, $maxY-$i/$my_steps*($maxY-$minY) , $darkred);
+			}
 		}
 		for($j=$stepTime-$correctTime;$j<=($maxX-$minX);$j+=$stepTime)
 		{
