@@ -544,6 +544,8 @@ int	evaluate_FUNCTION_thread(MYSQL *database, char *value,DB_ITEM *item,char *fu
 	float	value_float_abs;
 	char	suffix[MAX_STRING_LEN];
 
+	int	day;
+
 	zabbix_log( LOG_LEVEL_DEBUG, "Function [%s]",function);
 
 	if(strcmp(function,"last")==0)
@@ -622,6 +624,15 @@ int	evaluate_FUNCTION_thread(MYSQL *database, char *value,DB_ITEM *item,char *fu
 		now=time(NULL);
                 tm=localtime(&now);
                 snprintf(value,MAX_STRING_LEN-1,"%.4d%.2d%.2d",tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday);
+	}
+	else if(strcmp(function,"dayofweek")==0)
+	{
+		now=time(NULL);
+                tm=localtime(&now);
+		/* The number of days since Sunday, in the range 0 to 6. */
+		day=tm->tm_wday;
+		if(0 == day)	day=7;
+                snprintf(value,MAX_STRING_LEN-1,"%d", day);
 	}
 	else if(strcmp(function,"time")==0)
 	{
@@ -805,6 +816,8 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
 	float	value_float_abs;
 	char	suffix[MAX_STRING_LEN];
 
+	int	day;
+
 	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() Function [%s] flag [%d]",function,flag);
 
 	if(strcmp(function,"last")==0)
@@ -883,6 +896,15 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
 		now=time(NULL);
                 tm=localtime(&now);
                 snprintf(value,MAX_STRING_LEN-1,"%.4d%.2d%.2d",tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday);
+	}
+	else if(strcmp(function,"dayofweek")==0)
+	{
+		now=time(NULL);
+                tm=localtime(&now);
+		/* The number of days since Sunday, in the range 0 to 6. */
+		day=tm->tm_wday;
+		if(0 == day)	day=7;
+                snprintf(value,MAX_STRING_LEN-1,"%d", day);
 	}
 	else if(strcmp(function,"time")==0)
 	{
