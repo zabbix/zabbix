@@ -28,9 +28,10 @@ td.form_row
 	color: #FFFFFF;
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:10px;
-	background-color: #8dA8Cd;
+#	background-color: #8dA8Cd;
+	background-color: #6d88ad;
 	border-color: #000000;
-	border-width:1px;
+	border-width:0px;
 	border-top-style: solid;
 	border-left-style: solid;
 	border-right-style: solid;

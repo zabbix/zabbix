@@ -1614,7 +1614,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				"pages"=>array("latest.php","tr_status.php","queue.php","latestalarms.php","alerts.php","maps.php","charts.php","screens.php","srv_status.php"),
 				"level2"=>array(
 					array("label"=>"Latest data","url"=>"latest.php"),
-					array("label"=>"Triggers","url"=>"tr_status.php?onlytrue=true&noactions=true&compact=true.php"),
+					array("label"=>"Triggers","url"=>"tr_status.php?onlytrue=true&noactions=true&compact=true"),
 					array("label"=>"Queue","url"=>"queue.php"),
 					array("label"=>"Alarms","url"=>"latestalarms.php"),
 					array("label"=>"Alerts","url"=>"alerts.php"),
@@ -3680,7 +3680,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 ?>
 	<p align=center>
-	<table class="form" width="100%" cellspacing=0 cellpadding=1>
+	<table class="form" width="50%" cellspacing=0 cellpadding=1>
 	<tr>
 	<td class="form_row" height=24 colspan=2>
 <?php
