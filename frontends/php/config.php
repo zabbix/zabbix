@@ -96,6 +96,7 @@
 	$h2=$h2."<option value=\"0\" ".iif(isset($_GET["config"])&&$_GET["config"]==0,"selected","").">".S_HOUSEKEEPER;
 	$h2=$h2."<option value=\"1\" ".iif(isset($_GET["config"])&&$_GET["config"]==1,"selected","").">".S_MEDIA_TYPES;
 	$h2=$h2."<option value=\"2\" ".iif(isset($_GET["config"])&&$_GET["config"]==2,"selected","").">".S_ESCALATION_RULES;
+	$h2=$h2."<option value=\"3\" ".iif(isset($_GET["config"])&&$_GET["config"]==3,"selected","").">".S_IMAGES;
 	$h2=$h2."</select>";
 
 	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"config.php\">", "</form>");
@@ -105,12 +106,10 @@
 ?>
 
 <?php
-	$config=select_config();
-?>
-
-<?php
 	if($_GET["config"]==0)
 	{
+		$config=select_config();
+
 		$col=0;
 		show_form_begin("config");
 		echo S_HOUSEKEEPER;
@@ -134,10 +133,100 @@
 ?>
 
 <?php
+	if($_GET["config"]==3)
+	{
+		echo "<br>";
+		show_table_header(S_IMAGES_BIG);
+
+		table_begin();
+		table_header(array(S_ID,S_TYPE,S_NAME,S_ACTIONS));
+
+		$result=DBselect("select imageid,imagetype,name,image from images order by name");
+		$col=0;
+		while($row=DBfetch($result))
+		{
+			if($row["imagetype"]==1)
+			{
+				$imagetype=S_ICON;
+			}
+			else if($row["imagetype"]==2)
+			{
+				$imagetype=S_BACKGROUND;
+			}
+			else
+			{
+				$imagetype=S_UNKNOWN;
+			}
+			$actions="<a href=\"image.php?imageid=".$row["imageid"]."\">".S_SHOW."</a>";
+			$actions=$actions." :: <a href=\"config.php?config=3&register=change&imageid=".$row["imageid"]."\">".S_CHANGE."</a>";
+			table_row(array(
+				$row["imageid"],
+				$imagetype,
+				$row["name"],
+//				"<img src=\"image.php?imageid=".$row["imageid"]."\">",
+				$actions),$col++);
+		}
+		if(DBnum_rows($result)==0)
+		{
+				echo "<TR BGCOLOR=#EEEEEE>";
+				echo "<TD COLSPAN=4 ALIGN=CENTER>".S_NO_IMAGES_DEFINED."</TD>";
+				echo "<TR>";
+		}
+		table_end();
+
+		if(!isset($_GET["imageid"]))
+		{
+			$name="";
+			$type=1;
+		}
+		else
+		{
+			$result=DBselect("select imageid,imagetype,name,image from images where imageid=".$_GET["imageid"]);
+			$row=DBfetch($result);
+			$name=$row["name"];
+			$type=$row["type"];
+		}
+
+		$col=0;
+		show_form_begin("config");
+		echo S_IMAGE;
+
+		show_table2_v_delimiter($col++);
+		echo "<form method=\"get\" action=\"config.php\">";
+		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"3\" size=8>";
+		echo nbsp(S_NAME);
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"name\" value=\"".$name."\" size=8>";
+
+		show_table2_v_delimiter($col++);
+		echo S_TYPE;
+		show_table2_h_delimiter();
+		echo "<select class=\"biginput\" name=\"imagetype\" size=\"1\">";
+		if($imagetype==1)
+		{
+			echo "<option value=\"1\" selected>".S_ICON;
+			echo "<option value=\"2\">".S_BACKGROUND;
+		}
+		else
+		{
+			echo "<option value=\"1\">".S_ICON;
+			echo "<option value=\"2\" selected>".S_BACKGROUND;
+		}
+		echo "</select>";
+
+
+		show_table2_v_delimiter2();
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
+
+		show_table2_header_end();
+	}
+?>
+
+<?php
 	if($_GET["config"]==1)
 	{
 		echo "<br>";
-		show_table_header(S_AVAILABLE_MEDIA_TYPES);
+		show_table_header(S_MEDIA_TYPES_BIG);
 
 		table_begin();
 		table_header(array(S_ID,S_TYPE,S_DESCRIPTION_SMALL,S_ACTIONS));
@@ -217,7 +306,6 @@
 		show_table2_v_delimiter($col++);
 		echo S_TYPE;
 		show_table2_h_delimiter();
-//	echo "<select class=\"biginput\" name=\"type\" size=\"1\" onChange=\"doSelect(this,'sel_dmk')\">";
 		echo "<select class=\"biginput\" name=\"type\" size=\"1\" onChange=\"submit()\">";
 		if($type==0)
 		{
