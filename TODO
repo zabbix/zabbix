@@ -29,6 +29,7 @@ Not ready yet:
 
  OTHER:
 
+ - BUG. Check why check_service[nntp] is 1
  - support for complex reports
  - mass updates/inserts
  - get rid of long select lists in user forms 
