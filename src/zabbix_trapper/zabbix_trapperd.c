@@ -4,8 +4,6 @@
 
 #include <netdb.h>
 
-#include <syslog.h>
-
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -28,6 +26,7 @@
 
 #include "common.h"
 #include "db.h"
+#include "log.h"
 #include "functions.h"
 
 #define	LISTENQ 1024
@@ -61,7 +60,7 @@ void	uninit(void)
 
 		if( unlink(CONFIG_PID_FILE) != 0)
 		{
-			syslog( LOG_WARNING, "Cannot remove PID file [%s]",
+			zabbix_log( LOG_LEVEL_WARNING, "Cannot remove PID file [%s]",
 				CONFIG_PID_FILE);
 		}
 	}
@@ -75,7 +74,7 @@ void	create_pid_file(void)
 	f = fopen(CONFIG_PID_FILE, "r");
 	if(f != NULL)
 	{
-		syslog( LOG_CRIT, "File [%s] exists. Is zabbix_agentd already running ?",
+		zabbix_log( LOG_LEVEL_CRIT, "File [%s] exists. Is zabbix_agentd already running ?",
 			CONFIG_PID_FILE);
 		fclose(f);
 		exit(-1);
@@ -85,7 +84,7 @@ void	create_pid_file(void)
 
 	if( f == NULL)
 	{
-		syslog( LOG_CRIT, "Cannot create PID file [%s]. Errno [%d]",
+		zabbix_log( LOG_LEVEL_CRIT, "Cannot create PID file [%s]. Errno [%d]",
 			CONFIG_PID_FILE, errno);
 		uninit();
 		exit(-1);
@@ -100,23 +99,23 @@ void	signal_handler( int sig )
 	if( SIGALRM == sig )
 	{
 		signal( SIGALRM, signal_handler );
-		syslog( LOG_WARNING, "Timeout while answering request");
+		zabbix_log( LOG_LEVEL_WARNING, "Timeout while answering request");
 	}
 	else if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
 	{
-		syslog( LOG_WARNING, "Got signal. Exiting ...");
+		zabbix_log( LOG_LEVEL_WARNING, "Got signal. Exiting ...");
 		uninit();
 		exit( FAIL );
 	}
 	else if( SIGCHLD == sig )
 	{
-		syslog( LOG_WARNING, "One child process died. Exiting ...");
+		zabbix_log( LOG_LEVEL_WARNING, "One child process died. Exiting ...");
 		uninit();
 		exit( FAIL );
 	}
 	else
 	{
-		syslog( LOG_WARNING, "Got signal [%d]. Ignoring ...", sig);
+		zabbix_log( LOG_LEVEL_WARNING, "Got signal [%d]. Ignoring ...", sig);
 	}
 }
 
@@ -133,7 +132,7 @@ void	process_config_file(void)
 	file=fopen("/etc/zabbix/zabbix_trapperd.conf","r");
 	if(NULL == file)
 	{
-		syslog( LOG_CRIT, "Cannot open /etc/zabbix/zabbix_trapperd.conf");
+		zabbix_log( LOG_LEVEL_CRIT, "Cannot open /etc/zabbix/zabbix_trapperd.conf");
 		exit(1);
 	}
 
@@ -151,7 +150,7 @@ void	process_config_file(void)
 
 		if(NULL == value)
 		{
-			syslog( LOG_CRIT, "Error in line [%s] Line %d", line, lineno);
+			zabbix_log( LOG_LEVEL_CRIT, "Error in line [%s] Line %d", line, lineno);
 			fclose(file);
 			exit(1);
 		}
@@ -160,14 +159,14 @@ void	process_config_file(void)
 
 		parameter[value-line-1]=0;
 
-		syslog( LOG_DEBUG, "Parameter [%s] Value [%s]", parameter, value);
+		zabbix_log( LOG_LEVEL_DEBUG, "Parameter [%s] Value [%s]", parameter, value);
 
 		if(strcmp(parameter,"StartTrappers")==0)
 		{
 			i=atoi(value);
 			if( (i<2) || (i>255) )
 			{
-				syslog( LOG_CRIT, "Wrong value of StartTrappers in line %d. Should be between 2 and 255.", lineno);
+				zabbix_log( LOG_LEVEL_CRIT, "Wrong value of StartTrappers in line %d. Should be between 2 and 255.", lineno);
 				fclose(file);
 				exit(1);
 			}
@@ -178,7 +177,7 @@ void	process_config_file(void)
 			i=atoi(value);
 			if( (i<1) || (i>30) )
 			{
-				syslog( LOG_CRIT, "Wrong value of Timeout in line %d. Should be between 1 and 30.", lineno);
+				zabbix_log( LOG_LEVEL_CRIT, "Wrong value of Timeout in line %d. Should be between 1 and 30.", lineno);
 				fclose(file);
 				exit(1);
 			}
@@ -189,7 +188,7 @@ void	process_config_file(void)
 			i=atoi(value);
 			if( (i<=1024) || (i>32767) )
 			{
-				syslog( LOG_CRIT, "Wrong value of ListenPort in line %d. Should be between 1024 and 32768.", lineno);
+				zabbix_log( LOG_LEVEL_CRIT, "Wrong value of ListenPort in line %d. Should be between 1024 and 32768.", lineno);
 				fclose(file);
 				exit(1);
 			}
@@ -199,19 +198,19 @@ void	process_config_file(void)
 		{
 			if(strcmp(value,"1") == 0)
 			{
-				setlogmask(LOG_UPTO(LOG_CRIT));
+//				setlogmask(LOG_LEVEL_UPTO(LOG_CRIT));
 			}
 			else if(strcmp(value,"2") == 0)
 			{
-				setlogmask(LOG_UPTO(LOG_WARNING));
+//				setlogmask(LOG_UPTO(LOG_WARNING));
 			}
 			else if(strcmp(value,"3") == 0)
 			{
-				setlogmask(LOG_UPTO(LOG_DEBUG));
+//				setlogmask(LOG_UPTO(LOG_DEBUG));
 			}
 			else
 			{
-				syslog( LOG_CRIT, "Wrong DebugLevel in line %d", lineno);
+				zabbix_log( LOG_LEVEL_CRIT, "Wrong DebugLevel in line %d", lineno);
 				fclose(file);
 				exit(1);
 			}
@@ -238,7 +237,7 @@ void	process_config_file(void)
 		}
 		else
 		{
-			syslog( LOG_CRIT, "Unsupported parameter [%s] Line %d", parameter, lineno);
+			zabbix_log( LOG_LEVEL_CRIT, "Unsupported parameter [%s] Line %d", parameter, lineno);
 			fclose(file);
 			exit(1);
 		}
@@ -247,7 +246,7 @@ void	process_config_file(void)
 	
 	if(CONFIG_DBNAME == NULL)
 	{
-		syslog( LOG_CRIT, "DBName not in config file");
+		zabbix_log( LOG_LEVEL_CRIT, "DBName not in config file");
 		exit(1);
 	}
 	if(CONFIG_PID_FILE == NULL)
@@ -348,9 +347,12 @@ void    daemon_init(void)
 		close(i);
 	}
 
-	openlog("zabbix_trapperd",LOG_PID,LOG_USER);
-/*	setlogmask(LOG_UPTO(LOG_DEBUG));*/ 
-	setlogmask(LOG_UPTO(LOG_WARNING));
+/*	openlog("zabbix_trapperd",LOG_PID,LOG_USER);
+	setlogmask(LOG_UPTO(LOG_DEBUG));*
+	setlogmask(LOG_UPTO(LOG_WARNING));*/
+
+	zabbix_open_log(LOG_TYPE_FILE,LOG_LEVEL_WARNING,"/tmp/tmp.zzz");
+
 }
 
 void	process_child(int sockfd)
@@ -367,27 +369,27 @@ void	process_child(int sockfd)
 
 	alarm(CONFIG_TIMEOUT);
 
-	syslog( LOG_DEBUG, "Before read()");
+	zabbix_log( LOG_LEVEL_DEBUG, "Before read()");
 	if( (nread = read(sockfd, line, 1024)) < 0)
 	{
 		if(errno == EINTR)
 		{
-			syslog( LOG_DEBUG, "Read timeout");
+			zabbix_log( LOG_LEVEL_DEBUG, "Read timeout");
 		}
 		else
 		{
-			syslog( LOG_DEBUG, "read() failed");
+			zabbix_log( LOG_LEVEL_DEBUG, "read() failed");
 		}
-		syslog( LOG_DEBUG, "After read() 1");
+		zabbix_log( LOG_LEVEL_DEBUG, "After read() 1");
 		alarm(0);
 		return;
 	}
 
-	syslog( LOG_DEBUG, "After read() 2 [%d]",nread);
+	zabbix_log( LOG_LEVEL_DEBUG, "After read() 2 [%d]",nread);
 
 	line[nread-1]=0;
 
-	syslog( LOG_DEBUG, "Got line:%s", line);
+	zabbix_log( LOG_LEVEL_DEBUG, "Got line:%s", line);
 	if( SUCCEED == process(line) )
 	{
 		sprintf(result,"OK\n");
@@ -396,7 +398,7 @@ void	process_child(int sockfd)
 	{
 		sprintf(result,"NOT OK\n");
 	}
-	syslog( LOG_DEBUG, "Sending back:%s", result);
+	zabbix_log( LOG_LEVEL_DEBUG, "Sending back:%s", result);
 	write(sockfd,result,strlen(result));
 	alarm(0);
 }
@@ -408,7 +410,7 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 
 	if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
-		syslog( LOG_CRIT, "Cannot create socket");
+		zabbix_log( LOG_LEVEL_CRIT, "Cannot create socket");
 		exit(1);
 	}
 
@@ -419,13 +421,13 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 
 	if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 	{
-		syslog( LOG_CRIT, "Cannot bind to port %d. Another zabbix_trapperd running ?", port);
+		zabbix_log( LOG_LEVEL_CRIT, "Cannot bind to port %d. Another zabbix_trapperd running ?", port);
 		exit(1);
 	}
 	
 	if(listen(sockfd, LISTENQ) !=0 )
 	{
-		syslog( LOG_CRIT, "listen() failed");
+		zabbix_log( LOG_LEVEL_CRIT, "listen() failed");
 		exit(1);
 	}
 
@@ -442,7 +444,7 @@ void	child_main(int i,int listenfd, int addrlen)
 
 	cliaddr=malloc(addrlen);
 
-	syslog( LOG_WARNING, "zabbix_trapperd %ld started",(long)getpid());
+	zabbix_log( LOG_LEVEL_WARNING, "zabbix_trapperd %ld started",(long)getpid());
 
 	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
 
@@ -503,11 +505,11 @@ int	main()
 	sigaction(SIGTERM, &phan, NULL);
 	sigaction(SIGCHLD, &phan, NULL);
 
-	syslog( LOG_WARNING, "zabbix_trapperd started");
+	zabbix_log( LOG_LEVEL_WARNING, "zabbix_trapperd started");
 
 	if(gethostname(host,127) != 0)
 	{
-		syslog( LOG_CRIT, "gethostname() failed");
+		zabbix_log( LOG_LEVEL_CRIT, "gethostname() failed");
 		exit(FAIL);
 	}
 
@@ -518,7 +520,7 @@ int	main()
 	for(i = 0; i< CONFIG_TRAPPERD_FORKS; i++)
 	{
 		pids[i] = child_make(i, listenfd, addrlen);
-/*		syslog( LOG_WARNING, "zabbix_trapperd #%d started", pids[i]);*/
+/*		zabbix_log( LOG_LEVEL_WARNING, "zabbix_trapperd #%d started", pids[i]);*/
 	}
 
 #ifdef HAVE_FUNCTION_SETPROCTITLE

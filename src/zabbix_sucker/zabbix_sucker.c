@@ -1,5 +1,3 @@
-#define syslog zabbix_log
-
 #include "config.h"
 
 #include <stdio.h>
@@ -23,8 +21,6 @@
 #include <errno.h>
 
 #include <time.h>
-
-#include <syslog.h>
 
 /* Required for SNMP support*/
 #ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
@@ -65,15 +61,15 @@ void	uninit(void)
 			{
 				if(kill(pids[i],SIGTERM) !=0 )
 				{
-					syslog( LOG_WARNING, "Cannot kill process. PID=[%d] [%m]", pids[i]);
+					zabbix_log( LOG_LEVEL_WARNING, "Cannot kill process. PID=[%d] [%s]", pids[i], strerror(errno));
 				}
 			}
 		}
 
 		if(unlink(CONFIG_PID_FILE) != 0)
 		{
-			syslog( LOG_WARNING, "Cannot remove PID file [%s] [%m]",
-				CONFIG_PID_FILE);
+			zabbix_log( LOG_LEVEL_WARNING, "Cannot remove PID file [%s] [%s]",
+				CONFIG_PID_FILE, strerror(errno));
 		}
 	}
 }
@@ -84,23 +80,23 @@ void	signal_handler( int sig )
 	{
 		signal( SIGALRM, signal_handler );
  
-		syslog( LOG_DEBUG, "Timeout while executing operation." );
+		zabbix_log( LOG_LEVEL_DEBUG, "Timeout while executing operation." );
 	}
 	else if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
 	{
-		syslog( LOG_ERR, "Got QUIT or INT or TERM signal. Exiting..." );
+		zabbix_log( LOG_LEVEL_ERR, "Got QUIT or INT or TERM signal. Exiting..." );
 		uninit();
 		exit( FAIL );
 	}
 	else if( SIGCHLD == sig )
 	{
-		syslog( LOG_ERR, "One child died. Exiting ..." );
+		zabbix_log( LOG_LEVEL_ERR, "One child died. Exiting ..." );
 		uninit();
 		exit( FAIL );
 	}
 	else
 	{
-		syslog( LOG_WARNING, "Got signal [%d]. Ignoring ...", sig);
+		zabbix_log( LOG_LEVEL_WARNING, "Got signal [%d]. Ignoring ...", sig);
 	}
 }
 
@@ -159,11 +155,11 @@ void	daemon_init(void)
 		close(i);
 	}
 
-	openlog("zabbix_suckerd",LOG_PID,LOG_USER);
-/*	setlogmask(LOG_UPTO(LOG_DEBUG));	*/
-	setlogmask(LOG_UPTO(LOG_WARNING));
+/*	openlog("zabbix_suckerd",LOG_PID,LOG_USER);
+	setlogmask(LOG_UPTO(LOG_DEBUG));	
+	setlogmask(LOG_UPTO(LOG_WARNING));*/
 
-	zabbix_open_log(LOG_TYPE_FILE,0,"/tmp/tmp.zzz");
+	zabbix_open_log(LOG_TYPE_FILE,LOG_LEVEL_WARNING,"/tmp/tmp.zzz");
 }
 
 void	create_pid_file(void)
@@ -174,12 +170,12 @@ void	create_pid_file(void)
 	f = fopen(CONFIG_PID_FILE, "r");
 	if(f != NULL)
 	{
-		syslog( LOG_CRIT, "File [%s] exists. Is zabbix_agentd already running ?",
+		zabbix_log( LOG_LEVEL_CRIT, "File [%s] exists. Is zabbix_agentd already running ?",
 			CONFIG_PID_FILE);
 		if(fclose(f) != 0)
 		{
-			syslog( LOG_WARNING, "Cannot close file [%s] [%m]",
-			CONFIG_PID_FILE);
+			zabbix_log( LOG_LEVEL_WARNING, "Cannot close file [%s] [%s]",
+			CONFIG_PID_FILE,strerror(errno));
 		}
 		exit(-1);
 	}
@@ -188,8 +184,8 @@ void	create_pid_file(void)
 
 	if( f == NULL)
 	{
-		syslog( LOG_CRIT, "Cannot create PID file [%s] [%m]",
-			CONFIG_PID_FILE);
+		zabbix_log( LOG_LEVEL_CRIT, "Cannot create PID file [%s] [%s]",
+			CONFIG_PID_FILE, strerror(errno));
 		uninit();
 		exit(-1);
 	}
@@ -197,8 +193,8 @@ void	create_pid_file(void)
 	fprintf(f,"%d",getpid());
 	if(fclose(f) != 0)
 	{
-		syslog( LOG_WARNING, "Cannot close file [%s] [%m]",
-		CONFIG_PID_FILE);
+		zabbix_log( LOG_LEVEL_WARNING, "Cannot close file [%s] [%s]",
+		CONFIG_PID_FILE, strerror(errno));
 	}
 }
 
@@ -216,10 +212,10 @@ void	init_config(void)
 		{0}
 	};
 	parse_cfg_file("/etc/zabbix/zabbix_suckerd.conf",cfg);
-/*	syslog( LOG_WARNING, "PidFile [%d]", CONFIG_PID_FILE);
-	syslog( LOG_WARNING, "PidFile [%d]", &CONFIG_PID_FILE);
-	syslog( LOG_WARNING, "PidFile [%s]", &CONFIG_PID_FILE);*/
-	syslog( LOG_WARNING, "PidFile [%s]", CONFIG_PID_FILE);
+/*	zabbix_log( LOG_LEVEL_WARNING, "PidFile [%d]", CONFIG_PID_FILE);
+	zabbix_log( LOG_LEVEL_WARNING, "PidFile [%d]", &CONFIG_PID_FILE);
+	zabbix_log( LOG_LEVEL_WARNING, "PidFile [%s]", &CONFIG_PID_FILE);*/
+	zabbix_log( LOG_LEVEL_WARNING, "PidFile [%s]", CONFIG_PID_FILE);
 	
 	
 }
@@ -237,7 +233,7 @@ void	process_config_file(void)
 	file=fopen("/etc/zabbix/zabbix_suckerd.conf","r");
 	if(NULL == file)
 	{
-		syslog( LOG_CRIT, "Cannot open /etc/zabbix/zabbix_suckerd.conf");
+		zabbix_log( LOG_LEVEL_CRIT, "Cannot open /etc/zabbix/zabbix_suckerd.conf");
 		exit(1);
 	}
 
@@ -255,7 +251,7 @@ void	process_config_file(void)
 
 		if(NULL == value)
 		{
-			syslog( LOG_CRIT, "Error in line [%s] Line %d", line, lineno);
+			zabbix_log( LOG_LEVEL_CRIT, "Error in line [%s] Line %d", line, lineno);
 			fclose(file);
 			exit(1);
 		}
@@ -264,14 +260,14 @@ void	process_config_file(void)
 
 		parameter[value-line-1]=0;
 
-		syslog( LOG_DEBUG, "Parameter [%s] Value [%s]", parameter, value);
+		zabbix_log( LOG_LEVEL_DEBUG, "Parameter [%s] Value [%s]", parameter, value);
 
 		if(strcmp(parameter,"StartSuckers")==0)
 		{
 			i=atoi(value);
 			if( (i<2) || (i>255) )
 			{
-				syslog( LOG_CRIT, "Wrong value of StartAgents in line %d. Should be between 2 and 255.", lineno);
+				zabbix_log( LOG_LEVEL_CRIT, "Wrong value of StartAgents in line %d. Should be between 2 and 255.", lineno);
 				fclose(file);
 				exit(1);
 			}
@@ -282,7 +278,7 @@ void	process_config_file(void)
 			i=atoi(value);
 			if( (i<1) || (i>30) )
 			{
-				syslog( LOG_CRIT, "Wrong value of Timeout in line %d. Should be between 1 and 30.", lineno);
+				zabbix_log( LOG_LEVEL_CRIT, "Wrong value of Timeout in line %d. Should be between 1 and 30.", lineno);
 				fclose(file);
 				exit(1);
 			}
@@ -293,7 +289,7 @@ void	process_config_file(void)
 			i=atoi(value);
 			if( (i<0) || (i>1) )
 			{
-				syslog( LOG_CRIT, "Wrong value of NoTimeWait in line %d. Should be either 0 or 1", lineno);
+				zabbix_log( LOG_LEVEL_CRIT, "Wrong value of NoTimeWait in line %d. Should be either 0 or 1", lineno);
 				fclose(file);
 				exit(1);
 			}
@@ -304,7 +300,7 @@ void	process_config_file(void)
 			i=atoi(value);
 			if( (i<1) || (i>24) )
 			{
-				syslog( LOG_CRIT, "Wrong value of HousekeepingFrequency in line %d. Should be between 1 and 24.", lineno);
+				zabbix_log( LOG_LEVEL_CRIT, "Wrong value of HousekeepingFrequency in line %d. Should be between 1 and 24.", lineno);
 				fclose(file);
 				exit(1);
 			}
@@ -314,19 +310,19 @@ void	process_config_file(void)
 		{
 			if(strcmp(value,"1") == 0)
 			{
-				setlogmask(LOG_UPTO(LOG_CRIT));
+//				setlogmask(LOG_LEVEL_UPTO(LOG_CRIT));
 			}
 			else if(strcmp(value,"2") == 0)
 			{
-				setlogmask(LOG_UPTO(LOG_WARNING));
+//				setlogmask(LOG_LEVEL_UPTO(LOG_WARNING));
 			}
 			else if(strcmp(value,"3") == 0)
 			{
-				setlogmask(LOG_UPTO(LOG_DEBUG));
+//				setlogmask(LOG_UPTO(LOG_DEBUG));
 			}
 			else
 			{
-				syslog( LOG_CRIT, "Wrong DebugLevel in line %d", lineno);
+				zabbix_log( LOG_LEVEL_CRIT, "Wrong DebugLevel in line %d", lineno);
 				fclose(file);
 				exit(1);
 			}
@@ -353,7 +349,7 @@ void	process_config_file(void)
 		}
 		else
 		{
-			syslog( LOG_CRIT, "Unsupported parameter [%s] Line %d", parameter, lineno);
+			zabbix_log( LOG_LEVEL_CRIT, "Unsupported parameter [%s] Line %d", parameter, lineno);
 			fclose(file);
 			exit(1);
 		}
@@ -364,7 +360,7 @@ void	process_config_file(void)
 
 	if(CONFIG_DBNAME == NULL)
 	{
-		syslog( LOG_CRIT, "DBName not in config file");
+		zabbix_log( LOG_LEVEL_CRIT, "DBName not in config file");
 		exit(1);
 	}
 	if(CONFIG_PID_FILE == NULL)
@@ -447,7 +443,7 @@ int	get_value_SNMPv1(double *result,DB_ITEM *item)
 		{
 			int count=1;
 /*		if (vars->type == ASN_OCTET_STR)
-		syslog( LOG_WARNING, "Type:%d", vars->type);*/
+		zabbix_log( LOG_LEVEL_WARNING, "Type:%d", vars->type);*/
 			if(	(vars->type == ASN_INTEGER ) ||
 			(vars->type == ASN_UINTEGER ) ||
 			(vars->type == ASN_COUNTER ) ||
@@ -457,16 +453,16 @@ int	get_value_SNMPv1(double *result,DB_ITEM *item)
 				char *sp = (char *)malloc(1 + vars->val_len);
 				memcpy(sp, vars->val.string, vars->val_len);
 				sp[vars->val_len] = '\0';
-/*			syslog( LOG_WARNING, "value #%d is a string: %s\n", count++, sp);
+/*			zabbix_log( LOG_LEVEL_WARNING, "value #%d is a string: %s\n", count++, sp);
 			*result=strtod(sp,&e);
-			syslog( LOG_WARNING, "Type:%d", vars->type);
-			syslog( LOG_WARNING, "Value #%d is an integer: %d", count++, *vars->val.integer);*/
+			zabbix_log( LOG_LEVEL_WARNING, "Type:%d", vars->type);
+			zabbix_log( LOG_LEVEL_WARNING, "Value #%d is an integer: %d", count++, *vars->val.integer);*/
 				*result=*vars->val.integer;
 				free(sp);
 			}
 			else
 			{
-				syslog( LOG_WARNING,"value #%d is NOT an integer!\n", count++);
+				zabbix_log( LOG_LEVEL_WARNING,"value #%d is NOT an integer!\n", count++);
 			}
 		}
 	}
@@ -474,7 +470,7 @@ int	get_value_SNMPv1(double *result,DB_ITEM *item)
 	{
 		if (status == STAT_SUCCESS)
 		{
-			syslog( LOG_WARNING, "Error in packet\nReason: %s\n",
+			zabbix_log( LOG_LEVEL_WARNING, "Error in packet\nReason: %s\n",
 			snmp_errstring(response->errstat));
 		}
 		else
@@ -503,7 +499,7 @@ int	get_value_zabbix(double *result,char **result_str,DB_ITEM *item)
 {
 	int	s;
 	int	i;
-	char	c[1024];
+	char	c[MAX_STRING_LEN+1];
 	char	*e;
 
 	struct hostent *hp;
@@ -513,7 +509,7 @@ int	get_value_zabbix(double *result,char **result_str,DB_ITEM *item)
 
 	struct linger ling;
 
-	syslog( LOG_DEBUG, "%10s%25s", item->host, item->key );
+	zabbix_log( LOG_LEVEL_DEBUG, "%10s%25s", item->host, item->key );
 
 	servaddr_in.sin_family=AF_INET;
 	if(item->useip==1)
@@ -527,7 +523,7 @@ int	get_value_zabbix(double *result,char **result_str,DB_ITEM *item)
 
 	if(hp==NULL)
 	{
-		syslog( LOG_WARNING, "gethostbyname() failed" );
+		zabbix_log( LOG_LEVEL_WARNING, "gethostbyname() failed" );
 		return	NETWORK_ERROR;
 	}
 
@@ -543,12 +539,13 @@ int	get_value_zabbix(double *result,char **result_str,DB_ITEM *item)
 		ling.l_linger=0;
 		if(setsockopt(s,SOL_SOCKET,SO_LINGER,&ling,sizeof(ling))==-1)
 		{
-			syslog(LOG_WARNING, "Cannot setsockopt SO_LINGER [%m]");
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot setsockopt SO_LINGER [%s]", strerror(errno));
 		}
 	}
 	if(s==0)
 	{
-		syslog(LOG_WARNING, "Cannot create socket [%m]");
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot create socket [%s]",
+				strerror(errno));
 		return	FAIL;
 	}
  
@@ -561,13 +558,13 @@ int	get_value_zabbix(double *result,char **result_str,DB_ITEM *item)
 		switch (errno)
 		{
 			case EINTR:
-				syslog( LOG_WARNING, "Timeout while connecting to [%s]",item->host );
+				zabbix_log( LOG_LEVEL_WARNING, "Timeout while connecting to [%s]",item->host );
 				break;
 			case EHOSTUNREACH:
-				syslog( LOG_WARNING, "No route to host [%s]",item->host );
+				zabbix_log( LOG_LEVEL_WARNING, "No route to host [%s]",item->host );
 				break;
 			default:
-				syslog( LOG_WARNING, "Cannot connect to [%s] [%m]",item->host);
+				zabbix_log( LOG_LEVEL_WARNING, "Cannot connect to [%s] [%s]",item->host, strerror(errno));
 		} 
 		close(s);
 		return	NETWORK_ERROR;
@@ -579,29 +576,29 @@ int	get_value_zabbix(double *result,char **result_str,DB_ITEM *item)
 		switch (errno)
 		{
 			case EINTR:
-				syslog( LOG_WARNING, "Timeout while sending data to [%s]",item->host );
+				zabbix_log( LOG_LEVEL_WARNING, "Timeout while sending data to [%s]",item->host );
 				break;
 			default:
-				syslog( LOG_WARNING, "Error while sending data to [%s] [%m]",item->host);
+				zabbix_log( LOG_LEVEL_WARNING, "Error while sending data to [%s] [%s]",item->host, strerror(errno));
 		} 
 		close(s);
 		return	FAIL;
 	} 
 	i=sizeof(struct sockaddr_in);
 
-	i=recvfrom(s,c,1023,0,(struct sockaddr *)&servaddr_in,&i);
+	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);
 	if(i == -1)
 	{
 		switch (errno)
 		{
 			case 	EINTR:
-					syslog( LOG_WARNING, "Timeout while receiving data from [%s]",item->host );
+					zabbix_log( LOG_LEVEL_WARNING, "Timeout while receiving data from [%s]",item->host );
 					break;
 			case	ECONNRESET:
 					close(s);
 					return	NETWORK_ERROR;
 			default:
-				syslog( LOG_WARNING, "Error while receiving data from [%s] [%m]",item->host);
+				zabbix_log( LOG_LEVEL_WARNING, "Error while receiving data from [%s] [%s]",item->host, strerror(errno));
 		} 
 		close(s);
 		return	FAIL;
@@ -609,24 +606,24 @@ int	get_value_zabbix(double *result,char **result_str,DB_ITEM *item)
 
 	if( close(s)!=0 )
 	{
-		syslog(LOG_WARNING, "Problem with close [%m]");
+		zabbix_log(LOG_LEVEL_WARNING, "Problem with close [%s]", strerror(errno));
 	}
 	c[i-1]=0;
 
-	syslog(LOG_DEBUG, "Got string:%10s", c );
+	zabbix_log(LOG_LEVEL_DEBUG, "Got string:%10s", c );
 	*result=strtod(c,&e);
 
 	if( (*result==0) && (c==e) )
 	{
-		syslog( LOG_WARNING, "Got empty string from [%s]. Parameter [%s]",item->host, item->key);
-		syslog( LOG_WARNING, "Assuming that agent dropped connection because of access permissions");
+		zabbix_log( LOG_LEVEL_WARNING, "Got empty string from [%s]. Parameter [%s]",item->host, item->key);
+		zabbix_log( LOG_LEVEL_WARNING, "Assuming that agent dropped connection because of access permissions");
 		return	NETWORK_ERROR;
 	}
 	if( *result<0 )
 	{
 		if( cmp_double(*result,NOTSUPPORTED) == 0)
 		{
-			syslog(LOG_DEBUG, "NOTSUPPORTED1 [%s]", c );
+			zabbix_log(LOG_LEVEL_DEBUG, "NOTSUPPORTED1 [%s]", c );
 			return NOTSUPPORTED;
 		}
 		else
@@ -637,7 +634,7 @@ int	get_value_zabbix(double *result,char **result_str,DB_ITEM *item)
 
 	*result_str=strdup(c);
 
-	syslog(LOG_DEBUG, "RESULT_STR [%s]", c );
+	zabbix_log(LOG_LEVEL_DEBUG, "RESULT_STR [%s]", c );
 
 	return SUCCEED;
 }
@@ -667,7 +664,7 @@ int	get_value(double *result,char **result_str,DB_ITEM *item)
 #endif
 	else
 	{
-		syslog(LOG_WARNING, "Not supported item type:%d",item->type);
+		zabbix_log(LOG_LEVEL_WARNING, "Not supported item type:%d",item->type);
 		res=NOTSUPPORTED;
 	}
 	alarm(0);
@@ -676,19 +673,19 @@ int	get_value(double *result,char **result_str,DB_ITEM *item)
 
 int get_minnextcheck(int now)
 {
-	char		c[1024];
+	char		sql[MAX_STRING_LEN+1];
 
 	DB_RESULT	*result;
 
 	int		res;
 	int		count;
 
-	sprintf(c,"select count(*),min(nextcheck) from items i,hosts h where i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and i.itemid%%%d=%d",now,CONFIG_SUCKERD_FORKS-1,sucker_num-1);
-	result = DBselect(c);
+	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and i.itemid%%%d=%d",now,CONFIG_SUCKERD_FORKS-1,sucker_num-1);
+	result = DBselect(sql);
 
 	if( (result==NULL) || (DBnum_rows(result)==0) )
 	{
-		syslog(LOG_DEBUG, "No items to update for minnextcheck.");
+		zabbix_log(LOG_LEVEL_DEBUG, "No items to update for minnextcheck.");
 		DBfree_result(result);
 		return FAIL; 
 	}
@@ -697,7 +694,7 @@ int get_minnextcheck(int now)
 
 	if( count == 0 )
 	{
-		syslog( LOG_DEBUG, "No records for get_minnextcheck");
+		zabbix_log( LOG_LEVEL_DEBUG, "No records for get_minnextcheck");
 		DBfree_result(result);
 		return	FAIL;
 	}
@@ -712,7 +709,7 @@ int get_values(void)
 {
 	double		value;
 	char		*value_str;
-	char		c[1024];
+	char		sql[MAX_STRING_LEN+1];
  
 	DB_RESULT	*result;
 
@@ -726,13 +723,13 @@ int get_values(void)
 
 	now = time(NULL);
 
-	sprintf(c,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-1,sucker_num-1);
-	result = DBselect(c);
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-1,sucker_num-1);
+	result = DBselect(sql);
 
 	rows = DBnum_rows(result);
 	if( (result==NULL) || (rows == 0))
 	{
-		syslog( LOG_DEBUG, "No items to update.");
+		zabbix_log( LOG_LEVEL_DEBUG, "No items to update.");
 		DBfree_result(result);
 		return SUCCEED; 
 	}
@@ -777,7 +774,7 @@ int get_values(void)
 		item.value_type=atoi(DBget_field(result,i,17));
 
 		res = get_value(&value,&value_str,&item);
-		syslog( LOG_DEBUG, "GOT VALUE [%s]", value_str );
+		zabbix_log( LOG_LEVEL_DEBUG, "GOT VALUE [%s]", value_str );
 		
 		if(res == SUCCEED )
 		{
@@ -785,41 +782,41 @@ int get_values(void)
 			if(2 == host_status)
 			{
 				host_status=0;
-				syslog( LOG_WARNING, "Enabling host [%s]", item.host );
-				sprintf(c,"update hosts set status=0 where hostid=%d",item.hostid);
-				DBexecute(c);
+				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
+				sprintf(sql,"update hosts set status=0 where hostid=%d",item.hostid);
+				DBexecute(sql);
 
 				break;
 			}
 		}
 		else if(res == NOTSUPPORTED)
 		{
-			syslog( LOG_WARNING, "Parameter [%s] is not supported by agent on host [%s]", item.key, item.host );
-			sprintf(c,"update items set status=3 where itemid=%d",item.itemid);
-			DBexecute(c);
+			zabbix_log( LOG_LEVEL_WARNING, "Parameter [%s] is not supported by agent on host [%s]", item.key, item.host );
+			sprintf(sql,"update items set status=3 where itemid=%d",item.itemid);
+			DBexecute(sql);
 			if(2 == host_status)
 			{
 				host_status=0;
-				syslog( LOG_WARNING, "Enabling host [%s]", item.host );
-				sprintf(c,"update hosts set status=0 where hostid=%d",item.hostid);
-				DBexecute(c);
+				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
+				sprintf(sql,"update hosts set status=0 where hostid=%d",item.hostid);
+				DBexecute(sql);
 
 				break;
 			}
 		}
 		else if(res == NETWORK_ERROR)
 		{
-			syslog( LOG_WARNING, "Host [%s] will be checked after [%d] seconds", item.host, DELAY_ON_NETWORK_FAILURE );
+			zabbix_log( LOG_LEVEL_WARNING, "Host [%s] will be checked after [%d] seconds", item.host, DELAY_ON_NETWORK_FAILURE );
 			now=time(NULL);
-			sprintf(c,"update hosts set status=2,disable_until=%d where hostid=%d",now+DELAY_ON_NETWORK_FAILURE,item.hostid);
-			DBexecute(c);
+			sprintf(sql,"update hosts set status=2,disable_until=%d where hostid=%d",now+DELAY_ON_NETWORK_FAILURE,item.hostid);
+			DBexecute(sql);
 
 			break;
 		}
 		else
 		{
-			syslog( LOG_WARNING, "Getting value of [%s] from host [%s] failed", item.key, item.host );
-			syslog( LOG_WARNING, "The value is not stored in database.");
+			zabbix_log( LOG_LEVEL_WARNING, "Getting value of [%s] from host [%s] failed", item.key, item.host );
+			zabbix_log( LOG_LEVEL_WARNING, "The value is not stored in database.");
 		}
 	}
 
@@ -831,19 +828,19 @@ int get_values(void)
 
 int housekeeping_history(int now)
 {
-	char		c[1024];
+	char		sql[MAX_STRING_LEN+1];
 	DB_ITEM		item;
 
 	DB_RESULT	*result;
 
 	int		i,rows;
 
-	sprintf(c,"select i.itemid,i.lastdelete,i.history from items i where i.lastdelete<=%d", now);
-	result = DBselect(c);
+	sprintf(sql,"select i.itemid,i.lastdelete,i.history from items i where i.lastdelete<=%d", now);
+	result = DBselect(sql);
 
 	if(result==NULL)
 	{
-		syslog( LOG_DEBUG, "No items to delete.");
+		zabbix_log( LOG_LEVEL_DEBUG, "No items to delete.");
 		DBfree_result(result);
 		return SUCCEED; 
 	}
@@ -856,13 +853,13 @@ int housekeeping_history(int now)
 		item.history=atoi(DBget_field(result,i,2));
 
 /* To be rewritten. Only one delete depending on item.value_type */
-		sprintf	(c,"delete from history where itemid=%d and clock<%d",item.itemid,now-item.history);
-		DBexecute(c);
-		sprintf	(c,"delete from history_str where itemid=%d and clock<%d",item.itemid,now-item.history);
-		DBexecute(c);
+		sprintf	(sql,"delete from history where itemid=%d and clock<%d",item.itemid,now-item.history);
+		DBexecute(sql);
+		sprintf	(sql,"delete from history_str where itemid=%d and clock<%d",item.itemid,now-item.history);
+		DBexecute(sql);
 	
-		sprintf(c,"update items set LastDelete=%d where ItemId=%d",now,item.itemid);
-		DBexecute(c);
+		sprintf(sql,"update items set LastDelete=%d where ItemId=%d",now,item.itemid);
+		DBexecute(sql);
 	}
 	DBfree_result(result);
 	return SUCCEED;
@@ -870,17 +867,17 @@ int housekeeping_history(int now)
 
 int housekeeping_alerts(int now)
 {
-	char		c[1024];
+	char		sql[MAX_STRING_LEN+1];
 	int		alert_history;
 	DB_RESULT	*result;
 
-	sprintf(c,"select alert_history from config");
-	result = DBselect(c);
+	sprintf(sql,"select alert_history from config");
+	result = DBselect(sql);
 
 	alert_history=atoi(DBget_field(result,0,0));
 
-	sprintf	(c,"delete from alerts where clock<%d",now-alert_history);
-	DBexecute(c);
+	sprintf	(sql,"delete from alerts where clock<%d",now-alert_history);
+	DBexecute(sql);
 
 	DBfree_result(result);
 	return SUCCEED;
@@ -888,17 +885,17 @@ int housekeeping_alerts(int now)
 
 int housekeeping_alarms(int now)
 {
-	char		c[1024];
+	char		sql[MAX_STRING_LEN+1];
 	int		alarm_history;
 	DB_RESULT	*result;
 
-	sprintf(c,"select alarm_history from config");
-	result = DBselect(c);
+	sprintf(sql,"select alarm_history from config");
+	result = DBselect(sql);
 
 	alarm_history=atoi(DBget_field(result,0,0));
 
-	sprintf	(c,"delete from alarms where clock<%d",now-alarm_history);
-	DBexecute(c);
+	sprintf	(sql,"delete from alarms where clock<%d",now-alarm_history);
+	DBexecute(sql);
 	
 	DBfree_result(result);
 	return SUCCEED;
@@ -929,7 +926,7 @@ int main_housekeeping_loop()
 #endif
 
 		housekeeping_alerts(now);
-		syslog( LOG_DEBUG, "Sleeping for %d hours", CONFIG_HOUSEKEEPING_FREQUENCY);
+		zabbix_log( LOG_LEVEL_DEBUG, "Sleeping for %d hours", CONFIG_HOUSEKEEPING_FREQUENCY);
 
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("housekeeper [sleeping for %d hour(s)]", CONFIG_HOUSEKEEPING_FREQUENCY);
@@ -951,10 +948,10 @@ int main_sucker_loop()
 		now=time(NULL);
 		get_values();
 
-		syslog( LOG_DEBUG, "Spent %d seconds while updating values", (int)time(NULL)-now );
+		zabbix_log( LOG_LEVEL_DEBUG, "Spent %d seconds while updating values", (int)time(NULL)-now );
 
 		nextcheck=get_minnextcheck(now);
-		syslog( LOG_DEBUG, "Nextcheck:%d Time:%d", nextcheck, (int)time(NULL) );
+		zabbix_log( LOG_LEVEL_DEBUG, "Nextcheck:%d Time:%d", nextcheck, (int)time(NULL) );
 
 		if( FAIL == nextcheck)
 		{
@@ -974,7 +971,7 @@ int main_sucker_loop()
 			{
 				sleeptime = SUCKER_DELAY;
 			}
-			syslog( LOG_DEBUG, "Sleeping for %d seconds",
+			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
 					sleeptime );
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 			setproctitle("sucker [sleeping for %d seconds]", 
@@ -984,7 +981,7 @@ int main_sucker_loop()
 		}
 		else
 		{
-			syslog( LOG_DEBUG, "No sleeping" );
+			zabbix_log( LOG_LEVEL_DEBUG, "No sleeping" );
 		}
 	}
 }
@@ -1028,7 +1025,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	syslog( LOG_WARNING, "zabbix_suckerd #%d started",sucker_num);
+	zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started",sucker_num);
 
 #ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
 	init_snmp("zabbix_suckerd");
