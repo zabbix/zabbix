@@ -39,13 +39,18 @@
 
 <FONT COLOR="#000000">
 <?php
+	$sql="select max(alertid) as max from alerts";
+	$result=DBselect($sql);
+	$row=DBfetch($result);
+	$maxalertid=$row["max"];
+
 	if(!isset($HTTP_GET_VARS["start"]))
 	{
-		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries from alerts a,actions ac,media_type mt where a.actionid=ac.actionid and mt.mediatypeid=a.mediatypeid order by a.clock desc limit 500";
+		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries from alerts a,actions ac,media_type mt where a.actionid=ac.actionid and mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200 order by a.clock desc limit 200";
 	}
 	else
 	{
-		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries from alerts a,actions ac,media_type mt where a.actionid=ac.actionid and mt.mediatypeid=a.mediatypeid order by a.clock desc limit ".($HTTP_GET_VARS["start"]+500);
+		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries from alerts a,actions ac,media_type mt where a.actionid=ac.actionid and mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200-".$HTTP_GET_VARS["start"]." order by a.clock desc limit ".($HTTP_GET_VARS["start"]+500);
 	}
 	$result=DBselect($sql);
 

@@ -39,13 +39,18 @@
 
 <FONT COLOR="#000000">
 <?php
+	$sql="select max(alarmid) as max from alarms";
+	$result=DBselect($sql);
+	$row=DBfetch($result);
+	$maxalarmid=$row["max"];
+
 	if(!isset($HTTP_GET_VARS["start"]))
 	{
-		$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit 500";
+		$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t where t.triggerid=a.triggerid and a.alarmid>$maxalarmid-200 order by clock desc limit 200";
 	}
 	else
 	{
-		$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit ".($HTTP_GET_VARS["start"]+500);
+		$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t where t.triggerid=a.triggerid and a.alarmid>$maxalarmid-".($HTTP_GET_VARS["start"]+200)." order by clock desc limit ".($HTTP_GET_VARS["start"]+200);
 	}
 	$result=DBselect($sql);
 
