@@ -1,3 +1,16 @@
+HIGH PRIORITY:
+
+ - mass updates/inserts
+ - support for net-snmp
+ - LDAP authorisation (should work with MSWindows LDAP)
+ - get rid of long select lists in user forms 
+ - do not dump "Expression cannot be evaluated" in case if function.lastvalue
+   is NULL
+ - support fo netload under other platforms
+ - support for disk loads
+ - new host name should not contain space and other character not allowed by trigger expression
+ - get rid of "Bad protocol identification '0'" when doing ssh check
+
 TODO:
 
 After using zabbix for a week monitoring 4 linux and 1 sun machine I have a
@@ -39,24 +52,15 @@ Not ready yet:
  - apply Mariusz's patches
  - link map's line to a trigger
  - support for complex reports
- - mass updates/inserts
- - get rid of long select lists in user forms 
  - support for check_service[samba]
- - get rid of "Bad protocol identification '0'" when doing ssh check
  - ability to execute command on server monitored
  - support for tcp_ping[] which returns number of ms spent
- - new host name should not contain space and other character not allowed by trigger expression
- - support for net-snmp
  - support for OS X (network loads, disk loads)
- - support fo netload under other platforms
- - support for disk loads
  - agent to send something back in case of timeout (?)
  - check for function parameters in evaluate_simple_expression
  - make links different if something is already registered (as for medias,
    actions, etc)
  - update trigger status to UNKNOWN if cannot evaluate function 
- - do not dump "Expression cannot be evaluated" in case if function.lastvalue
-   is NULL
  - when doing UserParameter do not return FAIL in case of timeout
 
  LATER:
@@ -68,7 +72,6 @@ Not ready yet:
  - look for cool icons
  - different sound files for different severity
  - distributed monitoring
- - LDAP authorisation (should work with MSWindows LDAP)
  - Agent for Windows (can we use nsclient?)
  - rename "Alerts" to "Notification"
  - add numeric constants to trigger expressions
