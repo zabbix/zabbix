@@ -311,8 +311,8 @@
 	define("S_SELECT_HOST_DOT_DOT_DOT",		"Select host...");
 
 //	latestalarms.php
-	define("S_LATEST_ALARMS",			"Latest alarms");
-	define("S_HISTORY_OF_ALARMS_BIG",		"HISTORY OF ALARMS");
+	define("S_LATEST_EVENTS",			"Latest events");
+	define("S_HISTORY_OF_EVENTS_BIG",		"HISTORY OF EVENTS");
 
 //	latest.php
 	define("S_LAST_CHECK",				"Last check");

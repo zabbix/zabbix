@@ -191,9 +191,9 @@
 	show_table3_header_begin();
 	echo "&nbsp;".S_STATUS_OF_TRIGGERS_BIG;
 	show_table3_h_delimiter(60);
+	echo "<span style=\"float:right\">";
 ?>
 		<form name="form2" method="get" action="tr_status.php">
-
 <?php
 	echo "<input name=\"onlytrue\" type=\"hidden\" value=\"".$_GET["onlytrue"]."\">";
 	echo "<input name=\"noactions\" type=\"hidden\" value=\"".$_GET["noactions"]."\">";
@@ -267,9 +267,9 @@
 	echo nbsp(" ");
   	echo "<input class=\"button\" type=\"submit\" name=\"do\" value=\"select\">";
 	echo "</form>";
+	echo "</span>";
 //	show_table_header_end();
 ?>
-
 <?php
 	if(!isset($_GET["fullscreen"]))
 	{
@@ -301,7 +301,6 @@
 	                        echo "<A HREF=\"tr_status.php?hostid=".$row["hostid"]."&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">".$row["host"]."</A>  ";
 	                }
 	        }*/
-	 
 		show_table_v_delimiter(2);
 ?>
 

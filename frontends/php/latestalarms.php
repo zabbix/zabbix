@@ -20,7 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = S_LATEST_ALARMS;
+	$page["title"] = S_LATEST_EVENTS;
 	$page["file"] = "latestalarms.php";
 	show_header($page["title"],30,0);
 ?>
@@ -49,7 +49,7 @@
 
 <?php
 	show_table3_header_begin();
-	echo "&nbsp;".S_HISTORY_OF_ALARMS_BIG;
+	echo "&nbsp;".S_HISTORY_OF_EVENTS_BIG;
 	show_table3_h_delimiter(20);
 	echo "<form name=\"form2\" method=\"get\" action=\"latestalarms.php\">";
 	if(isset($_GET["start"]))
