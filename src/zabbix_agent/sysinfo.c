@@ -257,8 +257,6 @@ void	add_user_parameter(char *key,char *command)
 
 			commands[i].parameter=strdup(command);
 
-			commands[i+1].key = 0;
-			
 			break;
 		}
 	}
