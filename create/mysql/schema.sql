@@ -175,6 +175,8 @@ CREATE TABLE hosts (
   ip   varchar(15) DEFAULT '127.0.0.1' NOT NULL,
   port int(4) DEFAULT '0' NOT NULL,
   status int(4) DEFAULT '0' NOT NULL,
+# If status=UNREACHABLE, host will not be checked until  
+  disabled_until int(4) DEFAULT '0' NOT NULL,
   PRIMARY KEY (hostid),
   KEY (status)
 );
