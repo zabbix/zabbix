@@ -15,7 +15,7 @@
 ?>
  
 <?
-        $result=mysql_query("select hostid,host from hosts order by host",$mysql);
+        $result=DBselect("select hostid,host from hosts order by host");
         if(isset($hostid))
         {
                 echo "<A HREF=\"tr_status.html\">all</A>  ";
@@ -24,10 +24,10 @@
         {
                 echo "<b>[<A HREF=\"tr_status.html\">all</A>]</b>  ";
         }
-        while($row=mysql_fetch_row($result))
+	for($i=0;$i<DBnum_rows($result);$i++)
         {
-                $hid=$row[0];
-                $host=$row[1];
+                $hid=DBget_field($result,$i,0);
+                $host=DBget_field($result,$i,1);
                 if($hid == $hostid)
                 {
                         echo "<b>[<A HREF=\"tr_status.html?hostid=$hid\">$host</A>]</b>  ";
@@ -116,17 +116,14 @@
 
 	if($onlytrue=='true')
 	{
-		$result=mysql_query("select t.triggerid,t.istrue,t.description,t.lastcheck,t.expression,t.priority,t.lastchange,t.comments from triggers t,hosts h,items i,functions f  where t.istrue=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid $cond order by t.priority desc, t.description",$mysql);
+		$result=DBselect("select t.triggerid,t.istrue,t.description,t.lastcheck,t.expression,t.priority,t.lastchange,t.comments from triggers t,hosts h,items i,functions f  where t.istrue=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid $cond order by t.priority desc, t.description");
 	}
 	else
 	{
-		$result=mysql_query("select t.triggerid,t.istrue,t.description,t.lastcheck,t.expression,t.priority,t.lastchange,t.comments from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid $cond order by t.priority desc, t.description",$mysql);
+		$result=DBselect("select t.triggerid,t.istrue,t.description,t.lastcheck,t.expression,t.priority,t.lastchange,t.comments from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid $cond order by t.priority desc, t.description");
 	}
-	$trigcount=0;
-	$i=0;
-	while($row=mysql_fetch_row($result))
+	for($i=0;$i<DBnum_rows($result);$i++)
 	{
-		$trigcount++;
 		if($col==1)
 		{
 			echo "\n<TR BGCOLOR=#EEEEEE>";
@@ -136,14 +133,14 @@
 			echo "\n<TR BGCOLOR=#DDDDDD>";
 			$col=1;
 		}
-		$expression=$row[4];
-		$description=$row[2];
-		$triggerid=$row[0];
-		$istrue=$row[1];
-		$lastcheck=$row[3];
-		$priority=$row[5];
-		$lastchange=$row[6]; 
-		$comments=$row[7];  
+		$expression=DBget_field($result,$i,4);
+		$description=DBget_field($result,$i,2);
+		$triggerid=DBget_field($result,$i,0);
+		$istrue=DBget_field($result,$i,1);
+		$lastcheck=DBget_field($result,$i,3);
+		$priority=DBget_field($result,$i,5);
+		$lastchange=DBget_field($result,$i,6); 
+		$comments=DBget_field($result,$i,7);
  
 		$lastchange=date("d M H:i:s",$lastchange);
 
@@ -193,20 +190,20 @@
 			echo "</TD>";
 		}
 		if($istrue==0)	echo "</TR>\n";
-		$i++;
 	}
 	echo "</TABLE>\n";
 
+	$i=DBnum_rows($result);
+
 	show_table_header("Total:$i");
 
-	$result=mysql_query(" select min(lastcheck) from triggers where istrue<2;",$mysql);
-	$row=mysql_fetch_row($result);
-	$lastcheck=$row[0]; 
+	$result=DBselect("select min(lastcheck) from triggers where istrue<2");
+	$lastcheck=DBget_field($result,0,0);
 	$diff=mktime()-$lastcheck; 
 
-	$result=mysql_query("select count(*) from items i,hosts h where i.status=0 and h.status=0 and h.hostid=i.hostid and i.nextcheck<UNIX_TIMESTAMP()-60;",$mysql);
-	$row=mysql_fetch_row($result);
-	$answ=$row[0];
+	$now=time();
+	$result=DBselect("select count(*) from items i,hosts h where i.status=0 and h.status=0 and h.hostid=i.hostid and i.nextcheck<$now-60");
+	$answ=DBget_field($result,0,0);
 	if ($answ>0)
 	{ 
 		echo "<br>";

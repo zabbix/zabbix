@@ -25,10 +25,9 @@
 	if(!isset($description))
 	{
 		$sql="select description, expression from triggers where triggerid=$triggerid";
-		$result=mysql_query($sql,$mysql);
-		$row=mysql_fetch_row($result);
-		$description=$row[0];    
-		$expression=$row[1];    
+		$result=DBselect($sql);
+		$description=DBget_field($result,0,0);
+		$expression=DBget_field($result,0,1);
 	}
 
 ?>
@@ -42,7 +41,7 @@
 
 <?
 	$sql="select a.actionid,a.triggerid,u.alias,a.good,a.delay,a.subject,a.message from actions a,users u where a.userid=u.userid and a.triggerid=$triggerid order by u.alias, a.good desc";
-	$result=mysql_query($sql,$mysql);
+	$result=DBselect($sql);
 
 	echo "<CENTER>";
 	echo "<TABLE BORDER=0 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
@@ -54,18 +53,18 @@
 	echo "<TD><b>Message</b></TD>";
 	echo "<TD><b>Actions</b></TD>";                               
 	echo "</TR>";
-	while($row=mysql_fetch_row($result))
+	for($i=0;$i<DBnum_rows($result);$i++)
 	{
-		$actid=$row[0];
+		$actid=DBget_field($result,$i,0);
 		$good="OFF";
-		if($row[3])
+		if(DBget_field($result,$i,3))
 		{
 			$good="ON";
 		}
-		$to=$row[2];
-		$delay=$row[4];
-		$subject=$row[5];
-		$msg=$row[6];
+		$to=DBget_field($result,$i,2);
+		$delay=DBget_field($result,$i,4);
+		$subject=DBget_field($result,$i,5);
+		$msg=DBget_field($result,$i,6);
 
 		if($actionid==$actid)
 		{
@@ -112,16 +111,14 @@
 	if(isset($actionid))
 	{
 		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message from actions a where a.actionid=$actionid";
-		$result=mysql_query($sql,$mysql);
+		$result=DBselect($sql);
 
-		$row=mysql_fetch_row($result);
-
-		$actionid=$row[0];
-		$triggerid=$row[1];
-		$good=$row[2];
-		$delay=$row[3];
-		$subject=$row[4];
-		$message=$row[5];
+		$actionid=DBget_field($result,0,0);
+		$triggerid=DBget_field($rsult,0,1);
+		$good=DBget_field($result,0,2);
+		$delay=DBget_field($result,0,3);
+		$subject=DBget_field($result,0,4);
+		$message=DBget_field($result,0,5);
 	}
 	echo "<br>";
 	show_table2_header_begin();
@@ -136,11 +133,11 @@
 	echo "<SELECT NAME=\"userid\" SIZE=\"1\">";
 
 	$sql="select userid,alias from users order by alias";
-	$result=mysql_query($sql,$mysql);
-	while($row=mysql_fetch_row($result))
+	$result=DBselect($sql);
+	for($i=0;$i<DBnum_rows($result);$i++)
 	{
-		$id=$row[0];
-		$name=$row[1];
+		$id=DBget_field($result,$i,0);
+		$name=DBget_field($result,$i,1);
 		if($name==$sto)
 		{
 			echo "<option value=\"$id\" SELECTED>$name";

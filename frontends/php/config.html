@@ -27,12 +27,11 @@
 ?>
 
 <?
-	$result=mysql_query("select smtp_server,smtp_helo,smtp_email,password_required from config",$mysql);
-	$row=mysql_fetch_row($result);
-	$smtp_server=$row[0];
-	$smtp_helo=$row[1];
-	$smtp_email=$row[2];
-	$password_required=$row[3];
+	$result=DBselect("select smtp_server,smtp_helo,smtp_email,password_required from config");
+	$smtp_server=DBget_field($result,0,0);
+	$smtp_helo=DBget_field($result,0,1);
+	$smtp_email=DBget_field($result,0,2);
+	$password_required=DBget_field($result,0,3);
 ?>
 
 <?
