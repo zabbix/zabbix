@@ -3,6 +3,7 @@
 	$page["title"] = "Hosts";
 	$page["file"] = "hosts.php";
 	show_header($page["title"],0,0);
+	insert_confirm_javascript();
 ?>
 
 <?php
@@ -209,7 +210,7 @@
 	echo "<br>";
 	echo "<a name=\"form\"></a>";
 	show_table2_header_begin();
-	echo "Host details";
+	echo "Host";
 
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"hosts.php#form\">";
@@ -322,7 +323,7 @@
 	if(isset($HTTP_GET_VARS["hostid"]))
 	{
 		echo "<input type=\"submit\" name=\"register\" value=\"update\">";
-		echo "<input type=\"submit\" name=\"register\" value=\"delete\">";
+		echo "<input type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected host?');\">";
 	}
 
 	show_table2_header_end();

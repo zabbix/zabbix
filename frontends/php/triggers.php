@@ -4,6 +4,7 @@
 
 	include "include/config.inc.php";
 	show_header($page["title"],0,0);
+	insert_confirm_javascript();
 ?>
 
 <?php
@@ -277,9 +278,9 @@
 		}
 		echo "</table>";
 		show_table2_header_begin();
-		echo "<input type=\"submit\" name=\"register\" value=\"enable selected\">";
-		echo "<input type=\"submit\" name=\"register\" value=\"disable selected\">";
-		echo "<input type=\"submit\" name=\"register\" value=\"delete selected\">";
+		echo "<input type=\"submit\" name=\"register\" value=\"enable selected\" onClick=\"return Confirm('Enable selected triggers?');\">";
+		echo "<input type=\"submit\" name=\"register\" value=\"disable selected\" onClick=\"return Confirm('Disable selected triggers?');\">";
+		echo "<input type=\"submit\" name=\"register\" value=\"delete selected\" onClick=\"return Confirm('Delete selected triggers?');\">";
 		show_table2_header_end();
 		echo "</form>";
 	}
