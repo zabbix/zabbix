@@ -463,6 +463,7 @@ int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
 					zabbix_log( LOG_LEVEL_WARNING, "Timeout while receiving data from [%s]",item->host );
 					break;
 			case	ECONNRESET:
+					zabbix_log( LOG_LEVEL_WARNING, "Connection reset by peer. Host [%s] Parameter [%s]",item->host, item->key );
 					close(s);
 					return	NETWORK_ERROR;
 			default:
