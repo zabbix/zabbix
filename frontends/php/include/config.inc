@@ -1102,7 +1102,7 @@
 		}
 
 
-		if ($From>0) // 12h FORWARD
+		if (isset($From) && ($From>0))
 		{
 			$tmp=$from-12;
 			echo("[<A HREF=\"history.html?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
@@ -1113,7 +1113,7 @@
 			echo("[12h forward]");
 		}
 
-		if ($From>0) // WEEK Forward
+		if (isset($From) && ($From>0))
 		{
 			$tmp=$from-12*14;
 			echo("[<A HREF=\"history.html?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
@@ -1207,20 +1207,14 @@
 			$history=DBget_field($result,0,5);
 			$status=DBget_field($result,0,6);
 		}
-		if( !isset($port) )
+		else
 		{
+			$description="";
+			$key="";
+			$host="";
 			$port=10000;
-		}
-		if( !isset($delay) )
-		{
 			$delay=30;
-		}
-		if( !isset($history) )
-		{
 			$history=30*24*3600;
-		}
-		if( !isset($status) )
-		{
 			$status=0;
 		}
 
@@ -1317,7 +1311,6 @@
 	{
 		if(isset($userid))
 		{
-			echo $userid,"<br>";
 			$result=DBselect("select u.alias,u.name,u.surname,u.passwd,g.groupid from users u,groups g where u.groupid=g.groupid and u.userid=$userid");
 	
 			$alias=DBget_field($result,0,0);
@@ -1325,6 +1318,14 @@
 			$surname=DBget_field($result,0,2);
 			$password=DBget_field($result,0,3);
 			$groupid_=DBget_field($result,0,4);
+		}
+		else
+		{
+			$alias="";
+			$name="";
+			$surname="";
+			$password="";
+			$groupid_=0;
 		}
 
 		show_table2_header_begin();
@@ -1404,7 +1405,15 @@
 			$description=DBget_field($result,0,1);
 			$priority=DBget_field($result,0,2);
 			$istrue=DBget_field($result,0,3);
-			$comments=DBget_field($result,0,6);
+			$comments=DBget_field($result,0,4);
+		}
+		else
+		{
+			$expression="";
+			$description="";
+			$priority=0;
+			$istrue=0;
+			$comments="";
 		}
 		
 		echo "<br>";

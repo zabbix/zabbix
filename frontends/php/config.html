@@ -12,9 +12,9 @@
 ?>
 
 <?
-	if($register=="update")
+	if(isset($register) && ($register=="update"))
 	{
-		if($password_required=="true")
+		if(isset($password_required) && ($password_required=="true"))
 		{
 			$password_required="1";
 		}

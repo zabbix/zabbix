@@ -135,6 +135,7 @@
 
 
 		$result=DBselect("select clock,value from history where itemid=$itemid and clock>$time and clock<$till order by clock desc");
+		$col=0;
 		for($i=0;$i<DBnum_rows($result);$i++)
 		{
 			if($col==1)

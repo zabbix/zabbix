@@ -7,29 +7,28 @@
 ?>
 
 <?
-	if($register=="add")
+	if(isset($register))
 	{
-		add_action( $triggerid, $userid, $good, $delay, $subject, $message );
-	}
-	if($register=="update")
-	{
-		update_action( $actionid, $userid, $good, $delay, $subject, $message );
-	}
-	if($register=="delete")
-	{
-		delete_action($actionid);
+		if($register=="add")
+		{
+			add_action( $triggerid, $userid, $good, $delay, $subject, $message );
+		}
+		if($register=="update")
+		{
+			update_action( $actionid, $userid, $good, $delay, $subject, $message );
+		}
+		if($register=="delete")
+		{
+			delete_action($actionid);
+		}
 	}
 ?>
 
 <?
-	if(!isset($description))
-	{
-		$sql="select description, expression from triggers where triggerid=$triggerid";
-		$result=DBselect($sql);
-		$description=DBget_field($result,0,0);
-		$expression=DBget_field($result,0,1);
-	}
-
+	$sql="select description, expression from triggers where triggerid=$triggerid";
+	$result=DBselect($sql);
+	$description=DBget_field($result,0,0);
+	$expression=DBget_field($result,0,1);
 ?>
  
 <?
@@ -53,6 +52,7 @@
 	echo "<TD><b>Message</b></TD>";
 	echo "<TD><b>Actions</b></TD>";                               
 	echo "</TR>";
+	$col=0;
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		$actid=DBget_field($result,$i,0);
@@ -66,7 +66,7 @@
 		$subject=DBget_field($result,$i,5);
 		$msg=DBget_field($result,$i,6);
 
-		if($actionid==$actid)
+		if(isset($actionid) && ($actionid==$actid))
 		{
 			echo "<TR BGCOLOR=#FFDDDD>";
 			$col=$col+1;
@@ -114,11 +114,18 @@
 		$result=DBselect($sql);
 
 		$actionid=DBget_field($result,0,0);
-		$triggerid=DBget_field($rsult,0,1);
+		$triggerid=DBget_field($result,0,1);
 		$good=DBget_field($result,0,2);
 		$delay=DBget_field($result,0,3);
 		$subject=DBget_field($result,0,4);
 		$message=DBget_field($result,0,5);
+	}
+	else
+	{
+		$good=1;
+		$delay=30;
+		$subject="";
+		$message="";
 	}
 	echo "<br>";
 	show_table2_header_begin();
@@ -127,7 +134,10 @@
 	show_table2_v_delimiter();
 	echo "<form method=\"post\" action=\"actions.html\">";
 	echo "<input name=\"triggerid\" type=\"hidden\" value=$triggerid>";
-	echo "<input name=\"actionid\" type=\"hidden\" value=$actionid>";
+	if(isset($actionid))
+	{
+		echo "<input name=\"actionid\" type=\"hidden\" value=$actionid>";
+	}
 	echo "Send to";
 	show_table2_h_delimiter();
 	echo "<SELECT NAME=\"userid\" SIZE=\"1\">";
@@ -138,7 +148,7 @@
 	{
 		$id=DBget_field($result,$i,0);
 		$name=DBget_field($result,$i,1);
-		if($name==$sto)
+		if(isset($sto) && ($name==$sto))
 		{
 			echo "<option value=\"$id\" SELECTED>$name";
 		}
