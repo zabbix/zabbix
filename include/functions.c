@@ -311,14 +311,14 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL3");
 
-	if(hp==NULL)
+/*	if(hp==NULL)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot get IP for mailserver [%s]",smtp_server);
 		return FAIL;
 	}
 
 	servaddr_in.sin_addr.s_addr=((struct in_addr *)(hp->h_addr))->s_addr;
-	servaddr_in.sin_port=htons(25);
+	servaddr_in.sin_port=htons(25);*/
 
 	s=socket(AF_INET,SOCK_STREAM,0);
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL4");
