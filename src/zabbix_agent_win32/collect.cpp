@@ -34,6 +34,8 @@ double statProcUtilization15[MAX_CPU+1];
 double statProcLoad=0;
 double statProcLoad5=0;
 double statProcLoad15=0;
+double statAvgCollectorTime=0;
+double statMaxCollectorTime=0;
 
 
 //
@@ -42,6 +44,7 @@ double statProcLoad15=0;
 
 static LONG cpuUsageHistory[MAX_CPU+1][900];
 static LONG cpuQueueHistory[900];
+static DWORD collectorTimesHistory[60];
 
 
 //
@@ -57,12 +60,15 @@ void CollectorThread(void *)
    PDH_RAW_COUNTER rawCounter;      // Generic raw counter for various parameters
    PDH_STATUS status;
    SYSTEM_INFO sysInfo;
-   DWORD i,cpuHistoryIdx,cpuQueueHistoryIdx,dwSleepTime;
+   DWORD i,cpuHistoryIdx,cpuQueueHistoryIdx,collectorTimesIdx,dwSleepTime;
    USER_COUNTER *cptr;
    PDH_STATISTICS statData;
 
    TlsSetValue(dwTlsLogPrefix,"Collector: ");   // Set log prefix for collector thread
    GetSystemInfo(&sysInfo);
+
+   memset(collectorTimesHistory,0,sizeof(DWORD)*60);
+   collectorTimesIdx=0;
 
    // Prepare for CPU utilization collection
    memset(cpuUsageHistory,0,sizeof(LONG)*(MAX_CPU+1)*900);
@@ -227,6 +233,20 @@ void CollectorThread(void *)
       if (dwTicksElapsed>confMaxProcTime)
          WriteLog("Processing took more then %d milliseconds (%d milliseconds)\r\n",
                   confMaxProcTime,dwTicksElapsed);
+
+      // Save processing time to history buffer
+      collectorTimesHistory[collectorTimesIdx++]=dwTicksElapsed;
+      if (collectorTimesIdx==60)
+         collectorTimesIdx=0;
+
+      // Calculate average cpu usage for last minute
+      for(i=0,sum=0;i<60;i++)
+         sum+=collectorTimesHistory[i];
+      statAvgCollectorTime=((double)sum)/(double)60;
+
+      // Change maximum processing time if needed
+      if ((double)dwTicksElapsed>statMaxCollectorTime)
+         statMaxCollectorTime=(double)dwTicksElapsed;
 
       // Calculate sleeping time. We will sleep not less than 500 milliseconds even
       // if processing takes more than 500 milliseconds

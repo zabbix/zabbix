@@ -127,6 +127,7 @@ void ZabbixCreateService(char *execName)
    SC_HANDLE mgr,service;
    HKEY key;
    DWORD disp;
+   char cmdLine[MAX_PATH*2];
 
    mgr=OpenSCManager(NULL,NULL,GENERIC_WRITE);
    if (mgr==NULL)
@@ -135,8 +136,9 @@ void ZabbixCreateService(char *execName)
       return;
    }
 
+   sprintf(cmdLine,"\"%s\" --config \"%s\"",execName,confFile);
    service=CreateService(mgr,ZABBIX_SERVICE_NAME,"Zabbix Win32 Agent",GENERIC_READ,SERVICE_WIN32_OWN_PROCESS,
-                         SERVICE_AUTO_START,SERVICE_ERROR_NORMAL,execName,NULL,NULL,NULL,NULL,NULL);
+                         SERVICE_AUTO_START,SERVICE_ERROR_NORMAL,cmdLine,NULL,NULL,NULL,NULL,NULL);
    if (service==NULL)
    {
       DWORD code=GetLastError();
