@@ -53,8 +53,8 @@ insert into items_template (itemtemplateid,description,key_,delay)
 	values (16,'Size of /var/log/syslog','filesize[/var/log/syslog]', 30);
 insert into items_template (itemtemplateid,description,key_,delay)
 	values (17,'Number of users connected','system[users]', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (18,'Number of established TCP connections','tcp_count', 30);
+--insert into items_template (itemtemplateid,description,key_,delay)
+--	values (18,'Number of established TCP connections','tcp_count', 30);
 insert into items_template (itemtemplateid,description,key_,delay)
 	values (19,'Checksum of /etc/inetd.conf','cksum[/etc/inetd_conf]', 600);
 insert into items_template (itemtemplateid,description,key_,delay)
@@ -174,8 +174,8 @@ insert into triggers_template (triggertemplateid,itemtemplateid,description,expr
 	values (14,14,'Lack of free swap space on %s','{:.last(0)}<100000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (17,17,'Too may users connected on server %s','{:.last(0)}>50');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (18,18,'Too may established TCP connections on server %s','{:.last(0)}>500');
+--insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+--	values (18,18,'Too may established TCP connections on server %s','{:.last(0)}>500');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (19,19,'/etc/inetd.conf has been changed on server %s','{:.diff(0)}>0');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
