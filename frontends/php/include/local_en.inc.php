@@ -179,7 +179,7 @@
 
 //	Footer
 	define("S_ZABBIX_VER",				"ZABBIX 1.1alpha5");
-	define("S_COPYRIGHT_BY",			"Copyright 2001-2004 by ");
+	define("S_COPYRIGHT_BY",			"Copyright 2001-2005 by ");
 	define("S_CONNECTED_AS",			"Connected as");
 	define("S_ALEXEI_VLADISHEV",			"Alexei Vladishev");
 
