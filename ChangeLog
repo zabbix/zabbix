@@ -9,6 +9,7 @@ Noe ready yet:
 
 Changes for 1.0beta3:
 
+ - do not refresh screen if displayed all triggers (Alexei)
  - fixed "Send message to" in actions.html (Alexei)
  - support for experimental parameter NoTimeWait (Alexei)
  - diskfree[*] to return free disk space in Kb (Alexei)
