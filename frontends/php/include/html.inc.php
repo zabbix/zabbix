@@ -71,8 +71,8 @@
 
 	function table_row($elements, $rownum)
 	{
-		if($rownum%2 == 1)	{ echo "<TR BGCOLOR=#DDDDDD>"; }
-		else			{ echo "<TR BGCOLOR=#EEEEEE>"; }
+		if($rownum%2 == 1)	{ echo "<TR BGCOLOR=\"#DDDDDD\">"; }
+		else			{ echo "<TR BGCOLOR=\"#EEEEEE\">"; }
 
 		while(list($num,$element)=each($elements))
 		{

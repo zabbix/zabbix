@@ -1223,439 +1223,6 @@ echo "</head>";
 		if($nomenu == 0)
 		{
 ?>
-<!--
-	<p>
-
-	<table border=0 cellspacing=0 cellpadding=0 width=100% bgcolor=000000>
-	<tr>
-	<td valign="top">
-		<table width=100% border=0 cellspacing=1 cellpadding=2>
-		<tr>
-		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-<?php
-				if(check_anyright("Host","R"))
-				{
-					echo "<a href=\"latest.php\">";
-				}
-				if( 	($page["file"]=="latest.php") ||
-					($page["file"]=="history.php"))
-				{
-					echo "<b>[".nbsp(S_MENU_LATEST_VALUES)."]</b></a>";
-				}
-				else
-				{
-					echo nbsp(S_MENU_LATEST_VALUES)."</a>";
-				}
-?>
-		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
-<?php
-				if(check_anyright("Host","R"))
-				{
-					echo "<a href=\"tr_status.php?onlytrue=true&noactions=true&compact=true\">";
-				}
-				if($page["file"]=="tr_status.php")
-				{
-					echo "<b>[".S_MENU_TRIGGERS."]</b></a>";
-				}
-				else
-				{
-					echo S_MENU_TRIGGERS."</a>";
-				}
-?>
-		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
-<?php
-				if(check_anyright("Host","R"))
-				{
-					echo "<a href=\"queue.php\">";
-				}
-				if($page["file"]=="queue.php")
-				{
-					echo "<b>[".S_MENU_QUEUE."]</b></a>";
-				}
-				else
-				{
-					echo S_MENU_QUEUE."</a>";
-				}
-?>
-		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
-<?php
-				if(check_anyright("Default permission","R"))
-				{
-					echo "<a href=\"latestalarms.php\">";
-				}
-?>
-<?php
-				if(($page["file"]=="latestalarms.php") ||
-					($page["file"]=="alarms.php"))
-				{
-					echo "<b>[".S_MENU_ALARMS."]</b></a>";
-				}
-				else
-				{
-					echo S_MENU_ALARMS."</a>";
-				}
-?>
-		</td>
-		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
-<?php
-				if(check_anyright("Default permission","R"))
-				{
-					echo "<a href=\"alerts.php\">";
-				}
-?>
-<?php
-				if($page["file"]=="alerts.php")
-				{
-					echo "<b>[".S_MENU_ALERTS."]</b></a>";
-				}
-				else
-				{
-					echo S_MENU_ALERTS."</a>";
-				}
-?>
-		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-<?php
-				if(check_anyright("Network map","R"))
-				{
-					echo "<a href=\"maps.php\">";
-				}
-?>
-<?php
-				if($page["file"]=="maps.php")
-				{
-					echo "<b>[".nbsp(S_MENU_NETWORK_MAPS)."]</b></a>";
-				}
-				else
-				{
-					echo nbsp(S_MENU_NETWORK_MAPS)."</a>";
-				}
-?>
-		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-<?php
-				if(check_anyright("Graph","R"))
-				{
-					echo "<a href=\"charts.php\">";
-				}
-?>
-<?php
-				if($page["file"]=="charts.php")
-				{
-					echo "<b>[".S_MENU_GRAPHS."]</b></a>";
-				}
-				else
-				{
-					echo S_MENU_GRAPHS."</a>";
-				}
-?>
-		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-<?php
-				if(check_anyright("Screen","R"))
-				{
-					echo "<a href=\"screens.php\">";
-				}
-?>
-<?php
-				if($page["file"]=="screens.php")
-				{
-					echo "<b>[".S_MENU_SCREENS."]</b></a>";
-				}
-				else
-				{
-					echo S_MENU_SCREENS."</a>";
-				}
-?>
-		</td>
-
-		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-<?php
-				if(check_anyright("Service","R"))
-				{
-					echo "<a href=\"srv_status.php\">";
-				}
-				if($page["file"]=="srv_status.php")
-				{
-					echo "<b>[".nbsp(S_MENU_IT_SERVICES)."]</b></a>";
-				}
-				else
-				{
-					echo nbsp(S_MENU_IT_SERVICES)."</a>";
-				}
-?>
-		</td>
-		</tr>
-
-		<tr>
-		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
-				<a href="index.php">
-<?php
-				if($page["file"]=="index.php")
-				{
-					echo "<b>[".S_MENU_HOME."]</b></a>";
-				}
-				else
-				{
-					echo S_MENU_HOME."</a>";
-				}
-?>
-		</td>
-		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
-<?php
-				if(check_anyright("Default permission","R"))
-				{
-					echo "<a href=\"about.php\">";
-				}
-?>
-<?php
-				if($page["file"]=="about.php")
-				{
-					echo "<b>[".S_MENU_ABOUT."]</b></a>";
-				}
-				else
-				{
-					echo S_MENU_ABOUT."</a>";
-				}
-?>
-		</td>
-		<td colspan=3 bgcolor=FFFFFF align=center valign=top width=15%>
-<?php
-				if(check_anyright("Default permission","R"))
-				{
-					echo "<a href=\"report1.php\">";
-				}
-?>
-<?php
-				if($page["file"]=="report1.php")
-				{
-					echo "<b>[".nbsp(S_MENU_STATUS_OF_ZABBIX)."]</b></a>";
-				}
-				else
-				{
-					echo nbsp(S_MENU_STATUS_OF_ZABBIX)."</a>";
-				}
-?>
-		</td>
-		<td colspan=4 bgcolor=FFFFFF align=center valign=top width=15%>
-<?php
-				if(check_anyright("Host","R"))
-				{
-					echo "<a href=\"report2.php\">";
-				}
-?>
-<?php
-				if($page["file"]=="report2.php")
-				{
-					echo "<b>[".nbsp(S_MENU_AVAILABILITY_REPORT)."]</b></a>";
-				}
-				else
-				{
-					echo nbsp(S_MENU_AVAILABILITY_REPORT)."</a>";
-				}
-?>
-		</td>
-		</tr>
-<?php
-// Third row
-		if(	check_anyright("Configuration of Zabbix","U")
-			||
-			check_anyright("User","U")
-			||
-			check_anyright("Host","U")
-			||
-			check_anyright("Graph","U")
-			||
-			check_anyright("Screen","U")
-			||
-			check_anyright("Network map","U")
-			||
-			check_anyright("Service","U")
-		)
-		{
-
-?>
-		<tr>
-		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-<?php
-				if(check_anyright("Configuration of Zabbix","U"))
-				{
-					echo "<a href=\"config.php\">";
-				}
-				if($page["file"]=="config.php")
-				{
-					echo "<b>[".S_MENU_CONFIG."]</b></a>";
-				}
-				else
-				{
-					echo S_MENU_CONFIG."</a>";
-				}
-?>
-		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
-<?php
-				if(check_anyright("User","U"))
-				{
-					echo "<a href=\"users.php\">";
-				}
-				if(	($page["file"]=="users.php")||
-					($page["file"]=="media.php"))
-				{
-					echo "<b>[".S_MENU_USERS."]</b></a>";
-				}
-				else
-				{
-					echo S_MENU_USERS."</a>";
-				}
-?>
-		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
-<?php
-				if(check_anyright("Audit","U"))
-				{
-					echo "<a href=\"audit.php\">";
-				}
-				if($page["file"]=="audit.php")
-				{
-					echo "<b>[".S_MENU_AUDIT."]</b></a>";
-				}
-				else
-				{
-					echo S_MENU_AUDIT."</a>";
-				}
-?>
-		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
-<?php
-				if(check_anyright("Host","U"))
-				{
-					echo "<a href=\"hosts.php\">";
-				}
-				if($page["file"]=="hosts.php")
-				{
-					echo "<b>[".S_MENU_HOSTS."]</b></a>";
-				}
-				else
-				{
-					echo S_MENU_HOSTS."</a>";
-				}
-?>
-		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
-<?php
-				if(check_anyright("Host","U"))
-				{
-					echo "<a href=\"items.php\">";
-				}
-				if($page["file"]=="items.php")
-				{
-					echo "<b>[".S_MENU_ITEMS."]</b></a>";
-				}
-				else
-				{
-					echo S_MENU_ITEMS."</a>";
-				}
-?>
-		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-<?php
-				if(check_anyright("Host","U"))
-				{
-					echo "<a href=\"triggers.php\">";
-				}
-				if(	($page["file"]=="triggers.php")||
-					($page["file"]=="actions.php"))
-				{
-					echo "<b>[".S_MENU_TRIGGERS."]</b></a>";
-				}
-				else
-				{
-					echo S_MENU_TRIGGERS."</a>";
-				}
-?>
-		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-<?php
-				if(check_anyright("Network map","U"))
-				{
-					echo "<a href=\"sysmaps.php\">";
-				}
-				if(	($page["file"]=="sysmaps.php")||
-					($page["file"]=="sysmap.php"))
-				{
-					echo "<b>[".nbsp(S_MENU_NETWORK_MAPS)."]</b></a>";
-				}
-				else
-				{
-					echo nbsp(S_MENU_NETWORK_MAPS)."</a>";
-				}
-?>
-		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-<?php
-				if(check_anyright("Graph","U"))
-				{
-					echo "<a href=\"graphs.php\">";
-				}
-				if(	($page["file"]=="graphs.php")||
-					($page["file"]=="graph.php"))
-				{
-					echo "<b>[".S_MENU_GRAPHS."]</b></a>";
-				}
-				else
-				{
-					echo S_MENU_GRAPHS."</a>";
-				}
-?>
-		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-<?php
-				if(check_anyright("Screen","U"))
-				{
-					echo "<a href=\"screenconf.php\">";
-				}
-				if(	($page["file"]=="screenedit.php")||
-					($page["file"]=="screenconf.php"))
-				{
-					echo "<b>[".S_MENU_SCREENS."]</b></a>";
-				}
-				else
-				{
-					echo S_MENU_SCREENS."</a>";
-				}
-?>
-		</td>
-
-		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-<?php
-				if(check_anyright("Service","U"))
-				{
-					echo "<a href=\"services.php\">";
-				}
-				if($page["file"]=="services.php")
-				{
-					echo "<b>[".nbsp(S_MENU_IT_SERVICES)."]</b></a>";
-				}
-				else
-				{
-					echo nbsp(S_MENU_IT_SERVICES)."</a>";
-				}
-?>
-		</td>
-		</tr>
-<?php
-// THird row
-		}
-?>
-		</table>
-	</td>
-	</tr>
-	</table>
-	</p>
--->
 
 <?php
 	$menu=array(
@@ -1665,7 +1232,7 @@ echo "</head>";
 				"level2"=>array(
 					array("label"=>"Overview","url"=>"overview.php"),
 					array("label"=>"Latest data","url"=>"latest.php"),
-					array("label"=>"Triggers","url"=>"tr_status.php?onlytrue=true&noactions=true&compact=true"),
+					array("label"=>"Triggers","url"=>"tr_status.php?onlytrue=true&amp;noactions=true&amp;compact=true"),
 					array("label"=>"Queue","url"=>"queue.php"),
 					array("label"=>"Events","url"=>"latestalarms.php"),
 					array("label"=>"Actions","url"=>"alerts.php"),
@@ -1763,7 +1330,7 @@ echo "</head>";
 ?>
 </tr>
 </table>
-<table class="menu" width=100% cellspacing=0 cellpadding=5>
+<table class="menu" width="100%" cellspacing=0 cellpadding=5>
 <tr><td class="horizontal_menu" height=24 colspan=9><b>
 <?php
 	$i=0;
@@ -1809,7 +1376,7 @@ echo "</head>";
 ?>
 </b></td>
 </table>
-<p>
+<p align=center>
 
 
 <?php
@@ -3936,8 +3503,8 @@ echo "</head>";
 		cr();
 		echo "</tr>";
 		cr();
-		if($rownum%2 == 1)	{ echo "<TR BGCOLOR=#DFDFDF>"; }
-		else			{ echo "<TR BGCOLOR=#D8D8D8>"; }
+		if($rownum%2 == 1)	{ echo "<TR BGCOLOR=\"#DFDFDF\">"; }
+		else			{ echo "<TR BGCOLOR=\"#D8D8D8\">"; }
 		cr();
 //		echo "<td colspan=1 bgcolor=CCCCCC align=left valign=\"top\">";
 		echo "<td class=\"form_row_l\" height=24>";
@@ -3987,10 +3554,9 @@ echo "</head>";
 	function	show_form_begin($help="")
 	{
 ?>
-	<p align=center>
-	<table class="form" width="50%" cellspacing=0 cellpadding=1>
-	<tr>
-	<td class="form_row_first" height=24 colspan=2>
+<table class="form" width="50%" cellspacing=0 cellpadding=1>
+<tr>
+<td class="form_row_first" height=24 colspan=2>
 <?php
 		if($help!="")
 		{
@@ -4047,20 +3613,19 @@ echo "</head>";
 
 	function	show_table2_header_end()
 	{
-//		echo "	</font>";
+//		cr();
+//		echo "</td>";
+//		cr();
+//		echo "</tr>";
+//		cr();
+//		echo "</table>";
 		cr();
 		echo "</td>";
 		cr();
 		echo "</tr>";
 		cr();
 		echo "</table>";
-		cr();
-		echo "</td>";
-		cr();
-		echo "</tr>";
-		cr();
-		echo "</table>";
-		echo "</p>";
+//		echo "</p>";
 		cr();
 	}
 
@@ -4241,7 +3806,7 @@ echo "</head>";
 		}
 //		echo("<hr>");
 		echo "<center>";
-		echo "<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+		echo "<TABLE BORDER=0 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 		echo "<TR BGCOLOR=#EEEEEE>";
 		echo "<TR BGCOLOR=#DDDDDD>";
 		echo "<TD ALIGN=CENTER>";
@@ -4357,16 +3922,14 @@ echo "</head>";
 		global $USER_DETAILS;
 
 ?>
-<p>
+</p>
 <table class="menu" width="100%" cellspacing=0 cellpadding=5>
 <tr>
 <td class="horizontal_menu" height=24 colspan=9 align=center><b><?php echo "<a href=\"http://www.zabbix.com\" class=\"highlight\">".S_ZABBIX_VER."</a>&nbsp;".S_COPYRIGHT_BY."<a href=\"mailto:alex@gobbo.caves.lv\" class=\"highlight\">".S_ALEXEI_VLADISHEV."</a>"; ?></b></td>
 <td class="horizontal_menu" height=24 colspan=9 align=right><b><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><?php echo " ".S_CONNECTED_AS."&nbsp;".$USER_DETAILS["alias"];?></b></td>
 </tr>
 </table>
-</p>
 
-</p>
 </body>
 </html>
 <?php
