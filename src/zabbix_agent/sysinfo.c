@@ -1214,7 +1214,8 @@ double	DISKFREE(const char * mountPoint)
 		return  FAIL;
 	}
 
-	return  s.f_bavail * (s.f_bsize / 1024.0);
+/*	return  s.f_bavail * (s.f_bsize / 1024.0);*/
+	return  s.f_bavail * (s.f_frsize / 1024.0);
 #else
 	struct statfs   s;
 	long            blocks_used;
@@ -1256,7 +1257,8 @@ double	DISKUSED(const char * mountPoint)
 		return  FAIL;
 	}
 
-	return  (s.f_blocks-s.f_bavail) * (s.f_bsize / 1024.0);
+/*	return  (s.f_blocks-s.f_bavail) * (s.f_bsize / 1024.0);*/
+	return  (s.f_blocks-s.f_bavail) * (s.f_frsize / 1024.0);
 #else
 	struct statfs   s;
 	long            blocks_used;
@@ -1298,7 +1300,8 @@ double	DISKTOTAL(const char * mountPoint)
 		return  FAIL;
 	}
 
-	return  s.f_blocks * (s.f_bsize / 1024.0);
+/*	return  s.f_blocks * (s.f_bsize / 1024.0);*/
+	return  s.f_blocks * (s.f_frsize / 1024.0);
 #else
 	struct statfs   s;
 	long            blocks_used;
