@@ -44,14 +44,6 @@
 
 <?
 	$result=DBselect("select hostid,host from hosts order by host");
-//	if(isset($hostid))
-//	{
-//		echo "<A HREF=\"items.html\">all</A>  ";
-//	}
-//	else
-//	{
-//		echo "<b>[<A HREF=\"items.html\">all</A>]</b>  ";
-//	}
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		$hid=DBget_field($result,$i,0);

@@ -61,7 +61,7 @@
 
 //		echo "Validating simple:$expression<br>";
 //		if (eregi('^\{([0-9a-zA-Z\_\.]+)\:([0-9a-zA-Z\_]+)\.((diff)|(min)|(max)|(last)|(nodata))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
-		if (eregi('^\{([0-9a-zA-Z\_\.]+)\:([]\[0-9a-zA-Z\_\/]+)\.((diff)|(min)|(max)|(last)|(nodata))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
+		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/]+)\.((diff)|(min)|(max)|(last)|(prev))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
 		{
 			$host=$arr[1];
 			$key=$arr[2];
@@ -839,10 +839,26 @@
 		return	DBexecute($sql);
 	}
 
+	# Delete Alert by actionid
+
+	function	delete_alert_by_actionid( $actionid )
+	{
+		$sql="delete from alerts where actionid=$actionid";
+		return	DBexecute($sql);
+	}
+
 	# Delete Action by userid
 
 	function	delete_actions_by_userid( $userid )
 	{
+		$sql="select actionid from actions where userid=$userid";
+		$result=DBexecute($sql);
+		for($i=0;$i<DBnum_rows($result);$i++)
+		{
+			$actionid=DBget_field($result,$i,0);
+			delete_alert_by_actionid($actionid);
+		}
+
 		$sql="delete from actions where userid=$userid";
 		return	DBexecute($sql);
 	}
@@ -853,8 +869,8 @@
 	{
 		$sql="delete from actions where actionid=$actionid";
 		$result=DBexecute($sql);
-		$sql="delete from alerts where actionid=$actionid";
-		return	DBexecute($sql);
+
+		return delete_alert_by_actionid($actionid);
 	}
 
 	# Delete from History
@@ -968,13 +984,16 @@
 
 	# Delete Function and Trigger definitions by itemid
 
-	function	delete_triggers_functions_by_itemid($itemid)
+	function	delete_triggers_by_itemid($itemid)
 	{
 		$sql="select triggerid from functions where itemid=$itemid";
 		$result=DBselect($sql);
 		for($i=0;$i<DBnum_rows($result);$i++)
 		{
-			delete_trigger(DBget_field($result,$i,0));
+			if(!delete_trigger(DBget_field($result,$i,0)))
+			{
+				return FALSE;
+			}
 		}
 		$sql="delete from functions where itemid=$itemid";
 		return	DBexecute($sql);
@@ -985,8 +1004,12 @@
 
 	function	delete_item($itemid)
 	{
+		$sql="select hostid from items where itemid=$itemid";
+		$result=DBselect($sql);
+		$hostid=DBget_field($result,0,0);
+		delete_sysmaps_hosts($hostid);
 
-		$result=delete_triggers_functions_by_itemid($itemid);
+		$result=delete_triggers_by_itemid($itemid);
 		if(!$result)
 		{
 			return	$result;
