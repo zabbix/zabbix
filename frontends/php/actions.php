@@ -114,6 +114,12 @@
 		echo " <A HREF=\"actions.php?register=edit&actionid=".$row["actionid"]."&triggerid=".$row["triggerid"]."\">Change</A>";
 		echo "</TD></TR>";
 	}
+	if(DBnum_rows($result)==0)
+	{
+			echo "<TR BGCOLOR=#EEEEEE>";
+			echo "<TD COLSPAN=6 ALIGN=CENTER>-No actions defined-</TD>";
+			echo "<TR>";
+	}
 	echo "</TABLE>";
 ?>
 </font>
@@ -142,10 +148,11 @@
 		$trigger=get_trigger_by_triggerid($HTTP_GET_VARS["triggerid"]);
 		$description=$trigger["description"];
 
-		$good=1;
 		$delay=30;
 		$subject=$description;
 		$scope=@iif(isset($HTTP_GET_VARS["scope"]),$HTTP_GET_VARS["scope"],0);
+		$good=@iif(isset($HTTP_GET_VARS["good"]),$HTTP_GET_VARS["good"],1);
+		$whom=@iif(isset($HTTP_GET_VARS["whom"]),$HTTP_GET_VARS["whom"],0);
 		$severity=0;
 
 		$sql="select i.description, h.host, i.key_ from hosts h, items i,functions f where f.triggerid=".$HTTP_GET_VARS["triggerid"]." and h.hostid=i.hostid and f.itemid=i.itemid order by i.description";
@@ -172,52 +179,57 @@
 	}
 	echo nbsp("Send message to");
 	show_table2_h_delimiter();
-	echo "<select class=\"biginput\" name=\"whom\" size=\"1\">";
+	echo "<select class=\"biginput\" name=\"whom\" size=\"1\" onChange=\"submit()\">";
 
-	echo "<option value=\"user\" selected>Group";
-	echo "<option value=\"group\">User";
+	echo "<option value=\"0\""; if($whom==0) echo " selected"; echo ">Single user";
+	echo "<option value=\"1\""; if($whom==1) echo " selected"; echo ">User group";
 	echo "</select>";
 
-	show_table2_v_delimiter();
-	echo nbsp("Group");
-	show_table2_h_delimiter();
-	echo "<select class=\"biginput\" name=\"usrgrpid\" size=\"1\">";
-
-	$sql="select usrgrpid,name from usrgrp order by name";
-	$result=DBselect($sql);
-	while($row=DBfetch($result))
+	if($whom==0)
 	{
-		if(isset($usrgrpid) && ($row["usrgrpid"] == $usrgrpid))
+		show_table2_v_delimiter();
+		echo nbsp("Group");
+		show_table2_h_delimiter();
+		echo "<select class=\"biginput\" name=\"usrgrpid\" size=\"1\">";
+	
+		$sql="select usrgrpid,name from usrgrp order by name";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
 		{
-			echo "<option value=\"".$row["usrgrpid"]."\" selected>".$row["name"];
+			if(isset($usrgrpid) && ($row["usrgrpid"] == $usrgrpid))
+			{
+				echo "<option value=\"".$row["usrgrpid"]."\" selected>".$row["name"];
+			}
+			else
+			{
+				echo "<option value=\"".$row["usrgrpid"]."\">".$row["name"];
+			}
 		}
-		else
-		{
-			echo "<option value=\"".$row["usrgrpid"]."\">".$row["name"];
-		}
+		echo "</select>";
 	}
-	echo "</select>";
-
-	show_table2_v_delimiter();
-	echo nbsp("User");
-	show_table2_h_delimiter();
-	echo "<select class=\"biginput\" name=\"userid\" size=\"1\">";
-
-	$sql="select userid,alias from users order by alias";
-	$result=DBselect($sql);
-	while($row=DBfetch($result))
+	else
 	{
-		if(isset($uid) && ($row["userid"] == $uid))
+		show_table2_v_delimiter();
+		echo nbsp("User");
+		show_table2_h_delimiter();
+		echo "<select class=\"biginput\" name=\"userid\" size=\"1\">";
+	
+		$sql="select userid,alias from users order by alias";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
 		{
-			echo "<option value=\"".$row["userid"]."\" selected>".$row["alias"];
+			if(isset($uid) && ($row["userid"] == $uid))
+			{
+				echo "<option value=\"".$row["userid"]."\" selected>".$row["alias"];
+			}
+			else
+			{
+				echo "<option value=\"".$row["userid"]."\">".$row["alias"];
+			}
 		}
-		else
-		{
-			echo "<option value=\"".$row["userid"]."\">".$row["alias"];
-		}
+		echo "</select>";
 	}
-	echo "</select>";
-
+	
 	show_table2_v_delimiter();
 	echo nbsp("When trigger becomes");
 	show_table2_h_delimiter();
@@ -244,7 +256,7 @@
 	show_table2_v_delimiter();
 	echo "Scope";
 	show_table2_h_delimiter();
-	echo "<select class=\"biginput\" name=\"scope\" size=1  onChange=\"submit()\">";
+	echo "<select class=\"biginput\" name=\"scope\" size=1 onChange=\"submit()\">";
 	echo "<OPTION VALUE=\"0\""; if($scope==0) echo "SELECTED"; echo ">This trigger only";
 	echo "<OPTION VALUE=\"1\""; if($scope==1) echo "SELECTED"; echo ">All triggers of this host";
 	echo "<OPTION VALUE=\"2\""; if($scope==2) echo "SELECTED"; echo ">All triggers";

@@ -90,6 +90,12 @@
 		echo "<TD><A HREF=\"screenconf.php?screenid=".$row["screenid"]."#form\">Change</A></TD>";
 		echo "</TR>";
 	}
+	if(DBnum_rows($result)==0)
+	{
+			echo "<TR BGCOLOR=#EEEEEE>";
+			echo "<TD COLSPAN=5 ALIGN=CENTER>-No screens defined-</TD>";
+			echo "<TR>";
+	}
 	echo "</TABLE>";
 ?>
 
