@@ -38,17 +38,17 @@
 	$service=get_service_by_serviceid($HTTP_GET_VARS["serviceid"]);
 	$stat=calculate_service_availability($HTTP_GET_VARS["serviceid"],$period_start,$period_end);
 		
-	$true=$stat["true"];
-	$false=$stat["false"];
+	$problem=$stat["problem"];
+	$ok=$stat["ok"];
 
-//	echo $true," ",$false;
+//	echo $problem," ",$ok;
 
-	ImageFilledRectangle($im,$sizeX-$sizeX*$true/100-1,1,$sizeX-1,$sizeY-1,$darkred);
+	ImageFilledRectangle($im,$sizeX-$sizeX*$problem/100-1,1,$sizeX-1,$sizeY-1,$darkred);
 	ImageLine($im,$sizeX*$service["goodsla"]/100,1,$sizeX*$service["goodsla"]/100,$sizeY-1,$yellow);
 
-	$s=sprintf("%2.2f%%",$false);
+	$s=sprintf("%2.2f%%",$ok);
 	ImageString($im, 2,1,1, $s , $white);
-	$s=sprintf("%2.2f%%", $true);
+	$s=sprintf("%2.2f%%", $problem);
 	ImageString($im, 2,$sizeX-45,1, $s , $white);
 	ImagePng($im); 
 	ImageDestroy($im); 
