@@ -423,7 +423,7 @@ int	main()
 
 	if(CONFIG_LOG_FILE == NULL)
 	{
-		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,NULL);
+		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
 	}
 	else
 	{
