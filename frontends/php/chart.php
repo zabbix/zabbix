@@ -9,7 +9,7 @@
 
 	if(!isset($period))
 	{
-		$period=0;
+		$period=3600;
 	}
 
 	if(!isset($from))

@@ -2383,6 +2383,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	insert_time_navigator($itemid,$period,$from)
 	{
+		$descr=array("January","February","March","April","May","June",
+			"July","August","September","October","November","December");
 		$sql="select min(clock),max(clock) from history where itemid=$itemid";
 		$result=DBselect($sql);
 
@@ -2397,7 +2399,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$max=DBget_field($result,0,1);
 		}
 
-		$now=time()-12*$from;
+		$now=time()-3600*$from-$period;
 
 		$year_min=date("Y",$min);   
 		$year_max=date("Y",$max);
@@ -2407,9 +2409,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		$day_now=date("d",$now);
 		$hour_now=date("H",$now);
 
-		echo "<form method=\"post\" action=\"history.php?itemid=$itemid&action=showhistory\">";
+		echo "<form method=\"put\" action=\"history.php\">";
+		echo "<input name=\"itemid\" type=\"hidden\" value=$itemid size=8>";
+		echo "<input name=\"action\" type=\"hidden\" value=\"showhistory\" size=8>";
 
-		echo "Year:";
+		echo "Year";
 		echo "<select name=\"year\">";
 	        for($i=$year_min;$i<=$year_max;$i++)
 	        {
@@ -2424,22 +2428,22 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	        }
 		echo "</select>";
 
-		echo "Month:";
+		echo "Month";
 		echo "<select name=\"month\">";
 	        for($i=1;$i<=12;$i++)
 	        {
 			if($i==$month_now)
 			{	
-	               		echo "<option value=\"$i\" selected>$i";
+	               		echo "<option value=\"$i\" selected>".$descr[$i-1];
 			}
 			else
 			{
-	               		echo "<option value=\"$i\">$i";
+	               		echo "<option value=\"$i\">".$descr[$i-1];
 			}
 	        }
 		echo "</select>";
 
-		echo "Day:";
+		echo "Day";
 		echo "<select name=\"day\">";
 	        for($i=1;$i<=31;$i++)
 	        {
@@ -2454,7 +2458,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	        }
 		echo "</select>";
 
-		echo "Hour:";
+		echo "Hour";
 		echo "<select name=\"hour\">";
 	        for($i=0;$i<=23;$i++)
 	        {
