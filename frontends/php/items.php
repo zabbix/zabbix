@@ -201,9 +201,12 @@
 
 <?php
 
-	$lasthost="";
 	if(isset($_GET["hostid"])&&!isset($_GET["type"])) 
 	{
+		table_begin();
+		table_header(array(S_ID,S_KEY,S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),S_HISTORY,S_TRENDS,S_SHORT_NAME,S_TYPE,S_STATUS,S_ACTIONS));
+		echo "<form method=\"get\" action=\"items.php\">";
+		echo "<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_GET["hostid"]." size=8>";
 		$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.lastdelete,i.nextcheck,h.hostid,i.type,i.trends from hosts h,items i where h.hostid=i.hostid and h.hostid=".$_GET["hostid"]." order by h.host,i.key_,i.description");
 		$col=0;
 		while($row=DBfetch($result))
@@ -212,18 +215,6 @@
 			{
 				continue;
 			}
-			if($lasthost != $row["host"])
-			{
-				if($lasthost != "")
-				{
-					echo "</TABLE><BR>";
-				}
-				echo "<form method=\"get\" action=\"items.php\">";
-				echo "<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_GET["hostid"]." size=8>";
-				table_begin();
-				table_header(array(S_ID,S_KEY,S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),S_HISTORY,S_TRENDS,S_SHORT_NAME,S_TYPE,S_STATUS,S_ACTIONS));
-			}
-			$lasthost=$row["host"];
 
 			$input="<INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"".$row["itemid"]."\"> ".$row["itemid"];
 
