@@ -24,13 +24,13 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.23)
+Zabbix Reference Manual for version 1.0 (draft v1.24)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-27 June 2002
+30 June 2002
 \layout Abstract
 
 The document is Reference Manual for Zabbix version 1.0.
@@ -94,7 +94,7 @@ italic text
 
 \layout Standard
 
-File names, emphasis
+Name of file or directory, emphasis
 \end_inset 
 </cell>
 </row>
@@ -373,6 +373,42 @@ web-based interface for viewing and configuration
 flexible e-mail notification of predefined events
 \layout Subsection
 
+Why choose Zabbix ?
+\layout Itemize
+
+highly efficient agents
+\newline 
+Most of other software for monitoring does not have fast agents.
+ Forks, etc, etc ...
+\layout Itemize
+
+very simple configuration
+\layout Itemize
+
+all information (configuration, gathered data) is stored in SQL database
+\layout Itemize
+
+high-level service tree
+\layout Itemize
+
+tested using regression tests
+\layout Itemize
+
+very easy setup
+\layout Itemize
+
+support of SNMP
+\layout Itemize
+
+visualisation capabilities
+\layout Itemize
+
+housekeeping procedure
+\layout Itemize
+
+very low latency (usually less than 1 second)
+\layout Subsection
+
 About this Manual
 \layout Standard
 
@@ -642,6 +678,14 @@ Viewing trends of process load, disk usage, database activity, or other
 \layout Subsection
 
 Managing dependencies between IT resources
+\begin_float footnote 
+\layout Standard
+
+IT Services is experimental feature that should not be used in production
+ systems until 
+\series bold 
+Zabbix 1.0beta5
+\end_float 
 \layout Standard
 
 High level service tree allows create dependencies between various IT resource.
@@ -776,13 +820,35 @@ Zabbix
 :
 \layout Itemize
 
-Apache 1.3.12 or later
+Apache
+\begin_float footnote 
+\layout Standard
+
+
+\begin_inset LatexCommand \url{http://www.apache.org}
+
+\end_inset 
+
+
+\end_float 
+ 1.3.12 or later
 \layout Itemize
 
 MySQL 3.22 or later or - PostgreSQL 7.0.2 or later
 \layout Itemize
 
-PHP 4.0 or later compiled as Apache module 
+PHP
+\begin_float footnote 
+\layout Standard
+
+
+\begin_inset LatexCommand \url{http:///www.php.net}
+
+\end_inset 
+
+
+\end_float 
+ 4.0 or later compiled as Apache module 
 \layout Itemize
 
 PHP4.0 GD module (for PNG images)
@@ -795,7 +861,8 @@ GNU Make
 \layout Itemize
 
 WEB browser on client side (support for HTML and PNG images required).
- MS Explorer and Netscape work perfectly.
+ MS Explorer (5.xx and 6.xx) and Netscape 4.7x work perfectly.
+ Note that cookies must be enabled.
 \layout Itemize
 
 UCD-SNMP library and header files.
@@ -863,7 +930,13 @@ These results are predictable.
 \end_float 
 \layout Itemize
 
-no need to constantly run "vacuum" command with MySQL
+no need to constantly run command "
+\family typewriter 
+\emph on 
+vacuum
+\family default 
+\emph default 
+" MySQL
 \layout Standard
 
 MySQL MyISAM table is not a best choice because of lack of row locking.
@@ -920,14 +993,21 @@ For heavily loaded
 Zabbix
 \series default 
  servers, hourly execution of "VACUUM ANALYZE" for all tables except "history"
- is strongly recommended! You can use the command '
+ is strongly recommended! You can use the command 
+\newline 
+
+\newline 
+
 \family typewriter 
 \emph on 
 echo "vacuum verbose analyze"|psql zabbix
 \family default 
 \emph default 
-'.
- For more information about PostgreSQL see 
+ 
+\newline 
+
+\newline 
+For more information about PostgreSQL see 
 \begin_inset LatexCommand \cite{key-2}
 
 \end_inset 
@@ -996,7 +1076,9 @@ Structure of Zabbix distribution
 Zabbix distribution
 \layout Standard
 
-- doc
+- 
+\emph on 
+doc
 \layout Standard
 
 \SpecialChar ~
@@ -1007,22 +1089,34 @@ Manual
 in different formats
 \layout Standard
 
-- src
+- 
+\emph on 
+src
 \layout Standard
 
-- include
+- 
+\emph on 
+include
 \layout Standard
 
-- misc
+- 
+\emph on 
+misc
 \layout Standard
 
-- frontends
+- 
+\emph on 
+frontends
 \layout Standard
 
-- create
+- 
+\emph on 
+create
 \layout Standard
 
-- upgrades
+- 
+\emph on 
+upgrades
 \layout Subsection
 
 Installation procedure
@@ -1181,7 +1275,9 @@ To configure the source for the server, you must specify which database
 
 \family typewriter 
 \emph on 
-./configure --with-mysql # for MySQL 
+
+\newline 
+./configure --with-mysql # for MySQL
 \family default 
 \emph default 
 
@@ -1195,11 +1291,9 @@ or
 
 \family typewriter 
 \emph on 
-./configure --with-pgsql # for PostgreSQL make
+./configure --with-pgsql # for PostgreSQL mak
 \family default 
-
-\newline 
-
+e 
 \begin_float footnote 
 \layout Standard
 
@@ -1209,6 +1303,8 @@ Use flag --enable-static to statically link libraries.
 \end_float 
 
 \emph on 
+
+\newline 
 
 \newline 
 
@@ -1225,6 +1321,14 @@ However, if you want to compile client binaries only, run:
 
 \family default 
 \emph default 
+
+\newline 
+Parameter
+\emph on 
+ --enable-static
+\emph default 
+ may be used to force static linkage.
+\newline 
 
 \newline 
 Make everything:
@@ -1258,9 +1362,8 @@ Other common directories are
 \emph default 
  or 
 \emph on 
-/usr/local/zabbix/bin
-\emph default 
-.
+/usr/local/zabbix/bin.
+ 
 \layout Enumerate
 
 Configure 
@@ -1282,9 +1385,9 @@ The step is not real requirement.
 \emph on 
 
 \newline 
-zabbix_agent 10000/tcp 
+zabbix_agent 10000/tcp
 \newline 
-zabbix_trap 10001/tcp 
+zabbix_trap 10001/tcp
 \layout Enumerate
 
 Configure 
@@ -1539,9 +1642,10 @@ Zabbix
 /home/zabbix/html
 \emph default 
 , point your browser to 
-\family typewriter 
-http://localhost/~zabbix
-\family default 
+\begin_inset LatexCommand \url{http://localhost/~zabbix}
+
+\end_inset 
+
 )
 \newline 
 Once there, click on the CONFIG link.
@@ -1609,8 +1713,12 @@ When you set up an email notification, you may modify the subject and message
  For example, the subject for a warning message could look like:
 \newline 
 
+\newline 
+
 \emph on 
 Processor load on www.sf.net is {www.sf.net:system[procload].last(0)}
+\newline 
+
 \newline 
 
 \emph default 
@@ -1618,6 +1726,8 @@ In this case, you will receive message with subject like
 \emph on 
 "Processor load on www.sf.net is 0.85"
 \emph default 
+
+\newline 
 
 \newline 
 Click on the "MAPS" link to set up a network map.
@@ -1753,44 +1863,36 @@ Use flag --enable-static to statically link libraries.
 
 \newline 
 
+\newline 
+
 \family default 
 \emph default 
+Parameter 
+\emph on 
+--enable-static
+\emph default 
+ may be used to force static linkage.
+\newline 
 
 \newline 
 Build agent:
 \newline 
 
+\newline 
+
 \family typewriter 
 \emph on 
-
-\newline 
 make
 \family default 
-
-\newline 
-
 \emph default 
 
 \newline 
-Copy created binaries from 
-\emph on 
-bin/
-\emph default 
- to 
-\emph on 
-/opt/zabbix/bin
-\emph default 
- or any other directory 
+
 \newline 
-Other common directories are 
-\emph on 
-/usr/local/bin
-\emph default 
- or 
-\emph on 
-/usr/local/zabbix/bin
-\emph default 
-.
+Copy created binaries from bin/ to /opt/zabbix/bin or any other directory
+ 
+\newline 
+Other common directories are /usr/local/bin or /usr/local/zabbix/bin.
 \layout Enumerate
 
 Configure 
@@ -1956,7 +2058,18 @@ Zabbix
 \series default 
 .
  It means that if you have difficulties choosing between Linux and other
- OS, go for Debian Linux - you will get better support.
+ OS, go for Debian Linux
+\begin_float footnote 
+\layout Standard
+
+
+\begin_inset LatexCommand \url{http://www.debian.org}
+
+\end_inset 
+
+
+\end_float 
+ - you will get better support.
 \layout Standard
 
 
@@ -1964,7 +2077,18 @@ Zabbix
 Zabbix
 \series default 
  1.0beta4 was developed and tested on FreeBSD 4.4.
- Thus, FreeBSD is also safe choice.
+ Thus, FreeBSD
+\begin_float footnote 
+\layout Standard
+
+
+\begin_inset LatexCommand \url{http://www.freebsd.org}
+
+\end_inset 
+
+
+\end_float 
+ is also safe choice.
 \layout Subsection
 
 Platform specific notes
@@ -2440,7 +2564,90 @@ Parameter Server is comma-delimited list of Zabbix servers
 Zabbix 1.0beta4
 \layout Itemize
 
-support for processing of negative values
+IMPORTANT.
+ Do not forget to apply DB patches
+\layout Itemize
+
+IMPORTANT.
+ If you have parameter 
+\emph on 
+StartSuckers
+\emph default 
+ equal to 2, increase it to 3.
+ That is minimum value now.
+\layout Itemize
+
+IMPORTANT.
+ Added true availability checking.
+ When 
+\series bold 
+Zabbix
+\series default 
+ is not running, status of all triggers is set to UNKNOWN.
+\layout Itemize
+
+IMPORTANT.
+ Added special parameter, 
+\emph on 
+status
+\emph default 
+, that can be used for monitoring situations when a host goes down.
+ Add this parameter to all hosts beig monitored.
+\layout Itemize
+
+IMPORTANT.
+ Added check of source IP address for trapped parameters.See Item definition
+ screen.
+\layout Itemize
+
+IMPORTANT.
+ Housekeeping period is set in days instead of seconds for monitored parameters,
+ alarms, and alerts.
+\layout Itemize
+
+IMPORTANT.
+ Changed authorisation mechanism.
+ Default user 
+\emph on 
+guest
+\emph default 
+ introduced.
+\layout Itemize
+
+IMPORTANT.
+ Unreachable parameters will not be shown in the Queue.
+\layout Itemize
+
+Added parameter 
+\emph on 
+--enable-static
+\emph default 
+ for 
+\emph on 
+./configure
+\layout Itemize
+
+Enhancement of 
+\emph on 
+check_service[service<,port>]
+\layout Itemize
+
+
+\emph on 
+UserParameter
+\emph default 
+ can return non-numerci parameters
+\layout Itemize
+
+
+\emph on 
+doc/manual.lyx
+\emph default 
+ excluded from 
+\series bold 
+Zabbix
+\series default 
+ distribution
 \layout Itemize
 
 Parameter 
@@ -2458,10 +2665,285 @@ improvements in SNMP handling
 supports for non-numeric SNMP values
 \layout Itemize
 
+
+\series bold 
+Zabbix 
+\series default 
 can be compiled by standard Unix compiler (CC)
 \layout Subsection
 
 ChangeLog
+\layout Subsubsection
+
+Zabbix 1.0beta4
+\layout Itemize
+
+check permissions for Availability report
+\layout Itemize
+
+added parameter SenderFrequency to 
+\series bold 
+zabbix_suckerd
+\series default 
+ configuration file
+\layout Itemize
+
+added 
+\emph on 
+frontends/include/defines.inc.php
+\layout Itemize
+
+added column s
+\emph on 
+ervices.algorithm
+\layout Itemize
+
+list of test cases added to the Manual
+\layout Itemize
+
+emails to be sent in case of TRUE-UNKNOWN-FALSE and v.s.
+\layout Itemize
+
+one 
+\series bold 
+zabbix_suckerd
+\series default 
+ to send alerts
+\layout Itemize
+
+minimum number of 
+\series bold 
+zabbix_suckerd
+\series default 
+ StartSuckers is set to 3
+\layout Itemize
+
+added 
+\emph on 
+alerts.retries
+\layout Itemize
+
+added 
+\emph on 
+alerts.status
+\layout Itemize
+
+status of triggers changes if host/item status has been changed
+\layout Itemize
+
+status of triggers is set correctly even if 
+\series bold 
+Zabbix
+\series default 
+ is restarted
+\layout Itemize
+
+
+\emph on 
+php/include/*inc
+\emph default 
+ renamed to 
+\emph on 
+php/include/*inc.php
+\layout Itemize
+
+check of source IP address for trapped values
+\layout Itemize
+
+added 
+\emph on 
+include/security.h
+\emph default 
+ and 
+\emph on 
+include/security.c
+\layout Itemize
+
+added 
+\emph on 
+items.trapper_hosts
+\layout Itemize
+
+housekeeping period for items to be set in days
+\layout Itemize
+
+authorisation without user name/password
+\layout Itemize
+
+default user "
+\emph on 
+guest
+\emph default 
+"
+\layout Itemize
+
+added table '
+\emph on 
+sessions
+\emph default 
+'
+\layout Itemize
+
+added index 
+\emph on 
+triggers.value
+\emph default 
+ and 
+\emph on 
+trigger.status
+\layout Itemize
+
+added column 
+\emph on 
+alarms.value
+\layout Itemize
+
+removed column 
+\emph on 
+alarms.istrue
+\layout Itemize
+
+added columns 
+\emph on 
+triggers.status
+\layout Itemize
+
+added columns 
+\emph on 
+triggers.value
+\layout Itemize
+
+removed column 
+\emph on 
+triggers.istrue
+\layout Itemize
+
+support for 
+\emph on 
+--enable-static
+\emph default 
+ for 
+\emph on 
+./configure
+\layout Itemize
+
+housekeeping period for alarms and alerts to be set in days
+\layout Itemize
+
+created directory 
+\emph on 
+upgrades/dbpatches/1.0beta3_to_1.0beta4
+\layout Itemize
+
+more anvanced algorithm for updating 
+\emph on 
+disable_until
+\emph default 
+ field
+\layout Itemize
+
+problem with "Lost connection to DB" solved
+\layout Itemize
+
+function 
+\emph on 
+DBis_empty()
+\emph default 
+, code cleanup
+\layout Itemize
+
+unreachable parameters will not be shown in Queue
+\layout Itemize
+
+support for 
+\emph on 
+check_service[service,port]
+\layout Itemize
+
+advanced change of host status in 
+\series bold 
+zabbix_suckerd
+\layout Itemize
+
+added support of 
+\emph on 
+UserParameter
+\emph default 
+(s) returning non-numeric values
+\layout Itemize
+
+
+\emph on 
+doc/manual.lyx
+\emph default 
+ will not be included in 
+\series bold 
+Zabbix
+\series default 
+ release
+\layout Itemize
+
+chnages to make 
+\series bold 
+Zabbix
+\series default 
+ compile in non-GCC environments
+\layout Itemize
+
+unreachable hosts will be clickable in system maps
+\layout Itemize
+
+fixed double posting of the same trigger status into alarms
+\layout Itemize
+
+fixed macros substitution in email alerts
+\layout Itemize
+
+removed option 
+\emph on 
+-Wall
+\emph default 
+ from all Makefiles
+\layout Itemize
+
+removed "//" comments from Zabbix code
+\layout Itemize
+
+disabled experimental code by commenting 
+\emph on 
+#define PERF 
+\layout Itemize
+
+improvements in SNMP handling for 
+\series bold 
+zabbix_suckerd
+\layout Itemize
+
+fixed check for SNMP library in configure.in
+\layout Itemize
+
+template host set to empty in Host definition form
+\layout Itemize
+
+support for 
+\emph on 
+DisableHousekeeping
+\emph default 
+ for 
+\series bold 
+zabbix_suckerd
+\layout Itemize
+
+protection from 
+\emph on 
+items.delay
+\emph default 
+ set to 
+\emph on 
+0
+\layout Itemize
+
+values provided by an agent can be less than zero
 \layout Section
 
 Zabbix Architecture
@@ -2588,8 +3070,11 @@ zabbix_agent
 from
 \emph default 
  the server.
- If the server is used in the Server Listen Mode then the zabbix active
- client is used (
+ If the server is used in the Server Listen Mode then the 
+\series bold 
+Zabbix
+\series default 
+ active client is used (
 \series bold 
 zabbix_sende
 \series default 
@@ -3159,7 +3644,7 @@ five
 \latex default 
 copies
 \latex no_latex 
- by default).\SpecialChar ~
+ by default).
  Load is balanced between each copy of the process.
 \layout Standard
 
@@ -3784,7 +4269,7 @@ See
 \emph on 
 misc/conf/zabbix_agentd.conf
 \emph default 
- for already predefined (but commented) user-defined parameters.
+ for already predefined (but commented) parameters.
 \layout Subsection
 
 Monitoring of MS Windows servers
@@ -3798,6 +4283,16 @@ using
 zabbix_sender
 \series default 
  compiled under CygWin
+\begin_float footnote 
+\layout Standard
+
+
+\begin_inset LatexCommand \url{http://www.cygwin.com}
+
+\end_inset 
+
+
+\end_float 
 \layout Section
 
 Zabbix Configuration
@@ -3966,7 +4461,7 @@ zabbix
 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="13" columns="4">
+<lyxtabular version="2" rows="14" columns="4">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
@@ -4012,7 +4507,7 @@ Description
 
 \layout Standard
 
-HousekeepingFrequencyServer
+HousekeepingFrequency
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -4072,6 +4567,40 @@ No
 \layout Standard
 
 Number of zabbix_suckerd to start (3-255)
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+SenderFrequency
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+No
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+30
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+The parameter defines how often the daemon must try to send alerts (in seconds).
 \end_inset 
 </cell>
 </row>
@@ -6178,460 +6707,12 @@ diskfree[/]
 diskfree[/opt
 \emph default 
 ] - correct definitions.
-\layout Standard
-
 \layout Subsubsection
 
 List of supported parameters
 \layout Standard
 
-
-\series bold 
-memory[total]
-\series default 
- 
-\latex no_latex 
-Total amount of installed physical memory.
-\layout Description
-
-
-\latex no_latex 
-memory[shared]
-\latex default 
- 
-\latex no_latex 
-Amount of used shared memory.
-\layout Description
-
-
-\latex no_latex 
-memory[buffers]
-\latex default 
- 
-\latex no_latex 
-Amount of memory used for kernel buffers.
-\layout Description
-
-
-\latex no_latex 
-memory[cached]
-\latex default 
- 
-\latex no_latex 
-Amount of cached memory.
-\layout Description
-
-
-\latex no_latex 
-memory[free]
-\latex default 
- 
-\latex no_latex 
-Amount of unused physical memory.
-\layout Description
-
-
-\latex no_latex 
-diskfree[*]
-\latex default 
- 
-\latex no_latex 
-Amount of unused disk space for given volume
-\latex default 
- (in Kb)
-\latex no_latex 
-.
-\layout Standard
-
-E
-\latex no_latex 
-xample:
-\layout Standard
-
-
-\emph on 
-diskfree[/]
-\emph default 
-\latex no_latex 
- - returns free disk space for root volume.
-\layout Description
-
-
-\latex no_latex 
-inodefree[*]
-\latex default 
- 
-\latex no_latex 
-Number of unused inodes space for given volume.
-\layout Standard
-
-
-\latex no_latex 
-Example:
-\layout Standard
-
-
-\emph on 
-inodefree[/var]
-\emph default 
-\latex no_latex 
- - returns number of free inodes for volume /var
-\layout Description
-
-
-\latex no_latex 
-cksum[*]
-\latex default 
- 
-\latex no_latex 
-Check sum of given file.
-\layout Standard
-
-
-\latex no_latex 
-Example:
-\latex default 
- 
-\emph on 
-cksum[/etc/passwd]
-\layout Description
-
-
-\latex no_latex 
-filesize[*]
-\latex default 
- 
-\latex no_latex 
-Size of given file.
-\layout Standard
-
-E
-\latex no_latex 
-xample:
-\layout Standard
-
-
-\emph on 
-filesize[/var/log/syslog]
-\layout Description
-
-
-\latex no_latex 
-proc_cnt[*]
-\latex default 
- 
-\latex no_latex 
-Number of processes called "*" running.
-\layout Standard
-
-E
-\latex no_latex 
-xample:
-\latex default 
- 
-\emph on 
-proc_cnt[inetd]
-\layout Description
-
-
-\latex no_latex 
-swap[free]
-\latex default 
- 
-\latex no_latex 
-Free swap space.
-\layout Description
-
-
-\latex no_latex 
-swap[total]
-\latex default 
- 
-\latex no_latex 
-Total swap space.
-\layout Description
-
-
-\latex no_latex 
-swap[free]
-\latex default 
- 
-\latex no_latex 
-Free swap space.
-\layout Description
-
-
-\latex no_latex 
-system[procload]
-\latex default 
- 
-\latex no_latex 
-Load average for last 1 minute.
-\layout Description
-
-
-\latex no_latex 
-system[procload5]
-\latex default 
- 
-\latex no_latex 
-Load average for last 5 minutes.
-\layout Description
-
-
-\latex no_latex 
-system[procload15]
-\latex default 
- 
-\latex no_latex 
-Load average for last 15 minutes.
-\layout Description
-
-
-\latex no_latex 
-system[proccount]
-\latex default 
- 
-\latex no_latex 
-Number of processes.
-\layout Description
-
-
-\latex no_latex 
-system[procrunning]
-\latex default 
- 
-\latex no_latex 
-Number of running processes.
-\layout Description
-
-
-\latex no_latex 
-system[uptime]
-\latex default 
- 
-\latex no_latex 
-System's uptime.
-\layout Description
-
-
-\latex no_latex 
-system[users]
-\latex default 
- N
-\latex no_latex 
-umber of users connected.
-\layout Description
-
-kern[maxfiles] Maximum number of opened files supported by OS.
-\layout Description
-
-kern
-\latex no_latex 
-[
-\latex default 
-maxproc
-\latex no_latex 
-]
-\latex default 
- Maximum number of processes supported by OS
-\latex no_latex 
-.
-\layout Description
-
-
-\latex no_latex 
-ping
-\latex default 
- 
-\latex no_latex 
-Always return 1.
-\layout Description
-
-
-\latex no_latex 
-tcp_count
-\latex default 
- 
-\latex no_latex 
-Number of established TCP connections.
-\layout Description
-
-
-\latex no_latex 
-check_service[ftp]
-\latex default 
- 
-\latex no_latex 
-Check 
-\latex default 
-if
-\latex no_latex 
- FTP server is running and accepting connections.
-\layout Standard
-
-
-\latex no_latex 
-Result: 0 - FTP server is down
-\layout Standard
-
-1
-\latex no_latex 
- - FTP server is running
-\layout Description
-
-
-\latex no_latex 
-check_service[ssh]
-\latex default 
- 
-\latex no_latex 
-Check 
-\latex default 
-if
-\latex no_latex 
- SSH server is running and accepting connections.
-\layout Standard
-
-
-\latex no_latex 
-Result: 0 - SSH server is down
-\layout Standard
-
-1
-\latex no_latex 
- - SSH server is running
-\layout Description
-
-
-\latex no_latex 
-check_service[smtp]
-\latex default 
- 
-\latex no_latex 
-Check 
-\latex default 
-if
-\latex no_latex 
- Email (SMTP) server is running and accepting connections.
-\layout Standard
-
-
-\latex no_latex 
-Result: 0 - SMTP server is down
-\layout Standard
-
-
-\latex no_latex 
-1 - SMTP server is running
-\layout Description
-
-
-\latex no_latex 
-check_service[
-\latex default 
-http
-\latex no_latex 
-]
-\latex default 
- 
-\latex no_latex 
-Check 
-\latex default 
-if
-\latex no_latex 
- 
-\latex default 
-HTTP
-\latex no_latex 
- server is running and accepting connections.
-\layout Standard
-
-R
-\latex no_latex 
-esult: 0 - 
-\latex default 
-HTTP
-\latex no_latex 
- server is down
-\layout Standard
-
-1
-\latex no_latex 
- - 
-\latex default 
-HTTP
-\latex no_latex 
- server is running
-\layout Description
-
-
-\latex no_latex 
-check_service[pop]
-\latex default 
- 
-\latex no_latex 
-Check 
-\latex default 
-if
-\latex no_latex 
- POP server is running and accepting connections.
-\layout Standard
-
-R
-\latex no_latex 
-esult: 0 - POP server is down
-\layout Standard
-
-1
-\latex no_latex 
- - POP server is running
-\layout Description
-
-
-\latex no_latex 
-check_service[nntp]
-\latex default 
- C
-\latex no_latex 
-heck 
-\latex default 
-if
-\latex no_latex 
- NNTP server is running and accepting connections.
-\layout Standard
-
-
-\latex no_latex 
-Result: 0 - NNTP server is down
-\layout Standard
-
-
-\latex no_latex 
-1 - NNTP server is running
-\layout Description
-
-c
-\latex no_latex 
-heck_service[imap]
-\latex default 
- 
-\latex no_latex 
-Check 
-\latex default 
-if
-\latex no_latex 
- IMAP server is running and accepting connections.
-\layout Standard
-
-
-\latex no_latex 
-Result: 0 - IMAP server is down
-\layout Standard
-
-
-\latex no_latex 
-1 - IMAP server is running
+Sorted alphabetically:
 \layout Description
 
 
@@ -6676,6 +6757,539 @@ heck_port[80]
  to check either WEB server accepts connections.
 \layout Description
 
+
+\latex no_latex 
+check_service[ftp
+\latex default 
+<,port>
+\latex no_latex 
+]
+\latex default 
+ 
+\latex no_latex 
+Check 
+\latex default 
+if
+\latex no_latex 
+ FTP server is running and accepting connections.
+
+\latex default 
+ If port number is missing, '21' is used.
+\layout Standard
+
+
+\latex no_latex 
+Result: 0 - FTP server is down
+\layout Standard
+
+1
+\latex no_latex 
+ - FTP server is running
+\layout Description
+
+
+\latex no_latex 
+check_service[
+\latex default 
+http<,port>
+\latex no_latex 
+]
+\latex default 
+ 
+\latex no_latex 
+Check 
+\latex default 
+if
+\latex no_latex 
+ 
+\latex default 
+HTTP
+\latex no_latex 
+ server is running and accepting connections.
+
+\latex default 
+ If port number is missing, '80' is used.
+\layout Standard
+
+R
+\latex no_latex 
+esult: 0 - 
+\latex default 
+HTTP
+\latex no_latex 
+ server is down
+\layout Standard
+
+1
+\latex no_latex 
+ - 
+\latex default 
+HTTP
+\latex no_latex 
+ server is running
+\layout Description
+
+c
+\latex no_latex 
+heck_service[imap
+\latex default 
+<,port>
+\latex no_latex 
+]
+\latex default 
+ 
+\latex no_latex 
+Check 
+\latex default 
+if
+\latex no_latex 
+ IMAP server is running and accepting connections.
+
+\latex default 
+ If port number is missing, '143' is used.
+\layout Standard
+
+
+\latex no_latex 
+Result: 0 - IMAP server is down
+\layout Standard
+
+
+\latex no_latex 
+1 - IMAP server is running
+\layout Description
+
+
+\latex no_latex 
+check_service[nntp
+\latex default 
+<,port>
+\latex no_latex 
+]
+\latex default 
+ C
+\latex no_latex 
+heck 
+\latex default 
+if
+\latex no_latex 
+ NNTP server is running and accepting connections.
+
+\latex default 
+ If port number is missing, '119' is used.
+\layout Standard
+
+
+\latex no_latex 
+Result: 0 - NNTP server is down
+\layout Standard
+
+
+\latex no_latex 
+1 - NNTP server is running
+\layout Description
+
+
+\latex no_latex 
+check_service[pop
+\latex default 
+<,port>
+\latex no_latex 
+]
+\latex default 
+ 
+\latex no_latex 
+Check 
+\latex default 
+if
+\latex no_latex 
+ POP server is running and accepting connections.
+
+\latex default 
+ If port number is missing, '110' is used.
+\layout Standard
+
+R
+\latex no_latex 
+esult: 0 - POP server is down
+\layout Standard
+
+1
+\latex no_latex 
+ - POP server is running
+\layout Description
+
+
+\latex no_latex 
+check_service[smtp
+\latex default 
+<,port>
+\latex no_latex 
+]
+\latex default 
+ 
+\latex no_latex 
+Check 
+\latex default 
+if
+\latex no_latex 
+ Email (SMTP) server is running and accepting connections.
+
+\latex default 
+ If port number is missing, '25' is used.
+\layout Standard
+
+
+\latex no_latex 
+Result: 0 - SMTP server is down
+\layout Standard
+
+
+\latex no_latex 
+1 - SMTP server is running
+\layout Description
+
+
+\latex no_latex 
+check_service[ssh
+\latex default 
+<,port>
+\latex no_latex 
+]
+\latex default 
+ 
+\latex no_latex 
+Check 
+\latex default 
+if
+\latex no_latex 
+ SSH server is running and accepting connections.
+
+\latex default 
+ If port number is missing, '22' is used.
+\layout Standard
+
+
+\latex no_latex 
+Result: 0 - SSH server is down
+\layout Standard
+
+1
+\latex no_latex 
+ - SSH server is running
+\layout Description
+
+
+\latex no_latex 
+cksum[*]
+\latex default 
+ 
+\latex no_latex 
+Check sum of given file.
+\layout Standard
+
+
+\latex no_latex 
+Example:
+\latex default 
+ 
+\emph on 
+cksum[/etc/passwd]
+\layout Description
+
+
+\latex no_latex 
+diskfree[*]
+\latex default 
+ 
+\latex no_latex 
+Amount of unused disk space for given volume
+\latex default 
+ (in Kb)
+\latex no_latex 
+.
+\layout Standard
+
+E
+\latex no_latex 
+xample:
+\layout Standard
+
+
+\emph on 
+diskfree[/]
+\emph default 
+\latex no_latex 
+ - returns free disk space for root volume.
+\layout Description
+
+
+\latex no_latex 
+filesize[*]
+\latex default 
+ 
+\latex no_latex 
+Size of given file.
+\layout Standard
+
+E
+\latex no_latex 
+xample:
+\layout Standard
+
+
+\emph on 
+filesize[/var/log/syslog]
+\layout Description
+
+
+\latex no_latex 
+inodefree[*]
+\latex default 
+ 
+\latex no_latex 
+Number of unused inodes space for given volume.
+\layout Standard
+
+
+\latex no_latex 
+Example:
+\layout Standard
+
+
+\emph on 
+inodefree[/var]
+\emph default 
+\latex no_latex 
+ - returns number of free inodes for volume /var
+\layout Description
+
+kern[maxfiles] Maximum number of opened files supported by OS.
+\layout Description
+
+kern
+\latex no_latex 
+[
+\latex default 
+maxproc
+\latex no_latex 
+]
+\latex default 
+ Maximum number of processes supported by OS
+\latex no_latex 
+.
+\layout Description
+
+
+\latex no_latex 
+memory[buffers]
+\latex default 
+ 
+\latex no_latex 
+Amount of memory used for kernel buffers.
+\layout Description
+
+
+\latex no_latex 
+memory[cached]
+\latex default 
+ 
+\latex no_latex 
+Amount of cached memory.
+\layout Description
+
+
+\latex no_latex 
+memory[free]
+\latex default 
+ 
+\latex no_latex 
+Amount of unused physical memory
+\latex default 
+.
+\layout Description
+
+
+\latex no_latex 
+memory[shared]
+\latex default 
+ 
+\latex no_latex 
+Amount of used shared memory.
+\layout Description
+
+memory[total] 
+\latex no_latex 
+Total amount of installed physical memory.
+\layout Description
+
+
+\latex no_latex 
+ping
+\latex default 
+ 
+\latex no_latex 
+Always return 1.
+\layout Description
+
+
+\latex no_latex 
+proc_cnt[*]
+\latex default 
+ 
+\latex no_latex 
+Number of processes called "*" running.
+\layout Standard
+
+E
+\latex no_latex 
+xample:
+\latex default 
+ 
+\emph on 
+proc_cnt[inetd]
+\layout Description
+
+status Host status (0 - normal, 2 - unreachable).
+ This parameter is calculated internally by 
+\series bold 
+zabbix_suckerd
+\series default 
+.
+ No connection to an agent required.
+\layout Description
+
+
+\latex no_latex 
+swap[free]
+\latex default 
+ 
+\latex no_latex 
+Free swap space.
+\layout Description
+
+system[hostname] Returns host name.
+\layout Standard
+
+
+\latex no_latex 
+Result:
+\latex default 
+string value.
+ 
+\layout Standard
+
+
+\latex no_latex 
+Example
+\latex default 
+ of returned value: 
+\emph on 
+www.sf.net
+\layout Description
+
+
+\latex no_latex 
+swap[total]
+\latex default 
+ 
+\latex no_latex 
+Total swap space.
+\layout Description
+
+
+\latex no_latex 
+system[proccount]
+\latex default 
+ 
+\latex no_latex 
+Number of processes.
+\layout Description
+
+
+\latex no_latex 
+system[procload]
+\latex default 
+ 
+\latex no_latex 
+Load average for last 1 minute.
+\layout Description
+
+
+\latex no_latex 
+system[procload5]
+\latex default 
+ 
+\latex no_latex 
+Load average for last 5 minutes.
+\layout Description
+
+
+\latex no_latex 
+system[procload15]
+\latex default 
+ 
+\latex no_latex 
+Load average for last 15 minutes.
+\layout Description
+
+
+\latex no_latex 
+system[procrunning]
+\latex default 
+ 
+\latex no_latex 
+Number of running processes.
+\layout Description
+
+system[uname] Returns detailed host information.
+\layout Standard
+
+
+\latex no_latex 
+Result:
+\latex default 
+string value.
+ 
+\layout Standard
+
+
+\latex no_latex 
+Example
+\latex default 
+ of returned value: 
+\emph on 
+FreeBSD localhost 4.4-RELEASE FreeBSD 4.4-RELEASE #0: Tue Sep 18 11:57:08
+ PDT 2001 murray@builder.FreeBSD.org:/usr/src/sys/compile/GENERIC i386
+\layout Description
+
+
+\latex no_latex 
+system[uptime]
+\latex default 
+ 
+\latex no_latex 
+System's uptime.
+\layout Description
+
+
+\latex no_latex 
+system[users]
+\latex default 
+ N
+\latex no_latex 
+umber of users connected.
+\layout Description
+
+
+\latex no_latex 
+tcp_count
+\latex default 
+ 
+\latex no_latex 
+Number of established TCP connections.
+\layout Description
+
 version[zabbix_agent] Returns version of 
 \series bold 
 zabbix_agent
@@ -6702,47 +7316,6 @@ Example
  of returned value: 
 \emph on 
 1.0beta3
-\layout Description
-
-system[hostname] Returns host name.
-\layout Standard
-
-
-\latex no_latex 
-Result:
-\latex default 
-string value.
- 
-\layout Standard
-
-
-\latex no_latex 
-Example
-\latex default 
- of returned value: 
-\emph on 
-www.sf.net
-\layout Description
-
-system[uname] Returns detailed host information.
-\layout Standard
-
-
-\latex no_latex 
-Result:
-\latex default 
-string value.
- 
-\layout Standard
-
-
-\latex no_latex 
-Example
-\latex default 
- of returned value: 
-\emph on 
-FreeBSD localhost 4.4-RELEASE FreeBSD 4.4-RELEASE #0: Tue Sep 18 11:57:08
- PDT 2001 murray@builder.FreeBSD.org:/usr/src/sys/compile/GENERIC i386
 \layout Subsubsection
 
 SNMP parameters
@@ -6751,18 +7324,32 @@ SNMP parameters
 Example:
 \layout Standard
 
-Community: public
+Community: 
+\emph on 
+public
 \layout Standard
 
-Oid: 1.2.3.45.6.7.8.0
+Oid:
+\emph on 
+ 1.2.3.45.6.7.8.0
 \layout Standard
 
-Key: <Unique string to be used as reference to triggers>
+Key: 
+\emph on 
+<Unique string to be used as reference to triggers>
+\emph default 
+
 \newline 
 
 \newline 
-Note that OID can be given in either numeric or in string form.
- However, in some cases, string OID must be converted to numeric representation.
+Note that OID can be given in either numeric or string form.
+ However, in some cases, string OID must be converted to numeric representation
+\begin_float footnote 
+\layout Standard
+
+Zabbix 1.0 will be free of this limitation.
+\end_float 
+.
  Utility 
 \emph on 
 snmpget
@@ -6788,7 +7375,7 @@ Supported Parameters by Platform
 
 \begin_inset  Tabular
 <lyxtabular version="2" rows="42" columns="7">
-<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<features rotate="false" islongtable="true" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="15mm" special="">
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="15mm" special="">
@@ -9878,7 +10465,7 @@ mysql[version] Version of MySQL
 Example: mysql Ver 11.16 Distrib 3.23.49, for pc-linux-gnu (i686)
 \layout Section
 
-Getting Maximum Performance From Zabbix
+Getting Maximum Performance from Zabbix
 \layout Subsection
 
 Real world configuration
@@ -9987,7 +10574,7 @@ Zabbix Frontends
 Currently, the only frontend available is WEB frontend written in PHP.
 \layout Subsection
 
-WEB-based Frontend 
+PHP-based Frontend 
 \layout Standard
 
 
@@ -10232,6 +10819,7 @@ nd ICMP pings to list of servers.
 \layout Standard
 
 
+\family typewriter 
 \emph on 
 zabbix_sender <server> <port> <host>:alive 0
 \layout Standard
@@ -10254,6 +10842,7 @@ otherwise:
 \layout Standard
 
 
+\family typewriter 
 \emph on 
 zabbix_sender <server> <port> <host>:alive 1
 \layout Standard
@@ -10266,7 +10855,13 @@ zabbix_sender <server> <port> <host>:alive 1
 
 
 \latex no_latex 
-The script is usually called from cron.
+The script is usually called from 
+\series bold 
+\latex default 
+cron
+\series default 
+\latex no_latex 
+.
  Configure the script before use.
 
 \latex default 
@@ -10297,993 +10892,6 @@ Zabbix
 \layout Subsection
 
 Diagram
-\layout Subsection
-
-CONFIG 
-\layout Standard
-
-The table contains global configuration parameters.
-\layout Description
-
-
-\begin_inset  Tabular
-<lyxtabular version="2" rows="6" columns="3">
-<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="100mm" special="">
-<row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Column name
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Type
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Description
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-smtp_server
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-varchar
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Name of SMTP server
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-smtp_helo
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-varchar
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-HELO string used for SMTP server
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-smtp_email
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-varchar
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Email address used by Zabbix
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-alarm_history
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Zabbix will not store records in table
-\series bold 
- alarms
-\series default 
- older than this value
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-alert_history
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Zabbix will not store records in table 
-\series bold 
-alerts
-\series default 
- older than this value
-\end_inset 
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset 
-
-
-\layout Subsection
-
-GRAPHS_ITEMS
-\layout Standard
-
-The table contains list of monitored items belonging to graph.
-\layout Description
-
-
-\begin_inset  Tabular
-<lyxtabular version="2" rows="5" columns="3">
-<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
-<column alignment="left" valignment="top" leftline="true" rightline="false" width="" special="">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="100mm" special="">
-<row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Column name
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Type
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Description
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-gitemid
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Unique ID
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-graphid
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Graph ID
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-itemid
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Item ID
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-color
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-varchar
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Color
-\end_inset 
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset 
-
-
-\layout Subsection
-
-GRAPHS
-\layout Standard
-
-The table contains list of user-defined graphs (charts).
-\layout Description
-
-
-\begin_inset  Tabular
-<lyxtabular version="2" rows="5" columns="3">
-<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="100mm" special="">
-<row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Column name
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Type
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Description
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-graphid
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Unique Graph ID
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-name
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-varchar
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Name of the Graph
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-width
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Graph width
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-height
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Graph height
-\end_inset 
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset 
-
-
-\layout Subsection
-
-SYSMAPS_LINKS
-\layout Standard
-
-The table contains list of connectors between hosts diplayed on network
- map.
-\layout Description
-
-
-\begin_inset  Tabular
-<lyxtabular version="2" rows="5" columns="3">
-<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="100mm" special="">
-<row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Column name
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Type
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Description
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-linkid
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Unique Link ID
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-sysmapid
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Network map ID
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-shostid1
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-ID of first host
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-shostid2
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-ID of second host
-\end_inset 
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset 
-
-
-\layout Subsection
-
-SYSMAPS_HOSTS
-\layout Standard
-
-The table contains definition of host displayed on network map.
-\layout Description
-
-
-\begin_inset  Tabular
-<lyxtabular version="2" rows="7" columns="3">
-<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="100mm" special="">
-<row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Column name
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Type
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Description
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-shostid
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Unique ID
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-sysmapid
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Network map ID
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-hostid
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Host ID
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-label
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-varchar
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Label displayed under host icon
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-x
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Coordinate X
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-y
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Coordinate Y
-\end_inset 
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset 
-
-
-\layout Subsection
-
-SYSMAPS
-\layout Standard
-
-The table contains list of defined network maps
-\layout Description
-
-
-\begin_inset  Tabular
-<lyxtabular version="2" rows="5" columns="3">
-<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="100mm" special="">
-<row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Column name
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Type
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Description
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-sysmapid
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Unique network map ID
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-name
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-varchar
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Name of the network map
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-width
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Width of the map
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-height
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Height of the map
-\end_inset 
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset 
-
-
 \layout Subsection
 
 ACTIONS
@@ -11638,7 +11246,7 @@ Timestamp when trigger chaged its status
 
 \layout Standard
 
-istrue
+value
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -11654,7 +11262,480 @@ int
 
 \layout Standard
 
-If '1' - the trigger became true, '0' - otherwise
+Value of the alarm.
+ 1 - the trigger became true, 0 - false, 2 - unknown
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Subsection
+
+ALERTS
+\layout Standard
+
+This table contains history of alerts sent to users.
+ 
+\layout Description
+
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="10" columns="3">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="100mm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Column name
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Type
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+alertid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Unique alert ID
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+actionid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Action ID that generated this alert
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+clock
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Time when this alert was generated
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+type
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Type of alert: 'EMAIL' - email based alert.
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+sendto
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Recipient(s).
+ In case of EMAIL, this defines email address.
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+subject
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+In case of EMAIL, subject of the email.
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+message
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+blob
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Message.
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+status
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+0 - not sent, 1 - successfully sent.
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+retires
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Number of retries.
+ 
+\series bold 
+zabbix_suckerd
+\series default 
+ will not send message if the value is more than 2.
+ Increased after unsuccessfull try.
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Subsection
+
+CONFIG 
+\layout Standard
+
+The table contains global configuration parameters.
+\layout Description
+
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="6" columns="3">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="100mm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Column name
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Type
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+smtp_server
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Name of SMTP server
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+smtp_helo
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+HELO string used for SMTP server
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+smtp_email
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Email address used by Zabbix
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+alarm_history
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Zabbix will not store records in table
+\series bold 
+ alarms
+\series default 
+ older than this value (in days)
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+alert_history
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Zabbix will not store records in table 
+\series bold 
+alerts
+\series default 
+ older than this value (in days)
 \end_inset 
 </cell>
 </row>
@@ -11868,6 +11949,306 @@ Parameter to the function.
 
 \layout Subsection
 
+GRAPHS
+\layout Standard
+
+The table contains list of user-defined graphs (charts).
+\layout Description
+
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="5" columns="3">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="100mm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Column name
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Type
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+graphid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Unique Graph ID
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+name
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Name of the Graph
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+width
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Graph width
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+height
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Graph height
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Subsection
+
+GRAPHS_ITEMS
+\layout Standard
+
+The table contains list of monitored items belonging to graph.
+\layout Description
+
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="5" columns="3">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="100mm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Column name
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Type
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+gitemid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Unique ID
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+graphid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Graph ID
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+itemid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Item ID
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+color
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Color
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Subsection
+
 HISTORY
 \layout Standard
 
@@ -11992,6 +12373,156 @@ Value of the item at specific time
 
 \layout Subsection
 
+HOSTS
+\layout Standard
+
+The table contains list of monitored Hosts
+\layout Description
+
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="5" columns="3">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="100mm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Column name
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Type
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+hostid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Unique host ID
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+host
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Host name or IP address
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+status
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Host status: 0 - monitored, 1 - not monitored, 2 - unreachable
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+disable_until
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+In case if status is unreachabe, do not check host until this time
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Subsection
+
 ITEMS
 \layout Standard
 
@@ -12000,7 +12531,7 @@ This table contains definitions of monitored items.
 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="17" columns="3">
+<lyxtabular version="2" rows="18" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
@@ -12437,6 +12968,33 @@ Previous retrieved value
 \end_inset 
 </cell>
 </row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+trapper_hosts
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Comma delimited list of IP addresses of hosts allowed to send data of the
+ item
+\end_inset 
+</cell>
+</row>
 <row topline="true" bottomline="true" newpage="false">
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
@@ -12451,7 +13009,7 @@ status
 
 \layout Standard
 
-nt
+int
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -12461,6 +13019,182 @@ nt
 
 Status of the item: 0 - active, 1 - disabled, 2 - trapped, 3 - not supported
  by agent
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Subsection
+
+ITEMS_TEMPLATE
+\layout Standard
+
+The table contains list of supported items.
+\layout Description
+
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="6" columns="3">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="100mm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Column name
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Type
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+itemtemplateid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Unique ID of item template
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+description
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Item description
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+key_
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Key to send to host
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+value_type
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Type of monitored parameter( 0 - integer, 1 - string)
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+delay
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+How often the key should be sent
 \end_inset 
 </cell>
 </row>
@@ -12647,292 +13381,10 @@ Status of the media: 0 - active, 1 - disabled
 
 \layout Subsection
 
-TRIGGERS
+SERVICES
 \layout Standard
 
-The table contains list of triggers.
-\layout Description
-
-
-\begin_inset  Tabular
-<lyxtabular version="2" rows="10" columns="3">
-<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
-<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
-<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
-<column alignment="left" valignment="top" leftline="true" rightline="true" width="100mm" special="">
-<row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Column name
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Type
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Description
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-triggerid
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Unique trigger ID
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-expression
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-varchar
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Trigger's expression
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-url
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-varchar
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-URL
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-description
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-varchar
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Description of the trigger
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-istrue
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-0 - expression is false, 1 - expression is true, 2 - disabled, 3 - unknown
- status
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-priority
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-lastchange
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Time when value of istrue was changed
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-dep_level
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Dependency level.
- The number show how many other triggers depend on this trigger.
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-comments
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-blob
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-Comments
-\end_inset 
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset 
-
-
-\layout Subsection
-
-USERS
-\layout Standard
-
-The table contains list of Zabbix's users.
- 
+This table contains list of defined IT services.
 \layout Description
 
 
@@ -12959,7 +13411,7 @@ Column name
 Type
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -12969,12 +13421,12 @@ Description
 </cell>
 </row>
 <row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
 
-userid
+serviceid
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -12990,12 +13442,12 @@ int
 
 \layout Standard
 
-Unique user ID
+Unique service ID
 \end_inset 
 </cell>
 </row>
 <row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -13008,7 +13460,7 @@ name
 
 \layout Standard
 
-varchar
+int
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -13016,7 +13468,7 @@ varchar
 
 \layout Standard
 
-Name of the user
+Description of the service
 \end_inset 
 </cell>
 </row>
@@ -13026,7 +13478,7 @@ Name of the user
 
 \layout Standard
 
-surname
+status
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -13034,15 +13486,15 @@ surname
 
 \layout Standard
 
-varchar
+int
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
 
-Surname
+Status of the service
 \end_inset 
 </cell>
 </row>
@@ -13052,7 +13504,7 @@ Surname
 
 \layout Standard
 
-alias
+algorithm
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -13060,7 +13512,7 @@ alias
 
 \layout Standard
 
-varchar
+int
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -13068,7 +13520,8 @@ varchar
 
 \layout Standard
 
-User's alias (nickname)
+Algorith used to calculate status of the service.
+ 0 - none, 1 - MAX status of child services
 \end_inset 
 </cell>
 </row>
@@ -13078,7 +13531,7 @@ User's alias (nickname)
 
 \layout Standard
 
-passwd
+triggerid
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -13086,7 +13539,7 @@ passwd
 
 \layout Standard
 
-varchar
+int
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -13094,7 +13547,159 @@ varchar
 
 \layout Standard
 
-MD5 hash of user's password
+Is this service linked to a trigger? NULL - it is not, otherwise trigger
+ ID
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Subsection
+
+SERVICES_LINKS
+\layout Standard
+
+This table is used to define connections between different services to form
+ IT Service tree.
+\layout Description
+
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="5" columns="3">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="100mm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Column name
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Type
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+linkid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Unique link ID
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+serviceupid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+ID of higher level service
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+servicedownid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+ID of lower level service
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+soft
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+0 - hard link, 1 - soft link
 \end_inset 
 </cell>
 </row>
@@ -13282,10 +13887,10 @@ Recource ID
 
 \layout Subsection
 
-HOSTS
+SYSMAPS
 \layout Standard
 
-The table contains list of monitored Hosts
+The table contains list of defined network maps
 \layout Description
 
 
@@ -13312,7 +13917,7 @@ Column name
 Type
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -13322,12 +13927,12 @@ Description
 </cell>
 </row>
 <row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
 
-hostid
+sysmapid
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -13338,22 +13943,22 @@ hostid
 int
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
 
-Unique host ID
+Unique network map ID
 \end_inset 
 </cell>
 </row>
 <row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
 
-host
+name
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -13369,7 +13974,33 @@ varchar
 
 \layout Standard
 
-Host name or IP address
+Name of the network map
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+width
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Width of the map
 \end_inset 
 </cell>
 </row>
@@ -13379,7 +14010,7 @@ Host name or IP address
 
 \layout Standard
 
-status
+height
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -13395,33 +14026,7 @@ int
 
 \layout Standard
 
-Host status: 0 - monitored, 1 - not monitored, 2 - unreachable
-\end_inset 
-</cell>
-</row>
-<row topline="false" bottomline="true" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-disable_until
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-int
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-In case if status is unreachabe, do not check host until this time
+Height of the map
 \end_inset 
 </cell>
 </row>
@@ -13432,15 +14037,15 @@ In case if status is unreachabe, do not check host until this time
 
 \layout Subsection
 
-ITEMS_TEMPLATE
+SYSMAPS_HOSTS
 \layout Standard
 
-The table contains list of supported items.
+The table contains definition of host displayed on network map.
 \layout Description
 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="6" columns="3">
+<lyxtabular version="2" rows="7" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
@@ -13472,12 +14077,12 @@ Description
 </cell>
 </row>
 <row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
 
-itemtemplateid
+shostid
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -13493,12 +14098,417 @@ int
 
 \layout Standard
 
-Unique ID of item template
+Unique ID
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+sysmapid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Network map ID
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+hostid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Host ID
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+label
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Label displayed under host icon
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+x
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Coordinate X
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+y
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Coordinate Y
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Subsection
+
+SYSMAPS_LINKS
+\layout Standard
+
+The table contains list of connectors between hosts diplayed on network
+ map.
+\layout Description
+
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="5" columns="3">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="100mm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Column name
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Type
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Description
 \end_inset 
 </cell>
 </row>
 <row topline="true" bottomline="false" newpage="false">
 <cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+linkid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Unique Link ID
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+sysmapid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Network map ID
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+shostid1
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+ID of first host
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+shostid2
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+ID of second host
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Subsection
+
+TRIGGERS
+\layout Standard
+
+The table contains list of triggers.
+\layout Description
+
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="11" columns="3">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="100mm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Column name
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Type
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+triggerid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Unique trigger ID
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+expression
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Trigger's expression
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+url
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+URL
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -13519,7 +14529,7 @@ varchar
 
 \layout Standard
 
-Item description
+Description of the trigger
 \end_inset 
 </cell>
 </row>
@@ -13529,7 +14539,61 @@ Item description
 
 \layout Standard
 
-key_
+status
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Status of the strigger.
+ 0 - enabled, 1 - disabled
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+value
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Value of the trigger.
+ 0 - false, 1 - true, 2 - unknown
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+priority
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -13545,7 +14609,6 @@ int
 
 \layout Standard
 
-Key to send to host
 \end_inset 
 </cell>
 </row>
@@ -13555,7 +14618,7 @@ Key to send to host
 
 \layout Standard
 
-value_type
+lastchange
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -13571,7 +14634,34 @@ int
 
 \layout Standard
 
-Type of monitored parameter( 0 - integer, 1 - string)
+Time when value of istrue was changed
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+dep_level
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Dependency level.
+ The number show how many other triggers depend on this trigger.
 \end_inset 
 </cell>
 </row>
@@ -13581,7 +14671,7 @@ Type of monitored parameter( 0 - integer, 1 - string)
 
 \layout Standard
 
-delay
+comments
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -13589,7 +14679,7 @@ delay
 
 \layout Standard
 
-int
+blob
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -13597,7 +14687,7 @@ int
 
 \layout Standard
 
-How often the key should be sent
+Comments
 \end_inset 
 </cell>
 </row>
@@ -14030,6 +15120,307 @@ int
 \end_inset 
 
 
+\layout Subsection
+
+SESSIONS
+\layout Standard
+
+The table contains list of user sessions.
+\layout Standard
+
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="4" columns="3">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="100mm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Column name
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Type
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+sessionid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Unique ID of the sessioservice
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+userid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+User ID
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+lastaccess
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Last time the session was used
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Subsection
+
+USERS
+\layout Standard
+
+The table contains list of Zabbix's users.
+ 
+\layout Description
+
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="6" columns="3">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="100mm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Column name
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Type
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+userid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Unique user ID
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+name
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Name of the user
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+surname
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Surname
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+alias
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+User's alias (nickname)
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+passwd
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+MD5 hash of user's password
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
 \layout Section
 
 Problems and Common Errors
@@ -14045,6 +15436,9 @@ BigBrother
 \layout Itemize
 
 Nagios
+\layout Itemize
+
+MRTG
 \layout Itemize
 
 ...
@@ -14065,42 +15459,6 @@ WhatsUp Gold
 ...
 \layout Section
 
-Why choose Zabbix ?
-\layout Itemize
-
-highly efficient agents
-\newline 
-Most of other software for monitoring does not have fast agents.
- Forks, etc, etc ...
-\layout Itemize
-
-very simple configuration
-\layout Itemize
-
-all information (configuration, gathered data) is stored in SQL database
-\layout Itemize
-
-high-level service tree
-\layout Itemize
-
-tested using regression tests
-\layout Itemize
-
-very easy setup
-\layout Itemize
-
-support for SNMP
-\layout Itemize
-
-visualisation capabilities
-\layout Itemize
-
-housekeeping procedure
-\layout Itemize
-
-very low latency (usually less than 1 second)
-\layout Section
-
 Zabbix in the future
 \layout Itemize
 
@@ -14114,6 +15472,30 @@ Improved WEB interface
 \layout Itemize
 
 Native agent for MS platforms
+\layout Itemize
+
+Data encryption
+\layout Itemize
+
+Centralised monitoring of log files
+\layout Itemize
+
+All 
+\series bold 
+Zabbix 
+\series default 
+errors and warning to be numbered and documented
+\layout Itemize
+
+
+\series bold 
+Zabbix 
+\series default 
+to periodically generate and send by email set of standard reports in PDF
+ format
+\layout Itemize
+
+Graphs to be included into alert's email
 \layout Section
 
 Support of Zabbix
@@ -14122,12 +15504,40 @@ Support of Zabbix
 Free support
 \layout Itemize
 
-mailing lists
+mailing lists at 
+\begin_inset LatexCommand \url{http://sourceforge.net/mail/?group_id=23494}
+
+\end_inset 
+
+
 \layout Itemize
 
-forums
+
+\series bold 
+Zabbix 
+\series default 
+related discussions at 
+\begin_inset LatexCommand \url{http://sourceforge.net/forum/?group_id=23494}
+
+\end_inset 
+
+http://sourceforge.net/forum/?group_id=23494
 \layout Itemize
 
+feature requests can be viewed and registered at 
+\begin_inset LatexCommand \url{http://sourceforge.net/tracker/?atid=378686&group_id=23494&func=browse}
+
+\end_inset 
+
+
+\layout Itemize
+
+Email address of author and main developer of 
+\series bold 
+Zabbix
+\series default 
+ - 
+\family typewriter 
 alex@gobbo.caves.lv
 \layout Subsection
 
@@ -14152,6 +15562,42 @@ alex@gobbo.caves.lv
 commercial 
 \latex no_latex 
 support levels.
+
+\latex default 
+ 
+\layout Standard
+
+Benefits of commercial support may include:
+\layout Itemize
+
+guaranteed response time
+\layout Itemize
+
+direct contact to 
+\series bold 
+Zabbix
+\series default 
+ developers
+\layout Itemize
+
+customer-specific development made by 
+\series bold 
+Zabbix
+\series default 
+ developers
+\layout Itemize
+
+feature requests are considered top priority
+\layout Itemize
+
+printed 
+\series bold 
+Zabbix 
+\series default 
+manual plus installation on CD
+\layout Itemize
+
+other benefits
 \layout Section
 
 Credits
@@ -14221,7 +15667,49 @@ In alphabetical order:
 
 
 \noun on 
-Kaspars Cikmacs
+ALEXANDER KALIMULIN
+\layout Standard
+
+Help with various issues related to C, C functions, etc
+\layout Itemize
+
+
+\noun on 
+ARTURS ABOLTINS
+\layout Standard
+
+Patch to allow connection to MySQL using UNIX socket.
+\layout Itemize
+
+
+\noun on 
+CHARLIE COLLINS
+\layout Standard
+
+Startup scripts.
+ Significant improvements of the Manual.
+ Thanks Charlie!
+\layout Itemize
+
+
+\noun on 
+DENIS USTIMENKO
+\layout Standard
+
+Support for quering SNMP parameters by IP address.
+\layout Itemize
+
+
+\noun on 
+EVGENY ...
+\layout Standard
+
+Many suggestions for improvements.
+\layout Itemize
+
+
+\noun on 
+KASPARS CIKMACS
 \layout Standard
 
 Lots of new ideas based on real experience of using 
@@ -14229,27 +15717,6 @@ Lots of new ideas based on real experience of using
 Zabbix
 \series default 
 .
-\layout Itemize
-
-
-\noun on 
-Michal Suszycki
-\layout Standard
-
-Help with autoconf and automake issues.
-\layout Itemize
-
-
-\noun on 
-Mike Hoolehan
-\layout Standard
-
-Help with making the 
-\series bold 
-Zabbix
-\series default 
- Manual correct and understandable.
- 
 \layout Itemize
 
 
@@ -14270,59 +15737,472 @@ Status of Triggers
 
 
 \noun on 
+MICHAL SUSZYCKI
+\layout Standard
+
+Help with autoconf and automake issues.
+\layout Itemize
+
+
+\noun on 
+MIKE HOOLEHAN
+\layout Standard
+
+Help with making the 
+\series bold 
+Zabbix
+\series default 
+ Manual correct and understandable.
+ 
+\layout Itemize
+
+
+\noun on 
 OLIVER SIEGMAR
 \layout Standard
 
 Fixes in SQL statements of WEB frontend.
-\layout Itemize
-
-
-\noun on 
-CHARLIE COLLINS
-\layout Standard
-
-Startup scripts.
- Significant improvements of the Manual.
- Thanks Charlie!
-\layout Itemize
-
-
-\noun on 
-ALEXANDER KALIMULIN
-\layout Standard
-
-Help with various issues related to C, C functions, etc
-\layout Itemize
-
-
-\noun on 
-ARTURS ABOLTINS
-\layout Standard
-
-Patch to allow connection to MySQL using UNIX socket.
- Other (not yet applied) patches.
-\layout Itemize
-
-
-\noun on 
-DENIS USTIMENKO
-\layout Standard
-
-Support for quering SNMP parameters by IP address.
-\layout Itemize
-
-
-\noun on 
-EVGENY ...
-\layout Standard
-
-Many suggestions for improvements.
 \layout Subsection
 
 Supporters to Zabbix
 \layout Section
 
 Glossary
+\layout Standard
+
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="26" columns="2">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Term
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+GNU
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Generic Public License
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+SNMP
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Simple Network Management Protocol
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
 \layout Section
 
 GNU General Public License
@@ -16630,13 +18510,16 @@ Regression tests
 \layout Standard
 
 The following table contains list of tests applied to current Zabbix release.
- Each test case must be tested for each supported platform.
+ Each test case must be tested for each supported platform and for each
+ supported database engine.
 \layout Standard
 
 
+\size footnotesize 
+
 \begin_inset  Tabular
 <lyxtabular version="2" rows="50" columns="5">
-<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<features rotate="false" islongtable="true" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
@@ -16648,6 +18531,8 @@ The following table contains list of tests applied to current Zabbix release.
 
 \layout Standard
 
+
+\size footnotesize 
 Num
 \end_inset 
 </cell>
@@ -16656,6 +18541,8 @@ Num
 
 \layout Standard
 
+
+\size footnotesize 
 Description
 \end_inset 
 </cell>
@@ -16664,6 +18551,8 @@ Description
 
 \layout Standard
 
+
+\size footnotesize 
 Expected result
 \end_inset 
 </cell>
@@ -16672,6 +18561,8 @@ Expected result
 
 \layout Standard
 
+
+\size footnotesize 
 Pass/Fail
 \end_inset 
 </cell>
@@ -16680,6 +18571,8 @@ Pass/Fail
 
 \layout Standard
 
+
+\size footnotesize 
 Comments
 \end_inset 
 </cell>
@@ -16690,6 +18583,8 @@ Comments
 
 \layout Standard
 
+
+\size footnotesize 
 Installation procedure (1xxx)
 \end_inset 
 </cell>
@@ -16728,6 +18623,8 @@ Installation procedure (1xxx)
 
 \layout Standard
 
+
+\size footnotesize 
 1001
 \end_inset 
 </cell>
@@ -16736,7 +18633,13 @@ Installation procedure (1xxx)
 
 \layout Standard
 
-Unzip Zabbix release using tar and gzip
+
+\size footnotesize 
+Unzip 
+\series bold 
+Zabbix
+\series default 
+ release using tar and gzip
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -16744,6 +18647,8 @@ Unzip Zabbix release using tar and gzip
 
 \layout Standard
 
+
+\size footnotesize 
 No error/warning messages
 \end_inset 
 </cell>
@@ -16752,6 +18657,8 @@ No error/warning messages
 
 \layout Standard
 
+
+\size footnotesize 
 Pass
 \end_inset 
 </cell>
@@ -16783,6 +18690,8 @@ Pass
 
 \layout Standard
 
+
+\size footnotesize 
 Directory 
 \emph on 
 bin/
@@ -16795,6 +18704,8 @@ bin/
 
 \layout Standard
 
+
+\size footnotesize 
 Pass
 \end_inset 
 </cell>
@@ -16827,6 +18738,7 @@ Pass
 \layout Standard
 
 
+\size footnotesize 
 \emph on 
 doc/manual.txt
 \emph default 
@@ -16838,6 +18750,8 @@ doc/manual.txt
 
 \layout Standard
 
+
+\size footnotesize 
 Pass
 \end_inset 
 </cell>
@@ -16870,6 +18784,7 @@ Pass
 \layout Standard
 
 
+\size footnotesize 
 \emph on 
 doc/manual.html
 \emph default 
@@ -16881,6 +18796,8 @@ doc/manual.html
 
 \layout Standard
 
+
+\size footnotesize 
 Pass
 \end_inset 
 </cell>
@@ -16913,6 +18830,7 @@ Pass
 \layout Standard
 
 
+\size footnotesize 
 \emph on 
 doc/manual.pdf
 \emph default 
@@ -16924,6 +18842,8 @@ doc/manual.pdf
 
 \layout Standard
 
+
+\size footnotesize 
 Pass
 \end_inset 
 </cell>
@@ -16984,6 +18904,8 @@ Pass
 
 \layout Standard
 
+
+\size footnotesize 
 1002
 \end_inset 
 </cell>
@@ -16992,6 +18914,8 @@ Pass
 
 \layout Standard
 
+
+\size footnotesize 
 Run 
 \emph on 
 ./configure
@@ -17002,6 +18926,8 @@ Run
 
 \layout Standard
 
+
+\size footnotesize 
 No error/warning messages
 \end_inset 
 </cell>
@@ -17027,6 +18953,8 @@ Pass
 
 \layout Standard
 
+
+\emph on 
 1003
 \end_inset 
 </cell>
@@ -17035,6 +18963,8 @@ Pass
 
 \layout Standard
 
+
+\size footnotesize 
 Run 
 \emph on 
 ./configure --with-mysql
@@ -17045,6 +18975,8 @@ Run
 
 \layout Standard
 
+
+\size footnotesize 
 No error/warning messages
 \end_inset 
 </cell>
@@ -17078,6 +19010,8 @@ Pass
 
 \layout Standard
 
+
+\size footnotesize 
 Run 
 \emph on 
 ./configure
@@ -17092,6 +19026,8 @@ Run
 
 \layout Standard
 
+
+\size footnotesize 
 No error/warning messages
 \end_inset 
 </cell>
@@ -17125,6 +19061,8 @@ Pass
 
 \layout Standard
 
+
+\size footnotesize 
 Run 
 \emph on 
 ./configure --enable-static
@@ -17135,6 +19073,8 @@ Run
 
 \layout Standard
 
+
+\size footnotesize 
 No error/warning messages
 \end_inset 
 </cell>
@@ -17168,6 +19108,8 @@ Pass
 
 \layout Standard
 
+
+\size footnotesize 
 Run 
 \emph on 
 make 
@@ -17203,6 +19145,7 @@ make
 
 \layout Standard
 
+1007
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -17210,43 +19153,13 @@ make
 
 \layout Standard
 
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
 
-\layout Standard
-
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
+\size footnotesize 
+Run 
+\emph on 
+make 
+\emph default 
+(after 1003)
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -17277,6 +19190,7 @@ make
 
 \layout Standard
 
+1008
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -17284,43 +19198,13 @@ make
 
 \layout Standard
 
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
 
-\layout Standard
-
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
+\size footnotesize 
+Run 
+\emph on 
+make 
+\emph default 
+(after 1004)
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -17351,6 +19235,7 @@ make
 
 \layout Standard
 
+1009
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -17358,43 +19243,13 @@ make
 
 \layout Standard
 
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
 
-\layout Standard
-
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-\end_inset 
-</cell>
-</row>
-<row topline="true" bottomline="false" newpage="false">
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
-\end_inset 
-</cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
-\begin_inset Text
-
-\layout Standard
-
+\size footnotesize 
+Run 
+\emph on 
+make
+\emph default 
+ (after 1005)
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -17425,6 +19280,7 @@ make
 
 \layout Standard
 
+1010
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -17432,6 +19288,13 @@ make
 
 \layout Standard
 
+
+\size footnotesize 
+Try to compile 
+\series bold 
+Zabbix
+\series default 
+ with CC
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -17462,6 +19325,7 @@ make
 
 \layout Standard
 
+1011
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -17469,6 +19333,132 @@ make
 
 \layout Standard
 
+
+\size footnotesize 
+Load database schema into MySQL
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+1012
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+
+\size footnotesize 
+Load database schema into PostgreSQL
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+1013
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+
+\size footnotesize 
+Load data into MySQL
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+1014
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+
+\size footnotesize 
+Load data into PostgreSQL
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">

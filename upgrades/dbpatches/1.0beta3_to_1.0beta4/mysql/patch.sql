@@ -28,3 +28,8 @@ update alarms set value=1 where istrue in (1);
 update alarms set value=2 where istrue not in (0,1);
 
 alter table services add algorithm int(1) DEFAULT '0' NOT NULL;
+
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+        values (69,'Host status','status', 60, 0);
+insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+        values (69,69,'Server %s is unreachable','{:.last(0)}=2');

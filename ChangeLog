@@ -3,13 +3,13 @@ Not ready yet (later versions):
 [ CORE. All errors and warnings must be numbered and documented ]
 [ CORE. Support for macros like {server:system[procload].graph(1)} ]
 [ CORE. SSL between server and agents ]
+[ CORE. Support of monitoring of log files ]
 [ HB. Verify parameters before using them in SQL ]
 
 Not ready yet (1.0beta4):
 
 [ CORE. Support for Service Tree ] 
-[ CORE. Check permission system ]
-[ CORE. Support of monitoring of log files ]
+[ CORE. PostgreSQL ]
 
 [ PHP. Navigation by time period for graphs and trends ]
 
@@ -56,7 +56,7 @@ Changes for 1.0beta4:
  - advanced change of host status in zabbix_suckerd (Alexei)
  - added support of UserParameter(s) returning non-numeric values (Alexei) 
  - doc/manual.lyx will not be included in Zabbix release (Alexei)
- - chnages to make Zabbix compile in non-GCC environments (Alexei)
+ - changes to make Zabbix compile in non-GCC environments (Alexei)
  - unreachable hosts will be clickable in system maps (Alexei)
  - fixed double posting of the same trigger status into alarms (Alexei) 
  - fixed macros substitution in email alerts (Alexei)
