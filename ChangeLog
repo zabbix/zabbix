@@ -1,5 +1,6 @@
 Changes for 1.0beta11:
 
+ - restrict host status change from Unreachable (Alexei)
  - fix for Solaris swap sizes (Alexei)
  - fix for counting of triggers in map.php.  (Alexei)
  - added translation of special HTML characters in history of
