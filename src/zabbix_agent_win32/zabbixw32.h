@@ -35,7 +35,7 @@
 // Common constants
 //
 
-#define AGENT_VERSION         "1.0.0-alpha4"
+#define AGENT_VERSION         "1.0.0-alpha5"
 
 #define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
 

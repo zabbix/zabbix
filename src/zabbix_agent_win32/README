@@ -1,5 +1,5 @@
 
-                     ZabbixW32 version 1.0.0-alpha3
+                     ZabbixW32 version 1.0.0-alpha4
 
 ******************************************************************************
 
@@ -45,15 +45,12 @@ And possible options are:
                      (default is C:\zabbix_agentd.conf)
 
 
-Configuration file
-------------------
-
-
 Parameters supported by Zabbix Win32 Agent
 ------------------------------------------
 
 I. Zabbix standard parameters
 
+cksum[<path>]		<path> can be normal Windows path, like C:\, or UNC
 diskfree[<path>]	<path> can be normal Windows path, like C:\, or UNC
 disktotal[<path>]       <path> can be normal Windows path, like C:\, or UNC
 memory[free]
@@ -67,6 +64,8 @@ system[proccount]
 system[procload]
 system[procload5]
 system[procload15]
+system[uname]
+system[uptime]
 version[zabbix_agent]
 
 
@@ -84,6 +83,7 @@ cpu_util5[<instance>]	Average specific CPU utilization (in percents) for last
                         5 minutes, where <instance> is zero-based CPU number
 cpu_util15[<instance>]	Average specific CPU utilization (in percents) for last
                         15 minutes, where <instance> is zero-based CPU number
+md5_hash[<file name>]	MD5 hash of specified file (returned as string)
 perf_counter[<path>]    Value of any performance counter, where <path> is the 
 			counter path (you can use Performance Monitor to obtain
 			list of available counters). Please note that this
