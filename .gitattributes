@@ -1,2 +1,6 @@
 * text=auto !eol
-frontends/php/images/sysmaps/host.png svneol=native#unset
+frontends/php/images/sysmaps/Hub.png svneol=native#unset
+frontends/php/images/sysmaps/Notebook.png svneol=native#unset
+frontends/php/images/sysmaps/Printer.png svneol=native#unset
+frontends/php/images/sysmaps/Router.png svneol=native#unset
+frontends/php/images/sysmaps/Server.png svneol=native#unset
