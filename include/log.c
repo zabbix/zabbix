@@ -146,3 +146,4 @@ void zabbix_log(int level, const char *fmt, ...)
 	}	
         return;
 }
+

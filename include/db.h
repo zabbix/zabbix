@@ -23,6 +23,7 @@
 
 /* time_t */
 #include <time.h>
+
 #include "config.h"
 #include "common.h"
 
@@ -238,6 +239,7 @@ void    DBclose(void);
 void    DBvacuum(void);
 
 int	DBexecute( char *query );
+
 
 DB_RESULT	*DBselect(char *query);
 char		*DBget_field(DB_RESULT *result, int rownum, int fieldnum);
