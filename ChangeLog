@@ -1,6 +1,8 @@
 Changes for 1.0beta10:
 
- - added columnt items.units (Alexei)
+ - added support for units (Mb, Kb, Gb, etc) (Alexei)
+ - added column items.multiplier (Alexei)
+ - added column items.units (Alexei)
  - added table 'stats' (Alexei)
  - support for spaces in trigger expression. Thanks to Sébastien "Slix"
  Liénard. (Alexei)

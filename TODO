@@ -13,7 +13,6 @@ suckerd and agentd)
  - monitoring of log files
  - escalation
  - agents to execute command
- - suffixes Mb,Kb,Gb, etc
  - add alerts to host templates
  - add pinger (eping) to zabbix_sucker
 
@@ -94,7 +93,6 @@ LS:
 
  - why SNMP does not work though firewall? It establishes connection to UDP port 3. WHy?
  - item links to other item in order to show all of them on one graph
- - Support for Mb, Kb, KBps , MBps ,etc
  - daily weekly monthly graphs
  - detailed description for items
 
@@ -113,7 +111,6 @@ TOP PRIORITY:
 
 BUGS:
 
- - BUG. Inconsistency of units (bytes, kB) for memories and swap space
  - graphs and maps are not displayed properly sometimes
  - add protection from IT Service looping
  - BUG. No horizontal lines. Replace ImageDashedLine() to gdImageLine() plus
