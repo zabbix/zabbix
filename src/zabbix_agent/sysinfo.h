@@ -2,7 +2,9 @@
 #define MON_SYSINFO_H
  
 float	process(char *command);
- 
+
+void	test_parameters(void);
+
 float	INODE(const char * mountPoint);
 float	FILESIZE(const char * filename);
 float	DF(const char * mountPoint);
@@ -26,6 +28,7 @@ float	SWAPFREE(void);
 float	SWAPTOTAL(void);
 float	TCP_LISTEN(const char *porthex);
 float	UPTIME(void);
+float	TEST(void);
 float	EXECUTE(char *command);
 
 #define COMMAND struct command_type

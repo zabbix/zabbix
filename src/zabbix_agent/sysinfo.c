@@ -1,9 +1,20 @@
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-/* #include <mntent.h> */
-#include <sys/stat.h>
+#ifdef HAVE_STDIO_H
+	#include <stdio.h>
+#endif
+#ifdef HAVE_STDLIB_H
+	#include <stdlib.h>
+#endif
+#ifdef HAVE_UNISTD_H
+	#include <unistd.h>
+#endif
+#ifdef HAVE_SYS_STAT_H
+	#include <sys/stat.h>
+#endif
+#ifdef HAVE_SYS_TYPES_H
+	#include <sys/types.h>
+#endif
 /* Linux */
 #ifdef HAVE_SYS_VFS_H
 	#include <sys/vfs.h>
@@ -82,6 +93,7 @@ COMMAND	commands[]=
 	{"io[disk_wblk]"		,DISK_WBLK, 0},
 
 	{"system[procload]"		,PROCLOAD, 0},
+	{"test"				,TEST, 0},
 	{"system[procload5]"		,PROCLOAD5, 0},
 	{"system[procload15]"		,PROCLOAD15, 0},
 	{"system[proccount]"		,PROCCOUNT, 0},
@@ -101,6 +113,35 @@ COMMAND	commands[]=
 	{"net[listen_143]"		,TCP_LISTEN, "008F"},
 	{0				,0}
 	};
+
+void	test_parameters(void)
+{
+	int	i;
+	float	result;
+	float	(*function)();
+	char	*parameter = NULL;
+	char	*key = NULL;
+
+	i=0;
+	while(0 != commands[i].function)
+	{
+		key=commands[i].key;
+		function=commands[i].function;
+		parameter=commands[i].parameter;
+
+		result = function(parameter);
+		if( result == FAIL )
+		{
+			printf("UNSUPPORTED Key: %s\n",key);
+		}
+		else
+		{
+			printf("SUPPORTED Key: %s\n",key);
+		}
+
+		i++;
+	}
+}
 
 float	process(char *command)
 {
@@ -285,12 +326,38 @@ float	CACHEDMEM(void)
 
 float	BUFFERSMEM(void)
 {
-	return getPROC("/proc/meminfo",7,2);
+#ifdef HAVE_SYSINFO_BUFFERRAM
+	struct sysinfo info;
+
+	if( 0 == sysinfo(&info))
+	{
+		return	(float)info.bufferram;
+	}
+	else
+	{
+		return FAIL;
+	}
+#else
+	return	FAIL;
+#endif
 }
 
 float	SHAREDMEM(void)
 {
-	return getPROC("/proc/meminfo",6,2);
+#ifdef HAVE_SYSINFO_SHAREDRAM
+	struct sysinfo info;
+
+	if( 0 == sysinfo(&info))
+	{
+		return	(float)info.sharedram;
+	}
+	else
+	{
+		return FAIL;
+	}
+#else
+	return	FAIL;
+#endif
 }
 
 float	TOTALMEM(void)
@@ -311,7 +378,20 @@ float	TOTALMEM(void)
 		return page*pst.physical_memory;
 	}
 #else
-	return getPROC("/proc/meminfo",4,2);
+#ifdef HAVE_SYSINFO_TOTALRAM
+	struct sysinfo info;
+
+	if( 0 == sysinfo(&info))
+	{
+		return	(float)info.totalram;
+	}
+	else
+	{
+		return FAIL;
+	}
+#else
+	return	FAIL;
+#endif
 #endif
 }
 
@@ -352,13 +432,39 @@ float	FREEMEM(void)
 		}
 	}
 #else
-	return getPROC("/proc/meminfo",5,2);
+#ifdef HAVE_SYSINFO_FREERAM
+	struct sysinfo info;
+
+	if( 0 == sysinfo(&info))
+	{
+		return	(float)info.freeram;
+	}
+	else
+	{
+		return FAIL;
+	}
+#else
+	return	FAIL;
+#endif
 #endif
 }
 
 float	UPTIME(void)
 {
-	return getPROC("/proc/uptime",1,1);
+#ifdef HAVE_SYSINFO_UPTIME
+	struct sysinfo info;
+
+	if( 0 == sysinfo(&info))
+	{
+		return	(float)info.uptime;
+	}
+	else
+	{
+		return FAIL;
+	}
+#else
+	return	FAIL;
+#endif
 }
 
 float	PING(void)
@@ -392,7 +498,7 @@ float	PROCLOAD(void)
 		return dyn.psd_avg_1_min;
 	}
 #else
-	return	getPROC("/proc/loadavg",1,1);
+	return	FAIL;
 #endif
 #endif
 }
@@ -423,7 +529,7 @@ float	PROCLOAD5(void)
 		return dyn.psd_avg_5_min;
 	}
 #else
-	return	getPROC("/proc/loadavg",1,2);
+	return	FAIL;
 #endif
 #endif
 }
@@ -454,19 +560,46 @@ float	PROCLOAD15(void)
 		return dyn.psd_avg_5_min;
 	}
 #else
-	return	getPROC("/proc/loadavg",1,3);
+	return	FAIL;
 #endif
 #endif
 }
 
 float	SWAPFREE(void)
 {
-	return	getPROC("/proc/meminfo",10,2);
+#ifdef HAVE_SYSINFO_FREESWAP
+	struct sysinfo info;
+
+	if( 0 == sysinfo(&info))
+	{
+		return	(float)info.freeswap;
+	}
+	else
+	{
+		return FAIL;
+	}
+#else
+	return	FAIL;
+#endif
+}
+
+float	TEST(void)
+{
+	struct sysinfo info;
+
+	if( 0 == sysinfo(&info))
+	{
+		return	(float)info.freeswap;
+	}
+	else
+	{
+		return	FAIL;
+	}
 }
 
 float	PROCCOUNT(void)
 {
-#ifdef HAVE_SYS_SYSINFO_H
+#ifdef HAVE_SYSINFO_PROCS
 	struct sysinfo info;
 
 	if( 0 == sysinfo(&info))
@@ -484,7 +617,20 @@ float	PROCCOUNT(void)
 
 float	SWAPTOTAL(void)
 {
-	return	getPROC("/proc/meminfo",9,2);
+#ifdef HAVE_SYSINFO_TOTALSWAP
+	struct sysinfo info;
+
+	if( 0 == sysinfo(&info))
+	{
+		return	(float)info.totalswap;
+	}
+	else
+	{
+		return FAIL;
+	}
+#else
+	return	FAIL;
+#endif
 }
 
 float	DISK_IO(void)
