@@ -42,6 +42,15 @@ else
 	AC_MSG_RESULT(no)
 fi
 
+dnl Check for file /proc/loadavg
+AC_MSG_CHECKING(for file /proc/loadavg)
+if test -r /proc/loadavg; then
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(HAVE_PROC_LOADAVG)
+else
+	AC_MSG_RESULT(no)
+fi
+
 
 dnl Check for freeswap in struct sysinfo
 AC_MSG_CHECKING(for freeswap in struct sysinfo)
