@@ -1,5 +1,6 @@
 Changes for 1.1alpha8:
 
+ - fixed compilation of agent under OS/X (Alexei)
  - fixed memory[total] for HP-UX when >4GB of memory (Alexei)
 
 Changes for 1.1alpha7:

@@ -28,6 +28,10 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+/* Definitions of uint32_t under OS/X */
+#ifdef HAVE_STDINT_H
+	#include <stdint.h>
+#endif
 #ifdef HAVE_STRINGS_H
 	#include <strings.h>
 #endif
