@@ -10,6 +10,9 @@ Not ready yet:
 
 [ DOCS. All parameters should contain section "How can be used" in the Manual ]
 
+[ HB. Authorisation without user name/password ]
+[ HB. zabbix_suckerd core dumps occasionally ]
+
 Changes for 1.0beta4:
 
  - removed option -Wall from all Makefiles (Alexei)
