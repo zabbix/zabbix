@@ -1,6 +1,7 @@
 Changes for 1.0alpha11:
 
- - fixed nasty bug with situations when trigger looses its status
+ - when pressing Acive in list of items, [all] selected unstead of [Server]. Fixed.
+ - some triggers have incorrect status. Fixed.
  - global variable $ERROR_MSG will show details of operation failure
  - fixed both zabbix_trapper and zabbix_trapper to correctly change status of triggers
 
