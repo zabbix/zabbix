@@ -22,6 +22,22 @@
 #ifdef HAVE_SYS_SYSINFO_H
 	#include <sys/sysinfo.h>
 #endif
+/* Solaris */
+#ifdef HAVE_SYS_STATVFS_H
+	#include <sys/statvfs.h>
+#endif
+#ifdef HAVE_SYS_LOADAVG_H
+	#include <sys/loadavg.h>
+#endif
+#ifdef HAVE_SYS_SOCKET_H
+	#include <sys/socket.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
+	#include <netinet/in.h>
+#endif
+#ifdef HAVE_ARPA_INET_H
+	#include <arpa/inet.h>
+#endif
 /* OpenBSD */
 #ifdef HAVE_SYS_PARAM_H
 	#include <sys/param.h>
@@ -202,6 +218,16 @@ float   FILESIZE(const char * filename)
 
 float	INODE(const char * mountPoint)
 {
+#ifdef HAVE_SYS_STATVFS
+	struct statvfs   s;
+
+	if ( statvfs( (char *)mountPoint, &s) != 0 )
+	{
+		return  FAIL;
+	}
+
+	return  s.f_favail;
+#else
 	struct statfs   s;
 	long            blocks_used;
 	long            blocks_percent_used;
@@ -228,10 +254,21 @@ float	INODE(const char * mountPoint)
 	}
 
 	return	FAIL;
+#endif
 }
 
 float	DF(const char * mountPoint)
 {
+#ifdef HAVE_SYS_STATVFS
+	struct statvfs   s;
+
+	if ( statvfs( (char *)mountPoint, &s) != 0 )
+	{
+		return  FAIL;
+	}
+
+	return  s.f_bsize*s.f_bavail;
+#else
 	struct statfs   s;
 	long            blocks_used;
 	long            blocks_percent_used;
@@ -258,6 +295,7 @@ float	DF(const char * mountPoint)
 	}
 
 	return	FAIL;
+#endif
 }
 
 float	TCP_LISTEN(const char *porthex)
