@@ -28,18 +28,6 @@
 	<td><? echo $str; ?></td>
 	</tr>
 
-	<tr bgcolor="#dddddd">
-	<td>Is zabbix_alarmer running ?</td>
-	<?
-		$str="No";
-		if(exec("ps -aef|grep zabbix_alarmer|grep -v grep|wc -l")>0)
-		{
-			$str="Yes";
-		}
-	?>
-	<td><? echo $str; ?></td>
-	</tr>
-
 	<tr bgcolor="#eeeeee">
 	<td>Number of values stored in table history</td>
 	<td><? echo $stats["history_count"]; ?></td>

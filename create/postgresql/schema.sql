@@ -1,30 +1,17 @@
 \connect zabbix
 
 --
--- Table structure for table 'platforms'
---
-
---CREATE TABLE platforms (
---  platformid		serial,
---  platform		varchar(32)	DEFAULT '' NOT NULL,
---  PRIMARY KEY (platformid)
---);
-
---
 -- Table structure for table 'hosts'
 --
 
 CREATE TABLE hosts (
   hostid		serial,
---platformid		int4		NOT NULL,
   host			varchar(64)	DEFAULT '' NOT NULL,
   port			int4		DEFAULT '0' NOT NULL,
   status		int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (hostid)
---FOREIGN KEY (platformid) REFERENCES platforms
 );
 
---CREATE INDEX hosts_platformid on hosts (platformid);
 CREATE INDEX hosts_status on hosts (status);
 
 --
@@ -198,17 +185,13 @@ CREATE TABLE history (
 
 CREATE TABLE items_template (
   itemtemplateid	int4		NOT NULL,
---  platformid		int4		NOT NULL,
   description		varchar(255)	DEFAULT '' NOT NULL,
   key_			varchar(64)	DEFAULT '' NOT NULL,
   delay			int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (itemtemplateid)
---  FOREIGN KEY (platformid) REFERENCES platforms
 );
 
---CREATE UNIQUE INDEX items_template_p_k on items_template (platformid, key_);
 CREATE UNIQUE INDEX items_template_p_k on items_template (key_);
---CREATE INDEX items_template_itemid on items_template (platformid);
 
 --
 -- Table structure for table 'triggers_template'
@@ -236,3 +219,5 @@ CREATE TABLE media (
   PRIMARY KEY (mediaid),
   FOREIGN KEY (userid) REFERENCES users
 );
+
+VACUUM ANALYZE;
