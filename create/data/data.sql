@@ -189,6 +189,9 @@ INSERT INTO items VALUES (10415,0,'','',161,10001,'Used disk space on /tmp','dis
 INSERT INTO items VALUES (10416,0,'','',161,10001,'Used disk space on /usr','diskused[/usr]',30,30,0,0,NULL,NULL,NULL,0,0,'','B',1);
 INSERT INTO items VALUES (10417,0,'','',161,10001,'Used disk space on /home','diskused[/home]',30,30,0,0,NULL,NULL,NULL,0,0,'','B',1);
 
+INSERT INTO items VALUES (10418,0,'','',161,10001,'Temperature of mainboard','sensor[temp1]',30,30,0,0,NULL,NULL,NULL,0,0,'','C',0);
+INSERT INTO items VALUES (10419,0,'','',161,10001,'Temperature of CPU 1of2','sensor[temp2]',30,30,0,0,NULL,NULL,NULL,0,0,'','C',0);
+INSERT INTO items VALUES (10420,0,'','',161,10001,'Temperature of CPU 2of2','sensor[temp3]',30,30,0,0,NULL,NULL,NULL,0,0,'','C',0);
 
 
 INSERT INTO items VALUES (10090,0,'','',161,10002,'Free memory','memory[free]',30,30,0,0,NULL,NULL,NULL,0,0,'','B',0);
