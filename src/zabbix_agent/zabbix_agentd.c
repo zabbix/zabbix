@@ -410,7 +410,7 @@ int	main(int argc, char **argv)
 	int		i;
 
 	char		host[128];
-	char		ch;
+	int		ch;
 
         static struct  sigaction phan;
 

@@ -1276,7 +1276,7 @@ pid_t	child_trapper_make(int i,int listenfd, int addrlen)
 
 int main(int argc, char **argv)
 {
-	char	ch;
+	int	ch;
 	int	i;
 	pid_t	pid;
 
