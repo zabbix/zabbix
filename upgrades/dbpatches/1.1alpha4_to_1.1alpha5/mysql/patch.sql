@@ -4,3 +4,18 @@ CREATE TABLE escalations (
   PRIMARY KEY (escalationid),
   UNIQUE (name)
 ) type=InnoDB;
+
+--
+-- Table structure for table 'hosts_templates'
+--
+
+CREATE TABLE hosts_templates (
+  hostid		int(4)		DEFAULT '0' NOT NULL,
+  templateid		int(4)		DEFAULT '0' NOT NULL,
+  items			int(1)		DEFAULT '0' NOT NULL,
+  triggers		int(1)		DEFAULT '0' NOT NULL,
+  actions		int(1)		DEFAULT '0' NOT NULL,
+  graphs		int(1)		DEFAULT '0' NOT NULL,
+  screens		int(1)		DEFAULT '0' NOT NULL,
+  PRIMARY KEY (hostid, templateid)
+) type=InnoDB;
