@@ -1,5 +1,7 @@
 Changes for 1.0beta12:
 
+ - fixed update of special items 'status'. Thanks to
+ Sebastien "Slix" Linard. (Alexei) 
  - fixes for graph time navigation (Alexei)
  - fixed processing of trapped values, fixed pinger. Thanks
  to Sebastien "Slix" Linard. (Alexei) 
