@@ -146,7 +146,8 @@
 			$found=0;
 			while($row2=DBfetch($result2))
 			{
-				$sql="select * from actions a,triggers t,hosts h,functions f,items i where a.triggerid=t.triggerid and f.triggerid=t.triggerid and h.hostid=a.triggerid and i.hostid=h.hostid and a.actionid=".$row["actionid"]." and a.scope=1 and h.hostid=".$row2["hostid"];
+//				$sql="select * from actions a,triggers t,hosts h,functions f,items i where a.triggerid=t.triggerid and f.triggerid=t.triggerid and h.hostid=a.triggerid and i.hostid=h.hostid and a.actionid=".$row["actionid"]." and a.scope=1 and h.hostid=".$row2["hostid"];
+				$sql="select * from actions a where a.actionid=".$row["actionid"]." and a.scope=1 and a.triggerid=".$row2["hostid"];
 //				echo "$sql<br>";
 				$result3=DBselect($sql);
 				if(DBnum_rows($result3)>0)	$found=1;

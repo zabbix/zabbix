@@ -874,13 +874,13 @@ void	send_to_user(DB_TRIGGER *trigger,DB_ACTION *action)
 /*void	apply_actions(int triggerid,int good)*/
 void	apply_actions(DB_TRIGGER *trigger,int trigger_value)
 {
-	DB_RESULT *result,*result2;
+	DB_RESULT *result,*result2,*result3;
 	
 	DB_ACTION action;
 
 	char sql[MAX_STRING_LEN];
 
-	int	i;
+	int	i,j;
 	int	now;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In apply_actions(%d,%d)",trigger->triggerid, trigger_value);
@@ -934,6 +934,10 @@ void	apply_actions(DB_TRIGGER *trigger,int trigger_value)
 
 			substitute_macros(trigger, &action, action.message);
 			substitute_macros(trigger, &action, action.subject);
+
+			send_to_user(trigger,&action);
+			snprintf(sql,sizeof(sql)-1,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
+			DBexecute(sql);
 		}
 		else if(ACTION_SCOPE_HOST==action.scope)
 		{
@@ -941,8 +945,42 @@ void	apply_actions(DB_TRIGGER *trigger,int trigger_value)
 			{
 				continue;
 			}
-			snprintf(sql,sizeof(sql)-1,"select * from actions a,triggers t,hosts h,functions f where a.triggerid=t.triggerid and f.triggerid=t.triggerid and h.hostid=a.triggerid and t.triggerid=%d and a.scope=%d",trigger->triggerid,ACTION_SCOPE_HOST);
-/*			zabbix_log( LOG_LEVEL_WARNING, "[%s]",sql);*/
+
+			snprintf(sql,sizeof(sql)-1,"select distinct h.hostid from hosts h,items i,triggers t,functions f where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=%d", trigger->triggerid);
+			result2 = DBselect(sql);
+
+			for(j=0;j<DBnum_rows(result2);j++)
+			{
+				snprintf(sql,sizeof(sql)-1,"select distinct a.actionid from actions a,hosts h,items i,triggers t,functions f where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and a.triggerid=%d and a.scope=1 and a.actionid=%d and a.triggerid=h.hostid",atoi(DBget_field(result2,j,0)),action.actionid);
+				result3 = DBselect(sql);
+				if(DBnum_rows(result3)==0)
+				{
+					DBfree_result(result3);
+					continue;
+				}
+				DBfree_result(result3);
+
+				strscpy(action.subject,trigger->description);
+				if(TRIGGER_VALUE_TRUE == trigger_value)
+				{
+					strncat(action.subject," (ON)", MAX_STRING_LEN);
+				}
+				else
+				{
+					strncat(action.subject," (OFF)", MAX_STRING_LEN);
+				}
+				strscpy(action.message,action.subject);
+
+				substitute_macros(trigger, &action, action.message);
+				substitute_macros(trigger, &action, action.subject);
+
+				send_to_user(trigger,&action);
+				snprintf(sql,sizeof(sql)-1,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
+				DBexecute(sql);
+			}
+			DBfree_result(result2);
+
+/*			snprintf(sql,sizeof(sql)-1,"select * from actions a,triggers t,hosts h,functions f where a.triggerid=t.triggerid and f.triggerid=t.triggerid and h.hostid=a.triggerid and t.triggerid=%d and a.scope=%d",trigger->triggerid,ACTION_SCOPE_HOST);
 			result2 = DBselect(sql);
 			if(DBnum_rows(result2)==0)
 			{
@@ -950,6 +988,7 @@ void	apply_actions(DB_TRIGGER *trigger,int trigger_value)
 				continue;
 			}
 			DBfree_result(result2);
+
 			strscpy(action.subject,trigger->description);
 			if(TRIGGER_VALUE_TRUE == trigger_value)
 			{
@@ -962,10 +1001,7 @@ void	apply_actions(DB_TRIGGER *trigger,int trigger_value)
 			strscpy(action.message,action.subject);
 
 			substitute_macros(trigger, &action, action.message);
-			substitute_macros(trigger, &action, action.subject);
-
-/*			substitute_hostname(trigger->triggerid,action.message);
-			substitute_hostname(trigger->triggerid,action.subject);*/
+			substitute_macros(trigger, &action, action.subject);*/
 		}
 		else if(ACTION_SCOPE_HOSTS==action.scope)
 		{
@@ -991,15 +1027,16 @@ void	apply_actions(DB_TRIGGER *trigger,int trigger_value)
 
 /*			substitute_hostname(trigger->triggerid,action.message);
 			substitute_hostname(trigger->triggerid,action.subject);*/
+
+			send_to_user(trigger,&action);
+			snprintf(sql,sizeof(sql)-1,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
+			DBexecute(sql);
 		}
 		else
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Unsupported scope [%d] for actionid [%d]", action.scope, action.actionid);
 		}
 
-		send_to_user(trigger,&action);
-		snprintf(sql,sizeof(sql)-1,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
-		DBexecute(sql);
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "Actions applied for trigger %d %d", trigger->triggerid, trigger_value );
 	DBfree_result(result);
