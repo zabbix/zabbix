@@ -612,4 +612,16 @@ CREATE TABLE trends (
   FOREIGN KEY (itemid) REFERENCES items
 );
 
+--
+-- Table structure for table 'escalations'
+--
+
+CREATE TABLE escalations (
+  escalationid		serial		DEFAULT '0' NOT NULL,
+  name			varchar(64)	DEFAULT '0' NOT NULL,
+  PRIMARY KEY (escalationid)
+);
+
+CREATE UNIQUE INDEX escalations_name on escalations (name);
+
 VACUUM ANALYZE;

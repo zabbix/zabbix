@@ -606,3 +606,14 @@ CREATE TABLE images (
   PRIMARY KEY (imageid),
   UNIQUE (imagetype, name)
 ) type=InnoDB;
+
+--
+-- Table structure for table 'escalations'
+--
+
+CREATE TABLE escalations (
+  escalationid		int(4)		NOT NULL auto_increment,
+  name			varchar(64)	DEFAULT '0' NOT NULL,
+  PRIMARY KEY (escalationid),
+  UNIQUE (name)
+) type=InnoDB;
