@@ -36,6 +36,7 @@
 	{
 		show_header($page["title"],0,$nomenu);
 	}
+
 ?>
 
 <?php
@@ -172,19 +173,20 @@
 		$hour=3600;
 		foreach(array(1,2,4,8,12,24) as $count){
 			$tmp=$hour*$count;
-			echo("[<A HREF=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&from=".$HTTP_GET_VARS["from"]."&period=".$tmp."&keep=".$HTTP_GET_VARS["keep"]."\">");
+			echo("[<A HREF=\"charts.php?period=$tmp".url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">");
 			echo($count."h</A>]&nbsp;");
 		}
 
             echo("or&nbsp;");
 		$tmp=$HTTP_GET_VARS["period"]+$hour;
-		echo("[<A HREF=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&from=".$HTTP_GET_VARS["from"]."&period=".$tmp."&keep=".$HTTP_GET_VARS["keep"]."\">");
+		echo("[<A HREF=\"charts.php?period=$tmp".url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">");
 		echo("+1h</A>]&nbsp;");
 
 		if ($HTTP_GET_VARS["period"]>$hour) 
 		{
 			$tmp=$HTTP_GET_VARS["period"]-$hour;
-			echo("[<A HREF=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&from=".$HTTP_GET_VARS["from"]."&period=".$tmp."&keep=".$HTTP_GET_VARS["keep"]."\">");
+//			echo("[<A HREF=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&from=".$HTTP_GET_VARS["from"]."&period=".$tmp."&keep=".$HTTP_GET_VARS["keep"]."\">");
+			echo("[<A HREF=\"charts.php?period=$tmp".url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">");
 			echo("-1h</A>]&nbsp;");
 		}
 		else
@@ -199,7 +201,7 @@
 		$day=24;
 		foreach(array(0,1,2,7,14) as $count){
 			$tmp=$day*$count;
-			echo("[<A HREF=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&from=".$tmp."&period=".$HTTP_GET_VARS["period"]."&keep=".$HTTP_GET_VARS["keep"]."\">");
+			echo("[<A HREF=\"charts.php?from=$tmp".url_param("graphid").url_param("period").url_param("keep").url_param("fullscreen")."\">");
 			echo($count."d</A>]&nbsp;");
 		}
             
@@ -210,11 +212,11 @@
 			echo(" <b>Keep&nbsp;period&nbsp;=</b>&nbsp;");
 			if($HTTP_GET_VARS["keep"] == 1)
 			{
-				echo("<A HREF=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&from=".$HTTP_GET_VARS["from"]."&period=".$HTTP_GET_VARS["period"]."&keep=0\">Off</a>");
+				echo("<A HREF=\"charts.php?keep=0".url_param("graphid").url_param("from").url_param("period").url_param("fullscreen")."\">On</a>");
 			}
 			else
 			{
-				echo("<A HREF=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&from=".$HTTP_GET_VARS["from"]."&period=".$HTTP_GET_VARS["period"]."&keep=1\">On</a>");
+				echo("<A HREF=\"charts.php?keep=1".url_param("graphid").url_param("from").url_param("period").url_param("fullscreen")."\">Off</a>");
 			}
 		}
 
