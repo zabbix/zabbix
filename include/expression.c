@@ -566,6 +566,43 @@ int	evaluate(int *result,char *exp)
 	return SUCCEED;
 }
 
+/* Translate {DATE}, {TIME} */
+/* Doesn't work yet */
+void	substitute_simple_macros(char *exp)
+{
+	int	found = SUCCEED;
+	char	*s;
+	char	tmp[MAX_STRING_LEN+1];
+
+	time_t  now;
+	struct  tm      *tm;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros [%s]",exp);
+	while (found == SUCCEED)
+	{
+		found = FAIL;
+
+		if( (s = strstr(exp,"{DATE}")) != NULL )
+		{
+			now=time(NULL);
+			tm=localtime(&now);
+			sprintf(value,"%.4d%\..2d%\..2d",tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday);
+
+			found = SUCCEED;
+		}
+		if( (s = strstr(exp,"{TIME}")) != NULL )
+		{
+			now=time(NULL);
+			tm=localtime(&now);
+			sprintf(tmp,"%.2d:%.2d:%.2d",tm->tm_hour,tm->tm_min,tm->tm_sec);
+
+			found = SUCCEED;
+		}
+	}
+
+	zabbix_log( LOG_LEVEL_DEBUG, "Result expression [%s]", exp );
+}
+
 /*
  * Translate "{127.0.0.1:system[procload].last(0)}" to "1.34" 
  */
@@ -583,6 +620,8 @@ int	substitute_macros(char *exp)
 	int	r1,l1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_macros([%s])",exp);
+
+	substitute_simple_macros(exp);
 
 	while( find_char(exp,'{') != FAIL )
 	{
