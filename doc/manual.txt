@@ -320,7 +320,6 @@ Zabbix requires the following software to run properly:
  - PHP 4.0 or later, compiled as Apache module with 
  	- GD module (for PNG images)
 	- MySQL of PostgreSQL module
-	- mhash module (encrypted passwords)
  - GNU make
  - WEB browser on client side (support for HTML and PNG images required). MS Explorer and Netscape work perfectly.
  - UCD-SNMP library and header files. Required for support of SNMP agents. Optional.
@@ -605,7 +604,6 @@ That is all. Zabbix database is ready. Start Zabbix server processes using usual
 
 6.1 Zabbix 1.0alpha8
 
- - Install mhash module for PHP
  - Note that zabbix_sucker renamed to zabbix_suckerd
 
  - Replace zabbix_agent with zabbix_agentd
