@@ -2682,7 +2682,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		for($i=0;$i<$count;$i++)
 		{
-			$sql="insert into users_groups (usrgrpid,userid) values ($usrgrpid,".$userid[$i].")";
+			$sql="insert into users_groups (usrgrpid,userid) values ($usrgrpid,".$users[$i].")";
 			DBexecute($sql);
 		}
 	}
@@ -2711,7 +2711,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return 0;
 		}
 
-		$sql="select * from users_groups where name='$name'";
+		$sql="select * from usrgrp where name='$name'";
 		$result=DBexecute($sql);
 		if(DBnum_rows($result)>0)
 		{
@@ -2719,14 +2719,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return 0;
 		}
 
-		$sql="insert into hosts_groups (name) values ('$name')";
+		$sql="insert into usrgrp (name) values ('$name')";
 		$result=DBexecute($sql);
 		if(!$result)
 		{
 			return	$result;
 		}
 		
-		$usrgrpid=DBinsert_id($result,"hosts_groups","usrgrpid");
+		$usrgrpid=DBinsert_id($result,"usrgrp","usrgrpid");
 
 		update_user_groups($usrgrpid,$users);
 
@@ -3028,6 +3028,16 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return DBexecute($sql);
 	}
 
+	function	delete_user_group($usrgrpid)
+	{
+		global	$ERROR_MSG;
+
+		$sql="delete from users_groups where usrgrpid=$usrgrpid";
+		DBexecute($sql);
+		$sql="delete from usrgrp where usrgrpid=$usrgrpid";
+		return DBexecute($sql);
+	}
+
 	# Delete User definition
 
 	function	delete_user($userid)
@@ -3047,6 +3057,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		delete_rights_by_userid($userid);
 		delete_profiles_by_userid($userid);
 
+		$sql="delete from users_groups where userid=$userid";
+		DBexecute($sql);
 		$sql="delete from users where userid=$userid";
 		return DBexecute($sql);
 	}
@@ -3744,6 +3756,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	# Insert form for User Groups
 	function	insert_usergroups_form($usrgrpid)
 	{
+		global  $HTTP_GET_VARS;
+
 		if(isset($usrgrpid))
 		{
 			$usrgrp=get_usergroup_by_usrgrpid($usrgrpid);
@@ -3798,6 +3812,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		show_table2_v_delimiter2();
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add group\">";
+		if(isset($HTTP_GET_VARS["usrgrpid"]))
+		{
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update group\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete group\" onClick=\"return Confirm('Delete selected group?');\">";
+		}
 		echo "</form>";
 		show_table2_header_end();
 	}

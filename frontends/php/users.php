@@ -83,9 +83,14 @@
 		}
 		if($HTTP_GET_VARS["register"]=="add group")
 		{
-			$result=add_user_group($HTTP_GET_VARS["userid"]);
-			show_messages($result, "User successfully deleted", "Cannot delete user");
-			unset($userid);
+			$result=add_user_group($HTTP_GET_VARS["name"], $HTTP_GET_VARS["users"]);
+			show_messages($result, "Group added", "Cannot add group");
+		}
+		if($HTTP_GET_VARS["register"]=="delete group")
+		{
+			$result=delete_user_group($HTTP_GET_VARS["usrgrpid"]);
+			show_messages($result, "Group deleted", "Cannot delete group");
+			unset($HTTP_GET_VARS["usrgrpid"]);
 		}
 	}
 ?>
