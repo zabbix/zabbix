@@ -11,6 +11,7 @@ trigger wihout actions, etc etc
  5) When adding trigger, next page is without triggers of this host. Is  
  it possible after adding triger to go back to triggers of this host page ?
 
+ - background image for maps
 
  - overlib: context sensitive help in PHP frontend
  - add selection of MIN/MAX/AVG for graphs
