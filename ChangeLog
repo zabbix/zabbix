@@ -1,5 +1,7 @@
 Changes for 1.0beta10:
 
+ - buttons "Activate selected" and "Disable selected" in item
+ maintenance form (Alexei)
  - do not wrap Latest Values (Alexei)
  - support for changing of graph items (Alexei)
  - menu will not require more than three lines (Alexei)
