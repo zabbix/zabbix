@@ -48,7 +48,7 @@ float     received[60*15];
 */
 
 
-INTERFACE interfaces[128]=
+INTERFACE interfaces[8]=
 {
 	{0}
 };
