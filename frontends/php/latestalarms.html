@@ -39,7 +39,7 @@
 	}
 	else
 	{
-		$sql="select t.description,a.clock,a.istrue,t.triggerid from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit $limit 50";
+		$sql="select t.description,a.clock,a.istrue,t.triggerid from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit 50";
 	}
 	$result=DBselect($sql);
 
@@ -50,6 +50,7 @@
 	echo "<TD><b>Description</b></TD>";
 	echo "<TD width=\"10%\"><b>Status</b></TD>";
 	echo "</TR>";
+	$col=0;
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		$description=DBget_field($result,$i,0);

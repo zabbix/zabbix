@@ -13,7 +13,7 @@
 ?>
 
 <?
-	if($limit==200)
+	if(isset($limit)&&($limit==200))
 	{
 		echo "[<A HREF=\"alerts.html?limit=50\">";
 		echo "Show last 50</A>]";
