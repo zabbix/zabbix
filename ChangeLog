@@ -1,5 +1,6 @@
 Changes for 1.1alpha3:
 
+ - do not use items.lastdelete in housekeeping process (Alexei)
  - do not draw straight lines in graphs if no data (Alexei)
  - fixes for PHP5 (Alexei)
  - fix for crash of zabbix_suckerd (Alexei)
