@@ -57,10 +57,7 @@
 	show_table3_header_begin();
 	echo "&nbsp;".S_LATEST_DATA;
 	show_table3_h_delimiter(60);
-?>
-		<form name="form2" method="get" action="latest.php">
-
-<?php
+	echo "<form name=\"form2\" method=\"get\" action=\"latest.php\">";
 	echo S_GROUP."&nbsp;";
 	echo "<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
 	echo "<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_ALL_SMALL;
