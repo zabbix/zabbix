@@ -1,3 +1,18 @@
+Things to check:
+
+Read and respond to this message at:
+http://sourceforge.net/forum/message.php?msg_id=1615663
+By: jkonkol
+
+Yes fixing the correct server time fixed my authentication problem.
+Specifically it was set 6 hours earlier than the computer I was using the frontend
+on.  So when zabbix would check to see if I had been connected for longer than
+600 seconds it would always fail.
+
+Hope this helps.
+
+Changes for 1.0beta5:
+
 Changes for 1.0beta4:
 
  - ./configure will find libz  to solve problem with MySQL (Alexei)
