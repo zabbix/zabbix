@@ -36,9 +36,6 @@ COMMAND	commands[]=
 	{"cksum_inetd"	,EXECUTE, "cksum /etc/inetd.conf |cut -f1 -d' '"},
 	{"cksum_kernel"	,EXECUTE, "cksum /vmlinuz |cut -f1 -d' '"},
 	{"cksum_passwd"	,EXECUTE, "cksum /etc/passwd |cut -f1 -d' '"},
-//	{"mon_history"	,EXECUTE, "echo 'select count(*) from history'|mysql monitor -uroot|tail -1"},
-//	{"mon_sucker_load"	,EXECUTE, "ps aux|grep mon_sucker|grep -v grep|cut -b16-20"},
-//	{"mon_alarmer_load"	,EXECUTE, "ps aux|grep mon_alarmer|grep -v grep|cut -b16-20"},
 	{"proccount"	,EXECUTE, "echo /proc/[0-9]*|wc -w"},
 	{"ping"		,PING, 0},
 	{"procidle"	,EXECUTE, "vmstat 1 1|tail -1|awk {'print $16'}"},
@@ -49,10 +46,6 @@ COMMAND	commands[]=
 	{"procsystem"	,EXECUTE, "vmstat 1 1|tail -1|awk {'print $15'}"},
 	{"procuser"	,EXECUTE, "vmstat 1 1|tail -1|awk {'print $14'}"},
 	{"swapfree"	,SWAPFREE, 0},
-//	{"block_bi"	,EXECUTE, "vmstat 1 2|tail -1|cut -b45-50"},
-//	{"block_bo"	,EXECUTE, "vmstat 1 2|tail -1|cut -b51-56"},
-//	{"swap_si"	,EXECUTE, "vmstat 1 2|tail -1|cut -b37-40"},
-//	{"swap_so"	,EXECUTE, "vmstat 1 2|tail -1|cut -b41-44"},
 	{"syslog_size"	,FILESIZE, "/var/log/syslog"},
 	{"tcp_count"	,EXECUTE, "netstat -tn|grep EST|wc -l"},
 	{"users"	,EXECUTE, "who|wc -l"},
@@ -88,7 +81,6 @@ int	check_security(void)
 	file=open("/etc/zabbix/zabbix_agent.conf",O_RDONLY);
 	if(file == -1)
 	{
-//		printf("Open failed");
 		return FAIL;
 	}
 	i=read(file, config, 16);
@@ -99,9 +91,7 @@ int	check_security(void)
 
 	if(getpeername(0,  &name, &i) == 0)
 	{
-//		printf("%d\n",name.sin_port);
 		sname=inet_ntoa(name.sin_addr);
-//		printf("From:=%s=\n",sname);
 		if(strcmp(sname,config)!=0)
 		{
 			return	FAIL;
@@ -136,8 +126,6 @@ int	main()
 
 	for( p=s+strlen(s)-1; p>s && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
 	p[1]=0;
-//	printf("=%s=\n",s);
-//	s[strlen(s)-2]=0;
 	
 	i=0;
 	for(;;)
