@@ -1,6 +1,8 @@
 #ifndef ZABBIX_COMMON_H
 #define ZABBIX_COMMON_H
  
+#define PERF
+
 #define	SUCCEED		0
 #define	FAIL		(-1)
 #define	NOTSUPPORTED	(-2)

@@ -36,7 +36,8 @@ void    DBconnect( char *dbname, char *dbuser, char *dbpassword, char *dbsocket)
 #endif
 #ifdef	HAVE_PGSQL
 /*	conn = PQsetdb(pghost, pgport, pgoptions, pgtty, dbName); */
-	conn = PQsetdb(NULL, NULL, NULL, NULL, dbname);
+/*	conn = PQsetdb(NULL, NULL, NULL, NULL, dbname);*/
+	conn = PQsetdbLogin(NULL, NULL, NULL, NULL, dbname, dbuser, dbpassword );
 
 /* check to see that the backend connection was successfully made */
 	if (PQstatus(conn) == CONNECTION_BAD)
@@ -75,12 +76,14 @@ int	DBexecute(char *query)
 
 	if( result==NULL)
 	{
+		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", "Result is NULL" );
 		PQclear(result);
 		return FAIL;
 	}
 	if( PQresultStatus(result) != PGRES_COMMAND_OK)
 	{
+		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", PQresStatus(PQresultStatus(result)) );
 		PQclear(result);
 		return FAIL;
@@ -116,11 +119,13 @@ DB_RESULT *DBselect(char *query)
 
 	if( result==NULL)
 	{
+		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", "Result is NULL" );
 		exit( FAIL );
 	}
 	if( PQresultStatus(result) != PGRES_TUPLES_OK)
 	{
+		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", PQresStatus(PQresultStatus(result)) );
 		exit( FAIL );
 	}

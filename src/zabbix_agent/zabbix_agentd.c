@@ -366,6 +366,9 @@ int	check_security(int sockfd)
 	char	*sname;
 	struct	sockaddr_in name;
 	int	i;
+	char	*s;
+
+	char	*tmp;
 
 	i=sizeof(name);
 
@@ -375,11 +378,17 @@ int	check_security(int sockfd)
 
 		sname=inet_ntoa(name.sin_addr);
 
-		zabbix_log( LOG_LEVEL_DEBUG, "Connection from [%s]. Allowed server is [%s] ",sname, CONFIG_HOSTS_ALLOWED);
-		if(strcmp(sname, CONFIG_HOSTS_ALLOWED)!=0)
+		zabbix_log( LOG_LEVEL_DEBUG, "Connection from [%s]. Allowed servers [%s] ",sname, CONFIG_HOSTS_ALLOWED);
+
+		tmp=strdup(CONFIG_HOSTS_ALLOWED);
+        	s=(char *)strtok(tmp,",");
+		while(s!=NULL)
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Connection from [%s] rejected. Allowed server is [%s] ",sname, CONFIG_HOSTS_ALLOWED);
-			return	FAIL;
+			if(strcmp(sname, s)==0)
+			{
+				return	SUCCEED;
+			}
+                	s=(char *)strtok(NULL,",");
 		}
 	}
 	else
@@ -388,7 +397,8 @@ int	check_security(int sockfd)
 		zabbix_log( LOG_LEVEL_WARNING, "Connection rejected");
 		return FAIL;
 	}
-	return	SUCCEED;
+	zabbix_log( LOG_LEVEL_WARNING, "Connection from [%s] rejected. Allowed server is [%s] ",sname, CONFIG_HOSTS_ALLOWED);
+	return	FAIL;
 }
 
 void	process_child(int sockfd)
