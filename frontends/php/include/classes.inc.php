@@ -632,4 +632,38 @@
 			ImageDestroy($this->im); 
 		}
 	}
+
+	class	Item
+	{
+		var $data;
+		
+		function	Item($itemid=0)
+		{
+			if($itemid!=0)
+			{
+				$i=get_item_by_itemid($itemid);
+				if($i)
+				{
+					$data=$i;
+				}
+				else	unset($data);
+			}	
+		}
+		
+		function	GetData($element)
+		{
+			if(isset($this->data))
+			{
+				return $this->data[$element];
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		function	SetData($element)
+		{
+		}
+	}
 ?>
