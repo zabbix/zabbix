@@ -498,8 +498,10 @@
 			$now = time(NULL);
 			if(isset($this->stime))
 			{
-				$this->to_time=$this->stime+24*3600;
+#				$this->to_time=$this->stime+24*3600;
+#				$this->from_time=$this->stime;
 				$this->from_time=$this->stime;
+				$this->to_time=$this->stime+$this->period;
 			}
 			else
 			{
