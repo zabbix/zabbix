@@ -980,6 +980,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				($function!="abschange")&&
 				($function!="nodata")&&
 				($function!="time")&&
+				($function!="dayofweek")&&
 				($function!="date")&&
 				($function!="now")&&
 				($function!="str"))
