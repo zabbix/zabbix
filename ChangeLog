@@ -1,5 +1,6 @@
 Changes for 1.0beta2:
 
+ - clean compilation on FreeBSD (Alexei)
  - clean compilation on Solaris (Alexei)
  - check_service[smtp] will send QUIT. Thanks to Charlie. (Alexei)
  - calls to malloc+strcpy changed to strdup() (Alexei) 
