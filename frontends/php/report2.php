@@ -21,12 +21,12 @@
 		{
 			continue;
 		}
-		if( isset($hostid) && ($hostid == $row["hostid"]) )
+		if( isset($HTTP_GET_VARS["hostid"]) && ($HTTP_GET_VARS["hostid"] == $row["hostid"]) )
 		{
 			echo "<b>[";
 		}
 		echo "<a href='report2.php?hostid=".$row["hostid"]."'>".$row["host"]."</a>";
-		if(isset($hostid) && ($hostid == $row["hostid"]) )
+		if(isset($HTTP_GET_VARS["hostid"]) && ($HTTP_GET_VARS["hostid"] == $row["hostid"]) )
 		{
 			echo "]</b>";
 		}
@@ -38,14 +38,14 @@
 ?>
 
 <?
-	if(isset($hostid))
+	if(isset($HTTP_GET_VARS["hostid"]))
 	{
 		echo "<br>";
-		$result=DBselect("select host from hosts where hostid=$hostid");
+		$result=DBselect("select host from hosts where hostid=".$HTTP_GET_VARS["hostid"]);
 		$row=DBfetch($result);
 		show_table_header($row["host"]);
 
-		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.value from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.status=0 and t.triggerid=f.triggerid and h.hostid=$hostid and h.status in (0,2) and i.status=0 order by h.host, t.description");
+		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.value from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.status=0 and t.triggerid=f.triggerid and h.hostid=".$HTTP_GET_VARS["hostid"]." and h.status in (0,2) and i.status=0 order by h.host, t.description");
 		echo "<TABLE BORDER=0 COLS=3 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 		echo "<TR>";
 		echo "<TD><B>Description</B></TD>";

@@ -13,6 +13,7 @@
 		return $row["cnt"]; 
 	}
 
+/* Rewrite ! */
 	function	check_right($right,$permission,$id)
 	{
 		global $USER_DETAILS;
@@ -1460,7 +1461,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
 
-	function	add_service($name,$triggerid,$linktrigger,$algorithm)
+	function	add_service($serviceid,$name,$triggerid,$linktrigger,$algorithm)
 	{
 		if( isset($linktrigger)&&($linktrigger=="on") )
 		{
@@ -1477,7 +1478,16 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$sql="insert into services (name,status,algorithm) values ('$name',0,$algorithm)";
 		}
 		$result=DBexecute($sql);
-		return DBinsert_id($result,"services","serviceid");
+		if(!$result)
+		{
+			return FALSE;
+		}
+		$id=DBinsert_id($result,"services","serviceid");
+		if(isset($serviceid))
+		{
+			add_service_link($id,$serviceid,1);
+		}
+		return $id;
 	}
 
 	function	add_host_to_services($hostid,$serviceid)
@@ -1486,8 +1496,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
-			$serviceid2=add_service($row["description"],$row["triggerid"],"on",0);
-			add_service_link($serviceid2,$serviceid,0);
+			$serviceid2=add_service($serviceid,$row["description"],$row["triggerid"],"on",0);
+//			add_service_link($serviceid2,$serviceid,0);
 		}
 		return	1;
 	}

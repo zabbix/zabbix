@@ -406,3 +406,17 @@ CREATE TABLE problems_comments (
   PRIMARY KEY (commentid),
   KEY (problemid,clock)
 );
+
+--
+-- Table structure for table 'service_alarms'
+--
+
+CREATE TABLE service_alarms (
+  serviceid		int(4)		NOT NULL auto_increment,
+  clock			int(4)		DEFAULT '0' NOT NULL,
+  value			int(4)		DEFAULT '0' NOT NULL,
+  PRIMARY KEY (serviceid),
+  KEY (serviceid,clock),
+  KEY (clock)
+);
+

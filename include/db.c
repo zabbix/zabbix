@@ -354,6 +354,49 @@ int	latest_alarm(int triggerid, int status)
 	return ret;
 }
 
+/* SUCCEED if latest service alarm has this status */
+/* Rewrite required to simplify logic ?*/
+int	latest_service_alarm(int serviceid, int status)
+{
+	char	sql[MAX_STRING_LEN+1];
+	int	clock;
+	DB_RESULT	*result;
+	int ret = FAIL;
+
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In latest_service_alarm()");
+
+	sprintf(sql,"select max(clock) from service_alarms where serviceid=%d",serviceid);
+	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
+	result = DBselect(sql);
+
+	if(DBnum_rows(result) == 0)
+        {
+                zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
+                ret = FAIL;
+        }
+	else
+	{
+		clock=atoi(DBget_field(result,0,0));
+		DBfree_result(result);
+
+		sprintf(sql,"select value from service_alarms where serviceid=%d and clock=%d",serviceid,clock);
+		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
+		result = DBselect(sql);
+		if(DBnum_rows(result)==1)
+		{
+			if(atoi(DBget_field(result,0,0)) == status)
+			{
+				ret = SUCCEED;
+			}
+		}
+	}
+
+	DBfree_result(result);
+
+	return ret;
+}
+
 int	add_alarm(int triggerid,int status,int clock)
 {
 	char	sql[MAX_STRING_LEN+1];
@@ -370,6 +413,26 @@ int	add_alarm(int triggerid,int status,int clock)
 	DBexecute(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG,"End of add_alarm()");
+	
+	return SUCCEED;
+}
+
+int	DBadd_service_alarm(int serviceid,int status,int clock)
+{
+	char	sql[MAX_STRING_LEN+1];
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In add_service_alarm()");
+
+	if(latest_service_alarm(serviceid,status) == SUCCEED)
+	{
+		return SUCCEED;
+	}
+
+	sprintf(sql,"insert into service_alarms(serviceid,clock,value) values(%d,%d,%d)", serviceid, clock, status);
+	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
+	DBexecute(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG,"End of add_service_alarm()");
 	
 	return SUCCEED;
 }
