@@ -1,4 +1,26 @@
 #
+# Table structure for table 'services'
+#
+
+CREATE TABLE services (
+  serviceid		int(4)		NOT NULL auto_increment,
+  name			varchar(128)	DEFAULT '' NOT NULL,
+  triggerid		int(4),
+  PRIMARY KEY (serviceid)
+);
+
+#
+# Table structure for table 'services_links'
+#
+
+CREATE TABLE services_links (
+  serviceupid		int(4)		DEFAULT '0' NOT NULL,
+  servicedownid		int(4)		DEFAULT '0' NOT NULL,
+  KEY (serviceupid),
+  KEY (servicedownid)
+);
+
+#
 # Table structure for table 'graphs_items'
 #
 
