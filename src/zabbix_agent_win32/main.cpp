@@ -47,6 +47,7 @@ PERFCOUNTER *perfCounterList=NULL;
 DWORD (__stdcall *imp_GetGuiResources)(HANDLE,DWORD);
 BOOL (__stdcall *imp_GetProcessIoCounters)(HANDLE,PIO_COUNTERS);
 BOOL (__stdcall *imp_GetPerformanceInfo)(PPERFORMANCE_INFORMATION,DWORD);
+BOOL (__stdcall *imp_GlobalMemoryStatusEx)(LPMEMORYSTATUSEX);
 
 
 //
@@ -86,6 +87,7 @@ static void ImportSymbols(void)
    if (hModule!=NULL)
    {
       imp_GetProcessIoCounters=(BOOL (__stdcall *)(HANDLE,PIO_COUNTERS))GetProcAddressAndLog(hModule,"GetProcessIoCounters");
+      imp_GlobalMemoryStatusEx=(BOOL (__stdcall *)(LPMEMORYSTATUSEX))GetProcAddressAndLog(hModule,"GlobalMemoryStatusEx");
    }
    else
    {
