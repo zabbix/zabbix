@@ -1,5 +1,7 @@
 Changes for 1.0beta13:
 
+ - fix for chart_sla.php. Thanks to Sebastien "Slix"
+ Linard. (Alexei)
  - proper timeout handling for SNMP connect (Alexei)
 
 Changes for 1.0beta12:
