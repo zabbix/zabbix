@@ -402,4 +402,40 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			}
 		}
 	}
+
+	function	delete_trigger_from_templates($triggerid)
+	{
+		if($triggerid<=0)
+		{
+			return;
+		}
+
+		$trigger=get_trigger_by_triggerid($triggerid);
+
+		$sql="select distinct h.hostid from hosts h,functions f, items i where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid=$triggerid";
+		$result=DBselect($sql);
+		if(DBnum_rows($result)!=1)
+		{
+			return;
+		}
+
+		$row=DBfetch($result);
+
+		$hostid=$row["hostid"];
+
+		$sql="select hostid,templateid,items from hosts_templates where templateid=$hostid";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			if($row["triggers"]&4 == 0)	continue;
+
+			$sql="select distinct f.triggerid from functions f,items i,triggers t where t.description='".addslashes($trigger["description"])."' and t.triggerid=f.triggerid and i.itemid=f.itemid and i.hostid=".$row["hostid"];
+			$result2=DBselect($sql);
+			while($row2=DBfetch($result2))
+			{
+				delete_trigger($row2["triggerid"]);
+			}
+
+		}
+	}
 ?>
