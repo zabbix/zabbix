@@ -84,8 +84,6 @@ int	get_value_SNMPv1(double *result,ITEM *item)
     struct variable_list *vars;
     int status;
 
-    char *e;
-
     /*
      *      * Initialize the SNMP library
      *           */
@@ -145,6 +143,7 @@ int	get_value_SNMPv1(double *result,ITEM *item)
 	{
 		int count=1;
 //		if (vars->type == ASN_OCTET_STR)
+//		syslog( LOG_WARNING, "Type:%d", vars->type);
 		if (vars->type == ASN_INTEGER)
 		{
 			char *sp = (char *)malloc(1 + vars->val_len);
@@ -152,13 +151,15 @@ int	get_value_SNMPv1(double *result,ITEM *item)
 			sp[vars->val_len] = '\0';
 //			syslog( LOG_WARNING, "value #%d is a string: %s\n", count++, sp);
 //			*result=strtod(sp,&e);
-			syslog( LOG_WARNING, "Type:%d", vars->type);
-			syslog( LOG_WARNING, "Value #%d is an integer: %d", count++, *vars->val.integer);
+//			syslog( LOG_WARNING, "Type:%d", vars->type);
+//			syslog( LOG_WARNING, "Value #%d is an integer: %d", count++, *vars->val.integer);
 			*result=*vars->val.integer;
 			free(sp);
 		}
 		else
-			syslog( LOG_WARNING,"value #%d is NOT a string! Ack!\n", count++);
+		{
+//			syslog( LOG_WARNING,"value #%d is NOT an integer!\n", count++);
+		}
 	}
     } else {
       /*
