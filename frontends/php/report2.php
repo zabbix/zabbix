@@ -6,6 +6,15 @@
 ?>
 
 <?
+	if(!check_right("Host","R",0))
+	{
+		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+		show_footer();
+		exit;
+	}
+?>
+
+<?
 	show_table_header_begin();
 	echo "AVAILABILITY REPORT";
 

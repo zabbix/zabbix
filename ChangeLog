@@ -1,10 +1,13 @@
+TODO:
+
+ - IT Helpdesk's problems to be connected to Services only (?)
+
 Not ready yet:
 
  HBLV:
 
  - Tree like in old Zabbix
  - SNMP trapping
- - Triggers comment. Hide right should work.
  - Reports:
   - more customizable (graphs timerange: 1 mont, etc)
   - availability report for IT Services
@@ -13,13 +16,8 @@ Not ready yet:
 
  - responsible person (group of persons) for each problem
  - update patch and schema for PostgreSQL. Test it!
- - IT Helpdesk's problems to be connected to Services only (?)
  - module structure for Zabbix. Some modules (as Services, Helpdesk) should be
  made separate.
-
- IT SERVICES:
-
- - make IT Services stable
 
  OTHER:
 
@@ -58,6 +56,7 @@ Not ready yet:
 
 Changes for 1.0beta6:
 
+ - improvement in user rights handling routines (Alexei)
  - if trigger status is UNKNOWN, set function.lastvalue to NULL (Alexei)
  - fixed permission check for all *.php (Alexei)
  - Priority was renamed to Severity (Alexei)
