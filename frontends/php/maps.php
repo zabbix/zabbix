@@ -46,7 +46,7 @@
 			{
 				continue;
 			}
-			if( isset($sysmapid) && ($sysmapid == $row["sysmapid"]) )
+			if( isset($HTTP_GET_VARS["sysmapid"]) && ($HTTP_GET_VARS["sysmapid"] == $row["sysmapid"]) )
 			{
 				echo "<b>[";
 			}
