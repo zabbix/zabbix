@@ -19,14 +19,20 @@
 	{
 		$audio="warning_off.wav";
 	}
-	
+
+
+	$refresh=10;
+	if(!isset($onlytrue))
+	{
+		$refresh=0;
+	}
 	if(isset($fullscreen))
 	{
-		show_header($page["title"],10,1);
+		show_header($page["title"],$refresh,1);
 	}
 	else
 	{
-		show_header($page["title"],10,0);
+		show_header($page["title"],$refresh,0);
 	}
 
 	if(isset($audio))
