@@ -59,7 +59,7 @@
 		}
 		if($HTTP_GET_VARS["register"]=="enable selected")
 		{
-			$result=DBselect("select distinct t.triggerid from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$HTTP_GET_VARS["hostid"]." order by h.host,t.description");
+			$result=DBselect("select distinct t.triggerid from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$HTTP_GET_VARS["hostid"]);
 			while($row=DBfetch($result))
 			{
 				if(isset($HTTP_GET_VARS[$row["triggerid"]]))
@@ -71,7 +71,7 @@
 		}
 		if($HTTP_GET_VARS["register"]=="disable selected")
 		{
-			$result=DBselect("select distinct t.triggerid from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$HTTP_GET_VARS["hostid"]." order by h.host,t.description");
+			$result=DBselect("select distinct t.triggerid from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$HTTP_GET_VARS["hostid"]);
 			while($row=DBfetch($result))
 			{
 				if(isset($HTTP_GET_VARS[$row["triggerid"]]))
@@ -83,7 +83,7 @@
 		}
 		if($HTTP_GET_VARS["register"]=="delete selected")
 		{
-			$result=DBselect("select distinct t.triggerid from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$HTTP_GET_VARS["hostid"]." order by h.host,t.description");
+			$result=DBselect("select distinct t.triggerid from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$HTTP_GET_VARS["hostid"]);
 			while($row=DBfetch($result))
 			{
 				if(isset($HTTP_GET_VARS[$row["triggerid"]]))
