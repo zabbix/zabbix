@@ -1,6 +1,6 @@
 Changes for 1.1alpha6:
 
- - fixed va_copy() detection (Alexei)
+ - fixed detection of __va_copy() (Alexei)
 
 Changes for 1.1alpha5:
  
