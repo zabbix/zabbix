@@ -13,6 +13,9 @@ body
 
 td.horizontal_menu
 {
+	color: #FFFFFF;
+        font-family:verdana, arial, helvetica, sans-serif;
+        font-size:10px;
 	background-color: #6d88ad;
 	border-color: #000000;
 	border-width:0px;
