@@ -241,9 +241,9 @@
         	if(check_right("Host","U",$row["hostid"]))
 		{
 			if($row["status"] == 0)	
-				$status=array("value"=>"<a href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=1\">".S_MONITORED."</a>","class"=>"off");
+				$status=array("value"=>"<a class=\"off\" href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=1\">".S_MONITORED."</a>","class"=>"off");
 			else if($row["status"] == 1)
-				$status=array("value"=>"<a href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=0\">".S_NOT_MONITORED."</a>","class"=>"on");
+				$status=array("value"=>"<a class=\"on\" href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=0\">".S_NOT_MONITORED."</a>","class"=>"on");
 			else if($row["status"] == 2)
 				$status=array("value"=>S_UNREACHABLE,"class"=>"unknown");
 			else if($row["status"] == 3)
