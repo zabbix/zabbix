@@ -8,7 +8,7 @@
 	{
 		$nomenu=1;
 	}
-	if(isset($HTTP_GET_VARS["scid"]))
+	if(isset($HTTP_GET_VARS["screenid"]))
 	{
 		show_header($page["title"],60,$nomenu);
 	}
@@ -28,19 +28,19 @@
 
 		echo "<font size=2>";
 
-		$result=DBselect("select scid,name,cols,rows from screens order by name");
+		$result=DBselect("select screenid,name,cols,rows from screens order by name");
 		while($row=DBfetch($result))
 		{
-			if(!check_right("Screen","R",$row["scid"]))
+			if(!check_right("Screen","R",$row["screenid"]))
 			{
 				continue;
 			}
-			if( isset($HTTP_GET_VARS["scid"]) && ($HTTP_GET_VARS["scid"] == $row["scid"]) )
+			if( isset($HTTP_GET_VARS["screenid"]) && ($HTTP_GET_VARS["screenid"] == $row["screenid"]) )
 			{
 				echo "<b>[";
 			}
-			echo "<a href='screens.php?scid=".$row["scid"]."'>".$row["name"]."</a>";
-			if(isset($HTTP_GET_VARS["scid"]) && ($HTTP_GET_VARS["scid"] == $row["scid"]) )
+			echo "<a href='screens.php?screenid=".$row["screenid"]."'>".$row["name"]."</a>";
+			if(isset($HTTP_GET_VARS["screenid"]) && ($HTTP_GET_VARS["screenid"] == $row["screenid"]) )
 			{
 				echo "]</b>";
 			}
@@ -60,18 +60,18 @@
 ?>
 
 <?php
-	if(isset($HTTP_GET_VARS["scid"]))
+	if(isset($HTTP_GET_VARS["screenid"]))
 	{
-          $scid=$HTTP_GET_VARS["scid"];
-          $result=DBselect("select name,cols,rows from screens where scid=$scid");
+          $screenid=$HTTP_GET_VARS["screenid"];
+          $result=DBselect("select name,cols,rows from screens where screenid=$screenid");
           $row=DBfetch($result);
 	if(isset($HTTP_GET_VARS["fullscreen"]))
 	{
-		$map="<a href=\"screens.php?scid=".$HTTP_GET_VARS["scid"]."\">".$row["name"]."</a>";
+		$map="<a href=\"screens.php?screenid=".$HTTP_GET_VARS["screenid"]."\">".$row["name"]."</a>";
 	}
 	else
 	{
-		$map="<a href=\"screens.php?scid=".$HTTP_GET_VARS["scid"]."&fullscreen=1\">".$row["name"]."</a>";
+		$map="<a href=\"screens.php?screenid=".$HTTP_GET_VARS["screenid"]."&fullscreen=1\">".$row["name"]."</a>";
 	}
 	show_table_header($map);
           echo "<TABLE BORDER=1 COLS=".$row["cols"]." align=center WIDTH=100% BGCOLOR=\"#FFFFFF\"";
@@ -84,18 +84,18 @@
 
                 echo "<a name=\"form\"></a>";
                 echo "<form method=\"get\" action=\"screenedit.php\">";
-                $iresult=DBSelect("select * from screens_items where scid=$scid and x=$c and y=$r");
+                $iresult=DBSelect("select * from screens_items where screenid=$screenid and x=$c and y=$r");
                 if($iresult)
                 {
                         $irow=DBfetch($iresult);
-                        $scitemid=$irow["scitemid"];
+                        $screenitemid=$irow["screenitemid"];
                         $graphid=$irow["graphid"];
                         $width=$irow["width"];
                         $height=$irow["height"];
                 }
                 else
                 {
-                        $scitemid=0;
+                        $screenitemid=0;
                         $graphid=0;
                         $width=100;
                         $height=50;
