@@ -23,6 +23,15 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_PID_T
 
+dnl Check for /proc filesystem
+AC_MSG_CHECKING(for /proc filesystem)
+if test -d /proc; then
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(HAVE_PROC)
+else
+	AC_MSG_RESULT(no)
+fi
+
 dnl Check for freeswap in struct sysinfo
 AC_MSG_CHECKING(for freeswap in struct sysinfo)
 AC_TRY_COMPILE([#include <sys/sysinfo.h>],
