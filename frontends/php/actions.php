@@ -150,7 +150,8 @@
 		$triggerid=DBget_field($result,0,1);
 		$good=DBget_field($result,0,2);
 		$delay=DBget_field($result,0,3);
-		$subject=DBget_field($result,0,4);
+		// Otherwise symbols like ",' will not be shown
+		$subject=htmlspecialchars(DBget_field($result,0,4));
 		$message=DBget_field($result,0,5);
 		$uid=DBget_field($result,0,6);
 		$scope=@iif(isset($HTTP_GET_VARS["scope"]),$HTTP_GET_VARS["scope"],DBget_field($result,0,7));
