@@ -10,6 +10,26 @@ body
         line-height:16px;
 }
 
+td.horizontal_menu
+{
+	background-color: #556677;
+	border-color: #000000;
+	border-width:1px;
+	border-style: solid;
+}
+
+span.divider
+{
+	color: #000000;
+	font-family: Verdana, Arial, sans-serif;
+	font-size: 10px;
+	font-weight: normal;
+}
+
+a.highlight:link	{ text-decoration: none; color: #ffffff; font-family: Verdana, Arial, sans-serif; font-size: 10px; font-weight: bold; }
+a.highlight:visited	{ text-decoration: none; color: #ffffff; font-family: Verdana, Arial, sans-serif; font-size: 10px; font-weight: bold; }
+a.highlight:hover	{ text-decoration: underline; color: #ffcc00; font-family: Verdana, Arial, sans-serif; font-size: 10px; font-weight: bold; }
+	
 .footer
 {
 	color:#CCCCCC;
