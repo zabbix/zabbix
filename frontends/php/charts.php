@@ -170,7 +170,7 @@
 	echo "<TD ALIGN=LEFT>";
 		echo("<div align=left>");
 
-		echo("<b>Set&nbsp;Period:</b>&nbsp;(&nbsp;");
+		echo("<b>Period:</b>&nbsp;(&nbsp;");
 
 		$hour=3600;
 		foreach(array(1,2,4,8,12,24) as $count){
@@ -215,14 +215,14 @@
 
 		if(isset($HTTP_GET_VARS["keep"]))
 		{
-			echo(" <b>Keep&nbsp;period&nbsp;=</b>&nbsp;");
+			echo(" <b>Keep&nbsp;period:</b>&nbsp;");
 			if($HTTP_GET_VARS["keep"] == 1)
 			{
-				echo("<A HREF=\"charts.php?keep=0".url_param("graphid").url_param("from").url_param("period").url_param("fullscreen")."\">On</a>");
+				echo("[<A HREF=\"charts.php?keep=0".url_param("graphid").url_param("from").url_param("period").url_param("fullscreen")."\">On</a>]");
 			}
 			else
 			{
-				echo("<A HREF=\"charts.php?keep=1".url_param("graphid").url_param("from").url_param("period").url_param("fullscreen")."\">Off</a>");
+				echo("[<A HREF=\"charts.php?keep=1".url_param("graphid").url_param("from").url_param("period").url_param("fullscreen")."\">Off</a>]");
 			}
 		}
 		echo("</div>");
