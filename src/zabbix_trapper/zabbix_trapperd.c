@@ -47,6 +47,7 @@
 #include "db.h"
 #include "log.h"
 #include "cfg.h"
+#include "pid.h"
 #include "functions.h"
 
 #define	LISTENQ 1024
@@ -89,34 +90,6 @@ void	uninit(void)
 				CONFIG_PID_FILE);
 		}
 	}
-}
-
-void	create_pid_file(void)
-{
-	FILE	*f;
-
-/* Check if PID file already exists */
-	f = fopen(CONFIG_PID_FILE, "r");
-	if(f != NULL)
-	{
-		zabbix_log( LOG_LEVEL_CRIT, "File [%s] exists. Is zabbix_agentd already running ?",
-			CONFIG_PID_FILE);
-		fclose(f);
-		exit(-1);
-	}
-
-	f = fopen(CONFIG_PID_FILE, "w");
-
-	if( f == NULL)
-	{
-		zabbix_log( LOG_LEVEL_CRIT, "Cannot create PID file [%s]. Errno [%d]",
-			CONFIG_PID_FILE, errno);
-		uninit();
-		exit(-1);
-	}
-
-	fprintf(f,"%d",getpid());
-	fclose(f);
 }
 
 void	signal_handler( int sig )
@@ -263,7 +236,7 @@ void    daemon_init(void)
 
 	for(i=0;i<MAXFD;i++)
 	{
-		close(i);
+		if(i != fileno(stderr)) close(i);
 	}
 
 /*	openlog("zabbix_trapperd",LOG_PID,LOG_USER);
@@ -451,7 +424,11 @@ int	main()
 		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
 	}
 
-	create_pid_file();
+	if( FAIL == create_pid_file(CONFIG_PID_FILE))
+	{
+		uninit();
+		return -1;
+	}
 
 	phan.sa_handler = &signal_handler;
 	sigemptyset(&phan.sa_mask);

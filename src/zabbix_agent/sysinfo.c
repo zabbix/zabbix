@@ -1195,7 +1195,11 @@ double	BUFFERSMEM(void)
 
 	if( 0 == sysinfo(&info))
 	{
+#ifdef HAVE_SYSINFO_MEM_UNIT
+		return	(double)info.bufferram * (double)info.mem_unit;
+#else
 		return	(double)info.bufferram;
+#endif
 	}
 	else
 	{
@@ -1213,7 +1217,11 @@ double	SHAREDMEM(void)
 
 	if( 0 == sysinfo(&info))
 	{
+#ifdef HAVE_SYSINFO_MEM_UNIT
+		return	(double)info.sharedram * (double)info.mem_unit;
+#else
 		return	(double)info.sharedram;
+#endif
 	}
 	else
 	{
@@ -1264,7 +1272,11 @@ double	TOTALMEM(void)
 
 	if( 0 == sysinfo(&info))
 	{
+#ifdef HAVE_SYSINFO_MEM_UNIT
+		return	(double)info.totalram * (double)info.mem_unit;
+#else
 		return	(double)info.totalram;
+#endif
 	}
 	else
 	{
@@ -1338,7 +1350,11 @@ double	FREEMEM(void)
 
 	if( 0 == sysinfo(&info))
 	{
+#ifdef HAVE_SYSINFO_MEM_UNIT
+		return	(double)info.freeram * (double)info.mem_unit;
+#else
 		return	(double)info.freeram;
+#endif
 	}
 	else
 	{
@@ -1619,7 +1635,11 @@ double	SWAPFREE(void)
 
 	if( 0 == sysinfo(&info))
 	{
+#ifdef HAVE_SYSINFO_MEM_UNIT
+		return	(double)info.freeswap * (double)info.mem_unit;
+#else
 		return	(double)info.freeswap;
+#endif
 	}
 	else
 	{
@@ -1664,7 +1684,11 @@ double	SWAPTOTAL(void)
 
 	if( 0 == sysinfo(&info))
 	{
+#ifdef HAVE_SYSINFO_MEM_UNIT
+		return	(double)info.totalswap * (double)info.mem_unit;
+#else
 		return	(double)info.totalswap;
+#endif
 	}
 	else
 	{

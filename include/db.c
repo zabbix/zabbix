@@ -60,12 +60,14 @@ void    DBconnect(char *dbhost, char *dbname, char *dbuser, char *dbpassword, ch
 	mysql_init(&mysql);
 	if( ! mysql_real_connect( &mysql, dbhost, dbuser, dbpassword, dbname, 3306, dbsocket,0 ) )
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Failed to connect to database: Error: %s\n",mysql_error(&mysql) );
+		fprintf(stderr, "Failed to connect to database: Error: %s\n",mysql_error(&mysql) );
+		zabbix_log(LOG_LEVEL_ERR, "Failed to connect to database: Error: %s",mysql_error(&mysql) );
 		exit( FAIL );
 	}
 	if( mysql_select_db( &mysql, dbname ) != 0 )
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Failed to select database: Error: %s\n",mysql_error(&mysql) );
+		fprintf(stderr, "Failed to select database: Error: %s\n",mysql_error(&mysql) );
+		zabbix_log(LOG_LEVEL_ERR, "Failed to select database: Error: %s",mysql_error(&mysql) );
 		exit( FAIL );
 	}
 #endif
@@ -77,7 +79,9 @@ void    DBconnect(char *dbhost, char *dbname, char *dbuser, char *dbpassword, ch
 /* check to see that the backend connection was successfully made */
 	if (PQstatus(conn) == CONNECTION_BAD)
 	{
+		fprintf(stderr, "Connection to database '%s' failed.\n", dbname);
 		zabbix_log(LOG_LEVEL_ERR, "Connection to database '%s' failed.\n", dbname);
+		fprintf(stderr, "%s\n", PQerrorMessage(conn));
 		zabbix_log(LOG_LEVEL_ERR, "%s", PQerrorMessage(conn));
 		exit(FAIL);
 	}

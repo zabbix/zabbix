@@ -53,6 +53,7 @@
 #include "security.h"
 #include "zabbix_agent.h"
 
+#include "pid.h"
 #include "log.h"
 #include "cfg.h"
 #include "stats.h"
@@ -178,7 +179,8 @@ void    daemon_init(void)
 
 	for(i=0;i<MAXFD;i++)
 	{
-		close(i);
+		/* Do not close stderr */
+		if(i != fileno(stderr)) close(i);
 	}
 
 /*	openlog("zabbix_agentd",LOG_LEVEL_PID,LOG_USER);
@@ -187,37 +189,9 @@ void    daemon_init(void)
 
 	if(setpriority(PRIO_PROCESS,0,5)!=0)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Unable to set process priority to 5. Leaving default.");
+		fprintf(stderr, "Unable to set process priority to 5. Leaving default.\n");
 	}
 
-}
-
-void	create_pid_file(void)
-{
-	FILE	*f;
-
-/* Check if PID file already exists */
-	f = fopen(CONFIG_PID_FILE, "r");
-	if(f != NULL)
-	{
-		zabbix_log( LOG_LEVEL_CRIT, "File [%s] exists. Is zabbix_agentd already running ?",
-			CONFIG_PID_FILE);
-		fclose(f);
-		exit(-1);
-	}
-
-	f = fopen(CONFIG_PID_FILE, "w");
-
-	if( f == NULL)
-	{
-		zabbix_log( LOG_LEVEL_CRIT, "Cannot create PID file [%s] [%s]",
-			CONFIG_PID_FILE, strerror(errno));
-		uninit();
-		exit(-1);
-	}
-
-	fprintf(f,"%d",(int)getpid());
-	fclose(f);
 }
 
 int     add_parameter(char *value)
@@ -442,7 +416,11 @@ int	main()
 		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
 	}
 
-	create_pid_file();
+	if( FAIL == create_pid_file(CONFIG_PID_FILE))
+	{
+		uninit();
+		return -1;
+	}
 
 	zabbix_log( LOG_LEVEL_WARNING, "zabbix_agentd started");
 
