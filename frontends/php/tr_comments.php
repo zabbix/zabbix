@@ -36,7 +36,6 @@
 
 <?php
 	show_table_header(S_TRIGGER_COMMENTS_BIG);
-	echo "<br>";
 ?>
 
 <?php
