@@ -21,7 +21,7 @@
 	{
 //		echo "Validating simple:$expression<br>";
 //		if (eregi('^\{([0-9a-zA-Z\_\.]+)\:([0-9a-zA-Z\_]+)\.((diff)|(min)|(max)|(last)|(nodata))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
-		if (eregi('^\{([0-9a-zA-Z\_\.]+)\:([]\[0-9a-zA-Z\_]+)\.((diff)|(min)|(max)|(last)|(nodata))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
+		if (eregi('^\{([0-9a-zA-Z\_\.]+)\:([]\[0-9a-zA-Z\_\/]+)\.((diff)|(min)|(max)|(last)|(nodata))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
 		{
 			$host=$arr[1];
 			$key=$arr[2];
