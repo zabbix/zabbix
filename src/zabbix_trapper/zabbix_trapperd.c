@@ -357,7 +357,7 @@ void	child_main(int i,int listenfd, int addrlen)
 	if(0 == CONFIG_CONNECTONEACH)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "Before DBconnect()");
-		DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+		DBconnect();
 		zabbix_log( LOG_LEVEL_DEBUG, "After DBconnect()");
 	}
 
@@ -376,7 +376,7 @@ void	child_main(int i,int listenfd, int addrlen)
 
 		if(1 == CONFIG_CONNECTONEACH)
 		{
-			DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+			DBconnect();
 		}
 		process_child(connfd);
 		if(1 == CONFIG_CONNECTONEACH)

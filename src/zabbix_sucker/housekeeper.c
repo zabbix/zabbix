@@ -216,7 +216,7 @@ int main_housekeeper_loop()
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("connecting to the database");
 #endif
-		DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+		DBconnect();
 
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("housekeeper [removing deleted hosts]");
