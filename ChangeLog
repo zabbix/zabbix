@@ -1,3 +1,7 @@
+Changes for 1.1alpha3:
+
+ - fix for crash of zabbix_suckerd (Alexei)
+
 Changes for 1.1alpha2:
 
  - support for cpu[idleX], cpu[userX], cpu[niceX], cpu[systemX] (Alexei)
