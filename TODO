@@ -1,5 +1,6 @@
 1.0beta12:
 
+ - check return code for alert scripts
  - add support for function unixtime()
  - parameter to disable fping
  - zabbix[anything] return 0 instead of unsupported
