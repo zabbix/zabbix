@@ -32,6 +32,8 @@ AC_PROG_CC
 dnl Checks for libraries.
 AC_CHECK_LIB(crypto, main)
 AC_CHECK_LIB(snmp, main, LIBS="-lsnmp $LIBS")
+dnl Required for AIX when -lsnmp is used
+AC_CHECK_LIB(isode, main)
 AC_CHECK_LIB(socket, main)
 #Solaris SNMP requires this
 AC_CHECK_LIB(kstat, main)
