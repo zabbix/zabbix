@@ -1,5 +1,6 @@
 Changes for 1.0beta11:
 
+ - eliminated compiler's warnings under SUSE v8.2 (Alexei)
  - added src/zabbix_sucker/housekeeper.* (Alexei)
  - new hos status: 'deleted' (Alexei)
 
