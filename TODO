@@ -1,9 +1,7 @@
 TOP PRIORITY:
 
- - update docs related to WIN32 agent
  - improve graphing capabilities
  - support for net-snmp
- - get rid of long select lists in user forms 
  - SNMP trapping
 
 BUGS:
@@ -53,6 +51,8 @@ the agent with a predefined API that can return values to suckerd.
 
 Not ready yet:
 
+ - update docs related to WIN32 agent
+ - get rid of long select lists in user forms 
  - do not send notifications at certain periods of time. Do not monitor services at certain periods of time.
  - decrease number of TCP connections between server and agent
  - add triggers for all hosts at once
