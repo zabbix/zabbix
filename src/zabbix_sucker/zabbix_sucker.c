@@ -794,7 +794,7 @@ void update_key_status(int hostid,int host_status)
 		}
 		item.hostid=atoi(DBget_field(result,0,15));
 		item.value_type=atoi(DBget_field(result,0,17));
-		item.delat=atoi(DBget_field(result,0,18));
+		item.delta=atoi(DBget_field(result,0,18));
 	
 		sprintf(value_str,"%d",host_status);
 
