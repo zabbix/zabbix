@@ -25,6 +25,13 @@
 
 
 //
+// Externals
+//
+
+LONG H_ProcInfo(char *cmd,char *arg,double *value);
+
+
+//
 // Static data
 //
 
@@ -36,7 +43,7 @@ static HMODULE modList[MAX_MODULES];
 // Get instance for parameters like name[instance]
 //
 
-static void GetParameterInstance(char *param,char *instance,int maxSize)
+void GetParameterInstance(char *param,char *instance,int maxSize)
 {
    char *ptr1,*ptr2;
 
@@ -56,9 +63,10 @@ static void GetParameterInstance(char *param,char *instance,int maxSize)
 // Handler for parameters which always returns numeric constant (like ping)
 //
 
-static double H_NumericConstant(char *cmd,char *arg)
+static LONG H_NumericConstant(char *cmd,char *arg,double *value)
 {
-   return (double)((long)arg);
+   *value=(double)((long)arg);
+   return SYSINFO_RC_SUCCESS;
 }
 
 
@@ -66,9 +74,10 @@ static double H_NumericConstant(char *cmd,char *arg)
 // Handler for parameters which always returns string constant (like version[zabbix_agent])
 //
 
-static char *H_StringConstant(char *cmd,char *arg)
+static LONG H_StringConstant(char *cmd,char *arg,char **value)
 {
-   return strdup(arg ? arg : "(null)\n");
+   *value=strdup(arg ? arg : "(null)\n");
+   return SYSINFO_RC_SUCCESS;
 }
 
 
@@ -76,9 +85,10 @@ static char *H_StringConstant(char *cmd,char *arg)
 // Handler for parameters which returns numeric value from specific variable
 //
 
-static double H_NumericPtr(char *cmd,char *arg)
+static LONG H_NumericPtr(char *cmd,char *arg,double *value)
 {
-   return *((double *)arg);
+   *value=*((double *)arg);
+   return SYSINFO_RC_SUCCESS;
 }
 
 
@@ -86,7 +96,7 @@ static double H_NumericPtr(char *cmd,char *arg)
 // Handler for cpu_load[]
 //
 
-static double H_ProcUtil(char *cmd,char *arg)
+static LONG H_ProcUtil(char *cmd,char *arg,double *value)
 {
    char proc[16];
    int procnum;
@@ -102,7 +112,7 @@ static double H_ProcUtil(char *cmd,char *arg)
       {
          procnum=atoi(proc)+1;
          if ((procnum<1)||(procnum>MAX_CPU))
-            return NOTSUPPORTED;
+            return SYSINFO_RC_NOTSUPPORTED;
       }
    }
    else
@@ -112,13 +122,18 @@ static double H_ProcUtil(char *cmd,char *arg)
    switch((DWORD)arg & 0x03)
    {
       case 0:  // procload
-         return statProcUtilization[procnum];
+         *value=statProcUtilization[procnum];
+         break;
       case 1:  // procload5
-         return statProcUtilization5[procnum];
+         *value=statProcUtilization5[procnum];
+         break;
       case 2:  // procload15
-         return statProcUtilization15[procnum];
+         *value=statProcUtilization15[procnum];
+         break;
+      default:
+         return SYSINFO_RC_NOTSUPPORTED;
    }
-   return NOTSUPPORTED;
+   return SYSINFO_RC_SUCCESS;
 }
 
 
@@ -126,12 +141,13 @@ static double H_ProcUtil(char *cmd,char *arg)
 // Handler for system[proccount]
 //
 
-static double H_ProcCount(char *cmd,char *arg)
+static LONG H_ProcCount(char *cmd,char *arg,double *value)
 {
-   DWORD dwSize=0;
+   DWORD dwSize;
 
    EnumProcesses(procList,sizeof(DWORD)*MAX_PROCESSES,&dwSize);
-   return (double)(dwSize/sizeof(DWORD));
+   *value=(double)(dwSize/sizeof(DWORD));
+   return SYSINFO_RC_SUCCESS;
 }
 
 
@@ -139,7 +155,7 @@ static double H_ProcCount(char *cmd,char *arg)
 // Handler for proc_cnt[*]
 //
 
-static double H_ProcCountSpecific(char *cmd,char *arg)
+static LONG H_ProcCountSpecific(char *cmd,char *arg,double *value)
 {
    DWORD dwSize=0;
    int i,counter,procCount;
@@ -168,7 +184,8 @@ static double H_ProcCountSpecific(char *cmd,char *arg)
          CloseHandle(hProcess);
       }
    }
-   return (double)counter;
+   *value=(double)counter;
+   return SYSINFO_RC_SUCCESS;
 }
 
 
@@ -176,22 +193,30 @@ static double H_ProcCountSpecific(char *cmd,char *arg)
 // Handler for memory[*] and swap[*] parameters
 //
 
-static double H_MemoryInfo(char *cmd,char *arg)
+static LONG H_MemoryInfo(char *cmd,char *arg,double *value)
 {
    MEMORYSTATUS ms;
+//   PERFORMANCE_INFORMATION pfi;
 
-   GlobalMemoryStatus(&ms);
+/*   if (!strcmp(cmd,"memory[cached]"))
+      GetPerformanceInfo(&pfi,sizeof(PERFORMANCE_INFORMATION));
+   else*/
+      GlobalMemoryStatus(&ms);
 
    if (!strcmp(cmd,"memory[total]"))
-      return (double)ms.dwTotalPhys;
-   if (!strcmp(cmd,"memory[free]"))
-      return (double)ms.dwAvailPhys;
-   if (!strcmp(cmd,"swap[total]"))
-      return (double)ms.dwTotalPageFile;
-   if (!strcmp(cmd,"swap[free]"))
-      return (double)ms.dwAvailPageFile;
+      *value=(double)ms.dwTotalPhys;
+   else if (!strcmp(cmd,"memory[free]"))
+      *value=(double)ms.dwAvailPhys;
+/*   else if (!strcmp(cmd,"memory[cached]"))
+      *value=(double)pfi.SystemCache*(double)pfi.PageSize;*/
+   else if (!strcmp(cmd,"swap[total]"))
+      *value=(double)ms.dwTotalPageFile;
+   else if (!strcmp(cmd,"swap[free]"))
+      *value=(double)ms.dwAvailPageFile;
+   else
+      return SYSINFO_RC_NOTSUPPORTED;
 
-   return NOTSUPPORTED;
+   return SYSINFO_RC_SUCCESS;
 }
 
 
@@ -199,14 +224,15 @@ static double H_MemoryInfo(char *cmd,char *arg)
 // Handler for system[hostname] parameter
 //
 
-static char *H_HostName(char *cmd,char *arg)
+static LONG H_HostName(char *cmd,char *arg,char **value)
 {
    DWORD dwSize;
    char buffer[MAX_COMPUTERNAME_LENGTH+1];
 
    dwSize=MAX_COMPUTERNAME_LENGTH+1;
    GetComputerName(buffer,&dwSize);
-   return strdup(buffer);
+   *value=strdup(buffer);
+   return SYSINFO_RC_SUCCESS;
 }
 
 
@@ -214,26 +240,20 @@ static char *H_HostName(char *cmd,char *arg)
 // Handler for diskfree[*] and disktotal[*] parameters
 //
 
-static double H_DiskInfo(char *cmd,char *arg)
+static LONG H_DiskInfo(char *cmd,char *arg,double *value)
 {
    char path[MAX_PATH];
    ULARGE_INTEGER freeBytes,totalBytes;
-   double kbytes;
 
    GetParameterInstance(cmd,path,MAX_PATH-1);
    if (!GetDiskFreeSpaceEx(path,&freeBytes,&totalBytes,NULL))
-      return NOTSUPPORTED;
+      return SYSINFO_RC_NOTSUPPORTED;
 
    if (!memcmp(cmd,"diskfree[",9))
-   {
-      kbytes=(double)((__int64)(freeBytes.QuadPart/1024));
-      return kbytes;
-   }
+      *value=(double)((__int64)(freeBytes.QuadPart/1024));
    else
-   {
-      kbytes=(double)((__int64)(totalBytes.QuadPart/1024));
-      return kbytes;
-   }
+      *value=(double)((__int64)(totalBytes.QuadPart/1024));
+   return SYSINFO_RC_SUCCESS;
 }
 
 
@@ -241,22 +261,24 @@ static double H_DiskInfo(char *cmd,char *arg)
 // Handler for service_state[*] parameter
 //
 
-static double H_ServiceState(char *cmd,char *arg)
+static LONG H_ServiceState(char *cmd,char *arg,double *value)
 {
    SC_HANDLE mgr,service;
    char serviceName[MAX_PATH];
-   double result;
 
    GetParameterInstance(cmd,serviceName,MAX_PATH-1);
 
    mgr=OpenSCManager(NULL,NULL,GENERIC_READ);
    if (mgr==NULL)
-      return 255;    // Unable to retrieve information
+   {
+      *value=255;    // Unable to retrieve information
+      return SYSINFO_RC_SUCCESS;
+   }
 
    service=OpenService(mgr,serviceName,SERVICE_QUERY_STATUS);
    if (service==NULL)
    {
-      result=NOTSUPPORTED;
+      *value=SYSINFO_RC_NOTSUPPORTED;
    }
    else
    {
@@ -272,18 +294,18 @@ static double H_ServiceState(char *cmd,char *arg)
          for(i=0;i<7;i++)
             if (status.dwCurrentState==states[i])
                break;
-         result=(double)i;
+         *value=(double)i;
       }
       else
       {
-         result=255;    // Unable to retrieve information
+         *value=255;    // Unable to retrieve information
       }
 
       CloseServiceHandle(service);
    }
 
    CloseServiceHandle(mgr);
-   return result;
+   return SYSINFO_RC_SUCCESS;
 }
 
 
@@ -291,12 +313,12 @@ static double H_ServiceState(char *cmd,char *arg)
 // Handler for perf_counter[*] parameter
 //
 
-static double H_PerfCounter(char *cmd,char *arg)
+static LONG H_PerfCounter(char *cmd,char *arg,double *value)
 {
    HQUERY query;
    HCOUNTER counter;
    PDH_RAW_COUNTER rawData;
-   PDH_FMT_COUNTERVALUE value;
+   PDH_FMT_COUNTERVALUE counterValue;
    char counterName[MAX_PATH];
 
    GetParameterInstance(cmd,counterName,MAX_PATH-1);
@@ -304,29 +326,30 @@ static double H_PerfCounter(char *cmd,char *arg)
    if (PdhOpenQuery(NULL,0,&query)!=ERROR_SUCCESS)
    {
       WriteLog("PdhOpenQuery failed\r\n");
-      return FAIL;
+      return SYSINFO_RC_ERROR;
    }
 
    if (PdhAddCounter(query,counterName,0,&counter)!=ERROR_SUCCESS)
    {
       WriteLog("PdhAddCounter(%s) failed\r\n",counterName);
       PdhCloseQuery(query);
-      return NOTSUPPORTED;
+      return SYSINFO_RC_NOTSUPPORTED;
    }
 
    if (PdhCollectQueryData(query)!=ERROR_SUCCESS)
    {
       WriteLog("PdhCollectQueryData failed\r\n");
       PdhCloseQuery(query);
-      return FAIL;
+      return SYSINFO_RC_ERROR;
    }
 
    PdhGetRawCounterValue(counter,NULL,&rawData);
    PdhCalculateCounterFromRawValue(counter,PDH_FMT_DOUBLE,
-                                   &rawData,NULL,&value);
+                                   &rawData,NULL,&counterValue);
 
    PdhCloseQuery(query);
-   return value.doubleValue;
+   *value=counterValue.doubleValue;
+   return SYSINFO_RC_SUCCESS;
 }
 
 
@@ -334,7 +357,7 @@ static double H_PerfCounter(char *cmd,char *arg)
 // Handler for user counters
 //
 
-static double H_UserCounter(char *cmd,char *arg)
+static LONG H_UserCounter(char *cmd,char *arg,double *value)
 {
    USER_COUNTER *counter;
    char *ptr1,*ptr2;
@@ -345,9 +368,12 @@ static double H_UserCounter(char *cmd,char *arg)
    *ptr2=0;
    for(counter=userCounterList;counter!=NULL;counter=counter->next)
       if (!strcmp(counter->name,ptr1))
-         return counter->lastValue;
+      {
+         *value=counter->lastValue;
+         return SYSINFO_RC_SUCCESS;
+      }
 
-   return NOTSUPPORTED;
+   return SYSINFO_RC_NOTSUPPORTED;
 }
 
 
@@ -355,7 +381,7 @@ static double H_UserCounter(char *cmd,char *arg)
 // Calculate MD5 hash for file
 //
 
-static char *H_MD5Hash(char *cmd,char *arg)
+static LONG H_MD5Hash(char *cmd,char *arg,char **value)
 {
    char fileName[MAX_PATH],hashText[MD5_DIGEST_SIZE*2+1];
    unsigned char *data,hash[MD5_DIGEST_SIZE];
@@ -366,7 +392,7 @@ static char *H_MD5Hash(char *cmd,char *arg)
    GetParameterInstance(cmd,fileName,MAX_PATH-1);
    hFile=CreateFile(fileName,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,0,NULL);
    if (hFile==INVALID_HANDLE_VALUE)
-      return NULL;
+      return SYSINFO_RC_NOTSUPPORTED;
 
    // Create file mapping object
    hFileMapping=CreateFileMapping(hFile,NULL,PAGE_READONLY,0,0,NULL);
@@ -375,7 +401,7 @@ static char *H_MD5Hash(char *cmd,char *arg)
       WriteLog("CreateFileMapping(%s) failed [%s]\r\n",
                fileName,GetSystemErrorText(GetLastError()));
       CloseHandle(hFile);
-      return NULL;
+      return SYSINFO_RC_ERROR;
    }
 
    // Map entire file to process's address space
@@ -386,7 +412,7 @@ static char *H_MD5Hash(char *cmd,char *arg)
                fileName,GetSystemErrorText(GetLastError()));
       CloseHandle(hFileMapping);
       CloseHandle(hFile);
-      return NULL;
+      return SYSINFO_RC_ERROR;
    }
 
    CalculateMD5Hash(data,GetFileSize(hFile,NULL),hash);
@@ -400,7 +426,8 @@ static char *H_MD5Hash(char *cmd,char *arg)
    for(i=0;i<MD5_DIGEST_SIZE;i++)
       sprintf(&hashText[i<<1],"%02x",hash[i]);
 
-   return strdup(hashText);
+   *value=strdup(hashText);
+   return SYSINFO_RC_SUCCESS;
 }
 
 
@@ -408,7 +435,7 @@ static char *H_MD5Hash(char *cmd,char *arg)
 // Calculate CRC32 for file
 //
 
-static double H_CRC32(char *cmd,char *arg)
+static LONG H_CRC32(char *cmd,char *arg,double *value)
 {
    char fileName[MAX_PATH];
    unsigned char *data;
@@ -419,7 +446,7 @@ static double H_CRC32(char *cmd,char *arg)
    GetParameterInstance(cmd,fileName,MAX_PATH-1);
    hFile=CreateFile(fileName,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,0,NULL);
    if (hFile==INVALID_HANDLE_VALUE)
-      return NOTSUPPORTED;
+      return SYSINFO_RC_NOTSUPPORTED;
 
    // Create file mapping object
    hFileMapping=CreateFileMapping(hFile,NULL,PAGE_READONLY,0,0,NULL);
@@ -428,7 +455,7 @@ static double H_CRC32(char *cmd,char *arg)
       WriteLog("CreateFileMapping(%s) failed [%s]\r\n",
                fileName,GetSystemErrorText(GetLastError()));
       CloseHandle(hFile);
-      return FAIL;
+      return SYSINFO_RC_ERROR;
    }
 
    // Map entire file to process's address space
@@ -439,7 +466,7 @@ static double H_CRC32(char *cmd,char *arg)
                fileName,GetSystemErrorText(GetLastError()));
       CloseHandle(hFileMapping);
       CloseHandle(hFile);
-      return FAIL;
+      return SYSINFO_RC_ERROR;
    }
 
    crc=CalculateCRC32(data,GetFileSize(hFile,NULL));
@@ -449,7 +476,8 @@ static double H_CRC32(char *cmd,char *arg)
    CloseHandle(hFileMapping);
    CloseHandle(hFile);
 
-   return (double)crc;
+   *value=(double)crc;
+   return SYSINFO_RC_SUCCESS;
 }
 
 
@@ -457,7 +485,7 @@ static double H_CRC32(char *cmd,char *arg)
 // Handler for filesize[*] parameter
 //
 
-static double H_FileSize(char *cmd,char *arg)
+static LONG H_FileSize(char *cmd,char *arg,double *value)
 {
    char fileName[MAX_PATH];
    HANDLE hFind;
@@ -467,10 +495,11 @@ static double H_FileSize(char *cmd,char *arg)
 
    hFind=FindFirstFile(fileName,&findData);
    if (hFind==INVALID_HANDLE_VALUE)
-      return NOTSUPPORTED;
+      return SYSINFO_RC_NOTSUPPORTED;
    FindClose(hFind);
 
-   return (double)findData.nFileSizeLow+(double)(((__int64)findData.nFileSizeHigh) << 32);
+   *value=(double)findData.nFileSizeLow+(double)(((__int64)findData.nFileSizeHigh) << 32);
+   return SYSINFO_RC_SUCCESS;
 }
 
 
@@ -478,7 +507,7 @@ static double H_FileSize(char *cmd,char *arg)
 // Handler for system[uname] parameter
 //
 
-static char *H_SystemUname(char *cmd,char *arg)
+static LONG H_SystemUname(char *cmd,char *arg,char **value)
 {
    DWORD dwSize;
    char *cpuType,computerName[MAX_COMPUTERNAME_LENGTH+1],osVersion[256],buffer[1024];
@@ -546,7 +575,8 @@ static char *H_SystemUname(char *cmd,char *arg)
 
    sprintf(buffer,"Windows %s %d.%d.%d %s %s",computerName,versionInfo.dwMajorVersion,
            versionInfo.dwMinorVersion,versionInfo.dwBuildNumber,osVersion,cpuType);
-   return strdup(buffer);
+   *value=strdup(buffer);
+   return SYSINFO_RC_SUCCESS;
 }
 
 
@@ -574,6 +604,7 @@ static AGENT_COMMAND commands[]=
    { "perf_counter[*]",H_PerfCounter,NULL,NULL },
    { "ping",H_NumericConstant,NULL,(char *)1 },
    { "proc_cnt[*]",H_ProcCountSpecific,NULL,NULL },
+   { "proc_info[*]",H_ProcInfo,NULL,NULL },
    { "service_state[*]",H_ServiceState,NULL,NULL },
    { "swap[*]",H_MemoryInfo,NULL,NULL },
    { "system[hostname]",NULL,H_HostName,NULL },
@@ -596,6 +627,7 @@ void ProcessCommand(char *received_cmd,char *result)
    int i;
    double fResult=NOTSUPPORTED;
    char *strResult=NULL,cmd[MAX_ZABBIX_CMD_LEN];
+   LONG iRC=SYSINFO_RC_NOTSUPPORTED;
 
    ExpandAlias(received_cmd,cmd);
 
@@ -609,25 +641,40 @@ void ProcessCommand(char *received_cmd,char *result)
       {
          if (commands[i].handler_float!=NULL)
          {
-            fResult=commands[i].handler_float(cmd,commands[i].arg);
+            iRC=commands[i].handler_float(cmd,commands[i].arg,&fResult);
          }
          else
          {
             if (commands[i].handler_string!=NULL)
-               strResult=commands[i].handler_string(cmd,commands[i].arg);
+               iRC=commands[i].handler_string(cmd,commands[i].arg,&strResult);
          }
          break;
       }
    }
 
-   if (strResult==NULL)
+   switch(iRC)
    {
-      sprintf(result,"%f",fResult);
-   }
-   else
-   {
-      strncpy(result,strResult,MAX_STRING_LEN-1);
-      strcat(result,"\n");
-      free(strResult);
+      case SYSINFO_RC_SUCCESS:
+         if (strResult==NULL)
+         {
+            sprintf(result,"%f",fResult);
+         }
+         else
+         {
+            strncpy(result,strResult,MAX_STRING_LEN-1);
+            strcat(result,"\n");
+            free(strResult);
+         }
+         break;
+      case SYSINFO_RC_NOTSUPPORTED:
+         strcpy(result,"ZBX_NOTSUPPORTED\n");
+         break;
+      case SYSINFO_RC_ERROR:
+         strcpy(result,"ZBX_ERROR\n");
+         break;
+      default:
+         strcpy(result,"ZBX_ERROR\n");
+         WriteLog("Internal error: unexpected iRC=%d in ProcessCommand(%s)\r\n",iRC,received_cmd);
+         break;
    }
 }
