@@ -4,6 +4,9 @@
 /* Define if filesystem /proc exists */
 #undef HAVE_PROC
 
+/* Define if file /proc/net/dev exists */
+#undef HAVE_PROC_NET_DEV
+
 /* Define if file /proc/loadavg exists */
 #undef HAVE_PROC_LOADAVG
 

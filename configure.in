@@ -70,6 +70,14 @@ else
 	AC_MSG_RESULT(no)
 fi
 
+dnl Check for file /proc/net/dev
+AC_MSG_CHECKING(for file /proc/net/dev)
+if test -r /proc/net/dev; then
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(HAVE_PROC_NET_DEV)
+else
+	AC_MSG_RESULT(no)
+fi
 
 dnl Check for freeswap in struct sysinfo
 AC_MSG_CHECKING(for freeswap in struct sysinfo)
