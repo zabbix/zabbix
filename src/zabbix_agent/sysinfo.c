@@ -1641,7 +1641,7 @@ double	KERNEL_MAXFILES(void)
 
 	len=sizeof(maxfiles);
 
-	if(sysctl(mib,2,&maxfiles,&len,NULL,0) != 0)
+	if(sysctl(mib,2,&maxfiles,(size_t *)&len,NULL,0) != 0)
 	{
 		return	FAIL;
 	}
@@ -1663,7 +1663,7 @@ double	KERNEL_MAXPROC(void)
 
 	len=sizeof(maxproc);
 
-	if(sysctl(mib,2,&maxproc,&len,NULL,0) != 0)
+	if(sysctl(mib,2,&maxproc,(size_t *)&len,NULL,0) != 0)
 	{
 		return	FAIL;
 /*		printf("Errno [%m]");*/
@@ -1699,7 +1699,7 @@ double	UPTIME(void)
 
 	len=sizeof(uptime);
 
-	if(sysctl(mib,2,&uptime,&len,NULL,0) != 0)
+	if(sysctl(mib,2,&uptime,(size_t *)&len,NULL,0) != 0)
 	{
 		return	FAIL;
 /*		printf("Errno [%m]\n");*/
