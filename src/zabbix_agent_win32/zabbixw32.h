@@ -27,7 +27,7 @@
 #include <process.h>
 #include <stdio.h>
 #include <pdh.h>
-#include "common.h"
+#include "../../include/common.h"
 #include "md5.h"
 
 
@@ -35,7 +35,7 @@
 // Common constants
 //
 
-#define AGENT_VERSION         "1.0.0-alpha5"
+#define AGENT_VERSION         "1.0.0-beta7"
 
 #define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
 
@@ -153,5 +153,7 @@ extern double statProcUtilization15[];
 extern double statProcLoad;
 extern double statProcLoad5;
 extern double statProcLoad15;
+extern double statAvgCollectorTime;
+extern double statMaxCollectorTime;
 
 #endif

@@ -131,7 +131,7 @@ SOURCE=.\util.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=.\common.h
+SOURCE=..\..\include\common.h
 # End Source File
 # Begin Source File
 

@@ -1,5 +1,5 @@
 
-                     ZabbixW32 version 1.0.0-alpha4
+                     ZabbixW32 version 1.0.0-beta7
 
 ******************************************************************************
 
@@ -21,6 +21,10 @@ Installation is very simple and includes 3 steps:
 2. Create configuration file c:\zabbix_agentd.conf (it has the same syntax as
    for UNIX agent).
 3. Run command "ZabbixW32.exe install" to install Zabbix agent as service.
+   If you wish to use configuration file other that c:\zabbix_agentd.conf,
+   you should use the following command for service installation:
+   "ZabbixW32.exe --config <your_configuration_file> install". Full path to
+   configuration file should be specified.
 
 Now you can use Control Panel to start agent's service or run
 "ZabbixW32.exe start".
@@ -32,6 +36,7 @@ Command line syntax
 Usage: zabbixw32 [options] [command]
 
 Where possible commands are:
+   check-config    : Check configuration file and exit
    standalone      : Run in standalone mode
    start           : Start Zabbix Win32 Agent service
    stop            : Stop Zabbix Win32 Agent service
@@ -45,6 +50,68 @@ And possible options are:
                      (default is C:\zabbix_agentd.conf)
 
 
+Configuration file
+------------------
+
+Zabbix Win32 agent suports the following configuration parameters:
+
+Server = <ip_address>
+  Sets IP address of Zabbix server. Agent will accept connections only from
+  this address.
+
+ListenPort = <port_number>
+  Sets TCP port number for incoming connections.
+
+LogFile = <path>
+  Sets the agent's log file.
+
+Timeout = <number>
+  Sets the request processing timeout (in seconds). If server request will
+  not be processed within specified timeout, appropriate error code will be
+  returned to server. Default is 3 seconds.
+
+MaxCollectorProcessingTime = <number>
+  Sets maximum acceptable processing time of one data sample by collector
+  thread (in milliseconds). If processing time will exceed specified value,
+  warning message will be written to log file. Default value is 100
+  milliseconds.
+
+Alias = <alias_name>:<parameter_name>
+  Sets the alias for parameter. It can be useful to substitute long and 
+  complex parameter name with a smaller and simplies one. For example, if
+  you wish to retrieve paging file usage in percents from the server, you
+  can use parameter "perf_counter[\Paging File(_Total)\% Usage]", or you
+  can define an alias by adding the following line to configuration file:
+
+    Alias = pg_usage:perf_counter[\Paging File(_Total)\% Usage]
+
+  After that you can use parameter name "pg_usage" to retrieve the same
+  information. You can specify as many "Alias" records as you wish.
+  Please note tht aliases can not be used for parameters defined in 
+  "PerfCounter" configuration file records.
+
+PerfCounter = <parameter_name>,"<perf_counter_path>",<period>
+  Defines new parameter <parameter_name> which is an average value for
+  system performance counter <perf_counter_path> for the specified time
+  period <period> (in seconds). For example, if you wish to receive average
+  number of processor interrupts per second for last minute, you can define
+  new parameter "interrupts" as following:
+
+    PerfCounter = interrupts,"\Processor(0)\Interrupts/sec",60
+
+  Please note double quotes around performance counter path. Samples for
+  calculating average value will be taken every second.
+
+The following parameters can be presented in configuration file for
+compatibility with UNIX agents but has no effect:
+
+  StartAgents
+  DebugLevel
+  PidFile
+  NoTimeWait
+  UserParameter
+               
+
 Parameters supported by Zabbix Win32 Agent
 ------------------------------------------
 
@@ -53,6 +120,7 @@ I. Zabbix standard parameters
 cksum[<path>]		<path> can be normal Windows path, like C:\, or UNC
 diskfree[<path>]	<path> can be normal Windows path, like C:\, or UNC
 disktotal[<path>]       <path> can be normal Windows path, like C:\, or UNC
+filesize[<path>]	<path> can be normal Windows path, like C:\, or UNC
 memory[free]
 memory[total]
 ping
@@ -70,7 +138,11 @@ version[zabbix_agent]
 
 
 II. Win32-specific parameters
-                             
+
+agent[avg_collector_time] Average time spent by collector thread on each sample
+			processing for last minute (in milliseconds)                             
+agent[max_collector_time] Maximum time spent by collector thread on sample
+			processing (in milliseconds)                             
 cpu_util		Average CPU(s) utilization (in percents) for
                         last minute
 cpu_util5		Average CPU(s) utilization (in percents) for
