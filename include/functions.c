@@ -833,7 +833,7 @@ int	get_lastvalue(char *value,char *host,char *key,char *function,char *paramete
 	if(DBnum_rows(result) == 0)
 	{
         	DBfree_result(result);
-		zabbix_log(LOG_LEVEL_WARNING, "Query [%s] returned empty result" );
+		zabbix_log(LOG_LEVEL_WARNING, "Query [%s] returned empty result", sql );
 		return FAIL;	
 	}
 
