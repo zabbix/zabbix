@@ -572,6 +572,7 @@ void	substitute_simple_macros(char *exp)
 {
 	int	found = SUCCEED;
 	char	*s;
+	char	str[MAX_STRING_LEN+1];
 	char	tmp[MAX_STRING_LEN+1];
 
 	time_t  now;
@@ -580,23 +581,33 @@ void	substitute_simple_macros(char *exp)
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros [%s]",exp);
 	while (found == SUCCEED)
 	{
-		found = FAIL;
+		strncpy(str, exp, MAX_STRING_LEN);
 
-		if( (s = strstr(exp,"{DATE}")) != NULL )
+
+		if( (s = strstr(str,"{DATE}")) != NULL )
 		{
 			now=time(NULL);
 			tm=localtime(&now);
-			sprintf(value,"%.4d%\..2d%\..2d",tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday);
+			sprintf(tmp,"%.4d.%.2d.%.2d",tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday);
+
+			s[0]=0;
+			strncpy(exp, str, MAX_STRING_LEN);
+			strncat(exp, tmp, MAX_STRING_LEN);
+			strncat(exp, s+strlen("{DATE}"), MAX_STRING_LEN);
 
 			found = SUCCEED;
 		}
-		if( (s = strstr(exp,"{TIME}")) != NULL )
+		else if( (s = strstr(str,"{TIME}")) != NULL )
 		{
 			now=time(NULL);
 			tm=localtime(&now);
 			sprintf(tmp,"%.2d:%.2d:%.2d",tm->tm_hour,tm->tm_min,tm->tm_sec);
 
 			found = SUCCEED;
+		}
+		else
+		{
+			found = FAIL;
 		}
 	}
 
