@@ -755,6 +755,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<meta name="Author" content="Alexei Vladishev">
+	<link rel="stylesheet" href="css.css">
 <?
 	if($refresh!=0)
 	{

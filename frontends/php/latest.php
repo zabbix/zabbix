@@ -33,7 +33,7 @@
 
 	show_table_v_delimiter();
 
-	echo "<font size=2>";
+//	echo "<font size=2>";
 
 	if(isset($HTTP_GET_VARS["groupid"]))
 	{
