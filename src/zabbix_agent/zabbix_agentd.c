@@ -34,7 +34,7 @@
 
 #define	LISTENQ 1024
 
-static pid_t *pids;
+static	pid_t	*pids;
 
 char	*config_host_allowed=NULL;
 int	config_agentd_forks=AGENTD_FORKS;

@@ -5,6 +5,7 @@
 #define	FAIL		(-1)
 #define	NOTSUPPORTED	(-2)
 #define	NETWORK_ERROR	(-3)
+#define	TIMEOUT_ERROR	(-4)
 
 #define	MAXFD	64
 
@@ -25,7 +26,7 @@
 
 #define	SUCKER_TIMEOUT	5
 /* Delay on network failure*/
-#define DELAY_ON_NETWORK_FAILURE 2*60
+#define DELAY_ON_NETWORK_FAILURE 60
 
 #define	AGENT_TIMEOUT	3
 
