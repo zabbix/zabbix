@@ -1,5 +1,6 @@
 HIGH PRIORITY:
 
+ - support of mass sending for zabbix_sender
  - fix Select in Status of Triggers
  - mass updates/inserts
  - support for net-snmp
@@ -11,6 +12,7 @@ HIGH PRIORITY:
  - support for disk loads
  - new host name should not contain space and other character not allowed by trigger expression
  - add information about php.ini (<? ?> and <PHP PHP>) to Zabbix Manual
+ - better monitoring of log files
 
 TODO:
 

@@ -119,27 +119,47 @@ int main(int argc, char **argv)
 {
 	int	port;
 	int	ret=SUCCEED;
+	char	line[MAX_STRING_LEN+1];
+	char	*s;
 
 	signal( SIGINT,  signal_handler );
 	signal( SIGQUIT, signal_handler );
 	signal( SIGTERM, signal_handler );
 	signal( SIGALRM, signal_handler );
 
-	if(argc!=5)
-	{
-		printf("Usage: zabbix_sender <Zabbix server> <port> <server:key> <value>\n");
-		ret=FAIL;
-	}
-
-	if(FAIL != ret)
+	if(argc == 5)
 	{
 		port=atoi(argv[2]);
 
 		alarm(SENDER_TIMEOUT);
 
-		ret=send_value(argv[1],port,argv[3],argv[4]);
+		ret = send_value(argv[1],port,argv[3],argv[4]);
 
 		alarm(0);
+	}
+/* No parameters are given */	
+	else if(argc == 1)
+	{
+		while(fgets(line,MAX_STRING_LEN,stdin) != NULL)
+		{
+/*			printf("[%s]\n",line);*/
+			alarm(SENDER_TIMEOUT);
+			s=(char *)strtok(line," ");
+			while(s!=NULL)
+			{
+				printf("[%s]",s);
+				s=(char *)strtok(NULL," ");
+			}
+			alarm(0);
+		}
+	}
+	else
+	{
+		printf("Usage: zabbix_sender <Zabbix server> <port> <server:key> <value>\n");
+		printf("If no arguments are given, zabbix_sender expects list of parameters\n");
+		printf("from standard input.\n");
+		
+		ret = FAIL;
 	}
 
 	return ret;
