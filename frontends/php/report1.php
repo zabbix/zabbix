@@ -40,7 +40,7 @@
 	<td>Is zabbix_suckerd running ?</td>
 	<?php
 		$str="<font color=\"AA0000\">No</font>";
-		if(exec("ps -ef|grep zabbix_suckerd|grep -v grep|wc -l")>0)
+		if( (exec("ps -ef|grep zabbix_suckerd|grep -v grep|wc -l")>0) || (exec("ps -ax|grep zabbix_suckerd|grep -v grep|wc -l")>0) )
 		{
 			$str="<font color=\"00AA00\">Yes</font>";
 		}
@@ -52,7 +52,7 @@
 	<td>Is zabbix_trapperd running ?</td>
 	<?php
 		$str="<font color=\"AA0000\">No</font>";
-		if(exec("ps -ef|grep zabbix_trapperd|grep -v grep|wc -l")>0)
+		if( (exec("ps -ef|grep zabbix_trapperd|grep -v grep|wc -l")>0) || (exec("ps -ax|grep zabbix_trapperd|grep -v grep|wc -l")>0) )
 		{
 			$str="<font color=\"00AA00\">Yes</font>";
 		}
