@@ -77,7 +77,6 @@ HB:
  - Graphs for specified period and date and time
  - personalisation (refresh rate, graph size, default graph period, etc)
  - add protection from IT Service loop
- - add severity to pre-defined triggers 
 
  - Tree like in old Zabbix
  - LDAP authorisation (should work with MSWindows LDAP)
@@ -97,7 +96,6 @@ HB:
 
 - Network discovery daemon (?)
 - Native Windows GUI (in version 2.0 ?)
-- Host templates
 - Use UDP instead of TCP as transport protocol (?)
 - backup/restore scripts for server. Backup all (DB, configs, etc).
 - Network topology database

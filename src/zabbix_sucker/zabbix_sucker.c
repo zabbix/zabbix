@@ -543,7 +543,7 @@ int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
 	/* The section should be improved */
 	if( (*result==0) && (c==e) && (item->value_type==0) && (strcmp(c,"ZBX_NOTSUPPORTED") != 0) && (strcmp(c,"ZBX_ERROR") != 0) )
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Got empty string [%s] from [%s]. Parameter [%s]", c, item->host, item->key);
+		zabbix_log( LOG_LEVEL_WARNING, "Got empty string from [%s]. Parameter [%s]", item->host, item->key);
 		zabbix_log( LOG_LEVEL_WARNING, "Assuming that agent dropped connection because of access permissions");
 		return	NETWORK_ERROR;
 	}

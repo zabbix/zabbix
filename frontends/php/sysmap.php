@@ -271,48 +271,50 @@
 
 <?php
 	echo "<br>";
-	show_table2_header_begin();
-	echo "New connector";
-
-	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"sysmap.php?sysmapid=".$HTTP_GET_VARS["sysmapid"].">";
-	echo "Host 1";
-	show_table2_h_delimiter();
 	$result=DBselect("select shostid,label from sysmaps_hosts where sysmapid=".$HTTP_GET_VARS["sysmapid"]." order by label");
-	echo "<select class=\"biginput\" name=\"shostid1\" size=1>";
-	for($i=0;$i<DBnum_rows($result);$i++)
+	if(DBnum_rows($result)>1)
 	{
-		$shostid_=DBget_field($result,$i,0);
-		$label=DBget_field($result,$i,1);
-		if(isset($HTTP_GET_VARS["shostid"])&&($HTTP_GET_VARS["shostid"]==$shostid_))
+		show_table2_header_begin();
+		echo "New connector";
+
+		show_table2_v_delimiter();
+		echo "<form method=\"post\" action=\"sysmap.php?sysmapid=".$HTTP_GET_VARS["sysmapid"]."\">";
+		echo "Host 1";
+		show_table2_h_delimiter();
+//		$result=DBselect("select shostid,label from sysmaps_hosts where sysmapid=".$HTTP_GET_VARS["sysmapid"]." order by label");
+		echo "<select class=\"biginput\" name=\"shostid1\" size=1>";
+		for($i=0;$i<DBnum_rows($result);$i++)
 		{
-			echo "<OPTION VALUE='$shostid_' SELECTED>$label";
+			$shostid_=DBget_field($result,$i,0);
+			$label=DBget_field($result,$i,1);
+			if(isset($HTTP_GET_VARS["shostid"])&&($HTTP_GET_VARS["shostid"]==$shostid_))
+			{
+				echo "<OPTION VALUE='$shostid_' SELECTED>$label";
+			}
+			else
+			{
+				echo "<OPTION VALUE='$shostid_'>$label";
+			}
 		}
-		else
+		echo "</SELECT>";
+
+		show_table2_v_delimiter();
+//		echo "<form method=\"get\" action=\"sysmap.php?sysmapid=".$HTTP_GET_VARS["sysmapid"].">";
+		echo "Host 2";
+		show_table2_h_delimiter();
+		echo "<select class=\"biginput\" name=\"shostid2\" size=1>";
+		for($i=0;$i<DBnum_rows($result);$i++)
 		{
+			$shostid_=DBget_field($result,$i,0);
+			$label=DBget_field($result,$i,1);
 			echo "<OPTION VALUE='$shostid_'>$label";
 		}
+		echo "</SELECT>";
+
+		show_table2_v_delimiter2();
+		echo "<input type=\"submit\" name=\"register\" value=\"add link\">";
+		show_table2_header_end();
 	}
-	echo "</SELECT>";
-
-	show_table2_v_delimiter();
-	echo "<form method=\"get\" action=\"sysmap.php?sysmapid=".$HTTP_GET_VARS["sysmapid"].">";
-	echo "Host 2";
-	show_table2_h_delimiter();
-	$result=DBselect("select shostid,label from sysmaps_hosts where sysmapid=".$HTTP_GET_VARS["sysmapid"]." order by label");
-	echo "<select class=\"biginput\" name=\"shostid2\" size=1>";
-	for($i=0;$i<DBnum_rows($result);$i++)
-	{
-		$shostid_=DBget_field($result,$i,0);
-		$label=DBget_field($result,$i,1);
-		echo "<OPTION VALUE='$shostid_'>$label";
-	}
-	echo "</SELECT>";
-
-	show_table2_v_delimiter2();
-	echo "<input type=\"submit\" name=\"register\" value=\"add link\">";
-
-	show_table2_header_end();
 ?>
 
 <?php
