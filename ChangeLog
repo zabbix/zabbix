@@ -1,7 +1,9 @@
 Changes for 1.0alpha7:
 
- - added real links to page About
+ - deleted link to comments.html in tr_status.html
+ - fixed Enabled/Disabled checkbox in trigger form
 
+ - added real links to page About
  - fullscreen mode for form Status of Triggers
  - minor changes in manual.txt
  - no password to see alarms needed
