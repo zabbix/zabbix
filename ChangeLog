@@ -1,5 +1,6 @@
 Changes for 1.0beta10:
 
+ - removed script misc/pinger/ (Alexei)
  - support if simple check 'icmpping' (Alexei)
  - new zabbix_suckerd's parameter: PingerFrequency (Alexei)
  - new zabbix_suckerd's parameter: FpingLocation (Alexei)
