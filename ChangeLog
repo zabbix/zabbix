@@ -1,13 +1,26 @@
 Not ready yet:
 
+ - delete services if trigger is deleted
+ - monitoring of log files, Support for string=string.
+ - IPFC
+ - network map. Connect an icon to a trigger/service
+ - fix Next100 and Prev100
  - fix proc_cnt[*]
- - get rid of %s in alerts,alarms, etc
+ - create one common chart.php
  - add MRTG-like graphs
  - add support for /,*,+,- in expressions
- - check triggers added for db and db-2
+ - add support for LDAP
+ - add support for Kb,bytes,kps, etc
+ - add new screenshots to zabbix.sf.net
+
+ - FIX coredump after "Apply actions"
 
 Changes for 1.0beta5:
 
+ - changed grid size for all graphs (Alexei)
+ - added frontends/php/chart4.php (Alexei)
+ - added frontends/php/compare.php (Alexei)
+ - redesigned all graphs (changed colors, etc) (Alexei)
  - host selection for availability report (Alexei)
  - more fixes to send_email() (Alexei)
  - fixed crash in case if MySQL server gone (support for signal PIPE) (Alexei)

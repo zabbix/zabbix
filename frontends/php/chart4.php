@@ -9,39 +9,31 @@
 
 	if(!isset($type))
 	{
-		$type="15min";
+		$type="week";
 	}
 
-	if($type == "15min")
+	if($type == "month")
 	{
-		$period=900;
-		$label_format="H:i";
+		$period=24*30*2400;
 	}
-	else if($type == "30min")
+	else if($type == "week")
 	{
-		$period=1800;
-		$label_format="H:i";
+		$period=7*24*3600;
 	}
-	else if($type == "4hours")
+	else if($type == "year")
 	{
-		$period=4*3600;
-		$label_format="H:i";
-	}
-	else if($type == "12hours")
-	{
-		$period=12*3600;
-		$label_format="H:i";
+		$period=12*30*24*3600;
 	}
 	else
 	{
-		$period=3600;
-		$label_format="H:i";
+		$type="week";
+		$period=7*24*3600;
 	}
 
 	$sizeX=900;
 	$sizeY=200;
 
-	$shiftX=10;
+	$shiftX=12;
 	$shiftY=15;
 
 	$nodata=1;	
@@ -58,6 +50,7 @@
 	$green=ImageColorAllocate($im,0,255,0); 
 	$darkgreen=ImageColorAllocate($im,0,150,0); 
 	$blue=ImageColorAllocate($im,0,0,255); 
+	$darkblue=ImageColorAllocate($im,0,0,150); 
 	$yellow=ImageColorAllocate($im,255,255,0); 
 	$darkyellow=ImageColorAllocate($im,150,150,0); 
 	$cyan=ImageColorAllocate($im,0,255,255); 
@@ -72,57 +65,58 @@
 	ImageRectangle($im,0,0,$x-1,$y-1,$black);
 
 	$now = time(NULL);
-	$to_time=$now-$now%$period;
-	$from_time=$to_time-17*$period;
+	$to_time=$now;
+	$from_time=$to_time-$period*24*3600;
 
 	$count=array();
 	$min=array();
 	$max=array();
 	$avg=array();
-	for($i=0;$i<900;$i++)
+
+//	$result=DBselect("select clock,value from history where itemid=$itemid and clock>$from_time and clock<$to_time");
+	$result=DBselect("select round(900*((clock+3*3600)%(24*3600))/(24*3600)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid=$itemid and clock>$from_time and clock<$to_time group by round(900*((clock+3*3600)%(24*3600))/(24*3600))");
+	while($row=DBfetch($result))
 	{
-		$result=DBselect("select count(value),min(value),max(value),avg(value) from history where itemid=$itemid and clock>$from_time+$i*($to_time-$from_time)/(900-50) and clock<$from_time+($i+1)*($to_time-$from_time)/(900-50)");
-		$count[$i]=DBget_field($result,0,0);
-		if($count[$i]>0)
-		{
-			$min[$i]=DBget_field($result,0,1);
-			$max[$i]=DBget_field($result,0,2);
-			$avg[$i]=DBget_field($result,0,3);
-			$nodata=0;
-		}
+		$i=$row["i"];
+
+		$max[$i]=$row["max"];
+		$min[$i]=$row["min"];
+		$avg[$i]=$row["avg"];
+		$count[$i]=$row["count"];
+		$nodata=0;
+
+//		echo $i," ",$avg[$i],"<br>";
 	}
 
-	for($i=0;$i<=$sizeY;$i+=$sizeY/5)
+	$count_now=array();
+	$avg_now=array();
+	$to_time=$now;
+	$from_time=$to_time-$period;
+//	$result=DBselect("select clock,value from history where itemid=$itemid and clock>$from_time and clock<$to_time");
+	$result=DBselect("select round(900*((clock+3*3600)%(24*3600))/(24*3600)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid=$itemid and clock>$from_time and clock<$to_time group by round(900*((clock+3*3600)%(24*3600))/(24*3600))");
+	while($row=DBfetch($result))
+	{
+		$i=$row["i"];
+		$avg_now[$i]=$row["avg"];
+		$count_now[$i]=$row["count"];
+	}
+
+	for($i=0;$i<=$sizeY;$i+=50)
 	{
 		ImageDashedLine($im,$shiftX,$i+$shiftY,$sizeX+$shiftX,$i+$shiftY,$gray);
 	}
 
-	for($i=0;$i<=$sizeX;$i+=$sizeX/24)
+	for($i=0;$i<=$sizeX;$i+=50)
 	{
 		ImageDashedLine($im,$i+$shiftX,$shiftY,$i+$shiftX,$sizeY+$shiftY,$gray);
 		if($nodata == 0)
 		{
-			ImageString($im, 1,$i+$shiftX-11, $sizeY+$shiftY+5, date($label_format,$from_time+$period*($i/50)) , $black);
+			ImageString($im, 1,$i+$shiftX-11, $sizeY+$shiftY+5, date($label_format,-3*3600+24*3600*$i/900) , $black);
 		}
 	}
 
 	unset($maxY);
 	unset($minY);
-
-/*
-	for($i=0;$i<900;$i++)
-	{
-		$nodata=0;
-		if(!isset($maxY) || $max[$i]>$maxY)
-		{
-			$maxY=$max[$i];
-		}
-		if(!isset($minY) || (($min[$i]<$minY)&&($count[$i]>0)) )
-		{
-			$minY=$min[$i];
-		}
-	}
-*/
 
 	if($nodata == 0)
 	{
@@ -140,7 +134,6 @@
 
 	$maxX=900;
 	$minX=0;
-#	echo "MIN/MAX:",$minX," - ",$maxX," - ",$minY," - ",$maxY,"<Br>";
 
 	if(isset($minY)&&($maxY)&&($minX!=$maxX)&&($minY!=$maxY))
 	{
@@ -157,7 +150,7 @@
 					$y1=$sizeY-$y1;
 					$y2=$sizeY-$y2;
 
-					ImageLine($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX,$y2+$shiftY,$darkred);
+//					ImageLine($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX,$y2+$shiftY,$darkred);
 				}
 
 				$x1=$sizeX*($i-$minX)/($maxX-$minX);
@@ -167,7 +160,7 @@
 				$y1=$sizeY-$y1;
 				$y2=$sizeY-$y2;
 	
-				ImageLine($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX,$y2+$shiftY,$darkyellow);
+				ImageLine($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX,$y2+$shiftY,$darkgreen);
 
 				if(!isset($trendavg))
 				{
@@ -178,7 +171,23 @@
 					$y1=$sizeY-$y1;
 					$y2=$sizeY-$y2;
 	
-					ImageLine($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX,$y2+$shiftY,$darkgreen);
+//					ImageLine($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX,$y2+$shiftY,$darkgreen);
+				}
+			}
+			if(($count_now[$i]>0)&&($count_now[$i-1]>0))
+			{
+				if(!isset($trendavg)&&($i>0))
+				{
+					$x1=$sizeX*($i-$minX)/($maxX-$minX);
+					$y1=$sizeY*($avg_now[$i]-$minY)/($maxY-$minY);
+					$x2=$sizeX*($i-$minX-1)/($maxX-$minX);
+					$y2=$sizeY*($avg_now[$i-1]-$minY)/($maxY-$minY);
+//					$x2=$x1;
+//					$y2=0;
+					$y1=$sizeY-$y1;
+					$y2=$sizeY-$y2;
+	
+					ImageLine($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX,$y2+$shiftY,$darkred);
 				}
 			}
 
@@ -193,7 +202,7 @@
 
 	if($nodata == 0)
 	{
-		for($i=0;$i<=$sizeY;$i+=$sizeY/5)
+		for($i=0;$i<=$sizeY;$i+=50)
 		{
 			ImageString($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftY, $i*($maxY-$minY)/$sizeY+$minY , $darkred);
 		}
@@ -205,12 +214,11 @@
 	}
 	else
 	{
-		ImageString($im, 2,$sizeX/2 -50,                $sizeY+$shiftY+3, "NO DATA FOR THIS PERIOD" , $darkred);
+		ImageString($im, 2,$sizeX/2 -50,                $sizeY+$shiftY+3, "NO DATA FOR THIS PERIOD" , $red);
 	}
 
-	ImageString($im, 1,$shiftX, $sizeY+$shiftY+15, "MIN" , $darkgreen);
-	ImageString($im, 1,$shiftX+20, $sizeY+$shiftY+15, "AVG" , $darkyellow);
-	ImageString($im, 1,$shiftX+40, $sizeY+$shiftY+15, "MAX" , $darkred);
+	ImageString($im, 1,$shiftX, $sizeY+$shiftY+15, "AVG (LAST $type)" , $darkgreen);
+	ImageString($im, 1,$shiftX+80, $sizeY+$shiftY+15, "AVG (TODAY)" , $darkred);
 
 	ImageStringUp($im,0,2*$shiftX+$sizeX+40,$sizeY+2*$shiftY, "http://zabbix.sourceforge.net", $gray);
 

@@ -12,7 +12,7 @@
 	$host=DBget_field($result,0,1);
 	$hostid=DBget_field($result,0,2);
 
-	echo "<A HREF='latest.php?hostid=$hostid'>$host</A> : <a href='history.php?action=showhistory&itemid=$itemid'>$description</a>";
+	echo "<A HREF='latest.php?hostid=$hostid'>$host</A> : <a href='compare.php?action=showhistory&itemid=$itemid'>$description</a>";
 
 	show_table_v_delimiter();
 

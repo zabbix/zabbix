@@ -93,7 +93,7 @@
 	echo "<TD ALIGN=CENTER>";
 	if(isset($graphid))
 	{
-		echo "<IMG SRC=\"chart2.php?graphid=$graphid&period=$period&from=$from\">";
+		echo "<IMG ALIGH=CENTER SRC=\"chart2.php?graphid=$graphid&period=$period&from=$from\">";
 	}
 	else
 	{
