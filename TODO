@@ -1,5 +1,6 @@
 1.0beta11:
 
+ - suport for PREFIX/zabbix/etc (configuration files)
  - trapper item. Source->Alarms do not grow when last status is unknown for
 latest trigger (item type  = TRAPPER)
  - SNMP traps. Condition to switch expression off.
