@@ -34,6 +34,7 @@ TKOM:
 
 OTHER:
 
+ - add advanced task scheduler/executor to ZABBIX
  - agent incorrectly returns amount of free/available memory on HP-UX (must be 24GB)
  - add failure (timeouts, network errors, etc) reasons to items and hosts
  - use getopt() from unistd.h for config paths
