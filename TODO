@@ -1,17 +1,12 @@
 ZABBIX 1.1:
 
- - support of networks having 100-1000 network devices to monitor
  - escalation
  - execution of commands on monitored hosts in case of pre-defined events
  - repeated notifications
  - custom multiplier
  - monitoring of log files
  - audit log
- - manual to be in sync with current functionality
- - improved usability for large setups
  - new defaul port numbers to avoid confusion with WebMin
- - background image
- - downloadable icons
  - hierarchial maps
  - support of SNMPv3
  - anvanced SNMP trapper
@@ -94,7 +89,6 @@ Most of the signal handlers all need to delay or block signals to avoid signal r
  - add gaps to graph when no data present
  - make Zabbix reset nextcheck for items when updating or adding a trigger
  - remove icmpping and others from the QUEUE
- - hardlinked templates (several templates, one host)
  - escalation and repeated notifications
  - take advantage of PHP OOP (everything in classes)
  - improve WEB site to provide understanding of Zabbix and its concepts
