@@ -5,7 +5,7 @@
  - test on non-Linux platforms
  - test install and upgrade procedure for 1.0beta10
  - improve screens (add maps, all in one table, etc)
- - improve graphs
+ - cal culate maxY in graphs and show last value
  - Graphs: change order of lines
 
  - links to Zabbix frontend in alert emails

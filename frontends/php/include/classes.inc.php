@@ -232,13 +232,19 @@
 
 		function drawLegend()
 		{
+			$max_host_len=0;
+			$max_desc_len=0;
+			for($i=0;$i<$this->num;$i++)
+			{
+				if(strlen($this->items[$i]["host"])>$max_host_len)	$max_host_len=strlen($this->items[$i]["host"]);
+				if(strlen($this->items[$i]["description"])>$max_desc_len)	$max_desc_len=strlen($this->items[$i]["description"]);
+			}
+
 			for($i=0;$i<$this->num;$i++)
 			{
 				ImageFilledRectangle($this->im,$this->shiftX,$this->sizeY+$this->shiftY+32+12*$i,$this->shiftX+5,$this->sizeY+$this->shiftY+5+32+12*$i,$this->colors[$this->items[$i]["color"]]);
 				ImageRectangle($this->im,$this->shiftX,$this->sizeY+$this->shiftY+32+12*$i,$this->shiftX+5,$this->sizeY+$this->shiftY+5+32+12*$i,$this->colors["Black"]);
 
-				$max_host_len=strlen($this->items[$i]["host"]);
-				$max_desc_len=strlen($this->items[$i]["description"]);
 				$str=sprintf("%s: %s [min:%s max:%s]",
 					str_pad($this->items[$i]["host"],$max_host_len," "),
 					str_pad($this->items[$i]["description"],$max_desc_len," "),
@@ -247,22 +253,6 @@
 	
 				ImageString($this->im, 2,$this->shiftX+9,$this->sizeY+$this->shiftY+27+12*$i,$str, $this->colors["Black"]);
 			}
-
-//		for($i=0;$i<DBnum_rows($result2);$i++)
-//		{
-//			$z=get_item_by_itemid($iids[$i]);
-//			$h=get_host_by_hostid($z["hostid"]);
-//			if(strlen($h["host"])>$max_host_len)		$max_host_len=strlen($h["host"]);
-//			if(strlen($z["description"])>$max_desc_len)	$max_desc_len=strlen($z["description"]);
-//		}
-//		$i=get_item_by_itemid($iids[$item]);
-/*			$str=sprintf("%s: %s [min:%s max:%s]",
-				str_pad($this->items[0]["host"],$max_host_len," "),
-				str_pad($this->items[0]["description"],$max_desc_len," "),
-				convert_units(min($this->min[0]),$this->items[0]["units"],$this->items[0]["multiplier"]),
-				convert_units(max($this->max[0]),$this->items[0]["units"],$this->items[0]["multiplier"]));
-
-			ImageString($this->im, 2,$this->shiftX+9,$this->sizeY+$this->shiftY+30,$str, $this->colors["Black"]);*/
 		}
 
 		function drawElement($item,$x1,$y1,$x2,$y2)
