@@ -139,6 +139,7 @@ CREATE TABLE triggers_template (
 
 CREATE TABLE items (
   itemid int(4) NOT NULL auto_increment,
+  type int(4) DEFAULT '0' NOT NULL,
   hostid int(4) NOT NULL,
   description varchar(255) DEFAULT '' NOT NULL,
   key_ varchar(64) DEFAULT '' NOT NULL,
