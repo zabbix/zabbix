@@ -153,6 +153,11 @@ char	*DBget_field(DB_RESULT *result, int rownum, int fieldnum)
 
 	mysql_data_seek(result, rownum);
 	row=mysql_fetch_row(result);
+	if(row == NULL)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Error while mysql_fetch_row():[%s]", mysql_error(&mysql) );
+		exit(FAIL);
+	}
 	zabbix_log(LOG_LEVEL_DEBUG, "Got field:%s", row[fieldnum] );
 	return row[fieldnum];
 #endif

@@ -26,7 +26,7 @@
 
 <?
 
-	$result=DBselect("select h.hostid,h.host,t.triggerid,t.expression,t.description,t.value from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.status=0 and t.triggerid=f.triggerid and h.status in (0,2) and i.status=0 order by h.host,t.lastchange desc, t.description");
+	$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.value from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.status=0 and t.triggerid=f.triggerid and h.status in (0,2) and i.status=0 order by h.host, t.description");
 
 	$lasthost="";
 	$col=0;
