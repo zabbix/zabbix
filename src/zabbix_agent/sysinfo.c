@@ -241,7 +241,7 @@ float	PROCCNT(const char * procname)
 	struct	stat buf;
 	char	filename[512];
 	char	line[512];
-	char	*name;
+	char	name1[256],name2[256];
 
 	FILE	*f;
 
@@ -265,19 +265,26 @@ float	PROCCNT(const char * procname)
 			fgets(line,512,f);
 			fclose(f);
 
-/*			sscanf(line,"%s\t%s\n",line,name);
-			printf("%s\n",name);
-			fflush(stdout);*/
-
-			name=(char *)strtok(line,"\t");
-			name=(char *)strtok(NULL,"\t");
-
-			name[strlen(name)-1]=0;
-
-			if(strcmp(procname,name)==0)
-			{
-				proccount++;
-			}
+			if(sscanf(line,"%s\t%s\n",name1,name2)==2)
+                        {
+                                if(strcmp(name1,"Name:") == 0)
+                                {
+                                        if(strcmp(procname,name2)==0)
+                                        {
+                                                proccount++;
+                                        }
+                                }
+                                else
+                                {
+                                        closedir(dir);
+                                        return  FAIL;
+                                }
+                        }
+                        else
+                        {
+                                closedir(dir);
+                                return  FAIL;
+                        }
 		}
 	}
 	closedir(dir);
