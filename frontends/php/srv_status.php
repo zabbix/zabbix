@@ -52,7 +52,7 @@
 		$childs=get_num_of_service_childs($row["serviceid"]);
 		if(isset($row["triggerid"]))
 		{
-			$trigger=select_trigger_by_triggerid($row["triggerid"]);
+			$trigger=get_trigger_by_triggerid($row["triggerid"]);
 			$description="[TRIGGER] ".$trigger["description"];
 		}
 		else

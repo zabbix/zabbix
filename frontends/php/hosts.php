@@ -10,7 +10,7 @@
 	{
 		if($register=="add")
 		{
-			$result=add_host($host,$port,$status,$template,$useip,$ip);
+			$result=add_host($host,$port,$status,$template,$useip,$ip,$host_templateid);
 			show_messages($result,"Host added","Cannot add host");
 		}
 		if($register=="update")
@@ -152,6 +152,18 @@
 	echo "Add parameters supported by zabbix_agent";
 	show_table2_h_delimiter();
 	echo "<INPUT NAME=\"template\" TYPE=\"CHECKBOX\"  VALUE=\"true\" CHECKED>";
+
+	show_table2_v_delimiter();
+	echo "Use the host as a template";
+	show_table2_h_delimiter();
+	echo "<select name=\"host_templateid\" size=\"1\">";
+	echo "<option value=\"0\" selected>...";
+	$result=DBselect("select host,hostid from hosts order by host");
+	while($row=DBfetch($result))
+	{
+		echo "<option value=\"".$row["hostid"]."\" selected>".$row["host"];
+	}
+	echo "</select>";
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
