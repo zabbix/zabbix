@@ -36,23 +36,25 @@
 ?>
 
 <?php
-	if(isset($_GET["register"]))
+	if(isset($_POST["register"]))
 	{
-		if($_GET["register"]=="add")
+		if($_POST["register"]=="add")
 		{
-			$result=add_sysmap($_GET["name"],$_GET["width"],$_GET["height"]);
+			$result=add_sysmap($_POST["name"],$_POST["width"],$_POST["height"],$_FILES["background"]);
 			show_messages($result,"Network map added","Cannot add network map");
+			print_r($_FILES);
+			echo $_FILES["background"]["tmp_name"];
 		}
-		if($_GET["register"]=="update")
+		if($_POST["register"]=="update")
 		{
-			$result=update_sysmap($_GET["sysmapid"],$_GET["name"],$_GET["width"],$_GET["height"]);
+			$result=update_sysmap($_POST["sysmapid"],$_POST["name"],$_POST["width"],$_POST["height"]);
 			show_messages($result,"Network map updated","Cannot update network map");
 		}
-		if($_GET["register"]=="delete")
+		if($_POST["register"]=="delete")
 		{
-			$result=delete_sysmap($_GET["sysmapid"]);
+			$result=delete_sysmap($_POST["sysmapid"]);
 			show_messages($result,"Network map deleted","Cannot delete network map");
-			unset($_GET["sysmapid"]);
+			unset($_POST["sysmapid"]);
 		}
 	}
 ?>
@@ -64,7 +66,8 @@
 
 <?php
 	show_table_header("NETWORK MAPS");
-	echo "<TABLE BORDER=0 align=center COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TABLE BORDER=0 align=center COLS=4 WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
+	echo "<TR BGCOLOR=\"#CCCCCC\">";
 	echo "<TD WIDTH=3% NOSAVE><B>Id</B></TD>";
 	echo "<TD><B>Name</B></TD>";
 	echo "<TD WIDTH=5% NOSAVE><B>Width</B></TD>";
@@ -129,7 +132,7 @@
 	echo "New system map";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"get\" action=\"sysmaps.php\">";
+	echo "<form method=\"post\" enctype=\"multipart/form-data\" action=\"sysmaps.php\">";
 	if(isset($_GET["sysmapid"]))
 	{
 		echo "<input class=\"biginput\" name=\"sysmapid\" type=\"hidden\" value=".$_GET["sysmapid"].">";
@@ -147,6 +150,12 @@
 	echo "Height";
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"height\" size=5 value=\"$height\">";
+
+	show_table2_v_delimiter();
+	echo "Background image";
+	show_table2_h_delimiter();
+	echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"10000000\">";
+	echo "<input class=\"biginput\" type=\"file\" name=\"background\">";
 
 	show_table2_v_delimiter2();
 	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";

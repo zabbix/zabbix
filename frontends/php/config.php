@@ -102,8 +102,8 @@
 ?>
 
 <?php
-	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR><TD WIDTH=3%><B>".S_ID."</B></TD>";
+	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
+	echo "<TR BGCOLOR=\"#CCCCCC\"><TD WIDTH=3%><B>".S_ID."</B></TD>";
 	echo "<TD WIDTH=10%><B>".S_TYPE."</B></TD>";
 	echo "<TD><B>".S_DESCRIPTION_SMALL."</B></TD>";
 	echo "<TD WIDTH=10%><B>".S_ACTIONS."</B></TD>";

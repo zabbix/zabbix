@@ -120,7 +120,7 @@
 	echo "<TD WIDTH=5% NOSAVE><B>X</B></TD>";
 	echo "<TD WIDTH=5% NOSAVE><B>Y</B></TD>";
 	echo "<TD WIDTH=10% NOSAVE><B>Icon</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
+	echo "<TD WIDTH=15% NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
 	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,sh.icon from sysmaps_hosts sh,hosts h where sh.sysmapid=".$_GET["sysmapid"]." and h.hostid=sh.hostid order by h.host");
@@ -150,7 +150,7 @@
 		echo "<TD>$label_</TD>";
 		echo "<TD>$x_</TD>";
 		echo "<TD>$y_</TD>";
-		echo "<TD>$icon_</TD>";
+		echo "<TD>".nbsp($icon_)."</TD>";
 		echo "<TD><A HREF=\"sysmap.php?sysmapid=$sysmapid_&shostid=$shostid_#form\">Change</A> - <A HREF=\"sysmap.php?register=delete&sysmapid=$sysmapid_&shostid=$shostid_\">Delete</A></TD>";
 		echo "</TR>";
 	}

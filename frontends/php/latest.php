@@ -47,19 +47,20 @@
 ?>
 
 <?php
-	show_table_header_begin();
-	echo S_LATEST_DATA;
-
-	show_table_v_delimiter();
-
-// Start of new code
-	echo "<form name=\"form2\" method=\"get\" action=\"latest.php\">";
-
 	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
 	{
 		unset($_GET["groupid"]);
 	}
+?>
 
+<?php
+	show_table3_header_begin();
+	echo "&nbsp;".S_LATEST_DATA;
+	show_table3_h_delimiter(60);
+?>
+		<form name="form2" method="get" action="latest.php">
+
+<?php
 	echo S_GROUP."&nbsp;";
 	echo "<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
 	echo "<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_ALL_SMALL;
@@ -87,10 +88,16 @@
 
 	echo "&nbsp;".S_HOST."&nbsp;";
 	echo "<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
+	echo "<option value=\"0\"".iif(!isset($_GET["hostid"])||($_GET["hostid"]==0),"selected","").">Select host...";
 
-	$sql=iif(isset($_GET["groupid"]),
-		"select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status in (0,2) and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host",
-		"select h.hostid,h.host from hosts h,items i where h.status in (0,2) and h.hostid=i.hostid group by h.hostid,h.host order by h.host");
+	if(isset($_GET["groupid"]))
+	{
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status in (0,2) and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+	}
+	else
+	{
+		$sql="select h.hostid,h.host from hosts h,items i where h.status in (0,2) and h.hostid=i.hostid group by h.hostid,h.host order by h.host";
+	}
 
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
@@ -109,18 +116,25 @@
 	{
 		unset($_GET["select"]);
 	}
-	iif_echo(isset($_GET["select"]),
-  		"<input class=\"biginput\" type=\"text\" name=\"select\" value=\"".$_GET["select"]."\">",
-  		"<input class=\"biginput\" type=\"text\" name=\"select\" value=\"\">");
+	if(isset($_GET["select"]))
+	{
+		echo $_GET["select"];
+	}
+	if(isset($_GET["select"]))
+	{
+  		echo "<input class=\"biginput\" type=\"text\" name=\"select\" value=\"".$_GET["select"]."\">";
+	}
+	else
+	{
+ 		echo "<input class=\"biginput\" type=\"text\" name=\"select\" value=\"\">";
+	}
 	echo nbsp(" ");
   	echo "<input class=\"button\" type=\"submit\" name=\"do\" value=\"select\">";
 	echo "</form>";
-
-
-// end of new code
-
 	show_table_header_end();
+?>
 
+<?php
 	if(!isset($_GET["sort"]))
 	{
 		$_GET["sort"]="description";
@@ -138,22 +152,23 @@
 	if(isset($_GET["hostid"])||isset($_GET["select"]))
 	{
 
-		echo "<br>";
-		if(!isset($_GET["select"]))
+//		echo "<br>";
+		if(!isset($_GET["select"])||($_GET["select"] == ""))
 		{
 			$result=DBselect("select host from hosts where hostid=".$_GET["hostid"]);
 			$host=DBget_field($result,0,0);
-			show_table_header("<a href=\"latest.php?hostid=".$_GET["hostid"]."\">$host</a>");
+//			show_table_header("<a href=\"latest.php?hostid=".$_GET["hostid"]."\">$host</a>");
 		}
 		else
 		{
-			show_table_header("Description is like *".$_GET["select"]."*");
+//			show_table_header("Description is like *".$_GET["select"]."*");
 		}
 #		show_table_header_begin();
 #		echo "<a href=\"latest.php?hostid=".$_GET["hostid"]."\">$host</a>";
 #		show_table3_v_delimiter();
 
-		echo "<TABLE BORDER=0 COLS=4 WIDTH=100% cellspacing=1 cellpadding=3>";
+		echo "<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR=\"AAAAAA\" cellspacing=1 cellpadding=3>";
+//		echo "<TABLE BORDER=0 COLS=4 WIDTH=100% cellspacing=1 cellpadding=3>";
 		cr();
 		echo "<TR BGCOLOR=\"CCCCCC\">";
 		cr();
@@ -177,9 +192,10 @@
 		}
 		else
 		{
-			iif_echo(isset($_GET["select"]),
-				"<TD WIDTH=12%><B><a href=\"latest.php?select=".$_GET["select"]."&sort=lastcheck\">Last check</B></TD>",
-				"<TD WIDTH=12%><B><a href=\"latest.php?hostid=".$_GET["hostid"]."&sort=lastcheck\">Last check</B></TD>");
+			if(isset($_GET["select"]))
+				echo "<TD WIDTH=12%><B><a href=\"latest.php?select=".$_GET["select"]."&sort=lastcheck\">Last check</B></TD>";
+			else
+				echo "<TD WIDTH=12%><B><a href=\"latest.php?hostid=".$_GET["hostid"]."&sort=lastcheck\">Last check</B></TD>";
 		}
 		cr();
 		echo "<TD WIDTH=10%><B>Last value</B></TD>"; 
@@ -215,9 +231,10 @@
 		{
 			$_GET["sort"]="order by i.description";
 		}
-		$sql=iif(isset($_GET["select"]),
-			"select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and i.status=0 and i.description like '%".$_GET["select"]."%' ".$_GET["sort"],
-			"select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and i.status=0 and h.hostid=".$_GET["hostid"]." ".$_GET["sort"]);
+		if(isset($_GET["select"]))
+			$sql="select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and i.status=0 and i.description like '%".$_GET["select"]."%' ".$_GET["sort"];
+		else
+			$sql="select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and i.status=0 and h.hostid=".$_GET["hostid"]." ".$_GET["sort"];
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
@@ -253,7 +270,7 @@
 			if(isset($row["lastvalue"]))
 			{
 				iif_echo($row["value_type"] == 0,
-					"<td>".convert_units($row["lastvalue"],$row["units"],$row["multiplier"])."</td>",
+					"<td>".convert_units($row["lastvalue"],$row["units"])."</td>",
 					"<td>".nbsp(htmlspecialchars(substr($row["lastvalue"],0,20)." ..."))."</td>");
 			}
 			else
@@ -267,13 +284,13 @@
 //	sprintf("%+0.2f"); does not work
 				if($row["lastvalue"]-$row["prevvalue"]<0)
 				{
-					$str=convert_units($row["lastvalue"]-$row["prevvalue"],$row["units"],$row["multiplier"]);
+					$str=convert_units($row["lastvalue"]-$row["prevvalue"],$row["units"]);
 					$str=nbsp($str);
 					table_td($str,"");
 				}
 				else
 				{
-					$str="+".convert_units($row["lastvalue"]-$row["prevvalue"],$row["units"],$row["multiplier"]);
+					$str="+".convert_units($row["lastvalue"]-$row["prevvalue"],$row["units"]);
 					$str=nbsp($str);
 					table_td($str,"");
 //					printf("<td>+%0.2f</td>",$row["lastvalue"]-$row["prevvalue"]);
@@ -300,6 +317,16 @@
 		}
 		echo "</table>";
 		show_table_header_end();
+	}
+	else
+	{
+		echo "<TABLE BORDER=0 align=center COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+		echo "<TR BGCOLOR=#DDDDDD>";
+		echo "<TD ALIGN=CENTER>";
+		echo "...";
+		echo "</TD>";
+		echo "</TR>";
+		echo "</TABLE>";
 	}
 ?>
 

@@ -72,8 +72,8 @@
 		show_table_header($row["host"]);
 
 		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.value from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.status=0 and t.triggerid=f.triggerid and h.hostid=".$_GET["hostid"]." and h.status in (0,2) and i.status=0 order by h.host, t.description");
-		echo "<TABLE BORDER=0 COLS=3 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-		echo "<TR>";
+		echo "<TABLE BORDER=0 COLS=3 WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
+		echo "<TR BGCOLOR=\"#CCCCCC\">";
 		echo "<TD><B>".S_DESCRIPTION."</B></TD>";
 //		echo "<TD><B>Expression</B></TD>";
 		echo "<TD WIDTH=5%><B>".S_TRUE."</B></TD>";

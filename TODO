@@ -1,14 +1,30 @@
+DONE:
+
+TELECENTRS
+
+1. Support for custom multipliers.
+5. Support for SNMPv3.
+
+ZABBIX 1.1
+
+ - custom multiplier
+ - support of SNMPv3
+
+
+
+
+--------------------------------------------
+
 ZABBIX 1.1:
 
+ - RPM for RedHat EL
  - escalation
  - execution of commands on monitored hosts in case of pre-defined events
  - repeated notifications
- - custom multiplier
  - monitoring of log files
  - audit log
  - new defaul port numbers to avoid confusion with WebMin
  - hierarchial maps
- - support of SNMPv3
  - anvanced SNMP trapper
  - hard-linked templates
  - passing of parameters to user-defined commands (agent)
@@ -26,6 +42,18 @@ TKOM:
  - SNMP trap processing
  - SNMP trap sending
  - wider service testing possibilities
+
+TELECENTRS:
+
+
+2. Background image for system maps
+
+3. Hierarcy for system maps
+Integration of system maps and IT Services required.
+
+4. SNMP traps. Make possible action definition for the SNMP trap-related
+ events.
+
 
 OTHER:
 

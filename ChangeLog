@@ -1,5 +1,9 @@
 Changes for 1.1alpha1:
 
+ - added support for custom multiplier (Alexei)
+ - added column items.formula (Alexei)
+ - added support of SNMPv3 (Alexei)
+ - added columns snmpv3_* to table items (Alexei)
  - increased max number of network interfaces to 16 for zabbix_agentd (Alexei)
  - added command line parameters -c <config> and -h to zabbix_trapperd (Alexei)
  - added command line parameters -c <config> and -h to zabbix_agentd (Alexei)

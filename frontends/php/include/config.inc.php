@@ -47,17 +47,10 @@
 
 	function	iif_echo($bool,$a,$b)
 	{
-		if($bool)
-		{
-			echo $a;
-		}
-		else
-		{
-			echo $b;
-		}
+		echo iif($bool,$a,$b);
 	}
 
-	function	convert_units($value,$units,$multiplier)
+	function	convert_units($value,$units)
 	{
 // Special processing for seconds
 		if($units=="s")
@@ -100,8 +93,6 @@
 		}
 
 		$u="";
-
-		$value=$value*pow(1024,(int)$multiplier);
 
 		if($units=="")
 		{
@@ -1152,10 +1143,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 ?>
 
+	<p>
+
 	<table border=0 cellspacing=0 cellpadding=0 width=100% bgcolor=000000>
 	<tr>
 	<td valign="top">
-		<table width=100% border=0 cellspacing=1 cellpadding=3>
+		<table width=100% border=0 cellspacing=1 cellpadding=2>
 		<tr>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 <?php
@@ -1178,7 +1171,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 <?php
 				if(check_anyright("Host","R"))
 				{
-					echo "<a href=\"tr_status.php?notitle=true&onlytrue=true&noactions=true&compact=true\">";
+					echo "<a href=\"tr_status.php?onlytrue=true&noactions=true&compact=true\">";
 				}
 				if($page["file"]=="tr_status.php")
 				{
@@ -1565,7 +1558,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	</tr>
 	</table>
 
-	<br>
+	</p>
+
 <?php
 		}
 	}
@@ -1883,7 +1877,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Update Item definition
 
-	function	update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta)
+	function	update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula)
 	{
 		global	$ERROR_MSG;
 
@@ -1909,7 +1903,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$delta=0;
 		}
 
-		$sql="update items set description='$description',key_='$key',hostid=$hostid,delay=$delay,history=$history,lastdelete=0,nextcheck=0,status=$status,type=$type,snmp_community='$snmp_community',snmp_oid='$snmp_oid',value_type=$value_type,trapper_hosts='$trapper_hosts',snmp_port=$snmp_port,units='$units',multiplier=$multiplier,delta=$delta where itemid=$itemid";
+		$key=addslashes($key);
+		$description=addslashes($description);
+		$snmpv3_securityname=addslashes($snmpv3_securityname);
+		$snmpv3_authpassphrase=addslashes($snmpv3_authpassphrase);
+		$snmpv3_privpassphrase=addslashes($snmpv3_privpassphrase);
+
+		$sql="update items set description='$description',key_='$key',hostid=$hostid,delay=$delay,history=$history,lastdelete=0,nextcheck=0,status=$status,type=$type,snmp_community='$snmp_community',snmp_oid='$snmp_oid',value_type=$value_type,trapper_hosts='$trapper_hosts',snmp_port=$snmp_port,units='$units',multiplier=$multiplier,delta=$delta,snmpv3_securityname='$snmpv3_securityname',snmpv3_securitylevel=$snmpv3_securitylevel,snmpv3_authpassphrase='$snmpv3_authpassphrase',snmpv3_privpassphrase='$snmpv3_privpassphrase',formula='$formula' where itemid=$itemid";
 		return	DBexecute($sql);
 	}
 
@@ -2332,7 +2332,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Add Item definition
 
-	function	add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta)
+	function	add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula)
 	{
 		global	$ERROR_MSG;
 
@@ -2369,8 +2369,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		$key=addslashes($key);
 		$description=addslashes($description);
+		$snmpv3_securityname=addslashes($snmpv3_securityname);
+		$snmpv3_authpassphrase=addslashes($snmpv3_authpassphrase);
+		$snmpv3_privpassphrase=addslashes($snmpv3_privpassphrase);
 
-		$sql="insert into items (description,key_,hostid,delay,history,lastdelete,nextcheck,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta) values ('$description','$key',$hostid,$delay,$history,0,0,$status,$type,'$snmp_community','$snmp_oid',$value_type,'$trapper_hosts',$snmp_port,'$units',$multiplier,$delta)";
+		$sql="insert into items (description,key_,hostid,delay,history,lastdelete,nextcheck,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula) values ('$description','$key',$hostid,$delay,$history,0,0,$status,$type,'$snmp_community','$snmp_oid',$value_type,'$trapper_hosts',$snmp_port,'$units',$multiplier,$delta,'$snmpv3_securityname',$snmpv3_securitylevel,'$snmpv3_authpassphrase','$snmpv3_privpassphrase','$formula')";
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"items","itemid");
 	}
@@ -2706,7 +2709,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Add System Map
 
-	function	add_sysmap($name,$width,$height)
+	function	add_sysmap($name,$width,$height,$background)
 	{
 		global	$ERROR_MSG;
 
@@ -2716,7 +2719,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return 0;
 		}
 
-		$sql="insert into sysmaps (name,width,height) values ('$name',$width,$height)";
+		$sql="insert into sysmaps (name,width,height,background) values ('$name',$width,$height,load_file('".$background["tmp_name"]."'))";
 		return	DBexecute($sql);
 	}
 
@@ -3394,20 +3397,20 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		cr();
 	}
 
-	function	show_table3_h_delimiter()
+	function	show_table3_h_delimiter($width=10)
 	{
 //		echo "</font>";
 		cr();
 		echo "</td>";
 		cr();
-		echo "<td width=%10 colspan=1 bgcolor=99AABB align=right valign=\"top\">";
+		echo "<td width=$width% colspan=1 bgcolor=99AABB align=right valign=\"top\">";
 		cr();
 //		echo "	<font size=-1>";
 		cr();
 	}
 
 
-	function	show_table_v_delimiter()
+	function	show_table_v_delimiter($colspan=1)
 	{
 //		echo "</font>";
 		cr();
@@ -3417,7 +3420,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		cr();
 		echo "<tr>";
 		cr();
-		echo "<td colspan=1 bgcolor=FFFFFF align=center valign=\"top\">";
+		echo "<td colspan=$colspan bgcolor=FFFFFF align=center valign=\"top\">";
 		cr();
 //		echo "<font size=2>";
 		cr();
@@ -3518,11 +3521,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		cr();
 		echo "<td valign=\"top\">";
 		cr();
-		echo "<table width=100% border=0 cellspacing=1 cellpadding=3>";
+		echo "<table width=100% border=0 cellspacing=1 cellpadding=1>";
 		cr();
 		echo "<tr>";
 		cr();
-		echo "<td colspan=1 bgcolor=99AABB align=left valign=\"top\">";
+		echo "<td colspan=1 bgcolor=99AABB align=left valign=\"medium\">";
 		cr();
 //		echo "	<font size=+1>";
 		cr();
@@ -3844,11 +3847,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		global $USER_DETAILS;
 
-		echo "<br>";
+		echo "<p>";
+
 		echo "<table border=0 cellpadding=1 cellspacing=0 width=100% align=center>";
 		echo "<tr>";
 		echo "<td bgcolor=\"#000000\">";
-		echo "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\" width=100% bgcolor=\"#666666\">";
+		echo "<table border=\"0\" cellspacing=\"0\" cellpadding=\"1\" width=100% bgcolor=\"#666666\">";
 		echo "<tr><td align=center>";
 		echo "<a href=\"http://www.zabbix.com\">".S_ZABBIX_VER."</a>&nbsp;".S_COPYRIGHT_BY."<a href=\"mailto:alex@gobbo.caves.lv\">".S_ALEXEI_VLADISHEV."</a>";
 		echo "</td>";
@@ -3860,6 +3864,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "</td>";
 		echo "</tr>";
 		echo "</table>";
+
+		echo "</p>";
 
 		echo "</body>";
 	}
@@ -4436,4 +4442,141 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 	}
 
+
+	function time_navigator($resource="graphid",$id)
+	{
+	echo "<TABLE BORDER=0 align=center COLS=2 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=1>";
+	echo "<TR BGCOLOR=#FFFFFF>";
+	echo "<TD ALIGN=LEFT>";
+
+	echo "<div align=left>";
+	echo "<b>".S_PERIOD.":</b>&nbsp;";
+
+	$hour=3600;
+		
+		$a=array(S_1H=>3600,S_2H=>2*3600,S_4H=>4*3600,S_8H=>8*3600,S_12H=>12*3600,
+			S_24H=>24*3600,S_WEEK_SMALL=>7*24*3600,S_MONTH_SMALL=>31*24*3600,S_YEAR_SMALL=>365*24*3600);
+		foreach($a as $label=>$sec)
+		{
+			echo "[";
+			if($_GET["period"]>$sec)
+			{
+				$tmp=$_GET["period"]-$sec;
+				echo("<A HREF=\"charts.php?period=$tmp".url_param($resource).url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">-</A>");
+			}
+			else
+			{
+				echo "-";
+			}
+
+			echo("<A HREF=\"charts.php?period=$sec".url_param($resource).url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">");
+			echo($label."</A>");
+
+			$tmp=$_GET["period"]+$sec;
+			echo("<A HREF=\"charts.php?period=$tmp".url_param($resource).url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">+</A>");
+
+			echo "]&nbsp;";
+		}
+
+		echo("</div>");
+
+	echo "</TD>";
+	echo "<TD BGCOLOR=#FFFFFF WIDTH=15% ALIGN=RIGHT>";
+	echo "<b>".nbsp(S_KEEP_PERIOD).":</b>&nbsp;";
+		if($_GET["keep"] == 1)
+		{
+			echo("[<A HREF=\"charts.php?keep=0".url_param($resource).url_param("from").url_param("period").url_param("fullscreen")."\">".S_ON_C."</a>]");
+		}
+		else
+		{
+			echo("[<A HREF=\"charts.php?keep=1".url_param($resource).url_param("from").url_param("period").url_param("fullscreen")."\">".S_OFF_C."</a>]");
+		}
+	echo "</TD>";
+	echo "</TR>";
+	echo "<TR BGCOLOR=#FFFFFF>";
+	echo "<TD>";
+	if(isset($_GET["stime"]))
+	{
+		echo "<div align=left>" ;
+		echo "<b>".S_MOVE.":</b>&nbsp;" ;
+
+		$day=24;
+// $a already defined
+//		$a=array("1h"=>1,"2h"=>2,"4h"=>4,"8h"=>8,"12h"=>12,
+//			"24h"=>24,"week"=>7*24,"month"=>31*24,"year"=>365*24);
+		foreach($a as $label=>$hours)
+		{
+			echo "[";
+
+			$stime=$_GET["stime"];
+			$tmp=mktime(substr($stime,8,2),substr($stime,10,2),0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
+			$tmp=$tmp-3600*$hours;
+			$tmp=date("YmdHi",$tmp);
+			echo("<A HREF=\"charts.php?stime=$tmp".url_param($resource).url_param("period").url_param("keep").url_param("fullscreen")."\">-</A>");
+
+			echo($label);
+
+			$stime=$_GET["stime"];
+			$tmp=mktime(substr($stime,8,2),substr($stime,10,2),0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
+			$tmp=$tmp+3600*$hours;
+			$tmp=date("YmdHi",$tmp);
+			echo("<A HREF=\"charts.php?stime=$tmp".url_param($resource).url_param("period").url_param("keep").url_param("fullscreen")."\">+</A>");
+
+			echo "]&nbsp;";
+		}
+		echo("</div>");
+	}
+	else
+	{
+		echo "<div align=left>";
+		echo "<b>".S_MOVE.":</b>&nbsp;";
+
+		$day=24;
+// $a already defined
+//		$a=array("1h"=>1,"2h"=>2,"4h"=>4,"8h"=>8,"12h"=>12,
+//			"24h"=>24,"week"=>7*24,"month"=>31*24,"year"=>365*24);
+		foreach($a as $label=>$hours)
+		{
+			echo "[";
+			$tmp=$_GET["from"]+$hours;
+			echo("<A HREF=\"charts.php?from=$tmp".url_param($resource).url_param("period").url_param("keep").url_param("fullscreen")."\">-</A>");
+
+			echo($label);
+
+			if($_GET["from"]>=$hours)
+			{
+				$tmp=$_GET["from"]-$hours;
+				echo("<A HREF=\"charts.php?from=$tmp".url_param($resource).url_param("period").url_param("keep").url_param("fullscreen")."\">+</A>");
+			}
+			else
+			{
+				echo "+";
+			}
+
+			echo "]&nbsp;";
+		}
+		echo("</div>");
+	}
+	echo "</TD>";
+	echo "<TD BGCOLOR=#FFFFFF WIDTH=15% ALIGN=RIGHT>";
+//		echo("<div align=left>");
+		echo "<form method=\"put\" action=\"charts.php\">";
+		echo "<input name=\"graphid\" type=\"hidden\" value=\"".$_GET[$resource]."\" size=12>";
+		echo "<input name=\"period\" type=\"hidden\" value=\"".(9*3600)."\" size=12>";
+		if(isset($_GET["stime"]))
+		{
+			echo "<input name=\"stime\" class=\"biginput\" value=\"".$_GET["stime"]."\" size=12>";
+		}
+		else
+		{
+			echo "<input name=\"stime\" class=\"biginput\" value=\"yyyymmddhhmm\" size=12>";
+		}
+		echo "&nbsp;";
+		echo "<input class=\"button\" type=\"submit\" name=\"action\" value=\"go\">";
+		echo "</form>";
+//		echo("</div>");
+	echo "</TD>";
+	echo "</TR>";
+	echo "</TABLE>";
+	}
 ?>

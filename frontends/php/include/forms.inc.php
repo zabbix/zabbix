@@ -119,9 +119,16 @@
 		$hostid=@iif(isset($_GET["hostid"]),$_GET["hostid"],0);
 		$delta=@iif(isset($_GET["delta"]),$_GET["delta"],0);
 
+		$snmpv3_securityname=@iif(isset($_GET["snmpv3_securityname"]),$_GET["snmpv3_securityname"],"");
+		$snmpv3_securitylevel=@iif(isset($_GET["snmpv3_securitylevel"]),$_GET["snmpv3_securitylevel"],0);
+		$snmpv3_authpassphrase=@iif(isset($_GET["snmpv3_authpassphrase"]),$_GET["snmpv3_authpassphrase"],"");
+		$snmpv3_privpassphrase=@iif(isset($_GET["snmpv3_privpassphrase"]),$_GET["snmpv3_privpassphrase"],"")
+;
+		$formula=@iif(isset($_GET["formula"]),$_GET["formula"],"1");
+
 		if(isset($_GET["register"])&&($_GET["register"] == "change"))
 		{
-			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.snmp_port,i.units,i.multiplier,h.hostid,i.delta,i.trends from items i,hosts h where i.itemid=".$_GET["itemid"]." and h.hostid=i.hostid");
+			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.snmp_port,i.units,i.multiplier,h.hostid,i.delta,i.trends,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula from items i,hosts h where i.itemid=".$_GET["itemid"]." and h.hostid=i.hostid");
 		
 			$description=DBget_field($result,0,0);
 			$key=DBget_field($result,0,1);
@@ -141,6 +148,13 @@
 			$hostid=DBget_field($result,0,15);
 			$delta=DBget_field($result,0,16);
 			$trends=DBget_field($result,0,17);
+
+			$snmpv3_securityname=DBget_field($result,0,18);
+			$snmpv3_securitylevel=DBget_field($result,0,19);
+			$snmpv3_authpassphrase=DBget_field($result,0,20);
+			$snmpv3_privpassphrase=DBget_field($result,0,21);
+
+			$formula=DBget_field($result,0,22);
 		}
 
 		echo "<br>";
@@ -181,28 +195,39 @@
 		show_table2_v_delimiter();
 		echo S_TYPE;
 		show_table2_h_delimiter();
+
 		echo "<SELECT class=\"biginput\" NAME=\"type\" value=\"$type\" size=\"1\" onChange=\"submit()\">";
 		echo "<OPTION VALUE=\"0\"";
-		if($type==0) echo "SELECTED";
+		if($type==ITEM_TYPE_ZABBIX) echo "SELECTED";
 		echo ">Zabbix agent";
+
 		echo "<OPTION VALUE=\"3\"";
-		if($type==3) echo "SELECTED";
+		if($type==ITEM_TYPE_SIMPLE) echo "SELECTED";
 		echo ">Simple check";
+
 		echo "<OPTION VALUE=\"1\"";
-		if($type==1) echo "SELECTED";
+		if($type==ITEM_TYPE_SNMPV1) echo "SELECTED";
 		echo ">SNMPv1 agent";
+
 		echo "<OPTION VALUE=\"4\"";
-		if($type==4) echo "SELECTED";
+		if($type==ITEM_TYPE_SNMPV2C) echo "SELECTED";
 		echo ">SNMPv2 agent";
+
+		echo "<OPTION VALUE=\"6\"";
+		if($type==ITEM_TYPE_SNMPV3) echo "SELECTED";
+		echo ">SNMPv3 agent";
+
 		echo "<OPTION VALUE=\"2\"";
-		if($type==2) echo "SELECTED";
+		if($type==ITEM_TYPE_TRAPPER) echo "SELECTED";
 		echo ">Zabbix trapper";
+
 		echo "<OPTION VALUE=\"5\"";
-		if($type==5) echo "SELECTED";
+		if($type==ITEM_TYPE_INTERNAL) echo "SELECTED";
 		echo ">Zabbix internal";
+
 		echo "</SELECT>";
 
-		if(($type==1)||($type==4))
+		if(($type==ITEM_TYPE_SNMPV1)||($type==ITEM_TYPE_SNMPV2C))
 		{ 
 			show_table2_v_delimiter();
 			echo nbsp(S_SNMP_COMMUNITY);
@@ -218,12 +243,69 @@
 			echo nbsp(S_SNMP_PORT);
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"snmp_port\" value=\"$snmp_port\" size=5>";
+
+			echo "<input class=\"biginput\" name=\"snmpv3_securityname\" type=hidden value=\"$snmpv3_securityname\">";
+			echo "<input class=\"biginput\" name=\"snmpv3_securitylevel\" type=hidden value=\"$snmpv3_securitylevel\">";
+			echo "<input class=\"biginput\" name=\"snmpv3_authpassphrase\" type=hidden value=\"$snmpv3_authpassphrase\">";
+			echo "<input class=\"biginput\" name=\"snmpv3_privpassphrase\" type=hidden value=\"$snmpv3_privpassphrase\">";
+		}
+		else if($type==ITEM_TYPE_SNMPV3)
+		{
+			show_table2_v_delimiter();
+			echo nbsp(S_SNMP_OID);
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"snmp_oid\" value=\"$snmp_oid\" size=40>";
+
+			show_table2_v_delimiter();
+			echo nbsp(S_SNMPV3_SECURITY_NAME);
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"snmpv3_securityname\" value=\"$snmpv3_securityname\" size=64>";
+
+			show_table2_v_delimiter();
+			echo nbsp(S_SNMPV3_SECURITY_LEVEL);
+			show_table2_h_delimiter();
+			echo "<SELECT class=\"biginput\" NAME=\"snmpv3_securitylevel\" value=\"$snmpv3_securitylevel\" size=\"1\">";
+			echo "<OPTION VALUE=\"0\"";
+			if($snmpv3_securitylevel==ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) echo "SELECTED";
+			echo ">NoAuthPriv";
+
+			echo "<OPTION VALUE=\"1\"";
+			if($snmpv3_securitylevel==ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) echo "SELECTED";
+			echo ">AuthNoPriv";
+
+			echo "<OPTION VALUE=\"2\"";
+			if($snmpv3_securitylevel==ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) echo "SELECTED";
+			echo ">AuthPriv";
+
+			echo "</SELECT>";
+
+			show_table2_v_delimiter();
+			echo nbsp(S_SNMPV3_AUTH_PASSPHRASE);
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"snmpv3_authpassphrase\" value=\"$snmpv3_authpassphrase\" size=64>";
+
+			show_table2_v_delimiter();
+			echo nbsp(S_SNMPV3_PRIV_PASSPHRASE);
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"snmpv3_privpassphrase\" value=\"$snmpv3_privpassphrase\" size=64>";
+
+			show_table2_v_delimiter();
+			echo nbsp(S_SNMP_PORT);
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"snmp_port\" value=\"$snmp_port\" size=5>";
+
+			echo "<input class=\"biginput\" name=\"snmp_community\" type=hidden value=\"$snmp_community\">";
 		}
 		else
 		{
 			echo "<input class=\"biginput\" name=\"snmp_community\" type=hidden value=\"$snmp_community\">";
 			echo "<input class=\"biginput\" name=\"snmp_oid\" type=hidden value=\"$snmp_oid\">";
 			echo "<input class=\"biginput\" name=\"snmp_port\" type=hidden value=\"$snmp_port\">";
+
+			echo "<input class=\"biginput\" name=\"snmpv3_securityname\" type=hidden value=\"$snmpv3_securityname\">";
+			echo "<input class=\"biginput\" name=\"snmpv3_securitylevel\" type=hidden value=\"$snmpv3_securitylevel\">";
+			echo "<input class=\"biginput\" name=\"snmpv3_authpassphrase\" type=hidden value=\"$snmpv3_authpassphrase\">";
+			echo "<input class=\"biginput\" name=\"snmpv3_privpassphrase\" type=hidden value=\"$snmpv3_privpassphrase\">";
 		}
 
 		show_table2_v_delimiter();
@@ -237,22 +319,24 @@
 		echo "<input class=\"biginput\" name=\"units\" value=\"$units\" size=10>";
 
 		show_table2_v_delimiter();
-		echo S_MULTIPLIER;
+		echo S_USE_MULTIPLIER;
 		show_table2_h_delimiter();
-		echo "<SELECT class=\"biginput\" NAME=\"multiplier\" value=\"$multiplier\" size=\"1\">";
-		echo "<OPTION VALUE=\"0\"";
-		if($multiplier==0) echo "SELECTED";
-		echo ">-";
-		echo "<OPTION VALUE=\"1\"";
-		if($multiplier==1) echo "SELECTED";
-		echo ">K (1024)";
-		echo "<OPTION VALUE=\"2\"";
-		if($multiplier==2) echo "SELECTED";
-		echo ">M (1024^2)";
-		echo "<OPTION VALUE=\"3\"";
-		if($multiplier==3) echo "SELECTED";
-		echo ">G (1024^3)";
+		echo "<SELECT class=\"biginput\" NAME=\"multiplier\" value=\"$multiplier\" size=\"1\" onChange=\"submit()\">";
+		echo "<OPTION VALUE=\"0\""; if($multiplier==0) echo "SELECTED"; echo ">".S_DO_NOT_USE;
+		echo "<OPTION VALUE=\"1\" "; if($multiplier==1) echo "SELECTED"; echo ">".S_CUSTOM_MULTIPLIER;
 		echo "</SELECT>";
+
+		if($multiplier == 1)
+		{
+			show_table2_v_delimiter();
+			echo nbsp(S_CUSTOM_MULTIPLIER);
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"formula\" value=\"$formula\" size=40>";
+		}
+		else
+		{
+			echo "<input class=\"biginput\" name=\"formula\" type=hidden value=\"$formula\">";
+		}
 
 		if($type!=2)
 		{
@@ -326,6 +410,7 @@
 		{
 			echo "<input class=\"biginput\" name=\"trapper_hosts\" type=hidden value=\"$trapper_hosts\">";
 		}
+
  
 		show_table2_v_delimiter2();
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";

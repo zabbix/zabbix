@@ -19,10 +19,9 @@
 **/
 ?>
 <?php
+	include "include/config.inc.php";
 	$page["title"] = S_IT_SERVICES;
 	$page["file"] = "srv_status.php";
-
-	include "include/config.inc.php";
 	show_header($page["title"],30,0);
 ?>
  
@@ -45,9 +44,9 @@
 
 	$now=time();
 	$result=DBselect("select serviceid,name,triggerid,status,showsla,goodsla from services order by sortorder,name");
-	echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";
+	echo "<table border=0 width=100% bgcolor='#AAAAAA' cellspacing=1 cellpadding=3>";
 	echo "\n";
-	echo "<tr>";
+	echo "<tr bgcolor='#CCCCCC'>";
 	echo "<td width=40%><b>".S_SERVICE."</b></td>";
 	echo "<td width=10%><b>".S_STATUS."</b></td>";
 	echo "<td><b>".S_REASON."</b></td>";
