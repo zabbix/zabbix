@@ -47,11 +47,9 @@
 	#include <sys/ipc.h>
 	#include <sys/msg.h>
 
-    struct poller_msgbuf {
-        long mtype;  /* must be positive */
-        int num;
-        int ret;
-	double		value;
+    struct poller_request_buf {
+        long	mtype;  /* must be positive */
+        int	num;
 
 	int	type;
 	int	port;
@@ -63,8 +61,15 @@
 	char	snmp_community[MAX_ITEM_SNMP_COMMUNITY_LEN];
 //	char	snmp_oid[MAX_ITEM_SNMP_OID_LEN];
 	int	snmp_port;
+    };
 
+    struct poller_answer_buf {
+        long	mtype;  /* must be positive */
+        int	num;
+        int	ret;
+	double	value;
 	char	value_str[100];
+
     };
 #endif
 
@@ -459,35 +464,36 @@ void	trend(void)
 
 int poller(void)
 {
-	struct poller_msgbuf buf;
+	struct poller_request_buf request;
+	struct poller_answer_buf answer;
 
 	DB_ITEM		item;
 
 	for(;;)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Poller: Waiting for a request" );
-		if(-1 == msgrcv(requests_queue,&buf,sizeof(buf),1,0))
+		if(-1 == msgrcv(requests_queue,&request,sizeof(request),1,0))
 		{
 			zabbix_log( LOG_LEVEL_ERR, "Error doing msgrcv()" );
 		}
-		zabbix_log( LOG_LEVEL_ERR, "Got value for polling. Type [%d] Port [%d] IP [%s] Use IP [%d] Value type [%d] Key [%s]", buf.type, buf.port, buf.ip,buf.useip,buf.value_type, buf.key );
+		zabbix_log( LOG_LEVEL_ERR, "Got value for polling. Type [%d] Port [%d] IP [%s] Use IP [%d] Value type [%d] Key [%s]", request.type, request.port, request.ip,request.useip,request.value_type, request.key );
 
-		item.type = buf.type;
-		item.value_type = buf.value_type;
-		item.port = buf.port;
-		item.useip = buf.useip;
-		item.snmp_port = buf.snmp_port;
-		item.key=buf.key;
-		item.host=buf.host;
-		item.ip=buf.ip;
-		item.snmp_community=buf.snmp_community;
+		item.type = request.type;
+		item.value_type = request.value_type;
+		item.port = request.port;
+		item.useip = request.useip;
+		item.snmp_port = request.snmp_port;
+		item.key=request.key;
+		item.host=request.host;
+		item.ip=request.ip;
+		item.snmp_community=request.snmp_community;
 //		item.snmp_oid=buf.snmp_oid;
 
-		buf.mtype = 1;
-		buf.ret = get_value(&buf.value,buf.value_str,&item);
+		answer.mtype = 1;
+		answer.ret = get_value(&answer.value,answer.value_str,&item);
 
 		zabbix_log( LOG_LEVEL_ERR, "Poller: Sending result back" );
-		if(-1 == msgsnd(answers_queue, &buf, sizeof(buf), 0))
+		if(-1 == msgsnd(answers_queue, &answer, sizeof(answer), 0))
 		{
 			zabbix_log( LOG_LEVEL_ERR, "Poller: Error doing msgsnd()" );
 		}
@@ -512,7 +518,8 @@ int get_values_new(void)
 	int	host_status;
 	int	network_errors;
 
-	struct poller_msgbuf buf;
+	struct poller_request_buf request;
+	struct poller_answer_buf answer;
 
 	now = time(NULL);
 
@@ -591,37 +598,37 @@ int get_values_new(void)
 		item.units=DBget_field(result,i,23);
 		item.multiplier=atoi(DBget_field(result,i,24));
 
-		buf.mtype = 1;
-		buf.num = i;
-		buf.type = item.type;
-		buf.value_type = item.value_type;
-		buf.port = item.port;
-		buf.useip = item.useip;
-		buf.snmp_port = item.snmp_port;
+		request.mtype = 1;
+		request.num = i;
+		request.type = item.type;
+		request.value_type = item.value_type;
+		request.port = item.port;
+		request.useip = item.useip;
+		request.snmp_port = item.snmp_port;
 
-		strncpy(buf.key, item.key, MAX_ITEM_KEY_LEN);
-		strncpy(buf.host, item.host, MAX_HOST_HOST_LEN);
-		strncpy(buf.ip, item.ip, MAX_ITEM_IP_LEN);
-		strncpy(buf.snmp_community, item.snmp_community, MAX_ITEM_SNMP_COMMUNITY_LEN);
+		strncpy(request.key, item.key, MAX_ITEM_KEY_LEN);
+		strncpy(request.host, item.host, MAX_HOST_HOST_LEN);
+		strncpy(request.ip, item.ip, MAX_ITEM_IP_LEN);
+		strncpy(request.snmp_community, item.snmp_community, MAX_ITEM_SNMP_COMMUNITY_LEN);
 //		strncpy(buf.snmp_oid, item.snmp_oid, MAX_ITEM_SNMP_OID_LEN);
 
-		if(-1 == msgsnd(requests_queue, &buf, sizeof(buf), 0))
+		if(-1 == msgsnd(requests_queue, &request, sizeof(request), 0))
 		{
-			zabbix_log( LOG_LEVEL_ERR, "Get values: Error doing msgsnd(%d) [%m]", sizeof(buf) );
+			zabbix_log( LOG_LEVEL_ERR, "Get values: Error doing msgsnd(%d) [%m]", sizeof(request) );
 		}
-		zabbix_log( LOG_LEVEL_ERR, "Putting value [%d] into requests_queue. Msg size [%d]", i, sizeof(buf));
+		zabbix_log( LOG_LEVEL_ERR, "Putting value [%d] into requests_queue. Msg size [%d]", i, sizeof(request));
 	}
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
-		if(-1 == msgrcv(answers_queue,&buf,sizeof(buf),1,0))
+		if(-1 == msgrcv(answers_queue,&answer,sizeof(answer),1,0))
 		{
 			zabbix_log( LOG_LEVEL_ERR, "Error doing msgrcv() [%m]" );
 		}
-		zabbix_log( LOG_LEVEL_ERR, "Getting value from answers_queue. Res [%d] Num [%d]", buf.ret, buf.num );
+		zabbix_log( LOG_LEVEL_ERR, "Getting value from answers_queue. Res [%d] Num [%d]", answer.ret, answer.num );
 
-		j=buf.num;
-		res = buf.ret;
+		j=answer.num;
+		res = answer.ret;
 
 		item.itemid=atoi(DBget_field(result,j,0));
 		item.key=DBget_field(result,j,1);
@@ -690,8 +697,8 @@ int get_values_new(void)
 		item.units=DBget_field(result,j,23);
 		item.multiplier=atoi(DBget_field(result,j,24));
 
-		strncpy(value_str,buf.value_str, MAX_STRING_LEN);
-		value = buf.value;
+		strncpy(value_str,answer.value_str, MAX_STRING_LEN);
+		value = answer.value;
 
 //		res = get_value(&value,value_str,&item);
 		zabbix_log( LOG_LEVEL_ERR, "GOT VALUE [%s]", value_str );
