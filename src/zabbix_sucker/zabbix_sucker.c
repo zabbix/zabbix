@@ -7,6 +7,7 @@
 #include <netdb.h>
 
 #include <signal.h>
+#include <errno.h>
 
 #include <time.h>
 
@@ -126,9 +127,9 @@ int	get_value(double *result,char *key,char *host,int port)
 	alarm(SUCKER_TIMEOUT);
 
 	i=recvfrom(s,c,1023,0,(struct sockaddr *)&servaddr_in,&i);
-	if(s==-1)
+	if(i==-1)
 	{
-		dbg_write( dbg_syswarn, "Problem with recvfrom" );
+		dbg_write( dbg_syswarn, "Problem with recvfrom [%d]",errno );
 		close(s);
 		return	FAIL;
 	}
@@ -323,8 +324,8 @@ int main(int argc, char **argv)
 	signal( SIGQUIT, signal_handler );
 	signal( SIGTERM, signal_handler );
 
-	dbg_init( dbg_syswarn, "/var/log/zabbix_sucker.log" );
-//	dbg_init( dbg_proginfo, "/var/log/zabbi_sucker.log" );
+//	dbg_init( dbg_syswarn, "/var/log/zabbix_sucker.log" );
+	dbg_init( dbg_proginfo, "/var/log/zabbix_sucker.log" );
 
 	DBconnect();
 
