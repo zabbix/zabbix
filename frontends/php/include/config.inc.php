@@ -3034,7 +3034,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<input class=\"biginput\" name=\"key\" value=\"$key\" size=40>";
 
 		show_table2_v_delimiter();
-		echo "Delay";
+		echo "Update interval (in sec)";
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"delay\" value=\"$delay\" size=5>";
 
