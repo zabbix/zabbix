@@ -1,5 +1,16 @@
 Changes for 1.1alpha1:
 
+ - added table audit (Alexei)
+ - added audit.php (Alexei)
+ - new default port numbers for agent and trapper, 10050 and 10051 (Alexei)
+ - better internal coding standard for ZABBIX agent (Alexei)
+ - added support for md5sum for files less than 64M (Alexei)
+ - added include md5.c and md5.h (Alexei)
+ - remove trends.php, trend.php (Alexei)
+ - remove compare.php, chart3.php (Alexei)
+ - show trigger dependencies in list of configuration of triggers (Alexei)
+ - make Zabbix reset nextcheck for items when updating or adding a trigger (Alexei)
+ - minimum value of PingerFrequency changed to 1 (Alexei)
  - different icons depending on a triger status for sysmaps (Alexei)
  - added column sysmaps_hosts.icon_on (Alexei)
  - hierarchial maps (Alexei)

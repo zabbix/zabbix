@@ -296,7 +296,7 @@
 
 <?php
 	$host=@iif(isset($_GET["host"]),$_GET["host"],"");
-	$port=@iif(isset($_GET["port"]),$_GET["port"],get_profile("HOST_PORT",10000));
+	$port=@iif(isset($_GET["port"]),$_GET["port"],get_profile("HOST_PORT",10050));
 	$status=@iif(isset($_GET["status"]),$_GET["status"],0);
 	$useip=@iif(isset($_GET["useip"]),$_GET["useip"],"off");
 	$newgroup=@iif(isset($_GET["newgroup"]),$_GET["newgroup"],"");

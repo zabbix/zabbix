@@ -1232,7 +1232,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				}
 ?>
 		</td>
-		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
+		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
 <?php
 				if(check_anyright("Default permission","R"))
 				{
@@ -1355,7 +1355,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				}
 ?>
 		</td>
-		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
+		<td colspan=3 bgcolor=FFFFFF align=center valign=top width=15%>
 <?php
 				if(check_anyright("Default permission","R"))
 				{
@@ -1373,7 +1373,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				}
 ?>
 		</td>
-		<td colspan=3 bgcolor=FFFFFF align=center valign=top width=15%>
+		<td colspan=4 bgcolor=FFFFFF align=center valign=top width=15%>
 <?php
 				if(check_anyright("Host","R"))
 				{
@@ -1442,6 +1442,22 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				else
 				{
 					echo S_MENU_USERS."</a>";
+				}
+?>
+		</td>
+		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
+<?php
+				if(check_anyright("Audit","U"))
+				{
+					echo "<a href=\"audit.php\">";
+				}
+				if($page["file"]=="audit.php")
+				{
+					echo "<b>[".S_MENU_AUDIT."]</b></a>";
+				}
+				else
+				{
+					echo S_MENU_AUDIT."</a>";
 				}
 ?>
 		</td>
@@ -2514,6 +2530,20 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
 
+	# Reset nextcheck for related items
+
+	function	reset_items_nextcheck($triggerid)
+	{
+		$sql="select itemid from functions where triggerid=$triggerid";
+		$result=DBselect($sql);
+		for($i=0;$i<DBnum_rows($result);$i++)
+		{
+			$itemid=DBget_field($result,$i,0);
+			$sql="update items set nextcheck=0 where itemid=$itemid";
+			DBexecute($sql);
+		}
+	}
+
 	# Add Trigger definition
 
 	function	add_trigger($expression,$description,$priority,$status,$comments,$url)
@@ -2542,7 +2572,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		$expression=implode_exp($expression,$triggerid);
 		$sql="update triggers set expression='$expression' where triggerid=$triggerid";
 #		echo $sql,"<br>";
-		return	DBexecute($sql);
+		$triggerid=DBexecute($sql);
+		reset_items_nextcheck($triggerid);
+		return $triggerid;
 	}
 
 	# Delete Trigger definition
@@ -2608,6 +2640,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		$expression=implode_exp($expression,$triggerid);
 		add_alarm($triggerid,2);
 //		$sql="update triggers set expression='$expression',description='$description',priority=$priority,status=$status,comments='$comments',url='$url' where triggerid=$triggerid";
+		reset_items_nextcheck($triggerid);
 		$sql="update triggers set expression='$expression',description='$description',priority=$priority,status=$status,comments='$comments',url='$url',value=2 where triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
@@ -2623,6 +2656,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$ERROR_MSG="Insufficient permissions";
 			return 0;
 		}
+
+		add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,"User alias [$alias] name [$name] surname [$surname]");
 
 		if($passwd=="")
 		{
@@ -2655,6 +2690,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$ERROR_MSG="Insufficient permissions";
 			return 0;
 		}
+		
+		add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_USER,"User alias [$alias] name [$name] surname [$surname]");
 
 		$passwd=md5($passwd);
 		$sql="insert into users (name,surname,alias,passwd,url) values ('$name','$surname','$alias','$passwd','$url')";
@@ -3143,10 +3180,30 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
 
+	function	get_mediatype_by_mediatypeid($mediatypeid)
+	{
+		global	$ERROR_MSG;
+
+		$sql="select * from media_type where mediatypeid=$mediatypeid";
+		$result=DBselect($sql);
+		if(DBnum_rows($result) == 1)
+		{
+			return	DBfetch($result);	
+		}
+		else
+		{
+			$ERROR_MSG="No media type with with mediatypeid=[$mediatypeid]";
+		}
+		return	$item;
+	}
+
 	# Delete media type
 
 	function	delete_mediatype($mediatypeid)
 	{
+		$mediatype=get_mediatype_by_mediatypeid($mediatypeid);
+		add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MEDIA_TYPE,"Media type [".$mediatype["description"]."]");
+
 		delete_media_by_mediatypeid($mediatypeid);
 		delete_alerts_by_mediatypeid($mediatypeid);
 		$sql="delete from media_type where mediatypeid=$mediatypeid";
@@ -3157,6 +3214,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	update_mediatype($mediatypeid,$type,$description,$smtp_server,$smtp_helo,$smtp_email,$exec_path)
 	{
+		$description=addslashes($description);
+		add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MEDIA_TYPE,"Media type [$description]");
 		$sql="update media_type set type=$type,description='$description',smtp_server='$smtp_server',smtp_helo='$smtp_helo',smtp_email='$smtp_email',exec_path='$exec_path' where mediatypeid=$mediatypeid";
 		return	DBexecute($sql);
 	}
@@ -3165,6 +3224,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	add_mediatype($type,$description,$smtp_server,$smtp_helo,$smtp_email,$exec_path)
 	{
+		$description=addslashes($description);
+		add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_MEDIA_TYPE,"Media type [$description]");
 		$sql="insert into media_type (type,description,smtp_server,smtp_helo,smtp_email,exec_path) values ($type,'$description','$smtp_server','$smtp_helo','$smtp_email','$exec_path')";
 		return	DBexecute($sql);
 	}
@@ -3231,6 +3292,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$ERROR_MSG="Insufficient permissions";
 			return	0;
 		}
+
+		add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Alarm history [$alarm_history] alert history [$alert_history]");
 
 //		$sql="update config set smtp_server='$smtp_server',smtp_helo='$smtp_helo',smtp_email='$smtp_email',alarm_history=$alarm_history,alert_history=$alert_history";
 		$sql="update config set alarm_history=$alarm_history,alert_history=$alert_history";
@@ -3375,6 +3438,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$ERROR_MSG="Cannot delete user 'guest'";
 			return	0;
 		}
+
+		$user=get_user_by_userid($userid);
+		add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,"User alias [".$user["alias"]."] name [".$user["name"]."] surname [".$user["surname"]."]");
 
 		delete_media_by_userid($userid);
 		delete_actions_by_userid($userid);
@@ -4614,5 +4680,16 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 //		ImageJPEG($image);
 		ImagePNG($image);
+	}
+
+	function add_audit($action,$resource,$details)
+	{
+		global $USER_DETAILS;
+
+		$details=addslashes($details);
+		$userid=$USER_DETAILS["userid"];
+		$clock=time();
+		$sql="insert into audit (userid,clock,action,resource,details) values ($userid,$clock,$action,$resource,'$details')";
+		return DBexecute($sql);
 	}
 ?>

@@ -12,6 +12,10 @@ ZABBIX 1.1
  - custom multiplier
  - support of SNMPv3
  - hierarchial maps
+ - new defaul port numbers to avoid confusion with WebMin
+
+TKOM:
+ - maps with background and attractive icons
 
 --------------------------------------------
 
@@ -24,7 +28,6 @@ ZABBIX 1.1:
  - repeated notifications
  - monitoring of log files
  - audit log
- - new defaul port numbers to avoid confusion with WebMin
  - anvanced SNMP trapper
  - hard-linked templates
  - passing of parameters to user-defined commands (agent)
@@ -34,7 +37,6 @@ ZABBIX 1.1:
 TKOM:
 
  - alarms forwarding to external systems (using SNMP traps, for example)
- - maps with background and attractive icons
  - groups of graphs
  - auto-discovery script
  - alarm/trigger sounds
@@ -97,14 +99,9 @@ Most of the signal handlers all need to delay or block signals to avoid signal r
  - in user administration, add many resources from a list (not by one ID)
  - availability report for day/week/month/etc
  - check if items delay works
- - change location of Zabbix Manual in about.php
  - apply Igor patches for chart.php (calculation of MIN, MAX)
  - review PHP code for simplifying (urls, iif() )
-  - fix screenedit.php permissions
-
- Triggers - v ih spiske videljatj trigera u kotorih estj 'depends on'.
- * K primeru, posle virazhenija pistaj tekst v skobkah (depends on) ili inim
- metodom !
+ - fix screenedit.php permissions
 
  Kak naschet dopolnenij k time & date:
  * tipa weekday, month, day, year, hour, minute, ...
@@ -117,11 +114,8 @@ Most of the signal handlers all need to delay or block signals to avoid signal r
  - add requirement for fping to the manual
  - separate login.php and index.php
  - add gaps to graph when no data present
- - make Zabbix reset nextcheck for items when updating or adding a trigger
  - remove icmpping and others from the QUEUE
  - escalation and repeated notifications
- - take advantage of PHP OOP (everything in classes)
- - improve WEB site to provide understanding of Zabbix and its concepts
 
  - summarising report about triggers/actions/items. Show items without triggers,
 trigger wihout actions, etc etc
@@ -270,8 +264,6 @@ TOP PRIORITY:
 
  - fix update of 'status'. When added it never gets updated, if server is already unreachable.
  - pay attention to Solaris agent
- - better viewing of trigger dependencies
- - do not show "all" if no groups defined
  - add more checks for forms (check all possible wrong values)
  - support of fetch_html[*]
  - restructure sources
@@ -282,22 +274,12 @@ BUGS:
 
  - add protection from IT Service looping
 
-PERFORMANCE IMPROVEMENTS:
-
- - remove lastvalue, lastclock, prevvalue from table ITEMS
- - is there any need to update datta of table FUNCTIONS? Can it be done in memory only?
-
 DIFFERENT TASKS:
 
- - better monitoring of log files
  - SNMP trapping
- - SNMP v3
  - distributed monitoring
  - backup/restore scripts for server. Backup all (DB, configs, etc).
- - IT Helpdesk
  - personalisation (refresh rate, graph size, default graph period, etc)
- - encryption
- - automated report generation
  - SNMP-walk in WEB interface
  - add UserParameter without restart of an agent
 

@@ -34,7 +34,7 @@ HANDLE eventCollectorStarted;
 DWORD dwFlags=AF_USE_EVENT_LOG;
 char confFile[MAX_PATH]="C:\\zabbix_agentd.conf";
 char logFile[MAX_PATH]="{EventLog}";
-WORD confListenPort=10000;
+WORD confListenPort=10050; // Alexei: New defailt port 10000 -> 10050
 DWORD confServerAddr[MAX_SERVERS];
 DWORD confServerCount=0;
 DWORD confTimeout=3000;    // 3 seconds default timeout

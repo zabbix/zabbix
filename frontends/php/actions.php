@@ -87,8 +87,8 @@
 	$result=DBselect($sql);
 
 	echo "<div align=center>";
-	echo "<TABLE BORDER=0 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR>";
+	echo "<TABLE BORDER=0 WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
+	echo "<TR BGCOLOR=\"#CCCCCC\">";
 	echo "<TD><b>".S_SCOPE."</b></TD>";
 	echo "<TD><b>".S_SEND_MESSAGE_TO."</b></TD>";
 	echo "<TD WIDTH=10%><b>".S_WHEN_TRIGGER."</b></TD>";

@@ -270,6 +270,8 @@ int	do_ping(void)
 
 	while(NULL!=fgets(ip,MAX_STRING_LEN,f))
 	{
+/*		zabbix_log( LOG_LEVEL_WARNING, "PING: [%s]", ip);*/
+
 		ip[strlen(ip)-1]=0;
 		zabbix_log( LOG_LEVEL_DEBUG, "Update IP [%s]", ip);
 

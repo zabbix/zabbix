@@ -103,7 +103,7 @@
 		$description=@iif(isset($_GET["description"]),$_GET["description"],"");
 		$key=@iif(isset($_GET["key"]),$_GET["key"],"");
 		$host=@iif(isset($_GET["host"]),$_GET["host"],"");
-		$port=@iif(isset($_GET["port"]),$_GET["port"],10000);
+		$port=@iif(isset($_GET["port"]),$_GET["port"],10050);
 		$delay=@iif(isset($_GET["delay"]),$_GET["delay"],30);
 		$history=@iif(isset($_GET["history"]),$_GET["history"],90);
 		$trends=@iif(isset($_GET["trends"]),$_GET["trends"],365);
