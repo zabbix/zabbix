@@ -22,7 +22,7 @@ HB:
 
 TOP PRIORITY:
 
- - fix update of 'status'. When added it never gets aupdates, if server is already unrechable.
+ - fix update of 'status'. When added it never gets updated, if server is already unreachable.
  - add support for agent forwarding (proxy)
  - proofread Zabbix Manual  - Ted Rolle <ted@users.sourceforge.net>
  - pay attention to Solaris agent
