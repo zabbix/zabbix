@@ -17,7 +17,14 @@
 
 	if($action=="showhistory")
 	{
-		show_header("$host:$description",$beforenextcheck,0);
+		if(isset($year))
+		{
+			show_header("$host:$description",0,0);
+		}
+		else
+		{
+			show_header("$host:$description",$beforenextcheck,0);
+		}
 	}
 	if($action=="showhistory2")
 	{
@@ -193,13 +200,17 @@
 
 	if($action=="showhistory")
 	{
+		if(!isset($period))
+		{
+			$period=3600;
+		}
 		if(!isset($from))
 		{
 			$from=0;
 		}
-		if(!isset($period))
+		if(isset($year))
 		{
-			$period=3600;
+			$from=($now-mktime($hour, 0, 0, $month, $day,$year))/3600;
 		}
 		@show_history($itemid,$from,$period,0);
 		show_footer();
