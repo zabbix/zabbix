@@ -94,15 +94,14 @@ int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 						}
 						
 					}
-/* Can this be done without "pointer" ? */ 	
-					pointer=(int *)cfg[i].variable;
-					*pointer=var;
+					*((int*)cfg[i].variable)=var;
 				}
 				else
 				{
 /* Can this be done without "c" ? */ 
 					c=(char **)cfg[i].variable;
 					*c=(char *)strdup(value);
+/*					*((char*)cfg[i].variable)=strdup(value);*/
 				}
 				}
 			}
@@ -118,8 +117,9 @@ int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 		{
 			if(cfg[i].type == TYPE_INT)
 			{
-				pointer=(int *)cfg[i].variable;
-				if(*pointer==0)
+/*				pointer=(int *)cfg[i].variable;
+				if(*pointer==0)*/
+				if(*((int*)cfg[i].variable) == 0)
 				{
 					fprintf(stderr,"Missing mandatory parameter [%s]\n", cfg[i].parameter);
 					return	FAIL;
