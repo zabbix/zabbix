@@ -198,7 +198,7 @@ int	evaluate_NODATA(float *nodata,int itemid,int parameter)
 
 	now=time(NULL);
 
-	sprintf(c,"select value from history where itemid=%d and clock>%d-%d limit 1",now,itemid,parameter);
+	sprintf(c,"select value from history where itemid=%d and clock>%d-%d limit 1",itemid,now,parameter);
 
 	result = DBselect(c);
 	if(result==NULL)

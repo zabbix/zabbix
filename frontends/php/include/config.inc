@@ -457,6 +457,7 @@
 	{
 //		echo "Expression:$expression<br>";
 		$exp='';
+		$state="";
 		for($i=0;$i<strlen($expression);$i++)
 		{
 			if($expression[$i] == '{')
@@ -652,6 +653,12 @@
 		$result=DBexecute($sql);
 	}
 
+	function	delete_alarms_by_triggerid($triggerid)
+	{
+		$sql="delete from alarms where triggerid=$triggerid";
+		$result=DBexecute($sql);
+	}
+
 	# Delete Function and Trigger definitions by itemid
 
 	function	delete_triggers_functions_by_itemid($itemid)
@@ -662,9 +669,9 @@
 		{
 			delete_trigger(DBget_field($result,$i,0));
 		}
-
 		$sql="delete from functions where itemid=$itemid";
 		$result=DBexecute($sql);
+
 	}
 
 	# Delete Item definition
@@ -707,10 +714,12 @@
 
 	function	delete_trigger($triggerid)
 	{
+		delete_function_by_triggerid($triggerid);
+		delete_alarms_by_triggerid($triggerid);
+
 		$sql="delete from triggers where triggerid=$triggerid";
 		$result=DBexecute($sql);
 		
-		delete_function_by_triggerid($triggerid);
 	}
 
 	# Update Trigger definition
