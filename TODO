@@ -6,11 +6,6 @@ Error
 Critical
 Panic
 
-Neploho-bi pri formirovanii teksta sooschenija
-* ispoljzovatj nastroiki item-a, a imenno esli v 'Latest values'
-pokazivaetsja 2.93 Gb, to i pri posilke pustj budet takzhe.
-Seichas posilaetsja 3068380.
-
  - separate login.php and index.php
  - add gaps to graph when no data present
  - make Zabbix reset nextcheck for items when updating or adding a trigger
