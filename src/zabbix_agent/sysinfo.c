@@ -300,6 +300,7 @@ float	DF(const char * mountPoint)
 
 float	TCP_LISTEN(const char *porthex)
 {
+#ifdef HAVE_PROC
 	FILE	*f;
 	char	c[1024];
 
@@ -325,8 +326,12 @@ float	TCP_LISTEN(const char *porthex)
 	fclose(f);
 
 	return	0;
+#else
+	return	FAIL;
+#endif
 }
 
+#ifdef	HAVE_PROC
 float	getPROC(char *file,int lineno,int fieldno)
 {
 	FILE	*f;
@@ -355,10 +360,15 @@ float	getPROC(char *file,int lineno,int fieldno)
 
 	return	result;
 }
+#endif
 
 float	CACHEDMEM(void)
 {
+#ifdef HAVE_PROC
 	return getPROC("/proc/meminfo",8,2);
+#else
+	return FAIL;
+#endif
 }
 
 float	BUFFERSMEM(void)
@@ -535,7 +545,11 @@ float	PROCLOAD(void)
 		return dyn.psd_avg_1_min;
 	}
 #else
+#ifdef HAVE_PROC
 	return	getPROC("/proc/loadavg",1,1);
+#else
+	return	FAIL;
+#endif
 #endif
 #endif
 }
@@ -566,7 +580,11 @@ float	PROCLOAD5(void)
 		return dyn.psd_avg_5_min;
 	}
 #else
+#ifdef	HAVE_PROC
 	return	getPROC("/proc/loadavg",1,2);
+#else
+	return	FAIL;
+#endif
 #endif
 #endif
 }
@@ -597,7 +615,11 @@ float	PROCLOAD15(void)
 		return dyn.psd_avg_5_min;
 	}
 #else
+#ifdef	HAVE_PROC
 	return	getPROC("/proc/loadavg",1,3);
+#else
+	return	FAIL;
+#endif
 #endif
 #endif
 }
@@ -658,27 +680,47 @@ float	SWAPTOTAL(void)
 
 float	DISK_IO(void)
 {
+#ifdef	HAVE_PROC
 	return	getPROC("/proc/stat",2,2);
+#else
+	return	FAIL;
+#endif
 }
 
 float	DISK_RIO(void)
 {
+#ifdef	HAVE_PROC
 	return	getPROC("/proc/stat",3,2);
+#else
+	return	FAIL;
+#endif
 }
 
 float	DISK_WIO(void)
 {
+#ifdef	HAVE_PROC
 	return	getPROC("/proc/stat",4,2);
+#else
+	return	FAIL;
+#endif
 }
 
 float	DISK_RBLK(void)
 {
+#ifdef	HAVE_PROC
 	return	getPROC("/proc/stat",5,2);
+#else
+	return	FAIL;
+#endif
 }
 
 float	DISK_WBLK(void)
 {
+#ifdef	HAVE_PROC
 	return	getPROC("/proc/stat",6,2);
+#else
+	return	FAIL;
+#endif
 }
 
 float	EXECUTE(char *command)
