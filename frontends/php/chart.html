@@ -56,36 +56,41 @@
 
 	$from_time = time(NULL)-$period-3600*$from;
 	$to_time   = time(NULL)-3600*$from;
-	$result=DBselect("select clock,value from history where itemid=$itemid and clock>$from_time and clock<$to_time order by clock");
-	$len=0;
-	$maxX=-1000000000;
-	$maxY=-1000000000;
-	$minX=1000000000;
-	$minY=1000000000;
-	$x=array();
-	$y=array();
-	for($i=0;$i<DBnum_rows($result);$i++)
+	$result=DBselect("select count(clock),min(clock),max(clock),min(value),max(value) from history where itemid=$itemid and clock>$from_time and clock<$to_time ");
+	$count=DBget_field($result,0,0);
+	if($count>0)
 	{
 		$nodata=0;
-		$x[$len]=DBget_field($result,$i,0);
-		$y[$len]=DBget_field($result,$i,1);;
-//		echo $row[0]," - ",$y[$len],"<Br>";
-		if($x[$len]>$maxX) { $maxX=$x[$len]; }
-		if($x[$len]<$minX) { $minX=$x[$len]; }
-		if($y[$len]>$maxY) { $maxY=$y[$len]; }
-		if($y[$len]<$minY) { $minY=$y[$len]; }
-		$len++;
+		$minX=DBget_field($result,0,1);
+		$maxX=DBget_field($result,0,2);
+		$minY=DBget_field($result,0,3);
+		$maxY=DBget_field($result,0,4);
+		
 	}
+	else
+	{
+		$maxX=-1000000000;
+		$maxY=-1000000000;
+		$minX=1000000000;
+		$minY=1000000000;
+	}
+	
 //	echo "MIN/MAX:",$minX," - ",$maxX," - ",$minY," - ",$maxY,"<Br>";
 
 	if(($minX!=$maxX)&&($minY!=$maxY))
 	{
-		for($i=0;$i<$len-1;$i++)
+		$result=DBselect("select clock,value from history where itemid=$itemid and clock>$from_time and clock<$to_time order by clock");
+		for($i=0;$i<DBnum_rows($result)-1;$i++)
 		{
-			$x1=$sizeX*($x[$i]-$minX)/($maxX-$minX);
-			$y1=$sizeY*($y[$i]-$minY)/($maxY-$minY);
-			$x2=$sizeX*($x[$i+1]-$minX)/($maxX-$minX);
-			$y2=$sizeY*($y[$i+1]-$minY)/($maxY-$minY);
+			$x=DBget_field($result,$i,0);
+			$x_next=DBget_field($result,$i+1,0);
+			$y=DBget_field($result,$i,1);
+			$y_next=DBget_field($result,$i+1,1);
+
+			$x1=$sizeX*($x-$minX)/($maxX-$minX);
+			$y1=$sizeY*($y-$minY)/($maxY-$minY);
+			$x2=$sizeX*($x_next-$minX)/($maxX-$minX);
+			$y2=$sizeY*($y_next-$minY)/($maxY-$minY);
 
 			$y1=$sizeY-$y1;
 			$y2=$sizeY-$y2;
@@ -113,7 +118,7 @@
 	}
 	else
 	{
-		ImageString($im, 2,$sizeX/2 -50,                $sizeY+$shiftY+3, "NO DATA FOR THIS PERIOD" , $red);
+		ImageString($im, 2,$sizeX/2 -50,                $sizeY+$shiftY+3, "NO DATA FOUND FOR THIS PERIOD" , $red);
 	}
 
 	ImagePng($im); 
