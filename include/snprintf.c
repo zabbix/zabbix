@@ -1,1025 +1,980 @@
 /*
- * snprintf.c - a portable implementation of snprintf
- *
- * AUTHOR
- *   Mark Martinec <mark.martinec@ijs.si>, April 1999.
- *
- *   Copyright 1999, Mark Martinec. All rights reserved.
- *
- * TERMS AND CONDITIONS
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the "Frontier Artistic License" which comes
- *   with this Kit.
- *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty
- *   of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *   See the Frontier Artistic License for more details.
- *
- *   You should have received a copy of the Frontier Artistic License
- *   with this Kit in the file named LICENSE.txt .
- *   If not, I'll be glad to provide one.
- *
- * FEATURES
- * - careful adherence to specs regarding flags, field width and precision;
- * - good performance for large string handling (large format, large
- *   argument or large paddings). Performance is similar to system's sprintf
- *   and in several cases significantly better (make sure you compile with
- *   optimizations turned on, tell the compiler the code is strict ANSI
- *   if necessary to give it more freedom for optimizations);
- * - return value semantics per ISO/IEC 9899:1999 ("ISO C99");
- * - written in standard ISO/ANSI C - requires an ANSI C compiler.
- *
- * SUPPORTED CONVERSION SPECIFIERS AND DATA TYPES
- *
- * This snprintf only supports the following conversion specifiers:
- * s, c, d, u, o, x, X, p  (and synonyms: i, D, U, O - see below)
- * with flags: '-', '+', ' ', '0' and '#'.
- * An asterisk is supported for field width as well as precision.
- *
- * Length modifiers 'h' (short int), 'l' (long int),
- * and 'll' (long long int) are supported.
- * NOTE:
- *   If macro SNPRINTF_LONGLONG_SUPPORT is not defined (default) the
- *   length modifier 'll' is recognized but treated the same as 'l',
- *   which may cause argument value truncation! Defining
- *   SNPRINTF_LONGLONG_SUPPORT requires that your system's sprintf also
- *   handles length modifier 'll'.  long long int is a language extension
- *   which may not be portable.
- *
- * Conversion of numeric data (conversion specifiers d, u, o, x, X, p)
- * with length modifiers (none or h, l, ll) is left to the system routine
- * sprintf, but all handling of flags, field width and precision as well as
- * c and s conversions is done very carefully by this portable routine.
- * If a string precision (truncation) is specified (e.g. %.8s) it is
- * guaranteed the string beyond the specified precision will not be referenced.
- *
- * Length modifiers h, l and ll are ignored for c and s conversions (data
- * types wint_t and wchar_t are not supported).
- *
- * The following common synonyms for conversion characters are supported:
- *   - i is a synonym for d
- *   - D is a synonym for ld, explicit length modifiers are ignored
- *   - U is a synonym for lu, explicit length modifiers are ignored
- *   - O is a synonym for lo, explicit length modifiers are ignored
- * The D, O and U conversion characters are nonstandard, they are supported
- * for backward compatibility only, and should not be used for new code.
- *
- * The following is specifically NOT supported:
- *   - flag ' (thousands' grouping character) is recognized but ignored
- *   - numeric conversion specifiers: f, e, E, g, G and synonym F,
- *     as well as the new a and A conversion specifiers
- *   - length modifier 'L' (long double) and 'q' (quad - use 'll' instead)
- *   - wide character/string conversions: lc, ls, and nonstandard
- *     synonyms C and S
- *   - writeback of converted string length: conversion character n
- *   - the n$ specification for direct reference to n-th argument
- *   - locales
- *
- * It is permitted for str_m to be zero, and it is permitted to specify NULL
- * pointer for resulting string argument if str_m is zero (as per ISO C99).
- *
- * The return value is the number of characters which would be generated
- * for the given input, excluding the trailing null. If this value
- * is greater or equal to str_m, not all characters from the result
- * have been stored in str, output bytes beyond the (str_m-1) -th character
- * are discarded. If str_m is greater than zero it is guaranteed
- * the resulting string will be null-terminated.
- *
- * NOTE that this matches the ISO C99, OpenBSD, and GNU C library 2.1,
- * but is different from some older and vendor implementations,
- * and is also different from XPG, XSH5, SUSv2 specifications.
- * For historical discussion on changes in the semantics and standards
- * of snprintf see printf(3) man page in the Linux programmers manual.
- *
- * Routines asprintf and vasprintf return a pointer (in the ptr argument)
- * to a buffer sufficiently large to hold the resulting string. This pointer
- * should be passed to free(3) to release the allocated storage when it is
- * no longer needed. If sufficient space cannot be allocated, these functions
- * will return -1 and set ptr to be a NULL pointer. These two routines are a
- * GNU C library extensions (glibc).
- *
- * Routines asnprintf and vasnprintf are similar to asprintf and vasprintf,
- * yet, like snprintf and vsnprintf counterparts, will write at most str_m-1
- * characters into the allocated output string, the last character in the
- * allocated buffer then gets the terminating null. If the formatted string
- * length (the return value) is greater than or equal to the str_m argument,
- * the resulting string was truncated and some of the formatted characters
- * were discarded. These routines present a handy way to limit the amount
- * of allocated memory to some sane value.
- *
- * AVAILABILITY
- *   http://www.ijs.si/software/snprintf/
- *
- * REVISION HISTORY
- * 1999-04	V0.9  Mark Martinec
- *		- initial version, some modifications after comparing printf
- *		  man pages for Digital Unix 4.0, Solaris 2.6 and HPUX 10,
- *		  and checking how Perl handles sprintf (differently!);
- * 1999-04-09	V1.0  Mark Martinec <mark.martinec@ijs.si>
- *		- added main test program, fixed remaining inconsistencies,
- *		  added optional (long long int) support;
- * 1999-04-12	V1.1  Mark Martinec <mark.martinec@ijs.si>
- *		- support the 'p' conversion (pointer to void);
- *		- if a string precision is specified
- *		  make sure the string beyond the specified precision
- *		  will not be referenced (e.g. by strlen);
- * 1999-04-13	V1.2  Mark Martinec <mark.martinec@ijs.si>
- *		- support synonyms %D=%ld, %U=%lu, %O=%lo;
- *		- speed up the case of long format string with few conversions;
- * 1999-06-30	V1.3  Mark Martinec <mark.martinec@ijs.si>
- *		- fixed runaway loop (eventually crashing when str_l wraps
- *		  beyond 2^31) while copying format string without
- *		  conversion specifiers to a buffer that is too short
- *		  (thanks to Edwin Young <edwiny@autonomy.com> for
- *		  spotting the problem);
- *		- added macros PORTABLE_SNPRINTF_VERSION_(MAJOR|MINOR)
- *		  to snprintf.h
- * 2000-02-14	V2.0 (never released) Mark Martinec <mark.martinec@ijs.si>
- *		- relaxed license terms: The Artistic License now applies.
- *		  You may still apply the GNU GENERAL PUBLIC LICENSE
- *		  as was distributed with previous versions, if you prefer;
- *		- changed REVISION HISTORY dates to use ISO 8601 date format;
- *		- added vsnprintf (patch also independently proposed by
- *		  Caolan McNamara 2000-05-04, and Keith M Willenson 2000-06-01)
- * 2000-06-27	V2.1  Mark Martinec <mark.martinec@ijs.si>
- *		- removed POSIX check for str_m<1; value 0 for str_m is
- *		  allowed by ISO C99 (and GNU C library 2.1) - (pointed out
- *		  on 2000-05-04 by Caolan McNamara, caolan@ csn dot ul dot ie).
- *		  Besides relaxed license this change in standards adherence
- *		  is the main reason to bump up the major version number;
- *		- added nonstandard routines asnprintf, vasnprintf, asprintf,
- *		  vasprintf that dynamically allocate storage for the
- *		  resulting string; these routines are not compiled by default,
- *		  see comments where NEED_V?ASN?PRINTF macros are defined;
- *		- autoconf contributed by Caolan McNamara
- * 2000-10-06	V2.2  Mark Martinec <mark.martinec@ijs.si>
- *		- BUG FIX: the %c conversion used a temporary variable
- *		  that was no longer in scope when referenced,
- *		  possibly causing incorrect resulting character;
- *		- BUG FIX: make precision and minimal field width unsigned
- *		  to handle huge values (2^31 <= n < 2^32) correctly;
- *		  also be more careful in the use of signed/unsigned/size_t
- *		  internal variables - probably more careful than many
- *		  vendor implementations, but there may still be a case
- *		  where huge values of str_m, precision or minimal field
- *		  could cause incorrect behaviour;
- *		- use separate variables for signed/unsigned arguments,
- *		  and for short/int, long, and long long argument lengths
- *		  to avoid possible incompatibilities on certain
- *		  computer architectures. Also use separate variable
- *		  arg_sign to hold sign of a numeric argument,
- *		  to make code more transparent;
- *		- some fiddling with zero padding and "0x" to make it
- *		  Linux compatible;
- *		- systematically use macros fast_memcpy and fast_memset
- *		  instead of case-by-case hand optimization; determine some
- *		  breakeven string lengths for different architectures;
- *		- terminology change: 'format' -> 'conversion specifier',
- *		  'C9x' -> 'ISO/IEC 9899:1999 ("ISO C99")',
- *		  'alternative form' -> 'alternate form',
- *		  'data type modifier' -> 'length modifier';
- *		- several comments rephrased and new ones added;
- *		- make compiler not complain about 'credits' defined but
- *		  not used;
+ * Copyright Patrick Powell 1995
+ * This code is based on code written by Patrick Powell (papowell@astart.com)
+ * It may be used for any purpose as long as this notice remains intact
+ * on all source code distributions
  */
 
-
-/* Define HAVE_SNPRINTF if your system already has snprintf and vsnprintf.
+/**************************************************************
+ * Original:
+ * Patrick Powell Tue Apr 11 09:48:21 PDT 1995
+ * A bombproof version of doprnt (dopr) included.
+ * Sigh.  This sort of thing is always nasty do deal with.  Note that
+ * the version here does not include floating point...
  *
- * If HAVE_SNPRINTF is defined this module will not produce code for
- * snprintf and vsnprintf, unless PREFER_PORTABLE_SNPRINTF is defined as well,
- * causing this portable version of snprintf to be called portable_snprintf
- * (and portable_vsnprintf).
- */
-/* #define HAVE_SNPRINTF */
-
-/* Define PREFER_PORTABLE_SNPRINTF if your system does have snprintf and
- * vsnprintf but you would prefer to use the portable routine(s) instead.
- * In this case the portable routine is declared as portable_snprintf
- * (and portable_vsnprintf) and a macro 'snprintf' (and 'vsnprintf')
- * is defined to expand to 'portable_v?snprintf' - see file snprintf.h .
- * Defining this macro is only useful if HAVE_SNPRINTF is also defined,
- * but does does no harm if defined nevertheless.
- */
-/* #define PREFER_PORTABLE_SNPRINTF */
-
-/* Define SNPRINTF_LONGLONG_SUPPORT if you want to support
- * data type (long long int) and length modifier 'll' (e.g. %lld).
- * If undefined, 'll' is recognized but treated as a single 'l'.
+ * snprintf() is used instead of sprintf() as it does limit checks
+ * for string length.  This covers a nasty loophole.
  *
- * If the system's sprintf does not handle 'll'
- * the SNPRINTF_LONGLONG_SUPPORT must not be defined!
+ * The other functions are there to prevent NULL pointers from
+ * causing nast effects.
  *
- * This is off by default as (long long int) is a language extension.
- */
-/* #define SNPRINTF_LONGLONG_SUPPORT */
-
-/* Define NEED_SNPRINTF_ONLY if you only need snprintf, and not vsnprintf.
- * If NEED_SNPRINTF_ONLY is defined, the snprintf will be defined directly,
- * otherwise both snprintf and vsnprintf routines will be defined
- * and snprintf will be a simple wrapper around vsnprintf, at the expense
- * of an extra procedure call.
- */
-/* #define NEED_SNPRINTF_ONLY */
-
-/* Define NEED_V?ASN?PRINTF macros if you need library extension
- * routines asprintf, vasprintf, asnprintf, vasnprintf respectively,
- * and your system library does not provide them. They are all small
- * wrapper routines around portable_vsnprintf. Defining any of the four
- * NEED_V?ASN?PRINTF macros automatically turns off NEED_SNPRINTF_ONLY
- * and turns on PREFER_PORTABLE_SNPRINTF.
+ * More Recently:
+ *  Brandon Long <blong@fiction.net> 9/15/96 for mutt 0.43
+ *  This was ugly.  It is still ugly.  I opted out of floating point
+ *  numbers, but the formatter understands just about everything
+ *  from the normal C string format, at least as far as I can tell from
+ *  the Solaris 2.5 printf(3S) man page.
  *
- * Watch for name conflicts with the system library if these routines
- * are already present there.
+ *  Brandon Long <blong@fiction.net> 10/22/97 for mutt 0.87.1
+ *    Ok, added some minimal floating point support, which means this
+ *    probably requires libm on most operating systems.  Don't yet
+ *    support the exponent (e,E) and sigfig (g,G).  Also, fmtint()
+ *    was pretty badly broken, it just wasn't being exercised in ways
+ *    which showed it, so that's been fixed.  Also, formated the code
+ *    to mutt conventions, and removed dead code left over from the
+ *    original.  Also, there is now a builtin-test, just compile with:
+ *           gcc -DTEST_SNPRINTF -o snprintf snprintf.c -lm
+ *    and run snprintf for results.
+ * 
+ *  Thomas Roessler <roessler@guug.de> 01/27/98 for mutt 0.89i
+ *    The PGP code was using unsigned hexadecimal formats. 
+ *    Unfortunately, unsigned formats simply didn't work.
  *
- * NOTE: vasprintf and vasnprintf routines need va_copy() from stdarg.h, as
- * specified by C99, to be able to traverse the same list of arguments twice.
- * I don't know of any other standard and portable way of achieving the same.
- * With some versions of gcc you may use __va_copy(). You might even get away
- * with "ap2 = ap", in this case you must not call va_end(ap2) !
- *   #define va_copy(ap2,ap) ap2 = ap
- */
-/* #define NEED_ASPRINTF   */
-/* #define NEED_ASNPRINTF  */
-/* #define NEED_VASPRINTF  */
-/* #define NEED_VASNPRINTF */
-
-
-/* Define the following macros if desired:
- *   SOLARIS_COMPATIBLE, SOLARIS_BUG_COMPATIBLE,
- *   HPUX_COMPATIBLE, HPUX_BUG_COMPATIBLE, LINUX_COMPATIBLE,
- *   DIGITAL_UNIX_COMPATIBLE, DIGITAL_UNIX_BUG_COMPATIBLE,
- *   PERL_COMPATIBLE, PERL_BUG_COMPATIBLE,
+ *  Michael Elkins <me@cs.hmc.edu> 03/05/98 for mutt 0.90.8
+ *    The original code assumed that both snprintf() and vsnprintf() were
+ *    missing.  Some systems only have snprintf() but not vsnprintf(), so
+ *    the code is now broken down under HAVE_SNPRINTF and HAVE_VSNPRINTF.
  *
- * - For portable applications it is best not to rely on peculiarities
- *   of a given implementation so it may be best not to define any
- *   of the macros that select compatibility and to avoid features
- *   that vary among the systems.
+ *  Andrew Tridgell (tridge@samba.org) Oct 1998
+ *    fixed handling of %.0f
+ *    added test for HAVE_LONG_DOUBLE
  *
- * - Selecting compatibility with more than one operating system
- *   is not strictly forbidden but is not recommended.
+ * tridge@samba.org, idra@samba.org, April 2001
+ *    got rid of fcvt code (twas buggy and made testing harder)
+ *    added C99 semantics
  *
- * - 'x'_BUG_COMPATIBLE implies 'x'_COMPATIBLE .
- *
- * - 'x'_COMPATIBLE refers to (and enables) a behaviour that is
- *   documented in a sprintf man page on a given operating system
- *   and actually adhered to by the system's sprintf (but not on
- *   most other operating systems). It may also refer to and enable
- *   a behaviour that is declared 'undefined' or 'implementation specific'
- *   in the man page but a given implementation behaves predictably
- *   in a certain way.
- *
- * - 'x'_BUG_COMPATIBLE refers to (and enables) a behaviour of system's sprintf
- *   that contradicts the sprintf man page on the same operating system.
- *
- * - I do not claim that the 'x'_COMPATIBLE and 'x'_BUG_COMPATIBLE
- *   conditionals take into account all idiosyncrasies of a particular
- *   implementation, there may be other incompatibilities.
- */
+ **************************************************************/
 
-
-
-/* ============================================= */
-/* NO USER SERVICABLE PARTS FOLLOWING THIS POINT */
-/* ============================================= */
-
-#define PORTABLE_SNPRINTF_VERSION_MAJOR 2
-#define PORTABLE_SNPRINTF_VERSION_MINOR 2
-
-#if defined(NEED_ASPRINTF) || defined(NEED_ASNPRINTF) || defined(NEED_VASPRINTF) || defined(NEED_VASNPRINTF)
-# if defined(NEED_SNPRINTF_ONLY)
-# undef NEED_SNPRINTF_ONLY
-# endif
-# if !defined(PREFER_PORTABLE_SNPRINTF)
-# define PREFER_PORTABLE_SNPRINTF
-# endif
-#endif
-
-#if defined(SOLARIS_BUG_COMPATIBLE) && !defined(SOLARIS_COMPATIBLE)
-#define SOLARIS_COMPATIBLE
-#endif
-
-#if defined(HPUX_BUG_COMPATIBLE) && !defined(HPUX_COMPATIBLE)
-#define HPUX_COMPATIBLE
-#endif
-
-#if defined(DIGITAL_UNIX_BUG_COMPATIBLE) && !defined(DIGITAL_UNIX_COMPATIBLE)
-#define DIGITAL_UNIX_COMPATIBLE
-#endif
-
-#if defined(PERL_BUG_COMPATIBLE) && !defined(PERL_COMPATIBLE)
-#define PERL_COMPATIBLE
-#endif
-
-#if defined(LINUX_BUG_COMPATIBLE) && !defined(LINUX_COMPATIBLE)
-#define LINUX_COMPATIBLE
-#endif
-
-#include <sys/types.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <assert.h>
-#include <errno.h>
-
-#ifdef isdigit
-#undef isdigit
-#endif
-#define isdigit(c) ((c) >= '0' && (c) <= '9')
-
-/* For copying strings longer or equal to 'breakeven_point'
- * it is more efficient to call memcpy() than to do it inline.
- * The value depends mostly on the processor architecture,
- * but also on the compiler and its optimization capabilities.
- * The value is not critical, some small value greater than zero
- * will be just fine if you don't care to squeeze every drop
- * of performance out of the code.
- *
- * Small values favor memcpy, large values favor inline code.
- */
-#if defined(__alpha__) || defined(__alpha)
-#  define breakeven_point   2	/* AXP (DEC Alpha)     - gcc or cc or egcs */
-#endif
-#if defined(__i386__)  || defined(__i386)
-#  define breakeven_point  12	/* Intel Pentium/Linux - gcc 2.96 */
-#endif
-#if defined(__hppa)
-#  define breakeven_point  10	/* HP-PA               - gcc */
-#endif
-#if defined(__sparc__) || defined(__sparc)
-#  define breakeven_point  33	/* Sun Sparc 5         - gcc 2.8.1 */
-#endif
-
-/* some other values of possible interest: */
-/* #define breakeven_point  8 */  /* VAX 4000          - vaxc */
-/* #define breakeven_point 19 */  /* VAX 4000          - gcc 2.7.0 */
-
-#ifndef breakeven_point
-#  define breakeven_point   6	/* some reasonable one-size-fits-all value */
-#endif
-
-#define fast_memcpy(d,s,n) \
-  { register size_t nn = (size_t)(n); \
-    if (nn >= breakeven_point) memcpy((d), (s), nn); \
-    else if (nn > 0) { /* proc call overhead is worth only for large strings*/\
-      register char *dd; register const char *ss; \
-      for (ss=(s), dd=(d); nn>0; nn--) *dd++ = *ss++; } }
-
-#define fast_memset(d,c,n) \
-  { register size_t nn = (size_t)(n); \
-    if (nn >= breakeven_point) memset((d), (int)(c), nn); \
-    else if (nn > 0) { /* proc call overhead is worth only for large strings*/\
-      register char *dd; register const int cc=(int)(c); \
-      for (dd=(d); nn>0; nn--) *dd++ = cc; } }
-
-/* prototypes */
-
-#if defined(NEED_ASPRINTF)
-int asprintf   (char **ptr, const char *fmt, /*args*/ ...);
-#endif
-#if defined(NEED_VASPRINTF)
-int vasprintf  (char **ptr, const char *fmt, va_list ap);
-#endif
-#if defined(NEED_ASNPRINTF)
-int asnprintf  (char **ptr, size_t str_m, const char *fmt, /*args*/ ...);
-#endif
-#if defined(NEED_VASNPRINTF)
-int vasnprintf (char **ptr, size_t str_m, const char *fmt, va_list ap);
-#endif
-
-#if defined(HAVE_SNPRINTF)
-/* declare our portable snprintf  routine under name portable_snprintf  */
-/* declare our portable vsnprintf routine under name portable_vsnprintf */
+#ifndef NO_CONFIG_H /* for some tests */
+#include "config.h"
 #else
-/* declare our portable routines under names snprintf and vsnprintf */
-#define portable_snprintf snprintf
-#if !defined(NEED_SNPRINTF_ONLY)
-#define portable_vsnprintf vsnprintf
+#define NULL 0
+#endif
+
+#ifdef TEST_SNPRINTF /* need math library headers for testing */
+#include <math.h>
+#endif
+
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif
+
+#ifdef HAVE_STRINGS_H
+#include <strings.h>
+#endif
+#ifdef HAVE_CTYPE_H
+#include <ctype.h>
+#endif
+#include <sys/types.h>
+#include <stdarg.h>
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
+
+#if defined(HAVE_SNPRINTF) && defined(HAVE_VSNPRINTF) && defined(HAVE_C99_VSNPRINTF)
+/* only include stdio.h if we are not re-defining snprintf or vsnprintf */
+#include <stdio.h>
+ /* make the compiler happy with an empty file */
+ void dummy_snprintf(void) {} 
+#else
+
+#ifdef HAVE_LONG_DOUBLE
+#define LDOUBLE long double
+#else
+#define LDOUBLE double
+#endif
+
+#ifdef HAVE_LONG_LONG
+#define LLONG long long
+#else
+#define LLONG long
+#endif
+
+/* free memory if the pointer is valid and zero the pointer */
+#ifndef SAFE_FREE
+#define SAFE_FREE(x) do { if ((x) != NULL) {free((x)); (x)=NULL;} } while(0)
+#endif
+
+#ifndef VA_COPY
+#ifdef HAVE_VA_COPY
+#define VA_COPY(dest, src) __va_copy(dest, src)
+#else
+#define VA_COPY(dest, src) (dest) = (src)
 #endif
 #endif
 
-#if !defined(HAVE_SNPRINTF) || defined(PREFER_PORTABLE_SNPRINTF)
-int portable_snprintf(char *str, size_t str_m, const char *fmt, /*args*/ ...);
-#if !defined(NEED_SNPRINTF_ONLY)
-int portable_vsnprintf(char *str, size_t str_m, const char *fmt, va_list ap);
-#endif
-#endif
-
-/* declarations */
-
-static char credits[] = "\n\
-@(#)snprintf.c, v2.2: Mark Martinec, <mark.martinec@ijs.si>\n\
-@(#)snprintf.c, v2.2: Copyright 1999, Mark Martinec. Frontier Artistic License applies.\n\
-@(#)snprintf.c, v2.2: http://www.ijs.si/software/snprintf/\n";
-
-#if defined(NEED_ASPRINTF)
-int asprintf(char **ptr, const char *fmt, /*args*/ ...) {
-  va_list ap;
-  size_t str_m;
-  int str_l;
-
-  *ptr = NULL;
-  va_start(ap, fmt);                            /* measure the required size */
-  str_l = portable_vsnprintf(NULL, (size_t)0, fmt, ap);
-  va_end(ap);
-  assert(str_l >= 0);        /* possible integer overflow if str_m > INT_MAX */
-  *ptr = (char *) malloc(str_m = (size_t)str_l + 1);
-  if (*ptr == NULL) { errno = ENOMEM; str_l = -1; }
-  else {
-    int str_l2;
-    va_start(ap, fmt);
-    str_l2 = portable_vsnprintf(*ptr, str_m, fmt, ap);
-    va_end(ap);
-    assert(str_l2 == str_l);
-  }
-  return str_l;
-}
-#endif
-
-#if defined(NEED_VASPRINTF)
-int vasprintf(char **ptr, const char *fmt, va_list ap) {
-  size_t str_m;
-  int str_l;
-
-  *ptr = NULL;
-  { va_list ap2;
-    va_copy(ap2, ap);  /* don't consume the original ap, we'll need it again */
-    str_l = portable_vsnprintf(NULL, (size_t)0, fmt, ap2);/*get required size*/
-    va_end(ap2);
-  }
-  assert(str_l >= 0);        /* possible integer overflow if str_m > INT_MAX */
-  *ptr = (char *) malloc(str_m = (size_t)str_l + 1);
-  if (*ptr == NULL) { errno = ENOMEM; str_l = -1; }
-  else {
-    int str_l2 = portable_vsnprintf(*ptr, str_m, fmt, ap);
-    assert(str_l2 == str_l);
-  }
-  return str_l;
-}
-#endif
-
-#if defined(NEED_ASNPRINTF)
-int asnprintf (char **ptr, size_t str_m, const char *fmt, /*args*/ ...) {
-  va_list ap;
-  int str_l;
-
-  *ptr = NULL;
-  va_start(ap, fmt);                            /* measure the required size */
-  str_l = portable_vsnprintf(NULL, (size_t)0, fmt, ap);
-  va_end(ap);
-  assert(str_l >= 0);        /* possible integer overflow if str_m > INT_MAX */
-  if ((size_t)str_l + 1 < str_m) str_m = (size_t)str_l + 1;      /* truncate */
-  /* if str_m is 0, no buffer is allocated, just set *ptr to NULL */
-  if (str_m == 0) {  /* not interested in resulting string, just return size */
-  } else {
-    *ptr = (char *) malloc(str_m);
-    if (*ptr == NULL) { errno = ENOMEM; str_l = -1; }
-    else {
-      int str_l2;
-      va_start(ap, fmt);
-      str_l2 = portable_vsnprintf(*ptr, str_m, fmt, ap);
-      va_end(ap);
-      assert(str_l2 == str_l);
-    }
-  }
-  return str_l;
-}
-#endif
-
-#if defined(NEED_VASNPRINTF)
-int vasnprintf (char **ptr, size_t str_m, const char *fmt, va_list ap) {
-  int str_l;
-
-  *ptr = NULL;
-  { va_list ap2;
-    va_copy(ap2, ap);  /* don't consume the original ap, we'll need it again */
-    str_l = portable_vsnprintf(NULL, (size_t)0, fmt, ap2);/*get required size*/
-    va_end(ap2);
-  }
-  assert(str_l >= 0);        /* possible integer overflow if str_m > INT_MAX */
-  if ((size_t)str_l + 1 < str_m) str_m = (size_t)str_l + 1;      /* truncate */
-  /* if str_m is 0, no buffer is allocated, just set *ptr to NULL */
-  if (str_m == 0) {  /* not interested in resulting string, just return size */
-  } else {
-    *ptr = (char *) malloc(str_m);
-    if (*ptr == NULL) { errno = ENOMEM; str_l = -1; }
-    else {
-      int str_l2 = portable_vsnprintf(*ptr, str_m, fmt, ap);
-      assert(str_l2 == str_l);
-    }
-  }
-  return str_l;
-}
-#endif
+static size_t dopr(char *buffer, size_t maxlen, const char *format, 
+		   va_list args_in);
+static void fmtstr(char *buffer, size_t *currlen, size_t maxlen,
+		    char *value, int flags, int min, int max);
+static void fmtint(char *buffer, size_t *currlen, size_t maxlen,
+		    long value, int base, int min, int max, int flags);
+static void fmtfp(char *buffer, size_t *currlen, size_t maxlen,
+		   LDOUBLE fvalue, int min, int max, int flags);
+static void dopr_outch(char *buffer, size_t *currlen, size_t maxlen, char c);
 
 /*
- * If the system does have snprintf and the portable routine is not
- * specifically required, this module produces no code for snprintf/vsnprintf.
+ * dopr(): poor man's version of doprintf
  */
-#if !defined(HAVE_SNPRINTF) || defined(PREFER_PORTABLE_SNPRINTF)
 
-#if !defined(NEED_SNPRINTF_ONLY)
-int portable_snprintf(char *str, size_t str_m, const char *fmt, /*args*/ ...) {
-  va_list ap;
-  int str_l;
+/* format read states */
+#define DP_S_DEFAULT 0
+#define DP_S_FLAGS   1
+#define DP_S_MIN     2
+#define DP_S_DOT     3
+#define DP_S_MAX     4
+#define DP_S_MOD     5
+#define DP_S_CONV    6
+#define DP_S_DONE    7
 
-  va_start(ap, fmt);
-  str_l = portable_vsnprintf(str, str_m, fmt, ap);
-  va_end(ap);
-  return str_l;
+/* format flags - Bits */
+#define DP_F_MINUS 	(1 << 0)
+#define DP_F_PLUS  	(1 << 1)
+#define DP_F_SPACE 	(1 << 2)
+#define DP_F_NUM   	(1 << 3)
+#define DP_F_ZERO  	(1 << 4)
+#define DP_F_UP    	(1 << 5)
+#define DP_F_UNSIGNED 	(1 << 6)
+
+/* Conversion Flags */
+#define DP_C_SHORT   1
+#define DP_C_LONG    2
+#define DP_C_LDOUBLE 3
+#define DP_C_LLONG   4
+
+#define char_to_int(p) ((p)- '0')
+#ifndef MAX
+#define MAX(p,q) (((p) >= (q)) ? (p) : (q))
+#endif
+
+static size_t dopr(char *buffer, size_t maxlen, const char *format, va_list args_in)
+{
+	char ch;
+	LLONG value;
+	LDOUBLE fvalue;
+	char *strvalue;
+	int min;
+	int max;
+	int state;
+	int flags;
+	int cflags;
+	size_t currlen;
+	va_list args;
+
+	VA_COPY(args, args_in);
+	
+	state = DP_S_DEFAULT;
+	currlen = flags = cflags = min = 0;
+	max = -1;
+	ch = *format++;
+	
+	while (state != DP_S_DONE) {
+		if (ch == '\0') 
+			state = DP_S_DONE;
+
+		switch(state) {
+		case DP_S_DEFAULT:
+			if (ch == '%') 
+				state = DP_S_FLAGS;
+			else 
+				dopr_outch (buffer, &currlen, maxlen, ch);
+			ch = *format++;
+			break;
+		case DP_S_FLAGS:
+			switch (ch) {
+			case '-':
+				flags |= DP_F_MINUS;
+				ch = *format++;
+				break;
+			case '+':
+				flags |= DP_F_PLUS;
+				ch = *format++;
+				break;
+			case ' ':
+				flags |= DP_F_SPACE;
+				ch = *format++;
+				break;
+			case '#':
+				flags |= DP_F_NUM;
+				ch = *format++;
+				break;
+			case '0':
+				flags |= DP_F_ZERO;
+				ch = *format++;
+				break;
+			default:
+				state = DP_S_MIN;
+				break;
+			}
+			break;
+		case DP_S_MIN:
+			if (isdigit((unsigned char)ch)) {
+				min = 10*min + char_to_int (ch);
+				ch = *format++;
+			} else if (ch == '*') {
+				min = va_arg (args, int);
+				ch = *format++;
+				state = DP_S_DOT;
+			} else {
+				state = DP_S_DOT;
+			}
+			break;
+		case DP_S_DOT:
+			if (ch == '.') {
+				state = DP_S_MAX;
+				ch = *format++;
+			} else { 
+				state = DP_S_MOD;
+			}
+			break;
+		case DP_S_MAX:
+			if (isdigit((unsigned char)ch)) {
+				if (max < 0)
+					max = 0;
+				max = 10*max + char_to_int (ch);
+				ch = *format++;
+			} else if (ch == '*') {
+				max = va_arg (args, int);
+				ch = *format++;
+				state = DP_S_MOD;
+			} else {
+				state = DP_S_MOD;
+			}
+			break;
+		case DP_S_MOD:
+			switch (ch) {
+			case 'h':
+				cflags = DP_C_SHORT;
+				ch = *format++;
+				break;
+			case 'l':
+				cflags = DP_C_LONG;
+				ch = *format++;
+				if (ch == 'l') {	/* It's a long long */
+					cflags = DP_C_LLONG;
+					ch = *format++;
+				}
+				break;
+			case 'L':
+				cflags = DP_C_LDOUBLE;
+				ch = *format++;
+				break;
+			default:
+				break;
+			}
+			state = DP_S_CONV;
+			break;
+		case DP_S_CONV:
+			switch (ch) {
+			case 'd':
+			case 'i':
+				if (cflags == DP_C_SHORT) 
+					value = va_arg (args, int);
+				else if (cflags == DP_C_LONG)
+					value = va_arg (args, long int);
+				else if (cflags == DP_C_LLONG)
+					value = va_arg (args, LLONG);
+				else
+					value = va_arg (args, int);
+				fmtint (buffer, &currlen, maxlen, value, 10, min, max, flags);
+				break;
+			case 'o':
+				flags |= DP_F_UNSIGNED;
+				if (cflags == DP_C_SHORT)
+					value = va_arg (args, unsigned int);
+				else if (cflags == DP_C_LONG)
+					value = (long)va_arg (args, unsigned long int);
+				else if (cflags == DP_C_LLONG)
+					value = (long)va_arg (args, unsigned LLONG);
+				else
+					value = (long)va_arg (args, unsigned int);
+				fmtint (buffer, &currlen, maxlen, value, 8, min, max, flags);
+				break;
+			case 'u':
+				flags |= DP_F_UNSIGNED;
+				if (cflags == DP_C_SHORT)
+					value = va_arg (args, unsigned int);
+				else if (cflags == DP_C_LONG)
+					value = (long)va_arg (args, unsigned long int);
+				else if (cflags == DP_C_LLONG)
+					value = (LLONG)va_arg (args, unsigned LLONG);
+				else
+					value = (long)va_arg (args, unsigned int);
+				fmtint (buffer, &currlen, maxlen, value, 10, min, max, flags);
+				break;
+			case 'X':
+				flags |= DP_F_UP;
+			case 'x':
+				flags |= DP_F_UNSIGNED;
+				if (cflags == DP_C_SHORT)
+					value = va_arg (args, unsigned int);
+				else if (cflags == DP_C_LONG)
+					value = (long)va_arg (args, unsigned long int);
+				else if (cflags == DP_C_LLONG)
+					value = (LLONG)va_arg (args, unsigned LLONG);
+				else
+					value = (long)va_arg (args, unsigned int);
+				fmtint (buffer, &currlen, maxlen, value, 16, min, max, flags);
+				break;
+			case 'f':
+				if (cflags == DP_C_LDOUBLE)
+					fvalue = va_arg (args, LDOUBLE);
+				else
+					fvalue = va_arg (args, double);
+				/* um, floating point? */
+				fmtfp (buffer, &currlen, maxlen, fvalue, min, max, flags);
+				break;
+			case 'E':
+				flags |= DP_F_UP;
+			case 'e':
+				if (cflags == DP_C_LDOUBLE)
+					fvalue = va_arg (args, LDOUBLE);
+				else
+					fvalue = va_arg (args, double);
+				break;
+			case 'G':
+				flags |= DP_F_UP;
+			case 'g':
+				if (cflags == DP_C_LDOUBLE)
+					fvalue = va_arg (args, LDOUBLE);
+				else
+					fvalue = va_arg (args, double);
+				break;
+			case 'c':
+				dopr_outch (buffer, &currlen, maxlen, va_arg (args, int));
+				break;
+			case 's':
+				strvalue = va_arg (args, char *);
+				if (!strvalue) strvalue = "(NULL)";
+				if (max == -1) {
+					max = strlen(strvalue);
+				}
+				if (min > 0 && max >= 0 && min > max) max = min;
+				fmtstr (buffer, &currlen, maxlen, strvalue, flags, min, max);
+				break;
+			case 'p':
+				strvalue = va_arg (args, void *);
+				fmtint (buffer, &currlen, maxlen, (long) strvalue, 16, min, max, flags);
+				break;
+			case 'n':
+				if (cflags == DP_C_SHORT) {
+					short int *num;
+					num = va_arg (args, short int *);
+					*num = currlen;
+				} else if (cflags == DP_C_LONG) {
+					long int *num;
+					num = va_arg (args, long int *);
+					*num = (long int)currlen;
+				} else if (cflags == DP_C_LLONG) {
+					LLONG *num;
+					num = va_arg (args, LLONG *);
+					*num = (LLONG)currlen;
+				} else {
+					int *num;
+					num = va_arg (args, int *);
+					*num = currlen;
+				}
+				break;
+			case '%':
+				dopr_outch (buffer, &currlen, maxlen, ch);
+				break;
+			case 'w':
+				/* not supported yet, treat as next char */
+				ch = *format++;
+				break;
+			default:
+				/* Unknown, skip */
+				break;
+			}
+			ch = *format++;
+			state = DP_S_DEFAULT;
+			flags = cflags = min = 0;
+			max = -1;
+			break;
+		case DP_S_DONE:
+			break;
+		default:
+			/* hmm? */
+			break; /* some picky compilers need this */
+		}
+	}
+	if (maxlen != 0) {
+		if (currlen < maxlen - 1) 
+			buffer[currlen] = '\0';
+		else if (maxlen > 0) 
+			buffer[maxlen - 1] = '\0';
+	}
+	
+	return currlen;
+}
+
+static void fmtstr(char *buffer, size_t *currlen, size_t maxlen,
+		    char *value, int flags, int min, int max)
+{
+	int padlen, strln;     /* amount to pad */
+	int cnt = 0;
+
+#ifdef DEBUG_SNPRINTF
+	printf("fmtstr min=%d max=%d s=[%s]\n", min, max, value);
+#endif
+	if (value == 0) {
+		value = "<NULL>";
+	}
+
+	for (strln = 0; value[strln]; ++strln); /* strlen */
+	padlen = min - strln;
+	if (padlen < 0) 
+		padlen = 0;
+	if (flags & DP_F_MINUS) 
+		padlen = -padlen; /* Left Justify */
+	
+	while ((padlen > 0) && (cnt < max)) {
+		dopr_outch (buffer, currlen, maxlen, ' ');
+		--padlen;
+		++cnt;
+	}
+	while (*value && (cnt < max)) {
+		dopr_outch (buffer, currlen, maxlen, *value++);
+		++cnt;
+	}
+	while ((padlen < 0) && (cnt < max)) {
+		dopr_outch (buffer, currlen, maxlen, ' ');
+		++padlen;
+		++cnt;
+	}
+}
+
+/* Have to handle DP_F_NUM (ie 0x and 0 alternates) */
+
+static void fmtint(char *buffer, size_t *currlen, size_t maxlen,
+		    long value, int base, int min, int max, int flags)
+{
+	int signvalue = 0;
+	unsigned long uvalue;
+	char convert[20];
+	int place = 0;
+	int spadlen = 0; /* amount to space pad */
+	int zpadlen = 0; /* amount to zero pad */
+	int caps = 0;
+	
+	if (max < 0)
+		max = 0;
+	
+	uvalue = value;
+	
+	if(!(flags & DP_F_UNSIGNED)) {
+		if( value < 0 ) {
+			signvalue = '-';
+			uvalue = -value;
+		} else {
+			if (flags & DP_F_PLUS)  /* Do a sign (+/i) */
+				signvalue = '+';
+			else if (flags & DP_F_SPACE)
+				signvalue = ' ';
+		}
+	}
+  
+	if (flags & DP_F_UP) caps = 1; /* Should characters be upper case? */
+
+	do {
+		convert[place++] =
+			(caps? "0123456789ABCDEF":"0123456789abcdef")
+			[uvalue % (unsigned)base  ];
+		uvalue = (uvalue / (unsigned)base );
+	} while(uvalue && (place < 20));
+	if (place == 20) place--;
+	convert[place] = 0;
+
+	zpadlen = max - place;
+	spadlen = min - MAX (max, place) - (signvalue ? 1 : 0);
+	if (zpadlen < 0) zpadlen = 0;
+	if (spadlen < 0) spadlen = 0;
+	if (flags & DP_F_ZERO) {
+		zpadlen = MAX(zpadlen, spadlen);
+		spadlen = 0;
+	}
+	if (flags & DP_F_MINUS) 
+		spadlen = -spadlen; /* Left Justifty */
+
+#ifdef DEBUG_SNPRINTF
+	printf("zpad: %d, spad: %d, min: %d, max: %d, place: %d\n",
+	       zpadlen, spadlen, min, max, place);
+#endif
+
+	/* Spaces */
+	while (spadlen > 0) {
+		dopr_outch (buffer, currlen, maxlen, ' ');
+		--spadlen;
+	}
+
+	/* Sign */
+	if (signvalue) 
+		dopr_outch (buffer, currlen, maxlen, signvalue);
+
+	/* Zeros */
+	if (zpadlen > 0) {
+		while (zpadlen > 0) {
+			dopr_outch (buffer, currlen, maxlen, '0');
+			--zpadlen;
+		}
+	}
+
+	/* Digits */
+	while (place > 0) 
+		dopr_outch (buffer, currlen, maxlen, convert[--place]);
+  
+	/* Left Justified spaces */
+	while (spadlen < 0) {
+		dopr_outch (buffer, currlen, maxlen, ' ');
+		++spadlen;
+	}
+}
+
+static LDOUBLE abs_val(LDOUBLE value)
+{
+	LDOUBLE result = value;
+
+	if (value < 0)
+		result = -value;
+	
+	return result;
+}
+
+static LDOUBLE POW10(int exp)
+{
+	LDOUBLE result = 1;
+	
+	while (exp) {
+		result *= 10;
+		exp--;
+	}
+  
+	return result;
+}
+
+static LLONG ROUND(LDOUBLE value)
+{
+	LLONG intpart;
+
+	intpart = (LLONG)value;
+	value = value - intpart;
+	if (value >= 0.5) intpart++;
+	
+	return intpart;
+}
+
+/* a replacement for modf that doesn't need the math library. Should
+   be portable, but slow */
+static double my_modf(double x0, double *iptr)
+{
+	int i;
+	long l;
+	double x = x0;
+	double f = 1.0;
+
+	for (i=0;i<100;i++) {
+		l = (long)x;
+		if (l <= (x+1) && l >= (x-1)) break;
+		x *= 0.1;
+		f *= 10.0;
+	}
+
+	if (i == 100) {
+		/* yikes! the number is beyond what we can handle. What do we do? */
+		(*iptr) = 0;
+		return 0;
+	}
+
+	if (i != 0) {
+		double i2;
+		double ret;
+
+		ret = my_modf(x0-l*f, &i2);
+		(*iptr) = l*f + i2;
+		return ret;
+	} 
+
+	(*iptr) = l;
+	return x - (*iptr);
+}
+
+
+static void fmtfp (char *buffer, size_t *currlen, size_t maxlen,
+		   LDOUBLE fvalue, int min, int max, int flags)
+{
+	int signvalue = 0;
+	double ufvalue;
+	char iconvert[311];
+	char fconvert[311];
+	int iplace = 0;
+	int fplace = 0;
+	int padlen = 0; /* amount to pad */
+	int zpadlen = 0; 
+	int caps = 0;
+	int index;
+	double intpart;
+	double fracpart;
+	double temp;
+  
+	/* 
+	 * AIX manpage says the default is 0, but Solaris says the default
+	 * is 6, and sprintf on AIX defaults to 6
+	 */
+	if (max < 0)
+		max = 6;
+
+	ufvalue = abs_val (fvalue);
+
+	if (fvalue < 0) {
+		signvalue = '-';
+	} else {
+		if (flags & DP_F_PLUS) { /* Do a sign (+/i) */
+			signvalue = '+';
+		} else {
+			if (flags & DP_F_SPACE)
+				signvalue = ' ';
+		}
+	}
+
+#if 0
+	if (flags & DP_F_UP) caps = 1; /* Should characters be upper case? */
+#endif
+
+#if 0
+	 if (max == 0) ufvalue += 0.5; /* if max = 0 we must round */
+#endif
+
+	/* 
+	 * Sorry, we only support 16 digits past the decimal because of our 
+	 * conversion method
+	 */
+	if (max > 16)
+		max = 16;
+
+	/* We "cheat" by converting the fractional part to integer by
+	 * multiplying by a factor of 10
+	 */
+
+	temp = ufvalue;
+	my_modf(temp, &intpart);
+
+	fracpart = ROUND((POW10(max)) * (ufvalue - intpart));
+	
+	if (fracpart >= POW10(max)) {
+		intpart++;
+		fracpart -= POW10(max);
+	}
+
+
+	/* Convert integer part */
+	do {
+		temp = intpart*0.1;
+		my_modf(temp, &intpart);
+		index = (int) ((temp -intpart +0.05)* 10.0);
+		/* index = (int) (((double)(temp*0.1) -intpart +0.05) *10.0); */
+		/* printf ("%llf, %f, %x\n", temp, intpart, index); */
+		iconvert[iplace++] =
+			(caps? "0123456789ABCDEF":"0123456789abcdef")[index];
+	} while (intpart && (iplace < 311));
+	if (iplace == 311) iplace--;
+	iconvert[iplace] = 0;
+
+	/* Convert fractional part */
+	if (fracpart)
+	{
+		do {
+			temp = fracpart*0.1;
+			my_modf(temp, &fracpart);
+			index = (int) ((temp -fracpart +0.05)* 10.0);
+			/* index = (int) ((((temp/10) -fracpart) +0.05) *10); */
+			/* printf ("%lf, %lf, %ld\n", temp, fracpart, index); */
+			fconvert[fplace++] =
+			(caps? "0123456789ABCDEF":"0123456789abcdef")[index];
+		} while(fracpart && (fplace < 311));
+		if (fplace == 311) fplace--;
+	}
+	fconvert[fplace] = 0;
+  
+	/* -1 for decimal point, another -1 if we are printing a sign */
+	padlen = min - iplace - max - 1 - ((signvalue) ? 1 : 0); 
+	zpadlen = max - fplace;
+	if (zpadlen < 0) zpadlen = 0;
+	if (padlen < 0) 
+		padlen = 0;
+	if (flags & DP_F_MINUS) 
+		padlen = -padlen; /* Left Justifty */
+	
+	if ((flags & DP_F_ZERO) && (padlen > 0)) {
+		if (signvalue) {
+			dopr_outch (buffer, currlen, maxlen, signvalue);
+			--padlen;
+			signvalue = 0;
+		}
+		while (padlen > 0) {
+			dopr_outch (buffer, currlen, maxlen, '0');
+			--padlen;
+		}
+	}
+	while (padlen > 0) {
+		dopr_outch (buffer, currlen, maxlen, ' ');
+		--padlen;
+	}
+	if (signvalue) 
+		dopr_outch (buffer, currlen, maxlen, signvalue);
+	
+	while (iplace > 0) 
+		dopr_outch (buffer, currlen, maxlen, iconvert[--iplace]);
+
+#ifdef DEBUG_SNPRINTF
+	printf("fmtfp: fplace=%d zpadlen=%d\n", fplace, zpadlen);
+#endif
+
+	/*
+	 * Decimal point.  This should probably use locale to find the correct
+	 * char to print out.
+	 */
+	if (max > 0) {
+		dopr_outch (buffer, currlen, maxlen, '.');
+		
+		while (zpadlen > 0) {
+			dopr_outch (buffer, currlen, maxlen, '0');
+			--zpadlen;
+		}
+
+		while (fplace > 0) 
+			dopr_outch (buffer, currlen, maxlen, fconvert[--fplace]);
+	}
+
+	while (padlen < 0) {
+		dopr_outch (buffer, currlen, maxlen, ' ');
+		++padlen;
+	}
+}
+
+static void dopr_outch(char *buffer, size_t *currlen, size_t maxlen, char c)
+{
+	if (*currlen < maxlen) {
+		buffer[(*currlen)] = c;
+	}
+	(*currlen)++;
+}
+
+/* yes this really must be a ||. Don't muck with this (tridge) */
+/* Support for MacOS. Alexei */
+/*#if !defined(HAVE_VSNPRINTF) || !defined(HAVE_C99_VSNPRINTF)*/
+#if !defined(HAVE_VSNPRINTF)
+ int vsnprintf (char *str, size_t count, const char *fmt, va_list args)
+{
+	return dopr(str, count, fmt, args);
 }
 #endif
 
-#if defined(NEED_SNPRINTF_ONLY)
-int portable_snprintf(char *str, size_t str_m, const char *fmt, /*args*/ ...) {
-#else
-int portable_vsnprintf(char *str, size_t str_m, const char *fmt, va_list ap) {
-#endif
-
-#if defined(NEED_SNPRINTF_ONLY)
-  va_list ap;
-#endif
-  size_t str_l = 0;
-  const char *p = fmt;
-
-/* In contrast with POSIX, the ISO C99 now says
- * that str can be NULL and str_m can be 0.
- * This is more useful than the old:  if (str_m < 1) return -1; */
-
-#if defined(NEED_SNPRINTF_ONLY)
-  va_start(ap, fmt);
-#endif
-  if (!p) p = "";
-  while (*p) {
-    if (*p != '%') {
-   /* if (str_l < str_m) str[str_l++] = *p++;    -- this would be sufficient */
-   /* but the following code achieves better performance for cases
-    * where format string is long and contains few conversions */
-      const char *q = strchr(p+1,'%');
-      size_t n = !q ? strlen(p) : (q-p);
-      if (str_l < str_m) {
-        size_t avail = str_m-str_l;
-        fast_memcpy(str+str_l, p, (n>avail?avail:n));
-      }
-      p += n; str_l += n;
-    } else {
-      const char *starting_p;
-      size_t min_field_width = 0, precision = 0;
-      int zero_padding = 0, precision_specified = 0, justify_left = 0;
-      int alternate_form = 0, force_sign = 0;
-      int space_for_positive = 1; /* If both the ' ' and '+' flags appear,
-                                     the ' ' flag should be ignored. */
-      char length_modifier = '\0';            /* allowed values: \0, h, l, L */
-      char tmp[32];/* temporary buffer for simple numeric->string conversion */
-
-      const char *str_arg;      /* string address in case of string argument */
-      size_t str_arg_l;         /* natural field width of arg without padding
-                                   and sign */
-      unsigned char uchar_arg;
-        /* unsigned char argument value - only defined for c conversion.
-           N.B. standard explicitly states the char argument for
-           the c conversion is unsigned */
-
-      size_t number_of_zeros_to_pad = 0;
-        /* number of zeros to be inserted for numeric conversions
-           as required by the precision or minimal field width */
-
-      size_t zero_padding_insertion_ind = 0;
-        /* index into tmp where zero padding is to be inserted */
-
-      char fmt_spec = '\0';
-        /* current conversion specifier character */
-
-      str_arg = credits;/* just to make compiler happy (defined but not used)*/
-      str_arg = NULL;
-      starting_p = p; p++;  /* skip '%' */
-   /* parse flags */
-      while (*p == '0' || *p == '-' || *p == '+' ||
-             *p == ' ' || *p == '#' || *p == '\'') {
-        switch (*p) {
-        case '0': zero_padding = 1; break;
-        case '-': justify_left = 1; break;
-        case '+': force_sign = 1; space_for_positive = 0; break;
-        case ' ': force_sign = 1;
-     /* If both the ' ' and '+' flags appear, the ' ' flag should be ignored */
-#ifdef PERL_COMPATIBLE
-     /* ... but in Perl the last of ' ' and '+' applies */
-                  space_for_positive = 1;
-#endif
-                  break;
-        case '#': alternate_form = 1; break;
-        case '\'': break;
-        }
-        p++;
-      }
-   /* If the '0' and '-' flags both appear, the '0' flag should be ignored. */
-
-   /* parse field width */
-      if (*p == '*') {
-        int j;
-        p++; j = va_arg(ap, int);
-        if (j >= 0) min_field_width = j;
-        else { min_field_width = -j; justify_left = 1; }
-      } else if (isdigit((int)(*p))) {
-        /* size_t could be wider than unsigned int;
-           make sure we treat argument like common implementations do */
-        unsigned int uj = *p++ - '0';
-        while (isdigit((int)(*p))) uj = 10*uj + (unsigned int)(*p++ - '0');
-        min_field_width = uj;
-      }
-   /* parse precision */
-      if (*p == '.') {
-        p++; precision_specified = 1;
-        if (*p == '*') {
-          int j = va_arg(ap, int);
-          p++;
-          if (j >= 0) precision = j;
-          else {
-            precision_specified = 0; precision = 0;
-         /* NOTE:
-          *   Solaris 2.6 man page claims that in this case the precision
-          *   should be set to 0.  Digital Unix 4.0, HPUX 10 and BSD man page
-          *   claim that this case should be treated as unspecified precision,
-          *   which is what we do here.
-          */
-          }
-        } else if (isdigit((int)(*p))) {
-          /* size_t could be wider than unsigned int;
-             make sure we treat argument like common implementations do */
-          unsigned int uj = *p++ - '0';
-          while (isdigit((int)(*p))) uj = 10*uj + (unsigned int)(*p++ - '0');
-          precision = uj;
-        }
-      }
-   /* parse 'h', 'l' and 'll' length modifiers */
-      if (*p == 'h' || *p == 'l') {
-        length_modifier = *p; p++;
-        if (length_modifier == 'l' && *p == 'l') {   /* double l = long long */
-#ifdef SNPRINTF_LONGLONG_SUPPORT
-          length_modifier = '2';                  /* double l encoded as '2' */
-#else
-          length_modifier = 'l';                 /* treat it as a single 'l' */
-#endif
-          p++;
-        }
-      }
-      fmt_spec = *p;
-   /* common synonyms: */
-      switch (fmt_spec) {
-      case 'i': fmt_spec = 'd'; break;
-      case 'D': fmt_spec = 'd'; length_modifier = 'l'; break;
-      case 'U': fmt_spec = 'u'; length_modifier = 'l'; break;
-      case 'O': fmt_spec = 'o'; length_modifier = 'l'; break;
-      default: break;
-      }
-   /* get parameter value, do initial processing */
-      switch (fmt_spec) {
-      case '%': /* % behaves similar to 's' regarding flags and field widths */
-      case 'c': /* c behaves similar to 's' regarding flags and field widths */
-      case 's':
-        length_modifier = '\0';          /* wint_t and wchar_t not supported */
-     /* the result of zero padding flag with non-numeric conversion specifier*/
-     /* is undefined. Solaris and HPUX 10 does zero padding in this case,    */
-     /* Digital Unix and Linux does not. */
-#if !defined(SOLARIS_COMPATIBLE) && !defined(HPUX_COMPATIBLE)
-        zero_padding = 0;    /* turn zero padding off for string conversions */
-#endif
-        str_arg_l = 1;
-        switch (fmt_spec) {
-        case '%':
-          str_arg = p; break;
-        case 'c': {
-          int j = va_arg(ap, int);
-          uchar_arg = (unsigned char) j;   /* standard demands unsigned char */
-          str_arg = (const char *) &uchar_arg;
-          break;
-        }
-        case 's':
-          str_arg = va_arg(ap, const char *);
-          if (!str_arg) str_arg_l = 0;
-       /* make sure not to address string beyond the specified precision !!! */
-          else if (!precision_specified) str_arg_l = strlen(str_arg);
-       /* truncate string if necessary as requested by precision */
-          else if (precision == 0) str_arg_l = 0;
-          else {
-       /* memchr on HP does not like n > 2^31  !!! */
-            const char *q = memchr(str_arg, '\0',
-                             precision <= 0x7fffffff ? precision : 0x7fffffff);
-            str_arg_l = !q ? precision : (q-str_arg);
-          }
-          break;
-        default: break;
-        }
-        break;
-      case 'd': case 'u': case 'o': case 'x': case 'X': case 'p': {
-        /* NOTE: the u, o, x, X and p conversion specifiers imply
-                 the value is unsigned;  d implies a signed value */
-
-        int arg_sign = 0;
-          /* 0 if numeric argument is zero (or if pointer is NULL for 'p'),
-            +1 if greater than zero (or nonzero for unsigned arguments),
-            -1 if negative (unsigned argument is never negative) */
-
-        int int_arg = 0;  unsigned int uint_arg = 0;
-          /* only defined for length modifier h, or for no length modifiers */
-
-        long int long_arg = 0;  unsigned long int ulong_arg = 0;
-          /* only defined for length modifier l */
-
-        void *ptr_arg = NULL;
-          /* pointer argument value -only defined for p conversion */
-
-#ifdef SNPRINTF_LONGLONG_SUPPORT
-        long long int long_long_arg = 0;
-        unsigned long long int ulong_long_arg = 0;
-          /* only defined for length modifier ll */
-#endif
-        if (fmt_spec == 'p') {
-        /* HPUX 10: An l, h, ll or L before any other conversion character
-         *   (other than d, i, u, o, x, or X) is ignored.
-         * Digital Unix:
-         *   not specified, but seems to behave as HPUX does.
-         * Solaris: If an h, l, or L appears before any other conversion
-         *   specifier (other than d, i, u, o, x, or X), the behavior
-         *   is undefined. (Actually %hp converts only 16-bits of address
-         *   and %llp treats address as 64-bit data which is incompatible
-         *   with (void *) argument on a 32-bit system).
-         */
-#ifdef SOLARIS_COMPATIBLE
-#  ifdef SOLARIS_BUG_COMPATIBLE
-          /* keep length modifiers even if it represents 'll' */
-#  else
-          if (length_modifier == '2') length_modifier = '\0';
-#  endif
-#else
-          length_modifier = '\0';
-#endif
-          ptr_arg = va_arg(ap, void *);
-          if (ptr_arg != NULL) arg_sign = 1;
-        } else if (fmt_spec == 'd') {  /* signed */
-          switch (length_modifier) {
-          case '\0':
-          case 'h':
-         /* It is non-portable to specify a second argument of char or short
-          * to va_arg, because arguments seen by the called function
-          * are not char or short.  C converts char and short arguments
-          * to int before passing them to a function.
-          */
-            int_arg = va_arg(ap, int);
-            if      (int_arg > 0) arg_sign =  1;
-            else if (int_arg < 0) arg_sign = -1;
-            break;
-          case 'l':
-            long_arg = va_arg(ap, long int);
-            if      (long_arg > 0) arg_sign =  1;
-            else if (long_arg < 0) arg_sign = -1;
-            break;
-#ifdef SNPRINTF_LONGLONG_SUPPORT
-          case '2':
-            long_long_arg = va_arg(ap, long long int);
-            if      (long_long_arg > 0) arg_sign =  1;
-            else if (long_long_arg < 0) arg_sign = -1;
-            break;
-#endif
-          }
-        } else {  /* unsigned */
-          switch (length_modifier) {
-          case '\0':
-          case 'h':
-            uint_arg = va_arg(ap, unsigned int);
-            if (uint_arg) arg_sign = 1;
-            break;
-          case 'l':
-            ulong_arg = va_arg(ap, unsigned long int);
-            if (ulong_arg) arg_sign = 1;
-            break;
-#ifdef SNPRINTF_LONGLONG_SUPPORT
-          case '2':
-            ulong_long_arg = va_arg(ap, unsigned long long int);
-            if (ulong_long_arg) arg_sign = 1;
-            break;
-#endif
-          }
-        }
-        str_arg = tmp; str_arg_l = 0;
-     /* NOTE:
-      *   For d, i, u, o, x, and X conversions, if precision is specified,
-      *   the '0' flag should be ignored. This is so with Solaris 2.6,
-      *   Digital UNIX 4.0, HPUX 10, Linux, FreeBSD, NetBSD; but not with Perl.
-      */
-#ifndef PERL_COMPATIBLE
-        if (precision_specified) zero_padding = 0;
-#endif
-        if (fmt_spec == 'd') {
-          if (force_sign && arg_sign >= 0)
-            tmp[str_arg_l++] = space_for_positive ? ' ' : '+';
-         /* leave negative numbers for sprintf to handle,
-            to avoid handling tricky cases like (short int)(-32768) */
-#ifdef LINUX_COMPATIBLE
-        } else if (fmt_spec == 'p' && force_sign && arg_sign > 0) {
-          tmp[str_arg_l++] = space_for_positive ? ' ' : '+';
-#endif
-        } else if (alternate_form) {
-          if (arg_sign != 0 && (fmt_spec == 'x' || fmt_spec == 'X') )
-            { tmp[str_arg_l++] = '0'; tmp[str_arg_l++] = fmt_spec; }
-         /* alternate form should have no effect for p conversion, but ... */
-#ifdef HPUX_COMPATIBLE
-          else if (fmt_spec == 'p'
-         /* HPUX 10: for an alternate form of p conversion,
-          *          a nonzero result is prefixed by 0x. */
-#ifndef HPUX_BUG_COMPATIBLE
-         /* Actually it uses 0x prefix even for a zero value. */
-                   && arg_sign != 0
-#endif
-                  ) { tmp[str_arg_l++] = '0'; tmp[str_arg_l++] = 'x'; }
-#endif
-        }
-        zero_padding_insertion_ind = str_arg_l;
-        if (!precision_specified) precision = 1;   /* default precision is 1 */
-        if (precision == 0 && arg_sign == 0
-#if defined(HPUX_BUG_COMPATIBLE) || defined(LINUX_COMPATIBLE)
-            && fmt_spec != 'p'
-         /* HPUX 10 man page claims: With conversion character p the result of
-          * converting a zero value with a precision of zero is a null string.
-          * Actually HP returns all zeroes, and Linux returns "(nil)". */
-#endif
-        ) {
-         /* converted to null string */
-         /* When zero value is formatted with an explicit precision 0,
-            the resulting formatted string is empty (d, i, u, o, x, X, p).   */
-        } else {
-          char f[5]; int f_l = 0;
-          f[f_l++] = '%';    /* construct a simple format string for sprintf */
-          if (!length_modifier) { }
-          else if (length_modifier=='2') { f[f_l++] = 'l'; f[f_l++] = 'l'; }
-          else f[f_l++] = length_modifier;
-          f[f_l++] = fmt_spec; f[f_l++] = '\0';
-          if (fmt_spec == 'p') str_arg_l += sprintf(tmp+str_arg_l, f, ptr_arg);
-          else if (fmt_spec == 'd') {  /* signed */
-            switch (length_modifier) {
-            case '\0':
-            case 'h': str_arg_l+=sprintf(tmp+str_arg_l, f, int_arg);  break;
-            case 'l': str_arg_l+=sprintf(tmp+str_arg_l, f, long_arg); break;
-#ifdef SNPRINTF_LONGLONG_SUPPORT
-            case '2': str_arg_l+=sprintf(tmp+str_arg_l,f,long_long_arg); break;
-#endif
-            }
-          } else {  /* unsigned */
-            switch (length_modifier) {
-            case '\0':
-            case 'h': str_arg_l+=sprintf(tmp+str_arg_l, f, uint_arg);  break;
-            case 'l': str_arg_l+=sprintf(tmp+str_arg_l, f, ulong_arg); break;
-#ifdef SNPRINTF_LONGLONG_SUPPORT
-            case '2': str_arg_l+=sprintf(tmp+str_arg_l,f,ulong_long_arg);break;
-#endif
-            }
-          }
-         /* include the optional minus sign and possible "0x"
-            in the region before the zero padding insertion point */
-          if (zero_padding_insertion_ind < str_arg_l &&
-              tmp[zero_padding_insertion_ind] == '-') {
-            zero_padding_insertion_ind++;
-          }
-          if (zero_padding_insertion_ind+1 < str_arg_l &&
-              tmp[zero_padding_insertion_ind]   == '0' &&
-             (tmp[zero_padding_insertion_ind+1] == 'x' ||
-              tmp[zero_padding_insertion_ind+1] == 'X') ) {
-            zero_padding_insertion_ind += 2;
-          }
-        }
-        { size_t num_of_digits = str_arg_l - zero_padding_insertion_ind;
-          if (alternate_form && fmt_spec == 'o'
-#ifdef HPUX_COMPATIBLE                                  /* ("%#.o",0) -> ""  */
-              && (str_arg_l > 0)
-#endif
-#ifdef DIGITAL_UNIX_BUG_COMPATIBLE                      /* ("%#o",0) -> "00" */
-#else
-              /* unless zero is already the first character */
-              && !(zero_padding_insertion_ind < str_arg_l
-                   && tmp[zero_padding_insertion_ind] == '0')
-#endif
-          ) {        /* assure leading zero for alternate-form octal numbers */
-            if (!precision_specified || precision < num_of_digits+1) {
-             /* precision is increased to force the first character to be zero,
-                except if a zero value is formatted with an explicit precision
-                of zero */
-              precision = num_of_digits+1; precision_specified = 1;
-            }
-          }
-       /* zero padding to specified precision? */
-          if (num_of_digits < precision) 
-            number_of_zeros_to_pad = precision - num_of_digits;
-        }
-     /* zero padding to specified minimal field width? */
-        if (!justify_left && zero_padding) {
-          int n = min_field_width - (str_arg_l+number_of_zeros_to_pad);
-          if (n > 0) number_of_zeros_to_pad += n;
-        }
-        break;
-      }
-      default: /* unrecognized conversion specifier, keep format string as-is*/
-        zero_padding = 0;  /* turn zero padding off for non-numeric convers. */
-#ifndef DIGITAL_UNIX_COMPATIBLE
-        justify_left = 1; min_field_width = 0;                /* reset flags */
-#endif
-#if defined(PERL_COMPATIBLE) || defined(LINUX_COMPATIBLE)
-     /* keep the entire format string unchanged */
-        str_arg = starting_p; str_arg_l = p - starting_p;
-     /* well, not exactly so for Linux, which does something inbetween,
-      * and I don't feel an urge to imitate it: "%+++++hy" -> "%+y"  */
-#else
-     /* discard the unrecognized conversion, just keep *
-      * the unrecognized conversion character          */
-        str_arg = p; str_arg_l = 0;
-#endif
-        if (*p) str_arg_l++;  /* include invalid conversion specifier unchanged
-                                 if not at end-of-string */
-        break;
-      }
-      if (*p) p++;      /* step over the just processed conversion specifier */
-   /* insert padding to the left as requested by min_field_width;
-      this does not include the zero padding in case of numerical conversions*/
-      if (!justify_left) {                /* left padding with blank or zero */
-        int n = min_field_width - (str_arg_l+number_of_zeros_to_pad);
-        if (n > 0) {
-          if (str_l < str_m) {
-            size_t avail = str_m-str_l;
-            fast_memset(str+str_l, (zero_padding?'0':' '), (n>avail?avail:n));
-          }
-          str_l += n;
-        }
-      }
-   /* zero padding as requested by the precision or by the minimal field width
-    * for numeric conversions required? */
-      if (number_of_zeros_to_pad <= 0) {
-     /* will not copy first part of numeric right now, *
-      * force it to be copied later in its entirety    */
-        zero_padding_insertion_ind = 0;
-      } else {
-     /* insert first part of numerics (sign or '0x') before zero padding */
-        int n = zero_padding_insertion_ind;
-        if (n > 0) {
-          if (str_l < str_m) {
-            size_t avail = str_m-str_l;
-            fast_memcpy(str+str_l, str_arg, (n>avail?avail:n));
-          }
-          str_l += n;
-        }
-     /* insert zero padding as requested by the precision or min field width */
-        n = number_of_zeros_to_pad;
-        if (n > 0) {
-          if (str_l < str_m) {
-            size_t avail = str_m-str_l;
-            fast_memset(str+str_l, '0', (n>avail?avail:n));
-          }
-          str_l += n;
-        }
-      }
-   /* insert formatted string
-    * (or as-is conversion specifier for unknown conversions) */
-      { int n = str_arg_l - zero_padding_insertion_ind;
-        if (n > 0) {
-          if (str_l < str_m) {
-            size_t avail = str_m-str_l;
-            fast_memcpy(str+str_l, str_arg+zero_padding_insertion_ind,
-                        (n>avail?avail:n));
-          }
-          str_l += n;
-        }
-      }
-   /* insert right padding */
-      if (justify_left) {          /* right blank padding to the field width */
-        int n = min_field_width - (str_arg_l+number_of_zeros_to_pad);
-        if (n > 0) {
-          if (str_l < str_m) {
-            size_t avail = str_m-str_l;
-            fast_memset(str+str_l, ' ', (n>avail?avail:n));
-          }
-          str_l += n;
-        }
-      }
-    }
-  }
-#if defined(NEED_SNPRINTF_ONLY)
-  va_end(ap);
-#endif
-  if (str_m > 0) { /* make sure the string is null-terminated
-                      even at the expense of overwriting the last character
-                      (shouldn't happen, but just in case) */
-    str[str_l <= str_m-1 ? str_l : str_m-1] = '\0';
-  }
-  /* Return the number of characters formatted (excluding trailing null
-   * character), that is, the number of characters that would have been
-   * written to the buffer if it were large enough.
-   *
-   * The value of str_l should be returned, but str_l is of unsigned type
-   * size_t, and snprintf is int, possibly leading to an undetected
-   * integer overflow, resulting in a negative return value, which is illegal.
-   * Both XSH5 and ISO C99 (at least the draft) are silent on this issue.
-   * Should errno be set to EOVERFLOW and EOF returned in this case???
-   */
-  return (int) str_l;
+/* yes this really must be a ||. Don't muck wiith this (tridge)
+ *
+ * The logic for these two is that we need our own definition if the
+ * OS *either* has no definition of *sprintf, or if it does have one
+ * that doesn't work properly according to the autoconf test.  Perhaps
+ * these should really be smb_snprintf to avoid conflicts with buggy
+ * linkers? -- mbp
+ */
+/* Alexei Does not work under HP-UX */
+/*#if !defined(HAVE_SNPRINTF) || !defined(HAVE_C99_SNPRINTF)*/
+#if !defined(HAVE_SNPRINTF)
+ int snprintf(char *str,size_t count,const char *fmt,...)
+{
+	size_t ret;
+	va_list ap;
+    
+	va_start(ap, fmt);
+	ret = vsnprintf(str, count, fmt, ap);
+	va_end(ap);
+	return ret;
 }
 #endif
+
+#endif 
+
+#ifndef HAVE_VASPRINTF
+ int vasprintf(char **ptr, const char *format, va_list ap)
+{
+	int ret;
+	va_list ap2;
+
+	VA_COPY(ap2, ap);
+	
+	ret = vsnprintf(NULL, 0, format, ap2);
+	if (ret <= 0) return ret;
+
+	(*ptr) = (char *)malloc(ret+1);
+	if (!*ptr) return -1;
+
+	VA_COPY(ap2, ap);
+
+	ret = vsnprintf(*ptr, ret+1, format, ap2);
+
+	return ret;
+}
+#endif
+
+
+#ifndef HAVE_ASPRINTF
+ int asprintf(char **ptr, const char *format, ...)
+{
+	va_list ap;
+	int ret;
+	
+	*ptr = NULL;
+	va_start(ap, format);
+	ret = vasprintf(ptr, format, ap);
+	va_end(ap);
+
+	return ret;
+}
+#endif
+
+#ifdef TEST_SNPRINTF
+
+ int sprintf(char *str,const char *fmt,...);
+
+ int main (void)
+{
+	char buf1[1024];
+	char buf2[1024];
+	char *fp_fmt[] = {
+		"%1.1f",
+		"%-1.5f",
+		"%1.5f",
+		"%123.9f",
+		"%10.5f",
+		"% 10.5f",
+		"%+22.9f",
+		"%+4.9f",
+		"%01.3f",
+		"%4f",
+		"%3.1f",
+		"%3.2f",
+		"%.0f",
+		"%f",
+		"-16.16f",
+		NULL
+	};
+	double fp_nums[] = { 6442452944.1234, -1.5, 134.21, 91340.2, 341.1234, 0203.9, 0.96, 0.996, 
+			     0.9996, 1.996, 4.136, 5.030201, 0};
+	char *int_fmt[] = {
+		"%-1.5d",
+		"%1.5d",
+		"%123.9d",
+		"%5.5d",
+		"%10.5d",
+		"% 10.5d",
+		"%+22.33d",
+		"%01.3d",
+		"%4d",
+		"%d",
+		NULL
+	};
+	long int_nums[] = { -1, 134, 91340, 341, 0203, 0};
+	char *str_fmt[] = {
+		"10.5s",
+		"5.10s",
+		"10.1s",
+		"0.10s",
+		"10.0s",
+		"1.10s",
+		"%s",
+		"%.1s",
+		"%.10s",
+		"%10s",
+		NULL
+	};
+	char *str_vals[] = {"hello", "a", "", "a longer string", NULL};
+	int x, y;
+	int fail = 0;
+	int num = 0;
+
+	printf ("Testing snprintf format codes against system sprintf...\n");
+
+	for (x = 0; fp_fmt[x] ; x++) {
+		for (y = 0; fp_nums[y] != 0 ; y++) {
+			int l1 = snprintf(NULL, 0, fp_fmt[x], fp_nums[y]);
+			int l2 = snprintf(buf1, sizeof(buf1), fp_fmt[x], fp_nums[y]);
+			sprintf (buf2, fp_fmt[x], fp_nums[y]);
+			if (strcmp (buf1, buf2)) {
+				printf("snprintf doesn't match Format: %s\n\tsnprintf = [%s]\n\t sprintf = [%s]\n", 
+				       fp_fmt[x], buf1, buf2);
+				fail++;
+			}
+			if (l1 != l2) {
+				printf("snprintf l1 != l2 (%d %d) %s\n", l1, l2, fp_fmt[x]);
+				fail++;
+			}
+			num++;
+		}
+	}
+
+	for (x = 0; int_fmt[x] ; x++) {
+		for (y = 0; int_nums[y] != 0 ; y++) {
+			int l1 = snprintf(NULL, 0, int_fmt[x], int_nums[y]);
+			int l2 = snprintf(buf1, sizeof(buf1), int_fmt[x], int_nums[y]);
+			sprintf (buf2, int_fmt[x], int_nums[y]);
+			if (strcmp (buf1, buf2)) {
+				printf("snprintf doesn't match Format: %s\n\tsnprintf = [%s]\n\t sprintf = [%s]\n", 
+				       int_fmt[x], buf1, buf2);
+				fail++;
+			}
+			if (l1 != l2) {
+				printf("snprintf l1 != l2 (%d %d) %s\n", l1, l2, int_fmt[x]);
+				fail++;
+			}
+			num++;
+		}
+	}
+
+	for (x = 0; str_fmt[x] ; x++) {
+		for (y = 0; str_vals[y] != 0 ; y++) {
+			int l1 = snprintf(NULL, 0, str_fmt[x], str_vals[y]);
+			int l2 = snprintf(buf1, sizeof(buf1), str_fmt[x], str_vals[y]);
+			sprintf (buf2, str_fmt[x], str_vals[y]);
+			if (strcmp (buf1, buf2)) {
+				printf("snprintf doesn't match Format: %s\n\tsnprintf = [%s]\n\t sprintf = [%s]\n", 
+				       str_fmt[x], buf1, buf2);
+				fail++;
+			}
+			if (l1 != l2) {
+				printf("snprintf l1 != l2 (%d %d) %s\n", l1, l2, str_fmt[x]);
+				fail++;
+			}
+			num++;
+		}
+	}
+
+	printf ("%d tests failed out of %d.\n", fail, num);
+
+	printf("seeing how many digits we support\n");
+	{
+		double v0 = 0.12345678901234567890123456789012345678901;
+		for (x=0; x<100; x++) {
+			double p = pow(10, x); 
+			double r = v0*p;
+			snprintf(buf1, sizeof(buf1), "%1.1f", r);
+			sprintf(buf2,                "%1.1f", r);
+			if (strcmp(buf1, buf2)) {
+				printf("we seem to support %d digits\n", x-1);
+				break;
+			}
+		}
+	}
+
+	return 0;
+}
+#endif /* SNPRINTF_TEST */
