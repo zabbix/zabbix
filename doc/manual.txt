@@ -664,14 +664,17 @@ system[users]			|	X      |	X      |      X      |      X      |      X      |   
 ping				|	X      |	X      |      X      |      X      |      X      |     X     |
 tcp_count			|	X      |	X      |      X      |      -      |      -      |     X     |
 
-net[listen_21]			|	X      |	X      |      -      |      -      |      -      |     -     |
 net[listen_23]			|	X      |	X      |      -      |      -      |      -      |     -     |
-net[listen_25]			|	X      |	X      |      -      |      -      |      -      |     -     |
 net[listen_80]			|	X      |	X      |      -      |      -      |      -      |     -     |
 net[listen_110]			|	X      |	X      |      -      |      -      |      -      |     -     |
 net[listen_143]			|	X      |	X      |      -      |      -      |      -      |     -     |
 
+service_check[ftp]		|	X      |	X      |      ?      |      ?      |      ?      |     ?     |
 service_check[ssh]		|	X      |	X      |      ?      |      ?      |      ?      |     ?     |
+service_check[smtp]		|	X      |	X      |      ?      |      ?      |      ?      |     ?     |
+service_check[pop]		|	X      |	X      |      ?      |      ?      |      ?      |     ?     |
+service_check[nntp]		|	X      |	X      |      ?      |      ?      |      ?      |     ?     |
+service_check[imap]		|	X      |	X      |      ?      |      ?      |      ?      |     ?     |
 
 6. Chapter 6 (Upgrading)
 
@@ -727,11 +730,13 @@ This unloads DNS and makes zabbix_suckerd faster.
 
 6.2 Zabbix 1.0alpha9
 
-Do not forget to install DB patches.
+Do not forget to apply DB patches.
 
-6.3 Zabbix 1.0alpha9
+6.3 Zabbix 1.0alpha10
 
-Replace net[listen_22] by check_service[ssh] in table items.
+Do not forget to apply DB patches.
+
+Note that parameters net[listen_*] will be replaced by check_service[*] (for example, net[listen_25] -> check_service[smtp]).
 
 7. Chapter 7 (Misc)
 
