@@ -73,11 +73,11 @@
 
 	echo "<TABLE WIDTH=100% align=center BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR>";
-	echo "<TD><FONT SIZE=+1>Time</FONT></TD>";
-	echo "<TD><FONT SIZE=+1>Status</FONT></TD>";
-	echo "<TD><FONT SIZE=+1>Duration</FONT></TD>";
-	echo "<TD><FONT SIZE=+1>Sum</FONT></TD>";
-	echo "<TD><FONT SIZE=+1>%</FONT></TD>";
+	echo "<TD><B>Time</B></TD>";
+	echo "<TD><B>Status</B></TD>";
+	echo "<TD><B>Duration</B></TD>";
+	echo "<TD><B>Sum</B></TD>";
+	echo "<TD><B>%</B></TD>";
 	echo "</TR>";
 	$truesum=0;
 	$falsesum=0;
