@@ -132,7 +132,7 @@ CREATE TABLE alerts (
   PRIMARY KEY (alertid),
   INDEX (actionid),
   KEY clock (clock),
-  KEY status_retries (sent, retries)
+  KEY status_retries (status, retries)
 );
 
 --

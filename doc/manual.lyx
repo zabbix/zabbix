@@ -24,13 +24,13 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.22)
+Zabbix Reference Manual for version 1.0 (draft v1.23)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-23 June 2002
+27 June 2002
 \layout Abstract
 
 The document is Reference Manual for Zabbix version 1.0.
@@ -175,7 +175,7 @@ script
 
 \layout Standard
 
-Commands
+Shell commands
 \end_inset 
 </cell>
 </row>
@@ -667,7 +667,7 @@ A
 What resources specific IT service depends on?
 \layout Standard
 
-Example: WEB portan depends on the following recources:
+Example: WEB portal may depend on the following recources:
 \layout Enumerate
 
 processor load on server 
@@ -6748,7 +6748,7 @@ FreeBSD localhost 4.4-RELEASE FreeBSD 4.4-RELEASE #0: Tue Sep 18 11:57:08
 SNMP parameters
 \layout Standard
 
-When defining SNMP parameter, the following field must be filled:
+Example:
 \layout Standard
 
 Community: public
@@ -6758,6 +6758,24 @@ Oid: 1.2.3.45.6.7.8.0
 \layout Standard
 
 Key: <Unique string to be used as reference to triggers>
+\newline 
+
+\newline 
+Note that OID can be given in either numeric or in string form.
+ However, in some cases, string OID must be converted to numeric representation.
+ Untility 
+\emph on 
+snmpget
+\emph default 
+ may be used for this purpose:
+\newline 
+
+\layout Standard
+
+
+\family typewriter 
+\emph on 
+snmpget -On localhost public enterprises.ucdavis.memory.memTotalSwap.0
 \layout Standard
 
 \layout Subsection
@@ -9735,6 +9753,129 @@ X
 \end_inset 
 
 
+\layout Section
+
+Monitoring of specific applications
+\layout Subsection
+
+MySQL
+\layout Standard
+
+Configuration file 
+\emph on 
+misc/conf/zabbix_agentd.conf
+\emph default 
+ contains list of user defined parameters that can be used for monitoring
+ of MySQL.
+\newline 
+
+\layout Standard
+
+
+\family typewriter 
+\emph on 
+### Set of parameter for monitoring MySQL server (v3.23.42 and later)
+\layout Standard
+
+
+\family typewriter 
+\emph on 
+### Change -u<username> and add -p<password> if required
+\layout Standard
+
+
+\family typewriter 
+\emph on 
+\SpecialChar ~
+
+\layout Standard
+
+
+\family typewriter 
+\emph on 
+#UserParameter=mysql[ping],mysqladmin -uroot ping|grep alive|wc -l
+\layout Standard
+
+
+\family typewriter 
+\emph on 
+#UserParameter=mysql[uptime],mysqladmin -uroot status|cut -f2 -d":"|cut
+ -f1 -d"T"
+\layout Standard
+
+
+\family typewriter 
+\emph on 
+#UserParameter=mysql[threads],mysqladmin -uroot status|cut -f3 -d":"|cut
+ -f1 -d"Q"
+\layout Standard
+
+
+\family typewriter 
+\emph on 
+#UserParameter=mysql[questions],mysqladmin -uroot status|cut -f4 -d":"|cut
+ -f1 -d"S"
+\layout Standard
+
+
+\family typewriter 
+\emph on 
+#UserParameter=mysql[slowqueries],mysqladmin -uroot status|cut -f5 -d":"|cut
+ -f1 -d"O"
+\layout Standard
+
+
+\family typewriter 
+\emph on 
+#UserParameter=mysql[qps],mysqladmin -uroot status|cut -f9 -d":"
+\layout Standard
+
+
+\family typewriter 
+\emph on 
+#UserParameter=version[mysql],mysql -V
+\layout Description
+
+mysql[ping] 
+\latex no_latex 
+Check
+\latex default 
+, if MySQL is alive
+\layout Standard
+
+
+\latex no_latex 
+Result: 0 - 
+\latex default 
+not started
+\layout Standard
+
+
+\latex no_latex 
+1 - 
+\latex default 
+alive
+\layout Description
+
+mysql[uptime] Number of seconds MySQL is running
+\layout Description
+
+mysql[threads] Number of MySQL threads
+\layout Description
+
+mysql[questions] Number of processed queries
+\layout Description
+
+mysql[slowqueries] Number of slow queries
+\layout Description
+
+mysql[qps] Queries per second
+\layout Description
+
+mysql[version] Version of MySQL
+\layout Standard
+
+Example: mysql Ver 11.16 Distrib 3.23.49, for pc-linux-gnu (i686)
 \layout Section
 
 Getting Maximum Performace From Zabbix
