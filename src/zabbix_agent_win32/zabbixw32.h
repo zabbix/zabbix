@@ -26,6 +26,7 @@
 #include <windows.h>
 #include <process.h>
 #include <stdio.h>
+#include <pdh.h>
 #include "common.h"
 
 
@@ -33,30 +34,62 @@
 // Common constants
 //
 
-#define AGENT_VERSION         "1.0.0-alpha2"
+#define AGENT_VERSION         "1.0.0-alpha3"
 
 #define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
 
-#define MAX_ZABBIX_CMD_LEN    MAX_STRING_LEN
+#define COMMAND_TIMEOUT       5
 
+#define MAX_ZABBIX_CMD_LEN    MAX_STRING_LEN
 #define MAX_CPU               16
 #define MAX_PARAMETERS        256
 #define MAX_PARAM_NAME        64
 #define MAX_PROCESSES         4096
 #define MAX_MODULES           512
+#define MAX_ALIAS_NAME        120
+#define MAX_COUNTER_NAME      (MAX_ALIAS_NAME-12)
 
 
 //
 // Parameter definition structure
 //
 
-typedef struct
+struct AGENT_COMMAND
 {
    char name[MAX_PARAM_NAME];                   // Command's name
-   float (* handler_float)(char *,char *);       // Handler if return value is numeric
-   char * (* handler_string)(char *,char *);     // Handler if return value is string
+   float (* handler_float)(char *,char *);      // Handler if return value is numeric
+   char *(* handler_string)(char *,char *);     // Handler if return value is string
    char *arg;                                   // Optional command argument
-} AGENT_COMMAND;
+};
+
+
+//
+// Alias information structure
+//
+
+struct ALIAS
+{
+   ALIAS *next;
+   char name[MAX_ALIAS_NAME];
+   char *value;
+};
+
+
+//
+// User-defined performance counter structure
+//
+
+struct USER_COUNTER
+{
+   USER_COUNTER *next;              // Pointer to next counter in chain
+   char name[MAX_PARAM_NAME];
+   char counterPath[MAX_PATH];
+   LONG interval;                   // Time interval used in calculations
+   LONG currPos;                    // Current position in buffer
+   HCOUNTER handle;                 // Counter handle (set by collector thread)
+   PDH_RAW_COUNTER *rawValueArray;
+   float lastValue;                 // Last computed average value
+};
 
 
 //
@@ -89,6 +122,9 @@ void ProcessCommand(char *cmd,char *result);
 
 BOOL ReadConfig(void);
 
+BOOL AddAlias(char *name,char *value);
+void ExpandAlias(char *orig,char *expanded);
+
 
 //
 // Global variables
@@ -102,6 +138,9 @@ extern char confFile[];
 extern char logFile[];
 extern DWORD confServerAddr;
 extern WORD confListenPort;
+extern DWORD confTimeout;
+
+extern USER_COUNTER *userCounterList;
 
 extern float statProcUtilization[];
 extern float statProcUtilization5[];

@@ -24,6 +24,29 @@
 
 
 //
+// Request structure
+//
+
+struct REQUEST
+{
+   char cmd[MAX_ZABBIX_CMD_LEN];
+   char result[MAX_STRING_LEN];
+};
+
+
+//
+// Request processing thread
+//
+
+static unsigned int __stdcall ProcessingThread(void *arg)
+{
+   TlsSetValue(dwTlsLogPrefix,"ProcessingThread: ");
+   ProcessCommand(((REQUEST *)arg)->cmd,((REQUEST *)arg)->result);
+   return 0;
+}
+
+
+//
 // Client communication thread
 //
 
@@ -31,26 +54,54 @@ static void CommThread(void *param)
 {
    SOCKET sock;
    int rc;
-   char cmd[MAX_ZABBIX_CMD_LEN],result[MAX_STRING_LEN];
+   REQUEST rq;
+	struct timeval timeout;
+	FD_SET rdfs;
+   HANDLE hThread=NULL;
+   unsigned int tid;
 
    TlsSetValue(dwTlsLogPrefix,"CommThread: ");   // Set log prefix for communication thread
    sock=(SOCKET)param;
 
-   rc=recv(sock,cmd,MAX_ZABBIX_CMD_LEN,0);
+   // Wait for command from server
+	FD_ZERO(&rdfs);
+	FD_SET(sock,&rdfs);
+	timeout.tv_sec=COMMAND_TIMEOUT;
+	timeout.tv_usec=0;
+	if (select(sock+1,&rdfs,NULL,NULL,&timeout)==0)
+	{
+		WriteLog("Timed out waiting for server command\r\n");
+      goto end_session;
+	}
+
+   rc=recv(sock,rq.cmd,MAX_ZABBIX_CMD_LEN,0);
    if (rc<=0)
    {
       WriteLog("recv() failed [%s]\r\n",strerror(errno));
       goto end_session;
    }
 
-   cmd[rc-1]=0;
-   ProcessCommand(cmd,result);
-   send(sock,result,strlen(result),0);
+   rq.cmd[rc-1]=0;
+
+   hThread=(HANDLE)_beginthreadex(NULL,0,ProcessingThread,(void *)&rq,0,&tid);
+   if (WaitForSingleObject(hThread,confTimeout)==WAIT_TIMEOUT)
+   {
+      sprintf(rq.result,"%f",(float)TIMEOUT_ERROR);
+      WriteLog("Timed out while processing request (%s)\r\n",rq.cmd);
+   }
+   send(sock,rq.result,strlen(rq.result),0);
 
    // Terminate session
 end_session:
    shutdown(sock,2);
    closesocket(sock);
+
+   // Now wait for processing thread completion if we start one
+   if (hThread!=NULL)
+   {
+      WaitForSingleObject(hThread,INFINITE);
+      CloseHandle(hThread);
+   }
 }
 
 
