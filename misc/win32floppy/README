@@ -1,0 +1,13 @@
+This are small contribution to Zabbix 1.0 [http://www.zabbix.org]
+I thought it could make it more useful.
+
+	Fabricio Ferrari, Jan 2004
+	Porto Alegre, Brasil
+	[fabricio@ferrari.pro.br]
+
+HOWTO:
+
+ - format a floppy
+ - copy install.bat, ZabbixW32.exe, and zabbix_agentd.conf to the floppy
+
+Use the floppy to quickly install W32 agent!
