@@ -44,6 +44,7 @@ int	stats_request=0;
 
 static	char	*CONFIG_HOST_ALLOWED=NULL;
 static	char	*CONFIG_PID_FILE=NULL;
+static	char	*CONFIG_LOG_FILE=NULL;
 static	int	CONFIG_AGENTD_FORKS=AGENTD_FORKS;
 static	int	CONFIG_NOTIMEWAIT=0;
 static	int	CONFIG_TIMEOUT=AGENT_TIMEOUT;
@@ -154,7 +155,14 @@ void    daemon_init(void)
 /*        openlog("zabbix_agentd",LOG_LEVEL_PID,LOG_USER);
 	setlogmask(LOG_UPTO(LOG_WARNING));*/
 
-	zabbix_open_log(LOG_TYPE_FILE,LOG_LEVEL_WARNING,"/tmp/tmp.zzz");
+	if(CONFIG_LOG_FILE == NULL)
+	{
+		zabbix_open_log(LOG_TYPE_SYSLOG,LOG_LEVEL_WARNING,NULL);
+	}
+	else
+	{
+		zabbix_open_log(LOG_TYPE_FILE,LOG_LEVEL_WARNING,CONFIG_LOG_FILE);
+	}
 
 	if(setpriority(PRIO_PROCESS,0,5)!=0)
 	{
@@ -240,6 +248,10 @@ void	process_config_file(void)
 		else if(strcmp(parameter,"PidFile")==0)
 		{
 			CONFIG_PID_FILE=strdup(value);
+		}
+		else if(strcmp(parameter,"LogFile")==0)
+		{
+			CONFIG_LOG_FILE=strdup(value);
 		}
 		else if(strcmp(parameter,"Timeout")==0)
 		{

@@ -15,6 +15,11 @@ Not ready yet:
 
 Changes for 1.0beta3:
 
+ - added parameter LogFile for zabbix_trapper (Alexei)
+ - added parameter LogFile for zabbix_trapperd (Alexei)
+ - added parameter LogFile for zabbix_agentd (Alexei)
+ - added parameter LogFile for zabbix_suckerd (Alexei)
+
  - added partial support for non-syslog logging (Alexei)
  - added files include/log.h and include/log.c (Alexei)
  - solved problem with getpeername() (Alexei)
