@@ -523,6 +523,38 @@ void	apply_actions(int triggerid,int good)
 }
 
 /*
+ * Recursive function!
+ */
+void	update_services(int triggerid)
+{
+	char	sql[1024];
+	int	i,rows;
+
+	DB_RESULT *result;
+
+
+	sprintf(sql,"select serviceupid from services_links where servicedownid=%d", triggerid);
+
+	result = DBselect(sql);
+
+	rows = DBnum_rows(result);
+
+	if(rows == 0)
+	{
+		DBfree_result(result);
+		return;
+	}
+
+	for(i=0;i<rows;i++)
+	{
+		update_services(atoi(DBget_field(result,i,0)));
+	}
+
+	DBfree_result(result);
+	return;
+}
+
+/*
  * Re-calculate values of triggers
  */ 
 void	update_triggers( int flag, int sucker_num, int lastclock )
@@ -582,6 +614,8 @@ void	update_triggers( int flag, int sucker_num, int lastclock )
 
 			sprintf(c,"update actions set nextcheck=0 where triggerid=%d and good=0",trigger.triggerid);
 			DBexecute(c);
+
+			update_services(trigger.triggerid);
 		}
 
 		if((b==0)&&(trigger.istrue!=0))
@@ -598,6 +632,8 @@ void	update_triggers( int flag, int sucker_num, int lastclock )
 
 			sprintf(c,"update actions set nextcheck=0 where triggerid=%d and good=1",trigger.triggerid);
 			DBexecute(c);
+
+			update_services(trigger.triggerid);
 		}
 	}
 	DBfree_result(result);

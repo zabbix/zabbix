@@ -142,7 +142,10 @@
 		}
 		else
 		{
-			ImageLine($im,$shiftX,$shiftYup+$sizeY/2,$sizeX+$shiftX,$shiftYup+$sizeY/2,$colors[$color[$item]]);
+			if(isset($minX))
+			{
+				ImageLine($im,$shiftX,$shiftYup+$sizeY/2,$sizeX+$shiftX,$shiftYup+$sizeY/2,$colors[$color[$item]]);
+			}
 		}
 #		ImageFilledRectangle($im,$shiftX+200*$item,$sizeY+$shiftYup+19,$shiftX+200*$item+5,$sizeY+$shiftYup+15+9,$colors[$color[$item]]);
 #		ImageString($im, 2,$shiftX+200*$item+9,$sizeY+$shiftYup+15, $desc[$item], $gray);
