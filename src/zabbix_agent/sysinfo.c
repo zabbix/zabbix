@@ -332,7 +332,11 @@ float	EXECUTE(char *command)
 		return	FAIL;
 	}
 	fgets(c,1024,f);
-	pclose(f);
+
+	if(pclose(f) != 0)
+	{
+		return	FAIL;	
+	}
 
 	sscanf(c, "%f", &result );
 
