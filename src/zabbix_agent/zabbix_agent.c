@@ -69,7 +69,12 @@ COMMAND	commands[]=
 	{"ping"				,PING, 0},
 	{"tcp_count"			,EXECUTE, "netstat -tn|grep EST|wc -l"},
 
+	{"net[listen_21]"		,EXECUTE, "netstat -an|grep LISTEN|grep -v grep|grep ':21 '|wc -l"},
+	{"net[listen_22]"		,EXECUTE, "netstat -an|grep LISTEN|grep -v grep|grep ':22 '|wc -l"},
+	{"net[listen_23]"		,EXECUTE, "netstat -an|grep LISTEN|grep -v grep|grep ':23 '|wc -l"},
 	{"net[listen_25]"		,EXECUTE, "netstat -an|grep LISTEN|grep -v grep|grep ':25 '|wc -l"},
+	{"net[listen_80]"		,EXECUTE, "netstat -an|grep LISTEN|grep -v grep|grep ':80 '|wc -l"},
+	{"net[listen_143]"		,EXECUTE, "netstat -an|grep LISTEN|grep -v grep|grep ':143 '|wc -l"},
 	{0				,0}
 	};
 
