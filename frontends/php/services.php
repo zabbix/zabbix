@@ -20,12 +20,12 @@
 	{
 		if($HTTP_GET_VARS["register"]=="update")
 		{
-			$result=@update_service($HTTP_GET_VARS["serviceid"],$HTTP_GET_VARS["name"],$HTTP_GET_VARS["triggerid"],$HTTP_GET_VARS["linktrigger"],$HTTP_GET_VARS["algorithm"],$HTTP_GET_VARS["showsla"],$HTTP_GET_VARS["goodsla"]);
+			$result=@update_service($HTTP_GET_VARS["serviceid"],$HTTP_GET_VARS["name"],$HTTP_GET_VARS["triggerid"],$HTTP_GET_VARS["linktrigger"],$HTTP_GET_VARS["algorithm"],$HTTP_GET_VARS["showsla"],$HTTP_GET_VARS["goodsla"],$HTTP_GET_VARS["sortorder"]);
 			show_messages($result,"Service updated","Cannot update service");
 		}
 		if($HTTP_GET_VARS["register"]=="add")
 		{
-			$result=@add_service($HTTP_GET_VARS["serviceid"],$HTTP_GET_VARS["name"],$HTTP_GET_VARS["triggerid"],$HTTP_GET_VARS["linktrigger"],$HTTP_GET_VARS["algorithm"],$HTTP_GET_VARS["showsla"],$HTTP_GET_VARS["goodsla"]);
+			$result=@add_service($HTTP_GET_VARS["serviceid"],$HTTP_GET_VARS["name"],$HTTP_GET_VARS["triggerid"],$HTTP_GET_VARS["linktrigger"],$HTTP_GET_VARS["algorithm"],$HTTP_GET_VARS["showsla"],$HTTP_GET_VARS["goodsla"],$HTTP_GET_VARS["goodsla"]);
 			show_messages($result,"Service added","Cannot add service");
 		}
 		if($HTTP_GET_VARS["register"]=="add server")
@@ -64,7 +64,7 @@
 	show_table_header("IT SERVICES");
 
 	$now=time();
-	$result=DBselect("select serviceid,name,algorithm from services order by name");
+	$result=DBselect("select serviceid,name,algorithm from services order by sortorder,name");
 	echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";
 	echo "<tr>";
 	echo "<td><b>Service</b></td>";
@@ -188,18 +188,20 @@
 <?php
 	if(isset($HTTP_GET_VARS["serviceid"]))
 	{
-		$result=DBselect("select serviceid,triggerid,name,algorithm,showsla,goodsla from services where serviceid=".$HTTP_GET_VARS["serviceid"]);
+		$result=DBselect("select serviceid,triggerid,name,algorithm,showsla,goodsla,sortorder from services where serviceid=".$HTTP_GET_VARS["serviceid"]);
 		$triggerid=DBget_field($result,0,1);
 		$name=DBget_field($result,0,2);
 		$algorithm=DBget_field($result,0,3);
 		$showsla=DBget_field($result,0,4);
 		$goodsla=DBget_field($result,0,5);
+		$sortorder=DBget_field($result,0,6);
 	}
 	else
 	{
 		$name="";
 		$showsla=0;
 		$goodsla=99.05;
+		$sortorder=0;
 		unset($HTTP_GET_VARS["triggerid"]);
 	}
 
@@ -304,6 +306,12 @@
                 }
         }
         echo "</SELECT>";
+
+	show_table2_v_delimiter();
+	echo "Sort order (0->999)";
+	show_table2_h_delimiter();
+	echo "<input class=\"biginput\" name=\"sortorder\" value=\"$sortorder\" size=3>";
+
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
