@@ -1,5 +1,14 @@
 TOP PRIORITY:
 
+ - BUG.
+First and foremost, there are definitions in the PostgreSQL schema that
+define columns as "int4" with "99.9" ( a floating point number ) as a
+default. That may well work on MySQL, but does not on PostgreSQL.
+
+Additionally, the value_types column in the items table is incorrectly
+placed when compared to the MySQL schema. It's the third column in the
+psql definition, but the second last in the mysql one.
+
  - pay attention to Solaris agent
  - user parameter to overwrite already supported
  - better viewing of trigger dependencies
