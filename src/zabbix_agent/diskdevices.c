@@ -50,6 +50,8 @@
 /* Required for getpwuid */
 #include <pwd.h>
 
+#include <dirent.h>
+
 #include "common.h"
 #include "sysinfo.h"
 #include "security.h"
@@ -61,6 +63,104 @@
 
 DISKDEVICE diskdevices[MAX_DISKDEVICES];
 
+int	get_device_name(char *device,int major,int minor)
+{
+	DIR	*dir;
+	struct	dirent *entries;
+	struct	stat buf;
+	char	filename[1204];
+
+	dir=opendir("/dev");
+	while((entries=readdir(dir))!=NULL)
+	{
+		strncpy(filename,"/dev/",1024);	
+		strncat(filename,entries->d_name,1024);
+
+		if(stat(filename,&buf)==0)
+		{
+/*			printf("%s %d %d\n",filename,major(buf.st_rdev),minor(buf.st_rdev));*/
+			if(S_ISBLK(buf.st_mode)&&(major==major(buf.st_rdev))&&(minor==minor(buf.st_rdev)))
+			{
+				strcpy(device,entries->d_name);
+/*				printf("%s [%d %d] %d %d\n",filename,major, minor, major(buf.st_rdev),minor(buf.st_rdev));*/
+				closedir(dir);
+				return 0;
+			}
+		}
+	}
+	closedir(dir);
+	return	1;
+}
+
+void	init_stats_diskdevices()
+{
+	FILE	*file;
+	char	*s,*s2;
+	char	line[1024+1];
+	char	device[1024+1];
+	int	i,j;
+	int	major,minor;
+	int	noinfo;
+	int	read_io_ops;
+	int	blks_read;
+	int	write_io_ops;
+	int	blks_write;
+
+	for(i=0;i<MAX_DISKDEVICES;i++)
+	{
+		diskdevices[i].device=0;
+		for(j=0;j<60*15;j++)
+		{
+			diskdevices[i].clock[j]=0;
+		}
+	}
+
+	file=fopen("/proc/stat","r");
+	if(NULL == file)
+	{
+		fprintf(stderr, "Cannot open [%s] [%m]\n","/proc/stat");
+		return;
+	}
+	i=0;
+	while(fgets(line,1024,file) != NULL)
+	{
+		if( (s=strstr(line,"disk_io:")) == NULL)
+			continue;
+
+		s=line;
+
+		for(;;)
+		{
+			if( (s=strchr(s,' ')) == NULL)
+				break;
+			s++;
+			if( (s2=strchr(s,')')) == NULL)
+				break;
+			if( (s2=strchr(s2+1,')')) == NULL)
+				break;
+			s2++;
+	
+			strncpy(device,s,s2-s);
+			device[s2-s]=0;
+			sscanf(device,"(%d,%d):(%d,%d,%d,%d,%d)",&major,&minor,&noinfo,&read_io_ops,&blks_read,&write_io_ops,&blks_write);
+/*			printf("Major:[%d] Minor:[%d] read_io_ops[%d]\n",major,minor,read_io_ops);*/
+	
+			if(get_device_name(device,major,minor)==0)
+			{
+/*				printf("Device:%s\n",device);*/
+				diskdevices[i].device=strdup(device);
+				diskdevices[i].major=major;
+				diskdevices[i].minor=minor;
+				i++;
+			}
+			s=s2;
+		}
+	}
+
+	fclose(file);
+}
+
+/*
 void	init_stats_diskdevices()
 {
 	FILE	*file;
@@ -106,6 +206,7 @@ void	init_stats_diskdevices()
 
 	fclose(file);
 }
+*/
 
 void	report_stats_diskdevices(FILE *file, int now)
 {
@@ -193,85 +294,110 @@ void	report_stats_diskdevices(FILE *file, int now)
 
 		if((read_io_ops[0]!=0)&&(read_io_ops[1]!=0))
 		{
-			fprintf(file,"netloadout1[%s] %f\n", diskdevices[i].device, (float)((read_io_ops[0]-read_io_ops[1])/(now-time1)));
+			fprintf(file,"disk_read_ops1[%s] %f\n", diskdevices[i].device, (float)((read_io_ops[0]-read_io_ops[1])/(now-time1)));
 		}
 		else
 		{
-			fprintf(file,"netloadout1[%s] 0\n", diskdevices[i].device);
+			fprintf(file,"disk_read_ops1[%s] 0\n", diskdevices[i].device);
 		}
 		if((read_io_ops[0]!=0)&&(read_io_ops[2]!=0))
 		{
-			fprintf(file,"netloadout5[%s] %f\n", diskdevices[i].device, (float)((read_io_ops[0]-read_io_ops[2])/(now-time5)));
+			fprintf(file,"disk_read_ops5[%s] %f\n", diskdevices[i].device, (float)((read_io_ops[0]-read_io_ops[2])/(now-time5)));
 		}
 		else
 		{
-			fprintf(file,"netloadout5[%s] 0\n", diskdevices[i].device);
+			fprintf(file,"disk_read_ops5[%s] 0\n", diskdevices[i].device);
 		}
 		if((read_io_ops[0]!=0)&&(read_io_ops[3]!=0))
 		{
-			fprintf(file,"netloadout15[%s] %f\n", diskdevices[i].device, (float)((read_io_ops[0]-read_io_ops[3])/(now-time15)));
+			fprintf(file,"disk_read_ops15[%s] %f\n", diskdevices[i].device, (float)((read_io_ops[0]-read_io_ops[3])/(now-time15)));
 		}
 		else
 		{
-			fprintf(file,"netloadout15[%s] 0\n", diskdevices[i].device);
+			fprintf(file,"disk_read_ops15[%s] 0\n", diskdevices[i].device);
+		}
+
+		if((blks_read[0]!=0)&&(blks_read[1]!=0))
+		{
+			fprintf(file,"disk_read_blks1[%s] %f\n", diskdevices[i].device, (float)((blks_read[0]-blks_read[1])/(now-time1)));
+		}
+		else
+		{
+			fprintf(file,"disk_read_blks1[%s] 0\n", diskdevices[i].device);
+		}
+		if((blks_read[0]!=0)&&(blks_read[2]!=0))
+		{
+			fprintf(file,"disk_read_blks5[%s] %f\n", diskdevices[i].device, (float)((blks_read[0]-blks_read[2])/(now-time5)));
+		}
+		else
+		{
+			fprintf(file,"disk_read_blks5[%s] 0\n", diskdevices[i].device);
+		}
+		if((blks_read[0]!=0)&&(blks_read[3]!=0))
+		{
+			fprintf(file,"disk_read_blks15[%s] %f\n", diskdevices[i].device, (float)((blks_read[0]-blks_read[3])/(now-time15)));
+		}
+		else
+		{
+			fprintf(file,"disk_read_blks15[%s] 0\n", diskdevices[i].device);
 		}
 
 		if((write_io_ops[0]!=0)&&(write_io_ops[1]!=0))
 		{
-			fprintf(file,"netloadout1[%s] %f\n", diskdevices[i].device, (float)((write_io_ops[0]-write_io_ops[1])/(now-time1)));
+			fprintf(file,"disk_write_ops1[%s] %f\n", diskdevices[i].device, (float)((write_io_ops[0]-write_io_ops[1])/(now-time1)));
 		}
 		else
 		{
-			fprintf(file,"netloadout1[%s] 0\n", diskdevices[i].device);
+			fprintf(file,"disk_write_ops1[%s] 0\n", diskdevices[i].device);
 		}
 		if((write_io_ops[0]!=0)&&(write_io_ops[2]!=0))
 		{
-			fprintf(file,"netloadout5[%s] %f\n", diskdevices[i].device, (float)((write_io_ops[0]-write_io_ops[2])/(now-time5)));
+			fprintf(file,"disk_write_ops5[%s] %f\n", diskdevices[i].device, (float)((write_io_ops[0]-write_io_ops[2])/(now-time5)));
 		}
 		else
 		{
-			fprintf(file,"netloadout5[%s] 0\n", diskdevices[i].device);
+			fprintf(file,"disk_write_ops5[%s] 0\n", diskdevices[i].device);
 		}
 		if((write_io_ops[0]!=0)&&(write_io_ops[3]!=0))
 		{
-			fprintf(file,"netloadout15[%s] %f\n", diskdevices[i].device, (float)((write_io_ops[0]-write_io_ops[3])/(now-time15)));
+			fprintf(file,"disk_write_ops15[%s] %f\n", diskdevices[i].device, (float)((write_io_ops[0]-write_io_ops[3])/(now-time15)));
 		}
 		else
 		{
-			fprintf(file,"netloadout15[%s] 0\n", diskdevices[i].device);
+			fprintf(file,"disk_write_ops15[%s] 0\n", diskdevices[i].device);
 		}
 
-/*
-		if((received!=0)&&(received1!=0))
+		if((blks_write[0]!=0)&&(blks_write[1]!=0))
 		{
-			fprintf(file,"netloadin1[%s] %f\n", diskdevices[i].interface, (float)((received-received1)/(now-time1)));
+			fprintf(file,"disk_write_blks1[%s] %f\n", diskdevices[i].device, (float)((blks_write[0]-blks_write[1])/(now-time1)));
 		}
 		else
 		{
-			fprintf(file,"netloadin1[%s] 0\n", diskdevices[i].interface);
+			fprintf(file,"disk_write_blks1[%s] 0\n", diskdevices[i].device);
 		}
-		if((received!=0)&&(received5!=0))
+		if((blks_write[0]!=0)&&(blks_write[2]!=0))
 		{
-			fprintf(file,"netloadin5[%s] %f\n", diskdevices[i].interface, (float)((received-received5)/(now-time5)));
-		}
-		else
-		{
-			fprintf(file,"netloadin5[%s] 0\n", diskdevices[i].interface);
-		}
-		if((received!=0)&&(received15!=0))
-		{
-			fprintf(file,"netloadin15[%s] %f\n", diskdevices[i].interface, (float)((received-received15)/(now-time15)));
+			fprintf(file,"disk_write_blks5[%s] %f\n", diskdevices[i].device, (float)((blks_write[0]-blks_write[2])/(now-time5)));
 		}
 		else
 		{
-			fprintf(file,"netloadin15[%s] 0\n", diskdevices[i].interface);
-		}*/
+			fprintf(file,"disk_write_blks5[%s] 0\n", diskdevices[i].device);
+		}
+		if((blks_write[0]!=0)&&(blks_write[3]!=0))
+		{
+			fprintf(file,"disk_write_blks15[%s] %f\n", diskdevices[i].device, (float)((blks_write[0]-blks_write[3])/(now-time15)));
+		}
+		else
+		{
+			fprintf(file,"disk_write_blks15[%s] 0\n", diskdevices[i].device);
+		}
+
 	}
 
 }
 
 
-void	add_values_diskdevices(int now,char *device,float read_io_ops,float write_io_ops)
+void	add_values_diskdevices(int now,int major,int minor,float read_io_ops,float blks_read,float write_io_ops,float blks_write)
 {
 	int i,j;
 
@@ -279,7 +405,7 @@ void	add_values_diskdevices(int now,char *device,float read_io_ops,float write_i
 
 	for(i=0;i<MAX_DISKDEVICES;i++)
 	{
-		if(0 == strcmp(diskdevices[i].device,device))
+		if((diskdevices[i].major==major)&&(diskdevices[i].minor==minor))
 		{
 			for(j=0;j<15*60;j++)
 			{
@@ -287,7 +413,9 @@ void	add_values_diskdevices(int now,char *device,float read_io_ops,float write_i
 				{
 					diskdevices[i].clock[j]=now;
 					diskdevices[i].read_io_ops[j]=read_io_ops;
+					diskdevices[i].blks_read[j]=blks_read;
 					diskdevices[i].write_io_ops[j]=write_io_ops;
+					diskdevices[i].blks_write[j]=blks_write;
 					break;
 				}
 			}
@@ -300,13 +428,17 @@ void	collect_stats_diskdevices(FILE *outfile)
 {
 	FILE	*file;
 
-	char	*s;
+	char	*s,*s2;
 	char	line[MAX_STRING_LEN+1];
-	int	i,j;
-	int	i1,j1;
-	char	interface[MAX_STRING_LEN+1];
+	int	i;
+	char	device[MAX_STRING_LEN+1];
 	int	now;
-	float	received,sent;
+	int	major,minor;
+	int	noinfo;
+	int	read_io_ops;
+	int	blks_read;
+	int	write_io_ops;
+	int	blks_write;
 
 	/* Must be static */
 	static	int initialised=0;
@@ -319,51 +451,41 @@ void	collect_stats_diskdevices(FILE *outfile)
 
 	now=time(NULL);
 
-	file=fopen("/proc/net/dev","r");
+	file=fopen("/proc/stat","r");
 	if(NULL == file)
 	{
-		fprintf(stderr, "Cannot open config file [%s] [%m]\n","/proc/net/dev");
+		fprintf(stderr, "Cannot open [%s] [%m]\n","/proc/stat");
 		return;
 	}
-
-
 	i=0;
-	while(fgets(line,MAX_STRING_LEN,file) != NULL)
+	while(fgets(line,1024,file) != NULL)
 	{
-		if( (s=strstr(line,":")) == NULL)
+		if( (s=strstr(line,"disk_io:")) == NULL)
 			continue;
-		strncpy(interface,line,s-line);
-		interface[s-line]=0;
-		j1=0;
-		for(i1=0;i1<strlen(interface);i1++)
+
+		s=line;
+
+		for(;;)
 		{
-			if(interface[i1]!=' ')
-			{
-				interface[j1++]=interface[i1];
-			}
+			if( (s=strchr(s,' ')) == NULL)
+				break;
+			s++;
+			if( (s2=strchr(s,')')) == NULL)
+				break;
+			if( (s2=strchr(s2+1,')')) == NULL)
+				break;
+			s2++;
+	
+			strncpy(device,s,s2-s);
+			device[s2-s]=0;
+			sscanf(device,"(%d,%d):(%d,%d,%d,%d,%d)",&major,&minor,&noinfo,&read_io_ops,&blks_read,&write_io_ops,&blks_write);
+/*			printf("Major:[%d] Minor:[%d] read_io_ops[%d]\n",major,minor,read_io_ops);*/
+			add_values_diskdevices(now,major,minor,read_io_ops,blks_read,write_io_ops,blks_write);
+	
+			s=s2;
 		}
-		interface[j1]=0;
-		s=strtok(line,":");
-		j=0;
-/*		printf("Interface [%s]\n",interface);*/
-		while(s)
-		{
-			s = strtok(NULL," ");
-			if(j==0)
-			{
-/*				printf("Received [%s]\n",s);*/
-				received=atof(s);
-			}
-			else if(j==8)
-			{
-/*				printf("Sent [%s]\n",s);*/
-				sent=atof(s);
-				add_values_diskdevices(now,interface,sent,received);
-			}
-			j++;
-		}
-		i++;
 	}
+
 	fclose(file);
 
 	report_stats_diskdevices(outfile, now);
