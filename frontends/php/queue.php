@@ -60,6 +60,12 @@
 		echo "</tr>";
 		cr();
 	}
+	if(DBnum_rows($result)==0)
+	{
+			echo "<TR BGCOLOR=#EEEEEE>";
+			echo "<TD COLSPAN=3 ALIGN=CENTER>-The queue is empty-</TD>";
+			echo "<TR>";
+	}
 	echo "</table>";
 ?>
 <?php

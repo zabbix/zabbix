@@ -131,6 +131,12 @@
 		echo "</TR>";
 		cr();
 	}
+	if(DBnum_rows($result)==0)
+	{
+			echo "<TR BGCOLOR=#EEEEEE>";
+			echo "<TD COLSPAN=6 ALIGN=CENTER>-No alerts-</TD>";
+			echo "<TR>";
+	}
 	echo "</TABLE>";
 ?>
 </FONT>
