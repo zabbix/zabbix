@@ -5,6 +5,8 @@ Not ready yet (later versions):
 [ CORE. SSL between server and agents ]
 [ CORE. Support of monitoring of log files ]
 [ HB. Verify parameters before using them in SQL ]
+[ CORE. Support for zabbix_agentd -f <config file> for every process]
+[ CORE. One-connection-one-server concept. Is it real ? ]
 
 Not ready yet (1.0beta4):
 
