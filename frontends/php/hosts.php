@@ -95,7 +95,8 @@
 <?php
 	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR><TD WIDTH=3%><B>Id</B></TD>";
-	echo "<TD><B>Name</B></TD>";
+	echo "<TD WIDTH=10%><B>Name</B></TD>";
+	echo "<TD><B>Members</B></TD>";
 	echo "<TD WIDTH=10%><B>Actions</B></TD>";
 	echo "</TR>";
 
@@ -111,6 +112,17 @@
 		else 		{ echo "<TR BGCOLOR=#DDDDDD>"; }
 		echo "<TD>".$row["groupid"]."</TD>";
 		echo "<TD>".$row["name"]."</TD>";
+		echo "<TD>";
+		$result1=DBselect("select distinct h.host from hosts h, hosts_groups hg where h.hostid=hg.hostid and hg.groupid=".$row["groupid"]." order by host");
+		for($i=0;$i<DBnum_rows($result1);$i++)
+		{
+			echo DBget_field($result1,$i,0);
+			if($i<DBnum_rows($result1)-1)
+			{
+				echo ",&nbsp;";
+			}
+		}
+		echo "&nbsp;</TD>";
 		echo "<TD>";
 		echo "<A HREF=\"hosts.php?groupid=".$row["groupid"]."#form\">Change</A>";
 		echo "</TD>";
@@ -171,7 +183,8 @@
 	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR>";
 	echo "<TD WIDTH=3% NOSAVE><B>Id</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>Host</B></TD>";
+	echo "<TD><B>Host</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>IP</B></TD>";
 	echo "<TD WIDTH=10% NOSAVE><B>Port</B></TD>";
 	echo "<TD WIDTH=10% NOSAVE><B>Status</B></TD>";
 	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
@@ -180,11 +193,11 @@
 
 	if(isset($HTTP_GET_VARS["groupid"]))
 	{
-		$sql="select h.hostid,h.host,h.port,h.status from hosts h,hosts_groups hg where hg.groupid=".$HTTP_GET_VARS["groupid"]." and hg.hostid=h.hostid order by h.host";
+		$sql="select h.hostid,h.host,h.port,h.status,h.useip,h.ip from hosts h,hosts_groups hg where hg.groupid=".$HTTP_GET_VARS["groupid"]." and hg.hostid=h.hostid order by h.host";
 	}
 	else
 	{
-		$sql="select h.hostid,h.host,h.port,h.status from hosts h order by h.host";
+		$sql="select h.hostid,h.host,h.port,h.status,h.useip,h.ip from hosts h order by h.host";
 	}
 	$result=DBselect($sql);
 
@@ -200,6 +213,14 @@
 	
 		echo "<TD>".$row["hostid"]."</TD>";
 		echo "<TD><a href=\"items.php?hostid=".$row["hostid"]."\">".$row["host"]."</a></TD>";
+		if($row["useip"]==1)
+		{
+			echo "<TD>".$row["ip"]."</TD>";
+		}
+		else
+		{
+			echo "<TD>-</TD>";
+		}
 		echo "<TD>".$row["port"]."</TD>";
 		echo "<TD>";
         	if(check_right("Host","U",$row["hostid"]))
