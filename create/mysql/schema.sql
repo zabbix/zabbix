@@ -100,31 +100,12 @@ CREATE TABLE history (
 
 CREATE TABLE hosts (
   hostid int(4) NOT NULL auto_increment,
---platformid int(4) NOT NULL,
   host varchar(64) DEFAULT '' NOT NULL,
   port int(4) DEFAULT '0' NOT NULL,
   status int(4) DEFAULT '0' NOT NULL,
   PRIMARY KEY (hostid),
---KEY (platformid),
   KEY (status)
 );
-
-#
-# Table structure for table 'platforms'
-#
-
-#CREATE TABLE platforms (
-#  platformid int(4) NOT NULL,
-#  platform varchar(32) DEFAULT '' NOT NULL,
-#  PRIMARY KEY (platformid)
-#);
-
-#insert into platforms (platformid,platform)	values (1,'Linux v2.2');
-#insert into platforms (platformid,platform)	values (20,'HP-UX 10.xx or 11.xx');
-#insert into platforms (platformid,platform)	values (30,'AIX 4.xx');
-#insert into platforms (platformid,platform)	values (40,'Open BSD 2.8');
-#insert into platforms (platformid,platform)	values (100,'MS Windows 98');
-#insert into platforms (platformid,platform)	values (110,'MS Windows 2000');
 
 #
 # Table structure for table 'items_template'
@@ -132,14 +113,11 @@ CREATE TABLE hosts (
 
 CREATE TABLE items_template (
   itemtemplateid int(4) NOT NULL,
-#  platformid int(4) NOT NULL,
   description varchar(255) DEFAULT '' NOT NULL,
   key_ varchar(64) DEFAULT '' NOT NULL,
   delay int(4) DEFAULT '0' NOT NULL,
   PRIMARY KEY (itemtemplateid),
-#  UNIQUE (platformid, key_),
   UNIQUE (key_)
-#  KEY (platformid)
 );
 
 #
