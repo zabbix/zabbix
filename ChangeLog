@@ -1,5 +1,7 @@
 Changes for 1.0beta11:
 
+ - fix of automatic image scaling under Explorer for charts.php
+ (Alexei)
  - fixed division by zero and infinite loop in graphs (Alexei)
  - fixes for agent. Error checking for opendir() (Alexei)
  - fix for syslog logging of zabbix_trapperd (Alexei)
