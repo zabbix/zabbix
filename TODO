@@ -1,6 +1,5 @@
 HIGH PRIORITY:
 
- - support of mass sending for zabbix_sender
  - fix Select in Status of Triggers
  - mass updates/inserts
  - support for net-snmp
