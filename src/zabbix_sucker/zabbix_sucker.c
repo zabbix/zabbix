@@ -54,13 +54,14 @@
 	#include <ucd-snmp/system.h>
 #endif
 
-#include "common.h"
 #include "cfg.h"
+#include "pid.h"
 #include "db.h"
-#include "functions.h"
-#include "expression.h"
 #include "log.h"
 
+#include "common.h"
+#include "functions.h"
+#include "expression.h"
 #include "alerter.h"
 #include "pinger.h"
 
@@ -205,43 +206,7 @@ void	daemon_init(void)
 
 	for(i=0;i<MAXFD;i++)
 	{
-		close(i);
-	}
-}
-
-void	create_pid_file(void)
-{
-	FILE	*f;
-
-/* Check if PID file already exists */
-	f = fopen(CONFIG_PID_FILE, "r");
-	if(f != NULL)
-	{
-		zabbix_log( LOG_LEVEL_CRIT, "File [%s] exists. Is zabbix_suckerd already running ?",
-			CONFIG_PID_FILE);
-		if(fclose(f) != 0)
-		{
-			zabbix_log( LOG_LEVEL_WARNING, "Cannot close file [%s] [%s]",
-			CONFIG_PID_FILE,strerror(errno));
-		}
-		exit(-1);
-	}
-
-	f = fopen(CONFIG_PID_FILE, "w");
-
-	if( f == NULL)
-	{
-		zabbix_log( LOG_LEVEL_CRIT, "Cannot create PID file [%s] [%s]",
-			CONFIG_PID_FILE, strerror(errno));
-		uninit();
-		exit(-1);
-	}
-
-	fprintf(f,"%d",getpid());
-	if(fclose(f) != 0)
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Cannot close file [%s] [%s]",
-		CONFIG_PID_FILE, strerror(errno));
+		if(i != fileno(stderr)) close(i);
 	}
 }
 
@@ -1255,9 +1220,13 @@ int main(int argc, char **argv)
 		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
 	}
 
-	create_pid_file();
+	if( FAIL == create_pid_file(CONFIG_PID_FILE))
+	{
+		uninit();
+		return -1;
+	}
 
-	zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd started");
+/*	zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd started");*/
 
 /* Need to set trigger status to UNKNOWN since last run */
 	DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
@@ -1289,30 +1258,34 @@ int main(int argc, char **argv)
 	{
 		sigaction(SIGCHLD, &phan, NULL);
 /* First instance of zabbix_suckerd performs housekeeping procedures */
-		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started. Housekeeper.",sucker_num);
+		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started [Housekeeper]",sucker_num);
 		main_housekeeping_loop();
 	}
 	else if(sucker_num == 1)
 	{
 /* Second instance of zabbix_suckerd sends alerts to users */
-		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started. Alerter.",sucker_num);
+		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started [Alerter]",sucker_num);
 		main_alerter_loop();
 	}
 	else if(sucker_num == 2)
 	{
 /* Third instance of zabbix_suckerd periodically re-calculates 'nodata' functions */
-		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started. nodata() calculator.",sucker_num);
+		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started [nodata() calculator]",sucker_num);
 		main_nodata_loop();
 	}
 	else if(sucker_num == 3)
 	{
 /* Fourth instance of zabbix_suckerd periodically pings hosts */
-		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started. ICMP pinger.",sucker_num);
+		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started [ICMP pinger]",sucker_num);
 		main_pinger_loop();
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started. Sucker.",sucker_num);
+#ifdef HAVE_SNMP
+		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started [Sucker. SNMP:ON]",sucker_num);
+#else
+		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started [Sucker. SNMP:OFF]",sucker_num);
+#endif
 		main_sucker_loop();
 	}
 

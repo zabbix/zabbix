@@ -58,6 +58,7 @@ int zabbix_open_log(int type,int level, const char *filename)
 		log_file = fopen(filename,"a+");
 		if(log_file == NULL)
 		{
+			fprintf(stderr, "Unable to open debug file [%s] [%m]\n", filename);
 			return	FAIL;
 		}
 		log_type = LOG_TYPE_FILE;
@@ -67,6 +68,7 @@ int zabbix_open_log(int type,int level, const char *filename)
 	else
 	{
 /* Not supported logging type */
+		fprintf(stderr, "Not supported loggin type [%d]\n", type);
 		return	FAIL;
 	}
 	return	SUCCEED;

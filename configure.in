@@ -102,6 +102,16 @@ else
 	AC_MSG_RESULT(no)
 fi
 
+dnl Check for mem_unit in struct sysinfo
+AC_MSG_CHECKING(for mem_unit in struct sysinfo)
+AC_TRY_COMPILE([#include <sys/sysinfo.h>],
+[struct sysinfo sysinfo;
+sysinfo.mem_unit=0;
+],
+AC_DEFINE(HAVE_SYSINFO_MEM_UNIT)
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
 dnl Check for freeswap in struct sysinfo
 AC_MSG_CHECKING(for freeswap in struct sysinfo)
 AC_TRY_COMPILE([#include <sys/sysinfo.h>],
