@@ -29,6 +29,7 @@ Not ready yet:
 
  OTHER:
 
+ - support for tcp_ping[] which returns number of ms spent
  - new host name should not contain space and other character not allowed by trigger expression
  - support for net-snmp
  - support for OS X (network loads, disk loads)
