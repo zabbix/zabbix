@@ -20,12 +20,19 @@
 </TR>
 <TR BGCOLOR=#DDDDDD>
 <TD ALIGN=LEFT>
+	<font face="Helvetica"><a href="http://zabbix.sourceforge.net/#manual">Latest Zabbix Manual</a></font><br>
+</TD>
+<TD>
+	Latest version of the Manual.
+</TR>
+<TR BGCOLOR=#EEEEEE>
+<TD ALIGN=LEFT>
 	<font face="Helvetica"><a href="http://sourceforge.net/project/showfiles.php?group_id=23494&release_id=40630">Downloads</a></font><br>
 </TD>
 <TD>
 	Latest Zabbix release can be found here.
 </TR>
-<TR BGCOLOR=#EEEEEE>
+<TR BGCOLOR=#DDDDDD>
 <TD ALIGN=LEFT>
 	<font face="Helvetica"><a href="http://sourceforge.net/tracker/?atid=378686&group_id=23494&func=browse">Feature requests</a></font><br>
 </TD>
@@ -33,7 +40,7 @@
 	If you need additional functionality, go here.
 </TD>
 </TR>
-<TR BGCOLOR=#DDDDDD>
+<TR BGCOLOR=#EEEEEE>
 <TD ALIGN=LEFT>
 	<font face="Helvetica"><a href="http://sourceforge.net/forum/?group_id=23494">Forums</a></font><br>
 </TD>
@@ -41,7 +48,7 @@
 	Zabbix-related discussion.
 </TD>
 </TR>
-<TR BGCOLOR=#EEEEEE>
+<TR BGCOLOR=#DDDDDD>
 <TD ALIGN=LEFT>
 	<font face="Helvetica"><a href="http://sourceforge.net/tracker/?group_id=23494&atid=378683">Bug reports</a></font><br>
 </TD>
@@ -49,7 +56,7 @@
 	Bug in Zabbix ? Please, report it.
 </TD>
 </TR>
-<TR BGCOLOR=#DDDDDD>
+<TR BGCOLOR=#EEEEEE>
 <TD ALIGN=LEFT>
 	<font face="Helvetica"><a href="http://sourceforge.net/mail/?group_id=23494">Mailing lists</a></font><br>
 </TD>
