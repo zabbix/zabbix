@@ -49,6 +49,7 @@ the agent with a predefined API that can return values to suckerd.
 
 Not ready yet:
 
+ - support of fetch_html[*]
  - mass-adding of actions
  - BUG. zabbix_sucker should accept parameter regardless of "\n" at the end of line 
  - update docs related to WIN32 agent
