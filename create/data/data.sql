@@ -58,7 +58,7 @@ INSERT INTO hosts VALUES (10004,'STANDALONE',0,'',10000,3,0,0);
 -- Data for table items
 --
 
-INSERT INTO items VALUES (10001,0,'','',161,10001,'Free memory','memory[free]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (10001,0,'','',161,10001,'Free memory (bytes)','memory[free]',30,30,0,0,NULL,NULL,NULL,0,0,'');
 INSERT INTO items VALUES (10002,0,'','',161,10001,'Free disk space on /','diskfree[/]',30,30,0,0,NULL,NULL,NULL,0,0,'');
 INSERT INTO items VALUES (10003,0,'','',161,10001,'Free disk space on /tmp','diskfree[/tmp]',30,30,0,0,NULL,NULL,NULL,0,0,'');
 INSERT INTO items VALUES (10004,0,'','',161,10001,'Free disk space on /usr','diskfree[/usr]',30,30,0,0,NULL,NULL,NULL,0,0,'');
@@ -83,10 +83,10 @@ INSERT INTO items VALUES (10022,0,'','',161,10001,'Free number of inodes on /hom
 INSERT INTO items VALUES (10023,0,'','',161,10001,'Free disk space on /var','diskfree[/var]',30,30,0,0,NULL,NULL,NULL,0,0,'');
 INSERT INTO items VALUES (10024,0,'','',161,10001,'Free disk space on /opt','diskfree[/opt]',30,30,0,0,NULL,NULL,NULL,0,0,'');
 INSERT INTO items VALUES (10025,0,'','',161,10001,'Host uptime (in sec)','system[uptime]',300,30,0,0,NULL,NULL,NULL,0,0,'');
-INSERT INTO items VALUES (10026,0,'','',161,10001,'Total memory (kB)','memory[total]',1800,30,0,0,NULL,NULL,NULL,0,0,'');
-INSERT INTO items VALUES (10027,0,'','',161,10001,'Shared memory (kB)','memory[shared]',30,30,0,0,NULL,NULL,NULL,0,0,'');
-INSERT INTO items VALUES (10028,0,'','',161,10001,'Buffers memory (kB)','memory[buffers]',30,30,0,0,NULL,NULL,NULL,0,0,'');
-INSERT INTO items VALUES (10029,0,'','',161,10001,'Cached memory (kB)','memory[cached]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (10026,0,'','',161,10001,'Total memory (bytes)','memory[total]',1800,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (10027,0,'','',161,10001,'Shared memory (bytes)','memory[shared]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (10028,0,'','',161,10001,'Buffers memory (bytes)','memory[buffers]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (10029,0,'','',161,10001,'Cached memory (bytes)','memory[cached]',30,30,0,0,NULL,NULL,NULL,0,0,'');
 INSERT INTO items VALUES (10030,0,'','',161,10001,'Total swap space (Kb)','swap[total]',1800,30,0,0,NULL,NULL,NULL,0,0,'');
 INSERT INTO items VALUES (10031,0,'','',161,10001,'Email (SMTP) server is running','check_service[smtp]',60,30,0,0,NULL,NULL,NULL,0,0,'');
 INSERT INTO items VALUES (10032,0,'','',161,10001,'FTP server is running','check_service[ftp]',60,30,0,0,NULL,NULL,NULL,0,0,'');
@@ -147,7 +147,7 @@ INSERT INTO items VALUES (10086,0,'','',161,10001,'Average number of bytes sent 
 INSERT INTO items VALUES (10087,0,'','',161,10001,'Average number of bytes sent from interface eth1 (1min)','netloadout1[eth1]',5,30,0,0,NULL,NULL,NULL,0,0,'');
 INSERT INTO items VALUES (10088,0,'','',161,10001,'Average number of bytes sent from interface eth1 (5min)','netloadout5[eth1]',10,30,0,0,NULL,NULL,NULL,0,0,'');
 INSERT INTO items VALUES (10089,0,'','',161,10001,'Average number of bytes sent from interface eth1 (15min)','netloadout15[eth1]',20,30,0,0,NULL,NULL,NULL,0,0,'');
-INSERT INTO items VALUES (10090,0,'','',161,10002,'Free memory','memory[free]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (10090,0,'','',161,10002,'Free memory (bytes)','memory[free]',30,30,0,0,NULL,NULL,NULL,0,0,'');
 INSERT INTO items VALUES (10091,0,'','',161,10002,'Free disk space on c:','diskfree[c:]',30,30,0,0,NULL,NULL,NULL,0,0,'');
 INSERT INTO items VALUES (10098,0,'','',161,10002,'Number of processes','system[proccount]',30,30,0,0,NULL,NULL,NULL,0,0,'');
 INSERT INTO items VALUES (10099,0,'','',161,10002,'Processor load','system[procload]',5,30,0,0,NULL,NULL,NULL,0,0,'');
@@ -159,7 +159,7 @@ INSERT INTO items VALUES (10104,0,'','',161,10002,'Size of c:\\msdos.sys','files
 INSERT INTO items VALUES (10106,0,'','',161,10002,'Checksum of c:\\autoexec.bat','cksum[c:\\autoexec.bat]',600,30,0,0,NULL,NULL,NULL,0,0,'');
 INSERT INTO items VALUES (10109,0,'','',161,10002,'Ping to the server (TCP)','ping',30,30,0,0,NULL,NULL,NULL,0,0,'');
 INSERT INTO items VALUES (10114,0,'','',161,10002,'Host uptime (in sec)','system[uptime]',300,30,0,0,NULL,NULL,NULL,0,0,'');
-INSERT INTO items VALUES (10115,0,'','',161,10002,'Total memory (kB)','memory[total]',1800,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (10115,0,'','',161,10002,'Total memory (bytes)','memory[total]',1800,30,0,0,NULL,NULL,NULL,0,0,'');
 INSERT INTO items VALUES (10119,0,'','',161,10002,'Total swap space (Kb)','swap[total]',1800,30,0,0,NULL,NULL,NULL,0,0,'');
 INSERT INTO items VALUES (10137,0,'','',161,10002,'Number of running processes apache','proc_cnt[httpd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
 INSERT INTO items VALUES (10147,0,'','',161,10002,'Host information','system[uname]',1800,30,0,0,NULL,NULL,NULL,0,1,'');

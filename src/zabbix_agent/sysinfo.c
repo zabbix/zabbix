@@ -1127,7 +1127,9 @@ double	getPROC(char *file,int lineno,int fieldno)
 double	CACHEDMEM(void)
 {
 #ifdef HAVE_PROC
-	return getPROC("/proc/meminfo",8,2);
+/* Get CACHED memory in bytes */
+/*	return getPROC("/proc/meminfo",8,2);*/
+	return getPROC("/proc/meminfo",2,7);
 #else
 	return FAIL;
 #endif
