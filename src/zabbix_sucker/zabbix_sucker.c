@@ -39,6 +39,10 @@
 int	sucker_num=0;
 int	CONFIG_SUCKER_FORKS		=SUCKER_FORKS;
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
+char	*CONFIG_DBNAME			= NULL;
+char	*CONFIG_DBUSER			= NULL;
+char	*CONFIG_DBPASSWORD		= NULL;
+
 
 void	signal_handler( int sig )
 {
@@ -122,6 +126,7 @@ void	process_config_file(void)
 	int	lineno;
 	int	i;
 
+
 	file=fopen("/etc/zabbix/zabbix_suckerd.conf","r");
 	if(NULL == file)
 	{
@@ -195,6 +200,21 @@ void	process_config_file(void)
 				exit(1);
 			}
 		}
+		else if(strcmp(parameter,"DBName")==0)
+		{
+			CONFIG_DBNAME=(char *)malloc(strlen(value));
+			strcpy(CONFIG_DBNAME,value);
+		}
+		else if(strcmp(parameter,"DBUser")==0)
+		{
+			CONFIG_DBUSER=(char *)malloc(strlen(value));
+			strcpy(CONFIG_DBUSER,value);
+		}
+		else if(strcmp(parameter,"DBPassword")==0)
+		{
+			CONFIG_DBPASSWORD=(char *)malloc(strlen(value));
+			strcpy(CONFIG_DBPASSWORD,value);
+		}
 		else
 		{
 			syslog( LOG_CRIT, "Unsupported parameter [%s] Line %d", parameter, lineno);
@@ -205,6 +225,14 @@ void	process_config_file(void)
 		lineno++;
 	}
 	fclose(file);
+	
+
+
+	if(CONFIG_DBNAME == NULL)
+	{
+		syslog( LOG_CRIT, "DBName not in config file");
+		exit(1);
+	}
 }
 
 #ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
@@ -798,7 +826,7 @@ int main(int argc, char **argv)
 	init_snmp("zabbix_suckerd");
 #endif
 
-	DBconnect();
+	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD);
 
 	if(sucker_num == 0)
 	{
