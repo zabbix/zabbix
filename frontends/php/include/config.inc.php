@@ -1613,7 +1613,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	</tr>
 	</table>
 
-	<p>
 	<table class="menu" cellspacing=0 cellpadding=5>
 	<tr>
 	<td class="horizontal_menu" height=24 colspan=9><b><a href="http://www.zabbix.com/index.php" class="highlight">View</a></b></td>
@@ -1629,8 +1628,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	<tr><td class="horizontal_menu" height=24 colspan=9><b><a href="config.php" class="highlight">Config</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="users.php" class="highlight">Users</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="audit.php" class="highlight">Audit</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="hosts.php" class="highlight">Hosts</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="items.php" class="highlight">Items</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="triggers.php" class="highlight">Triggers</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="sysmaps.php" class="highlight">Maps</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="graphs.php" class="highlight">Graphs</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="screenconf.php" class="highlight">Screens</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="services.php" class="highlight">IT Services</a></b></td></tr>
 -->
 	</table>
+	<p>
 
-	</p>
 
 <?php
 		}
@@ -3989,6 +3988,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	<td class="horizontal_menu" height=24 colspan=9 align=right><b><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><?php echo " ".S_CONNECTED_AS."&nbsp;".$USER_DETAILS["alias"];?></b></td>
 	</tr>
 	</table>
+	</p>
+
 	</p>
 <?php
 
