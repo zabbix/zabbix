@@ -1,5 +1,8 @@
 BUGS:
 
+ - personalisation (remember default port number for hosts)
+ - mass update for triggers (activate, deactivate)
+ - BUG. zabbix_suckerd is crashing after EMAIL4
  - BUG! Lots of Evaluation of expression ... failed. Must be fixed.
  - graphs and maps are not displayed properly sometimes
 
