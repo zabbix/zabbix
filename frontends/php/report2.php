@@ -38,7 +38,7 @@
 ?>
 
 <?
-	if(isset($HTTP_GET_VARS["hostid"]))
+	if(isset($HTTP_GET_VARS["hostid"])&&!isset($HTTP_GET_VARS["triggerid"]))
 	{
 		echo "<br>";
 		$result=DBselect("select host from hosts where hostid=".$HTTP_GET_VARS["hostid"]);
@@ -77,7 +77,7 @@
 //			$description=rawurlencode($row["description"]);
 	
 //			echo "<TD>".explode_exp($row["expression"],1)."</TD>";
-			$availability=calculate_availability($row["triggerid"]);
+			$availability=calculate_availability($row["triggerid"],0,0);
 			echo "<TD>";
 			printf("%.4f%%",$availability["true"]);
 			echo "</TD>";
@@ -88,7 +88,7 @@
 			printf("%.4f%%",$availability["unknown"]);
 			echo "</TD>";
 			echo "<TD>";
-			echo "<a href=\"report2.php?triggerid=".$row["triggerid"]."\">Show</a>";
+			echo "<a href=\"report2.php?hostid=".$HTTP_GET_VARS["hostid"]."&triggerid=".$row["triggerid"]."\">Show</a>";
 			echo "</TD>";
 			echo "</TR>\n";
 		}
@@ -99,7 +99,14 @@
 <?
 	if(isset($HTTP_GET_VARS["triggerid"]))
 	{
+		echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+		echo "<TR BGCOLOR=#EEEEEE>";
+		echo "<TR BGCOLOR=#DDDDDD>";
+		echo "<TD ALIGN=CENTER>";
 		echo "<IMG SRC=\"chart4.php?triggerid=".$HTTP_GET_VARS["triggerid"]."\" border=0>";
+		echo "</TD>";
+		echo "</TR>";
+		echo "</TABLE>";
 	}
 ?>
 
