@@ -198,7 +198,7 @@
 	$result=DBselect("select host,hostid from hosts order by host");
 	while($row=DBfetch($result))
 	{
-		echo "<option value=\"".$row["hostid"]."\" selected>".$row["host"];
+		echo "<option value=\"".$row["hostid"]."\">".$row["host"];
 	}
 	echo "</select>";
 

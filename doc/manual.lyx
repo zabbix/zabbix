@@ -24,13 +24,13 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.16)
+Zabbix Reference Manual for version 1.0 (draft v1.17)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-18 May 2002
+19 May 2002
 \layout Abstract
 
 The document is Reference Manual for Zabbix version 1.0.
@@ -100,7 +100,7 @@ Zabbix
  uses a flexible notification mechanism that allows users to configure e-mail
  based alerts for virtually any event.
  This allows a fast reaction to server problems.
- All monitored parameters ar stored in a database.
+ All monitored parameters are stored in a database.
 \layout Standard
 
 
@@ -755,1057 +755,6 @@ Zabbix
 Installation procedure
 \layout Standard
 
-
-\lang english
-3.3 Installation procedure
-\layout Standard
-
-
-\lang english
---------------------------
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-Basic installation of Zabbix usually takes no more than 15
-\layout Standard
-
-
-\lang english
-minutes.
- However, to make the process more enjoyable, I
-\layout Standard
-
-
-\lang english
-would suggest you make a cup of tea (or coffee) for yourself.
-\layout Standard
-
-
-\lang english
-Ready? 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-1.
- Create the Zabbix superuser account.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- This is the user the server will run as.
- For production
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- use you should create a dedicated unprivileged account
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- ("zabbix" is commonly used).
- Running Zabbix as "root,"
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- "bin," or any other account with special rights is a security
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- risk.
- Do not do it! 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-2.
- Untar Zabbix sources.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- On Linux, use command tar -xvzf <zabbix.tar.gz>.
- On other
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- systems, try gunzip zabbix.tar.gz; tar xvf zabbix.tar
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-3.
- Create the Zabbix database.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- Zabbix comes with SQL scripts used to create the required
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- database schema and also to insert a default configuration.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- There are separate scripts for MySQL and PostgreSQL.
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- For MySQL: 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- mysql -u<username> -p<password> 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- >create database zabbix; 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- >quit; 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- cd create/mysql 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- cat schema.sql |mysql zabbix -u<username> -p<password>
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- cd create/data 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- cat data.sql |mysql zabbix -u<username> -p<password> 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- For PostgreSQL:
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- psql -U <username> 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- > create database zabbix; 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- > 
-\backslash 
-q 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- cd create/postgresql 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- cat schema.sql|psql -U <username> zabbix 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- cd create/data 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- cat data.sql|psql -U <username> zabbix
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-4.
- Configure include/db.h
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- Change the following parameters:
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- #define DB_NAME "zabbix" 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- #define DB_USER "zabbix" 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- #define DB_PASSWD "password"
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-5.
- Configure and compile the source code for your system
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- The sources must be compiled for both the server (monitoring
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- machine) as well as the clients (monitored machines).
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- To configure the source for the server, you must specify
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- which database will be used.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- ./configure --with-mysql # for MySQL 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- or 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- ./configure --with-pgsql # for PostgreSQL make
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- However, if you want to compile client binaries only, run:
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- ./configure make
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- Copy created binaries from bin/ to /opt/zabbix/bin or any
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- other directory 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- Other common directories are /usr/local/bin or /usr/local/zabbix/bin.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-6.
- Configure /etc/services
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- On the client (monitored) machines, add the following lines
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- to /etc/services:
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- zabbix_agent 10000/tcp 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- zabbix_trap 10001/tcp 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-7.
- Configure /etc/inetd.conf
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- If you are going to use trapping instead of the recommended
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- client-server approach, add the following line to /etc/inetd.conf:
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- zabbix_trap stream tcp nowait.3600 zabbix /opt/zabbix/bin/zabbix_trapper
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- If you plan to use zabbix_agent instead of the recommended
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- zabbix_agentd, the following line must be added:
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- zabbix_agent stream tcp nowait.3600 zabbix /opt/zabbix/bin/zabbix_agent
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-8.
- Restart inetd
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- killall -HUP inetd
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-9.
- Configure WEB interface
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- As user zabbix (or whatever you decided to name your dedicated
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- Zabbix account), do the following:
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- Change these values in frontends/php/include/db.inc: 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- $DB_TYPE ="POSTGRESQL"; /* Or "MYSQL" for MySQL */ 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- $DB_SERVER ="localhost"; 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- $DB_DATABASE ="zabbix"; 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- $DB_USER =""; 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- $DB_PWD =""
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- Copy the PHP source files to a place where your web server
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- can get to it.
- Perhaps /home/zabbix/html or /home/zabbix/public_html
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- or /var/www/html/zabbix, etc.
- For example, 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- mkdir /home/zabbix/html 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- cp -R frontends/php/* 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- /home/zabbix/html/
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-10.
- Configure Apache
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- By default, Apache does not recognize *.html files as PHP
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- scripts.
- Add the following line to Apache configuration
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- files to make Apache think that every *.html file is actually
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- PHP script that should be interpreted:
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- AddType application/x-httpd-php .html
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-11.
- Configure /etc/zabbix/zabbix_agent.conf
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- You need to configure this file for every host having zabbix_agent
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- installed.
- The file should contain IP address of Zabbix
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- server.
- Connections from other hosts will be denied.
- Note,
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- that no end of line character should present in the file.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-12.
- Initial Configuration
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- Once your Zabbix installation is complete, you will need
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- to configure Zabbix.
- Point your web browser to the location
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- you installed the PHP scripts to.
- (For example, if you
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- copied the PHP files to /home/zabbix/public_html or /home/zabbix/html,
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- point your browser to http://localhost/~zabbix)
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- Once there, click on the CONFIG link.
- You will be prompted
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- for a username and password.
- Zabbix comes pre-configured
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- with an administrative account: Enter the username 'Admin'
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- and leave the password field empty.
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- Add the configuration of your SMTP server of choice.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- Next, click on the "USERS" link.
- Add yourself to list of
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- Zabbix users.
- Don't forget to select "Administrators"
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- group.
- After you create your account, click the "Media"
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- link beside your account listing, and add your email address.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- Next, delete the default Admin user.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- Click on the 'HOSTS' link to add new hosts to be monitored.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- For each host you add, be sure that you've installed the
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- agent software on the host.
- If you have not yet done this,
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- set the status to "Not monitored".
- When a host is added,
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- a list of all possible parameters for the host will be
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- automatically added.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- After you've added your desired hosts, click on the "ITEMS"
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- link to modify the details of the monitored parameters.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- You may disable or delete monitored parameters or change
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- how often the parameters are checked.
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- Next, click on the 'TRIGGERS' link to change the triggers
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- relating to monitored parameters.
- You can change threshold
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- values, disable or delete triggers, and set up actions
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- (email notification).
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- When you set up an email notification, you may modify the
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- subject and message body as you wish.
- You can use macros
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- in both email subject and email body.
- For example, the
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- subject for a warning message could look like:
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- Processor load on www.sf.net is {www.sf.net:system[procload].last(0)}
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- In this case, you will receive message with subject like
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- "Processor load on www.sf.net is 0.85"
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- Click on the "MAPS" link to set up a network map.
- A map
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- will help you quickly identify any problems with your
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- monitored machines.
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- Finally, click on the "GRAPHS" link to set up a graph.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- A graph provides quick historical statistics on one or
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- more monitored statistics.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- Once you have an initial configuration created, run zabbix_suckerd
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- on the server machine:
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- /opt/zabbix/bin/zabbix_suckerd
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- and run zabbix_agentd on all monitored machines 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- /opt/zabbix/bin/zabbix_agentd
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- You should not run zabbix_agentd if you have chosen to
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
- use zabbix_agent!
-\layout Standard
-
 Basic installation of 
 \series bold 
 Zabbix
@@ -1835,6 +784,19 @@ Zabbix
  as "root," "bin," or any other account with special rights is a security
  risk.
  Do not do it!
+\begin_float footnote 
+\layout Standard
+
+Zabbix daemon processes (
+\series bold 
+zabbix_suckerd
+\series default 
+ and 
+\series bold 
+zabbix_trapperd
+\series default 
+) are protected from being run under root account.
+\end_float 
 \layout Enumerate
 
 Untar 
@@ -3063,6 +2025,9 @@ Status of Triggers
 \layout Itemize
 
 Parameter Server is comma-delimited list of Zabbix servers
+\layout Subsubsection
+
+Zabbix 1.0beta4
 \layout Subsection
 
 ChangeLog
@@ -3477,770 +2442,6 @@ Zabbix Processes
 \layout Standard
 
 
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-2.4.1.2 zabbix_agentd
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-The zabbix_agentd process resides on the host being monitored.
-\layout Standard
-
-
-\lang english
-Its purpose is to provide request information to zabbix_suckerd.
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-When a connection to zabbix_agent is made, the agent reads
-\layout Standard
-
-
-\lang english
-/etc/zabbix/zabbix_agent.conf in order to determine if the
-\layout Standard
-
-
-\lang english
-connection is coming from an authorized server.
- 
-\layout Standard
-
-
-\lang english
-The zabbix_agent.conf file must exist and contain the IP
-\layout Standard
-
-
-\lang english
-address of Zabbix server.
- Connections from other IPs are
-\layout Standard
-
-
-\lang english
-rejected.
-\layout Standard
-
-
-\lang english
-([footnote] - see section on config files for more info?)
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-No command-line switches supported by zabbix_agentd.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-The process is run as daemon under non-priveledged user account,
-\layout Standard
-
-
-\lang english
-usually zabbix.\SpecialChar ~
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-Syslog is used to store debug information for the process.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-2.4.1.3 zabbix_trapperd
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-The process collects information passed by active agents
-\layout Standard
-
-
-\lang english
-(zabbix_sender).
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-By default, zabbix_trapperd forks ten copies of itself.
- 
-\layout Standard
-
-
-\lang english
-The parameter TRAPPERD_FORKS in include/common.h can be
-\layout Standard
-
-
-\lang english
-changed to modify the number of forked processes.
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-No command-line switches are supported by zabbix_trapperd.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-The process is run as daemon under non-priveledged user account,
-\layout Standard
-
-
-\lang english
-usually zabbix.\SpecialChar ~
-\SpecialChar ~
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-Syslog is used to store debug information for the process.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-2.4.2 Inetd Mode Processes
-\layout Standard
-
-
-\lang english
---------------------------
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-2.4.2.1 zabbix_sucker
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-The zabbix_sucker process resides on the server and periodically 
-\layout Standard
-
-
-\lang english
-connects to agents (either Zabbix native or SNMP) to get the 
-\layout Standard
-
-
-\lang english
-values of parameters being monitored.\SpecialChar ~
- After receiving the values, the process
- 
-\layout Standard
-
-
-\lang english
-recalculates the status of Zabbix triggers.
- Also, the process sends 
-\layout Standard
-
-
-\lang english
-alerts to users if required.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-If zabbix_suckerd is unable to get value from an agent because
-\layout Standard
-
-
-\lang english
-of network problems, the value will be checked next time
-\layout Standard
-
-
-\lang english
-only after DELAY_ON_NETWORK_ERROR (defined in include/common.h,
-\layout Standard
-
-
-\lang english
-default value is 120 seconds.)
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-If an agent does not support requested parameter, zabbix_suckerd
-\layout Standard
-
-
-\lang english
-will change status of the parameter to NONSUPPORTED and
-\layout Standard
-
-
-\lang english
-will not try to get its value anymore.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-One zabbix_suckerd process is used for housekeeping purposes
-\layout Standard
-
-
-\lang english
-only.\SpecialChar ~
- The housekeeping process periodically (hourly,
-\layout Standard
-
-
-\lang english
-by default) deletes outdated information from the tables
-\layout Standard
-
-
-\lang english
-history, alarms and alerts.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-Housekeeping process will delete all records from table alarms
-\layout Standard
-
-
-\lang english
-older than value defined in Zabbix configuration and 
-\layout Standard
-
-
-\lang english
-delete all records from table alerts older than value defined 
-\layout Standard
-
-
-\lang english
-in Zabbix configuration.
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-No command line switches are supported by zabbix_suckerd.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-The zabbix_suckerd process is run as a daemon under a non-priveledged
-\layout Standard
-
-
-\lang english
-user account, usually zabbix.\SpecialChar ~
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-Syslog is used to store debug information for the process.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-2.4.2.2 zabbix_agent
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-The zabbix_agent process resides on the host being monitored.
- 
-\layout Standard
-
-
-\lang english
-Its purpose it to provide requested information to zabbix_sucker.
- 
-\layout Standard
-
-
-\lang english
-The zabbix_agent process is designed to be used with INETD
-\layout Standard
-
-
-\lang english
-daemon.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-Execution time of the process is limited.
- If the agent is
-\layout Standard
-
-
-\lang english
-not able to get the requested information within 3 seconds,
-\layout Standard
-
-
-\lang english
-it kills itself.
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-When a connection to zabbix_agent is made, the agent reads
-\layout Standard
-
-
-\lang english
-/etc/zabbix/zabbix_agent.conf in order to determine if the
-\layout Standard
-
-
-\lang english
-connection is coming from an authorized server.
- 
-\layout Standard
-
-
-\lang english
-The zabbix_agent.conf file must exist and contain the IP
-\layout Standard
-
-
-\lang english
-address of Zabbix server.
- Connections from other IPs are
-\layout Standard
-
-
-\lang english
-rejected.
- 
-\layout Standard
-
-
-\lang english
-([footnote] - see section on config files for more info?)
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-If possible, use of zabbix_agentd instead of
-\layout Standard
-
-
-\lang english
-zabbix_agent is recommended.
- The zabbix_agentd process 
-\layout Standard
-
-
-\lang english
-does not require extra fork() and exec() calls for every connection.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-2.4.2.3 zabbix_trapper
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-The process provides trapping support for Zabbix.
- 
-\layout Standard
-
-
-\lang english
-It constantly waits for connections from zabbix_sender agents.
- 
-\layout Standard
-
-
-\lang english
-It is designed to be used with inetd daemon.
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-If possible, it is recommended that zabbix_trapperd is used
-\layout Standard
-
-
-\lang english
-to provide trapping support.\SpecialChar ~
- 
-\layout Standard
-
-
-\lang english
-The zabbix_trapperd process does not require extra fork()
-\layout Standard
-
-
-\lang english
-and exec() calls for every connection.
- 
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-2.4.3 Command Line Processes
-\layout Standard
-
-
-\lang english
-----------------------------
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-2.4.3.1 zabbix_sender
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-This process, when executed, sends information to Zabbix trapper (inetd
- or standalone.)
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-Format of command:
-\layout Standard
-
-
-\lang english
-zabbix_sender zabbix_server port host:key value
-\layout Standard
-
-
-\lang english
-\SpecialChar ~
-
-\layout Standard
-
-
-\lang english
-Parameters:
-\layout Standard
-
-
-\lang english
-zabbix_server\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-- Name or IP address of Zabbix server to connect.
-\layout Standard
-
-
-\lang english
-port \SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-- Port number to connect to Zabbix.
- (Port number of zabbix_trapper process.)
-\layout Standard
-
-
-\lang english
-host:key\SpecialChar ~
- \SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-- Host name and key for value.
-\layout Standard
-
-
-\lang english
-value \SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-- Value for parameter "host:key".
- (Float number.) 
-\layout Standard
-
-
 \series bold 
 Zabbix
 \series default 
@@ -4440,215 +2641,9 @@ zabbix_suckerd
 \layout Standard
 
 Syslog or a file is used to store debug information for the process.
-\layout Subsubsection
-
-zabbix_agent
-\layout Standard
-
-
-\latex no_latex 
-The 
-\series bold 
-\latex default 
-Zabbix
-\series default 
-\latex no_latex 
- agent (called from inetd).
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-SYNOPSIS
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-zabbix_agent
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-DESCRIPTION
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-The zabbix_agent process resides on the host being monitored.\SpecialChar ~
- Its purpose
- it to provide requested information to zabbix_suckerd.\SpecialChar ~
- The zabbix_agent
- process is designed to be used with INETD daemon.
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-Execution time of the process is limited.
- If the agent is not able to get the requested information within 3 seconds,
- it kills itself.
- 
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-When a connection to
-\series bold 
-\latex default 
- zabbix_agent
-\series default 
-\latex no_latex 
- is made, the agent reads 
-\emph on 
-\latex default 
-/etc/zabbix/zabbix_agent.conf
-\emph default 
-\latex no_latex 
- in order to determine if the connection is coming from an authorized server.\SpecialChar ~
-
- The 
-\emph on 
-\latex default 
-zabbix_agent.conf
-\emph default 
-\latex no_latex 
- file must exist and contain the IP address of 
-\series bold 
-\latex default 
-Zabbix
-\series default 
-\latex no_latex 
- server.
- Connections from other IPs are rejected.
- 
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-U
-\latex no_latex 
-se of 
-\series bold 
-\latex default 
-zabbix_agentd
-\series default 
-\latex no_latex 
- (see below) instead of 
-\series bold 
-\latex default 
-zabbix_agent
-\series default 
-\latex no_latex 
- is 
-\emph on 
-\latex default 
-strongly
-\emph default 
- 
-\latex no_latex 
-recommended.\SpecialChar ~
- The 
-\series bold 
-\latex default 
-zabbix_agentd
-\series default 
-\latex no_latex 
- process does not require extra fork() and exec() calls for every connection
-\latex default 
-, no frequent parsing of configuration file is required as well
-\latex no_latex 
-.
-\layout Subsubsection
+\layout Paragraph
 
 zabbix_agentd
-\layout Standard
-
-
-\latex no_latex 
-Standalone 
-\series bold 
-\latex default 
-Zabbix
-\series default 
-\latex no_latex 
- agent (daemon).
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-SYNOPSIS
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\series bold 
-zabbix_agentd
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-DESCRIPTION
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
 \layout Standard
 
 
@@ -4666,15 +2661,7 @@ zabbix_agentd
 zabbix_suckerd
 \series default 
 \latex no_latex 
-.\SpecialChar ~
- This is the daemon version of the 
-\series bold 
-\latex default 
-zabbix_agent
-\series default 
-\latex no_latex 
- process.\SpecialChar ~
- 
+.
 \layout Standard
 
 
@@ -4695,12 +2682,14 @@ zabbix_agentd
 \latex default 
 five
 \latex no_latex 
- times by default).\SpecialChar ~
+ 
+\latex default 
+copies
+\latex no_latex 
+ by default).\SpecialChar ~
  Load is balanced between each copy of the process.
 \layout Standard
 
-
-\latex no_latex 
 \SpecialChar ~
 
 \layout Standard
@@ -4777,10 +2766,96 @@ The process is run as daemon under non-priveledged user account, usually
 
 
 \latex no_latex 
-Syslog is used to store debug information for the process.
+Syslog 
+\latex default 
+or a file 
+\latex no_latex 
+is used to store debug information for the process.
+\layout Paragraph
+
+zabbix_trapperd
+\layout Standard
+
+
+\latex no_latex 
+The process collects information passed by active agents (
+\series bold 
+\latex default 
+zabbix_sender
+\series default 
+\latex no_latex 
+).
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+By default, 
+\series bold 
+\latex default 
+zabbix_trapperd
+\series default 
+\latex no_latex 
+ forks ten copies of itself.\SpecialChar ~
+ The parameter TRAPPERD_FORKS in 
+\emph on 
+\latex default 
+include/common.h
+\emph default 
+\latex no_latex 
+ can be changed to modify the number of forked processes.
+ 
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+No command-line switches are supported by zabbix_trapperd.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+The process is run as daemon under non-priveledged user account, usually
+ zabbix.\SpecialChar ~
+\SpecialChar ~
+ 
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Syslog 
+\latex default 
+or a file 
+\latex no_latex 
+is used to store debug information for the process.
 \layout Subsubsection
 
-zabbix_trapper
+Inetd Mode Processes
+\layout Subsubsection
+
+zabbix_agent
 \layout Standard
 
 
@@ -4788,15 +2863,31 @@ zabbix_trapper
 The 
 \series bold 
 \latex default 
-Zabbix
+zabbix_agent
 \series default 
 \latex no_latex 
- trapping server process.
-\layout Standard
-
-
+ process resides on the host being monitored.\SpecialChar ~
+ Its purpose it to provide requested
+ information to 
+\series bold 
+\latex default 
+zabbix_suckerd
+\series default 
 \latex no_latex 
-SYNOPSIS
+.\SpecialChar ~
+ The 
+\series bold 
+\latex default 
+zabbix_agent
+\series default 
+\latex no_latex 
+ process is designed to be used with 
+\series bold 
+\latex default 
+INETD
+\series default 
+\latex no_latex 
+ daemon.
 \layout Standard
 
 
@@ -4807,24 +2898,106 @@ SYNOPSIS
 
 
 \latex no_latex 
+Execution time of the process is limited.
+ If the agent is not able to get the requested information within 
+\emph on 
+\latex default 
+Timeout
+\emph default 
+\latex no_latex 
+ seconds
+\latex default 
+ defined in 
+\emph on 
+/etc/zabbix/zabbix_agent.conf
+\emph default 
+\latex no_latex 
+, it kills itself.
+ 
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+When a connection to 
+\series bold 
+zabbix_agent
+\series default 
+ is made, the agent reads 
+\emph on 
+/etc/zabbix/zabbix_agent.conf
+\emph default 
+ in order to determine if the connection is coming from an authorized server.
+ The 
+\emph on 
+zabbix_agent.conf
+\emph default 
+ file must exist and contain the IP address of 
+\emph on 
+Zabbix
+\emph default 
+ server.
+ Connections from other IPs are rejected.
+ 
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+U
+\latex no_latex 
+se of 
+\series bold 
+\latex default 
+zabbix_agentd
+\series default 
+\latex no_latex 
+ (see below) instead of 
+\series bold 
+\latex default 
+zabbix_agent
+\series default 
+\latex no_latex 
+ is 
+\emph on 
+\latex default 
+strongly
+\emph default 
+ 
+\latex no_latex 
+recommended.\SpecialChar ~
+ The 
+\series bold 
+\latex default 
+zabbix_agentd
+\series default 
+\latex no_latex 
+ process does not require extra 
+\emph on 
+\latex default 
+fork()
+\emph default 
+\latex no_latex 
+ and 
+\emph on 
+\latex default 
+exec()
+\emph default 
+\latex no_latex 
+ calls for every connection
+\latex default 
+, no frequent parsing of configuration file is required as well
+\latex no_latex 
+.
+\layout Subsubsection
+
 zabbix_trapper
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-DESCRIPTION
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
 \layout Standard
 
 
@@ -4874,166 +3047,26 @@ zabbix_trapperd
 zabbix_trapperd
 \series default 
 \latex no_latex 
- process does not require extra fork() and exec() calls for every connection.
+ process does not require extra 
+\emph on 
+\latex default 
+fork()
+\emph default 
+\latex no_latex 
+ and 
+\emph on 
+\latex default 
+exec()
+\emph default 
+\latex no_latex 
+ calls for every connection.
  
 \layout Subsubsection
 
-zabbix_trapperd
-\layout Standard
-
-
-\series bold 
-Zabbix
-\series default 
-\latex no_latex 
- trapping server process (daemon).
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-SYNOPSIS
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-zabbix_trapperd
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-DESCRIPTION
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-The process collects information passed by active agents (zabbix_sender).
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-By default, zabbix_trapperd forks ten copies of itself.\SpecialChar ~
- The parameter TRAPPERD_FO
-RKS in include/common.h can be changed to modify the number of forked processes.
- 
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-No command-line switches are supported by zabbix_trapperd.
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-The process is run as daemon under non-priveledged user account, usually
- zabbix.\SpecialChar ~
-\SpecialChar ~
- 
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-Syslog is used to store debug information for the process.
-\layout Subsubsection
+Command line processes
+\layout Paragraph
 
 zabbix_sender
-\layout Standard
-
-
-\latex no_latex 
-The 
-\series bold 
-\latex default 
-Zabbix
-\series default 
-\latex no_latex 
- trapping agent.
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-SYNOPSIS
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-zabbix_sender zabbix_server port host:key value
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-DESCRIPTION
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
 \layout Standard
 
 
@@ -5043,8 +3076,15 @@ The process, when executed, sends information to
 \latex default 
 Zabbix
 \series default 
+ trapper (
+\series bold 
+INETD
+\series default 
+ or standalone
 \latex no_latex 
 .
+\latex default 
+)
 \layout Standard
 
 
@@ -5104,11 +3144,13 @@ Zabbix
 \series default 
 \latex no_latex 
 .
- It is port number of zabbix_trapper
+ 
 \latex default 
-(d)
-\latex no_latex 
- process.
+(Port number of 
+\series bold 
+zabbix_trapper 
+\series default 
+process.)
 \layout Standard
 
 
@@ -5154,8 +3196,13 @@ value\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 Value for parameter "host:key".
- Float number.
  
+\latex default 
+Positive f
+\latex no_latex 
+loat numb
+\latex default 
+er or a character string.
 \layout Standard
 
 
@@ -5391,7 +3438,7 @@ zabbix_suckerd
 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="11" columns="4">
+<lyxtabular version="2" rows="12" columns="4">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
@@ -5541,6 +3588,40 @@ Do not spend more than Timeout seconds on retrieving requested value (1-255).
 
 \layout Standard
 
+DisableHousekeeping
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+No
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+0
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+If set to 1, housekeeping procedure will be disabled.
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
 DebugLevel
 \end_inset 
 </cell>
@@ -5591,6 +3672,8 @@ No
 
 \layout Standard
 
+
+\emph on 
 /tmp/zabbix_suckerd.pid
 \end_inset 
 </cell>
@@ -5785,7 +3868,7 @@ Database name
 
 Example of the configuration file can be found at 
 \emph on 
-misc/conf/zabbix_agentd.conf
+misc/conf/zabbix_suckerd.conf
 \layout Subsubsection
 
 
@@ -15196,7 +13279,8 @@ CHARLIE COLLINS
 \layout Standard
 
 Startup scripts.
- Changes to the Manual.
+ Significant improvements for the Manual.
+ Thanks Charlie!
 \layout Itemize
 
 
