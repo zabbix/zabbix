@@ -133,7 +133,7 @@ Most of the signal handlers all need to delay or block signals to avoid signal r
  - fix screenedit.php permissions
 
  Kak naschet dopolnenij k time & date:
- * tipa weekday, month, day, year, hour, minute, ...
+ * tipa month, day, year, hour, minute, ...
  * osobenno weekday polezno - dabi ne podnimatj triggeri po vihodnim :)
 
  Nu i k 'str' dodlstj csjakie vsjakosti tipa
