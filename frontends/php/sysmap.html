@@ -15,24 +15,29 @@
 	{
 		if($register=="add")
 		{
-			add_host_to_sysmap($sysmapid,$hostid,$label,$x,$y,$icon);
+			$result=add_host_to_sysmap($sysmapid,$hostid,$label,$x,$y,$icon);
+			show_messages($result,"Host added","Cannot add host");
 		}
 		if($register=="update")
 		{
-			update_sysmap_host($shostid,$sysmapid,$hostid,$label,$x,$y,$icon);
+			$result=update_sysmap_host($shostid,$sysmapid,$hostid,$label,$x,$y,$icon);
+			show_messages($result,"Host updated","Cannot update host");
 		}
 		if($register=="add link")
 		{
-			add_link($sysmapid,$shostid1,$shostid2);
+			$result=add_link($sysmapid,$shostid1,$shostid2);
+			show_messages($result,"Link added","Cannot add link");
 		}
 		if($register=="delete_link")
 		{
-			delete_link($linkid);
+			$result=delete_link($linkid);
+			show_messages($result,"Link deleted","Cannot delete link");
 			unset($linkid);
 		}
 		if($register=="delete")
 		{
-			delete_sysmaps_host($shostid);
+			$result=delete_sysmaps_host($shostid);
+			show_messages($result,"Host deleted","Cannot delete host");
 			unset($shostid);
 		}
 	}

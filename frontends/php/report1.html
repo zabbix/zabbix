@@ -20,7 +20,7 @@
 	<td>Is zabbix_sucker running ?</td>
 	<?
 		$str="No";
-		if(exec("ps -aef|grep zabbix_sucker|grep -v grep|wc -l")>0)
+		if(exec("ps -aef|grep zabbix_suckerd|grep -v grep|wc -l")>0)
 		{
 			$str="Yes";
 		}

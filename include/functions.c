@@ -26,22 +26,18 @@ int	evaluate_LAST(float *last,int itemid,int parameter)
 {
 	DB_RESULT	*result;
 
-	char		c[1024];
+	char		c[256];
 	char		*field;
 
 	sprintf(c,"select lastvalue from items where itemid=%d and lastvalue is not null", itemid );
 
 	result = DBselect(c);
-	if(result==NULL)
+	if((result==NULL)||(DBnum_rows(result)==0))
 	{
 		DBfree_result(result);
 		return	FAIL;
 	}
-	if(DBnum_rows(result)==0)
-	{
-		DBfree_result(result);
-		return	FAIL;
-	}
+
 	field = DBget_field(result,0,0);
 	if( field == NULL )
 	{
@@ -59,7 +55,7 @@ int	evaluate_MIN(float *min,int itemid,int parameter)
 {
 	DB_RESULT	*result;
 
-	char		c[1024];
+	char		c[256];
 	char		*field;
 
 	int		now;
@@ -67,20 +63,16 @@ int	evaluate_MIN(float *min,int itemid,int parameter)
 	now=time(NULL);
 
 	sprintf(c,"select min(value) from history where clock>%d-%d and itemid=%d",now,parameter,itemid);
+	syslog(LOG_WARNING, "SQL:%s", c );
 
 	result = DBselect(c);
-	if(result==NULL)
+	if((result==NULL)||(DBnum_rows(result)==0))
 	{
 		syslog(LOG_NOTICE, "Result for MIN is empty" );
 		DBfree_result(result);
 		return	FAIL;
 	}
-	if(DBnum_rows(result)==0)
-	{
-		syslog( LOG_NOTICE, "Result for MIN is empty" );
-		DBfree_result(result);
-		return	FAIL;
-	}
+
 	field = DBget_field(result,0,0);
 	if( field == NULL )
 	{
@@ -99,7 +91,7 @@ int	evaluate_MAX(float *max,int itemid,int parameter)
 {
 	DB_RESULT	*result;
 
-	char		c[1024];
+	char		c[256];
 	char		*field;
 
 	int		now;
@@ -109,19 +101,17 @@ int	evaluate_MAX(float *max,int itemid,int parameter)
 	sprintf(c,"select max(value) from history where clock>%d-%d and itemid=%d",now,parameter,itemid);
 
 	result = DBselect(c);
-	if(result==NULL)
+	if((result==NULL)||(DBnum_rows(result)==0))
 	{
+		syslog(LOG_NOTICE, "Result for MAX is empty" );
 		DBfree_result(result);
 		return	FAIL;
 	}
-	if(DBnum_rows(result)==0)
-	{
-		DBfree_result(result);
-		return	FAIL;
-	}
+
 	field = DBget_field(result,0,0);
 	if( field == NULL )
 	{
+		syslog( LOG_NOTICE, "Result for MAX is empty" );
 		DBfree_result(result);
 		return	FAIL;
 	}	
@@ -142,19 +132,17 @@ int	evaluate_PREV(float *prev,int itemid,int parameter)
 	sprintf(c,"select prevvalue from items where itemid=%d and prevvalue is not null", itemid );
 
 	result = DBselect(c);
-	if(result==NULL)
+	if((result==NULL)||(DBnum_rows(result)==0))
 	{
+		syslog(LOG_NOTICE, "Result for PREV is empty" );
 		DBfree_result(result);
 		return	FAIL;
 	}
-	if(DBnum_rows(result)==0)
-	{
-		DBfree_result(result);
-		return	FAIL;
-	}
+
 	field = DBget_field(result,0,0);
 	if( field == NULL )
 	{
+		syslog(LOG_NOTICE, "Result for PREV is empty" );
 		DBfree_result(result);
 		return	FAIL;
 	}
@@ -240,15 +228,9 @@ int	update_functions( int itemid )
 	sprintf(c,"select function,parameter from functions where itemid=%d group by 1,2 order by 1,2",itemid );
 
 	result = DBselect(c);
-	if(result==NULL)
-	{
-		syslog( LOG_NOTICE, "No functions to update.");
-		DBfree_result(result);
-		return SUCCEED; 
-	}
-
 	rows=DBnum_rows(result);
-	if(rows == 0)
+
+	if((result==NULL)||(rows==0))
 	{
 		syslog( LOG_NOTICE, "No functions to update.");
 		DBfree_result(result);
@@ -260,8 +242,8 @@ int	update_functions( int itemid )
 		function.function=DBget_field(result,i,0);
 		function.parameter=atoi(DBget_field(result,i,1));
 		syslog( LOG_DEBUG, "ItemId:%d Evaluating %s(%d)\n",itemid,function.function,function.parameter);
-		ret = evaluate_FUNCTION(&value,itemid,function.function,function.parameter);
 
+		ret = evaluate_FUNCTION(&value,itemid,function.function,function.parameter);
 		if( FAIL == ret)	
 		{
 			syslog( LOG_WARNING, "Evaluation failed for function:%s\n",function.function);
@@ -651,20 +633,15 @@ int	get_lastvalue(float *Result,char *host,char *key,char *function,char *parame
 
 	sprintf( c, "select i.itemid from items i,hosts h where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", host, key );
 	result = DBselect(c);
-
-	if(result == NULL)
-	{
-        	DBfree_result(result);
-		syslog(LOG_WARNING, "Query failed" );
-		return FAIL;	
-	}
         rows = DBnum_rows(result);
-	if(rows == 0)
+
+	if((result == NULL)||(rows==0))
 	{
         	DBfree_result(result);
 		syslog(LOG_WARNING, "Query failed" );
 		return FAIL;	
 	}
+
         itemid=atoi(DBget_field(result,0,0));
 	syslog(LOG_DEBUG, "Itemid:%d", itemid );
         DBfree_result(result);

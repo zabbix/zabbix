@@ -15,11 +15,13 @@
 	{
 		if($register=="add")
 		{
-			add_item_to_graph($graphid,$itemid,$color);
+			$result=add_item_to_graph($graphid,$itemid,$color);
+			show_messages($result,"Item added","Cannot add item");
 		}
 		if($register=="delete")
 		{
-			delete_graphs_item($gitemid);
+			$result=delete_graphs_item($gitemid);
+			show_messages($result,"Item deleted","Cannot delete item");
 			unset($gitemid);
 		}
 	}

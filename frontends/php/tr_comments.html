@@ -14,7 +14,8 @@
 <?
 	if(isset($register) && ($register=="update"))
 	{
-		update_trigger_comments($triggerid,$comments);
+		$result=update_trigger_comments($triggerid,$comments);
+		show_messages($result,"Trigger comment updated","Cannot update trigger comment");
 	}
 ?>
 
