@@ -183,15 +183,16 @@
 		function drawGrid()
 		{
 			$this->drawSmallRectangle();
-			for($i=$this->sizeY/6;$i<=5*$this->sizeY/6;$i+=$this->sizeY/6)
+			for($i=1;$i<=5;$i++)
 			{
-				ImageDashedLine($this->im,$this->shiftX,$i+$this->shiftY,$this->sizeX+$this->shiftX,$i+$this->shiftY,$this->colors["Gray"]);
+				ImageDashedLine($this->im,$this->shiftX,$i*$this->sizeY/6+$this->shiftY,$this->sizeX+$this->shiftX,$i*$this->sizeY/6+$this->shiftY,$this->colors["Gray"]);
 			}
 		
-			for($i=$this->sizeX/24;$i<=23*$this->sizeX/24;$i+=$this->sizeX/24)
+			for($i=1;$i<=23;$i++)
 			{
-				ImageDashedLine($this->im,$i+$this->shiftX,$this->shiftY,$i+$this->shiftX,$this->sizeY+$this->shiftY,$this->colors["Gray"]);
+				ImageDashedLine($this->im,$i*$this->sizeX/24+$this->shiftX,$this->shiftY,$i*$this->sizeX/24+$this->shiftX,$this->sizeY+$this->shiftY,$this->colors["Gray"]);
 			}
+
 // Some data exists, so draw time line
 			if($this->nodata==0)
 			{
