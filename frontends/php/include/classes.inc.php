@@ -341,7 +341,21 @@
 					$maxY=@iif($maxY<max($this->max[$i]),max($this->max[$i]),$maxY);
 				}
 			}
+
 			$minY=0;
+// Calculation of maximum Y value
+			for($i=-10;$i<11;$i++)
+			{
+				$m=pow(10,$i);
+				if($m>$maxY)
+				{
+					if($m/2>$maxY)
+					{
+						$maxY=$m/2;
+					}
+					break;
+				}
+			}
 		
 			if(isset($minY)&&isset($maxY)&&($minX!=$maxX)&&($minY!=$maxY))
 			{
