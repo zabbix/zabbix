@@ -7,6 +7,15 @@
 ?>
 
 <?
+	if(!check_right_on_trigger("U",$HTTP_GET_VARS["triggerid"]))
+	{
+		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+		show_footer();
+		exit;
+	}
+?>
+
+<?
 	if(isset($HTTP_GET_VARS["register"]))
 	{
 		if($HTTP_GET_VARS["register"]=="add")

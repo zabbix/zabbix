@@ -35,6 +35,8 @@
 	Header( "Content-type:  image/png"); 
 	Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 
+	check_authorisation();
+
 	$result2=DBselect("select gi.itemid,i.description,gi.color,h.host from graphs_items gi,items i,hosts h where gi.itemid=i.itemid and gi.graphid=".$HTTP_GET_VARS["graphid"]." and i.hostid=h.hostid order by gi.gitemid");
 
 	$shiftX=10;
@@ -75,6 +77,16 @@
   
 	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10+50,$white);
 	ImageRectangle($im,0,0,$x-1,$y-1,$black);
+
+	if(!check_right("Graph","R",$HTTP_GET_VARS["graphid"]))
+	{
+//		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+//		show_footer();
+		ImagePng($im); 
+		ImageDestroy($im); 
+		exit;
+	}
+
 
 	for($i=0;$i<=$sizeY;$i+=$sizeY/5)
 	{

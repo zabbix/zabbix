@@ -43,6 +43,8 @@
 	Header( "Content-type:  image/png"); 
 	Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 
+	check_authorisation();
+
 	$im = imagecreate($sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10); 
   
 	$red=ImageColorAllocate($im,255,0,0); 
@@ -65,6 +67,16 @@
 //	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10,$white);
 	ImageFilledRectangle($im,0,0,$x,$y,$white);
 	ImageRectangle($im,0,0,$x-1,$y-1,$black);
+
+	if(!check_right_on_trigger("R",$HTTP_GET_VARS["triggerid"]))
+	{
+//		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+//		show_footer();
+		ImagePng($im); 
+		ImageDestroy($im); 
+		exit;
+	}
+
 
 	$trigger=get_trigger_by_triggerid($HTTP_GET_VARS["triggerid"]);
 	$str=$trigger["description"];

@@ -26,7 +26,6 @@ Not ready yet:
  - check for function parameters in evaluate_simple_expression
  - make links different if something is already registered (as for medias,
    actions, etc)
- - permissions for all *.php (charts, graphs , hosts, etc etc )
  - update function.lastvalue to NULL when trigger's status becomes
    UNKNOWN (done?)
  - update trigger status to unknown if cannot evaluate function 
@@ -61,6 +60,7 @@ Not ready yet:
 
 Changes for 1.0beta6:
 
+ - fixed permission check for all *.php (Alexei)
  - Priority was renamed to Severity (Alexei)
  - added graph to availability report (Alexei)
  - added frontends/php/chart4.php (Alexei)

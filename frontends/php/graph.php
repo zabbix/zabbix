@@ -11,6 +11,15 @@
 ?>
 
 <?
+	if(!check_right("Graph","R",$HTTP_GET_VARS["graphid"]))
+	{
+		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+		show_footer();
+		exit;
+	}
+?>
+
+<?
 	if(isset($HTTP_GET_VARS["register"]))
 	{
 		if($HTTP_GET_VARS["register"]=="add")

@@ -43,6 +43,8 @@
 	Header( "Content-type:  image/png"); 
 	Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 
+	check_authorisation();
+
 	$im = imagecreate($sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10); 
   
 	$red=ImageColorAllocate($im,255,0,0); 
@@ -64,6 +66,16 @@
   
 	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10,$white);
 	ImageRectangle($im,0,0,$x-1,$y-1,$black);
+
+	if(!check_right("Item","R",$HTTP_GET_VARS["itemid"]))
+	{
+//		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+//		show_footer();
+		ImagePng($im); 
+		ImageDestroy($im); 
+		exit;
+	}
+
 
 	$now = time(NULL);
 	$to_time=$now;
