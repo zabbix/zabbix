@@ -1,5 +1,6 @@
 Changes for 1.1alpha6:
 
+ - improved zabbix.spec. Thanks to Dirk Datzert. (Alexei)
  - fixed detection of __va_copy() (Alexei)
 
 Changes for 1.1alpha5:
