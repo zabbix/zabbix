@@ -1,5 +1,6 @@
 #include "config.h"
 
+#include "errno.h"
 
 /* For bcopy */
 #ifdef HAVE_STRING_H
@@ -1140,13 +1141,36 @@ float	EXECUTE(char *command)
 	f=popen( command,"r");
 	if(f==0)
 	{
-		return	FAIL;
+		switch errno
+		{
+			case	EINTR:
+				return TIMEOUT_ERROR;
+			default:
+				return FAIL;
+		}
 	}
-	fgets(c,1024,f);
+
+	if(NULL == fgets(c,1024,f))
+	{
+		pclose(f);
+		switch errno
+		{
+			case	EINTR:
+				return TIMEOUT_ERROR;
+			default:
+				return FAIL;
+		}
+	}
 
 	if(pclose(f) != 0)
 	{
-		return	FAIL;	
+		switch errno
+		{
+			case	EINTR:
+				return TIMEOUT_ERROR;
+			default:
+				return FAIL;
+		}
 	}
 
 	sscanf(c, "%f", &result );

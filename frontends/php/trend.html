@@ -5,10 +5,11 @@
 	
 #	itemid
 #	type
+#	trendavg
 
 	if(!isset($type))
 	{
-		$type="hourl";
+		$type="15min";
 	}
 
 	if($type == "15min")
@@ -70,17 +71,6 @@
 	$to_time=$now-$now%$period;
 	$from_time=$to_time-17*$period;
 
-	for($i=0;$i<=$sizeY;$i+=50)
-	{
-		ImageDashedLine($im,$shiftX,$i+$shiftY,$sizeX+$shiftX,$i+$shiftY,$darkgreen);
-	}
-
-	for($i=0;$i<=$sizeX;$i+=50)
-	{
-		ImageDashedLine($im,$i+$shiftX,$shiftY,$i+$shiftX,$sizeY+$shiftY,$darkgreen);
-		ImageString($im, 1,$i+$shiftX-11, $sizeY+$shiftY+5, date($label_format,$from_time+$period*($i/50)) , $red);
-	}
-
 	$count=array();
 	$min=array();
 	$max=array();
@@ -89,36 +79,82 @@
 	{
 		$result=DBselect("select count(value),min(value),max(value),avg(value) from history where itemid=$itemid and clock>$from_time+$i*($to_time-$from_time)/(900-50) and clock<$from_time+($i+1)*($to_time-$from_time)/(900-50)");
 		$count[$i]=DBget_field($result,0,0);
-		$min[$i]=DBget_field($result,0,1);
-		$max[$i]=DBget_field($result,0,2);
-		$avg[$i]=DBget_field($result,0,3);
+		if($count[$i]>0)
+		{
+			$min[$i]=DBget_field($result,0,1);
+			$max[$i]=DBget_field($result,0,2);
+			$avg[$i]=DBget_field($result,0,3);
+			$nodata=0;
+		}
 	}
-	$maxY=-1000000000;
-	$minY=1000000000;
+
+	for($i=0;$i<=$sizeY;$i+=50)
+	{
+		ImageDashedLine($im,$shiftX,$i+$shiftY,$sizeX+$shiftX,$i+$shiftY,$darkgreen);
+	}
+
+	for($i=0;$i<=$sizeX;$i+=50)
+	{
+		ImageDashedLine($im,$i+$shiftX,$shiftY,$i+$shiftX,$sizeY+$shiftY,$darkgreen);
+		if($nodata == 0)
+		{
+			ImageString($im, 1,$i+$shiftX-11, $sizeY+$shiftY+5, date($label_format,$from_time+$period*($i/50)) , $red);
+		}
+	}
+
+	unset($maxY);
+	unset($minY);
+
+/*
 	for($i=0;$i<900;$i++)
 	{
 		$nodata=0;
-		if($max[$i]>$maxY) { $maxY=$max[$i]; }
-		if(($min[$i]<$minY)&&($count[$i]>0)) { $minY=$min[$i]; }
+		if(!isset($maxY) || $max[$i]>$maxY)
+		{
+			$maxY=$max[$i];
+		}
+		if(!isset($minY) || (($min[$i]<$minY)&&($count[$i]>0)) )
+		{
+			$minY=$min[$i];
+		}
 	}
+*/
+
+	if($nodata == 0)
+	{
+		if(isset($trendavg))
+		{
+			$maxY=max($avg);
+			$minY=min($avg);
+		}
+		else
+		{
+			$maxY=max($max);
+			$minY=min($min);
+		}
+	}
+
 	$maxX=900;
 	$minX=0;
 #	echo "MIN/MAX:",$minX," - ",$maxX," - ",$minY," - ",$maxY,"<Br>";
 
-	if(($minX!=$maxX)&&($minY!=$maxY))
+	if(isset($minY)&&($maxY)&&($minX!=$maxX)&&($minY!=$maxY))
 	{
 		for($i=0;$i<900;$i++)
 		{
 			if($count[$i]>0)
 			{
-				$x1=$sizeX*($i-$minX)/($maxX-$minX);
-				$y1=$sizeY*($max[$i]-$minY)/($maxY-$minY);
-				$x2=$x1;
-				$y2=0;
-				$y1=$sizeY-$y1;
-				$y2=$sizeY-$y2;
+				if(!isset($trendavg))
+				{
+					$x1=$sizeX*($i-$minX)/($maxX-$minX);
+					$y1=$sizeY*($max[$i]-$minY)/($maxY-$minY);
+					$x2=$x1;
+					$y2=0;
+					$y1=$sizeY-$y1;
+					$y2=$sizeY-$y2;
 
-				ImageLine($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX,$y2+$shiftY,$red);
+					ImageLine($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX,$y2+$shiftY,$red);
+				}
 
 				$x1=$sizeX*($i-$minX)/($maxX-$minX);
 				$y1=$sizeY*($avg[$i]-$minY)/($maxY-$minY);
@@ -128,15 +164,18 @@
 				$y2=$sizeY-$y2;
 	
 				ImageLine($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX,$y2+$shiftY,$yellow);
+
+				if(!isset($trendavg))
+				{
+					$x1=$sizeX*($i-$minX)/($maxX-$minX);
+					$y1=$sizeY*($min[$i]-$minY)/($maxY-$minY);
+					$x2=$x1;
+					$y2=0;
+					$y1=$sizeY-$y1;
+					$y2=$sizeY-$y2;
 	
-				$x1=$sizeX*($i-$minX)/($maxX-$minX);
-				$y1=$sizeY*($min[$i]-$minY)/($maxY-$minY);
-				$x2=$x1;
-				$y2=0;
-				$y1=$sizeY-$y1;
-				$y2=$sizeY-$y2;
-	
-				ImageLine($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX,$y2+$shiftY,$green);
+					ImageLine($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX,$y2+$shiftY,$green);
+				}
 			}
 
 
@@ -145,7 +184,7 @@
 	}
 	else
 	{
-		ImageLine($im,$shiftX,$shiftY+$sizeY/2,$sizeX+$shiftX,$shiftY+$sizeY/2,$green);
+//		ImageLine($im,$shiftX,$shiftY+$sizeY/2,$sizeX+$shiftX,$shiftY+$sizeY/2,$green);
 	}
 
 	if($nodata == 0)

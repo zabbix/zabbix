@@ -1,7 +1,13 @@
 Changes for 1.0beta1:
-(Fix chart2.html in case of no data)
 (Add support for PostgreSQL and patches)
 (Add description of new tables to the manual)
+
+ - character '.' can be used in definition of monitored paramaters
+ (Alexei)
+ - added average-only mode for trends (Alexei)
+ - fixed bug with unexpected change of item status to NOT SUPPORTED. This
+ bug appeared because of incomplete processing of timeout situations (Alexei)
+ - constant DELAY_ON_NETWORK_FAILURE is set to 60 (Alexei)
 
  - added column status to table services (Alexei)
  - added user-defined sorting to form "Latest Values" (Alexei)

@@ -58,8 +58,22 @@
 	{
 		echo "<a href='trends.html?itemid=$itemid&type=15min'>15min</a> ";
 	}
-	
 	echo "</font>";
+
+
+	if(isset($type))
+	{
+		show_table_v_delimiter();
+		if(isset($trendavg))
+		{
+			echo "<a href='trends.html?itemid=$itemid&type=$type'>ALL</a> ";
+		}
+		else
+		{
+			echo "<a href='trends.html?itemid=$itemid&type=$type&trendavg=1'>AVG</a> ";
+		}
+	}
+
 	show_table_header_end();
 	echo "<br>";
 ?>
@@ -79,7 +93,14 @@
 	echo "<TD ALIGN=CENTER>";
 	if(isset($itemid)&&isset($type))
 	{
-		echo "<IMG SRC=\"trend.html?itemid=$itemid&type=$type\">";
+		if(isset($trendavg))
+		{
+			echo "<IMG SRC=\"trend.html?itemid=$itemid&type=$type&trendavg=1\">";
+		}
+		else
+		{
+			echo "<IMG SRC=\"trend.html?itemid=$itemid&type=$type\">";
+		}
 	}
 	else
 	{
