@@ -4230,6 +4230,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
                 return  DBexecute($sql);
         }
 
+        function add_screen_graph($screenid,$x,$y,$itemid,$width,$height)
+        {
+                $sql="insert into screens_graphs (screenid,x,y,itemid,width,height) values ($screenid,$x,$y,$itemid,$width,$height)";
+                return  DBexecute($sql);
+        }
+
         function update_screen_item($screenitemid,$graphid,$width,$height)
         {
                 $sql="update screens_items set graphid=$graphid,width=$width,height=$height where screenitemid=$screenitemid";

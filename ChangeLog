@@ -1,5 +1,7 @@
 Changes for 1.0beta10:
 
+ - added basic support for simple graphs in screens (Alexei)
+ - added table screens_graphs (Alexei)
  - dynamic form hosts.php (Alexei)
  - fixed 'make clean' under Solaris (rm -fv -> rm -f) (Alexei)
  - link map's connector to a trigger
