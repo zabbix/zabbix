@@ -147,7 +147,12 @@ COMMAND	commands[AGENT_MAX_USER_COMMANDS]=
 	{"disktotal[*]"		,DISKTOTAL,		0, "/"},
 	{"diskused[*]"		,DISKUSED,		0, "/"},
 
-	{"inodefree[*]"		,INODE, 		0, "/"},
+	{"diskfree_perc[*]"	,DISKFREE_PERC,		0, "/"},
+	{"diskused_perc[*]"	,DISKUSED_PERC,		0, "/"},
+
+	{"inodefree[*]"		,INODEFREE, 		0, "/"},
+
+	{"inodefree_perc[*]"	,INODEFREE_PERC,	0, "/"},
 
 	{"inodetotal[*]"	,INODETOTAL, 		0, "/"},
 
@@ -1204,7 +1209,7 @@ int	NETLOADOUT15(const char *cmd, const char *interface,double  *value)
 }
 
 
-int	INODE(const char *cmd, const char *mountPoint,double  *value)
+int	INODEFREE(const char *cmd, const char *mountPoint,double  *value)
 {
 #ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
@@ -1288,6 +1293,78 @@ int	INODETOTAL(const char *cmd, const char *mountPoint,double  *value)
 	}
 	return	SYSINFO_RET_FAIL;
 #endif
+}
+
+int	INODEFREE_PERC(const char *cmd, const char *mountPoint,double  *value)
+{
+	double	total;
+	double	free;
+
+	if(SYSINFO_RET_OK != INODETOTAL(cmd, mountPoint, &total))
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(SYSINFO_RET_OK != INODEFREE(cmd, mountPoint, &free))
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(total == 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	*value = 100*free/total;
+	return SYSINFO_RET_OK;
+}
+
+int	DISKUSED_PERC(const char *cmd, const char *mountPoint,double  *value)
+{
+	double	total;
+	double	used;
+
+	if(SYSINFO_RET_OK != DISKTOTAL(cmd, mountPoint, &total))
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(SYSINFO_RET_OK != DISKUSED(cmd, mountPoint, &used))
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(total == 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	*value = 100*used/total;
+	return SYSINFO_RET_OK;
+}
+
+int	DISKFREE_PERC(const char *cmd, const char *mountPoint,double  *value)
+{
+	double	total;
+	double	free;
+
+	if(SYSINFO_RET_OK != DISKTOTAL(cmd, mountPoint, &total))
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(SYSINFO_RET_OK != DISKFREE(cmd, mountPoint, &free))
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(total == 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	*value = 100*free/total;
+	return SYSINFO_RET_OK;
 }
 
 int	DISKFREE(const char *cmd, const char *mountPoint,double  *value)
@@ -1391,7 +1468,8 @@ int	DISKTOTAL(const char *cmd, const char *mountPoint,double  *value)
 	}
 
 /*	return  s.f_blocks * (s.f_bsize / 1024.0);*/
-	return  s.f_blocks * (s.f_frsize / 1024.0);
+	*value= s.f_blocks * (s.f_frsize / 1024.0);
+	return SYSINFO_RET_OK;
 #else
 	struct statfs   s;
 	long            blocks_used;
