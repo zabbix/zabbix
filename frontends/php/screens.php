@@ -133,6 +133,10 @@
 				echo get_map_imagemap($resourceid);
 				echo "<img src='map.php?sysmapid=$resourceid&noedit=true&border=1' border=0 usemap=#links>";
 			}
+			else if($resource == 3)
+			{
+				show_screen_plaintext($resourceid);
+			}
 		}
 		else
 		{

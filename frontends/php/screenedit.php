@@ -130,12 +130,14 @@
 			echo "<OPTION VALUE='0' ".iif($resource==0,"selected","").">".S_GRAPH;
 			echo "<OPTION VALUE='1' ".iif($resource==1,"selected","").">".S_SIMPLE_GRAPH;
 			echo "<OPTION VALUE='2' ".iif($resource==2,"selected","").">".S_MAP;
+			echo "<OPTION VALUE='3' ".iif($resource==3,"selected","").">".S_PLAIN_TEXT;
 			echo "</SELECT>";
 
+// Simple graph
 			if($resource == 1)
 			{
 				show_table2_v_delimiter();
-				echo nbsp(S_GRAPH_NAME);
+				echo nbsp(S_PARAMETER);
 				show_table2_h_delimiter();
 				$result=DBselect("select h.host,i.description,i.itemid from hosts h,items i where h.hostid=i.hostid and h.status in (0,2) and i.status=0 order by h.host,i.description");
 				echo "<select name=\"resourceid\" size=1>";
@@ -149,6 +151,25 @@
 				}
 				echo "</SELECT>";
 			}
+// Plain text
+			else if($resource == 3)
+			{
+				show_table2_v_delimiter();
+				echo nbsp(S_PARAMETER);
+				show_table2_h_delimiter();
+				$result=DBselect("select h.host,i.description,i.itemid from hosts h,items i where h.hostid=i.hostid and h.status in (0,2) and i.status=0 order by h.host,i.description");
+				echo "<select name=\"resourceid\" size=1>";
+				echo "<OPTION VALUE='0'>(none)";
+				for($i=0;$i<DBnum_rows($result);$i++)
+				{
+					$host_=DBget_field($result,$i,0);
+					$description_=DBget_field($result,$i,1);
+					$itemid_=DBget_field($result,$i,2);
+					echo "<OPTION VALUE='$itemid_' ".iif($resourceid==$itemid_,"selected","").">$host_: $description_";
+				}
+				echo "</SELECT>";
+			}
+// User-defined graph
 			else if($resource == 0)
 			{
 				show_table2_v_delimiter();
@@ -165,6 +186,7 @@
 				}
 				echo "</SELECT>";
 			}
+// Map
 			else if($resource == 2)
 			{
 				show_table2_v_delimiter();
@@ -224,6 +246,10 @@
 		else if( ($screenitemid!=0) && ($resource==2) )
 		{
 			echo "<a href=screenedit.php?register=edit&screenid=$screenid&x=$c&y=$r><img src='map.php?noedit=1&sysmapid=$resourceid&width=$width&height=$height&period=3600' border=0></a>";
+		}
+		else if( ($screenitemid!=0) && ($resource==3) )
+		{
+			show_screen_plaintext($resourceid);
 		}
 		else
 		{
