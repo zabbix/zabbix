@@ -4326,9 +4326,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
                 return  DBexecute($sql);
         }
 
-        function update_screen_item($screenitemid,$graphid,$width,$height)
+        function update_screen_item($screenitemid,$resource,$resourceid,$width,$height)
         {
-                $sql="update screens_items set graphid=$graphid,width=$width,height=$height where screenitemid=$screenitemid";
+                $sql="update screens_items set resource=$resourceid,resourceid=$resourceid,width=$width,height=$height where screenitemid=$screenitemid";
                 return  DBexecute($sql);
         }
 

@@ -62,8 +62,7 @@
 		}
                 if($HTTP_GET_VARS["register"]=="update")
                 {
-                        $result=update_screen_item($HTTP_GET_VARS["screenitemid"],$HTTP_GET_VARS["graphid"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
-                        $result=update_screen_graph($HTTP_GET_VARS["screengraphid"],$HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
+                        $result=update_screen_item($HTTP_GET_VARS["screenitemid"],$HTTP_GET_VARS["resource"],$HTTP_GET_VARS["resourceid"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
                         show_messages($result,"Item updated","Cannot update item");
 			unset($HTTP_GET_VARS["x"]);
                 }
