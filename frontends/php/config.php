@@ -158,11 +158,46 @@
 		{
 			$type=0;
 		}
-		$description="";
-		$smtp_server="";
-		$smtp_helo="";
-		$smtp_email="";
-		$exec_path="";
+		if(isset($HTTP_GET_VARS["description"]))
+		{
+			$description=$HTTP_GET_VARS["description"];
+		}
+		else
+		{
+			$description=0;
+		}
+		if(isset($HTTP_GET_VARS["smtp_server"]))
+		{
+			$smtp_server=$HTTP_GET_VARS["smtp_server"];
+		}
+		else
+		{
+			$smtp_server=0;
+		}
+		if(isset($HTTP_GET_VARS["smtp_helo"]))
+		{
+			$smtp_helo=$HTTP_GET_VARS["smtp_helo"];
+		}
+		else
+		{
+			$smtp_helo=0;
+		}
+		if(isset($HTTP_GET_VARS["smtp_email"]))
+		{
+			$smtp_email=$HTTP_GET_VARS["smtp_email"];
+		}
+		else
+		{
+			$smtp_email=0;
+		}
+		if(isset($HTTP_GET_VARS["exec_path"]))
+		{
+			$exec_path=$HTTP_GET_VARS["exec_path"];
+		}
+		else
+		{
+			$exec_path=0;
+		}
 	}
 ?>
 
