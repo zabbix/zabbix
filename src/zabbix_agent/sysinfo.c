@@ -173,6 +173,10 @@ COMMAND	commands[AGENT_MAX_USER_COMMANDS]=
 	{"disk_write_blks5[*]"	,DISKWRITEBLKS5,	0, "hda"},
 	{"disk_write_blks15[*]"	,DISKWRITEBLKS15,	0, "hda"},
 
+	{"sensor[temp1]"	,SENSOR_TEMP1, 		0, 0},
+	{"sensor[temp2]"	,SENSOR_TEMP2, 		0, 0},
+	{"sensor[temp3]"	,SENSOR_TEMP3, 		0, 0},
+
 	{"swap[free]"		,SWAPFREE, 		0, 0},
 	{"swap[total]"		,SWAPTOTAL, 		0, 0},
 
@@ -656,6 +660,138 @@ double   FILESIZE(const char * filename)
 		return	buf.st_size;
 	}
 
+	return	FAIL;
+}
+
+double	SENSOR_TEMP1(void)
+{
+	DIR	*dir;
+	struct	dirent *entries;
+	struct	stat buf;
+	char	filename[MAX_STRING_LEN+1];
+	char	line[MAX_STRING_LEN+1];
+	double	d1,d2,d3;
+
+	FILE	*f;
+
+	dir=opendir("/proc/sys/dev/sensors");
+	while((entries=readdir(dir))!=NULL)
+	{
+		strncpy(filename,"/proc/sys/dev/sensors/",MAX_STRING_LEN);	
+		strncat(filename,entries->d_name,MAX_STRING_LEN);
+		strncat(filename,"/temp1",MAX_STRING_LEN);
+
+		if(stat(filename,&buf)==0)
+		{
+			f=fopen(filename,"r");
+			if(f==NULL)
+			{
+				continue;
+			}
+			fgets(line,MAX_STRING_LEN,f);
+			fclose(f);
+
+			if(sscanf(line,"%lf\t%lf\t%lf\n",&d1, &d2, &d3) == 3)
+			{
+				closedir(dir);
+				return  d3;
+			}
+			else
+			{
+				closedir(dir);
+				return  FAIL;
+			}
+		}
+	}
+	closedir(dir);
+	return	FAIL;
+}
+
+double	SENSOR_TEMP2(void)
+{
+	DIR	*dir;
+	struct	dirent *entries;
+	struct	stat buf;
+	char	filename[MAX_STRING_LEN+1];
+	char	line[MAX_STRING_LEN+1];
+	double	d1,d2,d3;
+
+	FILE	*f;
+
+	dir=opendir("/proc/sys/dev/sensors");
+	while((entries=readdir(dir))!=NULL)
+	{
+		strncpy(filename,"/proc/sys/dev/sensors/",MAX_STRING_LEN);	
+		strncat(filename,entries->d_name,MAX_STRING_LEN);
+		strncat(filename,"/temp2",MAX_STRING_LEN);
+
+		if(stat(filename,&buf)==0)
+		{
+			f=fopen(filename,"r");
+			if(f==NULL)
+			{
+				continue;
+			}
+			fgets(line,MAX_STRING_LEN,f);
+			fclose(f);
+
+			if(sscanf(line,"%lf\t%lf\t%lf\n",&d1, &d2, &d3) == 3)
+			{
+				closedir(dir);
+				return  d3;
+			}
+			else
+			{
+				closedir(dir);
+				return  FAIL;
+			}
+		}
+	}
+	closedir(dir);
+	return	FAIL;
+}
+
+double	SENSOR_TEMP3(void)
+{
+	DIR	*dir;
+	struct	dirent *entries;
+	struct	stat buf;
+	char	filename[MAX_STRING_LEN+1];
+	char	line[MAX_STRING_LEN+1];
+	double	d1,d2,d3;
+
+	FILE	*f;
+
+	dir=opendir("/proc/sys/dev/sensors");
+	while((entries=readdir(dir))!=NULL)
+	{
+		strncpy(filename,"/proc/sys/dev/sensors/",MAX_STRING_LEN);	
+		strncat(filename,entries->d_name,MAX_STRING_LEN);
+		strncat(filename,"/temp3",MAX_STRING_LEN);
+
+		if(stat(filename,&buf)==0)
+		{
+			f=fopen(filename,"r");
+			if(f==NULL)
+			{
+				continue;
+			}
+			fgets(line,MAX_STRING_LEN,f);
+			fclose(f);
+
+			if(sscanf(line,"%lf\t%lf\t%lf\n",&d1, &d2, &d3) == 3)
+			{
+				closedir(dir);
+				return  d3;
+			}
+			else
+			{
+				closedir(dir);
+				return  FAIL;
+			}
+		}
+	}
+	closedir(dir);
 	return	FAIL;
 }
 

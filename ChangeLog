@@ -1,5 +1,7 @@
 Changes for 1.0beta11:
 
+ - monitoring of CPU and mainboard temperature under Linux (Alexei)
+ - support for sensor[temp1],sensor[temp2],sensor[temp3] (Alexei)
  - report1.php to use 'ps -ef' (Alexei)
  - document what template information is used 
  - support for prefixes in trigger expressions (K,M,G) (Alexei)
