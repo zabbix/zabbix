@@ -56,8 +56,8 @@ int	DBexecute(char *query)
 {
 
 #ifdef	HAVE_MYSQL
-	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s\n",query);
-/*	zabbix_log( LOG_LEVEL_WARNING, "Executing query:%s\n",query);*/
+	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s\n",query); 
+//	zabbix_log( LOG_LEVEL_WARNING, "Executing query:%s\n",query);
 
 	if( mysql_query(&mysql,query) != 0 )
 	{
