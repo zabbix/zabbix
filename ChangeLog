@@ -1,7 +1,6 @@
 Not ready yet:
 
-[ CORE. Investigate why new alarm added for unreachanbel host ]
-[ CORE. Investigate why trigger change its status from disabled to FALSE or TRUE ]
+[ CORE. Investigate why new alarm added for unreachable host ]
 
 [ HB. Authorisation without user name/password ]
 [ HB. Verify parameters before using them in SQL ]
@@ -31,6 +30,7 @@ snmpget -On localhost public enterprises.ucdavis.memory.memTotalSwap.0]
 
 Changes for 1.0beta4:
 
+ - added table 'sessions' (Alexei)
  - added index triggers.value and trigger.status (Alexei)
  - added column alarms.value (Alexei)
  - removed column alarms.istrue (Alexei)

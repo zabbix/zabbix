@@ -480,19 +480,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		global	$page;
 		global	$PHP_AUTH_USER,$PHP_AUTH_PW;
 		global	$USER_DETAILS;
+		global	$sessionid;
 
-//		if(!isset($PHP_AUTH_USER))
-//		{
-//			$PHP_AUTH_USER="guest";
-//			$PHP_AUTH_PW="";
-//		}
-
-		$passwd=md5($PHP_AUTH_PW);
-
-		$sql="select u.userid,u.alias,u.name,u.surname from users u where u.alias='$PHP_AUTH_USER' and u.passwd='$passwd'";
+		$sql="select u.userid,u.alias,u.name,u.surname from sessions s,users u where s.sessionid='$sessionid' and s.userid=u.userid and s.lastaccess-600<".time();
 		$result=DBselect($sql);
 		if(DBnum_rows($result)==1)
 		{
+			$sql="update sessions set lastaccess=".time()." where sessionid=$sessionid";
+			DBexecute($sql);
 			$USER_DETAILS["userid"]=DBget_field($result,0,0);
 			$USER_DETAILS["alias"]=DBget_field($result,0,1);
 			$USER_DETAILS["name"]=DBget_field($result,0,2);
@@ -501,13 +496,39 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		if(DBnum_rows($result)!=1)
 		{
-			Header("WWW-authenticate: basic realm=\"Zabbix\"");
-			Header("HTTP/1.0 401 Unauthorized");
-
 			echo "Try to contact Zabbix Administrator to get additional rights :-)\n";
-			exit;
+//			exit;
 		}
 	}
+
+//	function	check_authorisation()
+//	{
+//		global	$reconnect;	
+//		global	$page;
+//		global	$PHP_AUTH_USER,$PHP_AUTH_PW;
+//		global	$USER_DETAILS;
+//
+//		$passwd=md5($PHP_AUTH_PW);
+//
+//		$sql="select u.userid,u.alias,u.name,u.surname from users u where u.alias='$PHP_AUTH_USER' and u.passwd='$passwd'";
+//		$result=DBselect($sql);
+//		if(DBnum_rows($result)==1)
+//		{
+//			$USER_DETAILS["userid"]=DBget_field($result,0,0);
+//			$USER_DETAILS["alias"]=DBget_field($result,0,1);
+//			$USER_DETAILS["name"]=DBget_field($result,0,2);
+//			$USER_DETAILS["surname"]=DBget_field($result,0,3);
+//		}
+//
+//		if(DBnum_rows($result)!=1)
+//		{
+//			Header("WWW-authenticate: basic realm=\"Zabbix\"");
+//			Header("HTTP/1.0 401 Unauthorized");
+//
+//			echo "Try to contact Zabbix Administrator to get additional rights :-)\n";
+//			exit;
+//		}
+//	}
 
 	# Header for HTML pages
 
@@ -2686,6 +2707,29 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<input type=\"submit\" name=\"register\" value=\"add permission\">";
 		show_table2_header_end();
 	}
+
+	function	insert_login_form()
+	{
+		show_table2_header_begin();
+		echo "Login";
+
+		show_table2_v_delimiter();
+		echo "<form method=\"post\" action=\"index.php\">";
+
+		echo "Login name";
+		show_table2_h_delimiter();
+		echo "<input name=\"name\" value=\"$name\" size=20>";
+
+		show_table2_v_delimiter();
+		echo "Password";
+		show_table2_h_delimiter();
+		echo "<input type=\"password\" name=\"password\" value=\"$password\" size=20>";
+
+		show_table2_v_delimiter2();
+		echo "<input type=\"submit\" name=\"register\" value=\"Enter\">";
+		show_table2_header_end();
+	}
+
 
 	# Insert form for User
 	function	insert_user_form($userid)
