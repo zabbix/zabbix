@@ -20,6 +20,9 @@
 3.5 zabbix_sender
 3.6 Database
 3.7 WEB-based frontend
+3.7.1 Reports
+3.7.1.1 Status of Zabbix
+3.7.1.2 Availability report
 
 4. Chapter 4 (Installation)
 
@@ -30,8 +33,11 @@
 5.1 Zabbix configuration
 5.2 Expressions for triggers
 
-6. Chapter 6 (Misc)
-6.1 pinger.pl
+6. Chapter 6 (Upgrading)
+
+7. Chapter 7 (Misc)
+7.1 pinger.pl
+7.2 PostgreSQL notes
 
 Appendix A (Item configuration examples)
 Appendix B (Trigger configuration examples)
@@ -65,7 +71,7 @@ Zabbix was created by Alexei Vladishev, (alex@gobbo.caves.lv).
 Zabbix is software for monitoring various parameters of network and 
 servers. Polling and trapping are supported. All monitored parameters are stored 
 in Zabbix database.  It allows great reporting and data visualisation possibilities.
-Additionally, Zabbix is useful toool to monitor integrity of servers to avoid break-in
+Additionally, Zabbix is useful tool for monitoring integrity of servers to avoid break-in
 attempts.
 Stored data is useful source of information for capacity planning.
 
@@ -109,7 +115,7 @@ with latest information about performance of server being monitored.
 2.2 Alarming users
 
 Having performance monitoring is good, but it is almost useless without powerfull notification mechanism. Using Zabbix, 
-you can define virtually any possible condition for a trigger. How ? Using expressions !
+you can define virtually any possible condition for a trigger. How ? Using flexible expressions !
 
 Look, how it works.
 
@@ -250,6 +256,31 @@ Information provided by the frontend can be either graphical (e.g. graph on disk
 usage) or text format. Text representation of monitored parameters is made to allow
 easy way for export Zabbix data to other analytical tools.
 
+3.7.1 Reports
+
+Zabbix reports represent collected information in structured way. All reports are produced
+in HTML format.
+
+Note that report generation could be very time consuming operation. Additionally, if you
+use MySQL or ay other database with table locking, zabbix_sucker and zabbix_alarmer will
+wait until the report is finished.
+
+3.7.1.1 Status of Zabbix
+
+This report gives general information about Zabbix server including:
+
+ - number of records in most important tables
+ - are main Zabbix processes running ?
+ - other information
+
+3.7.1.2 Availability report
+
+This report calculates amount of time a trigger spent in true and false states. 
+
+Suppose, you want to see this information for trigger "WEB server is down". You run this report and see
+that the trigger was 0.005% in true state and 99.995 percent of time in false state. It means that
+WEB server was unavailable 0.005 percent of time, and availability index is 0.005%. Pretty good !
+
 4. Chapter 4 (Installation)
 
 4.1 Requirements
@@ -274,7 +305,17 @@ Zabbix requires the following software to run properly:
  - PHP 4.0 or later, compiled as Apache module with GD (for PNG images) with support of PostgreSQL or MySQL
  - GNU make
 
-However, Zabbix can work on previous versions of Apache, MySQL, PostgreSQL as well. 
+However, Zabbix can work on previous versions of Apache, MySQL, PostgreSQL as well.
+
+I've tried to run Zabbix on PostgreSQL 6.5x with no luck. PostgreSQL crashes after
+one-tree minutes of zabbix_sucker running. So, PostgreSQL version 7.0.2 or later is strongly
+recommended.
+
+For small installations MySQL is best choice. However, if you plan to monitor more than
+10-20 servers and keep long history of monitored parameters, PostgreSQL is preferred. Why ? 
+Because MySQL locks whole table during execution of SQL statements.
+
+Additionally, if you plan to use PostgreSQL, fast CPU required. 
 
 Memory requirements:
 
@@ -313,6 +354,8 @@ mysql -u<username> -p<password>
 
 cd create/mysql
 cat schema.sql |mysql zabbix -u<username> -p<password>
+cd create/data
+cat data.sql |mysql zabbix -u<username> -p<password>
 
 For PostgreSQL:
 
@@ -321,8 +364,9 @@ psql -U <username>
 > \q
 
 cd create/postgresql
-
 cat schema.sql|psql -U <username> zabbix
+cd create/data
+cat data.sql|psql -U <username> zabbix
 
 
 4.2.4 Configure include/db.h
@@ -497,9 +541,37 @@ differs from last one.
 Similiar expressions could be useful to monitor changes in important files, such as
 /etc/passwd, /etc/inetd.conf, /kernel, etc.
 
-6. Chapter 6 (Misc)
+6. Chapter 6 (Upgrading)
 
-6.1 pinger.pl
+Upgrade procedure is quite simple. New binaries and frontend
+should be installed acording to latest installation guide.
+
+In order to update database structure, the following steps
+should be performed. Note that before applying database patches,
+all Zabbix processes must be stopped. Also, the process can take
+from 0 seconds (if no patches required) up to several hours. 
+
+For business-critical installations database backup is required !
+
+Step 1. cd upgrades/dbpatches/
+Step 2. In case, if you need to upgrade existing 1.0alpha3 version to 1.0alpha4 version. 
+	cd 1.0alpha3_to_1.0alpha4/
+	(If you jump throw several Zabbix versions, for example, from 1.0alpha1 to 1.0.alpha5, all patches between 1.0alpha1 and 1.0alpha5 must be applied)
+Step 3. Depending on your database engine:
+
+	cd mysql
+	cat patch.sql |mysql zabbix -u<username> -p<password>
+
+	or
+
+	cd postgresql
+	cat patch.sql|psql -U <username> zabbix
+
+That is all. Zabbix database is ready. 
+
+7. Chapter 7 (Misc)
+
+7.1 pinger.pl
 
 The script is used to periodically sind ICMP pings to list of servers. In case, if it does
 not receive responce from host, it executes:
@@ -512,3 +584,18 @@ zabbix_server <server> <port> <host>:alive 1
 
 The script is usually called from cron. Configure the script before use. Change location for "hosts"
 file. You must have fping installed to successfully run the script.
+
+7.2 PostgreSQL notes
+
+Performance of PostgreSQL can be significantly improved by executing
+VACUUM command on Zabbix database.
+
+I would suggest execute VACUUM, at lease, after the following events:
+
+ - Zabbix is installed
+ - 10000 records in tbale "history"
+ - patches applied on Zabbix database
+
+Command:
+
+echo "vacuum verbose analyze"|psql zabbix
