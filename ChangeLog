@@ -1,5 +1,6 @@
 Changes for 1.0beta11:
 
+ - added table users_groups, usrgrp (Alexei)
  - monitoring of CPU and mainboard temperature under Linux (Alexei)
  - support for sensor[temp1],sensor[temp2],sensor[temp3] (Alexei)
  - report1.php to use 'ps -ef' (Alexei)
