@@ -83,3 +83,13 @@ img.bottom
 	border-color: gray;
 	background-color: white;
 }
+
+.biginput:focus
+{
+	font-family: Verdana, Helvetica, Geneva;
+	font-size: 10px;
+	border: solid;
+	border-width: 1px;
+	border-color: black;
+	background-color: white;
+}
