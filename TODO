@@ -7,6 +7,7 @@ TOP PRIORITY:
 
 BUGS:
 
+ - BUG. SQL errors when adding host to IT Services
  - graphs and maps are not displayed properly sometimes
  - BUG. Agent return unsupported in case if UserParameter ends by timeout.
  - add protection from IT Service looping

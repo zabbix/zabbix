@@ -1,5 +1,7 @@
 Changes for 1.0beta8:
 
+ - added basic support for SLA level in IT Services (Alexei)
+ - added chart_sla.php (Alexei)
  - fixed incorrect handling of timeouts when sendign emails
  (Alexei)
  - fixed selection of recipient in trigger actions (Alexei)
