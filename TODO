@@ -29,6 +29,10 @@ Not ready yet:
 
  OTHER:
 
+ - support for complex reports
+ - mass updates/inserts
+ - get rid of long select lists in user forms 
+ - support for check_service[samba]
  - get rid of "Bad protocol identification '0'" when doing ssh check
  - ability to execute command on server monitored
  - support for tcp_ping[] which returns number of ms spent
