@@ -7,16 +7,17 @@
 	$result=DBselect("select count(*) from triggers t,hosts h,items i,functions f  where t.istrue=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status in (0,2) order by t.triggerid");
 	$count=DBget_field($result,0,0);
 	setcookie("active_triggers",$count,time()+1800);
+
+//	Number of trigger decreased
 	if(!isset($active_triggers)||($count<$active_triggers))
 	{
-//		Number of trigger decreased
-		$audio="warning1.wav";
+		$audio="warning_on.wav";
 
 	}
+//	Number of trigger increased
 	if(!isset($active_triggers)||($count>$active_triggers))
 	{
-//		Number of trigger increased
-		$audio="warning2.wav";
+		$audio="warning_off.wav";
 	}
 	
 	if(isset($fullscreen))
@@ -30,8 +31,7 @@
 
 	if(isset($audio))
 	{
-//		echo "<EMBED src=\"audio/$audio\" autostart=true loop=false volume=100 hidden=true></EMBED>";
-//		echo "<NOEMBED><BGSOUND src=\"audio/$audio\"></NOEMBED>";
+		echo "<BGSOUND src=\"audio/$audio\" loop=0>";
 	}
 ?>                                                                                                             
 
