@@ -17,6 +17,7 @@ the agent with a predefined API that can return values to suckerd.
 
 Not ready yet:
 
+ - add support for downtimes, user availablity, etc
  - get rid of false warning messages (like unable to insert ...)
 
  HB:
