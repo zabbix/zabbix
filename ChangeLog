@@ -1,5 +1,6 @@
 Changes for 1.0beta10:
 
+ - added frontends/include.classes.inc.php (Alexei)
  - show selected host in Host Add form (Alexei)
  - fixed snmptrap.sh (Alexei)
  - improved performance of simple graphs (Alexei)
