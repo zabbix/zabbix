@@ -1,8 +1,5 @@
 1.0:
 
- - fixe apply_actions()
- - change logic for actions: scope =1 (triggerid=hostid), 2 (triggerid = NULL)
- - improve actions.php to make selection of trigger, host, hosts on the top
  - navigation bar for all graphs and screens
  - make support for "Clone"
  - add SNMP-based template
