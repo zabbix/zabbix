@@ -182,12 +182,10 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,int parameter)
 			{
 				if(cmp_double(item->lastvalue, item->prevvalue) == 0)
 				{
-//					*value=strdup("0");
 					strcpy(value,"0");
 				}
 				else
 				{
-//					*value=strdup("1");
 					strcpy(value,"1");
 				}
 			}
@@ -872,7 +870,6 @@ void	process_new_value(DB_ITEM *item,char *value)
 		DBexecute(sql);
 	}
 
-//	if((item->prevvalue_null == 1) || (cmp_double(value_double,item->lastvalue) != 0) || (cmp_double(item->prevvalue,item->lastvalue) != 0) )
 	if((item->prevvalue_null == 1) || (strcmp(value,item->lastvalue_str) != 0) || (strcmp(item->prevvalue_str,item->lastvalue_str) != 0) )
 	{
 		sprintf(sql,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=%d",now+item->delay,value,now,item->itemid);

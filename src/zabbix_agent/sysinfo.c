@@ -299,12 +299,6 @@ void	process(char *command,char *value)
 		}
 	}
 
-//	if(res == NULL)
-//	{
-/* Not exactly ... */
-//		result=NOTSUPPORTED;
-//	}
-
 	if(ret_str==0)
 	{
 		sprintf(value,"%f",result);
@@ -1242,8 +1236,8 @@ char	*EXECUTE_STR(char *command)
 	{
 		switch (errno)
 		{
-//			case	EINTR:
-//				return TIMEOUT_ERROR;
+/*			case	EINTR:
+				return TIMEOUT_ERROR;*/
 			default:
 				printf("E1\n");
 				return NULL;
@@ -1255,8 +1249,8 @@ char	*EXECUTE_STR(char *command)
 		pclose(f);
 		switch (errno)
 		{
-//			case	EINTR:
-//				return TIMEOUT_ERROR;
+/*			case	EINTR:
+				return TIMEOUT_ERROR;*/
 			default:
 				printf("E1\n");
 				return NULL;
@@ -1267,8 +1261,8 @@ char	*EXECUTE_STR(char *command)
 	{
 		switch (errno)
 		{
-//			case	EINTR:
-//				return TIMEOUT_ERROR;
+/*			case	EINTR:
+				return TIMEOUT_ERROR;*/
 			default:
 				printf("E1\n");
 				return NULL;

@@ -226,7 +226,7 @@ void    init_config(void)
 		{"ListenPort",&CONFIG_LISTEN_PORT,0,TYPE_INT,PARM_OPT,1024,32767},
 		{"DebugLevel",&CONFIG_LOG_LEVEL,0,TYPE_INT,PARM_OPT,0,4},
 		{"StartAgents",&CONFIG_AGENTD_FORKS,0,TYPE_INT,PARM_OPT,1,16},
-		{"UserParameter",0,&add_parameter,0,0,0,0},
+		{"UserParameter",0,(void *)&add_parameter,0,0,0,0},
 		{0}
 	};
 	parse_cfg_file("/etc/zabbix/zabbix_agentd.conf",cfg);
@@ -370,10 +370,7 @@ void	child_main(int i,int listenfd, int addrlen)
 {
 	int	connfd;
 	socklen_t	clilen;
-//	struct sockaddr *cliaddr;
 	struct sockaddr cliaddr;
-
-//	cliaddr=malloc(addrlen);
 
 	zabbix_log( LOG_LEVEL_WARNING, "zabbix_agentd %ld started",(long)getpid());
 
@@ -383,7 +380,6 @@ void	child_main(int i,int listenfd, int addrlen)
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("waiting for connection. Requests [%d]", stats_request++);
 #endif
-//		connfd=accept(listenfd,cliaddr, &clilen);
 		connfd=accept(listenfd,&cliaddr, &clilen);
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("processing request");

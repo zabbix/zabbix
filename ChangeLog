@@ -12,6 +12,8 @@ Not ready yet:
 
 Changes for 1.0beta4:
 
+ - removed option -Wall from all Makefiles (Alexei)
+ - removed "//" comments from Zabbix code (Alexei)
  - disabled experimental code by commenting #define PERF (Alexei)
  - improvements in SNMP handling for zabbix_suckerd (Alexei)
  - fixed check for SNMP library in configure.in (Alexei)
