@@ -180,6 +180,7 @@ int		DBnum_rows(DB_RESULT *result);
 int	DBget_function_result(double *result,char *functionid);
 void	DBupdate_host_status(int hostid,int status,int clock);
 int	DBupdate_item_status_to_notsupported(int itemid);
+int	DBadd_trend(int itemid, double value, int clock);
 int	DBadd_history(int itemid, double value, int clock);
 int	DBadd_history_str(int itemid, char *value, int clock);
 int	DBadd_service_alarm(int serviceid,int status,int clock);
