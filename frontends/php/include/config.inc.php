@@ -3801,7 +3801,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		show_table2_v_delimiter();
 		echo "Disabled";
 		show_table2_h_delimiter();
-		echo "<INPUT class=\"biginput\" TYPE=\"CHECKBOX\" ";
+		echo "<INPUT TYPE=\"CHECKBOX\" ";
 		if($status==1) { echo " CHECKED "; }
 		echo "NAME=\"disabled\"  VALUE=\"true\">";
 
