@@ -12,10 +12,55 @@
 		echo "\n";
 	}
 
+	function	check_authorisation()
+	{
+		global $mysql;
+		global $page;
+		global $PHP_AUTH_USER,$PHP_AUTH_PW;
+
+		if(	($page["file"]=="latest.html")||
+			($page["file"]=="tr_status.html")||
+			($page["file"]=="queue.html")||
+			($page["file"]=="latestalarms.html")||
+			($page["file"]=="alerts.html")||
+			($page["file"]=="history.html")||
+			($page["file"]=="index.html"))
+		{
+			$sql="select password_required from config";
+			$result=mysql_query($sql,$mysql);
+			$row=mysql_fetch_row($result);
+
+			if($row[0]==0)
+			{
+				return;
+			}
+
+			$sql="select count(*) from users u,groups g where u.alias='$PHP_AUTH_USER' and u.passwd='$PHP_AUTH_PW' and u.groupid=g.groupid and (g.groupid=1 or g.groupid=2)";
+		}
+		else
+		{
+			$sql="select count(*) from users u,groups g where u.alias='$PHP_AUTH_USER' and u.passwd='$PHP_AUTH_PW' and u.groupid=g.groupid and g.groupid=1";
+		}
+		$result=mysql_query($sql,$mysql);
+		$row=mysql_fetch_row($result);
+
+		if($row[0]!=1)
+		{
+			Header("WWW-authenticate: basic realm=\"Zabbix\"");
+			Header("HTTP/1.0 401 Unauthorized");
+			echo "Try to contact System Administrator to get additional rights :-)\n";
+			exit;
+		}
+
+	}
+
 	# Header for HTML pages
 
 	function	show_header($title,$refresh)
 	{
+		global $page;
+
+		check_authorisation();
 
 ?>
 	<!doctype html public "-//W3C//DTD HTML 3.2//EN">
@@ -40,54 +85,157 @@
 		<tr>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="latest.html">LATEST VALUES</a>
+				<a href="latest.html">
+<?
+				if( 	($page["file"]=="latest.html") ||
+					($page["file"]=="history.html"))
+				{
+					echo "<b>[LATEST VALUES]</b></a>";
+				}
+				else
+				{
+					echo "LATEST VALUES</a>";
+				}
+?>
 			</font>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="tr_status.html?notitle=true&onlytrue=true&noactions=true&compact=true">STATUS OF TRIGGERS</a>
+				<a href="tr_status.html?notitle=true&onlytrue=true&noactions=true&compact=true">
+<?
+				if($page["file"]=="tr_status.html")
+				{
+					echo "<b>[STATUS OF TRIGGERS]</b></a>";
+				}
+				else
+				{
+					echo "STATUS OF TRIGGERS</a>";
+				}
+?>
 			</font>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="queue.html">QUEUE</a>
+				<a href="queue.html">
+<?
+				if($page["file"]=="queue.html")
+				{
+					echo "<b>[QUEUE]</b></a>";
+				}
+				else
+				{
+					echo "QUEUE</a>";
+				}
+?>
 			</font>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="latestalarms.html">ALARMS</a>
+				<a href="latestalarms.html">
+<?
+				if($page["file"]=="latestalarms.html")
+				{
+					echo "<b>[ALARMS]</b></a>";
+				}
+				else
+				{
+					echo "ALARMS</a>";
+				}
+?>
 			</font>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="alerts.html">ALERTS</a>
+				<a href="alerts.html">
+<?
+				if($page["file"]=="alerts.html")
+				{
+					echo "<b>[ALERTS]</b></a>";
+				}
+				else
+				{
+					echo "ALERTS</a>";
+				}
+?>
 			</font>
 		</td>
 		</tr>
 		<tr>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="config.html">CONFIG</a>
+				<a href="config.html">
+<?
+				if($page["file"]=="config.html")
+				{
+					echo "<b>[CONFIG]</b></a>";
+				}
+				else
+				{
+					echo "CONFIG</a>";
+				}
+?>
 			</font>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="users.html">USERS</a>
+				<a href="users.html">
+<?
+				if(	($page["file"]=="users.html")||
+					($page["file"]=="media.html"))
+				{
+					echo "<b>[USERS]</b></a>";
+				}
+				else
+				{
+					echo "USERS</a>";
+				}
+?>
 			</font>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="hosts.html">HOSTS</a>
+				<a href="hosts.html">
+<?
+				if($page["file"]=="hosts.html")
+				{
+					echo "<b>[HOSTS]</b></a>";
+				}
+				else
+				{
+					echo "HOSTS</a>";
+				}
+?>
 			</font>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="items.html">ITEMS</a>
+				<a href="items.html">
+<?
+				if($page["file"]=="items.html")
+				{
+					echo "<b>[ITEMS]</b></a>";
+				}
+				else
+				{
+					echo "ITEMS</a>";
+				}
+?>
 			</font>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="triggers.html">TRIGGERS</a>
+				<a href="triggers.html">
+<?
+				if(	($page["file"]=="triggers.html")||
+					($page["file"]=="actions.html"))
+				{
+					echo "<b>[TRIGGERS]</b></a>";
+				}
+				else
+				{
+					echo "TRIGGERS</a>";
+				}
+?>
 			</font>
 		</td>
 		</tr>
@@ -473,11 +621,11 @@
 
 	# Add User definition
 
-	function	add_user($name,$surname,$alias)
+	function	add_user($groupid,$name,$surname,$alias,$passwd)
 	{
 		global	$mysql;
 
-		$sql="insert into users (userid,name,surname,alias) values (NULL,'$name','$surname','$alias')";
+		$sql="insert into users (userid,groupid,name,surname,alias,passwd) values (NULL,$groupid,'$name','$surname','$alias','$passwd')";
 		$result=mysql_query($sql,$mysql);
 
 		return	$result;
@@ -567,11 +715,11 @@
 
 	# Update configuration
 
-	function	update_config($smtp_server,$smtp_helo,$smtp_email)
+	function	update_config($smtp_server,$smtp_helo,$smtp_email,$password_required)
 	{
 		global	$mysql;
 
-		$sql="update config set smtp_server=\"$smtp_server\",smtp_helo=\"$smtp_helo\",smtp_email=\"$smtp_email\"";
+		$sql="update config set smtp_server=\"$smtp_server\",smtp_helo=\"$smtp_helo\",smtp_email=\"$smtp_email\",password_required=$password_required";
 		$result=mysql_query($sql,$mysql);
 	}
 

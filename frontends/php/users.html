@@ -1,7 +1,9 @@
 <?
+	$page["title"] = "Users";
+	$page["file"] = "users.html";
+
 	include "include/config.inc";
-	$title = "Users";
-	show_header($title,0);
+	show_header($page["title"],0);
 ?>
 
 <?
@@ -12,7 +14,10 @@
 <?
 	if($register=="add")
 	{
-		$result=add_user($name,$surname,$alias);
+		if($password1==$password2)
+		{
+			$result=add_user($groupid,$name,$surname,$alias,$password1);
+		}
 	}
 	if($register=="delete")
 	{
@@ -23,13 +28,14 @@
 <?
 	show_table_header("USERS");
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR><TD WIDTH=\"10%\"><B>Alias</B></TD>";
+	echo "<TR><TD WIDTH=\"10%\"><B>Group</B></TD>";
+	echo "<TD WIDTH=\"10%\"><B>Alias</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Name</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Surname</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
-	$result=mysql_query("select userid,alias,name,surname from users order by alias",$mysql);
+	$result=mysql_query("select u.userid,u.alias,u.name,u.surname,g.name from users u,groups g where u.groupid=g.groupid order by g.name,u.alias",$mysql);
 	echo "<CENTER>";
 	while($row=mysql_fetch_row($result))
 	{
@@ -46,7 +52,9 @@
 		$alias=$row[1];
 		$name=$row[2];
 		$surname=$row[3];
+		$group=$row[4];
 		$userid=$row[0];
+		echo "<TD>$group</TD>";
 		echo "<TD>$alias</TD>";
 		echo "<TD>$name</TD>";
 		echo "<TD>$surname</TD>";
@@ -78,6 +86,29 @@
 	echo "Surname";
 	show_table2_h_delimiter();
 	echo "<input name=\"surname\" size=20>";
+
+	show_table2_v_delimiter();
+	echo "User group";
+	show_table2_h_delimiter();
+	echo "<select name=\"groupid\">";
+	$result=mysql_query("select groupid,name from groups order by name",$mysql);
+	while($row=mysql_fetch_row($result))
+	{
+		$groupid=$row[0];
+		$name=$row[1];
+		echo "<option value=\"$groupid\">$name";
+	}
+	echo "</select>";
+
+	show_table2_v_delimiter();
+	echo "Password";
+	show_table2_h_delimiter();
+	echo "<input type=\"password\" name=\"password1\" size=20>";
+
+	show_table2_v_delimiter();
+	echo "Password (once again)";
+	show_table2_h_delimiter();
+	echo "<input type=\"password\" name=\"password2\" size=20>";
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
