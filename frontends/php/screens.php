@@ -39,42 +39,52 @@
 ?>
 
 <?php
-	if(!isset($_GET["fullscreen"]))
-	{
-		show_table_header_begin();
-		echo S_SCREENS_BIG;
+		show_table3_header_begin();
 
-		show_table_v_delimiter();
+		if(isset($_GET["screenid"])&&($_GET["screenid"]==0))
+		{
+			unset($_GET["screenid"]);
+		}
 
-		echo "<font size=2>";
+		if(isset($_GET["screenid"]))
+		{
+			$result=DBselect("select name from screens where screenid=".$_GET["screenid"]);
+			$map=DBget_field($result,0,0);
+			$map=iif(isset($_GET["fullscreen"]),
+				"<a href=\"screens.php?screenid=".$_GET["sysmapid"]."\">".$map."</a>",
+				"<a href=\"screens.php?screenid=".$_GET["sysmapid"]."&fullscreen=1\">".$map."</a>");
+		}
+		else
+		{
+			$map=S_SELECT_SCREEN_TO_DISPLAY;
+		}
 
-		$result=DBselect("select screenid,name,cols,rows from screens order by name");
+		echo S_SCREENS_BIG.nbsp(" / ").$map;
+// Start of new code
+		show_table3_h_delimiter();
+		echo "<form name=\"form2\" method=\"get\" action=\"screens.php\">";
+
+		if(isset($_GET["fullscreen"]))
+		{
+			echo "<input name=\"fullscreen\" type=\"hidden\" value=".$_GET["fullscreen"].">";
+		}
+
+		echo "<select class=\"biginput\" name=\"screenid\" onChange=\"submit()\">";
+		echo "<option value=\"0\" ".iif(!isset($_GET["screenid"]),"selected","").">".S_SELECT_SCREEN_DOT_DOT_DOT;
+
+		$result=DBselect("select screenid,name from screens order by name");
 		while($row=DBfetch($result))
 		{
 			if(!check_right("Screen","R",$row["screenid"]))
 			{
 				continue;
 			}
-			if( isset($_GET["screenid"]) && ($_GET["screenid"] == $row["screenid"]) )
-			{
-				echo "<b>[";
-			}
-			echo "<a href='screens.php?screenid=".$row["screenid"]."'>".$row["name"]."</a>";
-			if(isset($_GET["screenid"]) && ($_GET["screenid"] == $row["screenid"]) )
-			{
-				echo "]</b>";
-			}
-			echo " ";
+			echo "<option value=\"".$row["screenid"]."\" ".iif(isset($_GET["screenid"])&&($_GET["screenid"]==$row["screenid"]),"selected","").">".$row["name"];
 		}
-		if(DBnum_rows($result) == 0)
-		{
-			echo S_NO_SCREENS_TO_DISPLAY;
-		}
-
-		echo "</font>";
+		echo "</select>";
+		echo "</form>";
 		show_table_header_end();
-		echo "<br>";
-	}
+// End of new code
 ?>
 
 <?php
@@ -84,7 +94,7 @@
 		$screenid=$_GET["screenid"];
 		$result=DBselect("select name,cols,rows from screens where screenid=$screenid");
 		$row=DBfetch($result);
-		if(isset($_GET["fullscreen"]))
+/*		if(isset($_GET["fullscreen"]))
 		{
 			$map="<a href=\"screens.php?screenid=".$_GET["screenid"]."\">".$row["name"]."</a>";
 		}
@@ -92,7 +102,7 @@
 		{
 			$map="<a href=\"screens.php?screenid=".$_GET["screenid"]."&fullscreen=1\">".$row["name"]."</a>";
 		}
-	show_table_header($map);
+	show_table_header($map);*/
           echo "<TABLE BORDER=1 COLS=".$row["cols"]." align=center WIDTH=100% BGCOLOR=\"#FFFFFF\"";
           for($r=0;$r<$row["rows"];$r++)
           {
@@ -141,7 +151,7 @@
 	}
 	else
 	{
-		show_table_header(S_SELECT_SCREEN_TO_DISPLAY);		
+//		show_table_header(S_SELECT_SCREEN_TO_DISPLAY);		
 		echo "<TABLE BORDER=0 align=center COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 		echo "<TR BGCOLOR=#DDDDDD>";
 		echo "<TD ALIGN=CENTER>";
