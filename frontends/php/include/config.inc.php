@@ -178,10 +178,31 @@
 	
 	function	get_action_count_by_triggerid($triggerid)
 	{
-		$sql="select count(*) as cnt from actions where triggerid=$triggerid";
+		$cnt=0;
+
+		$sql="select count(*) as cnt from actions where triggerid=$triggerid and scope=0";
 		$result=DBselect($sql);
 		$row=DBfetch($result);
-		return $row["cnt"]; 
+
+		$cnt=$cnt+$row["cnt"];
+
+		$sql="select count(*) as cnt from actions where scope=2";
+		$result=DBselect($sql);
+		$row=DBfetch($result);
+
+		$cnt=$cnt+$row["cnt"];
+
+		$sql="select distinct h.hostid from hosts h,items i,triggers t,functions f where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=$triggerid";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			$sql="select count(*) as cnt from actions a,hosts h,items i,triggers t,functions f where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and a.triggerid=".$row["hostid"]." and a.scope=1 and t.triggerid";
+			$result2=DBselect($sql);
+			$row2=DBfetch($result2);
+			$cnt=$cnt+$row2["cnt"];
+		}
+
+		return $cnt; 
 	}
 
 	function	check_anyright($right,$permission)
@@ -2790,7 +2811,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					DBexecute($sql);
 				}
 				# Add actions
-				$sql="select actionid from actions where triggerid=".$row2["triggerid"];
+				$sql="select actionid from actions where scope=0 and triggerid=".$row2["triggerid"];
 				$result3=DBselect($sql);
 				while($row3=DBfetch($result3))
 				{

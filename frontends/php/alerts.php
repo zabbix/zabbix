@@ -66,11 +66,11 @@
 
 	if(!isset($HTTP_GET_VARS["start"]))
 	{
-		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries from alerts a,actions ac,media_type mt where a.actionid=ac.actionid and mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200 order by a.clock desc limit 200";
+		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries,ac.scope from alerts a,actions ac,media_type mt where a.actionid=ac.actionid and mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200 order by a.clock desc limit 200";
 	}
 	else
 	{
-		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries from alerts a,actions ac,media_type mt where a.actionid=ac.actionid and mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200-".$HTTP_GET_VARS["start"]." order by a.clock desc limit ".($HTTP_GET_VARS["start"]+500);
+		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries,ac.scope from alerts a,actions ac,media_type mt where a.actionid=ac.actionid and mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200-".$HTTP_GET_VARS["start"]." order by a.clock desc limit ".($HTTP_GET_VARS["start"]+500);
 	}
 	$result=DBselect($sql);
 
@@ -92,7 +92,15 @@
 		{
 			continue;
 		}
-		if(!check_right_on_trigger("R",$row["triggerid"]))
+		if(($row["scope"]==0)&&!check_right_on_trigger("R",$row["triggerid"]))
+                {
+			continue;
+		}
+		if(($row["scope"]==1)&&!check_right("Host","R",$row["triggerid"]))
+                {
+			continue;
+		}
+		if(($row["scope"]==2)&&!check_anyright("Default permission","R"))
                 {
 			continue;
 		}
@@ -102,7 +110,14 @@
 
 		if($col>100)	break;
 
-		echo "<TD><a href=\"alarms.php?triggerid=".$row["triggerid"]."\">".date("Y.M.d H:i:s",$row["clock"])."</a></TD>";
+		if($row["scope"]==0)
+		{
+			echo "<TD><a href=\"alarms.php?triggerid=".$row["triggerid"]."\">".date("Y.M.d H:i:s",$row["clock"])."</a></TD>";
+		}
+		else
+		{
+			echo "<TD>".date("Y.M.d H:i:s",$row["clock"])."</TD>";
+		}
 		echo "<TD>".$row["description"]."</TD>";
 		if($row["status"] == 1)
 		{
