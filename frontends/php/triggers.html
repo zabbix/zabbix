@@ -45,7 +45,7 @@
 ?>
 
 <?
-	$result=mysql_query("select hostid,host from hosts order by host",$mysql);
+	$result=DBselect("select hostid,host from hosts order by host");
 	if(isset($hostid))
 	{
 		echo "<A HREF=\"triggers.html\">all</A>  ";
@@ -54,10 +54,10 @@
 	{
 		echo "<b>[<A HREF=\"triggers.html\">all</A>]</b>  ";
 	}
-	while($row=mysql_fetch_row($result))
+	for($i=0;$i<DBnum_rows($result);$i++)
 	{
-		$hid=$row[0];
-		$host=$row[1];
+		$hid=DBget_field($result,$i,0);
+		$host=DBget_field($result,$i,1);
 		if($hid == $hostid)
 		{
 			echo "<b>[<A HREF=\"triggers.html?hostid=$hid\">$host</A>]</b>  ";
@@ -83,12 +83,12 @@
 		$cond="";
 	}
 
-	$result=mysql_query("select h.hostid,h.host,t.triggerid,t.expression,t.description,t.istrue from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid $cond order by h.host,t.description",$mysql);
+	$result=DBselect("select h.hostid,h.host,t.triggerid,t.expression,t.description,t.istrue from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid $cond order by h.host,t.description");
 	$ss=".";
-	while($row=mysql_fetch_row($result))
+	for($i=0;$i<DBnum_rows($result);$i++)
 	{
-		$hostid_=$row[0];
-		$host=$row[1];
+		$hostid_=DBget_field($result,$i,0);
+		$host=DBget_field($result,$i,1);
 		if($lasthost!=$host)
 		{
 			if($lasthost!="")
@@ -115,10 +115,10 @@
 	                echo "<TR BGCOLOR=#EEEEEE>";
 	                $col=1;
 	        }
-		$description=$row[4];
-		$triggerid_=$row[2];
-		$expression=$row[3];
-		$istrue=$row[5];
+		$description=DBget_field($result,$i,4);
+		$triggerid_=DBget_field($result,$i,2);
+		$expression=DBget_field($result,$i,3);
+		$istrue=DBget_field($result,$i,5);
 		echo "<TD>$description</TD>";
 		$description=rawurlencode($description);
 
@@ -151,9 +151,8 @@
 ?>
 
 <?
-	$result=mysql_query("select count(*) from hosts",$mysql);
-	$row=mysql_fetch_row($result);
-	if($row[0]>0)
+	$result=DBselect("select count(*) from hosts");
+	if(DBget_field($result,0,0)>0)
 	{
 		echo "<a name=\"form\"></a>";
 		insert_trigger_form($triggerid);

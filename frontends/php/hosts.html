@@ -35,9 +35,9 @@
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
-	$result=mysql_query("select h.hostid,p.platform,h.host,h.port,h.status from hosts h,platforms p where p.platformid=h.platformid order by p.platform,h.host",$mysql);
+	$result=DBselect("select h.hostid,p.platform,h.host,h.port,h.status from hosts h,platforms p where p.platformid=h.platformid order by p.platform,h.host");
 	echo "<CENTER>";
-	while($row=mysql_fetch_row($result))
+	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		if($col==1)
 		{
@@ -49,11 +49,11 @@
 			$col=1;
 		}
 	
-		$hostid=$row[0];
-		$platform=$row[1];
-		$host=$row[2];
-		$port=$row[3];
-		$status=$row[4];
+		$hostid=DBget_field($result,$i,0);
+		$platform=DBget_field($result,$i,1);
+		$host=DBget_field($result,$i,2);
+		$port=DBget_field($result,$i,3);
+		$status=DBget_field($result,$i,4);
 		echo "<TD>$platform</TD>";
 		echo "<TD><a href=\"items.html?hostid=$hostid\">$host</a></TD>";
 		echo "<TD>$port</TD>";
@@ -81,11 +81,11 @@
 	echo "Platform";
 	show_table2_h_delimiter();
 	echo "<select name=\"platformid\">";
-	$result=mysql_query("select platformid,platform from platforms order by platform",$mysql);
-	while($row=mysql_fetch_row($result))
+	$result=DBselect("select platformid,platform from platforms order by platform");
+	for($i=0;$i<DBnum_rows($result);$i++)
 	{
-		$platformid=$row[0];
-		$platform=$row[1];
+		$platformid=DBget_field($result,$i,0);
+		$platform=DBget_field($result,$i,1);
 		echo "<option value=\"$platformid\">$platform";
 	}
 	echo "</select>";

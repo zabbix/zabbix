@@ -46,7 +46,7 @@
 
 	$from_time = time(NULL)-$period-3600*$from;
 	$to_time   = time(NULL)-3600*$from;
-	$result=mysql_query("select clock,value from history where itemid=$itemid and clock>$from_time and clock<$to_time order by clock",$mysql);
+	$result=DBselect("select clock,value from history where itemid=$itemid and clock>$from_time and clock<$to_time order by clock");
 	$len=0;
 	$maxX=-1000000000;
 	$maxY=-1000000000;
@@ -54,11 +54,11 @@
 	$minY=1000000000;
 	$x=array();
 	$y=array();
-	while($row=mysql_fetch_row($result))
+	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		$nodata=0;
-		$x[$len]=$row[0];
-		$y[$len]=$row[1];
+		$x[$len]=DBget_field($result,$i,0);
+		$y[$len]=DBget_field($result,$i,1);;
 //		echo $row[0]," - ",$y[$len],"<Br>";
 		if($x[$len]>$maxX) { $maxX=$x[$len]; }
 		if($x[$len]<$minX) { $minX=$x[$len]; }

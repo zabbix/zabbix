@@ -14,19 +14,20 @@
 	show_table_header("QUEUE");
 ?>
 <?
-	$result=mysql_query("select i.itemid, from_unixtime(i.nextcheck), i.description, h.host from items i,hosts h where i.status=0 and h.status=0 and i.hostid=h.hostid and i.nextcheck<UNIX_TIMESTAMP() order by i.nextcheck;",$mysql);
-	$i=0;
+	$now=time();
+	$result=DBselect("select i.itemid, i.nextcheck, i.description, h.host from items i,hosts h where i.status=0 and h.status=0 and i.hostid=h.hostid and i.nextcheck<$now order by i.nextcheck");
 	echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";
 	echo "\n";
 	echo "<tr><td><b>Next time to check</b></td><td><b>Host</b></td><td><b>Description</b></td></tr>";
 	echo "\n";
-	while($row=mysql_fetch_row($result))
+	for($i=0;$i<DBnum_rows($result);$i++)
 	{
-		$i++;
-		$itemid=$row[0];
-		$time=$row[1];
-		$description=$row[2];
-		$host=$row[3];
+		$itemid=DBget_field($result,$i,0);
+		$time=DBget_field($result,$i,1);
+		$description=DBget_field($result,$i,2);
+		$host=DBget_field($result,$i,3);
+
+		$time=date("m.d.Y H:i:s",$time);
 
 		if($col==1)
 		{
@@ -46,6 +47,7 @@
 	echo "</table>";
 ?>
 <?
+	$i=DBnum_rows($result);
 	show_table_header("Total:$i");
 ?>
 

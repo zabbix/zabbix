@@ -14,7 +14,7 @@
 	echo "<font size=2>";
 
 	$lasthost="";
-	$result=mysql_query("select h.hostid,h.host from hosts h,items i where h.status=0 and h.hostid=i.hostid group by h.hostid,h.host order by h.host",$mysql);
+	$result=DBselect("select h.hostid,h.host from hosts h,items i where h.status=0 and h.hostid=i.hostid group by h.hostid,h.host order by h.host");
 
 	if(isset($hostid))
 	{
@@ -24,10 +24,10 @@
 	{
 		echo "<b>[<a href='latest.html'>all</a>]</b> ";
 	}
-	while($row=mysql_fetch_row($result))
+	for($i=0;$i<DBnum_rows($result);$i++)
 	{
-		$hostid_=$row[0];
-		$host=$row[1];
+		$hostid_=DBget_field($result,$i,0);
+		$host=DBget_field($result,$i,1);
 		if($hostid == $hostid_)
 		{
 			echo "<b>[";
@@ -53,12 +53,12 @@
 		$where="where h.hostid=i.hostid and h.status=0";
 	}
 
-	$result=mysql_query("select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid from items i,hosts h $where order by h.host,i.description",$mysql);
-	while($row=mysql_fetch_row($result))
+	$result=DBselect("select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid from items i,hosts h $where order by h.host,i.description");
+	for($i=0;$i<DBnum_rows($result);$i++)
 	{
-		$host=$row[0];
-		$itemid=$row[1];
-		$hostid=$row[7];
+		$host=DBget_field($result,$i,0);
+		$itemid=DBget_field($result,$i,1);
+		$hostid=DBget_field($result,$i,7);
 		if($lasthost!=$host)
 		{
 			if($lasthost!="")
@@ -94,10 +94,10 @@
 		echo "<tr bgcolor=#EEEEEE>";
 		$col=1;
 	}
-	$prevvalue=$row[4];
-	$description=$row[2];
-	$lastvalue=$row[3];
-	$lastclock=$row[5];
+	$prevvalue=DBget_field($result,$i,4);
+	$description=DBget_field($result,$i,2);
+	$lastvalue=DBget_field($result,$i,3);
+	$lastclock=DBget_field($result,$i,5);
 	if($lastclock==NULL)
 	{
 		$lastclock="<center>-</center>";
@@ -106,8 +106,8 @@
 	{
 		$lastclock=date("H:i:s",$lastclock);
 	}
-	$itemid=$row[1];
-	$status=$row[6];
+	$itemid=DBget_field($result,$i,1);
+	$status=DBget_field($result,$i,6);
 	$dif=$lastvalue-$prevvalue;
 	echo "<td>$description</td>";
 	echo "<td>";

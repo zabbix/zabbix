@@ -9,14 +9,17 @@
 		exit;
 	}
 
-	$result=mysql_query("select h.host,i.description,i.nextcheck-unix_timestamp(now()),h.hostid from items i,hosts h where i.itemid=$itemid and h.hostid=i.hostid");
-	while($row=mysql_fetch_row($result))
+	$now=time();
+
+	$result=DBselect("select h.host,i.description,i.nextcheck-$now,h.hostid from items i,hosts h where i.itemid=$itemid and h.hostid=i.hostid");
+	$host=DBget_field($result,0,0);
+	$description=DBget_field($result,0,1);
+	$beforenextcheck=DBget_field($result,0,2)+5;
+	if($beforenextcheck<=0)
 	{
-		$host=$row[0];
-		$description=$row[1];
-		$beforenextcheck=$row[2]+10;
-		$hostid=$row[3];
+		$beforenextcheck=5;
 	}
+	$hostid=DBget_field($result,0,3);
 
 	if($action=="showhistory")
 	{
@@ -131,8 +134,8 @@
 		echo "</TR>";
 
 
-		$result=mysql_query("select clock,value from history where itemid=$itemid and clock>$time and clock<$till order by clock desc");
-		while($row=mysql_fetch_row($result))
+		$result=DBselect("select clock,value from history where itemid=$itemid and clock>$time and clock<$till order by clock desc");
+		for($i=0;$i<DBnum_rows($result);$i++)
 		{
 			if($col==1)
 			{
@@ -143,8 +146,8 @@
 				echo "<TR BGCOLOR=#EEEEEE>";
 				$col=1;
 			}
-			$clock=$row[0];
-			$value=$row[1];
+			$clock=DBget_field($result,$i,0);
+			$value=DBget_field($result,$i,1);
 			$clock=date("d M - H:i:s",$clock);
 			echo "<TD>$clock</TD>";
 			echo "<TD>$value</TD>";

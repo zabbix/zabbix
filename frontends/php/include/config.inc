@@ -1,13 +1,7 @@
 <?
-	$DB_SERVER	="localhost";
-	$DB_DATABASE	="zabbix";
-	$DB_USER	="root";
-	$DB_PASSWORD	="";
+	include 	"include/db.inc";
 
 	$USER_DETAILS	="";
-
-	$mysql=mysql_pconnect($DB_SERVER,$DB_USER,$DB_PASSWORD);
-	mysql_select_db($DB_DATABASE);
 
 	function	validate_float($str)
 	{
@@ -24,8 +18,6 @@
 // Does expression match server:key.function(param) ?
 	function	validate_simple_expression($expression)
 	{
-		global	$mysql;
-
 //		echo "Validating:$expression<br>";
 		if (eregi('^\{([0-9a-zA-Z\_\.]+)\:([0-9a-zA-Z\_]+)\.((diff)|(min)|(max)|(last)|(nodata))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
 		{
@@ -35,9 +27,8 @@
 			$parameter=$arr[9];
 
 			$sql="select count(*) from hosts h,items i where h.host='$host' and i.key_='$key' and h.hostid=i.hostid";
-			$result=mysql_query($sql,$mysql);
-			$row=mysql_fetch_row($result);
-			if($row[0]!=1)
+			$result=DBselect($sql);
+			if($DBget_field($result,0,0)!=1)
 			{
 				return -1;
 			}
@@ -153,21 +144,19 @@
 
 	function	check_authorisation()
 	{
-		global $mysql;
 		global $page;
 		global $PHP_AUTH_USER,$PHP_AUTH_PW;
 		global $USER_DETAILS;
 
 		$sql="select g.groupid,u.userid,u.alias,u.name,u.surname from users u,groups g where u.alias='$PHP_AUTH_USER' and u.passwd='$PHP_AUTH_PW' and u.groupid=g.groupid";
-		$result=mysql_query($sql,$mysql);
-		$row=mysql_fetch_row($result);
-		if($row)
+		$result=DBselect($sql);
+		if(DBnum_rows($result)==1)
 		{
-			$USER_DETAILS["groupid"]=$row[0];
-			$USER_DETAILS["userid"]=$row[1];
-			$USER_DETAILS["alias"]=$row[2];
-			$USER_DETAILS["name"]=$row[3];
-			$USER_DETAILS["surname"]=$row[4];
+			$USER_DETAILS["groupid"]=DBget_field($result,0,0);
+			$USER_DETAILS["userid"]=DBget_field($result,0,1);
+			$USER_DETAILS["alias"]=DBget_field($result,0,2);
+			$USER_DETAILS["name"]=DBget_field($result,0,3);
+			$USER_DETAILS["surname"]=DBget_field($result,0,4);
 		}
 		
 
@@ -180,10 +169,9 @@
 			($page["file"]=="index.html"))
 		{
 			$sql="select password_required from config";
-			$result=mysql_query($sql,$mysql);
-			$row=mysql_fetch_row($result);
+			$result=DBselect($sql);
 
-			if($row[0]==0)
+			if(DBget_field($result,0,0)==0)
 			{
 				return;
 			}
@@ -194,10 +182,11 @@
 		{
 			$sql="select count(*) from users u,groups g where u.alias='$PHP_AUTH_USER' and u.passwd='$PHP_AUTH_PW' and u.groupid=g.groupid and g.groupid=1";
 		}
-		$result=mysql_query($sql,$mysql);
-		$row=mysql_fetch_row($result);
+		$result=DBselect($sql);
 
-		if($row[0]!=1)
+//		echo "==",DBget_field($result,0,0),"==";
+
+		if(DBget_field($result,0,0)!=1)
 		{
 			Header("WWW-authenticate: basic realm=\"Zabbix\"");
 			Header("HTTP/1.0 401 Unauthorized");
@@ -406,15 +395,13 @@
 
 	function	show_plaintext($itemid, $from, $till)
 	{
-		global $mysql;
-
-		$result=mysql_query("select clock,value from history where itemid=$itemid and clock>$from and clock<$till order by clock",$mysql);
+		$result=DBselect("select clock,value from history where itemid=$itemid and clock>$from and clock<$till order by clock");
 
 		echo "<PRE>";
-		while($row=mysql_fetch_row($result))
+		for($i=0;$i<DBnum_rows($result);$i++)
 		{
-			$clock=$row[0];
-			$value=$row[1];
+			$clock=DBget_field($result,$i,0);
+			$value=DBget_field($result,$i,1);
 			echo date("Y-m-d H:i:s",$clock);
 			echo "\t$clock\t$value\n";
 		}
@@ -425,8 +412,6 @@
 
 	function	explode_exp ($expression, $html)
 	{
-		global	$mysql;
-
 #		echo "EXPRESSION:",$expression,"<Br>";
 
 		$functionid='';
@@ -443,15 +428,14 @@
 			{
 				$state='';
 				$sql="select h.host,i.key_,f.function,f.parameter,i.itemid from items i,functions f,hosts h where functionid=$functionid and i.itemid=f.itemid and h.hostid=i.hostid";
-				$res1=mysql_query($sql,$mysql);
-				$row1=mysql_fetch_row($res1);
+				$res1=DBselect($sql);
 				if($html == 0)
 				{
-					$exp=$exp."{".$row1[0].":".$row1[1].".".$row1[2]."(".$row1[3].")}";
+					$exp=$exp."{".DBget_field($res1,0,0).":".DBget_field($res1,0,1).".".DBget_field($res1,0,2)."(".DBget_field($res1,0,3).")}";
 				}
 				else
 				{
-					$exp=$exp."{<A HREF=\"history.html?action=showhistory&itemid=$row1[4]\">".$row1[0].":".$row1[1]."</A>.<B>".$row1[2]."(</B>".$row1[3]."<B>)</B>}";
+					$exp=$exp."{<A HREF=\"history.html?action=showhistory&itemid=$row1[4]\">".DBget_field($res1,0,0).":".DBget_field($res1,0,1)."</A>.<B>".DBget_field($res1,0,2)."(</B>".DBget_field($res1,0,3)."<B>)</B>}";
 				}
 				continue;
 			}
@@ -470,8 +454,6 @@
 
 	function	implode_exp ($expression, $triggerid)
 	{
-		global	$mysql;
-
 		$exp='';
 		for($i=0;$i<strlen($expression);$i++)
 		{
@@ -497,10 +479,9 @@
 		
 				$sql="select i.itemid from items i,hosts h where i.key_='$key' and h.host='$host' and h.hostid=i.hostid";
 #				echo $sql,"<Br>";
-				$res=mysql_query($sql,$mysql);
-				$row=mysql_fetch_row($res);
+				$res=DBselect($sql);
 
-				$itemid=$row[0];
+				$itemid=DBget_field($res,0,0);
 #				echo "ITEMID:$itemid<BR>";
 	
 #				$sql="select functionid from functions where function='$function' and parameter=$parameter";
@@ -514,10 +495,10 @@
 #				}
 #				else
 #				{
-					$sql="insert into functions (functionid,itemid,triggerid,function,parameter) values (NULL,$itemid,$triggerid,'$function',$parameter)";
+					$sql="insert into functions (itemid,triggerid,function,parameter) values ($itemid,$triggerid,'$function',$parameter)";
 #					echo $sql,"<Br>";
-					$res=mysql_query($sql,$mysql);
-					$functionid=mysql_insert_id($mysql);	
+					$res=DBexecute($sql);
+					$functionid=DBinsert_id($res,"functions","functionid");
 #				}
 #				echo "FUNCTIONID:$functionid<BR>";
 
@@ -583,181 +564,149 @@
 
 	function	update_trigger_status($triggerid,$status)
 	{
-		global	$mysql;
-
 		$sql="update triggers set istrue=$status where triggerid=$triggerid";
-		$result=mysql_query($sql,$mysql);
+		$result=DBexecute($sql);
 	}
 
 	# Update Item status
 
 	function	update_item_status($itemid,$status)
 	{
-		global	$mysql;
-
 		$sql="update items set status=$status where itemid=$itemid";
-		$result=mysql_query($sql,$mysql);
+		$result=DBexecute($sql);
 	}
 
 	# Update Host status
 
 	function	update_host_status($hostid,$status)
 	{
-		global	$mysql;
-
 		$sql="update hosts set status=$status where hostid=$hostid";
-		$result=mysql_query($sql,$mysql);
+		$result=DBexecute($sql);
 	}
 
 	# Update Item definition
 
 	function	update_item($itemid,$description,$key,$hostid,$delay,$history,$status)
 	{
-		global	$mysql;
-
 		$sql="update items set description='$description',key_='$key',hostid=$hostid,delay=$delay,history=$history,lastdelete=0,nextcheck=0,status=$status where itemid=$itemid";
-		$result=mysql_query($sql,$mysql);
+		$result=DBexecute($sql);
 	}
 
 	# Add Action
 
 	function	add_action( $triggerid, $userid, $good, $delay, $subject, $message )
 	{
-		global	$mysql;
-
-		$sql="insert into actions (actionid,triggerid,userid,good,delay,nextcheck,subject,message) values (NULL,$triggerid,$userid,$good,$delay,0,'$subject','$message')";
-		$result=mysql_query($sql,$mysql);
+		$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message) values ($triggerid,$userid,$good,$delay,0,'$subject','$message')";
+		$result=DBexecute($sql);
 	}
 
 	# Update Action
 
 	function	update_action( $actionid, $userid, $good, $delay, $subject, $message )
 	{
-		global	$mysql;
-
 		$sql="update actions set userid=$userid,good=$good,delay=$delay,nextcheck=0,subject='$subject',message='$message' where actionid=$actionid";
-		$result=mysql_query($sql,$mysql);
+		$result=DBexecute($sql);
 	}
 
 	# Delete Action by userid
 
 	function	delete_actions_by_userid( $userid )
 	{
-		global	$mysql;
-
 		$sql="delete from actions where userid=$userid";
-		$result=mysql_query($sql,$mysql);
+		$result=DBexecute($sql);
 	}
 
 	# Delete Action
 
 	function	delete_action( $actionid )
 	{
-		global	$mysql;
-
 		$sql="delete from actions where actionid=$actionid";
-		$result=mysql_query($sql,$mysql);
+		$result=DBexecute($sql);
 	}
 
 	# Delete from History
 
 	function	delete_history_by_itemid( $itemid )
 	{
-		global	$mysql;
-
 
 		$sql="delete from history where itemid=$itemid";
-		$result=mysql_query($sql,$mysql);
+		$result=DBexecute($sql);
 	}
 
 	# Add Item definition
 
 	function	add_item($description,$key,$hostid,$delay,$history,$status)
 	{
-		global	$mysql;
-
-		$sql="insert into items (itemid,description,key_,hostid,delay,history,lastdelete,nextcheck,status) values (NULL,'$description','$key',$hostid,$delay,$history,0,0,$status)";
-		$result=mysql_query($sql,$mysql);
-		return mysql_insert_id($mysql);
+		$sql="insert into items (description,key_,hostid,delay,history,lastdelete,nextcheck,status) values ('$description','$key',$hostid,$delay,$history,0,0,$status)";
+		$result=DBexecute($sql);
+		return DBinsert_id($result,"items","itemid");
 	}
 
 	# Delete Function definition
 
 	function	delete_function_by_triggerid($triggerid)
 	{
-		global	$mysql;
-
 		$sql="delete from functions where triggerid=$triggerid";
-		$result=mysql_query($sql,$mysql);
+		$result=DBexecute($sql);
 	}
 
 	# Delete Function and Trigger definitions by itemid
 
 	function	delete_triggers_functions_by_itemid($itemid)
 	{
-		global	$mysql;
-
 		$sql="select triggerid from functions where itemid=$itemid";
-		$result=mysql_query($sql,$mysql);
-		while($row=mysql_fetch_row($result))
+		$result=DBselect($sql);
+		for($i=0;$i<DBnum_rows($result);$i++)
 		{
-			delete_function_by_triggerid($row[0]);
+			delete_function_by_triggerid(DBget_field($result,$i,0));
 		}
 
 		$sql="delete from functions where itemid=$itemid";
-		$result=mysql_query($sql,$mysql);
+		$result=DBexecute($sql);
 	}
 
 	# Delete Item definition
 
 	function	delete_item($itemid)
 	{
-		global	$mysql;
-
-		$sql="delete from items where itemid=$itemid";
-		$result=mysql_query($sql,$mysql);
 
 		delete_triggers_functions_by_itemid($itemid);
 		delete_history_by_itemid($itemid);
+		$sql="delete from items where itemid=$itemid";
+		$result=DBexecute($sql);
 	}
 
 	# Add alarm
 
 	function	add_alarm($triggerid,$istrue)
 	{
-		global	$mysql;
-
-		$now=mktime();
+		$now=time();
 		$sql="insert into alarms(triggerid,clock,istrue) values($triggerid,$now,$istrue)";
-		$result=mysql_query($sql,$mysql);
+		$result=DBexecute($sql);
 	}
 
 	# Add Trigger definition
 
 	function	add_trigger($expression,$description,$priority,$istrue,$comments)
 	{
-		global	$mysql;
-
-		$sql="insert into triggers  (triggerid,description,priority,istrue,comments) values (NULL,'$description',$priority,$istrue,'$comments')";
+		$sql="insert into triggers  (description,priority,istrue,comments) values ('$description',$priority,$istrue,'$comments')";
 #		echo $sql,"<Br>";
-		$result=mysql_query($sql,$mysql);
+		$result=DBexecute($sql);
  
-		$triggerid=mysql_insert_id($mysql);
+		$triggerid=DBinsert_id($result,"triggers","triggerid");
  
 		$expression=implode_exp($expression,$triggerid);
 		$sql="update triggers set expression='$expression' where triggerid=$triggerid";
 #		echo $sql,"<Br>";
-		$result=mysql_query($sql,$mysql);
+		$result=DBexecute($sql);
 	}
 
 	# Delete Trigger definition
 
 	function	delete_trigger($triggerid)
 	{
-		global	$mysql;
-
 		$sql="delete from triggers where triggerid=$triggerid";
-		$result=mysql_query($sql,$mysql);
+		$result=DBexecute($sql);
 		
 		delete_function_by_triggerid($triggerid);
 	}
@@ -766,8 +715,6 @@
 
 	function	update_trigger($triggerid,$expression,$description,$priority,$istrue,$comments)
 	{
-		global	$mysql;
-
 		delete_trigger($triggerid);
 
 		$triggerid=add_trigger($expression,$description,$priority,$istrue,$comments);
@@ -777,10 +724,8 @@
 
 	function	update_user($userid,$groupid,$name,$surname,$alias,$password)
 	{
-		global	$mysql;
-
 		$sql="update users set groupid=$groupid,name='$name',surname='$surname',alias='$alias',passwd='$password' where userid=$userid";
-		$result=mysql_query($sql,$mysql);
+		$result=DBexecute($sql);
 		return	$result;
 	}
 
@@ -789,10 +734,8 @@
 
 	function	add_user($groupid,$name,$surname,$alias,$passwd)
 	{
-		global	$mysql;
-
-		$sql="insert into users (userid,groupid,name,surname,alias,passwd) values (NULL,$groupid,'$name','$surname','$alias','$passwd')";
-		$result=mysql_query($sql,$mysql);
+		$sql="insert into users (groupid,name,surname,alias,passwd) values ($groupid,'$name','$surname','$alias','$passwd')";
+		$result=DBexecute($sql);
 
 		return	$result;
 	}
@@ -801,30 +744,28 @@
 
 	function	add_from_templates($hostid,$platformid,$host)
 	{
-		global	$mysql;
-
-		$result=mysql_query("select itemtemplateid,description,key_,delay from items_template where platformid=$platformid",$mysql);
-		while($row=mysql_fetch_row($result))
+		$result=DBselect("select itemtemplateid,description,key_,delay from items_template where platformid=$platformid");
+		for($i=0;$i<DBnum_rows($result);$i++) 
 		{
-			$itemtemplateid=$row[0];
-			$description=$row[1];
-			$key=$row[2];
-			$delay=$row[3];
+			$itemtemplateid=DBget_field($result,$i,0);
+			$description=DBget_field($result,$i,1);
+			$key=DBget_field($result,$i,2);
+			$delay=DBget_field($result,$i,3);
 
 			$itemid=add_item($description,$key,$hostid,$delay,24*3600,0);
 
-			$result2=mysql_query("select triggertemplateid,description,expression from triggers_template where itemtemplateid=$itemtemplateid",$mysql);
-			while($row2=mysql_fetch_row($result2))
+			$result2=DBselect("select triggertemplateid,description,expression from triggers_template where itemtemplateid=$itemtemplateid");
+			for($j=0;$j<DBnum_rows($result2);$j++)
 			{
-				$itemtemplateid=$row2[0];
-				$description=$row2[1];
-				$expression=$row2[2];
+				$itemtemplateid=DBget_field($result2,$j,0);
+				$description=DBget_field($result2,$j,1);
+				$expression=DBget_field($result2,$j,2);
 
-				for($i=0;$i<strlen($expression);$i++)
+				for($z=0;$z<strlen($expression);$z++)
 				{
-					if($expression[$i] == ':')
+					if($expression[$z] == ':')
 					{
-						$expression=substr($expression,0,$i)."$host:$key".substr($expression,$i);
+						$expression=substr($expression,0,$z)."$host:$key".substr($expression,$z);
 						
 						break;
 					}
@@ -839,11 +780,9 @@
 
 	function	add_host($platformid,$host,$port,$status)
 	{
-		global	$mysql;
-
-		$sql="insert into hosts (hostid,platformid,host,port,status) values (NULL,$platformid,'$host',$port,$status)";
-		$result=mysql_query($sql,$mysql);
-		$hostid=mysql_insert_id($mysql);
+		$sql="insert into hosts (platformid,host,port,status) values ($platformid,'$host',$port,$status)";
+		$result=DBexecute($sql);
+		$hostid=DBinsert_id($result,"hosts","hostid");
 
 		add_from_templates($hostid,$platformid,$host);
 
@@ -853,40 +792,32 @@
 
 	function	add_media( $userid, $type, $sendto)
 	{
-		global	$mysql;
-
-		$sql="insert into media (userid,mediaid,type,sendto,active) values ($userid,NULL,'$type','$sendto',0)";
-		$result=mysql_query($sql,$mysql);
+		$sql="insert into media (userid,type,sendto,active) values ($userid,'$type','$sendto',0)";
+		$result=DBexecute($sql);
 	}
 
 	# Delete Media definition
 
 	function	delete_media($mediaid)
 	{
-		global	$mysql;
-
 		$sql="delete from media where mediaid=$mediaid";
-		$result=mysql_query($sql,$mysql);
+		$result=DBexecute($sql);
 	}
 
 	# Delete Media definition by userid
 
 	function	delete_media_by_userid($userid)
 	{
-		global	$mysql;
-
 		$sql="delete from media where userid=$userid";
-		$result=mysql_query($sql,$mysql);
+		$result=DBexecute($sql);
 	}
 
 	# Update configuration
 
 	function	update_config($smtp_server,$smtp_helo,$smtp_email,$password_required)
 	{
-		global	$mysql;
-
-		$sql="update config set smtp_server=\"$smtp_server\",smtp_helo=\"$smtp_helo\",smtp_email=\"$smtp_email\",password_required=$password_required";
-		$result=mysql_query($sql,$mysql);
+		$sql="update config set smtp_server='$smtp_server',smtp_helo='$smtp_helo',smtp_email='$smtp_email',password_required=$password_required";
+		$result=DBexecute($sql);
 	}
 
 
@@ -894,50 +825,42 @@
 
 	function	activate_media($mediaid)
 	{
-		global	$mysql;
-
 		$sql="update media set active=0 where mediaid=$mediaid";
-		$result=mysql_query($sql,$mysql);
+		$result=DBexecute($sql);
 	}
 
 	# Disactivate Media
 
 	function	disactivate_media($mediaid)
 	{
-		global	$mysql;
-
 		$sql="update media set active=1 where mediaid=$mediaid";
-		$result=mysql_query($sql,$mysql);
+		$result=DBexecute($sql);
 	}
 
 	# Delete Host
 
 	function	delete_host($hostid)
 	{
-		global	$mysql;
-
 		$sql="select itemid from items where hostid=$hostid";
-		$result=mysql_query($sql,$mysql);
-		while($row=mysql_fetch_row($result))
+		$result=DBselect($sql);
+		for($i=0;$i<DBnum_rows($result);$i++)
 		{
-			delete_item($row[0]);
+			delete_item(DBget_field($result,$i,0));
 		}
 
 		$sql="delete from hosts where hostid=$hostid";
-		$result=mysql_query($sql,$mysql);
+		$result=DBexecute($sql);
 	}
 
 	# Delete User definition
 
 	function	delete_user($userid)
 	{
-		global	$mysql;
-
 		delete_media_by_userid($userid);
 		delete_actions_by_userid($userid);
 
 		$sql="delete from users where userid=$userid";
-		$result=mysql_query($sql,$mysql);
+		$result=DBexecute($sql);
 	}
 
 	function	show_table_h_delimiter()
@@ -1270,21 +1193,17 @@
 	# Insert form for Item information
 	function	insert_item_form($itemid)
 	{
-		global	$mysql;
-
 		if(isset($itemid))
 		{
-			mysql_select_db("monitor");
-			$result=mysql_query("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status from items i,hosts h where i.itemid=$itemid and h.hostid=i.hostid",$mysql);
-			$row=mysql_fetch_row($result);
+			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status from items i,hosts h where i.itemid=$itemid and h.hostid=i.hostid");
 		
-			$description=$row[0];
-			$key=$row[1];
-			$host=$row[2];
-			$port=$row[3];
-			$delay=$row[4];
-			$history=$row[5];
-			$status=$row[6];
+			$description=DBget_field($result,0,0);
+			$key=DBget_field($result,0,1);
+			$host=DBget_field($result,0,2);
+			$port=DBget_field($result,0,3);
+			$delay=DBget_field($result,0,4);
+			$history=DBget_field($result,0,5);
+			$status=DBget_field($result,0,6);
 		}
 		if( !isset($port) )
 		{
@@ -1319,11 +1238,11 @@
 		echo "Host";
 		show_table2_h_delimiter();
 		echo "<select name=\"hostid\" value=\"3\">";
-	        $result=mysql_query("select hostid,host from hosts order by host",$mysql);
-	        while($row=mysql_fetch_row($result))
+	        $result=DBselect("select hostid,host from hosts order by host");
+	        for($i=0;$i<DBnum_rows($result);$i++)
 	        {
-	                $hostid_=$row[0];
-	                $host_=$row[1];
+	                $hostid_=DBget_field($result,$i,0);
+	                $host_=DBget_field($result,$i,1);
 			if($host==$host_)
 			{
 	                	echo "<option value=\"$hostid_\" selected>$host_";
@@ -1394,18 +1313,16 @@
 	# Insert form for User
 	function	insert_user_form($userid)
 	{
-		global	$mysql;
-
 		if(isset($userid))
 		{
-			$result=mysql_query("select u.alias,u.name,u.surname,u.passwd,g.groupid from users u,groups g where u.groupid=g.groupid and u.userid=$userid",$mysql);
-			$row=mysql_fetch_row($result);
+			echo $userid,"<br>";
+			$result=DBselect("select u.alias,u.name,u.surname,u.passwd,g.groupid from users u,groups g where u.groupid=g.groupid and u.userid=$userid");
 	
-			$alias=$row[0];
-			$name=$row[1];
-			$surname=$row[2];
-			$password=$row[3];
-			$groupid_=$row[4];
+			$alias=DBget_field($result,0,0);
+			$name=DBget_field($result,0,1);
+			$surname=DBget_field($result,0,2);
+			$password=DBget_field($result,0,3);
+			$groupid_=DBget_field($result,0,4);
 		}
 
 		show_table2_header_begin();
@@ -1413,7 +1330,10 @@
 
 		show_table2_v_delimiter();
 		echo "<form method=\"post\" action=\"users.html\">";
-		echo "<input name=\"userid\" type=\"hidden\" value=$userid size=8>";
+		if(isset($userid))
+		{
+			echo "<input name=\"userid\" type=\"hidden\" value=\"$userid\" size=8>";
+		}
 		echo "Alias";
 		show_table2_h_delimiter();
 		echo "<input name=\"alias\" value=\"$alias\" size=20>";
@@ -1432,11 +1352,11 @@
 		echo "User group";
 		show_table2_h_delimiter();
 		echo "<select name=\"groupid\">";
-		$result=mysql_query("select groupid,name from groups order by name",$mysql);
-		while($row=mysql_fetch_row($result))
+		$result=DBselect("select groupid,name from groups order by name");
+		for($i=0;$i<DBnum_rows($result);$i++)
 		{
-			$groupid=$row[0];
-			$name=$row[1];
+			$groupid=DBget_field($result,$i,0);
+			$name=DBget_field($result,$i,1);
 			if($groupid_==$groupid)
 			{
 				echo "<option value=\"$groupid\" selected>$name";
@@ -1472,20 +1392,17 @@
 	# Insert form for Trigger
 	function	insert_trigger_form($triggerid)
 	{
-		global	$mysql;
-
 		if(isset($triggerid))
 		{
-			$result=mysql_query("select expression,description,priority,istrue,comments from triggers where triggerid=$triggerid",$mysql);
-			$row=mysql_fetch_row($result);
+			$result=DBselect("select expression,description,priority,istrue,comments from triggers where triggerid=$triggerid");
 	
-			$expression=$row[0];
+			$expression=DBget_field($result,0,0);
 			$expression=explode_exp($expression,0);
 
-			$description=$row[1];
-			$priority=$row[2];
-			$istrue=$row[3];
-			$comments=$row[6];
+			$description=DBget_field($result,0,1);
+			$priority=DBget_field($result,0,2);
+			$istrue=DBget_field($result,0,3);
+			$comments=DBget_field($result,0,6);
 		}
 		
 		echo "<br>";
