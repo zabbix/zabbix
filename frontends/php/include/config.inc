@@ -1320,7 +1320,7 @@
 		{
 			$useip=0;
 		}
-		$sql="insert into hosts (host,port,status,useip,ip) values ('$host',$port,$status,$useip,'$ip')";
+		$sql="insert into hosts (host,port,status,useip,ip,disable_until) values ('$host',$port,$status,$useip,'$ip',0)";
 		$result=DBexecute($sql);
 		if(!$result)
 		{

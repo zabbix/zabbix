@@ -321,7 +321,7 @@ int	get_value(double *result,DB_ITEM *item)
 	return res;
 }
 
-int get_minnextcheck(void)
+int get_minnextcheck(int now)
 {
 	char		c[1024];
 
@@ -330,7 +330,7 @@ int get_minnextcheck(void)
 	int		res;
 	int		count;
 
-	sprintf(c,"select count(*),min(nextcheck) from items i,hosts h where i.status=0 and h.status=0 and h.hostid=i.hostid and i.status=0 and i.itemid%%%d=%d",SUCKER_FORKS-1,sucker_num-1);
+	sprintf(c,"select count(*),min(nextcheck) from items i,hosts h where i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and i.itemid%%%d=%d",now,SUCKER_FORKS-1,sucker_num-1);
 	result = DBselect(c);
 
 	if(result==NULL)
@@ -375,9 +375,11 @@ int get_values(void)
 	DB_ITEM		item;
 	char		*s;
 
+	int	host_status;
+
 	now = time(NULL);
 
-	sprintf(c,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue from items i,hosts h where i.nextcheck<=%d and i.status=0 and h.status=0 and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, SUCKER_FORKS-1,sucker_num-1);
+	sprintf(c,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, now, SUCKER_FORKS-1,sucker_num-1);
 	result = DBselect(c);
 
 	rows = DBnum_rows(result);
@@ -423,26 +425,47 @@ int get_values(void)
 			item.prevvalue_null=0;
 			item.prevvalue=atof(s);
 		}
-
+		item.hostid=atoi(DBget_field(result,i,15));
+		host_status=atoi(DBget_field(result,i,16));
 
 		res = get_value(&value,&item);
 		
 		if(res == SUCCEED )
 		{
 			process_new_value(&item,value);
+			if(2 == host_status)
+			{
+				host_status=0;
+				syslog( LOG_WARNING, "Enabling host [%s]", item.host );
+				sprintf(c,"update hosts set status=0 where hostid=%d",item.hostid);
+				DBexecute(c);
+
+				break;
+			}
 		}
 		else if(res == NOTSUPPORTED)
 		{
 			syslog( LOG_WARNING, "Parameter [%s] is not supported by agent on host [%s]", item.key, item.host );
 			sprintf(c,"update items set status=3 where itemid=%d",item.itemid);
 			DBexecute(c);
+			if(2 == host_status)
+			{
+				host_status=0;
+				syslog( LOG_WARNING, "Enabling host [%s]", item.host );
+				sprintf(c,"update hosts set status=0 where hostid=%d",item.hostid);
+				DBexecute(c);
+
+				break;
+			}
 		}
 		else if(res == NETWORK_ERROR)
 		{
-			syslog( LOG_WARNING, "Parameter [%s] will be checked after [%d] seconds", item.key, DELAY_ON_NETWORK_FAILURE );
+			syslog( LOG_WARNING, "Host [%s] will be checked after [%d] seconds", item.host, DELAY_ON_NETWORK_FAILURE );
 			now=time(NULL);
-			sprintf(c,"update items set nextcheck=%d where itemid=%d",now+DELAY_ON_NETWORK_FAILURE,item.itemid);
+			sprintf(c,"update hosts set status=2,disable_until=%d where hostid=%d",now+DELAY_ON_NETWORK_FAILURE,item.hostid);
 			DBexecute(c);
+
+			break;
 		}
 		else
 		{
@@ -557,7 +580,7 @@ int main_sucker_loop()
 
 		syslog( LOG_DEBUG, "Spent %d seconds while updating values", (int)time(NULL)-now );
 
-		nextcheck=get_minnextcheck();
+		nextcheck=get_minnextcheck(now);
 		syslog( LOG_DEBUG, "Nextcheck:%d Time:%d", nextcheck, (int)time(NULL) );
 
 		if( FAIL == nextcheck)
