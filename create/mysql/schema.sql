@@ -302,6 +302,12 @@ CREATE TABLE items (
 	multiplier	int(4)	DEFAULT '0' NOT NULL,
 	delta		int(1)  DEFAULT '0' NOT NULL,
 	prevorgvalue	double(16,4)  DEFAULT NULL,
+	snmpv3_securityname	varchar(64) DEFAULT '' NOT NULL,
+	snmpv3_securitylevel	int(1) DEFAULT '0' NOT NULL,
+	snmpv3_authpassphrase	varchar(64) DEFAULT '' NOT NULL,
+	snmpv3_privpassphrase	varchar(64) DEFAULT '' NOT NULL,
+
+	formula		varchar(255) DEFAULT '{.last(0)}' NOT NULL,
 
 	PRIMARY KEY	(itemid),
 	UNIQUE		shortname (hostid,key_),

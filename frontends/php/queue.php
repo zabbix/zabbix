@@ -41,9 +41,9 @@
 <?php
 	$now=time();
 	$result=DBselect("select i.itemid, i.nextcheck, i.description, h.host,h.hostid from items i,hosts h where i.status=0 and i.type not in (2) and h.status=0 and i.hostid=h.hostid and i.nextcheck<$now and i.key_<>'status' order by i.nextcheck");
-	echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";
+	echo "<table border=0 width=100% bgcolor='#AAAAAA' cellspacing=1 cellpadding=3>";
 	echo "\n";
-	echo "<tr><td><b>".S_NEXT_CHECK."</b></td><td><b>".S_HOST."</b></td><td><b>".S_DESCRIPTION."</b></td></tr>";
+	echo "<tr bgcolor='#CCCCCC'><td><b>".S_NEXT_CHECK."</b></td><td><b>".S_HOST."</b></td><td><b>".S_DESCRIPTION."</b></td></tr>";
 	echo "\n";
 	$col=0;
 	while($row=DBfetch($result))

@@ -64,7 +64,8 @@
 
 <?php
 	show_table_header("SCREENS");
-	echo "<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
+	echo "<TR BGCOLOR=\"#CCCCCC\">";
 	echo "<TD WIDTH=5% NOSAVE><B>".S_ID."</B></TD>";
 	echo "<TD><B>".S_NAME."</B></TD>";
 	echo "<TD WIDTH=5% NOSAVE><B>".S_COLUMNS."</B></TD>";

@@ -363,9 +363,9 @@
 					$str=sprintf("%s: %s [min:%s max:%s last:%s]",
 						str_pad($this->items[$i]["host"],$max_host_len," "),
 						str_pad($this->items[$i]["description"],$max_desc_len," "),
-						convert_units(min($this->min[$i]),$this->items[$i]["units"],$this->items[$i]["multiplier"]),
-						convert_units(max($this->max[$i]),$this->items[$i]["units"],$this->items[$i]["multiplier"]),
-						convert_units($this->getLastValue($i),$this->items[$i]["units"],$this->items[$i]["multiplier"]));
+						convert_units(min($this->min[$i]),$this->items[$i]["units"]),
+						convert_units(max($this->max[$i]),$this->items[$i]["units"]),
+						convert_units($this->getLastValue($i),$this->items[$i]["units"]));
 				}
 				else
 				{
@@ -612,7 +612,7 @@
 			{
 				for($i=0;$i<=6;$i++)
 				{
-					ImageString($this->im, 1, $this->sizeX+5+$this->shiftX, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, convert_units($this->sizeY*$i/6*($maxY-$minY)/$this->sizeY+$minY,$this->items[0]["units"],$this->items[0]["multiplier"]) , $this->colors["Dark Red No Alpha"]);
+					ImageString($this->im, 1, $this->sizeX+5+$this->shiftX, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, convert_units($this->sizeY*$i/6*($maxY-$minY)/$this->sizeY+$minY,$this->items[0]["units"]) , $this->colors["Dark Red No Alpha"]);
 				}
 			}
 			else

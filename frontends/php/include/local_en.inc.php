@@ -75,6 +75,7 @@
 	define("S_DISASTER",				"Disaster");
 
 //	alarms.php
+	define("S_ALARMS",				"Alarms");
 	define("S_ALARMS_SMALL",			"Alarms");
 	define("S_ALARMS_BIG",				"ALARMS");
 	define("S_SHOW_ONLY_LAST_100",			"Show only last 100");
@@ -98,6 +99,7 @@
 	define("S_NOT_SENT",				"not sent");
 	define("S_NO_ALERTS",				"No alerts");
 	define("S_SHOW_NEXT_100",			"Show next 100");
+	define("S_SHOW_PREVIOUS_100",			"Show previous 100");
 
 //	charts.php
 	define("S_CUSTOM_GRAPHS",			"Custom graphs");
@@ -244,6 +246,8 @@
 	define("S_IP_ADDRESS",				"IP address");
 	define("S_USE_THE_HOST_AS_A_TEMPLATE",		"Use the host as a template");
 	define("S_DELETE_SELECTED_HOST_Q",		"Delete selected host?");
+	define("S_GROUP_NAME",				"Group name");
+	define("S_HOST_GROUP",				"Host group");
 
 //	items.php
 	define("S_CONFIGURATION_OF_ITEMS",		"Configuration of items");
@@ -280,6 +284,30 @@
 	define("S_DELETE_SELECTED_ITEMS_Q",		"Delete selected items?");
 	define("S_EMAIL",				"Email");
 	define("S_SCRIPT",				"Script");
+	define("S_UNITS",				"Units");
+	define("S_MULTIPLIER",				"Multiplier");
+	define("S_UPDATE_INTERVAL_IN_SEC",		"Update interval (in sec)");
+	define("S_KEEP_HISTORY_IN_DAYS",		"Keep history (in days)");
+	define("S_KEEP_TRENDS_IN_DAYS",			"Keep trends (in days)");
+	define("S_TYPE_OF_INFORMATION",			"Type of information");
+	define("S_STORE_VALUE",				"Store value");
+	define("S_NUMERIC",				"Numeric");
+	define("S_CHARACTER",				"Character");
+	define("S_AS_IS",				"As is");
+	define("S_DELTA_SPEED_PER_SECOND",		"Delta (speed per second)");
+	define("S_DELTA_SIMPLE_CHANGE",			"Delta (simple change)");
+	define("S_ITEM",				"Item");
+	define("S_SNMP_COMMUNITY",			"SNMP community");
+	define("S_SNMP_OID",				"SNMP OID");
+	define("S_SNMP_PORT",				"SNMP port");
+	define("S_ALLOWED_HOSTS",			"Allowed hosts");
+	define("S_SNMPV3_SECURITY_NAME",		"SNMPv3 security name");
+	define("S_SNMPV3_SECURITY_LEVEL",		"SNMPv3 security level");
+	define("S_SNMPV3_AUTH_PASSPHRASE",		"SNMPv3 auth passphrase");
+	define("S_SNMPV3_PRIV_PASSPHRASE",		"SNMPv3 priv passphrase");
+	define("S_CUSTOM_MULTIPLIER",			"Custom multiplier");
+	define("S_DO_NOT_USE",				"Do not use");
+	define("S_USE_MULTIPLIER",			"Use multiplier");
 
 //	latestalarms.php
 	define("S_LATEST_ALARMS",			"Latest alarms");
@@ -432,6 +460,9 @@
 	define("S_LINK_TO",				"Link to");
 	define("S_SOFT_LINK_Q",				"Soft link?");
 	define("S_ADD_SERVER_DETAILS",			"Add server details");
+	define("S_TRIGGER",				"Trigger");
+	define("S_SERVER",				"Server");
+	define("S_DELETE",				"Delete");
 
 //	srv_status.php
 	define("S_IT_SERVICES_BIG",			"IT SERVICES");
@@ -527,4 +558,7 @@
 	define("S_READ_ONLY",				"Read only");
 	define("S_READ_WRITE",				"Read-write");
 	define("S_HIDE",				"Hide");
+	define("S_PASSWORD",				"Password");
+	define("S_PASSWORD_ONCE_AGAIN",			"Password (once again)");
+	define("S_URL_AFTER_LOGIN",			"URL (after login)");
 ?>

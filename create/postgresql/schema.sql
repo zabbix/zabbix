@@ -66,6 +66,11 @@ CREATE TABLE items (
   multiplier		int4		DEFAULT '0' NOT NULL,
   delta			int4		DEFAULT '0' NOT NULL,
   prevorgvalue		float8		DEFAULT NULL,
+  snmpv3_securityname	varchar(64)	DEFAULT '' NOT NULL,
+  snmpv3_securitylevel	int4		DEFAULT '0' NOT NULL,
+  snmpv3_authpassphrase	varchar(64)	DEFAULT '' NOT NULL,
+  snmpv3_privpassphrase	varchar(64)	DEFAULT '' NOT NULL,
+  formula		varchar(255)	DEFAULT '{.last(0)}' NOT NULL,
   PRIMARY KEY (itemid),
   FOREIGN KEY (hostid) REFERENCES hosts
 );

@@ -26,38 +26,45 @@
 ?>
 
 <?php
-	show_table_header_begin();
-	echo S_ALERT_HISTORY_BIG;
- 
-	show_table_v_delimiter(); 
+	if(isset($_GET["start"])&&isset($_GET["do"])&&($_GET["do"]=="<< Prev 100"))
+	{
+		$_GET["start"]-=100;
+	}
+	if(isset($_GET["do"])&&($_GET["do"]=="Next 100 >>"))
+	{
+		if(isset($_GET["start"]))
+		{
+			$_GET["start"]+=100;
+		}
+		else
+		{
+			$_GET["start"]=100;
+		}
+	}
+	if(isset($_GET["start"])&&($_GET["start"]<=0))
+	{
+		unset($_GET["start"]);
+	}
 ?>
 
 <?php
-        if(isset($_GET["start"])&&($_GET["start"]<=0))
-        {
-                unset($_GET["start"]);
-        }
-        if(isset($_GET["start"]))
-        {
-                echo "[<A HREF=\"alerts.php?start=".($_GET["start"]-100)."\">";
-                echo "Show previous 100</A>] ";
-                echo "[<A HREF=\"alerts.php?start=".($_GET["start"]+100)."\">";
-                echo S_SHOW_NEXT_100;
-		echo "</A>]";
-        }
-        else
-        {
-                echo "[<A HREF=\"alerts.php?start=100\">";
-                echo S_SHOW_NEXT_100;
-		echo "</A>]";
-        }
-
+	show_table3_header_begin();
+	echo "&nbsp;".S_ALERT_HISTORY_BIG;
+	show_table3_h_delimiter(20);
+	echo "<form name=\"form2\" method=\"get\" action=\"alerts.php\">";
+	if(isset($_GET["start"]))
+	{
+		echo "<input class=\"biginput\" name=\"start\" type=hidden value=".$_GET["start"]." size=8>";
+  		echo "<input class=\"button\" type=\"submit\" name=\"do\" value=\"<< Prev 100\">";
+	}
+	else
+	{
+  		echo "<input class=\"button\" type=\"submit\" disabled name=\"do\" value=\"<< Prev 100\">";
+	}
+  	echo "<input class=\"button\" type=\"submit\" name=\"do\" value=\"Next 100 >>\">";
+	echo "</form>";
 	show_table_header_end();
-	echo "<br>";
-
-	show_table_header(S_ALERTS_BIG);
 ?>
-
 
 <FONT COLOR="#000000">
 <?php
@@ -76,8 +83,8 @@
 	}
 	$result=DBselect($sql);
 
-	echo "<TABLE WIDTH=100% align=center BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR>";
+	echo "<TABLE WIDTH=100% align=center BORDER=0 BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
+	echo "<TR BGCOLOR=\"#CCCCCC\">";
 	echo "<TD WIDTH=10%><b>".S_TIME."</b></TD>";
 	echo "<TD WIDTH=5%><b>".S_TYPE."</b></TD>";
 	echo "<TD WIDTH=5%><b>".S_STATUS."</b></TD>";

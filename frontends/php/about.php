@@ -29,7 +29,7 @@
 	show_table_header(S_INFORMATION_ABOUT_ZABBIX);
 ?>
 
-<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR="#CCCCCC" cellspacing=1 cellpadding=3>
+<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR="#AAAAAA" cellspacing=1 cellpadding=3>
 <TR BGCOLOR=#EEEEEE>
 <TD ALIGN=LEFT>
 	<font face="Helvetica"><a href="http://www.zabbix.com"><?php echo S_HOMEPAGE_OF_ZABBIX; ?></a></font><br>

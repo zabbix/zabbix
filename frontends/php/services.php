@@ -87,8 +87,8 @@
 
 	$now=time();
 	$result=DBselect("select serviceid,name,algorithm from services order by sortorder,name");
-	echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";
-	echo "<tr>";
+	echo "<table border=0 width=100% bgcolor='#AAAAAA' cellspacing=1 cellpadding=3>";
+	echo "<tr bgcolor='#CCCCCC'>";
 	echo "<td><b>".S_SERVICE."</b></td>";
 	echo "<td width=20%><b>".S_STATUS_CALCULATION."</b></td>";
 	echo "</tr>";
@@ -171,8 +171,8 @@
 	if(isset($_GET["serviceid"]))
 	{
 		show_table_header("LINKS");
-		echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";
-		echo "<tr>";
+		echo "<table border=0 width=100% bgcolor='#AAAAAA' cellspacing=1 cellpadding=3>";
+		echo "<tr bgcolor='#CCCCCC'>";
 		echo "<td><b>".S_SERVICE_1."</b></td>";
 		echo "<td><b>".S_SERVICE_2."</b></td>";
 		echo "<td><b>".S_SOFT_HARD_LINK."</b></td>";
@@ -331,7 +331,7 @@
         echo "</SELECT>";
 
 	show_table2_v_delimiter();
-	echo nbsp(".S_SORT_ORDER_0_999.");
+	echo nbsp(S_SORT_ORDER_0_999);
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"sortorder\" value=\"$sortorder\" size=3>";
 

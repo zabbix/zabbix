@@ -19,45 +19,51 @@
 **/
 ?>
 <?php
+	include "include/config.inc.php";
 	$page["title"] = S_LATEST_ALARMS;
 	$page["file"] = "latestalarms.php";
-
-	include "include/config.inc.php";
 	show_header($page["title"],30,0);
 ?>
 
 <?php
-	show_table_header_begin();
-	echo S_HISTORY_OF_ALARMS_BIG;
- 
-	show_table_v_delimiter();
-?>
-
-<?php
+	if(isset($_GET["start"])&&isset($_GET["do"])&&($_GET["do"]=="<< Prev 100"))
+	{
+		$_GET["start"]-=100;
+	}
+	if(isset($_GET["do"])&&($_GET["do"]=="Next 100 >>"))
+	{
+		if(isset($_GET["start"]))
+		{
+			$_GET["start"]+=100;
+		}
+		else
+		{
+			$_GET["start"]=100;
+		}
+	}
 	if(isset($_GET["start"])&&($_GET["start"]<=0))
 	{
 		unset($_GET["start"]);
 	}
+?>
+
+<?php
+	show_table3_header_begin();
+	echo "&nbsp;".S_HISTORY_OF_ALARMS_BIG;
+	show_table3_h_delimiter(20);
+	echo "<form name=\"form2\" method=\"get\" action=\"latestalarms.php\">";
 	if(isset($_GET["start"]))
 	{
-		echo "[<A HREF=\"latestalarms.php?start=".($_GET["start"]-100)."\">";
-		echo S_SHOW_PREVIOUS_100;
-		echo "</A>] ";
-		echo "[<A HREF=\"latestalarms.php?start=".($_GET["start"]+100)."\">";
-		echo S_SHOW_NEXT_100;
-		echo "</A>]";
+		echo "<input class=\"biginput\" name=\"start\" type=hidden value=".$_GET["start"]." size=8>";
+  		echo "<input class=\"button\" type=\"submit\" name=\"do\" value=\"<< Prev 100\">";
 	}
-	else 
+	else
 	{
-		echo "[<A HREF=\"latestalarms.php?start=100\">";
-		echo S_SHOW_NEXT_100;
-		echo "</A>]";
+  		echo "<input class=\"button\" type=\"submit\" disabled name=\"do\" value=\"<< Prev 100\">";
 	}
-
+  	echo "<input class=\"button\" type=\"submit\" name=\"do\" value=\"Next 100 >>\">";
+	echo "</form>";
 	show_table_header_end();
-	echo "<br>";
-
-	show_table_header(S_ALARMS_BIG);
 ?>
 
 <FONT COLOR="#000000">
@@ -77,8 +83,9 @@
 	}
 	$result=DBselect($sql);
 
-	echo "<TABLE WIDTH=100% align=center BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR>";
+//	echo "<TABLE WIDTH=100% align=center BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TABLE WIDTH=100% align=center BGCOLOR=\"#AAAAAA\" BORDER=0 cellspacing=1 cellpadding=3>";
+	echo "<TR BGCOLOR=\"#CCCCCC\">";
 	echo "<TD width=20%><b>".S_TIME."</b></TD>";
 	echo "<TD><b>".S_DESCRIPTION."</b></TD>";
 	echo "<TD width=10%><b>".S_VALUE."</b></TD>";
