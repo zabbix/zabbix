@@ -246,7 +246,6 @@ WIN32 Agent:
 
  - setup demo site
  - add user groups
- - look for cool icons
  - different sound files for different severity
  - rename "Alerts" to "Notifications"
  - add numeric constants to trigger expressions
