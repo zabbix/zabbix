@@ -135,6 +135,8 @@
 		$false[$i]=$stat["false"];
 		$unknown[$i]=$stat["unknown"];
 		$count_now[$i]=1;
+
+//		echo $true[$i]." ".$false[$i]."<br>";
 	}
 
 	for($i=0;$i<=$sizeY;$i+=$sizeY/10)
@@ -162,45 +164,23 @@
 	$maxX=900;
 	$minX=0;
 
-	for($i=1;$i<52;$i++)
+	for($i=0;$i<52;$i++)
 	{
-		$x1=(900/52)*$sizeX*($i-$minX)/($maxX-$minX);
-		$y1=$sizeY*($true[$i]-$minY)/($maxY-$minY);
-		$x2=(900/52)*$sizeX*($i-$minX-1)/($maxX-$minX);
-		$y2=$sizeY*($true[$i-1]-$minY)/($maxY-$minY);
-		$y1=$sizeY-$y1;
-		$y2=$sizeY-$y2;
-
-		ImageLine($im,$x1+$shiftX,$y1+$shiftYup,$x2+$shiftX,$y2+$shiftYup,$darkred);
-
-		ImageRectangle($im,$x1+$shiftX-1,$y1+$shiftYup-1,$x1+$shiftX+1,$y1+$shiftYup+1,$darkred);
-		ImageRectangle($im,$x2+$shiftX-1,$y2+$shiftYup-1,$x2+$shiftX+1,$y2+$shiftYup+1,$darkred);
 
 		$x1=(900/52)*$sizeX*($i-$minX)/($maxX-$minX);
-		$y1=$sizeY*($false[$i]-$minY)/($maxY-$minY);
-		$x2=(900/52)*$sizeX*($i-$minX-1)/($maxX-$minX);
-		$y2=$sizeY*($false[$i-1]-$minY)/($maxY-$minY);
+
+		ImageFilledRectangle($im,$x1+$shiftX,$shiftYup,$x1+$shiftX+8,$sizeY+$shiftYup,ImageColorAllocate($im,200,200,120))
+;
+		$y1=$sizeY*$true[$i]/100;
+
+		ImageFilledRectangle($im,$x1+$shiftX,$shiftYup,$x1+$shiftX+8,$y1+$shiftYup,ImageColorAllocate($im,200,120,120));
+
+		$y1=$sizeY*$false[$i]/100;
 		$y1=$sizeY-$y1;
-		$y2=$sizeY-$y2;
 
-		ImageLine($im,$x1+$shiftX,$y1+$shiftYup,$x2+$shiftX,$y2+$shiftYup,$darkgreen);
+		ImageFilledRectangle($im,$x1+$shiftX,$y1+$shiftYup,$x1+$shiftX+8,$sizeY+$shiftYup,ImageColorAllocate($im,120,200,120));
 
-		ImageRectangle($im,$x1+$shiftX-1,$y1+$shiftYup-1,$x1+$shiftX+1,$y1+$shiftYup+1,$darkgreen);
-		ImageRectangle($im,$x2+$shiftX-1,$y2+$shiftYup-1,$x2+$shiftX+1,$y2+$shiftYup+1,$darkgreen);
-
-		$x1=(900/52)*$sizeX*($i-$minX)/($maxX-$minX);
-		$y1=$sizeY*($unknown[$i]-$minY)/($maxY-$minY);
-		$x2=(900/52)*$sizeX*($i-$minX-1)/($maxX-$minX);
-		$y2=$sizeY*($unknown[$i-1]-$minY)/($maxY-$minY);
-		$y1=$sizeY-$y1;
-		$y2=$sizeY-$y2;
-
-		ImageLine($im,$x1+$shiftX,$y1+$shiftYup,$x2+$shiftX,$y2+$shiftYup,$darkyellow);
-
-		ImageRectangle($im,$x1+$shiftX-1,$y1+$shiftYup-1,$x1+$shiftX+1,$y1+$shiftYup+1,$darkyellow);
-		ImageRectangle($im,$x2+$shiftX-1,$y2+$shiftYup-1,$x2+$shiftX+1,$y2+$shiftYup+1,$darkyellow);
-
-#			ImageStringUp($im, 1, $x1+10, $sizeY+$shiftYup+15, $i , $red);
+		ImageRectangle($im,$x1+$shiftX,$shiftYup,$x1+$shiftX+8,$sizeY+$shiftYup,$black);
 	}
 
 	for($i=0;$i<=$sizeY;$i+=$sizeY/10)
@@ -208,15 +188,15 @@
 		ImageString($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftYup, $i*($maxY-$minY)/$sizeY+$minY , $darkred);
 	}
 
-	ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*0,$shiftX+5,$sizeY+$shiftYup+35+9+15*0,$darkgreen);
+	ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*0,$shiftX+5,$sizeY+$shiftYup+35+9+15*0,ImageColorAllocate($im,120,200,120));
 	ImageRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*0,$shiftX+5,$sizeY+$shiftYup+35+9+15*0,$black);
 	ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*0+35, "FALSE (%)", $black);
 
-	ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+35+9+15*1,$darkred);
+	ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+35+9+15*1,ImageColorAllocate($im,200,120,120));
 	ImageRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+15+9+35*1,$black);
 	ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*1+35, "TRUE (%)", $black);
 
-	ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*2,$shiftX+5,$sizeY+$shiftYup+35+9+15*2,$darkyellow);
+	ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*2,$shiftX+5,$sizeY+$shiftYup+35+9+15*2,ImageColorAllocate($im,200,200,120));
 	ImageRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*2,$shiftX+5,$sizeY+$shiftYup+35+9+15*2,$black);
 	ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*2+35, "UNKNOWN (%)", $black);
 
