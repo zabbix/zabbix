@@ -136,12 +136,12 @@ void	process_child(int sockfd)
 
 	struct  sigaction phan;
 
-	for(;;)
+//	for(;;)
 	{
 		phan.sa_handler = &signal_handler; /* set up sig handler using sigaction() */
 		sigemptyset(&phan.sa_mask);  /* just block alarm signal */
 		phan.sa_flags = 0;
-//      phan.sa_flags = SA_RESTART;
+		phan.sa_flags = SA_RESTART;
 		sigaction(SIGALRM, &phan, NULL);
 		alarm(AGENT_TIMEOUT);
 //
@@ -312,7 +312,6 @@ int	main()
 	signal( SIGALRM, signal_handler );
 
 	init_security();
-
 
 	syslog( LOG_WARNING, "zabbix_agentd started");
 
