@@ -596,7 +596,7 @@ float	PROCCNT(const char * procname)
 #endif
 }
 
-float	get_stat(const char *key)
+float	get_netstat(const char *key)
 {
 	FILE	*f;
 	char	line[MAX_STRING_LEN+1];
@@ -630,7 +630,7 @@ float	NETLOADIN1(char *interface)
 
 	sprintf(key,"netloadin1[%s]",interface);
 
-	return	get_stat(key);
+	return	get_netstat(key);
 }
 
 float	NETLOADIN5(char *interface)
@@ -639,7 +639,7 @@ float	NETLOADIN5(char *interface)
 
 	sprintf(key,"netloadin5[%s]",interface);
 
-	return	get_stat(key);
+	return	get_netstat(key);
 }
 
 float	NETLOADIN15(char *interface)
@@ -648,7 +648,7 @@ float	NETLOADIN15(char *interface)
 
 	sprintf(key,"netloadin15[%s]",interface);
 
-	return	get_stat(key);
+	return	get_netstat(key);
 }
 
 float	NETLOADOUT1(char *interface)
@@ -657,7 +657,7 @@ float	NETLOADOUT1(char *interface)
 
 	sprintf(key,"netloadout1[%s]",interface);
 
-	return	get_stat(key);
+	return	get_netstat(key);
 }
 
 float	NETLOADOUT5(char *interface)
@@ -666,7 +666,7 @@ float	NETLOADOUT5(char *interface)
 
 	sprintf(key,"netloadout5[%s]",interface);
 
-	return	get_stat(key);
+	return	get_netstat(key);
 }
 
 float	NETLOADOUT15(char *interface)
@@ -675,7 +675,7 @@ float	NETLOADOUT15(char *interface)
 
 	sprintf(key,"netloadout15[%s]",interface);
 
-	return	get_stat(key);
+	return	get_netstat(key);
 }
 
 

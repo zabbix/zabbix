@@ -298,6 +298,7 @@ void	process_child(int sockfd)
 	phan.sa_flags = 0;
 	sigaction(SIGALRM, &phan, NULL);
 
+
 	alarm(CONFIG_TIMEOUT);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Before read()");
