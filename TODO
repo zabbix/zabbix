@@ -22,6 +22,7 @@ HIGH PRIORITY:
  - SNMP trapping
  - personalisation (refresh rate, graph size, default graph period, etc)
  - BUG. Add information about configuration of <? ?> in php.ini into the Manual
+   (short_open_tag = On)
 
 TODO:
 
