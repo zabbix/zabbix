@@ -49,6 +49,10 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	char	c[MAX_STRING_LEN];
 	struct hostent *hp;
 
+	char	str_time[MAX_STRING_LEN];
+	struct	tm *local_time = NULL;
+	time_t	email_time;
+
 	struct sockaddr_in myaddr_in;
 	struct sockaddr_in servaddr_in;
 
@@ -244,8 +248,12 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	}
 
 	memset(c,0,MAX_STRING_LEN);
+	time(&email_time);
+	local_time = localtime(&email_time);
+	strftime( str_time, MAX_STRING_LEN, "%a, %d %b %Y %H:%M:%S %z", local_time );
 /*	sprintf(c,"Subject: %s\r\n%s",mailsubject, mailbody);*/
-	snprintf(c,sizeof(c)-1,"From:<%s>\r\nTo:<%s>\r\nSubject: %s\r\n\r\n%s",smtp_email,mailto,mailsubject, mailbody);
+/*	snprintf(c,sizeof(c)-1,"From:<%s>\r\nTo:<%s>\r\nSubject: %s\r\n\r\n%s",smtp_email,mailto,mailsubject, mailbody);*/
+	snprintf(c,sizeof(c)-1,"From:<%s>\r\nTo:<%s>\r\nDate: %s\r\nSubject: %s\r\n\r\n%s",smtp_email,mailto,str_time,mailsubject, mailbody);
 /*	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
 	e=write(s,c,strlen(c)); 
 	if(e == -1)
