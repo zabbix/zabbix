@@ -497,7 +497,7 @@ AC_ARG_WITH(pgsql,
 AC_SUBST(PGSQL_LFLAGS)
 AC_SUBST(PGSQL_INCLUDE)
 
-AC_MSG_CHECKING(for SNMP support)
+AC_MSG_CHECKING(for NET-SNMP support)
 AC_ARG_WITH(net-snmp,
 [
 What SNMP package do you want to use (please select only one):
@@ -555,8 +555,8 @@ What SNMP package do you want to use (please select only one):
 AC_SUBST(SNMP_LFLAGS)
 AC_SUBST(SNMP_INCLUDE)
 
-AC_MSG_CHECKING(for SNMP support)
-AC_ARG_WITH(net-snmp,
+AC_MSG_CHECKING(for UCD-SNMP support)
+AC_ARG_WITH(ucd-snmp,
 [  --with-ucd-snmp[=DIR]    Include SNMP support.  DIR is the UCD-SNMP
                          base install directory, default is to search 
                          through a number of common places for the
