@@ -281,7 +281,66 @@
 			}
 		}
 
-		function SelectData()
+// Calculation of maximum Y
+		function calculateMaxY()
+		{
+			unset($maxY);
+			for($i=0;$i<$this->num;$i++)
+			{
+				if(!isset($maxY))
+				{
+					if(count($this->max[$i])>0)
+					{
+						$maxY=max($this->max[$i]);
+					}
+				}
+				else
+				{
+					$maxY=@iif($maxY<max($this->max[$i]),max($this->max[$i]),$maxY);
+				}
+			}
+
+			if($maxY>0)
+			{
+				$exp = floor(log10($maxY));
+				$mant = $maxY/pow(10,$exp);
+			}
+			else
+			{
+				$exp=0;
+				$mant=0;
+			}
+
+			if($mant<1.5)
+			{
+				$mant=1.5;
+			}
+			elseif($mant<2)
+			{
+				$mant=2;
+			}
+			elseif($mant<3)
+			{
+				$mant=3;
+			}
+			elseif($mant<5)
+			{
+				$mant=5;
+			}
+			elseif($mant<8)
+			{
+				$mant=8;
+			}
+			else
+			{
+				$mant=10;
+			}
+			$maxY = $mant*pow(10,$exp);
+
+			return $maxY;
+		}
+
+		function selectData()
 		{
 			$now = time(NULL);
 			$this->to_time=$now-3600*$this->from;
@@ -336,7 +395,7 @@
 			}
 			$this->checkPermissions();
 
-			$this->SelectData();
+			$this->selectData();
 			if($this->nodata==1)
 			{
 				$this->noDataFound();
@@ -346,37 +405,10 @@
 		
 			$maxX=900;
 			$minX=0;
-			unset($maxY);
-			for($i=0;$i<$this->num;$i++)
-			{
-				if(!isset($maxY))
-				{
-					if(count($this->max[$i])>0)
-					{
-						$maxY=max($this->max[$i]);
-					}
-				}
-				else
-				{
-					$maxY=@iif($maxY<max($this->max[$i]),max($this->max[$i]),$maxY);
-				}
-			}
 
 			$minY=0;
-// Calculation of maximum Y value
-			for($i=-10;$i<11;$i++)
-			{
-				$m=pow(10,$i);
-				if($m>$maxY)
-				{
-					if($m/2>$maxY)
-					{
-						$maxY=$m/2;
-					}
-					break;
-				}
-			}
-		
+			$maxY=$this->calculateMaxY();
+
 			if(isset($minY)&&isset($maxY)&&($minX!=$maxX)&&($minY!=$maxY))
 			{
 				for($item=0;$item<$this->num;$item++)
