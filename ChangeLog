@@ -1,5 +1,10 @@
 Changes for 1.0beta1:
 
+ - default values for config.alert_history and config.alarm_history are set to
+ one year (Alexei)
+ - file COPYING changed (Alexei)
+ - file INSTALL truncated (Alexei)
+
  - added "-lcrypto" to SNMP library detection in configure.in (Alexei)
  - additional statistics in screen "Status of Zabbix" (Alexei)
  - changes in manual.lyx (Alexei)
