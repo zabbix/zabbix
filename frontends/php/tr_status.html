@@ -3,6 +3,22 @@
 	$page["file"] = "tr_status.html";
 
 	include "include/config.inc";
+
+	$result=DBselect("select count(*) from triggers t,hosts h,items i,functions f  where t.istrue=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status in (0,2) order by t.triggerid");
+	$count=DBget_field($result,0,0);
+	setcookie("active_triggers",$count,time()+1800);
+	if(!isset($active_triggers)||($count<$active_triggers))
+	{
+//		Number of trigger decreased
+		$audio="warning1.wav";
+
+	}
+	if(!isset($active_triggers)||($count>$active_triggers))
+	{
+//		Number of trigger increased
+		$audio="warning2.wav";
+	}
+	
 	if(isset($fullscreen))
 	{
 		show_header($page["title"],10,1);
@@ -10,6 +26,12 @@
 	else
 	{
 		show_header($page["title"],10,0);
+	}
+
+	if(isset($audio))
+	{
+//		echo "<EMBED src=\"audio/$audio\" autostart=true loop=false volume=100 hidden=true></EMBED>";
+//		echo "<NOEMBED><BGSOUND src=\"audio/$audio\"></NOEMBED>";
 	}
 ?>                                                                                                             
 
@@ -30,13 +52,14 @@
 ?>
 
 <?
-	if(isset($hostid))
+	if(!isset($select))
 	{
-		$result=DBselect("select host from hosts where hostid=$hostid");
-		if(DBnum_rows($result)==0)
-		{
-			unset($hostid);
-		}
+		$select="";
+	}
+
+	if(!isset($txt_select))
+	{
+		$txt_select="";
 	}
 
 	if(!isset($fullscreen))
@@ -83,29 +106,46 @@
 
 		if($onlytrue!='true')
 		{
-			echo "[<A HREF=\"tr_status.html?onlytrue=true&noactions=$noactions&compact=$compact$cond\">Show only true</a>] ";
+			echo "[<A HREF=\"tr_status.html?onlytrue=true&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$cond\">Show only true</a>] ";
 		}
 		else
 		{
-			echo "[<A HREF=\"tr_status.html?noactions=$noactions&compact=$compact$cond\">Show all triggers</A>] ";
+			echo "[<A HREF=\"tr_status.html?noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$cond\">Show all triggers</A>] ";
 		}
 		if($noactions!='true')
 		{
-			echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=true&compact=$compact$cond\">Hide Actions</A>] ";
+			echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=true&compact=$compact&select=$select&txt_select=$txt_select$cond\">Hide Actions</A>] ";
 		}
 		else
 		{
-			echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=false&compact=$compact$cond\">Show Actions</A>] ";
+			echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=false&compact=$compact&select=$select&txt_select=$txt_select$cond\">Show Actions</A>] ";
 		}
 		if($compact!='true')
 		{
-			echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=true$cond\">Hide Details</A>] ";
+			echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=true&select=$select&txt_select=$txt_select$cond\">Hide Details</A>] ";
 		}
 		else
 		{
-			echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=false$cond\">Show Details</A>] ";
+			echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=false&select=$select&txt_select=$txt_select$cond\">Show Details</A>] ";
 		}
-  
+		
+		if($select!='true')
+		{
+			echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=true&txt_select=$txt_select$cond\">Select</A>] ";
+		}
+		else
+		{
+			echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=false$cond\">Hide Select</A>] "; 
+			show_table_v_delimiter();
+			echo "<form name=\"form1\" method=\"get\" action=\"tr_status.html?select=true\">
+  			<input type=\"text\" name=\"txt_select\" value=\"$txt_select\">
+  			<input type=\"submit\" name=\"btnSelect\" value=\"Select\">
+			<INPUT NAME=\"compact\" TYPE=\"HIDDEN\" value=\"$compact\">
+			<INPUT NAME=\"onlytrue\" TYPE=\"HIDDEN\" value=\"$onlytrue\">
+			<INPUT NAME=\"noactions\" TYPE=\"HIDDEN\" value=\"$noactions\">			
+		        <INPUT NAME=\"select\" TYPE=\"HIDDEN\" value=\"$select\">
+			</form>";	
+		}
 		show_table_header_end();
 		echo "<br>";
 	}
@@ -123,11 +163,11 @@
 		}
 		if($onlytrue=='true')
 		{
-			$result=DBselect("select t.priority,count(*) from triggers t,hosts h,items i,functions f  where t.istrue=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status in (0,2) $cond group by 1");
+			$result=DBselect("select t.priority,count(*) from triggers t,hosts h,items i,functions f  where t.istrue=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.description like \"%$txt_select%\" and i.status in (0,2) $cond group by 1");
 		}
 		else
 		{
-			$result=DBselect("select t.priority,count(*) from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status in (0,2) $cond group by 1");
+			$result=DBselect("select t.priority,count(*) from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.description like \"%$txt_select%\" and i.status in (0,2) $cond group by 1");
 		}
 		$p0=$p1=$p2=$p3=$p4=$p5=0;
 		for($i=0;$i<DBnum_rows($result);$i++)
@@ -191,11 +231,11 @@
 
 	if($onlytrue=='true')
 	{
-		$result=DBselect("select distinct t.triggerid,t.istrue,t.description,t.expression,t.priority,t.lastchange,t.comments from triggers t,hosts h,items i,functions f  where t.istrue=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status in (0,2) $cond order by t.priority desc, t.description");
+		$result=DBselect("select distinct t.triggerid,t.istrue,t.description,t.expression,t.priority,t.lastchange,t.comments from triggers t,hosts h,items i,functions f  where t.istrue=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.description like \"%$txt_select%\" and t.triggerid=f.triggerid and i.status in (0,2) $cond order by t.priority desc, t.description");
 	}
 	else
 	{
-		$result=DBselect("select distinct t.triggerid,t.istrue,t.description,t.expression,t.priority,t.lastchange,t.comments from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status in (0,2) $cond order by t.priority desc, t.description");
+		$result=DBselect("select distinct t.triggerid,t.istrue,t.description,t.expression,t.priority,t.lastchange,t.comments from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.description like \"%$txt_select%\" and i.status in (0,2) $cond order by t.priority desc, t.description");
 	}
 	$col=0;
 	for($i=0;$i<DBnum_rows($result);$i++)
@@ -280,7 +320,7 @@
 		}
 		else
 		{
-			echo "<TD ALIGN=CENTER><A HREF=\"tr_comments.html?triggerid=$triggerid\">Add</a></TD>";
+			echo "<TD ALIGN=CENTER><A HREF=\"edit_comments.html?triggerid=$triggerid\">Add</a></TD>";
 		}
 		if($istrue==0)	echo "</TR>\n";
 	}
