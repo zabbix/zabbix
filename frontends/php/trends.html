@@ -7,8 +7,8 @@
 
 <?
 	show_table_header_begin();
-	$result=DBselect("select description from items where itemid=$itemid");
-	echo "TRENDS [",DBget_field($result,0,0),"]";
+	$result=DBselect("select i.description,h.host from items i,hosts h where i.hostid=h.hostid and i.itemid=$itemid");
+	echo "TRENDS [",DBget_field($result,0,1),":",DBget_field($result,0,0),"]";
 
 	show_table_v_delimiter();
 

@@ -1,13 +1,13 @@
-#define USE_MYSQL 1
-
 #ifndef MON_DB_H
 #define MON_DB_H
- 
-#ifdef USE_MYSQL
-#include "mysql.h"
+
+#include "config.h"
+
+#ifdef HAVE_MYSQL
+	#include "mysql.h"
 #endif
 
-#ifdef USE_POSTGRESQL
+#ifdef HAVE_PGSQL
 	#include "libpq-fe.h"
 #endif
 
@@ -21,12 +21,12 @@
 #define DB_FUNCTION struct function_type
 #define DB_MEDIA struct media_type
 
-#ifdef USE_MYSQL
+#ifdef HAVE_MYSQL
 	#define	DB_RESULT	MYSQL_RES
 	#define	DBfree_result	mysql_free_result
 #endif
 
-#ifdef USE_POSTGRESQL
+#ifdef HAVE_PGSQL
 	#define	DB_RESULT	PGresult
 	#define	DBfree_result	PQclear
 #endif

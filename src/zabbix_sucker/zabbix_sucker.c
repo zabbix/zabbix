@@ -93,7 +93,7 @@ int	get_value_SNMPv1(double *result,DB_ITEM *item)
 
 /*
 	Initialize the SNMP library
-	init_snmp("zabbix_sucker");
+	init_snmp("zabbix_suckerd");
 */
 
 /*
@@ -511,14 +511,14 @@ int main(int argc, char **argv)
 		}
 	}
 
-	openlog("zabbix_sucker",LOG_PID,LOG_USER);
+	openlog("zabbix_suckerd",LOG_PID,LOG_USER);
 //	ret=setlogmask(LOG_UPTO(LOG_DEBUG));
 	ret=setlogmask(LOG_UPTO(LOG_WARNING));
 
-	syslog( LOG_WARNING, "zabbix_sucker #%d started",sucker_num);
+	syslog( LOG_WARNING, "zabbix_suckerd #%d started",sucker_num);
 
 #ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
-	init_snmp("zabbix_sucker");
+	init_snmp("zabbix_suckerd");
 #endif
 
 	DBconnect();

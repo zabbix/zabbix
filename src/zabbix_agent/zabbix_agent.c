@@ -1,5 +1,3 @@
-/* #define TEST */
-
 #include "config.h"
 
 #include <stdlib.h>
@@ -21,76 +19,6 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "zabbix_agent.h"
-
-COMMAND	commands[]=
-	{
-	{"memory[total]"		,TOTALMEM, 0},
-	{"memory[shared]"		,SHAREDMEM, 0},
-	{"memory[buffers]"		,BUFFERSMEM, 0},
-	{"memory[cached]"		,CACHEDMEM, 0},
-	{"memory[free]"			,FREEMEM, 0},
-
-	{"diskfree[/]"			,DF, "/"},
-	{"diskfree[/opt]"		,DF, "/opt"},
-	{"diskfree[/tmp]"		,DF, "/tmp"},
-	{"diskfree[/usr]"		,DF, "/usr"},
-	{"diskfree[/home]"		,DF, "/home"},
-	{"diskfree[/var]"		,DF, "/var"},
-
-	{"inodefree[/]"			,INODE, "/"},
-	{"inodefree[/opt]"		,INODE, "/opt"},
-	{"inodefree[/tmp]"		,INODE, "/tmp"},
-	{"inodefree[/usr]"		,INODE, "/usr"},
-	{"inodefree[/home]"		,INODE, "/home"},
-	{"inodefree[/var]"		,INODE, "/var"},
-
-	{"cksum[/etc/inetd_conf]"	,EXECUTE, "(cksum /etc/inetd.conf 2>/dev/null || echo '-2') | cut -f1 -d' '"},
-	{"cksum[/etc/services]"		,EXECUTE, "(cksum /etc/services 2>/dev/null || echo '-2') | cut -f1 -d' '"},
-	{"cksum[/vmlinuz]"		,EXECUTE, "(cksum /vmlinuz 2>/dev/null || echo '-2') | cut -f1 -d' '"},
-	{"cksum[/etc/passwd]"		,EXECUTE, "(cksum /etc/passwd 2>/dev/null || echo '-2') | cut -f1 -d' '"},
-	{"cksum[/usr/sbin/sshd]"	,EXECUTE, "(cksum /usr/sbin/sshd 2>/dev/null || echo '-2') | cut -f1 -d' '"},
-	{"cksum[/usr/bin/ssh]"		,EXECUTE, "(cksum /usr/bin/ssh 2>/dev/null || echo '-2') | cut -f1 -d' '"},
-
-	{"filesize[/var/log/syslog]"	,FILESIZE, "/var/log/syslog"},
-
-	{"swap[free]"			,SWAPFREE, 0},
-	{"swap[total]"			,SWAPTOTAL, 0},
-
-/****************************************
-  	All these perameters require more than 1 second to retrieve.
-
-  	{"swap[in]"			,EXECUTE, "vmstat -n 1 2|tail -1|cut -b37-40"},
-	{"swap[out]"			,EXECUTE, "vmstat -n 1 2|tail -1|cut -b41-44"},
-
-	{"io[in]"			,EXECUTE, "vmstat -n 1 2|tail -1|cut -b45-50"},
-	{"io[out]"			,EXECUTE, "vmstat -n 1 2|tail -1|cut -b51-56"},
-
-	{"system[interrupts]"		,EXECUTE, "vmstat -n 1 2|tail -1|cut -b57-61"},
-	{"system[switches]"		,EXECUTE, "vmstat -n 1 2|tail -1|cut -b62-67"},
-***************************************/
-
-	{"system[procload]"		,PROCLOAD, 0},
-	{"system[procload5]"		,PROCLOAD5, 0},
-	{"system[procload15]"		,PROCLOAD15, 0},
-	{"system[proccount]"		,PROCCOUNT, 0},
-	{"system[procrunning]"		,EXECUTE, "cat /proc/loadavg|cut -f1 -d'/'|cut -f4 -d' '"},
-	{"system[uptime]"		,UPTIME, 0},
-	{"system[users]"		,EXECUTE, "who|wc -l"},
-
-	{"ping"				,PING, 0},
-	{"tcp_count"			,EXECUTE, "netstat -tn|grep EST|wc -l"},
-
-/*	{"net[listen_21]"		,EXECUTE, "netstat -lnt|grep -v grep|grep ':21 '|wc -l"}, */
-/*	{"net[listen_21]"		,EXECUTE, "cat /proc/net/tcp|grep '0015 00000000:0000 0A'|wc -l"}, */
-	{"net[listen_21]"		,TCP_LISTEN, "0015"},
-	{"net[listen_22]"		,TCP_LISTEN, "0016"},
-	{"net[listen_23]"		,TCP_LISTEN, "0017"},
-	{"net[listen_25]"		,TCP_LISTEN, "0019"},
-	{"net[listen_80]"		,TCP_LISTEN, "0050"},
-	{"net[listen_110]"		,TCP_LISTEN, "006E"},
-	{"net[listen_143]"		,TCP_LISTEN, "008F"},
-	{0				,0}
-	};
 
 void	signal_handler( int sig )
 {
@@ -140,38 +68,17 @@ int	check_security(void)
 	return	SUCCEED;
 }
 
+float	process_input()
+{
+	char	s[1024];
+
+	fgets(s,1024,stdin);
+
+	return	process(s);
+}
+
 int	main()
 {
-	char	*s,*p;
-	float	result;
-	int	i;
-	float	(*function)();
-	char	*parameter = NULL;
-
-#ifdef TEST
-	i=0;
-	for(;;)
-	{
-		if( commands[i].key == 0)
-		{
-			exit(0);
-		}
-		function=commands[i].function;
-		parameter=commands[i].parameter;
-
-		result=function(parameter);
-		if( result == FAIL )
-		{
-			printf("%s - NOT SUPPORTED\n",commands[i].key);
-		}
-		else
-		{
-			printf("%s\t - %f\n",commands[i].key,result);
-		}
-		i++;
-	}
-#endif
-
 	if(check_security() == FAIL)
 	{
 		exit(FAIL);
@@ -184,49 +91,10 @@ int	main()
 
 	alarm(AGENT_TIMEOUT);
 
-	s=(char *) malloc( 1024 );
+	printf("%f\n",process_input());
 
-	fgets(s,1024,stdin);
-
-	for( p=s+strlen(s)-1; p>s && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
-	p[1]=0;
-	
-	i=0;
-	for(;;)
-	{
-		if( commands[i].key == 0)
-		{
-			function=0;
-			break;
-		}
-		if( strcmp(commands[i].key,s) == 0)
-		{
-			function=commands[i].function;
-			parameter=commands[i].parameter;
-			break;
-		}	
-		i++;
-	}
-
-	if( function !=0 )
-	{
-		result=function(parameter);
-		if( result == FAIL )
-		{
-			printf("%d\n",NOTSUPPORTED);
-		}
-		else
-		{
-			printf("%f",result);
-		}
-	}
-	else
-	{
-		printf("%d\n",NOTSUPPORTED);
-	}
 	fflush(stdout);
 
-	free(s);
 	alarm(0);
 
 	return SUCCEED;

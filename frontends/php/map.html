@@ -14,7 +14,7 @@
 	$width=DBget_field($result,0,1);
 	$height=DBget_field($result,0,2);
 
-#	Header( "Content-type:  text/html"); 
+//	Header( "Content-type:  text/html"); 
 	Header( "Content-type:  image/png"); 
 	Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 
@@ -139,7 +139,7 @@
 #		ImageDestroy($img); 
 	}
 
-	ImageString($im,0,$width-147,$height-10, "http://zabbix.sourceforge.net", $gray);
+	ImageStringUp($im,0,$width-10,$height-4, "http://zabbix.sourceforge.net", $gray);
 
 	ImagePng($im); 
 	ImageDestroy($im); 
