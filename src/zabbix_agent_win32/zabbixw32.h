@@ -40,7 +40,7 @@
 #else
 #define DEBUG_SUFFIX
 #endif
-#define AGENT_VERSION         "1.0.0-beta8(rc2)" DEBUG_SUFFIX
+#define AGENT_VERSION         "1.0.0-beta8(rc3)" DEBUG_SUFFIX
 
 #define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
 
@@ -167,5 +167,8 @@ extern double statProcLoad5;
 extern double statProcLoad15;
 extern double statAvgCollectorTime;
 extern double statMaxCollectorTime;
+
+extern DWORD (__stdcall *imp_GetGuiResources)(HANDLE,DWORD);
+extern BOOL (__stdcall *imp_GetProcessIoCounters)(HANDLE,PIO_COUNTERS);
 
 #endif

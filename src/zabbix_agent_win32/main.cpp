@@ -40,6 +40,54 @@ DWORD confServerCount=0;
 DWORD confTimeout=3000;    // 3 seconds default timeout
 DWORD confMaxProcTime=100; // 100 milliseconds is default acceptable collector sample processing time
 
+DWORD (__stdcall *imp_GetGuiResources)(HANDLE,DWORD);
+BOOL (__stdcall *imp_GetProcessIoCounters)(HANDLE,PIO_COUNTERS);
+
+
+//
+// Get proc address and write log file
+//
+
+static FARPROC GetProcAddressAndLog(HMODULE hModule,LPCSTR procName)
+{
+   FARPROC ptr;
+
+   ptr=GetProcAddress(hModule,procName);
+   if (ptr==NULL)
+      WriteLog("Unable to get address for function \"%s\"\r\n",procName);
+   return ptr;
+}
+
+
+//
+// Import symbols
+//
+
+static void ImportSymbols(void)
+{
+   HMODULE hModule;
+
+   hModule=GetModuleHandle("USER32.DLL");
+   if (hModule!=NULL)
+   {
+      imp_GetGuiResources=(DWORD (__stdcall *)(HANDLE,DWORD))GetProcAddressAndLog(hModule,"GetGuiResources");
+   }
+   else
+   {
+      WriteLog("Unable to get handle to USER32.DLL\r\n");
+   }
+
+   hModule=GetModuleHandle("KERNEL32.DLL");
+   if (hModule!=NULL)
+   {
+      imp_GetProcessIoCounters=(BOOL (__stdcall *)(HANDLE,PIO_COUNTERS))GetProcAddressAndLog(hModule,"GetProcessIoCounters");
+   }
+   else
+   {
+      WriteLog("Unable to get handle to KERNEL32.DLL\r\n");
+   }
+}
+
 
 //
 // Initialization routine
@@ -58,6 +106,9 @@ BOOL Initialize(void)
    WSAStartup(0x0002,&sockInfo);
 
    InitLog();
+
+   // Dynamically import functions that may not be presented in all Windows versions
+   ImportSymbols();
 
    eventShutdown=CreateEvent(NULL,TRUE,FALSE,NULL);
 

@@ -1,5 +1,5 @@
 
-                     ZabbixW32 version 1.0.0-beta7
+                     ZabbixW32 version 1.0.0-beta8
 
 ******************************************************************************
 
@@ -141,41 +141,92 @@ version[zabbix_agent]
 
 II. Win32-specific parameters
 
-agent[avg_collector_time] Average time spent by collector thread on each sample
-			processing for last minute (in milliseconds)                             
-agent[max_collector_time] Maximum time spent by collector thread on sample
-			processing (in milliseconds)                             
-cpu_util		Average CPU(s) utilization (in percents) for
-                        last minute
-cpu_util5		Average CPU(s) utilization (in percents) for
-                        last 5 minutes
-cpu_util15		Average CPU(s) utilization (in percents) for
-                        last 15 minutes
-cpu_util[<instance>]	Average specific CPU utilization (in percents) for last
-                        minute, where <instance> is zero-based CPU number
-cpu_util5[<instance>]	Average specific CPU utilization (in percents) for last
-                        5 minutes, where <instance> is zero-based CPU number
-cpu_util15[<instance>]	Average specific CPU utilization (in percents) for last
-                        15 minutes, where <instance> is zero-based CPU number
-md5_hash[<file name>]	MD5 hash of specified file (returned as string)
-perf_counter[<path>]    Value of any performance counter, where <path> is the 
-			counter path (you can use Performance Monitor to obtain
-			list of available counters). Please note that this
-			parameter will return correct value only for counters
-			which requires just one sample (like "\System\Threads").
-			It will not work as expected for counters that requires
-			more than one sample - like CPU utilization.
-service_state[<srv>]	State of service <srv>. The following states can be
-         		returned:
-			   0 - Running
-			   1 - Paused
-			   2 - Start pending
-			   3 - Pause pending
-			   4 - Continue pending
-			   5 - Stop pending
-			   6 - Stopped
-			   7 - Unknown
-			 255 - SCM communication error
-			Please note that <srv> should be real service name (as
-			it seen in service properties under "Name:"), not
-			service display name! 
+agent[avg_collector_time] 
+Average time spent by collector thread on each sample processing for
+last minute (in milliseconds)                             
+
+agent[max_collector_time]
+Maximum time spent by collector thread on sample processing (in milliseconds)                             
+
+cpu_util
+Average CPU(s) utilization (in percents) for last minute
+
+cpu_util5
+Average CPU(s) utilization (in percents) for last 5 minutes
+
+cpu_util15
+Average CPU(s) utilization (in percents) for last 15 minutes
+
+cpu_util[<instance>]
+Average specific CPU utilization (in percents) for last minute, where
+<instance> is zero-based CPU number
+
+cpu_util5[<instance>]
+Average specific CPU utilization (in percents) for last 5 minutes, where
+<instance> is zero-based CPU number
+
+cpu_util15[<instance>]
+Average specific CPU utilization (in percents) for last 15 minutes, where
+<instance> is zero-based CPU number
+
+md5_hash[<file name>]
+MD5 hash of specified file (returned as string)
+
+perf_counter[<path>]
+Value of any performance counter, where <path> is the counter path (you can use
+Performance Monitor to obtain list of available counters). Please note that
+this parameter will return correct value only for counters which requires just
+one sample (like "\System\Threads"). It will not work as expected for counters
+that requires more than one sample - like CPU utilization.
+
+proc_info[<process>:<attribute>:<type>]
+Different information about specific process(es).
+    <process>   - process name (same as in proc_cnt[] parameter)
+    <attribute> - requested process attribute. The following attributes are
+                  currenty supported:
+       vmsize      - Size of process virtual memory in Kbytes
+       wkset       - Size of process working set (amount of physical memory
+                     used by process) in Kbytes
+       pf          - Number of page faults
+       ktime       - Process kernel time in milliseconds
+       utime       - Process user time in milliseconds
+       io_read_b   - Number of bytes read by process during I/O operations
+       io_read_op  - Number of read operation performed by process
+       io_write_b  - Number of bytes written by process during I/O operations
+       io_write_op - Number of write operation performed by process
+       io_other_b  - Number of bytes transferred by process during operations
+                     other than read and write operations
+       io_other_op - Number of I/O operations performed by process, other
+                     than read and write operations
+       gdiobj      - Number of GDI objects used by process
+       userobj     - Number of USER objects used by process
+    <type>      - representation type (meaningful when more than one process with the same
+                  name exists). Valid values are:
+         min - minimal value among all processes named <process>
+         max - maximal value among all processes named <process>
+         avg - average value for all processes named <process>
+         sum - sum of values for all processes named <process>
+Examples:
+1. To get amount of physical memory taken by all Internet Explorer processes.
+use the following parameter:
+   proc_info[iexplore.exe:wkset:sum]
+2. To get average number of page faults for Internet Explorer processes,
+use the following parameter:
+   proc_info[iexplore.exe:pf:avg]
+Notes:
+1. All io_xxx,gdiobj and userobj attributes available only on Windows 2000
+   and later versions of Windows, not on Windows NT 4.0.
+
+service_state[<srv>]
+State of service <srv>. The following states can be returned:
+   0 - Running
+   1 - Paused
+   2 - Start pending
+   3 - Pause pending
+   4 - Continue pending
+   5 - Stop pending
+   6 - Stopped
+   7 - Unknown
+ 255 - SCM communication error
+Please note that <srv> should be real service name (as it seen in service
+properties under "Name:"), not service display name!

@@ -39,6 +39,36 @@ static double ConvertProcessTime(FILETIME *lpft)
 
 
 //
+// Check if attribute supported or not
+//
+
+static BOOL IsAttributeSupported(int attr)
+{
+   switch(attr)
+   {
+      case 5:        // gdiobj
+      case 6:        // userobj
+         if (imp_GetGuiResources==NULL)
+            return FALSE;     // No appropriate function available, probably we are running on NT4
+         break;
+      case 7:        // io_read_b
+      case 8:        // io_read_op
+      case 9:        // io_write_b
+      case 10:       // io_write_op
+      case 11:       // io_other_b
+      case 12:       // io_other_op
+         if (imp_GetProcessIoCounters==NULL)
+            return FALSE;     // No appropriate function available, probably we are running on NT4
+         break;
+      default:
+         break;
+   }
+
+   return TRUE;
+}
+
+
+//
 // Get specific process attribute
 //
 
@@ -46,6 +76,7 @@ static double GetProcessAttribute(HANDLE hProcess,int attr,int type,int count,do
 {
    double value;  
    PROCESS_MEMORY_COUNTERS mc;
+   IO_COUNTERS ioCounters;
    FILETIME ftCreate,ftExit,ftKernel,ftUser;
 
    // Get value for current process instance
@@ -67,6 +98,34 @@ static double GetProcessAttribute(HANDLE hProcess,int attr,int type,int count,do
       case 4:        // utime
          GetProcessTimes(hProcess,&ftCreate,&ftExit,&ftKernel,&ftUser);
          value=ConvertProcessTime(attr==3 ? &ftKernel : &ftUser);
+         break;
+      case 5:        // gdiobj
+      case 6:        // userobj
+         value=(double)imp_GetGuiResources(hProcess,attr==5 ? 0 : 1);
+         break;
+      case 7:        // io_read_b
+         imp_GetProcessIoCounters(hProcess,&ioCounters);
+         value=(double)((__int64)ioCounters.ReadTransferCount);
+         break;
+      case 8:        // io_read_op
+         imp_GetProcessIoCounters(hProcess,&ioCounters);
+         value=(double)((__int64)ioCounters.ReadOperationCount);
+         break;
+      case 9:        // io_write_b
+         imp_GetProcessIoCounters(hProcess,&ioCounters);
+         value=(double)((__int64)ioCounters.WriteTransferCount);
+         break;
+      case 10:       // io_write_op
+         imp_GetProcessIoCounters(hProcess,&ioCounters);
+         value=(double)((__int64)ioCounters.WriteOperationCount);
+         break;
+      case 11:       // io_other_b
+         imp_GetProcessIoCounters(hProcess,&ioCounters);
+         value=(double)((__int64)ioCounters.OtherTransferCount);
+         break;
+      case 12:       // io_other_op
+         imp_GetProcessIoCounters(hProcess,&ioCounters);
+         value=(double)((__int64)ioCounters.OtherOperationCount);
          break;
       default:       // Unknown attribute
          WriteLog("INTERNAL ERROR: Unexpected attribute code %d in GetProcessAttribute()\r\n",attr);
@@ -108,7 +167,7 @@ static double GetProcessAttribute(HANDLE hProcess,int attr,int type,int count,do
 //         min - minimal value among all processes named <process>
 //         max - maximal value among all processes named <process>
 //         avg - average value for all processes named <process>
-//         sum - som of values for all processes named <process>
+//         sum - sum of values for all processes named <process>
 //
 
 LONG H_ProcInfo(char *cmd,char *arg,double *value)
@@ -125,6 +184,14 @@ LONG H_ProcInfo(char *cmd,char *arg,double *value)
       "pf",
       "ktime",
       "utime",
+      "gdiobj",
+      "userobj",
+      "io_read_b",
+      "io_read_op",
+      "io_write_b",
+      "io_write_op",
+      "io_other_b",
+      "io_other_op",
       NULL
    };
    static char *typeList[]={ "min","max","avg","sum" };
@@ -147,6 +214,9 @@ LONG H_ProcInfo(char *cmd,char *arg,double *value)
       if (!strcmp(attrList[attr],ptr1))
          break;
    if (attrList[attr]==NULL)
+      return SYSINFO_RC_NOTSUPPORTED;     // Unsupported attribute
+
+   if (!IsAttributeSupported(attr))
       return SYSINFO_RC_NOTSUPPORTED;     // Unsupported attribute
 
    // Get type code from string
