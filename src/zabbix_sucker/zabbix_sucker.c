@@ -785,16 +785,33 @@ int housekeeping_history(int now)
 		item.lastdelete=atoi(DBget_field(result,i,1));
 		item.history=atoi(DBget_field(result,i,2));
 
-/* To be rewritten. Only one delete depending on item.value_type */
+#ifdef HAVE_MYSQL
+		sprintf	(sql,"delete from history where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,CONFIG_HOUSEKEEPING_FREQUENCY*3600);
+#else
 		sprintf	(sql,"delete from history where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
+#endif
 		DBexecute(sql);
+#ifdef HAVE_MYSQL
+		sprintf	(sql,"delete from history_str where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,CONFIG_HOUSEKEEPING_FREQUENCY*3600);
+#else
 		sprintf	(sql,"delete from history_str where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
+#endif
 		DBexecute(sql);
 	
 		sprintf(sql,"update items set lastdelete=%d where itemid=%d",now,item.itemid);
 		DBexecute(sql);
 	}
 	DBfree_result(result);
+	return SUCCEED;
+}
+
+int housekeeping_sessions(int now)
+{
+	char	sql[MAX_STRING_LEN+1];
+
+	sprintf	(sql,"delete from sessions where lastaccess<%d",now-24*3600);
+	DBexecute(sql);
+
 	return SUCCEED;
 }
 
@@ -859,7 +876,7 @@ int main_alerter_loop()
 
 	char	sql[MAX_STRING_LEN+1];
 
-	int	i;
+	int	i,res;
 
 	DB_RESULT	*result;
 	DB_ALERT	alert;
@@ -899,7 +916,11 @@ int main_alerter_loop()
 
 			if(strcmp(alert.type,ALERT_TYPE_EMAIL)==0)
 			{
-				if(FAIL == send_mail(smtp_server,smtp_helo,smtp_email,alert.sendto,alert.subject,alert.message))
+				/* Hardcoded value */
+				alarm(10);
+				res = send_email(smtp_server,smtp_helo,smtp_email,alert.sendto,alert.subject,alert.message);
+				alarm(0);
+				if(FAIL == res)
 				{
 					zabbix_log( LOG_LEVEL_ERR, "Error sending email to '%s' Subject:'%s'", alert.sendto, alert.subject);
 					sprintf(sql,"update alerts set retries=retries+1 where alertid=%d", alert.alertid);
@@ -958,20 +979,23 @@ int main_housekeeping_loop()
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("housekeeper [removing old values]");
 #endif
-
 		housekeeping_history(now);
 
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("housekeeper [removing old alarms]");
 #endif
-
 		housekeeping_alarms(now);
 
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("housekeeper [removing old alerts]");
 #endif
-
 		housekeeping_alerts(now);
+
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("housekeeper [removing old sessions]");
+#endif
+		housekeeping_sessions(now);
+
 		zabbix_log( LOG_LEVEL_DEBUG, "Sleeping for %d hours", CONFIG_HOUSEKEEPING_FREQUENCY);
 
 #ifdef HAVE_FUNCTION_SETPROCTITLE

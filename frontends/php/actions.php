@@ -44,7 +44,7 @@
 	$sql="select a.actionid,a.triggerid,u.alias,a.good,a.delay,a.subject,a.message from actions a,users u where a.userid=u.userid and a.triggerid=$triggerid order by u.alias, a.good desc";
 	$result=DBselect($sql);
 
-	echo "<CENTER>";
+	echo "<div align=center>";
 	echo "<TABLE BORDER=0 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR>";
 	echo "<TD><b>Send message to</b></TD>";
@@ -89,7 +89,8 @@
 ?>
 </font>
 </tr>
-</table></center>
+</table>
+</div>
 
 <?
 

@@ -16,9 +16,6 @@
         }
 ?>
 
-<?
-	show_table_header("MEDIA");
-?>
 
 <?
 	if(isset($register))
@@ -47,14 +44,16 @@
 	}
 ?>
 
+<?
+	show_table_header("MEDIA");
+?>
 
 <FONT COLOR="#000000">
 <?
 	$sql="select mediaid,type,sendto,active from media where userid=$userid order by type,sendto";
 	$result=DBselect($sql);
 
-	echo "<CENTER>";
-	echo "<TABLE BORDER=0 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TABLE BORDER=0 WIDTH=100% align=center BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR>";
 	echo "<TD><B>Type</B></TD>";
 	echo "<TD><B>Send to</B></TD>";
@@ -106,9 +105,8 @@
 ?>
 </FONT>
 </TR>
-</TABLE></CENTER>
+</TABLE>
 
-<CENTER>
 <?
 	echo "<br>";
 	show_table2_header_begin();

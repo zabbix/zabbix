@@ -68,16 +68,15 @@
 ?>
 
 <?
-	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR><TD WIDTH=\"3%\"><B>Id</B></TD>";
-	echo "<TD WIDTH=\"10%\"><B>Alias</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Name</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Surname</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Actions</B></TD>";
+	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TR><TD WIDTH=3%><B>Id</B></TD>";
+	echo "<TD WIDTH=10%><B>Alias</B></TD>";
+	echo "<TD WIDTH=10%><B>Name</B></TD>";
+	echo "<TD WIDTH=10%><B>Surname</B></TD>";
+	echo "<TD WIDTH=10%><B>Actions</B></TD>";
 	echo "</TR>";
 
 	$result=DBselect("select u.userid,u.alias,u.name,u.surname from users u order by u.alias");
-	echo "<CENTER>";
 	$col=0;
 	while($row=DBfetch($result))
 	{
@@ -92,13 +91,21 @@
 		echo "<TD>".$row["alias"]."</TD>";
 		echo "<TD>".$row["name"]."</TD>";
 		echo "<TD>".$row["surname"]."</TD>";
+		echo "<TD>";
         	if(check_right("User","U",$row["userid"]))
 		{
-			echo "<TD><A HREF=\"users.php?register=change&userid=".$row["userid"]."\">Change</A> - <A HREF=\"media.php?userid=".$row["userid"]."\">Media</A>";
+			if(get_media_count_by_userid($row["userid"])>0)
+			{
+				echo "<A HREF=\"users.php?register=change&userid=".$row["userid"]."#form\">Change</A> - <A HREF=\"media.php?userid=".$row["userid"]."\"><b>M</b>edia</A>";
+			}
+			else
+			{
+				echo "<A HREF=\"users.php?register=change&userid=".$row["userid"]."#form\">Change</A> - <A HREF=\"media.php?userid=".$row["userid"]."\">Media</A>";
+			}
 		}
 		else
 		{
-			echo "<TD>Change - Media";
+			echo "Change - Media";
 		}
 		echo "</TD>";
 		echo "</TR>";
@@ -109,17 +116,16 @@
 <?
 	if(isset($userid))
 	{
-
 	echo "<br>";
+	echo "<a name=\"form\"></a>";
 	show_table_header("USER PERMISSIONS");
-	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR><TD WIDTH=\"10%\"><B>Permission</B></TD>";
-	echo "<TD WIDTH=\"10%\"><B>Right</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Resource name</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Actions</B></TD>";
+	echo "<TABLE BORDER=0 align=center COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TR><TD WIDTH=10%><B>Permission</B></TD>";
+	echo "<TD WIDTH=10%><B>Right</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Resource name</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 	$result=DBselect("select rightid,name,permission,id from rights where userid=$userid order by name,permission,id");
-	echo "<CENTER>";
 	$col=0;
 	while($row=DBfetch($result))
 	{

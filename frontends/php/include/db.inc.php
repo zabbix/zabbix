@@ -28,7 +28,7 @@
 	{
 		global $DB,$DB_TYPE;
 
-//		echo $query,"<br>";
+#		echo $query,"<br>";
 
 		if($DB_TYPE == "MYSQL")
 		{
@@ -46,7 +46,7 @@
 	{
 		global $DB,$DB_TYPE;
 
-//		echo $query,"<br>";
+#		echo $query,"<br>";
 
 		if($DB_TYPE == "MYSQL")
 		{

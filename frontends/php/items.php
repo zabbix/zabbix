@@ -77,7 +77,6 @@
 	if(isset($hostid)&&!isset($itemid)) 
 	{
 		$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.lastdelete,i.nextcheck,h.hostid from hosts h,items i where h.hostid=i.hostid and h.hostid=$hostid order by h.host,i.key_,i.description");
-		echo "<CENTER>";
 		$col=0;
 		while($row=DBfetch($result))
 		{
@@ -93,17 +92,17 @@
 				}
 				echo "<br>";
 				show_table_header("<A HREF='items.php?hostid=".$row["hostid"]."'>".$row["host"]."</A>");
-				echo "<TABLE BORDER=0 COLS=13  WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+				echo "<TABLE BORDER=0 COLS=13  align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 				echo "<TR>";
-				echo "<TD WIDTH=\"3%\" NOSAVE><B>Id</B></TD>";
-				echo "<TD WIDTH=\"10%\" NOSAVE><B>Host</B></TD>";
-				echo "<TD WIDTH=\"10%\" NOSAVE><B>Key</B></TD>";
-				echo "<TD WIDTH=\"10%\" NOSAVE><B>Description</B></TD>";
-				echo "<TD WIDTH=\"5%\"  NOSAVE><B>Delay</B></TD>";
-				echo "<TD WIDTH=\"5%\"  NOSAVE><B>History</B></TD>";
+				echo "<TD WIDTH=3% NOSAVE><B>Id</B></TD>";
+				echo "<TD WIDTH=10% NOSAVE><B>Host</B></TD>";
+				echo "<TD WIDTH=10% NOSAVE><B>Key</B></TD>";
+				echo "<TD WIDTH=10% NOSAVE><B>Description</B></TD>";
+				echo "<TD WIDTH=5%  NOSAVE><B>Delay</B></TD>";
+				echo "<TD WIDTH=5%  NOSAVE><B>History</B></TD>";
 				echo "<TD><B>Shortname</B></TD>";
-				echo "<TD WIDTH=\"5%\" NOSAVE><B>Status</B></TD>";
-				echo "<TD WIDTH=\"5%\" NOSAVE><B>Actions</B></TD>";
+				echo "<TD WIDTH=5% NOSAVE><B>Status</B></TD>";
+				echo "<TD WIDTH=5% NOSAVE><B>Actions</B></TD>";
 				echo "</TR>";
 			}
 			$lasthost=$row["host"];

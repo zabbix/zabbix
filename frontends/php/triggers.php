@@ -127,12 +127,12 @@
 				}
 				echo "<br>";
 				show_table_header("<A HREF='triggers.php?hostid=".$row["hostid"]."'>".$row["host"]."</A>");
-				echo "<TABLE BORDER=0 COLS=3 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+				echo "<TABLE BORDER=0 COLS=3 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 				echo "<TR>";
 				echo "<TD><B>Description</B></TD>";
 				echo "<TD><B>Expression</B></TD>";
-				echo "<TD WIDTH=\"5%\"><B>Status</B></TD>";
-				echo "<TD WIDTH=\"15%\" NOSAVE><B>Actions</B></TD>";
+				echo "<TD WIDTH=5%><B>Status</B></TD>";
+				echo "<TD WIDTH=15% NOSAVE><B>Actions</B></TD>";
 				echo "</TR>\n";
 			}
 			$lasthost=$row["host"];

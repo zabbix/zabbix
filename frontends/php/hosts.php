@@ -47,17 +47,16 @@
 ?>
 
 <?
-	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR>";
-	echo "<TD WIDTH=\"3%\" NOSAVE><B>Id</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Host</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Port</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Status</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Actions</B></TD>";
+	echo "<TD WIDTH=3% NOSAVE><B>Id</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Host</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Port</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Status</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
 	$result=DBselect("select h.hostid,h.host,h.port,h.status from hosts h order by h.host");
-	echo "<CENTER>";
 	$col=0;
 	while($row=DBfetch($result))
 //	for($i=0;$i<DBnum_rows($result);$i++)
