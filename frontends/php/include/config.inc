@@ -446,6 +446,22 @@
 ?>
 			</font>
 		</td>
+		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
+			<font face="Arial,Helvetica" size=2>
+				<a href="graphs.html">
+<?
+				if(	($page["file"]=="graphs.html")||
+					($page["file"]=="<change>.html"))
+				{
+					echo "<b>[GRAPHS]</b></a>";
+				}
+				else
+				{
+					echo "GRAPHS</a>";
+				}
+?>
+			</font>
+		</td>
 		</tr>
 		</table>
 	</td>
@@ -675,6 +691,14 @@
 		$result=DBexecute($sql);
 	}
 
+	# Delete Graph
+
+	function	delete_graph($graphid)
+	{
+		$sql="delete from graphs where graphid=$graphid";
+		$result=DBexecute($sql);
+	}
+
 	# Delete System Map
 
 	function	delete_sysmap( $sysmapid )
@@ -875,11 +899,27 @@
 		}
 	}
 
+	# Update Graph
+
+	function	update_graph($graphid,$name,$width,$height)
+	{
+		$sql="update graphs set name='$name',width=$width,height=$height where graphid=$graphid";
+		$result=DBexecute($sql);
+	}
+
 	# Update System Map
 
 	function	update_sysmap($sysmapid,$name,$width,$height)
 	{
 		$sql="update sysmaps set name='$name',width=$width,height=$height where sysmapid=$sysmapid";
+		$result=DBexecute($sql);
+	}
+
+	# Add Graph
+
+	function	add_graph($name,$width,$height)
+	{
+		$sql="insert into graphs (name,width,height) values ('$name',$width,$height)";
 		$result=DBexecute($sql);
 	}
 
