@@ -1,5 +1,6 @@
 1.0beta11:
 
+ - check user permissions (how to make only one host accessible?)
  - optimise update_trigger_status_after_restart()
  - special item. (last-prev)/time 
  - mess with user groups when running under root
