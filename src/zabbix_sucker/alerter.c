@@ -51,13 +51,20 @@
 
 #include "alerter.h"
 
+void	signal_handler2( int sig )
+{
+	zabbix_log( LOG_LEVEL_DEBUG, "Got signal [%d]", sig);
+}
+
 int send_alert(DB_ALERT	*alert,DB_MEDIATYPE *mediatype)
 {
 	int res=FAIL;
 	struct	sigaction phan;
 	int	pid;
 
-	zabbix_log( LOG_LEVEL_ERR, "In send_alert()");
+	char	full_path[MAX_STRING_LEN+1];
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In send_alert()");
 
 	if(mediatype->type==ALERT_TYPE_EMAIL)
 	{
@@ -66,14 +73,15 @@ int send_alert(DB_ALERT	*alert,DB_MEDIATYPE *mediatype)
 	else if(mediatype->type==ALERT_TYPE_EXEC)
 	{
 /*		if(-1 == execl(CONFIG_ALERT_SCRIPTS_PATH,mediatype->exec_path,alert->sendto,alert->subject,alert->message))*/
-		zabbix_log( LOG_LEVEL_ERR, "Before execl([%s],[%s])",CONFIG_ALERT_SCRIPTS_PATH,mediatype->exec_path);
+		zabbix_log( LOG_LEVEL_DEBUG, "Before execl([%s],[%s])",CONFIG_ALERT_SCRIPTS_PATH,mediatype->exec_path);
 
-/*		phan.sa_handler = &signal_handler;*/
-		signal( SIGCHLD, SIG_IGN );
+		phan.sa_handler = &signal_handler2;
+		phan.sa_handler = SIG_IGN;
+/*		signal( SIGCHLD, SIG_IGN );*/
 
-/*		sigemptyset(&phan.sa_mask);
+		sigemptyset(&phan.sa_mask);
 		phan.sa_flags = 0;
-		sigaction(SIGCHLD, &phan, NULL);*/
+		sigaction(SIGCHLD, &phan, NULL);
 
 /*		if(-1 == execl("/home/zabbix/bin/lmt.sh","lmt.sh",alert->sendto,alert->subject,alert->message,(char *)0))*/
 
@@ -84,23 +92,31 @@ int send_alert(DB_ALERT	*alert,DB_MEDIATYPE *mediatype)
 		}
 		else
 		{
-			if(-1 == execl("/bin/sh","-c","/home/zabbix/bin/lmt.sh",alert->sendto,alert->subject,alert->message,(char *)0))
+			strncpy(full_path,CONFIG_ALERT_SCRIPTS_PATH,MAX_STRING_LEN);
+			strncat(full_path,"/",MAX_STRING_LEN);
+			strncat(full_path,mediatype->exec_path,MAX_STRING_LEN);
+			zabbix_log( LOG_LEVEL_DEBUG, "Before executing [%s] [%m]", full_path);
+			if(-1 == execl("/bin/sh","-c",full_path,alert->sendto,alert->subject,alert->message,(char *)0))
 			{
-				zabbix_log( LOG_LEVEL_ERR, "Error executing [%s] in [%s] [%m]", mediatype->exec_path,CONFIG_ALERT_SCRIPTS_PATH);
+				zabbix_log( LOG_LEVEL_ERR, "Error executing [%s] [%m]", full_path);
 				res = FAIL;
 			}
 			else
 			{
 				res = SUCCEED;
 			}
+			zabbix_log( LOG_LEVEL_DEBUG, "After execl()");
 			exit(0);
 		}
+		res = SUCCEED;
 	}
 	else
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Unsupported media type [%d] for alert ID [%d]", mediatype->type,alert->alertid);
 		res=FAIL;
 	}
+
+	zabbix_log( LOG_LEVEL_DEBUG, "End of send_alert()");
 
 	return res;
 }
