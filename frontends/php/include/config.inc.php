@@ -3912,4 +3912,63 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 	}
 
+
+        function        add_screen($name,$cols,$rows)
+        {
+                global  $ERROR_MSG;
+
+                if(!check_right("Screen","A",0))
+                {
+                        $ERROR_MSG="Insufficient permissions";
+                        return 0;
+                }
+
+                $sql="insert into screens (name,cols,rows) values ('$name',$cols,$rows)";
+                return  DBexecute($sql);
+        }
+
+        function        update_screen($scid,$name,$cols,$rows)
+        {
+                global  $ERROR_MSG;
+
+                if(!check_right("Screen","U",0))
+                {
+                        $ERROR_MSG="Insufficient permissions";
+                        return 0;
+                }
+
+                $sql="update screens set name='$name',cols=$cols,rows=$rows where scid=$scid";
+                return  DBexecute($sql);
+        }
+
+        function        delete_screen($scid)
+        {
+                $sql="delete from screens_items where scid=$scid";
+                $result=DBexecute($sql);
+                if(!$result)
+                {
+                        return  $result;
+                }
+                $sql="delete from screens where scid=$scid";
+                return  DBexecute($sql);
+        }
+
+        function add_screen_item($scid,$x,$y,$graphid,$width,$height)
+        {
+                $sql="insert into screens_items (scid,x,y,graphid,width,height) values ($scid,$x,$y,$graphid,$width,$height)";
+                return  DBexecute($sql);
+        }
+
+        function update_screen_item($scitemid,$graphid,$width,$height)
+        {
+                $sql="update screens_items set graphid=$graphid,width=$width,height=$height where scitemid=$scitemid";
+                return  DBexecute($sql);
+        }
+
+
+        function delete_screen_item($scitemid)
+        {
+                $sql="delete from screens_items where scitemid=$scitemid";
+                return  DBexecute($sql);
+        }
 ?>
