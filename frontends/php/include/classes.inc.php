@@ -151,10 +151,9 @@
 
 		function setSTime($stime)
 		{
-			if($stime>20000000 && $stime<22000000)
+			if($stime>200000000000 && $stime<220000000000)
 			{
-				$this->stime=mktime(9,0,0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
-				$this->period=9*3600;
+				$this->stime=mktime(substr($stime,8,2),substr($stime,10,2),0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
 			}
 		}
 
