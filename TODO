@@ -34,6 +34,7 @@ TKOM:
 
 OTHER:
 
+ - check all screens if they are user friendly and present information in the best possible way
  - possibility (a button) to recheck unsupported parameters
  - increase number of network interfaces in zabbix agent
  - add advanced task scheduler/executor to ZABBIX
