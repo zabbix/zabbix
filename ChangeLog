@@ -1,5 +1,6 @@
 Changes for 1.0beta10:
 
+ - dynamic form config.php (Alexei)
  - fixes in services.php (Alexei)
  - fixes in screenedit.php (Alexei)
  - UserParameter does not become UNSUPPORTED anymore (Alexei)
