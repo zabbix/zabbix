@@ -1,5 +1,13 @@
 Changes for 1.0beta3:
 
+ - partial support for automake (Alexei)
+ - parent process will terminate childs if one of the childs died
+ (Alexei)
+ - support for PidFile for zabbix_agentd,zabbix_suckerd and
+ zabbix_trapperd (Alexei)
+ - Zabbix processes will show statuses for ps (FreeBSD,...) (Alexei)
+ - changes in AUTHORS (Alexei)
+
  - added support for IP addresses for SNMP-enabled hosts (Alexei) 
  - commented #define TEST_PARAMETERS in zabbix_agent.c (Alexei)
  - proc_cnt[apache] was changed to proc_cnt[httpd] (Alexei)

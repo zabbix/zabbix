@@ -37,11 +37,37 @@
 
 #define	LISTENQ 1024
 
-static	pid_t	*pids;
+static	pid_t	*pids=NULL;
+int	parent=0;
+/* Number of processed requests */
+int	stats_request=0;
 
 char	*CONFIG_HOST_ALLOWED=NULL;
+char	*CONFIG_PID_FILE=NULL;
 int	CONFIG_AGENTD_FORKS=AGENTD_FORKS;
 int	CONFIG_LISTEN_PORT=10000;
+
+void	uninit(void)
+{
+	int i;
+
+	if(parent == 1)
+	{
+		if(pids != NULL)
+		{
+			for(i = 0; i<CONFIG_AGENTD_FORKS; i++)
+			{
+				kill(pids[i],SIGTERM);
+			}
+		}
+
+		if( unlink(CONFIG_PID_FILE) != 0)
+		{
+			syslog( LOG_WARNING, "Cannot remove PID file [%s]",
+				CONFIG_PID_FILE);
+		}
+	}
+}
 
 void	signal_handler( int sig )
 {
@@ -50,11 +76,21 @@ void	signal_handler( int sig )
 		signal( SIGALRM, signal_handler );
 		syslog( LOG_WARNING, "Timeout while answering request");
 	}
- 
-	if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
+	else if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
 	{
 		syslog( LOG_WARNING, "Got signal. Exiting ...");
+		uninit();
 		exit( FAIL );
+	}
+	else if( SIGCHLD == sig )
+	{
+		syslog( LOG_WARNING, "One child process died. Exiting ...");
+		uninit();
+		exit( FAIL );
+	}
+	else
+	{
+		syslog( LOG_WARNING, "Got signal [%d]. Ignoring ...", sig);
 	}
 }
 
@@ -123,6 +159,34 @@ Is not supported on HP-UX
 
 }
 
+void	create_pid_file(void)
+{
+	FILE	*f;
+
+/* Check if PID file already exists */
+	f = fopen(CONFIG_PID_FILE, "r");
+	if(f != NULL)
+	{
+		syslog( LOG_CRIT, "File [%s] exists. Is zabbix_agentd already running ?",
+			CONFIG_PID_FILE);
+		fclose(f);
+		exit(-1);
+	}
+
+	f = fopen(CONFIG_PID_FILE, "w");
+
+	if( f == NULL)
+	{
+		syslog( LOG_CRIT, "Cannot create PID file [%s]. Errno [%d]",
+			CONFIG_PID_FILE, errno);
+		uninit();
+		exit(-1);
+	}
+
+	fprintf(f,"%d",getpid());
+	fclose(f);
+}
+
 void	process_config_file(void)
 {
 	FILE	*file;
@@ -168,6 +232,10 @@ void	process_config_file(void)
 		if(strcmp(parameter,"Server")==0)
 		{
 			CONFIG_HOST_ALLOWED=strdup(value);
+		}
+		else if(strcmp(parameter,"PidFile")==0)
+		{
+			CONFIG_PID_FILE=strdup(value);
 		}
 		else if(strcmp(parameter,"StartAgents")==0)
 		{
@@ -233,6 +301,11 @@ void	process_config_file(void)
 			exit(1);
 		}
 
+	}
+
+	if(CONFIG_PID_FILE == NULL)
+	{
+		CONFIG_PID_FILE=strdup("/tmp/zabbix_agentd.pid");
 	}
 	fclose(file);
 }
@@ -350,7 +423,13 @@ void	child_main(int i,int listenfd, int addrlen)
 	for(;;)
 	{
 		clilen = addrlen;
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("waiting for connection. Requests [%d]", stats_request++);
+#endif
 		connfd=accept(listenfd,cliaddr, &clilen);
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("processing request");
+#endif
 		if( check_security(connfd) == SUCCEED)
 		{
 			process_child(connfd);
@@ -393,8 +472,11 @@ int	main()
 	sigaction(SIGINT, &phan, NULL);
 	sigaction(SIGQUIT, &phan, NULL);
 	sigaction(SIGTERM, &phan, NULL);
+	sigaction(SIGCHLD, &phan, NULL);
 
 	process_config_file();
+
+	create_pid_file();
 
 	syslog( LOG_WARNING, "zabbix_agentd started");
 
@@ -414,6 +496,11 @@ int	main()
 /*		syslog( LOG_WARNING, "zabbix_agentd #%d started", pids[i]);*/
 	}
 
+	parent=1;
+
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+	setproctitle("main process");
+#endif
 	for(;;)
 	{
 			pause();
