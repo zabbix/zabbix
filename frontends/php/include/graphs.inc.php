@@ -45,7 +45,8 @@
 	function	add_item_to_graph($graphid,$itemid,$color,$drawtype,$sortorder)
 	{
 		$sql="insert into graphs_items (graphid,itemid,color,drawtype,sortorder) values ($graphid,$itemid,'$color',$drawtype,$sortorder)";
-		return	DBexecute($sql);
+		$result=DBexecute($sql);
+		return DBinsert_id($result,"graphs_items","gitemid");
 	}
 
 	# Update Graph
@@ -116,5 +117,42 @@
 			$ERROR_MSG="No graph with graphid=[$graphid]";
 		}
 		return	$result;
+	}
+
+	function		add_graph_item_to_templates($gitemid)
+	{
+		if($gitemid<=0)
+		{
+			return;
+		}
+
+		$graph_item=get_graphitem_by_gitemid($gitemid);
+		$graph=get_graph_by_graphid($graph_item["graphid"]);
+		$item=get_item_by_itemid($graph_item["itemid"]);
+
+		$sql="select hostid,templateid,actions from hosts_templates where templateid=".$item["hostid"];
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			if($row["actions"]&1 == 0)	continue;
+
+			$sql="select i.itemid from items i where i.key_='".$item["key_"]."' and i.hostid=".$row["hostid"];
+			$result2=DBselect($sql);
+			if(DBnum_rows($result2)==0)	continue;
+			$row2=DBfetch($result2);
+			$itemid=$row2["itemid"];
+
+			$sql="select distinct g.graphid from graphs g,graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and g.graphid=gi.graphid and g.name='".addslashes($graph["name"])."'";
+			$result2=DBselect($sql);
+			while($row2=DBfetch($result2))
+			{
+				add_item_to_graph($row2["graphid"],$itemid,$graph_item["color"],$graph_item["drawtype"],$graph_item["sortorder"]);
+			}
+			if(DBnum_rows($result2)==0)
+			{
+				$graphid=add_graph($graph["name"],$graph["width"],$graph["height"],$graph["yaxistype"],$graph["yaxismin"],$graph["yaxismax"]);
+				add_item_to_graph($graphid,$itemid,$graph_item["color"],$graph_item["drawtype"],$graph_item["sortorder"]);
+			}
+		}
 	}
 ?>

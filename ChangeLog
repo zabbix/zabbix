@@ -1,5 +1,6 @@
 Changes for 1.1alpha8:
 
+ - hard-linked templates works when adding graph element (Alexei)
  - support of memory[free] under OS/X (Alexei)
  - support of memory[total] under OS/X (Alexei)
  - fixed compilation of agent under OS/X (Alexei)
