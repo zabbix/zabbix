@@ -51,7 +51,8 @@
 		if($scope==2)
 		{
 			$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message,scope,severity,recipient) values (0,$id,$good,$delay,0,'*Automatically generated*','*Automatically generated*',$scope,$severity,$recipient)";
-			return	DBexecute($sql);
+			$result=DBexecute($sql);
+			return DBinsert_id($result,"actions","actionid");
 		}
 		elseif($scope==1)
 		{
@@ -69,7 +70,8 @@
 		else
 		{
 			$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message,scope,severity,recipient) values ($triggerid,$id,$good,$delay,0,'$subject','$message',$scope,$severity,$recipient)";
-			return	DBexecute($sql);
+			$result=DBexecute($sql);
+			return DBinsert_id($result,"actions","actionid");
 		}
 	}
 
@@ -97,5 +99,43 @@
 		$result=DBexecute($sql);
 
 		return delete_alert_by_actionid($actionid);
+	}
+
+	# Add action to hardlinked hosts
+
+	function	add_action_to_templates($actionid)
+	{
+		if($actionid<=0)
+		{
+			return;
+		}
+
+		$action=get_action_by_actionid($actionid);
+		$trigger=get_trigger_by_triggerid($action["triggerid"]);
+
+		$sql="select distinct h.hostid from hosts h,functions f, items i where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid=".$action["triggerid"];
+		$result=DBselect($sql);
+		if(DBnum_rows($result)!=1)
+		{
+			return;
+		}
+
+		$row=DBfetch($result);
+
+		$hostid=$row["hostid"];
+
+		$sql="select hostid,templateid,actions from hosts_templates where templateid=$hostid";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			if($row["actions"]&1 == 0)	continue;
+
+			$sql="select distinct f.triggerid from functions f,items i,triggers t where t.description='".addslashes($trigger["description"])."' and t.triggerid=f.triggerid and i.itemid=f.itemid and i.hostid=".$row["hostid"];
+			$result2=DBselect($sql);
+			while($row2=DBfetch($result2))
+			{
+				add_action($row2["triggerid"], $action["userid"], $action["good"], $action["delay"], $action["subject"], $action["message"], $action["scope"], $action["severity"], $action["recipient"], $action["userid"]);
+			}
+		}
 	}
 ?>

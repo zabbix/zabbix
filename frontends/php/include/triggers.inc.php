@@ -423,7 +423,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		$hostid=$row["hostid"];
 
-		$sql="select hostid,templateid,items from hosts_templates where templateid=$hostid";
+		$sql="select hostid,templateid,triggers from hosts_templates where templateid=$hostid";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
