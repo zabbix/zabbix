@@ -330,7 +330,7 @@ int	DBget_prev_trigger_value(int triggerid)
 
 	DB_RESULT	*result;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_prev_trigger_value()");
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_prev_trigger_value[%d]", triggerid);
 
 	snprintf(sql,sizeof(sql)-1,"select max(clock) from alarms where triggerid=%d",triggerid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
@@ -362,7 +362,7 @@ int	DBget_prev_trigger_value(int triggerid)
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
-	if(DBnum_rows(result) == SUCCEED)
+	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Result of [%s] is empty", sql );
 		DBfree_result(result);
@@ -510,7 +510,7 @@ int	DBupdate_trigger_value(int triggerid,int value,int clock)
 {
 	char	sql[MAX_STRING_LEN];
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value()");
+	zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value[%d,%d,%d]", triggerid, value, clock);
 	add_alarm(triggerid,value,clock);
 
 	snprintf(sql,sizeof(sql)-1,"update triggers set value=%d,lastchange=%d where triggerid=%d",value,clock,triggerid);
