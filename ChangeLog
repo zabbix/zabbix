@@ -1,6 +1,7 @@
 Not ready yet:
 
 [ Common parser (cfg.c) ]
+[ Support for system[uname] ]
 
 [ Update task status on SF ]
 
@@ -12,13 +13,14 @@ Not ready yet:
 [ Add support for new trigger statuses: MODIFIED/NOTSUPORTED ]
 [ All parameters should contain section "How can be used" in the Manual ]
 [ PHP to support non-numeric values ]
-[ Support for system[proccount] on FreeBSD ]
-[ Agent to support several hosts in parameter Server ]
 
 Changes for 1.0beta3:
 
+ - parameter Server can consist of list of Zabbix servers (Alexei)
+ - SO_LINGER is default socket option for zabbix_sender (Alexei)
+ - added support of NoTimeWait for zabbix_trapperd (Alexei)
+ - fixed schema for PostgreSQL, column disable_until (Alexei)
  - added directory upgrades/dbpatches/1.0beta2_to_1.0beta3 (Alexei)
-
  - correct handling of timeout situations for zabbix_agentd (Alexei)
  - added support for non-syslog logging (Alexei)
  - added parameter LogFile for zabbix_trapper (Alexei)

@@ -131,6 +131,7 @@ COMMAND	commands[AGENT_MAX_USER_COMMANDS]=
 #ifdef HAVE_PROC_LOADAVG
 	{"system[procrunning]"		,EXECUTE, "cat /proc/loadavg|cut -f1 -d'/'|cut -f4 -d' '"},
 #endif
+	{"system[uname]"		,EXECUTE, "uname -a"},
 	{"system[uptime]"		,UPTIME, 0},
 	{"system[users]"		,EXECUTE, "who|wc -l"},
 

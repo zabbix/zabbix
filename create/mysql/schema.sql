@@ -1,6 +1,6 @@
-#
-# Table structure for table 'services'
-#
+--
+-- Table structure for table 'services'
+--
 
 CREATE TABLE services (
   serviceid		int(4)		NOT NULL auto_increment,
@@ -10,9 +10,9 @@ CREATE TABLE services (
   PRIMARY KEY (serviceid)
 );
 
-#
-# Table structure for table 'services_links'
-#
+--
+-- Table structure for table 'services_links'
+--
 
 CREATE TABLE services_links (
   serviceupid		int(4)		DEFAULT '0' NOT NULL,
@@ -23,9 +23,9 @@ CREATE TABLE services_links (
   UNIQUE (serviceupid,servicedownid)
 );
 
-#
-# Table structure for table 'graphs_items'
-#
+--
+-- Table structure for table 'graphs_items'
+--
 
 CREATE TABLE graphs_items (
   gitemid		int(4)		NOT NULL auto_increment,
@@ -35,9 +35,9 @@ CREATE TABLE graphs_items (
   PRIMARY KEY (gitemid)
 );
 
-#
-# Table structure for table 'graphs'
-#
+--
+-- Table structure for table 'graphs'
+--
 
 CREATE TABLE graphs (
   graphid		int(4)		NOT NULL auto_increment,
@@ -48,9 +48,9 @@ CREATE TABLE graphs (
   UNIQUE (name)
 );
 
-#
-# Table structure for table 'sysmaps_links'
-#
+--
+-- Table structure for table 'sysmaps_links'
+--
 
 CREATE TABLE sysmaps_links (
   linkid		int(4)		NOT NULL auto_increment,
@@ -60,9 +60,9 @@ CREATE TABLE sysmaps_links (
   PRIMARY KEY (linkid)
 );
 
-#
-# Table structure for table 'sysmaps_hosts'
-#
+--
+-- Table structure for table 'sysmaps_hosts'
+--
 
 CREATE TABLE sysmaps_hosts (
   shostid		int(4)		NOT NULL auto_increment,
@@ -75,11 +75,9 @@ CREATE TABLE sysmaps_hosts (
   PRIMARY KEY (shostid)
 );
 
-# Foreign keys
-
-#
-# Table structure for table 'sysmaps'
-#
+--
+-- Table structure for table 'sysmaps'
+--
 
 CREATE TABLE sysmaps (
   sysmapid		int(4)		NOT NULL auto_increment,
@@ -90,9 +88,9 @@ CREATE TABLE sysmaps (
   UNIQUE (name)
 );
 
-#
-# Table structure for table 'config'
-#
+--
+-- Table structure for table 'config'
+--
 
 CREATE TABLE config (
   smtp_server		varchar(255)	DEFAULT '' NOT NULL,
@@ -103,9 +101,9 @@ CREATE TABLE config (
   alarm_history		int(4)		DEFAULT '0' NOT NULL
 );
 
-#
-# Table structure for table 'groups'
-#
+--
+-- Table structure for table 'groups'
+--
 
 CREATE TABLE groups (
   groupid		int(4)		NOT NULL auto_increment,
@@ -114,9 +112,9 @@ CREATE TABLE groups (
   UNIQUE (name)
 );
 
-#
-# Table structure for table 'alerts'
-#
+--
+-- Table structure for table 'alerts'
+--
 
 CREATE TABLE alerts (
   alertid		int(4)		NOT NULL auto_increment,
@@ -131,9 +129,9 @@ CREATE TABLE alerts (
   KEY clock (clock)
 );
 
-#
-# Table structure for table 'actions'
-#
+--
+-- Table structure for table 'actions'
+--
 
 CREATE TABLE actions (
   actionid		int(4)		NOT NULL auto_increment,
@@ -148,9 +146,9 @@ CREATE TABLE actions (
   KEY (triggerid)
 );
 
-#
-# Table structure for table 'alarms'
-#
+--
+-- Table structure for table 'alarms'
+--
 
 CREATE TABLE alarms (
   alarmid		int(4)		NOT NULL auto_increment,
@@ -162,9 +160,9 @@ CREATE TABLE alarms (
   KEY (clock)
 );
 
-#
-# Table structure for table 'functions'
-#
+--
+-- Table structure for table 'functions'
+--
 
 CREATE TABLE functions (
   functionid int(4) NOT NULL auto_increment,
@@ -178,9 +176,9 @@ CREATE TABLE functions (
   KEY itemidfunctionparameter (itemid,function,parameter)
 );
 
-#
-# Table structure for table 'history'
-#
+--
+-- Table structure for table 'history'
+--
 
 CREATE TABLE history (
   itemid int(4) DEFAULT '0' NOT NULL,
@@ -189,9 +187,9 @@ CREATE TABLE history (
   PRIMARY KEY (itemid,clock)
 );
 
-#
-# Table structure for table 'history_str'
-#
+--
+-- Table structure for table 'history_str'
+--
 
 CREATE TABLE history_str (
   itemid int(4) DEFAULT '0' NOT NULL,
@@ -200,9 +198,9 @@ CREATE TABLE history_str (
   PRIMARY KEY (itemid,clock)
 );
 
-#
-# Table structure for table 'hosts'
-#
+--
+-- Table structure for table 'hosts'
+--
 
 CREATE TABLE hosts (
   hostid int(4) NOT NULL auto_increment,
@@ -211,15 +209,15 @@ CREATE TABLE hosts (
   ip   varchar(15) DEFAULT '127.0.0.1' NOT NULL,
   port int(4) DEFAULT '0' NOT NULL,
   status int(4) DEFAULT '0' NOT NULL,
-# If status=UNREACHABLE, host will not be checked until  
+-- If status=UNREACHABLE, host will not be checked until  
   disable_until int(4) DEFAULT '0' NOT NULL,
   PRIMARY KEY (hostid),
   KEY (status)
 );
 
-#
-# Table structure for table 'items_template'
-#
+--
+-- Table structure for table 'items_template'
+--
 
 CREATE TABLE items_template (
   itemtemplateid int(4) NOT NULL,
@@ -230,9 +228,9 @@ CREATE TABLE items_template (
   UNIQUE (key_)
 );
 
-#
-# Table structure for table 'triggers_template'
-#
+--
+-- Table structure for table 'triggers_template'
+--
 
 CREATE TABLE triggers_template (
   triggertemplateid int(4) NOT NULL,
@@ -243,9 +241,9 @@ CREATE TABLE triggers_template (
   KEY (itemtemplateid)
 );
 
-#
-# Table structure for table 'items'
-#
+--
+-- Table structure for table 'items'
+--
 
 CREATE TABLE items (
 	itemid		int(4) NOT NULL auto_increment,
@@ -271,9 +269,9 @@ CREATE TABLE items (
 	KEY		(status)
 );
 
-#
-# Table structure for table 'media'
-#
+--
+-- Table structure for table 'media'
+--
 
 CREATE TABLE media (
 	mediaid		int(4) NOT NULL auto_increment,
@@ -285,9 +283,9 @@ CREATE TABLE media (
 	KEY		(userid)
 );
 
-#
-# Table structure for table 'triggers'
-#
+--
+-- Table structure for table 'triggers'
+--
 
 CREATE TABLE triggers (
 	triggerid	int(4) NOT NULL auto_increment,
@@ -303,9 +301,9 @@ CREATE TABLE triggers (
 	KEY		(istrue)
 );
 
-#
-# Table structure for table 'trigger_depends'
-#
+--
+-- Table structure for table 'trigger_depends'
+--
 
 CREATE TABLE trigger_depends (
 	triggerid_down	int(4) DEFAULT '0' NOT NULL,
@@ -315,9 +313,9 @@ CREATE TABLE trigger_depends (
 	KEY		(triggerid_up)
 );
 
-#
-# Table structure for table 'users'
-#
+--
+-- Table structure for table 'users'
+--
 
 CREATE TABLE users (
   userid		int(4)		NOT NULL auto_increment,

@@ -1,4 +1,4 @@
-#define	TEST_PARAMETERS 
+/* #define	TEST_PARAMETERS */
 
 #include "config.h"
 
@@ -145,6 +145,8 @@ int	check_security(void)
 	char	*sname;
 	struct	sockaddr_in name;
 	int	i;
+	char	*s;
+	char	*tmp;
 
 	i=sizeof(name);
 	if(getpeername(0,  (struct sockaddr *)&name, (size_t *)&i) == 0)
@@ -152,10 +154,17 @@ int	check_security(void)
 		i=sizeof(struct sockaddr_in);
 
 		sname=inet_ntoa(name.sin_addr);
-		if(strcmp(sname,CONFIG_HOSTS_ALLOWED)!=0)
-		{
-			return	FAIL;
-		}
+
+		tmp=strdup(CONFIG_HOSTS_ALLOWED);
+                s=(char *)strtok(tmp,",");
+                while(s!=NULL)
+                {
+                        if(strcmp(sname, s)==0)
+                        {
+                                return  SUCCEED;
+                        }
+                        s=(char *)strtok(NULL,",");
+                }
 	}
         else
 	{
@@ -163,7 +172,7 @@ int	check_security(void)
 /*		syslog( LOG_WARNING, "Connection rejected");*/
 		return FAIL;
 	}
-	return	SUCCEED;
+	return	FAIL;
 }
 
 float	process_input()
