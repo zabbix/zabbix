@@ -1,5 +1,7 @@
 Changes for 1.0beta7:
 
+ - monitoring of servers without Zabbix agent installed. New item type: Simple
+   Check. (Alexei)
  - improved performance of pinger.pl (Alexei)
  - added support of ':','\' for flexible parameters (example, cksum[c:\a.bat])
    (Alexei)
