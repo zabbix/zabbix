@@ -3,24 +3,39 @@
 #
 
 CREATE TABLE config (
-  smtp_server varchar(255) DEFAULT '' NOT NULL,
-  smtp_helo varchar(255) DEFAULT '' NOT NULL,
-  smtp_email varchar(255) DEFAULT '' NOT NULL
+  smtp_server		varchar(255)	DEFAULT '' NOT NULL,
+  smtp_helo		varchar(255)	DEFAULT '' NOT NULL,
+  smtp_email		varchar(255)	DEFAULT '' NOT NULL,
+  password_required	int(1)		DEFAULT '0' NOT NULL
 );
 
 insert into config (smtp_server,smtp_helo,smtp_email) values ("localhost","localhost","zabbix@localhost");
+
+#
+# Table structure for table 'groups'
+#
+
+CREATE TABLE groups (
+  groupid		int(4)		NOT NULL auto_increment,
+  name			varchar(64)	DEFAULT '' NOT NULL,
+  PRIMARY KEY (groupid),
+  UNIQUE (name)
+);
+
+insert into groups (groupid,name) values (1,"Administrators");
+insert into groups (groupid,name) values (2,"Zabbix user");
 
 #
 # Table structure for table 'alerts'
 #
 
 CREATE TABLE alerts (
-  alertid int(4) NOT NULL auto_increment,
-  clock int(4) DEFAULT '0' NOT NULL,
-  type varchar(10) DEFAULT '' NOT NULL,
-  sendto varchar(100) DEFAULT '' NOT NULL,
-  subject varchar(255) DEFAULT '' NOT NULL,
-  message varchar(255) DEFAULT '' NOT NULL,
+  alertid		int(4)		NOT NULL auto_increment,
+  clock			int(4)		DEFAULT '0' NOT NULL,
+  type			varchar(10)	DEFAULT '' NOT NULL,
+  sendto		varchar(100)	DEFAULT '' NOT NULL,
+  subject		varchar(255)	DEFAULT '' NOT NULL,
+  message		varchar(255)	DEFAULT '' NOT NULL,
   PRIMARY KEY (alertid),
   KEY clock (clock)
 );
@@ -30,14 +45,14 @@ CREATE TABLE alerts (
 #
 
 CREATE TABLE actions (
-  actionid int(4) NOT NULL auto_increment,
-  triggerid int(4) DEFAULT '0' NOT NULL,
-  userid int(4) DEFAULT '0' NOT NULL,
-  good int(4) DEFAULT '0' NOT NULL,
-  delay int(4) DEFAULT '0' NOT NULL,
-  subject varchar(255) DEFAULT '' NOT NULL,
-  message varchar(255) DEFAULT '' NOT NULL,
-  nextcheck int(4) DEFAULT '0' NOT NULL,
+  actionid		int(4)		NOT NULL auto_increment,
+  triggerid		int(4)		DEFAULT '0' NOT NULL,
+  userid		int(4)		DEFAULT '0' NOT NULL,
+  good			int(4)		DEFAULT '0' NOT NULL,
+  delay			int(4)		DEFAULT '0' NOT NULL,
+  subject		varchar(255)	DEFAULT '' NOT NULL,
+  message		varchar(255)	DEFAULT '' NOT NULL,
+  nextcheck		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (actionid)
 );
 
@@ -46,10 +61,10 @@ CREATE TABLE actions (
 #
 
 CREATE TABLE alarms (
-  alarmid int(4) NOT NULL auto_increment,
-  triggerid int(4) DEFAULT '0' NOT NULL,
-  clock int(4) DEFAULT '0' NOT NULL,
-  istrue int(4) DEFAULT '0' NOT NULL,
+  alarmid		int(4)		NOT NULL auto_increment,
+  triggerid		int(4)		DEFAULT '0' NOT NULL,
+  clock			int(4)		DEFAULT '0' NOT NULL,
+  istrue		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (alarmid)
 );
 
@@ -288,10 +303,12 @@ CREATE TABLE triggers (
 #
 
 CREATE TABLE users (
-  userid int(4) NOT NULL auto_increment,
-  alias varchar(100) DEFAULT '' NOT NULL,
-  name varchar(100) DEFAULT '' NOT NULL,
-  surname varchar(100) DEFAULT '' NOT NULL,
+  userid		int(4)		NOT NULL auto_increment,
+  groupid		int(4)		NOT NULL DEFAULT '0',
+  alias			varchar(100)	DEFAULT '' NOT NULL,
+  name			varchar(100)	DEFAULT '' NOT NULL,
+  surname		varchar(100)	DEFAULT '' NOT NULL,
+  passwd		varchar(64)	DEFAULT '' NOT NULL,
   PRIMARY KEY (userid),
   UNIQUE (alias)
 );

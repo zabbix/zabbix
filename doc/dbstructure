@@ -16,6 +16,18 @@ subject		varchar	; Subject of the message
 message		varchar	; The message itself
 nextcheck	int	; Time when we should send message next time
 
+
+Table GROUPS
+============
+
+This table contains list of user groups.
+
+STRUCTURE
+---------
+
+	groupid		int	; unique ID
+	name		varchar	; unique name of the groups
+
 Table ALARMS
 ============
 
@@ -124,11 +136,11 @@ STRUCTURE
 ---------
 
 	userid	int	; Unique user ID
+	groupid	int	; Groupd ID the user belongs to
 	name	varchar	; Name of user
 	surname	varchar	; Surname
 	alias	varchar	; User's alias
 	passwd	varchar	; User's password
-
 
 Table HOSTS 
 ===========
