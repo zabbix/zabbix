@@ -21,6 +21,7 @@
 #define ZABBIX_STATS_H
 
 #define	MAX_INTERFACE	8
+#define	MAX_DISKDEVICES	8
 
 #define INTERFACE struct interface_type
 INTERFACE
@@ -29,6 +30,17 @@ INTERFACE
 	int	clock[60*15];
 	float	sent[60*15];
 	float	received[60*15];
+};
+
+#define DISKDEVICE struct diskdevice_type
+DISKDEVICE
+{
+	char    *device;
+	int	clock[60*15];
+	float	read_io_ops[60*15];
+	float	blks_read[60*15];
+	float	write_io_ops[60*15];
+	float	blks_write[60*15];
 };
 
 void	collect_statistics();
