@@ -1,5 +1,6 @@
 Changes for 1.1alpha1:
 
+ - added table 'images' (Alexei)
  - added small icons for maps (Alexei)
  - added basic support of background images (Alexei)
  - added frontends/php/include/html.inc.php (Alexei)
