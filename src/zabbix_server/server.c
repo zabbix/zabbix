@@ -1378,7 +1378,7 @@ int main(int argc, char **argv)
 
 		for(i = CONFIG_SUCKERD_FORKS; i< CONFIG_SUCKERD_FORKS+CONFIG_TRAPPERD_FORKS; i++)
 		{
-			pids[i] = child_trapper_make(i, listenfd, addrlen);
+			pids[i-i] = child_trapper_make(i, listenfd, addrlen);
 		}
 
 /* First instance of zabbix_suckerd performs housekeeping procedures */
