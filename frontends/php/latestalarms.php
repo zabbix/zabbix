@@ -128,8 +128,6 @@
 			$value,
 			$priority),
 			$col++);
-
-		cr();
 	}
 	table_end();
 ?>
