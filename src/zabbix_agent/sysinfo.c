@@ -1614,6 +1614,74 @@ float	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose)
 	}
 }
 
+float	check_ssh(char	*hostname, short port)
+{
+	char	*haddr;
+	char	c[MAX_STRING_LEN+1];
+	char	out[MAX_STRING_LEN+1];
+	char	*ssh_proto=NULL;
+	char	*ssh_server=NULL;
+	
+	int	s;
+	struct	sockaddr_in addr;
+	int	addrlen;
+
+
+	struct hostent *host;
+
+	host = gethostbyname(hostname);
+	if(host == NULL)
+	{
+		return	0;
+	}
+
+	haddr=host->h_addr;
+
+	addrlen = sizeof(addr);
+	memset(&addr, 0, addrlen);
+	addr.sin_port = htons(port);
+	addr.sin_family = AF_INET;
+	bcopy(haddr, (void *) &addr.sin_addr.s_addr, 4);
+
+	s = socket(AF_INET, SOCK_STREAM, 0);
+	if (s == -1)
+	{
+		close(s);
+		return	0;
+	}
+
+	if (connect(s, (struct sockaddr *) &addr, addrlen) == -1)
+	{
+		close(s);
+		return	0;
+	}
+
+	memset(&c, 0, 1024);
+	recv(s, c, 1024, 0);
+	if ( strncmp(c, "SSH", 3) == 0 )
+	{
+		ssh_proto = c + 4;
+		ssh_server = ssh_proto + strspn (ssh_proto, "0123456789-. ");
+		ssh_proto[strspn (ssh_proto, "0123456789-. ")] = 0;
+
+/*		printf("[%s] [%s]\n",ssh_proto, ssh_server);*/
+
+		sprintf (out, "SSH-%s-%s\r\n", ssh_proto, "zabbix_agent");
+		send(s,out,strlen(out),0);
+
+/*		printf("[%s]\n",out);*/
+
+		close(s);
+		return	1;
+	}
+	else
+	{
+		send(s,"0\n",2,0);
+		close(s);
+		return	0;
+	}
+}
+
 /* Example check_service[ssh], check_service[smtp,29],check_service[ssh,127.0.0.1,22]*/
 /* check_service[ssh,127.0.0.1,ssh] */
 float	CHECK_SERVICE(char *service_and_ip_and_port)
@@ -1662,7 +1730,7 @@ float	CHECK_SERVICE(char *service_and_ip_and_port)
 	if(strcmp(service,"ssh") == 0)
 	{
 		if(port == 0)	port=22;
-		return	tcp_expect(ip,port,"SSH","0\n");
+		return	check_ssh(ip,port);
 	}
 	if(strcmp(service,"smtp") == 0)
 	{

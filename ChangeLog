@@ -1,5 +1,7 @@
 Changes for 1.0beta7:
 
+ - got rid of message "Bad protocol identification '0'" when doing check_service[ssh]
+ (Alexei)
  - performance improvements for zabbix_suckerd (Alexei)
  - added support of CSS (Alexei)
  - support of processor load on Solaris 2.6. Thanks to Mariusz. (Alexei)

@@ -9,7 +9,6 @@ HIGH PRIORITY:
  - support fo netload under other platforms
  - support for disk loads
  - new host name should not contain space and other character not allowed by trigger expression
- - get rid of "Bad protocol identification '0'" when doing ssh check
 
 TODO:
 
