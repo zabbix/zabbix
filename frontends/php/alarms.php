@@ -72,7 +72,7 @@
 	echo "<TR>";
 	echo "<TD><FONT SIZE=+1>Time</FONT></TD>";
 	echo "<TD><FONT SIZE=+1>Status</FONT></TD>";
-	echo "<TD><FONT SIZE=+1>Length</FONT></TD>";
+	echo "<TD><FONT SIZE=+1>Duration</FONT></TD>";
 	echo "<TD><FONT SIZE=+1>Sum</FONT></TD>";
 	echo "<TD><FONT SIZE=+1>%</FONT></TD>";
 	echo "</TR>";

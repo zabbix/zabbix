@@ -40,8 +40,6 @@
 	else
 	{
 		echo "<center>";
-		echo "Connected as ".$USER_DETAILS["alias"];
-		echo "<br>";
 		echo "Press <a href=\"index.php?reconnect=1\">here</a> to reconnect";
 		echo "</center>";
 	}	

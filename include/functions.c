@@ -659,7 +659,7 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 				sprintf(sql,"update triggers set value=%d, lastchange=%d where triggerid=%d",TRIGGER_VALUE_TRUE,now,trigger.triggerid);
 				DBexecute(sql);
 
-				DBadd_alarm(trigger.triggerid, TRIGGER_VALUE_TRUE);
+				DBadd_alarm(trigger.triggerid, TRIGGER_VALUE_TRUE, now);
 			}
 			if(trigger.value == TRIGGER_VALUE_FALSE)
 			{
@@ -681,7 +681,7 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 				sprintf(sql,"update triggers set value=%d, lastchange=%d where triggerid=%d",TRIGGER_VALUE_FALSE,now,trigger.triggerid);
 				DBexecute(sql);
 
-				DBadd_alarm(trigger.triggerid, TRIGGER_VALUE_FALSE);
+				DBadd_alarm(trigger.triggerid, TRIGGER_VALUE_FALSE,now);
 			}
 
 			if(trigger.value == TRIGGER_VALUE_TRUE)

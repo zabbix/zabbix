@@ -26,7 +26,7 @@
 
 <?
 
-	$result=DBselect("select h.hostid,h.host,t.triggerid,t.expression,t.description,t.istrue from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.istrue!=2 and t.triggerid=f.triggerid and h.status in (0,2) and i.status=0 order by h.host,t.lastchange desc, t.description");
+	$result=DBselect("select h.hostid,h.host,t.triggerid,t.expression,t.description,t.value from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.status=0 and t.triggerid=f.triggerid and h.status in (0,2) and i.status=0 order by h.host,t.lastchange desc, t.description");
 
 	$lasthost="";
 	$col=0;
@@ -53,7 +53,7 @@
 	        if($col++%2 == 1)	{ echo "<TR BGCOLOR=#DDDDDD>"; }
 		else			{ echo "<TR BGCOLOR=#EEEEEE>"; }
 
-		echo "<TD>".$row["description"]."</TD>";
+		echo "<TD><a href=\"alarms.php?triggerid=".$row["triggerid"]."\">".$row["description"]."</a></TD>";
 		$description=rawurlencode($row["description"]);
 
 		echo "<TD>".explode_exp($row["expression"],1)."</TD>";
