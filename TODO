@@ -2,6 +2,7 @@
  - hardlinked templates (several templates, one host)
  - escalation and repeated notifications
 
+ - add selection of MIN/MAX/AVG for graphs
  - make sure all screens looks good in case of hundreds of servers/groups
  - use oop approach for new development
  - update the manual
