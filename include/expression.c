@@ -17,18 +17,36 @@ int	cmp_double(double a,double b)
 	return	1;
 }
 
+/*
+ * Return SUCEED if parameter has format X.X or X, where X is [0..9]{1,n}
+ * */
 int	is_float(char *c)
 {
 	int i;
+	int dot=-1;
 
 	syslog(LOG_DEBUG, "Starting is_float:%s", c );
-	for(i=0;i<=strlen(c);i++)
+	for(i=0;i<strlen(c);i++)
 	{
-		if((c[i]=='(')||(c[i]==')')||(c[i]=='{')||(c[i]=='<')||(c[i]=='>')||(c[i]=='='))
+		if((c[i]>='0')&&(c[i]<='9'))
 		{
-			return FAIL;
+			continue;
 		}
+
+		if((c[i]=='.')&&(dot==-1))
+		{
+			dot=i;
+
+			if((dot!=0)&&(dot!=strlen(c)-1))
+			{
+				continue;
+			}
+		}
+
+		syslog(LOG_DEBUG, "It is NOT float" );
+		return FAIL;
 	}
+	syslog(LOG_DEBUG, "It is float" );
 	return SUCCEED;
 }
 
