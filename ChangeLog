@@ -1,5 +1,6 @@
 Changes for 1.0beta11:
 
+ - added support of system[proccount] under Solaris (Alexei) 
  - support for swap sizes >2Gb under Solaris. Thanks to Franky
  Van Liedekerke. (Alexei)
  - add actions when using templates. (Alexei)
