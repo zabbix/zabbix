@@ -116,8 +116,13 @@
 			if($count==1)
 			{
 				$color=$red;
-				$result1=DBselect("select t.description from items i,functions f,triggers t,hosts h where h.hostid=i.hostid and i.hostid=$hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.value=1 and t.status=0 and h.status in (0,2) and i.status=0");
+				$result1=DBselect("select t.description,t.triggerid from items i,functions f,triggers t,hosts h where h.hostid=i.hostid and i.hostid=$hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.value=1 and t.status=0 and h.status in (0,2) and i.status=0");
 				$label=DBget_field($result1,0,0);
+
+				if( strstr($label,"%s"))
+				{
+					$label=expand_trigger_description(DBget_field($result1,0,1));
+				}
 			}
 			else if($count>1)
 			{

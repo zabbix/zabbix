@@ -140,7 +140,13 @@
 		        if($col++%2 == 1)	{ echo "<TR BGCOLOR=#DDDDDD>"; }
 			else			{ echo "<TR BGCOLOR=#EEEEEE>"; }
 
-			echo "<TD>".$row["description"]."</TD>";
+			$description=$row["description"];
+
+			if( strstr($description,"%s"))
+			{
+				$description=expand_trigger_description($row["triggerid"]);
+			}
+			echo "<TD>$description</TD>";
 	
 			echo "<TD>".explode_exp($row["expression"],1)."</TD>";
 			echo "<TD>";

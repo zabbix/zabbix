@@ -14,10 +14,17 @@ Hope this helps.
 
 Not ready yet:
 
- - solution for problems with template-based hosts must be proposed
+ - add template host to DB?
+ - get rid of %s in alerts,alarms, etc
+ - add MRTG-like graphs
+ - network maps. Edit host, add link.
+ - HELO can be empty
+ - fix division by zero in report2
 
 Changes for 1.0beta5:
 
+ - for host templates, %s can be used in trigger description to be substituted
+   with new host name (Alexei)
  - empty result for DBselect is always checked (Alexei)
  - fixed send_email(). According to RFC, DATA should be sent with followed 
  EOL (Alexei)

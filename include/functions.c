@@ -515,6 +515,33 @@ void	send_to_user(int actionid,int userid,char *subject,char *message)
 }
 
 /*
+ * Translate all %s to host names
+ */ 
+void	substitute_hostname(int triggerid,char *s)
+{
+	char tmp[MAX_STRING_LEN+1];	
+	char sql[MAX_STRING_LEN+1];
+	DB_RESULT *result;
+
+	if(strstr(s,"%s") != 0)
+	{
+		sprintf(sql,"select distinct t.description,h.host from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid", triggerid);
+		result = DBselect(sql);
+
+		if(DBis_empty(result) == SUCCEED)
+		{
+			zabbix_log( LOG_LEVEL_DEBUG, "No hostname in substitute_hostname()");
+			DBfree_result(result);
+			return;
+		}
+		strcpy(tmp,s);
+		sprintf(s,tmp,DBget_field(result,0,1));
+
+		DBfree_result(result);
+	}
+}
+
+/*
  * Apply actions if any.
  */ 
 void	apply_actions(int triggerid,int good)
@@ -574,6 +601,9 @@ void	apply_actions(int triggerid,int good)
 		action.subject=DBget_field(result,i,3);
 		action.message=DBget_field(result,i,4);
 
+		substitute_hostname(triggerid,action.message);
+		substitute_hostname(triggerid,action.subject);
+		
 		substitute_macros(action.message);
 		substitute_macros(action.subject); 
 

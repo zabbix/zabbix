@@ -370,13 +370,20 @@
 
 		echo "<TD>";
 
+		$description=$row["description"];
+
+		if( strstr($description,"%s"))
+		{
+			$description=expand_trigger_description($row["triggerid"]);
+		}
+
 		if($row["url"] == "")
 		{
-			echo $row["description"];
+			echo $description;
 		}
 		else
 		{
-			echo "<a href='".$row["url"]."'>".$row["description"]."</a>";
+			echo "<a href='".$row["url"]."'>$description</a>";
 		}
 
 		if($compact!='true')
