@@ -1,6 +1,6 @@
 1.0beta14:
 
- - Battery.png have to be renamed to UPS.png?
+ - delete sysmap_links when deleting item (PostgreSQL)
  - test trigger scopes
  - 'clone' for graphs and screens
  - add screens and graphs to host templates
