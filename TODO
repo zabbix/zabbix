@@ -3,7 +3,7 @@
  - new host status: 'deleted'. Housekeeping to delete hosts, items, etc
  - fix problems under SUSE 8.2
  - user groups
-
+ - get rid of strlen() in for(;;)
 
  - finish src/zabbix_snmptrapper
  - links to Zabbix frontend in alert emails
