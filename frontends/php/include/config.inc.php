@@ -2220,9 +2220,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
 
-	function	add_item_to_graph($graphid,$itemid,$color)
+	function	add_item_to_graph($graphid,$itemid,$color,$drawtype)
 	{
-		$sql="insert into graphs_items (graphid,itemid,color) values ($graphid,$itemid,'$color')";
+		$sql="insert into graphs_items (graphid,itemid,color,drawtype) values ($graphid,$itemid,'$color',$drawtype)";
 		return	DBexecute($sql);
 	}
 
@@ -4040,9 +4040,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
         }
 
 
-        function delete_screen_item($screenitemid)
+        function get_drawtype_description($drawtype)
         {
-                $sql="delete from screens_items where screenitemid=$screenitemid";
-                return  DBexecute($sql);
+		if($drawtype==0)
+			return "Line";
+		if($drawtype==1)
+			return "Filled region";
+		if($drawtype==2)
+			return "Bold line";
+		return "Unknown";
         }
 ?>
