@@ -200,17 +200,17 @@
 	echo "<form method=\"get\" action=\"services.php\">";
 	if(isset($HTTP_GET_VARS["serviceid"]))
 	{
-		echo "<input name=\"serviceid\" type=\"hidden\" value=".$HTTP_GET_VARS["serviceid"].">";
+		echo "<input class=\"biginput\" name=\"serviceid\" type=\"hidden\" value=".$HTTP_GET_VARS["serviceid"].">";
 	}
 	echo "Name";
 	show_table2_h_delimiter();
-	echo "<input name=\"name\" value=\"$name\" size=32>";
+	echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=32>";
 
 	show_table2_v_delimiter();
 	echo "Status calculation algorithm";
 	show_table2_h_delimiter();
 	$result=DBselect("select triggerid,description from triggers order by description");
-	echo "<select name=\"algorithm\" size=1>";
+	echo "<select class=\"biginput\" name=\"algorithm\" size=1>";
 	if(isset($HTTP_GET_VARS["algorithm"]))
 	{
 		if($HTTP_GET_VARS["algorithm"] == SERVICE_ALGORITHM_NONE)
@@ -236,18 +236,18 @@
         show_table2_h_delimiter();
 	if(isset($HTTP_GET_VARS["triggerid"])&&($HTTP_GET_VARS["triggerid"]!=""))
 	{
-        	echo "<INPUT TYPE=\"CHECKBOX\" NAME=\"linktrigger\" VALUE=\"true\" CHECKED>";
+        	echo "<INPUT class=\"biginput\" TYPE=\"CHECKBOX\" NAME=\"linktrigger\" VALUE=\"true\" CHECKED>";
 	}
 	else
 	{
-        	echo "<INPUT TYPE=\"CHECKBOX\" NAME=\"linktrigger\">";
+        	echo "<INPUT class=\"biginput\" TYPE=\"CHECKBOX\" NAME=\"linktrigger\">";
 	}
 
 	show_table2_v_delimiter();
 	echo "Trigger";
 	show_table2_h_delimiter();
         $result=DBselect("select triggerid,description from triggers order by description");
-        echo "<select name=\"triggerid\" size=1>";
+        echo "<select class=\"biginput\" name=\"triggerid\" size=1>";
         for($i=0;$i<DBnum_rows($result);$i++)
         {
                 $triggerid_=DBget_field($result,$i,0);
@@ -304,7 +304,7 @@
 	echo "Name";
 	show_table2_h_delimiter();
 	$result=DBselect("select serviceid,triggerid,name from services order by name");
-        echo "<select name=\"servicedownid\" size=1>";
+        echo "<select class=\"biginput\" name=\"servicedownid\" size=1>";
         for($i=0;$i<DBnum_rows($result);$i++)
         {
                 $servicedownid_=DBget_field($result,$i,0);
@@ -328,7 +328,7 @@
 //	{
 //       	echo "<INPUT TYPE=\"CHECKBOX\" NAME=\"softlink\">";
 //	}
-	echo "<INPUT TYPE=\"CHECKBOX\" NAME=\"softlink\" VALUE=\"true\" checked>";
+	echo "<INPUT class=\"biginput\" TYPE=\"CHECKBOX\" NAME=\"softlink\" VALUE=\"true\" checked>";
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add link\">";
@@ -353,7 +353,7 @@
 	echo "Server";
 	show_table2_h_delimiter();
 	$result=DBselect("select hostid,host from hosts order by host");
-        echo "<select name=\"hostid\" size=1>";
+        echo "<select class=\"biginput\" name=\"hostid\" size=1>";
         while($row=DBfetch($result))
         {
 		echo "<OPTION VALUE='".$row["hostid"]."'>".$row["host"];
