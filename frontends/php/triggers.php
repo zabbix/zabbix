@@ -7,6 +7,17 @@
 ?>
 
 <?
+        if(!check_right("Host","R",0))
+        {
+                show_table_header("<font color=\"AA0000\">No permissions !</font
+>");
+                show_footer();
+                exit;
+        }
+?>
+
+
+<?
 	if(isset($register))
 	{
 		if($register=="add dependency")
@@ -77,6 +88,10 @@
 	$result=DBselect("select hostid,host from hosts order by host");
 	while($row=DBfetch($result))
 	{
+		if(!check_right("Host","R",$row["hostid"]))
+		{
+			continue;
+		}
 		if(isset($hostid) && ($row["hostid"] == $hostid))
 		{
 			echo "<b>[<A HREF=\"triggers.php?hostid=".$row["hostid"]."\">".$row["host"]."</A>]</b>  ";

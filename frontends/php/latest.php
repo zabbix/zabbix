@@ -6,6 +6,16 @@
 ?>
 
 <?
+        if(!check_right("Host","R",0))
+        {
+                show_table_header("<font color=\"AA0000\">No permissions !</font
+>");
+                show_footer();
+                exit;
+        }
+?>
+
+<?
 	show_table_header_begin();
 	echo "LATEST DATA";
 
@@ -17,6 +27,10 @@
 
 	while($row=DBfetch($result))
 	{
+        	if(!check_right("Host","R",$row["hostid"]))
+		{
+			continue;
+		}
 		if( isset($hostid) && ($hostid == $row["hostid"]) )
 		{
 			echo "<b>[";
@@ -112,6 +126,10 @@
 		$result=DBselect("select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and i.status in (0,2) and h.hostid=$hostid $sort");
 		while($row=DBfetch($result))
 		{
+        		if(check_right("Item","H",$row["itemid"]))
+			{
+				continue;
+			}
 			if($col++%2 == 1)	{ echo "<tr bgcolor=#DDDDDD>"; }
 			else			{ echo "<tr bgcolor=#EEEEEE>"; }
 

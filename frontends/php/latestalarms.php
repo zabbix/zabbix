@@ -53,6 +53,10 @@
 	$col=0;
 	while($row=DBfetch($result))
 	{
+		if(!check_right_on_trigger("R",$row["triggerid"]))
+		{
+			continue;
+		}
 		if($col++%2==0)	{ echo "<tr bgcolor=#DDDDDD>"; }
 		else		{ echo "<tr bgcolor=#EEEEEE>"; }
 
