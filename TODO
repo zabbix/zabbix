@@ -1,5 +1,7 @@
 1.0beta11:
 
+ - start&end time in time navigation
+ - historical data - no refresh
  - add Igor's patches
  - add Charlea RedHat startup scripts
  - different colors and line styles for map connectors
