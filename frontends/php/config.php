@@ -39,17 +39,35 @@
 ?>
 
 <?php
-	if(isset($_GET["register"]))
+	if(isset($_POST["config"]))	$_GET["config"]=$_POST["config"];
+
+# For images
+	if(isset($_POST["register"]))
 	{
-		if($_GET["register"]=="delete image")
+		if($_POST["register"]=="add image")
 		{
-			$result=delete_image($_GET["imageid"]);
+			$result=add_image($_POST["imageid"]);
 			show_messages($result, S_IMAGE_DELETED, S_CANNOT_DELETE_IMAGE);
 			if($result)
 			{
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Image deleted");
 			}
+			unset($_POST["imageid"]);
 		}
+		if($_POST["register"]=="delete image")
+		{
+			$result=delete_image($_POST["imageid"]);
+			show_messages($result, S_IMAGE_DELETED, S_CANNOT_DELETE_IMAGE);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Image deleted");
+			}
+			unset($_POST["imageid"]);
+		}
+	}
+	{
+	if(isset($_GET["register"]))
+	{
 		if($_GET["register"]=="update")
 		{
 			$result=update_config($_GET["alarm_history"],$_GET["alert_history"]);
@@ -201,7 +219,9 @@
 		echo S_IMAGE;
 
 		show_table2_v_delimiter($col++);
-		echo "<form method=\"get\" action=\"config.php\">";
+#		echo "<form method=\"get\" action=\"config.php\">";
+		echo "<form enctype=\"multipart/form-data\" method=\"post\" action=\"config.php\">";
+		echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"".(1024*1024)."\">";
 		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"3\" size=8>";
 		echo nbsp(S_NAME);
 		show_table2_h_delimiter();
@@ -223,6 +243,10 @@
 		}
 		echo "</select>";
 
+		show_table2_v_delimiter($col++);
+		echo S_UPLOAD;
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"file\" type=\"file\">";
 
 		show_table2_v_delimiter2();
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add image\">";
