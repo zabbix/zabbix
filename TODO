@@ -1,6 +1,6 @@
 1.0beta11:
 
- - new host status: 'deleted'. Housekeeping to delete hosts, items, etc
+ - new item status: 'deleted'. Housekeeping to delete items, etc
  - fix problems under SUSE 8.2
  - user groups
  - get rid of strlen() in for(;;)
