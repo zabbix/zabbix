@@ -116,6 +116,7 @@ DB_ALERT
 
 void    DBconnect( char *dbname, char *dbuser, char *dbpassword, char *dbsocket);
 void    DBclose(void);
+void    DBvacuum(void);
 
 int	DBexecute( char *query );
 

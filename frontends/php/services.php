@@ -52,6 +52,11 @@
 			show_messages($result,"Service deleted","Cannot delete service");
 			unset($serviceid);
 		}
+		if($register=="delete_link")
+		{
+			$result=delete_service_link($linkid);
+			show_messages($result,"Link deleted","Cannot delete link");
+		}
 	}
 ?>
 
@@ -146,7 +151,7 @@
 		echo "<td><b>Soft/hard link</b></td>";
 		echo "<td><b>Actions</b></td>";
 		echo "</tr>";
-		$sql="select servicedownid,serviceupid,soft from services_links where serviceupid=$serviceid or servicedownid=$serviceid";
+		$sql="select linkid,servicedownid,serviceupid,soft from services_links where serviceupid=$serviceid or servicedownid=$serviceid";
 		$result=DBselect($sql);
 		$col=0;
 		while($row=DBfetch($result))
@@ -165,7 +170,7 @@
 			{
 				echo "<td>Soft</td>";
 			}
-			echo "<td><a href=\"services.php?register=delete_link?\">".$service["name"]."</td>";
+			echo "<td><a href=\"services.php?register=delete_link&serviceid=$serviceid&linkid=".$row["linkid"]."\">Delete</a></td>";
 			echo "</tr>";
 		}
 		echo "</table>";

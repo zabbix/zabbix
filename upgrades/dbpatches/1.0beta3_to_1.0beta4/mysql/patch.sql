@@ -33,3 +33,6 @@ insert into items_template (itemtemplateid,description,key_,delay,value_type)
         values (69,'Host status','status', 60, 0);
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
         values (69,69,'Server %s is unreachable','{:.last(0)}=2');
+
+insert into users (userid,alias,name,surname,passwd) values (2,'guest','Default','User','d41d8cd98f00b204e9800998ecf8427e');
+insert into rights (rightid,userid,name,permission,id) values (3,2,'Default permission','R',0);

@@ -277,7 +277,7 @@
 	if($compact!='true') {echo "<BR><FONT SIZE=-1>Expression</FONT></B>";}
 	echo "</TD>";
 
-	echo "<TD WIDTH=\"5%\"><B>Value</B></TD>";
+	echo "<TD WIDTH=\"5%\"><B>Status</B></TD>";
 
 	if(!isset($sort)||(isset($sort) && $sort=="priority"))
 	{

@@ -90,26 +90,26 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	get_service_status_description($status)
 	{
-		$desc="-";
+		$desc="<font color=\"#00AA00\">OK</a>";
 		if($status==5)
 		{
-			$desc="Disaster";
+			$desc="<font color=\"#FF0000\">Disaster</a>";
 		}
 		elseif($status==4)
 		{
-			$desc="High";
+			$desc="<font color=\"#FF8888\">Serious problem</a>";
 		}
 		elseif($status==3)
 		{
-			$desc="Average";
+			$desc="<font color=\"#AA0000\">Average problem</a>";
 		}
 		elseif($status==2)
 		{
-			$desc="Warning";
+			$desc="<font color=\"#AA5555\">Minor problem</a>";
 		}
 		elseif($status==1)
 		{
-			$desc="Nothing serious";
+			$desc="<font color=\"#00AA00\">OK</a>";
 		}
 		return $desc;
 	}
@@ -820,6 +820,23 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			</font>
 		</td>
 		</tr>
+<?
+// Third row
+		if(	check_right("Configuration of Zabbix","U",0)
+			||
+			check_right("User","U",0)
+			||
+			check_right("Host","U",0)
+			||
+			check_right("Graph","U",0)
+			||
+			check_right("Network map","U",0)
+			||
+			check_right("Service","U",0)
+		)
+		{
+
+?>
 		<tr>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
@@ -970,8 +987,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 			</font>
 		</td>
-
 		</tr>
+<?
+// THird row
+		}
+?>
 		</table>
 	</td>
 	</tr>
@@ -1316,6 +1336,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	}
 
 
+	function	delete_service_link($linkid)
+	{
+		$sql="delete from services_links where linkid=$linkid";
+		return DBexecute($sql);
+	}
+
 	function	delete_service($serviceid)
 	{
 		$sql="delete from services_links where servicedownid=$serviceid or serviceupid=$serviceid";
@@ -1345,11 +1371,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		if( isset($linktrigger)&&($linktrigger=="on") )
 		{
-			$sql="insert into services (serviceid,name,triggerid,status,algorithm) values (NULL,'$name',$triggerid,0,$algorithm)";
+			$sql="insert into services (name,triggerid,status,algorithm) values ('$name',$triggerid,0,$algorithm)";
 		}
 		else
 		{
-			$sql="insert into services (serviceid,name,status,algorithm) values (NULL,'$name',0,$algorithm)";
+			$sql="insert into services (name,status,algorithm) values ('$name',0,$algorithm)";
 		}
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"services","serviceid");
@@ -1369,6 +1395,19 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	add_service_link($servicedownid,$serviceupid,$softlink)
 	{
+//		global	$ERROR_MSG;
+
+		if($softlink==0)
+		{
+			$sql="select count(*) from services_links where servicedownid=$servicedownid and soft=0";
+			$result=DBselect($sql);
+			if(DBget_field($result,0,0)>0)
+			{
+//				$ERROR_MSG="The service is already hard-linked";
+				return	FALSE;
+			}
+		}
+
 		$sql="insert into services_links (servicedownid,serviceupid,soft) values ($servicedownid,$serviceupid,$softlink)";
 		return	DBexecute($sql);
 	}
@@ -1776,7 +1815,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	add_permission($userid,$right,$permission,$id)
 	{
-		$sql="insert into rights (rightid,userid,name,permission,id) values (NULL,$userid,'$right','$permission',$id)";
+		$sql="insert into rights (userid,name,permission,id) values ($userid,'$right','$permission',$id)";
 		return DBexecute($sql);
 	}
 
@@ -2342,7 +2381,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		cr();
 	}
 
-	function	insert_time_navigator($itemid,$from,$period)
+	function	insert_time_navigator($itemid,$period,$from)
 	{
 		$sql="select min(clock),max(clock) from history where itemid=$itemid";
 		$result=DBselect($sql);
@@ -2358,16 +2397,30 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$max=DBget_field($result,0,1);
 		}
 
+		$now=time()-12*$from;
+
 		$year_min=date("Y",$min);   
 		$year_max=date("Y",$max);
 
-		echo "<form method=\"post\" action=\"zzz.php\">";
+		$year_now=date("Y",$now);
+		$month_now=date("m",$now);
+		$day_now=date("d",$now);
+		$hour_now=date("H",$now);
+
+		echo "<form method=\"post\" action=\"history.php?itemid=$itemid&action=showhistory\">";
 
 		echo "Year:";
 		echo "<select name=\"year\">";
 	        for($i=$year_min;$i<=$year_max;$i++)
 	        {
-	               	echo "<option value=\"$i\">$i";
+			if($i==$year_now)
+			{	
+	               		echo "<option value=\"$i\" selected>$i";
+			}
+			else
+			{
+	               		echo "<option value=\"$i\">$i";
+			}
 	        }
 		echo "</select>";
 
@@ -2375,7 +2428,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<select name=\"month\">";
 	        for($i=1;$i<=12;$i++)
 	        {
-	               	echo "<option value=\"$i\">$i";
+			if($i==$month_now)
+			{	
+	               		echo "<option value=\"$i\" selected>$i";
+			}
+			else
+			{
+	               		echo "<option value=\"$i\">$i";
+			}
 	        }
 		echo "</select>";
 
@@ -2383,26 +2443,61 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<select name=\"day\">";
 	        for($i=1;$i<=31;$i++)
 	        {
-	               	echo "<option value=\"$i\">$i";
+			if($i==$day_now)
+			{	
+	               		echo "<option value=\"$i\" selected>$i";
+			}
+			else
+			{
+	               		echo "<option value=\"$i\">$i";
+			}
 	        }
 		echo "</select>";
 
 		echo "Hour:";
 		echo "<select name=\"hour\">";
-	        for($i=1;$i<=24;$i++)
+	        for($i=0;$i<=23;$i++)
 	        {
-	               	echo "<option value=\"$i\">$i";
+			if($i==$hour_now)
+			{	
+	               		echo "<option value=\"$i\" selected>$i";
+			}
+			else
+			{
+	               		echo "<option value=\"$i\">$i";
+			}
 	        }
 		echo "</select>";
 
 		echo "Period:";
 		echo "<select name=\"period\">";
-		echo "<option value=\"3600\">1 hour";
-		echo "<option value=\"10800\">3 hours";
-		echo "<option value=\"21600\">6 hours";
+		if($period==3600)
+		{
+			echo "<option value=\"3600\" selected>1 hour";
+		}
+		else
+		{
+			echo "<option value=\"3600\">1 hour";
+		}
+		if($period==10800)
+		{
+			echo "<option value=\"10800\" selected>3 hours";
+		}
+		else
+		{
+			echo "<option value=\"10800\">3 hours";
+		}
+		if($period==21600)
+		{
+			echo "<option value=\"21600\" selected>6 hours";
+		}
+		else
+		{
+			echo "<option value=\"21600\">6 hours";
+		}
 		echo "</select>";
 
-		echo "<input type=\"submit\" name=\"action\" value=\"show\">";
+		echo "<input type=\"submit\" name=\"action\" value=\"showhistory\">";
 
 		echo "</form>";
 	}
@@ -2447,164 +2542,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo("<hr>");
 		insert_time_navigator($itemid,$period,$from);
 		echo("<hr>");
-
-		echo "<center>";
-		echo "Period: ";
-		//  Start of --- 
-		
-		if ($period>12*3600) 
-		{
-			$tmp=$period-12*3600;
-			if($diff==0)
-			{
-				echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$from&period=$tmp\">");
-			}
-			else
-			{
-				echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$from&period=$tmp\">");
-			}
-			echo("-12h</A>] ");
-		}
-		else
-		{
-			echo("[-12h]");
-		}
-		
-		if ($period>3600) 
-		{
-			$tmp=$period-3600;
-			if($diff==0)
-			{
-				echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$from&period=$tmp\">");
-			}
-			else
-			{
-				echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$from&period=$tmp\">");
-			}
-			echo("-1h</A>] ");
-		}
-		else
-		{
-			echo("[-1h]");
-		}
-
-		$tmp=$period+3600;
-		if($diff==0)
-		{
-			echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$from&period=$tmp\">");
-		}
-		else
-		{
-			echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$from&period=$tmp\">");
-		}
-		echo("+1h</A>] ");
-
-		$tmp=$period+12*3600;
-		if($diff==0)
-		{
-			echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$from&period=$tmp\">");
-		}
-		else
-		{
-			echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$from&period=$tmp\">");
-		}
-		echo("+12h</A>] ");
-
-		echo "<br>Start time:";
-
-		//  Start of <<< WEEK >>> 
-		$tmp=$from+12*14;
-		if($diff==0)
-		{
-			echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
-		}
-		else
-		{
-			echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$tmp&period=$period\">");
-		}
-		echo("Week back</A>] ");
-
-		//  Start of <<< 12h >>> 
-		$tmp=$from+12;
-		if($diff==0)
-		{
-			echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
-		}
-		else
-		{
-			echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$tmp&period=$period\">");
-		}
-		echo("12h back</A>] ");
-		//  End of <<< 12h >>> 
-		//  HOUR BACK
-		$tmp=$from+1;
-		if($diff==0)
-		{
-			echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
-		}
-		else
-		{
-			echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$tmp&period=$period\">");
-		}
-		echo("1h back</A>] ");
-
-		//  End of ------ 
-
-		if ($from>0) // HOUR FORWARD
-		{
-			$tmp=$from-1;
-			if($diff==0)
-			{
-				echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
-			}
-			else
-			{
-				echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$tmp&period=$period\">");
-			}
-			echo("1h forward</A>] ");
-		}
-		else
-		{
-			echo("[1h forward]");  
-		}
-
-
-		if (isset($From) && ($From>0))
-		{
-			$tmp=$from-12;
-			if($diff==0)
-			{
-				echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
-			}
-			else
-			{
-				echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$tmp&period=$period\">");
-			}
-			echo("12h forward</A>] ");
-		}
-		else
-		{
-			echo("[12h forward]");
-		}
-
-		if (isset($From) && ($From>0))
-		{
-			$tmp=$from-12*14;
-			if($diff==0)
-			{
-				echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
-			}
-			else
-			{
-				echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$tmp&period=$period\">");
-			}
-			echo("Week forward</A>] ");
-		}
-		else
-		{
-			echo("[Week forward]");
-		}
-		echo "</center>";
 	}
 
 	# Show history
