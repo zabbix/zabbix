@@ -36,7 +36,7 @@ Software Requirements
   - MySQL 3.22 or later
   or
   - PostgreSQL 7.0.2 or later
- - PHP 1.0 or later, compiled as Apache module with 
+ - PHP 4.0 or later, compiled as Apache module with 
  	- GD module (for PNG images)
 	- MySQL of PostgreSQL module
 	- mhash support
@@ -84,6 +84,11 @@ Running Zabbix as "root," "bin," or any other account with special rights is a s
 1.2.2 Untar Zabbix sources
 
 On Linux, use command tar -xvzf <zabbix.tar.gz>.
+
+On other systems, try
+
+gunzip zabbix.tar.gz
+tar xvf zabbix.tar
 
 1.2.3 Create the Zabbix database
 
@@ -137,7 +142,7 @@ make
 
 1.2.6 Copy created binaries from bin/ to /opt/zabbix/bin or any other directory 
 
-Other common directories are /usr/local/bin or usr/local/zabbix/bin.
+Other common directories are /usr/local/bin or /usr/local/zabbix/bin.
 
 1.2.7 Configure /etc/services
 

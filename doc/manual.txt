@@ -363,21 +363,43 @@ Amount of unused physical memory.
 
 Amount of unused disk space for given volume.
 
+Example:
+
+diskfree[/] - returns free disk space for root volume.
+
 - inodefree[*]
 
 Number of unused inodes space for given volume.
+
+Example:
+
+inodefree[/var] - returns number of free inodes for volume /var
 
 - cksum[*]
 
 Check sum of given file.
 
+Note, that currently all supported file names are hardcoded to sysinfo.c
+
+Example:
+
+cksum[/etc/passwd]
+
 - filesize[*]
 
 Size of given file.
 
+Example:
+
+filesize[/var/log/syslog]
+
 - proc_cnt[*]
 
 Number of processes called "*" running.
+
+Example:
+
+proc_cnt[inetd]
 
 - swap[free]
 
@@ -427,58 +449,67 @@ Always return 1.
 
 Number of established TCP connections.
 
-- service_check[ftp]
+- check_service[ftp]
 
 Check either FTP server is running and accepting connections.
 
 Result: 0 - FTP server is down
 	1 - FTP server is running
 
-- service_check[ssh]
+- check_service[ssh]
 
 Check either SSH server is running and accepting connections.
 
 Result: 0 - SSH server is down
 	1 - SSH server is running
 
-- service_check[smtp]
+- check_service[smtp]
 
 Check either Email (SMTP) server is running and accepting connections.
 
 Result: 0 - SMTP server is down
 	1 - SMTP server is running
 
-- service_check[pop]
+- check_service[pop]
 
 Check either POP server is running and accepting connections.
 
 Result: 0 - POP server is down
 	1 - POP server is running
 
-- service_check[nntp]
+- check_service[nntp]
 
 Check either NNTP server is running and accepting connections.
 
 Result: 0 - NNTP server is down
 	1 - NNTP server is running
 
-- service_check[imap]
+- check_service[imap]
 
 Check either IMAP server is running and accepting connections.
 
 Result: 0 - IMAP server is down
 	1 - IMAP server is running
 
+- check_port[*]
+
+Check either possible to connect to port number "*".
+
+Result: 0 - can connect
+	1 - cannot connect
+
+Example: Use check_port[80] to check either WEB server accepts connections.
+
 4.3 Supported parameters by platform
 
 PARAMETER / SYSTEM          | Debian Woody | Debian Potato | FreeBSD 4.3 | Solaris 5.8 | HP-UX 11.00 |  AIX 4.3  |
                             |    (i386)    |      (i386)   |    (i386)   | (Ultra-60)  |  9000/800   | (PowerPC) |
 ----------------------------------------------------------------------------------------------------------------------
-memory[total]               |       X      |         X     |      -      |      -      |      x      |     -     |
-memory[shared]              |       X      |         X     |      -      |      -      |      -      |     -     |
-memory[buffers]             |       X      |         X     |      -      |      -      |      -      |     -     |
-memory[cached]              |       X      |         X     |      -      |      -      |      -      |     -     |
-memory[free]                |       X      |         X     |      -      |      -      |      x      |     -     |
+memory[total]               |       X      |        X      |      -      |      -      |      x      |     -     |
+memory[shared]              |       X      |        X      |      -      |      -      |      -      |     -     |
+memory[buffers]             |       X      |        X      |      -      |      -      |      -      |     -     |
+memory[cached]              |       X      |        X      |      -      |      -      |      -      |     -     |
+memory[free]                |       X      |        X      |      -      |      -      |      x      |     -     |
 
 diskfree[*]                 |       X      |        X      |      X      |      X      |      X      |     X     |
 
@@ -524,16 +555,16 @@ net[listen_80]              |       X      |        X      |      -      |      
 net[listen_110]             |       X      |        X      |      -      |      -      |      -      |     -     |
 net[listen_143]             |       X      |        X      |      -      |      -      |      -      |     -     |
 
-service_check[ftp]          |       X      |        X      |      ?      |      ?      |      ?      |     ?     |
-service_check[ssh]          |       X      |        X      |      ?      |      ?      |      ?      |     ?     |
-service_check[smtp]         |       X      |        X      |      ?      |      ?      |      ?      |     ?     |
-service_check[pop]          |       X      |        X      |      ?      |      ?      |      ?      |     ?     |
-service_check[nntp]         |       X      |        X      |      ?      |      ?      |      ?      |     ?     |
-service_check[imap]         |       X      |        X      |      ?      |      ?      |      ?      |     ?     |
+check_service[ftp]          |       X      |        X      |      X      |      X      |      X      |     X     |
+check_service[ssh]          |       X      |        X      |      X      |      X      |      X      |     X     |
+check_service[smtp]         |       X      |        X      |      X      |      X      |      X      |     X     |
+check_service[pop]          |       X      |        X      |      X      |      X      |      X      |     X     |
+check_service[nntp]         |       X      |        X      |      X      |      X      |      X      |     X     |
+check_service[imap]         |       X      |        X      |      X      |      X      |      X      |     X     |
+
+check_port[imap]            |       X      |        X      |      X      |      X      |      X      |     X     |
 
 proc_cnt[*]                 |       X      |        X      |      -      |      -      |      -      |     -     |
-
-
 
 5. Miscellaneous 
 
