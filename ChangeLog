@@ -1,13 +1,3 @@
-Not ready yet (later versions):
-
-[ CORE. All errors and warnings must be numbered and documented ]
-[ CORE. Support for macros like {server:system[procload].graph(1)} ]
-[ CORE. SSL between server and agents ]
-[ CORE. Support of monitoring of log files ]
-[ HB. Verify parameters before using them in SQL ]
-[ CORE. Support for zabbix_agentd -f <config file> for every process]
-[ CORE. One-connection-one-server concept. Is it real ? ]
-
 Not ready yet (1.0beta4):
 
 [ PHP. Navigation by time period for graphs and trends ]
