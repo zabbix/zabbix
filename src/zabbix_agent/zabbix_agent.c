@@ -50,6 +50,14 @@ COMMAND	commands[]=
 
 	{"swap[free]"			,SWAPFREE, 0},
 	{"swap[total]"			,SWAPTOTAL, 0},
+	{"swap[in]"			,EXECUTE, "vmstat -n 1 2|tail -1|cut -b37-40"},
+	{"swap[out]"			,EXECUTE, "vmstat -n 1 2|tail -1|cut -b41-44"},
+
+	{"io[in]"			,EXECUTE, "vmstat -n 1 2|tail -1|cut -b45-50"},
+	{"io[out]"			,EXECUTE, "vmstat -n 1 2|tail -1|cut -b51-56"},
+
+	{"system[interrupts]"		,EXECUTE, "vmstat -n 1 2|tail -1|cut -b57-61"},
+	{"system[switches]"		,EXECUTE, "vmstat -n 1 2|tail -1|cut -b62-67"},
 
 	{"proccount"			,EXECUTE, "echo /proc/[0-9]*|wc -w"},
 	{"ping"				,PING, 0},
