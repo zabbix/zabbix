@@ -1,5 +1,6 @@
 Changes for 1.0beta2:
 
+ - changes in manuxl.lyx (Alexei)
  - added parameter ListenPort to zabbix_agentd and zabbix_trapperd
  (Alexei)
  - all *.html documents were renamed to *.php (Alexei)
