@@ -1,5 +1,6 @@
 Changes for 1.0alpha11:
 
+ - no warnings for bcopy anymore under Solaris (Alexei)
  - changes in AUTHORS (Alexei)
  - fixes in function PROCCNT (Alexei)
  - changes in documentation (Mike)
