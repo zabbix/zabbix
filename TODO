@@ -1,5 +1,9 @@
 HIGH PRIORITY:
 
+ - check Rickard's multythreaded agent
+ - check new Mariusz patches
+ - support ':' between [] (example, diskspace[c:])
+ - add/evaluate Windows agent
  - BUG. Avoid situations when PID file is not deleted.
  - BUG. Map does not show host status in case of trigger based on trapper
  - BUG. WHen ran first time, some triggers becomes TRUE (like files was changed)
