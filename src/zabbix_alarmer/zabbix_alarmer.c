@@ -297,8 +297,8 @@ int	main()
 
 	daemon_init();
 
-	dbg_init( dbg_syswarn, "/var/tmp/zabbix_alarmer.log" );
-//	dbg_init( dbg_proginfo, "/var/tmp/zabbix_alarmer.log" );
+	dbg_init( dbg_syswarn, "/var/log/zabbix_alarmer.log" );
+//	dbg_init( dbg_proginfo, "/var/log/zabbix_alarmer.log" );
 
 	DBconnect();
 
