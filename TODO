@@ -2,14 +2,13 @@ HIGH PRIORITY:
 
  - BUG. Agent return unsupported in case if UserParameter ends by timeout.
  - monitoring of servers without Zabbix agent installed
- - rewrite pinger.pl to use mass-send
  - check Rickard's multythreaded agent
  - check new Mariusz patches
  - support ':','\' between [] (example, diskspace[c:])
  - add/evaluate Windows agent
  - BUG. Avoid situations when PID file is not deleted.
  - BUG. Map does not show host status in case of trigger based on trapper
- - BUG. WHen ran first time, some triggers becomes TRUE (like files was changed)
+ - BUG. When ran first time, some triggers becomes TRUE (like files was changed)
  - default user name for DB acess should be the same (root)
  - mass updates/inserts (add items and triggers for all hosts at once)
  - support for net-snmp
