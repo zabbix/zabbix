@@ -278,6 +278,74 @@ int	evaluate(int *result,char *exp)
 	return SUCCEED;
 }
 
+/*
+ * Translate "{127.0.0.1:system[procload].last(0)}" to "1.34" 
+ */
+int	substitute_macros(char *exp)
+{
+	char	res[1024];
+	char	macro[1024];
+	int	i;
+	int	r,l;
+	float	value;
+
+	syslog(LOG_WARNING, "BEGIN substitute_macros" );
+
+	syslog( LOG_WARNING, "Expression1:%s", exp );
+
+	while( find_char(exp,'{') != FAIL )
+	{
+		l=find_char(exp,'{');
+		r=find_char(exp,'}');
+
+		if( r == FAIL )
+		{
+			syslog( LOG_WARNING, "Cannot find right bracket. Expression:%s", exp );
+			return	FAIL;
+		}
+
+		if( r < l )
+		{
+			syslog( LOG_WARNING, "Right bracket is before left one. Expression:%s", exp );
+			return	FAIL;
+		}
+
+		for(i=l+1;i<r;i++)
+		{
+			macro[i-l-1]=exp[i];
+		} 
+		macro[r-l-1]=0;
+
+		syslog( LOG_WARNING, "Macro:%s", macro );
+
+		/* macro=="host:key.function(parameter)" */
+
+		/* .................... */
+
+		value=1.234;
+
+		exp[l]='%';
+		exp[l+1]='f';
+		exp[l+2]=' ';
+
+		syslog( LOG_WARNING, "Expression2:%s", exp );
+
+		for(i=l+3;i<=r;i++) exp[i]=' ';
+
+		syslog( LOG_WARNING, "Expression3:%s", exp );
+
+		sprintf(res,exp,value);
+		strcpy(exp,res);
+//		delete_spaces(exp);
+		syslog( LOG_WARNING, "Expression4:%s", exp );
+	}
+
+	return SUCCEED;
+}
+
+/*
+ * Translate "{15}>10" to "6.456>10" 
+ */
 int	substitute_functions(char *exp)
 {
 	float	value;
