@@ -55,7 +55,7 @@
 	echo "<TD WIDTH=\"10%\"><b>Time</b></TD>";
 	echo "<TD WIDTH=\"5%\"><b>Type</b></TD>";
 	echo "<TD WIDTH=\"5%\"><b>Status</b></TD>";
-	echo "<TD WIDTH=\"15%\"><b>Send to</b></TD>";
+	echo "<TD WIDTH=\"15%\"><b>Recipient(s)</b></TD>";
 	echo "<TD><b>Subject</b></TD>";
 	echo "<TD><b>Message</b></TD>";
 	echo "</TR>";

@@ -162,6 +162,8 @@ insert into items_template (itemtemplateid,description,key_,delay,value_type)
 	values (67,'Version of zabbix_agent(d) running','version[zabbix_agent]', 1800, 1);
 insert into items_template (itemtemplateid,description,key_,delay,value_type)
 	values (68,'WEB (HTTP) server is running','check_service[http]', 60, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (69,'Host status','status', 60, 0);
 
 --
 -- Data for table triggers_template
@@ -261,3 +263,5 @@ insert into triggers_template (triggertemplateid,itemtemplateid,description,expr
 	values (67,67,'Version of zabbix_agent(d) was changed on %s','{:.diff(0)}>0');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (68,68,'WEB (HTTP) server is down on %s','{:.last(0)}<1');
+insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+	values (69,69,'Server %s is unreachable','{:.last(0)}=2');

@@ -115,7 +115,7 @@
 
 		$sql="select i.description, h.host, i.key_ from hosts h, items i,functions f where f.triggerid=$triggerid and h.hostid=i.hostid and f.itemid=i.itemid order by i.description";
 		$result=DBselect($sql);
-		$message="<INSERT YOUR MESSAGE HERE>\n\n------Latest data------\n\n";
+		$message="INSERT YOUR MESSAGE HERE\n\n------Latest data------\n\n";
 		while($row=DBfetch($result))
 		{
 			$message=$message.$row["description"].": {".$row["host"].":".$row["key_"].".last(0)}  (latest value)\n";
