@@ -1,5 +1,7 @@
 1.0beta11:
 
+ - add Igor's patches
+ - add Charlea RedHat startup scripts
  - different colors and line styles for map connectors
 
  - check user permissions (how to make only one host accessible?)
