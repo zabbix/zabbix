@@ -1,3 +1,10 @@
+Changes for 1.0beta1:
+
+ - added "-lcrypto" to SNMP library detection in configure.in (Alexei)
+ - additional statistics in screen "Status of Zabbix" (Alexei)
+ - changes in manual.lyx (Alexei)
+ - added #define <string.h> to some C sources to eliminate compiler warnings (Alexei)
+
 Changes for 1.0alpha12:
 
  - cksum[/etc/inetd.conf] will not be supporter for a while (Alexei)

@@ -24,13 +24,13 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.03)
+Zabbix Reference Manual for version 1.0 (draft v1.04)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-10 October 2001
+4 December 2001
 \layout Abstract
 
 The document is Reference Manual for Zabbix version 1.0.
@@ -1214,7 +1214,7 @@ IMPORTANT.
 /etc/inetd.conf
 \series default 
 ] is not supported.
- Thsi because of character '.' in argument.
+ This is because of character '.' in argument.
  This will be fixed in next versions of Zabbix.
 \layout Itemize
 
@@ -1265,6 +1265,12 @@ include/common.h
 
 Zabbix 1.0alpha12 is latest alpha version.
  Next Zabbix version will be called 1.0beta1.
+\layout Subsubsection
+
+Zabbix 1.0beta1
+\layout Itemize
+
+Do not forget to apply DB patches
 \layout Subsection
 
 ChangeLog
@@ -1698,6 +1704,8 @@ By default, zabbix_suckerd forks ten copies of itself.\SpecialChar ~
  number of forked processes, change the parameter SUCKER_FORKS in include/common.
 h.
  
+\latex default 
+Note that each forked process requires connection to database.
 \layout Standard
 
 
@@ -2285,7 +2293,11 @@ port\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 Port number to connect to Zabbix.
- It is port number of zabbix_trapper process.
+ It is port number of zabbix_trapper
+\latex default 
+(d)
+\latex no_latex 
+ process.
 \layout Standard
 
 
@@ -2603,8 +2615,8 @@ More complex example:
 
 
 \latex no_latex 
-({sourceforge.net:system[procload].last(0)}>5) | ({sourceforge.net:system[procload].
-min(600)}>2)
+({sourceforge.net:system[procload].last(0)}>5)|({sourceforge.net:system[procload].mi
+n(600)}>2)
 \layout Standard
 
 
@@ -2976,7 +2988,11 @@ check_service[ftp]
 \latex default 
  
 \latex no_latex 
-Check either FTP server is running and accepting connections.
+Check 
+\latex default 
+if
+\latex no_latex 
+ FTP server is running and accepting connections.
 \layout Standard
 
 
@@ -2995,7 +3011,11 @@ check_service[ssh]
 \latex default 
  
 \latex no_latex 
-Check either SSH server is running and accepting connections.
+Check 
+\latex default 
+if
+\latex no_latex 
+ SSH server is running and accepting connections.
 \layout Standard
 
 
@@ -3014,7 +3034,11 @@ check_service[smtp]
 \latex default 
  
 \latex no_latex 
-Check either Email (SMTP) server is running and accepting connections.
+Check 
+\latex default 
+if
+\latex no_latex 
+ Email (SMTP) server is running and accepting connections.
 \layout Standard
 
 
@@ -3033,7 +3057,11 @@ check_service[pop]
 \latex default 
  
 \latex no_latex 
-Check either POP server is running and accepting connections.
+Check 
+\latex default 
+if
+\latex no_latex 
+ POP server is running and accepting connections.
 \layout Standard
 
 R
@@ -3052,7 +3080,11 @@ check_service[nntp]
 \latex default 
  C
 \latex no_latex 
-heck either NNTP server is running and accepting connections.
+heck 
+\latex default 
+if
+\latex no_latex 
+ NNTP server is running and accepting connections.
 \layout Standard
 
 
@@ -3071,7 +3103,11 @@ heck_service[imap]
 \latex default 
  
 \latex no_latex 
-Check either IMAP server is running and accepting connections.
+Check 
+\latex default 
+if
+\latex no_latex 
+ IMAP server is running and accepting connections.
 \layout Standard
 
 
@@ -3090,7 +3126,11 @@ check_port[*]
 \latex default 
  
 \latex no_latex 
-Check either possible to connect to port number "*".
+Check
+\latex default 
+, is it
+\latex no_latex 
+ possible to connect to port number "*".
 \layout Standard
 
 
@@ -5873,8 +5913,8 @@ Getting Maximum Performace From Zabbix
 Real world configuration
 \layout Standard
 
-Server with Zabbix 1.0 installed (Linux 2.2, MySQL, Celeron/300Mhz, 32Mb,
- IDE) is able to collect more than 40 parameters per second from servers
+Server with Zabbix 1.0alpha12 installed (Linux 2.2, MySQL, Celeron/300Mhz,
+ 32Mb, IDE) is able to collect more than 40 parameters per second from servers
  being monitored.
  How many servers can be monitored by Zabbix on the hardware, you may ask.
  It depends on number of monitored parameters and how often Zabbix should
@@ -5882,6 +5922,11 @@ Server with Zabbix 1.0 installed (Linux 2.2, MySQL, Celeron/300Mhz, 32Mb,
  Suppose, each server you monitor has ten parameters to watch for.
  You want to update these parameters once in a 10 seconds.
  Doing simple calculation, we see that Zabbix is able to handle 40 servers.
+ In case if these parameters need to be updated once in a minute, the hardware
+ configuration will be able to handle 40x6=240 servers.
+\layout Subsection
+
+Performance tuning
 \layout Section
 
 Zabbix Frontends
