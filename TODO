@@ -254,7 +254,6 @@ TOP PRIORITY:
  - better viewing of trigger dependencies
  - do not show "all" if no groups defined
  - add more checks for forms (check all possible wrong values)
- - check Rickard's active(?) agent
  - support of fetch_html[*]
  - restructure sources
  - support for automake
@@ -309,7 +308,6 @@ I made changes to the PHP frontend and zabbix_sucker.c to enable the user to spe
  - do not send notifications at certain periods of time. Do not monitor services at certain periods of time.
  - decrease number of TCP connections between server and agent
  - add triggers for all hosts at once
- - check Rickard's multithreaded agent
  - check new Mariusz patches
  - add support for downtimes, user availablity, etc
 
