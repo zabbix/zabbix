@@ -1,5 +1,6 @@
 Changes for 1.1alpha1:
 
+ - fixed incorrect setting of ICMP-related triggers to UNKNOWN state (Alexei) 
  - added table audit (Alexei)
  - added audit.php (Alexei)
  - new default port numbers for agent and trapper, 10050 and 10051 (Alexei)
