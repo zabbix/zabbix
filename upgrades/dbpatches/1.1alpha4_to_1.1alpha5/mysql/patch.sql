@@ -25,3 +25,5 @@ CREATE TABLE hosts_templates (
 alter table hosts add available	int(4)		DEFAULT '0' NOT NULL;
 update hosts set available=1 where status=0;
 update hosts set available=2 where status=2;
+
+update hosts set status=0 where status=2;
