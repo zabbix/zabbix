@@ -1002,6 +1002,32 @@ int	DBget_items_unsupported_count(void)
 	return res;
 }
 
+int	DBget_history_str_count(void)
+{
+	int	res;
+	char	sql[MAX_STRING_LEN];
+	DB_RESULT	*result;
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_history_str_count()");
+
+	snprintf(sql,sizeof(sql)-1,"select count(*) from history_str");
+
+	result=DBselect(sql);
+
+	if(DBnum_rows(result) == 0)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
+		DBfree_result(result);
+		return 0;
+	}
+
+	res  = atoi(DBget_field(result,0,0));
+
+	DBfree_result(result);
+
+	return res;
+}
+
 int	DBget_history_count(void)
 {
 	int	res;
