@@ -1,5 +1,7 @@
 1.0beta11:
 
+ - different colors and line styles for map connectors
+
  - check user permissions (how to make only one host accessible?)
  - mess with user groups when running under root
  - support for PREFIX/zabbix/etc (configuration files)
