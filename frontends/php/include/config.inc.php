@@ -3726,7 +3726,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		if($multiplier==2) echo "SELECTED";
 		echo ">M (1024^2)";
 		echo "<OPTION VALUE=\"3\"";
-		if($multiplier==2) echo "SELECTED";
+		if($multiplier==3) echo "SELECTED";
 		echo ">G (1024^3)";
 		echo "</SELECT>";
 
