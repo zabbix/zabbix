@@ -208,7 +208,7 @@ void	process(char *command,char *value)
 	char	key[MAX_STRING_LEN+1];
 	char	param[1024];
 	char	cmd[1024];
-	char	*res2 = NULL;
+	char	*res2;
 	int	ret_str=0;
 
 	for( p=command+strlen(command)-1; p>command && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
@@ -317,10 +317,10 @@ void	process(char *command,char *value)
 		else
 		{
 			sprintf(value,"%s",res2);
-			if(res2!=NULL)
+/*			if(res2!=NULL)
 			{
 				free(res2);
-			}
+			}*/
 		}
 	}
 }
@@ -1234,13 +1234,7 @@ char	*VERSION(void)
 char	*EXECUTE_STR(char *command)
 {
 	FILE	*f;
-	char	*c;
-
-	c=(char *)malloc(MAX_STRING_LEN+1);
-	if(c == NULL)
-	{
-		return	NULL;
-	}
+	static	char	c[MAX_STRING_LEN+1];
 
 	f=popen( command,"r");
 	if(f==0)
