@@ -94,6 +94,44 @@
 
 		$u="";
 
+// Special processing for bits (kilo=1000, not 1024 for bits)
+		if($units=="b")
+		{
+			$abs=abs($value);
+
+			if($abs<1000)
+			{
+				$u="";
+			}
+			else if($abs<1000*1000)
+			{
+				$u="K";
+				$value=$value/1000;
+			}
+			else if($abs<1000*1000*1000)
+			{
+				$u="M";
+				$value=$value/(1000*1000);
+			}
+			else
+			{
+				$u="G";
+				$value=$value/(1000*1000*1000);
+			}
+	
+			if(round($value)==$value)
+			{
+				$s=sprintf("%.0f",$value);
+			}
+			else
+			{
+				$s=sprintf("%.2f",$value);
+			}
+
+			return "$s $u$units";
+		}
+
+
 		if($units=="")
 		{
 			if(round($value)==$value)

@@ -1,5 +1,7 @@
 Changes for 1.1alpha5:
 
+ - special processing of 'b' (bytes). Take 1000 for Kilos (Alexei)
+ - added form for managing images (Alexei)
  - added frontends/image.php (Alexei)
  - added table 'hosts_templates' (Alexei)
  - added table 'escalations' (Alexei)
