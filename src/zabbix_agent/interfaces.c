@@ -61,6 +61,34 @@
 
 INTERFACE interfaces[MAX_INTERFACE];
 
+/* For Solaris */
+/*
+#include <stdio.h>
+#include <string.h>
+#include <kstat.h>
+
+main()
+{
+	int i;
+	kstat_t *ksp;
+	kstat_named_t *knp;s
+
+	kstat_ctl_t *kc = kstat_open();
+	for (ksp = kc->kc_chain; ksp; ksp = ksp->ks_next)
+	{
+		if (strcmp(ksp->ks_class, "net") != 0)
+			continue;
+		printf("interface %s:\n", ksp->ks_name);
+		kstat_read(kc, ksp, NULL);
+		knp = KSTAT_NAMED_PTR(ksp);
+		for (i = 0; i < ksp->ks_ndata; i++)
+		{
+			printf("%30.30s = %u\n", knp[i].name, knp[i].value.ul);
+		}
+	}
+}
+*/
+
 void	init_stats_interfaces()
 {
 	FILE	*file;
