@@ -17,6 +17,10 @@
 		{
 			add_host_to_sysmap($sysmapid,$hostid,$label,$x,$y);
 		}
+		if($register=="update")
+		{
+			update_sysmap_host($shostid,$sysmapid,$hostid,$label,$x,$y);
+		}
 		if($register=="add link")
 		{
 			add_link($sysmapid,$shostid1,$shostid2);
@@ -35,7 +39,7 @@
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR BGCOLOR=#DDDDDD>";
 	echo "<TD ALIGN=CENTER>";
-	echo "<IMG SRC=\"map.html?noedit=1&sysmapid=$sysmapid\">";
+	echo "<IMG SRC=\"map.html?sysmapid=$sysmapid\">";
 	echo "</TD>";
 	echo "</TR>";
 	echo "</TABLE>";
@@ -65,18 +69,18 @@
 		}
 	
 		$host=DBget_field($result,$i,0);
-		$shostid=DBget_field($result,$i,1);
-		$sysmapid=DBget_field($result,$i,2);
-		$hostid=DBget_field($result,$i,3);
-		$label=DBget_field($result,$i,4);
-		$x=DBget_field($result,$i,5);
-		$y=DBget_field($result,$i,6);
+		$shostid_=DBget_field($result,$i,1);
+		$sysmapid_=DBget_field($result,$i,2);
+		$hostid_=DBget_field($result,$i,3);
+		$label_=DBget_field($result,$i,4);
+		$x_=DBget_field($result,$i,5);
+		$y_=DBget_field($result,$i,6);
 
 		echo "<TD>$host</TD>";
-		echo "<TD><a href=\"sysmap.html?sysmapid=$sysmapid\">$label</a></TD>";
-		echo "<TD>$x</TD>";
-		echo "<TD>$y</TD>";
-		echo "<TD><A HREF=\"sysmap.html?register=delete&sysmapid=$sysmapid&shostid=$shostid\">Delete</A></TD>";
+		echo "<TD><a href=\"sysmap.html?sysmapid=$sysmapid_\">$label_</a></TD>";
+		echo "<TD>$x_</TD>";
+		echo "<TD>$y_</TD>";
+		echo "<TD><A HREF=\"sysmap.html?sysmapid=$sysmapid_&shostid=$shostid_#form\">Change</A> - <A HREF=\"sysmap.html?register=delete&sysmapid=$sysmapid_&shostid=$shostid_\">Delete</A></TD>";
 		echo "</TR>";
 	}
 	echo "</TABLE>";
@@ -85,13 +89,12 @@
 <?
 	show_table_header("CONNECTORS");
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>ID</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Host 1</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Host 2</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
-	$result=DBselect("select linkid,shostid1,shostid2 from sysmaps_links order by linkid");
+	$result=DBselect("select linkid,shostid1,shostid2 from sysmaps_links where sysmapid=$sysmapid order by linkid");
 	echo "<CENTER>";
 	$col=0;
 	for($i=0;$i<DBnum_rows($result);$i++)
@@ -115,7 +118,6 @@
 		$result1=DBselect("select label from sysmaps_hosts where shostid=$shostid2");
 		$label2=DBget_field($result1,0,0);
 
-		echo "<TD>$linkid</TD>";
 		echo "<TD>$label1</TD>";
 		echo "<TD>$label2</TD>";
 		echo "<TD><A HREF=\"sysmap.html?register=delete_link&linkid=$linkid\">Delete</A></TD>";
@@ -124,49 +126,74 @@
 	echo "</TABLE>";
 ?>
 
-
-
-
-
-
-
-
 <?
 	echo "<br>";
+	echo "<a name=\"form\"></a>";
+
+	if(isset($shostid))
+	{
+		$result=DBselect("select hostid,label,x,y from sysmaps_hosts where shostid=$shostid");
+		$hostid=DBget_field($result,0,0);
+		$label=DBget_field($result,0,1);
+		$x=DBget_field($result,0,2);
+		$y=DBget_field($result,0,3);
+	}
+	else
+	{
+		$label="";
+		$x=0;
+		$y=0;
+	}
+
 	show_table2_header_begin();
 	echo "New host to display";
 
 	show_table2_v_delimiter();
 	echo "<form method=\"post\" action=\"sysmap.html?sysmapid=$sysmapid\">";
+	if(isset($shostid))
+	{
+		echo "<input name=\"shostid\" type=\"hidden\" value=$shostid>";
+	}
 	echo "Host";
 	show_table2_h_delimiter();
 	$result=DBselect("select hostid,host from hosts order by host");
 	echo "<select name=\"hostid\" size=1>";
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
-		$hostid=DBget_field($result,$i,0);
-		$host=DBget_field($result,$i,1);
-		echo "<OPTION VALUE='$hostid'>$host";
+		$hostid_=DBget_field($result,$i,0);
+		$host_=DBget_field($result,$i,1);
+		if(isset($hostid) && ($hostid==$hostid_))
+		{
+			echo "<OPTION VALUE='$hostid_' SELECTED>$host_";
+		}
+		else
+		{
+			echo "<OPTION VALUE='$hostid_'>$host_";
+		}
 	}
 	echo "</SELECT>";
 
 	show_table2_v_delimiter();
 	echo "Label";
 	show_table2_h_delimiter();
-	echo "<input name=\"label\" size=32 value=\"\">";
+	echo "<input name=\"label\" size=32 value=\"$label\">";
 
 	show_table2_v_delimiter();
 	echo "Coordinate X";
 	show_table2_h_delimiter();
-	echo "<input name=\"x\" size=5 value=\"0\">";
+	echo "<input name=\"x\" size=5 value=\"$x\">";
 
 	show_table2_v_delimiter();
 	echo "Coordinate Y";
 	show_table2_h_delimiter();
-	echo "<input name=\"y\" size=5 value=\"0\">";
+	echo "<input name=\"y\" size=5 value=\"$y\">";
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+	if(isset($shostid))
+	{
+		echo "<input type=\"submit\" name=\"register\" value=\"update\">";
+	}
 
 	show_table2_header_end();
 ?>
