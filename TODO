@@ -9,7 +9,6 @@
  - make support for "Clone"
  - add a simple generic tcp check
  - check bug with trapper receiving value with ":"
- - add "Add from template" feature
  - add "Application.MySQL" template
 
 LATER:
