@@ -6,14 +6,14 @@
 
  	A.footer {color:#CCCCCC;}
 	A {font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10pt}
-   	A:link {color:"blue"; text-decoration: underline; }
-	A:visited {color:"blue"; text-decoration: none; }
+   	A:link {color:"black"; text-decoration: none; }
+	A:visited {color:"black"; text-decoration: none; }
 	A:hover {color:"red"; text-decoration: underline;}
 	A:active {color:"#9D0000"; text-decoration: underline;}
 
 	P {font-family:Verdana, Arial, Helvetica, sans-serif;font-size:8pt; }
-   	P:link {color:"blue"; text-decoration: underline; }
-	P:visited {color:"blue"; text-decoration: none; }
+   	P:link {color:"black"; text-decoration: underline; }
+	P:visited {color:"black"; text-decoration: none; }
 	P:hover {color:"red"; text-decoration: none;}
 	P:active {color:"#9D0000"; text-decoration: underline;}
 	p.uppercase {text-transform: uppercase}
