@@ -125,7 +125,7 @@ int	process_data(char *server,char *key, double value)
 
 	DBexecute(sql);
 
-	update_functions( itemid );
+	update_triggers( itemid );
  
 	DBfree_result(result);
 

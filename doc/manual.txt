@@ -14,15 +14,14 @@
 
 3. Chapter 3 (Structure)
 3.1 zabbix_sucker
-3.2 zabbix_alarmer
-3.3 zabbix_agent
-3.4 zabbix_trapper
-3.5 zabbix_sender
-3.6 Database
-3.7 WEB-based frontend
-3.7.1 Reports
-3.7.1.1 Status of Zabbix
-3.7.1.2 Availability report
+3.2 zabbix_agent
+3.3 zabbix_trapper
+3.4 zabbix_sender
+3.5 Database
+3.6 WEB-based frontend
+3.6.1 Reports
+3.6.1.1 Status of Zabbix
+3.6.1.2 Availability report
 
 4. Chapter 4 (Installation)
 
@@ -163,30 +162,15 @@ zabbix_sucker
 DESCRIPTION
 
 The process periodically connects to agents to get updated information on parameters being
-monitored.
+monitored.  Also, the process periodically re-calculates status of triggers. It sends alerts to users
+if required.
 
 No switches are supported by zabbix_sucker.
 
 The process is run as daemon under non-priveledged user account, usually zabbix. Syslog is used to store
 debug information for the process.
 
-3.2 zabbix_alarmer
-
-The Zabbix server process.
-
-SYNOPSIS
-
-zabbix_alarmer
-
-DESCRIPTION
-
-The process periodically re-calculates status of triggers. It also sends alerts to users
-if required.
-
-The process is run as daemon under non-priveledged user account. Syslog is used to store debug information
-for the process.
-
-3.3 zabbix_agent
+3.2 zabbix_agent
 
 The Zabbix agent.
 
@@ -205,7 +189,7 @@ during 3 seconds, it kills himself.
 When executed, it reads /etc/zabbix/zabbix_agent.conf file. This file should exist and contain
 IP address of Zabbix server. Connections from other IPs are rejected.
 
-3.4 zabbix_trapper
+3.3 zabbix_trapper
 
 The Zabbix server process.
 
@@ -218,7 +202,7 @@ DESCRIPTION
 The process is made to support traping. It constantly waits for connections from zabbix_sender
 agents.  
 
-3.5 zabbix_sender
+3.4 zabbix_sender
 
 The Zabbix agent (trapping).
 
@@ -242,30 +226,30 @@ zabbix_sender zabbix.abcde.com 10001 db.abcde.com:procload 2.34
 It means, that zabbix_sender will send information about processor load on host db.abcde.com
 to Zabbix server located at zabbix.acbde.com. Processor load is 2.34.
 
-3.6 Database
+3.5 Database
 
 Database used by Zabbix play most important role. The database is the only source
 of configuration parameters and it stores all history of monitored values.
 
 Zabbix performance highly depends on officiency and speed of used database.
  
-3.7 WEB-based frontend
+3.6 WEB-based frontend
 
 The frontend provides convinient and platform independed way for accessing Zabbix.
 Information provided by the frontend can be either graphical (e.g. graph on disk space
 usage) or text format. Text representation of monitored parameters is made to allow
 easy way for export Zabbix data to other analytical tools.
 
-3.7.1 Reports
+3.6.1 Reports
 
 Zabbix reports represent collected information in structured way. All reports are produced
 in HTML format.
 
 Note that report generation could be very time consuming operation. Additionally, if you
-use MySQL or ay other database with table locking, zabbix_sucker and zabbix_alarmer will
+use MySQL or ay other database with table locking, zabbix_sucker and zabbix_trapper will
 wait until the report is finished.
 
-3.7.1.1 Status of Zabbix
+3.6.1.1 Status of Zabbix
 
 This report gives general information about Zabbix server including:
 
@@ -273,7 +257,7 @@ This report gives general information about Zabbix server including:
  - are main Zabbix processes running ?
  - other information
 
-3.7.1.2 Availability report
+3.6.1.2 Availability report
 
 This report calculates amount of time a trigger spent in true and false states. 
 
@@ -393,10 +377,6 @@ cd src/zabbix_sucker
 ./configure
 make
 
-cd src/zabbix_alarmer
-./configure
-make
-
 cd src/zabbix_agent
 ./configure
 make
@@ -471,9 +451,8 @@ to "Not monitored". List of possible parameers for the host will be automaticall
 
  - Configure TRIGGERS
 
- - Run zabbix_sucker and zabbix_alarmer
+ - Run zabbix_sucker
 
-/opt/zabbix/bin/zabbix_alarmer
 /opt/zabbix/bin/zabbix_sucker
 
 Define actions for triggers you are interested in.
