@@ -959,6 +959,8 @@ int get_values(void)
 	{
 		pthread_cond_wait(&result_cv, &result_mutex);
 	}
+	pthread_mutex_unlock(&result_mutex);
+
 	result = DBselect_thread(database, sql);
 	shared_result = result;
 	answer_count = 0;
@@ -968,20 +970,20 @@ int get_values(void)
 		requests[i].status = 0;
 		requests[i].itemid=atoi(DBget_field(result,i,0));
 	}
-	pthread_mutex_unlock(&result_mutex);
 
 
 	pthread_mutex_lock (&result_mutex);
 	state  = 1;
 //	pthread_cond_signal(&result_cv);
-//	zabbix_log( LOG_LEVEL_WARNING, "sucker: broadcast state [%d]", state);
+	zabbix_log( LOG_LEVEL_WARNING, "sucker: broadcast state [%d]", state);
 	pthread_cond_broadcast(&result_cv);
 	pthread_mutex_unlock(&result_mutex);
 	
 	pthread_mutex_lock (&result_mutex);
-//	zabbix_log( LOG_LEVEL_WARNING, "sucker: waiting for state 2 [update data in DB] state [%d]", state);
+	zabbix_log( LOG_LEVEL_WARNING, "sucker: waiting for request_count [%d] == answer_count [%d] [update data in DB] state [%d]", request_count, answer_count, state);
 //	while ( (state != 2) && (answer_count != request_count))
-	while (state != 2)
+//	while (state != CONFIG_SUCKERD_FORKS-5+request_count)
+	while (answer_count!=request_count)
 	{
 		pthread_cond_wait(&result_cv, &result_mutex);
 /*		zabbix_log( LOG_LEVEL_WARNING, "sucker: YOPT %d %d", request_count, answer_count);
@@ -990,15 +992,15 @@ int get_values(void)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "sucker: before doing actual DB update: itemid [%d] status [%d]", atoi(DBget_field(shared_result,i,0)), requests[i].status );
 		}*/
-		pthread_mutex_unlock (&poller_mutex);
+//		pthread_mutex_unlock (&poller_mutex);
 	}
 	pthread_mutex_unlock(&result_mutex);
 
 	pthread_mutex_lock (&result_mutex);
 	state  = 0;
 //	pthread_cond_signal(&result_cv);
-//	zabbix_log( LOG_LEVEL_WARNING, "sucker: broadcast state [%d]", state);
-//	pthread_cond_broadcast(&result_cv);
+	zabbix_log( LOG_LEVEL_WARNING, "sucker: broadcast state [%d]", state);
+	pthread_cond_broadcast(&result_cv);
 	pthread_mutex_unlock(&result_mutex);
 #else
 	result = DBselect(sql);
@@ -1078,7 +1080,7 @@ int get_values(void)
 		strscpy(value_str,requests[i].value_str);
 		if(requests[i].status != 2)
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "sucker: ERROR status [%d] expected [2]", requests[i].status );
+			zabbix_log( LOG_LEVEL_WARNING, "sucker: ERROR status [%d] expected [2] host [%s] key [%s]", requests[i].status, item.host, item.key );
 		}
 /*		res = get_value(&value,value_str,&item);*/
 #else
@@ -1291,10 +1293,12 @@ void *main_poller_loop()
 	zabbix_log( LOG_LEVEL_DEBUG, "In main_poller_loop()");
 	for(;;)
 	{
-//		zabbix_log( LOG_LEVEL_WARNING, "poller: waiting for state 1 [poll values from agents] State [%d]", state);
+//		zabbix_log( LOG_LEVEL_WARNING, "poller: waiting for state 1..%d [poll values from agents] State [%d]", (CONFIG_SUCKERD_FORKS-4)-1, state);
+		zabbix_log( LOG_LEVEL_WARNING, "poller: waiting for state 1 [poll values from agents] State [%d]", state);
 		pthread_mutex_lock (&result_mutex);
-//		while ( (state != 1) && (answer_count == request_count ))
 		while (state != 1)
+//		while ( (state != 1) && (answer_count == request_count ))
+//		while ( (state < 1) || (state>(CONFIG_SUCKERD_FORKS-4)) )
 		{
 			pthread_cond_wait(&result_cv, &result_mutex);
 		}
@@ -1307,6 +1311,8 @@ void *main_poller_loop()
 			processed=0;
 			for(i=0;i<request_count;i++)
 			{
+//				if(requests[i].status == 1)
+//					zabbix_log( LOG_LEVEL_WARNING, "poller: looking for status [0] host [%s] key [%s] status [%d]", DBget_field(shared_result,i,2), DBget_field(shared_result,i,1), requests[i].status);
 				num = i;
 				if(requests[i].status == 0)
 				{
@@ -1334,7 +1340,7 @@ void *main_poller_loop()
 			if( (num < request_count) && (unprocessed_flag == 1))
 			{
 				/* do logic */
-//				zabbix_log( LOG_LEVEL_WARNING, "poller: processing itemid [%d]", itemid);
+//				zabbix_log( LOG_LEVEL_WARNING, "poller: processing host [%s] key [%s] status [%d]", DBget_field(shared_result,num,2), DBget_field(shared_result,num,1), requests[num].status);
 
 				item.key=DBget_field(shared_result,num,1);
 				item.host=DBget_field(shared_result,num,2);
@@ -1382,16 +1388,22 @@ void *main_poller_loop()
 		}
 
 		pthread_mutex_lock (&result_mutex);
-		if(state == 1)
+//		if( (state >= 1) && (state< CONFIG_SUCKERD_FORKS-4) )
+
+/*		if(state == 1)
 		{
 			state = 2;
-//			zabbix_log( LOG_LEVEL_WARNING, "poller: broadcast state [%d]", state);
+			zabbix_log( LOG_LEVEL_WARNING, "poller: broadcast state [%d]", state);
 			pthread_cond_broadcast(&result_cv);
 		}
 		else
 		{
-//			zabbix_log( LOG_LEVEL_WARNING, "poller: do not broadcast state [2]");
+			zabbix_log( LOG_LEVEL_WARNING, "poller: do not broadcast state [2]");
 		}
+*/
+		state = 2;
+		zabbix_log( LOG_LEVEL_WARNING, "poller: broadcast state [%d]", state);
+		pthread_cond_broadcast(&result_cv);
 		pthread_mutex_unlock (&result_mutex);
 
 /*		pthread_mutex_lock (&result_mutex);
