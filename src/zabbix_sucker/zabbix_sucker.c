@@ -423,7 +423,7 @@ int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
 
 	struct hostent *hp;
 
-	struct sockaddr_in myaddr_in;
+/*	struct sockaddr_in myaddr_in;*/
 	struct sockaddr_in servaddr_in;
 
 	struct linger ling;
@@ -468,9 +468,9 @@ int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
 		return	FAIL;
 	}
  
-	myaddr_in.sin_family = AF_INET;
+/*	myaddr_in.sin_family = AF_INET;
 	myaddr_in.sin_port=0;
-	myaddr_in.sin_addr.s_addr=INADDR_ANY;
+	myaddr_in.sin_addr.s_addr=INADDR_ANY;*/
 
 	if( connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
@@ -491,7 +491,8 @@ int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
 
 	sprintf(c,"%s\n",item->key);
 	zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", c);
-	if( sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
+/*	if( sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )*/
+	if( write(s,c,strlen(c)) == -1 )
 	{
 		switch (errno)
 		{
@@ -507,7 +508,8 @@ int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
 	i=sizeof(struct sockaddr_in);
 
 	memset(c,0,MAX_STRING_LEN+1);
-	len=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);
+/*	len=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);*/
+	len=read(s,c,MAX_STRING_LEN);
 	if(len == -1)
 	{
 		switch (errno)
