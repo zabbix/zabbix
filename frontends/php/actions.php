@@ -151,7 +151,7 @@
 		$uid=DBget_field($result,0,6);
 		$scope=@iif(isset($HTTP_GET_VARS["scope"]),$HTTP_GET_VARS["scope"],DBget_field($result,0,7));
 		$severity=DBget_field($result,0,8);
-		$recipient=DBget_field($result,0,9);
+		$recipient=@iif(isset($HTTP_GET_VARS["recipient"]),$HTTP_GET_VARS["recipient"],DBget_field($result,0,9));
 	}
 	else
 	{
@@ -206,7 +206,8 @@
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
-			if(isset($usrgrpid) && ($row["usrgrpid"] == $usrgrpid))
+//			if(isset($usrgrpid) && ($row["usrgrpid"] == $usrgrpid))
+			if(isset($uid) && ($row["usrgrpid"] == $uid))
 			{
 				echo "<option value=\"".$row["usrgrpid"]."\" selected>".$row["name"];
 			}
