@@ -60,6 +60,42 @@
 ?>
 
 <?php
+	show_table_header_begin();
+	echo "CONFIGURATION OF ACTIONS";
+	show_table_v_delimiter();
+
+	if(!isset($HTTP_GET_VARS["scope"])|| (isset($HTTP_GET_VARS["scope"])&&($HTTP_GET_VARS["scope"]==0)) )
+	{
+		echo "<b>[<a href='actions.php?".url1_param("triggerid")."'>Trigger</a>]</b> ";
+	}
+	else
+	{
+		echo "<a href='actions.php?".url1_param("triggerid")."'>Trigger</a> ";
+	}
+
+	if(isset($HTTP_GET_VARS["scope"])&&($HTTP_GET_VARS["scope"]==1))
+	{
+		echo "<b>[<a href='actions.php?scope=1".url_param("triggerid")."'>Host</a>]</b> ";
+	}
+	else
+	{
+		echo "<a href='actions.php?scope=1".url_param("triggerid")."'>Host</a> ";
+	}
+
+	if(isset($HTTP_GET_VARS["scope"])&&($HTTP_GET_VARS["scope"]==2))
+	{
+		echo "<b>[<a href='actions.php?scope=2".url_param("triggerid")."'>All</a>]</b> ";
+	}
+	else
+	{
+		echo "<a href='actions.php?scope=2".url_param("triggerid")."'>All</a> ";
+	}
+
+	show_table_header_end();
+	echo "<br>";
+?>
+
+<?php
 	$trigger=get_trigger_by_triggerid($HTTP_GET_VARS["triggerid"]);
 	$expression=explode_exp($trigger["expression"],1);
 //	$description=$trigger["description"];
@@ -71,18 +107,27 @@
 ?>
 
 <?php
-	$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.recipient from actions a where a.triggerid=".$HTTP_GET_VARS["triggerid"]." order by a.recipient desc";
+	if(isset($HTTP_GET_VARS["scope"]))
+	{
+		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.recipient,a.scope from actions a where a.triggerid=".$HTTP_GET_VARS["triggerid"]." or a.scope=2 or a.scope=".$HTTP_GET_VARS["scope"]." order by a.recipient desc";
+	}
+	else
+	{
+		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.recipient,a.scope from actions a where a.triggerid=".$HTTP_GET_VARS["triggerid"]." or a.scope=2 order by a.recipient desc";
+	}
+//	echo $sql;
 	$result=DBselect($sql);
 
 	echo "<div align=center>";
 	echo "<TABLE BORDER=0 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR>";
+	echo "<TD><b>Scope</b></TD>";
 	echo "<TD><b>Send message to</b></TD>";
-	echo "<TD><b>When trigger</b></TD>";
-	echo "<TD><b>Delay</b></TD>";                            
+	echo "<TD WIDTH=10%><b>When trigger</b></TD>";
+	echo "<TD WIDTH=5%><b>Delay</b></TD>";                            
 	echo "<TD><b>Subject</b></TD>";
-	echo "<TD><b>Message</b></TD>";
-	echo "<TD><b>Actions</b></TD>";                               
+//	echo "<TD><b>Message</b></TD>";
+	echo "<TD WIDTH=10%><b>Actions</b></TD>";                               
 	echo "</TR>";
 	$col=0;
 	while($row=DBfetch($result))
@@ -97,6 +142,7 @@
 			if($col++%2 == 1)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
 			else			{ echo "<TR BGCOLOR=#DDDDDD>"; }
 		}
+		echo "<TD>".get_scope_description($row["scope"])."</TD>";
 		if($row["recipient"] == RECIPIENT_TYPE_USER)
 		{
 			$user=get_user_by_userid($row["userid"]);
@@ -122,9 +168,9 @@
 		}
 		echo "<TD>".htmlspecialchars($row["delay"])."</TD>";
 		echo "<TD>".htmlspecialchars($row["subject"])."</TD>";
-		echo "<TD>";
-		echo "<pre>".htmlspecialchars($row["message"])."</pre>";
-		echo "</TD>";
+//		echo "<TD>";
+//		echo "<pre>".htmlspecialchars($row["message"])."</pre>";
+//		echo "</TD>";
 		echo "<TD>";
 		echo " <A HREF=\"actions.php?register=edit&actionid=".$row["actionid"]."&triggerid=".$row["triggerid"]."#form\">Change</A>";
 		echo "</TD></TR>";
