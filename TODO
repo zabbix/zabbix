@@ -51,6 +51,7 @@ the agent with a predefined API that can return values to suckerd.
 
 Not ready yet:
 
+ - decrease number of TCP connections between server and agent
  - check Rickard's multithreaded agent
  - check new Mariusz patches
  - improve performance of Alarms and Alerts in PHP frontend
