@@ -163,8 +163,6 @@ void	process_child(int sockfd)
 		}
 		syslog( LOG_DEBUG, "After read() 2");
 
-		alarm(0);
-
 		line[nread-1]=0;
 
 //		printf("Got line:{%s}\n",line);
@@ -174,6 +172,8 @@ void	process_child(int sockfd)
 		sprintf(result,"%f",res);
 		syslog( LOG_DEBUG, "Sending back:%s", result);
 		write(sockfd,result,strlen(result));
+
+		alarm(0);
 	}
 }
 

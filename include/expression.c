@@ -8,6 +8,9 @@
 #include "common.h"
 #include "db.h"
 
+/*
+ * Return 0 if arguments are equal (differs less than 0.000001), 1 - otherwise
+ */
 int	cmp_double(double a,double b)
 {
 	if(fabs(a-b)<0.000001)
@@ -19,7 +22,7 @@ int	cmp_double(double a,double b)
 
 /*
  * Return SUCEED if parameter has format X.X or X, where X is [0..9]{1,n}
- * */
+ */
 int	is_float(char *c)
 {
 	int i;
@@ -50,6 +53,9 @@ int	is_float(char *c)
 	return SUCCEED;
 }
 
+/*
+ * Delete all spaces from given string
+ */ 
 void	delete_spaces(char *c)
 {
 	int i,j;
@@ -71,6 +77,9 @@ void	delete_spaces(char *c)
 
 }
 
+/*
+ * Locate character in given string. FAIL - not found, otherwise character position is returned
+ */
 int	find_char(char *str,char c)
 {
 	int i;

@@ -212,7 +212,6 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 
 	syslog( LOG_DEBUG, "%10s%25s", item->host, item->key );
 
-	alarm(SUCKER_TIMEOUT);
 
 	servaddr_in.sin_family=AF_INET;
 	if(item->useip==1)
@@ -294,7 +293,6 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 		}
 	}
 
-	alarm(0);
 
 //	phan.sa_handler = SIG_IGN; /* just ignore signal now */
 //      sigaction(SIGALRM, &phan, NULL);
@@ -304,22 +302,28 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 
 int	get_value(double *result,DB_ITEM *item)
 {
+	int res;
+
+	alarm(SUCKER_TIMEOUT);
+
 	if(item->type == ITEM_TYPE_ZABBIX)
 	{
-		return get_value_zabbix(result,item);
+		res=get_value_zabbix(result,item);
 	}
 #ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
 	else if(item->type == ITEM_TYPE_SNMP)
 	{
-		return get_value_SNMPv1(result,item);
+		res=get_value_SNMPv1(result,item);
 	}
 #endif
 	else
 	{
 		syslog(LOG_WARNING, "Not supported item type:%d",item->type);
 		*result=NOTSUPPORTED;
-		return SUCCEED;
+		res=SUCCEED;
 	}
+	alarm(0);
+	return res;
 }
 
 int get_minnextcheck(void)
