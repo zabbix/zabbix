@@ -1,5 +1,6 @@
 Changes for 1.0beta9:
 
+ - fixed situation when large SNMP values becomes nagative (Alexei) 
  - added EOL character to make HTML source more readable (Alexei)
  - added new column "severity" to history of alarms (Alexei)
  - status of triggers. If Select is used, no refresh (Alexei)

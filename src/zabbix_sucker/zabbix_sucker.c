@@ -346,7 +346,12 @@ int	get_value_SNMP(int version,double *result,char *result_str,DB_ITEM *item)
 			)
 			{
 				*result=*vars->val.integer;
-				sprintf(result_str,"%ld",(long)*vars->val.integer);
+				/*
+				 * This solves situation when large numbers are stored as negative values
+				 * http://sourceforge.net/tracker/index.php?func=detail&aid=700145&group_id=23494&atid=378683
+				 */ 
+				/*sprintf(result_str,"%ld",(long)*vars->val.integer);*/
+				sprintf(result_str,"%lu",(long)*vars->val.integer);
 			}
 			else if(vars->type == ASN_OCTET_STR)
 			{
