@@ -166,7 +166,11 @@ int	tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
 		exit(1);
 	}
 
-	listen(sockfd, LISTENQ);
+	if(listen(sockfd, LISTENQ) != 0)
+	{
+		syslog( LOG_CRIT, "listen()");
+		exit(1);
+	}
 
 	*addrlenp = sizeof(serv_addr);
 
