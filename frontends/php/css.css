@@ -77,6 +77,7 @@ td.horizontal_menu_n
 	border-color: #000000;
 	border-width:1px;
 	border-top-style: dotted;
+	border-left-style: dotted;
 	border-right-style: dotted;
 }
 
