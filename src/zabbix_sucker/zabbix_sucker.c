@@ -47,8 +47,6 @@ void	signal_handler( int sig )
 		syslog( LOG_ERR, "Got QUIT or INT or TERM signal. Exiting..." );
 		exit( FAIL );
 	}
- 
-	return;
 }
 
 void	daemon_init(void)
@@ -145,8 +143,8 @@ int	get_value_SNMPv1(double *result,DB_ITEM *item)
 		for(vars = response->variables; vars; vars = vars->next_variable)
 		{
 			int count=1;
-//		if (vars->type == ASN_OCTET_STR)
-//		syslog( LOG_WARNING, "Type:%d", vars->type);
+/*		if (vars->type == ASN_OCTET_STR)
+		syslog( LOG_WARNING, "Type:%d", vars->type);*/
 			if(	(vars->type == ASN_INTEGER ) ||
 			(vars->type == ASN_UINTEGER ) ||
 			(vars->type == ASN_COUNTER ) ||
@@ -156,10 +154,10 @@ int	get_value_SNMPv1(double *result,DB_ITEM *item)
 				char *sp = (char *)malloc(1 + vars->val_len);
 				memcpy(sp, vars->val.string, vars->val_len);
 				sp[vars->val_len] = '\0';
-//			syslog( LOG_WARNING, "value #%d is a string: %s\n", count++, sp);
-//			*result=strtod(sp,&e);
-//			syslog( LOG_WARNING, "Type:%d", vars->type);
-//			syslog( LOG_WARNING, "Value #%d is an integer: %d", count++, *vars->val.integer);
+/*			syslog( LOG_WARNING, "value #%d is a string: %s\n", count++, sp);
+			*result=strtod(sp,&e);
+			syslog( LOG_WARNING, "Type:%d", vars->type);
+			syslog( LOG_WARNING, "Value #%d is an integer: %d", count++, *vars->val.integer);*/
 				*result=*vars->val.integer;
 				free(sp);
 			}
@@ -225,8 +223,8 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 
 	if(hp==NULL)
 	{
-		syslog( LOG_WARNING, "Problem with gethostbyname" );
-		return	FAIL;
+		syslog( LOG_WARNING, "gethostbyname() failed" );
+		return	NETWORK_ERROR;
 	}
 
 	servaddr_in.sin_addr.s_addr=((struct in_addr *)(hp->h_addr))->s_addr;
@@ -236,7 +234,7 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 	s=socket(AF_INET,SOCK_STREAM,0);
 	if(s==0)
 	{
-		syslog( LOG_WARNING, "Problem with socket" );
+		syslog( LOG_WARNING, "Cannot create socket" );
 		return	FAIL;
 	}
  
@@ -246,9 +244,9 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 
 	if( connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
-		syslog( LOG_WARNING, "Problem with connect" );
+		syslog( LOG_WARNING, "Cannot connect to [%s]",item->host );
 		close(s);
-		return	FAIL;
+		return	NETWORK_ERROR;
 	}
 
 	sprintf(c,"%s\n",item->key);
@@ -256,7 +254,7 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 	{
 		syslog(LOG_WARNING, "Problem with sendto" );
 		close(s);
-		return	FAIL;
+		return	NETWORK_ERROR;
 	} 
 	i=sizeof(struct sockaddr_in);
 
@@ -265,7 +263,7 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 	{
 		syslog( LOG_WARNING, "Problem with recvfrom [%d]",errno );
 		close(s);
-		return	FAIL;
+		return	NETWORK_ERROR;
 	}
  
 	if( close(s)!=0 )
@@ -285,17 +283,13 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 	{
 		if( cmp_double(*result,NOTSUPPORTED) == 0)
 		{
-			return SUCCEED;
+			return NOTSUPPORTED;
 		}
 		else
 		{
 			return	FAIL;
 		}
 	}
-
-
-//	phan.sa_handler = SIG_IGN; /* just ignore signal now */
-//      sigaction(SIGALRM, &phan, NULL);
 
 	return SUCCEED;
 }
@@ -319,8 +313,7 @@ int	get_value(double *result,DB_ITEM *item)
 	else
 	{
 		syslog(LOG_WARNING, "Not supported item type:%d",item->type);
-		*result=NOTSUPPORTED;
-		res=SUCCEED;
+		res=NOTSUPPORTED;
 	}
 	alarm(0);
 	return res;
@@ -376,6 +369,7 @@ int get_values(void)
 
 	int		i,rows;
 	int		now;
+	int		res;
 	DB_ITEM		item;
 	char		*s;
 
@@ -429,21 +423,28 @@ int get_values(void)
 		}
 
 
-		if( get_value(&value,&item) == SUCCEED )
+		res = get_value(&value,&item);
+		
+		if(res == SUCCEED )
 		{
-			if( cmp_double(value,NOTSUPPORTED) == 0)
-			{
-				sprintf(c,"update items set status=3 where itemid=%d",item.itemid);
-				DBexecute(c);
-			}
-			else
-			{
-				process_new_value(&item,value);
-			}
+			process_new_value(&item,value);
+		}
+		else if(res == NOTSUPPORTED)
+		{
+			syslog( LOG_WARNING, "Parameter [%s] is not supported by agent on host [%s]", item.key, item.host );
+			sprintf(c,"update items set status=3 where itemid=%d",item.itemid);
+			DBexecute(c);
+		}
+		else if(res == NETWORK_ERROR)
+		{
+			syslog( LOG_WARNING, "Parameter [%s] will be checked after [%d] seconds", item.key, DELAY_ON_NETWORK_FAILURE );
+			now=time(NULL);
+			sprintf(c,"update items set nextcheck=%d where itemid=%d",now+DELAY_ON_NETWORK_FAILURE,item.itemid);
+			DBexecute(c);
 		}
 		else
 		{
-			syslog( LOG_WARNING, "Wrong value received [HOST:%s KEY:%s VALUE:%f]", item.host, item.key, value );
+			syslog( LOG_WARNING, "Getting value of [%s] from host [%s] failed", item.key, item.host );
 			syslog( LOG_WARNING, "The value is not stored in database.");
 		}
 	}
@@ -593,16 +594,10 @@ int main(int argc, char **argv)
 	phan.sa_handler = &signal_handler; /* set up sig handler using sigaction() */
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = 0;
-//	phan.sa_flags = SA_RESTART;
 	sigaction(SIGALRM, &phan, NULL);
 	sigaction(SIGINT, &phan, NULL);
 	sigaction(SIGQUIT, &phan, NULL);
 	sigaction(SIGTERM, &phan, NULL);
-
-
-//	signal( SIGINT,  signal_handler );
-//	signal( SIGQUIT, signal_handler );
-//	signal( SIGTERM, signal_handler );
 
 	for(i=1;i<SUCKER_FORKS;i++)
 	{
@@ -616,7 +611,7 @@ int main(int argc, char **argv)
 	}
 
 	openlog("zabbix_suckerd",LOG_PID,LOG_USER);
-//	ret=setlogmask(LOG_UPTO(LOG_DEBUG));
+/*	ret=setlogmask(LOG_UPTO(LOG_DEBUG)); */
 	ret=setlogmask(LOG_UPTO(LOG_WARNING));
 
 	syslog( LOG_WARNING, "zabbix_suckerd #%d started",sucker_num);

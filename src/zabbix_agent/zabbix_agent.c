@@ -30,13 +30,10 @@ void	signal_handler( int sig )
 	if( SIGALRM == sig )
 	{
 		signal( SIGALRM, signal_handler );
- 
-//		fprintf(stderr,"Timeout while executing operation.");
 	}
  
 	if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
 	{
-//		fprintf(stderr,"\nGot QUIT or INT or TERM signal. Exiting..." );
 	}
 	exit( FAIL );
 }

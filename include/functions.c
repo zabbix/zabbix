@@ -22,6 +22,9 @@
 #include "functions.h"
 #include "expression.h"
 
+/*
+ * Evaluate function MIN
+ */ 
 int	evaluate_MIN(float *min,int itemid,int parameter)
 {
 	DB_RESULT	*result;
@@ -58,6 +61,9 @@ int	evaluate_MIN(float *min,int itemid,int parameter)
 	return SUCCEED;
 }
 
+/*
+ * Evaluate function MAX
+ */ 
 int	evaluate_MAX(float *max,int itemid,int parameter)
 {
 	DB_RESULT	*result;
@@ -93,6 +99,9 @@ int	evaluate_MAX(float *max,int itemid,int parameter)
 	return SUCCEED;
 }
 
+/*
+ * Evaluate function (min,max,prev,last,diff)
+ */ 
 int	evaluate_FUNCTION(float *value,DB_ITEM *item,char *function,int parameter)
 {
 	int	ret  = SUCCEED;
@@ -153,6 +162,9 @@ int	evaluate_FUNCTION(float *value,DB_ITEM *item,char *function,int parameter)
 	return ret;
 }
 
+/*
+ * Re-calculate values of functions related to given ITEM
+ */ 
 void	update_functions(DB_ITEM *item)
 {
 	DB_FUNCTION	function;
@@ -162,45 +174,47 @@ void	update_functions(DB_ITEM *item)
 	int		ret=SUCCEED;
 	int		i,rows;
 
-		sprintf(c,"select function,parameter,itemid from functions where itemid=%d group by 1,2,3 order by 1,2,3",item->itemid);
+	sprintf(c,"select function,parameter,itemid from functions where itemid=%d group by 1,2,3 order by 1,2,3",item->itemid);
 
-		result = DBselect(c);
-		rows=DBnum_rows(result);
+	result = DBselect(c);
+	rows=DBnum_rows(result);
 
-		if((result==NULL)||(rows==0))
-		{
-			syslog( LOG_NOTICE, "No functions to update.");
-			DBfree_result(result);
-			return;
-			/*continue;*/
-		}
-
-		for(i=0;i<rows;i++)
-		{
-			function.function=DBget_field(result,i,0);
-			function.parameter=atoi(DBget_field(result,i,1));
-			function.itemid=atoi(DBget_field(result,i,2));
-
-			syslog( LOG_DEBUG, "ItemId:%d Evaluating %s(%d)\n",function.itemid,function.function,function.parameter);
-
-			ret = evaluate_FUNCTION(&value,item,function.function,function.parameter);
-			if( FAIL == ret)	
-			{
-				syslog( LOG_WARNING, "Evaluation failed for function:%s\n",function.function);
-				continue;
-			}
-			syslog( LOG_DEBUG, "Result:%f\n",value);
-			if (ret == SUCCEED)
-			{
-				sprintf(c,"update functions set lastvalue=%f where itemid=%d and function='%s' and parameter=%d", value, function.itemid, function.function, function.parameter );
-				DBexecute(c);
-			}
-		}
-	
+	if((result==NULL)||(rows==0))
+	{
+		syslog( LOG_NOTICE, "No functions to update.");
 		DBfree_result(result);
-/*	}*/
+		return;
+		/*continue;*/
+	}
+
+	for(i=0;i<rows;i++)
+	{
+		function.function=DBget_field(result,i,0);
+		function.parameter=atoi(DBget_field(result,i,1));
+		function.itemid=atoi(DBget_field(result,i,2));
+
+		syslog( LOG_DEBUG, "ItemId:%d Evaluating %s(%d)\n",function.itemid,function.function,function.parameter);
+
+		ret = evaluate_FUNCTION(&value,item,function.function,function.parameter);
+		if( FAIL == ret)	
+		{
+			syslog( LOG_WARNING, "Evaluation failed for function:%s\n",function.function);
+			continue;
+		}
+		syslog( LOG_DEBUG, "Result:%f\n",value);
+		if (ret == SUCCEED)
+		{
+			sprintf(c,"update functions set lastvalue=%f where itemid=%d and function='%s' and parameter=%d", value, function.itemid, function.function, function.parameter );
+			DBexecute(c);
+		}
+	}
+
+	DBfree_result(result);
 }
 
+/*
+ * Send email
+ */ 
 int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,char *mailsubject,char *mailbody)
 {
 	int	s;
@@ -217,7 +231,7 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 	hp=gethostbyname(smtp_server);
 	if(hp==NULL)
 	{
-		syslog(LOG_ERR, "Cannot get IP for mailserver.");
+		syslog(LOG_ERR, "Cannot get IP for mailserver [%s]",smtp_server);
 		return FAIL;
 	}
 
@@ -227,7 +241,7 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 	s=socket(AF_INET,SOCK_STREAM,0);
 	if(s==0)
 	{
-		syslog(LOG_ERR, "Socket error.");
+		syslog(LOG_ERR, "Cannot create socket");
 		return FAIL;
 	}
 	
@@ -237,7 +251,7 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 
 	if( connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
-		syslog(LOG_ERR, "Connect error.");
+		syslog(LOG_ERR, "Cannot connect to SMTP server [%s]",smtp_server);
 		return FAIL;
 	}
 		
@@ -388,6 +402,9 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 	return SUCCEED;
 }
 
+/*
+ * Send message to user. Message will be sent to all medias registered to given user.
+ */ 
 void	send_to_user(int actionid,int userid,char *smtp_server,char *smtp_helo,char *smtp_email,char *subject,char *message)
 {
 	DB_MEDIA media;
@@ -427,6 +444,9 @@ void	send_to_user(int actionid,int userid,char *smtp_server,char *smtp_helo,char
 	DBfree_result(result);
 }
 
+/*
+ * Apply actions if any.
+ */ 
 void	apply_actions(int triggerid,int good)
 {
 	DB_RESULT *result;
@@ -500,6 +520,9 @@ void	apply_actions(int triggerid,int good)
 	DBfree_result(result);
 }
 
+/*
+ * Re-calculate values of triggers
+ */ 
 void	update_triggers( int flag, int sucker_num, int lastclock )
 {
 	char c[1024];
@@ -698,10 +721,9 @@ void	process_new_value(DB_ITEM *item,double value)
 		DBexecute(c);
 	}
 
-/*	if((item->lastvalue_null != 1)&&(item->prevvalue_null != 1)&&cmp_double(value,item->lastvalue) == 0)*/
 	if((item->prevvalue_null == 1) || (cmp_double(value,item->lastvalue) != 0) || (cmp_double(item->prevvalue,item->lastvalue) != 0) )
 	{
-		sprintf(c,"update items set NextCheck=%d,PrevValue=LastValue,LastValue=%f,LastClock=%d where ItemId=%d",now+item->delay,value,now,item->itemid);
+		sprintf(c,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue=%f,lastclock=%d where itemid=%d",now+item->delay,value,now,item->itemid);
 		item->prevvalue=item->lastvalue;
 		item->lastvalue=value;
 		item->prevvalue_null=0;

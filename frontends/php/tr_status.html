@@ -38,7 +38,7 @@
 		echo "STATUS OF TRIGGERS";
 	        show_table_v_delimiter();
 
-	        $result=DBselect("select hostid,host from hosts order by host");
+	        $result=DBselect("select hostid,host from hosts where status=0 order by host");
 	        if(isset($hostid))
 	        {
 	                echo "<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact\">all</A>  ";
