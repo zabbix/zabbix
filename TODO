@@ -1,6 +1,5 @@
 1.0beta11:
 
- - add support for sensors
  - cannot use "." as key in trigger expressions
  - discuss prefixes diskfree>10K
  - support for suffixes in trigger expressions (K,M,G)
