@@ -672,7 +672,7 @@ void	apply_actions(int triggerid,int good)
 void	update_serv(int serviceid)
 {
 	char	sql[MAX_STRING_LEN+1];
-	int	i,j;
+	int	i;
 	int	status;
 	int	serviceupid, algorithm;
 	int	now;
