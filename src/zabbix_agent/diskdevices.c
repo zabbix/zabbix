@@ -273,22 +273,30 @@ void	report_stats_diskdevices(FILE *file, int now)
 			if(diskdevices[i].clock[j]==now)
 			{
 				read_io_ops[0]=diskdevices[i].read_io_ops[j];
+				blks_read[0]=diskdevices[i].blks_read[j];
 				write_io_ops[0]=diskdevices[i].write_io_ops[j];
+				blks_write[0]=diskdevices[i].blks_write[j];
 			}
 			if(diskdevices[i].clock[j]==time1)
 			{
 				read_io_ops[1]=diskdevices[i].read_io_ops[j];
+				blks_read[1]=diskdevices[i].blks_read[j];
 				write_io_ops[1]=diskdevices[i].write_io_ops[j];
+				blks_write[1]=diskdevices[i].blks_write[j];
 			}
 			if(diskdevices[i].clock[j]==time5)
 			{
 				read_io_ops[2]=diskdevices[i].read_io_ops[j];
+				blks_read[2]=diskdevices[i].blks_read[j];
 				write_io_ops[2]=diskdevices[i].write_io_ops[j];
+				blks_write[2]=diskdevices[i].blks_write[j];
 			}
 			if(diskdevices[i].clock[j]==time15)
 			{
 				read_io_ops[3]=diskdevices[i].read_io_ops[j];
+				blks_read[3]=diskdevices[i].blks_read[j];
 				write_io_ops[3]=diskdevices[i].write_io_ops[j];
+				blks_write[3]=diskdevices[i].blks_write[j];
 			}
 		}
 
