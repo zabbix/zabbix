@@ -183,7 +183,7 @@
 	if(DBget_field($result,0,0)>0)
 	{
 		echo "<a name=\"form\"></a>";
-		insert_item_form($HTTP_GET_VARS["itemid"]);
+		@insert_item_form($HTTP_GET_VARS["itemid"]);
 	}
 ?>
 

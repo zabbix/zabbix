@@ -2965,6 +2965,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	insert_login_form()
 	{
+		global	$HTTP_GET_VARS;
+
 		show_table2_header_begin();
 		echo "Login";
 
@@ -2973,12 +2975,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		echo "Login name";
 		show_table2_h_delimiter();
-		echo "<input name=\"name\" value=\"$name\" size=20>";
+//		echo "<input name=\"name\" value=\"".$HTTP_GET_VARS["name"]."\" size=20>";
+		echo "<input name=\"name\" value=\"\" size=20>";
 
 		show_table2_v_delimiter();
 		echo "Password";
 		show_table2_h_delimiter();
-		echo "<input type=\"password\" name=\"password\" value=\"$password\" size=20>";
+//		echo "<input type=\"password\" name=\"password\" value=\"$password\" size=20>";
+		echo "<input type=\"password\" name=\"password\" value=\"\" size=20>";
 
 		show_table2_v_delimiter2();
 		echo "<input type=\"submit\" name=\"register\" value=\"Enter\">";
