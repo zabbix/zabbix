@@ -108,17 +108,8 @@
 	$sql="select actionid,userid,delay,subject,message,scope,severity,recipient,good,triggerid from actions where (scope=0 and triggerid=".$_GET["triggerid"].") or scope=1 or scope=2";
 	$result=DBselect($sql);
 
-	echo "<div align=center>";
-	echo "<TABLE BORDER=0 WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
-	echo "<TR BGCOLOR=\"#CCCCCC\">";
-	echo "<TD><b>".S_SCOPE."</b></TD>";
-	echo "<TD><b>".S_SEND_MESSAGE_TO."</b></TD>";
-	echo "<TD WIDTH=10%><b>".S_WHEN_TRIGGER."</b></TD>";
-	echo "<TD WIDTH=5%><b>".S_DELAY."</b></TD>";                            
-	echo "<TD><b>".S_SUBJECT."</b></TD>";
-//	echo "<TD><b>Message</b></TD>";
-	echo "<TD WIDTH=10%><b>".S_ACTIONS."</b></TD>";                               
-	echo "</TR>";
+	table_begin();
+	table_header(array(S_SCOPE,S_SEND_MESSAGE_TO,S_WHEN_TRIGGER,S_DELAY,S_SUBJECT,S_ACTIONS));
 	$col=0;
 	while($row=DBfetch($result))
 	{
@@ -140,48 +131,42 @@
 			if($found==0)	continue;
 		}
 
-		if(isset($actionid) && ($actionid==$row["actionid"]))
-		{
-			echo "<TR BGCOLOR=#FFDDDD>";
-			$col++;
-		} 
-		else
-		{
-			if($col++%2 == 1)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
-			else			{ echo "<TR BGCOLOR=#DDDDDD>"; }
-		}
-		echo "<TD>".get_scope_description($row["scope"])."</TD>";
 		if($row["recipient"] == RECIPIENT_TYPE_USER)
 		{
 			$user=get_user_by_userid($row["userid"]);
-			echo "<TD>".$user["alias"]."</TD>";
+			$recipient=$user["alias"];
 		}
 		else
 		{
 			$groupd=get_usergroup_by_usrgrpid($row["userid"]);
-			echo "<TD>".$groupd["name"]."</TD>";
+			$recipient=$groupd["name"];
 		}
   
 		if($row["good"] == 1)
 		{
-			echo "<TD><FONT COLOR=\"#AA0000\">".S_ON."</FONT></TD>";
+#			echo "<TD><FONT COLOR=\"#AA0000\">".S_ON."</FONT></TD>";
+			$good=array("value"=>S_ON,"class"=>"on");
 		}
 		else if($row["good"] == 0)
 		{
-			echo "<TD><FONT COLOR=\"#00AA00\">".S_OFF."</FONT></TD>";
+#			echo "<TD><FONT COLOR=\"#00AA00\">".S_OFF."</FONT></TD>";
+			$good=array("value"=>S_OFF,"class"=>"off");
 		}
 		else if($row["good"] == 2)
 		{
-			echo "<TD><FONT COLOR=\"#AA0000\">".S_ON."</FONT>/<FONT COLOR=\"#00AA00\">OFF</FONT></TD>";
+#			echo "<TD><FONT COLOR=\"#AA0000\">".S_ON."</FONT>/<FONT COLOR=\"#00AA00\">OFF</FONT></TD>";
+			$good=array("value"=>S_ON."/".S_OFF,"class"=>"on");
 		}
-		echo "<TD>".htmlspecialchars($row["delay"])."</TD>";
-		echo "<TD>".htmlspecialchars($row["subject"])."</TD>";
-//		echo "<TD>";
-//		echo "<pre>".htmlspecialchars($row["message"])."</pre>";
-//		echo "</TD>";
-		echo "<TD>";
-		echo " <A HREF=\"actions.php?register=edit&actionid=".$row["actionid"]."&triggerid=".$_GET["triggerid"]."#form\">Change</A>";
-		echo "</TD></TR>";
+		$actions="<A HREF=\"actions.php?register=edit&actionid=".$row["actionid"]."&triggerid=".$_GET["triggerid"]."#form\">Change</A>";
+
+		table_row(array(
+			get_scope_description($row["scope"]),
+			$recipient,
+			$good,
+			htmlspecialchars($row["delay"]),
+			htmlspecialchars($row["subject"]),
+			$actions
+			),$col++);
 	}
 	if(DBnum_rows($result)==0)
 	{
@@ -189,12 +174,11 @@
 			echo "<TD COLSPAN=6 ALIGN=CENTER>".S_NO_ACTIONS_DEFINED."</TD>";
 			echo "<TR>";
 	}
-	echo "</TABLE>";
+	table_end();
 ?>
 </font>
 </tr>
 </table>
-</div>
 
 <?php
 	echo "<a name=\"form\"></a>";
