@@ -215,9 +215,10 @@
 	echo "<select name=\"icon\" size=1>";
 	$icons=array();
 	$icons[0]="Server";
-	$icons[1]="Printer";
-	$icons[2]="Hub";
-	for($i=0;$i<3;$i++)
+	$icons[1]="Workstation";
+	$icons[2]="Printer";
+	$icons[3]="Hub";
+	for($i=0;$i<4;$i++)
 	{
 		if(isset($hostid) && ($icon==$icons[$i]))
 		{
