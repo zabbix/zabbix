@@ -20,6 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
+	include "include/forms.inc.php";
 	$page["title"] = S_HOSTS;
 	$page["file"] = "hosts.php";
 	show_header($page["title"],0,0);
@@ -131,7 +132,7 @@
 	if(DBnum_rows($result)==0)
 	{
 			echo "<TR BGCOLOR=#EEEEEE>";
-			echo "<TD COLSPAN=3 ALIGN=CENTER>".S_NO_HOST_GROUPS_DEFINED."</TD>";
+			echo "<TD COLSPAN=4 ALIGN=CENTER>".S_NO_HOST_GROUPS_DEFINED."</TD>";
 			echo "<TR>";
 	}
 	echo "</TABLE>";
@@ -146,11 +147,11 @@
 	if(isset($HTTP_GET_VARS["groupid"]))
 	{
 //		echo "all ";
-		echo "<a href='hosts.php'>".S_ALL."</a> ";
+		echo "<a href='hosts.php'>".S_ALL_SMALL."</a> ";
 	}
 	else
 	{
-		echo "<b>[<a href='hosts.php'>".S_ALL."</a>]</b> ";
+		echo "<b>[<a href='hosts.php'>".S_ALL_SMALL."</a>]</b> ";
 	}
 
 	$result=DBselect("select groupid,name from groups order by name");
@@ -281,7 +282,7 @@
 	if(DBnum_rows($result)==0)
 	{
 			echo "<TR BGCOLOR=#EEEEEE>";
-			echo "<TD COLSPAN=5 ALIGN=CENTER>".S_NO_HOSTS_DEFINED."</TD>";
+			echo "<TD COLSPAN=6 ALIGN=CENTER>".S_NO_HOSTS_DEFINED."</TD>";
 			echo "<TR>";
 	}
 	echo "</TABLE>";

@@ -26,14 +26,14 @@
 ?>
 
 <?php
-	show_table_header("CONFIGURATION OF SCREEN");
+	show_table_header(S_CONFIGURATION_OF_SCREEN_BIG);
 	echo "<br>";
 ?>
 
 <?php
-	if(!check_right("Screen","R",$HTTP_GET_VARS["screenid"]))
+	if(!check_right("Screen","U",$HTTP_GET_VARS["screenid"]))
 	{
-		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_footer();
 		exit;
 	}
@@ -51,18 +51,18 @@
 //			}
 			$result=add_screen_item($HTTP_GET_VARS["resource"],$HTTP_GET_VARS["screenid"],$HTTP_GET_VARS["x"],$HTTP_GET_VARS["y"],$HTTP_GET_VARS["resourceid"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
 			unset($HTTP_GET_VARS["x"]);
-			show_messages($result,"Item added","Cannot add item");
+			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
 		if($HTTP_GET_VARS["register"]=="delete")
 		{
 			$result=delete_screen_item($HTTP_GET_VARS["screenitemid"]);
-			show_messages($result,"Item deleted","Cannot delete item");
+			show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
 			unset($HTTP_GET_VARS["x"]);
 		}
                 if($HTTP_GET_VARS["register"]=="update")
                 {
                         $result=update_screen_item($HTTP_GET_VARS["screenitemid"],$HTTP_GET_VARS["resource"],$HTTP_GET_VARS["resourceid"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
-                        show_messages($result,"Item updated","Cannot update item");
+                        show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 			unset($HTTP_GET_VARS["x"]);
                 }
 		unset($HTTP_GET_VARS["register"]);
@@ -114,7 +114,7 @@
 			$height=@iif(isset($HTTP_GET_VARS["height"]),$HTTP_GET_VARS["height"],$height);
 
         		show_table2_header_begin();
-        		echo "Screen cell configuration";
+        		echo S_SCREEN_CELL_CONFIGURATION;
 
         		echo "<input name=\"screenid\" type=\"hidden\" value=$screenid>";
         		echo "<input name=\"screenitemid\" type=\"hidden\" value=$screenitemid>";
@@ -124,18 +124,18 @@
 //			echo "<input name=\"resource\" type=\"hidden\" value='$resource'>";
 
 			show_table2_v_delimiter();
-			echo "Resource";
+			echo S_RESOURCE;
 			show_table2_h_delimiter();
 			echo "<select name=\"resource\" size=1 onChange=\"submit()\">";
-			echo "<OPTION VALUE='0' ".iif($resource==0,"selected","").">Graph";
-			echo "<OPTION VALUE='1' ".iif($resource==1,"selected","").">Simple graph";
-			echo "<OPTION VALUE='2' ".iif($resource==2,"selected","").">Map";
+			echo "<OPTION VALUE='0' ".iif($resource==0,"selected","").">".S_GRAPH;
+			echo "<OPTION VALUE='1' ".iif($resource==1,"selected","").">".S_SIMPLE_GRAPH;
+			echo "<OPTION VALUE='2' ".iif($resource==2,"selected","").">".S_MAP;
 			echo "</SELECT>";
 
 			if($resource == 1)
 			{
 				show_table2_v_delimiter();
-				echo nbsp("Graph name");
+				echo nbsp(S_GRAPH_NAME);
 				show_table2_h_delimiter();
 				$result=DBselect("select h.host,i.description,i.itemid from hosts h,items i where h.hostid=i.hostid and h.status in (0,2) and i.status=0 order by h.host,i.description");
 				echo "<select name=\"resourceid\" size=1>";
@@ -152,7 +152,7 @@
 			else if($resource == 0)
 			{
 				show_table2_v_delimiter();
-				echo nbsp("Graph name");
+				echo nbsp(S_GRAPH_NAME);
 				show_table2_h_delimiter();
 				$result=DBselect("select graphid,name from graphs order by name");
 				echo "<select name=\"resourceid\" size=1>";
@@ -168,7 +168,7 @@
 			else if($resource == 2)
 			{
 				show_table2_v_delimiter();
-				echo "Map";
+				echo S_MAP;
 				show_table2_h_delimiter();
 				$result=DBselect("select sysmapid,name from sysmaps order by name");
 				echo "<select name=\"resourceid\" size=1>";
@@ -189,11 +189,11 @@
 			if($resource!=2)
 			{
 				show_table2_v_delimiter();
-				echo "Width";
+				echo S_WIDTH;
 				show_table2_h_delimiter();
 				echo "<input class=\"biginput\" name=\"width\" size=5 value=\"$width\">";
 				show_table2_v_delimiter();
-				echo "Height";
+				echo S_HEIGHT;
 				show_table2_h_delimiter();
 				echo "<input class=\"biginput\" name=\"height\" size=5 value=\"$height\">";
 			}
@@ -227,7 +227,7 @@
 		}
 		else
 		{
-			echo "<a href=screenedit.php?register=edit&screenid=$screenid&x=$c&y=$r>Empty</a>";
+			echo "<a href=screenedit.php?register=edit&screenid=$screenid&x=$c&y=$r>".S_EMPTY."</a>";
 		}
 		echo "</form>\n";
         

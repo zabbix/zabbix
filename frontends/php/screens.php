@@ -42,7 +42,7 @@
 	if(!isset($HTTP_GET_VARS["fullscreen"]))
 	{
 		show_table_header_begin();
-		echo "SCREENS";
+		echo S_SCREENS_BIG;
 
 		show_table_v_delimiter();
 
@@ -68,7 +68,7 @@
 		}
 		if(DBnum_rows($result) == 0)
 		{
-			echo "No screens to display";
+			echo S_NO_SCREENS_TO_DISPLAY;
 		}
 
 		echo "</font>";
@@ -141,7 +141,7 @@
 	}
 	else
 	{
-		show_table_header("Select screen to display");		
+		show_table_header(S_SELECT_SCREEN_TO_DISPLAY);		
 		echo "<TABLE BORDER=0 align=center COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 		echo "<TR BGCOLOR=#DDDDDD>";
 		echo "<TD ALIGN=CENTER>";

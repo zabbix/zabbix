@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	$page["title"] = "Trigger comments";
+	$page["title"] = S_TRIGGER_COMMENTS;
 	$page["file"] = "tr_comments.php";
 
 	include "include/config.inc.php";
@@ -28,14 +28,14 @@
 <?php
 	if(!check_right("Trigger comment","R",$HTTP_GET_VARS["triggerid"]))
 	{
-		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_footer();
 		exit;
 	}
 ?>
 
 <?php
-	show_table_header("TRIGGER COMMENTS");
+	show_table_header(S_TRIGGER_COMMENTS_BIG);
 	echo "<br>";
 ?>
 
@@ -43,7 +43,7 @@
 	if(isset($HTTP_GET_VARS["register"]) && ($HTTP_GET_VARS["register"]=="update"))
 	{
 		$result=update_trigger_comments($HTTP_GET_VARS["triggerid"],$HTTP_GET_VARS["comments"]);
-		show_messages($result,"Trigger comment updated","Cannot update trigger comment");
+		show_messages($result, S_COMMENT_UPDATED, S_CANNO_UPDATE_COMMENT);
 	}
 ?>
 
@@ -54,12 +54,12 @@
 
 <?php
 	show_table2_header_begin();
-	echo "Comments";
+	echo S_COMMENTS;
 
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"tr_comments.php\">";
 	echo "<input name=\"triggerid\" type=\"hidden\" value=".$HTTP_GET_VARS["triggerid"].">";
-	echo "Comments";
+	echo S_COMMENTS;
 	show_table2_h_delimiter();
 	echo "<textarea name=\"comments\" cols=100 ROWS=\"25\" wrap=\"soft\">$comments</TEXTAREA>";
 

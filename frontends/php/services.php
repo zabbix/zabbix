@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	$page["title"] = "High-level representation of monitored data";
+	$page["title"] = S_IT_SERVICES;
 	$page["file"] = "services.php";
 
 	include "include/config.inc.php";
@@ -30,7 +30,7 @@
 <?php
 	if(!check_anyright("Service","U"))
 	{
-		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_footer();
 		exit;
 	}
@@ -42,17 +42,17 @@
 		if($HTTP_GET_VARS["register"]=="update")
 		{
 			$result=@update_service($HTTP_GET_VARS["serviceid"],$HTTP_GET_VARS["name"],$HTTP_GET_VARS["triggerid"],$HTTP_GET_VARS["linktrigger"],$HTTP_GET_VARS["algorithm"],$HTTP_GET_VARS["showsla"],$HTTP_GET_VARS["goodsla"],$HTTP_GET_VARS["sortorder"]);
-			show_messages($result,"Service updated","Cannot update service");
+			show_messages($result, S_SERVICE_UPDATED, S_CANNOT_UPDATE_SERVICE);
 		}
 		if($HTTP_GET_VARS["register"]=="add")
 		{
 			$result=@add_service($HTTP_GET_VARS["serviceid"],$HTTP_GET_VARS["name"],$HTTP_GET_VARS["triggerid"],$HTTP_GET_VARS["linktrigger"],$HTTP_GET_VARS["algorithm"],$HTTP_GET_VARS["showsla"],$HTTP_GET_VARS["goodsla"],$HTTP_GET_VARS["goodsla"]);
-			show_messages($result,"Service added","Cannot add service");
+			show_messages($result, S_SERVICE_ADDED, S_CANNOT_ADD_SERVICE);
 		}
 		if($HTTP_GET_VARS["register"]=="add server")
 		{
 			$result=add_host_to_services($HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["serviceid"]);
-			show_messages($result,"Host trigger added","Cannot add host triggers");
+			show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 		}
 		if($HTTP_GET_VARS["register"]=="add link")
 		{
@@ -65,31 +65,31 @@
 				$HTTP_GET_VARS["softlink"]=1;
 			}
 			$result=add_service_link($HTTP_GET_VARS["servicedownid"],$HTTP_GET_VARS["serviceupid"],$HTTP_GET_VARS["softlink"]);
-			show_messages($result,"Service link added","Cannot add service link");
+			show_messages($result, S_LINK_ADDED, S_CANNOT_ADD_LINK);
 		}
 		if($HTTP_GET_VARS["register"]=="delete")
 		{
 			$result=delete_service($HTTP_GET_VARS["serviceid"]);
-			show_messages($result,"Service deleted","Cannot delete service");
+			show_messages($result, S_SERVICE_DELETED, S_CANNOT_DELETE_SERVICE);
 			unset($HTTP_GET_VARS["serviceid"]);
 		}
 		if($HTTP_GET_VARS["register"]=="delete_link")
 		{
 			$result=delete_service_link($HTTP_GET_VARS["linkid"]);
-			show_messages($result,"Link deleted","Cannot delete link");
+			show_messages($result, S_LINK_DELETED, S_CANNOT_DELETE_LINK);
 		}
 	}
 ?>
 
 <?php
-	show_table_header("IT SERVICES");
+	show_table_header(S_IT_SERVICES_BIG);
 
 	$now=time();
 	$result=DBselect("select serviceid,name,algorithm from services order by sortorder,name");
 	echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";
 	echo "<tr>";
-	echo "<td><b>Service</b></td>";
-	echo "<td width=20%><b>Status calculation</b></td>";
+	echo "<td><b>".S_SERVICE."</b></td>";
+	echo "<td width=20%><b>".S_STATUS_CALCULATION."</b></td>";
 	echo "</tr>";
 
 	$col=0;
@@ -100,19 +100,19 @@
 		echo "<td><b><a href=\"services.php?serviceid=".$service["serviceid"]."#form\">".$service["name"]."</a></b></td>";
 		if($service["algorithm"] == SERVICE_ALGORITHM_NONE)
 		{
-			echo "<td>none</td>";
+			echo "<td>".S_NONE."</td>";
 		}
 		else if($service["algorithm"] == SERVICE_ALGORITHM_MAX)
 		{
-			echo "<td>MAX of childs</td>";
+			echo "<td>".S_MAX_OF_CHILDS."</td>";
 		}
 		else if($service["algorithm"] == SERVICE_ALGORITHM_MIN)
 		{
-			echo "<td>MIN of childs</td>";
+			echo "<td>".S_MIN_OF_CHILDS."</td>";
 		}
 		else
 		{
-			echo "<td>unknown</td>";
+			echo "<td>".S_UNKNOWN."</td>";
 		}
 		echo "</tr>"; 
 		$col++;
@@ -147,19 +147,19 @@
 		}
 		if($row["algorithm"] == SERVICE_ALGORITHM_NONE)
 		{
-			echo "<td>none</td>";
+			echo "<td>".S_NONE."</td>";
 		}
 		else if($row["algorithm"] == SERVICE_ALGORITHM_MAX)
 		{
-			echo "<td>MAX of childs</td>";
+			echo "<td>".S_MAX_OF_CHILDS."</td>";
 		}
 		else if($row["algorithm"] == SERVICE_ALGORITHM_MIN)
 		{
-			echo "<td>MIN of childs</td>";
+			echo "<td>".S_MIN_OF_CHILDS."</td>";
 		}
 		else
 		{
-			echo "<td>unknown</td>";
+			echo "<td>".S_UNKNOWN."</td>";
 		}
 		echo "</tr>";
 	}
@@ -172,10 +172,10 @@
 		show_table_header("LINKS");
 		echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";
 		echo "<tr>";
-		echo "<td><b>Service 1</b></td>";
-		echo "<td><b>Service 2</b></td>";
-		echo "<td><b>Soft/hard link</b></td>";
-		echo "<td><b>Actions</b></td>";
+		echo "<td><b>".S_SERVICE_1."</b></td>";
+		echo "<td><b>".S_SERVICE_2."</b></td>";
+		echo "<td><b>".S_SOFT_HARD_LINK."</b></td>";
+		echo "<td><b>".S_ACTIONS."</b></td>";
 		echo "</tr>";
 		$sql="select linkid,servicedownid,serviceupid,soft from services_links where serviceupid=".$HTTP_GET_VARS["serviceid"]." or servicedownid=".$HTTP_GET_VARS["serviceid"];
 		$result=DBselect($sql);
@@ -190,13 +190,13 @@
 			echo "<td>".$service["name"]."</td>";
 			if($row["soft"] == 0)
 			{	
-				echo "<td>Hard</td>";
+				echo "<td>".S_HARD."</td>";
 			}
 			else
 			{
-				echo "<td>Soft</td>";
+				echo "<td>".S_SOFT."</td>";
 			}
-			echo "<td><a href=\"services.php?register=delete_link&serviceid=".$HTTP_GET_VARS["serviceid"]."&linkid=".$row["linkid"]."\">Delete</a></td>";
+			echo "<td><a href=\"services.php?register=delete_link&serviceid=".$HTTP_GET_VARS["serviceid"]."&linkid=".$row["linkid"]."\">".S_DELETE."</a></td>";
 			echo "</tr>";
 		}
 		echo "</table>";
@@ -226,7 +226,7 @@
 	echo "<br>";
 	echo "<a name=\"form\"></a>";
 	show_table2_header_begin();
-	echo "Service";
+	echo S_SERVICE;
 
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"services.php\">";
@@ -234,12 +234,12 @@
 	{
 		echo "<input class=\"biginput\" name=\"serviceid\" type=\"hidden\" value=".$HTTP_GET_VARS["serviceid"].">";
 	}
-	echo "Name";
+	echo S_NAME;
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=32>";
 
 	show_table2_v_delimiter();
-	echo nbsp("Status calculation algorithm");
+	echo nbsp(S_STATUS_CALCULATION_ALGORITHM);
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"algorithm\" size=1>";
 //	if(isset($HTTP_GET_VARS["algorithm"]))
@@ -248,34 +248,34 @@
 //		if($HTTP_GET_VARS["algorithm"] == SERVICE_ALGORITHM_NONE)
 		if($algorithm == SERVICE_ALGORITHM_NONE)
 		{
-			echo "<OPTION VALUE='0' SELECTED>Do not calculate";
-			echo "<OPTION VALUE='1'>MAX";
-			echo "<OPTION VALUE='2'>MIN";
+			echo "<OPTION VALUE='0' SELECTED>".S_DO_NOT_CALCULATE;
+			echo "<OPTION VALUE='1'>".S_MAX_BIG;
+			echo "<OPTION VALUE='2'>".S_MIN_BIG;
 		}
 //		else if($HTTP_GET_VARS["algorithm"] == SERVICE_ALGORITHM_MAX)
 		else if($algorithm == SERVICE_ALGORITHM_MAX)
 		{
-			echo "<OPTION VALUE='0'>Do not calculate";
-			echo "<OPTION VALUE='1' SELECTED>MAX";
-			echo "<OPTION VALUE='2'>MIN";
+			echo "<OPTION VALUE='0'>".S_DO_NOT_CALCULATE;
+			echo "<OPTION VALUE='1' SELECTED>".S_MAX_BIG;
+			echo "<OPTION VALUE='2'>".S_MIN_BIG;
 		}
 		else if($HTTP_GET_VARS["algorithm"] == SERVICE_ALGORITHM_MIN)
 		{
-			echo "<OPTION VALUE='0'>Do not calculate";
-			echo "<OPTION VALUE='1'>MAX";
-			echo "<OPTION VALUE='2' SELECTED>MIN";
+			echo "<OPTION VALUE='0'>".S_DO_NOT_CALCULATE;
+			echo "<OPTION VALUE='1'>".S_MAX_BIG;
+			echo "<OPTION VALUE='2' SELECTED>".S_MIN_BIG;
 		}
 	}
 	else
 	{
-		echo "<OPTION VALUE='0'>Do not calculate";
-		echo "<OPTION VALUE='1' SELECTED>MAX";
-		echo "<OPTION VALUE='2'>MIN";
+		echo "<OPTION VALUE='0'>".S_DO_NOT_CALCULATE;
+		echo "<OPTION VALUE='1' SELECTED>".S_MAX_BIG;
+		echo "<OPTION VALUE='2'>".S_MIN_BIG;
 	}
 	echo "</SELECT>";
 
         show_table2_v_delimiter();
-        echo nbsp("Show SLA");
+        echo nbsp(S_SHOW_SLA);
         show_table2_h_delimiter();
 	if($showsla==1)
 	{
@@ -288,12 +288,12 @@
 	}
 
 	show_table2_v_delimiter();
-	echo nbsp("Acceptable SLA (in %)");
+	echo nbsp(S_ACCEPTABLE_SLA_IN_PERCENT);
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"goodsla\" value=\"$goodsla\" size=6>";
 
         show_table2_v_delimiter();
-        echo nbsp("Link to trigger ?");
+        echo nbsp(S_LINK_TO_TRIGGER_Q);
         show_table2_h_delimiter();
 	if(isset($triggerid)&&($triggerid!=""))
 	{
@@ -305,7 +305,7 @@
 	}
 
 	show_table2_v_delimiter();
-	echo "Trigger";
+	echo S_TRIGGER;
 	show_table2_h_delimiter();
         $result=DBselect("select triggerid,description from triggers order by description");
         echo "<select class=\"biginput\" name=\"triggerid\" size=1>";
@@ -330,7 +330,7 @@
         echo "</SELECT>";
 
 	show_table2_v_delimiter();
-	echo nbsp("Sort order (0->999)");
+	echo nbsp(".S_SORT_ORDER_0_999.");
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"sortorder\" value=\"$sortorder\" size=3>";
 
@@ -343,7 +343,7 @@
 	if(isset($HTTP_GET_VARS["serviceid"]))
 	{
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\"  onClick=\"return Confirm('Delete service?');\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\"  onClick=\"return Confirm('".S_DELETE_SERVICE_Q."');\">";
 	}
 
 	show_table2_header_end();
@@ -364,7 +364,7 @@
 
 	echo "<br>";
 	show_table2_header_begin();
-	echo nbsp("Link to ...");
+	echo nbsp(S_LINK_TO);
 
 	show_table2_v_delimiter();
 	echo "<form method=\"post\" action=\"services.php\">";
@@ -373,7 +373,7 @@
 		echo "<input name=\"serviceid\" type=\"hidden\" value=".$HTTP_GET_VARS["serviceid"].">";
 		echo "<input name=\"serviceupid\" type=\"hidden\" value=".$HTTP_GET_VARS["serviceid"].">";
 	}
-	echo "Name";
+	echo S_NAME;
 	show_table2_h_delimiter();
 	$result=DBselect("select serviceid,triggerid,name from services order by name");
         echo "<select class=\"biginput\" name=\"servicedownid\" size=1>";
@@ -397,7 +397,7 @@
         echo "</SELECT>";
 
         show_table2_v_delimiter();
-        echo nbsp("Soft link ?");
+        echo nbsp(S_SOFT_LINK_Q);
         show_table2_h_delimiter();
 //	if(isset($HTTP_GET_VARS["softlink"])&&($HTTP_GET_VARS["triggerid"]!=""))
 //	{
@@ -421,7 +421,7 @@
 
 	echo "<br>";
 	show_table2_header_begin();
-	echo nbsp("Add server details");
+	echo nbsp(S_ADD_SERVER_DETAILS);
 
 	show_table2_v_delimiter();
 	echo "<form method=\"post\" action=\"services.php\">";
@@ -429,7 +429,7 @@
 	{
 		echo "<input name=\"serviceid\" type=\"hidden\" value=".$HTTP_GET_VARS["serviceid"].">";
 	}
-	echo "Server";
+	echo S_SERVER;
 	show_table2_h_delimiter();
 	$result=DBselect("select hostid,host from hosts order by host");
         echo "<select class=\"biginput\" name=\"hostid\" size=1>";

@@ -53,8 +53,33 @@
 		echo S_GRAPHS_BIG;
 
 		show_table_v_delimiter();
+// Start of new code
+		echo "<form name=\"form2\" method=\"get\" action=\"charts.php\">";
 
-		echo "<font size=2>";
+		if(isset($HTTP_GET_VARS["graphid"])&&($HTTP_GET_VARS["graphid"]==0))
+		{
+			unset($HTTP_GET_VARS["graphid"]);
+		}
+
+		echo S_GRAPH."&nbsp;";
+		echo "<input name=\"keep\" type=\"hidden\" value=".$HTTP_GET_VARS["keep"].">";
+		echo "<select class=\"biginput\" name=\"graphid\" onChange=\"submit()\">";
+		echo "<option value=\"0\" ".iif(!isset($HTTP_GET_VARS["graphid"]),"selected","").">".S_SELECT_GRAPH_DOT_DOT_DOT;
+
+		$result=DBselect("select graphid,name from graphs order by name");
+		while($row=DBfetch($result))
+		{
+			if(!check_right("Graph","R",$row["graphid"]))
+			{
+				continue;
+			}
+			echo "<option value=\"".$row["graphid"]."\" ".iif(isset($HTTP_GET_VARS["graphid"])&&($HTTP_GET_VARS["graphid"]==$row["graphid"]),"selected","").">".$row["name"];
+		}
+		echo "</select>";
+		echo "</form>";
+// End of new code
+
+/*		echo "<font size=2>";
 
 		$result=DBselect("select graphid,name from graphs order by name");
 		while($row=DBfetch($result))
@@ -67,7 +92,6 @@
 			{
 				echo "<b>[";
 			}
-// BEGIN - IGMI - keep support
 			$str="";
 			if(isset($HTTP_GET_VARS["keep"]))
 			{
@@ -85,8 +109,6 @@
 				$str=$str."&keep=".$HTTP_GET_VARS["keep"];
 			}
 			echo "<a href='charts.php?graphid=".$row["graphid"].url_param("stime").$str."'>".$row["name"]."</a>";
-// END - IGMI - keep support
-//			echo "<a href='charts.php?graphid=".$row["graphid"]."'>".$row["name"]."</a>";
 			if(isset($HTTP_GET_VARS["graphid"]) && ($HTTP_GET_VARS["graphid"] == $row["graphid"]) )
 			{
 				echo "]</b>";
@@ -100,6 +122,7 @@
 		}
 
 		echo "</font>";
+*/
 		show_table_header_end();
 		echo "<br>";
 	}

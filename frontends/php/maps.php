@@ -48,57 +48,67 @@
 ?>
 
 <?php
-	if(!isset($HTTP_GET_VARS["fullscreen"]))
+//	if(!isset($HTTP_GET_VARS["fullscreen"]))
 	{
-		show_table_header_begin();
-		echo S_NETWORK_MAPS_BIG;
+		show_table3_header_begin();
 
-		show_table_v_delimiter();
+		if(isset($HTTP_GET_VARS["sysmapid"])&&($HTTP_GET_VARS["sysmapid"]==0))
+		{
+			unset($HTTP_GET_VARS["sysmapid"]);
+		}
 
-		$lasthost="";
+		if(isset($HTTP_GET_VARS["sysmapid"]))
+		{
+			$result=DBselect("select name from sysmaps where sysmapid=".$HTTP_GET_VARS["sysmapid"]);
+			$map=DBget_field($result,0,0);
+			$map=iif(isset($HTTP_GET_VARS["fullscreen"]),
+				"<a href=\"maps.php?sysmapid=".$HTTP_GET_VARS["sysmapid"]."\">".$map."</a>",
+				"<a href=\"maps.php?sysmapid=".$HTTP_GET_VARS["sysmapid"]."&fullscreen=1\">".$map."</a>");
+		}
+		else
+		{
+			$map=S_SELECT_MAP_TO_DISPLAY;
+		}
+
+		echo S_NETWORK_MAPS_BIG.nbsp(" / ").$map;
+// Start of new code
+		show_table3_h_delimiter();
+		echo "<form name=\"form2\" method=\"get\" action=\"maps.php\">";
+
+		if(isset($HTTP_GET_VARS["sysmapid"])&&($HTTP_GET_VARS["sysmapid"]==0))
+		{
+			unset($HTTP_GET_VARS["sysmapid"]);
+		}
+
+		echo "<select class=\"biginput\" name=\"sysmapid\" onChange=\"submit()\">";
+		echo "<option value=\"0\" ".iif(!isset($HTTP_GET_VARS["groupid"]),"selected","").">".S_SELECT_MAP_DOT_DOT_DOT;
+
 		$result=DBselect("select sysmapid,name from sysmaps order by name");
-
 		while($row=DBfetch($result))
 		{
 			if(!check_right("Network map","R",$row["sysmapid"]))
 			{
 				continue;
 			}
-			if( isset($HTTP_GET_VARS["sysmapid"]) && ($HTTP_GET_VARS["sysmapid"] == $row["sysmapid"]) )
-			{
-				echo "<b>[";
-			}
-			echo "<a href='maps.php?sysmapid=".$row["sysmapid"]."'>".$row["name"]."</a>";
-			if(isset($HTTP_GET_VARS["sysmapid"]) && ($HTTP_GET_VARS["sysmapid"] == $row["sysmapid"]) )
-			{
-				echo "]</b>";
-			}
-			echo " ";
+			echo "<option value=\"".$row["sysmapid"]."\" ".iif(isset($HTTP_GET_VARS["sysmapid"])&&($HTTP_GET_VARS["sysmapid"]==$row["sysmapid"]),"selected","").">".$row["name"];
 		}
-
-		if(DBnum_rows($result) == 0)
-		{
-			echo S_NO_MAPS_TO_DISPLAY;
-		}
+		echo "</select>";
+		echo "</form>";
+// End of new code
 
 		show_table_header_end();
-		echo "<br>";
+//		echo "<br>";
 	}
 ?>
 
 <?php
-	if(isset($HTTP_GET_VARS["sysmapid"]))
+/*	if(isset($HTTP_GET_VARS["sysmapid"]))
 	{
 		$result=DBselect("select name from sysmaps where sysmapid=".$HTTP_GET_VARS["sysmapid"]);
 		$map=DBget_field($result,0,0);
-		if(isset($HTTP_GET_VARS["fullscreen"]))
-		{
-			$map="<a href=\"maps.php?sysmapid=".$HTTP_GET_VARS["sysmapid"]."\">".$map."</a>";;
-		}
-		else
-		{
-			$map="<a href=\"maps.php?sysmapid=".$HTTP_GET_VARS["sysmapid"]."&fullscreen=1\">".$map."</a>";;
-		}
+		$map=iif(isset($HTTP_GET_VARS["fullscreen"]),
+			"<a href=\"maps.php?sysmapid=".$HTTP_GET_VARS["sysmapid"]."\">".$map."</a>",
+			"<a href=\"maps.php?sysmapid=".$HTTP_GET_VARS["sysmapid"]."&fullscreen=1\">".$map."</a>");
 	}
 	else
 	{
@@ -106,6 +116,7 @@
 	}
 
 	show_table_header($map);
+*/
 
 	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR BGCOLOR=#EEEEEE>";

@@ -302,12 +302,9 @@
 		echo nbsp("Store value");
 		show_table2_h_delimiter();
 		echo "<SELECT class=\"biginput\" NAME=\"delta\" value=\"$delta\" size=\"1\">";
-		echo "<OPTION VALUE=\"0\"";
-		if($delta==0) echo "SELECTED";
-		echo ">As is";
-		echo "<OPTION VALUE=\"1\"";
-		if($delta==1) echo "SELECTED";
-		echo ">Delta";
+		echo "<OPTION VALUE=\"0\" "; if($delta==0) echo "SELECTED"; echo ">As is";
+		echo "<OPTION VALUE=\"1\" "; if($delta==1) echo "SELECTED"; echo ">Delta (speed per second)";
+		echo "<OPTION VALUE=\"2\" "; if($delta==2) echo "SELECTED"; echo ">Delta (simple change)";
 		echo "</SELECT>";
 
 		if($type==2)
