@@ -1,5 +1,6 @@
 1.0beta10:
 
+ - fix pinger
  - finish src/zabbix_snmptrapper
  - fix PostgreSQL schema
  - improve screens (add maps, all in one table, etc)
