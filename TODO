@@ -350,10 +350,6 @@ WIN32 Agent:
 * Possibility to store configuration in registry
 * Configuration tool (may be through MMC?)
 
- PLUS:
-
-- backup/restore scripts for server. Backup all (DB, configs, etc).
-
  OTHER:
 
  - support for netload under other platforms
