@@ -891,6 +891,13 @@ double	PROCCNT(const char * procname)
 		strncat(filename,entries->d_name,MAX_STRING_LEN);
 		strncat(filename,"/status",MAX_STRING_LEN);
 
+/* Self is a symbolic link. It leads to incorrect results for proc_cnt[zabbix_agentd] */
+/* Better approach: check if /proc/x/ is symbolic link */
+		if(strncmp(entries->d_name,"self",MAX_STRING_LEN) == 0)
+		{
+			continue;
+		}
+
 		if(stat(filename,&buf)==0)
 		{
 			f=fopen(filename,"r");
