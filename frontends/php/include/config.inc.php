@@ -4604,7 +4604,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	        $result=DBselect("select count(*) from items where status=3");
 		$stat["items_count_not_supported"]=DBget_field($result,0,0);
 
-	        $result=DBselect("select count(*) from items where status=2");
+	        $result=DBselect("select count(*) from items where type=2");
 		$stat["items_count_trapper"]=DBget_field($result,0,0);
 
 	        $result=DBselect("select count(*) from hosts");

@@ -1,5 +1,6 @@
 Changes for 1.1alpha1:
 
+ - fixed number of trapped items in STATUS OF ZABBIX. Thanks to Igor. (Alexei)
  - fixed proc_cnt[zabbix_agentd] under Linux (Alexei)
  - added list of hosts for groups and IP addresses in host maintenance (Alexei)
  - fixed MacOS X related compilation issues. Thanks to Charles Galpin. (Alexei)
