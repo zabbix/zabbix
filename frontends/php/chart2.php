@@ -75,7 +75,7 @@
 	$colors["Dark Green"]=$darkgreen;
 	$colors["Yellow"]=$yellow;
 	$colors["Dark Yellow"]=$darkyellow;
-	$colors["Blue"]=$blue;
+	$colors["Blue"]=$darkblue;
 	$colors["Dark Blue"]=$blue;
 	$colors["White"]=$white;
 	$colors["Cyan"]=$cyan;
