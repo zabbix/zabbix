@@ -34,7 +34,7 @@ TKOM:
 
 OTHER:
 
- - check if simple checks  (FTP, SMTP!) works correctly when host is off
+ - check if simple checks  (FTP, SMTP!) works correctly when host name (not IP) is used
  - add icons to a map by clicking mouse
  - implement fixed range for graphs (Y axis)
  - different icons depending on a triger status for sysmaps
