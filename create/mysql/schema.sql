@@ -140,7 +140,8 @@ CREATE TABLE alarms (
   triggerid		int(4)		DEFAULT '0' NOT NULL,
   clock			int(4)		DEFAULT '0' NOT NULL,
   istrue		int(4)		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (alarmid)
+  PRIMARY KEY (alarmid),
+  KEY (triggerid,clock)
 );
 
 #
