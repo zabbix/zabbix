@@ -1,8 +1,13 @@
 alter table items add  units           varchar(10)     DEFAULT '' NOT NULL;
+alter table items add  multiplier      int(4)          DEFAULT '' NOT NULL;
 
 update items set units='bps' where key_ like "netload%";
 update items set units='bytes' where key_ like "memory[%]";
 update items set units='bytes' where key_ like "disk%[%]";
+update items set units='bytes' where key_ like "swap[%]";
+update items set units=' ' where key_ like "inode%[%]";
+
+update items set multiplier=1 where key_ like "disk%[%]";
 
 --
 -- Table structure for table 'stats'

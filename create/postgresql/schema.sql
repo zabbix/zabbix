@@ -62,6 +62,7 @@ CREATE TABLE items (
   value_type		int4		DEFAULT '0' NOT NULL,
   trapper_hosts		varchar(255)	DEFAULT '' NOT NULL,
   units			varchar(10)	DEFAULT '' NOT NULL,
+  multiplier		int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (itemid),
   FOREIGN KEY (hostid) REFERENCES hosts
 );

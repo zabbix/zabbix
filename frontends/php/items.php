@@ -21,7 +21,7 @@
 	{
 		if($HTTP_GET_VARS["register"]=="update")
 		{
-			$result=update_item($HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["description"],$HTTP_GET_VARS["key"],$HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["delay"],$HTTP_GET_VARS["history"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["type"],$HTTP_GET_VARS["snmp_community"],$HTTP_GET_VARS["snmp_oid"],$HTTP_GET_VARS["value_type"],$HTTP_GET_VARS["trapper_hosts"],$HTTP_GET_VARS["snmp_port"],$HTTP_GET_VARS["units"]);
+			$result=update_item($HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["description"],$HTTP_GET_VARS["key"],$HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["delay"],$HTTP_GET_VARS["history"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["type"],$HTTP_GET_VARS["snmp_community"],$HTTP_GET_VARS["snmp_oid"],$HTTP_GET_VARS["value_type"],$HTTP_GET_VARS["trapper_hosts"],$HTTP_GET_VARS["snmp_port"],$HTTP_GET_VARS["units"],$HTTP_GET_VARS["multiplier"]);
 			show_messages($result,"Item updated","Cannot update item");
 //			unset($itemid);
 		}
@@ -33,7 +33,7 @@
 		}
 		if($HTTP_GET_VARS["register"]=="add")
 		{
-			$result=add_item($HTTP_GET_VARS["description"],$HTTP_GET_VARS["key"],$HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["delay"],$HTTP_GET_VARS["history"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["type"],$HTTP_GET_VARS["snmp_community"],$HTTP_GET_VARS["snmp_oid"],$HTTP_GET_VARS["value_type"],$HTTP_GET_VARS["trapper_hosts"],$HTTP_GET_VARS["snmp_port"],$HTTP_GET_VARS["units"]);
+			$result=add_item($HTTP_GET_VARS["description"],$HTTP_GET_VARS["key"],$HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["delay"],$HTTP_GET_VARS["history"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["type"],$HTTP_GET_VARS["snmp_community"],$HTTP_GET_VARS["snmp_oid"],$HTTP_GET_VARS["value_type"],$HTTP_GET_VARS["trapper_hosts"],$HTTP_GET_VARS["snmp_port"],$HTTP_GET_VARS["units"],$HTTP_GET_VARS["multiplier"]);
 			show_messages($result,"Item added","Cannot add item");
 			unset($HTTP_GET_VARS["itemid"]);
 		}
@@ -44,7 +44,7 @@
 			$hosts_notok="";
 			while($row=DBfetch($result))
 			{
-				$result2=add_item($HTTP_GET_VARS["description"],$HTTP_GET_VARS["key"],$row["hostid"],$HTTP_GET_VARS["delay"],$HTTP_GET_VARS["history"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["type"],$HTTP_GET_VARS["snmp_community"],$HTTP_GET_VARS["snmp_oid"],$HTTP_GET_VARS["value_type"],$HTTP_GET_VARS["trapper_hosts"],$HTTP_GET_VARS["snmp_port"],$HTTP_GET_VARS["units"]);
+				$result2=add_item($HTTP_GET_VARS["description"],$HTTP_GET_VARS["key"],$row["hostid"],$HTTP_GET_VARS["delay"],$HTTP_GET_VARS["history"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["type"],$HTTP_GET_VARS["snmp_community"],$HTTP_GET_VARS["snmp_oid"],$HTTP_GET_VARS["value_type"],$HTTP_GET_VARS["trapper_hosts"],$HTTP_GET_VARS["snmp_port"],$HTTP_GET_VARS["units"],$HTTP_GET_VARS["multiplier"]);
 				if($result2)
 				{
 					$hosts_ok=$hosts_ok." ".$row["host"];

@@ -228,11 +228,11 @@
 		}
 		if(isset($HTTP_GET_VARS["select"]))
 		{
-			$result=DBselect("select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and i.status=0 and i.description like '%".$HTTP_GET_VARS["select"]."%' ".$HTTP_GET_VARS["sort"]);
+			$result=DBselect("select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and i.status=0 and i.description like '%".$HTTP_GET_VARS["select"]."%' ".$HTTP_GET_VARS["sort"]);
 		}
 		else
 		{
-			$result=DBselect("select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and i.status=0 and h.hostid=".$HTTP_GET_VARS["hostid"]." ".$HTTP_GET_VARS["sort"]);
+			$result=DBselect("select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and i.status=0 and h.hostid=".$HTTP_GET_VARS["hostid"]." ".$HTTP_GET_VARS["sort"]);
 		}
 		while($row=DBfetch($result))
 		{
@@ -276,7 +276,7 @@
 					if($row["value_type"] == 0 )
 					{
 //						echo "<td>"; printf("%.0f %s",$row["lastvalue"],$row["units"]); echo "</td>";
-						echo "<td>"; echo convert_units($row["lastvalue"],$row["units"],0); echo "</td>";
+						echo "<td>"; echo convert_units($row["lastvalue"],$row["units"],$row["multiplier"]); echo "</td>";
 					}
 					else
 					{
@@ -286,7 +286,7 @@
 				else
 				{
 //					echo "<td>"; printf("%.2f %s",$row["lastvalue"],$row["units"]); echo "</td>";
-					echo "<td>"; echo convert_units($row["lastvalue"],$row["units"],0); echo "</td>";
+					echo "<td>"; echo convert_units($row["lastvalue"],$row["units"],$row["multiplier"]); echo "</td>";
 				}
 			}
 			else
@@ -299,12 +299,12 @@
 //	sprintf("%+0.2f"); does not work
 				if($row["lastvalue"]-$row["prevvalue"]<0)
 				{
-					echo "<td>";echo convert_units($row["lastvalue"]-$row["prevvalue"],$row["units"],0); echo "</td>";
+					echo "<td>";echo convert_units($row["lastvalue"]-$row["prevvalue"],$row["units"],$row["multiplier"]); echo "</td>";
 //					printf("<td>%0.2f</td>",$row["lastvalue"]-$row["prevvalue"]);
 				}
 				else
 				{
-					echo "<td>+";echo convert_units($row["lastvalue"]-$row["prevvalue"],$row["units"],0); echo "</td>";
+					echo "<td>+";echo convert_units($row["lastvalue"]-$row["prevvalue"],$row["units"],$row["multiplier"]); echo "</td>";
 //					printf("<td>+%0.2f</td>",$row["lastvalue"]-$row["prevvalue"]);
 				}
 			}
