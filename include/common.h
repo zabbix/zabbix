@@ -53,6 +53,7 @@
 #define ITEM_TYPE_SIMPLE	3
 #define ITEM_TYPE_SNMPv2c	4
 #define ITEM_TYPE_INTERNAL	5
+#define ITEM_TYPE_SNMPv3	6
 
 /* Item value types */
 #define ITEM_VALUE_TYPE_FLOAT	0
