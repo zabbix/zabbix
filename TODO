@@ -4,7 +4,6 @@
  - proofread Zabbix Manual  - Ted Rolle <ted@users.sourceforge.net>
  - add complete support for SNMP trapping
  - improve graphing capabilities (MRTG like graphs)
- - improve user-defined graphs
  - link map's line to a trigger
  - ability to add a library of  userwritten c-functions with dlopen/dlsym to
 the agent with a predefined API that can return values to suckerd (for both 

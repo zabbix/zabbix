@@ -1,6 +1,8 @@
 alter table services modify goodsla float8 default '99.9' not null;
 alter table services add sortorder int4 default '0' not null;
 
+alter table graphs_items add drawtype int4 default '0' not null;
+
 --
 -- Table structure for table 'screens'
 --

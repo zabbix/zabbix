@@ -24,7 +24,7 @@
 	{
 		if($HTTP_GET_VARS["register"]=="add")
 		{
-			$result=add_item_to_graph($HTTP_GET_VARS["graphid"],$HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["color"]);
+			$result=add_item_to_graph($HTTP_GET_VARS["graphid"],$HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["color"],$HTTP_GET_VARS["drawtype"]);
 			show_messages($result,"Item added","Cannot add item");
 		}
 		if($HTTP_GET_VARS["register"]=="delete")
@@ -52,11 +52,12 @@
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TD WIDTH=10% NOSAVE><B>Host</B></TD>";
 	echo "<TD WIDTH=10% NOSAVE><B>Parameter</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Type</B></TD>";
 	echo "<TD WIDTH=10% NOSAVE><B>Color</B></TD>";
 	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
-	$sql="select i.itemid,h.host,i.description,gi.gitemid,gi.color from hosts h,graphs_items gi,items i where i.itemid=gi.itemid and gi.graphid=".$HTTP_GET_VARS["graphid"]." and h.hostid=i.hostid";
+	$sql="select i.itemid,h.host,i.description,gi.gitemid,gi.color,gi.drawtype from hosts h,graphs_items gi,items i where i.itemid=gi.itemid and gi.graphid=".$HTTP_GET_VARS["graphid"]." and h.hostid=i.hostid";
 	$result=DBselect($sql);
 	$col=0;
 	while($row=DBfetch($result))
@@ -66,6 +67,7 @@
 
 		echo "<TD>".$row["host"]."</TD>";
 		echo "<TD><a href=\"chart.php?itemid=".$row["itemid"]."&period=3600&from=0\">".$row["description"]."</a></TD>";
+		echo "<TD>".get_drawtype_description($row["drawtype"])."</TD>";
 		echo "<TD>".$row["color"]."</TD>";
 		echo "<TD><A HREF=\"graph.php?register=delete&graphid=".$HTTP_GET_VARS["graphid"]."&gitemid=".$row["gitemid"]."\">Delete</A></TD>";
 		echo "</TR>";
@@ -99,6 +101,15 @@
 		$itemid_=DBget_field($result,$i,2);
 		echo "<OPTION VALUE='$itemid_'>$host_: $description_";
 	}
+	echo "</SELECT>";
+
+	show_table2_v_delimiter();
+	echo "Type";
+	show_table2_h_delimiter();
+	echo "<select name=\"drawtype\" size=1>";
+	echo "<OPTION VALUE='0'>".get_drawtype_description(0);
+	echo "<OPTION VALUE='1'>".get_drawtype_description(1);
+	echo "<OPTION VALUE='2'>".get_drawtype_description(2);
 	echo "</SELECT>";
 
 	show_table2_v_delimiter();
