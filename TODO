@@ -1,5 +1,7 @@
 1.0beta12:
 
+ - timestamp for maps
+
 So functions.c should look
 >
 >       if(strncmp(OK_250,c,strlen(OK_250)) != 0 &&
