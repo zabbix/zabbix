@@ -233,13 +233,20 @@
 		{
 			for($i=0;$i<$this->num;$i++)
 			{
+				ImageFilledRectangle($this->im,$this->shiftX,$this->sizeY+$this->shiftY+35+10*$i,$this->shiftX+5,$this->sizeY+$this->shiftY+5+35+10*$i,$this->colors[$this->items[$i]["color"]]);
+				ImageRectangle($this->im,$this->shiftX,$this->sizeY+$this->shiftY+35+10*$i,$this->shiftX+5,$this->sizeY+$this->shiftY+5+35+10*$i,$this->colors["Black"]);
+
+				$max_host_len=strlen($this->items[$i]["host"]);
+				$max_desc_len=strlen($this->items[$i]["description"]);
+				$str=sprintf("%s: %s [min:%s max:%s]",
+					str_pad($this->items[$i]["host"],$max_host_len," "),
+					str_pad($this->items[$i]["description"],$max_desc_len," "),
+					convert_units(min($this->min[$i]),$this->items[$i]["units"],$this->items[$i]["multiplier"]),
+					convert_units(max($this->max[$i]),$this->items[$i]["units"],$this->items[$i]["multiplier"]));
+	
+				ImageString($this->im, 2,$this->shiftX+9,$this->sizeY+$this->shiftY+30+10*$i,$str, $this->colors["Black"]);
 			}
 
-				ImageFilledRectangle($this->im,$this->shiftX,$this->sizeY+$this->shiftY+35,$this->shiftX+5,$this->sizeY+$this->shiftY+5+35,$this->colors["Dark Green"]);
-				ImageRectangle($this->im,$this->shiftX,$this->sizeY+$this->shiftY+35,$this->shiftX+5,$this->sizeY+$this->shiftY+5+35,$this->colors["Black"]);
-
-				$max_host_len=strlen($this->items[0]["host"]);
-				$max_desc_len=strlen($this->items[0]["description"]);
 //		for($i=0;$i<DBnum_rows($result2);$i++)
 //		{
 //			$z=get_item_by_itemid($iids[$i]);
@@ -248,13 +255,13 @@
 //			if(strlen($z["description"])>$max_desc_len)	$max_desc_len=strlen($z["description"]);
 //		}
 //		$i=get_item_by_itemid($iids[$item]);
-			$str=sprintf("%s: %s [min:%s max:%s]",
+/*			$str=sprintf("%s: %s [min:%s max:%s]",
 				str_pad($this->items[0]["host"],$max_host_len," "),
 				str_pad($this->items[0]["description"],$max_desc_len," "),
 				convert_units(min($this->min[0]),$this->items[0]["units"],$this->items[0]["multiplier"]),
 				convert_units(max($this->max[0]),$this->items[0]["units"],$this->items[0]["multiplier"]));
 
-			ImageString($this->im, 2,$this->shiftX+9,$this->sizeY+$this->shiftY+30,$str, $this->colors["Black"]);
+			ImageString($this->im, 2,$this->shiftX+9,$this->sizeY+$this->shiftY+30,$str, $this->colors["Black"]);*/
 		}
 
 		function drawElement($item,$x1,$y1,$x2,$y2)
