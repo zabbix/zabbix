@@ -95,15 +95,17 @@
 	echo "Color";
 	show_table2_h_delimiter();
 	echo "<select name=\"color\" size=1>";
-	echo "<OPTION VALUE='Green'>Green";
-	echo "<OPTION VALUE='Dark Green'>Dark green";
-	echo "<OPTION VALUE='Red'>Red";
-	echo "<OPTION VALUE='Dark Red'>Dark red";
-	echo "<OPTION VALUE='Cyan'>Cyan";
-	echo "<OPTION VALUE='Yellow'>Yellow";
+	echo "<OPTION VALUE='Black'>Black";
 	echo "<OPTION VALUE='Blue'>Blue";
-	echo "<OPTION VALUE='Dark Blue'>Dark Blue";
+	echo "<OPTION VALUE='Cyan'>Cyan";
+	echo "<OPTION VALUE='Dark Blue'>Dark blue";
+	echo "<OPTION VALUE='Dark Green'>Dark green";
+	echo "<OPTION VALUE='Dark Red'>Dark red";
+	echo "<OPTION VALUE='Dark Yellow'>Dark yellow";
+	echo "<OPTION VALUE='Green'>Green";
+	echo "<OPTION VALUE='Red'>Red";
 	echo "<OPTION VALUE='White'>White";
+	echo "<OPTION VALUE='Yellow'>Yellow";
 	echo "</SELECT>";
 
 	show_table2_v_delimiter2();
