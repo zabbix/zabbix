@@ -38,24 +38,27 @@
 	echo "<CENTER>";
 	echo "<TABLE WIDTH=100% BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR>";
-	echo "<TD WIDTH=\"10%\"><FONT SIZE=+1>Time</FONT></TD>";
-	echo "<TD WIDTH=\"5%\"><FONT SIZE=+1>Type</FONT></TD>";
-	echo "<TD WIDTH=\"15%\"><FONT SIZE=+1>Send to</FONT></TD>";
-	echo "<TD><FONT SIZE=+1>Subject</FONT></TD>";
-	echo "<TD><FONT SIZE=+1>Message</FONT></TD>";
+	echo "<TD WIDTH=\"10%\"><b>Time</b></TD>";
+	echo "<TD WIDTH=\"5%\"><b>Type</b></TD>";
+	echo "<TD WIDTH=\"15%\"><b>Send to</b></TD>";
+	echo "<TD><b>Subject</b></TD>";
+	echo "<TD><b>Message</b></TD>";
 	echo "</TR>";
 	$col=0;
 	while($row=DBfetch($result))
 	{
 		if($col++%2==0)	{ echo "<tr bgcolor=#DDDDDD>"; }
 		else		{ echo "<tr bgcolor=#EEEEEE>"; }
-		if($row["type"]=="EMAIL")
-		{
-			$type="E-mail";
-		}
 
 		echo "<TD><a href=\"alarms.html?triggerid=".$row["triggerid"]."\">".date("Y.M.d H:i:s",$row["clock"])."</a></TD>";
-		echo "<TD>$type</TD>";
+		if($row["type"]=="EMAIL")
+		{
+			echo "<TD>E-mail</TD>";
+		}
+		else
+		{
+			echo "<TD>Unknown media type</TD>";
+		}
 		echo "<TD>".$row["sendto"]."</TD>";
 		echo "<TD>".$row["subject"]."</TD>";
 		echo "<TD>".$row["message"]."</TD>";

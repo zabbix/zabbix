@@ -7,7 +7,7 @@
 ?>
  
 <?
-	show_table_header("IT's SERVICES");
+	show_table_header("IT SERVICES");
 
 	echo "<br>";
 
@@ -21,8 +21,24 @@
 	echo "<tr><td><b>Service</b></td></tr>";
 	echo "\n";
 	$col=0;
+	if(isset($serviceid))
+	{
+		echo "<tr bgcolor=#EEEEEE>";
+		$service=get_service_by_serviceid($serviceid);
+		echo "<td><b><a href=\"srv_status.html?serviceid=".$service["serviceid"]."\">".$service["name"]."</a></b></td>";
+		echo "</tr>"; 
+		$col++;
+	}
 	while($row=DBfetch($result))
 	{
+		if(!isset($serviceid) && service_has_parent($row["serviceid"]))
+		{
+			continue;
+		}
+		if(isset($serviceid) && service_has_no_this_parent($serviceid,$row["serviceid"]))
+		{
+			continue;
+		}
 		if(isset($serviceid)&&($serviceid==$row["serviceid"]))
 		{
 			echo "<tr bgcolor=#99AABB>";
@@ -32,7 +48,30 @@
 			if($col++%2==0)	{ echo "<tr bgcolor=#EEEEEE>"; }
 			else		{ echo "<tr bgcolor=#DDDDDD>"; }
 		}
-		echo "<td><a href=\"srv_status.html?serviceid=".$row["serviceid"]."\">".$row["name"]."</a></td>";
+//		echo "<td><a href=\"srv_status.html?serviceid=".$row["serviceid"]."\">".$row["name"]."</a></td>";
+		$childs=get_num_of_service_childs($row["serviceid"]);
+		if(isset($serviceid))
+		{
+			if($childs == 0)
+			{
+				echo "<td> - ".$row["name"]."</td>";
+			}
+			else
+			{
+				echo "<td><a href=\"srv_status.html?serviceid=".$row["serviceid"]."\"> - [$childs]".$row["name"]."</a></td>";
+			}
+		}
+		else
+		{
+			if($childs == 0)
+			{
+				echo "<td>".$row["name"]."</td>";
+			}
+			else
+			{
+				echo "<td><a href=\"srv_status.html?serviceid=".$row["serviceid"]."\">[$childs] ".$row["name"]."</a></td>";
+			}
+		}
 		echo "</tr>"; 
 	}
 	echo "</table>";
