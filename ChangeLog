@@ -1,5 +1,6 @@
 Changes for 1.0beta7:
 
+ - startup scripts for RedHat 8.0. Thanks to John Crunk. (Alexei)
  - refresh rate is doubled for user 'guest' (Alexei)
  - mass insert and delete for items. (Alexei)
  - support for SNMPv2. New item type introduced. (Alexei)
