@@ -160,8 +160,7 @@ void	process_config_file(void)
 
 		if(strcmp(parameter,"Server")==0)
 		{
-			config_host_allowed=(char *)malloc(strlen(value)+1);
-			strcpy(config_host_allowed,value);
+			config_host_allowed=strdup(value);
 		}
 		else if(strcmp(parameter,"StartAgents")==0)
 		{

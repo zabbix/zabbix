@@ -165,13 +165,11 @@ void	add_user_parameter(char *key,char *command)
 	{
 		if( commands[i].key == 0)
 		{
-			commands[i].key=(char *)malloc(strlen(key)+1);
-			strcpy(commands[i].key,key);
+			commands[i].key=strdup(key);
 
 			commands[i].function=&EXECUTE;
 
-			commands[i].parameter=(char *)malloc(strlen(command)+1);
-			strcpy(commands[i].parameter,command);
+			commands[i].parameter=strdup(command);
 
 			commands[i+1].key = 0;
 			

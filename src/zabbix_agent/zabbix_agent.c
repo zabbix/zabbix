@@ -81,8 +81,7 @@ void	process_config_file(void)
 
 		if(strcmp(parameter,"Server")==0)
 		{
-			config_host_allowed=(char *)malloc(strlen(value));
-			strcpy(config_host_allowed,value);
+			config_host_allowed=strdup(value);
 		}
 		else if(strcmp(parameter,"UserParameter")==0)
 		{
@@ -113,14 +112,11 @@ void	process_config_file(void)
 int	check_security(void)
 {
 	char	*sname;
-	char	*config;
 	struct	sockaddr_in name;
 	int	i;
 
 	if(getpeername(0,  (struct sockaddr *)&name, (size_t *)&i) == 0)
 	{
-		config=(char *)malloc(16);
-
 		i=sizeof(struct sockaddr_in);
 
 		sname=inet_ntoa(name.sin_addr);
