@@ -9,6 +9,7 @@ ZABBIX 1.1:
  - more supported parameters under FreeBSD, HP-UX and Solaris (cpu times, network stats)
  - agent proxy
 
+ - usual user parameters do not work. Check mysql[qps]
  - disk stats under Linux 2.6.x
  - handle unavailability of MySQL gracefully
  - check SUSE 9.2 startup scripts. Parameter -u is misplaced.
