@@ -1173,7 +1173,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		if($nomenu == 0)
 		{
 ?>
-
+<!--
 	<p>
 
 	<table border=0 cellspacing=0 cellpadding=0 width=100% bgcolor=000000>
@@ -1605,9 +1605,16 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	</tr>
 	</table>
 	</p>
+-->
+
+	<table border=0 cellspacing=0 cellpadding=5 width="100%" bgcolor="#FFFFFF">
+	<tr>
+	<td width="118" height="31" class="top_header_left"><img width="118" height="31" src="http://www.zabbix.com/img/zabbix1.png" border="0" alt="ZABBIX"></td>
+	</tr>
+	</table>
 
 	<p>
-	<table class="menu">
+	<table class="menu" cellspacing=0 cellpadding=5>
 	<tr>
 	<td class="horizontal_menu" height=24 colspan=9><b><a href="http://www.zabbix.com/index.php" class="highlight">View</a></b></td>
 	<td class="horizontal_menu_n" height=24 colspan=9><b><a href="http://www.zabbix.com/index.php" class="highlight">Reports</a></b></td>
@@ -1615,10 +1622,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	<td class="horizontal_menu_n" height=24 colspan=9><b><a href="http://www.zabbix.com/index.php" class="highlight">Login</a></b></td>
 	</tr>
 	</table>
-	<table class="menu" width=100%>
+	<table class="menu" width=100% cellspacing=0 cellpadding=5>
 	<tr><td class="horizontal_menu" height=24 colspan=9><b><a href="latest.php" class="highlight">Latest data</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="tr_status.php?onlytrue=true&noactions=true&compact=true" class="highlight">Triggers</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="queue.php" class="highlight">Queue</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="latestalarms.php" class="highlight">Alarms</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="alerts.php" class="highlight">Alerts</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="maps.php" class="highlight">Maps</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="charts.php" class="highlight">Graphs</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="screens.php" class="highlight">Screens</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="srv_status.php" class="highlight">IT Services</a></b></td></tr>
+<!--
 	<tr><td class="horizontal_menu" height=24 colspan=9><b><a href="index.php" class="highlight">Home</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="about.php" class="highlight">About</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="report1.php" class="highlight">Status of ZABBIX</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="report2.php" class="highlight">Availability report</a></b></td></tr>
 	<tr><td class="horizontal_menu" height=24 colspan=9><b><a href="config.php" class="highlight">Config</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="users.php" class="highlight">Users</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="audit.php" class="highlight">Audit</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="hosts.php" class="highlight">Hosts</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="items.php" class="highlight">Items</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="triggers.php" class="highlight">Triggers</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="sysmaps.php" class="highlight">Maps</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="graphs.php" class="highlight">Graphs</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="screenconf.php" class="highlight">Screens</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="services.php" class="highlight">IT Services</a></b></td></tr>
+-->
 	</table>
 
 	</p>
