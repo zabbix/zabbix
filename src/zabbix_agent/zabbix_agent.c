@@ -20,36 +20,45 @@
 
 COMMAND	commands[]=
 	{
-	{"freemem"	,FREEMEM, 0},
-	{"root_free"	,DF, "/"},
-	{"opt_free"	,DF, "/opt"},
-	{"tmp_free"	,DF, "/tmp"},
-	{"usr_free"	,DF, "/usr"},
-	{"home_free"	,DF, "/home"},
-	{"var_free"	,DF, "/var"},
-	{"root_inode"	,INODE, "/"},
-	{"opt_inode"	,INODE, "/opt"},
-	{"tmp_inode"	,INODE, "/tmp"},
-	{"usr_inode"	,INODE, "/usr"},
-	{"home_inode"	,INODE, "/home"},
-	{"var_inode"	,INODE, "/var"},
-	{"cksum_inetd"	,EXECUTE, "cksum /etc/inetd.conf |cut -f1 -d' '"},
-	{"cksum_kernel"	,EXECUTE, "cksum /vmlinuz |cut -f1 -d' '"},
-	{"cksum_passwd"	,EXECUTE, "cksum /etc/passwd |cut -f1 -d' '"},
-	{"proccount"	,EXECUTE, "echo /proc/[0-9]*|wc -w"},
-	{"ping"		,PING, 0},
-	{"procidle"	,EXECUTE, "vmstat 1 1|tail -1|awk {'print $16'}"},
-	{"procload"	,PROCLOAD, 0},
-	{"procload5"	,PROCLOAD5, 0},
-	{"procload15"	,PROCLOAD15, 0},
-	{"procrunning"	,EXECUTE, "cat /proc/loadavg|cut -f1 -d'/'|cut -f4 -d' '"},
-	{"procsystem"	,EXECUTE, "vmstat 1 1|tail -1|awk {'print $15'}"},
-	{"procuser"	,EXECUTE, "vmstat 1 1|tail -1|awk {'print $14'}"},
-	{"swapfree"	,SWAPFREE, 0},
-	{"syslog_size"	,FILESIZE, "/var/log/syslog"},
-	{"tcp_count"	,EXECUTE, "netstat -tn|grep EST|wc -l"},
-	{"users"	,EXECUTE, "who|wc -l"},
-	{0		,0}
+	{"memory[total]"		,TOTALMEM, 0},
+	{"memory[shared]"		,SHAREDMEM, 0},
+	{"memory[buffers]"		,BUFFERSMEM, 0},
+	{"memory[cached]"		,CACHEDMEM, 0},
+	{"memory[free]"			,FREEMEM, 0},
+
+	{"diskfree[/]"			,DF, "/"},
+	{"diskfree[/opt]"		,DF, "/opt"},
+	{"diskfree[/tmp]"		,DF, "/tmp"},
+	{"diskfree[/usr]"		,DF, "/usr"},
+	{"diskfree[/home]"		,DF, "/home"},
+	{"diskfree[/var]"		,DF, "/var"},
+
+	{"inodefree[/]"			,INODE, "/"},
+	{"inodefree[/opt]"		,INODE, "/opt"},
+	{"inodefree[/tmp]"		,INODE, "/tmp"},
+	{"inodefree[/usr]"		,INODE, "/usr"},
+	{"inodefree[/home]"		,INODE, "/home"},
+	{"inodefree[/var]"		,INODE, "/var"},
+
+	{"cksum[/etc/inetd.conf]"	,EXECUTE, "cksum /etc/inetd.conf |cut -f1 -d' '"},
+	{"cksum[/vmlinuz]"		,EXECUTE, "cksum /vmlinuz |cut -f1 -d' '"},
+	{"cksum[/etc/passwd]"		,EXECUTE, "cksum /etc/passwd |cut -f1 -d' '"},
+
+	{"filesize[/var/log/syslog]"	,FILESIZE, "/var/log/syslog"},
+
+	{"swap[free]"			,SWAPFREE, 0},
+	{"swap[total]"			,SWAPTOTAL, 0},
+
+	{"proccount"			,EXECUTE, "echo /proc/[0-9]*|wc -w"},
+	{"ping"				,PING, 0},
+	{"procload"			,PROCLOAD, 0},
+	{"procload5"			,PROCLOAD5, 0},
+	{"procload15"			,PROCLOAD15, 0},
+	{"procrunning"			,EXECUTE, "cat /proc/loadavg|cut -f1 -d'/'|cut -f4 -d' '"},
+	{"tcp_count"			,EXECUTE, "netstat -tn|grep EST|wc -l"},
+	{"users"			,EXECUTE, "who|wc -l"},
+	{"uptime"			,UPTIME, 0},
+	{0				,0}
 	};
 
 void	signal_handler( int sig )

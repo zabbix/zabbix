@@ -10,19 +10,9 @@ dnl Replace `main' with a function in -lmysqlclient:
 dnl Checks for header files.
 AC_HEADER_STDC
 
-AC_CHECK_HEADERS(stdio.h)
-AC_CHECK_HEADERS(stdlib.h)
-AC_CHECK_HEADERS(string.h)
-AC_CHECK_HEADERS(signal.h)
-AC_CHECK_HEADERS(errno.h)
-AC_CHECK_HEADERS(unistd.h)
-AC_CHECK_HEADERS(mntent.h)
-AC_CHECK_HEADERS(fcntl.h)
-AC_CHECK_HEADERS(sys/stat.h)
-AC_CHECK_HEADERS(sys/socket.h)
-AC_CHECK_HEADERS(sys/types.h)
-AC_CHECK_HEADERS(netinet/in.h)
-AC_CHECK_HEADERS(arpa/inet.h)
+AC_CHECK_HEADERS(stdio.h stdlib.h string.h signal.h errno.h \
+  unistd.h mntent.h fcntl.h sys/stat.h sys/socket.h \
+  sys/types.h netinet/in.h arpa/inet.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_PID_T
