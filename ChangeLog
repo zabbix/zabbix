@@ -1,5 +1,6 @@
 Changes for 1.1alpha6:
 
+ - removed link to unexistant trends.php (Alexei)
  - support for unlimited number of user parameters (Alexei)
  - support of passing of parameters to user-defined commands (Alexei)
  - improved zabbix.spec. Thanks to Dirk Datzert. (Alexei)
