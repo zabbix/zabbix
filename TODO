@@ -1,14 +1,12 @@
 1.0beta10:
 
- - bug. New agent generates too many unsupported
- - add &nbsp; to the Latest Values
  - add all supported items to templates (data.sql)
  - performance of graphs: get rid of MIN,MAX
  - user groups
  - test on non-Linux platforms
  - test install and upgrade procedure for 1.0beta10
  - write error message in case of PID file and LOG file errors
- - Graphs: change order it lines
+ - Graphs: change order of lines
  - support for proc_cnt() under Solaris
  - zabbix to write log to the item (for example: log when item becomes unsupported)
  - strings items for graphs

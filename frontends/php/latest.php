@@ -299,12 +299,16 @@
 //	sprintf("%+0.2f"); does not work
 				if($row["lastvalue"]-$row["prevvalue"]<0)
 				{
-					echo "<td>";echo convert_units($row["lastvalue"]-$row["prevvalue"],$row["units"],$row["multiplier"]); echo "</td>";
+					$str=convert_units($row["lastvalue"]-$row["prevvalue"],$row["units"],$row["multiplier"]);
+					$str=str_replace(" ","&nbsp;",$str);
+					echo "<td>$str</td>";
 //					printf("<td>%0.2f</td>",$row["lastvalue"]-$row["prevvalue"]);
 				}
 				else
 				{
-					echo "<td>+";echo convert_units($row["lastvalue"]-$row["prevvalue"],$row["units"],$row["multiplier"]); echo "</td>";
+					$str="+".convert_units($row["lastvalue"]-$row["prevvalue"],$row["units"],$row["multiplier"]);
+					$str=str_replace(" ","&nbsp;",$str);
+					echo "<td>$str</td>";
 //					printf("<td>+%0.2f</td>",$row["lastvalue"]-$row["prevvalue"]);
 				}
 			}
