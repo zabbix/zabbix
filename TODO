@@ -1,5 +1,12 @@
 HIGH PRIORITY:
 
+ - trapper-based triggers in Status of Triggers
+ - availability for trapper-based triggers
+ - rename Show-Show-Show
+ - BUG. history graph goes left
+ - Graphs for specified period and date and time
+ - Check Housekeeping procedure
+
  - fix buffer overflow in zbx_log().
 * - add severity to pre-defined triggers 
 * - BUG. zabbix_sucker should accept parameter regardless of "\n" at the end of line 
