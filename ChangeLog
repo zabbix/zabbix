@@ -1,5 +1,6 @@
 Changes for 1.0beta7:
 
+ - fixed housekeeping procedure. Upgrade carefully! (Alexei)
  - support of template hosts. Remove tables hosts_templates and
    triggers_template. (Alexei) 
  - Show-Show-Show renamed to Graph-Trend-Compare in latest.html (Alexei)
