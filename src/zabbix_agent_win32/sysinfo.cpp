@@ -419,7 +419,7 @@ static double H_CRC32(char *cmd,char *arg)
    GetParameterInstance(cmd,fileName,MAX_PATH-1);
    hFile=CreateFile(fileName,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,0,NULL);
    if (hFile==INVALID_HANDLE_VALUE)
-      return NULL;
+      return NOTSUPPORTED;
 
    // Create file mapping object
    hFileMapping=CreateFileMapping(hFile,NULL,PAGE_READONLY,0,0,NULL);
@@ -428,7 +428,7 @@ static double H_CRC32(char *cmd,char *arg)
       WriteLog("CreateFileMapping(%s) failed [%s]\r\n",
                fileName,GetSystemErrorText(GetLastError()));
       CloseHandle(hFile);
-      return NULL;
+      return FAIL;
    }
 
    // Map entire file to process's address space
@@ -439,7 +439,7 @@ static double H_CRC32(char *cmd,char *arg)
                fileName,GetSystemErrorText(GetLastError()));
       CloseHandle(hFileMapping);
       CloseHandle(hFile);
-      return NULL;
+      return FAIL;
    }
 
    crc=CalculateCRC32(data,GetFileSize(hFile,NULL));
@@ -450,6 +450,103 @@ static double H_CRC32(char *cmd,char *arg)
    CloseHandle(hFile);
 
    return (double)crc;
+}
+
+
+//
+// Handler for filesize[*] parameter
+//
+
+static double H_FileSize(char *cmd,char *arg)
+{
+   char fileName[MAX_PATH];
+   HANDLE hFind;
+   WIN32_FIND_DATA findData;
+
+   GetParameterInstance(cmd,fileName,MAX_PATH-1);
+
+   hFind=FindFirstFile(fileName,&findData);
+   if (hFind==INVALID_HANDLE_VALUE)
+      return NOTSUPPORTED;
+   FindClose(hFind);
+
+   return (double)findData.nFileSizeLow+(double)(((__int64)findData.nFileSizeHigh) << 32);
+}
+
+
+//
+// Handler for system[uname] parameter
+//
+
+static char *H_SystemUname(char *cmd,char *arg)
+{
+   DWORD dwSize;
+   char *cpuType,computerName[MAX_COMPUTERNAME_LENGTH+1],osVersion[256],buffer[1024];
+   SYSTEM_INFO sysInfo;
+   OSVERSIONINFO versionInfo;
+
+   dwSize=MAX_COMPUTERNAME_LENGTH+1;
+   GetComputerName(computerName,&dwSize);
+
+   versionInfo.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
+   GetVersionEx(&versionInfo);
+   GetSystemInfo(&sysInfo);
+
+   switch(versionInfo.dwPlatformId)
+   {
+      case VER_PLATFORM_WIN32_WINDOWS:
+         sprintf(osVersion,"Windows %s-%s",versionInfo.dwMinorVersion==0 ? "95" :
+            (versionInfo.dwMinorVersion==10 ? "98" :
+               (versionInfo.dwMinorVersion==90 ? "Me" : "Unknown")),versionInfo.szCSDVersion);
+         break;
+      case VER_PLATFORM_WIN32_NT:
+         if (versionInfo.dwMajorVersion!=5)
+            sprintf(osVersion,"Windows NT %d.%d %s",versionInfo.dwMajorVersion,
+                    versionInfo.dwMinorVersion,versionInfo.szCSDVersion);
+         else      // Windows 2000 or Windows XP
+            sprintf(osVersion,"Windows %s %s",versionInfo.dwMinorVersion==0 ? "2000" : "XP",
+                    versionInfo.szCSDVersion);
+         break;
+      default:
+         strcpy(osVersion,"Windows [Unknown Version]");
+         break;
+   }
+
+   switch(sysInfo.wProcessorArchitecture)
+   {
+      case PROCESSOR_ARCHITECTURE_INTEL:
+         cpuType="Intel IA-32";
+         break;
+      case PROCESSOR_ARCHITECTURE_MIPS:
+         cpuType="MIPS";
+         break;
+      case PROCESSOR_ARCHITECTURE_ALPHA:
+         cpuType="Alpha";
+         break;
+      case PROCESSOR_ARCHITECTURE_PPC:
+         cpuType="PowerPC";
+         break;
+      case PROCESSOR_ARCHITECTURE_IA64:
+         cpuType="Intel IA-64";
+         break;
+#ifdef PROCESSOR_ARCHITECTURE_IA32_ON_WIN64
+      case PROCESSOR_ARCHITECTURE_IA32_ON_WIN64:
+         cpuType="IA-32 on IA-64";
+         break;
+#endif
+#ifdef PROCESSOR_ARCHITECTURE_AMD64
+      case PROCESSOR_ARCHITECTURE_AMD64:
+         cpuType="AMD-64";
+         break;
+#endif
+      default:
+         cpuType="unknown";
+         break;
+   }
+
+   sprintf(buffer,"Windows %s %d.%d.%d %s %s",computerName,versionInfo.dwMajorVersion,
+           versionInfo.dwMinorVersion,versionInfo.dwBuildNumber,osVersion,cpuType);
+   return strdup(buffer);
 }
 
 
@@ -469,6 +566,7 @@ static AGENT_COMMAND commands[]=
    { "cpu_util15[*]",H_ProcUtil,NULL,(char *)0x82 },
    { "diskfree[*]",H_DiskInfo,NULL,NULL },
    { "disktotal[*]",H_DiskInfo,NULL,NULL },
+   { "filesize[*]",H_FileSize,NULL,NULL },
    { "md5_hash[*]",NULL,H_MD5Hash,NULL },
    { "memory[*]",H_MemoryInfo,NULL,NULL },
    { "perf_counter[*]",H_PerfCounter,NULL,NULL },
@@ -481,6 +579,7 @@ static AGENT_COMMAND commands[]=
    { "system[procload]",H_NumericPtr,NULL,(char *)&statProcLoad },
    { "system[procload5]",H_NumericPtr,NULL,(char *)&statProcLoad5 },
    { "system[procload15]",H_NumericPtr,NULL,(char *)&statProcLoad15 },
+   { "system[uname]",NULL,H_SystemUname,NULL },
    { "version[zabbix_agent]",NULL,H_StringConstant,AGENT_VERSION },
    { "",NULL,NULL,NULL }
 };
