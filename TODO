@@ -34,6 +34,8 @@ TKOM:
 
 OTHER:
 
+ - check if Zabbix send alert while initial unknown->true state change
+
 I think that i found a bug in zabbix_suckerd.
 I get the value :" The system's global status is normal. " from snmp.
 but the log say me :
