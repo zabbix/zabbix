@@ -76,10 +76,13 @@
 
 		while(list($num,$element)=each($elements))
 		{
-			if(!$element)	continue;
+			if(is_array($element)&&isset($element["hide"])&&($element["hide"]==1))	continue;
 			if(is_array($element))
 			{
-				echo "<td class=\"".$element["class"]."\">".$element["value"]."</td>";
+				if(isset($element["class"]))
+					echo "<td class=\"".$element["class"]."\">".$element["value"]."</td>";
+				else
+					echo "<td>".$element["value"]."</td>";
 			}
 			else
 			{

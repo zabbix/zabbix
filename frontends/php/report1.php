@@ -28,79 +28,37 @@
 <?php
 	show_table_header(S_STATUS_OF_ZABBIX_BIG);
 
-	echo "<TABLE BORDER=0 WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
-	echo "<TR BGCOLOR=\"#CCCCCC\"><TD WIDTH=10%><B>".S_PARAMETER."</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>".S_VALUE."</B></TD>";
-	echo "</TR>";
+	table_begin();
+
+	table_header(array(S_PARAMETER,S_VALUE));
 
 	$stats=get_stats();
+
+	$col=0;
+	$str=array("value"=>S_NO,"class"=>"on");
+	if( (exec("ps -ef|grep zabbix_suckerd|grep -v grep|wc -l")>0) || (exec("ps -ax|grep zabbix_suckerd|grep -v grep|wc -l")>0) )
+	{
+		$str=array("value"=>S_YES,"class"=>"off");
+	}
+	table_row(array(S_ZABBIX_SUCKERD_IS_RUNNING,$str),$col++);
+
+	$str=array("value"=>S_NO,"class"=>"on");
+	if( (exec("ps -ef|grep zabbix_trapperd|grep -v grep|wc -l")>0) || (exec("ps -ax|grep zabbix_trapperd|grep -v grep|wc -l")>0) )
+	{
+		$str=array("value"=>S_YES,"class"=>"off");
+	}
+	table_row(array(S_ZABBIX_TRAPPERD_IS_RUNNING,$str),$col++);
+	table_row(array(S_NUMBER_OF_VALUES_STORED,$stats["history_count"]),$col++);
+	table_row(array(S_NUMBER_OF_TRENDS_STORED,$stats["trends_count"]),$col++);
+	table_row(array(S_NUMBER_OF_ALARMS,$stats["alarms_count"]),$col++);
+	table_row(array(S_NUMBER_OF_ALERTS,$stats["alerts_count"]),$col++);
+	table_row(array(S_NUMBER_OF_TRIGGERS_ENABLED_DISABLED,$stats["triggers_count"]."(".$stats["triggers_count_enabled"]."/".$stats["triggers_count_disabled"].")"),$col++);
+	table_row(array(S_NUMBER_OF_ITEMS_ACTIVE_TRAPPER,$stats["items_count"]."(".$stats["items_count_active"]."/".$stats["items_count_trapper"]."/".$stats["items_count_not_active"]."/".$stats["items_count_not_supported"].")"),$col++);
+	table_row(array(S_NUMBER_OF_USERS,$stats["users_count"]),$col++);
+	table_row(array(S_NUMBER_OF_HOSTS_MONITORED,$stats["hosts_count"]."(".$stats["hosts_count_monitored"]."/".$stats["hosts_count_not_monitored"]."/".$stats["hosts_count_template"].")"),$col++);
+
+	table_end();
 ?>
-
-	<tr bgcolor="#eeeeee">
-	<td><?php echo S_ZABBIX_SUCKERD_IS_RUNNING; ?></td>
-	<?php
-		$str="<font color=\"AA0000\">".S_NO."</font>";
-		if( (exec("ps -ef|grep zabbix_suckerd|grep -v grep|wc -l")>0) || (exec("ps -ax|grep zabbix_suckerd|grep -v grep|wc -l")>0) )
-		{
-			$str="<font color=\"00AA00\">".S_YES."</font>";
-		}
-	?>
-	<td><?php echo $str; ?></td>
-	</tr>
-
-	<tr bgcolor="#dddddd">
-	<td><?php echo S_ZABBIX_TRAPPERD_IS_RUNNING; ?></td>
-	<?php
-		$str="<font color=\"AA0000\">".S_NO."</font>";
-		if( (exec("ps -ef|grep zabbix_trapperd|grep -v grep|wc -l")>0) || (exec("ps -ax|grep zabbix_trapperd|grep -v grep|wc -l")>0) )
-		{
-			$str="<font color=\"00AA00\">".S_YES."</font>";
-		}
-	?>
-	<td><?php echo $str; ?></td>
-	</tr>
-
-	<tr bgcolor="#eeeeee">
-	<td><?php echo S_NUMBER_OF_VALUES_STORED; ?></td>
-	<td><?php echo $stats["history_count"]; ?></td>
-	</tr>
-
-	<tr bgcolor="#dddddd">
-	<td><?php echo S_NUMBER_OF_TRENDS_STORED; ?></td>
-	<td><?php echo $stats["trends_count"]; ?></td>
-	</tr>
-
-	<tr bgcolor="#eeeeee">
-	<td><?php echo S_NUMBER_OF_ALARMS; ?></td>
-	<td><?php echo $stats["alarms_count"]; ?></td>
-	</tr>
-
-	<tr bgcolor="#dddddd">
-	<td><?php echo S_NUMBER_OF_ALERTS; ?></td>
-	<td><?php echo $stats["alerts_count"]; ?></td>
-	</tr>
-
-	<tr bgcolor="#eeeeee">
-	<td><?php echo S_NUMBER_OF_TRIGGERS_ENABLED_DISABLED; ?></td>
-	<td><?php echo $stats["triggers_count"],"(",$stats["triggers_count_enabled"],"/",$stats["triggers_count_disabled"],")"; ?></td>
-	</tr>
-
-	<tr bgcolor="#dddddd">
-	<td><?php echo S_NUMBER_OF_ITEMS_ACTIVE_TRAPPER; ?></td>
-	<td><?php echo $stats["items_count"],"(",$stats["items_count_active"],"/",$stats["items_count_trapper"],"/",$stats["items_count_not_active"],"/",$stats["items_count_not_supported"],")"; ?></td>
-	</tr>
-
-	<tr bgcolor="#eeeeee">
-	<td><?php echo S_NUMBER_OF_USERS; ?></td>
-	<td><?php echo $stats["users_count"]; ?></td>
-	</tr>
-
-	<tr bgcolor="#dddddd">
-	<td><?php echo S_NUMBER_OF_HOSTS_MONITORED; ?></td>
-	<td><?php echo $stats["hosts_count"],"(",$stats["hosts_count_monitored"],"/",$stats["hosts_count_not_monitored"],"/",$stats["hosts_count_template"],")"; ?></td>
-	</tr>
-
-	</table>
 
 <?php
 	show_footer();

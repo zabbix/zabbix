@@ -44,17 +44,8 @@
 
 	$now=time();
 	$result=DBselect("select serviceid,name,triggerid,status,showsla,goodsla from services order by sortorder,name");
-	echo "<table border=0 width=100% bgcolor='#AAAAAA' cellspacing=1 cellpadding=3>";
-	echo "\n";
-	echo "<tr bgcolor='#CCCCCC'>";
-	echo "<td width=40%><b>".S_SERVICE."</b></td>";
-	echo "<td width=10%><b>".S_STATUS."</b></td>";
-	echo "<td><b>".S_REASON."</b></td>";
-	echo "<td width=20%><b>".S_SLA_LAST_7_DAYS."</b></td>";
-	echo "<td width=10% align=center><b>".nbsp(S_PLANNED_CURRENT_SLA)."</b></td>";
-	echo "<td width=5%><b>".S_GRAPH."</b></td>";
-	echo "</tr>";
-	echo "\n";
+	table_begin();
+	table_header(array(S_SERVICE,S_STATUS,S_REASON,S_SLA_LAST_7_DAYS,nbsp(S_PLANNED_CURRENT_SLA),S_GRAPH));
 	$col=0;
 	if(isset($_GET["serviceid"]))
 	{
@@ -122,12 +113,7 @@
 		$childs=get_num_of_service_childs($row["serviceid"]);
 		if(isset($row["triggerid"]))
 		{
-//			$trigger=get_trigger_by_triggerid($row["triggerid"]);
-//			$description=$trigger["description"];
-//			if( strstr($description,"%s"))
-//			{
-				$description=nbsp(expand_trigger_description($row["triggerid"]));
-//			}
+			$description=nbsp(expand_trigger_description($row["triggerid"]));
 			$description="[<a href=\"alarms.php?triggerid=".$row["triggerid"]."\">".S_TRIGGER_BIG."</a>] $description";
 		}
 		else
@@ -172,12 +158,7 @@
 			{
 				if(does_service_depend_on_the_service($row["serviceid"],$row2["serviceid"]))
 				{
-//					$trigger=get_trigger_by_triggerid($row2["triggerid"]);
-//					$description=$trigger["description"];
-//					if( strstr($description,"%s"))
-//					{
-						$description=nbsp(expand_trigger_description($row2["triggerid"]));
-//					}
+					$description=nbsp(expand_trigger_description($row2["triggerid"]));
 					echo "<li class=\"itservices\"><a href=\"alarms.php?triggerid=".$row2["triggerid"]."\">$description</a></li>";
 				}
 			}
@@ -221,7 +202,7 @@
 		echo "<td><a href=\"srv_status.php?serviceid=".$row["serviceid"]."&showgraph=1\">Show</a></td>";
 		echo "</tr>"; 
 	}
-	echo "</table>";
+	table_end();
 ?>
 
 <?php
