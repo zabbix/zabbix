@@ -43,7 +43,7 @@
 #else
 #define DEBUG_SUFFIX
 #endif
-#define AGENT_VERSION         "1.0.0-beta11(rc2)" DEBUG_SUFFIX
+#define AGENT_VERSION         "1.0.0-beta15(rc1)" DEBUG_SUFFIX
 
 #define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
 #define ZABBIX_EVENT_SOURCE   "Zabbix Win32 Agent"
@@ -242,5 +242,6 @@ extern double statAcceptErrors;
 extern DWORD (__stdcall *imp_GetGuiResources)(HANDLE,DWORD);
 extern BOOL (__stdcall *imp_GetProcessIoCounters)(HANDLE,PIO_COUNTERS);
 extern BOOL (__stdcall *imp_GetPerformanceInfo)(PPERFORMANCE_INFORMATION,DWORD);
+extern BOOL (__stdcall *imp_GlobalMemoryStatusEx)(LPMEMORYSTATUSEX);
 
 #endif
