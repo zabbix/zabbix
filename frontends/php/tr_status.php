@@ -323,7 +323,14 @@
 	}
 	else
 	{
-		echo "<TD ALIGN=LEFT><B><A HREF=\"tr_status.php?sort=description&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">Description</a>";
+		if($select=="TRUE")
+		{
+			echo "<TD ALIGN=LEFT><B><A HREF=\"tr_status.php?sort=description&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">Description</a>";
+		}
+		else
+		{
+			echo "<TD ALIGN=LEFT><B><A HREF=\"tr_status.php?sort=description&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$fullscreen$cond\">Description</a>";
+		}
 	}
 	if($compact!='true') {echo "<BR><FONT SIZE=-1>Expression</FONT></B>";}
 	echo "</TD>";
@@ -336,7 +343,14 @@
 	}
 	else
 	{
-		echo "<TD ALIGN=CENTER><B><A HREF=\"tr_status.php?sort=priority&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">Severity</a>";
+		if($select=="TRUE")
+		{
+			echo "<TD ALIGN=CENTER><B><A HREF=\"tr_status.php?sort=priority&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">Severity</a>";
+		}
+		else
+		{
+			echo "<TD ALIGN=CENTER><B><A HREF=\"tr_status.php?sort=priority&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$fullscreen$cond\">Severity</a>";
+		}
 	}
 	if($noactions=='true')
 		echo "<TD WIDTH=12% ALIGN=CENTER>";
@@ -349,7 +363,14 @@
 	}
 	else
 	{
-		echo "<B><A HREF=\"tr_status.php?sort=lastchange&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">Last change</a>";
+		if($select=="TRUE")
+		{
+			echo "<B><A HREF=\"tr_status.php?sort=lastchange&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">Last change</a>";
+		}
+		else
+		{
+			echo "<B><A HREF=\"tr_status.php?sort=lastchange&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$fullscreen$cond\">Last change</a>";
+		}
 	}
 	echo "</TD>";
    

@@ -1,5 +1,6 @@
 Changes for 1.0beta11:
 
+ - fixed refresh of status of triggers. (Alexei) 
  - updated RedHat start-up scripts in misc/init.d/redhat. Thanks
  to Charlie. (Alexei)
  - fix for flexible SNMP port name (Alexei)
