@@ -3,6 +3,7 @@ Changes for 1.0beta1:
 (Add description of new tables and column URL to the manual)
 (snmptrap -v 1 127.0.0.1 public '' localhost 3 0 '' interfaces.ifTable.ifEntry.ifIndex.1 i 1)
 
+ - support for configuration file for zabbix_trapper(d) (Alexei)
  - support for DB* parameters in zabbix_suckerd.conf (Alexei)
  - not supported items will not be shown in latest values (Alexei)
  - zabbix_agentd cannot be ran as root (Alexei)

@@ -32,6 +32,11 @@
 
 static pid_t *pids;
 
+int	CONFIG_TRAPPERD_FORKS		= TRAPPERD_FORKS;
+char	*CONFIG_DBNAME			= NULL;
+char	*CONFIG_DBUSER			= NULL;
+char	*CONFIG_DBPASSWORD		= NULL;
+
 void	signal_handler( int sig )
 {
 	if( SIGALRM == sig )
@@ -44,6 +49,111 @@ void	signal_handler( int sig )
 	{
 		syslog( LOG_WARNING, "Got signal. Exiting ...");
 		exit( FAIL );
+	}
+}
+
+void	process_config_file(void)
+{
+	FILE	*file;
+	char	line[1024];
+	char	parameter[1024];
+	char	*value;
+	int	lineno;
+	int	i;
+
+
+	file=fopen("/etc/zabbix/zabbix_trapperd.conf","r");
+	if(NULL == file)
+	{
+		syslog( LOG_CRIT, "Cannot open /etc/zabbix/zabbix_trapperd.conf");
+		exit(1);
+	}
+
+	lineno=1;
+	while(fgets(line,1024,file) != NULL)
+	{
+		if(line[0]=='#')	continue;
+		if(strlen(line)==1)	continue;
+
+		strcpy(parameter,line);
+
+		value=strstr(line,"=");
+
+		if(NULL == value)
+		{
+			syslog( LOG_CRIT, "Error in line [%s] Line %d", line, lineno);
+			fclose(file);
+			exit(1);
+		}
+		value++;
+		value[strlen(value)-1]=0;
+
+		parameter[value-line-1]=0;
+
+		syslog( LOG_DEBUG, "Parameter [%s] Value [%s]", parameter, value);
+
+		if(strcmp(parameter,"StartTrappers")==0)
+		{
+			i=atoi(value);
+			if( (i<2) || (i>255) )
+			{
+				syslog( LOG_CRIT, "Wrong value of StartTrappers in line %d. Should be between 2 and 255.", lineno);
+				fclose(file);
+				exit(1);
+			}
+			CONFIG_TRAPPERD_FORKS=i;
+		}
+		else if(strcmp(parameter,"DebugLevel")==0)
+		{
+			if(strcmp(value,"1") == 0)
+			{
+				setlogmask(LOG_UPTO(LOG_CRIT));
+			}
+			else if(strcmp(value,"2") == 0)
+			{
+				setlogmask(LOG_UPTO(LOG_WARNING));
+			}
+			else if(strcmp(value,"3") == 0)
+			{
+				setlogmask(LOG_UPTO(LOG_DEBUG));
+			}
+			else
+			{
+				syslog( LOG_CRIT, "Wrong DebugLevel in line %d", lineno);
+				fclose(file);
+				exit(1);
+			}
+		}
+		else if(strcmp(parameter,"DBName")==0)
+		{
+			CONFIG_DBNAME=(char *)malloc(strlen(value));
+			strcpy(CONFIG_DBNAME,value);
+		}
+		else if(strcmp(parameter,"DBUser")==0)
+		{
+			CONFIG_DBUSER=(char *)malloc(strlen(value));
+			strcpy(CONFIG_DBUSER,value);
+		}
+		else if(strcmp(parameter,"DBPassword")==0)
+		{
+			CONFIG_DBPASSWORD=(char *)malloc(strlen(value));
+			strcpy(CONFIG_DBPASSWORD,value);
+		}
+		else
+		{
+			syslog( LOG_CRIT, "Unsupported parameter [%s] Line %d", parameter, lineno);
+			fclose(file);
+			exit(1);
+		}
+
+		lineno++;
+	}
+	fclose(file);
+	
+	if(CONFIG_DBNAME == NULL)
+	{
+		syslog( LOG_CRIT, "DBName not in config file");
+		exit(1);
 	}
 }
 
@@ -205,7 +315,7 @@ void	child_main(int i,int listenfd, int addrlen)
 
 	syslog( LOG_WARNING, "zabbix_trapperd %ld started",(long)getpid());
 
-	DBconnect();
+	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD);
 
 	for(;;)
 	{
@@ -247,6 +357,8 @@ int	main()
 
 	daemon_init();
 
+	process_config_file();
+
 	phan.sa_handler = &signal_handler;
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = 0;
@@ -264,9 +376,9 @@ int	main()
 
 	listenfd = tcp_listen(host,port,&addrlen);
 
-	pids = calloc(TRAPPERD_FORKS, sizeof(pid_t));
+	pids = calloc(CONFIG_TRAPPERD_FORKS, sizeof(pid_t));
 
-	for(i = 0; i< TRAPPERD_FORKS; i++)
+	for(i = 0; i< CONFIG_TRAPPERD_FORKS; i++)
 	{
 		pids[i] = child_make(i, listenfd, addrlen);
 /*		syslog( LOG_WARNING, "zabbix_trapperd #%d started", pids[i]);*/
