@@ -173,6 +173,9 @@
 				case 4:
 					echo "SNMPv2 agent";
 					break;
+				case 5:
+					echo "Zabbix internal";
+					break;
 				default:
 					echo "Unknown";
 					break;
