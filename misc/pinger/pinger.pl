@@ -26,26 +26,32 @@ $ZABBIX_PORT="10001";
 $HOST_FILE="hosts";
 $TMP_FILE="/tmp/zabbix.pinger.tmp";
 
+$ZABBIX_SENDER="zabbix_sender";
+
 # END OF CONFIGURATION
 
 $hosts = `cat $HOST_FILE | fping`;
 
-system("rm -f $TMP_FILE");
+unlink($TMP_FILE);
+
+open(F,">>",$TMP_FILE) or die "Cannot open $TMP_FILE";
 
 foreach $host (split(/\n/,$hosts))
 {
 	if($host=~/^((.)*) is alive$/)
 	{
-		$cmd="echo $ZABBIX_SERVER $ZABBIX_PORT $1:alive 1 >>$TMP_FILE"; 
+		$str="$ZABBIX_SERVER $ZABBIX_PORT $1:alive 1"; 
 	}
 	else
 	{
 		$host=~/^((.)*) is((.)*)$/;
-		$cmd="echo $ZABBIX_SERVER $ZABBIX_PORT $1:alive 0 >>$TMP_FILE"; 
+		$str="$ZABBIX_SERVER $ZABBIX_PORT $1:alive 0"; 
 	}
-	system( $cmd );	
+	printf F "%s\n",$str;
 }
 
-$cmd="zabbix_sender <$TMP_FILE";
+close(F);
+
+$cmd="$ZABBIX_SENDER <$TMP_FILE";
 
 system($cmd);
