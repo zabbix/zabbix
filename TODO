@@ -34,6 +34,8 @@ TKOM:
 
 OTHER:
 
+ - add information about integration with OpenView to the manual
+ - add tabs to all screens where required
  - check all screens if they are user friendly and present information in the best possible way
  - possibility (a button) to recheck unsupported parameters
  - increase number of network interfaces in zabbix agent
