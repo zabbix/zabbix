@@ -78,7 +78,7 @@
 
 if($DB_TYPE=="MYSQL")
 {
-	$sql="select round(900*((clock+3*3600)%(24*3600))/(24*3600)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid=$itemid and clock>$from_time and clock<$to_time group by round(900*((clock+3*3600)%(24*3600))/(24*3600))";
+	$sql="select round(900*((clock+3*3600)%(24*3600))/(24*3600)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid=$itemid and clock>$from_time and clock<$to_time group by 1";
 //	echo $sql."<br>";
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
@@ -93,7 +93,7 @@ if($DB_TYPE=="MYSQL")
 
 	$count_now=array();
 	$avg_now=array();
-	$result=DBselect("select round(900*((clock+3*3600)%(24*3600))/(24*3600)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid=$itemid and clock>$from_time_now and clock<$to_time group by round(900*((clock+3*3600)%(24*3600))/(24*3600))");
+	$result=DBselect("select round(900*((clock+3*3600)%(24*3600))/(24*3600)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid=$itemid and clock>$from_time_now and clock<$to_time group by 1");
 	while($row=DBfetch($result))
 	{
 		$i=$row["i"];
