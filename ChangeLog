@@ -2,10 +2,8 @@ Not ready yet:
 
 [ CORE. Investigate why new alarm added for unreachable host ]
 
-[ HB. Authorisation without user name/password ]
 [ HB. Verify parameters before using them in SQL ]
 [ HB. Check IP addresses for trapped parameters ]
-[ HB. Authorisation without user name/password ]
 [ CORE. Support for Service Tree ] 
 [ CORE. If Zabbix is restarted change triggers status to UNKNOWN ]
 [ CORE. Change trigger status in case if host/item status is changed ]
@@ -30,6 +28,8 @@ snmpget -On localhost public enterprises.ucdavis.memory.memTotalSwap.0]
 
 Changes for 1.0beta4:
 
+ - authorisation without user name/password (Alexei)
+ - default user "guest" (Alexei)
  - added table 'sessions' (Alexei)
  - added index triggers.value and trigger.status (Alexei)
  - added column alarms.value (Alexei)

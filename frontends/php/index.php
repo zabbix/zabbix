@@ -4,6 +4,12 @@
 
 	include "include/config.inc";
 
+	if(isset($reconnect))
+	{
+		setcookie("sessionid",$sessionid,time()-3600);
+		unset($sessionid);
+	}
+
 	if(isset($register)&&($register=="Enter"))
 	{
 		$password=md5($password);
@@ -27,11 +33,18 @@
 ?>
 
 <?
-	echo "Session ID:",$sessionid,"<br>";
-//	if(!isset($sessionid))
+	if(!isset($sessionid))
 	{
 		insert_login_form();
 	}
+	else
+	{
+		echo "<center>";
+		echo "Connected as ".$USER_DETAILS["alias"];
+		echo "<br>";
+		echo "Press <a href=\"index.php?reconnect=1\">here</a> to reconnect";
+		echo "</center>";
+	}	
 //	echo "<center>";
 //	echo "<font face=\"arial,helvetica\" size=2>";
 //	echo "Connected as ".$USER_DETAILS["alias"]."</b>";
