@@ -52,6 +52,10 @@
 	#include <sys/pstat.h>
 #endif
 
+#ifdef HAVE_NETDB_H
+	#include <netdb.h>
+#endif
+
 #include <string.h>
 
 #include "common.h"
@@ -120,12 +124,13 @@ COMMAND	commands[]=
 	{"tcp_count"			,EXECUTE, "netstat -tn|grep EST|wc -l"},
 
 	{"net[listen_21]"		,TCP_LISTEN, "0015"},
-	{"net[listen_22]"		,TCP_LISTEN, "0016"},
 	{"net[listen_23]"		,TCP_LISTEN, "0017"},
 	{"net[listen_25]"		,TCP_LISTEN, "0019"},
 	{"net[listen_80]"		,TCP_LISTEN, "0050"},
 	{"net[listen_110]"		,TCP_LISTEN, "006E"},
 	{"net[listen_143]"		,TCP_LISTEN, "008F"},
+
+	{"check_service[ssh]"		,CHECK_SERVICE_SSH, 0},
 	{0				,0}
 	};
 
@@ -744,4 +749,61 @@ float	EXECUTE(char *command)
 	sscanf(c, "%f", &result );
 
 	return	result;
+}
+
+float	CHECK_SERVICE_SSH(void)
+{
+	char	*haddr;
+	short	hport=22;
+	char	c[1024];
+	
+	int	s;
+	struct	sockaddr_in addr;
+	int	addrlen;
+
+
+	struct hostent *host;
+
+	host = gethostbyname("127.0.0.1");
+	if(host == NULL)
+	{
+		return	FAIL;
+	}
+
+	haddr=host->h_addr;
+
+
+	addrlen = sizeof(addr);
+	memset(&addr, 0, addrlen);
+	addr.sin_port = htons(hport);
+	addr.sin_family = AF_INET;
+	bcopy(haddr, (void *) &addr.sin_addr.s_addr, 4);
+
+	s = socket(AF_INET, SOCK_STREAM, 0);
+	if (s == -1)
+	{
+		return	FAIL;
+	}
+
+	if (connect(s, (struct sockaddr *) &addr, addrlen) == -1)
+	{
+		return	FAIL;
+	}
+
+	memset(&c, 0, 1024);
+	recv(s, c, 1024, 0);
+	if (strncmp(c, "SSH", 3) == 0)
+	{
+		sprintf(c,"0\n");
+		send(s,c,3,0);
+		close(s);
+		return	1;
+	}
+	else
+	{
+		sprintf(c,"0\n");
+		send(s,c,3,0);
+		close(s);
+		return	FAIL;
+	}
 }

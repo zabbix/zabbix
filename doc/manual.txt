@@ -38,6 +38,7 @@
 6. Chapter 6 (Upgrading)
 6.1 Zabbix 1.0alpha8
 6.2 Zabbix 1.0alpha9
+6.3 Zabbix 1.0alpha10
 
 7. Chapter 7 (Misc)
 7.1 pinger.pl
@@ -664,18 +665,18 @@ ping				|	X      |	X      |      X      |      X      |      X      |     X     
 tcp_count			|	X      |	X      |      X      |      -      |      -      |     X     |
 
 net[listen_21]			|	X      |	X      |      -      |      -      |      -      |     -     |
-net[listen_22]			|	X      |	X      |      -      |      -      |      -      |     -     |
 net[listen_23]			|	X      |	X      |      -      |      -      |      -      |     -     |
 net[listen_25]			|	X      |	X      |      -      |      -      |      -      |     -     |
 net[listen_80]			|	X      |	X      |      -      |      -      |      -      |     -     |
 net[listen_110]			|	X      |	X      |      -      |      -      |      -      |     -     |
 net[listen_143]			|	X      |	X      |      -      |      -      |      -      |     -     |
 
+service_check[ssh]		|	X      |	X      |      ?      |      ?      |      ?      |     ?     |
 
 6. Chapter 6 (Upgrading)
 
 Upgrade procedure is quite simple. New binaries and frontend
-should be installed according to latest installation incstuctions.
+should be installed according to latest installation instructions.
 
 In order to update database structure, the following steps
 should be performed. Note that before applying database patches,
@@ -727,6 +728,10 @@ This unloads DNS and makes zabbix_suckerd faster.
 6.2 Zabbix 1.0alpha9
 
 Do not forget to install DB patches.
+
+6.3 Zabbix 1.0alpha9
+
+Replace net[listen_22] by check_service[ssh] in table items.
 
 7. Chapter 7 (Misc)
 
