@@ -15,6 +15,7 @@ trigger wihout actions, etc etc
  - zabbix thinks that host is unrechable if it receives string for numeric item
 
  - think about implementation of sinchronised items like cpu[usr], cpu[sys], cpu[idle]
+ - check setproctitle() Lukas sent some time ago for Linux
 
  - overlib: context sensitive help in PHP frontend
  - add selection of MIN/MAX/AVG for graphs
