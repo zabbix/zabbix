@@ -1,5 +1,6 @@
 1.0beta14:
 
+ - check if G,K and M work in trigger expressions
  - status of triggers shows {HOSTNAME} in descriptions
  - start&end time in time navigation
 
