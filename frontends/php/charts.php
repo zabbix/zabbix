@@ -20,7 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = "User defined graphs";
+	$page["title"] = S_CUSTOM_GRAPHS;
 	$page["file"] = "charts.php";
 
 	$nomenu=0;
@@ -50,7 +50,7 @@
 	if(!isset($HTTP_GET_VARS["fullscreen"]))
 	{
 		show_table_header_begin();
-		echo "GRAPHS";
+		echo S_GRAPHS_BIG;
 
 		show_table_v_delimiter();
 
@@ -96,7 +96,7 @@
 
 		if(DBnum_rows($result) == 0)
 		{
-			echo "No graphs to display";
+			echo S_NO_GRAPHS_TO_DISPLAY;;
 		}
 
 		echo "</font>";
@@ -133,7 +133,7 @@
 	}
 	else
 	{
-		$map="Select graph to display";
+		$map=S_SELECT_GRAPH_TO_DISPLAY;
 	}
 	if(!isset($HTTP_GET_VARS["from"]))
 	{
@@ -168,14 +168,14 @@
 	echo "<TABLE BORDER=0 align=center COLS=2 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR BGCOLOR=#FFFFFF>";
 	echo "<TD ALIGN=LEFT>";
-		echo("<div align=left>");
 
-		echo("<b>Period:</b>&nbsp;");
+	echo "<div align=left>";
+	echo "<b>".S_PERIOD.":</b>&nbsp;";
 
-		$hour=3600;
+	$hour=3600;
 		
-		$a=array("1h"=>3600,"2h"=>2*3600,"4h"=>4*3600,"8h"=>8*3600,"12h"=>12*3600,
-			"24h"=>24*3600,"week"=>7*24*3600,"month"=>31*24*3600,"year"=>365*24*3600);
+		$a=array(S_1H=>3600,S_2H=>2*3600,S_4H=>4*3600,S_8H=>8*3600,S_12H=>12*3600,
+			S_24H=>24*3600,S_WEEK_SMALL=>7*24*3600,S_MONTH_SMALL=>31*24*3600,S_YEAR_SMALL=>365*24*3600);
 		foreach($a as $label=>$sec)
 		{
 			echo "[";
@@ -223,14 +223,14 @@
 
 	echo "</TD>";
 	echo "<TD BGCOLOR=#FFFFFF WIDTH=15% ALIGN=RIGHT>";
-		echo(" <b>Keep&nbsp;period:</b>&nbsp;");
+	echo "<b>".nbsp(S_KEEP_PERIOD).":</b>&nbsp;";
 		if($HTTP_GET_VARS["keep"] == 1)
 		{
-			echo("[<A HREF=\"charts.php?keep=0".url_param("graphid").url_param("from").url_param("period").url_param("fullscreen")."\">On</a>]");
+			echo("[<A HREF=\"charts.php?keep=0".url_param("graphid").url_param("from").url_param("period").url_param("fullscreen")."\">".S_ON_C."</a>]");
 		}
 		else
 		{
-			echo("[<A HREF=\"charts.php?keep=1".url_param("graphid").url_param("from").url_param("period").url_param("fullscreen")."\">Off</a>]");
+			echo("[<A HREF=\"charts.php?keep=1".url_param("graphid").url_param("from").url_param("period").url_param("fullscreen")."\">".S_OFF_C."</a>]");
 		}
 	echo "</TD>";
 	echo "</TR>";
@@ -238,12 +238,13 @@
 	echo "<TD>";
 	if(isset($HTTP_GET_VARS["stime"]))
 	{
-		echo("<div align=left>");
-		echo("<b>Move:</b>&nbsp;");
+		echo "<div align=left>" ;
+		echo "<b>".S_MOVE.":</b>&nbsp;" ;
 
 		$day=24;
-		$a=array("1h"=>1,"2h"=>2,"4h"=>4,"8h"=>8,"12h"=>12,
-			"24h"=>24,"week"=>7*24,"month"=>31*24,"year"=>365*24);
+// $a already defined
+//		$a=array("1h"=>1,"2h"=>2,"4h"=>4,"8h"=>8,"12h"=>12,
+//			"24h"=>24,"week"=>7*24,"month"=>31*24,"year"=>365*24);
 		foreach($a as $label=>$hours)
 		{
 			echo "[";
@@ -268,12 +269,13 @@
 	}
 	else
 	{
-		echo("<div align=left>");
-		echo("<b>Move:</b>&nbsp;");
+		echo "<div align=left>";
+		echo "<b>".S_MOVE.":</b>&nbsp;";
 
 		$day=24;
-		$a=array("1h"=>1,"2h"=>2,"4h"=>4,"8h"=>8,"12h"=>12,
-			"24h"=>24,"week"=>7*24,"month"=>31*24,"year"=>365*24);
+// $a already defined
+//		$a=array("1h"=>1,"2h"=>2,"4h"=>4,"8h"=>8,"12h"=>12,
+//			"24h"=>24,"week"=>7*24,"month"=>31*24,"year"=>365*24);
 		foreach($a as $label=>$hours)
 		{
 			echo "[";

@@ -20,7 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = "Latest values";
+	$page["title"] = S_LATEST_VALUES;
 	$page["file"] = "latest.php";
 	show_header($page["title"],0,0);
 ?>
@@ -28,7 +28,7 @@
 <?php
         if(!check_anyright("Host","R"))
         {
-                show_table_header("<font color=\"AA0000\">No permissions !</font>");
+                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
                 show_footer();
                 exit;
         }
@@ -39,7 +39,7 @@
 	
         if(isset($HTTP_GET_VARS["hostid"])&&!check_right("Host","R",$HTTP_GET_VARS["hostid"]))
         {
-                show_table_header("<font color=\"AA0000\">No permissions !</font>");
+                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
                 show_footer();
                 exit;
         }
@@ -47,7 +47,7 @@
 
 <?php
 	show_table_header_begin();
-	echo "LATEST DATA";
+	echo S_LATEST_DATA;
 
 	show_table_v_delimiter();
 
@@ -56,11 +56,11 @@
 	if(isset($HTTP_GET_VARS["groupid"]))
 	{
 //		echo "all ";
-		echo "<a href='latest.php'>all</a> ";
+		echo "<a href='latest.php'>".S_ALL."</a> ";
 	}
 	else
 	{
-		echo "<b>[<a href='latest.php'>all</a>]</b> ";
+		echo "<b>[<a href='latest.php'>".S_ALL."</a>]</b> ";
 	}
 
 	$result=DBselect("select groupid,name from groups order by name");
@@ -198,17 +198,17 @@
 		}
 		if(!isset($HTTP_GET_VARS["sort"])||(isset($HTTP_GET_VARS["sort"])&&($HTTP_GET_VARS["sort"]=="description")))
 		{
-			echo "<TD><B>DESCRIPTION</B></TD>";
+			echo "<TD><B>".S_DESCRIPTION_LARGE."</B></TD>";
 		}
 		else
 		{
 			if(isset($HTTP_GET_VARS["select"]))
 			{
-				echo "<TD><B><a href=\"latest.php?select=".$HTTP_GET_VARS["select"]."&sort=description\">Description</B></TD>";
+				echo "<TD><B><a href=\"latest.php?select=".$HTTP_GET_VARS["select"]."&sort=description\">".S_DESCRIPTION_SMALL."</B></TD>";
 			}
 			else
 			{
-				echo "<TD><B><a href=\"latest.php?hostid=".$HTTP_GET_VARS["hostid"]."&sort=description\">Description</B></TD>";
+				echo "<TD><B><a href=\"latest.php?hostid=".$HTTP_GET_VARS["hostid"]."&sort=description\">".S_DESCRIPTION_SMALL."</B></TD>";
 			}
 		}
 		if(isset($HTTP_GET_VARS["sort"])&&($HTTP_GET_VARS["sort"]=="lastcheck"))
@@ -359,15 +359,15 @@
 			}
 			if($row["value_type"]==0)
 			{
-				echo "<td align=center><a href=\"history.php?action=showhistory&itemid=".$row["itemid"]."\">Graph</a></td>";
+				echo "<td align=center><a href=\"history.php?action=showhistory&itemid=".$row["itemid"]."\">".S_GRAPH."</a></td>";
 			}
 			else
 			{
-				echo "<td align=center><a href=\"history.php?action=showvalues&period=3600&itemid=".$row["itemid"]."\">History</a></td>";
+				echo "<td align=center><a href=\"history.php?action=showvalues&period=3600&itemid=".$row["itemid"]."\">".S_HISTORY."</a></td>";
 			}
 			if($row["value_type"]==0)
 			{
-				echo "<td align=center><a href=\"trends.php?itemid=".$row["itemid"]."\">Trend</a></td>";
+				echo "<td align=center><a href=\"trends.php?itemid=".$row["itemid"]."\">".S_TREND."</a></td>";
 			}
 			else
 			{
@@ -375,7 +375,7 @@
 			}
 			if($row["value_type"]==0)
 			{
-				echo "<td align=center><a href=\"compare.php?itemid=".$row["itemid"]."\">Compare</a></td>";
+				echo "<td align=center><a href=\"compare.php?itemid=".$row["itemid"]."\">".S_COMPARE."</a></td>";
 			}
 			else
 			{

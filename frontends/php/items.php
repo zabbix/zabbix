@@ -19,10 +19,11 @@
 **/
 ?>
 <?php
-        $page["title"] = "Configuration of items";
+        $page["title"] = S_CONFIGURATION_OF_ITEMS;
         $page["file"] = "items.php";
 
-        include "include/config.inc.php";
+	include "include/config.inc.php";
+	include "include/forms.inc.php";
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();
 ?>
@@ -30,7 +31,7 @@
 <?php
         if(!check_anyright("Host","U"))
         {
-                show_table_header("<font color=\"AA0000\">No permissions !</font
+                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font
 >");
                 show_footer();
                 exit;
@@ -43,19 +44,19 @@
 		if($HTTP_GET_VARS["register"]=="update")
 		{
 			$result=update_item($HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["description"],$HTTP_GET_VARS["key"],$HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["delay"],$HTTP_GET_VARS["history"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["type"],$HTTP_GET_VARS["snmp_community"],$HTTP_GET_VARS["snmp_oid"],$HTTP_GET_VARS["value_type"],$HTTP_GET_VARS["trapper_hosts"],$HTTP_GET_VARS["snmp_port"],$HTTP_GET_VARS["units"],$HTTP_GET_VARS["multiplier"],$HTTP_GET_VARS["delta"]);
-			show_messages($result,"Item updated","Cannot update item");
+			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 //			unset($itemid);
 		}
 		if($HTTP_GET_VARS["register"]=="changestatus")
 		{
 			$result=update_item_status($HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["status"]);
-			show_messages($result,"Status of item changed","Cannot change item status");
+			show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 			unset($HTTP_GET_VARS["itemid"]);
 		}
 		if($HTTP_GET_VARS["register"]=="add")
 		{
 			$result=add_item($HTTP_GET_VARS["description"],$HTTP_GET_VARS["key"],$HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["delay"],$HTTP_GET_VARS["history"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["type"],$HTTP_GET_VARS["snmp_community"],$HTTP_GET_VARS["snmp_oid"],$HTTP_GET_VARS["value_type"],$HTTP_GET_VARS["trapper_hosts"],$HTTP_GET_VARS["snmp_port"],$HTTP_GET_VARS["units"],$HTTP_GET_VARS["multiplier"],$HTTP_GET_VARS["delta"]);
-			show_messages($result,"Item added","Cannot add item");
+			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 			unset($HTTP_GET_VARS["itemid"]);
 		}
 		if($HTTP_GET_VARS["register"]=="add to all hosts")
@@ -81,7 +82,7 @@
 		if($HTTP_GET_VARS["register"]=="delete")
 		{
 			$result=delete_item($HTTP_GET_VARS["itemid"]);
-			show_messages($result,"Item deleted","Cannot delete item");
+			show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
 			unset($itemid);
 		}
 		if($HTTP_GET_VARS["register"]=="Delete selected")
@@ -95,7 +96,7 @@
 					$result2=delete_item($row["itemid"]);
 				}
 			}
-			show_messages(TRUE,"Items deleted","Cannot delete items");
+			show_messages(TRUE, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
 		}
 		if($HTTP_GET_VARS["register"]=="Activate selected")
 		{
@@ -108,7 +109,7 @@
 					$result2=activate_item($row["itemid"]);
 				}
 			}
-			show_messages(TRUE,"Items activated","Cannot activate items");
+			show_messages(TRUE, S_ITEMS_ACTIVATED, S_CANNOT_ACTIVATE_ITEMS);
 		}
 		if($HTTP_GET_VARS["register"]=="Disable selected")
 		{
@@ -121,14 +122,14 @@
 					$result2=disable_item($row["itemid"]);
 				}
 			}
-			show_messages(TRUE,"Items disabled","Cannot disable items");
+			show_messages(TRUE, S_ITEMS_DISABLED, S_CANNOT_DISABLE_ITEMS);
 		}
 	}
 ?>
 
 <?php
 	show_table_header_begin();
-	echo "CONFIGURATION OF ITEMS";
+	echo S_CONFIGURATION_OF_ITEMS_BIG;;
 	show_table_v_delimiter();
 
 //	echo "<font size=2>";
@@ -136,11 +137,11 @@
 	if(isset($HTTP_GET_VARS["groupid"]))
 	{
 //		echo "all ";
-		echo "<a href='items.php'>all</a> ";
+		echo "<a href='items.php'>".S_ALL."</a> ";
 	}
 	else
 	{
-		echo "<b>[<a href='items.php'>all</a>]</b> ";
+		echo "<b>[<a href='items.php'>".S_ALL."</a>]</b> ";
 	}
 
 	$result=DBselect("select groupid,name from groups order by name");
@@ -226,16 +227,16 @@
 				echo "<TABLE BORDER=0 COLS=13  align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 				echo "<TR>";
 //				echo "<TD WIDTH=3% NOSAVE><B>Sel</B></TD>";
-				echo "<TD WIDTH=8% NOSAVE><B>Id</B></TD>";
-//				echo "<TD WIDTH=10% NOSAVE><B>Host</B></TD>";
-				echo "<TD WIDTH=10% NOSAVE><B>Key</B></TD>";
-				echo "<TD WIDTH=10% NOSAVE><B>Description</B></TD>";
-				echo "<TD WIDTH=5%  NOSAVE><B>Update interval</B></TD>";
-				echo "<TD WIDTH=5%  NOSAVE><B>History</B></TD>";
-				echo "<TD><B>Shortname</B></TD>";
-				echo "<TD WIDTH=5% NOSAVE><B>Type</B></TD>";
-				echo "<TD WIDTH=5% NOSAVE><B>Status</B></TD>";
-				echo "<TD WIDTH=5% NOSAVE><B>Actions</B></TD>";
+				echo "<TD WIDTH=8% NOSAVE><B>".S_ID."</B></TD>";
+//				echo "<TD WIDTH=10% NOSAVE><B>".S_HOST."</B></TD>";
+				echo "<TD WIDTH=10% NOSAVE><B>".S_KEY."</B></TD>";
+				echo "<TD WIDTH=10% NOSAVE><B>".S_DESCRIPTION."</B></TD>";
+				echo "<TD WIDTH=5%  NOSAVE><B>".S_UPDATE_INTERVAL."</B></TD>";
+				echo "<TD WIDTH=5%  NOSAVE><B>".S_HISTORY."</B></TD>";
+				echo "<TD><B>".S_SHORT_NAME."</B></TD>";
+				echo "<TD WIDTH=5% NOSAVE><B>".S_TYPE."</B></TD>";
+				echo "<TD WIDTH=5% NOSAVE><B>".S_STATUS."</B></TD>";
+				echo "<TD WIDTH=5% NOSAVE><B>".S_ACTIONS."</B></TD>";
 				echo "</TR>";
 			}
 			$lasthost=$row["host"];
@@ -255,25 +256,25 @@
 			switch($row["type"])
 			{
 				case 0:
-					echo "Zabbix agent";
+					echo S_ZABBIX_AGENT;
 					break;
 				case 1:
-					echo "SNMPv1 agent";
+					echo S_SNMPV1_AGENT;
 					break;
 				case 2:
-					echo "Zabbix trapper";
+					echo S_ZABBIX_TRAPPER;
 					break;
 				case 3:
-					echo "Simple check";
+					echo S_SIMPLE_CHECK;
 					break;
 				case 4:
-					echo "SNMPv2 agent";
+					echo S_SNMPV2_AGENT;
 					break;
 				case 5:
-					echo "Zabbix internal";
+					echo S_ZABBIX_INTERNAL;
 					break;
 				default:
-					echo "Unknown";
+					echo S_UNKNOWN;
 					break;
 			}
 			echo "</td>";
@@ -285,19 +286,19 @@
 				switch($row["status"])
 				{
 					case 0:
-						echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$HTTP_GET_VARS["hostid"]."&register=changestatus&status=1\"><font color=\"00AA00\">Active</font></a>";
+						echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$HTTP_GET_VARS["hostid"]."&register=changestatus&status=1\"><font color=\"00AA00\">".S_ACTIVE."</font></a>";
 						break;
 					case 1:
-						echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$HTTP_GET_VARS["hostid"]."&register=changestatus&status=0\"><font color=\"AA0000\">Not active</font></a>";
+						echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$HTTP_GET_VARS["hostid"]."&register=changestatus&status=0\"><font color=\"AA0000\">".S_NOT_ACTIVE."</font></a>";
 						break;
 #					case 2:
 #						echo "Trapper";
 #						break;
 					case 3:
-						echo "<font color=\"AAAAAA\">Not supported</font>";
+						echo "<font color=\"AAAAAA\">".S_NOT_SUPPORTED."</font>";
 						break;
 					default:
-						echo "<B>$status</B> Unknown";
+						echo S_UNKNOWN;
 				}
 #			}
 #			else
@@ -324,19 +325,19 @@
 	
         		if(check_right("Item","U",$row["itemid"]))
 			{
-				echo "<TD><A HREF=\"items.php?register=change&itemid=".$row["itemid"]."#form\">Change</A></TD>";
+				echo "<TD><A HREF=\"items.php?register=change&itemid=".$row["itemid"]."#form\">".S_CHANGE."</A></TD>";
 			}
 			else
 			{
-				echo "<TD>Change</TD>";
+				echo "<TD>".S_CHANGE."</TD>";
 			}
 			echo "</TR>";
 		}
 		echo "</TABLE>";
 		show_table2_header_begin();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Activate selected\" onClick=\"return Confirm('Activate selected items?');\">";
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Disable selected\" onClick=\"return Confirm('Disable selected items?');\">";
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Delete selected\" onClick=\"return Confirm('Delete selected items?');\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Activate selected\" onClick=\"return Confirm('".S_ACTIVATE_SELECTED_ITEMS_Q."');\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Disable selected\" onClick=\"return Confirm('".S_DISABLE_SELECTED_ITEMS_Q."');\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Delete selected\" onClick=\"return Confirm('".S_DELETE_SELECTED_ITEMS_Q."');\">";
 		show_table2_header_end();
 		echo "</form>";
 	}

@@ -20,21 +20,21 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = "Graphs";
+	$page["title"] = S_CONFIGURATION_OF_GRAPHS;
 	$page["file"] = "graphs.php";
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();
 ?>
 
 <?php
-	show_table_header("CONFIGURATION OF GRAPHS");
+	show_table_header(S_CONFIGURATION_OF_GRAPHS_BIG);
 	echo "<br>";
 ?>
 
 <?php
 	if(!check_anyright("Graph","U"))
 	{
-		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_footer();
 		exit;
 	}
@@ -46,17 +46,17 @@
 		if($HTTP_GET_VARS["register"]=="add")
 		{
 			$result=add_graph($HTTP_GET_VARS["name"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
-			show_messages($result,"Graph added","Cannot add graph");
+			show_messages($result, S_GRAPH_ADDED, S_CANNOT_ADD_GRAPH);
 		}
 		if($HTTP_GET_VARS["register"]=="update")
 		{
 			$result=update_graph($HTTP_GET_VARS["graphid"],$HTTP_GET_VARS["name"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
-			show_messages($result,"Graph updated","Cannot update graph");
+			show_messages($result, S_GRAPH_UPDATED, S_CANNOT_UPDATE_GRAPH);
 		}
 		if($HTTP_GET_VARS["register"]=="delete")
 		{
 			$result=delete_graph($HTTP_GET_VARS["graphid"]);
-			show_messages($result,"Graph deleted","Cannot delete graph");
+			show_messages($result, S_GRAPH_DELETED, S_CANNOT_DELETE_GRAPH);
 			unset($HTTP_GET_VARS["graphid"]);
 		}
 	}
@@ -65,11 +65,11 @@
 <?php
 	show_table_header("GRAPHS");
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TD WIDTH=5% NOSAVE><B>Id</B></TD>";
-	echo "<TD><B>Name</B></TD>";
-	echo "<TD WIDTH=5% NOSAVE><B>Width</B></TD>";
-	echo "<TD WIDTH=5% NOSAVE><B>Height</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
+	echo "<TD WIDTH=5% NOSAVE><B>".S_ID."</B></TD>";
+	echo "<TD><B>".S_NAME."</B></TD>";
+	echo "<TD WIDTH=5% NOSAVE><B>".S_WIDTH."</B></TD>";
+	echo "<TD WIDTH=5% NOSAVE><B>".S_HEIGHT."</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>".S_ACTIONS."</B></TD>";
 	echo "</TR>";
 
 	$result=DBselect("select g.graphid,g.name,g.width,g.height from graphs g order by g.name");
@@ -93,7 +93,7 @@
 	if(DBnum_rows($result)==0)
 	{
 		echo "<TR BGCOLOR=#EEEEEE>";
-		echo "<TD COLSPAN=5 ALIGN=CENTER>-No graphs defined-</TD>";
+		echo "<TD COLSPAN=5 ALIGN=CENTER>".S_NO_GRAPHS_DEFINED."</TD>";
 		echo "<TR>";
 	}
 	echo "</TABLE>";
@@ -119,7 +119,7 @@
 
 	echo "<br>";
 	show_table2_header_begin();
-	echo "Graph";
+	echo S_GRAPH;
 
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"graphs.php\">";
@@ -127,17 +127,17 @@
 	{
 		echo "<input class=\"biginput\" name=\"graphid\" type=\"hidden\" value=".$HTTP_GET_VARS["graphid"].">";
 	}
-	echo "Name";
+	echo S_NAME; 
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=32>";
 
 	show_table2_v_delimiter();
-	echo "Width";
+	echo S_WIDTH;
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"width\" size=5 value=\"$width\">";
 
 	show_table2_v_delimiter();
-	echo "Height";
+	echo S_HEIGHT;
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"height\" size=5 value=\"$height\">";
 
@@ -146,7 +146,7 @@
 	if(isset($HTTP_GET_VARS["graphid"]))
 	{
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete graph?');\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('".S_DELETE_GRAPH_Q."');\">";
 	}
 
 	show_table2_header_end();

@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	$page["title"] = "Configuration of Zabbix";
+	$page["title"] = S_CONFIGURATION_OF_ZABBIX;
 	$page["file"] = "config.php";
 
 	include "include/config.inc.php";
@@ -30,7 +30,7 @@
 <?php
         if(!check_anyright("Configuration of Zabbix","U"))
         {
-                show_table_header("<font color=\"AA0000\">No permissions !</font
+                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font
 >");
                 show_footer();
                 exit;
@@ -43,29 +43,29 @@
 		if($HTTP_GET_VARS["register"]=="update")
 		{
 			$result=update_config($HTTP_GET_VARS["alarm_history"],$HTTP_GET_VARS["alert_history"]);
-			show_messages($result, "Configuration updated", "Configuration was NOT updated");
+			show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
 		}
 		if($HTTP_GET_VARS["register"]=="add")
 		{
 			$result=add_mediatype($HTTP_GET_VARS["type"],$HTTP_GET_VARS["description"],$HTTP_GET_VARS["smtp_server"],$HTTP_GET_VARS["smtp_helo"],$HTTP_GET_VARS["smtp_email"],$HTTP_GET_VARS["exec_path"]);
-			show_messages($result, "Added new media type", "New media type was NOT added");
+			show_messages($result, S_ADDED_NEW_MEDIA_TYPE, S_NEW_MEDIA_TYPE_WAS_NOT_ADDED);
 		}
 		if($HTTP_GET_VARS["register"]=="update media")
 		{
 			$result=update_mediatype($HTTP_GET_VARS["mediatypeid"],$HTTP_GET_VARS["type"],$HTTP_GET_VARS["description"],$HTTP_GET_VARS["smtp_server"],$HTTP_GET_VARS["smtp_helo"],$HTTP_GET_VARS["smtp_email"],$HTTP_GET_VARS["exec_path"]);
-			show_messages($result, "Media type was updated", "Media type was NOT updated");
+			show_messages($result, S_MEDIA_TYPE_UPDATED, S_MEDIA_TYPE_WAS_NOT_UPDATED);
 		}
 		if($HTTP_GET_VARS["register"]=="delete")
 		{
 			$result=delete_mediatype($HTTP_GET_VARS["mediatypeid"]);
-			show_messages($result, "Deleted media type", "Media typewas NOT deleted");
+			show_messages($result, S_MEDIA_TYPE_DELETED, S_MEDIA_TYPE_WAS_NOT_DELETED);
 			unset($HTTP_GET_VARS["mediatypeid"]);
 		}
 	}
 ?>
 
 <?php
-	show_table_header("CONFIGURATION OF ZABBIX");
+	show_table_header(S_CONFIGURATION_OF_ZABBIX_BIG);
 	echo "<br>";
 ?>
 
@@ -76,16 +76,16 @@
 
 <?php
 	show_table2_header_begin();
-	echo "Configuration";
+	echo S_CONFIGURATION;
 
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"config.php\">";
-	echo nbsp("Do not keep alerts older than (in days)");
+	echo nbsp(S_DO_NOT_KEEP_ALERTS_OLDER_THAN);
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"alert_history\" value=\"".$config["alert_history"]."\" size=8>";
 
 	show_table2_v_delimiter();
-	echo nbsp("Do not keep alarms older than (in days)");
+	echo nbsp(S_DO_NOT_KEEP_ALARMS_OLDER_THAN);
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"alarm_history\" value=\"".$config["alarm_history"]."\" size=8>";
 
@@ -97,15 +97,15 @@
 
 <?php
 	echo "<br>";
-	show_table_header("AVAILABLE MEDIA TYPES");
+	show_table_header(S_AVAILABLE_MEDIA_TYPES);
 ?>
 
 <?php
 	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR><TD WIDTH=3%><B>Id</B></TD>";
-	echo "<TD WIDTH=10%><B>Type</B></TD>";
-	echo "<TD><B>Description</B></TD>";
-	echo "<TD WIDTH=10%><B>Actions</B></TD>";
+	echo "<TR><TD WIDTH=3%><B>".S_ID."</B></TD>";
+	echo "<TD WIDTH=10%><B>".S_TYPE."</B></TD>";
+	echo "<TD><B>".S_DESCRIPTION_SMALL."</B></TD>";
+	echo "<TD WIDTH=10%><B>".S_ACTIONS."</B></TD>";
 	echo "</TR>";
 
 	$result=DBselect("select mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path from media_type mt order by mt.type");
@@ -117,24 +117,24 @@
 		echo "<td>".$row["mediatypeid"]."</td>";
 		if($row["type"]==0)
 		{
-			echo "<td>Email</td>";
+			echo "<td>".S_EMAIL."</td>";
 		}
 		else if($row["type"]==1)
 		{
-			echo "<td>Script</td>";
+			echo "<td>".S_SCRIPT."</td>";
 		}
 		else
 		{
-			echo "<td>Unknown</td>";
+			echo "<td>".S_UNKNOWN."</td>";
 		}
 		echo "<td>".$row["description"]."</td>";
-		echo "<td><a href=\"config.php?register=change&mediatypeid=".$row["mediatypeid"]."\">Change</a></td>";
+		echo "<td><a href=\"config.php?register=change&mediatypeid=".$row["mediatypeid"]."\">".S_CHANGE."</a></td>";
 		echo "</tr>";
 	}
 	if(DBnum_rows($result)==0)
 	{
 			echo "<TR BGCOLOR=#EEEEEE>";
-			echo "<TD COLSPAN=4 ALIGN=CENTER>-No media types defined-</TD>";
+			echo "<TD COLSPAN=4 ALIGN=CENTER>".S_NO_MEDIA_TYPES_DEFINED."</TD>";
 			echo "<TR>";
 	}
 	echo "</TABLE>";
@@ -165,7 +165,7 @@
 
 <?php
 	show_table2_header_begin();
-	echo "Media";
+	echo S_MEDIA;
 
 	show_table2_v_delimiter();
 	echo "<form name=\"selForm\" method=\"get\" action=\"config.php\">";
@@ -174,24 +174,24 @@
 		echo "<input class=\"biginput\" name=\"mediatypeid\" type=\"hidden\" value=\"$mediatypeid\" size=8>";
 	}
 
-	echo "Description";
+	echo S_DESCRIPTION;
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"description\" value=\"".$description."\" size=30>";
 
 	show_table2_v_delimiter();
-	echo "Type";
+	echo S_TYPE;
 	show_table2_h_delimiter();
 //	echo "<select class=\"biginput\" name=\"type\" size=\"1\" onChange=\"doSelect(this,'sel_dmk')\">";
 	echo "<select class=\"biginput\" name=\"type\" size=\"1\" onChange=\"submit()\">";
 	if($type==0)
 	{
-		echo "<option value=\"0\" selected>Email";
-		echo "<option value=\"1\">Script";
+		echo "<option value=\"0\" selected>".S_EMAIL;
+		echo "<option value=\"1\">".S_SCRIPT;
 	}
 	else
 	{
-		echo "<option value=\"0\">Email";
-		echo "<option value=\"1\" selected>Script";
+		echo "<option value=\"0\">".S_EMAIL;
+		echo "<option value=\"1\" selected>".S_SCRIPT;
 	}
 	echo "</select>";
 
@@ -200,17 +200,17 @@
 		echo "<input class=\"biginput\" name=\"exec_path\" type=\"hidden\" value=\"$exec_path\">";
 
 		show_table2_v_delimiter();
-		echo nbsp("SMTP server");
+		echo nbsp(S_SMTP_SERVER);
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"smtp_server\" value=\"".$smtp_server."\" size=30>";
 
 		show_table2_v_delimiter();
-		echo nbsp("SMTP helo");
+		echo nbsp(S_SMTP_HELO);
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"smtp_helo\" value=\"".$smtp_helo."\" size=30>";
 
 		show_table2_v_delimiter();
-		echo nbsp("SMTP email");
+		echo nbsp(S_SMTP_EMAIL);
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"smtp_email\" value=\"".$smtp_email."\" size=30>";
 	}
@@ -221,7 +221,7 @@
 		echo "<input class=\"biginput\" name=\"smtp_email\" type=\"hidden\" value=\"$smtp_email\">";
 
 		show_table2_v_delimiter();
-		echo "Script name";
+		echo S_SCRIPT_NAME;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"exec_path\" value=\"".$exec_path."\" size=50>";
 	}
@@ -232,7 +232,7 @@
 	if(isset($mediatypeid))
 	{
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update media\">";
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected media?');\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('".S_DELETE_SELECTED_MEDIA."');\">";
 	}
 
 	show_table2_header_end();

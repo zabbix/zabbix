@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	$page["title"] = "Alarms";
+	$page["title"] = S_ALARMS;
 	$page["file"] = "alarms.php";
 
 	include "include/config.inc.php";
@@ -29,8 +29,7 @@
 <?php
 	if(!check_right_on_trigger("R",$HTTP_GET_VARS["triggerid"]))
         {
-                show_table_header("<font color=\"AA0000\">No permissions !</font
->");
+                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
                 show_footer();
                 exit;
         }
@@ -38,7 +37,7 @@
 
 <?php
 	show_table_header_begin();
-	echo "ALARMS";
+	echo S_ALARMS_BIG;
  
 	show_table_v_delimiter(); 
 
@@ -62,13 +61,15 @@
 	if(isset($HTTP_GET_VARS["limit"]) && ($HTTP_GET_VARS["limit"]=="NO"))
 	{
 		echo "[<A HREF=\"alarms.php?triggerid=".$HTTP_GET_VARS["triggerid"]."&limit=30\">";
-		echo "Show only last 100</A>]";
+		echo S_SHOW_ONLY_LAST_100;
+		echo "</A>]";
 		$limit=" ";
 	}
 	else 
 	{
 		echo "[<A HREF=\"alarms.php?triggerid=".$HTTP_GET_VARS["triggerid"]."&limit=NO\">";
-		echo "Show all</A>]";
+		echo S_SHOW_ALL;
+		echo "</A>]";
 		$limit=" limit 100";
 	}
 
@@ -93,10 +94,10 @@
 
 	echo "<TABLE WIDTH=100% align=center BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR>";
-	echo "<TD><B>Time</B></TD>";
-	echo "<TD><B>Status</B></TD>";
-	echo "<TD><B>Duration</B></TD>";
-	echo "<TD><B>Sum</B></TD>";
+	echo "<TD><B>".S_TIME."</B></TD>";
+	echo "<TD><B>".S_STATUS."</B></TD>";
+	echo "<TD><B>".S_DURATION."</B></TD>";
+	echo "<TD><B>".S_SUM."</B></TD>";
 	echo "<TD><B>%</B></TD>";
 	echo "</TR>";
 	$truesum=0;
@@ -116,25 +117,25 @@
 		echo "<TD>",date("Y.M.d H:i:s",$row["clock"]),"</TD>";
 		if($row["value"]==1)
 		{
-			$istrue="TRUE";
+			$istrue=S_TRUE_BIG;
 			$truesum=$truesum+$leng;
 			$sum=$truesum;
 		}
 		elseif($row["value"]==0)
 		{
-			$istrue="FALSE";
+			$istrue=S_FALSE_BIG;
 			$falsesum=$falsesum+$leng;
 			$sum=$falsesum;
 		}
 		elseif($row["value"]==3)
 		{
-			$istrue="DISABLED";
+			$istrue=S_DISABLED_BIG;
 			$dissum=$dissum+$leng;
 			$sum=$dissum;
 		}
 		elseif($row["value"]==2)
 		{
-			$istrue="UNKNOWN";
+			$istrue=S_UNKNOWN_BIG;
 			$dissum=$dissum+$leng;
 			$sum=$dissum;
 		}

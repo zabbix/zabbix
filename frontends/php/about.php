@@ -20,68 +20,68 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = "About Zabbix";
+	$page["title"] = S_ABOUT_ZABBIX;
 	$page["file"] = "about.php";
 	show_header($page["title"],0,0);
 ?>
 
 <?php
-	show_table_header("Information about Zabbix (v1.0)");
+	show_table_header(S_INFORMATION_ABOUT_ZABBIX);
 ?>
 
 <TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR="#CCCCCC" cellspacing=1 cellpadding=3>
 <TR BGCOLOR=#EEEEEE>
 <TD ALIGN=LEFT>
-	<font face="Helvetica"><a href="http://www.zabbix.com">Homepage of Zabbix</a></font><br>
+	<font face="Helvetica"><a href="http://www.zabbix.com"><?php echo S_HOMEPAGE_OF_ZABBIX; ?></a></font><br>
 </TD>
 <TD ALIGN=LEFT>
-	This is home page of Zabbix.
+<?php echo S_HOMEPAGE_OF_ZABBIX_DETAILS; ?>
 </TD>
 </TR>
 <TR BGCOLOR=#DDDDDD>
 <TD ALIGN=LEFT>
-	<font face="Helvetica"><a href="http://www.zabbix.com/#manual">Latest Zabbix Manual</a></font><br>
+	<font face="Helvetica"><a href="http://www.zabbix.com/#manual"><?php echo S_LATEST_ZABBIX_MANUAL; ?></a></font><br>
 </TD>
 <TD>
-	Latest version of the Manual.
+<?php echo S_LATEST_ZABBIX_MANUAL_DETAILS; ?>
 </TR>
 <TR BGCOLOR=#EEEEEE>
 <TD ALIGN=LEFT>
-	<font face="Helvetica"><a href="http://sourceforge.net/project/showfiles.php?group_id=23494&release_id=40630">Downloads</a></font><br>
+	<font face="Helvetica"><a href="http://sourceforge.net/project/showfiles.php?group_id=23494&release_id=40630"><?php echo S_DOWNLOADS; ?></a></font><br>
 </TD>
 <TD>
-	Latest Zabbix release can be found here.
+<?php echo S_DOWNLOADS_DETAILS; ?>
 </TR>
 <TR BGCOLOR=#DDDDDD>
 <TD ALIGN=LEFT>
-	<font face="Helvetica"><a href="http://sourceforge.net/tracker/?atid=378686&group_id=23494&func=browse">Feature requests</a></font><br>
+	<font face="Helvetica"><a href="http://sourceforge.net/tracker/?atid=378686&group_id=23494&func=browse"><?php echo S_FEATURE_REQUESTS; ?></a></font><br>
 </TD>
 <TD>
-	If you need additional functionality, go here.
+<?php echo S_FEATURE_REQUESTS_DETAILS; ?>
 </TD>
 </TR>
 <TR BGCOLOR=#EEEEEE>
 <TD ALIGN=LEFT>
-	<font face="Helvetica"><a href="http://sourceforge.net/forum/?group_id=23494">Forums</a></font><br>
+	<font face="Helvetica"><a href="http://sourceforge.net/forum/?group_id=23494"><?php echo S_FORUMS; ?></a></font><br>
 </TD>
 <TD>
-	Zabbix-related discussion.
+<?php echo S_FORUMS_DETAILS; ?>
 </TD>
 </TR>
 <TR BGCOLOR=#DDDDDD>
 <TD ALIGN=LEFT>
-	<font face="Helvetica"><a href="http://sourceforge.net/tracker/?group_id=23494&atid=378683">Bug reports</a></font><br>
+	<font face="Helvetica"><a href="http://sourceforge.net/tracker/?group_id=23494&atid=378683"><?php echo S_BUG_REPORTS; ?></a></font><br>
 </TD>
 <TD>
-	Bug in Zabbix ? Please, report it.
+<?php echo S_BUG_REPORTS_DETAILS; ?>
 </TD>
 </TR>
 <TR BGCOLOR=#EEEEEE>
 <TD ALIGN=LEFT>
-	<font face="Helvetica"><a href="http://sourceforge.net/mail/?group_id=23494">Mailing lists</a></font><br>
+	<font face="Helvetica"><a href="http://sourceforge.net/mail/?group_id=23494"><?php echo S_MAILING_LISTS; ?></a></font><br>
 </TD>
 <TD>
-	Zabbix-related mailing lists.
+<?php echo S_MAILING_LISTS_DETAILS; ?>
 </TD>
 </TR>
 </TABLE>
