@@ -394,6 +394,58 @@ void	child_main(int i,int listenfd, int addrlen)
 	}
 }
 
+void	collect_statistics()
+{
+	#define INTERFACE struct interface_type
+	INTERFACE
+	{
+		char    *interface;
+		int	sent_total;
+		int	sent_load1;
+		int	sent_load5;
+		int	sent_load15;
+		int	received_total;
+		int	received_load1;
+		int	received_load5;
+		int	received_load15;
+	};
+
+	FILE	*file;
+	char	*s;
+	char	line[MAX_STRING_LEN+1];
+	int	i;
+	char	a[MAX_STRING_LEN+1];
+	char	b[MAX_STRING_LEN+1];
+	char	*token;
+
+	INTERFACE interfaces[128]=
+        {
+			{0}
+	};
+
+	file=fopen("/proc/net/dev","r");
+	if(NULL == file)
+	{
+		fprintf(stderr, "Cannot open config file [%s] [%m]\n","/proc/net/dev");
+		return;
+	}
+
+	i=0;
+	while(fgets(line,MAX_STRING_LEN,file) != NULL)
+	{
+		if(strstr(line,":") == NULL)
+			continue;
+		s=strtok(line,":");
+		while(s)
+		{
+			s = strtok(NULL," ");
+			printf("[%s]\n",s);
+		}
+		i++;
+	}
+	fclose(file);
+}
+
 pid_t	child_make(int i,int listenfd, int addrlen)
 {
 	pid_t	pid;
@@ -419,6 +471,9 @@ int	main()
 	char		host[128];
 
         static struct  sigaction phan;
+	
+	collect_statistics();
+	exit;
 
 	init_config();
 	daemon_init();
@@ -458,7 +513,6 @@ int	main()
 	for(i = 0; i<CONFIG_AGENTD_FORKS; i++)
 	{
 		pids[i] = child_make(i, listenfd, addrlen);
-/*		zabbix_log( LOG_LEVEL_WARNING, "zabbix_agentd #%d started", pids[i]);*/
 	}
 
 	parent=1;
@@ -469,10 +523,8 @@ int	main()
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 	setproctitle("main process");
 #endif
-	for(;;)
-	{
-			pause();
-	}
+
+	collect_statistics();
 
 	return SUCCEED;
 }
