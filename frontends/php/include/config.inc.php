@@ -946,7 +946,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 		</td>
 
-		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
+		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
 <?php
 				if(check_right("Service","R",0))
 				{
