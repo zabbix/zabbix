@@ -30,5 +30,6 @@ dnl Checks for library functions.
 AC_TYPE_SIGNAL
 AC_CHECK_FUNCS(socket strtod)
 
+
 AC_CONFIG_HEADER(config.h)
 AC_OUTPUT(Makefile)
