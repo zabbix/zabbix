@@ -503,8 +503,8 @@ cksum[/usr/bin/ssh]         |       X      |        X      |      X      |      
       
 filesize[/var/log/syslog]   |       X      |        X      |      x      |      X      |      x      |     x     |
 
-swap[free]                  |       X      |        X      |      -      |      -      |      -      |     -     |
-swap[total]                 |       X      |        X      |      -      |      -      |      -      |     -     |
+swap[free]                  |       X      |        X      |      -      |      X      |      -      |     -     |
+swap[total]                 |       X      |        X      |      -      |      X      |      -      |     -     |
 
 swap[in]                    |       X      |        X      |      -      |      -      |      -      |     -     |
 swap[out]                   |       X      |        X      |      -      |      -      |      -      |     -     |
