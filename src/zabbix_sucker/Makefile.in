@@ -5,9 +5,9 @@ LIBS    = @LIBS@ @MYSQL_LFLAGS@ @PGSQL_LFLAGS@
 
 all:
 
-	@CC@ -o ../../bin/zabbix_sucker @CFLAGS@ -I../../include $(INCLUDE) zabbix_sucker.c ../../include/db.c ../../include/functions.c ../../include/expression.c -Wall $(LIBS) 
+	@CC@ -o ../../bin/zabbix_suckerd @CFLAGS@ -I../../include $(INCLUDE) zabbix_sucker.c ../../include/db.c ../../include/functions.c ../../include/expression.c -Wall $(LIBS) 
 
 clean:
 	rm -fv *.o 
-	rm -fv ../../bin/zabbix_sucker
+	rm -fv ../../bin/zabbix_suckerd
 

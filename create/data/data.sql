@@ -1,10 +1,4 @@
 --
--- Data for table help
---
-
-insert into help (helpid,topic,description) values (1,"What is SMTP server ?","... Example help text ...");
-
---
 -- Data for table config
 --
 

@@ -1,13 +1,14 @@
 Changes for 1.0alpha8:
 
+ - zabbix_sucker renamed to zabbix_suckerd
+ - new high performance zabbix_agentd
+
  - connect using IP address became possible
  - new columns - useip,ip were added to table hosts
-
  - added bin/
  - removed src/.../acconfig.h
  - removed src/.../configure.in
  - added Makefile.in,acconfig.h,configure.in
-
  - added src/zabbix_sucker/acconfig.h and src/zabbix_trapper/acconfig.h
  - parameters net[listen_??] will use /proc filesystem
  - parameter system[proccount] uses call to sysinfo() function
