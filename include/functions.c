@@ -217,7 +217,13 @@ int	evaluate_FUNCTION(float *value,int itemid,char *function,int parameter)
 }
 
 /*int	update_functions( int itemid )*/
-int	update_functions( int sucker_num )
+/*int	update_functions( int sucker_num )*/
+
+/*
+ * Flag: 0 - id==itemid
+ * 	 1 - id==sucker_num
+ * */
+int	update_functions( int id, int flag )
 {
 	DB_FUNCTION	function;
 	DB_RESULT	*result;
@@ -226,8 +232,14 @@ int	update_functions( int sucker_num )
 	int		ret=SUCCEED;
 	int		i,rows;
 
-/*	sprintf(c,"select function,parameter from functions where itemid=%d group by 1,2 order by 1,2",itemid );*/
-	sprintf(c,"select function,parameter,itemid from functions where itemid%%%d=%d group by 1,2 order by 1,2", SUCKER_FORKS-1,sucker_num-1);
+	if(flag==0)
+	{
+		sprintf(c,"select function,parameter,itemid from functions where itemid=%d group by 1,2 order by 1,2",id );
+	}
+	else
+	{
+		sprintf(c,"select function,parameter,itemid from functions where itemid%%%d=%d group by 1,2 order by 1,2", SUCKER_FORKS-1,id-1);
+	}
 
 	result = DBselect(c);
 	rows=DBnum_rows(result);
@@ -568,7 +580,13 @@ void	apply_actions(int triggerid,int good)
 }
 
 /*void	update_triggers(int itemid)*/
-void	update_triggers(int sucker_num)
+/*void	update_triggers(int sucker_num)*/
+
+/*
+ * Flag: 0 - id==itemid
+ * 	 1 - id==sucker_num
+ * */
+void	update_triggers( int id, int flag )
 {
 	char c[1024];
 	char exp[8192];
@@ -579,9 +597,14 @@ void	update_triggers(int sucker_num)
 	int	i,rows;
 	int	now;
 
-/*	sprintf(c,"select t.triggerid,t.expression,t.istrue from triggers t,functions f where t.istrue!=2 and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.istrue",itemid);*/
-
-	sprintf(c,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f where t.istrue!=2 and f.triggerid=t.triggerid and f.itemid%%%d=%d group by t.triggerid,t.expression,t.istrue,t.dep_level order by t.dep_level desc", SUCKER_FORKS-1,sucker_num-1);
+	if(flag==0)
+	{
+		sprintf(c,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f where t.istrue!=2 and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.istrue,t.dep_level",id);
+	}
+	else
+	{
+		sprintf(c,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f where t.istrue!=2 and f.triggerid=t.triggerid and f.itemid%%%d=%d group by t.triggerid,t.expression,t.istrue,t.dep_level order by t.dep_level desc", SUCKER_FORKS-1,id-1);
+	}
 
 	result = DBselect(c);
 

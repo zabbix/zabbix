@@ -1,8 +1,12 @@
+Changes for 1.0alpha11:
+
+ - global variable $ERROR_MSG will show details of operation failure
+ - fixed both zabbix_trapper and zabbix_trapper to correctly change status of triggers
+
 Changes for 1.0alpha10:
 
  - added support for trigger dependencies
  - added column dep_level to table TRIGGERS
-
  - added new host type: Workstation + frontends/php/images/sysmaps/Workstation.png
  - added table triger_depends
  - calls to perror() were changed to syslog() where possible

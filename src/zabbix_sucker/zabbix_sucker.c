@@ -441,12 +441,12 @@ int get_values(void)
 
 	if(rows>0)
 	{
-		if( update_functions( sucker_num ) == FAIL)
+		if( update_functions( sucker_num, 1 ) == FAIL)
 		{
 			syslog( LOG_WARNING, "Updating simple functions failed" );
 		}
 
-		update_triggers( sucker_num );
+		update_triggers( sucker_num, 1 );
 	}
 
 	DBfree_result(result);
