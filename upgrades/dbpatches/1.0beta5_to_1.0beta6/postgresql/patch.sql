@@ -1,5 +1,6 @@
 alter table functions alter lastvalue varchar(255);
 alter table functions alter parameter varchar(255) default '0' not null;
+alter table hosts add network_errors int4 DEFAULT '0'	NOT NULL;
 
 --
 -- Table structure for table 'services_alarms'
