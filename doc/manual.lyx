@@ -2757,7 +2757,7 @@ support for SCO OpenServer
 reason of problem in screen IT Services
 \layout Itemize
 
-IMPORTANT Added IT Helpdesk (experimental, do not use for live systems)
+added availbality graph for IT Services
 \layout Subsection
 
 ChangeLog
@@ -3217,6 +3217,9 @@ fixed missing close of socket in case if connection to SMTP server is rejected
 Zabbix 1.0beta6
 \layout Itemize
 
+added availability graph for IT Services
+\layout Itemize
+
 if trigger status is UNKNOWN, set function.lastvalue to NULL
 \layout Itemize
 
@@ -3447,11 +3450,6 @@ reason of problem in screen IT Services
 added 
 \emph on 
 frontends/php/helpdesk.php
-\layout Itemize
-
-added tables: 
-\emph on 
-problems, problems_comments,categories
 \layout Itemize
 
 added "
