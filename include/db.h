@@ -61,6 +61,8 @@ extern	char	*CONFIG_DBSOCKET;
 	#define	DBfree_result	PQclear
 #endif
 
+#define	MAX_HOST_HOST_LEN	64
+
 DB_HOST
 {
 	int     hostid;
@@ -68,6 +70,11 @@ DB_HOST
 	int     useip;
 	char    *ip;
 };
+
+#define	MAX_ITEM_KEY_LEN	64
+#define	MAX_ITEM_IP_LEN		15
+#define	MAX_ITEM_SNMP_COMMUNITY_LEN	64
+#define	MAX_ITEM_SNMP_OID_LEN	255
 
 DB_ITEM
 {
