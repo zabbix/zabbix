@@ -63,6 +63,25 @@ AC_DEFINE(HAVE_SYSINFO_FREESWAP)
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
+dnl Check for vmtotal in sys/vmmeter.h
+AC_MSG_CHECKING(for vmtotal in struct sys/vmmeter.h)
+AC_TRY_COMPILE([#include <sys/vmmeter.h>],
+[
+        int mib[2],len;
+        struct vmtotal v;
+
+        len=sizeof(struct vmtotal);
+        mib[0]=CTL_VM;
+        mib[1]=VM_METER;
+
+        sysctl(mib,2,&v,&len,NULL,0);
+],
+AC_DEFINE(HAVE_SYS_VMMETER_VMTOTAL)
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for totalswap in struct sysinfo
+
 dnl Check for totalswap in struct sysinfo
 AC_MSG_CHECKING(for totalswap in struct sysinfo)
 AC_TRY_COMPILE([#include <sys/sysinfo.h>],
