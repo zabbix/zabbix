@@ -83,15 +83,8 @@
 	}
 	$result=DBselect($sql);
 
-	echo "<TABLE WIDTH=100% align=center BORDER=0 BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
-	echo "<TR BGCOLOR=\"#CCCCCC\">";
-	echo "<TD WIDTH=10%><b>".S_TIME."</b></TD>";
-	echo "<TD WIDTH=5%><b>".S_TYPE."</b></TD>";
-	echo "<TD WIDTH=5%><b>".S_STATUS."</b></TD>";
-	echo "<TD WIDTH=15%><b>".S_RECIPIENTS."</b></TD>";
-	echo "<TD><b>".S_SUBJECT."</b></TD>";
-	echo "<TD><b>".S_MESSAGE."</b></TD>";
-	echo "</TR>";
+	table_begin();
+	table_header(array(S_TIME, S_TYPE, S_STATUS, S_RECIPIENTS, S_SUBJECT, S_MESSAGE));
 	$col=0;
 	$zzz=0;
 	while($row=DBfetch($result))
@@ -121,39 +114,31 @@
 
 		if($row["scope"]==0)
 		{
-			echo "<TD><a href=\"alarms.php?triggerid=".$row["triggerid"]."\">".date("Y.M.d H:i:s",$row["clock"])."</a></TD>";
+			$time="<a href=\"alarms.php?triggerid=".$row["triggerid"]."\">".date("Y.M.d H:i:s",$row["clock"])."</a>";
 		}
 		else
 		{
-			echo "<TD>".date("Y.M.d H:i:s",$row["clock"])."</TD>";
+			$time=date("Y.M.d H:i:s",$row["clock"]);
 		}
-		echo "<TD>".$row["description"]."</TD>";
 		if($row["status"] == 1)
 		{
-			echo "<TD><font color=\"00AA00\">".S_SENT."</font></TD>";
+			$status="<font color=\"00AA00\">".S_SENT."</font>";
 		}
 		else
 		{
-			echo "<TD><font color=\"AA0000\">".S_NOT_SENT."</font></TD>";
+			$status="<font color=\"AA0000\">".S_NOT_SENT."</font>";
 		}
-		echo "<TD>".htmlspecialchars($row["sendto"])."</TD>";
-		echo "<TD><pre>".htmlspecialchars($row["subject"])."</pre></TD>";
-		echo "<TD>";
-		echo "<pre>".htmlspecialchars($row["message"])."</pre>";
-//		for($i=0;$i<strlen($row["message"]);$i++)
-//		{
-//			if($row["message"][$i]=="\n")
-//			{
-//				echo "<br>";
-//			}
-//			else
-//			{
-//				echo $row["message"][$i];
-//			}
-//		}
-		echo "</TD>";
-		echo "</TR>";
-		cr();
+		$sendto=htmlspecialchars($row["sendto"]);
+		$subject="<pre>".htmlspecialchars($row["subject"])."</pre>";
+		$message="<pre>".htmlspecialchars($row["message"])."</pre>";
+		table_row(array(
+			$time,
+			$row["description"],
+			$status,
+			$sendto,
+			$subject,
+			$message),
+			$col++);
 	}
 	if(DBnum_rows($result)==0)
 	{
@@ -161,11 +146,8 @@
 			echo "<TD COLSPAN=6 ALIGN=CENTER>".S_NO_ALERTS."</TD>";
 			echo "<TR>";
 	}
-	echo "</TABLE>";
+	table_end();
 ?>
-</FONT>
-</TR>
-</TABLE>
 
 <?php
 	show_footer();
