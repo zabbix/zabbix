@@ -345,7 +345,6 @@ int get_minnextcheck(void)
 	}
 
 	count = atoi(DBget_field(result,0,0));
-	res = atoi(DBget_field(result,0,1));
 
 	if( count == 0 )
 	{
@@ -353,6 +352,8 @@ int get_minnextcheck(void)
 		DBfree_result(result);
 		return	FAIL;
 	}
+
+	res = atoi(DBget_field(result,0,1));
 
 	DBfree_result(result);
 	return	res;

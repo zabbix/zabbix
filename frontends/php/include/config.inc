@@ -859,6 +859,7 @@
 
 	function	add_trigger($expression,$description,$priority,$istrue,$comments)
 	{
+		$description=addslashes($description);
 		$sql="insert into triggers  (description,priority,istrue,comments) values ('$description',$priority,$istrue,'$comments')";
 #		echo $sql,"<Br>";
 		$result=DBexecute($sql);
@@ -948,6 +949,7 @@
 						break;
 					}
 				}
+				$description=sprintf($description,$host);
 
 				add_trigger($expression,$description,0,0,"");
 			}
@@ -1020,13 +1022,16 @@
 
 	# Add Host definition
 
-	function	add_host($host,$port,$status)
+	function	add_host($host,$port,$status,$template)
 	{
 		$sql="insert into hosts (host,port,status) values ('$host',$port,$status)";
 		$result=DBexecute($sql);
 		$hostid=DBinsert_id($result,"hosts","hostid");
 
-		add_from_templates($hostid,$host);
+		if($template=="true")
+		{
+			add_from_templates($hostid,$host);
+		}
 
 	}
 

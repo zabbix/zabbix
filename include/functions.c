@@ -262,7 +262,7 @@ int	update_functions( int itemid )
 
 		if( FAIL == ret)	
 		{
-			syslog( LOG_WARNING, "Unknown function:%s\n",function.function);
+			syslog( LOG_WARNING, "Evaluation failed for function:%s\n",function.function);
 			DBfree_result(result);
 			return FAIL;
 		}

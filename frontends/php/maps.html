@@ -47,6 +47,11 @@
 			echo " ";
 		}
 
+		if(DBnum_rows($result) == 0)
+		{
+			echo "No maps to display";
+		}
+
 		echo "</font>";
 		show_table_header_end();
 		echo "<br>";
