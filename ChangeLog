@@ -1,5 +1,6 @@
 Changes for 1.1alpha7:
 
+ - no warning about uninitialised function_str (Alexei)
  - fixed simple checks (Alexei)
  - fixed startup of housekeeper (Alexei)
  - added frontends/php/include/triggers.inc.php (Alexei)

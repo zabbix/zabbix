@@ -385,8 +385,8 @@ void	process(char *command,char *value)
 	double	result=0;
 	int	i;
 	char	*n,*l,*r;
-	int	(*function)();
-	int	(*function_str)();
+	int	(*function)() = NULL;
+	int	(*function_str)() = NULL;
 	char	*parameter = NULL;
 	char	*cmd_line_param = NULL;
 	char	key[MAX_STRING_LEN];
