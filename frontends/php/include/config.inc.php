@@ -2339,7 +2339,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		$sql="select hostid from items where itemid=$itemid";
 		$result=DBselect($sql);
 		$hostid=DBget_field($result,0,0);
-		delete_sysmaps_host($hostid);
+		delete_sysmaps_host_by_hostid($hostid);
 
 		$result=delete_triggers_by_itemid($itemid);
 		if(!$result)
@@ -3119,17 +3119,30 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
 
+	function	delete_sysmaps_host_by_hostid($hostid)
+	{
+		$sql="select shostid from sysmaps_hosts where hostid=$hostid";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			$sql="delete from sysmaps_links where shostid1=".$row["shostid"]." or shostid2".$row["shostid"];
+			DBexecute($sql);
+		}
+		$sql="delete from sysmaps_hosts where hostid=$hostid";
+		return DBexecute($sql);
+	}
+
 	# Delete Host from sysmap definition
 
 	function	delete_sysmaps_host($shostid)
 	{
-		$sql="delete from sysmaps_hosts where shostid=$shostid";
+		$sql="delete from sysmaps_links where shostid1=$shostid or shostid2=$shostid";
 		$result=DBexecute($sql);
 		if(!$result)
 		{
 			return	$result;
 		}
-		$sql="delete from sysmaps_links where shostid1=$shostid or shostid2=$shostid";
+		$sql="delete from sysmaps_hosts where shostid=$shostid";
 		return	DBexecute($sql);
 	}
 
