@@ -22,12 +22,11 @@
 	{
 		if((!$Expression)||(!$Description)||(!$Priority))
 		{
-			$result=mysql_query("select expression,description,priority from triggers where triggerid=$triggerid",$mysql);
-			$row=mysql_fetch_row($result);
+			$result=DBselect("select expression,description,priority from triggers where triggerid=$triggerid");
 
-			if(!isset($Expression)) $Expression=$row[0];
-			if(!isset($Description)) $Description=$row[1];
-			if(!isset($Priority)) $Priority=$row[2];
+			if(!isset($Expression)) $Expression=DBget_field($result,0,0);
+			if(!isset($Description)) $Description=DBget_field($result,0,1);
+			if(!isset($Priority)) $Priority=DBget_field($result,0,2);
 		}
 	}
 ?>
@@ -59,7 +58,7 @@
 <FONT COLOR="#000000">
 <?
 	$sql="select clock,istrue from alarms where triggerid=$triggerid order by clock desc $limit";
-	$result=mysql_query($sql,$mysql);
+	$result=DBselect($sql);
 
 	echo "<CENTER>";
 	echo "<TABLE WIDTH=100% BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
@@ -74,12 +73,12 @@
 	$falsesum=0;
 	$dissum=0;
 	$clock=mktime();
-	while($row=mysql_fetch_row($result))
+	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		$lclock=$clock;
-		$clock=$row[0];
+		$clock=DBget_field($result,$i,0);
 		$leng=$lclock-$clock;
-		$status=$row[1];
+		$status=DBget_field($result,$i,1);
 		if($status==0) {  echo "<TR BGCOLOR=#EEFFEE>"; }
 		elseif($status==2) { echo "<TR BGCOLOR=#DDDDDD>"; }
 		elseif($status==3) { echo "<TR BGCOLOR=#EEEEEE>"; }

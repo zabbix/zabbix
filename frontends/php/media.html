@@ -41,7 +41,7 @@
 <FONT COLOR="#000000">
 <?
 	$sql="select mediaid,type,sendto,active from media where userid=$userid order by type,sendto";
-	$result=mysql_query($sql,$mysql);
+	$result=DBselect($sql);
 
 	echo "<CENTER>";
 	echo "<TABLE BORDER=0 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
@@ -52,7 +52,7 @@
 	echo "<TD><FONT SIZE=+1>Actions</FONT></TD>";
 	echo "</TR>";
 
-	while($row=mysql_fetch_row($result))
+	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		if($col==1)
 		{
@@ -63,8 +63,8 @@
 			echo "<TR BGCOLOR=#EEEEEE>";
 			$col=1;
 		}
-		$mediaid=$row[0];
-		$type_=$row[1];
+		$mediaid=DBget_field($result,$i,0);
+		$type_=DBget_field($result,$i,1);
 		echo "<TD>";
 		if($type_=="EMAIL")
 		{
@@ -75,7 +75,7 @@
 			echo $type_;
 		}
 		echo "</TD>";
-		echo "<TD>",$row[2],"</TD>";
+		echo "<TD>",DBget_field($result,$i,2),"</TD>";
 		echo "<TD>";
 		if($row[3]==0) 
 		{

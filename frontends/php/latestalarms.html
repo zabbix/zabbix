@@ -41,7 +41,7 @@
 	{
 		$sql="select t.description,a.clock,a.istrue,t.triggerid from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit $limit 50";
 	}
-	$result=mysql_query($sql,$mysql);
+	$result=DBselect($sql);
 
 	echo "<CENTER>";
 	echo "<TABLE WIDTH=100% BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
@@ -50,12 +50,12 @@
 	echo "<TD><b>Description</b></TD>";
 	echo "<TD width=\"10%\"><b>Status</b></TD>";
 	echo "</TR>";
-	while($row=mysql_fetch_row($result))
+	for($i=0;$i<DBnum_rows($result);$i++)
 	{
-		$description=$row[0];
-		$clock=$row[1];
-		$istrue=$row[2];
-		$triggerid_=$row[3];
+		$description=DBget_field($result,$i,0);
+		$clock=DBget_field($result,$i,1);
+		$istrue=DBget_field($result,$i,2);
+		$triggerid_=DBget_field($result,$i,3);
 
 		if($col==1)
 		{
