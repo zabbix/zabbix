@@ -17,6 +17,56 @@
 		}
 	}
 
+	function	convert_units($value,$units,$multiplier)
+	{
+		$u="";
+
+		if($units=="")
+		{
+			if(round($value)==$value)
+			{
+				return sprintf("%.0f",$value);
+			}
+			else
+			{
+				return sprintf("%.2f",$value);
+			}
+		}
+
+		$abs=abs($value);
+
+		if($abs<1024)
+		{
+			$u="";
+		}
+		else if($abs<1024*1024)
+		{
+			$u="K";
+			$value=$value/1024;
+		}
+		else if($abs<1024*1024*1024)
+		{
+			$u="M";
+			$value=$value/(1024*1024);
+		}
+		else
+		{
+			$u="G";
+			$value=$value/(1024*1024*1024);
+		}
+
+		if(round($value)==$value)
+		{
+			$s=sprintf("%.0f",$value);
+		}
+		else
+		{
+			$s=sprintf("%.2f",$value);
+		}
+
+		return "$s $u$units";
+	}
+	
 	function	get_media_count_by_userid($userid)
 	{
 		$sql="select count(*) as cnt from media where userid=$userid";
