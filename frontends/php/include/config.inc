@@ -759,7 +759,15 @@
 				}
 				else
 				{
-					$exp=$exp."{<A HREF=\"history.php?action=showhistory&itemid=".DBget_field($res1,0,4)."\">".DBget_field($res1,0,0).":".DBget_field($res1,0,1)."</A>.<B>".DBget_field($res1,0,2)."(</B>".DBget_field($res1,0,3)."<B>)</B>}";
+					$item=get_item_by_itemid(DBget_field($res1,0,4));
+					if($item["value_type"] ==0) 
+					{
+						$exp=$exp."{<A HREF=\"history.php?action=showhistory&itemid=".DBget_field($res1,0,4)."\">".DBget_field($res1,0,0).":".DBget_field($res1,0,1)."</A>.<B>".DBget_field($res1,0,2)."(</B>".DBget_field($res1,0,3)."<B>)</B>}";
+					}
+					else
+					{
+						$exp=$exp."{<A HREF=\"history.php?action=showvalues&period=3600&itemid=".DBget_field($res1,0,4)."\">".DBget_field($res1,0,0).":".DBget_field($res1,0,1)."</A>.<B>".DBget_field($res1,0,2)."(</B>".DBget_field($res1,0,3)."<B>)</B>}";
+					}
 				}
 				continue;
 			}
@@ -1908,7 +1916,7 @@
 
 		show_table2_v_delimiter2();
 		echo "Press ";
-		echo "<input type=\"submit\" name=\"action\" value=\"showvalues\"> to see graph";
+		echo "<input type=\"submit\" name=\"action\" value=\"showvalues\"> to see values in plain text";
 
 		show_table2_header_end();
 

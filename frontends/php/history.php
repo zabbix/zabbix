@@ -46,7 +46,15 @@
 
 <?
 	show_table_header_begin();
-	echo "<A HREF='latest.php?hostid=$hostid'>$host</A> : <a href='trends.php?itemid=$itemid'>$description</a>";
+	$item=get_item_by_itemid($itemid);
+	if($item["value_type"] == 0)
+	{
+		echo "<A HREF='latest.php?hostid=$hostid'>$host</A> : <a href='trends.php?itemid=$itemid'>$description</a>";
+	}
+	else
+	{
+		echo "<A HREF='latest.php?hostid=$hostid'>$host</A> : $description";
+	}
 	show_table_v_delimiter();
 	echo("<DIV ALIGN=CENTER>");
 	if($action =="showhistory")
@@ -55,7 +63,11 @@
 	}
 	else
 	{
-		echo("<A HREF=\"history.php?action=showhistory&itemid=$itemid\">Last hour graph</A> ");
+		$item=get_item_by_itemid($itemid);
+		if($item["value_type"] == 0)
+		{
+			echo("<A HREF=\"history.php?action=showhistory&itemid=$itemid\">Last hour graph</A> ");
+		}
 	}
 	if($action =="showvalues")
 	{

@@ -11,11 +11,13 @@
 //	Number of trigger decreased
 	if(isset($active_triggers)&&($count<$active_triggers))
 	{
+		echo "<tr>OFF<tr>";
 		$audio="warning_off.wav";
 	}
 //	Number of trigger increased
 	if(isset($active_triggers)&&($count>$active_triggers))
 	{
+		echo "<tr>ON<tr>";
 		$audio="warning_on.wav";
 	}
 
