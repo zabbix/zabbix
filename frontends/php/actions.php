@@ -244,8 +244,9 @@
 	echo "<br>";
 	show_table2_header_begin();
 	echo nbsp(S_NEW_ACTION);
+	$col=0;
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo "<form method=\"get\" action=\"actions.php\">";
 	echo "<input name=\"triggerid\" type=\"hidden\" value=".$_GET["triggerid"].">";
 	if(isset($_GET["actionid"]))
@@ -262,7 +263,7 @@
 
 	if($recipient==RECIPIENT_TYPE_GROUP)
 	{
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo nbsp(S_GROUP);
 		show_table2_h_delimiter();
 		echo "<select class=\"biginput\" name=\"usrgrpid\" size=\"1\">";
@@ -285,7 +286,7 @@
 	}
 	else
 	{
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo nbsp(S_USER);
 		show_table2_h_delimiter();
 		echo "<select class=\"biginput\" name=\"userid\" size=\"1\">";
@@ -306,7 +307,7 @@
 		echo "</select>";
 	}
 	
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo nbsp(S_WHEN_TRIGGER_BECOMES);
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"good\" size=1>";
@@ -315,22 +316,22 @@
 	echo "<OPTION VALUE=\"2\""; if($good==2) echo "SELECTED"; echo ">".S_ON_OR_OFF;
 	echo "</SELECT>";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo nbsp(S_DELAY_BETWEEN_MESSAGES_IN_SEC);
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"delay\" value=\"$delay\" size=5>";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo S_SUBJECT;
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"subject\" value=\"$subject\" size=70>";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo S_MESSAGE;
 	show_table2_h_delimiter();
  	echo "<textarea class=\"biginput\" name=\"message\" cols=70 ROWS=\"7\" wrap=\"soft\">$message</TEXTAREA>";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo S_SCOPE;
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"scope\" size=1 onChange=\"submit()\">";
@@ -341,7 +342,7 @@
 
 	if($scope>0)
 	{
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo nbsp(S_USE_IF_TRIGGER_SEVERITY);
 		show_table2_h_delimiter();
 		echo "<select class=\"biginput\" name=\"severity\" size=1>";

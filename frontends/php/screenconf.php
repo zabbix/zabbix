@@ -113,8 +113,9 @@
 	echo "<br>";
 	show_table2_header_begin();
 	echo S_SCREEN;
+	$col=0;
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo "<form method=\"get\" action=\"screenconf.php\">";
 	if(isset($_GET["screenid"]))
 	{
@@ -124,12 +125,12 @@
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=32>";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo S_COLUMNS;
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"cols\" size=5 value=\"$cols\">";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo S_ROWS;
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"rows\" size=5 value=\"$rows\">";

@@ -339,8 +339,9 @@
 	echo "<a name=\"form\"></a>";
 	show_table2_header_begin();
 	echo S_HOST;
+	$col=0;
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo "<form method=\"get\" action=\"hosts.php#form\">";
 	if(isset($_GET["hostid"]))
 	{
@@ -354,7 +355,7 @@
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"host\" value=\"$host\" size=20>";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo S_GROUPS;
 	show_table2_h_delimiter();
 	echo "<select multiple class=\"biginput\" name=\"groups[]\" size=\"5\">";
@@ -382,12 +383,12 @@
 	}
 	echo "</select>";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo nbsp(S_NEW_GROUP);
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"newgroup\" size=20 value=\"$newgroup\">";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo nbsp(S_USE_IP_ADDRESS);
 	show_table2_h_delimiter();
 // onChange does not work on some browsers: MacOS, KDE browser
@@ -396,7 +397,7 @@
 
 	if($useip=="checked")
 	{
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo S_IP_ADDRESS;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"ip\" value=\"$ip\" size=15>";
@@ -406,12 +407,12 @@
 		echo "<input class=\"biginput\" type=\"hidden\"name=\"ip\" value=\"$ip\" size=15>";
 	}
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo S_PORT;
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"port\" size=6 value=\"$port\">";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo S_STATUS;
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"status\" size=\"1\">";
@@ -435,7 +436,7 @@
 	}
 	echo "</select>";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo nbsp(S_USE_THE_HOST_AS_A_TEMPLATE);
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"host_templateid\" size=\"1\">";
