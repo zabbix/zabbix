@@ -1,5 +1,6 @@
 Changes for 1.0beta9:
 
+ - session cookie will expire wneh session is closed (Alexei)
  - fixed situation when large SNMP values becomes nagative (Alexei) 
  - added EOL character to make HTML source more readable (Alexei)
  - added new column "severity" to history of alarms (Alexei)

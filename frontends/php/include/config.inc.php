@@ -716,7 +716,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$result=DBselect($sql);
 			if(DBnum_rows($result)==1)
 			{
-				setcookie("sessionid",$sessionid,time()+3600);
+//				setcookie("sessionid",$sessionid,time()+3600);
+				setcookie("sessionid",$sessionid);
 				$sql="update sessions set lastaccess=".time()." where sessionid='$sessionid'";
 				DBexecute($sql);
 				$USER_DETAILS["userid"]=DBget_field($result,0,0);
