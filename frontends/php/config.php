@@ -41,6 +41,15 @@
 <?php
 	if(isset($_GET["register"]))
 	{
+		if($_GET["register"]=="delete image")
+		{
+			$result=delete_image($_GET["imageid"]);
+			show_messages($result, S_IMAGE_DELETED, S_CANNOT_DELETE_IMAGE);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Image deleted");
+			}
+		}
 		if($_GET["register"]=="update")
 		{
 			$result=update_config($_GET["alarm_history"],$_GET["alert_history"]);
@@ -177,14 +186,14 @@
 		if(!isset($_GET["imageid"]))
 		{
 			$name="";
-			$type=1;
+			$imagetype=1;
 		}
 		else
 		{
 			$result=DBselect("select imageid,imagetype,name,image from images where imageid=".$_GET["imageid"]);
 			$row=DBfetch($result);
 			$name=$row["name"];
-			$type=$row["type"];
+			$imagetype=$row["imagetype"];
 		}
 
 		$col=0;
@@ -196,7 +205,7 @@
 		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"3\" size=8>";
 		echo nbsp(S_NAME);
 		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"name\" value=\"".$name."\" size=8>";
+		echo "<input class=\"biginput\" name=\"name\" value=\"".$name."\" size=64>";
 
 		show_table2_v_delimiter($col++);
 		echo S_TYPE;
@@ -216,7 +225,11 @@
 
 
 		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add image\">";
+		if(isset($_GET["imageid"]))
+		{
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete image\" onClick=\"return Confirm('".S_DELETE_SELECTED_IMAGE."');\">";
+		}
 
 		show_table2_header_end();
 	}

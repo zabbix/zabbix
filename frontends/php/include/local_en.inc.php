@@ -157,6 +157,7 @@
 	define("S_SMTP_EMAIL",				"SMTP email");
 	define("S_SCRIPT_NAME",				"Script name");
 	define("S_DELETE_SELECTED_MEDIA",		"Delete selected media?");
+	define("S_DELETE_SELECTED_IMAGE",		"Delete selected image?");
 	define("S_HOUSEKEEPER",				"Housekeeper");
 	define("S_MEDIA_TYPES",				"Media types");
 	define("S_ESCALATION_RULES",			"Escalation rules");
