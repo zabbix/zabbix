@@ -1229,56 +1229,56 @@ int	CPUSYSTEM15(const char *cmd, const char *param,double  *value)
 	return	get_stat("cpu[system15]",value);
 }
 
-int	NETLOADIN1(const char *cmd, const char *interface,double  *value)
+int	NETLOADIN1(const char *cmd, const char *parameter,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"netloadin1[%s]",interface);
+	snprintf(key,sizeof(key)-1,"netloadin1[%s]",parameter);
 
 	return	get_stat(key,value);
 }
 
-int	NETLOADIN5(const char *cmd, const char *interface,double  *value)
+int	NETLOADIN5(const char *cmd, const char *parameter,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"netloadin5[%s]",interface);
+	snprintf(key,sizeof(key)-1,"netloadin5[%s]",parameter);
 
 	return	get_stat(key,value);
 }
 
-int	NETLOADIN15(const char *cmd, const char *interface,double  *value)
+int	NETLOADIN15(const char *cmd, const char *parameter,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"netloadin15[%s]",interface);
+	snprintf(key,sizeof(key)-1,"netloadin15[%s]",parameter);
 
 	return	get_stat(key,value);
 }
 
-int	NETLOADOUT1(const char *cmd, const char *interface,double  *value)
+int	NETLOADOUT1(const char *cmd, const char *parameter,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"netloadout1[%s]",interface);
+	snprintf(key,sizeof(key)-1,"netloadout1[%s]",parameter);
 
 	return	get_stat(key,value);
 }
 
-int	NETLOADOUT5(const char *cmd, const char *interface,double  *value)
+int	NETLOADOUT5(const char *cmd, const char *parameter,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"netloadout5[%s]",interface);
+	snprintf(key,sizeof(key)-1,"netloadout5[%s]",parameter);
 
 	return	get_stat(key,value);
 }
 
-int	NETLOADOUT15(const char *cmd, const char *interface,double  *value)
+int	NETLOADOUT15(const char *cmd, const char *parameter,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"netloadout15[%s]",interface);
+	snprintf(key,sizeof(key)-1,"netloadout15[%s]",parameter);
 
 	return	get_stat(key,value);
 }
