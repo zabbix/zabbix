@@ -33,5 +33,6 @@
 /* Type - 0 (syslog), 1 - file */
 int zabbix_open_log(int type,int level, const char *filename);
 void zabbix_log(int level, const char *fmt, ...);
+void zabbix_set_log_level(int level);
 
 #endif

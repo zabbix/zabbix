@@ -74,6 +74,11 @@ int zabbix_open_log(int type,int level, const char *filename)
 	return	SUCCEED;
 }
 
+void zabbix_set_log_level(int level)
+{
+	log_level = level;
+}
+
 void zabbix_log(int level, const char *fmt, ...)
 {
 	char	str[MAX_STRING_LEN+1];
