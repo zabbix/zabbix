@@ -877,7 +877,7 @@ GNU Make
 \layout Itemize
 
 WEB browser on client side (support for HTML and PNG images required).
- MS Explorer (5.xx and 6.xx) and Netscape 4.7x work perfectly.
+ MS Explorer (5.xx and 6.xx), Mozilla 1.x and Netscape 4.7x work perfectly.
  Note that cookies must be enabled.
 \layout Itemize
 

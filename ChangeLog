@@ -10,7 +10,6 @@ Not ready yet:
  - Reports:
   - more customizable (graphs timerange: 1 mont, etc)
   - availability report for IT Services
-  - availability report for triggers
 
  IT HELPDESK:
 
@@ -62,6 +61,7 @@ Not ready yet:
 
 Changes for 1.0beta6:
 
+ - added graph to availability report (Alexei)
  - added frontends/php/chart4.php (Alexei)
  - availability report will not show trigger expressions (Alexei)
  - added creation of table 'sessions' to migration scripts for 
