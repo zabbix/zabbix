@@ -275,11 +275,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		$priorities=0;
 		for($i=0;$i<=5;$i++)
 		{
-	        	$result=DBselect("select count(*) from triggers t,hosts h,items i,functions f  where t.value=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status in (0,2) and t.priority=$i");
+	        	$result=DBselect("select count(*) from triggers t,hosts h,items i,functions f  where t.value=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status=0 and t.priority=$i");
 			$priorities+=(1000^$i)*DBget_field($result,0,0);
 		}
 		$triggerids="";
-	       	$result=DBselect("select t.triggerid from triggers t,hosts h,items i,functions f  where t.value=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status in (0,2)");
+	       	$result=DBselect("select t.triggerid from triggers t,hosts h,items i,functions f  where t.value=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status=0");
 		for($i=0;$i<DBnum_rows($result);$i++)
 		{
 			$triggerids="$triggerids,".DBget_field($result,$i,0);
@@ -3013,6 +3013,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<OPTION VALUE=\"1\"";
 		if($type==1) echo "SELECTED";
 		echo ">SNMPv1 agent";
+		echo "<OPTION VALUE=\"2\"";
+		if($type==2) echo "SELECTED";
+		echo ">Zabbix trapper";
 		echo "</SELECT>";
  
 		show_table2_v_delimiter();
@@ -3050,9 +3053,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<OPTION VALUE=\"1\"";
 		if($status==1) echo "SELECTED";
 		echo ">Disabled";
-		echo "<OPTION VALUE=\"2\"";
-		if($status==2) echo "SELECTED";
-		echo ">Trapper";
+#		echo "<OPTION VALUE=\"2\"";
+#		if($status==2) echo "SELECTED";
+#		echo ">Trapper";
 		echo "<OPTION VALUE=\"3\"";
 		if($status==3) echo "SELECTED";
 		echo ">Not supported";
