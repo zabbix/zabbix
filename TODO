@@ -1,5 +1,6 @@
 1.0beta11:
 
+ - user groups
  - start&end time in time navigation
  - add Igor's patches
  - add Charlea RedHat startup scripts
@@ -14,11 +15,9 @@ latest trigger (item type  = TRAPPER)
  status of the trigger could help. 
 
  - cannot use "." as key in trigger expressions
- - show date in graps
  - time-navigation for graphs
  - preset time for graphs
  - new item status: 'deleted'. Housekeeping to delete items, etc
- - user groups
 
  - finish src/zabbix_snmptrapper
  - links to Zabbix frontend in alert emails
