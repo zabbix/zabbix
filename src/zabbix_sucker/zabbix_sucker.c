@@ -509,7 +509,7 @@ int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
 
 int	get_value(double *result,char *result_str,DB_ITEM *item)
 {
-	int res;
+	int res=FAIL;
 
 	struct	sigaction phan;
 
@@ -550,6 +550,9 @@ int get_minnextcheck(int now)
 	int		res;
 	int		count;
 
+/* Host status	0 == MONITORED
+		1 == NOT MONITORED
+		2 == UNREACHABLE */ 
 	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and i.itemid%%%d=%d",now,CONFIG_SUCKERD_FORKS-1,sucker_num-1);
 	result = DBselect(sql);
 
@@ -575,6 +578,101 @@ int get_minnextcheck(int now)
 	return	res;
 }
 
+/* SUCCEED if latest alarm with triggerid has this status */
+int	latest_alarm(int triggerid, int status)
+{
+	int	rows;
+	char	sql[MAX_STRING_LEN+1];
+	int	clock;
+
+	DB_RESULT	*result;
+
+	sprintf(sql,"select max(clock) from alarms where triggerid=%d",triggerid);;
+	result = DBselect(sql);
+
+	rows=DBnum_rows(result);
+
+	if( (result!=NULL) && (rows==1) )
+	{
+		clock=atoi(DBget_field(result,0,0));
+		DBfree_result(result);
+
+		sprintf(sql,"select istrue from alarms where triggerid=%d and clock=%d",triggerid,clock);
+		result = DBselect(sql);
+		if(DBnum_rows(result)==1)
+		{
+			if(atoi(DBget_field(result,0,0)) == status)
+			{
+				DBfree_result(result);
+				return SUCCEED;
+			}
+		}
+	}
+	DBfree_result(result);
+
+	return FAIL;
+}
+
+int	add_alarm(int triggerid, int status)
+{
+	int	now;
+	char	sql[MAX_STRING_LEN+1];
+
+	if(latest_alarm(triggerid,status) == SUCCEED)
+	{
+		return SUCCEED;
+	}
+
+	now=time(NULL);
+	sprintf(sql,"insert into alarms(triggerid,clock,istrue) values(%d,%d,%d)",triggerid,now,status);
+	DBexecute(sql);
+	
+	return SUCCEED;
+}
+
+int	update_trigger_status(int triggerid,int status)
+{
+	char	sql[MAX_STRING_LEN+1];
+
+	add_alarm(triggerid,status);
+
+	sprintf(sql,"update triggers set istrue=%d where triggerid=%d",status,triggerid);
+	DBexecute(sql);
+
+	return SUCCEED;
+}
+
+int update_triggers_status_to_unknown(int hostid)
+{
+	int	i,rows;
+	char	sql[MAX_STRING_LEN+1];
+	int	triggerid;
+
+	DB_RESULT	*result;
+
+	sprintf(sql,"select distinct t.triggerid from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.hostid=%d",hostid);
+	result = DBselect(sql);
+
+	rows=DBnum_rows(result);
+
+	if( (result==NULL) || (rows==0) )
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "No triggers to update for hostid=[%d]",hostid);
+		DBfree_result(result);
+		return FAIL; 
+	}
+
+	for(i=0;i<rows;i++)
+	{
+		triggerid=atoi(DBget_field(result,i,0));
+		update_trigger_status(triggerid,TRIGGER_STATUS_UNKNOWN);
+	}
+
+	DBfree_result(result);
+
+	return SUCCEED; 
+}
+
 int update_host_status(int hostid,int status)
 {
 	DB_RESULT	*result;
@@ -595,7 +693,8 @@ int update_host_status(int hostid,int status)
 
 	if(status == atoi(DBget_field(result,0,0)))
 	{
-		if((status==2) && (now+DELAY_ON_NETWORK_FAILURE>=atoi(DBget_field(result,0,1))) )
+		if((status==HOST_STATUS_UNREACHABLE) 
+		&&(now+DELAY_ON_NETWORK_FAILURE>atoi(DBget_field(result,0,1))) )
 		{
 		}
 		else
@@ -608,14 +707,19 @@ int update_host_status(int hostid,int status)
 
 	DBfree_result(result);
 
-	if(status==0)
+	if(status==HOST_STATUS_MONITORED)
 	{
-		sprintf(sql,"update hosts set status=0 where hostid=%d",hostid);
+		sprintf(sql,"update hosts set status=%d where hostid=%d",HOST_STATUS_MONITORED,hostid);
 		DBexecute(sql);
 	}
-	else if(status==2)
+	else if(status==HOST_STATUS_NOT_MONITORED)
 	{
-		sprintf(sql,"update hosts set status=2,disable_until=%d where hostid=%d",now+DELAY_ON_NETWORK_FAILURE,hostid);
+		sprintf(sql,"update hosts set status=%d where hostid=%d",HOST_STATUS_NOT_MONITORED,hostid);
+		DBexecute(sql);
+	}
+	else if(status==HOST_STATUS_UNREACHABLE)
+	{
+		sprintf(sql,"update hosts set status=%d,disable_until=%d where hostid=%d",HOST_STATUS_UNREACHABLE,now+DELAY_ON_NETWORK_FAILURE,hostid);
 		DBexecute(sql);
 	}
 	else
@@ -624,6 +728,7 @@ int update_host_status(int hostid,int status)
 		return FAIL;
 	}
 
+	update_triggers_status_to_unknown(hostid);
 
 	return SUCCEED;
 }
@@ -704,11 +809,11 @@ int get_values(void)
 		if(res == SUCCEED )
 		{
 			process_new_value(&item,value_str);
-			if(2 == host_status)
+			if(HOST_STATUS_UNREACHABLE == host_status)
 			{
-				host_status=0;
+				host_status=HOST_STATUS_MONITORED;
 				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
-				update_host_status(item.hostid,0);
+				update_host_status(item.hostid,HOST_STATUS_MONITORED);
 
 				break;
 			}
@@ -718,11 +823,11 @@ int get_values(void)
 			zabbix_log( LOG_LEVEL_WARNING, "Parameter [%s] is not supported by agent on host [%s]", item.key, item.host );
 			sprintf(sql,"update items set status=3 where itemid=%d",item.itemid);
 			DBexecute(sql);
-			if(2 == host_status)
+			if(HOST_STATUS_UNREACHABLE == host_status)
 			{
-				host_status=0;
+				host_status=HOST_STATUS_MONITORED;
 				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
-				update_host_status(item.hostid,0);
+				update_host_status(item.hostid,HOST_STATUS_MONITORED);
 
 				break;
 			}
@@ -730,7 +835,7 @@ int get_values(void)
 		else if(res == NETWORK_ERROR)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Host [%s] will be checked after [%d] seconds", item.host, DELAY_ON_NETWORK_FAILURE );
-			update_host_status(item.hostid,2);
+			update_host_status(item.hostid,HOST_STATUS_UNREACHABLE);
 
 			break;
 		}

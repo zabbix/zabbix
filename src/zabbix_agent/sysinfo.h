@@ -1,5 +1,7 @@
 #ifndef MON_SYSINFO_H
 #define MON_SYSINFO_H
+
+/* #define TEST_PARAMETERS */
  
 void	process(char *command, char *value);
 
@@ -38,13 +40,15 @@ float	EXECUTE(char *command);
 char	*EXECUTE_STR(char *command);
 char	*VERSION(void);
 
-float	CHECK_SERVICE_SSH(void);
+float	CHECK_SERVICE(char *service);
+
+/*float	CHECK_SERVICE_SSH(void);
 float	CHECK_SERVICE_SMTP(void);
 float	CHECK_SERVICE_FTP(void);
 float	CHECK_SERVICE_HTTP(void);
 float	CHECK_SERVICE_POP(void);
 float	CHECK_SERVICE_NNTP(void);
-float	CHECK_SERVICE_IMAP(void);
+float	CHECK_SERVICE_IMAP(void);*/
 
 float	CHECK_PORT(char *port);
 
