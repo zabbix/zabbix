@@ -16,6 +16,7 @@ Not ready yet:
 
 Changes for 1.0beta3:
 
+ - added table 'rights' (Alexei)
  - added time legend for simple graph (Alexei)
  - already existing hosts can be used as template from new host (Alexei)
  - new algorithm for audible notification in screen "Status of Triggers"
