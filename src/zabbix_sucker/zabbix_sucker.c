@@ -702,6 +702,7 @@ int housekeeping_history(int now)
 
 	int		i;
 
+/* How lastdelete is used ??? */
 	sprintf(sql,"select i.itemid,i.lastdelete,i.history from items i where i.lastdelete<=%d", now);
 	result = DBselect(sql);
 
@@ -719,9 +720,9 @@ int housekeeping_history(int now)
 		item.history=atoi(DBget_field(result,i,2));
 
 /* To be rewritten. Only one delete depending on item.value_type */
-		sprintf	(sql,"delete from history where itemid=%d and clock<%d",item.itemid,now-item.history);
+		sprintf	(sql,"delete from history where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
 		DBexecute(sql);
-		sprintf	(sql,"delete from history_str where itemid=%d and clock<%d",item.itemid,now-item.history);
+		sprintf	(sql,"delete from history_str where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
 		DBexecute(sql);
 	
 		sprintf(sql,"update items set lastdelete=%d where itemid=%d",now,item.itemid);

@@ -2,7 +2,7 @@
 -- Data for table config
 --
 
-insert into config (smtp_server,smtp_helo,smtp_email,alert_history,alarm_history) values ('localhost','localhost','zabbix@localhost',12*31*24*3600,12*31*24*3600);
+insert into config (smtp_server,smtp_helo,smtp_email,alert_history,alarm_history) values ('localhost','localhost','zabbix@localhost',365,365);
 
 --
 -- Data for table groups

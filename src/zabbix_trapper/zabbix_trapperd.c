@@ -164,6 +164,8 @@ int	process(char *s)
 
 	int	ret=SUCCEED;
 
+	return	SUCCEED;
+
 	for( p=s+strlen(s)-1; p>s && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
 	p[1]=0;
 
@@ -255,8 +257,8 @@ void    daemon_init(void)
 void	process_child(int sockfd)
 {
 	ssize_t	nread;
-	char	line[1024];
-	char	result[1024];
+	char	line[MAX_STRING_LEN+1];
+	char	result[MAX_STRING_LEN+1];
 	static struct  sigaction phan;
 
 	phan.sa_handler = &signal_handler;
@@ -267,7 +269,7 @@ void	process_child(int sockfd)
 	alarm(CONFIG_TIMEOUT);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Before read()");
-	if( (nread = read(sockfd, line, 1024)) < 0)
+	if( (nread = read(sockfd, line, MAX_STRING_LEN)) < 0)
 	{
 		if(errno == EINTR)
 		{
@@ -295,7 +297,8 @@ void	process_child(int sockfd)
 	{
 		sprintf(result,"NOT OK\n");
 	}
-	zabbix_log( LOG_LEVEL_DEBUG, "Sending back:%s", result);
+	zabbix_log( LOG_LEVEL_DEBUG, "Sending back [%s]", result);
+	zabbix_log( LOG_LEVEL_DEBUG, "Length [%d]", strlen(result));
 	zabbix_log( LOG_LEVEL_DEBUG, "Sockfd [%d]", sockfd);
 	if( write(sockfd,result,strlen(result)) == -1)
 	{
