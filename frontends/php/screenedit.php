@@ -56,7 +56,6 @@
 		if($HTTP_GET_VARS["register"]=="delete")
 		{
 			$result=delete_screen_item($HTTP_GET_VARS["screenitemid"]);
-			$result=delete_screen_graph($HTTP_GET_VARS["screengraphid"]);
 			show_messages($result,"Item deleted","Cannot delete item");
 			unset($HTTP_GET_VARS["x"]);
 		}
@@ -109,7 +108,7 @@
 		if(isset($HTTP_GET_VARS["x"])&&($HTTP_GET_VARS["x"]==$c)&&($HTTP_GET_VARS["y"]==$r))
 		{
 			$resource=@iif(isset($HTTP_GET_VARS["resource"]),$HTTP_GET_VARS["resource"],$resource);
-			$resourceid=@iif(isset($HTTP_GET_VARS["resource"]),$HTTP_GET_VARS["resourceid"],$resourceid);
+			$resourceid=@iif(isset($HTTP_GET_VARS["resourceid"]),$HTTP_GET_VARS["resourceid"],$resourceid);
 			$screenitemid=@iif(isset($HTTP_GET_VARS["screenitemid"]),$HTTP_GET_VARS["screenitemid"],$screenitemid);
 			$width=@iif(isset($HTTP_GET_VARS["width"]),$HTTP_GET_VARS["width"],$width);
 			$height=@iif(isset($HTTP_GET_VARS["height"]),$HTTP_GET_VARS["height"],$height);
@@ -118,10 +117,11 @@
         		echo "Screen cell configuration";
 
         		echo "<input name=\"screenid\" type=\"hidden\" value=$screenid>";
+        		echo "<input name=\"screenitemid\" type=\"hidden\" value=$screenitemid>";
 			echo "<input name=\"x\" type=\"hidden\" value=$c>";
 			echo "<input name=\"y\" type=\"hidden\" value=$r>";
 //			echo "<input name=\"resourceid\" type=\"hidden\" value=$resourceid>";
-			echo "<input name=\"resource\" type=\"hidden\" value='$resource'>";
+//			echo "<input name=\"resource\" type=\"hidden\" value='$resource'>";
 
 			show_table2_v_delimiter();
 			echo "Resource";

@@ -137,7 +137,8 @@
 			}
 			else if($resource == 2)
 			{
-				echo "<a href=history.php?action=showhistory&itemid=$resourceid><img src='map.php?sysmapid=$resourceid&noedit=true&border=1' border=0></a>";
+				echo get_map_imagemap($resourceid);
+				echo "<img src='map.php?sysmapid=$resourceid&noedit=true&border=1' border=0 usemap=#links>";
 			}
 		}
 		echo "</form>\n";
