@@ -101,17 +101,6 @@
           {
                 echo "<TD align=\"center\">\n";
 
-                echo "<a name=\"form\"></a>";
-                echo "<form method=\"get\" action=\"screenedit.php\">";
-
-		{
-			$screenitemid=0;
-			$graphid=0;
-			$itemid=0;
-			$width=100;
-			$height=50;
-		}
-
 		$sql="select * from screens_items where screenid=$screenid and x=$c and y=$r";
 		$iresult=DBSelect($sql);
 		if(DBnum_rows($iresult)>0)
@@ -124,7 +113,7 @@
 			$height=$irow["height"];
 		}
 
-		if($resourceid!=0)
+		if(DBnum_rows($iresult)>0)
 		{
 			if($resource == 0)
 			{
@@ -140,7 +129,10 @@
 				echo "<img src='map.php?sysmapid=$resourceid&noedit=true&border=1' border=0 usemap=#links>";
 			}
 		}
-		echo "</form>\n";
+		else
+		{
+			echo "&nbsp;";
+		}
 		echo "</TD>";
           }
           echo "</TR>\n";
