@@ -279,7 +279,7 @@ CREATE TABLE users (
   alias			varchar(100)	DEFAULT '' NOT NULL,
   name			varchar(100)	DEFAULT '' NOT NULL,
   surname		varchar(100)	DEFAULT '' NOT NULL,
-  passwd		varchar(64)	DEFAULT '' NOT NULL,
+  passwd		char(32)	DEFAULT '' NOT NULL,
   PRIMARY KEY (userid),
   UNIQUE (alias)
 );

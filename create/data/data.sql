@@ -21,7 +21,7 @@ insert into groups (groupid,name) values (2,'Zabbix user');
 -- Data for table users
 --
 
-insert into users (userid,groupid,alias,name,surname,passwd) values (1,1,'Admin','Zabbix','Administrator','');
+insert into users (userid,groupid,alias,name,surname,passwd) values (1,1,'Admin','Zabbix','Administrator','d41d8cd98f00b204e9800998ecf8427e');
 
 --
 -- Data for table items_template 

@@ -3,7 +3,6 @@
 all:
 
 	@CC@ -o zabbix_sucker @CFLAGS@ -ggdb -I /usr/include/postgresql -I /usr/include/mysql -I../../include  -L/usr/lib/mysql zabbix_sucker.c ../../include/db.c ../../include/functions.c ../../include/expression.c -Wall @LIBS@
-	strip zabbix_sucker
 
 clean:
 	rm -fv *.o 

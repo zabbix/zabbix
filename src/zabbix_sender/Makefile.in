@@ -3,7 +3,6 @@
 all:
 
 	@CC@ -o zabbix_sender @CFLAGS@ -ggdb -I../../include zabbix_sender.c -Wall @LIBS@
-	strip zabbix_sender
 
 clean:
 	rm -fv *.o 
