@@ -143,7 +143,7 @@ int create_host_file(void)
 	}
 
 	now=time(NULL);
-	sprintf(sql,"select distinct h.ip from hosts h,items i where i.hostid=h.hostid and (h.status=%d or (h.status=%d and h.disable_until<=%d)) and (i.key_='icmpping' or i.key_='icmppingsec') and i.type=%d and i.status=%d and h.useip=1", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, ITEM_TYPE_SIMPLE, ITEM_STATUS_ACTIVE);
+	sprintf(sql,"select distinct h.ip from hosts h,items i where i.hostid=h.hostid and (h.status=%d or (h.status=%d and h.disable_until<=%d)) and (i.key_='%s' or i.key_='%s') and i.type=%d and i.status=%d and h.useip=1", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, ITEM_TYPE_SIMPLE, ITEM_STATUS_ACTIVE);
 	result = DBselect(sql);
 		
 	for(i=0;i<DBnum_rows(result);i++)
@@ -207,13 +207,13 @@ int	do_ping(void)
 			zabbix_log( LOG_LEVEL_DEBUG, "IP [%s] alive [%d]", ip, alive);
 			if(0 == alive)
 			{
-				process_value("icmpping",ip,"0");
+				process_value(SERVER_ICMPPING_KEY,ip,"0");
 			}
 			else
 			{
 				sprintf(tmp,"%f",mseconds/100);
-				process_value("icmpping",ip,"1");
-				process_value("icmppingsec",ip,tmp);
+				process_value(SERVER_ICMPPING_KEY,ip,"1");
+				process_value(SERVER_ICMPPINGSEC_KEY,ip,tmp);
 			}
 		}
 	}
