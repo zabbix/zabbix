@@ -384,7 +384,7 @@ CREATE TABLE services (
   algorithm		int2		DEFAULT '0' NOT NULL,
   triggerid		int4,
   showsla		int4		DEFAULT '0' NOT NULL,
-  goodsla		int4		DEFAULT '99.9' NOT NULL,
+  goodsla		float8		DEFAULT '99.9' NOT NULL,
   PRIMARY KEY (serviceid)
 );
 

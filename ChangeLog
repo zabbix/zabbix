@@ -1,5 +1,6 @@
 Changes for 1.0beta9:
 
+ - fixed type of services.goodsla. It's float now. (Alexei)
  - fixed addition of host triggers into IT Service tree (Alexei)
  - support of '(' and ')' in item keys (Alexei)
  - fixed dark blue color for user-defined chart (Alexei)
