@@ -1,7 +1,7 @@
 #ifndef ZABBIX_SYSINFO_H
 #define ZABBIX_SYSINFO_H
 
-/* #define TEST_PARAMETERS */
+#define TEST_PARAMETERS
  
 void	process(char *command, char *value);
 
