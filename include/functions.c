@@ -216,7 +216,8 @@ int	evaluate_FUNCTION(float *value,int itemid,char *function,int parameter)
 	return ret;
 }
 
-int	update_functions( int itemid )
+/*int	update_functions( int itemid )*/
+int	update_functions( int sucker_num )
 {
 	DB_FUNCTION	function;
 	DB_RESULT	*result;
@@ -225,7 +226,8 @@ int	update_functions( int itemid )
 	int		ret=SUCCEED;
 	int		i,rows;
 
-	sprintf(c,"select function,parameter from functions where itemid=%d group by 1,2 order by 1,2",itemid );
+/*	sprintf(c,"select function,parameter from functions where itemid=%d group by 1,2 order by 1,2",itemid );*/
+	sprintf(c,"select function,parameter,itemid from functions where itemid%%%d=%d group by 1,2 order by 1,2", SUCKER_FORKS-1,sucker_num-1);
 
 	result = DBselect(c);
 	rows=DBnum_rows(result);
@@ -241,9 +243,11 @@ int	update_functions( int itemid )
 	{
 		function.function=DBget_field(result,i,0);
 		function.parameter=atoi(DBget_field(result,i,1));
-		syslog( LOG_DEBUG, "ItemId:%d Evaluating %s(%d)\n",itemid,function.function,function.parameter);
+		function.itemid=atoi(DBget_field(result,i,2));
 
-		ret = evaluate_FUNCTION(&value,itemid,function.function,function.parameter);
+		syslog( LOG_DEBUG, "ItemId:%d Evaluating %s(%d)\n",function.itemid,function.function,function.parameter);
+
+		ret = evaluate_FUNCTION(&value,function.itemid,function.function,function.parameter);
 		if( FAIL == ret)	
 		{
 			syslog( LOG_WARNING, "Evaluation failed for function:%s\n",function.function);
@@ -253,7 +257,7 @@ int	update_functions( int itemid )
 		syslog( LOG_DEBUG, "Result:%f\n",value);
 		if (ret == SUCCEED)
 		{
-			sprintf(c,"update functions set lastvalue=%f where itemid=%d and function='%s' and parameter=%d", value, itemid, function.function, function.parameter );
+			sprintf(c,"update functions set lastvalue=%f where itemid=%d and function='%s' and parameter=%d", value, function.itemid, function.function, function.parameter );
 //			printf("%s\n",c);
 			DBexecute(c);
 		}
@@ -505,6 +509,23 @@ void	apply_actions(int triggerid,int good)
 	int	i,rows;
 	int	now;
 
+	if(good==1)
+	{
+		syslog( LOG_DEBUG, "Check dependencies");
+
+		sprintf(c,"select count(*) from trigger_depends d,triggers t where d.triggerid_down=%d and d.triggerid_up=t.triggerid and t.istrue=1",triggerid);
+		syslog( LOG_DEBUG, "SQL:%s",c);
+		result = DBselect(c);
+		i=atoi(DBget_field(result,0,0));
+		syslog( LOG_DEBUG, "I:%d",i);
+		DBfree_result(result);
+		if(i>0)
+		{
+			syslog( LOG_DEBUG, "Will not apply actions");
+			return;
+		}
+	}
+
 	syslog( LOG_DEBUG, "Applying actions");
 
 	/* Get smtp_server and smtp_helo from config */
@@ -546,7 +567,8 @@ void	apply_actions(int triggerid,int good)
 	DBfree_result(result);
 }
 
-void	update_triggers(int itemid)
+/*void	update_triggers(int itemid)*/
+void	update_triggers(int sucker_num)
 {
 	char c[1024];
 	char exp[8192];
@@ -557,7 +579,9 @@ void	update_triggers(int itemid)
 	int	i,rows;
 	int	now;
 
-	sprintf(c,"select t.triggerid,t.expression,t.istrue from triggers t,functions f where t.istrue!=2 and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.istrue",itemid);
+/*	sprintf(c,"select t.triggerid,t.expression,t.istrue from triggers t,functions f where t.istrue!=2 and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.istrue",itemid);*/
+
+	sprintf(c,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f where t.istrue!=2 and f.triggerid=t.triggerid and f.itemid%%%d=%d group by t.triggerid,t.expression,t.istrue,t.dep_level order by t.dep_level desc", SUCKER_FORKS-1,sucker_num-1);
 
 	result = DBselect(c);
 
@@ -565,7 +589,7 @@ void	update_triggers(int itemid)
 
 	if(rows == 0)
 	{
-		syslog( LOG_DEBUG, "Zero, so returning..." );
+		syslog( LOG_DEBUG, "No triggers to update, returning..." );
 
 		DBfree_result(result);
 		return;

@@ -843,6 +843,76 @@
 		return	DBexecute($sql);
 	}
 
+	function	delete_trigger_dependency($triggerid_down,$triggerid_up)
+	{
+		$sql="select count(*) from trigger_depends where triggerid_down=$triggerid_up and triggerid_up=$triggerid_down";
+		$result=DBexecute($sql);
+		if(DBget_field($result,0,0)>0)
+		{
+			return	FALSE;
+		}
+
+		$sql="select triggerid_down,triggerid_up from trigger_depends where triggerid_up=$triggerid_up or triggerid_down=$triggerid_down";
+		$result=DBexecute($sql);
+		for($i=0;$i<DBnum_rows($result);$i++)
+		{
+			$down=DBget_field($result,$i,0);
+			$up=DBget_field($result,$i,1);
+			$sql="delete from trigger_depends where triggerid_up=$up and triggerid_down=$down";
+			DBexecute($sql);
+			$sql="update triggers set dep_level=dep_level-1 where triggerid=$up";
+			DBexecute($sql);
+		}
+		return	TRUE;
+	}
+
+	function	insert_dependency($triggerid_down,$triggerid_up)
+	{
+		$sql="insert into trigger_depends (triggerid_down,triggerid_up) values ($triggerid_down,$triggerid_up)";
+		$result=DBexecute($sql);
+		if(!$result)
+		{
+			return	$result;
+		}
+		$sql="update triggers set dep_level=dep_level+1 where triggerid=$triggerid_up";
+		$result=DBexecute($sql);
+		return	$result;
+	}
+
+	// If 1 depends on 2, and 2 depends on 3, then add dependency 1->3
+	function	add_additional_dependencies($triggerid_down,$triggerid_up)
+	{
+		$sql="select triggerid_down from trigger_depends where triggerid_up=$triggerid_down";
+		$result=DBselect($sql);
+		for($i=0;$i<DBnum_rows($result);$i++)
+		{
+			$triggerid=DBget_field($result,$i,0);
+			insert_dependency($triggerid,$triggerid_up);
+			add_additional_dependencies($triggerid,$triggerid_up);
+		}
+		$sql="select triggerid_up from trigger_depends where triggerid_down=$triggerid_up";
+		$result=DBselect($sql);
+		for($i=0;$i<DBnum_rows($result);$i++)
+		{
+			$triggerid=DBget_field($result,$i,0);
+			insert_dependency($triggerid_down,$triggerid);
+			add_additional_dependencies($triggerid_down,$triggerid);
+		}
+	}
+
+	function	add_trigger_dependency($triggerid,$depid)
+	{
+		$result=insert_dependency($triggerid,$depid);;
+		if(!$result)
+		{
+			return $result;
+		}
+		add_additional_dependencies($triggerid,$depid);
+		return $result;
+	}
+
+	# Delete Function definition
+
 	# Add Item definition
 
 	function	add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid)
@@ -1894,12 +1964,12 @@
 			echo "Dependencies";
 			show_table2_h_delimiter();
 			$sql="select t.triggerid,t.description from triggers t,trigger_depends d where t.triggerid=d.triggerid_up and d.triggerid_down=$triggerid";
-			$result=DBselect($sql);
-			echo "<SELECT NAME=\"priority\" size=\"1\">";
-			for($i=0;$i<DBnum_rows($result);$i++)
+			$result1=DBselect($sql);
+			echo "<SELECT NAME=\"dependency\" size=\"1\">";
+			for($i=0;$i<DBnum_rows($result1);$i++)
 			{
-				$depid=DBget_field($result,$i,0);
-				$depdescr=DBget_field($result,$i,1);
+				$depid=DBget_field($result1,$i,0);
+				$depdescr=DBget_field($result1,$i,1);
 				echo "<OPTION VALUE=\"$depid\">$depdescr";
 			}
 			echo "</SELECT>";
@@ -1909,7 +1979,7 @@
 			show_table2_h_delimiter();
 			$sql="select t.triggerid,t.description from triggers t where t.triggerid!=$triggerid order by t.description";
 			$result=DBselect($sql);
-			echo "<SELECT NAME=\"priority\" size=\"1\">";
+			echo "<SELECT NAME=\"depid\" size=\"1\">";
 			for($i=0;$i<DBnum_rows($result);$i++)
 			{
 				$depid=DBget_field($result,$i,0);
@@ -1922,7 +1992,10 @@
 			if(isset($triggerid))
 			{
 				echo "<input type=\"submit\" name=\"register\" value=\"add dependency\">";
-				echo "<input type=\"submit\" name=\"register\" value=\"delete dependency\">";
+				if(DBnum_rows($result1)>0)
+				{
+					echo "<input type=\"submit\" name=\"register\" value=\"delete dependency\">";
+				}
 			}
 		}
 

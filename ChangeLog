@@ -1,10 +1,12 @@
 Changes for 1.0alpha10:
 
+ - added support for trigger dependencies
+ - added column dep_level to table TRIGGERS
+
  - added new host type: Workstation + frontends/php/images/sysmaps/Workstation.png
  - added table triger_depends
  - calls to perror() were changed to syslog() where possible
  - added status line to full screen version of form "Status of Triggers"
-
  - added directory upgrades/dbpatches/1.0alpha9_to_1.0alpha10/
  - removed parameters net[listen_21],net[listen_22],net[listen_25],net[listen_110],
    net[listen_143]
@@ -12,7 +14,7 @@ Changes for 1.0alpha10:
    check_service[nntp],check_service[imap]
  - added constant TRAPPERD_FORKS (default is 10)
  - added constant AGENTD_FORKS (default is 10)
- - minor fixed in PHP code
+ - minor fixes in PHP code
  - added some basic information on zabbix_trapperd to manual.txt
  - added zabbix_trapperd
  - minor fixes in manual.txt

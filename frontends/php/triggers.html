@@ -9,6 +9,16 @@
 <?
 	if(isset($register))
 	{
+		if($register=="add dependency")
+		{
+			$result=add_trigger_dependency($triggerid,$depid);
+			show_messages($result,"Dependency added","Cannot add dependency");
+		}
+		if($register=="delete dependency")
+		{
+			$result=delete_trigger_dependency($triggerid,$dependency);
+			show_messages($result,"Dependency deleted","Cannot delete dependency");
+		}
 		if($register=="changestatus")
 		{
 			$result=update_trigger_status($triggerid,$status);
