@@ -300,6 +300,8 @@
 		{
 			if(!check_right("Item","R",$this->items[0]["itemid"]))
 			{
+				$this->drawGrid();
+				ImageString($this->im, 2,$this->sizeX/2 -50,$this->sizeY+$this->shiftY+3, "NO PERMISSIONS" , $this->colors["Dark Red No Alpha"]);
 				ImagePng($this->im); 
 				ImageDestroy($this->im); 
 				exit;
