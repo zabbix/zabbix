@@ -1,5 +1,6 @@
 Changes for 1.0beta13:
 
+ - new icons and icon types for sysmaps (Alexei)
  - added columns color_on,color_off,drawtype_on,drawtype_off to table
  sysmaps_links (Alexei)
  - do not show group having no hosts in Latest Values (Alexei) 
