@@ -365,7 +365,7 @@ int update_triggers_status_to_unknown(int hostid,int clock)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In update_triggers_status_to_unknown()");
 
-	sprintf(sql,"select distinct t.triggerid from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.hostid=%d",hostid);
+	sprintf(sql,"select distinct t.triggerid from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.hostid=%d and i.key_<>'%s'",hostid,SERVER_STATUS_KEY);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
@@ -402,7 +402,7 @@ int DBupdate_triggers_status_after_restart(void)
 
 	now=time(NULL);
 
-	sprintf(sql,"select distinct t.triggerid from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.nextcheck+i.delay<%d",now);
+	sprintf(sql,"select distinct t.triggerid from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.nextcheck+i.delay<%d and i.key_<>'%s'",now,SERVER_STATUS_KEY);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 

@@ -51,7 +51,7 @@ The
 \emph on 
 Zabbix Manual 
 \emph default 
-uses the typographical convensions shown in the following table.
+uses the typographical conventions shown in the following table.
 \layout Standard
 
 
@@ -302,7 +302,7 @@ Zabbix
  can play an important role in monitoring IT infrastructure
 \latex default 
 .
- This is equally true for small organizations with a few servers and for
+ This is equally true for small organisations with a few servers and for
  large companies with a multitude of servers.
 \layout Standard
 
@@ -421,7 +421,7 @@ Zabbix
  is trying to achieve:
 \layout Itemize
 
-become recognized Open Source monitoring tool
+become recognised Open Source monitoring tool
 \layout Itemize
 
 create 
@@ -641,10 +641,10 @@ Viewing trends of process load, disk usage, database activity, or other
  next hardware upgrade should be made.
 \layout Subsection
 
-Manging dependencies between IT resources
+Managing dependencies between IT resources
 \layout Standard
 
-High level service tree allows create dependecies between various IT resource.
+High level service tree allows create dependencies between various IT resource.
  Such representation of monitored data makes possible answer to the following
  questions:
 \layout Itemize
@@ -667,7 +667,7 @@ A
 What resources specific IT service depends on?
 \layout Standard
 
-Example: WEB portal may depend on the following recources:
+Example: WEB portal may depend on the following resources:
 \layout Enumerate
 
 processor load on server 
@@ -856,7 +856,7 @@ Zabbix
 \begin_float footnote 
 \layout Standard
 
-These results are predictible.
+These results are predictable.
  Zabbix mainly uses simple SQL statements like single row INSERT, UPDATE,
  and simple SELECT operators.
  In such environment, use of advanced SQL engine (like PostgreSQL) is overkill.
@@ -1964,7 +1964,7 @@ Zabbix
 Zabbix
 \series default 
  1.0beta4 was developed and tested on FreeBSD 4.4.
- Thus, FreeBSD is also safe choise.
+ Thus, FreeBSD is also safe choice.
 \layout Subsection
 
 Platform specific notes
@@ -2305,7 +2305,7 @@ can be used in definition of monitored parameters
 \layout Itemize
 
 IMPORTANT.
- Algorithm for unreachble hosts changed.
+ Algorithm for unreachable hosts changed.
  In case of network problems host will be disabled for the next 60 seconds
  (defined in 
 \shape italic 
@@ -2394,7 +2394,7 @@ IMPORTANT.
 \layout Itemize
 
 IMPORTANT.
- Added support for flexible permisions.
+ Added support for flexible permissions.
 \layout Itemize
 
 Added new parameters: check_service[http],system[uname],system[hostname],version
@@ -2404,7 +2404,7 @@ Added new parameters: check_service[http],system[uname],system[hostname],version
 diskfree[*] will return free disk space in Kb
 \layout Itemize
 
-Added suppor for system[uptime],kern[maxfiles],kern[maxproc] of FreeBSD
+Added support for system[uptime],kern[maxfiles],kern[maxproc] of FreeBSD
 \layout Itemize
 
 zabbix_trapperd cannot be ran as root
@@ -2500,7 +2500,7 @@ Zabbix
 \series default 
  server processes can be run in a polling or listening configuration or
  both.
- These methods differ in the approach that they utilize and affect what
+ These methods differ in the approach that they utilise and affect what
  processes must be run.
  In the Server Polling Method the 
 \series bold 
@@ -2636,7 +2636,7 @@ These methods are not mutually exclusive and can be used in conjunction.
 
 \layout Standard
 
-The standard method utilized is the Server Polling Method in most instances.
+The standard method utilised is the Server Polling Method in most instances.
  In this method the server is setup and configured to be aware of clients
  and then the server polls the clients at defined intervals.
 \layout Standard
@@ -2654,7 +2654,7 @@ tor.
  when it has ended.
  In this manner the client dictates the interval of the information and
  sends information when specified events occur rather than the server requesting
- information at speicified intervals.
+ information at specified intervals.
 \layout Subsubsection
 
 Server Polling Method (Server connects to Client)
@@ -2718,7 +2718,7 @@ zabbix_agentd
 \series bold 
 Zabbix
 \series default 
- client is acting like a traditional server and listenting for connections
+ client is acting like a traditional server and listening for connections
  and responding; and the 
 \series bold 
 Zabbix
@@ -2903,7 +2903,7 @@ Zabbix Processes
 Zabbix
 \series default 
  supports several different processes that perform specific functions depending
- on the mode of execution that is utilized (inetd vs.
+ on the mode of execution that is utilised (inetd vs.
  standalone.)
 \layout Subsubsection
 
@@ -3079,7 +3079,7 @@ from
 \emph default 
 zabbix_suckerd.conf
 \shape default 
- defines how often housekeping procecedure must be executed.
+ defines how often housekeeping procedure must be executed.
 \layout Standard
 
 \SpecialChar ~
@@ -3183,7 +3183,7 @@ rmine
 \latex default 
 s
 \latex no_latex 
- if the connection is coming from an authorized server.\SpecialChar ~
+ if the connection is coming from an authorised server.\SpecialChar ~
  The 
 \emph on 
 \latex default 
@@ -3422,7 +3422,7 @@ zabbix_agent
 \emph on 
 /etc/zabbix/zabbix_agent.conf
 \emph default 
- in order to determine if the connection is coming from an authorized server.
+ in order to determine if the connection is coming from an authorised server.
  The 
 \emph on 
 zabbix_agent.conf
@@ -3806,7 +3806,7 @@ Zabbix Configuration
 Configuration Methods and Execution Modes
 \layout Standard
 
-Depending on the configuration method and execution mode that is being utilized
+Depending on the configuration method and execution mode that is being utilised
  (polling vs.
  listening and inetd vs.
  standalone respectively) the 
@@ -6125,7 +6125,7 @@ The expression is true when the previous value of checksum of
 
 
 \latex no_latex 
-Similiar expressions could be useful to monitor changes in important files,
+Similar expressions could be useful to monitor changes in important files,
  such as 
 \emph on 
 \latex default 
@@ -6763,7 +6763,7 @@ Key: <Unique string to be used as reference to triggers>
 \newline 
 Note that OID can be given in either numeric or in string form.
  However, in some cases, string OID must be converted to numeric representation.
- Untility 
+ Utility 
 \emph on 
 snmpget
 \emph default 
@@ -9878,7 +9878,7 @@ mysql[version] Version of MySQL
 Example: mysql Ver 11.16 Distrib 3.23.49, for pc-linux-gnu (i686)
 \layout Section
 
-Getting Maximum Performace From Zabbix
+Getting Maximum Performance From Zabbix
 \layout Subsection
 
 Real world configuration
@@ -10115,7 +10115,7 @@ x reports represent collected information in structured way.
  
 \latex no_latex 
 Report generation can be a very time consuming operation.
- Additionally, if you use MySQL or ay other database with table locking,
+ Additionally, if you use MySQL or any other database with table locking,
  
 \series bold 
 \latex default 
@@ -10222,7 +10222,7 @@ The script is used to periodically s
 e
 \latex no_latex 
 nd ICMP pings to list of servers.
- In case, if it does not receive responce from host, it executes:
+ In case, if it does not receive response from host, it executes:
 \layout Standard
 
 
@@ -14174,7 +14174,7 @@ s
 the project.
  
 \latex default 
-Ou team
+Our team
 \latex no_latex 
  also want
 \latex default 
@@ -14224,7 +14224,7 @@ In alphabetical order:
 Kaspars Cikmacs
 \layout Standard
 
-Lots of new ideas based on real expirience of using 
+Lots of new ideas based on real experience of using 
 \series bold 
 Zabbix
 \series default 

@@ -15,6 +15,9 @@
 #define ITEM_TYPE_SNMP		1
 #define ITEM_TYPE_TRAPPER	2
 
+/* Special item key used for storing server status */
+#define SERVER_STATUS_KEY	"status"
+
 /* Alert types */
 #define ALERT_TYPE_EMAIL	"EMAIL"
 

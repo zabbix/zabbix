@@ -10,15 +10,13 @@ Not ready yet (1.0beta4):
 [ CORE. Support for Service Tree ] 
 [ CORE. Check permission system ]
 [ CORE. Support of monitoring of log files ]
-[ CORE. Special item which will reflect availability of server ]
-
-[ DOCS. SNMP with missing MIB files can be used by:
-snmpget -On localhost public enterprises.ucdavis.memory.memTotalSwap.0]
 
 [ PHP. Navigation by time period for graphs and trends ]
 
 Changes for 1.0beta4:
 
+ - added item which reflects host status (0-normal, 2-unreachable) (Alexei)
+ - fixed function apply_actions() (Alexei)
  - added Next100 and Prev100 for alerts and alarms (Alexei)
  - check permissions for Availability report (Alexei)
  - added parameter SenderFrequency to zabbix_suckerd configuration 
