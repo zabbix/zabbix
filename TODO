@@ -1,10 +1,10 @@
 1.1:
+ - hardlinked templates (several templates, one host)
 
  - make sure all screens looks good in case of hundreds of servers/groups
  - use oop approach for new development
  - update the manual
  - put manual in HTML to the web
- - hardlinked templates (several templates, one host)
  - rewrite validation and evaluation of expressions (i.e. make >-1 work)
  - support for 'Clone' (graphs and screens)
  - add support of interface statistics under Solaris and FreeBSD
