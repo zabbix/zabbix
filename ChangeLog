@@ -1,5 +1,7 @@
 Changes for 1.0beta10:
 
+ - fixed nasty bug in getting SNMP parameters. Thanks to Igor Micko.
+ (Alexei)
  - added support for diskused[*] (Alexei)
  - Alert History renamed to Alerts (Alexei)
  - Status of Triggers renamed to Triggers (Alexei)
