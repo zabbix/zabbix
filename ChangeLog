@@ -1,5 +1,7 @@
 Changes for 1.0beta11:
 
+ - http://zabbix.sf.nt was changed to http://www.zabbix.org
+ (Alexei)
  - support of delta flag in item definition (Alexei)
  - added column items.delta,prevorgvalue (Alexei)
  - support for operator '#', not equal. (Alexei)
