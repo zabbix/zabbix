@@ -9,7 +9,7 @@ all:
 	@CC@ -o ../../bin/zabbix_trapperd @CFLAGS@ $(INCLUDE) -I../../include  zabbix_trapperd.c ../../include/db.c ../../include/functions.c ../../include/expression.c ../../include/log.c ../../include/cfg.c ../../include/security.c -Wall $(LIBS)
 
 clean:
-	rm -fv *.o 
-	rm -fv ../../bin/zabbix_trapper
-	rm -fv ../../bin/zabbix_trapperd
+	rm -f *.o 
+	rm -f ../../bin/zabbix_trapper
+	rm -f ../../bin/zabbix_trapperd
 
