@@ -45,7 +45,7 @@
 	define("S_ACTION_UPDATED",			"Action updated");
 	define("S_CANNOT_UPDATE_ACTION",		"Cannot update action");
 	define("S_ACTION_DELETED",			"Action deleted");
-	define("S_CANNOT_DELETED_ACTION",		"Cannot delete action");
+	define("S_CANNOT_DELETE_ACTION",		"Cannot delete action");
 	define("S_SCOPE",				"Scope");
 	define("S_SEND_MESSAGE_TO",			"Send message to");
 	define("S_WHEN_TRIGGER",			"When trigger");

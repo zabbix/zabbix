@@ -44,8 +44,16 @@
 			show_messages($result,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
 			if($result)
 			{
-				$user=get_user_by_userid($_GET["userid"]);
-				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ACTION,"User [".$user["alias"]."] when [".$_GET["good"]."] subject [".$_GET["subject"]."]");
+				if(isset($_GET["userid"]))
+				{
+					$user=get_user_by_userid($_GET["userid"]);
+					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ACTION,"User [".$user["alias"]."] when [".$_GET["good"]."] subject [".$_GET["subject"]."]");
+				}
+				else
+				{
+					$group=get_group_by_groupid($_GET["usrgrpid"]);
+					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ACTION,"User [".$group["name"]."] when [".$_GET["good"]."] subject [".$_GET["subject"]."]");
+				}
 			}
 		}
 		if($_GET["register"]=="update")
@@ -241,7 +249,6 @@
 			$message=$message."---------End--------\n";
 		}
 	}
-	echo "<br>";
 	show_table2_header_begin();
 	echo nbsp(S_NEW_ACTION);
 	$col=0;
