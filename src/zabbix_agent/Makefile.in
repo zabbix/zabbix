@@ -3,7 +3,7 @@
 all:
 
 	@CC@ -o ../../bin/zabbix_agent  @CFLAGS@ -I../../include zabbix_agent.c sysinfo.c ../../include/log.c ../../include/cfg.c ../../include/security.c @LIBS@
-	@CC@ -o ../../bin/zabbix_agentd @CFLAGS@ -I../../include zabbix_agentd.c sysinfo.c ../../include/log.c ../../include/cfg.c ../../include/security.c @LIBS@
+	@CC@ -o ../../bin/zabbix_agentd @CFLAGS@ -I../../include zabbix_agentd.c sysinfo.c stats.c ../../include/log.c ../../include/cfg.c ../../include/security.c @LIBS@
 
 clean:
 	rm -fv *.o 
