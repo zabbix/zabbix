@@ -72,7 +72,7 @@ void	daemon_init(void)
 	}
 }
 
-int	get_value_SNMPv1(double *result,ITEM *item)
+int	get_value_SNMPv1(double *result,DB_ITEM *item)
 {
     struct snmp_session session, *ss;
     struct snmp_pdu *pdu;
@@ -144,7 +144,11 @@ int	get_value_SNMPv1(double *result,ITEM *item)
 		int count=1;
 //		if (vars->type == ASN_OCTET_STR)
 //		syslog( LOG_WARNING, "Type:%d", vars->type);
-		if (vars->type == ASN_INTEGER)
+		if(	(vars->type == ASN_INTEGER ) ||
+			(vars->type == ASN_UINTEGER ) ||
+			(vars->type == ASN_COUNTER ) ||
+			(vars->type == ASN_GAUGE )
+		)
 		{
 			char *sp = (char *)malloc(1 + vars->val_len);
 			memcpy(sp, vars->val.string, vars->val_len);
@@ -158,7 +162,7 @@ int	get_value_SNMPv1(double *result,ITEM *item)
 		}
 		else
 		{
-//			syslog( LOG_WARNING,"value #%d is NOT an integer!\n", count++);
+			syslog( LOG_WARNING,"value #%d is NOT an integer!\n", count++);
 		}
 	}
     } else {
@@ -187,7 +191,7 @@ int	get_value_SNMPv1(double *result,ITEM *item)
     return SUCCEED;
 } /* main() */
 
-int	get_value_zabbix(double *result,ITEM *item)
+int	get_value_zabbix(double *result,DB_ITEM *item)
 {
 	int	s;
 	int	i;
@@ -288,7 +292,7 @@ int	get_value_zabbix(double *result,ITEM *item)
 	return SUCCEED;
 }
 
-int	get_value(double *result,ITEM *item)
+int	get_value(double *result,DB_ITEM *item)
 {
 	if(item->type == ITEM_TYPE_ZABBIX)
 	{
@@ -347,7 +351,7 @@ int get_values(void)
 {
 	double		value;
 	char		c[1024];
-	ITEM		item;
+	DB_ITEM		item;
  
 	DB_RESULT	*result;
 
