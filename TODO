@@ -1,10 +1,9 @@
 1.0beta10:
 
- - add &nbsp; to forms and other places
- - fix evaluation of trigger expressions
+ - test screenedit
+ - fix form 'edit actions'
  - fix pinger
  - finish src/zabbix_snmptrapper
- - fix PostgreSQL schema
  - improve screens (add maps, all in one table, etc)
 
  - links to Zabbix frontend in alert emails
