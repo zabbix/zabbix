@@ -43,15 +43,8 @@
 /*
 char    *interface;
 int     clock[60*15];
-int     sent[60*15];
-int     received[60*15];
-int     sent_load1;
-int     sent_load5;
-int     sent_load15;
-int     received_total;
-int     received_load1;
-int     received_load5;
-int     received_load15;
+float     sent[60*15];
+float     received[60*15];
 */
 
 
@@ -113,7 +106,8 @@ void	report_stat(int now)
 	int	time=0,
 		time1=0,
 		time5=0,
-		time15=0,
+		time15=0;
+	float
 		sent=0,
 		sent1=0,
 		sent5=0,
@@ -248,11 +242,11 @@ void	report_stat(int now)
 }
 
 
-void	add_values(int now,char *interface,int value_sent,int value_received)
+void	add_values(int now,char *interface,float value_sent,float value_received)
 {
 	int i,j;
 
-/*	printf("Add_values [%s] [%d] [%d]\n",interface,value_sent,value_received);*/
+/*	printf("Add_values [%s] [%f] [%f]\n",interface,value_sent,value_received);*/
 
 	for(i=0;i<128;i++)
 	{
@@ -285,7 +279,7 @@ void	collect_stat()
 	char	interface[MAX_STRING_LEN+1];
 	FILE	*file;
 	int	now;
-	int	received,sent;
+	float	received,sent;
 
 	/* Must be static */
 	static	int initialised=0;
@@ -324,18 +318,19 @@ void	collect_stat()
 		interface[j1]=0;
 		s=strtok(line,":");
 		j=0;
+/*		printf("Interface [%s]\n",interface);*/
 		while(s)
 		{
 			s = strtok(NULL," ");
 			if(j==0)
 			{
 /*				printf("Received [%s]\n",s);*/
-				received=atoi(s);
+				received=atof(s);
 			}
 			else if(j==8)
 			{
 /*				printf("Sent [%s]\n",s);*/
-				sent=atoi(s);
+				sent=atof(s);
 				add_values(now,interface,sent,received);
 			}
 			j++;
