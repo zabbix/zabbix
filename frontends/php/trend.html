@@ -93,11 +93,11 @@
 	{
 		$nodata=0;
 		if($max[$i]>$maxY) { $maxY=$max[$i]; }
-		if(($max[$i]<$minY)&&($count[$i]>0)) { $minY=$max[$i]; }
+		if(($min[$i]<$minY)&&($count[$i]>0)) { $minY=$min[$i]; }
 	}
 	$maxX=900;
 	$minX=0;
-//	echo "MIN/MAX:",$minX," - ",$maxX," - ",$minY," - ",$maxY,"<Br>";
+#	echo "MIN/MAX:",$minX," - ",$maxX," - ",$minY," - ",$maxY,"<Br>";
 
 	if(($minX!=$maxX)&&($minY!=$maxY))
 	{
