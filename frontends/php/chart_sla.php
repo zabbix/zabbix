@@ -43,8 +43,15 @@
 
 //	echo $problem," ",$ok;
 
-	ImageFilledRectangle($im,$sizeX-$sizeX*$problem/100-1,1,$sizeX-1,$sizeY-1,$darkred);
-	ImageLine($im,$sizeX*$service["goodsla"]/100,1,$sizeX*$service["goodsla"]/100,$sizeY-1,$yellow);
+// for test
+//	$problem=81;
+//	$service["goodsla"]=81;
+
+	$p=min(100-$problem,20);
+	$g=max($service["goodsla"]-80,0);
+
+	ImageFilledRectangle($im,$sizeX-$sizeX*$p/20,1,$sizeX-2,$sizeY-1,$darkred);
+	ImageLine($im,$sizeX*$g/20,1,$sizeX*$g/20,$sizeY-1,$yellow);
 
 	$s=sprintf("%2.2f%%",$ok);
 	ImageString($im, 2,1,1, $s , $white);
