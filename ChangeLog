@@ -1,5 +1,7 @@
 Changes for 1.0beta14:
 
+ - added escaping of 'special' characters before SQL insert statements
+ (Alexei)
  - fixed removal of sysmaps hosts and links when deleting item (Alexei)
  - fixed Use IP address in host definition form (Alexei)
  - fixed audio in Status of Triggers (Alexei)
