@@ -177,6 +177,7 @@ CREATE TABLE alerts (
   message		blob		DEFAULT '' NOT NULL,
   status		int(4)		DEFAULT '0' NOT NULL,
   retries		int(4)		DEFAULT '0' NOT NULL,
+  error			varchar(128)	DEFAULT '' NOT NULL,
   PRIMARY KEY (alertid),
   INDEX (actionid),
   KEY clock (clock),
@@ -272,6 +273,7 @@ CREATE TABLE hosts (
 -- If status=UNREACHABLE, host will not be checked until this time
 	disable_until	int(4)		DEFAULT '0' NOT NULL,
 	network_errors	int(4)		DEFAULT '0' NOT NULL,
+	error		varchar(128)	DEFAULT '' NOT NULL,
 	PRIMARY KEY	(hostid),
 	UNIQUE		(host),
 	KEY		(status)
@@ -312,6 +314,7 @@ CREATE TABLE items (
 	snmpv3_privpassphrase	varchar(64) DEFAULT '' NOT NULL,
 
 	formula		varchar(255) DEFAULT '0' NOT NULL,
+	error		varchar(128) DEFAULT '' NOT NULL,
 
 	PRIMARY KEY	(itemid),
 	UNIQUE		shortname (hostid,key_),

@@ -21,6 +21,6 @@
 #ifndef ZABBIX_EMAIL_H
 #define ZABBIX_EMAIL_H
 
-int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,char *mailsubject,char *mailbody);
+int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,char *mailsubject,char *mailbody, char *error, int max_error_len);
 
 #endif

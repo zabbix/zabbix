@@ -58,7 +58,7 @@ void	signal_handler2( int sig )
 }
 
 /* Send alert */
-int send_alert(DB_ALERT	*alert,DB_MEDIATYPE *mediatype)
+int send_alert(DB_ALERT	*alert,DB_MEDIATYPE *mediatype, char *error, int max_error_len)
 {
 	int res=FAIL;
 	struct	sigaction phan;
@@ -70,7 +70,8 @@ int send_alert(DB_ALERT	*alert,DB_MEDIATYPE *mediatype)
 
 	if(mediatype->type==ALERT_TYPE_EMAIL)
 	{
-		res = send_email(mediatype->smtp_server,mediatype->smtp_helo,mediatype->smtp_email,alert->sendto,alert->subject,alert->message);
+		res = send_email(mediatype->smtp_server,mediatype->smtp_helo,mediatype->smtp_email,alert->sendto,alert->subject,
+			alert->message, error, max_error_len);
 	}
 	else if(mediatype->type==ALERT_TYPE_EXEC)
 	{
@@ -101,6 +102,7 @@ int send_alert(DB_ALERT	*alert,DB_MEDIATYPE *mediatype)
 			if(-1 == execl(full_path,mediatype->exec_path,alert->sendto,alert->subject,alert->message,(char *)0))
 			{
 				zabbix_log( LOG_LEVEL_ERR, "Error executing [%s] [%m]", full_path);
+				snprintf(error,max_error_len-1,"Error executing [%s] [%s]", full_path, strerror(errno));
 				res = FAIL;
 			}
 			else
@@ -116,6 +118,7 @@ int send_alert(DB_ALERT	*alert,DB_MEDIATYPE *mediatype)
 	else
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Unsupported media type [%d] for alert ID [%d]", mediatype->type,alert->alertid);
+		snprintf(error,max_error_len-1,"Unsupported media type [%d]", mediatype->type);
 		res=FAIL;
 	}
 
@@ -131,6 +134,8 @@ int main_alerter_loop()
 #endif
 {
 	char	sql[MAX_STRING_LEN];
+	char	error[MAX_STRING_LEN];
+	char	error_esc[MAX_STRING_LEN];
 
 	int	i,res;
 
@@ -192,7 +197,7 @@ int main_alerter_loop()
 
 			/* Hardcoded value */
 			alarm(10);
-			res=send_alert(&alert,&mediatype);
+			res=send_alert(&alert,&mediatype,error,sizeof(error));
 			alarm(0);
 
 			if(res==SUCCEED)
@@ -204,7 +209,8 @@ int main_alerter_loop()
 			else
 			{
 				zabbix_log( LOG_LEVEL_ERR, "Error sending alert ID [%d]", alert.alertid);
-				snprintf(sql,sizeof(sql)-1,"update alerts set retries=retries+1 where alertid=%d", alert.alertid);
+				DBescape_string(error,error_esc,MAX_STRING_LEN);
+				snprintf(sql,sizeof(sql)-1,"update alerts set retries=retries+1,error='%s' where alertid=%d", error_esc, alert.alertid);
 #ifdef	ZABBIX_THREADS
 				DBexecute_thread(&database,sql);
 #else

@@ -52,7 +52,7 @@
 ?>
 
 <?php
-	show_table2_header_begin();
+	show_form_begin("tr_comments.comments");
 	echo S_COMMENTS;
 
 	show_table2_v_delimiter();

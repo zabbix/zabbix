@@ -75,16 +75,16 @@
 
 	if(!isset($_GET["start"]))
 	{
-		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries,ac.scope from alerts a,actions ac,media_type mt where a.actionid=ac.actionid and mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200 order by a.clock desc limit 200";
+		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries,ac.scope,a.error from alerts a,actions ac,media_type mt where a.actionid=ac.actionid and mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200 order by a.clock desc limit 200";
 	}
 	else
 	{
-		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries,ac.scope from alerts a,actions ac,media_type mt where a.actionid=ac.actionid and mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200-".$_GET["start"]." order by a.clock desc limit ".($_GET["start"]+500);
+		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries,ac.scope,a.error from alerts a,actions ac,media_type mt where a.actionid=ac.actionid and mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200-".$_GET["start"]." order by a.clock desc limit ".($_GET["start"]+500);
 	}
 	$result=DBselect($sql);
 
 	table_begin();
-	table_header(array(S_TIME, S_TYPE, S_STATUS, S_RECIPIENTS, S_SUBJECT, S_MESSAGE));
+	table_header(array(S_TIME, S_TYPE, S_STATUS, S_RECIPIENTS, S_SUBJECT, S_MESSAGE, S_ERROR));
 	$col=0;
 	$zzz=0;
 	while($row=DBfetch($result))
@@ -119,22 +119,31 @@
 		}
 		if($row["status"] == 1)
 		{
-			$status="<font color=\"00AA00\">".S_SENT."</font>";
+			$status=array("value"=>S_SENT,"class"=>"off");
 		}
 		else
 		{
-			$status="<font color=\"AA0000\">".S_NOT_SENT."</font>";
+			$status=array("value"=>S_NOT_SENT,"class"=>"on");
 		}
 		$sendto=htmlspecialchars($row["sendto"]);
 		$subject="<pre>".htmlspecialchars($row["subject"])."</pre>";
 		$message="<pre>".htmlspecialchars($row["message"])."</pre>";
+		if($row["error"] == "")
+		{
+			$error=array("value"=>"&nbsp;","class"=>"off");
+		}
+		else
+		{
+			$error=array("value"=>$row["error"],"class"=>"on");
+		}
 		table_row(array(
 			$time,
 			$row["description"],
 			$status,
 			$sendto,
 			$subject,
-			$message),
+			$message,
+			$error),
 			$col++);
 	}
 	if(DBnum_rows($result)==0)

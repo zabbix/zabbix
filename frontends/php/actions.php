@@ -249,7 +249,7 @@
 			$message=$message."---------End--------\n";
 		}
 	}
-	show_table2_header_begin();
+	show_form_begin("actions.action");
 	echo nbsp(S_NEW_ACTION);
 	$col=0;
 

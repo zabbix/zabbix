@@ -209,15 +209,15 @@
 
 <?php
 	table_begin();
-	table_header(array(S_ID,S_HOST,S_IP,S_PORT,S_STATUS,S_ACTIONS));
+	table_header(array(S_ID,S_HOST,S_IP,S_PORT,S_STATUS,S_ERROR,S_ACTIONS));
 
 	if(isset($_GET["groupid"]))
 	{
-		$sql="select h.hostid,h.host,h.port,h.status,h.useip,h.ip from hosts h,hosts_groups hg where hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid order by h.host";
+		$sql="select h.hostid,h.host,h.port,h.status,h.useip,h.ip,h.error from hosts h,hosts_groups hg where hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid order by h.host";
 	}
 	else
 	{
-		$sql="select h.hostid,h.host,h.port,h.status,h.useip,h.ip from hosts h order by h.host";
+		$sql="select h.hostid,h.host,h.port,h.status,h.useip,h.ip,h.error from hosts h order by h.host";
 	}
 	$result=DBselect($sql);
 
@@ -268,6 +268,14 @@
 			else
 				$status=S_UNKNOWN;
 		}
+		if($row["error"] == "")
+		{
+			$error=array("value"=>"&nbsp;","class"=>"off");
+		}
+		else
+		{
+			$error=array("value"=>$row["error"],"class"=>"on");
+		}
         	if(check_right("Host","U",$row["hostid"]))
 		{
 			if($row["status"] != HOST_STATUS_DELETED)
@@ -296,6 +304,7 @@
 			$ip,
 			$row["port"],
 			$status,
+			$error,
 			$actions
 			),$col++);
 	}
@@ -355,7 +364,7 @@
 
 
 	echo "<a name=\"form\"></a>";
-	show_table2_header_begin();
+	show_form_begin("hosts.host");
 	echo S_HOST;
 	$col=0;
 

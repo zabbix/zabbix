@@ -21,7 +21,7 @@
 
 #ifdef HAVE_SNMP
 /*int	get_value_SNMP(int version,double *result,char *result_str,DB_ITEM *item)*/
-int	get_value_snmp(double *result,char *result_str,DB_ITEM *item)
+int	get_value_snmp(double *result,char *result_str,DB_ITEM *item,char *error, int max_error_len)
 {
 
 	#define NEW_APPROACH
@@ -62,6 +62,7 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item)
 	else
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Error in get_value_SNMP. Wrong item type [%d]. Must be SNMP.", item->type);
+		snprintf(error,max_error_len-1,"Error in get_value_SNMP. Wrong item type [%d]. Must be SNMP.", item->type);
 		return FAIL;
 	}
 
@@ -113,6 +114,7 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item)
 		else
 		{
 			zabbix_log( LOG_LEVEL_ERR, "Unsupported SNMPv3 security level [%d]", item->snmpv3_securitylevel);
+			snprintf(error,max_error_len-1,"Unsupported SNMPv3 security level [%d]", item->snmpv3_securitylevel);
 			return FAIL;
 		}
 
@@ -133,12 +135,14 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item)
 				&session.securityAuthKeyLen) != SNMPERR_SUCCESS)
 		{
 			zabbix_log( LOG_LEVEL_ERR, "Error generating Ku from authentication pass phrase.");
+			snprintf(error,max_error_len-1,"Error generating Ku from authentication pass phrase.");
 			return FAIL;
 		}
 	}
 	else
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Error in get_value_SNMP. Unsupported session.version [%d]", session.version);
+		snprintf(error,max_error_len-1,"Error in get_value_SNMP. Unsupported session.version [%d]",(int)session.version);
 		return FAIL;
 	}
 
@@ -151,7 +155,8 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item)
 	if(ss == NULL)
 	{
 		SOCK_CLEANUP;
-		zabbix_log( LOG_LEVEL_WARNING, "Error: snmp_open()");
+		zabbix_log( LOG_LEVEL_WARNING, "Error doing snmp_open()");
+		snprintf(error,max_error_len-1,"Error doing snmp_open()");
 		return FAIL;
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP() 0.2");
@@ -207,8 +212,13 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item)
 			{
 				memcpy(result_str,vars->val.string,vars->val_len);
 				result_str[vars->val_len] = '\0';
-				if(item->type == 0)
+/*				if(item->type == 0)
 				{
+					ret = NOTSUPPORTED;
+				}*/
+				if(item->value_type != ITEM_VALUE_TYPE_STR)
+				{
+					snprintf(error,max_error_len-1,"Cannot store SNMP string value (ASN_OCTET_STR) in item having numeric type");
 					ret = NOTSUPPORTED;
 				}
 			}
@@ -216,14 +226,22 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item)
 			{
 				ip = vars->val.string;
 				snprintf(result_str,MAX_STRING_LEN-1,"%d.%d.%d.%d",ip[0],ip[1],ip[2],ip[3]);
-				if(item->type == 0)
+/*				if(item->type == 0)
 				{
+					ret = NOTSUPPORTED;
+				}*/
+				if(item->value_type != ITEM_VALUE_TYPE_STR)
+				{
+					snprintf(error,max_error_len-1,"Cannot store SNMP string value (ASN_IPADDRESS) in item having numeric type");
 					ret = NOTSUPPORTED;
 				}
 			}
 			else
 			{
-				zabbix_log( LOG_LEVEL_WARNING,"value #%d has unknow type", count++);
+/* count is not really used. Has to be removed */ 
+				count++;
+				zabbix_log(LOG_LEVEL_WARNING,"value #%d has unknow type",count);
+				snprintf(error,max_error_len-1,"value #%d has unknow type",count);
 				ret  = NOTSUPPORTED;
 			}
 		}
@@ -236,10 +254,12 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item)
 				snmp_errstring(response->errstat));
 			if(response->errstat == SNMP_ERR_NOSUCHNAME)
 			{
+				snprintf(error,max_error_len-1,"SNMP error [%s]", snmp_errstring(response->errstat));
 				ret=NOTSUPPORTED;
 			}
 			else
 			{
+				snprintf(error,max_error_len-1,"SNMP error [%s]", snmp_errstring(response->errstat));
 				ret=FAIL;
 			}
 		}
@@ -247,6 +267,7 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Timeout while connecting to [%s]",
 					session.peername);
+			snprintf(error,max_error_len-1,"Timeout while connecting to [%s]",session.peername);
 			snmp_sess_perror("snmpget", ss);
 			ret = NETWORK_ERROR;
 		}
@@ -254,6 +275,7 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Error [%d]",
 					status);
+			snprintf(error,max_error_len-1,"SNMP error [%d]",status);
 			snmp_sess_perror("snmpget", ss);
 			ret=FAIL;
 		}
