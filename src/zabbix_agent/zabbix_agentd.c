@@ -430,6 +430,8 @@ int	main(int argc, char **argv)
 			break;
 	}
 
+/* Must be before init_config() */
+	init_metrics();
 	init_config();
 	daemon_init();
 

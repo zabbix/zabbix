@@ -107,6 +107,8 @@ int	main()
 	signal( SIGTERM, signal_handler );
 	signal( SIGALRM, signal_handler );
 
+/* Must be before init_config() */
+	init_metrics();
 	init_config();
 
 /* Do not create debug files */
