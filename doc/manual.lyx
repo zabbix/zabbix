@@ -24,7 +24,7 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.07)
+Zabbix Reference Manual for version 1.0 (draft v1.08)
 \layout Author
 
 ALEXEI VLADISHEV
@@ -287,7 +287,12 @@ The latest version of the manual will always be available at
 \latex default 
  
 \family typewriter 
-http://zabbix.sourceforge.net
+
+\begin_inset LatexCommand \url{http://zabbix.sourceforge.net}
+
+\end_inset 
+
+
 \layout Subsection
 
 Main Goals and Principles of Zabbix Development
@@ -523,15 +528,16 @@ Installing Zabbix
 How to Get Zabbix
 \layout Standard
 
-Cgech the 
+Check the 
 \series bold 
 Zabbix
 \series default 
- Home Page (
-\family typewriter 
-http://zabbix.sourceforge.net
-\family default 
-) for information about the current version and for downloading instructions.
+ Home Page at 
+\begin_inset LatexCommand \url{http://zabbix.sourceforge.net}
+
+\end_inset 
+
+ for information about the current version and for downloading instructions.
 \layout Subsection
 
 Requirements
@@ -606,7 +612,11 @@ Zabbix
 Zabbix
 \series default 
  on PostgreSQL 6.5x with no luck.
- PostgreSQL crashes after one to three minutes of zabbix_suckerd running.
+ PostgreSQL crashes after one to three minutes of 
+\series bold 
+zabbix_suckerd
+\series default 
+ running.
  So, PostgreSQL version 7.0.2 or later is 
 \emph on 
 strongly
@@ -728,6 +738,9 @@ Zabbix
  However, to make the process more enjoyable, I would suggest you make a
  cup of tea (or coffee) for yourself.
  Ready? 
+\layout Subsubsection
+
+Server side
 \layout Enumerate
 
 Create the 
@@ -869,7 +882,17 @@ However, if you want to compile client binaries only, run:
 
 \family typewriter 
 \emph on 
-./configure make
+./configure 
+\newline 
+
+\family default 
+\emph default 
+Make everything:
+\family typewriter 
+\emph on 
+
+\newline 
+make
 \family default 
 
 \newline 
@@ -1130,12 +1153,12 @@ For small installations (up to ten monitored hosts), default parameters
 Zabbix
 \series default 
 .
- See section Performance Tuning for details.
+ See section Performance Tuning for more details.
  
 \newline 
 You may take 
 \emph on 
-misc/conf/zabbix_suckerd.conf 
+misc/conf/zabbix_trapperd.conf 
 \emph default 
 as example.
 \layout Enumerate
@@ -1285,6 +1308,231 @@ zabbix_agentd
 zabbix_agent
 \series default 
 !
+\layout Subsubsection
+
+Client side
+\layout Enumerate
+
+Create the Zabbix account.
+\newline 
+This is the user the agent will run as.
+ For production use you should create a dedicated unprivileged account ("zabbix"
+ is commonly used).
+ Zabbix agents has protection against running as root.
+\layout Enumerate
+
+Untar 
+\series bold 
+Zabbix
+\series default 
+ sources.
+\newline 
+On Linux, use command 
+\family typewriter 
+\emph on 
+tar -xvzf <zabbix.tar.gz>
+\family default 
+\emph default 
+.
+ On other systems, try 
+\family typewriter 
+\emph on 
+gunzip zabbix.tar.gz; tar xvf zabbix.tar
+\layout Enumerate
+
+Configure and compile the source code for your system
+\newline 
+The sources must be compiled for the client only.
+\newline 
+To configure the source for the client:
+\newline 
+You want to compile client binaries only:
+\newline 
+
+\family typewriter 
+\emph on 
+./configure
+\newline 
+
+\family default 
+\emph default 
+Build agent:
+\newline 
+
+\family typewriter 
+\emph on 
+make
+\family default 
+
+\newline 
+
+\emph default 
+Copy created binaries from 
+\emph on 
+bin/
+\emph default 
+ to 
+\emph on 
+/opt/zabbix/bin
+\emph default 
+ or any other directory 
+\newline 
+Other common directories are 
+\emph on 
+/usr/local/bin
+\emph default 
+ or 
+\emph on 
+/usr/local/zabbix/bin
+\emph default 
+.
+\layout Enumerate
+
+Configure 
+\emph on 
+/etc/services
+\newline 
+
+\emph default 
+The step is not real requirement.
+ However, it is recommended.
+ On the client (monitored) machines, add the following lines to 
+\emph on 
+/etc/services
+\emph default 
+:
+\newline 
+
+\family typewriter 
+\emph on 
+zabbix_agent 10000/tcp 
+\newline 
+zabbix_trap 10001/tcp 
+\layout Enumerate
+
+Configure 
+\emph on 
+/etc/inetd.conf
+\newline 
+
+\emph default 
+ If you plan to use 
+\series bold 
+zabbix_agent
+\series default 
+ instead of the 
+\emph on 
+recommended
+\emph default 
+ 
+\series bold 
+zabbix_agentd
+\series default 
+, the following line must be added:
+\newline 
+
+\family typewriter 
+\emph on 
+zabbix_agent stream tcp nowait.3600 zabbix /opt/zabbix/bin/zabbix_agent
+\layout Enumerate
+
+Restart 
+\series bold 
+inetd
+\newline 
+
+\family typewriter 
+\series default 
+\emph on 
+killall -HUP inetd
+\layout Enumerate
+
+Configure 
+\emph on 
+/etc/zabbix/zabbix_agent.conf
+\newline 
+
+\emph default 
+You need to configure this file for every host having 
+\series bold 
+zabbix_agent
+\series default 
+ installed.
+ The file should contain IP address of 
+\series bold 
+Zabbix
+\series default 
+ server.
+ Connections from other hosts will be denied.
+ 
+\emph on 
+Note
+\emph default 
+, that no end of line character should present in the file.
+\newline 
+You may take 
+\emph on 
+misc/conf/zabbix_agent.conf
+\emph default 
+ as example.
+\layout Enumerate
+
+Configure 
+\emph on 
+/etc/zabbix/zabbix_agentd.conf
+\newline 
+
+\emph default 
+You need to configure this file for every host having 
+\series bold 
+zabbix_agentd
+\series default 
+ installed.
+ The file should contain IP address of 
+\series bold 
+Zabbix
+\series default 
+ server.
+ Connections from other hosts will be denied.
+ You may take 
+\emph on 
+misc/conf/zabbix_agentd.conf
+\emph default 
+ as example.
+\layout Enumerate
+
+Run 
+\series bold 
+zabbix_agentd
+\series default 
+ on all monitored machines 
+\newline 
+
+\newline 
+
+\family typewriter 
+\emph on 
+/opt/zabbix/bin/zabbix_agentd
+\family default 
+
+\newline 
+
+\newline 
+
+\emph default 
+Not that you 
+\emph on 
+should not
+\emph default 
+ run 
+\series bold 
+zabbix_agentd
+\series default 
+ if you have chosen to use 
+\series bold 
+zabbix_agent
+\series default 
+!
 \layout Subsection
 
 Development Environment 
@@ -1320,10 +1568,18 @@ Zabbix
 General Procedure
 \layout Standard
 
-Go to the upgrades/dbpatches directory.
+Go to the 
+\shape italic 
+upgrades/dbpatches
+\shape default 
+ directory.
  In this directory are subdirectories named according to a version upgrade
  (e.g.
- 1.0alpha3_to_1.0alpha4).
+ 
+\shape italic 
+1.0alpha11_to_1.0beta1
+\shape default 
+).
  Enter the directory corresponding to your upgrade (if you are upgrading
  through multiple versions, you will need to apply the upgrades one at a
  time).
@@ -1335,7 +1591,7 @@ Go to the upgrades/dbpatches directory.
 
 \family typewriter 
 \emph on 
-cd mysql cat patch.sql |mysql zabbix -u<username> -p<password>
+cd mysql; cat patch.sql |mysql zabbix -u<username> -p<password>
 \layout Standard
 
 or
@@ -1344,7 +1600,7 @@ or
 
 \family typewriter 
 \emph on 
-cd postgresql cat patch.sql|psql -U <username> zabbix
+cd postgresql; cat patch.sql|psql -U <username> zabbix
 \newline 
 
 \layout Standard
@@ -1590,6 +1846,13 @@ Status of Triggers
 Added sort criteria for sorting at some forms
 \layout Itemize
 
+Character 
+\emph on 
+'.' 
+\emph default 
+can be used in definition of monitored parameters
+\layout Itemize
+
 IMPORTANT.
  Algorith for unreachble hosts changed.
  In case of network problems host will be disabled for the next 60 seconds
@@ -1601,7 +1864,11 @@ include/common.h
 \layout Itemize
 
 IMPORTANT.
- Name and format of configuration files for zabbix_agent(d) have been changed.
+ Name and format of configuration files for 
+\series bold 
+zabbix_agent(d)
+\series default 
+ have been changed.
  See 
 \shape italic 
 misc/conf/zabbix_agentd.conf
@@ -1614,8 +1881,32 @@ isc/conf/zabbix_agent.conf
 \layout Itemize
 
 IMPORTANT.
- Default number of forked zabbix_agentd was changed to 5 (previous value
- was 10).
+ Configuration files added for all 
+\series bold 
+Zabix
+\series default 
+ processes.
+ See 
+\emph on 
+misc/conv/ 
+\emph default 
+for examples.
+\layout Itemize
+
+IMPORTANT.
+ Default number of forked 
+\series bold 
+zabbix_agentd
+\series default 
+ was changed to 5.
+\layout Itemize
+
+IMPORTANT.
+ Default number of forked 
+\series bold 
+zabbix_trapperd
+\series default 
+ was changed to 5.
 \layout Subsection
 
 ChangeLog
@@ -1664,6 +1955,17 @@ Zabbix
 \series default 
 \latex no_latex 
  server.
+\layout Subsection
+
+Theory of operations
+\layout Standard
+
+
+\begin_inset Info
+Details !
+\end_inset 
+
+
 \layout Subsection
 
 Database
@@ -2833,6 +3135,19 @@ Value of
 t
 \latex no_latex 
 he processor load is 2.34.
+\layout Subsection
+
+Extending Zabbix agents
+\layout Standard
+
+Zabbix agents can be easily extended by using configuration parameter 
+\emph on 
+UserParameter.
+\begin_inset Info
+More information required
+\end_inset 
+
+
 \layout Section
 
 Zabbix Configuration
@@ -4048,7 +4363,7 @@ A simple useful expression might look like:
 \layout Standard
 
 
-\latex no_latex 
+\emph on 
 {<server>:<key>.<function>(<parameter>)}<operator><const>
 \layout Standard
 
@@ -4070,16 +4385,8 @@ Example 1:
 \layout Standard
 
 
-\latex no_latex 
-{sourceforge.net:
-\latex default 
-system[
-\latex no_latex 
-procload
-\latex default 
-]
-\latex no_latex 
-.last(0)}>5
+\emph on 
+{sourceforge.net:system[procload].last(0)}>5
 \layout Standard
 
 
@@ -4090,45 +4397,67 @@ procload
 
 
 \latex no_latex 
-'sourceforge.net:
+'
+\emph on 
 \latex default 
-system[
+sourceforge.net:system[procload]'
+\emph default 
 \latex no_latex 
-procload
-\latex default 
-]
-\latex no_latex 
-' gives a short name of monitored parameter.
+ gives a short name of monitored parameter.
 
 \latex default 
  
 \latex no_latex 
-It specifies that the server is 'sourceforge.net' and the key being monitored
- is
+It specifies that the server is 
+\emph on 
+\latex default 
+'sourceforge.net'
+\emph default 
+\latex no_latex 
+ and the key being monitored is
 \latex default 
  
 \latex no_latex 
 '
+\emph on 
 \latex default 
-system[
-\latex no_latex 
-procload
-\latex default 
-]
+system[procload]
+\emph default 
 \latex no_latex 
 '.
 
 \latex default 
  
 \latex no_latex 
-By using the function 'last(),' we are specifying we are referring to the
- most recent value.
+By using the function '
+\emph on 
+\latex default 
+last()
+\emph default 
+\latex no_latex 
+'
+\latex default 
+,
+\latex no_latex 
+ we are specifying we are referring to the most recent value.
 
 \latex default 
  
 \latex no_latex 
-Finally, '>5' means that the trigger is true whenever the most recent procload
- measurement from sourceforge.net is greater than 5.
+Finally, '
+\emph on 
+\latex default 
+>5
+\emph default 
+\latex no_latex 
+' means that the trigger is true whenever the most recent procload measurement
+ from 
+\emph on 
+\latex default 
+sourceforge.net
+\emph default 
+\latex no_latex 
+ is greater than 5.
 \layout Standard
 
 
@@ -4160,7 +4489,7 @@ More complex example:
 \layout Standard
 
 
-\latex no_latex 
+\emph on 
 ({sourceforge.net:system[procload].last(0)}>5)|({sourceforge.net:system[procload].mi
 n(600)}>2)
 \layout Standard
@@ -4206,7 +4535,7 @@ Use of diff function.
 \layout Standard
 
 
-\latex no_latex 
+\emph on 
 ({sourceforge.net:cksum[/etc/passwd].diff(0)})>0
 \layout Standard
 
@@ -4267,12 +4596,24 @@ Flexible parameter is parameter which accepts argument.
 \layout Standard
 
 For example, 
-\latex no_latex 
+\emph on 
 diskfree[*]
-\latex default 
+\emph default 
  is flexible parameter.
- '*' is any string that will be passed as argument of the parameter.
- diskfree[/], diskfree[/opt] - correct definitions.
+ '
+\emph on 
+*
+\emph default 
+' is any string that will be passed as argument of the parameter.
+ 
+\emph on 
+diskfree[/]
+\emph default 
+, 
+\emph on 
+diskfree[/opt
+\emph default 
+] - correct definitions.
 \layout Subsubsection
 
 List of supported parameters
@@ -4338,8 +4679,11 @@ xample:
 \layout Standard
 
 
+\emph on 
+diskfree[/]
+\emph default 
 \latex no_latex 
-diskfree[/] - returns free disk space for root volume.
+ - returns free disk space for root volume.
 \layout Description
 
 
@@ -4357,8 +4701,11 @@ Example:
 \layout Standard
 
 
+\emph on 
+inodefree[/var]
+\emph default 
 \latex no_latex 
-inodefree[/var] - returns number of free inodes for volume /var
+ - returns number of free inodes for volume /var
 \layout Description
 
 
@@ -4375,7 +4722,7 @@ Check sum of given file.
 Example:
 \latex default 
  
-\latex no_latex 
+\emph on 
 cksum[/etc/passwd]
 \layout Description
 
@@ -4412,7 +4759,7 @@ E
 xample:
 \latex default 
  
-\latex no_latex 
+\emph on 
 proc_cnt[inetd]
 \layout Description
 
@@ -4695,7 +5042,13 @@ Result: 0 - can connect
 
 
 \latex no_latex 
-Example: Use check_port[80] to check either WEB server accepts connections.
+Example: Use c
+\emph on 
+\latex default 
+heck_port[80]
+\emph default 
+\latex no_latex 
+ to check either WEB server accepts connections.
 \layout Subsection
 
 Supported Parameters by Platform
@@ -10286,7 +10639,7 @@ The table contains list of triggers.
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="100mm" special="">
 <row topline="true" bottomline="true" newpage="false">
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
@@ -10434,7 +10787,7 @@ istrue
 int
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -11065,7 +11418,7 @@ The table contains sample list of triggers for each template item.
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
-<column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="100mm" special="">
 <row topline="true" bottomline="true" newpage="false">
 <cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
@@ -11187,7 +11540,7 @@ expression
 varchar
 \end_inset 
 </cell>
-<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
 \layout Standard
@@ -11493,6 +11846,9 @@ SysOrb
 HP OpenView
 \layout Itemize
 
+WhatsUp Gold
+\layout Itemize
+
 ...
 \layout Section
 
@@ -11585,6 +11941,14 @@ Status of Triggers
 \end_inset 
 
 
+\layout Itemize
+
+
+\noun on 
+OLIVER SIEGMAR
+\layout Standard
+
+Fixes in SQL statements of WEB frontend.
 \layout Subsection
 
 Supporters to Zabbix
@@ -13874,4 +14238,13 @@ PostgreSQL User's Guide
 \bibitem {key-3}
 
 PHP Manual
+\layout Bibliography
+\bibitem {key-4}
+
+The Zabbix home page at 
+\begin_inset LatexCommand \url{http://zabbix.sourceforge.net}
+
+\end_inset 
+
+
 \the_end
