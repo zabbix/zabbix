@@ -146,6 +146,36 @@ void	process_child(int sockfd)
 
 int	tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
 {
+	int			sockfd;
+	struct sockaddr_in	serv_addr;
+
+	if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+	{
+		syslog( LOG_CRIT, "socket()");
+		exit(1);
+	}
+
+	bzero((char *) &serv_addr, sizeof(serv_addr));
+	serv_addr.sin_family      = AF_INET;
+	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	serv_addr.sin_port        = htons(10000);
+
+	if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
+	{
+		syslog( LOG_CRIT, "bind()");
+		exit(1);
+	}
+
+	listen(sockfd, LISTENQ);
+
+	*addrlenp = sizeof(serv_addr);
+
+	return	sockfd;
+}
+
+/*
+int	tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
+{
 	int		listenfd, n;
 	const int	on=1;
 	struct addrinfo	hints, *res, *ressave;
@@ -196,6 +226,7 @@ int	tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
 
 	return	(listenfd);
 }
+*/
 
 void	child_main(int i,int listenfd, int addrlen)
 {
