@@ -5,8 +5,9 @@
 INTERFACE
 {
 	char    *interface;
-	int	sent_total_clock[60*15];
-	int	sent_total_values[60*15];
+	int	clock[60*15];
+	int	sent[60*15];
+	int	received[60*15];
 	int	sent_load1;
 	int	sent_load5;
 	int	sent_load15;
