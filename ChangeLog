@@ -1,5 +1,6 @@
 Changes for 1.0beta9:
 
+ - fixed statistics of bounced interfaces (Alexei)
  - added support for zabbix[items], zabbix[history] (Alexei)
  - new item type: internal (Alexei)
  - play disaster-on.wav if disaster trigger appers (Alexei)
