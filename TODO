@@ -1,7 +1,5 @@
 1.0beta14:
 
- - start&end time in time navigation
-
  - preserve selected host group between different screens (trigger maintenance, host maintenance)
  - add zabbix[unixtime] and lastupdate() and tick() to get rid of nodata()
  - check return code for alert scripts
