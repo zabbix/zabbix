@@ -143,7 +143,6 @@
 			echo "<TR>";
 	}
 	table_end();
-	echo "<br>";
 ?>
 
 <?php
@@ -292,7 +291,6 @@
 ?>
 
 <?php
-	echo "<br>";
 	insert_hostgroups_form($_GET["groupid"]);
 ?>
 
@@ -337,7 +335,6 @@
 	}
 
 
-	echo "<br>";
 	echo "<a name=\"form\"></a>";
 	show_table2_header_begin();
 	echo S_HOST;

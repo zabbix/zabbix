@@ -851,7 +851,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 			$color="#223344";
 		}
-		echo "<center>";
+		echo "<p align=center>";
 //		echo "<font size=+1 color='$color'>";
 		echo "<font color='$color'>";
 		if($ERROR_MSG=="")
@@ -863,7 +863,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			echo "<b>[$msg. $ERROR_MSG]</b>";
 		}
 		echo "</font>";
-		echo "</center><br>";
+		echo "</p>";
 	}
 
 	function	show_message($msg)
@@ -3761,6 +3761,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "</tr>";
 		cr();
 		echo "</table>";
+		echo "</p>";
 		cr();
 	}
 

@@ -198,6 +198,7 @@
 	define("S_CANNOT_UPDATE_GRAPH",			"Cannot update graph");
 	define("S_GRAPH_DELETED",			"Graph deleted");
 	define("S_CANNOT_DELETE_GRAPH",			"Cannot delete graph");
+	define("S_CANNOT_ADD_GRAPH",			"Cannot add graph");
 	define("S_ID",					"Id");
 	define("S_NO_GRAPHS_DEFINED",			"No graphs defined");
 	define("S_DELETE_GRAPH_Q",			"Delete graph?");
