@@ -12,6 +12,14 @@
 		$row=DBfetch($result);
 		return $row["cnt"]; 
 	}
+	
+	function	get_action_count_by_triggerid($triggerid)
+	{
+		$sql="select count(*) as cnt from actions where triggerid=$triggerid";
+		$result=DBselect($sql);
+		$row=DBfetch($result);
+		return $row["cnt"]; 
+	}
 
 	function	check_right($right,$permission,$id)
 	{
