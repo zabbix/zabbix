@@ -20,7 +20,7 @@
 #ifndef ZABBIX_INTERFACES_H
 #define ZABBIX_INTERFACES_H
 
-#define	MAX_INTERFACE	8
+#define	MAX_INTERFACE	16
 
 #define INTERFACE struct interface_type
 INTERFACE
