@@ -21,6 +21,7 @@
 <?php
 	include_once 	"include/defines.inc.php";
 	include_once 	"include/db.inc.php";
+	include_once 	"include/local_en.inc.php";
 
 	# Insert form for User
 	function	insert_user_form($userid)
@@ -46,7 +47,7 @@
 		}
 
 		show_table2_header_begin();
-		echo "User";
+		echo S_USER;
 
 		show_table2_v_delimiter();
 		echo "<form method=\"get\" action=\"users.php\">";
@@ -54,32 +55,32 @@
 		{
 			echo "<input class=\"biginput\" name=\"userid\" type=\"hidden\" value=\"$userid\" size=8>";
 		}
-		echo "Alias";
+		echo S_ALIAS;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"alias\" value=\"$alias\" size=20>";
 
 		show_table2_v_delimiter();
-		echo "Name";
+		echo S_NAME;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=20>";
 
 		show_table2_v_delimiter();
-		echo "Surname";
+		echo S_SURNAME;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"surname\" value=\"$surname\" size=20>";
 
 		show_table2_v_delimiter();
-		echo "Password";
+		echo S_PASSWORD;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" type=\"password\" name=\"password1\" value=\"$password\" size=20>";
 
 		show_table2_v_delimiter();
-		echo nbsp("Password (once again)");
+		echo nbsp(S_PASSWORD_ONCE_AGAIN);
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" type=\"password\" name=\"password2\" value=\"$password\" size=20>";
 
 		show_table2_v_delimiter();
-		echo "URL (after login)";
+		echo S_URL_AFTER_LOGIN;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"url\" value=\"$url\" size=50>";
 
@@ -145,7 +146,7 @@
 		echo "<br>";
 
 		show_table2_header_begin();
-		echo "Item";
+		echo S_ITEM;
  
 		show_table2_v_delimiter();
 		echo "<form method=\"get\" action=\"items.php\">";
@@ -153,12 +154,12 @@
 		{
 			echo "<input class=\"biginput\" name=\"itemid\" type=hidden value=".$_GET["itemid"].">";
 		}
-		echo "Description";
+		echo S_DESCRIPTION;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"description\" value=\"$description\"size=40>";
 
 		show_table2_v_delimiter();
-		echo "Host";
+		echo S_HOST;
 		show_table2_h_delimiter();
 		echo "<select class=\"biginput\" name=\"hostid\" value=\"3\">";
 	        $result=DBselect("select hostid,host from hosts order by host");
@@ -178,7 +179,7 @@
 		echo "</select>";
 
 		show_table2_v_delimiter();
-		echo "Type";
+		echo S_TYPE;
 		show_table2_h_delimiter();
 		echo "<SELECT class=\"biginput\" NAME=\"type\" value=\"$type\" size=\"1\" onChange=\"submit()\">";
 		echo "<OPTION VALUE=\"0\"";
@@ -204,17 +205,17 @@
 		if(($type==1)||($type==4))
 		{ 
 			show_table2_v_delimiter();
-			echo nbsp("SNMP community");
+			echo nbsp(S_SNMP_COMMUNITY);
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"snmp_community\" value=\"$snmp_community\" size=16>";
 
 			show_table2_v_delimiter();
-			echo nbsp("SNMP OID");
+			echo nbsp(S_SNMP_OID);
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"snmp_oid\" value=\"$snmp_oid\" size=40>";
 
 			show_table2_v_delimiter();
-			echo nbsp("SNMP port");
+			echo nbsp(S_SNMP_PORT);
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"snmp_port\" value=\"$snmp_port\" size=5>";
 		}
@@ -226,17 +227,17 @@
 		}
 
 		show_table2_v_delimiter();
-		echo "Key";
+		echo S_KEY;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"key\" value=\"$key\" size=40>";
 
 		show_table2_v_delimiter();
-		echo "Units";
+		echo S_UNITS;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"units\" value=\"$units\" size=10>";
 
 		show_table2_v_delimiter();
-		echo "Multiplier";
+		echo S_MULTIPLIER;
 		show_table2_h_delimiter();
 		echo "<SELECT class=\"biginput\" NAME=\"multiplier\" value=\"$multiplier\" size=\"1\">";
 		echo "<OPTION VALUE=\"0\"";
@@ -256,7 +257,7 @@
 		if($type!=2)
 		{
 			show_table2_v_delimiter();
-			echo nbsp("Update interval (in sec)");
+			echo nbsp(S_UPDATE_INTERVAL_IN_SEC);
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"delay\" value=\"$delay\" size=5>";
 		}
@@ -266,58 +267,58 @@
 		}
 
 		show_table2_v_delimiter();
-		echo nbsp("Keep history (in days)");
+		echo nbsp(S_KEEP_HISTORY_IN_DAYS);
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"history\" value=\"$history\" size=8>";
 
 		show_table2_v_delimiter();
-		echo nbsp("Keep trends (in days)");
+		echo nbsp(S_KEEP_TRENDS_IN_DAYS);
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"trends\" value=\"$trends\" size=8>";
 
 		show_table2_v_delimiter();
-		echo "Status";
+		echo S_STATUS;
 		show_table2_h_delimiter();
 		echo "<SELECT class=\"biginput\" NAME=\"status\" value=\"$status\" size=\"1\">";
 		echo "<OPTION VALUE=\"0\"";
 		if($status==0) echo "SELECTED";
-		echo ">Monitored";
+		echo ">".S_MONITORED;
 		echo "<OPTION VALUE=\"1\"";
 		if($status==1) echo "SELECTED";
-		echo ">Disabled";
+		echo ">".S_DISABLED;
 #		echo "<OPTION VALUE=\"2\"";
 #		if($status==2) echo "SELECTED";
 #		echo ">Trapper";
 		echo "<OPTION VALUE=\"3\"";
 		if($status==3) echo "SELECTED";
-		echo ">Not supported";
+		echo ">".S_NOT_SUPPORTED;
 		echo "</SELECT>";
 
 		show_table2_v_delimiter();
-		echo nbsp("Type of information");
+		echo nbsp(S_TYPE_OF_INFORMATION);
 		show_table2_h_delimiter();
 		echo "<SELECT class=\"biginput\" NAME=\"value_type\" value=\"$value_type\" size=\"1\">";
 		echo "<OPTION VALUE=\"0\"";
 		if($value_type==0) echo "SELECTED";
-		echo ">Numeric";
+		echo ">".S_NUMERIC;
 		echo "<OPTION VALUE=\"1\"";
 		if($value_type==1) echo "SELECTED";
-		echo ">Character";
+		echo ">".S_CHARACTER;
 		echo "</SELECT>";
 
 		show_table2_v_delimiter();
-		echo nbsp("Store value");
+		echo nbsp(S_STORE_VALUE);
 		show_table2_h_delimiter();
 		echo "<SELECT class=\"biginput\" NAME=\"delta\" value=\"$delta\" size=\"1\">";
-		echo "<OPTION VALUE=\"0\" "; if($delta==0) echo "SELECTED"; echo ">As is";
-		echo "<OPTION VALUE=\"1\" "; if($delta==1) echo "SELECTED"; echo ">Delta (speed per second)";
-		echo "<OPTION VALUE=\"2\" "; if($delta==2) echo "SELECTED"; echo ">Delta (simple change)";
+		echo "<OPTION VALUE=\"0\" "; if($delta==0) echo "SELECTED"; echo ">".S_AS_IS;
+		echo "<OPTION VALUE=\"1\" "; if($delta==1) echo "SELECTED"; echo ">".S_DELTA_SPEED_PER_SECOND;
+		echo "<OPTION VALUE=\"2\" "; if($delta==2) echo "SELECTED"; echo ">".S_DELTA_SIMPLE_CHANGE;
 		echo "</SELECT>";
 
 		if($type==2)
 		{
 			show_table2_v_delimiter();
-			echo nbsp("Allowed hosts");
+			echo nbsp(S_ALLOWED_HOSTS);
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"trapper_hosts\" value=\"$trapper_hosts\" size=40>";
 		}
@@ -355,7 +356,7 @@
 		}
 
 		show_table2_header_begin();
-		echo "Host group";
+		echo S_HOST_GROUP;
 
 		show_table2_v_delimiter();
 		echo "<form method=\"get\" action=\"hosts.php\">";
@@ -363,12 +364,12 @@
 		{
 			echo "<input name=\"groupid\" type=\"hidden\" value=\"".$_GET["groupid"]."\" size=8>";
 		}
-		echo "Group name";
+		echo S_GROUP_NAME;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=30>";
 
 		show_table2_v_delimiter();
-		echo "Hosts";
+		echo S_HOSTS;
 		show_table2_h_delimiter();
 		echo "<select multiple class=\"biginput\" name=\"hosts[]\" size=\"5\">";
 		$result=DBselect("select distinct hostid,host from hosts order by host");
@@ -423,7 +424,7 @@
 		}
 
 		show_table2_header_begin();
-		echo "User group";
+		echo S_USER_GROUP;
 
 		show_table2_v_delimiter();
 		echo "<form method=\"get\" action=\"users.php\">";
@@ -431,12 +432,12 @@
 		{
 			echo "<input name=\"usrgrpid\" type=\"hidden\" value=\"$usrgrpid\" size=8>";
 		}
-		echo "Group name";
+		echo S_GROUP_NAME;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=30>";
 
 		show_table2_v_delimiter();
-		echo "Users";
+		echo S_USERS;
 		show_table2_h_delimiter();
 		echo "<select multiple class=\"biginput\" name=\"users[]\" size=\"5\">";
 		$result=DBselect("select distinct userid,alias from users order by alias");
@@ -488,7 +489,7 @@
 		{
 			echo "<input name=\"userid\" type=\"hidden\" value=\"$userid\" size=8>";
 		}
-		echo "Resource";
+		echo S_RESOURCE;
 		show_table2_h_delimiter();
 		echo "<select class=\"biginput\" name=\"right\">";
 		echo "<option value=\"Configuration of Zabbix\">Configuration of Zabbix";
@@ -504,7 +505,7 @@
 		echo "</select>";
 
 		show_table2_v_delimiter();
-		echo "Permission";
+		echo S_PERMISSION;
 		show_table2_h_delimiter();
 		echo "<select class=\"biginput\" name=\"permission\">";
 		echo "<option value=\"R\">Read-only";
