@@ -35,7 +35,8 @@ HANDLE eventShutdown;
 char confFile[MAX_PATH]="C:\\zabbix_agentd.conf";
 char logFile[MAX_PATH]="C:\\zabbix_agentd.log";
 WORD confListenPort=10000;
-DWORD confServerAddr=0;
+DWORD confServerAddr[MAX_SERVERS];
+DWORD confServerCount=0;
 DWORD confTimeout=3000;    // 3 seconds default timeout
 DWORD confMaxProcTime=100; // 100 milliseconds is default acceptable collector sample processing time
 
