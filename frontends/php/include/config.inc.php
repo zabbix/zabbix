@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2000,2001,2002,2003 Alexei Vladishev
+** Copyright (C) 2000,2001,2002,2003,2004 Alexei Vladishev
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -4216,7 +4216,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<td bgcolor=\"#000000\">";
 		echo "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\" width=100% bgcolor=\"#666666\">";
 		echo "<tr><td align=center>";
-		echo "<a href=\"http://www.zabbix.org\">ZABBIX</a> Copyright 2000-2003 by <a href=\"mailto:alex@gobbo.caves.lv\">Alexei Vladishev</a>";
+		echo "<a href=\"http://www.zabbix.org\">ZABBIX</a> Copyright 2000-2004 by <a href=\"mailto:alex@gobbo.caves.lv\">Alexei Vladishev</a>";
 		echo "</td>";
 		echo "<td align=right width=15%>";
 		echo "| Connected as ".$USER_DETAILS["alias"];
