@@ -161,10 +161,10 @@
 
 		function drawSmallRectangle()
 		{
-			ImageDashedLine($this->im,$this->shiftX+1,$this->shiftY,$this->shiftX+1,$this->sizeY+$this->shiftY,$this->colors["Black"]);
-			ImageDashedLine($this->im,$this->shiftX+1,$this->shiftY,$this->shiftX+$this->sizeX,$this->shiftY,$this->colors["Black"]);
-			ImageDashedLine($this->im,$this->shiftX+$this->sizeX,$this->shiftY,$this->shiftX+$this->sizeX,$this->sizeY+$this->shiftY,$this->colors["Black"]);
-			ImageDashedLine($this->im,$this->shiftX+1,$this->shiftY+$this->sizeY,$this->shiftX+$this->sizeX,$this->sizeY+$this->shiftY,$this->colors["Black"]);
+			DashedLine($this->im,$this->shiftX+1,$this->shiftY,$this->shiftX+1,$this->sizeY+$this->shiftY,$this->colors["Black"]);
+			DashedLine($this->im,$this->shiftX+1,$this->shiftY,$this->shiftX+$this->sizeX,$this->shiftY,$this->colors["Black"]);
+			DashedLine($this->im,$this->shiftX+$this->sizeX,$this->shiftY,$this->shiftX+$this->sizeX,$this->sizeY+$this->shiftY,$this->colors["Black"]);
+			DashedLine($this->im,$this->shiftX+1,$this->shiftY+$this->sizeY,$this->shiftX+$this->sizeX,$this->sizeY+$this->shiftY,$this->colors["Black"]);
 		}
 
 		function drawRectangle()
@@ -200,12 +200,12 @@
 			$this->drawSmallRectangle();
 			for($i=1;$i<=5;$i++)
 			{
-				ImageDashedLine($this->im,$this->shiftX,$i*$this->sizeY/6+$this->shiftY,$this->sizeX+$this->shiftX,$i*$this->sizeY/6+$this->shiftY,$this->colors["Gray"]);
+				DashedLine($this->im,$this->shiftX,$i*$this->sizeY/6+$this->shiftY,$this->sizeX+$this->shiftX,$i*$this->sizeY/6+$this->shiftY,$this->colors["Gray"]);
 			}
 		
 			for($i=1;$i<=23;$i++)
 			{
-				ImageDashedLine($this->im,$i*$this->sizeX/24+$this->shiftX,$this->shiftY,$i*$this->sizeX/24+$this->shiftX,$this->sizeY+$this->shiftY,$this->colors["Gray"]);
+				DashedLine($this->im,$i*$this->sizeX/24+$this->shiftX,$this->shiftY,$i*$this->sizeX/24+$this->shiftX,$this->sizeY+$this->shiftY,$this->colors["Gray"]);
 			}
 
 // Some data exists, so draw time line

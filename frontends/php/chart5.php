@@ -129,13 +129,13 @@
 
 	for($i=0;$i<=$sizeY;$i+=$sizeY/10)
 	{
-		ImageDashedLine($im,$shiftX,$i+$shiftYup,$sizeX+$shiftX,$i+$shiftYup,$gray);
+		DashedLine($im,$shiftX,$i+$shiftYup,$sizeX+$shiftX,$i+$shiftYup,$gray);
 	}
 
 	$j=0;
 	for($i=0;$i<=$sizeX;$i+=$sizeX/52)
 	{
-		ImageDashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
+		DashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
 		$period_start=$start+7*24*3600*$j;
 		ImageStringUp($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, date("d.M",$period_start) , $black);
 		$j++;

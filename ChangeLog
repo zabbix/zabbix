@@ -1,5 +1,6 @@
 Changes for 1.0beta11:
 
+ - fix for dashed lines under some broken GD (Alexei)
  - http://zabbix.sf.net was changed to http://www.zabbix.org
  (Alexei)
  - support of delta flag in item definition (Alexei)

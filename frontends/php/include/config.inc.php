@@ -4424,4 +4424,24 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return $map;
 	}
 
+/* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
+	if(function_exists("imagesetstyle"))
+	{
+		function DashedLine($image,$x1,$y1,$x2,$y2,$color)
+		{
+// Style for dashed lines
+//			$style = array($color, $color, $color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
+			$style = array($color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
+			ImageSetStyle($image, $style);
+			ImageLine($image,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
+		}
+	}
+	else
+	{
+		function DashedLine($image,$x1,$y1,$x2,$y2,$color)
+		{
+			ImageDashedLine($image,$x1,$y1,$x2,$y2,$color);
+		}
+	}
+
 ?>
