@@ -4561,7 +4561,7 @@ echo "</head>";
 					{
 						$url="tr_status.php?hostid=$hostid&noactions=true&onlytrue=true&compact=true";
 					}
-					$map=$map."\n<area shape=rect coords=$x,$y,".($x+$sizex).",".($y+$sizey)." href=\"$url\" alt=\"$host\">";
+					$map=$map."\n<area shape=rect coords=$x,$y,".($x+$sizex).",".($y+$sizey)." href=\"$url\" alt=\"Host: $host Label: $label\">";
 				}
 
 /*				if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
