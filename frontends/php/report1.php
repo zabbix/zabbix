@@ -36,18 +36,12 @@
 
 	$col=0;
 	$str=array("value"=>S_NO,"class"=>"on");
-	if( (exec("ps -ef|grep zabbix_suckerd|grep -v grep|wc -l")>0) || (exec("ps -ax|grep zabbix_suckerd|grep -v grep|wc -l")>0) )
+	if( (exec("ps -ef|grep zabbix_server|grep -v grep|wc -l")>0) || (exec("ps -ax|grep zabbix_server|grep -v grep|wc -l")>0) )
 	{
 		$str=array("value"=>S_YES,"class"=>"off");
 	}
-	table_row(array(S_ZABBIX_SUCKERD_IS_RUNNING,$str),$col++);
+	table_row(array(S_ZABBIX_SERVER_IS_RUNNING,$str),$col++);
 
-	$str=array("value"=>S_NO,"class"=>"on");
-	if( (exec("ps -ef|grep zabbix_trapperd|grep -v grep|wc -l")>0) || (exec("ps -ax|grep zabbix_trapperd|grep -v grep|wc -l")>0) )
-	{
-		$str=array("value"=>S_YES,"class"=>"off");
-	}
-	table_row(array(S_ZABBIX_TRAPPERD_IS_RUNNING,$str),$col++);
 	table_row(array(S_NUMBER_OF_VALUES_STORED,$stats["history_count"]),$col++);
 	table_row(array(S_NUMBER_OF_TRENDS_STORED,$stats["trends_count"]),$col++);
 	table_row(array(S_NUMBER_OF_ALARMS,$stats["alarms_count"]),$col++);
