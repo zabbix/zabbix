@@ -15,6 +15,7 @@ AC_CHECK_LIB(crypto, main)
 AC_CHECK_LIB(snmp, main, LIBS="-lsnmp $LIBS")
 AC_CHECK_LIB(socket, main)
 AC_CHECK_LIB(nsl, main)
+AC_CHECK_LIB(z, main)
 
 dnl Checks for header files.
 AC_HEADER_STDC
