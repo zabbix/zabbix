@@ -37,6 +37,9 @@
 /* Define if sys/vmmeter.h defines struct vmtotal*/
 #undef HAVE_SYS_VMMETER_VMTOTAL
 
+/* Define if structure sysinfo has mem_unit */
+#undef HAVE_SYSINFO_MEM_UNIT
+
 /* Define if structure sysinfo has bufferram */
 #undef HAVE_SYSINFO_BUFFERRAM
 

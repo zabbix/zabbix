@@ -60,7 +60,7 @@ int create_host_file(void)
 	DB_HOST	host;
 	DB_RESULT	*result;
 
-	zabbix_log( LOG_LEVEL_ERR, "In create_host_file()");
+	zabbix_log( LOG_LEVEL_DEBUG, "In create_host_file()");
 
 	f = fopen("/tmp/zabbix_suckerd.pinger", "w");
 
@@ -103,7 +103,7 @@ int	do_ping(void)
 	FILE	*f;
 	static	char	c[MAX_STRING_LEN+1];
 
-	zabbix_log( LOG_LEVEL_ERR, "In do_ping()");
+	zabbix_log( LOG_LEVEL_DEBUG, "In do_ping()");
 
 	f=popen("cat /tmp/zabbix_suckerd.pinger|/usr/sbin/fping|cut -f1 -d' '","r");
 	if(f==0)

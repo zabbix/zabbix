@@ -1,5 +1,8 @@
 Changes for 1.0beta10:
 
+ - fixed sysinfo() result. Multiplication to mem_unit required (Alexei)
+ - better reporting in case of different startup errors (Alexei)
+ - added include/pid.c and include/pid.h (Alexei)
  - PostreSQL related fixes (Alexei)
  - added src/zabbix_snmptrap (Alexei)
  - fixed support of user-defined height of graphs (Alexei)
