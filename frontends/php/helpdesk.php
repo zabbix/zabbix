@@ -52,7 +52,7 @@
 	echo "<TABLE WIDTH=100% BORDER=0 align=center BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR>";
 	echo "<TD WIDTH=10%><b>Registered at</b></TD>";
-	echo "<TD WIDTH=10%><b>Priority</b></TD>";
+	echo "<TD WIDTH=10%><b>Severity</b></TD>";
 	echo "<TD WIDTH=10%><b>Category</b></TD>";
 	echo "<TD WIDTH=10%><b>Description</b></TD>";
 	echo "<TD WIDTH=5%><b>Status</b></TD>";

@@ -3072,7 +3072,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<input name=\"description\" value=\"$description\" size=70>";
 
 		show_table2_v_delimiter();
-		echo "Priority";
+		echo "Severity";
 		show_table2_h_delimiter();
 		echo "<SELECT NAME=\"priority\" size=\"1\">";
 		echo "<OPTION VALUE=\"0\" "; if($priority==0) echo "SELECTED"; echo ">Not classified";
@@ -3155,7 +3155,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<input name=\"expression\" value=\"$expression\" size=70>";
 
 		show_table2_v_delimiter();
-		echo "Priority";
+		echo "Severity";
 		show_table2_h_delimiter();
 		echo "<SELECT NAME=\"priority\" size=\"1\">";
 		echo "<OPTION VALUE=\"0\" "; if($priority==0) echo "SELECTED"; echo ">Not classified";

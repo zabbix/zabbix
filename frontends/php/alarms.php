@@ -34,7 +34,7 @@
 
 		$Expression=$trigger["expression"];
 		$Description=$trigger["description"];
-		$Priority=$trigger["priority"];
+//		$Priority=$trigger["priority"];
 	}
 ?>
 
