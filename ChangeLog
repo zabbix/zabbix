@@ -1,5 +1,6 @@
 Changes for 1.0beta11:
 
+ - support for operator '#', not equal. (Alexei)
  - support for functions date() and time() (Alexei)
  - fix of /proc/stat interpretation in diskdevice.c (Alexei)
  - support of system[uptime] for Solaris. Thanks to Franky Van
