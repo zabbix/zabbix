@@ -48,7 +48,6 @@ serial number/mesto polozhenija/etc.
 
 OTHER:
 
- - fix incorrect gaps in graphs
  - check bug with trapper receiving value with ":"
  - configuration management. Add a page with hardware details for each host.
  - multi-institution support
