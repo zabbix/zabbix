@@ -208,7 +208,7 @@ void	process(char *command,char *value)
 	char	key[MAX_STRING_LEN+1];
 	char	param[1024];
 	char	cmd[1024];
-	char	*res2;
+	char	*res2 = NULL;
 	int	ret_str=0;
 
 	for( p=command+strlen(command)-1; p>command && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
