@@ -24,13 +24,13 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.31)
+Zabbix Reference Manual for version 1.0 (draft v1.32)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-07 October 2002
+25 December 2002
 \layout Abstract
 
 The document is Reference Manual for Zabbix version 1.0.
@@ -3824,6 +3824,374 @@ upgrades/dbpatches/1.0beta5_to_1.0beta6/
 added 
 \emph on 
 misc/init.d/debian/zabbix_agent
+\layout Subsubsection
+
+Zabbix 1.0beta7
+\layout Itemize
+
+SO_LINGER is not default 
+\emph on 
+socket()
+\emph default 
+ option for 
+\series bold 
+zabbix_sender
+\layout Itemize
+
+
+\emph on 
+recvfrom()
+\emph default 
+ and 
+\emph on 
+sendto()
+\emph default 
+ were changed to 
+\emph on 
+read()
+\emph default 
+ and 
+\emph on 
+write()
+\layout Itemize
+
+\SpecialChar ~
+- fixed housekeeping procedure.
+ Upgrade carefully! (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- support of template hosts.
+ Remove tables hosts_templates and
+\layout Itemize
+
+\SpecialChar ~
+\SpecialChar ~
+ triggers_template.
+ (Alexei) 
+\layout Itemize
+
+\SpecialChar ~
+- Show-Show-Show renamed to Graph-Trend-Compare in latest.html (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- fixed buffer overflow in zabbix_log().
+ (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- availability reports for trapper-based triggers (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- fixed possible zabbix_suckerd crash.
+ It may happen if socket() returns 0.
+\layout Itemize
+
+\SpecialChar ~
+\SpecialChar ~
+ (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- added new Host status - Template(3).
+ )Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- fixed group "all" in latest.php (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- do not dump "Expression cannot be evaluated" in case if function.lastvalue
+\layout Itemize
+
+\SpecialChar ~
+\SpecialChar ~
+ is NULL.
+ Logic was changed a bit, but the message is still there.
+ (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- show who is online in User config form.
+ (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- when ran first time, some triggers becomes TRUE (like files was changed).
+\layout Itemize
+
+\SpecialChar ~
+\SpecialChar ~
+ This is already fixed.
+ This bug does not exist.
+ (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- fixed bug in queue.php select statement.
+ Trapper type will not be
+\layout Itemize
+
+\SpecialChar ~
+\SpecialChar ~
+ selected.
+ (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- when W2000 with SNMP agent restarted, items will becomes Not Supported.
+\layout Itemize
+
+\SpecialChar ~
+\SpecialChar ~
+ There is no such bug in CVS code anymore.
+ (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- map will show host status in case of trigger based on trapper (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- fixed bug in zabbix_suckerd's select statements.
+ Trapper type will not be
+\layout Itemize
+
+\SpecialChar ~
+\SpecialChar ~
+ selected.
+ (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- new protocol for Zabbix agents, Support for ZBX_ERROR and ZBX_NOTSUPPORTED.
+\layout Itemize
+
+\SpecialChar ~
+\SpecialChar ~
+ (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- about.hph: version of Zabbix was changed to 1.0beta7 (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- items.php: "Delay" renamed to "Update interval".
+ (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- fixed precision issues in zabbix_agent(d) and zabbix_suckerd.
+ All floats
+\layout Itemize
+
+\SpecialChar ~
+\SpecialChar ~
+ converted to double.
+ (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- fixed selection of icon and host in sysmap.php.
+ Thanks to S<E9>bastien "slix"
+\layout Itemize
+
+\SpecialChar ~
+\SpecialChar ~
+ Li<E9>nard.
+ (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- monitoring of servers without Zabbix agent installed.
+ New item type: Simple
+\layout Itemize
+
+\SpecialChar ~
+\SpecialChar ~
+ Check.
+ (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- improved performance of pinger.pl (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- added support of ':','
+\backslash 
+' for flexible parameters (example, cksum[c:
+\backslash 
+a.bat])
+\layout Itemize
+
+\SpecialChar ~
+\SpecialChar ~
+ (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- added copyright notice to source files (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- pinger.pl will use mass-send of collected data.
+ No unnecessary forks
+\layout Itemize
+
+\SpecialChar ~
+\SpecialChar ~
+ anymore.
+ (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- all <? ?> were changed to <?php ?>.
+ No changes in php.ini required anymore.
+\layout Itemize
+
+\SpecialChar ~
+\SpecialChar ~
+ (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- added Zabbix agent for WIN32 platforms.
+ Thanks to Victor Kirhenstein.
+ (Alexei) 
+\layout Itemize
+
+\SpecialChar ~
+- fixed coredump in get_lstvalue().
+ Thanks to Rickard Plars.
+ (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- delay renamed to "Update interval (in sec)" in item definition form
+\layout Itemize
+
+\SpecialChar ~
+(Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- create/mysql/schema.sql will create tables with type=InnoDB by default
+\layout Itemize
+
+\SpecialChar ~
+(Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- added upgrades/dbpatches/1.0beta6_to_1.0beta7/ with patches (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- added item type TRAPPER (Alexei) 
+\layout Itemize
+
+\SpecialChar ~
+- fixes for PostgreSQL (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- added validation of host name (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- default value of StartSuckers is set to 4 (Alexei) 
+\layout Itemize
+
+\SpecialChar ~
+- fixed Select in Status of Triggers (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- precision of Change is set to 2 in Latest Values (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- --enable-static to work on all platforms (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- zabbix_sender to be able to get information from stdin (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- support fo JavaScript required now (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- automatic resize of all graphs depending on screen size (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- got rid of message "Bad protocol identification '0'" when doing check_service[
+ssh]
+\layout Itemize
+
+\SpecialChar ~
+(Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- performance improvements for zabbix_suckerd (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- added support of CSS (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- support of processor load on Solaris 2.6.
+ Thanks to Mariusz.
+ (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- improvements for user-defined graphs.
+ Thanks to Mariusz.
+ (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- improvements for System Maps.
+ Thanks to Mariusz.
+ (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- support for host groups (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- added table hosts_groups (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- added table groups (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- ./configure to find PostgreSQL's includes in /usr/local/include
+\layout Itemize
+
+\SpecialChar ~
+(Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- basic support for log rotating (Alexei)
+\layout Itemize
+
+\SpecialChar ~
+- added additional error checks in get_value_snmp() (Alexei)
 \layout Section
 
 Zabbix Architecture
