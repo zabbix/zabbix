@@ -188,10 +188,12 @@ void    daemon_init(void)
 	setlogmask(LOG_UPTO(LOG_WARNING));*/
 
 
+#ifdef HAVE_SYS_RESOURCE_SETPRIORITY
 	if(setpriority(PRIO_PROCESS,0,5)!=0)
 	{
 		fprintf(stderr, "Unable to set process priority to 5. Leaving default.\n");
 	}
+#endif
 
 }
 
