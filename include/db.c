@@ -30,6 +30,7 @@
 
 #include "db.h"
 #include "log.h"
+#include "zlog.h"
 #include "common.h"
 
 #ifdef	HAVE_MYSQL
@@ -384,6 +385,7 @@ char	*DBget_field(DB_RESULT *result, int rownum, int fieldnum)
 	if(row == NULL)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Error while mysql_fetch_row():Error [%s] Rownum [%d] Fieldnum [%d]", mysql_error(&mysql), rownum, fieldnum );
+		zabbix_syslog("MYSQL: Error while mysql_fetch_row():Error [%s] Rownum [%d] Fieldnum [%d]", mysql_error(&mysql), rownum, fieldnum );
 		exit(FAIL);
 	}
 	return row[fieldnum];
@@ -470,6 +472,7 @@ int     DBget_function_result_thread(MYSQL *database, double *result,char *funct
 	if(DBnum_rows(dbresult) == 0)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "No function for functionid:[%s]", functionid );
+		zabbix_syslog("No function for functionid:[%s]", functionid );
 		res = FAIL;
 	}
 	else if(DBget_field(dbresult,0,1) == NULL)
@@ -504,6 +507,7 @@ int     DBget_function_result(double *result,char *functionid)
 	if(DBnum_rows(dbresult) == 0)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "No function for functionid:[%s]", functionid );
+		zabbix_syslog("No function for functionid:[%s]", functionid );
 		res = FAIL;
 	}
 	else if(DBget_field(dbresult,0,1) == NULL)
@@ -1419,6 +1423,7 @@ void DBupdate_host_status_thread(MYSQL *database, int hostid,int status,int cloc
 	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot select host with hostid [%d]",hostid);
+		zabbix_syslog("Cannot select host with hostid [%d]",hostid);
 		DBfree_result(result);
 		return;
 	}
@@ -1468,7 +1473,8 @@ void DBupdate_host_status_thread(MYSQL *database, int hostid,int status,int cloc
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Unknown host status [%d]", status);
+		zabbix_log( LOG_LEVEL_ERR, "Unknown host status [%d] for hostid [%d]", status, hostid);
+		zabbix_syslog("Unknown host status [%d] for hostid [%d]", status, hostid);
 		return;
 	}
 
@@ -1497,6 +1503,7 @@ void DBupdate_host_status(int hostid,int status,int clock, char *error)
 	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot select host with hostid [%d]",hostid);
+		zabbix_syslog("Cannot select host with hostid [%d]",hostid);
 		DBfree_result(result);
 		return;
 	}
@@ -1546,7 +1553,8 @@ void DBupdate_host_status(int hostid,int status,int clock, char *error)
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Unknown host status [%d]", status);
+		zabbix_log( LOG_LEVEL_ERR, "Unknown host status [%d] for hostid [%d]", status, hostid);
+		zabbix_syslog("Unknown host status [%d] for hostid [%d]", status, hostid);
 		return;
 	}
 
@@ -1749,6 +1757,7 @@ int	DBget_items_count(void)
 	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
+		zabbix_syslog("Cannot execute query [%s]", sql);
 		DBfree_result(result);
 		return 0;
 	}
@@ -1776,6 +1785,7 @@ int	DBget_items_count_thread(MYSQL *database)
 	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
+		zabbix_syslog("Cannot execute query [%s]", sql);
 		DBfree_result(result);
 		return 0;
 	}
@@ -1804,6 +1814,7 @@ int	DBget_triggers_count_thread(MYSQL *database)
 	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
+		zabbix_syslog("Cannot execute query [%s]", sql);
 		DBfree_result(result);
 		return 0;
 	}
@@ -1831,6 +1842,7 @@ int	DBget_triggers_count(void)
 	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
+		zabbix_syslog("Cannot execute query [%s]", sql);
 		DBfree_result(result);
 		return 0;
 	}
@@ -1858,6 +1870,7 @@ int	DBget_items_unsupported_count_thread(MYSQL *database)
 	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
+		zabbix_syslog("Cannot execute query [%s]", sql);
 		DBfree_result(result);
 		return 0;
 	}
@@ -1885,6 +1898,7 @@ int	DBget_items_unsupported_count(void)
 	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
+		zabbix_syslog("Cannot execute query [%s]", sql);
 		DBfree_result(result);
 		return 0;
 	}
@@ -1912,6 +1926,7 @@ int	DBget_history_str_count_thread(MYSQL *database)
 	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
+		zabbix_syslog("Cannot execute query [%s]", sql);
 		DBfree_result(result);
 		return 0;
 	}
@@ -1939,6 +1954,7 @@ int	DBget_history_str_count(void)
 	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
+		zabbix_syslog("Cannot execute query [%s]", sql);
 		DBfree_result(result);
 		return 0;
 	}
@@ -1966,6 +1982,7 @@ int	DBget_history_count_thread(MYSQL *database)
 	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
+		zabbix_syslog("Cannot execute query [%s]", sql);
 		DBfree_result(result);
 		return 0;
 	}
@@ -1993,6 +2010,7 @@ int	DBget_history_count(void)
 	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
+		zabbix_syslog("Cannot execute query [%s]", sql);
 		DBfree_result(result);
 		return 0;
 	}
@@ -2020,6 +2038,7 @@ int	DBget_trends_count_thread(MYSQL *database)
 	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
+		zabbix_syslog("Cannot execute query [%s]", sql);
 		DBfree_result(result);
 		return 0;
 	}
@@ -2047,6 +2066,7 @@ int	DBget_trends_count(void)
 	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
+		zabbix_syslog("Cannot execute query [%s]", sql);
 		DBfree_result(result);
 		return 0;
 	}
@@ -2076,6 +2096,7 @@ int	DBget_queue_count_thread(MYSQL *database)
 	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
+		zabbix_syslog("Cannot execute query [%s]", sql);
 		DBfree_result(result);
 		return 0;
 	}
@@ -2105,6 +2126,7 @@ int	DBget_queue_count(void)
 	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
+		zabbix_syslog("Cannot execute query [%s]", sql);
 		DBfree_result(result);
 		return 0;
 	}
