@@ -168,7 +168,7 @@
 
 		function drawRectangle()
 		{
-			ImageFilledRectangle($this->im,0,0,$this->sizeX+$this->shiftX+61,$this->sizeY+$this->shiftY+62+12*$this->num+2,$this->colors["White"]);
+			ImageFilledRectangle($this->im,0,0,$this->sizeX+$this->shiftX+61,$this->sizeY+$this->shiftY+62+12*$this->num+8,$this->colors["White"]);
 			if($this->border==1)
 			{
 				ImageRectangle($this->im,0,0,imagesx($this->im)-1,imagesy($this->im)-1,$this->colors["Black"]);
@@ -438,7 +438,7 @@
 
 			check_authorisation();
 		
-			$this->im = imagecreate($this->sizeX+$this->shiftX+61,$this->sizeY+$this->shiftY+62+12*$this->num+2);
+			$this->im = imagecreate($this->sizeX+$this->shiftX+61,$this->sizeY+$this->shiftY+62+12*$this->num+8);
 
 			$this->initColors();
 			$this->drawRectangle();
