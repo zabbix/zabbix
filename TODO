@@ -1,14 +1,19 @@
-1.0beta9:
+1.0beta10:
 
  - add support for agent forwarding (proxy)
-
+ - link map's line to a trigger
  - proofread Zabbix Manual  - Ted Rolle <ted@users.sourceforge.net>
  - add complete support for SNMP trapping
- - improve graphing capabilities (MRTG like graphs)
- - link map's line to a trigger
  - ability to add a library of  userwritten c-functions with dlopen/dlsym to
 the agent with a predefined API that can return values to suckerd (for both 
 suckerd and agentd)
+ - monitoring of log files
+ - escalation
+ - agents to execute command
+ - suffixes Mb,Kb,Gb, etc
+ - add alerts to host templates
+
+ - improve graphing capabilities (MRTG like graphs)
  - monitoring of log files
  - [10] Refresh stop ability. At least for graphs and triggers being selected.
  - [10] IT Services. Show downtimes for weeks.
