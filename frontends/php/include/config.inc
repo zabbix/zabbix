@@ -486,6 +486,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		$result=DBselect($sql);
 		if(DBnum_rows($result)==1)
 		{
+			setcookie("sessionid",$sessionid,time()+3600);
 			$sql="update sessions set lastaccess=".time()." where sessionid=$sessionid";
 			DBexecute($sql);
 			$USER_DETAILS["userid"]=DBget_field($result,0,0);
@@ -2536,7 +2537,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		if(isset($itemid))
 		{
-			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type from items i,hosts h where i.itemid=$itemid and h.hostid=i.hostid");
+			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts from items i,hosts h where i.itemid=$itemid and h.hostid=i.hostid");
 		
 			$description=DBget_field($result,0,0);
 			$key=DBget_field($result,0,1);
@@ -2549,6 +2550,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$snmp_community=DBget_field($result,0,8);
 			$snmp_oid=DBget_field($result,0,9);
 			$value_type=DBget_field($result,0,10);
+			$trapper_hosts=DBget_field($result,0,11);
 		}
 		else
 		{
@@ -2557,12 +2559,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$host="";
 			$port=10000;
 			$delay=30;
-			$history=30*24*3600;
+			$history=365;
 			$status=0;
 			$type=0;
 			$snmp_community="public";
 			$snmp_oid="interfaces.ifTable.ifEntry.ifInOctets.1";
 			$value_type=0;
+			$trapper_hosts="";
 		}
 
 		echo "<br>";
@@ -2630,7 +2633,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<input name=\"delay\" value=\"$delay\" size=5>";
 
 		show_table2_v_delimiter();
-		echo "Keep history (in sec)";
+		echo "Keep history (in days)";
 		show_table2_h_delimiter();
 		echo "<input name=\"history\" value=\"$history\" size=8>";
 
@@ -2663,6 +2666,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		if($value_type==1) echo "SELECTED";
 		echo ">Character";
 		echo "</SELECT>";
+
+		show_table2_v_delimiter();
+		echo "Allowed hosts (for trapper item only)";
+		show_table2_h_delimiter();
+		echo "<input name=\"trapper_hosts\" value=\"$trapper_hosts\" size=40>";
  
 		show_table2_v_delimiter2();
 		echo "<input type=\"submit\" name=\"register\" value=\"add\">";
