@@ -96,7 +96,7 @@ int send_alert(DB_ALERT	*alert,DB_MEDIATYPE *mediatype)
 			strncat(full_path,"/",MAX_STRING_LEN);
 			strncat(full_path,mediatype->exec_path,MAX_STRING_LEN);
 			zabbix_log( LOG_LEVEL_DEBUG, "Before executing [%s] [%m]", full_path);
-			if(-1 == execl("/bin/sh","-c",full_path,alert->sendto,alert->subject,alert->message,(char *)0))
+			if(-1 == execl(full_path,mediatype->exec_path,alert->sendto,alert->subject,alert->message,(char *)0))
 			{
 				zabbix_log( LOG_LEVEL_ERR, "Error executing [%s] [%m]", full_path);
 				res = FAIL;
@@ -105,6 +105,7 @@ int send_alert(DB_ALERT	*alert,DB_MEDIATYPE *mediatype)
 			{
 				res = SUCCEED;
 			}
+			/* In normal case the program will never reach this point */
 			zabbix_log( LOG_LEVEL_DEBUG, "After execl()");
 			exit(0);
 		}
