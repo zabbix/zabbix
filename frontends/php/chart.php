@@ -233,7 +233,7 @@
 
 		for($i=0;$i<=$my_steps;$i++)
 		{
-			ImageString($im, 1, $sizeX+5+$shiftX, $i/$my_steps*$sizeY+$shiftY-4, $maxY-$i/$my_steps*($maxY-$minY) , $darkred);
+			ImageString($im, 1, $sizeX+5+$shiftX, $i/$my_steps*$sizeY+$shiftY-4, convert_units($maxY-$i/$my_steps*($maxY-$minY),$item["units"],0) , $darkred);
 		}
 		for($j=$stepTime-$correctTime;$j<=($maxX-$minX);$j+=$stepTime)
 		{

@@ -275,7 +275,8 @@
 				{ 
 					if($row["value_type"] == 0 )
 					{
-						echo "<td>"; printf("%.0f %s",$row["lastvalue"],$row["units"]); echo "</td>";
+//						echo "<td>"; printf("%.0f %s",$row["lastvalue"],$row["units"]); echo "</td>";
+						echo "<td>"; echo convert_units($row["lastvalue"],$row["units"],0); echo "</td>";
 					}
 					else
 					{
@@ -284,7 +285,8 @@
 				}
 				else
 				{
-					echo "<td>"; printf("%.2f %s",$row["lastvalue"],$row["units"]); echo "</td>";
+//					echo "<td>"; printf("%.2f %s",$row["lastvalue"],$row["units"]); echo "</td>";
+					echo "<td>"; echo convert_units($row["lastvalue"],$row["units"],0); echo "</td>";
 				}
 			}
 			else
@@ -297,11 +299,13 @@
 //	sprintf("%+0.2f"); does not work
 				if($row["lastvalue"]-$row["prevvalue"]<0)
 				{
-					printf("<td>%0.2f</td>",$row["lastvalue"]-$row["prevvalue"]);
+					echo "<td>";echo convert_units($row["lastvalue"]-$row["prevvalue"],$row["units"],0); echo "</td>";
+//					printf("<td>%0.2f</td>",$row["lastvalue"]-$row["prevvalue"]);
 				}
 				else
 				{
-					printf("<td>+%0.2f</td>",$row["lastvalue"]-$row["prevvalue"]);
+					echo "<td>+";echo convert_units($row["lastvalue"]-$row["prevvalue"],$row["units"],0); echo "</td>";
+//					printf("<td>+%0.2f</td>",$row["lastvalue"]-$row["prevvalue"]);
 				}
 			}
 			else
