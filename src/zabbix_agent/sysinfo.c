@@ -2143,7 +2143,7 @@ double	DISK_WBLK(void)
 
 char	*VERSION(void)
 {
-	static	char	version[]="1.0\n";
+	static	char	version[]="1.1alpha1\n";
 
 	return	version;
 }
@@ -2522,7 +2522,9 @@ double	CHECK_SERVICE_PERF(char *service_and_ip_and_port)
 	else if(strcmp(service,"nntp") == 0)
 	{
 		if(port == 0)	port=119;
-		result=tcp_expect(ip,port,"220","");
+/* 220 is incorrect */
+/*		result=tcp_expect(ip,port,"220","");*/
+		result=tcp_expect(ip,port,"200","");
 	}
 	else if(strcmp(service,"imap") == 0)
 	{
@@ -2671,7 +2673,9 @@ double	CHECK_SERVICE(char *service_and_ip_and_port)
 	else if(strcmp(service,"nntp") == 0)
 	{
 		if(port == 0)	port=119;
-		result=tcp_expect(ip,port,"220","");
+/* 220 is incorrect */
+/*		result=tcp_expect(ip,port,"220","");*/
+		result=tcp_expect(ip,port,"200","");
 	}
 	else if(strcmp(service,"imap") == 0)
 	{

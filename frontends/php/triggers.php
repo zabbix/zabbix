@@ -23,6 +23,7 @@
 	$page["file"] = "triggers.php";
 
 	include "include/config.inc.php";
+	include "include/forms.inc.php";
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();
 ?>

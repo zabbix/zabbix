@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	$page["title"]="Actions";
+	$page["title"]=S_ACTIONS;
 	$page["file"]="actions.php";
 
 	include "include/config.inc.php";
@@ -30,7 +30,7 @@
 <?php
 	if(($HTTP_GET_VARS["triggerid"]!=0)&&!check_right_on_trigger("U",$HTTP_GET_VARS["triggerid"]))
 	{
-		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_footer();
 		exit;
 	}
@@ -42,57 +42,21 @@
 		if($HTTP_GET_VARS["register"]=="add")
 		{
 			$result=add_action( $HTTP_GET_VARS["triggerid"], $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["good"], $HTTP_GET_VARS["delay"], $HTTP_GET_VARS["subject"], $HTTP_GET_VARS["message"],$HTTP_GET_VARS["scope"],$HTTP_GET_VARS["severity"],$HTTP_GET_VARS["recipient"],$HTTP_GET_VARS["usrgrpid"]);
-			show_messages($result,"Action added","Cannot add action");
+			show_messages($result,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
 		}
 		if($HTTP_GET_VARS["register"]=="update")
 		{
 			$result=update_action( $HTTP_GET_VARS["actionid"], $HTTP_GET_VARS["triggerid"], $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["good"], $HTTP_GET_VARS["delay"], $HTTP_GET_VARS["subject"], $HTTP_GET_VARS["message"],$HTTP_GET_VARS["scope"],$HTTP_GET_VARS["severity"],$HTTP_GET_VARS["recipient"],$HTTP_GET_VARS["usrgrpid"]);
-			show_messages($result,"Action updated","Cannot update action");
+			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPATE_ACTION);
 			unset($HTTP_GET_VARS["actionid"]);
 		}
 		if($HTTP_GET_VARS["register"]=="delete")
 		{
 			$result=delete_action($HTTP_GET_VARS["actionid"]);
-			show_messages($result,"Action deleted","Cannot delete action");
+			show_messages($result,S_ACTION_DELETED,S_CANNOT_DELETE_ACTION);
 			unset($HTTP_GET_VARS["actionid"]);
 		}
 	}
-?>
-
-<?php
-/*	show_table_header_begin();
-	echo "CONFIGURATION OF ACTIONS";
-	show_table_v_delimiter();
-
-	if(!isset($HTTP_GET_VARS["scope"])|| (isset($HTTP_GET_VARS["scope"])&&($HTTP_GET_VARS["scope"]==0)) )
-	{
-		echo "<b>[<a href='actions.php?".url1_param("triggerid")."'>Trigger</a>]</b> ";
-	}
-	else
-	{
-		echo "<a href='actions.php?".url1_param("triggerid")."'>Trigger</a> ";
-	}
-
-	if(isset($HTTP_GET_VARS["scope"])&&($HTTP_GET_VARS["scope"]==1))
-	{
-		echo "<b>[<a href='actions.php?scope=1".url_param("triggerid")."'>Host</a>]</b> ";
-	}
-	else
-	{
-		echo "<a href='actions.php?scope=1".url_param("triggerid")."'>Host</a> ";
-	}
-
-	if(isset($HTTP_GET_VARS["scope"])&&($HTTP_GET_VARS["scope"]==2))
-	{
-		echo "<b>[<a href='actions.php?scope=2".url_param("triggerid")."'>All</a>]</b> ";
-	}
-	else
-	{
-		echo "<a href='actions.php?scope=2".url_param("triggerid")."'>All</a> ";
-	}
-
-	show_table_header_end();
-	echo "<br>";*/
 ?>
 
 <?php
@@ -126,13 +90,13 @@
 	echo "<div align=center>";
 	echo "<TABLE BORDER=0 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR>";
-	echo "<TD><b>Scope</b></TD>";
-	echo "<TD><b>Send message to</b></TD>";
-	echo "<TD WIDTH=10%><b>When trigger</b></TD>";
-	echo "<TD WIDTH=5%><b>Delay</b></TD>";                            
-	echo "<TD><b>Subject</b></TD>";
+	echo "<TD><b>".S_SCOPE."</b></TD>";
+	echo "<TD><b>".S_SEND_MESSAGE_TO."</b></TD>";
+	echo "<TD WIDTH=10%><b>".S_WHEN_TRIGGER."</b></TD>";
+	echo "<TD WIDTH=5%><b>".S_DELAY."</b></TD>";                            
+	echo "<TD><b>".S_SUBJECT."</b></TD>";
 //	echo "<TD><b>Message</b></TD>";
-	echo "<TD WIDTH=10%><b>Actions</b></TD>";                               
+	echo "<TD WIDTH=10%><b>".S_ACTIONS."</b></TD>";                               
 	echo "</TR>";
 	$col=0;
 	while($row=DBfetch($result))
@@ -179,15 +143,15 @@
   
 		if($row["good"] == 1)
 		{
-			echo "<TD><FONT COLOR=\"#AA0000\">ON</FONT></TD>";
+			echo "<TD><FONT COLOR=\"#AA0000\">".S_ON."</FONT></TD>";
 		}
 		else if($row["good"] == 0)
 		{
-			echo "<TD><FONT COLOR=\"#00AA00\">OFF</FONT></TD>";
+			echo "<TD><FONT COLOR=\"#00AA00\">".S_OFF."</FONT></TD>";
 		}
 		else if($row["good"] == 2)
 		{
-			echo "<TD><FONT COLOR=\"#AA0000\">ON</FONT>/<FONT COLOR=\"#00AA00\">OFF</FONT></TD>";
+			echo "<TD><FONT COLOR=\"#AA0000\">".S_ON."</FONT>/<FONT COLOR=\"#00AA00\">OFF</FONT></TD>";
 		}
 		echo "<TD>".htmlspecialchars($row["delay"])."</TD>";
 		echo "<TD>".htmlspecialchars($row["subject"])."</TD>";
@@ -201,7 +165,7 @@
 	if(DBnum_rows($result)==0)
 	{
 			echo "<TR BGCOLOR=#EEEEEE>";
-			echo "<TD COLSPAN=6 ALIGN=CENTER>-No actions defined-</TD>";
+			echo "<TD COLSPAN=6 ALIGN=CENTER>".S_NO_ACTIONS_DEFINED."</TD>";
 			echo "<TR>";
 	}
 	echo "</TABLE>";
@@ -266,7 +230,7 @@
 	}
 	echo "<br>";
 	show_table2_header_begin();
-	echo nbsp("New action");
+	echo nbsp(S_NEW_ACTION);
 
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"actions.php\">";
@@ -275,18 +239,18 @@
 	{
 		echo "<input name=\"actionid\" type=\"hidden\" value=".$HTTP_GET_VARS["actionid"].">";
 	}
-	echo nbsp("Send message to");
+	echo nbsp(S_SEND_MESSAGE_TO);
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"recipient\" size=\"1\" onChange=\"submit()\">";
 
-	echo "<option value=\"0\""; if($recipient==RECIPIENT_TYPE_USER) echo " selected"; echo ">Single user";
-	echo "<option value=\"1\""; if($recipient==RECIPIENT_TYPE_GROUP) echo " selected"; echo ">User group";
+	echo "<option value=\"0\""; if($recipient==RECIPIENT_TYPE_USER) echo " selected"; echo ">".S_SINGLE_USER;
+	echo "<option value=\"1\""; if($recipient==RECIPIENT_TYPE_GROUP) echo " selected"; echo ">".S_USER_GROUP;
 	echo "</select>";
 
 	if($recipient==RECIPIENT_TYPE_GROUP)
 	{
 		show_table2_v_delimiter();
-		echo nbsp("Group");
+		echo nbsp(S_GROUP);
 		show_table2_h_delimiter();
 		echo "<select class=\"biginput\" name=\"usrgrpid\" size=\"1\">";
 	
@@ -309,7 +273,7 @@
 	else
 	{
 		show_table2_v_delimiter();
-		echo nbsp("User");
+		echo nbsp(S_USER);
 		show_table2_h_delimiter();
 		echo "<select class=\"biginput\" name=\"userid\" size=\"1\">";
 	
@@ -330,50 +294,50 @@
 	}
 	
 	show_table2_v_delimiter();
-	echo nbsp("When trigger becomes");
+	echo nbsp(S_WHEN_TRIGGER_BECOMES);
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"good\" size=1>";
-	echo "<OPTION VALUE=\"1\""; if($good==1) echo "SELECTED"; echo ">ON";
-	echo "<OPTION VALUE=\"0\""; if($good==0) echo "SELECTED"; echo ">OFF";
-	echo "<OPTION VALUE=\"2\""; if($good==2) echo "SELECTED"; echo ">ON or OFF";
+	echo "<OPTION VALUE=\"1\""; if($good==1) echo "SELECTED"; echo ">".S_ON;
+	echo "<OPTION VALUE=\"0\""; if($good==0) echo "SELECTED"; echo ">".S_OFF;
+	echo "<OPTION VALUE=\"2\""; if($good==2) echo "SELECTED"; echo ">".S_ON_OR_OFF;
 	echo "</SELECT>";
 
 	show_table2_v_delimiter();
-	echo nbsp("Delay between messages (in sec)");
+	echo nbsp(S_DELAY_BETWEEN_MESSAGES_IN_SEC);
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"delay\" value=\"$delay\" size=5>";
 
 	show_table2_v_delimiter();
-	echo "Subject";
+	echo S_SUBJECT;
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"subject\" value=\"$subject\" size=70>";
 
 	show_table2_v_delimiter();
-	echo "Message";
+	echo S_MESSAGE;
 	show_table2_h_delimiter();
  	echo "<textarea class=\"biginput\" name=\"message\" cols=70 ROWS=\"7\" wrap=\"soft\">$message</TEXTAREA>";
 
 	show_table2_v_delimiter();
-	echo "Scope";
+	echo S_SCOPE;
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"scope\" size=1 onChange=\"submit()\">";
-	echo "<OPTION VALUE=\"0\""; if($scope==0) echo "SELECTED"; echo ">This trigger only";
-	echo "<OPTION VALUE=\"1\""; if($scope==1) echo "SELECTED"; echo ">All triggers of this host";
-	echo "<OPTION VALUE=\"2\""; if($scope==2) echo "SELECTED"; echo ">All triggers";
+	echo "<OPTION VALUE=\"0\""; if($scope==0) echo "SELECTED"; echo ">".S_THIS_TRIGGER_ONLY;
+	echo "<OPTION VALUE=\"1\""; if($scope==1) echo "SELECTED"; echo ">".S_ALL_TRIGGERS_OF_THIS_HOST;
+	echo "<OPTION VALUE=\"2\""; if($scope==2) echo "SELECTED"; echo ">".S_ALL_TRIGGERS;
 	echo "</SELECT>";
 
 	if($scope>0)
 	{
 		show_table2_v_delimiter();
-		echo nbsp("Use if trigger's severity equal or more than");
+		echo nbsp(S_USE_IF_TRIGGER_SEVERITY);
 		show_table2_h_delimiter();
 		echo "<select class=\"biginput\" name=\"severity\" size=1>";
-		echo "<OPTION VALUE=\"0\" "; if($severity==0) echo "SELECTED"; echo ">Not classified";
-		echo "<OPTION VALUE=\"1\" "; if($severity==1) echo "SELECTED"; echo ">Information";
-		echo "<OPTION VALUE=\"2\" "; if($severity==2) echo "SELECTED"; echo ">Warning";
-		echo "<OPTION VALUE=\"3\" "; if($severity==3) echo "SELECTED"; echo ">Average";
-		echo "<OPTION VALUE=\"4\" "; if($severity==4) echo "SELECTED"; echo ">High";
-		echo "<OPTION VALUE=\"5\" "; if($severity==5) echo "SELECTED"; echo ">Disaster";
+		echo "<OPTION VALUE=\"0\" "; if($severity==0) echo "SELECTED"; echo ">".S_NOT_CLASSIFIED;
+		echo "<OPTION VALUE=\"1\" "; if($severity==1) echo "SELECTED"; echo ">".S_INFORMATION;
+		echo "<OPTION VALUE=\"2\" "; if($severity==2) echo "SELECTED"; echo ">".S_WARNING;
+		echo "<OPTION VALUE=\"3\" "; if($severity==3) echo "SELECTED"; echo ">".S_AVERAGE;
+		echo "<OPTION VALUE=\"4\" "; if($severity==4) echo "SELECTED"; echo ">".S_HIGH;
+		echo "<OPTION VALUE=\"5\" "; if($severity==5) echo "SELECTED"; echo ">".S_DISASTER;
 		echo "</SELECT>";
 	}
 	else

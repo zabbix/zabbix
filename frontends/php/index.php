@@ -23,6 +23,7 @@
 	$page["file"]="index.php";
 
 	include "include/config.inc.php";
+	include "include/forms.inc.php";
 
 	if(isset($HTTP_POST_VARS["password"]))
 	{

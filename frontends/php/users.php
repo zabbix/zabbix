@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	$page["title"] = "Users";
+	$page["title"] = S_USERS;
 	$page["file"] = "users.php";
 
 	include "include/config.inc.php";
@@ -31,8 +31,7 @@
 <?php
         if(!check_anyright("User","U"))
         {
-                show_table_header("<font color=\"AA0000\">No permissions !</font
->");
+                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
                 show_footer();
                 exit;
         }
@@ -46,72 +45,72 @@
 			if($HTTP_GET_VARS["password1"]==$HTTP_GET_VARS["password2"])
 			{
 				$result=add_user($HTTP_GET_VARS["name"],$HTTP_GET_VARS["surname"],$HTTP_GET_VARS["alias"],$HTTP_GET_VARS["password1"],$HTTP_GET_VARS["url"]);
-				show_messages($result, "User added", "Cannot add user");
+				show_messages($result, S_USER_ADDED, S_CANNOT_ADD_USER);
 			}
 			else
 			{
-				show_error_message("Cannot add user. Both passwords must be equal.");
+				show_error_message(S_CANNOT_ADD_USER_BOTH_PASSWORDS_MUST);
 			}
 		}
 		if($HTTP_GET_VARS["register"]=="delete")
 		{
 			$result=delete_user($HTTP_GET_VARS["userid"]);
-			show_messages($result, "User successfully deleted", "Cannot delete user");
+			show_messages($result, S_USER_DELETED, S_CANNOT_DELETE_USER);
 			unset($userid);
 		}
 		if($HTTP_GET_VARS["register"]=="delete_permission")
 		{
 			$result=delete_permission($HTTP_GET_VARS["rightid"]);
-			show_messages($result, "Permission successfully deleted", "Cannot delete permission");
+			show_messages($result, S_PERMISSION_DELETED, S_CANNOT_DELETE_PERMISSION);
 			unset($rightid);
 		}
 		if($HTTP_GET_VARS["register"]=="add permission")
 		{
 			$result=add_permission($HTTP_GET_VARS["userid"],$HTTP_GET_VARS["right"],$HTTP_GET_VARS["permission"],$HTTP_GET_VARS["id"]);
-			show_messages($result, "Permission successfully added", "Cannot add permission");
+			show_messages($result, S_PERMISSION_ADDED, S_CANNOT_ADD_PERMISSION);
 		}
 		if($HTTP_GET_VARS["register"]=="update")
 		{
 			if($HTTP_GET_VARS["password1"]==$HTTP_GET_VARS["password2"])
 			{
 				$result=update_user($HTTP_GET_VARS["userid"],$HTTP_GET_VARS["name"],$HTTP_GET_VARS["surname"],$HTTP_GET_VARS["alias"],$HTTP_GET_VARS["password1"],$HTTP_GET_VARS["url"]);
-				show_messages($result, "Information successfully updated", "Cannot update information");
+				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 			}
 			else
 			{
-				show_error_message("Cannot update user. Both passwords must be equal.");
+				show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
 			}
 		}
 		if($HTTP_GET_VARS["register"]=="add group")
 		{
 			$result=add_user_group($HTTP_GET_VARS["name"], $HTTP_GET_VARS["users"]);
-			show_messages($result, "Group added", "Cannot add group");
+			show_messages($result, S_GROUP_ADDED, S_CANNOT_ADD_GROUP);
 		}
 		if($HTTP_GET_VARS["register"]=="update group")
 		{
 			$result=update_user_group($HTTP_GET_VARS["usrgrpid"], $HTTP_GET_VARS["name"], $HTTP_GET_VARS["users"]);
-			show_messages($result, "Group updated", "Cannot update group");
+			show_messages($result, S_GROUP_UPDATED, S_CANNOT_UPDATE_GROUP);
 		}
 		if($HTTP_GET_VARS["register"]=="delete group")
 		{
 			$result=delete_user_group($HTTP_GET_VARS["usrgrpid"]);
-			show_messages($result, "Group deleted", "Cannot delete group");
+			show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
 			unset($HTTP_GET_VARS["usrgrpid"]);
 		}
 	}
 ?>
 
 <?php
-	show_table_header("CONFIGURATION OF USER GROUPS");
+	show_table_header(S_CONFIGURATION_OF_USER_GROUPS_BIG);
 ?>
 
 
 <?php
 	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR><TD WIDTH=3%><B>Id</B></TD>";
-	echo "<TD><B>Name</B></TD>";
-	echo "<TD><B>Members</B></TD>";
-	echo "<TD WIDTH=10%><B>Actions</B></TD>";
+	echo "<TR><TD WIDTH=3%><B>".S_ID."</B></TD>";
+	echo "<TD><B>".S_NAME."</B></TD>";
+	echo "<TD><B>".S_MEMBERS."</B></TD>";
+	echo "<TD WIDTH=10%><B>".S_ACTIONS."</B></TD>";
 	echo "</TR>";
 
 	$result=DBselect("select usrgrpid,name from usrgrp order by name");
@@ -146,7 +145,7 @@
 	if(DBnum_rows($result)==0)
 	{
 			echo "<TR BGCOLOR=#EEEEEE>";
-			echo "<TD COLSPAN=3 ALIGN=CENTER>-No user groups defined-</TD>";
+			echo "<TD COLSPAN=3 ALIGN=CENTER>".S_NO_USER_GROUPS_DEFINED."</TD>";
 			echo "<TR>";
 	}
 	echo "</TABLE>";
@@ -154,17 +153,17 @@
 ?>
 
 <?php
-	show_table_header("CONFIGURATION OF USERS");
+	show_table_header(S_CONFIGURATION_OF_USERS_BIG);
 ?>
 
 <?php
 	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR><TD WIDTH=3%><B>Id</B></TD>";
-	echo "<TD WIDTH=10%><B>Alias</B></TD>";
-	echo "<TD WIDTH=10%><B>Name</B></TD>";
-	echo "<TD WIDTH=10%><B>Surname</B></TD>";
-	echo "<TD WIDTH=10%><B>Is online?</B></TD>";
-	echo "<TD WIDTH=10%><B>Actions</B></TD>";
+	echo "<TR><TD WIDTH=3%><B>".S_ID."</B></TD>";
+	echo "<TD WIDTH=10%><B>".S_ALIAS."</B></TD>";
+	echo "<TD WIDTH=10%><B>".S_NAME."</B></TD>";
+	echo "<TD WIDTH=10%><B>".S_SURNAME."</B></TD>";
+	echo "<TD WIDTH=10%><B>".S_IS_ONLINE_Q."</B></TD>";
+	echo "<TD WIDTH=10%><B>".S_ACTIONS."</B></TD>";
 	echo "</TR>";
 
 	$result=DBselect("select u.userid,u.alias,u.name,u.surname from users u order by u.alias");
@@ -187,27 +186,27 @@
 		$row2=DBfetch($result2);
 		if($row2["count"]>0)
 		{
-			echo "<TD><font color=\"00AA00\">Yes</font></TD>";
+			echo "<TD><font color=\"00AA00\">".S_YES."</font></TD>";
 		}
 		else
 		{
-			echo "<TD><font color=\"AA0000\">No</font></TD>";
+			echo "<TD><font color=\"AA0000\">".S_NO."</font></TD>";
 		}
 		echo "<TD>";
         	if(check_right("User","U",$row["userid"]))
 		{
 			if(get_media_count_by_userid($row["userid"])>0)
 			{
-				echo "<A HREF=\"users.php?register=change&userid=".$row["userid"]."#form\">Change</A> - <A HREF=\"media.php?userid=".$row["userid"]."\"><b>M</b>edia</A>";
+				echo "<A HREF=\"users.php?register=change&userid=".$row["userid"]."#form\">".S_CHANGE."</A> - <A HREF=\"media.php?userid=".$row["userid"]."\"><b>M</b>edia</A>";
 			}
 			else
 			{
-				echo "<A HREF=\"users.php?register=change&userid=".$row["userid"]."#form\">Change</A> - <A HREF=\"media.php?userid=".$row["userid"]."\">Media</A>";
+				echo "<A HREF=\"users.php?register=change&userid=".$row["userid"]."#form\">".S_CHANGE."</A> - <A HREF=\"media.php?userid=".$row["userid"]."\">".S_MEDIA."</A>";
 			}
 		}
 		else
 		{
-			echo "Change - Media";
+			echo S_CHANGE." - ".S_MEDIA";
 		}
 		echo "</TD>";
 		echo "</TR>";
@@ -215,7 +214,7 @@
 	if(DBnum_rows($result)==0)
 	{
 			echo "<TR BGCOLOR=#EEEEEE>";
-			echo "<TD COLSPAN=6 ALIGN=CENTER>-No users defined-</TD>";
+			echo "<TD COLSPAN=6 ALIGN=CENTER>".S_NO_USERS_DEFINED."</TD>";
 			echo "<TR>";
 	}
 	echo "</TABLE>";
@@ -228,10 +227,10 @@
 	echo "<a name=\"form\"></a>";
 	show_table_header("USER PERMISSIONS");
 	echo "<TABLE BORDER=0 align=center COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR><TD WIDTH=10%><B>Permission</B></TD>";
-	echo "<TD WIDTH=10%><B>Right</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>Resource name</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
+	echo "<TR><TD WIDTH=10%><B>".S_PERMISSION."</B></TD>";
+	echo "<TD WIDTH=10%><B>".S_RIGHT."</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>".S_RESOURCE_NAME."</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>".S_ACTIONS."</B></TD>";
 	echo "</TR>";
 	$result=DBselect("select rightid,name,permission,id from rights where userid=".$HTTP_GET_VARS["userid"]." order by name,permission,id");
 	$col=0;
@@ -247,26 +246,26 @@
 		echo "<TD>".$row["name"]."</TD>";
 		if($row["permission"]=="R")
 		{
-			echo "<TD>Read only</TD>";
+			echo "<TD>".S_READ_ONLY."</TD>";
 		}
 		else if($row["permission"]=="U")
 		{
-			echo "<TD>Read-write</TD>";
+			echo "<TD>".S_READ_WRITE."</TD>";
 		}
 		else if($row["permission"]=="H")
 		{
-			echo "<TD>Hide</TD>";
+			echo "<TD>".S_HIDE."</TD>";
 		}
 		else if($row["permission"]=="A")
 		{
-			echo "<TD>Add</TD>";
+			echo "<TD>".S_ADD."</TD>";
 		}
 		else
 		{
 			echo "<TD>".$row["permission"]."</TD>";
 		}
 		echo "<TD>".get_resource_name($row["name"],$row["id"])."</TD>";
-		echo "<TD><A HREF=users.php?userid=".$HTTP_GET_VARS["userid"]."&rightid=".$row["rightid"]."&register=delete_permission>Delete</A></TD>";
+		echo "<TD><A HREF=users.php?userid=".$HTTP_GET_VARS["userid"]."&rightid=".$row["rightid"]."&register=delete_permission>".S_DELETE."</A></TD>";
 	}
 	echo "</TR>";
 	echo "</TABLE>";

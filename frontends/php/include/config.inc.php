@@ -21,6 +21,7 @@
 <?php
 	include_once 	"include/defines.inc.php";
 	include_once 	"include/db.inc.php";
+	include_once 	"include/local_en.inc.php";
 
 	$USER_DETAILS	="";
 	$ERROR_MSG	="";
@@ -1185,11 +1186,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				if( 	($page["file"]=="latest.php") ||
 					($page["file"]=="history.php"))
 				{
-					echo "<b>[LATEST&nbsp;VALUES]</b></a>";
+					echo "<b>[".nbsp(S_MENU_LATEST_VALUES)."]</b></a>";
 				}
 				else
 				{
-					echo "LATEST&nbsp;VALUES</a>";
+					echo nbsp(S_MENU_LATEST_VALUES)."</a>";
 				}
 ?>
 		</td>
@@ -1201,11 +1202,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				}
 				if($page["file"]=="tr_status.php")
 				{
-					echo "<b>[TRIGGERS]</b></a>";
+					echo "<b>[".S_MENU_TRIGGERS."]</b></a>";
 				}
 				else
 				{
-					echo "TRIGGERS</a>";
+					echo S_MENU_TRIGGERS."</a>";
 				}
 ?>
 		</td>
@@ -1217,11 +1218,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				}
 				if($page["file"]=="queue.php")
 				{
-					echo "<b>[QUEUE]</b></a>";
+					echo "<b>[".S_MENU_QUEUE."]</b></a>";
 				}
 				else
 				{
-					echo "QUEUE</a>";
+					echo S_MENU_QUEUE."</a>";
 				}
 ?>
 		</td>
@@ -1236,11 +1237,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				if(($page["file"]=="latestalarms.php") ||
 					($page["file"]=="alarms.php"))
 				{
-					echo "<b>[ALARMS]</b></a>";
+					echo "<b>[".S_MENU_ALARMS."]</b></a>";
 				}
 				else
 				{
-					echo "ALARMS</a>";
+					echo S_MENU_ALARMS."</a>";
 				}
 ?>
 		</td>
@@ -1254,11 +1255,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 <?php
 				if($page["file"]=="alerts.php")
 				{
-					echo "<b>[ALERTS]</b></a>";
+					echo "<b>[".S_MENU_ALERTS."]</b></a>";
 				}
 				else
 				{
-					echo "ALERTS</a>";
+					echo S_MENU_ALERTS."</a>";
 				}
 ?>
 		</td>
@@ -1272,11 +1273,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 <?php
 				if($page["file"]=="maps.php")
 				{
-					echo "<b>[NETWORK&nbsp;MAPS]</b></a>";
+					echo "<b>[".nbsp(S_MENU_NETWORK_MAPS)."]</b></a>";
 				}
 				else
 				{
-					echo "NETWORK&nbsp;MAPS</a>";
+					echo nbsp(S_MENU_NETWORK_MAPS)."</a>";
 				}
 ?>
 		</td>
@@ -1290,11 +1291,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 <?php
 				if($page["file"]=="charts.php")
 				{
-					echo "<b>[GRAPHS]</b></a>";
+					echo "<b>[".S_MENU_GRAPHS."]</b></a>";
 				}
 				else
 				{
-					echo "GRAPHS</a>";
+					echo S_MENU_GRAPHS."</a>";
 				}
 ?>
 		</td>
@@ -1308,11 +1309,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 <?php
 				if($page["file"]=="screens.php")
 				{
-					echo "<b>[SCREENS]</b></a>";
+					echo "<b>[".S_MENU_SCREENS."]</b></a>";
 				}
 				else
 				{
-					echo "SCREENS</a>";
+					echo S_MENU_SCREENS."</a>";
 				}
 ?>
 		</td>
@@ -1325,11 +1326,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				}
 				if($page["file"]=="srv_status.php")
 				{
-					echo "<b>[IT&nbsp;SERVICES]</b></a>";
+					echo "<b>[".nbsp(S_MENU_IT_SERVICES)."]</b></a>";
 				}
 				else
 				{
-					echo "IT&nbsp;SERVICES</a>";
+					echo nbsp(S_MENU_IT_SERVICES)."</a>";
 				}
 ?>
 		</td>
@@ -1341,11 +1342,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 <?php
 				if($page["file"]=="index.php")
 				{
-					echo "<b>[HOME]</b></a>";
+					echo "<b>[".S_MENU_HOME."]</b></a>";
 				}
 				else
 				{
-					echo "HOME</a>";
+					echo S_MENU_HOME."</a>";
 				}
 ?>
 		</td>
@@ -1359,11 +1360,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 <?php
 				if($page["file"]=="about.php")
 				{
-					echo "<b>[ABOUT]</b></a>";
+					echo "<b>[".S_MENU_ABOUT."]</b></a>";
 				}
 				else
 				{
-					echo "ABOUT</a>";
+					echo S_MENU_ABOUT."</a>";
 				}
 ?>
 		</td>
@@ -1377,11 +1378,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 <?php
 				if($page["file"]=="report1.php")
 				{
-					echo "<b>[STATUS&nbsp;OF&nbsp;ZABBIX]</b></a>";
+					echo "<b>[".nbsp(S_MENU_STATUS_OF_ZABBIX)."]</b></a>";
 				}
 				else
 				{
-					echo "STATUS&nbsp;OF&nbsp;ZABBIX</a>";
+					echo nbsp(S_MENU_STATUS_OF_ZABBIX)."</a>";
 				}
 ?>
 		</td>
@@ -1395,11 +1396,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 <?php
 				if($page["file"]=="report2.php")
 				{
-					echo "<b>[AVAILABILITY&nbsp;REPORT]</b></a>";
+					echo "<b>[".nbsp(S_MENU_AVAILABILITY_REPORT)."]</b></a>";
 				}
 				else
 				{
-					echo "AVAILABILITY&nbsp;REPORT</a>";
+					echo nbsp(S_MENU_AVAILABILITY_REPORT)."</a>";
 				}
 ?>
 		</td>
@@ -1432,11 +1433,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				}
 				if($page["file"]=="config.php")
 				{
-					echo "<b>[CONFIG]</b></a>";
+					echo "<b>[".S_MENU_CONFIG."]</b></a>";
 				}
 				else
 				{
-					echo "CONFIG</a>";
+					echo S_MENU_CONFIG."</a>";
 				}
 ?>
 		</td>
@@ -1449,11 +1450,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				if(	($page["file"]=="users.php")||
 					($page["file"]=="media.php"))
 				{
-					echo "<b>[USERS]</b></a>";
+					echo "<b>[".S_MENU_USERS."]</b></a>";
 				}
 				else
 				{
-					echo "USERS</a>";
+					echo S_MENU_USERS."</a>";
 				}
 ?>
 		</td>
@@ -1465,11 +1466,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				}
 				if($page["file"]=="hosts.php")
 				{
-					echo "<b>[HOSTS]</b></a>";
+					echo "<b>[".S_MENU_HOSTS."]</b></a>";
 				}
 				else
 				{
-					echo "HOSTS</a>";
+					echo S_MENU_HOSTS."</a>";
 				}
 ?>
 		</td>
@@ -1481,11 +1482,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				}
 				if($page["file"]=="items.php")
 				{
-					echo "<b>[ITEMS]</b></a>";
+					echo "<b>[".S_MENU_ITEMS."]</b></a>";
 				}
 				else
 				{
-					echo "ITEMS</a>";
+					echo S_MENU_ITEMS."</a>";
 				}
 ?>
 		</td>
@@ -1498,11 +1499,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				if(	($page["file"]=="triggers.php")||
 					($page["file"]=="actions.php"))
 				{
-					echo "<b>[TRIGGERS]</b></a>";
+					echo "<b>[".S_MENU_TRIGGERS."]</b></a>";
 				}
 				else
 				{
-					echo "TRIGGERS</a>";
+					echo S_MENU_TRIGGERS."</a>";
 				}
 ?>
 		</td>
@@ -1515,11 +1516,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				if(	($page["file"]=="sysmaps.php")||
 					($page["file"]=="sysmap.php"))
 				{
-					echo "<b>[NETWORK&nbsp;MAPS]</b></a>";
+					echo "<b>[".nbsp(S_MENU_NETWORK_MAPS)."]</b></a>";
 				}
 				else
 				{
-					echo "NETWORK&nbsp;MAPS</a>";
+					echo nbsp(S_MENU_NETWORK_MAPS)."</a>";
 				}
 ?>
 		</td>
@@ -1532,11 +1533,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				if(	($page["file"]=="graphs.php")||
 					($page["file"]=="graph.php"))
 				{
-					echo "<b>[GRAPHS]</b></a>";
+					echo "<b>[".S_MENU_GRAPHS."]</b></a>";
 				}
 				else
 				{
-					echo "GRAPHS</a>";
+					echo S_MENU_GRAPHS."</a>";
 				}
 ?>
 		</td>
@@ -1549,11 +1550,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				if(	($page["file"]=="screenedit.php")||
 					($page["file"]=="screenconf.php"))
 				{
-					echo "<b>[SCREENS]</b></a>";
+					echo "<b>[".S_MENU_SCREENS."]</b></a>";
 				}
 				else
 				{
-					echo "SCREENS</a>";
+					echo S_MENU_SCREENS."</a>";
 				}
 ?>
 		</td>
@@ -1566,11 +1567,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				}
 				if($page["file"]=="services.php")
 				{
-					echo "<b>[IT&nbsp;SERVICES]</b></a>";
+					echo "<b>[".nbsp(S_MENU_IT_SERVICES)."]</b></a>";
 				}
 				else
 				{
-					echo "IT&nbsp;SERVICES</a>";
+					echo nbsp(S_MENU_IT_SERVICES)."</a>";
 				}
 ?>
 		</td>
@@ -3827,658 +3828,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		show_footer();
 	}
 
-	# Insert form for Item information
-	function	insert_item_form()
-	{
-		global  $HTTP_GET_VARS;
-
-		$description=@iif(isset($HTTP_GET_VARS["description"]),$HTTP_GET_VARS["description"],"");
-		$key=@iif(isset($HTTP_GET_VARS["key"]),$HTTP_GET_VARS["key"],"");
-		$host=@iif(isset($HTTP_GET_VARS["host"]),$HTTP_GET_VARS["host"],"");
-		$port=@iif(isset($HTTP_GET_VARS["port"]),$HTTP_GET_VARS["port"],10000);
-		$delay=@iif(isset($HTTP_GET_VARS["delay"]),$HTTP_GET_VARS["delay"],30);
-		$history=@iif(isset($HTTP_GET_VARS["history"]),$HTTP_GET_VARS["history"],365);
-		$status=@iif(isset($HTTP_GET_VARS["status"]),$HTTP_GET_VARS["status"],0);
-		$type=@iif(isset($HTTP_GET_VARS["type"]),$HTTP_GET_VARS["type"],0);
-		$snmp_community=@iif(isset($HTTP_GET_VARS["snmp_community"]),$HTTP_GET_VARS["snmp_community"],"public");
-		$snmp_oid=@iif(isset($HTTP_GET_VARS["snmp_oid"]),$HTTP_GET_VARS["snmp_oid"],"interfaces.ifTable.ifEntry.ifInOctets.1");
-		$value_type=@iif(isset($HTTP_GET_VARS["value_type"]),$HTTP_GET_VARS["value_type"],0);
-		$trapper_hosts=@iif(isset($HTTP_GET_VARS["trapper_hosts"]),$HTTP_GET_VARS["trapper_hosts"],"");
-		$snmp_port=@iif(isset($HTTP_GET_VARS["snmp_port"]),$HTTP_GET_VARS["snmp_port"],161);
-		$units=@iif(isset($HTTP_GET_VARS["units"]),$HTTP_GET_VARS["units"],'');
-		$multiplier=@iif(isset($HTTP_GET_VARS["multiplier"]),$HTTP_GET_VARS["multiplier"],0);
-		$hostid=@iif(isset($HTTP_GET_VARS["hostid"]),$HTTP_GET_VARS["hostid"],0);
-		$delta=@iif(isset($HTTP_GET_VARS["delta"]),$HTTP_GET_VARS["delta"],0);
-
-		if(isset($HTTP_GET_VARS["register"])&&($HTTP_GET_VARS["register"] == "change"))
-		{
-			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.snmp_port,i.units,i.multiplier,h.hostid,i.delta from items i,hosts h where i.itemid=".$HTTP_GET_VARS["itemid"]." and h.hostid=i.hostid");
-		
-			$description=DBget_field($result,0,0);
-			$key=DBget_field($result,0,1);
-			$host=DBget_field($result,0,2);
-			$port=DBget_field($result,0,3);
-			$delay=DBget_field($result,0,4);
-			$history=DBget_field($result,0,5);
-			$status=DBget_field($result,0,6);
-			$type=iif(isset($HTTP_GET_VARS["type"]),isset($HTTP_GET_VARS["type"]),DBget_field($result,0,7));
-			$snmp_community=DBget_field($result,0,8);
-			$snmp_oid=DBget_field($result,0,9);
-			$value_type=DBget_field($result,0,10);
-			$trapper_hosts=DBget_field($result,0,11);
-			$snmp_port=DBget_field($result,0,12);
-			$units=DBget_field($result,0,13);
-			$multiplier=DBget_field($result,0,14);
-			$hostid=DBget_field($result,0,15);
-			$delta=DBget_field($result,0,16);
-		}
-
-		echo "<br>";
-
-		show_table2_header_begin();
-		echo "Item";
- 
-		show_table2_v_delimiter();
-		echo "<form method=\"get\" action=\"items.php\">";
-		if(isset($HTTP_GET_VARS["itemid"]))
-		{
-			echo "<input class=\"biginput\" name=\"itemid\" type=hidden value=".$HTTP_GET_VARS["itemid"].">";
-		}
-		echo "Description";
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"description\" value=\"$description\"size=40>";
-
-		show_table2_v_delimiter();
-		echo "Host";
-		show_table2_h_delimiter();
-		echo "<select class=\"biginput\" name=\"hostid\" value=\"3\">";
-	        $result=DBselect("select hostid,host from hosts order by host");
-	        for($i=0;$i<DBnum_rows($result);$i++)
-	        {
-	                $hostid_=DBget_field($result,$i,0);
-	                $host_=DBget_field($result,$i,1);
-			if($hostid==$hostid_)
-			{
-	                	echo "<option value=\"$hostid_\" selected>$host_";
-			}
-			else
-			{
-	                	echo "<option value=\"$hostid_\">$host_";
-			}
-	        }
-		echo "</select>";
-
-		show_table2_v_delimiter();
-		echo "Type";
-		show_table2_h_delimiter();
-		echo "<SELECT class=\"biginput\" NAME=\"type\" value=\"$type\" size=\"1\" onChange=\"submit()\">";
-		echo "<OPTION VALUE=\"0\"";
-		if($type==0) echo "SELECTED";
-		echo ">Zabbix agent";
-		echo "<OPTION VALUE=\"3\"";
-		if($type==3) echo "SELECTED";
-		echo ">Simple check";
-		echo "<OPTION VALUE=\"1\"";
-		if($type==1) echo "SELECTED";
-		echo ">SNMPv1 agent";
-		echo "<OPTION VALUE=\"4\"";
-		if($type==4) echo "SELECTED";
-		echo ">SNMPv2 agent";
-		echo "<OPTION VALUE=\"2\"";
-		if($type==2) echo "SELECTED";
-		echo ">Zabbix trapper";
-		echo "<OPTION VALUE=\"5\"";
-		if($type==5) echo "SELECTED";
-		echo ">Zabbix internal";
-		echo "</SELECT>";
-
-		if(($type==1)||($type==4))
-		{ 
-			show_table2_v_delimiter();
-			echo nbsp("SNMP community");
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"snmp_community\" value=\"$snmp_community\" size=16>";
-
-			show_table2_v_delimiter();
-			echo nbsp("SNMP OID");
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"snmp_oid\" value=\"$snmp_oid\" size=40>";
-
-			show_table2_v_delimiter();
-			echo nbsp("SNMP port");
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"snmp_port\" value=\"$snmp_port\" size=5>";
-		}
-		else
-		{
-			echo "<input class=\"biginput\" name=\"snmp_community\" type=hidden value=\"$snmp_community\">";
-			echo "<input class=\"biginput\" name=\"snmp_oid\" type=hidden value=\"$snmp_oid\">";
-			echo "<input class=\"biginput\" name=\"snmp_port\" type=hidden value=\"$snmp_port\">";
-		}
-
-		show_table2_v_delimiter();
-		echo "Key";
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"key\" value=\"$key\" size=40>";
-
-		show_table2_v_delimiter();
-		echo "Units";
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"units\" value=\"$units\" size=10>";
-
-		show_table2_v_delimiter();
-		echo "Multiplier";
-		show_table2_h_delimiter();
-		echo "<SELECT class=\"biginput\" NAME=\"multiplier\" value=\"$multiplier\" size=\"1\">";
-		echo "<OPTION VALUE=\"0\"";
-		if($multiplier==0) echo "SELECTED";
-		echo ">-";
-		echo "<OPTION VALUE=\"1\"";
-		if($multiplier==1) echo "SELECTED";
-		echo ">K (1024)";
-		echo "<OPTION VALUE=\"2\"";
-		if($multiplier==2) echo "SELECTED";
-		echo ">M (1024^2)";
-		echo "<OPTION VALUE=\"3\"";
-		if($multiplier==3) echo "SELECTED";
-		echo ">G (1024^3)";
-		echo "</SELECT>";
-
-		if($type!=2)
-		{
-			show_table2_v_delimiter();
-			echo nbsp("Update interval (in sec)");
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"delay\" value=\"$delay\" size=5>";
-		}
-		else
-		{
-			echo "<input class=\"biginput\" name=\"delay\" type=hidden value=\"$delay\">";
-		}
-
-		show_table2_v_delimiter();
-		echo nbsp("Keep history (in days)");
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"history\" value=\"$history\" size=8>";
-
-		show_table2_v_delimiter();
-		echo "Status";
-		show_table2_h_delimiter();
-		echo "<SELECT class=\"biginput\" NAME=\"status\" value=\"$status\" size=\"1\">";
-		echo "<OPTION VALUE=\"0\"";
-		if($status==0) echo "SELECTED";
-		echo ">Monitored";
-		echo "<OPTION VALUE=\"1\"";
-		if($status==1) echo "SELECTED";
-		echo ">Disabled";
-#		echo "<OPTION VALUE=\"2\"";
-#		if($status==2) echo "SELECTED";
-#		echo ">Trapper";
-		echo "<OPTION VALUE=\"3\"";
-		if($status==3) echo "SELECTED";
-		echo ">Not supported";
-		echo "</SELECT>";
-
-		show_table2_v_delimiter();
-		echo nbsp("Type of information");
-		show_table2_h_delimiter();
-		echo "<SELECT class=\"biginput\" NAME=\"value_type\" value=\"$value_type\" size=\"1\">";
-		echo "<OPTION VALUE=\"0\"";
-		if($value_type==0) echo "SELECTED";
-		echo ">Numeric";
-		echo "<OPTION VALUE=\"1\"";
-		if($value_type==1) echo "SELECTED";
-		echo ">Character";
-		echo "</SELECT>";
-
-		show_table2_v_delimiter();
-		echo nbsp("Store value");
-		show_table2_h_delimiter();
-		echo "<SELECT class=\"biginput\" NAME=\"delta\" value=\"$delta\" size=\"1\">";
-		echo "<OPTION VALUE=\"0\"";
-		if($delta==0) echo "SELECTED";
-		echo ">As is";
-		echo "<OPTION VALUE=\"1\"";
-		if($delta==1) echo "SELECTED";
-		echo ">Delta";
-		echo "</SELECT>";
-
-		if($type==2)
-		{
-			show_table2_v_delimiter();
-			echo nbsp("Allowed hosts");
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"trapper_hosts\" value=\"$trapper_hosts\" size=40>";
-		}
-		else
-		{
-			echo "<input class=\"biginput\" name=\"trapper_hosts\" type=hidden value=\"$trapper_hosts\">";
-		}
- 
-		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add to all hosts\" onClick=\"return Confirm('Add item to all hosts?');\">";
-		if(isset($HTTP_GET_VARS["itemid"]))
-		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected item?');\">";
-		}
- 
-		show_table2_header_end();
-?>
-<?php
-?>
-</TR>
-</TABLE>
-
-</CENTER>
-</FORM>
-
-</BODY>
-</HTML>
-<?php
-	}
-
-	# Insert form for Host Groups
-	function	insert_hostgroups_form($groupid)
-	{
-		global  $HTTP_GET_VARS;
-
-		if(isset($groupid))
-		{
-			$groupid=get_group_by_groupid($groupid);
-	
-			$name=$groupid["name"];
-		}
-		else
-		{
-			$name="";
-		}
-
-		show_table2_header_begin();
-		echo "Host group";
-
-		show_table2_v_delimiter();
-		echo "<form method=\"get\" action=\"hosts.php\">";
-		if(isset($HTTP_GET_VARS["groupid"]))
-		{
-			echo "<input name=\"groupid\" type=\"hidden\" value=\"".$HTTP_GET_VARS["groupid"]."\" size=8>";
-		}
-		echo "Group name";
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=30>";
-
-		show_table2_v_delimiter();
-		echo "Hosts";
-		show_table2_h_delimiter();
-		echo "<select multiple class=\"biginput\" name=\"hosts[]\" size=\"5\">";
-		$result=DBselect("select distinct hostid,host from hosts order by host");
-		while($row=DBfetch($result))
-		{
-			if(isset($HTTP_GET_VARS["groupid"]))
-			{
-				$sql="select count(*) as count from hosts_groups where hostid=".$row["hostid"]." and groupid=".$HTTP_GET_VARS["groupid"];
-				$result2=DBselect($sql);
-				$row2=DBfetch($result2);
-				if($row2["count"]==0)
-				{
-					echo "<option value=\"".$row["hostid"]."\">".$row["host"];
-				}
-				else
-				{
-					echo "<option value=\"".$row["hostid"]."\" selected>".$row["host"];
-				}
-			}
-			else
-			{
-				echo "<option value=\"".$row["hostid"]."\">".$row["host"];
-			}
-		}
-		echo "</select>";
-
-		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add group\">";
-		if(isset($HTTP_GET_VARS["groupid"]))
-		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update group\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete group\" onClick=\"return Confirm('Delete selected group?');\">";
-		}
-		echo "</form>";
-		show_table2_header_end();
-	}
-
-	# Insert form for User Groups
-	function	insert_usergroups_form($usrgrpid)
-	{
-		global  $HTTP_GET_VARS;
-
-		if(isset($usrgrpid))
-		{
-			$usrgrp=get_usergroup_by_usrgrpid($usrgrpid);
-	
-			$name=$usrgrp["name"];
-		}
-		else
-		{
-			$name="";
-		}
-
-		show_table2_header_begin();
-		echo "User group";
-
-		show_table2_v_delimiter();
-		echo "<form method=\"get\" action=\"users.php\">";
-		if(isset($usrgrpid))
-		{
-			echo "<input name=\"usrgrpid\" type=\"hidden\" value=\"$usrgrpid\" size=8>";
-		}
-		echo "Group name";
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=30>";
-
-		show_table2_v_delimiter();
-		echo "Users";
-		show_table2_h_delimiter();
-		echo "<select multiple class=\"biginput\" name=\"users[]\" size=\"5\">";
-		$result=DBselect("select distinct userid,alias from users order by alias");
-		while($row=DBfetch($result))
-		{
-			if(isset($HTTP_GET_VARS["usrgrpid"]))
-			{
-				$sql="select count(*) as count from users_groups where userid=".$row["userid"]." and usrgrpid=".$HTTP_GET_VARS["usrgrpid"];
-				$result2=DBselect($sql);
-				$row2=DBfetch($result2);
-				if($row2["count"]==0)
-				{
-					echo "<option value=\"".$row["userid"]."\">".$row["alias"];
-				}
-				else
-				{
-					echo "<option value=\"".$row["userid"]."\" selected>".$row["alias"];
-				}
-			}
-			else
-			{
-				echo "<option value=\"".$row["userid"]."\">".$row["alias"];
-			}
-		}
-		echo "</select>";
-
-		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add group\">";
-		if(isset($HTTP_GET_VARS["usrgrpid"]))
-		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update group\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete group\" onClick=\"return Confirm('Delete selected group?');\">";
-		}
-		echo "</form>";
-		show_table2_header_end();
-	}
-
-	# Insert form for User permissions
-	function	insert_permissions_form($userid)
-	{
-		echo "<br>";
-
-		show_table2_header_begin();
-		echo "New permission";
-
-		show_table2_v_delimiter();
-		echo "<form method=\"get\" action=\"users.php\">";
-		if(isset($userid))
-		{
-			echo "<input name=\"userid\" type=\"hidden\" value=\"$userid\" size=8>";
-		}
-		echo "Resource";
-		show_table2_h_delimiter();
-		echo "<select class=\"biginput\" name=\"right\">";
-		echo "<option value=\"Configuration of Zabbix\">Configuration of Zabbix";
-		echo "<option value=\"Default permission\">Default permission";
-		echo "<option value=\"Graph\">Graph";
-		echo "<option value=\"Host\">Host";
-		echo "<option value=\"Screen\">Screen";
-		echo "<option value=\"Service\">IT Service";
-		echo "<option value=\"Item\">Item";
-		echo "<option value=\"Network map\">Network map";
-		echo "<option value=\"Trigger comment\">Trigger's comment";
-		echo "<option value=\"User\">User";
-		echo "</select>";
-
-		show_table2_v_delimiter();
-		echo "Permission";
-		show_table2_h_delimiter();
-		echo "<select class=\"biginput\" name=\"permission\">";
-		echo "<option value=\"R\">Read-only";
-		echo "<option value=\"U\">Read-write";
-		echo "<option value=\"H\">Hide";
-		echo "<option value=\"A\">Add";
-		echo "</select>";
-
-		show_table2_v_delimiter();
-		echo "Resource ID (0 for all)";
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"id\" value=\"0\" size=4>";
-
-		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add permission\">";
-		show_table2_header_end();
-	}
-
-	function	insert_login_form()
-	{
-		global	$HTTP_GET_VARS;
-
-		show_table2_header_begin();
-		echo "Login";
-
-		show_table2_v_delimiter();
-		echo "<form method=\"post\" action=\"index.php\">";
-
-		echo "Login name";
-		show_table2_h_delimiter();
-//		echo "<input name=\"name\" value=\"".$HTTP_GET_VARS["name"]."\" size=20>";
-		echo "<input class=\"biginput\" name=\"name\" value=\"\" size=20>";
-
-		show_table2_v_delimiter();
-		echo "Password";
-		show_table2_h_delimiter();
-//		echo "<input type=\"password\" name=\"password\" value=\"$password\" size=20>";
-		echo "<input class=\"biginput\" type=\"password\" name=\"password\" value=\"\" size=20>";
-
-		show_table2_v_delimiter2();
-		echo "<input class=\"button\" class=\"button\" type=\"submit\" name=\"register\" value=\"Enter\">";
-		show_table2_header_end();
-	}
-
-	# Insert form for Problem
-	function	insert_problem_form($problemid)
-	{
-		echo "<br>";
-
-		show_table2_header_begin();
-		echo "Problem definition";
-		show_table2_v_delimiter();
-		echo "<form method=\"post\" action=\"helpdesk.php\">";
-		echo "<input name=\"problemid\" type=hidden value=$problemid size=8>";
-		echo "Description";
-		show_table2_h_delimiter();
-		echo "<input name=\"description\" value=\"$description\" size=70>";
-
-		show_table2_v_delimiter();
-		echo "Severity";
-		show_table2_h_delimiter();
-		echo "<SELECT NAME=\"priority\" size=\"1\">";
-		echo "<OPTION VALUE=\"0\" "; if($priority==0) echo "SELECTED"; echo ">Not classified";
-		echo "<OPTION VALUE=\"1\" "; if($priority==1) echo "SELECTED"; echo ">Information";
-		echo "<OPTION VALUE=\"2\" "; if($priority==2) echo "SELECTED"; echo ">Warning";
-		echo "<OPTION VALUE=\"3\" "; if($priority==3) echo "SELECTED"; echo ">Average";
-		echo "<OPTION VALUE=\"4\" "; if($priority==4) echo "SELECTED"; echo ">High";
-		echo "<OPTION VALUE=\"5\" "; if($priority==5) echo "SELECTED"; echo ">Disaster";
-		echo "</SELECT>";
-
-		show_table2_v_delimiter();
-		echo "Status";
-		show_table2_h_delimiter();
-		echo "<SELECT NAME=\"status\" value=\"$status\" size=\"1\">";
-		echo "<OPTION VALUE=\"0\"";
-		if($status==0) echo "SELECTED";
-		echo ">Opened";
-		echo "<OPTION VALUE=\"1\"";
-		if($status==1) echo "SELECTED";
-		echo ">Closed";
-		echo "</SELECT>";
-
-		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
-		if(isset($problemid))
-		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\">";
-		}
-
-		show_table2_header_end();
-	}
-
-	# Insert form for Trigger
-	function	insert_trigger_form($hostid,$triggerid)
-	{
-		if(isset($triggerid))
-		{
-			$trigger=get_trigger_by_triggerid($triggerid);
-	
-			$expression=explode_exp($trigger["expression"],0);
-			$description=htmlspecialchars(stripslashes($trigger["description"]));
-			$priority=$trigger["priority"];
-			$status=$trigger["status"];
-			$comments=$trigger["comments"];
-			$url=$trigger["url"];
-		}
-		else
-		{
-			$expression="";
-			$description="";
-			$priority=0;
-			$status=0;
-			$comments="";
-			$url="";
-		}
-		
-		echo "<br>";
-
-		show_table2_header_begin();
-		echo "Trigger configuration";
- 
-		show_table2_v_delimiter();
-		if(isset($hostid))
-		{
-			echo "<form method=\"get\" action=\"triggers.php?hostid=$hostid\">";
-		}
-		else
-		{
-			echo "<form method=\"get\" action=\"triggers.php\">";
-		}
-		echo "<input class=\"biginput\" name=\"triggerid\" type=hidden value=$triggerid size=8>";
-		echo "Description";
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"description\" value=\"$description\" size=70>";
-
-		show_table2_v_delimiter();
-		echo "Expression";
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"expression\" value=\"$expression\" size=70>";
-
-		show_table2_v_delimiter();
-		echo "Severity";
-		show_table2_h_delimiter();
-		echo "<SELECT class=\"biginput\" NAME=\"priority\" size=\"1\">";
-		echo "<OPTION VALUE=\"0\" "; if($priority==0) echo "SELECTED"; echo ">Not classified";
-		echo "<OPTION VALUE=\"1\" "; if($priority==1) echo "SELECTED"; echo ">Information";
-		echo "<OPTION VALUE=\"2\" "; if($priority==2) echo "SELECTED"; echo ">Warning";
-		echo "<OPTION VALUE=\"3\" "; if($priority==3) echo "SELECTED"; echo ">Average";
-		echo "<OPTION VALUE=\"4\" "; if($priority==4) echo "SELECTED"; echo ">High";
-		echo "<OPTION VALUE=\"5\" "; if($priority==5) echo "SELECTED"; echo ">Disaster";
-		echo "</SELECT>";
-
-		show_table2_v_delimiter();
-		echo "Comments";
-		show_table2_h_delimiter();
- 		echo "<TEXTAREA class=\"biginput\" NAME=\"comments\" COLS=70 ROWS=\"7\" WRAP=\"SOFT\">$comments</TEXTAREA>";
-
-		show_table2_v_delimiter();
-		echo "URL";
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"url\" value=\"$url\" size=70>";
-
-		show_table2_v_delimiter();
-		echo "Disabled";
-		show_table2_h_delimiter();
-		echo "<INPUT TYPE=\"CHECKBOX\" ";
-		if($status==1) { echo " CHECKED "; }
-		echo "NAME=\"disabled\"  VALUE=\"true\">";
-
- 
-		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
-		if(isset($triggerid))
-		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete trigger?');\">";
-		}
-
-		if(isset($triggerid))
-		{
-			show_table2_v_delimiter();
-			echo "The trigger depends on";
-			show_table2_h_delimiter();
-			$sql="select t.triggerid,t.description from triggers t,trigger_depends d where t.triggerid=d.triggerid_up and d.triggerid_down=$triggerid";
-			$result1=DBselect($sql);
-			echo "<SELECT class=\"biginput\" NAME=\"dependency\" size=\"1\">";
-			for($i=0;$i<DBnum_rows($result1);$i++)
-			{
-				$depid=DBget_field($result1,$i,0);
-//				$depdescr=DBget_field($result1,$i,1);
-//				if( strstr($depdescr,"%s"))
-//				{
-					$depdescr=expand_trigger_description($depid);
-//				}
-				echo "<OPTION VALUE=\"$depid\">$depdescr";
-			}
-			echo "</SELECT>";
-
-			show_table2_v_delimiter();
-			echo "New dependency";
-			show_table2_h_delimiter();
-			$sql="select t.triggerid,t.description from triggers t where t.triggerid!=$triggerid order by t.description";
-			$result=DBselect($sql);
-			echo "<SELECT class=\"biginput\" NAME=\"depid\" size=\"1\">";
-			for($i=0;$i<DBnum_rows($result);$i++)
-			{
-				$depid=DBget_field($result,$i,0);
-//				$depdescr=DBget_field($result,$i,1);
-
-//				if( strstr($depdescr,"%s"))
-//				{
-					$depdescr=expand_trigger_description($depid);
-//				}
-				echo "<OPTION VALUE=\"$depid\">$depdescr";
-			}
-			echo "</SELECT>";
-
-			show_table2_v_delimiter2();
-			if(isset($triggerid))
-			{
-				echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add dependency\">";
-				if(DBnum_rows($result1)>0)
-				{
-					echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete dependency\">";
-				}
-			}
-		}
-
-		echo "</form>";
-		show_table2_header_end();
-	}
-
 	function	show_footer()
 	{
 		global $USER_DETAILS;
@@ -4489,10 +3838,10 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<td bgcolor=\"#000000\">";
 		echo "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\" width=100% bgcolor=\"#666666\">";
 		echo "<tr><td align=center>";
-		echo "<a href=\"http://www.zabbix.com\">ZABBIX 1.0</a> Copyright 2000-2004 by <a href=\"mailto:alex@gobbo.caves.lv\">Alexei Vladishev</a>";
+		echo "<a href=\"http://www.zabbix.com\">".S_ZABBIX_VER."</a>&nbsp;".S_COPYRIGHT_BY."<a href=\"mailto:alex@gobbo.caves.lv\">".S_ALEXEI_VLADISHEV."</a>";
 		echo "</td>";
 		echo "<td align=right width=15%>";
-		echo "| Connected as ".$USER_DETAILS["alias"];
+		echo "| ".S_CONNECTED_AS."&nbsp;".$USER_DETAILS["alias"];
 		echo "</td>";
 		echo "</tr>";
 		echo "</table>";

@@ -20,7 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = "Hosts";
+	$page["title"] = S_HOSTS;
 	$page["file"] = "hosts.php";
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();
@@ -29,7 +29,7 @@
 <?php
 	if(!check_anyright("Host","U"))
 	{
-		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_footer();
 		exit;
 	}
@@ -41,63 +41,63 @@
 		if($HTTP_GET_VARS["register"]=="add")
 		{
 			$result=add_host($HTTP_GET_VARS["host"],$HTTP_GET_VARS["port"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["useip"],$HTTP_GET_VARS["ip"],$HTTP_GET_VARS["host_templateid"],$HTTP_GET_VARS["newgroup"],$HTTP_GET_VARS["groups"]);
-			show_messages($result,"Host added","Cannot add host");
+			show_messages($result, S_HOST_ADDED, S_CANNOT_ADD_HOST);
 			unset($HTTP_GET_VARS["hostid"]);
 		}
 		if($HTTP_GET_VARS["register"]=="add items from template")
 		{
 			$result=add_using_host_template($HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["host_templateid"]);
-			show_messages($result,"Items added","Cannot add items");
+			show_messages($result, S_ITEMS_ADDED, S_CANNOT_ADD_ITEMS);
 			unset($HTTP_GET_VARS["hostid"]);
 		}
 		if($HTTP_GET_VARS["register"]=="update")
 		{
 			$result=@update_host($HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["host"],$HTTP_GET_VARS["port"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["useip"],$HTTP_GET_VARS["ip"],$HTTP_GET_VARS["newgroup"],$HTTP_GET_VARS["groups"]);
-			show_messages($result,"Host details updated","Cannot update host details");
+			show_messages($result, S_HOST_UPDATED, S_CANNOT_UPDATE_HOST);
 			unset($HTTP_GET_VARS["hostid"]);
 		}
 		if($HTTP_GET_VARS["register"]=="changestatus")
 		{
 			$result=update_host_status($HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["status"]);
-			show_messages($result,"Host status updated","Cannot update host status");
+			show_messages($result,S_HOST_STATUS_UPDATED,S_CANNOT_UPDATE_HOST_STATUS);
 			unset($HTTP_GET_VARS["hostid"]);
 		}
 		if($HTTP_GET_VARS["register"]=="delete")
 		{
 			$result=delete_host($HTTP_GET_VARS["hostid"]);
-			show_messages($result,"Host deleted","Cannot delete host");
+			show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 			unset($HTTP_GET_VARS["hostid"]);
 		}
 		if($HTTP_GET_VARS["register"]=="add group")
 		{
 			$result=add_host_group($HTTP_GET_VARS["name"], $HTTP_GET_VARS["hosts"]);
-			show_messages($result, "Group added", "Cannot add group");
+			show_messages($result, S_GROUP_ADDED, S_CANNOT_ADD_GROUP);
 		}
 		if($HTTP_GET_VARS["register"]=="delete group")
 		{
 			$result=delete_host_group($HTTP_GET_VARS["groupid"]);
-			show_messages($result, "Group deleted", "Cannot delete group");
+			show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
 			unset($HTTP_GET_VARS["groupid"]);
 		}
 		if($HTTP_GET_VARS["register"]=="update group")
 		{
 			$result=update_host_group($HTTP_GET_VARS["groupid"], $HTTP_GET_VARS["name"], $HTTP_GET_VARS["hosts"]);
-			show_messages($result, "Group updated", "Cannot update group");
+			show_messages($result, S_GROUP_UPDATED, _S_CANNOT_UPDATE_GROUP);
 		}
 	}
 ?>
 
 <?php
-	show_table_header("CONFIGURATION OF HOST GROUPS");
+	show_table_header(S_CONFIGURATION_OF_HOST_GROUPS);
 ?>
 
 
 <?php
 	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR><TD WIDTH=3%><B>Id</B></TD>";
-	echo "<TD WIDTH=10%><B>Name</B></TD>";
-	echo "<TD><B>Members</B></TD>";
-	echo "<TD WIDTH=10%><B>Actions</B></TD>";
+	echo "<TR><TD WIDTH=3%><B>".S_ID."</B></TD>";
+	echo "<TD WIDTH=10%><B>".S_NAME."</B></TD>";
+	echo "<TD><B>".S_MEMBERS."</B></TD>";
+	echo "<TD WIDTH=10%><B>".S_ACTIONS."</B></TD>";
 	echo "</TR>";
 
 	$result=DBselect("select groupid,name from groups order by name");
@@ -124,14 +124,14 @@
 		}
 		echo "&nbsp;</TD>";
 		echo "<TD>";
-		echo "<A HREF=\"hosts.php?groupid=".$row["groupid"]."#form\">Change</A>";
+		echo "<A HREF=\"hosts.php?groupid=".$row["groupid"]."#form\">".S_CHANGE."</A>";
 		echo "</TD>";
 		echo "</TR>";
 	}
 	if(DBnum_rows($result)==0)
 	{
 			echo "<TR BGCOLOR=#EEEEEE>";
-			echo "<TD COLSPAN=3 ALIGN=CENTER>-No host groups defined-</TD>";
+			echo "<TD COLSPAN=3 ALIGN=CENTER>".S_NO_HOST_GROUPS_DEFINED."</TD>";
 			echo "<TR>";
 	}
 	echo "</TABLE>";
@@ -140,17 +140,17 @@
 
 <?php
 	show_table_header_begin();
-	echo "CONFIGURATION OF HOSTS";
+	echo S_CONFIGURATION_OF_HOSTS_BIG;
 	show_table_v_delimiter();
 
 	if(isset($HTTP_GET_VARS["groupid"]))
 	{
 //		echo "all ";
-		echo "<a href='hosts.php'>all</a> ";
+		echo "<a href='hosts.php'>".S_ALL."</a> ";
 	}
 	else
 	{
-		echo "<b>[<a href='hosts.php'>all</a>]</b> ";
+		echo "<b>[<a href='hosts.php'>".S_ALL."</a>]</b> ";
 	}
 
 	$result=DBselect("select groupid,name from groups order by name");
@@ -182,12 +182,12 @@
 {
 	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR>";
-	echo "<TD WIDTH=3% NOSAVE><B>Id</B></TD>";
-	echo "<TD><B>Host</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>IP</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>Port</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>Status</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
+	echo "<TD WIDTH=3% NOSAVE><B>".S_ID."</B></TD>";
+	echo "<TD><B>".S_HOST."</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>".S_IP."</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>".S_PORT."</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>".S_STATUS."</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>".S_ACTIONS."</B></TD>";
 	echo "</TR>";
 
 
@@ -226,32 +226,32 @@
         	if(check_right("Host","U",$row["hostid"]))
 		{
 			if($row["status"] == 0)	
-				echo "<a href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=1\"><font color=\"00AA00\">Monitored</font></a>";
+				echo "<a href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=1\"><font color=\"00AA00\">".S_MONITORED."</font></a>";
 			else if($row["status"] == 1)
-				echo "<a href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=0\"><font color=\"AA0000\">Not monitored</font></a>";
+				echo "<a href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=0\"><font color=\"AA0000\">".S_NOT_MONITORED."</font></a>";
 			else if($row["status"] == 2)
-				echo "<font color=\"AAAAAA\">Unreachable</font>";
+				echo "<font color=\"AAAAAA\">".S_UNREACHABLE."</font>";
 			else if($row["status"] == 3)
-				echo "<font color=\"AAAAAA\">Template</font>";
+				echo "<font color=\"AAAAAA\">".S_TEMPLATE."</font>";
 			else if($row["status"] == HOST_STATUS_DELETED)
-				echo "<font color=\"AAAAAA\">Deleted</font>";
+				echo "<font color=\"AAAAAA\">".S_DELETED."</font>";
 			else
-				echo "Unknown";
+				echo S_UNKNOWN;
 		}
 		else
 		{
 			if($row["status"] == 0)	
-				echo "<font color=\"00AA00\">Monitored</font>";
+				echo "<font color=\"00AA00\">".S_MONITORED."</font>";
 			else if($row["status"] == 1)
-				echo "<font color=\"AA0000\">Not monitored</font>";
+				echo "<font color=\"AA0000\">".S_NOT_MONITORED."</font>";
 			else if($row["status"] == 2)
-				echo "<font color=\"AAAAAA\">Unreachable</font>";
+				echo "<font color=\"AAAAAA\">".S_UNREACHABLE."</font>";
 			else if($row["status"] == 3)
-				echo "<font color=\"AAAAAA\">Template</font>";
+				echo "<font color=\"AAAAAA\">".S_TEMPLATE."</font>";
 			else if($row["status"] == HOST_STATUS_DELETED)
-				echo "<font color=\"AAAAAA\">Deleted</font>";
+				echo "<font color=\"AAAAAA\">".S_DELETED."</font>";
 			else
-				echo "Unknown";
+				echo S_UNKNOWN;
 		}
 		echo "</TD>";
         	if(check_right("Host","U",$row["hostid"]))
@@ -260,11 +260,11 @@
 			{
 				if(isset($HTTP_GET_VARS["groupid"]))
 				{
-					echo "<TD><A HREF=\"hosts.php?register=change&hostid=".$row["hostid"]."&groupid=".$HTTP_GET_VARS["groupid"]."#form\">Change</A></TD>";
+					echo "<TD><A HREF=\"hosts.php?register=change&hostid=".$row["hostid"]."&groupid=".$HTTP_GET_VARS["groupid"]."#form\">".S_CHANGE."</A></TD>";
 				}
 				else
 				{
-					echo "<TD><A HREF=\"hosts.php?register=change&hostid=".$row["hostid"]."#form\">Change</A></TD>";
+					echo "<TD><A HREF=\"hosts.php?register=change&hostid=".$row["hostid"]."#form\">".S_CHANGE."</A></TD>";
 				}
 			}
 			else
@@ -274,14 +274,14 @@
 		}
 		else
 		{
-			echo "<TD>Change</TD>";
+			echo "<TD>".S_CHANGE."</TD>";
 		}
 		echo "</TR>";
 	}
 	if(DBnum_rows($result)==0)
 	{
 			echo "<TR BGCOLOR=#EEEEEE>";
-			echo "<TD COLSPAN=5 ALIGN=CENTER>-No hosts defined-</TD>";
+			echo "<TD COLSPAN=5 ALIGN=CENTER>".S_NO_HOSTS_DEFINED."</TD>";
 			echo "<TR>";
 	}
 	echo "</TABLE>";
@@ -337,7 +337,7 @@
 	echo "<br>";
 	echo "<a name=\"form\"></a>";
 	show_table2_header_begin();
-	echo "Host";
+	echo S_HOST;
 
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"hosts.php#form\">";
@@ -349,12 +349,12 @@
 	{
 		echo "<input class=\"biginput\" name=\"groupid\" type=\"hidden\" value=\"".$HTTP_GET_VARS["groupid"]."\">";
 	}
-	echo "Host";
+	echo S_HOST;
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"host\" value=\"$host\" size=20>";
 
 	show_table2_v_delimiter();
-	echo "Groups";
+	echo S_GROUPS;
 	show_table2_h_delimiter();
 	echo "<select multiple class=\"biginput\" name=\"groups[]\" size=\"5\">";
 	$result=DBselect("select distinct groupid,name from groups order by name");
@@ -382,12 +382,12 @@
 	echo "</select>";
 
 	show_table2_v_delimiter();
-	echo nbsp("New group");
+	echo nbsp(S_NEW_GROUP);
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"newgroup\" size=20 value=\"$newgroup\">";
 
 	show_table2_v_delimiter();
-	echo nbsp("Use IP address");
+	echo nbsp(S_USE_IP_ADDRESS);
 	show_table2_h_delimiter();
 // onChange does not work on some browsers: MacOS, KDE browser
 //	echo "<INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"useip\" $useip onChange=\"submit()\">";
@@ -396,7 +396,7 @@
 	if($useip=="checked")
 	{
 		show_table2_v_delimiter();
-		echo "IP address";
+		echo S_IP_ADDRESS;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"ip\" value=\"$ip\" size=15>";
 	}
@@ -406,36 +406,36 @@
 	}
 
 	show_table2_v_delimiter();
-	echo "Port";
+	echo S_PORT;
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"port\" size=6 value=\"$port\">";
 
 	show_table2_v_delimiter();
-	echo "Status";
+	echo S_STATUS;
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"status\" size=\"1\">";
 	if($status==0)
 	{
-		echo "<option value=\"0\" selected>Monitored";
-		echo "<option value=\"1\">Not monitored";
-		echo "<option value=\"3\">Template";
+		echo "<option value=\"0\" selected>".S_MONITORED;
+		echo "<option value=\"1\">".S_NOT_MONITORED;
+		echo "<option value=\"3\">".S_TEMPLATE;
 	}
 	else if($status==3)
 	{
-		echo "<option value=\"0\">Monitored";
-		echo "<option value=\"1\">Not monitored";
-		echo "<option value=\"3\" selected>Template";
+		echo "<option value=\"0\">".S_MONITORED;
+		echo "<option value=\"1\">".S_NOT_MONITORED;
+		echo "<option value=\"3\" selected>".S_TEMPLATE;
 	}
 	else
 	{
-		echo "<option value=\"0\">Monitored";
-		echo "<option value=\"1\" selected>Not monitored";
-		echo "<option value=\"3\">Template";
+		echo "<option value=\"0\">".S_MONITORED;
+		echo "<option value=\"1\" selected>".S_NOT_MONITORED;
+		echo "<option value=\"3\">".S_TEMPLATE;
 	}
 	echo "</select>";
 
 	show_table2_v_delimiter();
-	echo nbsp("Use the host as a template");
+	echo nbsp(S_USE_THE_HOST_AS_A_TEMPLATE);
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"host_templateid\" size=\"1\">";
 	echo "<option value=\"0\" selected>...";
@@ -461,7 +461,7 @@
 	{
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add items from template\">";
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected host?');\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('".S_DELETE_SELECTED_HOST_Q."');\">";
 	}
 
 	show_table2_header_end();

@@ -20,20 +20,20 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = "Configuration of graph";
+	$page["title"] = S_CONFIGURATION_OF_GRAPH;
 	$page["file"] = "graph.php";
 	show_header($page["title"],0,0);
 ?>
 
 <?php
-	show_table_header("CONFIGURATION OF GRAPH");
+	show_table_header(S_CONFIGURATION_OF_GRAPH_BIG);
 	echo "<br>";
 ?>
 
 <?php
 	if(!check_right("Graph","R",$HTTP_GET_VARS["graphid"]))
 	{
-		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_footer();
 		exit;
 	}
@@ -45,31 +45,31 @@
 		if($HTTP_GET_VARS["register"]=="add")
 		{
 			$result=add_item_to_graph($HTTP_GET_VARS["graphid"],$HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["color"],$HTTP_GET_VARS["drawtype"],$HTTP_GET_VARS["sortorder"]);
-			show_messages($result,"Item added","Cannot add item");
+			show_messages($result,S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
 		if($HTTP_GET_VARS["register"]=="update")
 		{
 			$result=update_graph_item($HTTP_GET_VARS["gitemid"],$HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["color"],$HTTP_GET_VARS["drawtype"],$HTTP_GET_VARS["sortorder"]);
-			show_messages($result,"Item updated","Cannot update item");
+			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
 		if($HTTP_GET_VARS["register"]=="delete")
 		{
 			$result=delete_graphs_item($HTTP_GET_VARS["gitemid"]);
-			show_messages($result,"Item deleted","Cannot delete item");
+			show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
 			unset($HTTP_GET_VARS["gitemid"]);
 		}
 		if($HTTP_GET_VARS["register"]=="up")
 		{
 			$sql="update graphs_items set sortorder=sortorder-1 where sortorder>0 and gitemid=".$HTTP_GET_VARS["gitemid"];
 			$result=DBexecute($sql);
-			show_messages($result,"Sort order updated","Cannot update sort order");
+			show_messages($result, S_SORT_ORDER_UPDATED, S_CANNOT_UPDATE_SORT_ORDER);
 			unset($HTTP_GET_VARS["gitemid"]);
 		}
 		if($HTTP_GET_VARS["register"]=="down")
 		{
 			$sql="update graphs_items set sortorder=sortorder+1 where sortorder<100 and gitemid=".$HTTP_GET_VARS["gitemid"];
 			$result=DBexecute($sql);
-			show_messages($result,"Sort order updated","Cannot update sort order");
+			show_messages($result, S_SORT_ORDER_UPDATED, S_CANNOT_UPDATE_SORT_ORDER);
 			unset($HTTP_GET_VARS["gitemid"]);
 		}
 	}
@@ -87,14 +87,14 @@
 	echo "</TR>";
 	echo "</TABLE>";
 
-	show_table_header("DISPLAYED PARAMETERS");
+	show_table_header(S_DISPLAYED_PARAMETERS_BIG);
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TD WIDTH=5% NOSAVE><B>Sort order</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>Host</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>Parameter</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>Type</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>Color</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
+	echo "<TD WIDTH=5% NOSAVE><B>".S_SORT_ORDER."</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>".S_HOST."</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>".S_PARAMETER."</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>".S_TYPE."</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>".S_COLOR."</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>".S_ACTIONS."</B></TD>";
 	echo "</TR>";
 
 	$sql="select i.itemid,h.host,i.description,gi.gitemid,gi.color,gi.drawtype,gi.sortorder from hosts h,graphs_items gi,items i where i.itemid=gi.itemid and gi.graphid=".$HTTP_GET_VARS["graphid"]." and h.hostid=i.hostid order by gi.sortorder";
@@ -111,11 +111,11 @@
 		echo "<TD>".get_drawtype_description($row["drawtype"])."</TD>";
 		echo "<TD>".$row["color"]."</TD>";
 		echo "<TD>";
-		echo "<A HREF=\"graph.php?graphid=".$HTTP_GET_VARS["graphid"]."&gitemid=".$row["gitemid"]."#form\">Change</A>";
+		echo "<A HREF=\"graph.php?graphid=".$HTTP_GET_VARS["graphid"]."&gitemid=".$row["gitemid"]."#form\">".S_CHANGE."</A>";
 		echo " - ";
-		echo "<A HREF=\"graph.php?graphid=".$HTTP_GET_VARS["graphid"]."&gitemid=".$row["gitemid"]."&register=up\">Up</A>";
+		echo "<A HREF=\"graph.php?graphid=".$HTTP_GET_VARS["graphid"]."&gitemid=".$row["gitemid"]."&register=up\">".S_UP."</A>";
 		echo " - ";
-		echo "<A HREF=\"graph.php?graphid=".$HTTP_GET_VARS["graphid"]."&gitemid=".$row["gitemid"]."&register=down\">Down</A>";
+		echo "<A HREF=\"graph.php?graphid=".$HTTP_GET_VARS["graphid"]."&gitemid=".$row["gitemid"]."&register=down\">".S_DOWN."</A>";
 		echo "</TD>";
 		echo "</TR>";
 	}
@@ -141,7 +141,7 @@
 	}
 
 	show_table2_header_begin();
-	echo "New item for graph";
+	echo S_NEW_ITEM_FOR_THE_GRAPH;
 
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"graph.php\">";
@@ -151,7 +151,7 @@
 		echo "<input name=\"gitemid\" type=\"hidden\" value=".$HTTP_GET_VARS["gitemid"].">";
 	}
 
-	echo "Parameter";
+	echo S_PARAMETER;
 	show_table2_h_delimiter();
 	$result=DBselect("select h.host,i.description,i.itemid from hosts h,items i where h.hostid=i.hostid and h.status in (0,2) and i.status=0 order by h.host,i.description");
 	echo "<select name=\"itemid\" size=1>";
@@ -172,7 +172,7 @@
 	echo "</SELECT>";
 
 	show_table2_v_delimiter();
-	echo "Type";
+	echo S_TYPE;
 	show_table2_h_delimiter();
 	echo "<select name=\"drawtype\" size=1>";
 	echo "<OPTION VALUE='0' ".iif(isset($drawtype)&&($drawtype==0),"SELECTED","").">".get_drawtype_description(0);
@@ -182,24 +182,24 @@
 	echo "</SELECT>";
 
 	show_table2_v_delimiter();
-	echo "Color";
+	echo S_COLOR;
 	show_table2_h_delimiter();
 	echo "<select name=\"color\" size=1>";
-	echo "<OPTION VALUE='Black' ".iif(isset($color)&&($color=="Black"),"SELECTED","").">Black";
-	echo "<OPTION VALUE='Blue' ".iif(isset($color)&&($color=="Blue"),"SELECTED","").">Blue";
-	echo "<OPTION VALUE='Cyan' ".iif(isset($color)&&($color=="Cyan"),"SELECTED","").">Cyan";
-	echo "<OPTION VALUE='Dark Blue' ".iif(isset($color)&&($color=="Dark Blue"),"SELECTED","").">Dark blue";
-	echo "<OPTION VALUE='Dark Green' ".iif(isset($color)&&($color=="Dark Green"),"SELECTED","").">Dark green";
-	echo "<OPTION VALUE='Dark Red' ".iif(isset($color)&&($color=="Dark Red"),"SELECTED","").">Dark red";
-	echo "<OPTION VALUE='Dark Yellow' ".iif(isset($color)&&($color=="Dark Yellow"),"SELECTED","").">Dark yellow";
-	echo "<OPTION VALUE='Green' ".iif(isset($color)&&($color=="Green"),"SELECTED","").">Green";
-	echo "<OPTION VALUE='Red' ".iif(isset($color)&&($color=="Red"),"SELECTED","").">Red";
-	echo "<OPTION VALUE='White' ".iif(isset($color)&&($color=="White"),"SELECTED","").">White";
-	echo "<OPTION VALUE='Yellow' ".iif(isset($color)&&($color=="Yellow"),"SELECTED","").">Yellow";
+	echo "<OPTION VALUE='Black' ".iif(isset($color)&&($color=="Black"),"SELECTED","").">".S_BLACK;
+	echo "<OPTION VALUE='Blue' ".iif(isset($color)&&($color=="Blue"),"SELECTED","").">".S_BLUE;
+	echo "<OPTION VALUE='Cyan' ".iif(isset($color)&&($color=="Cyan"),"SELECTED","").">".S_CYAN;
+	echo "<OPTION VALUE='Dark Blue' ".iif(isset($color)&&($color=="Dark Blue"),"SELECTED","").">".S_DARK_BLUE;
+	echo "<OPTION VALUE='Dark Green' ".iif(isset($color)&&($color=="Dark Green"),"SELECTED","").">".S_DARK_GREEN;
+	echo "<OPTION VALUE='Dark Red' ".iif(isset($color)&&($color=="Dark Red"),"SELECTED","").">".S_DARK_RED;
+	echo "<OPTION VALUE='Dark Yellow' ".iif(isset($color)&&($color=="Dark Yellow"),"SELECTED","").">".S_DARK_YELLOW;
+	echo "<OPTION VALUE='Green' ".iif(isset($color)&&($color=="Green"),"SELECTED","").">".S_GREEN;
+	echo "<OPTION VALUE='Red' ".iif(isset($color)&&($color=="Red"),"SELECTED","").">".S_RED;
+	echo "<OPTION VALUE='White' ".iif(isset($color)&&($color=="White"),"SELECTED","").">".S_WHITE;
+	echo "<OPTION VALUE='Yellow' ".iif(isset($color)&&($color=="Yellow"),"SELECTED","").">".S_YELLOW;
 	echo "</SELECT>";
 
 	show_table2_v_delimiter();
-	echo nbsp("Sort order (0->100)");
+	echo nbsp("S_SORT_ORDER_1_100");
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"sortorder\" value=\"$sortorder\" size=3>";
 

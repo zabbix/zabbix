@@ -20,7 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = "Network maps";
+	$page["title"] = S_NETWORK_MAPS;
 	$page["file"] = "maps.php";
 
 	$nomenu=0;
@@ -41,7 +41,7 @@
 <?php
 	if(isset($HTTP_GET_VARS["sysmapid"])&&!check_right("Network map","R",$HTTP_GET_VARS["sysmapid"]))
 	{
-		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_footer();
 		exit;
 	}
@@ -51,7 +51,7 @@
 	if(!isset($HTTP_GET_VARS["fullscreen"]))
 	{
 		show_table_header_begin();
-		echo "NETWORK MAPS";
+		echo S_NETWORK_MAPS_BIG;
 
 		show_table_v_delimiter();
 
@@ -78,7 +78,7 @@
 
 		if(DBnum_rows($result) == 0)
 		{
-			echo "No maps to display";
+			echo S_NO_MAPS_TO_DISPLAY;
 		}
 
 		show_table_header_end();
@@ -102,7 +102,7 @@
 	}
 	else
 	{
-		$map="Select map to display";
+		$map=S_SELECT_MAP_TO_DISPLAY;
 	}
 
 	show_table_header($map);
