@@ -37,6 +37,7 @@
 static pid_t *pids;
 
 char	*config_host_allowed=NULL;
+int	config_agentd_forks=AGENTD_FORKS;
 
 void	signal_handler( int sig )
 {
@@ -99,6 +100,7 @@ void	process_config_file(void)
 	char	*value;
 	char	*value2;
 	int	lineno;
+	int	i;
 
 	file=fopen("/etc/zabbix/zabbix_agentd.conf","r");
 	if(NULL == file)
@@ -135,6 +137,17 @@ void	process_config_file(void)
 			config_host_allowed=(char *)malloc(strlen(value));
 			strcpy(config_host_allowed,value);
 		}
+		else if(strcmp(parameter,"StartAgents")==0)
+		{
+			i=atoi(value);
+			if( (i<1) || (i>16) )
+			{
+				syslog( LOG_CRIT, "Wrong value of StartAgents in line %d. Should be between 1 and 16.", lineno);
+				fclose(file);
+				exit(1);
+			}
+			config_agentd_forks=i;
+		}
 		else if(strcmp(parameter,"DebugLevel")==0)
 		{
 			if(strcmp(value,"1") == 0)
@@ -168,7 +181,7 @@ void	process_config_file(void)
 			value2[0]=0;
 			value2++;
 			syslog( LOG_WARNING, "Added user-defined parameter [%s] Command [%s]", value, value2);
-//			add_user_parameter("system[test]","who|wc -l");
+			add_user_parameter(value, value2);
 		}
 		else
 		{
@@ -352,9 +365,9 @@ int	main()
 
 	listenfd = tcp_listen(host,port,&addrlen);
 
-	pids = calloc(AGENTD_FORKS, sizeof(pid_t));
+	pids = calloc(config_agentd_forks, sizeof(pid_t));
 
-	for(i = 0; i< AGENTD_FORKS; i++)
+	for(i = 0; i<config_agentd_forks; i++)
 	{
 		pids[i] = child_make(i, listenfd, addrlen);
 /*		syslog( LOG_WARNING, "zabbix_agentd #%d started", pids[i]);*/

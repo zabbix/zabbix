@@ -2093,6 +2093,12 @@ The file contains configuration parameters for zabbix_agentd.
 Server=<IP address of Zabbix server>
 \layout Itemize
 
+StartAgents=<number of agents to start>
+\newline 
+The parameter should be between 1 and 16.
+ Defauls value is 5.
+\layout Itemize
+
 DebugLevel=<debug level>
 \layout Itemize
 
@@ -2100,7 +2106,7 @@ UserParameter=<key>,<shell command>
 \layout Standard
 
 Example: UserParameter=users,who|wc -l
-\layout Standard
+\newline 
 
 \layout Standard
 

@@ -1,7 +1,9 @@
 Changes for 1.0beta1:
 
+ - added srv_status.html and services.html (Alexei)
+ - added table services and services_links (Alexei)
+ - support for parameter StartAgents in zabbix_agentd.conf (Alexei)
  - number of forked zabbix_trapperd decreased to 5 (Alexei)
-
  - number of forked zabbix_agentd decreased to 5 (Alexei)
  - support for parameter UserParameter in zabbix_agentd.conf (Alexei)
  - support for advanced zabbix_agentd.conf (Alexei)
