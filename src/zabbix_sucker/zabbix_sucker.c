@@ -44,6 +44,7 @@ static	int	CONFIG_NOTIMEWAIT		=0;
 static	int	CONFIG_TIMEOUT			=SUCKER_TIMEOUT;
 static	int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
 static	char	*CONFIG_PID_FILE		= NULL;
+static	char	*CONFIG_LOG_FILE		= NULL;
 static	char	*CONFIG_DBNAME			= NULL;
 static	char	*CONFIG_DBUSER			= NULL;
 static	char	*CONFIG_DBPASSWORD		= NULL;
@@ -159,7 +160,6 @@ void	daemon_init(void)
 	setlogmask(LOG_UPTO(LOG_DEBUG));	
 	setlogmask(LOG_UPTO(LOG_WARNING));*/
 
-	zabbix_open_log(LOG_TYPE_FILE,LOG_LEVEL_WARNING,"/tmp/tmp.zzz");
 }
 
 void	create_pid_file(void)
@@ -330,6 +330,10 @@ void	process_config_file(void)
 		else if(strcmp(parameter,"PidFile")==0)
 		{
 			CONFIG_PID_FILE=strdup(value);
+		}
+		else if(strcmp(parameter,"LogFile")==0)
+		{
+			CONFIG_LOG_FILE=strdup(value);
 		}
 		else if(strcmp(parameter,"DBName")==0)
 		{
@@ -1004,6 +1008,15 @@ int main(int argc, char **argv)
 	sigaction(SIGCHLD, &phan, NULL);
 
 	process_config_file();
+
+	if(CONFIG_LOG_FILE == NULL)
+	{
+		zabbix_open_log(LOG_TYPE_SYSLOG,LOG_LEVEL_WARNING,NULL);
+	}
+	else
+	{
+		zabbix_open_log(LOG_TYPE_FILE,LOG_LEVEL_WARNING,CONFIG_LOG_FILE);
+	}
 
 /* process_config_file to be removed */
 /*	init_config();*/
