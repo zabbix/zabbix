@@ -178,10 +178,10 @@
 				else
 					$color=$darkyellow;
 
-				if( strstr($label,"%s"))
-				{
+//				if( strstr($label,"%s"))
+//				{
 					$label=expand_trigger_description(DBget_field($result1,0,1));
-				}
+//				}
 			}
 			else if($count>1)
 			{

@@ -12,3 +12,7 @@ CREATE TABLE trends (
   PRIMARY KEY (itemid,clock),
   FOREIGN KEY (itemid) REFERENCES items
 );
+
+update triggers set description=replace(description,'%s','{HOSTNAME}');
+update actions set subject=replace(subject,'%s','{HOSTNAME}');
+update actions set message=replace(message,'%s','{HOSTNAME}');

@@ -184,12 +184,12 @@
 
 		if(isset($triggerid))
 		{
-			$trigger=get_trigger_by_triggerid($triggerid);
-			$description=$trigger["description"];
-			if( strstr($description,"%s"))
-			{
+//			$trigger=get_trigger_by_triggerid($triggerid);
+//			$description=$trigger["description"];
+//			if( strstr($description,"%s"))
+//			{
 				$description=expand_trigger_description($triggerid);
-			}
+//			}
 		}
 		else
 		{
@@ -356,12 +356,12 @@
 		echo "<OPTION VALUE='0' SELECTED>-";
 	        for($i=0;$i<DBnum_rows($result);$i++)
 	        {
-	                $triggerid_=DBget_field($result,$i,0);
-	                $description_=DBget_field($result,$i,1);
-			if( strstr($description_,"%s"))
-			{
+//	                $triggerid_=DBget_field($result,$i,0);
+//	                $description_=DBget_field($result,$i,1);
+//			if( strstr($description_,"%s"))
+//			{
 				$description_=expand_trigger_description($triggerid_);
-			}
+//			}
 			echo "<OPTION VALUE='$triggerid_'>$description_";
 	        }
 	        echo "</SELECT>";

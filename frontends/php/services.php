@@ -312,11 +312,11 @@
         for($i=0;$i<DBnum_rows($result);$i++)
         {
                 $triggerid_=DBget_field($result,$i,0);
-                $description_=DBget_field($result,$i,1);
-		if( strstr($description_,"%s"))
-		{
+//                $description_=DBget_field($result,$i,1);
+//		if( strstr($description_,"%s"))
+//		{
 			$description_=expand_trigger_description($triggerid_);
-		}
+//		}
 //		if(isset($HTTP_GET_VARS["triggerid"]) && ($HTTP_GET_VARS["triggerid"]==$triggerid_))
 		if(isset($triggerid) && ($triggerid==$triggerid_))
                 {
@@ -380,11 +380,11 @@
         for($i=0;$i<DBnum_rows($result);$i++)
         {
                 $servicedownid_=DBget_field($result,$i,0);
-                $name_=DBget_field($result,$i,2);
-		if( strstr($name_,"%s"))
-		{
+//                $name_=DBget_field($result,$i,2);
+//		if( strstr($name_,"%s"))
+//		{
 			$name_=expand_trigger_description(DBget_field($result,$i,1));
-		}
+//		}
 		echo "<OPTION VALUE='$servicedownid_'>$name_";
         }
         echo "</SELECT>";
