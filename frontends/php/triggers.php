@@ -263,7 +263,15 @@
 			{
 				echo "<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."#form\">Change</A> ";
 			}
-			echo "-<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">Actions</A>";
+			echo "-";
+			if(get_action_count_by_triggerid($row["triggerid"])>0)
+			{
+				echo "<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\"><b>A</b>ctions</A>";
+			}
+			else
+			{
+				echo "<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">Actions</A>";
+			}
 			echo "</TD>";
 			echo "</TR>";
 		}
