@@ -371,7 +371,7 @@ int	get_value_SNMP(int version,double *result,char *result_str,DB_ITEM *item)
 				/*sprintf(result_str,"%ld",(long)*vars->val.integer);*/
 				snprintf(result_str,MAX_STRING_LEN-1,"%lu",(long)*vars->val.integer);
 			}
-			else if(vars->type == ASN_OCTET_STR)
+			else if( (vars->type == ASN_OCTET_STR) || (vars->type == ASN_IPADDRESS))
 			{
 				memcpy(result_str,vars->val.string,vars->val_len);
 				result_str[vars->val_len] = '\0';
