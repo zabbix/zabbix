@@ -51,7 +51,7 @@
 		$result=DBselect("select screenid,name,cols,rows from screens order by name");
 		while($row=DBfetch($result))
 		{
-			if(!check_right("Screen","U",$row["screenid"]))
+			if(!check_right("Screen","R",$row["screenid"]))
 			{
 				continue;
 			}
@@ -67,10 +67,6 @@
 			echo " ";
 		}
 
-		if(DBnum_rows($result) == 0)
-		{
-			echo "No screens to display";
-		}
 
 		echo "</font>";
 		show_table_header_end();
