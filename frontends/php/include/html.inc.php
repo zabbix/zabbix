@@ -54,7 +54,7 @@
 
 	function table_begin($class="tborder")
 	{
-		echo "<table class=\"$class\" border=0 width=100% bgcolor='#AAAAAA' cellspacing=1 cellpadding=3>";
+		echo "<table class=\"$class\" border=0 width=\"100%\" bgcolor='#AAAAAA' cellspacing=1 cellpadding=3>";
 		echo "\n";
 	}
 
