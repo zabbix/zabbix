@@ -64,6 +64,7 @@
 #include "expression.h"
 #include "alerter.h"
 #include "pinger.h"
+#include "housekeeper.h"
 
 #include "../zabbix_agent/sysinfo.h"
 
@@ -935,114 +936,6 @@ int get_values(void)
 	return SUCCEED;
 }
 
-int housekeeping_history(int now)
-{
-	char		sql[MAX_STRING_LEN+1];
-	DB_ITEM		item;
-
-	DB_RESULT	*result;
-
-	int		i;
-
-/* How lastdelete is used ??? */
-	sprintf(sql,"select itemid,lastdelete,history,delay from items where lastdelete<=%d", now);
-	result = DBselect(sql);
-
-	for(i=0;i<DBnum_rows(result);i++)
-	{
-		item.itemid=atoi(DBget_field(result,i,0));
-		item.lastdelete=atoi(DBget_field(result,i,1));
-		item.history=atoi(DBget_field(result,i,2));
-		item.delay=atoi(DBget_field(result,i,3));
-
-		if(item.delay==0)
-		{
-			item.delay=1;
-		}
-
-#ifdef HAVE_MYSQL
-		sprintf	(sql,"delete from history where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
-#else
-		sprintf	(sql,"delete from history where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
-#endif
-		DBexecute(sql);
-#ifdef HAVE_MYSQL
-		sprintf	(sql,"delete from history_str where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
-#else
-		sprintf	(sql,"delete from history_str where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
-#endif
-		DBexecute(sql);
-	
-		sprintf(sql,"update items set lastdelete=%d where itemid=%d",now,item.itemid);
-		DBexecute(sql);
-	}
-	DBfree_result(result);
-	return SUCCEED;
-}
-
-int housekeeping_sessions(int now)
-{
-	char	sql[MAX_STRING_LEN+1];
-
-	sprintf	(sql,"delete from sessions where lastaccess<%d",now-24*3600);
-	DBexecute(sql);
-
-	return SUCCEED;
-}
-
-int housekeeping_alerts(int now)
-{
-	char		sql[MAX_STRING_LEN+1];
-	int		alert_history;
-	DB_RESULT	*result;
-	int		res = SUCCEED;
-
-	sprintf(sql,"select alert_history from config");
-	result = DBselect(sql);
-
-	if(DBnum_rows(result) == 0)
-	{
-		zabbix_log( LOG_LEVEL_ERR, "No records in table 'config'.");
-		res = FAIL;
-	}
-	else
-	{
-		alert_history=atoi(DBget_field(result,0,0));
-
-		sprintf	(sql,"delete from alerts where clock<%d",now-24*3600*alert_history);
-		DBexecute(sql);
-	}
-
-	DBfree_result(result);
-	return res;
-}
-
-int housekeeping_alarms(int now)
-{
-	char		sql[MAX_STRING_LEN+1];
-	int		alarm_history;
-	DB_RESULT	*result;
-	int		res = SUCCEED;
-
-	sprintf(sql,"select alarm_history from config");
-	result = DBselect(sql);
-	if(DBnum_rows(result) == 0)
-	{
-		zabbix_log( LOG_LEVEL_ERR, "No records in table 'config'.");
-		res = FAIL;
-	}
-	else
-	{
-		alarm_history=atoi(DBget_field(result,0,0));
-
-		sprintf	(sql,"delete from alarms where clock<%d",now-24*3600*alarm_history);
-		DBexecute(sql);
-	}
-	
-	DBfree_result(result);
-	return res;
-}
-
 int main_nodata_loop()
 {
 	char	sql[MAX_STRING_LEN+1];
@@ -1087,62 +980,6 @@ int main_nodata_loop()
 		setproctitle("sleeping for 30 sec");
 #endif
 		sleep(30);
-	}
-}
-
-int main_housekeeping_loop()
-{
-	int	now;
-
-	if(CONFIG_DISABLE_HOUSEKEEPING == 1)
-	{
-		for(;;)
-		{
-/* Do nothing */
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-			setproctitle("do nothing");
-#endif
-			sleep(3600);
-		}
-	}
-
-	for(;;)
-	{
-		now = time(NULL);
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("connecting to the database");
-#endif
-		DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
-
-		DBvacuum();
-
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("housekeeper [removing old values]");
-#endif
-		housekeeping_history(now);
-
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("housekeeper [removing old alarms]");
-#endif
-		housekeeping_alarms(now);
-
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("housekeeper [removing old alerts]");
-#endif
-		housekeeping_alerts(now);
-
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("housekeeper [removing old sessions]");
-#endif
-		housekeeping_sessions(now);
-
-		zabbix_log( LOG_LEVEL_DEBUG, "Sleeping for %d hours", CONFIG_HOUSEKEEPING_FREQUENCY);
-
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("housekeeper [sleeping for %d hour(s)]", CONFIG_HOUSEKEEPING_FREQUENCY);
-#endif
-		DBclose();
-		sleep(3660*CONFIG_HOUSEKEEPING_FREQUENCY);
 	}
 }
 
@@ -1264,7 +1101,7 @@ int main(int argc, char **argv)
 		sigaction(SIGCHLD, &phan, NULL);
 /* First instance of zabbix_suckerd performs housekeeping procedures */
 		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started [Housekeeper]",sucker_num);
-		main_housekeeping_loop();
+		main_housekeeper_loop();
 	}
 	else if(sucker_num == 1)
 	{
