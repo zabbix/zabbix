@@ -54,6 +54,10 @@
 		$_GET["keep"]=1;
 	}
 
+	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
+	{
+		unset($_GET["groupid"]);
+	}
 
 	if(isset($_GET["graphid"])&&($_GET["graphid"]==0))
 	{
