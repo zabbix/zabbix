@@ -63,3 +63,12 @@
 
 /* Define if you want to use PostgreSQL */
 #undef HAVE_PGSQL
+
+/* Define if you want to use SNMP */
+#undef HAVE_SNMP
+
+/* Define if you want to use NET-SNMP */
+#undef HAVE_NETSNMP
+
+/* Define if you want to use UCD-SNMP */
+#undef HAVE_UCDSNMP
