@@ -1,5 +1,7 @@
 Changes for 1.0beta9:
 
+ - misc fixes for services.php. Thanks to Sébastien "Slix" Liénard.
+ (Alexei)
  - different styles for user-defined graphs (Alexei)
  - cached memory in bytes (not in Kb as before) (Alexei)
  - show current and planned SLA in IT Services screen (Alexei)
