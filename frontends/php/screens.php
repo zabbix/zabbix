@@ -99,7 +99,7 @@
           echo "<TR>";
           for($c=0;$c<$row["cols"];$c++)
           {
-                echo "<TD align=\"center\">\n";
+                echo "<TD align=\"center\" valign=\"top\">\n";
 
 		$sql="select * from screens_items where screenid=$screenid and x=$c and y=$r";
 		$iresult=DBSelect($sql);
