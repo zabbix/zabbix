@@ -45,6 +45,7 @@
 			echo "<TD><B>Expression</B></TD>";
 			echo "<TD WIDTH=\"5%\"><B>True (%)</B></TD>";
 			echo "<TD WIDTH=\"5%\"><B>False (%)</B></TD>";
+			echo "<TD WIDTH=\"5%\"><B>Unknown (%)</B></TD>";
 			echo "</TR>\n";
 		}
 		$lasthost=$row["host"];
@@ -62,6 +63,9 @@
 		echo "</TD>";
 		echo "<TD>";
 		printf("%.4f%%",$availability["false"]);
+		echo "</TD>";
+		echo "<TD>";
+		printf("%.4f%%",$availability["unknown"]);
 		echo "</TD>";
 		echo "</TR>\n";
 	}

@@ -3,7 +3,6 @@ Not ready yet:
 [ CORE. Support for automake ]
 
 [ CORE. Support for Service Tree ] 
-[ CORE. Support for flexible permissions ]
 
 [ CORE. Make Zabbix compile by cc ]
 
@@ -16,6 +15,7 @@ Not ready yet:
 
 Changes for 1.0beta3:
 
+ - support for new trigger status - UNKNOWN (Alexei)
  - zabbix_suckerd housekeeping process to disconnect from 
  DB when unactive (Alexei)
  - support for check_service[http] (Alexei)

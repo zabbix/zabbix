@@ -383,8 +383,12 @@
 			{ echo "<TD ALIGN=CENTER><FONT COLOR=\"00AA00\">FALSE</FONT></TD>";}
 		elseif($row["istrue"]==2)
 			{ echo "<TD ALIGN=CENTER><FONT COLOR=\"777777\">DISABLED</FONT></TD>";  }
-		else 
+		elseif($row["istrue"]==1)
 			{  echo "<TD ALIGN=CENTER><FONT COLOR=\"AA0000\">TRUE</FONT></TD>"; }
+		elseif($row["istrue"]==3)
+			{  echo "<TD ALIGN=CENTER><FONT COLOR=\"AA0000\">UNKNOWN</FONT></TD>"; }
+		else
+			{  echo "<TD ALIGN=CENTER><FONT COLOR=\"AA0000\">Error !</FONT></TD>"; }
 
 		if($row["priority"]==0)		echo "<TD ALIGN=CENTER>Not classified</TD>";
 		elseif($row["priority"]==1)	echo "<TD ALIGN=CENTER>Just information</TD>";

@@ -66,6 +66,10 @@
 		{
 			echo "<TD><font color=\"00AA00\">OFF</font></TD>";
 		}
+		elseif($row["istrue"] == 3)
+		{
+			echo "<TD><font color=\"AAAAAA\">UNKNOWN</font></TD>";
+		}
 		else
 		{
 			echo "<TD><font color=\"AA0000\">ON</font></TD>";
