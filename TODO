@@ -3,7 +3,6 @@ HIGH PRIORITY:
  - add ZBX_ERROR and ZBX_NOTSUPPORTED
  - improve performance of Alarms and Alerts in PHP frontend
  - BUG. Agent return unsupported in case if UserParameter ends by timeout.
- - monitoring of servers without Zabbix agent installed
  - check Rickard's multythreaded agent
  - check new Mariusz patches
  - BUG. Avoid situations when PID file is not deleted.
@@ -54,6 +53,18 @@ Not ready yet:
 - API for sub-agents
 - Add logging to system log
 
+ PLUS:
+
+- Network discovery daemon (?)
+- Native Windows GUI (in version 2.0 ?)
+- Host templates
+- Use UDP instead of TCP as transport protocol (?)
+- backup/restore scripts for server. Backup all (DB, configs, etc).
+- Network topology database
+- Automatic network map generation from topology database
+- Audit log
+- Support for MD5 checksums
+
  OTHER:
 
  - round MIN/MAX/AVG numbers for graphs
@@ -90,3 +101,4 @@ Not ready yet:
  - get rid of problems with ' and "
  - think about service node types (some nodes will automatically register
   problem)
+ - restructure sources (no C files in include/, move some sources into lib, etc)

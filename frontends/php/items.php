@@ -130,6 +130,9 @@
 				case 2:
 					echo "Zabbix trapper";
 					break;
+				case 3:
+					echo "Simple check";
+					break;
 				default:
 					echo "Unknown";
 					break;
