@@ -215,11 +215,11 @@
 
 		if($onlytrue=='true')
 		{
-			$sql="select t.priority,count(*) from triggers t,hosts h,items i,functions f  where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.description $select_cond and i.status in (0,2) $cond group by 1";
+			$sql="select t.priority,count(*) from triggers t,hosts h,items i,functions f  where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and h.status in (0,2) and t.triggerid=f.triggerid and t.description $select_cond and i.status in (0,2) $cond group by 1";
 		}
 		else
 		{
-			$sql="select t.priority,count(*) from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.description  $select_cond and i.status in (0,2) $cond group by 1";
+			$sql="select t.priority,count(*) from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=0 and h.status in (0,2) and t.description $select_cond and i.status in (0,2) $cond group by 1";
 		}
 		$result=DBselect($sql);
 		$p0=$p1=$p2=$p3=$p4=$p5=0;
@@ -272,7 +272,7 @@
 	if($compact!='true') {echo "<BR><FONT SIZE=-1>Expression</FONT></B>";}
 	echo "</TD>";
 
-	echo "<TD WIDTH=\"5%\"><B>Status</B></TD>";
+	echo "<TD WIDTH=\"5%\"><B>Value</B></TD>";
 
 	if(!isset($sort)||(isset($sort) && $sort=="priority"))
 	{
@@ -335,11 +335,11 @@
 
 	if($onlytrue=='true')
 	{
-		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f  where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and t.description $select_cond and t.triggerid=f.triggerid and i.status in (0,2) $cond $sort");
+		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f  where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and t.description $select_cond and t.triggerid=f.triggerid and i.status in (0,2) and h.status in (0,2) $cond $sort");
 	}
 	else
 	{
-		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.description $select_cond and i.status in (0,2) $cond $sort");
+		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=0 and t.description $select_cond and i.status in (0,2) and h.status in (0,2) $cond $sort");
 	}
 	$col=0;
 	while($row=DBfetch($result))
@@ -381,6 +381,8 @@
 		echo "</TD>";
 		if($row["value"]==0)
 			{ echo "<TD ALIGN=CENTER><FONT COLOR=\"00AA00\">FALSE</FONT></TD>";}
+		else if($row["value"]==2)
+			{  echo "<TD ALIGN=CENTER><FONT COLOR=\"AAAAAA\">UNKNOWN</FONT></TD>"; }
 		else
 			{  echo "<TD ALIGN=CENTER><FONT COLOR=\"AA0000\">TRUE</FONT></TD>"; }
 

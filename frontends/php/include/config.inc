@@ -1133,13 +1133,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
 
-	function	update_trigger_status_to_unknown_by_hostid($hostid)
+	function	update_trigger_value_to_unknown_by_hostid($hostid)
 	{
 		$sql="select distinct t.triggerid from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.hostid=$hostid";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
-			update_trigger_status($row["triggerid"],3);
+			$sql="update triggers set value=2 where triggerid=".$row["triggerid"];
+			DBexecute($sql);
 		}
 	}
 
@@ -1158,7 +1159,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		$result=DBselect($sql);
 		if($status != DBget_field($result,0,0))
 		{
-			update_trigger_status_to_unknown_by_hostid($hostid);
+			update_trigger_value_to_unknown_by_hostid($hostid);
 			$sql="update hosts set status=$status where hostid=$hostid";
 			return	DBexecute($sql);
 		}

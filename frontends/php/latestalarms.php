@@ -68,11 +68,11 @@
 		}
 		elseif($row["value"] == 1)
 		{
-			echo "<TD><font color=\"AAAAAA\">ON</font></TD>";
+			echo "<TD><font color=\"AA0000\">ON</font></TD>";
 		}
 		else
 		{
-			echo "<TD><font color=\"AA0000\">UNKNOWN</font></TD>";
+			echo "<TD><font color=\"AAAAAA\">UNKNOWN</font></TD>";
 		}
 		echo "</TR>";
 	}

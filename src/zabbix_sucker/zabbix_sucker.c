@@ -679,9 +679,15 @@ int get_values(void)
 			zabbix_log( LOG_LEVEL_WARNING, "Getting value of [%s] from host [%s] failed", item.key, item.host );
 			zabbix_log( LOG_LEVEL_WARNING, "The value is not stored in database.");
 		}
+
+		if(res != NETWORK_ERROR)
+		{
+		        update_triggers(0, 1, item.itemid, 0 );
+		}
+
 	}
 
-	update_triggers( CONFIG_SUCKERD_FORKS, 0, sucker_num, now );
+/*	update_triggers( CONFIG_SUCKERD_FORKS, 0, sucker_num, now );*/
 
 	DBfree_result(result);
 	return SUCCEED;
