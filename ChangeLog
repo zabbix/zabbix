@@ -1,6 +1,6 @@
 Changes for 1.0alpha9:
 
-
+ - zabbix_suckerd fixed to listen on interfaces other than 127.0.0.1
  - Fixed nasty bug in DB structure. One of indexes of table functions was incorrectly defined as unique.
  - added patches to upgrades/dbpatches/1.0alpha8_to_1.0alpha9
  - Added status line to all PHP forms (like, "[Host added]")
