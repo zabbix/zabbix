@@ -1,5 +1,7 @@
 1.0beta10:
 
+ - UserParameter does not appear in the log
+ - add support for diskused[*]
  - allow creation of PID file as 'root'. Required for RedHat RPMs.
  - add MRTG-like graphs + periodic recalculation of aggregate functions
  - why '-lsnmp' added to the agent's Makefile
@@ -26,6 +28,13 @@ suckerd and agentd)
  - [10] IT Services. SLA for a period of time only (09:00-18:00)
 
 LS:
+
+ - sdelatj legendu graphov v vide tablici
+ - graphs. Dobavljatj item so smescheniem vo vremeni
+ - rename St of Triggers to Triggers, etc
+ - check permissions for zabbix_agentd when started under root
+ - add item to group (not to all)
+ - update host from template
 
 change(N) - raznica mezhdu poslednim i na N vremeni ranee poluchennim
 znacheniem;
