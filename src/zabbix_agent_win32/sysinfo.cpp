@@ -557,6 +557,8 @@ static char *H_SystemUname(char *cmd,char *arg)
 static AGENT_COMMAND commands[]=
 {
    { "__usercnt{*}",H_UserCounter,NULL,NULL },
+   { "agent[avg_collector_time]",H_NumericPtr,NULL,(char *)&statAvgCollectorTime },
+   { "agent[max_collector_time]",H_NumericPtr,NULL,(char *)&statMaxCollectorTime },
    { "cksum[*]",H_CRC32,NULL,NULL },
    { "cpu_util",H_ProcUtil,NULL,(char *)0x00 },
    { "cpu_util5",H_ProcUtil,NULL,(char *)0x01 },
