@@ -3516,15 +3516,17 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	show_table3_h_delimiter($width=10)
 	{
-//		echo "</font>";
+?>
+        </td><td class="horizontal_menu" height=24 colspan=9 width="<?php echo $width;?>%">
+<?php
+/*
 		cr();
 		echo "</td>";
 		cr();
-//		echo "<td width=$width% colspan=1 bgcolor=99AABB align=right valign=\"top\">";
 		echo "<td width=$width% colspan=1 bgcolor=6d88ad align=right valign=\"top\">";
 		cr();
-//		echo "	<font size=-1>";
 		cr();
+*/
 	}
 
 
@@ -3562,19 +3564,20 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	show_table3_v_delimiter()
 	{
-//		echo "</font>";
-		cr();
+?>
+        </td><td class="horizontal_menu_n" height=24 colspan=9>
+
+<?php
+/*		cr();
 		echo "</td>";
 		cr();
 		echo "</tr>";
 		cr();
 		echo "<tr>";
 		cr();
-//		echo "<td colspan=1 bgcolor=99AABB align=left valign=\"top\">";
 		echo "<td colspan=1 bgcolor=#6d88ad align=left valign=\"top\">";
 		cr();
-//		echo "<font size=-1>";
-		cr();
+		cr();*/
 	}
 
 
@@ -3637,6 +3640,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	show_table3_header_begin()
 	{
+?>
+	<table class="menu" cellspacing=0 cellpadding=1 width="100%">
+	<tr>
+<?php
+	echo "<td class=\"horizontal_menu\" height=24 colspan=9>";
+/*
 		echo "<table border=0 align=center cellspacing=0 cellpadding=0 width=100% bgcolor=000000>";
 		cr();
 		echo "<tr>";
@@ -3648,10 +3657,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<tr>";
 		cr();
 		echo "<td colspan=1 bgcolor=#6d88ad align=left valign=\"medium\">";
-//		echo "<td colspan=1 bgcolor=99AABB align=left valign=\"medium\">";
 		cr();
-//		echo "	<font size=+1>";
-		cr();
+		cr();*/
 	}
 
 
@@ -3675,30 +3682,34 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	show_table_header_end()
 	{
-//		echo "	</font>";
-		cr();
+/*		cr();
 		echo "</td>";
 		cr();
 		echo "</tr>";
 		cr();
 		echo "</table>";
-		cr();
+		cr();*/
 		echo "</td>";
-		cr();
 		echo "</tr>";
-		cr();
 		echo "</table>";
-		cr();
 	}
 
 	function	show_table_header($title)
 	{
-		show_table_header_begin();
+/*		show_table_header_begin();
 		cr();
 		echo $title;
 		cr();
 		show_table_header_end();
-		cr();
+		cr();*/
+?>
+	<table class="menu" width="100%" cellspacing=0 cellpadding=1>
+	<tr>
+	<td class="horizontal_menu" height=24 colspan=9><b><?php echo $title; ?></b></td>
+	</tr>
+	</table>
+<?php
+
 	}
 
 	function	insert_time_navigator($itemid,$period,$from)
