@@ -1,0 +1,5 @@
+* Support for check_port[*] parameter
+* Support for check_service[*] parameter
+* Installation program
+* Possibility to store configuration in registry
+* Configuration tool (may be through MMC)
