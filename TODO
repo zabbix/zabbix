@@ -1,5 +1,6 @@
 1.0beta11:
 
+ - fix agent crash when no sensors in /proc
  - cannot use "." as key in trigger expressions
  - discuss prefixes diskfree>10K
  - support for suffixes in trigger expressions (K,M,G)
