@@ -1,5 +1,6 @@
 Changes for 1.0alpha7:
 
+ - added file frontends/php/about.html
  - link can be deleted now (network maps)
  - host icons in network maps became clickable
  - function NODATA is no longer supported
