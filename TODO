@@ -29,6 +29,7 @@ Not ready yet:
 
  OTHER:
 
+ - support for net-snmp
  - support for OS X (network loads, disk loads)
  - support fo netload under other platforms
  - support for disk loads
@@ -39,7 +40,7 @@ Not ready yet:
  - update trigger status to UNKNOWN if cannot evaluate function 
  - do not dump "Expression cannot be evaluated" in case if function.lastvalue
    is NULL
- - when doing UserParameter sdo not return FAIL in case of timeout
+ - when doing UserParameter do not return FAIL in case of timeout
 
  LATER:
 
