@@ -93,7 +93,9 @@
 	echo "<TD ALIGN=CENTER>";
 	if(isset($HTTP_GET_VARS["graphid"]))
 	{
-		echo "<IMG SRC=\"chart2.php?graphid=".$HTTP_GET_VARS["graphid"]."&period=".$HTTP_GET_VARS["period"]."&from=".$HTTP_GET_VARS["from"]."\">";
+		echo "<script language=\"JavaScript\">";
+		echo "document.write(\"<IMG SRC='chart2.php?graphid=".$HTTP_GET_VARS["graphid"]."&period=".$HTTP_GET_VARS["period"]."&from=".$HTTP_GET_VARS["from"]."&x=\"+(document.width-108)+\">\")";
+		echo "</script>";
 	}
 	else
 	{
