@@ -112,6 +112,13 @@ DB_ITEM
 	int	delta;
 	int	multiplier;
 	char	*units;
+
+	char	*snmpv3_securityname;
+	int	snmpv3_securitylevel;
+	char	*snmpv3_authpassphrase;
+	char	*snmpv3_privpassphrase;
+
+	char	*formula;
 };
  
 DB_FUNCTION

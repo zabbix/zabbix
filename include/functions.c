@@ -733,7 +733,12 @@ int	evaluate_FUNCTION_thread(MYSQL *database, char *value,DB_ITEM *item,char *fu
 		(SUCCEED == ret) && strlen(item->units)>0)
 	{
 		value_float=atof(value);
-		value_float=value_float*pow(1024,item->multiplier);
+		/* Use multiplier ? */
+/*		if(item->multiplier == 1)
+		{
+			zabbix_log( LOG_LEVEL_WARNING, "HMM [%s] [%f] [%f]",item->formula, value_float, atof(item->formula));
+			value_float=value_float*atof(item->formula);
+		}*/
 		value_float_abs=abs(value_float);
 		if(value_float_abs<1024)
 		{
@@ -993,7 +998,11 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
 		(SUCCEED == ret) && strlen(item->units)>0)
 	{
 		value_float=atof(value);
-		value_float=value_float*pow(1024,item->multiplier);
+		/* Custom multiplier? */
+		if(item->multiplier == 1)
+		{
+			value_float=value_float*atof(item->formula);
+		}
 		value_float_abs=abs(value_float);
 		if(value_float_abs<1024)
 		{
@@ -2231,6 +2240,7 @@ void	process_new_value_thread(MYSQL *database, DB_ITEM *item,char *value)
 	char	sql[MAX_STRING_LEN];
 	char	value_esc[MAX_STRING_LEN];
 	double	value_double;
+	double	multiplier;
 	char	*e;
 
 	now = time(NULL);
@@ -2238,17 +2248,23 @@ void	process_new_value_thread(MYSQL *database, DB_ITEM *item,char *value)
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_new_value()");
 	value_double=strtod(value,&e);
 
+	if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (item->multiplier == ITEM_MULTIPLIER_USE))
+	{
+		multiplier = strtod(item->formula,&e);
+		value_double = value_double * multiplier;
+	}
+
 	if(item->history>0)
 	{
 		if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
 		{
 			/* Should we store delta or original value? */
-			if(item->delta == 0)
+			if(item->delta == ITEM_STORE_AS_IS)
 			{
 				DBadd_history_thread(database, item->itemid,value_double,now);
 			}
 			/* Delta as speed of change */
-			else if(item->delta == 1)
+			else if(item->delta == ITEM_STORE_SPEED_PER_SECOND)
 			{
 				/* Save delta */
 				if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
@@ -2257,7 +2273,7 @@ void	process_new_value_thread(MYSQL *database, DB_ITEM *item,char *value)
 				}
 			}
 			/* Real delta: simple difference between values */
-			else if(item->delta == 2)
+			else if(item->delta == ITEM_STORE_SIMPLE_CHANGE)
 			{
 				/* Save delta */
 				if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
@@ -2278,7 +2294,7 @@ void	process_new_value_thread(MYSQL *database, DB_ITEM *item,char *value)
 	}
 
 
-	if(item->delta ==0)
+	if(item->delta == ITEM_STORE_AS_IS)
 	{
 		if((item->prevvalue_null == 1) || (strcmp(value,item->lastvalue_str) != 0) || (strcmp(item->prevvalue_str,item->lastvalue_str) != 0) )
 		{
@@ -2298,7 +2314,7 @@ void	process_new_value_thread(MYSQL *database, DB_ITEM *item,char *value)
 		}
 	}
 	/* Logic for delta as speed of change */
-	else if(item->delta == 1)
+	else if(item->delta == ITEM_STORE_SPEED_PER_SECOND)
 	{
 		if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
 		{
@@ -2318,7 +2334,7 @@ void	process_new_value_thread(MYSQL *database, DB_ITEM *item,char *value)
 		item->lastvalue_null=0;
 	}
 	/* Real delta: simple difference between values */
-	else if(item->delta == 2)
+	else if(item->delta == ITEM_STORE_SIMPLE_CHANGE)
 	{
 		if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
 		{

@@ -20,8 +20,9 @@
 
 /*#define TESTTEST*/
 
+/*
 #define	ZABBIX_THREADS
-
+*/
 #define	IT_HELPDESK
 
 #ifndef ZABBIX_COMMON_H
@@ -58,6 +59,20 @@
 /* Item value types */
 #define ITEM_VALUE_TYPE_FLOAT	0
 #define ITEM_VALUE_TYPE_STR	1
+
+/* Item snmpv3 security levels */
+#define ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV	0
+#define ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV	1
+#define ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV	2
+
+/* Item multiplier types */
+#define ITEM_MULTIPLIER_DO_NOT_USE		0
+#define ITEM_MULTIPLIER_USE			1
+
+/* Item delta types */
+#define ITEM_STORE_AS_IS		0
+#define ITEM_STORE_SPEED_PER_SECOND	1
+#define ITEM_STORE_SIMPLE_CHANGE	2
 
 /* Recipient types for actions */
 #define RECIPIENT_TYPE_USER	0

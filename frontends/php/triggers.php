@@ -223,8 +223,8 @@
 				show_table_header("<A HREF='triggers.php?hostid=".$row["hostid"]."'>".$row["host"]."</A>");
 				echo "<form method=\"get\" action=\"triggers.php\">";
 				echo "<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_GET["hostid"]." size=8>";
-				echo "<TABLE BORDER=0 COLS=3 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-				echo "<TR>";
+				echo "<TABLE BORDER=0 COLS=3 WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
+				echo "<TR BGCOLOR=\"#CCCCCC\">";
 				echo "<TD WIDTH=\"8%\"><B>Id</B></TD>";
 				echo "<TD><B>".S_DESCRIPTION."</B></TD>";
 				echo "<TD><B>".S_EXPRESSION."</B></TD>";

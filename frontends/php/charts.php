@@ -131,7 +131,7 @@
 	if(isset($_GET["graphid"])/*&&(!isset($_GET["fullscreen"]))*/)
 	{
 // BEGIN - IGMI - just another way of navigation
-	echo "<TABLE BORDER=0 align=center COLS=2 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TABLE BORDER=0 align=center COLS=2 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=1>";
 	echo "<TR BGCOLOR=#FFFFFF>";
 	echo "<TD ALIGN=LEFT>";
 
@@ -163,27 +163,6 @@
 
 			echo "]&nbsp;";
 		}
-
-//		echo("[<A HREF=\"charts.php?period=".(7*24*3600).url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">week</A>]&nbsp;");
-//		echo("[<A HREF=\"charts.php?period=".(30*24*3600).url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">month</A>]&nbsp;");
-//		echo("[<A HREF=\"charts.php?period=".(365*24*3600).url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">year</A>]&nbsp;");
-
-/*		echo("or&nbsp;");
-		$tmp=$_GET["period"]+$hour;
-		echo("[<A HREF=\"charts.php?period=$tmp".url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">");
-		echo("+1h</A>]&nbsp;");
-
-		if ($_GET["period"]>$hour) 
-		{
-			$tmp=$_GET["period"]-$hour;
-//			echo("[<A HREF=\"charts.php?graphid=".$_GET["graphid"]."&from=".$_GET["from"]."&period=".$tmp."&keep=".$_GET["keep"]."\">");
-			echo("[<A HREF=\"charts.php?period=$tmp".url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">");
-			echo("-1h</A>]&nbsp;");
-		}
-		else
-		{
-			echo("[-1h]&nbsp;");
-		}*/
 
 		echo("</div>");
 

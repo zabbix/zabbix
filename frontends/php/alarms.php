@@ -19,10 +19,9 @@
 **/
 ?>
 <?php
+	include "include/config.inc.php";
 	$page["title"] = S_ALARMS;
 	$page["file"] = "alarms.php";
-
-	include "include/config.inc.php";
 	show_header($page["title"],0,0);
 ?>
 
@@ -92,8 +91,8 @@
 	$sql="select clock,value,triggerid from alarms where triggerid=".$_GET["triggerid"]." order by clock desc $limit";
 	$result=DBselect($sql);
 
-	echo "<TABLE WIDTH=100% align=center BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR>";
+	echo "<TABLE WIDTH=100% align=center BORDER=0 BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
+	echo "<TR BGCOLOR=\"#CCCCCC\">";
 	table_td("<B>".S_TIME."</B>","");
 	table_td("<B>".S_STATUS."</B>","");
 	table_td("<B>".S_DURATION."</B>","");

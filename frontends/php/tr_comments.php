@@ -19,12 +19,12 @@
 **/
 ?>
 <?php
+	include "include/config.inc.php";
 	$page["title"] = S_TRIGGER_COMMENTS;
 	$page["file"] = "tr_comments.php";
-
-	include "include/config.inc.php";
 	show_header($page["title"],0,0);
 ?>
+
 <?php
 	if(!check_right("Trigger comment","R",$_GET["triggerid"]))
 	{

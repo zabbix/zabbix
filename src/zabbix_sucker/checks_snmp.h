@@ -41,6 +41,10 @@
 	#include <ucd-snmp/ucd-snmp-config.h>
 	#include <ucd-snmp/ucd-snmp-includes.h>
 	#include <ucd-snmp/system.h>
+/* For usmHMACMD5AuthProtocol */
+	#include <ucd-snmp/transform_oids.h>
+/* For generate_Ku() */
+	#include <ucd-snmp/keytools.h>
 #endif
 
 

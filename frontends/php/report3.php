@@ -76,8 +76,8 @@
 
 
 	echo "<br>";
-	echo "<TABLE BORDER=0 COLS=3 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR>";
+	echo "<TABLE BORDER=0 COLS=3 WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
+	echo "<TR BGCOLOR=\"#CCCCCC\">";
 	echo "<TD WIDTH=15%><B>From</B></TD>";
 	echo "<TD WIDTH=15%><B>Till</B></TD>";
 	echo "<TD WIDTH=10%><B>OK</B></TD>";

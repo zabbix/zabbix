@@ -28,8 +28,8 @@
 <?php
 	show_table_header(S_STATUS_OF_ZABBIX_BIG);
 
-	echo "<TABLE BORDER=0 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR><TD WIDTH=10%><B>".S_PARAMETER."</B></TD>";
+	echo "<TABLE BORDER=0 WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
+	echo "<TR BGCOLOR=\"#CCCCCC\"><TD WIDTH=10%><B>".S_PARAMETER."</B></TD>";
 	echo "<TD WIDTH=10% NOSAVE><B>".S_VALUE."</B></TD>";
 	echo "</TR>";
 

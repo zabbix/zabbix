@@ -19,10 +19,9 @@
 **/
 ?>
 <?php
-	$page["title"] = S_STATUS_OF_TRIGGERS;
-	$page["file"] = "tr_status.php";
-
 	include "include/config.inc.php";
+	$page["file"] = "tr_status.php";
+	$page["title"] = S_STATUS_OF_TRIGGERS;
 ?>
 <?php
 	$tr_hash=calc_trigger_hash();
@@ -175,10 +174,106 @@
 	{
 		$select_cond="like '%$txt_select%'";
 	}
+?>
 
+
+
+
+
+<?php
+	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
+	{
+		unset($_GET["groupid"]);
+	}
+?>
+
+<?php
+	show_table3_header_begin();
+	echo "&nbsp;".S_STATUS_OF_TRIGGERS_BIG;
+	show_table3_h_delimiter(60);
+?>
+		<form name="form2" method="get" action="tr_status.php">
+
+<?php
+	echo "<input name=\"onlytrue\" type=\"hidden\" value=\"".$_GET["onlytrue"]."\">";
+	echo "<input name=\"noactions\" type=\"hidden\" value=\"".$_GET["noactions"]."\">";
+	echo S_GROUP."&nbsp;";
+	echo "<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
+	echo "<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_ALL_SMALL;
+
+	$result=DBselect("select groupid,name from groups order by name");
+	while($row=DBfetch($result))
+	{
+// Check if at least one host with read permission exists for this group
+		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status in (0,2) and h.hostid=i.hostid and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
+		$cnt=0;
+		while($row2=DBfetch($result2))
+		{
+			if(!check_right("Host","R",$row2["hostid"]))
+			{
+				continue;
+			}
+			$cnt=1; break;
+		}
+		if($cnt!=0)
+		{
+			echo "<option value=\"".$row["groupid"]."\" ".iif(isset($_GET["groupid"])&&($_GET["groupid"]==$row["groupid"]),"selected","").">".$row["name"];
+		}
+	}
+	echo "</select>";
+
+	echo "&nbsp;".S_HOST."&nbsp;";
+	echo "<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
+	echo "<option value=\"0\"".iif(!isset($_GET["hostid"])||($_GET["hostid"]==0),"selected","").">Select host...";
+
+	if(isset($_GET["groupid"]))
+	{
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status in (0,2) and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+	}
+	else
+	{
+		$sql="select h.hostid,h.host from hosts h,items i where h.status in (0,2) and h.hostid=i.hostid group by h.hostid,h.host order by h.host";
+	}
+
+	$result=DBselect($sql);
+	while($row=DBfetch($result))
+	{
+		if(!check_right("Host","R",$row["hostid"]))
+		{
+			continue;
+		}
+		echo "<option value=\"".$row["hostid"]."\"".iif(isset($_GET["hostid"])&&($_GET["hostid"]==$row["hostid"]),"selected","").">".$row["host"];
+	}
+	echo "</select>";
+
+	echo nbsp("  ");
+
+	if(isset($_GET["select"])&&($_GET["select"]==""))
+	{
+		unset($_GET["select"]);
+	}
+	if(isset($_GET["select"]))
+	{
+		echo $_GET["select"];
+	}
+	if(isset($_GET["select"]))
+	{
+  		echo "<input class=\"biginput\" type=\"text\" name=\"select\" value=\"".$_GET["select"]."\">";
+	}
+	else
+	{
+ 		echo "<input class=\"biginput\" type=\"text\" name=\"select\" value=\"\">";
+	}
+	echo nbsp(" ");
+  	echo "<input class=\"button\" type=\"submit\" name=\"do\" value=\"select\">";
+	echo "</form>";
+//	show_table_header_end();
+?>
+
+<?php
 	if(!isset($_GET["fullscreen"]))
 	{
-		show_table_header_begin();
+/*		show_table_header_begin();
 		echo S_STATUS_OF_TRIGGERS_BIG;
 	        show_table_v_delimiter();
 
@@ -205,9 +300,9 @@
 	                {
 	                        echo "<A HREF=\"tr_status.php?hostid=".$row["hostid"]."&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">".$row["host"]."</A>  ";
 	                }
-	        }
+	        }*/
 	 
-		show_table_v_delimiter();
+		show_table_v_delimiter(2);
 ?>
 
 <?php
@@ -315,9 +410,9 @@
 		show_table_header("<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&fullscreen=1&sort=$sort\">".S_TRIGGERS_BIG." $time</A>");
 	}
   
-	echo "<TABLE BORDER=0 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TABLE BORDER=0 WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
 
-	echo "<TR ALIGN=CENTER>";
+	echo "<TR ALIGN=CENTER BGCOLOR=\"#CCCCCC\">";
 	if(isset($_GET["fullscreen"]))
 	{
 		$fullscreen="&fullscreen=1";
@@ -368,17 +463,17 @@
 
 	if(isset($sort) && $sort=="lastchange")
 	{
-		echo "<B>".S_LAST_CHANGE_BIG;
+		echo "<B>".nbsp(S_LAST_CHANGE_BIG);
 	}
 	else
 	{
 		if($select=="TRUE")
 		{
-			echo "<B><A HREF=\"tr_status.php?sort=lastchange&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">".S_LAST_CHANGE."</a>";
+			echo "<B><A HREF=\"tr_status.php?sort=lastchange&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">".nbsp(S_LAST_CHANGE)."</a>";
 		}
 		else
 		{
-			echo "<B><A HREF=\"tr_status.php?sort=lastchange&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$fullscreen$cond\">".S_LAST_CHANGE."</a>";
+			echo "<B><A HREF=\"tr_status.php?sort=lastchange&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$fullscreen$cond\">".nbsp(S_LAST_CHANGE)."</a>";
 		}
 	}
 	echo "</TD>";

@@ -93,11 +93,28 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item)
 	else if(session.version == SNMP_VERSION_3)
 	{
 		/* set the SNMPv3 user name */
-		session.securityName = strdup("myuser");
+		session.securityName = item->snmpv3_securityname;
 		session.securityNameLen = strlen(session.securityName);
 
 		/* set the security level to authenticated, but not encrypted */
-		session.securityLevel = SNMP_SEC_LEVEL_AUTHNOPRIV;
+
+		if(item->snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV)
+		{
+			session.securityLevel = SNMP_SEC_LEVEL_NOAUTH;
+		}
+		else if(item->snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV)
+		{
+			session.securityLevel = SNMP_SEC_LEVEL_AUTHNOPRIV;
+		}
+		else if(item->snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV)
+		{
+			session.securityLevel = SNMP_SEC_LEVEL_AUTHPRIV;
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_ERR, "Unsupported SNMPv3 security level [%d]", item->snmpv3_securitylevel);
+			return FAIL;
+		}
 
 		/* set the authentication method to MD5 */
 		session.securityAuthProto = usmHMACMD5AuthProtocol;
@@ -107,9 +124,11 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item)
 		/* set the authentication key to a MD5 hashed version of our
 		passphrase "The UCD Demo Password" (which must be at least 8
 		characters long) */
+
+		/* Where item->snmpv3_privpassphrase has to be used? */
 		if (generate_Ku(session.securityAuthProto,
 				session.securityAuthProtoLen,
-				(u_char *) our_v3_passphrase, strlen(our_v3_passphrase),
+				(u_char *) item->snmpv3_authpassphrase, strlen(item->snmpv3_authpassphrase),
 				session.securityAuthKey,
 				&session.securityAuthKeyLen) != SNMPERR_SUCCESS)
 		{
