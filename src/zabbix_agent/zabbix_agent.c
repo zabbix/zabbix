@@ -158,7 +158,14 @@ int	main()
 	if( function !=0 )
 	{
 		result=function(parameter);
-		printf("%f",result);
+		if( result == FAIL )
+		{
+			printf("%d\n",NOTSUPPORTED);
+		}
+		else
+		{
+			printf("%f",result);
+		}
 	}
 	else
 	{
