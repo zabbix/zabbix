@@ -218,7 +218,7 @@ float   FILESIZE(const char * filename)
 
 float	INODE(const char * mountPoint)
 {
-#ifdef HAVE_SYS_STATVFS
+#ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
 
 	if ( statvfs( (char *)mountPoint, &s) != 0 )
@@ -259,7 +259,7 @@ float	INODE(const char * mountPoint)
 
 float	DF(const char * mountPoint)
 {
-#ifdef HAVE_SYS_STATVFS
+#ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
 
 	if ( statvfs( (char *)mountPoint, &s) != 0 )
