@@ -1,5 +1,5 @@
 <?
-	include "include/config.inc";
+	include "include/config.inc.php";
 	$page["title"] = "Network maps";
 	$page["file"] = "maps.php";
 

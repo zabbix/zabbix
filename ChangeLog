@@ -1,9 +1,6 @@
 Not ready yet:
 
-[ CORE. Investigate why new alarm added for unreachable host ]
-
 [ HB. Verify parameters before using them in SQL ]
-[ HB. Check IP addresses for trapped parameters ]
 [ CORE. Support for Service Tree ] 
 [ CORE. If Zabbix is restarted change triggers status to UNKNOWN ]
 [ CORE. Change trigger status in case if host/item status is changed ]
@@ -13,7 +10,6 @@ Not ready yet:
 
 [ PHP. Show triggers by userid ]
 [ PHP. Split include/common.inc ]
-[ PHP. Rename *.inc to *.inc.php ]
 
 [ CORE. Make one suckerd to send emails ]
 
@@ -28,7 +24,10 @@ snmpget -On localhost public enterprises.ucdavis.memory.memTotalSwap.0]
 
 Changes for 1.0beta4:
 
- - new column item.trapper_hosts (Alexei)
+ - php/include/*inc renamed to php/include/*inc.php (Alexei)
+ - check of source IP address for trapped values (Alexei)
+ - added include/security.h and include/security.c (Alexei)
+ - added items.trapper_hosts (Alexei)
  - housekeeping period for items to be set in days (Alexei)
  - authorisation without user name/password (Alexei)
  - default user "guest" (Alexei)

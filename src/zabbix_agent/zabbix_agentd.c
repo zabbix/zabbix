@@ -31,6 +31,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "security.h"
 #include "zabbix_agent.h"
 
 #include "log.h"
@@ -235,7 +236,7 @@ void    init_config(void)
 		CONFIG_PID_FILE=strdup("/tmp/zabbix_agentd.pid");
 	}
 }
-
+/*
 int	check_security(int sockfd)
 {
 	char	*sname;
@@ -275,6 +276,7 @@ int	check_security(int sockfd)
 	zabbix_log( LOG_LEVEL_WARNING, "Connection from [%s] rejected. Allowed server is [%s] ",sname, CONFIG_HOSTS_ALLOWED);
 	return	FAIL;
 }
+*/
 
 void	process_child(int sockfd)
 {
@@ -384,7 +386,7 @@ void	child_main(int i,int listenfd, int addrlen)
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("processing request");
 #endif
-		if( check_security(connfd) == SUCCEED)
+		if( check_security(connfd, CONFIG_HOSTS_ALLOWED, 0) == SUCCEED)
 		{
 			process_child(connfd);
 		}

@@ -43,6 +43,7 @@ DB_ITEM
 	char    *shortname;
 	char    *snmp_community;
 	char    *snmp_oid;
+	char	*trapper_hosts;
 	int     port;
 	int     delay;
 	int     history;

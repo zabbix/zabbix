@@ -38,6 +38,7 @@ CREATE TABLE items (
   lastclock		int4		DEFAULT NULL,
   prevvalue		varchar(255)	DEFAULT NULL,
   status		int4		DEFAULT '0' NOT NULL,
+  trapper_hosts		varchar(255)	DEFAULT '' NOT NULL,
   PRIMARY KEY (itemid),
   FOREIGN KEY (hostid) REFERENCES hosts
 );

@@ -1,7 +1,7 @@
 Order Deny,Allow
 Deny from All
 
-<files config.inc>
+<files *.php>
 Order Deny,Allow
 Deny from All
 </files>

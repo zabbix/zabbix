@@ -2,7 +2,7 @@
 	$page["title"]="Zabbix main page";
 	$page["file"]="index.php";
 
-	include "include/config.inc";
+	include "include/config.inc.php";
 
 	if(isset($reconnect))
 	{

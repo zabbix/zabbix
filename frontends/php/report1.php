@@ -1,5 +1,5 @@
 <?
-	include "include/config.inc";
+	include "include/config.inc.php";
 	$page["title"] = "Status of Zabbix";
 	$page["file"] = "report1.php";
 	show_header($page["title"],0,0);
