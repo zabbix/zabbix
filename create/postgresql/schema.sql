@@ -1,6 +1,20 @@
 \connect zabbix
 
 --
+-- Table structure for table 'sysmaps'
+--
+
+CREATE TABLE sysmaps (
+  sysmapid		serial,
+  name			varchar(128)	DEFAULT '' NOT NULL,
+  width			int4		DEFAULT '0' NOT NULL,
+  height		int4		DEFAULT '0' NOT NULL,
+  PRIMARY KEY (sysmapid)
+);
+
+CREATE UNIQUE INDEX sysmaps_name on sysmaps (name);
+
+--
 -- Table structure for table 'hosts'
 --
 
