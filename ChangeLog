@@ -2,7 +2,7 @@ Changes for 1.0beta9:
 
  - added severity to media definition (Alexei)
  - add media.severity (Alexei)
- - added support for check_service_perf[*] (Alexei)
+ - added support for check_service_perf[*]. Thanks to Jürgen Schmitz (Alexei)
  - added parameter AlertScriptsPath to zabbix_suckerd (Alexei)
  - added support for alternative medias (Alexei)
  - added src/zabbix_sucker/alerter.h (Alexei)
@@ -26,8 +26,6 @@ Changes for 1.0beta9:
  - added sort order by sortorder for IT Services (Alexei)
  - added column service.sortorder (Alexei)
  - show last 20% (80%-100%) in SLA bar (Alexei)
- - changes definition of check_service[*]. Now it returns number of seconds
- spent on service check. Tahns to Jürgen Schmitz. (Alexei)
  - fixed statistics of bounced interfaces (Alexei)
  - added support for zabbix[items], zabbix[history] (Alexei)
  - new item type: internal (Alexei)
@@ -36,7 +34,7 @@ Changes for 1.0beta9:
  disk_write_blksX[*] (Alexei)
  - added basice support of monitoring of disk stats (Alexei)
  - session cookie will expire wneh session is closed (Alexei)
- - fixed situation when large SNMP values becomes nagative (Alexei) 
+ - fixed situation when large SNMP values become nagative (Alexei) 
  - added EOL character to make HTML source more readable (Alexei)
  - added new column "severity" to history of alarms (Alexei)
  - status of triggers. If Select is used, no refresh (Alexei)
