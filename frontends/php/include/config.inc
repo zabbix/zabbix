@@ -435,7 +435,7 @@
 				}
 				else
 				{
-					$exp=$exp."{<A HREF=\"history.html?action=showhistory&itemid=$row1[4]\">".DBget_field($res1,0,0).":".DBget_field($res1,0,1)."</A>.<B>".DBget_field($res1,0,2)."(</B>".DBget_field($res1,0,3)."<B>)</B>}";
+					$exp=$exp."{<A HREF=\"history.html?action=showhistory&itemid=".DBget_field($res1,0,4)."\">".DBget_field($res1,0,0).":".DBget_field($res1,0,1)."</A>.<B>".DBget_field($res1,0,2)."(</B>".DBget_field($res1,0,3)."<B>)</B>}";
 				}
 				continue;
 			}
