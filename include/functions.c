@@ -922,6 +922,9 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 			}
 			strscpy(action.message,action.subject);
 
+			substitute_macros(trigger, &action, action.message);
+			substitute_macros(trigger, &action, action.subject);
+
 /*			substitute_hostname(trigger->triggerid,action.message);
 			substitute_hostname(trigger->triggerid,action.subject);*/
 		}
@@ -943,6 +946,9 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 				strncat(action.subject," (OFF)", MAX_STRING_LEN);
 			}
 			strscpy(action.message,action.subject);
+
+			substitute_macros(trigger, &action, action.message);
+			substitute_macros(trigger, &action, action.subject);
 
 /*			substitute_hostname(trigger->triggerid,action.message);
 			substitute_hostname(trigger->triggerid,action.subject);*/

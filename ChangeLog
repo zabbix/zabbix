@@ -1,5 +1,6 @@
 Changes for 1.0beta14:
 
+ - added substitution of macros for all actions (Alexei)
  - added escaping of 'special' characters before SQL insert statements
  (Alexei)
  - fixed removal of sysmaps hosts and links when deleting item (Alexei)
