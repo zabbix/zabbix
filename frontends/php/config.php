@@ -65,7 +65,6 @@
 			unset($_POST["imageid"]);
 		}
 	}
-	{
 	if(isset($_GET["register"]))
 	{
 		if($_GET["register"]=="update")
