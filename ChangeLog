@@ -1,5 +1,6 @@
 Changes for 1.0beta11:
 
+ - document what template information is used 
  - support for prefixes in trigger expressions (K,M,G) (Alexei)
  - new item status: 'deleted' (Alexei)
  - fixed autoconf problems under SUSE 8.2 (Alexei)
