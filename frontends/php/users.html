@@ -6,10 +6,6 @@
 	show_header($page["title"],0,0);
 ?>
 
-<?
-	show_table_header("CONFIGURATION OF USERS");
-	echo "<br>";
-?>
 
 <?
 	if(isset($register))
@@ -19,21 +15,37 @@
 			if($password1==$password2)
 			{
 				$result=add_user($groupid,$name,$surname,$alias,$password1);
+				show_messages($result, "User added", "Cannot add user");
+			}
+			else
+			{
+				show_error_message("Cannot add user. Both passwords must be equal.");
 			}
 		}
 		if($register=="delete")
 		{
-			delete_user($userid);
+			$result=delete_user($userid);
+			show_messages($result, "User successfully deleted", "Cannot delete user");
 			unset($userid);
 		}
 		if($register=="update")
 		{
 			if($password1==$password2)
 			{
-				update_user($userid,$groupid,$name,$surname,$alias,$password1);
+				$result=update_user($userid,$groupid,$name,$surname,$alias,$password1);
+				show_messages($result, "Information successfully updated", "Cannot update information");
+			}
+			else
+			{
+				show_error_message("Cannot update user. Both passwords must be equal.");
 			}
 		}
 	}
+?>
+
+<?
+	show_table_header("CONFIGURATION OF USERS");
+	echo "<br>";
 ?>
 
 <?

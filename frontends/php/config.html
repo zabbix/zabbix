@@ -7,11 +7,6 @@
 ?>
 
 <?
-	show_table_header("CONFIGURATION OF ZABBIX");
-	echo "<br>";
-?>
-
-<?
 	if(isset($register) && ($register=="update"))
 	{
 		if(isset($password_required) && ($password_required=="true"))
@@ -22,8 +17,14 @@
 		{
 			$password_required="0";
 		}
-		update_config($smtp_server,$smtp_helo,$smtp_email,$password_required);
+		$result=update_config($smtp_server,$smtp_helo,$smtp_email,$password_required);
+		show_messages($result, "Configuration updated", "Configuation was NOT updated");
 	}
+?>
+
+<?
+	show_table_header("CONFIGURATION OF ZABBIX");
+	echo "<br>";
 ?>
 
 <?

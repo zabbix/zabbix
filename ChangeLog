@@ -1,8 +1,14 @@
+Changes for 1.0alpha9:
+
+ - Added error checking to hosts.html
+ - Added error checking to users.html
+ - Added error checking to config.html
+ - Added error checking to items.html
+
 Changes for 1.0alpha8:
 
  - changed type of actions.message and alerts.message to blob(text)
  - added new parameters: io[disk_*]
-
  - zabbix_sucker renamed to zabbix_suckerd
  - new high performance zabbix_agentd
  - connect using IP address became possible

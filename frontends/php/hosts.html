@@ -6,27 +6,30 @@
 ?>
 
 <?
-	show_table_header("CONFIGURATION OF HOSTS");
-	echo "<br>";
-?>
-
-<?
 	if(isset($register))
 	{
 		if($register=="add")
 		{
-			add_host($host,$port,$status,$template,$useip,$ip);
+			$result=add_host($host,$port,$status,$template,$useip,$ip);
+			show_messages($result,"Host added","Cannot add host");
 		}
 		if($register=="changestatus")
 		{
-			update_host_status($hostid,$status);
+			$result=update_host_status($hostid,$status);
+			show_messages($result,"Host status updated","Cannot update host status");
 		}
 		if($register=="delete")
 		{
-			delete_host($hostid);
+			$result=delete_host($hostid);
+			show_messages($result,"Host deleted","Cannot delete host");
 			unset($hostid);
 		}
 	}
+?>
+
+<?
+	show_table_header("CONFIGURATION OF HOSTS");
+	echo "<br>";
 ?>
 
 <?
