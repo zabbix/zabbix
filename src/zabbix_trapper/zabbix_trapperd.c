@@ -62,6 +62,7 @@ int	CONFIG_TIMEOUT			= TRAPPER_TIMEOUT;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 int	CONFIG_NOTIMEWAIT		= 0;
 int	CONFIG_CONNECTONEACH		= 0;
+char	*CONFIG_FILE			= NULL;
 char	*CONFIG_PID_FILE		= NULL;
 char	*CONFIG_LOG_FILE		= NULL;
 char	*CONFIG_DBHOST			= NULL;
@@ -117,6 +118,16 @@ void	signal_handler( int sig )
 	}
 }
 
+void usage(char *prog)
+{
+	printf("zabbix_trapperd - ZABBIX trapper v1.1\n");
+	printf("Usage: %s [-h] [-c <file>]\n", prog);
+	printf("\nOptions:\n");
+	printf("  -c <file>   Specify configuration file\n");
+	printf("  -h          Help\n");
+	exit(-1);
+}
+
 void    init_config(void)
 {
 	static struct cfg_line cfg[]=
@@ -139,7 +150,13 @@ void    init_config(void)
 		{0}
 	};
 
-	parse_cfg_file("/etc/zabbix/zabbix_trapperd.conf",cfg);
+	if(CONFIG_FILE == NULL)
+	{
+		CONFIG_FILE=strdup("/etc/zabbix/zabbix_trapperd.conf");
+	}
+
+	parse_cfg_file(CONFIG_FILE,cfg);
+
 	if(CONFIG_DBNAME == NULL)
 	{
 		zabbix_log( LOG_LEVEL_CRIT, "DBName not in config file");
@@ -408,15 +425,31 @@ pid_t	child_make(int i,int listenfd, int addrlen)
 	return 0;
 }
 
-int	main()
+int	main(int argc, char **argv)
 {
 	int		listenfd;
 	socklen_t	addrlen;
 	int		i;
 
+	char		ch;
+
 	char		host[128];
 
 	static struct  sigaction phan;
+
+/* Parse the command-line. */
+	while ((ch = getopt(argc, argv, "c:h")) != EOF)
+	switch ((char) ch) {
+		case 'c':
+			CONFIG_FILE = optarg;
+			break;
+		case 'h':
+			usage(argv[0]);
+			break;
+		default:
+			usage(argv[0]);
+			break;
+        }
 
 	init_config();
 	daemon_init();
