@@ -300,7 +300,7 @@
 					}
 					else
 					{
-						echo "<td>"; echo htmlspecialchars(substr($row["lastvalue"],0,20)." ..."); echo "</td>";
+						echo "<td>"; echo nbsp(htmlspecialchars(substr($row["lastvalue"],0,20)." ...")); echo "</td>";
 					}
 				}
 				else
