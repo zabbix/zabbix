@@ -48,7 +48,7 @@
 
 		$col=0;
 
-		show_form_begin("users.user");
+		show_form_begin("users");
 		echo S_USER;
 
 		show_table2_v_delimiter($col++);
@@ -513,7 +513,7 @@
 			$name="";
 		}
 
-		show_form_begin("users.group");
+		show_form_begin("users");
 		echo S_USER_GROUP;
 
 		show_table2_v_delimiter($col++);

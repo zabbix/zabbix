@@ -94,7 +94,7 @@
 <?php
 
 	$col=0;
-	show_form_begin("config.configuration");
+	show_form_begin("config");
 	echo S_CONFIGURATION;
 
 	show_table2_v_delimiter($col++);
@@ -177,7 +177,7 @@
 ?>
 
 <?php
-	show_form_begin("config.media");
+	show_form_begin("config");
 	echo S_MEDIA;
 
 	$col=0;
