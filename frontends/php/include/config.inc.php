@@ -1628,7 +1628,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		if($status != DBget_field($result,0,0))
 		{
 			update_trigger_value_to_unknown_by_hostid($hostid);
-			$sql="update hosts set status=$status where hostid=$hostid";
+			$sql="update hosts set status=$status where hostid=$hostid and status not in (".HOST_STATUS_UNREACHABLE.",".HOST_STATUS_DELETED.")";
 			return	DBexecute($sql);
 		}
 		else
@@ -2611,8 +2611,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 			$useip=0;
 		}
-		$sql="update hosts set host='$host',port=$port,status=$status,useip=$useip,ip='$ip' where hostid=$hostid";
+		$sql="update hosts set host='$host',port=$port,useip=$useip,ip='$ip' where hostid=$hostid";
 		$result=DBexecute($sql);
+		update_host_status($hostid, $status);
 		update_host_groups($hostid,$groups);
 		if($newgroup != "")
 		{
