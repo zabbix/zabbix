@@ -95,7 +95,7 @@
 		$u="";
 
 // Special processing for bits (kilo=1000, not 1024 for bits)
-		if($units=="b")
+		if( ($units=="b") || ($units=="bps"))
 		{
 			$abs=abs($value);
 
