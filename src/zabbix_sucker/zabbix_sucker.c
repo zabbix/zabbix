@@ -434,6 +434,7 @@ int	get_value_SIMPLE(double *result,char *result_str,DB_ITEM *item)
 	char	*e,*t;
 	char	c[MAX_STRING_LEN];
 	char	s[MAX_STRING_LEN];
+	int	ret = SUCCEED;
 
 	/* The code is ugly. I would rewrite it. Alexei.	*/
 	/* Assumption: host name does not contain '_perf'	*/
@@ -466,10 +467,19 @@ int	get_value_SIMPLE(double *result,char *result_str,DB_ITEM *item)
 
 
 	process(c,result_str);
-	*result=strtod(result_str,&e);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "SIMPLE [%s] [%s] [%f]", c, result_str, *result);
-	return SUCCEED;
+	if(strcmp(result_str,"ZBX_NOTSUPPORTED\n") == 0)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Simple check [%s] is not supported", c);
+		ret = NOTSUPPORTED;
+	}
+	else
+	{
+		*result=strtod(result_str,&e);
+	}
+
+	zabbix_log( LOG_LEVEL_DEBUG, "SIMPLE [%s] [%s] [%f] RET [%d]", c, result_str, *result, ret);
+	return ret;
 }
 
 int	get_value_INTERNAL(double *result,char *result_str,DB_ITEM *item)
