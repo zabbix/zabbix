@@ -1,5 +1,6 @@
 Changes for 1.0beta10:
 
+ - added support for zabbix[queue] (Alexei)
  - added basic support for simple graphs in screens (Alexei)
  - added table screens_graphs (Alexei)
  - dynamic form hosts.php (Alexei)

@@ -455,6 +455,10 @@ int	get_value_INTERNAL(double *result,char *result_str,DB_ITEM *item)
 	{
 		*result=DBget_history_count();
 	}
+	else if(strcmp(item->key,"zabbix[queue]")==0)
+	{
+		*result=DBget_queue_count();
+	}
 	else
 	{
 		*result=NOTSUPPORTED;
