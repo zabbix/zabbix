@@ -2198,6 +2198,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return	$result;
 		}
 
+		$sql="update sysmaps_links set triggerid=NULL where triggerid=$triggerid";
+		DBexecute($sql);
+
 		$sql="delete from triggers where triggerid=$triggerid";
 		return	DBexecute($sql);
 	}

@@ -195,7 +195,7 @@
 		cr();
 		echo "<TD WIDTH=10%><B>Last value</B></TD>"; 
 		cr();
-		echo "<TD WIDTH=5%><B>Change</B></TD>"; 
+		echo "<TD WIDTH=10%><B>Change</B></TD>"; 
 		cr();
 		echo "<TD WIDTH=5% align=center><B>History</B></TD>";
 		cr();
