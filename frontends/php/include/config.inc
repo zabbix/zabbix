@@ -205,7 +205,7 @@
 
 	# Header for HTML pages
 
-	function	show_header($title,$refresh)
+	function	show_header($title,$refresh,$nomenu)
 	{
 		global $page;
 
@@ -227,9 +227,13 @@
 	{
 		echo "<title>$title</title>";
 	}
+	echo "<head>";
 ?>
-	</head>
 	<body bgcolor="#778899" text="#000000" link="#000000" vlink="#000000" topmargin=4 leftmargin=0 rightmargin=0 marginheight=4>
+<?
+		if($nomenu == 0)
+		{
+?>
 
 	<table border=0 cellspacing=0 cellpadding=0 width="100%" bgcolor=000000>
 	<tr>
@@ -508,6 +512,7 @@
 
 	<br>
 <?
+		}
 	}
 
 	# Show values in plain text

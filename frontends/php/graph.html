@@ -2,7 +2,7 @@
 	include "include/config.inc";
 	$page["title"] = "Configuration of graph";
 	$page["file"] = "graph.html";
-	show_header($page["title"],0);
+	show_header($page["title"],0,0);
 ?>
 
 <?
@@ -24,6 +24,7 @@
 		if($register=="delete")
 		{
 			delete_graphs_item($gitemid);
+			unset($gitemid);
 		}
 	}
 ?>

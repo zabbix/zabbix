@@ -2,7 +2,7 @@
 	include "include/config.inc";
 	$page["title"] = "Hosts";
 	$page["file"] = "hosts.html";
-	show_header($page["title"],0);
+	show_header($page["title"],0,0);
 ?>
 
 <?
@@ -24,6 +24,7 @@
 		if($register=="delete")
 		{
 			delete_host($hostid);
+			unset($hostid);
 		}
 	}
 ?>
