@@ -108,6 +108,7 @@ char		*DBget_field(DB_RESULT *result, int rownum, int fieldnum);
 int		DBnum_rows(DB_RESULT *result);
 int		DBis_empty(DB_RESULT *result);
 
-int	DBget_function_result(float *Result,char *functionID);
+int	DBget_function_result(float *result,char *functionid);
+int	DBupdate_host_status(int hostid,int status);
 
 #endif

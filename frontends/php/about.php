@@ -38,6 +38,14 @@
 	If you need additional functionality, go here.
 </TD>
 </TR>
+<TR BGCOLOR=#EEEEEE>
+<TD ALIGN=LEFT>
+	<font face="Helvetica">Forums</font><br>
+</TD>
+<TD>
+	Zabbix-related discussion.
+</TD>
+</TR>
 <TR BGCOLOR=#DDDDDD>
 <TD ALIGN=LEFT>
 	<font face="Helvetica"><a href="http://sourceforge.net/tracker/?group_id=23494&atid=378683">Bug reports</a></font><br>
