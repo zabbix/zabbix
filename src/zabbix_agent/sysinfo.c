@@ -1,5 +1,6 @@
 #include "config.h"
 
+
 /* For bcopy */
 #ifdef HAVE_STRING_H
 	#include <string.h>
@@ -69,6 +70,19 @@
 /* Solaris */
 #ifdef HAVE_SYS_SWAP_H
 	#include <sys/swap.h>
+#endif
+
+/* FreeBSD */
+#ifdef HAVE_SYS_SYSCTL_H
+	#include <sys/sysctl.h>
+#endif
+/* FreeBSD */
+#ifdef HAVE_VM_VM_PARAM_H
+	#include <vm/vm_param.h>
+#endif
+/* FreeBSD */
+#ifdef HAVE_SYS_VMMETER_H
+	#include <sys/vmmeter.h>
 #endif
 
 #include "common.h"
@@ -572,7 +586,20 @@ float	SHAREDMEM(void)
 		return FAIL;
 	}
 #else
+#ifdef HAVE_SYS_VMMETER_H
+	int mib[2],len;
+	struct vmtotal v;
+
+	len=sizeof(struct vmtotal);
+	mib[0]=CTL_VM;
+	mib[1]=VM_METER;
+
+	sysctl(mib,2,&v,&len,NULL,0);
+
+	return (float)(v.t_armshr<<2);
+#else
 	return	FAIL;
+#endif
 #endif
 }
 
@@ -606,7 +633,20 @@ float	TOTALMEM(void)
 		return FAIL;
 	}
 #else
+#ifdef HAVE_SYS_VMMETER_H
+	int mib[2],len;
+	struct vmtotal v;
+
+	len=sizeof(struct vmtotal);
+	mib[0]=CTL_VM;
+	mib[1]=VM_METER;
+
+	sysctl(mib,2,&v,&len,NULL,0);
+
+	return (float)(v.t_rm<<2);
+#else
 	return	FAIL;
+#endif
 #endif
 #endif
 }
@@ -660,7 +700,20 @@ float	FREEMEM(void)
 		return FAIL;
 	}
 #else
+#ifdef HAVE_SYS_VMMETER_H
+	int mib[2],len;
+	struct vmtotal v;
+
+	len=sizeof(struct vmtotal);
+	mib[0]=CTL_VM;
+	mib[1]=VM_METER;
+
+	sysctl(mib,2,&v,&len,NULL,0);
+
+	return (float)(v.t_free<<2);
+#else
 	return	FAIL;
+#endif
 #endif
 #endif
 }
