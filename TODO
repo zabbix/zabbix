@@ -34,6 +34,18 @@ TKOM:
 
 OTHER:
 
+I think that i found a bug in zabbix_suckerd.
+I get the value :" The system's global status is normal. " from snmp.
+but the log say me :
+
+023889:20040630:131408 Query::update items set
+nextcheck=1088594108,prevvalue=lastvalue,lastvalue='The system's global status
+is normal. ',lastclock=1088594048 where itemid=24893
+023889:20040630:131408 Query failed:You have an error in your SQL syntax near
+'s global status is normal. ',lastclock=1088594048 where itemid=24893' at line
+1 [1064]
+(there is 3 ' on the update)
+
  - in user administration, add many resources from a list (not by one ID)
  - availability report for day/week/month/etc
  - add housekeeping for trends
