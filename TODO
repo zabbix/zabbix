@@ -13,6 +13,7 @@ TOP PRIORITY:
  - ability to add a library of  userwritten c-functions with dlopen/dlsym to
 the agent with a predefined API that can return values to suckerd (for both 
 suckerd and agentd)
+ - zabbix_agentd to support processor load, swap[*] and memeory[*] onder AIX
 
 BUGS:
 
