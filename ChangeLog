@@ -1,10 +1,14 @@
 Changes for 1.0alpha10:
 
+ - removed parameter net[listen_22]
+ - added parameter check_service[ssh]
+ - added constant TRAPPERD_FORKS (default is 10)
+ - added constant AGENTD_FORKS (default is 10)
+
  - minor fixed in PHP code
  - added some basic information on zabbix_trapperd to manual.txt
  - added zabbix_trapperd
  - minor fixes in manual.txt
-
  - check for filesystem /proc in configure.in
  - table "Supported parameters by platform" added to manual.txt
  - removed recommendation of PostgreSQL from manual.txt
