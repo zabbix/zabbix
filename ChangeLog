@@ -1,5 +1,7 @@
 Changes for 1.0beta7:
 
+ - added upgrades/dbpatches/1.0beta6_to_1.0beta7/ with patches (Alexei)
+ - added item type TRAPPER (Alexei) 
  - fixes for PostgreSQL (Alexei)
  - added validation of host name (Alexei)
  - default value of StartSuckers is set to 4 (Alexei) 

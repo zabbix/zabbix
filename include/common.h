@@ -17,6 +17,7 @@
 /* Item types */
 #define ITEM_TYPE_ZABBIX	0
 #define ITEM_TYPE_SNMP		1
+#define ITEM_TYPE_TRAPPER	2
 
 /* Item value types */
 #define ITEM_VALUE_TYPE_FLOAT	0
@@ -31,7 +32,7 @@
 /* Item statuses */
 #define ITEM_STATUS_ACTIVE	0
 #define ITEM_STATUS_DISABLED	1
-#define ITEM_STATUS_TRAPPED	2
+/*#define ITEM_STATUS_TRAPPED	2*/
 #define ITEM_STATUS_NOTSUPPORTED	3
 
 /* Host statuses */
