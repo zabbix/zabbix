@@ -107,7 +107,7 @@
 						echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=$hostid&register=changestatus&status=1\">Active</a>";
 						break;
 					case 1:
-						echo "<a href=\"items.php?itemid=$itemid_&hostid=".$row["hostid"]."&register=changestatus&status=0\">Not active</a>";
+						echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$row["hostid"]."&register=changestatus&status=0\">Not active</a>";
 						break;
 					case 2:
 						echo "Trapper";

@@ -16,6 +16,7 @@ Not ready yet:
 
 Changes for 1.0beta3:
 
+ - fixed items.php (Alexei)
  - added table 'rights' (Alexei)
  - added time legend for simple graph (Alexei)
  - already existing hosts can be used as template from new host (Alexei)
