@@ -54,6 +54,8 @@ Not ready yet:
 
 Changes for 1.0beta6:
 
+ - fixed problem with parsing of trigger expressions. [.-.] changed
+ to - (Alexei)
  - support for function nodata() added (Alexei)
  - minimum number of zabbix_suckerd that can be started is 4 (Alexei)
  - simplified function update_triggers(). (Alexei)
