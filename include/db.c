@@ -64,6 +64,7 @@ int     DBget_function_result(float *Result,char *FunctionID)
         row = DBfetch_row(result);
 	if(row == NULL)
 	{
+        	DBfree_result(result);
 		dbg_write( dbg_syswarn, "Query failed for functionid:[%s]", FunctionID );
 		return FAIL;	
 	}
