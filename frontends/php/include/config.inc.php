@@ -2084,6 +2084,22 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	TRUE;
 	}
 
+	# Activate Item
+
+	function	activate_item($itemid)
+	{
+		$sql="update items set status=".ITEM_STATUS_ACTIVE." where itemid=$itemid";
+		return	DBexecute($sql);
+	}
+
+	# Disable Item
+
+	function	disable_item($itemid)
+	{
+		$sql="update items set status=".ITEM_STATUS_DISABLED." where itemid=$itemid";
+		return	DBexecute($sql);
+	}
+
 	# Delete Item definition
 
 	function	delete_item($itemid)
