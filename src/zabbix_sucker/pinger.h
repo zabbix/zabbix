@@ -21,6 +21,7 @@
 #define ZABBIX_PINGER_H
 
 extern	int	CONFIG_PINGER_FREQUENCY;
+extern	int	CONFIG_DISABLE_PINGER;
 extern	char	*CONFIG_DBHOST;
 extern	char	*CONFIG_DBNAME;
 extern	char	*CONFIG_DBUSER;
