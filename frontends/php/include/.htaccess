@@ -1,0 +1,7 @@
+Order Deny,Allow
+Deny from All
+
+<files config.inc>
+Order Deny,Allow
+Deny from All
+</files>
