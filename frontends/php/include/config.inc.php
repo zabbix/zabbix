@@ -1660,7 +1660,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	<table border=0 cellspacing=0 cellpadding=5 width="100%" bgcolor="#FFFFFF">
 	<tr>
-	<td width="118" height="31" class="top_header_left"><img width="118" height="31" src="http://www.zabbix.com/img/zabbix1.png" border="0" alt="ZABBIX"></td>
+	<td width="118" height="31" class="top_header_left"><img width="118" height="31" src="images/general/zabbix.png" border="0" alt="ZABBIX"></td>
 	</tr>
 	</table>
 
