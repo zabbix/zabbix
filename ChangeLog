@@ -1,5 +1,6 @@
 Changes for 1.0beta9:
 
+ - show current and planned SLA in IT Services screen (Alexei)
  - added sort order by sortorder for IT Services (Alexei)
  - added column service.sortorder (Alexei)
  - show last 20% (80%-100%) in SLA bar (Alexei)
