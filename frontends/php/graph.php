@@ -31,7 +31,7 @@
 	$result=DBselect("select name from graphs where graphid=$graphid");
 	$row=DBfetch($result);
 	show_table_header($row["name"]);
-	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR BGCOLOR=#DDDDDD>";
 	echo "<TD ALIGN=CENTER>";
 	echo "<IMG SRC=\"chart2.php?graphid=$graphid&period=3600&from=0\">";
@@ -40,16 +40,15 @@
 	echo "</TABLE>";
 
 	show_table_header("DISPLAYED PARAMETERS");
-	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Host</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Parameter</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Color</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Actions</B></TD>";
+	echo "<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TD WIDTH=10% NOSAVE><B>Host</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Parameter</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Color</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
 	$sql="select i.itemid,h.host,i.description,gi.gitemid,gi.color from hosts h,graphs_items gi,items i where i.itemid=gi.itemid and gi.graphid=$graphid and h.hostid=i.hostid";
 	$result=DBselect($sql);
-	echo "<CENTER>";
 	$col=0;
 	while($row=DBfetch($result))
 	{

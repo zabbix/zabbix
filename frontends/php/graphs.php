@@ -43,16 +43,15 @@
 
 <?
 	show_table_header("GRAPHS");
-	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TD WIDTH=\"5%\" NOSAVE><B>Id</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Name</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Width</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Height</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Actions</B></TD>";
+	echo "<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TD WIDTH=5% NOSAVE><B>Id</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Name</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Width</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Height</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
 	$result=DBselect("select g.graphid,g.name,g.width,g.height from graphs g order by g.name");
-	echo "<CENTER>";
 	$col=0;
 	while($row=DBfetch($result))
 	{

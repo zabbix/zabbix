@@ -8,9 +8,9 @@
 <?
 	show_table_header("STATUS OF ZABBIX");
 
-	echo "<TABLE BORDER=0 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR><TD WIDTH=\"10%\"><B>Parameter</B></TD>";
-	echo "<TD WIDTH=\"10%\" NOSAVE><B>Value</B></TD>";
+	echo "<TABLE BORDER=0 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TR><TD WIDTH=10%><B>Parameter</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>Value</B></TD>";
 	echo "</TR>";
 
 	$stats=get_stats();

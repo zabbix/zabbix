@@ -156,7 +156,7 @@
 
 		show_table_header("Showing history of $period seconds($hours h)<BR>[from: ".date("Y.M.d H:i:s",$time)."] [till: ".date("Y.M.d H:i:s",$till)."]");
 
-		echo "<TABLE BORDER=0 COLS=2 ALIGN=CENTER WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+		echo "<TABLE BORDER=0 COLS=2 ALIGN=CENTER WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 		echo "<TR>";
 		echo "<TD><B>Clock</B></TD>";
 		echo "<TD><B>Value</B></TD>";
@@ -190,10 +190,8 @@
 			echo "<TD>$value</TD>";
 			echo "</TR>";
 		}
-		echo "</TABLE><CENTER>";        
+		echo "</TABLE>";        
  
-//		echo("</CENTER></BODY></HTML>\n");
-
 		show_footer();
 		exit;
 	}

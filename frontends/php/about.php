@@ -9,7 +9,7 @@
 	show_table_header("Information about Zabbix (v1.0beta5)");
 ?>
 
-<TABLE BORDER=0 COLS=4 WIDTH="100%" BGCOLOR="#CCCCCC" cellspacing=1 cellpadding=3>
+<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR="#CCCCCC" cellspacing=1 cellpadding=3>
 <TR BGCOLOR=#EEEEEE>
 <TD ALIGN=LEFT>
 	<font face="Helvetica"><a href="http://zabbix.sourceforge.net">Homepage of Zabbix</a></font><br>

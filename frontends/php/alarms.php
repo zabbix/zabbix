@@ -24,7 +24,7 @@
 
 	if(!isset($triggerid))
 	{
-		echo "<CENTER><B>No triggerID!!!!</B><BR>Please Contact Server Adminstrator</CENTER>";
+		echo "<div align=center><B>No triggerID!!!!</B><BR>Please Contact Server Adminstrator</div>";
 		show_footer();
 		exit;
 	}
@@ -71,8 +71,7 @@
 	$sql="select clock,value,triggerid from alarms where triggerid=$triggerid order by clock desc $limit";
 	$result=DBselect($sql);
 
-	echo "<CENTER>";
-	echo "<TABLE WIDTH=100% BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TABLE WIDTH=100% align=center BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR>";
 	echo "<TD><FONT SIZE=+1>Time</FONT></TD>";
 	echo "<TD><FONT SIZE=+1>Status</FONT></TD>";
@@ -170,11 +169,8 @@
 		echo "<TD>$proc</TD>";
 		echo "</TR>";
 	}
-	echo "</TABLE><BR>";
+	echo "</TABLE>";
 ?>
-</FONT>
-</TR>
-</TABLE></CENTER>
 
 <?
 	show_footer();
