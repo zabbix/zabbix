@@ -6,7 +6,6 @@ ZABBIX 1.1:
  - audit log
  - anvanced SNMP trapper
  - hard-linked templates
- - passing of parameters to user-defined commands (agent)
  - more supported parameters under FreeBSD, HP-UX and Solaris (cpu times, network stats)
  - agent proxy
 

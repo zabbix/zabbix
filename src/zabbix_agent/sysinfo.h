@@ -119,7 +119,7 @@ int	UPTIME(const char *cmd, const char *parameter,double  *value);
 int	TCP_LISTEN(const char *cmd, const char *porthex,double  *value);
 
 int	EXECUTE(const char *cmd, const char *command,double  *value);
-int	EXECUTE_STR(const char *cmd, const char *command,char **value);
+int	EXECUTE_STR(const char *cmd, const char *command, const char *parameter, char  **value);
 int	VERSION(const char *cmd, const char *command,char **value);
 
 int	MD5SUM(const char *cmd, const char *filename, char **value);
