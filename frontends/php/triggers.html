@@ -130,11 +130,11 @@
 		echo "<TD>";
 		if(isset($hostid))
 		{
-			echo "<A HREF=\"triggers.html#form?triggerid=$triggerid_&hostid=$hostid\">Change</A> ";
+			echo "<A HREF=\"triggers.html?triggerid=$triggerid_&hostid=$hostid#form\">Change</A> ";
 		}
 		else
 		{
-			echo "<A HREF=\"triggers.html#form?triggerid=$triggerid_\">Change</A> ";
+			echo "<A HREF=\"triggers.html?triggerid=$triggerid_#form\">Change</A> ";
 		}
 		echo "-<A HREF=\"actions.html?triggerid=$triggerid_&description=$description\">ShowActions</A>";
 		echo "</TD>";
