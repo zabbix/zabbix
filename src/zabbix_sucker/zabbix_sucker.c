@@ -279,24 +279,21 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 	snmp_add_null_var(pdu, anOID, anOID_len);
 	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMPv1() 0.3");
   
-/* Send the Request out */
 	status = snmp_synch_response(ss, pdu, &response);
 	zabbix_log( LOG_LEVEL_DEBUG, "Status send [%d]", status);
 	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMPv1() 0.4");
 
-/* Process the response */
 	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMPv1() 1");
+
 	if (status == STAT_SUCCESS && response->errstat == SNMP_ERR_NOERROR)
 	{
-/* SUCCESS: Print the result variables */
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMPv1() 2");
-		for(vars = response->variables; vars; vars = vars->next_variable)
+/*		for(vars = response->variables; vars; vars = vars->next_variable)
 		{
 			print_variable(vars->name, vars->name_length, vars);
-		}
+		}*/
 
-/* manipuate the information ourselves */
 		for(vars = response->variables; vars; vars = vars->next_variable)
 		{
 			int count=1;
@@ -351,11 +348,6 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 		}
 	}
 
-/*
-*      * Clean up:
-*      *  1) free the response.
-*      *  2) close the session.
-*      */
 	if (response)
 	{
 		snmp_free_pdu(response);
@@ -721,7 +713,7 @@ int update_host_status(int hostid,int status)
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Host already has status [%d]",status);
+			zabbix_log(LOG_LEVEL_DEBUG, "Host already has status [%d]",status);
 			DBfree_result(result);
 			return FAIL;
 		}
