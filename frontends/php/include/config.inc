@@ -2236,7 +2236,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Show History Graph
 
-	function	show_history($itemid,$from,$period)
+	function	show_history($itemid,$from,$period,$diff)
 	{
 		if (!isset($from))
 		{
@@ -2261,7 +2261,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 		echo("<hr>");
 		echo "<center>";
-		echo "<IMG SRC=\"chart.php?itemid=$itemid&period=$period&from=$from\">"; 
+		if($diff==0)
+		{
+			echo "<IMG SRC=\"chart.php?itemid=$itemid&period=$period&from=$from\">";
+		}
+		else
+		{
+			echo "<IMG SRC=\"chart_diff.php?itemid=$itemid&period=$period&from=$from\">";
+		}
 		echo "</center>";
 		echo("<hr>");
 
@@ -2269,29 +2276,64 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<center>";
 		//  Start of <<< WEEK >>> 
 		$tmp=$from+12*14;
-		echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
+		if($diff==0)
+		{
+			echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
+		}
+		else
+		{
+			echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$tmp&period=$period\">");
+		}
 		echo("Week back</A>] ");
 
 		//  Start of <<< 12h >>> 
 		$tmp=$from+12;
-		echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
+		if($diff==0)
+		{
+			echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
+		}
+		else
+		{
+			echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$tmp&period=$period\">");
+		}
 		echo("12h back</A>] ");
 		//  End of <<< 12h >>> 
 		
 		//  HOUR BACK
 		$tmp=$from+1;
-		echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
+		if($diff==0)
+		{
+			echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
+		}
+		else
+		{
+			echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$tmp&period=$period\">");
+		}
 		echo("1h back</A>] ");
 
 		//  Start of --- 
 		$tmp=$period+3600;
-		echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$from&period=$tmp\">");
+		if($diff==0)
+		{
+			echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$from&period=$tmp\">");
+		}
+		else
+		{
+			echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$from&period=$tmp\">");
+		}
 		echo("+1h</A>] ");
 
 		if ($period>3600) 
 		{
 			$tmp=$period-3600;
-			echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$from&period=$tmp\">");
+			if($diff==0)
+			{
+				echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$from&period=$tmp\">");
+			}
+			else
+			{
+				echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$from&period=$tmp\">");
+			}
 			echo("-1h</A>] ");
 		}
 		else
@@ -2303,7 +2345,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		if ($from>0) // HOUR FORWARD
 		{
 			$tmp=$from-1;
-			echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
+			if($diff==0)
+			{
+				echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
+			}
+			else
+			{
+				echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$tmp&period=$period\">");
+			}
 			echo("1h forward</A>] ");
 		}
 		else
@@ -2315,7 +2364,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		if (isset($From) && ($From>0))
 		{
 			$tmp=$from-12;
-			echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
+			if($diff==0)
+			{
+				echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
+			}
+			else
+			{
+				echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$tmp&period=$period\">");
+			}
 			echo("12h forward</A>] ");
 		}
 		else
@@ -2326,7 +2382,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		if (isset($From) && ($From>0))
 		{
 			$tmp=$from-12*14;
-			echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
+			if($diff==0)
+			{
+				echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
+			}
+			else
+			{
+				echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$tmp&period=$period\">");
+			}
 			echo("Week forward</A>] ");
 		}
 		else

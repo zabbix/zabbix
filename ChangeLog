@@ -15,6 +15,7 @@ Not ready yet:
 
 Changes for 1.0beta3:
 
+ - support for chart showing diff instead of real values (Alexei)
  - support for new trigger status - UNKNOWN (Alexei)
  - zabbix_suckerd housekeeping process to disconnect from 
  DB when unactive (Alexei)
