@@ -1,5 +1,6 @@
 Changes for 1.0:
 
+ - templates were renamed to "Host.Unix", "Host.Win32" and "Host.Standalone" (Alexei)
  - fixed problem with undefined socklen_t under Solaris (Alexei)
  - show user groups in the list of users. Thanks to Igor (Alexei)
  - fixed sql statement in trigger definition form (Alexei)

@@ -68,9 +68,9 @@ insert into rights (rightid,userid,name,permission,id) values (3,2,'Default perm
 -- Data for table hosts 
 --
 
-INSERT INTO hosts VALUES (10001,'UNIX_ZABBIX_AGENT',0,'',10000,3,0,0);
-INSERT INTO hosts VALUES (10002,'WIN32_ZABBIX_AGENT',0,'',10000,3,0,0);
-INSERT INTO hosts VALUES (10004,'STANDALONE',0,'',10000,3,0,0);
+INSERT INTO hosts VALUES (10001,'Host.Unix',0,'',10000,3,0,0);
+INSERT INTO hosts VALUES (10002,'Host.Win32',0,'',10000,3,0,0);
+INSERT INTO hosts VALUES (10004,'Host.Standalone',0,'',10000,3,0,0);
 
 --
 -- Data for table groups
