@@ -30,6 +30,20 @@
 		return str_replace(" ","&nbsp;",$str);;
 	}
 
+	function url_param($parameter)
+	{
+		global $HTTP_GET_VARS;
+	
+		if(isset($HTTP_GET_VARS[$parameter]))
+		{
+			return "&$parameter=".$HTTP_GET_VARS[$parameter];
+		}
+		else
+		{
+			return "";
+		}
+	}
+
 	function getmicrotime()
 	{
 		list($usec, $sec) = explode(" ",microtime()); 
