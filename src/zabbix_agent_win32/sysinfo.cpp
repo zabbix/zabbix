@@ -37,6 +37,10 @@ LONG H_ProcInfo(char *cmd,char *arg,double *value);
 static DWORD procList[MAX_PROCESSES];
 static HMODULE modList[MAX_MODULES];
 
+static double statProcessedRequests=0;
+static double statFailedRequests=0;
+static double statUnsupportedRequests=0;
+
 
 //
 // Get instance for parameters like name[instance]
@@ -396,6 +400,7 @@ static LONG H_MD5Hash(char *cmd,char *arg,char **value)
    char fileName[MAX_PATH],hashText[MD5_DIGEST_SIZE*2+1];
    unsigned char *data,hash[MD5_DIGEST_SIZE];
    HANDLE hFile,hFileMapping;
+   DWORD dwSize,dwSizeHigh;
    int i;
 
    // Get file name from parameter name and open it
@@ -404,32 +409,43 @@ static LONG H_MD5Hash(char *cmd,char *arg,char **value)
    if (hFile==INVALID_HANDLE_VALUE)
       return SYSINFO_RC_NOTSUPPORTED;
 
-   // Create file mapping object
-   hFileMapping=CreateFileMapping(hFile,NULL,PAGE_READONLY,0,0,NULL);
-   if (hFileMapping==NULL)
+   // Get file size
+   dwSize=GetFileSize(hFile,&dwSizeHigh);
+   if (dwSizeHigh>0 || dwSize>0x4000000)
+      return SYSINFO_RC_NOTSUPPORTED;  // We will not work with files larger than 64MB
+
+   if (dwSize>0)     // We will not create mapping for zero-length files
    {
-      WriteLog(MSG_FILE_MAP_FAILED,EVENTLOG_ERROR_TYPE,"ss",
-               fileName,GetSystemErrorText(GetLastError()));
-      CloseHandle(hFile);
-      return SYSINFO_RC_ERROR;
+      // Create file mapping object
+      hFileMapping=CreateFileMapping(hFile,NULL,PAGE_READONLY,0,0,NULL);
+      if (hFileMapping==NULL)
+      {
+         WriteLog(MSG_FILE_MAP_FAILED,EVENTLOG_ERROR_TYPE,"se",
+                  fileName,GetLastError());
+         CloseHandle(hFile);
+         return SYSINFO_RC_ERROR;
+      }
+
+      // Map entire file to process's address space
+      data=(unsigned char *)MapViewOfFile(hFileMapping,FILE_MAP_READ,0,0,0);
+      if (data==NULL)
+      {
+         WriteLog(MSG_MAP_VIEW_FAILED,EVENTLOG_ERROR_TYPE,"se",
+                  fileName,GetLastError());
+         CloseHandle(hFileMapping);
+         CloseHandle(hFile);
+         return SYSINFO_RC_ERROR;
+      }
    }
 
-   // Map entire file to process's address space
-   data=(unsigned char *)MapViewOfFile(hFileMapping,FILE_MAP_READ,0,0,0);
-   if (data==NULL)
-   {
-      WriteLog(MSG_MAP_VIEW_FAILED,EVENTLOG_ERROR_TYPE,"ss",
-               fileName,GetSystemErrorText(GetLastError()));
-      CloseHandle(hFileMapping);
-      CloseHandle(hFile);
-      return SYSINFO_RC_ERROR;
-   }
-
-   CalculateMD5Hash(data,GetFileSize(hFile,NULL),hash);
+   CalculateMD5Hash(data,dwSize,hash);
 
    // Unmap and close file
-   UnmapViewOfFile(data);
-   CloseHandle(hFileMapping);
+   if (dwSize>0)
+   {
+      UnmapViewOfFile(data);
+      CloseHandle(hFileMapping);
+   }
    CloseHandle(hFile);
 
    // Convert MD5 hash to text form
@@ -448,9 +464,9 @@ static LONG H_MD5Hash(char *cmd,char *arg,char **value)
 static LONG H_CRC32(char *cmd,char *arg,double *value)
 {
    char fileName[MAX_PATH];
-   unsigned char *data;
    HANDLE hFile,hFileMapping;
-   DWORD crc;
+   DWORD dwSize,dwSizeHigh,crc;
+   unsigned char *data;
 
    // Get file name from parameter name and open it
    GetParameterInstance(cmd,fileName,MAX_PATH-1);
@@ -458,32 +474,43 @@ static LONG H_CRC32(char *cmd,char *arg,double *value)
    if (hFile==INVALID_HANDLE_VALUE)
       return SYSINFO_RC_NOTSUPPORTED;
 
-   // Create file mapping object
-   hFileMapping=CreateFileMapping(hFile,NULL,PAGE_READONLY,0,0,NULL);
-   if (hFileMapping==NULL)
+   // Get file size
+   dwSize=GetFileSize(hFile,&dwSizeHigh);
+   if (dwSizeHigh>0 || dwSize>0x4000000)
+      return SYSINFO_RC_NOTSUPPORTED;  // We will not work with files larger than 64MB
+
+   if (dwSize>0)     // We will not create mapping for zero-length files
    {
-      WriteLog(MSG_FILE_MAP_FAILED,EVENTLOG_ERROR_TYPE,"ss",
-               fileName,GetSystemErrorText(GetLastError()));
-      CloseHandle(hFile);
-      return SYSINFO_RC_ERROR;
+      // Create file mapping object
+      hFileMapping=CreateFileMapping(hFile,NULL,PAGE_READONLY,0,0,NULL);
+      if (hFileMapping==NULL)
+      {
+         WriteLog(MSG_FILE_MAP_FAILED,EVENTLOG_ERROR_TYPE,"ss",
+                  fileName,GetSystemErrorText(GetLastError()));
+         CloseHandle(hFile);
+         return SYSINFO_RC_ERROR;
+      }
+
+      // Map entire file to process's address space
+      data=(unsigned char *)MapViewOfFile(hFileMapping,FILE_MAP_READ,0,0,0);
+      if (data==NULL)
+      {
+         WriteLog(MSG_MAP_VIEW_FAILED,EVENTLOG_ERROR_TYPE,"ss",
+                  fileName,GetSystemErrorText(GetLastError()));
+         CloseHandle(hFileMapping);
+         CloseHandle(hFile);
+         return SYSINFO_RC_ERROR;
+      }
    }
 
-   // Map entire file to process's address space
-   data=(unsigned char *)MapViewOfFile(hFileMapping,FILE_MAP_READ,0,0,0);
-   if (data==NULL)
-   {
-      WriteLog(MSG_MAP_VIEW_FAILED,EVENTLOG_ERROR_TYPE,"ss",
-               fileName,GetSystemErrorText(GetLastError()));
-      CloseHandle(hFileMapping);
-      CloseHandle(hFile);
-      return SYSINFO_RC_ERROR;
-   }
-
-   crc=CalculateCRC32(data,GetFileSize(hFile,NULL));
+   crc=CalculateCRC32(data,dwSize);
 
    // Unmap and close file
-   UnmapViewOfFile(data);
-   CloseHandle(hFileMapping);
+   if (dwSize>0)
+   {
+      UnmapViewOfFile(data);
+      CloseHandle(hFileMapping);
+   }
    CloseHandle(hFile);
 
    *value=(double)crc;
@@ -599,6 +626,13 @@ static AGENT_COMMAND commands[]=
    { "__usercnt{*}",H_UserCounter,NULL,NULL },
    { "agent[avg_collector_time]",H_NumericPtr,NULL,(char *)&statAvgCollectorTime },
    { "agent[max_collector_time]",H_NumericPtr,NULL,(char *)&statMaxCollectorTime },
+   { "agent[accepted_requests]",H_NumericPtr,NULL,(char *)&statAcceptedRequests },
+   { "agent[rejected_requests]",H_NumericPtr,NULL,(char *)&statRejectedRequests },
+   { "agent[timed_out_requests]",H_NumericPtr,NULL,(char *)&statTimedOutRequests },
+   { "agent[accept_errors]",H_NumericPtr,NULL,(char *)&statAcceptErrors },
+   { "agent[processed_requests]",H_NumericPtr,NULL,(char *)&statProcessedRequests },
+   { "agent[failed_requests]",H_NumericPtr,NULL,(char *)&statFailedRequests },
+   { "agent[unsupported_requests]",H_NumericPtr,NULL,(char *)&statUnsupportedRequests },
    { "cksum[*]",H_CRC32,NULL,NULL },
    { "cpu_util",H_ProcUtil,NULL,(char *)0x00 },
    { "cpu_util5",H_ProcUtil,NULL,(char *)0x01 },
@@ -675,16 +709,20 @@ void ProcessCommand(char *received_cmd,char *result)
             strcat(result,"\n");
             free(strResult);
          }
+         statProcessedRequests++;
          break;
       case SYSINFO_RC_NOTSUPPORTED:
          strcpy(result,"ZBX_NOTSUPPORTED\n");
+         statUnsupportedRequests++;
          break;
       case SYSINFO_RC_ERROR:
          strcpy(result,"ZBX_ERROR\n");
+         statFailedRequests++;
          break;
       default:
          strcpy(result,"ZBX_ERROR\n"); // MSG_UNEXPECETD_IRC
          WriteLog(MSG_UNEXPECTED_IRC,EVENTLOG_ERROR_TYPE,"ds",iRC,received_cmd);
+         statFailedRequests++;
          break;
    }
 }

@@ -30,6 +30,7 @@
 
 DWORD dwTlsLogPrefix;
 HANDLE eventShutdown;
+HANDLE eventCollectorStarted;
 
 BOOL optStandalone=FALSE;
 BOOL optUseEventLog=TRUE;
@@ -123,14 +124,17 @@ BOOL Initialize(void)
    ImportSymbols();
 
    eventShutdown=CreateEvent(NULL,TRUE,FALSE,NULL);
+   eventCollectorStarted=CreateEvent(NULL,TRUE,FALSE,NULL);
 
    // Internal command aliases
    AddAlias("system[uptime]","perf_counter[\\System\\System Up Time]");
 
    // Start TCP/IP listener and collector threads
    _beginthread(CollectorThread,0,NULL);
-   Sleep(1500);   // Allow collector thread to initialize
+   WaitForSingleObject(eventCollectorStarted,INFINITE);  // Allow collector thread to initialize
    _beginthread(ListenerThread,0,NULL);
+
+   CloseHandle(eventCollectorStarted);
 
    return TRUE;
 }

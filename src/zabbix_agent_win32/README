@@ -133,7 +133,9 @@ Parameters supported by Zabbix Win32 Agent
 
 I. Zabbix standard parameters
 
-cksum[<path>]		<path> can be normal Windows path, like C:\, or UNC
+cksum[<path>]		<path> can be normal Windows path, like C:\, or UNC.
+			Agent will return UNSUPPORTED if file is larger than
+			64MB.
 diskfree[<path>]	<path> can be normal Windows path, like C:\, or UNC
 disktotal[<path>]       <path> can be normal Windows path, like C:\, or UNC
 filesize[<path>]	<path> can be normal Windows path, like C:\, or UNC
@@ -163,6 +165,30 @@ last minute (in milliseconds)
 agent[max_collector_time]
 Maximum time spent by collector thread on sample processing (in milliseconds)                             
 
+agent[accepted_requests]
+Total number of requests accepted by agent for processing.
+
+agent[rejected_requests]
+Total number of requests rejected by agent because they was coming from
+unallowed source.
+
+agent[timed_out_requests]
+Total number of requests timed out in processing.
+
+agent[accept_errors]
+Total number of accept() syscall errors.
+
+agent[processed_requests]
+Total number of requests successfully processed by agent.
+
+agent[failed_requests]
+Total number of requests with errors in processing (requests generated
+ZBX_ERROR return code).
+
+agent[unsupported_requests]
+Total number of requests for unsupported parameters (requests generated
+ZBX_UNSUPPORTED return code).
+
 cpu_util
 Average CPU(s) utilization (in percents) for last minute
 
@@ -185,7 +211,8 @@ Average specific CPU utilization (in percents) for last 15 minutes, where
 <instance> is zero-based CPU number
 
 md5_hash[<file name>]
-MD5 hash of specified file (returned as string)
+MD5 hash of specified file (returned as string). Agent will return UNSUPPORTED
+if file is larger than 64MB.
 
 perf_counter[<path>]
 Value of any performance counter, where <path> is the counter path (you can use

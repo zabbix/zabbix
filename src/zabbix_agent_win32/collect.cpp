@@ -78,7 +78,7 @@ void CollectorThread(void *)
 
    if (PdhOpenQuery(NULL,0,&query)!=ERROR_SUCCESS)
    {
-      WriteLog(MSG_PDH_OPEN_QUERY_FAILED,EVENTLOG_ERROR_TYPE,"s",GetSystemErrorText(GetLastError()));
+      WriteLog(MSG_PDH_OPEN_QUERY_FAILED,EVENTLOG_ERROR_TYPE,"e",GetLastError());
       return;
    }
 
@@ -141,6 +141,7 @@ void CollectorThread(void *)
 
    // Data collection loop
    WriteLog(MSG_COLLECTOR_INIT_OK,EVENTLOG_INFORMATION_TYPE,NULL);
+   SetEvent(eventCollectorStarted);
    do
    {
       LONG sum;
