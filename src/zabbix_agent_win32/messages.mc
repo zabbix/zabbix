@@ -170,4 +170,22 @@ Language=English
 Subagent "%1" loaded successfully
 .
 
+MessageId=
+SymbolicName=MSG_CREATE_PROCESS_FAILED
+Language=English
+Unable to create process "%1": %2
+.
+
+MessageId=
+SymbolicName=MSG_CREATE_TMP_FILE_FAILED
+Language=English
+Unable to create temporary file: %1
+.
+
+MessageId=
+SymbolicName=MSG_OPEN_TMP_FILE_FAILED
+Language=English
+Unable to open existing temporary file: %1
+.
+
 ;#endif

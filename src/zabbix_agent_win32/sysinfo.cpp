@@ -1,6 +1,6 @@
 /* 
 ** ZabbixW32 - Win32 agent for Zabbix
-** Copyright (C) 2002 Victor Kirhenshtein
+** Copyright (C) 2002,2003 Victor Kirhenshtein
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 //
 
 LONG H_ProcInfo(char *cmd,char *arg,double *value);
+LONG H_Execute(char *cmd,char *arg,char **value);
 
 
 //
@@ -260,9 +261,9 @@ static LONG H_DiskInfo(char *cmd,char *arg,double *value)
       return SYSINFO_RC_NOTSUPPORTED;
 
    if (!memcmp(cmd,"diskfree[",9))
-      *value=(double)((__int64)(freeBytes.QuadPart/1024));
+      *value=(double)((__int64)freeBytes.QuadPart);
    else
-      *value=(double)((__int64)(totalBytes.QuadPart/1024));
+      *value=(double)((__int64)totalBytes.QuadPart);
    return SYSINFO_RC_SUCCESS;
 }
 
@@ -623,6 +624,7 @@ static LONG H_SystemUname(char *cmd,char *arg,char **value)
 
 static AGENT_COMMAND commands[]=
 {
+   { "__exec{*}",NULL,H_Execute,NULL },
    { "__usercnt{*}",H_UserCounter,NULL,NULL },
    { "agent[avg_collector_time]",H_NumericPtr,NULL,(char *)&statAvgCollectorTime },
    { "agent[max_collector_time]",H_NumericPtr,NULL,(char *)&statMaxCollectorTime },
