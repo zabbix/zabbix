@@ -259,7 +259,7 @@ void	process_config_file(void)
 	{
 		CONFIG_PID_FILE=strdup("/tmp/zabbix_trapperd.pid");
 	}
-	// Check, if we are able to connect
+/* Check, if we are able to connect */
 	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
 }
 
@@ -290,8 +290,8 @@ int	process(char *s)
 	{
 		return FAIL;
 	}
-//	???
-//	value=atof(value_string);
+/*	???
+	value=atof(value_string);*/
 
 	ret=process_data(server,key,value_string);
 

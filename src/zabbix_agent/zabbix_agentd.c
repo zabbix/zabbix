@@ -34,6 +34,7 @@
 #include "zabbix_agent.h"
 
 #include "log.h"
+#include "cfg.h"
 
 #define	LISTENQ 1024
 
@@ -42,7 +43,7 @@ int	parent=0;
 /* Number of processed requests */
 int	stats_request=0;
 
-static	char	*CONFIG_HOST_ALLOWED		= NULL;
+static	char	*CONFIG_HOSTS_ALLOWED		= NULL;
 static	char	*CONFIG_PID_FILE		= NULL;
 static	char	*CONFIG_LOG_FILE		= NULL;
 static	int	CONFIG_AGENTD_FORKS		= AGENTD_FORKS;
@@ -196,6 +197,20 @@ void	create_pid_file(void)
 	fclose(f);
 }
 
+void    init_config(void)
+{
+	struct cfg_line cfg[]=
+	{
+/*               PARAMETER      ,VAR    ,FUNC,  TYPE(0i,1s),MANDATORY,MIN,MAX
+*/
+		{"Server",&CONFIG_HOSTS_ALLOWED,0,TYPE_STRING,PARM_OPT,0,0},
+		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
+		{0}
+	};
+	parse_cfg_file("/etc/zabbix/zabbix_agentd.conf",cfg);
+}
+
+
 void	process_config_file(void)
 {
 	FILE	*file;
@@ -240,7 +255,7 @@ void	process_config_file(void)
 
 		if(strcmp(parameter,"Server")==0)
 		{
-			CONFIG_HOST_ALLOWED=strdup(value);
+			CONFIG_HOSTS_ALLOWED=strdup(value);
 		}
 		else if(strcmp(parameter,"PidFile")==0)
 		{
@@ -360,10 +375,10 @@ int	check_security(int sockfd)
 
 		sname=inet_ntoa(name.sin_addr);
 
-		zabbix_log( LOG_LEVEL_DEBUG, "Connection from [%s]. Allowed server is [%s] ",sname, CONFIG_HOST_ALLOWED);
-		if(strcmp(sname, CONFIG_HOST_ALLOWED)!=0)
+		zabbix_log( LOG_LEVEL_DEBUG, "Connection from [%s]. Allowed server is [%s] ",sname, CONFIG_HOSTS_ALLOWED);
+		if(strcmp(sname, CONFIG_HOSTS_ALLOWED)!=0)
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Connection from [%s] rejected. Allowed server is [%s] ",sname, CONFIG_HOST_ALLOWED);
+			zabbix_log( LOG_LEVEL_WARNING, "Connection from [%s] rejected. Allowed server is [%s] ",sname, CONFIG_HOSTS_ALLOWED);
 			return	FAIL;
 		}
 	}

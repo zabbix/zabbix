@@ -570,13 +570,14 @@ float	INODE(const char * mountPoint)
 		blocks_percent_used = (long)
 		(blocks_used * 100.0 / (blocks_used + s.f_bavail) + 0.5);
 
-//		printf(
-//		"%7.0f %7.0f  %7.0f  %5ld%%   %s\n"
-//		,s.f_blocks * (s.f_bsize / 1024.0)
-//		,(s.f_blocks - s.f_bfree)  * (s.f_bsize / 1024.0)
-//		,s.f_bavail * (s.f_bsize / 1024.0)
-//		,blocks_percent_used
-//		,mountPoint);
+/*		printf(
+		"%7.0f %7.0f  %7.0f  %5ld%%   %s\n"
+		,s.f_blocks * (s.f_bsize / 1024.0)
+		,(s.f_blocks - s.f_bfree)  * (s.f_bsize / 1024.0)
+		,s.f_bavail * (s.f_bsize / 1024.0)
+		,blocks_percent_used
+		,mountPoint);
+*/
 		return s.f_ffree;
 
 	}
@@ -611,13 +612,14 @@ float	DF(const char * mountPoint)
 		blocks_percent_used = (long)
 		(blocks_used * 100.0 / (blocks_used + s.f_bavail) + 0.5);
 
-//		printf(
-//		"%7.0f %7.0f  %7.0f  %5ld%%   %s\n"
-//		,s.f_blocks * (s.f_bsize / 1024.0)
-//		,(s.f_blocks - s.f_bfree)  * (s.f_bsize / 1024.0)
-//		,s.f_bavail * (s.f_bsize / 1024.0)
-//		,blocks_percent_used
-//		,mountPoint);
+/*		printf(
+		"%7.0f %7.0f  %7.0f  %5ld%%   %s\n"
+		,s.f_blocks * (s.f_bsize / 1024.0)
+		,(s.f_blocks - s.f_bfree)  * (s.f_bsize / 1024.0)
+		,s.f_bavail * (s.f_bsize / 1024.0)
+		,blocks_percent_used
+		,mountPoint);
+*/
 		return s.f_bavail * (s.f_bsize / 1024.0);
 
 	}
@@ -811,7 +813,7 @@ float	FREEMEM(void)
 	{
 		/* Get page size */	
 		page = pst.page_size;
-//		return pst.physical_memory;
+/*		return pst.physical_memory;*/
 
 		if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
 		{
@@ -819,16 +821,18 @@ float	FREEMEM(void)
 		}
 		else
 		{
-//cout<<"total virtual memory allocated is " << dyn.psd_vm << "
-//pages, " << dyn.psd_vm * page << " bytes" << endl;
-//cout<<"active virtual memory is " << dyn.psd_avm <<" pages, " <<
-//dyn.psd_avm * page << " bytes" << endl;
-//cout<<"total real memory is " << dyn.psd_rm << " pages, " <<
-//dyn.psd_rm * page << " bytes" << endl;
-//cout<<"active real memory is " << dyn.psd_arm << " pages, " <<
-//dyn.psd_arm * page << " bytes" << endl;
-//cout<<"free memory is " << dyn.psd_free << " pages, " <<
-		/* Free memory in bytes */	
+/*		cout<<"total virtual memory allocated is " << dyn.psd_vm << "
+		pages, " << dyn.psd_vm * page << " bytes" << endl;
+		cout<<"active virtual memory is " << dyn.psd_avm <<" pages, " <<
+		dyn.psd_avm * page << " bytes" << endl;
+		cout<<"total real memory is " << dyn.psd_rm << " pages, " <<
+		dyn.psd_rm * page << " bytes" << endl;
+		cout<<"active real memory is " << dyn.psd_arm << " pages, " <<
+		dyn.psd_arm * page << " bytes" << endl;
+		cout<<"free memory is " << dyn.psd_free << " pages, " <<
+*/
+		/* Free memory in bytes */
+
 			return dyn.psd_free * page;
 		}
 	}

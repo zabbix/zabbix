@@ -24,6 +24,7 @@ CREATE INDEX hosts_status on hosts (status);
 CREATE TABLE items (
   itemid		serial,
   type			int4		NOT NULL,
+  value_type		int4		DEFAULT '0' NOT NULL,
   snmp_community	varchar(64)	DEFAULT '' NOT NULL,
   snmp_oid		varchar(255)	DEFAULT '' NOT NULL,
   hostid		int4		NOT NULL,
@@ -202,6 +203,17 @@ CREATE TABLE history (
   FOREIGN KEY (itemid) REFERENCES items
 );
 
+--
+-- Table structure for table 'history_str'
+--
+
+CREATE TABLE history_str (
+  itemid                int4            DEFAULT '0' NOT NULL,
+  clock                 int4            DEFAULT '0' NOT NULL,
+  value                 varchar(255)    DEFAULT '' NOT NULL,
+  PRIMARY KEY (itemid,clock),
+  FOREIGN KEY (itemid) REFERENCES items
+);
 
 --
 -- Table structure for table 'items_template'
