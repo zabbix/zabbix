@@ -241,11 +241,15 @@ AC_ARG_WITH(pgsql,
 			PGSQL_INCDIR=/usr/include/pgsql
 		elif test -f /usr/include/postgresql/libpq-fe.h; then
 			PGSQL_INCDIR=/usr/include/postgresql
+		elif test -f /usr/local/include/pgsql/libpq-fe.h; then
+			PGSQL_INCDIR=/usr/local/include/pgsql
 		else
 			PGSQL_INCDIR=/usr/local/pgsql/include
 		fi
 		if test -f /usr/lib/libpq.a; then
 			PGSQL_LIBDIR=/usr/lib
+		elif test -f /usr/local/lib/libpq.a; then
+			PGSQL_LIBDIR=/usr/local/lib
 		else
 			PGSQL_LIBDIR=/usr/local/pgsql/lib
 		fi

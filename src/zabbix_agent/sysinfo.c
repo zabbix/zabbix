@@ -109,7 +109,7 @@ COMMAND	commands[512]=
 
 	{"cksum[*]"			,CKSUM, "/etc/services"},
 
-	{"filesize[*]"			,FILESIZE, "/var/log/syslog"},
+	{"filesize[*]"			,FILESIZE, "/etc/passwd"},
 
 	{"swap[free]"			,SWAPFREE, 0},
 	{"swap[total]"			,SWAPTOTAL, 0},

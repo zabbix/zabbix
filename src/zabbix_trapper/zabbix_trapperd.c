@@ -36,6 +36,7 @@ int	CONFIG_TRAPPERD_FORKS		= TRAPPERD_FORKS;
 char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
+char	*CONFIG_DBSOCKET		= NULL;
 
 void	signal_handler( int sig )
 {
@@ -136,6 +137,10 @@ void	process_config_file(void)
 		{
 			CONFIG_DBPASSWORD=strdup(value);
 		}
+		else if(strcmp(parameter,"DBSocket")==0)
+		{
+			CONFIG_DBSOCKET=strdup(value);
+		}
 		else
 		{
 			syslog( LOG_CRIT, "Unsupported parameter [%s] Line %d", parameter, lineno);
@@ -153,7 +158,7 @@ void	process_config_file(void)
 		exit(1);
 	}
 	// Check, if we are able to connect
-	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD);
+	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
 }
 
 int	process(char *s)
@@ -314,7 +319,7 @@ void	child_main(int i,int listenfd, int addrlen)
 
 	syslog( LOG_WARNING, "zabbix_trapperd %ld started",(long)getpid());
 
-	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD);
+	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
 
 	for(;;)
 	{
