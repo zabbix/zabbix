@@ -143,7 +143,7 @@
 	}
 	if($HTTP_GET_VARS["action"] =="showplaintxt")
 	{
-		echo("<b>[<A HREF=\"history.php?action=showplaintxt&itemid=".$HTTP_GET_VARS["itemid"]."\">Values in plaint text format</A>]</b> ");
+		echo("<b>[<A HREF=\"history.php?action=showplaintxt&itemid=".$HTTP_GET_VARS["itemid"]."\">Values in plain text format</A>]</b> ");
 	}
 	else
 	{
