@@ -468,6 +468,21 @@
 ?>
 			</font>
 		</td>
+		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
+			<font face="Arial,Helvetica" size=2>
+				<a href="srv_status.html">
+<?
+				if($page["file"]=="srv_status.html")
+				{
+					echo "<b>[SERVICES]</b></a>";
+				}
+				else
+				{
+					echo "SERVICES</a>";
+				}
+?>
+			</font>
+		</td>
 		</tr>
 		<tr>
 		<td colspan=2 bgcolor=FFFFFF align=center valign="top" width="15%">
@@ -485,7 +500,7 @@
 ?>
 			</font>
 		</td>
-		<td colspan=2 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=3 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
 				<a href="report1.html">
 <?
@@ -622,6 +637,21 @@
 				else
 				{
 					echo "GRAPHS</a>";
+				}
+?>
+			</font>
+		</td>
+		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
+			<font face="Arial,Helvetica" size=2>
+				<a href="services.html">
+<?
+				if($page["file"]=="services.html")
+				{
+					echo "<b>[SERVICES]</b></a>";
+				}
+				else
+				{
+					echo "SERVICES</a>";
 				}
 ?>
 			</font>
@@ -857,6 +887,25 @@
 	function	add_action( $triggerid, $userid, $good, $delay, $subject, $message )
 	{
 		$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message) values ($triggerid,$userid,$good,$delay,0,'$subject','$message')";
+		return	DBexecute($sql);
+	}
+
+	function	add_service($name,$triggerid,$linktrigger)
+	{
+		if( isset($linktrigger)&&($linktrigger=="on") )
+		{
+			$sql="insert into services (serviceid,name,triggerid) values (NULL,'$name',$triggerid)";
+		}
+		else
+		{
+			$sql="insert into services (serviceid,name) values (NULL,'$name')";
+		}
+		return	DBexecute($sql);
+	}
+
+	function	add_service_link($servicedownid,$serviceupid)
+	{
+		$sql="insert into services_links (servicedownid,serviceupid) values ($servicedownid,$serviceupid)";
 		return	DBexecute($sql);
 	}
 

@@ -27,15 +27,17 @@
 	$sizeX=$width;
 	$sizeY=$height;
 
-	$shiftX=10;
-	$shiftYup=10;
-	$shiftYdown=25;
-
 	$nodata=1;	
 
 	Header( "Content-type:  text/html"); 
 //	Header( "Content-type:  image/png"); 
 	Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
+
+	$result2=DBselect("select gi.itemid,i.description,gi.color,h.host from graphs_items gi,items i,hosts h where gi.itemid=i.itemid and gi.graphid=$graphid and i.hostid=h.hostid order by gi.gitemid");
+
+	$shiftX=10;
+	$shiftYup=10;
+	$shiftYdown=7+15*DBnum_rows($result2);
 
 	$im = imagecreate($sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10); 
   
@@ -80,7 +82,6 @@
 	$from_time = time(NULL)-$period-3600*$from;
 	$to_time   = time(NULL)-3600*$from;
 
-	$result2=DBselect("select gi.itemid,i.description,gi.color from graphs_items gi,items i where gi.itemid=i.itemid and gi.graphid=$graphid order by gi.gitemid");
 
 	$len=array();
 	$x=array();
@@ -98,6 +99,7 @@
 		$itemid=DBget_field($result2,$item,0);
 		$desc[$item]=DBget_field($result2,$item,1);
 		$color[$item]=DBget_field($result2,$item,2);
+		$host[$item]=DBget_field($result2,$item,3);
 	
 		$result=DBselect("select clock,value from history where itemid=$itemid and clock>$from_time and clock<$to_time order by clock");
 		$len[$item]=0;
@@ -142,8 +144,10 @@
 		{
 			ImageLine($im,$shiftX,$shiftYup+$sizeY/2,$sizeX+$shiftX,$shiftYup+$sizeY/2,$colors[$color[$item]]);
 		}
-		ImageFilledRectangle($im,$shiftX+200*$item,$sizeY+$shiftYup+19,$shiftX+200*$item+5,$sizeY+$shiftYup+15+9,$colors[$color[$item]]);
-		ImageString($im, 2,$shiftX+200*$item+9,$sizeY+$shiftYup+15, $desc[$item], $gray);
+#		ImageFilledRectangle($im,$shiftX+200*$item,$sizeY+$shiftYup+19,$shiftX+200*$item+5,$sizeY+$shiftYup+15+9,$colors[$color[$item]]);
+#		ImageString($im, 2,$shiftX+200*$item+9,$sizeY+$shiftYup+15, $desc[$item], $gray);
+		ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*$item,$shiftX+5,$sizeY+$shiftYup+15+9+15*$item,$colors[$color[$item]]);
+		ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*$item+15, $host[$item].": ".$desc[$item], $gray);
 	}
 
 	if($nodata == 0)
