@@ -50,6 +50,7 @@ serial number/mesto polozhenija/etc.
 
 OTHER:
 
+ - add acknowledgements
  - put eror string into alerts if cannot send notification
 
  - improve temoval of item related data from history
