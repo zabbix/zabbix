@@ -84,7 +84,6 @@
 
 <?php
 	show_table_header(S_CONFIGURATION_OF_ZABBIX_BIG);
-	echo "<br>";
 ?>
 
 <?php
@@ -116,7 +115,6 @@
 ?>
 
 <?php
-	echo "<br>";
 	show_table_header(S_AVAILABLE_MEDIA_TYPES);
 ?>
 
@@ -154,7 +152,6 @@
 			echo "<TR>";
 	}
 	table_end();
-	echo"<br>";
 ?>
 
 <?php

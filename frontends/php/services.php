@@ -224,7 +224,6 @@
 		unset($triggerid);
 	}
 
-	echo "<br>";
 	echo "<a name=\"form\"></a>";
 	show_table2_header_begin();
 	echo S_SERVICE;
@@ -364,7 +363,6 @@
 		unset($_GET["triggerid"]);
 	}
 
-	echo "<br>";
 	show_table2_header_begin();
 	echo nbsp(S_LINK_TO);
 	$col=0;
@@ -422,7 +420,6 @@
 	if(isset($_GET["serviceid"]))
 	{
 
-	echo "<br>";
 	show_table2_header_begin();
 	echo nbsp(S_ADD_SERVER_DETAILS);
 	$col=0;

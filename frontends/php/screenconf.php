@@ -110,7 +110,6 @@
 		$rows=1;
 	}
 
-	echo "<br>";
 	show_table2_header_begin();
 	echo S_SCREEN;
 	$col=0;
