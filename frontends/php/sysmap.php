@@ -95,7 +95,14 @@
 			$y_=DBget_field($result,$i,6);
 			$status_=DBget_field($result,$i,7);
 
-			$map=$map."\n<area shape=rect coords=$x_,$y_,".($x_+32).",".($y_+32)." href=\"sysmap.php?sysmapid=$sysmapid_&shostid=$shostid_#form\" alt=\"$host_\">";
+			if(function_exists("imagecreatetruecolor"))
+			{
+				$map=$map."\n<area shape=rect coords=$x_,$y_,".($x_+48).",".($y_+48)." href=\"sysmap.php?sysmapid=$sysmapid_&shostid=$shostid_#form\" alt=\"$host_\">";
+			}
+			else
+			{
+				$map=$map."\n<area shape=rect coords=$x_,$y_,".($x_+32).",".($y_+32)." href=\"sysmap.php?sysmapid=$sysmapid_&shostid=$shostid_#form\" alt=\"$host_\">";
+			}
 		}
 		$map=$map."\n</map>";
 		echo $map;
@@ -264,19 +271,27 @@
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"icon\" size=1>";
 	$icons=array();
-	$icons[0]="Server";
-	$icons[1]="Workstation";
-	$icons[2]="Printer";
-	$icons[3]="Hub";
-	$icons[4]="Battery";
-	$icons[5]="Display";
-	$icons[6]="Network";
-	$icons[7]="Palm";
-	$icons[8]="Phone";
-	$icons[9]="PrinterLaser";
-	$icons[10]="Satellite";
-	$icons[11]="Terminal";
-	for($i=0;$i<12;$i++)
+	if(function_exists("imagecreatetruecolor"))
+	{
+		$icons[0]="Server";
+		$icons[1]="Workstation";
+		$icons[2]="Printer";
+		$icons[3]="Hub";
+		$icons[4]="UPS";
+		$icons[5]="Network";
+		$icons[6]="Phone";
+		$icons[7]="Satellite";
+		$num=8;
+	}
+	else
+	{
+		$icons[0]="Server";
+		$icons[1]="Workstation";
+		$icons[2]="Printer";
+		$icons[3]="Hub";
+		$num=4;
+	}
+	for($i=0;$i<$num;$i++)
 	{
 		if(isset($HTTP_GET_VARS["shostid"]) && ($icon==$icons[$i]))
 //		if(isset($HTTP_GET_VARS["hostid"]) && ($HTTP_GET_VARS["icon"]==$icons[$i]))
