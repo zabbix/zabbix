@@ -249,7 +249,7 @@ static LONG H_HostName(char *cmd,char *arg,char **value)
 
 
 //
-// Handler for diskfree[*] and disktotal[*] parameters
+// Handler for diskfree[*], diskused[*]  and disktotal[*] parameters
 //
 
 static LONG H_DiskInfo(char *cmd,char *arg,double *value)
@@ -263,6 +263,8 @@ static LONG H_DiskInfo(char *cmd,char *arg,double *value)
 
    if (!memcmp(cmd,"diskfree[",9))
       *value=(double)((__int64)freeBytes.QuadPart);
+   else if (!memcmp(cmd,"diskused[",9))
+      *value=(double)((__int64)totalBytes.QuadPart-(__int64)freeBytes.QuadPart);
    else
       *value=(double)((__int64)totalBytes.QuadPart);
    return SYSINFO_RC_SUCCESS;
@@ -646,6 +648,7 @@ static AGENT_COMMAND commands[]=
    { "cpu_util15[*]",H_ProcUtil,NULL,(char *)0x82 },
    { "diskfree[*]",H_DiskInfo,NULL,NULL },
    { "disktotal[*]",H_DiskInfo,NULL,NULL },
+   { "diskused[*]",H_DiskInfo,NULL,NULL },
    { "filesize[*]",H_FileSize,NULL,NULL },
    { "md5_hash[*]",NULL,H_MD5Hash,NULL },
    { "memory[*]",H_MemoryInfo,NULL,NULL },

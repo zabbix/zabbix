@@ -114,7 +114,8 @@ void InitService(void)
 {
    static SERVICE_TABLE_ENTRY serviceTable[2]={ { ZABBIX_SERVICE_NAME,ZabbixServiceMain },{ NULL,NULL } };
 
-   StartServiceCtrlDispatcher(serviceTable);
+   if (!StartServiceCtrlDispatcher(serviceTable))
+      printf("StartServiceCtrlDispatcher() failed: %s\n",GetSystemErrorText(GetLastError()));
 }
 
 

@@ -1,6 +1,7 @@
 /* 
 ** ZabbixW32 - Win32 agent for Zabbix
 ** Copyright (C) 2002 Victor Kirhenshtein
+** Support for non-English Windows versions (C) 2003 Harald Holzer
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
