@@ -69,7 +69,8 @@ DB_FUNCTION
 	double  lastvalue;
 	int	lastvalue_null;
 	char    *function;
-	int     parameter;
+/*	int     parameter;*/
+	char	*parameter;
 };
 
 DB_MEDIA

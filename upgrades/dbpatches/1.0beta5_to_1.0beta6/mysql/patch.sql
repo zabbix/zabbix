@@ -1,4 +1,5 @@
 alter table functions modify lastvalue varchar(255);
+alter table functions modify parameter varchar(255) default '0' not null;
 
 
 --
