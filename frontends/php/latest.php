@@ -138,10 +138,17 @@
 			{
 				if(round($row["lastvalue"])==$row["lastvalue"])
 				{ 
-					echo "<td>"; printf("%.0f",$row["lastvalue"]); echo "</td>";
+					if($row["value_type"] == 0 )
+					{
+						echo "<td>"; printf("%.0f",$row["lastvalue"]); echo "</td>";
+					}
+					else
+					{
+						echo "<td>"; echo substr($row["lastvalue"],0,20)," ..."; echo "</td>";
+					}
 				}
 				else
-				{ 
+				{
 					echo "<td>"; printf("%.2f",$row["lastvalue"]); echo "</td>";
 				}
 			}
@@ -151,7 +158,7 @@
 			}
 			if( isset($row["lastvalue"]) && isset($row["prevvalue"]) && $row["lastvalue"]-$row["prevvalue"] != 0 )
 			{
-				echo "<td>".($row["lastvalue"]-$row["prevvalue"])."</td>";
+				echo "<td>"; echo $row["lastvalue"]-$row["prevvalue"]; echo "</td>";
 			}
 			else
 			{
