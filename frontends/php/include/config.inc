@@ -4,8 +4,147 @@
 	$DB_USER	="root";
 	$DB_PASSWORD	="";
 
+	$USER_DETAILS	="";
+
 	$mysql=mysql_pconnect($DB_SERVER,$DB_USER,$DB_PASSWORD);
 	mysql_select_db($DB_DATABASE);
+
+	function	validate_float($str)
+	{
+		if (eregi('^([0-9]+)((\.)?)([0-9]*)$', $str, &$arr)) 
+		{
+			return 0;
+		}
+		else
+		{
+			return -1;
+		}
+	}
+
+// Does expression match server:key.function(param) ?
+	function	validate_simple_expression($expression)
+	{
+		global	$mysql;
+
+//		echo "Validating:$expression<br>";
+		if (eregi('^\{([0-9a-zA-Z\_\.]+)\:([0-9a-zA-Z\_]+)\.((diff)|(min)|(max)|(last)|(nodata))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
+		{
+			$host=$arr[1];
+			$key=$arr[2];
+			$function=$arr[3];
+			$parameter=$arr[9];
+
+			$sql="select count(*) from hosts h,items i where h.host='$host' and i.key_='$key' and h.hostid=i.hostid";
+			$result=mysql_query($sql,$mysql);
+			$row=mysql_fetch_row($result);
+			if($row[0]!=1)
+			{
+				return -1;
+			}
+
+			if(validate_float($parameter)!=0)
+			{
+				return -1;
+			}
+		}
+		else
+		{
+			return -1;
+		}
+		return 0;
+	}
+
+	function	validate_expression($expression)
+	{
+//		echo "Validating expression: $expression<br>";
+
+		$ok=0;
+// Replace all {server:key.function(param)} with 0
+		while($ok==0)
+		{
+//			echo "Expression:$expression<br>";
+			$arr="";
+			if (eregi('^((.)*)(\{((.)*)\})((.)*)$', $expression, &$arr)) 
+			{
+//				echo "OK<br>";
+//				for($i=0;$i<20;$i++)
+//				{
+//					if($arr[$i])
+//						echo "  $i: ",$arr[$i],"<br>";
+//				}
+				if(validate_simple_expression($arr[3])!=0)
+				{
+					return -1;
+				}
+				$expression=$arr[1]."0".$arr[6];
+	                }
+			else
+			{
+				$ok=1;
+			}
+		}
+//		echo "Result:$expression<br><hr>";
+
+		$ok=0;
+		while($ok==0)
+		{
+// 	Replace all float sign float with 0
+//			echo "Expression:$expression<br>";
+			$arr="";
+			if (eregi('^((.)*)([0-9\.]+)([\&\|\>\<]{1})([0-9\.]+)((.)*)$', $expression, &$arr)) 
+			{
+//				echo "OK<br>";
+//				for($i=0;$i<50;$i++)
+//				{
+//					if($arr[$i]!="")
+//						echo "  $i: ",$arr[$i],"<br>";
+//				}
+				if(validate_float($arr[3])!=0)
+				{
+					return -1;
+				}
+				if(validate_float($arr[5])!=0)
+				{
+					return -1;
+				}
+				$expression=$arr[1]."0".$arr[6];
+	                }
+			else
+			{
+				$ok=1;
+			}
+
+
+// 	Replace all (float) with 0
+//			echo "Expression2:$expression<br>";
+			$arr="";
+			if (eregi('^((.)*)(\(([0-9\.]+)\))((.)*)$', $expression, &$arr)) 
+			{
+//				echo "OK<br>";
+//				for($i=0;$i<30;$i++)
+//				{
+//					if($arr[$i]!="")
+//						echo "  $i: ",$arr[$i],"<br>";
+//				}
+				if(validate_float($arr[4])!=0)
+				{
+					return -1;
+				}
+				$expression=$arr[1]."0".$arr[5];
+				$ok=0;
+	                }
+			else
+			{
+				$ok=1;
+			}
+
+
+
+		}
+//		echo "Result:$expression<br><hr>";
+
+		return $expression;
+	}
 
 	function	cr()
 	{
@@ -17,6 +156,20 @@
 		global $mysql;
 		global $page;
 		global $PHP_AUTH_USER,$PHP_AUTH_PW;
+		global $USER_DETAILS;
+
+		$sql="select g.groupid,u.userid,u.alias,u.name,u.surname from users u,groups g where u.alias='$PHP_AUTH_USER' and u.passwd='$PHP_AUTH_PW' and u.groupid=g.groupid";
+		$result=mysql_query($sql,$mysql);
+		$row=mysql_fetch_row($result);
+		if($row)
+		{
+			$USER_DETAILS["groupid"]=$row[0];
+			$USER_DETAILS["userid"]=$row[1];
+			$USER_DETAILS["alias"]=$row[2];
+			$USER_DETAILS["name"]=$row[3];
+			$USER_DETAILS["surname"]=$row[4];
+		}
+		
 
 		if(	($page["file"]=="latest.html")||
 			($page["file"]=="tr_status.html")||
@@ -51,6 +204,7 @@
 			echo "Try to contact System Administrator to get additional rights :-)\n";
 			exit;
 		}
+
 
 	}
 
@@ -618,6 +772,18 @@
 
 		$triggerid=add_trigger($expression,$description,$priority,$istrue,$comments);
 	}
+
+	# Update User definition
+
+	function	update_user($userid,$groupid,$name,$surname,$alias,$password)
+	{
+		global	$mysql;
+
+		$sql="update users set groupid=$groupid,name='$name',surname='$surname',alias='$alias',passwd='$password' where userid=$userid";
+		$result=mysql_query($sql,$mysql);
+		return	$result;
+	}
+
 
 	# Add User definition
 
@@ -1225,6 +1391,84 @@
 <?
 	}
 
+	# Insert form for User
+	function	insert_user_form($userid)
+	{
+		global	$mysql;
+
+		if(isset($userid))
+		{
+			$result=mysql_query("select u.alias,u.name,u.surname,u.passwd,g.groupid from users u,groups g where u.groupid=g.groupid and u.userid=$userid",$mysql);
+			$row=mysql_fetch_row($result);
+	
+			$alias=$row[0];
+			$name=$row[1];
+			$surname=$row[2];
+			$password=$row[3];
+			$groupid_=$row[4];
+		}
+
+		show_table2_header_begin();
+		echo "New user";
+
+		show_table2_v_delimiter();
+		echo "<form method=\"post\" action=\"users.html\">";
+		echo "<input name=\"userid\" type=\"hidden\" value=$userid size=8>";
+		echo "Alias";
+		show_table2_h_delimiter();
+		echo "<input name=\"alias\" value=\"$alias\" size=20>";
+
+		show_table2_v_delimiter();
+		echo "Name";
+		show_table2_h_delimiter();
+		echo "<input name=\"name\" value=\"$name\" size=20>";
+
+		show_table2_v_delimiter();
+		echo "Surname";
+		show_table2_h_delimiter();
+		echo "<input name=\"surname\" value=\"$surname\" size=20>";
+
+		show_table2_v_delimiter();
+		echo "User group";
+		show_table2_h_delimiter();
+		echo "<select name=\"groupid\">";
+		$result=mysql_query("select groupid,name from groups order by name",$mysql);
+		while($row=mysql_fetch_row($result))
+		{
+			$groupid=$row[0];
+			$name=$row[1];
+			if($groupid_==$groupid)
+			{
+				echo "<option value=\"$groupid\" selected>$name";
+			}
+			else
+			{
+				echo "<option value=\"$groupid\">$name";
+			}
+		}
+		echo "</select>";
+
+		show_table2_v_delimiter();
+		echo "Password";
+		show_table2_h_delimiter();
+		echo "<input type=\"password\" name=\"password1\" value=\"$password\" size=20>";
+
+		show_table2_v_delimiter();
+		echo "Password (once again)";
+		show_table2_h_delimiter();
+		echo "<input type=\"password\" name=\"password2\" value=\"$password\" size=20>";
+
+		show_table2_v_delimiter2();
+		echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+		if(isset($userid))
+		{
+			echo "<input type=\"submit\" name=\"register\" value=\"update\">";
+			echo "<input type=\"submit\" name=\"register\" value=\"delete\">";
+		}
+
+		show_table2_header_end();
+	}
+
 	# Insert form for Trigger
 	function	insert_trigger_form($triggerid)
 	{
@@ -1235,13 +1479,13 @@
 			$result=mysql_query("select expression,description,priority,istrue,comments from triggers where triggerid=$triggerid",$mysql);
 			$row=mysql_fetch_row($result);
 	
-			if(!isset($expression)) $expression=$row[0];
+			$expression=$row[0];
 			$expression=explode_exp($expression,0);
 
-			if(!$description) $description=$row[1];
-			if(!$priority) $priority=$row[2];
-			if(!$istrue) $istrue=$row[3];
-			if(!$comments) $comments=$row[6];
+			$description=$row[1];
+			$priority=$row[2];
+			$istrue=$row[3];
+			$comments=$row[6];
 		}
 		
 		echo "<br>";

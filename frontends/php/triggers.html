@@ -13,19 +13,24 @@
 	}
 	if($register=="update")
 	{
-		$now=mktime();
-		if($disabled=='true')	{ $istrue=2; }
-		else			{ $istrue=3; }
+		if(validate_expression($expression)==0)
+		{
+			$now=mktime();
+			if($disabled=='true')	{ $istrue=2; }
+			else			{ $istrue=3; }
 
-		update_trigger($triggerid,$expression,$description,$priority,$istrue,$comments);
+			update_trigger($triggerid,$expression,$description,$priority,$istrue,$comments);
+		}
 	}
 	if($register=="add")
 	{
-
-		if($disabled=='true') { $istrue=2; }
-		else                  { $istrue=0; }
-
-		add_trigger($expression,$description,$priority,$istrue,$comments);
+		if(validate_expression($expression)==0)
+		{
+			if($disabled=='true') { $istrue=2; }
+			else                  { $istrue=0; }
+			
+			add_trigger($expression,$description,$priority,$istrue,$comments);
+		}
 	}
 	if($register=="delete")
 	{
