@@ -332,18 +332,33 @@
 <?
 				if($page["file"]=="charts.html")
 				{
-					echo "<b>[CHARTS]</b></a>";
+					echo "<b>[GRAPHS]</b></a>";
 				}
 				else
 				{
-					echo "CHARTS</a>";
+					echo "GRAPHS</a>";
 				}
 ?>
 			</font>
 		</td>
 		</tr>
 		<tr>
-		<td colspan=3 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=2 bgcolor=FFFFFF align=center valign="top" width="15%">
+			<font face="Arial,Helvetica" size=2>
+				<a href="about.html">
+<?
+				if($page["file"]=="about.html")
+				{
+					echo "<b>[ABOUT]</b></a>";
+				}
+				else
+				{
+					echo "ABOUT</a>";
+				}
+?>
+			</font>
+		</td>
+		<td colspan=2 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
 				<a href="report1.html">
 <?
@@ -358,7 +373,7 @@
 ?>
 			</font>
 		</td>
-		<td colspan=4 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=3 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
 				<a href="report2.html">
 <?
@@ -475,11 +490,11 @@
 				if(	($page["file"]=="graphs.html")||
 					($page["file"]=="graph.html"))
 				{
-					echo "<b>[CHARTS]</b></a>";
+					echo "<b>[GRAPHS]</b></a>";
 				}
 				else
 				{
-					echo "CHARTS</a>";
+					echo "GRAPHS</a>";
 				}
 ?>
 			</font>

@@ -1,6 +1,6 @@
 <?
 	include "include/config.inc";
-	$page["title"] = "User defined charts";
+	$page["title"] = "User defined graphs";
 	$page["file"] = "charts.html";
 	if(isset($graphid))
 	{
@@ -14,7 +14,7 @@
 
 <?
 	show_table_header_begin();
-	echo "CHARTS";
+	echo "GRAPHS";
 
 	show_table_v_delimiter();
 
@@ -53,7 +53,7 @@
 	}
 	else
 	{
-		$map="Select chart to display";
+		$map="Select graph to display";
 	}
 	if(!isset($from))
 	{
