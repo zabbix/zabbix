@@ -377,7 +377,7 @@ Size of given file.
 
 - proc_cnt[*]
 
-Number of processes called "*" running. Standard set of supported processes is: apache,inetd,syslogd,sshd,zabbix_agentd,zabbix_suckerd, zabbix_trapperd.
+Number of processes called "*" running.
 
 - swap[free]
 
@@ -480,19 +480,9 @@ memory[buffers]             |       X      |         X     |      -      |      
 memory[cached]              |       X      |         X     |      -      |      -      |      -      |     -     |
 memory[free]                |       X      |         X     |      -      |      -      |      x      |     -     |
 
-diskfree[/]                 |       X      |        X      |      X      |      X      |      X      |     X     |
-diskfree[/opt]              |       X      |        X      |      X      |      X      |      X      |     X     |
-diskfree[/tmp]              |       X      |        X      |      X      |      X      |      X      |     X     |
-diskfree[/usr]              |       X      |        X      |      X      |      X      |      X      |     X     |
-diskfree[/home]             |       X      |        X      |      X      |      X      |      X      |     X     |
-diskfree[/var]              |       X      |        X      |      X      |      X      |      X      |     X     |
+diskfree[*]                 |       X      |        X      |      X      |      X      |      X      |     X     |
 
-inodefree[/]                |       X      |        X      |      X      |      X      |      X      |     X     |
-inodefree[/opt]             |       X      |        X      |      X      |      X      |      X      |     X     |
-inodefree[/tmp]             |       X      |        X      |      X      |      X      |      X      |     X     |
-inodefree[/usr]             |       X      |        X      |      X      |      X      |      X      |     X     |
-inodefree[/home]            |       X      |        X      |      X      |      X      |      X      |     X     |
-inodefree[/var]             |       X      |        X      |      X      |      X      |      X      |     X     |
+inodefree[*]                |       X      |        X      |      X      |      X      |      X      |     X     |
 
 cksum[/etc/inetd_conf]      |       X      |        X      |      X      |      X      |      X      |     X     |
 cksum[/etc/services]        |       X      |        X      |      X      |      X      |      X      |     X     |
@@ -501,7 +491,7 @@ cksum[/etc/passwd]          |       X      |        X      |      X      |      
 cksum[/usr/sbin/sshd]       |       X      |        X      |      X      |      X      |      X      |     X     |
 cksum[/usr/bin/ssh]         |       X      |        X      |      X      |      X      |      X      |     X     |
       
-filesize[/var/log/syslog]   |       X      |        X      |      x      |      X      |      x      |     x     |
+filesize[*]                 |       X      |        X      |      x      |      X      |      x      |     x     |
 
 swap[free]                  |       X      |        X      |      -      |      X      |      -      |     -     |
 swap[total]                 |       X      |        X      |      -      |      X      |      -      |     -     |
@@ -541,7 +531,7 @@ service_check[pop]          |       X      |        X      |      ?      |      
 service_check[nntp]         |       X      |        X      |      ?      |      ?      |      ?      |     ?     |
 service_check[imap]         |       X      |        X      |      ?      |      ?      |      ?      |     ?     |
 
-proc_cnt[apache]            |       X      |        X      |      -      |      -      |      -      |     -     |
+proc_cnt[*]                 |       X      |        X      |      -      |      -      |      -      |     -     |
 
 
 

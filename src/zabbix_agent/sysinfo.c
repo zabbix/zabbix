@@ -77,15 +77,7 @@
 
 COMMAND	commands[]=
 	{
-	{"proc_cnt[apache]"		,PROCCNT, "apache"},
-	{"proc_cnt[inetd]"		,PROCCNT, "inetd"},
-	{"proc_cnt[mysqld]"		,PROCCNT, "mysqld"},
-	{"proc_cnt[syslogd]"		,PROCCNT, "syslogd"},
-	{"proc_cnt[sshd]"		,PROCCNT, "sshd"},
-
-	{"proc_cnt[zabbix_agentd]"	,PROCCNT, "zabbix_agentd"},
-	{"proc_cnt[zabbix_suckerd]"	,PROCCNT, "zabbix_suckerd"},
-	{"proc_cnt[zabbix_trapperd]"	,PROCCNT, "zabbix_trapperd"},
+	{"proc_cnt[*]"			,PROCCNT, "inetd"},
 
 	{"memory[total]"		,TOTALMEM, 0},
 	{"memory[shared]"		,SHAREDMEM, 0},
@@ -93,19 +85,9 @@ COMMAND	commands[]=
 	{"memory[cached]"		,CACHEDMEM, 0},
 	{"memory[free]"			,FREEMEM, 0},
 
-	{"diskfree[/]"			,DF, "/"},
-	{"diskfree[/opt]"		,DF, "/opt"},
-	{"diskfree[/tmp]"		,DF, "/tmp"},
-	{"diskfree[/usr]"		,DF, "/usr"},
-	{"diskfree[/home]"		,DF, "/home"},
-	{"diskfree[/var]"		,DF, "/var"},
+	{"diskfree[*]"			,DF, "/"},
 
-	{"inodefree[/]"			,INODE, "/"},
-	{"inodefree[/opt]"		,INODE, "/opt"},
-	{"inodefree[/tmp]"		,INODE, "/tmp"},
-	{"inodefree[/usr]"		,INODE, "/usr"},
-	{"inodefree[/home]"		,INODE, "/home"},
-	{"inodefree[/var]"		,INODE, "/var"},
+	{"inodefree[*]"			,INODE, "/"},
 
 	{"cksum[/etc/inetd_conf]"	,EXECUTE, "(cksum /etc/inetd.conf 2>/dev/null || echo '-2') | cut -f1 -d' '"},
 	{"cksum[/etc/services]"		,EXECUTE, "(cksum /etc/services 2>/dev/null || echo '-2') | cut -f1 -d' '"},
@@ -114,7 +96,7 @@ COMMAND	commands[]=
 	{"cksum[/usr/sbin/sshd]"	,EXECUTE, "(cksum /usr/sbin/sshd 2>/dev/null || echo '-2') | cut -f1 -d' '"},
 	{"cksum[/usr/bin/ssh]"		,EXECUTE, "(cksum /usr/bin/ssh 2>/dev/null || echo '-2') | cut -f1 -d' '"},
 
-	{"filesize[/var/log/syslog]"	,FILESIZE, "/var/log/syslog"},
+	{"filesize[*]"			,FILESIZE, "/var/log/syslog"},
 
 	{"swap[free]"			,SWAPFREE, 0},
 	{"swap[total]"			,SWAPTOTAL, 0},
@@ -256,27 +238,60 @@ float	process(char *command)
 	char	*p;
 	float	result;
 	int	i;
+	char	*n,*l,*r;
 	float	(*function)();
 	char	*parameter = NULL;
+	char	key[1024];
+	char	param[1024];
+	char	cmd[1024];
 
 	for( p=command+strlen(command)-1; p>command && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
 	p[1]=0;
 	
-	i=0;
-	for(;;)
+	for(i=0;;i++)
 	{
 		if( commands[i].key == 0)
 		{
 			function=0;
 			break;
 		}
-		if( strcmp(commands[i].key,command) == 0)
+
+		strcpy(key, commands[i].key);
+
+		if( (n = strstr(key,"[*]")) != NULL)
 		{
-			function=commands[i].function;
-			parameter=commands[i].parameter;
-			break;
-		}	
-		i++;
+			n[0]=0;
+
+			l=strstr(command,"[");	
+			r=strstr(command,"]");
+
+			if( (l==NULL)||(r==NULL) )
+			{
+				continue;
+			}
+
+			strncpy( param,l+1, r-l-1);
+			param[r-l-1]=0;
+
+			strncpy( cmd, command, l-command);
+			cmd[l-command]=0;
+
+			if( strcmp(key, cmd) == 0)
+			{
+				function=commands[i].function;
+				parameter=param;
+				break;
+			}
+		}
+		else
+		{
+			if( strcmp(key,command) == 0)
+			{
+				function=commands[i].function;
+				parameter=commands[i].parameter;
+				break;
+			}	
+		}
 	}
 
 	if( function !=0 )
