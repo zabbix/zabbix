@@ -34,6 +34,7 @@ TKOM:
 
 OTHER:
 
+ - make w32 agent not to write warnings in case of timeout (HB)
  - security-related issues
 
 There are still quite a few strcpy calls made against non-const user, database, or remote supplied data, in both the src/* and include/* directories.
