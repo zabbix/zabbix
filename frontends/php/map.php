@@ -282,10 +282,13 @@
 //		imagecolortransparent ($img, 0, 0, 0);
 		ImageCopy($im,$img,$x,$y,0,0,ImageSX($img),ImageSY($img));
 
-		$x1=$x+ImageSX($img)/2-ImageFontWidth(2)*strlen($label)/2;
-		$y1=$y+ImageSY($img);
-		ImageFilledRectangle($im,$x1-2, $y1,$x1+ImageFontWidth(2)*strlen($label), $y1+ImageFontHeight(2),$white);
-		ImageString($im, 2, $x1, $y1, $label,$black);
+		if($label!="")
+		{
+			$x1=$x+ImageSX($img)/2-ImageFontWidth(2)*strlen($label)/2;
+			$y1=$y+ImageSY($img);
+			ImageFilledRectangle($im,$x1-2, $y1,$x1+ImageFontWidth(2)*strlen($label), $y1+ImageFontHeight(2),$white);
+			ImageString($im, 2, $x1, $y1, $label,$black);
+		}
 
 		if($status == 1)
 		{
