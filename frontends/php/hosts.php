@@ -22,16 +22,19 @@
 		{
 			$result=add_host($HTTP_GET_VARS["host"],$HTTP_GET_VARS["port"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["template"],$HTTP_GET_VARS["useip"],$HTTP_GET_VARS["ip"],$HTTP_GET_VARS["host_templateid"]);
 			show_messages($result,"Host added","Cannot add host");
+			unset($HTTP_GET_VARS["hostid"]);
 		}
 		if($HTTP_GET_VARS["register"]=="update")
 		{
 			$result=update_host($HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["host"],$HTTP_GET_VARS["port"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["useip"],$HTTP_GET_VARS["ip"]);
 			show_messages($result,"Host details updated","Cannot update host details");
+			unset($HTTP_GET_VARS["hostid"]);
 		}
 		if($HTTP_GET_VARS["register"]=="changestatus")
 		{
 			$result=update_host_status($HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["status"]);
 			show_messages($result,"Host status updated","Cannot update host status");
+			unset($HTTP_GET_VARS["hostid"]);
 		}
 		if($HTTP_GET_VARS["register"]=="delete")
 		{
@@ -47,6 +50,8 @@
 ?>
 
 <?
+	if(!isset($HTTP_GET_VARS["hostid"]))
+{
 	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR>";
 	echo "<TD WIDTH=3% NOSAVE><B>Id</B></TD>";
@@ -105,6 +110,7 @@
 		echo "</TR>";
 	}
 	echo "</TABLE>";
+}
 ?>
 
 <?

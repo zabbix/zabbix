@@ -112,7 +112,7 @@
 		$color[$item]=DBget_field($result2,$item,2);
 		$host[$item]=DBget_field($result2,$item,3);
 	
-		$result=DBselect("select clock,value from history where itemid=".$HTTP_GET_VARS["itemid"]." and clock>$from_time and clock<$to_time order by clock");
+		$result=DBselect("select clock,value from history where itemid=$itemid and clock>$from_time and clock<$to_time order by clock");
 		$len[$item]=0;
 		$x[$item]=array();
 		$y[$item]=array();
