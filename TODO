@@ -42,6 +42,8 @@ suckerd and agentd)
  - [10] BUG. When adding new service, service name is wrong.
  - [10] IT Services. SLA for a period of time only (09:00-18:00)
 
+ - monitoring of Windows event log
+
 LS:
 
  - update trigger value immediately after add or update
