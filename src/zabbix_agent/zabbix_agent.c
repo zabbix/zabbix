@@ -97,6 +97,7 @@ int	main()
 	char	value[MAX_STRING_LEN];
 
 #ifdef	TEST_PARAMETERS
+	init_metrics();
 	init_config();
 	test_parameters();
 	return	SUCCEED;
