@@ -21,3 +21,7 @@ CREATE TABLE hosts_templates (
   PRIMARY KEY (hosttemplateid),
   UNIQUE (hostid, templateid)
 ) type=InnoDB;
+
+alter table hosts add available	int(4)		DEFAULT '0' NOT NULL;
+update hosts set available=1 where status=0;
+update hosts set available=2 where status=2;

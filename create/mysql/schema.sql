@@ -274,6 +274,7 @@ CREATE TABLE hosts (
 	disable_until	int(4)		DEFAULT '0' NOT NULL,
 	network_errors	int(4)		DEFAULT '0' NOT NULL,
 	error		varchar(128)	DEFAULT '' NOT NULL,
+	available	int(4)		DEFAULT '0' NOT NULL,
 	PRIMARY KEY	(hostid),
 	UNIQUE		(host),
 	KEY		(status)

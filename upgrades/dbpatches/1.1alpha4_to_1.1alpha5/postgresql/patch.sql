@@ -23,3 +23,8 @@ CREATE TABLE hosts_templates (
 );
 
 CREATE UNIQUE INDEX hosts_templates_hostid_templateid on hosts_templates (hostid, templateid);
+
+alter table hosts add available	int4	DEFAULT '0'	NOT NULL;
+
+update hosts set available=1 where status=0;
+update hosts set available=2 where status=2;

@@ -33,6 +33,7 @@ CREATE TABLE hosts (
   disable_until		int4		DEFAULT '0'		NOT NULL,
   network_errors	int4		DEFAULT '0'		NOT NULL,
   error			varchar(128)	DEFAULT ''		NOT NULL,
+  available		int4		DEFAULT '0'		NOT NULL,
   PRIMARY KEY (hostid)
 );
 
