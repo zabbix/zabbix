@@ -118,10 +118,51 @@
 	show_table_header_begin();
 	echo "CONFIGURATION OF TRIGGERS";
 	show_table_v_delimiter();
+
+//	echo "<font size=2>";
+
+	if(isset($HTTP_GET_VARS["groupid"]))
+	{
+//		echo "all ";
+		echo "<a href='triggers.php'>all</a> ";
+	}
+	else
+	{
+		echo "<b>[<a href='triggers.php'>all</a>]</b> ";
+	}
+
+	$result=DBselect("select groupid,name from groups order by name");
+
+	while($row=DBfetch($result))
+	{
+//		if(!check_right("Host","R",$row["hostid"]))
+//		{
+//			continue;
+//		}
+		if( isset($HTTP_GET_VARS["groupid"]) && ($HTTP_GET_VARS["groupid"] == $row["groupid"]) )
+		{
+			echo "<b>[";
+		}
+		echo "<a href='triggers.php?groupid=".$row["groupid"]."'>".$row["name"]."</a>";
+		if(isset($HTTP_GET_VARS["groupid"]) && ($HTTP_GET_VARS["groupid"] == $row["groupid"]) )
+		{
+			echo "]</b>";
+		}
+		echo " ";
+	}
 ?>
 
 <?php
-	$result=DBselect("select hostid,host from hosts order by host");
+	show_table_v_delimiter();
+	if(isset($HTTP_GET_VARS["groupid"]))
+	{
+		$sql="select h.hostid,h.host from hosts h,hosts_groups hg where hg.groupid=".$HTTP_GET_VARS["groupid"]." and hg.hostid=h.hostid order by h.host";
+	}
+	else
+	{
+		$sql="select hostid,host from hosts order by host";
+	}
+	$result=DBselect($sql);
 	while($row=DBfetch($result))
 	{
 		if(!check_right("Host","R",$row["hostid"]))
@@ -130,12 +171,21 @@
 		}
 		if(isset($HTTP_GET_VARS["hostid"]) && ($row["hostid"] == $HTTP_GET_VARS["hostid"]))
 		{
-			echo "<b>[<A HREF=\"triggers.php?hostid=".$row["hostid"]."\">".$row["host"]."</A>]</b>  ";
+			echo "<b>[";
+		}
+		if(isset($HTTP_GET_VARS["groupid"]))
+		{
+			echo "<A HREF=\"triggers.php?hostid=".$row["hostid"]."&groupid=".$HTTP_GET_VARS["groupid"]."\">".$row["host"]."</A>";
 		}
 		else
 		{
-			echo "<A HREF=\"triggers.php?hostid=".$row["hostid"]."\">".$row["host"]."</A>  ";
+			echo "<A HREF=\"triggers.php?hostid=".$row["hostid"]."\">".$row["host"]."</A>";
 		}
+		if(isset($HTTP_GET_VARS["hostid"]) && ($row["hostid"] == $HTTP_GET_VARS["hostid"]))
+		{
+			echo "]</b>";
+		}
+		echo " ";
 	}
 
 	show_table_header_end();

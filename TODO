@@ -36,7 +36,6 @@ nu i massu matematicheskih mozhno - dlja super-advanced chuvakov:
  - show host groups in "Status of Triggers"
  - if 'Update', then default action (button 'Enter') must be Update
  - do not check SNMP port existance if Item is not SNMP
- - items/triggers definition screens. Add group of hosts.
  - host groups (delete, rename)
  - add item to host group
  - add descriptions to items
