@@ -1,0 +1,5188 @@
+#LyX 1.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 218
+\textclass article
+\language english
+\inputencoding default
+\fontscheme default
+\graphics default
+\paperfontsize 10
+\spacing single 
+\papersize Default
+\paperpackage a4
+\use_geometry 0
+\use_amsmath 0
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\quotes_times 2
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+
+\layout Title
+\added_space_top vfill \added_space_bottom vfill 
+Zabbix Reference Manual for version 1.0
+\layout Author
+
+ALEXEI VLADISHEV
+\layout Date
+
+10 October 2001
+\layout Abstract
+
+ABSTRACT
+\layout Standard
+
+
+\begin_inset LatexCommand \tableofcontents{}
+
+\end_inset 
+
+
+\layout Section
+
+General Information About Zabbix
+\layout Subsection
+
+What is Zabbix
+\layout Standard
+
+
+\latex no_latex 
+Zabbix was created by Alexei Vladishev, (alex@gobbo.caves.lv).
+
+\latex default 
+ 
+\latex no_latex 
+Zabbix is software that monitors numerous parameters of a network and the
+ servers on that network.
+
+\latex default 
+ 
+\latex no_latex 
+Zabbix is a useful tool for monitoring the health and integrity of servers.
+
+\latex default 
+ 
+\latex no_latex 
+A flexible notification mechanism allows users to configure e-mail based
+ alerts for virtually any event, allowing fast reaction to server problems.
+
+\latex default 
+ A
+\latex no_latex 
+ll monitored parameters are stored in a database.
+
+\latex default 
+ 
+\latex no_latex 
+Zabbix offers excellent reporting and data visualisation features based
+ on the stored data, making Zabbix useful for capacity planning.
+
+\latex default 
+ 
+\latex no_latex 
+Zabbix supports both polling and trapping.
+
+\latex default 
+ 
+\latex no_latex 
+All Zabbix reports and statistics, as well as configuration parameters,
+ are accessed through a web-based frontend.
+
+\latex default 
+ 
+\latex no_latex 
+The web-based front end means that the health of your servers can be assessed
+ from any location.
+
+\latex default 
+ 
+\latex no_latex 
+Properly configured, Zabbix can play an important role in monitoring IT
+ infrastructure for companies with even hundreds of servers to monitor.
+
+\latex default 
+ 
+\latex no_latex 
+Zabbix is free of cost.
+
+\latex default 
+ 
+\latex no_latex 
+If support is an issue for you, several options are available as well.
+
+\latex default 
+ 
+\latex no_latex 
+Please, contact alex@gobbo.caves.lv to get additional information on available
+ support levels.
+
+\latex default 
+ 
+\latex no_latex 
+The latest version of Zabbix can be found at http://zabbix.sourceforge.net.
+\layout Subsection
+
+What does Zabbix offer
+\layout Standard
+
+
+\latex no_latex 
+Zabbix offers:
+\layout Itemize
+
+
+\latex no_latex 
+support for both polling and trapping mechanisms
+\layout Itemize
+
+
+\latex no_latex 
+agents (client software) for Linux (HP-UX, AIX, FreeBSD, OpenBSD are coming
+ soon)
+\layout Itemize
+
+
+\latex no_latex 
+server software for Linux (other UNIX variants to be supported soon)
+\layout Itemize
+
+
+\latex no_latex 
+secure user authorisation
+\layout Itemize
+
+
+\latex no_latex 
+two user groups: "Administrators" and "Zabbix users"
+\layout Itemize
+
+
+\latex no_latex 
+web-based interface for viewing and configuration
+\layout Itemize
+
+
+\latex no_latex 
+flexible e-mail notification of predefined events
+\layout Subsection
+
+About this Manual
+\layout Standard
+
+
+\latex no_latex 
+This manual is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of
+\latex default 
+ 
+\latex no_latex 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+\latex default 
+ 
+\latex no_latex 
+This manual is part of Zabbix software.
+
+\latex default 
+ 
+\latex no_latex 
+The latest version of the manual will always be available at
+\latex default 
+ http://zabbix.sourceforge.net
+\layout Section
+
+Use of Zabbix
+\layout Section
+
+Installing Zabbix
+\layout Subsection
+
+Requirements
+\layout Subsubsection
+
+Supported Platforms
+\layout Standard
+
+Linux 2.xx - Support for HP-UX, AIX, FreeBSD and OpenBSD is coming soon
+\layout Subsubsection
+
+Software Requirements
+\layout Standard
+
+- Apache 1.3.12 or later - Database engine - MySQL 3.22 or later or - PostgreSQL
+ 7.0.2 or later - PHP 4.0 or later, compiled as Apache module with - GD module
+ (for PNG images) - MySQL of PostgreSQL module - mhash support - GNU make
+ - WEB browser on client side (support for HTML and PNG images required).
+ MS Explorer and Netscape work perfectly.
+ - UCD-SNMP library and header files.
+ Required for support of SNMP agents.
+ Optional.
+\layout Standard
+
+Zabbix may work on previous versions of Apache, MySQL, PostgreSQL as well.
+ I've tried to run Zabbix on PostgreSQL 6.5x with no luck.
+ PostgreSQL crashes after one to three minutes of zabbix_suckerd running.
+ So, PostgreSQL version 7.0.2 or later is strongly recommended.
+\layout Standard
+
+Regarding the choice between PostgreSQL and MySQL, I recommend MySQL + InnoDB
+ for several reasons: - my recent benchmarks clearly show that PostgreSQL
+ (7.1.x) is at least 10 times slower than MySQL (3.23.29) - no need to constantly
+ run "vacuum" command with MySQL - MySQL MyISAM table is not a good choice
+ because of lack of row locking.
+ So, InnoDB is required
+\layout Standard
+
+If you do use PostgreSQL, performance can be significantly improved by executing
+ the VACUUM command on the Zabbix database.
+\layout Standard
+
+I would suggest execution of VACUUM, at least after the following events:
+ - Zabbix is installed - 10000 records in table "history" - patches applied
+ on Zabbix database
+\layout Standard
+
+For heavily loaded Zabbix servers, hourly execution of "VACUUM ANALYZE"
+ for all tables except "history" is strongly recommended! You can use the
+ command 'echo "vacuum verbose analyze"|psql zabbix'.
+\layout Standard
+
+Debian Potato and Debian Woody are development and testing platforms I currently
+ use.
+\layout Subsubsection
+
+Memory requirements
+\layout Standard
+
+Zabbix requires both physical (surprise!) and disk memory.
+ 32 Mb of physical memory and 20 Mb of free disk memory could be good starting
+ point.
+ However, the amount of required disk memory obviously depends on the number
+ of hosts and parameters that are being monitored.
+ If you're planning to keep a long history of monitored parameters, you
+ should be thinking of at least a couple of gigabytes to have enough space
+ to store the history in the database.
+\layout Standard
+
+Remember, the more physical memory you have, the faster the database (and
+ therefore Zabbix) works!
+\layout Subsection
+
+Installation procedure
+\layout Standard
+
+Basic installation of Zabbix usually takes no more than 15 minutes.
+ However, to make the process more enjoyable, I would suggest you make a
+ cup of tea (or coffee) for yourself.
+ Ready? 
+\layout Standard
+
+1.2.1 Create the Zabbix superuser account 
+\layout Standard
+
+This is the user the server will run as.
+ For production use you should create a dedicated unprivileged account ("zabbix"
+ is commonly used).
+\layout Standard
+
+Running Zabbix as "root," "bin," or any other account with special rights
+ is a security risk.
+ Do not do it! 
+\layout Standard
+
+1.2.2 Untar Zabbix sources
+\layout Standard
+
+On Linux, use command tar -xvzf <zabbix.tar.gz>.
+\layout Standard
+
+On other systems, try
+\layout Standard
+
+gunzip zabbix.tar.gz tar xvf zabbix.tar
+\layout Standard
+
+1.2.3 Create the Zabbix database
+\layout Standard
+
+Zabbix comes with SQL scripts used to create the required database schema
+ and also to insert a default configuration.
+ There are separate scripts for MySQL and PostgreSQL.
+\layout Standard
+
+For MySQL:
+\layout Standard
+
+mysql -u<username> -p<password> > create database zabbix; >quit;
+\layout Standard
+
+cd create/mysql cat schema.sql |mysql zabbix -u<username> -p<password> cd
+ create/data cat data.sql |mysql zabbix -u<username> -p<password>
+\layout Standard
+
+For PostgreSQL:
+\layout Standard
+
+psql -U <username> > create database zabbix; > 
+\backslash 
+q
+\layout Standard
+
+cd create/postgresql cat schema.sql|psql -U <username> zabbix cd create/data
+ cat data.sql|psql -U <username> zabbix
+\layout Standard
+
+1.2.4 Configure include/db.h
+\layout Standard
+
+Change the following parameters:
+\layout Standard
+
+#define DB_NAME "zabbix" #define DB_USER "zabbix" #define DB_PASSWD "password"
+\layout Standard
+
+1.2.5 Configure and compile the source code for your system
+\layout Standard
+
+The sources must be compiled for both the server (monitoring machine) as
+ well as the clients (monitored machines).
+ 
+\layout Standard
+
+To configure the source for the server, you must specify which database
+ will be used.
+\layout Standard
+
+./configure --with-mysql # for MySQL or ./configure --with-pgsql # for PostgreSQL
+ make
+\layout Standard
+
+However, if you want to compile client binaries only, run:
+\layout Standard
+
+./configure make
+\layout Standard
+
+1.2.6 Copy created binaries from bin/ to /opt/zabbix/bin or any other directory
+ 
+\layout Standard
+
+Other common directories are /usr/local/bin or /usr/local/zabbix/bin.
+\layout Standard
+
+1.2.7 Configure /etc/services
+\layout Standard
+
+On the client (monitored) machines, add the following lines to /etc/services:
+\layout Standard
+
+zabbix_agent 10000/tcp zabbix_trap 10001/tcp 
+\layout Standard
+
+1.2.8 Configure /etc/inetd.conf
+\layout Standard
+
+If you are going to use trapping instead of the recommended client-server
+ approach (see manual for more details), add the following line to /etc/inetd.con
+f:
+\layout Standard
+
+zabbix_trap stream tcp nowait.3600 zabbix /opt/zabbix/bin/zabbix_trapper
+\layout Standard
+
+If you plan to use zabbix_agent instead of the recommended zabbix_agentd
+ (again, see manual for more details), the following line must be added:
+\layout Standard
+
+zabbix_agent stream tcp nowait.3600 zabbix /opt/zabbix/bin/zabbix_agent
+\layout Standard
+
+1.2.9 Restart inetd
+\layout Standard
+
+killall -HUP inetd
+\layout Standard
+
+1.2.10 Configure WEB interface
+\layout Standard
+
+As user zabbix (or whatever you decided to name your dedicated Zabbix account
+ in step 1.2.1), do the following:
+\layout Standard
+
+Change these values in frontends/php/include/db.inc: $DB_TYPE ="POSTGRESQL";
+ /* Or "MYSQL" for MySQL */ $DB_SERVER ="localhost"; $DB_DATABASE ="zabbix";
+ $DB_USER =""; $DB_PWD =""
+\layout Standard
+
+Copy the PHP source files to a place where your web server can get to it.
+ Perhaps /home/zabbix/html or /home/zabbix/public_html or /var/www/html/zabbix,
+ etc.
+ For example, mkdir /home/zabbix/html cp -R frontends/php/* /home/zabbix/html/
+\layout Standard
+
+1.2.11 Configure Apache
+\layout Standard
+
+By default, Apache does not recognize *.html files as PHP scripts.
+ Add the following line to Apache configuration files to make Apache think
+ that every *.html file is actually PHP script that should be interpreted:
+\layout Standard
+
+AddType application/x-httpd-php .html
+\layout Standard
+
+1.2.12 Configure /etc/zabbix/zabbix_agent.conf
+\layout Standard
+
+You need to configure this file for every host having zabbix_agent installed.
+ The file should contain IP address of Zabbix server.
+ Connections from other hosts will be denied.
+\layout Standard
+
+1.3 Initial Configuration
+\layout Standard
+
+Once your Zabbix installation is complete, you will need to configure Zabbix.
+ Point your web browser to the location you installed the PHP scripts to.
+ (For example, if you copied the PHP files to /home/zabbix/public_html or
+ /home/zabbix/html, point your browser to http://localhost/~zabbix)
+\layout Standard
+
+Once there, click on the CONFIG link.
+ You will be prompted for a username and password.
+ Zabbix comes pre-configured with an administrative account: Enter the username
+ 'Admin' and leave the password field empty.
+ 
+\layout Standard
+
+Add the configuration of your SMTP server of choice.
+\layout Standard
+
+Next, click on the "USERS" link.
+ Add yourself to list of Zabbix users.
+ Don't forget to select "Administrators" group.
+ After you create your account, click the "Media" link beside your account
+ listing, and add your email address.
+\layout Standard
+
+Next, delete the default Admin user.
+\layout Standard
+
+Click on the 'HOSTS' link to add new hosts to be monitored.
+ For each host you add, be sure that you've installed the agent software
+ on the host.
+ If you have not yet done this, set the status to "Not monitored".
+ When a host is added, a list of all possible parameters for the host will
+ be automatically added.
+\layout Standard
+
+After you've added your desired hosts, click on the "ITEMS" link to modify
+ the details of the monitored parameters.
+ You may disable or delete monitored parameters or change how often the
+ parameters are checked.
+ 
+\layout Standard
+
+Next, click on the 'TRIGGERS' link to change the triggers relating to monitored
+ parameters.
+ You can change threshold values, disable or delete triggers, and set up
+ actions (email notification).
+ 
+\layout Standard
+
+When you set up an email notification, you may modify the subject and message
+ body as you wish.
+ You can use macros in both email subject and email body.
+ For example, the subject for a warning message could look like:
+\layout Standard
+
+Processor load on www.sf.net is {www.sf.net:system[procload].last(0)}
+\layout Standard
+
+In this case, you will receive message with subject like "Processor load
+ on www.sf.net is 0.85".
+\layout Standard
+
+Click on the "MAPS" link to set up a network map.
+ A map will help you quickly identify any problems with your monitored machines.
+ 
+\layout Standard
+
+Finally, click on the "GRAPHS" link to set up a graph.
+ A graph provides quick historical statistics on one or more monitored statistic
+s.
+\layout Standard
+
+Once you have an initial configuration created, run zabbix_suckerd on the
+ server machine:
+\layout Standard
+
+/opt/zabbix/bin/zabbix_suckerd
+\layout Standard
+
+and run zabbix_agentd on all monitored machines 
+\layout Standard
+
+/opt/zabbix/bin/zabbix_agentd
+\layout Standard
+
+You should not run zabbix_agentd if you have chosen to use zabbix_agent!
+\layout Section
+
+Upgrading
+\layout Standard
+
+The upgrade procedure is quite simple.
+ New binaries and frontend should be installed according to latest installation
+ instructions.
+ In order to update database structure, the following steps should be performed.
+ Note that before applying database patches, all Zabbix processes must be
+ stopped.
+ Also, the process can take from 0 seconds (if no patches required) up to
+ several hours.
+ 
+\layout Standard
+
+For production installations database backup is required !
+\layout Subsection
+
+General Procedure
+\layout Standard
+
+Go to the upgrades/dbpatches directory.
+ In this directory are subdirectories named according to a version upgrade
+ (e.g.
+ 1.0alpha3_to_1.0alpha4).
+ Enter the directory corresponding to your upgrade (if you are upgrading
+ through multiple versions, you will need to apply the upgrades one at a
+ time).
+ Depending on which database you use:
+\layout Standard
+
+cd mysql cat patch.sql |mysql zabbix -u<username> -p<password>
+\layout Standard
+
+or
+\layout Standard
+
+cd postgresql cat patch.sql|psql -U <username> zabbix
+\layout Standard
+
+Finally, read version specific notes below for any extra procedures.
+\layout Subsection
+
+Zabbix releases
+\layout Subsubsection
+
+Zabbix 1.0alpha8
+\layout Standard
+
+- Note that zabbix_sucker has been renamed to zabbix_suckerd.
+\layout Standard
+
+- Replace zabbix_agent with zabbix_agentd.
+ zabbix_agentd runs much faster than the 'old' zabbix_agent.
+ Moreover, if you do not run inetd, zabbix_agentd is the only choice :)
+\layout Standard
+
+- PostgreSQL does not support modifying the structure of table fields.
+ Therefore, please change the definition of the following fields (MySQL
+ code): alter table users modify passwd char(32) default '' not null; alter
+ table actions modify message text default '' not null; alter table alerts
+ modify message text default '' not null;
+\layout Standard
+
+- Try to use IP address in host definition.
+ This unloads DNS and makes zabbix_suckerd faster.
+\layout Subsubsection
+
+Zabbix 1.0alpha9
+\layout Standard
+
+- Don't forget to apply DB patches.
+\layout Subsubsection
+
+Zabbix 1.0alpha10
+\layout Standard
+
+- Don't forget to apply DB patches.
+\layout Standard
+
+- Note that parameters net[listen_*] will be replaced by check_service[*]
+ (for example, net[listen_25] -> check_service[smtp]).
+\layout Subsubsection
+
+Zabbix 1.0alpha11
+\layout Standard
+
+- Do not forget to apply DB patches.
+\layout Standard
+
+- PostgreSQL users: Please delete the column "triggers.lastcheck" manually
+ by reloading whole table.
+ Unfortunately, PostgreSQL does not support "alter table triggers drop lastcheck
+".
+\layout Standard
+
+- New set of parameters appeared in this release: proc_cnt[*]
+\layout Standard
+
+- IMPORTANT.
+ Parameter tcp_count is not supported anymore.
+\layout Subsection
+
+ChangeLog
+\layout Subsection
+
+Perfomance Monitoring
+\layout Standard
+
+
+\latex no_latex 
+One of most important uses of Zabbix is performance monitoring.
+
+\latex default 
+ 
+\latex no_latex 
+Processor load, number of running processes, number of processes, disk activity,
+ status of swap space, and memory availability are some of the numerous
+ system parameters Zabbix is able to monitor.
+ Zabbix provides a system administrator with timely information about performanc
+e of a server.
+
+\latex default 
+ 
+\latex no_latex 
+In addition, Zabbix can produce trend graphs to help identify bottlenecks
+ in system performance.
+ 
+\layout Subsection
+
+Alerting Users
+\layout Standard
+
+H
+\latex no_latex 
+aving performance monitoring is good, but it is almost useless without a
+ powerful notification mechanism.
+ With Zabbix, an administrator can define virtually any possible condition
+ for a trigger, using flexible expressions.
+
+\latex default 
+ 
+\latex no_latex 
+Any time these expressions become true, an alert will be emailed to any
+ addresses defined by the administrator.
+
+\latex default 
+ 
+\layout Standard
+
+
+\latex no_latex 
+For example, suppose you wish to be notified when /etc/passwd is changed
+ by someone.
+ You define a trigger with expression {sourceforge.net:cksum[/etc/passwd].diff(0)}
+>0.
+
+\latex default 
+ 
+\latex no_latex 
+The "diff" function is true when the current value received by Zabbix is
+ different than the previous value.
+
+\latex default 
+ 
+\latex no_latex 
+Therefore, this expression will be true whenever /etc/passwd is changed.
+
+\latex default 
+ 
+\latex no_latex 
+Next, you define one or more actions that will be performed when the trigger
+ is true.
+
+\latex default 
+ 
+\latex no_latex 
+Add an action to email your account, you will get email notification anytime
+ /etc/passwd is changed.
+\layout Subsection
+
+Integrity Checking
+\layout Standard
+
+
+\latex no_latex 
+Zabbix can easily be used for servers integrity monitoring.
+
+\latex default 
+ 
+\latex no_latex 
+All critical configuration files, binaries, kernel, scripts, and web server
+ HTML pages can be monitored by Zabbix so that the administrator can be
+ alerted to modifications made to these files.
+\layout Subsection
+
+Logging Services
+\layout Standard
+
+
+\latex no_latex 
+All values of monitored parameters are stored in a database.
+ The collected data can be used later for any purposes.
+\layout Subsection
+
+
+\latex no_latex 
+Capacity planning
+\layout Standard
+
+
+\latex no_latex 
+Viewing trends of process load, disk usage, database activity, or other
+ important metrics allows a system administrator to clearly see when the
+ next hardware upgrade should be made.
+\layout Section
+
+Zabbix Architecture
+\layout Subsection
+
+Overview
+\layout Standard
+
+
+\latex no_latex 
+Zabbix is structured in a client-server architecture.
+ The Zabbix server (zabbix_suckerd) periodically connects to an agent placed
+ on the monitored host, asks for specific information (processor load, free
+ memory, available inodes, etc).
+ The agent provides the server with the requested information and the server,
+ in turn, stores the received values in the database
+\latex default 
+.
+ 
+\latex no_latex 
+Zabbix also supports the use of a trapping method.
+ In this case, the monitored host sends information to Zabbix server.
+\layout Subsection
+
+Database
+\layout Standard
+
+
+\latex no_latex 
+Database use plays a very important role in the Zabbix application.\SpecialChar ~
+ The entire
+ history of received parameter values is stored in the database.
+
+\latex default 
+ 
+\latex no_latex 
+In addition, the database is the sole source of configuration parameters
+ for the application.
+
+\latex default 
+ 
+\latex no_latex 
+Zabbix performance depends highly on the efficiency and speed of the database
+ used by Zabbix.
+\layout Subsubsection
+
+PostgreSQL Notes
+\layout Standard
+
+
+\latex no_latex 
+Performance of PostgreSQL can be significantly improved by executing the
+ VACUUM command on the Zabbix database.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+I would suggest execution of VACUUM at least after the following events:
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+- Zabbix is installed
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+- 10000 records in table "history"
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+- patches applied on Zabbix database
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+For heavily loaded Zabbix servers, hourly execution of "VACUUM ANALYZE"
+ for all tables except "history" is strongly recommended!\SpecialChar ~
+ You can use the
+ command 'echo "vacuum verbose analyze"|psql zabbix'.
+\layout Subsection
+
+Zabbix Processes
+\layout Subsubsection
+
+zabbix_suckerd
+\layout Standard
+
+
+\latex no_latex 
+The Zabbix server process.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+SYNOPSIS
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+zabbix_suckerd
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+DESCRIPTION
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+The zabbix_suckerd process periodically connects to agents (either Zabbix
+ native or SNMP) to get the values of parameters being monitored.\SpecialChar ~
+ After receiving
+ the values, the process recalculates the status of Zabbix triggers.\SpecialChar ~
+ Also,
+ the process sends alerts to users if required.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+By default, zabbix_suckerd forks ten copies of itself.\SpecialChar ~
+ This means that Zabbix
+ will be able to get ten monitored parameters simultaneously.\SpecialChar ~
+ To modify the
+ number of forked processes, change the parameter SUCKER_FORKS in include/common.
+h.
+ 
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+One zabbix_suckerd process is used for housekeeping purposes only.\SpecialChar ~
+ The housekeepi
+ng process periodically (hourly, by default) deletes outdated information
+ from table history.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+No command line switches are supported by zabbix_suckerd.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+The zabbix_suckerd process is run as a daemon under a non-priveledged user
+ account, usually zabbix.\SpecialChar ~
+ 
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Syslog is used to store debug information for the process.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Subsubsection
+
+zabbix_agent
+\layout Standard
+
+
+\latex no_latex 
+The Zabbix agent (called from inetd).
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+SYNOPSIS
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+zabbix_agent
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+DESCRIPTION
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+The zabbix_agent process resides on the host being monitored.\SpecialChar ~
+ Its purpose
+ it to provide requested information to zabbix_suckerd.\SpecialChar ~
+ The zabbix_agent
+ process is designed to be used with INETD daemon.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Execution time of the process is limited.
+ If the agent is not able to get the requested information within 3 seconds,
+ it kills itself.
+ 
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+When a connection to zabbix_agent is made, the agent reads /etc/zabbix/zabbix_ag
+ent.conf in order to determine if the connection is coming from an authorized
+ server.\SpecialChar ~
+ The zabbix_agent.conf file must exist and contain the IP address
+ of Zabbix server.
+ Connections from other IPs are rejected.
+ 
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+If possible, use of zabbix_agentd (see below) instead of zabbix_agent is
+ recommended.\SpecialChar ~
+ The zabbix_agentd process does not require extra fork() and
+ exec() calls for every connection.
+\layout Subsubsection
+
+zabbix_agentd
+\layout Standard
+
+
+\latex no_latex 
+Standalone Zabbix agent (daemon).
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+SYNOPSIS
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+zabbix_agentd
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+DESCRIPTION
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+The zabbix_agentd process resides on the host being monitored.
+ Its purpose is to provide request information to zabbix_suckerd.\SpecialChar ~
+ This is
+ the daemon version of the zabbix_agent process.\SpecialChar ~
+ 
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+When executed, the zabbix_agentd process forks himself (ten times by default).\SpecialChar ~
+
+ Load is balanced between each copy of the process.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+When a connection to zabbix_agent is made, the agent reads /etc/zabbix/zabbix_ag
+ent.conf in order to determine if the connection is coming from an authorized
+ server.\SpecialChar ~
+ The zabbix_agent.conf file must exist and contain the IP address
+ of Zabbix server.
+ Connections from other IPs are rejected.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+No command-line switches supported by zabbix_agentd.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+The process is run as daemon under non-priveledged user account, usually
+ zabbix.\SpecialChar ~
+ 
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Syslog is used to store debug information for the process.
+\layout Subsubsection
+
+zabbix_trapper
+\layout Standard
+
+
+\latex no_latex 
+The Zabbix trapping server process.
+\layout Standard
+
+
+\latex no_latex 
+SYNOPSIS
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+zabbix_trapper
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+DESCRIPTION
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+The process provides trapping support for Zabbix.\SpecialChar ~
+ It constantly waits for
+ connections from zabbix_sender agents.\SpecialChar ~
+ It is designed to be used with inetd
+ daemon.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+If possible, it is recommended that zabbix_trapperd is used to provide trapping
+ support.\SpecialChar ~
+\SpecialChar ~
+ The zabbix_trapperd process does not require extra fork() and exec()
+ calls for every connection.
+ 
+\layout Subsubsection
+
+zabbix_trapperd
+\layout Standard
+
+
+\latex no_latex 
+Zabbix trapping server process (daemon).
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+SYNOPSIS
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+zabbix_trapperd
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+DESCRIPTION
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+The process collects information passed by active agents (zabbix_sender).
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+By default, zabbix_trapperd forks ten copies of itself.\SpecialChar ~
+ The parameter TRAPPERD_FO
+RKS in include/common.h can be changed to modify the number of forked processes.
+ 
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+No command-line switches are supported by zabbix_trapperd.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+The process is run as daemon under non-priveledged user account, usually
+ zabbix.\SpecialChar ~
+\SpecialChar ~
+ 
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Syslog is used to store debug information for the process.
+\layout Subsubsection
+
+zabbix_sender
+\layout Standard
+
+
+\latex no_latex 
+The Zabbix trapping agent.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+SYNOPSIS
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+zabbix_sender zabbix_server port host:key value
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+DESCRIPTION
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+The process, when executed, sends information to Zabbix.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+zabbix_server\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+Name or IP address of Zabbix server to connect.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+port\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+Port number to connect to Zabbix.
+ It is port number of zabbix_trapper process.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+host:key\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+Host name and key for value.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+value\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+Value for parameter "host:key".
+ Float number.
+ 
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+EXAMPLE:
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+zabbix_sender zabbix.abcde.com 10001 db.abcde.com:procload 2.34
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+In this example, zabbix_sender will send information about processor load
+ on host db.abcde.com to Zabbix server located at zabbix.acbde.com.\SpecialChar ~
+ The processor
+ load is 2.34.
+\layout Section
+
+Zabbix Configuration
+\layout Subsection
+
+Expression for triggers
+\layout Standard
+
+
+\latex no_latex 
+The expressions used in triggers are very flexible.\SpecialChar ~
+ You can use them to create
+ complex logical tests regarding monitored statistics.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+The following operators are supported for triggers:
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+> - more than
+\layout Standard
+
+
+\latex no_latex 
+< - less than
+\layout Standard
+
+
+\latex no_latex 
+| - logical OR
+\layout Standard
+
+
+\latex no_latex 
+& - logical AND
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+The following functions are supported:
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+last\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+- last (most recent) value, parameter is ignored 
+\layout Standard
+
+
+\latex no_latex 
+min\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+- MIN value for period of time, parameter - time in sec
+\layout Standard
+
+
+\latex no_latex 
+max\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+- MAX value for period of time, parameter - time in sec
+\layout Standard
+
+
+\latex no_latex 
+diff\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+- 1 - if last and previous values are different, 0 - otherwise
+\layout Standard
+
+
+\latex no_latex 
+prev\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+- previous value, parameter is ignored
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+A simple useful expression might look like:
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+{<server>:<key>.<function>(<parameter>)}<operator><const>
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Example 1:
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+{sourceforge.net:procload.last(0)}>5
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+'sourceforge.net:procload' gives a short name of monitored parameter.\SpecialChar ~
+ It specifies
+ that the server is 'sourceforge.net' and the key being monitored is
+\layout Standard
+
+
+\latex no_latex 
+'procload'.\SpecialChar ~
+ By using the function 'last(),' we are specifying we are referring
+ to the most recent value.\SpecialChar ~
+ Finally, '>5' means that the trigger is true whenever
+ the most recent procload measurement from sourceforge.net is greater than
+ 5.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Example 2:
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+More complex example:
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+({sourceforge.net:system[procload].last(0)}>5) | ({sourceforge.net:system[procload].
+min(600)}>2)
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+The expression is true when either the current processor load is more than
+ 5 or the processor load was more than 2 during last 10 minutes.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Example 3:
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Use of diff function.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+({sourceforge.net:cksum[/etc/passwd].diff(0)})>0
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+The expression is true when the previous value of checksum of /etc/passwd
+ differs from the most recent one.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Similiar expressions could be useful to monitor changes in important files,
+ such as /etc/passwd, /etc/inetd.conf, /kernel, etc.
+\layout Subsection
+
+Monitored Parameters
+\layout Standard
+
+
+\latex no_latex 
+- memory[total]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Total amount of installed physical memory.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- memory[shared]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Amount of used shared memory.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- memory[buffers]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Amount of memory used for kernel buffers.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- memory[cached]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Amount of cached memory.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- memory[free]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Amount of unused physical memory.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- diskfree[*]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Amount of unused disk space for given volume.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Example:
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+diskfree[/] - returns free disk space for root volume.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- inodefree[*]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Number of unused inodes space for given volume.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Example:
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+inodefree[/var] - returns number of free inodes for volume /var
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- cksum[*]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Check sum of given file.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Note, that currently all supported file names are hardcoded to sysinfo.c
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Example:
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+cksum[/etc/passwd]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- filesize[*]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Size of given file.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Example:
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+filesize[/var/log/syslog]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- proc_cnt[*]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Number of processes called "*" running.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Example:
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+proc_cnt[inetd]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- swap[free]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Free swap space.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- swap[total]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Total swap space.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- swap[free]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Free swap space.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- system[procload]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Load average for last 1 minute.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- system[procload5]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Load average for last 5 minutes.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- system[procload15]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Load average for last 15 minutes.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- system[proccount]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Number of processes.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- system[procrunning]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Number of running processes.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- system[uptime]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+System's uptime.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- system[users]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Number of users connected.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- ping
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Always return 1.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- tcp_count
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Number of established TCP connections.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- check_service[ftp]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Check either FTP server is running and accepting connections.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Result: 0 - FTP server is down
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+1 - FTP server is running
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- check_service[ssh]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Check either SSH server is running and accepting connections.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Result: 0 - SSH server is down
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+1 - SSH server is running
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- check_service[smtp]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Check either Email (SMTP) server is running and accepting connections.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Result: 0 - SMTP server is down
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+1 - SMTP server is running
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- check_service[pop]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Check either POP server is running and accepting connections.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Result: 0 - POP server is down
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+1 - POP server is running
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- check_service[nntp]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Check either NNTP server is running and accepting connections.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Result: 0 - NNTP server is down
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+1 - NNTP server is running
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- check_service[imap]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Check either IMAP server is running and accepting connections.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Result: 0 - IMAP server is down
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+1 - IMAP server is running
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+- check_port[*]
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Check either possible to connect to port number "*".
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Result: 0 - can connect
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+1 - cannot connect
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Example: Use check_port[80] to check either WEB server accepts connections.
+\layout Subsection
+
+Supported Parameters by Platform
+\layout Standard
+
+
+\size footnotesize 
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="38" columns="7">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Parameter/sysem
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Debian Woody (i386)
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Debian Potato (i386)
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+FreeBSD 4.3(i386)
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Solaris 5.8(Ultra-60)
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+HP-UX 11.00(9000/800)
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+AIX 4.3(PowerPC)
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+memory[total]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+memory[shared]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+memory[buffers]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+memory[cached]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+memory[free]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+diskfree[*]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+inodefree[*]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+cksum[*]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+filesize[*]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+swap[free]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+swap[total]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+swap[in]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+swap[out]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+system[interrupts]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+system[switches]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+proc_cnt[*]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+check_port[*]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+check_service[ftp]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+check_service[ssh]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+check_service[smtp]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+check_service[pop]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+check_service[nntp]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+check_service[imap]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+io[disk_io]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+io[disk_rio]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+io[disk_wio]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+io[disk_rblk]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+io[disk_wblk]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+system[procload]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+system[procload5]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+system[procload15]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+system[proccount]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+system[procrunning]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+system[uptime]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+system[users]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+ping
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+tcp_count
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Section
+
+Getting Maximum Performace From Zabbix
+\layout Section
+
+Zabbix Frontends
+\layout Subsection
+
+WEB-based Frontend 
+\layout Standard
+
+
+\latex no_latex 
+The frontend provides a convenient and platform-independent method for accessing
+ Zabbix.
+
+\latex default 
+ 
+\latex no_latex 
+Information provided by the frontend can be either graphical or textual.
+
+\latex default 
+ 
+\latex no_latex 
+While graphical representations usually provide the easiest method to understand
+ trends, the text representation of monitored parameter is intended to provide
+ an easy way to export Zabbix data to other analytical tools.
+\layout Subsubsection
+
+Reports
+\layout Standard
+
+
+\latex no_latex 
+Zabbix reports represent collected information in structured way.
+ All reports are produced in HTML format.
+
+\latex default 
+ 
+\latex no_latex 
+Report generation can be a very time consuming operation.
+ Additionally, if you use MySQL or ay other database with table locking,
+ zabbix_suckerd and zabbix_trapper will wait until the report is finished.
+\layout Paragraph
+
+Status of Zabbix
+\layout Standard
+
+
+\latex no_latex 
+This report gives general information about the Zabbix server including:
+\layout Itemize
+
+
+\latex no_latex 
+whether the main Zabbix process is runnin
+\latex default 
+g
+\layout Itemize
+
+
+\latex no_latex 
+number of values stored in table history
+\layout Itemize
+
+
+\latex no_latex 
+number of triggers
+\layout Itemize
+
+
+\latex no_latex 
+number of parameters monitored
+\layout Itemize
+
+
+\latex no_latex 
+number of users
+\layout Itemize
+
+
+\latex no_latex 
+number of hosts 
+\layout Paragraph
+
+Availability Report
+\layout Standard
+
+
+\latex no_latex 
+This report calculates amount of time a trigger has been in true and false
+ states.
+ For example, suppose you want to know what percentage of the time your
+ web server is down.\SpecialChar ~
+
+\latex default 
+ 
+\latex no_latex 
+Assuming you have been monitoring the web server and have the "WEB server
+ is down" trigger enabled, the availability report will display what percentage
+ of the time the trigger was in the true state (web server down) and in
+ the false state (web server running).
+\layout Section
+
+Zabbix utilities
+\layout Subsection
+
+pinger.pl
+\layout Standard
+
+
+\latex no_latex 
+The script is used to periodically sind ICMP pings to list of servers.
+ In case, if it does not receive responce from host, it executes:
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+zabbix_sender <server> <port> <host>:alive 0
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+otherwise:
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+zabbix_sender <server> <port> <host>:alive 1
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+The script is usually called from cron.
+ Configure the script before use.\SpecialChar ~
+ Change location for "hosts" file.\SpecialChar ~
+ You must
+ have fping installed to successfully run the script.
+\layout Section
+
+Problems and Common Errors
+\layout Section
+
+Credits
+\layout Standard
+
+
+\latex no_latex 
+I want to thank the guys from sourceforge.net for providing hosting for
+\latex default 
+ 
+\latex no_latex 
+the project.
+ I also want to thank all the Zabbix users who have sent corrections and
+ suggestions.
+
+\latex default 
+ 
+\latex no_latex 
+This sort of feedback helps me make the software better.
+\the_end
