@@ -397,3 +397,45 @@ char *GetPdhErrorText(DWORD error)
       return GetSystemErrorText(error);
    }
 }
+
+
+//
+// Get performance counter name by index
+//
+
+char *GetCounterName(DWORD index)
+{
+	PERFCOUNTER	*counterName;
+	DWORD	dwSize;
+	char hostname[MAX_COMPUTERNAME_LENGTH+3];
+
+	counterName=perfCounterList;
+	while(counterName!=NULL)
+	{
+		if (counterName->pdhIndex == index)
+         break;
+		counterName = counterName->next;
+	}
+	if (counterName == NULL)
+	{
+		counterName = (PERFCOUNTER *)malloc(sizeof(PERFCOUNTER));
+		memset(counterName,0, sizeof(PERFCOUNTER));
+		counterName->pdhIndex = index;
+		counterName->next = perfCounterList;
+
+		sprintf(hostname, "\\\\");
+		dwSize = MAX_COMPUTERNAME_LENGTH;
+		GetComputerName((char *) &hostname + 2, &dwSize);
+
+		dwSize = MAX_COUNTER_PATH;
+		if (PdhLookupPerfNameByIndex((char *)&hostname, index, (char *)&counterName->name, &dwSize)==ERROR_SUCCESS)
+		{
+			perfCounterList = counterName;
+		} else 
+      {
+			free(counterName);
+			return "UnknownPerformanceCounter";
+		}
+	}
+	return (char *)&counterName->name;
+}
