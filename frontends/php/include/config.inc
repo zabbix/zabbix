@@ -1049,7 +1049,20 @@
 		{
 			$sql="insert into services (serviceid,name,status) values (NULL,'$name',0)";
 		}
-		return	DBexecute($sql);
+		$result=DBexecute($sql);
+		return DBinsert_id($result,"services","serviceid");
+	}
+
+	function	add_host_to_services($hostid,$serviceid)
+	{
+		$sql="select t.triggerid,t.description from triggers t,hosts h,items i,functions f where h.hostid=$hostid and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			$serviceid2=add_service($row["description"],$row["triggerid"],"on");
+			add_service_link($serviceid2,$serviceid,0);
+		}
+		return	1;
 	}
 
 	function	add_service_link($servicedownid,$serviceupid,$softlink)

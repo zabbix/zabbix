@@ -19,6 +19,11 @@
 			$result=@add_service($name,$triggerid,$linktrigger);
 			show_messages($result,"Service added","Cannot add service");
 		}
+		if($register=="add server")
+		{
+			$result=add_host_to_services($hostid,$serviceid);
+			show_messages($result,"Host trigger added","Cannot add host triggers");
+		}
 		if($register=="add link")
 		{
 			if(!isset($softlink))
@@ -218,6 +223,38 @@
 	echo "<input type=\"submit\" name=\"register\" value=\"add link\">";
 
 	show_table2_header_end();
+?>
+
+<?
+	if(isset($serviceid))
+	{
+
+	echo "<br>";
+	show_table2_header_begin();
+	echo "Add server details";
+
+	show_table2_v_delimiter();
+	echo "<form method=\"post\" action=\"services.php\">";
+	if(isset($serviceid))
+	{
+		echo "<input name=\"serviceid\" type=\"hidden\" value=$serviceid>";
+	}
+	echo "Server";
+	show_table2_h_delimiter();
+	$result=DBselect("select hostid,host from hosts order by host");
+        echo "<select name=\"hostid\" size=1>";
+        while($row=DBfetch($result))
+        {
+		echo "<OPTION VALUE='".$row["hostid"]."'>".$row["host"];
+        }
+        echo "</SELECT>";
+
+	show_table2_v_delimiter2();
+	echo "<input type=\"submit\" name=\"register\" value=\"add server\">";
+
+	show_table2_header_end();
+	}
+
 ?>
 
 <?
