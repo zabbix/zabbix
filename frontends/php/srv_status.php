@@ -28,10 +28,10 @@
 	echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";
 	echo "\n";
 	echo "<tr>";
-	echo "<td><b>Service</b></td>";
+	echo "<td width=40%><b>Service</b></td>";
 	echo "<td width=10%><b>Status</b></td>";
-	echo "<td width=30%><b>Reason</b></td>";
-	echo "<td width=30%><b>SLA</b></td>";
+	echo "<td><b>Reason</b></td>";
+	echo "<td width=20%><b>SLA</b></td>";
 	echo "<td width=5%><b>Graph</b></td>";
 	echo "</tr>";
 	echo "\n";

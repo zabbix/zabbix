@@ -1582,6 +1582,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			{
 				$description=expand_trigger_description($triggerid);
 			}
+			$description=addslashes($description);
 			$sql="insert into services (name,triggerid,status,algorithm) values ('$description',$triggerid,0,$algorithm)";
 		}
 		else
