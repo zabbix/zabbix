@@ -10,6 +10,11 @@ Not ready yet:
 [ CORE. Get rid of all numerics constants in the code ]
 
 [ PHP. Show triggers by userid ]
+[ PHP. Split include/common.inc ]
+[ PHP. Rename *.inc to *.inc.php ]
+
+[ CORE. Change sleep to usleep in zabbix_suckerd ]
+[ CORE. Make one suckerd to send emails ]
 
 [ DOCS. All parameters should contain section "How can be used" in the Manual ]
 
@@ -19,6 +24,8 @@ Not ready yet:
 
 [ DOCS. SNMP with missing MIB files can be used by:
 snmpget -On localhost public enterprises.ucdavis.memory.memTotalSwap.0]
+
+[ DITRIB. Exclude LyX from Zabbix distribution ]
 
 Changes for 1.0beta4:
 
