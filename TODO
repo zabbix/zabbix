@@ -7,7 +7,6 @@
  - check if alert and service alert is added after host become reachable again
  - navigation bar for all graphs and screens
  - make support for "Clone"
- - add SNMP-based and simple-standalone template
  - add a simple generic tcp check
  - check bug with trapper receiving value with ":"
  - add "Add from template" feature
