@@ -6,7 +6,6 @@
  - change %s to {HOSTNAME}, {DATE},{TIME}, etc
  - add zabbix[unixtime] and lastupdate() to get rid of nodata()
  - check return code for alert scripts
- - add support for function unixtime()
  - zabbix_agentd to support processor load, swap[*] and memory[*] onder AIX
  - make possible passing of parameters to user script for UserParameters
  like param[*]
