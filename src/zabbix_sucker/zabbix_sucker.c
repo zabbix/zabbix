@@ -403,6 +403,7 @@ int get_values(void)
 		item.nextcheck=atoi(DBget_field(result,i,8));
 		item.type=atoi(DBget_field(result,i,9));
 		item.snmp_community=DBget_field(result,i,10);
+		item.snmp_oid=DBget_field(result,i,10);
 		item.useip=atoi(DBget_field(result,i,12));
 		item.ip=DBget_field(result,i,13);
 
