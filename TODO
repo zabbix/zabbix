@@ -1,5 +1,6 @@
 1.0beta10:
 
+ - links to Zabbix frontend in alert emails
  - fix PostgreSQL schema
  - add all supported items to templates (data.sql)
  - user groups
