@@ -243,6 +243,7 @@
 	define("S_CONFIGURATION_OF_HOSTS_AND_HOST_GROUPS","CONFIGURATION OF HOSTS AND HOST GROUPS");
 	define("S_HOST_GROUPS_BIG",			"HOST GROUPS");
 	define("S_NO_HOST_GROUPS_DEFINED",		"No host groups defined");
+	define("S_NO_LINKAGES_DEFINED",			"No linkages defined");
 	define("S_NO_HOSTS_DEFINED",			"No hosts defined");
 	define("S_HOSTS_BIG",				"HOSTS");
 	define("S_HOST",				"Host");

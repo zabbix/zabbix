@@ -292,14 +292,14 @@
 		if(DBnum_rows($result)==0)
 		{
 				echo "<TR BGCOLOR=#EEEEEE>";
-				echo "<TD COLSPAN=4 ALIGN=CENTER>".S_NO_HOST_GROUPS_DEFINED."</TD>";
+				echo "<TD COLSPAN=8 ALIGN=CENTER>".S_NO_LINKAGES_DEFINED."</TD>";
 				echo "<TR>";
 		}
 		table_end();
 	}
-	if($_GET["config"]==2)
+	if(isset($_GET["hostid"])&&$_GET["config"]==2)
 	{
-		insert_template_form($_GET["groupid"]);
+		insert_template_form($_GET["hosttemplateid"]);
 	}
 ?>
 
