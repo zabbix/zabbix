@@ -688,6 +688,13 @@
 		return $exp;
 	}
 
+	function	update_trigger_comments($triggerid,$comments)
+	{
+		$comments=addslashes($comments);
+		$sql="update triggers set comments='$comments' where triggerid=$triggerid";
+		$result=DBexecute($sql);
+	}
+
 	# Update Trigger status
 
 	function	update_trigger_status($triggerid,$status)
