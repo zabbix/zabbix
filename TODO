@@ -16,6 +16,7 @@ suckerd and agentd)
  - add alerts to host templates
  - add pinger (fping) to zabbix_sucker
 
+ - improve screens (add maps, simple graphs, etc)
  - improve graphing capabilities (MRTG like graphs)
  - monitoring of log files
  - [10] Refresh stop ability. At least for graphs and triggers being selected.
