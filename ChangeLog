@@ -1,5 +1,6 @@
 Changes for 1.1alpha1:
 
+ - send alert when trigger changes its value to TRUE for the first time (Alexei)
  - added support of zabbix[history_str] (Alexei)
  - use $_GET, $_POST, $_COOKIE to be PHP5-compatible. Thanks to Martin MOHNHAUP. (Alexei)
  - added table 'images' (Alexei)
