@@ -1,5 +1,8 @@
 Changes for 1.0beta7:
 
+ - support for host groups (Alexei)
+ - added table hosts_groups (Alexei)
+ - added table groups (Alexei)
  - ./configure to find PostgreSQL's includes in /usr/local/include
  (Alexei)
  - basic support for log rotating (Alexei)

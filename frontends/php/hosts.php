@@ -19,13 +19,13 @@
 	{
 		if($HTTP_GET_VARS["register"]=="add")
 		{
-			$result=add_host($HTTP_GET_VARS["host"],$HTTP_GET_VARS["port"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["template"],$HTTP_GET_VARS["useip"],$HTTP_GET_VARS["ip"],$HTTP_GET_VARS["host_templateid"]);
+			$result=add_host($HTTP_GET_VARS["host"],$HTTP_GET_VARS["port"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["template"],$HTTP_GET_VARS["useip"],$HTTP_GET_VARS["ip"],$HTTP_GET_VARS["host_templateid"],$HTTP_GET_VARS["newgroup"],$HTTP_GET_VARS["groups"]);
 			show_messages($result,"Host added","Cannot add host");
 			unset($HTTP_GET_VARS["hostid"]);
 		}
 		if($HTTP_GET_VARS["register"]=="update")
 		{
-			$result=update_host($HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["host"],$HTTP_GET_VARS["port"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["useip"],$HTTP_GET_VARS["ip"]);
+			$result=update_host($HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["host"],$HTTP_GET_VARS["port"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["useip"],$HTTP_GET_VARS["ip"],$HTTP_GET_VARS["newgroup"],$HTTP_GET_VARS["groups"]);
 			show_messages($result,"Host details updated","Cannot update host details");
 			unset($HTTP_GET_VARS["hostid"]);
 		}
@@ -154,6 +154,39 @@
 	echo "Host";
 	show_table2_h_delimiter();
 	echo "<input name=\"host\" value=\"$host\" size=20>";
+
+	show_table2_v_delimiter();
+	echo "Groups";
+	show_table2_h_delimiter();
+	echo "<select multiple name=\"groups[]\" size=\"5\">";
+	$result=DBselect("select distinct groupid,name from groups order by name");
+	while($row=DBfetch($result))
+	{
+		if(isset($HTTP_GET_VARS["hostid"]))
+		{
+			$sql="select count(*) as count from hosts_groups where hostid=".$HTTP_GET_VARS["hostid"]." and groupid=".$row["groupid"];
+			$result2=DBselect($sql);
+			$row2=DBfetch($result2);
+			if($row2["count"]==0)
+			{
+				echo "<option value=\"".$row["groupid"]."\">".$row["name"];
+			}
+			else
+			{
+				echo "<option value=\"".$row["groupid"]."\" selected>".$row["name"];
+			}
+		}
+		else
+		{
+			echo "<option value=\"".$row["groupid"]."\">".$row["name"];
+		}
+	}
+	echo "</select>";
+
+	show_table2_v_delimiter();
+	echo "New group";
+	show_table2_h_delimiter();
+	echo "<input name=\"newgroup\" value=\"\" size=20>";
 
 	show_table2_v_delimiter();
 	echo "Use IP address";
