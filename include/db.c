@@ -878,7 +878,9 @@ int	DBadd_trend(int itemid, double value, int clock)
 		value_avg=atof(DBget_field(result,0,2));
 		value_max=atof(DBget_field(result,0,3));
 		if(value<value_min)	value_min=value;
-		if(value>value_avg)	value_max=value;
+/* Unfortunate mistake... */
+/*		if(value>value_avg)	value_max=value;*/
+		if(value>value_max)	value_max=value;
 		value_avg=(num*value_avg+value)/(num+1);
 		num++;
 		snprintf(sql,sizeof(sql)-1,"update trends set num=%d, value_min=%f, value_avg=%f, value_max=%f where itemid=%d and clock=%d", num, value_min, value_avg, value_max, itemid, hour);
