@@ -142,6 +142,13 @@
 	else
 	{
 		show_table_header("Select screen to display");		
+		echo "<TABLE BORDER=0 align=center COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+		echo "<TR BGCOLOR=#DDDDDD>";
+		echo "<TD ALIGN=CENTER>";
+		echo "...";
+		echo "</TD>";
+		echo "</TR>";
+		echo "</TABLE>";
 	}
 ?>
 
