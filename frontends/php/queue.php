@@ -41,10 +41,8 @@
 <?php
 	$now=time();
 	$result=DBselect("select i.itemid, i.nextcheck, i.description, h.host,h.hostid from items i,hosts h where i.status=0 and i.type not in (2) and h.status=0 and i.hostid=h.hostid and i.nextcheck<$now and i.key_<>'status' order by i.nextcheck");
-	echo "<table border=0 width=100% bgcolor='#AAAAAA' cellspacing=1 cellpadding=3>";
-	echo "\n";
-	echo "<tr bgcolor='#CCCCCC'><td><b>".S_NEXT_CHECK."</b></td><td><b>".S_HOST."</b></td><td><b>".S_DESCRIPTION."</b></td></tr>";
-	echo "\n";
+	table_begin();
+	table_header(array(S_NEXT_CHECK,S_HOST,S_DESCRIPTION));
 	$col=0;
 	while($row=DBfetch($result))
 	{
@@ -52,19 +50,14 @@
 		{
 			continue;
 		}
-		iif_echo($col++%2==0,
-			"<tr bgcolor=#EEEEEE>",
-			"<tr bgcolor=#DDDDDD>");
-		table_td(date("m.d.Y H:i:s",$row["nextcheck"]),"");
-		table_td($row["host"],"");
-		table_td($row["description"],"");
-		echo "</tr>";
-		cr();
+		$elements=array(date("m.d.Y H:i:s",$row["nextcheck"]),$row["host"],$row["description"]);
+		table_row($elements,$col++);
 	}
 	iif_echo(DBnum_rows($result)==0,
 		"<TR BGCOLOR=#EEEEEE><TD COLSPAN=3 ALIGN=CENTER>".S_THE_QUEUE_IS_EMPTY."</TD><TR>",
 		"");
-	echo "</table>";
+
+	table_end();
 ?>
 <?php
 	show_table_header(S_TOTAL.":$col");
