@@ -594,6 +594,14 @@ void  DBdelete_triggers_by_itemid(int itemid)
 	zabbix_log(LOG_LEVEL_DEBUG,"End of DBdelete_triggers_by_itemid(%d)", itemid);
 }
 
+void DBdelete_trends_by_itemid(int itemid)
+{
+	char	sql[MAX_STRING_LEN+1];
+
+	sprintf(sql,"delete from trends where itemid=%d", itemid);
+	DBexecute(sql);
+}
+
 void DBdelete_history_by_itemid(int itemid)
 {
 	char	sql[MAX_STRING_LEN+1];
@@ -612,6 +620,7 @@ void DBdelete_item(int itemid)
 
 	DBdelete_triggers_by_itemid(itemid);
 	DBdelete_history_by_itemid(itemid);
+	DBdelete_trends_by_itemid(itemid);
 
 	sprintf(sql,"delete from items where itemid=%d", itemid);
 	DBexecute(sql);
