@@ -6,6 +6,16 @@
 ?>
 
 <?
+        if(!check_right("Host","R",0))
+        {
+                show_table_header("<font color=\"AA0000\">No permissions !</font
+>");
+                show_footer();
+                exit;
+        }
+?>
+
+<?
 	if(isset($register))
 	{
 		if($register=="add")
@@ -41,6 +51,7 @@
 	show_table_header("HOSTS");
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR>";
+	echo "<TD WIDTH=\"3%\" NOSAVE><B>Id</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Host</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Port</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Status</B></TD>";
@@ -53,9 +64,14 @@
 	while($row=DBfetch($result))
 //	for($i=0;$i<DBnum_rows($result);$i++)
 	{
+        	if(!check_right("Host","R",$row["hostid"]))
+		{
+			continue;
+		}
 		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
 		else 		{ echo "<TR BGCOLOR=#DDDDDD>"; }
 	
+		echo "<TD>".$row["hostid"]."</TD>";
 		echo "<TD><a href=\"items.php?hostid=".$row["hostid"]."\">".$row["host"]."</a></TD>";
 		echo "<TD>".$row["port"]."</TD>";
 		echo "<TD>";
@@ -68,7 +84,14 @@
 		else
 			echo "Unknown";
 		echo "</TD>";
-		echo "<TD><A HREF=\"hosts.php?register=change&hostid=".$row["hostid"]."#form\">Change</A></TD>";
+        	if(check_right("Host","U",$row["hostid"]))
+		{
+			echo "<TD><A HREF=\"hosts.php?register=change&hostid=".$row["hostid"]."#form\">Change</A></TD>";
+		}
+		else
+		{
+			echo "<TD>Change</TD>";
+		}
 		echo "</TR>";
 	}
 	echo "</TABLE>";

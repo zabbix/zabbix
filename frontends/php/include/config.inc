@@ -8,19 +8,75 @@
 	{
 		global $USER_DETAILS;
 
-		$sql="select * from users u,rights r where u.userid=r.userid and r.name='$right' and r.permission='$permission'";
+		$sql="select permission from rights where name='Default permission' and userid=".$USER_DETAILS["userid"];
+		$result=DBselect($sql);
+
+		$default_permission="H";
+		if(DBnum_rows($result)>0)
+		{
+			$row=DBfetch($result);
+			$default_permission=$row["permission"];
+		}
+
+		if($permission=='R')
+		{
+			$cond="'R','U'";
+		}
+		else
+		{
+			$cond="'".$permission."'";
+		}
+
+		if($id==0)
+		{
+			$sql="select * from rights where name='$right' and permission in ($cond) and userid=".$USER_DETAILS["userid"];
+		}
+		else
+		{
+			$sql="select * from rights where name='$right' and permission in ($cond) and (id=$id or id=0) and userid=".$USER_DETAILS["userid"];
+		}
+//		echo $sql;
 
 		$result=DBselect($sql);
 
 		if(DBnum_rows($result)>0)
 		{
-			return	0;
+			return	1;
 		}
 		else
 		{
-			return	-1;
+			if(($default_permission=="R")&&($permission=="R"))
+			{
+				return 1;
+			}
+			if(($default_permission=="U")&&($permission=="R"))
+			{
+				return 1;
+			}
+			if(($default_permission=="U")&&($permission=="U"))
+			{
+				return 1;
+			}
+			return	0;
 		}
 	}
+
+	function	check_right_on_trigger($permission,$triggerid)
+	{
+                $sql="select distinct h.hostid from functions f,items i,hosts h
+where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
+                $result=DBselect($sql);
+                $ok=0;
+		while($row=DBfetch($result))
+		{
+			if(check_right("Host",$permission,$row["hostid"]))
+			{
+				$ok=1;
+			}
+		}
+		return	$ok;
+}
+
 
 //	The hash has form <md5sum of triggerid>,<sum of priorities>
 	function	calc_trigger_hash()
@@ -40,7 +96,23 @@
 		$md5sum=md5($triggerids);
 
 		return	"$priorities,$md5sum";
+	}
 
+	function	get_user_by_userid($userid)
+	{
+		global	$ERROR_MSG;
+
+		$sql="select * from users where userid=$userid"; 
+		$result=DBselect($sql);
+		if(DBnum_rows($result) == 1)
+		{
+			return	DBfetch($result);	
+		}
+		else
+		{
+			$ERROR_MSG="No user with itemid=[$userid]";
+		}
+		return	$user;
 	}
 
 	function	get_item_by_itemid($itemid)
@@ -118,7 +190,7 @@
 		return	$config;
 	}
 
-	function	select_host_by_hostid($hostid)
+	function	get_host_by_hostid($hostid)
 	{
 		global	$ERROR_MSG;
 
@@ -462,8 +534,11 @@
 		<tr>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="latest.php">
 <?
+				if(check_right("Host","R",0))
+				{
+					echo "<a href=\"latest.php\">";
+				}
 				if( 	($page["file"]=="latest.php") ||
 					($page["file"]=="history.php"))
 				{
@@ -478,8 +553,11 @@
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="tr_status.php?notitle=true&onlytrue=true&noactions=true&compact=true">
 <?
+				if(check_right("Host","R",0))
+				{
+					echo "<a href=\"tr_status.php?notitle=true&onlytrue=true&noactions=true&compact=true\">";
+				}
 				if($page["file"]=="tr_status.php")
 				{
 					echo "<b>[STATUS OF TRIGGERS]</b></a>";
@@ -493,8 +571,11 @@
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="queue.php">
 <?
+				if(check_right("Host","R",0))
+				{
+					echo "<a href=\"queue.php\">";
+				}
 				if($page["file"]=="queue.php")
 				{
 					echo "<b>[QUEUE]</b></a>";
@@ -635,8 +716,11 @@
 		<tr>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="config.php">
 <?
+				if(check_right("Configuration of Zabbix","R",0))
+				{
+					echo "<a href=\"config.php\">";
+				}
 				if($page["file"]=="config.php")
 				{
 					echo "<b>[CONFIG]</b></a>";
@@ -650,8 +734,11 @@
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="users.php">
 <?
+				if(check_right("User","R",0))
+				{
+					echo "<a href=\"users.php\">";
+				}
 				if(	($page["file"]=="users.php")||
 					($page["file"]=="media.php"))
 				{
@@ -666,8 +753,11 @@
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="hosts.php">
 <?
+				if(check_right("Host","R",0))
+				{
+					echo "<a href=\"hosts.php\">";
+				}
 				if($page["file"]=="hosts.php")
 				{
 					echo "<b>[HOSTS]</b></a>";
@@ -681,8 +771,11 @@
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="items.php">
 <?
+				if(check_right("Host","R",0))
+				{
+					echo "<a href=\"items.php\">";
+				}
 				if($page["file"]=="items.php")
 				{
 					echo "<b>[ITEMS]</b></a>";
@@ -696,8 +789,11 @@
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="triggers.php">
 <?
+				if(check_right("Host","R",0))
+				{
+					echo "<a href=\"triggers.php\">";
+				}
 				if(	($page["file"]=="triggers.php")||
 					($page["file"]=="actions.php"))
 				{
@@ -964,6 +1060,8 @@
 
 	function	update_trigger_comments($triggerid,$comments)
 	{
+		global	$ERROR_MSG;
+
 		$comments=addslashes($comments);
 		$sql="update triggers set comments='$comments' where triggerid=$triggerid";
 		return	DBexecute($sql);
@@ -1432,6 +1530,13 @@
 		return DBexecute($sql);
 	}
 
+	# Add permission
+
+	function	add_permission($userid,$right,$permission,$id)
+	{
+		$sql="insert into rights (rightid,userid,name,permission,id) values (NULL,$userid,'$right','$permission',$id)";
+		return DBexecute($sql);
+	}
 
 	# Add User definition
 
@@ -1670,6 +1775,14 @@
 
 	function	update_config($smtp_server,$smtp_helo,$smtp_email,$password_required,$alarm_history,$alert_history)
 	{
+		global	$ERROR_MSG;
+
+		if(!check_right("Configuration of Zabbix","U",0))
+		{
+			$ERROR_MSG="Insufficient permissions";
+			return	0;
+		}
+
 		$sql="update config set smtp_server='$smtp_server',smtp_helo='$smtp_helo',smtp_email='$smtp_email',password_required=$password_required,alarm_history=$alarm_history,alert_history=$alert_history";
 		return	DBexecute($sql);
 	}
@@ -1724,6 +1837,14 @@
 		}
 		$sql="delete from hosts where hostid=$hostid";
 		return	DBexecute($sql);
+	}
+
+	# Delete User permission
+
+	function	delete_permission($rightid)
+	{
+		$sql="delete from rights where rightid=$rightid";
+		return DBexecute($sql);
 	}
 
 	# Delete User definition
@@ -2237,6 +2358,49 @@
 <?
 	}
 
+	# Insert form for User permissions
+	function	insert_permissions_form($userid)
+	{
+		show_table2_header_begin();
+		echo "New permission";
+
+		show_table2_v_delimiter();
+		echo "<form method=\"post\" action=\"users.php\">";
+		if(isset($userid))
+		{
+			echo "<input name=\"userid\" type=\"hidden\" value=\"$userid\" size=8>";
+		}
+		echo "Resource";
+		show_table2_h_delimiter();
+		echo "<select name=\"right\">";
+		echo "<option value=\"Configuration of Zabbix\">Configuration of Zabbix";
+		echo "<option value=\"Default permission\">Default permission";
+		echo "<option value=\"Host\">Host";
+		echo "<option value=\"Item\">Item";
+		echo "<option value=\"Trigger comment\">Trigger's comment";
+		echo "<option value=\"User\">User";
+		echo "</select>";
+
+		show_table2_v_delimiter();
+		echo "Permission";
+		show_table2_h_delimiter();
+		echo "<select name=\"permission\">";
+		echo "<option value=\"R\">Read-only";
+		echo "<option value=\"U\">Read-write";
+		echo "<option value=\"H\">Hide";
+		echo "<option value=\"A\">Add";
+		echo "</select>";
+
+		show_table2_v_delimiter();
+		echo "Resource ID (0 for all)";
+		show_table2_h_delimiter();
+		echo "<input name=\"id\" value=\"0\" size=4>";
+
+		show_table2_v_delimiter2();
+		echo "<input type=\"submit\" name=\"register\" value=\"add permission\">";
+		show_table2_header_end();
+	}
+
 	# Insert form for User
 	function	insert_user_form($userid)
 	{
@@ -2606,4 +2770,46 @@
 		return $ret;
 	}
 
+	function	get_resource_name($permission,$id)
+	{
+		$res="-";
+		if($permission=="Host")
+		{
+			if(isset($id)&&($id!=0))
+			{
+				$host=get_host_by_hostid($id);
+				$res=$host["host"];
+			}
+			else
+			{
+				$res="All hosts";
+			}
+		}
+		else if($permission=="Item")
+		{
+			if(isset($id)&&($id!=0))
+			{
+				$item=get_item_by_itemid($id);
+				$host=get_host_by_hostid($item["hostid"]);
+				$res=$host["host"].":".$item["description"];
+			}
+			else
+			{
+				$res="All items";
+			}
+		}
+		else if($permission=="User")
+		{
+			if(isset($id)&&($id!=0))
+			{
+				$user=get_user_by_userid($id);
+				$res=$user["name"]." ".$user["surname"];
+			}
+			else
+			{
+				$res="All users";
+			}
+		}
+		return $res;
+	}
 ?>

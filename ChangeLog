@@ -16,6 +16,8 @@ Not ready yet:
 
 Changes for 1.0beta3:
 
+ - added support for Inverse Select in status of triggers (Alexei)
+ - added support for flexible permissions (Alexei)
  - fixed items.php (Alexei)
  - added table 'rights' (Alexei)
  - added time legend for simple graph (Alexei)

@@ -7,6 +7,16 @@
 ?>
 
 <?
+	if(!check_right_on_trigger("R",$triggerid))
+        {
+                show_table_header("<font color=\"AA0000\">No permissions !</font
+>");
+                show_footer();
+                exit;
+        }
+?>
+
+<?
 	show_table_header_begin();
 	echo "ALARMS";
  
@@ -54,7 +64,7 @@
 
 <FONT COLOR="#000000">
 <?
-	$sql="select clock,istrue as status from alarms where triggerid=$triggerid order by clock desc $limit";
+	$sql="select clock,istrue as status,triggerid from alarms where triggerid=$triggerid order by clock desc $limit";
 	$result=DBselect($sql);
 
 	echo "<CENTER>";
