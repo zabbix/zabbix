@@ -560,3 +560,16 @@ CREATE TABLE trends (
   value_max		double(16,4)	DEFAULT '0.0000' NOT NULL,
   PRIMARY KEY (itemid,clock)
 ) type=InnoDB;
+
+--
+-- Table structure for table 'images'
+--
+
+CREATE TABLE images (
+  imageid		int(4)		DEFAULT '0' NOT NULL,
+  imagetype		int(4)		DEFAULT '0' NOT NULL,
+  name			varchar(64)	DEFAULT '0' NOT NULL,
+  image			blob		DEFAULT '' NOT NULL,
+  PRIMARY KEY (imageid),
+  UNIQUE (imagetype, name)
+) type=InnoDB;
