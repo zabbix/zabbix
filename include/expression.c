@@ -579,6 +579,7 @@ void	substitute_simple_macros(char *exp)
 	struct  tm      *tm;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros [%s]",exp);
+
 	while (found == SUCCEED)
 	{
 		strncpy(str, exp, MAX_STRING_LEN);
@@ -602,6 +603,11 @@ void	substitute_simple_macros(char *exp)
 			now=time(NULL);
 			tm=localtime(&now);
 			sprintf(tmp,"%.2d:%.2d:%.2d",tm->tm_hour,tm->tm_min,tm->tm_sec);
+
+			s[0]=0;
+			strncpy(exp, str, MAX_STRING_LEN);
+			strncat(exp, tmp, MAX_STRING_LEN);
+			strncat(exp, s+strlen("{TIME}"), MAX_STRING_LEN);
 
 			found = SUCCEED;
 		}

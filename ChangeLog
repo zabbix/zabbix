@@ -1,5 +1,7 @@
 Changes for 1.0beta13:
 
+ - added support of macros {DATE} and {TIME} in alerts
+ (Alexei)
  - fixed selection of multiplier in item definition form
  (Alexei)
  - support for 'icmppingsec' (Alexei)
