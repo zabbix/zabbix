@@ -26,13 +26,13 @@
 ?>
 
 <?php
-	show_table_header("Information about Zabbix (v1.0beta14)");
+	show_table_header("Information about Zabbix (v1.0)");
 ?>
 
 <TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR="#CCCCCC" cellspacing=1 cellpadding=3>
 <TR BGCOLOR=#EEEEEE>
 <TD ALIGN=LEFT>
-	<font face="Helvetica"><a href="http://www.zabbix.org">Homepage of Zabbix</a></font><br>
+	<font face="Helvetica"><a href="http://www.zabbix.com">Homepage of Zabbix</a></font><br>
 </TD>
 <TD ALIGN=LEFT>
 	This is home page of Zabbix.
@@ -40,7 +40,7 @@
 </TR>
 <TR BGCOLOR=#DDDDDD>
 <TD ALIGN=LEFT>
-	<font face="Helvetica"><a href="http://www.zabbix.org/#manual">Latest Zabbix Manual</a></font><br>
+	<font face="Helvetica"><a href="http://www.zabbix.com/#manual">Latest Zabbix Manual</a></font><br>
 </TD>
 <TD>
 	Latest version of the Manual.

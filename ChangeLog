@@ -1,5 +1,6 @@
 Changes for 1.0:
 
+ - changed all versions from 1.0beta14 to 1.0 (Alexei)
  - converted redhat scripts from DOS to UNIX format (Alexei)
 
 Changes for 1.0beta14:

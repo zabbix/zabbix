@@ -312,7 +312,7 @@
 			$this->drawGrid();
 
 			ImageString($this->im, 2,$this->sizeX/2-50,                $this->sizeY+$this->shiftY+3, "NO DATA FOUND FOR THIS PERIOD" , $this->colors["Dark Red No Alpha"]);
-			ImageStringUp($this->im,0,imagesx($this->im)-10,imagesy($this->im)-50, "http://www.zabbix.org", $this->colors["Gray"]);
+			ImageStringUp($this->im,0,imagesx($this->im)-10,imagesy($this->im)-50, "http://www.zabbix.com", $this->colors["Gray"]);
 			ImagePng($this->im); 
 			ImageDestroy($this->im); 
 			exit;
@@ -320,7 +320,7 @@
 
 		function drawLogo()
 		{
-			ImageStringUp($this->im,0,imagesx($this->im)-10,imagesy($this->im)-50, "http://www.zabbix.org", $this->colors["Gray"]);
+			ImageStringUp($this->im,0,imagesx($this->im)-10,imagesy($this->im)-50, "http://www.zabbix.com", $this->colors["Gray"]);
 		}
 
 		function drawLegend()

@@ -273,7 +273,7 @@ else
 	ImageString($im, 1,$shiftX+20, $sizeY+$shiftY+15, "AVG" , $darkyellow);
 	ImageString($im, 1,$shiftX+40, $sizeY+$shiftY+15, "MAX" , $darkred);
 
-	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, "http://www.zabbix.org", $gray);
+	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, "http://www.zabbix.com", $gray);
 
 	$end_time=time(NULL);
 	ImageString($im, 0,imagesx($im)-100,imagesy($im)-12,"Generated in ".($end_time-$start_time)." sec", $gray);
