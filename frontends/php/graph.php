@@ -31,7 +31,7 @@
 ?>
 
 <?php
-	if(!check_right("Graph","R",$HTTP_GET_VARS["graphid"]))
+	if(!check_right("Graph","R",$_GET["graphid"]))
 	{
 		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_footer();
@@ -40,49 +40,49 @@
 ?>
 
 <?php
-	if(isset($HTTP_GET_VARS["register"]))
+	if(isset($_GET["register"]))
 	{
-		if($HTTP_GET_VARS["register"]=="add")
+		if($_GET["register"]=="add")
 		{
-			$result=add_item_to_graph($HTTP_GET_VARS["graphid"],$HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["color"],$HTTP_GET_VARS["drawtype"],$HTTP_GET_VARS["sortorder"]);
+			$result=add_item_to_graph($_GET["graphid"],$_GET["itemid"],$_GET["color"],$_GET["drawtype"],$_GET["sortorder"]);
 			show_messages($result,S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
-		if($HTTP_GET_VARS["register"]=="update")
+		if($_GET["register"]=="update")
 		{
-			$result=update_graph_item($HTTP_GET_VARS["gitemid"],$HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["color"],$HTTP_GET_VARS["drawtype"],$HTTP_GET_VARS["sortorder"]);
+			$result=update_graph_item($_GET["gitemid"],$_GET["itemid"],$_GET["color"],$_GET["drawtype"],$_GET["sortorder"]);
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
-		if($HTTP_GET_VARS["register"]=="delete")
+		if($_GET["register"]=="delete")
 		{
-			$result=delete_graphs_item($HTTP_GET_VARS["gitemid"]);
+			$result=delete_graphs_item($_GET["gitemid"]);
 			show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
-			unset($HTTP_GET_VARS["gitemid"]);
+			unset($_GET["gitemid"]);
 		}
-		if($HTTP_GET_VARS["register"]=="up")
+		if($_GET["register"]=="up")
 		{
-			$sql="update graphs_items set sortorder=sortorder-1 where sortorder>0 and gitemid=".$HTTP_GET_VARS["gitemid"];
+			$sql="update graphs_items set sortorder=sortorder-1 where sortorder>0 and gitemid=".$_GET["gitemid"];
 			$result=DBexecute($sql);
 			show_messages($result, S_SORT_ORDER_UPDATED, S_CANNOT_UPDATE_SORT_ORDER);
-			unset($HTTP_GET_VARS["gitemid"]);
+			unset($_GET["gitemid"]);
 		}
-		if($HTTP_GET_VARS["register"]=="down")
+		if($_GET["register"]=="down")
 		{
-			$sql="update graphs_items set sortorder=sortorder+1 where sortorder<100 and gitemid=".$HTTP_GET_VARS["gitemid"];
+			$sql="update graphs_items set sortorder=sortorder+1 where sortorder<100 and gitemid=".$_GET["gitemid"];
 			$result=DBexecute($sql);
 			show_messages($result, S_SORT_ORDER_UPDATED, S_CANNOT_UPDATE_SORT_ORDER);
-			unset($HTTP_GET_VARS["gitemid"]);
+			unset($_GET["gitemid"]);
 		}
 	}
 ?>
 
 <?php
-	$result=DBselect("select name from graphs where graphid=".$HTTP_GET_VARS["graphid"]);
+	$result=DBselect("select name from graphs where graphid=".$_GET["graphid"]);
 	$row=DBfetch($result);
 	show_table_header($row["name"]);
 	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR BGCOLOR=#DDDDDD>";
 	echo "<TD ALIGN=CENTER>";
-	echo "<IMG SRC=\"chart2.php?graphid=".$HTTP_GET_VARS["graphid"]."&period=3600&from=0\">";
+	echo "<IMG SRC=\"chart2.php?graphid=".$_GET["graphid"]."&period=3600&from=0\">";
 	echo "</TD>";
 	echo "</TR>";
 	echo "</TABLE>";
@@ -97,7 +97,7 @@
 	echo "<TD WIDTH=10% NOSAVE><B>".S_ACTIONS."</B></TD>";
 	echo "</TR>";
 
-	$sql="select i.itemid,h.host,i.description,gi.gitemid,gi.color,gi.drawtype,gi.sortorder from hosts h,graphs_items gi,items i where i.itemid=gi.itemid and gi.graphid=".$HTTP_GET_VARS["graphid"]." and h.hostid=i.hostid order by gi.sortorder";
+	$sql="select i.itemid,h.host,i.description,gi.gitemid,gi.color,gi.drawtype,gi.sortorder from hosts h,graphs_items gi,items i where i.itemid=gi.itemid and gi.graphid=".$_GET["graphid"]." and h.hostid=i.hostid order by gi.sortorder";
 	$result=DBselect($sql);
 	$col=0;
 	while($row=DBfetch($result))
@@ -111,11 +111,11 @@
 		echo "<TD>".get_drawtype_description($row["drawtype"])."</TD>";
 		echo "<TD>".$row["color"]."</TD>";
 		echo "<TD>";
-		echo "<A HREF=\"graph.php?graphid=".$HTTP_GET_VARS["graphid"]."&gitemid=".$row["gitemid"]."#form\">".S_CHANGE."</A>";
+		echo "<A HREF=\"graph.php?graphid=".$_GET["graphid"]."&gitemid=".$row["gitemid"]."#form\">".S_CHANGE."</A>";
 		echo " - ";
-		echo "<A HREF=\"graph.php?graphid=".$HTTP_GET_VARS["graphid"]."&gitemid=".$row["gitemid"]."&register=up\">".S_UP."</A>";
+		echo "<A HREF=\"graph.php?graphid=".$_GET["graphid"]."&gitemid=".$row["gitemid"]."&register=up\">".S_UP."</A>";
 		echo " - ";
-		echo "<A HREF=\"graph.php?graphid=".$HTTP_GET_VARS["graphid"]."&gitemid=".$row["gitemid"]."&register=down\">".S_DOWN."</A>";
+		echo "<A HREF=\"graph.php?graphid=".$_GET["graphid"]."&gitemid=".$row["gitemid"]."&register=down\">".S_DOWN."</A>";
 		echo "</TD>";
 		echo "</TR>";
 	}
@@ -126,9 +126,9 @@
 	echo "<br>";
 	echo "<a name=\"form\"></a>";
 
-	if(isset($HTTP_GET_VARS["gitemid"]))
+	if(isset($_GET["gitemid"]))
 	{
-		$sql="select itemid,color,drawtype,sortorder from graphs_items where gitemid=".$HTTP_GET_VARS["gitemid"];
+		$sql="select itemid,color,drawtype,sortorder from graphs_items where gitemid=".$_GET["gitemid"];
 		$result=DBselect($sql);
 		$itemid=DBget_field($result,0,0);
 		$color=DBget_field($result,0,1);
@@ -145,10 +145,10 @@
 
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"graph.php\">";
-	echo "<input name=\"graphid\" type=\"hidden\" value=".$HTTP_GET_VARS["graphid"].">";
-	if(isset($HTTP_GET_VARS["gitemid"]))
+	echo "<input name=\"graphid\" type=\"hidden\" value=".$_GET["graphid"].">";
+	if(isset($_GET["gitemid"]))
 	{
-		echo "<input name=\"gitemid\" type=\"hidden\" value=".$HTTP_GET_VARS["gitemid"].">";
+		echo "<input name=\"gitemid\" type=\"hidden\" value=".$_GET["gitemid"].">";
 	}
 
 	echo S_PARAMETER;

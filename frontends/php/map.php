@@ -28,7 +28,7 @@
 
 	$grid=50;
 
-	$result=DBselect("select name,width,height,use_background,background from sysmaps where sysmapid=".$HTTP_GET_VARS["sysmapid"]);
+	$result=DBselect("select name,width,height,use_background,background from sysmaps where sysmapid=".$_GET["sysmapid"]);
 
 	$name=DBget_field($result,0,0);
 	$width=DBget_field($result,0,1);
@@ -90,7 +90,7 @@
 		ImageFilledRectangle($im,0,0,$width,$height,$white);
 	}
 
-	if(!isset($HTTP_GET_VARS["border"]))
+	if(!isset($_GET["border"]))
 	{
 		ImageRectangle($im,0,0,$width-1,$height-1,$colors["Black"]);
 	}
@@ -101,14 +101,14 @@
 	$str=date("m.d.Y H:i:s",time(NULL));
 	ImageString($im, 0,imagesx($im)-120,imagesy($im)-12,"$str", $gray);
 
-	if(!check_right("Network map","R",$HTTP_GET_VARS["sysmapid"]))
+	if(!check_right("Network map","R",$_GET["sysmapid"]))
 	{
 		ImagePng($im); 
 		ImageDestroy($im); 
 		exit();
 	}
 
-	if(!isset($HTTP_GET_VARS["noedit"]))
+	if(!isset($_GET["noedit"]))
 	{
 		for($x=$grid;$x<$width;$x+=$grid)
 		{
@@ -126,7 +126,7 @@
 
 # Draw connectors 
 
-	$result=DBselect("select shostid1,shostid2,triggerid,color_off,drawtype_off,color_on,drawtype_on from sysmaps_links where sysmapid=".$HTTP_GET_VARS["sysmapid"]);
+	$result=DBselect("select shostid1,shostid2,triggerid,color_off,drawtype_off,color_on,drawtype_on from sysmaps_links where sysmapid=".$_GET["sysmapid"]);
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		$shostid1=DBget_field($result,$i,0);
@@ -198,7 +198,7 @@
 # Draw hosts
 
 	$icons=array();
-	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status,sh.icon from sysmaps_hosts sh,hosts h where sh.sysmapid=".$HTTP_GET_VARS["sysmapid"]." and h.hostid=sh.hostid");
+	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status,sh.icon from sysmaps_hosts sh,hosts h where sh.sysmapid=".$_GET["sysmapid"]." and h.hostid=sh.hostid");
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		$host=DBget_field($result,$i,0);

@@ -39,28 +39,28 @@
 ?>
 
 <?php
-	if(isset($HTTP_GET_VARS["register"]))
+	if(isset($_GET["register"]))
 	{
-		if($HTTP_GET_VARS["register"]=="update")
+		if($_GET["register"]=="update")
 		{
-			$result=update_config($HTTP_GET_VARS["alarm_history"],$HTTP_GET_VARS["alert_history"]);
+			$result=update_config($_GET["alarm_history"],$_GET["alert_history"]);
 			show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
 		}
-		if($HTTP_GET_VARS["register"]=="add")
+		if($_GET["register"]=="add")
 		{
-			$result=add_mediatype($HTTP_GET_VARS["type"],$HTTP_GET_VARS["description"],$HTTP_GET_VARS["smtp_server"],$HTTP_GET_VARS["smtp_helo"],$HTTP_GET_VARS["smtp_email"],$HTTP_GET_VARS["exec_path"]);
+			$result=add_mediatype($_GET["type"],$_GET["description"],$_GET["smtp_server"],$_GET["smtp_helo"],$_GET["smtp_email"],$_GET["exec_path"]);
 			show_messages($result, S_ADDED_NEW_MEDIA_TYPE, S_NEW_MEDIA_TYPE_WAS_NOT_ADDED);
 		}
-		if($HTTP_GET_VARS["register"]=="update media")
+		if($_GET["register"]=="update media")
 		{
-			$result=update_mediatype($HTTP_GET_VARS["mediatypeid"],$HTTP_GET_VARS["type"],$HTTP_GET_VARS["description"],$HTTP_GET_VARS["smtp_server"],$HTTP_GET_VARS["smtp_helo"],$HTTP_GET_VARS["smtp_email"],$HTTP_GET_VARS["exec_path"]);
+			$result=update_mediatype($_GET["mediatypeid"],$_GET["type"],$_GET["description"],$_GET["smtp_server"],$_GET["smtp_helo"],$_GET["smtp_email"],$_GET["exec_path"]);
 			show_messages($result, S_MEDIA_TYPE_UPDATED, S_MEDIA_TYPE_WAS_NOT_UPDATED);
 		}
-		if($HTTP_GET_VARS["register"]=="delete")
+		if($_GET["register"]=="delete")
 		{
-			$result=delete_mediatype($HTTP_GET_VARS["mediatypeid"]);
+			$result=delete_mediatype($_GET["mediatypeid"]);
 			show_messages($result, S_MEDIA_TYPE_DELETED, S_MEDIA_TYPE_WAS_NOT_DELETED);
-			unset($HTTP_GET_VARS["mediatypeid"]);
+			unset($_GET["mediatypeid"]);
 		}
 	}
 ?>
@@ -143,18 +143,18 @@
 ?>
 
 <?php
-	$type=@iif(isset($HTTP_GET_VARS["type"]),$HTTP_GET_VARS["type"],0);
-	$description=@iif(isset($HTTP_GET_VARS["description"]),$HTTP_GET_VARS["description"],"");
-	$smtp_server=@iif(isset($HTTP_GET_VARS["smtp_server"]),$HTTP_GET_VARS["smtp_server"],"localhost");
-	$smtp_helo=@iif(isset($HTTP_GET_VARS["smtp_helo"]),$HTTP_GET_VARS["smtp_helo"],"localhost");
-	$smtp_email=@iif(isset($HTTP_GET_VARS["smtp_email"]),$HTTP_GET_VARS["smtp_email"],"zabbix@localhost");
-	$exec_path=@iif(isset($HTTP_GET_VARS["exec_path"]),$HTTP_GET_VARS["exec_path"],"");
+	$type=@iif(isset($_GET["type"]),$_GET["type"],0);
+	$description=@iif(isset($_GET["description"]),$_GET["description"],"");
+	$smtp_server=@iif(isset($_GET["smtp_server"]),$_GET["smtp_server"],"localhost");
+	$smtp_helo=@iif(isset($_GET["smtp_helo"]),$_GET["smtp_helo"],"localhost");
+	$smtp_email=@iif(isset($_GET["smtp_email"]),$_GET["smtp_email"],"zabbix@localhost");
+	$exec_path=@iif(isset($_GET["exec_path"]),$_GET["exec_path"],"");
 
-	if(isset($HTTP_GET_VARS["register"]) && ($HTTP_GET_VARS["register"] == "change"))
+	if(isset($_GET["register"]) && ($_GET["register"] == "change"))
 	{
-		$result=DBselect("select mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path from media_type where mediatypeid=".$HTTP_GET_VARS["mediatypeid"]);
+		$result=DBselect("select mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path from media_type where mediatypeid=".$_GET["mediatypeid"]);
 		$mediatypeid=DBget_field($result,0,0);
-		$type=@iif(isset($HTTP_GET_VARS["type"]),$HTTP_GET_VARS["type"],DBget_field($result,0,1));
+		$type=@iif(isset($_GET["type"]),$_GET["type"],DBget_field($result,0,1));
 		$description=DBget_field($result,0,2);
 		$smtp_server=DBget_field($result,0,3);
 		$smtp_helo=DBget_field($result,0,4);

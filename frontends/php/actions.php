@@ -28,7 +28,7 @@
 ?>
 
 <?php
-	if(($HTTP_GET_VARS["triggerid"]!=0)&&!check_right_on_trigger("U",$HTTP_GET_VARS["triggerid"]))
+	if(($_GET["triggerid"]!=0)&&!check_right_on_trigger("U",$_GET["triggerid"]))
 	{
 		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_footer();
@@ -37,54 +37,54 @@
 ?>
 
 <?php
-	if(isset($HTTP_GET_VARS["register"]))
+	if(isset($_GET["register"]))
 	{
-		if($HTTP_GET_VARS["register"]=="add")
+		if($_GET["register"]=="add")
 		{
-			$result=add_action( $HTTP_GET_VARS["triggerid"], $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["good"], $HTTP_GET_VARS["delay"], $HTTP_GET_VARS["subject"], $HTTP_GET_VARS["message"],$HTTP_GET_VARS["scope"],$HTTP_GET_VARS["severity"],$HTTP_GET_VARS["recipient"],$HTTP_GET_VARS["usrgrpid"]);
+			$result=add_action( $_GET["triggerid"], $_GET["userid"], $_GET["good"], $_GET["delay"], $_GET["subject"], $_GET["message"],$_GET["scope"],$_GET["severity"],$_GET["recipient"],$_GET["usrgrpid"]);
 			show_messages($result,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
 		}
-		if($HTTP_GET_VARS["register"]=="update")
+		if($_GET["register"]=="update")
 		{
-			$result=update_action( $HTTP_GET_VARS["actionid"], $HTTP_GET_VARS["triggerid"], $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["good"], $HTTP_GET_VARS["delay"], $HTTP_GET_VARS["subject"], $HTTP_GET_VARS["message"],$HTTP_GET_VARS["scope"],$HTTP_GET_VARS["severity"],$HTTP_GET_VARS["recipient"],$HTTP_GET_VARS["usrgrpid"]);
+			$result=update_action( $_GET["actionid"], $_GET["triggerid"], $_GET["userid"], $_GET["good"], $_GET["delay"], $_GET["subject"], $_GET["message"],$_GET["scope"],$_GET["severity"],$_GET["recipient"],$_GET["usrgrpid"]);
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPATE_ACTION);
-			unset($HTTP_GET_VARS["actionid"]);
+			unset($_GET["actionid"]);
 		}
-		if($HTTP_GET_VARS["register"]=="delete")
+		if($_GET["register"]=="delete")
 		{
-			$result=delete_action($HTTP_GET_VARS["actionid"]);
+			$result=delete_action($_GET["actionid"]);
 			show_messages($result,S_ACTION_DELETED,S_CANNOT_DELETE_ACTION);
-			unset($HTTP_GET_VARS["actionid"]);
+			unset($_GET["actionid"]);
 		}
 	}
 ?>
 
 <?php
-	$trigger=get_trigger_by_triggerid($HTTP_GET_VARS["triggerid"]);
+	$trigger=get_trigger_by_triggerid($_GET["triggerid"]);
 	$expression=explode_exp($trigger["expression"],1);
 //	$description=$trigger["description"];
 //	if( strstr($description,"%s"))
 //	{
-		$description=expand_trigger_description($HTTP_GET_VARS["triggerid"]);
+		$description=expand_trigger_description($_GET["triggerid"]);
 //	}
 	show_table_header("$description<BR>$expression");
 ?>
 
 <?php
-/*	if(isset($HTTP_GET_VARS["scope"])&&($HTTP_GET_VARS["scope"]==2))
+/*	if(isset($_GET["scope"])&&($_GET["scope"]==2))
 	{
 		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.recipient,a.scope from actions a order by a.scope desc";
 	}
-	elseif(isset($HTTP_GET_VARS["scope"])&&($HTTP_GET_VARS["scope"]==1))
+	elseif(isset($_GET["scope"])&&($_GET["scope"]==1))
 	{
 		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.recipient,a.scope from actions a where a.scope=2 or a.scope=1 order by a.recipient desc";
 	}
 	else
 	{
-		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.recipient,a.scope from actions a where (a.triggerid=".$HTTP_GET_VARS["triggerid"]." and a.scope=0) or (a.scope=2 or a.scope=1) order by a.recipient desc";
+		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.recipient,a.scope from actions a where (a.triggerid=".$_GET["triggerid"]." and a.scope=0) or (a.scope=2 or a.scope=1) order by a.recipient desc";
 	}*/
 //	echo $sql;
-	$sql="select actionid,userid,delay,subject,message,scope,severity,recipient,good,triggerid from actions where (scope=0 and triggerid=".$HTTP_GET_VARS["triggerid"].") or scope=1 or scope=2";
+	$sql="select actionid,userid,delay,subject,message,scope,severity,recipient,good,triggerid from actions where (scope=0 and triggerid=".$_GET["triggerid"].") or scope=1 or scope=2";
 	$result=DBselect($sql);
 
 	echo "<div align=center>";
@@ -104,7 +104,7 @@
 
 		if($row["scope"] == 1)
 		{
-			$sql="select h.hostid from triggers t,hosts h,functions f,items i where f.triggerid=t.triggerid and h.hostid=i.hostid and i.itemid=f.itemid and t.triggerid=".$HTTP_GET_VARS["triggerid"];
+			$sql="select h.hostid from triggers t,hosts h,functions f,items i where f.triggerid=t.triggerid and h.hostid=i.hostid and i.itemid=f.itemid and t.triggerid=".$_GET["triggerid"];
 //			echo "$sql<br>";
 			$result2=DBselect($sql);
 			$found=0;
@@ -159,7 +159,7 @@
 //		echo "<pre>".htmlspecialchars($row["message"])."</pre>";
 //		echo "</TD>";
 		echo "<TD>";
-		echo " <A HREF=\"actions.php?register=edit&actionid=".$row["actionid"]."&triggerid=".$HTTP_GET_VARS["triggerid"]."#form\">Change</A>";
+		echo " <A HREF=\"actions.php?register=edit&actionid=".$row["actionid"]."&triggerid=".$_GET["triggerid"]."#form\">Change</A>";
 		echo "</TD></TR>";
 	}
 	if(DBnum_rows($result)==0)
@@ -178,9 +178,9 @@
 <?php
 	echo "<a name=\"form\"></a>";
 
-	if(isset($HTTP_GET_VARS["actionid"]))
+	if(isset($_GET["actionid"]))
 	{
-		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.scope,a.severity,a.recipient from actions a where a.actionid=".$HTTP_GET_VARS["actionid"];
+		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.scope,a.severity,a.recipient from actions a where a.actionid=".$_GET["actionid"];
 		$result=DBselect($sql);
 
 		$actionid=DBget_field($result,0,0);
@@ -191,30 +191,30 @@
 		$subject=htmlspecialchars(DBget_field($result,0,4));
 		$message=DBget_field($result,0,5);
 		$uid=DBget_field($result,0,6);
-		$scope=@iif(isset($HTTP_GET_VARS["scope"]),$HTTP_GET_VARS["scope"],DBget_field($result,0,7));
+		$scope=@iif(isset($_GET["scope"]),$_GET["scope"],DBget_field($result,0,7));
 		$severity=DBget_field($result,0,8);
-		$recipient=@iif(isset($HTTP_GET_VARS["recipient"]),$HTTP_GET_VARS["recipient"],DBget_field($result,0,9));
+		$recipient=@iif(isset($_GET["recipient"]),$_GET["recipient"],DBget_field($result,0,9));
 	}
 	else
 	{
-		$trigger=get_trigger_by_triggerid($HTTP_GET_VARS["triggerid"]);
+		$trigger=get_trigger_by_triggerid($_GET["triggerid"]);
 		$description=htmlspecialchars(stripslashes($trigger["description"]));
 
 //		$delay=30;
-		$delay=@iif(isset($HTTP_GET_VARS["delay"]),$HTTP_GET_VARS["delay"],30);
+		$delay=@iif(isset($_GET["delay"]),$_GET["delay"],30);
 //		$subject=$description;
-		$subject=@iif(isset($HTTP_GET_VARS["subject"]),$HTTP_GET_VARS["subject"],$description);
-		$scope=@iif(isset($HTTP_GET_VARS["scope"]),$HTTP_GET_VARS["scope"],0);
-		$good=@iif(isset($HTTP_GET_VARS["good"]),$HTTP_GET_VARS["good"],1);
-		$recipient=@iif(isset($HTTP_GET_VARS["recipient"]),$HTTP_GET_VARS["recipient"],RECIPIENT_TYPE_GROUP);
+		$subject=@iif(isset($_GET["subject"]),$_GET["subject"],$description);
+		$scope=@iif(isset($_GET["scope"]),$_GET["scope"],0);
+		$good=@iif(isset($_GET["good"]),$_GET["good"],1);
+		$recipient=@iif(isset($_GET["recipient"]),$_GET["recipient"],RECIPIENT_TYPE_GROUP);
 //		$severity=0;
-		$severity=@iif(isset($HTTP_GET_VARS["severity"]),$HTTP_GET_VARS["severity"],0);
+		$severity=@iif(isset($_GET["severity"]),$_GET["severity"],0);
 
-		$sql="select i.description, h.host, i.key_ from hosts h, items i,functions f where f.triggerid=".$HTTP_GET_VARS["triggerid"]." and h.hostid=i.hostid and f.itemid=i.itemid order by i.description";
+		$sql="select i.description, h.host, i.key_ from hosts h, items i,functions f where f.triggerid=".$_GET["triggerid"]." and h.hostid=i.hostid and f.itemid=i.itemid order by i.description";
 		$result=DBselect($sql);
-		if(isset($HTTP_GET_VARS["message"]))
+		if(isset($_GET["message"]))
 		{
-			$message=$HTTP_GET_VARS["message"];
+			$message=$_GET["message"];
 		}
 		else
 		{
@@ -234,10 +234,10 @@
 
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"actions.php\">";
-	echo "<input name=\"triggerid\" type=\"hidden\" value=".$HTTP_GET_VARS["triggerid"].">";
-	if(isset($HTTP_GET_VARS["actionid"]))
+	echo "<input name=\"triggerid\" type=\"hidden\" value=".$_GET["triggerid"].">";
+	if(isset($_GET["actionid"]))
 	{
-		echo "<input name=\"actionid\" type=\"hidden\" value=".$HTTP_GET_VARS["actionid"].">";
+		echo "<input name=\"actionid\" type=\"hidden\" value=".$_GET["actionid"].">";
 	}
 	echo nbsp(S_SEND_MESSAGE_TO);
 	show_table2_h_delimiter();

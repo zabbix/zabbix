@@ -39,13 +39,13 @@
 ?>
 
 <?php
-	if(isset($HTTP_GET_VARS["register"]))
+	if(isset($_GET["register"]))
 	{
-		if($HTTP_GET_VARS["register"]=="add")
+		if($_GET["register"]=="add")
 		{
-			if($HTTP_GET_VARS["password1"]==$HTTP_GET_VARS["password2"])
+			if($_GET["password1"]==$_GET["password2"])
 			{
-				$result=add_user($HTTP_GET_VARS["name"],$HTTP_GET_VARS["surname"],$HTTP_GET_VARS["alias"],$HTTP_GET_VARS["password1"],$HTTP_GET_VARS["url"]);
+				$result=add_user($_GET["name"],$_GET["surname"],$_GET["alias"],$_GET["password1"],$_GET["url"]);
 				show_messages($result, S_USER_ADDED, S_CANNOT_ADD_USER);
 			}
 			else
@@ -53,28 +53,28 @@
 				show_error_message(S_CANNOT_ADD_USER_BOTH_PASSWORDS_MUST);
 			}
 		}
-		if($HTTP_GET_VARS["register"]=="delete")
+		if($_GET["register"]=="delete")
 		{
-			$result=delete_user($HTTP_GET_VARS["userid"]);
+			$result=delete_user($_GET["userid"]);
 			show_messages($result, S_USER_DELETED, S_CANNOT_DELETE_USER);
 			unset($userid);
 		}
-		if($HTTP_GET_VARS["register"]=="delete_permission")
+		if($_GET["register"]=="delete_permission")
 		{
-			$result=delete_permission($HTTP_GET_VARS["rightid"]);
+			$result=delete_permission($_GET["rightid"]);
 			show_messages($result, S_PERMISSION_DELETED, S_CANNOT_DELETE_PERMISSION);
 			unset($rightid);
 		}
-		if($HTTP_GET_VARS["register"]=="add permission")
+		if($_GET["register"]=="add permission")
 		{
-			$result=add_permission($HTTP_GET_VARS["userid"],$HTTP_GET_VARS["right"],$HTTP_GET_VARS["permission"],$HTTP_GET_VARS["id"]);
+			$result=add_permission($_GET["userid"],$_GET["right"],$_GET["permission"],$_GET["id"]);
 			show_messages($result, S_PERMISSION_ADDED, S_CANNOT_ADD_PERMISSION);
 		}
-		if($HTTP_GET_VARS["register"]=="update")
+		if($_GET["register"]=="update")
 		{
-			if($HTTP_GET_VARS["password1"]==$HTTP_GET_VARS["password2"])
+			if($_GET["password1"]==$_GET["password2"])
 			{
-				$result=update_user($HTTP_GET_VARS["userid"],$HTTP_GET_VARS["name"],$HTTP_GET_VARS["surname"],$HTTP_GET_VARS["alias"],$HTTP_GET_VARS["password1"],$HTTP_GET_VARS["url"]);
+				$result=update_user($_GET["userid"],$_GET["name"],$_GET["surname"],$_GET["alias"],$_GET["password1"],$_GET["url"]);
 				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 			}
 			else
@@ -82,21 +82,21 @@
 				show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
 			}
 		}
-		if($HTTP_GET_VARS["register"]=="add group")
+		if($_GET["register"]=="add group")
 		{
-			$result=add_user_group($HTTP_GET_VARS["name"], $HTTP_GET_VARS["users"]);
+			$result=add_user_group($_GET["name"], $_GET["users"]);
 			show_messages($result, S_GROUP_ADDED, S_CANNOT_ADD_GROUP);
 		}
-		if($HTTP_GET_VARS["register"]=="update group")
+		if($_GET["register"]=="update group")
 		{
-			$result=update_user_group($HTTP_GET_VARS["usrgrpid"], $HTTP_GET_VARS["name"], $HTTP_GET_VARS["users"]);
+			$result=update_user_group($_GET["usrgrpid"], $_GET["name"], $_GET["users"]);
 			show_messages($result, S_GROUP_UPDATED, S_CANNOT_UPDATE_GROUP);
 		}
-		if($HTTP_GET_VARS["register"]=="delete group")
+		if($_GET["register"]=="delete group")
 		{
-			$result=delete_user_group($HTTP_GET_VARS["usrgrpid"]);
+			$result=delete_user_group($_GET["usrgrpid"]);
 			show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
-			unset($HTTP_GET_VARS["usrgrpid"]);
+			unset($_GET["usrgrpid"]);
 		}
 	}
 ?>
@@ -217,7 +217,7 @@
 ?>
 
 <?php
-	if(isset($HTTP_GET_VARS["userid"]))
+	if(isset($_GET["userid"]))
 	{
 	echo "<br>";
 	echo "<a name=\"form\"></a>";
@@ -228,7 +228,7 @@
 	echo "<TD WIDTH=10% NOSAVE><B>".S_RESOURCE_NAME."</B></TD>";
 	echo "<TD WIDTH=10% NOSAVE><B>".S_ACTIONS."</B></TD>";
 	echo "</TR>";
-	$result=DBselect("select rightid,name,permission,id from rights where userid=".$HTTP_GET_VARS["userid"]." order by name,permission,id");
+	$result=DBselect("select rightid,name,permission,id from rights where userid=".$_GET["userid"]." order by name,permission,id");
 	$col=0;
 	while($row=DBfetch($result))
 	{
@@ -261,22 +261,22 @@
 			echo "<TD>".$row["permission"]."</TD>";
 		}
 		echo "<TD>".get_resource_name($row["name"],$row["id"])."</TD>";
-		echo "<TD><A HREF=users.php?userid=".$HTTP_GET_VARS["userid"]."&rightid=".$row["rightid"]."&register=delete_permission>".S_DELETE."</A></TD>";
+		echo "<TD><A HREF=users.php?userid=".$_GET["userid"]."&rightid=".$row["rightid"]."&register=delete_permission>".S_DELETE."</A></TD>";
 	}
 	echo "</TR>";
 	echo "</TABLE>";
 
-	insert_permissions_form($HTTP_GET_VARS["userid"]);
+	insert_permissions_form($_GET["userid"]);
 
 	}
 ?>
 
 <?php
 	echo "<br>";
-	@insert_usergroups_form($HTTP_GET_VARS["usrgrpid"]);
+	@insert_usergroups_form($_GET["usrgrpid"]);
 
 	echo "<br>";
-	@insert_user_form($HTTP_GET_VARS["userid"]);
+	@insert_user_form($_GET["userid"]);
 ?>
 
 <?php

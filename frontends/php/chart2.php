@@ -23,37 +23,37 @@
 	include "include/classes.inc.php";
 
 	$graph=new Graph();
-	if(isset($HTTP_GET_VARS["period"]))
+	if(isset($_GET["period"]))
 	{
-		$graph->setPeriod($HTTP_GET_VARS["period"]);
+		$graph->setPeriod($_GET["period"]);
 	}
-	if(isset($HTTP_GET_VARS["from"]))
+	if(isset($_GET["from"]))
 	{
-		$graph->setFrom($HTTP_GET_VARS["from"]);
+		$graph->setFrom($_GET["from"]);
 	}
-	if(isset($HTTP_GET_VARS["stime"]))
+	if(isset($_GET["stime"]))
 	{
-		$graph->setSTime($HTTP_GET_VARS["stime"]);
+		$graph->setSTime($_GET["stime"]);
 	}
-	if(isset($HTTP_GET_VARS["border"]))
+	if(isset($_GET["border"]))
 	{
 		$graph->setBorder(0);
 	}
 
-	$result=DBselect("select name,width,height from graphs where graphid=".$HTTP_GET_VARS["graphid"]);
+	$result=DBselect("select name,width,height from graphs where graphid=".$_GET["graphid"]);
 
 	$name=DBget_field($result,0,0);
-	if(isset($HTTP_GET_VARS["width"])&&$HTTP_GET_VARS["width"]>0)
+	if(isset($_GET["width"])&&$_GET["width"]>0)
 	{
-		$width=$HTTP_GET_VARS["width"];
+		$width=$_GET["width"];
 	}
 	else
 	{
 		$width=DBget_field($result,0,1);
 	}
-	if(isset($HTTP_GET_VARS["height"])&&$HTTP_GET_VARS["height"]>0)
+	if(isset($_GET["height"])&&$_GET["height"]>0)
 	{
-		$height=$HTTP_GET_VARS["height"];
+		$height=$_GET["height"];
 	}
 	else
 	{
@@ -64,7 +64,7 @@
 	$graph->setHeight($height);
 	$graph->setHeader(DBget_field($result,0,0));
 
-	$result=DBselect("select gi.itemid,i.description,gi.color,h.host,gi.drawtype from graphs_items gi,items i,hosts h where gi.itemid=i.itemid and gi.graphid=".$HTTP_GET_VARS["graphid"]." and i.hostid=h.hostid order by gi.sortorder");
+	$result=DBselect("select gi.itemid,i.description,gi.color,h.host,gi.drawtype from graphs_items gi,items i,hosts h where gi.itemid=i.itemid and gi.graphid=".$_GET["graphid"]." and i.hostid=h.hostid order by gi.sortorder");
 
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
