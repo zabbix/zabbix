@@ -289,6 +289,9 @@ CREATE TABLE items (
 	trapper_hosts	varchar(255) DEFAULT '' NOT NULL,
 	units		varchar(10)	DEFAULT '' NOT NULL,
 	multiplier	int(4)	DEFAULT '0' NOT NULL,
+	delta		int(1)  DEFAULT '0' NOT NULL,
+	prevorgvalue	double(16,4)  DEFAULT '0.0',
+
 	PRIMARY KEY	(itemid),
 	UNIQUE		shortname (hostid,key_),
 	KEY		(hostid),
