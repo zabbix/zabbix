@@ -108,7 +108,7 @@
 #include "sysinfo.h"
 
 COMMAND	commands[AGENT_MAX_USER_COMMANDS]=
-/* 	KEY		FUNCTION (if float) FUNCTION (if string) PARAM*/
+/* 	KEY		FUNCTION (if double) FUNCTION (if string) PARAM*/
 	{
 	{"kern[maxfiles]"	,KERNEL_MAXFILES,	0, 0},
 	{"kern[maxproc]"	,KERNEL_MAXPROC, 	0, 0},
@@ -234,7 +234,7 @@ void	process(char *command,char *value)
 	double	result=0;
 	int	i;
 	char	*n,*l,*r;
-	float	(*function)();
+	double	(*function)();
 	char	*(*function_str)() = NULL;
 	char	*parameter = NULL;
 	char	key[MAX_STRING_LEN+1];
@@ -332,27 +332,34 @@ void	process(char *command,char *value)
 		{
 			result = NOTSUPPORTED;
 		}
+		else if(res2==TIMEOUT_ERROR)
+		{
+			result = TIMEOUT_ERROR;
+		}
 	}
 
-	if(ret_str==0)
+	if(result==NOTSUPPORTED)
 	{
-		sprintf(value,"%f",result);
+/* New protocol */
+/*			sprintf(value,"%f",result);*/
+		sprintf(value,"%s","ZBX_NOTSUPPORTED\n");
+	}
+	else if(result==TIMEOUT_ERROR)
+	{
+		sprintf(value,"%s","ZBX_ERROR\n");
 	}
 	else
 	{
-		if(result==NOTSUPPORTED)
+		if(ret_str==0)
 		{
 			sprintf(value,"%f",result);
 		}
 		else
 		{
 			sprintf(value,"%s",res2);
-/*			if(res2!=NULL)
-			{
-				free(res2);
-			}*/
 		}
 	}
+
 }
 
 /* Code for cksum is based on code from cksum.c */
@@ -421,7 +428,7 @@ static u_long crctab[] = {
  * on failure.  Errno is set on failure.
  */
 
-float	CKSUM(const char * filename)
+double	CKSUM(const char * filename)
 {
 	register u_char *p;
 	register int nr;
@@ -462,7 +469,7 @@ float	CKSUM(const char * filename)
 
 	cval = ~crc;
 
-	return	(float)cval;
+	return	(double)cval;
 }
 
 int
@@ -546,7 +553,7 @@ point
 #endif
 #endif
 
-float   FILESIZE(const char * filename)
+double   FILESIZE(const char * filename)
 {
 	struct stat	buf;
 
@@ -558,7 +565,7 @@ float   FILESIZE(const char * filename)
 	return	FAIL;
 }
 
-float	PROCCNT(const char * procname)
+double	PROCCNT(const char * procname)
 {
 #ifdef	HAVE_PROC_1_STATUS
 	DIR	*dir;
@@ -613,13 +620,13 @@ float	PROCCNT(const char * procname)
 		}
 	}
 	closedir(dir);
-	return	(float)proccount;
+	return	(double)proccount;
 #else
 	return	FAIL;
 #endif
 }
 
-float	get_netstat(const char *key)
+double	get_netstat(const char *key)
 {
 	FILE	*f;
 	char	line[MAX_STRING_LEN+1];
@@ -647,7 +654,7 @@ float	get_netstat(const char *key)
 	return FAIL;
 }
 
-float	NETLOADIN1(char *interface)
+double	NETLOADIN1(char *interface)
 {
 	char	key[MAX_STRING_LEN+1];
 
@@ -656,7 +663,7 @@ float	NETLOADIN1(char *interface)
 	return	get_netstat(key);
 }
 
-float	NETLOADIN5(char *interface)
+double	NETLOADIN5(char *interface)
 {
 	char	key[MAX_STRING_LEN+1];
 
@@ -665,7 +672,7 @@ float	NETLOADIN5(char *interface)
 	return	get_netstat(key);
 }
 
-float	NETLOADIN15(char *interface)
+double	NETLOADIN15(char *interface)
 {
 	char	key[MAX_STRING_LEN+1];
 
@@ -674,7 +681,7 @@ float	NETLOADIN15(char *interface)
 	return	get_netstat(key);
 }
 
-float	NETLOADOUT1(char *interface)
+double	NETLOADOUT1(char *interface)
 {
 	char	key[MAX_STRING_LEN+1];
 
@@ -683,7 +690,7 @@ float	NETLOADOUT1(char *interface)
 	return	get_netstat(key);
 }
 
-float	NETLOADOUT5(char *interface)
+double	NETLOADOUT5(char *interface)
 {
 	char	key[MAX_STRING_LEN+1];
 
@@ -692,7 +699,7 @@ float	NETLOADOUT5(char *interface)
 	return	get_netstat(key);
 }
 
-float	NETLOADOUT15(char *interface)
+double	NETLOADOUT15(char *interface)
 {
 	char	key[MAX_STRING_LEN+1];
 
@@ -702,7 +709,7 @@ float	NETLOADOUT15(char *interface)
 }
 
 
-float	INODE(const char * mountPoint)
+double	INODE(const char * mountPoint)
 {
 #ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
@@ -743,7 +750,7 @@ float	INODE(const char * mountPoint)
 #endif
 }
 
-float	INODETOTAL(const char * mountPoint)
+double	INODETOTAL(const char * mountPoint)
 {
 #ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
@@ -784,7 +791,7 @@ float	INODETOTAL(const char * mountPoint)
 #endif
 }
 
-float	DISKFREE(const char * mountPoint)
+double	DISKFREE(const char * mountPoint)
 {
 #ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
@@ -826,7 +833,7 @@ float	DISKFREE(const char * mountPoint)
 #endif
 }
 
-float	DISKTOTAL(const char * mountPoint)
+double	DISKTOTAL(const char * mountPoint)
 {
 #ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
@@ -868,7 +875,7 @@ float	DISKTOTAL(const char * mountPoint)
 #endif
 }
 
-float	TCP_LISTEN(const char *porthex)
+double	TCP_LISTEN(const char *porthex)
 {
 #ifdef HAVE_PROC
 	FILE	*f;
@@ -902,12 +909,12 @@ float	TCP_LISTEN(const char *porthex)
 }
 
 #ifdef	HAVE_PROC
-float	getPROC(char *file,int lineno,int fieldno)
+double	getPROC(char *file,int lineno,int fieldno)
 {
 	FILE	*f;
 	char	*t;
 	char	c[MAX_STRING_LEN+1];
-	float	result;
+	double	result;
 	int	i;
 
 	f=fopen(file,"r");
@@ -926,13 +933,13 @@ float	getPROC(char *file,int lineno,int fieldno)
 	}
 	fclose(f);
 
-	sscanf(t, "%f", &result );
+	sscanf(t, "%lf", &result );
 
 	return	result;
 }
 #endif
 
-float	CACHEDMEM(void)
+double	CACHEDMEM(void)
 {
 #ifdef HAVE_PROC
 	return getPROC("/proc/meminfo",8,2);
@@ -941,14 +948,14 @@ float	CACHEDMEM(void)
 #endif
 }
 
-float	BUFFERSMEM(void)
+double	BUFFERSMEM(void)
 {
 #ifdef HAVE_SYSINFO_BUFFERRAM
 	struct sysinfo info;
 
 	if( 0 == sysinfo(&info))
 	{
-		return	(float)info.bufferram;
+		return	(double)info.bufferram;
 	}
 	else
 	{
@@ -959,14 +966,14 @@ float	BUFFERSMEM(void)
 #endif
 }
 
-float	SHAREDMEM(void)
+double	SHAREDMEM(void)
 {
 #ifdef HAVE_SYSINFO_SHAREDRAM
 	struct sysinfo info;
 
 	if( 0 == sysinfo(&info))
 	{
-		return	(float)info.sharedram;
+		return	(double)info.sharedram;
 	}
 	else
 	{
@@ -983,14 +990,14 @@ float	SHAREDMEM(void)
 
 	sysctl(mib,2,&v,&len,NULL,0);
 
-	return (float)(v.t_armshr<<2);
+	return (double)(v.t_armshr<<2);
 #else
 	return	FAIL;
 #endif
 #endif
 }
 
-float	TOTALMEM(void)
+double	TOTALMEM(void)
 {
 #ifdef HAVE_SYS_PSTAT_H
 	struct	pst_static pst;
@@ -1013,7 +1020,7 @@ float	TOTALMEM(void)
 
 	if( 0 == sysinfo(&info))
 	{
-		return	(float)info.totalram;
+		return	(double)info.totalram;
 	}
 	else
 	{
@@ -1030,7 +1037,7 @@ float	TOTALMEM(void)
 
 	sysctl(mib,2,&v,&len,NULL,0);
 
-	return (float)(v.t_rm<<2);
+	return (double)(v.t_rm<<2);
 #else
 	return	FAIL;
 #endif
@@ -1038,7 +1045,7 @@ float	TOTALMEM(void)
 #endif
 }
 
-float	FREEMEM(void)
+double	FREEMEM(void)
 {
 #ifdef HAVE_SYS_PSTAT_H
 	struct	pst_static pst;
@@ -1082,7 +1089,7 @@ float	FREEMEM(void)
 
 	if( 0 == sysinfo(&info))
 	{
-		return	(float)info.freeram;
+		return	(double)info.freeram;
 	}
 	else
 	{
@@ -1099,7 +1106,7 @@ float	FREEMEM(void)
 
 	sysctl(mib,2,&v,&len,NULL,0);
 
-	return (float)(v.t_free<<2);
+	return (double)(v.t_free<<2);
 #else
 	return	FAIL;
 #endif
@@ -1107,7 +1114,7 @@ float	FREEMEM(void)
 #endif
 }
 
-float	KERNEL_MAXFILES(void)
+double	KERNEL_MAXFILES(void)
 {
 #ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXFILES
 	int	mib[2],len;
@@ -1123,13 +1130,13 @@ float	KERNEL_MAXFILES(void)
 		return	FAIL;
 	}
 
-	return (float)(maxfiles);
+	return (double)(maxfiles);
 #else
 	return	FAIL;
 #endif
 }
 
-float	KERNEL_MAXPROC(void)
+double	KERNEL_MAXPROC(void)
 {
 #ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXPROC
 	int	mib[2],len;
@@ -1146,20 +1153,20 @@ float	KERNEL_MAXPROC(void)
 /*		printf("Errno [%m]");*/
 	}
 
-	return (float)(maxproc);
+	return (double)(maxproc);
 #else
 	return	FAIL;
 #endif
 }
 
-float	UPTIME(void)
+double	UPTIME(void)
 {
 #ifdef HAVE_SYSINFO_UPTIME
 	struct sysinfo info;
 
 	if( 0 == sysinfo(&info))
 	{
-		return	(float)info.uptime;
+		return	(double)info.uptime;
 	}
 	else
 	{
@@ -1184,19 +1191,19 @@ float	UPTIME(void)
 
 	now=time(NULL);
 
-	return (float)(now-uptime.tv_sec);
+	return (double)(now-uptime.tv_sec);
 #else
 	return	FAIL;
 #endif
 #endif
 }
 
-float	PING(void)
+double	PING(void)
 {
 	return	1;
 }
 
-float	PROCLOAD(void)
+double	PROCLOAD(void)
 {
 #ifdef HAVE_GETLOADAVG
 	double	load[3];
@@ -1249,7 +1256,7 @@ float	PROCLOAD(void)
 #endif
 }
 
-float	PROCLOAD5(void)
+double	PROCLOAD5(void)
 {
 #ifdef HAVE_GETLOADAVG
 	double	load[3];
@@ -1302,7 +1309,7 @@ float	PROCLOAD5(void)
 #endif
 }
 
-float	PROCLOAD15(void)
+double	PROCLOAD15(void)
 {
 #ifdef HAVE_GETLOADAVG
 	double	load[3];
@@ -1355,14 +1362,14 @@ float	PROCLOAD15(void)
 #endif
 }
 
-float	SWAPFREE(void)
+double	SWAPFREE(void)
 {
 #ifdef HAVE_SYSINFO_FREESWAP
 	struct sysinfo info;
 
 	if( 0 == sysinfo(&info))
 	{
-		return	(float)info.freeswap;
+		return	(double)info.freeswap;
 	}
 	else
 	{
@@ -1375,14 +1382,14 @@ float	SWAPFREE(void)
 
 	get_swapinfo(&swaptotal,&swapfree);
 
-	return	(float)swapfree;
+	return	(double)swapfree;
 #else
 	return	FAIL;
 #endif
 #endif
 }
 
-float	PROCCOUNT(void)
+double	PROCCOUNT(void)
 {
 #ifdef HAVE_SYSINFO_PROCS
 	struct sysinfo info;
@@ -1400,14 +1407,14 @@ float	PROCCOUNT(void)
 #endif
 }
 
-float	SWAPTOTAL(void)
+double	SWAPTOTAL(void)
 {
 #ifdef HAVE_SYSINFO_TOTALSWAP
 	struct sysinfo info;
 
 	if( 0 == sysinfo(&info))
 	{
-		return	(float)info.totalswap;
+		return	(double)info.totalswap;
 	}
 	else
 	{
@@ -1420,14 +1427,14 @@ float	SWAPTOTAL(void)
 
 	get_swapinfo(&swaptotal,&swapfree);
 
-	return	(float)swaptotal;
+	return	(double)swaptotal;
 #else
 	return	FAIL;
 #endif
 #endif
 }
 
-float	DISK_IO(void)
+double	DISK_IO(void)
 {
 #ifdef	HAVE_PROC
 	return	getPROC("/proc/stat",2,2);
@@ -1436,7 +1443,7 @@ float	DISK_IO(void)
 #endif
 }
 
-float	DISK_RIO(void)
+double	DISK_RIO(void)
 {
 #ifdef	HAVE_PROC
 	return	getPROC("/proc/stat",3,2);
@@ -1445,7 +1452,7 @@ float	DISK_RIO(void)
 #endif
 }
 
-float	DISK_WIO(void)
+double	DISK_WIO(void)
 {
 #ifdef	HAVE_PROC
 	return	getPROC("/proc/stat",4,2);
@@ -1454,7 +1461,7 @@ float	DISK_WIO(void)
 #endif
 }
 
-float	DISK_RBLK(void)
+double	DISK_RBLK(void)
 {
 #ifdef	HAVE_PROC
 	return	getPROC("/proc/stat",5,2);
@@ -1463,7 +1470,7 @@ float	DISK_RBLK(void)
 #endif
 }
 
-float	DISK_WBLK(void)
+double	DISK_WBLK(void)
 {
 #ifdef	HAVE_PROC
 	return	getPROC("/proc/stat",6,2);
@@ -1489,10 +1496,9 @@ char	*EXECUTE_STR(char *command)
 	{
 		switch (errno)
 		{
-/*			case	EINTR:
-				return TIMEOUT_ERROR;*/
+			case	EINTR:
+				return TIMEOUT_ERROR;
 			default:
-				printf("E1\n");
 				return NULL;
 		}
 	}
@@ -1502,10 +1508,9 @@ char	*EXECUTE_STR(char *command)
 		pclose(f);
 		switch (errno)
 		{
-/*			case	EINTR:
-				return TIMEOUT_ERROR;*/
+			case	EINTR:
+				return TIMEOUT_ERROR;
 			default:
-				printf("E1\n");
 				return NULL;
 		}
 	}
@@ -1514,10 +1519,9 @@ char	*EXECUTE_STR(char *command)
 	{
 		switch (errno)
 		{
-/*			case	EINTR:
-				return TIMEOUT_ERROR;*/
+			case	EINTR:
+				return TIMEOUT_ERROR;
 			default:
-				printf("E1\n");
 				return NULL;
 		}
 	}
@@ -1525,10 +1529,10 @@ char	*EXECUTE_STR(char *command)
 	return	c;
 }
 
-float	EXECUTE(char *command)
+double	EXECUTE(char *command)
 {
 	FILE	*f;
-	float	result;
+	double	result;
 	char	c[MAX_STRING_LEN+1];
 
 	f=popen( command,"r");
@@ -1566,12 +1570,12 @@ float	EXECUTE(char *command)
 		}
 	}
 
-	sscanf(c, "%f", &result );
+	sscanf(c, "%lf", &result );
 
 	return	result;
 }
 
-float	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose)
+double	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose)
 {
 	char	*haddr;
 	char	c[1024];
@@ -1633,7 +1637,7 @@ float	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose)
 	}
 }
 
-float	check_ssh(char	*hostname, short port)
+double	check_ssh(char	*hostname, short port)
 {
 	char	*haddr;
 	char	c[MAX_STRING_LEN+1];
@@ -1703,7 +1707,7 @@ float	check_ssh(char	*hostname, short port)
 
 /* Example check_service[ssh], check_service[smtp,29],check_service[ssh,127.0.0.1,22]*/
 /* check_service[ssh,127.0.0.1,ssh] */
-float	CHECK_SERVICE(char *service_and_ip_and_port)
+double	CHECK_SERVICE(char *service_and_ip_and_port)
 {
 	char	*c,*c1;
 	int	port=0;
@@ -1785,7 +1789,7 @@ float	CHECK_SERVICE(char *service_and_ip_and_port)
 	return FAIL;
 }
 
-float	CHECK_PORT(char *ip_and_port)
+double	CHECK_PORT(char *ip_and_port)
 {
 	char	*c;
 	int	port=0;

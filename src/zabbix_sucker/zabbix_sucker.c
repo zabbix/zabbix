@@ -416,8 +416,9 @@ int	get_value_SIMPLE(double *result,char *result_str,DB_ITEM *item)
 int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
 {
 	int	s;
-	int	i;
-	char	c[MAX_STRING_LEN+1];
+	int	len;
+	socklen_t	i;
+	static	char	c[MAX_STRING_LEN+1];
 	char	*e;
 
 	struct hostent *hp;
@@ -460,7 +461,7 @@ int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot setsockopt SO_LINGER [%s]", strerror(errno));
 		}
 	}
-	if(s==0)
+	if(s == -1)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot create socket [%s]",
 				strerror(errno));
@@ -489,6 +490,7 @@ int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
 	}
 
 	sprintf(c,"%s\n",item->key);
+	zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", c);
 	if( sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
 		switch (errno)
@@ -504,8 +506,9 @@ int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
 	} 
 	i=sizeof(struct sockaddr_in);
 
-	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);
-	if(i == -1)
+	memset(c,0,MAX_STRING_LEN+1);
+	len=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);
+	if(len == -1)
 	{
 		switch (errno)
 		{
@@ -527,24 +530,37 @@ int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Problem with close [%s]", strerror(errno));
 	}
-	c[i-1]=0;
+	zabbix_log(LOG_LEVEL_DEBUG, "Got string:[%d] [%s]", len, c);
+	if(len>0)
+	{
+		c[len-1]=0;
+	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Got string:%10s", c );
 	*result=strtod(c,&e);
 
-	if( (*result==0) && (c==e) && (item->value_type==0) )
+	/* The section should be improved */
+	if( (*result==0) && (c==e) && (item->value_type==0) && (strcmp(c,"ZBX_NOTSUPPORTED") != 0) && (strcmp(c,"ZBX_ERROR") != 0) )
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Got empty string from [%s]. Parameter [%s]",item->host, item->key);
+		zabbix_log( LOG_LEVEL_WARNING, "Got empty string [%s] from [%s]. Parameter [%s]", c, item->host, item->key);
 		zabbix_log( LOG_LEVEL_WARNING, "Assuming that agent dropped connection because of access permissions");
 		return	NETWORK_ERROR;
 	}
-	if( *result<0 )
+
+	/* Should be deleted in Zabbix 1.0 stable */
+	if( cmp_double(*result,NOTSUPPORTED) == 0)
 	{
-		if( cmp_double(*result,NOTSUPPORTED) == 0)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "NOTSUPPORTED1 [%s]", c );
-			return NOTSUPPORTED;
-		}
+		zabbix_log(LOG_LEVEL_DEBUG, "NOTSUPPORTED1 [%s]", c );
+		return NOTSUPPORTED;
+	}
+	if( strcmp(c,"ZBX_NOTSUPPORTED") == 0)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "NOTSUPPORTED2 [%s]", c );
+		return NOTSUPPORTED;
+	}
+	if( strcmp(c,"ZBX_ERROR") == 0)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "AGENT_ERROR [%s]", c );
+		return AGENT_ERROR;
 	}
 
 	strncpy(result_str,c,MAX_STRING_LEN);
@@ -605,9 +621,9 @@ int get_minnextcheck(int now)
 		1 == NOT MONITORED
 		2 == UNREACHABLE */ 
 #ifdef TESTTEST
-	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and h.hostid%%%d=%d and i.key_<>'%s'",now,CONFIG_SUCKERD_FORKS-3,sucker_num-3,SERVER_STATUS_KEY);
+	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and i.type not in (%d) and h.hostid%%%d=%d and i.key_<>'%s'", now, ITEM_TYPE_TRAPPER, CONFIG_SUCKERD_FORKS-3,sucker_num-3,SERVER_STATUS_KEY);
 #else
-	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=%d and i.itemid%%%d=%d and i.key_<>'%s'", now, ITEM_STATUS_ACTIVE, CONFIG_SUCKERD_FORKS-3,sucker_num-3,SERVER_STATUS_KEY);
+	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=%d and i.type not in (%d) and i.itemid%%%d=%d and i.key_<>'%s'", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, CONFIG_SUCKERD_FORKS-3,sucker_num-3,SERVER_STATUS_KEY);
 #endif
 	result = DBselect(sql);
 
@@ -720,7 +736,7 @@ int get_values(void)
 #ifdef TESTTEST
 	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and h.hostid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-3,sucker_num-3,SERVER_STATUS_KEY);
 #else
-	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors from items i,hosts h where i.nextcheck<=%d and i.status=%d and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, ITEM_STATUS_ACTIVE, now, CONFIG_SUCKERD_FORKS-3,sucker_num-3,SERVER_STATUS_KEY);
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors from items i,hosts h where i.nextcheck<=%d and i.status=%d and i.type not in (%d) and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, now, CONFIG_SUCKERD_FORKS-3,sucker_num-3,SERVER_STATUS_KEY);
 #endif
 	result = DBselect(sql);
 
@@ -821,6 +837,14 @@ int get_values(void)
 				sprintf(sql,"update hosts set network_errors=%d where hostid=%d", network_errors, item.hostid);
 				DBexecute(sql);
 			}
+
+			break;
+		}
+/* Possibly, other logic required? */
+		else if(res == AGENT_ERROR)
+		{
+			zabbix_log( LOG_LEVEL_WARNING, "Getting value of [%s] from host [%s] failed (ZBX_ERROR)", item.key, item.host );
+			zabbix_log( LOG_LEVEL_WARNING, "The value is not stored in database.");
 
 			break;
 		}

@@ -44,12 +44,12 @@ int	cmp_double(double a,double b)
  * Return SUCCEED if parameter has format X.X or X, where X is [0..9]{1,n}
  * In other words, parameter is float number :)
  */
-int	is_float(char *c)
+int	is_double(char *c)
 {
 	int i;
 	int dot=-1;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Starting is_float:[%s]", c );
+	zabbix_log(LOG_LEVEL_DEBUG, "Starting is_double:[%s]", c );
 	for(i=0;i<strlen(c);i++)
 	{
 		if((c[i]>='0')&&(c[i]<='9'))
@@ -67,10 +67,10 @@ int	is_float(char *c)
 			}
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "It is NOT float" );
+		zabbix_log(LOG_LEVEL_DEBUG, "It is NOT double" );
 		return FAIL;
 	}
-	zabbix_log(LOG_LEVEL_DEBUG, "It is float" );
+	zabbix_log(LOG_LEVEL_DEBUG, "It is double" );
 	return SUCCEED;
 }
 
@@ -117,15 +117,15 @@ int	find_char(char *str,char c)
  * Evaluate simple expression
  * Simple expression is either <float> or <float> <operator> <float>
  */ 
-int	evaluate_simple (float *result,char *exp)
+int	evaluate_simple (double *result,char *exp)
 {
-	float	value1,value2;
+	double	value1,value2;
 	char	first[MAX_STRING_LEN+1],second[MAX_STRING_LEN+1];
 	int	i,j,l;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Evaluating simple expression [%s]", exp );
 
-	if( is_float(exp) == SUCCEED )
+	if( is_double(exp) == SUCCEED )
 	{
 		*result=atof(exp);
 		return SUCCEED;
@@ -183,12 +183,12 @@ int	evaluate_simple (float *result,char *exp)
 		zabbix_log(LOG_LEVEL_DEBUG, "[%s] [%s]",first,second );
 		if( evaluate_simple(&value1,first) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", first );
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", second );
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
 			return FAIL;
 		}
 		if( (value1 == 1) && (value2 == 1) )
@@ -216,12 +216,12 @@ int	evaluate_simple (float *result,char *exp)
 		second[j]=0;
 		if( evaluate_simple(&value1,first) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", first );
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", second );
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
 			return FAIL;
 		}
 		if( value1 > value2 )
@@ -250,12 +250,12 @@ int	evaluate_simple (float *result,char *exp)
 		zabbix_log(LOG_LEVEL_DEBUG, "[%s] [%s]",first,second );
 		if( evaluate_simple(&value1,first) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", first );
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", second );
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
 			return FAIL;
 		}
 		if( value1 < value2 )
@@ -284,12 +284,12 @@ int	evaluate_simple (float *result,char *exp)
 		second[j]=0;
 		if( evaluate_simple(&value1,first) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", first );
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", second );
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
 			return FAIL;
 		}
 		*result=value1*value2;
@@ -310,12 +310,12 @@ int	evaluate_simple (float *result,char *exp)
 		second[j]=0;
 		if( evaluate_simple(&value1,first) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", first );
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", second );
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
 			return FAIL;
 		}
 		if(cmp_double(value2,0) == 0)
@@ -344,12 +344,12 @@ int	evaluate_simple (float *result,char *exp)
 		second[j]=0;
 		if( evaluate_simple(&value1,first) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", first );
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", second );
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
 			return FAIL;
 		}
 		*result=value1+value2;
@@ -370,12 +370,12 @@ int	evaluate_simple (float *result,char *exp)
 		second[j]=0;
 		if( evaluate_simple(&value1,first) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", first );
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", second );
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
 			return FAIL;
 		}
 		*result=value1-value2;
@@ -396,12 +396,12 @@ int	evaluate_simple (float *result,char *exp)
 		second[j]=0;
 		if( evaluate_simple(&value1,first) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", first );
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot evaluate expression [%s]", second );
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
 			return FAIL;
 		}
 		if( cmp_double(value1,value2) ==0 )
@@ -427,7 +427,7 @@ int	evaluate_simple (float *result,char *exp)
  */ 
 int	evaluate(int *result,char *exp)
 {
-	float	value;
+	double	value;
 	char	res[MAX_STRING_LEN+1];
 	char	simple[MAX_STRING_LEN+1];
 	int	i,l,r;
@@ -459,15 +459,19 @@ int	evaluate(int *result,char *exp)
 
 		if( evaluate_simple( &value, simple ) != SUCCEED )
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Unable to evaluate simple expression1 [%s]", simple );
+			/* Changed to LOG_LEVEL_DEBUG */
+			zabbix_log( LOG_LEVEL_DEBUG, "Unable to evaluate simple expression1 [%s]", simple );
 			return	FAIL;
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Expression1:[%s]", exp );
 
 		exp[l]='%';
+		exp[l+1]='l';
+		exp[l+2]='f';
+/*		exp[l]='%';
 		exp[l+1]='f';
-		exp[l+2]=' ';
+		exp[l+2]=' ';*/
 
 		for(i=l+3;i<=r;i++) exp[i]=' ';
 
@@ -481,7 +485,7 @@ int	evaluate(int *result,char *exp)
 		zabbix_log(LOG_LEVEL_WARNING, "Unable to evaluate simple expression2 [%s]", simple );
 		return	FAIL;
 	}
-	zabbix_log( LOG_LEVEL_DEBUG, "Evaluate end:[%f]", value );
+	zabbix_log( LOG_LEVEL_DEBUG, "Evaluate end:[%lf]", value );
 	*result=value;
 	return SUCCEED;
 }
@@ -618,7 +622,7 @@ int	substitute_macros(char *exp)
  */
 int	substitute_functions(char *exp)
 {
-	float	value;
+	double	value;
 	char	functionid[MAX_STRING_LEN+1];
 	char	res[MAX_STRING_LEN+1];
 	int	i,l,r;
@@ -657,8 +661,11 @@ int	substitute_functions(char *exp)
 		zabbix_log( LOG_LEVEL_DEBUG, "Expression1:[%s]", exp );
 
 		exp[l]='%';
+		exp[l+1]='l';
+		exp[l+2]='f';
+/*		exp[l]='%';
 		exp[l+1]='f';
-		exp[l+2]=' ';
+		exp[l+2]=' ';*/
 
 		zabbix_log( LOG_LEVEL_DEBUG, "Expression2:[%s]", exp );
 
@@ -689,5 +696,6 @@ int	evaluate_expression(int *result,char *expression)
 			return SUCCEED;
 		}
 	}
+	zabbix_log(LOG_LEVEL_WARNING, "Evaluation of expression [%s] failed", expression );
 	return FAIL;
 }

@@ -1,31 +1,44 @@
 HIGH PRIORITY:
 
- - add notification to all trigers of the hist
- - BUG. Problems with backslashes when adding host from template
- - test everythinkg under Explorer. Especially Graphs,Charts and Maps.
- - add ZBX_ERROR and ZBX_NOTSUPPORTED
- - improve performance of Alarms and Alerts in PHP frontend
- - BUG. Agent return unsupported in case if UserParameter ends by timeout.
- - check Rickard's multythreaded agent
- - check new Mariusz patches
- - BUG. Avoid situations when PID file is not deleted.
- - BUG. Map does not show host status in case of trigger based on trapper
- - BUG. When ran first time, some triggers becomes TRUE (like files was changed)
- - default user name for DB acess should be the same (root)
+ - fix buffer overflow in zbx_log().
+* - add severity to pre-defined triggers 
+* - BUG. zabbix_sucker should accept parameter regardless of "\n" at the end of line 
+* - BUG. Agent return unsupported in case if UserParameter ends by timeout.
+ - test everything under Explorer and Netscape. Especially Graphs,Charts and Maps.
  - mass updates/inserts (add items and triggers for all hosts at once)
- - support for net-snmp
- - LDAP authorisation (should work with MSWindows LDAP)
+* - support for net-snmp
  - get rid of long select lists in user forms 
- - do not dump "Expression cannot be evaluated" in case if function.lastvalue
-   is NULL
- - support for netload under other platforms
- - support for disk loads
  - better monitoring of log files
  - IT Helpdesk
  - SNMP trapping
  - personalisation (refresh rate, graph size, default graph period, etc)
- - BUG. When W2000 with SNMP agent restarted, items will becomes Not Supported
- - BUG. Pricision is lost for bug numbers. Convert all float types to double.
+* - add protection from IT Service loop
+* - support of template hosts. Remove tables hosts_templates and others
+
+PERFORMANCE IMPROVEMENTS:
+
+ - remove lastvalue, lastclock, prevvalue from table ITEMS
+
+DIFFERENT TASKS:
+
+ - SNMP trapping
+ - SNMP v2,v3
+ - auto-discovery
+ - Native Windows GUI
+ - distributed monitoring
+ - use JS in forms
+ - audit log
+ - backup/restore scripts for server. Backup all (DB, configs, etc).
+ - IT Helpdesk
+ - monitoring of log files
+ - high-performance, optimised zabbix_suckerd and zabbix_trapperd
+ - personalisation (refresh rate, graph size, default graph period, etc)
+ - encryption
+ - automated report generation
+ - SNMP-walk in WEB interface
+ - add UserParameter without restart of an agent
+ - write white-paper
+ - prepare Power Point presentation
 
 REGISTERED BUGS:
 
@@ -45,15 +58,20 @@ the agent with a predefined API that can return values to suckerd.
 
 Not ready yet:
 
+ - check Rickard's multithreaded agent
+ - check new Mariusz patches
+ - improve performance of Alarms and Alerts in PHP frontend
+ - default user name for DB acess should be the same (root)
  - add support for downtimes, user availablity, etc
  - get rid of false warning messages (like unable to insert ...)
+ - BUG. Avoid situations when PID file is not deleted.
 
- HB:
+HB:
 
  - Tree like in old Zabbix
- - SNMP trapping
+ - LDAP authorisation (should work with MSWindows LDAP)
  - Reports:
-  - more customizable (graphs time range: 1 mont, etc)
+ - more customizable (graphs time range: 1 mont, etc)
 
  WIN32 Agent:
 
@@ -78,6 +96,8 @@ Not ready yet:
 
  OTHER:
 
+ - support for netload under other platforms
+ - support for disk loads
  - round MIN/MAX/AVG numbers for graphs
  - dashed grid somethimes is out of rectangle for graphs
  - calculate MIN value for graphs (do not use '0')
@@ -91,23 +111,20 @@ Not ready yet:
  - ability to execute command on server monitored
  - support for tcp_ping[] which returns number of ms spent
  - support for OS X (network loads, disk loads)
- - agent to send something back in case of timeout (?)
  - check for function parameters in evaluate_simple_expression
- - make links different if something is already registered (as for medias,
+ - make links look different if something is already registered (as for medias,
    actions, etc)
  - update trigger status to UNKNOWN if cannot evaluate function 
  - when doing UserParameter do not return FAIL in case of timeout
 
  LATER:
 
- - show who is online somewhere (in User config form?)
  - setup demo site
  - add user groups
  - look for cool icons
  - different sound files for different severity
  - distributed monitoring
- - Agent for Windows (can we use nsclient?)
- - rename "Alerts" to "Notification"
+ - rename "Alerts" to "Notifications"
  - add numeric constants to trigger expressions
  - get rid of problems with ' and "
  - think about service node types (some nodes will automatically register

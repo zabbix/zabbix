@@ -918,6 +918,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				}
 ?>
 		</td>
+		</tr>
 
 		<tr>
 		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
@@ -1139,7 +1140,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				}
 ?>
 		</td>
-
 		</tr>
 <?php
 // THird row
@@ -3443,7 +3443,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<td bgcolor=\"#000000\">";
 		echo "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\" width=100% bgcolor=\"#666666\">";
 		echo "<tr><td align=center>";
-		echo "<a href=\"http://zabbix.sourceforge.net\">ZABBIX</a> Copyright 2000,2001,2002 by <a href=\"mailto:alex@gobbo.caves.lv\">Alexei Vladishev</a>";
+		echo "<a href=\"http://zabbix.sourceforge.net\">ZABBIX</a> Copyright 2000,2001,2002,2003 by <a href=\"mailto:alex@gobbo.caves.lv\">Alexei Vladishev</a>";
 		echo "</td>";
 		echo "<td align=right width=15%>";
 		echo "| Connected as ".$USER_DETAILS["alias"];
