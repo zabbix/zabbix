@@ -1,5 +1,7 @@
 Changes for 1.0beta8:
 
+ - fixed incorrect handling of timeouts when sendign emails
+ (Alexei)
  - fixed selection of recipient in trigger actions (Alexei)
  - fixed Plain Text values (Alexei)
  - fixed improper handling of special characters i.e. '\/" (Alexei)

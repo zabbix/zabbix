@@ -994,6 +994,8 @@ int main_alerter_loop()
 
 	int	i,res;
 
+	struct	sigaction phan;
+
 	DB_RESULT	*result;
 	DB_ALERT	alert;
 
@@ -1032,6 +1034,12 @@ int main_alerter_loop()
 
 			if(strcmp(alert.type,ALERT_TYPE_EMAIL)==0)
 			{
+
+				phan.sa_handler = &signal_handler;
+				sigemptyset(&phan.sa_mask);
+				phan.sa_flags = 0;
+				sigaction(SIGALRM, &phan, NULL);
+
 				/* Hardcoded value */
 				alarm(10);
 				res = send_email(smtp_server,smtp_helo,smtp_email,alert.sendto,alert.subject,alert.message);
@@ -1285,7 +1293,6 @@ int main(int argc, char **argv)
 	}
 	else if(sucker_num == 1)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Mailer PID [%d]",getpid());
 /* Second instance of zabbix_suckerd sends alerts to users */
 		main_alerter_loop();
 	}	
