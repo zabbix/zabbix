@@ -8,6 +8,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+#include <string.h>
+
 #ifdef HAVE_NETDB_H
 	#include <netdb.h>
 #endif

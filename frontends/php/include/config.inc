@@ -2167,14 +2167,44 @@
 	        $result=DBselect("select count(*) from history");
 		$stat["history_count"]=DBget_field($result,0,0);
 
+	        $result=DBselect("select count(*) from alarms");
+		$stat["alarms_count"]=DBget_field($result,0,0);
+
+	        $result=DBselect("select count(*) from alerts");
+		$stat["alerts_count"]=DBget_field($result,0,0);
+
 	        $result=DBselect("select count(*) from triggers");
 		$stat["triggers_count"]=DBget_field($result,0,0);
+
+	        $result=DBselect("select count(*) from triggers where istrue!=2");
+		$stat["triggers_count_enabled"]=DBget_field($result,0,0);
+
+	        $result=DBselect("select count(*) from triggers where istrue=2");
+		$stat["triggers_count_disabled"]=DBget_field($result,0,0);
 
 	        $result=DBselect("select count(*) from items");
 		$stat["items_count"]=DBget_field($result,0,0);
 
+	        $result=DBselect("select count(*) from items where status=0");
+		$stat["items_count_active"]=DBget_field($result,0,0);
+
+	        $result=DBselect("select count(*) from items where status=1");
+		$stat["items_count_not_active"]=DBget_field($result,0,0);
+
+	        $result=DBselect("select count(*) from items where status=3");
+		$stat["items_count_not_supported"]=DBget_field($result,0,0);
+
+	        $result=DBselect("select count(*) from items where status=2");
+		$stat["items_count_trapper"]=DBget_field($result,0,0);
+
 	        $result=DBselect("select count(*) from hosts");
 		$stat["hosts_count"]=DBget_field($result,0,0);
+
+	        $result=DBselect("select count(*) from hosts where status=0");
+		$stat["hosts_count_monitored"]=DBget_field($result,0,0);
+
+	        $result=DBselect("select count(*) from hosts where status=1");
+		$stat["hosts_count_not_monitored"]=DBget_field($result,0,0);
 
 	        $result=DBselect("select count(*) from users");
 		$stat["users_count"]=DBget_field($result,0,0);

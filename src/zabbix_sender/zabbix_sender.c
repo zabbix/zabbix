@@ -8,6 +8,8 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
+#include <string.h>
+
 /* OpenBSD*/
 #ifdef HAVE_SYS_SOCKET_H
 	#include <sys/socket.h>
