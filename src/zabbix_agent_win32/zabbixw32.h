@@ -28,13 +28,14 @@
 #include <stdio.h>
 #include <pdh.h>
 #include "common.h"
+#include "md5.h"
 
 
 //
 // Common constants
 //
 
-#define AGENT_VERSION         "1.0.0-alpha3"
+#define AGENT_VERSION         "1.0.0-alpha4"
 
 #define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
 
@@ -56,10 +57,10 @@
 
 struct AGENT_COMMAND
 {
-   char name[MAX_PARAM_NAME];                   // Command's name
-   float (* handler_float)(char *,char *);      // Handler if return value is numeric
-   char *(* handler_string)(char *,char *);     // Handler if return value is string
-   char *arg;                                   // Optional command argument
+   char name[MAX_PARAM_NAME];               // Command's name
+   double (* handler_float)(char *,char *); // Handler if return value is floating point numeric
+   char *(* handler_string)(char *,char *); // Handler if return value is string
+   char *arg;                               // Optional command argument
 };
 
 
@@ -88,7 +89,7 @@ struct USER_COUNTER
    LONG currPos;                    // Current position in buffer
    HCOUNTER handle;                 // Counter handle (set by collector thread)
    PDH_RAW_COUNTER *rawValueArray;
-   float lastValue;                 // Last computed average value
+   double lastValue;                // Last computed average value
 };
 
 
@@ -100,6 +101,9 @@ BOOL ParseCommandLine(int argc,char *argv[]);
 char *GetSystemErrorText(DWORD error);
 BOOL MatchString(char *pattern,char *string);
 void StrStrip(char *string);
+
+void CalculateMD5Hash(const unsigned char *data,int nbytes,unsigned char *hash);
+DWORD CalculateCRC32(const unsigned char *data,DWORD nbytes);
 
 void InitService(void);
 void ZabbixCreateService(char *execName);
@@ -139,14 +143,15 @@ extern char logFile[];
 extern DWORD confServerAddr;
 extern WORD confListenPort;
 extern DWORD confTimeout;
+extern DWORD confMaxProcTime;
 
 extern USER_COUNTER *userCounterList;
 
-extern float statProcUtilization[];
-extern float statProcUtilization5[];
-extern float statProcUtilization15[];
-extern float statProcLoad;
-extern float statProcLoad5;
-extern float statProcLoad15;
+extern double statProcUtilization[];
+extern double statProcUtilization5[];
+extern double statProcUtilization15[];
+extern double statProcLoad;
+extern double statProcLoad5;
+extern double statProcLoad15;
 
 #endif

@@ -111,6 +111,10 @@ SOURCE=.\main.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\md5.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\service.cpp
 # End Source File
 # Begin Source File
@@ -128,6 +132,10 @@ SOURCE=.\util.cpp
 # Begin Source File
 
 SOURCE=.\common.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\md5.h
 # End Source File
 # Begin Source File
 
