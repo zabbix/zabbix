@@ -210,7 +210,7 @@
 			echo "[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=false&sort=$sort$cond\">Hide Select</A>] "; 
 			show_table_v_delimiter();
 			echo "<form name=\"form1\" method=\"get\" action=\"tr_status.php?select=true\">
-  			<input type=\"text\" name=\"txt_select\" value=\"$txt_select\">
+  			<input class=\"biginput\" type=\"text\" name=\"txt_select\" value=\"$txt_select\">
   			<input type=\"submit\" name=\"btnSelect\" value=\"Select\">
   			<input type=\"submit\" name=\"btnSelect\" value=\"Inverse select\">
 			<INPUT NAME=\"compact\" TYPE=\"HIDDEN\" value=\"$compact\">

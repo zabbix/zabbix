@@ -204,7 +204,7 @@
 	echo "Host";
 	show_table2_h_delimiter();
 	$result=DBselect("select hostid,host from hosts order by host");
-	echo "<select name=\"hostid\" size=1>";
+	echo "<select class=\"biginput\" name=\"hostid\" size=1>";
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		$hostid_=DBget_field($result,$i,0);
@@ -223,7 +223,7 @@
 	show_table2_v_delimiter();
 	echo "Icon";
 	show_table2_h_delimiter();
-	echo "<select name=\"icon\" size=1>";
+	echo "<select class=\"biginput\" name=\"icon\" size=1>";
 	$icons=array();
 	$icons[0]="Server";
 	$icons[1]="Workstation";
@@ -245,17 +245,17 @@
 	show_table2_v_delimiter();
 	echo "Label";
 	show_table2_h_delimiter();
-	echo "<input name=\"label\" size=32 value=\"$label\">";
+	echo "<input class=\"biginput\" name=\"label\" size=32 value=\"$label\">";
 
 	show_table2_v_delimiter();
 	echo "Coordinate X";
 	show_table2_h_delimiter();
-	echo "<input name=\"x\" size=5 value=\"$x\">";
+	echo "<input class=\"biginput\" name=\"x\" size=5 value=\"$x\">";
 
 	show_table2_v_delimiter();
 	echo "Coordinate Y";
 	show_table2_h_delimiter();
-	echo "<input name=\"y\" size=5 value=\"$y\">";
+	echo "<input class=\"biginput\" name=\"y\" size=5 value=\"$y\">";
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
@@ -277,7 +277,7 @@
 	echo "Host 1";
 	show_table2_h_delimiter();
 	$result=DBselect("select shostid,label from sysmaps_hosts where sysmapid=".$HTTP_GET_VARS["sysmapid"]." order by label");
-	echo "<select name=\"shostid1\" size=1>";
+	echo "<select class=\"biginput\" name=\"shostid1\" size=1>";
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		$shostid_=DBget_field($result,$i,0);
@@ -298,7 +298,7 @@
 	echo "Host 2";
 	show_table2_h_delimiter();
 	$result=DBselect("select shostid,label from sysmaps_hosts where sysmapid=".$HTTP_GET_VARS["sysmapid"]." order by label");
-	echo "<select name=\"shostid2\" size=1>";
+	echo "<select class=\"biginput\" name=\"shostid2\" size=1>";
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		$shostid_=DBget_field($result,$i,0);

@@ -3096,7 +3096,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 		echo "Resource";
 		show_table2_h_delimiter();
-		echo "<select name=\"right\">";
+		echo "<select class=\"biginput\" name=\"right\">";
 		echo "<option value=\"Configuration of Zabbix\">Configuration of Zabbix";
 		echo "<option value=\"Default permission\">Default permission";
 		echo "<option value=\"Graph\">Graph";
@@ -3111,7 +3111,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		show_table2_v_delimiter();
 		echo "Permission";
 		show_table2_h_delimiter();
-		echo "<select name=\"permission\">";
+		echo "<select class=\"biginput\" name=\"permission\">";
 		echo "<option value=\"R\">Read-only";
 		echo "<option value=\"U\">Read-write";
 		echo "<option value=\"H\">Hide";
@@ -3121,7 +3121,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		show_table2_v_delimiter();
 		echo "Resource ID (0 for all)";
 		show_table2_h_delimiter();
-		echo "<input name=\"id\" value=\"0\" size=4>";
+		echo "<input class=\"biginput\" name=\"id\" value=\"0\" size=4>";
 
 		show_table2_v_delimiter2();
 		echo "<input type=\"submit\" name=\"register\" value=\"add permission\">";
@@ -3141,13 +3141,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "Login name";
 		show_table2_h_delimiter();
 //		echo "<input name=\"name\" value=\"".$HTTP_GET_VARS["name"]."\" size=20>";
-		echo "<input name=\"name\" value=\"\" size=20>";
+		echo "<input class=\"biginput\" name=\"name\" value=\"\" size=20>";
 
 		show_table2_v_delimiter();
 		echo "Password";
 		show_table2_h_delimiter();
 //		echo "<input type=\"password\" name=\"password\" value=\"$password\" size=20>";
-		echo "<input type=\"password\" name=\"password\" value=\"\" size=20>";
+		echo "<input class=\"biginput\" type=\"password\" name=\"password\" value=\"\" size=20>";
 
 		show_table2_v_delimiter2();
 		echo "<input type=\"submit\" name=\"register\" value=\"Enter\">";
