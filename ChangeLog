@@ -1,5 +1,6 @@
 Changes for 1.0beta11:
 
+ - fix for counting of triggers in map.php.  (Alexei)
  - added translation of special HTML characters in history of
  alerts and alarms (Alexei)
  - fixed calculation of graph width under MS Explorer (Alexei)
