@@ -189,6 +189,7 @@ CREATE TABLE actions (
   subject		varchar(255)	DEFAULT '' NOT NULL,
   message		blob		DEFAULT '' NOT NULL,
   nextcheck		int(4)		DEFAULT '0' NOT NULL,
+  recipient		int(1)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (actionid),
   KEY (triggerid)
 ) type=InnoDB;

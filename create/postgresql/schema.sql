@@ -176,6 +176,7 @@ CREATE TABLE actions (
   subject		varchar(255)	DEFAULT '' NOT NULL,
   message		text		DEFAULT '' NOT NULL,
   nextcheck		int4		DEFAULT '0' NOT NULL,
+  recipient		int1		DEFAULT '0' NOT NULL,
   PRIMARY KEY (actionid),
   FOREIGN KEY (triggerid) REFERENCES triggers,
   FOREIGN KEY (userid) REFERENCES users
