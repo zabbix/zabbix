@@ -17,12 +17,22 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_STATS_H
-#define ZABBIX_STATS_H
+#ifndef ZABBIX_DISKDEVICES_H
+#define ZABBIX_DISKDEVICES_H
 
-#include "interfaces.h"
-#include "diskdevices.h"
+#define	MAX_DISKDEVICES	8
 
-void	collect_statistics();
+#define DISKDEVICE struct diskdevice_type
+DISKDEVICE
+{
+	char    *device;
+	int	clock[60*15];
+	float	read_io_ops[60*15];
+	float	blks_read[60*15];
+	float	write_io_ops[60*15];
+	float	blks_write[60*15];
+};
+
+void	collect_stats_diskdevices(FILE *outfile);
 
 #endif
