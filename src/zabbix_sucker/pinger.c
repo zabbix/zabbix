@@ -52,7 +52,7 @@
 #include "pinger.h"
 
 
-int	process_ip(char *ip, char *value)
+int	process_value(char *key, char *ip, char *value)
 {
 	char	sql[MAX_STRING_LEN+1];
 
@@ -62,7 +62,7 @@ int	process_ip(char *ip, char *value)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_ip()");
 
-	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta from items i,hosts h where h.status in (%d,%d) and h.hostid=i.hostid and h.ip='%s' and i.key_='icmpping' and i.status=%d and i.type=%d", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, ip, ITEM_STATUS_ACTIVE, ITEM_TYPE_SIMPLE);
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta from items i,hosts h where h.status in (%d,%d) and h.hostid=i.hostid and h.ip='%s' and i.key_='%s' and i.status=%d and i.type=%d", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, ip, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_SIMPLE);
 	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
 	result = DBselect(sql);
 
@@ -143,7 +143,7 @@ int create_host_file(void)
 	}
 
 	now=time(NULL);
-	sprintf(sql,"select distinct h.ip from hosts h,items i where i.hostid=h.hostid and (h.status=%d or (h.status=%d and h.disable_until<=%d)) and i.key_='icmpping' and i.type=%d and i.status=%d and h.useip=1", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, ITEM_TYPE_SIMPLE, ITEM_STATUS_ACTIVE);
+	sprintf(sql,"select distinct h.ip from hosts h,items i where i.hostid=h.hostid and (h.status=%d or (h.status=%d and h.disable_until<=%d)) and (i.key_='icmpping' or i.key_='icmppingsec') and i.type=%d and i.status=%d and h.useip=1", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, ITEM_TYPE_SIMPLE, ITEM_STATUS_ACTIVE);
 	result = DBselect(sql);
 		
 	for(i=0;i<DBnum_rows(result);i++)
@@ -166,14 +166,16 @@ int create_host_file(void)
 int	do_ping(void)
 {
 	FILE	*f;
-	static	char	ip[MAX_STRING_LEN+1];
+	char	ip[MAX_STRING_LEN+1];
 	char	str[MAX_STRING_LEN+1];
+	char	tmp[MAX_STRING_LEN+1];
+	double	mseconds;
 	char	*c;
 	int	alive;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In do_ping()");
 
-	sprintf(str,"cat /tmp/zabbix_suckerd.pinger|%s",CONFIG_FPING_LOCATION);
+	sprintf(str,"cat /tmp/zabbix_suckerd.pinger|%s -e",CONFIG_FPING_LOCATION);
 	
 	f=popen(str,"r");
 	if(f==0)
@@ -191,6 +193,8 @@ int	do_ping(void)
 		if(strstr(ip,"alive") != NULL)
 		{
 			alive=1;
+			sscanf(ip,"%s is alive (%lf ms)", tmp, &mseconds);
+			zabbix_log( LOG_LEVEL_DEBUG, "Mseconds [%lf]", mseconds);
 		}
 		else
 		{
@@ -203,11 +207,13 @@ int	do_ping(void)
 			zabbix_log( LOG_LEVEL_DEBUG, "IP [%s] alive [%d]", ip, alive);
 			if(0 == alive)
 			{
-				process_ip(ip,"0");
+				process_value("icmpping",ip,"0");
 			}
 			else
 			{
-				process_ip(ip,"1");
+				sprintf(tmp,"%f",mseconds/100);
+				process_value("icmpping",ip,"1");
+				process_value("icmppingsec",ip,tmp);
 			}
 		}
 	}
