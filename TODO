@@ -1,5 +1,6 @@
 1.0beta11:
 
+ - special item. (last-prev)/time 
  - special item which returns time!
  - mess with user groups when running under root
  - support for PREFIX/zabbix/etc (configuration files)
