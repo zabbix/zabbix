@@ -3,6 +3,7 @@ Changes for 1.0beta1:
 (Add support for PostgreSQL and patches)
 (Add description of new tables to the manual)
 
+ - added column status to table services (Alexei)
  - added user-defined sorting to form "Latest Values" (Alexei)
  - extra debug information in case of network errors in zabbix_suckerd
  (Alexei)

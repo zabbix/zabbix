@@ -31,7 +31,11 @@
 
 	echo "</font>";
 	show_table_header_end();
-	echo "<br>";
+
+	if(!isset($sort))
+	{
+		$sort="description";
+	}
 
 	if(isset($hostid))
 	{
@@ -47,6 +51,7 @@
 		$result=DBselect("select host from hosts where hostid=$hostid");
 		$host=DBget_field($result,0,0);
 
+		echo "<br>";
 		show_table_header("<a href=\"latest.html?hostid=$hostid\">$host</a>");
 #		show_table_header_begin();
 #		echo "<a href=\"latest.html?hostid=$hostid\">$host</a>";
@@ -102,7 +107,7 @@
 		}
 		else
 		{
-			$sort="";
+			$sort="order by i.description";
 		}
 		$result=DBselect("select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and h.hostid=$hostid $sort");
 		while($row=DBfetch($result))

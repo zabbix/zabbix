@@ -9,9 +9,14 @@
 <?
 	if(isset($register))
 	{
+		if($register=="update")
+		{
+			$result=@update_service($serviceid,$name,$triggerid,$linktrigger);
+			show_messages($result,"Service updated","Cannot update service");
+		}
 		if($register=="add")
 		{
-			$result=add_service($name,$triggerid,$linktrigger);
+			$result=@add_service($name,$triggerid,$linktrigger);
 			show_messages($result,"Service added","Cannot add service");
 		}
 		if($register=="add link")
@@ -22,6 +27,12 @@
 			}
 			$result=add_service_link($servicedownid,$serviceupid,$softlink);
 			show_messages($result,"Service link added","Cannot add service link");
+		}
+		if($register=="delete")
+		{
+			$result=delete_service($serviceid);
+			show_messages($result,"Service deleted","Cannot delete service");
+			unset($serviceid);
 		}
 	}
 ?>
@@ -37,9 +48,10 @@
 	$now=time();
 	$result=DBselect("select serviceid,name from services order by name");
 	echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";
-	echo "\n";
-	echo "<tr><td><b>Service</b></td></tr>";
-	echo "\n";
+	echo "<tr>";
+	echo "<td><b>Service</b></td>";
+	echo "<td width=\"10%\"><b>Actions</b></td>";
+	echo "</tr>";
 
 	$col=0;
 	if(isset($serviceid))
@@ -47,6 +59,7 @@
 		echo "<tr bgcolor=#EEEEEE>";
 		$service=get_service_by_serviceid($serviceid);
 		echo "<td><b><a href=\"services.html?serviceid=".$service["serviceid"]."#form\">".$service["name"]."</a></b></td>";
+		echo "<td><a href=\"services.html?serviceid=".$service["serviceid"]."&register=delete\">Delete</a></td>";
 		echo "</tr>"; 
 		$col++;
 	}
@@ -72,13 +85,14 @@
 		$childs=get_num_of_service_childs($row["serviceid"]);
 		if(isset($serviceid))
 		{
-			echo "<td><a href=\"services.html?serviceid=".$row["serviceid"]."#form\"> - ".$row["name"]."</a></td>";
+			echo "<td><a href=\"services.html?serviceid=".$row["serviceid"]."#form\"> - ".$row["name"]." [$childs]</a></td>";
 		}
 		else
 		{
-			echo "<td><a href=\"services.html?serviceid=".$row["serviceid"]."#form\">[$childs] ".$row["name"]."</a></td>";
+			echo "<td><a href=\"services.html?serviceid=".$row["serviceid"]."#form\">".$row["name"]." [$childs]</a></td>";
 		}
-		echo "</tr>"; 
+		echo "<td><a href=\"services.html?serviceid=".$row["serviceid"]."&register=delete\">Delete</a></td>";
+		echo "</tr>";
 	}
 	echo "</table>";
 ?>
