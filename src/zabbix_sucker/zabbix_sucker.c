@@ -1230,6 +1230,7 @@ int main(int argc, char **argv)
 	sigaction(SIGINT, &phan, NULL);
 	sigaction(SIGQUIT, &phan, NULL);
 	sigaction(SIGTERM, &phan, NULL);
+		sigaction(SIGCHLD, &phan, NULL);
 
 	if(CONFIG_LOG_FILE == NULL)
 	{
@@ -1296,7 +1297,6 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		sigaction(SIGCHLD, &phan, NULL);
 		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started. Sucker.",sucker_num);
 		main_sucker_loop();
 	}
