@@ -3,7 +3,7 @@ Changes for 1.1alpha5:
  - fixed mouse navigation for multiple maps in one screen (Alexei)
  - fixed unmodified item parameter "Keep trends (in days)" (Alexei)
  - fixed support of negative values for SNMP integers (Alexei)
- - added support of functiona dayofweek() for triggers (Alexei)
+ - added support of function dayofweek() for triggers (Alexei)
  - configurable format of icon labels for maps (Alexei)
  - added column sysmaps.label_type (Alexei)
  - keep host selection when adding/deleting/updating item (Alexei)
