@@ -29,3 +29,5 @@ insert into usrgrp (usrgrpid, name) values (NULL, 'Zabbix administrators');
 
 alter table items add delta int(1)  DEFAULT '0' NOT NULL;
 alter table items add prevorgvalue double(16,4)  DEFAULT NULL;
+
+alter table actions add recipient int(1)  DEFAULT '0' NOT NULL;
