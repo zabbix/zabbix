@@ -468,7 +468,7 @@ int	get_value_SIMPLE(double *result,char *result_str,DB_ITEM *item)
 	process(c,result_str);
 	*result=strtod(result_str,&e);
 
-	zabbix_log( LOG_LEVEL_ERR, "SIMPLE [%s] [%s] [%f]", c, result_str, *result);
+	zabbix_log( LOG_LEVEL_DEBUG, "SIMPLE [%s] [%s] [%f]", c, result_str, *result);
 	return SUCCEED;
 }
 
