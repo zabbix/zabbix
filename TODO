@@ -1,5 +1,6 @@
 ZABBIX 1.1:
 
+ - check if items delay works
  - support of networks having 100-1000 network devices to monitor
  - escalation
  - execution of commands on monitored hosts in case of pre-defined events
