@@ -128,7 +128,8 @@ CREATE TABLE triggers (
   PRIMARY KEY (triggerid)
 );
 
-CREATE INDEX triggers_istrue on triggers (istrue);
+CREATE INDEX triggers_value on triggers (value);
+CREATE INDEX triggers_status on triggers (status);
 
 --
 -- Table structure for table 'trigger_depends'
@@ -320,7 +321,7 @@ CREATE TABLE media (
   severity		int4		DEFAULT '63' NOT NULL,
   PRIMARY KEY (mediaid),
   FOREIGN KEY (userid) REFERENCES users,
-  FOREIGN KEY (mediatypeid) REFERENCES media_type,
+  FOREIGN KEY (mediatypeid) REFERENCES media_type
 );
 
 --
@@ -435,7 +436,7 @@ CREATE UNIQUE INDEX services_links_upidownid on services_links (serviceupid, ser
 
 CREATE TABLE rights (
   rightid               serial,
-  userid                int4		DEFAULT '' NOT NULL,
+  userid                int4		DEFAULT '0' NOT NULL,
   name                  char(255)	DEFAULT '' NOT NULL,
   permission            char(1)		DEFAULT '' NOT NULL,
   id                    int4,
