@@ -1,5 +1,6 @@
 1.0beta10:
 
+ - add MRTG-like graphs + periodic recalculation of aggregate functions
  - why '-lsnmp' added to the agent's Makefile
  - add support for agent forwarding (proxy)
  - link map's line to a trigger
