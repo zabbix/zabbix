@@ -449,7 +449,7 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 	else if(strcmp(function,"now")==0)
 	{
 		now=time(NULL);
-                sprintf(value,"%d",now);
+                sprintf(value,"%d",(int)now);
 	}
 	else
 	{
