@@ -2,7 +2,7 @@
 	$DB_SERVER	="localhost";
 	$DB_DATABASE	="zabbix";
 	$DB_USER	="<user>";
-	$DB_PWD		="<password>";
+	$DB_PASSWORD	="<password>";
 
 	$mysql=mysql_pconnect($DB_SERVER,$DB_USER,$DB_PASSWORD);
 	mysql_select_db($DB_DATABASE);
