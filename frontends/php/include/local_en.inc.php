@@ -591,4 +591,5 @@
 	define("S_LOGGED_IN",				"Logged in");
 	define("S_LOGGED_OUT",				"Logged out");
 	define("S_MEDIA_TYPE",				"Media type");
+	define("S_GRAPH_ELEMENT",			"Graph element");
 ?>

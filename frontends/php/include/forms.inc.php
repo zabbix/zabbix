@@ -159,8 +159,6 @@
 			$formula=DBget_field($result,0,22);
 		}
 
-		echo "<br>";
-
 		show_table2_header_begin();
 		echo S_ITEM;
 
@@ -745,8 +743,6 @@
 			$comments="";
 			$url="";
 		}
-		
-		echo "<br>";
 
 		show_table2_header_begin();
 		echo "Trigger configuration";
