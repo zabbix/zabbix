@@ -1,5 +1,7 @@
 Changes for 1.0beta7:
 
+ - improvements for user-defined graphs. Thanks to Mariusz. (Alexei)
+ - improvements for System Maps. Thanks to Mariusz. (Alexei)
  - support for host groups (Alexei)
  - added table hosts_groups (Alexei)
  - added table groups (Alexei)

@@ -1,8 +1,8 @@
-<? 
+<?
 	include "include/config.inc.php";
 
 #	PARAMETERS:
-	
+
 #	sysmapid
 #	noedit
 
@@ -24,14 +24,15 @@
   
 	$red=ImageColorAllocate($im,255,0,0); 
 	$darkred=ImageColorAllocate($im,150,0,0); 
-	$green=ImageColorAllocate($im,0,255,0); 
+	$green=ImageColorAllocate($im,0,255,0);
 	$darkgreen=ImageColorAllocate($im,0,150,0); 
-	$blue=ImageColorAllocate($im,0,0,255); 
-	$yellow=ImageColorAllocate($im,255,255,0); 
-	$cyan=ImageColorAllocate($im,0,255,255); 
+	$blue=ImageColorAllocate($im,0,0,255);
+	$yellow=ImageColorAllocate($im,255,255,0);
+	$darkyellow=ImageColorAllocate($im,150,127,0);
+	$cyan=ImageColorAllocate($im,0,255,255);
 	$white=ImageColorAllocate($im,255,255,255); 
 	$black=ImageColorAllocate($im,0,0,0); 
-	$gray=ImageColorAllocate($im,150,150,150); 
+	$gray=ImageColorAllocate($im,150,150,150);
 
 	$x=imagesx($im); 
 	$y=imagesy($im);
@@ -124,9 +125,12 @@
 			$count=DBget_field($result1,0,0);
 			if($count==1)
 			{
-				$color=$red;
-				$result1=DBselect("select t.description,t.triggerid from items i,functions f,triggers t,hosts h where h.hostid=i.hostid and i.hostid=$hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.value=1 and t.status=0 and h.status in (0,2) and i.status=0");
+				$result1=DBselect("select t.description,t.triggerid, t.priority from items i,functions f,triggers t,hosts h where h.hostid=i.hostid and i.hostid=$hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.value=1 and t.status=0 and h.status in (0,2) and i.status=0");
 				$label=DBget_field($result1,0,0);
+				if (DBget_field($result1,0,2) > 3)
+					$color=$red;
+				else
+					$color=$darkyellow;
 
 				if( strstr($label,"%s"))
 				{
@@ -136,7 +140,7 @@
 			else if($count>1)
 			{
 				$color=$red;
-				$label="Problems";
+				$label=$count." problems";
 			}
 			else
 			{
@@ -151,11 +155,11 @@
 
 #		ImageFilledRectangle($im,$x+ImageSX($img)/2-ImageFontWidth(2)*strlen($label)/2-2, $y+ImageSY($img),$x+ImageSX($img)/2+ImageFontWidth(2)*strlen($label)/2, $y+ImageSY($img)+ImageFontHeight(2),$white);
 #		ImageString($im, 2, $x+ImageSX($img)/2-ImageFontWidth(2)*strlen($label)/2, $y+ImageSY($img)+ImageFontHeight(2), $label,$color);
-#		ImageDestroy($img); 
+#		ImageDestroy($img);
 	}
 
 	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, "http://zabbix.sourceforge.net", $gray);
 
-	ImagePng($im); 
-	ImageDestroy($im); 
+	ImagePng($im);
+	ImageDestroy($im);
 ?>

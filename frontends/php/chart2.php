@@ -1,12 +1,15 @@
-<? 
+<?
 	include "include/config.inc.php";
 
 #	PARAMETERS:
-	
+
 #	graphid
 
 #	period
 #	from
+#	force_miny
+#	force_maxy
+#	refresh
 
 	$start_time=time(NULL);
 
@@ -20,6 +23,10 @@
 		$HTTP_GET_VARS["from"]=0;
 	}
 
+	$refresh=$HTTP_GET_VARS["refresh"];
+	if ( $refresh > 0 )
+		header("Refresh: " . $refresh );
+
 	$result=DBselect("select name,width,height from graphs where graphid=".$HTTP_GET_VARS["graphid"]);
 
 	$name=DBget_field($result,0,0);
@@ -29,11 +36,11 @@
 	$sizeX=$width;
 	$sizeY=$height;
 
-	$nodata=1;	
+	$nodata=1;
 
-//	Header( "Content-type:  text/html"); 
-	Header( "Content-type:  image/png"); 
-	Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
+//	Header( "Content-type:  text/html");
+	Header( "Content-type:  image/png");
+	Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT");
 
 	check_authorisation();
 
@@ -43,20 +50,20 @@
 	$shiftYup=17;
 	$shiftYdown=7+15*DBnum_rows($result2);
 
-	$im = imagecreate($sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10+50); 
-  
-	$red=ImageColorAllocate($im,255,0,0); 
-	$darkred=ImageColorAllocate($im,150,0,0); 
-	$green=ImageColorAllocate($im,0,255,0); 
-	$darkgreen=ImageColorAllocate($im,0,150,0); 
-	$blue=ImageColorAllocate($im,0,0,255); 
-	$darkblue=ImageColorAllocate($im,0,0,150); 
-	$yellow=ImageColorAllocate($im,255,255,0); 
-	$darkyellow=ImageColorAllocate($im,150,150,0); 
-	$cyan=ImageColorAllocate($im,0,255,255); 
-	$black=ImageColorAllocate($im,0,0,0); 
-	$white=ImageColorAllocate($im,255,255,255); 
-	$gray=ImageColorAllocate($im,150,150,150); 
+	$im = imagecreate($sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10+50);
+
+	$red=ImageColorAllocate($im,255,0,0);
+	$darkred=ImageColorAllocate($im,150,0,0);
+	$green=ImageColorAllocate($im,0,255,0);
+	$darkgreen=ImageColorAllocate($im,0,150,0);
+	$blue=ImageColorAllocate($im,0,0,255);
+	$darkblue=ImageColorAllocate($im,0,0,150);
+	$yellow=ImageColorAllocate($im,255,255,0);
+	$darkyellow=ImageColorAllocate($im,150,150,0);
+	$cyan=ImageColorAllocate($im,0,255,255);
+	$black=ImageColorAllocate($im,0,0,0);
+	$white=ImageColorAllocate($im,255,255,255);
+	$gray=ImageColorAllocate($im,150,150,150);
 
 	$colors=array();
 
@@ -72,29 +79,25 @@
 	$colors["Red"]=$red;
 	$colors["Dark Red"]=$darkred;
 
-	$x=imagesx($im); 
+	$x=imagesx($im);
 	$y=imagesy($im);
-  
+
 	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10+50,$white);
 	ImageRectangle($im,0,0,$x-1,$y-1,$black);
+//	ImageRectangle($im,$shiftX+1,$shiftYup,$shiftX+$sizeX,$shiftYup+$sizeY, $black );
+
+	ImageDashedLine($im,$shiftX+1,$shiftYup,$shiftX+1,$sizeY+$shiftYup,$black);
+	ImageDashedLine($im,$shiftX+1,$shiftYup,$shiftX+$sizeX,$shiftYup,$black);
+	ImageDashedLine($im,$shiftX+$sizeX,$shiftYup,$shiftX+$sizeX,$sizeY+$shiftYup,$black);
+	ImageDashedLine($im,$shiftX+1,$shiftYup+$sizeY,$shiftX+$sizeX,$sizeY+$shiftYup,$black);
 
 	if(!check_right("Graph","R",$HTTP_GET_VARS["graphid"]))
 	{
 //		show_table_header("<font color=\"AA0000\">No permissions !</font>");
 //		show_footer();
-		ImagePng($im); 
-		ImageDestroy($im); 
+		ImagePng($im);
+		ImageDestroy($im);
 		exit;
-	}
-
-
-	for($i=0;$i<=$sizeY;$i+=$sizeY/5)
-	{
-		ImageDashedLine($im,$shiftX,$i+$shiftYup,$sizeX+$shiftX,$i+$shiftYup,$gray);
-	}
-	for($i=0;$i<=$sizeX;$i+=$sizeX/24)
-	{
-		ImageDashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
 	}
 
 	$graph=get_graph_by_graphid($HTTP_GET_VARS["graphid"]);
@@ -123,7 +126,7 @@
 		$desc[$item]=DBget_field($result2,$item,1);
 		$color[$item]=DBget_field($result2,$item,2);
 		$host[$item]=DBget_field($result2,$item,3);
-	
+
 		$result=DBselect("select clock,value from history where itemid=$itemid and clock>$from_time and clock<$to_time order by clock");
 		$len[$item]=0;
 		$x[$item]=array();
@@ -143,25 +146,76 @@
 	}
 
 //	echo "MIN/MAX:",$minX," - ",$maxX," - ",$minY," - ",$maxY,"<Br>";
+	if(isset($HTTP_GET_VARS["force_miny"]))
+	{
+		$minY = $HTTP_GET_VARS["force_miny"];
+	}
+	if(isset($HTTP_GET_VARS["force_maxy"]))
+	{
+		$maxY = $HTTP_GET_VARS["force_maxy"];
+	}
+
+	$my_exp = floor(log10($maxY));
+	$my_mant = $maxY/pow(10,$my_exp);
+	if ($my_mant < 1.5 )
+	{
+		$my_mant = 1.5;
+		$my_steps = 5;
+	}
+	elseif($my_mant < 2 )
+	{
+		$my_mant = 2;
+		$my_steps = 4;
+	}
+	elseif($my_mant < 3 )
+	{
+		$my_mant = 3;
+		$my_steps = 6;
+	}
+	elseif($my_mant < 5 )
+	{
+		$my_mant = 5;
+		$my_steps = 5;
+	}
+	elseif($my_mant < 8 )
+	{
+		$my_mant = 8;
+		$my_steps = 4;
+	}
+	else
+	{
+		$my_mant = 10;
+		$my_steps = 5;
+	}
+	$maxY = $my_mant*pow(10,$my_exp);
+	$minY = 0;
 
 //	$result2=DBselect("select itemid from graphs_items where graphid=".$HTTP_GET_VARS["graphid"]);
 	for($item=0;$item<DBnum_rows($result2);$item++)
 	{
 		if(isset($minX)&&isset($minY)&&($minX!=$maxX)&&($minY!=$maxY))
 		{
+			$itemMin = $y[$item][0];
+			$itemMax = $y[$item][0];
+			$itemAvg = $y[$item][0];
 			for($i=0;$i<$len[$item]-1;$i++)
 			{
 				$x1=$sizeX*($x[$item][$i]-$minX)/($maxX-$minX);
 				$y1=$sizeY*($y[$item][$i]-$minY)/($maxY-$minY);
 				$x2=$sizeX*($x[$item][$i+1]-$minX)/($maxX-$minX);
 				$y2=$sizeY*($y[$item][$i+1]-$minY)/($maxY-$minY);
-	
+
 				$y1=$sizeY-$y1;
 				$y2=$sizeY-$y2;
-	
+
 	//		echo $x1," - ",$x2," - ",$y1," - ",$y2,"<Br>";
 				ImageLine($im,$x1+$shiftX,$y1+$shiftYup,$x2+$shiftX,$y2+$shiftYup,$colors[$color[$item]]);
+
+				$itemMin=min($y[$item][$i+1], $itemMin);
+				$itemMax=max($y[$item][$i+1], $itemMax);
+				$itemAvg+=$y[$item][$i+1];
 			}
+			$itemAvg /= $len[$item];
 		}
 		else
 		{
@@ -174,19 +228,65 @@
 #		ImageString($im, 2,$shiftX+200*$item+9,$sizeY+$shiftYup+15, $desc[$item], $gray);
 		ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*$item+45,$shiftX+5,$sizeY+$shiftYup+15+9+15*$item+45,$colors[$color[$item]]);
 		ImageRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*$item+45,$shiftX+5,$sizeY+$shiftYup+15+9+15*$item+45,$black);
-		ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*$item+15+45, $host[$item].": ".$desc[$item], $black);
+		ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*$item+15+45, $host[$item].": ".$desc[$item]." (min:".$itemMin.", avg:".$itemAvg.", max:".$itemMax.")", $black);
 	}
 
+	// grid
+
+//	$startTime=floor(($maxX-$minX)/$sizeX+$minX);
+	$startTime=$minX;
+	if (($maxX-$maxY) < 300)
+		$precTime=10;
+	elseif (($maxX-$maxY) < 3600 )
+		$precTime=60;
+	else
+		$precTime=300;
+
+	if (($maxX-$maxY) < 1200 )
+		$dateForm="H:i:s";
+	else
+		$dateForm="H:i";
+
+
+	$correctTime=$startTime % $precTime;
+	$stepTime=ceil(ceil(($maxX-$minX)/20)/$precTime)*(1.0*$precTime);
+/*	ImageString($im,0,10,10,date("H:i:s",$startTime),$blue);
+	ImageString($im,0,10,22,date("H:i:s",$startTime-$correctTime),$blue);
+	ImageString($im,0,10,34,date("H:i:s",$startTime-$correctTime+$stepTime),$blue);
+*/
+	for($i=1;$i<$my_steps;$i++)
+	{
+		ImageDashedLine($im,$shiftX,$i/$my_steps*$sizeY+$shiftYup,$sizeX+$shiftX,$i/$my_steps*$sizeY+$shiftYup,$gray);
+	}
+
+
+	for($j=$stepTime-$correctTime;$j<=($maxX-$minX);$j+=$stepTime)
+	{
+		ImageDashedLine($im,$shitfX+($sizeX*$j)/($maxX-$minX),$shiftYup,$shitfX+($sizeX*$j)/($maxX-$minX),$sizeY+$shiftYup,$gray);
+	}
+
+/*	for($j=$correctTime;$j<=($maxX-$minX);$j+=($maxX-$minX)/24)
+	{
+		ImageDashedLine($im,$shitfX+$sizeX-$j/($maxX-$minX)*$sizeX,$shiftYup,$shitfX+$sizeX-$j/($maxX-$minX)*$sizeX,$sizeY+$shiftYup,$gray);
+	}
+*/
+	//labels
 	if($nodata == 0)
 	{
-		for($i=0;$i<=$sizeY;$i+=$sizeY/5)
+		for($i=0;$i<=$my_steps;$i++)
 		{
-			ImageString($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftYup, $i*($maxY-$minY)/$sizeY+$minY , $darkred);
+			ImageString($im, 1, $sizeX+5+$shiftX, $i/$my_steps*$sizeY+$shiftYup-4, $maxY-$i/$my_steps*($maxY-$minY) , $darkred);
 		}
-		for($i=0;$i<=$sizeX;$i+=$sizeX/24)
+		for($j=$stepTime-$correctTime;$j<=($maxX-$minX);$j+=$stepTime)
+		{
+			ImageStringUp($im,0,$shitfX+($sizeX*$j)/($maxX-$minX),$shiftYup+$sizeY+43,date($dateForm,$startTime+$j),$black);
+//			ImageDashedLine($im,$shitfX+$sizeX-$j/($maxX-$minX)*$sizeX,$shiftYup,$shitfX+$sizeX-$j/($maxX-$minX)*$sizeX,$sizeY+$shiftYup,$gray);
+		}
+/*		for($i=0;$i<=$sizeX;$i+=$sizeX/24)
 		{
 			ImageStringUp($im,0,$i+$shiftX-3,$shiftYup+$sizeY+53,date("H:i:s",$i*($maxX-$minX)/$sizeX+$minX),$black);
 		}
+*/
 
 //		date("dS of F Y h:i:s A",DBget_field($result,0,0));
 
@@ -204,6 +304,6 @@
 	$end_time=time(NULL);
 	ImageString($im, 0,imagesx($im)-100,imagesy($im)-12,"Generated in ".($end_time-$start_time)." sec", $gray);
 
-	ImagePng($im); 
-	ImageDestroy($im); 
+	ImagePng($im);
+	ImageDestroy($im);
 ?>
