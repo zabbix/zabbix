@@ -934,6 +934,9 @@ int main_housekeeping_loop()
 		setproctitle("connecting to the database");
 #endif
 		DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+
+		DBvacuum();
+
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("housekeeper [removing old values]");
 #endif

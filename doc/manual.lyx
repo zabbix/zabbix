@@ -24,13 +24,13 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.24)
+Zabbix Reference Manual for version 1.0 (draft v1.25)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-30 June 2002
+7 July 2002
 \layout Abstract
 
 The document is Reference Manual for Zabbix version 1.0.
@@ -961,54 +961,23 @@ Zabbix is not tested with MySQL's InnoDB database structure.
 \end_inset 
 
 .
-\layout Standard
-
-If you do use PostgreSQL, performance can be significantly improved by executing
- the VACUUM command on the 
-\series bold 
-Zabbix
-\series default 
- database.
- For more information on the VACUUM command please see 
-\begin_inset LatexCommand \cite{key-2}
-
-\end_inset 
-
-
-\lang english
-.
-\layout Standard
-
-I would suggest execution of VACUUM, at least after the following events
-\layout Itemize
-
-
-\series bold 
-Zabbix
-\series default 
- is installed - 10000 records in table "history" 
-\layout Itemize
-
-patches applied on 
-\series bold 
-Zabbix
-\series default 
- database
-\layout Standard
-
-For heavily loaded 
-\series bold 
-Zabbix
-\series default 
- servers, hourly execution of "VACUUM ANALYZE" for all tables except "history"
- is strongly recommended! You can use the command 
 \newline 
 
-\newline 
+\layout Standard
 
+If you do use PostgreSQL, 
+\series bold 
+zabbix_suckerd
+\series default 
+ will periodically (defined in 
+\emph on 
+HousekeepingFrequency
+\emph default 
+) execute command 
 \family typewriter 
 \emph on 
-echo "vacuum verbose analyze"|psql zabbix
+vacuum analyze.
+
 \family default 
 \emph default 
  
@@ -2684,6 +2653,24 @@ ChangeLog
 \layout Subsubsection
 
 Zabbix 1.0beta4
+\layout Itemize
+
+initial support for service tree
+\layout Itemize
+
+vacuuming is made as part of housekeeping process for PostgreSQL
+\layout Itemize
+
+many improvements for PostgreSQL support
+\layout Itemize
+
+added item which reflects host status (0-normal,2-unreachable)
+\layout Itemize
+
+fixed function apply_actions()
+\layout Itemize
+
+added Next100 and Prev100 for alerts and alarms
 \layout Itemize
 
 check permissions for Availability report
@@ -4540,7 +4527,14 @@ No
 \layout Standard
 
 The parameter defines how often the daemon must perform housekeeping procedure
- (in hours)
+ (in hours).
+ If Postgresql is used, set the value to 24 as it will perform command 
+\family typewriter 
+\emph on 
+VACUUM
+\family default 
+\emph default 
+.
 \end_inset 
 </cell>
 </row>
@@ -10566,6 +10560,10 @@ Many parameters may be changed to get optimal performance ...
 Database Engine
 \layout Itemize
 
+use fastest database engine, i.e.
+ MySQL
+\layout Itemize
+
 use stable release of a database engine
 \layout Itemize
 
@@ -10786,7 +10784,7 @@ Availability Report
 This report calculates amount of time a trigger has been in true and false
  states.
  For example, suppose you want to know what percentage of the time your
- web server is down.\SpecialChar ~
+ web server is down.
 
 \latex default 
  

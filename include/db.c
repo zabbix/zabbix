@@ -567,3 +567,19 @@ int	DBadd_alert(int actionid, char *type, char *sendto, char *subject, char *mes
 
 	return SUCCEED;
 }
+
+void	DBvacuum(void)
+{
+#ifdef	HAVE_PGSQL
+	char	sql[MAX_STRING_LEN+1];
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+	setproctitle("housekeeper [vacuum DB]");
+#endif
+	sprintf(sql,"vacuum analyze");
+	DBexecute(sql);
+#endif
+
+#ifdef	HAVE_MYSQL
+	/* Nothing to do */
+#endif
+}

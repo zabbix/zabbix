@@ -3,7 +3,7 @@
 	$page["file"] = "srv_status.php";
 
 	include "include/config.inc.php";
-	show_header($page["title"],0,0);
+	show_header($page["title"],10,0);
 ?>
  
 <?
@@ -16,7 +16,6 @@
 	echo "<tr>";
 	echo "<td><b>Service</b></td>";
 	echo "<td width=\"10%\"><b>Status</b></td>";
-	echo "<td width=\"20%\"><b>Actions</b></td>";
 	echo "</tr>";
 	echo "\n";
 	$col=0;
@@ -26,7 +25,6 @@
 		$service=get_service_by_serviceid($serviceid);
 		echo "<td><b><a href=\"srv_status.php?serviceid=".$service["serviceid"]."\">".$service["name"]."</a></b></td>";
 		echo "<td>".get_service_status_description($service["status"])."</td>";
-		echo "<td>[Root of the problem]</td>";
 		echo "</tr>"; 
 		$col++;
 	}
@@ -37,6 +35,10 @@
 			continue;
 		}
 		if(isset($serviceid) && service_has_no_this_parent($serviceid,$row["serviceid"]))
+		{
+			continue;
+		}
+		if(isset($row["triggerid"])&&!check_right_on_trigger("R",$row["triggerid"]))
 		{
 			continue;
 		}
@@ -83,7 +85,6 @@
 			}
 		}
 		echo "<td>".get_service_status_description($row["status"])."</td>";
-		echo "<td>[Root of the problem]</td>";
 		echo "</tr>"; 
 	}
 	echo "</table>";
