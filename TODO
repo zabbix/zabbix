@@ -1,6 +1,5 @@
 ZABBIX 1.1:
 
- - RPM for RedHat EL
  - escalation and repeated notifications
  - execution of commands on monitored hosts in case of pre-defined events
  - monitoring of log files
