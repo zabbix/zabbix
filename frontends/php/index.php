@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	$page["title"]="Zabbix main page";
+	$page["title"]="ZABBIX main page";
 	$page["file"]="index.php";
 
 	include "include/config.inc.php";

@@ -430,13 +430,13 @@
 		}
         	if(check_right("Host","U",$row["hostid"]))
 		{
-			if($row["status"] == 0)	
+			if($row["status"] == HOST_STATUS_MONITORED)	
 				$status=array("value"=>"<a class=\"off\" href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=1\">".S_MONITORED."</a>","class"=>"off");
-			else if($row["status"] == 1)
+			else if($row["status"] == HOST_STATUS_NOT_MONITORED)
 				$status=array("value"=>"<a class=\"on\" href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=0\">".S_NOT_MONITORED."</a>","class"=>"on");
-			else if($row["status"] == 2)
-				$status=array("value"=>S_UNREACHABLE,"class"=>"unknown");
-			else if($row["status"] == 3)
+//			else if($row["status"] == 2)
+//				$status=array("value"=>S_UNREACHABLE,"class"=>"unknown");
+			else if($row["status"] == HOST_STATUS_TEMPLATE)
 				$status=array("value"=>S_TEMPLATE,"class"=>"unknown");
 			else if($row["status"] == HOST_STATUS_DELETED)
 				$status=array("value"=>S_DELETED,"class"=>"unknown");
@@ -445,13 +445,13 @@
 		}
 		else
 		{
-			if($row["status"] == 0)	
+			if($row["status"] == HOST_STATUS_MONITORED)	
 				$status=array("value"=>S_MONITORED,"class"=>"off");
-			else if($row["status"] == 1)
+			else if($row["status"] == HOST_STATUS_NOT_MONITORED)
 				$status=array("value"=>S_NOT_MONITORED,"class"=>"on");
-			else if($row["status"] == 2)
-				$status=array("value"=>S_UNREACHABLE,"class"=>"unknown");
-			else if($row["status"] == 3)
+//			else if($row["status"] == 2)
+//				$status=array("value"=>S_UNREACHABLE,"class"=>"unknown");
+			else if($row["status"] == HOST_STATUS_TEMPLATE)
 				$status=array("value"=>S_TEMPLATE,"class"=>"unknown");
 			else if($row["status"] == HOST_STATUS_DELETED)
 				$status=array("value"=>S_DELETED,"class"=>"unknown");
@@ -521,7 +521,7 @@
 	
 	$host=@iif(isset($_GET["host"]),$_GET["host"],"");
 	$port=@iif(isset($_GET["port"]),$_GET["port"],get_profile("HOST_PORT",10050));
-	$status=@iif(isset($_GET["status"]),$_GET["status"],0);
+	$status=@iif(isset($_GET["status"]),$_GET["status"],HOST_STATUS_MONITORED);
 	$useip=@iif(isset($_GET["useip"]),$_GET["useip"],"off");
 	$newgroup=@iif(isset($_GET["newgroup"]),$_GET["newgroup"],"");
 	$ip=@iif(isset($_GET["ip"]),$_GET["ip"],"");
@@ -667,13 +667,13 @@
 	echo S_STATUS;
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"status\" size=\"1\">";
-	if($status==0)
+	if($status==HOST_STATUS_MONITORED)
 	{
 		echo "<option value=\"0\" selected>".S_MONITORED;
 		echo "<option value=\"1\">".S_NOT_MONITORED;
 		echo "<option value=\"3\">".S_TEMPLATE;
 	}
-	else if($status==3)
+	else if($status==HOST_STATUS_TEMPLATE)
 	{
 		echo "<option value=\"0\">".S_MONITORED;
 		echo "<option value=\"1\">".S_NOT_MONITORED;

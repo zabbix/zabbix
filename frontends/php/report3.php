@@ -52,7 +52,7 @@
 
 	show_table_v_delimiter();
 
-	$result=DBselect("select h.hostid,h.host from hosts h,items i where h.status in (0,2) and h.hostid=i.hostid group by h.hostid,h.host order by h.host");
+	$result=DBselect("select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid group by h.hostid,h.host order by h.host");
 
 	$year=date("Y");
 	for($year=date("Y")-2;$year<=date("Y");$year++)
