@@ -1,15 +1,14 @@
 1.0beta14:
 
+ - different colors and line styles for map connectors
+ - start&end time in time navigation
+
  - add zabbix[unixtime] and lastupdate() to get rid of nodata()
  - check return code for alert scripts
  - zabbix_agentd to support processor load, swap[*] and memory[*] onder AIX
  - make possible passing of parameters to user script for UserParameters
  like param[*]
  - make session expiration time configurable in config.php
- - start&end time in time navigation
-
- - different colors and line styles for map connectors
-
  - mess with user groups when running under root
  - support for PREFIX/zabbix/etc (configuration files)
  - trapper item. Source->Alarms do not grow when last status is unknown for
@@ -18,7 +17,6 @@ latest trigger (item type  = TRAPPER)
  status of the trigger could help. 
 
  - cannot use "." as key in trigger expressions
- - time-navigation for graphs
  - preset time for graphs
 
  - finish src/zabbix_snmptrapper
