@@ -55,6 +55,8 @@ TELECENTRS:
 
 OTHER:
 
+'-' doesn't work in trigger expressions (a-b=0)
+
  When editing trigger actions in subject it says something
 for instance "low disk space on {HOSTNAME}'s /usr"
 when submitting form, it dumps mysql error, due to non-
