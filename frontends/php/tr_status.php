@@ -290,7 +290,7 @@
 			if($priority==4) $p4=$count;
 			if($priority==5) $p5=$count;
 		}
-		echo "\n<TABLE BORDER=0 COLS=6 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=0>";
+		echo "\n<TABLE BORDER=0 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=0>";
 		echo "<TR ALIGN=CENTER>";
 		echo "<TD><B>Not classified: $p0</B></TD>";
 		echo "<TD><B>Information: $p1</B></TD>";
@@ -306,7 +306,7 @@
 		show_table_header("<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&fullscreen=1&sort=$sort\">TRIGGERS $time</A>");
 	}
   
-	echo "<TABLE BORDER=0 COLS=5 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TABLE BORDER=0 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 
 	echo "<TR ALIGN=CENTER>";
 	if(isset($HTTP_GET_VARS["fullscreen"]))
