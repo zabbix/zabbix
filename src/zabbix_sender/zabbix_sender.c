@@ -1,3 +1,5 @@
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -6,8 +8,12 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
-#include <signal.h>
+/* OpenBSD*/
+#ifdef HAVE_SYS_SOCKET_H
+	#include <sys/socket.h>
+#endif
 
+#include <signal.h>
 #include <time.h>
 
 #include "common.h"

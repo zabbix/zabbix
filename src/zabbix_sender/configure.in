@@ -11,15 +11,8 @@ AC_CHECK_LIB(mysqlclient, main)
 dnl Checks for header files.
 AC_HEADER_STDC
 
-AC_CHECK_HEADERS(stdio.h)
-AC_CHECK_HEADERS(stdlib.h)
-AC_CHECK_HEADERS(unistd.h)
-AC_CHECK_HEADERS(netdb.h)
-AC_CHECK_HEADERS(signal.h)
-AC_CHECK_HEADERS(time.h)
-AC_CHECK_HEADERS(sys/types.h)
-AC_CHECK_HEADERS(sys/stat.h)
-AC_CHECK_HEADERS(netinet/in.h)
+AC_CHECK_HEADERS(stdio.h stdlib.h unistd.h netdb.h signal.h \
+  time.h sys/types.h sys/stat.h sys/socket.h netinet/in.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_PID_T

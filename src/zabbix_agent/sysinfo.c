@@ -1,10 +1,24 @@
+#include "config.h"
+
 #include <stdio.h>
-#include <mntent.h>
+/* #include <mntent.h> */
 #include <sys/stat.h>
-#include <sys/vfs.h>
+/* Linux */
+#ifdef HAVE_SYS_VFS_H
+	#include <sys/vfs.h>
+#endif
+/* OpenBSD */
+#ifdef HAVE_SYS_PARAM_H
+	#include <sys/param.h>
+#endif
+
+#ifdef HAVE_SYS_MOUNT_H
+	#include <sys/mount.h>
+#endif
+
 #include <string.h>
 
-#include "../include/common.h"
+#include "common.h"
 #include "sysinfo.h"
 
 float   FILESIZE(const char * filename)
@@ -25,7 +39,7 @@ float	INODE(const char * mountPoint)
 	long            blocks_used;
 	long            blocks_percent_used;
 
-	if ( statfs(mountPoint, &s) != 0 ) 
+	if ( statfs( (char *)mountPoint, &s) != 0 ) 
 	{
 		return	FAIL;
 	}
@@ -55,7 +69,7 @@ float	DF(const char * mountPoint)
 	long            blocks_used;
 	long            blocks_percent_used;
 
-	if ( statfs(mountPoint, &s) != 0 )
+	if ( statfs( (char *)mountPoint, &s) != 0 )
 	{
 		return	FAIL;
 	}
