@@ -405,6 +405,7 @@
 	define("S_LINK_DELETED",			"Link deleted");
 	define("S_CANNOT_DELETE_LINK",			"Cannot delete link");
 	define("S_STATUS_CALCULATION",			"Status calculation");
+	define("S_STATUS_CALCULATION_ALGORITHM",	"Status calculation algorithm");
 	define("S_NONE",				"None");
 	define("S_MAX_OF_CHILDS",			"MAX of childs");
 	define("S_MIN_OF_CHILDS",			"MIN of childs");
