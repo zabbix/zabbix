@@ -197,7 +197,7 @@
 		{
 			Header("WWW-authenticate: basic realm=\"Zabbix\"");
 			Header("HTTP/1.0 401 Unauthorized");
-			echo "Try to contact System Administrator to get additional rights :-)\n";
+			echo "Try to contact Zabbix Administrator to get additional rights :-)\n";
 			exit;
 		}
 
@@ -980,9 +980,9 @@
 		$result=DBexecute($sql);
 	}
 
-	function	add_item_to_graph($graphid,$itemid)
+	function	add_item_to_graph($graphid,$itemid,$color)
 	{
-		$sql="insert into graphs_items (graphid,itemid) values ($graphid,$itemid)";
+		$sql="insert into graphs_items (graphid,itemid,color) values ($graphid,$itemid,'$color')";
 		$result=DBexecute($sql);
 	}
 

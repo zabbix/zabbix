@@ -172,12 +172,14 @@ int	evaluate_DIFF(float *diff,int itemid,int parameter)
 
 	if(evaluate_PREV(&prev,itemid,parameter) == FAIL)
 	{
-		return FAIL;
+		*diff=0;
+		return SUCCEED;
 	}
 
 	if(evaluate_LAST(&last,itemid,parameter) == FAIL)
 	{
-		return FAIL;
+		*diff=0;
+		return SUCCEED;
 	}
 	
 	tmp=last-prev;
