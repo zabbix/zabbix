@@ -369,6 +369,10 @@ CREATE TABLE sysmaps_links (
   shostid2		int4		DEFAULT '0' NOT NULL,
 -- may be NULL 
   triggerid		int4,
+  drawtype_off		int4		DEFAULT '0' NOT NULL,
+  color_off		varchar(32)	DEFAULT 'Black' NOT NULL,
+  drawtype_on		int4		DEFAULT '0' NOT NULL,
+  color_on		varchar(32)	DEFAULT 'Dark Red' NOT NULL,
   PRIMARY KEY (linkid),
   FOREIGN KEY (sysmapid) REFERENCES sysmaps,
   FOREIGN KEY (shostid1) REFERENCES sysmaps_hosts,

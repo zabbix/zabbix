@@ -1,5 +1,7 @@
 Changes for 1.0beta13:
 
+ - added columns color_on,color_off,drawtype_on,drawtype_off to table
+ sysmaps_links (Alexei)
  - do not show group having no hosts in Latest Values (Alexei) 
  - better management of host groups (Alexei)
  - added support of macro {HOSTNAME}, removed support of %s (Alexei)
