@@ -14,17 +14,17 @@ Hope this helps.
 
 Not ready yet:
 
- - add template host to DB?
  - get rid of %s in alerts,alarms, etc
  - add MRTG-like graphs
- - network maps. Edit host, add link.
  - HELO can be empty
  - fix division by zero in report2
- - trigger OFF does not work
- - disabled triggers still send emails
+ - trigger OFF does not work. Test on Zabbix.
+ - disabled triggers still send emails. Test on Zabbix.
 
 Changes for 1.0beta5:
 
+ - added frontends/php/chart3.php (Alexei)
+ - small fix for form "Configuration of network map" (Alexei)
  - for host templates, %s can be used in trigger description to be substituted
    with new host name (Alexei)
  - empty result for DBselect is always checked (Alexei)
