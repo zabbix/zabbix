@@ -1,5 +1,6 @@
 Changes for 1.0beta11:
 
+ - add actions when using templates. (Alexei)
  - fixed refresh of status of triggers. (Alexei) 
  - updated RedHat start-up scripts in misc/init.d/redhat. Thanks
  to Charlie. (Alexei)
