@@ -47,299 +47,757 @@ insert into rights (rightid,userid,name,permission,id) values (2,1,'Default perm
 insert into rights (rightid,userid,name,permission,id) values (3,2,'Default permission','R',0);
 
 --
--- Data for table items_template 
+-- Data for table hosts 
 --
 
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (1,'Free memory','memory[free]', 30, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (2,'Free disk space on /','diskfree[/]', 30, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (3,'Free disk space on /tmp','diskfree[/tmp]', 30, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (4,'Free disk space on /usr','diskfree[/usr]', 30, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (5,'Free number of inodes on /','inodefree[/]', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (6,'Free number of inodes on /opt','inodefree[/opt]', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (7,'Free number of inodes on /tmp','inodefree[/tmp]', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (8,'Free number of inodes on /usr','inodefree[/usr]', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (9,'Number of processes','system[proccount]', 30, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (10,'Processor load','system[procload]', 5, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (11,'Processor load5','system[procload5]', 10, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (12,'Processor load15','system[procload15]', 20, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (13,'Number of running processes','system[procrunning]', 30, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (14,'Free swap space (Kb)','swap[free]', 30, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (16,'Size of /var/log/syslog','filesize[/var/log/syslog]', 30, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (17,'Number of users connected','system[users]', 30, 0);
---insert into items_template (itemtemplateid,description,key_,delay,value_type)
---	values (18,'Number of established TCP connections','tcp_count', 30, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (19,'Checksum of /etc/inetd.conf','cksum[/etc/inetd.conf]', 600, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (20,'Checksum of /vmlinuz','cksum[/vmlinuz]', 600, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (21,'Checksum of /etc/passwd','cksum[/etc/passwd]', 600, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (22,'Ping to the server (TCP)','ping', 30, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (23,'Free disk space on /home','diskfree[/home]', 30, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (24,'Free number of inodes on /home','inodefree[/home]', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (25,'Free disk space on /var','diskfree[/var]', 30, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (26,'Free disk space on /opt','diskfree[/opt]', 30, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (27,'Host uptime (in sec)','system[uptime]', 300, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (28,'Total memory (kB)','memory[total]', 1800, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (29,'Shared memory (kB)','memory[shared]', 30, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (30,'Buffers memory (kB)','memory[buffers]', 30, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (31,'Cached memory (kB)','memory[cached]', 30, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (32,'Total swap space (Kb)','swap[total]', 1800, 0);
---insert into items_template (itemtemplateid,description,key_,delay,value_type)
---	values (33,'Amount of memory swapped in from disk (kB/s)','swap[in]', 30, 0);
---insert into items_template (itemtemplateid,description,key_,delay,value_type)
---	values (34,'Amount of memory swapped to disk (kB/s)','swap[out]', 30, 0);
---insert into items_template (itemtemplateid,description,key_,delay,value_type)
---	values (35,'Blocks sent to a block device (blocks/s)','io[in]', 30, 0);
---insert into items_template (itemtemplateid,description,key_,delay,value_type)
---	values (36,'Blocks received from a block device (blocks/s)','io[out]', 30, 0);
---insert into items_template (itemtemplateid,description,key_,delay,value_type)
---	values (37,'The number of interrupts per second, including the clock','system[interrupts]', 30, 0);
---insert into items_template (itemtemplateid,description,key_,delay,value_type)
---	values (38,'The number of context switches per second','system[switches]', 30, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (39,'Email (SMTP) server is running','check_service[smtp]', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (40,'FTP server is running','check_service[ftp]', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (41,'SSH server is running','check_service[ssh]', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (42,'Telnet server is running','net[listen_23]', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (43,'WEB server is running','net[listen_80]', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (44,'POP3 server is running','check_service[pop]', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (45,'IMAP server is running','check_service[imap]', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (46,'Checksum of /usr/sbin/sshd','cksum[/usr/sbin/sshd]', 600, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (47,'Checksum of /usr/bin/ssh','cksum[/usr/bin/ssh]', 600, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (48,'Checksum of /etc/services','cksum[/etc/services]', 600, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (49,'Number of disks read/write operations','io[disk_io]', 30, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (50,'Number of disks read operations','io[disk_rio]', 30, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (51,'Number of disks write operations','io[disk_wio]', 30, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (52,'Number of block read from disks','io[disk_rblk]', 30, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (53,'Number of block written to disks','io[disk_wblk]', 30, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (54,'News (NNTP) server is running','check_service[nntp]', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (55,'Number of running processes inetd','proc_cnt[inetd]', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (56,'Number of running processes apache','proc_cnt[httpd]', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (57,'Number of running processes mysqld','proc_cnt[mysqld]', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (58,'Number of running processes syslogd','proc_cnt[syslogd]', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (59,'Number of running processes sshd','proc_cnt[sshd]', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (60,'Number of running processes zabbix_agentd','proc_cnt[zabbix_agentd]', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (61,'Number of running processes zabbix_suckerd','proc_cnt[zabbix_suckerd]', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay, value_type)
-	values (62,'Number of running processes zabbix_trapperd','proc_cnt[zabbix_trapperd]', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (63,'Maximum number of processes','kern[maxproc]', 1800, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (64,'Maximum number of opened files','kern[maxfiles]', 1800, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (65,'Host name','system[hostname]', 1800, 1);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (66,'Host information','system[uname]', 1800, 1);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (67,'Version of zabbix_agent(d) running','version[zabbix_agent]', 1800, 1);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (68,'WEB (HTTP) server is running','check_service[http]', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (69,'Host status','status', 60, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (70,'Total number of inodes on /','inodetotal[/]', 3600, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (71,'Total number of inodes on /opt','inodetotal[/opt]', 3600, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (72,'Total number of inodes on /tmp','inodetotal[/tmp]', 3600, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (73,'Total number of inodes on /usr','inodetotal[/usr]', 3600, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (74,'Total number of inodes on /home','inodetotal[/home]', 3600, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (75,'Total disk space on /','disktotal[/]', 3600, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (76,'Total disk space on /opt','disktotal[/opt]', 3600, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (77,'Total disk space on /tmp','disktotal[/tmp]', 3600, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (78,'Total disk space on /usr','disktotal[/usr]', 3600, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (79,'Total disk space on /home','disktotal[/home]', 3600, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (80,'Average number of bytes received on interface lo (1min)','netloadin1[lo]', 5, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (81,'Average number of bytes received on interface lo (5min)','netloadin5[lo]', 10, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (82,'Average number of bytes received on interface lo (15min)','netloadin15[lo]', 20, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (83,'Average number of bytes received on interface eth0 (1min)','netloadin1[eth0]', 5, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (84,'Average number of bytes received on interface eth0 (5min)','netloadin5[eth0]', 10, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (85,'Average number of bytes received on interface eth0 (15min)','netloadin15[eth0]', 20, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (86,'Average number of bytes received on interface eth1 (1min)','netloadin1[eth1]', 5, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (87,'Average number of bytes received on interface eth1 (5min)','netloadin5[eth1]', 10, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (88,'Average number of bytes received on interface eth1 (15min)','netloadin15[eth1]', 20, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (89,'Average number of bytes sent from interface lo (1min)','netloadout1[lo]', 5, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (90,'Average number of bytes sent from interface lo (5min)','netloadout5[lo]', 10, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (91,'Average number of bytes sent from interface lo (15min)','netloadout15[lo]', 20, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (92,'Average number of bytes sent from interface eth0 (1min)','netloadout1[eth0]', 5, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (93,'Average number of bytes sent from interface eth0 (5min)','netloadout5[eth0]', 10, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (94,'Average number of bytes sent from interface eth0 (15min)','netloadout15[eth0]', 20, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (95,'Average number of bytes sent from interface eth1 (1min)','netloadout1[eth1]', 5, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (96,'Average number of bytes sent from interface eth1 (5min)','netloadout5[eth1]', 10, 0);
-insert into items_template (itemtemplateid,description,key_,delay,value_type)
-	values (97,'Average number of bytes sent from interface eth1 (15min)','netloadout15[eth1]', 20, 0);
+INSERT INTO hosts VALUES (1,'TEMPLATE_UNIX_ZABBIX_AGENT',0,'',10000,3,0,0);
+INSERT INTO hosts VALUES (2,'TEMPLATE_W32_ZABBIX_AGENT',0,'',10000,3,0,0);
+INSERT INTO hosts VALUES (3,'TEMPLATE_W32_NO_ZABBIX_AGENT',0,'',10000,3,0,0);
+INSERT INTO hosts VALUES (4,'TEMPLATE_UNIX_NO_ZABBIX_AGENT',0,'',10000,3,0,0);
 
 --
--- Data for table triggers_template
+-- Data for table items
 --
 
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (1,1,'Lack of free memory on server %s','{:.last(0)}<10000');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (2,2,'Low free disk space on %s\'s volume /','{:.last(0)}<10000');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (3,3,'Low free disk space on %s\'s volume /tmp','{:.last(0)}<10000');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (4,4,'Low free disk space on %s\'s volume /usr','{:.last(0)}<10000');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (5,5,'Low number of free inodes on %s\'s volume /','{:.last(0)}<10000');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (6,6,'Low number of free inodes on %s\'s volume /opt','{:.last(0)}<10000');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (7,7,'Low number of free inodes on %s\'s volume /tmp','{:.last(0)}<10000');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (8,8,'Low number of free inodes on %s\'s volume /usr','{:.last(0)}<10000');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (9,9,'Too many processes on %s','{:.last(0)}>300');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (10,10,'Processor load is too high on %s','{:.last(0)}>5');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (13,13,'Too many processes running on %s','{:.last(0)}>10');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (14,14,'Lack of free swap space on %s','{:.last(0)}<100000');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (17,17,'Too may users connected on server %s','{:.last(0)}>50');
---insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
---	values (18,18,'Too may established TCP connections on server %s','{:.last(0)}>500');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (19,19,'/etc/inetd.conf has been changed on server %s','{:.diff(0)}>0');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (20,20,'/vmlinuz has been changed on server %s','{:.diff(0)}>0');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (21,21,'/passwd has been changed on server %s','{:.diff(0)}>0');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (23,23,'Low free disk space on %s\'s volume /home','{:.last(0)}<10000');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (24,24,'Low number of free inodes on %s\' volume /home','{:.last(0)}<10000');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (25,25,'Low free disk space on %s\'s volume /var','{:.last(0)}<10000');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (26,26,'Low free disk space on %s\'s volume /opt','{:.last(0)}<10000');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (27,27,'%s has just been restarted','{:.last(0)}<600');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (39,39,'Email (SMTP) server is down on %s','{:.last(0)}<1');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (40,40,'FTP server is down on %s','{:.last(0)}<1');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (41,41,'SSH server is down on %s','{:.last(0)}<1');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (42,42,'Telnet server is down on %s','{:.last(0)}<1');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (43,43,'WEB server is down on %s','{:.last(0)}<1');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (44,44,'POP3 server is down on %s','{:.last(0)}<1');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (45,45,'IMAP server is down on %s','{:.last(0)}<1');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (46,46,'/usr/sbin/sshd has been changed on server %s','{:.diff(0)}>0');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (47,47,'/usr/bin/ssh has been changed on server %s','{:.diff(0)}>0');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (48,48,'/etc/services has been changed on server %s','{:.diff(0)}>0');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (54,54,'News (NNTP) server is down on %s','{:.last(0)}<1');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (55,55,'Inetd is not running on %s','{:.last(0)}<1');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (56,56,'Apache is not running on %s','{:.last(0)}<1');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (57,57,'Mysql is not running on %s','{:.last(0)}<1');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (58,58,'Syslogd is not running on %s','{:.last(0)}<1');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (59,59,'Sshd is not running on %s','{:.last(0)}<1');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (60,60,'Zabbix_agentd is not running on %s','{:.last(0)}<1');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (61,61,'Zabbix_suckerd is not running on %s','{:.last(0)}<1');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (62,62,'Zabbix_trapperd is not running on %s','{:.last(0)}<1');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (63,63,'Configured max number of processes is too low on %s','{:.last(0)}<256');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (64,64,'Configured max number of opened files is too low on %s','{:.last(0)}<512');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (65,65,'Hostname was changed on %s','{:.diff(0)}>0');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (66,66,'Host information was changed on %s','{:.diff(0)}>0');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (67,67,'Version of zabbix_agent(d) was changed on %s','{:.diff(0)}>0');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (68,68,'WEB (HTTP) server is down on %s','{:.last(0)}<1');
-insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (69,69,'Server %s is unreachable','{:.last(0)}=2');
+INSERT INTO items VALUES (1,0,'','',1,'Free memory','memory[free]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (2,0,'','',1,'Free disk space on /','diskfree[/]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (3,0,'','',1,'Free disk space on /tmp','diskfree[/tmp]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (4,0,'','',1,'Free disk space on /usr','diskfree[/usr]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (5,0,'','',1,'Free number of inodes on /','inodefree[/]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (6,0,'','',1,'Free number of inodes on /opt','inodefree[/opt]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (7,0,'','',1,'Free number of inodes on /tmp','inodefree[/tmp]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (8,0,'','',1,'Free number of inodes on /usr','inodefree[/usr]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (9,0,'','',1,'Number of processes','system[proccount]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (10,0,'','',1,'Processor load','system[procload]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (11,0,'','',1,'Processor load5','system[procload5]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (12,0,'','',1,'Processor load15','system[procload15]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (13,0,'','',1,'Number of running processes','system[procrunning]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (14,0,'','',1,'Free swap space (Kb)','swap[free]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (15,0,'','',1,'Size of /var/log/syslog','filesize[/var/log/syslog]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (16,0,'','',1,'Number of users connected','system[users]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (17,0,'','',1,'Checksum of /etc/inetd.conf','cksum[/etc/inetd.conf]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (18,0,'','',1,'Checksum of /vmlinuz','cksum[/vmlinuz]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (19,0,'','',1,'Checksum of /etc/passwd','cksum[/etc/passwd]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (20,0,'','',1,'Ping to the server (TCP)','ping',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (21,0,'','',1,'Free disk space on /home','diskfree[/home]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (22,0,'','',1,'Free number of inodes on /home','inodefree[/home]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (23,0,'','',1,'Free disk space on /var','diskfree[/var]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (24,0,'','',1,'Free disk space on /opt','diskfree[/opt]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (25,0,'','',1,'Host uptime (in sec)','system[uptime]',300,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (26,0,'','',1,'Total memory (kB)','memory[total]',1800,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (27,0,'','',1,'Shared memory (kB)','memory[shared]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (28,0,'','',1,'Buffers memory (kB)','memory[buffers]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (29,0,'','',1,'Cached memory (kB)','memory[cached]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (30,0,'','',1,'Total swap space (Kb)','swap[total]',1800,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (31,0,'','',1,'Email (SMTP) server is running','check_service[smtp]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (32,0,'','',1,'FTP server is running','check_service[ftp]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (33,0,'','',1,'SSH server is running','check_service[ssh]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (34,0,'','',1,'Telnet server is running','net[listen_23]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (35,0,'','',1,'WEB server is running','net[listen_80]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (36,0,'','',1,'POP3 server is running','check_service[pop]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (37,0,'','',1,'IMAP server is running','check_service[imap]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (38,0,'','',1,'Checksum of /usr/sbin/sshd','cksum[/usr/sbin/sshd]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (39,0,'','',1,'Checksum of /usr/bin/ssh','cksum[/usr/bin/ssh]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (40,0,'','',1,'Checksum of /etc/services','cksum[/etc/services]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (41,0,'','',1,'Number of disks read/write operations','io[disk_io]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (42,0,'','',1,'Number of disks read operations','io[disk_rio]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (43,0,'','',1,'Number of disks write operations','io[disk_wio]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (44,0,'','',1,'Number of block read from disks','io[disk_rblk]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (45,0,'','',1,'Number of block written to disks','io[disk_wblk]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (46,0,'','',1,'News (NNTP) server is running','check_service[nntp]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (47,0,'','',1,'Number of running processes inetd','proc_cnt[inetd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (48,0,'','',1,'Number of running processes apache','proc_cnt[httpd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (49,0,'','',1,'Number of running processes mysqld','proc_cnt[mysqld]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (50,0,'','',1,'Number of running processes syslogd','proc_cnt[syslogd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (51,0,'','',1,'Number of running processes sshd','proc_cnt[sshd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (52,0,'','',1,'Number of running processes zabbix_agentd','proc_cnt[zabbix_agentd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (53,0,'','',1,'Number of running processes zabbix_suckerd','proc_cnt[zabbix_suckerd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (54,0,'','',1,'Number of running processes zabbix_trapperd','proc_cnt[zabbix_trapperd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (55,0,'','',1,'Maximum number of processes','kern[maxproc]',1800,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (56,0,'','',1,'Maximum number of opened files','kern[maxfiles]',1800,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (57,0,'','',1,'Host name','system[hostname]',1800,30,0,0,NULL,NULL,NULL,0,1,'');
+INSERT INTO items VALUES (58,0,'','',1,'Host information','system[uname]',1800,30,0,0,NULL,NULL,NULL,0,1,'');
+INSERT INTO items VALUES (59,0,'','',1,'Version of zabbix_agent(d) running','version[zabbix_agent]',1800,30,0,0,NULL,NULL,NULL,0,1,'');
+INSERT INTO items VALUES (60,0,'','',1,'WEB (HTTP) server is running','check_service[http]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (61,0,'','',1,'Host status','status',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (62,0,'','',1,'Total number of inodes on /','inodetotal[/]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (63,0,'','',1,'Total number of inodes on /opt','inodetotal[/opt]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (64,0,'','',1,'Total number of inodes on /tmp','inodetotal[/tmp]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (65,0,'','',1,'Total number of inodes on /usr','inodetotal[/usr]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (66,0,'','',1,'Total number of inodes on /home','inodetotal[/home]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (67,0,'','',1,'Total disk space on /','disktotal[/]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (68,0,'','',1,'Total disk space on /opt','disktotal[/opt]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (69,0,'','',1,'Total disk space on /tmp','disktotal[/tmp]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (70,0,'','',1,'Total disk space on /usr','disktotal[/usr]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (71,0,'','',1,'Total disk space on /home','disktotal[/home]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (72,0,'','',1,'Average number of bytes received on interface lo (1min)','netloadin1[lo]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (73,0,'','',1,'Average number of bytes received on interface lo (5min)','netloadin5[lo]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (74,0,'','',1,'Average number of bytes received on interface lo (15min)','netloadin15[lo]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (75,0,'','',1,'Average number of bytes received on interface eth0 (1min)','netloadin1[eth0]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (76,0,'','',1,'Average number of bytes received on interface eth0 (5min)','netloadin5[eth0]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (77,0,'','',1,'Average number of bytes received on interface eth0 (15min)','netloadin15[eth0]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (78,0,'','',1,'Average number of bytes received on interface eth1 (1min)','netloadin1[eth1]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (79,0,'','',1,'Average number of bytes received on interface eth1 (5min)','netloadin5[eth1]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (80,0,'','',1,'Average number of bytes received on interface eth1 (15min)','netloadin15[eth1]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (81,0,'','',1,'Average number of bytes sent from interface lo (1min)','netloadout1[lo]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (82,0,'','',1,'Average number of bytes sent from interface lo (5min)','netloadout5[lo]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (83,0,'','',1,'Average number of bytes sent from interface lo (15min)','netloadout15[lo]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (84,0,'','',1,'Average number of bytes sent from interface eth0 (1min)','netloadout1[eth0]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (85,0,'','',1,'Average number of bytes sent from interface eth0 (5min)','netloadout5[eth0]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (86,0,'','',1,'Average number of bytes sent from interface eth0 (15min)','netloadout15[eth0]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (87,0,'','',1,'Average number of bytes sent from interface eth1 (1min)','netloadout1[eth1]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (88,0,'','',1,'Average number of bytes sent from interface eth1 (5min)','netloadout5[eth1]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (89,0,'','',1,'Average number of bytes sent from interface eth1 (15min)','netloadout15[eth1]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (90,0,'','',2,'Free memory','memory[free]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (91,0,'','',2,'Free disk space on /','diskfree[/]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (92,0,'','',2,'Free disk space on /tmp','diskfree[/tmp]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (93,0,'','',2,'Free disk space on /usr','diskfree[/usr]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (94,0,'','',2,'Free number of inodes on /','inodefree[/]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (95,0,'','',2,'Free number of inodes on /opt','inodefree[/opt]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (96,0,'','',2,'Free number of inodes on /tmp','inodefree[/tmp]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (97,0,'','',2,'Free number of inodes on /usr','inodefree[/usr]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (98,0,'','',2,'Number of processes','system[proccount]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (99,0,'','',2,'Processor load','system[procload]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (100,0,'','',2,'Processor load5','system[procload5]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (101,0,'','',2,'Processor load15','system[procload15]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (102,0,'','',2,'Number of running processes','system[procrunning]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (103,0,'','',2,'Free swap space (Kb)','swap[free]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (104,0,'','',2,'Size of /var/log/syslog','filesize[/var/log/syslog]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (105,0,'','',2,'Number of users connected','system[users]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (106,0,'','',2,'Checksum of /etc/inetd.conf','cksum[/etc/inetd.conf]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (107,0,'','',2,'Checksum of /vmlinuz','cksum[/vmlinuz]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (108,0,'','',2,'Checksum of /etc/passwd','cksum[/etc/passwd]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (109,0,'','',2,'Ping to the server (TCP)','ping',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (110,0,'','',2,'Free disk space on /home','diskfree[/home]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (111,0,'','',2,'Free number of inodes on /home','inodefree[/home]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (112,0,'','',2,'Free disk space on /var','diskfree[/var]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (113,0,'','',2,'Free disk space on /opt','diskfree[/opt]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (114,0,'','',2,'Host uptime (in sec)','system[uptime]',300,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (115,0,'','',2,'Total memory (kB)','memory[total]',1800,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (116,0,'','',2,'Shared memory (kB)','memory[shared]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (117,0,'','',2,'Buffers memory (kB)','memory[buffers]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (118,0,'','',2,'Cached memory (kB)','memory[cached]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (119,0,'','',2,'Total swap space (Kb)','swap[total]',1800,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (120,0,'','',2,'Email (SMTP) server is running','check_service[smtp]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (121,0,'','',2,'FTP server is running','check_service[ftp]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (122,0,'','',2,'SSH server is running','check_service[ssh]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (123,0,'','',2,'Telnet server is running','net[listen_23]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (124,0,'','',2,'WEB server is running','net[listen_80]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (125,0,'','',2,'POP3 server is running','check_service[pop]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (126,0,'','',2,'IMAP server is running','check_service[imap]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (127,0,'','',2,'Checksum of /usr/sbin/sshd','cksum[/usr/sbin/sshd]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (128,0,'','',2,'Checksum of /usr/bin/ssh','cksum[/usr/bin/ssh]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (129,0,'','',2,'Checksum of /etc/services','cksum[/etc/services]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (130,0,'','',2,'Number of disks read/write operations','io[disk_io]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (131,0,'','',2,'Number of disks read operations','io[disk_rio]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (132,0,'','',2,'Number of disks write operations','io[disk_wio]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (133,0,'','',2,'Number of block read from disks','io[disk_rblk]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (134,0,'','',2,'Number of block written to disks','io[disk_wblk]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (135,0,'','',2,'News (NNTP) server is running','check_service[nntp]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (136,0,'','',2,'Number of running processes inetd','proc_cnt[inetd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (137,0,'','',2,'Number of running processes apache','proc_cnt[httpd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (138,0,'','',2,'Number of running processes mysqld','proc_cnt[mysqld]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (139,0,'','',2,'Number of running processes syslogd','proc_cnt[syslogd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (140,0,'','',2,'Number of running processes sshd','proc_cnt[sshd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (141,0,'','',2,'Number of running processes zabbix_agentd','proc_cnt[zabbix_agentd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (142,0,'','',2,'Number of running processes zabbix_suckerd','proc_cnt[zabbix_suckerd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (143,0,'','',2,'Number of running processes zabbix_trapperd','proc_cnt[zabbix_trapperd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (144,0,'','',2,'Maximum number of processes','kern[maxproc]',1800,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (145,0,'','',2,'Maximum number of opened files','kern[maxfiles]',1800,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (146,0,'','',2,'Host name','system[hostname]',1800,30,0,0,NULL,NULL,NULL,0,1,'');
+INSERT INTO items VALUES (147,0,'','',2,'Host information','system[uname]',1800,30,0,0,NULL,NULL,NULL,0,1,'');
+INSERT INTO items VALUES (148,0,'','',2,'Version of zabbix_agent(d) running','version[zabbix_agent]',1800,30,0,0,NULL,NULL,NULL,0,1,'');
+INSERT INTO items VALUES (149,0,'','',2,'WEB (HTTP) server is running','check_service[http]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (150,0,'','',2,'Host status','status',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (151,0,'','',2,'Total number of inodes on /','inodetotal[/]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (152,0,'','',2,'Total number of inodes on /opt','inodetotal[/opt]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (153,0,'','',2,'Total number of inodes on /tmp','inodetotal[/tmp]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (154,0,'','',2,'Total number of inodes on /usr','inodetotal[/usr]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (155,0,'','',2,'Total number of inodes on /home','inodetotal[/home]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (156,0,'','',2,'Total disk space on /','disktotal[/]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (157,0,'','',2,'Total disk space on /opt','disktotal[/opt]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (158,0,'','',2,'Total disk space on /tmp','disktotal[/tmp]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (159,0,'','',2,'Total disk space on /usr','disktotal[/usr]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (160,0,'','',2,'Total disk space on /home','disktotal[/home]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (161,0,'','',2,'Average number of bytes received on interface lo (1min)','netloadin1[lo]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (162,0,'','',2,'Average number of bytes received on interface lo (5min)','netloadin5[lo]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (163,0,'','',2,'Average number of bytes received on interface lo (15min)','netloadin15[lo]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (164,0,'','',2,'Average number of bytes received on interface eth0 (1min)','netloadin1[eth0]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (165,0,'','',2,'Average number of bytes received on interface eth0 (5min)','netloadin5[eth0]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (166,0,'','',2,'Average number of bytes received on interface eth0 (15min)','netloadin15[eth0]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (167,0,'','',2,'Average number of bytes received on interface eth1 (1min)','netloadin1[eth1]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (168,0,'','',2,'Average number of bytes received on interface eth1 (5min)','netloadin5[eth1]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (169,0,'','',2,'Average number of bytes received on interface eth1 (15min)','netloadin15[eth1]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (170,0,'','',2,'Average number of bytes sent from interface lo (1min)','netloadout1[lo]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (171,0,'','',2,'Average number of bytes sent from interface lo (5min)','netloadout5[lo]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (172,0,'','',2,'Average number of bytes sent from interface lo (15min)','netloadout15[lo]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (173,0,'','',2,'Average number of bytes sent from interface eth0 (1min)','netloadout1[eth0]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (174,0,'','',2,'Average number of bytes sent from interface eth0 (5min)','netloadout5[eth0]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (175,0,'','',2,'Average number of bytes sent from interface eth0 (15min)','netloadout15[eth0]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (176,0,'','',2,'Average number of bytes sent from interface eth1 (1min)','netloadout1[eth1]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (177,0,'','',2,'Average number of bytes sent from interface eth1 (5min)','netloadout5[eth1]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (178,0,'','',2,'Average number of bytes sent from interface eth1 (15min)','netloadout15[eth1]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (179,0,'','',3,'Free memory','memory[free]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (180,0,'','',3,'Free disk space on /','diskfree[/]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (181,0,'','',3,'Free disk space on /tmp','diskfree[/tmp]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (182,0,'','',3,'Free disk space on /usr','diskfree[/usr]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (183,0,'','',3,'Free number of inodes on /','inodefree[/]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (184,0,'','',3,'Free number of inodes on /opt','inodefree[/opt]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (185,0,'','',3,'Free number of inodes on /tmp','inodefree[/tmp]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (186,0,'','',3,'Free number of inodes on /usr','inodefree[/usr]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (187,0,'','',3,'Number of processes','system[proccount]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (188,0,'','',3,'Processor load','system[procload]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (189,0,'','',3,'Processor load5','system[procload5]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (190,0,'','',3,'Processor load15','system[procload15]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (191,0,'','',3,'Number of running processes','system[procrunning]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (192,0,'','',3,'Free swap space (Kb)','swap[free]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (193,0,'','',3,'Size of /var/log/syslog','filesize[/var/log/syslog]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (194,0,'','',3,'Number of users connected','system[users]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (195,0,'','',3,'Checksum of /etc/inetd.conf','cksum[/etc/inetd.conf]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (196,0,'','',3,'Checksum of /vmlinuz','cksum[/vmlinuz]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (197,0,'','',3,'Checksum of /etc/passwd','cksum[/etc/passwd]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (198,0,'','',3,'Ping to the server (TCP)','ping',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (199,0,'','',3,'Free disk space on /home','diskfree[/home]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (200,0,'','',3,'Free number of inodes on /home','inodefree[/home]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (201,0,'','',3,'Free disk space on /var','diskfree[/var]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (202,0,'','',3,'Free disk space on /opt','diskfree[/opt]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (203,0,'','',3,'Host uptime (in sec)','system[uptime]',300,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (204,0,'','',3,'Total memory (kB)','memory[total]',1800,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (205,0,'','',3,'Shared memory (kB)','memory[shared]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (206,0,'','',3,'Buffers memory (kB)','memory[buffers]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (207,0,'','',3,'Cached memory (kB)','memory[cached]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (208,0,'','',3,'Total swap space (Kb)','swap[total]',1800,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (209,0,'','',3,'Email (SMTP) server is running','check_service[smtp]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (210,0,'','',3,'FTP server is running','check_service[ftp]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (211,0,'','',3,'SSH server is running','check_service[ssh]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (212,0,'','',3,'Telnet server is running','net[listen_23]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (213,0,'','',3,'WEB server is running','net[listen_80]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (214,0,'','',3,'POP3 server is running','check_service[pop]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (215,0,'','',3,'IMAP server is running','check_service[imap]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (216,0,'','',3,'Checksum of /usr/sbin/sshd','cksum[/usr/sbin/sshd]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (217,0,'','',3,'Checksum of /usr/bin/ssh','cksum[/usr/bin/ssh]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (218,0,'','',3,'Checksum of /etc/services','cksum[/etc/services]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (219,0,'','',3,'Number of disks read/write operations','io[disk_io]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (220,0,'','',3,'Number of disks read operations','io[disk_rio]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (221,0,'','',3,'Number of disks write operations','io[disk_wio]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (222,0,'','',3,'Number of block read from disks','io[disk_rblk]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (223,0,'','',3,'Number of block written to disks','io[disk_wblk]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (224,0,'','',3,'News (NNTP) server is running','check_service[nntp]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (225,0,'','',3,'Number of running processes inetd','proc_cnt[inetd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (226,0,'','',3,'Number of running processes apache','proc_cnt[httpd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (227,0,'','',3,'Number of running processes mysqld','proc_cnt[mysqld]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (228,0,'','',3,'Number of running processes syslogd','proc_cnt[syslogd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (229,0,'','',3,'Number of running processes sshd','proc_cnt[sshd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (230,0,'','',3,'Number of running processes zabbix_agentd','proc_cnt[zabbix_agentd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (231,0,'','',3,'Number of running processes zabbix_suckerd','proc_cnt[zabbix_suckerd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (232,0,'','',3,'Number of running processes zabbix_trapperd','proc_cnt[zabbix_trapperd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (233,0,'','',3,'Maximum number of processes','kern[maxproc]',1800,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (234,0,'','',3,'Maximum number of opened files','kern[maxfiles]',1800,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (235,0,'','',3,'Host name','system[hostname]',1800,30,0,0,NULL,NULL,NULL,0,1,'');
+INSERT INTO items VALUES (236,0,'','',3,'Host information','system[uname]',1800,30,0,0,NULL,NULL,NULL,0,1,'');
+INSERT INTO items VALUES (237,0,'','',3,'Version of zabbix_agent(d) running','version[zabbix_agent]',1800,30,0,0,NULL,NULL,NULL,0,1,'');
+INSERT INTO items VALUES (238,0,'','',3,'WEB (HTTP) server is running','check_service[http]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (239,0,'','',3,'Host status','status',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (240,0,'','',3,'Total number of inodes on /','inodetotal[/]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (241,0,'','',3,'Total number of inodes on /opt','inodetotal[/opt]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (242,0,'','',3,'Total number of inodes on /tmp','inodetotal[/tmp]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (243,0,'','',3,'Total number of inodes on /usr','inodetotal[/usr]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (244,0,'','',3,'Total number of inodes on /home','inodetotal[/home]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (245,0,'','',3,'Total disk space on /','disktotal[/]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (246,0,'','',3,'Total disk space on /opt','disktotal[/opt]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (247,0,'','',3,'Total disk space on /tmp','disktotal[/tmp]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (248,0,'','',3,'Total disk space on /usr','disktotal[/usr]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (249,0,'','',3,'Total disk space on /home','disktotal[/home]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (250,0,'','',3,'Average number of bytes received on interface lo (1min)','netloadin1[lo]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (251,0,'','',3,'Average number of bytes received on interface lo (5min)','netloadin5[lo]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (252,0,'','',3,'Average number of bytes received on interface lo (15min)','netloadin15[lo]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (253,0,'','',3,'Average number of bytes received on interface eth0 (1min)','netloadin1[eth0]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (254,0,'','',3,'Average number of bytes received on interface eth0 (5min)','netloadin5[eth0]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (255,0,'','',3,'Average number of bytes received on interface eth0 (15min)','netloadin15[eth0]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (256,0,'','',3,'Average number of bytes received on interface eth1 (1min)','netloadin1[eth1]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (257,0,'','',3,'Average number of bytes received on interface eth1 (5min)','netloadin5[eth1]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (258,0,'','',3,'Average number of bytes received on interface eth1 (15min)','netloadin15[eth1]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (259,0,'','',3,'Average number of bytes sent from interface lo (1min)','netloadout1[lo]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (260,0,'','',3,'Average number of bytes sent from interface lo (5min)','netloadout5[lo]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (261,0,'','',3,'Average number of bytes sent from interface lo (15min)','netloadout15[lo]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (262,0,'','',3,'Average number of bytes sent from interface eth0 (1min)','netloadout1[eth0]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (263,0,'','',3,'Average number of bytes sent from interface eth0 (5min)','netloadout5[eth0]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (264,0,'','',3,'Average number of bytes sent from interface eth0 (15min)','netloadout15[eth0]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (265,0,'','',3,'Average number of bytes sent from interface eth1 (1min)','netloadout1[eth1]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (266,0,'','',3,'Average number of bytes sent from interface eth1 (5min)','netloadout5[eth1]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (267,0,'','',3,'Average number of bytes sent from interface eth1 (15min)','netloadout15[eth1]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (268,0,'','',4,'Free memory','memory[free]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (269,0,'','',4,'Free disk space on /','diskfree[/]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (270,0,'','',4,'Free disk space on /tmp','diskfree[/tmp]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (271,0,'','',4,'Free disk space on /usr','diskfree[/usr]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (272,0,'','',4,'Free number of inodes on /','inodefree[/]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (273,0,'','',4,'Free number of inodes on /opt','inodefree[/opt]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (274,0,'','',4,'Free number of inodes on /tmp','inodefree[/tmp]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (275,0,'','',4,'Free number of inodes on /usr','inodefree[/usr]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (276,0,'','',4,'Number of processes','system[proccount]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (277,0,'','',4,'Processor load','system[procload]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (278,0,'','',4,'Processor load5','system[procload5]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (279,0,'','',4,'Processor load15','system[procload15]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (280,0,'','',4,'Number of running processes','system[procrunning]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (281,0,'','',4,'Free swap space (Kb)','swap[free]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (282,0,'','',4,'Size of /var/log/syslog','filesize[/var/log/syslog]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (283,0,'','',4,'Number of users connected','system[users]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (284,0,'','',4,'Checksum of /etc/inetd.conf','cksum[/etc/inetd.conf]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (285,0,'','',4,'Checksum of /vmlinuz','cksum[/vmlinuz]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (286,0,'','',4,'Checksum of /etc/passwd','cksum[/etc/passwd]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (287,0,'','',4,'Ping to the server (TCP)','ping',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (288,0,'','',4,'Free disk space on /home','diskfree[/home]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (289,0,'','',4,'Free number of inodes on /home','inodefree[/home]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (290,0,'','',4,'Free disk space on /var','diskfree[/var]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (291,0,'','',4,'Free disk space on /opt','diskfree[/opt]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (292,0,'','',4,'Host uptime (in sec)','system[uptime]',300,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (293,0,'','',4,'Total memory (kB)','memory[total]',1800,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (294,0,'','',4,'Shared memory (kB)','memory[shared]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (295,0,'','',4,'Buffers memory (kB)','memory[buffers]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (296,0,'','',4,'Cached memory (kB)','memory[cached]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (297,0,'','',4,'Total swap space (Kb)','swap[total]',1800,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (298,0,'','',4,'Email (SMTP) server is running','check_service[smtp]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (299,0,'','',4,'FTP server is running','check_service[ftp]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (300,0,'','',4,'SSH server is running','check_service[ssh]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (301,0,'','',4,'Telnet server is running','net[listen_23]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (302,0,'','',4,'WEB server is running','net[listen_80]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (303,0,'','',4,'POP3 server is running','check_service[pop]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (304,0,'','',4,'IMAP server is running','check_service[imap]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (305,0,'','',4,'Checksum of /usr/sbin/sshd','cksum[/usr/sbin/sshd]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (306,0,'','',4,'Checksum of /usr/bin/ssh','cksum[/usr/bin/ssh]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (307,0,'','',4,'Checksum of /etc/services','cksum[/etc/services]',600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (308,0,'','',4,'Number of disks read/write operations','io[disk_io]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (309,0,'','',4,'Number of disks read operations','io[disk_rio]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (310,0,'','',4,'Number of disks write operations','io[disk_wio]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (311,0,'','',4,'Number of block read from disks','io[disk_rblk]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (312,0,'','',4,'Number of block written to disks','io[disk_wblk]',30,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (313,0,'','',4,'News (NNTP) server is running','check_service[nntp]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (314,0,'','',4,'Number of running processes inetd','proc_cnt[inetd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (315,0,'','',4,'Number of running processes apache','proc_cnt[httpd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (316,0,'','',4,'Number of running processes mysqld','proc_cnt[mysqld]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (317,0,'','',4,'Number of running processes syslogd','proc_cnt[syslogd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (318,0,'','',4,'Number of running processes sshd','proc_cnt[sshd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (319,0,'','',4,'Number of running processes zabbix_agentd','proc_cnt[zabbix_agentd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (320,0,'','',4,'Number of running processes zabbix_suckerd','proc_cnt[zabbix_suckerd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (321,0,'','',4,'Number of running processes zabbix_trapperd','proc_cnt[zabbix_trapperd]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (322,0,'','',4,'Maximum number of processes','kern[maxproc]',1800,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (323,0,'','',4,'Maximum number of opened files','kern[maxfiles]',1800,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (324,0,'','',4,'Host name','system[hostname]',1800,30,0,0,NULL,NULL,NULL,0,1,'');
+INSERT INTO items VALUES (325,0,'','',4,'Host information','system[uname]',1800,30,0,0,NULL,NULL,NULL,0,1,'');
+INSERT INTO items VALUES (326,0,'','',4,'Version of zabbix_agent(d) running','version[zabbix_agent]',1800,30,0,0,NULL,NULL,NULL,0,1,'');
+INSERT INTO items VALUES (327,0,'','',4,'WEB (HTTP) server is running','check_service[http]',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (328,0,'','',4,'Host status','status',60,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (329,0,'','',4,'Total number of inodes on /','inodetotal[/]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (330,0,'','',4,'Total number of inodes on /opt','inodetotal[/opt]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (331,0,'','',4,'Total number of inodes on /tmp','inodetotal[/tmp]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (332,0,'','',4,'Total number of inodes on /usr','inodetotal[/usr]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (333,0,'','',4,'Total number of inodes on /home','inodetotal[/home]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (334,0,'','',4,'Total disk space on /','disktotal[/]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (335,0,'','',4,'Total disk space on /opt','disktotal[/opt]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (336,0,'','',4,'Total disk space on /tmp','disktotal[/tmp]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (337,0,'','',4,'Total disk space on /usr','disktotal[/usr]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (338,0,'','',4,'Total disk space on /home','disktotal[/home]',3600,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (339,0,'','',4,'Average number of bytes received on interface lo (1min)','netloadin1[lo]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (340,0,'','',4,'Average number of bytes received on interface lo (5min)','netloadin5[lo]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (341,0,'','',4,'Average number of bytes received on interface lo (15min)','netloadin15[lo]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (342,0,'','',4,'Average number of bytes received on interface eth0 (1min)','netloadin1[eth0]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (343,0,'','',4,'Average number of bytes received on interface eth0 (5min)','netloadin5[eth0]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (344,0,'','',4,'Average number of bytes received on interface eth0 (15min)','netloadin15[eth0]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (345,0,'','',4,'Average number of bytes received on interface eth1 (1min)','netloadin1[eth1]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (346,0,'','',4,'Average number of bytes received on interface eth1 (5min)','netloadin5[eth1]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (347,0,'','',4,'Average number of bytes received on interface eth1 (15min)','netloadin15[eth1]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (348,0,'','',4,'Average number of bytes sent from interface lo (1min)','netloadout1[lo]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (349,0,'','',4,'Average number of bytes sent from interface lo (5min)','netloadout5[lo]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (350,0,'','',4,'Average number of bytes sent from interface lo (15min)','netloadout15[lo]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (351,0,'','',4,'Average number of bytes sent from interface eth0 (1min)','netloadout1[eth0]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (352,0,'','',4,'Average number of bytes sent from interface eth0 (5min)','netloadout5[eth0]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (353,0,'','',4,'Average number of bytes sent from interface eth0 (15min)','netloadout15[eth0]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (354,0,'','',4,'Average number of bytes sent from interface eth1 (1min)','netloadout1[eth1]',5,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (355,0,'','',4,'Average number of bytes sent from interface eth1 (5min)','netloadout5[eth1]',10,30,0,0,NULL,NULL,NULL,0,0,'');
+INSERT INTO items VALUES (356,0,'','',4,'Average number of bytes sent from interface eth1 (15min)','netloadout15[eth1]',20,30,0,0,NULL,NULL,NULL,0,0,'');
+
+--
+-- Data for table triggers
+--
+
+INSERT INTO triggers VALUES (1,'{1}<10000','Lack of free memory on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (2,'{2}<10000','Low free disk space on %s\'s volume /','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (3,'{3}<10000','Low free disk space on %s\'s volume /tmp','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (4,'{4}<10000','Low free disk space on %s\'s volume /usr','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (5,'{5}<10000','Low number of free inodes on %s\'s volume /','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (6,'{6}<10000','Low number of free inodes on %s\'s volume /opt','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (7,'{7}<10000','Low number of free inodes on %s\'s volume /tmp','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (8,'{8}<10000','Low number of free inodes on %s\'s volume /usr','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (9,'{9}>300','Too many processes on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (10,'{10}>5','Processor load is too high on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (11,'{11}>10','Too many processes running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (12,'{12}<100000','Lack of free swap space on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (13,'{13}>50','Too may users connected on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (14,'{14}>0','/etc/inetd.conf has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (15,'{15}>0','/vmlinuz has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (16,'{16}>0','/passwd has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (17,'{17}<10000','Low free disk space on %s\'s volume /home','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (18,'{18}<10000','Low number of free inodes on %s\' volume /home','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (19,'{19}<10000','Low free disk space on %s\'s volume /var','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (20,'{20}<10000','Low free disk space on %s\'s volume /opt','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (21,'{21}<600','%s has just been restarted','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (22,'{22}<1','Email (SMTP) server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (23,'{23}<1','FTP server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (24,'{24}<1','SSH server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (25,'{25}<1','Telnet server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (26,'{26}<1','WEB server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (27,'{27}<1','POP3 server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (28,'{28}<1','IMAP server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (29,'{29}>0','/usr/sbin/sshd has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (30,'{30}>0','/usr/bin/ssh has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (31,'{31}>0','/etc/services has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (32,'{32}<1','News (NNTP) server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (33,'{33}<1','Inetd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (34,'{34}<1','Apache is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (35,'{35}<1','Mysql is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (36,'{36}<1','Syslogd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (37,'{37}<1','Sshd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (38,'{38}<1','Zabbix_agentd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (39,'{39}<1','Zabbix_suckerd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (40,'{40}<1','Zabbix_trapperd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (41,'{41}<256','Configured max number of processes is too low on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (42,'{42}<512','Configured max number of opened files is too low on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (43,'{43}>0','Hostname was changed on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (44,'{44}>0','Host information was changed on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (45,'{45}>0','Version of zabbix_agent(d) was changed on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (46,'{46}<1','WEB (HTTP) server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (47,'{47}=2','Server %s is unreachable','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (48,'{48}<10000','Lack of free memory on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (49,'{49}<10000','Low free disk space on %s\'s volume /','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (50,'{50}<10000','Low free disk space on %s\'s volume /tmp','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (51,'{51}<10000','Low free disk space on %s\'s volume /usr','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (52,'{52}<10000','Low number of free inodes on %s\'s volume /','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (53,'{53}<10000','Low number of free inodes on %s\'s volume /opt','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (54,'{54}<10000','Low number of free inodes on %s\'s volume /tmp','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (55,'{55}<10000','Low number of free inodes on %s\'s volume /usr','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (56,'{56}>300','Too many processes on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (57,'{57}>5','Processor load is too high on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (58,'{58}>10','Too many processes running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (59,'{59}<100000','Lack of free swap space on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (60,'{60}>50','Too may users connected on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (61,'{61}>0','/etc/inetd.conf has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (62,'{62}>0','/vmlinuz has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (63,'{63}>0','/passwd has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (64,'{64}<10000','Low free disk space on %s\'s volume /home','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (65,'{65}<10000','Low number of free inodes on %s\' volume /home','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (66,'{66}<10000','Low free disk space on %s\'s volume /var','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (67,'{67}<10000','Low free disk space on %s\'s volume /opt','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (68,'{68}<600','%s has just been restarted','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (69,'{69}<1','Email (SMTP) server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (70,'{70}<1','FTP server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (71,'{71}<1','SSH server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (72,'{72}<1','Telnet server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (73,'{73}<1','WEB server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (74,'{74}<1','POP3 server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (75,'{75}<1','IMAP server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (76,'{76}>0','/usr/sbin/sshd has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (77,'{77}>0','/usr/bin/ssh has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (78,'{78}>0','/etc/services has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (79,'{79}<1','News (NNTP) server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (80,'{80}<1','Inetd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (81,'{81}<1','Apache is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (82,'{82}<1','Mysql is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (83,'{83}<1','Syslogd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (84,'{84}<1','Sshd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (85,'{85}<1','Zabbix_agentd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (86,'{86}<1','Zabbix_suckerd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (87,'{87}<1','Zabbix_trapperd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (88,'{88}<256','Configured max number of processes is too low on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (89,'{89}<512','Configured max number of opened files is too low on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (90,'{90}>0','Hostname was changed on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (91,'{91}>0','Host information was changed on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (92,'{92}>0','Version of zabbix_agent(d) was changed on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (93,'{93}<1','WEB (HTTP) server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (94,'{94}=2','Server %s is unreachable','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (95,'{95}<10000','Lack of free memory on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (96,'{96}<10000','Low free disk space on %s\'s volume /','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (97,'{97}<10000','Low free disk space on %s\'s volume /tmp','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (98,'{98}<10000','Low free disk space on %s\'s volume /usr','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (99,'{99}<10000','Low number of free inodes on %s\'s volume /','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (100,'{100}<10000','Low number of free inodes on %s\'s volume /opt','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (101,'{101}<10000','Low number of free inodes on %s\'s volume /tmp','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (102,'{102}<10000','Low number of free inodes on %s\'s volume /usr','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (103,'{103}>300','Too many processes on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (104,'{104}>5','Processor load is too high on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (105,'{105}>10','Too many processes running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (106,'{106}<100000','Lack of free swap space on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (107,'{107}>50','Too may users connected on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (108,'{108}>0','/etc/inetd.conf has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (109,'{109}>0','/vmlinuz has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (110,'{110}>0','/passwd has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (111,'{111}<10000','Low free disk space on %s\'s volume /home','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (112,'{112}<10000','Low number of free inodes on %s\' volume /home','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (113,'{113}<10000','Low free disk space on %s\'s volume /var','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (114,'{114}<10000','Low free disk space on %s\'s volume /opt','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (115,'{115}<600','%s has just been restarted','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (116,'{116}<1','Email (SMTP) server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (117,'{117}<1','FTP server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (118,'{118}<1','SSH server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (119,'{119}<1','Telnet server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (120,'{120}<1','WEB server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (121,'{121}<1','POP3 server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (122,'{122}<1','IMAP server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (123,'{123}>0','/usr/sbin/sshd has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (124,'{124}>0','/usr/bin/ssh has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (125,'{125}>0','/etc/services has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (126,'{126}<1','News (NNTP) server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (127,'{127}<1','Inetd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (128,'{128}<1','Apache is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (129,'{129}<1','Mysql is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (130,'{130}<1','Syslogd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (131,'{131}<1','Sshd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (132,'{132}<1','Zabbix_agentd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (133,'{133}<1','Zabbix_suckerd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (134,'{134}<1','Zabbix_trapperd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (135,'{135}<256','Configured max number of processes is too low on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (136,'{136}<512','Configured max number of opened files is too low on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (137,'{137}>0','Hostname was changed on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (138,'{138}>0','Host information was changed on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (139,'{139}>0','Version of zabbix_agent(d) was changed on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (140,'{140}<1','WEB (HTTP) server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (141,'{141}=2','Server %s is unreachable','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (142,'{142}<10000','Lack of free memory on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (143,'{143}<10000','Low free disk space on %s\'s volume /','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (144,'{144}<10000','Low free disk space on %s\'s volume /tmp','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (145,'{145}<10000','Low free disk space on %s\'s volume /usr','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (146,'{146}<10000','Low number of free inodes on %s\'s volume /','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (147,'{147}<10000','Low number of free inodes on %s\'s volume /opt','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (148,'{148}<10000','Low number of free inodes on %s\'s volume /tmp','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (149,'{149}<10000','Low number of free inodes on %s\'s volume /usr','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (150,'{150}>300','Too many processes on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (151,'{151}>5','Processor load is too high on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (152,'{152}>10','Too many processes running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (153,'{153}<100000','Lack of free swap space on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (154,'{154}>50','Too may users connected on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (155,'{155}>0','/etc/inetd.conf has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (156,'{156}>0','/vmlinuz has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (157,'{157}>0','/passwd has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (158,'{158}<10000','Low free disk space on %s\'s volume /home','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (159,'{159}<10000','Low number of free inodes on %s\' volume /home','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (160,'{160}<10000','Low free disk space on %s\'s volume /var','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (161,'{161}<10000','Low free disk space on %s\'s volume /opt','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (162,'{162}<600','%s has just been restarted','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (163,'{163}<1','Email (SMTP) server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (164,'{164}<1','FTP server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (165,'{165}<1','SSH server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (166,'{166}<1','Telnet server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (167,'{167}<1','WEB server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (168,'{168}<1','POP3 server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (169,'{169}<1','IMAP server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (170,'{170}>0','/usr/sbin/sshd has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (171,'{171}>0','/usr/bin/ssh has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (172,'{172}>0','/etc/services has been changed on server %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (173,'{173}<1','News (NNTP) server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (174,'{174}<1','Inetd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (175,'{175}<1','Apache is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (176,'{176}<1','Mysql is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (177,'{177}<1','Syslogd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (178,'{178}<1','Sshd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (179,'{179}<1','Zabbix_agentd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (180,'{180}<1','Zabbix_suckerd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (181,'{181}<1','Zabbix_trapperd is not running on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (182,'{182}<256','Configured max number of processes is too low on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (183,'{183}<512','Configured max number of opened files is too low on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (184,'{184}>0','Hostname was changed on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (185,'{185}>0','Host information was changed on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (186,'{186}>0','Version of zabbix_agent(d) was changed on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (187,'{187}<1','WEB (HTTP) server is down on %s','',0,2,0,0,0,'');
+INSERT INTO triggers VALUES (188,'{188}=2','Server %s is unreachable','',0,2,0,0,0,'');
+
+--
+-- Data for table functions
+--
+
+INSERT INTO functions VALUES (1,1,1,NULL,'last','0');
+INSERT INTO functions VALUES (2,2,2,NULL,'last','0');
+INSERT INTO functions VALUES (3,3,3,NULL,'last','0');
+INSERT INTO functions VALUES (4,4,4,NULL,'last','0');
+INSERT INTO functions VALUES (5,5,5,NULL,'last','0');
+INSERT INTO functions VALUES (6,6,6,NULL,'last','0');
+INSERT INTO functions VALUES (7,7,7,NULL,'last','0');
+INSERT INTO functions VALUES (8,8,8,NULL,'last','0');
+INSERT INTO functions VALUES (9,9,9,NULL,'last','0');
+INSERT INTO functions VALUES (10,10,10,NULL,'last','0');
+INSERT INTO functions VALUES (11,13,11,NULL,'last','0');
+INSERT INTO functions VALUES (12,14,12,NULL,'last','0');
+INSERT INTO functions VALUES (13,16,13,NULL,'last','0');
+INSERT INTO functions VALUES (14,17,14,NULL,'diff','0');
+INSERT INTO functions VALUES (15,18,15,NULL,'diff','0');
+INSERT INTO functions VALUES (16,19,16,NULL,'diff','0');
+INSERT INTO functions VALUES (17,21,17,NULL,'last','0');
+INSERT INTO functions VALUES (18,22,18,NULL,'last','0');
+INSERT INTO functions VALUES (19,23,19,NULL,'last','0');
+INSERT INTO functions VALUES (20,24,20,NULL,'last','0');
+INSERT INTO functions VALUES (21,25,21,NULL,'last','0');
+INSERT INTO functions VALUES (22,31,22,NULL,'last','0');
+INSERT INTO functions VALUES (23,32,23,NULL,'last','0');
+INSERT INTO functions VALUES (24,33,24,NULL,'last','0');
+INSERT INTO functions VALUES (25,34,25,NULL,'last','0');
+INSERT INTO functions VALUES (26,35,26,NULL,'last','0');
+INSERT INTO functions VALUES (27,36,27,NULL,'last','0');
+INSERT INTO functions VALUES (28,37,28,NULL,'last','0');
+INSERT INTO functions VALUES (29,38,29,NULL,'diff','0');
+INSERT INTO functions VALUES (30,39,30,NULL,'diff','0');
+INSERT INTO functions VALUES (31,40,31,NULL,'diff','0');
+INSERT INTO functions VALUES (32,46,32,NULL,'last','0');
+INSERT INTO functions VALUES (33,47,33,NULL,'last','0');
+INSERT INTO functions VALUES (34,48,34,NULL,'last','0');
+INSERT INTO functions VALUES (35,49,35,NULL,'last','0');
+INSERT INTO functions VALUES (36,50,36,NULL,'last','0');
+INSERT INTO functions VALUES (37,51,37,NULL,'last','0');
+INSERT INTO functions VALUES (38,52,38,NULL,'last','0');
+INSERT INTO functions VALUES (39,53,39,NULL,'last','0');
+INSERT INTO functions VALUES (40,54,40,NULL,'last','0');
+INSERT INTO functions VALUES (41,55,41,NULL,'last','0');
+INSERT INTO functions VALUES (42,56,42,NULL,'last','0');
+INSERT INTO functions VALUES (43,57,43,NULL,'diff','0');
+INSERT INTO functions VALUES (44,58,44,NULL,'diff','0');
+INSERT INTO functions VALUES (45,59,45,NULL,'diff','0');
+INSERT INTO functions VALUES (46,60,46,NULL,'last','0');
+INSERT INTO functions VALUES (47,61,47,NULL,'last','0');
+INSERT INTO functions VALUES (48,90,48,NULL,'last','0');
+INSERT INTO functions VALUES (49,91,49,NULL,'last','0');
+INSERT INTO functions VALUES (50,92,50,NULL,'last','0');
+INSERT INTO functions VALUES (51,93,51,NULL,'last','0');
+INSERT INTO functions VALUES (52,94,52,NULL,'last','0');
+INSERT INTO functions VALUES (53,95,53,NULL,'last','0');
+INSERT INTO functions VALUES (54,96,54,NULL,'last','0');
+INSERT INTO functions VALUES (55,97,55,NULL,'last','0');
+INSERT INTO functions VALUES (56,98,56,NULL,'last','0');
+INSERT INTO functions VALUES (57,99,57,NULL,'last','0');
+INSERT INTO functions VALUES (58,102,58,NULL,'last','0');
+INSERT INTO functions VALUES (59,103,59,NULL,'last','0');
+INSERT INTO functions VALUES (60,105,60,NULL,'last','0');
+INSERT INTO functions VALUES (61,106,61,NULL,'diff','0');
+INSERT INTO functions VALUES (62,107,62,NULL,'diff','0');
+INSERT INTO functions VALUES (63,108,63,NULL,'diff','0');
+INSERT INTO functions VALUES (64,110,64,NULL,'last','0');
+INSERT INTO functions VALUES (65,111,65,NULL,'last','0');
+INSERT INTO functions VALUES (66,112,66,NULL,'last','0');
+INSERT INTO functions VALUES (67,113,67,NULL,'last','0');
+INSERT INTO functions VALUES (68,114,68,NULL,'last','0');
+INSERT INTO functions VALUES (69,120,69,NULL,'last','0');
+INSERT INTO functions VALUES (70,121,70,NULL,'last','0');
+INSERT INTO functions VALUES (71,122,71,NULL,'last','0');
+INSERT INTO functions VALUES (72,123,72,NULL,'last','0');
+INSERT INTO functions VALUES (73,124,73,NULL,'last','0');
+INSERT INTO functions VALUES (74,125,74,NULL,'last','0');
+INSERT INTO functions VALUES (75,126,75,NULL,'last','0');
+INSERT INTO functions VALUES (76,127,76,NULL,'diff','0');
+INSERT INTO functions VALUES (77,128,77,NULL,'diff','0');
+INSERT INTO functions VALUES (78,129,78,NULL,'diff','0');
+INSERT INTO functions VALUES (79,135,79,NULL,'last','0');
+INSERT INTO functions VALUES (80,136,80,NULL,'last','0');
+INSERT INTO functions VALUES (81,137,81,NULL,'last','0');
+INSERT INTO functions VALUES (82,138,82,NULL,'last','0');
+INSERT INTO functions VALUES (83,139,83,NULL,'last','0');
+INSERT INTO functions VALUES (84,140,84,NULL,'last','0');
+INSERT INTO functions VALUES (85,141,85,NULL,'last','0');
+INSERT INTO functions VALUES (86,142,86,NULL,'last','0');
+INSERT INTO functions VALUES (87,143,87,NULL,'last','0');
+INSERT INTO functions VALUES (88,144,88,NULL,'last','0');
+INSERT INTO functions VALUES (89,145,89,NULL,'last','0');
+INSERT INTO functions VALUES (90,146,90,NULL,'diff','0');
+INSERT INTO functions VALUES (91,147,91,NULL,'diff','0');
+INSERT INTO functions VALUES (92,148,92,NULL,'diff','0');
+INSERT INTO functions VALUES (93,149,93,NULL,'last','0');
+INSERT INTO functions VALUES (94,150,94,NULL,'last','0');
+INSERT INTO functions VALUES (95,179,95,NULL,'last','0');
+INSERT INTO functions VALUES (96,180,96,NULL,'last','0');
+INSERT INTO functions VALUES (97,181,97,NULL,'last','0');
+INSERT INTO functions VALUES (98,182,98,NULL,'last','0');
+INSERT INTO functions VALUES (99,183,99,NULL,'last','0');
+INSERT INTO functions VALUES (100,184,100,NULL,'last','0');
+INSERT INTO functions VALUES (101,185,101,NULL,'last','0');
+INSERT INTO functions VALUES (102,186,102,NULL,'last','0');
+INSERT INTO functions VALUES (103,187,103,NULL,'last','0');
+INSERT INTO functions VALUES (104,188,104,NULL,'last','0');
+INSERT INTO functions VALUES (105,191,105,NULL,'last','0');
+INSERT INTO functions VALUES (106,192,106,NULL,'last','0');
+INSERT INTO functions VALUES (107,194,107,NULL,'last','0');
+INSERT INTO functions VALUES (108,195,108,NULL,'diff','0');
+INSERT INTO functions VALUES (109,196,109,NULL,'diff','0');
+INSERT INTO functions VALUES (110,197,110,NULL,'diff','0');
+INSERT INTO functions VALUES (111,199,111,NULL,'last','0');
+INSERT INTO functions VALUES (112,200,112,NULL,'last','0');
+INSERT INTO functions VALUES (113,201,113,NULL,'last','0');
+INSERT INTO functions VALUES (114,202,114,NULL,'last','0');
+INSERT INTO functions VALUES (115,203,115,NULL,'last','0');
+INSERT INTO functions VALUES (116,209,116,NULL,'last','0');
+INSERT INTO functions VALUES (117,210,117,NULL,'last','0');
+INSERT INTO functions VALUES (118,211,118,NULL,'last','0');
+INSERT INTO functions VALUES (119,212,119,NULL,'last','0');
+INSERT INTO functions VALUES (120,213,120,NULL,'last','0');
+INSERT INTO functions VALUES (121,214,121,NULL,'last','0');
+INSERT INTO functions VALUES (122,215,122,NULL,'last','0');
+INSERT INTO functions VALUES (123,216,123,NULL,'diff','0');
+INSERT INTO functions VALUES (124,217,124,NULL,'diff','0');
+INSERT INTO functions VALUES (125,218,125,NULL,'diff','0');
+INSERT INTO functions VALUES (126,224,126,NULL,'last','0');
+INSERT INTO functions VALUES (127,225,127,NULL,'last','0');
+INSERT INTO functions VALUES (128,226,128,NULL,'last','0');
+INSERT INTO functions VALUES (129,227,129,NULL,'last','0');
+INSERT INTO functions VALUES (130,228,130,NULL,'last','0');
+INSERT INTO functions VALUES (131,229,131,NULL,'last','0');
+INSERT INTO functions VALUES (132,230,132,NULL,'last','0');
+INSERT INTO functions VALUES (133,231,133,NULL,'last','0');
+INSERT INTO functions VALUES (134,232,134,NULL,'last','0');
+INSERT INTO functions VALUES (135,233,135,NULL,'last','0');
+INSERT INTO functions VALUES (136,234,136,NULL,'last','0');
+INSERT INTO functions VALUES (137,235,137,NULL,'diff','0');
+INSERT INTO functions VALUES (138,236,138,NULL,'diff','0');
+INSERT INTO functions VALUES (139,237,139,NULL,'diff','0');
+INSERT INTO functions VALUES (140,238,140,NULL,'last','0');
+INSERT INTO functions VALUES (141,239,141,NULL,'last','0');
+INSERT INTO functions VALUES (142,268,142,NULL,'last','0');
+INSERT INTO functions VALUES (143,269,143,NULL,'last','0');
+INSERT INTO functions VALUES (144,270,144,NULL,'last','0');
+INSERT INTO functions VALUES (145,271,145,NULL,'last','0');
+INSERT INTO functions VALUES (146,272,146,NULL,'last','0');
+INSERT INTO functions VALUES (147,273,147,NULL,'last','0');
+INSERT INTO functions VALUES (148,274,148,NULL,'last','0');
+INSERT INTO functions VALUES (149,275,149,NULL,'last','0');
+INSERT INTO functions VALUES (150,276,150,NULL,'last','0');
+INSERT INTO functions VALUES (151,277,151,NULL,'last','0');
+INSERT INTO functions VALUES (152,280,152,NULL,'last','0');
+INSERT INTO functions VALUES (153,281,153,NULL,'last','0');
+INSERT INTO functions VALUES (154,283,154,NULL,'last','0');
+INSERT INTO functions VALUES (155,284,155,NULL,'diff','0');
+INSERT INTO functions VALUES (156,285,156,NULL,'diff','0');
+INSERT INTO functions VALUES (157,286,157,NULL,'diff','0');
+INSERT INTO functions VALUES (158,288,158,NULL,'last','0');
+INSERT INTO functions VALUES (159,289,159,NULL,'last','0');
+INSERT INTO functions VALUES (160,290,160,NULL,'last','0');
+INSERT INTO functions VALUES (161,291,161,NULL,'last','0');
+INSERT INTO functions VALUES (162,292,162,NULL,'last','0');
+INSERT INTO functions VALUES (163,298,163,NULL,'last','0');
+INSERT INTO functions VALUES (164,299,164,NULL,'last','0');
+INSERT INTO functions VALUES (165,300,165,NULL,'last','0');
+INSERT INTO functions VALUES (166,301,166,NULL,'last','0');
+INSERT INTO functions VALUES (167,302,167,NULL,'last','0');
+INSERT INTO functions VALUES (168,303,168,NULL,'last','0');
+INSERT INTO functions VALUES (169,304,169,NULL,'last','0');
+INSERT INTO functions VALUES (170,305,170,NULL,'diff','0');
+INSERT INTO functions VALUES (171,306,171,NULL,'diff','0');
+INSERT INTO functions VALUES (172,307,172,NULL,'diff','0');
+INSERT INTO functions VALUES (173,313,173,NULL,'last','0');
+INSERT INTO functions VALUES (174,314,174,NULL,'last','0');
+INSERT INTO functions VALUES (175,315,175,NULL,'last','0');
+INSERT INTO functions VALUES (176,316,176,NULL,'last','0');
+INSERT INTO functions VALUES (177,317,177,NULL,'last','0');
+INSERT INTO functions VALUES (178,318,178,NULL,'last','0');
+INSERT INTO functions VALUES (179,319,179,NULL,'last','0');
+INSERT INTO functions VALUES (180,320,180,NULL,'last','0');
+INSERT INTO functions VALUES (181,321,181,NULL,'last','0');
+INSERT INTO functions VALUES (182,322,182,NULL,'last','0');
+INSERT INTO functions VALUES (183,323,183,NULL,'last','0');
+INSERT INTO functions VALUES (184,324,184,NULL,'diff','0');
+INSERT INTO functions VALUES (185,325,185,NULL,'diff','0');
+INSERT INTO functions VALUES (186,326,186,NULL,'diff','0');
+INSERT INTO functions VALUES (187,327,187,NULL,'last','0');
+INSERT INTO functions VALUES (188,328,188,NULL,'last','0');
