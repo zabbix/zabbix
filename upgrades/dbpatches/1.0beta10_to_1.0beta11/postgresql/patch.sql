@@ -31,4 +31,4 @@ insert into usrgrp (usrgrpid, name) values (NULL, 'Head of IT department');
 insert into usrgrp (usrgrpid, name) values (NULL, 'Zabbix administrators');  
 
 alter table items add delta int1  DEFAULT '0' NOT NULL;
-alter table items add prevorgvalue float8  DEFAULT '0.0';
+alter table items add prevorgvalue float8  DEFAULT NULL;
