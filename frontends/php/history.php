@@ -77,7 +77,7 @@
 	}
 	else
 	{
-		echo "<A HREF='latest.php?hostid=".$HTTP_GET_VARS["hostid"]."'>$host</A> : $description";
+		echo "<A HREF='latest.php?hostid=$hostid'>$host</A> : $description";
 	}
 	show_table_v_delimiter();
 	echo("<DIV ALIGN=CENTER>");
@@ -167,7 +167,7 @@
 		$till=time(NULL)-$HTTP_GET_VARS["from"]*3600;
 		$hours=$HTTP_GET_VARS["period"]/3600;
 
-		show_table_header("Showing history of $period seconds($hours h)<BR>[from: ".date("Y.M.d H:i:s",$time)."] [till: ".date("Y.M.d H:i:s",$till)."]");
+		show_table_header("Showing history of ".$HTTP_GET_VARS["period"]." seconds($hours h)<BR>[from: ".date("Y.M.d H:i:s",$time)."] [till: ".date("Y.M.d H:i:s",$till)."]");
 
 		echo "<TABLE BORDER=0 COLS=2 ALIGN=CENTER WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 		echo "<TR>";
