@@ -15,7 +15,7 @@
 
 #define	AGENTD_FORKS	5
 
-#define	TRAPPERD_FORKS	10
+#define	TRAPPERD_FORKS	5
 
 #define	SUCKER_FORKS	11
 #define	SUCKER_DELAY	60
