@@ -1,15 +1,15 @@
-1.1alpha7:
+1.1alpha8:
 
- - Develop hard-linked templates
+ - multi threading (better paralellism)
+ - finish hard-linked templates
+ - escalations and repeated notifications
 
 ZABBIX 1.1:
 
- - escalation and repeated notifications
  - execution of commands on monitored hosts in case of pre-defined events
  - monitoring of log files
  - audit log
  - anvanced SNMP trapper
- - hard-linked templates
  - more supported parameters under FreeBSD, HP-UX and Solaris (cpu times, network stats)
 
  - disk stats under Linux 2.6.x
