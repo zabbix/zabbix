@@ -498,7 +498,7 @@ float	PROCLOAD(void)
 		return dyn.psd_avg_1_min;
 	}
 #else
-	return	FAIL;
+	return	getPROC("/proc/loadavg",1,1);
 #endif
 #endif
 }
@@ -529,7 +529,7 @@ float	PROCLOAD5(void)
 		return dyn.psd_avg_5_min;
 	}
 #else
-	return	FAIL;
+	return	getPROC("/proc/loadavg",1,2);
 #endif
 #endif
 }
@@ -560,7 +560,7 @@ float	PROCLOAD15(void)
 		return dyn.psd_avg_5_min;
 	}
 #else
-	return	FAIL;
+	return	getPROC("/proc/loadavg",1,3);
 #endif
 #endif
 }
