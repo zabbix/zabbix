@@ -1932,8 +1932,27 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$id = $usrgrpid;
 		}
 
-		$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message,scope,severity,recipient) values ($triggerid,$id,$good,$delay,0,'$subject','$message',$scope,$severity,$recipient)";
-		return	DBexecute($sql);
+		if($scope==2)
+		{
+			$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message,scope,severity,recipient) values (0,$id,$good,$delay,0,'*Automatically generated*','*Automatically generated*',$scope,$severity,$recipient)";
+			return	DBexecute($sql);
+		}
+		elseif($scope==1)
+		{
+			$sql="select h.hostid from triggers t,hosts h,functions f,items i where f.triggerid=t.triggerid and t.hostid=h.hostid and h.hostid=i.itemid and i.itemid=f.itemid and t.triggerid=$triggerid";
+			$result=DBselect($sql);
+			while($row=DBfetch($result))
+			{
+				$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message,scope,severity,recipient) values (".$row["hostid"].",$id,$good,$delay,0,'*Automatically generated*','*Automatically generated*',$scope,$severity,$recipient)";
+				DBexecute($sql);
+			}
+			return TRUE;
+		}
+		else
+		{
+			$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message,scope,severity,recipient) values ($triggerid,$id,$good,$delay,0,'$subject','$message',$scope,$severity,$recipient)";
+			return	DBexecute($sql);
+		}
 	}
 
 	# Return TRUE if triggerid is a reason why the service is not OK

@@ -178,7 +178,9 @@ CREATE TABLE actions (
   nextcheck		int4		DEFAULT '0' NOT NULL,
   recipient		int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (actionid),
-  FOREIGN KEY (triggerid) REFERENCES triggers
+--  depends on scope. Could be hostid or 0.
+--  FOREIGN KEY (triggerid) REFERENCES triggers
+--  could be groupid
 --  FOREIGN KEY (userid) REFERENCES users
 );
 
