@@ -118,28 +118,26 @@ void	process_child(int sockfd)
 	char	result[1024];
 	static struct  sigaction phan;
 
-	daemon_init();
-
 	phan.sa_handler = &signal_handler;
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = 0;
-	sigaction(SIGINT, &phan, NULL);
-	sigaction(SIGQUIT, &phan, NULL);
-	sigaction(SIGTERM, &phan, NULL);
-
-	signal( SIGINT,  signal_handler );
-	signal( SIGQUIT, signal_handler );
-	signal( SIGTERM, signal_handler );
-//	signal( SIGALRM, signal_handler );
+	sigaction(SIGALRM, &phan, NULL);
 
 //	for(;;)
 //	{
 //		sigfunc = signal( SIGALRM, signal_handler );
-		alarm(AGENT_TIMEOUT);
+		alarm(TRAPPER_TIMEOUT);
 
 		if( (nread = read(sockfd, line, 1024)) < 0)
 		{
-			syslog( LOG_DEBUG, "Sending back:%s", result);
+			if(errno == EINTR)
+			{
+				syslog( LOG_DEBUG, "Timeout while waiting for parameter");
+			}
+			else
+			{
+				syslog( LOG_DEBUG, "read() error");
+			}
 			return;
 		}
 

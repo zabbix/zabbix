@@ -1,6 +1,8 @@
 Changes for 1.0alpha12:
 
- - more changes in timeout handling (Alexei)
+ - added support for opertor '=' (Alexei)
+ - changes in timeout handling for zabbix_trapperd (Alexei)
+
  - changes in doc/manual.lyx (Alexei)
  - doc/manual.lyx created (Alexei)
  - no SA_RESTART flag for sigaction() (Alexei)

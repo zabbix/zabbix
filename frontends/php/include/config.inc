@@ -128,7 +128,7 @@
 // 	Replace all float sign float with 0
 //			echo "Expression:$expression<br>";
 			$arr="";
-			if (eregi('^((.)*)([0-9\.]+)([\&\|\>\<]{1})([0-9\.]+)((.)*)$', $expression, &$arr)) 
+			if (eregi('^((.)*)([0-9\.]+)([\&\|\>\<\=]{1})([0-9\.]+)((.)*)$', $expression, &$arr)) 
 			{
 //				echo "OK<br>";
 //				for($i=0;$i<50;$i++)

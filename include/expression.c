@@ -129,6 +129,7 @@ int	evaluate_simple (float *result,char *exp)
 			j++;
 		}
 		second[j]=0;
+		syslog(LOG_DEBUG, "[%s] [%s]",first,second );
 		if( evaluate_simple(&value1,first) == FAIL )
 		{
 			syslog(LOG_WARNING, "Cannot evaluate expression [%s]", first );
@@ -195,6 +196,7 @@ int	evaluate_simple (float *result,char *exp)
 			j++;
 		}
 		second[j]=0;
+		syslog(LOG_DEBUG, "[%s] [%s]",first,second );
 		if( evaluate_simple(&value1,first) == FAIL )
 		{
 			syslog(LOG_WARNING, "Cannot evaluate expression [%s]", first );
@@ -206,6 +208,40 @@ int	evaluate_simple (float *result,char *exp)
 			return FAIL;
 		}
 		if( value1 < value2 )
+		{
+			*result=1;
+		}
+		else
+		{
+			*result=0;
+		}
+		syslog(LOG_DEBUG, "Result [%f]",*result );
+		return SUCCEED;
+	}
+	else if( find_char(exp,'=') != FAIL )
+	{
+		syslog(LOG_DEBUG, "= is found" );
+		l=find_char(exp,'=');
+		strcpy(first, exp);
+		first[l]=0;
+		j=0;
+		for(i=l+1;i<strlen(exp);i++)
+		{
+			second[j]=exp[i];
+			j++;
+		}
+		second[j]=0;
+		if( evaluate_simple(&value1,first) == FAIL )
+		{
+			syslog(LOG_WARNING, "Cannot evaluate expression [%s]", first );
+			return FAIL;
+		}
+		if( evaluate_simple(&value2,second) == FAIL )
+		{
+			syslog(LOG_WARNING, "Cannot evaluate expression [%s]", second );
+			return FAIL;
+		}
+		if( cmp_double(value1,value2) ==0 )
 		{
 			*result=1;
 		}
