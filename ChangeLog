@@ -56,6 +56,8 @@ Not ready yet:
 
 Changes for 1.0beta6:
 
+ - zabbix_suckerd to write "Connection reset by peer" to LogFile
+ (Alexei)
  - \n change to \r\n in send_email() (Alexei)
  - added table service_alarms (Alexei)
  - fixed problem with parsing of trigger expressions. [.-.] changed
