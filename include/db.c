@@ -780,6 +780,32 @@ int	DBget_history_count(void)
 	return res;
 }
 
+int	DBget_queue_count(void)
+{
+	int	res;
+	char	sql[MAX_STRING_LEN+1];
+	DB_RESULT	*result;
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_queue_count()");
+
+	sprintf(sql,"select count(*) from items i,hosts h where i.status=%d and i.type not in (%d) and h.status=%d and i.hostid=h.hostid and i.nextcheck<$now and i.key_<>'status'", ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, HOST_STATUS_MONITORED);
+
+	result=DBselect(sql);
+
+	if(DBnum_rows(result) == 0)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
+		DBfree_result(result);
+		return 0;
+	}
+
+	res  = atoi(DBget_field(result,0,0));
+
+	DBfree_result(result);
+
+	return res;
+}
+
 int	DBadd_alert(int actionid, int mediatypeid, char *sendto, char *subject, char *message)
 {
 	int	now;
