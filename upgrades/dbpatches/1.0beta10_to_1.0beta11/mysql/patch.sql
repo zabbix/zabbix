@@ -26,3 +26,6 @@ insert into usrgrp (usrgrpid, name) values (NULL, 'Security specialists');
 insert into usrgrp (usrgrpid, name) values (NULL, 'WEB administrators');
 insert into usrgrp (usrgrpid, name) values (NULL, 'Head of IT department');  
 insert into usrgrp (usrgrpid, name) values (NULL, 'Zabbix administrators');  
+
+alter table items add delta int(1)  DEFAULT '0' NOT NULL;
+alter table items add prevorgvalue double(16,4)  DEFAULT '0.0';

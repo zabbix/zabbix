@@ -79,7 +79,10 @@ DB_ITEM
 	int     port;
 	int     delay;
 	int     history;
+	double	prevorgvalue;
+	int	prevorgvalue_null;
 	double	lastvalue;
+	int	lastclock;
 	char	*lastvalue_str;
 	int     lastvalue_null;
 	double	prevvalue;
@@ -89,6 +92,7 @@ DB_ITEM
 	time_t  lastcheck;
 	time_t	nextcheck;
 	int     value_type;
+	int     delta;
 };
  
 DB_FUNCTION
