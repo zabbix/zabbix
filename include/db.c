@@ -56,10 +56,17 @@ int     DBget_function_result(float *Result,char *FunctionID)
 
 	sprintf( c, "select lastvalue from functions where functionid=%s", FunctionID );
 	DBexecute(c);
+
+	dbg_write( dbg_proginfo, "1\n");
  
         result = DBget_result();
  
         row = DBfetch_row(result);
+	if(row == NULL)
+	{
+		dbg_write( dbg_syswarn, "Query failed for functionid:[%s]", FunctionID );
+		return FAIL;	
+	}
         *Result=atof(row[0]);
         DBfree_result(result);
 
