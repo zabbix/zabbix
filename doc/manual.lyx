@@ -28,13 +28,13 @@
 \emph on 
 ZABBIX
 \emph default 
- Reference Manual for version 1.0 (draft v1.33)
+ Reference Manual for version 1.0 (draft v1.34)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-27 December 2002
+02 January 2003
 \layout Abstract
 
 The document is Reference Manual for 
@@ -372,14 +372,6 @@ end.
  
 \latex no_latex 
 The web-based front end means that the health of your servers can be assessed
-\latex default 
-
-\begin_inset Info
-Accessed?
-\end_inset 
-
-
-\latex no_latex 
  from any location.
 
 \latex default 
@@ -3885,6 +3877,9 @@ misc/init.d/debian/zabbix_agent
 Zabbix 1.0beta7
 \layout Itemize
 
+startup scripts for RedHat 8.0
+\layout Itemize
+
 refresh rate is doubled for user 'guest'
 \layout Itemize
 
@@ -5157,6 +5152,9 @@ zabbix_agentd.conf (it has the same syntax as
 \SpecialChar ~
 \SpecialChar ~
  for UNIX agent).
+ 
+\series bold 
+See src/zabbix_agent_win32/README for more detailed information!
 \layout Standard
 
 3.
@@ -19080,6 +19078,14 @@ JEFF REDDING
 \layout Standard
 
 Support for non-GCC compilers
+\layout Itemize
+
+
+\noun on 
+JOHN CRUNK
+\layout Standard
+
+Startup scripts for RedHat 8.0
 \layout Itemize
 
 
