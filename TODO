@@ -1,5 +1,31 @@
 1.0beta12:
 
+BUGS
+ - trigger key cannot contain dash
+ - no way to delete or rename host group
+ - update item does not work (multiplier)
+
+ in screenedit.php, line 148 there is:
+
+echo "<OPTION VALUE='$itemid_' ".iif
+($resourceid==$itemid_,"selected","")."'>$host_:
+$description_";
+
+==> the single quote before >$host should be removed,
+otherwise you don't get a select window. So it should be:
+
+echo "<OPTION VALUE='$itemid_' ".iif
+($resourceid==$itemid_,"selected","").">$host_:
+$description_";
+
+
+Another bug is in the showing of screens: if I define a
+screen with 2 rows and 3 columns, but only define 5 of
+the six open "slots", the sixed gets the value of the fifth,
+instead of being empty (when you view the screen, in
+the definition of the screen the sixth is still empty)
+
+
  - timestamp for maps
  - change %s to {HOSTNAME}, {DATE},{TIME}, etc
  - add zabbix[unixtime] and lastupdate() to get rid of nodata()
