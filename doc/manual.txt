@@ -119,10 +119,10 @@ you can define virtually any possible condition for a trigger. How ? Using flexi
 Look, how it works.
 
 Suppose, you wish to be notified when file /etc/passwd is changed by someone. You define
-trigger with expression {sourceforget.net:cksum[/etc/passwd].diff(0)}>0. This expression becomes
+trigger with expression {sourceforge.net:cksum[/etc/passwd].diff(0)}>0. This expression becomes
 true, when current value of checksum for /etc/passwd will be different with previously
 gotten checksum.
-Then, you define list of actions for the trigger. All you want is getting Email about this event.
+Then, you define list of actions for the trigger. All you want is getting an Email about this event.
 So, you add action for this trigger. When the trigger expression becomes true, you will get Email notification.
 
 2.3 Integrity checking
@@ -295,6 +295,8 @@ Zabbix requires the following software to run properly:
 
 However, Zabbix can work on previous versions of Apache, MySQL, PostgreSQL as well.
 
+Debian Potato and Debian Woody are development and testing platforms I currently use.
+
 I've tried to run Zabbix on PostgreSQL 6.5x with no luck. PostgreSQL crashes after
 one-tree minutes of zabbix_sucker running. So, PostgreSQL version 7.0.2 or later is strongly
 recommended.
@@ -307,14 +309,14 @@ Additionally, if you plan to use PostgreSQL, fast CPU required.
 
 Memory requirements:
 
-Zabbix requires both physical (suprise!) and disk memory. 64 Mb of physical 
-memory and 50 Mb of free disk memory could be good start point.
-However, amount of required memory strongly depends on used configuration 
+Zabbix requires both physical (suprise!) and disk memory. 32 Mb of physical 
+memory and 20 Mb of free disk memory could be good start point.
+However, amount of required disk memory strongly depends on used configuration 
 parameters. If you're planning to keep long history of monitored parameters, 
 you should think of even a couple of gigabytes to have enough space to store the history in 
 the database.
 
-Remember, the more memory you have, the faster database and Zabbix works !
+Remember, the more physical memory you have, the faster database and Zabbix works !
 
 4.2 Installation procedure
 

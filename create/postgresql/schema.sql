@@ -241,21 +241,6 @@ CREATE UNIQUE INDEX sysmaps_name on sysmaps (name);
 -- Table structure for table 'sysmaps_hosts'
 --
 
-CREATE TABLE sysmaps_links (
-  linkid		serial,
-  sysmapid		int4		DEFAULT '0' NOT NULL,
-  shostid1		int4		DEFAULT '0' NOT NULL,
-  shostid2		int4		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (linkid),
-  FOREIGN KEY (sysmapid) REFERENCES sysmaps,
-  FOREIGN KEY (shostid1) REFERENCES sysmaps_hosts,
-  FOREIGN KEY (shostid2) REFERENCES sysmaps_hosts
-);
-
---
--- Table structure for table 'sysmaps_hosts'
---
-
 CREATE TABLE sysmaps_hosts (
   shostid		serial,
   sysmapid		int4		DEFAULT '0' NOT NULL,
@@ -266,6 +251,21 @@ CREATE TABLE sysmaps_hosts (
   PRIMARY KEY (shostid),
   FOREIGN KEY (sysmapid) REFERENCES sysmaps,
   FOREIGN KEY (hostid) REFERENCES hosts
+);
+
+--
+-- Table structure for table 'sysmaps_links'
+--
+
+CREATE TABLE sysmaps_links (
+  linkid		serial,
+  sysmapid		int4		DEFAULT '0' NOT NULL,
+  shostid1		int4		DEFAULT '0' NOT NULL,
+  shostid2		int4		DEFAULT '0' NOT NULL,
+  PRIMARY KEY (linkid),
+  FOREIGN KEY (sysmapid) REFERENCES sysmaps,
+  FOREIGN KEY (shostid1) REFERENCES sysmaps_hosts,
+  FOREIGN KEY (shostid2) REFERENCES sysmaps_hosts
 );
 
 --
