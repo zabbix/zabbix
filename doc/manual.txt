@@ -458,7 +458,13 @@ to "Not monitored". List of possible parameers for the host will be automaticall
 
 /opt/zabbix/bin/zabbix_sucker
 
-Define actions for triggers you are interested in.
+Define actions for triggers you are interested in. Note, that you can always use
+macros in both email subject and email body. 
+For example, subject for warning message could look like:
+
+Processor load on www.sf.net is {www.sf.net:system[procload].last(0)}
+
+In this case, you will receive message with subject like "Processor load on www.sf.net is 0.85".
 
 - Create /etc/zabbix/zabbix_agent.conf
 
