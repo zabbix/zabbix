@@ -151,6 +151,8 @@
 				echo "<font color=\"AAAAAA\">Unreachable</font>";
 			else if($row["status"] == 3)
 				echo "<font color=\"AAAAAA\">Template</font>";
+			else if($row["status"] == HOST_STATUS_DELETED)
+				echo "<font color=\"AAAAAA\">Deleted</font>";
 			else
 				echo "Unknown";
 		}
@@ -164,19 +166,28 @@
 				echo "<font color=\"AAAAAA\">Unreachable</font>";
 			else if($row["status"] == 3)
 				echo "<font color=\"AAAAAA\">Template</font>";
+			else if($row["status"] == HOST_STATUS_DELETED)
+				echo "<font color=\"AAAAAA\">Deleted</font>";
 			else
 				echo "Unknown";
 		}
 		echo "</TD>";
         	if(check_right("Host","U",$row["hostid"]))
 		{
-			if(isset($HTTP_GET_VARS["groupid"]))
+			if($row["status"] != HOST_STATUS_DELETED)
 			{
-				echo "<TD><A HREF=\"hosts.php?register=change&hostid=".$row["hostid"]."&groupid=".$HTTP_GET_VARS["groupid"]."#form\">Change</A></TD>";
+				if(isset($HTTP_GET_VARS["groupid"]))
+				{
+					echo "<TD><A HREF=\"hosts.php?register=change&hostid=".$row["hostid"]."&groupid=".$HTTP_GET_VARS["groupid"]."#form\">Change</A></TD>";
+				}
+				else
+				{
+					echo "<TD><A HREF=\"hosts.php?register=change&hostid=".$row["hostid"]."#form\">Change</A></TD>";
+				}
 			}
 			else
 			{
-				echo "<TD><A HREF=\"hosts.php?register=change&hostid=".$row["hostid"]."#form\">Change</A></TD>";
+					echo "<TD>&nbsp;</TD>";
 			}
 		}
 		else
