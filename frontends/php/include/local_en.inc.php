@@ -159,6 +159,8 @@
 	define("S_DELETE_SELECTED_MEDIA",		"Delete selected media?");
 	define("S_HOUSEKEEPER",				"Housekeeper");
 	define("S_MEDIA_TYPES",				"Media types");
+	define("S_ESCALATION_RULES",			"Escalation rules");
+	define("S_ESCALATION_RULES_BIG",		"ESCALATION RULES");
 
 //	Latest values
 	define("S_LATEST_VALUES",			"Latest values");
