@@ -40,7 +40,7 @@
 		$graph->setBorder(0);
 	}
 
-	$result=DBselect("select name,width,height from graphs where graphid=".$_GET["graphid"]);
+	$result=DBselect("select name,width,height,yaxistype,yaxismin,yaxismax from graphs where graphid=".$_GET["graphid"]);
 
 	$name=DBget_field($result,0,0);
 	if(isset($_GET["width"])&&$_GET["width"]>0)
@@ -63,6 +63,9 @@
 	$graph->setWidth($width);
 	$graph->setHeight($height);
 	$graph->setHeader(DBget_field($result,0,0));
+	$graph->setYAxisType(DBget_field($result,0,3));
+	$graph->setYAxisMin(DBget_field($result,0,4));
+	$graph->setYAxisMax(DBget_field($result,0,5));
 
 	$result=DBselect("select gi.itemid,i.description,gi.color,h.host,gi.drawtype from graphs_items gi,items i,hosts h where gi.itemid=i.itemid and gi.graphid=".$_GET["graphid"]." and i.hostid=h.hostid order by gi.sortorder");
 

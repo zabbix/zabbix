@@ -20,6 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
+	include "include/forms.inc.php";
 	$page["title"] = S_CONFIGURATION_OF_GRAPHS;
 	$page["file"] = "graphs.php";
 	show_header($page["title"],0,0);
@@ -45,12 +46,12 @@
 	{
 		if($_GET["register"]=="add")
 		{
-			$result=add_graph($_GET["name"],$_GET["width"],$_GET["height"]);
+			$result=add_graph($_GET["name"],$_GET["width"],$_GET["height"],$_GET["yaxistype"],$_GET["yaxismin"],$_GET["yaxismax"]);
 			show_messages($result, S_GRAPH_ADDED, S_CANNOT_ADD_GRAPH);
 		}
 		if($_GET["register"]=="update")
 		{
-			$result=update_graph($_GET["graphid"],$_GET["name"],$_GET["width"],$_GET["height"]);
+			$result=update_graph($_GET["graphid"],$_GET["name"],$_GET["width"],$_GET["height"],$_GET["yaxistype"],$_GET["yaxismin"],$_GET["yaxismax"]);
 			show_messages($result, S_GRAPH_UPDATED, S_CANNOT_UPDATE_GRAPH);
 		}
 		if($_GET["register"]=="delete")
@@ -102,54 +103,8 @@
 <?php
 	echo "<a name=\"form\"></a>";
 
-	if(isset($_GET["graphid"]))
-	{
-		$result=DBselect("select g.graphid,g.name,g.width,g.height from graphs g where graphid=".$_GET["graphid"]);
-		$row=DBfetch($result);
-		$name=$row["name"];
-		$width=$row["width"];
-		$height=$row["height"];
-	}
-	else
-	{
-		$name="";
-		$width=900;
-		$height=200;
-	}
+	insert_graph_form();
 
-	echo "<br>";
-	show_table2_header_begin();
-	echo S_GRAPH;
-
-	show_table2_v_delimiter();
-	echo "<form method=\"get\" action=\"graphs.php\">";
-	if(isset($_GET["graphid"]))
-	{
-		echo "<input class=\"biginput\" name=\"graphid\" type=\"hidden\" value=".$_GET["graphid"].">";
-	}
-	echo S_NAME; 
-	show_table2_h_delimiter();
-	echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=32>";
-
-	show_table2_v_delimiter();
-	echo S_WIDTH;
-	show_table2_h_delimiter();
-	echo "<input class=\"biginput\" name=\"width\" size=5 value=\"$width\">";
-
-	show_table2_v_delimiter();
-	echo S_HEIGHT;
-	show_table2_h_delimiter();
-	echo "<input class=\"biginput\" name=\"height\" size=5 value=\"$height\">";
-
-	show_table2_v_delimiter2();
-	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
-	if(isset($_GET["graphid"]))
-	{
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('".S_DELETE_GRAPH_Q."');\">";
-	}
-
-	show_table2_header_end();
 ?>
 
 <?php
