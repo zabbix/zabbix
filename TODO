@@ -1,6 +1,5 @@
 1.0beta14:
 
- - sysmaps to work on all systems
  - start&end time in time navigation
 
  - preserve selected host group between different screens (trigger maintenance, host maintenance)
