@@ -1710,6 +1710,7 @@ echo "</head>";
 <table border=0 cellspacing=0 cellpadding=5 width="100%" bgcolor="#FFFFFF">
 <tr>
 <td width="118" height="31" class="top_header_left"><img width="118" height="31" src="images/general/zabbix.png" border="0" alt="ZABBIX"></td>
+<td width="662" class="top_header_right"><a href="http://www.zabbix.com/manual/v1.1/index.php" class="small_font">|Help|</a></td>
 </tr>
 </table>
 
