@@ -1,5 +1,7 @@
 Changes for 1.0beta9:
 
+ - fixed plaintext values for string data type. Thanks to
+ Sébastien "Slix" Liénard. (Alexei)
  - misc fixes for services.php. Thanks to Sébastien "Slix" Liénard.
  (Alexei)
  - different styles for user-defined graphs (Alexei)
