@@ -524,12 +524,14 @@ int	get_value(double *result,char *result_str,DB_ITEM *item)
 	{
 		res=get_value_zabbix(result,result_str,item);
 	}
-#ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
 	else if(item->type == ITEM_TYPE_SNMP)
 	{
+#ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
 		res=get_value_SNMPv1(result,result_str,item);
-	}
+#else
+		zabbix_log(LOG_LEVEL_WARNING, "Support of SNMP parameters was no compiled in");
 #endif
+	}
 	else
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Not supported item type:%d",item->type);

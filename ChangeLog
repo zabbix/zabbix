@@ -1,12 +1,15 @@
 Not ready yet:
 
+[ HB. Authorisation without user name/password ]
+[ CORE. Support for Service Tree ] 
+[ CORE. If Zabbix is restarted change triggers status to UNKNOWN ]
+[ CORE. Change trigger status in case if host/item status is changed ]
+[ PHP. Navigation by time period for graphs and trends ]
+
 [ CORE. Support for automake ]
 
-[ CORE. Support for Service Tree ] 
+[ TESTING. Define procedure for regression testing ]
 
-[ CORE. Make Zabbix compile by cc ]
-
-[ CORE. Change trigger status in case if host/item status is changed ]
 [ CORE. Get rid of all numerics constants in the code ]
 
 [ PHP. Show triggers by userid ]
@@ -18,17 +21,18 @@ Not ready yet:
 
 [ DOCS. All parameters should contain section "How can be used" in the Manual ]
 
-[ HB. Authorisation without user name/password ]
 [ HB. zabbix_suckerd core dumps occasionally ]
 [ HB. SNMP code core dumps occasionally ]
 
 [ DOCS. SNMP with missing MIB files can be used by:
 snmpget -On localhost public enterprises.ucdavis.memory.memTotalSwap.0]
 
-[ DITRIB. Exclude LyX from Zabbix distribution ]
+[ CORE. All errors and warnings must be numbered and documented ]
 
 Changes for 1.0beta4:
 
+ - added support of UserParameter(s) returning non-numeric values (Alexei) 
+ - doc/manual.lyx will not be included in Zabbix release (Alexei)
  - chnages to make Zabbix compile in non-GCC environments (Alexei)
  - unreachable hosts will be clickable in system maps (Alexei)
  - fixed double posting of the same trigger status into alarms (Alexei) 
@@ -39,7 +43,6 @@ Changes for 1.0beta4:
  - improvements in SNMP handling for zabbix_suckerd (Alexei)
  - fixed check for SNMP library in configure.in (Alexei)
  - template host set to empty in Host definition form (Alexei)
- - changes in the Manual (Alexei)
  - support for DisableHousekeeping for zabbix_suckerd (Alexei)
  - protection from items.delay set to 0 (Alexei)
  - values provided by an agent can be less than zero (Alexei)
