@@ -263,7 +263,14 @@ int	get_value_SNMPv1(double *result,DB_ITEM *item)
 *           */
 	snmp_sess_init( &session );                   /* set up defaults */
 	session.version = SNMP_VERSION_1;
-	session.peername = item->host;
+	if(item->useip==1)
+	{
+		session.peername = item->ip;
+	}
+	else
+	{
+		session.peername = item->host;
+	}
 	session.community = item->snmp_community;
 	session.community_len = strlen(session.community);
 

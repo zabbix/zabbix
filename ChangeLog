@@ -1,5 +1,6 @@
 Changes for 1.0beta3:
 
+ - added support for IP addresses for SNMP-enabled hosts (Alexei) 
  - commented #define TEST_PARAMETERS in zabbix_agent.c (Alexei)
  - proc_cnt[apache] was changed to proc_cnt[httpd] (Alexei)
 
