@@ -1,5 +1,6 @@
 Changes for 1.0beta7:
 
+ - improvements in housekeeping procedure (Alexei)
  - improvements for chart.php (Alexei)
  - added severity to pre-defined triggers (Alexei)
  - SO_LINGER is not default socket() option for zabbix_sender. (Alexei)
