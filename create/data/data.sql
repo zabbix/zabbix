@@ -87,9 +87,9 @@ INSERT INTO hosts_groups VALUES (10007,1);
 --
 
 INSERT INTO items VALUES (10001,0,'','',161,10001,'Free memory','memory[free]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',0,0,NULL,'',0,'','',0,'');
-INSERT INTO items VALUES (10002,0,'','',161,10001,'Free disk space on /','diskfree[/]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','',0,'');
-INSERT INTO items VALUES (10003,0,'','',161,10001,'Free disk space on /tmp','diskfree[/tmp]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','',0,'');
-INSERT INTO items VALUES (10004,0,'','',161,10001,'Free disk space on /usr','diskfree[/usr]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','',0,'');
+INSERT INTO items VALUES (10002,0,'','',161,10001,'Free disk space on /','diskfree[/]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','',1,'');
+INSERT INTO items VALUES (10003,0,'','',161,10001,'Free disk space on /tmp','diskfree[/tmp]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','',1,'');
+INSERT INTO items VALUES (10004,0,'','',161,10001,'Free disk space on /usr','diskfree[/usr]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','',1,'');
 INSERT INTO items VALUES (10005,0,'','',161,10001,'Free number of inodes on /','inodefree[/]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'');
 INSERT INTO items VALUES (10006,0,'','',161,10001,'Free number of inodes on /opt','inodefree[/opt]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'');
 INSERT INTO items VALUES (10007,0,'','',161,10001,'Free number of inodes on /tmp','inodefree[/tmp]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'');
@@ -106,10 +106,10 @@ INSERT INTO items VALUES (10017,0,'','',161,10001,'Checksum of /etc/inetd.conf',
 INSERT INTO items VALUES (10018,0,'','',161,10001,'Checksum of /vmlinuz','cksum[/vmlinuz]',600,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'');
 INSERT INTO items VALUES (10019,0,'','',161,10001,'Checksum of /etc/passwd','cksum[/etc/passwd]',600,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'');
 INSERT INTO items VALUES (10020,0,'','',161,10001,'Ping to the server (TCP)','ping',30,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'');
-INSERT INTO items VALUES (10021,0,'','',161,10001,'Free disk space on /home','diskfree[/home]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','',0,'');
+INSERT INTO items VALUES (10021,0,'','',161,10001,'Free disk space on /home','diskfree[/home]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','',1,'');
 INSERT INTO items VALUES (10022,0,'','',161,10001,'Free number of inodes on /home','inodefree[/home]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'');
-INSERT INTO items VALUES (10023,0,'','',161,10001,'Free disk space on /var','diskfree[/var]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','',0,'');
-INSERT INTO items VALUES (10024,0,'','',161,10001,'Free disk space on /opt','diskfree[/opt]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','',0,'');
+INSERT INTO items VALUES (10023,0,'','',161,10001,'Free disk space on /var','diskfree[/var]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','',1,'');
+INSERT INTO items VALUES (10024,0,'','',161,10001,'Free disk space on /opt','diskfree[/opt]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','',1,'');
 INSERT INTO items VALUES (10025,0,'','',161,10001,'Host uptime (in sec)','system[uptime]',300,7,365,0,NULL,NULL,NULL,0,0,'','s',0,0,NULL,'',0,'','',0,'');
 INSERT INTO items VALUES (10026,0,'','',161,10001,'Total memory','memory[total]',1800,7,365,0,NULL,NULL,NULL,0,0,'','B',0,0,NULL,'',0,'','',0,'');
 INSERT INTO items VALUES (10027,0,'','',161,10001,'Shared memory','memory[shared]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',0,0,NULL,'',0,'','',0,'');
@@ -197,7 +197,7 @@ INSERT INTO items VALUES (10418,0,'','',161,10001,'Temperature of mainboard','se
 INSERT INTO items VALUES (10419,0,'','',161,10001,'Temperature of CPU 1of2','sensor[temp2]',30,7,365,0,NULL,NULL,NULL,0,0,'','C',0,0,NULL,'',0,'','',0,'');
 INSERT INTO items VALUES (10420,0,'','',161,10001,'Temperature of CPU 2of2','sensor[temp3]',30,7,365,0,NULL,NULL,NULL,0,0,'','C',0,0,NULL,'',0,'','',0,'');
 INSERT INTO items VALUES (10090,0,'','',161,10002,'Free memory','memory[free]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',0,0,NULL,'',0,'','',0,'');
-INSERT INTO items VALUES (10091,0,'','',161,10002,'Free disk space on c:','diskfree[c:]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','',0,'');
+INSERT INTO items VALUES (10091,0,'','',161,10002,'Free disk space on c:','diskfree[c:]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','',1,'');
 INSERT INTO items VALUES (10098,0,'','',161,10002,'Number of processes','system[proccount]',30,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'');
 INSERT INTO items VALUES (10099,0,'','',161,10002,'Processor load','system[procload]',5,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'');
 INSERT INTO items VALUES (10100,0,'','',161,10002,'Processor load5','system[procload5]',10,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'');
@@ -217,7 +217,7 @@ INSERT INTO items VALUES (10150,0,'','',161,10002,'Host status','status',60,7,36
 INSERT INTO items VALUES (10156,0,'','',161,10002,'Total disk space on c:','disktotal[c:]',3600,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','',0,'');
 INSERT INTO items VALUES (10359,0,'','',161,10002,'Total disk space on d:','disktotal[d:]',3600,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','',0,'');
 INSERT INTO items VALUES (10357,0,'','',161,10002,'Checksum of c:\\config.sys','cksum[c:\\config.sys]',600,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'');
-INSERT INTO items VALUES (10358,0,'','',161,10002,'Free disk space on d:','diskfree[d:]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','',0,'');
+INSERT INTO items VALUES (10358,0,'','',161,10002,'Free disk space on d:','diskfree[d:]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','',1,'');
 
 
 INSERT INTO items VALUES (10200,0,'','',161,10003,'MySQL is alive','mysql[ping]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'');
@@ -461,7 +461,7 @@ INSERT INTO triggers VALUES (10012,'{10212}<100000','Lack of free swap space on 
 INSERT INTO triggers VALUES (10013,'{10013}>50','Too may users connected on server {HOSTNAME}','',0,2,3,0,0,'');
 INSERT INTO triggers VALUES (10014,'{10197}>0','/etc/inetd.conf has been changed on server {HOSTNAME}','',0,2,2,0,0,'');
 INSERT INTO triggers VALUES (10015,'{10201}>0','/vmlinuz has been changed on server {HOSTNAME}','',0,2,2,0,0,'');
-INSERT INTO triggers VALUES (10016,'{10199}>0','/passwd has been changed on server {HOSTNAME}','',0,2,3,0,0,'');
+INSERT INTO triggers VALUES (10016,'{10199}>0','/etc/passwd has been changed on server {HOSTNAME}','',0,2,3,0,0,'');
 INSERT INTO triggers VALUES (10017,'{10214}<10000','Low free disk space on {HOSTNAME}\'s volume /home','',0,2,4,0,0,'');
 INSERT INTO triggers VALUES (10018,'{10220}<10000','Low number of free inodes on {HOSTNAME}\' volume /home','',0,2,4,0,0,'');
 INSERT INTO triggers VALUES (10019,'{10218}<10000','Low free disk space on {HOSTNAME}\'s volume /var','',0,2,4,0,0,'');
