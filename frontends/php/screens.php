@@ -75,11 +75,11 @@
 		show_table_header_end();
 		echo "<br>";
 	}
-
 ?>
 
 <?php
-	if(isset($HTTP_GET_VARS["screenid"]))
+//	if(isset($HTTP_GET_VARS["screenid"]))
+	if( isset($HTTP_GET_VARS["screenid"]) && check_right("Screen","R",$HTTP_GET_VARS["screenid"]))
 	{
 		$screenid=$HTTP_GET_VARS["screenid"];
 		$result=DBselect("select name,cols,rows from screens where screenid=$screenid");
