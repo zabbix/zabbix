@@ -134,15 +134,8 @@ void	process_child(int sockfd)
 	char	result[1024];
 	double	res;
 
-	struct  sigaction phan;
-
 //	for(;;)
 	{
-		phan.sa_handler = &signal_handler; /* set up sig handler using sigaction() */
-		sigemptyset(&phan.sa_mask);  /* just block alarm signal */
-		phan.sa_flags = 0;
-		phan.sa_flags = SA_RESTART;
-		sigaction(SIGALRM, &phan, NULL);
 		alarm(AGENT_TIMEOUT);
 //
 
@@ -153,9 +146,7 @@ void	process_child(int sockfd)
 			return;
 		}
 
-	        phan.sa_handler = SIG_IGN; /* just ignore signal now */
-	        sigaction(SIGALRM, &phan, NULL);
-
+		alarm(0);
 
 		line[nread-1]=0;
 
@@ -303,13 +294,16 @@ int	main()
 
 	char		host[128];
 	char		*port="10000";
-	
+
+        struct  sigaction phan;
+
 	daemon_init();
 
-	signal( SIGINT,  signal_handler );
-	signal( SIGQUIT, signal_handler );
-	signal( SIGTERM, signal_handler );
-	signal( SIGALRM, signal_handler );
+	phan.sa_handler = &signal_handler; /* set up sig handler using sigaction() */
+	sigemptyset(&phan.sa_mask);  /* just block alarm signal */
+	phan.sa_flags = 0;
+	phan.sa_flags = SA_RESTART;
+	sigaction(SIGALRM, &phan, NULL);
 
 	init_security();
 

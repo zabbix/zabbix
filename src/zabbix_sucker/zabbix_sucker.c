@@ -204,9 +204,6 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 	int	i;
 	char	c[1024];
 	char	*e;
-	void	*sigfunc;
-
-	struct	sigaction phan;
 
 	struct hostent *hp;
 
@@ -215,19 +212,7 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 
 	syslog( LOG_DEBUG, "%10s%25s", item->host, item->key );
 
-
-
-	phan.sa_handler = &signal_handler; /* set up sig handler using sigaction() */
-	sigemptyset(&phan.sa_mask);  /* just block alarm signal */
-	phan.sa_flags = 0;
-	phan.sa_flags = SA_RESTART;
-	sigaction(SIGALRM, &phan, NULL);
-	alarm(1);
-
-
-
-
-
+	alarm(SUCKER_TIMEOUT);
 
 	servaddr_in.sin_family=AF_INET;
 	if(item->useip==1)
@@ -309,8 +294,10 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 		}
 	}
 
-	phan.sa_handler = SIG_IGN; /* just ignore signal now */
-        sigaction(SIGALRM, &phan, NULL);
+	alarm(0);
+
+//	phan.sa_handler = SIG_IGN; /* just ignore signal now */
+//      sigaction(SIGALRM, &phan, NULL);
 
 	return SUCCEED;
 }
@@ -558,11 +545,20 @@ int main(int argc, char **argv)
 	int 	ret;
 	int	i;
 
+	struct	sigaction phan;
+
 	daemon_init();
 
-	signal( SIGINT,  signal_handler );
-	signal( SIGQUIT, signal_handler );
-	signal( SIGTERM, signal_handler );
+	phan.sa_handler = &signal_handler; /* set up sig handler using sigaction() */
+	sigemptyset(&phan.sa_mask);  /* just block alarm signal */
+	phan.sa_flags = 0;
+	phan.sa_flags = SA_RESTART;
+	sigaction(SIGALRM, &phan, NULL);
+
+
+//	signal( SIGINT,  signal_handler );
+//	signal( SIGQUIT, signal_handler );
+//	signal( SIGTERM, signal_handler );
 
 	for(i=1;i<SUCKER_FORKS;i++)
 	{
