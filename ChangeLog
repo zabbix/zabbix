@@ -1,3 +1,8 @@
+Changes for 1.0beta8:
+
+ - different colors for different status of items, triggers, users
+ (Alexei)
+
 Changes for 1.0beta7:
 
  - startup scripts for RedHat 8.0. Thanks to John Crunk. (Alexei)
