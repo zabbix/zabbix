@@ -42,17 +42,31 @@
 		{
 			$result=add_action( $_GET["triggerid"], $_GET["userid"], $_GET["good"], $_GET["delay"], $_GET["subject"], $_GET["message"],$_GET["scope"],$_GET["severity"],$_GET["recipient"],$_GET["usrgrpid"]);
 			show_messages($result,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
+			if($result)
+			{
+				$user=get_user_by_userid($_GET["userid"]);
+				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ACTION,"User [".$user["alias"]."] when [".$_GET["good"]."] subject [".$_GET["subject"]."]");
+			}
 		}
 		if($_GET["register"]=="update")
 		{
 			$result=update_action( $_GET["actionid"], $_GET["triggerid"], $_GET["userid"], $_GET["good"], $_GET["delay"], $_GET["subject"], $_GET["message"],$_GET["scope"],$_GET["severity"],$_GET["recipient"],$_GET["usrgrpid"]);
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPATE_ACTION);
+			if($result)
+			{
+				$user=get_user_by_userid($_GET["userid"]);
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ACTION,"User [".$user["alias"]."] when [".$_GET["good"]."] subject [".$_GET["subject"]."]");
+			}
 			unset($_GET["actionid"]);
 		}
 		if($_GET["register"]=="delete")
 		{
 			$result=delete_action($_GET["actionid"]);
 			show_messages($result,S_ACTION_DELETED,S_CANNOT_DELETE_ACTION);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_ACTION,"When [".$_GET["good"]."] subject [".$_GET["subject"]."]");
+			}
 			unset($_GET["actionid"]);
 		}
 	}

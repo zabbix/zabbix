@@ -130,6 +130,18 @@
 		{
 			echo S_HOST;
 		}
+		else if($row["resource"]==AUDIT_RESOURCE_ACTION)
+		{
+			echo S_ACTION;
+		}
+		else if($row["resource"]==AUDIT_RESOURCE_GRAPH)
+		{
+			echo S_GRAPH;
+		}
+		else if($row["resource"]==AUDIT_RESOURCE_GRAPH_ELEMENT)
+		{
+			echo S_GRAPH_ELEMENT;
+		}
 		else
 		{
 			echo S_UNKNOWN_RESOURCE;

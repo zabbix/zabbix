@@ -666,6 +666,23 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	}
 
 
+	function	get_graphitem_by_gitemid($gitemid)
+	{
+		global	$ERROR_MSG;
+
+		$sql="select * from graphs_items where gitemid=$gitemid"; 
+		$result=DBselect($sql);
+		if(DBnum_rows($result) == 1)
+		{
+			return	DBfetch($result);	
+		}
+		else
+		{
+			$ERROR_MSG="No graph item with gitemid=[$gitemid]";
+		}
+		return	$result;
+	}
+
 	function	get_graph_by_graphid($graphid)
 	{
 		global	$ERROR_MSG;
@@ -680,7 +697,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 			$ERROR_MSG="No graph with graphid=[$graphid]";
 		}
-		return	$graph;
+		return	$result;
 	}
 
 	function	get_image_by_name($imagetype,$name)
