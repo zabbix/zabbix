@@ -27,6 +27,8 @@ snmpget -On localhost public enterprises.ucdavis.memory.memTotalSwap.0]
 
 [ CORE. zabbix_trapperd crashes when we kill zabbix_sender ! ]
 
+[ CORE. Support for macros like {server:system[procload].graph(1)} ]
+
 Changes for 1.0beta4:
 
  - added index triggers.value and trigger.status (Alexei)
