@@ -1,5 +1,6 @@
 Changes for 1.0beta13:
 
+ - better management of host groups (Alexei)
  - added support of macro {HOSTNAME}, removed support of
  %s (Alexei)
  - added support of macros {DATE} and {TIME} in alerts

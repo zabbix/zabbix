@@ -62,6 +62,22 @@
 			show_messages($result,"Host deleted","Cannot delete host");
 			unset($HTTP_GET_VARS["hostid"]);
 		}
+		if($HTTP_GET_VARS["register"]=="add group")
+		{
+			$result=add_host_group($HTTP_GET_VARS["name"], $HTTP_GET_VARS["hosts"]);
+			show_messages($result, "Group added", "Cannot add group");
+		}
+		if($HTTP_GET_VARS["register"]=="delete group")
+		{
+			$result=delete_host_group($HTTP_GET_VARS["groupid"]);
+			show_messages($result, "Group deleted", "Cannot delete group");
+			unset($HTTP_GET_VARS["groupid"]);
+		}
+		if($HTTP_GET_VARS["register"]=="update group")
+		{
+			$result=update_host_group($HTTP_GET_VARS["groupid"], $HTTP_GET_VARS["name"], $HTTP_GET_VARS["hosts"]);
+			show_messages($result, "Group updated", "Cannot update group");
+		}
 	}
 ?>
 
