@@ -12,6 +12,29 @@ INSERT INTO hosts VALUES (10002,'WIN32_ZABBIX_AGENT',0,'',10000,3,0,0);
 INSERT INTO hosts VALUES (10004,'STANDALONE',0,'',10000,3,0,0);
 
 --
+-- Table structure for table 'groups'
+--
+
+CREATE TABLE groups (
+  groupid		serial,
+  name			varchar(64)     DEFAULT '' NOT NULL,
+  PRIMARY KEY (groupid),
+  UNIQUE (name)
+);
+
+CREATE UNIQUE INDEX groups_name on groups (name);
+
+--
+-- Table structure for table 'hosts_groups'
+--
+
+CREATE TABLE hosts_groups (
+  hostid		int4		DEFAULT '0' NOT NULL,
+  groupid		int4		DEFAULT '0' NOT NULL,
+  PRIMARY KEY (hostid,groupid)
+);
+
+--
 -- Data for table items
 --
 
