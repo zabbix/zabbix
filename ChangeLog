@@ -1,5 +1,6 @@
 Changes for 1.0beta14:
 
+ - new action type: "ON or OFF" (Alexei)
  - added support of macro {STATUS} (Alexei)
  - pinger to work for all hosts (ip and hostname-based) (Alexei)
  - fixed memory[cached] to work for both linux 2.4 and 2.6 (Alexei)
