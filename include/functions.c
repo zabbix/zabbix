@@ -1256,7 +1256,7 @@ int	process_data(int sockfd,char *server,char *key,char *value)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_data()");
 
-	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts from items i,hosts h where h.status in (0,2) and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type=%d", server, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta from items i,hosts h where h.status in (0,2) and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type=%d", server, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
 	result = DBselect(sql);
 
 	if(DBnum_rows(result) == 0)
@@ -1308,6 +1308,7 @@ int	process_data(int sockfd,char *server,char *key,char *value)
 		item.prevvalue=atof(s);
 	}
 	item.value_type=atoi(DBget_field(result,0,15));
+	item.delta=atoi(DBget_field(result,0,17));
 
 	process_new_value(&item,value);
 
