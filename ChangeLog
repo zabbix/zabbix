@@ -9,10 +9,9 @@ Not ready yet:
  - Agent for Windows (can we use nsclient?)
  - Reports:
   - more customizable (graphs timerange: 1 mont, etc)
-  - availability reportus prieks IT services
   - availability report for IT Services
   - availability report for triggers
-  - LDAP authorisation (should work with MSWindows LDAP)
+ - LDAP authorisation (should work with MSWindows LDAP)
 
  DISTRIBUTED MONITORING:
 
@@ -36,7 +35,6 @@ Not ready yet:
 
  - look for cool icons
  - different sound files for different severity
- - add table sessions to patches for beta4?
  - check for function parameters in evaluate_simple_expression
  - make links different if something is already registered (as for medias,
    actions, etc)
@@ -64,8 +62,11 @@ Not ready yet:
 
 Changes for 1.0beta6:
 
+ - added frontends/php/chart4.php (Alexei)
+ - availability report will not show trigger expressions (Alexei)
+ - added creation of table 'sessions' to migration scripts for 
+ 1.0beta4 (Alexei)
  - no dependency on register_globals in php.ini (Alexei)
-
  - zabbix_suckerd to write "Connection reset by peer" to LogFile
  (Alexei)
  - \n change to \r\n in send_email() (Alexei)

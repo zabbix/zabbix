@@ -36,3 +36,14 @@ insert into triggers_template (triggertemplateid,itemtemplateid,description,expr
 
 insert into users (userid,alias,name,surname,passwd) values (2,'guest','Default','User','d41d8cd98f00b204e9800998ecf8427e');
 insert into rights (rightid,userid,name,permission,id) values (3,2,'Default permission','R',0);
+
+--
+-- Table structure for table 'sessions'
+--
+
+CREATE TABLE sessions (
+  sessionid             varchar(32)     NOT NULL DEFAULT '',
+  userid                int(4)          NOT NULL DEFAULT '0',
+  lastaccess            int(4)          NOT NULL DEFAULT '0',
+  PRIMARY KEY (sessionid)
+);

@@ -34,3 +34,11 @@ insert into triggers_template (triggertemplateid,itemtemplateid,description,expr
         values (69,69,'Server %s is unreachable','{:.last(0)}=2');
 
 create index status_retries on alerts (status,retries);
+
+CREATE TABLE sessions (
+        sessionid       varchar(32)     DEFAULT '' NOT NULL,
+        userid          int4            DEFAULT '0' NOT NULL,
+        lastaccess      int4            DEFAULT '0' NOT NULL,
+        PRIMARY KEY (sessionid),
+        FOREIGN KEY (userid) REFERENCES users
+);
