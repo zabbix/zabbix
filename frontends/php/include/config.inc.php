@@ -2249,7 +2249,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			}
 		}
 
-		return SUCCEED;
+		return TRUE;
 	}
 
 	function	add_group_to_host($hostid,$newgroup)
