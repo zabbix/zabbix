@@ -24,13 +24,13 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.09)
+Zabbix Reference Manual for version 1.0 (draft v1.10)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-22 January 2002
+06 February 2002
 \layout Abstract
 
 The document is Reference Manual for Zabbix version 1.0.
@@ -1854,7 +1854,7 @@ can be used in definition of monitored parameters
 \layout Itemize
 
 IMPORTANT.
- Algorith for unreachble hosts changed.
+ Algorithm for unreachble hosts changed.
  In case of network problems host will be disabled for the next 60 seconds
  (defined in 
 \shape italic 
@@ -1907,6 +1907,16 @@ IMPORTANT.
 zabbix_trapperd
 \series default 
  was changed to 5.
+\layout Subsubsection
+
+Zabbix 1.0beta2
+\layout Itemize
+
+IMPORTANT.
+ All *html documents were renamed to *.php
+\layout Itemize
+
+No DB patches need to be applied
 \layout Subsection
 
 ChangeLog
@@ -3453,7 +3463,7 @@ zabbix_agentd
 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="5" columns="4">
+<lyxtabular version="2" rows="6" columns="4">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
@@ -3525,6 +3535,40 @@ Yes
 
 IP address of Zabbix server.
  Connections from other IP addresses will be rejected.
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+ListenPort
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+No
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+10000
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Port number to listen
 \end_inset 
 </cell>
 </row>
@@ -4025,7 +4069,7 @@ zabbix_trapperd
 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="6" columns="4">
+<lyxtabular version="2" rows="7" columns="4">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
@@ -4096,6 +4140,40 @@ No
 \layout Standard
 
 Debug level
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+ListenPort
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+No
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+10001
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Port to listen
 \end_inset 
 </cell>
 </row>
@@ -11950,6 +12028,23 @@ CHARLIE COLLINS
 \layout Standard
 
 Startup scripts.
+\layout Itemize
+
+
+\noun on 
+ALEXANDER KALIMULIN
+\layout Standard
+
+Help with various issues related to C, C functions, etc
+\layout Itemize
+
+
+\noun on 
+ARTURS ABOLTINS
+\layout Standard
+
+Patch to allow connection to MySQL using UNIX socket.
+ Other (not yet applied) patches.
 \layout Subsection
 
 Supporters to Zabbix
