@@ -1,5 +1,6 @@
 Changes for 1.0beta11:
 
+ - IRC support channel #zabbix on irc.pilgerer.org (Alexei)
  - fix for dashed lines under some broken GD (Alexei)
  - http://zabbix.sf.net was changed to http://www.zabbix.org
  (Alexei)
