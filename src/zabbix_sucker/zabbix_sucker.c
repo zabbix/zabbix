@@ -56,26 +56,14 @@ void	signal_handler( int sig )
 	}
 }
 
-/* Am I root ? 0 - no */
-int	is_root()
-{
-	int	res=0;
-
-	if( (getuid()==0) || (getuid()==0) )
-	{
-		res = 1;
-	}
-
-	return	res;
-}
-
 void	daemon_init(void)
 {
 	int		i;
 	pid_t		pid;
 	struct passwd	*pwd;
 
-	if(is_root() !=0)
+	/* running as root ?*/
+	if((getuid()==0) || (getuid()==0))
 	{
 		pwd = getpwnam("zabbix");
 		if ( pwd == NULL )
@@ -505,18 +493,11 @@ int get_minnextcheck(int now)
 	sprintf(c,"select count(*),min(nextcheck) from items i,hosts h where i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and i.itemid%%%d=%d",now,CONFIG_SUCKER_FORKS-1,sucker_num-1);
 	result = DBselect(c);
 
-	if(result==NULL)
+	if( (result==NULL) || (DBnum_rows(result)==0) )
 	{
 		syslog(LOG_DEBUG, "No items to update for minnextcheck.");
 		DBfree_result(result);
 		return FAIL; 
-	}
-
-	if(DBnum_rows(result)==0)
-	{
-		syslog( LOG_DEBUG, "Num_rows is 0.");
-		DBfree_result(result);
-		return	FAIL;
 	}
 
 	count = atoi(DBget_field(result,0,0));
@@ -646,7 +627,7 @@ int get_values(void)
 		}
 	}
 
-	update_triggers( 0, sucker_num, now );
+	update_triggers( CONFIG_SUCKER_FORKS, 0, sucker_num, now );
 
 	DBfree_result(result);
 	return SUCCEED;
@@ -769,6 +750,10 @@ int main_sucker_loop()
 		}
 		if(sleeptime>0)
 		{
+			if(sleeptime > SUCKER_DELAY)
+			{
+				sleeptime = SUCKER_DELAY;
+			}
 			syslog( LOG_DEBUG, "Sleeping for %d seconds", sleeptime );
 			sleep( sleeptime );
 		}

@@ -1,7 +1,9 @@
 Changes for 1.0beta1:
 (Add support for PostgreSQL and patches)
 (Add description of new tables and column URL to the manual)
+(snmptrap -v 1 127.0.0.1 public '' localhost 3 0 '' interfaces.ifTable.ifEntry.ifIndex.1 i 1)
 
+ - zabbix_agentd cannot be ran as root (Alexei)
  - added file misc/conf/zabbix_suckerd.conf (Alexei)
  - added misc/init.d/debian/zabbix-server (Alexei)
  - zabbix_suckerd cannot be ran as root (Alexei)

@@ -28,6 +28,9 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
+/* Required for getpwuid */
+#include <pwd.h>
+
 #include "common.h"
 #include "sysinfo.h"
 #include "zabbix_agent.h"
@@ -58,6 +61,29 @@ void    daemon_init(void)
 {
 	int     i;
 	pid_t   pid;
+	struct passwd   *pwd;
+
+	/* running as root ?*/
+	if((getuid()==0) || (getuid()==0))
+	{
+		pwd = getpwnam("zabbix");
+		if ( pwd == NULL )
+		{
+			fprintf(stderr,"User zabbix does not exist.\n");
+			fprintf(stderr, "Cannot run as root !\n");
+			exit(FAIL);
+		}
+		if( (setgid(pwd->pw_gid) ==-1) || (setuid(pwd->pw_uid) == -1) )
+		{
+			fprintf(stderr,"Cannot setgid or setuid to zabbix\n");
+			exit(FAIL);
+		}
+		if( (setegid(pwd->pw_gid) ==-1) || (seteuid(pwd->pw_uid) == -1) )
+		{
+			fprintf(stderr,"Cannot setegid or seteuid to zabbix\n");
+			exit(FAIL);
+		}
+	}
 
 	if( (pid = fork()) != 0 )
 	{
