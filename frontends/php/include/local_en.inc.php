@@ -436,6 +436,7 @@
 
 //	screenedit.php
 	define("S_MAP",					"Map");
+	define("S_PLAIN_TEXT",				"Plain text");
 
 //	screens.php
 	define("S_CUSTOM_SCREENS",			"Custom screens");
