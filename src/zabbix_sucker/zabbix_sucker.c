@@ -995,7 +995,11 @@ int main_nodata_loop()
 		DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
 
 		now=time(NULL);
+#ifdef HAVE_PGSQL
+		sprintf(sql,"select distinct f.itemid,f.functionid,f.parameter from functions f, items i,hosts h where h.hostid=i.hostid and (h.status=0 or (h.status=2 and h.disable_until<%d)) and i.itemid=f.itemid and f.function='nodata' and i.lastclock+f.parameter::text::integer<=%d and i.status in (%d,%d) and f.lastvalue<>1", now, now, ITEM_STATUS_ACTIVE, ITEM_STATUS_TRAPPED);
+#else
 		sprintf(sql,"select distinct f.itemid,f.functionid,f.parameter from functions f, items i,hosts h where h.hostid=i.hostid and (h.status=0 or (h.status=2 and h.disable_until<%d)) and i.itemid=f.itemid and f.function='nodata' and i.lastclock+f.parameter<=%d and i.status in (%d,%d) and f.lastvalue<>1", now, now, ITEM_STATUS_ACTIVE, ITEM_STATUS_TRAPPED);
+#endif
 		result = DBselect(sql);
 
 		for(i=0;i<DBnum_rows(result);i++)
