@@ -846,7 +846,7 @@ void	apply_actions(DB_TRIGGER *trigger,int trigger_value)
 	int	i;
 	int	now;
 
-	zabbix_log( LOG_LEVEL_ERR, "In apply_actions(%d,%d)",trigger->triggerid, trigger_value);
+	zabbix_log( LOG_LEVEL_DEBUG, "In apply_actions(%d,%d)",trigger->triggerid, trigger_value);
 
 	if(TRIGGER_VALUE_TRUE == trigger_value)
 	{
@@ -872,14 +872,13 @@ void	apply_actions(DB_TRIGGER *trigger,int trigger_value)
 
 /*	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,scope,severity,recipient,good from actions where (scope=%d and triggerid=%d and good=%d and nextcheck<=%d) or (scope=%d and good=%d) or (scope=%d and good=%d)",ACTION_SCOPE_TRIGGER,trigger->triggerid,trigger_value,now,ACTION_SCOPE_HOST,trigger_value,ACTION_SCOPE_HOSTS,trigger_value);*/
 	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,scope,severity,recipient,good from actions where (scope=%d and triggerid=%d and (good=%d or good=2) and nextcheck<=%d) or (scope=%d and (good=%d or good=2)) or (scope=%d and (good=%d or good=2))",ACTION_SCOPE_TRIGGER,trigger->triggerid,trigger_value,now,ACTION_SCOPE_HOST,trigger_value,ACTION_SCOPE_HOSTS,trigger_value);
-	zabbix_log( LOG_LEVEL_ERR, "SQL[%s]",sql);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 
 		zabbix_log( LOG_LEVEL_DEBUG, "i=[%d]",i);
-		zabbix_log( LOG_LEVEL_ERR, "Fetched: ID [%s] %s %s %s %s\n",DBget_field(result,i,0),DBget_field(result,i,1),DBget_field(result,i,2),DBget_field(result,i,3),DBget_field(result,i,4));
+/*		zabbix_log( LOG_LEVEL_ERR, "Fetched: ID [%s] %s %s %s %s\n",DBget_field(result,i,0),DBget_field(result,i,1),DBget_field(result,i,2),DBget_field(result,i,3),DBget_field(result,i,4));*/
 
 		action.actionid=atoi(DBget_field(result,i,0));
 		action.userid=atoi(DBget_field(result,i,1));
@@ -963,10 +962,9 @@ void	apply_actions(DB_TRIGGER *trigger,int trigger_value)
 
 		send_to_user(trigger,&action);
 		snprintf(sql,sizeof(sql)-1,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
-		zabbix_log( LOG_LEVEL_ERR, "SQL[%s]",sql);
 		DBexecute(sql);
 	}
-	zabbix_log( LOG_LEVEL_ERR, "Actions applied for trigger %d %d", trigger->triggerid, trigger_value );
+	zabbix_log( LOG_LEVEL_DEBUG, "Actions applied for trigger %d %d", trigger->triggerid, trigger_value );
 	DBfree_result(result);
 }
 
