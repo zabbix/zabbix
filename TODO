@@ -1,5 +1,6 @@
 1.0beta10:
 
+ - bug. New agent generates too many unsupported
  - add &nbsp; to the Latest Values
  - add all supported items to templates (data.sql)
  - performance of graphs: get rid of MIN,MAX
