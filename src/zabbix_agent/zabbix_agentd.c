@@ -17,6 +17,9 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+/* No warning for bzero */
+#include <strings.h>
+
 /* For config file operations */
 #include <sys/types.h>
 #include <sys/stat.h>
