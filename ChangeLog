@@ -1,5 +1,6 @@
 Changes for 1.1alpha6:
 
+ - added propagation of template item change to related hosts (Alexei)
  - modified data.sql to exclude zabbix_suckerd and zabbix_agentd (Alexei)
  - fixed SQL warning when updating actions (Alexei)
  - fixed change of plain text data in screens (Alexei)
