@@ -28,6 +28,7 @@ Not ready yet:
 
  OTHER:
 
+ - look for cool icons
  - different sound files for different severity
  - add table sessions to patches for beta4?
  - check for function parameters in evaluate_simple_expression
@@ -46,7 +47,6 @@ Not ready yet:
  - update trigger status to unknown if cannot evaluate function 
  - do not dump "Expression cannot be evaluated" in case if function.lastvalue
    is NULL
- - get rid of register_globals in php.ini (use $HTTP_GET_VARS, ...)
  - rename "Alerts" to "Notification" (Alexei)
 
  TO TEST:
@@ -57,6 +57,8 @@ Not ready yet:
   - everything for PostgreSQL
 
 Changes for 1.0beta6:
+
+ - no dependency on register_globals in php.ini (Alexei)
 
  - zabbix_suckerd to write "Connection reset by peer" to LogFile
  (Alexei)
