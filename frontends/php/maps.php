@@ -31,16 +31,18 @@
 		$lasthost="";
 		$result=DBselect("select sysmapid,name from sysmaps order by name");
 
-		for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 		{
-			$sysmapid_=DBget_field($result,$i,0);
-			$name=DBget_field($result,$i,1);
-			if( isset($sysmapid) && ($sysmapid == $sysmapid_) )
+			if(!check_right("Network map","R",$row["sysmapid"]))
+			{
+				continue;
+			}
+			if( isset($sysmapid) && ($sysmapid == $row["sysmapid"]) )
 			{
 				echo "<b>[";
 			}
-			echo "<a href='maps.php?sysmapid=$sysmapid_'>$name</a>";
-			if(isset($sysmapid) && ($sysmapid == $sysmapid_) )
+			echo "<a href='maps.php?sysmapid=".$row["sysmapid"]."'>".$row["name"]."</a>";
+			if(isset($sysmapid) && ($sysmapid == $row["sysmapid"]) )
 			{
 				echo "]</b>";
 			}

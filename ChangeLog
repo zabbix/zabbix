@@ -1,6 +1,7 @@
 Not ready yet:
 
 [ CORE. Support for automake ]
+[ CORE. Connect to DB for each request. zabbix_trapperd ]
 
 [ CORE. Support for Service Tree ] 
 [ CORE. Support for flexible permissions ]
@@ -16,6 +17,8 @@ Not ready yet:
 
 Changes for 1.0beta3:
 
+ - added default user "guest" (Alexei)
+ - more support for flexible permissions (Alexei)
  - added support for Inverse Select in status of triggers (Alexei)
  - added support for flexible permissions (Alexei)
  - fixed items.php (Alexei)
