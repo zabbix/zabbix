@@ -356,7 +356,7 @@
 		echo "<OPTION VALUE='0' SELECTED>-";
 	        for($i=0;$i<DBnum_rows($result);$i++)
 	        {
-//	                $triggerid_=DBget_field($result,$i,0);
+	                $triggerid_=DBget_field($result,$i,0);
 //	                $description_=DBget_field($result,$i,1);
 //			if( strstr($description_,"%s"))
 //			{
