@@ -34,8 +34,8 @@ snmpget -On localhost public enterprises.ucdavis.memory.memTotalSwap.0]
 
 Changes for 1.0beta4:
 
+ - more anvanced algorithm for updating disable_until field (Alexei)
  - problem with "Lost connection to DB" solved (Alexei)
-
  - function DBis_empty(), code cleanup (Alexei)
  - unreachable parameters will not be shown in Queue (Alexei)
  - support for check_service[service,port]
