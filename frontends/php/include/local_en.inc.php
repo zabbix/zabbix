@@ -162,6 +162,9 @@
 	define("S_ESCALATION_RULES",			"Escalation rules");
 	define("S_ESCALATION_RULES_BIG",		"ESCALATION RULES");
 	define("S_NO_ESCALATION_RULES_DEFINED",		"No escalation rules defined");
+	define("S_NO_ESCALATION_DETAILS",		"No escalation details");
+	define("S_ESCALATION_DETAILS_BIG",		"ESCALATION DETAILS");
+	define("S_STEP",				"Step");
 
 //	Latest values
 	define("S_LATEST_VALUES",			"Latest values");
