@@ -1402,7 +1402,31 @@ double	CACHEDMEM(void)
 #ifdef HAVE_PROC
 /* Get CACHED memory in bytes */
 /*	return getPROC("/proc/meminfo",8,2);*/
-	return getPROC("/proc/meminfo",2,7);
+/* It does not work for both 2.4 and 2.6 */
+/*	return getPROC("/proc/meminfo",2,7);*/
+	FILE	*f;
+	char	*t;
+	char	c[MAX_STRING_LEN];
+	double	result = FAIL;
+
+	f=fopen("/proc/meminfo","r");
+	if(NULL == f)
+	{
+		return	FAIL;
+	}
+	while(NULL!=fgets(c,MAX_STRING_LEN,f))
+	{
+		if(strncmp(c,"Cached:",7) == 0)
+		{
+			t=(char *)strtok(c," ");
+			t=(char *)strtok(NULL," ");
+			sscanf(t, "%lf", &result );
+			break;
+		}
+	}
+	fclose(f);
+
+	return	result;
 #else
 	return FAIL;
 #endif
