@@ -128,7 +128,7 @@ void ListenerThread(void *)
 {
    SOCKET sock,sockClient;
    struct sockaddr_in servAddr;
-   int iSize;
+   int iSize,errorCount=0;
 
    TlsSetValue(dwTlsLogPrefix,"Listener: ");   // Set log prefix for listener thread
 
@@ -161,10 +161,21 @@ void ListenerThread(void *)
       iSize=sizeof(struct sockaddr_in);
       if ((sockClient=accept(sock,(struct sockaddr *)&servAddr,&iSize))==-1)
       {
-         WriteLog(MSG_ACCEPT_ERROR,EVENTLOG_ERROR_TYPE,"s",GetSystemErrorText(WSAGetLastError()));
-         closesocket(sock);
-         exit(1);
+         int error=WSAGetLastError();
+
+         if (error!=WSAEINTR)
+            WriteLog(MSG_ACCEPT_ERROR,EVENTLOG_ERROR_TYPE,"s",GetSystemErrorText(error));
+         errorCount++;
+         if (errorCount>1000)
+         {
+            WriteLog(MSG_TOO_MANY_ERRORS,EVENTLOG_WARNING_TYPE,NULL);
+            errorCount=0;
+         }
+         Sleep(500);
       }
+
+      errorCount=0;     // Reset consecutive errors counter
+
       if (IsValidServerAddr(servAddr.sin_addr.S_un.S_addr))
       {
          _beginthread(CommThread,0,(void *)sockClient);

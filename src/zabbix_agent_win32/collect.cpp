@@ -82,9 +82,10 @@ void CollectorThread(void *)
       return;
    }
 
-   if (PdhAddCounter(query,"\\Processor(_Total)\\% Processor Time",0,&cntCpuUsage[0])!=ERROR_SUCCESS)
+   if ((status=PdhAddCounter(query,"\\Processor(_Total)\\% Processor Time",0,&cntCpuUsage[0]))!=ERROR_SUCCESS)
    {
-      WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"s","\\Processor(_Total)\\%% Processor Time");
+      WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"ss",
+               "\\Processor(_Total)\\%% Processor Time",GetPdhErrorText(status));
       PdhCloseQuery(query);
       return;
    }
@@ -93,18 +94,19 @@ void CollectorThread(void *)
       char counterPath[256];
 
       sprintf(counterPath,"\\Processor(%d)\\%% Processor Time",i);
-      if (PdhAddCounter(query,counterPath,0,&cntCpuUsage[i+1])!=ERROR_SUCCESS)
+      if ((status=PdhAddCounter(query,counterPath,0,&cntCpuUsage[i+1]))!=ERROR_SUCCESS)
       {
-         WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"s",counterPath);
+         WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"ss",
+                  counterPath,GetPdhErrorText(status));
          PdhCloseQuery(query);
          return;
       }
    }
 
-   if (PdhCollectQueryData(query)!=ERROR_SUCCESS)
+   if ((status=PdhCollectQueryData(query))!=ERROR_SUCCESS)
    {
       WriteLog(MSG_PDH_COLLECT_QUERY_DATA_FAILED,EVENTLOG_ERROR_TYPE,"s",
-               GetSystemErrorText(GetLastError()));
+               GetPdhErrorText(status));
       PdhCloseQuery(query);
       return;
    }
@@ -114,9 +116,10 @@ void CollectorThread(void *)
    cpuHistoryIdx=0;
 
    // Prepare for CPU execution queue usage collection
-   if (PdhAddCounter(query,"\\System\\Processor Queue Length",0,&cntCpuQueue)!=ERROR_SUCCESS)
+   if ((status=PdhAddCounter(query,"\\System\\Processor Queue Length",0,&cntCpuQueue))!=ERROR_SUCCESS)
    {
-      WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"s","\\System\\Processor Queue Length");
+      WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"ss",
+               "\\System\\Processor Queue Length",GetPdhErrorText(status));
       PdhCloseQuery(query);
       return;
    }
@@ -127,12 +130,12 @@ void CollectorThread(void *)
    // Add user counters to query
    for(cptr=userCounterList;cptr!=NULL;cptr=cptr->next)
    {
-      if (PdhAddCounter(query,cptr->counterPath,0,&cptr->handle)!=ERROR_SUCCESS)
+      if ((status=PdhAddCounter(query,cptr->counterPath,0,&cptr->handle))!=ERROR_SUCCESS)
       {
          cptr->interval=-1;   // Flag for unsupported counters
          cptr->lastValue=NOTSUPPORTED;
-         WriteLog(MSG_USERDEF_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"ss",
-                  cptr->name,cptr->counterPath);
+         WriteLog(MSG_USERDEF_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"sss",
+                  cptr->name,cptr->counterPath,GetPdhErrorText(status));
       }
    }
 
@@ -147,7 +150,7 @@ void CollectorThread(void *)
       dwTicksStart=GetTickCount();
       if ((status=PdhCollectQueryData(query))!=ERROR_SUCCESS)
          WriteLog(MSG_PDH_COLLECT_QUERY_DATA_FAILED,EVENTLOG_ERROR_TYPE,"s",
-                  GetSystemErrorText(GetLastError()));
+                  GetPdhErrorText(status));
 
       // Process CPU utilization data
       for(i=0;i<=sysInfo.dwNumberOfProcessors;i++)

@@ -325,6 +325,7 @@ static LONG H_PerfCounter(char *cmd,char *arg,double *value)
    HCOUNTER counter;
    PDH_RAW_COUNTER rawData;
    PDH_FMT_COUNTERVALUE counterValue;
+   PDH_STATUS status;
    char counterName[MAX_PATH];
 
    GetParameterInstance(cmd,counterName,MAX_PATH-1);
@@ -336,9 +337,10 @@ static LONG H_PerfCounter(char *cmd,char *arg,double *value)
       return SYSINFO_RC_ERROR;
    }
 
-   if (PdhAddCounter(query,counterName,0,&counter)!=ERROR_SUCCESS)
+   if ((status=PdhAddCounter(query,counterName,0,&counter))!=ERROR_SUCCESS)
    {
-      WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"s",counterName);
+      WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"ss",
+               counterName,GetPdhErrorText(status));
       PdhCloseQuery(query);
       return SYSINFO_RC_NOTSUPPORTED;
    }

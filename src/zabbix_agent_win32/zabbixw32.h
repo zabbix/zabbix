@@ -42,7 +42,7 @@
 #else
 #define DEBUG_SUFFIX
 #endif
-#define AGENT_VERSION         "1.0.0-beta8(rc4)" DEBUG_SUFFIX
+#define AGENT_VERSION         "1.0.0-beta8(rc5)" DEBUG_SUFFIX
 
 #define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
 #define ZABBIX_EVENT_SOURCE   "Zabbix Win32 Agent"
@@ -112,6 +112,7 @@ struct USER_COUNTER
 
 BOOL ParseCommandLine(int argc,char *argv[]);
 char *GetSystemErrorText(DWORD error);
+char *GetPdhErrorText(DWORD error);
 BOOL MatchString(char *pattern,char *string);
 void StrStrip(char *string);
 void GetParameterInstance(char *param,char *instance,int maxSize);

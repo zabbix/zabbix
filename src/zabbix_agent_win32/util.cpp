@@ -152,16 +152,21 @@ char *GetSystemErrorText(DWORD error)
    char *msgBuf;
    static char staticBuffer[1024];
 
-   FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-                 FORMAT_MESSAGE_FROM_SYSTEM | 
-                 FORMAT_MESSAGE_IGNORE_INSERTS,
-                 NULL,error,
-                 MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT), // Default language
-                 (LPSTR)&msgBuf,0,NULL);
-
-   msgBuf[strcspn(msgBuf,"\r\n")]=0;
-   strncpy(staticBuffer,msgBuf,1023);
-   LocalFree(msgBuf);
+   if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+                     FORMAT_MESSAGE_FROM_SYSTEM | 
+                     FORMAT_MESSAGE_IGNORE_INSERTS,
+                     NULL,error,
+                     MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT), // Default language
+                     (LPSTR)&msgBuf,0,NULL)>0)
+   {
+      msgBuf[strcspn(msgBuf,"\r\n")]=0;
+      strncpy(staticBuffer,msgBuf,1023);
+      LocalFree(msgBuf);
+   }
+   else
+   {
+      sprintf(staticBuffer,"MSG 0x%08X - Unable to find message text",error);
+   }
 
    return staticBuffer;
 }
@@ -363,4 +368,32 @@ DWORD CalculateCRC32(const unsigned char *data,DWORD nbytes)
       crc=(crc << 8)^crctab[(crc >> 24)^(len & 0xFF)];
 
 	return ~crc;
+}
+
+
+//
+// Get error text for PDH functions
+//
+
+char *GetPdhErrorText(DWORD error)
+{
+   char *msgBuf;
+   static char staticBuffer[1024];
+
+   if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+                     FORMAT_MESSAGE_FROM_HMODULE | 
+                     FORMAT_MESSAGE_IGNORE_INSERTS,
+                     GetModuleHandle("PDH.DLL"),error,
+                     MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT), // Default language
+                     (LPSTR)&msgBuf,0,NULL)>0)
+   {
+      msgBuf[strcspn(msgBuf,"\r\n")]=0;
+      strncpy(staticBuffer,msgBuf,1023);
+      LocalFree(msgBuf);
+      return staticBuffer;
+   }
+   else
+   {
+      return GetSystemErrorText(error);
+   }
 }
