@@ -11,11 +11,11 @@
 	$result=DBselect("select name,width,height from sysmaps where sysmapid=$sysmapid");
 
 	$name=DBget_field($result,0,0);
-	$width=DBget_field($result,0,1);;
-	$height=DBget_field($result,0,2);;
+	$width=DBget_field($result,0,1);
+	$height=DBget_field($result,0,2);
 
-	Header( "Content-type:  text/html"); 
-#	Header( "Content-type:  image/png"); 
+#	Header( "Content-type:  text/html"); 
+	Header( "Content-type:  image/png"); 
 	Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 
 	$im = imagecreate($width,$height); 
@@ -69,7 +69,7 @@
 		$x2=DBget_field($result1,0,0);
 		$y2=DBget_field($result1,0,1);
 
-		ImageLine($im,$x1+22,$y1+22,$x2+22,$y2+22,$black);
+		ImageLine($im,$x1+16,$y1+16,$x2+16,$y2+16,$black);
 	}
 
 # Draw hosts
@@ -88,7 +88,6 @@
 		$status=DBget_field($result,$i,7);
 
 		ImageCopy($im,$img,$x,$y,0,0,ImageSX($img),ImageSY($img));
-
 
 		$x1=$x+ImageSX($img)/2-ImageFontWidth(2)*strlen($label)/2;
 		$y1=$y+ImageSY($img);

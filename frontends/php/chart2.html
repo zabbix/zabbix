@@ -18,8 +18,14 @@
 		$from=0;
 	}
 
-	$sizeX=900;
-	$sizeY=200;
+	$result=DBselect("select name,width,height from graphs where graphid=$graphid");
+
+	$name=DBget_field($result,0,0);
+	$width=DBget_field($result,0,1);
+	$height=DBget_field($result,0,2);
+
+	$sizeX=$width;
+	$sizeY=$height;
 
 	$shiftX=10;
 	$shiftYup=10;
