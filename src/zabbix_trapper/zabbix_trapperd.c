@@ -33,6 +33,7 @@
 static pid_t *pids;
 
 int	CONFIG_TRAPPERD_FORKS		= TRAPPERD_FORKS;
+int	CONFIG_LISTEN_PORT		= 10001;
 char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
@@ -70,9 +71,11 @@ void	process_config_file(void)
 		exit(1);
 	}
 
-	lineno=1;
+	lineno=0;
 	while(fgets(line,1024,file) != NULL)
 	{
+		lineno++;
+
 		if(line[0]=='#')	continue;
 		if(strlen(line)==1)	continue;
 
@@ -103,6 +106,17 @@ void	process_config_file(void)
 				exit(1);
 			}
 			CONFIG_TRAPPERD_FORKS=i;
+		}
+		else if(strcmp(parameter,"ListenPort")==0)
+		{
+			i=atoi(value);
+			if( (i<=1024) || (i>32767) )
+			{
+				syslog( LOG_CRIT, "Wrong value of ListenPort in line %d. Should be between 1024 and 32768.", lineno);
+				fclose(file);
+				exit(1);
+			}
+			CONFIG_LISTEN_PORT=i;
 		}
 		else if(strcmp(parameter,"DebugLevel")==0)
 		{
@@ -147,8 +161,6 @@ void	process_config_file(void)
 			fclose(file);
 			exit(1);
 		}
-
-		lineno++;
 	}
 	fclose(file);
 	
@@ -276,7 +288,7 @@ void	process_child(int sockfd)
 	alarm(0);
 }
 
-int	tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
+int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 {
 	int	sockfd;
 	struct	sockaddr_in      serv_addr;
@@ -290,11 +302,11 @@ int	tcp_listen(const char *host, const char *serv, socklen_t *addrlenp)
 	bzero((char *) &serv_addr, sizeof(serv_addr));
 	serv_addr.sin_family      = AF_INET;
 	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	serv_addr.sin_port        = htons(10001);
+	serv_addr.sin_port        = htons(port);
 
 	if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 	{
-		syslog( LOG_CRIT, "Cannot bind to port %d. Another zabbix_trapperd running ?",10001);
+		syslog( LOG_CRIT, "Cannot bind to port %d. Another zabbix_trapperd running ?", port);
 		exit(1);
 	}
 	
@@ -355,7 +367,6 @@ int	main()
 	int		i;
 
 	char		host[128];
-	char		*port="10001";
 
 	static struct  sigaction phan;
 
@@ -378,7 +389,7 @@ int	main()
 		exit(FAIL);
 	}
 
-	listenfd = tcp_listen(host,port,&addrlen);
+	listenfd = tcp_listen(host,CONFIG_LISTEN_PORT,&addrlen);
 
 	pids = calloc(CONFIG_TRAPPERD_FORKS, sizeof(pid_t));
 

@@ -56,9 +56,11 @@ void	process_config_file(void)
 		exit(1);
 	}
 
-	lineno=1;
+	lineno=0;
 	while(fgets(line,1024,file) != NULL)
 	{
+		lineno++;
+
 		if(line[0]=='#')	continue;
 		if(strlen(line)==1)	continue;
 
@@ -103,8 +105,6 @@ void	process_config_file(void)
 			fclose(file);
 			exit(1);
 		}
-
-		lineno++;
 	}
 	fclose(file);
 }
