@@ -1,18 +1,22 @@
+%define apxs    /usr/sbin/apxs2
+%define apache_datadir          %(%{apxs} -q DATADIR)
+%define apache_sysconfdir       %(%{apxs} -q SYSCONFDIR)
+
 Name: zabbix
-Version: 1.0beta10
+Version: 1.1alpha6
 Release: 1
 Group: System Environment/Daemons
-License: LGPL
+License: GPL
 Source: %{name}-%{version}.tar.gz
-Patch0:	zabbix-1.0b9-ping.diff
-Patch1: zabbix-1.0b9-phpconf.diff
-Patch2:	zabbix-1.0b9-rh-init.diff
 BuildRoot: %{_tmppath}/%{name}-root
-BuildPrereq: mysql, ucd-snmp
-BuildPrereq: mysql-devel, ucd-snmp-devel
-BuildPrereq: rpm-devel, openssl-devel
-Requires: mysql, ucd-snmp
+BuildPrereq: mysql-client, mysql-devel, ucdsnmp
+Requires: mysql-client, ucdsnmp
 Summary: A network monitor.
+
+%define zabbix_prefix           /opt/%{name}
+%define zabbix_bindir 		%{zabbix_prefix}/bin
+%define zabbix_confdir 		%{_sysconfdir}/%{name}
+%define zabbix_phpfrontend	%{zabbix_prefix}/frontends/php
 
 %description
 zabbix is a network monitor.
@@ -34,40 +38,55 @@ a php frontend for zabbix.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
 
 %build
 %configure --with-mysql --with-ucd-snmp
 make
 
-%post
-/usr/sbin/useradd -r zabbix
-/sbin/chkconfig --add zabbix_suckerd
-/sbin/chkconfig --add zabbix_trapperd
+# adjust in several files /home/zabbix
+for zabbixfile in misc/conf/* misc/init.d/suse/*/zabbix_agentd src/zabbix_server/{alerter,server}.c; do
+  sed -i -e "s#/home/zabbix/bin#%{zabbix_bindir}#g" \
+         -e "s#PidFile=/var/tmp#PidFile=%{_localstatedir}/run#g" \
+         -e "s#LogFile=/tmp#LogFile=%{_localstatedir}/log#g" \
+         -e "s#/home/zabbix/lock#%{_localstatedir}/lock#g" $zabbixfile
+done
+
+# adjust /home/zabbix to /usr/share/doc/packages/
+sed -i -e "s#/home/zabbix#%{_defaultdocdir}#g" create/data/images.sql
+
+%pre
+if [ -z "`grep zabbix etc/group`" ]; then
+  usr/sbin/groupadd zabbix >/dev/null 2>&1
+fi
+if [ -z "`grep zabbix etc/passwd`" ]; then
+  usr/sbin/useradd -g zabbix zabbix >/dev/null 2>&1
+fi
+
+%pre agent
+if [ -z "`grep zabbix etc/group`" ]; then
+  usr/sbin/groupadd zabbix >/dev/null 2>&1
+fi
+if [ -z "`grep zabbix etc/passwd`" ]; then
+  usr/sbin/useradd -g zabbix zabbix >/dev/null 2>&1
+fi
 
 %post agent
-/usr/sbin/useradd -r zabbix
-/sbin/chkconfig --add zabbix_agentd
+%{fillup_and_insserv -f zabbix_agentd}
 
-%preun
-if [ $1 = 0 ] ; then
-    /usr/sbin/userdel zabbix
-    /sbin/chkconfig --del zabbix_suckerd
-    /sbin/chkconfig --del zabbix_trapperd
-    /sbin/service zabbix_suckerd stop >/dev/null 2>&1
-    /sbin/service zabbix_trapperd stop >/dev/null 2>&1
+if [ -z "`grep zabbix_agent etc/services`" ]; then
+  cat >>etc/services <<EOF
+zabbix_agent	10050/tcp
+EOF
 fi
-exit 0
 
-%preun agent
-if [ $1 = 0 ] ; then
-    /usr/sbin/userdel zabbix
-    /sbin/chkconfig --del zabbix_agentd
-    /sbin/service zabbix_agentd stop >/dev/null 2>&1
+if [ -z "`grep zabbix_trap etc/services`" ]; then
+  cat >>etc/services <<EOF
+zabbix_trap	10051/tcp
+EOF
 fi
-exit 0
+
+%postun agent
+%{insserv_cleanup}
 
 %clean
 rm -fr $RPM_BUILD_ROOT
@@ -75,56 +94,72 @@ rm -fr $RPM_BUILD_ROOT
 %install
 rm -fr $RPM_BUILD_ROOT
 #make install DESTDIR=$RPM_BUILD_ROOT
-install -d %{buildroot}%{_sbindir}
-install -m 755 bin/zabbix_sender %{buildroot}%{_sbindir}/
-install -m 755 bin/zabbix_suckerd %{buildroot}%{_sbindir}/
-install -m 755 bin/zabbix_trapper %{buildroot}%{_sbindir}/
-install -m 755 bin/zabbix_trapperd %{buildroot}%{_sbindir}/
-install -d %{buildroot}%{_libdir}/%{name}
-cp -r frontends/php %{buildroot}%{_libdir}/%{name}/
-install -d %{buildroot}%{_sysconfdir}/zabbix
-install -d %{buildroot}%{_sysconfdir}/rc.d/init.d
-install -m 755 misc/conf/zabbix_suckerd.conf %{buildroot}%{_sysconfdir}/zabbix/
-install -m 755 misc/conf/zabbix_trapper.conf %{buildroot}%{_sysconfdir}/zabbix/
-install -m 755 misc/conf/zabbix_trapperd.conf %{buildroot}%{_sysconfdir}/zabbix/
-install -m 755 misc/conf/zabbix_php.conf %{buildroot}%{_sysconfdir}/zabbix/
-install -m 755 misc/init.d/redhat/8.0/zabbix_suckerd %{buildroot}%{_sysconfdir}/rc.d/init.d/
-install -m 755 misc/init.d/redhat/8.0/zabbix_trapperd %{buildroot}%{_sysconfdir}/rc.d/init.d/
 
-install -m 755 bin/zabbix_agent %{buildroot}%{_sbindir}/
-install -m 755 bin/zabbix_agentd %{buildroot}%{_sbindir}/
-install -m 755 misc/conf/zabbix_agent.conf %{buildroot}%{_sysconfdir}/zabbix/
-install -m 755 misc/conf/zabbix_agentd.conf %{buildroot}%{_sysconfdir}/zabbix/
-install -m 755 misc/init.d/redhat/8.0/zabbix_agentd %{buildroot}%{_sysconfdir}/rc.d/init.d/
+# create directory structure
+install -d %{buildroot}%{zabbix_bindir}
+install -d %{buildroot}%{zabbix_confdir}
+install -d %{buildroot}%{_sysconfdir}/init.d
+install -d %{buildroot}%{apache_sysconfdir}/conf.d
+
+# copy binaries
+install -m 755 bin/zabbix_* %{buildroot}%{zabbix_bindir}
+
+# copy conf files
+install -m 755 misc/conf/zabbix_*.conf %{buildroot}%{zabbix_confdir}
+
+# copy frontends
+cp -r frontends %{buildroot}%{zabbix_prefix}
+
+# apache2 config
+cat >zabbix.conf <<EOF
+Alias /%{name} %{zabbix_phpfrontend}
+
+<Directory "%{zabbix_phpfrontend}">
+    Options FollowSymLinks
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+</Directory>
+EOF
+
+install -m 644 zabbix.conf %{buildroot}%{apache_sysconfdir}/conf.d
+
+# SuSE Start Scripts
+install -m 755 misc/init.d/suse/9.1/zabbix_* %{buildroot}%{_sysconfdir}/init.d/
 
 %files
 %defattr(-,root,root)
-%doc AUTHORS COPYING NEWS README INSTALL TODO doc create upgrades
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/zabbix/zabbix_suckerd.conf
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/zabbix/zabbix_trapper.conf
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/zabbix/zabbix_trapperd.conf
-%config(noreplace) %{_sysconfdir}/rc.d/init.d/zabbix_suckerd
-%config(noreplace) %{_sysconfdir}/rc.d/init.d/zabbix_trapperd
-%attr(0755,root,root) %{_sbindir}/zabbix_trapper
-%attr(0755,root,root) %{_sbindir}/zabbix_trapperd
-%attr(0755,root,root) %{_sbindir}/zabbix_suckerd
+%doc AUTHORS COPYING NEWS README INSTALL create upgrades
+%dir %attr(0755,root,root) %{zabbix_confdir}
+%attr(0644,root,root) %config(noreplace) %{zabbix_confdir}/zabbix_server.conf
+%dir %attr(0755,root,root) %{zabbix_prefix}
+%dir %attr(0755,root,root) %{zabbix_bindir}
+%attr(0755,root,root) %{zabbix_bindir}/zabbix_server
 
 %files agent 
 %defattr(-,root,root)
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/zabbix/zabbix_agent.conf
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/zabbix/zabbix_agentd.conf
-%config(noreplace) %{_sysconfdir}/rc.d/init.d/zabbix_agentd
-%attr(0755,root,root) %{_sbindir}/zabbix_agent
-%attr(0755,root,root) %{_sbindir}/zabbix_agentd
-%attr(0755,root,root) %{_sbindir}/zabbix_sender
+%dir %attr(0755,root,root) %{zabbix_confdir}
+%attr(0644,root,root) %config(noreplace) %{zabbix_confdir}/zabbix_agent.conf
+%attr(0644,root,root) %config(noreplace) %{zabbix_confdir}/zabbix_agentd.conf
+%config(noreplace) %{_sysconfdir}/init.d/zabbix_agentd
+%dir %attr(0755,root,root) %{zabbix_prefix}
+%dir %attr(0755,root,root) %{zabbix_bindir}
+%attr(0755,root,root) %{zabbix_bindir}/zabbix_agent
+%attr(0755,root,root) %{zabbix_bindir}/zabbix_agentd
+%attr(0755,root,root) %{zabbix_bindir}/zabbix_sender
 
 %files phpfrontend
 %defattr(-,root,root)
-%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/zabbix/zabbix_php.conf
-%attr(0755,root,root) %{_libdir}/%{name}/php
+%attr(0644,root,root) %config(noreplace) %{apache_sysconfdir}/conf.d/zabbix.conf
+%dir %attr(0755,root,root) %{zabbix_prefix}
+%dir %attr(0755,root,root) %{zabbix_prefix}/frontends
+%attr(0755,root,root) %{zabbix_phpfrontend}
 
 %changelog
-* Alexei Vladishev <alex@gobbo.caves.lv>
+* Fri Jan 29 2005 Dirk Datzert <dirk@datzert.de>
+- update to 1.1aplha6
+
+* Tue Jun 01 2003 Alexei Vladishev <alex@gobbo.caves.lv>
 - update to 1.0beta10 
 
 * Tue Jun 01 2003 Harald Holzer <hholzer@may.co.at>
