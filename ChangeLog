@@ -1,5 +1,6 @@
 Changes for 1.0:
 
+ - fixed sql statement in trigger definition form (Alexei)
  - changed all versions from 1.0beta14 to 1.0 (Alexei)
  - converted redhat scripts from DOS to UNIX format (Alexei)
 

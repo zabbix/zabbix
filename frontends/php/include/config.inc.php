@@ -196,7 +196,7 @@
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
-			$sql="select count(*) as cnt from actions a,hosts h,items i,triggers t,functions f where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and a.triggerid=".$row["hostid"]." and a.scope=1 and t.triggerid";
+			$sql="select count(*) as cnt from actions a,hosts h,items i,triggers t,functions f where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and a.triggerid=".$row["hostid"]." and a.scope=1";
 			$result2=DBselect($sql);
 			$row2=DBfetch($result2);
 			$cnt=$cnt+$row2["cnt"];
