@@ -521,8 +521,40 @@ void update_triggers_status_to_unknown(int hostid,int clock)
 	return; 
 }
 
+void  DBdelete_service(int serviceid)
+{
+	char	sql[MAX_STRING_LEN+1];
+
+	sprintf(sql,"delete from services_links where servicedownid=%d or serviceupid=%d", serviceid, serviceid);
+	DBexecute(sql);
+	sprintf(sql,"delete from services where serviceid=%d", serviceid);
+	DBexecute(sql);
+}
+
+void  DBdelete_services_by_triggerid(int triggerid)
+{
+	int	i, serviceid;
+	char	sql[MAX_STRING_LEN+1];
+	DB_RESULT	*result;
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBdelete_services_by_triggerid(%d)", triggerid);
+	sprintf(sql,"select serviceid from services where triggerid=%d", triggerid);
+	result = DBselect(sql);
+
+	for(i=0;i<DBnum_rows(result);i++)
+	{
+		serviceid=atoi(DBget_field(result,i,0));
+		DBdelete_service(serviceid);
+	}
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG,"End of DBdelete_services_by_triggerid(%d)", triggerid);
+}
+
 void  DBdelete_trigger(int triggerid)
 {
+	char	sql[MAX_STRING_LEN+1];
+
 	sprintf(sql,"delete from trigger_depends where triggerid_down=%d or triggerid_up=%d", triggerid, triggerid);
 	DBexecute(sql);
 	sprintf(sql,"delete from functions where triggerid=%d", triggerid);
@@ -562,10 +594,11 @@ void  DBdelete_triggers_by_itemid(int itemid)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"End of DBdelete_triggers_by_itemid(%d)", itemid);
 }
-}
 
 void DBdelete_history_by_itemid(int itemid)
 {
+	char	sql[MAX_STRING_LEN+1];
+
 	sprintf(sql,"delete from history where itemid=%d", itemid);
 	DBexecute(sql);
 	sprintf(sql,"delete from history_str where itemid=%d", itemid);
@@ -574,6 +607,8 @@ void DBdelete_history_by_itemid(int itemid)
 
 void DBdelete_item(int itemid)
 {
+	char	sql[MAX_STRING_LEN+1];
+
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBdelete_item(%d)", itemid);
 
 	DBdelete_triggers_by_itemid(itemid);

@@ -1,5 +1,6 @@
 Changes for 1.0beta11:
 
+ - housekeeping to delete hosts having status 'deleted' (Alexei)
  - AC_FUNC_GETLOADAVG changes to AC_REPLACE_FUNCS(getloadavg) in
  configure.in (Alexei)
  - eliminated compiler's warnings under SUSE v8.2 (Alexei)
