@@ -531,11 +531,21 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	check_authorisation()
 	{
-		global	$reconnect;	
 		global	$page;
 		global	$PHP_AUTH_USER,$PHP_AUTH_PW;
 		global	$USER_DETAILS;
-		global	$sessionid;
+		global	$HTTP_COOKIE_VARS;
+		global	$HTTP_GET_VARS;
+//		global	$sessionid;
+
+		if(isset($HTTP_COOKIE_VARS["sessionid"]))
+		{
+			$sessionid=$HTTP_COOKIE_VARS["sessionid"];
+		}
+		else
+		{
+			unset($sessionid);
+		}
 
 		$sql="select u.userid,u.alias,u.name,u.surname from sessions s,users u where s.sessionid='$sessionid' and s.userid=u.userid and s.lastaccess-600<".time();
 		$result=DBselect($sql);
