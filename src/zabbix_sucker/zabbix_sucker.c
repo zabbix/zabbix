@@ -425,7 +425,28 @@ int	get_value_SIMPLE(double *result,char *result_str,DB_ITEM *item)
 	zabbix_log( LOG_LEVEL_DEBUG, "SIMPLE [%s] [%s] [%f]", c, result_str, *result);
 	return SUCCEED;
 }
-	
+
+int	get_value_INTERNAL(double *result,char *result_str,DB_ITEM *item)
+{
+	if(strcmp(item->key,"zabbix[items]")==0)
+	{
+		*result=DBget_items_count();
+	}
+	else if(strcmp(item->key,"zabbix[history]")==0)
+	{
+		*result=DBget_history_count();
+	}
+	else
+	{
+		*result=NOTSUPPORTED;
+	}
+
+	sprintf(result_str,"%f",*result);
+
+	zabbix_log( LOG_LEVEL_DEBUG, "INTERNAL [%s] [%f]", result_str, *result);
+	return SUCCEED;
+}
+
 int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
 {
 	int	s;
@@ -616,6 +637,10 @@ int	get_value(double *result,char *result_str,DB_ITEM *item)
 	else if(item->type == ITEM_TYPE_SIMPLE)
 	{
 		res=get_value_SIMPLE(result,result_str,item);
+	}
+	else if(item->type == ITEM_TYPE_INTERNAL)
+	{
+		res=get_value_INTERNAL(result,result_str,item);
 	}
 	else
 	{

@@ -158,4 +158,6 @@ void	DBupdate_triggers_status_after_restart(void);
 int	DBget_prev_trigger_value(int triggerid);
 int	DBupdate_trigger_value(int triggerid,int value,int clock);
 
+int	DBget_items_count(void);
+int	DBget_history_count(void);
 #endif
