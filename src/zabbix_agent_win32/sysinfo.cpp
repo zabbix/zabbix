@@ -212,20 +212,40 @@ static LONG H_MemoryInfo(char *cmd,char *arg,double *value)
    }
    else
    {
-      MEMORYSTATUS ms;
+      if (imp_GlobalMemoryStatusEx!=NULL)
+      {
+         MEMORYSTATUSEX ms;
 
-      GlobalMemoryStatus(&ms);
-
-      if (!strcmp(cmd,"memory[total]"))
-         *value=(double)ms.dwTotalPhys;
-      else if (!strcmp(cmd,"memory[free]"))
-         *value=(double)ms.dwAvailPhys;
-      else if (!strcmp(cmd,"swap[total]"))
-         *value=(double)ms.dwTotalPageFile;
-      else if (!strcmp(cmd,"swap[free]"))
-         *value=(double)ms.dwAvailPageFile;
+         ms.dwLength = sizeof(MEMORYSTATUSEX);
+         imp_GlobalMemoryStatusEx(&ms);
+         if (!strcmp(cmd, "memory[total]"))
+            *value = (double)((__int64)ms.ullTotalPhys);
+         else if (!strcmp(cmd, "memory[free]"))
+            *value = (double)((__int64)ms.ullAvailPhys);
+         else if (!strcmp(cmd, "swap[total]"))
+            *value = (double)((__int64)ms.ullTotalPageFile);
+         else if (!strcmp(cmd, "swap[free]"))
+            *value = (double)((__int64)ms.ullAvailPageFile);
+         else
+            return SYSINFO_RC_NOTSUPPORTED;
+      }
       else
-         return SYSINFO_RC_NOTSUPPORTED;
+      {
+         MEMORYSTATUS ms;
+
+         GlobalMemoryStatus(&ms);
+
+         if (!strcmp(cmd,"memory[total]"))
+            *value=(double)ms.dwTotalPhys;
+         else if (!strcmp(cmd,"memory[free]"))
+            *value=(double)ms.dwAvailPhys;
+         else if (!strcmp(cmd,"swap[total]"))
+            *value=(double)ms.dwTotalPageFile;
+         else if (!strcmp(cmd,"swap[free]"))
+            *value=(double)ms.dwAvailPageFile;
+         else
+            return SYSINFO_RC_NOTSUPPORTED;
+      }
    }
    
    return SYSINFO_RC_SUCCESS;
