@@ -29,6 +29,21 @@ TKOM:
 
 OTHER:
 
+We're currently using Zabbix to monitor about 350 routers at our remote
+locations. I have two items configured for each node a simple icmpping to
+see if the router is up, and an SNMP query to check the status of a
+particular interface (to see if the site has failed over to dial backup).
+
+The issue that I am seeing is that when the site goes down, the icmpping
+history shows all 0's for as long as the outage has occured, but the alerts
+for the trigger associated with the icmpping item bounces between TRUE and
+UNKNOWN (every 1 - 3 minutes).
+
+With some research I've discovered that if I disable the SNMP item (which
+is obviously failing to get to the router) the icmpping trigger comes up as
+TRUE and will stay there until the fault has been cleared.
+
+
  - add information about integration with OpenView to the manual
  - add tabs to all screens where required
  - check all screens if they are user friendly and present information in the best possible way
