@@ -76,7 +76,7 @@ CREATE TABLE graphs (
   yaxismin		double(16,4)	DEFAULT '0' NOT NULL,
   yaxismax		double(16,4)	DEFAULT '0' NOT NULL,
   PRIMARY KEY (graphid),
-  UNIQUE (name)
+  KEY (name)
 ) type=InnoDB;
 
 --
