@@ -243,23 +243,48 @@ void	add_values_interfaces(int now,char *interface,float value_sent,float value_
 {
 	int i,j;
 
+	int bounced;
+
 /*	printf("Add_values [%s] [%f] [%f]\n",interface,value_sent,value_received);*/
 
 	for(i=0;i<MAX_INTERFACE;i++)
 	{
 		if(0 == strcmp(interfaces[i].interface,interface))
 		{
+			bounced=0;
 			for(j=0;j<15*60;j++)
 			{
-				if(interfaces[i].clock[j]<now-15*60)
+				if((interfaces[i].clock[j]<now)&&
+					((value_sent<interfaces[i].sent[j])||(value_received<interfaces[i].received[j])))
 				{
-					interfaces[i].clock[j]=now;
-					interfaces[i].sent[j]=value_sent;
-					interfaces[i].received[j]=value_received;
+/* Bounced interface. Reset counters. */
+					bounced=1;
 					break;
 				}
+		
 			}
-			break;
+			if(bounced==0)
+			{
+				for(j=0;j<15*60;j++)
+				{
+					if(interfaces[i].clock[j]<now-15*60)
+					{
+						interfaces[i].clock[j]=now;
+						interfaces[i].sent[j]=value_sent;
+						interfaces[i].received[j]=value_received;
+						break;
+					}
+				}
+			}
+			else
+			{
+				for(j=0;j<15*60;j++)
+				{
+					interfaces[i].clock[j]=0;
+					interfaces[i].sent[j]=0;
+					interfaces[i].received[j]=0;
+				}
+			}
 		}
 	}
 }

@@ -1,6 +1,5 @@
 HB:
 
- - add metrics like zabbix[history_count], zabbix[items_notsupported], etc
  - use profiles instead of passing parameters using POST
  - add threshold,min,max line for user-defined graphs
  - 
