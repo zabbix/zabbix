@@ -1,0 +1,215 @@
+/* 
+** Zabbix
+** Copyright (C) 2000,2001,2002,2003 Alexei Vladishev
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+**/
+
+#include "config.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+
+#include <sys/wait.h>
+
+#include <string.h>
+
+#ifdef HAVE_NETDB_H
+	#include <netdb.h>
+#endif
+
+/* Required for getpwuid */
+#include <pwd.h>
+
+#include <signal.h>
+#include <errno.h>
+
+#include <time.h>
+
+#include "common.h"
+#include "cfg.h"
+#include "db.h"
+#include "log.h"
+
+#include "housekeeper.h"
+
+int housekeeping_history(int now)
+{
+	char		sql[MAX_STRING_LEN+1];
+	DB_ITEM		item;
+
+	DB_RESULT	*result;
+
+	int		i;
+
+/* How lastdelete is used ??? */
+	sprintf(sql,"select itemid,lastdelete,history,delay from items where lastdelete<=%d", now);
+	result = DBselect(sql);
+
+	for(i=0;i<DBnum_rows(result);i++)
+	{
+		item.itemid=atoi(DBget_field(result,i,0));
+		item.lastdelete=atoi(DBget_field(result,i,1));
+		item.history=atoi(DBget_field(result,i,2));
+		item.delay=atoi(DBget_field(result,i,3));
+
+		if(item.delay==0)
+		{
+			item.delay=1;
+		}
+
+#ifdef HAVE_MYSQL
+		sprintf	(sql,"delete from history where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
+#else
+		sprintf	(sql,"delete from history where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
+#endif
+		DBexecute(sql);
+#ifdef HAVE_MYSQL
+		sprintf	(sql,"delete from history_str where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
+#else
+		sprintf	(sql,"delete from history_str where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
+#endif
+		DBexecute(sql);
+	
+		sprintf(sql,"update items set lastdelete=%d where itemid=%d",now,item.itemid);
+		DBexecute(sql);
+	}
+	DBfree_result(result);
+	return SUCCEED;
+}
+
+int housekeeping_sessions(int now)
+{
+	char	sql[MAX_STRING_LEN+1];
+
+	sprintf	(sql,"delete from sessions where lastaccess<%d",now-24*3600);
+	DBexecute(sql);
+
+	return SUCCEED;
+}
+
+int housekeeping_alerts(int now)
+{
+	char		sql[MAX_STRING_LEN+1];
+	int		alert_history;
+	DB_RESULT	*result;
+	int		res = SUCCEED;
+
+	sprintf(sql,"select alert_history from config");
+	result = DBselect(sql);
+
+	if(DBnum_rows(result) == 0)
+	{
+		zabbix_log( LOG_LEVEL_ERR, "No records in table 'config'.");
+		res = FAIL;
+	}
+	else
+	{
+		alert_history=atoi(DBget_field(result,0,0));
+
+		sprintf	(sql,"delete from alerts where clock<%d",now-24*3600*alert_history);
+		DBexecute(sql);
+	}
+
+	DBfree_result(result);
+	return res;
+}
+
+int housekeeping_alarms(int now)
+{
+	char		sql[MAX_STRING_LEN+1];
+	int		alarm_history;
+	DB_RESULT	*result;
+	int		res = SUCCEED;
+
+	sprintf(sql,"select alarm_history from config");
+	result = DBselect(sql);
+	if(DBnum_rows(result) == 0)
+	{
+		zabbix_log( LOG_LEVEL_ERR, "No records in table 'config'.");
+		res = FAIL;
+	}
+	else
+	{
+		alarm_history=atoi(DBget_field(result,0,0));
+
+		sprintf	(sql,"delete from alarms where clock<%d",now-24*3600*alarm_history);
+		DBexecute(sql);
+	}
+	
+	DBfree_result(result);
+	return res;
+}
+
+int main_housekeeper_loop()
+{
+	int	now;
+
+	if(CONFIG_DISABLE_HOUSEKEEPING == 1)
+	{
+		for(;;)
+		{
+/* Do nothing */
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+			setproctitle("do nothing");
+#endif
+			sleep(3600);
+		}
+	}
+
+	for(;;)
+	{
+		now = time(NULL);
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("connecting to the database");
+#endif
+		DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+
+		DBvacuum();
+
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("housekeeper [removing old values]");
+#endif
+		housekeeping_history(now);
+
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("housekeeper [removing old alarms]");
+#endif
+		housekeeping_alarms(now);
+
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("housekeeper [removing old alerts]");
+#endif
+		housekeeping_alerts(now);
+
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("housekeeper [removing old sessions]");
+#endif
+		housekeeping_sessions(now);
+
+		zabbix_log( LOG_LEVEL_DEBUG, "Sleeping for %d hours", CONFIG_HOUSEKEEPING_FREQUENCY);
+
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("housekeeper [sleeping for %d hour(s)]", CONFIG_HOUSEKEEPING_FREQUENCY);
+#endif
+		DBclose();
+		sleep(3660*CONFIG_HOUSEKEEPING_FREQUENCY);
+	}
+}

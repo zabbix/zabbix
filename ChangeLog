@@ -1,5 +1,6 @@
 Changes for 1.0beta11:
 
+ - added src/zabbix_sucker/housekeeper.* (Alexei)
  - new hos status: 'deleted' (Alexei)
 
 Changes for 1.0beta10:

@@ -52,7 +52,7 @@ int	is_double(char *c)
 	zabbix_log(LOG_LEVEL_DEBUG, "Starting is_double:[%s]", c );
 	for(i=0;i<strlen(c);i++)
 	{
-		if((c[i]>='0')&&(c[i]<='9'))
+		if(((c[i]>='0')&&(c[i]<='9'))
 		{
 			continue;
 		}
