@@ -227,23 +227,33 @@
 		$trigger=get_trigger_by_triggerid($HTTP_GET_VARS["triggerid"]);
 		$description=htmlspecialchars(stripslashes($trigger["description"]));
 
-		$delay=30;
-		$subject=$description;
+//		$delay=30;
+		$delay=@iif(isset($HTTP_GET_VARS["delay"]),$HTTP_GET_VARS["delay"],30);
+//		$subject=$description;
+		$subject=@iif(isset($HTTP_GET_VARS["subject"]),$HTTP_GET_VARS["subject"],$description);
 		$scope=@iif(isset($HTTP_GET_VARS["scope"]),$HTTP_GET_VARS["scope"],0);
 		$good=@iif(isset($HTTP_GET_VARS["good"]),$HTTP_GET_VARS["good"],1);
 		$recipient=@iif(isset($HTTP_GET_VARS["recipient"]),$HTTP_GET_VARS["recipient"],RECIPIENT_TYPE_GROUP);
-		$severity=0;
+//		$severity=0;
+		$severity=@iif(isset($HTTP_GET_VARS["severity"]),$HTTP_GET_VARS["severity"],0);
 
 		$sql="select i.description, h.host, i.key_ from hosts h, items i,functions f where f.triggerid=".$HTTP_GET_VARS["triggerid"]." and h.hostid=i.hostid and f.itemid=i.itemid order by i.description";
 		$result=DBselect($sql);
-		$message="INSERT YOUR MESSAGE HERE\n\n------Latest data------\n\n";
-		while($row=DBfetch($result))
+		if(isset($HTTP_GET_VARS["message"]))
 		{
-			$message=$message.$row["description"].": {".$row["host"].":".$row["key_"].".last(0)}  (latest value)\n";
-			$message=$message.$row["description"].": {".$row["host"].":".$row["key_"].".max(300)} (maximum value for last 5 min)\n";
-			$message=$message.$row["description"].": {".$row["host"].":".$row["key_"].".min(300)} (minimum value for last 5 min)\n\n";
+			$message=$HTTP_GET_VARS["message"];
 		}
-		$message=$message."---------End--------\n";
+		else
+		{
+			$message="INSERT YOUR MESSAGE HERE\n\n------Latest data------\n\n";
+			while($row=DBfetch($result))
+			{
+				$message=$message.$row["description"].": {".$row["host"].":".$row["key_"].".last(0)}  (latest value)\n";
+				$message=$message.$row["description"].": {".$row["host"].":".$row["key_"].".max(300)} (maximum value for last 5 min)\n";
+				$message=$message.$row["description"].": {".$row["host"].":".$row["key_"].".min(300)} (minimum value for last 5 min)\n\n";
+			}
+			$message=$message."---------End--------\n";
+		}
 	}
 	echo "<br>";
 	show_table2_header_begin();
