@@ -36,8 +36,8 @@
 	$use_background=DBget_field($result,0,3);
 	$background=DBget_field($result,0,4);
 
-	Header( "Content-type:  text/html"); 
-//	Header( "Content-type:  image/png"); 
+//	Header( "Content-type:  text/html"); 
+	Header( "Content-type:  image/png"); 
 	Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 
 	check_authorisation();
