@@ -25,6 +25,10 @@
 		{
 			add_link($sysmapid,$shostid1,$shostid2);
 		}
+		if($register=="delete_link")
+		{
+			delete_link($linkid);
+		}
 		if($register=="delete")
 		{
 			delete_sysmaps_host($shostid);
@@ -141,7 +145,7 @@
 
 		echo "<TD>$label1</TD>";
 		echo "<TD>$label2</TD>";
-		echo "<TD><A HREF=\"sysmap.html?register=delete_link&linkid=$linkid\">Delete</A></TD>";
+		echo "<TD><A HREF=\"sysmap.html?sysmapid=$sysmapid&register=delete_link&linkid=$linkid\">Delete</A></TD>";
 		echo "</TR>";
 	}
 	echo "</TABLE>";

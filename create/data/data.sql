@@ -62,7 +62,7 @@ insert into items_template (itemtemplateid,description,key_,delay)
 insert into items_template (itemtemplateid,description,key_,delay)
 	values (21,'Checksum of /etc/passwd','cksum[/etc/passwd]', 600);
 insert into items_template (itemtemplateid,description,key_,delay)
-	values (22,'Ping of server','ping', 30);
+	values (22,'Ping to the server (TCP)','ping', 30);
 insert into items_template (itemtemplateid,description,key_,delay)
 	values (23,'Free disk space on /home','diskfree[/home]', 30);
 insert into items_template (itemtemplateid,description,key_,delay)
