@@ -1,5 +1,6 @@
 Changes for 1.0beta7:
 
+ - added support of CSS (Alexei)
  - support of processor load on Solaris 2.6. Thanks to Mariusz. (Alexei)
  - improvements for user-defined graphs. Thanks to Mariusz. (Alexei)
  - improvements for System Maps. Thanks to Mariusz. (Alexei)
