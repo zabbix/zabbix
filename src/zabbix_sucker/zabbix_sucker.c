@@ -21,17 +21,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 
 #include <string.h>
 
-#ifdef HAVE_NETDB_H
-	#include <netdb.h>
-#endif
 
 /* Required for getpwuid */
 #include <pwd.h>
@@ -41,19 +34,6 @@
 
 #include <time.h>
 
-/* NET-SNMP is used */
-#ifdef HAVE_NETSNMP
-	#include <net-snmp/net-snmp-config.h>
-	#include <net-snmp/net-snmp-includes.h>
-#endif
-
-/* Required for SNMP support*/
-#ifdef HAVE_UCDSNMP
-	#include <ucd-snmp/ucd-snmp-config.h>
-	#include <ucd-snmp/ucd-snmp-includes.h>
-	#include <ucd-snmp/system.h>
-#endif
-
 #include "cfg.h"
 #include "pid.h"
 #include "db.h"
@@ -62,11 +42,16 @@
 #include "common.h"
 #include "functions.h"
 #include "expression.h"
+
 #include "alerter.h"
 #include "pinger.h"
 #include "housekeeper.h"
+#include "housekeeper.h"
 
-#include "../zabbix_agent/sysinfo.h"
+#include "checks_agent.h"
+#include "checks_internal.h"
+#include "checks_simple.h"
+#include "checks_snmp.h"
 
 static	pid_t	*pids=NULL;
 
@@ -260,430 +245,6 @@ void	init_config(void)
 	}
 }
 
-#ifdef HAVE_SNMP
-int	get_value_SNMP(int version,double *result,char *result_str,DB_ITEM *item)
-{
-
-	#define NEW_APPROACH
-
-	struct snmp_session session, *ss;
-	struct snmp_pdu *pdu;
-	struct snmp_pdu *response;
-
-	#ifdef NEW_APPROACH
-	char temp[MAX_STRING_LEN];
-	#endif
-
-	oid anOID[MAX_OID_LEN];
-	size_t anOID_len = MAX_OID_LEN;
-
-	struct variable_list *vars;
-	int status;
-
-	unsigned char *ip;
-
-	int ret=SUCCEED;
-
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP()");
-
-	snmp_sess_init( &session );
-	session.version = version;
-	session.remote_port = item->snmp_port;
-
-
-	if(item->useip == 1)
-	{
-	#ifdef NEW_APPROACH
-		snprintf(temp,sizeof(temp)-1,"%s:%d", item->ip, item->snmp_port);
-		session.peername = temp;
-	#else
-		session.peername = item->ip;
-	#endif
-	}
-	else
-	{
-	#ifdef NEW_APPROACH
-		snprintf(temp, sizeof(temp)-1, "%s:%d", item->host, item->snmp_port);
-		session.peername = temp;
-	#else
-		session.peername = item->host;
-	#endif
-	}
-	session.community = item->snmp_community;
-	session.community_len = strlen(session.community);
-
-	zabbix_log( LOG_LEVEL_DEBUG, "SNMP [%s@%s:%d]",session.community, session.peername, session.remote_port);
-	zabbix_log( LOG_LEVEL_DEBUG, "OID [%s]", item->snmp_oid);
-
-	SOCK_STARTUP;
-	ss = snmp_open(&session);
-
-	if(ss == NULL)
-	{
-		SOCK_CLEANUP;
-		zabbix_log( LOG_LEVEL_WARNING, "Error: snmp_open()");
-		return FAIL;
-	}
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP() 0.2");
-
-	pdu = snmp_pdu_create(SNMP_MSG_GET);
-	read_objid(item->snmp_oid, anOID, &anOID_len);
-
-#if OTHER_METHODS
-	get_node("sysDescr.0", anOID, &anOID_len);
-	read_objid(".1.3.6.1.2.1.1.1.0", anOID, &anOID_len);
-	read_objid("system.sysDescr.0", anOID, &anOID_len);
-#endif
-
-	snmp_add_null_var(pdu, anOID, anOID_len);
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP() 0.3");
-  
-	status = snmp_synch_response(ss, pdu, &response);
-	zabbix_log( LOG_LEVEL_DEBUG, "Status send [%d]", status);
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP() 0.4");
-
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP() 1");
-
-	if (status == STAT_SUCCESS && response->errstat == SNMP_ERR_NOERROR)
-	{
-
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP() 2");
-/*		for(vars = response->variables; vars; vars = vars->next_variable)
-		{
-			print_variable(vars->name, vars->name_length, vars);
-		}*/
-
-		for(vars = response->variables; vars; vars = vars->next_variable)
-		{
-			int count=1;
-			zabbix_log( LOG_LEVEL_DEBUG, "AV loop()");
-
-			if(	(vars->type == ASN_INTEGER) ||
-				(vars->type == ASN_UINTEGER)||
-				(vars->type == ASN_COUNTER) ||
-				(vars->type == ASN_TIMETICKS) ||
-				(vars->type == ASN_GAUGE)
-			)
-			{
-				*result=(long)*vars->val.integer;
-				/*
-				 * This solves situation when large numbers are stored as negative values
-				 * http://sourceforge.net/tracker/index.php?func=detail&aid=700145&group_id=23494&atid=378683
-				 */ 
-				/*sprintf(result_str,"%ld",(long)*vars->val.integer);*/
-				snprintf(result_str,MAX_STRING_LEN-1,"%lu",(long)*vars->val.integer);
-			}
-			else if(vars->type == ASN_OCTET_STR)
-			{
-				memcpy(result_str,vars->val.string,vars->val_len);
-				result_str[vars->val_len] = '\0';
-				if(item->type == 0)
-				{
-					ret = NOTSUPPORTED;
-				}
-			}
-			else if(vars->type == ASN_IPADDRESS)
-			{
-				ip = vars->val.string;
-				snprintf(result_str,MAX_STRING_LEN-1,"%d.%d.%d.%d",ip[0],ip[1],ip[2],ip[3]);
-				if(item->type == 0)
-				{
-					ret = NOTSUPPORTED;
-				}
-			}
-			else
-			{
-				zabbix_log( LOG_LEVEL_WARNING,"value #%d has unknow type", count++);
-				ret  = NOTSUPPORTED;
-			}
-		}
-	}
-	else
-	{
-		if (status == STAT_SUCCESS)
-		{
-			zabbix_log( LOG_LEVEL_WARNING, "Error in packet\nReason: %s\n",
-				snmp_errstring(response->errstat));
-			if(response->errstat == SNMP_ERR_NOSUCHNAME)
-			{
-				ret=NOTSUPPORTED;
-			}
-			else
-			{
-				ret=FAIL;
-			}
-		}
-		else if(status == STAT_TIMEOUT)
-		{
-			zabbix_log( LOG_LEVEL_WARNING, "Timeout while connecting to [%s]",
-					session.peername);
-			snmp_sess_perror("snmpget", ss);
-			ret = NETWORK_ERROR;
-		}
-		else
-		{
-			zabbix_log( LOG_LEVEL_WARNING, "Error [%d]",
-					status);
-			snmp_sess_perror("snmpget", ss);
-			ret=FAIL;
-		}
-	}
-
-	if (response)
-	{
-		snmp_free_pdu(response);
-	}
-	snmp_close(ss);
-
-	SOCK_CLEANUP;
-	return ret;
-}
-#endif
-
-int	get_value_SIMPLE(double *result,char *result_str,DB_ITEM *item)
-{
-	char	*e,*t;
-	char	c[MAX_STRING_LEN];
-	char	s[MAX_STRING_LEN];
-	int	ret = SUCCEED;
-
-	/* The code is ugly. I would rewrite it. Alexei.	*/
-	/* Assumption: host name does not contain '_perf'	*/
-	if(NULL == strstr(item->key,"_perf"))
-	{
-		if(item->useip==1)
-		{
-			snprintf(c,sizeof(c)-1,"check_service[%s,%s]",item->key,item->ip);
-		}
-		else
-		{
-			snprintf(c,sizeof(c)-1,"check_service[%s,%s]",item->key,item->host);
-		}
-	}
-	else
-	{
-		strscpy(s,item->key);
-		t=strstr(s,"_perf");
-		t[0]=0;
-		
-		if(item->useip==1)
-		{
-			snprintf(c,sizeof(c)-1,"check_service_perf[%s,%s]",s,item->ip);
-		}
-		else
-		{
-			snprintf(c,sizeof(c)-1,"check_service_perf[%s,%s]",s,item->host);
-		}
-	}
-
-
-	process(c,result_str);
-
-	if(strcmp(result_str,"ZBX_NOTSUPPORTED\n") == 0)
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Simple check [%s] is not supported", c);
-		ret = NOTSUPPORTED;
-	}
-	else
-	{
-		*result=strtod(result_str,&e);
-	}
-
-	zabbix_log( LOG_LEVEL_DEBUG, "SIMPLE [%s] [%s] [%f] RET [%d]", c, result_str, *result, ret);
-	return ret;
-}
-
-int	get_value_INTERNAL(double *result,char *result_str,DB_ITEM *item)
-{
-	if(strcmp(item->key,"zabbix[triggers]")==0)
-	{
-		*result=DBget_triggers_count();
-	}
-	else if(strcmp(item->key,"zabbix[items]")==0)
-	{
-		*result=DBget_items_count();
-	}
-	else if(strcmp(item->key,"zabbix[items_unsupported]")==0)
-	{
-		*result=DBget_items_unsupported_count();
-	}
-	else if(strcmp(item->key,"zabbix[history]")==0)
-	{
-		*result=DBget_history_count();
-	}
-	else if(strcmp(item->key,"zabbix[history_str]")==0)
-	{
-		*result=DBget_history_str_count();
-	}
-	else if(strcmp(item->key,"zabbix[trends]")==0)
-	{
-		*result=DBget_trends_count();
-	}
-	else if(strcmp(item->key,"zabbix[queue]")==0)
-	{
-		*result=DBget_queue_count();
-	}
-	else
-	{
-		return NOTSUPPORTED;
-	}
-
-	snprintf(result_str,MAX_STRING_LEN-1,"%f",*result);
-
-	zabbix_log( LOG_LEVEL_DEBUG, "INTERNAL [%s] [%f]", result_str, *result);
-	return SUCCEED;
-}
-
-int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
-{
-	int	s;
-	int	len;
-	static	char	c[MAX_STRING_LEN];
-	char	*e;
-
-	struct hostent *hp;
-
-	struct sockaddr_in servaddr_in;
-
-	struct linger ling;
-
-	zabbix_log( LOG_LEVEL_DEBUG, "%10s%25s", item->host, item->key );
-
-	servaddr_in.sin_family=AF_INET;
-	if(item->useip==1)
-	{
-		hp=gethostbyname(item->ip);
-	}
-	else
-	{
-		hp=gethostbyname(item->host);
-	}
-
-	if(hp==NULL)
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "gethostbyname() failed" );
-		return	NETWORK_ERROR;
-	}
-
-	servaddr_in.sin_addr.s_addr=((struct in_addr *)(hp->h_addr))->s_addr;
-
-	servaddr_in.sin_port=htons(item->port);
-
-	s=socket(AF_INET,SOCK_STREAM,0);
-
-	if(CONFIG_NOTIMEWAIT == 1)
-	{
-		ling.l_onoff=1;
-		ling.l_linger=0;
-		if(setsockopt(s,SOL_SOCKET,SO_LINGER,&ling,sizeof(ling))==-1)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot setsockopt SO_LINGER [%s]", strerror(errno));
-		}
-	}
-	if(s == -1)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot create socket [%s]",
-				strerror(errno));
-		return	FAIL;
-	}
- 
-	if( connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
-	{
-		switch (errno)
-		{
-			case EINTR:
-				zabbix_log( LOG_LEVEL_WARNING, "Timeout while connecting to [%s]",item->host );
-				break;
-			case EHOSTUNREACH:
-				zabbix_log( LOG_LEVEL_WARNING, "No route to host [%s]",item->host );
-				break;
-			default:
-				zabbix_log( LOG_LEVEL_WARNING, "Cannot connect to [%s] [%s]",item->host, strerror(errno));
-		} 
-		close(s);
-		return	NETWORK_ERROR;
-	}
-
-	snprintf(c,sizeof(c)-1,"%s\n",item->key);
-	zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", c);
-	if( write(s,c,strlen(c)) == -1 )
-	{
-		switch (errno)
-		{
-			case EINTR:
-				zabbix_log( LOG_LEVEL_WARNING, "Timeout while sending data to [%s]",item->host );
-				break;
-			default:
-				zabbix_log( LOG_LEVEL_WARNING, "Error while sending data to [%s] [%s]",item->host, strerror(errno));
-		} 
-		close(s);
-		return	FAIL;
-	} 
-
-	memset(c,0,MAX_STRING_LEN);
-	len=read(s,c,MAX_STRING_LEN);
-	if(len == -1)
-	{
-		switch (errno)
-		{
-			case 	EINTR:
-					zabbix_log( LOG_LEVEL_WARNING, "Timeout while receiving data from [%s]",item->host );
-					break;
-			case	ECONNRESET:
-					zabbix_log( LOG_LEVEL_WARNING, "Connection reset by peer. Host [%s] Parameter [%s]",item->host, item->key );
-					close(s);
-					return	NETWORK_ERROR;
-			default:
-				zabbix_log( LOG_LEVEL_WARNING, "Error while receiving data from [%s] [%s]",item->host, strerror(errno));
-		} 
-		close(s);
-		return	FAIL;
-	}
-
-	if( close(s)!=0 )
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Problem with close [%s]", strerror(errno));
-	}
-	zabbix_log(LOG_LEVEL_DEBUG, "Got string:[%d] [%s]", len, c);
-	if(len>0)
-	{
-		c[len-1]=0;
-	}
-
-	*result=strtod(c,&e);
-
-	/* The section should be improved */
-	if( (*result==0) && (c==e) && (item->value_type==0) && (strcmp(c,"ZBX_NOTSUPPORTED") != 0) && (strcmp(c,"ZBX_ERROR") != 0) )
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Got empty string from [%s]. Parameter [%s]", item->host, item->key);
-		zabbix_log( LOG_LEVEL_WARNING, "Assuming that agent dropped connection because of access permissions");
-		return	NETWORK_ERROR;
-	}
-
-	/* Should be deleted in Zabbix 1.0 stable */
-	if( cmp_double(*result,NOTSUPPORTED) == 0)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "NOTSUPPORTED1 [%s]", c );
-		return NOTSUPPORTED;
-	}
-	if( strcmp(c,"ZBX_NOTSUPPORTED") == 0)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "NOTSUPPORTED2 [%s]", c );
-		return NOTSUPPORTED;
-	}
-	if( strcmp(c,"ZBX_ERROR") == 0)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "AGENT_ERROR [%s]", c );
-		return AGENT_ERROR;
-	}
-
-	strcpy(result_str,c);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "RESULT_STR [%s]", c );
-
-	return SUCCEED;
-}
-
 int	get_value(double *result,char *result_str,DB_ITEM *item)
 {
 	int res=FAIL;
@@ -699,21 +260,12 @@ int	get_value(double *result,char *result_str,DB_ITEM *item)
 
 	if(item->type == ITEM_TYPE_ZABBIX)
 	{
-		res=get_value_zabbix(result,result_str,item);
+		res=get_value_agent(result,result_str,item);
 	}
-	else if(item->type == ITEM_TYPE_SNMPv1)
+	else if( (item->type == ITEM_TYPE_SNMPv1) || (item->type == ITEM_TYPE_SNMPv2c))
 	{
 #ifdef HAVE_SNMP
-		res=get_value_SNMP(SNMP_VERSION_1,result,result_str,item);
-#else
-		zabbix_log(LOG_LEVEL_WARNING, "Support of SNMP parameters was no compiled in");
-		res=NOTSUPPORTED;
-#endif
-	}
-	else if(item->type == ITEM_TYPE_SNMPv2c)
-	{
-#ifdef HAVE_SNMP
-		res=get_value_SNMP(SNMP_VERSION_2c,result,result_str,item);
+		res=get_value_snmp(result,result_str,item);
 #else
 		zabbix_log(LOG_LEVEL_WARNING, "Support of SNMP parameters was no compiled in");
 		res=NOTSUPPORTED;
@@ -721,11 +273,11 @@ int	get_value(double *result,char *result_str,DB_ITEM *item)
 	}
 	else if(item->type == ITEM_TYPE_SIMPLE)
 	{
-		res=get_value_SIMPLE(result,result_str,item);
+		res=get_value_simple(result,result_str,item);
 	}
 	else if(item->type == ITEM_TYPE_INTERNAL)
 	{
-		res=get_value_INTERNAL(result,result_str,item);
+		res=get_value_internal(result,result_str,item);
 	}
 	else
 	{

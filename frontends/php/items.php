@@ -192,7 +192,7 @@
 	$lasthost="";
 	if(isset($_GET["hostid"])&&!isset($_GET["type"])) 
 	{
-		$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.lastdelete,i.nextcheck,h.hostid,i.type from hosts h,items i where h.hostid=i.hostid and h.hostid=".$_GET["hostid"]." order by h.host,i.key_,i.description");
+		$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.lastdelete,i.nextcheck,h.hostid,i.type,i.trends from hosts h,items i where h.hostid=i.hostid and h.hostid=".$_GET["hostid"]." order by h.host,i.key_,i.description");
 		$col=0;
 		while($row=DBfetch($result))
 		{
@@ -219,6 +219,7 @@
 				echo "<TD WIDTH=10% NOSAVE><B>".S_DESCRIPTION."</B></TD>";
 				echo "<TD WIDTH=5%  NOSAVE><B>".S_UPDATE_INTERVAL."</B></TD>";
 				echo "<TD WIDTH=5%  NOSAVE><B>".S_HISTORY."</B></TD>";
+				echo "<TD WIDTH=5%  NOSAVE><B>".S_TRENDS."</B></TD>";
 				echo "<TD><B>".S_SHORT_NAME."</B></TD>";
 				echo "<TD WIDTH=5% NOSAVE><B>".S_TYPE."</B></TD>";
 				echo "<TD WIDTH=5% NOSAVE><B>".S_STATUS."</B></TD>";
@@ -237,6 +238,7 @@
 			echo "<TD>".$row["description"]."</TD>";
 			echo "<TD>".$row["delay"]."</TD>";
 			echo "<TD>".$row["history"]."</TD>";
+			echo "<TD>".$row["trends"]."</TD>";
 			echo "<TD>".$row["host"].":".$row["key_"]."</TD>";
 	
 			echo "<td align=center>";

@@ -40,7 +40,7 @@
 </TR>
 <TR BGCOLOR=#DDDDDD>
 <TD ALIGN=LEFT>
-	<font face="Helvetica"><a href="http://www.zabbix.com/manual.php>"<?php echo S_LATEST_ZABBIX_MANUAL; ?></a></font><br>
+	<font face="Helvetica"><a href="http://www.zabbix.com/manual.php"><?php echo S_LATEST_ZABBIX_MANUAL; ?></a></font><br>
 </TD>
 <TD>
 <?php echo S_LATEST_ZABBIX_MANUAL_DETAILS; ?>

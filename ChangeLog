@@ -1,5 +1,12 @@
 Changes for 1.1alpha1:
 
+ - added housekeeping of trends (Alexei)
+ - added column items.trends (Alexei)
+ - added escaping of SQL statements where needed (Alexei)
+ - added src/zabbix_sucker/checks_agent.[h,c] (Alexei)
+ - added src/zabbix_sucker/checks_internal.[h,c] (Alexei)
+ - added src/zabbix_sucker/checks_snmp.[h,c] (Alexei)
+ - added src/zabbix_sucker/checks_simple.[h,c] (Alexei)
  - send alert when trigger changes its value to TRUE for the first time (Alexei)
  - added support of zabbix[history_str] (Alexei)
  - use $_GET, $_POST, $_COOKIE to be PHP5-compatible. Thanks to Martin MOHNHAUP. (Alexei)

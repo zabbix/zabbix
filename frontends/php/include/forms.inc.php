@@ -104,7 +104,8 @@
 		$host=@iif(isset($_GET["host"]),$_GET["host"],"");
 		$port=@iif(isset($_GET["port"]),$_GET["port"],10000);
 		$delay=@iif(isset($_GET["delay"]),$_GET["delay"],30);
-		$history=@iif(isset($_GET["history"]),$_GET["history"],365);
+		$history=@iif(isset($_GET["history"]),$_GET["history"],90);
+		$trends=@iif(isset($_GET["trends"]),$_GET["trends"],365);
 		$status=@iif(isset($_GET["status"]),$_GET["status"],0);
 		$type=@iif(isset($_GET["type"]),$_GET["type"],0);
 		$snmp_community=@iif(isset($_GET["snmp_community"]),$_GET["snmp_community"],"public");
@@ -119,7 +120,7 @@
 
 		if(isset($_GET["register"])&&($_GET["register"] == "change"))
 		{
-			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.snmp_port,i.units,i.multiplier,h.hostid,i.delta from items i,hosts h where i.itemid=".$_GET["itemid"]." and h.hostid=i.hostid");
+			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.snmp_port,i.units,i.multiplier,h.hostid,i.delta,i.trends from items i,hosts h where i.itemid=".$_GET["itemid"]." and h.hostid=i.hostid");
 		
 			$description=DBget_field($result,0,0);
 			$key=DBget_field($result,0,1);
@@ -138,6 +139,7 @@
 			$multiplier=DBget_field($result,0,14);
 			$hostid=DBget_field($result,0,15);
 			$delta=DBget_field($result,0,16);
+			$trends=DBget_field($result,0,17);
 		}
 
 		echo "<br>";
@@ -267,6 +269,11 @@
 		echo nbsp("Keep history (in days)");
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"history\" value=\"$history\" size=8>";
+
+		show_table2_v_delimiter();
+		echo nbsp("Keep trends (in days)");
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"trends\" value=\"$trends\" size=8>";
 
 		show_table2_v_delimiter();
 		echo "Status";
