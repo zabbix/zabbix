@@ -92,12 +92,12 @@ int	process_data(char *server,char *key, double value)
 
 	DBexecute(sql);
 
-	if( update_functions( itemid ) == FAIL)
+	if( update_functions( itemid, 0 ) == FAIL)
 	{
 		return FAIL;
 	}
 
-	update_triggers( itemid );
+	update_triggers( itemid, 0 );
  
 	DBfree_result(result);
 

@@ -2,9 +2,12 @@
 	include 	"include/db.inc";
 
 	$USER_DETAILS	="";
+	$ERROR_MSG	="";
 
 	function	show_messages($bool,$msg,$errmsg)
 	{
+		global	$ERROR_MSG;
+
 		if(!$bool)
 		{
 			$msg="ERROR:".$errmsg;
@@ -16,7 +19,14 @@
 		}
 		echo "<center>";
 		echo "<font face='Helvetica' size=+1 color='$color'>";
-		echo "<b>[$msg]</b>";
+		if($ERROR_MSG=="")
+		{
+			echo "<b>[$msg]</b>";
+		}
+		else
+		{
+			echo "<b>[$msg. $ERROR_MSG]</b>";
+		}
 		echo "</font>";
 		echo "</center><br>";
 	}
@@ -47,6 +57,8 @@
 // Does expression match server:key.function(param) ?
 	function	validate_simple_expression($expression)
 	{
+		global	$ERROR_MSG;
+
 //		echo "Validating simple:$expression<br>";
 //		if (eregi('^\{([0-9a-zA-Z\_\.]+)\:([0-9a-zA-Z\_]+)\.((diff)|(min)|(max)|(last)|(nodata))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
 		if (eregi('^\{([0-9a-zA-Z\_\.]+)\:([]\[0-9a-zA-Z\_\/]+)\.((diff)|(min)|(max)|(last)|(nodata))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
@@ -60,16 +72,19 @@
 			$result=DBselect($sql);
 			if(DBget_field($result,0,0)!=1)
 			{
+				$ERROR_MSG="No such host ($host) or monitored parameter ($key)";
 				return -1;
 			}
 
 			if(validate_float($parameter)!=0)
 			{
+				$ERROR_MSG="[$parameter] is not a float";
 				return -1;
 			}
 		}
 		else
 		{
+			$ERROR_MSG="Expression [$expression] does not match to [server:key.func(param)]";
 			return -1;
 		}
 		return 0;
@@ -77,6 +92,8 @@
 
 	function	validate_expression($expression)
 	{
+		global	$ERROR_MSG;
+
 //		echo "Validating expression: $expression<br>";
 
 		$ok=0;
@@ -121,10 +138,12 @@
 //				}
 				if(validate_float($arr[3])!=0)
 				{
+					$ERROR_MSG="[".$arr[3]."] is not a float";
 					return -1;
 				}
 				if(validate_float($arr[5])!=0)
 				{
+					$ERROR_MSG="[".$arr[5]."] is not a float";
 					return -1;
 				}
 				$expression=$arr[1]."0".$arr[6];
@@ -148,6 +167,7 @@
 //				}
 				if(validate_float($arr[4])!=0)
 				{
+					$ERROR_MSG="[".$arr[4]."] is not a float";
 					return -1;
 				}
 				$expression=$arr[1]."0".$arr[5];
@@ -845,6 +865,7 @@
 
 	function	delete_trigger_dependency($triggerid_down,$triggerid_up)
 	{
+
 		$sql="select count(*) from trigger_depends where triggerid_down=$triggerid_up and triggerid_up=$triggerid_down";
 		$result=DBexecute($sql);
 		if(DBget_field($result,0,0)>0)
@@ -1017,10 +1038,13 @@
 
 	function	delete_trigger($triggerid)
 	{
+		global	$ERROR_MSG;
+
 		$sql="select count(*) from trigger_depends where triggerid_down=$triggerid or triggerid_up=$triggerid";
 		$result=DBexecute($sql);
 		if(DBget_field($result,0,0)>0)
 		{
+			$ERROR_MSG="Delete dependencies first";
 			return	FALSE;
 		}
 
