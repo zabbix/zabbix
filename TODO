@@ -1,11 +1,11 @@
 BUGS:
 
+ - BUG! Lots of Evaluation of expression ... failed. Must be fixed.
  - graphs and maps are not displayed properly sometimes
 
 FUTURE REQUESTS:
 
  - improve graphing capabilities
- - do not send notifications at certain periods of time. Do not monitor services at certain periods of time.
 
 HIGH PRIORITY:
 
@@ -46,7 +46,6 @@ REGISTERED BUGS:
  - improper handling of special characters i.e. ',", etc
  - graphs and maps not displayed sometimes
 
-
 TODO:
 
 - Agent
@@ -59,6 +58,7 @@ the agent with a predefined API that can return values to suckerd.
 
 Not ready yet:
 
+ - do not send notifications at certain periods of time. Do not monitor services at certain periods of time.
  - decrease number of TCP connections between server and agent
  - add triggers for all hosts at once
  - check Rickard's multithreaded agent
@@ -131,7 +131,6 @@ HB:
  - add user groups
  - look for cool icons
  - different sound files for different severity
- - distributed monitoring
  - rename "Alerts" to "Notifications"
  - add numeric constants to trigger expressions
  - get rid of problems with ' and "

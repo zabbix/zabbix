@@ -56,8 +56,8 @@
 <?php
 	if($HTTP_GET_VARS["action"]=="plaintext")
 	{
-		$from=mktime($fromhour,$frommin,0,$frommonth,$fromday,$fromyear);
-		$till=mktime($tillhour,$tillmin,0,$tillmonth,$tillday,$tillyear);
+		$from=mktime($HTTP_GET_VARS["fromhour"],$HTTP_GET_VARS["frommin"],0,$HTTP_GET_VARS["frommonth"],$HTTP_GET_VARS["fromday"],$HTTP_GET_VARS["fromyear"]);
+		$till=mktime($HTTP_GET_VARS["tillhour"],$HTTP_GET_VARS["tillmin"],0,$HTTP_GET_VARS["tillmonth"],$HTTP_GET_VARS["tillday"],$HTTP_GET_VARS["tillyear"]);
 		show_plaintext($HTTP_GET_VARS["itemid"], $from, $till);
 		exit;
 	}
@@ -174,12 +174,13 @@
 		$item=get_item_by_itemid($HTTP_GET_VARS["itemid"]);
 		if($item["value_type"]==0)
 		{
-			$result=DBselect("select clock,value from history where itemid=".$HTTP_GET_VARS["itemid"]." and clock>$time and clock<$till order by clock desc");
+			$sql="select clock,value from history where itemid=".$HTTP_GET_VARS["itemid"]." and clock>$time and clock<$till order by clock desc";
 		}
 		else
 		{
-			$result=DBselect("select clock,value from history_str where itemid=".$HTTP_GET_VARS["itemid"]." and clock>$time and clock<$till order by clock desc");
+			$sql="select clock,value from history_str where itemid=".$HTTP_GET_VARS["itemid"]." and clock>$time and clock<$till order by clock desc";
 		}
+		$result=DBselect($sql);
 		$col=0;
 		for($i=0;$i<DBnum_rows($result);$i++)
 		{

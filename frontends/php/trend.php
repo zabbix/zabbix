@@ -40,7 +40,7 @@
 		$label_format="H:i";
 	}
 
-	if(isset($HTTP_GET_VARS["width"]))
+	if(isset($HTTP_GET_VARS["width"])&&$HTTP_GET_VARS["width"]>0)
 	{
 		$sizeX=$HTTP_GET_VARS["width"];
 	}

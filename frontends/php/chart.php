@@ -25,7 +25,7 @@
 		$from=0;
 	}
 
-	if(isset($HTTP_GET_VARS["width"]))
+	if(isset($HTTP_GET_VARS["width"])&&$HTTP_GET_VARS["width"]>0)
 	{
 		$sizeX=$HTTP_GET_VARS["width"];
 	}
@@ -115,6 +115,13 @@
 		unset($maxY);
 		unset($minX);
 		unset($minY);
+
+		ImageString($im, 2,$sizeX/2-50,                $sizeY+$shiftY+3, "NO DATA FOUND FOR THIS PERIOD" , $darkred);
+		ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, "http://zabbix.sourceforge.net", $gray);
+
+		ImagePng($im); 
+		ImageDestroy($im); 
+		exit;
 	}
 
 	$my_exp = floor(log10($maxY));

@@ -743,6 +743,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	function	show_special_header($title,$refresh,$nomenu,$noauth)
 	{
 		global $page;
+		global $USER_DETAILS;
 
 		if($noauth!=1)
 		{
@@ -757,6 +758,10 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	<meta name="Author" content="Alexei Vladishev">
 	<link rel="stylesheet" href="css.css">
 <?php
+	if($USER_DETAILS['alias']=='guest')
+	{
+		$refresh=2*$refresh;
+	}
 	if($refresh!=0)
 	{
 		echo "<meta http-equiv=\"refresh\" content=\"$refresh\">";
@@ -1159,7 +1164,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	show_plaintext($itemid, $from, $till)
 	{
-		$result=DBselect("select clock,value from history where itemid=$itemid and clock>$from and clock<$till order by clock");
+		$sql="select clock,value from history where itemid=$itemid and clock>$from and clock<$till order by clock";
+		$result=DBselect($sql);
+		echo $sql;
 
 		echo "<PRE>";
 		for($i=0;$i<DBnum_rows($result);$i++)
@@ -2803,7 +2810,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 //			echo "<IMG SRC=\"chart.php?itemid=$itemid&period=$period&from=$from\">";
 			echo "<script language=\"JavaScript\">";
 //			echo "document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&width=\"+(document.width-108)+\"'>\")";
-			echo "document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&width=\"+(document.width-108)+\"'>\")";
+			echo "document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&width='+(document.width-108)+'>'\")";
 			echo "</script>";
 		}
 		else
@@ -2831,7 +2838,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "Choose period";
 
 		show_table2_v_delimiter();
-		echo "<form method=\"post\" action=\"history.php\">";
+		echo "<form method=\"get\" action=\"history.php\">";
 		echo "<input name=\"itemid\" type=\"hidden\" value=$itemid size=8>";
 		echo "Period in seconds";
 		show_table2_h_delimiter();

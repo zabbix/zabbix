@@ -26,7 +26,7 @@
 	$result=DBselect("select name,width,height from graphs where graphid=".$HTTP_GET_VARS["graphid"]);
 
 	$name=DBget_field($result,0,0);
-	if(isset($HTTP_GET_VARS["width"]))
+	if(isset($HTTP_GET_VARS["width"])&&$HTTP_GET_VARS["width"]>0)
 	{
 		$width=$HTTP_GET_VARS["width"];
 	}

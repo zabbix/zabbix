@@ -24,16 +24,24 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.32)
+
+\emph on 
+ZABBIX
+\emph default 
+ Reference Manual for version 1.0 (draft v1.33)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-25 December 2002
+27 December 2002
 \layout Abstract
 
-The document is Reference Manual for Zabbix version 1.0.
+The document is Reference Manual for 
+\emph on 
+ZABBIX
+\emph default 
+ version 1.0.
 \layout Standard
 
 
@@ -269,11 +277,11 @@ What is Zabbix
 \layout Standard
 
 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX 
+\emph default 
 \latex no_latex 
- was created by 
+was created by 
 \noun on 
 \latex default 
 Alexei Vladishev
@@ -292,68 +300,68 @@ alex@gobbo.caves.lv
 \layout Standard
 
 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX 
+\emph default 
 \latex no_latex 
- is software that monitors numerous parameters of a network and the servers
+is software that monitors numerous parameters of a network and the servers
  on that network.
 
 \latex default 
  
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX 
+\emph default 
 \latex no_latex 
- is a useful tool for monitoring the health and integrity of servers.
+is a useful tool for monitoring the health and integrity of servers.
 
 \latex default 
  
 \layout Standard
 
 
-\series bold 
-Zabbix
-\series default 
- uses a flexible notification mechanism that allows users to configure e-mail
+\emph on 
+ZABBIX 
+\emph default 
+uses a flexible notification mechanism that allows users to configure e-mail
  based alerts for virtually any event.
  This allows a fast reaction to server problems.
  All monitored parameters are stored in a database.
 \layout Standard
 
 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX 
+\emph default 
 \latex no_latex 
- offers excellent reporting and data visualisation features based on the
+offers excellent reporting and data visualisation features based on the
  stored data
 \latex default 
 .
  This makes 
-\series bold 
-Zabbix
-\series default 
- very useful for capacity planning.
+\emph on 
+ZABBIX 
+\emph default 
+very useful for capacity planning.
 \layout Standard
 
 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX 
+\emph default 
 \latex no_latex 
- supports both polling and trapping.
+supports both polling and trapping.
 
 \latex default 
  
 \latex no_latex 
 All 
-\series bold 
+\emph on 
 \latex default 
-Zabbix
-\series default 
+ZABBIX 
+\emph default 
 \latex no_latex 
- reports and statistics, as well as configuration parameters, are accessed
+reports and statistics, as well as configuration parameters, are accessed
  through a web-based front
 \latex default 
  
@@ -378,12 +386,12 @@ Accessed?
  
 \latex no_latex 
 Properly configured, 
-\series bold 
+\emph on 
 \latex default 
-Zabbix
-\series default 
+ZABBIX 
+\emph default 
 \latex no_latex 
- can play an important role in monitoring IT infrastructure
+can play an important role in monitoring IT infrastructure
 \latex default 
 .
  This is equally true for small organisations with a few servers and for
@@ -391,31 +399,35 @@ Zabbix
 \layout Standard
 
 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX 
+\emph default 
 \latex no_latex 
- is free of cost.
+is free of cost.
 
 \latex default 
  
-\series bold 
-Zabbix 
-\series default 
+\emph on 
+ZABBIX 
+\emph default 
 is written and distributed under the GPL General Public License which means
  that its source code is freely distributed and available for the general
  public.
 \layout Subsection
 
-What does Zabbix offer
+What does 
+\emph on 
+ZABBIX 
+\emph default 
+offer
 \layout Standard
 
 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX 
+\emph default 
 \latex no_latex 
- offers:
+offers:
 \layout Itemize
 
 
@@ -439,6 +451,9 @@ agents (client software) for Linux
  HP-UX, AIX, FreeBSD, OpenBSD
 \latex default 
 , OS X, Windows NT4.0, Windows 2000, Windows XP
+\layout Itemize
+
+monitoring of servers without any agent installed
 \layout Itemize
 
 
@@ -466,7 +481,11 @@ web-based interface for viewing and configuration
 flexible e-mail notification of predefined events
 \layout Subsection
 
-Why choose Zabbix ?
+Why choose 
+\emph on 
+ZABBIX
+\emph default 
+ ?
 \layout Itemize
 
 highly efficient agents for UNIX and WIN32 based platforms
@@ -523,12 +542,12 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  
 \latex no_latex 
 This manual is part of 
-\series bold 
+\emph on 
 \latex default 
-Zabbix
-\series default 
+ZABBIX 
+\emph default 
 \latex no_latex 
- software.
+software.
 
 \latex default 
  
@@ -549,31 +568,35 @@ is
 
 \layout Subsection
 
-Main Goals and Principles of Zabbix Development
+Main Goals and Principles of 
+\emph on 
+ZABBIX
+\emph default 
+ Development
 \layout Standard
 
 There are several goals 
-\series bold 
-Zabbix
-\series default 
- is trying to achieve:
+\emph on 
+ZABBIX 
+\emph default 
+is trying to achieve:
 \layout Itemize
 
 become recognised Open Source monitoring tool
 \layout Itemize
 
 create 
-\series bold 
-Zabbix
-\series default 
- user group, which helps making the software even better
+\emph on 
+ZABBIX 
+\emph default 
+user group, which helps making the software even better
 \layout Standard
 
 Main principles of 
-\series bold 
-Zabbix
-\series default 
- development:
+\emph on 
+ZABBIX 
+\emph default 
+development:
 \layout Itemize
 
 be user friendly
@@ -591,7 +614,9 @@ be as fast as possible
 document every single aspect of the software
 \layout Section
 
-Use of Zabbix
+Use of 
+\emph on 
+ZABBIX
 \layout Subsection
 
 Perfomance Monitoring
@@ -600,12 +625,12 @@ Perfomance Monitoring
 
 \latex no_latex 
 One of most important uses of 
-\series bold 
+\emph on 
 \latex default 
-Zabbix
-\series default 
+ZABBIX 
+\emph default 
 \latex no_latex 
- is performance monitoring.
+is performance monitoring.
 
 \latex default 
  
@@ -613,31 +638,31 @@ Zabbix
 Processor load, number of running processes, number of processes, disk activity,
  status of swap space, and memory availability are some of the numerous
  system parameters 
-\series bold 
+\emph on 
 \latex default 
-Zabbix
-\series default 
+ZABBIX 
+\emph default 
 \latex no_latex 
- is able to monitor.
+is able to monitor.
  
-\series bold 
+\emph on 
 \latex default 
-Zabbix
-\series default 
+ZABBIX 
+\emph default 
 \latex no_latex 
- provides a system administrator with timely information about performance
+provides a system administrator with timely information about performance
  of a server.
 
 \latex default 
  
 \latex no_latex 
 In addition, 
-\series bold 
+\emph on 
 \latex default 
-Zabbix
-\series default 
+ZABBIX 
+\emph default 
 \latex no_latex 
- can produce trend graphs to help identify bottlenecks in system performance.
+can produce trend graphs to help identify bottlenecks in system performance.
  
 \layout Subsection
 
@@ -649,10 +674,10 @@ H
 aving performance monitoring is good, but it is almost useless without a
  powerful notification mechanism.
  With 
-\series bold 
+\emph on 
 \latex default 
-Zabbix
-\series default 
+ZABBIX
+\emph default 
 \latex no_latex 
 , an administrator can define virtually any possible condition for a trigger,
  using flexible expressions.
@@ -674,23 +699,23 @@ Integrity Checking
 \layout Standard
 
 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX 
+\emph default 
 \latex no_latex 
- can easily be used for servers integrity monitoring.
+can easily be used for servers integrity monitoring.
 
 \latex default 
  
 \latex no_latex 
 All critical configuration files, binaries, kernel, scripts, and web server
  HTML pages can be monitored by 
-\series bold 
+\emph on 
 \latex default 
-Zabbix
-\series default 
+ZABBIX 
+\emph default 
 \latex no_latex 
- so that the administrator can be alerted to modifications made to these
+so that the administrator can be alerted to modifications made to these
  files.
 \layout Standard
 
@@ -721,12 +746,12 @@ diff
 \series default 
 \latex no_latex 
 " function is true when the current value received by 
-\series bold 
+\emph on 
 \latex default 
-Zabbix
-\series default 
+ZABBIX 
+\emph default 
 \latex no_latex 
- is different than the previous value.
+is different than the previous value.
 
 \latex default 
  
@@ -889,17 +914,21 @@ graphical representation of collected information
 Installation and configuration guide
 \layout Section
 
-Installing Zabbix
+Installing 
+\emph on 
+ZABBIX
 \layout Subsection
 
-How to Get Zabbix
+How to Get 
+\emph on 
+ZABBIX
 \layout Standard
 
 Check the 
-\series bold 
-Zabbix
-\series default 
- Home Page at 
+\emph on 
+ZABBIX 
+\emph default 
+Home Page at 
 \begin_inset LatexCommand \url{http://zabbix.sourceforge.net}
 
 \end_inset 
@@ -950,10 +979,10 @@ Add the platform to table of supported parameters. Contact Alk for more informat
 \layout Standard
 
 Note that 
-\series bold 
-Zabbix
-\series default 
- may work on other Unix-like operating systems.
+\emph on 
+ZABBIX 
+\emph default 
+may work on other Unix-like operating systems.
 \layout Subsubsection
 
 Software Requirements
@@ -968,9 +997,9 @@ is built around modern Apache WEB server, MySQL or PostgreSQL database engine,
 \layout Standard
 
 The following software is required to run 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
 :
 \layout Itemize
 
@@ -1040,10 +1069,10 @@ Required software considerations
 \layout Standard
 
 
-\series bold 
-Zabbix
-\series default 
- may work on previous versions of Apache, MySQL, PostgreSQL as well.
+\emph on 
+ZABBIX 
+\emph default 
+may work on previous versions of Apache, MySQL, PostgreSQL as well.
  It has been tried on PostgreSQL 6.5x with no luck.
  PostgreSQL crashes after one to three minutes of 
 \series bold 
@@ -1077,10 +1106,10 @@ Regarding the choice between PostgreSQL and MySQL, MySQL is recommended
 \layout Itemize
 
 recent benchmarks using 
-\series bold 
-Zabbix
-\series default 
- clearly show that PostgreSQL (7.1.x) is at least 10 times slower than MySQL
+\emph on 
+ZABBIX 
+\emph default 
+clearly show that PostgreSQL (7.1.x) is at least 10 times slower than MySQL
  (3.23.29)
 \begin_float footnote 
 \layout Standard
@@ -1154,10 +1183,10 @@ Memory Requirements
 \layout Standard
 
 
-\series bold 
-Zabbix
-\series default 
- requires both physical and disk memory.
+\emph on 
+ZABBIX 
+\emph default 
+requires both physical and disk memory.
  32 Mb of physical memory and 20 Mb of free disk memory could be good starting
  point.
  However, the amount of required disk memory obviously depends on the number
@@ -1168,9 +1197,9 @@ Zabbix
 \layout Standard
 
 Each 
-\series bold 
-Zabbix 
-\series default 
+\emph on 
+ZABBIX 
+\emph default 
 daemon process requires several connections to a database server.
  Amount of memory allocated for the connection depends on configuration
  of the database engine.
@@ -1187,16 +1216,20 @@ DBConnectOnEach.
 
 Remember, the more physical memory you have, the faster the database (and
  therefore 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
 ) works!
 \layout Subsubsection
 
 Time synchronisation
 \layout Standard
 
-It is very important to have precise system date on server with Zabbix running.
+It is very important to have precise system date on server with 
+\emph on 
+ZABBIX 
+\emph default 
+running.
  
 \emph on 
 timed 
@@ -1205,7 +1238,11 @@ is one of most popular daemons that synchronises the host's time with the
  time of other machines.
 \layout Subsection
 
-Structure of Zabbix distribution
+Structure of 
+\emph on 
+ZABBIX 
+\emph default 
+distribution
 \begin_inset Info
 More details.
 \end_inset 
@@ -1213,7 +1250,11 @@ More details.
 
 \layout Standard
 
-Zabbix distribution
+
+\emph on 
+ZABBIX
+\emph default 
+ distribution
 \layout Standard
 
 - 
@@ -1278,20 +1319,20 @@ Simplify!
 \layout Standard
 
 Basic installation of 
-\series bold 
-Zabbix
-\series default 
- usually takes no more than 15 minutes.
+\emph on 
+ZABBIX 
+\emph default 
+usually takes no more than 15 minutes.
 \layout Subsubsection
 
 Server side
 \layout Enumerate
 
 Create the 
-\series bold 
-Zabbix
-\series default 
- superuser account.
+\emph on 
+ZABBIX 
+\emph default 
+superuser account.
 \newline 
 This is the user the server will run as.
  For production use you should create a dedicated unprivileged account ("
@@ -1300,10 +1341,10 @@ zabbix
 \emph default 
 " is commonly used).
  Running 
-\series bold 
-Zabbix
-\series default 
- as "root," "bin," or any other account with special rights is a security
+\emph on 
+ZABBIX 
+\emph default 
+as "root," "bin," or any other account with special rights is a security
  risk.
  Do not do it!
 \begin_float footnote 
@@ -1322,10 +1363,10 @@ zabbix_trapperd
 \layout Enumerate
 
 Untar 
-\series bold 
-Zabbix
-\series default 
- sources.
+\emph on 
+ZABBIX 
+\emph default 
+sources.
 \newline 
 On Linux, use command
 \family typewriter 
@@ -1352,17 +1393,17 @@ gunzip zabbix.tar.gz; tar -xvf zabbix.tar
 \layout Enumerate
 
 Create the 
-\series bold 
-Zabbix
-\series default 
- database.
+\emph on 
+ZABBIX 
+\emph default 
+database.
 \newline 
 
-\series bold 
-Zabbix
-\series default 
- comes with SQL scripts used to create the required database schema and
- also to insert a default configuration.
+\emph on 
+ZABBIX 
+\emph default 
+comes with SQL scripts used to create the required database schema and also
+ to insert a default configuration.
  There are separate scripts for MySQL and PostgreSQL.
  
 \newline 
@@ -1571,8 +1612,11 @@ Configure
 \newline 
 
 \emph default 
-If you are going to use non-daemon versions of Zabbix trapper, add the following
- line to 
+If you are going to use non-daemon versions of 
+\emph on 
+ZABBIX 
+\emph default 
+trapper, add the following line to 
 \emph on 
 /etc/inetd.conf
 \emph default 
@@ -1638,10 +1682,10 @@ php.ini
 
 \newline 
 As user zabbix (or whatever you decided to name your dedicated 
-\series bold 
-Zabbix
-\series default 
- account), do the following:
+\emph on 
+ZABBIX 
+\emph default 
+account), do the following:
 \newline 
 Change these values in 
 \emph on 
@@ -1709,10 +1753,10 @@ zabbix_agent
 \series default 
  installed.
  The file should contain IP address of 
-\series bold 
-Zabbix
-\series default 
- server.
+\emph on 
+ZABBIX 
+\emph default 
+server.
  Connections from other hosts will be denied.
 \newline 
 You may take 
@@ -1734,10 +1778,10 @@ zabbix_agentd
 \series default 
  installed.
  The file should contain IP address of 
-\series bold 
-Zabbix
-\series default 
- server.
+\emph on 
+ZABBIX 
+\emph default 
+server.
  Connections from other hosts will be denied.
  
 \newline 
@@ -1757,9 +1801,9 @@ Configure
 For small installations (five monitored hosts), default parameters are fine.
  However, you should change default parameters to get maximum performance
  from 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
 .
  See section 
 \emph on 
@@ -1790,9 +1834,9 @@ For small installations (up to ten monitored hosts), default parameters
  are fine.
  However, you should change default parameters to get maximum performance
  from 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
 .
  See section 
 \begin_inset LatexCommand \vref{Performance tuning}
@@ -1812,13 +1856,13 @@ as example.
 Initial Configuration
 \newline 
 Once your 
-\series bold 
-Zabbix
-\series default 
- installation is complete, you will need to configure 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX 
+\emph default 
+installation is complete, you will need to configure 
+\emph on 
+ZABBIX
+\emph default 
 .
  Point your web browser to the location you installed the PHP scripts to.
  (For example, if you copied the PHP files to 
@@ -1839,9 +1883,9 @@ Zabbix
 Once there, click on the CONFIG link.
  You will be prompted for a username and password.
  
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
  comes pre-configured with an administrative account: Enter the username
  'Admin' and leave the password field empty.
  
@@ -1855,9 +1899,9 @@ Add the configuration of your SMTP server of choice.
 \newline 
 Next, click on the "USERS" link.
  Add yourself to list of 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
  users.
  Don't forget to add 
 \begin_inset Quotes eld
@@ -1990,12 +2034,20 @@ zabbix_agent
 Client side
 \layout Enumerate
 
-Create the Zabbix account.
+Create the 
+\emph on 
+ZABBIX 
+\emph default 
+account.
 \newline 
 This is the user the agent will run as.
  For production use you should create a dedicated unprivileged account ("zabbix"
  is commonly used).
- Zabbix agents has protection against running under 
+ 
+\emph on 
+ZABBIX 
+\emph default 
+agents has protection against running under 
 \emph on 
 root
 \emph default 
@@ -2003,10 +2055,10 @@ root
 \layout Enumerate
 
 Untar 
-\series bold 
-Zabbix
-\series default 
- sources.
+\emph on 
+ZABBIX 
+\emph default 
+sources.
 \newline 
 Use command 
 \family typewriter 
@@ -2159,10 +2211,10 @@ zabbix_agent
 \series default 
  installed.
  The file should contain IP address of 
-\series bold 
-Zabbix
-\series default 
- server.
+\emph on 
+ZABBIX 
+\emph default 
+server.
  Connections from other hosts will be denied.
  
 \emph on 
@@ -2189,10 +2241,10 @@ zabbix_agentd
 \series default 
  installed.
  The file should contain IP address of 
-\series bold 
-Zabbix
-\series default 
- server.
+\emph on 
+ZABBIX 
+\emph default 
+server.
  Connections from other hosts will be denied.
  You may take 
 \emph on 
@@ -2240,9 +2292,9 @@ Development Environment
 
 Debian Potato Linux and Debian Woody Linux (both on Intel hardware) are
  used as primary development platform for 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
 .
  It means that if you have difficulties choosing between Linux and other
  OS, go for Debian Linux
@@ -2260,10 +2312,10 @@ Zabbix
 \layout Standard
 
 
-\series bold 
-Zabbix
-\series default 
- 1.0beta4 was developed and tested on FreeBSD 4.4.
+\emph on 
+ZABBIX 
+\emph default 
+1.0beta4 was developed and tested on FreeBSD 4.4.
  Thus, FreeBSD
 \begin_float footnote 
 \layout Standard
@@ -2291,10 +2343,10 @@ FreeBSD
 
 Default FreeBSD settings (at least, FreeBSD 4.4) cannot handle amount of
  TCP connections 
-\series bold 
-Zabbix
-\series default 
- is able to generate.
+\emph on 
+ZABBIX 
+\emph default 
+is able to generate.
  To solve this issue, define 
 \emph on 
 NoTimeWait 
@@ -2324,10 +2376,10 @@ The upgrade procedure is quite simple.
  instructions.
  In order to update database structure, the following steps should be performed.
  Note that before applying database patches, all 
-\series bold 
-Zabbix
-\series default 
- processes must be stopped.
+\emph on 
+ZABBIX 
+\emph default 
+processes must be stopped.
  Also, the process can take from 0 seconds (if no patches required) up to
  several hours.
  For production installations database backup is required !
@@ -2381,7 +2433,11 @@ Finally, read version specific notes below for any extra procedures and
  useful information.
 \layout Subsection
 
-Zabbix releases
+
+\emph on 
+ZABBIX
+\emph default 
+ releases
 \layout Subsubsection
 
 Zabbix 1.0alpha8
@@ -3829,6 +3885,25 @@ misc/init.d/debian/zabbix_agent
 Zabbix 1.0beta7
 \layout Itemize
 
+refresh rate is doubled for user 'guest'
+\layout Itemize
+
+mass insert and delete for items
+\layout Itemize
+
+support for SNMPv2.
+ New item type introduced.
+\layout Itemize
+
+improvements in housekeeping procedure 
+\layout Itemize
+
+improvements for chart.php
+\layout Itemize
+
+added severity to pre-defined triggers
+\layout Itemize
+
 SO_LINGER is not default 
 \emph on 
 socket()
@@ -4207,7 +4282,11 @@ added additional error checks in
 get_value_snmp()
 \layout Section
 
-Zabbix Architecture
+
+\emph on 
+ZABBIX 
+\emph default 
+Architecture
 \layout Standard
 
 
@@ -4222,17 +4301,17 @@ Overview
 \layout Standard
 
 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
  is structured in a client-server architecture.
  
 \layout Standard
 
 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
  is capable of running in either standalone or inetd execution mode.
 \begin_float footnote 
 \layout Standard
@@ -4246,42 +4325,24 @@ The standalone method is the recommended approach.
 \layout Standard
 
 The 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
  server processes can be run in a polling or listening configuration or
  both.
  These methods differ in the approach that they utilise and affect what
  processes must be run.
- In the Server Polling Method the 
-\series bold 
-Zabbix
-\series default 
- Server polls established 
-\series bold 
-Zabbix
-\series default 
- clients (preferred.) In the Server Listen Method the 
-\series bold 
-Zabbix
-\series default 
- server awaits connections from active 
-\series bold 
-Zabbix
-\series default 
- clients.
+ In the Server Polling Method the ZABBIX Server polls established ZABBIX
+ clients (preferred.) In the Server Listen Method the ZABBIX server awaits
+ connections from active ZABBIX clients.
 \layout Standard
 
 \SpecialChar ~
 
 \layout Standard
 
-
-\series bold 
-Zabbix
-\series default 
- server processes consist of a standalone process used for the Server Polling
- Mode (
+ZABBIX server processes consist of a standalone process used for the Server
+ Polling Mode (
 \series bold 
 zabbix_suckderd
 \series default 
@@ -4304,11 +4365,7 @@ zabbix_trapper.)
 
 \layout Standard
 
-
-\series bold 
-Zabbix
-\series default 
- agents (clients) consist of a 
+ZABBIX agents (clients) consist of a 
 \emph on 
 choice
 \emph default 
@@ -4323,9 +4380,9 @@ choice
 \layout Standard
 
 If the server is used in the Server Polling Mode then the 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
  listening client is used (
 \series bold 
 zabbix_agentd
@@ -4339,11 +4396,8 @@ zabbix_agent
 from
 \emph default 
  the server.
- If the server is used in the Server Listen Mode then the 
-\series bold 
-Zabbix
-\series default 
- active client is used (
+ If the server is used in the Server Listen Mode then the ZABBIX active
+ client is used (
 \series bold 
 zabbix_sende
 \series default 
@@ -4359,11 +4413,7 @@ to
 
 \layout Standard
 
-
-\series bold 
-Zabbix
-\series default 
- is written in C.
+ZABBIX is written in C.
  WEB frontend is written in PHP.
 \layout Subsection
 
@@ -4371,10 +4421,10 @@ Server Approach Modes
 \layout Standard
 
 
-\series bold 
-Zabbix
-\series default 
- supports two methods of server role activity.
+\emph on 
+ZABBIX 
+\emph default 
+supports two methods of server role activity.
  The server may be used in a polling mode (Server Polling Method) or the
  server may be using in a listening mode (Server Listen Method) or both.
 \layout Standard
@@ -4415,9 +4465,9 @@ Server Polling Method (Server connects to Client)
 \layout Standard
 
 In this method the 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
  server (
 \series bold 
 zabbix_suckerd
@@ -4485,19 +4535,11 @@ Zabbix
 Server Listen Method (Client connects to Server)
 \layout Standard
 
-In this method the 
-\series bold 
-Zabbix
-\series default 
- client (
+In this method the ZABBIX client (
 \series bold 
 zabbix_sender
 \series default 
-) initiates connections to a 
-\series bold 
-Zabbix
-\series default 
- server (
+) initiates connections to a ZABBIX server (
 \series bold 
 zabbix_trapperd
 \series default 
@@ -4524,10 +4566,13 @@ Server ->[key]->Agent
 \layout Standard
 
 Agent->[result]->Server
+\newline 
+
 \layout Standard
 
-If received result is equal to '-1' then the agent does not support processing
- of required parameter.
+If received result is equal to 'ZBX_NOTSUPPORTED' then the agent does not
+ support processing of required parameter.
+ 'ZBX_ERROR' indicates that agent was unable to return requested parameter.
 \layout Standard
 
 
@@ -4555,10 +4600,8 @@ Database
 
 \latex no_latex 
 Database use plays a very important role in the 
-\series bold 
 \latex default 
-Zabbix
-\series default 
+ZABBIX
 \latex no_latex 
  application.
 
@@ -4574,17 +4617,12 @@ In addition, the database is the sole source of configuration parameters
  for the application.
 
 \latex default 
- 
-\series bold 
-Zabbix
-\series default 
+ ZABBIX
 \latex no_latex 
  performance depends highly on the efficiency and speed of the database
  used by 
-\series bold 
 \latex default 
-Zabbix
-\series default 
+ZABBIX
 \latex no_latex 
 .
 \layout Subsubsection
@@ -4601,10 +4639,8 @@ Rewrite. VACUUM is already included into housekeeping
 \latex no_latex 
 Performance of PostgreSQL can be significantly improved by executing the
  VACUUM command on the 
-\series bold 
 \latex default 
-Zabbix
-\series default 
+ZABBIX
 \latex no_latex 
  database.
 
@@ -4614,10 +4650,7 @@ Zabbix
 I would suggest execution of VACUUM at least after the following events:
 \layout Itemize
 
-
-\series bold 
-Zabbix
-\series default 
+ZABBIX
 \latex no_latex 
  is installed
 \layout Itemize
@@ -4630,10 +4663,8 @@ Zabbix
 
 \latex no_latex 
 patches applied on 
-\series bold 
 \latex default 
-Zabbix
-\series default 
+ZABBIX
 \latex no_latex 
  database
 \layout Standard
@@ -4641,10 +4672,8 @@ Zabbix
 
 \latex no_latex 
 For heavily loaded 
-\series bold 
 \latex default 
-Zabbix
-\series default 
+ZABBIX
 \latex no_latex 
  servers, hourly execution of "VACUUM ANALYZE" for all tables except "history"
  is 
@@ -4685,9 +4714,9 @@ Zabbix Processes
 \layout Standard
 
 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
  supports several different processes that perform specific functions depending
  on the mode of execution that is utilised (inetd vs.
  standalone.)
@@ -4705,14 +4734,14 @@ zabbix_suckerd
 \series default 
  process resides on the server and periodically connects to agents (either
  
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
  native or SNMP) to get the values of parameters being monitored.
  After receiving the values, the process recalculates the status of 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
  triggers.
  Also, the process sends alerts to users if required.
 \layout Standard
@@ -4769,10 +4798,10 @@ five
  
 \latex no_latex 
 This means that 
-\series bold 
+\emph on 
 \latex default 
-Zabbix
-\series default 
+ZABBIX
+\emph default 
 \latex no_latex 
  will be able to get 
 \latex default 
@@ -4831,9 +4860,9 @@ sessions
 
 Housekeeping process will delete all records from table alarms older than
  value defined in 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
  configuration and delete all records from tables 
 \emph on 
 alerts
@@ -4843,9 +4872,9 @@ alerts
 alarms 
 \emph default 
 older than value defined in 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
  configuration.
  
 \layout Standard
@@ -4981,10 +5010,10 @@ zabbix_agentd.conf
  (or list of IP addresses)
 \latex no_latex 
  of 
-\series bold 
+\emph on 
 \latex default 
-Zabbix
-\series default 
+ZABBIX
+\emph default 
 \latex no_latex 
  server.
  Connections from other IP
@@ -5054,6 +5083,260 @@ List of supported parameters can be extended by using configuration file
  parameter 
 \emph on 
 UserParameter.
+\layout Paragraph
+
+ZabbixW32.exe (WIN32 agent)
+\layout Standard
+
+
+\series bold 
+ZabbixW32
+\series default 
+ is 
+\emph on 
+ZABBIX
+\emph default 
+ agent for Win32 systems.
+ It will work on Windows NT 4.0,
+\layout Standard
+
+Windows 2000 and Windows XP.
+ ZabbixW32 doesn't supposed to work on other
+\layout Standard
+
+Windows platforms.
+\layout Standard
+
+
+\latex no_latex 
+The 
+\series bold 
+\latex default 
+ZabbixW32.exe
+\series default 
+\latex no_latex 
+ process resides on the host being monitored.
+ Its purpose is to provide request information to 
+\series bold 
+\latex default 
+zabbix_suckerd
+\series default 
+\latex no_latex 
+.
+
+\latex default 
+ 
+\newline 
+
+\layout Standard
+
+Installation
+\layout Standard
+
+\SpecialChar ~
+
+\layout Standard
+
+Installation is very simple and includes 3 steps:
+\layout Standard
+
+\SpecialChar ~
+
+\layout Standard
+
+1.
+ Unpack ZabbixW32.exe
+\layout Standard
+
+2.
+ Create configuration file c:
+\backslash 
+zabbix_agentd.conf (it has the same syntax as
+\layout Standard
+
+\SpecialChar ~
+\SpecialChar ~
+ for UNIX agent).
+\layout Standard
+
+3.
+ Run command "ZabbixW32.exe install" to install 
+\emph on 
+ZABBIX
+\emph default 
+ agent as a service.
+\layout Standard
+
+\SpecialChar ~
+
+\layout Standard
+
+Now you can use Control Panel to start agent's service or run
+\layout Standard
+
+"ZabbixW32.exe start".
+\layout Standard
+
+\SpecialChar ~
+
+\layout Standard
+
+\SpecialChar ~
+
+\layout Standard
+
+Command line syntax
+\layout Standard
+
+-------------------
+\layout Standard
+
+\SpecialChar ~
+
+\layout Standard
+
+Usage: zabbixw32 [options] [command]
+\layout Standard
+
+\SpecialChar ~
+
+\layout Standard
+
+Where possible commands are:
+\layout Standard
+
+\SpecialChar ~
+\SpecialChar ~
+ standalone\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ : Run in standalone mode
+\layout Standard
+
+\SpecialChar ~
+\SpecialChar ~
+ start\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ : Start Zabbix Win32 Agent service
+\layout Standard
+
+\SpecialChar ~
+\SpecialChar ~
+ stop\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ : Stop Zabbix Win32 Agent service
+\layout Standard
+
+\SpecialChar ~
+\SpecialChar ~
+ install\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ : Install Zabbix Win32 Agent as service
+\layout Standard
+
+\SpecialChar ~
+\SpecialChar ~
+ remove\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ : Remove previously installed Zabbix Win32 Agent service
+\layout Standard
+
+\SpecialChar ~
+\SpecialChar ~
+ help\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ : Display help information
+\layout Standard
+
+\SpecialChar ~
+\SpecialChar ~
+ version\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ : Display version information
+\layout Standard
+
+\SpecialChar ~
+
+\layout Standard
+
+And possible options are:
+\layout Standard
+
+\SpecialChar ~
+\SpecialChar ~
+ --config <file> : Specify alternate configuration file
+\layout Standard
+
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+\SpecialChar ~
+ (default is C:
+\backslash 
+zabbix_agentd.conf)
 \layout Paragraph
 
 zabbix_trapperd
@@ -5229,7 +5512,7 @@ zabbix_agent.conf
 \emph default 
  file must exist and contain the IP address of 
 \emph on 
-Zabbix
+ZABBIX
 \emph default 
  server.
  Connections from other IP addresses are rejected.
@@ -5295,13 +5578,17 @@ zabbix_trapper
 
 \latex no_latex 
 The process provides trapping support for 
-\series bold 
+\emph on 
 \latex default 
-Zabbix
-\series default 
+ZABBIX
+\emph default 
 \latex no_latex 
-.\SpecialChar ~
- It constantly waits for connections from 
+.
+
+\latex default 
+ 
+\latex no_latex 
+It constantly waits for connections from 
 \series bold 
 \latex default 
 zabbix_sender
@@ -5364,10 +5651,10 @@ zabbix_sender
 
 \latex no_latex 
 The process, when executed, sends information to 
-\series bold 
+\emph on 
 \latex default 
-Zabbix
-\series default 
+ZABBIX
+\emph default 
  trapper (
 \series bold 
 INETD
@@ -5399,10 +5686,10 @@ zabbix_server\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 Name or IP address of 
-\series bold 
+\emph on 
 \latex default 
-Zabbix
-\series default 
+ZABBIX
+\emph default 
 \latex no_latex 
  server to connect.
 \layout Standard
@@ -5430,10 +5717,10 @@ port\SpecialChar ~
 \SpecialChar ~
 \SpecialChar ~
 Port number to connect to 
-\series bold 
+\emph on 
 \latex default 
-Zabbix
-\series default 
+ZABBIX
+\emph default 
 \latex no_latex 
 .
  
@@ -5539,10 +5826,10 @@ r
 db.abcde.com
 \latex no_latex 
  to 
-\series bold 
+\emph on 
 \latex default 
-Zabbix
-\series default 
+ZABBIX
+\emph default 
 \latex no_latex 
  server located at 
 \emph on 
@@ -5560,12 +5847,77 @@ zabbix.abcde.com
 t
 \latex no_latex 
 he processor load is 2.34.
-\layout Subsection
-
-Extending Zabbix agents
 \layout Standard
 
-Zabbix agents can be easily extended by using configuration parameter 
+\SpecialChar ~
+
+\layout Standard
+
+If no parameters are given, 
+\series bold 
+zabbix_sender
+\series default 
+ expects list of values from standart input i.e.
+ stdin.
+ Parameters should be given in the following format:
+\layout Standard
+
+\SpecialChar ~
+
+\layout Standard
+
+
+\emph on 
+zabbix_server1\SpecialChar ~
+port1\SpecialChar ~
+host1:key1\SpecialChar ~
+value1
+\layout Standard
+
+
+\emph on 
+zabbix_server2\SpecialChar ~
+port2\SpecialChar ~
+host2:key2\SpecialChar ~
+value2
+\layout Standard
+
+
+\emph on 
+....
+\layout Standard
+
+
+\emph on 
+zabbix_serverN\SpecialChar ~
+portN\SpecialChar ~
+hostN:keyN\SpecialChar ~
+valueN
+\layout Standard
+
+\SpecialChar ~
+
+\layout Standard
+
+In this case, 
+\series bold 
+zabbix_sender 
+\series default 
+will be executed only once, therefore no unnecessary forks will be required.
+\layout Subsection
+
+Extending 
+\emph on 
+ZABBIX
+\emph default 
+ agents
+\layout Standard
+
+
+\emph on 
+ZABBIX
+\emph default 
+ agents can be easily extended by using configuration parameter 
 \emph on 
 UserParameter.
  
@@ -5594,9 +5946,9 @@ MS Windows based servers can be monitored by:
 \layout Itemize
 
 using native 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
  agent for WIN32 platforms (Windows NT4.0, Windows 2000, Windows XP)
 \layout Itemize
 
@@ -5620,7 +5972,11 @@ zabbix_sender
 \end_float 
 \layout Section
 
-Zabbix Configuration
+
+\emph on 
+ZABBIX
+\emph default 
+ Configuration
 \layout Subsection
 
 Configuration Methods and Execution Modes
@@ -5630,13 +5986,13 @@ Depending on the configuration method and execution mode that is being utilised
  (polling vs.
  listening and inetd vs.
  standalone respectively) the 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
  server and 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
  client have several different processes and names.
 \layout Subsubsection
 
@@ -5750,17 +6106,17 @@ Configuration files
 \layout Standard
 
 All 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
  processes can be configured by changing appropriate configuration files.
  After a change was made, restart of the process required.
 \layout Standard
 
 All 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
  configuration files are stored in directory 
 \emph on 
 /etc/zabbix/.
@@ -9114,7 +9470,7 @@ Parameter/system
 
 \layout Standard
 
-Windows (WIN2K, W2000, XP)
+Windows (NT4.0, W2000, XP)
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -13197,27 +13553,27 @@ New benchmark needed
 \layout Standard
 
 Server with 
-\series bold 
-Zabbix
-\series default 
- 1.0alpha12 installed (Linux 2.2, MySQL, Celeron/300Mhz, 32Mb, IDE) is able
+\emph on 
+ZABBIX 
+\emph default 
+1.0alpha12 installed (Linux 2.2, MySQL, Celeron/300Mhz, 32Mb, IDE) is able
  to collect more than 40 parameters per second from servers being monitored.
  How many servers can be monitored by 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
  on the hardware, you may ask.
  It depends on number of monitored parameters and how often 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
  should acquire these parameters.
  Suppose, each server you monitor has ten parameters to watch for.
  You want to update these parameters once in a 10 seconds.
  Doing simple calculation, we see that 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
  is able to handle 40 servers.
  In case if these parameters need to be updated once in a minute, the hardware
  configuration will be able to handle 40x6=240 servers.
@@ -13236,10 +13592,10 @@ Performance tuning
 \layout Standard
 
 Performance of 
-\series bold 
-Zabbix
-\series default 
- can be significantly improved by tuning:
+\emph on 
+ZABBIX 
+\emph default 
+can be significantly improved by tuning:
 \layout Subsubsection
 
 Hardware
@@ -13277,7 +13633,11 @@ Exclude unnecessary functionality from kernel
 Tune kernel parameters
 \layout Subsubsection
 
-Zabbix configuration parameters
+
+\emph on 
+ZABBIX
+\emph default 
+ configuration parameters
 \layout Standard
 
 Many parameters may be tuned to get optimal performance.
@@ -13293,9 +13653,9 @@ StartSuckers General rule - keep this parameter as low as possible.
 \series bold 
 zabbix_suckerd
 \series default 
- adds know overhead, in the same time, parallelism is increased.
- Optimal number of instances is achieved when queue contains minimum number
- of parameters (ideally, 0 at any given moment).
+ adds known overhead, in the same time, parallelism is increased.
+ Optimal number of instances is achieved when queue, on average, contains
+ minimum number of parameters (ideally, 0 at any given moment).
 \layout Description
 
 DebugLevel Optimal value is '3'.
@@ -13347,7 +13707,11 @@ works at least 1.5 times (comparing to MyISAM) if InnoDB is used.
 \end_float 
 \layout Section
 
-Zabbix Frontends
+
+\emph on 
+ZABBIX
+\emph default 
+ Frontends
 \layout Standard
 
 Currently, the only frontend available is WEB frontend written in PHP.
@@ -13360,10 +13724,10 @@ PHP-based Frontend
 \latex no_latex 
 The frontend provides a convenient and platform-independent method for accessing
  
-\series bold 
+\emph on 
 \latex default 
-Zabbix
-\series default 
+ZABBIX
+\emph default 
 \latex no_latex 
 .
 
@@ -13378,12 +13742,12 @@ Information provided by the frontend can be either graphical or textual.
 While graphical representations usually provide the easiest method to understand
  trends, the text representation of monitored parameter is intended to provide
  an easy way to export 
-\series bold 
+\emph on 
 \latex default 
-Zabbix
-\series default 
+ZABBIX 
+\emph default 
 \latex no_latex 
- data to other analytical tools.
+data to other analytical tools.
 \layout Subsubsection
 
 Menu
@@ -13392,10 +13756,10 @@ Menu
 Most of pages contain menu that visibly consists of three rows.
  First row contains end-user functionality.
  Second and third row is area for 
-\series bold 
-Zabbix
-\series default 
- administration.
+\emph on 
+ZABBIX 
+\emph default 
+administration.
  
 \layout Paragraph
 
@@ -13405,10 +13769,10 @@ CONFIG
 \layout Standard
 
 The menu item is used to set global 
-\series bold 
-Zabbix
-\series default 
- parameters.
+\emph on 
+ZABBIX 
+\emph default 
+parameters.
 \layout Standard
 
 
@@ -13468,9 +13832,9 @@ Yes
 
 IP address or name of SMTP server.
  
-\series bold 
-Zabbix 
-\series default 
+\emph on 
+ZABBIX 
+\emph default 
 sends alert messages via this server.
 \end_inset 
 </cell>
@@ -13499,9 +13863,9 @@ No
 
 Usually set to domain name.
  
-\series bold 
-Zabbix 
-\series default 
+\emph on 
+ZABBIX 
+\emph default 
 will not use HELO authentification.
  Example: 
 \emph on 
@@ -13516,9 +13880,9 @@ sourceforge.net.
 \layout Standard
 
 
-\series bold 
-Zabbix 
-\series default 
+\emph on 
+ZABBIX 
+\emph default 
 email address
 \end_inset 
 </cell>
@@ -13536,9 +13900,9 @@ Yes
 \layout Standard
 
 
-\series bold 
-Zabbix 
-\series default 
+\emph on 
+ZABBIX 
+\emph default 
 uses this address as source addredd for all emails.
 \end_inset 
 </cell>
@@ -13548,19 +13912,17 @@ uses this address as source addredd for all emails.
 \end_inset 
 
 
-\layout Standard
-
 \layout Subsubsection
 
 Reports
 \layout Standard
 
 
-\series bold 
-Zabbi
-\series default 
+\emph on 
+ZABBIX 
+\emph default 
 \latex no_latex 
-x reports represent collected information in structured way.
+reports represent collected information in structured way.
  All reports are produced in HTML format.
 
 \latex default 
@@ -13583,29 +13945,31 @@ zabbix_trapperd
  will wait until the report is finished.
 \layout Paragraph
 
-Status of Zabbix
+Status of 
+\emph on 
+ZABBIX
 \layout Standard
 
 
 \latex no_latex 
 This report gives general information about the 
-\series bold 
+\emph on 
 \latex default 
-Zabbix
-\series default 
+ZABBIX 
+\emph default 
 \latex no_latex 
- server including:
+server including:
 \layout Itemize
 
 
 \latex no_latex 
 whether the main 
-\series bold 
+\emph on 
 \latex default 
-Zabbix
-\series default 
+ZABBIX 
+\emph default 
 \latex no_latex 
- process is runnin
+process is runnin
 \latex default 
 g
 \layout Itemize
@@ -13755,10 +14119,10 @@ Database structure
 \layout Standard
 
 The section describes structure of tables of 
-\series bold 
-Zabbix
-\series default 
- database.
+\emph on 
+ZABBIX 
+\emph default 
+database.
 \layout Subsection
 
 Diagram
@@ -14545,7 +14909,9 @@ varchar
 
 \layout Standard
 
-Email address used by Zabbix
+Email address used by 
+\emph on 
+ZABBIX
 \end_inset 
 </cell>
 </row>
@@ -14571,7 +14937,11 @@ int
 
 \layout Standard
 
-Zabbix will not store records in table
+
+\emph on 
+ZABBIX 
+\emph default 
+will delete records in table
 \series bold 
  alarms
 \series default 
@@ -14601,7 +14971,11 @@ int
 
 \layout Standard
 
-Zabbix will not store records in table 
+
+\emph on 
+ZABBIX 
+\emph default 
+will delete records in table 
 \series bold 
 alerts
 \series default 
@@ -15119,6 +15493,104 @@ Color
 
 \layout Subsection
 
+GROUPS
+\layout Standard
+
+The table contains list of host groups.
+\layout Description
+
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="3" columns="3">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="100mm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Column name
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Type
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+groupid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Unique ID
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+name
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+varchar
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Name of the group
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Subsection
+
 HISTORY
 \layout Standard
 
@@ -15356,7 +15828,7 @@ int
 
 \layout Standard
 
-Host status: 0 - monitored, 1 - not monitored, 2 - unreachable
+Host status: 0 - monitored, 1 - not monitored, 2 - unreachable, 3 - template
 \end_inset 
 </cell>
 </row>
@@ -15383,6 +15855,104 @@ int
 \layout Standard
 
 In case if status is unreachabe, do not check host until this time
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Subsection
+
+HOSTS_GROUPS
+\layout Standard
+
+The table is used to define linkage between hosts and host groups.
+\layout Description
+
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="3" columns="3">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="100mm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Column name
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Type
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Description
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+hostid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Host ID
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+groupid
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Group ID
 \end_inset 
 </cell>
 </row>
@@ -15480,7 +16050,8 @@ int
 
 \layout Standard
 
-Type of item: 0 - Zabbix, 1 - SNMPv1
+Type of item: 0 - Zabbix, 1 - SNMPv1, 2 - Trapper, 3 - Simple check, 4 -
+ SNMPv2
 \end_inset 
 </cell>
 </row>
@@ -15887,8 +16458,7 @@ int
 
 \layout Standard
 
-Status of the item: 0 - active, 1 - disabled, 2 - trapped, 3 - not supported
- by agent
+Status of the item: 0 - active, 1 - disabled, 3 - not supported by agent
 \end_inset 
 </cell>
 </row>
@@ -17793,7 +18363,11 @@ Last time the session was used
 USERS
 \layout Standard
 
-The table contains list of Zabbix's users.
+The table contains list of 
+\emph on 
+ZABBIX
+\emph default 
+'s users.
  
 \layout Description
 
@@ -17974,18 +18548,18 @@ Authentication failed in case if user name and password is correct
 \layout Itemize
 
 Check system date on both 
-\series bold 
-Zabbix 
-\series default 
+\emph on 
+ZABBIX 
+\emph default 
 server and client machine where WEB browser is running.
  The difference should not be more than 20 minutes.
 \layout Itemize
 
 Browser should be configured to accept cookies.
  
-\series bold 
-Zabbix 
-\series default 
+\emph on 
+ZABBIX 
+\emph default 
 uses cookies to store session-related information.
 \layout Itemize
 
@@ -18052,7 +18626,11 @@ libz-dev
 package to ged rid of the problem.
 \layout Section
 
-How Zabbix Compares to Other Monitoring Software
+How 
+\emph on 
+ZABBIX
+\emph default 
+ Compares to Other Monitoring Software
 \layout Subsection
 
 Open Source monitoring software
@@ -18129,9 +18707,6 @@ Distributed monitoring
 Get rid of Apache and PHP (2.0?)
 \layout Itemize
 
-Native agent for MS platforms
-\layout Itemize
-
 Data encryption (SSL)
 \layout Itemize
 
@@ -18139,8 +18714,11 @@ Centralised monitoring of log files
 \layout Itemize
 
 
+\emph on 
+ZABBIX
 \series bold 
-Zabbix 
+\emph default 
+ 
 \series default 
 to periodically generate and send by email set of standard reports in PDF/HTML/P
 S format
@@ -18198,11 +18776,6 @@ network map.
  Connect an icon to a trigger/service
 \layout Itemize
 
-fix 
-\emph on 
-proc_cnt[*]
-\layout Itemize
-
 create one universal 
 \emph on 
 chart.php
@@ -18227,14 +18800,11 @@ improve functionality of IT Services
 dlopen/dlsym for agents
 \layout Itemize
 
-native agent for MS Windows
-\layout Itemize
-
 
 \series bold 
 zabbix_suckerd
 \series default 
- to support ICMP pings
+ to send ICMP pings
 \layout Itemize
 
 
@@ -18248,7 +18818,9 @@ zabbix_agentd
  installed
 \layout Section
 
-Support of Zabbix
+Support of 
+\emph on 
+ZABBIX
 \layout Subsection
 
 Free support
@@ -18263,8 +18835,11 @@ mailing lists at
 \layout Itemize
 
 
+\emph on 
+ZABBIX
 \series bold 
-Zabbix 
+\emph default 
+ 
 \series default 
 related discussions at 
 \begin_inset LatexCommand \url{http://sourceforge.net/forum/?group_id=23494}
@@ -18287,10 +18862,10 @@ Email address of
 Alexei Vladishev
 \noun default 
 ,author and main developer of 
-\series bold 
-Zabbix
-\series default 
- is
+\emph on 
+ZABBIX 
+\emph default 
+is
 \family typewriter 
  alex@gobbo.caves.lv
 \layout Subsection
@@ -18338,26 +18913,26 @@ guaranteed response time
 \layout Itemize
 
 direct contact to 
-\series bold 
-Zabbix
-\series default 
- developers
+\emph on 
+ZABBIX 
+\emph default 
+developers
 \layout Itemize
 
 customer-specific development made by 
-\series bold 
-Zabbix
-\series default 
- developers
+\emph on 
+ZABBIX 
+\emph default 
+developers
 \layout Itemize
 
 feature requests are considered top priority
 \layout Itemize
 
 printed 
-\series bold 
-Zabbix 
-\series default 
+\emph on 
+ZABBIX 
+\emph default 
 manual plus installation on CD
 \layout Itemize
 
@@ -18368,9 +18943,9 @@ Credits
 \layout Standard
 
 
-\series bold 
-Zabbix 
-\series default 
+\emph on 
+ZABBIX 
+\emph default 
 team w
 \latex no_latex 
 ant
@@ -18397,12 +18972,12 @@ Our team
 s
 \latex no_latex 
  to thank all the 
-\series bold 
+\emph on 
 \latex default 
-Zabbix
-\series default 
+ZABBIX 
+\emph default 
 \latex no_latex 
- users who have sent corrections and suggestions.
+users who have sent corrections and suggestions.
 
 \latex default 
  
@@ -18423,10 +18998,10 @@ Alexei Vladishev
 \layout Standard
 
 Has written most of 
-\series bold 
-Zabbix
-\series default 
- code including PHP frontend.
+\emph on 
+ZABBIX 
+\emph default 
+code including PHP frontend.
 \layout Subsection
 
 Contributors to Zabbix
@@ -18449,9 +19024,9 @@ ALEXANDER KIRHENSTEIN
 \layout Standard
 
 Suggested fixes to make 
-\series bold 
-Zabbix 
-\series default 
+\emph on 
+ZABBIX 
+\emph default 
 work under SCO.
 \layout Itemize
 
@@ -18521,9 +19096,9 @@ KASPARS CIKMACS
 \layout Standard
 
 Lots of new ideas based on real experience of using 
-\series bold 
-Zabbix
-\series default 
+\emph on 
+ZABBIX
+\emph default 
 .
 \layout Itemize
 
@@ -18553,6 +19128,16 @@ Many ideas
 
 
 \noun on 
+MARIUSZ ...
+\layout Standard
+
+Support for system[procload] on Solaris 2.6.
+ Improvements for graphs.
+ Improvements for system maps.
+\layout Itemize
+
+
+\noun on 
 MICHAL SUSZYCKI
 \layout Standard
 
@@ -18565,10 +19150,10 @@ MIKE HOOLEHAN
 \layout Standard
 
 Help with making the 
-\series bold 
-Zabbix
-\series default 
- Manual correct and understandable.
+\emph on 
+ZABBIX 
+\emph default 
+Manual correct and understandable.
  
 \layout Itemize
 
@@ -18578,9 +19163,49 @@ OLIVER SIEGMAR
 \layout Standard
 
 Fixes in SQL statements of WEB frontend.
+\layout Itemize
+
+
+\noun on 
+RICKARD PLARS
+\layout Standard
+
+Help with fixing coredump for 
+\series bold 
+zabbix_suckerd.
+\layout Itemize
+
+
+\noun on 
+SEBASTIEN 
+\begin_inset Quotes eld
+\end_inset 
+
+SLIX
+\begin_inset Quotes erd
+\end_inset 
+
+ LIENARD
+\layout Standard
+
+Fixed selection of hosts and icons in sysmap.php
+\layout Itemize
+
+
+\noun on 
+VIKTOR KIRHENSTEIN
+\layout Standard
+
+Native 
+\emph on 
+ZABBIX 
+\emph default 
+agent for WIN32 platforms.
 \layout Subsection
 
-Supporters to Zabbix
+Supporters to 
+\emph on 
+ZABBIX
 \layout Section
 
 Glossary of terms
@@ -21308,7 +21933,11 @@ PHP Manual
 \layout Bibliography
 \bibitem {key-4}
 
-The Zabbix home page at 
+The 
+\emph on 
+ZABBIX 
+\emph default 
+home page at 
 \begin_inset LatexCommand \url{http://zabbix.sourceforge.net}
 
 \end_inset 
@@ -21325,7 +21954,11 @@ Warnings and Errors
 Regression tests
 \layout Standard
 
-The following table contains list of tests applied to current Zabbix release.
+The following table contains list of tests applied to current 
+\emph on 
+ZABBIX 
+\emph default 
+release.
  Each test case must be tested for each supported platform and for each
  supported database engine.
 \layout Standard

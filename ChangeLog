@@ -1,5 +1,6 @@
 Changes for 1.0beta7:
 
+ - refresh rate is doubled for user 'guest' (Alexei)
  - mass insert and delete for items. (Alexei)
  - support for SNMPv2. New item type introduced. (Alexei)
  - improvements in housekeeping procedure (Alexei)
@@ -31,7 +32,7 @@ Changes for 1.0beta7:
    selected. (Alexei)
  - new protocol for Zabbix agents, Support for ZBX_ERROR and ZBX_NOTSUPPORTED.
    (Alexei)
- - about.hph: version of Zabbix was changed to 1.0beta7 (Alexei)
+ - about.php: version of Zabbix was changed to 1.0beta7 (Alexei)
  - items.php: "Delay" renamed to "Update interval". (Alexei)
  - fixed precision issues in zabbix_agent(d) and zabbix_suckerd. All floats
    converted to double. (Alexei)
@@ -48,7 +49,7 @@ Changes for 1.0beta7:
  - all <? ?> were changed to <?php ?>. No changes in php.ini required anymore.
    (Alexei)
  - added Zabbix agent for WIN32 platforms. Thanks to Victor Kirhenstein. (Alexei) 
- - fixed coredump in get_lstvalue(). Thanks to Rickard Plars. (Alexei)
+ - fixed coredump in get_lastvalue(). Thanks to Rickard Plars. (Alexei)
  - delay renamed to "Update interval (in sec)" in item definition form
  (Alexei)
  - create/mysql/schema.sql will create tables with type=InnoDB by default
