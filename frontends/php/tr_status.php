@@ -430,43 +430,43 @@
 			$description="<A HREF=\"tr_status.php?sort=description&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$fullscreen$cond\">".S_DESCRIPTION."</a>";
 	}
 	if($compact!='true') {$description=$description."<BR><FONT SIZE=-1>".S_EXPRESSION."</FONT></B>";}
-	$header=array_merge($header,$description);
-	$header=array_merge($header,S_STATUS);
+	$header=array_merge($header,array($description));
+	$header=array_merge($header,array(S_STATUS));
 
 	if(!isset($sort)||(isset($sort) && $sort=="priority"))
 	{
-		$header=array_merge($header,S_SEVERITY_BIG);
+		$header=array_merge($header,array(S_SEVERITY_BIG));
 	}
 	else
 	{
 		if($select=="TRUE")
-			$header=array_merge($header,"<A HREF=\"tr_status.php?sort=priority&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">".S_SEVERITY."</a>");
+			$header=array_merge($header,array("<A HREF=\"tr_status.php?sort=priority&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">".S_SEVERITY."</a>"));
 		else
-			$header=array_merge($header,"<A HREF=\"tr_status.php?sort=priority&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$fullscreen$cond\">".S_SEVERITY."</a>");
+			$header=array_merge($header,array("<A HREF=\"tr_status.php?sort=priority&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$fullscreen$cond\">".S_SEVERITY."</a>"));
 	}
 
 	if(isset($sort) && $sort=="lastchange")
 	{
-		$header=array_merge($header,nbsp(S_LAST_CHANGE_BIG));
+		$header=array_merge($header,array(nbsp(S_LAST_CHANGE_BIG)));
 	}
 	else
 	{
 		if($select=="TRUE")
 		{
-			$header=array_merge($header,"<A HREF=\"tr_status.php?sort=lastchange&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">".nbsp(S_LAST_CHANGE)."</a>");
+			$header=array_merge($header,array("<A HREF=\"tr_status.php?sort=lastchange&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">".nbsp(S_LAST_CHANGE)."</a>"));
 		}
 		else
 		{
-			$header=array_merge($header,"<A HREF=\"tr_status.php?sort=lastchange&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$fullscreen$cond\">".nbsp(S_LAST_CHANGE)."</a>");
+			$header=array_merge($header,array("<A HREF=\"tr_status.php?sort=lastchange&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$fullscreen$cond\">".nbsp(S_LAST_CHANGE)."</a>"));
 		}
 	}
 	echo "</TD>";
    
 	if($noactions!='true')
 	{
-		$header=array_merge($header,S_ACTIONS);
+		$header=array_merge($header,array(S_ACTIONS));
 	}
-	$header=array_merge($header,S_COMMENTS);
+	$header=array_merge($header,array(S_COMMENTS));
 	table_header($header);
 	unset($header);
 

@@ -54,24 +54,24 @@
 		elseif($_GET["register"]=="add")
 		{
 			$severity=array();
-			if(isset($_GET["0"]))	$severity=array_merge($severity,0);
-			if(isset($_GET["1"]))	$severity=array_merge($severity,1);
-			if(isset($_GET["2"]))	$severity=array_merge($severity,2);
-			if(isset($_GET["3"]))	$severity=array_merge($severity,3);
-			if(isset($_GET["4"]))	$severity=array_merge($severity,4);
-			if(isset($_GET["5"]))	$severity=array_merge($severity,5);
+			if(isset($_GET["0"]))	$severity=array_merge($severity,array(0));
+			if(isset($_GET["1"]))	$severity=array_merge($severity,array(1));
+			if(isset($_GET["2"]))	$severity=array_merge($severity,array(2));
+			if(isset($_GET["3"]))	$severity=array_merge($severity,array(3));
+			if(isset($_GET["4"]))	$severity=array_merge($severity,array(4));
+			if(isset($_GET["5"]))	$severity=array_merge($severity,array(5));
 			$result=add_media( $_GET["userid"], $_GET["mediatypeid"], $_GET["sendto"],$severity,$_GET["active"]);
 			show_messages($result, S_MEDIA_ADDED, S_CANNOT_ADD_MEDIA);
 		}
 		elseif($_GET["register"]=="update")
 		{
 			$severity=array();
-			if(isset($_GET["0"]))	$severity=array_merge($severity,0);
-			if(isset($_GET["1"]))	$severity=array_merge($severity,1);
-			if(isset($_GET["2"]))	$severity=array_merge($severity,2);
-			if(isset($_GET["3"]))	$severity=array_merge($severity,3);
-			if(isset($_GET["4"]))	$severity=array_merge($severity,4);
-			if(isset($_GET["5"]))	$severity=array_merge($severity,5);
+			if(isset($_GET["0"]))	$severity=array_merge($severity,array(0));
+			if(isset($_GET["1"]))	$severity=array_merge($severity,array(1));
+			if(isset($_GET["2"]))	$severity=array_merge($severity,array(2));
+			if(isset($_GET["3"]))	$severity=array_merge($severity,array(3));
+			if(isset($_GET["4"]))	$severity=array_merge($severity,array(4));
+			if(isset($_GET["5"]))	$severity=array_merge($severity,array(5));
 			$result=update_media($_GET["mediaid"], $_GET["userid"], $_GET["mediatypeid"], $_GET["sendto"],$severity,$_GET["active"]);
 			show_messages($result,S_MEDIA_UPDATED,S_CANNOT_UPDATE_MEDIA);
 		}

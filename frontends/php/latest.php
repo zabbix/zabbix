@@ -163,31 +163,31 @@
 		$header=array();
 		if(isset($_GET["select"]))
 		{
-			$header=array_merge($header,S_HOST);
+			$header=array_merge($header,array(S_HOST));
 		}
 		if(!isset($_GET["sort"])||(isset($_GET["sort"])&&($_GET["sort"]=="description")))
 		{
-			$header=array_merge($header,S_DESCRIPTION_LARGE);
+			$header=array_merge($header,array(S_DESCRIPTION_LARGE));
 		}
 		else
 		{
 			if(isset($_GET["select"]))
-				$header=array_merge($header,"<a href=\"latest.php?select=".$_GET["select"]."&sort=description\">".S_DESCRIPTION_SMALL);
+				$header=array_merge($header,array("<a href=\"latest.php?select=".$_GET["select"]."&sort=description\">".S_DESCRIPTION_SMALL));
 			else
-				$header=array_merge($header,"<a href=\"latest.php?hostid=".$_GET["hostid"]."&sort=description\">".S_DESCRIPTION_SMALL);
+				$header=array_merge($header,array("<a href=\"latest.php?hostid=".$_GET["hostid"]."&sort=description\">".S_DESCRIPTION_SMALL));
 		}
 		if(isset($_GET["sort"])&&($_GET["sort"]=="lastcheck"))
 		{
-			$header=array_merge($header,S_LAST_CHECK_BIG);
+			$header=array_merge($header,array(S_LAST_CHECK_BIG));
 		}
 		else
 		{
 			if(isset($_GET["select"]))
-				$header=array_merge($header,"<a href=\"latest.php?select=".$_GET["select"]."&sort=lastcheck\">".S_LAST_CHECK);
+				$header=array_merge($header,array("<a href=\"latest.php?select=".$_GET["select"]."&sort=lastcheck\">".S_LAST_CHECK));
 			else
-			$header=array_merge($header,"<a href=\"latest.php?hostid=".$_GET["hostid"]."&sort=lastcheck\">".S_LAST_CHECK);
+			$header=array_merge($header,array("<a href=\"latest.php?hostid=".$_GET["hostid"]."&sort=lastcheck\">".S_LAST_CHECK));
 		}
-		$header=array_merge($header,S_LAST_VALUE,S_CHANGE,S_HISTORY);
+		$header=array_merge($header,array(S_LAST_VALUE,S_CHANGE,S_HISTORY));
 
 		table_header($header);
 
