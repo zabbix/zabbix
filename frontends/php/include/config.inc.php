@@ -458,15 +458,15 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 		elseif($status==4)
 		{
-			$desc="<font color=\"#FF8888\">Serious problem</a>";
+			$desc="<font color=\"#FF8888\">Serious&nbsp;problem</a>";
 		}
 		elseif($status==3)
 		{
-			$desc="<font color=\"#AA0000\">Average problem</a>";
+			$desc="<font color=\"#AA0000\">Average&nbsp;problem</a>";
 		}
 		elseif($status==2)
 		{
-			$desc="<font color=\"#AA5555\">Minor problem</a>";
+			$desc="<font color=\"#AA5555\">Minor&nbsp;problem</a>";
 		}
 		elseif($status==1)
 		{
