@@ -21,7 +21,7 @@
 <?php
 	include "include/config.inc.php";
 	$page["title"] = S_LATEST_VALUES;
-	$page["file"] = "latest.php";
+	$page["file"] = "overview.php";
 	show_header($page["title"],0,0);
 ?>
 
@@ -80,50 +80,7 @@
 	}
 	$h2=$h2."</select>";
 
-	$h2=$h2."&nbsp;".S_HOST."&nbsp;";
-	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
-	$h2=$h2."<option value=\"0\"".iif(!isset($_GET["hostid"])||($_GET["hostid"]==0),"selected","").">".S_SELECT_HOST_DOT_DOT_DOT;
-
-	if(isset($_GET["groupid"]))
-	{
-		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
-	}
-	else
-	{
-		$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid group by h.hostid,h.host order by h.host";
-	}
-
-	$result=DBselect($sql);
-	while($row=DBfetch($result))
-	{
-		if(!check_right("Host","R",$row["hostid"]))
-		{
-			continue;
-		}
-		$h2=$h2."<option value=\"".$row["hostid"]."\"".iif(isset($_GET["hostid"])&&($_GET["hostid"]==$row["hostid"]),"selected","").">".$row["host"];
-	}
-	$h2=$h2."</select>";
-
-	$h2=$h2.nbsp("  ");
-
-	if(isset($_GET["select"])&&($_GET["select"]==""))
-	{
-		unset($_GET["select"]);
-	}
-//	$h2=$h2.S_SELECT;
-//	$h2=$h2.nbsp("  ");
-	if(isset($_GET["select"]))
-	{
-  		$h2=$h2."<input class=\"biginput\" type=\"text\" name=\"select\" value=\"".$_GET["select"]."\">";
-	}
-	else
-	{
- 		$h2=$h2."<input class=\"biginput\" type=\"text\" name=\"select\" value=\"\">";
-	}
-	$h2=$h2.nbsp(" ");
-  	$h2=$h2."<input class=\"button\" type=\"submit\" name=\"do\" value=\"select\">";
-
-	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"latest.php\">", "</form>");
+	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"overview.php\">", "</form>");
 ?>
 
 <?php
@@ -132,103 +89,19 @@
 		$_GET["sort"]="description";
 	}
 
-	if(isset($_GET["hostid"]))
+	if(isset($_GET["groupid"]))
 	{
-		$result=DBselect("select host from hosts where hostid=".$_GET["hostid"]);
-		if(DBnum_rows($result)==0)
-		{
-			unset($_GET["hostid"]);
-		}
-	}
-
-	if(isset($_GET["hostid"])||isset($_GET["select"]))
-	{
-
-//		echo "<br>";
-		if(!isset($_GET["select"])||($_GET["select"] == ""))
-		{
-			$result=DBselect("select host from hosts where hostid=".$_GET["hostid"]);
-			$host=DBget_field($result,0,0);
-//			show_table_header("<a href=\"latest.php?hostid=".$_GET["hostid"]."\">$host</a>");
-		}
-		else
-		{
-//			show_table_header("Description is like *".$_GET["select"]."*");
-		}
-#		show_table_header_begin();
-#		echo "<a href=\"latest.php?hostid=".$_GET["hostid"]."\">$host</a>";
-#		show_table3_v_delimiter();
-
 		table_begin();
-		$header=array();
-		if(isset($_GET["select"]))
+		$header=array("&nbsp;");
+		$hosts=array();
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
 		{
-			$header=array_merge($header,array(S_HOST));
+			$header=array_merge($header,array($row["host"]));
+			$hosts=array_merge($hosts,array($row["hostid"]));
 		}
-		if(!isset($_GET["sort"])||(isset($_GET["sort"])&&($_GET["sort"]=="description")))
-		{
-			$header=array_merge($header,array(S_DESCRIPTION_LARGE));
-		}
-		else
-		{
-			if(isset($_GET["select"]))
-				$header=array_merge($header,array("<a href=\"latest.php?select=".$_GET["select"]."&sort=description\">".S_DESCRIPTION_SMALL));
-			else
-				$header=array_merge($header,array("<a href=\"latest.php?hostid=".$_GET["hostid"]."&sort=description\">".S_DESCRIPTION_SMALL));
-		}
-		if(isset($_GET["sort"])&&($_GET["sort"]=="lastcheck"))
-		{
-			$header=array_merge($header,array(S_LAST_CHECK_BIG));
-		}
-		else
-		{
-			if(isset($_GET["select"]))
-				$header=array_merge($header,array("<a href=\"latest.php?select=".$_GET["select"]."&sort=lastcheck\">".S_LAST_CHECK));
-			else
-			$header=array_merge($header,array("<a href=\"latest.php?hostid=".$_GET["hostid"]."&sort=lastcheck\">".S_LAST_CHECK));
-		}
-		$header=array_merge($header,array(S_LAST_VALUE,S_CHANGE,S_HISTORY));
-
 		table_header($header);
-
-
-/*		cr();
-		echo "<TR BGCOLOR=\"CCCCCC\">";
-		cr();
-		if(isset($_GET["select"]))
-		{
-			echo "<TD><B>Host</B></TD>";
-		}
-		if(!isset($_GET["sort"])||(isset($_GET["sort"])&&($_GET["sort"]=="description")))
-		{
-			echo "<TD><B>".S_DESCRIPTION_LARGE."</B></TD>";
-		}
-		else
-		{
-			iif_echo(isset($_GET["select"]),
-				"<TD><B><a href=\"latest.php?select=".$_GET["select"]."&sort=description\">".S_DESCRIPTION_SMALL."</B></TD>",
-				"<TD><B><a href=\"latest.php?hostid=".$_GET["hostid"]."&sort=description\">".S_DESCRIPTION_SMALL."</B></TD>");
-		}
-		if(isset($_GET["sort"])&&($_GET["sort"]=="lastcheck"))
-		{
-			echo "<TD WIDTH=12%><B>LAST CHECK</B></TD>";
-		}
-		else
-		{
-			if(isset($_GET["select"]))
-				echo "<TD WIDTH=12%><B><a href=\"latest.php?select=".$_GET["select"]."&sort=lastcheck\">Last check</B></TD>";
-			else
-				echo "<TD WIDTH=12%><B><a href=\"latest.php?hostid=".$_GET["hostid"]."&sort=lastcheck\">Last check</B></TD>";
-		}
-		cr();
-		echo "<TD WIDTH=10%><B>Last value</B></TD>"; 
-		cr();
-		echo "<TD WIDTH=10%><B>Change</B></TD>"; 
-		cr();
-		echo "<TD WIDTH=5% align=center><B>History</B></TD>";
-		cr();
-		echo "</TR>";
-		cr();*/
 
 		$col=0;
 		if(isset($_GET["sort"]))
@@ -250,81 +123,29 @@
 		{
 			$_GET["sort"]="order by i.description";
 		}
-		if(isset($_GET["select"]))
-			$sql="select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier from items i,hosts h where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 and i.description like '%".$_GET["select"]."%' ".$_GET["sort"];
-		else
-			$sql="select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier from items i,hosts h where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 and h.hostid=".$_GET["hostid"]." ".$_GET["sort"];
+//		$sql="select distinct description from items order by 1;";
+		$sql="select distinct i.description from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid order by 1";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
-        		if(!check_right("Item","R",$row["itemid"]))
+			$rows=array(nbsp($row["description"]));
+			foreach($hosts as $hostid)
 			{
-				continue;
-			}
-        		if(!check_right("Host","R",$row["hostid"]))
-			{
-				continue;
-			}
-			iif_echo($col++%2 == 1,
-				"<tr bgcolor=#DDDDDD>",
-				"<tr bgcolor=#EEEEEE>");
-
-			if(isset($_GET["select"]))
-			{
-				table_td($row["host"],"");
-			}
-			table_td($row["description"],"");
-
-			echo "<td>";
-			if($row["status"] == 2)
-			{
-				echo "<font color=\"#FF6666\">";
-			}
-
-			iif_echo(!isset($row["lastclock"]),
-				"<div align=center>-</div>",
-				date("d M H:i:s",$row["lastclock"]));
-			echo "</font></td>";
-
-			if(isset($row["lastvalue"]))
-			{
-				iif_echo($row["value_type"] == 0,
-					"<td>".convert_units($row["lastvalue"],$row["units"])."</td>",
-					"<td>".nbsp(htmlspecialchars(substr($row["lastvalue"],0,20)." ..."))."</td>");
-			}
-			else
-			{
-				table_td("-","align=center");
-			}
-			if( isset($row["lastvalue"]) && isset($row["prevvalue"]) &&
-				($row["value_type"] == 0) && ($row["lastvalue"]-$row["prevvalue"] != 0) )
-			{
-//				echo "<td>"; echo $row["lastvalue"]-$row["prevvalue"]; echo "</td>";
-//	sprintf("%+0.2f"); does not work
-				if($row["lastvalue"]-$row["prevvalue"]<0)
+				$sql="select lastvalue,units from items where hostid=$hostid and description='".$row["description"]."'";
+				$result2=DBselect($sql);
+				if(DBnum_rows($result2)==1)
 				{
-					$str=convert_units($row["lastvalue"]-$row["prevvalue"],$row["units"]);
-					$str=nbsp($str);
-					table_td($str,"");
+					$row2=DBfetch($result2);
+					$value=convert_units($row2["lastvalue"],$row2["units"]);
 				}
 				else
 				{
-					$str="+".convert_units($row["lastvalue"]-$row["prevvalue"],$row["units"]);
-					$str=nbsp($str);
-					table_td($str,"");
-//					printf("<td>+%0.2f</td>",$row["lastvalue"]-$row["prevvalue"]);
+					$value="-";
 				}
+				$rows=array_merge($rows,array($value));
 			}
-			else
-			{
-				echo "<td align=center>-</td>";
-			}
-			iif_echo($row["value_type"]==0,
-				"<td align=center><a href=\"history.php?action=showhistory&itemid=".$row["itemid"]."\">".S_GRAPH."</a></td>",
-				"<td align=center><a href=\"history.php?action=showvalues&period=3600&itemid=".$row["itemid"]."\">".S_HISTORY."</a></td>");
 
-			echo "</tr>";
-			cr();
+			table_row($rows, $col++);
 		}
 		table_end();
 		show_table_header_end();
