@@ -5,6 +5,7 @@ float	process(char *command);
 
 void	test_parameters(void);
 
+float   CKSUM(const char * filename);
 float	INODE(const char * mountPoint);
 float	FILESIZE(const char * filename);
 float	DF(const char * mountPoint);
