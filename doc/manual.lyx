@@ -1,7 +1,7 @@
 #LyX 1.1 created this file. For more info see http://www.lyx.org/
 \lyxformat 218
 \textclass article
-\language english
+\language british
 \inputencoding default
 \fontscheme default
 \graphics default
@@ -12,7 +12,7 @@
 \use_geometry 0
 \use_amsmath 0
 \paperorientation portrait
-\secnumdepth 3
+\secnumdepth 4
 \tocdepth 3
 \paragraph_separation indent
 \defskip medskip
@@ -23,8 +23,8 @@
 \paperpagestyle default
 
 \layout Title
-\added_space_top vfill \added_space_bottom vfill 
-Zabbix Reference Manual for version 1.0
+\added_space_top vfill 
+Zabbix Reference Manual for version 1.0 (DRAFT)
 \layout Author
 
 ALEXEI VLADISHEV
@@ -33,7 +33,7 @@ ALEXEI VLADISHEV
 10 October 2001
 \layout Abstract
 
-ABSTRACT
+The document is Reference Manual for Zabbix version 1.0.
 \layout Standard
 
 
@@ -91,7 +91,7 @@ Zabbix supports both polling and trapping.
  
 \latex no_latex 
 All Zabbix reports and statistics, as well as configuration parameters,
- are accessed through a web-based frontend.
+ are accessed through a web-based front-end.
 
 \latex default 
  
@@ -142,13 +142,18 @@ support for both polling and trapping mechanisms
 
 
 \latex no_latex 
-agents (client software) for Linux (HP-UX, AIX, FreeBSD, OpenBSD are coming
- soon)
+agents (client software) for Linux
+\latex default 
+, Solaris,
+\latex no_latex 
+ HP-UX, AIX, FreeBSD, Open BSD
 \layout Itemize
 
 
 \latex no_latex 
-server software for Linux (other UNIX variants to be supported soon)
+server software for Linux
+\latex default 
+, Solaris, HP-UX, AIX, FreeBSD, Open BSD
 \layout Itemize
 
 
@@ -206,20 +211,52 @@ Requirements
 \layout Subsubsection
 
 Supported Platforms
-\layout Standard
+\layout Itemize
 
-Linux 2.xx - Support for HP-UX, AIX, FreeBSD and OpenBSD is coming soon
+Linux 2.xx
+\layout Itemize
+
+Solaris 5.8
+\layout Itemize
+
+HP-UX 11.xx
+\layout Itemize
+
+AIX 4.3
+\layout Itemize
+
+FreeBSD 4.3
 \layout Subsubsection
 
 Software Requirements
 \layout Standard
 
-- Apache 1.3.12 or later - Database engine - MySQL 3.22 or later or - PostgreSQL
- 7.0.2 or later - PHP 4.0 or later, compiled as Apache module with - GD module
- (for PNG images) - MySQL of PostgreSQL module - mhash support - GNU make
- - WEB browser on client side (support for HTML and PNG images required).
+The following software is required to run Zabbix:
+\layout Itemize
+
+Apache 1.3.12 or later
+\layout Itemize
+
+MySQL 3.22 or later or - PostgreSQL 7.0.2 or later
+\layout Itemize
+
+PHP 4.0 or later compiled as Apache module 
+\layout Itemize
+
+PHP4.0 GD module (for PNG images)
+\layout Itemize
+
+PHP4.0 MySQL or PostgreSQL module
+\layout Itemize
+
+GNU Make
+\layout Itemize
+
+WEB browser on client side (support for HTML and PNG images required).
  MS Explorer and Netscape work perfectly.
- - UCD-SNMP library and header files.
+\layout Itemize
+
+UCD-SNMP library and header files.
  Required for support of SNMP agents.
  Optional.
 \layout Standard
@@ -228,32 +265,68 @@ Zabbix may work on previous versions of Apache, MySQL, PostgreSQL as well.
  I've tried to run Zabbix on PostgreSQL 6.5x with no luck.
  PostgreSQL crashes after one to three minutes of zabbix_suckerd running.
  So, PostgreSQL version 7.0.2 or later is strongly recommended.
+\layout Paragraph
+
+PostgreSQL vs MySQL
 \layout Standard
 
-Regarding the choice between PostgreSQL and MySQL, I recommend MySQL + InnoDB
- for several reasons: - my recent benchmarks clearly show that PostgreSQL
- (7.1.x) is at least 10 times slower than MySQL (3.23.29) - no need to constantly
- run "vacuum" command with MySQL - MySQL MyISAM table is not a good choice
- because of lack of row locking.
- So, InnoDB is required
+Regarding the choice between PostgreSQL and MySQL, I recommend MySQL for
+ several reasons:
+\layout Itemize
+
+my recent benchmarks clearly show that PostgreSQL (7.1.x) is at least 10 times
+ slower than MySQL (3.23.29)
+\begin_float footnote 
+\layout Standard
+
+These results are predictible.
+ Zabbix mainly uses simple SQL statements like single row INSERT, UPDATE,
+ and simple SELECT operators.
+ In such environment, use of advanced SQL engine (like PostgreSQL) is overkill.
+\end_float 
+\layout Itemize
+
+no need to constantly run "vacuum" command with MySQL
+\layout Standard
+
+MySQL MyISAM table is not a best choice because of lack of row locking.
+ So, InnoDB is recommended.
+\begin_float footnote 
+\layout Standard
+
+Zabbix is not tested with MySQL's InnoDB database structure.
+ The recommendation was made based on information available on Internet.
+\end_float 
+ For more information about MySQL see 
+\begin_inset LatexCommand \cite{key-1}
+
+\end_inset 
+
+.
 \layout Standard
 
 If you do use PostgreSQL, performance can be significantly improved by executing
  the VACUUM command on the Zabbix database.
 \layout Standard
 
-I would suggest execution of VACUUM, at least after the following events:
- - Zabbix is installed - 10000 records in table "history" - patches applied
- on Zabbix database
+I would suggest execution of VACUUM, at least after the following events
+\layout Itemize
+
+Zabbix is installed - 10000 records in table "history" 
+\layout Itemize
+
+patches applied on Zabbix database
 \layout Standard
 
 For heavily loaded Zabbix servers, hourly execution of "VACUUM ANALYZE"
  for all tables except "history" is strongly recommended! You can use the
  command 'echo "vacuum verbose analyze"|psql zabbix'.
-\layout Standard
+ For more information about PostgreSQL see 
+\begin_inset LatexCommand \cite{key-2}
 
-Debian Potato and Debian Woody are development and testing platforms I currently
- use.
+\end_inset 
+
+.
 \layout Subsubsection
 
 Memory requirements
@@ -533,6 +606,15 @@ and run zabbix_agentd on all monitored machines
 \layout Standard
 
 You should not run zabbix_agentd if you have chosen to use zabbix_agent!
+\layout Subsection
+
+Development Environment 
+\layout Standard
+
+Debian Potato Linux and Debian Woody Linux (both on Intel hardware) are
+ used as primary development platform for Zabbix.
+ It means that if you have difficulties choosing between Linux and other
+ OS, go for Debian Linux - you will get better support.
 \layout Section
 
 Upgrading
@@ -546,10 +628,7 @@ The upgrade procedure is quite simple.
  stopped.
  Also, the process can take from 0 seconds (if no patches required) up to
  several hours.
- 
-\layout Standard
-
-For production installations database backup is required !
+ For production installations database backup is required !
 \layout Subsection
 
 General Procedure
@@ -619,21 +698,21 @@ Zabbix 1.0alpha10
 \layout Subsubsection
 
 Zabbix 1.0alpha11
-\layout Standard
+\layout Itemize
 
-- Do not forget to apply DB patches.
-\layout Standard
+Do not forget to apply DB patches.
+\layout Itemize
 
-- PostgreSQL users: Please delete the column "triggers.lastcheck" manually
+PostgreSQL users: Please delete the column "triggers.lastcheck" manually
  by reloading whole table.
  Unfortunately, PostgreSQL does not support "alter table triggers drop lastcheck
 ".
-\layout Standard
+\layout Itemize
 
-- New set of parameters appeared in this release: proc_cnt[*]
-\layout Standard
+New set of parameters appeared in this release: proc_cnt[*]
+\layout Itemize
 
-- IMPORTANT.
+IMPORTANT.
  Parameter tcp_count is not supported anymore.
 \layout Subsection
 
@@ -1565,116 +1644,99 @@ Expression for triggers
 
 
 \latex no_latex 
-The expressions used in triggers are very flexible.\SpecialChar ~
- You can use them to create
- complex logical tests regarding monitored statistics.
-\layout Standard
+The expressions used in triggers are very flexible.
 
-
+\latex default 
+ 
 \latex no_latex 
-\SpecialChar ~
-
+You can use them to create complex logical tests regarding monitored statistics.
 \layout Standard
 
 
 \latex no_latex 
 The following operators are supported for triggers:
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
+>
+\latex default 
+ 
+\latex no_latex 
+more than
+\layout Description
 
 
 \latex no_latex 
-> - more than
-\layout Standard
+< less than
+\layout Description
 
 
 \latex no_latex 
-< - less than
-\layout Standard
+|
+\latex default 
+ 
+\latex no_latex 
+logical OR
+\layout Description
 
 
 \latex no_latex 
-| - logical OR
-\layout Standard
-
-
+&
+\latex default 
+ 
 \latex no_latex 
-& - logical AND
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
+logical AND
 \layout Standard
 
 
 \latex no_latex 
 The following functions are supported:
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
+last
+\latex default 
+ 
+\latex no_latex 
+last (most recent) value, parameter is ignored 
+\layout Description
 
 
 \latex no_latex 
-last\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-- last (most recent) value, parameter is ignored 
-\layout Standard
+min
+\latex default 
+ 
+\latex no_latex 
+MIN value for period of time, parameter - time in sec
+\layout Description
 
 
 \latex no_latex 
-min\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-- MIN value for period of time, parameter - time in sec
-\layout Standard
+max
+\latex default 
+ 
+\latex no_latex 
+MAX value for period of time, parameter - time in sec
+\layout Description
 
 
 \latex no_latex 
-max\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-- MAX value for period of time, parameter - time in sec
-\layout Standard
+diff
+\latex default 
+ 
+\latex no_latex 
+1 - if last and previous values are different, 0 - otherwise
+\layout Description
 
 
 \latex no_latex 
-diff\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-- 1 - if last and previous values are different, 0 - otherwise
-\layout Standard
-
-
+prev
+\latex default 
+ 
 \latex no_latex 
-prev\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-- previous value, parameter is ignored
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
+previous value, parameter is ignored
 \layout Standard
 
 
@@ -1723,19 +1785,29 @@ Example 1:
 
 
 \latex no_latex 
-'sourceforge.net:procload' gives a short name of monitored parameter.\SpecialChar ~
- It specifies
- that the server is 'sourceforge.net' and the key being monitored is
-\layout Standard
+'sourceforge.net:procload' gives a short name of monitored parameter.
 
-
+\latex default 
+ 
 \latex no_latex 
-'procload'.\SpecialChar ~
- By using the function 'last(),' we are specifying we are referring
- to the most recent value.\SpecialChar ~
- Finally, '>5' means that the trigger is true whenever
- the most recent procload measurement from sourceforge.net is greater than
- 5.
+It specifies that the server is 'sourceforge.net' and the key being monitored
+ is
+\latex default 
+ 
+\latex no_latex 
+'procload'.
+
+\latex default 
+ 
+\latex no_latex 
+By using the function 'last(),' we are specifying we are referring to the
+ most recent value.
+
+\latex default 
+ 
+\latex no_latex 
+Finally, '>5' means that the trigger is true whenever the most recent procload
+ measurement from sourceforge.net is greater than 5.
 \layout Standard
 
 
@@ -1842,633 +1914,261 @@ Similiar expressions could be useful to monitor changes in important files,
 \layout Subsection
 
 Monitored Parameters
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-- memory[total]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+memory[total]
+\latex default 
+ 
 \latex no_latex 
 Total amount of installed physical memory.
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- memory[shared]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+memory[shared]
+\latex default 
+ 
 \latex no_latex 
 Amount of used shared memory.
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- memory[buffers]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+memory[buffers]
+\latex default 
+ 
 \latex no_latex 
 Amount of memory used for kernel buffers.
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- memory[cached]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+memory[cached]
+\latex default 
+ 
 \latex no_latex 
 Amount of cached memory.
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- memory[free]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+memory[free]
+\latex default 
+ 
 \latex no_latex 
 Amount of unused physical memory.
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- diskfree[*]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+diskfree[*]
+\latex default 
+ 
 \latex no_latex 
 Amount of unused disk space for given volume.
 \layout Standard
 
-
+E
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-Example:
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
+xample:
 \layout Standard
 
 
 \latex no_latex 
 diskfree[/] - returns free disk space for root volume.
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- inodefree[*]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+inodefree[*]
+\latex default 
+ 
 \latex no_latex 
 Number of unused inodes space for given volume.
 \layout Standard
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
 Example:
 \layout Standard
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
 inodefree[/var] - returns number of free inodes for volume /var
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- cksum[*]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+cksum[*]
+\latex default 
+ 
 \latex no_latex 
 Check sum of given file.
 \layout Standard
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-Note, that currently all supported file names are hardcoded to sysinfo.c
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
 Example:
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+\latex default 
+ 
 \latex no_latex 
 cksum[/etc/passwd]
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- filesize[*]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+filesize[*]
+\latex default 
+ 
 \latex no_latex 
 Size of given file.
 \layout Standard
 
-
+E
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-Example:
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
+xample:
 \layout Standard
 
 
 \latex no_latex 
 filesize[/var/log/syslog]
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- proc_cnt[*]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+proc_cnt[*]
+\latex default 
+ 
 \latex no_latex 
 Number of processes called "*" running.
 \layout Standard
 
-
+E
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-Example:
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+xample:
+\latex default 
+ 
 \latex no_latex 
 proc_cnt[inetd]
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- swap[free]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+swap[free]
+\latex default 
+ 
 \latex no_latex 
 Free swap space.
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- swap[total]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+swap[total]
+\latex default 
+ 
 \latex no_latex 
 Total swap space.
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- swap[free]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+swap[free]
+\latex default 
+ 
 \latex no_latex 
 Free swap space.
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- system[procload]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+system[procload]
+\latex default 
+ 
 \latex no_latex 
 Load average for last 1 minute.
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- system[procload5]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+system[procload5]
+\latex default 
+ 
 \latex no_latex 
 Load average for last 5 minutes.
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- system[procload15]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+system[procload15]
+\latex default 
+ 
 \latex no_latex 
 Load average for last 15 minutes.
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- system[proccount]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+system[proccount]
+\latex default 
+ 
 \latex no_latex 
 Number of processes.
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- system[procrunning]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+system[procrunning]
+\latex default 
+ 
 \latex no_latex 
 Number of running processes.
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- system[uptime]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+system[uptime]
+\latex default 
+ 
 \latex no_latex 
 System's uptime.
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
+system[users]
+\latex default 
+ N
+\latex no_latex 
+umber of users connected.
+\layout Description
 
 
 \latex no_latex 
-- system[users]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-Number of users connected.
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- ping
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+ping
+\latex default 
+ 
 \latex no_latex 
 Always return 1.
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- tcp_count
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+tcp_count
+\latex default 
+ 
 \latex no_latex 
 Number of established TCP connections.
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- check_service[ftp]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+check_service[ftp]
+\latex default 
+ 
 \latex no_latex 
 Check either FTP server is running and accepting connections.
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
 \layout Standard
 
 
@@ -2476,45 +2176,18 @@ Check either FTP server is running and accepting connections.
 Result: 0 - FTP server is down
 \layout Standard
 
-
+1
 \latex no_latex 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-1 - FTP server is running
-\layout Standard
+ - FTP server is running
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- check_service[ssh]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+check_service[ssh]
+\latex default 
+ 
 \latex no_latex 
 Check either SSH server is running and accepting connections.
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
 \layout Standard
 
 
@@ -2522,45 +2195,18 @@ Check either SSH server is running and accepting connections.
 Result: 0 - SSH server is down
 \layout Standard
 
-
+1
 \latex no_latex 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-1 - SSH server is running
-\layout Standard
+ - SSH server is running
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- check_service[smtp]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+check_service[smtp]
+\latex default 
+ 
 \latex no_latex 
 Check either Email (SMTP) server is running and accepting connections.
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
 \layout Standard
 
 
@@ -2570,89 +2216,35 @@ Result: 0 - SMTP server is down
 
 
 \latex no_latex 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
 1 - SMTP server is running
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- check_service[pop]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+check_service[pop]
+\latex default 
+ 
 \latex no_latex 
 Check either POP server is running and accepting connections.
 \layout Standard
 
-
+R
 \latex no_latex 
-\SpecialChar ~
-
+esult: 0 - POP server is down
 \layout Standard
 
-
+1
 \latex no_latex 
-Result: 0 - POP server is down
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-1 - POP server is running
-\layout Standard
+ - POP server is running
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+check_service[nntp]
+\latex default 
+ C
 \latex no_latex 
-- check_service[nntp]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-Check either NNTP server is running and accepting connections.
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
+heck either NNTP server is running and accepting connections.
 \layout Standard
 
 
@@ -2662,43 +2254,16 @@ Result: 0 - NNTP server is down
 
 
 \latex no_latex 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
 1 - NNTP server is running
-\layout Standard
+\layout Description
 
-
+c
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- check_service[imap]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+heck_service[imap]
+\latex default 
+ 
 \latex no_latex 
 Check either IMAP server is running and accepting connections.
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
 \layout Standard
 
 
@@ -2708,43 +2273,16 @@ Result: 0 - IMAP server is down
 
 
 \latex no_latex 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
 1 - IMAP server is running
-\layout Standard
+\layout Description
 
 
 \latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
-\latex no_latex 
-- check_port[*]
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
-\layout Standard
-
-
+check_port[*]
+\latex default 
+ 
 \latex no_latex 
 Check either possible to connect to port number "*".
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
 \layout Standard
 
 
@@ -2754,21 +2292,7 @@ Result: 0 - can connect
 
 
 \latex no_latex 
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
-\SpecialChar ~
 1 - cannot connect
-\layout Standard
-
-
-\latex no_latex 
-\SpecialChar ~
-
 \layout Standard
 
 
@@ -2798,6 +2322,8 @@ Supported Parameters by Platform
 
 \layout Standard
 
+
+\lang english
 Parameter/sysem
 \end_inset 
 </cell>
@@ -2806,6 +2332,8 @@ Parameter/sysem
 
 \layout Standard
 
+
+\lang english
 Debian Woody (i386)
 \end_inset 
 </cell>
@@ -2814,6 +2342,8 @@ Debian Woody (i386)
 
 \layout Standard
 
+
+\lang english
 Debian Potato (i386)
 \end_inset 
 </cell>
@@ -2822,6 +2352,8 @@ Debian Potato (i386)
 
 \layout Standard
 
+
+\lang english
 FreeBSD 4.3(i386)
 \end_inset 
 </cell>
@@ -2830,6 +2362,8 @@ FreeBSD 4.3(i386)
 
 \layout Standard
 
+
+\lang english
 Solaris 5.8(Ultra-60)
 \end_inset 
 </cell>
@@ -2838,6 +2372,8 @@ Solaris 5.8(Ultra-60)
 
 \layout Standard
 
+
+\lang english
 HP-UX 11.00(9000/800)
 \end_inset 
 </cell>
@@ -2846,6 +2382,8 @@ HP-UX 11.00(9000/800)
 
 \layout Standard
 
+
+\lang english
 AIX 4.3(PowerPC)
 \end_inset 
 </cell>
@@ -2856,6 +2394,8 @@ AIX 4.3(PowerPC)
 
 \layout Standard
 
+
+\lang english
 memory[total]
 \end_inset 
 </cell>
@@ -2864,6 +2404,8 @@ memory[total]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -2872,6 +2414,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -2880,6 +2424,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -2888,6 +2434,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -2896,6 +2444,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -2904,6 +2454,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -2914,6 +2466,8 @@ X
 
 \layout Standard
 
+
+\lang english
 memory[shared]
 \end_inset 
 </cell>
@@ -2922,6 +2476,8 @@ memory[shared]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -2930,6 +2486,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -2938,6 +2496,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -2946,6 +2506,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -2954,6 +2516,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -2962,6 +2526,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -2972,6 +2538,8 @@ X
 
 \layout Standard
 
+
+\lang english
 memory[buffers]
 \end_inset 
 </cell>
@@ -2980,6 +2548,8 @@ memory[buffers]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -2988,6 +2558,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -2996,6 +2568,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3004,6 +2578,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3012,6 +2588,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3020,6 +2598,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3030,6 +2610,8 @@ X
 
 \layout Standard
 
+
+\lang english
 memory[cached]
 \end_inset 
 </cell>
@@ -3038,6 +2620,8 @@ memory[cached]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3046,6 +2630,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3054,6 +2640,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3062,6 +2650,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3070,6 +2660,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3078,6 +2670,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3088,6 +2682,8 @@ X
 
 \layout Standard
 
+
+\lang english
 memory[free]
 \end_inset 
 </cell>
@@ -3096,6 +2692,8 @@ memory[free]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3104,6 +2702,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3112,6 +2712,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3120,6 +2722,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3128,6 +2732,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3136,6 +2742,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3146,6 +2754,8 @@ X
 
 \layout Standard
 
+
+\lang english
 diskfree[*]
 \end_inset 
 </cell>
@@ -3154,6 +2764,8 @@ diskfree[*]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3162,6 +2774,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3170,6 +2784,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3178,6 +2794,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3186,6 +2804,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3194,6 +2814,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3204,6 +2826,8 @@ X
 
 \layout Standard
 
+
+\lang english
 inodefree[*]
 \end_inset 
 </cell>
@@ -3212,6 +2836,8 @@ inodefree[*]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3220,6 +2846,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3228,6 +2856,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3236,6 +2866,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3244,6 +2876,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3252,6 +2886,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3262,6 +2898,8 @@ X
 
 \layout Standard
 
+
+\lang english
 cksum[*]
 \end_inset 
 </cell>
@@ -3270,6 +2908,8 @@ cksum[*]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3278,6 +2918,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3286,6 +2928,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3294,6 +2938,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3302,6 +2948,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3310,6 +2958,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3320,6 +2970,8 @@ X
 
 \layout Standard
 
+
+\lang english
 filesize[*]
 \end_inset 
 </cell>
@@ -3328,6 +2980,8 @@ filesize[*]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3336,6 +2990,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3344,6 +3000,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3352,6 +3010,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3360,6 +3020,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3368,6 +3030,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3378,6 +3042,8 @@ X
 
 \layout Standard
 
+
+\lang english
 swap[free]
 \end_inset 
 </cell>
@@ -3386,6 +3052,8 @@ swap[free]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3394,6 +3062,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3402,6 +3072,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3410,6 +3082,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3418,6 +3092,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3426,6 +3102,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3436,6 +3114,8 @@ X
 
 \layout Standard
 
+
+\lang english
 swap[total]
 \end_inset 
 </cell>
@@ -3444,6 +3124,8 @@ swap[total]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3452,6 +3134,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3460,6 +3144,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3468,6 +3154,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3476,6 +3164,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3484,6 +3174,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3494,6 +3186,8 @@ X
 
 \layout Standard
 
+
+\lang english
 swap[in]
 \end_inset 
 </cell>
@@ -3502,6 +3196,8 @@ swap[in]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3510,6 +3206,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3518,6 +3216,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3526,6 +3226,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3534,6 +3236,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3542,6 +3246,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3552,6 +3258,8 @@ X
 
 \layout Standard
 
+
+\lang english
 swap[out]
 \end_inset 
 </cell>
@@ -3560,6 +3268,8 @@ swap[out]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3568,6 +3278,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3576,6 +3288,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3584,6 +3298,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3592,6 +3308,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3600,6 +3318,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3610,6 +3330,8 @@ X
 
 \layout Standard
 
+
+\lang english
 system[interrupts]
 \end_inset 
 </cell>
@@ -3618,6 +3340,8 @@ system[interrupts]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3626,6 +3350,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3634,6 +3360,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3642,6 +3370,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3650,6 +3380,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3658,6 +3390,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3668,6 +3402,8 @@ X
 
 \layout Standard
 
+
+\lang english
 system[switches]
 \end_inset 
 </cell>
@@ -3676,6 +3412,8 @@ system[switches]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3684,6 +3422,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3692,6 +3432,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3700,6 +3442,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3708,6 +3452,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3716,6 +3462,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3726,6 +3474,8 @@ X
 
 \layout Standard
 
+
+\lang english
 proc_cnt[*]
 \end_inset 
 </cell>
@@ -3734,6 +3484,8 @@ proc_cnt[*]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3742,6 +3494,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3750,6 +3504,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3758,6 +3514,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3766,6 +3524,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3774,6 +3534,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -3784,6 +3546,8 @@ X
 
 \layout Standard
 
+
+\lang english
 check_port[*]
 \end_inset 
 </cell>
@@ -3792,6 +3556,8 @@ check_port[*]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3800,6 +3566,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3808,6 +3576,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3816,6 +3586,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3824,6 +3596,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3832,6 +3606,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3842,6 +3618,8 @@ X
 
 \layout Standard
 
+
+\lang english
 check_service[ftp]
 \end_inset 
 </cell>
@@ -3850,6 +3628,8 @@ check_service[ftp]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3858,6 +3638,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3866,6 +3648,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3874,6 +3658,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3882,6 +3668,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3890,6 +3678,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3900,6 +3690,8 @@ X
 
 \layout Standard
 
+
+\lang english
 check_service[ssh]
 \end_inset 
 </cell>
@@ -3908,6 +3700,8 @@ check_service[ssh]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3916,6 +3710,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3924,6 +3720,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3932,6 +3730,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3940,6 +3740,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3948,6 +3750,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3958,6 +3762,8 @@ X
 
 \layout Standard
 
+
+\lang english
 check_service[smtp]
 \end_inset 
 </cell>
@@ -3966,6 +3772,8 @@ check_service[smtp]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3974,6 +3782,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3982,6 +3792,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3990,6 +3802,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -3998,6 +3812,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4006,6 +3822,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4016,6 +3834,8 @@ X
 
 \layout Standard
 
+
+\lang english
 check_service[pop]
 \end_inset 
 </cell>
@@ -4024,6 +3844,8 @@ check_service[pop]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4032,6 +3854,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4040,6 +3864,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4048,6 +3874,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4056,6 +3884,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4064,6 +3894,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4074,6 +3906,8 @@ X
 
 \layout Standard
 
+
+\lang english
 check_service[nntp]
 \end_inset 
 </cell>
@@ -4082,6 +3916,8 @@ check_service[nntp]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4090,6 +3926,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4098,6 +3936,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4106,6 +3946,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4114,6 +3956,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4122,6 +3966,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4132,6 +3978,8 @@ X
 
 \layout Standard
 
+
+\lang english
 check_service[imap]
 \end_inset 
 </cell>
@@ -4140,6 +3988,8 @@ check_service[imap]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4148,6 +3998,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4156,6 +4008,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4164,6 +4018,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4172,6 +4028,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4180,6 +4038,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4190,6 +4050,8 @@ X
 
 \layout Standard
 
+
+\lang english
 io[disk_io]
 \end_inset 
 </cell>
@@ -4198,6 +4060,8 @@ io[disk_io]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4206,6 +4070,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4214,6 +4080,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4222,6 +4090,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4230,6 +4100,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4238,6 +4110,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4248,6 +4122,8 @@ X
 
 \layout Standard
 
+
+\lang english
 io[disk_rio]
 \end_inset 
 </cell>
@@ -4256,6 +4132,8 @@ io[disk_rio]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4264,6 +4142,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4272,6 +4152,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4280,6 +4162,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4288,6 +4172,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4296,6 +4182,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4306,6 +4194,8 @@ X
 
 \layout Standard
 
+
+\lang english
 io[disk_wio]
 \end_inset 
 </cell>
@@ -4314,6 +4204,8 @@ io[disk_wio]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4322,6 +4214,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4330,6 +4224,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4338,6 +4234,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4346,6 +4244,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4354,6 +4254,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4364,6 +4266,8 @@ X
 
 \layout Standard
 
+
+\lang english
 io[disk_rblk]
 \end_inset 
 </cell>
@@ -4372,6 +4276,8 @@ io[disk_rblk]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4380,6 +4286,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4388,6 +4296,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4396,6 +4306,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4404,6 +4316,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4412,6 +4326,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4422,6 +4338,8 @@ X
 
 \layout Standard
 
+
+\lang english
 io[disk_wblk]
 \end_inset 
 </cell>
@@ -4430,6 +4348,8 @@ io[disk_wblk]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4438,6 +4358,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4446,6 +4368,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4454,6 +4378,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4462,6 +4388,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4470,6 +4398,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4480,6 +4410,8 @@ X
 
 \layout Standard
 
+
+\lang english
 system[procload]
 \end_inset 
 </cell>
@@ -4488,6 +4420,8 @@ system[procload]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4496,6 +4430,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4504,6 +4440,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4512,6 +4450,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4520,6 +4460,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4528,6 +4470,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4538,6 +4482,8 @@ X
 
 \layout Standard
 
+
+\lang english
 system[procload5]
 \end_inset 
 </cell>
@@ -4546,6 +4492,8 @@ system[procload5]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4554,6 +4502,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4562,6 +4512,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4570,6 +4522,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4578,6 +4532,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4586,6 +4542,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4596,6 +4554,8 @@ X
 
 \layout Standard
 
+
+\lang english
 system[procload15]
 \end_inset 
 </cell>
@@ -4604,6 +4564,8 @@ system[procload15]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4612,6 +4574,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4620,6 +4584,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4628,6 +4594,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4636,6 +4604,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4644,6 +4614,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4654,6 +4626,8 @@ X
 
 \layout Standard
 
+
+\lang english
 system[proccount]
 \end_inset 
 </cell>
@@ -4662,6 +4636,8 @@ system[proccount]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4670,6 +4646,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4678,6 +4656,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4686,6 +4666,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4694,6 +4676,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4702,6 +4686,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4712,6 +4698,8 @@ X
 
 \layout Standard
 
+
+\lang english
 system[procrunning]
 \end_inset 
 </cell>
@@ -4720,6 +4708,8 @@ system[procrunning]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4728,6 +4718,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4736,6 +4728,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4744,6 +4738,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4752,6 +4748,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4760,6 +4758,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4770,6 +4770,8 @@ X
 
 \layout Standard
 
+
+\lang english
 system[uptime]
 \end_inset 
 </cell>
@@ -4778,6 +4780,8 @@ system[uptime]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4786,6 +4790,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4794,6 +4800,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4802,6 +4810,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4810,6 +4820,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4818,6 +4830,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4828,6 +4842,8 @@ X
 
 \layout Standard
 
+
+\lang english
 system[users]
 \end_inset 
 </cell>
@@ -4836,6 +4852,8 @@ system[users]
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4844,6 +4862,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4852,6 +4872,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4860,6 +4882,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4868,6 +4892,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4876,6 +4902,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4886,6 +4914,8 @@ X
 
 \layout Standard
 
+
+\lang english
 ping
 \end_inset 
 </cell>
@@ -4894,6 +4924,8 @@ ping
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4902,6 +4934,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4910,6 +4944,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4918,6 +4954,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4926,6 +4964,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4934,6 +4974,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4944,6 +4986,8 @@ X
 
 \layout Standard
 
+
+\lang english
 tcp_count
 \end_inset 
 </cell>
@@ -4952,6 +4996,8 @@ tcp_count
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4960,6 +5006,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4968,6 +5016,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -4976,6 +5026,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4984,6 +5036,8 @@ X
 
 \layout Standard
 
+
+\lang english
 -
 \end_inset 
 </cell>
@@ -4992,6 +5046,8 @@ X
 
 \layout Standard
 
+
+\lang english
 X
 \end_inset 
 </cell>
@@ -5004,6 +5060,20 @@ X
 \layout Section
 
 Getting Maximum Performace From Zabbix
+\layout Subsection
+
+Real world configuration
+\layout Standard
+
+Server with Zabbix 1.0 installed (Linux 2.2, MySQL, Celeron/300Mhz, 32Mb,
+ IDE) is able to collect more than 40 parameters per second from servers
+ being monitored.
+ How many servers can be monitored by Zabbix on the hardware, you may ask.
+ It depends on number of monitored parameters and how often Zabbix should
+ acquire these parameters.
+ Suppose, each server you monitor has ten parameters to watch for.
+ You want to update these parameters once in a 10 seconds.
+ Doing simple calculation, we see that Zabbix is able to handle 40 servers.
 \layout Section
 
 Zabbix Frontends
@@ -5028,6 +5098,66 @@ Information provided by the frontend can be either graphical or textual.
 While graphical representations usually provide the easiest method to understand
  trends, the text representation of monitored parameter is intended to provide
  an easy way to export Zabbix data to other analytical tools.
+\layout Subsubsection
+
+Menu
+\layout Standard
+\added_space_bottom 0.3cm 
+Most of pages contain menu that visibly consists of three rows.
+ First row is accessible for any Zabbix users.
+ Administrator priveledges required to access items of second and third
+ menu' rows.
+ Third row is area for Zabbix administrators.
+ 
+\layout Paragraph
+
+CONFIG
+\newline 
+
+\layout Standard
+
+The menu item is used to set global Zabbix parameters.
+\layout Description
+
+SMTP\SpecialChar ~
+SERVER
+\layout Standard
+
+Name or IP address of SMTP server that will be used for sending emails.
+\layout Description
+
+Value\SpecialChar ~
+for\SpecialChar ~
+SMTP\SpecialChar ~
+HELO\SpecialChar ~
+authentification
+\layout Standard
+
+Usually address of Zabbix server.
+\layout Standard
+
+Example: zabbix.sf.net
+\layout Description
+
+Zabbix\SpecialChar ~
+email\SpecialChar ~
+address\SpecialChar ~
+to\SpecialChar ~
+send\SpecialChar ~
+emals\SpecialChar ~
+from
+\layout Standard
+
+Email address which will be used to fill field From: for all emails that
+ Zabbix will send.
+\layout Description
+
+Password\SpecialChar ~
+required?
+\layout Standard
+
+If checked, user authorisation will be required for accessing any menu item
+ of Zabbix WEB front-end.
 \layout Subsubsection
 
 Reports
@@ -5185,4 +5315,50 @@ the project.
  
 \latex no_latex 
 This sort of feedback helps me make the software better.
+\layout Subsection
+
+Developers of Zabbix
+\layout Itemize
+
+Alexei Vladishev 
+\layout Standard
+
+Has written most of Zabbix code including PHP frontend.
+\layout Subsection
+
+Contributors to Zabbix
+\layout Itemize
+
+Kaspars Cikmacs
+\layout Standard
+
+Lots of new ideas based on real expirience of using Zabbix.
+\layout Itemize
+
+Michal Suszycki
+\layout Standard
+
+Help with autoconf issues.
+\layout Itemize
+
+Mike Hoolehan
+\layout Standard
+
+Helping with making the Reference Manual correct and understandable.
+ 
+\layout Subsection
+
+Supporters to Zabbix
+\layout Bibliography
+\bibitem {key-1}
+
+MySQL Reference Manual for version 3.23.39
+\layout Bibliography
+\bibitem {key-2}
+
+PostgreSQL User's Guide
+\layout Bibliography
+\bibitem {key-3}
+
+PHP Manual
 \the_end
