@@ -132,75 +132,60 @@
 	echo S_CONFIGURATION_OF_ITEMS_BIG;;
 	show_table_v_delimiter();
 
-//	echo "<font size=2>";
+// Start of new code
+	echo "<form name=\"form2\" method=\"get\" action=\"items.php\">";
 
-	if(isset($HTTP_GET_VARS["groupid"]))
+	if(isset($HTTP_GET_VARS["groupid"])&&($HTTP_GET_VARS["groupid"]==0))
 	{
-//		echo "all ";
-		echo "<a href='items.php'>".S_ALL."</a> ";
+		unset($HTTP_GET_VARS["groupid"]);
 	}
-	else
-	{
-		echo "<b>[<a href='items.php'>".S_ALL."</a>]</b> ";
-	}
+
+	echo S_GROUP."&nbsp;";
+	echo "<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
+	echo "<option value=\"0\" ".iif(!isset($HTTP_GET_VARS["groupid"]),"selected","").">".S_ALL_SMALL;
 
 	$result=DBselect("select groupid,name from groups order by name");
-
 	while($row=DBfetch($result))
 	{
-//		if(!check_right("Host","R",$row["hostid"]))
-//		{
-//			continue;
-//		}
-		if( isset($HTTP_GET_VARS["groupid"]) && ($HTTP_GET_VARS["groupid"] == $row["groupid"]) )
+// Check if at least one host with read permission exists for this group
+		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status in (0,2) and h.hostid=i.hostid and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
+		$cnt=0;
+		while($row2=DBfetch($result2))
 		{
-			echo "<b>[";
+			if(!check_right("Host","U",$row2["hostid"]))
+			{
+				continue;
+			}
+			$cnt=1; break;
 		}
-		echo "<a href='items.php?groupid=".$row["groupid"]."'>".$row["name"]."</a>";
-		if(isset($HTTP_GET_VARS["groupid"]) && ($HTTP_GET_VARS["groupid"] == $row["groupid"]) )
+		if($cnt!=0)
 		{
-			echo "]</b>";
+			echo "<option value=\"".$row["groupid"]."\" ".iif(isset($HTTP_GET_VARS["groupid"])&&($HTTP_GET_VARS["groupid"]==$row["groupid"]),"selected","").">".$row["name"];
 		}
-		echo " ";
 	}
-?>
+	echo "</select>";
 
-<?php
-	show_table_v_delimiter();
-	if(isset($HTTP_GET_VARS["groupid"]))
-	{
-		$sql="select h.hostid,h.host from hosts h,hosts_groups hg where hg.groupid=".$HTTP_GET_VARS["groupid"]." and hg.hostid=h.hostid order by h.host";
-	}
-	else
-	{
-		$sql="select hostid,host from hosts order by host";
-	}
+	echo "&nbsp;".S_HOST."&nbsp;";
+	echo "<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
+
+	$sql=iif(isset($HTTP_GET_VARS["groupid"]),
+		"select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status in (0,2) and h.hostid=i.hostid and hg.groupid=".$HTTP_GET_VARS["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host",
+		"select h.hostid,h.host from hosts h,items i where h.status in (0,2) and h.hostid=i.hostid group by h.hostid,h.host order by h.host");
+
 	$result=DBselect($sql);
-//	$result=DBselect("select hostid,host from hosts order by host");
 	while($row=DBfetch($result))
 	{
-        	if(!check_right("Host","U",$row["hostid"]))
-        	{
+		if(!check_right("Host","U",$row["hostid"]))
+		{
 			continue;
 		}
-		if(isset($HTTP_GET_VARS["hostid"]) && ($HTTP_GET_VARS["hostid"] == $row["hostid"]))
-		{
-			echo "<b>[";
-		}
-		if(isset($HTTP_GET_VARS["groupid"]))
-		{
-			echo "<A HREF=\"items.php?hostid=".$row["hostid"]."&groupid=".$HTTP_GET_VARS["groupid"]."\">".$row["host"]."</A>";
-		}
-		else
-		{
-			echo "<A HREF=\"items.php?hostid=".$row["hostid"]."\">".$row["host"]."</A>";
-		}
-		if(isset($HTTP_GET_VARS["hostid"]) && ($HTTP_GET_VARS["hostid"] == $row["hostid"]))
-		{
-			echo "]</b>";
-		}
-		echo " ";
+		echo "<option value=\"".$row["hostid"]."\"".iif(isset($HTTP_GET_VARS["hostid"])&&($HTTP_GET_VARS["hostid"]==$row["hostid"]),"selected","").">".$row["host"];
 	}
+	echo "</select>";
+
+	echo "</form>";
+// end of new code
+
 	show_table_header_end();
 
 	$lasthost="";
@@ -240,8 +225,9 @@
 				echo "</TR>";
 			}
 			$lasthost=$row["host"];
-		        if($col++%2 == 1)	{ echo "<TR BGCOLOR=#DDDDDD>"; }
-			else			{ echo "<TR BGCOLOR=#EEEEEE>"; }
+		        iif_echo($col++%2 == 1,
+				"<TR BGCOLOR=#DDDDDD>",
+				"<TR BGCOLOR=#EEEEEE>");
 
 			echo "<TD><INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"".$row["itemid"]."\"> ".$row["itemid"]."</TD>";
 //			echo "<TD>".$row["itemid"]."</TD>";
@@ -281,56 +267,28 @@
 
 			
 			echo "<td align=center>";
-#			if(isset($HTTP_GET_VARS["hostid"]))
-#			{
-				switch($row["status"])
-				{
-					case 0:
-						echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$HTTP_GET_VARS["hostid"]."&register=changestatus&status=1\"><font color=\"00AA00\">".S_ACTIVE."</font></a>";
-						break;
-					case 1:
-						echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$HTTP_GET_VARS["hostid"]."&register=changestatus&status=0\"><font color=\"AA0000\">".S_NOT_ACTIVE."</font></a>";
-						break;
-#					case 2:
-#						echo "Trapper";
-#						break;
-					case 3:
-						echo "<font color=\"AAAAAA\">".S_NOT_SUPPORTED."</font>";
-						break;
-					default:
-						echo S_UNKNOWN;
-				}
-#			}
-#			else
-#			{
-#				switch($row["status"])
-#				{
-#					case 0:
-#						echo "<a href=\"items.php?itemid=".$row["itemid"]."&register=changestatus&status=1\">Active</a>";
-#						break;
-#					case 1:
-#						echo "<a href=\"items.php?itemid=".$row["itemid"]."&register=changestatus&status=0\">Not active</a>";
-#						break;
-#					case 2:
-#						echo "Trapper";
-#						break;
-#					case 3:
-#						echo "Not supported";
-#						break;
-#					default:
-#						echo "<B>$status</B> Unknown";
-#				}
-#			}
+			switch($row["status"])
+			{
+				case 0:
+					echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$HTTP_GET_VARS["hostid"]."&register=changestatus&status=1\"><font color=\"00AA00\">".S_ACTIVE."</font></a>";
+					break;
+				case 1:
+					echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$HTTP_GET_VARS["hostid"]."&register=changestatus&status=0\"><font color=\"AA0000\">".S_NOT_ACTIVE."</font></a>";
+					break;
+#				case 2:
+#					echo "Trapper";
+#					break;
+				case 3:
+					echo "<font color=\"AAAAAA\">".S_NOT_SUPPORTED."</font>";
+					break;
+				default:
+					echo S_UNKNOWN;
+			}
 			echo "</td>";
 	
-        		if(check_right("Item","U",$row["itemid"]))
-			{
-				echo "<TD><A HREF=\"items.php?register=change&itemid=".$row["itemid"]."#form\">".S_CHANGE."</A></TD>";
-			}
-			else
-			{
-				echo "<TD>".S_CHANGE."</TD>";
-			}
+        		iif_echo(check_right("Item","U",$row["itemid"]),
+				"<TD><A HREF=\"items.php?register=change&itemid=".$row["itemid"]."#form\">".S_CHANGE."</A></TD>",
+				"<TD>".S_CHANGE."</TD>");
 			echo "</TR>";
 		}
 		echo "</TABLE>";

@@ -645,7 +645,8 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 
 		if( (s = strstr(str,"{HOSTNAME}")) != NULL )
 		{
-			snprintf(sql,sizeof(sql)-1,"select distinct t.description,h.host from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid", trigger->triggerid);
+/*			snprintf(sql,sizeof(sql)-1,"select distinct t.description,h.host from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid", trigger->triggerid);*/
+			snprintf(sql,sizeof(sql)-1,"select distinct h.host from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid", trigger->triggerid);
 			result = DBselect(sql);
 
 			if(DBnum_rows(result) == 0)
@@ -656,7 +657,7 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 			}
 			else
 			{
-				strscpy(tmp,DBget_field(result,0,1));
+				strscpy(tmp,DBget_field(result,0,0));
 
 				DBfree_result(result);
 			}
@@ -665,6 +666,31 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 			strcpy(exp, str);
 			strncat(exp, tmp, MAX_STRING_LEN);
 			strncat(exp, s+strlen("{HOSTNAME}"), MAX_STRING_LEN);
+
+			found = SUCCEED;
+		}
+		else if( (s = strstr(str,"{IPADDRESS}")) != NULL )
+		{
+			snprintf(sql,sizeof(sql)-1,"select distinct h.ip from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.useip=1", trigger->triggerid);
+			result = DBselect(sql);
+
+			if(DBnum_rows(result) == 0)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No IP address in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				strscpy(tmp, "*UNKNOWN IP*");
+				DBfree_result(result);
+			}
+			else
+			{
+				strscpy(tmp,DBget_field(result,0,0));
+
+				DBfree_result(result);
+			}
+
+			s[0]=0;
+			strcpy(exp, str);
+			strncat(exp, tmp, MAX_STRING_LEN);
+			strncat(exp, s+strlen("{IPADDRESS}"), MAX_STRING_LEN);
 
 			found = SUCCEED;
 		}

@@ -94,11 +94,11 @@
 
 	echo "<TABLE WIDTH=100% align=center BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR>";
-	echo "<TD><B>".S_TIME."</B></TD>";
-	echo "<TD><B>".S_STATUS."</B></TD>";
-	echo "<TD><B>".S_DURATION."</B></TD>";
-	echo "<TD><B>".S_SUM."</B></TD>";
-	echo "<TD><B>%</B></TD>";
+	table_td("<B>".S_TIME."</B>","");
+	table_td("<B>".S_STATUS."</B>","");
+	table_td("<B>".S_DURATION."</B>","");
+	table_td("<B>".S_SUM."</B>","");
+	table_td("<B>%</B>","");
 	echo "</TR>";
 	$truesum=0;
 	$falsesum=0;
@@ -114,7 +114,7 @@
 		elseif($row["value"]==2)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
 		else				{ echo "<TR BGCOLOR=#FFDDDD>"; }
 
-		echo "<TD>",date("Y.M.d H:i:s",$row["clock"]),"</TD>";
+		table_td(date("Y.M.d H:i:s",$row["clock"]),"");
 		if($row["value"]==1)
 		{
 			$istrue=S_TRUE_BIG;
@@ -144,7 +144,7 @@
 		$proc=round($proc*100)/100;
 		$proc="$proc%";
  
-		echo "<TD><B>",$istrue,"</B></TD>";
+		table_td("<B>$istrue</B>","");
 		if($leng>60*60*24)
 		{
 			$leng= round(($leng/(60*60*24))*10)/10;
@@ -185,9 +185,9 @@
 			$sum="$sum secs";
 		}
   
-		echo "<TD>$leng</TD>";
-		echo "<TD>$sum</TD>";
-		echo "<TD>$proc</TD>";
+		table_td($leng,"");
+		table_td($sum,"");
+		table_td($proc,"");
 		echo "</TR>";
 	}
 	echo "</TABLE>";

@@ -20,83 +20,83 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = "Status of Zabbix";
+	$page["title"] = S_STATUS_OF_ZABBIX;
 	$page["file"] = "report1.php";
 	show_header($page["title"],0,0);
 ?>
 
 <?php
-	show_table_header("STATUS OF ZABBIX");
+	show_table_header(S_STATUS_OF_ZABBIX_BIG);
 
 	echo "<TABLE BORDER=0 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR><TD WIDTH=10%><B>Parameter</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>Value</B></TD>";
+	echo "<TR><TD WIDTH=10%><B>".S_PARAMETER."</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>".S_VALUE."</B></TD>";
 	echo "</TR>";
 
 	$stats=get_stats();
 ?>
 
 	<tr bgcolor="#eeeeee">
-	<td>Is zabbix_suckerd running ?</td>
+	<td><?php echo S_ZABBIX_SUCKERD_IS_RUNNING; ?></td>
 	<?php
-		$str="<font color=\"AA0000\">No</font>";
+		$str="<font color=\"AA0000\">".S_NO."</font>";
 		if( (exec("ps -ef|grep zabbix_suckerd|grep -v grep|wc -l")>0) || (exec("ps -ax|grep zabbix_suckerd|grep -v grep|wc -l")>0) )
 		{
-			$str="<font color=\"00AA00\">Yes</font>";
+			$str="<font color=\"00AA00\">".S_YES."</font>";
 		}
 	?>
 	<td><?php echo $str; ?></td>
 	</tr>
 
 	<tr bgcolor="#dddddd">
-	<td>Is zabbix_trapperd running ?</td>
+	<td><?php echo S_ZABBIX_TRAPPERD_IS_RUNNING; ?></td>
 	<?php
-		$str="<font color=\"AA0000\">No</font>";
+		$str="<font color=\"AA0000\">".S_NO."</font>";
 		if( (exec("ps -ef|grep zabbix_trapperd|grep -v grep|wc -l")>0) || (exec("ps -ax|grep zabbix_trapperd|grep -v grep|wc -l")>0) )
 		{
-			$str="<font color=\"00AA00\">Yes</font>";
+			$str="<font color=\"00AA00\">".S_YES."</font>";
 		}
 	?>
 	<td><?php echo $str; ?></td>
 	</tr>
 
 	<tr bgcolor="#eeeeee">
-	<td>Number of values stored</td>
+	<td><?php echo S_NUMBER_OF_VALUES_STORED; ?></td>
 	<td><?php echo $stats["history_count"]; ?></td>
 	</tr>
 
 	<tr bgcolor="#dddddd">
-	<td>Number of trends stored</td>
+	<td><?php echo S_NUMBER_OF_TRENDS_STORED; ?></td>
 	<td><?php echo $stats["trends_count"]; ?></td>
 	</tr>
 
 	<tr bgcolor="#eeeeee">
-	<td>Number of alarms</td>
+	<td><?php echo S_NUMBER_OF_ALARMS; ?></td>
 	<td><?php echo $stats["alarms_count"]; ?></td>
 	</tr>
 
 	<tr bgcolor="#dddddd">
-	<td>Number of alerts</td>
+	<td><?php echo S_NUMBER_OF_ALERTS; ?></td>
 	<td><?php echo $stats["alerts_count"]; ?></td>
 	</tr>
 
 	<tr bgcolor="#eeeeee">
-	<td>Number of triggers (enabled/disabled)</td>
+	<td><?php echo S_NUMBER_OF_TRIGGERS_ENABLED_DISABLED; ?></td>
 	<td><?php echo $stats["triggers_count"],"(",$stats["triggers_count_enabled"],"/",$stats["triggers_count_disabled"],")"; ?></td>
 	</tr>
 
 	<tr bgcolor="#dddddd">
-	<td>Number of items (active/trapper/not active/not supported)</td>
+	<td><?php echo S_NUMBER_OF_ITEMS_ACTIVE_TRAPPER; ?></td>
 	<td><?php echo $stats["items_count"],"(",$stats["items_count_active"],"/",$stats["items_count_trapper"],"/",$stats["items_count_not_active"],"/",$stats["items_count_not_supported"],")"; ?></td>
 	</tr>
 
 	<tr bgcolor="#eeeeee">
-	<td>Number of users</td>
+	<td><?php echo S_NUMBER_OF_USERS; ?></td>
 	<td><?php echo $stats["users_count"]; ?></td>
 	</tr>
 
 	<tr bgcolor="#dddddd">
-	<td>Number of hosts (monitored/not monitored/templates)</td>
+	<td><?php echo S_NUMBER_OF_HOSTS_MONITORED; ?></td>
 	<td><?php echo $stats["hosts_count"],"(",$stats["hosts_count_monitored"],"/",$stats["hosts_count_not_monitored"],"/",$stats["hosts_count_template"],")"; ?></td>
 	</tr>
 

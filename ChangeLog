@@ -1,5 +1,14 @@
 Changes for 1.1alpha1:
 
+ - added support for real delta. item.delta=2. (Alexei)
+ - new selection for triggers.php (Alexei)
+ - new selection for items.php (Alexei)
+ - removed helpdesk.php (Alexei)
+ - fixed check of permissions for screenedit.php (Alexei)
+ - new selection for graphs in charts.php (Alexei)
+ - new selection of maps in maps.php (Alexei)
+ - new selection of group and host for latest.php (Alexei)
+ - added support for macro {IPADDRESS} (Alexei)
  - added support of localisation (Alexei)
  - added file frontends/php/include/locale_en.inc.php (Alexei)
  - fixed check of NNTP service (Alexei)

@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	$page["title"] = "High-level representation of monitored data";
+	$page["title"] = S_IT_SERVICES;
 	$page["file"] = "srv_status.php";
 
 	include "include/config.inc.php";
@@ -27,7 +27,7 @@
 ?>
  
 <?php
-	show_table_header("IT SERVICES");
+	show_table_header(S_IT_SERVICES_BIG);
 
 	if(isset($HTTP_GET_VARS["serviceid"])&&isset($HTTP_GET_VARS["showgraph"]))
 	{
@@ -48,12 +48,12 @@
 	echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";
 	echo "\n";
 	echo "<tr>";
-	echo "<td width=40%><b>Service</b></td>";
-	echo "<td width=10%><b>Status</b></td>";
-	echo "<td><b>Reason</b></td>";
-	echo "<td width=20%><b>SLA (last 7 days)</b></td>";
-	echo "<td width=10% align=center><b>Planned/current&nbsp;SLA</b></td>";
-	echo "<td width=5%><b>Graph</b></td>";
+	echo "<td width=40%><b>".S_SERVICE."</b></td>";
+	echo "<td width=10%><b>".S_STATUS."</b></td>";
+	echo "<td><b>".S_REASON."</b></td>";
+	echo "<td width=20%><b>".S_SLA_LAST_7_DAYS."</b></td>";
+	echo "<td width=10% align=center><b>".nbsp(S_PLANNED_CURRENT_SLA)."</b></td>";
+	echo "<td width=5%><b>".S_GRAPH."</b></td>";
 	echo "</tr>";
 	echo "\n";
 	$col=0;
@@ -129,7 +129,7 @@
 //			{
 				$description=nbsp(expand_trigger_description($row["triggerid"]));
 //			}
-			$description="[<a href=\"alarms.php?triggerid=".$row["triggerid"]."\">TRIGGER</a>] $description";
+			$description="[<a href=\"alarms.php?triggerid=".$row["triggerid"]."\">".S_TRIGGER_BIG."</a>] $description";
 		}
 		else
 		{
