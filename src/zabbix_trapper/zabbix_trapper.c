@@ -30,6 +30,7 @@
 int	CONFIG_TIMEOUT		= TRAPPER_TIMEOUT;
 int	CONFIG_LOG_LEVEL	= LOG_LEVEL_WARNING;
 char	*CONFIG_LOG_FILE	= NULL;
+char	*CONFIG_DBHOST		= NULL;
 char	*CONFIG_DBNAME		= NULL;
 char	*CONFIG_DBUSER		= NULL;
 char	*CONFIG_DBPASSWORD	= NULL;
@@ -60,6 +61,7 @@ void    init_config(void)
                 {"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
                 {"DebugLevel",&CONFIG_LOG_LEVEL,0,TYPE_INT,PARM_OPT,1,3},
                 {"LogFile",&CONFIG_LOG_FILE,0,TYPE_STRING,PARM_OPT,0,0},
+                {"DBHost",&CONFIG_DBHOST,0,TYPE_STRING,PARM_OPT,0,0},
                 {"DBName",&CONFIG_DBNAME,0,TYPE_STRING,PARM_MAND,0,0},
                 {"DBUser",&CONFIG_DBUSER,0,TYPE_STRING,PARM_OPT,0,0},
                 {"DBPassword",&CONFIG_DBPASSWORD,0,TYPE_STRING,PARM_OPT,0,0},
@@ -126,7 +128,7 @@ int	main()
 /*	???
 	value=atof(value_string);*/
 
-	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+	DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
 	ret=process_data(0,server,key,value_string);
 
 	alarm(0);

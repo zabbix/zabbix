@@ -1,5 +1,10 @@
+Not ready yet:
+
+ - permissions for charts, graphs ,etc etc 
+
 Changes for 1.0beta5:
 
+ - added parameter DBHost (Alexei)
  - added upgrades/dbpatches/1.0beta4_to_1.0beta5/ with patches (Alexei)
  - added support for disktotal[*] (Alexei)
  - added support for inodetotal[*] (Alexei)

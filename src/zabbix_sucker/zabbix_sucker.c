@@ -49,6 +49,7 @@ static	int	CONFIG_DISABLE_HOUSEKEEPING	= 0;
 static	int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 static	char	*CONFIG_PID_FILE		= NULL;
 static	char	*CONFIG_LOG_FILE		= NULL;
+static	char	*CONFIG_DBHOST			= NULL;
 static	char	*CONFIG_DBNAME			= NULL;
 static	char	*CONFIG_DBUSER			= NULL;
 static	char	*CONFIG_DBPASSWORD		= NULL;
@@ -211,6 +212,7 @@ void	init_config(void)
 		{"DebugLevel",&CONFIG_LOG_LEVEL,0,TYPE_INT,PARM_OPT,0,4},
 		{"PidFile",&CONFIG_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"LogFile",&CONFIG_LOG_FILE,0,TYPE_STRING,PARM_OPT,0,0},
+		{"DBHost",&CONFIG_DBHOST,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBName",&CONFIG_DBNAME,0,TYPE_STRING,PARM_MAND,0,0},
 		{"DBUser",&CONFIG_DBUSER,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBPassword",&CONFIG_DBPASSWORD,0,TYPE_STRING,PARM_OPT,0,0},
@@ -867,7 +869,7 @@ int main_alerter_loop()
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("connecting to the database");
 #endif
-		DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+		DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
 
 		sprintf(sql,"select smtp_server,smtp_helo,smtp_email from config");
 		result = DBselect(sql);
@@ -949,7 +951,7 @@ int main_housekeeping_loop()
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("connecting to the database");
 #endif
-		DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+		DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
 
 		DBvacuum();
 
@@ -985,7 +987,7 @@ int main_sucker_loop()
 	int	now;
 	int	nextcheck,sleeptime;
 
-	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+	DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
 	for(;;)
 	{
 #ifdef HAVE_FUNCTION_SETPROCTITLE
@@ -1065,7 +1067,7 @@ int main(int argc, char **argv)
 	zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd started");
 
 /* Need to set trigger status to UNKNOWN since last run */
-	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+	DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
 	DBupdate_triggers_status_after_restart();
 	DBclose();
 
