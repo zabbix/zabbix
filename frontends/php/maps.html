@@ -2,7 +2,14 @@
 	include "include/config.inc";
 	$page["title"] = "Network maps";
 	$page["file"] = "maps.html";
-	show_header($page["title"],0);
+	if(isset($sysmapid))
+	{
+		show_header($page["title"],30);
+	}
+	else
+	{
+		show_header($page["title"],0);
+	}
 ?>
 
 <?
