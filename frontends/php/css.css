@@ -10,13 +10,32 @@ body
         line-height:16px;
 }
 
-	.footer {color:#CCCCCC;}
+.footer
+{
+	color:#CCCCCC;
+}
 
-	td,tr {font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10pt; text-decoration: none;}
-	tr:zzz {color:red; background:"red";text-decoration: underline; text-transform: bold;}
+td,tr
+{
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+	font-size:10pt;
+	text-decoration: none;
+}
+
+tr:zzz
+{
+	color:red;
+	background:"red";
+	text-decoration: underline;
+	text-transform: bold;
+}
 
 
- 	A.footer {color:#CCCCCC;}
+A.footer
+{
+	color:#CCCCCC;
+}
+
 	A {font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10pt}
    	A:link {color:black; text-decoration: none; }
 	A:visited {color:black; text-decoration: none; }
@@ -33,11 +52,27 @@ body
 	
 	
 	
-	table.home {font-family: Verdana, Arial, Helvetica, sans-serif ;font-size: 8 pt}
+table.home
+{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8 pt
+}
     
-	.img {border-color: #black  ; border-width:1px;}
-	img.top {vertical-align:text-top}
-	img.bottom {vertical-align:text-bottom}
+.img
+{
+	border-color: #black;
+	border-width:1px;
+}
+
+img.top
+{
+	vertical-align:text-top
+}
+
+img.bottom
+{
+	vertical-align:text-bottom
+}
 
 .biginput
 {

@@ -31,6 +31,11 @@
 	if($DB_TYPE == "MYSQL")
 	{
 		$DB=mysql_pconnect($DB_SERVER,$DB_USER,$DB_PASSWORD);
+		if(!mysql_select_db($DB_DATABASE))
+		{
+			echo "Error connecting to database [".mysql_error()."]";
+			exit;
+		}
 		mysql_select_db($DB_DATABASE);
 	}
 	if($DB_TYPE == "POSTGRESQL")
