@@ -55,6 +55,8 @@
 #define SERVER_STATUS_KEY	"status"
 /* Special item key used for ICMP pings */
 #define SERVER_ICMPPING_KEY	"icmpping"
+/* Special item key used for ICMP ping latency */
+#define SERVER_ICMPPINGSEC_KEY	"icmppingsec"
 
 /* Alert types */
 #define ALERT_TYPE_EMAIL	0
