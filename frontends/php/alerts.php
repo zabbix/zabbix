@@ -149,7 +149,7 @@
 	if(DBnum_rows($result)==0)
 	{
 			echo "<TR BGCOLOR=#EEEEEE>";
-			echo "<TD COLSPAN=6 ALIGN=CENTER>".S_NO_ALERTS."</TD>";
+			echo "<TD COLSPAN=7 ALIGN=CENTER>".S_NO_ALERTS."</TD>";
 			echo "<TR>";
 	}
 	table_end();
