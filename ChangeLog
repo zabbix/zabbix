@@ -1,5 +1,6 @@
 Changes for 1.1alpha6:
 
+ - fixed SQL warning when updating actions (Alexei)
  - fixed change of plain text data in screens (Alexei)
  - fixed mouse navigation for multiple maps in one screen (Alexei)
  - configurable timestamp format in local_en.inc.php (Alexei)
