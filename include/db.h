@@ -87,6 +87,7 @@ DB_ITEM
 	char	*key;
 	char	*host;
 	int	host_status;
+	int	host_available;
 	int	host_network_errors;
 	int	useip;
 	char	*ip;
@@ -212,7 +213,7 @@ void	DBdelete_host_thread(MYSQL *database, int hostid);
 void	DBvacuum_thread(MYSQL *database);
 void	DBdelete_service_thread(MYSQL *database, int serviceid);
 void	DBdelete_sysmaps_links_by_shostid_thread(MYSQL *database, int shostid);
-void	DBupdate_host_status_thread(MYSQL *database, int hostid,int status,int clock,char *error);
+void	DBupdate_host_availability_thread(MYSQL *database, int hostid,int available,int clock,char *error);
 int	DBupdate_item_status_to_notsupported_thread(MYSQL *database, int itemid, char *error);
 int	DBadd_history_thread(MYSQL *database, int itemid, double value, int clock);
 int	DBadd_trend_thread(MYSQL *database, int itemid, double value, int clock);
@@ -246,7 +247,7 @@ char		*DBget_field(DB_RESULT *result, int rownum, int fieldnum);
 int		DBnum_rows(DB_RESULT *result);
 
 int	DBget_function_result(double *result,char *functionid);
-void	DBupdate_host_status(int hostid,int status,int clock,char *error);
+void	DBupdate_host_availability(int hostid,int available,int clock,char *error);
 int	DBupdate_item_status_to_notsupported(int itemid, char *error);
 int	DBadd_trend(int itemid, double value, int clock);
 int	DBadd_history(int itemid, double value, int clock);

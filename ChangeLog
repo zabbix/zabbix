@@ -1,5 +1,7 @@
 Changes for 1.1alpha5:
 
+ - changed logic yo update host.available instead of host.status (Alexei)
+ - added column hosts.available (Alexei)
  - added link to ZABBIX Manual v1.1 into page header (Alexei)
  - fixed evaluation of nodata(). Thanks to Igor Micko. (Alexei)
  - fixed time selection for custom graphs (Alexei)
