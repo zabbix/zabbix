@@ -41,10 +41,10 @@
 			if(validate_expression($expression)==0)
 			{
 				$now=mktime();
-				if(isset($disabled))	{ $istrue=2; }
-				else			{ $istrue=0; }
+				if(isset($disabled))	{ $status=1; }
+				else			{ $status=0; }
 	
-				$result=update_trigger($triggerid,$expression,$description,$priority,$istrue,$comments,$url);
+				$result=update_trigger($triggerid,$expression,$description,$priority,$status,$comments,$url);
 				show_messages($result,"Trigger updated","Cannot update trigger");
 			}
 			else
@@ -57,10 +57,10 @@
 		{
 			if(validate_expression($expression)==0)
 			{
-				if(isset($disabled))	{ $istrue=2; }
-				else			{ $istrue=3; }
+				if(isset($disabled))	{ $status=1; }
+				else			{ $status=0; }
 				
-				$result=add_trigger($expression,$description,$priority,$istrue,$comments,$url);
+				$result=add_trigger($expression,$description,$priority,$status,$comments,$url);
 				show_messages($result,"Trigger added","Cannot add trigger");
 			}
 			else
@@ -110,7 +110,7 @@
 	if(isset($hostid)&&!isset($triggerid))
 	{
 
-		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.istrue from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=$hostid order by h.host,t.description");
+		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.status,t.value from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=$hostid order by h.host,t.description");
 		$lasthost="";
 		$col=0;
 		while($row=DBfetch($result))
@@ -144,13 +144,13 @@
 	
 			echo "<TD>".explode_exp($row["expression"],1)."</TD>";
 			echo "<TD>";
-			if($row["istrue"] == 2)
+			if($row["status"] == 1)
 			{
-				echo "<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=3&hostid=".$row["hostid"]."\">Disabled</a>";
+				echo "<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=0&hostid=".$row["hostid"]."\">Disabled</a>";
 			}
 			else
 			{
-				echo "<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=2&hostid=".$row["hostid"]."\">Enabled</a>";
+				echo "<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=1&hostid=".$row["hostid"]."\">Enabled</a>";
 			}
 			$expression=rawurlencode($row["expression"]);
 			echo "</TD>";
