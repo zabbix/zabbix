@@ -2,7 +2,7 @@
 	include "include/config.inc";
 	$page["title"] = "Latest values";
 	$page["file"] = "latest.html";
-	show_header($page["title"],10,0);
+	show_header($page["title"],0,0);
 ?>
 
 <?
@@ -14,37 +14,37 @@
 
 	echo "<font size=2>";
 
-	if(isset($type)&&$type=="yearly")
+	if(isset($type)&&$type=="4hours")
 	{
-		echo "<b>[<a href='trends.html?itemid=$itemid&type=yearly'>yearly</a>]</b> ";
+		echo "<b>[<a href='trends.html?itemid=$itemid&type=4hours'>4hours</a>]</b> ";
 	}
 	else
 	{
-		echo "<a href='trends.html?itemid=$itemid&type=yearly'>yearly</a> ";
+		echo "<a href='trends.html?itemid=$itemid&type=4hours'>4hours</a> ";
 	}
-	if(isset($type)&&$type=="monthly")
+	if(isset($type)&&$type=="hour")
 	{
-		echo "<b>[<a href='trends.html?itemid=$itemid&type=monthly'>monthly</a>]</b> ";
-	}
-	else
-	{
-		echo "<a href='trends.html?itemid=$itemid&type=monthly'>monthly</a> ";
-	}
-	if(isset($type)&&$type=="daily")
-	{
-		echo "<b>[<a href='trends.html?itemid=$itemid&type=daily'>daily</a>]</b> ";
+		echo "<b>[<a href='trends.html?itemid=$itemid&type=hour'>hour</a>]</b> ";
 	}
 	else
 	{
-		echo "<a href='trends.html?itemid=$itemid&type=daily'>daily</a> ";
+		echo "<a href='trends.html?itemid=$itemid&type=hour'>hour</a> ";
 	}
-	if(isset($type)&&$type=="hourly")
+	if(isset($type)&&$type=="30min")
 	{
-		echo "<b>[<a href='trends.html?itemid=$itemid&type=hourly'>hourly</a>]</b> ";
+		echo "<b>[<a href='trends.html?itemid=$itemid&type=30min'>30min</a>]</b> ";
 	}
 	else
 	{
-		echo "<a href='trends.html?itemid=$itemid&type=hourly'>hourly</a> ";
+		echo "<a href='trends.html?itemid=$itemid&type=30min'>30min</a> ";
+	}
+	if(isset($type)&&$type=="15min")
+	{
+		echo "<b>[<a href='trends.html?itemid=$itemid&type=15min'>15min</a>]</b> ";
+	}
+	else
+	{
+		echo "<a href='trends.html?itemid=$itemid&type=15min'>15min</a> ";
 	}
 	
 	echo "</font>";

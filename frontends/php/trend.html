@@ -6,14 +6,30 @@
 #	itemid
 #	type
 
-	if(!isset($period))
+	if(!isset($type))
 	{
-		$period=0;
+		$type="hourl";
 	}
 
-	if(!isset($from))
+	if($type == "15min")
 	{
-		$from=0;
+		$period=900;
+		$label_format="H:i";
+	}
+	else if($type == "30min")
+	{
+		$period=1800;
+		$label_format="H:i";
+	}
+	else if($type == "4hours")
+	{
+		$period=4*3600;
+		$label_format="H:i";
+	}
+	else
+	{
+		$period=3600;
+		$label_format="H:i";
 	}
 
 	$sizeX=900;
@@ -22,8 +38,6 @@
 	$shiftX=10;
 	$shiftY=10;
 
-	$space_for_text=50;
-
 	$nodata=1;	
 
 
@@ -31,7 +45,7 @@
 	Header( "Content-type:  image/png"); 
 	Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 
-	$im = imagecreate($sizeX+$shiftX+61,$sizeY+2*$shiftY+$space_for_text+10); 
+	$im = imagecreate($sizeX+$shiftX+61,$sizeY+2*$shiftY+10); 
   
 	$red=ImageColorAllocate($im,255,0,0); 
 	$green=ImageColorAllocate($im,0,255,0); 
@@ -44,77 +58,83 @@
 	$x=imagesx($im); 
 	$y=imagesy($im);
   
-	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+2*$shiftY+$space_for_text+10,$black);
+	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+2*$shiftY+10,$black);
+
+	$now = time(NULL);
+	$to_time=$now-$now%$period;
+	$from_time=$to_time-17*$period;
 
 	for($i=0;$i<=$sizeY;$i+=50)
 	{
 		ImageDashedLine($im,$shiftX,$i+$shiftY,$sizeX+$shiftX,$i+$shiftY,$darkgreen);
 	}
+
 	for($i=0;$i<=$sizeX;$i+=50)
 	{
 		ImageDashedLine($im,$i+$shiftX,$shiftY,$i+$shiftX,$sizeY+$shiftY,$darkgreen);
+		ImageString($im, 1,$i+$shiftX-11, $sizeY+$shiftY+5, date($label_format,$from_time+$period*($i/50)) , $red);
 	}
-
-	$now = time(NULL);
 
 	$count=array();
 	$min=array();
 	$max=array();
 	$avg=array();
-	for($i=0;$i<100;$i++)
+	for($i=0;$i<900;$i++)
 	{
-		$result=DBselect("select count(value),min(value),max(value),avg(value) from history where itemid=$itemid and clock>$now-($i+1)*60 and clock<$now-$i*60");
-		$count[99-$i]=DBget_field($result,0,0);
-		$min[99-$i]=DBget_field($result,0,1);
-		$max[99-$i]=DBget_field($result,0,2);
-		$avg[99-$i]=DBget_field($result,0,3);
+		$result=DBselect("select count(value),min(value),max(value),avg(value) from history where itemid=$itemid and clock>$from_time+$i*($to_time-$from_time)/(900-50) and clock<$from_time+($i+1)*($to_time-$from_time)/(900-50)");
+		$count[$i]=DBget_field($result,0,0);
+		$min[$i]=DBget_field($result,0,1);
+		$max[$i]=DBget_field($result,0,2);
+		$avg[$i]=DBget_field($result,0,3);
 	}
-	$len=0;
 	$maxY=-1000000000;
 	$minY=1000000000;
-	for($i=0;$i<100;$i++)
+	for($i=0;$i<900;$i++)
 	{
 		$nodata=0;
 		if($max[$i]>$maxY) { $maxY=$max[$i]; }
 		if(($max[$i]<$minY)&&($count[$i]>0)) { $minY=$max[$i]; }
-		$len++;
 	}
-	$maxX=800;
+	$maxX=900;
 	$minX=0;
 //	echo "MIN/MAX:",$minX," - ",$maxX," - ",$minY," - ",$maxY,"<Br>";
 
 	if(($minX!=$maxX)&&($minY!=$maxY))
 	{
-		for($i=0;$i<100;$i++)
+		for($i=0;$i<900;$i++)
 		{
-			$x1=8*$sizeX*($i-$minX)/($maxX-$minX);
-			$y1=$sizeY*($max[$i]-$minY)/($maxY-$minY);
-			$x2=$x1;
-			$y2=0;
-			$y1=$sizeY-$y1;
-			$y2=$sizeY-$y2;
+			if($count[$i]>0)
+			{
+				$x1=$sizeX*($i-$minX)/($maxX-$minX);
+				$y1=$sizeY*($max[$i]-$minY)/($maxY-$minY);
+				$x2=$x1;
+				$y2=0;
+				$y1=$sizeY-$y1;
+				$y2=$sizeY-$y2;
 
-			ImageFilledRectangle($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX+8,$y2+$shiftY,$red);
+				ImageLine($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX,$y2+$shiftY,$red);
+	
+				$x1=$sizeX*($i-$minX)/($maxX-$minX);
+				$y1=$sizeY*($avg[$i]-$minY)/($maxY-$minY);
+				$x2=$x1;
+				$y2=0;
+				$y1=$sizeY-$y1;
+				$y2=$sizeY-$y2;
+	
+				ImageLine($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX,$y2+$shiftY,$yellow);
+	
+				$x1=$sizeX*($i-$minX)/($maxX-$minX);
+				$y1=$sizeY*($min[$i]-$minY)/($maxY-$minY);
+				$x2=$x1;
+				$y2=0;
+				$y1=$sizeY-$y1;
+				$y2=$sizeY-$y2;
+	
+				ImageLine($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX,$y2+$shiftY,$green);
+			}
 
-			$x1=8*$sizeX*($i-$minX)/($maxX-$minX);
-			$y1=$sizeY*($avg[$i]-$minY)/($maxY-$minY);
-			$x2=$x1;
-			$y2=0;
-			$y1=$sizeY-$y1;
-			$y2=$sizeY-$y2;
 
-			ImageFilledRectangle($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX+8,$y2+$shiftY,$yellow);
-
-			$x1=8*$sizeX*($i-$minX)/($maxX-$minX);
-			$y1=$sizeY*($min[$i]-$minY)/($maxY-$minY);
-			$x2=$x1;
-			$y2=0;
-			$y1=$sizeY-$y1;
-			$y2=$sizeY-$y2;
-
-			ImageFilledRectangle($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX+8,$y2+$shiftY,$green);
-
-			ImageStringUp($im, 1, $x1+10, $sizeY+$shiftY+$space_for_text+15, "123456789012" , $red);
+#			ImageStringUp($im, 1, $x1+10, $sizeY+$shiftY+15, $i , $red);
 		}
 	}
 	else
