@@ -2,11 +2,17 @@ Not ready yet:
 
  HBLV:
 
- - Availability report for IT Services
  - Tree like in old Zabbix
  - SNMP trapping
  - Think about BACKUP for HISTORY
  - Triggers comment. Hide right should work.
+ - Agent for Windows (can we use nsclient?)
+ - Reports:
+  - more customizable (graphs timerange: 1 mont, etc)
+  - availability reportus prieks IT services
+  - availability report for IT Services
+  - availability report for triggers
+  - LDAP authorisation (should work with MSWindows LDAP)
 
  DISTRIBUTED MONITORING:
 
