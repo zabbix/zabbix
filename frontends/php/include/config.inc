@@ -15,7 +15,7 @@
 		}
 		else
 		{
-			$color="#000000";
+			$color="#223344";
 		}
 		echo "<center>";
 		echo "<font face='Helvetica' size=+1 color='$color'>";
@@ -851,6 +851,8 @@
 	function	delete_action( $actionid )
 	{
 		$sql="delete from actions where actionid=$actionid";
+		$result=DBexecute($sql);
+		$sql="delete from alerts where actionid=$actionid";
 		return	DBexecute($sql);
 	}
 

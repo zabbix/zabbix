@@ -1,8 +1,13 @@
 #ifndef MON_FUNCTIONS_H
 #define MON_FUNCTIONS_H
 
-int	update_functions(int id, int flag);
-void    update_triggers (int id, int flag);
+#include "db.h"
+
+/*void	update_functions(DB_ITEM items[]);*/
+void	update_functions(DB_ITEM *item);
+void    update_triggers (int flag,int sucker_num,int lastclock);
 int	get_lastvalue(float *Result,char *host,char *key,char *function,char *parameter);
+int	process_data(char *server,char *key, double value);
+void	process_new_value(DB_ITEM *item,double value);
 
 #endif

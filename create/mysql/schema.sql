@@ -252,7 +252,6 @@ CREATE TABLE triggers (
 	expression	varchar(255) DEFAULT '' NOT NULL,
 	description	varchar(255) DEFAULT '' NOT NULL,
 	istrue		int(4) DEFAULT '0' NOT NULL,
-	lastcheck	int(4) DEFAULT '0' NOT NULL,
 	priority	int(2) DEFAULT '0' NOT NULL,
 	lastchange	int(4) DEFAULT '0' NOT NULL,
 	dep_level	int(2) DEFAULT '0' NOT NULL,

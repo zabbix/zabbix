@@ -1,5 +1,11 @@
 Changes for 1.0alpha11:
 
+ - no full list of triggers and items will be shown
+ - deleted column triggers.lastcheck
+ - fixed PostgreSQL upgrade patch to 1.0alpha10
+ - if item.history==0, not values will be added to table history for this item
+ - added directory upgrades/dbpatches/1.0alpha10_to_1.0alpha11/
+
  - added set of keys proc_cnt[*]
  - when pressing Acive in list of items, [all] selected unstead of [Server]. Fixed.
  - some triggers have incorrect status. Fixed.

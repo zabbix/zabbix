@@ -32,6 +32,16 @@ else
 	AC_MSG_RESULT(no)
 fi
 
+dnl Check for file /proc/1/status
+AC_MSG_CHECKING(for file /proc/1/status)
+if test -r /proc/1/status; then
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(HAVE_PROC_1_STATUS)
+else
+	AC_MSG_RESULT(no)
+fi
+
+
 dnl Check for freeswap in struct sysinfo
 AC_MSG_CHECKING(for freeswap in struct sysinfo)
 AC_TRY_COMPILE([#include <sys/sysinfo.h>],

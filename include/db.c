@@ -54,6 +54,7 @@ int	DBexecute(char *query)
 
 #ifdef	HAVE_MYSQL
 	syslog( LOG_DEBUG, "Executing query:%s\n",query);
+//	syslog( LOG_WARNING, "Executing query:%s\n",query);
 
 	if( mysql_query(&mysql,query) != 0 )
 	{
@@ -94,6 +95,7 @@ DB_RESULT *DBselect(char *query)
 {
 #ifdef	HAVE_MYSQL
 	syslog( LOG_DEBUG, "Executing query:%s\n",query);
+//	syslog( LOG_WARNING, "Executing query:%s\n",query);
 
 	if( mysql_query(&mysql,query) != 0 )
 	{

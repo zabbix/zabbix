@@ -176,7 +176,6 @@ STRUCTURE
 	expression	varchar	; Expression for trigger
 	description	varchar	; Description of trigger
 	istrue		int	; 1 if expression is true, 2 - disabled, 0 - false
-	lastcheck	int	; Time when trigger expression was recalculated 
 	priority	int	; 
 	lastchange	int	; Time when istrue was changed
 	dep_level	int	; Dependency level. The number shows how many triggers depend on this trigger.
