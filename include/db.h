@@ -12,7 +12,7 @@
 #endif
 
 #define	DB_NAME		"zabbix"
-#define	DB_USER		"zabbix"
+#define	DB_USER		"root"
 #define	DB_PASSWD	""
 
 #define ITEM struct item_type
