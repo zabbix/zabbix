@@ -93,7 +93,7 @@
 
 	if(isset($actionid))
 	{
-		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message from actions a where a.actionid=$actionid";
+		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid from actions a where a.actionid=$actionid";
 		$result=DBselect($sql);
 
 		$actionid=DBget_field($result,0,0);
@@ -102,6 +102,7 @@
 		$delay=DBget_field($result,0,3);
 		$subject=DBget_field($result,0,4);
 		$message=DBget_field($result,0,5);
+		$uid=DBget_field($result,0,6);
 	}
 	else
 	{
@@ -142,7 +143,7 @@
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
 	{
-		if(isset($sto) && ($row["name"] == $sto))
+		if(isset($uid) && ($row["userid"] == $uid))
 		{
 			echo "<option value=\"".$row["userid"]."\" SELECTED>".$row["alias"];
 		}
