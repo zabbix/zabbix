@@ -32,7 +32,7 @@
 ?>
 
 <?php
-	if(!check_allright("Graph","U"))
+	if(!check_anyright("Graph","U"))
 	{
 		show_table_header("<font color=\"AA0000\">No permissions !</font>");
 		show_footer();
