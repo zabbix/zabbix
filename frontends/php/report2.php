@@ -104,12 +104,12 @@
 	
 //			echo "<TD>".explode_exp($row["expression"],1)."</TD>";
 			$availability=calculate_availability($row["triggerid"],0,0);
-			echo "<TD>";
+			echo "<TD><font color=\"AA0000\">";
 			printf("%.4f%%",$availability["true"]);
-			echo "</TD>";
-			echo "<TD>";
+			echo "</font></TD>";
+			echo "<TD><font color=\"00AA00\">";
 			printf("%.4f%%",$availability["false"]);
-			echo "</TD>";
+			echo "</font></TD>";
 			echo "<TD>";
 			printf("%.4f%%",$availability["unknown"]);
 			echo "</TD>";
