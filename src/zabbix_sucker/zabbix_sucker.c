@@ -649,7 +649,7 @@ int get_values(void)
 			{
 				host_status=HOST_STATUS_MONITORED;
 				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
-				DBupdate_host_status(item.hostid,HOST_STATUS_MONITORED);
+				DBupdate_host_status(item.hostid,HOST_STATUS_MONITORED,now);
 
 				break;
 			}
@@ -662,7 +662,7 @@ int get_values(void)
 			{
 				host_status=HOST_STATUS_MONITORED;
 				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
-				DBupdate_host_status(item.hostid,HOST_STATUS_MONITORED);
+				DBupdate_host_status(item.hostid,HOST_STATUS_MONITORED,now);
 
 				break;
 			}
@@ -670,7 +670,7 @@ int get_values(void)
 		else if(res == NETWORK_ERROR)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Host [%s] will be checked after [%d] seconds", item.host, DELAY_ON_NETWORK_FAILURE );
-			DBupdate_host_status(item.hostid,HOST_STATUS_UNREACHABLE);
+			DBupdate_host_status(item.hostid,HOST_STATUS_UNREACHABLE,now);
 
 			break;
 		}
@@ -900,6 +900,11 @@ int main(int argc, char **argv)
 	}
 
 	create_pid_file();
+
+/* Need to set trigger status to UNKNOWN since last run */
+	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+	DBupdate_triggers_status_after_restart();
+	DBclose();
 
 	pids=calloc(CONFIG_SUCKERD_FORKS-1,sizeof(pid_t));
 

@@ -112,11 +112,13 @@ int		DBnum_rows(DB_RESULT *result);
 int		DBis_empty(DB_RESULT *result);
 
 int	DBget_function_result(float *result,char *functionid);
-int	DBupdate_host_status(int hostid,int status);
+int	DBupdate_host_status(int hostid,int status,int clock);
 int	DBupdate_item_status_to_notsupported(int itemid);
 int	DBadd_history(int itemid, double value);
 int	DBadd_history_str(int itemid, char *value);
-int	DBadd_alarm(int triggerid, int status);
+int	DBadd_alarm(int triggerid, int status,int clock);
 int	DBadd_alert(int actionid, char *type, char *sendto, char *subject, char *message);
+int	DBupdate_triggers_status_after_restart(void);
+
 
 #endif
