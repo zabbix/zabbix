@@ -130,11 +130,11 @@
 		$graph=get_graph_by_graphid($graph_item["graphid"]);
 		$item=get_item_by_itemid($graph_item["itemid"]);
 
-		$sql="select hostid,templateid,actions from hosts_templates where templateid=".$item["hostid"];
+		$sql="select hostid,templateid,graphs from hosts_templates where templateid=".$item["hostid"];
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
-			if($row["actions"]&1 == 0)	continue;
+			if($row["graphs"]&1 == 0)	continue;
 
 			$sql="select i.itemid from items i where i.key_='".$item["key_"]."' and i.hostid=".$row["hostid"];
 			$result2=DBselect($sql);
@@ -152,6 +152,41 @@
 			{
 				$graphid=add_graph($graph["name"],$graph["width"],$graph["height"],$graph["yaxistype"],$graph["yaxismin"],$graph["yaxismax"]);
 				add_item_to_graph($graphid,$itemid,$graph_item["color"],$graph_item["drawtype"],$graph_item["sortorder"]);
+			}
+		}
+	}
+
+	function	delete_graph_item_from_templates($gitemid)
+	{
+		if($gitemid<=0)
+		{
+			return;
+		}
+
+		$graph_item=get_graphitem_by_gitemid($gitemid);
+		$graph=get_graph_by_graphid($graph_item["graphid"]);
+		$item=get_item_by_itemid($graph_item["itemid"]);
+
+		$sql="select hostid,templateid,graphs from hosts_templates where templateid=".$item["hostid"];
+		echo $sql,"<br>";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			if($row["graphs"]&4 == 0)	continue;
+
+			$sql="select i.itemid from items i where i.key_='".$item["key_"]."' and i.hostid=".$row["hostid"];
+			echo $sql,"<br>";
+			$result2=DBselect($sql);
+			if(DBnum_rows($result2)==0)	continue;
+			$row2=DBfetch($result2);
+			$itemid=$row2["itemid"];
+
+			$sql="select distinct gi.gitemid from graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and i.itemid=$itemid";
+			echo $sql,"<br>";
+			$result2=DBselect($sql);
+			while($row2=DBfetch($result2))
+			{
+				delete_graphs_item($row2["gitemid"]);
 			}
 		}
 	}

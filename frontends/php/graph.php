@@ -69,6 +69,7 @@
 		}
 		if($_GET["register"]=="delete")
 		{
+			delete_graph_item_from_templates($_GET["gitemid"]);
 			$graphitem=get_graphitem_by_gitemid($_GET["gitemid"]);
 			$graph=get_graph_by_graphid($graphitem["graphid"]);
 			$item=get_item_by_itemid($graphitem["itemid"]);
