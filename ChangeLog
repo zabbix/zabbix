@@ -1,5 +1,8 @@
 Changes for 1.0beta9:
 
+ - added table media_type (Alexei)
+ - added column media.type, added column media.mediatypeid (Alexei)
+ - removed columns config.(smtp_server,smtp_helo,smtp_email) (Alexei)
  - added columns actions.scope and actions.severity (Alexei)
  - added support of global alerts limited by triggers severity (Alexei)
  - added group selection in Item and Trigger definition forms (Alexei)
