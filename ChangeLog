@@ -1,5 +1,6 @@
 Changes for 1.1alpha1:
 
+ - email routines moved to email.c (Alexei)
  - fixed hosts.php. Changed <? to <?php. (Alexei)
  - fixed number of trapped items in STATUS OF ZABBIX. Thanks to Igor. (Alexei)
  - fixed proc_cnt[zabbix_agentd] under Linux (Alexei)
