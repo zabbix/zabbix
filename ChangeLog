@@ -1,6 +1,6 @@
 Changes for 1.1alpha1:
 
- - send data as part of email alerts (Alexei)
+ - send date as part of email alerts (Alexei)
  - added SuSE 9.1 startup scripts. Thanks to A.Tophofen. (Alexei)
  - change of architecture to multi-threaded model (Alexei)
  - fixed typo: getuid() -> getgid() in daemon_init() (Alexei)
