@@ -1,5 +1,6 @@
 Changes for 1.0beta10:
 
+ - show selected host in Host Add form (Alexei)
  - fixed snmptrap.sh (Alexei)
  - improved performance of simple graphs (Alexei)
  - minor fixes to eliminate compiler's warnings (Alexei)
