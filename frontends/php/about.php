@@ -1,11 +1,11 @@
-<?
+<?php
 	include "include/config.inc.php";
 	$page["title"] = "Abbout Zabbix";
 	$page["file"] = "about.php";
 	show_header($page["title"],0,0);
 ?>
 
-<?
+<?php
 	show_table_header("Information about Zabbix (v1.0beta6)");
 ?>
 
@@ -59,6 +59,6 @@
 </TR>
 </TABLE>
 
-<?
+<?php
 	show_footer();
 ?>

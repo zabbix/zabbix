@@ -1,4 +1,4 @@
-<?
+<?php
 	$page["title"] = "Media";
 	$page["file"] = "media.php";
 
@@ -6,7 +6,7 @@
 	show_header($page["title"],0,0);
 ?>
 
-<?
+<?php
         if(!check_right("User","R",$HTTP_GET_VARS["userid"]))
         {
                 show_table_header("<font color=\"AA0000\">No permissions !</font
@@ -17,7 +17,7 @@
 ?>
 
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["register"]))
 	{
 		if($HTTP_GET_VARS["register"]=="enable")
@@ -44,12 +44,12 @@
 	}
 ?>
 
-<?
+<?php
 	show_table_header("MEDIA");
 ?>
 
 <FONT COLOR="#000000">
-<?
+<?php
 	$sql="select mediaid,type,sendto,active from media where userid=".$HTTP_GET_VARS["userid"]." order by type,sendto";
 	$result=DBselect($sql);
 
@@ -107,7 +107,7 @@
 </TR>
 </TABLE>
 
-<?
+<?php
 	echo "<br>";
 	show_table2_header_begin();
 	echo "New media";

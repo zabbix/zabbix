@@ -1,11 +1,11 @@
-<?
+<?php
 	include "include/config.inc.php";
 	$page["title"] = "Availability report";
 	$page["file"] = "report2.php";
 	show_header($page["title"],0,0);
 ?>
 
-<?
+<?php
 	if(!check_right("Host","R",0))
 	{
 		show_table_header("<font color=\"AA0000\">No permissions !</font>");
@@ -14,7 +14,7 @@
 	}
 ?>
 
-<?
+<?php
 	show_table_header_begin();
 	echo "AVAILABILITY REPORT";
 
@@ -43,7 +43,7 @@
 	show_table_header_end();
 ?>
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["hostid"])&&!isset($HTTP_GET_VARS["triggerid"]))
 	{
 		echo "<br>";
@@ -102,7 +102,7 @@
 	}
 ?>
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["triggerid"]))
 	{
 		echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
@@ -117,6 +117,6 @@
 ?>
 
 
-<?
+<?php
 	show_footer();
 ?>

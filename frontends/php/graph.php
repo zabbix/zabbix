@@ -1,16 +1,16 @@
-<?
+<?php
 	include "include/config.inc.php";
 	$page["title"] = "Configuration of graph";
 	$page["file"] = "graph.php";
 	show_header($page["title"],0,0);
 ?>
 
-<?
+<?php
 	show_table_header("CONFIGURATION OF GRAPH");
 	echo "<br>";
 ?>
 
-<?
+<?php
 	if(!check_right("Graph","R",$HTTP_GET_VARS["graphid"]))
 	{
 		show_table_header("<font color=\"AA0000\">No permissions !</font>");
@@ -19,7 +19,7 @@
 	}
 ?>
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["register"]))
 	{
 		if($HTTP_GET_VARS["register"]=="add")
@@ -36,7 +36,7 @@
 	}
 ?>
 
-<?
+<?php
 	$result=DBselect("select name from graphs where graphid=".$HTTP_GET_VARS["graphid"]);
 	$row=DBfetch($result);
 	show_table_header($row["name"]);
@@ -73,7 +73,7 @@
 	echo "</TABLE>";
 ?>
 
-<?
+<?php
 	echo "<br>";
 	echo "<a name=\"form\"></a>";
 
@@ -124,6 +124,6 @@
 	show_table2_header_end();
 ?>
 
-<?
+<?php
 	show_footer();
 ?>

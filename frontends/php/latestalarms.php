@@ -1,4 +1,4 @@
-<?
+<?php
 	$page["title"] = "Latest alarms";
 	$page["file"] = "latestalarms.php";
 
@@ -6,14 +6,14 @@
 	show_header($page["title"],30,0);
 ?>
 
-<?
+<?php
 	show_table_header_begin();
 	echo "HISTORY OF ALARMS";
  
 	show_table_v_delimiter();
 ?>
 
-<?
+<?php
 	if(isset($start)&&($start<=0))
 	{
 		unset($start);
@@ -38,7 +38,7 @@
 ?>
 
 <FONT COLOR="#000000">
-<?
+<?php
 	if(!isset($start))
 	{
 		$sql="select t.description,a.clock,a.value,t.triggerid from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit 1000";
@@ -100,6 +100,6 @@
 </TR>
 </TABLE>
 
-<?
+<?php
 	show_footer();
 ?>

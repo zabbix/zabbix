@@ -1,11 +1,11 @@
-<?
+<?php
 	$page["title"] = "Trigger comments";
 	$page["file"] = "tr_comments.php";
 
 	include "include/config.inc.php";
 	show_header($page["title"],0,0);
 ?>
-<?
+<?php
 	if(!check_right("Trigger comment","R",$HTTP_GET_VARS["triggerid"]))
 	{
 		show_table_header("<font color=\"AA0000\">No permissions !</font>");
@@ -14,12 +14,12 @@
 	}
 ?>
 
-<?
+<?php
 	show_table_header("TRIGGER COMMENTS");
 	echo "<br>";
 ?>
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["register"]) && ($HTTP_GET_VARS["register"]=="update"))
 	{
 		$result=update_trigger_comments($HTTP_GET_VARS["triggerid"],$HTTP_GET_VARS["comments"]);
@@ -27,12 +27,12 @@
 	}
 ?>
 
-<?
+<?php
 	$result=DBselect("select comments from triggers where triggerid=".$HTTP_GET_VARS["triggerid"]);
 	$comments=stripslashes(DBget_field($result,0,0));
 ?>
 
-<?
+<?php
 	show_table2_header_begin();
 	echo "Comments";
 
@@ -49,6 +49,6 @@
 	show_table2_header_end();
 ?>
 
-<?
+<?php
 	show_footer();
 ?>

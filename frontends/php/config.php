@@ -1,4 +1,4 @@
-<?
+<?php
 	$page["title"] = "Configuration of Zabbix";
 	$page["file"] = "config.php";
 
@@ -6,7 +6,7 @@
 	show_header($page["title"],0,0);
 ?>
 
-<?
+<?php
         if(!check_right("Configuration of Zabbix","U",0))
         {
                 show_table_header("<font color=\"AA0000\">No permissions !</font
@@ -16,7 +16,7 @@
         }
 ?>
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["register"]) && ($HTTP_GET_VARS["register"]=="update"))
 	{
 		$result=update_config($HTTP_GET_VARS["smtp_server"],$HTTP_GET_VARS["smtp_helo"],
@@ -26,16 +26,16 @@
 	}
 ?>
 
-<?
+<?php
 	show_table_header("CONFIGURATION OF ZABBIX");
 	echo "<br>";
 ?>
 
-<?
+<?php
 	$config=select_config();
 ?>
 
-<?
+<?php
 	show_table2_header_begin();
 	echo "Configuration";
 
@@ -71,6 +71,6 @@
 	show_table2_header_end();
 ?>
 
-<?
+<?php
 	show_footer();
 ?>

@@ -1,4 +1,4 @@
-<?
+<?php
 	include 	"include/defines.inc.php";
 	include 	"include/db.inc.php";
 
@@ -756,7 +756,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<meta name="Author" content="Alexei Vladishev">
 	<link rel="stylesheet" href="css.css">
-<?
+<?php
 	if($refresh!=0)
 	{
 		echo "<meta http-equiv=\"refresh\" content=\"$refresh\">";
@@ -769,7 +769,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	echo "<head>";
 ?>
 	<body>
-<?
+<?php
 		if($nomenu == 0)
 		{
 ?>
@@ -780,7 +780,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		<table width=100% border=0 cellspacing=1 cellpadding=3>
 		<tr>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-<?
+<?php
 				if(check_right("Host","R",0))
 				{
 					echo "<a href=\"latest.php\">";
@@ -797,7 +797,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
-<?
+<?php
 				if(check_right("Host","R",0))
 				{
 					echo "<a href=\"tr_status.php?notitle=true&onlytrue=true&noactions=true&compact=true\">";
@@ -813,7 +813,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
-<?
+<?php
 				if(check_right("Host","R",0))
 				{
 					echo "<a href=\"queue.php\">";
@@ -829,13 +829,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
-<?
+<?php
 				if(check_right("Default permission","R",0))
 				{
 					echo "<a href=\"latestalarms.php\">";
 				}
 ?>
-<?
+<?php
 				if(($page["file"]=="latestalarms.php") ||
 					($page["file"]=="alarms.php"))
 				{
@@ -848,13 +848,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-<?
+<?php
 				if(check_right("Default permission","R",0))
 				{
 					echo "<a href=\"alerts.php\">";
 				}
 ?>
-<?
+<?php
 				if($page["file"]=="alerts.php")
 				{
 					echo "<b>[ALERT HISTORY]</b></a>";
@@ -866,13 +866,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-<?
+<?php
 				if(check_right("Network map","R",0))
 				{
 					echo "<a href=\"maps.php\">";
 				}
 ?>
-<?
+<?php
 				if($page["file"]=="maps.php")
 				{
 					echo "<b>[NETWORK MAPS]</b></a>";
@@ -884,13 +884,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-<?
+<?php
 				if(check_right("Graph","R",0))
 				{
 					echo "<a href=\"charts.php\">";
 				}
 ?>
-<?
+<?php
 				if($page["file"]=="charts.php")
 				{
 					echo "<b>[GRAPHS]</b></a>";
@@ -903,7 +903,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 
 		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
-<?
+<?php
 				if(check_right("Service","R",0))
 				{
 					echo "<a href=\"srv_status.php\">";
@@ -922,7 +922,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		<tr>
 		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
 				<a href="index.php">
-<?
+<?php
 				if($page["file"]=="index.php")
 				{
 					echo "<b>[HOME]</b></a>";
@@ -934,13 +934,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 		</td>
 		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
-<?
+<?php
 				if(check_right("Default permission","R",0))
 				{
 					echo "<a href=\"about.php\">";
 				}
 ?>
-<?
+<?php
 				if($page["file"]=="about.php")
 				{
 					echo "<b>[ABOUT]</b></a>";
@@ -952,13 +952,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 		</td>
 		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
-<?
+<?php
 				if(check_right("Default permission","R",0))
 				{
 					echo "<a href=\"report1.php\">";
 				}
 ?>
-<?
+<?php
 				if($page["file"]=="report1.php")
 				{
 					echo "<b>[STATUS OF ZABBIX]</b></a>";
@@ -970,13 +970,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 		</td>
 		<td colspan=3 bgcolor=FFFFFF align=center valign=top width=15%>
-<?
+<?php
 				if(check_right("Host","R",0))
 				{
 					echo "<a href=\"report2.php\">";
 				}
 ?>
-<?
+<?php
 				if($page["file"]=="report2.php")
 				{
 					echo "<b>[AVAILABILITY REPORT]</b></a>";
@@ -988,7 +988,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 		</td>
 		</tr>
-<?
+<?php
 // Third row
 		if(	check_right("Configuration of Zabbix","U",0)
 			||
@@ -1007,7 +1007,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 		<tr>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-<?
+<?php
 				if(check_right("Configuration of Zabbix","U",0))
 				{
 					echo "<a href=\"config.php\">";
@@ -1023,7 +1023,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
-<?
+<?php
 				if(check_right("User","U",0))
 				{
 					echo "<a href=\"users.php\">";
@@ -1040,7 +1040,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
-<?
+<?php
 				if(check_right("Host","U",0))
 				{
 					echo "<a href=\"hosts.php\">";
@@ -1056,7 +1056,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=10%>
-<?
+<?php
 				if(check_right("Host","U",0))
 				{
 					echo "<a href=\"items.php\">";
@@ -1072,7 +1072,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-<?
+<?php
 				if(check_right("Host","U",0))
 				{
 					echo "<a href=\"triggers.php\">";
@@ -1089,7 +1089,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-<?
+<?php
 				if(check_right("Network map","U",0))
 				{
 					echo "<a href=\"sysmaps.php\">";
@@ -1106,7 +1106,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-<?
+<?php
 				if(check_right("Graph","U",0))
 				{
 					echo "<a href=\"graphs.php\">";
@@ -1124,7 +1124,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 
 		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-<?
+<?php
 				if(check_right("Service","U",0))
 				{
 					echo "<a href=\"services.php\">";
@@ -1141,7 +1141,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 
 		</tr>
-<?
+<?php
 // THird row
 		}
 ?>
@@ -1151,7 +1151,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	</table>
 
 	<br>
-<?
+<?php
 		}
 	}
 
@@ -3088,7 +3088,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
  
 		show_table2_header_end();
 ?>
-<?
+<?php
 ?>
 </TR>
 </TABLE>
@@ -3098,7 +3098,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 </BODY>
 </HTML>
-<?
+<?php
 	}
 
 	# Insert form for User permissions

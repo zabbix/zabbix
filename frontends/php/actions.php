@@ -1,4 +1,4 @@
-<?
+<?php
 	$page["title"]="Actions";
 	$page["file"]="actions.php";
 
@@ -6,7 +6,7 @@
 	show_header($page["title"],0,0);
 ?>
 
-<?
+<?php
 	if(!check_right_on_trigger("U",$HTTP_GET_VARS["triggerid"]))
 	{
 		show_table_header("<font color=\"AA0000\">No permissions !</font>");
@@ -15,7 +15,7 @@
 	}
 ?>
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["register"]))
 	{
 		if($HTTP_GET_VARS["register"]=="add")
@@ -38,7 +38,7 @@
 	}
 ?>
 
-<?
+<?php
 	$trigger=get_trigger_by_triggerid($HTTP_GET_VARS["triggerid"]);
 	$expression=explode_exp($trigger["expression"],1);
 	$description=$trigger["description"];
@@ -49,7 +49,7 @@
 	show_table_header("$description<BR>$expression");
 ?>
 
-<?
+<?php
 	$sql="select a.actionid,a.triggerid,u.alias,a.good,a.delay,a.subject,a.message from actions a,users u where a.userid=u.userid and a.triggerid=".$HTTP_GET_VARS["triggerid"]." order by u.alias, a.good desc";
 	$result=DBselect($sql);
 
@@ -101,7 +101,7 @@
 </table>
 </div>
 
-<?
+<?php
 
 	if(isset($HTTP_GET_VARS["actionid"]))
 	{

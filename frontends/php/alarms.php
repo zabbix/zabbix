@@ -1,4 +1,4 @@
-<?
+<?php
 	$page["title"] = "Alarms";
 	$page["file"] = "alarms.php";
 
@@ -6,7 +6,7 @@
 	show_header($page["title"],0,0);
 ?>
 
-<?
+<?php
 	if(!check_right_on_trigger("R",$HTTP_GET_VARS["triggerid"]))
         {
                 show_table_header("<font color=\"AA0000\">No permissions !</font
@@ -16,7 +16,7 @@
         }
 ?>
 
-<?
+<?php
 	show_table_header_begin();
 	echo "ALARMS";
  
@@ -38,7 +38,7 @@
 	}
 ?>
 
-<?
+<?php
 	if(isset($HTTP_GET_VARS["limit"]) && ($HTTP_GET_VARS["limit"]=="NO"))
 	{
 		echo "[<A HREF=\"alarms.php?triggerid=".$HTTP_GET_VARS["triggerid"]."&limit=30\">";
@@ -57,7 +57,7 @@
 ?>
 
 
-<?
+<?php
 	$Expression=explode_exp($Expression,1);
 	if( strstr($Description,"%s"))
 	{
@@ -67,7 +67,7 @@
 ?>
 
 <FONT COLOR="#000000">
-<?
+<?php
 	$sql="select clock,value,triggerid from alarms where triggerid=".$HTTP_GET_VARS["triggerid"]." order by clock desc $limit";
 	$result=DBselect($sql);
 
@@ -172,6 +172,6 @@
 	echo "</TABLE>";
 ?>
 
-<?
+<?php
 	show_footer();
 ?>
