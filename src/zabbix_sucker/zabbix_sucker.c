@@ -308,7 +308,7 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 			)
 			{
 				*result=*vars->val.integer;
-				sprintf(result_str,"%d",*vars->val.integer);
+				sprintf(result_str,"%ld",(long)*vars->val.integer);
 			}
 			else if(vars->type == ASN_OCTET_STR)
 			{

@@ -2330,6 +2330,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 		echo("<hr>");
 		echo "<center>";
+
 		if($diff==0)
 		{
 			echo "<IMG SRC=\"chart.php?itemid=$itemid&period=$period&from=$from\">";
@@ -2343,6 +2344,69 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
  
 		echo "<center>";
+		echo "Period: ";
+		//  Start of --- 
+		
+		if ($period>12*3600) 
+		{
+			$tmp=$period-12*3600;
+			if($diff==0)
+			{
+				echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$from&period=$tmp\">");
+			}
+			else
+			{
+				echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$from&period=$tmp\">");
+			}
+			echo("-12h</A>] ");
+		}
+		else
+		{
+			echo("[-12h]");
+		}
+		
+		if ($period>3600) 
+		{
+			$tmp=$period-3600;
+			if($diff==0)
+			{
+				echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$from&period=$tmp\">");
+			}
+			else
+			{
+				echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$from&period=$tmp\">");
+			}
+			echo("-1h</A>] ");
+		}
+		else
+		{
+			echo("[-1h]");
+		}
+
+		$tmp=$period+3600;
+		if($diff==0)
+		{
+			echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$from&period=$tmp\">");
+		}
+		else
+		{
+			echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$from&period=$tmp\">");
+		}
+		echo("+1h</A>] ");
+
+		$tmp=$period+12*3600;
+		if($diff==0)
+		{
+			echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$from&period=$tmp\">");
+		}
+		else
+		{
+			echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$from&period=$tmp\">");
+		}
+		echo("+12h</A>] ");
+
+		echo "<br>Start time:";
+
 		//  Start of <<< WEEK >>> 
 		$tmp=$from+12*14;
 		if($diff==0)
@@ -2367,7 +2431,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 		echo("12h back</A>] ");
 		//  End of <<< 12h >>> 
-		
 		//  HOUR BACK
 		$tmp=$from+1;
 		if($diff==0)
@@ -2380,35 +2443,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 		echo("1h back</A>] ");
 
-		//  Start of --- 
-		$tmp=$period+3600;
-		if($diff==0)
-		{
-			echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$from&period=$tmp\">");
-		}
-		else
-		{
-			echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$from&period=$tmp\">");
-		}
-		echo("+1h</A>] ");
-
-		if ($period>3600) 
-		{
-			$tmp=$period-3600;
-			if($diff==0)
-			{
-				echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$from&period=$tmp\">");
-			}
-			else
-			{
-				echo("[<A HREF=\"history.php?action=showhistory2&itemid=$itemid&from=$from&period=$tmp\">");
-			}
-			echo("-1h</A>] ");
-		}
-		else
-		{
-			echo("[-1h]");
-		}
 		//  End of ------ 
 
 		if ($from>0) // HOUR FORWARD

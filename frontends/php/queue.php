@@ -17,9 +17,6 @@
 
 <?
 	show_table_header("QUEUE OF ITEMS TO BE UPDATED");
-	echo "<br>";
-
-	show_table_header("QUEUE");
 ?>
 <?
 	$now=time();

@@ -578,7 +578,7 @@ void	update_services(int triggerid, int status)
 
 	if(DBis_empty(result) == SUCCEED)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "No service for this triggerid [%d]", triggerid);
+		zabbix_log( LOG_LEVEL_DEBUG, "No service for this triggerid [%d]", triggerid);
 		DBfree_result(result);
 		return;
 	}
