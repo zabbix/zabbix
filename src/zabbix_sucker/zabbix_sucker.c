@@ -43,6 +43,10 @@
 #include "db.h"
 #include "log.h"
 
+#ifdef ZABBIX_THREADS
+	#include <pthread.h>
+#endif
+
 #ifdef ZBX_POLLER
 	#include <sys/types.h>
 	#include <sys/ipc.h>
@@ -87,6 +91,27 @@
 #include "checks_internal.h"
 #include "checks_simple.h"
 #include "checks_snmp.h"
+
+#ifdef ZABBIX_THREADS
+struct poller_answer {
+        int	status; /* 0 - not received 1 - received */
+        int	itemid;
+        int	ret;
+	double	value;
+	char	value_str[100];
+};
+
+struct poller_answer requests[10000];
+int answer_count = 0;
+int request_count = 0;
+
+pthread_mutex_t poller_mutex;
+
+pthread_mutex_t result_mutex;
+pthread_cond_t result_cv;
+int	state = 0; /* 0 - select data from DB, 1 - poll values from agents, 2 - update database */
+DB_RESULT	*shared_result;
+#endif
 
 static	pid_t	*pids=NULL;
 
@@ -328,6 +353,51 @@ int	get_value(double *result,char *result_str,DB_ITEM *item)
 	return res;
 }
 
+#ifdef ZABBIX_THREADS
+int get_minnextcheck_thread(MYSQL *database, int now)
+{
+	char		sql[MAX_STRING_LEN];
+
+	DB_RESULT	*result;
+
+	int		res;
+
+/* Host status	0 == MONITORED
+		1 == NOT MONITORED
+		2 == UNREACHABLE */ 
+#ifdef TESTTEST
+	snprintf(sql,sizeof(sql)-1,"select count(*),min(nextcheck) from items i,hosts h where (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and i.type not in (%d) and h.hostid%%%d=%d and i.key_<>'%s'", now, ITEM_TYPE_TRAPPER, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY);
+#else
+	snprintf(sql,sizeof(sql)-1,"select count(*),min(nextcheck) from items i,hosts h where (h.status=%d or (h.status=%d and h.disable_until<%d)) and h.hostid=i.hostid and i.status=%d and i.type not in (%d) and i.key_<>'%s' and i.key_<>'%s' and i.key_<>'%s'", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY);
+#endif
+#ifdef ZABBIX_THREADS
+	result = DBselect_thread(database, sql);
+#else
+	result = DBselect(sql);
+#endif
+
+	if( DBnum_rows(result) == 0)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "No items to update for minnextcheck.");
+		res = FAIL; 
+	}
+	else
+	{
+		if( atoi(DBget_field(result,0,0)) == 0)
+		{
+			res = FAIL;
+		}
+		else
+		{
+			res = atoi(DBget_field(result,0,1));
+		}
+	}
+	DBfree_result(result);
+
+	return	res;
+}
+#endif
+
 int get_minnextcheck(int now)
 {
 	char		sql[MAX_STRING_LEN];
@@ -366,6 +436,77 @@ int get_minnextcheck(int now)
 
 	return	res;
 }
+
+#ifdef ZABBIX_THREADS
+/* Update special host's item - "status" */
+void update_key_status_thread(MYSQL *database, int hostid,int host_status)
+{
+	char		sql[MAX_STRING_LEN];
+	char		value_str[MAX_STRING_LEN];
+	char		*s;
+
+	DB_ITEM		item;
+	DB_RESULT	*result;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In update_key_status()");
+
+	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,i.status from items i,hosts h where h.hostid=i.hostid and h.hostid=%d and i.key_='%s'", hostid,SERVER_STATUS_KEY);
+	result = DBselect_thread(database, sql);
+
+	if( DBnum_rows(result) == 0)
+	{
+		zabbix_log( LOG_LEVEL_DEBUG, "No items to update.");
+	}
+	else
+	{
+		item.itemid=atoi(DBget_field(result,0,0));
+		item.key=DBget_field(result,0,1);
+		item.host=DBget_field(result,0,2);
+		item.port=atoi(DBget_field(result,0,3));
+		item.delay=atoi(DBget_field(result,0,4));
+		item.description=DBget_field(result,0,5);
+		item.nextcheck=atoi(DBget_field(result,0,6));
+		item.type=atoi(DBget_field(result,0,7));
+		item.snmp_community=DBget_field(result,0,8);
+		item.snmp_oid=DBget_field(result,0,9);
+		item.useip=atoi(DBget_field(result,0,10));
+		item.ip=DBget_field(result,0,11);
+		item.history=atoi(DBget_field(result,0,12));
+		s=DBget_field(result,0,13);
+		if(s==NULL)
+		{
+			item.lastvalue_null=1;
+		}
+		else
+		{
+			item.lastvalue_null=0;
+			item.lastvalue_str=s;
+			item.lastvalue=atof(s);
+		}
+		s=DBget_field(result,0,14);
+		if(s==NULL)
+		{
+			item.prevvalue_null=1;
+		}
+		else
+		{
+			item.prevvalue_null=0;
+			item.prevvalue_str=s;
+			item.prevvalue=atof(s);
+		}
+		item.hostid=atoi(DBget_field(result,0,15));
+		item.value_type=atoi(DBget_field(result,0,17));
+		item.delta=atoi(DBget_field(result,0,18));
+	
+		snprintf(value_str,sizeof(value_str)-1,"%d",host_status);
+
+		process_new_value_thread(database,&item,value_str);
+		update_triggers_thread(database,item.itemid);
+	}
+
+	DBfree_result(result);
+}
+#endif
 
 /* Update special host's item - "status" */
 void update_key_status(int hostid,int host_status)
@@ -783,7 +924,11 @@ int get_values_new(void)
 }
 #endif
 
+#ifdef ZABBIX_THREADS
+int get_values(MYSQL *database)
+#else
 int get_values(void)
+#endif
 {
 	double		value;
 	char		value_str[MAX_STRING_LEN];
@@ -802,8 +947,62 @@ int get_values(void)
 
 	now = time(NULL);
 
+#ifdef ZABBIX_THREADS
+	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier from items i,hosts h where i.nextcheck<=%d and i.status=%d and i.type not in (%d) and (h.status=%d or (h.status=%d and h.disable_until<=%d)) and h.hostid=i.hostid and i.key_<>'%s' and i.key_<>'%s' and i.key_<>'%s' order by i.nextcheck", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY);
+#else
 	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier from items i,hosts h where i.nextcheck<=%d and i.status=%d and i.type not in (%d) and (h.status=%d or (h.status=%d and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d and i.key_<>'%s' and i.key_<>'%s' and i.key_<>'%s' order by i.nextcheck", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY);
+#endif
+#ifdef ZABBIX_THREADS
+	pthread_mutex_lock (&result_mutex);
+//	zabbix_log( LOG_LEVEL_WARNING, "\nSUCKER: waiting for state 0 [select data from DB] state [%d]", state);
+	while (state != 0)
+	{
+		pthread_cond_wait(&result_cv, &result_mutex);
+	}
+	result = DBselect_thread(database, sql);
+	shared_result = result;
+	answer_count = 0;
+	request_count = DBnum_rows(result);
+	for(i=0;i<request_count;i++)
+	{
+		requests[i].status = 0;
+		requests[i].itemid=atoi(DBget_field(result,i,0));
+	}
+	pthread_mutex_unlock(&result_mutex);
+
+
+	pthread_mutex_lock (&result_mutex);
+	state  = 1;
+//	pthread_cond_signal(&result_cv);
+//	zabbix_log( LOG_LEVEL_WARNING, "sucker: broadcast state [%d]", state);
+	pthread_cond_broadcast(&result_cv);
+	pthread_mutex_unlock(&result_mutex);
+	
+	pthread_mutex_lock (&result_mutex);
+//	zabbix_log( LOG_LEVEL_WARNING, "sucker: waiting for state 2 [update data in DB] state [%d]", state);
+//	while ( (state != 2) && (answer_count != request_count))
+	while (state != 2)
+	{
+		pthread_cond_wait(&result_cv, &result_mutex);
+/*		zabbix_log( LOG_LEVEL_WARNING, "sucker: YOPT %d %d", request_count, answer_count);
+		zabbix_log( LOG_LEVEL_WARNING, "sucker: before printing result");
+		for(i=0;i<request_count;i++)
+		{
+			zabbix_log( LOG_LEVEL_WARNING, "sucker: before doing actual DB update: itemid [%d] status [%d]", atoi(DBget_field(shared_result,i,0)), requests[i].status );
+		}*/
+		pthread_mutex_unlock (&poller_mutex);
+	}
+	pthread_mutex_unlock(&result_mutex);
+
+	pthread_mutex_lock (&result_mutex);
+	state  = 0;
+//	pthread_cond_signal(&result_cv);
+//	zabbix_log( LOG_LEVEL_WARNING, "sucker: broadcast state [%d]", state);
+//	pthread_cond_broadcast(&result_cv);
+	pthread_mutex_unlock(&result_mutex);
+#else
 	result = DBselect(sql);
+#endif
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
@@ -873,25 +1072,45 @@ int get_values(void)
 		item.units=DBget_field(result,i,23);
 		item.multiplier=atoi(DBget_field(result,i,24));
 
+#ifdef ZABBIX_THREADS
+		res = requests[i].ret;
+		value = requests[i].value;
+		strscpy(value_str,requests[i].value_str);
+/*		res = get_value(&value,value_str,&item);*/
+#else
 		res = get_value(&value,value_str,&item);
+#endif
 		zabbix_log( LOG_LEVEL_DEBUG, "GOT VALUE [%s]", value_str );
 		
 		if(res == SUCCEED )
 		{
+#ifdef ZABBIX_THREADS
+			process_new_value_thread(database, &item,value_str);
+#else
 			process_new_value(&item,value_str);
+#endif
 
 			if(network_errors>0)
 			{
 				snprintf(sql,sizeof(sql)-1,"update hosts set network_errors=0 where hostid=%d and network_errors>0", item.hostid);
+#ifdef ZABBIX_THREADS
+				DBexecute_thread(database, sql);
+#else
 				DBexecute(sql);
+#endif
 			}
 
 			if(HOST_STATUS_UNREACHABLE == host_status)
 			{
 				host_status=HOST_STATUS_MONITORED;
 				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
+#ifdef ZABBIX_THREADS
+				DBupdate_host_status_thread(database, item.hostid,HOST_STATUS_MONITORED,now);
+				update_key_status_thread(database, item.hostid,HOST_STATUS_MONITORED);
+#else
 				DBupdate_host_status(item.hostid,HOST_STATUS_MONITORED,now);
-				update_key_status(item.hostid,HOST_STATUS_MONITORED);	
+				update_key_status(item.hostid,HOST_STATUS_MONITORED);
+#endif
 
 				break;
 			}
@@ -899,13 +1118,22 @@ int get_values(void)
 		else if(res == NOTSUPPORTED)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Parameter [%s] is not supported by agent on host [%s]", item.key, item.host );
+#ifdef ZABBIX_THREADS
+			DBupdate_item_status_to_notsupported_thread(database, item.itemid);
+#else
 			DBupdate_item_status_to_notsupported(item.itemid);
+#endif
 			if(HOST_STATUS_UNREACHABLE == host_status)
 			{
 				host_status=HOST_STATUS_MONITORED;
 				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
+#ifdef ZABBIX_THREADS
+				DBupdate_host_status_thread(database, item.hostid,HOST_STATUS_MONITORED,now);
+				update_key_status_thread(database, item.hostid,HOST_STATUS_MONITORED);	
+#else
 				DBupdate_host_status(item.hostid,HOST_STATUS_MONITORED,now);
 				update_key_status(item.hostid,HOST_STATUS_MONITORED);	
+#endif
 
 				break;
 			}
@@ -916,16 +1144,29 @@ int get_values(void)
 			if(network_errors>=3)
 			{
 				zabbix_log( LOG_LEVEL_WARNING, "Host [%s] will be checked after [%d] seconds", item.host, DELAY_ON_NETWORK_FAILURE );
+#ifdef ZABBIX_THREADS
+				DBupdate_host_status_thread(database, item.hostid,HOST_STATUS_UNREACHABLE,now);
+				update_key_status_thread(database,item.hostid,HOST_STATUS_UNREACHABLE);	
+#else
 				DBupdate_host_status(item.hostid,HOST_STATUS_UNREACHABLE,now);
 				update_key_status(item.hostid,HOST_STATUS_UNREACHABLE);	
+#endif
 
 				snprintf(sql,sizeof(sql)-1,"update hosts set network_errors=3 where hostid=%d", item.hostid);
+#ifdef ZABBIX_THREADS
+				DBexecute_thread(database, sql);
+#else
 				DBexecute(sql);
+#endif
 			}
 			else
 			{
 				snprintf(sql,sizeof(sql)-1,"update hosts set network_errors=%d where hostid=%d", network_errors, item.hostid);
+#ifdef ZABBIX_THREADS
+				DBexecute_thread(database, sql);
+#else
 				DBexecute(sql);
+#endif
 			}
 
 			break;
@@ -946,7 +1187,11 @@ int get_values(void)
 
 		if(res ==  SUCCEED)
 		{
+#ifdef ZABBIX_THREADS
+		        update_triggers_thread(database, item.itemid);
+#else
 		        update_triggers(item.itemid);
+#endif
 		}
 
 	}
@@ -955,7 +1200,11 @@ int get_values(void)
 	return SUCCEED;
 }
 
+#ifdef ZABBIX_THREADS
+void *main_nodata_loop()
+#else
 int main_nodata_loop()
+#endif
 {
 	char	sql[MAX_STRING_LEN];
 	int	i,now;
@@ -963,6 +1212,9 @@ int main_nodata_loop()
 	int	itemid,functionid;
 	char	*parameter;
 
+#ifdef ZABBIX_THREADS
+	DB_HANDLE	database;
+#endif
 	DB_RESULT	*result;
 
 	for(;;)
@@ -970,7 +1222,12 @@ int main_nodata_loop()
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("updating nodata() functions");
 #endif
+
+#ifdef ZABBIX_THREADS
+		DBconnect_thread(&database);
+#else
 		DBconnect();
+#endif
 
 		now=time(NULL);
 #ifdef HAVE_PGSQL
@@ -978,7 +1235,12 @@ int main_nodata_loop()
 #else
 		snprintf(sql,sizeof(sql)-1,"select distinct f.itemid,f.functionid,f.parameter from functions f, items i,hosts h where h.hostid=i.hostid and (h.status=%d or (h.status=%d and h.disable_until<%d)) and i.itemid=f.itemid and f.function='nodata' and i.lastclock+f.parameter<=%d and i.status=%d and i.type=%d and f.lastvalue<>1", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
 #endif
+
+#ifdef ZABBIX_THREADS
+		result = DBselect_thread(&database, sql);
+#else
 		result = DBselect(sql);
+#endif
 
 		for(i=0;i<DBnum_rows(result);i++)
 		{
@@ -987,13 +1249,25 @@ int main_nodata_loop()
 			parameter=DBget_field(result,i,2);
 
 			snprintf(sql,sizeof(sql)-1,"update functions set lastvalue='1' where itemid=%d and function='nodata' and parameter='%s'" , itemid, parameter );
+#ifdef ZABBIX_THREADS
+			DBexecute_thread(&database, sql);
+#else
 			DBexecute(sql);
+#endif
 
+#ifdef ZABBIX_THREADS
+			update_triggers_thread(&database, itemid);
+#else
 			update_triggers(itemid);
+#endif
 		}
 
 		DBfree_result(result);
+#ifdef ZABBIX_THREADS
+		DBclose_thread(&database);
+#else
 		DBclose();
+#endif
 
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("sleeping for 30 sec");
@@ -1002,12 +1276,155 @@ int main_nodata_loop()
 	}
 }
 
+#ifdef ZABBIX_THREADS
+void *main_poller_loop()
+{
+	int i, num, ret, end, unprocessed_flag, processed;
+	int itemid=0;
+
+	DB_ITEM item;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In main_poller_loop()");
+	for(;;)
+	{
+//		zabbix_log( LOG_LEVEL_WARNING, "poller: waiting for state 1 [poll values from agents] State [%d]", state);
+		pthread_mutex_lock (&result_mutex);
+//		while ( (state != 1) && (answer_count == request_count ))
+		while (state != 1)
+		{
+			pthread_cond_wait(&result_cv, &result_mutex);
+		}
+		pthread_mutex_unlock (&result_mutex);
+// Do work till there are unprocessed requests
+		for(;;)
+		{
+			pthread_mutex_lock (&poller_mutex);
+			unprocessed_flag=0;
+			processed=0;
+			for(i=0;i<request_count;i++)
+			{
+				num = i;
+				if(requests[i].status == 0)
+				{
+//					zabbix_log( LOG_LEVEL_WARNING, "poller: itemid [%d]", atoi(DBget_field(shared_result,i,0)) );
+					requests[i].status = 1;
+					/* we should retrieve info from shared_result here */
+					itemid=atoi(DBget_field(shared_result,i,0));
+					unprocessed_flag=1;
+					break;
+				}
+				else
+				{
+					processed++;
+				}
+			}
+			pthread_mutex_unlock (&poller_mutex);
+
+/*			zabbix_log( LOG_LEVEL_WARNING, "poller: number of already retrieved items [%d] total [%d]", i, request_count);*/
+
+			/* 0 5 6 ? */
+//			zabbix_log( LOG_LEVEL_WARNING, "poller: num [%d] answer count [%d] request count [%d]", num, answer_count, request_count);
+//			if(processed < request_count-1)
+			if( (num < request_count) && (unprocessed_flag == 1))
+			{
+				/* do logic */
+//				zabbix_log( LOG_LEVEL_WARNING, "poller: processing itemid [%d]", itemid);
+
+				item.key=DBget_field(shared_result,num,1);
+				item.host=DBget_field(shared_result,num,2);
+				item.port=atoi(DBget_field(shared_result,num,3));
+				item.type=atoi(DBget_field(shared_result,num,7));
+				item.snmp_community=DBget_field(shared_result,num,8);
+				item.snmp_oid=DBget_field(shared_result,num,9);
+				item.useip=atoi(DBget_field(shared_result,num,10));
+				item.ip=DBget_field(shared_result,num,11);
+				item.value_type=atoi(DBget_field(shared_result,num,17));
+				item.snmp_port=atoi(DBget_field(shared_result,num,19));
+
+				ret = get_value(&requests[num].value,requests[num].value_str,&item);
+				/* end of do logic */
+
+				pthread_mutex_lock (&poller_mutex);
+				requests[num].ret = ret;
+				if(requests[num].status!=1)
+					zabbix_log( LOG_LEVEL_WARNING, "poller: ERROR status [%d] host [%s] key  [%s]", requests[num].status, item.host, item.key);
+				requests[num].status = 2;
+				answer_count++;
+//				zabbix_log( LOG_LEVEL_WARNING, "poller: answer count [%d] request count [%d]", answer_count, request_count);
+				pthread_mutex_unlock (&poller_mutex);
+
+//				zabbix_log( LOG_LEVEL_WARNING, "poller: processed [%d] request count [%d]", processed, request_count);
+			}
+
+//			if(num == request_count-1)
+			pthread_mutex_lock (&poller_mutex);
+//			zabbix_log( LOG_LEVEL_WARNING, "poller:      num [%d] answer count [%d] request count [%d] processed [%d]", num, answer_count, request_count, processed);
+			if(processed == request_count)		end = 1;
+			else					end = 0;
+			pthread_mutex_unlock (&poller_mutex);
+
+			if(end == 1)
+			{
+				break;
+			}
+
+		}
+
+		pthread_mutex_lock (&result_mutex);
+		if(state == 1)
+		{
+			state = 2;
+//			zabbix_log( LOG_LEVEL_WARNING, "poller: broadcast state [%d]", state);
+			pthread_cond_broadcast(&result_cv);
+		}
+		else
+		{
+//			zabbix_log( LOG_LEVEL_WARNING, "poller: do not broadcast state [2]");
+		}
+		pthread_mutex_unlock (&result_mutex);
+
+/*		pthread_mutex_lock (&result_mutex);
+//		if( (answer_count == request_count) && (state == 1))
+		if( answer_count == request_count)
+		{
+			state = 2;
+			zabbix_log( LOG_LEVEL_WARNING, "poller: broadcast state [%d]", state);
+			pthread_cond_signal(&result_cv);
+//		pthread_cond_broadcast(&result_cv);
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_WARNING, "poller: do not broadcast state [2]");
+		}
+		pthread_mutex_unlock (&result_mutex);*/
+	}
+	sleep(100000);
+}
+#endif
+
+#ifdef ZABBIX_THREADS
+void *main_sucker_loop()
+#else
 int main_sucker_loop()
+#endif
 {
 	int	now;
 	int	nextcheck,sleeptime;
 
+#ifdef ZABBIX_THREADS
+	DB_HANDLE	database;
+#endif
+
+#ifdef ZABBIX_THREADS
+	my_thread_init();
+#endif
+
+#ifdef ZABBIX_THREADS
+	DBconnect_thread(&database);
+#else
 	DBconnect();
+#endif
+
 	for(;;)
 	{
 #ifdef HAVE_FUNCTION_SETPROCTITLE
@@ -1024,12 +1441,20 @@ int main_sucker_loop()
 			poller();
 		}
 #else
+#ifdef ZABBIX_THREADS
+		get_values(&database);
+#else
 		get_values();
+#endif
 #endif
 
 		zabbix_log( LOG_LEVEL_DEBUG, "Spent %d seconds while updating values", (int)time(NULL)-now );
 
+#ifdef ZABBIX_THREADS
+		nextcheck=get_minnextcheck_thread(&database,now);
+#else
 		nextcheck=get_minnextcheck(now);
+#endif
 		zabbix_log( LOG_LEVEL_DEBUG, "Nextcheck:%d Time:%d", nextcheck, (int)time(NULL) );
 
 		if( FAIL == nextcheck)
@@ -1064,6 +1489,54 @@ int main_sucker_loop()
 		}
 	}
 }
+
+#ifdef ZABBIX_THREADS
+
+#define NUM_THREADS	100
+void	init_threads(void)
+{
+	pthread_t threads[NUM_THREADS];
+	int rc, i;
+	for(i=0;i < CONFIG_SUCKERD_FORKS;i++){
+		zabbix_log( LOG_LEVEL_WARNING, "Creating thread %d", i);
+		if(i==0)
+		{
+			rc = pthread_create(&threads[i], NULL, main_housekeeper_loop, (void *)i);
+		}
+		else if(i==1)
+		{
+			rc = pthread_create(&threads[i], NULL, main_alerter_loop, (void *)i);
+		}
+		else if(i==2)
+		{
+			rc = pthread_create(&threads[i], NULL, main_nodata_loop, (void *)i);
+//			rc = pthread_create(&threads[i], NULL, main_housekeeper_loop, (void *)i);
+		}
+		else if(i==3)
+		{
+//			rc = pthread_create(&threads[i], NULL, main_pinger_loop, (void *)i);
+			rc = pthread_create(&threads[i], NULL, main_housekeeper_loop, (void *)i);
+		}
+		else if(i==4)
+		{
+#ifdef HAVE_SNMP
+			init_snmp("zabbix_suckerd");
+#endif
+			rc = pthread_create(&threads[i], NULL, main_sucker_loop, (void *)i);
+		}
+		else
+		{
+			rc = pthread_create(&threads[i], NULL, main_poller_loop, (void *)i);
+		}
+
+		if (rc){
+			zabbix_log( LOG_LEVEL_ERR, "ERROR from pthread_create() [%m]");
+			exit(-1);
+		}
+	}
+	pthread_exit(NULL);
+}
+#endif
 
 int main(int argc, char **argv)
 {
@@ -1143,6 +1616,16 @@ int main(int argc, char **argv)
 	}
 #endif
 
+#ifdef ZABBIX_THREADS
+	my_init();
+	pthread_mutex_init(&poller_mutex, NULL);
+	pthread_mutex_init(&result_mutex, NULL);
+	pthread_cond_init(&result_cv, NULL);
+	init_threads();
+	for(;;) sleep(100000);
+	return 0;
+#endif
+
 	for(i=1;i<CONFIG_SUCKERD_FORKS;i++)
 	{
 		if((pid = fork()) == 0)
@@ -1158,9 +1641,7 @@ int main(int argc, char **argv)
 
 /*	zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started",sucker_num);*/
 
-#ifdef HAVE_SNMP
-	init_snmp("zabbix_suckerd");
-#endif
+
 
 	if( sucker_num == 0)
 	{
@@ -1190,6 +1671,7 @@ int main(int argc, char **argv)
 	else
 	{
 #ifdef HAVE_SNMP
+		init_snmp("zabbix_suckerd");
 		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started [Sucker. SNMP:ON]",sucker_num);
 #else
 		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started [Sucker. SNMP:OFF]",sucker_num);

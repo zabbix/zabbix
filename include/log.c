@@ -32,7 +32,6 @@
 #include "log.h"
 #include "common.h"
 
-static	FILE *log_file = NULL;
 static	char log_filename[MAX_STRING_LEN];
 
 static	int log_type = LOG_TYPE_UNDEFINED;
@@ -40,6 +39,7 @@ static	int log_level;
 
 int zabbix_open_log(int type,int level, const char *filename)
 {
+	FILE *log_file = NULL;
 /* Just return if we do not want to write debug */
 	log_level = level;
 	if(level == LOG_LEVEL_EMPTY)
@@ -81,6 +81,8 @@ void zabbix_set_log_level(int level)
 
 void zabbix_log(int level, const char *fmt, ...)
 {
+	FILE *log_file = NULL;
+
 	char	str[MAX_STRING_LEN];
 	char	str2[MAX_STRING_LEN];
 	time_t	t;
