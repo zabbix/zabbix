@@ -95,7 +95,7 @@
 			$y_=DBget_field($result,$i,6);
 			$status_=DBget_field($result,$i,7);
 
-			if(function_exists("imagecreatetruecolor"))
+			if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
 			{
 				$map=$map."\n<area shape=rect coords=$x_,$y_,".($x_+48).",".($y_+48)." href=\"sysmap.php?sysmapid=$sysmapid_&shostid=$shostid_#form\" alt=\"$host_\">";
 			}
@@ -271,7 +271,7 @@
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"icon\" size=1>";
 	$icons=array();
-	if(function_exists("imagecreatetruecolor"))
+	if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
 	{
 		$icons[0]="Server";
 		$icons[1]="Workstation";
