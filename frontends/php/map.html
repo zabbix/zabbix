@@ -29,6 +29,7 @@
 	$cyan=ImageColorAllocate($im,0,255,255); 
 	$white=ImageColorAllocate($im,255,255,255); 
 	$black=ImageColorAllocate($im,0,0,0); 
+	$gray=ImageColorAllocate($im,150,150,150); 
 
 	$x=imagesx($im); 
 	$y=imagesy($im);
@@ -103,7 +104,13 @@
 		{
 			$result1=DBselect("select count(*) from items i,functions f,triggers t,hosts h where h.hostid=i.hostid and i.hostid=$hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.istrue=1 and h.status=0");
 			$count=DBget_field($result1,0,0);
-			if($count>0)
+			if($count==1)
+			{
+				$color=$red;
+				$result1=DBselect("select t.description from items i,functions f,triggers t,hosts h where h.hostid=i.hostid and i.hostid=$hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.istrue=1 and h.status=0");
+				$label=DBget_field($result1,0,0);
+			}
+			else if($count>1)
 			{
 				$color=$red;
 				$label="Problems";
@@ -124,6 +131,8 @@
 
 	}
 	ImageDestroy($img); 
+
+	ImageString($im,0,$width-147,$height-10, "http://zabbix.sourceforge.net", $gray);
 
 	ImagePng($im); 
 	ImageDestroy($im); 

@@ -1300,6 +1300,7 @@
 		echo("<hr>");
 
  
+		echo "<center>";
 		//  Start of <<< WEEK >>> 
 		$tmp=$from+12*14;
 		echo("[<A HREF=\"history.html?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
@@ -1366,8 +1367,7 @@
 		{
 			echo("[Week forward]");
 		}
-
-		echo("</body></html>\n");
+		echo "</center>";
 	}
 
 	# Show history
@@ -1786,16 +1786,15 @@
 
 	function	calculate_availability($triggerid)
 	{
-	        $result=DBselect("select min(clock),max(clock) from history");
-		$ret["history_min_clock"]=DBget_field($result,0,0);
-		$ret["history_max_clock"]=DBget_field($result,0,1);
+	        $result=DBselect("select min(clock),max(clock) from alarms where triggerid=$triggerid");
+		$max=DBget_field($result,0,0);
+		$min=DBget_field($result,0,1);
 
-	        $result=DBselect("select min(clock),max(clock) from alarms");
-		$ret["alarms_min_clock"]=DBget_field($result,0,0);
-		$ret["alarms_max_clock"]=DBget_field($result,0,1);
-
-		$min=min($ret["history_min_clock"],$ret["alarms_min_clock"]);
-		$max=max($ret["history_max_clock"],$ret["alarms_max_clock"]);
+		if($max=="")
+		{
+			$max=time();
+			$min=time()-24*3600;
+		}
 
 		$sql="select clock,istrue from alarms where triggerid=$triggerid and clock>=$min and clock<=$max";
 		$result=DBselect($sql);
@@ -1804,7 +1803,7 @@
 		$state=-1;
 		$true_time=0;
 		$false_time=0;
-		$time=$ret["history_min_clock"];
+		$time=$min;
 		$max=time();
 		for($i=0;$i<DBnum_rows($result);$i++)
 		{
@@ -1841,7 +1840,7 @@
 
 		if(DBnum_rows($result)==0)
 		{
-			$false_time=$max-$ret["history_min_clock"];
+			$false_time=$max-$min;
 		}
 		else
 		{

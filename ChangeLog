@@ -1,5 +1,9 @@
 Changes for 1.0alpha7:
 
+ - added /upgrades/dbpatches/1.0alpha6_to_1.0alpha7
+ - changes in manual.txt
+ - fixed bug with lost status of trigger
+
  - added file frontends/php/about.html
  - link can be deleted now (network maps)
  - host icons in network maps became clickable

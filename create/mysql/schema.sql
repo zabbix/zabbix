@@ -25,7 +25,7 @@ CREATE TABLE graphs (
 # Foreign keys
 
 #
-# Table structure for table 'sysmaps_hosts'
+# Table structure for table 'sysmaps_links'
 #
 
 CREATE TABLE sysmaps_links (

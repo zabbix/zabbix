@@ -20,10 +20,7 @@
 ?>
 
 <?
-	$stats=get_stats();
-	$txt="AVAILABILITY REPORT";
-	$txt=$txt."<br>"."(From:".date("y/m/d H:i:s",$stats["history_min_clock"])." till:".date("y/m/d H:i:s",time()).")";
-	show_table_header($txt);
+	show_table_header("AVAILABILITY REPORT");
 	echo "<br>";
 ?>
 

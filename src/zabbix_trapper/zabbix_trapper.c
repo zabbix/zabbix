@@ -125,6 +125,11 @@ int	process_data(char *server,char *key, double value)
 
 	DBexecute(sql);
 
+	if( update_functions( itemid ) == FAIL)
+	{
+		return FAIL;
+	}
+
 	update_triggers( itemid );
  
 	DBfree_result(result);
