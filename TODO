@@ -1,5 +1,6 @@
 1.0:
 
+ - add SNMP-based template
  - fix all reported bugs
  - support for UDP-based checks (DNS, etc)
  - test trigger scopes
