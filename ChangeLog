@@ -1,5 +1,6 @@
 Changes for 1.0beta14:
 
+ - fixed removing of an item under PostgreSQL (Alexei)
  - fixed patch for PostgreSQL (Alexei)
 
 Changes for 1.0beta13:
