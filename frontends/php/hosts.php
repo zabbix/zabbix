@@ -288,7 +288,7 @@
 }
 ?>
 
-<?
+<?php
 	echo "<br>";
 	insert_hostgroups_form($HTTP_GET_VARS["groupid"]);
 ?>
