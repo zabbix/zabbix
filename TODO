@@ -38,6 +38,7 @@ LS:
  - check permissions for zabbix_agentd when started under root
  - add item to group (not to all)
  - update host from template
+ - more macros. %s -> {HOSTNAME}
 
 change(N) - raznica mezhdu poslednim i na N vremeni ranee poluchennim
 znacheniem;
