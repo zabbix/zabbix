@@ -60,6 +60,8 @@ int create_host_file(void)
 	DB_HOST	host;
 	DB_RESULT	*result;
 
+	zabbix_log( LOG_LEVEL_ERR, "In create_host_file()");
+
 	f = fopen("/tmp/zabbix_agentd.pinger", "w");
 
 	if( f == NULL)
@@ -101,6 +103,8 @@ int	do_ping(void)
 	FILE	*f;
 	static	char	c[MAX_STRING_LEN+1];
 
+	zabbix_log( LOG_LEVEL_ERR, "In do_ping()");
+
 	f=popen("/usr/sbin/fping ...","r");
 	if(f==0)
 	{
@@ -124,6 +128,8 @@ int	update_items(void)
 
 	DB_HOST	host;
 	DB_RESULT	*result;
+
+	zabbix_log( LOG_LEVEL_ERR, "In update_items()");
 
 	now=time(NULL);
 	sprintf(sql,"select h.useip,h.ip,h.host from hosts h where (h.status=%d or (h.status=%d and h.disable_until<=%d))", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now);
@@ -153,6 +159,8 @@ int main_pinger_loop(void)
 {
 	int ret = SUCCEED;
 
+	sleep(3600);
+	
 	for(;;)
 	{
 #ifdef HAVE_FUNCTION_SETPROCTITLE
