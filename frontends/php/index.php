@@ -40,7 +40,7 @@
 	else
 	{
 		echo "<center>";
-		echo "Press <a href=\"index.php?reconnect=1\">here</a> to reconnect";
+		echo "Press <a href=\"index.php?reconnect=1\">here</a> to disconnect/reconnect";
 		echo "</center>";
 	}	
 //	echo "<center>";

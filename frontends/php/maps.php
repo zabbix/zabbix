@@ -19,6 +19,15 @@
 ?>
 
 <?
+	if(isset($sysmapid)&&!check_right("Network map","R",$sysmapid))
+	{
+		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+		show_footer();
+		exit;
+	}
+?>
+
+<?
 	if(!isset($fullscreen))
 	{
 		show_table_header_begin();

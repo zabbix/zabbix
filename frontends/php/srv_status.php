@@ -25,7 +25,8 @@
 		echo "<tr bgcolor=#EEEEEE>";
 		$service=get_service_by_serviceid($serviceid);
 		echo "<td><b><a href=\"srv_status.php?serviceid=".$service["serviceid"]."\">".$service["name"]."</a></b></td>";
-		echo "<td>".$service["status"]."</td>";
+		echo "<td>".get_service_status_description($service["status"])."</td>";
+		echo "<td>[Root of the problem]</td>";
 		echo "</tr>"; 
 		$col++;
 	}
@@ -81,7 +82,7 @@
 				echo "<td><a href=\"srv_status.php?serviceid=".$row["serviceid"]."\"> $description</a></td>";
 			}
 		}
-		echo "<td>".$row["status"]."</td>";
+		echo "<td>".get_service_status_description($row["status"])."</td>";
 		echo "<td>[Root of the problem]</td>";
 		echo "</tr>"; 
 	}

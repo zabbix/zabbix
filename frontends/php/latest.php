@@ -13,6 +13,13 @@
                 show_footer();
                 exit;
         }
+        if(isset($hostid)&&!check_right("Host","R",$hostid))
+        {
+                show_table_header("<font color=\"AA0000\">No permissions !</font
+>");
+                show_footer();
+                exit;
+        }
 ?>
 
 <?
