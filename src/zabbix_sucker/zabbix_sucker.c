@@ -335,6 +335,7 @@ int get_minnextcheck(void)
 		DBfree_result(result);
 		return FAIL; 
 	}
+
 	if(DBnum_rows(result)==0)
 	{
 		syslog( LOG_DEBUG, "No items to update for minnextcheck.");
