@@ -615,7 +615,7 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 			sprintf(c,"update actions set nextcheck=0 where triggerid=%d and good=0",trigger.triggerid);
 			DBexecute(c);
 
-			update_services(trigger.triggerid);
+/*			update_services(trigger.triggerid); */
 		}
 
 		if((b==0)&&(trigger.istrue!=0))
@@ -633,7 +633,7 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 			sprintf(c,"update actions set nextcheck=0 where triggerid=%d and good=1",trigger.triggerid);
 			DBexecute(c);
 
-			update_services(trigger.triggerid);
+/*			update_services(trigger.triggerid);*/
 		}
 	}
 	DBfree_result(result);
