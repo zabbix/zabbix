@@ -81,6 +81,8 @@ STRUCTURE
 
 	itemid		int	; Unique item ID
 	type		int	; Type of item: 0 - Zabbix, 1 - SNMPv1
+	snmp_community	varchar ; Name of community for SNMP requests
+	snmp_oid	varchar ; Object ID for SNMP requests
 	hostid		int	; Host ID
 	description	varchar ; Description of the item
 	key_		varchar ; Key to be sent to host
