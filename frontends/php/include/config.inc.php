@@ -3407,7 +3407,9 @@ echo "</head>";
 
 		if($host_templateid != 0)
 		{
-			$result=add_using_host_template($hostid,$host_templateid);
+			add_templates_to_host($hostid,$host_templateid);
+//			$result=add_using_host_template($hostid,$host_templateid);
+			sync_host_with_templates($hostid);
 		}
 		update_host_groups($hostid,$groups);
 		if($newgroup != "")
@@ -3464,6 +3466,101 @@ echo "</head>";
 			add_group_to_host($hostid,$newgroup);
 		}
 		return	$result;
+	}
+	
+	# Add templates linked to template host to the host
+
+	function	add_templates_to_host($hostid,$host_templateid)
+	{
+		$sql="select * from hosts_templates where hostid=$host_templateid";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			add_template_linkage($hostid,$row["templateid"],$row["items"],$row["triggers"],$row["actions"],
+						$row["graphs"],$row["screens"]);
+		}
+	}
+
+	# Sync host with hard-linked templates
+	function	sync_host_with_templates($hostid)
+	{
+		$sql="select * from hosts_templates where hostid=$hostid";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			sync_host_with_template($hostid,$row["templateid"],$row["items"],$row["triggers"],$row["actions"],
+                                                $row["graphs"],$row["screens"]);
+		}
+	}
+
+	# Sync host with hard-linked template
+	function	sync_host_with_template($hostid,$templateid,$items,$triggers,$actions,$graphs,$screens)
+	{
+		global	$ERROR_MSG;
+
+		if(!isset($templateid)||($templateid==0))
+		{
+			$ERROR_MSG="Select template first";
+			return 0;
+		}
+
+		$host=get_host_by_hostid($hostid);
+		$sql="select itemid from items where hostid=$templateid";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			$item=get_item_by_itemid($row["itemid"]);
+			$itemid=add_item($item["description"],$item["key_"],$hostid,$item["delay"],$item["history"],$item["status"],$item["type"],$item["snmp_community"],$item["snmp_oid"],$item["value_type"],"",$item["snmp_port"],$item["units"],$item["multiplier"],$item["delta"],$item["snmpv3_securityname"],$item["snmpv3_securitylevel"],$item["snmpv3_authpassphrase"],$item["snmpv3_privpassphrase"],$item["formula"],$item["trends"]);
+
+			$sql="select distinct t.triggerid from triggers t,functions f where f.itemid=".$row["itemid"]." and f.triggerid=t.triggerid";
+			$result2=DBselect($sql);
+			while($row2=DBfetch($result2))
+			{
+				$trigger=get_trigger_by_triggerid($row2["triggerid"]);
+// Cannot use add_trigger here
+				$description=$trigger["description"];
+#				$description=str_replace("%s",$host["host"],$description);	
+				$sql="insert into triggers  (description,priority,status,comments,url,value) values ('".addslashes($description)."',".$trigger["priority"].",".$trigger["status"].",'".addslashes($trigger["comments"])."','".addslashes($trigger["url"])."',2)";
+				$result4=DBexecute($sql);
+				$triggerid=DBinsert_id($result4,"triggers","triggerid");
+
+				$sql="select functionid from functions where triggerid=".$row2["triggerid"]." and itemid=".$row["itemid"];
+				$result3=DBselect($sql);
+				while($row3=DBfetch($result3))
+				{
+					$function=get_function_by_functionid($row3["functionid"]);
+					$sql="insert into functions (itemid,triggerid,function,parameter) values ($itemid,$triggerid,'".$function["function"]."','".$function["parameter"]."')";
+					$result4=DBexecute($sql);
+					$functionid=DBinsert_id($result4,"functions","functionid");
+					$sql="update triggers set expression='".$trigger["expression"]."' where triggerid=$triggerid";
+					DBexecute($sql);
+					$trigger["expression"]=str_replace("{".$row3["functionid"]."}","{".$functionid."}",$trigger["expression"]);
+					$sql="update triggers set expression='".$trigger["expression"]."' where triggerid=$triggerid";
+					DBexecute($sql);
+				}
+				# Add actions
+				$sql="select actionid from actions where scope=0 and triggerid=".$row2["triggerid"];
+				$result3=DBselect($sql);
+				while($row3=DBfetch($result3))
+				{
+					$action=get_action_by_actionid($row3["actionid"]);
+					$userid=$action["userid"];
+					$scope=$action["scope"];
+					$severity=$action["severity"];
+					$good=$action["good"];
+					$delay=$action["delay"];
+					$subject=addslashes($action["subject"]);
+					$message=addslashes($action["message"]);
+					$recipient=$action["recipient"];
+					$sql="insert into actions (triggerid, userid, scope, severity, good, delay, subject, message,recipient) values ($triggerid,$userid,$scope,$severity,$good,$delay,'$subject','$message',$recipient)";
+//					echo "$sql<br>";
+					$result4=DBexecute($sql);
+					$actionid=DBinsert_id($result4,"actions","actionid");
+				}
+			}
+		}
+
+		return TRUE;
 	}
 
 	# Delete Media definition by mediatypeid
