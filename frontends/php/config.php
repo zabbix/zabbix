@@ -166,9 +166,12 @@
 		echo "<option value=\"0\">Email";
 		echo "<option value=\"1\" selected>Script";
 	}
+	echo "</select>";
 
 	if($type==0)
 	{
+		echo "<input class=\"biginput\" name=\"exec_path\" type=\"hidden\" value=\"$exec_path\">";
+
 		show_table2_v_delimiter();
 		echo "SMTP server";
 		show_table2_h_delimiter();
@@ -186,6 +189,10 @@
 	}
 	if($type==1)
 	{
+		echo "<input class=\"biginput\" name=\"smtp_server\" type=\"hidden\" value=\"$smtp_server\">";
+		echo "<input class=\"biginput\" name=\"smtp_helo\" type=\"hidden\" value=\"$smtp_helo\">";
+		echo "<input class=\"biginput\" name=\"smtp_email\" type=\"hidden\" value=\"$smtp_email\">";
+
 		show_table2_v_delimiter();
 		echo "Script path";
 		show_table2_h_delimiter();
