@@ -62,7 +62,7 @@
 		echo "<a name=\"form\"></a>";
 		echo "<form method=\"get\" action=\"screenedit.php\">";
 		$iresult=DBSelect("select * from screens_items where screenid=$screenid and x=$c and y=$r");
-        	if($iresult)
+        	if(DBnum_rows($iresult)>0)
         	{
         		$irow=DBfetch($iresult);
         		$screenitemid=$irow["screenitemid"];
@@ -74,8 +74,8 @@
 		{
                 	$screenitemid=0;
                 	$graphid=0;
-                	$width=100;
-                	$height=50;
+                	$width=500;
+                	$height=100;
 		}
 
 		if(isset($HTTP_GET_VARS["register"])&&($HTTP_GET_VARS["register"]=="edit")&&($HTTP_GET_VARS["x"]==$c)&&($HTTP_GET_VARS["y"]==$r))
