@@ -12,6 +12,8 @@ body
         line-height:16px;
 }
 
+form {margin: 0px}
+
 td.form_row_l
 {
 	color: #000000;
