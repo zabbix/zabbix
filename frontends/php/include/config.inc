@@ -1041,9 +1041,17 @@
 
 	# Add Host definition
 
-	function	add_host($host,$port,$status,$template)
+	function	add_host($host,$port,$status,$template,$useip,$ip)
 	{
-		$sql="insert into hosts (host,port,status) values ('$host',$port,$status)";
+		if($useip=="true")
+		{
+			$useip=1;
+		}
+		else
+		{
+			$useip=0;
+		}
+		$sql="insert into hosts (host,port,status,useip,ip) values ('$host',$port,$status,$useip,'$ip')";
 		$result=DBexecute($sql);
 		$hostid=DBinsert_id($result,"hosts","hostid");
 

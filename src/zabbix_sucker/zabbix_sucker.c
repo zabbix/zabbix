@@ -213,7 +213,14 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 	syslog( LOG_DEBUG, "%10s%25s", item->host, item->key );
 
 	servaddr_in.sin_family=AF_INET;
-	hp=gethostbyname(item->host);
+	if(item->useip==1)
+	{
+		hp=gethostbyname(item->ip);
+	}
+	else
+	{
+		hp=gethostbyname(item->host);
+	}
 
 	if(hp==NULL)
 	{
@@ -372,7 +379,7 @@ int get_values(void)
 
 	now = time(NULL);
 
-	sprintf(c,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.history,i.lastdelete,i.nextcheck,i.type,i.snmp_community,i.snmp_oid from items i,hosts h where i.nextcheck<=%d and i.status=0 and h.status=0 and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, SUCKER_FORKS,sucker_num);
+	sprintf(c,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.history,i.lastdelete,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip from items i,hosts h where i.nextcheck<=%d and i.status=0 and h.status=0 and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, SUCKER_FORKS,sucker_num);
 	result = DBselect(c);
 
 	if(result==NULL)
@@ -396,7 +403,8 @@ int get_values(void)
 		item.nextcheck=atoi(DBget_field(result,i,8));
 		item.type=atoi(DBget_field(result,i,9));
 		item.snmp_community=DBget_field(result,i,10);
-		item.snmp_oid=DBget_field(result,i,11);
+		item.useip=atoi(DBget_field(result,i,12));
+		item.ip=DBget_field(result,i,13);
 
 		if( get_value(&value,&item) == SUCCEED )
 		{

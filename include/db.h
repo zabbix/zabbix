@@ -39,6 +39,8 @@ DB_ITEM
 	char    *description;
 	char    *key;
 	char    *host;
+	int     useip;
+	char    *ip;
 	char    *shortname;
 	char    *snmp_community;
 	char    *snmp_oid;
