@@ -230,7 +230,7 @@ void	init_config(void)
 }
 
 #ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
-int	get_value_SNMPv1(double *result,DB_ITEM *item)
+int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 {
 	struct snmp_session session, *ss;
 	struct snmp_pdu *pdu;
@@ -241,6 +241,10 @@ int	get_value_SNMPv1(double *result,DB_ITEM *item)
 
 	struct variable_list *vars;
 	int status;
+
+	int ret=SUCCEED;
+
+	zabbix_log( LOG_LEVEL_WARNING, "In get_value_SNMPv1()");
 
 /*
 	Initialize the SNMP library
@@ -260,14 +264,19 @@ int	get_value_SNMPv1(double *result,DB_ITEM *item)
 	{
 		session.peername = item->host;
 	}
+	zabbix_log( LOG_LEVEL_WARNING, "Peername [%s]", session.peername);
 	session.community = item->snmp_community;
+	zabbix_log( LOG_LEVEL_WARNING, "Community [%s]", session.community);
+	zabbix_log( LOG_LEVEL_WARNING, "OID [%s]", item->snmp_oid);
 	session.community_len = strlen(session.community);
+	zabbix_log( LOG_LEVEL_WARNING, "In get_value_SNMPv1() 0.1");
 
 /*
 *      * Open the session
 *           */
 	SOCK_STARTUP;
 	ss = snmp_open(&session);                     /* establish the session */
+	zabbix_log( LOG_LEVEL_WARNING, "In get_value_SNMPv1() 0.2");
 
 /*
 *      * Create the PDU for the data for our request.
@@ -284,15 +293,20 @@ int	get_value_SNMPv1(double *result,DB_ITEM *item)
 #endif
 
 	snmp_add_null_var(pdu, anOID, anOID_len);
+	zabbix_log( LOG_LEVEL_WARNING, "In get_value_SNMPv1() 0.3");
   
 /* Send the Request out */
 	status = snmp_synch_response(ss, pdu, &response);
+	zabbix_log( LOG_LEVEL_WARNING, "Status send [%d]", status);
+	zabbix_log( LOG_LEVEL_WARNING, "In get_value_SNMPv1() 0.4");
 
 /* Process the response */
+	zabbix_log( LOG_LEVEL_WARNING, "In get_value_SNMPv1() 1");
 	if (status == STAT_SUCCESS && response->errstat == SNMP_ERR_NOERROR)
 	{
 /* SUCCESS: Print the result variables */
 
+	zabbix_log( LOG_LEVEL_WARNING, "In get_value_SNMPv1() 2");
 		for(vars = response->variables; vars; vars = vars->next_variable)
 		{
 			print_variable(vars->name, vars->name_length, vars);
@@ -302,12 +316,14 @@ int	get_value_SNMPv1(double *result,DB_ITEM *item)
 		for(vars = response->variables; vars; vars = vars->next_variable)
 		{
 			int count=1;
-/*		if (vars->type == ASN_OCTET_STR)
-		zabbix_log( LOG_LEVEL_WARNING, "Type:%d", vars->type);*/
-			if(	(vars->type == ASN_INTEGER ) ||
-			(vars->type == ASN_UINTEGER ) ||
-			(vars->type == ASN_COUNTER ) ||
-			(vars->type == ASN_GAUGE )
+			zabbix_log( LOG_LEVEL_WARNING, "AV loop()");
+
+/*		if (vars->type == ASN_OCTET_STR) */
+
+			if(	(vars->type == ASN_INTEGER) ||
+				(vars->type == ASN_UINTEGER)||
+				(vars->type == ASN_COUNTER) ||
+				(vars->type == ASN_GAUGE)
 			)
 			{
 				char *sp = (char *)malloc(1 + vars->val_len);
@@ -318,6 +334,7 @@ int	get_value_SNMPv1(double *result,DB_ITEM *item)
 /*			*result=strtod(sp,&e);
 			zabbix_log( LOG_LEVEL_WARNING, "Value #%d is an integer: %d", count++, *vars->val.integer);*/
 				*result=*vars->val.integer;
+				sprintf(result_str,"%d",*vars->val.integer);
 				free(sp);
 			}
 			else
@@ -335,8 +352,12 @@ int	get_value_SNMPv1(double *result,DB_ITEM *item)
 		}
 		else
 		{
+			zabbix_log( LOG_LEVEL_WARNING, "Error!");
+			zabbix_log( LOG_LEVEL_WARNING, "Error [%d]",
+					status);
 			snmp_sess_perror("snmpget", ss);
 		}
+		ret = FAIL;
 	}
 
 /*
@@ -351,7 +372,7 @@ int	get_value_SNMPv1(double *result,DB_ITEM *item)
 	snmp_close(ss);
 
 	SOCK_CLEANUP;
-	return SUCCEED;
+	return ret;
 }
 #endif
 
@@ -515,7 +536,7 @@ int	get_value(double *result,char *result_str,DB_ITEM *item)
 #ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
 	else if(item->type == ITEM_TYPE_SNMP)
 	{
-		res=get_value_SNMPv1(result,item);
+		res=get_value_SNMPv1(result,result_str,item);
 	}
 #endif
 	else
