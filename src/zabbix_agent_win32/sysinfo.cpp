@@ -573,9 +573,10 @@ static LONG H_SystemUname(char *cmd,char *arg,char **value)
          if (versionInfo.dwMajorVersion!=5)
             sprintf(osVersion,"Windows NT %d.%d %s",versionInfo.dwMajorVersion,
                     versionInfo.dwMinorVersion,versionInfo.szCSDVersion);
-         else      // Windows 2000 or Windows XP
-            sprintf(osVersion,"Windows %s %s",versionInfo.dwMinorVersion==0 ? "2000" : "XP",
-                    versionInfo.szCSDVersion);
+         else      // Windows 2000, Windows XP or Windows Server 2003
+            sprintf(osVersion,"Windows %s%s%s",versionInfo.dwMinorVersion==0 ? "2000" :
+                                              (versionInfo.dwMinorVersion==1 ? "XP" : "Server 2003"),
+                    versionInfo.szCSDVersion[0]==0 ? "" : " ",versionInfo.szCSDVersion);
          break;
       default:
          strcpy(osVersion,"Windows [Unknown Version]");
@@ -599,16 +600,12 @@ static LONG H_SystemUname(char *cmd,char *arg,char **value)
       case PROCESSOR_ARCHITECTURE_IA64:
          cpuType="Intel IA-64";
          break;
-#ifdef PROCESSOR_ARCHITECTURE_IA32_ON_WIN64
       case PROCESSOR_ARCHITECTURE_IA32_ON_WIN64:
          cpuType="IA-32 on IA-64";
          break;
-#endif
-#ifdef PROCESSOR_ARCHITECTURE_AMD64
       case PROCESSOR_ARCHITECTURE_AMD64:
          cpuType="AMD-64";
          break;
-#endif
       default:
          cpuType="unknown";
          break;
