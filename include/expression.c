@@ -75,7 +75,6 @@ void	delete_spaces(char *c)
 	c[j]=0;
 
 	syslog(LOG_DEBUG, "After deleting spaces:%s", c );
-
 }
 
 /*
@@ -96,7 +95,7 @@ int	find_char(char *str,char c)
 
 /*
  * Evaluate simple expression
- * Simple expression is either float number or <float> <operator> <float>
+ * Simple expression is either <float> or <float> <operator> <float>
  */ 
 int	evaluate_simple (float *result,char *exp)
 {
@@ -551,7 +550,7 @@ int	substitute_functions(char *exp)
 /*
  * Evaluate complex expression. Example: ({127.0.0.1:system[procload].last(0)}>1)|({127.0.0.1:system[procload].max(300)}>3)
  */ 
-int	evaluate_expression (int *result,char *expression)
+int	evaluate_expression(int *result,char *expression)
 {
 	delete_spaces(expression);
 	if( substitute_functions(expression) == SUCCEED)
