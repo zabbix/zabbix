@@ -116,7 +116,8 @@ monitored.
 
 No switches are supported by zabbix_sucker.
 
-The process is run as daemon under non-priveledged user account, usually zabbix.
+The process is run as daemon under non-priveledged user account, usually zabbix. Syslog is used to store
+debug information for the process.
 
 2.2 zabbix_alarmer
 
@@ -131,7 +132,8 @@ DESCRIPTION
 The process periodically re-calculates status of triggers. It also sends alerts to users
 if required.
 
-The process is run as daemon under non-priveledged user account.
+The process is run as daemon under non-priveledged user account. Syslog is used to store debug information
+for the process.
 
 2.3 zabbix_agent
 
