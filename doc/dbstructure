@@ -151,22 +151,8 @@ STRUCTURE
 ---------
 
 	hostid		int	; Unique host ID
-	platformid	int	; Platform ID
 	host		varchar	; Host name of IP address
 	status		int	; Host status. 0 - monitored, 1 - not monitored
-
-
-Table PLATFORMS
-===============
-
-The table contains list of platforms
-
-STRUCTURE
----------
-
-	platformid	int	; Unique platform ID
-	platform	varchar	; Name of platform
-
 
 Table ITEMS_TEMPLATE
 ====================
@@ -177,7 +163,6 @@ STRUCTURE
 ---------
 
 	itemtemplateid	int	; Unique ID of item template
-	platformid	int	; Platform ID
 	description	varchar	; Item description
 	key_		int	; Key to sent to host
 	delay		int	; How often we sent the key (in sec)
