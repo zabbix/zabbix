@@ -105,12 +105,22 @@
 #define SAFE_FREE(x) do { if ((x) != NULL) {free((x)); (x)=NULL;} } while(0)
 #endif
 
+/*
 #ifndef VA_COPY
 #ifdef HAVE_VA_COPY
 #define VA_COPY(dest, src) __va_copy(dest, src)
 #else
 #define VA_COPY(dest, src) (dest) = (src)
 #endif
+#endif
+*/
+
+
+#ifdef HAVE_VA_COPY
+	#define VA_COPY(dest, src) va_copy(dest, src)
+/*	#define VA_COPY(dest, src) __va_copy(dest, src)*/
+#else
+	#define VA_COPY(dest, src) (dest) = (src)
 #endif
 
 static size_t dopr(char *buffer, size_t maxlen, const char *format, 
