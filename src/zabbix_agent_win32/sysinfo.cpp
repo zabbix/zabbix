@@ -29,6 +29,7 @@
 
 LONG H_ProcInfo(char *cmd,char *arg,double *value);
 LONG H_Execute(char *cmd,char *arg,char **value);
+LONG H_CheckTcpPort(char *cmd,char *arg,double *value);
 
 
 //
@@ -635,6 +636,7 @@ static AGENT_COMMAND commands[]=
    { "agent[processed_requests]",H_NumericPtr,NULL,(char *)&statProcessedRequests },
    { "agent[failed_requests]",H_NumericPtr,NULL,(char *)&statFailedRequests },
    { "agent[unsupported_requests]",H_NumericPtr,NULL,(char *)&statUnsupportedRequests },
+   { "check_port[*]",H_CheckTcpPort,NULL,NULL },
    { "cksum[*]",H_CRC32,NULL,NULL },
    { "cpu_util",H_ProcUtil,NULL,(char *)0x00 },
    { "cpu_util5",H_ProcUtil,NULL,(char *)0x01 },
