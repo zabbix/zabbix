@@ -1,5 +1,6 @@
 Changes for 1.0alpha11:
 
+ - simplified tcp_listen procedure in zabbix_trapperd.c
  - simplified tcp_listen procedure in zabbix_agentd.c
  - no full list of triggers and items will be shown
  - deleted column triggers.lastcheck
