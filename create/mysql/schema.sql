@@ -290,7 +290,7 @@ CREATE TABLE items (
 	units		varchar(10)	DEFAULT '' NOT NULL,
 	multiplier	int(4)	DEFAULT '0' NOT NULL,
 	delta		int(1)  DEFAULT '0' NOT NULL,
-	prevorgvalue	double(16,4)  DEFAULT '0.0',
+	prevorgvalue	double(16,4)  DEFAULT NULL,
 
 	PRIMARY KEY	(itemid),
 	UNIQUE		shortname (hostid,key_),
