@@ -1,7 +1,7 @@
 Changes for 1.1alpha1:
 
  - fixed evaluation of expressions when a number contains spaces (Alexei)
- - added Gentoo start-up scripts. Thanks to A.Tophofen. (Alexei)
+ - added Gentoo start-up scripts. Thanks to Andreas Tophofen. (Alexei)
  - fixed PostgreSQL schema. Removed unnecessary comma. (Alexei)
 
 Changes for 1.0:
