@@ -102,6 +102,7 @@
 //			continue;
 //		}
 		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
+		else 		{ echo "<TR BGCOLOR=#DDDDDD>"; }
 		echo "<TD>".$row["groupid"]."</TD>";
 		echo "<TD>".$row["name"]."</TD>";
 		echo "<TD>";
