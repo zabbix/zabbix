@@ -1,5 +1,6 @@
 1.0beta12:
 
+ - add support for function unixtime()
  - parameter to disable fping
  - zabbix[anything] return 0 instead of unsupported
  - zabbix_agentd to support processor load, swap[*] and memory[*] onder AIX
