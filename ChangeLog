@@ -1,3 +1,7 @@
+Changes for 1.0.1:
+
+ - fixed PostgreSQL schema. Removed unnecessary comma. (Alexei)
+
 Changes for 1.0:
 
  - changed graph legend a little bit. Thanks to Igor. (Alexei)
