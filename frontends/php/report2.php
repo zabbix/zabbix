@@ -49,10 +49,11 @@
 		echo "<TABLE BORDER=0 COLS=3 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 		echo "<TR>";
 		echo "<TD><B>Description</B></TD>";
-		echo "<TD><B>Expression</B></TD>";
-		echo "<TD WIDTH=5%><B>True (%)</B></TD>";
-		echo "<TD WIDTH=5%><B>False (%)</B></TD>";
-		echo "<TD WIDTH=5%><B>Unknown (%)</B></TD>";
+//		echo "<TD><B>Expression</B></TD>";
+		echo "<TD WIDTH=5%><B>True</B></TD>";
+		echo "<TD WIDTH=5%><B>False</B></TD>";
+		echo "<TD WIDTH=5%><B>Unknown</B></TD>";
+		echo "<TD WIDTH=5%><B>Graph</B></TD>";
 		echo "</TR>\n";
 		$col=0;
 		while($row=DBfetch($result))
@@ -73,9 +74,9 @@
 				$description=expand_trigger_description($row["triggerid"]);
 			}
 			echo "<TD><a href=\"alarms.php?triggerid=".$row["triggerid"]."\">$description</a></TD>";
-			$description=rawurlencode($row["description"]);
+//			$description=rawurlencode($row["description"]);
 	
-			echo "<TD>".explode_exp($row["expression"],1)."</TD>";
+//			echo "<TD>".explode_exp($row["expression"],1)."</TD>";
 			$availability=calculate_availability($row["triggerid"]);
 			echo "<TD>";
 			printf("%.4f%%",$availability["true"]);
@@ -86,11 +87,23 @@
 			echo "<TD>";
 			printf("%.4f%%",$availability["unknown"]);
 			echo "</TD>";
+			echo "<TD>";
+			echo "<a href=\"report2.php?triggerid=".$row["triggerid"]."\">Show</a>";
+			echo "</TD>";
 			echo "</TR>\n";
 		}
 		echo "</table>\n";
 	}
 ?>
+
+<?
+	if(isset($HTTP_GET_VARS["triggerid"]))
+	{
+		echo "<IMG SRC=\"chart4.php?triggerid=".$HTTP_GET_VARS["triggerid"]."\" border=0>";
+	}
+?>
+
+
 <?
 	show_footer();
 ?>
