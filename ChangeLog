@@ -1,5 +1,8 @@
 Changes for 1.0alpha8:
 
+ - connect using IP address became possible
+ - new columns - useip,ip were added to table hosts
+
  - added bin/
  - removed src/.../acconfig.h
  - removed src/.../configure.in

@@ -6,9 +6,11 @@
 
 CREATE TABLE hosts (
   hostid		serial,
-  host			varchar(64)	DEFAULT '' NOT NULL,
-  port			int4		DEFAULT '0' NOT NULL,
-  status		int4		DEFAULT '0' NOT NULL,
+  host			varchar(64)	DEFAULT '' 		NOT NULL,
+  useip			int4		DEFAULT '0'		NOT NULL,
+  ip			varchar(15)	DEFAULT '127.0.0.1'	NOT NULL,
+  port			int4		DEFAULT '0'		NOT NULL,
+  status		int4		DEFAULT '0'		NOT NULL,
   PRIMARY KEY (hostid)
 );
 
