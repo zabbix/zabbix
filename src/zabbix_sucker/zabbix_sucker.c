@@ -14,6 +14,11 @@
 
 #include <syslog.h>
 
+/* Required for SNMP support*/
+#include <ucd-snmp/ucd-snmp-config.h>
+#include <ucd-snmp/ucd-snmp-includes.h>
+#include <ucd-snmp/system.h>
+
 #include "common.h"
 #include "db.h"
 #include "functions.h"
@@ -67,7 +72,121 @@ void	daemon_init(void)
 	}
 }
 
-int	get_value(double *result,char *key,char *host,int port)
+int	get_value_SNMPv1(double *result,ITEM *item)
+{
+    struct snmp_session session, *ss;
+    struct snmp_pdu *pdu;
+    struct snmp_pdu *response;
+
+    oid anOID[MAX_OID_LEN];
+    size_t anOID_len = MAX_OID_LEN;
+
+    struct variable_list *vars;
+    int status;
+
+    char *e;
+
+    /*
+     *      * Initialize the SNMP library
+     *           */
+    init_snmp("zabbix_sucker");
+
+    /*
+     *      * Initialize a "session" that defines who we're going to talk to
+     *           */
+    snmp_sess_init( &session );                   /* set up defaults */
+    session.version = SNMP_VERSION_1;
+    session.peername = item->host;
+/*"ucd-snmp.ucdavis.edu";*/
+    session.community = item->snmp_community;
+/*"demopublic";*/
+    session.community_len = strlen(session.community);
+
+    /*
+     *      * Open the session
+     *           */
+    SOCK_STARTUP;
+    ss = snmp_open(&session);                     /* establish the session */
+
+    /*
+     *      * Create the PDU for the data for our request.
+     *           *   1) We're going to GET the system.sysDescr.0 node.
+     *                */
+    pdu = snmp_pdu_create(SNMP_MSG_GET);
+    read_objid(item->snmp_oid, anOID, &anOID_len);
+/*    read_objid(".1.3.6.1.2.1.1.1.0", anOID, &anOID_len); */
+
+#if OTHER_METHODS
+    get_node("sysDescr.0", anOID, &anOID_len);
+    read_objid(".1.3.6.1.2.1.1.1.0", anOID, &anOID_len);
+    read_objid("system.sysDescr.0", anOID, &anOID_len);
+#endif
+
+    snmp_add_null_var(pdu, anOID, anOID_len);
+  
+    /*
+     *      * Send the Request out.
+     *           */
+    status = snmp_synch_response(ss, pdu, &response);
+
+    /*
+     *      * Process the response.
+     *           */
+    if (status == STAT_SUCCESS && response->errstat == SNMP_ERR_NOERROR) {
+      /*
+       *        * SUCCESS: Print the result variables
+       *               */
+
+      for(vars = response->variables; vars; vars = vars->next_variable)
+        print_variable(vars->name, vars->name_length, vars);
+
+      /* manipuate the information ourselves */
+	for(vars = response->variables; vars; vars = vars->next_variable)
+	{
+		int count=1;
+//		if (vars->type == ASN_OCTET_STR)
+		if (vars->type == ASN_INTEGER)
+		{
+			char *sp = (char *)malloc(1 + vars->val_len);
+			memcpy(sp, vars->val.string, vars->val_len);
+			sp[vars->val_len] = '\0';
+//			syslog( LOG_WARNING, "value #%d is a string: %s\n", count++, sp);
+//			*result=strtod(sp,&e);
+			syslog( LOG_WARNING, "Type:%d", vars->type);
+			syslog( LOG_WARNING, "Value #%d is an integer: %d", count++, *vars->val.integer);
+			*result=*vars->val.integer;
+			free(sp);
+		}
+		else
+			syslog( LOG_WARNING,"value #%d is NOT a string! Ack!\n", count++);
+	}
+    } else {
+      /*
+       *        * FAILURE: print what went wrong!
+       *               */
+
+      if (status == STAT_SUCCESS)
+	syslog( LOG_WARNING, "Error in packet\nReason: %s\n",
+                snmp_errstring(response->errstat));
+      else
+        snmp_sess_perror("snmpget", ss);
+
+    }
+
+    /*
+     *      * Clean up:
+     *           *  1) free the response.
+     *                *  2) close the session.
+     *                     */
+    if (response)
+      snmp_free_pdu(response);
+    snmp_close(ss);
+
+    SOCK_CLEANUP;
+    return SUCCEED;
+} /* main() */
+
+int	get_value_zabbix(double *result,ITEM *item)
 {
 	int	s;
 	int	i;
@@ -80,10 +199,10 @@ int	get_value(double *result,char *key,char *host,int port)
 	struct sockaddr_in myaddr_in;
 	struct sockaddr_in servaddr_in;
 
-	syslog( LOG_DEBUG, "%10s%25s", host, key );
+	syslog( LOG_DEBUG, "%10s%25s", item->host, item->key );
 
 	servaddr_in.sin_family=AF_INET;
-	hp=gethostbyname(host);
+	hp=gethostbyname(item->host);
 
 	if(hp==NULL)
 	{
@@ -93,7 +212,7 @@ int	get_value(double *result,char *key,char *host,int port)
 
 	servaddr_in.sin_addr.s_addr=((struct in_addr *)(hp->h_addr))->s_addr;
 
-	servaddr_in.sin_port=htons(port);
+	servaddr_in.sin_port=htons(item->port);
 
 	s=socket(AF_INET,SOCK_STREAM,0);
 	if(s==0)
@@ -119,7 +238,7 @@ int	get_value(double *result,char *key,char *host,int port)
 	alarm(0);
 	signal( SIGALRM, sigfunc );
 
-	sprintf(c,"%s\n",key);
+	sprintf(c,"%s\n",item->key);
 	if( sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
 		syslog(LOG_WARNING, "Problem with sendto" );
@@ -166,6 +285,23 @@ int	get_value(double *result,char *key,char *host,int port)
 		}
 	}
 	return SUCCEED;
+}
+
+int	get_value(double *result,ITEM *item)
+{
+	if(item->type == ITEM_TYPE_ZABBIX)
+	{
+		return get_value_zabbix(result,item);
+	}
+	else if(item->type == ITEM_TYPE_SNMP)
+	{
+		return get_value_SNMPv1(result,item);
+	}
+	else
+	{
+		*result=NOTSUPPORTED;
+		return SUCCEED;
+	}
 }
 
 int get_minnextcheck(void)
@@ -219,7 +355,7 @@ int get_values(void)
 
 	now = time(NULL);
 
-	sprintf(c,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.history,i.lastdelete,i.nextcheck from items i,hosts h where i.nextcheck<=%d and i.status=0 and h.status=0 and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, SUCKER_FORKS,sucker_num);
+	sprintf(c,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.history,i.lastdelete,i.nextcheck,i.type,i.snmp_community,i.snmp_oid from items i,hosts h where i.nextcheck<=%d and i.status=0 and h.status=0 and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, SUCKER_FORKS,sucker_num);
 	result = DBselect(c);
 
 	if(result==NULL)
@@ -241,8 +377,11 @@ int get_values(void)
 		item.history=atoi(DBget_field(result,i,6));
 		item.lastdelete=atoi(DBget_field(result,i,7));
 		item.nextcheck=atoi(DBget_field(result,i,8));
+		item.type=atoi(DBget_field(result,i,9));
+		item.snmp_community=DBget_field(result,i,10);
+		item.snmp_oid=DBget_field(result,i,11);
 
-		if( get_value(&value,item.key,item.host,item.port) == SUCCEED )
+		if( get_value(&value,&item) == SUCCEED )
 		{
 			if( value == NOTSUPPORTED)
 			{

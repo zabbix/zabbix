@@ -7,6 +7,10 @@
 
 #define	MAXFD	64
 
+/* Item types */
+
+#define ITEM_TYPE_ZABBIX 0
+#define ITEM_TYPE_SNMP   1
 
 #define	SUCKER_FORKS	10
 

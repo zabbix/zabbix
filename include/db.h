@@ -17,8 +17,8 @@
 
 #define ITEM struct item_type
 #define TRIGGER struct trigger_type
+#define DB_ACTION struct action_type
 #define FUNCTION struct function_type
-#define ACTION struct action_type
 #define MEDIA struct media_type
 
 #ifdef USE_MYSQL
@@ -35,10 +35,13 @@
 ITEM
 {
 	int     itemid;
+	int     type;
 	char    *description;
 	char    *key;
 	char    *host;
 	char    *shortname;
+	char    *snmp_community;
+	char    *snmp_oid;
 	int     port;
 	int     delay;
 	int     history;
@@ -65,24 +68,24 @@ MEDIA
 	int	active;
 };
 
-ACTION
-{
-	int	actionid;
-	int	triggerid;
-	int	userid;
-	int	good;
-	int	delay;
-	int	lastcheck;
-	char	*subject;
-	char	*message;
-};
-
 TRIGGER
 {
 	int	triggerid;
 	char	*expression;
 	char	*description;
 	int	istrue;
+};
+
+DB_ACTION
+{
+	int     actionid;
+	int     triggerid;
+	int     userid;
+	int     good;
+	int     delay;
+	int     lastcheck;
+	char    *subject;
+	char    *message;
 };
 
 void    DBconnect( void );
