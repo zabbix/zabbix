@@ -61,7 +61,7 @@ void	daemon_init(void)
 	}
 }
 
-int	get_value(double *Result,char *Key,char *Host,int Port)
+int	get_value(double *result,char *key,char *host,int port)
 {
 	int	s;
 	int	i;
@@ -74,10 +74,10 @@ int	get_value(double *Result,char *Key,char *Host,int Port)
 	struct sockaddr_in myaddr_in;
 	struct sockaddr_in servaddr_in;
 
-	dbg_write( dbg_proginfo, "%10s%25s\t", Host, Key );
+	dbg_write( dbg_proginfo, "%10s%25s\t", host, key );
 
 	servaddr_in.sin_family=AF_INET;
-	hp=gethostbyname(Host);
+	hp=gethostbyname(host);
 
 	if(hp==NULL)
 	{
@@ -87,7 +87,7 @@ int	get_value(double *Result,char *Key,char *Host,int Port)
 
 	servaddr_in.sin_addr.s_addr=((struct in_addr *)(hp->h_addr))->s_addr;
 
-	servaddr_in.sin_port=htons(Port);
+	servaddr_in.sin_port=htons(port);
 
 	s=socket(AF_INET,SOCK_STREAM,0);
 	if(s==0)
@@ -113,7 +113,7 @@ int	get_value(double *Result,char *Key,char *Host,int Port)
 	alarm(0);
 	signal( SIGALRM, sigfunc );
 
-	sprintf(c,"%s\n",Key);
+	sprintf(c,"%s\n",key);
 	if( sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
 		dbg_write( dbg_syswarn, "Problem with sendto" );
@@ -143,15 +143,15 @@ int	get_value(double *Result,char *Key,char *Host,int Port)
 	c[i-1]=0;
 
 	dbg_write( dbg_proginfo, "Got string:%10s", c );
-	*Result=strtod(c,&e);
+	*result=strtod(c,&e);
 
-	if( (*Result==0) && (c==e) )
+	if( (*result==0) && (c==e) )
 	{
 		return	FAIL;
 	}
-	if( *Result<0 )
+	if( *result<0 )
 	{
-		if( *Result == NOTSUPPORTED)
+		if( *result == NOTSUPPORTED)
 		{
 			return SUCCEED;
 		}
@@ -204,9 +204,9 @@ int get_minnextcheck(void)
 
 int get_values(void)
 {
-	double		Value;
+	double		value;
 	char		c[1024];
-	ITEM		Item;
+	ITEM		item;
  
 	DB_RESULT	*result;
 	DB_ROW		row;
@@ -223,32 +223,32 @@ int get_values(void)
 	}
 	while ( (row = DBfetch_row(result)) != NULL )
 	{
-		Item.ItemId=atoi(row[0]);
-		Item.Key=row[1];
-		Item.Host=row[2];
-		Item.Port=atoi(row[3]);
-		Item.Delay=atoi(row[4]);
-		Item.Description=row[5];
-		Item.History=atoi(row[6]);
-		Item.LastDelete=atoi(row[7]);
-		Item.ShortName=row[8];
+		item.itemid=atoi(row[0]);
+		item.key=row[1];
+		item.host=row[2];
+		item.port=atoi(row[3]);
+		item.delay=atoi(row[4]);
+		item.description=row[5];
+		item.history=atoi(row[6]);
+		item.lastdelete=atoi(row[7]);
+		item.shortname=row[8];
 
-		if( get_value(&Value,Item.Key,Item.Host,Item.Port) == SUCCEED )
+		if( get_value(&value,item.key,item.host,item.port) == SUCCEED )
 		{
-			if( Value == NOTSUPPORTED)
+			if( value == NOTSUPPORTED)
 			{
-				sprintf(c,"update items set status=3 where itemid=%d",Item.ItemId);
+				sprintf(c,"update items set status=3 where itemid=%d",item.itemid);
 				DBexecute(c);
 			}
 			else
 			{
-				sprintf(c,"insert into history (itemid,clock,value) values (%d,unix_timestamp(),%g)",Item.ItemId,Value);
+				sprintf(c,"insert into history (itemid,clock,value) values (%d,unix_timestamp(),%g)",item.itemid,value);
 				DBexecute(c);
 
-				sprintf(c,"update items set NextCheck=unix_timestamp()+%d,PrevValue=LastValue,LastValue=%f,LastClock=unix_timestamp() where ItemId=%d",Item.Delay,Value,Item.ItemId);
+				sprintf(c,"update items set NextCheck=unix_timestamp()+%d,PrevValue=LastValue,LastValue=%f,LastClock=unix_timestamp() where ItemId=%d",item.delay,value,item.itemid);
 				DBexecute(c);
 
-				if( updateFunctions( Item.ItemId ) == FAIL)
+				if( update_functions( item.itemid ) == FAIL)
 				{
 					dbg_write( dbg_syswarn, "Updating simple functions failed" );
 				}
@@ -256,16 +256,16 @@ int get_values(void)
 		}
 		else
 		{
-			dbg_write( dbg_syswarn, "Wrong value from host [HOST:%s KEY:%s VALUE:%f]", Item.Host, Item.Key, Value );
+			dbg_write( dbg_syswarn, "Wrong value from host [HOST:%s KEY:%s VALUE:%f]", item.host, item.key, value );
 			dbg_write( dbg_syswarn, "The value is not stored in database.");
 		}
 
-		if(Item.LastDelete+3600<time(NULL))
+		if(item.lastdelete+3600<time(NULL))
 		{
-			sprintf	(c,"delete from history where ItemId=%d and Clock<unix_timestamp()-%d",Item.ItemId,Item.History);
+			sprintf	(c,"delete from history where ItemId=%d and Clock<unix_timestamp()-%d",item.itemid,item.history);
 			DBexecute(c);
 	
-			sprintf(c,"update items set LastDelete=unix_timestamp() where ItemId=%d",Item.ItemId);
+			sprintf(c,"update items set LastDelete=unix_timestamp() where ItemId=%d",item.itemid);
 			DBexecute(c);
 		}
 	}

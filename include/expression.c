@@ -7,7 +7,7 @@
 #include "debug.h"
 #include "db.h"
 
-int	IsFloat(char *c)
+int	is_float(char *c)
 {
 	int i;
 
@@ -22,7 +22,7 @@ int	IsFloat(char *c)
 	return SUCCEED;
 }
 
-void	DeleteSpaces(char *c)
+void	delete_spaces(char *c)
 {
 	int i,j;
 
@@ -43,7 +43,7 @@ void	DeleteSpaces(char *c)
 
 }
 
-int	FindChar(char *str,char c)
+int	find_char(char *str,char c)
 {
 	int i;
 
@@ -54,7 +54,7 @@ int	FindChar(char *str,char c)
 	return	FAIL;
 }
 
-int	EvaluateSimple (float *Result,char *exp)
+int	evaluate_simple (float *result,char *exp)
 {
 	float	value1,value2;
 	char	first[1024],second[1024];
@@ -62,16 +62,16 @@ int	EvaluateSimple (float *Result,char *exp)
 
 	dbg_write( dbg_proginfo, "Evaluating simple expression [%s]", exp );
 
-	if( IsFloat(exp) == SUCCEED )
+	if( is_float(exp) == SUCCEED )
 	{
-		*Result=atof(exp);
+		*result=atof(exp);
 		return SUCCEED;
 	}
 
-	if( FindChar(exp,'|') != FAIL )
+	if( find_char(exp,'|') != FAIL )
 	{
 		dbg_write( dbg_proginfo, "| is found" );
-		l=FindChar(exp,'|');
+		l=find_char(exp,'|');
 		strcpy( first, exp );
 		first[l]=0;
 		j=0;
@@ -81,33 +81,33 @@ int	EvaluateSimple (float *Result,char *exp)
 			j++;
 		}
 		second[j]=0;
-		if( EvaluateSimple(&value1,first) == FAIL )
+		if( evaluate_simple(&value1,first) == FAIL )
 		{
 			dbg_write( dbg_syserr, "Cannot evaluate expression [%s]", first );
 			return FAIL;
 		}
 		if( value1 == 1)
 		{
-			*Result=value1;
+			*result=value1;
 			return SUCCEED;
 		}
-		if( EvaluateSimple(&value2,second) == FAIL )
+		if( evaluate_simple(&value2,second) == FAIL )
 		{
 			dbg_write( dbg_syserr, "Cannot evaluate expression [%s]", second );
 			return FAIL;
 		}
 		if( value2 == 1)
 		{
-			*Result=value2;
+			*result=value2;
 			return SUCCEED;
 		}
-		*Result=0;
+		*result=0;
 		return SUCCEED;
 	}
-	else if( FindChar(exp,'&') != FAIL )
+	else if( find_char(exp,'&') != FAIL )
 	{
 		dbg_write( dbg_proginfo, "& is found" );
-		l=FindChar(exp,'&');
+		l=find_char(exp,'&');
 		strcpy( first, exp );
 		first[l]=0;
 		j=0;
@@ -117,30 +117,30 @@ int	EvaluateSimple (float *Result,char *exp)
 			j++;
 		}
 		second[j]=0;
-		if( EvaluateSimple(&value1,first) == FAIL )
+		if( evaluate_simple(&value1,first) == FAIL )
 		{
 			dbg_write( dbg_syserr, "Cannot evaluate expression [%s]", first );
 			return FAIL;
 		}
-		if( EvaluateSimple(&value2,second) == FAIL )
+		if( evaluate_simple(&value2,second) == FAIL )
 		{
 			dbg_write( dbg_syserr, "Cannot evaluate expression [%s]", second );
 			return FAIL;
 		}
 		if( (value1 == 1) && (value2 == 1) )
 		{
-			*Result=1;
+			*result=1;
 		}
 		else
 		{
-			*Result=0;
+			*result=0;
 		}
 		return SUCCEED;
 	}
-	else if( FindChar(exp,'>') != FAIL )
+	else if( find_char(exp,'>') != FAIL )
 	{
 		dbg_write( dbg_proginfo, "> is found" );
-		l=FindChar(exp,'>');
+		l=find_char(exp,'>');
 		strcpy(first, exp);
 		first[l]=0;
 		j=0;
@@ -150,30 +150,30 @@ int	EvaluateSimple (float *Result,char *exp)
 			j++;
 		}
 		second[j]=0;
-		if( EvaluateSimple(&value1,first) == FAIL )
+		if( evaluate_simple(&value1,first) == FAIL )
 		{
 			dbg_write( dbg_syserr, "Cannot evaluate expression [%s]", first );
 			return FAIL;
 		}
-		if( EvaluateSimple(&value2,second) == FAIL )
+		if( evaluate_simple(&value2,second) == FAIL )
 		{
 			dbg_write( dbg_syserr, "Cannot evaluate expression [%s]", second );
 			return FAIL;
 		}
 		if( value1 > value2 )
 		{
-			*Result=1;
+			*result=1;
 		}
 		else
 		{
-			*Result=0;
+			*result=0;
 		}
 		return SUCCEED;
 	}
-	else if( FindChar(exp,'<') != FAIL )
+	else if( find_char(exp,'<') != FAIL )
 	{
 		dbg_write( dbg_proginfo, "< is found" );
-		l=FindChar(exp,'<');
+		l=find_char(exp,'<');
 		strcpy(first, exp);
 		first[l]=0;
 		j=0;
@@ -183,23 +183,23 @@ int	EvaluateSimple (float *Result,char *exp)
 			j++;
 		}
 		second[j]=0;
-		if( EvaluateSimple(&value1,first) == FAIL )
+		if( evaluate_simple(&value1,first) == FAIL )
 		{
 			dbg_write( dbg_syserr, "Cannot evaluate expression [%s]", first );
 			return FAIL;
 		}
-		if( EvaluateSimple(&value2,second) == FAIL )
+		if( evaluate_simple(&value2,second) == FAIL )
 		{
 			dbg_write( dbg_syserr, "Cannot evaluate expression [%s]", second );
 			return FAIL;
 		}
 		if( value1 < value2 )
 		{
-			*Result=1;
+			*result=1;
 		}
 		else
 		{
-			*Result=0;
+			*result=0;
 		}
 		return SUCCEED;
 	}
@@ -211,7 +211,7 @@ int	EvaluateSimple (float *Result,char *exp)
 	return SUCCEED;
 }
 
-int	Evaluate(int *Result,char *exp)
+int	evaluate(int *result,char *exp)
 {
 	float	value;
 	char	res[1024];
@@ -220,10 +220,10 @@ int	Evaluate(int *Result,char *exp)
 
 	strcpy( res,exp );
 
-	while( FindChar( exp, ')' ) != FAIL )
+	while( find_char( exp, ')' ) != FAIL )
 	{
 		l=-1;
-		r=FindChar(exp,')');
+		r=find_char(exp,')');
 		for(i=r;i>=0;i--)
 		{
 			if( exp[i] == '(' )
@@ -243,7 +243,7 @@ int	Evaluate(int *Result,char *exp)
 		} 
 		simple[r-l-1]=0;
 
-		if( EvaluateSimple( &value, simple ) != SUCCEED )
+		if( evaluate_simple( &value, simple ) != SUCCEED )
 		{
 			dbg_write( dbg_syserr, "Unable to evaluate simple expression [%s]", simple );
 			return	FAIL;
@@ -263,20 +263,20 @@ int	Evaluate(int *Result,char *exp)
 
 		sprintf(res,exp,value);
 		strcpy(exp,res);
-		DeleteSpaces(res);
+		delete_spaces(res);
 		dbg_write( dbg_proginfo, "Expression4:%s", res );
 	}
-	if( EvaluateSimple( &value, res ) != SUCCEED )
+	if( evaluate_simple( &value, res ) != SUCCEED )
 	{
 		dbg_write( dbg_syserr, "Unable to evaluate simple expression [%s]", simple );
 		return	FAIL;
 	}
 	dbg_write( dbg_proginfo, "Evaluate end:[%f]", value );
-	*Result=value;
+	*result=value;
 	return SUCCEED;
 }
 
-int	SubstituteFunctions(char *exp)
+int	substitute_functions(char *exp)
 {
 	float	value;
 	char	functionid[1024];
@@ -285,10 +285,10 @@ int	SubstituteFunctions(char *exp)
 
 	dbg_write( dbg_proginfo, "BEGIN SubstituteFunctions" );
 
-	while( FindChar(exp,'{') != FAIL )
+	while( find_char(exp,'{') != FAIL )
 	{
-		l=FindChar(exp,'{');
-		r=FindChar(exp,'}');
+		l=find_char(exp,'{');
+		r=find_char(exp,'}');
 		if( r == FAIL )
 		{
 			dbg_write( dbg_syserr, "Cannot find right bracket. Expression:%s", exp );
@@ -326,7 +326,7 @@ int	SubstituteFunctions(char *exp)
 
 		sprintf(res,exp,value);
 		strcpy(exp,res);
-		DeleteSpaces(exp);
+		delete_spaces(exp);
 		dbg_write( dbg_proginfo, "Expression4:%s", exp );
 	}
 	dbg_write( dbg_proginfo, "Expression:%s", exp );
@@ -334,12 +334,12 @@ int	SubstituteFunctions(char *exp)
 	return SUCCEED;
 }
 
-int	EvaluateExpression (int *Result,char *expression)
+int	evaluate_expression (int *result,char *expression)
 {
-	DeleteSpaces(expression);
-	if( SubstituteFunctions(expression) == SUCCEED)
+	delete_spaces(expression);
+	if( substitute_functions(expression) == SUCCEED)
 	{
-		if( Evaluate(Result, expression) == SUCCEED)
+		if( evaluate(result, expression) == SUCCEED)
 		{
 			return SUCCEED;
 		}
