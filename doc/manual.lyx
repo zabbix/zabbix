@@ -2704,6 +2704,48 @@ Host selection for availability report
 Zabbix 1.0beta6
 \layout Itemize
 
+IMPORTANT.
+ Minimum number of 
+\series bold 
+zabbix_suckerd
+\series default 
+ is 4
+\layout Itemize
+
+added support for 
+\series bold 
+check_service(service,ip,port)
+\layout Itemize
+
+added support for 
+\series bold 
+check_port(ip,port)
+\layout Itemize
+
+changes in email sending routines
+\layout Itemize
+
+status will be changed to UNCREACHABLE only in case of three network errors
+\layout Itemize
+
+support for parameters 
+\series bold 
+netloadin[*]
+\series default 
+ and 
+\series bold 
+netloadout[*]
+\layout Itemize
+
+fixed permission check for all forms and graphics
+\layout Itemize
+
+priority was renamed to Severity
+\layout Itemize
+
+added graph to availability report
+\layout Itemize
+
 
 \emph on 
 register_globals
@@ -2730,14 +2772,6 @@ nodata()
 support for function 
 \emph on 
 str()
-\layout Itemize
-
-IMPORTANT.
- Minimum number of 
-\series bold 
-zabbix_suckerd
-\series default 
- is 4
 \layout Itemize
 
 additional colors for graphs
@@ -3215,6 +3249,84 @@ fixed missing close of socket in case if connection to SMTP server is rejected
 \layout Subsubsection
 
 Zabbix 1.0beta6
+\layout Itemize
+
+added support for 
+\emph on 
+check_service(service,ip,port)
+\layout Itemize
+
+added support for 
+\emph on 
+check_port(ip,port)
+\layout Itemize
+
+fixed 
+\emph on 
+check_right()
+\emph default 
+.
+ Thanks to Daniel Higgins.
+\layout Itemize
+
+more changes to 
+\emph on 
+send_email()
+\emph default 
+.
+ Thanks to Daniel Higgins.
+\layout Itemize
+
+added file 
+\emph on 
+TODO
+\layout Itemize
+
+status will be changed to UNCREACHABLE only in case of three network errors
+\layout Itemize
+
+added column 
+\emph on 
+hosts.network_errors
+\layout Itemize
+
+support for parameters 
+\series bold 
+netloadin[*]
+\series default 
+ and 
+\series bold 
+netloadout[*]
+\layout Itemize
+
+added 
+\emph on 
+src/zabbix_agent/stats.c
+\emph default 
+ and 
+\emph on 
+stats.h
+\layout Itemize
+
+availability graph for IT Services
+\layout Itemize
+
+improvement in user rights handling routines
+\layout Itemize
+
+if trigger status is UNKNOWN, set 
+\emph on 
+function.lastvalue
+\emph default 
+ to NULL
+\layout Itemize
+
+fixed permission check for all 
+\emph on 
+*.php
+\layout Itemize
+
+Priority was renamed to Severity
 \layout Itemize
 
 added availability graph for IT Services
@@ -7434,7 +7546,11 @@ Sorted alphabetically:
 
 
 \latex no_latex 
-check_port[*]
+check_port[
+\latex default 
+<ip,>port
+\latex no_latex 
+]
 \latex default 
  
 \latex no_latex 
@@ -7451,6 +7567,10 @@ connect
 ion
 \latex no_latex 
  to port number "*".
+
+\latex default 
+ If IP adress is missing, 127.0.0.1 is used.
+ IP address is optionsl.
 \layout Standard
 
 
@@ -7478,7 +7598,7 @@ heck_port[80]
 \latex no_latex 
 check_service[ftp
 \latex default 
-<,port>
+<,ip><,port>
 \latex no_latex 
 ]
 \latex default 
@@ -7492,6 +7612,8 @@ if
 
 \latex default 
  If port number is missing, '21' is used.
+ If IP adress is missing, 127.0.0.1 is used.
+ Both IP address and port number are optional.
 \layout Standard
 
 
@@ -7508,7 +7630,7 @@ Result: 0 - FTP server is down
 \latex no_latex 
 check_service[
 \latex default 
-http<,port>
+http<,ip><,port>
 \latex no_latex 
 ]
 \latex default 
@@ -7526,6 +7648,8 @@ HTTP
 
 \latex default 
  If port number is missing, '80' is used.
+ If IP adress is missing, 127.0.0.1 is used.
+ Both IP address and port number are optional.
 \layout Standard
 
 R
@@ -7550,7 +7674,7 @@ c
 \latex no_latex 
 heck_service[imap
 \latex default 
-<,port>
+<,ip><,port>
 \latex no_latex 
 ]
 \latex default 
@@ -7564,6 +7688,8 @@ if
 
 \latex default 
  If port number is missing, '143' is used.
+ If IP adress is missing, 127.0.0.1 is used.
+ Both IP address and port number are optional.
 \layout Standard
 
 
@@ -7580,7 +7706,7 @@ Result: 0 - IMAP server is down
 \latex no_latex 
 check_service[nntp
 \latex default 
-<,port>
+<,ip><,port>
 \latex no_latex 
 ]
 \latex default 
@@ -7594,6 +7720,8 @@ if
 
 \latex default 
  If port number is missing, '119' is used.
+ If IP adress is missing, 127.0.0.1 is used.
+ Both IP address and port number are optional.
 \layout Standard
 
 
@@ -7610,7 +7738,7 @@ Result: 0 - NNTP server is down
 \latex no_latex 
 check_service[pop
 \latex default 
-<,port>
+<,ip><,port>
 \latex no_latex 
 ]
 \latex default 
@@ -7624,6 +7752,8 @@ if
 
 \latex default 
  If port number is missing, '110' is used.
+ If IP adress is missing, 127.0.0.1 is used.
+ Both IP address and port number are optional.
 \layout Standard
 
 R
@@ -7640,7 +7770,7 @@ esult: 0 - POP server is down
 \latex no_latex 
 check_service[smtp
 \latex default 
-<,port>
+<,ip><,port>
 \latex no_latex 
 ]
 \latex default 
@@ -7654,6 +7784,8 @@ if
 
 \latex default 
  If port number is missing, '25' is used.
+ If IP adress is missing, 127.0.0.1 is used.
+ Both IP address and port number are optional.
 \layout Standard
 
 
@@ -7670,7 +7802,7 @@ Result: 0 - SMTP server is down
 \latex no_latex 
 check_service[ssh
 \latex default 
-<,port>
+<,ip><,port>
 \latex no_latex 
 ]
 \latex default 
@@ -7684,6 +7816,8 @@ if
 
 \latex default 
  If port number is missing, '22' is used.
+ If IP adress is missing, 127.0.0.1 is used.
+ Both IP address and port number are optional.
 \layout Standard
 
 
@@ -7912,6 +8046,40 @@ Amount of used shared memory.
 memory[total] 
 \latex no_latex 
 Total amount of installed physical memory.
+\layout Description
+
+netloadin1[*] Average number of bytes received on iterface '*'.
+ Average for 1 minute.
+\layout Standard
+
+Example: 
+\emph on 
+netloadin1[eth0]
+\layout Description
+
+netloadin5[*] Average number of bytes received on iterface '*'.
+ Average for last 5 minutes.
+\layout Description
+
+netloadin15[*] Average number of bytes received on iterface '*'.
+ Average for last 15 minutes.
+\layout Description
+
+netloadout1[*] Average number of bytes sent on iterface '*'.
+ Average for 1 minute.
+\layout Standard
+
+Example: 
+\emph on 
+netloadout1[eth1]
+\layout Description
+
+netloadout5[*] Average number of bytes sent on iterface '*'.
+ Average for 5 minute.
+\layout Description
+
+netloadout15[*] Average number of bytes sent on iterface '*'.
+ Average for 15 minute.
 \layout Description
 
 
@@ -8165,7 +8333,7 @@ Supported Parameters by Platform
 \size footnotesize 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="44" columns="7">
+<lyxtabular version="2" rows="50" columns="7">
 <features rotate="false" islongtable="true" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="15mm" special="">
@@ -11143,6 +11311,354 @@ kern[maxproc]
 \layout Standard
 
 X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+netlodin1[*]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+netloadin5[*]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+netloadin15[*]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+netloadout1[*]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+netloadout5[*]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+netloadout15[*]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
@@ -16584,9 +17100,6 @@ TODO (1.0 stable)
 support for IT helpdesk
 \layout Itemize
 
-timeout for sending alerts
-\layout Itemize
-
 
 \emph on 
 ./configure
@@ -16607,13 +17120,7 @@ errors and warning to be numbered and documented
 better support for SNMP (send and receive SNMP traps)
 \layout Itemize
 
-fix permissions for graphs, etc
-\layout Itemize
-
-monitoring of log files, Support for string=string.
-\layout Itemize
-
-regression tests
+full set of regression tests
 \layout Itemize
 
 same time navigator for all graphs
@@ -16657,14 +17164,6 @@ check_service[ldap]
 \layout Itemize
 
 add support for Kb,bytes,kps, etc
-\layout Itemize
-
-add new screenshots to 
-\emph on 
-zabbix.sf.net
-\layout Itemize
-
-add graph for availability report
 \layout Itemize
 
 improve functionality of IT Services
@@ -16892,6 +17391,15 @@ DENIS USTIMENKO
 \layout Standard
 
 Support for quering SNMP parameters by IP address.
+\layout Itemize
+
+
+\noun on 
+DANIEL HIGGINS
+\layout Standard
+
+Improvements for email sending routines.
+ Other changes.
 \layout Itemize
 
 
