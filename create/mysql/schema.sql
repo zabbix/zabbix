@@ -498,6 +498,21 @@ CREATE TABLE screens_items (
 ) TYPE=InnoDB;
 
 --
+-- Table structure for table 'screens_graphs'
+--
+
+CREATE TABLE screens_graphs (
+  screengraphid		int(4)		NOT NULL auto_increment,
+  screenid		int(4)		DEFAULT '0' NOT NULL,
+  itemid		int(4)		DEFAULT '0' NOT NULL,
+  width			int(4)		DEFAULT '320' NOT NULL,
+  height		int(4)		DEFAULT '200' NOT NULL,
+  x			int(4)		DEFAULT '0' NOT NULL,
+  y			int(4)		DEFAULT '0' NOT NULL,
+  PRIMARY KEY  (screengraphid)
+) TYPE=InnoDB;
+
+--
 -- Table structure for table 'stats'
 --
 
