@@ -231,7 +231,7 @@
 	else
 	{
 		$trigger=get_trigger_by_triggerid($HTTP_GET_VARS["triggerid"]);
-		$description=$trigger["description"];
+		$description=htmlspecialchars(stripslashes($trigger["description"]));
 
 		$delay=30;
 		$subject=$description;

@@ -2757,7 +2757,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 // Cannot use add_trigger here
 				$description=$trigger["description"];
 #				$description=str_replace("%s",$host["host"],$description);	
-				$sql="insert into triggers  (description,priority,status,comments,url,value) values ('".addslashes($description)."',".$trigger["priority"].",".$trigger["status"].",'".$trigger["comments"]."','".$trigger["url"]."',2)";
+				$sql="insert into triggers  (description,priority,status,comments,url,value) values ('".addslashes($description)."',".$trigger["priority"].",".$trigger["status"].",'".addslashes($trigger["comments"])."','".addslashes($trigger["url"])."',2)";
 				$result4=DBexecute($sql);
 				$triggerid=DBinsert_id($result4,"triggers","triggerid");
 
@@ -2786,8 +2786,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					$severity=$action["severity"];
 					$good=$action["good"];
 					$delay=$action["delay"];
-					$subject=$action["subject"];
-					$message=$action["message"];
+					$subject=addslashes($action["subject"]);
+					$message=addslashes($action["message"]);
 					$recipient=$action["recipient"];
 					$sql="insert into actions (triggerid, userid, scope, severity, good, delay, subject, message,recipient) values ($triggerid,$userid,$scope,$severity,$good,$delay,'$subject','$message',$recipient)";
 //					echo "$sql<br>";
