@@ -82,7 +82,7 @@
 	echo "<TD ALIGN=CENTER>";
 	if(isset($_GET["sysmapid"]))
 	{
-		$map="\n<map name=links>";
+		$map="\n<map name=links".$_GET["sysmapid"]."_".rand(0,100000).">";
 		$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status from sysmaps_hosts sh,hosts h where sh.sysmapid=".$_GET["sysmapid"]." and h.hostid=sh.hostid");
 		for($i=0;$i<DBnum_rows($result);$i++)
 		{
