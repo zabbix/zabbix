@@ -81,6 +81,12 @@
 				show_error_message("Cannot update user. Both passwords must be equal.");
 			}
 		}
+		if($HTTP_GET_VARS["register"]=="add group")
+		{
+			$result=add_user_group($HTTP_GET_VARS["userid"]);
+			show_messages($result, "User successfully deleted", "Cannot delete user");
+			unset($userid);
+		}
 	}
 ?>
 
