@@ -1,3 +1,9 @@
+1.1alpha7:
+
+ - Fix startup of housekeeper
+ - Fix simple checks
+ - Develop hard-linked templates
+
 ZABBIX 1.1:
 
  - escalation and repeated notifications
