@@ -285,3 +285,5 @@ alter table alerts modify message text default '' not null;
 
  - New set of parameters appeared in this release: proc_cnt[*]
 
+ - IMPORTANT. Parameter tcp_count is not supported anymore.
+
