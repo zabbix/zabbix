@@ -5,7 +5,6 @@ HIGH PRIORITY:
  - Graphs for specified period and date and time
  - Check Housekeeping procedure
 
- - fix buffer overflow in zbx_log().
 * - add severity to pre-defined triggers 
 * - BUG. zabbix_sucker should accept parameter regardless of "\n" at the end of line 
 * - BUG. Agent return unsupported in case if UserParameter ends by timeout.
@@ -13,8 +12,6 @@ HIGH PRIORITY:
  - mass updates/inserts (add items and triggers for all hosts at once)
 * - support for net-snmp
  - get rid of long select lists in user forms 
- - better monitoring of log files
- - IT Helpdesk
  - SNMP trapping
  - personalisation (refresh rate, graph size, default graph period, etc)
 * - add protection from IT Service loop
@@ -26,6 +23,7 @@ PERFORMANCE IMPROVEMENTS:
 
 DIFFERENT TASKS:
 
+ - better monitoring of log files
  - SNMP trapping
  - SNMP v2,v3
  - auto-discovery
