@@ -76,6 +76,32 @@
 			}
 			show_messages(TRUE,"Items deleted","Cannot delete items");
 		}
+		if($HTTP_GET_VARS["register"]=="Activate selected")
+		{
+			$result=DBselect("select itemid from items where hostid=".$HTTP_GET_VARS["hostid"]);
+			while($row=DBfetch($result))
+			{
+// $$ is correct here
+				if(isset($HTTP_GET_VARS[$row["itemid"]]))
+				{
+					$result2=activate_item($row["itemid"]);
+				}
+			}
+			show_messages(TRUE,"Items activated","Cannot activate items");
+		}
+		if($HTTP_GET_VARS["register"]=="Disable selected")
+		{
+			$result=DBselect("select itemid from items where hostid=".$HTTP_GET_VARS["hostid"]);
+			while($row=DBfetch($result))
+			{
+// $$ is correct here
+				if(isset($HTTP_GET_VARS[$row["itemid"]]))
+				{
+					$result2=disable_item($row["itemid"]);
+				}
+			}
+			show_messages(TRUE,"Items disabled","Cannot disable items");
+		}
 	}
 ?>
 
@@ -287,6 +313,8 @@
 		}
 		echo "</TABLE>";
 		show_table2_header_begin();
+		echo "<input type=\"submit\" name=\"register\" value=\"Activate selected\">";
+		echo "<input type=\"submit\" name=\"register\" value=\"Disable selected\">";
 		echo "<input type=\"submit\" name=\"register\" value=\"Delete selected\">";
 		show_table2_header_end();
 		echo "</form>";
