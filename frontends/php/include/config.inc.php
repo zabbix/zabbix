@@ -28,7 +28,11 @@
 	include_once 	"include/local_en.inc.php";
 	include_once 	"include/db.inc.php";
 	include_once 	"include/html.inc.php";
+
+	include_once 	"include/audit.inc.php";
+	include_once 	"include/users.inc.php";
 	include_once 	"include/items.inc.php";
+	include_once 	"include/screens.inc.php";
 
 	function getmicrotime()
 	{
@@ -648,23 +652,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	$result;
 	}
 
-	function	get_user_by_userid($userid)
-	{
-		global	$ERROR_MSG;
-
-		$sql="select * from users where userid=$userid"; 
-		$result=DBselect($sql);
-		if(DBnum_rows($result) == 1)
-		{
-			return	DBfetch($result);	
-		}
-		else
-		{
-			$ERROR_MSG="No user with itemid=[$userid]";
-		}
-		return	$result;
-	}
-
 	function	get_usergroup_by_usrgrpid($usrgrpid)
 	{
 		global	$ERROR_MSG;
@@ -677,23 +664,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		else
 		{
 			$ERROR_MSG="No user group with usrgrpid=[$usrgrpid]";
-		}
-		return	$result;
-	}
-
-	function	get_screen_by_screenid($screenid)
-	{
-		global	$ERROR_MSG;
-
-		$sql="select * from screens where screenid=$screenid"; 
-		$result=DBselect($sql);
-		if(DBnum_rows($result) == 1)
-		{
-			return	DBfetch($result);	
-		}
-		else
-		{
-			$ERROR_MSG="No screen with screenid=[$screenid]";
 		}
 		return	$result;
 	}
@@ -2357,56 +2327,6 @@ echo "</head>";
 		return	DBexecute($sql);
 	}
 
-	# Update User definition
-
-	function	update_user($userid,$name,$surname,$alias,$passwd, $url)
-	{
-		global	$ERROR_MSG;
-
-		if(!check_right("User","U",$userid))
-		{
-			$ERROR_MSG="Insufficient permissions";
-			return 0;
-		}
-
-		if($passwd=="")
-		{
-			$sql="update users set name='$name',surname='$surname',alias='$alias',url='$url' where userid=$userid";
-		}
-		else
-		{
-			$passwd=md5($passwd);
-			$sql="update users set name='$name',surname='$surname',alias='$alias',passwd='$passwd',url='$url' where userid=$userid";
-		}
-		return DBexecute($sql);
-	}
-
-	# Add permission
-
-	function	add_permission($userid,$right,$permission,$id)
-	{
-		$sql="insert into rights (userid,name,permission,id) values ($userid,'$right','$permission',$id)";
-		return DBexecute($sql);
-	}
-
-	# Add User definition
-
-	function	add_user($name,$surname,$alias,$passwd,$url)
-	{
-		global	$ERROR_MSG;
-
-		if(!check_right("User","A",0))
-		{
-			$ERROR_MSG="Insufficient permissions";
-			return 0;
-		}
-		
-
-		$passwd=md5($passwd);
-		$sql="insert into users (name,surname,alias,passwd,url) values ('$name','$surname','$alias','$passwd','$url')";
-		return DBexecute($sql);
-	}
-
 	# Update Graph
 
 	function	update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax)
@@ -2624,20 +2544,6 @@ echo "</head>";
 		$result=DBexecute($sql);
 
 		return $result;
-	}
-
-	function	update_user_groups($usrgrpid,$users)
-	{
-		$count=count($users);
-
-		$sql="delete from users_groups where usrgrpid=$usrgrpid";
-		DBexecute($sql);
-
-		for($i=0;$i<$count;$i++)
-		{
-			$sql="insert into users_groups (usrgrpid,userid) values ($usrgrpid,".$users[$i].")";
-			DBexecute($sql);
-		}
 	}
 
 	function	update_host_groups_by_groupid($groupid,$hosts)
@@ -4226,67 +4132,6 @@ echo "</head>";
 		}
 	}
 
-
-        function        add_screen($name,$cols,$rows)
-        {
-                global  $ERROR_MSG;
-
-                if(!check_right("Screen","A",0))
-                {
-                        $ERROR_MSG="Insufficient permissions";
-                        return 0;
-                }
-
-                $sql="insert into screens (name,cols,rows) values ('$name',$cols,$rows)";
-                return  DBexecute($sql);
-        }
-
-        function        update_screen($screenid,$name,$cols,$rows)
-        {
-                global  $ERROR_MSG;
-
-                if(!check_right("Screen","U",0))
-                {
-                        $ERROR_MSG="Insufficient permissions";
-                        return 0;
-                }
-
-                $sql="update screens set name='$name',cols=$cols,rows=$rows where screenid=$screenid";
-                return  DBexecute($sql);
-        }
-
-        function        delete_screen($screenid)
-        {
-                $sql="delete from screens_items where screenid=$screenid";
-                $result=DBexecute($sql);
-                if(!$result)
-                {
-                        return  $result;
-                }
-                $sql="delete from screens where screenid=$screenid";
-                return  DBexecute($sql);
-        }
-
-        function add_screen_item($resource,$screenid,$x,$y,$resourceid,$width,$height)
-        {
-                $sql="delete from screens_items where screenid=$screenid and x=$x and y=$y";
-                DBexecute($sql);
-                $sql="insert into screens_items (resource,screenid,x,y,resourceid,width,height) values ($resource,$screenid,$x,$y,$resourceid,$width,$height)";
-                return  DBexecute($sql);
-        }
-
-        function update_screen_item($screenitemid,$resource,$resourceid,$width,$height)
-        {
-                $sql="update screens_items set resource=$resource,resourceid=$resourceid,width=$width,height=$height where screenitemid=$screenitemid";
-                return  DBexecute($sql);
-        }
-
-        function delete_screen_item($screenitemid)
-        {
-                $sql="delete from screens_items where screenitemid=$screenitemid";
-                return  DBexecute($sql);
-        }
-
         function get_drawtype_description($drawtype)
         {
 		if($drawtype==0)
@@ -4531,14 +4376,17 @@ echo "</head>";
 		ImagePNG($image);
 	}
 
-	function add_audit($action,$resource,$details)
+	function	update_user_groups($usrgrpid,$users)
 	{
-		global $USER_DETAILS;
+		$count=count($users);
 
-		$details=addslashes($details);
-		$userid=$USER_DETAILS["userid"];
-		$clock=time();
-		$sql="insert into audit (userid,clock,action,resource,details) values ($userid,$clock,$action,$resource,'$details')";
-		return DBexecute($sql);
+		$sql="delete from users_groups where usrgrpid=$usrgrpid";
+		DBexecute($sql);
+
+		for($i=0;$i<$count;$i++)
+		{
+			$sql="insert into users_groups (usrgrpid,userid) values ($usrgrpid,".$users[$i].")";
+			DBexecute($sql);
+		}
 	}
 ?>
