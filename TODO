@@ -1,6 +1,5 @@
 1.0beta12:
 
- - support for SNMP under SuSe
  - zabbix_agentd to support processor load, swap[*] and memory[*] onder AIX
  - make possible passing of parameters to user script for UserParameters
  like param[*]
