@@ -78,14 +78,8 @@
 
 <?php
 	show_table_header("GRAPHS");
-	echo "<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
-	echo "<TR BGCOLOR=\"#CCCCCC\">";
-	echo "<TD WIDTH=5% NOSAVE><B>".S_ID."</B></TD>";
-	echo "<TD><B>".S_NAME."</B></TD>";
-	echo "<TD WIDTH=5% NOSAVE><B>".S_WIDTH."</B></TD>";
-	echo "<TD WIDTH=5% NOSAVE><B>".S_HEIGHT."</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>".S_ACTIONS."</B></TD>";
-	echo "</TR>";
+	table_begin();
+	table_header(array(S_ID,S_NAME,S_WIDTH,S_HEIGHT,S_ACTIONS));
 
 	$result=DBselect("select g.graphid,g.name,g.width,g.height from graphs g order by g.name");
 	$col=0;
@@ -95,15 +89,14 @@
 		{
 			continue;
 		}
-		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
-		else		{ echo "<TR BGCOLOR=#DDDDDD>"; }
 	
-		echo "<TD>".$row["graphid"]."</TD>";
-		echo "<TD><a href=\"graph.php?graphid=".$row["graphid"]."\">".$row["name"]."</a></TD>";
-		echo "<TD>".$row["width"]."</TD>";
-		echo "<TD>".$row["height"]."</TD>";
-		echo "<TD><A HREF=\"graphs.php?graphid=".$row["graphid"]."#form\">Change</A></TD>";
-		echo "</TR>";
+		table_row(array(
+			$row["graphid"],
+			"<a href=\"graph.php?graphid=".$row["graphid"]."\">".$row["name"]."</a>",
+			$row["width"],
+			$row["height"],
+			"<A HREF=\"graphs.php?graphid=".$row["graphid"]."#form\">Change</A>"
+			),$col++);
 	}
 	if(DBnum_rows($result)==0)
 	{
@@ -111,7 +104,7 @@
 		echo "<TD COLSPAN=5 ALIGN=CENTER>".S_NO_GRAPHS_DEFINED."</TD>";
 		echo "<TR>";
 	}
-	echo "</TABLE>";
+	table_end();
 ?>
 
 <?php
