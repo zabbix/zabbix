@@ -3739,7 +3739,7 @@ echo "</head>";
 <?php
 		if($help!="")
 		{
-			echo "<a style=\"float:right\" href=\"http://www.zabbix.com/manual/v1.1/web.$help.php\">?</a>";
+			echo "<a style=\"float:right\" href=\"http://www.zabbix.com/manual/v1.1/web.$help.php\"><img src=\"images/general/help.gif\" border=0 alt=\"?\"></a>";
 		}
 	}
 
