@@ -127,7 +127,7 @@
 		$expression=implode_exp($expression,$triggerid);
 		$sql="update triggers set expression='$expression' where triggerid=$triggerid";
 #		echo $sql,"<br>";
-		$triggerid=DBexecute($sql);
+		DBexecute($sql);
 		reset_items_nextcheck($triggerid);
 		return $triggerid;
 	}
@@ -356,18 +356,50 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 			return;
 		}
-/*
-		$sql="select hostid,templateid,items from hosts_templates where templateid=".$item["hostid"];
+
+		$row=DBfetch($result);
+
+		$hostid=$row["hostid"];
+
+		$sql="select hostid,templateid,items from hosts_templates where templateid=$hostid";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
-			if($row["items"]&1 == 0)	continue;
-			$sql="select itemid from items where key_=\"".$item["key_"]."\" and hostid=".$row["hostid"];
+			if($row["triggers"]&1 == 0)	continue;
+
+			$sql="insert into triggers  (description,priority,status,comments,url,value,expression) values ('".addslashes($trigger["description"])."',".$trigger["priority"].",".$trigger["status"].",'".addslashes($trigger["comments"])."','".addslashes($trigger["url"])."',2,'".$trigger["expression"]."')";
+			$result4=DBexecute($sql);
+			$triggerid_new=DBinsert_id($result4,"triggers","triggerid");
+
+
+			$sql="select i.key_,f.parameter,f.function,f.functionid from functions f,items i where i.itemid=f.itemid and f.triggerid=$triggerid";
 			$result2=DBselect($sql);
-			if(DBnum_rows($result2)==0)
+			while($row2=DBfetch($result2))
 			{
-				add_item($item["description"],$item["key_"],$row["hostid"],$item["delay"],$item["history"],$item["status"],$item["type"],$item["snmp_community"],$item["snmp_oid"],$item["value_type"],$item["trapper_hosts"],$item["snmp_port"],$item["units"],$item["multiplier"],$item["delta"],$item["snmpv3_securityname"],$item["snmpv3_securitylevel"],$item["snmpv3_authpassphrase"],$item["snmpv3_privpassphrase"],$item["formula"],$item["trends"]);
+				$sql="select itemid from items where key_=\"".$row2["key_"]."\" and hostid=".$row["hostid"];
+				$result3=DBselect($sql);
+				if(DBnum_rows($result3)!=1)
+				{
+					$sql="delete from triggers where triggerid=$triggerid_new";
+					DBexecute($sql);
+					$sql="delete from functions where triggerid=$triggerid_new";
+					DBexecute($sql);
+					break;
+				}
+				$row3=DBfetch($result3);
+
+				$item=get_item_by_itemid($row3["itemid"]);
+
+				$sql="insert into functions (itemid,triggerid,function,parameter) values (".$item["itemid"].",$triggerid_new,'".$row2["function"]."','".$row2["parameter"]."')";
+				$result4=DBexecute($sql);
+				$functionid=DBinsert_id($result4,"functions","functionid");
+
+				$sql="update triggers set expression='".$trigger["expression"]."' where triggerid=$triggerid_new";
+				DBexecute($sql);
+				$expression=str_replace("{".$row2["functionid"]."}","{".$functionid."}",$trigger["expression"]);
+				$sql="update triggers set expression='$expression' where triggerid=$triggerid_new";
+				DBexecute($sql);
 			}
-		}*/
+		}
 	}
 ?>
