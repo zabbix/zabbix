@@ -24,13 +24,13 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.13)
+Zabbix Reference Manual for version 1.0 (draft v1.14)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-11 May 2002
+12 May 2002
 \layout Abstract
 
 The document is Reference Manual for Zabbix version 1.0.
@@ -1919,6 +1919,62 @@ IMPORTANT.
 
 IMPORTANT.
  Added support for non-numeric values.
+\layout Itemize
+
+IMPORTANT.
+ Added support for non-syslog logging.
+\layout Itemize
+
+IMPORTANT.
+ Changed definition of parameter DebugLevel!
+\layout Itemize
+
+IMPORTANT.
+ New improved algorithm of audible notification.
+\layout Itemize
+
+IMPORTANT.
+ Added support for flexible permisions.
+\layout Itemize
+
+Added new parameters: check_service[http],system[uname],system[hostname],version
+[zabbix_agent]
+\layout Itemize
+
+diskfree[*] will return free disk space in Kb
+\layout Itemize
+
+Added suppor for system[uptime],kern[maxfiles],kern[maxproc] of FreeBSD
+\layout Itemize
+
+zabbix_trapperd cannot be ran as root
+\layout Itemize
+
+IP address can be used for SNMP-enabled hosts
+\layout Itemize
+
+New configuration file parameters: Timeout, LogFile, NoTimeWait,PidFile,DBConnec
+tOnEach
+\layout Itemize
+
+Already existing host can be used as a template for new one
+\layout Itemize
+
+Added time legend for simple graph
+\layout Itemize
+
+Added support for inverse select in form 
+\begin_inset Quotes eld
+\end_inset 
+
+Status of Triggers
+\begin_inset Quotes erd
+\end_inset 
+
+
+\layout Itemize
+
+Parameter Server is comma-delimited list of Zabbix servers
 \layout Subsection
 
 ChangeLog
@@ -3192,7 +3248,7 @@ zabbix_suckerd
 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="10" columns="4">
+<lyxtabular version="2" rows="11" columns="4">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
@@ -3307,6 +3363,41 @@ Number of zabbix_suckerd to start
 
 \layout Standard
 
+Timeout
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+No
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+5
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Do not spend more than Timeout seconds on retrieving requested value (1-255).
+ 
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
 DebugLevel
 \end_inset 
 </cell>
@@ -3323,7 +3414,7 @@ No
 
 \layout Standard
 
-2
+3
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -3331,7 +3422,7 @@ No
 
 \layout Standard
 
-Debug level 
+Debug level ( 0 - none, 1 - critical, 2 - error, 3 - warnings, 4 - debug)
 \end_inset 
 </cell>
 </row>
@@ -3640,7 +3731,7 @@ Yes
 
 \layout Standard
 
-IP address of Zabbix server.
+Comma-delimited list of IP addresses of Zabbix servers.
  Connections from other IP addresses will be rejected.
 \end_inset 
 </cell>
@@ -3735,7 +3826,7 @@ No
 
 \layout Standard
 
-2
+3
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -3743,7 +3834,7 @@ No
 
 \layout Standard
 
-Debug level 
+Debug level ( 0 - none, 1 - critical, 2 - error, 3 - warnings, 4 - debug)
 \end_inset 
 </cell>
 </row>
@@ -3769,7 +3860,7 @@ No
 
 \layout Standard
 
-/tmp/zabbix_agentd.conf
+/tmp/zabbix_agentd.pid
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -3846,7 +3937,7 @@ No
 
 \layout Standard
 
-Experimntal parameter.
+Experimental parameter.
  If set, no sockets in TIME_WAIT state will exist.
  Works on FreeBSD.
 \end_inset 
@@ -3927,7 +4018,7 @@ zabbix_agent
 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="3" columns="4">
+<lyxtabular version="2" rows="4" columns="4">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="true" width="" special="">
@@ -3997,8 +4088,42 @@ Yes
 
 \layout Standard
 
-IP address of Zabbix server.
+Comme-delimited list of IP addresses of Zabbix servers.
  Connections from other IP addresses will be rejected.
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Timeout
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+No
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+3
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Do not spend more than Timeout seconds on getting requested value (1-255).
 \end_inset 
 </cell>
 </row>
@@ -4077,7 +4202,7 @@ zabbix_trapper
 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="6" columns="4">
+<lyxtabular version="2" rows="8" columns="4">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
@@ -4139,7 +4264,7 @@ No
 
 \layout Standard
 
-2
+3
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -4147,7 +4272,7 @@ No
 
 \layout Standard
 
-Debug level
+Debug level ( 0 - none, 1 - critical, 2 - error, 3 - warnings, 4 - debug)
 \end_inset 
 </cell>
 </row>
@@ -4183,6 +4308,76 @@ No
 
 Name of log file.
  If not set, syslog is used.
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Timeout
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+No
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+5
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Do not spend more than Timeout seconds on processing received value (1-255).
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+NoTimeWait
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+No
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+-
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Experimental parameter.
+ If set, no sockets in TIME_WAIT state will exist.
+ Works on FreeBSD.
 \end_inset 
 </cell>
 </row>
@@ -4316,7 +4511,7 @@ zabbix_trapperd
 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="10" columns="4">
+<lyxtabular version="2" rows="11" columns="4">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
@@ -4378,7 +4573,7 @@ No
 
 \layout Standard
 
-2
+3
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -4386,7 +4581,7 @@ No
 
 \layout Standard
 
-Debug level
+Debug level( 0 - none, 1 - critical, 2 - error, 3 - warnings, 4 - debug)
 \end_inset 
 </cell>
 </row>
@@ -4430,6 +4625,40 @@ Port to listen
 
 \layout Standard
 
+Timeout
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+No
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+5
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Do not spend more that Timeout seconds on processing received value (1-255).
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
 PidFile
 \end_inset 
 </cell>
@@ -4446,7 +4675,7 @@ No
 
 \layout Standard
 
-/tmp/zabbix_trapperd.conf
+/tmp/zabbix_trapperd.pid
 \end_inset 
 </cell>
 <cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
@@ -5606,7 +5835,7 @@ Supported Parameters by Platform
 \size footnotesize 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="41" columns="7">
+<lyxtabular version="2" rows="42" columns="7">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="15mm" special="">
@@ -8255,6 +8484,64 @@ X
 
 \layout Standard
 
+version[zabbix_agent]
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+X
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
 
 \lang english
 ping
@@ -10597,7 +10884,7 @@ This table contains definitions of monitored items.
 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="16" columns="3">
+<lyxtabular version="2" rows="17" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
@@ -10677,6 +10964,32 @@ int
 \layout Standard
 
 Type of item: 0 - Zabbix, 1 - SNMPv1
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+value_type
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Type of received values (0 - float, 1 - string)
 \end_inset 
 </cell>
 </row>
@@ -11383,7 +11696,8 @@ int
 
 \layout Standard
 
-0 - expression is false, 1 - expression is true, 2 - disabled
+0 - expression is false, 1 - expression is true, 2 - disabled, 3 - unknown
+ status
 \end_inset 
 </cell>
 </row>
@@ -12010,7 +12324,7 @@ The table contains list of supported items.
 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="5" columns="3">
+<lyxtabular version="2" rows="6" columns="3">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="left" valignment="top" leftline="true" rightline="false" width="35mm" special="">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
@@ -12116,6 +12430,32 @@ int
 \layout Standard
 
 Key to send to host
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+value_type
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+int
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Type of monitored parameter( 0 - integer, 1 - string)
 \end_inset 
 </cell>
 </row>
