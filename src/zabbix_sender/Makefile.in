@@ -2,7 +2,7 @@
 
 all:
 
-	@CC@ @LIBS@ @CFLAGS@ -ggdb -I /usr/include/mysql -I../../include  -L/usr/lib/mysql zabbix_sender.c ../../include/debug.c ../../include/db.c -o zabbix_sender -Wall
+	@CC@ @LIBS@ @CFLAGS@ -ggdb -I /usr/include/mysql -I../../include  -L/usr/lib/mysql zabbix_sender.c ../../include/db.c -o zabbix_sender -Wall
 	strip zabbix_sender
 
 clean:

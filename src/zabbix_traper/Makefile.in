@@ -2,7 +2,7 @@
 
 all:
 
-	@CC@ @LIBS@ @CFLAGS@ -ggdb -I /usr/include/mysql -I../../include  -L/usr/lib/mysql zabbix_traper.c ../../include/debug.c ../../include/db.c ../../include/functions.c -o zabbix_traper -Wall
+	@CC@ @LIBS@ @CFLAGS@ -ggdb -I /usr/include/mysql -I../../include  -L/usr/lib/mysql zabbix_traper.c ../../include/db.c ../../include/functions.c -o zabbix_traper -Wall
 	strip zabbix_traper
 
 clean:
