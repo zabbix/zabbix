@@ -1,5 +1,6 @@
 Changes for 1.0beta10:
 
+ - support for memory[free] and memory[total] under Solaris (Alexei)
  - fixed compilation of the agent under FreeBSD (Alexei)
 
 Changes for 1.0beta9:

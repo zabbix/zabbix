@@ -107,6 +107,21 @@ AC_DEFINE(HAVE_SYSINFO_FREESWAP)
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
+dnl Check for function sysconf in unistd.h
+AC_MSG_CHECKING(for function sysconf() in unistd.h)
+AC_TRY_COMPILE(
+[
+#include <unistd.h>
+],
+[	int i;
+
+	i=sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PHYS_PAGES);
+	i=sysconf(_SC_AVPHYS_PAGES)*sysconf(_SC_PHYS_PAGES);
+],
+AC_DEFINE(HAVE_UNISTD_SYSCONF)
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
 dnl Check for vmtotal in sys/vmmeter.h
 AC_MSG_CHECKING(for vmtotal in struct sys/vmmeter.h)
 AC_TRY_COMPILE(
