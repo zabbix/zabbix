@@ -33,6 +33,7 @@ suckerd and agentd)
 
 LS:
 
+ - update trigger value immediately after add or update
  - graphs. Dobavljatj item so smescheniem vo vremeni
  - check permissions for zabbix_agentd when started under root
  - add item to group (not to all)
