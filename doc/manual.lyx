@@ -71,6 +71,9 @@ alex@gobbo.caves.lv
 
 \latex default 
  
+\layout Standard
+
+
 \series bold 
 Zabbix
 \series default 
@@ -130,7 +133,11 @@ Zabbix
 \series default 
 \latex no_latex 
  reports and statistics, as well as configuration parameters, are accessed
- through a web-based front-end.
+ through a web-based front
+\latex default 
+ 
+\latex no_latex 
+end.
 
 \latex default 
  
@@ -140,6 +147,9 @@ The web-based front end means that the health of your servers can be assessed
 
 \latex default 
  
+\layout Standard
+
+
 \latex no_latex 
 Properly configured, 
 \series bold 
@@ -152,6 +162,9 @@ Zabbix
 
 \latex default 
  
+\layout Standard
+
+
 \series bold 
 Zabbix
 \series default 
@@ -548,11 +561,14 @@ Zabbix
  sources.
 \newline 
 On Linux, use command 
+\family typewriter 
 \emph on 
 tar -xvzf <zabbix.tar.gz>
+\family default 
 \emph default 
 .
  On other systems, try 
+\family typewriter 
 \emph on 
 gunzip zabbix.tar.gz; tar xvf zabbix.tar
 \layout Enumerate
@@ -573,6 +589,9 @@ Zabbix
 For MySQL: 
 \newline 
 
+\newline 
+
+\family typewriter 
 \emph on 
 mysql -u<username> -p<password> 
 \newline 
@@ -587,6 +606,7 @@ cat schema.sql |mysql zabbix -u<username> -p<password>
 cd create/data 
 \newline 
 cat data.sql |mysql zabbix -u<username> -p<password> 
+\family default 
 \emph default 
 
 \newline 
@@ -595,6 +615,9 @@ cat data.sql |mysql zabbix -u<username> -p<password>
 For PostgreSQL:
 \newline 
 
+\newline 
+
+\family typewriter 
 \emph on 
 psql -U <username> 
 \newline 
@@ -617,6 +640,8 @@ Configure include/db.h
 \newline 
 Change the following parameters:
 \newline 
+
+\family typewriter 
 #define DB_NAME "zabbix" 
 \newline 
 #define DB_USER "zabbix" 
@@ -634,16 +659,21 @@ To configure the source for the server, you must specify which database
  will be used.
 \newline 
 
+\family typewriter 
 \emph on 
 ./configure --with-mysql # for MySQL 
+\family default 
 \emph default 
 
 \newline 
 or 
 \newline 
 
+\family typewriter 
 \emph on 
 ./configure --with-pgsql # for PostgreSQL make
+\family default 
+
 \newline 
 
 \newline 
@@ -652,8 +682,11 @@ or
 However, if you want to compile client binaries only, run:
 \newline 
 
+\family typewriter 
 \emph on 
 ./configure make
+\family default 
+
 \newline 
 
 \emph default 
@@ -691,6 +724,7 @@ On the client (monitored) machines, add the following lines to
 :
 \newline 
 
+\family typewriter 
 \emph on 
 zabbix_agent 10000/tcp 
 \newline 
@@ -711,8 +745,11 @@ If you are going to use trapping instead of the recommended client-server
 :
 \newline 
 
+\family typewriter 
 \emph on 
 zabbix_trap stream tcp nowait.3600 zabbix /opt/zabbix/bin/zabbix_trapper
+\family default 
+
 \newline 
 
 \emph default 
@@ -727,6 +764,7 @@ zabbix_agentd
 , the following line must be added:
 \newline 
 
+\family typewriter 
 \emph on 
 zabbix_agent stream tcp nowait.3600 zabbix /opt/zabbix/bin/zabbix_agent
 \layout Enumerate
@@ -736,6 +774,7 @@ Restart
 inetd
 \newline 
 
+\family typewriter 
 \series default 
 \emph on 
 killall -HUP inetd
@@ -755,6 +794,10 @@ frontends/php/include/db.inc
 \emph default 
 : 
 \newline 
+
+\newline 
+
+\family typewriter 
 $DB_TYPE ="POSTGRESQL"; /* Or "MYSQL" for MySQL */ 
 \newline 
 $DB_SERVER ="localhost"; 
@@ -764,6 +807,8 @@ $DB_DATABASE ="zabbix";
 $DB_USER =""; 
 \newline 
 $DB_PWD =""
+\family default 
+
 \newline 
 
 \newline 
@@ -784,6 +829,9 @@ Copy the PHP source files to a place where your web server can get to it.
  For example, 
 \newline 
 
+\newline 
+
+\family typewriter 
 \emph on 
 mkdir /home/zabbix/html 
 \newline 
@@ -799,6 +847,7 @@ By default, Apache does not recognize *.html files as PHP scripts.
  that every *.html file is actually PHP script that should be interpreted:
 \newline 
 
+\family typewriter 
 \emph on 
 AddType application/x-httpd-php .html
 \layout Enumerate
@@ -920,8 +969,15 @@ zabbix_suckerd
  on the server machine:
 \newline 
 
+\newline 
+
+\family typewriter 
 \emph on 
 /opt/zabbix/bin/zabbix_suckerd
+\family default 
+
+\newline 
+
 \newline 
 
 \emph default 
@@ -932,8 +988,15 @@ zabbix_agentd
  on all monitored machines 
 \newline 
 
+\newline 
+
+\family typewriter 
 \emph on 
 /opt/zabbix/bin/zabbix_agentd
+\family default 
+
+\newline 
+
 \newline 
 
 \emph default 
@@ -989,9 +1052,12 @@ Go to the upgrades/dbpatches directory.
  through multiple versions, you will need to apply the upgrades one at a
  time).
  Depending on which database you use:
+\newline 
+
 \layout Standard
 
 
+\family typewriter 
 \emph on 
 cd mysql cat patch.sql |mysql zabbix -u<username> -p<password>
 \layout Standard
@@ -1000,8 +1066,11 @@ or
 \layout Standard
 
 
+\family typewriter 
 \emph on 
 cd postgresql cat patch.sql|psql -U <username> zabbix
+\newline 
+
 \layout Standard
 
 Finally, read version specific notes below for any extra procedures.
@@ -1054,6 +1123,9 @@ PostgreSQL does not support modifying the structure of table fields.
  code):
 \newline 
 
+\newline 
+
+\family typewriter 
 \emph on 
 alter table users modify passwd char(32) default '' not null;
 \newline 
