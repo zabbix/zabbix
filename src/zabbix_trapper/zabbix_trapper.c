@@ -30,6 +30,7 @@
 char	*CONFIG_DBNAME		= NULL;
 char	*CONFIG_DBUSER		= NULL;
 char	*CONFIG_DBPASSWORD	= NULL;
+char	*CONFIG_DBSOCKET	= NULL;
 
 void	signal_handler( int sig )
 {
@@ -120,6 +121,10 @@ void	process_config_file(void)
 		{
 			CONFIG_DBPASSWORD=strdup(value);
 		}
+		else if(strcmp(parameter,"DBSocket")==0)
+		{
+			CONFIG_DBSOCKET=strdup(value);
+		}
 		else
 		{
 			syslog( LOG_CRIT, "Unsupported parameter [%s] Line %d", parameter, lineno);
@@ -185,7 +190,7 @@ int	main()
 	value=atof(value_string);
 
 
-	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD);
+	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
 
 	ret=process_data(server,key,value);
 

@@ -1,6 +1,8 @@
 #ifndef MON_DB_H
 #define MON_DB_H
 
+/* time_t */
+#include <time.h>
 #include "config.h"
 
 #ifdef HAVE_MYSQL
@@ -93,7 +95,7 @@ DB_ACTION
 };
 
 
-void    DBconnect( char *dbname, char *dbuser, char *dbpassword);
+void    DBconnect( char *dbname, char *dbuser, char *dbpassword, char *dbsocket);
 
 int	DBexecute( char *query );
 
