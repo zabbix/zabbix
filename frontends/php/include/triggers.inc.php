@@ -338,4 +338,36 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 		return	TRUE;
 	}
+
+	# Add item to hardlinked hosts
+
+	function	add_trigger_to_templates($triggerid)
+	{
+		if($triggerid<=0)
+		{
+			return;
+		}
+
+		$trigger=get_trigger_by_triggerid($triggerid);
+
+		$sql="select distinct h.hostid from hosts h,functions f, items i where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid=$triggerid";
+		$result=DBselect($sql);
+		if(DBnum_rows($result)!=1)
+		{
+			return;
+		}
+/*
+		$sql="select hostid,templateid,items from hosts_templates where templateid=".$item["hostid"];
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			if($row["items"]&1 == 0)	continue;
+			$sql="select itemid from items where key_=\"".$item["key_"]."\" and hostid=".$row["hostid"];
+			$result2=DBselect($sql);
+			if(DBnum_rows($result2)==0)
+			{
+				add_item($item["description"],$item["key_"],$row["hostid"],$item["delay"],$item["history"],$item["status"],$item["type"],$item["snmp_community"],$item["snmp_oid"],$item["value_type"],$item["trapper_hosts"],$item["snmp_port"],$item["units"],$item["multiplier"],$item["delta"],$item["snmpv3_securityname"],$item["snmpv3_securitylevel"],$item["snmpv3_authpassphrase"],$item["snmpv3_privpassphrase"],$item["formula"],$item["trends"]);
+			}
+		}*/
+	}
 ?>
