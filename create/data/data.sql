@@ -191,7 +191,7 @@ insert into triggers_template (triggertemplateid,itemtemplateid,description,expr
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (26,26,'Low free disk space on %s\'s volume /opt','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (27,27,'%s have just been restarted','{:.last(0)}<600');
+	values (27,27,'%s has just been restarted','{:.last(0)}<600');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (39,39,'Email (SMTP) server is down on %s','{:.last(0)}<1');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)

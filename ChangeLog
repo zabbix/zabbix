@@ -1,8 +1,16 @@
 Changes for 1.0alpha12:
 
+ - added version (draft 1.01) to manual.lyx
+ - character '-' can be used to form server name (Alexei)
+ - fixed dependencies in functions that delete information for zabbix tables (Alexei)
+ - fixed function is_float (Alexei)
+ - fixed select statement for Network Maps. Host status is correct. (Alexei) 
+ - availability report will not show not monitored hosts (Alexei)
+ - "maxumum" changed to "maximum" in actions.html (Alexei)
+ - "have been restarted" changed to "has been ..." (Alexei)
+
  - added support for opertor '=' (Alexei)
  - changes in timeout handling for zabbix_trapperd (Alexei)
-
  - changes in doc/manual.lyx (Alexei)
  - doc/manual.lyx created (Alexei)
  - no SA_RESTART flag for sigaction() (Alexei)
