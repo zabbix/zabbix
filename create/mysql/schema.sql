@@ -310,7 +310,7 @@ CREATE TABLE items (
 	snmpv3_authpassphrase	varchar(64) DEFAULT '' NOT NULL,
 	snmpv3_privpassphrase	varchar(64) DEFAULT '' NOT NULL,
 
-	formula		varchar(255) DEFAULT '{.last(0)}' NOT NULL,
+	formula		varchar(255) DEFAULT '0' NOT NULL,
 
 	PRIMARY KEY	(itemid),
 	UNIQUE		shortname (hostid,key_),
