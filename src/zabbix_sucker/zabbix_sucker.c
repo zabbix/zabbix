@@ -15,9 +15,13 @@
 #include <syslog.h>
 
 /* Required for SNMP support*/
+#ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
+
 #include <ucd-snmp/ucd-snmp-config.h>
 #include <ucd-snmp/ucd-snmp-includes.h>
 #include <ucd-snmp/system.h>
+
+#endif
 
 #include "common.h"
 #include "db.h"
@@ -72,6 +76,7 @@ void	daemon_init(void)
 	}
 }
 
+#ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
 int	get_value_SNMPv1(double *result,DB_ITEM *item)
 {
 	struct snmp_session session, *ss;
@@ -190,6 +195,7 @@ int	get_value_SNMPv1(double *result,DB_ITEM *item)
 	SOCK_CLEANUP;
 	return SUCCEED;
 }
+#endif
 
 int	get_value_zabbix(double *result,DB_ITEM *item)
 {
@@ -298,10 +304,12 @@ int	get_value(double *result,DB_ITEM *item)
 	{
 		return get_value_zabbix(result,item);
 	}
+#ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
 	else if(item->type == ITEM_TYPE_SNMP)
 	{
 		return get_value_SNMPv1(result,item);
 	}
+#endif
 	else
 	{
 		*result=NOTSUPPORTED;
@@ -497,7 +505,9 @@ int main(int argc, char **argv)
 
 	syslog( LOG_WARNING, "zabbix_sucker #%d started",sucker_num);
 
+#ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
 	init_snmp("zabbix_sucker");
+#endif
 
 	DBconnect();
 
