@@ -14,6 +14,14 @@
 
 	echo "<font size=2>";
 
+	if(isset($type)&&$type=="12hours")
+	{
+		echo "<b>[<a href='trends.html?itemid=$itemid&type=12hours'>12hours</a>]</b> ";
+	}
+	else
+	{
+		echo "<a href='trends.html?itemid=$itemid&type=12hours'>12hours</a> ";
+	}
 	if(isset($type)&&$type=="4hours")
 	{
 		echo "<b>[<a href='trends.html?itemid=$itemid&type=4hours'>4hours</a>]</b> ";
