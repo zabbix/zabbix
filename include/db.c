@@ -712,6 +712,9 @@ void DBdelete_host(int hostid)
 
 	DBdelete_sysmaps_hosts_by_hostid(hostid);
 
+	snprintf(sql,sizeof(sql)-1,"delete from actions where triggerid=%d and scope=%d", hostid, ACTION_SCOPE_HOST);
+	DBexecute(sql);
+
 	snprintf(sql,sizeof(sql)-1,"delete from hosts_groups where hostid=%d", hostid);
 	DBexecute(sql);
 
