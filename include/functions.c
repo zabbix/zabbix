@@ -43,6 +43,34 @@
 #include "functions.h"
 #include "expression.h"
 
+/* Delete trailing zeroes */
+/* 10.0100 -> 10.01, 10. -> 10 */
+void del_zeroes(char *s)
+{
+	int     i;
+
+	if(strchr(s,'.')!=NULL)
+	{
+		for(i=strlen(s)-1;;i--)
+		{
+			if(s[i]=='0')
+			{
+				s[i]=0;
+			}
+			else if(s[i]=='.')
+			{
+				s[i]=0;
+				break;
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+}
+
+
 /*
  * Evaluate function COUNT
  */ 
@@ -142,6 +170,7 @@ int	evaluate_AVG(char *value,DB_ITEM	*item,int parameter)
 	else
 	{
 		strcpy(value,DBget_field(result,0,0));
+		del_zeroes(value);
 	}
 	DBfree_result(result);
 
@@ -177,6 +206,7 @@ int	evaluate_MIN(char *value,DB_ITEM	*item,int parameter)
 	else
 	{
 		strcpy(value,DBget_field(result,0,0));
+		del_zeroes(value);
 	}
 	DBfree_result(result);
 
@@ -212,6 +242,7 @@ int	evaluate_MAX(char *value,DB_ITEM *item,int parameter)
 	else
 	{
 		strcpy(value,DBget_field(result,0,0));
+		del_zeroes(value);
 	}
 	DBfree_result(result);
 
@@ -247,6 +278,7 @@ int	evaluate_DELTA(char *value,DB_ITEM *item,int parameter)
 	else
 	{
 		strcpy(value,DBget_field(result,0,0));
+		del_zeroes(value);
 	}
 	DBfree_result(result);
 
@@ -276,6 +308,7 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 			{
 				zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 1");
 				snprintf(value,MAX_STRING_LEN-1,"%f",item->lastvalue);
+				del_zeroes(value);
 				zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 2");
 			}
 			else
@@ -298,6 +331,7 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 			if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
 			{
 				snprintf(value,MAX_STRING_LEN-1,"%f",item->prevvalue);
+				del_zeroes(value);
 			}
 			else
 			{
@@ -356,6 +390,7 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 			if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
 			{
 				snprintf(value,MAX_STRING_LEN-1,"%f",(float)abs(item->lastvalue-item->prevvalue));
+				del_zeroes(value);
 			}
 			else
 			{
@@ -381,6 +416,7 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 			if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
 			{
 				snprintf(value,MAX_STRING_LEN-1,"%f",item->lastvalue-item->prevvalue);
+				del_zeroes(value);
 			}
 			else
 			{
@@ -456,6 +492,7 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 		zabbix_log( LOG_LEVEL_WARNING, "Unsupported function:%s",function);
 		ret = FAIL;
 	}
+
 	zabbix_log( LOG_LEVEL_DEBUG, "End of evaluate_FUNCTION. Result [%s]",value);
 	return ret;
 }

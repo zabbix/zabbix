@@ -1,7 +1,6 @@
 1.0:
 
  - add support for system[proccount] under FreeBSD
- - get rid of .0000000 in alert messages
  - cannot use "." as key in trigger expressions
  - navigation bar for all graphs and screens
 
