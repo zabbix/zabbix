@@ -116,9 +116,9 @@
 	show_table_header("DISPLAYED HOSTS");
 	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TD WIDTH=10% NOSAVE><B>Host</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>Label</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>X</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>Y</B></TD>";
+	echo "<TD><B>Label</B></TD>";
+	echo "<TD WIDTH=5% NOSAVE><B>X</B></TD>";
+	echo "<TD WIDTH=5% NOSAVE><B>Y</B></TD>";
 	echo "<TD WIDTH=10% NOSAVE><B>Icon</B></TD>";
 	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
