@@ -30,3 +30,5 @@ update hosts set available=1 where status=0;
 update hosts set available=2 where status=2;
 
 update hosts set status=0 where status=2;
+
+alter table sysmaps add  label_type	int4	DEFAULT '0' NOT NULL;

@@ -372,6 +372,7 @@ CREATE TABLE sysmaps (
   width			int4		DEFAULT '0' NOT NULL,
   height		int4		DEFAULT '0' NOT NULL,
   background		varchar(64)	DEFAULT '' NOT NULL,
+  label_type		int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (sysmapid)
 );
 

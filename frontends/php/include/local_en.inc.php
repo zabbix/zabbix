@@ -376,6 +376,11 @@
 	define("S_NO_MAPS_TO_DISPLAY",			"No maps to display");
 	define("S_SELECT_MAP_TO_DISPLAY",		"Select map to display");
 	define("S_SELECT_MAP_DOT_DOT_DOT",		"Select map...");
+	define("S_BACKGROUND_IMAGE",			"Background image");
+	define("S_ICON_LABEL_TYPE",			"Icon label type");
+	define("S_HOST_LABEL",				"Host label");
+	define("S_HOST_NAME",				"Host name");
+	define("S_NOTHING",				"Nothing");
 
 //	media.php
 	define("S_MEDIA",				"Media");

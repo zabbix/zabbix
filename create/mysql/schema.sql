@@ -124,6 +124,7 @@ CREATE TABLE sysmaps (
   width			int(4)		DEFAULT '0' NOT NULL,
   height		int(4)		DEFAULT '0' NOT NULL,
   background		varchar(64)	DEFAULT '' NOT NULL,
+  label_type		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (sysmapid),
   UNIQUE (name)
 ) type=InnoDB;

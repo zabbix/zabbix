@@ -2992,7 +2992,7 @@ echo "</head>";
 
 	# Update System Map
 
-	function	update_sysmap($sysmapid,$name,$width,$height,$background)
+	function	update_sysmap($sysmapid,$name,$width,$height,$background,$label_type)
 	{
 		global	$ERROR_MSG;
 
@@ -3002,7 +3002,7 @@ echo "</head>";
 			return 0;
 		}
 
-		$sql="update sysmaps set name='$name',width=$width,height=$height,background='$background' where sysmapid=$sysmapid";
+		$sql="update sysmaps set name='$name',width=$width,height=$height,background='$background',label_type=$label_type where sysmapid=$sysmapid";
 		return	DBexecute($sql);
 	}
 
@@ -3036,7 +3036,7 @@ echo "</head>";
 
 	# Add System Map
 
-	function	add_sysmap($name,$width,$height,$background)
+	function	add_sysmap($name,$width,$height,$background,$label_type)
 	{
 		global	$ERROR_MSG;
 
@@ -3046,7 +3046,7 @@ echo "</head>";
 			return 0;
 		}
 
-		$sql="insert into sysmaps (name,width,height,background) values ('$name',$width,$height,'$background')";
+		$sql="insert into sysmaps (name,width,height,background,label_type) values ('$name',$width,$height,'$background',$label_type)";
 		return	DBexecute($sql);
 	}
 
