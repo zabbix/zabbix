@@ -26,6 +26,7 @@ snmpget -On localhost public enterprises.ucdavis.memory.memTotalSwap.0]
 
 Changes for 1.0beta4:
 
+ - added index triggers.value and trigger.status (Alexei)
  - added column alarms.value (Alexei)
  - removed column alarms.istrue (Alexei)
  - added columns triggers.status (Alexei)
