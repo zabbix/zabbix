@@ -142,7 +142,6 @@ CREATE TABLE items (
 	type		int(4) DEFAULT '0' NOT NULL,
 	snmp_community	varchar(64) DEFAULT '' NOT NULL,
 	snmp_oid	varchar(255) DEFAULT '' NOT NULL,
-	description	varchar(255) DEFAULT '' NOT NULL,
 	hostid		int(4) NOT NULL,
 	description	varchar(255) DEFAULT '' NOT NULL,
 	key_		varchar(64) DEFAULT '' NOT NULL,
