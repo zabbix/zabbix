@@ -41,12 +41,12 @@
 	{
 		if($HTTP_GET_VARS["register"]=="add")
 		{
-			$result=add_action( $HTTP_GET_VARS["triggerid"], $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["good"], $HTTP_GET_VARS["delay"], $HTTP_GET_VARS["subject"], $HTTP_GET_VARS["message"],$HTTP_GET_VARS["scope"],$HTTP_GET_VARS["severity"]);
+			$result=add_action( $HTTP_GET_VARS["triggerid"], $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["good"], $HTTP_GET_VARS["delay"], $HTTP_GET_VARS["subject"], $HTTP_GET_VARS["message"],$HTTP_GET_VARS["scope"],$HTTP_GET_VARS["severity"],$HTTP_GET_VARS["recipient"],$HTTP_GET_VARS["usrgrpid"]);
 			show_messages($result,"Action added","Cannot add action");
 		}
 		if($HTTP_GET_VARS["register"]=="update")
 		{
-			$result=update_action( $HTTP_GET_VARS["actionid"], $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["good"], $HTTP_GET_VARS["delay"], $HTTP_GET_VARS["subject"], $HTTP_GET_VARS["message"],$HTTP_GET_VARS["scope"],$HTTP_GET_VARS["severity"]);
+			$result=update_action( $HTTP_GET_VARS["actionid"], $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["good"], $HTTP_GET_VARS["delay"], $HTTP_GET_VARS["subject"], $HTTP_GET_VARS["message"],$HTTP_GET_VARS["scope"],$HTTP_GET_VARS["severity"],$HTTP_GET_VARS["recipient"],$HTTP_GET_VARS["usrgrpid"]);
 			show_messages($result,"Action updated","Cannot update action");
 			unset($HTTP_GET_VARS["actionid"]);
 		}
@@ -152,7 +152,7 @@
 		$subject=$description;
 		$scope=@iif(isset($HTTP_GET_VARS["scope"]),$HTTP_GET_VARS["scope"],0);
 		$good=@iif(isset($HTTP_GET_VARS["good"]),$HTTP_GET_VARS["good"],1);
-		$whom=@iif(isset($HTTP_GET_VARS["whom"]),$HTTP_GET_VARS["whom"],0);
+		$recipient=@iif(isset($HTTP_GET_VARS["recipient"]),$HTTP_GET_VARS["recipient"],1);
 		$severity=0;
 
 		$sql="select i.description, h.host, i.key_ from hosts h, items i,functions f where f.triggerid=".$HTTP_GET_VARS["triggerid"]." and h.hostid=i.hostid and f.itemid=i.itemid order by i.description";
@@ -179,13 +179,13 @@
 	}
 	echo nbsp("Send message to");
 	show_table2_h_delimiter();
-	echo "<select class=\"biginput\" name=\"whom\" size=\"1\" onChange=\"submit()\">";
+	echo "<select class=\"biginput\" name=\"recipient\" size=\"1\" onChange=\"submit()\">";
 
-	echo "<option value=\"0\""; if($whom==0) echo " selected"; echo ">Single user";
-	echo "<option value=\"1\""; if($whom==1) echo " selected"; echo ">User group";
+	echo "<option value=\"0\""; if($recipient==RECIPIENT_TYPE_USER) echo " selected"; echo ">Single user";
+	echo "<option value=\"1\""; if($recipient==RECIPIENT_TYPE_GROUP) echo " selected"; echo ">User group";
 	echo "</select>";
 
-	if($whom==0)
+	if($recipient==RECIPIENT_TYPE_GROUP)
 	{
 		show_table2_v_delimiter();
 		echo nbsp("Group");
