@@ -21,7 +21,7 @@
 #ifndef ZABBIX_SYSINFO_H
 #define ZABBIX_SYSINFO_H
 
-#define TEST_PARAMETERS
+/* #define TEST_PARAMETERS */
 
 #define	SYSINFO_RET_OK		0
 #define	SYSINFO_RET_FAIL	1
