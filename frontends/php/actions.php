@@ -24,6 +24,7 @@
 
 	include "include/config.inc.php";
 	show_header($page["title"],0,0);
+	insert_confirm_javascript();
 ?>
 
 <?php
@@ -100,18 +101,17 @@
 		echo "<TD>".$row["alias"]."</TD>";
 		if($row["good"])
 		{
-			echo "<TD>ON</TD>";
+			echo "<TD><FONT COLOR=\"#AA0000\">ON</FONT></TD>";
 		}
 		else
 		{
-			echo "<TD>OFF</TD>";
+			echo "<TD><FONT COLOR=\"#00AA00\">OFF</FONT></TD>";
 		}
 		echo "<TD>".$row["delay"]."</TD>";
 		echo "<TD>".$row["subject"]."</TD>";
 		echo "<TD>".$row["message"]."</TD>";
 		echo "<TD>";
-		echo " <A HREF=\"actions.php?register=edit&actionid=".$row["actionid"]."&triggerid=".$row["triggerid"]."\">Edit</A>";
-		echo ", <A HREF=\"actions.php?register=delete&actionid=".$row["actionid"]."&triggerid=".$row["triggerid"]."\">Delete</A>";
+		echo " <A HREF=\"actions.php?register=edit&actionid=".$row["actionid"]."&triggerid=".$row["triggerid"]."\">Change</A>";
 		echo "</TD></TR>";
 	}
 	echo "</TABLE>";
@@ -122,7 +122,6 @@
 </div>
 
 <?php
-
 	if(isset($HTTP_GET_VARS["actionid"]))
 	{
 		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.scope,a.severity from actions a where a.actionid=".$HTTP_GET_VARS["actionid"];
@@ -135,7 +134,7 @@
 		$subject=DBget_field($result,0,4);
 		$message=DBget_field($result,0,5);
 		$uid=DBget_field($result,0,6);
-		$scope=DBget_field($result,0,7);
+		$scope=@iif(isset($HTTP_GET_VARS["scope"]),$HTTP_GET_VARS["scope"],DBget_field($result,0,7));
 		$severity=DBget_field($result,0,8);
 	}
 	else
@@ -146,7 +145,7 @@
 		$good=1;
 		$delay=30;
 		$subject=$description;
-		$scope=0;
+		$scope=@iif(isset($HTTP_GET_VARS["scope"]),$HTTP_GET_VARS["scope"],0);
 		$severity=0;
 
 		$sql="select i.description, h.host, i.key_ from hosts h, items i,functions f where f.triggerid=".$HTTP_GET_VARS["triggerid"]." and h.hostid=i.hostid and f.itemid=i.itemid order by i.description";
@@ -216,29 +215,37 @@
 	show_table2_v_delimiter();
 	echo "Scope";
 	show_table2_h_delimiter();
-	echo "<select class=\"biginput\" name=\"scope\" size=1>";
+	echo "<select class=\"biginput\" name=\"scope\" size=1  onChange=\"submit()\">";
 	echo "<OPTION VALUE=\"0\""; if($scope==0) echo "SELECTED"; echo ">This trigger only";
 	echo "<OPTION VALUE=\"1\""; if($scope==1) echo "SELECTED"; echo ">All triggers of this host";
 	echo "<OPTION VALUE=\"2\""; if($scope==2) echo "SELECTED"; echo ">All triggers";
 	echo "</SELECT>";
 
-	show_table2_v_delimiter();
-	echo nbsp("Use if trigger's severity equal or more than<br>(for host-based scope only)");
-	show_table2_h_delimiter();
-	echo "<select class=\"biginput\" name=\"severity\" size=1>";
-	echo "<OPTION VALUE=\"0\" "; if($severity==0) echo "SELECTED"; echo ">Not classified";
-	echo "<OPTION VALUE=\"1\" "; if($severity==1) echo "SELECTED"; echo ">Information";
-	echo "<OPTION VALUE=\"2\" "; if($severity==2) echo "SELECTED"; echo ">Warning";
-	echo "<OPTION VALUE=\"3\" "; if($severity==3) echo "SELECTED"; echo ">Average";
-	echo "<OPTION VALUE=\"4\" "; if($severity==4) echo "SELECTED"; echo ">High";
-	echo "<OPTION VALUE=\"5\" "; if($severity==5) echo "SELECTED"; echo ">Disaster";
-	echo "</SELECT>";
+	if($scope>0)
+	{
+		show_table2_v_delimiter();
+		echo nbsp("Use if trigger's severity equal or more than");
+		show_table2_h_delimiter();
+		echo "<select class=\"biginput\" name=\"severity\" size=1>";
+		echo "<OPTION VALUE=\"0\" "; if($severity==0) echo "SELECTED"; echo ">Not classified";
+		echo "<OPTION VALUE=\"1\" "; if($severity==1) echo "SELECTED"; echo ">Information";
+		echo "<OPTION VALUE=\"2\" "; if($severity==2) echo "SELECTED"; echo ">Warning";
+		echo "<OPTION VALUE=\"3\" "; if($severity==3) echo "SELECTED"; echo ">Average";
+		echo "<OPTION VALUE=\"4\" "; if($severity==4) echo "SELECTED"; echo ">High";
+		echo "<OPTION VALUE=\"5\" "; if($severity==5) echo "SELECTED"; echo ">Disaster";
+		echo "</SELECT>";
+	}
+	else
+	{
+		echo "<input name=\"severity\" type=\"hidden\" value=$severity>";
+	}
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
 	if(isset($actionid))
 	{
 		echo "<input type=\"submit\" name=\"register\" value=\"update\">";
+		echo "<input type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected action?');\">";
 	}
 
 	show_table2_header_end();
