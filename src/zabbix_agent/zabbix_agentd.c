@@ -426,7 +426,7 @@ int	main()
 	char		host[128];
 
         static struct  sigaction phan;
-	
+
 	init_config();
 	daemon_init();
 
