@@ -770,7 +770,9 @@ static void dopr_outch(char *buffer, size_t *currlen, size_t maxlen, char c)
 }
 
 /* yes this really must be a ||. Don't muck with this (tridge) */
-#if !defined(HAVE_VSNPRINTF) || !defined(HAVE_C99_VSNPRINTF)
+/* Support for MacOS. Alexei */
+/*#if !defined(HAVE_VSNPRINTF) || !defined(HAVE_C99_VSNPRINTF)*/
+#if !defined(HAVE_VSNPRINTF)
  int vsnprintf (char *str, size_t count, const char *fmt, va_list args)
 {
 	return dopr(str, count, fmt, args);
