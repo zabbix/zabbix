@@ -80,6 +80,7 @@ void	collect_statistics()
 			/* Here is list of functions to call periodically */
 			collect_stats_interfaces(file);
 			collect_stats_diskdevices(file);
+			collect_stats_cpustat(file);
 
 			fclose(file);
 			rename("/tmp/zabbix_agentd.tmp2","/tmp/zabbix_agentd.tmp");
