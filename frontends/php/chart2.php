@@ -23,10 +23,6 @@
 		$HTTP_GET_VARS["from"]=0;
 	}
 
-#	$refresh=$HTTP_GET_VARS["refresh"];
-#	if ( $refresh > 0 )
-#		header("Refresh: " . $refresh );
-
 	$result=DBselect("select name,width,height from graphs where graphid=".$HTTP_GET_VARS["graphid"]);
 
 	$name=DBget_field($result,0,0);
@@ -162,8 +158,16 @@
 		$maxY = $HTTP_GET_VARS["force_maxy"];
 	}
 
+	if(!isset($maxY))
+	{
+		$maxY=1;
+	}
+
+	$maxY=1;
+
 	$my_exp = floor(log10($maxY));
 	$my_mant = $maxY/pow(10,$my_exp);
+
 	if ($my_mant < 1.5 )
 	{
 		$my_mant = 1.5;
@@ -231,18 +235,12 @@
 				ImageLine($im,$shiftX,$shiftYup+$sizeY/2,$sizeX+$shiftX,$shiftYup+$sizeY/2,$colors[$color[$item]]);
 			}
 		}
-#		ImageFilledRectangle($im,$shiftX+200*$item,$sizeY+$shiftYup+19,$shiftX+200*$item+5,$sizeY+$shiftYup+15+9,$colors[$color[$item]]);
-#		ImageString($im, 2,$shiftX+200*$item+9,$sizeY+$shiftYup+15, $desc[$item], $gray);
 		ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*$item+45,$shiftX+5,$sizeY+$shiftYup+15+9+15*$item+45,$colors[$color[$item]]);
 		ImageRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*$item+45,$shiftX+5,$sizeY+$shiftYup+15+9+15*$item+45,$black);
 		$str=sprintf("%s: %s [min:%.2f, avg:%.2f, max:%.2f]", $host[$item], $desc[$item], $itemMin, $itemAvg, $itemMax);
 		ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*$item+15+45,$str, $black);
-//		ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*$item+15+45, $host[$item].": ".$desc[$item]." (min:".$itemMin.", avg:".$itemAvg.", max:".$itemMax.")", $black);
 	}
 
-	// grid
-
-//	$startTime=floor(($maxX-$minX)/$sizeX+$minX);
 	$startTime=$minX;
 	if (($maxX-$maxY) < 300)
 		$precTime=10;
@@ -259,29 +257,20 @@
 
 	$correctTime=$startTime % $precTime;
 	$stepTime=ceil(ceil(($maxX-$minX)/20)/$precTime)*(1.0*$precTime);
-/*	ImageString($im,0,10,10,date("H:i:s",$startTime),$blue);
-	ImageString($im,0,10,22,date("H:i:s",$startTime-$correctTime),$blue);
-	ImageString($im,0,10,34,date("H:i:s",$startTime-$correctTime+$stepTime),$blue);
-*/
+
 	for($i=1;$i<$my_steps;$i++)
 	{
 		ImageDashedLine($im,$shiftX,$i/$my_steps*$sizeY+$shiftYup,$sizeX+$shiftX,$i/$my_steps*$sizeY+$shiftYup,$gray);
 	}
 
 
-	for($j=$stepTime-$correctTime;$j<=($maxX-$minX);$j+=$stepTime)
-	{
-		ImageDashedLine($im,$shiftX+($sizeX*$j)/($maxX-$minX),$shiftYup,$shiftX+($sizeX*$j)/($maxX-$minX),$sizeY+$shiftYup,$gray);
-	}
 
-/*	for($j=$correctTime;$j<=($maxX-$minX);$j+=($maxX-$minX)/24)
-	{
-		ImageDashedLine($im,$shiftX+$sizeX-$j/($maxX-$minX)*$sizeX,$shiftYup,$shiftX+$sizeX-$j/($maxX-$minX)*$sizeX,$sizeY+$shiftYup,$gray);
-	}
-*/
-	//labels
 	if($nodata == 0)
 	{
+		for($j=$stepTime-$correctTime;$j<=($maxX-$minX);$j+=$stepTime)
+		{
+			ImageDashedLine($im,$shiftX+($sizeX*$j)/($maxX-$minX),$shiftYup,$shiftX+($sizeX*$j)/($maxX-$minX),$sizeY+$shiftYup,$gray);
+		}
 		for($i=0;$i<=$my_steps;$i++)
 		{
 			ImageString($im, 1, $sizeX+5+$shiftX, $i/$my_steps*$sizeY+$shiftYup-4, $maxY-$i/$my_steps*($maxY-$minY) , $darkred);
@@ -289,15 +278,7 @@
 		for($j=$stepTime-$correctTime;$j<=($maxX-$minX);$j+=$stepTime)
 		{
 			ImageStringUp($im,0,$shiftX+($sizeX*$j)/($maxX-$minX),$shiftYup+$sizeY+43,date($dateForm,$startTime+$j),$black);
-//			ImageDashedLine($im,$shiftX+$sizeX-$j/($maxX-$minX)*$sizeX,$shiftYup,$shiftX+$sizeX-$j/($maxX-$minX)*$sizeX,$sizeY+$shiftYup,$gray);
 		}
-/*		for($i=0;$i<=$sizeX;$i+=$sizeX/24)
-		{
-			ImageStringUp($im,0,$i+$shiftX-3,$shiftYup+$sizeY+53,date("H:i:s",$i*($maxX-$minX)/$sizeX+$minX),$black);
-		}
-*/
-
-//		date("dS of F Y h:i:s A",DBget_field($result,0,0));
 
 		ImageString($im, 1,10,                $sizeY+$shiftYup+5, date("dS of F Y h:i:s A",$minX) , $darkred);
 		ImageString($im, 1,$sizeX+$shiftX-168,$sizeY+$shiftYup+5, date("dS of F Y h:i:s A",$maxX) , $darkred);
@@ -307,7 +288,6 @@
 		ImageString($im, 2,$sizeX/2 -50,                $sizeY+$shiftYup+3, "NO DATA FOR THIS PERIOD" , $red);
 	}
 
-#	ImageString($im,0,$shiftX+$sizeX-85,$sizeY+$shiftYup+25, "http://zabbix.sourceforge.net", $gray);
 	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, "http://zabbix.sourceforge.net", $gray);
 
 	$end_time=time(NULL);

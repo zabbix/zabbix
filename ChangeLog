@@ -1,5 +1,6 @@
 Changes for 1.0beta7:
 
+ - added severity to pre-defined triggers (Alexei)
  - SO_LINGER is not default socket() option for zabbix_sender. (Alexei)
  - recvfrom() and sendto() were changed to read() and write() (Alexei)
  - fixed housekeeping procedure. Upgrade carefully! (Alexei)
@@ -10,7 +11,7 @@ Changes for 1.0beta7:
  - availability reports for trapper-based triggers (Alexei)
  - fixed possible zabbix_suckerd crash. It may happen if socket() returns 0.
    (Alexei)
- - added new Host status - Template(3). )Alexei)
+ - added new Host status - Template(3). (Alexei)
  - fixed group "all" in latest.php (Alexei)
  - do not dump "Expression cannot be evaluated" in case if function.lastvalue
    is NULL. Logic was changed a bit, but the message is still there. (Alexei)

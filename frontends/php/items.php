@@ -23,7 +23,7 @@
 		{
 			$result=update_item($HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["description"],$HTTP_GET_VARS["key"],$HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["delay"],$HTTP_GET_VARS["history"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["type"],$HTTP_GET_VARS["snmp_community"],$HTTP_GET_VARS["snmp_oid"],$HTTP_GET_VARS["value_type"],$HTTP_GET_VARS["trapper_hosts"]);
 			show_messages($result,"Item updated","Cannot update item");
-			unset($itemid);
+//			unset($itemid);
 		}
 		if($HTTP_GET_VARS["register"]=="changestatus")
 		{
@@ -42,6 +42,19 @@
 			$result=delete_item($HTTP_GET_VARS["itemid"]);
 			show_messages($result,"Item deleted","Cannot delete item");
 			unset($itemid);
+		}
+		if($HTTP_GET_VARS["register"]=="Delete selected")
+		{
+			$result=DBselect("select itemid from items where hostid=".$HTTP_GET_VARS["hostid"]);
+			while($row=DBfetch($result))
+			{
+// $$ is correct here
+				if(isset($$row["itemid"]))
+				{
+					$result2=delete_item($row["itemid"]);
+				}
+			}
+			show_messages($result2,"Items deleted","Cannot delete items");
 		}
 	}
 ?>
@@ -92,10 +105,13 @@
 				}
 				echo "<br>";
 				show_table_header("<A HREF='items.php?hostid=".$row["hostid"]."'>".$row["host"]."</A>");
+				echo "<form method=\"get\" action=\"items.php\">";
+				echo "<input class=\"biginput\" name=\"hostid\" type=hidden value=".$HTTP_GET_VARS["hostid"]." size=8>";
 				echo "<TABLE BORDER=0 COLS=13  align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 				echo "<TR>";
+				echo "<TD WIDTH=3% NOSAVE><B>Sel</B></TD>";
 				echo "<TD WIDTH=3% NOSAVE><B>Id</B></TD>";
-				echo "<TD WIDTH=10% NOSAVE><B>Host</B></TD>";
+//				echo "<TD WIDTH=10% NOSAVE><B>Host</B></TD>";
 				echo "<TD WIDTH=10% NOSAVE><B>Key</B></TD>";
 				echo "<TD WIDTH=10% NOSAVE><B>Description</B></TD>";
 				echo "<TD WIDTH=5%  NOSAVE><B>Update interval</B></TD>";
@@ -110,8 +126,9 @@
 		        if($col++%2 == 1)	{ echo "<TR BGCOLOR=#DDDDDD>"; }
 			else			{ echo "<TR BGCOLOR=#EEEEEE>"; }
 
+			echo "<TD><INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"".$row["itemid"]."\"></TD>";
 			echo "<TD>".$row["itemid"]."</TD>";
-			echo "<TD>".$row["host"]."</TD>";
+//			echo "<TD>".$row["host"]."</TD>";
 			echo "<TD>".$row["key_"]."</TD>";
 			echo "<TD>".$row["description"]."</TD>";
 			echo "<TD>".$row["delay"]."</TD>";
@@ -194,6 +211,10 @@
 			echo "</TR>";
 		}
 		echo "</TABLE>";
+		show_table2_header_begin();
+		echo "<input type=\"submit\" name=\"register\" value=\"Delete selected\">";
+		show_table2_header_end();
+		echo "</form>";
 	}
 	else
 	{

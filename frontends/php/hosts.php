@@ -220,7 +220,7 @@
 	else if($status==3)
 	{
 		echo "<option value=\"0\">Monitored";
-		echo "<option value=\"1\" selected>Not monitored";
+		echo "<option value=\"1\">Not monitored";
 		echo "<option value=\"3\" selected>Template";
 	}
 	else
@@ -236,7 +236,8 @@
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"host_templateid\" size=\"1\">";
 	echo "<option value=\"0\" selected>...";
-	$result=DBselect("select host,hostid from hosts where status=3 order by host");
+//	$result=DBselect("select host,hostid from hosts where status=3 order by host");
+	$result=DBselect("select host,hostid from hosts order by host");
 	while($row=DBfetch($result))
 	{
 		echo "<option value=\"".$row["hostid"]."\">".$row["host"];
