@@ -1,5 +1,5 @@
-#ifndef MON_COMMON_H
-#define MON_COMMON_H
+#ifndef ZABBIX_COMMON_H
+#define ZABBIX_COMMON_H
  
 #define	SUCCEED		0
 #define	FAIL		(-1)
@@ -11,8 +11,9 @@
 
 /* Item types */
 
-#define ITEM_TYPE_ZABBIX 0
-#define ITEM_TYPE_SNMP   1
+#define ITEM_TYPE_ZABBIX	0
+#define ITEM_TYPE_SNMP		1
+#define ITEM_TYPE_TRAPPER	2
 
 #define	AGENTD_FORKS	5
 

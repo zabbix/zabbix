@@ -1,5 +1,5 @@
-#ifndef MON_DB_H
-#define MON_DB_H
+#ifndef ZABBIX_DB_H
+#define ZABBIX_DB_H
 
 /* time_t */
 #include <time.h>
@@ -53,6 +53,7 @@ DB_ITEM
 	time_t  lastdelete;
 	time_t  lastcheck;
 	time_t	nextcheck;
+	int     value_type;
 };
  
 DB_FUNCTION

@@ -107,7 +107,7 @@ int	evaluate_FUNCTION(float *value,DB_ITEM *item,char *function,int parameter)
 {
 	int	ret  = SUCCEED;
 
-	syslog( LOG_DEBUG, "Function [%s]\n",function);
+	syslog( LOG_DEBUG, "Function [%s]",function);
 
 	if(strcmp(function,"last")==0)
 	{
@@ -670,7 +670,8 @@ int	get_lastvalue(float *Result,char *host,char *key,char *function,char *parame
 }
 
 /* For zabbix_trapper(d) */
-int	process_data(char *server,char *key, double value)
+/* int	process_data(char *server,char *key, double value)*/
+int	process_data(char *server,char *key,char *value)
 {
 	char	sql[1024];
 
@@ -678,7 +679,7 @@ int	process_data(char *server,char *key, double value)
 	DB_ITEM	item;
 	char	*s;
 
-	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue from items i,hosts h where h.status in (0,2) and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=2", server, key);
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type from items i,hosts h where h.status in (0,2) and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d", server, key, ITEM_TYPE_TRAPPER);
 	result = DBselect(sql);
 
 	if(result==NULL)
@@ -731,6 +732,7 @@ int	process_data(char *server,char *key, double value)
 		item.prevvalue_null=0;
 		item.prevvalue=atof(s);
 	}
+	item.value_type=atoi(DBget_field(result,0,15));
 
 	process_new_value(&item,value);
 
@@ -741,24 +743,33 @@ int	process_data(char *server,char *key, double value)
 	return SUCCEED;
 }
 
-void	process_new_value(DB_ITEM *item,double value)
+void	process_new_value(DB_ITEM *item,char *value)
 {
 	int 	now;
 	char	c[1024];
+	double	value_double;
+	char	*e;
 
 	now = time(NULL);
 
+	value_double=strtod(value,&e);
+
 	if(item->history>0)
 	{
-		sprintf(c,"insert into history (itemid,clock,value) values (%d,%d,%g)",item->itemid,now,value);
+		if(item->value_type==0)
+			sprintf(c,"insert into history (itemid,clock,value) \
+				values (%d,%d,%g)",item->itemid,now,value_double);
+		else
+			sprintf(c,"insert into history_str (itemid,clock,value) 
+				values (%d,%d,'%s')",item->itemid,now,value);
 		DBexecute(c);
 	}
 
-	if((item->prevvalue_null == 1) || (cmp_double(value,item->lastvalue) != 0) || (cmp_double(item->prevvalue,item->lastvalue) != 0) )
+	if((item->prevvalue_null == 1) || (cmp_double(value_double,item->lastvalue) != 0) || (cmp_double(item->prevvalue,item->lastvalue) != 0) )
 	{
-		sprintf(c,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue=%f,lastclock=%d where itemid=%d",now+item->delay,value,now,item->itemid);
+		sprintf(c,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue=%f,lastclock=%d where itemid=%d",now+item->delay,value_double,now,item->itemid);
 		item->prevvalue=item->lastvalue;
-		item->lastvalue=value;
+		item->lastvalue=value_double;
 		item->prevvalue_null=item->lastvalue_null;
 		item->lastvalue_null=0;
 	}
