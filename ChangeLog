@@ -1,4 +1,25 @@
+Noe ready yet:
+
+[ Solve problem with getpeername ]
+[ All parameters should contain section "How can be used" in the Manual]
+[ PHP to support non-numerci values ]
+[ Support for system[proccount] on FreeBSD ]
+[ Patches for PostgreSQL ]
+[ Common parser (cfg.c) ]
+
 Changes for 1.0beta3:
+
+ - support for non-numeric parameters (Alexei)
+ - common parser function for configuration files (Alexei)
+
+ - added file include/cfg.h and include/cfg.c (Alexei)
+ - support for system[uptime] on FreeBSD (Alexei)
+ - support for kern[maxfiles] on FreeBSD (Alexei)
+ - support for kern[maxproc] on FreeBSD (Alexei)
+ - zabbix_trapperd cannot be ran as root (Alexei)
+ - added table history_str (Alexei)
+ - added column value_type to table items (Alexei)
+ - removed(?) support for automake (Alexei)
 
  - partial support for automake (Alexei)
  - parent process will terminate childs if one of the childs died
@@ -7,7 +28,6 @@ Changes for 1.0beta3:
  zabbix_trapperd (Alexei)
  - Zabbix processes will show statuses for ps (FreeBSD,...) (Alexei)
  - changes in AUTHORS (Alexei)
-
  - added support for IP addresses for SNMP-enabled hosts (Alexei) 
  - commented #define TEST_PARAMETERS in zabbix_agent.c (Alexei)
  - proc_cnt[apache] was changed to proc_cnt[httpd] (Alexei)

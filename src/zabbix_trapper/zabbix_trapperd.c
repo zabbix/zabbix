@@ -24,6 +24,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include <pwd.h>
+
 #include "common.h"
 #include "db.h"
 #include "functions.h"
@@ -248,7 +250,6 @@ int	process(char *s)
 {
 	char	*p;
 	char	*server,*key,*value_string;
-	double	value;
 
 	int	ret=SUCCEED;
 
@@ -272,9 +273,10 @@ int	process(char *s)
 	{
 		return FAIL;
 	}
-	value=atof(value_string);
+//	???
+//	value=atof(value_string);
 
-	ret=process_data(server,key,value);
+	ret=process_data(server,key,value_string);
 
 	return ret;
 }
@@ -283,6 +285,34 @@ void    daemon_init(void)
 {
 	int     i;
 	pid_t   pid;
+	struct passwd *pwd;
+
+	/* running as root ?*/
+	if((getuid()==0) || (getuid()==0))
+	{
+		pwd = getpwnam("zabbix");
+		if ( pwd == NULL )
+		{
+			fprintf(stderr,"User zabbix does not exist.\n");
+			fprintf(stderr, "Cannot run as root !\n");
+			exit(FAIL);
+		}
+
+		if( (setgid(pwd->pw_gid) ==-1) || (setuid(pwd->pw_uid) == -1) )
+		{
+			fprintf(stderr,"Cannot setgid or setuid to zabbix");
+			exit(FAIL);
+		}
+
+#ifdef HAVE_FUNCTION_SETEUID
+		if( (setegid(pwd->pw_gid) ==-1) || (seteuid(pwd->pw_uid) == -1) )
+		{
+			fprintf(stderr,"Cannot setegid or seteuid to zabbix");
+			exit(FAIL);
+		}
+#endif
+
+	}
 
 	if( (pid = fork()) != 0 )
 	{

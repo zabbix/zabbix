@@ -115,15 +115,15 @@ void    daemon_init(void)
 			fprintf(stderr,"Cannot setgid or setuid to zabbix\n");
 			exit(FAIL);
 		}
-/*
-Is not supported on HP-UX
 
+#ifdef HAVE_FUNCTION_SETEUID
 		if( (setegid(pwd->pw_gid) ==-1) || (seteuid(pwd->pw_uid) == -1) )
 		{
 			fprintf(stderr,"Cannot setegid or seteuid to zabbix\n");
 			exit(FAIL);
 		}
-*/
+#endif
+
 	}
 
 	if( (pid = fork()) != 0 )
@@ -177,8 +177,8 @@ void	create_pid_file(void)
 
 	if( f == NULL)
 	{
-		syslog( LOG_CRIT, "Cannot create PID file [%s]. Errno [%d]",
-			CONFIG_PID_FILE, errno);
+		syslog( LOG_CRIT, "Cannot create PID file [%s] [%m]",
+			CONFIG_PID_FILE);
 		uninit();
 		exit(-1);
 	}
@@ -227,7 +227,7 @@ void	process_config_file(void)
 
 		parameter[value-line-1]=0;
 
-		syslog( LOG_DEBUG, "Parameter [%s] Value [%s]", parameter, value);
+		syslog( LOG_WARNING, "Parameter [%s] Value [%s]", parameter, value);
 
 		if(strcmp(parameter,"Server")==0)
 		{
@@ -272,6 +272,8 @@ void	process_config_file(void)
 			else if(strcmp(value,"3") == 0)
 			{
 				setlogmask(LOG_UPTO(LOG_DEBUG));
+				syslog( LOG_WARNING, "DebugLevel -[%s]",value);
+				syslog( LOG_DEBUG, "DebugLevel --[%s]",value);
 			}
 			else
 			{
@@ -279,6 +281,7 @@ void	process_config_file(void)
 				fclose(file);
 				exit(1);
 			}
+			syslog( LOG_WARNING, "DebugLevel is set to [%s]", value);
 		}
 		else if(strcmp(parameter,"UserParameter")==0)
 		{
@@ -322,11 +325,18 @@ int	check_security(int sockfd)
 
 		sname=inet_ntoa(name.sin_addr);
 
+		syslog( LOG_WARNING, "Connection from [%s]. Allowed server is [%s] ",sname, CONFIG_HOST_ALLOWED);
 		if(strcmp(sname, CONFIG_HOST_ALLOWED)!=0)
 		{
 			syslog( LOG_WARNING, "Connection from [%s] rejected. Allowed server is [%s] ",sname, CONFIG_HOST_ALLOWED);
 			return	FAIL;
 		}
+	}
+	else
+	{
+		syslog( LOG_WARNING, "Error getpeername [%m]");
+		syslog( LOG_WARNING, "Connection rejected");
+		return FAIL;
 	}
 	return	SUCCEED;
 }

@@ -35,7 +35,7 @@ void    signal_handler( int sig )
 	exit( FAIL );
 }
 
-int	send_value(char *monserver,int port,char *shortname,char *value)
+int	send_value(char *server,int port,char *shortname,char *value)
 {
 	int	i,s;
 	char	tosend[1024];
@@ -46,7 +46,7 @@ int	send_value(char *monserver,int port,char *shortname,char *value)
 	struct sockaddr_in servaddr_in;
 
 	servaddr_in.sin_family=AF_INET;
-	hp=gethostbyname(monserver);
+	hp=gethostbyname(server);
 
 	if(hp==NULL)
 	{
