@@ -6,6 +6,8 @@ Not ready yet:
 
 [ CORE. Make Zabbix compile by cc ]
 
+[ CORE. Change trigger status in case if host/item status is changed ]
+
 [ PHP. Show triggers by userid ]
 
 [ DOCS. All parameters should contain section "How can be used" in the Manual ]
@@ -15,6 +17,7 @@ Not ready yet:
 
 Changes for 1.0beta4:
 
+ - fixed macros substitution in email alerts (Alexei)
  - removed option -Wall from all Makefiles (Alexei)
  - removed "//" comments from Zabbix code (Alexei)
  - disabled experimental code by commenting #define PERF (Alexei)

@@ -209,7 +209,7 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,int parameter)
 		zabbix_log( LOG_LEVEL_WARNING, "Unsupported function:%s",function);
 		ret = FAIL;
 	}
-	zabbix_log( LOG_LEVEL_DEBUG, "End of evaluate_FUNCTION");
+	zabbix_log( LOG_LEVEL_DEBUG, "End of evaluate_FUNCTION. Result [%s]",value);
 	return ret;
 }
 
@@ -536,8 +536,10 @@ void	apply_actions(int triggerid,int good)
 		action.subject=DBget_field(result,i,3);
 		action.message=DBget_field(result,i,4);
 
-		substitute_macros(&*action.message);
-		substitute_macros(&*action.subject); 
+		substitute_macros(action.message);
+		substitute_macros(action.subject); 
+/*		substitute_macros(&*action.message);
+		substitute_macros(&*action.subject); */
 
 		send_to_user(action.actionid,action.userid,smtp_server,smtp_helo,smtp_email,action.subject,action.message);
 		now = time(NULL);
@@ -723,10 +725,11 @@ int	get_lastvalue(char *value,char *host,char *key,char *function,char *paramete
         int	rows;
 	int	parm;
 	char	*s;
+	int	res;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In get_lastvalue()" );
+	zabbix_log(LOG_LEVEL_DEBUG, "In get_lastvalue()" );
 
-	sprintf(sql, "select i.itemid,i.prevvalue,i.lastvalue from items i,hosts h where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", host, key );
+	sprintf(sql, "select i.itemid,i.prevvalue,i.lastvalue,i.value_type from items i,hosts h where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", host, key );
 	result = DBselect(sql);
         rows = DBnum_rows(result);
 
@@ -760,16 +763,18 @@ int	get_lastvalue(char *value,char *host,char *key,char *function,char *paramete
 		item.lastvalue_str=s;
 		item.lastvalue=atof(s);
 	}
+        item.value_type=atoi(DBget_field(result,0,3));
 
-
-
-	zabbix_log(LOG_LEVEL_WARNING, "Itemid:%d", item.itemid );
-        DBfree_result(result);
+	zabbix_log(LOG_LEVEL_DEBUG, "Itemid:%d", item.itemid );
 
 	parm=atoi(parameter);
-	zabbix_log(LOG_LEVEL_WARNING, "Before evaluate_FUNCTION()" );
+	zabbix_log(LOG_LEVEL_DEBUG, "Before evaluate_FUNCTION()" );
 
-	return evaluate_FUNCTION(value,&item,function,parm);
+	res = evaluate_FUNCTION(value,&item,function,parm);
+
+/* Cannot call DBfree_result until evaluate_FUNC */
+	DBfree_result(result);
+	return res;
 }
 
 /* For zabbix_trapper(d) */
