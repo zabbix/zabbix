@@ -1,6 +1,6 @@
 Changes for 1.0beta7:
 
- - SO_LINGER is not defaul socket() option for zabbix_sender. (Alexei)
+ - SO_LINGER is not default socket() option for zabbix_sender. (Alexei)
  - recvfrom() and sendto() were changed to read() and write() (Alexei)
  - fixed housekeeping procedure. Upgrade carefully! (Alexei)
  - support of template hosts. Remove tables hosts_templates and
