@@ -24,13 +24,13 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.14)
+Zabbix Reference Manual for version 1.0 (draft v1.15)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-12 May 2002
+16 May 2002
 \layout Abstract
 
 The document is Reference Manual for Zabbix version 1.0.
@@ -91,32 +91,35 @@ Zabbix
 
 \latex default 
  
-\latex no_latex 
-A flexible notification mechanism allows users to configure e-mail based
- alerts for virtually any event, allowing fast reaction to server problems.
+\layout Standard
 
-\latex default 
- A
-\latex no_latex 
-ll monitored parameters are stored in a database.
 
-\latex default 
- 
+\series bold 
+Zabbix
+\series default 
+ uses a flexible notification mechanism that allows users to configure e-mail
+ based alerts for virtually any event.
+ This allows a fast reaction to server problems.
+ All monitored parameters ar stored in a database.
+\layout Standard
+
+
 \series bold 
 Zabbix
 \series default 
 \latex no_latex 
  offers excellent reporting and data visualisation features based on the
- stored data, making 
-\series bold 
+ stored data
 \latex default 
+.
+ This makes 
+\series bold 
 Zabbix
 \series default 
-\latex no_latex 
- useful for capacity planning.
+ very useful for capacity planning.
+\layout Standard
 
-\latex default 
- 
+
 \series bold 
 Zabbix
 \series default 
@@ -147,9 +150,6 @@ The web-based front end means that the health of your servers can be assessed
 
 \latex default 
  
-\layout Standard
-
-
 \latex no_latex 
 Properly configured, 
 \series bold 
@@ -157,11 +157,11 @@ Properly configured,
 Zabbix
 \series default 
 \latex no_latex 
- can play an important role in monitoring IT infrastructure for companies
- with even hundreds of servers to monitor.
-
+ can play an important role in monitoring IT infrastructure
 \latex default 
- 
+.
+ This is equally true for small organizations with a few servers and for
+ large companies with a multitude of servers.
 \layout Standard
 
 
@@ -242,9 +242,7 @@ server software for Linux
 secure user authorisation
 \layout Itemize
 
-
-\latex no_latex 
-two user groups: "Administrators" and "Zabbix users"
+flexible user permissions
 \layout Itemize
 
 
@@ -328,7 +326,7 @@ be user friendly
 keep things simple
 \layout Itemize
 
-use as less resources as possible
+use as few resources as possible
 \layout Itemize
 
 be as fast as possible
@@ -603,6 +601,9 @@ UCD-SNMP library and header files.
 Optional
 \emph default 
 .
+\layout Subsubsection
+
+Required software considerations
 \layout Standard
 
 
@@ -610,32 +611,44 @@ Optional
 Zabbix
 \series default 
  may work on previous versions of Apache, MySQL, PostgreSQL as well.
- I've tried to run 
-\series bold 
-Zabbix
-\series default 
- on PostgreSQL 6.5x with no luck.
+ It has been tried on PostgreSQL 6.5x with no luck.
  PostgreSQL crashes after one to three minutes of 
 \series bold 
 zabbix_suckerd
 \series default 
  running.
- So, PostgreSQL version 7.0.2 or later is 
+ So, if using PostgreSQL, version 7.0.2 or later is 
 \emph on 
 strongly
 \emph default 
  recommended.
-\layout Paragraph
+\layout Standard
 
+
+\lang english
+\SpecialChar ~
+
+\layout Standard
+
+
+\series bold 
 PostgreSQL vs MySQL
 \layout Standard
 
-Regarding the choice between PostgreSQL and MySQL, I recommend MySQL for
- several reasons:
+\SpecialChar ~
+
+\layout Standard
+
+Regarding the choice between PostgreSQL and MySQL, MySQL is recommended
+ for several reasons:
 \layout Itemize
 
-my recent benchmarks clearly show that PostgreSQL (7.1.x) is at least 10 times
- slower than MySQL (3.23.29)
+recent benchmarks using 
+\series bold 
+Zabbix
+\series default 
+ clearly show that PostgreSQL (7.1.x) is at least 10 times slower than MySQL
+ (3.23.29)
 \begin_float footnote 
 \layout Standard
 
@@ -671,6 +684,15 @@ If you do use PostgreSQL, performance can be significantly improved by executing
 Zabbix
 \series default 
  database.
+ For more information on the VACUUM command please see the PostgreSQL documentat
+ion - 
+\lang english
+
+\begin_inset LatexCommand \url[Description of the Vacuum command]{http://www.postgresql.org/idocs/index.php?sql-vacuum.html}
+
+\end_inset 
+
+.
 \layout Standard
 
 I would suggest execution of VACUUM, at least after the following events
@@ -950,8 +972,8 @@ Configure
 \newline 
 
 \emph default 
-If you are going to use trapping instead of the recommended client-server
- approach, add the following line to 
+If you are going to use non-daemon versions of Zabbix trapper, add the following
+ line to 
 \emph on 
 /etc/inetd.conf
 \emph default 
@@ -1070,11 +1092,6 @@ Zabbix
 \series default 
  server.
  Connections from other hosts will be denied.
- 
-\emph on 
-Note
-\emph default 
-, that no end of line character should present in the file.
 \newline 
 You may take 
 \emph on 
@@ -1198,7 +1215,23 @@ Next, click on the "USERS" link.
 Zabbix
 \series default 
  users.
- Don't forget to select "Administrators" group.
+ Don't forget to add 
+\begin_inset Quotes eld
+\end_inset 
+
+read/write
+\begin_inset Quotes erd
+\end_inset 
+
+ and 
+\begin_inset Quotes eld
+\end_inset 
+
+add
+\begin_inset Quotes eld
+\end_inset 
+
+ default permissions to the user.
  After you create your account, click the "Media" link beside your account
  listing, and add your email address.
 \newline 
@@ -1537,6 +1570,14 @@ Zabbix
 .
  It means that if you have difficulties choosing between Linux and other
  OS, go for Debian Linux - you will get better support.
+\layout Standard
+
+Zabbix 1.0beta3 was developed and tested on FreeBSD 4.4.
+ Thus, FreeBSD is also stable platform for 
+\series bold 
+Zabbix
+\series default 
+.
 \layout Section
 
 Upgrading
@@ -1568,9 +1609,9 @@ upgrades/dbpatches
  (e.g.
  
 \shape italic 
-1.0alpha11_to_1.0beta1
+1.0alpha11_to_1.0beta
 \shape default 
-).
+4).
  Enter the directory corresponding to your upgrade (if you are upgrading
  through multiple versions, you will need to apply the upgrades one at a
  time).
@@ -1990,39 +2031,276 @@ Overview
 \series bold 
 Zabbix
 \series default 
-\latex no_latex 
  is structured in a client-server architecture.
- The 
+ 
+\layout Standard
+
+
 \series bold 
-\latex default 
 Zabbix
 \series default 
-\latex no_latex 
+ is capable of running in either standalone or inetd execution mode.
+\begin_float footnote 
+\layout Standard
+
+The standalone method is the recommended approach.
+\end_float 
+\layout Standard
+
+\SpecialChar ~
+
+\layout Standard
+
+The 
+\series bold 
+Zabbix
+\series default 
+ server processes can be run in a polling or listening configuration or
+ both.
+ These methods differ in the approach that they utilize and affect what
+ processes must be run.
+ In the Server Polling Method the 
+\series bold 
+Zabbix
+\series default 
+ Server polls established 
+\series bold 
+Zabbix
+\series default 
+ clients (preferred.) In the Server Listen Method the 
+\series bold 
+Zabbix
+\series default 
+ server awaits connections from active 
+\series bold 
+Zabbix
+\series default 
+ clients.
+\layout Standard
+
+\SpecialChar ~
+
+\layout Standard
+
+
+\series bold 
+Zabbix
+\series default 
+ server processes consist of a standalone process used for the Server Polling
+ Mode (
+\series bold 
+zabbix_suckderd
+\series default 
+) and a 
+\emph on 
+choice
+\emph default 
+ of standalone or inetd processes for the Server Listen Method (
+\series bold 
+zabbix_trapperd
+\series default 
+ or 
+\series bold 
+zabbix_trapper.)
+\layout Standard
+
+
+\series bold 
+\SpecialChar ~
+
+\layout Standard
+
+
+\series bold 
+Zabbix
+\series default 
+ agents (clients) consist of a 
+\emph on 
+choice
+\emph default 
+ of standalone or inetd processes for the Server Polling Method and a standalone
+ process for the Server Listen Method (There is no inetd process for the
+ Server Listen Method because when using that method the client must initiate
+ the connection.) 
+\layout Standard
+
+\SpecialChar ~
+
+\layout Standard
+
+If the server is used in the Server Polling Mode then the 
+\series bold 
+Zabbix
+\series default 
+ listening client is used (
+\series bold 
+zabbix_agentd
+\series default 
+ or 
+\series bold 
+zabbix_agent
+\series default 
+), this client awaits connections 
+\emph on 
+from
+\emph default 
+ the server.
+ If the server is used in the Server Listen Mode then the zabbix active
+ client is used (
+\series bold 
+zabbix_sende
+\series default 
+r), this client initiates connections 
+\emph on 
+to
+\emph default 
+ the server.
+ 
+\layout Subsection
+
+Server Approach Modes
+\layout Standard
+
+
+\series bold 
+Zabbix
+\series default 
+ supports two methods of server role activity.
+ The server may be used in a polling mode (Server Polling Method) or the
+ server may be using in a listening mode (Server Listen Method) or both.
+\layout Standard
+
+\SpecialChar ~
+
+\layout Standard
+
+These methods are not mutually exclusive and can be used in conjunction.
+\layout Standard
+
+\SpecialChar ~
+
+\layout Standard
+
+The standard method utilized is the Server Polling Method in most instances.
+ In this method the server is setup and configured to be aware of clients
+ and then the server polls the clients at defined intervals.
+\layout Standard
+
+\SpecialChar ~
+
+\layout Standard
+
+The additional Server Active Method can also be used.
+ This is generally used in a complimentary fashion to have clients send
+ information to the server on a predetermined basis as defined by the administra
+tor.
+ For example, the Server Listen Method can be used to have a client machine
+ send information to the server when a backup process has begun and again
+ when it has ended.
+ In this manner the client dictates the interval of the information and
+ sends information when specified events occur rather than the server requesting
+ information at speicified intervals.
+\layout Subsubsection
+
+Server Polling Method (Server connects to Client)
+\layout Standard
+
+In this method the 
+\series bold 
+Zabbix
+\series default 
  server (
 \series bold 
-\latex default 
 zabbix_suckerd
 \series default 
-\latex no_latex 
-) periodically connects to an agent placed on the monitored host, asks for
- specific information (processor load, free memory, available inodes, etc).
- The agent provides the server with the requested information and the server,
- in turn, stores the received values in the database
-\latex default 
-.
+ or z
+\series bold 
+abbix_sucker
+\series default 
+) initiates connections to a client agent placed on the monitored host (
+\series bold 
+zabbix_agentd
+\series default 
+ or 
+\series bold 
+zabbix_agent
+\series default 
+) on a periodic basis.
+ The server requests specific information (processor load, free memory,
+ available inodes, etc, whatever is being monitored.) The client provides
+ the server with the requested information and the server, in turn, stores
+ the received values in the database.
+\begin_float footnote 
+\layout Standard
+
+In this case the traditional sense of client is turned around.
+ The client is actually the server.
+ That is to say 
+\layout Standard
+
+that the connection is made 
+\emph on 
+from
+\emph default 
+ the main 
+\series bold 
+Zabbix
+\series default 
+ server (
+\series bold 
+zabbix_suckerd
+\series default 
+) 
+\emph on 
+to
+\emph default 
+ the 
+\series bold 
+Zabbix
+\series default 
+ client (
+\series bold 
+zabbix_agentd
+\series default 
+), and therefore the 
+\series bold 
+Zabbix
+\series default 
+ client is acting like a traditional server and listenting for connections
+ and responding; and the 
+\series bold 
+Zabbix
+\series default 
+ server is actually acting as a traditional client and initiating a connection.
+\end_float 
  
+\layout Subsubsection
+
+Server Listen Method (Client connects to Server)
+\layout Standard
+
+In this method the 
 \series bold 
 Zabbix
 \series default 
-\latex no_latex 
- also supports the use of a trapping method.
- In this case, the monitored host sends information to 
+ client (
 \series bold 
-\latex default 
+zabbix_sender
+\series default 
+) initiates connections to a 
+\series bold 
 Zabbix
 \series default 
-\latex no_latex 
- server.
+ server (
+\series bold 
+zabbix_trapperd
+\series default 
+ or 
+\series bold 
+zabbix_trapper
+\series default 
+) on an event driven basis.
+ 
 \layout Subsection
 
 Theory of operations
@@ -2273,8 +2551,12 @@ zabbix_suckerd
 \latex default 
 five
 \latex no_latex 
- copies of itself.\SpecialChar ~
- This means that 
+ copies of itself.
+
+\latex default 
+ 
+\latex no_latex 
+This means that 
 \series bold 
 \latex default 
 Zabbix
@@ -2284,9 +2566,12 @@ Zabbix
 \latex default 
 five
 \latex no_latex 
- monitored parameters simultaneously.\SpecialChar ~
- To modify the number of forked processes,
- change the parameter 
+ monitored parameters simultaneously.
+
+\latex default 
+ 
+\latex no_latex 
+To modify the number of forked processes, change the parameter 
 \emph on 
 \latex default 
 StartSuckers
@@ -2299,7 +2584,7 @@ StartSuckers
 .
  
 \latex default 
-Note that each forked process requires connection to database.
+Note that each forked process requires connection to the database.
  Make sure that the database is able to provide this number of connections.
 \layout Standard
 
@@ -2427,7 +2712,30 @@ zabbix_suckerd
 
 
 \latex no_latex 
-Syslog is used to store debug information for the process.
+The 
+\series bold 
+\latex default 
+zabbix_suckerd
+\series default 
+\latex no_latex 
+ process 
+\latex default 
+cannot be ran as root.
+\layout Standard
+
+
+\latex no_latex 
+\SpecialChar ~
+
+\layout Standard
+
+
+\latex no_latex 
+Syslog
+\latex default 
+ or a file
+\latex no_latex 
+ is used to store debug information for the process.
 \layout Subsubsection
 
 zabbix_agent
@@ -5272,6 +5580,8 @@ diskfree[/]
 diskfree[/opt
 \emph default 
 ] - correct definitions.
+\layout Standard
+
 \layout Subsubsection
 
 List of supported parameters
@@ -9108,7 +9418,11 @@ pinger.pl
 
 
 \latex no_latex 
-The script is used to periodically sind ICMP pings to list of servers.
+The script is used to periodically s
+\latex default 
+e
+\latex no_latex 
+nd ICMP pings to list of servers.
  In case, if it does not receive responce from host, it executes:
 \layout Standard
 
