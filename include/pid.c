@@ -40,9 +40,9 @@ int	create_pid_file(const char *pidfile)
 	f = fopen(pidfile, "r");
 	if(f != NULL)
 	{
-		fprintf(stderr, "File [%s] exists. Is zabbix_agentd already running ?\n",
+		fprintf(stderr, "File [%s] exists. Is this process already running ?\n",
 			pidfile);
-		zabbix_log( LOG_LEVEL_CRIT, "File [%s] exists. Is zabbix_agentd already running ?",
+		zabbix_log( LOG_LEVEL_CRIT, "File [%s] exists. Is this process already running ?",
 			pidfile);
 		if(fclose(f) != 0)
 		{
