@@ -1,6 +1,6 @@
 Changes for 1.0beta11:
 
- - http://zabbix.sf.nt was changed to http://www.zabbix.org
+ - http://zabbix.sf.net was changed to http://www.zabbix.org
  (Alexei)
  - support of delta flag in item definition (Alexei)
  - added column items.delta,prevorgvalue (Alexei)
@@ -29,7 +29,6 @@ Changes for 1.0beta11:
  - monitoring of CPU and mainboard temperature under Linux (Alexei)
  - support for sensor[temp1],sensor[temp2],sensor[temp3] (Alexei)
  - report1.php to use 'ps -ef' (Alexei)
- - document what template information is used 
  - support for prefixes in trigger expressions (K,M,G) (Alexei)
  - new item status: 'deleted' (Alexei)
  - fixed autoconf problems under SUSE 8.2 (Alexei)
