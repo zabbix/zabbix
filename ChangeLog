@@ -1,7 +1,8 @@
 Changes for 1.0beta14:
 
- - Bettery.png has been renamed to UPS.png (Alexei)
- - fixed removing of an item under PostgreSQL (Alexei)
+ - fixed creation of actions from templates (Alexei)
+ - Battery.png has been renamed to UPS.png (Alexei)
+ - fixed removal of an item under PostgreSQL (Alexei)
  - fixed patch for PostgreSQL (Alexei)
 
 Changes for 1.0beta13:
