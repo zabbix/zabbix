@@ -4459,7 +4459,7 @@ echo "</head>";
 
 	function get_map_imagemap($sysmapid)
 	{
-		$map="\n<map name=links$sysmapid"."_".rand(0,100000).">";
+		$map="\n<map name=links$sysmapid>";
 		$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status,sh.icon,sh.url from sysmaps_hosts sh,hosts h where sh.sysmapid=$sysmapid and h.hostid=sh.hostid");
 		for($i=0;$i<DBnum_rows($result);$i++)
 		{
