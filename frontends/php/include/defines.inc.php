@@ -32,6 +32,7 @@
 	define("AUDIT_RESOURCE_HOST",		4);
 	define("AUDIT_RESOURCE_ACTION",		5);
 	define("AUDIT_RESOURCE_GRAPH",		6);
+	define("AUDIT_RESOURCE_GRAPH_ELEMENT",	7);
 
 
 

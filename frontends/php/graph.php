@@ -72,7 +72,7 @@
 			if($result)
 			{
 				$graph=get_graph_by_graphid($graphitem["graphid"]);
-				$item=get_item_by_itemid($graphitemid["itemid"]);
+				$item=get_item_by_itemid($graph["itemid"]);
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH_ELEMENT,"Graph ID [".$graphitem["graphid"]."] Name [".$graph["name"]."] Deleted [".$item["name"]."]");
 			}
 			show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
@@ -219,7 +219,7 @@
 	echo "</SELECT>";
 
 	show_table2_v_delimiter();
-	echo nbsp("S_SORT_ORDER_1_100");
+	echo nbsp(S_SORT_ORDER_1_100);
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"sortorder\" value=\"$sortorder\" size=3>";
 
