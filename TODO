@@ -1,23 +1,35 @@
 1.1:
 
+ - make sure all screens looks good in case of hundreds of servers/groups
+ - use oop approach for new development
+ - update the manual
+ - put manual in HTML to the web
+ - hardlinked templates (several templates, one host)
+ - rewrite validation and evaluation of expressions (i.e. make >-1 work)
+ - support for 'Clone' (graphs and screens)
+ - add support of interface statistics under Solaris and FreeBSD
+ - add screens and graphs to host templates
+ - SNMP trapping
+ - SNMP v3
+ - pass parameters to UserParameters
+ - custom multiplier
+ - calculate MIN value for graphs (do not use '0')
+ - infrastructure for reports
+
  - man pages for all daemons
  - icmppingsec->icmppingmsec
  - disk size is not correct after evaluating macros in the message
- - add support of interface statistics under Solaris and FreeBSD
  - add support for real 'delta' (last-previous)
  - fix evaluation of complex trigger expressions (diskpercentage)
  - add support for percentages of disk usage and diskused[]
  - check if alert and service alert is added after host become reachable again
  - navigation bar for all graphs and screens
- - make support for "Clone"
  - check bug with trapper receiving value with ":"
 
 LATER:
 
  - zabbix to write log to the item (for example: log when item becomes unsupported)
  - support for UDP-based checks (DNS, etc)
- - 'clone' for graphs and screens
- - add screens and graphs to host templates
  - preserve selected host group between different screens (trigger maintenance, host maintenance)
  - add zabbix[unixtime] and lastupdate() and tick() to get rid of nodata()
  - check return code for alert scripts
@@ -38,7 +50,6 @@ latest trigger (item type  = TRAPPER)
  - finish src/zabbix_snmptrapper
  - links to Zabbix frontend in alert emails
  - strings items for graphs
- - support of '-' in trigger expressions (...>-1)
  - UserParameter does not appear in the log
  - add support for agent forwarding (proxy)
  - ability to add a library of  userwritten c-functions with dlopen/dlsym to
@@ -58,10 +69,6 @@ suckerd and agentd)
  - [10] IT Services. SLA for a period of time only (09:00-18:00)
 
  - monitoring of Windows event log
-
-SECURITY:
-
- - get rid of strcpy, strncpy, sprintf, strcat ,etc
 
 LS:
 
@@ -202,7 +209,6 @@ I made changes to the PHP frontend and zabbix_sucker.c to enable the user to spe
 
 
  - BUG. zabbix_sucker should accept parameter regardless of "\n" at the end of line 
- - get rid of long select lists in user forms 
  - do not send notifications at certain periods of time. Do not monitor services at certain periods of time.
  - decrease number of TCP connections between server and agent
  - add triggers for all hosts at once
@@ -240,7 +246,6 @@ WIN32 Agent:
  OTHER:
 
  - support for netload under other platforms
- - calculate MIN value for graphs (do not use '0')
  - make kstat structure local (instead of static)
  - collect network and other statistics using kstat()
  - apply Mariusz's patches
