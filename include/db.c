@@ -785,10 +785,12 @@ int	DBget_queue_count(void)
 	int	res;
 	char	sql[MAX_STRING_LEN+1];
 	DB_RESULT	*result;
+	int	now;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_queue_count()");
 
-	sprintf(sql,"select count(*) from items i,hosts h where i.status=%d and i.type not in (%d) and h.status=%d and i.hostid=h.hostid and i.nextcheck<$now and i.key_<>'status'", ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, HOST_STATUS_MONITORED);
+	now=time(NULL);
+	sprintf(sql,"select count(*) from items i,hosts h where i.status=%d and i.type not in (%d) and h.status=%d and i.hostid=h.hostid and i.nextcheck<%d and i.key_<>'status'", ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, HOST_STATUS_MONITORED, now);
 
 	result=DBselect(sql);
 

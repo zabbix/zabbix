@@ -32,7 +32,7 @@
 	echo "<td width=10%><b>Status</b></td>";
 	echo "<td><b>Reason</b></td>";
 	echo "<td width=20%><b>SLA (last 7 days)</b></td>";
-	echo "<td width=10% align=center><b>Planned/current<BR>SLA</b></td>";
+	echo "<td width=10% align=center><b>Planned/current&nbsp;SLA</b></td>";
 	echo "<td width=5%><b>Graph</b></td>";
 	echo "</tr>";
 	echo "\n";

@@ -573,6 +573,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 		echo "<center>";
 //		echo "<font size=+1 color='$color'>";
+		echo "<font color='$color'>";
 		if($ERROR_MSG=="")
 		{
 			echo "<b>[$msg]</b>";
@@ -581,7 +582,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 			echo "<b>[$msg. $ERROR_MSG]</b>";
 		}
-//		echo "</font>";
+		echo "</font>";
 		echo "</center><br>";
 	}
 
@@ -901,11 +902,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				if( 	($page["file"]=="latest.php") ||
 					($page["file"]=="history.php"))
 				{
-					echo "<b>[LATEST VALUES]</b></a>";
+					echo "<b>[LATEST&nbsp;VALUES]</b></a>";
 				}
 				else
 				{
-					echo "LATEST VALUES</a>";
+					echo "LATEST&nbsp;VALUES</a>";
 				}
 ?>
 		</td>
@@ -988,11 +989,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 <?php
 				if($page["file"]=="maps.php")
 				{
-					echo "<b>[NETWORK MAPS]</b></a>";
+					echo "<b>[NETWORK&nbsp;MAPS]</b></a>";
 				}
 				else
 				{
-					echo "NETWORK MAPS</a>";
+					echo "NETWORK&nbsp;MAPS</a>";
 				}
 ?>
 		</td>
@@ -1041,11 +1042,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				}
 				if($page["file"]=="srv_status.php")
 				{
-					echo "<b>[IT SERVICES]</b></a>";
+					echo "<b>[IT&nbsp;SERVICES]</b></a>";
 				}
 				else
 				{
-					echo "IT SERVICES</a>";
+					echo "IT&nbsp;SERVICES</a>";
 				}
 ?>
 		</td>
@@ -1093,11 +1094,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 <?php
 				if($page["file"]=="report1.php")
 				{
-					echo "<b>[STATUS OF ZABBIX]</b></a>";
+					echo "<b>[STATUS&nbsp;OF&nbsp;ZABBIX]</b></a>";
 				}
 				else
 				{
-					echo "STATUS OF ZABBIX</a>";
+					echo "STATUS&nbsp;OF&nbsp;ZABBIX</a>";
 				}
 ?>
 		</td>
@@ -1111,11 +1112,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 <?php
 				if($page["file"]=="report2.php")
 				{
-					echo "<b>[AVAILABILITY REPORT]</b></a>";
+					echo "<b>[AVAILABILITY&nbsp;REPORT]</b></a>";
 				}
 				else
 				{
-					echo "AVAILABILITY REPORT</a>";
+					echo "AVAILABILITY&nbsp;REPORT</a>";
 				}
 ?>
 		</td>
@@ -1231,11 +1232,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				if(	($page["file"]=="sysmaps.php")||
 					($page["file"]=="sysmap.php"))
 				{
-					echo "<b>[NETWORK MAPS]</b></a>";
+					echo "<b>[NETWORK&nbsp;MAPS]</b></a>";
 				}
 				else
 				{
-					echo "NETWORK MAPS</a>";
+					echo "NETWORK&nbsp;MAPS</a>";
 				}
 ?>
 		</td>
@@ -1282,11 +1283,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				}
 				if($page["file"]=="services.php")
 				{
-					echo "<b>[IT SERVICES]</b></a>";
+					echo "<b>[IT&nbsp;SERVICES]</b></a>";
 				}
 				else
 				{
-					echo "IT SERVICES</a>";
+					echo "IT&nbsp;SERVICES</a>";
 				}
 ?>
 		</td>
@@ -1805,10 +1806,16 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	add_service_link($servicedownid,$serviceupid,$softlink)
 	{
-//		global	$ERROR_MSG;
+		global	$ERROR_MSG;
 
 		if( ($softlink==0) && (is_service_hardlinked($servicedownid)==TRUE) )
 		{
+			return	FALSE;
+		}
+
+		if($servicedownid==$serviceupid)
+		{
+			$ERROR_MSG="Cannot link service to itself.";
 			return	FALSE;
 		}
 
@@ -2323,6 +2330,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 
 		$sql="insert into graphs (name,width,height) values ('$name',$width,$height)";
+		return	DBexecute($sql);
+	}
+
+	function	update_graph_item($gitemid,$itemid,$color,$drawtype)
+	{
+		$sql="update graphs_items set itemid=$itemid,color='$color',drawtype=$drawtype where gitemid=$gitemid";
 		return	DBexecute($sql);
 	}
 
@@ -4220,18 +4233,28 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
                 {
                         return  $result;
                 }
+                $sql="delete from screens_graphs where screenid=$screenid";
+                $result=DBexecute($sql);
+                if(!$result)
+                {
+                        return  $result;
+                }
                 $sql="delete from screens where screenid=$screenid";
                 return  DBexecute($sql);
         }
 
         function add_screen_item($screenid,$x,$y,$graphid,$width,$height)
         {
+                $sql="delete from screens_items where screenid=$screenid and x=$x and y=$y";
+                DBexecute($sql);
                 $sql="insert into screens_items (screenid,x,y,graphid,width,height) values ($screenid,$x,$y,$graphid,$width,$height)";
                 return  DBexecute($sql);
         }
 
         function add_screen_graph($screenid,$x,$y,$itemid,$width,$height)
         {
+                $sql="delete from screens_graphs where screenid=$screenid and x=$x and y=$y";
+                DBexecute($sql);
                 $sql="insert into screens_graphs (screenid,x,y,itemid,width,height) values ($screenid,$x,$y,$itemid,$width,$height)";
                 return  DBexecute($sql);
         }
@@ -4247,7 +4270,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
                 $sql="delete from screens_items where screenitemid=$screenitemid";
                 return  DBexecute($sql);
         }
-
 
         function get_drawtype_description($drawtype)
         {

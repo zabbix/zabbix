@@ -118,8 +118,12 @@ int	do_ping(void)
 
 int	update_items(void)
 {
+	int ret = SUCCEED;
 	char	sql[MAX_STRING_LEN+1];
 	int	i,now;
+
+	DB_HOST	host;
+	DB_RESULT	*result;
 
 	now=time(NULL);
 	sprintf(sql,"select h.useip,h.ip,h.host from hosts h where (h.status=%d or (h.status=%d and h.disable_until<=%d))", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now);
@@ -131,16 +135,18 @@ int	update_items(void)
 		host.ip=DBget_field(result,i,1);
 		host.host=DBget_field(result,i,2);
 
-		if(HOST_USE_IP == host.useip)
+/*		if(HOST_USE_IP == host.useip)
 		{
 			fprintf(f,"%s\n",host.ip);
 		}
 		else
 		{
 			fprintf(f,"%s\n",host.host);
-		}
+		}*/
 	}
 	DBfree_result(result);
+
+	return ret;
 }
 
 int main_pinger_loop(void)

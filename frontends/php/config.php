@@ -194,7 +194,7 @@
 		echo "<input class=\"biginput\" name=\"smtp_email\" type=\"hidden\" value=\"$smtp_email\">";
 
 		show_table2_v_delimiter();
-		echo "Script path";
+		echo "Script name";
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"exec_path\" value=\"".$exec_path."\" size=50>";
 	}

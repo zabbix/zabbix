@@ -1,7 +1,12 @@
 Changes for 1.0beta10:
 
+ - support for changing of graph items (Alexei)
+ - menu will not require more than three lines (Alexei)
+ - fixed dividion by zero in chart2.php (Alexei)
+ - period and start of interval are preserved in full-screen mode (Alexei)
+ - added units in graph legends (Alexei)
+ - table-like legend for user graphs (Alexei)
  - small fix for executing user scripts (Alexei)
- - check if there is problem with script execution
  - fix to enable use of abschange() (Alexei)
  - cosmetic change of "LATEST VALUES" screen (Alexei)
  - support for simple checks :smtp_perf, ftp_perf, ssh_perf, etc. (Alexei)

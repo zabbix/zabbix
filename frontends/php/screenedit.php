@@ -24,10 +24,11 @@
 	{
 		if($HTTP_GET_VARS["register"]=="add")
 		{
-			if(isset($HTTP_GET_VARS["screenitemid"]))
-			{
-				delete_screen_item($HTTP_GET_VARS["screenitemid"]);
-			}
+//			if(isset($HTTP_GET_VARS["screenitemid"]))
+//			{
+//				delete_screen_item($HTTP_GET_VARS["screenitemid"]);
+//				unset($HTTP_GET_VARS["screenitemid"]);
+//			}
 			if($HTTP_GET_VARS["resource"]==0)
 			{
 				$result=add_screen_graph($HTTP_GET_VARS["screenid"],$HTTP_GET_VARS["x"],$HTTP_GET_VARS["y"],$HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
@@ -36,6 +37,7 @@
 			{
 				$result=add_screen_item($HTTP_GET_VARS["screenid"],$HTTP_GET_VARS["x"],$HTTP_GET_VARS["y"],$HTTP_GET_VARS["graphid"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
 			}
+			unset($HTTP_GET_VARS["x"]);
 			show_messages($result,"Item added","Cannot add item");
 		}
 		if($HTTP_GET_VARS["register"]=="delete")
@@ -113,6 +115,7 @@
 			echo "<input name=\"x\" type=\"hidden\" value=$c>";
 			echo "<input name=\"y\" type=\"hidden\" value=$r>";
 			echo "<input name=\"screenitemid\" type=\"hidden\" value=$screenitemid>";
+			echo "<input name=\"screengraphid\" type=\"hidden\" value=$screengraphid>";
 			echo "<input name=\"resource\" type=\"hidden\" value=$resource>";
 
 			show_table2_v_delimiter();
@@ -137,7 +140,7 @@
 					$host_=DBget_field($result,$i,0);
 					$description_=DBget_field($result,$i,1);
 					$itemid_=DBget_field($result,$i,2);
-					echo "<OPTION VALUE='$itemid_ ".iif($itemid==$itemid_,"selected","")."'>$host_: $description_";
+					echo "<OPTION VALUE='$itemid_' ".iif($itemid==$itemid_,"selected","")."'>$host_: $description_";
 				}
 				echo "</SELECT>";
 			}

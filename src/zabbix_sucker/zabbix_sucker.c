@@ -155,12 +155,6 @@ void	daemon_init(void)
 			exit(FAIL);
 		}
 
-		if( (setgid(pwd->pw_gid) ==-1) || (setuid(pwd->pw_uid) == -1) )
-		{
-			fprintf(stderr,"Cannot setgid or setuid to zabbix");
-			exit(FAIL);
-		}
-
 #ifdef HAVE_FUNCTION_SETEUID
 		if( (setegid(pwd->pw_gid) ==-1) || (seteuid(pwd->pw_uid) == -1) )
 		{
@@ -168,6 +162,13 @@ void	daemon_init(void)
 			exit(FAIL);
 		}
 #endif
+
+		if( (setgid(pwd->pw_gid) ==-1) || (setuid(pwd->pw_uid) == -1) )
+		{
+			fprintf(stderr,"Cannot setgid or setuid to zabbix");
+			exit(FAIL);
+		}
+
 
 	}
 
@@ -437,7 +438,7 @@ int	get_value_SIMPLE(double *result,char *result_str,DB_ITEM *item)
 	{
 		strncpy(s,item->key,MAX_STRING_LEN);
 		t=strstr(item->key,"_perf");
-		s[t]=0;
+		t[0]=0;
 		
 		if(item->useip==1)
 		{
@@ -1266,7 +1267,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started",sucker_num);
+/*	zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started",sucker_num);*/
 
 #ifdef HAVE_SNMP
 	init_snmp("zabbix_suckerd");
@@ -1275,25 +1276,31 @@ int main(int argc, char **argv)
 	if( sucker_num == 0)
 	{
 /* First instance of zabbix_suckerd performs housekeeping procedures */
+		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started. Housekeeper.",sucker_num);
 		main_housekeeping_loop();
 	}
 	else if(sucker_num == 1)
 	{
 /* Second instance of zabbix_suckerd sends alerts to users */
+		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started. Alerter.",sucker_num);
 		main_alerter_loop();
 	}
 	else if(sucker_num == 2)
 	{
 /* Third instance of zabbix_suckerd periodically re-calculates 'nodata' functions */
+		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started. nodata() calculator.",sucker_num);
 		main_nodata_loop();
 	}
 	else if(sucker_num == 3)
 	{
 /* Fourth instance of zabbix_suckerd periodically pings hosts */
-		main_pinger_loop();
+		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started. ICMP pinger.",sucker_num);
+		for(;;) sleep(3600);
+/*		main_pinger_loop();*/
 	}
 	else
 	{
+		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started. Sucker.",sucker_num);
 		main_sucker_loop();
 	}
 

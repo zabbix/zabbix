@@ -27,6 +27,11 @@
 			$result=add_item_to_graph($HTTP_GET_VARS["graphid"],$HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["color"],$HTTP_GET_VARS["drawtype"]);
 			show_messages($result,"Item added","Cannot add item");
 		}
+		if($HTTP_GET_VARS["register"]=="update")
+		{
+			$result=update_graph_item($HTTP_GET_VARS["gitemid"],$HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["color"],$HTTP_GET_VARS["drawtype"]);
+			show_messages($result,"Item updated","Cannot update item");
+		}
 		if($HTTP_GET_VARS["register"]=="delete")
 		{
 			$result=delete_graphs_item($HTTP_GET_VARS["gitemid"]);
@@ -69,7 +74,11 @@
 		echo "<TD><a href=\"chart.php?itemid=".$row["itemid"]."&period=3600&from=0\">".$row["description"]."</a></TD>";
 		echo "<TD>".get_drawtype_description($row["drawtype"])."</TD>";
 		echo "<TD>".$row["color"]."</TD>";
-		echo "<TD><A HREF=\"graph.php?register=delete&graphid=".$HTTP_GET_VARS["graphid"]."&gitemid=".$row["gitemid"]."\">Delete</A></TD>";
+		echo "<TD>";
+		echo "<A HREF=\"graph.php?graphid=".$HTTP_GET_VARS["graphid"]."&gitemid=".$row["gitemid"]."#form\">Change</A>";
+		echo " - ";
+		echo "<A HREF=\"graph.php?register=delete&graphid=".$HTTP_GET_VARS["graphid"]."&gitemid=".$row["gitemid"]."\">Delete</A>";
+		echo "</TD>";
 		echo "</TR>";
 	}
 	echo "</TABLE>";
@@ -78,6 +87,15 @@
 <?php
 	echo "<br>";
 	echo "<a name=\"form\"></a>";
+
+	if(isset($HTTP_GET_VARS["gitemid"]))
+	{
+		$sql="select itemid,color,drawtype from graphs_items where gitemid=".$HTTP_GET_VARS["gitemid"];
+		$result=DBselect($sql);
+		$itemid=DBget_field($result,0,0);
+		$color=DBget_field($result,0,1);
+		$drawtype=DBget_field($result,0,2);
+	}
 
 	show_table2_header_begin();
 	echo "New item for graph";
@@ -99,7 +117,14 @@
 		$host_=DBget_field($result,$i,0);
 		$description_=DBget_field($result,$i,1);
 		$itemid_=DBget_field($result,$i,2);
-		echo "<OPTION VALUE='$itemid_'>$host_: $description_";
+		if(isset($itemid)&&($itemid==$itemid_))
+		{
+			echo "<OPTION VALUE='$itemid_' SELECTED>$host_: $description_";
+		}
+		else
+		{
+			echo "<OPTION VALUE='$itemid_'>$host_: $description_";
+		}
 	}
 	echo "</SELECT>";
 
@@ -107,30 +132,34 @@
 	echo "Type";
 	show_table2_h_delimiter();
 	echo "<select name=\"drawtype\" size=1>";
-	echo "<OPTION VALUE='0'>".get_drawtype_description(0);
-	echo "<OPTION VALUE='1'>".get_drawtype_description(1);
-	echo "<OPTION VALUE='2'>".get_drawtype_description(2);
+	echo "<OPTION VALUE='0' ".iif(isset($drawtype)&&($drawtype==0),"SELECTED","").">".get_drawtype_description(0);
+	echo "<OPTION VALUE='1' ".iif(isset($drawtype)&&($drawtype==1),"SELECTED","").">".get_drawtype_description(1);
+	echo "<OPTION VALUE='2' ".iif(isset($drawtype)&&($drawtype==2),"SELECTED","").">".get_drawtype_description(2);
 	echo "</SELECT>";
 
 	show_table2_v_delimiter();
 	echo "Color";
 	show_table2_h_delimiter();
 	echo "<select name=\"color\" size=1>";
-	echo "<OPTION VALUE='Black'>Black";
-	echo "<OPTION VALUE='Blue'>Blue";
-	echo "<OPTION VALUE='Cyan'>Cyan";
-	echo "<OPTION VALUE='Dark Blue'>Dark blue";
-	echo "<OPTION VALUE='Dark Green'>Dark green";
-	echo "<OPTION VALUE='Dark Red'>Dark red";
-	echo "<OPTION VALUE='Dark Yellow'>Dark yellow";
-	echo "<OPTION VALUE='Green'>Green";
-	echo "<OPTION VALUE='Red'>Red";
-	echo "<OPTION VALUE='White'>White";
-	echo "<OPTION VALUE='Yellow'>Yellow";
+	echo "<OPTION VALUE='Black' ".iif(isset($color)&&($color=="Black"),"SELECTED","").">Black";
+	echo "<OPTION VALUE='Blue' ".iif(isset($color)&&($color=="Blue"),"SELECTED","").">Blue";
+	echo "<OPTION VALUE='Cyan' ".iif(isset($color)&&($color=="Cyan"),"SELECTED","").">Cyan";
+	echo "<OPTION VALUE='Dark Blue' ".iif(isset($color)&&($color=="Dark Blue"),"SELECTED","").">Dark blue";
+	echo "<OPTION VALUE='Dark Green' ".iif(isset($color)&&($color=="Dark Green"),"SELECTED","").">Dark green";
+	echo "<OPTION VALUE='Dark Red' ".iif(isset($color)&&($color=="Dark Red"),"SELECTED","").">Dark red";
+	echo "<OPTION VALUE='Dark Yellow' ".iif(isset($color)&&($color=="Dark Yellow"),"SELECTED","")."'>Dark yellow";
+	echo "<OPTION VALUE='Green' ".iif(isset($color)&&($color=="Green"),"SELECTED","").">Green";
+	echo "<OPTION VALUE='Red' ".iif(isset($color)&&($color=="Red"),"SELECTED","").">Red";
+	echo "<OPTION VALUE='White' ".iif(isset($color)&&($color=="White"),"SELECTED","").">White";
+	echo "<OPTION VALUE='Yellow' ".iif(isset($color)&&($color=="Yellow"),"SELECTED","").">Yellow";
 	echo "</SELECT>";
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+	if(isset($itemid))
+	{
+		echo "<input type=\"submit\" name=\"register\" value=\"update\">";
+	}
 
 	show_table2_header_end();
 ?>
