@@ -73,6 +73,10 @@ extern	char	*CONFIG_DBSOCKET;*/
 		{
 			fprintf(stderr, "Failed to connect to database: Error: %s\n",mysql_error(&mysql) );
 			zabbix_log(LOG_LEVEL_ERR, "Failed to connect to database: Error: %s",mysql_error(&mysql) );
+			if( (ER_SERVER_SHUTDOWN != mysql_errno(&mysql)) && (CR_SERVER_GONE_ERROR != mysql_errno(&mysql)))
+			{
+				exit(FAIL);
+			}
 		}
 		else
 		{
