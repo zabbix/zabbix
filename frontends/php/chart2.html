@@ -47,6 +47,7 @@
 	$cyan=ImageColorAllocate($im,0,255,255); 
 	$black=ImageColorAllocate($im,0,0,0); 
 	$white=ImageColorAllocate($im,255,255,255); 
+	$gray=ImageColorAllocate($im,150,150,150); 
 
 	$colors=array();
 
@@ -133,7 +134,8 @@
 		{
 			ImageLine($im,$shiftX,$shiftYup+$sizeY/2,$sizeX+$shiftX,$shiftYup+$sizeY/2,$color[$item]);
 		}
-		ImageString($im, 2,$shiftX+150*$item,$sizeY+$shiftYup+15, "[".$desc[$item]."]", $color[$item]);
+		ImageFilledRectangle($im,$shiftX+150*$item,$sizeY+$shiftYup+19,$shiftX+150*$item+5,$sizeY+$shiftYup+15+9,$color[$item]);
+		ImageString($im, 2,$shiftX+150*$item+9,$sizeY+$shiftYup+15, $desc[$item], $gray);
 	}
 
 	if($nodata == 0)
@@ -153,7 +155,7 @@
 		ImageString($im, 2,$sizeX/2 -50,                $sizeY+$shiftYup+3, "NO DATA FOR THIS PERIOD" , $red);
 	}
 
-	ImageString($im,0,$shiftX+$sizeX-85,$sizeY+$shiftYup+25, "http://zabbix.sourceforge.net", $white);
+	ImageString($im,0,$shiftX+$sizeX-85,$sizeY+$shiftYup+25, "http://zabbix.sourceforge.net", $gray);
 
 	ImagePng($im); 
 	ImageDestroy($im); 
