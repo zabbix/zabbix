@@ -363,6 +363,8 @@ CREATE TABLE sysmaps_links (
   sysmapid		int4		DEFAULT '0' NOT NULL,
   shostid1		int4		DEFAULT '0' NOT NULL,
   shostid2		int4		DEFAULT '0' NOT NULL,
+-- may be NULL 
+  triggerid		int4,
   PRIMARY KEY (linkid),
   FOREIGN KEY (sysmapid) REFERENCES sysmaps,
   FOREIGN KEY (shostid1) REFERENCES sysmaps_hosts,
@@ -515,8 +517,10 @@ CREATE TABLE stats (
   month			int4		DEFAULT '0' NOT NULL,
   day			int4		DEFAULT '0' NOT NULL,
   hour			int4		DEFAULT '0' NOT NULL,
-  value			float8		DEFAULT '0.0000' NOT NULL,
-  PRIMARY KEY (itemid,year,month,day,hour),
+  value_max		float8		DEFAULT '0.0000' NOT NULL,
+  value_min		float8		DEFAULT '0.0000' NOT NULL,
+  value_avg		float8		DEFAULT '0.0000' NOT NULL,
+  PRIMARY KEY (itemid,year,month,day,hour)
 );
 
 VACUUM ANALYZE;
