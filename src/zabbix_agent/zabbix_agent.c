@@ -65,7 +65,7 @@ void    init_config(void)
 */
 		{"Server",&CONFIG_HOSTS_ALLOWED,0,TYPE_STRING,PARM_MAND,0,0},
 		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
-		{"UserParameter",0,(void *)&add_parameter,0,0,0,0},
+		{"UserParameter",0,&add_parameter,0,0,0,0},
 		{0}
 	};
 
