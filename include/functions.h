@@ -23,6 +23,9 @@
 
 #include "db.h"
 
+#define	EVALUATE_FUNCTION_NORMAL	0
+#define	EVALUATE_FUNCTION_SUFFIX	1
+
 void    update_triggers (int itemid);
 int	get_lastvalue(char *value,char *host,char *key,char *function,char *parameter);
 int	process_data(int sockfd,char *server,char *key, char *value);
