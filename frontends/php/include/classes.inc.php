@@ -52,6 +52,7 @@
 
 		function initColors()
 		{
+// I should rename No Alpha to Alpha at some point to get rid of some confusion
 			if(function_exists("ImageColorExactAlpha")&&function_exists("ImageCreateTrueColor"))
 			{
 				$this->colors["Red"]=		ImageColorExactAlpha($this->im,255,0,0,50); 
@@ -84,6 +85,9 @@
 				$this->colors["Black"]=ImageColorAllocate($this->im,0,0,0); 
 				$this->colors["Gray"]=ImageColorAllocate($this->im,150,150,150); 
 				$this->colors["White"]=ImageColorAllocate($this->im,255,255,255);
+
+				$this->colors["Dark Red No Alpha"]=	ImageColorAllocate($this->im,150,0,0); 
+				$this->colors["Black No Alpha"]=	ImageColorAllocate($this->im,0,0,0); 
 			}
 		}
 
