@@ -24,6 +24,39 @@
 
 
 //
+// Static data
+//
+
+static int numSubAgents;
+
+
+//
+// Parse SubAgent=... parameter
+// Argument is a module name and command line separated by comma
+//
+
+static BOOL AddSubAgent(char *args)
+{
+   char *cmdLine;
+
+   cmdLine=strchr(args,',');
+   if (cmdLine!=NULL)
+   {
+      *cmdLine=0;
+      cmdLine++;
+   }
+
+   subagentNameList=(SUBAGENT_NAME *)realloc(subagentNameList,sizeof(SUBAGENT_NAME)*(numSubAgents+2));
+   subagentNameList[numSubAgents].name=strdup(args);
+   subagentNameList[numSubAgents].cmdLine=cmdLine==NULL ? NULL : strdup(cmdLine);
+   numSubAgents++;
+   subagentNameList[numSubAgents].name=NULL;
+
+   return TRUE;
+}
+
+
+//
 // Parse PerfCounter=... parameter and add new performance counter
 // Argument is a config file parameter value which should have the following syntax:
 //    <key>,"<counter path>",<time interval>
@@ -135,6 +168,8 @@ BOOL ReadConfig(void)
          printf("Unable to open configuration file: %s\n",strerror(errno));
       return FALSE;
    }
+
+   numSubAgents=0;
 
    while(!feof(cfg))
    {
@@ -272,6 +307,11 @@ BOOL ReadConfig(void)
             dwFlags|=AF_LOG_UNRESOLVED_SYMBOLS;
          else
             dwFlags&=~AF_LOG_UNRESOLVED_SYMBOLS;
+      }
+      else if (!stricmp(buffer,"SubAgent"))
+      {
+         if (!AddSubAgent(ptr))
+            errors++;
       }
       else if ((!stricmp(buffer,"PidFile"))||(!stricmp(buffer,"NoTimeWait"))||
                (!stricmp(buffer,"StartAgents"))||(!stricmp(buffer,"DebugLevel")))

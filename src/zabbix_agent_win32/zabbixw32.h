@@ -31,6 +31,7 @@
 #include "../../include/common.h"
 #include "md5.h"
 #include "messages.h"
+#include "zabbix_subagent.h"
 
 
 //
@@ -42,7 +43,7 @@
 #else
 #define DEBUG_SUFFIX
 #endif
-#define AGENT_VERSION         "1.0.0-beta8" DEBUG_SUFFIX
+#define AGENT_VERSION         "1.0.0-beta9(rc1)" DEBUG_SUFFIX
 
 #define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
 #define ZABBIX_EVENT_SOURCE   "Zabbix Win32 Agent"
@@ -52,16 +53,11 @@
 #define MAX_SERVERS           32
 #define MAX_ZABBIX_CMD_LEN    MAX_STRING_LEN
 #define MAX_CPU               16
-#define MAX_PARAMETERS        256
 #define MAX_PARAM_NAME        64
 #define MAX_PROCESSES         4096
 #define MAX_MODULES           512
 #define MAX_ALIAS_NAME        120
 #define MAX_COUNTER_NAME      (MAX_ALIAS_NAME-12)
-
-#define SYSINFO_RC_SUCCESS       0
-#define SYSINFO_RC_NOTSUPPORTED  1
-#define SYSINFO_RC_ERROR         2
 
 
 //
@@ -118,6 +114,31 @@ struct USER_COUNTER
 
 
 //
+// Subagent information structure
+//
+
+struct SUBAGENT
+{
+   SUBAGENT *next;                  // Pointer to next element in a chain
+   HMODULE hModule;                 // DLL module handle
+   int (__zabbix_api * init)(char *,SUBAGENT_COMMAND **);
+   void (__zabbix_api * shutdown)(void);
+   SUBAGENT_COMMAND *cmdList;       // List of subagent's commands
+};
+
+
+//
+// Subagent names list
+//
+
+struct SUBAGENT_NAME
+{
+   char *name;
+   char *cmdLine;
+};
+
+
+//
 // Functions
 //
 
@@ -163,7 +184,6 @@ void ExpandAlias(char *orig,char *expanded);
 // Global variables
 //
 
-extern DWORD dwTlsLogPrefix;
 extern HANDLE eventShutdown;
 extern HANDLE eventCollectorStarted;
 
@@ -178,6 +198,8 @@ extern DWORD confTimeout;
 extern DWORD confMaxProcTime;
 
 extern USER_COUNTER *userCounterList;
+extern SUBAGENT *subagentList;
+extern SUBAGENT_NAME *subagentNameList;
 
 extern double statProcUtilization[];
 extern double statProcUtilization5[];

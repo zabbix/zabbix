@@ -28,7 +28,6 @@
 // Global variables
 //
 
-DWORD dwTlsLogPrefix;
 HANDLE eventShutdown;
 HANDLE eventCollectorStarted;
 
@@ -40,6 +39,9 @@ DWORD confServerAddr[MAX_SERVERS];
 DWORD confServerCount=0;
 DWORD confTimeout=3000;    // 3 seconds default timeout
 DWORD confMaxProcTime=100; // 100 milliseconds is default acceptable collector sample processing time
+
+SUBAGENT *subagentList;    // List of loaded subagents
+SUBAGENT_NAME *subagentNameList=NULL;
 
 DWORD (__stdcall *imp_GetGuiResources)(HANDLE,DWORD);
 BOOL (__stdcall *imp_GetProcessIoCounters)(HANDLE,PIO_COUNTERS);
@@ -102,17 +104,59 @@ static void ImportSymbols(void)
 
 
 //
+// Load subagent
+//
+
+static BOOL LoadSubAgent(char *name,char *cmdLine)
+{
+   SUBAGENT *sbi;
+   int rc;
+
+   sbi=(SUBAGENT *)malloc(sizeof(SUBAGENT));
+   sbi->hModule=LoadLibrary(name);
+   if (sbi->hModule==NULL)
+   {
+      WriteLog(MSG_LOAD_FAILED,EVENTLOG_ERROR_TYPE,"se",name,GetLastError());
+      free(sbi);
+      return FALSE;
+   }
+
+   sbi->init=(int (__zabbix_api *)(char *,SUBAGENT_COMMAND **))GetProcAddress(sbi->hModule,"zabbix_subagent_init");
+   sbi->shutdown=(void (__zabbix_api *)(void))GetProcAddress(sbi->hModule,"zabbix_subagent_shutdown");
+   if ((sbi->init==NULL)||(sbi->shutdown==NULL))
+   {
+      WriteLog(MSG_NO_ENTRY_POINTS,EVENTLOG_ERROR_TYPE,"s",name);
+      FreeLibrary(sbi->hModule);
+      free(sbi);
+      return FALSE;
+   }
+
+   if ((rc=sbi->init(cmdLine,&sbi->cmdList))!=0)
+   {
+      WriteLog(MSG_SUBAGENT_INIT_FAILED,EVENTLOG_ERROR_TYPE,"sd",name,rc);
+      FreeLibrary(sbi->hModule);
+      free(sbi);
+      return FALSE;
+   }
+
+   // Add new subagent to chain
+   sbi->next=subagentList;
+   subagentList=sbi;
+
+   WriteLog(MSG_SUBAGENT_LOADED,EVENTLOG_INFORMATION_TYPE,"s",name);
+
+   return TRUE;
+}
+
+
+//
 // Initialization routine
 //
 
 BOOL Initialize(void)
 {
    WSAData sockInfo;
-
-   dwTlsLogPrefix=TlsAlloc();
-   if (dwTlsLogPrefix==TLS_OUT_OF_INDEXES)
-      return FALSE;
-   TlsSetValue(dwTlsLogPrefix,NULL);   // Set no prefix for main thread
+   int i;
 
    // Initialize Windows Sockets API
    WSAStartup(0x0002,&sockInfo);
@@ -122,6 +166,20 @@ BOOL Initialize(void)
    // Dynamically import functions that may not be presented in all Windows versions
    ImportSymbols();
 
+   // Load subagents
+   if (subagentNameList!=NULL)
+   {
+      for(i=0;subagentNameList[i].name!=NULL;i++)
+      {
+         LoadSubAgent(subagentNameList[i].name,subagentNameList[i].cmdLine);
+         free(subagentNameList[i].name);
+         if (subagentNameList[i].cmdLine!=NULL)
+            free(subagentNameList[i].cmdLine);
+      }
+      free(subagentNameList);
+   }
+
+   // Create synchronization stuff
    eventShutdown=CreateEvent(NULL,TRUE,FALSE,NULL);
    eventCollectorStarted=CreateEvent(NULL,TRUE,FALSE,NULL);
 
@@ -149,7 +207,6 @@ void Shutdown(void)
    Sleep(1000);      // Allow other threads to terminate
    WriteLog(MSG_AGENT_SHUTDOWN,EVENTLOG_INFORMATION_TYPE,NULL);
    CloseLog();
-   TlsFree(dwTlsLogPrefix);
 }
 
 
