@@ -45,7 +45,6 @@ CREATE UNIQUE INDEX hosts_host on hosts (host);
 CREATE TABLE items (
   itemid		serial,
   type			int4		NOT NULL,
-  value_type		int4		DEFAULT '0'	NOT NULL,
   snmp_community	varchar(64)	DEFAULT ''	NOT NULL,
   snmp_oid		varchar(255)	DEFAULT ''	NOT NULL,
   snmp_port		int4		DEFAULT '161'	NOT NULL,
@@ -60,6 +59,7 @@ CREATE TABLE items (
   lastclock		int4		DEFAULT NULL,
   prevvalue		varchar(255)	DEFAULT NULL,
   status		int4		DEFAULT '0' NOT NULL,
+  value_type		int4		DEFAULT '0' NOT NULL,
   trapper_hosts		varchar(255)	DEFAULT '' NOT NULL,
   PRIMARY KEY (itemid),
   FOREIGN KEY (hostid) REFERENCES hosts
