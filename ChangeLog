@@ -1,6 +1,7 @@
 Changes for 1.1alpha1:
 
- - support for check_service[ldap] and check_service_perf[ldap]. Thanks to Andreas Brenk. (Alexei)
+ - support of diskfree_perc[],diskused_perc[], inodefree_perc[]. (Alexei)
+ - support of check_service[ldap] and check_service_perf[ldap]. Thanks to Andreas Brenk. (Alexei)
  - fixed incorrect setting of ICMP-related triggers to UNKNOWN state (Alexei) 
  - added table audit (Alexei)
  - added audit.php (Alexei)
