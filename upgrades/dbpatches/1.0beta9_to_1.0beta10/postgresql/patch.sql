@@ -1,8 +1,17 @@
-alter table items add  units           varchar(10)     DEFAULT '' NOT NULL;
-alter table items add  multiplier      int4            DEFAULT '0' NOT NULL;
+alter table items add  units           varchar(10);
+alter table items alter units set default '';
+update items set units='';
+
+alter table items add  multiplier      int4;
+alter table items alter multiplier set default '0';
+update items set multiplier='0';
+
 alter table sysmaps_links add triggerid int4;
 
-alter table graphs_items add sortorder int4 DEFAULT '0' NOT NULL;
+alter table graphs_items add sortorder int4;
+alter table graphs_items alter sortorder set DEFAULT '0';
+update graphs_items set sortorder=0;
+--alter table graphs_items alter sortorder set not null;
 
 update items set units='bps' where key_ like "netload%";
 update items set units='bytes' where key_ like "memory[%]";

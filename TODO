@@ -2,11 +2,8 @@
 
  - finish src/zabbix_snmptrapper
  - fix PostgreSQL schema
- - test on non-Linux platforms
- - test install and upgrade procedure for 1.0beta10
  - improve screens (add maps, all in one table, etc)
- - cal culate maxY in graphs and show last value
- - Graphs: change order of lines
+ - calculate maxY in graphs and show last value
 
  - links to Zabbix frontend in alert emails
  - user groups
