@@ -11,6 +11,7 @@ Noe ready yet:
 
 Changes for 1.0beta3:
 
+ - fixed wrong data in alarms.php (Alexei)
  - swapped warning_on.wav and warning_off.wav (Alexei)
  - support for parameter Timeout for zabbix_agentd (Alexei)
  - support for parameter Timeout for zabbix_suckerd (Alexei)

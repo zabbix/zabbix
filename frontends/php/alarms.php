@@ -73,6 +73,7 @@
 	while($row=DBfetch($result))
 	{
 		$lclock=$clock;
+		$clock=$row["clock"];
 		$leng=$lclock-$row["clock"];
 
 		if($row["status"]==0)		{ echo "<TR BGCOLOR=#EEFFEE>"; }
