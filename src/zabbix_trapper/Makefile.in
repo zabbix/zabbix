@@ -1,0 +1,10 @@
+# Build rules
+
+all:
+
+	@CC@ @LIBS@ @CFLAGS@ -ggdb -I /usr/include/mysql -I../../include  -L/usr/lib/mysql zabbix_trapper.c ../../include/db.c ../../include/functions.c -o zabbix_trapper -Wall
+	strip zabbix_trapper
+
+clean:
+	rm -fv *.o 
+

@@ -9,7 +9,7 @@
 2.1 zabbix_sucker
 2.2 zabbix_alarmer
 2.3 zabbix_agent
-2.4 zabbix_traper
+2.4 zabbix_trapper
 2.5 zabbix_sender
 2.6 Database
 2.7 WEB-based frontend
@@ -152,13 +152,13 @@ during 3 seconds, it kills himself.
 When executed, it reads /etc/zabbix/zabbix_agent.conf file. This file should exist and contain
 IP address of Zabbix server. Connections from other IPs are rejected.
 
-2.4 zabbix_traper
+2.4 zabbix_trapper
 
 The Zabbix server process.
 
 SYNOPSIS
 
-zabbix_traper
+zabbix_trapper
 
 DESCRIPTION
 
@@ -178,7 +178,7 @@ DESCRIPTION
 The process, when executed, sends information to Zabbix.
 
 	zabbix_server	Name or IP address of Zabbix server to connect.
-	port		Port number to connect to Zabbix. It is port number of zabbix_traper process.
+	port		Port number to connect to Zabbix. It is port number of zabbix_trapper process.
 	host:key	Host name and key for value.
 	value		Value for parameter "host:key". Float number. 
 
@@ -283,7 +283,7 @@ cd src/zabbix_agent
 ./configure
 make
 
-cd src/zabbix_traper
+cd src/zabbix_trapper
 ./configure
 make
 
@@ -305,7 +305,7 @@ zabbix_trap     10001/tcp
 Add the following lines to /etc/inetd.conf:
 
 zabbix_agent        stream  tcp     nowait.3600    zabbix /opt/zabbix/bin/zabbix_agent
-zabbix_trap         stream  tcp     nowait.3600    zabbix /opt/zabbix/bin/zabbix_traper
+zabbix_trap         stream  tcp     nowait.3600    zabbix /opt/zabbix/bin/zabbix_trapper
 
 3.2.9 Restart inetd
 

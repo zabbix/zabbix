@@ -15,6 +15,6 @@
 #define	AGENT_TIMEOUT	3
 
 #define	SENDER_TIMEOUT	3
-#define	TRAPER_TIMEOUT	5
+#define	TRAPPER_TIMEOUT	5
 
 #endif
