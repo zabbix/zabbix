@@ -178,6 +178,7 @@
 	echo "<OPTION VALUE='0' ".iif(isset($drawtype)&&($drawtype==0),"SELECTED","").">".get_drawtype_description(0);
 	echo "<OPTION VALUE='1' ".iif(isset($drawtype)&&($drawtype==1),"SELECTED","").">".get_drawtype_description(1);
 	echo "<OPTION VALUE='2' ".iif(isset($drawtype)&&($drawtype==2),"SELECTED","").">".get_drawtype_description(2);
+	echo "<OPTION VALUE='3' ".iif(isset($drawtype)&&($drawtype==4),"SELECTED","").">".get_drawtype_description(3);
 	echo "</SELECT>";
 
 	show_table2_v_delimiter();

@@ -290,6 +290,11 @@
 
 				ImageFilledPolygon($this->im,$a,4,$this->colors[$this->items[$item]["color"]]);
 			}
+			else if($this->items[$item]["drawtype"] == GRAPH_DRAW_TYPE_DOT)
+			{
+				ImageFilledRectangle($this->im,$x1-1,$y1-1,$x1+1,$y1+1,$this->colors[$this->items[$item]["color"]]);
+				ImageFilledRectangle($this->im,$x2-1,$y2-1,$x2+1,$y2+1,$this->colors[$this->items[$item]["color"]]);
+			}
 		}
 
 // Calculation of maximum Y
