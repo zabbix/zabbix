@@ -1633,7 +1633,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				),
 		"configuration"=>array(
 				"label"=>"Configuration",
-				"pages"=>array("config.php","users.php","audit.php","hosts.php","items.php","triggers.php","sysmaps.php","graphs.php","screenconf.php","services.php"),
+				"pages"=>array("config.php","users.php","audit.php","hosts.php","items.php","triggers.php","sysmaps.php","graphs.php","screenconf.php","services.php","sysmap.php","media.php"),
 				"level2"=>array(
 					array("label"=>"General","url"=>"config.php"),
 					array("label"=>"Users","url"=>"users.php"),
