@@ -55,6 +55,7 @@ TELECENTRS:
 
 OTHER:
 
+ - improve temoval of item related data from history
 '-' doesn't work in trigger expressions (a-b=0)
 
  When editing trigger actions in subject it says something
