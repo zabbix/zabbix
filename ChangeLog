@@ -1,5 +1,6 @@
 Changes for 1.0beta9:
 
+ - added columns actions.scope and actions.severity (Alexei)
  - added basic support of global alerts (Alexei)
  - added group selection in Item and Trigger definition forms (Alexei)
  - added support for functions abschange(),change(),delta(),sum(), 
