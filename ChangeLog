@@ -31,6 +31,7 @@ Not ready yet:
 
  OTHER:
 
+ - why Zabbix write Host ... will b checked after 60 seconds after the host was enabled ?
  - make links different if something is already registered (as for medias,
    actions, etc)
  - get rid of problems with ' and "
