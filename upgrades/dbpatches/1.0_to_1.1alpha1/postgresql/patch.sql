@@ -3,3 +3,7 @@ alter table sysmaps add  use_background		int4	DEFAULT 0 NOT NULL;
 alter table sysmaps add  background		blob	DEFAULT '' NOT NULL;
 
 alter table items add trends int4 DEFAULT '365' NOT NULL;
+
+alter table graphs add  yaxistype		int2		DEFAULT '0' NOT NULL;
+alter table graphs add  yaxismin		float8		DEFAULT '0' NOT NULL;
+alter table graphs add  yaxismax		float8		DEFAULT '0' NOT NULL;

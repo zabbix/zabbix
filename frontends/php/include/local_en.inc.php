@@ -199,6 +199,11 @@
 	define("S_ID",					"Id");
 	define("S_NO_GRAPHS_DEFINED",			"No graphs defined");
 	define("S_DELETE_GRAPH_Q",			"Delete graph?");
+	define("S_YAXIS_TYPE",				"Y axis type");
+	define("S_YAXIS_MIN_VALUE",			"Y axis MIN value");
+	define("S_YAXIS_MAX_VALUE",			"Y axis MAX value");
+	define("S_CALCULATED",				"Calculated");
+	define("S_FIXED",				"Fixed");
 
 //	history.php
 	define("S_LAST_HOUR_GRAPH",			"Last hour graph");

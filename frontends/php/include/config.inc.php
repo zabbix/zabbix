@@ -2646,7 +2646,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Update Graph
 
-	function	update_graph($graphid,$name,$width,$height)
+	function	update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax)
 	{
 		global	$ERROR_MSG;
 
@@ -2656,7 +2656,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return 0;
 		}
 
-		$sql="update graphs set name='$name',width=$width,height=$height where graphid=$graphid";
+		$sql="update graphs set name='$name',width=$width,height=$height,yaxistype=$yaxistype,yaxismin=$yaxismin,yaxismax=$yaxismax where graphid=$graphid";
 		return	DBexecute($sql);
 	}
 
@@ -2678,7 +2678,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Add Graph
 
-	function	add_graph($name,$width,$height)
+	function	add_graph($name,$width,$height,$yaxistype,$yaxismin,$yaxismax)
 	{
 		global	$ERROR_MSG;
 
@@ -2688,7 +2688,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return 0;
 		}
 
-		$sql="insert into graphs (name,width,height) values ('$name',$width,$height)";
+		$sql="insert into graphs (name,width,height,yaxistype,yaxismin,yaxismax) values ('$name',$width,$height,$yaxistype,$yaxismin,$yaxismax)";
 		return	DBexecute($sql);
 	}
 
