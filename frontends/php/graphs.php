@@ -29,7 +29,6 @@
 
 <?php
 	show_table_header(S_CONFIGURATION_OF_GRAPHS_BIG);
-	echo "<br>";
 ?>
 
 <?php
@@ -77,17 +76,102 @@
 ?>
 
 <?php
-	show_table_header("GRAPHS");
+	if(isset($_GET["graphid"])&&($_GET["graphid"]==0))
+	{
+		unset($_GET["graphid"]);
+	}
+
+	if(isset($_GET["graphid"]))
+	{
+		$result=DBselect("select name from graphs where graphid=".$_GET["graphid"]);
+		$graph=DBget_field($result,0,0);
+		$h1=iif(isset($_GET["fullscreen"]),
+			"<a href=\"charts.php?graphid=".$_GET["graphid"]."\">".$graph."</a>",
+			"<a href=\"charts.php?graphid=".$_GET["graphid"]."&fullscreen=1\">".$graph."</a>");
+	}
+	else
+	{
+		$h1=S_SELECT_GRAPH_TO_DISPLAY;
+	}
+
+	$h1=S_GRAPHS_BIG.nbsp(" / ").$h1;
+
+	$h2=S_GROUP."&nbsp;";
+	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
+	$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_ALL_SMALL;
+	$result=DBselect("select groupid,name from groups order by name");
+	while($row=DBfetch($result))
+	{
+// Check if at least one host with read permission exists for this group
+		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.hostid=i.hostid and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
+		$cnt=0;
+		while($row2=DBfetch($result2))
+		{
+			if(!check_right("Host","R",$row2["hostid"]))
+			{
+				continue;
+			}
+			$cnt=1; break;
+		}
+		if($cnt!=0)
+		{
+			$h2=$h2."<option value=\"".$row["groupid"]."\" ".iif(isset($_GET["groupid"])&&($_GET["groupid"]==$row["groupid"]),"selected","").">".$row["name"];
+		}
+	}
+	$h2=$h2."</select>";
+
+	$h2=$h2."&nbsp;".S_HOST."&nbsp;";
+	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
+	$h2=$h2."<option value=\"0\"".iif(!isset($_GET["hostid"])||($_GET["hostid"]==0),"selected","").">".S_SELECT_HOST_DOT_DOT_DOT;
+
+	if(isset($_GET["groupid"]))
+	{
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+	}
+	else
+	{
+		$sql="select h.hostid,h.host from hosts h,items i where h.hostid=i.hostid group by h.hostid,h.host order by h.host";
+	}
+
+	$result=DBselect($sql);
+	while($row=DBfetch($result))
+	{
+		if(!check_right("Host","R",$row["hostid"]))
+		{
+			continue;
+		}
+		$h2=$h2."<option value=\"".$row["hostid"]."\"".iif(isset($_GET["hostid"])&&($_GET["hostid"]==$row["hostid"]),"selected","").">".$row["host"];
+	}
+	$h2=$h2."</select>";
+
+	show_header2($h1,$h2,"<form name=\"form2\" method=\"get\" action=\"graphs.php\">","</form>");
+?>
+
+<?php
 	table_begin();
 	table_header(array(S_ID,S_NAME,S_WIDTH,S_HEIGHT,S_ACTIONS));
 
-	$result=DBselect("select g.graphid,g.name,g.width,g.height from graphs g order by g.name");
+	if(isset($_GET["hostid"])&&($_GET["hostid"]!=0))
+	{
+		$result=DBselect("select distinct g.graphid,g.name,g.width,g.height from graphs g,items i,graphs_items gi where gi.itemid=i.itemid and g.graphid=gi.graphid and i.hostid=".$_GET["hostid"]." order by g.name");
+	}
+	else
+	{
+		$result=DBselect("select distinct g.graphid,g.name,g.width,g.height from graphs g order by g.name");
+	}
 	$col=0;
 	while($row=DBfetch($result))
 	{
 		if(!check_right("Graph","U",$row["graphid"]))
 		{
 			continue;
+		}
+
+		if(!isset($_GET["hostid"]))
+		{
+			$sql="select * from graphs_items where graphid=".$row["graphid"];
+			$result2=DBselect($sql);
+			if(DBnum_rows($result2)>0)	continue;
 		}
 	
 		table_row(array(
