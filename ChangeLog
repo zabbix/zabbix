@@ -1,5 +1,6 @@
 Changes for 1.0beta14:
 
+ - fixed compilation of the agent under HP-UX (Alexei)
  - fixed simple checks to return NOTSUPPORTED (Alexei)
  - removed primary keys for both 'history' and 'history_str' (Alexei)
  - added support for system[proccount] under FreeBSD (Alexei)
