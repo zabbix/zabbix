@@ -23,9 +23,9 @@
 		$HTTP_GET_VARS["from"]=0;
 	}
 
-	$refresh=$HTTP_GET_VARS["refresh"];
-	if ( $refresh > 0 )
-		header("Refresh: " . $refresh );
+#	$refresh=$HTTP_GET_VARS["refresh"];
+#	if ( $refresh > 0 )
+#		header("Refresh: " . $refresh );
 
 	$result=DBselect("select name,width,height from graphs where graphid=".$HTTP_GET_VARS["graphid"]);
 
@@ -262,12 +262,12 @@
 
 	for($j=$stepTime-$correctTime;$j<=($maxX-$minX);$j+=$stepTime)
 	{
-		ImageDashedLine($im,$shitfX+($sizeX*$j)/($maxX-$minX),$shiftYup,$shitfX+($sizeX*$j)/($maxX-$minX),$sizeY+$shiftYup,$gray);
+		ImageDashedLine($im,$shiftX+($sizeX*$j)/($maxX-$minX),$shiftYup,$shiftX+($sizeX*$j)/($maxX-$minX),$sizeY+$shiftYup,$gray);
 	}
 
 /*	for($j=$correctTime;$j<=($maxX-$minX);$j+=($maxX-$minX)/24)
 	{
-		ImageDashedLine($im,$shitfX+$sizeX-$j/($maxX-$minX)*$sizeX,$shiftYup,$shitfX+$sizeX-$j/($maxX-$minX)*$sizeX,$sizeY+$shiftYup,$gray);
+		ImageDashedLine($im,$shiftX+$sizeX-$j/($maxX-$minX)*$sizeX,$shiftYup,$shiftX+$sizeX-$j/($maxX-$minX)*$sizeX,$sizeY+$shiftYup,$gray);
 	}
 */
 	//labels
@@ -279,8 +279,8 @@
 		}
 		for($j=$stepTime-$correctTime;$j<=($maxX-$minX);$j+=$stepTime)
 		{
-			ImageStringUp($im,0,$shitfX+($sizeX*$j)/($maxX-$minX),$shiftYup+$sizeY+43,date($dateForm,$startTime+$j),$black);
-//			ImageDashedLine($im,$shitfX+$sizeX-$j/($maxX-$minX)*$sizeX,$shiftYup,$shitfX+$sizeX-$j/($maxX-$minX)*$sizeX,$sizeY+$shiftYup,$gray);
+			ImageStringUp($im,0,$shiftX+($sizeX*$j)/($maxX-$minX),$shiftYup+$sizeY+43,date($dateForm,$startTime+$j),$black);
+//			ImageDashedLine($im,$shiftX+$sizeX-$j/($maxX-$minX)*$sizeX,$shiftYup,$shiftX+$sizeX-$j/($maxX-$minX)*$sizeX,$sizeY+$shiftYup,$gray);
 		}
 /*		for($i=0;$i<=$sizeX;$i+=$sizeX/24)
 		{
