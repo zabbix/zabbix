@@ -1,5 +1,6 @@
 Changes for 1.1alpha6:
 
+ - support for no labels and no status in network maps (Alexei)
  - fix for startup of housekeeping process (Alexei)
  - fix of agent crash on 64 bit platforms in CKSUM() (Alexei)
  - added frontends/php/overview.php (Alexei)

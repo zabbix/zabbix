@@ -326,10 +326,7 @@
 				else
 					$color=$darkyellow;
 
-//				if( strstr($label,"%s"))
-//				{
 					$label=expand_trigger_description_simple(DBget_field($result1,0,1));
-//				}
 			}
 			else if($count>1)
 			{
@@ -348,12 +345,11 @@
 		{
 			$y1=$y1+ImageFontHeight(2);
 		}
-		ImageFilledRectangle($im,$x1-2, $y1,$x1+ImageFontWidth(2)*strlen($label), $y1+ImageFontHeight(2),$white);
-		ImageString($im, 2, $x1, $y1, $label,$color);
-
-#		ImageFilledRectangle($im,$x+ImageSX($img)/2-ImageFontWidth(2)*strlen($label)/2-2, $y+ImageSY($img),$x+ImageSX($img)/2+ImageFontWidth(2)*strlen($label)/2, $y+ImageSY($img)+ImageFontHeight(2),$white);
-#		ImageString($im, 2, $x+ImageSX($img)/2-ImageFontWidth(2)*strlen($label)/2, $y+ImageSY($img)+ImageFontHeight(2), $label,$color);
-#		ImageDestroy($img);
+		if($label_type!=MAP_LABEL_TYPE_NOTHING)
+		{
+			ImageFilledRectangle($im,$x1-2, $y1,$x1+ImageFontWidth(2)*strlen($label), $y1+ImageFontHeight(2),$white);
+			ImageString($im, 2, $x1, $y1, $label,$color);
+		}
 	}
 
 	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, S_ZABBIX_URL, $gray);

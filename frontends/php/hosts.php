@@ -189,13 +189,11 @@
 	$h2=$h2."<select class=\"biginput\" name=\"config\" onChange=\"submit()\">";
 	$h2=$h2."<option value=\"0\" ".iif(isset($_GET["config"])&&$_GET["config"]==0,"selected","").">".S_HOSTS;
 	$h2=$h2."<option value=\"1\" ".iif(isset($_GET["config"])&&$_GET["config"]==1,"selected","").">".S_HOST_GROUPS;
-	$h2=$h2."<option value=\"2\" ".iif(isset($_GET["config"])&&$_GET["config"]==2,"selected","").">".S_TEMPLATES;
+	$h2=$h2."<option value=\"2\" ".iif(isset($_GET["config"])&&$_GET["config"]==2,"selected","").">".S_HOSTS_TEMPLATES_LINKAGE;
 	$h2=$h2."</select>";
 
 	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"hosts.php\">", "</form>");
 ?>
-
-
 
 
 <?php
