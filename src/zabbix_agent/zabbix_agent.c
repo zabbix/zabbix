@@ -1,4 +1,4 @@
-/* #define	TEST_PARAMETERS */
+/*#define	TEST_PARAMETERS*/
 
 #include "config.h"
 
@@ -42,15 +42,30 @@ void	signal_handler( int sig )
 	exit( FAIL );
 }
 
+int	add_parameter(char *value)
+{
+	char	*value2;
+
+	value2=strstr(value,",");
+	if(NULL == value2)
+	{
+		return	FAIL;
+	}
+	value2[0]=0;
+	value2++;
+	add_user_parameter(value, value2);
+	return	SUCCEED;
+}
+
 void    init_config(void)
 {
 	struct cfg_line cfg[]=
 	{
 /*               PARAMETER      ,VAR    ,FUNC,  TYPE(0i,1s),MANDATORY,MIN,MAX
 */
-		{"Server",&CONFIG_HOSTS_ALLOWED,0,TYPE_STRING,PARM_OPT,0,0},
+		{"Server",&CONFIG_HOSTS_ALLOWED,0,TYPE_STRING,PARM_MAND,0,0},
 		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
-
+		{"UserParameter",0,&add_parameter,0,0,0,0},
 		{0}
 	};
 
@@ -175,7 +190,7 @@ int	check_security(void)
 	return	FAIL;
 }
 
-float	process_input()
+char	*process_input()
 {
 	char	s[1024];
 
@@ -186,6 +201,8 @@ float	process_input()
 
 int	main()
 {
+	char	*res;
+
 #ifdef	TEST_PARAMETERS
 	process_config_file();
 	test_parameters();
@@ -197,7 +214,7 @@ int	main()
 	signal( SIGTERM, signal_handler );
 	signal( SIGALRM, signal_handler );
 
-	process_config_file();
+	init_config();
 
 	alarm(CONFIG_TIMEOUT);
 
@@ -206,7 +223,9 @@ int	main()
 		exit(FAIL);
 	}
 
-	printf("%f\n",process_input());
+	res=process_input();
+
+	printf("%s\n",res);
 
 	fflush(stdout);
 

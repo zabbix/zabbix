@@ -41,7 +41,7 @@ int	evaluate_MIN(float *min,int itemid,int parameter)
 	result = DBselect(sql);
 	if((result==NULL)||(DBnum_rows(result)==0))
 	{
-		zabbix_log(LOG_LEVEL_NOTICE, "Result for MIN is empty" );
+		zabbix_log(LOG_LEVEL_DEBUG, "Result for MIN is empty" );
 		DBfree_result(result);
 		return	FAIL;
 	}
@@ -49,7 +49,7 @@ int	evaluate_MIN(float *min,int itemid,int parameter)
 	field = DBget_field(result,0,0);
 	if( field == NULL )
 	{
-		zabbix_log( LOG_LEVEL_NOTICE, "Result for MIN is empty" );
+		zabbix_log( LOG_LEVEL_DEBUG, "Result for MIN is empty" );
 		DBfree_result(result);
 		return	FAIL;
 	}
@@ -79,7 +79,7 @@ int	evaluate_MAX(float *max,int itemid,int parameter)
 	result = DBselect(sql);
 	if((result==NULL)||(DBnum_rows(result)==0))
 	{
-		zabbix_log(LOG_LEVEL_NOTICE, "Result for MAX is empty" );
+		zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
 		DBfree_result(result);
 		return	FAIL;
 	}
@@ -87,7 +87,7 @@ int	evaluate_MAX(float *max,int itemid,int parameter)
 	field = DBget_field(result,0,0);
 	if( field == NULL )
 	{
-		zabbix_log( LOG_LEVEL_NOTICE, "Result for MAX is empty" );
+		zabbix_log( LOG_LEVEL_DEBUG, "Result for MAX is empty" );
 		DBfree_result(result);
 		return	FAIL;
 	}	
@@ -182,7 +182,7 @@ void	update_functions(DB_ITEM *item)
 
 	if((result==NULL)||(rows==0))
 	{
-		zabbix_log( LOG_LEVEL_NOTICE, "No functions to update.");
+		zabbix_log( LOG_LEVEL_DEBUG, "No functions to update.");
 		DBfree_result(result);
 		return;
 	}
@@ -514,7 +514,7 @@ void	apply_actions(int triggerid,int good)
 /*
  * Recursive function!
  */
-void	update_services(int triggerid)
+void	update_services(int triggerid, int istrue)
 {
 	char	sql[MAX_STRING_LEN+1];
 	int	i,rows;
@@ -536,7 +536,7 @@ void	update_services(int triggerid)
 
 	for(i=0;i<rows;i++)
 	{
-		update_services(atoi(DBget_field(result,i,0)));
+		update_services(atoi(DBget_field(result,i,0)), istrue);
 	}
 
 	DBfree_result(result);
@@ -572,7 +572,7 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 
 	if(rows == 0)
 	{
-		zabbix_log( LOG_LEVEL_NOTICE, "No triggers to update" );
+		zabbix_log( LOG_LEVEL_DEBUG, "No triggers to update" );
 		DBfree_result(result);
 		return;
 	}
@@ -604,7 +604,7 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 			sprintf(sql,"update actions set nextcheck=0 where triggerid=%d and good=0",trigger.triggerid);
 			DBexecute(sql);
 
-/*			update_services(trigger.triggerid); */
+			update_services(trigger.triggerid, 1);
 		}
 
 		if((b==0)&&(trigger.istrue!=0))
@@ -622,7 +622,7 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 			sprintf(sql,"update actions set nextcheck=0 where triggerid=%d and good=1",trigger.triggerid);
 			DBexecute(sql);
 
-/*			update_services(trigger.triggerid);*/
+			update_services(trigger.triggerid, 0);
 		}
 	}
 	DBfree_result(result);
