@@ -120,7 +120,7 @@ void	init_stats_interfaces()
 		strncpy(interface,line,s-line);
 		interface[s-line]=0;
 		j1=0;
-		for(j=0;j<strlen(interface);j++)
+		for(j=0;j<(int)strlen(interface);j++)
 		{
 			if(interface[j]!=' ')
 			{
@@ -357,7 +357,7 @@ void	collect_stats_interfaces(FILE *outfile)
 		strncpy(interface,line,s-line);
 		interface[s-line]=0;
 		j1=0;
-		for(i1=0;i1<strlen(interface);i1++)
+		for(i1=0;i1<(int)strlen(interface);i1++)
 		{
 			if(interface[i1]!=' ')
 			{
