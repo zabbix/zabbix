@@ -1,5 +1,6 @@
 1.0beta14:
 
+ - test trigger scopes
  - problem when deleting item on PostgreSQL. have to delete trens before the item
  - 'clone' for graphs and screens
  - add screens and graphs to host templates
