@@ -71,7 +71,7 @@
 ?>
 
 <?php
-	$sql="select a.actionid,a.triggerid,u.alias,a.good,a.delay,a.subject,a.message from actions a,users u where a.userid=u.userid and a.triggerid=".$HTTP_GET_VARS["triggerid"]." order by u.alias, a.good desc";
+	$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.recipient from actions a where a.triggerid=".$HTTP_GET_VARS["triggerid"]." order by a.recipient desc";
 	$result=DBselect($sql);
 
 	echo "<div align=center>";
@@ -97,8 +97,17 @@
 			if($col++%2 == 1)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
 			else			{ echo "<TR BGCOLOR=#DDDDDD>"; }
 		}
+		if($row["recipient"] == RECIPIENT_TYPE_USER)
+		{
+			$user=get_user_by_userid($row["userid"]);
+			echo "<TD>".$user["alias"]."</TD>";
+		}
+		else
+		{
+			$groupd=get_usergroup_by_usrgrpid($row["userid"]);
+			echo "<TD>".$groupd["name"]."</TD>";
+		}
   
-		echo "<TD>".$row["alias"]."</TD>";
 		if($row["good"])
 		{
 			echo "<TD><FONT COLOR=\"#AA0000\">ON</FONT></TD>";
@@ -130,7 +139,7 @@
 <?php
 	if(isset($HTTP_GET_VARS["actionid"]))
 	{
-		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.scope,a.severity from actions a where a.actionid=".$HTTP_GET_VARS["actionid"];
+		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.scope,a.severity,a.recipient from actions a where a.actionid=".$HTTP_GET_VARS["actionid"];
 		$result=DBselect($sql);
 
 		$actionid=DBget_field($result,0,0);
@@ -142,6 +151,7 @@
 		$uid=DBget_field($result,0,6);
 		$scope=@iif(isset($HTTP_GET_VARS["scope"]),$HTTP_GET_VARS["scope"],DBget_field($result,0,7));
 		$severity=DBget_field($result,0,8);
+		$recipient=DBget_field($result,0,9);
 	}
 	else
 	{
@@ -152,7 +162,7 @@
 		$subject=$description;
 		$scope=@iif(isset($HTTP_GET_VARS["scope"]),$HTTP_GET_VARS["scope"],0);
 		$good=@iif(isset($HTTP_GET_VARS["good"]),$HTTP_GET_VARS["good"],1);
-		$recipient=@iif(isset($HTTP_GET_VARS["recipient"]),$HTTP_GET_VARS["recipient"],1);
+		$recipient=@iif(isset($HTTP_GET_VARS["recipient"]),$HTTP_GET_VARS["recipient"],RECIPIENT_TYPE_GROUP);
 		$severity=0;
 
 		$sql="select i.description, h.host, i.key_ from hosts h, items i,functions f where f.triggerid=".$HTTP_GET_VARS["triggerid"]." and h.hostid=i.hostid and f.itemid=i.itemid order by i.description";
