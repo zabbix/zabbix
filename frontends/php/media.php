@@ -151,7 +151,6 @@
 		$active=0;
 	}
 
-	echo "<br>";
 	show_table2_header_begin();
 	echo S_NEW_MEDIA;
 

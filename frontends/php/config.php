@@ -184,9 +184,9 @@
 
 	show_table2_v_delimiter($col++);
 	echo "<form name=\"selForm\" method=\"get\" action=\"config.php\">";
-	if(isset($mediatypeid))
+	if(isset($_GET["mediatypeid"]))
 	{
-		echo "<input class=\"biginput\" name=\"mediatypeid\" type=\"hidden\" value=\"$mediatypeid\" size=8>";
+		echo "<input class=\"biginput\" name=\"mediatypeid\" type=\"hidden\" value=\"".$_GET["mediatypeid"]."\" size=8>";
 	}
 
 	echo S_DESCRIPTION;
@@ -244,7 +244,7 @@
 	show_table2_v_delimiter2();
 	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
 
-	if(isset($mediatypeid))
+	if(isset($_GET["mediatypeid"]))
 	{
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update media\">";
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('".S_DELETE_SELECTED_MEDIA."');\">";

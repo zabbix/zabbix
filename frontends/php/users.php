@@ -91,12 +91,32 @@
 		}
 		if($_GET["register"]=="add group")
 		{
-			$result=add_user_group($_GET["name"], $_GET["users"]);
+			$users=array();
+			$result=DBselect("select userid from users");
+			while($row=DBfetch($result))
+			{
+				if(isset($_GET[$row["userid"]]))
+				{
+					$users=array_merge($users,$row["userid"]);
+				}
+			}
+//			$result=add_user_group($_GET["name"], $_GET["users"]);
+			$result=add_user_group($_GET["name"], $users);
 			show_messages($result, S_GROUP_ADDED, S_CANNOT_ADD_GROUP);
 		}
 		if($_GET["register"]=="update group")
 		{
-			$result=update_user_group($_GET["usrgrpid"], $_GET["name"], $_GET["users"]);
+			$users=array();
+			$result=DBselect("select userid from users");
+			while($row=DBfetch($result))
+			{
+				if(isset($_GET[$row["userid"]]))
+				{
+					$users=array_merge($users,$row["userid"]);
+				}
+			}
+//			$result=update_user_group($_GET["usrgrpid"], $_GET["name"], $_GET["users"]);
+			$result=update_user_group($_GET["usrgrpid"], $_GET["name"], $users);
 			show_messages($result, S_GROUP_UPDATED, S_CANNOT_UPDATE_GROUP);
 		}
 		if($_GET["register"]=="delete group")
