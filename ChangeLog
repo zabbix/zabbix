@@ -1,5 +1,10 @@
 Not ready yet:
 
+[ CORE. Apply patch for DB unavailability ]]
+
+[ BUG. UNREACHABLE latcheck!=lastcheck+60 ]
+[ CORE. Support for check_service[snmp,27] ]
+
 [ HB. Authorisation without user name/password ]
 [ CORE. Support for Service Tree ] 
 [ CORE. If Zabbix is restarted change triggers status to UNKNOWN ]
@@ -26,6 +31,7 @@ Not ready yet:
 
 [ DOCS. SNMP with missing MIB files can be used by:
 snmpget -On localhost public enterprises.ucdavis.memory.memTotalSwap.0]
+[ DOCS. Add release procedure to the Manual (as unvisible comment) ] 
 
 [ CORE. All errors and warnings must be numbered and documented ]
 
