@@ -2961,7 +2961,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		show_table2_header_end();
 	}
 
-
+/*
 	function	show_footer()
 	{
 		echo "<br>";
@@ -2973,6 +2973,33 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<font face=\"Arial,Helvetica\" size=1>";
 		echo "<a href=\"http://zabbix.sourceforge.net\">ZABBIX</a> Copyright 2000,2001,2002 by <a href=\"mailto:alex@gobbo.caves.lv\">Alexei Vladishev</a>";
 		echo "</font>";
+		echo "</td>";
+		echo "</tr>";
+		echo "</table>";
+		echo "</td>";
+		echo "</tr>";
+		echo "</table>";
+
+		echo "</body>";
+	}
+*/
+
+	function	show_footer()
+	{
+		global $USER_DETAILS;
+
+		echo "<br>";
+		echo "<table border=0 cellpadding=1 cellspacing=0 width=\"100%\" align=center>";
+		echo "<tr>";
+		echo "<td bgcolor=\"#000000\">";
+		echo "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\" width=\"100%\" bgcolor=\"#666666\">";
+		echo "<tr><td align=center width=\"90%\">";
+		echo "<font face=\"Arial,Helvetica\" size=1>";
+		echo "<a href=\"http://zabbix.sourceforge.net\">ZABBIX</a> Copyright 2000,2001,2002 by <a href=\"mailto:alex@gobbo.caves.lv\">Alexei Vladishev</a>";
+		echo "</font>";
+		echo "</td>";
+		echo "<td align=right>";
+		echo "<font size=-1>| Connected as ".$USER_DETAILS["alias"];
 		echo "</td>";
 		echo "</tr>";
 		echo "</table>";
@@ -3051,6 +3078,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		$sql="select clock,value from alarms where triggerid=$triggerid and clock>=$min and clock<=$max";
 		$result=DBselect($sql);
 
+//		echo $sql,"<br>";
+
 // -1,0,1
 		$state=-1;
 		$true_time=0;
@@ -3078,7 +3107,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				{
 					$true_time+=$diff;
 				}
-				if($state == 3)
+				if($state == 2)
 				{
 					$unknown_time+=$diff;
 				}
@@ -3093,7 +3122,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				$true_time+=$diff;
 				$state=$value;
 			}
-			else if($state==3)
+			else if($state==2)
 			{
 				$unknown_time+=$diff;
 				$state=$value;
@@ -3120,6 +3149,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			}
 
 		}
+//		echo "$true_time $false_time $unknown_time";
 
 		$total_time=$true_time+$false_time+$unknown_time;
 		$ret["true_time"]=$true_time;

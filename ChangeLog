@@ -2,14 +2,12 @@ Not ready yet:
 
 [ HB. Verify parameters before using them in SQL ]
 [ CORE. Support for Service Tree ] 
-[ CORE. If Zabbix is restarted change triggers status to UNKNOWN ]
 [ CORE. Change trigger status in case if host/item status is changed ]
 [ PHP. Navigation by time period for graphs and trends ]
 
 [ TESTING. Define procedure for regression testing ]
 
 [ PHP. Show triggers by userid ]
-[ PHP. Split include/common.inc ]
 
 [ CORE. Make one suckerd to send emails ]
 
@@ -18,12 +16,12 @@ snmpget -On localhost public enterprises.ucdavis.memory.memTotalSwap.0]
 
 [ CORE. All errors and warnings must be numbered and documented ]
 
-[ CORE. zabbix_trapperd crashes when we kill zabbix_sender ! ]
-
 [ CORE. Support for macros like {server:system[procload].graph(1)} ]
 
 Changes for 1.0beta4:
 
+ - status of triggers changes if host/item status has been changed (Alexei)
+ - status of triggers is set correctly even if zabbix is restarted (Alexei)
  - php/include/*inc renamed to php/include/*inc.php (Alexei)
  - check of source IP address for trapped values (Alexei)
  - added include/security.h and include/security.c (Alexei)
