@@ -15,6 +15,9 @@
 #ifdef HAVE_SYS_TYPES_H
 	#include <sys/types.h>
 #endif
+#ifdef HAVE_DIRENT_H
+	#include <dirent.h>
+#endif
 /* Linux */
 #ifdef HAVE_SYS_VFS_H
 	#include <sys/vfs.h>
@@ -64,6 +67,16 @@
 
 COMMAND	commands[]=
 	{
+	{"proc_cnt[apache]"		,PROCCNT, "apache"},
+	{"proc_cnt[inetd]"		,PROCCNT, "inetd"},
+	{"proc_cnt[mysqld]"		,PROCCNT, "mysqld"},
+	{"proc_cnt[syslogd]"		,PROCCNT, "syslogd"},
+	{"proc_cnt[sshd]"		,PROCCNT, "sshd"},
+
+	{"proc_cnt[zabbix_agentd]"	,PROCCNT, "zabbix_agentd"},
+	{"proc_cnt[zabbix_suckerd]"	,PROCCNT, "zabbix_suckerd"},
+	{"proc_cnt[zabbix_trapperd]"	,PROCCNT, "zabbix_trapperd"},
+
 	{"memory[total]"		,TOTALMEM, 0},
 	{"memory[shared]"		,SHAREDMEM, 0},
 	{"memory[buffers]"		,BUFFERSMEM, 0},
@@ -218,6 +231,56 @@ float   FILESIZE(const char * filename)
 	}
 
 	return	FAIL;
+}
+
+float	PROCCNT(const char * procname)
+{
+	DIR	*dir;
+	struct	dirent *entries;
+	struct	stat buf;
+	char	filename[512];
+	char	line[512];
+	char	*name;
+
+	FILE	*f;
+
+	int	proccount=0;
+
+	dir=opendir("/proc");
+	while((entries=readdir(dir))!=NULL)
+	{
+		strcpy(filename,"/proc/");	
+		strcat(filename,entries->d_name);
+		strcat(filename,"/status");
+
+		if(stat(filename,&buf)==0)
+		{
+			fflush(stdout);
+			f=fopen(filename,"r");
+			if(f==NULL)
+			{
+				continue;
+			}
+			fgets(line,512,f);
+			fclose(f);
+
+/*			sscanf(line,"%s\t%s\n",line,name);
+			printf("%s\n",name);
+			fflush(stdout);*/
+
+			name=(char *)strtok(line,"\t");
+			name=(char *)strtok(NULL,"\t");
+
+			name[strlen(name)-1]=0;
+
+			if(strcmp(procname,name)==0)
+			{
+				proccount++;
+			}
+		}
+	}
+	closedir(dir);
+	return	(float)proccount;
 }
 
 float	INODE(const char * mountPoint)
