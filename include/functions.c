@@ -309,7 +309,8 @@ void	update_functions( DB_ITEM *item )
 			syslog( LOG_DEBUG, "Result:%f\n",value);
 			if (ret == SUCCEED)
 			{
-				if((function.lastvalue_null == 1)||(cmp_double(function.lastvalue,value)==1))
+// Commented. Otherwise, if  we have more than 1 function to update, only one function being updated. Wrong !
+				//				if((function.lastvalue_null == 1)||(cmp_double(function.lastvalue,value)==1))
 				{
 					sprintf(c,"update functions set lastvalue=%f where itemid=%d and function='%s' and parameter=%d", value, function.itemid, function.function, function.parameter );
 					DBexecute(c);
