@@ -125,6 +125,7 @@ disktotal[<path>]       <path> can be normal Windows path, like C:\, or UNC
 filesize[<path>]	<path> can be normal Windows path, like C:\, or UNC
 memory[free]
 memory[total]
+memory[cached]		Only on Windows XP
 ping
 proc_cnt[<process_name>]
 swap[free]

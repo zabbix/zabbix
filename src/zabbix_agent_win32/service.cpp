@@ -53,7 +53,7 @@ static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
          status.dwWaitHint=4000;
          SetServiceStatus(serviceHandle,&status);
 
-         WriteLog("Service stopped [Control code %d]\r\n",ctrlCode);
+//         WriteLog(MSG_SERVICE_STOPPPED,EVENTLOG_INFORMATION_TYPE,NULL);
          Shutdown();
 
          status.dwCurrentState=SERVICE_STOPPED;
@@ -125,8 +125,6 @@ void InitService(void)
 void ZabbixCreateService(char *execName)
 {
    SC_HANDLE mgr,service;
-   HKEY key;
-   DWORD disp;
    char cmdLine[MAX_PATH*2];
 
    mgr=OpenSCManager(NULL,NULL,GENERIC_WRITE);
@@ -156,16 +154,7 @@ void ZabbixCreateService(char *execName)
 
    CloseServiceHandle(mgr);
 
-   // Create event source in registry
-   if (RegCreateKeyEx(HKEY_LOCAL_MACHINE,"SYSTEM\\CurrentControlSet\\Services\\EventLog\\System\\Zabbix Win32 Agent",
-                      0,NULL,REG_OPTION_NON_VOLATILE,KEY_ALL_ACCESS,
-                      NULL,&key,&disp)==ERROR_SUCCESS)
-   {
-      disp=EVENTLOG_ERROR_TYPE | EVENTLOG_WARNING_TYPE | EVENTLOG_INFORMATION_TYPE;
-      RegSetValueEx(key,"TypesSupported",0,REG_DWORD,(BYTE *)&disp,sizeof(DWORD));
-      RegSetValueEx(key,"EventMessageFile",0,REG_EXPAND_SZ,(BYTE *)execName,strlen(execName)+1);
-      RegCloseKey(key);
-   }
+   ZabbixInstallEventSource(execName);
 }
 
 
@@ -202,6 +191,8 @@ void ZabbixRemoveService(void)
    }
 
    CloseServiceHandle(mgr);
+
+   ZabbixRemoveEventSource();
 }
 
 
@@ -276,4 +267,48 @@ void ZabbixStopService(void)
    }
 
    CloseServiceHandle(mgr);
+}
+
+
+//
+// Install event source
+//
+
+void ZabbixInstallEventSource(char *path)
+{
+   HKEY hKey;
+   DWORD dwTypes=EVENTLOG_ERROR_TYPE | EVENTLOG_WARNING_TYPE | EVENTLOG_INFORMATION_TYPE;
+
+   if (ERROR_SUCCESS!=RegCreateKeyEx(HKEY_LOCAL_MACHINE,
+         "System\\CurrentControlSet\\Services\\EventLog\\System\\" ZABBIX_EVENT_SOURCE,
+         0,NULL,REG_OPTION_NON_VOLATILE,KEY_SET_VALUE,NULL,&hKey,NULL))
+   {
+      printf("Unable to create registry key: %s\n",GetSystemErrorText(GetLastError()));
+      return;
+   }
+
+   RegSetValueEx(hKey,"TypesSupported",0,REG_DWORD,(BYTE *)&dwTypes,sizeof(DWORD));
+   RegSetValueEx(hKey,"EventMessageFile",0,REG_EXPAND_SZ,(BYTE *)path,strlen(path)+1);
+
+   RegCloseKey(hKey);
+   printf("Event source \"" ZABBIX_EVENT_SOURCE "\" installed successfully\n");
+}
+
+
+//
+// Remove event source
+//
+
+void ZabbixRemoveEventSource(void)
+{
+   if (ERROR_SUCCESS==RegDeleteKey(HKEY_LOCAL_MACHINE,
+         "System\\CurrentControlSet\\Services\\EventLog\\System\\" ZABBIX_EVENT_SOURCE))
+   {
+      printf("Event source \"" ZABBIX_EVENT_SOURCE "\" uninstalled successfully\n");
+   }
+   else
+   {
+      printf("Unable to uninstall event source \"" ZABBIX_EVENT_SOURCE "\": %s\n",
+             GetSystemErrorText(GetLastError()));
+   }
 }

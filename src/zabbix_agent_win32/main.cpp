@@ -29,9 +29,10 @@
 //
 
 DWORD dwTlsLogPrefix;
-BOOL optStandalone=FALSE;
 HANDLE eventShutdown;
 
+BOOL optStandalone=FALSE;
+BOOL optUseEventLog=TRUE;
 char confFile[MAX_PATH]="C:\\zabbix_agentd.conf";
 char logFile[MAX_PATH]="C:\\zabbix_agentd.log";
 WORD confListenPort=10000;
@@ -42,6 +43,7 @@ DWORD confMaxProcTime=100; // 100 milliseconds is default acceptable collector s
 
 DWORD (__stdcall *imp_GetGuiResources)(HANDLE,DWORD);
 BOOL (__stdcall *imp_GetProcessIoCounters)(HANDLE,PIO_COUNTERS);
+BOOL (__stdcall *imp_GetPerformanceInfo)(PPERFORMANCE_INFORMATION,DWORD);
 
 
 //
@@ -54,7 +56,7 @@ static FARPROC GetProcAddressAndLog(HMODULE hModule,LPCSTR procName)
 
    ptr=GetProcAddress(hModule,procName);
    if (ptr==NULL)
-      WriteLog("Unable to get address for function \"%s\"\r\n",procName);
+      WriteLog(MSG_NO_FUNCTION,EVENTLOG_WARNING_TYPE,"s",procName);
    return ptr;
 }
 
@@ -74,7 +76,7 @@ static void ImportSymbols(void)
    }
    else
    {
-      WriteLog("Unable to get handle to USER32.DLL\r\n");
+      WriteLog(MSG_NO_DLL,EVENTLOG_WARNING_TYPE,"s","USER32.DLL");
    }
 
    hModule=GetModuleHandle("KERNEL32.DLL");
@@ -84,7 +86,17 @@ static void ImportSymbols(void)
    }
    else
    {
-      WriteLog("Unable to get handle to KERNEL32.DLL\r\n");
+      WriteLog(MSG_NO_DLL,EVENTLOG_WARNING_TYPE,"s","KERNEL32.DLL");
+   }
+
+   hModule=GetModuleHandle("PSAPI.DLL");
+   if (hModule!=NULL)
+   {
+      imp_GetPerformanceInfo=(BOOL (__stdcall *)(PPERFORMANCE_INFORMATION,DWORD))GetProcAddressAndLog(hModule,"GetPerformanceInfo");
+   }
+   else
+   {
+      WriteLog(MSG_NO_DLL,EVENTLOG_WARNING_TYPE,"s","PSAPI.DLL");
    }
 }
 
@@ -131,7 +143,7 @@ void Shutdown(void)
 {
    SetEvent(eventShutdown);
    Sleep(1000);      // Allow other threads to terminate
-   WriteLog("Zabbix Win32 agent shutdown\r\n");
+   WriteLog(MSG_AGENT_SHUTDOWN,EVENTLOG_INFORMATION_TYPE,NULL);
    CloseLog();
    TlsFree(dwTlsLogPrefix);
 }
@@ -143,7 +155,7 @@ void Shutdown(void)
 
 void Main(void)
 {
-   WriteLog("Zabbix Win32 agent started\r\n");
+   WriteLog(MSG_AGENT_STARTED,EVENTLOG_INFORMATION_TYPE,NULL);
 
    if (optStandalone)
    {

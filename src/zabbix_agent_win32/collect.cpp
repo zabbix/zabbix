@@ -78,13 +78,13 @@ void CollectorThread(void *)
 
    if (PdhOpenQuery(NULL,0,&query)!=ERROR_SUCCESS)
    {
-      WriteLog("PdhOpenQuery failed\r\n");
+      WriteLog(MSG_PDH_OPEN_QUERY_FAILED,EVENTLOG_ERROR_TYPE,"s",GetSystemErrorText(GetLastError()));
       return;
    }
 
    if (PdhAddCounter(query,"\\Processor(_Total)\\% Processor Time",0,&cntCpuUsage[0])!=ERROR_SUCCESS)
    {
-      WriteLog("PdhAddCounter(\\Processor(_Total)\\%% Processor Time) failed\r\n");
+      WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"s","\\Processor(_Total)\\%% Processor Time");
       PdhCloseQuery(query);
       return;
    }
@@ -95,7 +95,7 @@ void CollectorThread(void *)
       sprintf(counterPath,"\\Processor(%d)\\%% Processor Time",i);
       if (PdhAddCounter(query,counterPath,0,&cntCpuUsage[i+1])!=ERROR_SUCCESS)
       {
-         WriteLog("PdhAddCounter(%s) failed\r\n",counterPath);
+         WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"s",counterPath);
          PdhCloseQuery(query);
          return;
       }
@@ -103,7 +103,8 @@ void CollectorThread(void *)
 
    if (PdhCollectQueryData(query)!=ERROR_SUCCESS)
    {
-      WriteLog("PdhCollectQueryData failed\r\n");
+      WriteLog(MSG_PDH_COLLECT_QUERY_DATA_FAILED,EVENTLOG_ERROR_TYPE,"s",
+               GetSystemErrorText(GetLastError()));
       PdhCloseQuery(query);
       return;
    }
@@ -115,7 +116,7 @@ void CollectorThread(void *)
    // Prepare for CPU execution queue usage collection
    if (PdhAddCounter(query,"\\System\\Processor Queue Length",0,&cntCpuQueue)!=ERROR_SUCCESS)
    {
-      WriteLog("PdhAddCounter(\\System\\Processor Queue Length) failed\r\n");
+      WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"s","\\System\\Processor Queue Length");
       PdhCloseQuery(query);
       return;
    }
@@ -130,13 +131,13 @@ void CollectorThread(void *)
       {
          cptr->interval=-1;   // Flag for unsupported counters
          cptr->lastValue=NOTSUPPORTED;
-         WriteLog("Unable to add user-defined counter %s=\"%s\" to query\r\n",
+         WriteLog(MSG_USERDEF_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"ss",
                   cptr->name,cptr->counterPath);
       }
    }
 
    // Data collection loop
-   WriteLog("Initialization complete\r\n");
+   WriteLog(MSG_COLLECTOR_INIT_OK,EVENTLOG_INFORMATION_TYPE,NULL);
    do
    {
       LONG sum;
@@ -145,7 +146,8 @@ void CollectorThread(void *)
 
       dwTicksStart=GetTickCount();
       if ((status=PdhCollectQueryData(query))!=ERROR_SUCCESS)
-         WriteLog("PdhCollectQueryData failed (status=%08X)\r\n",status);
+         WriteLog(MSG_PDH_COLLECT_QUERY_DATA_FAILED,EVENTLOG_ERROR_TYPE,"s",
+                  GetSystemErrorText(GetLastError()));
 
       // Process CPU utilization data
       for(i=0;i<=sysInfo.dwNumberOfProcessors;i++)
@@ -231,7 +233,7 @@ void CollectorThread(void *)
       // Calculate time spent on sample processing and issue warning if it exceeds threshold
       dwTicksElapsed=GetTickCount()-dwTicksStart;
       if (dwTicksElapsed>confMaxProcTime)
-         WriteLog("Processing took more then %d milliseconds (%d milliseconds)\r\n",
+         WriteLog(MSG_BIG_PROCESSING_TIME,EVENTLOG_WARNING_TYPE,"dd",
                   confMaxProcTime,dwTicksElapsed);
 
       // Save processing time to history buffer
