@@ -66,11 +66,26 @@ CREATE TABLE config (
 -- Table structure for table 'groups'
 --
 
---CREATE TABLE groups (
---  groupid		serial,
---  name			varchar(64)	DEFAULT '' NOT NULL,
---  PRIMARY KEY (groupid)
---);
+CREATE TABLE groups (
+  groupid		serial,
+  name			varchar(64)     DEFAULT '' NOT NULL,
+  PRIMARY KEY (groupid),
+  UNIQUE (name)
+);
+
+CREATE UNIQUE INDEX groups_name on groups (name);
+
+--
+-- Table structure for table 'hosts_groups'
+--
+
+CREATE TABLE hosts_groups (
+  hostid		int4		DEFAULT '0' NOT NULL,
+  groupid		int4		DEFAULT '0' NOT NULL,
+  PRIMARY KEY (hostid,groupid)
+);
+
+--CREATE UNIQUE INDEX hosts_groups_name on hosts_groups (hostid,groupid);
 
 --
 -- Table structure for table 'triggers'
