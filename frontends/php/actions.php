@@ -78,6 +78,7 @@
 		}
 		if($_GET["register"]=="delete")
 		{
+			delete_action_from_templates($_GET["actionid"]);
 			$result=delete_action($_GET["actionid"]);
 			show_messages($result,S_ACTION_DELETED,S_CANNOT_DELETE_ACTION);
 			if($result)

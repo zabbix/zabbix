@@ -138,4 +138,47 @@
 			}
 		}
 	}
+
+	# Delete action from hardlinked hosts
+
+	function	delete_action_from_templates($actionid)
+	{
+		if($actionid<=0)
+		{
+			return;
+		}
+
+		$action=get_action_by_actionid($actionid);
+		$trigger=get_trigger_by_triggerid($action["triggerid"]);
+
+		$sql="select distinct h.hostid from hosts h,functions f, items i where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid=".$action["triggerid"];
+		$result=DBselect($sql);
+		if(DBnum_rows($result)!=1)
+		{
+			return;
+		}
+
+		$row=DBfetch($result);
+
+		$hostid=$row["hostid"];
+
+		$sql="select hostid,templateid,actions from hosts_templates where templateid=$hostid";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			if($row["actions"]&4 == 0)	continue;
+
+			$sql="select distinct f.triggerid from functions f,items i,triggers t where t.description='".addslashes($trigger["description"])."' and t.triggerid=f.triggerid and i.itemid=f.itemid and i.hostid=".$row["hostid"];
+			$result2=DBselect($sql);
+			while($row2=DBfetch($result2))
+			{
+				$sql="select actionid from actions where triggerid=".$row2["triggerid"]." and subject='".addslashes($action["subject"])."' and message='".addslashes($action["message"])."' and userid=".$action["userid"]." and good=".$action["good"]." and scope=".$action["scope"]." and recipient=".$action["recipient"]." and severity=".$action["severity"];
+				$result3=DBselect($sql);
+				while($row3=DBfetch($result3))
+				{
+					delete_action($row3["actionid"]);
+				}
+			}
+		}
+	}
 ?>
