@@ -1,5 +1,6 @@
 Changes for 1.0beta10:
 
+ - support of system maps for screens (Alexei)
  - removed column graphid from table screens_items (Alexei)
  - added columns resource and resourceid to table screens_items
  (Alexei)
