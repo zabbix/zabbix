@@ -11,7 +11,6 @@ TOP PRIORITY:
 BUGS:
 
  - BUG. zabbix_suckerd is crashing after EMAIL4
- - BUG! Lots of Evaluation of expression ... failed. Must be fixed.
  - graphs and maps are not displayed properly sometimes
  - BUG. zabbix_sucker should accept parameter regardless of "\n" at the end of line 
  - BUG. Agent return unsupported in case if UserParameter ends by timeout.
