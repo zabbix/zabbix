@@ -3,6 +3,7 @@
  - multi threading (better paralellism)
  - finish hard-linked templates
  - escalations and repeated notifications
+ - daily/weekly/monthly SLA reporting
 
 ZABBIX 1.1:
 
