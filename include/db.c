@@ -23,7 +23,7 @@ void    DBconnect( char *dbname, char *dbuser, char *dbpassword, char *dbsocket)
 #ifdef	HAVE_MYSQL
 /* For MySQL >3.22.00 */
 /*	if( ! mysql_connect( &mysql, NULL, dbuser, dbpassword ) )*/
-	if( ! mysql_real_connect( &mysql, NULL, dbuser, dbpassword, dbname, 0, dbsocket,0 ) )
+	if( ! mysql_real_connect( &mysql, NULL, dbuser, dbpassword, dbname, 3306, dbsocket,0 ) )
 	{
 		syslog(LOG_ERR, "Failed to connect to database: Error: %s\n",mysql_error(&mysql) );
 		exit( FAIL );
