@@ -520,6 +520,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 
 	char	*OK_220="220";
 	char	*OK_250="250";
+	char	*OK_251="251";
 	char	*OK_354="354";
 
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL");
@@ -671,7 +672,8 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 		close(s);
 		return FAIL;
 	}
-	if(strncmp(OK_250,c,strlen(OK_250)) != 0)
+	/* May return 251 as well: User not local; will forward to <forward-path>. See RFC825 */
+	if( strncmp(OK_250,c,strlen(OK_250)) != 0 && strncmp(OK_251,c,strlen(OK_251)) != 0)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Wrong answer on RCPT TO [%s]", c);
 		close(s);
