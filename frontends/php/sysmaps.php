@@ -112,7 +112,6 @@
 		$background="";
 	}
 
-	echo "<br>";
 	show_table2_header_begin();
 	echo "New system map";
 

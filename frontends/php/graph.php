@@ -23,6 +23,7 @@
 	$page["title"] = S_CONFIGURATION_OF_GRAPH;
 	$page["file"] = "graph.php";
 	show_header($page["title"],0,0);
+	insert_confirm_javascript();
 ?>
 
 <?php
@@ -49,7 +50,7 @@
 			{
 				$graph=get_graph_by_graphid($_GET["graphid"]);
 				$item=get_item_by_itemid($_GET["itemid"]);
-				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH_ELEMENT,"Graph ID [".$_GET["graphid"]."] Name [".$graph["name"]."] Added [".$item["name"]."]");
+				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH_ELEMENT,"Graph ID [".$_GET["graphid"]."] Name [".$graph["name"]."] Added [".$item["description"]."]");
 			}
 			show_messages($result,S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
@@ -60,20 +61,20 @@
 			{
 				$graphitem=get_graphitem_by_gitemid($_GET["gitemid"]);
 				$graph=get_graph_by_graphid($graphitem["graphid"]);
-				$item=get_item_by_itemid($graphitemid["itemid"]);
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_GRAPH_ELEMENT,"Graph ID [".$graphitem["graphid"]."] Name [".$graph["name"]."] Updated [".$item["name"]."]");
+				$item=get_item_by_itemid($graphitem["itemid"]);
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_GRAPH_ELEMENT,"Graph ID [".$graphitem["graphid"]."] Name [".$graph["name"]."] Updated [".$item["description"]."]");
 			}
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
 		if($_GET["register"]=="delete")
 		{
 			$graphitem=get_graphitem_by_gitemid($_GET["gitemid"]);
+			$graph=get_graph_by_graphid($graphitem["graphid"]);
+			$item=get_item_by_itemid($graphitem["itemid"]);
 			$result=delete_graphs_item($_GET["gitemid"]);
 			if($result)
 			{
-				$graph=get_graph_by_graphid($graphitem["graphid"]);
-				$item=get_item_by_itemid($graph["itemid"]);
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH_ELEMENT,"Graph ID [".$graphitem["graphid"]."] Name [".$graph["name"]."] Deleted [".$item["name"]."]");
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH_ELEMENT,"Graph ID [".$graphitem["graphid"]."] Name [".$graph["name"]."] Deleted [".$item["description"]."]");
 			}
 			show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
 			unset($_GET["gitemid"]);
@@ -228,7 +229,7 @@
 	if(isset($itemid))
 	{
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete graph element?');\">";
 	}
 
 	show_table2_header_end();

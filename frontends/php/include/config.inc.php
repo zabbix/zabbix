@@ -2911,7 +2911,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function add_host_to_sysmap($sysmapid,$hostid,$label,$x,$y,$icon,$url,$icon_on)
 	{
-		$sql="insert into sysmaps_hosts (sysmapid,hostid,label,x,y,icon,url) values ($sysmapid,$hostid,'$label',$x,$y,'$icon','$url','$icon_on')";
+		$sql="insert into sysmaps_hosts (sysmapid,hostid,label,x,y,icon,url,icon_on) values ($sysmapid,$hostid,'$label',$x,$y,'$icon','$url','$icon_on')";
 		return	DBexecute($sql);
 	}
 
