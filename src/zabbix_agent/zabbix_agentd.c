@@ -48,7 +48,7 @@ int	stats_request=0;
 static	char	*CONFIG_HOSTS_ALLOWED		= NULL;
 static	char	*CONFIG_PID_FILE		= NULL;
 static	char	*CONFIG_LOG_FILE		= NULL;
-static	char	*CONFIG_STAT_FILE		= NULL;
+/*static	char	*CONFIG_STAT_FILE		= NULL;*/
 static	int	CONFIG_AGENTD_FORKS		= AGENTD_FORKS;
 static	int	CONFIG_NOTIMEWAIT		= 0;
 static	int	CONFIG_TIMEOUT			= AGENT_TIMEOUT;
@@ -224,7 +224,7 @@ void    init_config(void)
 		{"Server",&CONFIG_HOSTS_ALLOWED,0,TYPE_STRING,PARM_MAND,0,0},
 		{"PidFile",&CONFIG_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"LogFile",&CONFIG_LOG_FILE,0,TYPE_STRING,PARM_OPT,0,0},
-		{"StatFile",&CONFIG_STAT_FILE,0,TYPE_STRING,PARM_OPT,0,0},
+/*		{"StatFile",&CONFIG_STAT_FILE,0,TYPE_STRING,PARM_OPT,0,0},*/
 		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
 		{"NoTimeWait",&CONFIG_NOTIMEWAIT,0,TYPE_INT,PARM_OPT,0,1},
 		{"ListenPort",&CONFIG_LISTEN_PORT,0,TYPE_INT,PARM_OPT,1024,32767},
@@ -238,10 +238,10 @@ void    init_config(void)
 	{
 		CONFIG_PID_FILE=strdup("/tmp/zabbix_agentd.pid");
 	}
-	if(CONFIG_STAT_FILE == NULL)
+/*	if(CONFIG_STAT_FILE == NULL)
 	{
 		CONFIG_STAT_FILE=strdup("/tmp/zabbix_agentd.tmp");
-	}
+	}*/
 }
 /*
 int	check_security(int sockfd)

@@ -1,5 +1,6 @@
 Changes for 1.0beta6:
 
+ - parameter StatFile removed (Alexei)
  - added support for check_service(service,ip,port) (Alexei)
  - added support for check_port(ip,port) (Alexei)
  - fixed check_right(). Thanks to Daniel Higgins. (Alexei)
