@@ -16,6 +16,7 @@ suckerd and agentd)
  - add alerts to host templates
  - add pinger (fping) to zabbix_sucker
 
+ - fix problem when graph is broken if one parameter is unavailable
  - improve screens (add maps, simple graphs, etc)
  - improve graphing capabilities (MRTG like graphs)
  - monitoring of log files
