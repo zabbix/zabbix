@@ -55,6 +55,14 @@
 	{
 		$map="Select chart to display";
 	}
+	if(!isset($from))
+	{
+		$from=0;
+	}
+	if(!isset($period))
+	{
+		$period=3600;
+	}
 
 	show_table_header($map);
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
@@ -63,7 +71,7 @@
 	echo "<TD ALIGN=CENTER>";
 	if(isset($graphid))
 	{
-		echo "<IMG SRC=\"chart2.html?graphid=$graphid&period=3600&from=0\">";
+		echo "<IMG SRC=\"chart2.html?graphid=$graphid&period=$period&from=$from\">";
 	}
 	else
 	{
@@ -72,6 +80,70 @@
 	echo "</TD>";
 	echo "</TR>";
 	echo "</TABLE>";
+
+	if(isset($graphid))
+	{
+		echo("<hr>");
+		$tmp=$from+12*14;
+		echo("[<A HREF=\"charts.html?graphid=$graphid&from=$tmp&period=$period\">");
+		echo("Week back</A>] ");
+
+		$tmp=$from+12;
+		echo("[<A HREF=\"charts.html?graphid=$graphid&from=$tmp&period=$period\">");
+		echo("12h back</A>] ");
+		
+		$tmp=$from+1;
+		echo("[<A HREF=\"charts.html?graphid=$graphid&from=$tmp&period=$period\">");
+		echo("1h back</A>] ");
+
+		$tmp=$period+3600;
+		echo("[<A HREF=\"charts.html?graphid=$graphid&from=$from&period=$tmp\">");
+		echo("+1h</A>] ");
+
+		if ($period>3600) 
+		{
+			$tmp=$period-3600;
+			echo("[<A HREF=\"charts.html?graphid=$graphid&from=$from&period=$tmp\">");
+			echo("-1h</A>] ");
+		}
+		else
+		{
+			echo("[-1h]");
+		}
+	
+		if ($from>0) // HOUR FORWARD
+		{
+			$tmp=$from-1;
+			echo("[<A HREF=\"charts.html?graphid=$graphid&from=$tmp&period=$period\">");
+			echo("1h forward</A>] ");
+		}
+		else
+		{
+			echo("[1h forward]");  
+		}
+		if (isset($From) && ($From>0))
+		{
+			$tmp=$from-12;
+			echo("[<A HREF=\"charts.html?graphid=$graphid&from=$tmp&period=$period\">");
+			echo("12h forward</A>] ");
+		}
+		else
+		{
+			echo("[12h forward]");
+		}
+	
+		if (isset($From) && ($From>0))
+		{
+			$tmp=$from-12*14;
+			echo("[<A HREF=\"charts.html?graphid=$graphid&from=$tmp&period=$period\">");
+			echo("Week forward</A>] ");
+		}
+		else
+		{
+			echo("[Week forward]");
+		}
+	}
+	
 ?>
 
 <?
