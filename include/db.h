@@ -106,6 +106,7 @@ int	DBexecute( char *query );
 DB_RESULT	*DBselect(char *query);
 char		*DBget_field(DB_RESULT *result, int rownum, int fieldnum);
 int		DBnum_rows(DB_RESULT *result);
+int		DBis_empty(DB_RESULT *result);
 
 int	DBget_function_result(float *Result,char *functionID);
 
