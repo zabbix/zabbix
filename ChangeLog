@@ -1,5 +1,6 @@
 Changes for 1.1alpha7:
 
+ - added frontends/php/include/hosts.inc.php (Alexei)
  - added frontends/php/include/maps.inc.php (Alexei)
  - added frontends/php/include/services.inc.php (Alexei)
  - added frontends/php/include/actions.inc.php (Alexei)
