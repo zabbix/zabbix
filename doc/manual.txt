@@ -33,7 +33,8 @@
 5. Chapter 5 (Administration)
 5.1 Zabbix configuration
 5.2 Expressions for triggers
-5.3 Supported parameters by platform
+5.3 Parameters
+5.4 Supported parameters by platform
 
 6. Chapter 6 (Upgrading)
 6.1 Zabbix 1.0alpha8
@@ -604,7 +605,58 @@ differs from last one.
 Similiar expressions could be useful to monitor changes in important files, such as
 /etc/passwd, /etc/inetd.conf, /kernel, etc.
 
-5.3 Supported parameters by platform
+5.3 Parameters
+
+- memory[total]
+
+Total amount of installed physical memory.
+
+- memory[shared]
+
+Amount of used shared memory.
+
+- memory[buffers]
+
+Amount of memory used for kernel buffers.
+
+- memory[cached]
+
+Amount of cached memory.
+
+- memory[free]
+
+Amount of unused physical memory.
+
+- diskfree[*]
+
+Amount of unused disk space for given volume.
+
+- inodefree[*]
+
+Number of unused inodes space for given volume.
+
+- cksum[*]
+
+Check sum of given file.
+
+- filesize[*]
+
+Size of given file.
+
+- swap[free]
+
+Free swap space.
+
+- swap[total]
+
+Total swap space.
+
+- swap[free]
+
+Free swap space.
+
+
+5.4 Supported parameters by platform
 
 PARAMETER / SYSTEM		| Debian Woody | Debian Potato | FreeBSD 4.3 | Solaris 5.8 | HP-UX 11.00 |  AIX 4.3  |
 				|    (i386)    |      (i386)   |    (i386)   | (Ultra-60)  |  9000/800   | (PowerPC) |
