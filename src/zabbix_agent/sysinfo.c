@@ -8,6 +8,9 @@
 #ifdef HAVE_SYS_VFS_H
 	#include <sys/vfs.h>
 #endif
+#ifdef HAVE_SYS_SYSINFO_H
+	#include <sys/sysinfo.h>
+#endif
 /* OpenBSD */
 #ifdef HAVE_SYS_PARAM_H
 	#include <sys/param.h>
@@ -99,6 +102,35 @@ float	DF(const char * mountPoint)
 	return	FAIL;
 }
 
+float	TCP_LISTEN(const char *porthex)
+{
+	FILE	*f;
+	char	c[1024];
+
+	char	pattern[1024]="0050 00000000:0000 0A";
+
+	strcpy(pattern,porthex);
+	strcat(pattern," 00000000:0000 0A");
+
+	f=fopen("/proc/net/tcp","r");
+	if(NULL == f)
+	{
+		return	FAIL;
+	}
+
+	while (NULL!=fgets(c,1024,f))
+	{
+		if(NULL != strstr(c,pattern))
+		{
+			fclose(f);
+			return 1;
+		}
+	}
+	fclose(f);
+
+	return	0;
+}
+
 float	getPROC(char *file,int lineno,int fieldno)
 {
 	FILE	*f;
@@ -108,7 +140,7 @@ float	getPROC(char *file,int lineno,int fieldno)
 	int	i;
 
 	f=fopen(file,"r");
-	if( f==NULL)
+	if(NULL == f)
 	{
 		return	FAIL;
 	}
@@ -312,6 +344,24 @@ float	PROCLOAD15(void)
 float	SWAPFREE(void)
 {
 	return	getPROC("/proc/meminfo",10,2);
+}
+
+float	PROCCOUNT(void)
+{
+#ifdef HAVE_SYS_SYSINFO_H
+	struct sysinfo info;
+
+	if( 0 == sysinfo(&info))
+	{
+		return	info.procs;
+	}
+	else
+	{
+		return FAIL;
+	}
+#else
+	return	FAIL;
+#endif
 }
 
 float	SWAPTOTAL(void)
