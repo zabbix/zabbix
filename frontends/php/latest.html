@@ -1,0 +1,154 @@
+<?
+	include "config.inc";
+	$title = "Latest values";
+	show_header($title,0);
+?>
+
+<?
+	show_table_header_begin();
+	echo "LATEST DATA";
+
+	show_table_v_delimiter();
+
+	echo "<font size=2>";
+
+	$lasthost="";
+	$result=mysql_query("select h.hostid,h.host from hosts h,items i where h.status=0 and h.hostid=i.hostid group by h.hostid,h.host order by h.host",$mysql);
+
+	if(isset($hostid))
+	{
+		echo "<a href='latest.html'>all</a> ";
+	}
+	else
+	{
+		echo "<b>[<a href='latest.html'>all</a>]</b> ";
+	}
+	while($row=mysql_fetch_row($result))
+	{
+		$hostid_=$row[0];
+		$host=$row[1];
+		if($hostid == $hostid_)
+		{
+			echo "<b>[";
+		}
+		echo "<a href='latest.html?hostid=$hostid_'>$host</a>";
+		if($hostid == $hostid_)
+		{
+			echo "]</b>";
+		}
+		echo " ";
+	}
+
+	echo "</font>";
+	show_table_header_end();
+	echo "<br>";
+
+	if(isset($hostid))
+	{
+		$where="where h.hostid=i.hostid and h.status=0 and h.hostid=$hostid";
+	}
+	else
+	{
+		$where="where h.hostid=i.hostid and h.status=0";
+	}
+
+	$result=mysql_query("select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid from items i,hosts h $where order by h.host,i.description",$mysql);
+	while($row=mysql_fetch_row($result))
+	{
+		$host=$row[0];
+		$itemid=$row[1];
+		$hostid=$row[7];
+		if($lasthost!=$host)
+		{
+			if($lasthost!="")
+			{
+				echo "</table>";
+			}
+			show_table_header("<a href=\"latest.html?hostid=$hostid\">$host</a>");
+
+			echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+			cr();
+			echo "<TR>";
+			cr();
+			echo "<TD><B>Description</B></TD>";
+			cr();
+			echo "<TD WIDTH=\"10%\" NOSAVE><B>Last check</B></TD>";
+			cr();
+			echo "<TD WIDTH=\"10%\" NOSAVE><B>Last value</B></TD>"; 
+			cr();
+			echo "<TD WIDTH=\"5%\" NOSAVE><B>Change</B></TD>"; 
+			cr();
+			echo "<TD WIDTH=\"10%\" NOSAVE><center><B>History</B></center></TD>";
+			cr();
+			echo "</TR>";
+			cr();
+	}
+	$lasthost=$host;
+	if($col==1)
+	{
+		echo "<tr bgcolor=#DDDDDD>";
+		$col=0;
+	} else
+	{
+		echo "<tr bgcolor=#EEEEEE>";
+		$col=1;
+	}
+	$prevvalue=$row[4];
+	$description=$row[2];
+	$lastvalue=$row[3];
+	$lastclock=$row[5];
+	if($lastclock==NULL)
+	{
+		$lastclock="<center>-</center>";
+	}
+	else
+	{
+		$lastclock=date("H:i:s",$lastclock);
+	}
+	$itemid=$row[1];
+	$status=$row[6];
+	$dif=$lastvalue-$prevvalue;
+	echo "<td>$description</td>";
+	echo "<td>";
+	if($status==2)
+	{
+		echo "<font color=\"#FF6666\">";
+	}
+	elseif($status!=0)
+	{
+		echo "<font color=\"#666666\">";
+	}
+
+	echo "$lastclock</td>\n";
+	if($lastvalue!=NULL)
+	{
+		if(round($lastvalue)==$lastvalue)
+		{ 
+			echo "<td>"; printf("%.0f",$lastvalue); echo "</td>";
+		}
+		else
+		{ 
+			echo "<td>"; printf("%.2f",$lastvalue); echo "</td>";
+		}
+	}
+	else
+	{
+		echo "<td><center>-</center></td>";
+	}
+	if( $dif != 0 )
+	{
+		echo "<td>$dif</td>";
+	}
+	else
+	{
+		echo "<td><center>-</center></td>";
+	}
+	echo "<td><center><a href=\"history.html?action=showhistory&itemid=$itemid\">Show</a></center></td>";
+	echo "</tr>";
+	}
+	echo "</table>";
+?>
+
+<?
+	show_footer();
+?>

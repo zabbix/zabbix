@@ -1,0 +1,111 @@
+<? 
+	include "config.inc";
+
+#	PARAMETERS:
+	
+#	itemid
+#	period
+#	from
+
+	$sizeX=900;
+	$sizeY=200;
+
+	$shiftX=10;
+	$shiftY=10;
+
+	$nodata=1;	
+
+
+//	Header( "Content-type:  text/html"); 
+	Header( "Content-type:  image/png"); 
+	Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
+
+	$im = imagecreate($sizeX+$shiftX+61,$sizeY+2*$shiftY+10); 
+  
+	$red=ImageColorAllocate($im,255,0,0); 
+	$green=ImageColorAllocate($im,0,255,0); 
+	$darkgreen=ImageColorAllocate($im,0,150,0); 
+	$blue=ImageColorAllocate($im,0,0,255); 
+	$yellow=ImageColorAllocate($im,255,255,0); 
+	$cyan=ImageColorAllocate($im,0,255,255); 
+	$black=ImageColorAllocate($im,0,0,0); 
+
+	$x=imagesx($im); 
+	$y=imagesy($im);
+  
+	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+2*$shiftY+10,$black);
+
+	for($i=0;$i<=$sizeY;$i+=50)
+	{
+		ImageDashedLine($im,$shiftX,$i+$shiftY,$sizeX+$shiftX,$i+$shiftY,$darkgreen);
+	}
+	for($i=0;$i<=$sizeX;$i+=50)
+	{
+		ImageDashedLine($im,$i+$shiftX,$shiftY,$i+$shiftX,$sizeY+$shiftY,$darkgreen);
+	}
+
+	$from_time = time(NULL)-$period-3600*$from;
+	$to_time   = time(NULL)-3600*$from;
+	$result=mysql_query("select clock,value from history where itemid=$itemid and clock>$from_time and clock<$to_time order by clock",$mysql);
+	$len=0;
+	$maxX=-1000000000;
+	$maxY=-1000000000;
+	$minX=1000000000;
+	$minY=1000000000;
+	$x=array();
+	$y=array();
+	while($row=mysql_fetch_row($result))
+	{
+		$nodata=0;
+		$x[$len]=$row[0];
+		$y[$len]=$row[1];
+//		echo $row[0]," - ",$y[$len],"<Br>";
+		if($x[$len]>$maxX) { $maxX=$x[$len]; }
+		if($x[$len]<$minX) { $minX=$x[$len]; }
+		if($y[$len]>$maxY) { $maxY=$y[$len]; }
+		if($y[$len]<$minY) { $minY=$y[$len]; }
+		$len++;
+	}
+//	echo "MIN/MAX:",$minX," - ",$maxX," - ",$minY," - ",$maxY,"<Br>";
+
+	if(($minX!=$maxX)&&($minY!=$maxY))
+	{
+		for($i=0;$i<$len-1;$i++)
+		{
+			$x1=$sizeX*($x[$i]-$minX)/($maxX-$minX);
+			$y1=$sizeY*($y[$i]-$minY)/($maxY-$minY);
+			$x2=$sizeX*($x[$i+1]-$minX)/($maxX-$minX);
+			$y2=$sizeY*($y[$i+1]-$minY)/($maxY-$minY);
+
+			$y1=$sizeY-$y1;
+			$y2=$sizeY-$y2;
+
+//		echo $x1," - ",$x2," - ",$y1," - ",$y2,"<Br>";
+			ImageLine($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX,$y2+$shiftY,$green);
+		}
+	}
+	else
+	{
+		ImageLine($im,$shiftX,$shiftY+$sizeY/2,$sizeX+$shiftX,$shiftY+$sizeY/2,$green);
+	}
+
+	if($nodata == 0)
+	{
+		for($i=0;$i<=$sizeY;$i+=50)
+		{
+			ImageString($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftY, $i*($maxY-$minY)/$sizeY+$minY , $red);
+		}
+
+		date("dS of F Y h:i:s A",$row[0]);
+
+		ImageString($im, 1,10,                $sizeY+$shiftY+5, date("dS of F Y h:i:s A",$minX) , $red);
+		ImageString($im, 1,$sizeX+$shiftX-168,$sizeY+$shiftY+5, date("dS of F Y h:i:s A",$maxX) , $red);
+	}
+	else
+	{
+		ImageString($im, 2,$sizeX/2 -50,                $sizeY+$shiftY+3, "NO DATA FOR THIS PERIOD" , $red);
+	}
+
+	ImagePng($im); 
+	ImageDestroy($im); 
+?>

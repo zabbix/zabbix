@@ -1,0 +1,181 @@
+<?
+        include "config.inc";
+        $title = "Configuration of items";
+	show_header($title,0);
+?>
+
+<?
+
+	if($register=="update")
+	{
+		update_item($itemid,$description,$key,$hostid,$delay,$history,$status);
+	}
+	if($register=="changestatus")
+	{
+		update_item_status($itemid,$status);
+	}
+	if($register=="add")
+	{
+		add_item($description,$key,$hostid,$delay,$history,$status);
+	}
+	if($register=="delete")
+	{
+		delete_item($itemid);
+	}
+?>
+
+<?
+	show_table_header_begin();
+	echo "CONFIGURATION OF ITEMS";
+	show_table_v_delimiter();
+?>
+
+<?
+	$result=mysql_query("select hostid,host from hosts order by host",$mysql);
+	if(isset($hostid))
+	{
+		echo "<A HREF=\"items.html\">all</A>  ";
+	}
+	else
+	{
+		echo "<b>[<A HREF=\"items.html\">all</A>]</b>  ";
+	}
+	while($row=mysql_fetch_row($result))
+	{
+		$hid=$row[0];
+		$host=$row[1];
+		if($hostid == $hid)
+		{
+			echo "<b>[";
+		}
+		echo "<A HREF=\"items.html?hostid=$hid\">$host</A>";
+		if($hostid == $hid)
+		{
+			echo "]</b>";
+		}
+		echo " ";
+	}
+	show_table_header_end();
+	echo "<br>";
+
+	$lasthost="";
+	if(isset($hostid)) 
+	{
+		$whereonly="where h.hostid=i.hostid and h.hostid=$hostid";
+	}
+	else
+	{
+		$whereonly="where h.hostid=i.hostid"; 
+	}
+	$result=mysql_query("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.lastdelete,i.nextcheck,h.hostid from hosts h,items i $whereonly order by h.host,i.key_,i.description",$mysql);
+	echo "<CENTER>";
+	while($row=mysql_fetch_row($result))
+	{
+		$host=$row[0];
+		$itemid_=$row[2];
+		$hostid_=$row[12];
+//		echo "\n<br><hr><b>=$host= =$lasthost=</b>\n";
+		if($lasthost!=$host)
+		{
+			if($lasthost!="")
+			{
+				echo "</TABLE><BR>";
+			}
+			show_table_header("<A HREF='items.html?hostid=$hostid_'>$host</A>");
+			echo "<TABLE BORDER=0 COLS=13  WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+			cr();
+			echo "<TR>";
+			cr();
+			echo "<TD WIDTH=\"10%\" NOSAVE><B>Host</B></TD>";
+			cr();
+			echo "<TD WIDTH=\"10%\" NOSAVE><B>Key</B></TD>";
+			cr();
+			echo "<TD WIDTH=\"10%\" ><B>Description</B></TD>";
+			cr();
+			echo "<TD WIDTH=\"5%\" NOSAVE><B>Delay</B></TD>";
+			cr();
+			echo "<TD WIDTH=\"5%\" NOSAVE><B>History</B></TD>";
+			cr();
+			echo "<TD><B>Shortname</B></TD>";
+			cr();
+			echo "<TD WIDTH=\"5%\" NOSAVE><B>Status</B></TD>";
+			cr();
+			echo "<TD WIDTH=\"5%\" NOSAVE><B>Lastdelete</B></TD>";
+			cr();
+			echo "<TD WIDTH=\"5%\" NOSAVE><B>Nextcheck</B></TD>";
+			cr();
+			echo "<TD WIDTH=\"5%\" NOSAVE><B>Actions</B></TD>";
+			cr();
+			echo "</TR>";
+			cr();
+		}
+		$lasthost=$host;
+	        if($col==1)
+	        {
+	                echo "<TR BGCOLOR=#DDDDDD>";
+			cr();
+	                $col=0;
+	        } else
+	        {
+	                echo "<TR BGCOLOR=#EEEEEE>";
+	                $col=1;
+	        }
+		$host=$row[0];
+		$port=$row[4];
+		$delay=$row[5];
+		$history=$row[6];
+		$shortname=$row[0].':'.$row[1];
+		$key=$row[1];
+		$description=$row[3];
+		$lastvalue=$row[7];
+		$lastclock=date("y/m/d H:i:s",$row[9]);
+		$itemid_=$row[2];
+		$status=$row[9];
+		$lastdelete=date("y/m/d H:i:s",$row[10]);
+		$nextcheck=date("y/m/d H:i:s",$row[11]);
+		echo "<TD>$host</TD>";
+		echo "<TD>$key</TD>";
+		echo "<TD>$description</TD>";
+		$description=rawurlencode($description);
+		echo "<TD>$delay</TD>";
+		echo "<TD>$history</TD>";
+		echo "<TD>$shortname</TD>";
+
+		echo "<td align=center>";
+		if($status==0)		echo "<a href=\"items.html?itemid=$itemid_&register=changestatus&status=1\">Active</a>";
+		elseif($status==1)	echo "<a href=\"items.html?itemid=$itemid_&register=changestatus&status=0\">Not active</a>";
+		elseif($status==2)	echo "Traper";
+		elseif($status==3)	echo "Not supported";
+		elseif($status==10)	echo "Autodisabled";
+		else echo "<TD ALIGN=CENTER><B>$status</B> Unknown</TD>";
+		echo "</td>";
+
+		echo "<TD>$lastdelete</TD>";
+		echo "<TD>$nextcheck</TD>";
+
+		if(isset($hostid_))
+		{
+			echo "<TD><A HREF=\"items.html#form?hostid=$hostid_&itemid=$itemid_\">Change</A></TD>";
+		}
+		else
+		{
+			echo "<TD><A HREF=\"items.html#form?itemid=$itemid_\">Change</A></TD>";
+		}
+		echo "</TR>";
+	}
+	echo "</TABLE>";
+?>
+
+<?
+	$result=mysql_query("select count(*) from hosts",$mysql);
+	$row=mysql_fetch_row($result);
+	if($row[0]>0)
+	{
+		echo "<a name=\"form\"></a>";
+		insert_item_form($itemid);
+	}
+?>
+
+<?
+	show_footer();
+?>

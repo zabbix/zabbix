@@ -1,0 +1,158 @@
+<?
+        include "config.inc";
+        $title = "Configuration of triggers";
+	show_header($title,0);
+?>
+
+<?
+	if($register=="changestatus")
+	{
+		update_trigger_status($triggerid,$status);
+	}
+	if($register=="update")
+	{
+		$now=mktime();
+		if($disabled=='true')	{ $istrue=2; }
+		else			{ $istrue=3; }
+
+		update_trigger($triggerid,$expression,$description,$priority,$istrue,$comments);
+	}
+	if($register=="add")
+	{
+
+		if($disabled=='true') { $istrue=2; }
+		else                  { $istrue=0; }
+
+		add_trigger($expression,$description,$priority,$istrue,$comments);
+	}
+	if($register=="delete")
+	{
+		delete_trigger($triggerid);
+	}
+?>
+
+<?
+	show_table_header_begin();
+	echo "CONFIGURATION OF TRIGGERS";
+	show_table_v_delimiter();
+?>
+
+<?
+	$result=mysql_query("select hostid,host from hosts order by host",$mysql);
+	if(isset($hostid))
+	{
+		echo "<A HREF=\"triggers.html\">all</A>  ";
+	}
+	else
+	{
+		echo "<b>[<A HREF=\"triggers.html\">all</A>]</b>  ";
+	}
+	while($row=mysql_fetch_row($result))
+	{
+		$hid=$row[0];
+		$host=$row[1];
+		if($hid == $hostid)
+		{
+			echo "<b>[<A HREF=\"triggers.html?hostid=$hid\">$host</A>]</b>  ";
+		}
+		else
+		{
+			echo "<A HREF=\"triggers.html?hostid=$hid\">$host</A>  ";
+		}
+	}
+
+	show_table_header_end();
+	echo "<br>";
+?>
+
+<?
+
+	if(isset($hostid))
+	{
+		$cond=" and h.hostid=$hostid ";
+	}
+	else
+	{
+		$cond="";
+	}
+
+	$result=mysql_query("select h.hostid,h.host,t.triggerid,t.expression,t.description,t.istrue from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid $cond order by h.host,t.description",$mysql);
+	$ss=".";
+	while($row=mysql_fetch_row($result))
+	{
+		$hostid_=$row[0];
+		$host=$row[1];
+		if($lasthost!=$host)
+		{
+			if($lasthost!="")
+			{
+				echo "</TABLE><BR>";
+			}
+			show_table_header("<A HREF='triggers.html?hostid=$hostid_'>$host</A>");
+			echo "<TABLE BORDER=0 COLS=3 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+			echo "<TR>";
+			echo "<TD><B>Description</B></TD>";
+			echo "<TD><B>Expression</B></TD>";
+			echo "<TD WIDTH=\"5%\"><B>Status</B></TD>";
+			echo "<TD WIDTH=\"15%\" NOSAVE><B>Actions</B></TD>";
+			echo "</TR>\n";
+		}
+		$lasthost=$host;
+
+	        if($col==1)
+	        {
+	                echo "<TR BGCOLOR=#DDDDDD>";
+	                $col=0;
+	        } else
+	        {
+	                echo "<TR BGCOLOR=#EEEEEE>";
+	                $col=1;
+	        }
+		$description=$row[4];
+		$triggerid_=$row[2];
+		$expression=$row[3];
+		$istrue=$row[5];
+		echo "<TD>$description</TD>";
+		$description=rawurlencode($description);
+
+		echo "<TD>".explode_exp($expression,1)."</TD>";
+		echo "<TD>";
+		if($istrue == 2)
+		{
+			echo "<a href=\"triggers.html?register=changestatus&triggerid=$triggerid_&status=0&hostid=$hostid_\">Disabled";
+		}
+		else
+		{
+			echo "<a href=\"triggers.html?register=changestatus&triggerid=$triggerid_&status=2&hostid=$hostid_\">Enabled";
+		}
+		$expression=rawurlencode($expression);
+		echo "</TD>";
+		echo "<TD>";
+		if(isset($hostid))
+		{
+			echo "<A HREF=\"triggers.html#form?triggerid=$triggerid_&hostid=$hostid\">Change</A> ";
+		}
+		else
+		{
+			echo "<A HREF=\"triggers.html#form?triggerid=$triggerid_\">Change</A> ";
+		}
+		echo "-<A HREF=\"actions.html?triggerid=$triggerid_&description=$description\">ShowActions</A>";
+		echo "</TD>";
+		echo "</TR>\n";
+	}
+	echo "</table>\n";
+?>
+
+<?
+	$result=mysql_query("select count(*) from hosts",$mysql);
+	$row=mysql_fetch_row($result);
+	if($row[0]>0)
+	{
+		echo "<a name=\"form\"></a>";
+		insert_trigger_form($triggerid);
+	} 
+?>
+
+<?
+	show_footer();
+?>

@@ -1,0 +1,52 @@
+<?
+        include "config.inc";
+        $title = "Information about monitoring server";
+	show_header($title,10);
+?>
+ 
+<?
+	show_table_header("QUEUE OF ITEMS TO BE UPDATED");
+
+	echo "<br>";
+
+	show_table_header("QUEUE");
+?>
+<?
+	$result=mysql_query("select i.itemid, from_unixtime(i.nextcheck), i.description, h.host from items i,hosts h where i.status=0 and h.status=0 and i.hostid=h.hostid and i.nextcheck<UNIX_TIMESTAMP() order by i.nextcheck;",$mysql);
+	$i=0;
+	echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";
+	echo "\n";
+	echo "<tr><td><b>Next time to check</b></td><td><b>Host</b></td><td><b>Description</b></td></tr>";
+	echo "\n";
+	while($row=mysql_fetch_row($result))
+	{
+		$i++;
+		$itemid=$row[0];
+		$time=$row[1];
+		$description=$row[2];
+		$host=$row[3];
+
+		if($col==1)
+		{
+			echo "<tr bgcolor=#EEEEEE>";
+			$col=0;
+		} else
+		{
+			echo "<tr bgcolor=#DDDDDD>";
+			$col=1;
+		}
+		echo "\n";
+		echo "<td>$time</td><td>$host</td><td>$description</td>";
+		echo "\n";
+		echo "</tr>"; 
+		echo "\n";
+	}
+	echo "</table>";
+?>
+<?
+	show_table_header("Total:$i");
+?>
+
+<?
+	show_footer();
+?>

@@ -1,0 +1,165 @@
+<?
+	include "config.inc";
+
+	if(!isset($itemid))
+	{
+		echo "Missing <B>itemid</B> Parameter - See System Administror";
+		exit;
+	}
+
+	$result=mysql_query("select h.host,i.description,i.nextcheck-unix_timestamp(now()),h.hostid from items i,hosts h where i.itemid=$itemid and h.hostid=i.hostid");
+	while($row=mysql_fetch_row($result))
+	{
+		$host=$row[0];
+		$description=$row[1];
+		$beforenextcheck=$row[2]+10;
+		$hostid=$row[3];
+	}
+
+	if($action=="showhistory")
+	{
+		show_header("$host:$description",$beforenextcheck);
+	}
+	if($action=="showvalues")
+	{
+		show_header("$host:$description",0);
+	}
+	if($action=="showfreehist")
+	{
+		show_header("$host:$description",0);
+	}
+	if($action=="showplaintxt")
+	{
+		show_header("$host:$description",0);
+	}
+?>
+
+<?
+	if($action=="plaintext")
+	{
+		$from=mktime($fromhour,$frommin,0,$frommonth,$fromday,$fromyear);
+		$till=mktime($tillhour,$tillmin,0,$tillmonth,$tillday,$tillyear);
+		show_plaintext($itemid, $from, $till);
+		exit;
+	}
+
+?>
+
+<?
+	show_table_header_begin();
+	echo "<A HREF='latest.html?hostid=$hostid'>$host</A> : $description";
+	show_table_v_delimiter();
+	echo("<DIV ALIGN=CENTER>");
+	if($action =="showhistory")
+	{
+		echo("<b>[<A HREF=\"history.html?action=showhistory&itemid=$itemid\">Last hour graph</A>]</b> ");
+	}
+	else
+	{
+		echo("<A HREF=\"history.html?action=showhistory&itemid=$itemid\">Last hour graph</A> ");
+	}
+	if($action =="showvalues")
+	{
+		echo("<b>[<A HREF=\"history.html?action=showvalues&itemid=$itemid&period=3600\">Values of last hour</A>]</b> ");
+	}
+	else
+	{
+		echo("<A HREF=\"history.html?action=showvalues&itemid=$itemid&period=3600\">Values of last hour</A> ");
+	}
+	if($action =="showfreehist")
+	{
+		echo("<b>[<A HREF=\"history.html?action=showfreehist&itemid=$itemid\">Values of specified period</A>]</b> ");
+	}
+	else
+	{
+		echo("<A HREF=\"history.html?action=showfreehist&itemid=$itemid\">Values of specified period</A> ");
+	}
+	if($action =="showplaintxt")
+	{
+		echo("<b>[<A HREF=\"history.html?action=showplaintxt&itemid=$itemid\">Values in plaint text format</A>]</b> ");
+	}
+	else
+	{
+		echo("<A HREF=\"history.html?action=showplaintxt&itemid=$itemid\">Values in plaint text format</A> ");
+	}
+	echo("</DIV>\n");
+	show_table_header_end();
+	echo("<br>");
+
+	if($action=="showfreehist")
+	{
+		if(!isset($period))
+		{
+			show_freehist($itemid,$period);
+		} 
+		exit;
+ 
+	}
+
+	if($action=="showplaintxt")
+	{
+		if(!isset($period))
+		{
+			show_plaintxt($itemid,$period);
+		} 
+		exit;
+   
+	}
+
+	if($action=="showvalues")
+	{
+		if(!isset($from))
+		{
+			$from=0;
+		}
+		if(!isset($period))
+		{
+			$period=3600;
+		}
+		$time=time(NULL)-$period-$from*3600;
+		$till=time(NULL)-$from*3600;
+		$hours=$period/3600;
+
+		show_table_header("Showing history of $period seconds($hours h)<BR>[from: ".date("d M - H:i:s",$time)."] [till: ".date("d M - H:i:s",$till)."]");
+
+		echo "<TABLE BORDER=0 COLS=2 ALIGN=CENTER WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+		echo "<TR>";
+		echo "<TD><B>Clock</B></TD>";
+		echo "<TD><B>Value</B></TD>";
+		echo "</TR>";
+
+
+		$result=mysql_query("select clock,value from history where itemid=$itemid and clock>$time and clock<$till order by clock desc");
+		while($row=mysql_fetch_row($result))
+		{
+			if($col==1)
+			{
+				echo "<TR BGCOLOR=#DDDDDD>";
+				$col=0;
+			} else
+			{
+				echo "<TR BGCOLOR=#EEEEEE>";
+				$col=1;
+			}
+			$clock=$row[0];
+			$value=$row[1];
+			$clock=date("d M - H:i:s",$clock);
+			echo "<TD>$clock</TD>";
+			echo "<TD>$value</TD>";
+			echo "</TR>";
+		}
+		echo "</TABLE><CENTER><BR>";        
+ 
+		echo("</CENTER></BODY></HTML>\n");
+
+		show_footer();
+		exit;
+	}
+
+	if($action=="showhistory")
+	{
+		show_history($itemid,$from,$period);
+		show_footer();
+		exit;
+	}
+?>
