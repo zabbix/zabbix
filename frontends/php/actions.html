@@ -30,14 +30,9 @@
 ?>
 
 <?
-	$sql="select description, expression from triggers where triggerid=$triggerid";
-	$result=DBselect($sql);
-	$description=DBget_field($result,0,0);
-	$expression=DBget_field($result,0,1);
-?>
- 
-<?
-	$expression=explode_exp($expression,1);
+	$trigger=select_trigger_by_triggerid($triggerid);
+	$expression=explode_exp($trigger["expression"],1);
+	$description=$trigger["description"];
 	show_table_header("$description<BR>$expression");
 ?>
 
@@ -127,9 +122,8 @@
 	}
 	else
 	{
-		$sql="select description from triggers where triggerid=$triggerid";
-		$result=DBselect($sql);
-		$description=DBget_field($result,0,0);
+		$trigger=select_trigger_by_triggerid($triggerid);
+		$description=$trigger["description"];
 
 		$good=1;
 		$delay=30;

@@ -22,35 +22,6 @@
 #include "functions.h"
 #include "expression.h"
 
-int	evaluate_LAST(float *last,int itemid,int parameter)
-{
-	DB_RESULT	*result;
-
-	char		c[256];
-	char		*field;
-
-	sprintf(c,"select lastvalue from items where itemid=%d and lastvalue is not null", itemid );
-
-	result = DBselect(c);
-	if((result==NULL)||(DBnum_rows(result)==0))
-	{
-		DBfree_result(result);
-		return	FAIL;
-	}
-
-	field = DBget_field(result,0,0);
-	if( field == NULL )
-	{
-		DBfree_result(result);
-		return	FAIL;
-	}
-	*last=atof(field);
-
-	DBfree_result(result);
-
-	return SUCCEED;
-}
-
 int	evaluate_MIN(float *min,int itemid,int parameter)
 {
 	DB_RESULT	*result;
@@ -122,68 +93,6 @@ int	evaluate_MAX(float *max,int itemid,int parameter)
 	return SUCCEED;
 }
 
-int	evaluate_PREV(float *prev,int itemid,int parameter)
-{
-	DB_RESULT	*result;
-
-	char		c[1024];
-	char		*field;
-
-	sprintf(c,"select prevvalue from items where itemid=%d and prevvalue is not null", itemid );
-
-	result = DBselect(c);
-	if((result==NULL)||(DBnum_rows(result)==0))
-	{
-		syslog(LOG_NOTICE, "Result for PREV is empty" );
-		DBfree_result(result);
-		return	FAIL;
-	}
-
-	field = DBget_field(result,0,0);
-	if( field == NULL )
-	{
-		syslog(LOG_NOTICE, "Result for PREV is empty" );
-		DBfree_result(result);
-		return	FAIL;
-	}
-	*prev=atof(field);
-
-	DBfree_result(result);
-
-	return SUCCEED;
-}
-
-int	evaluate_DIFF(float *diff,int itemid,int parameter)
-{
-	float	prev,last;
-	float	tmp;
-
-	if(evaluate_PREV(&prev,itemid,parameter) == FAIL)
-	{
-		*diff=0;
-		return SUCCEED;
-	}
-
-	if(evaluate_LAST(&last,itemid,parameter) == FAIL)
-	{
-		*diff=0;
-		return SUCCEED;
-	}
-	
-	tmp=last-prev;
-
-	if((tmp<0.000001)&&(tmp>-0.000001))
-	{
-		*diff=0;
-	}
-	else
-	{
-		*diff=1;
-	}
-
-	return SUCCEED;
-}
-
 int	evaluate_FUNCTION(float *value,DB_ITEM *item,char *function,int parameter)
 {
 	int	ret  = SUCCEED;
@@ -198,7 +107,6 @@ int	evaluate_FUNCTION(float *value,DB_ITEM *item,char *function,int parameter)
 		{
 			*value=item->lastvalue;
 		}
-/*		ret = evaluate_LAST(value,item->itemid,parameter);*/
 	}
 	else if(strcmp(function,"prev")==0)
 	{
@@ -210,7 +118,6 @@ int	evaluate_FUNCTION(float *value,DB_ITEM *item,char *function,int parameter)
 		{
 			*value=item->prevvalue;
 		}
-/*		ret = evaluate_PREV(value,item->itemid,parameter);*/
 	}
 	else if(strcmp(function,"min")==0)
 	{
@@ -237,7 +144,6 @@ int	evaluate_FUNCTION(float *value,DB_ITEM *item,char *function,int parameter)
 				*value=1;
 			}
 		}
-/*		ret = evaluate_DIFF(value,item->itemid,parameter);*/
 	}
 	else
 	{
@@ -247,15 +153,7 @@ int	evaluate_FUNCTION(float *value,DB_ITEM *item,char *function,int parameter)
 	return ret;
 }
 
-/*int	update_functions( int itemid )*/
-/*int	update_functions( int sucker_num )*/
-
-/*
- * Flag: 0 - id==itemid
- * 	 1 - id==sucker_num
- * */
-/*void	update_functions( DB_ITEM items[] )*/
-void	update_functions( DB_ITEM *item )
+void	update_functions(DB_ITEM *item)
 {
 	DB_FUNCTION	function;
 	DB_RESULT	*result;
@@ -263,13 +161,8 @@ void	update_functions( DB_ITEM *item )
 	float		value;
 	int		ret=SUCCEED;
 	int		i,rows;
-	char		*s;
 
-/*	for(row=0;items[row].itemid!=0;row++)
-	{*/
-/*		sprintf(c,"select function,parameter,itemid from functions where itemid=%d group by 1,2,3 order by 1,2,3",items[row].itemid );*/
-/*		sprintf(c,"select function,parameter,itemid,lastvalue from functions where itemid%%%d=%d group by 1,2,3 order by 1,2,3",SUCKER_FORKS-1,sucker_num-1);*/
-		sprintf(c,"select function,parameter,itemid,lastvalue from functions where itemid=%d group by 1,2,3 order by 1,2,3",item->itemid);
+		sprintf(c,"select function,parameter,itemid from functions where itemid=%d group by 1,2,3 order by 1,2,3",item->itemid);
 
 		result = DBselect(c);
 		rows=DBnum_rows(result);
@@ -287,16 +180,6 @@ void	update_functions( DB_ITEM *item )
 			function.function=DBget_field(result,i,0);
 			function.parameter=atoi(DBget_field(result,i,1));
 			function.itemid=atoi(DBget_field(result,i,2));
-			s=DBget_field(result,i,3);
-			if(s==NULL)
-			{
-				function.lastvalue_null=1;
-			}
-			else
-			{
-				function.lastvalue_null=0;
-				function.lastvalue=atof(DBget_field(result,i,3));
-			}
 
 			syslog( LOG_DEBUG, "ItemId:%d Evaluating %s(%d)\n",function.itemid,function.function,function.parameter);
 
@@ -309,12 +192,8 @@ void	update_functions( DB_ITEM *item )
 			syslog( LOG_DEBUG, "Result:%f\n",value);
 			if (ret == SUCCEED)
 			{
-// Commented. Otherwise, if  we have more than 1 function to update, only one function being updated. Wrong !
-				//				if((function.lastvalue_null == 1)||(cmp_double(function.lastvalue,value)==1))
-				{
-					sprintf(c,"update functions set lastvalue=%f where itemid=%d and function='%s' and parameter=%d", value, function.itemid, function.function, function.parameter );
-					DBexecute(c);
-				}
+				sprintf(c,"update functions set lastvalue=%f where itemid=%d and function='%s' and parameter=%d", value, function.itemid, function.function, function.parameter );
+				DBexecute(c);
 			}
 		}
 	
