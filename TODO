@@ -16,6 +16,8 @@ trigger wihout actions, etc etc
  - think about implementation of sinchronised items like cpu[usr], cpu[sys], cpu[idle]
  - check setproctitle() Lukas sent some time ago for Linux
 
+ - implement complex SLA calculation (donwtimes, working/non-working hours), etc. See
+forum Open Discussion for more info.
  - overlib: context sensitive help in PHP frontend
  - add selection of MIN/MAX/AVG for graphs
  - make sure all screens looks good in case of hundreds of servers/groups
