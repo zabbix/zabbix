@@ -47,8 +47,10 @@ DB_ITEM
 	int     delay;
 	int     history;
 	double	lastvalue;
+	char	*lastvalue_str;
 	int     lastvalue_null;
 	double	prevvalue;
+	char	*prevvalue_str;
 	int     prevvalue_null;
 	time_t  lastdelete;
 	time_t  lastcheck;

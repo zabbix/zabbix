@@ -25,7 +25,7 @@
 /*
  * Evaluate function MIN
  */ 
-int	evaluate_MIN(float *min,int itemid,int parameter)
+int	evaluate_MIN(char **value,DB_ITEM	*item,int parameter)
 {
 	DB_RESULT	*result;
 
@@ -34,9 +34,14 @@ int	evaluate_MIN(float *min,int itemid,int parameter)
 
 	int		now;
 
+	if(item->value_type != 0)
+	{
+		return	FAIL;
+	}
+
 	now=time(NULL);
 
-	sprintf(sql,"select min(value) from history where clock>%d and itemid=%d",now-parameter,itemid);
+	sprintf(sql,"select min(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
 
 	result = DBselect(sql);
 	if((result==NULL)||(DBnum_rows(result)==0))
@@ -53,7 +58,8 @@ int	evaluate_MIN(float *min,int itemid,int parameter)
 		DBfree_result(result);
 		return	FAIL;
 	}
-	*min=atof(field);
+
+	*value=strdup(field);
 
 	DBfree_result(result);
 
@@ -63,7 +69,7 @@ int	evaluate_MIN(float *min,int itemid,int parameter)
 /*
  * Evaluate function MAX
  */ 
-int	evaluate_MAX(float *max,int itemid,int parameter)
+int	evaluate_MAX(char **value,DB_ITEM *item,int parameter)
 {
 	DB_RESULT	*result;
 
@@ -72,9 +78,14 @@ int	evaluate_MAX(float *max,int itemid,int parameter)
 
 	int		now;
 
+	if(item->value_type != 0)
+	{
+		return	FAIL;
+	}
+
 	now=time(NULL);
 
-	sprintf(sql,"select max(value) from history where clock>%d and itemid=%d",now-parameter,itemid);
+	sprintf(sql,"select max(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
 
 	result = DBselect(sql);
 	if((result==NULL)||(DBnum_rows(result)==0))
@@ -90,8 +101,9 @@ int	evaluate_MAX(float *max,int itemid,int parameter)
 		zabbix_log( LOG_LEVEL_DEBUG, "Result for MAX is empty" );
 		DBfree_result(result);
 		return	FAIL;
-	}	
-	*max=atof(field);
+	}
+	
+	*value=strdup(field);
 
 	DBfree_result(result);
 
@@ -101,7 +113,7 @@ int	evaluate_MAX(float *max,int itemid,int parameter)
 /*
  * Evaluate function (min,max,prev,last,diff)
  */ 
-int	evaluate_FUNCTION(float *value,DB_ITEM *item,char *function,int parameter)
+int	evaluate_FUNCTION(char **value,DB_ITEM *item,char *function,int parameter)
 {
 	int	ret  = SUCCEED;
 
@@ -115,7 +127,15 @@ int	evaluate_FUNCTION(float *value,DB_ITEM *item,char *function,int parameter)
 		}
 		else
 		{
-			*value=item->lastvalue;
+			if(item->value_type==0)
+			{
+				*value=(char *)malloc(MAX_STRING_LEN+1);
+				sprintf(*value,"%f",item->lastvalue);
+			}
+			else
+			{
+				*value=strdup(item->lastvalue_str);
+			}
 		}
 	}
 	else if(strcmp(function,"prev")==0)
@@ -126,16 +146,24 @@ int	evaluate_FUNCTION(float *value,DB_ITEM *item,char *function,int parameter)
 		}
 		else
 		{
-			*value=item->prevvalue;
+			if(item->value_type==0)
+			{
+				*value=(char *)malloc(MAX_STRING_LEN+1);
+				sprintf(*value,"%f",item->prevvalue);
+			}
+			else
+			{
+				*value=strdup(item->prevvalue_str);
+			}
 		}
 	}
 	else if(strcmp(function,"min")==0)
 	{
-		ret = evaluate_MIN(value,item->itemid,parameter);
+		ret = evaluate_MIN(value,item,parameter);
 	}
 	else if(strcmp(function,"max")==0)
 	{
-		ret = evaluate_MAX(value,item->itemid,parameter);
+		ret = evaluate_MAX(value,item,parameter);
 	}
 	else if(strcmp(function,"diff")==0)
 	{
@@ -145,13 +173,27 @@ int	evaluate_FUNCTION(float *value,DB_ITEM *item,char *function,int parameter)
 		}
 		else
 		{
-			if(cmp_double(item->lastvalue, item->prevvalue) == 0)
+			if(item->value_type==0)
 			{
-				*value=0;
+				if(cmp_double(item->lastvalue, item->prevvalue) == 0)
+				{
+					*value=strdup("0");
+				}
+				else
+				{
+					*value=strdup("1");
+				}
 			}
 			else
 			{
-				*value=1;
+				if(strcmp(item->lastvalue_str, item->prevvalue_str) == 0)
+				{
+					*value=strdup("0");
+				}
+				else
+				{
+					*value=strdup("1");
+				}
 			}
 		}
 	}
@@ -160,6 +202,7 @@ int	evaluate_FUNCTION(float *value,DB_ITEM *item,char *function,int parameter)
 		zabbix_log( LOG_LEVEL_WARNING, "Unsupported function:%s",function);
 		ret = FAIL;
 	}
+	zabbix_log( LOG_LEVEL_DEBUG, "End of evaluate_FUNCTION");
 	return ret;
 }
 
@@ -171,7 +214,7 @@ void	update_functions(DB_ITEM *item)
 	DB_FUNCTION	function;
 	DB_RESULT	*result;
 	char		sql[MAX_STRING_LEN+1];
-	float		value;
+	char		*value;
 	int		ret=SUCCEED;
 	int		i,rows;
 
@@ -204,9 +247,10 @@ void	update_functions(DB_ITEM *item)
 		zabbix_log( LOG_LEVEL_DEBUG, "Result:%f\n",value);
 		if (ret == SUCCEED)
 		{
-			sprintf(sql,"update functions set lastvalue=%f where itemid=%d and function='%s' and parameter=%d", value, function.itemid, function.function, function.parameter );
+			sprintf(sql,"update functions set lastvalue='%s' where itemid=%d and function='%s' and parameter=%d", value, function.itemid, function.function, function.parameter );
 			DBexecute(sql);
 		}
+		free(value);
 	}
 
 	DBfree_result(result);
@@ -592,7 +636,7 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 		if((b==1)&&(trigger.istrue!=1))
 		{
 			now = time(NULL);
-			sprintf(sql,"update triggers set IsTrue=1, lastchange=%d where triggerid=%d",now,trigger.triggerid);
+			sprintf(sql,"update triggers set istrue=1, lastchange=%d where triggerid=%d",now,trigger.triggerid);
 			DBexecute(sql);
 
 			now = time(NULL);
@@ -610,7 +654,7 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 		if((b==0)&&(trigger.istrue!=0))
 		{
 			now = time(NULL);
-			sprintf(sql,"update triggers set IsTrue=0, lastchange=%d where triggerid=%d",now,trigger.triggerid);
+			sprintf(sql,"update triggers set istrue=0, lastchange=%d where triggerid=%d",now,trigger.triggerid);
 			DBexecute(sql);
 
 			now = time(NULL);
@@ -628,7 +672,7 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 	DBfree_result(result);
 }
 
-int	get_lastvalue(float *Result,char *host,char *key,char *function,char *parameter)
+int	get_lastvalue(char **value,char *host,char *key,char *function,char *parameter)
 {
 	DB_ITEM	item;
 	DB_RESULT *result;
@@ -653,7 +697,7 @@ int	get_lastvalue(float *Result,char *host,char *key,char *function,char *parame
         DBfree_result(result);
 
 	parm=atoi(parameter);
-	evaluate_FUNCTION(Result,&item,function,parm);
+	evaluate_FUNCTION(value,&item,function,parm);
 
         return SUCCEED;
 }
@@ -710,6 +754,7 @@ int	process_data(char *server,char *key,char *value)
 	{
 		item.lastvalue_null=0;
 		item.lastvalue=atof(s);
+		item.lastvalue_str=s;
 	}
 	s=DBget_field(result,0,14);
 	if(s==NULL)
@@ -720,6 +765,7 @@ int	process_data(char *server,char *key,char *value)
 	{
 		item.prevvalue_null=0;
 		item.prevvalue=atof(s);
+		item.prevvalue_str=s;
 	}
 	item.value_type=atoi(DBget_field(result,0,15));
 
@@ -764,7 +810,7 @@ void	process_new_value(DB_ITEM *item,char *value)
 	}
 	else
 	{
-		sprintf(sql,"update items set NextCheck=%d,LastClock=%d where ItemId=%d",now+item->delay,now,item->itemid);
+		sprintf(sql,"update items set nextcheck=%d,lastclock=%d where itemid=%d",now+item->delay,now,item->itemid);
 	}
 	DBexecute(sql);
 

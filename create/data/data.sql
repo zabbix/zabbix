@@ -151,6 +151,8 @@ insert into items_template (itemtemplateid,description,key_,delay,value_type)
 	values (65,'Host name','system[hostname]', 1800, 1);
 insert into items_template (itemtemplateid,description,key_,delay,value_type)
 	values (66,'Host information','system[uname]', 1800, 1);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (67,'Version of zabbix_agent(d) running','version[zabbix_agent]', 1800, 1);
 
 --
 -- Data for table triggers_template

@@ -231,7 +231,7 @@
 		$ok=0;
 		while($ok==0)
 		{
-// 	Replace all float sign float with 0
+// 	Replace all <float> <sign> <float> with 0
 //			echo "Expression:$expression<br>";
 			$arr="";
 			if (eregi('^((.)*)([0-9\.]+)([\&\|\>\<\=]{1})([0-9\.]+)((.)*)$', $expression, &$arr)) 
@@ -289,7 +289,12 @@
 		}
 //		echo "Result:$expression<br><hr>";
 
-		return $expression;
+		if($expression=="0")
+		{
+			return 0;
+		}
+
+		return 1;
 	}
 
 	function	cr()
