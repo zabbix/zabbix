@@ -127,7 +127,7 @@
 			$description=$trigger["description"];
 			if( strstr($description,"%s"))
 			{
-				$description=expand_trigger_description($row["triggerid"]);
+				$description=nbsp(expand_trigger_description($row["triggerid"]));
 			}
 			$description="[<a href=\"alarms.php?triggerid=".$row["triggerid"]."\">TRIGGER</a>] $description";
 		}
@@ -166,6 +166,7 @@
 		else
 		{
 			echo "<td>";
+			echo "<ul>";
 			$sql="select s.triggerid,s.serviceid from services s, triggers t where s.status>0 and s.triggerid is not NULL and t.triggerid=s.triggerid order by s.status desc,t.description";
 			$result2=DBselect($sql);
 			while($row2=DBfetch($result2))
@@ -176,11 +177,12 @@
 					$description=$trigger["description"];
 					if( strstr($description,"%s"))
 					{
-						$description=expand_trigger_description($row2["triggerid"]);
+						$description=nbsp(expand_trigger_description($row2["triggerid"]));
 					}
-					echo "<li><a href=\"alarms.php?triggerid=".$row2["triggerid"]."\">$description</a></li>";
+					echo "<li class=\"itservices\"><a href=\"alarms.php?triggerid=".$row2["triggerid"]."\">$description</a></li>";
 				}
 			}
+			echo "</ul>";
 			echo "</td>";
 		}
 
