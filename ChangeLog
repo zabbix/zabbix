@@ -1,5 +1,6 @@
 Changes for 1.0beta14:
 
+ - added DB patches for migration to 1.0beta14 (Alexei)
  - changed logic of actions: scope=1 (triggerid=hostid), 2 (triggerid=0) (Alexei)
  - fixed compilation of --with-pgsql on non-GCC platforms (Alexei)
  - fixed refresh in actions screen (Alexei) 
