@@ -28,6 +28,7 @@ LONG H_Execute(char *cmd,char *arg,char **value)
    char *ptr1,*ptr2;
    STARTUPINFO si;
    PROCESS_INFORMATION pi;
+   SECURITY_ATTRIBUTES sa;
    HANDLE hOutput;
    char szTempPath[MAX_PATH],szTempFile[MAX_PATH];
    DWORD dwBytes=0;
@@ -41,7 +42,10 @@ LONG H_Execute(char *cmd,char *arg,char **value)
    // Create temporary file to hold process output
    GetTempPath(MAX_PATH-1,szTempPath);
    GetTempFileName(szTempPath,"zbx",0,szTempFile);
-   hOutput=CreateFile(szTempFile,GENERIC_READ | GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_TEMPORARY,NULL);
+   sa.nLength=sizeof(SECURITY_ATTRIBUTES);
+   sa.lpSecurityDescriptor=NULL;
+   sa.bInheritHandle=TRUE;
+   hOutput=CreateFile(szTempFile,GENERIC_READ | GENERIC_WRITE,0,&sa,CREATE_ALWAYS,FILE_ATTRIBUTE_TEMPORARY,NULL);
    if (hOutput==INVALID_HANDLE_VALUE)
    {
       WriteLog(MSG_CREATE_TMP_FILE_FAILED,EVENTLOG_ERROR_TYPE,"e",GetLastError());
@@ -53,6 +57,7 @@ LONG H_Execute(char *cmd,char *arg,char **value)
    si.cb=sizeof(STARTUPINFO);
    si.dwFlags=STARTF_USESTDHANDLES;
    si.hStdInput=GetStdHandle(STD_INPUT_HANDLE);
+//   si.hStdOutput=GetStdHandle(STD_OUTPUT_HANDLE);
    si.hStdOutput=hOutput;
    si.hStdError=GetStdHandle(STD_ERROR_HANDLE);
 

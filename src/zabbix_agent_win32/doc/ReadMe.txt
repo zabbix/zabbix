@@ -1,5 +1,5 @@
 
-                     ZabbixW32 version 1.0.0-beta8
+                     ZabbixW32 version 1.0.0-beta9
 
 ******************************************************************************
 
@@ -122,6 +122,11 @@ LogUnresolvedSymbols = (yes | no)
   Controls logging of unresolved symbols during agent startup. Values can be
   strings "yes" or "no" (without quotes).
 
+UserParameter = <parameter_name>,<executable_path>
+  Defines new parameter <parameter_name> which is an output of executable
+  file specified by <executable_path>. Executable file should be console
+  executable and send it's output to STDOUT.
+
 The following parameters can be presented in configuration file for
 compatibility with UNIX agents but has no effect:
 
@@ -129,7 +134,6 @@ compatibility with UNIX agents but has no effect:
   DebugLevel
   PidFile
   NoTimeWait
-  UserParameter
                
 
 Parameters supported by Zabbix Win32 Agent
