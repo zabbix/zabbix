@@ -108,12 +108,22 @@ CREATE TABLE config (
 -- Table structure for table 'groups'
 --
 
--- CREATE TABLE groups (
---   groupid		int(4)		NOT NULL auto_increment,
---   name			varchar(64)	DEFAULT '' NOT NULL,
---   PRIMARY KEY (groupid),
---   UNIQUE (name)
--- );
+CREATE TABLE groups (
+  groupid		int(4)		NOT NULL auto_increment,
+  name			varchar(64)	DEFAULT '' NOT NULL,
+  PRIMARY KEY (groupid),
+  UNIQUE (name)
+);
+
+--
+-- Table structure for table 'hosts_groups'
+--
+
+CREATE TABLE hosts_groups (
+  hostid		int(4)		DEFAULT '0' NOT NULL,
+  groupid		int(4)		DEFAULT '0' NOT NULL,
+  PRIMARY KEY (hostid,groupid)
+);
 
 --
 -- Table structure for table 'alerts'
@@ -330,7 +340,6 @@ CREATE TABLE trigger_depends (
 
 CREATE TABLE users (
   userid		int(4)		NOT NULL auto_increment,
---  groupid		int(4)		NOT NULL DEFAULT '0',
   alias			varchar(100)	DEFAULT '' NOT NULL,
   name			varchar(100)	DEFAULT '' NOT NULL,
   surname		varchar(100)	DEFAULT '' NOT NULL,
@@ -421,4 +430,3 @@ CREATE TABLE service_alarms (
   KEY (serviceid,clock),
   KEY (clock)
 );
-

@@ -2291,9 +2291,40 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return SUCCEED;
 	}
 
+	function	add_group_to_host($hostid,$newgroup)
+	{
+		$sql="insert into groups (groupid,name) values (NULL,'$newgroup')";
+		$result=DBexecute($sql);
+		if(!$result)
+		{
+			return	$result;
+		}
+		
+		$groupid=DBinsert_id($result,"groupd","groupid");
+
+		$sql="insert into hosts_groups (hostid,groupid) values ($hostid,$groupid)";
+		$result=DBexecute($sql);
+
+		return $result;
+	}
+
+	function	update_host_groups($hostid,$groups)
+	{
+		$count=count($groups);
+
+		$sql="delete from hosts_groups where hostid=$hostid";
+		DBexecute($sql);
+
+		for($i=0;$i<$count;$i++)
+		{
+			$sql="insert into hosts_groups (hostid,groupid) values ($hostid,".$groups[$i].")";
+			DBexecute($sql);
+		}
+	}
+
 	# Add Host definition
 
-	function	add_host($host,$port,$status,$template,$useip,$ip,$host_templateid)
+	function	add_host($host,$port,$status,$template,$useip,$ip,$host_templateid,$newgroup,$groups)
 	{
 		global	$ERROR_MSG;
 
@@ -2334,10 +2365,15 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 			$result=add_using_host_template($hostid,$host_templateid);
 		}
+		update_host_groups($hostid,$groups);
+		if($newgroup != "")
+		{
+			add_group_to_host($hostid,$newgroup);
+		}
 		return	$result;
 	}
 
-	function	update_host($hostid,$host,$port,$status,$useip,$ip)
+	function	update_host($hostid,$host,$port,$status,$useip,$ip,$newgroup,$groups)
 	{
 		global	$ERROR_MSG;
 
@@ -2357,6 +2393,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 		$sql="update hosts set host='$host',port=$port,status=$status,useip=$useip,ip='$ip' where hostid=$hostid";
 		$result=DBexecute($sql);
+		update_host_groups($hostid,$groups);
+		if($newgroup != "")
+		{
+			add_group_to_host($hostid,$newgroup);
+		}
 		return	$result;
 	}
 
