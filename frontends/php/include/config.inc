@@ -5,6 +5,7 @@
 
 	function	validate_float($str)
 	{
+//		echo "Validating float:$str<br>";
 		if (eregi('^([0-9]+)((\.)?)([0-9]*)$', $str, &$arr)) 
 		{
 			return 0;
@@ -18,8 +19,9 @@
 // Does expression match server:key.function(param) ?
 	function	validate_simple_expression($expression)
 	{
-//		echo "Validating:$expression<br>";
-		if (eregi('^\{([0-9a-zA-Z\_\.]+)\:([0-9a-zA-Z\_]+)\.((diff)|(min)|(max)|(last)|(nodata))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
+//		echo "Validating simple:$expression<br>";
+//		if (eregi('^\{([0-9a-zA-Z\_\.]+)\:([0-9a-zA-Z\_]+)\.((diff)|(min)|(max)|(last)|(nodata))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
+		if (eregi('^\{([0-9a-zA-Z\_\.]+)\:([]\[0-9a-zA-Z\_]+)\.((diff)|(min)|(max)|(last)|(nodata))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
 		{
 			$host=$arr[1];
 			$key=$arr[2];
@@ -28,7 +30,7 @@
 
 			$sql="select count(*) from hosts h,items i where h.host='$host' and i.key_='$key' and h.hostid=i.hostid";
 			$result=DBselect($sql);
-			if($DBget_field($result,0,0)!=1)
+			if(DBget_field($result,0,0)!=1)
 			{
 				return -1;
 			}
@@ -57,7 +59,6 @@
 			$arr="";
 			if (eregi('^((.)*)(\{((.)*)\})((.)*)$', $expression, &$arr)) 
 			{
-//				echo "OK<br>";
 //				for($i=0;$i<20;$i++)
 //				{
 //					if($arr[$i])
