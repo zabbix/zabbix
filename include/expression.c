@@ -454,6 +454,40 @@ int	evaluate_simple (double *result,char *exp)
 		}
 		return SUCCEED;
 	}
+	else if( find_char(exp,'#') != FAIL )
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "# is found" );
+		l=find_char(exp,'#');
+		strncpy(first, exp, MAX_STRING_LEN);
+		first[l]=0;
+		j=0;
+/*		for(i=l+1;i<(int)strlen(exp);i++)*/
+		for(i=l+1;exp[i]!=0;i++)
+		{
+			second[j]=exp[i];
+			j++;
+		}
+		second[j]=0;
+		if( evaluate_simple(&value1,first) == FAIL )
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
+			return FAIL;
+		}
+		if( evaluate_simple(&value2,second) == FAIL )
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
+			return FAIL;
+		}
+		if( cmp_double(value1,value2) != 0 )
+		{
+			*result=1;
+		}
+		else
+		{
+			*result=0;
+		}
+		return SUCCEED;
+	}
 	else
 	{
 			zabbix_log( LOG_LEVEL_WARNING, "Format error or unsupported operator.  Exp: [%s]", exp );
