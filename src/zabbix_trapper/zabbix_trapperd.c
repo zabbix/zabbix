@@ -541,10 +541,10 @@ int	main()
 
 	static struct  sigaction phan;
 
+	init_config();
 	daemon_init();
 
 /*	process_config_file(); */
-	init_config();
 
 	if(CONFIG_LOG_FILE == NULL)
 	{

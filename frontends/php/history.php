@@ -127,8 +127,15 @@
 		echo "<TD><B>Value</B></TD>";
 		echo "</TR>";
 
-
-		$result=DBselect("select clock,value from history where itemid=$itemid and clock>$time and clock<$till order by clock desc");
+		$item=get_item_by_itemid($itemid);
+		if($item["value_type"]==0)
+		{
+			$result=DBselect("select clock,value from history where itemid=$itemid and clock>$time and clock<$till order by clock desc");
+		}
+		else
+		{
+			$result=DBselect("select clock,value from history_str where itemid=$itemid and clock>$time and clock<$till order by clock desc");
+		}
 		$col=0;
 		for($i=0;$i<DBnum_rows($result);$i++)
 		{
@@ -148,9 +155,9 @@
 			echo "<TD>$value</TD>";
 			echo "</TR>";
 		}
-		echo "</TABLE><CENTER><BR>";        
+		echo "</TABLE><CENTER>";        
  
-		echo("</CENTER></BODY></HTML>\n");
+//		echo("</CENTER></BODY></HTML>\n");
 
 		show_footer();
 		exit;

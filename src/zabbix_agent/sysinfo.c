@@ -85,71 +85,73 @@
 #include "sysinfo.h"
 
 COMMAND	commands[AGENT_MAX_USER_COMMANDS]=
+/* 	KEY		FUNCTION (if float) FUNCTION (if string) PARAM*/
 	{
-	{"kern[maxfiles]"		,KERNEL_MAXFILES, 0},
-	{"kern[maxproc]"		,KERNEL_MAXPROC, 0},
+	{"kern[maxfiles]"	,KERNEL_MAXFILES,	0, 0},
+	{"kern[maxproc]"	,KERNEL_MAXPROC, 	0, 0},
 
-	{"proc_cnt[*]"			,PROCCNT, "inetd"},
+	{"proc_cnt[*]"		,PROCCNT, 		0, "inetd"},
 
-	{"memory[total]"		,TOTALMEM, 0},
-	{"memory[shared]"		,SHAREDMEM, 0},
-	{"memory[buffers]"		,BUFFERSMEM, 0},
-	{"memory[cached]"		,CACHEDMEM, 0},
-	{"memory[free]"			,FREEMEM, 0},
+	{"memory[total]"	,TOTALMEM, 		0, 0},
+	{"memory[shared]"	,SHAREDMEM, 		0, 0},
+	{"memory[buffers]"	,BUFFERSMEM, 		0, 0},
+	{"memory[cached]"	,CACHEDMEM, 		0, 0},
+	{"memory[free]"		,FREEMEM, 		0, 0},
 
-	{"diskfree[*]"			,DF, "/"},
+	{"diskfree[*]"		,DF, 			0, "/"},
 
-	{"inodefree[*]"			,INODE, "/"},
+	{"inodefree[*]"		,INODE, 		0, "/"},
 
-	{"cksum[*]"			,CKSUM, "/etc/services"},
+	{"cksum[*]"		,CKSUM, 		0, "/etc/services"},
 
-	{"filesize[*]"			,FILESIZE, "/etc/passwd"},
+	{"filesize[*]"		,FILESIZE, 		0, "/etc/passwd"},
 
-	{"swap[free]"			,SWAPFREE, 0},
-	{"swap[total]"			,SWAPTOTAL, 0},
+	{"swap[free]"		,SWAPFREE, 		0, 0},
+	{"swap[total]"		,SWAPTOTAL, 		0, 0},
 
 /****************************************
   	All these perameters require more than 1 second to retrieve.
 
-  	{"swap[in]"			,EXECUTE, "vmstat -n 1 2|tail -1|cut -b37-40"},
-	{"swap[out]"			,EXECUTE, "vmstat -n 1 2|tail -1|cut -b41-44"},
+  	{"swap[in]"		,EXECUTE, 0, "vmstat -n 1 2|tail -1|cut -b37-40"},
+	{"swap[out]"		,EXECUTE, 0, "vmstat -n 1 2|tail -1|cut -b41-44"},
 
-	{"system[interrupts]"		,EXECUTE, "vmstat -n 1 2|tail -1|cut -b57-61"},
-	{"system[switches]"		,EXECUTE, "vmstat -n 1 2|tail -1|cut -b62-67"},
+	{"system[interrupts]"	,EXECUTE, 0, "vmstat -n 1 2|tail -1|cut -b57-61"},
+	{"system[switches]"	,EXECUTE, 0, "vmstat -n 1 2|tail -1|cut -b62-67"},
 ***************************************/
 
-	{"io[disk_io]"			,DISK_IO,  0},
-	{"io[disk_rio]"			,DISK_RIO, 0},
-	{"io[disk_wio]"			,DISK_WIO, 0},
-	{"io[disk_rblk]"		,DISK_RBLK, 0},
-	{"io[disk_wblk]"		,DISK_WBLK, 0},
+	{"io[disk_io]"		,DISK_IO,  	0, 0},
+	{"io[disk_rio]"		,DISK_RIO, 	0, 0},
+	{"io[disk_wio]"		,DISK_WIO, 	0, 0},
+	{"io[disk_rblk]"	,DISK_RBLK, 	0, 0},
+	{"io[disk_wblk]"	,DISK_WBLK, 	0, 0},
 
-	{"system[procload]"		,PROCLOAD, 0},
-	{"system[procload5]"		,PROCLOAD5, 0},
-	{"system[procload15]"		,PROCLOAD15, 0},
-	{"system[proccount]"		,PROCCOUNT, 0},
+	{"system[procload]"	,PROCLOAD, 	0, 0},
+	{"system[procload5]"	,PROCLOAD5, 	0, 0},
+	{"system[procload15]"	,PROCLOAD15, 	0, 0},
+	{"system[proccount]"	,PROCCOUNT, 	0, 0},
 #ifdef HAVE_PROC_LOADAVG
-	{"system[procrunning]"		,EXECUTE, "cat /proc/loadavg|cut -f1 -d'/'|cut -f4 -d' '"},
+	{"system[procrunning]"	,EXECUTE, 	0, "cat /proc/loadavg|cut -f1 -d'/'|cut -f4 -d' '"},
 #endif
-	{"system[uname]"		,EXECUTE, "uname -a"},
-	{"system[uptime]"		,UPTIME, 0},
-	{"system[users]"		,EXECUTE, "who|wc -l"},
+	{"system[hostname]"	,0,		EXECUTE_STR, "hostname"},
+	{"system[uname]"	,0,		EXECUTE_STR, "uname -a"},
+	{"system[uptime]"	,UPTIME,	0, 0},
+	{"system[users]"	,EXECUTE, 	0,"who|wc -l"},
 
-	{"ping"				,PING, 0},
-/*	{"tcp_count"			,EXECUTE, "netstat -tn|grep EST|wc -l"}, */
+	{"ping"			,PING, 		0, 0},
+/*	{"tcp_count"		,EXECUTE, 	0, "netstat -tn|grep EST|wc -l"}, */
 
-	{"net[listen_23]"		,TCP_LISTEN, "0017"},
-	{"net[listen_80]"		,TCP_LISTEN, "0050"},
+	{"net[listen_23]"	,TCP_LISTEN, 	0, "0017"},
+	{"net[listen_80]"	,TCP_LISTEN, 	0, "0050"},
 
-	{"check_port[*]"		,CHECK_PORT, "80"},
+	{"check_port[*]"	,CHECK_PORT, 	0, "80"},
 
-	{"check_service[ssh]"		,CHECK_SERVICE_SSH, 0},
-	{"check_service[smtp]"		,CHECK_SERVICE_SMTP, 0},
-	{"check_service[ftp]"		,CHECK_SERVICE_FTP, 0},
-	{"check_service[pop]"		,CHECK_SERVICE_POP, 0},
-	{"check_service[nntp]"		,CHECK_SERVICE_NNTP, 0},
-	{"check_service[imap]"		,CHECK_SERVICE_IMAP, 0},
-	{0				,0}
+	{"check_service[ssh]"	,CHECK_SERVICE_SSH, 	0, 0},
+	{"check_service[smtp]"	,CHECK_SERVICE_SMTP, 	0, 0},
+	{"check_service[ftp]"	,CHECK_SERVICE_FTP, 	0, 0},
+	{"check_service[pop]"	,CHECK_SERVICE_POP, 	0, 0},
+	{"check_service[nntp]"	,CHECK_SERVICE_NNTP, 	0, 0},
+	{"check_service[imap]"	,CHECK_SERVICE_IMAP, 	0, 0},
+	{0}
 	};
 
 void	add_user_parameter(char *key,char *command)
@@ -178,48 +180,42 @@ void	add_user_parameter(char *key,char *command)
 void	test_parameters(void)
 {
 	int	i;
-	float	result;
-	float	(*function)();
-	char	*parameter = NULL;
-	char	*key = NULL;
+
+	char	*c;
 
 	i=0;
-	while(0 != commands[i].function)
+	while(0 != commands[i].key)
 	{
-		key=commands[i].key;
-		function=commands[i].function;
-		parameter=commands[i].parameter;
-
-		result = function(parameter);
-		if( result == FAIL )
-		{
-			printf("\tUNSUPPORTED Key: %s\n",key);
-		}
-		else
-		{
-			printf("SUPPORTED Key: %s [%f]\n",key,result);
-		}
+		c=process(commands[i].key);
+		printf("Key: [%s]\tResult: [%s]\n",commands[i].key,c);
 		fflush(stdout);
-
+		free(c);
 		i++;
 	}
 }
 
-float	process(char *command)
+/* The messy function must be rewritten! */
+char	*process(char *command)
 {
 	char	*p;
-	float	result;
+	double	result=0;
 	int	i;
 	char	*n,*l,*r;
 	float	(*function)();
+	char	*(*function_str)();
 	char	*parameter = NULL;
-	char	key[1024];
+	char	key[MAX_STRING_LEN+1];
 	char	param[1024];
 	char	cmd[1024];
+	char	*res,*res2;
+	int	ret_str=0;
 
 	for( p=command+strlen(command)-1; p>command && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
-	p[1]=0;
-	
+	if( (*p=='\r') || (*p=='\n') ||(*p==' '))
+	{
+		p[1]=0;
+	}
+
 	for(i=0;;i++)
 	{
 		if( commands[i].key == 0)
@@ -251,6 +247,11 @@ float	process(char *command)
 			if( strcmp(key, cmd) == 0)
 			{
 				function=commands[i].function;
+				if(function==0)
+				{
+					function_str=commands[i].function_str;
+					ret_str=1;
+				}
 				parameter=param;
 				break;
 			}
@@ -260,26 +261,65 @@ float	process(char *command)
 			if( strcmp(key,command) == 0)
 			{
 				function=commands[i].function;
+				if(function==0)
+				{
+					function_str=commands[i].function_str;
+					ret_str=1;
+				}
 				parameter=commands[i].parameter;
 				break;
 			}	
 		}
 	}
-
-	if( function !=0 )
+	
+	if(ret_str == 0)
 	{
-		result = function(parameter);
-		if( result == FAIL )
+		if(function != 0)
+		{
+			result = function(parameter);
+			if( result == FAIL )
+			{
+				result = NOTSUPPORTED;
+			}
+		}
+		else
 		{
 			result = NOTSUPPORTED;
 		}
 	}
 	else
 	{
+		res2=function_str(parameter);
+		if(res2==NULL)
+		{
+			result = NOTSUPPORTED;
+		}
+	}
+
+	res=(char *)malloc(MAX_STRING_LEN+1);
+	if(res == NULL)
+	{
+/* Not exactly ... */
 		result=NOTSUPPORTED;
 	}
 
-	return	result;
+	if(ret_str==0)
+	{
+		sprintf(res,"%f",result);
+	}
+	else
+	{
+		if(result==NOTSUPPORTED)
+		{
+			sprintf(res,"%f",result);
+		}
+		else
+		{
+			sprintf(res,"%s",res2);
+		}
+	}
+
+	return	res;
 }
 
 /* Code for cksum is based on code from cksum.c */
@@ -348,7 +388,7 @@ static u_long crctab[] = {
  * on failure.  Errno is set on failure.
  */
 
-float   CKSUM(const char * filename)
+float	CKSUM(const char * filename)
 {
 	register u_char *p;
 	register int nr;
@@ -388,6 +428,7 @@ float   CKSUM(const char * filename)
 	}
 
 	cval = ~crc;
+
 	return	(float)cval;
 }
 
@@ -490,9 +531,10 @@ float	PROCCNT(const char * procname)
 	DIR	*dir;
 	struct	dirent *entries;
 	struct	stat buf;
-	char	filename[512];
-	char	line[512];
-	char	name1[256],name2[256];
+	char	filename[MAX_STRING_LEN+1];
+	char	line[MAX_STRING_LEN+1];
+	char	name1[MAX_STRING_LEN+1];
+	char	name2[MAX_STRING_LEN+1];
 
 	FILE	*f;
 
@@ -501,9 +543,9 @@ float	PROCCNT(const char * procname)
 	dir=opendir("/proc");
 	while((entries=readdir(dir))!=NULL)
 	{
-		strcpy(filename,"/proc/");	
-		strcat(filename,entries->d_name);
-		strcat(filename,"/status");
+		strncpy(filename,"/proc/",MAX_STRING_LEN);	
+		strncat(filename,entries->d_name,MAX_STRING_LEN);
+		strncat(filename,"/status",MAX_STRING_LEN);
 
 		if(stat(filename,&buf)==0)
 		{
@@ -513,7 +555,7 @@ float	PROCCNT(const char * procname)
 			{
 				continue;
 			}
-			fgets(line,512,f);
+			fgets(line,MAX_STRING_LEN,f);
 			fclose(f);
 
 			if(sscanf(line,"%s\t%s\n",name1,name2)==2)
@@ -633,12 +675,12 @@ float	TCP_LISTEN(const char *porthex)
 {
 #ifdef HAVE_PROC
 	FILE	*f;
-	char	c[1024];
+	char	c[MAX_STRING_LEN+1];
 
-	char	pattern[1024]="0050 00000000:0000 0A";
+	char	pattern[MAX_STRING_LEN+1]="0050 00000000:0000 0A";
 
-	strcpy(pattern,porthex);
-	strcat(pattern," 00000000:0000 0A");
+	strncpy(pattern,porthex,MAX_STRING_LEN);
+	strncat(pattern," 00000000:0000 0A", MAX_STRING_LEN);
 
 	f=fopen("/proc/net/tcp","r");
 	if(NULL == f)
@@ -646,7 +688,7 @@ float	TCP_LISTEN(const char *porthex)
 		return	FAIL;
 	}
 
-	while (NULL!=fgets(c,1024,f))
+	while (NULL!=fgets(c,MAX_STRING_LEN,f))
 	{
 		if(NULL != strstr(c,pattern))
 		{
@@ -667,7 +709,7 @@ float	getPROC(char *file,int lineno,int fieldno)
 {
 	FILE	*f;
 	char	*t;
-	char	c[1024];
+	char	c[MAX_STRING_LEN+1];
 	float	result;
 	int	i;
 
@@ -678,7 +720,7 @@ float	getPROC(char *file,int lineno,int fieldno)
 	}
 	for(i=1;i<=lineno;i++)
 	{	
-		fgets(c,1024,f);
+		fgets(c,MAX_STRING_LEN,f);
 	}
 	t=(char *)strtok(c," ");
 	for(i=2;i<=fieldno;i++)
@@ -1179,11 +1221,63 @@ float	DISK_WBLK(void)
 #endif
 }
 
+char	*EXECUTE_STR(char *command)
+{
+	FILE	*f;
+	char	*c;
+
+	c=(char *)malloc(MAX_STRING_LEN+1);
+	if(c == NULL)
+	{
+		return	NULL;
+	}
+
+	f=popen( command,"r");
+	if(f==0)
+	{
+		switch (errno)
+		{
+//			case	EINTR:
+//				return TIMEOUT_ERROR;
+			default:
+				printf("E1\n");
+				return NULL;
+		}
+	}
+
+	if(NULL == fgets(c,MAX_STRING_LEN,f))
+	{
+		pclose(f);
+		switch (errno)
+		{
+//			case	EINTR:
+//				return TIMEOUT_ERROR;
+			default:
+				printf("E1\n");
+				return NULL;
+		}
+	}
+
+	if(pclose(f) != 0)
+	{
+		switch (errno)
+		{
+//			case	EINTR:
+//				return TIMEOUT_ERROR;
+			default:
+				printf("E1\n");
+				return NULL;
+		}
+	}
+
+	return	c;
+}
+
 float	EXECUTE(char *command)
 {
 	FILE	*f;
 	float	result;
-	char	c[1024];
+	char	c[MAX_STRING_LEN+1];
 
 	f=popen( command,"r");
 	if(f==0)
@@ -1197,7 +1291,7 @@ float	EXECUTE(char *command)
 		}
 	}
 
-	if(NULL == fgets(c,1024,f))
+	if(NULL == fgets(c,MAX_STRING_LEN,f))
 	{
 		pclose(f);
 		switch (errno)

@@ -224,6 +224,7 @@ CREATE TABLE items_template (
   description		varchar(255)	DEFAULT '' NOT NULL,
   key_			varchar(64)	DEFAULT '' NOT NULL,
   delay			int4		DEFAULT '0' NOT NULL,
+  value_type		int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (itemtemplateid)
 );
 

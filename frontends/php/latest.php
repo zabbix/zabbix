@@ -4,6 +4,7 @@
 	$page["file"] = "latest.php";
 	show_header($page["title"],0,0);
 ?>
+
 <?
 	show_table_header_begin();
 	echo "LATEST DATA";
@@ -156,7 +157,14 @@
 			{
 				echo "<td><center>-</center></td>";
 			}
-			echo "<td><center><a href=\"history.php?action=showhistory&itemid=".$row["itemid"]."\">Show</a></center></td>";
+			if($row["value_type"]==0)
+			{
+				echo "<td><center><a href=\"history.php?action=showhistory&itemid=".$row["itemid"]."\">Show</a></center></td>";
+			}
+			else
+			{
+				echo "<td><center><a href=\"history.php?action=showvalues&period=3600&itemid=".$row["itemid"]."\">Show</a></center></td>";
+			}
 			if($row["value_type"]==0)
 			{
 				echo "<td><center><a href=\"trends.php?itemid=".$row["itemid"]."\">Show</a></center></td>";
