@@ -28,7 +28,6 @@ latest trigger (item type  = TRAPPER)
  - date&time in alert emails
  - support of '-' in trigger expressions (...>-1)
  - UserParameter does not appear in the log
- - add MRTG-like graphs + periodic recalculation of aggregate functions
  - add support for agent forwarding (proxy)
  - ability to add a library of  userwritten c-functions with dlopen/dlsym to
 the agent with a predefined API that can return values to suckerd (for both 
