@@ -187,7 +187,6 @@ I made changes to the PHP frontend and zabbix_sucker.c to enable the user to spe
 (From: "Dave McCrudden" <dmccrudden@custcare.com.au>)
 
 
- - mass-adding of actions
  - BUG. zabbix_sucker should accept parameter regardless of "\n" at the end of line 
  - get rid of long select lists in user forms 
  - do not send notifications at certain periods of time. Do not monitor services at certain periods of time.

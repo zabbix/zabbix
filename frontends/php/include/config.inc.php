@@ -485,6 +485,23 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	"$priorities,$md5sum";
 	}
 
+	function	get_action_by_actionid($actionid)
+	{
+		global	$ERROR_MSG;
+
+		$sql="select * from actions where actionid=$actionid"; 
+		$result=DBselect($sql);
+		if(DBnum_rows($result) == 1)
+		{
+			return	DBfetch($result);	
+		}
+		else
+		{
+			$ERROR_MSG="No action with actionid=[$actionid]";
+		}
+		return	$result;
+	}
+
 	function	get_user_by_userid($userid)
 	{
 		global	$ERROR_MSG;
@@ -2598,6 +2615,23 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					$trigger["expression"]=str_replace("{".$row3["functionid"]."}","{".$functionid."}",$trigger["expression"]);
 					$sql="update triggers set expression='".$trigger["expression"]."' where triggerid=$triggerid";
 					DBexecute($sql);
+				}
+				# Add actions
+				$sql="select actionid from actions where triggerid=".$row2["triggerid"];
+				$result3=DBselect($sql);
+				while($row3=DBfetch($result3))
+				{
+					$action=get_action_by_actionid($row3["actionid"]);
+					$userid=$action["userid"];
+					$scope=$action["scope"];
+					$severity=$action["severity"];
+					$good=$action["good"];
+					$delay=$action["delay"];
+					$subject=$action["subject"];
+					$message=$action["message"];
+					$sql="insert into actions (triggerid, userid, scope, severity, good, delay, subject, message) values ($triggerid,$itemid,$userid,$scope,$severity,$good,'$subject','$message')";
+					$result4=DBexecute($sql);
+					$actionid=DBinsert_id($result4,"actions","actionid");
 				}
 			}
 		}
