@@ -83,14 +83,8 @@
 	}
 	$result=DBselect($sql);
 
-//	echo "<TABLE WIDTH=100% align=center BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TABLE WIDTH=100% align=center BGCOLOR=\"#AAAAAA\" BORDER=0 cellspacing=1 cellpadding=3>";
-	echo "<TR BGCOLOR=\"#CCCCCC\">";
-	echo "<TD width=20%><b>".S_TIME."</b></TD>";
-	echo "<TD><b>".S_DESCRIPTION."</b></TD>";
-	echo "<TD width=10%><b>".S_VALUE."</b></TD>";
-	echo "<TD width=10%><b>".S_SEVERITY."</b></TD>";
-	echo "</TR>";
+	table_begin();
+	table_header(array(S_TIME, S_DESCRIPTION, S_VALUE, S_SEVERITY));
 	$col=0;
 	$i=0;
 	while($row=DBfetch($result))
@@ -104,42 +98,41 @@
 		{
 			continue;
 		}
-		if($col++%2==0)	{ echo "<tr bgcolor=#DDDDDD>"; }
-		else		{ echo "<tr bgcolor=#EEEEEE>"; }
-
 		if($col>100)	break;
 
-		echo "<TD>",date("Y.M.d H:i:s",$row["clock"]),"</TD>";
-//		$description=$row["description"];
-//		if( strstr($description,"%s"))
-//		{
-			$description=expand_trigger_description($row["triggerid"]);
-//		}
-		echo "<TD><a href=\"alarms.php?triggerid=".$row["triggerid"]."\">$description</a></TD>";
-//		echo "<TD><a href=\"alarms.php?triggerid=".$row["triggerid"]."\">".htmlspecialchars($description)."</a></TD>";
+		$description=expand_trigger_description($row["triggerid"]);
+		$description="<a href=\"alarms.php?triggerid=".$row["triggerid"]."\">$description</a>";
+
 		if($row["value"] == 0)
 		{
-			echo "<TD><font color=\"00AA00\">".S_OFF."</font></TD>";
+			$value=array("value"=>S_OFF,"class"=>"off");
 		}
 		elseif($row["value"] == 1)
 		{
-			echo "<TD><font color=\"AA0000\">".S_ON."</font></TD>";
+			$value=array("value"=>S_ON,"class"=>"on");
 		}
 		else
 		{
-			echo "<TD><font color=\"AAAAAA\">".S_UNKNOWN_BIG."</font></TD>";
+			$value=array("value"=>S_UNKNOWN_BIG,"class"=>"unknown");
 		}
-		if($row["priority"]==0)         echo "<TD ALIGN=CENTER>".S_NOT_CLASSIFIED."</TD>";
-		elseif($row["priority"]==1)     echo "<TD ALIGN=CENTER>".S_INFORMATION."</TD>";
-		elseif($row["priority"]==2)     echo "<TD ALIGN=CENTER>".S_WARNING."</TD>";
-		elseif($row["priority"]==3)     echo "<TD ALIGN=CENTER BGCOLOR=#DDAAAA>".S_AVERAGE."</TD>";
-		elseif($row["priority"]==4)     echo "<TD ALIGN=CENTER BGCOLOR=#FF8888>".S_HIGH."</TD>";
-		elseif($row["priority"]==5)     echo "<TD ALIGN=CENTER BGCOLOR=RED>".S_DISASTER."</TD>";
-		else                            echo "<TD ALIGN=CENTER><B>".$row["priority"]."</B></TD>";
-		echo "</TR>";
+		if($row["priority"]==0)		$priority=S_NOT_CLASSIFIED;
+		elseif($row["priority"]==1)	$priority=S_INFORMATION;
+		elseif($row["priority"]==2)	$priority=S_WARNING;
+		elseif($row["priority"]==3)	$priority=array("value"=>S_AVERAGE,"class"=>"average");
+		elseif($row["priority"]==4)	$priority=array("value"=>S_HIGH,"class"=>"high");
+		elseif($row["priority"]==5)	$priority=array("value"=>S_DISASTER,"class"=>"disaster");
+		else				$priority=$row["priority"];
+
+		table_row(array(
+			date("Y.M.d H:i:s",$row["clock"]),
+			$description,
+			$value,
+			$priority),
+			$col++);
+
 		cr();
 	}
-	echo "</TABLE>";
+	table_end();
 ?>
 </FONT>
 </TR>

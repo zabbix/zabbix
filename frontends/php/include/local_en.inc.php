@@ -314,6 +314,11 @@
 	define("S_LATEST_ALARMS",			"Latest alarms");
 	define("S_HISTORY_OF_ALARMS_BIG",		"HISTORY OF ALARMS");
 
+//	latest.php
+	define("S_LAST_CHECK",				"Last check");
+	define("S_LAST_CHECK_BIG",			"LAST CHECK");
+	define("S_LAST_VALUE",				"Last value");
+
 //	map.php
 	define("S_OK_BIG",				"OK");
 	define("S_PROBLEMS_SMALL",			"problems");

@@ -52,6 +52,50 @@
 		}
 	}
 
+	function table_begin($class="tborder")
+	{
+		echo "<table class=\"$class\" border=0 width=100% bgcolor='#AAAAAA' cellspacing=1 cellpadding=3>";
+		echo "\n";
+	}
+
+	function table_header($elements)
+	{
+		echo "<tr bgcolor='#CCCCCC'>";
+		while(list($num,$element)=each($elements))
+		{
+			echo "<td><b>".$element."</b></td>";
+		}
+		echo "</tr>";
+		echo "\n";
+	}
+
+	function table_row($elements, $rownum)
+	{
+		if($rownum%2 == 1)	{ echo "<TR BGCOLOR=#DDDDDD>"; }
+		else			{ echo "<TR BGCOLOR=#EEEEEE>"; }
+
+		while(list($num,$element)=each($elements))
+		{
+			if(is_array($element))
+			{
+				echo "<td class=\"".$element["class"]."\">".$element["value"]."</td>";
+			}
+			else
+			{
+				echo "<td>".$element."</td>";
+			}
+		}
+		echo "</tr>";
+		echo "\n";
+	}
+
+
+	function table_end()
+	{
+		echo "</table>";
+		echo "\n";
+	}
+
 	function table_td($text,$attr)
 	{
 		echo "<td $attr>$text</td>";
