@@ -30,7 +30,7 @@ insert into usrgrp (usrgrpid, name) values (NULL, 'WEB administrators');
 insert into usrgrp (usrgrpid, name) values (NULL, 'Head of IT department');  
 insert into usrgrp (usrgrpid, name) values (NULL, 'Zabbix administrators');  
 
-alter table items add delta int1  DEFAULT '0' NOT NULL;
+alter table items add delta int4  DEFAULT '0' NOT NULL;
 alter table items add prevorgvalue float8  DEFAULT NULL;
 
-alter table actions add recipient int1  DEFAULT '0' NOT NULL;
+alter table actions add recipient int4  DEFAULT '0' NOT NULL;
