@@ -26,7 +26,7 @@
 ?>
 
 <?php
-	show_table_header("Information about Zabbix (v1.0)");
+	show_table_header("Information about Zabbix (v1.0beta11)");
 ?>
 
 <TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR="#CCCCCC" cellspacing=1 cellpadding=3>
