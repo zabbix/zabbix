@@ -10,6 +10,8 @@
 
 #include <syslog.h>
 
+#include <string.h>
+
 #include <time.h>
 
 #include <sys/socket.h>
@@ -565,10 +567,6 @@ void	update_triggers( int flag, int sucker_num, int lastclock )
 			syslog( LOG_WARNING, "Expression %s - SUX.",trigger.expression);
 			continue;
 		}
-
-/*		now = time(NULL);
-		sprintf(c,"update triggers set lastcheck=%d where triggerid=%d",now,trigger.triggerid);
-		DBexecute(c);*/
 
 		if((b==1)&&(trigger.istrue!=1))
 		{
