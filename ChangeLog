@@ -1,5 +1,10 @@
 Changes for 1.0alpha10:
 
+ - minor fixed in PHP code
+ - added some basic information on zabbix_trapperd to manual.txt
+ - added zabbix_trapperd
+ - minor fixes in manual.txt
+
  - check for filesystem /proc in configure.in
  - table "Supported parameters by platform" added to manual.txt
  - removed recommendation of PostgreSQL from manual.txt
