@@ -38,6 +38,7 @@
 <?php
 	show_table_header(S_QUEUE_OF_ITEMS_TO_BE_UPDATED_BIG);
 ?>
+
 <?php
 	$now=time();
 	$result=DBselect("select i.itemid, i.nextcheck, i.description, h.host,h.hostid from items i,hosts h where i.status=0 and i.type not in (2) and h.status=0 and i.hostid=h.hostid and i.nextcheck<$now and i.key_<>'status' order by i.nextcheck");

@@ -188,18 +188,14 @@
 ?>
 
 <?php
-	show_table3_header_begin();
-	echo "&nbsp;".S_STATUS_OF_TRIGGERS_BIG;
-	show_table3_h_delimiter(60);
-	echo "<span style=\"float:right\">";
-?>
-		<form name="form2" method="get" action="tr_status.php">
-<?php
-	echo "<input name=\"onlytrue\" type=\"hidden\" value=\"".$_GET["onlytrue"]."\">";
-	echo "<input name=\"noactions\" type=\"hidden\" value=\"".$_GET["noactions"]."\">";
-	echo S_GROUP."&nbsp;";
-	echo "<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
-	echo "<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_ALL_SMALL;
+	$h1="&nbsp;".S_STATUS_OF_TRIGGERS_BIG;
+
+	$h2="";
+	$h2=$h2."<input name=\"onlytrue\" type=\"hidden\" value=\"".$_GET["onlytrue"]."\">";
+	$h2=$h2."<input name=\"noactions\" type=\"hidden\" value=\"".$_GET["noactions"]."\">";
+	$h2=$h2.S_GROUP."&nbsp;";
+	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
+	$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_ALL_SMALL;
 
 	$result=DBselect("select groupid,name from groups order by name");
 	while($row=DBfetch($result))
@@ -217,14 +213,14 @@
 		}
 		if($cnt!=0)
 		{
-			echo "<option value=\"".$row["groupid"]."\" ".iif(isset($_GET["groupid"])&&($_GET["groupid"]==$row["groupid"]),"selected","").">".$row["name"];
+			$h2=$h2."<option value=\"".$row["groupid"]."\" ".iif(isset($_GET["groupid"])&&($_GET["groupid"]==$row["groupid"]),"selected","").">".$row["name"];
 		}
 	}
-	echo "</select>";
+	$h2=$h2."</select>";
 
-	echo "&nbsp;".S_HOST."&nbsp;";
-	echo "<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
-	echo "<option value=\"0\"".iif(!isset($_GET["hostid"])||($_GET["hostid"]==0),"selected","").">Select host...";
+	$h2=$h2."&nbsp;".S_HOST."&nbsp;";
+	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
+	$h2=$h2."<option value=\"0\"".iif(!isset($_GET["hostid"])||($_GET["hostid"]==0),"selected","").">Select host...";
 
 	if(isset($_GET["groupid"]))
 	{
@@ -242,11 +238,11 @@
 		{
 			continue;
 		}
-		echo "<option value=\"".$row["hostid"]."\"".iif(isset($_GET["hostid"])&&($_GET["hostid"]==$row["hostid"]),"selected","").">".$row["host"];
+		$h2=$h2."<option value=\"".$row["hostid"]."\"".iif(isset($_GET["hostid"])&&($_GET["hostid"]==$row["hostid"]),"selected","").">".$row["host"];
 	}
-	echo "</select>";
+	$h2=$h2."</select>";
 
-	echo nbsp("  ");
+	$h2=$h2.nbsp("  ");
 
 	if(isset($_GET["select"])&&($_GET["select"]==""))
 	{
@@ -258,18 +254,18 @@
 	}
 	if(isset($_GET["select"]))
 	{
-  		echo "<input class=\"biginput\" type=\"text\" name=\"select\" value=\"".$_GET["select"]."\">";
+  		$h2=$h2."<input class=\"biginput\" type=\"text\" name=\"select\" value=\"".$_GET["select"]."\">";
 	}
 	else
 	{
- 		echo "<input class=\"biginput\" type=\"text\" name=\"select\" value=\"\">";
+ 		$h2=$h2."<input class=\"biginput\" type=\"text\" name=\"select\" value=\"\">";
 	}
-	echo nbsp(" ");
-  	echo "<input class=\"button\" type=\"submit\" name=\"do\" value=\"select\">";
-	echo "</form>";
-	echo "</span>";
+	$h2=$h2.nbsp(" ");
+  	$h2=$h2."<input class=\"button\" type=\"submit\" name=\"do\" value=\"select\">";
 //	show_table_header_end();
+	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"tr_status.php\">", "</form>");
 ?>
+
 <?php
 	if(!isset($_GET["fullscreen"]))
 	{
@@ -301,10 +297,12 @@
 	                        echo "<A HREF=\"tr_status.php?hostid=".$row["hostid"]."&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">".$row["host"]."</A>  ";
 	                }
 	        }*/
-		show_table_v_delimiter(2);
+//		show_table_v_delimiter(2);
+//		show_table_header_begin();
 ?>
 
 <?php
+		$h1="";
 		if(isset($_GET["hostid"]))
 		{
 			$cond="&hostid=".$_GET["hostid"];
@@ -316,38 +314,37 @@
 
 		if($onlytrue!='true')
 		{
-			echo "[<A HREF=\"tr_status.php?onlytrue=true&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond\">".S_SHOW_ONLY_TRUE."</a>] ";
+			$h1=$h1."[<A HREF=\"tr_status.php?onlytrue=true&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond\">".S_SHOW_ONLY_TRUE."</a>] ";
 		}
 		else
 		{
-			echo "[<A HREF=\"tr_status.php?noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond\">".S_SHOW_ALL_TRIGGERS."</A>] ";
+			$h1=$h1."[<A HREF=\"tr_status.php?noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond\">".S_SHOW_ALL_TRIGGERS."</A>] ";
 		}
 		if($noactions!='true')
 		{
-			echo "[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=true&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond\">".S_HIDE_ACTIONS."</A>] ";
+			$h1=$h1."[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=true&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond\">".S_HIDE_ACTIONS."</A>] ";
 		}
 		else
 		{
-			echo "[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=false&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond\">".S_SHOW_ACTIONS."</A>] ";
+			$h1=$h1."[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=false&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond\">".S_SHOW_ACTIONS."</A>] ";
 		}
 		if($compact!='true')
 		{
-			echo "[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=true&select=$select&txt_select=$txt_select&sort=$sort$cond\">".S_HIDE_DETAILS."</A>] ";
+			$h1=$h1."[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=true&select=$select&txt_select=$txt_select&sort=$sort$cond\">".S_HIDE_DETAILS."</A>] ";
 		}
 		else
 		{
-			echo "[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=false&select=$select&txt_select=$txt_select&sort=$sort$cond\">".S_SHOW_DETAILS."</A>] ";
+			$h1=$h1."[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=false&select=$select&txt_select=$txt_select&sort=$sort$cond\">".S_SHOW_DETAILS."</A>] ";
 		}
 		
 		if($select!='true')
 		{
-			echo "[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=true&txt_select=$txt_select&sort=$sort$cond\">".S_SELECT."</A>] ";
+			$h1=$h1."[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=true&txt_select=$txt_select&sort=$sort$cond\">".S_SELECT."</A>] ";
 		}
 		else
 		{
-			echo "[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=false&sort=$sort$cond\">".S_HIDE_SELECT."</A>] "; 
-			show_table_v_delimiter();
-			echo "<form name=\"form1\" method=\"get\" action=\"tr_status.php?select=true\">
+			$h1=$h1."[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=false&sort=$sort$cond\">".S_HIDE_SELECT."</A>] "; 
+			$h1=$h1."<form name=\"form1\" method=\"get\" action=\"tr_status.php?select=true\">
   			<input class=\"biginput\" type=\"text\" name=\"txt_select\" value=\"$txt_select\">
   			<input class=\"button\" type=\"submit\" name=\"btnSelect\" value=\"Select\">
   			<input class=\"button\" type=\"submit\" name=\"btnSelect\" value=\"Inverse select\">
@@ -357,8 +354,8 @@
 		        <INPUT NAME=\"select\" TYPE=\"HIDDEN\" value=\"$select\">
 			</form>";
 		}
-		show_table_header_end();
-		echo "<br>";
+		show_table_header($h1);
+//		echo "<br>";
 	}
 
  	$time=date("[H:i:s]",time());
@@ -406,7 +403,7 @@
 	}
 	else
 	{
-		show_table_header("<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&fullscreen=1&sort=$sort\">".S_TRIGGERS_BIG." $time</A>");
+//		show_table_header("<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&fullscreen=1&sort=$sort\">".S_TRIGGERS_BIG." $time</A>");
 	}
 
 	table_begin();
