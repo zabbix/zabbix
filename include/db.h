@@ -44,6 +44,7 @@ ITEM
 	int     history;
 	time_t  lastdelete;
 	time_t  lastcheck;
+	time_t	nextcheck;
 };
  
 FUNCTION
@@ -86,7 +87,7 @@ TRIGGER
 
 void    DBconnect( void );
 
-void	DBexecute( char *query );
+int	DBexecute( char *query );
 
 DB_RESULT	*DBselect(char *query);
 char		*DBget_field(DB_RESULT *result, int rownum, int fieldnum);

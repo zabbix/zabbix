@@ -19,6 +19,8 @@
 #include "functions.h"
 #include "expression.h"
 
+int	sucker_num=0;
+
 void	signal_handler( int sig )
 {
 	if( SIGALRM == sig )
@@ -175,7 +177,7 @@ int get_minnextcheck(void)
 
 	int		res;
 
-	sprintf(c,"select min(nextcheck) from items i,hosts h where i.status=0 and h.status=0 and h.hostid=i.hostid and i.status=0");
+	sprintf(c,"select min(nextcheck) from items i,hosts h where i.status=0 and h.status=0 and h.hostid=i.hostid and i.status=0 and i.itemid%%%d=%d",SUCKER_FORKS,sucker_num);
 	result = DBselect(c);
 
 	if(result==NULL)
@@ -217,7 +219,7 @@ int get_values(void)
 
 	now = time(NULL);
 
-	sprintf(c,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.history,i.lastdelete from items i,hosts h where i.nextcheck<=%d and i.status=0 and h.status=0 and h.hostid=i.hostid order by i.nextcheck", now);
+	sprintf(c,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.history,i.lastdelete,i.nextcheck from items i,hosts h where i.nextcheck<=%d and i.status=0 and h.status=0 and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, SUCKER_FORKS,sucker_num);
 	result = DBselect(c);
 
 	if(result==NULL)
@@ -238,6 +240,7 @@ int get_values(void)
 		item.description=DBget_field(result,i,5);
 		item.history=atoi(DBget_field(result,i,6));
 		item.lastdelete=atoi(DBget_field(result,i,7));
+		item.nextcheck=atoi(DBget_field(result,i,8));
 
 		if( get_value(&value,item.key,item.host,item.port) == SUCCEED )
 		{
@@ -279,6 +282,7 @@ int get_values(void)
 			sprintf(c,"update items set LastDelete=%d where ItemId=%d",now,item.itemid);
 			DBexecute(c);
 		}
+
 	}
 	DBfree_result(result);
 	return SUCCEED;
@@ -313,7 +317,7 @@ int main_loop()
 		}
 		if(sleeptime>0)
 		{
-			syslog( LOG_DEBUG, "Sleeping for %d seconds", sleeptime );
+			syslog( LOG_WARNING, "Sleeping for %d seconds", sleeptime );
 			sleep( sleeptime );
 		}
 		else
@@ -326,6 +330,7 @@ int main_loop()
 int main(int argc, char **argv)
 {
 	int 	ret;
+	int	i;
 
 	daemon_init();
 
@@ -333,6 +338,14 @@ int main(int argc, char **argv)
 	signal( SIGQUIT, signal_handler );
 	signal( SIGTERM, signal_handler );
 
+	for(i=1;i<SUCKER_FORKS-1;i++)
+	{
+		if(fork() == 0)
+		{
+			sucker_num=i;
+			break;
+		}
+	}
 
 	openlog("zabbix_sucker",LOG_PID,LOG_USER);
 //	ret=setlogmask(LOG_UPTO(LOG_DEBUG));
