@@ -24,7 +24,7 @@
 	}
 
 	$now=time();
-	$result=DBselect("select serviceid,name,triggerid,status,showsla from services order by sortorder,name");
+	$result=DBselect("select serviceid,name,triggerid,status,showsla,goodsla from services order by sortorder,name");
 	echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";
 	echo "\n";
 	echo "<tr>";
@@ -32,6 +32,7 @@
 	echo "<td width=10%><b>Status</b></td>";
 	echo "<td><b>Reason</b></td>";
 	echo "<td width=20%><b>SLA (last 7 days)</b></td>";
+	echo "<td width=10% align=center><b>Planned/current<BR>SLA</b></td>";
 	echo "<td width=5%><b>Graph</b></td>";
 	echo "</tr>";
 	echo "\n";
@@ -51,7 +52,28 @@
 		{
 			echo "<td>-</td>";
 		}
-		echo "<td>-</td>";
+		if($service["showsla"]==1)
+		{
+			$now=time(NULL);
+			$period_start=$now-7*24*3600;
+			$period_end=$now;
+			$stat=calculate_service_availability($service["serviceid"],$period_start,$period_end);
+
+			if($service["goodsla"]>$stat["ok"])
+			{
+				$color="AA0000";
+			}
+			else
+			{
+				$color="00AA00";
+			}
+			printf ("<td><font color=\"00AA00\">%.2f%%</font><b>/</b><font color=\"%s\">%.2f%%</font></td>",$service["goodsla"],$color,$stat["ok"]);
+		}
+		else
+		{
+			echo "<td>-</td>";
+		}
+		echo "<td><a href=\"srv_status.php?serviceid=".$service["serviceid"]."&showgraph=1\">Show</a></td>";
 		echo "</tr>"; 
 		$col++;
 	}
@@ -141,6 +163,7 @@
 			}
 			echo "</td>";
 		}
+
 		if($row["showsla"]==1)
 		{
 			echo "<td><a href=\"report3.php?serviceid=".$row["serviceid"]."&year=".date("Y")."\"><img src=\"chart_sla.php?serviceid=".$row["serviceid"]."\" border=0></td>";
@@ -149,6 +172,31 @@
 		{
 			echo "<td>-</td>";
 		}
+
+		if($row["showsla"]==1)
+		{
+			$now=time(NULL);
+			$period_start=$now-7*24*3600;
+			$period_end=$now;
+			$stat=calculate_service_availability($row["serviceid"],$period_start,$period_end);
+
+			if($row["goodsla"]>$stat["ok"])
+			{
+				$color="AA0000";
+			}
+			else
+			{
+				$color="00AA00";
+			}
+			printf ("<td><font color=\"00AA00\">%.2f%%</font><b>/</b><font color=\"%s\">%.2f%%</font></td>",$row["goodsla"],$color,$stat["ok"]);
+		}
+		else
+		{
+			echo "<td>-</td>";
+		}
+
+
+
 		echo "<td><a href=\"srv_status.php?serviceid=".$row["serviceid"]."&showgraph=1\">Show</a></td>";
 		echo "</tr>"; 
 	}
