@@ -36,6 +36,42 @@
 			show_messages($result,"Trigger status updated","Cannot update trigger status");
 			unset($HTTP_GET_VARS["triggerid"]);
 		}
+		if($HTTP_GET_VARS["register"]=="enable selected")
+		{
+			$result=DBselect("select distinct t.triggerid from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$HTTP_GET_VARS["hostid"]." order by h.host,t.description");
+			while($row=DBfetch($result))
+			{
+				if(isset($HTTP_GET_VARS[$row["triggerid"]]))
+				{
+					$result2=update_trigger_status($row["triggerid"],0);
+				}
+			}
+			show_messages(TRUE,"Triggers enabled","Cannot enable triggers");
+		}
+		if($HTTP_GET_VARS["register"]=="disable selected")
+		{
+			$result=DBselect("select distinct t.triggerid from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$HTTP_GET_VARS["hostid"]." order by h.host,t.description");
+			while($row=DBfetch($result))
+			{
+				if(isset($HTTP_GET_VARS[$row["triggerid"]]))
+				{
+					$result2=update_trigger_status($row["triggerid"],1);
+				}
+			}
+			show_messages(TRUE,"Triggers disabled","Cannot disable triggers");
+		}
+		if($HTTP_GET_VARS["register"]=="delete selected")
+		{
+			$result=DBselect("select distinct t.triggerid from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$HTTP_GET_VARS["hostid"]." order by h.host,t.description");
+			while($row=DBfetch($result))
+			{
+				if(isset($HTTP_GET_VARS[$row["triggerid"]]))
+				{
+					$result2=delete_trigger($row["triggerid"]);
+				}
+			}
+			show_messages(TRUE,"Triggers deleted","Cannot delete triggers");
+		}
 		if($HTTP_GET_VARS["register"]=="update")
 		{
 			if(validate_expression($HTTP_GET_VARS["expression"])==0)
@@ -184,9 +220,9 @@
 		}
 		echo "</table>";
 		show_table2_header_begin();
-		echo "<input type=\"submit\" name=\"register\" value=\"Enable selected\">";
-		echo "<input type=\"submit\" name=\"register\" value=\"Disable selected\">";
-		echo "<input type=\"submit\" name=\"register\" value=\"Delete selected\">";
+		echo "<input type=\"submit\" name=\"register\" value=\"enable selected\">";
+		echo "<input type=\"submit\" name=\"register\" value=\"disable selected\">";
+		echo "<input type=\"submit\" name=\"register\" value=\"delete selected\">";
 		show_table2_header_end();
 		echo "</form>";
 	}

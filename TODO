@@ -3,7 +3,6 @@ TOP PRIORITY:
  - assure uniqueness of host name
  - update docs related to WIN32 agent
  - personalisation (remember default port number for hosts)
- - mass update for triggers (activate, deactivate)
  - improve graphing capabilities
  - support for net-snmp
  - get rid of long select lists in user forms 
