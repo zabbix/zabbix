@@ -146,7 +146,7 @@ int housekeeping_history_and_trends(int now)
 
 /* Delete HISTORY */
 #ifdef HAVE_MYSQL
-		snprintf(sql,sizeof(sql)-1,"delete from history where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
+		snprintf(sql,sizeof(sql)-1,"delete low_priority from history where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
 #else
 		snprintf(sql,sizeof(sql)-1,"delete from history where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
 #endif
@@ -158,7 +158,7 @@ int housekeeping_history_and_trends(int now)
 
 /* Delete HISTORY_STR */
 #ifdef HAVE_MYSQL
-		snprintf(sql,sizeof(sql)-1,"delete from history_str where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
+		snprintf(sql,sizeof(sql)-1,"delete low_priority from history_str where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
 #else
 		snprintf(sql,sizeof(sql)-1,"delete from history_str where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
 #endif
@@ -170,7 +170,7 @@ int housekeeping_history_and_trends(int now)
 
 /* Delete HISTORY_TRENDS */
 #ifdef HAVE_MYSQL
-		snprintf(sql,sizeof(sql)-1,"delete from trends where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.trends,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
+		snprintf(sql,sizeof(sql)-1,"delete low_priority from trends where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.trends,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
 #else
 		snprintf(sql,sizeof(sql)-1,"delete from trends where itemid=%d and clock<%d",item.itemid,now-24*3600*item.trends);
 #endif
@@ -199,7 +199,11 @@ int housekeeping_sessions(int now)
 {
 	char	sql[MAX_STRING_LEN];
 
+#ifdef HAVE_MYSQL
+	snprintf(sql,sizeof(sql)-1,"delete low_priority from sessions where lastaccess<%d",now-24*3600);
+#else
 	snprintf(sql,sizeof(sql)-1,"delete from sessions where lastaccess<%d",now-24*3600);
+#endif
 #ifdef ZABBIX_THREADS
 	DBexecute_thread(database,sql);
 #else

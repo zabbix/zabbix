@@ -1,5 +1,6 @@
 Changes for 1.1alpha5:
 
+ - introduced 'insert delayed' and 'delete low_priority' for MySQL (Alexei)
  - added frontends/image.php (Alexei)
  - added table 'hosts_templates' (Alexei)
  - added table 'escalations' (Alexei)
