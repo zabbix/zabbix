@@ -15,16 +15,14 @@
 
 	$result=DBselect("select h.hostid,h.host from hosts h,items i where h.status in (0,2) and h.hostid=i.hostid group by h.hostid,h.host order by h.host");
 
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
 	{
-		$hostid_=DBget_field($result,$i,0);
-		$host=DBget_field($result,$i,1);
-		if( isset($hostid) && ($hostid == $hostid_) )
+		if( isset($hostid) && ($hostid == $row["hostid"]) )
 		{
 			echo "<b>[";
 		}
-		echo "<a href='latest.html?hostid=$hostid_'>$host</a>";
-		if(isset($hostid) && ($hostid == $hostid_) )
+		echo "<a href='latest.html?hostid=".$row["hostid"]."'>".$row["host"]."</a>";
+		if(isset($hostid) && ($hostid == $row["hostid"]) )
 		{
 			echo "]</b>";
 		}

@@ -16,6 +16,7 @@ CREATE TABLE services (
 CREATE TABLE services_links (
   serviceupid		int(4)		DEFAULT '0' NOT NULL,
   servicedownid		int(4)		DEFAULT '0' NOT NULL,
+  soft			int(1)		DEFAULT '0' NOT NULL,
   KEY (serviceupid),
   KEY (servicedownid)
 );

@@ -54,7 +54,7 @@
 
 <FONT COLOR="#000000">
 <?
-	$sql="select clock,istrue from alarms where triggerid=$triggerid order by clock desc $limit";
+	$sql="select clock,istrue as status from alarms where triggerid=$triggerid order by clock desc $limit";
 	$result=DBselect($sql);
 
 	echo "<CENTER>";
@@ -70,37 +70,36 @@
 	$falsesum=0;
 	$dissum=0;
 	$clock=mktime();
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
 	{
 		$lclock=$clock;
-		$clock=DBget_field($result,$i,0);
-		$leng=$lclock-$clock;
-		$status=DBget_field($result,$i,1);
-		if($status==0) {  echo "<TR BGCOLOR=#EEFFEE>"; }
-		elseif($status==2) { echo "<TR BGCOLOR=#DDDDDD>"; }
-		elseif($status==3) { echo "<TR BGCOLOR=#EEEEEE>"; }
-		else { echo "<TR BGCOLOR=#FFDDDD>"; }
+		$leng=$lclock-$row["clock"];
 
-		echo "<TD>",date("Y.M.d H:i:s",$clock),"</TD>";
-		if($status==1)
+		if($row["status"]==0)		{ echo "<TR BGCOLOR=#EEFFEE>"; }
+		elseif($row["status"]==2)	{ echo "<TR BGCOLOR=#DDDDDD>"; }
+		elseif($row["status"]==3)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
+		else				{ echo "<TR BGCOLOR=#FFDDDD>"; }
+
+		echo "<TD>",date("Y.M.d H:i:s",$row["clock"]),"</TD>";
+		if($row["status"]==1)
 		{
 			$istrue="TRUE";
 			$truesum=$truesum+$leng;
 			$sum=$truesum;
 		}
-		elseif($status==0)
+		elseif($row["status"]==0)
 		{
 			$istrue="FALSE";
 			$falsesum=$falsesum+$leng;
 			$sum=$falsesum;
 		}
-		elseif($status==2)
+		elseif($row["status"]==2)
 		{
 			$istrue="DISABLED";
 			$dissum=$dissum+$leng;
 			$sum=$dissum;
 		}
-		elseif($status==3)
+		elseif($row["status"]==3)
 		{
 			$istrue="MODIFIED";
 			$dissum=$dissum+$leng;

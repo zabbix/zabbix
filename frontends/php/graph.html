@@ -29,8 +29,8 @@
 
 <?
 	$result=DBselect("select name from graphs where graphid=$graphid");
-	$map=DBget_field($result,0,0);
-	show_table_header($map);
+	$row=DBfetch($result);
+	show_table_header($row["name"]);
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR BGCOLOR=#DDDDDD>";
 	echo "<TD ALIGN=CENTER>";
@@ -51,28 +51,15 @@
 	$result=DBselect($sql);
 	echo "<CENTER>";
 	$col=0;
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
 	{
-		if($col==1)
-		{
-			echo "<TR BGCOLOR=#EEEEEE>";
-			$col=0;
-		} else
-		{
-			echo "<TR BGCOLOR=#DDDDDD>";
-			$col=1;
-		}
-	
-		$itemid_=DBget_field($result,$i,0);
-		$host_=DBget_field($result,$i,1);
-		$description_=DBget_field($result,$i,2);
-		$gitemid_=DBget_field($result,$i,3);
-		$color_=DBget_field($result,$i,4);
+		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
+		else		{ echo "<TR BGCOLOR=#DDDDDD>"; }
 
-		echo "<TD>$host_</TD>";
-		echo "<TD><a href=\"chart.html?itemid=$itemid_&period=3600&from=0\">$description_</a></TD>";
-		echo "<TD>$color_</TD>";
-		echo "<TD><A HREF=\"graph.html?register=delete&graphid=$graphid&gitemid=$gitemid_\">Delete</A></TD>";
+		echo "<TD>".$row["host"]."</TD>";
+		echo "<TD><a href=\"chart.html?itemid=".$row["itemid"]."&period=3600&from=0\">".$row["description"]."</a></TD>";
+		echo "<TD>".$row["color"]."</TD>";
+		echo "<TD><A HREF=\"graph.html?register=delete&graphid=$graphid&gitemid=".$row["gitemid"]."\">Delete</A></TD>";
 		echo "</TR>";
 	}
 	echo "</TABLE>";
