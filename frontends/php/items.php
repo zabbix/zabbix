@@ -156,7 +156,7 @@
 	show_table_header_end();
 
 	$lasthost="";
-	if(isset($HTTP_GET_VARS["hostid"])&&!isset($HTTP_GET_VARS["itemid"])) 
+	if(isset($HTTP_GET_VARS["hostid"])&&!isset($HTTP_GET_VARS["type"])) 
 	{
 		$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.lastdelete,i.nextcheck,h.hostid,i.type from hosts h,items i where h.hostid=i.hostid and h.hostid=".$HTTP_GET_VARS["hostid"]." order by h.host,i.key_,i.description");
 		$col=0;
@@ -302,7 +302,7 @@
 	if(DBget_field($result,0,0)>0)
 	{
 		echo "<a name=\"form\"></a>";
-		@insert_item_form($HTTP_GET_VARS["itemid"]);
+		insert_item_form();
 	}
 ?>
 
