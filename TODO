@@ -2,7 +2,6 @@
 
  - fix PostgreSQL schema
  - add all supported items to templates (data.sql)
- - performance of graphs: get rid of MIN,MAX
  - user groups
  - test on non-Linux platforms
  - test install and upgrade procedure for 1.0beta10
