@@ -1,6 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+/* for setproctitle() */
+#include <sys/types.h>
+#include <unistd.h>
+
 #include "db.h"
 #include "log.h"
 #include "common.h"

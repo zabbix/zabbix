@@ -1,5 +1,7 @@
 Changes for 1.0beta7:
 
+ - ./configure to find PostgreSQL's includes in /usr/local/include
+ (Alexei)
  - basic support for log rotating (Alexei)
  - added additional error checks in get_value_snmp() (Alexei)
 
