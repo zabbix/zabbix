@@ -14,6 +14,7 @@ So functions.c should look
 >       char    *OK_251="251";
 
 
+ - graceful processing of database loss
  - add zabbix[unixtime] and lastupdate() to get rid of nodata()
  - check return code for alert scripts
  - add support for function unixtime()
@@ -37,7 +38,6 @@ latest trigger (item type  = TRAPPER)
  - cannot use "." as key in trigger expressions
  - time-navigation for graphs
  - preset time for graphs
- - new item status: 'deleted'. Housekeeping to delete items, etc
 
  - finish src/zabbix_snmptrapper
  - links to Zabbix frontend in alert emails
