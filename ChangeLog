@@ -1,5 +1,7 @@
 Changes for 1.0alpha5:
 
+ - zabbix_sucker forks N (default=10) copies to run in parallel mode. Monitoring of hundreds of servers is reality ! 
+ - "netstat -ln|grep tcp" was replaced by more efficient "netstat -lnt"
  - support for macros in email subject and body
  - fixed zabbix_trapper. Added update_functions (itemid).
  - finally (!) removed include/sysinfo.h

@@ -8,7 +8,9 @@
 #define	MAXFD	64
 
 
-#define	SUCKER_DELAY	10
+#define	SUCKER_FORKS	10
+
+#define	SUCKER_DELAY	30
 
 #define	SUCKER_TIMEOUT	5
 #define	AGENT_TIMEOUT	3
