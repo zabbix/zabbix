@@ -127,7 +127,10 @@
 
 void	forward_request(char *proxy,char *command,int port,char *value);
 
-COMMAND	commands[AGENT_MAX_USER_COMMANDS]=
+/*COMMAND	commands[AGENT_MAX_USER_COMMANDS]=*/
+COMMAND	*commands=NULL;
+
+COMMAND	agent_commands[]=
 /* 	KEY		FUNCTION (if double) FUNCTION (if string) PARAM*/
 	{
 	{"kern[maxfiles]"	,KERNEL_MAXFILES,	0, 0},
@@ -251,39 +254,62 @@ COMMAND	commands[AGENT_MAX_USER_COMMANDS]=
 	{0}
 	};
 
+void	add_metric(char *key, void *function,void *function_str,char *parameter )
+{
+
+	int i;
+
+	for(i=0;;i++)
+	{
+		if(commands[i].key == NULL)
+		{
+
+			commands[i].key=strdup(key);
+			if(parameter == NULL)
+			{
+				commands[i].parameter=NULL;
+			}
+			else
+			{
+				commands[i].parameter=strdup(parameter);
+			}
+			commands[i].function=function;
+			commands[i].function_str=function_str;
+
+			commands=realloc(commands,(i+2)*sizeof(COMMAND));
+			commands[i+1].key=NULL;
+			break;
+		}
+	}
+}
+
 void	add_user_parameter(char *key,char *command)
 {
 	int i;
 
-	for(i=0;i<AGENT_MAX_USER_COMMANDS;i++)
+	for(i=0;;i++)
 	{
 		if( commands[i].key == 0)
 		{
 			commands[i].key=strdup(key);
-
 			commands[i].function=0;
-
 			commands[i].function_str=&EXECUTE_STR;
-
 			commands[i].parameter=strdup(command);
 
-			commands[i+1].key = 0;
-			
+			commands=realloc(commands,(i+2)*sizeof(COMMAND));
+			commands[i+1].key=NULL;
+
 			break;
 		}
 		/* Replace existing parameters */
 		if(strcmp(commands[i].key, key) == 0)
 		{
-			/* Can we free this? I don't know/ */
-/*			free(commands[i].key);
-			free(commands[i].key);*/
+			free(commands[i].key);
+			if(commands[i].parameter!=NULL)	free(commands[i].parameter);
 
 			commands[i].key=strdup(key);
-
 			commands[i].function=0;
-
 			commands[i].function_str=&EXECUTE_STR;
-
 			commands[i].parameter=strdup(command);
 
 			break;
@@ -291,6 +317,18 @@ void	add_user_parameter(char *key,char *command)
 	}
 }
 
+void	init_metrics()
+{
+	int 	i;
+
+	commands=malloc(sizeof(COMMAND));
+	commands[0].key=NULL;
+
+	for(i=0;agent_commands[i].key!=0;i++)
+	{
+		add_metric(agent_commands[i].key, agent_commands[i].function, agent_commands[i].function_str, agent_commands[i].parameter);
+	}
+}
 
 void    escape_string(char *from, char *to, int maxlen)
 {
