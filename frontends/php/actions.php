@@ -143,7 +143,7 @@
 			$sql="select * from actions a,triggers t,hosts h,functions f where a.triggerid=t.triggerid and f.triggerid=t.triggerid and h.hostid=a.triggerid and t.hostid=h.hostid and t.triggerid=".$HTTP_GET_VARS["triggerid"]."and a.scope=1 and h.hostid=".$row["triggerid"];
 //			echo $sql;
 			$result2=DBselect($sql);
-			if(DBnum_rows($result2)==0)	continue;
+//			if(DBnum_rows($result2)==0)	continue;
 		}
 
 		if(isset($actionid) && ($actionid==$row["actionid"]))
