@@ -49,7 +49,6 @@
 
 		var $colors;
 		var $im;
-		var $date_format;
 
 		function initColors()
 		{
@@ -87,14 +86,14 @@
 			$this->itemids=array();
 
 
-			if($this->period<=3600)
+/*			if($this->period<=3600)
 			{
 				$this->date_format="H:i";
 			}
 			else
 			{
 				$this->date_format="m.d H:i";
-			}
+			}*/
 
 		}
 
@@ -169,7 +168,7 @@
 
 		function drawRectangle()
 		{
-			ImageFilledRectangle($this->im,0,0,$this->sizeX+$this->shiftX+61,$this->sizeY+$this->shiftY+32+12*$this->num+2,$this->colors["White"]);
+			ImageFilledRectangle($this->im,0,0,$this->sizeX+$this->shiftX+61,$this->sizeY+$this->shiftY+62+12*$this->num+2,$this->colors["White"]);
 			if($this->border==1)
 			{
 				ImageRectangle($this->im,0,0,imagesx($this->im)-1,imagesy($this->im)-1,$this->colors["Black"]);
@@ -211,9 +210,18 @@
 // Some data exists, so draw time line
 			if($this->nodata==0)
 			{
-				for($i=0;$i<=$this->sizeX;$i+=$this->sizeX/24)
+				$old_day=-1;
+				for($i=0;$i<=24;$i++)
 				{
-					ImageStringUp($this->im, 1,$i+$this->shiftX-3, $this->sizeY+$this->shiftY+27, date($this->date_format,$this->from_time+$i*$this->period/$this->sizeX) , $this->colors["Black"]);
+					ImageStringUp($this->im, 1,$i*$this->sizeX/24+$this->shiftX-3, $this->sizeY+$this->shiftY+57, date("      H:i",$this->from_time+$i*$this->period/24) , $this->colors["Black"]);
+
+					$new_day=date("d",$this->from_time+$i*$this->period/24);
+					if( ($old_day != $new_day) ||($i==24))
+					{
+						$old_day=$new_day;
+						ImageStringUp($this->im, 1,$i*$this->sizeX/24+$this->shiftX-3, $this->sizeY+$this->shiftY+57, date("m.d",$this->from_time+$i*$this->period/24) , $this->colors["Dark Red"]);
+
+					}
 				}
 			}
 		}
@@ -256,8 +264,8 @@
 
 			for($i=0;$i<$this->num;$i++)
 			{
-				ImageFilledRectangle($this->im,$this->shiftX,$this->sizeY+$this->shiftY+32+12*$i,$this->shiftX+5,$this->sizeY+$this->shiftY+5+32+12*$i,$this->colors[$this->items[$i]["color"]]);
-				ImageRectangle($this->im,$this->shiftX,$this->sizeY+$this->shiftY+32+12*$i,$this->shiftX+5,$this->sizeY+$this->shiftY+5+32+12*$i,$this->colors["Black"]);
+				ImageFilledRectangle($this->im,$this->shiftX,$this->sizeY+$this->shiftY+62+12*$i,$this->shiftX+5,$this->sizeY+$this->shiftY+5+62+12*$i,$this->colors[$this->items[$i]["color"]]);
+				ImageRectangle($this->im,$this->shiftX,$this->sizeY+$this->shiftY+62+12*$i,$this->shiftX+5,$this->sizeY+$this->shiftY+5+62+12*$i,$this->colors["Black"]);
 
 				$str=sprintf("%s: %s [min:%s max:%s last:%s]",
 					str_pad($this->items[$i]["host"],$max_host_len," "),
@@ -266,7 +274,7 @@
 					convert_units(max($this->max[$i]),$this->items[$i]["units"],$this->items[$i]["multiplier"]),
 					convert_units($this->getLastValue($i),$this->items[$i]["units"],$this->items[$i]["multiplier"]));
 	
-				ImageString($this->im, 2,$this->shiftX+9,$this->sizeY+$this->shiftY+27+12*$i,$str, $this->colors["Black"]);
+				ImageString($this->im, 2,$this->shiftX+9,$this->sizeY+$this->shiftY+(62-5)+12*$i,$str, $this->colors["Black"]);
 			}
 		}
 
@@ -403,7 +411,7 @@
 
 			check_authorisation();
 		
-			$this->im = imagecreate($this->sizeX+$this->shiftX+61,$this->sizeY+$this->shiftY+32+12*$this->num+2);
+			$this->im = imagecreate($this->sizeX+$this->shiftX+61,$this->sizeY+$this->shiftY+62+12*$this->num+2);
 
 			$this->initColors();
 			$this->drawRectangle();
