@@ -807,9 +807,10 @@ void	substitute_hostname(int triggerid,char *s)
 /*
  * Apply actions if any.
  */ 
-void	apply_actions(int triggerid,int good)
+/*void	apply_actions(int triggerid,int good)*/
+void	apply_actions(DB_TRIGGER *trigger,int good)
 {
-	DB_RESULT *result;
+	DB_RESULT *result,*result2;
 	
 	DB_ACTION action;
 
@@ -818,13 +819,13 @@ void	apply_actions(int triggerid,int good)
 	int	i;
 	int	now;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In apply_actions(%d,%d)",triggerid, good);
+	zabbix_log( LOG_LEVEL_DEBUG, "In apply_actions(%d,%d)",trigger->triggerid, good);
 
 	if(good==1)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "Check dependencies");
 
-		sprintf(sql,"select count(*) from trigger_depends d,triggers t where d.triggerid_down=%d and d.triggerid_up=t.triggerid and t.value=%d",triggerid, TRIGGER_VALUE_TRUE);
+		sprintf(sql,"select count(*) from trigger_depends d,triggers t where d.triggerid_down=%d and d.triggerid_up=t.triggerid and t.value=%d",trigger->triggerid, TRIGGER_VALUE_TRUE);
 		result = DBselect(sql);
 		if(DBnum_rows(result) == 1)
 		{
@@ -842,7 +843,7 @@ void	apply_actions(int triggerid,int good)
 
 	now = time(NULL);
 
-	sprintf(sql,"select actionid,userid,delay,subject,message from actions where triggerid=%d and good=%d and nextcheck<=%d",triggerid,good,now);
+	sprintf(sql,"select actionid,userid,delay,subject,message,scope,severity from actions where (scope=%d and triggerid=%d and good=%d and nextcheck<=%d) or (scope=%d) or (scope=%d)",ACTION_SCOPE_TRIGGER,trigger->triggerid,good,now,ACTION_SCOPE_HOST,ACTION_SCOPE_HOSTS);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
@@ -856,19 +857,62 @@ void	apply_actions(int triggerid,int good)
 		action.delay=atoi(DBget_field(result,i,2));
 		strncpy(action.subject,DBget_field(result,i,3),MAX_STRING_LEN);
 		strncpy(action.message,DBget_field(result,i,4),MAX_STRING_LEN);
+		action.scope=atoi(DBget_field(result,i,5));
+		action.severity=atoi(DBget_field(result,i,6));
 
-		substitute_hostname(triggerid,action.message);
-		substitute_hostname(triggerid,action.subject);
+		if(ACTION_SCOPE_TRIGGER==action.scope)
+		{
+			substitute_hostname(trigger->triggerid,action.message);
+			substitute_hostname(trigger->triggerid,action.subject);
 		
-		substitute_macros(action.message);
-		substitute_macros(action.subject); 
+			substitute_macros(action.message);
+			substitute_macros(action.subject);
+		}
+		else if(ACTION_SCOPE_HOSTS==action.scope)
+		{
+			sprintf(sql,"select * from actions a,triggers t,hosts h,functions f,items i where a.triggerid=t.triggerid and f.triggerid=t.triggerid and i.itemid=f.itemid and h.hostid=i.hostid and a.scope=%d",ACTION_SCOPE_HOSTS);
+			result2 = DBselect(sql);
+			if(DBnum_rows(result2)==0)
+			{
+				DBfree_result(result2);
+				continue;
+			}
+			DBfree_result(result2);
+			strncpy(action.subject,trigger->description,MAX_STRING_LEN);
+			if(0==good)
+			{
+				strncat(action.subject," (ON)", MAX_STRING_LEN);
+			}
+			else
+			{
+				strncat(action.subject," (OFF)", MAX_STRING_LEN);
+			}
+			strncpy(action.message,action.subject,MAX_STRING_LEN);
+		}
+		else if(ACTION_SCOPE_HOSTS==action.scope)
+		{
+			strncpy(action.subject,trigger->description,MAX_STRING_LEN);
+			if(0==good)
+			{
+				strncat(action.subject," (ON)", MAX_STRING_LEN);
+			}
+			else
+			{
+				strncat(action.subject," (OFF)", MAX_STRING_LEN);
+			}
+			strncpy(action.message,action.subject,MAX_STRING_LEN);
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_WARNING, "Unsupported scope [%d] for actionid [%d]", action.scope, action.actionid);
+		}
 
 		send_to_user(action.actionid,action.userid,action.subject,action.message);
 		now = time(NULL);
 		sprintf(sql,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
 		DBexecute(sql);
 	}
-	zabbix_log( LOG_LEVEL_DEBUG, "Actions applied for trigger %d %d\n", triggerid, good );
+	zabbix_log( LOG_LEVEL_DEBUG, "Actions applied for trigger %d %d", trigger->triggerid, good );
 	DBfree_result(result);
 }
 
@@ -1032,7 +1076,8 @@ void	update_triggers(int itemid)
 			))
 			{
 				now = time(NULL);
-				apply_actions(trigger.triggerid,1);
+/*				apply_actions(trigger.triggerid,1);*/
+				apply_actions(&trigger,1);
 	
 				sprintf(sql,"update actions set nextcheck=0 where triggerid=%d and good=0",trigger.triggerid);
 				DBexecute(sql);
@@ -1058,7 +1103,8 @@ void	update_triggers(int itemid)
 			 (DBget_prev_trigger_value(trigger.triggerid) == TRIGGER_VALUE_TRUE)
 			))
 			{
-				apply_actions(trigger.triggerid,0);
+/*				apply_actions(trigger.triggerid,0);*/
+				apply_actions(&trigger,0);
 
 				sprintf(sql,"update actions set nextcheck=0 where triggerid=%d and good=1",trigger.triggerid);
 				DBexecute(sql);

@@ -117,6 +117,8 @@ DB_ACTION
 	int     actionid;
 	int     triggerid;
 	int     userid;
+	int     scope;
+	int     severity;
 	int     good;
 	int     delay;
 	int     lastcheck;

@@ -1549,7 +1549,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Add Action
 
-	function	add_action( $triggerid, $userid, $good, $delay, $subject, $message )
+	function	add_action( $triggerid, $userid, $good, $delay, $subject, $message, $scope, $severity)
 	{
 		global	$ERROR_MSG;
 
@@ -1559,7 +1559,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
                         return 0;
 		}
 
-		$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message) values ($triggerid,$userid,$good,$delay,0,'$subject','$message')";
+		$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message,scope,severity) values ($triggerid,$userid,$good,$delay,0,'$subject','$message',$scope,$severity)";
 		return	DBexecute($sql);
 	}
 
@@ -1737,9 +1737,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Update Action
 
-	function	update_action( $actionid, $userid, $good, $delay, $subject, $message )
+	function	update_action( $actionid, $userid, $good, $delay, $subject, $message, $scope, $severity )
 	{
-		$sql="update actions set userid=$userid,good=$good,delay=$delay,nextcheck=0,subject='$subject',message='$message' where actionid=$actionid";
+		$sql="update actions set userid=$userid,good=$good,delay=$delay,nextcheck=0,subject='$subject',message='$message',scope=$scope,severity=$severity where actionid=$actionid";
 		return	DBexecute($sql);
 	}
 
