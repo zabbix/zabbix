@@ -26,9 +26,11 @@ TKOM:
 TELECENTRS:
 
  - rus/lat characters for graphs
- - show/hide host labels in maps
+ - show/hide host labels in maps (show: label/hostname/nothing) Title: label+hostname
  - clickable map in map configuration
  - hard-linked templates (graphs for new hosts to be added automatically)
+ - add/update item -> return o the list of items for the same host/group
+ - update status when host is created
 
 <?
 print_r($_POST);
