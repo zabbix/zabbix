@@ -81,11 +81,17 @@
 	{
 		if(isset($HTTP_GET_VARS["trendavg"]))
 		{
-			echo "<IMG SRC=\"chart3.php?itemid=".$HTTP_GET_VARS["itemid"]."&type=".$HTTP_GET_VARS["type"]."&trendavg=1\">";
+//			echo "<IMG SRC=\"chart3.php?itemid=".$HTTP_GET_VARS["itemid"]."&type=".$HTTP_GET_VARS["type"]."&trendavg=1\">";
+			echo "<script language=\"JavaScript\">";
+			echo "document.write(\"<IMG SRC='chart3.php?itemid=".$HTTP_GET_VARS["itemid"]."&type=".$HTTP_GET_VARS["type"]."&trendavg=1&width=\"+(document.width-108)+\">\")";
+			echo "</script>";
 		}
 		else
 		{
-			echo "<IMG SRC=\"chart3.php?itemid=".$HTTP_GET_VARS["itemid"]."&type=".$HTTP_GET_VARS["type"]."\">";
+//			echo "<IMG SRC=\"chart3.php?itemid=".$HTTP_GET_VARS["itemid"]."&type=".$HTTP_GET_VARS["type"]."\">";
+			echo "<script language=\"JavaScript\">";
+			echo "document.write(\"<IMG SRC='chart3.php?itemid=".$HTTP_GET_VARS["itemid"]."&type=".$HTTP_GET_VARS["type"]."&width=\"+(document.width-108)+\">\")";
+			echo "</script>";
 		}
 	}
 	else
