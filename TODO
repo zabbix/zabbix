@@ -1,3 +1,13 @@
+BUGS:
+
+ - graphs and maps are not displayed properly sometimes
+
+FUTURE REQUESTS:
+
+ - improve graphing capabilities
+ - SNMP v2
+ - do not send notifications at certain periods of time. Do not monitor services at certain periods of time.
+
 HIGH PRIORITY:
 
  - BUG. zabbix_sucker should accept parameter regardless of "\n" at the end of line 
