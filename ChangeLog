@@ -1,3 +1,7 @@
+Changes for 1.1alpha2:
+
+ - fixed addition of network maps (Alexei)
+
 Changes for 1.1alpha1:
 
  - agent will return ZBX_UNSUPPORTED in case if execute command returned EOL only (Alexei)

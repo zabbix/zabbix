@@ -2884,7 +2884,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return 0;
 		}
 
-		$sql="insert into sysmaps (name,width,height,background) values ('$name',$width,$height,'$background'))";
+		$sql="insert into sysmaps (name,width,height,background) values ('$name',$width,$height,'$background')";
 		return	DBexecute($sql);
 	}
 
