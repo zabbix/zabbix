@@ -640,7 +640,6 @@ int get_values(void)
 			item.lastvalue_null=0;
 			item.lastvalue_str=s;
 			item.lastvalue=atof(s);
-//			item.lastvalue_str=DBget_field(result,i,13);
 		}
 		s=DBget_field(result,i,14);
 		if(s==NULL)
@@ -652,7 +651,6 @@ int get_values(void)
 			item.prevvalue_null=0;
 			item.prevvalue_str=s;
 			item.prevvalue=atof(s);
-//			item.prevvalue_str=DBget_field(result,i,14);
 		}
 		item.hostid=atoi(DBget_field(result,i,15));
 		host_status=atoi(DBget_field(result,i,16));

@@ -52,8 +52,8 @@ float	CHECK_PORT(char *port);
 COMMAND
 {
 	char	*key;
-	void	*function;
-	void	*function_str;
+        float   (*function)();
+        char    *(*function_str)();
 	char	*parameter;
 };
 
