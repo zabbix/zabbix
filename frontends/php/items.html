@@ -11,19 +11,23 @@
 	{
 		if($register=="update")
 		{
-			update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid);
+			$result=update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid);
+			show_messages($result,"Item updated","Cannot update item");
 		}
 		if($register=="changestatus")
 		{
-			update_item_status($itemid,$status);
+			$result=update_item_status($itemid,$status);
+			show_messages($result,"Status of item changed","Cannot change item status");
 		}
 		if($register=="add")
 		{
-			add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid);
+			$result=add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid);
+			show_messages($result,"Item added","Cannot add item");
 		}
 		if($register=="delete")
 		{
-			delete_item($itemid);
+			$result=delete_item($itemid);
+			show_messages($result,"Item deleted","Cannot delete item");
 			unset($itemid);
 		}
 	}

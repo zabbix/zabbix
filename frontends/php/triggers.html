@@ -11,7 +11,8 @@
 	{
 		if($register=="changestatus")
 		{
-			update_trigger_status($triggerid,$status);
+			$result=update_trigger_status($triggerid,$status);
+			show_messages($result,"Trigger status updated","Cannot update trigger status");
 		}
 		if($register=="update")
 		{
@@ -21,7 +22,12 @@
 				if(isset($disabled))	{ $istrue=2; }
 				else			{ $istrue=3; }
 	
-				update_trigger($triggerid,$expression,$description,$priority,$istrue,$comments);
+				$result=update_trigger($triggerid,$expression,$description,$priority,$istrue,$comments);
+				show_messages($result,"Trigger updated","Cannot update trigger");
+			}
+			else
+			{
+				show_error_message("Invalid trigger expression");
 			}
 		}
 		if($register=="add")
@@ -31,12 +37,18 @@
 				if(isset($disabled))	{ $istrue=2; }
 				else			{ $istrue=0; }
 				
-				add_trigger($expression,$description,$priority,$istrue,$comments);
+				$result=add_trigger($expression,$description,$priority,$istrue,$comments);
+				show_messages($result,"Trigger added","Cannot add trigger");
+			}
+			else
+			{
+				show_error_message("Invalid trigger expression");
 			}
 		}
 		if($register=="delete")
 		{
-			delete_trigger($triggerid);
+			$result=delete_trigger($triggerid);
+			show_messages($result,"Trigger deleted","Cannot delete trigger");
 			unset($triggerid);
 		}
 	}
