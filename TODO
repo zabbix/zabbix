@@ -53,6 +53,12 @@ TELECENTRS:
 
 OTHER:
 
+ When editing trigger actions in subject it says something
+for instance "low disk space on {HOSTNAME}'s /usr"
+when submitting form, it dumps mysql error, due to non-
+escaped single quote. I believe all user input should be
+escaped before submitting to mysql.
+
 Escalation:
 * Nabor pravil izmenenija prioriteta triggera/... s techeniem vremeni.
 * Nabor pravil ustanavlivaetsja na sled.urovnjah: sistema, host, user,
