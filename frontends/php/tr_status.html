@@ -1,0 +1,199 @@
+<?
+	include "config.inc";
+	$title = "Status of triggers";
+	show_header($title,10);
+?>                                                                                                             
+
+<?
+	show_table_header_begin();
+	echo "STATUS OF TRIGGERS";
+ 
+	show_table_v_delimiter();
+?>
+
+<A NAME="top"></A>
+<?
+	if($noactions!='true')
+	{
+		$noactions='false';
+	}
+?>
+
+<?
+	if($onlytrue!='true')
+	{
+		echo "[<A HREF=\"tr_status.html?onlytrue=true&noactions=$noactions&compact=$compact\">Show only true</a>] ";
+		$onlytrue='false';
+	}
+	else
+	{
+		echo "[<A HREF=\"tr_status.html?noactions=$noactions&compact=$compact\">Show all triggers</A>] ";
+	}
+	if($noactions!='true')
+	{
+		echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=true&compact=$compact\">Hide Actions</A>] ";
+	}
+	else
+	{
+		echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=false&compact=$compact\">Show Actions</A>] ";
+	}
+	if($compact!='true')
+	{
+		echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=true\">Hide Details</A>] ";
+	}
+	else
+	{
+		echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=false\">Show Details</A>] ";
+	}
+	echo "[<A HREF=\"tr_status.html?noactions=false&onlytrue=false&showselected=true\">Select</A>] ";
+
+  
+	if($showselected=='true')
+	{
+		echo	"<form method=\"get\" action=\"tr_status.html\">";
+		echo	"Where <b>Description</b> like <input name=\"only\" type=\"text\" value=\"$only\">";
+		echo	"<INPUT NAME=\"noactions\" TYPE=\"HIDDEN\" value=\"$noactions\"> ";
+		echo	"<INPUT NAME=\"showselected\" TYPE=\"HIDDEN\" value=\"true\"> ";
+//		echo	"<INPUT TYPE=\"IMAGE\" SRC=\"img/enter.gif\"VALUE=\"Show\" BORDER=0 ALT=\"Show\"";
+		echo	"<input type=\"submit\" name=\"register\" value=\"Show\">";
+		echo	"</form>";
+		if($only==$asdfasdf) $only="abcdef";
+		$onlywheredesc=" where description like \"%$only%\" ";
+	}
+	show_table_header_end();
+	
+	echo "<br>";
+   
+	show_table_header("TRIGGERS");
+  
+	echo "\n<TABLE BORDER=0 COLS=5 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TR ALIGN=CENTER>";
+	echo "<TD ALIGN=LEFT><B>Description";
+	if($compact!='true') {echo "<BR><FONT SIZE=-1>Expression</FONT></B>";}
+	echo "</TD>";
+	echo "<TD WIDTH=\"3%\"><B>Status</B></TD>";
+	echo "<TD WIDTH=\"3%\"><B>Priority</B></TD>";
+	if($noactions=='true')
+		echo "<TD WIDTH=\"12%\">";
+	else
+		echo "<TD WIDTH=\"3%\">";
+
+	echo "<B>Last change";
+	if($compact!='true') { echo "<BR><FONT SIZE=-1>(Last check)</FONT></B>";}
+	echo "</TD>";
+   
+	if($noactions!='true')
+	{  
+		echo "<TD WIDTH=\"8%\" NOSAVE><B>Actions</B></TD>";
+	}
+	echo "</TR>\n";
+
+	if($onlytrue=='true')
+	{
+		$result=mysql_query("select triggerid,istrue,description,lastcheck,expression,priority,lastchange,comments from triggers where istrue=1 order by priority desc, description",$mysql);
+	}
+	else
+	{
+		$result=mysql_query("select triggerid,istrue,description,lastcheck,expression,priority,lastchange,comments from triggers $onlywheredesc order by description,priority",$mysql);
+	}
+	$trigcount=0;
+	$i=0;
+	while($row=mysql_fetch_row($result))
+	{
+		$trigcount++;
+		if($col==1)
+		{
+			echo "\n<TR BGCOLOR=#EEEEEE>";
+			$col=0;
+		} else
+		{
+			echo "\n<TR BGCOLOR=#DDDDDD>";
+			$col=1;
+		}
+		$expression=$row[4];
+		$description=$row[2];
+		$triggerid=$row[0];
+		$istrue=$row[1];
+		$lastcheck=$row[3];
+		$priority=$row[5];
+		$lastchange=$row[6]; 
+		$comments=$row[7];  
+ 
+		$lastchange=date("d M H:i:s",$lastchange);
+
+		echo "<TD>";
+
+		if(($comments!="")&&($comments!=" "))
+		{
+			echo "<A HREF=\"comments.html?triggerId=$triggerid\"><b>C</b></a>  &nbsp;";
+		}  
+		echo "$description";
+
+		if($compact!='true')
+		{
+			$expression=explode_exp($expression,1);
+			echo "<BR><FONT COLOR=\"#000000\" SIZE=-2>$expression</FONT>";
+		}
+		echo "</TD>";
+		if($istrue==0)
+		{ echo "<TD ALIGN=CENTER><FONT COLOR=\"00AA00\">FALSE</FONT></TD>";}
+		elseif($istrue==2)
+		{ echo "<TD ALIGN=CENTER><FONT COLOR=\"777777\">DISABLED</FONT></TD>";  }
+		elseif($istrue==3)
+		{ echo "<TD ALIGN=CENTER><FONT COLOR=\"777777\">MODIFIED</FONT></TD>";  }
+		else 
+		{  echo "<TD ALIGN=CENTER><FONT COLOR=\"AA0000\">TRUE</FONT></TD>"; }
+
+		if($priority==0)	echo "<TD ALIGN=CENTER>Not clasified</TD>";
+		elseif($priority==1)	echo "<TD ALIGN=CENTER>Just information</TD>";
+		elseif($priority==2)	echo "<TD ALIGN=CENTER>Warning</TD>";
+		elseif($priority==3)	echo "<TD ALIGN=CENTER BGCOLOR=#DDAAAA>Average</TD>";
+		elseif($priority==4)	echo "<TD ALIGN=CENTER BGCOLOR=#FF8888>High</TD>";
+		elseif($priority==5)	echo "<TD ALIGN=CENTER BGCOLOR=RED>Disaster !!!</TD>";
+		else			echo "<TD ALIGN=CENTER><B>$priority</B></TD>";
+
+		echo "<TD ALIGN=CENTER><A HREF=\"alarms.html?triggerid=$triggerid\">$lastchange</a>";
+		if($compact!='true')
+		{ 
+			echo "<BR><FONT SIZE=-1 COLOR=BLACK>(",date("H:i:s",$lastcheck),")</FONT>";
+		}
+		echo "</TD>";
+
+		if($noactions!='true')
+		{
+			echo "<TD>";
+			echo "<A HREF=\"actions.html?triggerid=$triggerid\">Show actions</A> - ";
+			echo "<A HREF=\"alarms.html?triggerid=$triggerid\">History</A>";
+			echo "</TD>";
+		}
+		if($istrue==0)	echo "</TR>\n";
+		$i++;
+	}
+	echo "</TABLE>\n";
+
+	show_table_header("Total:$i");
+
+	$result=mysql_query(" select min(lastcheck) from triggers where istrue<2;",$mysql);
+	$row=mysql_fetch_row($result);
+	$lastcheck=$row[0]; 
+	$diff=mktime()-$lastcheck; 
+
+	$result=mysql_query("select count(*) from items i,hosts h where i.status=0 and h.status=0 and h.hostid=i.hostid and i.nextcheck<UNIX_TIMESTAMP()-60;",$mysql);
+	$row=mysql_fetch_row($result);
+	$answ=$row[0];
+	if ($answ>0)
+	{ 
+		echo "<br>";
+		show_table_header("<font color=\"AA0000\">Is zabbix_sucker running ? Check QUEUE.</font>");
+	}
+
+	if(($lastcheck!=NULL)&&($diff>180)) ### Result for Trigger checking
+	{
+		echo "<br>";
+		show_table_header("<font color=\"AA0000\">Is zabbix_alarmer running ?</font>");
+	}
+?>
+
+<?
+	show_footer();
+?>

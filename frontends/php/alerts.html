@@ -1,0 +1,84 @@
+<?
+	include "config.inc";
+	$title = "Alerts";
+	show_header($title,0);
+?>
+
+<?
+	show_table_header_begin();
+	echo "ALERTS";
+ 
+	show_table_v_delimiter(); 
+?>
+
+<?
+	if(isset($limit))
+	{
+		echo "[<A HREF=\"alerts.html?limit=200\">";
+		echo "Show last 200</A>]";
+		$limit=" limit 50";
+	}
+	else 
+	{
+		echo "[<A HREF=\"alerts.html?limit=200\">";
+		echo "Show last 200</A>]";
+		$limit=" limit 200";
+	}
+
+	show_table_header_end();
+	echo "<br>";
+?>
+
+
+<FONT COLOR="#000000">
+<?
+	$sql="select alertid,clock,type,sendto,subject,message from alerts order by clock desc $limit";
+	$result=mysql_query($sql,$mysql);
+
+	echo "<CENTER>";
+	echo "<TABLE WIDTH=100% BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TR>";
+	echo "<TD WIDTH=\"10%\"><FONT SIZE=+1>Time</FONT></TD>";
+	echo "<TD WIDTH=\"5%\"><FONT SIZE=+1>Type</FONT></TD>";
+	echo "<TD><FONT SIZE=+1>Send to</FONT></TD>";
+	echo "<TD><FONT SIZE=+1>Subject</FONT></TD>";
+	echo "<TD><FONT SIZE=+1>Message</FONT></TD>";
+	echo "</TR>";
+	while($row=mysql_fetch_row($result))
+	{
+		if($col==1)
+		{
+			echo "<tr bgcolor=#DDDDDD>";
+			$col=0;
+		}
+		else
+		{
+			echo "<tr bgcolor=#EEEEEE>";
+			$col=1;
+		}
+		$clock=$row[1];
+		$type=$row[2];
+		if($type=="EMAIL")
+		{
+			$type="E-mail";
+		}
+		$sendto=$row[3];
+		$subject=$row[4];
+		$message=$row[5];
+
+		echo "<TD>".date("Y.M.d H:i:s",$clock)."</TD>";
+		echo "<TD>$type</TD>";
+		echo "<TD>$sendto</TD>";
+		echo "<TD>$subject</TD>";
+		echo "<TD>$message</TD>";
+		echo "</TR>";
+	}
+	echo "</TABLE><BR>";
+?>
+</FONT>
+</TR>
+</TABLE></CENTER>
+
+<?
+	show_footer();
+?>

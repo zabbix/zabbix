@@ -1,0 +1,118 @@
+<?
+	include "config.inc";
+	$title = "Hosts";
+	show_header($title,0);
+?>
+
+<?
+	show_table_header("CONFIGURATION OF HOSTS");
+	echo "<br>";
+?>
+
+<?
+	if($register=="add")
+	{
+		add_host($platformid,$host,$port,$status);
+	}
+	if($register=="changestatus")
+	{
+		update_host_status($hostid,$status);
+	}
+	if($register=="delete")
+	{
+		delete_host($hostid);
+	}
+?>
+
+<?
+	show_table_header("HOSTS");
+	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TR><TD WIDTH=\"10%\"><B>Platform</B></TD>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>Host</B></TD>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>Port</B></TD>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>Status</B></TD>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>Actions</B></TD>";
+	echo "</TR>";
+
+	$result=mysql_query("select h.hostid,p.platform,h.host,h.port,h.status from hosts h,platforms p where p.platformid=h.platformid order by p.platform,h.host",$mysql);
+	echo "<CENTER>";
+	while($row=mysql_fetch_row($result))
+	{
+		if($col==1)
+		{
+			echo "<TR BGCOLOR=#EEEEEE>";
+			$col=0;
+		} else
+		{
+			echo "<TR BGCOLOR=#DDDDDD>";
+			$col=1;
+		}
+	
+		$hostid=$row[0];
+		$platform=$row[1];
+		$host=$row[2];
+		$port=$row[3];
+		$status=$row[4];
+		echo "<TD>$platform</TD>";
+		echo "<TD><a href=\"items.html?hostid=$hostid\">$host</a></TD>";
+		echo "<TD>$port</TD>";
+		echo "<TD>";
+		if($status == 0)	
+			echo "<a href=\"hosts.html?hostid=$hostid&register=changestatus&status=1\">Monitored</a>";
+		else if($status == 1)
+			echo "<a href=\"hosts.html?hostid=$hostid&register=changestatus&status=0\">Not monitored</a>";
+		else
+			echo "Unknown";
+		echo "</TD>";
+		echo "<TD><A HREF=\"hosts.html?register=delete&hostid=$hostid\">Delete</A></TD>";
+		echo "</TR>";
+	}
+	echo "</TABLE>";
+?>
+
+<?
+	echo "<br>";
+	show_table2_header_begin();
+	echo "New host";
+
+	show_table2_v_delimiter();
+	echo "<form method=\"post\" action=\"hosts.html\">";
+	echo "Platform";
+	show_table2_h_delimiter();
+	echo "<select name=\"platformid\">";
+	$result=mysql_query("select platformid,platform from platforms order by platform",$mysql);
+	while($row=mysql_fetch_row($result))
+	{
+		$platformid=$row[0];
+		$platform=$row[1];
+		echo "<option value=\"$platformid\">$platform";
+	}
+	echo "</select>";
+
+	show_table2_v_delimiter();
+	echo "Host";
+	show_table2_h_delimiter();
+	echo "<input name=\"host\" size=20>";
+
+	show_table2_v_delimiter();
+	echo "Port";
+	show_table2_h_delimiter();
+	echo "<input name=\"port\" size=5 value=\"10000\">";
+
+	show_table2_v_delimiter();
+	echo "Status";
+	show_table2_h_delimiter();
+	echo "<select name=\"status\" size=\"1\">";
+	echo "<option value=\"0\" \"selected\">Monitored";
+	echo "<option value=\"1\">Not monitored";
+	echo "</select>";
+
+	show_table2_v_delimiter2();
+	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+
+	show_table2_header_end();
+?>
+
+<?
+	show_footer();
+?>

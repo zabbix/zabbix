@@ -1,0 +1,124 @@
+<?
+	include "config.inc";
+	$title = "Media";
+	show_header($title,0);
+?>
+
+<?
+	show_table_header("MEDIA");
+?>
+
+<HR>
+
+<?
+	if($register=="enable")
+	{
+		activate_media( $mediaid );
+	}
+	elseif($register=="disable")
+	{
+		disactivate_media( $mediaid );
+	}
+	elseif($register!=$asdfasd)
+	{
+#		include "check_auth.inc";
+	}
+
+
+	if($register=="add")
+	{
+		add_media( $userid, $type, $sendto);
+	}
+	if($register=="delete")
+	{
+		delete_media( $mediaid );
+	}
+?>
+
+
+<FONT COLOR="#000000">
+<?
+	$sql="select mediaid,type,sendto,active from media where userid=$userid order by type,sendto";
+	$result=mysql_query($sql,$mysql);
+
+	echo "<CENTER>";
+	echo "<TABLE BORDER=0 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TR>";
+	echo "<TD><FONT SIZE=+1>Type</FONT></TD>";
+	echo "<TD><FONT SIZE=+1>Send to</FONT></TD>";
+	echo "<TD><FONT SIZE=+1>Status</FONT></TD>";
+	echo "<TD><FONT SIZE=+1>Actions</FONT></TD>";
+	echo "</TR>";
+
+	while($row=mysql_fetch_row($result))
+	{
+		if($col==1)
+		{
+			echo "<TR BGCOLOR=#DDDDDD>";
+			$col=0;
+		} else
+		{
+			echo "<TR BGCOLOR=#EEEEEE>";
+			$col=1;
+		}
+		$mediaid=$row[0];
+		$type_=$row[1];
+		echo "<TD>";
+		if($type_=="EMAIL")
+		{
+			echo "E-mail";
+		}
+		else
+		{
+			echo $type_;
+		}
+		echo "</TD>";
+		echo "<TD>",$row[2],"</TD>";
+		echo "<TD>";
+		if($row[3]==0) 
+		{
+			echo "<a href=\"media.html?register=disable&mediaid=$mediaid&userid=$userid\">Enabled</A>";
+		}
+		else
+		{
+			echo "<a href=\"media.html?register=enable&mediaid=$mediaid&userid=$userid\">Disabled</A>";
+		}
+		echo "</TD>";
+		echo "<TD>";
+		echo "<A HREF=\"media.html?register=delete&mediaid=$mediaid&userid=$userid\">Delete</A>";
+		echo "</TD>";
+		echo "</TR>";
+	}
+	echo "</TABLE>";
+?>
+</FONT>
+</TR>
+</TABLE></CENTER>
+
+<CENTER>
+<?
+	echo "<br>";
+	show_table2_header_begin();
+	echo "New media";
+
+	show_table2_v_delimiter();
+	echo "<form method=\"post\" action=\"media.html\">";
+	echo "<input name=\"userid\" type=\"hidden\" value=$userid>";
+	echo "Type";
+	show_table2_h_delimiter();
+	echo "<select name=\"type\" size=1>";
+	echo "<OPTION VALUE=\"EMAIL\">E-mail";
+	echo "</SELECT>";
+
+	show_table2_v_delimiter();
+	echo "Send to";
+	show_table2_h_delimiter();
+	echo "<input name=\"sendto\" size=20>";
+
+	show_table2_v_delimiter2();
+	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+
+	show_table2_header_end();
+
+	show_footer();
+?>

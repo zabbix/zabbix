@@ -1,0 +1,185 @@
+Description of database structure
+=================================
+
+The table contains list of actions to be applied if trigger
+change its state. 
+
+Table ACTIONS
+=============
+
+actionid	int	; Unique action ID
+triggerid	int	; Trigger ID
+userid		int	; User ID
+good		int	;
+delay		int	; How ofter sent the message (in sec) 
+subject		varchar	; Subject of the message
+message		varchar	; The message itself
+nextcheck	int	; Time when we should send message next time
+
+Table ALARMS
+============
+
+This table contains history of changes of trigger states.
+When a trigger changes its state, new record is added to the table.
+
+STRUCTURE
+---------
+
+	triggerid	int	; unique ID
+	clock		int	; Timestamp when trigger changed its status
+	istrue		int	; if '1' the trigger became true, '0' otherwise
+
+
+Table FUNCTIONS
+===============
+
+The table contains list of simple functions used in trigger expressions.
+
+STRUCTURE
+---------
+
+functionid	int	; Unique function ID
+itemid		int	; Item ID
+triggerid	int	; Trigger ID
+lastvalue	double	; Last values
+function	varchar	; Function name: LAST, MIN, MAX, PREV, NODATA
+parameter	int	; Parameter to function. Ignored if function does not need any parameter
+
+Table HISTORY
+=============
+
+This table contains history of values of items.  
+
+STRUCTURE
+---------
+
+	itemid	int	; Item ID
+	clock	int	; Timestamp
+	value	double	; Value of the item at specific time
+
+
+
+Table ITEMS
+===========
+
+This table contains list of monitored items.
+
+STRUCTURE
+---------
+
+	itemid		int	; Unique item ID
+	hostid		id	; Host ID
+	description	varchar ; Description of the item
+	key_		varchar ; Key to be sent to host
+	delay		int	; How often we retrieve this item (in sec)
+	history		int	; Store only "history" seconds in history table
+	lastdelete	int	; Time of last deletion from "history" table
+	nextcheck	int	; Time when next value should be retrieved from host
+	lastvalue	double	; Last value retrieved from host 
+	lastclock	int	; Time when last value was retrieved
+	prevvalue	double	; Previous last value
+	status		int	; Status of item. 0 - active, 1 - disabled, 2 - traper, 
+				; 3 - not supported by agent 
+
+
+Table MEDIA
+===========
+
+This table contains list of available medias for given user.
+
+STRUCTURE
+---------
+
+	mediaid	int	; Unique media ID
+	userid	int	; User ID
+	type	varchar	; Type of media: EMAIL, EITEMS, EMEDIA
+	sendto	varchar	; Address to send email
+	active	int	; Status of media. 0 - active, 1 - disbaled
+
+
+Table TRIGGERS
+==============
+
+The table contains list of triggers.
+
+STRUCTURE
+---------
+
+	triggerid	int	; Unique trigger ID
+	expression	varchar	; Expression for trigger
+	description	varchar	; Description of trigger
+	istrue		int	; 1 if expression is false, 0 otherwise 
+	lastcheck	int	; Time when trigger expression was recalculated 
+	priority	int	; 
+	lastchange	int	; Time when istrue was changed
+	comments	blob	; Comments
+
+
+Table USERS
+===========
+
+The table contains list of Zabbix's users. 
+
+STRUCTURE
+---------
+
+	userid	int	; Unique user ID
+	name	varchar	; Name of user
+	surname	varchar	; Surname
+	alias	varchar	; User's alias
+	passwd	varchar	; User's password
+
+
+Table HOSTS 
+===========
+
+The table contains list of monitored Hosts
+
+STRUCTURE
+---------
+
+	hostid		int	; Unique host ID
+	platformid	int	; Platform ID
+	host		varchar	; Host name of IP address
+	status		int	; Host status. 0 - monitored, 1 - not monitored
+
+
+Table PLATFORMS
+===============
+
+The table contains list of platforms
+
+STRUCTURE
+---------
+
+	platformid	int	; Unique platform ID
+	platform	varchar	; Name of platform
+
+
+Table ITEMS_TEMPLATE
+====================
+
+The table contains list of supported items for each platform
+
+STRUCTURE
+---------
+
+	itemtemplateid	int	; Unique ID of item template
+	platformid	int	; Platform ID
+	description	varchar	; Item description
+	key_		int	; Key to sent to host
+	delay		int	; How often we sent the key (in sec)
+
+
+Table TRIGGERS_TEMPLATE
+====================
+
+The table contains sample list of triggers for each template item
+
+STRUCTURE
+---------
+
+	triggertemplateid	int	; Unique ID of trigger template
+	itemtemplateid		int	; ID of item template the trigger belongs to
+	description		varchar	; Trigger description
+	expression		varchar	; Expression for trigger

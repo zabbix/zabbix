@@ -1,0 +1,286 @@
+1. Chapter 1 (Introduction)
+
+1.1 About the manual
+1.2 What is Zabbix ?
+1.3 What front end are available for Zabbix ?
+1.4 What databases can be used with Zabbix ?
+1.5 What does Zabbix offer ?
+1.6 What does Zabbix consist of ?
+
+2. Chapter 2 (Installation)
+
+2.1 What platforms are supported by Zabbix ?
+2.2 Before you start
+2.3 Installation procedure
+
+3. Chapter 3 (Adminitration)
+3.1 Zabbix configuration
+3.2 Expressions for triggers
+
+- Chapter 1 (Introduction)
+
+1.1 About the manual
+
+This manual is distributed in the hope that it will be useful, 
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+
+1.2 What is Zabbix ?
+
+Zabbix was created by Alexei Vladishev. It is software for monitoring
+of network and servers. It has flexible notification mechanism. All 
+monitored parameters (such as process load, free disk space, etc)
+can be viewed in either graphical or text way. 
+
+1.3 What frontends are available for Zabbix ?
+
+Currently, Zabbix has PHP-based WEB interface.
+
+1.4 What databases can be used with Zabbix ?
+
+MySQL is the only database supported by Zabbix. Support for other
+databases (PostgreSQL,Oracle, etc) is coming soon.
+
+1.5 What does Zabbix offer ?
+
+The following are amongst the features that Zabbix offer:
+
+ - Zabbix agent for Linux
+ - Zabbix's server side for Linux
+ - WEB-based interface
+ - E-mail notification in case of predefined events
+ - Support for both polling and traping mechanism
+
+1.6 What does Zabbix consist of ?
+
+Zabbix consists of seven main components:
+
+- database
+
+Zabbix uses database to store everything from configuration parameters
+to values received from agents.
+
+- end user interface
+
+- "zabbix_sucker"
+
+The process periodically connects to agents to get updated information
+on monitored parameters.
+
+- "zabbix_agent"
+
+The process lives on monitored server. zabbix_sucker connects to the zabbix_agent
+to get latest values of monitored parameters.
+
+- "zabbix_alarmer"
+
+The process is used to calculate expressions used for triggers and send
+alarms to users.
+
+- "zabbix_sender"
+
+The process is used to send values to Zabbix.
+
+- "zabbix_traper"
+
+The process receives values sent by zabbix_sender.
+
+2. Chapter 2 (Installation)
+
+2.1 What platforms are supported by Zabbix ?
+
+Zabbix server side supports the following platforms:
+
+ - Linux 2.xx
+
+Agents are available for the following platforms:
+
+ - Linux 2.xx
+
+2.2 Before you start
+
+Building Zabbix requires GNU make. It will not work with other make programs.
+
+Zabbix requires both physical (suprise!) and disk memory. 64 Mb of physical 
+memory and 50 Mb of free disk memory is good start point.
+However, amount of required memory strongly depends on configuration 
+parameters. If you're planning to keep long history of monitored parameters, 
+you should think of even a couple of gigabytes to store the history in 
+the database. 
+
+2.3 Installation procedure
+
+ - Create the Zabbix superuser account. 
+
+This is the user the server will run on.  For production use you should create 
+a separate, unprivileged account ("zabbix" is commonly used).
+
+Running Zabbix as "root","bin", or any other account with special rights is a 
+security risk. Do not do it ! 
+
+ - Create the Zabbix database.
+
+For MySQL:
+
+mysql -u<username> -p<password>
+> create database zabbix;
+>quit;
+
+cd create/mysql
+cat schema.sql |mysql zabbix -u<username> -p<password>
+
+ - Configure include/db.h
+
+#define DB_NAME         ""
+#define DB_USER         ""
+#define DB_PASSWD       ""
+
+Change these values.    
+
+ - Configure the source code for you system.
+
+cd src/zabbix_sucker
+./configure
+make
+
+cd src/zabbix_alarmer
+./configure
+make
+
+cd src/zabbix_agent
+./configure
+make
+
+cd src/zabbix_traper
+./configure
+make
+
+cd src/zabbix_sender
+./configure
+make
+
+ - Copy binaries to /opt/zabbix/bin or any other directory. 
+
+ - Configure /etc/services
+
+Add the following lines to /etc/services:
+
+zabbix_agent    10000/tcp
+zabbix_trap     10001/tcp 
+
+ - Configure /etc/inetd.conf
+
+Add the following lines to /etc/inetd.conf:
+
+zabbix_agent        stream  tcp     nowait.3600    zabbix /opt/zabbix/bin/zabbix_agent
+zabbix_trap         stream  tcp     nowait.3600    zabbix /opt/zabbix/bin/zabbix_traper
+
+ - Restart inetd
+
+killall -HUP inetd
+
+ - Configure WEB interface
+
+As zabbix:
+
+mkdir /home/zabbix/html
+cp frontends/php/* /home/zabbix/html/
+
+Change these values in config.inc:
+
+        $DB_SERVER      ="";
+        $DB_DATABASE    ="zabbix";
+        $DB_USER        ="";
+        $DB_PWD         =""
+
+3.1 Zabbix configuration
+
+ - Use WEB browser to configure Zabbix (http://localhost/~zabbix)
+ - Click on "CONFIG"
+
+Set up SMTP parameters. 
+
+ - Click on "USERS"
+
+Add yourself to list of users.
+
+ - Set up available Medias for the user (Click on "Media")
+
+ - Add host for monitoring
+
+Be sure that you've installed agent on the host. Otherwise, set status
+to "Not monitored".
+
+ - Configure ITEMS
+
+ - Configure TRIGGERS
+
+Defined actions for triggers you are interested in.
+
+- Create /etc/zabbix/zabbix_agent.conf
+
+Put IP address of Zabbix server here.
+
+ - Run zabbix_sucker and zabbix_alarmer
+
+/opt/zabbix/bin/zabbix_alarmer
+/opt/zabbix/bin/zabbix_sucker
+
+3.2 Expressions for triggers
+
+The following operators supported for triggers:
+
+> - more than
+< - less than
+| - logical OR
+& - logical AND
+
+The following functions supported:
+
+last	- last value, parameter is ignored 
+min	- MIN value for period of time, parameter - time in sec
+max	- MAX value for period of time, parameter - time in sec
+diff	- 1 - if last and previous values are different, 0 - otherwise
+prev	- previous value, parameter is ignored
+nodata	- 1, if no values were received for "parameter" seconds
+
+Simplest useful expression might look as:
+
+{<server>:<key>.<function>(<parameter>)}<operator><const>
+
+Example 1:
+
+{sourceforge.net:procload.last(0)}>5
+
+It means:
+
+sourceforge.net - server name
+procload	- key name
+
+sourceforge.net:procload gives short name of monitored parameter.
+
+last		- function name
+
+Basically the expression means, processor load of sourceforge.net is more than
+5. The trigger becomes true, when processor load exceeds 5. 
+
+Example 2:
+
+More complex example:
+
+({sourceforge.net:procload.last(0)>5}) | ({sourceforge.net:procload.min(600)}>2)
+
+The expression becomes true when either current processor load is more
+than 5 or it was more than 2 during last 10 minutes.
+
+Example 3:
+
+Use of diff function.
+
+({sourceforge.net:passwd_md5sum.diff(0)})>0
+
+The expression becomes true when previous value of MD5 sum of /etc/passwd
+differs from last one.
+
+Similiar expressions could be useful to monitor changes in important files, such as
+/etc/passwd, /etc/inetd.conf, /kernel, etc.
