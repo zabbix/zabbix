@@ -1781,13 +1781,6 @@ echo "</head>";
 		return	DBexecute($sql);
 	}
 
-	# Update Action
-
-	function	update_action( $actionid, $triggerid, $userid, $good, $delay, $subject, $message, $scope, $severity, $recipient, $usrgrpid)
-	{
-		delete_action($actionid);
-		return add_action( $triggerid, $userid, $good, $delay, $subject, $message, $scope, $severity, $recipient, $usrgrpid);
-	}
 
 	# Delete System Map
 
@@ -1821,33 +1814,6 @@ echo "</head>";
 	{
 		$sql="delete from rights where userid=$userid";
 		return	DBexecute($sql);
-	}
-
-
-	# Delete Action by userid
-
-	function	delete_actions_by_userid( $userid )
-	{
-		$sql="select actionid from actions where userid=$userid";
-		$result=DBexecute($sql);
-		for($i=0;$i<DBnum_rows($result);$i++)
-		{
-			$actionid=DBget_field($result,$i,0);
-			delete_alert_by_actionid($actionid);
-		}
-
-		$sql="delete from actions where userid=$userid";
-		return	DBexecute($sql);
-	}
-
-	# Delete Action
-
-	function	delete_action( $actionid )
-	{
-		$sql="delete from actions where actionid=$actionid";
-		$result=DBexecute($sql);
-
-		return delete_alert_by_actionid($actionid);
 	}
 
 	# Delete from History
