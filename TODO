@@ -29,6 +29,12 @@ Not ready yet:
 
  OTHER:
 
+ - personalisation (refresh rate, graph size, default graph period, etc)
+ - round MIN/MAX/AVG numbers for graphs
+ - dashed grid somethimes is out of rectangle for graphs
+ - calculate MIN value for graphs (do not use '0')
+ - use JS in forms
+ - collect network and other statistics using kstat()
  - apply Mariusz's patches
  - link map's line to a trigger
  - support for complex reports
