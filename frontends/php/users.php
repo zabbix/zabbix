@@ -23,7 +23,7 @@
 		{
 			if($password1==$password2)
 			{
-				$result=add_user($groupid,$name,$surname,$alias,$password1);
+				$result=add_user($name,$surname,$alias,$password1);
 				show_messages($result, "User added", "Cannot add user");
 			}
 			else
@@ -52,7 +52,7 @@
 		{
 			if($password1==$password2)
 			{
-				$result=update_user($userid,$groupid,$name,$surname,$alias,$password1);
+				$result=update_user($userid,$name,$surname,$alias,$password1);
 				show_messages($result, "Information successfully updated", "Cannot update information");
 			}
 			else
@@ -72,23 +72,25 @@
 	show_table_header("USERS");
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR><TD WIDTH=\"3%\"><B>Id</B></TD>";
-	echo "<TD WIDTH=\"10%\"><B>Group</B></TD>";
 	echo "<TD WIDTH=\"10%\"><B>Alias</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Name</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Surname</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
-	$result=DBselect("select u.userid,u.alias,u.name,u.surname,g.name as grp from users u,groups g where u.groupid=g.groupid order by g.name,u.alias");
+	$result=DBselect("select u.userid,u.alias,u.name,u.surname from users u order by u.alias");
 	echo "<CENTER>";
 	$col=0;
 	while($row=DBfetch($result))
 	{
+		if(!check_right("User","R",$row["userid"]))
+		{
+			continue;
+		}
 		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
 		else		{ echo "<TR BGCOLOR=#DDDDDD>"; }
 	
 		echo "<TD>".$row["userid"]."</TD>";
-		echo "<TD>".$row["grp"]."</TD>";
 		echo "<TD>".$row["alias"]."</TD>";
 		echo "<TD>".$row["name"]."</TD>";
 		echo "<TD>".$row["surname"]."</TD>";
@@ -142,6 +144,10 @@
 		else if($row["permission"]=="H")
 		{
 			echo "<TD>Hide</TD>";
+		}
+		else if($row["permission"]=="A")
+		{
+			echo "<TD>Add</TD>";
 		}
 		else
 		{

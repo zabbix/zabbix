@@ -99,6 +99,7 @@ DB_ACTION
 
 
 void    DBconnect( char *dbname, char *dbuser, char *dbpassword, char *dbsocket);
+void    DBclose(void);
 
 int	DBexecute( char *query );
 

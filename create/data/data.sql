@@ -8,14 +8,16 @@ insert into config (smtp_server,smtp_helo,smtp_email,alert_history,alarm_history
 -- Data for table groups
 --
 
-insert into groups (groupid,name) values (1,'Administrators');
-insert into groups (groupid,name) values (2,'Zabbix user');
+-- insert into groups (groupid,name) values (1,'Administrators');
+-- insert into groups (groupid,name) values (2,'Zabbix user');
 
 --
 -- Data for table users
 --
 
-insert into users (userid,groupid,alias,name,surname,passwd) values (1,1,'Admin','Zabbix','Administrator','d41d8cd98f00b204e9800998ecf8427e');
+insert into users (userid,alias,name,surname,passwd) values (1,'Admin','Zabbix','Administrator','d41d8cd98f00b204e9800998ecf8427e');
+
+insert into users (userid,alias,name,surname,passwd) values (2,'guest','Default','User','d41d8cd98f00b204e9800998ecf8427e');
 
 --
 -- Data for table items_template 
@@ -153,6 +155,8 @@ insert into items_template (itemtemplateid,description,key_,delay,value_type)
 	values (66,'Host information','system[uname]', 1800, 1);
 insert into items_template (itemtemplateid,description,key_,delay,value_type)
 	values (67,'Version of zabbix_agent(d) running','version[zabbix_agent]', 1800, 1);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (68,'WEB (HTTP) server is running','check_service[http]', 60, 0);
 
 --
 -- Data for table triggers_template
@@ -250,3 +254,5 @@ insert into triggers_template (triggertemplateid,itemtemplateid,description,expr
 	values (66,66,'Host information was changed on %s','{:.diff(0)}>0');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (67,67,'Version of zabbix_agent(d) was changed on %s','{:.diff(0)}>0');
+insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+	values (68,68,'WEB (HTTP) server is down on %s','{:.last(0)}<1');

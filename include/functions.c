@@ -631,14 +631,14 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 			continue;
 		}
 
-		if((b==1)&&(trigger.istrue!=1))
+		if((b==1)&&(trigger.istrue==TRIGGER_STATUS_FALSE))
 		{
 			now = time(NULL);
-			sprintf(sql,"update triggers set istrue=1, lastchange=%d where triggerid=%d",now,trigger.triggerid);
+			sprintf(sql,"update triggers set istrue=%d, lastchange=%d where triggerid=%d",TRIGGER_STATUS_TRUE,now,trigger.triggerid);
 			DBexecute(sql);
 
 			now = time(NULL);
-			sprintf(sql,"insert into alarms(triggerid,clock,istrue) values(%d,%d,1)",trigger.triggerid,now);
+			sprintf(sql,"insert into alarms(triggerid,clock,istrue) values(%d,%d,%d)",trigger.triggerid,now,TRIGGER_STATUS_TRUE);
 			DBexecute(sql);
 
 			apply_actions(trigger.triggerid,1);
@@ -649,14 +649,14 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 			update_services(trigger.triggerid, 1);
 		}
 
-		if((b==0)&&(trigger.istrue!=0))
+		if((b==0)&&(trigger.istrue==TRIGGER_STATUS_TRUE))
 		{
 			now = time(NULL);
-			sprintf(sql,"update triggers set istrue=0, lastchange=%d where triggerid=%d",now,trigger.triggerid);
+			sprintf(sql,"update triggers set istrue=%d, lastchange=%d where triggerid=%d",TRIGGER_STATUS_FALSE,now,trigger.triggerid);
 			DBexecute(sql);
 
 			now = time(NULL);
-			sprintf(sql,"insert into alarms(triggerid,clock,istrue) values(%d,%d,0)",trigger.triggerid,now);
+			sprintf(sql,"insert into alarms(triggerid,clock,istrue) values(%d,%d,%d)",trigger.triggerid,now,TRIGGER_STATUS_FALSE);
 			DBexecute(sql);
 
 			apply_actions(trigger.triggerid,0);
