@@ -295,7 +295,6 @@ CREATE TABLE triggers (
 	expression	varchar(255) DEFAULT '' NOT NULL,
 	description	varchar(255) DEFAULT '' NOT NULL,
 	url		varchar(255) DEFAULT '' NOT NULL,
---	istrue		int(4) DEFAULT '0' NOT NULL,
 	status		int(4) DEFAULT '0' NOT NULL,
 	value		int(4) DEFAULT '0' NOT NULL,
 	priority	int(2) DEFAULT '0' NOT NULL,
@@ -303,7 +302,8 @@ CREATE TABLE triggers (
 	dep_level	int(2) DEFAULT '0' NOT NULL,
 	comments	blob,
 	PRIMARY KEY	(triggerid),
-	KEY		(istrue)
+	KEY		(status),
+	KEY		(value)
 );
 
 --
