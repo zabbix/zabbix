@@ -17,8 +17,9 @@ td.form_row_l
 	color: #000000;
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:10px;
-	font-weight: bold;
-	border-color: #888888;
+#	font-weight: bold;
+#	border-color: #888888;
+	border-color: #222255;
 	border-width:1px;
 	border-left-style: solid;
 }
@@ -28,7 +29,8 @@ td.form_row_r
 	color: #000000;
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:10px;
-	border-color: #888888;
+	border-color: #222255;
+#	border-color: #888888;
 	border-width:1px;
 	border-right-style: solid;
 }
@@ -39,9 +41,10 @@ td.form_row_first
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:10px;
 	font-weight: bold;
-#	background-color: #8dA8Cd;
+#	background-color: #6d88ad;
 	background-color: #6d88ad;
-	border-color: #888888;
+	border-color: #222255;
+#	border-color: #888888;
 	border-width:1px;
 	border-top-style: solid;
 	border-left-style: solid;
@@ -56,7 +59,8 @@ td.form_row_last
         font-size:10px;
 #	background-color: #8dA8Cd;
 	background-color: #6d88ad;
-	border-color: #888888;
+	border-color: #222255;
+#	border-color: #888888;
 	border-width:1px;
 	border-top-style: solid;
 	border-left-style: solid;
@@ -270,7 +274,7 @@ img.bottom
 	border: solid;
 	border-width: 1px;
 	border-color: gray;
-	background-color: white;
+	background-color: #dddddd;
 	margin-right:5px;
 }
 
