@@ -1,5 +1,6 @@
 Changes for 1.0beta7:
 
+ - fixes for PostgreSQL (Alexei)
  - added validation of host name (Alexei)
  - default value of StartSuckers is set to 4 (Alexei) 
  - fixed Select in Status of Triggers (Alexei)
