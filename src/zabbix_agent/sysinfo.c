@@ -649,7 +649,9 @@ int	CKSUM(const char *cmd, const char *filename,double  *value)
 {
 	register u_char *p;
 	register int nr;
-	register u_long crc, len;
+/*	AV Crashed under 64 platforms. Must be 32 bit! */
+/*	register u_long crc, len;*/
+	register uint32_t crc, len;
 	u_char buf[16 * 1024];
 	u_long cval, clen;
 	int	fd;
