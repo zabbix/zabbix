@@ -117,14 +117,14 @@
 	echo "<input name=\"userid\" type=\"hidden\" value=".$HTTP_GET_VARS["userid"].">";
 	echo "Type";
 	show_table2_h_delimiter();
-	echo "<select name=\"type\" size=1>";
+	echo "<select class=\"biginput\" name=\"type\" size=1>";
 	echo "<OPTION VALUE=\"EMAIL\">E-mail";
 	echo "</SELECT>";
 
 	show_table2_v_delimiter();
 	echo "Send to";
 	show_table2_h_delimiter();
-	echo "<input name=\"sendto\" size=20>";
+	echo "<input class=\"biginput\" name=\"sendto\" size=20>";
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
