@@ -13,6 +13,7 @@ ZABBIX 1.1:
  - agent proxy
 
  - check if trigger related SQL statements contains status=active, dependency does not work
+ - disk stats under Linux 2.6.x
 
 TKOM:
 
