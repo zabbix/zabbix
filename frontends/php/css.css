@@ -94,13 +94,33 @@ img.bottom
 	background-color: white;
 }
 
+.biginput:hover
+{
+	font-family: Verdana, Helvetica, Geneva;
+	font-size: 10px;
+	border: solid;
+	border-width: 1px;
+	border-color: black;
+	background-color: white;
+}
+
+.select
+{
+	font-family: Verdana, Helvetica, Geneva;
+	font-size: 10px;
+	border: solid;
+	border-width: 1px;
+	border-color: gray;
+	background-color: white;
+}
+
 .button
 {
 	font-family: Verdana, Helvetica, Geneva;
 	font-size: 12px;
 	border: solid;
 	border-width: 1px;
-	border-color: black;
+	border-color: gray;
 	background-color: white;
 	margin-right:5px;
 }

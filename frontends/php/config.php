@@ -176,7 +176,7 @@
 	echo "Type";
 	show_table2_h_delimiter();
 //	echo "<select class=\"biginput\" name=\"type\" size=\"1\" onChange=\"doSelect(this,'sel_dmk')\">";
-	echo "<select name=\"type\" size=\"1\" onChange=\"submit()\">";
+	echo "<select class=\"select\" name=\"type\" size=\"1\" onChange=\"submit()\">";
 	if($type==0)
 	{
 		echo "<option value=\"0\" selected>Email";
