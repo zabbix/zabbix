@@ -93,51 +93,6 @@
 	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"report2.php\">", "</form>");
 ?>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<?php
-/*
-	show_table_header_begin();
-	echo S_AVAILABILITY_REPORT_BIG;
-
-	show_table_v_delimiter();
-
-	$result=DBselect("select h.hostid,h.host from hosts h,items i where h.status in (0,2) and h.hostid=i.hostid group by h.hostid,h.host order by h.host");
-
-	while($row=DBfetch($result))
-	{
-		if(!check_right("Host","R",$row["hostid"]))
-		{
-			continue;
-		}
-		if( isset($_GET["hostid"]) && ($_GET["hostid"] == $row["hostid"]) )
-		{
-			echo "<b>[";
-		}
-		echo "<a href='report2.php?hostid=".$row["hostid"]."'>".$row["host"]."</a>";
-		if(isset($_GET["hostid"]) && ($_GET["hostid"] == $row["hostid"]) )
-		{
-			echo "]</b>";
-		}
-		echo " ";
-	}
-
-	show_table_header_end();
-*/
-?>
-
 <?php
 	if(isset($_GET["hostid"])&&!isset($_GET["triggerid"]))
 	{
