@@ -1111,10 +1111,9 @@ int main_housekeeping_loop()
 		}
 	}
 
-	now = time(NULL);
-
 	for(;;)
 	{
+		now = time(NULL);
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("connecting to the database");
 #endif
@@ -1148,7 +1147,7 @@ int main_housekeeping_loop()
 		setproctitle("housekeeper [sleeping for %d hour(s)]", CONFIG_HOUSEKEEPING_FREQUENCY);
 #endif
 		DBclose();
-		sleep(3600*CONFIG_HOUSEKEEPING_FREQUENCY);
+		sleep(3660*CONFIG_HOUSEKEEPING_FREQUENCY);
 	}
 }
 
