@@ -21,7 +21,6 @@ Changes for 1.0beta3:
  - new algorithm for audible notification in screen "Status of Triggers"
  (Alexei)
  - changed definition of DebugLevel (Alexei)
-
  - improved update_triggers() (Alexei)
  - fixed get_lastvalue() (Alexei)
  - minor changes in include/cfg.c (Alexei)
