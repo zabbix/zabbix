@@ -48,7 +48,8 @@ int	check_security(int sockfd, char *ip_list, int allow_if_empty)
 
 	i=sizeof(name);
 
-	if(getpeername(sockfd,  (struct sockaddr *)&name, (size_t *)&i) == 0)
+/*	if(getpeername(sockfd,  (struct sockaddr *)&name, (size_t *)&i) == 0)*/
+	if(getpeername(sockfd,  (struct sockaddr *)&name, (socklen_t *)&i) == 0)
 	{
 		i=sizeof(struct sockaddr_in);
 
