@@ -1,5 +1,7 @@
 Changes for 1.0beta14:
 
+ - fixed simple check when port specified. Order of IP and PORT is
+ arbitrary now (Alexei)
  - fixed pinger to correc calculate number of seconds (Alexei)
  - fixed selection of "Dark Yellow" for graphs and map links (Alexei)
  - fixed removal of trigger dependency (Alexei)
