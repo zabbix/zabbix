@@ -133,13 +133,19 @@ AC_SUBST(PGSQL_LFLAGS)
 AC_SUBST(PGSQL_INCLUDE)
 
 if test "$have_db" != "yes"; then
-	{ echo "configure: error: No database selected! Use --with-XXX where XXX is your preferred database type" 1>&2; exit 1; }
-echo
+	echo "configure: No database selected! Use --with-XXX where XXX is your preferred database type";
+	echo "configure: Server processer (zabbix_suckerd and zabbix_trpper) will not be created !";
+
+	SUBDIRS="src/zabbix_agent src/zabbix_sender"
+else
+	SUBDIRS="src/zabbix_agent src/zabbix_sender src/zabbix_sucker src/zabbix_trapper"
 fi
+
+AC_SUBST(SUBDIRS)
 
 AC_CONFIG_HEADER(include/config.h)
 AC_OUTPUT(Makefile src/zabbix_sender/Makefile src/zabbix_agent/Makefile \
-        src/zabbix_sucker/Makefile src/zabbix_trapper/Makefile)
+       	src/zabbix_sucker/Makefile src/zabbix_trapper/Makefile)
 
 echo
 echo "***********************************************************"

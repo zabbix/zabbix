@@ -124,10 +124,27 @@
 	}
 	else
 	{
+		$sql="select description from triggers where triggerid=$triggerid";
+		$result=DBselect($sql);
+		$description=DBget_field($result,0,0);
+
 		$good=1;
 		$delay=30;
 		$subject=$description;
-		$message="";
+
+		$sql="select i.description, h.host, i.key_ from hosts h, items i,functions f where f.triggerid=$triggerid and h.hostid=i.hostid and f.itemid=i.itemid order by i.description";
+		$result=DBselect($sql);
+		$message="<INSERT YOUR MESSAGE HERE>\n\n------Latest data------\n\n";
+		for($i=0;$i<DBnum_rows($result);$i++)
+		{
+			$description=DBget_field($result,$i,0);
+			$host=DBget_field($result,$i,1);
+			$key=DBget_field($result,$i,2);
+			$message=$message."$description: \{$host:$key.last(0)}  (latest value)\n";
+			$message=$message."$description: \{$host:$key.max(300)} (maxumum value for latest 5 min)\n";
+			$message=$message."$description: \{$host:$key.min(300)}   (minimum value for last 5 min)\n\n";
+		}
+		$message=$message."---------End--------\n";
 	}
 	echo "<br>";
 	show_table2_header_begin();
@@ -177,12 +194,12 @@
 	show_table2_v_delimiter();
 	echo "Subject";
 	show_table2_h_delimiter();
-	echo "<input name=\"subject\" value=\"$subject\" size=50>";
+	echo "<input name=\"subject\" value=\"$subject\" size=70>";
 
 	show_table2_v_delimiter();
 	echo "Message";
 	show_table2_h_delimiter();
- 	echo "<textarea name=\"message\" cols=50 ROWS=\"5\" wrap=\"soft\">$message</TEXTAREA>";
+ 	echo "<textarea name=\"message\" cols=70 ROWS=\"7\" wrap=\"soft\">$message</TEXTAREA>";
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";

@@ -112,7 +112,7 @@ CREATE TABLE actions (
   good			int4		DEFAULT '0' NOT NULL,
   delay			int4		DEFAULT '0' NOT NULL,
   subject		varchar(255)	DEFAULT '' NOT NULL,
-  message		varchar(255)	DEFAULT '' NOT NULL,
+  message		text		DEFAULT '' NOT NULL,
   nextcheck		int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (actionid),
   FOREIGN KEY (triggerid) REFERENCES triggers,
@@ -130,7 +130,7 @@ CREATE TABLE alerts (
   type			varchar(10)	DEFAULT '' NOT NULL,
   sendto		varchar(100)	DEFAULT '' NOT NULL,
   subject		varchar(255)	DEFAULT '' NOT NULL,
-  message		varchar(255)	DEFAULT '' NOT NULL,
+  message		text		DEFAULT '' NOT NULL,
   PRIMARY KEY (alertid),
   FOREIGN KEY (actionid) REFERENCES actions
 );

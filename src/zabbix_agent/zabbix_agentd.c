@@ -30,6 +30,8 @@
 
 static pid_t *pids;
 
+char	host_allowed[16];
+
 void	signal_handler( int sig )
 {
 	if( SIGALRM == sig )
@@ -73,31 +75,34 @@ void    daemon_init(void)
 	}
 }
 
+void	init_security(void)
+{
+	int file;
+	int	i;
+
+	file=open("/etc/zabbix/zabbix_agent.conf",O_RDONLY);
+	if(file == -1)
+	{
+		syslog( LOG_CRIT, "Cannot open /etc/zabbix/zabbix_agent.conf");
+		exit(1);
+	}
+	i=read(file, host_allowed, 16);
+	host_allowed[i-1]=0;
+	close(file);
+}
 
 int	check_security(int sockfd)
 {
 	char	*sname;
-	char	config[16];
 	struct	sockaddr_in name;
 	int	i;
-	int	file;
 
 	if(getpeername(sockfd,  (struct sockaddr *)&name, (size_t *)&i) == 0)
 	{
-		file=open("/etc/zabbix/zabbix_agent.conf",O_RDONLY);
-		if(file == -1)
-		{
-			syslog( LOG_CRIT, "Cannot open /etc/zabbix/zabbix_agent.conf");
-			exit(1);
-		}
-		i=read(file, config, 16);
-		config[i-1]=0;
-		close(file);
-
 		i=sizeof(struct sockaddr_in);
 
 		sname=inet_ntoa(name.sin_addr);
-		if(strcmp(sname,config)!=0)
+		if(strcmp(sname, host_allowed)!=0)
 		{
 			syslog( LOG_WARNING, "Connection from [%s] rejected",sname);
 			return	FAIL;
@@ -112,7 +117,6 @@ void	process_child(int sockfd)
 	char	line[1024];
 	char	result[1024];
 	double	res;
-	void	*sigfunc;
 
 	for(;;)
 	{
@@ -244,10 +248,7 @@ int	main()
 	signal( SIGTERM, signal_handler );
 	signal( SIGALRM, signal_handler );
 
-//	if(check_security() == FAIL)
-//	{
-//		exit(FAIL);
-//	}
+	init_security();
 
         openlog("zabbix_agentd",LOG_PID,LOG_USER);
 //	ret=setlogmask(LOG_UPTO(LOG_DEBUG));
