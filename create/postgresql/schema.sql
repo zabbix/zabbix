@@ -61,6 +61,7 @@ CREATE TABLE items (
   status		int4		DEFAULT '0' NOT NULL,
   value_type		int4		DEFAULT '0' NOT NULL,
   trapper_hosts		varchar(255)	DEFAULT '' NOT NULL,
+  units			varchar(10)	DEFAULT '' NOT NULL,
   PRIMARY KEY (itemid),
   FOREIGN KEY (hostid) REFERENCES hosts
 );
