@@ -422,9 +422,10 @@
 	define("S_MENU_ITEMS",				"ITEMS");
 	define("S_MENU_AUDIT",				"AUDIT");
 
-//	queue.php
+//	overview.php
 	define("S_OVERVIEW",				"Overview");
 	define("S_OVERVIEW_BIG",			"OVERVIEW");
+	define("S_EXCL",				"!");
 
 //	queue.php
 	define("S_QUEUE_BIG",				"QUEUE");
