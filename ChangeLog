@@ -1,5 +1,8 @@
 Changes for 1.1alpha7:
 
+ - added frontends/php/include/audit.inc.php (Alexei)
+ - added frontends/php/include/users.inc.php (Alexei)
+ - added frontends/php/include/screens.inc.php (Alexei)
  - added frontends/php/include/items.inc.php (Alexei)
  - Overview and Details mode for screen Queue (Alexei)
 
