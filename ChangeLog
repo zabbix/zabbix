@@ -26,6 +26,11 @@ snmpget -On localhost public enterprises.ucdavis.memory.memTotalSwap.0]
 
 Changes for 1.0beta4:
 
+ - added column alarms.value (Alexei)
+ - removed column alarms.istrue (Alexei)
+ - added columns triggers.status (Alexei)
+ - added columns triggers.value (Alexei)
+ - removed column triggers.istrue (Alexei)
  - support for --enable-static for ./configure (Alexei)
  - housekeeping period for alarms and alerts to be set in days (Alexei)
  - created directory upgrades/dbpatches/1.0beta3_to_1.0beta4 (Alexei)

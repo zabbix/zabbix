@@ -250,7 +250,7 @@ int	latest_alarm(int triggerid, int status)
 	zabbix_log(LOG_LEVEL_DEBUG,"In latest_alarm(1)");
 		DBfree_result(result);
 
-		sprintf(sql,"select istrue from alarms where triggerid=%d and clock=%d",triggerid,clock);
+		sprintf(sql,"select value from alarms where triggerid=%d and clock=%d",triggerid,clock);
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		result = DBselect(sql);
 		if(DBnum_rows(result)==1)
@@ -280,7 +280,7 @@ int	DBadd_alarm(int triggerid, int status)
 	}
 
 	now=time(NULL);
-	sprintf(sql,"insert into alarms(triggerid,clock,istrue) values(%d,%d,%d)",triggerid,now,status);
+	sprintf(sql,"insert into alarms(triggerid,clock,value) values(%d,%d,%d)",triggerid,now,status);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	DBexecute(sql);
 
@@ -289,18 +289,18 @@ int	DBadd_alarm(int triggerid, int status)
 	return SUCCEED;
 }
 
-int	update_trigger_status(int triggerid,int status)
+int	update_trigger_value(int triggerid,int value)
 {
 	char	sql[MAX_STRING_LEN+1];
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_status()");
-	DBadd_alarm(triggerid,status);
+	zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value()");
+	DBadd_alarm(triggerid,value);
 
-	sprintf(sql,"update triggers set istrue=%d where triggerid=%d",status,triggerid);
+	sprintf(sql,"update triggers set value=%d where triggerid=%d",value,triggerid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	DBexecute(sql);
 
-	zabbix_log(LOG_LEVEL_DEBUG,"End of update_trigger_status()");
+	zabbix_log(LOG_LEVEL_DEBUG,"End of update_trigger_value()");
 	return SUCCEED;
 }
 
@@ -328,7 +328,7 @@ int update_triggers_status_to_unknown(int hostid)
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 		triggerid=atoi(DBget_field(result,i,0));
-		update_trigger_status(triggerid,TRIGGER_STATUS_UNKNOWN);
+		update_trigger_value(triggerid,TRIGGER_VALUE_UNKNOWN);
 	}
 
 	DBfree_result(result);

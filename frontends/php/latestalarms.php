@@ -35,11 +35,11 @@
 <?
 	if(isset($limit))
 	{
-		$sql="select t.description,a.clock,a.istrue,t.triggerid from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit $limit";
+		$sql="select t.description,a.clock,a.value,t.triggerid from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit $limit";
 	}
 	else
 	{
-		$sql="select t.description,a.clock,a.istrue,t.triggerid from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit 50";
+		$sql="select t.description,a.clock,a.value,t.triggerid from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit 50";
 	}
 	$result=DBselect($sql);
 
@@ -48,7 +48,7 @@
 	echo "<TR>";
 	echo "<TD width=\"20%\"><b>Time</b></TD>";
 	echo "<TD><b>Description</b></TD>";
-	echo "<TD width=\"10%\"><b>Status</b></TD>";
+	echo "<TD width=\"10%\"><b>Value</b></TD>";
 	echo "</TR>";
 	$col=0;
 	while($row=DBfetch($result))
@@ -62,17 +62,17 @@
 
 		echo "<TD>",date("Y.M.d H:i:s",$row["clock"]),"</TD>";
 		echo "<TD><a href=\"alarms.php?triggerid=".$row["triggerid"]."\">".$row["description"]."</a></TD>";
-		if($row["istrue"] == 0)
+		if($row["value"] == 0)
 		{
 			echo "<TD><font color=\"00AA00\">OFF</font></TD>";
 		}
-		elseif($row["istrue"] == 3)
+		elseif($row["value"] == 1)
 		{
-			echo "<TD><font color=\"AAAAAA\">UNKNOWN</font></TD>";
+			echo "<TD><font color=\"AAAAAA\">ON</font></TD>";
 		}
 		else
 		{
-			echo "<TD><font color=\"AA0000\">ON</font></TD>";
+			echo "<TD><font color=\"AA0000\">UNKNOWN</font></TD>";
 		}
 		echo "</TR>";
 	}

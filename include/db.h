@@ -82,7 +82,8 @@ DB_TRIGGER
 	int	triggerid;
 	char	*expression;
 	char	*description;
-	int	istrue;
+	int	status;
+	int	value;
 	int	priority;
 };
 

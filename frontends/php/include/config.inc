@@ -94,11 +94,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		$priorities=0;
 		for($i=0;$i<=5;$i++)
 		{
-	        	$result=DBselect("select count(*) from triggers t,hosts h,items i,functions f  where t.istrue=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status in (0,2) and t.priority=$i");
+	        	$result=DBselect("select count(*) from triggers t,hosts h,items i,functions f  where t.value=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status in (0,2) and t.priority=$i");
 			$priorities+=(1000^$i)*DBget_field($result,0,0);
 		}
 		$triggerids="";
-	       	$result=DBselect("select t.triggerid from triggers t,hosts h,items i,functions f  where t.istrue=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status in (0,2)");
+	       	$result=DBselect("select t.triggerid from triggers t,hosts h,items i,functions f  where t.value=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status in (0,2)");
 		for($i=0;$i<DBnum_rows($result);$i++)
 		{
 			$triggerids="$triggerids,".DBget_field($result,$i,0);
@@ -199,7 +199,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		global	$ERROR_MSG;
 
-		$sql="select triggerid,expression,description,istrue,priority,lastchange,dep_level,comments,url from triggers where triggerid=$triggerid";
+		$sql="select triggerid,expression,description,status,priority,lastchange,dep_level,comments,url,value from triggers where triggerid=$triggerid";
 		$result=DBselect($sql);
 		if(DBnum_rows($result) == 1)
 		{
@@ -1113,8 +1113,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
                         $ERROR_MSG="Insufficient permissions";
                         return 0;
 		}
-		add_alarm($triggerid,3);
-		$sql="update triggers set istrue=$status where triggerid=$triggerid";
+		add_alarm($triggerid,2);
+		$sql="update triggers set status=$status where triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
 
@@ -1546,19 +1546,19 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Add alarm
 
-	function	add_alarm($triggerid,$istrue)
+	function	add_alarm($triggerid,$value)
 	{
 		$sql="select max(clock) from alarms where triggerid=$triggerid";
 		$result=DBselect($sql);
 		$row=DBfetch($result);
 		if($row[0]!="")
 		{
-			$sql="select istrue from alarms where triggerid=$triggerid and clock=".$row[0];
+			$sql="select value from alarms where triggerid=$triggerid and clock=".$row[0];
 			$result=DBselect($sql);
 			if(DBnum_rows($result) == 1)
 			{
 				$row=DBfetch($result);
-				if($row["istrue"] == $istrue)
+				if($row["value"] == $value)
 				{
 					return 0;
 				}
@@ -1566,13 +1566,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 
 		$now=time();
-		$sql="insert into alarms(triggerid,clock,istrue) values($triggerid,$now,$istrue)";
+		$sql="insert into alarms(triggerid,clock,value) values($triggerid,$now,$value)";
 		return	DBexecute($sql);
 	}
 
 	# Add Trigger definition
 
-	function	add_trigger($expression,$description,$priority,$istrue,$comments,$url)
+	function	add_trigger($expression,$description,$priority,$status,$comments,$url)
 	{
 		global	$ERROR_MSG;
 
@@ -1583,7 +1583,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 //		}
 
 		$description=addslashes($description);
-		$sql="insert into triggers  (description,priority,istrue,comments,url) values ('$description',$priority,$istrue,'$comments','$url')";
+		$sql="insert into triggers  (description,priority,status,comments,url,value) values ('$description',$priority,$status,'$comments','$url',2)";
 #		echo $sql,"<br>";
 		$result=DBexecute($sql);
 		if(!$result)
@@ -1593,7 +1593,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
  
 		$triggerid=DBinsert_id($result,"triggers","triggerid");
 #		echo $triggerid,"<br>";
-		add_alarm($triggerid,3);
+		add_alarm($triggerid,2);
  
 		$expression=implode_exp($expression,$triggerid);
 		$sql="update triggers set expression='$expression' where triggerid=$triggerid";
@@ -1637,7 +1637,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Update Trigger definition
 
-	function	update_trigger($triggerid,$expression,$description,$priority,$istrue,$comments,$url)
+	function	update_trigger($triggerid,$expression,$description,$priority,$status,$comments,$url)
 	{
 		global	$ERROR_MSG;
 
@@ -1654,15 +1654,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 
 		$expression=implode_exp($expression,$triggerid);
-		if($istrue != 2)
-		{
-			$istrue="istrue";
-		}
-		else
-		{
-			add_alarm($triggerid,3);
-		}
-		$sql="update triggers set expression='$expression',description='$description',priority=$priority,istrue=$istrue,comments='$comments',url='$url' where triggerid=$triggerid";
+		add_alarm($triggerid,2);
+		$sql="update triggers set expression='$expression',description='$description',priority=$priority,status=$status,comments='$comments',url='$url' where triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
 
@@ -1867,7 +1860,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			{
 				$trigger=get_trigger_by_triggerid($row2["triggerid"]);
 // Cannot use add_trigger here
-				$sql="insert into triggers  (description,priority,istrue,comments,url) values ('".$trigger["description"]."',".$trigger["priority"].",".$trigger["istrue"].",'".$trigger["comments"]."','".$trigger["url"]."')";
+				$sql="insert into triggers  (description,priority,status,comments,url,value) values ('".$trigger["description"]."',".$trigger["priority"].",".$trigger["status"].",'".$trigger["comments"]."','".$trigger["url"]."',2)";
 				$result4=DBexecute($sql);
 				$triggerid=DBinsert_id($result4,"triggers","triggerid");
 
@@ -2768,7 +2761,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$expression=explode_exp($trigger["expression"],0);
 			$description=$trigger["description"];
 			$priority=$trigger["priority"];
-			$istrue=$trigger["istrue"];
+			$status=$trigger["status"];
 			$comments=$trigger["comments"];
 			$url=$trigger["url"];
 		}
@@ -2777,7 +2770,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$expression="";
 			$description="";
 			$priority=0;
-			$istrue=3;
+			$status=0;
 			$comments="";
 			$url="";
 		}
@@ -2832,7 +2825,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "Disabled";
 		show_table2_h_delimiter();
 		echo "<INPUT TYPE=\"CHECKBOX\" ";
-		if($istrue==2) { echo " CHECKED "; }
+		if($status==1) { echo " CHECKED "; }
 		echo "NAME=\"disabled\"  VALUE=\"true\">";
 
  
@@ -2924,10 +2917,10 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	        $result=DBselect("select count(*) from triggers");
 		$stat["triggers_count"]=DBget_field($result,0,0);
 
-	        $result=DBselect("select count(*) from triggers where istrue!=2");
+	        $result=DBselect("select count(*) from triggers where status=0");
 		$stat["triggers_count_enabled"]=DBget_field($result,0,0);
 
-	        $result=DBselect("select count(*) from triggers where istrue=2");
+	        $result=DBselect("select count(*) from triggers where status=1");
 		$stat["triggers_count_disabled"]=DBget_field($result,0,0);
 
 	        $result=DBselect("select count(*) from items");
@@ -2975,7 +2968,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$min=$max-24*3600;
 		}
 
-		$sql="select clock,istrue from alarms where triggerid=$triggerid and clock>=$min and clock<=$max";
+		$sql="select clock,value from alarms where triggerid=$triggerid and clock>=$min and clock<=$max";
 		$result=DBselect($sql);
 
 // -1,0,1
@@ -2988,7 +2981,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		for($i=0;$i<DBnum_rows($result);$i++)
 		{
 			$clock=DBget_field($result,$i,0);
-			$istrue=DBget_field($result,$i,1);
+			$value=DBget_field($result,$i,1);
 
 			$diff=$clock-$time;
 
@@ -2996,7 +2989,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 			if($state==-1)
 			{
-				$state=$istrue;
+				$state=$value;
 				if($state == 0)
 				{
 					$false_time+=$diff;
@@ -3013,17 +3006,17 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			else if($state==0)
 			{
 				$false_time+=$diff;
-				$state=$istrue;
+				$state=$value;
 			}
 			else if($state==1)
 			{
 				$true_time+=$diff;
-				$state=$istrue;
+				$state=$value;
 			}
 			else if($state==3)
 			{
 				$unknown_time+=$diff;
-				$state=$istrue;
+				$state=$value;
 			}
 		}
 
