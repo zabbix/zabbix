@@ -773,29 +773,39 @@ int	DBupdate_item_status_to_notsupported(int itemid)
 	return SUCCEED;
 }
 
-int	DBadd_history(int itemid, double value)
+int	DBadd_trend(int itemid, double value, int clock)
 {
-	int	now;
 	char	sql[MAX_STRING_LEN+1];
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In add_history()");
+	zabbix_log(LOG_LEVEL_DEBUG,"In add_trend()");
 
-	now=time(NULL);
-	sprintf(sql,"insert into history (clock,itemid,value) values (%d,%d,%g)",now,itemid,value);
+	sprintf(sql,"insert into trends (clock,itemid,num,value_min,value_avg,value_max) values (%d,%d,%d,%g,%g%g)", clock, itemid, 1, value, value, value);
 	DBexecute(sql);
 
 	return SUCCEED;
 }
 
-int	DBadd_history_str(int itemid, char *value)
+int	DBadd_history(int itemid, double value, int clock)
 {
-	int	now;
+	char	sql[MAX_STRING_LEN+1];
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In add_history()");
+
+	sprintf(sql,"insert into history (clock,itemid,value) values (%d,%d,%g)",clock,itemid,value);
+	DBexecute(sql);
+
+	DBadd_trend(itemid, value, clock);
+
+	return SUCCEED;
+}
+
+int	DBadd_history_str(int itemid, char *value, int clock)
+{
 	char	sql[MAX_STRING_LEN+1];
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_str()");
 
-	now=time(NULL);
-	sprintf(sql,"insert into history_str (clock,itemid,value) values (%d,%d,'%s')",now,itemid,value);
+	sprintf(sql,"insert into history_str (clock,itemid,value) values (%d,%d,'%s')",clock,itemid,value);
 	DBexecute(sql);
 
 	return SUCCEED;
