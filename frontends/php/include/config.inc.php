@@ -468,7 +468,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		global	$ERROR_MSG;
 
-//		$sql="select itemid,type,snmp_community,snmp_oid,hostid,description,key_,delay,history,lastdelete, nextcheck,lastvalue, lastclock, prevvalue, status, value_type from items where itemid=$itemid"; 
 		$sql="select * from items where itemid=$itemid"; 
 		$result=DBselect($sql);
 		if(DBnum_rows($result) == 1)
@@ -1641,7 +1640,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Update Item definition
 
-	function	update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier)
+	function	update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta)
 	{
 		global	$ERROR_MSG;
 
@@ -1662,7 +1661,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return 0;
 		}
 
-		$sql="update items set description='$description',key_='$key',hostid=$hostid,delay=$delay,history=$history,lastdelete=0,nextcheck=0,status=$status,type=$type,snmp_community='$snmp_community',snmp_oid='$snmp_oid',value_type=$value_type,trapper_hosts='$trapper_hosts',snmp_port=$snmp_port,units='$units',multiplier=$multiplier where itemid=$itemid";
+		if($value_type == ITEM_VALUE_TYPE_STR)
+		{
+			$delta=0;
+		}
+
+		$sql="update items set description='$description',key_='$key',hostid=$hostid,delay=$delay,history=$history,lastdelete=0,nextcheck=0,status=$status,type=$type,snmp_community='$snmp_community',snmp_oid='$snmp_oid',value_type=$value_type,trapper_hosts='$trapper_hosts',snmp_port=$snmp_port,units='$units',multiplier=$multiplier,delta=$delta where itemid=$itemid";
 		return	DBexecute($sql);
 	}
 
@@ -2032,7 +2036,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Add Item definition
 
-	function	add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier)
+	function	add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta)
 	{
 		global	$ERROR_MSG;
 
@@ -2062,11 +2066,15 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return 0;
 		}
 
+		if($value_type == ITEM_VALUE_TYPE_STR)
+		{
+			$delta=0;
+		}
 
 		$key=addslashes($key);
 		$description=addslashes($description);
 
-		$sql="insert into items (description,key_,hostid,delay,history,lastdelete,nextcheck,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier) values ('$description','$key',$hostid,$delay,$history,0,0,$status,$type,'$snmp_community','$snmp_oid',$value_type,'$trapper_hosts',$snmp_port,'$units',$multiplier)";
+		$sql="insert into items (description,key_,hostid,delay,history,lastdelete,nextcheck,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta) values ('$description','$key',$hostid,$delay,$history,0,0,$status,$type,'$snmp_community','$snmp_oid',$value_type,'$trapper_hosts',$snmp_port,'$units',$multiplier,$delta)";
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"items","itemid");
 	}
@@ -2457,7 +2465,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		while($row=DBfetch($result))
 		{
 			$item=get_item_by_itemid($row["itemid"]);
-			$itemid=add_item($item["description"],$item["key_"],$hostid,$item["delay"],$item["history"],$item["status"],$item["type"],$item["snmp_community"],$item["snmp_oid"],$item["value_type"],"",161,$item["units"],$item["multiplier"]);
+			$itemid=add_item($item["description"],$item["key_"],$hostid,$item["delay"],$item["history"],$item["status"],$item["type"],$item["snmp_community"],$item["snmp_oid"],$item["value_type"],"",161,$item["units"],$item["multiplier"],$item["delta"]);
 
 			$sql="select distinct t.triggerid from triggers t,functions f where f.itemid=".$row["itemid"]." and f.triggerid=t.triggerid";
 			$result2=DBselect($sql);
@@ -3299,10 +3307,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		$units=@iif(isset($HTTP_GET_VARS["units"]),$HTTP_GET_VARS["units"],'');
 		$multiplier=@iif(isset($HTTP_GET_VARS["multiplier"]),$HTTP_GET_VARS["multiplier"],0);
 		$hostid=@iif(isset($HTTP_GET_VARS["hostid"]),$HTTP_GET_VARS["hostid"],0);
+		$delta=@iif(isset($HTTP_GET_VARS["delta"]),$HTTP_GET_VARS["delta"],0);
 
 		if(isset($HTTP_GET_VARS["register"])&&($HTTP_GET_VARS["register"] == "change"))
 		{
-			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.snmp_port,i.units,i.multiplier,h.hostid from items i,hosts h where i.itemid=".$HTTP_GET_VARS["itemid"]." and h.hostid=i.hostid");
+			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.snmp_port,i.units,i.multiplier,h.hostid,i.delta from items i,hosts h where i.itemid=".$HTTP_GET_VARS["itemid"]." and h.hostid=i.hostid");
 		
 			$description=DBget_field($result,0,0);
 			$key=DBget_field($result,0,1);
@@ -3320,6 +3329,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$units=DBget_field($result,0,13);
 			$multiplier=DBget_field($result,0,14);
 			$hostid=DBget_field($result,0,15);
+			$delta=DBget_field($result,0,16);
 		}
 
 		echo "<br>";
@@ -3478,6 +3488,18 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<OPTION VALUE=\"1\"";
 		if($value_type==1) echo "SELECTED";
 		echo ">Character";
+		echo "</SELECT>";
+
+		show_table2_v_delimiter();
+		echo nbsp("Store value");
+		show_table2_h_delimiter();
+		echo "<SELECT class=\"biginput\" NAME=\"delta\" value=\"$delta\" size=\"1\">";
+		echo "<OPTION VALUE=\"0\"";
+		if($delta==0) echo "SELECTED";
+		echo ">As is";
+		echo "<OPTION VALUE=\"1\"";
+		if($delta==1) echo "SELECTED";
+		echo ">Delta";
 		echo "</SELECT>";
 
 		if($type==2)
