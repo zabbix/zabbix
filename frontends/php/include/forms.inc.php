@@ -46,10 +46,12 @@
 			$url="";
 		}
 
+		$col=0;
+
 		show_table2_header_begin();
 		echo S_USER;
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo "<form method=\"get\" action=\"users.php\">";
 		if(isset($userid))
 		{
@@ -59,32 +61,32 @@
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"alias\" value=\"$alias\" size=20>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo S_NAME;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=20>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo S_SURNAME;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"surname\" value=\"$surname\" size=20>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo S_PASSWORD;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" type=\"password\" name=\"password1\" value=\"$password\" size=20>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo nbsp(S_PASSWORD_ONCE_AGAIN);
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" type=\"password\" name=\"password2\" value=\"$password\" size=20>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo S_URL_AFTER_LOGIN;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"url\" value=\"$url\" size=50>";
 
-		show_table2_v_delimiter2();
+		show_table2_v_delimiter2($col++);
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
 		if(isset($userid))
 		{
