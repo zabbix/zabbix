@@ -16,7 +16,6 @@ should read
 
  - document that --enable-static does not work on Solaris
  - test on HP-UX, AIX and Solaris
- - on the sysmap, a < in the trigger title shows up as &lt; 
  - improve actions.php to make selection of trigger, host, hosts on the top
  - navigation bar for all graphs and screens
  - make support for "Clone"
