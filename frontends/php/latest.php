@@ -107,6 +107,8 @@
 		cr();
 		echo "<TD WIDTH=\"5%\" NOSAVE><center><B>Trends</B></center></TD>";
 		cr();
+		echo "<TD WIDTH=\"5%\" NOSAVE><center><B>Compare</B></center></TD>";
+		cr();
 		echo "</TR>";
 		cr();
 
@@ -204,6 +206,14 @@
 			if($row["value_type"]==0)
 			{
 				echo "<td><center><a href=\"trends.php?itemid=".$row["itemid"]."\">Show</a></center></td>";
+			}
+			else
+			{
+				echo "<td><center>Show</center></td>";
+			}
+			if($row["value_type"]==0)
+			{
+				echo "<td><center><a href=\"compare.php?itemid=".$row["itemid"]."\">Show</a></center></td>";
 			}
 			else
 			{

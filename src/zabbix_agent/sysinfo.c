@@ -149,13 +149,6 @@ COMMAND	commands[AGENT_MAX_USER_COMMANDS]=
 
 	{"check_service[*]"	,CHECK_SERVICE, 	0, "ssh,22"},
 
-/*	{"check_service[ssh]"	,CHECK_SERVICE_SSH, 	0, 0},
-	{"check_service[smtp]"	,CHECK_SERVICE_SMTP, 	0, 0},
-	{"check_service[ftp]"	,CHECK_SERVICE_FTP, 	0, 0},
-	{"check_service[http]"	,CHECK_SERVICE_HTTP, 	0, 0},
-	{"check_service[pop]"	,CHECK_SERVICE_POP, 	0, 0},
-	{"check_service[nntp]"	,CHECK_SERVICE_NNTP, 	0, 0},
-	{"check_service[imap]"	,CHECK_SERVICE_IMAP, 	0, 0},*/
 	{0}
 	};
 
@@ -1442,42 +1435,6 @@ float	CHECK_SERVICE(char *service)
 
 	return FAIL;
 }
-/*
-float	CHECK_SERVICE_SSH(void)
-{
-	return	tcp_expect("127.0.0.1",22,"SSH","0\n");
-}
-
-float	CHECK_SERVICE_SMTP(void)
-{
-	return	tcp_expect("127.0.0.1",25,"220","QUIT\n");
-}
-
-float	CHECK_SERVICE_FTP(void)
-{
-	return	tcp_expect("127.0.0.1",21,"220","");
-}
-
-float	CHECK_SERVICE_HTTP(void)
-{
-	return	tcp_expect("127.0.0.1",80,NULL,"");
-}
-
-float	CHECK_SERVICE_POP(void)
-{
-	return	tcp_expect("127.0.0.1",110,"+OK","");
-}
-
-float	CHECK_SERVICE_NNTP(void)
-{
-	return	tcp_expect("127.0.0.1",119,"220","");
-}
-
-float	CHECK_SERVICE_IMAP(void)
-{
-	return	tcp_expect("127.0.0.1",143,"* OK","a1 LOGOUT\n");
-}
-*/
 
 float	CHECK_PORT(char *port)
 {

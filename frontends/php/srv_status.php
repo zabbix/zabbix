@@ -55,7 +55,12 @@
 		if(isset($row["triggerid"]))
 		{
 			$trigger=get_trigger_by_triggerid($row["triggerid"]);
-			$description="[<a href=\"alarms.php?triggerid=".$row["triggerid"]."\">TRIGGER</a>] ".$trigger["description"];
+			$description=$trigger["description"];
+			if( strstr($description,"%s"))
+			{
+				$description=expand_trigger_description($row["triggerid"]);
+			}
+			$description="[<a href=\"alarms.php?triggerid=".$row["triggerid"]."\">TRIGGER</a>] $description";
 		}
 		else
 		{

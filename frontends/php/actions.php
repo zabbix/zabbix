@@ -33,6 +33,10 @@
 	$trigger=get_trigger_by_triggerid($triggerid);
 	$expression=explode_exp($trigger["expression"],1);
 	$description=$trigger["description"];
+	if( strstr($description,"%s"))
+	{
+		$description=expand_trigger_description($triggerid);
+	}
 	show_table_header("$description<BR>$expression");
 ?>
 

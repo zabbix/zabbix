@@ -252,6 +252,10 @@
         {
                 $triggerid_=DBget_field($result,$i,0);
                 $description_=DBget_field($result,$i,1);
+		if( strstr($description_,"%s"))
+		{
+			$description_=expand_trigger_description($triggerid_);
+		}
                 if(isset($triggerid) && ($triggerid==$triggerid_))
                 {
                         echo "<OPTION VALUE='$triggerid_' SELECTED>$description_";

@@ -33,6 +33,7 @@
 	$im = imagecreate($sizeX+$shiftX+61,$sizeY+2*$shiftY+10); 
   
 	$red=ImageColorAllocate($im,255,0,0); 
+	$darkred=ImageColorAllocate($im,150,0,0); 
 	$green=ImageColorAllocate($im,0,255,0); 
 	$darkgreen=ImageColorAllocate($im,0,150,0); 
 	$blue=ImageColorAllocate($im,0,0,255); 
@@ -40,20 +41,25 @@
 	$cyan=ImageColorAllocate($im,0,255,255); 
 	$black=ImageColorAllocate($im,0,0,0); 
 	$gray=ImageColorAllocate($im,150,150,150); 
+	$white=ImageColorAllocate($im,255,255,255); 
 
 	$x=imagesx($im); 
 	$y=imagesy($im);
   
-	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+2*$shiftY+10,$black);
+	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+2*$shiftY+10,$white);
+	ImageRectangle($im,0,0,$x-1,$y-1,$black);
 
-	for($i=0;$i<=$sizeY;$i+=50)
+	for($i=0;$i<=$sizeY;$i+=$sizeY/5)
 	{
-		ImageDashedLine($im,$shiftX,$i+$shiftY,$sizeX+$shiftX,$i+$shiftY,$darkgreen);
+		ImageDashedLine($im,$shiftX,$i+$shiftY,$sizeX+$shiftX,$i+$shiftY,$black);
 	}
-	for($i=0;$i<=$sizeX;$i+=50)
+	for($i=0;$i<=$sizeX;$i+=$sizeX/24)
 	{
-		ImageDashedLine($im,$i+$shiftX,$shiftY,$i+$shiftX,$sizeY+$shiftY,$darkgreen);
+		ImageDashedLine($im,$i+$shiftX,$shiftY,$i+$shiftX,$sizeY+$shiftY,$black);
 	}
+	$item=get_item_by_itemid($itemid);
+	$host=get_host_by_hostid($item["hostid"]);
+	ImageString($im, 4,$sizeX/2-50,-1, $host["host"].":".$item["description"]." (diff)" , $darkred);
 
 	$from_time = time(NULL)-$period-3600*$from;
 	$to_time   = time(NULL)-3600*$from;
@@ -107,7 +113,7 @@
 		}
 		$y1=$sizeY*(-$minY)/($maxY-$minY);
 		$y1=$sizeY-$y1;
-		ImageDashedLine($im,$shiftX,$y1+$shiftY,$sizeX+$shiftX,$y1+$shiftY,$yellow);
+		ImageDashedLine($im,$shiftX,$y1+$shiftY,$sizeX+$shiftX,$y1+$shiftY,$darkred);
 		for($i=0;$i<DBnum_rows($result)-3;$i++)
 		{
 			$x=DBget_field($result,$i,0);
@@ -126,30 +132,30 @@
 			$y2=$sizeY-$y2;
 
 //		echo $x1," - ",$x2," - ",$y1," - ",$y2,"<Br>";
-			ImageLine($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX,$y2+$shiftY,$green);
+			ImageLine($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX,$y2+$shiftY,$darkgreen);
 		}
 	}
 	else
 	{
 		if(isset($minX))
 		{
-			ImageLine($im,$shiftX,$shiftY+$sizeY/2,$sizeX+$shiftX,$shiftY+$sizeY/2,$green);
+			ImageLine($im,$shiftX,$shiftY+$sizeY/2,$sizeX+$shiftX,$shiftY+$sizeY/2,$darkgreen);
 		}
 	}
 
 	if($nodata == 0)
 	{
-		for($i=0;$i<=$sizeY;$i+=50)
+		for($i=0;$i<=$sizeY;$i+=$sizeY/5)
 		{
-			ImageString($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftY, $i*($maxY-$minY)/$sizeY+$minY , $red);
+			ImageString($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftY, $i*($maxY-$minY)/$sizeY+$minY , $darkred);
 		}
 
-		ImageString($im, 1,10,                $sizeY+$shiftY+5, date("dS of F Y h:i:s A",$minX) , $red);
-		ImageString($im, 1,$sizeX+$shiftX-168,$sizeY+$shiftY+5, date("dS of F Y h:i:s A",$maxX) , $red);
+		ImageString($im, 1,10,                $sizeY+$shiftY+5, date("dS of F Y h:i:s A",$minX) , $darkred);
+		ImageString($im, 1,$sizeX+$shiftX-168,$sizeY+$shiftY+5, date("dS of F Y h:i:s A",$maxX) , $darkred);
 	}
 	else
 	{
-		ImageString($im, 2,$sizeX/2-50,                $sizeY+$shiftY+3, "NO DATA FOUND FOR THIS PERIOD" , $red);
+		ImageString($im, 2,$sizeX/2-50,                $sizeY+$shiftY+3, "NO DATA FOUND FOR THIS PERIOD" , $darkred);
 	}
 
 	ImageStringUp($im,0,2*$shiftX+$sizeX+40,$sizeY+2*$shiftY, "http://zabbix.sourceforge.net", $gray);
