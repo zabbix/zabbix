@@ -1,7 +1,3 @@
-Not ready yet (1.0beta4):
-
-[ PHP. Navigation by time period for graphs and trends ]
-
 Changes for 1.0beta4:
 
  - ./configure will find libz  to solve problem with MySQL (Alexei)
