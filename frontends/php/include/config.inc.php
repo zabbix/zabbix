@@ -502,6 +502,22 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	$result;
 	}
 
+	function	get_usergroup_by_usrgrpid($usrgrpid)
+	{
+		global	$ERROR_MSG;
+
+		$result=DBselect("select usrgrpid,name from usrgrp where usrgrpid=$usrgrpid"); 
+		if(DBnum_rows($result) == 1)
+		{
+			return	DBfetch($result);	
+		}
+		else
+		{
+			$ERROR_MSG="No user group with usrgrpid=[$usrgrpid]";
+		}
+		return	$result;
+	}
+
 	function	get_screen_by_screenid($screenid)
 	{
 		global	$ERROR_MSG;
@@ -3626,6 +3642,66 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 </BODY>
 </HTML>
 <?php
+	}
+
+	# Insert form for User Groups
+	function	insert_usergroups_form($usrgrpid)
+	{
+		if(isset($usrgrpid))
+		{
+			$usrgrp=get_usergroup_by_usrgrpid($usrgrpid);
+	
+			$name=$usrgrp["name"];
+		}
+		else
+		{
+			$name="";
+		}
+
+		show_table2_header_begin();
+		echo "User group";
+
+		show_table2_v_delimiter();
+/*		echo "<form method=\"get\" action=\"users.php\">";
+		if(isset($usrgrpid))
+		{
+			echo "<input name=\"usrgrpid\" type=\"hidden\" value=\"$userid\" size=8>";
+		}*/
+		echo "Group name";
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=20>";
+
+		show_table2_v_delimiter();
+		echo "Users";
+		show_table2_h_delimiter();
+		echo "<select multiple class=\"biginput\" name=\"users[]\" size=\"5\">";
+		$result=DBselect("select distinct userid,alias from users order by alias");
+		while($row=DBfetch($result))
+		{
+			if(isset($HTTP_GET_VARS["usrgrpid"]))
+			{
+				$sql="select count(*) as count from users_groups where usrgrpid=".$HTTP_GET_VARS["usrgrpid"];
+				$result2=DBselect($sql);
+				$row2=DBfetch($result2);
+				if($row2["count"]==0)
+				{
+					echo "<option value=\"".$row["userid"]."\">".$row["alias"];
+				}
+				else
+				{
+					echo "<option value=\"".$row["userid"]."\" selected>".$row["alias"];
+				}
+			}
+			else
+			{
+				echo "<option value=\"".$row["userid"]."\">".$row["alias"];
+			}
+		}
+		echo "</select>";
+
+		show_table2_v_delimiter2();
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add group\">";
+		show_table2_header_end();
 	}
 
 	# Insert form for User permissions
