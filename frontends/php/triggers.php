@@ -127,8 +127,11 @@
 				}
 				echo "<br>";
 				show_table_header("<A HREF='triggers.php?hostid=".$row["hostid"]."'>".$row["host"]."</A>");
+				echo "<form method=\"get\" action=\"triggers.php\">";
+				echo "<input class=\"biginput\" name=\"hostid\" type=hidden value=".$HTTP_GET_VARS["hostid"]." size=8>";
 				echo "<TABLE BORDER=0 COLS=3 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 				echo "<TR>";
+				echo "<TD WIDTH=\"8%\"><B>Id</B></TD>";
 				echo "<TD><B>Description</B></TD>";
 				echo "<TD><B>Expression</B></TD>";
 				echo "<TD WIDTH=5%><B>Status</B></TD>";
@@ -146,6 +149,7 @@
 			{
 				$description=expand_trigger_description($row["triggerid"]);
 			}
+			echo "<TD><INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"".$row["triggerid"]."\"> ".$row["triggerid"]."</TD>";
 			echo "<TD>$description</TD>";
 	
 			echo "<TD>".explode_exp($row["expression"],1)."</TD>";
@@ -176,9 +180,15 @@
 //			echo "-<A HREF=\"actions.php?triggerid=".$row["triggerid"]."&description=".$row["description"]."\">ShowActions</A>";
 			echo "-<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">ShowActions</A>";
 			echo "</TD>";
-			echo "</TR>\n";
+			echo "</TR>";
 		}
-		echo "</table>\n";
+		echo "</table>";
+		show_table2_header_begin();
+		echo "<input type=\"submit\" name=\"register\" value=\"Enable selected\">";
+		echo "<input type=\"submit\" name=\"register\" value=\"Disable selected\">";
+		echo "<input type=\"submit\" name=\"register\" value=\"Delete selected\">";
+		show_table2_header_end();
+		echo "</form>";
 	}
 ?>
 

@@ -129,8 +129,8 @@
 				echo "<input class=\"biginput\" name=\"hostid\" type=hidden value=".$HTTP_GET_VARS["hostid"]." size=8>";
 				echo "<TABLE BORDER=0 COLS=13  align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 				echo "<TR>";
-				echo "<TD WIDTH=3% NOSAVE><B>Sel</B></TD>";
-				echo "<TD WIDTH=3% NOSAVE><B>Id</B></TD>";
+//				echo "<TD WIDTH=3% NOSAVE><B>Sel</B></TD>";
+				echo "<TD WIDTH=8% NOSAVE><B>Id</B></TD>";
 //				echo "<TD WIDTH=10% NOSAVE><B>Host</B></TD>";
 				echo "<TD WIDTH=10% NOSAVE><B>Key</B></TD>";
 				echo "<TD WIDTH=10% NOSAVE><B>Description</B></TD>";
@@ -146,8 +146,8 @@
 		        if($col++%2 == 1)	{ echo "<TR BGCOLOR=#DDDDDD>"; }
 			else			{ echo "<TR BGCOLOR=#EEEEEE>"; }
 
-			echo "<TD><INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"".$row["itemid"]."\"></TD>";
-			echo "<TD>".$row["itemid"]."</TD>";
+			echo "<TD><INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"".$row["itemid"]."\"> ".$row["itemid"]."</TD>";
+//			echo "<TD>".$row["itemid"]."</TD>";
 //			echo "<TD>".$row["host"]."</TD>";
 			echo "<TD>".$row["key_"]."</TD>";
 			echo "<TD>".$row["description"]."</TD>";
