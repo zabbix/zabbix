@@ -1037,7 +1037,7 @@ void	update_triggers(int itemid)
 /* Does not work for PostgreSQL */
 /*		sprintf(sql,"select t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.dep_level",TRIGGER_STATUS_ENABLED,sucker_num);*/
 /* Is it correct SQL? */
-	sprintf(sql,"select distinct t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value from triggers t,functions f,items i where i.status<>%d and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d",ITEM_STATUS_NOTSUPPORTED, TRIGGER_STATUS_ENABLED, itemid);
+	sprintf(sql,"select distinct t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value,t.description from triggers t,functions f,items i where i.status<>%d and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d",ITEM_STATUS_NOTSUPPORTED, TRIGGER_STATUS_ENABLED, itemid);
 
 	result = DBselect(sql);
 
@@ -1049,6 +1049,7 @@ void	update_triggers(int itemid)
 		trigger.priority=atoi(DBget_field(result,i,4));
 
 		trigger.value=atoi(DBget_field(result,i,5));
+		trigger.description=DBget_field(result,i,6);
 		strncpy(exp, trigger.expression, MAX_STRING_LEN);
 		if( evaluate_expression(&b, exp) != 0 )
 		{
