@@ -98,12 +98,13 @@ extern	char	*CONFIG_DBSOCKET;*/
 		conn = PQsetdbLogin(CONFIG_DBHOST, NULL, NULL, NULL, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD );
 
 /* check to see that the backend connection was successfully made */
-		if (PQstatus(conn) == CONNECTION_BAD)
+		if (PQstatus(conn) != CONNECTION_OK)
 		{
 			fprintf(stderr, "Connection to database '%s' failed.\n", CONFIG_DBNAME);
 			zabbix_log(LOG_LEVEL_ERR, "Connection to database '%s' failed.\n", CONFIG_DBNAME);
 			fprintf(stderr, "%s\n", PQerrorMessage(conn));
 			zabbix_log(LOG_LEVEL_ERR, "%s", PQerrorMessage(conn));
+			exit(FAIL);
 		}
 		else
 		{
