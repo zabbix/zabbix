@@ -1610,33 +1610,45 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 <?php
 	$menu=array(
 		"view"=>array(
-				array("label"=>"Latest data","url"=>"latest.php"),
-				array("label"=>"Triggers","url"=>"tr_status.php?onlytrue=true&noactions=true&compact=true.php"),
-				array("label"=>"Queue","url"=>"queue.php"),
-				array("label"=>"Alarms","url"=>"latestalarms.php"),
-				array("label"=>"Alerts","url"=>"alerts.php"),
-				array("label"=>"Maps","url"=>"maps.php"),
-				array("label"=>"Graphs","url"=>"charts.php"),
-				array("label"=>"Screens","url"=>"screens.php"),
-				array("label"=>"IT Services","url"=>"srv_status.php")
+				"label"=>"View",
+				"level2"=>array(
+					array("label"=>"Latest data","url"=>"latest.php"),
+					array("label"=>"Triggers","url"=>"tr_status.php?onlytrue=true&noactions=true&compact=true.php"),
+					array("label"=>"Queue","url"=>"queue.php"),
+					array("label"=>"Alarms","url"=>"latestalarms.php"),
+					array("label"=>"Alerts","url"=>"alerts.php"),
+					array("label"=>"Maps","url"=>"maps.php"),
+					array("label"=>"Graphs","url"=>"charts.php"),
+					array("label"=>"Screens","url"=>"screens.php"),
+					array("label"=>"IT Services","url"=>"srv_status.php")
+					)
 				),
 		"reports"=>array(
-				array("label"=>"Availability report","url"=>"report2.php")
+				"label"=>"Reports",
+				"level2"=>array(
+					array("label"=>"Availability report","url"=>"report2.php")
+					)
 				),
 		"configuration"=>array(
-				array("label"=>"General","url"=>"config.php"),
-				array("label"=>"Users","url"=>"users.php"),
-				array("label"=>"Audit","url"=>"audit.php"),
-				array("label"=>"Hosts","url"=>"hosts.php"),
-				array("label"=>"Items","url"=>"items.php"),
-				array("label"=>"Triggers","url"=>"triggers.php"),
-				array("label"=>"Maps","url"=>"sysmaps.php"),
-				array("label"=>"Graphs","url"=>"graphs.php"),
-				array("label"=>"Screens","url"=>"screenconf.php"),
-				array("label"=>"IT Services","url"=>"services.php")
+				"label"=>"Configuration",
+				"level2"=>array(
+					array("label"=>"General","url"=>"config.php"),
+					array("label"=>"Users","url"=>"users.php"),
+					array("label"=>"Audit","url"=>"audit.php"),
+					array("label"=>"Hosts","url"=>"hosts.php"),
+					array("label"=>"Items","url"=>"items.php"),
+					array("label"=>"Triggers","url"=>"triggers.php"),
+					array("label"=>"Maps","url"=>"sysmaps.php"),
+					array("label"=>"Graphs","url"=>"graphs.php"),
+					array("label"=>"Screens","url"=>"screenconf.php"),
+					array("label"=>"IT Services","url"=>"services.php")
+					)
 				),
 		"login"=>array(
-				array("label"=>"Login","url"=>"index.php"),
+				"label"=>"Login",
+				"level2"=>array(
+					array("label"=>"Login","url"=>"index.php"),
+					)
 				),
 		);
 ?>
@@ -1649,19 +1661,33 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	<table class="menu" cellspacing=0 cellpadding=5>
 	<tr>
-	<td class="horizontal_menu" height=24 colspan=9><b><a href="http://www.zabbix.com/index.php" class="highlight">View</a></b></td>
-	<td class="horizontal_menu_n" height=24 colspan=9><b><a href="http://www.zabbix.com/index.php" class="highlight">Reports</a></b></td>
-	<td class="horizontal_menu_n" height=24 colspan=9><b><a href="http://www.zabbix.com/index.php" class="highlight">Configuration</a></b></td>
-	<td class="horizontal_menu_n" height=24 colspan=9><b><a href="http://www.zabbix.com/index.php" class="highlight">Login</a></b></td>
+<?php
+	$i=0;
+	foreach($menu as $label=>$sub)
+	{
+		if($i==0)
+			echo "<td class=\"horizontal_menu\" height=24 colspan=9><b><a href=\"http://www.zabbix.com/index.php\" class=\"highlight\">".$sub["label"]."</a></b></td>";
+		else
+			echo "<td class=\"horizontal_menu_n\" height=24 colspan=9><b><a href=\"http://www.zabbix.com/index.php\" class=\"highlight\">".$sub["label"]."</a></b></td>";
+		$i++;
+	}
+?>
 	</tr>
 	</table>
 	<table class="menu" width=100% cellspacing=0 cellpadding=5>
-	<tr><td class="horizontal_menu" height=24 colspan=9><b><a href="latest.php" class="highlight">Latest data</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="tr_status.php?onlytrue=true&noactions=true&compact=true" class="highlight">Triggers</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="queue.php" class="highlight">Queue</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="latestalarms.php" class="highlight">Alarms</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="alerts.php" class="highlight">Alerts</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="maps.php" class="highlight">Maps</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="charts.php" class="highlight">Graphs</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="screens.php" class="highlight">Screens</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="srv_status.php" class="highlight">IT Services</a></b></td></tr>
-<!--
-	<tr><td class="horizontal_menu" height=24 colspan=9><b><a href="report2.php" class="highlight">Availability Report</a></b></td></tr>
-	<tr><td class="horizontal_menu" height=24 colspan=9><b><a href="index.php" class="highlight">Home</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="about.php" class="highlight">About</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="report1.php" class="highlight">Status of ZABBIX</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="report2.php" class="highlight">Availability report</a></b></td></tr>
-	<tr><td class="horizontal_menu" height=24 colspan=9><b><a href="config.php" class="highlight">Config</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="users.php" class="highlight">Users</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="audit.php" class="highlight">Audit</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="hosts.php" class="highlight">Hosts</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="items.php" class="highlight">Items</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="triggers.php" class="highlight">Triggers</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="sysmaps.php" class="highlight">Maps</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="graphs.php" class="highlight">Graphs</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="screenconf.php" class="highlight">Screens</a><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><a href="services.php" class="highlight">IT Services</a></b></td></tr>
--->
+	<tr><td class="horizontal_menu" height=24 colspan=9><b>
+<?php
+	$i=0;
+	foreach($menu["view"]["level2"] as $label=>$sub)
+	{
+		if($i==0)
+			echo "<a href=\"".$sub["url"]."\" class=\"highlight\">".$sub["label"]."</a><span class=\"divider\">&nbsp;&nbsp;|&nbsp;&nbsp;</span>";
+		else
+			echo "<a href=\"".$sub["url"]."\" class=\"highlight\">".$sub["label"]."</a><span class=\"divider\">&nbsp;&nbsp;|&nbsp;&nbsp;</span>";
+		$i++;
+	}
+?>
+</b></td>
 	</table>
 	<p>
 
