@@ -21,7 +21,6 @@
 **/
 
 #include "zabbixw32.h"
-#include <psapi.h>
 
 
 //
@@ -128,7 +127,7 @@ static double GetProcessAttribute(HANDLE hProcess,int attr,int type,int count,do
          value=(double)((__int64)ioCounters.OtherOperationCount);
          break;
       default:       // Unknown attribute
-         WriteLog("INTERNAL ERROR: Unexpected attribute code %d in GetProcessAttribute()\r\n",attr);
+         WriteLog(MSG_UNEXPECTED_ATTRIBUTE,EVENTLOG_ERROR_TYPE,"x",attr);
          value=0;
    }
 
@@ -149,7 +148,7 @@ static double GetProcessAttribute(HANDLE hProcess,int attr,int type,int count,do
       case 3:     // sum
          return lastValue+value;
       default:
-         WriteLog("INTERNAL ERROR: Unexpected type %d in GetProcessAttribute()\r\n",type);
+         WriteLog(MSG_UNEXPECTED_TYPE,EVENTLOG_ERROR_TYPE,"x",type);
          return 0;
    }
 }

@@ -37,6 +37,10 @@ static void Help(void)
           "   stop            : Stop Zabbix Win32 Agent service\n"
           "   install         : Install Zabbix Win32 Agent as service\n"
           "   remove          : Remove previously installed Zabbix Win32 Agent service\n"
+          "   install-events  : Install Zabbix Win32 Agent as event source for Event Log\n"
+          "                     This is done automatically when service is being installed\n"
+          "   remove-events   : Remove Zabbix Win32 Agent event source\n"
+          "                     This is done automatically when service is being removed\n"
           "   help            : Display help information\n"
           "   version         : Display version information\n\n"
           "And possible options are:\n"
@@ -78,7 +82,8 @@ BOOL ParseCommandLine(int argc,char *argv[])
          optStandalone=TRUE;
          return TRUE;
       }
-      else if (!strcmp(argv[i],"install"))
+      else if ((!strcmp(argv[i],"install"))||
+               (!strcmp(argv[i],"install-events")))
       {
          char path[MAX_PATH],*ptr;
 
@@ -93,12 +98,20 @@ BOOL ParseCommandLine(int argc,char *argv[])
          if (stricmp(&path[strlen(path)-4],".exe"))
             strcat(path,".exe");
 
-         ZabbixCreateService(path);
+         if (!strcmp(argv[i],"install"))
+            ZabbixCreateService(path);
+         else
+            ZabbixInstallEventSource(path);
          return FALSE;
       }
       else if (!strcmp(argv[i],"remove"))
       {
          ZabbixRemoveService();
+         return FALSE;
+      }
+      else if (!strcmp(argv[i],"remove-events"))
+      {
+         ZabbixRemoveEventSource();
          return FALSE;
       }
       else if (!strcmp(argv[i],"start"))

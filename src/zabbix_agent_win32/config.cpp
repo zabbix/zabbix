@@ -167,8 +167,16 @@ BOOL ReadConfig(void)
 
       if (!stricmp(buffer,"LogFile"))
       {
-         memset(logFile,0,MAX_PATH);
-         strncpy(logFile,ptr,MAX_PATH-1);
+         if (!stricmp(ptr,"{EventLog}"))
+         {
+            optUseEventLog=TRUE;
+         }
+         else
+         {
+            optUseEventLog=FALSE;
+            memset(logFile,0,MAX_PATH);
+            strncpy(logFile,ptr,MAX_PATH-1);
+         }
       }
       else if (!stricmp(buffer,"Server"))
       {
