@@ -655,6 +655,83 @@ Total swap space.
 
 Free swap space.
 
+- system[procload]
+
+Load average for last 1 minute.
+
+- system[procload5]
+
+Load average for last 5 minutes.
+
+- system[procload15]
+
+Load average for last 15 minutes.
+
+- system[proccount]
+
+Number of processes.
+
+- system[procrunning]
+
+Number of running processes.
+
+- system[uptime]
+
+System's uptime.
+
+- system[users]
+
+Number of users connected.
+
+- ping
+
+Always return 1.
+
+- tcp_count
+
+Number of established TCP connections.
+
+- service_check[ftp]
+
+Check either FTP server is running and accepting connections.
+
+Result: 0 - FTP server is down
+	1 - FTP server is running
+
+- service_check[ssh]
+
+Check either SSH server is running and accepting connections.
+
+Result: 0 - SSH server is down
+	1 - SSH server is running
+
+- service_check[smtp]
+
+Check either Email (SMTP) server is running and accepting connections.
+
+Result: 0 - SMTP server is down
+	1 - SMTP server is running
+
+- service_check[pop]
+
+Check either POP server is running and accepting connections.
+
+Result: 0 - POP server is down
+	1 - POP server is running
+
+- service_check[nntp]
+
+Check either NNTP server is running and accepting connections.
+
+Result: 0 - NNTP server is down
+	1 - NNTP server is running
+
+- service_check[imap]
+
+Check either IMAP server is running and accepting connections.
+
+Result: 0 - IMAP server is down
+	1 - IMAP server is running
 
 5.4 Supported parameters by platform
 
