@@ -23,6 +23,7 @@
 	{
 		var $period;
 		var $from;
+		var $stime;
 		var $sizeX;
 		var $sizeY;
 		var $shiftX;
@@ -146,6 +147,15 @@
 		function setPeriod($period)
 		{
 			$this->period=$period;
+		}
+
+		function setSTime($stime)
+		{
+			if($stime>20000000 && $stime<22000000)
+			{
+				$this->stime=mktime(0,0,0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
+				$this->period=24*3600;
+			}
 		}
 
 		function setFrom($from)
@@ -431,8 +441,16 @@
 		function selectData()
 		{
 			$now = time(NULL);
-			$this->to_time=$now-3600*$this->from;
-			$this->from_time=$this->to_time-$this->period;
+			if(isset($this->stime))
+			{
+				$this->to_time=$this->stime+24*3600;
+				$this->from_time=$this->stime;
+			}
+			else
+			{
+				$this->to_time=$now-3600*$this->from;
+				$this->from_time=$this->to_time-$this->period;
+			}
 		
 			$p=$this->to_time-$this->from_time;
 			$z=$p-$this->from_time%$p;

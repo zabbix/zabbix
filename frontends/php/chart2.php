@@ -31,6 +31,10 @@
 	{
 		$graph->setFrom($HTTP_GET_VARS["from"]);
 	}
+	if(isset($HTTP_GET_VARS["stime"]))
+	{
+		$graph->setSTime($HTTP_GET_VARS["stime"]);
+	}
 	if(isset($HTTP_GET_VARS["border"]))
 	{
 		$graph->setBorder(0);
