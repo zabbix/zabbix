@@ -44,7 +44,7 @@ void	signal_handler( int sig )
  
 	if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
 	{
-		syslog( LOG_ERR, "\nGot QUIT or INT or TERM signal. Exiting..." );
+		syslog( LOG_ERR, "Got QUIT or INT or TERM signal. Exiting..." );
 		exit( FAIL );
 	}
  
@@ -550,10 +550,13 @@ int main(int argc, char **argv)
 	daemon_init();
 
 	phan.sa_handler = &signal_handler; /* set up sig handler using sigaction() */
-	sigemptyset(&phan.sa_mask);  /* just block alarm signal */
+	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = 0;
 //	phan.sa_flags = SA_RESTART;
 	sigaction(SIGALRM, &phan, NULL);
+	sigaction(SIGINT, &phan, NULL);
+	sigaction(SIGQUIT, &phan, NULL);
+	sigaction(SIGTERM, &phan, NULL);
 
 
 //	signal( SIGINT,  signal_handler );
