@@ -1,5 +1,7 @@
 Changes for 1.0beta10:
 
+ - support for spaces in trigger expression. Thanks to Sébastien "Slix"
+ Liénard. (Alexei)
  - dynamic form items.php (Alexei)
  - added zabbix.spec. 'rpm -ta zabbix.tar.gz'. Thanks to Harald Holzer. (Alexei)
  - dynamic form config.php (Alexei)
