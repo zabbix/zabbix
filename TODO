@@ -130,7 +130,6 @@ Most of the signal handlers all need to delay or block signals to avoid signal r
 
  - add requirement for fping to the manual
  - separate login.php and index.php
- - add gaps to graph when no data present
  - remove icmpping and others from the QUEUE
  - escalation and repeated notifications
 
