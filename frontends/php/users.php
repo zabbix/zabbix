@@ -97,7 +97,7 @@
 			{
 				if(isset($_GET[$row["userid"]]))
 				{
-					$users=array_merge($users,$row["userid"]);
+					$users=array_merge($users,array($row["userid"]));
 				}
 			}
 //			$result=add_user_group($_GET["name"], $_GET["users"]);
@@ -112,7 +112,7 @@
 			{
 				if(isset($_GET[$row["userid"]]))
 				{
-					$users=array_merge($users,$row["userid"]);
+					$users=array_merge($users,array($row["userid"]));
 				}
 			}
 //			$result=update_user_group($_GET["usrgrpid"], $_GET["name"], $_GET["users"]);
