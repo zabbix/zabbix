@@ -42,8 +42,8 @@
 	$nodata=1;	
 
 
-//	Header( "Content-type:  text/html"); 
-	Header( "Content-type:  image/png"); 
+	Header( "Content-type:  text/html"); 
+//	Header( "Content-type:  image/png"); 
 	Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 
 	check_authorisation();
@@ -70,6 +70,9 @@
 		
 	$true=$stat["true"];
 	$false=$stat["false"];
+
+	echo $true," ",$false;
+	exit;
 
 	ImageFilledRectangle($im,$sizeX-$sizeX*$true/100,0,$sizeX,$sizeY,$darkred);
 	ImageString($im, 2,1,1, "$true | $false" , $darkred);
