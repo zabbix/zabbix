@@ -46,7 +46,7 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item,char *error, in
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP()");
 
-	assert((item->type == ITEM_TYPE_SNMPv1)||(item->type == ITEM_TYPE_SNMPv2c));
+/*	assert((item->type == ITEM_TYPE_SNMPv1)||(item->type == ITEM_TYPE_SNMPv2c)); */
 	assert((item->type == ITEM_TYPE_SNMPv1)||(item->type == ITEM_TYPE_SNMPv2c)||(item->type == ITEM_TYPE_SNMPv3));
 
 	snmp_sess_init( &session );
@@ -193,8 +193,8 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item,char *error, in
 			int count=1;
 			zabbix_log( LOG_LEVEL_DEBUG, "AV loop()");
 
-			if(	(vars->type == ASN_INTEGER) ||
-				(vars->type == ASN_UINTEGER)||
+/*			if(	(vars->type == ASN_INTEGER) ||*/
+			if(	(vars->type == ASN_UINTEGER)||
 				(vars->type == ASN_COUNTER) ||
 				(vars->type == ASN_TIMETICKS) ||
 				(vars->type == ASN_GAUGE)
@@ -207,6 +207,11 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item,char *error, in
 				 */ 
 				/*sprintf(result_str,"%ld",(long)*vars->val.integer);*/
 				snprintf(result_str,MAX_STRING_LEN-1,"%lu",(long)*vars->val.integer);
+			}
+			else if(vars->type == ASN_INTEGER)
+			{
+				*result=(long)*vars->val.integer;
+				snprintf(result_str,MAX_STRING_LEN-1,"%ld",(long)*vars->val.integer);
 			}
 			else if(vars->type == ASN_OCTET_STR)
 			{
