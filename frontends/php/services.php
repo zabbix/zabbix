@@ -223,17 +223,19 @@
 	show_table2_v_delimiter();
 	echo "Status calculation algorithm";
 	show_table2_h_delimiter();
-	$result=DBselect("select triggerid,description from triggers order by description");
 	echo "<select class=\"biginput\" name=\"algorithm\" size=1>";
-	if(isset($HTTP_GET_VARS["algorithm"]))
+//	if(isset($HTTP_GET_VARS["algorithm"]))
+	if(isset($algorithm))
 	{
-		if($HTTP_GET_VARS["algorithm"] == SERVICE_ALGORITHM_NONE)
+//		if($HTTP_GET_VARS["algorithm"] == SERVICE_ALGORITHM_NONE)
+		if($algorithm == SERVICE_ALGORITHM_NONE)
 		{
 			echo "<OPTION VALUE='0' SELECTED>Do not calculate";
 			echo "<OPTION VALUE='1'>MAX";
 			echo "<OPTION VALUE='2'>MIN";
 		}
-		else if($HTTP_GET_VARS["algorithm"] == SERVICE_ALGORITHM_MAX)
+//		else if($HTTP_GET_VARS["algorithm"] == SERVICE_ALGORITHM_MAX)
+		else if($algorithm == SERVICE_ALGORITHM_MAX)
 		{
 			echo "<OPTION VALUE='0'>Do not calculate";
 			echo "<OPTION VALUE='1' SELECTED>MAX";
@@ -259,7 +261,8 @@
         show_table2_h_delimiter();
 	if($showsla==1)
 	{
-        	echo "<INPUT class=\"biginput\" TYPE=\"CHECKBOX\" NAME=\"showsla\" VALUE=\"true\" CHECKED>";
+   //     	echo "<INPUT class=\"biginput\" TYPE=\"CHECKBOX\" NAME=\"showsla\" VALUE=\"true\" CHECKED>";
+        	echo "<INPUT class=\"biginput\" TYPE=\"CHECKBOX\" NAME=\"showsla\" VALUE=\"on\" CHECKED>";
 	}
 	else
 	{
@@ -296,7 +299,8 @@
 		{
 			$description_=expand_trigger_description($triggerid_);
 		}
-                if(isset($HTTP_GET_VARS["triggerid"]) && ($HTTP_GET_VARS["triggerid"]==$triggerid_))
+//		if(isset($HTTP_GET_VARS["triggerid"]) && ($HTTP_GET_VARS["triggerid"]==$triggerid_))
+		if(isset($triggerid) && ($triggerid==$triggerid_))
                 {
                         echo "<OPTION VALUE='$triggerid_' SELECTED>$description_";
                 }
