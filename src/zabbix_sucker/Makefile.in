@@ -2,7 +2,7 @@
 
 all:
 
-	@CC@ @LIBS@ @CFLAGS@ -ggdb -I /usr/include/mysql -I../../include  -L/usr/lib/mysql zabbix_sucker.c ../../include/db.c ../../include/functions.c -o zabbix_sucker -Wall
+	@CC@ -o zabbix_sucker @CFLAGS@ -ggdb -I /usr/include/mysql -I../../include  -L/usr/lib/mysql zabbix_sucker.c ../../include/db.c ../../include/functions.c -Wall @LIBS@
 	strip zabbix_sucker
 
 clean:
