@@ -54,4 +54,4 @@ alter table media add mediatypeid     int4 DEFAULT '0' NOT NULL;
 alter table alerts drop type;
 alter table alerts add mediatypeid     int4 DEFAULT '0' NOT NULL;
 
-insert into media_type (mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path) values (0,0,'Email','localhost','localhost','zabbix@localhost','');
+insert into media_type (mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path) values (1,0,'Email','localhost','localhost','zabbix@localhost','');
