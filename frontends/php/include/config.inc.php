@@ -3592,7 +3592,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	function	show_table3_h_delimiter($width=10)
 	{
 ?>
-        </td><td class="sub_menu" height=24 colspan=9 width="<?php echo $width;?>%">
+        </td><td class="sub_menu" height=24 colspan=9 nowrap="nowrap" width="<?php echo $width;?>%">
 <?php
 /*
 		cr();
@@ -3724,7 +3724,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	<table class="menu" cellspacing=0 cellpadding=1 width="100%">
 	<tr>
 <?php
-	echo "<td class=\"sub_menu\" height=24 colspan=9>";
+	echo "<td class=\"sub_menu\" height=24 colspan=9 nowrap=\"nowrap\">";
 /*
 		echo "<table border=0 align=center cellspacing=0 cellpadding=0 width=100% bgcolor=000000>";
 		cr();

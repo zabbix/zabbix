@@ -51,6 +51,7 @@
 	show_table3_header_begin();
 	echo "&nbsp;".S_ALERT_HISTORY_BIG;
 	show_table3_h_delimiter(20);
+	echo "<span style=\"float:right\">";
 	echo "<form name=\"form2\" method=\"get\" action=\"alerts.php\">";
 	if(isset($_GET["start"]))
 	{
@@ -63,6 +64,7 @@
 	}
   	echo "<input class=\"button\" type=\"submit\" name=\"do\" value=\"Next 100 >>\">";
 	echo "</form>";
+	echo "</span>";
 	show_table_header_end();
 ?>
 
