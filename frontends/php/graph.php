@@ -45,16 +45,36 @@
 		if($_GET["register"]=="add")
 		{
 			$result=add_item_to_graph($_GET["graphid"],$_GET["itemid"],$_GET["color"],$_GET["drawtype"],$_GET["sortorder"]);
+			if($result)
+			{
+				$graph=get_graph_by_graphid($_GET["graphid"]);
+				$item=get_item_by_itemid($_GET["itemid"]);
+				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH_ELEMENT,"Graph ID [".$_GET["graphid"]."] Name [".$graph["name"]."] Added [".$item["name"]."]");
+			}
 			show_messages($result,S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
 		if($_GET["register"]=="update")
 		{
 			$result=update_graph_item($_GET["gitemid"],$_GET["itemid"],$_GET["color"],$_GET["drawtype"],$_GET["sortorder"]);
+			if($result)
+			{
+				$graphitem=get_graphitem_by_gitemid($_GET["gitemid"]);
+				$graph=get_graph_by_graphid($graphitem["graphid"]);
+				$item=get_item_by_itemid($graphitemid["itemid"]);
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_GRAPH_ELEMENT,"Graph ID [".$graphitem["graphid"]."] Name [".$graph["name"]."] Updated [".$item["name"]."]");
+			}
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
 		if($_GET["register"]=="delete")
 		{
+			$graphitem=get_graphitem_by_gitemid($_GET["gitemid"]);
 			$result=delete_graphs_item($_GET["gitemid"]);
+			if($result)
+			{
+				$graph=get_graph_by_graphid($graphitem["graphid"]);
+				$item=get_item_by_itemid($graphitemid["itemid"]);
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH_ELEMENT,"Graph ID [".$graphitem["graphid"]."] Name [".$graph["name"]."] Deleted [".$item["name"]."]");
+			}
 			show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
 			unset($_GET["gitemid"]);
 		}

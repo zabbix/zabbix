@@ -47,16 +47,29 @@
 		if($_GET["register"]=="add")
 		{
 			$result=add_graph($_GET["name"],$_GET["width"],$_GET["height"],$_GET["yaxistype"],$_GET["yaxismin"],$_GET["yaxismax"]);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,"Graph [".addslashes($_GET["name"])."]");
+			}
 			show_messages($result, S_GRAPH_ADDED, S_CANNOT_ADD_GRAPH);
 		}
 		if($_GET["register"]=="update")
 		{
 			$result=update_graph($_GET["graphid"],$_GET["name"],$_GET["width"],$_GET["height"],$_GET["yaxistype"],$_GET["yaxismin"],$_GET["yaxismax"]);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,"Graph ID [".$_GET["graphid"]."] Graph [".addslashes($_GET["name"])."]");
+			}
 			show_messages($result, S_GRAPH_UPDATED, S_CANNOT_UPDATE_GRAPH);
 		}
 		if($_GET["register"]=="delete")
 		{
+			$graph=get_graph_by_graphid($_GET["graphid"]);
 			$result=delete_graph($_GET["graphid"]);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,"Graph [".addslashes($graph["name"])."]");
+			}
 			show_messages($result, S_GRAPH_DELETED, S_CANNOT_DELETE_GRAPH);
 			unset($_GET["graphid"]);
 		}
