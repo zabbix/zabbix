@@ -14,11 +14,9 @@ ZABBIX 1.1:
 
  - disk stats under Linux 2.6.x
  - handle unavailability of MySQL gracefully
- - check, if alerts are generated in 1.1
  - check SUSE 9.2 startup scripts. Parameter -u is misplaced.
  - get rid of limit of user defined parameters for agent
  - test everything on 64bit platforms:
- - fix multiple maps on one screen
  - apply patches for DNS checks
 
 TKOM:
