@@ -1,5 +1,6 @@
 Changes for 1.0beta9:
 
+ - support for high performance DB engines like Berkeley DB
  - removed doc/manual.lyx (Alexei)
  - fixed resizing of simple graphs (Alexei)
  - suppor for "--with-net-snmp" and "--with-ucd-snmp" (Alexei)
