@@ -19,7 +19,6 @@ Not ready yet:
  - HELO can be empty
  - add support for /,*,+,- in expressions
 
- - trigger OFF does not work. Test on Zabbix.
  - disabled triggers still send emails. Test on Zabbix.
 
 Changes for 1.0beta5:
