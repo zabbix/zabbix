@@ -1,5 +1,6 @@
 Changes for 1.1alpha6:
 
+ - fix for startup of housekeeping process (Alexei)
  - fix of agent crash on 64 bit platforms in CKSUM() (Alexei)
  - added frontends/php/overview.php (Alexei)
  - removed link to unexistant trends.php (Alexei)
