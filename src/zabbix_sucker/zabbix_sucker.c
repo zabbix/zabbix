@@ -1222,7 +1222,6 @@ int main(int argc, char **argv)
 
 	if( FAIL == create_pid_file(CONFIG_PID_FILE))
 	{
-		uninit();
 		return -1;
 	}
 
@@ -1254,6 +1253,7 @@ int main(int argc, char **argv)
 	init_snmp("zabbix_suckerd");
 #endif
 
+	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_suckerd...");
 	if( sucker_num == 0)
 	{
 		sigaction(SIGCHLD, &phan, NULL);
