@@ -353,7 +353,6 @@ WIN32 Agent:
  PLUS:
 
 - backup/restore scripts for server. Backup all (DB, configs, etc).
-- Support for MD5 checksums
 
  OTHER:
 
