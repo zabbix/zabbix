@@ -44,6 +44,111 @@
 #include "expression.h"
 
 /*
+ * Evaluate function COUNT
+ */ 
+int	evaluate_COUNT(char *value,DB_ITEM	*item,int parameter)
+{
+	DB_RESULT	*result;
+
+	char		sql[MAX_STRING_LEN+1];
+	int		now;
+	int		res = SUCCEED;
+
+	if(item->value_type != ITEM_VALUE_TYPE_FLOAT)
+	{
+		return	FAIL;
+	}
+
+	now=time(NULL);
+
+	sprintf(sql,"select count(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+
+	result = DBselect(sql);
+	if(DBnum_rows(result) == 0)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Result for COUNT is empty" );
+		res = FAIL;
+	}
+	else
+	{
+		strncpy(value,DBget_field(result,0,0),MAX_STRING_LEN);
+	}
+	DBfree_result(result);
+
+	return res;
+}
+
+/*
+ * Evaluate function SUM
+ */ 
+int	evaluate_SUM(char *value,DB_ITEM	*item,int parameter)
+{
+	DB_RESULT	*result;
+
+	char		sql[MAX_STRING_LEN+1];
+	int		now;
+	int		res = SUCCEED;
+
+	if(item->value_type != ITEM_VALUE_TYPE_FLOAT)
+	{
+		return	FAIL;
+	}
+
+	now=time(NULL);
+
+	sprintf(sql,"select sum(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+
+	result = DBselect(sql);
+	if(DBnum_rows(result) == 0)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Result for SUM is empty" );
+		res = FAIL;
+	}
+	else
+	{
+		strncpy(value,DBget_field(result,0,0),MAX_STRING_LEN);
+	}
+	DBfree_result(result);
+
+	return res;
+}
+
+/*
+ * Evaluate function AVG
+ */ 
+int	evaluate_AVG(char *value,DB_ITEM	*item,int parameter)
+{
+	DB_RESULT	*result;
+
+	char		sql[MAX_STRING_LEN+1];
+	int		now;
+	int		res = SUCCEED;
+
+	if(item->value_type != ITEM_VALUE_TYPE_FLOAT)
+	{
+		return	FAIL;
+	}
+
+	now=time(NULL);
+
+	sprintf(sql,"select avg(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+
+	result = DBselect(sql);
+	if(DBnum_rows(result) == 0)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Result for AVG is empty" );
+		res = FAIL;
+	}
+	else
+	{
+		strncpy(value,DBget_field(result,0,0),MAX_STRING_LEN);
+	}
+	DBfree_result(result);
+
+	return res;
+}
+
+/*
  * Evaluate function MIN
  */ 
 int	evaluate_MIN(char *value,DB_ITEM	*item,int parameter)
@@ -114,7 +219,42 @@ int	evaluate_MAX(char *value,DB_ITEM *item,int parameter)
 }
 
 /*
- * Evaluate function (min,max,prev,last,diff,str)
+ * Evaluate function DELTA
+ */ 
+int	evaluate_DELTA(char *value,DB_ITEM *item,int parameter)
+{
+	DB_RESULT	*result;
+
+	char		sql[MAX_STRING_LEN+1];
+	int		now;
+	int		res = SUCCEED;
+
+	if(item->value_type != ITEM_VALUE_TYPE_FLOAT)
+	{
+		return	FAIL;
+	}
+
+	now=time(NULL);
+
+	sprintf(sql,"select max(value)-min(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+
+	result = DBselect(sql);
+	if(DBnum_rows(result) == 0)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Result for DELTA is empty" );
+		res = FAIL;
+	}
+	else
+	{
+		strncpy(value,DBget_field(result,0,0),MAX_STRING_LEN);
+	}
+	DBfree_result(result);
+
+	return res;
+}
+
+/*
+ * Evaluate function (avg,min,max,prev,last,diff,str,change,abschange,delta)
  */ 
 int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 {
@@ -171,9 +311,75 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 	{
 		ret = evaluate_MAX(value,item,atoi(parameter));
 	}
+	else if(strcmp(function,"avg")==0)
+	{
+		ret = evaluate_AVG(value,item,atoi(parameter));
+	}
+	else if(strcmp(function,"sum")==0)
+	{
+		ret = evaluate_SUM(value,item,atoi(parameter));
+	}
+	else if(strcmp(function,"count")==0)
+	{
+		ret = evaluate_COUNT(value,item,atoi(parameter));
+	}
+	else if(strcmp(function,"delta")==0)
+	{
+		ret = evaluate_DELTA(value,item,atoi(parameter));
+	}
 	else if(strcmp(function,"nodata")==0)
 	{
 		strcpy(value,"0");
+	}
+	else if(strcmp(function,"abschange")==0)
+	{
+		if((item->lastvalue_null==1)||(item->prevvalue_null==1))
+		{
+			ret = FAIL;
+		}
+		else
+		{
+			if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
+			{
+				sprintf(value,"%f",(float)abs(item->lastvalue-item->prevvalue));
+			}
+			else
+			{
+				if(strcmp(item->lastvalue_str, item->prevvalue_str) == 0)
+				{
+					strcpy(value,"0");
+				}
+				else
+				{
+					strcpy(value,"1");
+				}
+			}
+		}
+	}
+	else if(strcmp(function,"change")==0)
+	{
+		if((item->lastvalue_null==1)||(item->prevvalue_null==1))
+		{
+			ret = FAIL;
+		}
+		else
+		{
+			if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
+			{
+				sprintf(value,"%f",item->lastvalue-item->prevvalue);
+			}
+			else
+			{
+				if(strcmp(item->lastvalue_str, item->prevvalue_str) == 0)
+				{
+					strcpy(value,"0");
+				}
+				else
+				{
+					strcpy(value,"1");
+				}
+			}
+		}
 	}
 	else if(strcmp(function,"diff")==0)
 	{

@@ -15,6 +15,28 @@ suckerd and agentd)
  - [10] BUG. When adding new service, service name is wrong.
  - [10] IT Services. SLA for a period of time only (09:00-18:00)
 
+LS:
+
+sum(N) - summa znachenii za interval vremeni N;
+
+change(N) - raznica mezhdu poslednim i na N vremeni ranee poluchennim
+znacheniem;
+abschange(N) = abs(change(N));
+
+count(N) - kolichestvo udacnih izmerenij za interval vremeni N;
+
+trend(N) - linejnaja aproksimacija sled.znachenija po interval vremeni N;
+trend(N,M) - tozhe, no ne sled.znachenie, a vpered na interval vremeni M;
+
+!!!!! kstati bilo-bi neploho pozvolitj poljzovatsja ne toljko intervalom
+vremeni kak argumentom funkcij,
+no i ispoljzovatj kolichestvo otscetov, tipa srednee za poslednie 5
+scitivanij !!!!!
+* k primeru argument 5 oznachhaet pjatj sekund, a #5 - pjatj izmerenii !!!
+
+nu i massu matematicheskih mozhno - dlja super-advanced chuvakov:
+* SQRT, LOG, LOG10, trigonometricheskie, ...
+
 HP:
 
  - use profiles instead of passing parameters using POST
