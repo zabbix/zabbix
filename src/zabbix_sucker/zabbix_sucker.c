@@ -749,6 +749,7 @@ int get_minnextcheck(int now)
 
 	return	res;
 }
+
 /* Update special host's item - "status" */
 void update_key_status(int hostid,int host_status)
 {
