@@ -82,7 +82,15 @@ void	report_stats_cpustat(FILE *file, int now)
 		cpu_user=0,
 		cpu_user1=0,
 		cpu_user5=0,
-		cpu_user15=0;
+		cpu_user15=0,
+		cpu_system=0,
+		cpu_system1=0,
+		cpu_system5=0,
+		cpu_system15=0,
+		cpu_nice=0,
+		cpu_nice1=0,
+		cpu_nice5=0,
+		cpu_nice15=0;
 
 	int	i;
 
@@ -119,75 +127,134 @@ void	report_stats_cpustat(FILE *file, int now)
 		{
 			cpu_idle=cpustat.cpu_idle[i];
 			cpu_user=cpustat.cpu_user[i];
+			cpu_nice=cpustat.cpu_nice[i];
+			cpu_system=cpustat.cpu_system[i];
 		}
 		if(cpustat.clock[i]==time1)
 		{
 			cpu_idle1=cpustat.cpu_idle[i];
 			cpu_user1=cpustat.cpu_user[i];
+			cpu_nice1=cpustat.cpu_nice[i];
+			cpu_system1=cpustat.cpu_system[i];
 		}
 		if(cpustat.clock[i]==time5)
 		{
 			cpu_idle5=cpustat.cpu_idle[i];
 			cpu_user5=cpustat.cpu_user[i];
+			cpu_nice5=cpustat.cpu_nice[i];
+			cpu_system5=cpustat.cpu_system[i];
 		}
 		if(cpustat.clock[i]==time15)
 		{
 			cpu_idle15=cpustat.cpu_idle[i];
 			cpu_user15=cpustat.cpu_user[i];
+			cpu_nice15=cpustat.cpu_nice[i];
+			cpu_system15=cpustat.cpu_system[i];
 		}
 	}
-	if((sent!=0)&&(sent1!=0))
+	if((cpu_idle!=0)&&(cpu_idle1!=0))
 	{
-		fprintf(file,"netloadout1[%s] %f\n", cpustat[i].interface, (float)((sent-sent1)/(now-time1)));
+		fprintf(file,"cpu[idle1] %f\n", (float)((cpu_idle-cpu_idle1)/(now-time1)));
 	}
 	else
 	{
-		fprintf(file,"netloadout1[%s] 0\n", cpustat[i].interface);
+		fprintf(file,"cpu[idle1] 0\n");
 	}
-	if((sent!=0)&&(sent5!=0))
+	if((cpu_idle!=0)&&(cpu_idle5!=0))
 	{
-		fprintf(file,"netloadout5[%s] %f\n", cpustat[i].interface, (float)((sent-sent5)/(now-time5)));
-	}
-	else
-	{
-		fprintf(file,"netloadout5[%s] 0\n", cpustat[i].interface);
-	}
-	if((sent!=0)&&(sent15!=0))
-	{
-		fprintf(file,"netloadout15[%s] %f\n", cpustat[i].interface, (float)((sent-sent15)/(now-time15)));
+		fprintf(file,"cpu[idle5] %f\n",(float)((cpu_idle-cpu_idle5)/(now-time5)));
 	}
 	else
 	{
-		fprintf(file,"netloadout15[%s] 0\n", cpustat[i].interface);
+		fprintf(file,"cpu[idle5] 0\n");
 	}
-	if((received!=0)&&(received1!=0))
+	if((cpu_idle!=0)&&(cpu_idle15!=0))
 	{
-		fprintf(file,"netloadin1[%s] %f\n", cpustat[i].interface, (float)((received-received1)/(now-time1)));
-	}
-	else
-	{
-		fprintf(file,"netloadin1[%s] 0\n", cpustat[i].interface);
-	}
-	if((received!=0)&&(received5!=0))
-	{
-		fprintf(file,"netloadin5[%s] %f\n", cpustat[i].interface, (float)((received-received5)/(now-time5)));
+		fprintf(file,"cpu[idle15] %f\n", (float)((cpu_idle-cpu_idle15)/(now-time15)));
 	}
 	else
 	{
-		fprintf(file,"netloadin5[%s] 0\n", cpustat[i].interface);
+		fprintf(file,"cpu[idle15] 0\n");
 	}
-	if((received!=0)&&(received15!=0))
+
+	if((cpu_user!=0)&&(cpu_user1!=0))
 	{
-		fprintf(file,"netloadin15[%s] %f\n", cpustat[i].interface, (float)((received-received15)/(now-time15)));
+		fprintf(file,"cpu[user1] %f\n", (float)((cpu_user-cpu_user1)/(now-time1)));
 	}
 	else
 	{
-		fprintf(file,"netloadin15[%s] 0\n", cpustat[i].interface);
+		fprintf(file,"cpu[user1] 0\n");
+	}
+	if((cpu_user!=0)&&(cpu_user5!=0))
+	{
+		fprintf(file,"cpu[user5] %f\n", (float)((cpu_user-cpu_user5)/(now-time5)));
+	}
+	else
+	{
+		fprintf(file,"cpu[user5] 0\n");
+	}
+	if((cpu_user!=0)&&(cpu_user15!=0))
+	{
+		fprintf(file,"cpu[user15] %f\n", (float)((cpu_user-cpu_user15)/(now-time15)));
+	}
+	else
+	{
+		fprintf(file,"cpu[user15] 0\n");
+	}
+
+	if((cpu_nice!=0)&&(cpu_nice1!=0))
+	{
+		fprintf(file,"cpu[nice1] %f\n", (float)((cpu_nice-cpu_nice1)/(now-time1)));
+	}
+	else
+	{
+		fprintf(file,"cpu[nice1] 0\n");
+	}
+	if((cpu_nice!=0)&&(cpu_nice5!=0))
+	{
+		fprintf(file,"cpu[nice5] %f\n", (float)((cpu_nice-cpu_nice5)/(now-time5)));
+	}
+	else
+	{
+		fprintf(file,"cpu[nice5] 0\n");
+	}
+	if((cpu_nice!=0)&&(cpu_nice15!=0))
+	{
+		fprintf(file,"cpu[nice15] %f\n", (float)((cpu_nice-cpu_nice15)/(now-time15)));
+	}
+	else
+	{
+		fprintf(file,"cpu[nice15] 0\n");
+	}
+
+	if((cpu_system!=0)&&(cpu_system1!=0))
+	{
+		fprintf(file,"cpu[system1] %f\n", (float)((cpu_system-cpu_system1)/(now-time1)));
+	}
+	else
+	{
+		fprintf(file,"cpu[system1] 0\n");
+	}
+	if((cpu_system!=0)&&(cpu_system5!=0))
+	{
+		fprintf(file,"cpu[system5] %f\n", (float)((cpu_system-cpu_system5)/(now-time5)));
+	}
+	else
+	{
+		fprintf(file,"cpu[system5] 0\n");
+	}
+	if((cpu_system!=0)&&(cpu_system15!=0))
+	{
+		fprintf(file,"cpu[system15] %f\n", (float)((cpu_system-cpu_system15)/(now-time15)));
+	}
+	else
+	{
+		fprintf(file,"cpu[system15] 0\n");
 	}
 }
 
 
-void	add_values_diskdevices(int now,float cpu_user,float cpu_system,float cpu_nice,float cpu_idle)
+void	add_values_cpustat(int now,float cpu_user,float cpu_system,float cpu_nice,float cpu_idle)
 {
 	int i;
 
@@ -207,7 +274,7 @@ void	add_values_diskdevices(int now,float cpu_user,float cpu_system,float cpu_ni
 	}
 }
 
-void	collect_stats_diskdevices(FILE *outfile)
+void	collect_stats_cpustat(FILE *outfile)
 {
 	FILE	*file;
 
