@@ -492,13 +492,29 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$USER_DETAILS["alias"]=DBget_field($result,0,1);
 			$USER_DETAILS["name"]=DBget_field($result,0,2);
 			$USER_DETAILS["surname"]=DBget_field($result,0,3);
+			return;
 		}
 
-		if(DBnum_rows($result)!=1)
-		{
-			echo "Try to contact Zabbix Administrator to get additional rights :-)\n";
-//			exit;
+                $sql="select u.userid,u.alias,u.name,u.surname from users u where u.alias='guest'";
+                $result=DBselect($sql);
+                if(DBnum_rows($result)==1)
+                {
+                        $USER_DETAILS["userid"]=DBget_field($result,0,0);
+                        $USER_DETAILS["alias"]=DBget_field($result,0,1);
+                        $USER_DETAILS["name"]=DBget_field($result,0,2);
+                        $USER_DETAILS["surname"]=DBget_field($result,0,3);
+			return;
 		}
+
+		if($page["file"]!="index.php")
+		{
+			echo "<meta http-equiv=\"refresh\" content=\"0; url=index.php\">";
+		}
+		show_special_header("Login",0,1,1);
+		show_error_message("Login name or password is incorrect");
+		insert_login_form();
+		show_footer();
+		exit;
 	}
 
 //	function	check_authorisation()
@@ -530,13 +546,23 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 //		}
 //	}
 
+	
 	# Header for HTML pages
 
 	function	show_header($title,$refresh,$nomenu)
 	{
+		show_special_header($title,$refresh,$nomenu,0);
+	}
+
+
+	function	show_special_header($title,$refresh,$nomenu,$noauth)
+	{
 		global $page;
 
-		check_authorisation();
+		if($noauth!=1)
+		{
+			check_authorisation();
+		}
 
 ?>
 	<!doctype html public "-//W3C//DTD HTML 3.2//EN">
@@ -2939,7 +2965,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<font face=\"Arial,Helvetica\" size=1>";
 		echo "<a href=\"http://zabbix.sourceforge.net\">ZABBIX</a> Copyright 2000,2001,2002 by <a href=\"mailto:alex@gobbo.caves.lv\">Alexei Vladishev</a>";
 		echo "</font>";
-		echo "</td></tr>";
+		echo "</td>";
+		echo "</tr>";
 		echo "</table>";
 		echo "</td>";
 		echo "</tr>";
