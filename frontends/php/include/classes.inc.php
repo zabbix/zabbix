@@ -330,12 +330,12 @@
 			$this->initColors();
 			$this->drawRectangle();
 			$this->drawHeader();
-			$this->checkPermissions();
 
 			if($this->num==0)
 			{
 				$this->noDataFound();
 			}
+			$this->checkPermissions();
 
 			$this->SelectData();
 
