@@ -6,6 +6,7 @@ AC_PROG_CC
 
 dnl Checks for libraries.
 AC_CHECK_LIB(snmp, main)
+AC_CHECK_LIB(crypto, main)
 AC_CHECK_LIB(socket, main)
 AC_CHECK_LIB(nsl, main)
 
