@@ -13,6 +13,7 @@ Hope this helps.
 
 Changes for 1.0beta5:
 
+ - fixed memory leak in main_alerter_loop(). Added DBfree_result(). (Alexei) 
  - fixed missing close of socket in case if connection to SMTP server
  is rejected (Alexei)
 
