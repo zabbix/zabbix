@@ -1,7 +1,6 @@
 1.0beta11:
 
  - check user permissions (how to make only one host accessible?)
- - optimise update_trigger_status_after_restart()
  - special item. (last-prev)/time  (Update of frontend required!)
  - mess with user groups when running under root
  - support for PREFIX/zabbix/etc (configuration files)
@@ -12,7 +11,6 @@ latest trigger (item type  = TRAPPER)
 
  - trigger expression for ON->OFF state
  - cannot use "." as key in trigger expressions
- - discuss prefixes diskfree>10K
  - show date in graps
  - time-navigation for graphs
  - preset time for graphs
