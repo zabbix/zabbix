@@ -202,7 +202,7 @@ CREATE TABLE hosts (
   port int(4) DEFAULT '0' NOT NULL,
   status int(4) DEFAULT '0' NOT NULL,
 # If status=UNREACHABLE, host will not be checked until  
-  disabled_until int(4) DEFAULT '0' NOT NULL,
+  disable_until int(4) DEFAULT '0' NOT NULL,
   PRIMARY KEY (hostid),
   KEY (status)
 );
