@@ -12,6 +12,8 @@
 #define ITEM_TYPE_ZABBIX 0
 #define ITEM_TYPE_SNMP   1
 
+#define	AGENTD_FORKS	10
+
 #define	SUCKER_FORKS	11
 #define	SUCKER_DELAY	30
 
