@@ -311,8 +311,8 @@ int	main()
 	daemon_init();
 
 	openlog("zabbix_alarmer",LOG_PID,LOG_USER);
-	ret=setlogmask(LOG_UPTO(LOG_DEBUG));
-//	ret=setlogmask(LOG_UPTO(LOG_WARNING));
+//	ret=setlogmask(LOG_UPTO(LOG_DEBUG));
+	ret=setlogmask(LOG_UPTO(LOG_WARNING));
 
 	syslog(LOG_WARNING, "zabbix_alarmer started");
 

@@ -76,7 +76,7 @@ insert into config (smtp_server,smtp_helo,smtp_email) values ('localhost','local
 --
 
 CREATE TABLE groups (
-  groupid		serial		NOT NULL,
+  groupid		serial,
   name			varchar(64)	DEFAULT '' NOT NULL,
   PRIMARY KEY (groupid)
 );
