@@ -59,12 +59,17 @@
 #define MAX_ALIAS_NAME        120
 #define MAX_COUNTER_NAME      (MAX_ALIAS_NAME-12)
 
+
+//
 // Performance Counter Indexes
-#define PCI_SYSTEM				2
-#define PCI_PROCESSOR			238
-#define PCI_PROCESSOR_TIME		6
+//
+
+#define PCI_SYSTEM				      2
+#define PCI_PROCESSOR			      238
+#define PCI_PROCESSOR_TIME		      6
 #define PCI_PROCESSOR_QUEUE_LENGTH	44
-#define PCI_SYSTEM_UP_TIME		674
+#define PCI_SYSTEM_UP_TIME		      674
+
 
 //
 // Application flags
@@ -129,6 +134,7 @@ struct PERFCOUNTER
 	DWORD pdhIndex;
 	char name[MAX_COUNTER_NAME + 1];
 };
+
 
 //
 // Subagent information structure

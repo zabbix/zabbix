@@ -82,9 +82,9 @@ void CollectorThread(void *)
       return;
    }
 
-   sprintf((char *) &counterPath, "\\%s(_Total)\\%s", GetCounterName(PCI_PROCESSOR), GetCounterName(PCI_PROCESSOR_TIME));
+   sprintf(counterPath,"\\%s(_Total)\\%s",GetCounterName(PCI_PROCESSOR),GetCounterName(PCI_PROCESSOR_TIME));
 
-   if ((status=PdhAddCounter(query,(char *) &counterPath, 0, &cntCpuUsage[0]))!=ERROR_SUCCESS)
+   if ((status=PdhAddCounter(query,counterPath, 0, &cntCpuUsage[0]))!=ERROR_SUCCESS)
    {
       WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"ss",
                (char *) &counterPath, GetPdhErrorText(status));
@@ -93,7 +93,7 @@ void CollectorThread(void *)
    }
    for(i=0;i<sysInfo.dwNumberOfProcessors;i++)
    {
-      sprintf((char *) &counterPath,"\\%s(%d)\\%s", GetCounterName(PCI_PROCESSOR), i, GetCounterName(PCI_PROCESSOR_TIME));
+      sprintf(counterPath,"\\%s(%d)\\%s", GetCounterName(PCI_PROCESSOR), i, GetCounterName(PCI_PROCESSOR_TIME));
       if ((status=PdhAddCounter(query,counterPath,0,&cntCpuUsage[i+1]))!=ERROR_SUCCESS)
       {
          WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"ss",
