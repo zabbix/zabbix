@@ -69,7 +69,7 @@
 		}
 		$map=$map."\n</map>";
 		echo $map;
-		echo "<IMG SRC=\"map.php?sysmapid=".$HTTP_GET_VARS["sysmapid"]." border=0 usemap=#links>";
+		echo "<IMG SRC=\"map.php?sysmapid=".$HTTP_GET_VARS["sysmapid"]."\" border=0 usemap=#links>";
 	}
 
 	echo "</TD>";
