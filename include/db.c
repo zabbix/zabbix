@@ -521,6 +521,28 @@ void update_triggers_status_to_unknown(int hostid,int clock)
 	return; 
 }
 
+void DBdelete_host(int hostid)
+{
+	int	i, itemid;
+	char	sql[MAX_STRING_LEN+1];
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBdelete_host(%d)", hostid);
+	sprintf(sql,"select itemid from items where hostid=%d", hostid);
+	result = DBselect(sql);
+
+	for(i=0;i<DBnum_rows(result);i++)
+	{
+		itemid=atoi(DBget_field(result,i,0));
+		DBdelete_item(itemid);
+	}
+	DBfree_result(result);
+
+	sprintf(sql,"delete hosts where hostid=%d", hostid);
+	DBexecute(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG,"End of DBdelete_host(%d)", hostid);
+}
+
 void DBupdate_triggers_status_after_restart(void)
 {
 	int	i;
