@@ -2548,7 +2548,7 @@ int    check_ldap(char *hostname, short port,int *value)
 	*value=1;
 	return	SYSINFO_RET_OK;
 }
-+#endif
+#endif
 
 
 /* 
