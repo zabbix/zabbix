@@ -337,11 +337,7 @@ int	evaluate(int *result,char *exp)
 		exp[l+1]='f';
 		exp[l+2]=' ';
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Expression2:[%s]", exp );
-
 		for(i=l+3;i<=r;i++) exp[i]=' ';
-
-		zabbix_log(LOG_LEVEL_DEBUG, "Expression3:[%s]", exp );
 
 		sprintf(res,exp,value);
 		strncpy(exp,res, MAX_STRING_LEN);
@@ -374,9 +370,9 @@ int	substitute_macros(char *exp)
 	int	r,l;
 	int	r1,l1;
 
-	zabbix_log(LOG_LEVEL_WARNING, "BEGIN substitute_macros" );
+	zabbix_log(LOG_LEVEL_DEBUG, "BEGIN substitute_macros" );
 
-	zabbix_log( LOG_LEVEL_WARNING, "Expression1:[%s]", exp );
+	zabbix_log( LOG_LEVEL_DEBUG, "Expression1:[%s]", exp );
 
 	while( find_char(exp,'{') != FAIL )
 	{
@@ -401,7 +397,7 @@ int	substitute_macros(char *exp)
 		} 
 		macro[r-l-1]=0;
 
-		zabbix_log( LOG_LEVEL_WARNING, "Macro:%s", macro );
+		zabbix_log( LOG_LEVEL_DEBUG, "Macro:%s", macro );
 
 		/* macro=="host:key.function(parameter)" */
 
@@ -413,7 +409,7 @@ int	substitute_macros(char *exp)
 		} 
 		host[r1]=0;
 
-		zabbix_log( LOG_LEVEL_WARNING, "Host:%s", host );
+		zabbix_log( LOG_LEVEL_DEBUG, "Host:%s", host );
 
 		r1=r1+1;
 		l1=find_char(macro+r1,'.');
@@ -424,7 +420,7 @@ int	substitute_macros(char *exp)
 		} 
 		key[l1]=0;
 
-		zabbix_log( LOG_LEVEL_WARNING, "Key:%s", key );
+		zabbix_log( LOG_LEVEL_DEBUG, "Key:%s", key );
 
 		l1=l1+r1+1;
 		r1=find_char(macro+l1,'(');
@@ -435,7 +431,7 @@ int	substitute_macros(char *exp)
 		} 
 		function[r1]=0;
 
-		zabbix_log( LOG_LEVEL_WARNING, "Function:%s", function );
+		zabbix_log( LOG_LEVEL_DEBUG, "Function:%s", function );
 
 		l1=l1+r1+1;
 		r1=find_char(macro+l1,')');
@@ -446,62 +442,38 @@ int	substitute_macros(char *exp)
 		} 
 		parameter[r1]=0;
 
-		zabbix_log( LOG_LEVEL_WARNING, "Parameter:%s", parameter );
-
-		zabbix_log( LOG_LEVEL_WARNING, "Before get_lastvalue()" );
-		zabbix_log( LOG_LEVEL_WARNING, "After get_lastvalue2(%s)", exp );
-		zabbix_log( LOG_LEVEL_WARNING, "After get_lastvalue3(%d)", l );
 		i=get_lastvalue(value,host,key,function,parameter);
-		zabbix_log( LOG_LEVEL_WARNING, "After get_lastvalue(%d)", i );
-		zabbix_log( LOG_LEVEL_WARNING, "Yo");
-
-		exp[l]='%';
+		zabbix_log( LOG_LEVEL_DEBUG, "Value3 [%s]", value );
+/*		exp[l]='%';
 		exp[l+1]='s';
 		exp[l+2]=' ';
 
-		zabbix_log( LOG_LEVEL_WARNING, "Expression2:[%s]", exp );
-		zabbix_log( LOG_LEVEL_WARNING, "Expression2:[%s]", exp );
-		zabbix_log( LOG_LEVEL_WARNING, "Expression2:[%s]", exp );
-		zabbix_log( LOG_LEVEL_WARNING, "Expression2:[%s]", exp );
-
 		for(i=l+3;i<=r;i++)
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "i [%d]", i );
 			exp[i]=' ';
-		}
-		zabbix_log( LOG_LEVEL_WARNING, "ZZZ" );
-		zabbix_log( LOG_LEVEL_WARNING, "ZZZ" );
-		zabbix_log( LOG_LEVEL_WARNING, "ZZZ" );
-		zabbix_log( LOG_LEVEL_WARNING, "ZZZ" );
-		zabbix_log( LOG_LEVEL_WARNING, "ZZZ" );
-		zabbix_log( LOG_LEVEL_WARNING, "ZZZ" );
+		}*/
 
 		j=0;
 		for(i=0;i<strlen(exp);i++)
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "i2 [%d]", i );
-			zabbix_log( LOG_LEVEL_WARNING, "j [%d]", j );
-			zabbix_log( LOG_LEVEL_WARNING, "exp [%s]", exp );
 			if( (i>=l+3) && (i<=r) )
 				continue;
 			exp[j]=exp[i];
 			if(i==l)
 				exp[j]='%';
 			if(i==l+1)
-				exp[j]='f';
+				exp[j]='s';
 			j++;
 		}
 		exp[j]=0;
 
-		zabbix_log( LOG_LEVEL_WARNING, "Expression3:[%s]", exp );
-
 		sprintf(res,exp,value);
 		strncpy(exp,res, MAX_STRING_LEN);
 /*		delete_spaces(exp); */
-		zabbix_log( LOG_LEVEL_WARNING, "Expression4:[%s]", exp );
+		zabbix_log( LOG_LEVEL_DEBUG, "Expression4:[%s]", exp );
 	}
 
-	zabbix_log( LOG_LEVEL_WARNING, "Result expression:%s", exp );
+	zabbix_log( LOG_LEVEL_DEBUG, "Result expression:%s", exp );
 
 	return SUCCEED;
 }
