@@ -10,6 +10,10 @@ the agent with a predefined API that can return values to suckerd (for both
 suckerd and agentd)
  - monitoring of log files
  - [10] Refresh stop ability. At least for graphs and triggers being selected.
+ - [10] IT Services. Show downtimes for weeks.
+ - [10] IT Services. User view, show algorithm.
+ - [10] BUG. When adding new service, service name is wrong.
+ - [10] IT Services. SLA for a period of time only (09:00-18:00)
 
 HP:
 
@@ -31,7 +35,7 @@ Vel viens wishlists ir pie "IT Services", pielikt pie
  - [5] Configuration of items/triggers. Add Select.
  - [7] SLA algorithm (A - 0%, B - 100% -> availability of AB = 50%)
  - [7] IT Service % must start at 01.01.20xx, not first day of the week
- - [7] ALARMS. Abality to select events by specifying date from/to.
+ - [7] ALARMS. Ability to select events by specifying date from/to.
  - [8] escalation (if trigger is ON 30 sec, send email to someone else)
  - [9] History of who and when changed trigger comment. As starting point: who and when
  did latest changes.
