@@ -86,7 +86,33 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			}
 		}
 		return	$ok;
-}
+	}
+
+	function	get_service_status_description($status)
+	{
+		$desc="-";
+		if($status==5)
+		{
+			$desc="Disaster";
+		}
+		elseif($status==4)
+		{
+			$desc="High";
+		}
+		elseif($status==3)
+		{
+			$desc="Average";
+		}
+		elseif($status==2)
+		{
+			$desc="Warning";
+		}
+		elseif($status==1)
+		{
+			$desc="Nothing serious";
+		}
+		return $desc;
+	}
 
 
 //	The hash has form <md5sum of triggerid>,<sum of priorities>
@@ -714,8 +740,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-			<a href="srv_status.php">
 <?
+				if(check_right("Service","R",0))
+				{
+					echo "<a href=\"srv_status.php\">";
+				}
 				if($page["file"]=="srv_status.php")
 				{
 					echo "<b>[IT SERVICES]</b></a>";
@@ -795,7 +824,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
 <?
-				if(check_right("Configuration of Zabbix","R",0))
+				if(check_right("Configuration of Zabbix","U",0))
 				{
 					echo "<a href=\"config.php\">";
 				}
@@ -813,7 +842,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
 			<font face="Arial,Helvetica" size=2>
 <?
-				if(check_right("User","R",0))
+				if(check_right("User","U",0))
 				{
 					echo "<a href=\"users.php\">";
 				}
@@ -832,7 +861,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
 			<font face="Arial,Helvetica" size=2>
 <?
-				if(check_right("Host","R",0))
+				if(check_right("Host","U",0))
 				{
 					echo "<a href=\"hosts.php\">";
 				}
@@ -850,7 +879,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
 			<font face="Arial,Helvetica" size=2>
 <?
-				if(check_right("Host","R",0))
+				if(check_right("Host","U",0))
 				{
 					echo "<a href=\"items.php\">";
 				}
@@ -868,7 +897,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
 <?
-				if(check_right("Host","R",0))
+				if(check_right("Host","U",0))
 				{
 					echo "<a href=\"triggers.php\">";
 				}
@@ -886,8 +915,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="sysmaps.php">
 <?
+				if(check_right("Network map","U",0))
+				{
+					echo "<a href=\"sysmaps.php\">";
+				}
 				if(	($page["file"]=="sysmaps.php")||
 					($page["file"]=="sysmap.php"))
 				{
@@ -902,8 +934,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="graphs.php">
 <?
+				if(check_right("Graph","U",0))
+				{
+					echo "<a href=\"graphs.php\">";
+				}
 				if(	($page["file"]=="graphs.php")||
 					($page["file"]=="graph.php"))
 				{
@@ -919,8 +954,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-			<a href="services.php">
 <?
+				if(check_right("Service","U",0))
+				{
+					echo "<a href=\"services.php\">";
+				}
 				if($page["file"]=="services.php")
 				{
 					echo "<b>[IT SERVICES]</b></a>";
@@ -2303,6 +2341,71 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		cr();
 	}
 
+	function	insert_time_navigator($itemid,$from,$period)
+	{
+		$sql="select min(clock),max(clock) from history where itemid=$itemid";
+		$result=DBselect($sql);
+
+		if(DBnum_rows($result) == 0)
+		{
+			$min=time(NULL);
+			$max=time(NULL);
+		}
+		else
+		{
+			$min=DBget_field($result,0,0);
+			$max=DBget_field($result,0,1);
+		}
+
+		$year_min=date("Y",$min);   
+		$year_max=date("Y",$max);
+
+		echo "<form method=\"post\" action=\"zzz.php\">";
+
+		echo "Year:";
+		echo "<select name=\"year\">";
+	        for($i=$year_min;$i<=$year_max;$i++)
+	        {
+	               	echo "<option value=\"$i\">$i";
+	        }
+		echo "</select>";
+
+		echo "Month:";
+		echo "<select name=\"month\">";
+	        for($i=1;$i<=12;$i++)
+	        {
+	               	echo "<option value=\"$i\">$i";
+	        }
+		echo "</select>";
+
+		echo "Day:";
+		echo "<select name=\"day\">";
+	        for($i=1;$i<=31;$i++)
+	        {
+	               	echo "<option value=\"$i\">$i";
+	        }
+		echo "</select>";
+
+		echo "Hour:";
+		echo "<select name=\"hour\">";
+	        for($i=1;$i<=24;$i++)
+	        {
+	               	echo "<option value=\"$i\">$i";
+	        }
+		echo "</select>";
+
+		echo "Period:";
+		echo "<select name=\"period\">";
+		echo "<option value=\"3600\">1 hour";
+		echo "<option value=\"10800\">3 hours";
+		echo "<option value=\"21600\">6 hours";
+		echo "</select>";
+
+		echo "<input type=\"submit\" name=\"action\" value=\"show\">";
+
+		echo "</form>";
+	}
+
 	# Show History Graph
 
 	function	show_history($itemid,$from,$period,$diff)
@@ -2341,8 +2444,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 		echo "</center>";
 		echo("<hr>");
+		insert_time_navigator($itemid,$period,$from);
+		echo("<hr>");
 
- 
 		echo "<center>";
 		echo "Period: ";
 		//  Start of --- 
@@ -2751,6 +2855,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<option value=\"Default permission\">Default permission";
 		echo "<option value=\"Graph\">Graph";
 		echo "<option value=\"Host\">Host";
+		echo "<option value=\"Service\">IT Service";
 		echo "<option value=\"Item\">Item";
 		echo "<option value=\"Network map\">Network map";
 		echo "<option value=\"Trigger comment\">Trigger's comment";

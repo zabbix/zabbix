@@ -58,7 +58,12 @@
 <?
 	if(!check_right("Host","R",0))
 	{
-		show_header($page["title"],$refresh,0);
+		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+		show_footer();
+		exit;
+	}
+	if(isset($hostid)&&!check_right("Host","R",$hostid))
+	{
 		show_table_header("<font color=\"AA0000\">No permissions !</font>");
 		show_footer();
 		exit;
