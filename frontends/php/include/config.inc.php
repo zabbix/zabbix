@@ -2345,9 +2345,16 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
 
-	function	add_link($sysmapid,$shostid1,$shostid2)
+	function	add_link($sysmapid,$shostid1,$shostid2,$triggerid)
 	{
-		$sql="insert into sysmaps_links (sysmapid,shostid1,shostid2) values ($sysmapid,$shostid1,$shostid2)";
+		if($triggerid == 0)
+		{
+			$sql="insert into sysmaps_links (sysmapid,shostid1,shostid2,triggerid) values ($sysmapid,$shostid1,$shostid2,NULL)";
+		}
+		else
+		{
+			$sql="insert into sysmaps_links (sysmapid,shostid1,shostid2,triggerid) values ($sysmapid,$shostid1,$shostid2,$triggerid)";
+		}
 		return	DBexecute($sql);
 	}
 

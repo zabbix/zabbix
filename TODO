@@ -4,7 +4,6 @@
  - add MRTG-like graphs + periodic recalculation of aggregate functions
  - why '-lsnmp' added to the agent's Makefile
  - add support for agent forwarding (proxy)
- - link map's line to a trigger
  - proofread Zabbix Manual  - Ted Rolle <ted@users.sourceforge.net>
  - add complete support for SNMP trapping
  - ability to add a library of  userwritten c-functions with dlopen/dlsym to
@@ -54,7 +53,6 @@ nu i massu matematicheskih mozhno - dlja super-advanced chuvakov:
 
 graphs:
 
- - 2000->2K
  - min value (0 or automatic)
  - customisation of font size
  - link items to show them in one graph (network in/out) 
@@ -166,14 +164,12 @@ I made changes to the PHP frontend and zabbix_sucker.c to enable the user to spe
 
  - mass-adding of actions
  - BUG. zabbix_sucker should accept parameter regardless of "\n" at the end of line 
- - update docs related to WIN32 agent
  - get rid of long select lists in user forms 
  - do not send notifications at certain periods of time. Do not monitor services at certain periods of time.
  - decrease number of TCP connections between server and agent
  - add triggers for all hosts at once
  - check Rickard's multithreaded agent
  - check new Mariusz patches
- - improve performance of Alarms and Alerts in PHP frontend
  - default user name for DB acess should be the same (root)
  - add support for downtimes, user availablity, etc
  - get rid of false warning messages (like unable to insert ...)
@@ -225,7 +221,6 @@ WIN32 Agent:
  - make links look different if something is already registered (as for medias,
    actions, etc)
  - update trigger status to UNKNOWN if cannot evaluate function 
- - when doing UserParameter do not return FAIL in case of timeout
 
  LATER:
 

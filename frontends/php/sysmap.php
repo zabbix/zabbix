@@ -34,7 +34,7 @@
 		}
 		if($HTTP_GET_VARS["register"]=="add link")
 		{
-			$result=add_link($HTTP_GET_VARS["sysmapid"],$HTTP_GET_VARS["shostid1"],$HTTP_GET_VARS["shostid2"]);
+			$result=add_link($HTTP_GET_VARS["sysmapid"],$HTTP_GET_VARS["shostid1"],$HTTP_GET_VARS["shostid2"],$HTTP_GET_VARS["triggerid"]);
 			show_messages($result,"Link added","Cannot add link");
 		}
 		if($HTTP_GET_VARS["register"]=="delete_link")
@@ -134,10 +134,11 @@
 	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TD WIDTH=10% NOSAVE><B>Host 1</B></TD>";
 	echo "<TD WIDTH=10% NOSAVE><B>Host 2</B></TD>";
+	echo "<TD><B>Link status indicator</B></TD>";
 	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
-	$result=DBselect("select linkid,shostid1,shostid2 from sysmaps_links where sysmapid=".$HTTP_GET_VARS["sysmapid"]." order by linkid");
+	$result=DBselect("select linkid,shostid1,shostid2,triggerid from sysmaps_links where sysmapid=".$HTTP_GET_VARS["sysmapid"]." order by linkid");
 	$col=0;
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
@@ -154,14 +155,30 @@
 		$linkid=DBget_field($result,$i,0);
 		$shostid1=DBget_field($result,$i,1);
 		$shostid2=DBget_field($result,$i,2);
+		$triggerid=DBget_field($result,$i,3);
 
 		$result1=DBselect("select label from sysmaps_hosts where shostid=$shostid1");
 		$label1=DBget_field($result1,0,0);
 		$result1=DBselect("select label from sysmaps_hosts where shostid=$shostid2");
 		$label2=DBget_field($result1,0,0);
 
+		if(isset($triggerid))
+		{
+			$trigger=get_trigger_by_triggerid($triggerid);
+			$description=$trigger["description"];
+			if( strstr($description,"%s"))
+			{
+				$description=expand_trigger_description($triggerid);
+			}
+		}
+		else
+		{
+			$description="-";
+		}
+
 		echo "<TD>$label1</TD>";
 		echo "<TD>$label2</TD>";
+		echo "<TD>$description</TD>";
 		echo "<TD><A HREF=\"sysmap.php?sysmapid=".$HTTP_GET_VARS["sysmapid"]."&register=delete_link&linkid=$linkid\">Delete</A></TD>";
 		echo "</TR>";
 	}
@@ -310,6 +327,24 @@
 			echo "<OPTION VALUE='$shostid_'>$label";
 		}
 		echo "</SELECT>";
+
+		show_table2_v_delimiter();
+		echo "Link status indicator";
+		show_table2_h_delimiter();
+	        $result=DBselect("select triggerid,description from triggers order by description");
+	        echo "<select class=\"biginput\" name=\"triggerid\" size=1>";
+		echo "<OPTION VALUE='0' SELECTED>-";
+	        for($i=0;$i<DBnum_rows($result);$i++)
+	        {
+	                $triggerid_=DBget_field($result,$i,0);
+	                $description_=DBget_field($result,$i,1);
+			if( strstr($description_,"%s"))
+			{
+				$description_=expand_trigger_description($triggerid_);
+			}
+			echo "<OPTION VALUE='$triggerid_'>$description_";
+	        }
+	        echo "</SELECT>";
 
 		show_table2_v_delimiter2();
 		echo "<input type=\"submit\" name=\"register\" value=\"add link\">";
