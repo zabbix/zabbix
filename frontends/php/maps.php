@@ -4,11 +4,11 @@
 	$page["file"] = "maps.php";
 
 	$nomenu=0;
-	if(isset($fullscreen))
+	if(isset($HTTP_GET_VARS["fullscreen"]))
 	{
 		$nomenu=1;
 	}
-	if(isset($sysmapid))
+	if(isset($HTTP_GET_VARS["sysmapid"]))
 	{
 		show_header($page["title"],30,$nomenu);
 	}
@@ -19,7 +19,7 @@
 ?>
 
 <?
-	if(isset($sysmapid)&&!check_right("Network map","R",$sysmapid))
+	if(isset($HTTP_GET_VARS["sysmapid"])&&!check_right("Network map","R",$HTTP_GET_VARS["sysmapid"]))
 	{
 		show_table_header("<font color=\"AA0000\">No permissions !</font>");
 		show_footer();
@@ -28,7 +28,7 @@
 ?>
 
 <?
-	if(!isset($fullscreen))
+	if(!isset($HTTP_GET_VARS["fullscreen"]))
 	{
 		show_table_header_begin();
 		echo "NETWORK MAPS";
@@ -51,7 +51,7 @@
 				echo "<b>[";
 			}
 			echo "<a href='maps.php?sysmapid=".$row["sysmapid"]."'>".$row["name"]."</a>";
-			if(isset($sysmapid) && ($sysmapid == $row["sysmapid"]) )
+			if(isset($HTTP_GET_VARS["sysmapid"]) && ($HTTP_GET_VARS["sysmapid"] == $row["sysmapid"]) )
 			{
 				echo "]</b>";
 			}
@@ -70,17 +70,17 @@
 ?>
 
 <?
-	if(isset($sysmapid))
+	if(isset($HTTP_GET_VARS["sysmapid"]))
 	{
-		$result=DBselect("select name from sysmaps where sysmapid=$sysmapid");
+		$result=DBselect("select name from sysmaps where sysmapid=".$HTTP_GET_VARS["sysmapid"]);
 		$map=DBget_field($result,0,0);
-		if(isset($fullscreen))
+		if(isset($HTTP_GET_VARS["fullscreen"]))
 		{
-			$map="<a href=\"maps.php?sysmapid=$sysmapid\">".$map."</a>";;
+			$map="<a href=\"maps.php?sysmapid=".$HTTP_GET_VARS["sysmapid"]."\">".$map."</a>";;
 		}
 		else
 		{
-			$map="<a href=\"maps.php?sysmapid=$sysmapid&fullscreen=1\">".$map."</a>";;
+			$map="<a href=\"maps.php?sysmapid=".$HTTP_GET_VARS["sysmapid"]."&fullscreen=1\">".$map."</a>";;
 		}
 	}
 	else
@@ -94,10 +94,10 @@
 	echo "<TR BGCOLOR=#EEEEEE>";
 	echo "<TR BGCOLOR=#DDDDDD>";
 	echo "<TD ALIGN=CENTER>";
-	if(isset($sysmapid))
+	if(isset($HTTP_GET_VARS["sysmapid"]))
 	{
 		$map="\n<map name=links>";
-		$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status from sysmaps_hosts sh,hosts h where sh.sysmapid=$sysmapid and h.hostid=sh.hostid");
+		$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status from sysmaps_hosts sh,hosts h where sh.sysmapid=".$HTTP_GET_VARS["sysmapid"]." and h.hostid=sh.hostid");
 		for($i=0;$i<DBnum_rows($result);$i++)
 		{
 			$host=DBget_field($result,$i,0);
@@ -116,7 +116,7 @@
 		}
 		$map=$map."\n</map>";
 		echo $map;
-		echo "<IMG SRC=\"map.php?noedit=1&sysmapid=$sysmapid\" border=0 usemap=#links>";
+		echo "<IMG SRC=\"map.php?noedit=1&sysmapid=".$HTTP_GET_VARS["sysmapid"]."\" border=0 usemap=#links>";
 	}
 	else
 	{

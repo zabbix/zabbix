@@ -4,8 +4,22 @@
 
 	include "include/config.inc.php";
 
-	$password=$HTTP_POST_VARS["password"];
-	$name=$HTTP_POST_VARS["name"];
+	if(isset($HTTP_POST_VARS["password"]))
+	{
+		$password=$HTTP_POST_VARS["password"];
+	}
+	else
+	{
+		unset($password);
+	}
+	if(isset($HTTP_POST_VARS["name"]))
+	{
+		$name=$HTTP_POST_VARS["name"];
+	}
+	else
+	{
+		unset($name);
+	}
 	if(isset($HTTP_POST_VARS["register"]))
 	{
 		$register=$HTTP_POST_VARS["register"];
