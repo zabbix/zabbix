@@ -45,6 +45,7 @@ int	stats_request=0;
 char	*CONFIG_HOST_ALLOWED=NULL;
 char	*CONFIG_PID_FILE=NULL;
 int	CONFIG_AGENTD_FORKS=AGENTD_FORKS;
+int	CONFIG_NOTIMEWAIT=0;
 int	CONFIG_LISTEN_PORT=10000;
 
 void	uninit(void)
@@ -237,6 +238,17 @@ void	process_config_file(void)
 		{
 			CONFIG_PID_FILE=strdup(value);
 		}
+		else if(strcmp(parameter,"NoTimeWait")==0)
+		{
+			i=atoi(value);
+			if( (i<0) || (i>1) )
+			{
+				syslog( LOG_CRIT, "Wrong value of NoTimeWait in line %d. Should be either 0 or 1.", lineno);
+				fclose(file);
+				exit(1);
+			}
+			CONFIG_NOTIMEWAIT=i;
+		}
 		else if(strcmp(parameter,"StartAgents")==0)
 		{
 			i=atoi(value);
@@ -334,9 +346,9 @@ int	check_security(int sockfd)
 	}
 	else
 	{
-		syslog( LOG_WARNING, "Error getpeername [%m]");
+/*		syslog( LOG_WARNING, "Error getpeername [%m]");
 		syslog( LOG_WARNING, "Connection rejected");
-		return FAIL;
+		return FAIL;*/
 	}
 	return	SUCCEED;
 }
@@ -392,11 +404,24 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 	int			sockfd;
 	struct sockaddr_in	serv_addr;
 
+	struct linger ling;
+
 	if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
 		syslog( LOG_CRIT, "Unable to create socket");
 		exit(1);
 	}
+
+	if(CONFIG_NOTIMEWAIT == 1)
+	{
+		ling.l_onoff=1;
+	        ling.l_linger=0;
+		if(setsockopt(sockfd,SOL_SOCKET,SO_LINGER,&ling,sizeof(ling))==-1)
+		{
+			syslog(LOG_WARNING, "Cannot setsockopt SO_LINGER [%m]");
+		}
+	}
+
 
 	bzero((char *) &serv_addr, sizeof(serv_addr));
 	serv_addr.sin_family      = AF_INET;
