@@ -1,8 +1,11 @@
 # Build rules
 
+INCLUDE = @MYSQL_INCLUDE@ @PGSQL_INCLUDE@
+LIBS    = @LIBS@ @MYSQL_LFLAGS@ @PGSQL_LFLAGS@
+
 all:
 
-	@CC@ -o zabbix_trapper @CFLAGS@ -ggdb -I /usr/include/postgresql -I /usr/include/mysql -I../../include  -L/usr/lib/mysql zabbix_trapper.c ../../include/db.c ../../include/functions.c ../../include/expression.c -Wall @LIBS@
+	@CC@ -o zabbix_trapper @CFLAGS@ $(INCLUDE) -I../../include  zabbix_trapper.c ../../include/db.c ../../include/functions.c ../../include/expression.c -Wall $(LIBS)
 
 clean:
 	rm -fv *.o 

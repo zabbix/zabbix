@@ -2,7 +2,7 @@
 
 all:
 
-	@CC@ -o zabbix_sender @CFLAGS@ -ggdb -I../../include zabbix_sender.c -Wall @LIBS@
+	@CC@ -o zabbix_sender @CFLAGS@ -I../../include zabbix_sender.c -Wall @LIBS@
 
 clean:
 	rm -fv *.o 
