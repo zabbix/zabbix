@@ -2673,6 +2673,20 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return $result;
 	}
 
+	function	update_user_groups($usrgrpid,$users)
+	{
+		$count=count($users);
+
+		$sql="delete from users_groups where usrgrpid=$usrgrpid";
+		DBexecute($sql);
+
+		for($i=0;$i<$count;$i++)
+		{
+			$sql="insert into users_groups (usrgrpid,userid) values ($usrgrpid,".$userid[$i].")";
+			DBexecute($sql);
+		}
+	}
+
 	function	update_host_groups($hostid,$groups)
 	{
 		$count=count($groups);
@@ -2687,6 +2701,38 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 	}
 
+	function	add_user_group($name,$users)
+	{
+		global	$ERROR_MSG;
+
+		if(!check_right("Host","A",0))
+		{
+			$ERROR_MSG="Insufficient permissions";
+			return 0;
+		}
+
+		$sql="select * from users_groups where name='$name'";
+		$result=DBexecute($sql);
+		if(DBnum_rows($result)>0)
+		{
+			$ERROR_MSG="Group '$name' already exists";
+			return 0;
+		}
+
+		$sql="insert into hosts_groups (name) values ('$name')";
+		$result=DBexecute($sql);
+		if(!$result)
+		{
+			return	$result;
+		}
+		
+		$usrgrpid=DBinsert_id($result,"hosts_groups","usrgrpid");
+
+		update_user_groups($usrgrpid,$users);
+
+		return $result;
+	}
+		
 	# Add Host definition
 
 	function	add_host($host,$port,$status,$useip,$ip,$host_templateid,$newgroup,$groups)
@@ -3713,14 +3759,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "User group";
 
 		show_table2_v_delimiter();
-/*		echo "<form method=\"get\" action=\"users.php\">";
+		echo "<form method=\"get\" action=\"users.php\">";
 		if(isset($usrgrpid))
 		{
-			echo "<input name=\"usrgrpid\" type=\"hidden\" value=\"$userid\" size=8>";
-		}*/
+			echo "<input name=\"usrgrpid\" type=\"hidden\" value=\"$usrgrpid\" size=8>";
+		}
 		echo "Group name";
 		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=20>";
+		echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=30>";
 
 		show_table2_v_delimiter();
 		echo "Users";
@@ -3752,6 +3798,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		show_table2_v_delimiter2();
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add group\">";
+		echo "</form>";
 		show_table2_header_end();
 	}
 
