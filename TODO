@@ -19,6 +19,7 @@ ZABBIX 1.1:
  - check SUSE 9.2 startup scripts. Parameter -u is misplaced.
  - get rid of limit of user defined parameters for agent
  - test everything on 64bit platforms:
+ - fix multiple maps on one screen
 
 TKOM:
 
