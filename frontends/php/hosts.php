@@ -399,15 +399,15 @@
 
 <?php
 	table_begin();
-	table_header(array(S_ID,S_HOST,S_IP,S_PORT,S_STATUS,S_ERROR,S_ACTIONS));
+	table_header(array(S_ID,S_HOST,S_IP,S_PORT,S_STATUS,S_AVAILABILITY,S_ERROR,S_ACTIONS));
 
 	if(isset($_GET["groupid"]))
 	{
-		$sql="select h.hostid,h.host,h.port,h.status,h.useip,h.ip,h.error from hosts h,hosts_groups hg where hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid order by h.host";
+		$sql="select h.hostid,h.host,h.port,h.status,h.useip,h.ip,h.error,h.available from hosts h,hosts_groups hg where hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid order by h.host";
 	}
 	else
 	{
-		$sql="select h.hostid,h.host,h.port,h.status,h.useip,h.ip,h.error from hosts h order by h.host";
+		$sql="select h.hostid,h.host,h.port,h.status,h.useip,h.ip,h.error,h.available from hosts h order by h.host";
 	}
 	$result=DBselect($sql);
 
@@ -458,6 +458,14 @@
 			else
 				$status=S_UNKNOWN;
 		}
+
+		if($row["available"] == HOST_AVAILABLE_TRUE)	
+			$available=array("value"=>S_AVAILABLE,"class"=>"off");
+		else if($row["available"] == HOST_AVAILABLE_FALSE)
+			$available=array("value"=>S_NOT_AVAILABLE,"class"=>"on");
+		else if($row["available"] == HOST_AVAILABLE_UNKNOWN)
+			$available=array("value"=>S_UNKNOWN,"class"=>"unknown");
+
 		if($row["error"] == "")
 		{
 			$error=array("value"=>"&nbsp;","class"=>"off");
@@ -494,6 +502,7 @@
 			$ip,
 			$row["port"],
 			$status,
+			$available,
 			$error,
 			$actions
 			),$col++);
