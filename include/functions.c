@@ -1184,7 +1184,6 @@ void	update_triggers(int itemid)
 		}
 
 /* Oprimise a little bit */
-/* Comment! */
 		prevvalue=DBget_prev_trigger_value(trigger.triggerid);
 
 		zabbix_log( LOG_LEVEL_DEBUG, "b trigger.value prevvalue [%d] [%d] [%d]", b, trigger.value, prevvalue);
