@@ -568,15 +568,18 @@ int	evaluate(int *result,char *exp)
 
 /* Translate {DATE}, {TIME} */
 /* Doesn't work yet */
-void	substitute_simple_macros(char *exp)
+void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 {
 	int	found = SUCCEED;
 	char	*s;
+	char	sql[MAX_STRING_LEN+1];
 	char	str[MAX_STRING_LEN+1];
 	char	tmp[MAX_STRING_LEN+1];
 
 	time_t  now;
 	struct  tm      *tm;
+
+	DB_RESULT *result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros [%s]",exp);
 
@@ -585,7 +588,32 @@ void	substitute_simple_macros(char *exp)
 		strncpy(str, exp, MAX_STRING_LEN);
 
 
-		if( (s = strstr(str,"{DATE}")) != NULL )
+		if( (s = strstr(str,"{HOSTNAME}")) != NULL )
+		{
+			sprintf(sql,"select distinct t.description,h.host from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid", trigger->triggerid);
+			result = DBselect(sql);
+
+			if(DBnum_rows(result) == 0)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				strncpy(tmp, "*UNKNOWN*", MAX_STRING_LEN);
+				DBfree_result(result);
+			}
+			else
+			{
+				strncpy(tmp,DBget_field(result,0,1), MAX_STRING_LEN);
+
+				DBfree_result(result);
+			}
+
+			s[0]=0;
+			strncpy(exp, str, MAX_STRING_LEN);
+			strncat(exp, tmp, MAX_STRING_LEN);
+			strncat(exp, s+strlen("{HOSTNAME}"), MAX_STRING_LEN);
+
+			found = SUCCEED;
+		}
+		else if( (s = strstr(str,"{DATE}")) != NULL )
 		{
 			now=time(NULL);
 			tm=localtime(&now);
@@ -623,7 +651,7 @@ void	substitute_simple_macros(char *exp)
 /*
  * Translate "{127.0.0.1:system[procload].last(0)}" to "1.34" 
  */
-int	substitute_macros(char *exp)
+int	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 {
 	char	res[MAX_STRING_LEN+1];
 	char	macro[MAX_STRING_LEN+1];
@@ -638,7 +666,7 @@ int	substitute_macros(char *exp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_macros([%s])",exp);
 
-	substitute_simple_macros(exp);
+	substitute_simple_macros(trigger, action, exp);
 
 	while( find_char(exp,'{') != FAIL )
 	{

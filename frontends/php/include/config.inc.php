@@ -1752,7 +1752,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		$result=DBselect($sql);
 		$row=DBfetch($result);
 
-		$description=str_replace("%s",$row["host"],$row["description"]);
+//		$description=str_replace("%s",$row["host"],$row["description"]);
+
+		$search=array("{HOSTNAME}");
+		$replace=array($row["host"]);
+		$description = str_replace($search, $replace,$row["description"]);
+
+		$description=stripslashes(htmlspecialchars($description));
 
 		return $description;
 	}
@@ -1959,12 +1965,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 		if( isset($linktrigger)&&($linktrigger=="on") )
 		{
-			$trigger=get_trigger_by_triggerid($triggerid);
-			$description=$trigger["description"];
-			if( strstr($description,"%s"))
-			{
+//			$trigger=get_trigger_by_triggerid($triggerid);
+//			$description=$trigger["description"];
+//			if( strstr($description,"%s"))
+//			{
 				$description=expand_trigger_description($triggerid);
-			}
+//			}
 			$description=addslashes($description);
 			$sql="insert into services (name,triggerid,status,algorithm,showsla,goodsla,sortorder) values ('$description',$triggerid,0,$algorithm,$showsla,$goodsla,$sortorder)";
 		}
@@ -4248,11 +4254,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			for($i=0;$i<DBnum_rows($result1);$i++)
 			{
 				$depid=DBget_field($result1,$i,0);
-				$depdescr=DBget_field($result1,$i,1);
-				if( strstr($depdescr,"%s"))
-				{
+//				$depdescr=DBget_field($result1,$i,1);
+//				if( strstr($depdescr,"%s"))
+//				{
 					$depdescr=expand_trigger_description($depid);
-				}
+//				}
 				echo "<OPTION VALUE=\"$depid\">$depdescr";
 			}
 			echo "</SELECT>";
@@ -4266,12 +4272,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			for($i=0;$i<DBnum_rows($result);$i++)
 			{
 				$depid=DBget_field($result,$i,0);
-				$depdescr=DBget_field($result,$i,1);
+//				$depdescr=DBget_field($result,$i,1);
 
-				if( strstr($depdescr,"%s"))
-				{
+//				if( strstr($depdescr,"%s"))
+//				{
 					$depdescr=expand_trigger_description($depid);
-				}
+//				}
 				echo "<OPTION VALUE=\"$depid\">$depdescr";
 			}
 			echo "</SELECT>";

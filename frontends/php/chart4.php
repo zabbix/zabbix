@@ -98,13 +98,13 @@
 	}
 
 
-	$trigger=get_trigger_by_triggerid($HTTP_GET_VARS["triggerid"]);
-	$str=$trigger["description"];
+//	$trigger=get_trigger_by_triggerid($HTTP_GET_VARS["triggerid"]);
+//	$str=$trigger["description"];
 
-	if( strstr($str,"%s"))
-	{
+//	if( strstr($str,"%s"))
+//	{
 		$str=expand_trigger_description($HTTP_GET_VARS["triggerid"]);
-	}
+//	}
 
 	$str=$str." (year ".date("Y").")";
 	$x=imagesx($im)/2-ImageFontWidth(4)*strlen($str)/2;

@@ -93,12 +93,12 @@
 		        if($col++%2 == 1)	{ echo "<TR BGCOLOR=#DDDDDD>"; }
 			else			{ echo "<TR BGCOLOR=#EEEEEE>"; }
 
-			$description=$row["description"];
+//			$description=$row["description"];
 
-			if( strstr($description,"%s"))
-			{
+//			if( strstr($description,"%s"))
+//			{
 				$description=expand_trigger_description($row["triggerid"]);
-			}
+//			}
 			echo "<TD><a href=\"alarms.php?triggerid=".$row["triggerid"]."\">$description</a></TD>";
 //			$description=rawurlencode($row["description"]);
 	

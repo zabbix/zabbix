@@ -123,12 +123,12 @@
 		$childs=get_num_of_service_childs($row["serviceid"]);
 		if(isset($row["triggerid"]))
 		{
-			$trigger=get_trigger_by_triggerid($row["triggerid"]);
-			$description=$trigger["description"];
-			if( strstr($description,"%s"))
-			{
+//			$trigger=get_trigger_by_triggerid($row["triggerid"]);
+//			$description=$trigger["description"];
+//			if( strstr($description,"%s"))
+//			{
 				$description=nbsp(expand_trigger_description($row["triggerid"]));
-			}
+//			}
 			$description="[<a href=\"alarms.php?triggerid=".$row["triggerid"]."\">TRIGGER</a>] $description";
 		}
 		else
@@ -173,12 +173,12 @@
 			{
 				if(does_service_depend_on_the_service($row["serviceid"],$row2["serviceid"]))
 				{
-					$trigger=get_trigger_by_triggerid($row2["triggerid"]);
-					$description=$trigger["description"];
-					if( strstr($description,"%s"))
-					{
+//					$trigger=get_trigger_by_triggerid($row2["triggerid"]);
+//					$description=$trigger["description"];
+//					if( strstr($description,"%s"))
+//					{
 						$description=nbsp(expand_trigger_description($row2["triggerid"]));
-					}
+//					}
 					echo "<li class=\"itservices\"><a href=\"alarms.php?triggerid=".$row2["triggerid"]."\">$description</a></li>";
 				}
 			}
