@@ -202,7 +202,7 @@
 
 		echo(")");
 
-		echo(" <b>Go&nbsp;Back:</b>&nbsp;(&nbsp;");
+		echo(" <b>Back:</b>&nbsp;(&nbsp;");
 
 		$day=24;
 		foreach(array(0,1,2,7,14) as $count){
