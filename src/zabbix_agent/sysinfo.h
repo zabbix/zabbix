@@ -22,79 +22,90 @@
 #define ZABBIX_SYSINFO_H
 
 /* #define TEST_PARAMETERS */
+
+#define	SYSINFO_RET_OK		0
+#define	SYSINFO_RET_FAIL	1
+#define	SYSINFO_RET_TIMEOUT	2
  
 void	process(char *command, char *value);
 
 void    add_user_parameter(char *key,char *command);
 void	test_parameters(void);
-double	getPROC(char *file,int lineno,int fieldno);
+int	getPROC(char *file,int lineno,int fieldno, double *value);
 
-double	BUFFERSMEM(void);
-double	CACHEDMEM(void);
-double	CKSUM(const char * filename);
-double	FILESIZE(const char * filename);
-double	DISKFREE(const char * mountPoint);
-double	DISKTOTAL(const char * mountPoint);
-double	DISKUSED(const char * mountPoint);
-double	DISK_IO(void);
-double	DISK_RIO(void);
-double	DISK_WIO(void);
-double	DISK_RBLK(void);
-double	DISK_WBLK(void);
-double	FREEMEM(void);
-double	INODE(const char * mountPoint);
-double	INODETOTAL(const char * mountPoint);
-double	KERNEL_MAXPROC(void);
-double	KERNEL_MAXFILES(void);
-double	NETLOADIN1(char *interface);
-double	NETLOADIN5(char *interface);
-double	NETLOADIN15(char *interface);
-double	NETLOADOUT1(char *interface);
-double	NETLOADOUT5(char *interface);
-double	NETLOADOUT15(char *interface);
-double	DISKREADOPS1(char *device);
-double	DISKREADOPS5(char *device);
-double	DISKREADOPS15(char *device);
-double	DISKREADBLKS1(char *device);
-double	DISKREADBLKS5(char *device);
-double	DISKREADBLKS15(char *device);
-double	DISKWRITEOPS1(char *device);
-double	DISKWRITEOPS5(char *device);
-double	DISKWRITEOPS15(char *device);
-double	DISKWRITEBLKS1(char *device);
-double	DISKWRITEBLKS5(char *device);
-double	DISKWRITEBLKS15(char *device);
-double	PING(void);
-double	SHAREDMEM(void);
-double	TOTALMEM(void);
-double	PROCCNT(const char *procname);
-double	PROCCOUNT(void);
-double	PROCLOAD(void);
-double	PROCLOAD5(void);
-double	PROCLOAD15(void);
-double	SENSOR_TEMP1(void);
-double	SENSOR_TEMP2(void);
-double	SENSOR_TEMP3(void);
-double	SWAPFREE(void);
-double	SWAPTOTAL(void);
-double	TCP_LISTEN(const char *porthex);
-double	UPTIME(void);
+int	BUFFERSMEM(const char *cmd, const char *parameter,double  *value);
+int	CACHEDMEM(const char *cmd, const char *parameter,double  *value);
+int	CKSUM(const char *cmd, const char *filename,double  *value);
+int	FILESIZE(const char *cmd, const char *filename,double  *value);
+int	DISKFREE(const char *cmd, const char *mountPoint,double  *value);
+int	DISKTOTAL(const char *cmd, const char *mountPoint,double  *value);
+int	DISKUSED(const char *cmd, const char *mountPoint,double  *value);
 
-double	EXECUTE(char *command);
-char	*EXECUTE_STR(char *command);
-char	*VERSION(void);
+int	DISK_IO(const char *cmd, const char *parameter,double  *value);
+int	DISK_RIO(const char *cmd, const char *parameter,double  *value);
+int	DISK_WIO(const char *cmd, const char *parameter,double  *value);
+int	DISK_RBLK(const char *cmd, const char *parameter,double  *value);
+int	DISK_WBLK(const char *cmd, const char *parameter,double  *value);
+int	FREEMEM(const char *cmd, const char *parameter,double  *value);
 
-double	CHECK_SERVICE(char *service);
-double	CHECK_SERVICE_PERF(char *service);
+int	INODE(const char *cmd, const char *mountPoint,double  *value);
+int	INODETOTAL(const char *cmd, const char *mountPoint,double  *value);
 
-double	CHECK_PORT(char *ip_and_port);
+int	KERNEL_MAXFILES(const char *cmd, const char *parameter,double  *value);
+int	KERNEL_MAXPROC(const char *cmd, const char *parameter,double  *value);
+int	NETLOADIN1(const char *cmd, const char *interface,double  *value);
+int	NETLOADIN5(const char *cmd, const char *interface,double  *value);
+int	NETLOADIN15(const char *cmd, const char *interface,double  *value);
+int	NETLOADOUT1(const char *cmd, const char *interface,double  *value);
+int	NETLOADOUT5(const char *cmd, const char *interface,double  *value);
+int	NETLOADOUT15(const char *cmd, const char *interface,double  *value);
+int	DISKREADOPS1(const char *cmd, const char *interface,double  *value);
+int	DISKREADOPS5(const char *cmd, const char *interface,double  *value);
+int	DISKREADOPS15(const char *cmd, const char *interface,double  *value);
+int	DISKREADBLKS1(const char *cmd, const char *interface,double  *value);
+int	DISKREADBLKS5(const char *cmd, const char *interface,double  *value);
+int	DISKREADBLKS15(const char *cmd, const char *interface,double  *value);
+int	DISKWRITEOPS1(const char *cmd, const char *interface,double  *value);
+int	DISKWRITEOPS5(const char *cmd, const char *interface,double  *value);
+int	DISKWRITEOPS15(const char *cmd, const char *interface,double  *value);
+int	DISKWRITEBLKS1(const char *cmd, const char *interface,double  *value);
+int	DISKWRITEBLKS5(const char *cmd, const char *interface,double  *value);
+int	DISKWRITEBLKS15(const char *cmd, const char *interface,double  *value);
+int	PING(const char *cmd, const char *parameter,double  *value);
+int	SHAREDMEM(const char *cmd, const char *parameter,double  *value);
+int	TOTALMEM(const char *cmd, const char *parameter,double  *value);
+int	PROCCNT(const char *cmd, const char *parameter,double  *value);
+int	PROCCOUNT(const char *cmd, const char *parameter,double  *value);
+int	PROCLOAD(const char *cmd, const char *parameter,double  *value);
+int	PROCLOAD5(const char *cmd, const char *parameter,double  *value);
+int	PROCLOAD15(const char *cmd, const char *parameter,double  *value);
+
+int	SENSOR_TEMP1(const char *cmd, const char *parameter,double  *value);
+int	SENSOR_TEMP2(const char *cmd, const char *parameter,double  *value);
+int	SENSOR_TEMP3(const char *cmd, const char *parameter,double  *value);
+
+int	SWAPFREE(const char *cmd, const char *parameter,double  *value);
+int	SWAPTOTAL(const char *cmd, const char *parameter,double  *value);
+int	UPTIME(const char *cmd, const char *parameter,double  *value);
+
+int	TCP_LISTEN(const char *cmd, const char *porthex,double  *value);
+
+int	EXECUTE(const char *cmd, const char *command,double  *value);
+int	EXECUTE_STR(const char *cmd, const char *command,char **value);
+int	VERSION(const char *cmd, const char *command,char **value);
+
+int	MD5SUM(const char *cmd, const char *filename, char **value);
+
+int	CHECK_SERVICE(const char *cmd, const char *service,double  *value);
+int	CHECK_SERVICE_PERF(const char *cmd, const char *service,double  *value);
+int	CHECK_PORT(const char *cmd, const char *ip_and_port,double  *value);
 
 #define COMMAND struct command_type
 COMMAND
 {
 	char	*key;
-	double   (*function)();
-        char    *(*function_str)();
+	int	(*function)();
+        int	(*function_str)();
 	char	*parameter;
 };
 

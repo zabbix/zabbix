@@ -204,10 +204,10 @@
 		cr();
 		echo "<TD WIDTH=5% align=center><B>History</B></TD>";
 		cr();
-		echo "<TD WIDTH=5% align=center><B>Trends</B></TD>";
-		cr();
-		echo "<TD WIDTH=5% align=center><B>Compare</B></TD>";
-		cr();
+//		echo "<TD WIDTH=5% align=center><B>Trends</B></TD>";
+//		cr();
+//		echo "<TD WIDTH=5% align=center><B>Compare</B></TD>";
+//		cr();
 		echo "</TR>";
 		cr();
 
@@ -304,13 +304,13 @@
 				"<td align=center><a href=\"history.php?action=showhistory&itemid=".$row["itemid"]."\">".S_GRAPH."</a></td>",
 				"<td align=center><a href=\"history.php?action=showvalues&period=3600&itemid=".$row["itemid"]."\">".S_HISTORY."</a></td>");
 
-			iif_echo($row["value_type"]==0,
-				"<td align=center><a href=\"trends.php?itemid=".$row["itemid"]."\">".S_TREND."</a></td>",
-				"<td align=center>-</td>");
+//			iif_echo($row["value_type"]==0,
+//				"<td align=center><a href=\"trends.php?itemid=".$row["itemid"]."\">".S_TREND."</a></td>",
+//				"<td align=center>-</td>");
 
-			iif_echo($row["value_type"]==0,
-				"<td align=center><a href=\"compare.php?itemid=".$row["itemid"]."\">".S_COMPARE."</a></td>",
-				"<td align=center>-</td>");
+//			iif_echo($row["value_type"]==0,
+//				"<td align=center><a href=\"compare.php?itemid=".$row["itemid"]."\">".S_COMPARE."</a></td>",
+//				"<td align=center>-</td>");
 
 			echo "</tr>";
 			cr();

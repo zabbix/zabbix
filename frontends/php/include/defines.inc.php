@@ -19,6 +19,17 @@
 **/
 ?>
 <?php
+	define("AUDIT_ACTION_ADD",		0);
+	define("AUDIT_ACTION_UPDATE",		1);
+	define("AUDIT_ACTION_DELETE",		2);
+	define("AUDIT_ACTION_LOGIN",		3);
+	define("AUDIT_ACTION_LOGOUT",		4);
+
+	define("AUDIT_RESOURCE_USER",		0);
+	define("AUDIT_RESOURCE_ZABBIX",		1);
+	define("AUDIT_RESOURCE_ZABBIX_CONFIG",	2);
+	define("AUDIT_RESOURCE_MEDIA_TYPE",	3);
+
 	define("HOST_STATUS_MONITORED",		0);
 	define("HOST_STATUS_NOT_MONITORED",	1);
 	define("HOST_STATUS_UNREACHABLE",	2);

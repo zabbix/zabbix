@@ -34,6 +34,22 @@ update items set formula="1073741824" where multiplier=3;
 
 update items set multiplier=1 where multiplier!=0;
 
+--
+-- Table structure for table 'audit'
+--
+
+CREATE TABLE audit (
+  auditid		int(4)		NOT NULL auto_increment,
+  userid		int(4)		DEFAULT '0' NOT NULL,
+  clock			int(4)		DEFAULT '0' NOT NULL,
+  action		int(4)		DEFAULT '0' NOT NULL,
+  resource		int(4)		DEFAULT '0' NOT NULL,
+  details		varchar(128)	DEFAULT '0' NOT NULL,
+  PRIMARY KEY (auditid),
+  UNIQUE (userid,clock),
+  KEY (clock)
+) type=InnoDB;
+
 insert into images values(1,1,"Hub",load_file("../data/images/Hub.png"));
 insert into images values(2,1,"Hub (small)",load_file("../data/images/Hub_small.png"));
 insert into images values(3,1,"Network",load_file("../data/images/Network.png"));
