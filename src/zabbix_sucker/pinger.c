@@ -51,6 +51,76 @@
 
 #include "pinger.h"
 
+
+int	process_ip(char *ip, char *value)
+{
+	char	sql[MAX_STRING_LEN+1];
+
+	DB_RESULT       *result;
+	DB_ITEM	item;
+	char	*s;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_ip()");
+
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts from items i,hosts h where h.status in (0,2) and h.hostid=i.hostid and h.ip='%s' and i.key_='icmpping' and i.status=%d and i.type=%d", ip, ITEM_STATUS_ACTIVE, ITEM_TYPE_SIMPLE);
+	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
+	result = DBselect(sql);
+
+	if(DBnum_rows(result) == 0)
+	{
+		DBfree_result(result);
+		return  FAIL;
+	}
+
+	item.itemid=atoi(DBget_field(result,0,0));
+	item.key=DBget_field(result,0,1);
+	item.host=DBget_field(result,0,2);
+	item.port=atoi(DBget_field(result,0,3));
+	item.delay=atoi(DBget_field(result,0,4));
+	item.description=DBget_field(result,0,5);
+	item.nextcheck=atoi(DBget_field(result,0,6));
+	item.type=atoi(DBget_field(result,0,7));
+	item.snmp_community=DBget_field(result,0,8);
+	item.snmp_oid=DBget_field(result,0,9);
+	item.useip=atoi(DBget_field(result,0,10));
+	item.ip=DBget_field(result,0,11);
+	item.history=atoi(DBget_field(result,0,12));
+	s=DBget_field(result,0,13);
+	if(s==NULL)
+	{
+		item.lastvalue_null=1;
+	}
+	else
+	{
+		item.lastvalue_null=0;
+		item.lastvalue_str=s;
+		item.lastvalue=atof(s);
+	}
+	s=DBget_field(result,0,14);
+	if(s==NULL)
+	{
+		item.prevvalue_null=1;
+	}
+	else
+	{
+		item.prevvalue_null=0;
+		item.prevvalue_str=s;
+		item.prevvalue=atof(s);
+	}
+	item.value_type=atoi(DBget_field(result,0,15));
+	item.trapper_hosts=DBget_field(result,0,16);
+
+	process_new_value(&item,value);
+
+	update_triggers(item.itemid);
+ 
+	DBfree_result(result);
+
+	return SUCCEED;
+}
+
+
+
 int create_host_file(void)
 {
 	char	sql[MAX_STRING_LEN+1];
@@ -72,23 +142,17 @@ int create_host_file(void)
 	}
 
 	now=time(NULL);
-	sprintf(sql,"select distinct h.useip,h.ip,h.host from hosts h,items i where i.hostid=h.hostid and (h.status=%d or (h.status=%d and h.disable_until<=%d)) and i.key_='icmpping' and i.type=%d and i.status=%d", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, ITEM_TYPE_SIMPLE, ITEM_STATUS_ACTIVE);
+	sprintf(sql,"select distinct h.ip from hosts h,items i where i.hostid=h.hostid and (h.status=%d or (h.status=%d and h.disable_until<=%d)) and i.key_='icmpping' and i.type=%d and i.status=%d and h.useip=1", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, ITEM_TYPE_SIMPLE, ITEM_STATUS_ACTIVE);
 	result = DBselect(sql);
 		
 	for(i=0;i<DBnum_rows(result);i++)
 	{
-		host.useip=atoi(DBget_field(result,i,0));
-		host.ip=DBget_field(result,i,1);
-		host.host=DBget_field(result,i,2);
+		host.ip=DBget_field(result,i,0);
+/*		host.host=DBget_field(result,i,2);*/
 
-		if(HOST_USE_IP == host.useip)
-		{
-			fprintf(f,"%s\n",host.ip);
-		}
-/*		else
-		{
-			fprintf(f,"%s\n",host.host);
-		}*/
+		fprintf(f,"%s\n",host.ip);
+
+		zabbix_log( LOG_LEVEL_DEBUG, "IP [%s]", host.ip);
 	}
 	DBfree_result(result);
 
@@ -101,22 +165,50 @@ int create_host_file(void)
 int	do_ping(void)
 {
 	FILE	*f;
-	static	char	c[MAX_STRING_LEN+1];
+	static	char	ip[MAX_STRING_LEN+1];
+	char	str[MAX_STRING_LEN+1];
+	char	*c;
+	int	alive;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In do_ping()");
 
-	f=popen("cat /tmp/zabbix_suckerd.pinger|/usr/sbin/fping|cut -f1 -d' '","r");
+	sprintf(str,"cat /tmp/zabbix_suckerd.pinger|%s",CONFIG_FPING_LOCATION);
+	
+	f=popen(str,"r");
 	if(f==0)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Cannot execute /usr/sbin/fping [%s]",
-			strerror(errno));
+		zabbix_log( LOG_LEVEL_ERR, "Cannot execute [%s] [%s]",
+			CONFIG_FPING_LOCATION, strerror(errno));
 		return FAIL;
 	}
 
-	while(NULL!=fgets(c,MAX_STRING_LEN,f))
+	while(NULL!=fgets(ip,MAX_STRING_LEN,f))
 	{
-		c[strlen(c)-1]=0;
-		zabbix_log( LOG_LEVEL_ERR, "Update [%s]", c);
+		ip[strlen(ip)-1]=0;
+		zabbix_log( LOG_LEVEL_DEBUG, "Update IP [%s]", ip);
+
+		if(strstr(ip,"alive") != NULL)
+		{
+			alive=1;
+		}
+		else
+		{
+			alive=0;
+		}
+		c=strstr(ip," ");
+		if(c != NULL)
+		{
+			*c=0;
+			zabbix_log( LOG_LEVEL_DEBUG, "IP [%s] alive [%d]", ip, alive);
+			if(0 == alive)
+			{
+				process_ip(ip,"0");
+			}
+			else
+			{
+				process_ip(ip,"1");
+			}
+		}
 	}
 
 	pclose(f);
