@@ -10,10 +10,10 @@
  - support for proc_cnt() under Solaris
  - improve screens (add maps, all in one table, etc)
  - improve graphs
+ - Graphs: change order of lines
 
  - links to Zabbix frontend in alert emails
  - user groups
- - Graphs: change order of lines
  - zabbix to write log to the item (for example: log when item becomes unsupported)
  - strings items for graphs
  - date&time in alert emails
