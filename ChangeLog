@@ -1,5 +1,6 @@
 Changes for 1.0beta9:
 
+ - support of '(' and ')' in item keys (Alexei)
  - fixed dark blue color for user-defined chart (Alexei)
  - removed DOS style EOL from RedHat startup scripts (Alexei)
  - IT service to be hard-linked when added (Alexei)
