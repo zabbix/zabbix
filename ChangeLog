@@ -1,5 +1,6 @@
 Changes for 1.0beta10:
 
+ - added support for zabbix[triggers_count] (Alexei)
  - added support for zabbix[items_unsupported_count] (Alexei)
  - support for memory[free] and memory[total] under Solaris (Alexei)
  - fixed compilation of the agent under FreeBSD (Alexei)
