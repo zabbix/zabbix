@@ -3347,9 +3347,21 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return $stat;
 	}
 
-	function	calculate_availability($triggerid)
+	// If $period_start=$period_end=0, then take maximum period
+	function	calculate_availability($triggerid,$period_start,$period_end)
 	{
-	        $result=DBselect("select count(*),min(clock),max(clock) from alarms where triggerid=$triggerid");
+		if(($period_start==0)&&($period_end==0))
+		{
+	        	$sql="select count(*),min(clock),max(clock) from alarms where triggerid=$triggerid";
+		}
+		else
+		{
+	        	$sql="select count(*),min(clock),max(clock) from alarms where triggerid=$triggerid and clock>=$period_start and clock<=$period_end";
+		}
+//		echo $sql,"<br>";
+
+		
+	        $result=DBselect($sql);
 		if(DBget_field($result,0,0)>0)
 		{
 			$min=DBget_field($result,0,1);
@@ -3357,11 +3369,25 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 		else
 		{
-			$max=time();
-			$min=$max-24*3600;
+			if(($period_start==0)&&($period_end==0))
+			{
+				$max=time();
+				$min=$max-24*3600;
+			}
+			else
+			{
+				$ret["true_time"]=0;
+				$ret["false_time"]=0;
+				$ret["unknown_time"]=0;
+				$ret["true"]=0;
+				$ret["false"]=0;
+				$ret["unknown"]=100;
+				return $ret;
+			}
 		}
 
 		$sql="select clock,value from alarms where triggerid=$triggerid and clock>=$min and clock<=$max";
+//		echo " $sql<br>";
 		$result=DBselect($sql);
 
 //		echo $sql,"<br>";
@@ -3372,7 +3398,10 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		$false_time=0;
 		$unknown_time=0;
 		$time=$min;
-		$max=time();
+		if(($period_start==0)&&($period_end==0))
+		{
+			$max=time();
+		}
 		for($i=0;$i<DBnum_rows($result);$i++)
 		{
 			$clock=DBget_field($result,$i,0);
