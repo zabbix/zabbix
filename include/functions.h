@@ -8,5 +8,6 @@ int	evaluate_PREV(float *Result,int ItemId,int Parameter);
 int	evaluate_DIFF(float *Result,int ItemId,int Parameter);
 int	evaluate_NODATA(float *Result,int ItemId,int Parameter);
 int	update_functions( int ItemId );
+void    update_triggers(int itemid);
 
 #endif
