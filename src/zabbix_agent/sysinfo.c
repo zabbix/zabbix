@@ -167,7 +167,9 @@ void	add_user_parameter(char *key,char *command)
 		{
 			commands[i].key=strdup(key);
 
-			commands[i].function=&EXECUTE;
+			commands[i].function=0;
+
+			commands[i].function_str=&EXECUTE_STR;
 
 			commands[i].parameter=strdup(command);
 
