@@ -1825,7 +1825,11 @@ void	forward_request(char *proxy,char *command,int port,char *value);
 }
 */
 
-double	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose)
+/* 
+ * 0 - NOT OK
+ * 1 - OK
+ * */
+int	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose)
 {
 	char	*haddr;
 	char	c[1024];
@@ -1887,7 +1891,11 @@ double	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose)
 	}
 }
 
-double	check_ssh(char	*hostname, short port)
+/* 
+ * 0 - NOT OK
+ * 1 - OK
+ * */
+int	check_ssh(char	*hostname, short port)
 {
 	char	*haddr;
 	char	c[MAX_STRING_LEN+1];
@@ -1965,6 +1973,15 @@ double	CHECK_SERVICE(char *service_and_ip_and_port)
 	char	ip[MAX_STRING_LEN+1];
 	char	port_str[MAX_STRING_LEN+1];
 
+	struct timeval t1,t2;
+	struct timezone tz1,tz2;
+
+	int	result;
+
+	long	exec_time;
+
+	gettimeofday(&t1,&tz1);
+
 	c=strchr(service_and_ip_and_port,',');
 	strncpy(service,service_and_ip_and_port,MAX_STRING_LEN);
 
@@ -2003,40 +2020,53 @@ double	CHECK_SERVICE(char *service_and_ip_and_port)
 	if(strcmp(service,"ssh") == 0)
 	{
 		if(port == 0)	port=22;
-		return	check_ssh(ip,port);
+		result=check_ssh(ip,port);
 	}
-	if(strcmp(service,"smtp") == 0)
+	else if(strcmp(service,"smtp") == 0)
 	{
 		if(port == 0)	port=25;
-		return	tcp_expect(ip,port,"220","QUIT\n");
+		result=tcp_expect(ip,port,"220","QUIT\n");
 	}
-	if(strcmp(service,"ftp") == 0)
+	else if(strcmp(service,"ftp") == 0)
 	{
 		if(port == 0)	port=21;
-		return	tcp_expect(ip,port,"220","");
+		result=tcp_expect(ip,port,"220","");
 	}
-	if(strcmp(service,"http") == 0)
+	else if(strcmp(service,"http") == 0)
 	{
 		if(port == 0)	port=80;
-		return	tcp_expect(ip,port,NULL,"");
+		result=tcp_expect(ip,port,NULL,"");
 	}
-	if(strcmp(service,"pop") == 0)
+	else if(strcmp(service,"pop") == 0)
 	{
 		if(port == 0)	port=110;
-		return	tcp_expect(ip,port,"+OK","");
+		result=tcp_expect(ip,port,"+OK","");
 	}
-	if(strcmp(service,"nntp") == 0)
+	else if(strcmp(service,"nntp") == 0)
 	{
 		if(port == 0)	port=119;
-		return	tcp_expect(ip,port,"220","");
+		result=tcp_expect(ip,port,"220","");
 	}
-	if(strcmp(service,"imap") == 0)
+	else if(strcmp(service,"imap") == 0)
 	{
 		if(port == 0)	port=143;
-		return	tcp_expect(ip,port,"* OK","a1 LOGOUT\n");
+		result=tcp_expect(ip,port,"* OK","a1 LOGOUT\n");
+	}
+	else
+	{
+		result=0;
 	}
 
-	return FAIL;
+	if(1 == result)
+	{
+		gettimeofday(&t2,&tz2);
+   		exec_time=(t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec);
+		return (double)exec_time/1000000;
+	}
+	else
+	{
+		return (double)result;
+	}
 }
 
 double	CHECK_PORT(char *ip_and_port)

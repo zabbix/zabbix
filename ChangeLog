@@ -1,5 +1,7 @@
 Changes for 1.0beta9:
 
+ - changes definition of check_service[*]. Now it returns number of seconds
+spent on service check. Tahns to Jürgen Schmitz. (Alexei)
  - fixed statistics of bounced interfaces (Alexei)
  - added support for zabbix[items], zabbix[history] (Alexei)
  - new item type: internal (Alexei)
