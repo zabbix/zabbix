@@ -30,7 +30,6 @@ int	evaluate_MIN(char *value,DB_ITEM	*item,int parameter)
 	DB_RESULT	*result;
 
 	char		sql[MAX_STRING_LEN+1];
-	char		*field;
 
 	int		now;
 
@@ -44,23 +43,14 @@ int	evaluate_MIN(char *value,DB_ITEM	*item,int parameter)
 	sprintf(sql,"select min(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
 
 	result = DBselect(sql);
-	if((result==NULL)||(DBnum_rows(result)==0))
+	if(DBis_empty(result) == SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for MIN is empty" );
 		DBfree_result(result);
 		return	FAIL;
 	}
 
-	field = DBget_field(result,0,0);
-	if( field == NULL )
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Result for MIN is empty" );
-		DBfree_result(result);
-		return	FAIL;
-	}
-
-/*	*value=strdup(field);*/
-	strncpy(value,field,MAX_STRING_LEN);
+	strncpy(value,DBget_field(result,0,0),MAX_STRING_LEN);
 
 	DBfree_result(result);
 
@@ -75,7 +65,6 @@ int	evaluate_MAX(char *value,DB_ITEM *item,int parameter)
 	DB_RESULT	*result;
 
 	char		sql[MAX_STRING_LEN+1];
-	char		*field;
 
 	int		now;
 
@@ -89,23 +78,14 @@ int	evaluate_MAX(char *value,DB_ITEM *item,int parameter)
 	sprintf(sql,"select max(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
 
 	result = DBselect(sql);
-	if((result==NULL)||(DBnum_rows(result)==0))
+	if(DBis_empty(result) == SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
 		DBfree_result(result);
 		return	FAIL;
 	}
-
-	field = DBget_field(result,0,0);
-	if( field == NULL )
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Result for MAX is empty" );
-		DBfree_result(result);
-		return	FAIL;
-	}
 	
-/*	*value=strdup(field);*/
-	strncpy(value,field,MAX_STRING_LEN);
+	strncpy(value,DBget_field(result,0,0),MAX_STRING_LEN);
 
 	DBfree_result(result);
 
@@ -223,21 +203,20 @@ void	update_functions(DB_ITEM *item)
 	char		sql[MAX_STRING_LEN+1];
 	char		value[MAX_STRING_LEN+1];
 	int		ret=SUCCEED;
-	int		i,rows;
+	int		i;
 
 	sprintf(sql,"select function,parameter,itemid from functions where itemid=%d group by 1,2,3 order by 1,2,3",item->itemid);
 
 	result = DBselect(sql);
-	rows=DBnum_rows(result);
 
-	if((result==NULL)||(rows==0))
+	if(DBis_empty(result) == SUCCEED)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "No functions to update.");
 		DBfree_result(result);
 		return;
 	}
 
-	for(i=0;i<rows;i++)
+	for(i=0;i<DBnum_rows(result);i++)
 	{
 		function.function=DBget_field(result,i,0);
 		function.parameter=atoi(DBget_field(result,i,1));
@@ -440,15 +419,20 @@ void	send_to_user(int actionid,int userid,char *smtp_server,char *smtp_helo,char
 	char sql[MAX_STRING_LEN+1];
 	DB_RESULT *result;
 
-	int	i,rows;
+	int	i;
 	int	now;
 
-	sprintf(sql,"select type,sendto,active from media where active=0 and userid=%d",userid);
+	sprintf(sql,"select type,sendto,active from media where active=%d and userid=%d",MEDIA_STATUS_ACTIVE,userid);
 	result = DBselect(sql);
 
-	rows=DBnum_rows(result);
+	if(DBis_empty(result) == SUCCEED)
+	{
+		zabbix_log( LOG_LEVEL_DEBUG, "No active media defined for this user.");
+		DBfree_result(result);
+		return;
+	}
 
-	for(i=0;i<rows;i++)
+	for(i=0;i<DBnum_rows(result);i++)
 	{
 		media.active=atoi(DBget_field(result,i,2));
 		media.type=DBget_field(result,i,0);
@@ -467,7 +451,7 @@ void	send_to_user(int actionid,int userid,char *smtp_server,char *smtp_helo,char
 		} 
 		else
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Type %s is not supported yet", media.type );
+			zabbix_log( LOG_LEVEL_WARNING, "Media type %s is not supported yet", media.type );
 		}
 	}
 	DBfree_result(result);
@@ -495,16 +479,18 @@ void	apply_actions(int triggerid,int good)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "Check dependencies");
 
-		sprintf(sql,"select count(*) from trigger_depends d,triggers t where d.triggerid_down=%d and d.triggerid_up=t.triggerid and t.istrue=1",triggerid);
+		sprintf(sql,"select count(*) from trigger_depends d,triggers t where d.triggerid_down=%d and d.triggerid_up=t.triggerid and t.istrue=%d",triggerid, TRIGGER_STATUS_TRUE);
 		result = DBselect(sql);
-		i=atoi(DBget_field(result,0,0));
-		zabbix_log( LOG_LEVEL_DEBUG, "I:%d",i);
-		DBfree_result(result);
-		if(i>0)
+		if(DBis_empty(result) == FAIL)
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Will not apply actions");
+			if(atoi(DBget_field(result,0,0))>0)
+			{
+				zabbix_log( LOG_LEVEL_DEBUG, "Will not apply actions");
+			}
+			DBfree_result(result);
 			return;
 		}
+		DBfree_result(result);
 	}
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Applying actions");
@@ -619,70 +605,70 @@ void	update_services(int triggerid, int istrue)
 */ 
 void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 {
-char sql[MAX_STRING_LEN+1];
-char exp[MAX_STRING_LEN+1];
-int b;
-DB_TRIGGER trigger;
-DB_RESULT *result;
+	char sql[MAX_STRING_LEN+1];
+	char exp[MAX_STRING_LEN+1];
+	int b;
+	DB_TRIGGER trigger;
+	DB_RESULT *result;
 
-int	i,rows;
-int	now;
+	int	i,rows;
+	int	now;
 
-if(flag == 0)
-{
-	now=time(NULL);
-/* Added table hosts to eliminate unnecessary update of triggers */
-	sprintf(sql,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f,items i,hosts h where i.hostid=h.hostid and i.status<>3 and i.itemid=f.itemid and i.lastclock<=%d and t.istrue!=2 and f.triggerid=t.triggerid and f.itemid%%%d=%d and (h.status=0 or (h.status=2 and h.disable_until<%d)) group by t.triggerid,t.expression,t.istrue,t.dep_level",lastclock,suckers-1,sucker_num-1,now);
-}
-else
-{
-	sprintf(sql,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.istrue!=2 and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.istrue,t.dep_level",sucker_num);
-}
-
-result = DBselect(sql);
-
-rows = DBnum_rows(result);
-
-if(rows == 0)
-{
-	zabbix_log( LOG_LEVEL_DEBUG, "No triggers to update" );
-	DBfree_result(result);
-	return;
-}
-for(i=0;i<rows;i++)
-{
-	zabbix_log( LOG_LEVEL_DEBUG, "Fetched: TrId[%s] Exp[%s] IsTrue[%s]\n", DBget_field(result,i,0),DBget_field(result,i,1),DBget_field(result,i,2));
-	trigger.triggerid=atoi(DBget_field(result,i,0));
-	trigger.expression=DBget_field(result,i,1);
-	trigger.istrue=atoi(DBget_field(result,i,2));
-	strncpy(exp, trigger.expression, MAX_STRING_LEN);
-	if( evaluate_expression(&b, exp) != 0 )
+	if(flag == 0)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Expression [%s] - SUX.",trigger.expression);
-		continue;
+		now=time(NULL);
+/* Added table hosts to eliminate unnecessary update of triggers */
+		sprintf(sql,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f,items i,hosts h where i.hostid=h.hostid and i.status<>3 and i.itemid=f.itemid and i.lastclock<=%d and t.istrue!=2 and f.triggerid=t.triggerid and f.itemid%%%d=%d and (h.status=0 or (h.status=2 and h.disable_until<%d)) group by t.triggerid,t.expression,t.istrue,t.dep_level",lastclock,suckers-1,sucker_num-1,now);
+	}
+	else
+	{
+		sprintf(sql,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.istrue!=2 and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.istrue,t.dep_level",sucker_num);
 	}
 
-	if(b==1)
+	result = DBselect(sql);
+
+	rows = DBnum_rows(result);
+
+	if(rows == 0)
 	{
-		if(trigger.istrue!=TRIGGER_STATUS_TRUE)
+		zabbix_log( LOG_LEVEL_DEBUG, "No triggers to update" );
+		DBfree_result(result);
+		return;
+	}
+	for(i=0;i<rows;i++)
+	{
+		zabbix_log( LOG_LEVEL_DEBUG, "Fetched: TrId[%s] Exp[%s] IsTrue[%s]\n", DBget_field(result,i,0),DBget_field(result,i,1),DBget_field(result,i,2));
+		trigger.triggerid=atoi(DBget_field(result,i,0));
+		trigger.expression=DBget_field(result,i,1);
+		trigger.istrue=atoi(DBget_field(result,i,2));
+		strncpy(exp, trigger.expression, MAX_STRING_LEN);
+		if( evaluate_expression(&b, exp) != 0 )
 		{
-			now = time(NULL);
-			sprintf(sql,"update triggers set istrue=%d, lastchange=%d where triggerid=%d",TRIGGER_STATUS_TRUE,now,trigger.triggerid);
-			DBexecute(sql);
-
-			now = time(NULL);
-			sprintf(sql,"insert into alarms(triggerid,clock,istrue) values(%d,%d,%d)",trigger.triggerid,now,TRIGGER_STATUS_TRUE);
-			DBexecute(sql);
+			zabbix_log( LOG_LEVEL_WARNING, "Expression [%s] - SUX.",trigger.expression);
+			continue;
 		}
-		if(trigger.istrue==TRIGGER_STATUS_FALSE)
+
+		if(b==1)
 		{
-			now = time(NULL);
-			apply_actions(trigger.triggerid,1);
+			if(trigger.istrue!=TRIGGER_STATUS_TRUE)
+			{
+				now = time(NULL);
+				sprintf(sql,"update triggers set istrue=%d, lastchange=%d where triggerid=%d",TRIGGER_STATUS_TRUE,now,trigger.triggerid);
+				DBexecute(sql);
+	
+				now = time(NULL);
+				sprintf(sql,"insert into alarms(triggerid,clock,istrue) values(%d,%d,%d)",trigger.triggerid,now,TRIGGER_STATUS_TRUE);
+				DBexecute(sql);
+			}
+			if(trigger.istrue==TRIGGER_STATUS_FALSE)
+			{
+				now = time(NULL);
+				apply_actions(trigger.triggerid,1);
+	
+				sprintf(sql,"update actions set nextcheck=0 where triggerid=%d and good=0",trigger.triggerid);
+				DBexecute(sql);
 
-			sprintf(sql,"update actions set nextcheck=0 where triggerid=%d and good=0",trigger.triggerid);
-			DBexecute(sql);
-
-			update_services(trigger.triggerid, 1);
+				update_services(trigger.triggerid, 1);
 			}
 		}
 
@@ -722,7 +708,6 @@ int	get_lastvalue(char *value,char *host,char *key,char *function,char *paramete
 	DB_RESULT *result;
 
         char	sql[MAX_STRING_LEN+1];
-        int	rows;
 	int	parm;
 	char	*s;
 	int	res;
@@ -731,9 +716,8 @@ int	get_lastvalue(char *value,char *host,char *key,char *function,char *paramete
 
 	sprintf(sql, "select i.itemid,i.prevvalue,i.lastvalue,i.value_type from items i,hosts h where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", host, key );
 	result = DBselect(sql);
-        rows = DBnum_rows(result);
 
-	if((result == NULL)||(rows==0))
+	if(DBis_empty(result) == SUCCEED)
 	{
         	DBfree_result(result);
 		zabbix_log(LOG_LEVEL_WARNING, "Query [%s] returned empty result" );
@@ -790,18 +774,7 @@ int	process_data(char *server,char *key,char *value)
 	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type from items i,hosts h where h.status in (0,2) and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d", server, key, ITEM_TYPE_TRAPPER);
 	result = DBselect(sql);
 
-	if(result==NULL)
-	{
-		DBfree_result(result);
-		return  FAIL;
-	}
-	if(DBnum_rows(result)==0)
-	{
-		DBfree_result(result);
-		return  FAIL;
-	}
-
-	if( DBget_field(result,0,0) == NULL )
+	if(DBis_empty(result) == SUCCEED)
 	{
 		DBfree_result(result);
 		return  FAIL;
