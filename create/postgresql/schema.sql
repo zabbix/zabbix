@@ -64,7 +64,7 @@ CREATE TABLE config (
   smtp_server		varchar(255)	DEFAULT '' NOT NULL,
   smtp_helo		varchar(255)	DEFAULT '' NOT NULL,
   smtp_email		varchar(255)	DEFAULT '' NOT NULL,
-  password_required	bool		DEFAULT '0' NOT NULL
+  password_required	int4		DEFAULT '0' NOT NULL
 );
 
 insert into config (smtp_server,smtp_helo,smtp_email) values ('localhost','localhost','zabbix@localhost');
@@ -148,6 +148,7 @@ CREATE TABLE alerts (
   sendto		varchar(100)	DEFAULT '' NOT NULL,
   subject		varchar(255)	DEFAULT '' NOT NULL,
   message		varchar(255)	DEFAULT '' NOT NULL,
+  PRIMARY KEY (alertid),
   FOREIGN KEY (actionid) REFERENCES actions
 );
 
@@ -163,7 +164,8 @@ CREATE TABLE alarms (
   triggerid		int4		DEFAULT '0' NOT NULL,
   clock			int4		DEFAULT '0' NOT NULL,
   istrue		int4		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (alarmid)
+  PRIMARY KEY (alarmid),
+  FOREIGN KEY (triggerid) REFERENCES triggers
 );
 
 --
@@ -194,7 +196,8 @@ CREATE TABLE history (
   itemid		int4		DEFAULT '0' NOT NULL,
   clock			int4		DEFAULT '0' NOT NULL,
   value			float8		DEFAULT '0.0000' NOT NULL,
-  PRIMARY KEY (itemid,clock)
+  PRIMARY KEY (itemid,clock),
+  FOREIGN KEY (itemid) REFERENCES items
 );
 
 
@@ -208,7 +211,8 @@ CREATE TABLE items_template (
   description		varchar(255)	DEFAULT '' NOT NULL,
   key_			varchar(64)	DEFAULT '' NOT NULL,
   delay			int4		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (itemtemplateid)
+  PRIMARY KEY (itemtemplateid),
+  FOREIGN KEY (platformid) REFERENCES platforms
 );
 
 CREATE UNIQUE INDEX items_template_p_k on items_template (platformid, key_);
