@@ -9,8 +9,9 @@
 #include <signal.h>
 #include <time.h>
 
+#include <syslog.h>
+
 #include "common.h"
-#include "debug.h"
 #include "expression.h"
 #include "db.h"
 
@@ -53,7 +54,7 @@ void	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	struct sockaddr_in myaddr_in;
 	struct sockaddr_in servaddr_in;
 
-	dbg_write( dbg_proginfo, "SENDING MAIL");
+	syslog( LOG_DEBUG, "SENDING MAIL");
 
 	servaddr_in.sin_family=AF_INET;
 	hp=gethostbyname(smtp_server);
@@ -145,7 +146,7 @@ void	send_to_user(int actionid,int userid,char *smtp_server,char *smtp_helo,char
 	while ( (row = DBfetch_row(result)) )
 	{
 		media.active=atoi(row[2]);
-		dbg_write( dbg_proginfo, "ACTIVE=%d or %s\n", media.active, row[2] );
+		syslog( LOG_DEBUG, "ACTIVE=%d or %s\n", media.active, row[2] );
 		if(media.active!=1) // If media is enabled (active)
 		{
 			media.type=row[0];
@@ -153,14 +154,14 @@ void	send_to_user(int actionid,int userid,char *smtp_server,char *smtp_helo,char
 
 			if(strcmp(media.type,"EMAIL")==0)
 			{
-				dbg_write( dbg_proginfo, "Email sending to %s %s Subject:%s Message:%s to %d\n", media.type, media.sendto, subject, message, userid );
+				syslog( LOG_DEBUG, "Email sending to %s %s Subject:%s Message:%s to %d\n", media.type, media.sendto, subject, message, userid );
 				send_mail(smtp_server,smtp_helo,smtp_email,media.sendto,subject,message);
 				sprintf(c,"insert into alerts (alertid,actionid,clock,type,sendto,subject,message) values (NULL,%d,unix_timestamp(),'%s','%s','%s','%s');",actionid,media.type,media.sendto,subject,message);
 				DBexecute(c);
 			} 
 			else
 			{
-				dbg_write( dbg_syserr, "Type %s is not supported yet", media.type );
+				syslog( LOG_WARNING, "Type %s is not supported yet", media.type );
 			}
 		}
 	}
@@ -181,7 +182,7 @@ void	apply_actions(int triggerid,int good)
 		smtp_helo[256],
 		smtp_email[256];
 
-	dbg_write( dbg_syswarn, "Applying actions");
+	syslog( LOG_DEBUG, "Applying actions");
 
 	/* Get smtp_server and smtp_helo from config */
 	sprintf(c,"select smtp_server,smtp_helo,smtp_email from config");
@@ -203,7 +204,7 @@ void	apply_actions(int triggerid,int good)
 
 	while ( (row = DBfetch_row(result)) )
 	{
-		dbg_write( dbg_proginfo, "Fetched:%s %s %s %s %s\n",row[0],row[1],row[2],row[3],row[4]);
+		syslog( LOG_DEBUG, "Fetched:%s %s %s %s %s\n",row[0],row[1],row[2],row[3],row[4]);
 
 		action.actionid=atoi(row[0]);
 		action.userid=atoi(row[1]);
@@ -211,14 +212,14 @@ void	apply_actions(int triggerid,int good)
 		action.subject=row[3];
 		action.message=row[4];
 
-		substitute_functions(&*action.message);
-		substitute_functions(&*action.subject); 
+//		substitute_functions(&*action.message);
+//		substitute_functions(&*action.subject); 
 
 		send_to_user(action.actionid,action.userid,smtp_server,smtp_helo,smtp_email,action.subject,action.message);
 		sprintf(c,"update actions set nextcheck=unix_timestamp()+%d where actionid=%d",action.delay,action.actionid);
 		DBexecute(c);
 	}
-	dbg_write( dbg_proginfo, "Actions applied for trigger %d %d\n", triggerid, good );
+	syslog( LOG_DEBUG, "Actions applied for trigger %d %d\n", triggerid, good );
 	DBfree_result(result);
 }
 
@@ -239,21 +240,21 @@ void	update_triggers(void)
 
 	if(DBnum_rows(result)==0)
 	{
-		dbg_write( dbg_proginfo, "Zero, so returning..." );
+		syslog( LOG_DEBUG, "Zero, so returning..." );
 
 		DBfree_result(result);
 		return;
 	} 
 	while ( (row = DBfetch_row(result)) )
 	{
-		dbg_write( dbg_proginfo, "Fetched: TrId[%s] Exp[%s] IsTrue[%s]\n", row[0], row[1], row[2] );
+		syslog( LOG_DEBUG, "Fetched: TrId[%s] Exp[%s] IsTrue[%s]\n", row[0], row[1], row[2] );
 		trigger.triggerid=atoi(row[0]);
 		trigger.expression=row[1];
 		trigger.istrue=atoi(row[2]);
 		strcpy(exp, trigger.expression);
 		if( evaluate_expression(&b, exp) != 0 )
 		{
-			dbg_write( dbg_syswarn, "Expression %s - SUX.",trigger.expression);
+			syslog( LOG_WARNING, "Expression %s - SUX.",trigger.expression);
 			continue;
 		}
 
@@ -295,12 +296,16 @@ void	update_triggers(void)
 
 int	main()
 {
-	time_t now,diff;
+	time_t	now,diff;
+	int 	ret;
 
 	daemon_init();
 
-	dbg_init( dbg_syswarn, "/var/log/zabbix_alarmer.log" );
-//	dbg_init( dbg_proginfo, "/var/log/zabbix_alarmer.log" );
+	openlog("zabbix_alarmer",LOG_PID,LOG_USER);
+//	ret=setlogmask(LOG_UPTO(LOG_DEBUG));
+	ret=setlogmask(LOG_UPTO(LOG_WARNING));
+
+	syslog(LOG_WARNING, "zabbix_alarmer started");
 
 	DBconnect();
 
@@ -309,12 +314,12 @@ int	main()
 		now=time(NULL);
 		update_triggers();
 		diff=time(NULL)-now;
-		dbg_write( dbg_proginfo, "Spent %d seconds while updating triggers", diff );
+		syslog( LOG_DEBUG, "Spent %d seconds while updating triggers", diff );
 		if( diff<ALARMER_DELAY )
 		{
 			if( diff>=0 )
 			{
-				dbg_write( dbg_proginfo, "Sleeping for %d seconds", ALARMER_DELAY-diff );
+				syslog( LOG_DEBUG, "Sleeping for %d seconds", ALARMER_DELAY-diff );
 				sleep(ALARMER_DELAY-diff);
 			}
 		}

@@ -108,6 +108,21 @@
 </table></center>
 
 <?
+
+	if(isset($actionid))
+	{
+		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message from actions a where a.actionid=$actionid";
+		$result=mysql_query($sql,$mysql);
+
+		$row=mysql_fetch_row($result);
+
+		$actionid=$row[0];
+		$triggerid=$row[1];
+		$good=$row[2];
+		$delay=$row[3];
+		$subject=$row[4];
+		$message=$row[5];
+	}
 	echo "<br>";
 	show_table2_header_begin();
 	echo "New action";
@@ -115,7 +130,7 @@
 	show_table2_v_delimiter();
 	echo "<form method=\"post\" action=\"actions.html\">";
 	echo "<input name=\"triggerid\" type=\"hidden\" value=$triggerid>";
-	echo "<input name=\"actionid\" type=\"hidden\" value=$sactid>";
+	echo "<input name=\"actionid\" type=\"hidden\" value=$actionid>";
 	echo "Send to";
 	show_table2_h_delimiter();
 	echo "<SELECT NAME=\"userid\" SIZE=\"1\">";
@@ -141,24 +156,24 @@
 	echo "When trigger becomes";
 	show_table2_h_delimiter();
 	echo "<select name=\"good\" size=1>";
-	echo "<OPTION VALUE=\"1\""; if($sgood=="ON") echo "SELECTED"; echo ">ON";
-	echo "<OPTION VALUE=\"0\""; if($sgood=="OFF") echo "SELECTED"; echo ">OFF";
+	echo "<OPTION VALUE=\"1\""; if($good==1) echo "SELECTED"; echo ">ON";
+	echo "<OPTION VALUE=\"0\""; if($good==0) echo "SELECTED"; echo ">OFF";
 	echo "</SELECT>";
 
 	show_table2_v_delimiter();
 	echo "Delay";
 	show_table2_h_delimiter();
-	echo "<input name=\"delay\" value=\"300\" size=5>";
+	echo "<input name=\"delay\" value=\"$delay\" size=5>";
 
 	show_table2_v_delimiter();
 	echo "Subject";
 	show_table2_h_delimiter();
-	echo "<input name=\"subject\" size=50>";
+	echo "<input name=\"subject\" value=\"$subject\" size=50>";
 
 	show_table2_v_delimiter();
 	echo "Message";
 	show_table2_h_delimiter();
-	echo "<input name=\"message\" size=50>";
+	echo "<input name=\"message\" value=\"$message\" size=50>";
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
