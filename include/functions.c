@@ -833,8 +833,9 @@ void	send_to_user(DB_TRIGGER *trigger,DB_ACTION *action)
 
 /*
  * Translate all %s to host names
- */ 
-void	substitute_hostname(int triggerid,char *s)
+ */
+/* Not required anymore. Replaced by substitute_simple_macros */
+/*void	substitute_hostname(int triggerid,char *s)
 {
 	char tmp[MAX_STRING_LEN+1];	
 	char sql[MAX_STRING_LEN+1];
@@ -859,7 +860,7 @@ void	substitute_hostname(int triggerid,char *s)
 		DBfree_result(result);
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "End of substitute_hostname() Result [%s]",s);
-}
+}*/
 
 /*
  * Apply actions if any.
@@ -920,11 +921,11 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 
 		if(ACTION_SCOPE_TRIGGER==action.scope)
 		{
-			substitute_hostname(trigger->triggerid,action.message);
-			substitute_hostname(trigger->triggerid,action.subject);
+/*			substitute_hostname(trigger->triggerid,action.message);
+			substitute_hostname(trigger->triggerid,action.subject);*/
 
-			substitute_macros(action.message);
-			substitute_macros(action.subject);
+			substitute_macros(trigger, &action, action.message);
+			substitute_macros(trigger, &action, action.subject);
 		}
 		else if(ACTION_SCOPE_HOST==action.scope)
 		{
@@ -952,8 +953,8 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 			}
 			strncpy(action.message,action.subject,MAX_STRING_LEN);
 
-			substitute_hostname(trigger->triggerid,action.message);
-			substitute_hostname(trigger->triggerid,action.subject);
+/*			substitute_hostname(trigger->triggerid,action.message);
+			substitute_hostname(trigger->triggerid,action.subject);*/
 		}
 		else if(ACTION_SCOPE_HOSTS==action.scope)
 		{
@@ -974,8 +975,8 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 			}
 			strncpy(action.message,action.subject,MAX_STRING_LEN);
 
-			substitute_hostname(trigger->triggerid,action.message);
-			substitute_hostname(trigger->triggerid,action.subject);
+/*			substitute_hostname(trigger->triggerid,action.message);
+			substitute_hostname(trigger->triggerid,action.subject);*/
 		}
 		else
 		{

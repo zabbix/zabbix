@@ -24,7 +24,7 @@
 int	cmp_double(double a,double b);
 int	find_char(char *str,char c);
 int	substitute_functions(char *exp);
-int	substitute_macros(char *exp);
+int	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp);
 int     evaluate_expression (int *result,char *expression);
 
 #endif

@@ -250,12 +250,12 @@
 		        if($col++%2 == 1)	{ echo "<TR BGCOLOR=#DDDDDD>"; }
 			else			{ echo "<TR BGCOLOR=#EEEEEE>"; }
 
-			$description=stripslashes(htmlspecialchars($row["description"]));
+//			$description=stripslashes(htmlspecialchars($row["description"]));
 
-			if( strstr($description,"%s"))
-			{
+//			if( strstr($description,"%s"))
+//			{
 				$description=expand_trigger_description($row["triggerid"]);
-			}
+//			}
 			echo "<TD><INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"".$row["triggerid"]."\"> ".$row["triggerid"]."</TD>";
 			echo "<TD>$description</TD>";
 	

@@ -100,11 +100,11 @@
 		if($col>100)	break;
 
 		echo "<TD>",date("Y.M.d H:i:s",$row["clock"]),"</TD>";
-		$description=$row["description"];
-		if( strstr($description,"%s"))
-		{
+//		$description=$row["description"];
+//		if( strstr($description,"%s"))
+//		{
 			$description=expand_trigger_description($row["triggerid"]);
-		}
+//		}
 		echo "<TD><a href=\"alarms.php?triggerid=".$row["triggerid"]."\">".htmlspecialchars($description)."</a></TD>";
 		if($row["value"] == 0)
 		{

@@ -11,3 +11,7 @@ CREATE TABLE trends (
   value_max             double(16,4)    DEFAULT '0.0000' NOT NULL,
   PRIMARY KEY (itemid,clock)
 ) type=InnoDB;
+
+update triggers set description=replace(description,'%s','{HOSTNAME}');
+update actions set subject=replace(subject,'%s','{HOSTNAME}');
+update actions set message=replace(message,'%s','{HOSTNAME}');

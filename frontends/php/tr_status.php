@@ -442,12 +442,12 @@
 
 		echo "<TD>";
 
-		$description=$row["description"];
+//		$description=$row["description"];
 
-		if( strstr($description,"%s"))
-		{
+//		if( strstr($description,"%s"))
+//		{
 			$description=expand_trigger_description($row["triggerid"]);
-		}
+//		}
 
 		if($row["url"] == "")
 		{

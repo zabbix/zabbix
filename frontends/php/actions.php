@@ -62,11 +62,11 @@
 <?php
 	$trigger=get_trigger_by_triggerid($HTTP_GET_VARS["triggerid"]);
 	$expression=explode_exp($trigger["expression"],1);
-	$description=$trigger["description"];
-	if( strstr($description,"%s"))
-	{
+//	$description=$trigger["description"];
+//	if( strstr($description,"%s"))
+//	{
 		$description=expand_trigger_description($HTTP_GET_VARS["triggerid"]);
-	}
+//	}
 	show_table_header("$description<BR>$expression");
 ?>
 
