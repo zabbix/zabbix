@@ -419,7 +419,9 @@
 				$mant=0;
 			}
 
-			if($mant<1.5)
+			$mant=(floor($mant*1.1*10/6)+1)*6/10;
+
+/*			if($mant<1.5)
 			{
 				$mant=1.5;
 			}
@@ -443,6 +445,7 @@
 			{
 				$mant=10;
 			}
+*/
 			$maxY = $mant*pow(10,$exp);
 
 			return $maxY;
