@@ -116,6 +116,14 @@
 	#include <sys/time.h>
 #endif
 
+#ifdef HAVE_MACH_HOST_INFO_H
+	#include <mach/host_info.h>
+#endif
+#ifdef HAVE_MACH_MACH_HOST_H
+	#include <mach/mach_host.h>
+#endif
+
+
 #ifdef HAVE_KSTAT_H
 	#include <kstat.h>
 #endif
@@ -1942,7 +1950,42 @@ int	FREEMEM(const char *cmd, const char *parameter,double  *value)
 	*value=(double)(v.t_free<<2);
 	return SYSINFO_RET_OK;
 #else
+/* OS/X */
+#ifdef HAVE_MACH_HOST_INFO_H
+	vm_statistics_data_t page_info;
+	vm_size_t pagesize;
+	mach_msg_type_number_t count;
+	kern_return_t kret;
+	int ret;
+	
+	pagesize = 0;
+	kret = host_page_size (mach_host_self(), &pagesize);
+
+	count = HOST_VM_INFO_COUNT;
+	kret = host_statistics (mach_host_self(), HOST_VM_INFO,
+	(host_info_t)&page_info, &count);
+	if (kret == KERN_SUCCESS)
+	{
+		double pw, pa, pi, pf, pu;
+
+		pw = (double)page_info.wire_count*pagesize;
+		pa = (double)page_info.active_count*pagesize;
+		pi = (double)page_info.inactive_count*pagesize;
+		pf = (double)page_info.free_count*pagesize;
+
+		pu = pw+pa+pi;
+
+		*value=(double)pf;
+		ret = SYSINFO_RET_OK;
+	}
+	else
+	{
+		ret = SYSINFO_RET_FAIL;
+	}
+	return ret;
+#else
 	return	SYSINFO_RET_FAIL;
+#endif
 #endif
 #endif
 #endif
