@@ -130,7 +130,7 @@ void zabbix_log(int level, const char *fmt, ...)
 			if(buf.st_size>1024*1024)
 			{
 				strscpy(filename_old,log_filename);
-				strcat(filename_old,".old");
+				strncat(filename_old,".old",MAX_STRING_LEN);
 				if(rename(log_filename,filename_old) != 0)
 				{
 /*					exit(1);*/
