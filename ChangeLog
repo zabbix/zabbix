@@ -1,5 +1,7 @@
 Changes for 1.0beta13:
 
+ - added information about table 'trends' to 'Status of
+ Zabbix' screen (Alexei)
  - transparency for graphs on GD 2.x platforms (Alexei)
  - added timestamp and header to maps (Alexei)
  - fixes for screens.php (Alexei)

@@ -4235,6 +4235,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	        $result=DBselect("select count(*) from history");
 		$stat["history_count"]=DBget_field($result,0,0);
 
+	        $result=DBselect("select count(*) from trends");
+		$stat["trends_count"]=DBget_field($result,0,0);
+
 	        $result=DBselect("select count(*) from alarms");
 		$stat["alarms_count"]=DBget_field($result,0,0);
 
