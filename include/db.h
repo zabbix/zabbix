@@ -71,22 +71,23 @@ DB_HOST
 
 DB_ITEM
 {
-	int     itemid;
-	int     hostid;
-	int     type;
-	char    *description;
-	char    *key;
-	char    *host;
-	int     useip;
-	char    *ip;
-	char    *shortname;
-	char    *snmp_community;
-	char    *snmp_oid;
-	int     snmp_port;
+	int	itemid;
+	int	hostid;
+	int	type;
+	char	*description;
+	char	*key;
+	char	*host;
+	int	useip;
+	char	*ip;
+	char	*shortname;
+	char	*snmp_community;
+	char	*snmp_oid;
+	int	snmp_port;
 	char	*trapper_hosts;
 	int     port;
 	int     delay;
 	int     history;
+	int	trends;
 	double	prevorgvalue;
 	int	prevorgvalue_null;
 	double	lastvalue;
