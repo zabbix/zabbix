@@ -32,7 +32,6 @@ suckerd and agentd)
  - monitoring of log files
  - escalation
  - agents to execute command
- - add alerts to host templates
  - add complete support for SNMP trapping
  - zabbix_trapperd does not start if PostgreSQL and DBConnectOnEach=1
 
