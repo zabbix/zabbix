@@ -131,7 +131,11 @@
 
 		function setWidth($width)
 		{
-			$this->sizeX=$width;
+// Avoid sizeX==0, to prevent division bu zero later
+			if($width>0)
+			{
+				$this->sizeX=$width;
+			}
 		}
 
 		function setHeight($height)
