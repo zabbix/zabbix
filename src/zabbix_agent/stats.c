@@ -59,16 +59,6 @@
 #include "cfg.h"
 #include "stats.h"
 
-#define	LISTENQ 1024
-
-/*
-char    *interface;
-int     clock[60*15];
-float     sent[60*15];
-float     received[60*15];
-*/
-
-
 INTERFACE interfaces[MAX_INTERFACE]=
 {
 	{0}

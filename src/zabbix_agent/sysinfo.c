@@ -206,9 +206,26 @@ void	add_user_parameter(char *key,char *command)
 			
 			break;
 		}
+		/* Replace existing parameters */
+		if(strcmp(commands[i].key, key) == 0)
+		{
+			/* Can we free this? I don't know/ */
+/*			free(commands[i].key);
+			free(commands[i].key);*/
+
+			commands[i].key=strdup(key);
+
+			commands[i].function=0;
+
+			commands[i].function_str=&EXECUTE_STR;
+
+			commands[i].parameter=strdup(command);
+
+			commands[i+1].key = 0;
+			
+			break;
+		}
 	}
-
-
 }
 
 void	test_parameters(void)
@@ -227,7 +244,9 @@ void	test_parameters(void)
 	}
 }
 
-/* This messy function must be rewritten! */
+/* This messy function must be rewritten!
+ * Command has the following format: "key[|proxy[:port]]"
+ */
 void	process(char *command,char *value)
 {
 	char	*p;
@@ -238,6 +257,9 @@ void	process(char *command,char *value)
 	char	*(*function_str)() = NULL;
 	char	*parameter = NULL;
 	char	key[MAX_STRING_LEN+1];
+	char	proxy[MAX_STRING_LEN+1];
+	char	port[MAX_STRING_LEN+1];
+	int	port_int;
 	char	param[1024];
 	char	cmd[1024];
 	char	*res2 = NULL;
@@ -248,6 +270,43 @@ void	process(char *command,char *value)
 	if( (p[1]=='\r') || (p[1]=='\n') ||(p[1]==' '))
 	{
 		p[1]=0;
+	}
+
+	n=strchr(command,'|');
+	if(NULL != n)
+	{
+		n[0]=0;
+		strncpy(proxy,n,MAX_STRING_LEN);
+		n=strchr(proxy,':');
+		if(NULL != n)
+		{
+			strncpy(port,n,MAX_STRING_LEN);
+			n[0]=0;
+		}
+		else
+		{
+			port[0]=0;
+		}
+	}
+	else
+	{
+		proxy[0]=0;
+		port[0]=0;
+	}
+
+/* Use this agent as a proxy */
+	if(0 != proxy[0])
+	{
+		if(0 == port[0])
+		{
+			port_int=10000;
+		}
+		else
+		{
+			port_int=atoi(port);
+		}
+		forward_request(proxy,comman,port_int,value);
+		return;
 	}
 
 	for(i=0;;i++)
@@ -1577,6 +1636,66 @@ double	EXECUTE(char *command)
 	sscanf(c, "%lf", &result );
 
 	return	result;
+}
+
+void	forward_request(char *proxy,char *command,int port,char *value);
+{
+	char	*haddr;
+	char	c[1024];
+	
+	int	s;
+	struct	sockaddr_in addr;
+	int	addrlen;
+
+
+	struct hostent *host;
+
+	host = gethostbyname(proxy);
+	if(host == NULL)
+	{
+		return	0;
+	}
+
+	haddr=host->h_addr;
+
+	addrlen = sizeof(addr);
+	memset(&addr, 0, addrlen);
+	addr.sin_port = htons(port);
+	addr.sin_family = AF_INET;
+	bcopy(haddr, (void *) &addr.sin_addr.s_addr, 4);
+
+	s = socket(AF_INET, SOCK_STREAM, 0);
+	if (s == -1)
+	{
+		close(s);
+		return	0;
+	}
+
+	if (connect(s, (struct sockaddr *) &addr, addrlen) == -1)
+	{
+		close(s);
+		return	0;
+	}
+
+	if(write(s,command,strlen(command)) == -1)
+	{
+	}
+		
+
+	memset(&c, 0, 1024);
+	recv(s, c, 1024, 0);
+	if ( strncmp(c, expect, strlen(expect)) == 0 )
+	{
+		send(s,sendtoclose,strlen(sendtoclose),0);
+		close(s);
+		return	1;
+	}
+	else
+	{
+		send(s,sendtoclose,strlen(sendtoclose),0);
+		close(s);
+		return	0;
+	}
 }
 
 double	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose)

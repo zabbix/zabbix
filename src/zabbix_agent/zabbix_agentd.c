@@ -262,47 +262,6 @@ void    init_config(void)
 		CONFIG_STAT_FILE=strdup("/tmp/zabbix_agentd.tmp");
 	}*/
 }
-/*
-int	check_security(int sockfd)
-{
-	char	*sname;
-	struct	sockaddr_in name;
-	int	i;
-	char	*s;
-
-	char	tmp[MAX_STRING_LEN+1];
-
-	i=sizeof(name);
-
-	if(getpeername(sockfd,  (struct sockaddr *)&name, (size_t *)&i) == 0)
-	{
-		i=sizeof(struct sockaddr_in);
-
-		sname=inet_ntoa(name.sin_addr);
-
-		zabbix_log( LOG_LEVEL_DEBUG, "Connection from [%s]. Allowed servers [%s] ",sname, CONFIG_HOSTS_ALLOWED);
-
-		strncpy(tmp,CONFIG_HOSTS_ALLOWED,MAX_STRING_LEN);
-        	s=(char *)strtok(tmp,",");
-		while(s!=NULL)
-		{
-			if(strcmp(sname, s)==0)
-			{
-				return	SUCCEED;
-			}
-                	s=(char *)strtok(NULL,",");
-		}
-	}
-	else
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Error getpeername [%s]",strerror(errno));
-		zabbix_log( LOG_LEVEL_WARNING, "Connection rejected");
-		return FAIL;
-	}
-	zabbix_log( LOG_LEVEL_WARNING, "Connection from [%s] rejected. Allowed server is [%s] ",sname, CONFIG_HOSTS_ALLOWED);
-	return	FAIL;
-}
-*/
 
 void	process_child(int sockfd)
 {
