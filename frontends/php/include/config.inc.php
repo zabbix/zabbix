@@ -1621,7 +1621,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		$id=DBinsert_id($result,"services","serviceid");
 		if(isset($serviceid))
 		{
-			add_service_link($id,$serviceid,1);
+			add_service_link($id,$serviceid,0);
 		}
 		return $id;
 	}
