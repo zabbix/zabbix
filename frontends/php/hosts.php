@@ -121,47 +121,66 @@
 ?>
 
 <?php
-	show_table_header(S_CONFIGURATION_OF_HOST_GROUPS);
+	if(!isset($_GET["config"]))
+	{
+		$_GET["config"]=0;
+	}
+
+	$h1=S_CONFIGURATION_OF_HOST_GROUPS;
+
+#	$h2=S_GROUP."&nbsp;";
+	$h2="";
+	$h2=$h2."<select class=\"biginput\" name=\"config\" onChange=\"submit()\">";
+	$h2=$h2."<option value=\"0\" ".iif(isset($_GET["config"])&&$_GET["config"]==0,"selected","").">".S_HOSTS;
+	$h2=$h2."<option value=\"1\" ".iif(isset($_GET["config"])&&$_GET["config"]==1,"selected","").">".S_HOST_GROUPS;
+	$h2=$h2."</select>";
+
+	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"hosts.php\">", "</form>");
 ?>
 
 
 <?php
-	table_begin();
-	table_header(array(S_ID,S_NAME,S_MEMBERS,S_ACTIONS));
-
-	$result=DBselect("select groupid,name from groups order by name");
-	$col=0;
-	while($row=DBfetch($result))
+	if($_GET["config"]==1)
 	{
-//		$members=array("hide"=>1,"value"=>"");
-		$members=array("hide"=>0,"value"=>"");
-		$result1=DBselect("select distinct h.host from hosts h, hosts_groups hg where h.hostid=hg.hostid and hg.groupid=".$row["groupid"]." order by host");
-		for($i=0;$i<DBnum_rows($result1);$i++)
+		echo "<br>";
+		show_table_header(S_CONFIGURATION_OF_HOST_GROUPS);
+		table_begin();
+		table_header(array(S_ID,S_NAME,S_MEMBERS,S_ACTIONS));
+
+		$result=DBselect("select groupid,name from groups order by name");
+		$col=0;
+		while($row=DBfetch($result))
 		{
-			$members["hide"]=0;
-			$members["value"]=$members["value"].DBget_field($result1,$i,0);
-			if($i<DBnum_rows($result1)-1)
+//		$members=array("hide"=>1,"value"=>"");
+			$members=array("hide"=>0,"value"=>"");
+			$result1=DBselect("select distinct h.host from hosts h, hosts_groups hg where h.hostid=hg.hostid and hg.groupid=".$row["groupid"]." order by host");
+			for($i=0;$i<DBnum_rows($result1);$i++)
 			{
-				$members["value"]=$members["value"].", ";
+				$members["hide"]=0;
+				$members["value"]=$members["value"].DBget_field($result1,$i,0);
+				if($i<DBnum_rows($result1)-1)
+				{
+					$members["value"]=$members["value"].", ";
+				}
 			}
-		}
-		$members["value"]=$members["value"]."&nbsp;";
-		$actions="<A HREF=\"hosts.php?groupid=".$row["groupid"]."#form\">".S_CHANGE."</A>";
+			$members["value"]=$members["value"]."&nbsp;";
+			$actions="<A HREF=\"hosts.php?config=".$_GET["config"]."&groupid=".$row["groupid"]."#form\">".S_CHANGE."</A>";
 
-		table_row(array(
-			$row["groupid"],
-			$row["name"],
-			$members,
-			$actions
-			),$col++);
+			table_row(array(
+				$row["groupid"],
+				$row["name"],
+				$members,
+				$actions
+				),$col++);
+		}
+		if(DBnum_rows($result)==0)
+		{
+				echo "<TR BGCOLOR=#EEEEEE>";
+				echo "<TD COLSPAN=4 ALIGN=CENTER>".S_NO_HOST_GROUPS_DEFINED."</TD>";
+				echo "<TR>";
+		}
+		table_end();
 	}
-	if(DBnum_rows($result)==0)
-	{
-			echo "<TR BGCOLOR=#EEEEEE>";
-			echo "<TD COLSPAN=4 ALIGN=CENTER>".S_NO_HOST_GROUPS_DEFINED."</TD>";
-			echo "<TR>";
-	}
-	table_end();
 ?>
 
 <?php
@@ -172,7 +191,7 @@
 ?>
 
 <?php
-	if(!isset($_GET["hostid"]))
+	if(!isset($_GET["hostid"])&&($_GET["config"]==0))
 {
 
 	$h1="&nbsp;".S_CONFIGURATION_OF_HOSTS_BIG;
@@ -204,6 +223,7 @@
 	}
 	$h2=$h2."</select>";
 
+	echo "<br>";
 	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"hosts.php\">", "</form>");
 ?>
 
@@ -282,11 +302,11 @@
 			{
 				if(isset($_GET["groupid"]))
 				{
-					$actions="<A HREF=\"hosts.php?register=change&hostid=".$row["hostid"]."&groupid=".$_GET["groupid"]."#form\">".S_CHANGE."</A>";
+					$actions="<A HREF=\"hosts.php?register=change&config=".$_GET["config"]."&hostid=".$row["hostid"]."&groupid=".$_GET["groupid"]."#form\">".S_CHANGE."</A>";
 				}
 				else
 				{
-					$actions="<A HREF=\"hosts.php?register=change&hostid=".$row["hostid"]."#form\">".S_CHANGE."</A>";
+					$actions="<A HREF=\"hosts.php?register=change&config=".$_GET["config"]."&hostid=".$row["hostid"]."#form\">".S_CHANGE."</A>";
 				}
 			}
 			else
@@ -319,10 +339,16 @@
 ?>
 
 <?php
-	insert_hostgroups_form($_GET["groupid"]);
+	if($_GET["config"]==1)
+	{
+		insert_hostgroups_form($_GET["groupid"]);
+	}
 ?>
 
 <?php
+	if($_GET["config"]==0)
+	{
+	
 	$host=@iif(isset($_GET["host"]),$_GET["host"],"");
 	$port=@iif(isset($_GET["port"]),$_GET["port"],get_profile("HOST_PORT",10050));
 	$status=@iif(isset($_GET["status"]),$_GET["status"],0);
@@ -522,6 +548,8 @@
 	}
 
 	show_table2_header_end();
+//	end of if($_GET["config"]==1)
+	}
 ?>
 
 <?php
