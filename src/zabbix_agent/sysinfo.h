@@ -58,7 +58,7 @@ float	CHECK_SERVICE_POP(void);
 float	CHECK_SERVICE_NNTP(void);
 float	CHECK_SERVICE_IMAP(void);*/
 
-float	CHECK_PORT(char *port);
+float	CHECK_PORT(char *ip_and_port);
 
 #define COMMAND struct command_type
 COMMAND

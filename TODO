@@ -17,7 +17,6 @@ the agent with a predefined API that can return values to suckerd.
 
 Not ready yet:
 
- - agent to send something back in case of timeout
  - monitoring of services for different interfaces
  - get rid of false warning messages (like unable to insert ...)
 
@@ -30,12 +29,14 @@ Not ready yet:
 
  OTHER:
 
+ - agent to send something back in case of timeout (?)
  - check for function parameters in evaluate_simple_expression
  - make links different if something is already registered (as for medias,
    actions, etc)
  - update trigger status to UNKNOWN if cannot evaluate function 
  - do not dump "Expression cannot be evaluated" in case if function.lastvalue
    is NULL
+ - when doing UserParameter sdo not return FAIL in case of timeout
 
  LATER:
 
