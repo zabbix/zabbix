@@ -4,7 +4,7 @@ body
         margin: 3px 3px 3px 3px;
         padding: 0px 0px 0px 0px;
         color:black;
-        font-family:verdana, arial, helvetica;
+        font-family:verdana, arial, helvetica, sans-serif;
         font-size:10px;
 	text-decoration: none;
         line-height:16px;
@@ -21,15 +21,6 @@ td,tr
 	font-size:10pt;
 	text-decoration: none;
 }
-
-tr:zzz
-{
-	color:red;
-	background:"red";
-	text-decoration: underline;
-	text-transform: bold;
-}
-
 
 A.footer
 {
@@ -55,12 +46,12 @@ A.footer
 table.home
 {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 8 pt
+	font-size: 8pt;
 }
     
 .img
 {
-	border-color: #black;
+	border-color:black;
 	border-width:1px;
 }
 
