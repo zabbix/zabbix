@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <syslog.h>
 
 #include "db.h"
+#include "log.h"
 #include "common.h"
 
 #ifdef	HAVE_MYSQL
@@ -19,18 +19,18 @@
  */ 
 void    DBconnect( char *dbname, char *dbuser, char *dbpassword, char *dbsocket)
 {
-/*	syslog(LOG_ERR, "[%s] [%s] [%s]\n",dbname, dbuser, dbpassword ); */
+/*	zabbix_log(LOG_LEVEL_ERR, "[%s] [%s] [%s]\n",dbname, dbuser, dbpassword ); */
 #ifdef	HAVE_MYSQL
 /* For MySQL >3.22.00 */
 /*	if( ! mysql_connect( &mysql, NULL, dbuser, dbpassword ) )*/
 	if( ! mysql_real_connect( &mysql, NULL, dbuser, dbpassword, dbname, 3306, dbsocket,0 ) )
 	{
-		syslog(LOG_ERR, "Failed to connect to database: Error: %s\n",mysql_error(&mysql) );
+		zabbix_log(LOG_LEVEL_ERR, "Failed to connect to database: Error: %s\n",mysql_error(&mysql) );
 		exit( FAIL );
 	}
 	if( mysql_select_db( &mysql, dbname ) != 0 )
 	{
-		syslog(LOG_ERR, "Failed to select database: Error: %s\n",mysql_error(&mysql) );
+		zabbix_log(LOG_LEVEL_ERR, "Failed to select database: Error: %s\n",mysql_error(&mysql) );
 		exit( FAIL );
 	}
 #endif
@@ -41,8 +41,8 @@ void    DBconnect( char *dbname, char *dbuser, char *dbpassword, char *dbsocket)
 /* check to see that the backend connection was successfully made */
 	if (PQstatus(conn) == CONNECTION_BAD)
 	{
-		syslog(LOG_ERR, "Connection to database '%s' failed.\n", dbname);
-		syslog(LOG_ERR, "%s", PQerrorMessage(conn));
+		zabbix_log(LOG_LEVEL_ERR, "Connection to database '%s' failed.\n", dbname);
+		zabbix_log(LOG_LEVEL_ERR, "%s", PQerrorMessage(conn));
 		exit(FAIL);
 	}
 #endif
@@ -56,32 +56,32 @@ int	DBexecute(char *query)
 {
 
 #ifdef	HAVE_MYSQL
-	syslog( LOG_DEBUG, "Executing query:%s\n",query);
-/*	syslog( LOG_WARNING, "Executing query:%s\n",query);*/
+	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s\n",query);
+/*	zabbix_log( LOG_LEVEL_WARNING, "Executing query:%s\n",query);*/
 
 	if( mysql_query(&mysql,query) != 0 )
 	{
-		syslog( LOG_ERR, "Query::%s",query);
-		syslog(LOG_ERR, "Query failed:%s", mysql_error(&mysql) );
+		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
+		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", mysql_error(&mysql) );
 		return FAIL;
 	}
 #endif
 #ifdef	HAVE_PGSQL
 	PGresult	*result;
 
-	syslog( LOG_DEBUG, "Executing query:%s\n",query);
+	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s\n",query);
 
 	result = PQexec(conn,query);
 
 	if( result==NULL)
 	{
-		syslog(LOG_ERR, "Query failed:%s", "Result is NULL" );
+		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", "Result is NULL" );
 		PQclear(result);
 		return FAIL;
 	}
 	if( PQresultStatus(result) != PGRES_COMMAND_OK)
 	{
-		syslog(LOG_ERR, "Query failed:%s", PQresStatus(PQresultStatus(result)) );
+		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", PQresStatus(PQresultStatus(result)) );
 		PQclear(result);
 		return FAIL;
 	}
@@ -97,13 +97,13 @@ int	DBexecute(char *query)
 DB_RESULT *DBselect(char *query)
 {
 #ifdef	HAVE_MYSQL
-	syslog( LOG_DEBUG, "Executing query:%s\n",query);
-//	syslog( LOG_WARNING, "Executing query:%s\n",query);
+	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s\n",query);
+//	zabbix_log( LOG_LEVEL_WARNING, "Executing query:%s\n",query);
 
 	if( mysql_query(&mysql,query) != 0 )
 	{
-		syslog( LOG_ERR, "Query::%s",query);
-		syslog(LOG_ERR, "Query failed:%s", mysql_error(&mysql) );
+		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
+		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", mysql_error(&mysql) );
 		exit( FAIL );
 	}
 	return	mysql_store_result(&mysql);
@@ -111,17 +111,17 @@ DB_RESULT *DBselect(char *query)
 #ifdef	HAVE_PGSQL
 	PGresult	*result;
 
-	syslog( LOG_DEBUG, "Executing query:%s\n",query);
+	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s\n",query);
 	result = PQexec(conn,query);
 
 	if( result==NULL)
 	{
-		syslog(LOG_ERR, "Query failed:%s", "Result is NULL" );
+		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", "Result is NULL" );
 		exit( FAIL );
 	}
 	if( PQresultStatus(result) != PGRES_TUPLES_OK)
 	{
-		syslog(LOG_ERR, "Query failed:%s", PQresStatus(PQresultStatus(result)) );
+		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", PQresStatus(PQresultStatus(result)) );
 		exit( FAIL );
 	}
 	return result;
@@ -138,7 +138,7 @@ char	*DBget_field(DB_RESULT *result, int rownum, int fieldnum)
 
 	mysql_data_seek(result, rownum);
 	row=mysql_fetch_row(result);
-	syslog(LOG_DEBUG, "Got field:%s", row[fieldnum] );
+	zabbix_log(LOG_LEVEL_DEBUG, "Got field:%s", row[fieldnum] );
 	return row[fieldnum];
 #endif
 #ifdef	HAVE_PGSQL
@@ -166,7 +166,7 @@ int     DBget_function_result(float *Result,char *FunctionID)
 {
 	DB_RESULT *result;
 
-        char	c[128];
+        char	c[MAX_STRING_LEN+1];
         int	rows;
 
 	sprintf( c, "select lastvalue from functions where functionid=%s", FunctionID );
@@ -175,14 +175,14 @@ int     DBget_function_result(float *Result,char *FunctionID)
 	if(result == NULL)
 	{
         	DBfree_result(result);
-		syslog(LOG_WARNING, "Query failed for functionid:[%s]", FunctionID );
+		zabbix_log(LOG_LEVEL_WARNING, "Query failed for functionid:[%s]", FunctionID );
 		return FAIL;	
 	}
         rows = DBnum_rows(result);
 	if(rows == 0)
 	{
         	DBfree_result(result);
-		syslog(LOG_WARNING, "Query failed for functionid:[%s]", FunctionID );
+		zabbix_log(LOG_LEVEL_WARNING, "Query failed for functionid:[%s]", FunctionID );
 		return FAIL;	
 	}
         *Result=atof(DBget_field(result,0,0));

@@ -27,8 +27,8 @@
 int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 {
 	FILE	*file;
-	char	line[1024];
-	char	parameter[1024];
+	char	line[MAX_STRING_LEN+1];
+	char	parameter[MAX_STRING_LEN+1];
 	char	*value;
 	int	lineno;
 	int	i,var;
@@ -44,14 +44,14 @@ int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 	}
 
 	lineno=0;
-	while(fgets(line,1024,file) != NULL)
+	while(fgets(line,MAX_STRING_LEN,file) != NULL)
 	{
 		lineno++;
 
 		if(line[0]=='#')	continue;
 		if(strlen(line)==1)	continue;
 
-		strcpy(parameter,line);
+		strncpy(parameter,line,MAX_STRING_LEN);
 
 		value=strstr(line,"=");
 

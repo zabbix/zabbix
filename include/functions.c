@@ -8,18 +8,16 @@
 
 #include <signal.h>
 
-#include <syslog.h>
-
 #include <string.h>
 
 #include <time.h>
 
 #include <sys/socket.h>
 #include <errno.h>
-#include <syslog.h>
 
 #include "common.h"
 #include "db.h"
+#include "log.h"
 
 #include "functions.h"
 #include "expression.h"
@@ -31,19 +29,19 @@ int	evaluate_MIN(float *min,int itemid,int parameter)
 {
 	DB_RESULT	*result;
 
-	char		c[256];
+	char		sql[MAX_STRING_LEN+1];
 	char		*field;
 
 	int		now;
 
 	now=time(NULL);
 
-	sprintf(c,"select min(value) from history where clock>%d and itemid=%d",now-parameter,itemid);
+	sprintf(sql,"select min(value) from history where clock>%d and itemid=%d",now-parameter,itemid);
 
-	result = DBselect(c);
+	result = DBselect(sql);
 	if((result==NULL)||(DBnum_rows(result)==0))
 	{
-		syslog(LOG_NOTICE, "Result for MIN is empty" );
+		zabbix_log(LOG_LEVEL_NOTICE, "Result for MIN is empty" );
 		DBfree_result(result);
 		return	FAIL;
 	}
@@ -51,7 +49,7 @@ int	evaluate_MIN(float *min,int itemid,int parameter)
 	field = DBget_field(result,0,0);
 	if( field == NULL )
 	{
-		syslog( LOG_NOTICE, "Result for MIN is empty" );
+		zabbix_log( LOG_LEVEL_NOTICE, "Result for MIN is empty" );
 		DBfree_result(result);
 		return	FAIL;
 	}
@@ -69,19 +67,19 @@ int	evaluate_MAX(float *max,int itemid,int parameter)
 {
 	DB_RESULT	*result;
 
-	char		c[256];
+	char		sql[MAX_STRING_LEN+1];
 	char		*field;
 
 	int		now;
 
 	now=time(NULL);
 
-	sprintf(c,"select max(value) from history where clock>%d and itemid=%d",now-parameter,itemid);
+	sprintf(sql,"select max(value) from history where clock>%d and itemid=%d",now-parameter,itemid);
 
-	result = DBselect(c);
+	result = DBselect(sql);
 	if((result==NULL)||(DBnum_rows(result)==0))
 	{
-		syslog(LOG_NOTICE, "Result for MAX is empty" );
+		zabbix_log(LOG_LEVEL_NOTICE, "Result for MAX is empty" );
 		DBfree_result(result);
 		return	FAIL;
 	}
@@ -89,7 +87,7 @@ int	evaluate_MAX(float *max,int itemid,int parameter)
 	field = DBget_field(result,0,0);
 	if( field == NULL )
 	{
-		syslog( LOG_NOTICE, "Result for MAX is empty" );
+		zabbix_log( LOG_LEVEL_NOTICE, "Result for MAX is empty" );
 		DBfree_result(result);
 		return	FAIL;
 	}	
@@ -107,7 +105,7 @@ int	evaluate_FUNCTION(float *value,DB_ITEM *item,char *function,int parameter)
 {
 	int	ret  = SUCCEED;
 
-	syslog( LOG_DEBUG, "Function [%s]",function);
+	zabbix_log( LOG_LEVEL_DEBUG, "Function [%s]",function);
 
 	if(strcmp(function,"last")==0)
 	{
@@ -159,7 +157,7 @@ int	evaluate_FUNCTION(float *value,DB_ITEM *item,char *function,int parameter)
 	}
 	else
 	{
-		syslog( LOG_WARNING, "Unsupported function:%s",function);
+		zabbix_log( LOG_LEVEL_WARNING, "Unsupported function:%s",function);
 		ret = FAIL;
 	}
 	return ret;
@@ -172,19 +170,19 @@ void	update_functions(DB_ITEM *item)
 {
 	DB_FUNCTION	function;
 	DB_RESULT	*result;
-	char		c[1024];
+	char		sql[MAX_STRING_LEN+1];
 	float		value;
 	int		ret=SUCCEED;
 	int		i,rows;
 
-	sprintf(c,"select function,parameter,itemid from functions where itemid=%d group by 1,2,3 order by 1,2,3",item->itemid);
+	sprintf(sql,"select function,parameter,itemid from functions where itemid=%d group by 1,2,3 order by 1,2,3",item->itemid);
 
-	result = DBselect(c);
+	result = DBselect(sql);
 	rows=DBnum_rows(result);
 
 	if((result==NULL)||(rows==0))
 	{
-		syslog( LOG_NOTICE, "No functions to update.");
+		zabbix_log( LOG_LEVEL_NOTICE, "No functions to update.");
 		DBfree_result(result);
 		return;
 	}
@@ -195,19 +193,19 @@ void	update_functions(DB_ITEM *item)
 		function.parameter=atoi(DBget_field(result,i,1));
 		function.itemid=atoi(DBget_field(result,i,2));
 
-		syslog( LOG_DEBUG, "ItemId:%d Evaluating %s(%d)\n",function.itemid,function.function,function.parameter);
+		zabbix_log( LOG_LEVEL_DEBUG, "ItemId:%d Evaluating %s(%d)\n",function.itemid,function.function,function.parameter);
 
 		ret = evaluate_FUNCTION(&value,item,function.function,function.parameter);
 		if( FAIL == ret)	
 		{
-			syslog( LOG_DEBUG, "Evaluation failed for function:%s\n",function.function);
+			zabbix_log( LOG_LEVEL_DEBUG, "Evaluation failed for function:%s\n",function.function);
 			continue;
 		}
-		syslog( LOG_DEBUG, "Result:%f\n",value);
+		zabbix_log( LOG_LEVEL_DEBUG, "Result:%f\n",value);
 		if (ret == SUCCEED)
 		{
-			sprintf(c,"update functions set lastvalue=%f where itemid=%d and function='%s' and parameter=%d", value, function.itemid, function.function, function.parameter );
-			DBexecute(c);
+			sprintf(sql,"update functions set lastvalue=%f where itemid=%d and function='%s' and parameter=%d", value, function.itemid, function.function, function.parameter );
+			DBexecute(sql);
 		}
 	}
 
@@ -221,19 +219,19 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 {
 	int	s;
 	int	i,e;
-	char	*c;
+	char	c[MAX_STRING_LEN+1];
 	struct hostent *hp;
 
 	struct sockaddr_in myaddr_in;
 	struct sockaddr_in servaddr_in;
 
-	syslog( LOG_DEBUG, "SENDING MAIL");
+	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL");
 
 	servaddr_in.sin_family=AF_INET;
 	hp=gethostbyname(smtp_server);
 	if(hp==NULL)
 	{
-		syslog(LOG_ERR, "Cannot get IP for mailserver [%s]",smtp_server);
+		zabbix_log(LOG_LEVEL_ERR, "Cannot get IP for mailserver [%s]",smtp_server);
 		return FAIL;
 	}
 
@@ -243,7 +241,7 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 	s=socket(AF_INET,SOCK_STREAM,0);
 	if(s==0)
 	{
-		syslog(LOG_ERR, "Cannot create socket");
+		zabbix_log(LOG_LEVEL_ERR, "Cannot create socket");
 		return FAIL;
 	}
 	
@@ -253,33 +251,25 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 
 	if( connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
-		syslog(LOG_ERR, "Cannot connect to SMTP server [%s]",smtp_server);
+		zabbix_log(LOG_LEVEL_ERR, "Cannot connect to SMTP server [%s]",smtp_server);
 		return FAIL;
 	}
 		
-	c=(char *)malloc(1024);
-	if(c == NULL)
-	{
-		syslog(LOG_ERR, "Malloc error.");
-		close(s);
-		return FAIL;
-	}
-
 	sprintf(c,"HELO %s\n",smtp_helo);
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e == -1)
 	{
-		syslog(LOG_ERR, "Error sending HELO to mailserver.");
+		zabbix_log(LOG_LEVEL_ERR, "Error sending HELO to mailserver.");
 		close(s);
 		free(c);
 		return FAIL;
 	}
 			
 	i=sizeof(struct sockaddr_in);
-	i=recvfrom(s,c,1023,0,(struct sockaddr *)&servaddr_in,&i);
+	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);
 	if(i == -1)
 	{
-		syslog(LOG_ERR, "Error receiving answer on HELO request.");
+		zabbix_log(LOG_LEVEL_ERR, "Error receiving answer on HELO request.");
 		close(s);
 		free(c);
 		return FAIL;
@@ -289,16 +279,16 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e == -1)
 	{
-		syslog(LOG_ERR, "Error sending MAIL FROM to mailserver.");
+		zabbix_log(LOG_LEVEL_ERR, "Error sending MAIL FROM to mailserver.");
 		close(s);
 		free(c);
 		return FAIL;
 	}
 	i=sizeof(struct sockaddr_in);
-	i=recvfrom(s,c,1023,0,(struct sockaddr *)&servaddr_in,&i);
+	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);
 	if(i == -1)
 	{
-		syslog(LOG_ERR, "Error receiving answer on MAIL FROM request.");
+		zabbix_log(LOG_LEVEL_ERR, "Error receiving answer on MAIL FROM request.");
 		close(s);
 		free(c);
 		return FAIL;
@@ -308,16 +298,16 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e == -1)
 	{
-		syslog(LOG_ERR, "Error sending RCPT TO to mailserver.");
+		zabbix_log(LOG_LEVEL_ERR, "Error sending RCPT TO to mailserver.");
 		close(s);
 		free(c);
 		return FAIL;
 	}
 	i=sizeof(struct sockaddr_in);
-	i=recvfrom(s,c,1023,0,(struct sockaddr *)&servaddr_in,&i);
+	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);
 	if(i == -1)
 	{
-		syslog(LOG_ERR, "Error receiving answer on RCPT TO request.");
+		zabbix_log(LOG_LEVEL_ERR, "Error receiving answer on RCPT TO request.");
 		close(s);
 		free(c);
 		return FAIL;
@@ -327,16 +317,16 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e == -1)
 	{
-		syslog(LOG_ERR, "Error sending DATA to mailserver.");
+		zabbix_log(LOG_LEVEL_ERR, "Error sending DATA to mailserver.");
 		close(s);
 		free(c);
 		return FAIL;
 	}
 	i=sizeof(struct sockaddr_in);
-	i=recvfrom(s,c,1023,0,(struct sockaddr *)&servaddr_in,&i);
+	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);
 	if(i == -1)
 	{
-		syslog(LOG_ERR, "Error receivng answer on DATA request.");
+		zabbix_log(LOG_LEVEL_ERR, "Error receivng answer on DATA request.");
 		close(s);
 		free(c);
 		return FAIL;
@@ -345,7 +335,7 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e == -1)
 	{
-		syslog(LOG_ERR, "Error sending mail body to mailserver.");
+		zabbix_log(LOG_LEVEL_ERR, "Error sending mail body to mailserver.");
 		close(s);
 		free(c);
 		return FAIL;
@@ -354,16 +344,16 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e == -1)
 	{
-		syslog(LOG_ERR, "Error sending . to mailserver.");
+		zabbix_log(LOG_LEVEL_ERR, "Error sending . to mailserver.");
 		close(s);
 		free(c);
 		return FAIL;
 	}
 	i=sizeof(struct sockaddr_in);
-	i=recvfrom(s,c,1023,0,(struct sockaddr *)&servaddr_in,&i);
+	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);
 	if(i == -1)
 	{
-		syslog(LOG_ERR, "Error receivng answer on . request.");
+		zabbix_log(LOG_LEVEL_ERR, "Error receivng answer on . request.");
 		close(s);
 		free(c);
 		return FAIL;
@@ -373,16 +363,16 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e ==- 1)
 	{
-		syslog(LOG_ERR, "Error sending \\n to mailserver.");
+		zabbix_log(LOG_LEVEL_ERR, "Error sending \\n to mailserver.");
 		close(s);
 		free(c);
 		return FAIL;
 	}
 	i=sizeof(struct sockaddr_in);
-	i=recvfrom(s,c,1023,0,(struct sockaddr *)&servaddr_in,&i);
+	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);
 	if(i == -1)
 	{
-		syslog(LOG_ERR, "Error receivng answer on \\n request.");
+		zabbix_log(LOG_LEVEL_ERR, "Error receiving answer on \\n request.");
 		close(s);
 		free(c);
 		return FAIL;
@@ -392,14 +382,13 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); 
 	if(e == -1)
 	{
-		syslog(LOG_ERR, "Error sending QUIT to mailserver.");
+		zabbix_log(LOG_LEVEL_ERR, "Error sending QUIT to mailserver.");
 		close(s);
 		free(c);
 		return FAIL;
 	}
 
 	close(s);
-	free(c); 
 	
 	return SUCCEED;
 }
@@ -410,14 +399,14 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 void	send_to_user(int actionid,int userid,char *smtp_server,char *smtp_helo,char *smtp_email,char *subject,char *message)
 {
 	DB_MEDIA media;
-	char c[1024];
+	char sql[MAX_STRING_LEN+1];
 	DB_RESULT *result;
 
 	int	i,rows;
 	int	now;
 
-	sprintf(c,"select type,sendto,active from media where active=0 and userid=%d",userid);
-	result = DBselect(c);
+	sprintf(sql,"select type,sendto,active from media where active=0 and userid=%d",userid);
+	result = DBselect(sql);
 
 	rows=DBnum_rows(result);
 
@@ -429,18 +418,18 @@ void	send_to_user(int actionid,int userid,char *smtp_server,char *smtp_helo,char
 
 		if(strcmp(media.type,"EMAIL")==0)
 		{
-			syslog( LOG_DEBUG, "Email sending to %s %s Subject:%s Message:%s to %d\n", media.type, media.sendto, subject, message, userid );
+			zabbix_log( LOG_LEVEL_DEBUG, "Email sending to %s %s Subject:%s Message:%s to %d\n", media.type, media.sendto, subject, message, userid );
 			if( FAIL == send_mail(smtp_server,smtp_helo,smtp_email,media.sendto,subject,message))
 			{
-				syslog( LOG_ERR, "Error sending email to '%s' Subject:'%s' to userid:%d\n", media.sendto, subject, userid );
+				zabbix_log( LOG_LEVEL_ERR, "Error sending email to '%s' Subject:'%s' to userid:%d\n", media.sendto, subject, userid );
 			}
 			now = time(NULL);
-			sprintf(c,"insert into alerts (alertid,actionid,clock,type,sendto,subject,message) values (NULL,%d,%d,'%s','%s','%s','%s');",actionid,now,media.type,media.sendto,subject,message);
-			DBexecute(c);
+			sprintf(sql,"insert into alerts (alertid,actionid,clock,type,sendto,subject,message) values (NULL,%d,%d,'%s','%s','%s','%s');",actionid,now,media.type,media.sendto,subject,message);
+			DBexecute(sql);
 		} 
 		else
 		{
-			syslog( LOG_WARNING, "Type %s is not supported yet", media.type );
+			zabbix_log( LOG_LEVEL_WARNING, "Type %s is not supported yet", media.type );
 		}
 	}
 	DBfree_result(result);
@@ -455,54 +444,54 @@ void	apply_actions(int triggerid,int good)
 	
 	DB_ACTION action;
 
-	char c[1024];
+	char sql[MAX_STRING_LEN+1];
 
-	char	smtp_server[256],
-		smtp_helo[256],
-		smtp_email[256];
+	char	smtp_server[MAX_STRING_LEN+1],
+		smtp_helo[MAX_STRING_LEN+1],
+		smtp_email[MAX_STRING_LEN+1];
 
 	int	i,rows;
 	int	now;
 
 	if(good==1)
 	{
-		syslog( LOG_DEBUG, "Check dependencies");
+		zabbix_log( LOG_LEVEL_DEBUG, "Check dependencies");
 
-		sprintf(c,"select count(*) from trigger_depends d,triggers t where d.triggerid_down=%d and d.triggerid_up=t.triggerid and t.istrue=1",triggerid);
-		syslog( LOG_DEBUG, "SQL:%s",c);
-		result = DBselect(c);
+		sprintf(sql,"select count(*) from trigger_depends d,triggers t where d.triggerid_down=%d and d.triggerid_up=t.triggerid and t.istrue=1",triggerid);
+		zabbix_log( LOG_LEVEL_DEBUG, "SQL:%s",sql);
+		result = DBselect(sql);
 		i=atoi(DBget_field(result,0,0));
-		syslog( LOG_DEBUG, "I:%d",i);
+		zabbix_log( LOG_LEVEL_DEBUG, "I:%d",i);
 		DBfree_result(result);
 		if(i>0)
 		{
-			syslog( LOG_DEBUG, "Will not apply actions");
+			zabbix_log( LOG_LEVEL_DEBUG, "Will not apply actions");
 			return;
 		}
 	}
 
-	syslog( LOG_DEBUG, "Applying actions");
+	zabbix_log( LOG_LEVEL_DEBUG, "Applying actions");
 
 	/* Get smtp_server and smtp_helo from config */
-	sprintf(c,"select smtp_server,smtp_helo,smtp_email from config");
-	result = DBselect(c);
+	sprintf(sql,"select smtp_server,smtp_helo,smtp_email from config");
+	result = DBselect(sql);
 
-	strcpy(smtp_server,DBget_field(result,0,0));
-	strcpy(smtp_helo,DBget_field(result,0,1));
-	strcpy(smtp_email,DBget_field(result,0,2));
+	strncpy(smtp_server,DBget_field(result,0,0), MAX_STRING_LEN);
+	strncpy(smtp_helo,DBget_field(result,0,1), MAX_STRING_LEN);
+	strncpy(smtp_email,DBget_field(result,0,2), MAX_STRING_LEN);
 
 	DBfree_result(result);
 
 	now = time(NULL);
 
-	sprintf(c,"select actionid,userid,delay,subject,message from actions where triggerid=%d and good=%d and nextcheck<=%d",triggerid,good,now);
-	result = DBselect(c);
+	sprintf(sql,"select actionid,userid,delay,subject,message from actions where triggerid=%d and good=%d and nextcheck<=%d",triggerid,good,now);
+	result = DBselect(sql);
 
 	rows = DBnum_rows(result);
 
 	for(i=0;i<rows;i++)
 	{
-		syslog( LOG_DEBUG, "Fetched:%s %s %s %s %s\n",DBget_field(result,i,0),DBget_field(result,i,1),DBget_field(result,i,2),DBget_field(result,i,3),DBget_field(result,i,4));
+		zabbix_log( LOG_LEVEL_DEBUG, "Fetched:%s %s %s %s %s\n",DBget_field(result,i,0),DBget_field(result,i,1),DBget_field(result,i,2),DBget_field(result,i,3),DBget_field(result,i,4));
 
 		action.actionid=atoi(DBget_field(result,i,0));
 		action.userid=atoi(DBget_field(result,i,1));
@@ -515,10 +504,10 @@ void	apply_actions(int triggerid,int good)
 
 		send_to_user(action.actionid,action.userid,smtp_server,smtp_helo,smtp_email,action.subject,action.message);
 		now = time(NULL);
-		sprintf(c,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
-		DBexecute(c);
+		sprintf(sql,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
+		DBexecute(sql);
 	}
-	syslog( LOG_DEBUG, "Actions applied for trigger %d %d\n", triggerid, good );
+	zabbix_log( LOG_LEVEL_DEBUG, "Actions applied for trigger %d %d\n", triggerid, good );
 	DBfree_result(result);
 }
 
@@ -527,7 +516,7 @@ void	apply_actions(int triggerid,int good)
  */
 void	update_services(int triggerid)
 {
-	char	sql[1024];
+	char	sql[MAX_STRING_LEN+1];
 	int	i,rows;
 
 	DB_RESULT *result;
@@ -559,8 +548,8 @@ void	update_services(int triggerid)
  */ 
 void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 {
-	char c[1024];
-	char exp[8192];
+	char sql[MAX_STRING_LEN+1];
+	char exp[MAX_STRING_LEN+1];
 	int b;
 	DB_TRIGGER trigger;
 	DB_RESULT *result;
@@ -570,50 +559,50 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 
 	if(flag == 0)
 	{
-		sprintf(c,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and i.lastclock<=%d and t.istrue!=2 and f.triggerid=t.triggerid and f.itemid%%%d=%d group by t.triggerid,t.expression,t.istrue,t.dep_level",lastclock,suckers-1,sucker_num-1);
+		sprintf(sql,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and i.lastclock<=%d and t.istrue!=2 and f.triggerid=t.triggerid and f.itemid%%%d=%d group by t.triggerid,t.expression,t.istrue,t.dep_level",lastclock,suckers-1,sucker_num-1);
 	}
 	else
 	{
-		sprintf(c,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.istrue!=2 and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.istrue,t.dep_level",sucker_num);
+		sprintf(sql,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.istrue!=2 and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.istrue,t.dep_level",sucker_num);
 	}
 
-	result = DBselect(c);
+	result = DBselect(sql);
 
 	rows = DBnum_rows(result);
 
 	if(rows == 0)
 	{
-		syslog( LOG_NOTICE, "No triggers to update" );
+		zabbix_log( LOG_LEVEL_NOTICE, "No triggers to update" );
 		DBfree_result(result);
 		return;
 	}
 	for(i=0;i<rows;i++)
 	{
-		syslog( LOG_DEBUG, "Fetched: TrId[%s] Exp[%s] IsTrue[%s]\n", DBget_field(result,i,0),DBget_field(result,i,1),DBget_field(result,i,2));
+		zabbix_log( LOG_LEVEL_DEBUG, "Fetched: TrId[%s] Exp[%s] IsTrue[%s]\n", DBget_field(result,i,0),DBget_field(result,i,1),DBget_field(result,i,2));
 		trigger.triggerid=atoi(DBget_field(result,i,0));
 		trigger.expression=DBget_field(result,i,1);
 		trigger.istrue=atoi(DBget_field(result,i,2));
-		strcpy(exp, trigger.expression);
+		strncpy(exp, trigger.expression, MAX_STRING_LEN);
 		if( evaluate_expression(&b, exp) != 0 )
 		{
-			syslog( LOG_WARNING, "Expression %s - SUX.",trigger.expression);
+			zabbix_log( LOG_LEVEL_WARNING, "Expression %s - SUX.",trigger.expression);
 			continue;
 		}
 
 		if((b==1)&&(trigger.istrue!=1))
 		{
 			now = time(NULL);
-			sprintf(c,"update triggers set IsTrue=1, lastchange=%d where triggerid=%d",now,trigger.triggerid);
-			DBexecute(c);
+			sprintf(sql,"update triggers set IsTrue=1, lastchange=%d where triggerid=%d",now,trigger.triggerid);
+			DBexecute(sql);
 
 			now = time(NULL);
-			sprintf(c,"insert into alarms(triggerid,clock,istrue) values(%d,%d,1)",trigger.triggerid,now);
-			DBexecute(c);
+			sprintf(sql,"insert into alarms(triggerid,clock,istrue) values(%d,%d,1)",trigger.triggerid,now);
+			DBexecute(sql);
 
 			apply_actions(trigger.triggerid,1);
 
-			sprintf(c,"update actions set nextcheck=0 where triggerid=%d and good=0",trigger.triggerid);
-			DBexecute(c);
+			sprintf(sql,"update actions set nextcheck=0 where triggerid=%d and good=0",trigger.triggerid);
+			DBexecute(sql);
 
 /*			update_services(trigger.triggerid); */
 		}
@@ -621,17 +610,17 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 		if((b==0)&&(trigger.istrue!=0))
 		{
 			now = time(NULL);
-			sprintf(c,"update triggers set IsTrue=0, lastchange=%d where triggerid=%d",now,trigger.triggerid);
-			DBexecute(c);
+			sprintf(sql,"update triggers set IsTrue=0, lastchange=%d where triggerid=%d",now,trigger.triggerid);
+			DBexecute(sql);
 
 			now = time(NULL);
-			sprintf(c,"insert into alarms(triggerid,clock,istrue) values(%d,%d,0)",trigger.triggerid,now);
-			DBexecute(c);
+			sprintf(sql,"insert into alarms(triggerid,clock,istrue) values(%d,%d,0)",trigger.triggerid,now);
+			DBexecute(sql);
 
 			apply_actions(trigger.triggerid,0);
 
-			sprintf(c,"update actions set nextcheck=0 where triggerid=%d and good=1",trigger.triggerid);
-			DBexecute(c);
+			sprintf(sql,"update actions set nextcheck=0 where triggerid=%d and good=1",trigger.triggerid);
+			DBexecute(sql);
 
 /*			update_services(trigger.triggerid);*/
 		}
@@ -644,23 +633,23 @@ int	get_lastvalue(float *Result,char *host,char *key,char *function,char *parame
 	DB_ITEM	item;
 	DB_RESULT *result;
 
-        char	c[128];
+        char	sql[MAX_STRING_LEN+1];
         int	rows;
 	int	parm;
 
-	sprintf( c, "select i.itemid from items i,hosts h where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", host, key );
-	result = DBselect(c);
+	sprintf(sql, "select i.itemid from items i,hosts h where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", host, key );
+	result = DBselect(sql);
         rows = DBnum_rows(result);
 
 	if((result == NULL)||(rows==0))
 	{
         	DBfree_result(result);
-		syslog(LOG_WARNING, "Query failed" );
+		zabbix_log(LOG_LEVEL_WARNING, "Query failed" );
 		return FAIL;	
 	}
 
         item.itemid=atoi(DBget_field(result,0,0));
-	syslog(LOG_DEBUG, "Itemid:%d", item.itemid );
+	zabbix_log(LOG_LEVEL_DEBUG, "Itemid:%d", item.itemid );
         DBfree_result(result);
 
 	parm=atoi(parameter);
@@ -673,7 +662,7 @@ int	get_lastvalue(float *Result,char *host,char *key,char *function,char *parame
 /* int	process_data(char *server,char *key, double value)*/
 int	process_data(char *server,char *key,char *value)
 {
-	char	sql[1024];
+	char	sql[MAX_STRING_LEN+1];
 
 	DB_RESULT       *result;
 	DB_ITEM	item;
@@ -746,7 +735,7 @@ int	process_data(char *server,char *key,char *value)
 void	process_new_value(DB_ITEM *item,char *value)
 {
 	int 	now;
-	char	c[1024];
+	char	sql[MAX_STRING_LEN+1];
 	double	value_double;
 	char	*e;
 
@@ -757,17 +746,17 @@ void	process_new_value(DB_ITEM *item,char *value)
 	if(item->history>0)
 	{
 		if(item->value_type==0)
-			sprintf(c,"insert into history (itemid,clock,value) \
+			sprintf(sql,"insert into history (itemid,clock,value) \
 				values (%d,%d,%g)",item->itemid,now,value_double);
 		else
-			sprintf(c,"insert into history_str (itemid,clock,value) 
+			sprintf(sql,"insert into history_str (itemid,clock,value) 
 				values (%d,%d,'%s')",item->itemid,now,value);
-		DBexecute(c);
+		DBexecute(sql);
 	}
 
 	if((item->prevvalue_null == 1) || (cmp_double(value_double,item->lastvalue) != 0) || (cmp_double(item->prevvalue,item->lastvalue) != 0) )
 	{
-		sprintf(c,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue=%f,lastclock=%d where itemid=%d",now+item->delay,value_double,now,item->itemid);
+		sprintf(sql,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue=%f,lastclock=%d where itemid=%d",now+item->delay,value_double,now,item->itemid);
 		item->prevvalue=item->lastvalue;
 		item->lastvalue=value_double;
 		item->prevvalue_null=item->lastvalue_null;
@@ -775,9 +764,9 @@ void	process_new_value(DB_ITEM *item,char *value)
 	}
 	else
 	{
-		sprintf(c,"update items set NextCheck=%d,LastClock=%d where ItemId=%d",now+item->delay,now,item->itemid);
+		sprintf(sql,"update items set NextCheck=%d,LastClock=%d where ItemId=%d",now+item->delay,now,item->itemid);
 	}
-	DBexecute(c);
+	DBexecute(sql);
 
 	update_functions( item );
 }

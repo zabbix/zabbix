@@ -8,6 +8,7 @@
 #define	TIMEOUT_ERROR	(-4)
 
 #define	MAXFD	64
+#define MAX_STRING_LEN	1024
 
 /* Item types */
 

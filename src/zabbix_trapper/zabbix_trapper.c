@@ -21,10 +21,9 @@
 
 #include <time.h>
 
-#include <syslog.h>
-
 #include "common.h"
 #include "db.h"
+#include "log.h"
 #include "functions.h"
 
 int	CONFIG_TIMEOUT		= TRAPPER_TIMEOUT;
@@ -53,8 +52,8 @@ void	signal_handler( int sig )
 void	process_config_file(void)
 {
 	FILE	*file;
-	char	line[1024];
-	char	parameter[1024];
+	char	line[MAX_STRING_LEN+1];
+	char	parameter[MAX_STRING_LEN+1];
 	char	*value;
 	int	lineno;
 	int	i;
@@ -62,25 +61,25 @@ void	process_config_file(void)
 	file=fopen("/etc/zabbix/zabbix_trapper.conf","r");
 	if(NULL == file)
 	{
-		syslog( LOG_CRIT, "Cannot open /etc/zabbix/zabbix_trapper.conf");
+		zabbix_log( LOG_LEVEL_CRIT, "Cannot open /etc/zabbix/zabbix_trapper.conf");
 		exit(1);
 	}
 
 	lineno=0;
-	while(fgets(line,1024,file) != NULL)
+	while(fgets(line,MAX_STRING_LEN,file) != NULL)
 	{
 		lineno++;
 
 		if(line[0]=='#')	continue;
 		if(strlen(line)==1)	continue;
 
-		strcpy(parameter,line);
+		strncpy(parameter,line,MAX_STRING_LEN);
 
 		value=strstr(line,"=");
 
 		if(NULL == value)
 		{
-			syslog( LOG_CRIT, "Error in line [%s] Line %d", line, lineno);
+			zabbix_log( LOG_LEVEL_CRIT, "Error in line [%s] Line %d", line, lineno);
 			fclose(file);
 			exit(1);
 		}
@@ -89,25 +88,25 @@ void	process_config_file(void)
 
 		parameter[value-line-1]=0;
 
-		syslog( LOG_DEBUG, "Parameter [%s] Value [%s]", parameter, value);
+		zabbix_log( LOG_LEVEL_DEBUG, "Parameter [%s] Value [%s]", parameter, value);
 
 		if(strcmp(parameter,"DebugLevel")==0)
 		{
 			if(strcmp(value,"1") == 0)
 			{
-				setlogmask(LOG_UPTO(LOG_CRIT));
+//				setlogmask(LOG_UPTO(LOG_CRIT));
 			}
 			else if(strcmp(value,"2") == 0)
 			{
-				setlogmask(LOG_UPTO(LOG_WARNING));
+//				setlogmask(LOG_UPTO(LOG_WARNING));
 			}
 			else if(strcmp(value,"3") == 0)
 			{
-				setlogmask(LOG_UPTO(LOG_DEBUG));
+//				setlogmask(LOG_UPTO(LOG_DEBUG));
 			}
 			else
 			{
-				syslog( LOG_CRIT, "Wrong DebugLevel in line %d", lineno);
+//				zabbix_log( LOG_LEVEL_CRIT, "Wrong DebugLevel in line %d", lineno);
 				fclose(file);
 				exit(1);
 			}
@@ -117,7 +116,7 @@ void	process_config_file(void)
 			i=atoi(value);
 			if( (i<1) || (i>30) )
 			{
-				syslog( LOG_CRIT, "Wrong value of Timeout in line %d. Should be between 1 and 30.", lineno);
+				zabbix_log( LOG_LEVEL_CRIT, "Wrong value of Timeout in line %d. Should be between 1 and 30.", lineno);
 				fclose(file);
 				exit(1);
 			}
@@ -141,7 +140,7 @@ void	process_config_file(void)
 		}
 		else
 		{
-			syslog( LOG_CRIT, "Unsupported parameter [%s] Line %d", parameter, lineno);
+			zabbix_log( LOG_LEVEL_CRIT, "Unsupported parameter [%s] Line %d", parameter, lineno);
 			fclose(file);
 			exit(1);
 		}
@@ -150,14 +149,16 @@ void	process_config_file(void)
 	
 	if(CONFIG_DBNAME == NULL)
 	{
-		syslog( LOG_CRIT, "DBName not in config file");
+		zabbix_log( LOG_LEVEL_CRIT, "DBName not in config file");
 		exit(1);
 	}
 }
 
 int	main()
 {
-	char	*s,*p;
+	static	char	s[MAX_STRING_LEN+1];
+	char	*p;
+
 	char	*server,*key,*value_string;
 
 	int	ret=SUCCEED;
@@ -167,17 +168,18 @@ int	main()
 	signal( SIGTERM, signal_handler );
 	signal( SIGALRM, signal_handler );
 
-	s=(char *) malloc( 1024 );
-
 	alarm(CONFIG_TIMEOUT);
 
-	openlog("zabbix_trapper",LOG_PID,LOG_USER);
+//	openlog("zabbix_trapper",LOG_PID,LOG_USER);
 	//	ret=setlogmask(LOG_UPTO(LOG_DEBUG));
-	ret=setlogmask(LOG_UPTO(LOG_WARNING));
+//	ret=setlogmask(LOG_UPTO(LOG_WARNING));
+
+	zabbix_open_log(LOG_TYPE_FILE,LOG_LEVEL_WARNING,"/tmp/tmp.zzz");
+
 
 	process_config_file();
 	
-	fgets(s,1024,stdin);
+	fgets(s,MAX_STRING_LEN,stdin);
 	for( p=s+strlen(s)-1; p>s && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
 	p[1]=0;
 
@@ -216,8 +218,6 @@ int	main()
 	{
 		printf("OK\n");
 	}
-
-	free(s);
 
 	return ret;
 }
