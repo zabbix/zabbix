@@ -74,7 +74,7 @@
 		}
 		if($_GET["register"]=="delete")
 		{
-			$host-get_host_by_hostid($_GET["hostid"]);
+			$host=get_host_by_hostid($_GET["hostid"]);
 			$result=delete_host($_GET["hostid"]);
 			if($result)
 			{
