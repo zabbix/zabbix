@@ -91,7 +91,7 @@
 	{
 //              show_table_header("<font color=\"AA0000\">No permissions !</font>");
 //              show_footer();
-		ImagePng($im);
+		ImageOut($im);
 		ImageDestroy($im);
 		exit;
 	}
@@ -210,6 +210,6 @@
 
 	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, "http://www.zabbix.com", $gray);
 
-	ImagePng($im); 
+	ImageOut($im); 
 	ImageDestroy($im); 
 ?>

@@ -38,6 +38,16 @@
         }
 ?>
 
+<?php
+	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
+	{
+		unset($_GET["groupid"]);
+	}
+	if(isset($_GET["hostid"])&&($_GET["hostid"]==0))
+	{
+		unset($_GET["hostid"]);
+	}
+?>
 
 <?php
 	if(isset($_GET["register"]))
@@ -177,10 +187,12 @@
 
 	echo "&nbsp;".S_HOST."&nbsp;";
 	echo "<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
+	echo "<option value=\"0\" ".iif(!isset($_GET["hostid"]),"selected","").">".S_SELECT_HOST_DOT_DOT_DOT;
 
-	$sql=iif(isset($_GET["groupid"]),
-		"select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status in (0,2) and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host",
-		"select h.hostid,h.host from hosts h,items i where h.status in (0,2) and h.hostid=i.hostid group by h.hostid,h.host order by h.host");
+	if(isset($_GET["groupid"]))
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status in (0,2) and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+	else
+		$sql="select h.hostid,h.host from hosts h,items i where h.status in (0,2) and h.hostid=i.hostid group by h.hostid,h.host order by h.host";
 
 	$result=DBselect($sql);
 	while($row=DBfetch($result))

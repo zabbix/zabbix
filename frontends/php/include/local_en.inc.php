@@ -308,6 +308,7 @@
 	define("S_CUSTOM_MULTIPLIER",			"Custom multiplier");
 	define("S_DO_NOT_USE",				"Do not use");
 	define("S_USE_MULTIPLIER",			"Use multiplier");
+	define("S_SELECT_HOST_DOT_DOT_DOT",		"Select host...");
 
 //	latestalarms.php
 	define("S_LATEST_ALARMS",			"Latest alarms");

@@ -349,6 +349,7 @@ CREATE TABLE sysmaps (
   name			varchar(128)	DEFAULT '' NOT NULL,
   width			int4		DEFAULT '0' NOT NULL,
   height		int4		DEFAULT '0' NOT NULL,
+  background		varchar(64)	DEFAULT '' NOT NULL,
   PRIMARY KEY (sysmapid)
 );
 
@@ -363,9 +364,11 @@ CREATE TABLE sysmaps_hosts (
   sysmapid		int4		DEFAULT '0' NOT NULL,
   hostid		int4		DEFAULT '0' NOT NULL,
   icon			varchar(32)	DEFAULT 'Server' NOT NULL,
+  icon_on		varchar(32)	DEFAULT 'Server' NOT NULL,
   label			varchar(128)	DEFAULT '' NOT NULL,
   x			int4		DEFAULT '0' NOT NULL,
   y			int4		DEFAULT '0' NOT NULL,
+  url			varchar(255)	DEFAULT '' NOT NULL,
   PRIMARY KEY (shostid),
   FOREIGN KEY (sysmapid) REFERENCES sysmaps,
   FOREIGN KEY (hostid) REFERENCES hosts

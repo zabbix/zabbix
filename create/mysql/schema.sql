@@ -106,9 +106,11 @@ CREATE TABLE sysmaps_hosts (
   sysmapid		int(4)		DEFAULT '0' NOT NULL,
   hostid		int(4)		DEFAULT '0' NOT NULL,
   icon			varchar(32)	DEFAULT 'Server' NOT NULL,
+  icon_on		varchar(32)	DEFAULT 'Server' NOT NULL,
   label			varchar(128)	DEFAULT '' NOT NULL,
   x			int(4)		DEFAULT '0' NOT NULL,
   y			int(4)		DEFAULT '0' NOT NULL,
+  url			varchar(255)	DEFAULT '' NOT NULL,
   PRIMARY KEY (shostid)
 ) type=InnoDB;
 
@@ -121,6 +123,7 @@ CREATE TABLE sysmaps (
   name			varchar(128)	DEFAULT '' NOT NULL,
   width			int(4)		DEFAULT '0' NOT NULL,
   height		int(4)		DEFAULT '0' NOT NULL,
+  background		varchar(64)	DEFAULT '' NOT NULL,
   PRIMARY KEY (sysmapid),
   UNIQUE (name)
 ) type=InnoDB;
@@ -579,7 +582,7 @@ CREATE TABLE images (
   imageid		int(4)		DEFAULT '0' NOT NULL,
   imagetype		int(4)		DEFAULT '0' NOT NULL,
   name			varchar(64)	DEFAULT '0' NOT NULL,
-  image			blob		DEFAULT '' NOT NULL,
+  image			longblob	DEFAULT '' NOT NULL,
   PRIMARY KEY (imageid),
   UNIQUE (imagetype, name)
 ) type=InnoDB;

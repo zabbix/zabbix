@@ -350,7 +350,8 @@ int main_pinger_loop()
 			DBconnect();
 #endif
 	
-	zabbix_set_log_level(LOG_LEVEL_DEBUG);
+/*	zabbix_set_log_level(LOG_LEVEL_DEBUG);*/
+
 #ifdef ZABBIX_THREADS
 			ret = create_host_file(&database);
 #else
@@ -371,7 +372,8 @@ int main_pinger_loop()
 			}
 			unlink("/tmp/zabbix_suckerd.pinger");
 	
-	zabbix_set_log_level(LOG_LEVEL_WARNING);
+/*	zabbix_set_log_level(LOG_LEVEL_WARNING); */
+
 #ifdef ZABBIX_THREADS
 			DBclose_thread(&database);
 #else

@@ -36,25 +36,25 @@
 ?>
 
 <?php
-	if(isset($_POST["register"]))
+	if(isset($_GET["register"]))
 	{
-		if($_POST["register"]=="add")
+		if($_GET["register"]=="add")
 		{
-			$result=add_sysmap($_POST["name"],$_POST["width"],$_POST["height"],$_FILES["background"]);
+			$result=add_sysmap($_GET["name"],$_GET["width"],$_GET["height"],$_GET["background"]);
 			show_messages($result,"Network map added","Cannot add network map");
 			print_r($_FILES);
 			echo $_FILES["background"]["tmp_name"];
 		}
-		if($_POST["register"]=="update")
+		if($_GET["register"]=="update")
 		{
-			$result=update_sysmap($_POST["sysmapid"],$_POST["name"],$_POST["width"],$_POST["height"]);
+			$result=update_sysmap($_GET["sysmapid"],$_GET["name"],$_GET["width"],$_GET["height"],$_GET["background"]);
 			show_messages($result,"Network map updated","Cannot update network map");
 		}
-		if($_POST["register"]=="delete")
+		if($_GET["register"]=="delete")
 		{
-			$result=delete_sysmap($_POST["sysmapid"]);
+			$result=delete_sysmap($_GET["sysmapid"]);
 			show_messages($result,"Network map deleted","Cannot delete network map");
-			unset($_POST["sysmapid"]);
+			unset($_GET["sysmapid"]);
 		}
 	}
 ?>
@@ -115,16 +115,18 @@
 
 	if(isset($_GET["sysmapid"]))
 	{
-		$result=DBselect("select s.sysmapid,s.name,s.width,s.height from sysmaps s where sysmapid=".$_GET["sysmapid"]);
+		$result=DBselect("select s.sysmapid,s.name,s.width,s.height,s.background from sysmaps s where sysmapid=".$_GET["sysmapid"]);
 		$name=DBget_field($result,0,1);
 		$width=DBget_field($result,0,2);
 		$height=DBget_field($result,0,3);
+		$background=DBget_field($result,0,4);
 	}
 	else
 	{
 		$name="";
 		$width=800;
 		$height=600;
+		$background="";
 	}
 
 	echo "<br>";
@@ -132,7 +134,7 @@
 	echo "New system map";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" enctype=\"multipart/form-data\" action=\"sysmaps.php\">";
+	echo "<form method=\"get\" enctype=\"multipart/form-data\" action=\"sysmaps.php\">";
 	if(isset($_GET["sysmapid"]))
 	{
 		echo "<input class=\"biginput\" name=\"sysmapid\" type=\"hidden\" value=".$_GET["sysmapid"].">";
@@ -154,8 +156,23 @@
 	show_table2_v_delimiter();
 	echo "Background image";
 	show_table2_h_delimiter();
-	echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"10000000\">";
-	echo "<input class=\"biginput\" type=\"file\" name=\"background\">";
+	echo "<select class=\"biginput\" name=\"background\" size=1>";
+	$result=DBselect("select name from images where imagetype=2 order by name");
+	echo "<OPTION VALUE=''>No image...";
+	for($i=0;$i<DBnum_rows($result);$i++)
+	{
+		$name=DBget_field($result,$i,0);
+		if(isset($_GET["sysmapid"]) && ($background==$name))
+//		if(isset($_GET["hostid"]) && ($_GET["icon"]==$icons[$i]))
+		{
+			echo "<OPTION VALUE='".$name."' SELECTED>".$name;
+		}
+		else
+		{
+			echo "<OPTION VALUE='".$name."'>".$name;
+		}
+	}
+	echo "</SELECT>";
 
 	show_table2_v_delimiter2();
 	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
