@@ -42,7 +42,7 @@
 #else
 #define DEBUG_SUFFIX
 #endif
-#define AGENT_VERSION         "1.0.0-beta8(rc6)" DEBUG_SUFFIX
+#define AGENT_VERSION         "1.0.0-beta8" DEBUG_SUFFIX
 
 #define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
 #define ZABBIX_EVENT_SOURCE   "Zabbix Win32 Agent"
@@ -62,6 +62,17 @@
 #define SYSINFO_RC_SUCCESS       0
 #define SYSINFO_RC_NOTSUPPORTED  1
 #define SYSINFO_RC_ERROR         2
+
+
+//
+// Application flags
+//
+
+#define AF_STANDALONE               0x0001
+#define AF_USE_EVENT_LOG            0x0002
+#define AF_LOG_UNRESOLVED_SYMBOLS   0x0004
+
+#define IsStandalone() (dwFlags & AF_STANDALONE)
 
 
 //
@@ -156,8 +167,7 @@ extern DWORD dwTlsLogPrefix;
 extern HANDLE eventShutdown;
 extern HANDLE eventCollectorStarted;
 
-extern BOOL optStandalone;
-extern BOOL optUseEventLog;
+extern DWORD dwFlags;
 
 extern char confFile[];
 extern char logFile[];
