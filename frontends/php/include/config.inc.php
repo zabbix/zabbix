@@ -2468,7 +2468,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				while($row3=DBfetch($result3))
 				{
 					$function=get_function_by_functionid($row3["functionid"]);
-					$sql="insert into functions (itemid,triggerid,function,parameter) values ($itemid,$triggerid,'".$function["function"]."',".$function["parameter"].")";
+					$sql="insert into functions (itemid,triggerid,function,parameter) values ($itemid,$triggerid,'".$function["function"]."','".$function["parameter"]."')";
 					$result4=DBexecute($sql);
 					$functionid=DBinsert_id($result4,"functions","functionid");
 					$sql="update triggers set expression='".$trigger["expression"]."' where triggerid=$triggerid";
