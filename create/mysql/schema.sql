@@ -123,11 +123,12 @@ CREATE TABLE platforms (
   PRIMARY KEY (platformid)
 );
 
-insert into platforms (platformid,platform)	values (1,"Linux (Intel) v2.2");
-insert into platforms (platformid,platform)	values (2,"HP-UX 10.xx/11.xx");
-insert into platforms (platformid,platform)	values (3,"AIX 4.xx");
-insert into platforms (platformid,platform)	values (4,"MS Windows 98");
-insert into platforms (platformid,platform)	values (5,"MS Windows 2000");
+insert into platforms (platformid,platform)	values (1,"Linux v2.2");
+insert into platforms (platformid,platform)	values (20,"HP-UX 10.xx or 11.xx");
+insert into platforms (platformid,platform)	values (30,"AIX 4.xx");
+insert into platforms (platformid,platform)	values (40,"Open BSD 2.8");
+insert into platforms (platformid,platform)	values (100,"MS Windows 98");
+insert into platforms (platformid,platform)	values (110,"MS Windows 2000");
 
 #
 # Table structure for table 'items_template'

@@ -1,6 +1,7 @@
 #include "config.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 /* #include <mntent.h> */
 #include <sys/stat.h>
 /* Linux */
@@ -160,17 +161,56 @@ float	PING(void)
 
 float	PROCLOAD(void)
 {
+#ifdef HAVE_GETLOADAVG
+	double	load[3];
+
+	if(getloadavg(load, 3))
+	{
+		return load[0];	
+	}
+	else
+	{
+		return FAIL;	
+	}
+#else
 	return	getPROC("/proc/loadavg",1,1);
+#endif
 }
 
 float	PROCLOAD5(void)
 {
+#ifdef HAVE_GETLOADAVG
+	double	load[3];
+
+	if(getloadavg(load, 3))
+	{
+		return load[1];	
+	}
+	else
+	{
+		return FAIL;	
+	}
+#else
 	return	getPROC("/proc/loadavg",1,2);
+#endif
 }
 
 float	PROCLOAD15(void)
 {
+#ifdef HAVE_GETLOADAVG
+	double	load[3];
+
+	if(getloadavg(load, 3))
+	{
+		return load[2];	
+	}
+	else
+	{
+		return FAIL;	
+	}
+#else
 	return	getPROC("/proc/loadavg",1,3);
+#endif
 }
 
 float	SWAPFREE(void)
