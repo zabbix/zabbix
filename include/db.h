@@ -178,4 +178,5 @@ int	DBupdate_trigger_value(int triggerid,int value,int clock);
 int	DBget_items_count(void);
 int	DBget_items_unsupported_count(void);
 int	DBget_history_count(void);
+int	DBget_triggers_count(void);
 #endif

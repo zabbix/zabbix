@@ -436,7 +436,11 @@ int	get_value_SIMPLE(double *result,char *result_str,DB_ITEM *item)
 
 int	get_value_INTERNAL(double *result,char *result_str,DB_ITEM *item)
 {
-	if(strcmp(item->key,"zabbix[items]")==0)
+	if(strcmp(item->key,"zabbix[triggers]")==0)
+	{
+		*result=DBget_triggers_count();
+	}
+	else if(strcmp(item->key,"zabbix[items]")==0)
 	{
 		*result=DBget_items_count();
 	}
