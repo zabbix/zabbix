@@ -1,17 +1,5 @@
 1.0:
 
-Under Solaris:
-
--I/home/spath/net-snmp-5.0.9/include/net-snmp
-should read
--I/home/spath/net-snmp-5.0.9/include
-        
-and
-
--L/home/spath/net-snmp-5.0.9/lib/net-snmp
-should read
--L/home/spath/net-snmp-5.0.9/lib
-
  - check simple check FTP under Mandrake 9.0: https://sourceforge.net/forum/message.php?msg_id=2410500
  - improve actions.php to make selection of trigger, host, hosts on the top
  - navigation bar for all graphs and screens
