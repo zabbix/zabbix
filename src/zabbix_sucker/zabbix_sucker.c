@@ -498,7 +498,7 @@ int	get_value_INTERNAL(double *result,char *result_str,DB_ITEM *item)
 	}
 	else
 	{
-		*result=NOTSUPPORTED;
+		return NOTSUPPORTED;
 	}
 
 	sprintf(result_str,"%f",*result);
