@@ -44,6 +44,7 @@ static	int	CONFIG_SUCKERD_FORKS		=SUCKER_FORKS;
 static	int	CONFIG_NOTIMEWAIT		=0;
 static	int	CONFIG_TIMEOUT			=SUCKER_TIMEOUT;
 static	int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
+static	int	CONFIG_SENDER_FREQUENCY		= 30;
 static	int	CONFIG_DISABLE_HOUSEKEEPING	= 0;
 static	int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 static	char	*CONFIG_PID_FILE		= NULL;
@@ -201,8 +202,9 @@ void	init_config(void)
 	static struct cfg_line cfg[]=
 	{
 /*		 PARAMETER	,VAR	,FUNC,	TYPE(0i,1s),MANDATORY,MIN,MAX	*/
-		{"StartSuckers",&CONFIG_SUCKERD_FORKS,0,TYPE_INT,PARM_OPT,2,255},
+		{"StartSuckers",&CONFIG_SUCKERD_FORKS,0,TYPE_INT,PARM_OPT,3,255},
 		{"HousekeepingFrequency",&CONFIG_HOUSEKEEPING_FREQUENCY,0,TYPE_INT,PARM_OPT,1,24},
+		{"SenderFrequency",&CONFIG_SENDER_FREQUENCY,0,TYPE_INT,PARM_OPT,5,3600},
 		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
 		{"NoTimeWait",&CONFIG_NOTIMEWAIT,0,TYPE_INT,PARM_OPT,0,1},
 		{"DisableHousekeeping",&CONFIG_DISABLE_HOUSEKEEPING,0,TYPE_INT,PARM_OPT,0,1},
@@ -545,7 +547,7 @@ int get_minnextcheck(int now)
 /* Host status	0 == MONITORED
 		1 == NOT MONITORED
 		2 == UNREACHABLE */ 
-	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and i.itemid%%%d=%d",now,CONFIG_SUCKERD_FORKS-1,sucker_num-1);
+	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and i.itemid%%%d=%d",now,CONFIG_SUCKERD_FORKS-2,sucker_num-2);
 	result = DBselect(sql);
 
 	if( DBis_empty(result) == SUCCEED)
@@ -588,7 +590,7 @@ int get_values(void)
 
 	now = time(NULL);
 
-	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-1,sucker_num-1);
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-2,sucker_num-2);
 	result = DBselect(sql);
 
 	if( DBis_empty(result) == SUCCEED)
@@ -768,6 +770,76 @@ int housekeeping_alarms(int now)
 	return SUCCEED;
 }
 
+int main_alerter_loop()
+{
+	char	smtp_server[MAX_STRING_LEN+1];
+	char	smtp_helo[MAX_STRING_LEN+1];
+	char	smtp_email[MAX_STRING_LEN+1];
+
+	char	sql[MAX_STRING_LEN+1];
+
+	int	i;
+
+	DB_RESULT	*result;
+	DB_ALERT	alert;
+
+	for(;;)
+	{
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("connecting to the database");
+#endif
+		DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+
+		sprintf(sql,"select smtp_server,smtp_helo,smtp_email from config");
+		result = DBselect(sql);
+		strncpy(smtp_server,DBget_field(result,0,0), MAX_STRING_LEN);
+		strncpy(smtp_helo,DBget_field(result,0,1), MAX_STRING_LEN);
+		strncpy(smtp_email,DBget_field(result,0,2), MAX_STRING_LEN);
+		DBfree_result(result);
+
+		sprintf(sql,"select alertid,type,sendto,subject,message,status,retries from alerts where status=0 and retries<3 order by clock");
+		result = DBselect(sql);
+
+		for(i=0;i<DBnum_rows(result);i++)
+		{
+			alert.alertid=atoi(DBget_field(result,i,0));
+			alert.type=DBget_field(result,i,1);
+			alert.sendto=DBget_field(result,i,2);
+			alert.subject=DBget_field(result,i,3);
+			alert.message=DBget_field(result,i,4);
+			alert.status=atoi(DBget_field(result,i,5));
+			alert.retries=atoi(DBget_field(result,i,6));
+
+			if(strcmp(alert.type,ALERT_TYPE_EMAIL)==0)
+			{
+				if(FAIL == send_mail(smtp_server,smtp_helo,smtp_email,alert.sendto,alert.subject,alert.message))
+				{
+					zabbix_log( LOG_LEVEL_ERR, "Error sending email to '%s' Subject:'%s'", alert.sendto, alert.subject);
+					sprintf(sql,"update alerts set retries=retries+1 where alertid=%d", alert.alertid);
+					DBexecute(sql);
+				}
+				else
+				{
+					sprintf(sql,"update alerts set status=1 where alertid=%d", alert.alertid);
+					DBexecute(sql);
+				}
+			}
+			else
+			{
+					sprintf(sql,"update alerts set retries=3 where alertid=%d", alert.alertid);
+					DBexecute(sql);
+					zabbix_log( LOG_LEVEL_ERR, "Unsupported type of alert [%s] Alert ID [%d]", alert.type, alert.alertid );
+			}
+		}
+
+		DBclose();
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("sender [sleeping for %d seconds]", CONFIG_SENDER_FREQUENCY);
+#endif
+		sleep(CONFIG_SENDER_FREQUENCY);
+	}
+}
+
 int main_housekeeping_loop()
 {
 	int	now;
@@ -901,6 +973,8 @@ int main(int argc, char **argv)
 
 	create_pid_file();
 
+	zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd started");
+
 /* Need to set trigger status to UNKNOWN since last run */
 	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
 	DBupdate_triggers_status_after_restart();
@@ -932,6 +1006,11 @@ int main(int argc, char **argv)
 /* First instance of zabbix_suckerd does housekeeping procedures */
 		main_housekeeping_loop();
 	}
+	else if(sucker_num == 1)
+	{
+/* Second instance of zabbix_suckerd sends alerts to users */
+		main_alerter_loop();
+	}	
 	else
 	{
 		main_sucker_loop();

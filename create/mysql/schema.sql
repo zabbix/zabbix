@@ -6,6 +6,7 @@ CREATE TABLE services (
   serviceid		int(4)		NOT NULL auto_increment,
   name			varchar(128)	DEFAULT '' NOT NULL,
   status		int(1)		DEFAULT '0' NOT NULL,
+  algorithm		int(1)		DEFAULT '0' NOT NULL,
   triggerid		int(4),
   PRIMARY KEY (serviceid)
 );
@@ -126,9 +127,12 @@ CREATE TABLE alerts (
   sendto		varchar(100)	DEFAULT '' NOT NULL,
   subject		varchar(255)	DEFAULT '' NOT NULL,
   message		blob		DEFAULT '' NOT NULL,
+  status		int(4)		DEFAULT '0' NOT NULL,
+  retries		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (alertid),
   INDEX (actionid),
-  KEY clock (clock)
+  KEY clock (clock),
+  KEY status_retries (sent, retries)
 );
 
 --

@@ -1,25 +1,32 @@
-Not ready yet:
+Not ready yet (later versions):
 
+[ CORE. All errors and warnings must be numbered and documented ]
+[ CORE. Support for macros like {server:system[procload].graph(1)} ]
 [ HB. Verify parameters before using them in SQL ]
+
+Not ready yet (1.0beta4):
+
 [ CORE. Support for Service Tree ] 
-[ CORE. Change trigger status in case if host/item status is changed ]
-[ PHP. Navigation by time period for graphs and trends ]
-
-[ TESTING. Define procedure for regression testing ]
-
-[ PHP. Show triggers by userid ]
-
-[ CORE. Make one suckerd to send emails ]
+[ CORE. Check permission system ]
+[ CORE. Support of monitoring of log files ]
 
 [ DOCS. SNMP with missing MIB files can be used by:
 snmpget -On localhost public enterprises.ucdavis.memory.memTotalSwap.0]
 
-[ CORE. All errors and warnings must be numbered and documented ]
-
-[ CORE. Support for macros like {server:system[procload].graph(1)} ]
+[ PHP. Navigation by time period for graphs and trends ]
 
 Changes for 1.0beta4:
 
+ - added parameter SenderFrequency to zabbix_suckerd configuration 
+ file (Alexei)
+ - added frontends/include/defines.inc.php (Alexei)
+ - added column services.algorithm (Alexei)
+ - list of test cases added to the Manual (Alexei)
+ - emails to be sent in case of TRUE-UNKNOWN-FALSE and v.s. (Alexei)
+ - one zabbix_suckerd to send alerts (Alexei)
+ - minimum number of zabbix_suckers StartSuckers is set to 3 (Alexei)
+ - added alerts.retries (Alexei)
+ - added alerts.status (Alexei)
  - status of triggers changes if host/item status has been changed (Alexei)
  - status of triggers is set correctly even if zabbix is restarted (Alexei)
  - php/include/*inc renamed to php/include/*inc.php (Alexei)

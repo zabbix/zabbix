@@ -414,7 +414,7 @@ int	send_mail(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,ch
 /*
  * Send message to user. Message will be sent to all medias registered to given user.
  */ 
-void	send_to_user(int actionid,int userid,char *smtp_server,char *smtp_helo,char *smtp_email,char *subject,char *message)
+void	send_to_user(int actionid,int userid,char *subject,char *message)
 {
 	DB_MEDIA media;
 	char sql[MAX_STRING_LEN+1];
@@ -438,19 +438,7 @@ void	send_to_user(int actionid,int userid,char *smtp_server,char *smtp_helo,char
 		media.type=DBget_field(result,i,0);
 		media.sendto=DBget_field(result,i,1);
 
-		if(strcmp(media.type,"EMAIL")==0)
-		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Email sending to %s %s Subject:%s Message:%s to %d\n", media.type, media.sendto, subject, message, userid );
-			if( FAIL == send_mail(smtp_server,smtp_helo,smtp_email,media.sendto,subject,message))
-			{
-				zabbix_log( LOG_LEVEL_ERR, "Error sending email to '%s' Subject:'%s' to userid:%d\n", media.sendto, subject, userid );
-			}
-			DBadd_alert(actionid,media.type,media.sendto,subject,message);
-		} 
-		else
-		{
-			zabbix_log( LOG_LEVEL_WARNING, "Media type %s is not supported yet", media.type );
-		}
+		DBadd_alert(actionid,media.type,media.sendto,subject,message);
 	}
 	DBfree_result(result);
 }
@@ -466,12 +454,10 @@ void	apply_actions(int triggerid,int good)
 
 	char sql[MAX_STRING_LEN+1];
 
-	char	smtp_server[MAX_STRING_LEN+1],
-		smtp_helo[MAX_STRING_LEN+1],
-		smtp_email[MAX_STRING_LEN+1];
-
 	int	i,rows;
 	int	now;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In apply_actions()");
 
 	if(good==1)
 	{
@@ -493,16 +479,6 @@ void	apply_actions(int triggerid,int good)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Applying actions");
 
-	/* Get smtp_server and smtp_helo from config */
-	sprintf(sql,"select smtp_server,smtp_helo,smtp_email from config");
-	result = DBselect(sql);
-
-	strncpy(smtp_server,DBget_field(result,0,0), MAX_STRING_LEN);
-	strncpy(smtp_helo,DBget_field(result,0,1), MAX_STRING_LEN);
-	strncpy(smtp_email,DBget_field(result,0,2), MAX_STRING_LEN);
-
-	DBfree_result(result);
-
 	now = time(NULL);
 
 	sprintf(sql,"select actionid,userid,delay,subject,message from actions where triggerid=%d and good=%d and nextcheck<=%d",triggerid,good,now);
@@ -523,7 +499,7 @@ void	apply_actions(int triggerid,int good)
 		substitute_macros(action.message);
 		substitute_macros(action.subject); 
 
-		send_to_user(action.actionid,action.userid,smtp_server,smtp_helo,smtp_email,action.subject,action.message);
+		send_to_user(action.actionid,action.userid,action.subject,action.message);
 		now = time(NULL);
 		sprintf(sql,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
 		DBexecute(sql);
@@ -532,32 +508,48 @@ void	apply_actions(int triggerid,int good)
 	DBfree_result(result);
 }
 
+/*
+ * Recursive function!
+ */
 void	update_serv(int serviceid)
 {
 	char	sql[MAX_STRING_LEN+1];
 	int	i,j;
 	int	status;
+	int	serviceupid, algorithm;
 
 	DB_RESULT *result,*result2;
 
-	sprintf(sql,"select serviceupid from services_links where servicedownid=%d",serviceid);
+	sprintf(sql,"select l.serviceupid,s.algorithm from services_links l,services s where s.serviceid=l.serviceupid and l.servicedownid=%d",serviceid);
 	result=DBselect(sql);
 	status=0;	
 	for(i=0;i<DBnum_rows(result);i++)
 	{
-		sprintf(sql,"select status from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",atoi(DBget_field(result,i,0)));
-		result2=DBselect(sql);
-		for(j=0;j<DBnum_rows(result2);j++)
+		serviceupid=atoi(DBget_field(result,i,0));
+		algorithm=atoi(DBget_field(result,i,1));
+		if(SERVICE_ALGORITHM_NONE == algorithm)
 		{
-			if(atoi(DBget_field(result2,j,0))>status)
-			{
-				status=atoi(DBget_field(result2,j,0));
-			}
+/* Do nothing */
 		}
-		sprintf(sql,"update services set status=%d where serviceid=%d",status,atoi(DBget_field(result,i,0)));
-		DBexecute(sql);
-
-		DBfree_result(result2);
+		else if(SERVICE_ALGORITHM_MAX == algorithm)
+		{
+			sprintf(sql,"select status from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
+			result2=DBselect(sql);
+			for(j=0;j<DBnum_rows(result2);j++)
+			{
+				if(atoi(DBget_field(result2,j,0))>status)
+				{
+					status=atoi(DBget_field(result2,j,0));
+				}
+			}
+			sprintf(sql,"update services set status=%d where serviceid=%d",status,atoi(DBget_field(result,i,0)));
+			DBexecute(sql);
+			DBfree_result(result2);
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_ERR, "Unknown calculation algorithm of service status [%d]", algorithm);
+		}
 	}
 	DBfree_result(result);
 
@@ -570,9 +562,6 @@ void	update_serv(int serviceid)
 	DBfree_result(result);
 }
 
-/*
- * Recursive function!
- */
 void	update_services(int triggerid, int status)
 {
 	char	sql[MAX_STRING_LEN+1];
@@ -616,6 +605,7 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 	DB_RESULT	*result;
 
 	int	i;
+	int	prevvalue;
 
 	if(flag == 0)
 	{
@@ -651,6 +641,8 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 			continue;
 		}
 
+		prevvalue=DBget_prev_trigger_value(trigger.triggerid);
+
 		if(b==1)
 		{
 			if(trigger.value != TRIGGER_VALUE_TRUE)
@@ -661,7 +653,12 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 
 				DBadd_alarm(trigger.triggerid, TRIGGER_VALUE_TRUE, now);
 			}
-			if(trigger.value == TRIGGER_VALUE_FALSE)
+			if((trigger.value == TRIGGER_VALUE_FALSE)
+			||
+			(
+			 (trigger.value == TRIGGER_VALUE_UNKNOWN) &&
+			 (prevvalue == TRIGGER_VALUE_FALSE)
+			))
 			{
 				now = time(NULL);
 				apply_actions(trigger.triggerid,1);
@@ -684,7 +681,12 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 				DBadd_alarm(trigger.triggerid, TRIGGER_VALUE_FALSE,now);
 			}
 
-			if(trigger.value == TRIGGER_VALUE_TRUE)
+			if((trigger.value == TRIGGER_VALUE_TRUE)
+			||
+			(
+			 (trigger.value == TRIGGER_VALUE_UNKNOWN) &&
+			 (prevvalue == TRIGGER_VALUE_TRUE)
+			))
 			{
 				apply_actions(trigger.triggerid,0);
 
