@@ -68,6 +68,8 @@ COMMAND	commands[]=
 
 	{"ping"				,PING, 0},
 	{"tcp_count"			,EXECUTE, "netstat -tn|grep EST|wc -l"},
+
+	{"net[listen_25]"		,EXECUTE, "netstat -an|grep LISTEN|grep -v grep|grep ':25 '|wc -l"},
 	{0				,0}
 	};
 
