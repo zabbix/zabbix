@@ -47,6 +47,8 @@ int	find_char(char *str,char c)
 {
 	int i;
 
+	dbg_write( dbg_proginfo, "Before find_char:%s[%c]", str, c );
+
 	for(i=0;i<strlen(str);i++)
 	{
 		if(str[i]==c) return i;
@@ -283,7 +285,7 @@ int	substitute_functions(char *exp)
 	char	res[1024];
 	int	i,l,r;
 
-	dbg_write( dbg_proginfo, "BEGIN SubstituteFunctions" );
+	dbg_write( dbg_proginfo, "BEGIN substitute_functions" );
 
 	while( find_char(exp,'{') != FAIL )
 	{
