@@ -1,5 +1,6 @@
 Changes for 1.0beta14:
 
+ - fixed trigger update. Value of the trigger sets to UNKNOWN. (Alexei)
  - fixed --with-[net|ucd]-snmp to work with various paths (Alexei)
  - changed css.css to follow W3C standard (Alexei)
  - changed DB schema. Dropped foreign key for table actions (Alexei)
