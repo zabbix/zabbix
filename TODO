@@ -4,11 +4,11 @@
  - improve actions.php to make selection of trigger, host, hosts on the top
  - navigation bar for all graphs and screens
  - make support for "Clone"
+ - add SNMP-based template
 
 LATER:
 
  - zabbix to write log to the item (for example: log when item becomes unsupported)
- - add SNMP-based template
  - support for UDP-based checks (DNS, etc)
  - 'clone' for graphs and screens
  - add screens and graphs to host templates
