@@ -30,6 +30,10 @@
 			{
 				$softlink=0;
 			}
+			else
+			{
+				$softlink=1;
+			}
 			$result=add_service_link($servicedownid,$serviceupid,$softlink);
 			show_messages($result,"Service link added","Cannot add service link");
 		}
@@ -90,7 +94,7 @@
 		$childs=get_num_of_service_childs($row["serviceid"]);
 		if(isset($serviceid))
 		{
-			echo "<td><a href=\"services.php?serviceid=".$row["serviceid"]."#form\"> - ".$row["name"]." [$childs]</a></td>";
+			echo "<td> - <a href=\"services.php?serviceid=".$row["serviceid"]."#form\">".$row["name"]." [$childs]</a></td>";
 		}
 		else
 		{
@@ -223,7 +227,7 @@
 
 	echo "<br>";
 	show_table2_header_begin();
-	echo "New link";
+	echo "Link to ...";
 
 	show_table2_v_delimiter();
 	echo "<form method=\"post\" action=\"services.php\">";

@@ -665,6 +665,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
+			<a href="srv_status.php">
 <?
 				if($page["file"]=="srv_status.php")
 				{
@@ -869,6 +870,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
+			<a href="services.php">
 <?
 				if($page["file"]=="services.php")
 				{
@@ -1259,14 +1261,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	add_service_link($servicedownid,$serviceupid,$softlink)
 	{
-		if(isset($softlink) && ($softlink=="on"))
-		{
-			$sql="insert into services_links (servicedownid,serviceupid,soft) values ($servicedownid,$serviceupid,1)";
-		}
-		else
-		{
-			$sql="insert into services_links (servicedownid,serviceupid,soft) values ($servicedownid,$serviceupid,0)";
-		}
+		$sql="insert into services_links (servicedownid,serviceupid,soft) values ($servicedownid,$serviceupid,$softlink)";
 		return	DBexecute($sql);
 	}
 
