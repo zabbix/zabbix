@@ -129,11 +129,15 @@
 		{
 			if($resource == 0)
 			{
-				echo "<a href=charts.php?graphid=$resourceid><img src='chart2.php?graphid=$resourceid&width=$width&height=$height&period=3600&noborder=1' border=0></a>";
+				echo "<a href=charts.php?graphid=$resourceid><img src='chart2.php?graphid=$resourceid&width=$width&height=$height&period=3600&border=0' border=0></a>";
 			}
 			else if($resource == 1)
 			{
-				echo "<a href=history.php?action=showhistory&itemid=$resourceid><img src='chart.php?itemid=$resourceid&width=$width&height=$height&period=3600&noborder=1' border=0></a>";
+				echo "<a href=history.php?action=showhistory&itemid=$resourceid><img src='chart.php?itemid=$resourceid&width=$width&height=$height&period=3600&border=0' border=0></a>";
+			}
+			else if($resource == 2)
+			{
+				echo "<a href=history.php?action=showhistory&itemid=$resourceid><img src='map.php?sysmapid=$resourceid&noedit=true&border=1' border=0></a>";
 			}
 		}
 		echo "</form>\n";
