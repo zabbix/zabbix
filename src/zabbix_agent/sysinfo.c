@@ -332,7 +332,8 @@ void	process(char *command,char *value)
 		{
 			result = NOTSUPPORTED;
 		}
-		else if(res2==TIMEOUT_ERROR)
+/* (int) to avoid compiler's warning */
+		else if((int)res2==TIMEOUT_ERROR)
 		{
 			result = TIMEOUT_ERROR;
 		}
@@ -1497,7 +1498,8 @@ char	*EXECUTE_STR(char *command)
 		switch (errno)
 		{
 			case	EINTR:
-				return TIMEOUT_ERROR;
+/* (char *) to avoid compiler warning */
+				return (char *)TIMEOUT_ERROR;
 			default:
 				return NULL;
 		}
@@ -1509,7 +1511,8 @@ char	*EXECUTE_STR(char *command)
 		switch (errno)
 		{
 			case	EINTR:
-				return TIMEOUT_ERROR;
+/* (char *) to avoid compiler warning */
+				return (char *)TIMEOUT_ERROR;
 			default:
 				return NULL;
 		}
@@ -1520,7 +1523,8 @@ char	*EXECUTE_STR(char *command)
 		switch (errno)
 		{
 			case	EINTR:
-				return TIMEOUT_ERROR;
+/* (char *) to avoid compiler warning */
+				return (char *)TIMEOUT_ERROR;
 			default:
 				return NULL;
 		}
