@@ -16,6 +16,8 @@ Not ready yet:
 
 Changes for 1.0beta3:
 
+ - minor changes in include/cfg.c (Alexei)
+
  - column functions.lastvalue changed to varchar(255) (Alexei)
  - column items.lastvalue changed to varchar(255) (Alexei)
  - column items.prevvalue changed to varchar(255) (Alexei)
