@@ -1,6 +1,8 @@
 Changes for 1.0beta13:
 
- - added 2>/dev/null to fping to get rid of message on the console (Alexei)
+ - fixed support for situation when one of graph's metrics has no values
+ (Alexei)
+ - added '2>/dev/null' to fping to get rid of message on the console (Alexei)
  - new icons and icon types for sysmaps (Alexei)
  - added columns color_on,color_off,drawtype_on,drawtype_off to table
  sysmaps_links (Alexei)

@@ -337,12 +337,21 @@
 				ImageFilledRectangle($this->im,$this->shiftX,$this->sizeY+$this->shiftY+62+12*$i,$this->shiftX+5,$this->sizeY+$this->shiftY+5+62+12*$i,$this->colors[$this->items[$i]["color"]]);
 				ImageRectangle($this->im,$this->shiftX,$this->sizeY+$this->shiftY+62+12*$i,$this->shiftX+5,$this->sizeY+$this->shiftY+5+62+12*$i,$this->colors["Black No Alpha"]);
 
-				$str=sprintf("%s: %s [min:%s max:%s last:%s]",
-					str_pad($this->items[$i]["host"],$max_host_len," "),
-					str_pad($this->items[$i]["description"],$max_desc_len," "),
-					convert_units(min($this->min[$i]),$this->items[$i]["units"],$this->items[$i]["multiplier"]),
-					convert_units(max($this->max[$i]),$this->items[$i]["units"],$this->items[$i]["multiplier"]),
-					convert_units($this->getLastValue($i),$this->items[$i]["units"],$this->items[$i]["multiplier"]));
+				if(isset($this->min[$i]))
+				{
+					$str=sprintf("%s: %s [min:%s max:%s last:%s]",
+						str_pad($this->items[$i]["host"],$max_host_len," "),
+						str_pad($this->items[$i]["description"],$max_desc_len," "),
+						convert_units(min($this->min[$i]),$this->items[$i]["units"],$this->items[$i]["multiplier"]),
+						convert_units(max($this->max[$i]),$this->items[$i]["units"],$this->items[$i]["multiplier"]),
+						convert_units($this->getLastValue($i),$this->items[$i]["units"],$this->items[$i]["multiplier"]));
+				}
+				else
+				{
+					$str=sprintf("%s: %s [ no data ]",
+						str_pad($this->items[$i]["host"],$max_host_len," "),
+						str_pad($this->items[$i]["description"],$max_desc_len," "));
+				}
 	
 				ImageString($this->im, 2,$this->shiftX+9,$this->sizeY+$this->shiftY+(62-5)+12*$i,$str, $this->colors["Black No Alpha"]);
 			}
