@@ -65,6 +65,12 @@
 		ImageRectangle($im,0,0,$width-1,$height-1,$black);
 	}
 
+	$x=imagesx($im)/2-ImageFontWidth(4)*strlen($name)/2;
+	ImageString($im, 4,$x,1, $name , $darkred);
+
+	$str=date("m.d.Y H:i:s",time(NULL));
+	ImageString($im, 0,imagesx($im)-120,imagesy($im)-12,"$str", $gray);
+
 	if(!check_right("Network map","R",$HTTP_GET_VARS["sysmapid"]))
 	{
 		ImagePng($im); 
