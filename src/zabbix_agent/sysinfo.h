@@ -20,6 +20,7 @@ float	DISK_WIO(void);
 float	DISK_RBLK(void);
 float	DISK_WBLK(void);
 float	PING(void);
+float	PROCCNT(const char *procname);
 float	PROCCOUNT(void);
 float	PROCLOAD(void);
 float	PROCLOAD5(void);

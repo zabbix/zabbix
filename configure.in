@@ -14,7 +14,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   syslog.h time.h errno.h sys/types.h sys/stat.h netinet/in.h \
   sys/socket.h ucd-snmp/ucd-snmp-config.h ucd-snmp/system.h \
-  ucd-snmp/ucd-snmp-includes.h \
+  ucd-snmp/ucd-snmp-includes.h dirent.h \
   mtent.h fcntl.h sys/param.h sys/mount.h arpa/inet.h \
   sys/vfs.h sys/pstat.h sys/sysinfo.h sys/statvfs.h \
   sys/socket.h sys/loadavg.h netinet/in.h arpa/inet.h)
