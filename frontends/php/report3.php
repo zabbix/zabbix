@@ -21,11 +21,14 @@
 		show_footer();
 		exit;
 	}
+	$service=get_service_by_serviceid($HTTP_GET_VARS["serviceid"]);
 ?>
 
 <?php
 	show_table_header_begin();
 	echo "IT SERVICES AVAILABILITY REPORT";
+	echo "<br>";
+	echo "<a href=\"srv_status.php?serviceid=".$service["serviceid"]."\">",$service["name"],"</a>";;
 
 	show_table_v_delimiter();
 
@@ -51,7 +54,6 @@
 
 <?php
 
-	$service=get_service_by_serviceid($HTTP_GET_VARS["serviceid"]);
 
 	echo "<br>";
 	echo "<TABLE BORDER=0 COLS=3 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
@@ -60,7 +62,7 @@
 	echo "<TD WIDTH=15%><B>Till</B></TD>";
 	echo "<TD WIDTH=10%><B>OK</B></TD>";
 	echo "<TD WIDTH=10%><B>Problems</B></TD>";
-	echo "<TD WIDTH=10%><B>Percentage</B></TD>";
+	echo "<TD WIDTH=15%><B>Percentage</B></TD>";
 	echo "<TD><B>SLA</B></TD>";
 	echo "</TR>\n";
 
@@ -100,90 +102,26 @@
 			echo "<td>"; echo "<font color=\"00AA00\">$f_time</font>" ; echo "</td>";
 			echo "<td>"; echo "<font color=\"AA0000\">$t_time</a>" ; echo "</td>";
 			echo "<td>"; echo "<font color=\"00AA00\">$f</font>/<font color=\"AA0000\">$t</font>" ; echo "</td>";
-			echo "<td></td>";
+			if($service["showsla"]==1)
+			{
+				if($stat["ok"]>=$service["goodsla"])
+				{
+					echo "<td><font color=\"00AA00\">".$service["goodsla"]."%</font></td>";
+				}
+				else
+				{
+					echo "<td><font color=\"AA0000\">".$service["goodsla"]."%</font></td>";
+				}
+			}
+			else
+			{
+				echo "<td>-</td>";
+			}
 		
 			echo "</tr>";
 		}
 	}
 	echo "</TABLE>";
 
-	show_footer();
-	exit;
-?>
-
-	if(isset($HTTP_GET_VARS["hostid"])&&!isset($HTTP_GET_VARS["triggerid"]))
-	{
-		echo "<br>";
-		$result=DBselect("select host from hosts where hostid=".$HTTP_GET_VARS["hostid"]);
-		$row=DBfetch($result);
-		show_table_header($row["host"]);
-
-		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.value from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.status=0 and t.triggerid=f.triggerid and h.hostid=".$HTTP_GET_VARS["hostid"]." and h.status in (0,2) and i.status=0 order by h.host, t.description");
-		echo "<TABLE BORDER=0 COLS=3 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-		echo "<TR>";
-		echo "<TD><B>Description</B></TD>";
-//		echo "<TD><B>Expression</B></TD>";
-		echo "<TD WIDTH=5%><B>True</B></TD>";
-		echo "<TD WIDTH=5%><B>False</B></TD>";
-		echo "<TD WIDTH=5%><B>Unknown</B></TD>";
-		echo "<TD WIDTH=5%><B>Graph</B></TD>";
-		echo "</TR>\n";
-		$col=0;
-		while($row=DBfetch($result))
-		{
-			if(!check_right_on_trigger("R",$row["triggerid"])) 
-			{
-				continue;
-			}
-			$lasthost=$row["host"];
-
-		        if($col++%2 == 1)	{ echo "<TR BGCOLOR=#DDDDDD>"; }
-			else			{ echo "<TR BGCOLOR=#EEEEEE>"; }
-
-			$description=$row["description"];
-
-			if( strstr($description,"%s"))
-			{
-				$description=expand_trigger_description($row["triggerid"]);
-			}
-			echo "<TD><a href=\"alarms.php?triggerid=".$row["triggerid"]."\">$description</a></TD>";
-//			$description=rawurlencode($row["description"]);
-	
-//			echo "<TD>".explode_exp($row["expression"],1)."</TD>";
-			$availability=calculate_availability($row["triggerid"],0,0);
-			echo "<TD>";
-			printf("%.4f%%",$availability["true"]);
-			echo "</TD>";
-			echo "<TD>";
-			printf("%.4f%%",$availability["false"]);
-			echo "</TD>";
-			echo "<TD>";
-			printf("%.4f%%",$availability["unknown"]);
-			echo "</TD>";
-			echo "<TD>";
-			echo "<a href=\"report2.php?hostid=".$HTTP_GET_VARS["hostid"]."&triggerid=".$row["triggerid"]."\">Show</a>";
-			echo "</TD>";
-			echo "</TR>\n";
-		}
-		echo "</table>\n";
-	}
-?>
-
-<?php
-	if(isset($HTTP_GET_VARS["triggerid"]))
-	{
-		echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-		echo "<TR BGCOLOR=#EEEEEE>";
-		echo "<TR BGCOLOR=#DDDDDD>";
-		echo "<TD ALIGN=CENTER>";
-		echo "<IMG SRC=\"chart4.php?triggerid=".$HTTP_GET_VARS["triggerid"]."\" border=0>";
-		echo "</TD>";
-		echo "</TR>";
-		echo "</TABLE>";
-	}
-?>
-
-
-<?php
 	show_footer();
 ?>
