@@ -53,7 +53,7 @@
 
 int calculator_loop()
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 
 	int	i,res;
 

@@ -93,8 +93,8 @@ void	init_stats_interfaces()
 {
 	FILE	*file;
 	char	*s;
-	char	line[MAX_STRING_LEN+1];
-	char	interface[MAX_STRING_LEN+1];
+	char	line[MAX_STRING_LEN];
+	char	interface[MAX_STRING_LEN];
 	int	i,j,j1;
 
 	for(i=0;i<MAX_INTERFACE;i++)
@@ -323,10 +323,10 @@ void	collect_stats_interfaces(FILE *outfile)
 	FILE	*file;
 
 	char	*s;
-	char	line[MAX_STRING_LEN+1];
+	char	line[MAX_STRING_LEN];
 	int	i,j;
 	int	i1,j1;
-	char	interface[MAX_STRING_LEN+1];
+	char	interface[MAX_STRING_LEN];
 	int	now;
 	float	received=0,sent;
 

@@ -432,8 +432,8 @@ int	get_value_SNMP(int version,double *result,char *result_str,DB_ITEM *item)
 int	get_value_SIMPLE(double *result,char *result_str,DB_ITEM *item)
 {
 	char	*e,*t;
-	char	c[MAX_STRING_LEN+1];
-	char	s[MAX_STRING_LEN+1];
+	char	c[MAX_STRING_LEN];
+	char	s[MAX_STRING_LEN];
 
 	/* The code is ugly. I would rewrite it. Alexei.	*/
 	/* Assumption: host name does not contain '_perf'	*/
@@ -450,7 +450,7 @@ int	get_value_SIMPLE(double *result,char *result_str,DB_ITEM *item)
 	}
 	else
 	{
-		strncpy(s,item->key,MAX_STRING_LEN);
+		strscpy(s,item->key);
 		t=strstr(s,"_perf");
 		t[0]=0;
 		
@@ -513,7 +513,7 @@ int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
 {
 	int	s;
 	int	len;
-	static	char	c[MAX_STRING_LEN+1];
+	static	char	c[MAX_STRING_LEN];
 	char	*e;
 
 	struct hostent *hp;
@@ -595,7 +595,7 @@ int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
 		return	FAIL;
 	} 
 
-	memset(c,0,MAX_STRING_LEN+1);
+	memset(c,0,MAX_STRING_LEN);
 	len=read(s,c,MAX_STRING_LEN);
 	if(len == -1)
 	{
@@ -652,7 +652,7 @@ int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
 		return AGENT_ERROR;
 	}
 
-	strncpy(result_str,c,MAX_STRING_LEN);
+	strcpy(result_str,c);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "RESULT_STR [%s]", c );
 
@@ -713,7 +713,7 @@ int	get_value(double *result,char *result_str,DB_ITEM *item)
 
 int get_minnextcheck(int now)
 {
-	char		sql[MAX_STRING_LEN+1];
+	char		sql[MAX_STRING_LEN];
 
 	DB_RESULT	*result;
 
@@ -752,8 +752,8 @@ int get_minnextcheck(int now)
 /* Update special host's item - "status" */
 void update_key_status(int hostid,int host_status)
 {
-	char		sql[MAX_STRING_LEN+1];
-	char		value_str[MAX_STRING_LEN+1];
+	char		sql[MAX_STRING_LEN];
+	char		value_str[MAX_STRING_LEN];
 	char		*s;
 
 	DB_ITEM		item;
@@ -820,7 +820,7 @@ void update_key_status(int hostid,int host_status)
 
 void	trend(void)
 {
-	char		sql[MAX_STRING_LEN+1];
+	char		sql[MAX_STRING_LEN];
  
 	DB_RESULT	*result,*result2;
 
@@ -846,8 +846,8 @@ void	trend(void)
 int get_values(void)
 {
 	double		value;
-	char		value_str[MAX_STRING_LEN+1];
-	char		sql[MAX_STRING_LEN+1];
+	char		value_str[MAX_STRING_LEN];
+	char		sql[MAX_STRING_LEN];
  
 	DB_RESULT	*result;
 
@@ -1015,7 +1015,7 @@ int get_values(void)
 
 int main_nodata_loop()
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 	int	i,now;
 
 	int	itemid,functionid;

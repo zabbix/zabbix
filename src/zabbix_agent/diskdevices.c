@@ -446,9 +446,9 @@ void	collect_stats_diskdevices(FILE *outfile)
 	FILE	*file;
 
 	char	*s,*s2;
-	char	line[MAX_STRING_LEN+1];
+	char	line[MAX_STRING_LEN];
 	int	i;
-	char	device[MAX_STRING_LEN+1];
+	char	device[MAX_STRING_LEN];
 	int	now;
 	int	major,diskno;
 	int	noinfo;

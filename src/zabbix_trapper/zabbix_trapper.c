@@ -99,7 +99,7 @@ void    init_config(void)
       
 int	main()
 {
-	static	char	s[MAX_STRING_LEN+1];
+	static	char	s[MAX_STRING_LEN];
 	char	*p;
 
 	char	*server,*key,*value_string;

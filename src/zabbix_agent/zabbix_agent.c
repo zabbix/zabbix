@@ -93,8 +93,8 @@ void    init_config(void)
 
 int	main()
 {
-	char	s[MAX_STRING_LEN+1];
-	char	value[MAX_STRING_LEN+1];
+	char	s[MAX_STRING_LEN];
+	char	value[MAX_STRING_LEN];
 
 #ifdef	TEST_PARAMETERS
 	init_config();

@@ -129,4 +129,7 @@
 #define	TRAPPER_TIMEOUT		5
 #define	SNMPTRAPPER_TIMEOUT	5
 
+/* Secure string copy */
+#define strscpy(x,y) { strncpy(x,y,sizeof(x)); x[sizeof(x)-1]=0; }
+
 #endif
