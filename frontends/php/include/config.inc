@@ -8,18 +8,11 @@
 	{
 		global	$ERROR_MSG;
 
-		$sql="select triggerid,expression,description,istrue,priority,lastchange,dep_level,comments from triggers where triggerid=$triggerid";
+		$sql="select triggerid,expression,description,istrue,priority,lastchange,dep_level,comments,url from triggers where triggerid=$triggerid";
 		$result=DBselect($sql);
 		if(DBnum_rows($result) == 1)
 		{
-			$trigger["groupid"]=DBget_field($result,0,0);
-			$trigger["expression"]=DBget_field($result,0,1);
-			$trigger["description"]=DBget_field($result,0,2);
-			$trigger["istrue"]=DBget_field($result,0,3);
-			$trigger["priority"]=DBget_field($result,0,4);
-			$trigger["lastchange"]=DBget_field($result,0,5);
-			$trigger["dep_level"]=DBget_field($result,0,6);
-			$trigger["comments"]=DBget_field($result,0,7);
+			return	DBfetch($result);	
 		}
 		else
 		{
@@ -1248,10 +1241,10 @@
 
 	# Add Trigger definition
 
-	function	add_trigger($expression,$description,$priority,$istrue,$comments)
+	function	add_trigger($expression,$description,$priority,$istrue,$comments,$url)
 	{
 		$description=addslashes($description);
-		$sql="insert into triggers  (description,priority,istrue,comments) values ('$description',$priority,$istrue,'$comments')";
+		$sql="insert into triggers  (description,priority,istrue,comments,url) values ('$description',$priority,$istrue,'$comments','$url')";
 #		echo $sql,"<br>";
 		$result=DBexecute($sql);
 		if(!$result)
@@ -1304,7 +1297,7 @@
 
 	# Update Trigger definition
 
-	function	update_trigger($triggerid,$expression,$description,$priority,$istrue,$comments)
+	function	update_trigger($triggerid,$expression,$description,$priority,$istrue,$comments,$url)
 	{
 
 		$result=delete_function_by_triggerid($triggerid);
@@ -1315,7 +1308,7 @@
 
 		$expression=implode_exp($expression,$triggerid);
 		if($istrue != 2) $istrue="istrue";
-		$sql="update triggers set expression='$expression',description='$description',priority=$priority,istrue=$istrue,comments='$comments' where triggerid=$triggerid";
+		$sql="update triggers set expression='$expression',description='$description',priority=$priority,istrue=$istrue,comments='$comments',url='$url' where triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
 
@@ -1377,7 +1370,7 @@
 				}
 				$description=sprintf($description,$host);
 
-				add_trigger($expression,$description,0,0,"");
+				add_trigger($expression,$description,0,0,"","");
 			}
 		}
 		return	TRUE;
@@ -2171,6 +2164,7 @@
 			$priority=$trigger["priority"];
 			$istrue=$trigger["istrue"];
 			$comments=$trigger["comments"];
+			$url=$trigger["url"];
 		}
 		else
 		{
@@ -2179,6 +2173,7 @@
 			$priority=0;
 			$istrue=0;
 			$comments="";
+			$url="";
 		}
 		
 		echo "<br>";
@@ -2198,12 +2193,12 @@
 		echo "<input name=\"triggerid\" type=hidden value=$triggerid size=8>";
 		echo "Description";
 		show_table2_h_delimiter();
-		echo "<input name=\"description\" value=\"$description\"size=70>";
+		echo "<input name=\"description\" value=\"$description\" size=70>";
 
 		show_table2_v_delimiter();
 		echo "Expression";
 		show_table2_h_delimiter();
-		echo "<input name=\"expression\" value=\"$expression\"size=70>";
+		echo "<input name=\"expression\" value=\"$expression\" size=70>";
 
 		show_table2_v_delimiter();
 		echo "Priority";
@@ -2221,6 +2216,11 @@
 		echo "Comments";
 		show_table2_h_delimiter();
  		echo "<TEXTAREA NAME=\"comments\" COLS=70 ROWS=\"7\" WRAP=\"SOFT\">$comments</TEXTAREA>";
+
+		show_table2_v_delimiter();
+		echo "URL";
+		show_table2_h_delimiter();
+		echo "<input name=\"url\" value=\"$url\" size=70>";
 
 		show_table2_v_delimiter();
 		echo "Disabled";

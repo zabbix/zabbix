@@ -284,11 +284,11 @@
 
 	if($onlytrue=='true')
 	{
-		$result=DBselect("select distinct t.triggerid,t.istrue,t.description,t.expression,t.priority,t.lastchange,t.comments from triggers t,hosts h,items i,functions f  where t.istrue=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.description like \"%$txt_select%\" and t.triggerid=f.triggerid and i.status in (0,2) $cond $sort");
+		$result=DBselect("select distinct t.triggerid,t.istrue,t.description,t.expression,t.priority,t.lastchange,t.comments,t.url from triggers t,hosts h,items i,functions f  where t.istrue=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.description like \"%$txt_select%\" and t.triggerid=f.triggerid and i.status in (0,2) $cond $sort");
 	}
 	else
 	{
-		$result=DBselect("select distinct t.triggerid,t.istrue,t.description,t.expression,t.priority,t.lastchange,t.comments from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.description like \"%$txt_select%\" and i.status in (0,2) $cond $sort");
+		$result=DBselect("select distinct t.triggerid,t.istrue,t.description,t.expression,t.priority,t.lastchange,t.comments,t.url from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.description like \"%$txt_select%\" and i.status in (0,2) $cond $sort");
 	}
 	$col=0;
 	while($row=DBfetch($result))
@@ -310,7 +310,14 @@
 
 		echo "<TD>";
 
-		echo $row["description"];
+		if($row["url"] == "")
+		{
+			echo $row["description"];
+		}
+		else
+		{
+			echo "<a href='".$row["url"]."'>".$row["description"]."</a>";
+		}
 
 		if($compact!='true')
 		{
