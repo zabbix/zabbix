@@ -1,5 +1,6 @@
 Changes for 1.1alpha5:
 
+ - added table 'escalations' (Alexei)
  - selection of configuration areas in config.php (Alexei)
 
 Changes for 1.1alpha4:

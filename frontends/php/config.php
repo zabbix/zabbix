@@ -95,6 +95,7 @@
 	$h2=$h2."<select class=\"biginput\" name=\"config\" onChange=\"submit()\">";
 	$h2=$h2."<option value=\"0\" ".iif(isset($_GET["config"])&&$_GET["config"]==0,"selected","").">".S_HOUSEKEEPER;
 	$h2=$h2."<option value=\"1\" ".iif(isset($_GET["config"])&&$_GET["config"]==1,"selected","").">".S_MEDIA_TYPES;
+	$h2=$h2."<option value=\"2\" ".iif(isset($_GET["config"])&&$_GET["config"]==2,"selected","").">".S_ESCALATION_RULES;
 	$h2=$h2."</select>";
 
 	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"config.php\">", "</form>");
@@ -271,6 +272,47 @@
 		}
 
 		show_table2_header_end();
+	}
+?>
+
+<?php
+	if($_GET["config"]==2)
+	{
+		echo "<br>";
+		show_table_header(S_ESCALATION_RULES_BIG);
+
+		table_begin();
+		table_header(array(S_ID,S_DESCRIPTION_SMALL,S_ACTIONS));
+
+		$result=DBselect("select mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path from media_type mt order by mt.type");
+		$col=0;
+		while($row=DBfetch($result))
+		{
+			if($row["type"]==0)
+			{
+				$type=S_EMAIL;
+			}
+			else if($row["type"]==1)
+			{
+				$type=S_SCRIPT;
+			}
+			else
+			{
+				$type=S_UNKNOWN;
+			}
+			$actions="<a href=\"config.php?config=1&register=change&mediatypeid=".$row["mediatypeid"]."\">".S_CHANGE."</a>";
+			table_row(array(
+				$row["mediatypeid"],
+				$row["description"],
+				$actions),$col++);
+		}
+		if(DBnum_rows($result)==0)
+		{
+				echo "<TR BGCOLOR=#EEEEEE>";
+				echo "<TD COLSPAN=4 ALIGN=CENTER>".S_NO_MEDIA_TYPES_DEFINED."</TD>";
+				echo "<TR>";
+		}
+		table_end();
 	}
 ?>
 
