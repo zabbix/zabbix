@@ -266,9 +266,11 @@ CREATE TABLE history (
   itemid		int4		DEFAULT '0' NOT NULL,
   clock			int4		DEFAULT '0' NOT NULL,
   value			float8		DEFAULT '0.0000' NOT NULL,
-  PRIMARY KEY (itemid,clock),
+--  PRIMARY KEY (itemid,clock),
   FOREIGN KEY (itemid) REFERENCES items
 );
+
+CREATE INDEX history_i_c on history (itemid, clock);
 
 --
 -- Table structure for table 'history_str'
@@ -278,9 +280,11 @@ CREATE TABLE history_str (
   itemid                int4            DEFAULT '0' NOT NULL,
   clock                 int4            DEFAULT '0' NOT NULL,
   value                 varchar(255)    DEFAULT '' NOT NULL,
-  PRIMARY KEY (itemid,clock),
+--  PRIMARY KEY (itemid,clock),
   FOREIGN KEY (itemid) REFERENCES items
 );
+
+CREATE INDEX history_str_i_c on history_str (itemid, clock);
 
 --
 -- Table structure for table 'items_template'
