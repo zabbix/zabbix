@@ -90,40 +90,6 @@ void    init_config(void)
 
 	parse_cfg_file("/etc/zabbix/zabbix_agent.conf",cfg);
 }
-/*
-int	check_security(void)
-{
-	char	*sname;
-	struct	sockaddr_in name;
-	int	i;
-	char	*s;
-	char	*tmp;
-
-	i=sizeof(name);
-	if(getpeername(0,  (struct sockaddr *)&name, (size_t *)&i) == 0)
-	{
-		i=sizeof(struct sockaddr_in);
-
-		sname=inet_ntoa(name.sin_addr);
-
-		tmp=strdup(CONFIG_HOSTS_ALLOWED);
-                s=(char *)strtok(tmp,",");
-                while(s!=NULL)
-                {
-                        if(strcmp(sname, s)==0)
-                        {
-                                return  SUCCEED;
-                        }
-                        s=(char *)strtok(NULL,",");
-                }
-	}
-        else
-	{
-		return FAIL;
-	}
-	return	FAIL;
-}
-*/
 
 int	main()
 {

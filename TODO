@@ -1,21 +1,13 @@
 TOP PRIORITY:
+
+ - support for high performance DB engines like Berkeley DB
+ - add support for agent forwarding (proxy)
  - proofread Zabbix Manual  - Ted Rolle <ted@users.sourceforge.net>
- - BUG.
-First and foremost, there are definitions in the PostgreSQL schema that
-define columns as "int4" with "99.9" ( a floating point number ) as a
-default. That may well work on MySQL, but does not on PostgreSQL.
-
-Additionally, the value_types column in the items table is incorrectly
-placed when compared to the MySQL schema. It's the third column in the
-psql definition, but the second last in the mysql one.
-
  - pay attention to Solaris agent
- - user parameter to overwrite already supported
  - better viewing of trigger dependencies
- - add description of service_alarms into Manual
  - add complete support for SNMP trapping
  - do not show "all" if no groups defined
- - add more checks for forms (where possible)
+ - add more checks for forms (check all possible wrong values)
  - improve user-defined graphs
  - check Rickard's active(?) agent
  - improve graphing capabilities
