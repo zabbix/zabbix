@@ -1,5 +1,6 @@
 1.0:
 
+ - fix --with-net-snmp and --with-ucd-snmp
  - see severity in trigger listing for a host
  - change logic for actions: scope =1 (triggerid=hostid), 2 (triggerid = NULL)
  - check simple check FTP under Mandrake 9.0: https://sourceforge.net/forum/message.php?msg_id=2410500
