@@ -249,7 +249,8 @@ void	add_values_interfaces(int now,char *interface,float value_sent,float value_
 
 	for(i=0;i<MAX_INTERFACE;i++)
 	{
-		if(0 == strcmp(interfaces[i].interface,interface))
+		/* Fist condition must be here! */
+		if((interface[i].interface!=0)&&(0 == strcmp(interfaces[i].interface,interface)))
 		{
 			bounced=0;
 			for(j=0;j<15*60;j++)
