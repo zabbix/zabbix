@@ -11,7 +11,7 @@ struct cfg_line
 {
 	char	*parameter;
 	void	*variable;
-	void	*function;
+	int	(*function)();
 	int	type;
 	int	mandatory;
 	int	min;

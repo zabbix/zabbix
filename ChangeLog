@@ -29,6 +29,7 @@ snmpget -On localhost public enterprises.ucdavis.memory.memTotalSwap.0]
 
 Changes for 1.0beta4:
 
+ - chnages to make Zabbix compile in non-GCC environments (Alexei)
  - unreachable hosts will be clickable in system maps (Alexei)
  - fixed double posting of the same trigger status into alarms (Alexei) 
  - fixed macros substitution in email alerts (Alexei)
