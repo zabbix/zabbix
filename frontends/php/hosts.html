@@ -15,7 +15,7 @@
 	{
 		if($register=="add")
 		{
-			add_host($platformid,$host,$port,$status);
+			add_host($host,$port,$status);
 		}
 		if($register=="changestatus")
 		{
@@ -31,14 +31,13 @@
 <?
 	show_table_header("HOSTS");
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR><TD WIDTH=\"10%\"><B>Platform</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Host</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Port</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Status</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
-	$result=DBselect("select h.hostid,p.platform,h.host,h.port,h.status from hosts h,platforms p where p.platformid=h.platformid order by p.platform,h.host");
+	$result=DBselect("select h.hostid,h.host,h.port,h.status from hosts h order by h.host");
 	echo "<CENTER>";
 	$col=0;
 	for($i=0;$i<DBnum_rows($result);$i++)
@@ -54,11 +53,9 @@
 		}
 	
 		$hostid=DBget_field($result,$i,0);
-		$platform=DBget_field($result,$i,1);
-		$host=DBget_field($result,$i,2);
-		$port=DBget_field($result,$i,3);
-		$status=DBget_field($result,$i,4);
-		echo "<TD>$platform</TD>";
+		$host=DBget_field($result,$i,1);
+		$port=DBget_field($result,$i,2);
+		$status=DBget_field($result,$i,3);
 		echo "<TD><a href=\"items.html?hostid=$hostid\">$host</a></TD>";
 		echo "<TD>$port</TD>";
 		echo "<TD>";
@@ -82,19 +79,6 @@
 
 	show_table2_v_delimiter();
 	echo "<form method=\"post\" action=\"hosts.html\">";
-	echo "Platform";
-	show_table2_h_delimiter();
-	echo "<select name=\"platformid\">";
-	$result=DBselect("select platformid,platform from platforms order by platform");
-	for($i=0;$i<DBnum_rows($result);$i++)
-	{
-		$platformid=DBget_field($result,$i,0);
-		$platform=DBget_field($result,$i,1);
-		echo "<option value=\"$platformid\">$platform";
-	}
-	echo "</select>";
-
-	show_table2_v_delimiter();
 	echo "Host";
 	show_table2_h_delimiter();
 	echo "<input name=\"host\" size=20>";
