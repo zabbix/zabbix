@@ -19,11 +19,11 @@
 **/
 ?>
 <?php
-	$DB_TYPE	="POSTGRESQL";
-//	$DB_TYPE	="MYSQL";
+//	$DB_TYPE	="POSTGRESQL";
+	$DB_TYPE	="MYSQL";
 	$DB_SERVER	="localhost";
 	$DB_DATABASE	="zabbix";
-	$DB_USER	="zabbix";
+	$DB_USER	="root";
 	$DB_PASSWORD	="";
 
 	$USER_DETAILS	="";
