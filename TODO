@@ -15,6 +15,7 @@ suckerd and agentd)
  - agents to execute command
  - suffixes Mb,Kb,Gb, etc
  - add alerts to host templates
+ - add pinger (eping) to zabbix_sucker
 
  - improve graphing capabilities (MRTG like graphs)
  - monitoring of log files
