@@ -1,5 +1,6 @@
 Changes for 1.0beta14:
 
+ - delete sysmap information on host removal (Alexei)
  - fixed compilation of the agent under HP-UX (Alexei)
  - fixed simple checks to return NOTSUPPORTED (Alexei)
  - removed primary keys for both 'history' and 'history_str' (Alexei)
