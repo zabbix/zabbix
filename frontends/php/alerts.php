@@ -107,9 +107,6 @@
 			continue;
 		}
 
-		if($col++%2==0)	{ echo "<tr bgcolor=#DDDDDD>"; }
-		else		{ echo "<tr bgcolor=#EEEEEE>"; }
-
 		if($col>100)	break;
 
 		if($row["scope"]==0)
