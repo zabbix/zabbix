@@ -146,9 +146,8 @@ CREATE TABLE functions (
   function varchar(10) DEFAULT '' NOT NULL,
   parameter int(4) DEFAULT '0' NOT NULL,
   PRIMARY KEY (functionid),
-  KEY itemid (itemid),
   KEY triggerid (triggerid),
-  UNIQUE itemidfunctionparameter (itemid,function,parameter)
+  KEY itemidfunctionparameter (itemid,function,parameter)
 );
 
 #

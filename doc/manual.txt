@@ -35,6 +35,7 @@
 
 6. Chapter 6 (Upgrading)
 6.1 Zabbix 1.0alpha8
+6.2 Zabbix 1.0alpha9
 
 7. Chapter 7 (Misc)
 7.1 pinger.pl
@@ -624,6 +625,10 @@ alter table alerts modify message text default '' not null;
  - Try to use IP address in host definition
 
 This unloads DNS and makes zabbix_suckerd faster.
+
+6.2 Zabbix 1.0alpha9
+
+Do not forget to install DB patches.
 
 7. Chapter 7 (Misc)
 

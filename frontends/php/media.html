@@ -17,19 +17,23 @@
 	{
 		if($register=="enable")
 		{
-			activate_media( $mediaid );
+			$result=activate_media( $mediaid );
+			show_messages($result,"Media activated","Cannot activate media");
 		}
 		elseif($register=="disable")
 		{
-			disactivate_media( $mediaid );
+			$result=disactivate_media( $mediaid );
+			show_messages($result,"Media disabled","Cannot disable media");
 		}
 		elseif($register=="add")
 		{
-			add_media( $userid, $type, $sendto);
+			$result=add_media( $userid, $type, $sendto);
+			show_messages($result,"Media added","Cannot add media");
 		}
 		elseif($register=="delete")
 		{
-			delete_media( $mediaid );
+			$result=delete_media( $mediaid );
+			show_messages($result,"Media deleted","Cannot delete media");
 			unset($mediaid);
 		}
 	}
