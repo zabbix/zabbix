@@ -9,7 +9,7 @@ Not ready yet:
 [ PHP. Show diff instead of real values ]
 [ PHP. Show triggers by userid ]
 
-[ CORE. Add support for new trigger statuses: DISABLED/UNKNOWN/NOTSUPORTED ]
+[ CORE. Add support for new trigger statuses: NOTSUPORTED ]
 
 [ DOCS. All parameters should contain section "How can be used" in the Manual ]
 
