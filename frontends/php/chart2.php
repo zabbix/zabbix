@@ -147,6 +147,16 @@
 		}
 	}
 
+	if($nodata==1)
+	{
+		ImageString($im, 2,$sizeX/2-50,                $sizeY+$shiftYup+3, "NO DATA FOUND FOR THIS PERIOD" , $darkred);
+		ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, "http://zabbix.sourceforge.net", $gray);
+
+		ImagePng($im); 
+		ImageDestroy($im); 
+		exit;
+	}
+
 //	echo "MIN/MAX:",$minX," - ",$maxX," - ",$minY," - ",$maxY,"<Br>";
 	if(isset($HTTP_GET_VARS["force_miny"]))
 	{
