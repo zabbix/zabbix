@@ -25,41 +25,41 @@
 	include "include/config.inc.php";
 	include "include/forms.inc.php";
 
-	if(isset($HTTP_POST_VARS["password"]))
+	if(isset($_POST["password"]))
 	{
-		$password=$HTTP_POST_VARS["password"];
+		$password=$_POST["password"];
 	}
 	else
 	{
 		unset($password);
 	}
-	if(isset($HTTP_POST_VARS["name"]))
+	if(isset($_POST["name"]))
 	{
-		$name=$HTTP_POST_VARS["name"];
+		$name=$_POST["name"];
 	}
 	else
 	{
 		unset($name);
 	}
-	if(isset($HTTP_POST_VARS["register"]))
+	if(isset($_POST["register"]))
 	{
-		$register=$HTTP_POST_VARS["register"];
+		$register=$_POST["register"];
 	}
 	else
 	{
 		unset($register);
 	}
-	if(isset($HTTP_GET_VARS["reconnect"]))
+	if(isset($_GET["reconnect"]))
 	{
-		$reconnect=$HTTP_GET_VARS["reconnect"];
+		$reconnect=$_GET["reconnect"];
 	}
 	else
 	{
 		unset($reconnect);
 	}
-	if(isset($HTTP_COOKIE_VARS["sessionid"]))
+	if(isset($_COOKIE["sessionid"]))
 	{
-		$sessionid=$HTTP_COOKIE_VARS["sessionid"];
+		$sessionid=$_COOKIE["sessionid"];
 	}
 	else
 	{
@@ -90,7 +90,7 @@
 			$sessionid=md5(time().$password.$name.rand(0,10000000));
 			setcookie("sessionid",$sessionid,time()+3600);
 // Required !
-			$HTTP_COOKIE_VARS["sessionid"]=$sessionid;
+			$_COOKIE["sessionid"]=$sessionid;
 			$sql="insert into sessions (sessionid,userid,lastaccess) values ('$sessionid',".$USER_DETAILS["userid"].",".time().")";
 			DBexecute($sql);
 
@@ -110,7 +110,7 @@
 <?php
 	if(!isset($sessionid))
 	{
-//		echo "-",$HTTP_COOKIE_VARS["sessionid"],"-<br>";
+//		echo "-",$_COOKIE["sessionid"],"-<br>";
 		insert_login_form();
 	}
 	else

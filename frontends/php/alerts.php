@@ -33,15 +33,15 @@
 ?>
 
 <?php
-        if(isset($HTTP_GET_VARS["start"])&&($HTTP_GET_VARS["start"]<=0))
+        if(isset($_GET["start"])&&($_GET["start"]<=0))
         {
-                unset($HTTP_GET_VARS["start"]);
+                unset($_GET["start"]);
         }
-        if(isset($HTTP_GET_VARS["start"]))
+        if(isset($_GET["start"]))
         {
-                echo "[<A HREF=\"alerts.php?start=".($HTTP_GET_VARS["start"]-100)."\">";
+                echo "[<A HREF=\"alerts.php?start=".($_GET["start"]-100)."\">";
                 echo "Show previous 100</A>] ";
-                echo "[<A HREF=\"alerts.php?start=".($HTTP_GET_VARS["start"]+100)."\">";
+                echo "[<A HREF=\"alerts.php?start=".($_GET["start"]+100)."\">";
                 echo S_SHOW_NEXT_100;
 		echo "</A>]";
         }
@@ -66,13 +66,13 @@
 	$row=DBfetch($result);
 	$maxalertid=@iif(DBnum_rows($result)>0,$row["max"],0);
 
-	if(!isset($HTTP_GET_VARS["start"]))
+	if(!isset($_GET["start"]))
 	{
 		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries,ac.scope from alerts a,actions ac,media_type mt where a.actionid=ac.actionid and mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200 order by a.clock desc limit 200";
 	}
 	else
 	{
-		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries,ac.scope from alerts a,actions ac,media_type mt where a.actionid=ac.actionid and mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200-".$HTTP_GET_VARS["start"]." order by a.clock desc limit ".($HTTP_GET_VARS["start"]+500);
+		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries,ac.scope from alerts a,actions ac,media_type mt where a.actionid=ac.actionid and mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200-".$_GET["start"]." order by a.clock desc limit ".($_GET["start"]+500);
 	}
 	$result=DBselect($sql);
 
@@ -90,7 +90,7 @@
 	while($row=DBfetch($result))
 	{
 		$zzz++;	
-		if(isset($HTTP_GET_VARS["start"])&&($zzz<$HTTP_GET_VARS["start"]))
+		if(isset($_GET["start"])&&($zzz<$_GET["start"]))
 		{
 			continue;
 		}

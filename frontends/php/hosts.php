@@ -37,52 +37,52 @@
 ?>
 
 <?php
-	if(isset($HTTP_GET_VARS["register"]))
+	if(isset($_GET["register"]))
 	{
-		if($HTTP_GET_VARS["register"]=="add")
+		if($_GET["register"]=="add")
 		{
-			$result=add_host($HTTP_GET_VARS["host"],$HTTP_GET_VARS["port"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["useip"],$HTTP_GET_VARS["ip"],$HTTP_GET_VARS["host_templateid"],$HTTP_GET_VARS["newgroup"],$HTTP_GET_VARS["groups"]);
+			$result=add_host($_GET["host"],$_GET["port"],$_GET["status"],$_GET["useip"],$_GET["ip"],$_GET["host_templateid"],$_GET["newgroup"],$_GET["groups"]);
 			show_messages($result, S_HOST_ADDED, S_CANNOT_ADD_HOST);
-			unset($HTTP_GET_VARS["hostid"]);
+			unset($_GET["hostid"]);
 		}
-		if($HTTP_GET_VARS["register"]=="add items from template")
+		if($_GET["register"]=="add items from template")
 		{
-			$result=add_using_host_template($HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["host_templateid"]);
+			$result=add_using_host_template($_GET["hostid"],$_GET["host_templateid"]);
 			show_messages($result, S_ITEMS_ADDED, S_CANNOT_ADD_ITEMS);
-			unset($HTTP_GET_VARS["hostid"]);
+			unset($_GET["hostid"]);
 		}
-		if($HTTP_GET_VARS["register"]=="update")
+		if($_GET["register"]=="update")
 		{
-			$result=@update_host($HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["host"],$HTTP_GET_VARS["port"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["useip"],$HTTP_GET_VARS["ip"],$HTTP_GET_VARS["newgroup"],$HTTP_GET_VARS["groups"]);
+			$result=@update_host($_GET["hostid"],$_GET["host"],$_GET["port"],$_GET["status"],$_GET["useip"],$_GET["ip"],$_GET["newgroup"],$_GET["groups"]);
 			show_messages($result, S_HOST_UPDATED, S_CANNOT_UPDATE_HOST);
-			unset($HTTP_GET_VARS["hostid"]);
+			unset($_GET["hostid"]);
 		}
-		if($HTTP_GET_VARS["register"]=="changestatus")
+		if($_GET["register"]=="changestatus")
 		{
-			$result=update_host_status($HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["status"]);
+			$result=update_host_status($_GET["hostid"],$_GET["status"]);
 			show_messages($result,S_HOST_STATUS_UPDATED,S_CANNOT_UPDATE_HOST_STATUS);
-			unset($HTTP_GET_VARS["hostid"]);
+			unset($_GET["hostid"]);
 		}
-		if($HTTP_GET_VARS["register"]=="delete")
+		if($_GET["register"]=="delete")
 		{
-			$result=delete_host($HTTP_GET_VARS["hostid"]);
+			$result=delete_host($_GET["hostid"]);
 			show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
-			unset($HTTP_GET_VARS["hostid"]);
+			unset($_GET["hostid"]);
 		}
-		if($HTTP_GET_VARS["register"]=="add group")
+		if($_GET["register"]=="add group")
 		{
-			$result=add_host_group($HTTP_GET_VARS["name"], $HTTP_GET_VARS["hosts"]);
+			$result=add_host_group($_GET["name"], $_GET["hosts"]);
 			show_messages($result, S_GROUP_ADDED, S_CANNOT_ADD_GROUP);
 		}
-		if($HTTP_GET_VARS["register"]=="delete group")
+		if($_GET["register"]=="delete group")
 		{
-			$result=delete_host_group($HTTP_GET_VARS["groupid"]);
+			$result=delete_host_group($_GET["groupid"]);
 			show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
-			unset($HTTP_GET_VARS["groupid"]);
+			unset($_GET["groupid"]);
 		}
-		if($HTTP_GET_VARS["register"]=="update group")
+		if($_GET["register"]=="update group")
 		{
-			$result=update_host_group($HTTP_GET_VARS["groupid"], $HTTP_GET_VARS["name"], $HTTP_GET_VARS["hosts"]);
+			$result=update_host_group($_GET["groupid"], $_GET["name"], $_GET["hosts"]);
 			show_messages($result, S_GROUP_UPDATED, _S_CANNOT_UPDATE_GROUP);
 		}
 	}
@@ -144,7 +144,7 @@
 	echo S_CONFIGURATION_OF_HOSTS_BIG;
 	show_table_v_delimiter();
 
-	if(isset($HTTP_GET_VARS["groupid"]))
+	if(isset($_GET["groupid"]))
 	{
 //		echo "all ";
 		echo "<a href='hosts.php'>".S_ALL_SMALL."</a> ";
@@ -162,12 +162,12 @@
 //		{
 //			continue;
 //		}
-		if( isset($HTTP_GET_VARS["groupid"]) && ($HTTP_GET_VARS["groupid"] == $row["groupid"]) )
+		if( isset($_GET["groupid"]) && ($_GET["groupid"] == $row["groupid"]) )
 		{
 			echo "<b>[";
 		}
 		echo "<a href='hosts.php?groupid=".$row["groupid"]."'>".$row["name"]."</a>";
-		if(isset($HTTP_GET_VARS["groupid"]) && ($HTTP_GET_VARS["groupid"] == $row["groupid"]) )
+		if(isset($_GET["groupid"]) && ($_GET["groupid"] == $row["groupid"]) )
 		{
 			echo "]</b>";
 		}
@@ -179,7 +179,7 @@
 ?>
 
 <?php
-	if(!isset($HTTP_GET_VARS["hostid"]))
+	if(!isset($_GET["hostid"]))
 {
 	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR>";
@@ -192,9 +192,9 @@
 	echo "</TR>";
 
 
-	if(isset($HTTP_GET_VARS["groupid"]))
+	if(isset($_GET["groupid"]))
 	{
-		$sql="select h.hostid,h.host,h.port,h.status,h.useip,h.ip from hosts h,hosts_groups hg where hg.groupid=".$HTTP_GET_VARS["groupid"]." and hg.hostid=h.hostid order by h.host";
+		$sql="select h.hostid,h.host,h.port,h.status,h.useip,h.ip from hosts h,hosts_groups hg where hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid order by h.host";
 	}
 	else
 	{
@@ -259,9 +259,9 @@
 		{
 			if($row["status"] != HOST_STATUS_DELETED)
 			{
-				if(isset($HTTP_GET_VARS["groupid"]))
+				if(isset($_GET["groupid"]))
 				{
-					echo "<TD><A HREF=\"hosts.php?register=change&hostid=".$row["hostid"]."&groupid=".$HTTP_GET_VARS["groupid"]."#form\">".S_CHANGE."</A></TD>";
+					echo "<TD><A HREF=\"hosts.php?register=change&hostid=".$row["hostid"]."&groupid=".$_GET["groupid"]."#form\">".S_CHANGE."</A></TD>";
 				}
 				else
 				{
@@ -291,17 +291,17 @@
 
 <?php
 	echo "<br>";
-	insert_hostgroups_form($HTTP_GET_VARS["groupid"]);
+	insert_hostgroups_form($_GET["groupid"]);
 ?>
 
 <?php
-	$host=@iif(isset($HTTP_GET_VARS["host"]),$HTTP_GET_VARS["host"],"");
-	$port=@iif(isset($HTTP_GET_VARS["port"]),$HTTP_GET_VARS["port"],get_profile("HOST_PORT",10000));
-	$status=@iif(isset($HTTP_GET_VARS["status"]),$HTTP_GET_VARS["status"],0);
-	$useip=@iif(isset($HTTP_GET_VARS["useip"]),$HTTP_GET_VARS["useip"],"off");
-	$newgroup=@iif(isset($HTTP_GET_VARS["newgroup"]),$HTTP_GET_VARS["newgroup"],"");
-	$ip=@iif(isset($HTTP_GET_VARS["ip"]),$HTTP_GET_VARS["ip"],"");
-	$host_templateid=@iif(isset($HTTP_GET_VARS["host_templateid"]),$HTTP_GET_VARS["host_templateid"],"");
+	$host=@iif(isset($_GET["host"]),$_GET["host"],"");
+	$port=@iif(isset($_GET["port"]),$_GET["port"],get_profile("HOST_PORT",10000));
+	$status=@iif(isset($_GET["status"]),$_GET["status"],0);
+	$useip=@iif(isset($_GET["useip"]),$_GET["useip"],"off");
+	$newgroup=@iif(isset($_GET["newgroup"]),$_GET["newgroup"],"");
+	$ip=@iif(isset($_GET["ip"]),$_GET["ip"],"");
+	$host_templateid=@iif(isset($_GET["host_templateid"]),$_GET["host_templateid"],"");
 
 	if($useip!="on")
 	{
@@ -312,9 +312,9 @@
 		$useip="checked";
 	}
 
-	if(isset($HTTP_GET_VARS["register"]) && ($HTTP_GET_VARS["register"] == "change"))
+	if(isset($_GET["register"]) && ($_GET["register"] == "change"))
 	{
-		$result=DBselect("select host,port,status,useip,ip from hosts where hostid=".$HTTP_GET_VARS["hostid"]); 
+		$result=DBselect("select host,port,status,useip,ip from hosts where hostid=".$_GET["hostid"]); 
 		$host=DBget_field($result,0,0);
 		$port=DBget_field($result,0,1);
 		$status=DBget_field($result,0,2);
@@ -342,13 +342,13 @@
 
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"hosts.php#form\">";
-	if(isset($HTTP_GET_VARS["hostid"]))
+	if(isset($_GET["hostid"]))
 	{
-		echo "<input class=\"biginput\" name=\"hostid\" type=\"hidden\" value=\"".$HTTP_GET_VARS["hostid"]."\">";
+		echo "<input class=\"biginput\" name=\"hostid\" type=\"hidden\" value=\"".$_GET["hostid"]."\">";
 	}
-	if(isset($HTTP_GET_VARS["groupid"]))
+	if(isset($_GET["groupid"]))
 	{
-		echo "<input class=\"biginput\" name=\"groupid\" type=\"hidden\" value=\"".$HTTP_GET_VARS["groupid"]."\">";
+		echo "<input class=\"biginput\" name=\"groupid\" type=\"hidden\" value=\"".$_GET["groupid"]."\">";
 	}
 	echo S_HOST;
 	show_table2_h_delimiter();
@@ -361,9 +361,9 @@
 	$result=DBselect("select distinct groupid,name from groups order by name");
 	while($row=DBfetch($result))
 	{
-		if(isset($HTTP_GET_VARS["hostid"]))
+		if(isset($_GET["hostid"]))
 		{
-			$sql="select count(*) as count from hosts_groups where hostid=".$HTTP_GET_VARS["hostid"]." and groupid=".$row["groupid"];
+			$sql="select count(*) as count from hosts_groups where hostid=".$_GET["hostid"]." and groupid=".$row["groupid"];
 			$result2=DBselect($sql);
 			$row2=DBfetch($result2);
 			if($row2["count"]==0)
@@ -458,7 +458,7 @@
 
 	show_table2_v_delimiter2();
 	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
-	if(isset($HTTP_GET_VARS["hostid"]))
+	if(isset($_GET["hostid"]))
 	{
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add items from template\">";
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";

@@ -27,7 +27,7 @@
 ?>
 
 <?php
-	if(!check_right_on_trigger("R",$HTTP_GET_VARS["triggerid"]))
+	if(!check_right_on_trigger("R",$_GET["triggerid"]))
         {
                 show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
                 show_footer();
@@ -41,7 +41,7 @@
  
 	show_table_v_delimiter(); 
 
-	if(!isset($HTTP_GET_VARS["triggerid"]))
+	if(!isset($_GET["triggerid"]))
 	{
 		echo "<div align=center><B>No triggerID!!!!</B><BR>Please Contact Server Adminstrator</div>";
 		show_footer();
@@ -49,7 +49,7 @@
 	}
 	else
 	{
-		$trigger=get_trigger_by_triggerid($HTTP_GET_VARS["triggerid"]);
+		$trigger=get_trigger_by_triggerid($_GET["triggerid"]);
 
 		$Expression=$trigger["expression"];
 		$Description=$trigger["description"];
@@ -58,16 +58,16 @@
 ?>
 
 <?php
-	if(isset($HTTP_GET_VARS["limit"]) && ($HTTP_GET_VARS["limit"]=="NO"))
+	if(isset($_GET["limit"]) && ($_GET["limit"]=="NO"))
 	{
-		echo "[<A HREF=\"alarms.php?triggerid=".$HTTP_GET_VARS["triggerid"]."&limit=30\">";
+		echo "[<A HREF=\"alarms.php?triggerid=".$_GET["triggerid"]."&limit=30\">";
 		echo S_SHOW_ONLY_LAST_100;
 		echo "</A>]";
 		$limit=" ";
 	}
 	else 
 	{
-		echo "[<A HREF=\"alarms.php?triggerid=".$HTTP_GET_VARS["triggerid"]."&limit=NO\">";
+		echo "[<A HREF=\"alarms.php?triggerid=".$_GET["triggerid"]."&limit=NO\">";
 		echo S_SHOW_ALL;
 		echo "</A>]";
 		$limit=" limit 100";
@@ -89,7 +89,7 @@
 
 <FONT COLOR="#000000">
 <?php
-	$sql="select clock,value,triggerid from alarms where triggerid=".$HTTP_GET_VARS["triggerid"]." order by clock desc $limit";
+	$sql="select clock,value,triggerid from alarms where triggerid=".$_GET["triggerid"]." order by clock desc $limit";
 	$result=DBselect($sql);
 
 	echo "<TABLE WIDTH=100% align=center BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";

@@ -27,27 +27,27 @@
 #	period
 #	from
 
-	if(!isset($HTTP_GET_VARS["period"]))
+	if(!isset($_GET["period"]))
 	{
 		$period=0;
 	}
 	else
 	{
-		$period=$HTTP_GET_VARS["period"];
+		$period=$_GET["period"];
 	}
 
-	if(!isset($HTTP_GET_VARS["from"]))
+	if(!isset($_GET["from"]))
 	{
 		$from=0;
 	}
 	else
 	{
-		$from=$HTTP_GET_VARS["from"];
+		$from=$_GET["from"];
 	}
 
-	if(isset($HTTP_GET_VARS["width"]))
+	if(isset($_GET["width"]))
 	{
-		$sizeX=$HTTP_GET_VARS["width"];
+		$sizeX=$_GET["width"];
 	}
 	else
 	{
@@ -87,7 +87,7 @@
 	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+2*$shiftY+10,$white);
 	ImageRectangle($im,0,0,$x-1,$y-1,$black);
 
-	if(!check_right("Item","R",$HTTP_GET_VARS["itemid"]))
+	if(!check_right("Item","R",$_GET["itemid"]))
 	{
 //              show_table_header("<font color=\"AA0000\">No permissions !</font>");
 //              show_footer();
@@ -104,7 +104,7 @@
 	{
 		DashedLine($im,$i+$shiftX,$shiftY,$i+$shiftX,$sizeY+$shiftY,$gray);
 	}
-	$item=get_item_by_itemid($HTTP_GET_VARS["itemid"]);
+	$item=get_item_by_itemid($_GET["itemid"]);
 	$host=get_host_by_hostid($item["hostid"]);
 
 	$str=$host["host"].":".$item["description"]." (diff)";
@@ -113,7 +113,7 @@
 
 	$from_time = time(NULL)-$period-3600*$from;
 	$to_time   = time(NULL)-3600*$from;
-	$result=DBselect("select count(clock),min(clock),max(clock),min(value),max(value) from history where itemid=".$HTTP_GET_VARS["itemid"]." and clock>$from_time and clock<$to_time ");
+	$result=DBselect("select count(clock),min(clock),max(clock),min(value),max(value) from history where itemid=".$_GET["itemid"]." and clock>$from_time and clock<$to_time ");
 	$count=DBget_field($result,0,0);
 	if($count>0)
 	{
@@ -140,7 +140,7 @@
 	
 //	echo "MIN/MAX:",$minX," - ",$maxX," - ",$minY," - ",$maxY,"<Br>";
 
-	$result=DBselect("select clock,value from history where itemid=".$HTTP_GET_VARS["itemid"]." and clock>$from_time and clock<$to_time order by clock");
+	$result=DBselect("select clock,value from history where itemid=".$_GET["itemid"]." and clock>$from_time and clock<$to_time order by clock");
 	if(isset($minX)&&($minX!=$maxX)&&($minY!=$maxY))
 	{
 		for($i=0;$i<DBnum_rows($result)-3;$i++)

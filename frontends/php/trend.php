@@ -29,27 +29,27 @@
 
 	$start_time=time(NULL);
 
-	if(!isset($HTTP_GET_VARS["type"]))
+	if(!isset($_GET["type"]))
 	{
-		$HTTP_GET_VARS["type"]="15min";
+		$_GET["type"]="15min";
 	}
 
-	if($HTTP_GET_VARS["type"] == "15min")
+	if($_GET["type"] == "15min")
 	{
 		$period=900;
 		$label_format="H:i";
 	}
-	else if($HTTP_GET_VARS["type"] == "30min")
+	else if($_GET["type"] == "30min")
 	{
 		$period=1800;
 		$label_format="H:i";
 	}
-	else if($HTTP_GET_VARS["type"] == "4hours")
+	else if($_GET["type"] == "4hours")
 	{
 		$period=4*3600;
 		$label_format="H:i";
 	}
-	else if($HTTP_GET_VARS["type"] == "12hours")
+	else if($_GET["type"] == "12hours")
 	{
 		$period=12*3600;
 		$label_format="H:i";
@@ -60,9 +60,9 @@
 		$label_format="H:i";
 	}
 
-	if(isset($HTTP_GET_VARS["width"])&&$HTTP_GET_VARS["width"]>0)
+	if(isset($_GET["width"])&&$_GET["width"]>0)
 	{
-		$sizeX=$HTTP_GET_VARS["width"];
+		$sizeX=$_GET["width"];
 	}
 	else
 	{
@@ -102,7 +102,7 @@
 	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+2*$shiftY+10,$white);
 	ImageRectangle($im,0,0,$x-1,$y-1,$black);
 
-	if(!check_right("Item","R",$HTTP_GET_VARS["itemid"]))
+	if(!check_right("Item","R",$_GET["itemid"]))
 	{
 		ImagePng($im); 
 		ImageDestroy($im); 
@@ -139,7 +139,7 @@ else
 {
 	for($i=0;$i<900;$i++)
 	{
-		$result=DBselect("select count(value),min(value),max(value),avg(value) from history where itemid=".$HTTP_GET_VARS["itemid"]." and clock>$from_time+$i*($to_time-$from_time)/(900-50) and clock<$from_time+($i+1)*($to_time-$from_time)/(900-50)");
+		$result=DBselect("select count(value),min(value),max(value),avg(value) from history where itemid=".$_GET["itemid"]." and clock>$from_time+$i*($to_time-$from_time)/(900-50) and clock<$from_time+($i+1)*($to_time-$from_time)/(900-50)");
 		$count[$i]=DBget_field($result,0,0);
 		if($count[$i]>0)
 		{
@@ -186,7 +186,7 @@ else
 
 	if($nodata == 0)
 	{
-		if(isset($HTTP_GET_VARS["trendavg"]))
+		if(isset($_GET["trendavg"]))
 		{
 			$maxY=max($avg);
 			$minY=min($avg);
@@ -208,7 +208,7 @@ else
 		{
 			if($count[$i]>0)
 			{
-				if(!isset($HTTP_GET_VARS["trendavg"]))
+				if(!isset($_GET["trendavg"]))
 				{
 					$x1=$sizeX*($i-$minX)/($maxX-$minX);
 					$y1=$sizeY*($max[$i]-$minY)/($maxY-$minY);
@@ -229,7 +229,7 @@ else
 	
 				ImageLine($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX,$y2+$shiftY,$darkyellow);
 
-				if(!isset($HTTP_GET_VARS["trendavg"]))
+				if(!isset($_GET["trendavg"]))
 				{
 					$x1=$sizeX*($i-$minX)/($maxX-$minX);
 					$y1=$sizeY*($min[$i]-$minY)/($maxY-$minY);
@@ -253,7 +253,7 @@ else
 
 	if($nodata == 0)
 	{
-		$item=get_item_by_itemid($HTTP_GET_VARS["itemid"]);
+		$item=get_item_by_itemid($_GET["itemid"]);
 		for($i=0;$i<=$sizeY;$i+=$sizeY/5)
 		{
 			ImageString($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftY, convert_units($i*($maxY-$minY)/$sizeY+$minY,$item["units"],$item["multiplier"]) , $darkred);

@@ -28,20 +28,20 @@
 
 	$start_time=time(NULL);
 
-	if(!isset($HTTP_GET_VARS["type"]))
+	if(!isset($_GET["type"]))
 	{
-		$HTTP_GET_VARS["type"]="week";
+		$_GET["type"]="week";
 	}
 
-	if($HTTP_GET_VARS["type"] == "month")
+	if($_GET["type"] == "month")
 	{
 		$period=30*24*3600;
 	}
-	else if($HTTP_GET_VARS["type"] == "week")
+	else if($_GET["type"] == "week")
 	{
 		$period=7*24*3600;
 	}
-	else if($HTTP_GET_VARS["type"] == "year")
+	else if($_GET["type"] == "year")
 	{
 		$period=365*24*3600;
 	}
@@ -51,9 +51,9 @@
 		$type="week";
 	}
 
-	if(isset($HTTP_GET_VARS["width"])&&$HTTP_GET_VARS["width"]>0)
+	if(isset($_GET["width"])&&$_GET["width"]>0)
 	{
-		$sizeX=$HTTP_GET_VARS["width"];
+		$sizeX=$_GET["width"];
 	}
 	else
 	{
@@ -94,7 +94,7 @@
 	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10,$white);
 	ImageRectangle($im,0,0,$x-1,$y-1,$black);
 
-	if(!check_right("Item","R",$HTTP_GET_VARS["itemid"]))
+	if(!check_right("Item","R",$_GET["itemid"]))
 	{
 //		show_table_header("<font color=\"AA0000\">No permissions !</font>");
 //		show_footer();
@@ -114,7 +114,7 @@
 	$max=array();
 	$avg=array();
 
-	$sql="select round(900*((clock+3*3600)%(24*3600))/(24*3600)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid=".$HTTP_GET_VARS["itemid"]." and clock>$from_time and clock<$to_time group by 1";
+	$sql="select round(900*((clock+3*3600)%(24*3600))/(24*3600)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid=".$_GET["itemid"]." and clock>$from_time and clock<$to_time group by 1";
 //	echo $sql."<br>";
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
@@ -129,7 +129,7 @@
 
 	$count_now=array();
 	$avg_now=array();
-	$result=DBselect("select round(900*((clock+3*3600)%(24*3600))/(24*3600)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid=".$HTTP_GET_VARS["itemid"]." and clock>$from_time_now and clock<$to_time group by 1");
+	$result=DBselect("select round(900*((clock+3*3600)%(24*3600))/(24*3600)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid=".$_GET["itemid"]." and clock>$from_time_now and clock<$to_time group by 1");
 	while($row=DBfetch($result))
 	{
 		$i=$row["i"];
@@ -258,7 +258,7 @@
 
 	if(isset($nodata)&&($nodata == 0))
 	{
-		$item=get_item_by_itemid($HTTP_GET_VARS["itemid"]);
+		$item=get_item_by_itemid($_GET["itemid"]);
 		for($i=0;$i<=$sizeY;$i+=$sizeY/5)
 		{
 			ImageString($im, 1, $sizeX+5+$shiftX, $sizeY-$i-4+$shiftYup, convert_units($i*($maxY-$minY)/$sizeY+$minY,$item["units"],$item["multiplier"]) , $darkred);
@@ -276,11 +276,11 @@
 
 	ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*0,$shiftX+5,$sizeY+$shiftYup+15+9+15*0,$darkgreen);
 	ImageRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*0,$shiftX+5,$sizeY+$shiftYup+15+9+15*0,$black);
-	if($HTTP_GET_VARS["type"]=="year")
+	if($_GET["type"]=="year")
 	{
 		ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*0+15, "Average for last 365 days", $black);
 	}
-	else if($HTTP_GET_VARS["type"]=="month")
+	else if($_GET["type"]=="month")
 	{
 		ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*0+15, "Average for last 30 days", $black);
 	}

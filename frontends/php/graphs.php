@@ -41,23 +41,23 @@
 ?>
 
 <?php
-	if(isset($HTTP_GET_VARS["register"]))
+	if(isset($_GET["register"]))
 	{
-		if($HTTP_GET_VARS["register"]=="add")
+		if($_GET["register"]=="add")
 		{
-			$result=add_graph($HTTP_GET_VARS["name"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
+			$result=add_graph($_GET["name"],$_GET["width"],$_GET["height"]);
 			show_messages($result, S_GRAPH_ADDED, S_CANNOT_ADD_GRAPH);
 		}
-		if($HTTP_GET_VARS["register"]=="update")
+		if($_GET["register"]=="update")
 		{
-			$result=update_graph($HTTP_GET_VARS["graphid"],$HTTP_GET_VARS["name"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
+			$result=update_graph($_GET["graphid"],$_GET["name"],$_GET["width"],$_GET["height"]);
 			show_messages($result, S_GRAPH_UPDATED, S_CANNOT_UPDATE_GRAPH);
 		}
-		if($HTTP_GET_VARS["register"]=="delete")
+		if($_GET["register"]=="delete")
 		{
-			$result=delete_graph($HTTP_GET_VARS["graphid"]);
+			$result=delete_graph($_GET["graphid"]);
 			show_messages($result, S_GRAPH_DELETED, S_CANNOT_DELETE_GRAPH);
-			unset($HTTP_GET_VARS["graphid"]);
+			unset($_GET["graphid"]);
 		}
 	}
 ?>
@@ -102,9 +102,9 @@
 <?php
 	echo "<a name=\"form\"></a>";
 
-	if(isset($HTTP_GET_VARS["graphid"]))
+	if(isset($_GET["graphid"]))
 	{
-		$result=DBselect("select g.graphid,g.name,g.width,g.height from graphs g where graphid=".$HTTP_GET_VARS["graphid"]);
+		$result=DBselect("select g.graphid,g.name,g.width,g.height from graphs g where graphid=".$_GET["graphid"]);
 		$row=DBfetch($result);
 		$name=$row["name"];
 		$width=$row["width"];
@@ -123,9 +123,9 @@
 
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"graphs.php\">";
-	if(isset($HTTP_GET_VARS["graphid"]))
+	if(isset($_GET["graphid"]))
 	{
-		echo "<input class=\"biginput\" name=\"graphid\" type=\"hidden\" value=".$HTTP_GET_VARS["graphid"].">";
+		echo "<input class=\"biginput\" name=\"graphid\" type=\"hidden\" value=".$_GET["graphid"].">";
 	}
 	echo S_NAME; 
 	show_table2_h_delimiter();
@@ -143,7 +143,7 @@
 
 	show_table2_v_delimiter2();
 	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
-	if(isset($HTTP_GET_VARS["graphid"]))
+	if(isset($_GET["graphid"]))
 	{
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('".S_DELETE_GRAPH_Q."');\">";
