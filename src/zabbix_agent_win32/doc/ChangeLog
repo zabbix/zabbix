@@ -1,6 +1,7 @@
 1.0.0-beta10
 
 * Added support for non-english Windows versions - thanks to Harald Holzer
+* Added diskused[*] parameter
 
 
 1.0.0-beta9
