@@ -201,7 +201,7 @@ void	process_child(int sockfd)
 		}
 		else
 		{
-			result[0]=0;
+			sprintf(result,"NOT OK\n");
 		}
 		syslog( LOG_DEBUG, "Sending back:%s", result);
 		write(sockfd,result,strlen(result));
