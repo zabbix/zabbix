@@ -413,13 +413,13 @@ char *GetCounterName(DWORD index)
 	while(counterName!=NULL)
 	{
 		if (counterName->pdhIndex == index)
-         break;
+		   break;
 		counterName = counterName->next;
 	}
 	if (counterName == NULL)
 	{
 		counterName = (PERFCOUNTER *)malloc(sizeof(PERFCOUNTER));
-		memset(counterName,0, sizeof(PERFCOUNTER));
+		memset(counterName, 0, sizeof(PERFCOUNTER));
 		counterName->pdhIndex = index;
 		counterName->next = perfCounterList;
 
@@ -427,12 +427,13 @@ char *GetCounterName(DWORD index)
 		dwSize = MAX_COMPUTERNAME_LENGTH;
 		GetComputerName((char *) &hostname + 2, &dwSize);
 
-		dwSize = MAX_COUNTER_PATH;
+		dwSize = MAX_COUNTER_NAME;
 		if (PdhLookupPerfNameByIndex((char *)&hostname, index, (char *)&counterName->name, &dwSize)==ERROR_SUCCESS)
 		{
 			perfCounterList = counterName;
-		} else 
-      {
+		} 
+		else 
+		{
 			free(counterName);
 			return "UnknownPerformanceCounter";
 		}
