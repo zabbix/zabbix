@@ -18,62 +18,62 @@
 
 
 <?
-	if(isset($register))
+	if(isset($HTTP_GET_VARS["register"]))
 	{
-		if($register=="add dependency")
+		if($HTTP_GET_VARS["register"]=="add dependency")
 		{
-			$result=add_trigger_dependency($triggerid,$depid);
+			$result=add_trigger_dependency($HTTP_GET_VARS["triggerid"],$HTTP_GET_VARS["depid"]);
 			show_messages($result,"Dependency added","Cannot add dependency");
 		}
-		if($register=="delete dependency")
+		if($HTTP_GET_VARS["register"]=="delete dependency")
 		{
-			$result=delete_trigger_dependency($triggerid,$dependency);
+			$result=delete_trigger_dependency($HTTP_GET_VARS["triggerid"],$HTTP_GET_VARS["dependency"]);
 			show_messages($result,"Dependency deleted","Cannot delete dependency");
 		}
-		if($register=="changestatus")
+		if($HTTP_GET_VARS["register"]=="changestatus")
 		{
-			$result=update_trigger_status($triggerid,$status);
+			$result=update_trigger_status($HTTP_GET_VARS["triggerid"],$HTTP_GET_VARS["status"]);
 			show_messages($result,"Trigger status updated","Cannot update trigger status");
-			unset($triggerid);
+			unset($HTTP_GET_VARS["triggerid"]);
 		}
-		if($register=="update")
+		if($HTTP_GET_VARS["register"]=="update")
 		{
-			if(validate_expression($expression)==0)
+			if(validate_expression($HTTP_GET_VARS["expression"])==0)
 			{
 				$now=mktime();
-				if(isset($disabled))	{ $status=1; }
+				if(isset($HTTP_GET_VARS["disabled"]))	{ $status=1; }
 				else			{ $status=0; }
 	
-				$result=update_trigger($triggerid,$expression,$description,$priority,$status,$comments,$url);
+				$result=update_trigger($HTTP_GET_VARS["triggerid"],$HTTP_GET_VARS["expression"],$HTTP_GET_VARS["description"],$HTTP_GET_VARS["priority"],$status,$HTTP_GET_VARS["comments"],$HTTP_GET_VARS["url"]);
 				show_messages($result,"Trigger updated","Cannot update trigger");
 			}
 			else
 			{
 				show_error_message("Invalid trigger expression");
 			}
-			unset($triggerid);
+			unset($HTTP_GET_VARS["triggerid"]);
 		}
-		if($register=="add")
+		if($HTTP_GET_VARS["register"]=="add")
 		{
-			if(validate_expression($expression)==0)
+			if(validate_expression($HTTP_GET_VARS["expression"])==0)
 			{
-				if(isset($disabled))	{ $status=1; }
+				if(isset($HTTP_GET_VARS["disabled"]))	{ $status=1; }
 				else			{ $status=0; }
 				
-				$result=add_trigger($expression,$description,$priority,$status,$comments,$url);
+				$result=add_trigger($HTTP_GET_VARS["expression"],$HTTP_GET_VARS["description"],$HTTP_GET_VARS["priority"],$status,$HTTP_GET_VARS["comments"],$HTTP_GET_VARS["url"]);
 				show_messages($result,"Trigger added","Cannot add trigger");
 			}
 			else
 			{
 				show_error_message("Invalid trigger expression");
 			}
-			unset($triggerid);
+			unset($HTTP_GET_VARS["triggerid"]);
 		}
-		if($register=="delete")
+		if($HTTP_GET_VARS["register"]=="delete")
 		{
-			$result=delete_trigger($triggerid);
+			$result=delete_trigger($HTTP_GET_VARS["triggerid"]);
 			show_messages($result,"Trigger deleted","Cannot delete trigger");
-			unset($triggerid);
+			unset($HTTP_GET_VARS["triggerid"]);
 		}
 	}
 ?>
@@ -92,7 +92,7 @@
 		{
 			continue;
 		}
-		if(isset($hostid) && ($row["hostid"] == $hostid))
+		if(isset($HTTP_GET_VARS["hostid"]) && ($row["hostid"] == $HTTP_GET_VARS["hostid"]))
 		{
 			echo "<b>[<A HREF=\"triggers.php?hostid=".$row["hostid"]."\">".$row["host"]."</A>]</b>  ";
 		}
@@ -107,10 +107,10 @@
 
 <?
 
-	if(isset($hostid)&&!isset($triggerid))
+	if(isset($HTTP_GET_VARS["hostid"])&&!isset($HTTP_GET_VARS["triggerid"]))
 	{
 
-		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.status,t.value from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=$hostid order by h.host,t.description");
+		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.status,t.value from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$HTTP_GET_VARS["hostid"]." order by h.host,t.description");
 		$lasthost="";
 		$col=0;
 		while($row=DBfetch($result))
@@ -165,7 +165,7 @@
 			$expression=rawurlencode($row["expression"]);
 			echo "</TD>";
 			echo "<TD>";
-			if(isset($hostid))
+			if(isset($HTTP_GET_VARS["hostid"]))
 			{
 				echo "<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."&hostid=".$row["hostid"]."#form\">Change</A> ";
 			}
@@ -187,7 +187,7 @@
 	if(DBget_field($result,0,0)>0)
 	{
 		echo "<a name=\"form\"></a>";
-		@insert_trigger_form($hostid,$triggerid);
+		@insert_trigger_form($HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["triggerid"]);
 	} 
 ?>
 

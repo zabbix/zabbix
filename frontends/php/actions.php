@@ -7,41 +7,41 @@
 ?>
 
 <?
-	if(isset($register))
+	if(isset($HTTP_GET_VARS["register"]))
 	{
-		if($register=="add")
+		if($HTTP_GET_VARS["register"]=="add")
 		{
-			$result=add_action( $triggerid, $userid, $good, $delay, $subject, $message );
+			$result=add_action( $HTTP_GET_VARS["triggerid"], $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["good"], $HTTP_GET_VARS["delay"], $HTTP_GET_VARS["subject"], $HTTP_GET_VARS["message"] );
 			show_messages($result,"Action added","Cannot add action");
 		}
-		if($register=="update")
+		if($HTTP_GET_VARS["register"]=="update")
 		{
-			$result=update_action( $actionid, $userid, $good, $delay, $subject, $message );
+			$result=update_action( $HTTP_GET_VARS["actionid"], $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["good"], $HTTP_GET_VARS["delay"], $HTTP_GET_VARS["subject"], $HTTP_GET_VARS["message"] );
 			show_messages($result,"Action updated","Cannot update action");
-			unset($actionid);
+			unset($HTTP_GET_VARS["actionid"]);
 		}
-		if($register=="delete")
+		if($HTTP_GET_VARS["register"]=="delete")
 		{
-			$result=delete_action($actionid);
+			$result=delete_action($HTTP_GET_VARS["actionid"]);
 			show_messages($result,"Action deleted","Cannot delete action");
-			unset($actionid);
+			unset($HTTP_GET_VARS["actionid"]);
 		}
 	}
 ?>
 
 <?
-	$trigger=get_trigger_by_triggerid($triggerid);
+	$trigger=get_trigger_by_triggerid($HTTP_GET_VARS["triggerid"]);
 	$expression=explode_exp($trigger["expression"],1);
 	$description=$trigger["description"];
 	if( strstr($description,"%s"))
 	{
-		$description=expand_trigger_description($triggerid);
+		$description=expand_trigger_description($HTTP_GET_VARS["triggerid"]);
 	}
 	show_table_header("$description<BR>$expression");
 ?>
 
 <?
-	$sql="select a.actionid,a.triggerid,u.alias,a.good,a.delay,a.subject,a.message from actions a,users u where a.userid=u.userid and a.triggerid=$triggerid order by u.alias, a.good desc";
+	$sql="select a.actionid,a.triggerid,u.alias,a.good,a.delay,a.subject,a.message from actions a,users u where a.userid=u.userid and a.triggerid=".$HTTP_GET_VARS["triggerid"]." order by u.alias, a.good desc";
 	$result=DBselect($sql);
 
 	echo "<div align=center>";
@@ -94,9 +94,9 @@
 
 <?
 
-	if(isset($actionid))
+	if(isset($HTTP_GET_VARS["actionid"]))
 	{
-		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid from actions a where a.actionid=$actionid";
+		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid from actions a where a.actionid=".$HTTP_GET_VARS["actionid"];
 		$result=DBselect($sql);
 
 		$actionid=DBget_field($result,0,0);
@@ -109,14 +109,14 @@
 	}
 	else
 	{
-		$trigger=get_trigger_by_triggerid($triggerid);
+		$trigger=get_trigger_by_triggerid($HTTP_GET_VARS["triggerid"]);
 		$description=$trigger["description"];
 
 		$good=1;
 		$delay=30;
 		$subject=$description;
 
-		$sql="select i.description, h.host, i.key_ from hosts h, items i,functions f where f.triggerid=$triggerid and h.hostid=i.hostid and f.itemid=i.itemid order by i.description";
+		$sql="select i.description, h.host, i.key_ from hosts h, items i,functions f where f.triggerid=".$HTTP_GET_VARS["triggerid"]." and h.hostid=i.hostid and f.itemid=i.itemid order by i.description";
 		$result=DBselect($sql);
 		$message="INSERT YOUR MESSAGE HERE\n\n------Latest data------\n\n";
 		while($row=DBfetch($result))
@@ -132,11 +132,11 @@
 	echo "New action";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"actions.php\">";
-	echo "<input name=\"triggerid\" type=\"hidden\" value=$triggerid>";
-	if(isset($actionid))
+	echo "<form method=\"get\" action=\"actions.php\">";
+	echo "<input name=\"triggerid\" type=\"hidden\" value=".$HTTP_GET_VARS["triggerid"].">";
+	if(isset($HTTP_GET_VARS["actionid"]))
 	{
-		echo "<input name=\"actionid\" type=\"hidden\" value=$actionid>";
+		echo "<input name=\"actionid\" type=\"hidden\" value=".$HTTP_GET_VARS["actionid"].">";
 	}
 	echo "Send message to";
 	show_table2_h_delimiter();
@@ -146,7 +146,7 @@
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
 	{
-		if(isset($uid) && ($row["userid"] == $uid))
+		if(isset($HTTP_GET_VARS["uid"]) && ($row["userid"] == $HTTP_GET_VARS["uid"]))
 		{
 			echo "<option value=\"".$row["userid"]."\" SELECTED>".$row["alias"];
 		}

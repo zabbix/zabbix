@@ -17,13 +17,13 @@
 ?>
 
 <?
-	if(isset($register))
+	if(isset($HTTP_GET_VARS["register"]))
 	{
-		if($register=="add")
+		if($HTTP_GET_VARS["register"]=="add")
 		{
-			if($password1==$password2)
+			if($HTTP_GET_VARS["password1"]==$HTTP_GET_VARS["password2"])
 			{
-				$result=add_user($name,$surname,$alias,$password1);
+				$result=add_user($HTTP_GET_VARS["name"],$HTTP_GET_VARS["surname"],$HTTP_GET_VARS["alias"],$HTTP_GET_VARS["password1"]);
 				show_messages($result, "User added", "Cannot add user");
 			}
 			else
@@ -31,28 +31,28 @@
 				show_error_message("Cannot add user. Both passwords must be equal.");
 			}
 		}
-		if($register=="delete")
+		if($HTTP_GET_VARS["register"]=="delete")
 		{
-			$result=delete_user($userid);
+			$result=delete_user($HTTP_GET_VARS["userid"]);
 			show_messages($result, "User successfully deleted", "Cannot delete user");
 			unset($userid);
 		}
-		if($register=="delete_permission")
+		if($HTTP_GET_VARS["register"]=="delete_permission")
 		{
-			$result=delete_permission($rightid);
+			$result=delete_permission($HTTP_GET_VARS["rightid"]);
 			show_messages($result, "Permission successfully deleted", "Cannot delete permission");
 			unset($rightid);
 		}
-		if($register=="add permission")
+		if($HTTP_GET_VARS["register"]=="add permission")
 		{
-			$result=add_permission($userid,$right,$permission,$id);
+			$result=add_permission($HTTP_GET_VARS["userid"],$HTTP_GET_VARS["right"],$HTTP_GET_VARS["permission"],$HTTP_GET_VARS["id"]);
 			show_messages($result, "Permission successfully added", "Cannot add permission");
 		}
-		if($register=="update")
+		if($HTTP_GET_VARS["register"]=="update")
 		{
-			if($password1==$password2)
+			if($HTTP_GET_VARS["password1"]==$HTTP_GET_VARS["password2"])
 			{
-				$result=update_user($userid,$name,$surname,$alias,$password1);
+				$result=update_user($HTTP_GET_VARS["userid"],$HTTP_GET_VARS["name"],$HTTP_GET_VARS["surname"],$HTTP_GET_VARS["alias"],$HTTP_GET_VARS["password1"]);
 				show_messages($result, "Information successfully updated", "Cannot update information");
 			}
 			else
@@ -114,7 +114,7 @@
 ?>
 
 <?
-	if(isset($userid))
+	if(isset($HTTP_GET_VARS["userid"]))
 	{
 	echo "<br>";
 	echo "<a name=\"form\"></a>";
@@ -125,7 +125,7 @@
 	echo "<TD WIDTH=10% NOSAVE><B>Resource name</B></TD>";
 	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
-	$result=DBselect("select rightid,name,permission,id from rights where userid=$userid order by name,permission,id");
+	$result=DBselect("select rightid,name,permission,id from rights where userid=".$HTTP_GET_VARS["userid"]." order by name,permission,id");
 	$col=0;
 	while($row=DBfetch($result))
 	{
@@ -158,12 +158,12 @@
 			echo "<TD>".$row["permission"]."</TD>";
 		}
 		echo "<TD>".get_resource_name($row["name"],$row["id"])."</TD>";
-		echo "<TD><A HREF=users.php?userid=$userid&rightid=".$row["rightid"]."&register=delete_permission>Delete</A></TD>";
+		echo "<TD><A HREF=users.php?userid=".$HTTP_GET_VARS["userid"]."&rightid=".$row["rightid"]."&register=delete_permission>Delete</A></TD>";
 	}
 	echo "</TR>";
 	echo "</TABLE>";
 
-	insert_permissions_form($userid);
+	insert_permissions_form($HTTP_GET_VARS["userid"]);
 
 	}
 ?>
@@ -171,7 +171,7 @@
 <?
 	echo "<br>";
 
-	@insert_user_form($userid);
+	@insert_user_form($HTTP_GET_VARS["userid"]);
 ?>
 
 <?

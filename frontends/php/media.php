@@ -7,7 +7,7 @@
 ?>
 
 <?
-        if(!check_right("User","R",$userid))
+        if(!check_right("User","R",$HTTP_GET_VARS["userid"]))
         {
                 show_table_header("<font color=\"AA0000\">No permissions !</font
 >");
@@ -18,28 +18,28 @@
 
 
 <?
-	if(isset($register))
+	if(isset($HTTP_GET_VARS["register"]))
 	{
-		if($register=="enable")
+		if($HTTP_GET_VARS["register"]=="enable")
 		{
-			$result=activate_media( $mediaid );
+			$result=activate_media( $HTTP_GET_VARS["mediaid"] );
 			show_messages($result,"Media activated","Cannot activate media");
 		}
-		elseif($register=="disable")
+		elseif($HTTP_GET_VARS["register"]=="disable")
 		{
-			$result=disactivate_media( $mediaid );
+			$result=disactivate_media( $HTTP_GET_VARS["mediaid"] );
 			show_messages($result,"Media disabled","Cannot disable media");
 		}
-		elseif($register=="add")
+		elseif($HTTP_GET_VARS["register"]=="add")
 		{
-			$result=add_media( $userid, $type, $sendto);
+			$result=add_media( $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["type"], $HTTP_GET_VARS["sendto"]);
 			show_messages($result,"Media added","Cannot add media");
 		}
-		elseif($register=="delete")
+		elseif($HTTP_GET_VARS["register"]=="delete")
 		{
-			$result=delete_media( $mediaid );
+			$result=delete_media( $HTTP_GET_VARS["mediaid"] );
 			show_messages($result,"Media deleted","Cannot delete media");
-			unset($mediaid);
+			unset($HTTP_GET_VARS["mediaid"]);
 		}
 	}
 ?>
@@ -50,7 +50,7 @@
 
 <FONT COLOR="#000000">
 <?
-	$sql="select mediaid,type,sendto,active from media where userid=$userid order by type,sendto";
+	$sql="select mediaid,type,sendto,active from media where userid=".$HTTP_GET_VARS["userid"]." order by type,sendto";
 	$result=DBselect($sql);
 
 	echo "<TABLE BORDER=0 WIDTH=100% align=center BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
@@ -89,15 +89,15 @@
 		echo "<TD>";
 		if(DBget_field($result,$i,3)==0) 
 		{
-			echo "<a href=\"media.php?register=disable&mediaid=$mediaid&userid=$userid\">Enabled</A>";
+			echo "<a href=\"media.php?register=disable&mediaid=$mediaid&userid=".$HTTP_GET_VARS["userid"]."\">Enabled</A>";
 		}
 		else
 		{
-			echo "<a href=\"media.php?register=enable&mediaid=$mediaid&userid=$userid\">Disabled</A>";
+			echo "<a href=\"media.php?register=enable&mediaid=$mediaid&userid=".$HTTP_GET_VARS["userid"]."\">Disabled</A>";
 		}
 		echo "</TD>";
 		echo "<TD>";
-		echo "<A HREF=\"media.php?register=delete&mediaid=$mediaid&userid=$userid\">Delete</A>";
+		echo "<A HREF=\"media.php?register=delete&mediaid=$mediaid&userid=".$HTTP_GET_VARS["userid"]."\">Delete</A>";
 		echo "</TD>";
 		echo "</TR>";
 	}
@@ -113,8 +113,8 @@
 	echo "New media";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"media.php\">";
-	echo "<input name=\"userid\" type=\"hidden\" value=$userid>";
+	echo "<form method=\"get\" action=\"media.php\">";
+	echo "<input name=\"userid\" type=\"hidden\" value=".$HTTP_GET_VARS["userid"].">";
 	echo "Type";
 	show_table2_h_delimiter();
 	echo "<select name=\"type\" size=1>";

@@ -16,28 +16,28 @@
 ?>
 
 <?
-	if(isset($register))
+	if(isset($HTTP_GET_VARS["register"]))
 	{
-		if($register=="add")
+		if($HTTP_GET_VARS["register"]=="add")
 		{
-			$result=add_host($host,$port,$status,$template,$useip,$ip,$host_templateid);
+			$result=add_host($HTTP_GET_VARS["host"],$HTTP_GET_VARS["port"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["template"],$HTTP_GET_VARS["useip"],$HTTP_GET_VARS["ip"],$HTTP_GET_VARS["host_templateid"]);
 			show_messages($result,"Host added","Cannot add host");
 		}
-		if($register=="update")
+		if($HTTP_GET_VARS["register"]=="update")
 		{
-			$result=update_host($hostid,$host,$port,$status,$useip,$ip);
+			$result=update_host($HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["host"],$HTTP_GET_VARS["port"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["useip"],$HTTP_GET_VARS["ip"]);
 			show_messages($result,"Host details updated","Cannot update host details");
 		}
-		if($register=="changestatus")
+		if($HTTP_GET_VARS["register"]=="changestatus")
 		{
-			$result=update_host_status($hostid,$status);
+			$result=update_host_status($HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["status"]);
 			show_messages($result,"Host status updated","Cannot update host status");
 		}
-		if($register=="delete")
+		if($HTTP_GET_VARS["register"]=="delete")
 		{
-			$result=delete_host($hostid);
+			$result=delete_host($HTTP_GET_VARS["hostid"]);
 			show_messages($result,"Host deleted","Cannot delete host");
-			unset($hostid);
+			unset($HTTP_GET_VARS["hostid"]);
 		}
 	}
 ?>
@@ -59,7 +59,6 @@
 	$result=DBselect("select h.hostid,h.host,h.port,h.status from hosts h order by h.host");
 	$col=0;
 	while($row=DBfetch($result))
-//	for($i=0;$i<DBnum_rows($result);$i++)
 	{
         	if(!check_right("Host","R",$row["hostid"]))
 		{
@@ -109,9 +108,9 @@
 ?>
 
 <?
-	if(isset($register) && ($register == "change"))
+	if(isset($HTTP_GET_VARS["register"]) && ($HTTP_GET_VARS["register"] == "change"))
 	{
-		$result=DBselect("select host,port,status,useip,ip from hosts where hostid=$hostid"); 
+		$result=DBselect("select host,port,status,useip,ip from hosts where hostid=".$HTTP_GET_VARS["hostid"]); 
 		$host=DBget_field($result,0,0);
 		$port=DBget_field($result,0,1);
 		$status=DBget_field($result,0,2);
@@ -142,10 +141,10 @@
 	echo "Host details";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"hosts.php\">";
-	if(isset($hostid))
+	echo "<form method=\"get\" action=\"hosts.php\">";
+	if(isset($HTTP_GET_VARS["hostid"]))
 	{
-		echo "<input name=\"hostid\" type=\"hidden\" value=$hostid>";
+		echo "<input name=\"hostid\" type=\"hidden\" value=\"".$HTTP_GET_VARS["hostid"]."\">";
 	}
 	echo "Host";
 	show_table2_h_delimiter();
@@ -201,7 +200,7 @@
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
-	if(isset($hostid))
+	if(isset($HTTP_GET_VARS["hostid"]))
 	{
 		echo "<input type=\"submit\" name=\"register\" value=\"update\">";
 		echo "<input type=\"submit\" name=\"register\" value=\"delete\">";

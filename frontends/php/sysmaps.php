@@ -15,21 +15,21 @@
 ?>
 
 <?
-	if(isset($register))
+	if(isset($HTTP_GET_VARS["register"]))
 	{
-		if($register=="add")
+		if($HTTP_GET_VARS["register"]=="add")
 		{
-			$result=add_sysmap($name,$width,$height);
+			$result=add_sysmap($HTTP_GET_VARS["name"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
 			show_messages($result,"Network map added","Cannot add network map");
 		}
-		if($register=="update")
+		if($HTTP_GET_VARS["register"]=="update")
 		{
-			$result=update_sysmap($sysmapid,$name,$width,$height);
+			$result=update_sysmap($HTTP_GET_VARS["sysmapid"],$HTTP_GET_VARS["name"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
 			show_messages($result,"Network map updated","Cannot update network map");
 		}
-		if($register=="delete")
+		if($HTTP_GET_VARS["register"]=="delete")
 		{
-			$result=delete_sysmap($sysmapid);
+			$result=delete_sysmap($HTTP_GET_VARS["sysmapid"]);
 			show_messages($result,"Network map deleted","Cannot delete network map");
 			unset($sysmapid);
 		}
@@ -83,9 +83,9 @@
 <?
 	echo "<a name=\"form\"></a>";
 
-	if(isset($sysmapid))
+	if(isset($HTTP_GET_VARS["sysmapid"]))
 	{
-		$result=DBselect("select s.sysmapid,s.name,s.width,s.height from sysmaps s where sysmapid=$sysmapid");
+		$result=DBselect("select s.sysmapid,s.name,s.width,s.height from sysmaps s where sysmapid=".$HTTP_GET_VARS["sysmapid"]);
 		$name=DBget_field($result,0,1);
 		$width=DBget_field($result,0,2);
 		$height=DBget_field($result,0,3);
@@ -102,10 +102,10 @@
 	echo "New system map";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"sysmaps.php\">";
-	if(isset($sysmapid))
+	echo "<form method=\"get\" action=\"sysmaps.php\">";
+	if(isset($HTTP_GET_VARS["sysmapid"]))
 	{
-		echo "<input name=\"sysmapid\" type=\"hidden\" value=$sysmapid>";
+		echo "<input name=\"sysmapid\" type=\"hidden\" value=".$HTTP_GET_VARS["sysmapid"].">";
 	}
 	echo "Name";
 	show_table2_h_delimiter();
@@ -123,7 +123,7 @@
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
-	if(isset($sysmapid))
+	if(isset($HTTP_GET_VARS["sysmapid"]))
 	{
 		echo "<input type=\"submit\" name=\"register\" value=\"update\">";
 	}
