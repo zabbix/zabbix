@@ -6,7 +6,12 @@ CREATE TABLE escalations (
 
 CREATE UNIQUE INDEX escalations_name on escalations (name);
 
+--
+-- Table structure for table 'hosts_templates'
+--
+
 CREATE TABLE hosts_templates (
+  hosttemplateid	serial,
   hostid		int4		DEFAULT '0' NOT NULL,
   templateid		int4		DEFAULT '0' NOT NULL,
   items			int2		DEFAULT '0' NOT NULL,
@@ -14,5 +19,7 @@ CREATE TABLE hosts_templates (
   actions		int2		DEFAULT '0' NOT NULL,
   graphs		int2		DEFAULT '0' NOT NULL,
   screens		int2		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (hostid, templateid)
+  PRIMARY KEY (hosttemplateid)
 );
+
+CREATE UNIQUE INDEX hosts_templates_hostid_templateid on hosts_templates (hostid, templateid);

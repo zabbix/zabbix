@@ -297,6 +297,10 @@
 		}
 		table_end();
 	}
+	if($_GET["config"]==2)
+	{
+		insert_template_form($_GET["groupid"]);
+	}
 ?>
 
 <?php

@@ -617,7 +617,7 @@ CREATE TABLE trends (
 --
 
 CREATE TABLE escalations (
-  escalationid		serial		DEFAULT '0' NOT NULL,
+  escalationid		serial,
   name			varchar(64)	DEFAULT '0' NOT NULL,
   PRIMARY KEY (escalationid)
 );
@@ -629,6 +629,7 @@ CREATE UNIQUE INDEX escalations_name on escalations (name);
 --
 
 CREATE TABLE hosts_templates (
+  hosttemplateid	serial,
   hostid		int4		DEFAULT '0' NOT NULL,
   templateid		int4		DEFAULT '0' NOT NULL,
   items			int2		DEFAULT '0' NOT NULL,
@@ -636,7 +637,9 @@ CREATE TABLE hosts_templates (
   actions		int2		DEFAULT '0' NOT NULL,
   graphs		int2		DEFAULT '0' NOT NULL,
   screens		int2		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (hostid, templateid)
+  PRIMARY KEY (hosttemplateid)
 );
+
+CREATE UNIQUE INDEX hosts_templates_hostid_templateid on hosts_templates (hostid, templateid);
 
 VACUUM ANALYZE;

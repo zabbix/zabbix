@@ -10,6 +10,7 @@ CREATE TABLE escalations (
 --
 
 CREATE TABLE hosts_templates (
+  hosttemplateid	int(4)		NOT NULL auto_increment,
   hostid		int(4)		DEFAULT '0' NOT NULL,
   templateid		int(4)		DEFAULT '0' NOT NULL,
   items			int(1)		DEFAULT '0' NOT NULL,
@@ -17,5 +18,6 @@ CREATE TABLE hosts_templates (
   actions		int(1)		DEFAULT '0' NOT NULL,
   graphs		int(1)		DEFAULT '0' NOT NULL,
   screens		int(1)		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (hostid, templateid)
+  PRIMARY KEY (hosttemplateid),
+  UNIQUE (hostid, templateid)
 ) type=InnoDB;
