@@ -1,5 +1,6 @@
 Changes for 1.0beta11:
 
+ - fix for proc_cnt[*] under Solaris (Alexei)
  - fix of automatic image scaling under Explorer for charts.php
  (Alexei)
  - fixed division by zero and infinite loop in graphs (Alexei)
