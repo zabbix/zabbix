@@ -1661,8 +1661,9 @@ echo "</head>";
 	$menu=array(
 		"view"=>array(
 				"label"=>"View",
-				"pages"=>array("latest.php","tr_status.php","queue.php","latestalarms.php","alerts.php","maps.php","charts.php","screens.php","srv_status.php","alarms.php","history.php","tr_comments.php","report3.php"),
+				"pages"=>array("overview.php","latest.php","tr_status.php","queue.php","latestalarms.php","alerts.php","maps.php","charts.php","screens.php","srv_status.php","alarms.php","history.php","tr_comments.php","report3.php"),
 				"level2"=>array(
+					array("label"=>"Overview","url"=>"overview.php"),
 					array("label"=>"Latest data","url"=>"latest.php"),
 					array("label"=>"Triggers","url"=>"tr_status.php?onlytrue=true&noactions=true&compact=true"),
 					array("label"=>"Queue","url"=>"queue.php"),
@@ -1771,6 +1772,7 @@ echo "</head>";
 	{
 // Check permissions
 		if(($sub["url"]=="latest.php")&&!check_anyright("Host","R"))							continue;
+		if(($sub["url"]=="overview.php")&&!check_anyright("Host","R"))							continue;
 		if(($sub["url"]=="tr_status.php?onlytrue=true&noactions=true&compact=true")&&!check_anyright("Host","R"))	continue;
 		if(($sub["url"]=="queue.php")&&!check_anyright("Host","R"))							continue;
 		if(($sub["url"]=="latestalarms.php")&&!check_anyright("Default permission","R"))				continue;
