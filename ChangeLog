@@ -28,6 +28,7 @@ Not ready yet:
 
  OTHER:
 
+ - add "connection reset by peer"
  - check for function parameters in evaluate_simple_expression
  - make links different if something is already registered (as for medias,
    actions, etc)
