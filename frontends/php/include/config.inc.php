@@ -681,6 +681,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				($function!="change")&&
 				($function!="abschange")&&
 				($function!="nodata")&&
+				($function!="time")&&
+				($function!="date")&&
 				($function!="str"))
 			{
 				$ERROR_MSG="Unknown function [$function]";
