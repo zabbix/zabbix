@@ -2207,7 +2207,81 @@ echo "</head>";
 		return $result;
 	}
 
-	# Delete Function definition
+	# Add item to hardlinked hosts
+
+	function	add_item_to_templates($itemid)
+	{
+		if($itemid<=0)
+		{
+			return;
+		}
+
+		$item=get_item_by_itemid($itemid);
+
+		$sql="select hostid,templateid from hosts_templates where templateid=".$item["hostid"];
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			$sql="select itemid from items where key_=\"".$item["key_"]."\" and hostid=".$row["hostid"];
+			$result2=DBselect($sql);
+			if(DBnum_rows($result2)==0)
+			{
+				add_item($item["description"],$item["key_"],$row["hostid"],$item["delay"],$item["history"],$item["status"],$item["type"],$item["snmp_community"],$item["snmp_oid"],$item["value_type"],$item["trapper_hosts"],$item["snmp_port"],$item["units"],$item["multiplier"],$item["delta"],$item["snmpv3_securityname"],$item["snmpv3_securitylevel"],$item["snmpv3_authpassphrase"],$item["snmpv3_privpassphrase"],$item["formula"],$item["trends"]);
+			}
+		}
+	}
+
+	# Add item to hardlinked hosts
+
+	function	delete_item_from_templates($itemid)
+	{
+		if($itemid<=0)
+		{
+			return;
+		}
+
+		$item=get_item_by_itemid($itemid);
+
+		$sql="select hostid,templateid from hosts_templates where templateid=".$item["hostid"];
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			$sql="select itemid from items where key_=\"".$item["key_"]."\" and hostid=".$row["hostid"];
+			$result2=DBselect($sql);
+			while($row2=DBfetch($result2))
+			{
+				delete_item($row2["itemid"]);
+			}
+		}
+	}
+
+	# Update item in hardlinked hosts
+
+	function	update_item_in_templates($itemid)
+	{
+		if($itemid<=0)
+		{
+			return;
+		}
+
+		$item=get_item_by_itemid($itemid);
+
+		$sql="select hostid,templateid from hosts_templates where templateid=".$item["hostid"];
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			$sql="select itemid from items where key_=\"".$item["key_"]."\" and hostid=".$row["hostid"];
+			$result2=DBselect($sql);
+			if(DBnum_rows($result2)==1)
+			{
+				$row2=DBfetch($result2);
+				update_item($row2["itemid"],$item["description"],$item["key_"],$row["hostid"],$item["delay"],$item["history"],$item["status"],$item["type"],$item["snmp_community"],$item["snmp_oid"],$item["value_type"],$item["trapper_hosts"],$item["snmp_port"],$item["units"],$item["multiplier"],$item["delta"],$item["snmpv3_securityname"],$item["snmpv3_securitylevel"],$item["snmpv3_authpassphrase"],$item["snmpv3_privpassphrase"],$item["formula"],$item["trends"]);
+			}
+		}
+	}
+
+	# Add Item definition
+
 
 	# Add Item definition
 
