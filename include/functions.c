@@ -41,6 +41,7 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
+#include "zlog.h"
 #include "security.h"
 
 #include "functions.h"
@@ -739,6 +740,7 @@ int	evaluate_FUNCTION_thread(MYSQL *database, char *value,DB_ITEM *item,char *fu
 	else
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Unsupported function:%s",function);
+		zabbix_syslog("Unsupported function:%s",function);
 		ret = FAIL;
 	}
 
@@ -783,11 +785,6 @@ int	evaluate_FUNCTION_thread(MYSQL *database, char *value,DB_ITEM *item,char *fu
 		{
                 	snprintf(value, MAX_STRING_LEN-1, "%.2f %s%s", value_float, suffix, item->units);
 		}
-	}
-	else
-	{
-		if( (EVALUATE_FUNCTION_SUFFIX == flag))
-			zabbix_log( LOG_LEVEL_WARNING, "Hmm [%d] [%d] [%d] [%s]", flag, item->value_type, ret, item->units);
 	}
 
 	zabbix_log( LOG_LEVEL_DEBUG, "End of evaluate_FUNCTION. Result [%s]",value);
@@ -1004,6 +1001,7 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
 	else
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Unsupported function:%s",function);
+		zabbix_syslog("Unsupported function:%s",function);
 		ret = FAIL;
 	}
 
@@ -1056,11 +1054,6 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
 		{
                 	snprintf(value, MAX_STRING_LEN-1, "%.2f %s%s", value_float, suffix, item->units);
 		}
-	}
-	else
-	{
-		if( (EVALUATE_FUNCTION_SUFFIX == flag))
-			zabbix_log( LOG_LEVEL_WARNING, "Hmm [%d] [%d] [%d] [%s]", flag, item->value_type, ret, item->units);
 	}
 
 	zabbix_log( LOG_LEVEL_DEBUG, "End of evaluate_FUNCTION. Result [%s]",value);
@@ -1251,6 +1244,7 @@ void	send_to_user_thread(MYSQL *database, DB_TRIGGER *trigger,DB_ACTION *action)
 	else
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Unknown recipient type [%d] for actionid [%d]",action->recipient,action->actionid);
+		zabbix_syslog("Unknown recipient type [%d] for actionid [%d]",action->recipient,action->actionid);
 	}
 }
 #endif
@@ -1282,6 +1276,7 @@ void	send_to_user(DB_TRIGGER *trigger,DB_ACTION *action)
 	else
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Unknown recipient type [%d] for actionid [%d]",action->recipient,action->actionid);
+		zabbix_syslog("Unknown recipient type [%d] for actionid [%d]",action->recipient,action->actionid);
 	}
 }
 
@@ -1453,6 +1448,7 @@ void	apply_actions_thread(MYSQL *database, DB_TRIGGER *trigger,int trigger_value
 		else
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Unsupported scope [%d] for actionid [%d]", action.scope, action.actionid);
+			zabbix_syslog("Unsupported scope [%d] for actionid [%d]", action.scope, action.actionid);
 		}
 
 	}
@@ -1628,6 +1624,7 @@ void	apply_actions(DB_TRIGGER *trigger,int trigger_value)
 		else
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Unsupported scope [%d] for actionid [%d]", action.scope, action.actionid);
+			zabbix_syslog("Unsupported scope [%d] for actionid [%d]", action.scope, action.actionid);
 		}
 
 	}
@@ -1700,6 +1697,7 @@ void	update_serv_thread(MYSQL *database,int serviceid)
 		else
 		{
 			zabbix_log( LOG_LEVEL_ERR, "Unknown calculation algorithm of service status [%d]", algorithm);
+			zabbix_syslog("Unknown calculation algorithm of service status [%d]", algorithm);
 		}
 	}
 	DBfree_result(result);
@@ -1779,6 +1777,7 @@ void	update_serv(int serviceid)
 		else
 		{
 			zabbix_log( LOG_LEVEL_ERR, "Unknown calculation algorithm of service status [%d]", algorithm);
+			zabbix_syslog("Unknown calculation algorithm of service status [%d]", algorithm);
 		}
 	}
 	DBfree_result(result);
@@ -1879,6 +1878,7 @@ void	update_triggers_thread(MYSQL *database, int itemid)
 		if( evaluate_expression_thread(database, &b, exp) != 0 )
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated.",trigger.expression);
+			zabbix_syslog("Expression [%s] cannot be evaluated.",trigger.expression);
 			continue;
 		}
 
@@ -1982,6 +1982,7 @@ void	update_triggers(int itemid)
 		if( evaluate_expression(&b, exp) != 0 )
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated.",trigger.expression);
+			zabbix_syslog("Expression [%s] cannot be evaluated.",trigger.expression);
 			continue;
 		}
 
@@ -2069,6 +2070,7 @@ int	get_lastvalue_thread(MYSQL *database, char *value,char *host,char *key,char 
 	{
         	DBfree_result(result);
 		zabbix_log(LOG_LEVEL_WARNING, "Query [%s] returned empty result", sql );
+		zabbix_syslog("Query [%s] returned empty result", sql );
 		return FAIL;	
 	}
 
@@ -2133,7 +2135,8 @@ int	get_lastvalue(char *value,char *host,char *key,char *function,char *paramete
 	{
         	DBfree_result(result);
 		zabbix_log(LOG_LEVEL_WARNING, "Query [%s] returned empty result", sql );
-		return FAIL;	
+		zabbix_syslog("Query [%s] returned empty result", sql );
+		return FAIL;
 	}
 
         item.itemid=atoi(DBget_field(result,0,0));
@@ -2308,6 +2311,7 @@ void	process_new_value_thread(MYSQL *database, DB_ITEM *item,char *value)
 			else
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Value not stored for itemid [%d]. Unknown delta [%d]", item->itemid, item->delta);
+				zabbix_syslog("Value not stored for itemid [%d]. Unknown delta [%d]", item->itemid, item->delta);
 				return;
 			}
 		}
@@ -2443,6 +2447,7 @@ void	process_new_value(DB_ITEM *item,char *value)
 			else
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Value not stored for itemid [%d]. Unknown delta [%d]", item->itemid, item->delta);
+				zabbix_syslog("Value not stored for itemid [%d]. Unknown delta [%d]", item->itemid, item->delta);
 				return;
 			}
 		}
