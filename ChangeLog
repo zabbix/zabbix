@@ -1,5 +1,7 @@
 Changes for 1.0beta7:
 
+ - added validation of host name (Alexei)
+ - default value of StartSuckers is set to 4 (Alexei) 
  - fixed Select in Status of Triggers (Alexei)
  - precision of Change is set to 2 in Latest Values (Alexei)
  - --enable-static to work on all platforms (Alexei)
