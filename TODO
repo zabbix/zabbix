@@ -1,7 +1,7 @@
 HIGH PRIORITY:
 
  - fix Select in Status of Triggers
- - mass updates/inserts
+ - mass updates/inserts (add items and triggers for all hosts at once)
  - support for net-snmp
  - LDAP authorisation (should work with MSWindows LDAP)
  - get rid of long select lists in user forms 
@@ -11,15 +11,11 @@ HIGH PRIORITY:
  - support for disk loads
  - new host name should not contain space and other character not allowed by trigger expression
  - better monitoring of log files
+ - IT Helpdesk
+ - SNMP trapping
+ - personalisation (refresh rate, graph size, default graph period, etc)
 
 TODO:
-
-After using zabbix for a week monitoring 4 linux and 1 sun machine I have a
-small wish-list:
-
-- PHP front end
- 1. Add items for all hosts at once
- 2. Add triggers for all hosts at once
 
 - Agent
  1. An API so that I can build and active agent into
@@ -43,7 +39,6 @@ Not ready yet:
 
  OTHER:
 
- - personalisation (refresh rate, graph size, default graph period, etc)
  - round MIN/MAX/AVG numbers for graphs
  - dashed grid somethimes is out of rectangle for graphs
  - calculate MIN value for graphs (do not use '0')
@@ -66,7 +61,6 @@ Not ready yet:
 
  LATER:
 
- - IT Helpdesk
  - show who is online somewhere (in User config form?)
  - setup demo site
  - add user groups

@@ -294,7 +294,16 @@
 			}
 			if( isset($row["lastvalue"]) && isset($row["prevvalue"]) && $row["lastvalue"]-$row["prevvalue"] != 0 )
 			{
-				echo "<td>"; echo $row["lastvalue"]-$row["prevvalue"]; echo "</td>";
+//				echo "<td>"; echo $row["lastvalue"]-$row["prevvalue"]; echo "</td>";
+//	sprintf("%+0.2f"); does not work
+				if($row["lastvalue"]-$row["prevvalue"]<0)
+				{
+					printf("<td>%0.2f</td>",$row["lastvalue"]-$row["prevvalue"]);
+				}
+				else
+				{
+					printf("<td>+%0.2f</td>",$row["lastvalue"]-$row["prevvalue"]);
+				}
 			}
 			else
 			{
