@@ -47,6 +47,10 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
+
+/* for minor(), major() under Solaris */
+#include <sys/sysmacros.h>
+
 /* Required for getpwuid */
 #include <pwd.h>
 
@@ -63,7 +67,7 @@
 
 DISKDEVICE diskdevices[MAX_DISKDEVICES];
 
-int	get_device_name(char *device,int major,int minor)
+int	get_device_name(char *device,int mjr,int mnr)
 {
 	DIR	*dir;
 	struct	dirent *entries;
@@ -79,10 +83,10 @@ int	get_device_name(char *device,int major,int minor)
 		if(stat(filename,&buf)==0)
 		{
 /*			printf("%s %d %d\n",filename,major(buf.st_rdev),minor(buf.st_rdev));*/
-			if(S_ISBLK(buf.st_mode)&&(major==major(buf.st_rdev))&&(minor==minor(buf.st_rdev)))
+			if(S_ISBLK(buf.st_mode)&&(mjr==major(buf.st_rdev))&&(mnr==minor(buf.st_rdev)))
 			{
 				strcpy(device,entries->d_name);
-/*				printf("%s [%d %d] %d %d\n",filename,major, minor, major(buf.st_rdev),minor(buf.st_rdev));*/
+/*				printf("%s [%d %d] %d %d\n",filename,mjr, mnr, major(buf.st_rdev),minor(buf.st_rdev));*/
 				closedir(dir);
 				return 0;
 			}

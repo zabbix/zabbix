@@ -215,7 +215,7 @@ void	create_pid_file(void)
 		exit(-1);
 	}
 
-	fprintf(f,"%d",getpid());
+	fprintf(f,"%d",(int)getpid());
 	fclose(f);
 }
 
