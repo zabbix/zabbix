@@ -4,6 +4,24 @@
 	$USER_DETAILS	="";
 	$ERROR_MSG	="";
 
+	function	check_right($right,$permission,$id)
+	{
+		global $USER_DETAILS;
+
+		$sql="select * from users u,rights r where u.userid=r.userid and r.name='$right' and r.permission='$permission'";
+
+		$result=DBselect($sql);
+
+		if(DBnum_rows($result)>0)
+		{
+			return	0;
+		}
+		else
+		{
+			return	-1;
+		}
+	}
+
 //	The hash has form <md5sum of triggerid>,<sum of priorities>
 	function	calc_trigger_hash()
 	{
