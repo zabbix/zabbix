@@ -3718,27 +3718,31 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		cr();
 	}
 
+	function	show_header2($h1, $h2, $h2_form1, $h2_form2)
+	{
+?>
+	<table class="menu" cellspacing=0 cellpadding=1 width="100%">
+	<tr>
+	<td class="sub_menu" height=24 align=left>
+	<?php echo $h1; ?>
+	</td>
+	<?php echo $h2_form1; ?>
+	<td class="sub_menu" height=24 align=right>
+	<?php echo $h2; ?>
+	</td>
+	<?php echo $h2_form2; ?>
+	</tr>
+	</table>
+<?php
+	}
+
 	function	show_table3_header_begin()
 	{
 ?>
 	<table class="menu" cellspacing=0 cellpadding=1 width="100%">
 	<tr>
 <?php
-	echo "<td class=\"sub_menu\" height=24 colspan=9 nowrap=\"nowrap\">";
-/*
-		echo "<table border=0 align=center cellspacing=0 cellpadding=0 width=100% bgcolor=000000>";
-		cr();
-		echo "<tr>";
-		cr();
-		echo "<td valign=\"top\">";
-		cr();
-		echo "<table width=100% border=0 cellspacing=1 cellpadding=1>";
-		cr();
-		echo "<tr>";
-		cr();
-		echo "<td colspan=1 bgcolor=#6d88ad align=left valign=\"medium\">";
-		cr();
-		cr();*/
+		echo "<td class=\"sub_menu\" height=24 colspan=9 nowrap=\"nowrap\">";
 	}
 
 

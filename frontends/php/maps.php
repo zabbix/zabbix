@@ -60,24 +60,23 @@
 		if(isset($_GET["sysmapid"]))
 		{
 			$result=DBselect("select name from sysmaps where sysmapid=".$_GET["sysmapid"]);
-			$map=DBget_field($result,0,0);
-			$map=iif(isset($_GET["fullscreen"]),
-				"<a href=\"maps.php?sysmapid=".$_GET["sysmapid"]."\">".$map."</a>",
-				"<a href=\"maps.php?sysmapid=".$_GET["sysmapid"]."&fullscreen=1\">".$map."</a>");
+			$h1=DBget_field($result,0,0);
+			$h1=iif(isset($_GET["fullscreen"]),
+				"<a href=\"maps.php?sysmapid=".$_GET["sysmapid"]."\">".$h1."</a>",
+				"<a href=\"maps.php?sysmapid=".$_GET["sysmapid"]."&fullscreen=1\">".$h1."</a>");
 		}
 		else
 		{
-			$map=S_SELECT_MAP_TO_DISPLAY;
+			$h1=S_SELECT_MAP_TO_DISPLAY;
 		}
 
-		echo S_NETWORK_MAPS_BIG.nbsp(" / ").$map;
-// Start of new code
-		show_table3_h_delimiter();
-		echo "<form name=\"form2\" method=\"get\" action=\"maps.php\">";
+		$h1=S_NETWORK_MAPS_BIG.nbsp(" / ").$h1;
+
+		$h2="";
 
 		if(isset($_GET["fullscreen"]))
 		{
-			echo "<input name=\"fullscreen\" type=\"hidden\" value=".$_GET["fullscreen"].">";
+			$h2=$h2."<input name=\"fullscreen\" type=\"hidden\" value=".$_GET["fullscreen"].">";
 		}
 
 		if(isset($_GET["sysmapid"])&&($_GET["sysmapid"]==0))
@@ -85,8 +84,8 @@
 			unset($_GET["sysmapid"]);
 		}
 
-		echo "<select class=\"biginput\" name=\"sysmapid\" onChange=\"submit()\">";
-		echo "<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_SELECT_MAP_DOT_DOT_DOT;
+		$h2=$h2."<select class=\"biginput\" name=\"sysmapid\" onChange=\"submit()\">";
+		$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_SELECT_MAP_DOT_DOT_DOT;
 
 		$result=DBselect("select sysmapid,name from sysmaps order by name");
 		while($row=DBfetch($result))
@@ -95,14 +94,11 @@
 			{
 				continue;
 			}
-			echo "<option value=\"".$row["sysmapid"]."\" ".iif(isset($_GET["sysmapid"])&&($_GET["sysmapid"]==$row["sysmapid"]),"selected","").">".$row["name"];
+			$h2=$h2."<option value=\"".$row["sysmapid"]."\" ".iif(isset($_GET["sysmapid"])&&($_GET["sysmapid"]==$row["sysmapid"]),"selected","").">".$row["name"];
 		}
-		echo "</select>";
-		echo "</form>";
-// End of new code
+		$h2=$h2."</select>";
 
-		show_table_header_end();
-//		echo "<br>";
+		show_header2($h1,$h2,"<form name=\"form2\" method=\"get\" action=\"maps.php\">","</form>");
 	}
 ?>
 
