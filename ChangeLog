@@ -1,8 +1,7 @@
 Changes for 1.0beta2:
-(Is connection via Unix socket faster ?)
-(Add reconnect in case if server gone)
-(net_listen[] should be unsupported)
 
+ - added parameter ListenPort to zabbix_agentd and zabbix_trapperd
+ (Alexei)
  - all *.html documents were renamed to *.php (Alexei)
  - clean compilation on HP-UX 11.xx (Alexei)
  - change host status to Unreachable if agent drops connection (Alexei)
