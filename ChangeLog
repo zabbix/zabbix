@@ -1,3 +1,7 @@
+Changes for 1.0beta14:
+
+ - fixed patch for PostgreSQL (Alexei)
+
 Changes for 1.0beta13:
 
  - fixed sending of alerts when PostgreSQL is used (Alexei)
