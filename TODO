@@ -76,14 +76,15 @@ HB:
  - Reports:
  - more customizable (graphs time range: 1 mont, etc)
 
- WIN32 Agent:
+WIN32 Agent:
 
-- Support for timeout parameter
-- Support for user-configurable data collection (like CPU utilization, but
-  for any performance counter)
-- Support for external program execution
-- API for sub-agents
-- Add logging to system log
+* Support for external program execution
+* API for sub-agents
+* Support for check_port[] parameter
+* Support for check_service[] parameter
+* Installation program
+* Possibility to store configuration in registry
+* Configuration tool (may be through MMC?)
 
  PLUS:
 

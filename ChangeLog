@@ -27,6 +27,25 @@ Changes for 1.0beta8:
  - different colors for different status of items, triggers, users
  (Alexei)
 
+ - WIN32 agent. Added support for multiple servers (Victor)
+ - WIN32 agent. Changes in communication protocol: on errors now returned
+   special (Victor)
+ - WIN32 agent. Support for new client-server protocol (Victor)
+ - WIN32 agent. Added proc_info[] parameter (Victor)
+ - WIN32 agent. Added memory[cached] parameter (supported only on Windows XP) (Victor)
+ - WIN32 agent. Added logging to system Event Log (Vicotr)
+ - WIN32 agent. PDH-related error messages are now more specific (Vicotr)
+ - WIN32 agent. Listener thread now will not exit on any accept() error
+   (Vicotr)
+ - WIN32 agent. Added some parameters for agent statistics monitoring: number 
+ of accepted and rejected connections, processing errors, etc. (Victor)
+ - WIN32 agent. Fixed bug in calculation of md5_hash[] and cksum[] parameters for
+ zero-length files (Victor)
+ - WIN32 agent. md5_hash[] and cksum[] now ruturns UNSUPPORTED for files larger than
+ 64MB (due to high performance impact caused by checksum computing for large files).
+ (Victor)
+
+
 Changes for 1.0beta7:
 
  - startup scripts for RedHat 8.0. Thanks to John Crunk. (Alexei)
