@@ -93,16 +93,18 @@
 
 
 <?php
+
+	$col=0;
 	show_table2_header_begin();
 	echo S_CONFIGURATION;
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo "<form method=\"get\" action=\"config.php\">";
 	echo nbsp(S_DO_NOT_KEEP_ALERTS_OLDER_THAN);
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"alert_history\" value=\"".$config["alert_history"]."\" size=8>";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo nbsp(S_DO_NOT_KEEP_ALARMS_OLDER_THAN);
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"alarm_history\" value=\"".$config["alarm_history"]."\" size=8>";
@@ -181,7 +183,9 @@
 	show_table2_header_begin();
 	echo S_MEDIA;
 
-	show_table2_v_delimiter();
+	$col=0;
+
+	show_table2_v_delimiter($col++);
 	echo "<form name=\"selForm\" method=\"get\" action=\"config.php\">";
 	if(isset($mediatypeid))
 	{
@@ -192,7 +196,7 @@
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"description\" value=\"".$description."\" size=30>";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo S_TYPE;
 	show_table2_h_delimiter();
 //	echo "<select class=\"biginput\" name=\"type\" size=\"1\" onChange=\"doSelect(this,'sel_dmk')\">";
@@ -213,17 +217,17 @@
 	{
 		echo "<input class=\"biginput\" name=\"exec_path\" type=\"hidden\" value=\"$exec_path\">";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo nbsp(S_SMTP_SERVER);
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"smtp_server\" value=\"".$smtp_server."\" size=30>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo nbsp(S_SMTP_HELO);
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"smtp_helo\" value=\"".$smtp_helo."\" size=30>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo nbsp(S_SMTP_EMAIL);
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"smtp_email\" value=\"".$smtp_email."\" size=30>";
@@ -234,7 +238,7 @@
 		echo "<input class=\"biginput\" name=\"smtp_helo\" type=\"hidden\" value=\"$smtp_helo\">";
 		echo "<input class=\"biginput\" name=\"smtp_email\" type=\"hidden\" value=\"$smtp_email\">";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo S_SCRIPT_NAME;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"exec_path\" value=\"".$exec_path."\" size=50>";

@@ -228,8 +228,9 @@
 	echo "<a name=\"form\"></a>";
 	show_table2_header_begin();
 	echo S_SERVICE;
+	$col=0;
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo "<form method=\"get\" action=\"services.php\">";
 	if(isset($_GET["serviceid"]))
 	{
@@ -239,7 +240,7 @@
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=32>";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo nbsp(S_STATUS_CALCULATION_ALGORITHM);
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"algorithm\" size=1>";
@@ -275,7 +276,7 @@
 	}
 	echo "</SELECT>";
 
-        show_table2_v_delimiter();
+        show_table2_v_delimiter($col++);
         echo nbsp(S_SHOW_SLA);
         show_table2_h_delimiter();
 	if($showsla==1)
@@ -288,12 +289,12 @@
         	echo "<INPUT class=\"biginput\" TYPE=\"CHECKBOX\" NAME=\"showsla\">";
 	}
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo nbsp(S_ACCEPTABLE_SLA_IN_PERCENT);
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"goodsla\" value=\"$goodsla\" size=6>";
 
-        show_table2_v_delimiter();
+        show_table2_v_delimiter($col++);
         echo nbsp(S_LINK_TO_TRIGGER_Q);
         show_table2_h_delimiter();
 	if(isset($triggerid)&&($triggerid!=""))
@@ -305,7 +306,7 @@
         	echo "<INPUT class=\"biginput\" TYPE=\"CHECKBOX\" NAME=\"linktrigger\">";
 	}
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo S_TRIGGER;
 	show_table2_h_delimiter();
         $result=DBselect("select triggerid,description from triggers order by description");
@@ -330,7 +331,7 @@
         }
         echo "</SELECT>";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo nbsp(S_SORT_ORDER_0_999);
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"sortorder\" value=\"$sortorder\" size=3>";
@@ -366,8 +367,9 @@
 	echo "<br>";
 	show_table2_header_begin();
 	echo nbsp(S_LINK_TO);
+	$col=0;
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo "<form method=\"post\" action=\"services.php\">";
 	if(isset($_GET["serviceid"]))
 	{
@@ -397,7 +399,7 @@
         }
         echo "</SELECT>";
 
-        show_table2_v_delimiter();
+        show_table2_v_delimiter($col++);
         echo nbsp(S_SOFT_LINK_Q);
         show_table2_h_delimiter();
 //	if(isset($_GET["softlink"])&&($_GET["triggerid"]!=""))
@@ -423,8 +425,9 @@
 	echo "<br>";
 	show_table2_header_begin();
 	echo nbsp(S_ADD_SERVER_DETAILS);
+	$col=0;
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo "<form method=\"post\" action=\"services.php\">";
 	if(isset($_GET["serviceid"]))
 	{

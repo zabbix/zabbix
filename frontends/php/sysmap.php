@@ -193,8 +193,9 @@
 
 	show_table2_header_begin();
 	echo "New host to display";
+	$col=0;
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo "<form method=\"get\" action=\"sysmap.php\">";
 	if(isset($_GET["shostid"]))
 	{
@@ -224,7 +225,7 @@
 	}
 	echo "</SELECT>";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo "Icon (OFF)";
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"icon\" size=1>";
@@ -243,7 +244,7 @@
 	}
 	echo "</SELECT>";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo "Icon (ON)";
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"icon_on\" size=1>";
@@ -262,22 +263,22 @@
 	}
 	echo "</SELECT>";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo "Label";
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"label\" size=32 value=\"$label\">";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo nbsp("Coordinate X");
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"x\" size=5 value=\"$x\">";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo nbsp("Coordinate Y");
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"y\" size=5 value=\"$y\">";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo nbsp("URL");
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"url\" size=64 value=\"$url\">";
@@ -299,8 +300,9 @@
 	{
 		show_table2_header_begin();
 		echo "New connector";
+		$col=0;
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo "<form method=\"post\" action=\"sysmap.php?sysmapid=".$_GET["sysmapid"]."\">";
 		echo nbsp("Host 1");
 		show_table2_h_delimiter();
@@ -321,7 +323,7 @@
 		}
 		echo "</SELECT>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 //		echo "<form method=\"get\" action=\"sysmap.php?sysmapid=".$_GET["sysmapid"].">";
 		echo nbsp("Host 2");
 		show_table2_h_delimiter();
@@ -334,7 +336,7 @@
 		}
 		echo "</SELECT>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo nbsp("Link status indicator");
 		show_table2_h_delimiter();
 	        $result=DBselect("select triggerid,description from triggers order by description");
@@ -352,7 +354,7 @@
 	        }
 	        echo "</SELECT>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo "Type (OFF)";
 		show_table2_h_delimiter();
 		echo "<select name=\"drawtype_off\" size=1>";
@@ -363,7 +365,7 @@
 		echo "<OPTION VALUE='4' ".iif(isset($drawtype_off)&&($drawtype_off==4),"SELECTED","").">".get_drawtype_description(4);
 		echo "</SELECT>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo "Color (OFF)";
 		show_table2_h_delimiter();
 		echo "<select name=\"color_off\" size=1>";
@@ -380,7 +382,7 @@
 		echo "<OPTION VALUE='Yellow' ".iif(isset($color_off)&&($color_off=="Yellow"),"SELECTED","").">Yellow";
 		echo "</SELECT>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo "Type (ON)";
 		show_table2_h_delimiter();
 		echo "<select name=\"drawtype_on\" size=1>";
@@ -391,7 +393,7 @@
 		echo "<OPTION VALUE='4' ".iif(isset($drawtype_on)&&($drawtype_on==4),"SELECTED","").">".get_drawtype_description(4);
 		echo "</SELECT>";
 
-		show_table2_v_delimiter();
+		show_table2_v_delimiter($col++);
 		echo "Color (ON)";
 		show_table2_h_delimiter();
 		echo "<select name=\"color_on\" size=1>";
