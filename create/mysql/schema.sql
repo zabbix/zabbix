@@ -412,10 +412,11 @@ CREATE TABLE problems_comments (
 --
 
 CREATE TABLE service_alarms (
-  serviceid		int(4)		NOT NULL auto_increment,
+  servicealarmid	int(4)		NOT NULL auto_increment,
+  serviceid		int(4)		DEFAULT '0' NOT NULL,
   clock			int(4)		DEFAULT '0' NOT NULL,
   value			int(4)		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (serviceid),
+  PRIMARY KEY (servicealarmid),
   KEY (serviceid,clock),
   KEY (clock)
 );
