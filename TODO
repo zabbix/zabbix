@@ -1,5 +1,6 @@
 HB:
 
+ - add metrics like zabbix[history_count], zabbix[items_notsupported], etc
  - use profiles instead of passing parameters using POST
 
  - [3] Windows event log checking.
