@@ -2,6 +2,15 @@ HB:
 
  - add metrics like zabbix[history_count], zabbix[items_notsupported], etc
  - use profiles instead of passing parameters using POST
+ - add threshold,min,max line for user-defined graphs
+ - 
+Vel viens wishlists ir pie "IT Services", pielikt pie 
+/~zabbix/report3.php?serviceid=1&year=2003
+
+ Ka ir reziims, ka paraada visus downtime attieciigajaa meenesii (vai gadaa/nedeelaa).
+(Tipa  : time  - subservice/trigers - priority - ...)
+
+
 
  - [3] Windows event log checking.
  - [4] Latest values. Link to page which shows list of all triggers-related
