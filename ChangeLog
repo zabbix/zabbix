@@ -1,5 +1,6 @@
 Changes for 1.0beta9:
 
+ - fixed pinger.pl (Alexei)
  - user-defined parameters will overwrite already existing
  (Alexei)
  - fixed field order for PostgreSQL, table items (Alexei)

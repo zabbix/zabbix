@@ -25,9 +25,9 @@ $ZABBIX_SERVER="zabbix";
 $ZABBIX_PORT="10001";
 $HOST_FILE="hosts";
 $KEY="alive";
-$TMP_FILE="/tmp/zabbix.pinger.tmp";
+$TMP_FILE="/tmp/zabbix_pinger.tmp";
 
-$ZABBIX_SENDER="zabbix_sender";
+$ZABBIX_SENDER="/home/zabbix/bin/zabbix_sender";
 
 # END OF CONFIGURATION
 
@@ -35,7 +35,7 @@ $hosts = `cat $HOST_FILE | fping`;
 
 unlink($TMP_FILE);
 
-open(F,">>",$TMP_FILE) or die "Cannot open $TMP_FILE";
+open(F,">>$TMP_FILE") or die "Cannot open $TMP_FILE";
 
 foreach $host (split(/\n/,$hosts))
 {
