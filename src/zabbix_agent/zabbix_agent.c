@@ -13,6 +13,9 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+/* For bcopy */
+#include <strings.h>
+
 /* For config file operations */
 #include <sys/types.h>
 #include <sys/stat.h>

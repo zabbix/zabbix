@@ -1,5 +1,10 @@
 #include "config.h"
 
+/* For bcopy */
+#ifdef HAVE_STRINGS_H
+	#include <strings.h>
+#endif
+
 #ifdef HAVE_STDIO_H
 	#include <stdio.h>
 #endif
