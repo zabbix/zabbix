@@ -137,14 +137,17 @@
 	$h2=$h2."<select class=\"biginput\" name=\"graphid\" onChange=\"submit()\">";
 	$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["graphid"]),"selected","").">".S_SELECT_GRAPH_DOT_DOT_DOT;
 
-	$result=DBselect("select graphid,name from graphs order by name");
-	while($row=DBfetch($result))
+	if(isset($_GET["hostid"])&&($_GET["hostid"]!=0))
 	{
-		if(!check_right("Graph","R",$row["graphid"]))
+		$result=DBselect("select distinct g.graphid,g.name from graphs g,graphs_items gi,items i where i.itemid=gi.itemid and g.graphid=gi.graphid and i.hostid=".$_GET["hostid"]." order by g.name");
+		while($row=DBfetch($result))
 		{
-			continue;
+			if(!check_right("Graph","R",$row["graphid"]))
+			{
+				continue;
+			}
+			$h2=$h2."<option value=\"".$row["graphid"]."\" ".iif(isset($_GET["graphid"])&&($_GET["graphid"]==$row["graphid"]),"selected","").">".$row["name"];
 		}
-		$h2=$h2."<option value=\"".$row["graphid"]."\" ".iif(isset($_GET["graphid"])&&($_GET["graphid"]==$row["graphid"]),"selected","").">".$row["name"];
 	}
 	$h2=$h2."</select>";
 
