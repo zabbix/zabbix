@@ -1,5 +1,6 @@
 Changes for 1.0beta8:
 
+ - fixed Plain Text values (Alexei)
  - fixed improper handling of special characters i.e. '\/" (Alexei)
  - fixed Last100 and Prev100 for both Alarms and Alerts (Alexei)
  - fixed "STATUS OF ZABBIX". Command was changed to 'ps aux' (Alexei)

@@ -43,6 +43,10 @@
 	{
 		show_header("$host:$description",0,0);
 	}
+	if($HTTP_GET_VARS["action"]=="plaintext")
+	{
+		show_header("$host:$description",0,1);
+	}
 
 	if(!check_right("Item","R",$HTTP_GET_VARS["itemid"]))
 	{
