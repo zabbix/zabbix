@@ -20,6 +20,8 @@ Not ready yet:
  - network maps. Edit host, add link.
  - HELO can be empty
  - fix division by zero in report2
+ - trigger OFF does not work
+ - disabled triggers still send emails
 
 Changes for 1.0beta5:
 
