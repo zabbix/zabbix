@@ -33,6 +33,8 @@ dnl Checks for libraries.
 AC_CHECK_LIB(crypto, main)
 AC_CHECK_LIB(snmp, main, LIBS="-lsnmp $LIBS")
 AC_CHECK_LIB(socket, main)
+#Solaris SNMP requires this
+AC_CHECK_LIB(kstat, main)
 AC_CHECK_LIB(nsl, main)
 
 dnl Checks for header files.
