@@ -1611,7 +1611,7 @@ echo "</head>";
 	$menu=array(
 		"view"=>array(
 				"label"=>"View",
-				"pages"=>array("latest.php","tr_status.php","queue.php","latestalarms.php","alerts.php","maps.php","charts.php","screens.php","srv_status.php","alarms.php","history.php","tr_comments.php"),
+				"pages"=>array("latest.php","tr_status.php","queue.php","latestalarms.php","alerts.php","maps.php","charts.php","screens.php","srv_status.php","alarms.php","history.php","tr_comments.php","report3.php"),
 				"level2"=>array(
 					array("label"=>"Latest data","url"=>"latest.php"),
 					array("label"=>"Triggers","url"=>"tr_status.php?onlytrue=true&noactions=true&compact=true"),

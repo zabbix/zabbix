@@ -419,6 +419,14 @@
 	define("S_TRUE",				"True");
 	define("S_FALSE",				"False");
 
+//	report3.php
+	define("S_FROM",				"From");
+	define("S_TILL",				"Till");
+	define("S_OK",					"Ok");
+	define("S_PROBLEMS",				"Problems");
+	define("S_PERCENTAGE",				"Percentage");
+	define("S_SLA",					"SLA");
+
 //	screenconf.php
 	define("S_SCREENS",				"Screens");
 	define("S_SCREEN",				"Screen");
