@@ -43,7 +43,7 @@
 #else
 #define DEBUG_SUFFIX
 #endif
-#define AGENT_VERSION         "1.0.0" DEBUG_SUFFIX
+#define AGENT_VERSION         "1.0.1" DEBUG_SUFFIX
 
 #define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
 #define ZABBIX_EVENT_SOURCE   "Zabbix Win32 Agent"
@@ -212,6 +212,7 @@ extern HANDLE eventShutdown;
 extern HANDLE eventCollectorStarted;
 
 extern DWORD dwFlags;
+extern DWORD g_dwLogLevel;
 
 extern char confFile[];
 extern char logFile[];
