@@ -62,6 +62,16 @@ the agent with a predefined API that can return values to suckerd.
 
 Not ready yet:
 
+1. Monitoring of Windows (2000) services via SNMP
+This is an extension I wrote based on your SNMP checker that scans through the Windows SNMP mib to check if a specified
++process is running. I thought it may be able to be used in a similar situation to the new SIMPLE check.
+
+2. Basic schedule to monitor certain items during specified period.
+I made changes to the PHP frontend and zabbix_sucker.c to enable the user to specify a time period (like between 9am-5pm) when
++the item should be checked.
+(From: "Dave McCrudden" <dmccrudden@custcare.com.au>)
+
+
  - mass-adding of actions
  - BUG. zabbix_sucker should accept parameter regardless of "\n" at the end of line 
  - update docs related to WIN32 agent
