@@ -2471,15 +2471,60 @@ double	CHECK_SERVICE_PERF(char *service_and_ip_and_port)
 /* check_service[ssh,127.0.0.1,ssh] */
 double	CHECK_SERVICE(char *service_and_ip_and_port)
 {
-	char	*c,*c1;
 	int	port=0;
 	char	service[MAX_STRING_LEN];
 	char	ip[MAX_STRING_LEN];
 	char	port_str[MAX_STRING_LEN];
+	char	tmp[MAX_STRING_LEN];
+	char	*s;
 
 	int	result;
 
-	c=strchr(service_and_ip_and_port,',');
+	/* Default IP address */
+	strscpy(ip,"127.0.0.1");
+
+	strscpy(tmp,service_and_ip_and_port);
+
+	s=strtok(tmp,",");
+	if(s)
+	{
+		strscpy(service,s);
+
+		s = strtok(NULL,",");
+	}
+	if(s)
+	{
+		if(strchr(s,'.')!=NULL)
+		{
+			strscpy(ip,s);
+		}
+		else
+		{
+			strscpy(port_str,s);
+			port=atoi(port_str);
+		}
+
+		s = strtok(NULL,",");
+	}
+	if(s)
+	{
+		if(strchr(s,'.')!=NULL)
+		{
+			strscpy(ip,s);
+		}
+		else
+		{
+			strscpy(port_str,s);
+			port=atoi(port_str);
+		}
+		s = strtok(NULL,",");
+	}
+
+/*	printf("IP:[%s]\n",ip);
+	printf("Service:[%s]\n",service);
+	printf("Port:[%d]\n\n",port);*/
+
+/*	c=strchr(service_and_ip_and_port,',');
 	strscpy(service,service_and_ip_and_port);
 
 	if(c != NULL)
@@ -2508,7 +2553,7 @@ double	CHECK_SERVICE(char *service_and_ip_and_port)
 	else
 	{
 		strcpy(ip,"127.0.0.1");
-	}
+	}*/
 
 /*	printf("IP:[%s]",ip);
 	printf("Service:[%s]",service);
