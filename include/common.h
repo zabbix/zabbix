@@ -15,6 +15,11 @@
 #define ITEM_TYPE_SNMP		1
 #define ITEM_TYPE_TRAPPER	2
 
+/* Host statuses */
+#define HOST_STATUS_MONITORED	0
+#define HOST_STATUS_NOT_MONITORED	1
+#define HOST_STATUS_UNREACHABLE	2
+
 /* Trigger statuses */
 #define TRIGGER_STATUS_FALSE	0
 #define TRIGGER_STATUS_TRUE	1

@@ -147,13 +147,15 @@ COMMAND	commands[AGENT_MAX_USER_COMMANDS]=
 
 	{"check_port[*]"	,CHECK_PORT, 	0, "80"},
 
-	{"check_service[ssh]"	,CHECK_SERVICE_SSH, 	0, 0},
+	{"check_service[*]"	,CHECK_SERVICE, 	0, "ssh,22"},
+
+/*	{"check_service[ssh]"	,CHECK_SERVICE_SSH, 	0, 0},
 	{"check_service[smtp]"	,CHECK_SERVICE_SMTP, 	0, 0},
 	{"check_service[ftp]"	,CHECK_SERVICE_FTP, 	0, 0},
 	{"check_service[http]"	,CHECK_SERVICE_HTTP, 	0, 0},
 	{"check_service[pop]"	,CHECK_SERVICE_POP, 	0, 0},
 	{"check_service[nntp]"	,CHECK_SERVICE_NNTP, 	0, 0},
-	{"check_service[imap]"	,CHECK_SERVICE_IMAP, 	0, 0},
+	{"check_service[imap]"	,CHECK_SERVICE_IMAP, 	0, 0},*/
 	{0}
 	};
 
@@ -257,7 +259,11 @@ void	process(char *command,char *value)
 					function_str=commands[i].function_str;
 					ret_str=1;
 				}
+#ifdef TEST_PARAMETERS
+				parameter=commands[i].parameter;
+#else
 				parameter=param;
+#endif
 				break;
 			}
 		}
@@ -1382,6 +1388,62 @@ float	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose)
 	}
 }
 
+/* Service is either service name or service name plus port */
+/* Example check_service[ssh], check_service[smtp,29]	*/
+float	CHECK_SERVICE(char *service)
+{
+	char	*c;
+	int	port=0;
+	char	name[MAX_STRING_LEN+1];
+
+	c=strchr(service,',');
+	strncpy(name,service,MAX_STRING_LEN);
+
+	if(c != NULL)
+	{
+		port=atoi(c+1);
+		name[c-service]=0;
+	}
+
+	if(strcmp(name,"ssh") == 0)
+	{
+		if(port == 0)	port=22;
+		return	tcp_expect("127.0.0.1",port,"SSH","0\n");
+	}
+	if(strcmp(name,"smtp") == 0)
+	{
+		if(port == 0)	port=25;
+		return	tcp_expect("127.0.0.1",port,"220","QUIT\n");
+	}
+	if(strcmp(name,"ftp") == 0)
+	{
+		if(port == 0)	port=21;
+		return	tcp_expect("127.0.0.1",port,"220","");
+	}
+	if(strcmp(name,"http") == 0)
+	{
+		if(port == 0)	port=80;
+		return	tcp_expect("127.0.0.1",port,NULL,"");
+	}
+	if(strcmp(name,"pop") == 0)
+	{
+		if(port == 0)	port=110;
+		return	tcp_expect("127.0.0.1",port,"+OK","");
+	}
+	if(strcmp(name,"nntp") == 0)
+	{
+		if(port == 0)	port=119;
+		return	tcp_expect("127.0.0.1",port,"220","");
+	}
+	if(strcmp(name,"imap") == 0)
+	{
+		if(port == 0)	port=143;
+		return	tcp_expect("127.0.0.1",port,"* OK","a1 LOGOUT\n");
+	}
+
+	return FAIL;
+}
+/*
 float	CHECK_SERVICE_SSH(void)
 {
 	return	tcp_expect("127.0.0.1",22,"SSH","0\n");
@@ -1416,6 +1478,7 @@ float	CHECK_SERVICE_IMAP(void)
 {
 	return	tcp_expect("127.0.0.1",143,"* OK","a1 LOGOUT\n");
 }
+*/
 
 float	CHECK_PORT(char *port)
 {
