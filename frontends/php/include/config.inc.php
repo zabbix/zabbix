@@ -4352,6 +4352,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return "Filled region";
 		if($drawtype==2)
 			return "Bold line";
+		if($drawtype==3)
+			return "Dot";
 		return "Unknown";
         }
 

@@ -22,6 +22,7 @@
 	define("GRAPH_DRAW_TYPE_LINE",0);
 	define("GRAPH_DRAW_TYPE_FILL",1);
 	define("GRAPH_DRAW_TYPE_BOLDLINE",2);
+	define("GRAPH_DRAW_TYPE_DOT",3);
 
 	define("ITEM_VALUE_TYPE_FLOAT",0);
 	define("ITEM_VALUE_TYPE_STR",1);
