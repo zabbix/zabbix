@@ -227,6 +227,9 @@
 
 //	hosts.php
 	define("S_HOSTS",				"Hosts");
+	define("S_ITEMS",				"Items");
+	define("S_TRIGGERS",				"Triggers");
+	define("S_GRAPHS",				"Graphs");
 	define("S_HOST_ADDED",				"Host added");
 	define("S_CANNOT_ADD_HOST",			"Cannot add host");
 	define("S_ITEMS_ADDED",				"Items added");
@@ -260,6 +263,7 @@
 	define("S_GROUP_NAME",				"Group name");
 	define("S_HOST_GROUP",				"Host group");
 	define("S_HOST_GROUPS",				"Host groups");
+	define("S_UPDATE",				"Update");
 
 //	items.php
 	define("S_CONFIGURATION_OF_ITEMS",		"Configuration of items");
@@ -585,6 +589,9 @@
 	define("S_USERS_BIG",				"USERS");
 	define("S_USER_GROUPS",				"User groups");
 	define("S_MEMBERS",				"Members");
+	define("S_TEMPLATES",				"Templates");
+	define("S_CONFIGURATION_OF_TEMPLATES_LINKAGE",	"CONFIGURATION OF TEMPLATES LINKAGE");
+	define("S_LINKED_TEMPLATES_BIG",		"LINKED TEMPLATES");
 	define("S_NO_USER_GROUPS_DEFINED",		"No user groups defined");
 	define("S_ALIAS",				"Alias");
 	define("S_NAME",				"Name");
