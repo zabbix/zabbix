@@ -44,17 +44,19 @@ COMMAND	commands[]=
 	{"inodefree[/home]"		,INODE, "/home"},
 	{"inodefree[/var]"		,INODE, "/var"},
 
-	{"cksum[/etc/inetd_conf]"	,EXECUTE, "cksum /etc/inetd.conf |cut -f1 -d' '"},
-	{"cksum[/vmlinuz]"		,EXECUTE, "cksum /vmlinuz |cut -f1 -d' '"},
-	{"cksum[/etc/passwd]"		,EXECUTE, "cksum /etc/passwd |cut -f1 -d' '"},
-	{"cksum[/usr/sbin/sshd]"	,EXECUTE, "cksum /usr/sbin/sshd |cut -f1 -d' '"},
-	{"cksum[/usr/bin/ssh]"		,EXECUTE, "cksum /usr/bin/ssh |cut -f1 -d' '"},
+	{"cksum[/etc/inetd_conf]"	,EXECUTE, "(cksum /etc/inetd.conf 2>/dev/null || echo '-2') | cut -f1 -d' '"},
+	{"cksum[/etc/services]"		,EXECUTE, "(cksum /etc/services 2>/dev/null || echo '-2') | cut -f1 -d' '"},
+	{"cksum[/vmlinuz]"		,EXECUTE, "(cksum /vmlinuz 2>/dev/null || echo '-2') | cut -f1 -d' '"},
+	{"cksum[/etc/passwd]"		,EXECUTE, "(cksum /etc/passwd 2>/dev/null || echo '-2') | cut -f1 -d' '"},
+	{"cksum[/usr/sbin/sshd]"	,EXECUTE, "(cksum /usr/sbin/sshd 2>/dev/null || echo '-2') | cut -f1 -d' '"},
+	{"cksum[/usr/bin/ssh]"		,EXECUTE, "(cksum /usr/bin/ssh 2>/dev/null || echo '-2') | cut -f1 -d' '"},
 
 	{"filesize[/var/log/syslog]"	,FILESIZE, "/var/log/syslog"},
 
 	{"swap[free]"			,SWAPFREE, 0},
 	{"swap[total]"			,SWAPTOTAL, 0},
-/*
+
+/****************************************
   	All these perameters require more than 1 second to retrieve.
 
   	{"swap[in]"			,EXECUTE, "vmstat -n 1 2|tail -1|cut -b37-40"},
@@ -64,11 +66,13 @@ COMMAND	commands[]=
 	{"io[out]"			,EXECUTE, "vmstat -n 1 2|tail -1|cut -b51-56"},
 
 	{"system[interrupts]"		,EXECUTE, "vmstat -n 1 2|tail -1|cut -b57-61"},
-	{"system[switches]"		,EXECUTE, "vmstat -n 1 2|tail -1|cut -b62-67"},*/
+	{"system[switches]"		,EXECUTE, "vmstat -n 1 2|tail -1|cut -b62-67"},
+***************************************/
+
 	{"system[procload]"		,PROCLOAD, 0},
 	{"system[procload5]"		,PROCLOAD5, 0},
 	{"system[procload15]"		,PROCLOAD15, 0},
-	{"system[proccount]"		,EXECUTE, "echo /proc/[0-9]*|wc -w"},
+	{"system[proccount]"		,PROCCOUNT, 0},
 	{"system[procrunning]"		,EXECUTE, "cat /proc/loadavg|cut -f1 -d'/'|cut -f4 -d' '"},
 	{"system[uptime]"		,UPTIME, 0},
 	{"system[users]"		,EXECUTE, "who|wc -l"},
@@ -76,13 +80,15 @@ COMMAND	commands[]=
 	{"ping"				,PING, 0},
 	{"tcp_count"			,EXECUTE, "netstat -tn|grep EST|wc -l"},
 
-	{"net[listen_21]"		,EXECUTE, "netstat -lnt|grep -v grep|grep ':21 '|wc -l"},
-	{"net[listen_22]"		,EXECUTE, "netstat -lnt|grep -v grep|grep ':22 '|wc -l"},
-	{"net[listen_23]"		,EXECUTE, "netstat -lnt|grep -v grep|grep ':23 '|wc -l"},
-	{"net[listen_25]"		,EXECUTE, "netstat -lnt|grep -v grep|grep ':25 '|wc -l"},
-	{"net[listen_80]"		,EXECUTE, "netstat -lnt|grep -v grep|grep ':80 '|wc -l"},
-	{"net[listen_110]"		,EXECUTE, "netstat -lnt|grep -v grep|grep ':110 '|wc -l"},
-	{"net[listen_143]"		,EXECUTE, "netstat -lnt|grep -v grep|grep ':143 '|wc -l"},
+/*	{"net[listen_21]"		,EXECUTE, "netstat -lnt|grep -v grep|grep ':21 '|wc -l"}, */
+/*	{"net[listen_21]"		,EXECUTE, "cat /proc/net/tcp|grep '0015 00000000:0000 0A'|wc -l"}, */
+	{"net[listen_21]"		,TCP_LISTEN, "0015"},
+	{"net[listen_22]"		,TCP_LISTEN, "0016"},
+	{"net[listen_23]"		,TCP_LISTEN, "0017"},
+	{"net[listen_25]"		,TCP_LISTEN, "0019"},
+	{"net[listen_80]"		,TCP_LISTEN, "0050"},
+	{"net[listen_110]"		,TCP_LISTEN, "006E"},
+	{"net[listen_143]"		,TCP_LISTEN, "008F"},
 	{0				,0}
 	};
 

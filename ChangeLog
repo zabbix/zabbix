@@ -1,8 +1,10 @@
 Changes for 1.0alpha8:
 
+ - parameters net[listen_??] will use /proc filesystem
+ - parameter system[proccount] uses call to sysinfo() function
+
  - removed calls to command strip from all Makefile.in
  - passwords are not stored in plain text. MD5 is used.
-
  - zabbix_agent can be tested by defining macro TEST
  - added index (triggerid,clock) for table alarms
  - status of triggers will not be shown for disabled and not-supported parameters

@@ -11,11 +11,13 @@ float	SHAREDMEM(void);
 float	BUFFERSMEM(void);
 float	CACHEDMEM(void);
 float	PING(void);
+float	PROCCOUNT(void);
 float	PROCLOAD(void);
 float	PROCLOAD5(void);
 float	PROCLOAD15(void);
 float	SWAPFREE(void);
 float	SWAPTOTAL(void);
+float	TCP_LISTEN(const char *porthex);
 float	UPTIME(void);
 float	EXECUTE(char *command);
 
