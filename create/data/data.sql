@@ -115,60 +115,60 @@ insert into items_template (itemtemplateid,description,key_,delay)
 --
 
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (1,1,'Lack of free memory','{:.last(0)}<10000');
+	values (1,1,'Lack of free memory on server %s','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (2,2,'Low free disk space on /','{:.last(0)}<10000');
+	values (2,2,'Low free disk space on %s\'s volume /','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (3,3,'Low free disk space on /tmp','{:.last(0)}<10000');
+	values (3,3,'Low free disk space on %s\'s volume /tmp','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (4,4,'Low free disk space on /usr','{:.last(0)}<10000');
+	values (4,4,'Low free disk space on %s\'s volume /usr','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (5,5,'Low number of free inodes on /','{:.last(0)}<10000');
+	values (5,5,'Low number of free inodes on %s\'s volume /','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (6,6,'Low number of free inodes on /opt','{:.last(0)}<10000');
+	values (6,6,'Low number of free inodes on %s\'s volume /opt','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (7,7,'Low number of free inodes on /tmp','{:.last(0)}<10000');
+	values (7,7,'Low number of free inodes on %s\'s volume /tmp','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (8,8,'Low number of free inodes on /usr','{:.last(0)}<10000');
+	values (8,8,'Low number of free inodes on %s\'s volume /usr','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (9,9,'Too many processes running','{:.last(0)}>300');
+	values (9,9,'Too many processes running on %s','{:.last(0)}>300');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (10,10,'Processor load is too high','{:.last(0)}>5');
+	values (10,10,'Processor load is too high on %s','{:.last(0)}>5');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (13,13,'Too many processes running','{:.last(0)}>10');
+	values (13,13,'Too many processes running on %s','{:.last(0)}>10');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (14,14,'Lack of free swap space','{:.last(0)}<100000');
+	values (14,14,'Lack of free swap space on %s','{:.last(0)}<100000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (17,17,'Too may users connected','{:.last(0)}>50');
+	values (17,17,'Too may users connected on server %s','{:.last(0)}>50');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (18,18,'Too may established TCP connections','{:.last(0)}>500');
+	values (18,18,'Too may established TCP connections on server %s','{:.last(0)}>500');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (19,19,'/etc/inetd.conf has been changed','{:.diff(0)}>0');
+	values (19,19,'/etc/inetd.conf has been changed on server %s','{:.diff(0)}>0');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (20,20,'/vmlinuz has been changed','{:.diff(0)}>0');
+	values (20,20,'/vmlinuz has been changed on server %s','{:.diff(0)}>0');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (21,21,'/passwd has been changed','{:.diff(0)}>0');
+	values (21,21,'/passwd has been changed on server %s','{:.diff(0)}>0');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (23,23,'Low free disk space on /home','{:.last(0)}<10000');
+	values (23,23,'Low free disk space on %s\'s volume /home','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (24,24,'Low number of free inodes on /home','{:.last(0)}<10000');
+	values (24,24,'Low number of free inodes on %s\' volume /home','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (25,25,'Low free disk space on /var','{:.last(0)}<10000');
+	values (25,25,'Low free disk space on %s\'s volume /var','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (26,26,'Low free disk space on /opt','{:.last(0)}<10000');
+	values (26,26,'Low free disk space on %s\'s volume /opt','{:.last(0)}<10000');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (27,27,'Host have just been restarted','{:.last(0)}<600');
+	values (27,27,'%s have just been restarted','{:.last(0)}<600');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (39,39,'Email (SMTP) server is down','{:.last(0)}<1');
+	values (39,39,'Email (SMTP) server is down on %s','{:.last(0)}<1');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (40,40,'FTP server is down','{:.last(0)}<1');
+	values (40,40,'FTP server is down on %s','{:.last(0)}<1');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (41,41,'SSH server is down','{:.last(0)}<1');
+	values (41,41,'SSH server is down on %s','{:.last(0)}<1');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (42,42,'Telnet server is down','{:.last(0)}<1');
+	values (42,42,'Telnet server is down on %s','{:.last(0)}<1');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (43,43,'WEB server is down','{:.last(0)}<1');
+	values (43,43,'WEB server is down on %s','{:.last(0)}<1');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (44,44,'POP3 server is down','{:.last(0)}<1');
+	values (44,44,'POP3 server is down on %s','{:.last(0)}<1');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
-	values (45,45,'IMAP server is down','{:.last(0)}<1');
+	values (45,45,'IMAP server is down on %s','{:.last(0)}<1');

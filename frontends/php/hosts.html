@@ -15,7 +15,7 @@
 	{
 		if($register=="add")
 		{
-			add_host($host,$port,$status);
+			add_host($host,$port,$status,$template);
 		}
 		if($register=="changestatus")
 		{
@@ -96,6 +96,12 @@
 	echo "<option value=\"0\" \"selected\">Monitored";
 	echo "<option value=\"1\">Not monitored";
 	echo "</select>";
+
+	show_table2_v_delimiter();
+	echo "Add items supported by zabbix_agent";
+	show_table2_h_delimiter();
+	echo "<INPUT TYPE=\"CHECKBOX\" CHECKED ";
+	echo " NAME=\"template\"  VALUE=\"true\">";
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";

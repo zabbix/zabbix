@@ -214,7 +214,15 @@
 		{
 			echo "<TD>";
 			echo "<A HREF=\"actions.html?triggerid=$triggerid\">Show actions</A> - ";
-			echo "<A HREF=\"alarms.html?triggerid=$triggerid\">History</A>";
+			echo "<A HREF=\"alarms.html?triggerid=$triggerid\">History</A> - ";
+			if(isset($hostid))
+			{
+				echo "<A HREF=\"triggers.html?hostid=$hostid&triggerid=$triggerid#form\">Change</A>";
+			}
+			else
+			{
+				echo "<A HREF=\"triggers.html?triggerid=$triggerid#form\">Change</A>";
+			}
 			echo "</TD>";
 		}
 		if($istrue==0)	echo "</TR>\n";
