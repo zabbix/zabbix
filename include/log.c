@@ -93,6 +93,7 @@ void zabbix_log(int level, const char *fmt, ...)
 		va_start(ap,fmt);
 		vsprintf(str,fmt,ap);
 		strncat(str,"\n",MAX_STRING_LEN);
+		str[MAX_STRING_LEN]=0;
 		syslog(LOG_DEBUG,str);
 		va_end(ap);
 	}
@@ -103,9 +104,7 @@ void zabbix_log(int level, const char *fmt, ...)
 		sprintf(str2,"%.6d:%.4d%.2d%.2d:%.2d%.2d%.2d ",getpid(),tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday,tm->tm_hour,tm->tm_min,tm->tm_sec);
 
 		va_start(ap,fmt);
-		vsprintf(str,fmt,ap);
-		strncat(str,"\n",MAX_STRING_LEN);
-		strncat(str2,str,MAX_STRING_LEN);
+		vsnprintf(str,MAX_STRING_LEN,fmt,ap);
 
 		log_file = fopen(log_filename,"a+");
 		if(log_file == NULL)
@@ -113,6 +112,8 @@ void zabbix_log(int level, const char *fmt, ...)
 			return;
 		}
 		fprintf(log_file,"%s",str2);
+		fprintf(log_file,"%s",str);
+		fprintf(log_file,"\n");
 		fclose(log_file);
 		va_end(ap);
 
