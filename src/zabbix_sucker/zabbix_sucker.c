@@ -611,7 +611,7 @@ int main(int argc, char **argv)
 	}
 
 	openlog("zabbix_suckerd",LOG_PID,LOG_USER);
-/*	ret=setlogmask(LOG_UPTO(LOG_DEBUG)); */
+/*	ret=setlogmask(LOG_UPTO(LOG_DEBUG));*/
 	ret=setlogmask(LOG_UPTO(LOG_WARNING));
 
 	syslog( LOG_WARNING, "zabbix_suckerd #%d started",sucker_num);
