@@ -1,11 +1,11 @@
 1.0beta11:
 
+ - mess with user groups when running under root
  - suport for PREFIX/zabbix/etc (configuration files)
  - trapper item. Source->Alarms do not grow when last status is unknown for
 latest trigger (item type  = TRAPPER)
  - SNMP traps. Condition to switch expression off.
 
- - fix agent crash when no sensors in /proc
  - cannot use "." as key in trigger expressions
  - discuss prefixes diskfree>10K
  - support for suffixes in trigger expressions (K,M,G)
