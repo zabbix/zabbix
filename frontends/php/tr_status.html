@@ -15,14 +15,28 @@
 ?>
  
 <?
+	if($onlytrue!='true')
+	{
+		$onlytrue='false';
+	}
+	if($noactions!='true')
+	{
+		$noactions='false';
+	}
+	if($compact!='true')
+	{
+		$compact='false';
+	}
+?>
+<?
         $result=DBselect("select hostid,host from hosts order by host");
         if(isset($hostid))
         {
-                echo "<A HREF=\"tr_status.html\">all</A>  ";
+                echo "<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact\">all</A>  ";
         }
         else
         {
-                echo "<b>[<A HREF=\"tr_status.html\">all</A>]</b>  ";
+                echo "<b>[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=$compact\">all</A>]</b>  ";
         }
 	for($i=0;$i<DBnum_rows($result);$i++)
         {
@@ -30,11 +44,11 @@
                 $host=DBget_field($result,$i,1);
                 if($hid == $hostid)
                 {
-                        echo "<b>[<A HREF=\"tr_status.html?hostid=$hid\">$host</A>]</b>  ";
+                        echo "<b>[<A HREF=\"tr_status.html?hostid=$hid&onlytrue=$onlytrue&noactions=$noactions&compact=$compact\">$host</A>]</b>  ";
                 }
                 else
                 {
-                        echo "<A HREF=\"tr_status.html?hostid=$hid\">$host</A>  ";
+                        echo "<A HREF=\"tr_status.html?hostid=$hid&onlytrue=$onlytrue&noactions=$noactions&compact=$compact\">$host</A>  ";
                 }
         }
  
@@ -43,37 +57,38 @@
 
 <A NAME="top"></A>
 <?
-	if($noactions!='true')
+	if(isset($hostid))
 	{
-		$noactions='false';
+		$cond="&hostid=$hostid";
 	}
-?>
+	else
+	{
+		$cond="";
+	}
 
-<?
 	if($onlytrue!='true')
 	{
-		echo "[<A HREF=\"tr_status.html?onlytrue=true&noactions=$noactions&compact=$compact\">Show only true</a>] ";
-		$onlytrue='false';
+		echo "[<A HREF=\"tr_status.html?onlytrue=true&noactions=$noactions&compact=$compact$cond\">Show only true</a>] ";
 	}
 	else
 	{
-		echo "[<A HREF=\"tr_status.html?noactions=$noactions&compact=$compact\">Show all triggers</A>] ";
+		echo "[<A HREF=\"tr_status.html?noactions=$noactions&compact=$compact$cond\">Show all triggers</A>] ";
 	}
 	if($noactions!='true')
 	{
-		echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=true&compact=$compact\">Hide Actions</A>] ";
+		echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=true&compact=$compact$cond\">Hide Actions</A>] ";
 	}
 	else
 	{
-		echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=false&compact=$compact\">Show Actions</A>] ";
+		echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=false&compact=$compact$cond\">Show Actions</A>] ";
 	}
 	if($compact!='true')
 	{
-		echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=true\">Hide Details</A>] ";
+		echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=true$cond\">Hide Details</A>] ";
 	}
 	else
 	{
-		echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=false\">Show Details</A>] ";
+		echo "[<A HREF=\"tr_status.html?onlytrue=$onlytrue&noactions=$noactions&compact=false$cond\">Show Details</A>] ";
 	}
   
 	show_table_header_end();
@@ -196,25 +211,6 @@
 	$i=DBnum_rows($result);
 
 	show_table_header("Total:$i");
-
-	$result=DBselect("select min(lastcheck) from triggers where istrue<2");
-	$lastcheck=DBget_field($result,0,0);
-	$diff=mktime()-$lastcheck; 
-
-	$now=time();
-	$result=DBselect("select count(*) from items i,hosts h where i.status=0 and h.status=0 and h.hostid=i.hostid and i.nextcheck<$now-60");
-	$answ=DBget_field($result,0,0);
-	if ($answ>0)
-	{ 
-		echo "<br>";
-		show_table_header("<font color=\"AA0000\">Is zabbix_sucker running ? Check QUEUE.</font>");
-	}
-
-	if(($lastcheck!=NULL)&&($diff>180)) ### Result for Trigger checking
-	{
-		echo "<br>";
-		show_table_header("<font color=\"AA0000\">Is zabbix_alarmer running ?</font>");
-	}
 ?>
 
 <?

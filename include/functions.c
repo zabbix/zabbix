@@ -55,7 +55,11 @@ int	evaluate_MIN(float *min,int itemid,int parameter)
 	char		c[1024];
 	char		*field;
 
-	sprintf(c,"select min(value) from history where clock>unix_timestamp()-%d and itemid=%d",parameter,itemid);
+	int		now;
+
+	now=time(NULL);
+
+	sprintf(c,"select min(value) from history where clock>%d-%d and itemid=%d",now,parameter,itemid);
 
 	result = DBselect(c);
 	if(result==NULL)
@@ -91,7 +95,11 @@ int	evaluate_MAX(float *max,int itemid,int parameter)
 	char		c[1024];
 	char		*field;
 
-	sprintf(c,"select max(value) from history where clock>unix_timestamp()-%d and itemid=%d",parameter,itemid);
+	int		now;
+
+	now=time(NULL);
+
+	sprintf(c,"select max(value) from history where clock>%d-%d and itemid=%d",now,parameter,itemid);
 
 	result = DBselect(c);
 	if(result==NULL)
@@ -186,7 +194,11 @@ int	evaluate_NODATA(float *nodata,int itemid,int parameter)
 	char		c[1024];
 	char		*field;
 
-	sprintf(c,"select value from history where itemid=%d and clock>unix_timestamp()-%d limit 1",itemid,parameter);
+	int		now;
+
+	now=time(NULL);
+
+	sprintf(c,"select value from history where itemid=%d and clock>%d-%d limit 1",now,itemid,parameter);
 
 	result = DBselect(c);
 	if(result==NULL)

@@ -2,3 +2,6 @@ Changes after 1.0alpha2:
 
  - added check for SMTP, FTP, SSH, TELNET, WEB, POP3, and IMAP 
    servers availability
+ - fixed annoying glitch in Trigger Status form
+ - removed MySQL sepecific unix_timestamp() from SQL statements
+ - added "Use of Zabbix" section to manual

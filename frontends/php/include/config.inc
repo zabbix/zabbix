@@ -454,6 +454,7 @@
 
 	function	implode_exp ($expression, $triggerid)
 	{
+//		echo "Expression:$expression<br>";
 		$exp='';
 		for($i=0;$i<strlen($expression);$i++)
 		{
@@ -658,7 +659,7 @@
 		$result=DBselect($sql);
 		for($i=0;$i<DBnum_rows($result);$i++)
 		{
-			delete_function_by_triggerid(DBget_field($result,$i,0));
+			delete_trigger(DBget_field($result,$i,0));
 		}
 
 		$sql="delete from functions where itemid=$itemid";
@@ -765,13 +766,13 @@
 				{
 					if($expression[$z] == ':')
 					{
-						$expression=substr($expression,0,$z)."$host:$key".substr($expression,$z);
+						$expression=substr($expression,0,$z)."$host:$key".substr($expression,$z+1);
 						
 						break;
 					}
 				}
 
-				add_trigger($expression,$description,0,2,"");
+				add_trigger($expression,$description,0,0,"");
 			}
 		}
 	}

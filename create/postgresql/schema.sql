@@ -1,3 +1,5 @@
+\connect zabbix
+
 --
 -- Table structure for table 'platforms'
 --
@@ -253,7 +255,7 @@ insert into items_template (itemtemplateid,platformid,description,key_,delay)
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
 	values (18,1,'Number of established TCP connections','tcp_count', 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (19,1,'Checksum of /etc/inetd.conf','cksum[/etc/inetd.conf]', 600);
+	values (19,1,'Checksum of /etc/inetd.conf','cksum[/etc/inetd_conf]', 600);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
 	values (20,1,'Checksum of /vmlinuz','cksum[/vmlinuz]', 600);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
