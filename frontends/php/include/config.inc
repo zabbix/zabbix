@@ -165,6 +165,7 @@
 			($page["file"]=="tr_status.html")||
 			($page["file"]=="queue.html")||
 			($page["file"]=="latestalarms.html")||
+			($page["file"]=="alarms.html")||
 			($page["file"]=="alerts.html")||
 			($page["file"]=="history.html")||
 			($page["file"]=="maps.html")||
@@ -290,7 +291,8 @@
 			<font face="Arial,Helvetica" size=2>
 				<a href="latestalarms.html">
 <?
-				if($page["file"]=="latestalarms.html")
+				if(($page["file"]=="latestalarms.html") ||
+					($page["file"]=="alarms.html"))
 				{
 					echo "<b>[ALARMS]</b></a>";
 				}

@@ -70,5 +70,3 @@ CREATE TABLE graphs_items (
   FOREIGN KEY (graphid) REFERENCES graphs,
   FOREIGN KEY (itemid) REFERENCES items
 );
-
-VACUUM ANALYZE;

@@ -1,7 +1,10 @@
 Changes for 1.0alpha7:
 
- - fullscreen mode for Network Maps and graphs
+ - fullscreen mode for form Status of Triggers
+ - minor changes in manual.txt
+ - no password to see alarms needed
 
+ - fullscreen mode for Network Maps and graphs
  - fixed bug with getting processor load on Linux
  - added /upgrades/dbpatches/1.0alpha6_to_1.0alpha7
  - changes in manual.txt
