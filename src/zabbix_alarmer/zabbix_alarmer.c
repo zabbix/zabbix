@@ -240,6 +240,8 @@ void	update_triggers(void)
 	if(DBnum_rows(result)==0)
 	{
 		dbg_write( dbg_proginfo, "Zero, so returning..." );
+
+		DBfree_result(result);
 		return;
 	} 
 	while ( (row = DBfetch_row(result)) )
