@@ -113,17 +113,25 @@
 ?>
 
 <?
-	if(!isset($select))
+	if(!isset($HTTP_GET_VARS["select"]))
 	{
 		$select="";
 	}
+	else
+	{
+		$select=$HTTP_GET_VARS["select"];
+	}
 
-	if(!isset($txt_select))
+	if(!isset($HTTP_GET_VARS["txt_select"]))
 	{
 		$txt_select="";
 	}
+	else
+	{
+		$txt_select=$HTTP_GET_VARS["txt_select"];
+	}
 
-	if(isset($btnSelect)&&($btnSelect=="Inverse select"))
+	if(isset($HTTP_GET_VARS["btnSelect"])&&($HTTP_GET_VARS["btnSelect"]=="Inverse select"))
 	{
 		$select_cond="not like '%$txt_select%'";
 	}
