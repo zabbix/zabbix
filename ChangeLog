@@ -1,5 +1,6 @@
 Changes for 1.0beta7:
 
+ - recvfrom() and sendto() were changed to read() and write() (Alexei)
  - fixed housekeeping procedure. Upgrade carefully! (Alexei)
  - support of template hosts. Remove tables hosts_templates and
    triggers_template. (Alexei) 
