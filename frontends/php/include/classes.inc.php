@@ -609,9 +609,18 @@
 //								if($this->clock[$item][$i]-$this->clock[$item][$j]<4*$this->items[$item]["delay"])
 //								echo 8*($this->to_time-$this->from_time)/900,"<br>";
 //								echo $this->clock[$item][$i]-$this->clock[$item][$j],"<br>";
-								if($this->clock[$item][$i]-$this->clock[$item][$j]<8*($this->to_time-$this->from_time)/900)
+								$diff=$this->clock[$item][$i]-$this->clock[$item][$j];
+								$cell=($this->to_time-$this->from_time)/900;
+								$delay=$this->items[$item]["delay"];
+								if($cell>$delay)
 								{
-									$this->drawElement($item, $x1+$this->shiftX,$y1+$this->shiftY,$x2+$this->shiftX+1,$y2+$this->shiftY);
+									if($diff<16*$cell)
+										$this->drawElement($item, $x1+$this->shiftX,$y1+$this->shiftY,$x2+$this->shiftX+1,$y2+$this->shiftY);
+								}
+								else
+								{
+									if($diff<4*$delay)
+										$this->drawElement($item, $x1+$this->shiftX,$y1+$this->shiftY,$x2+$this->shiftX+1,$y2+$this->shiftY);
 								}
 								break;
 							}
