@@ -1,6 +1,6 @@
 1. Chapter 1 (Introduction)
 
-1.1 About the manuaL
+1.1 About the manual
 1.2 Acknowledgements
 1.3 What is Zabbix ?
 1.4 What does Zabbix offer ?
@@ -191,10 +191,10 @@ to Zabbix server located at zabbix.acbde.com. Processor load is 2.34.
 
 2.6 Database
 
-Database used by Zabbix is very important. The database is the only source
+Database used by Zabbix play most important role. The database is the only source
 of configuration parameters and it stores all history of monitored values.
 
-Zabbix performance higihly depends on officiency and speed of used database.
+Zabbix performance highly depends on officiency and speed of used database.
  
 2.7 WEB-based frontend
 
@@ -220,8 +220,11 @@ Zabbix agents are available for the following platforms:
 Zabbix requires the following software to run properly:
 
  - Apache 1.3.12 or later
- - MySQL 3.22 or later
- - PHP (4.0) compiled as Apache module with GD (for PNG images) and MySQL support
+ - Database engine
+  - MySQL 3.22 or later
+  or
+  - PostgreSQL 7.0.2 or later
+ - PHP 4.0 or later, compiled as Apache module with GD (for PNG images) with support of PostgreSQL or MySQL
  - GNU make
 
 Memory requirements:
@@ -231,7 +234,9 @@ memory and 50 Mb of free disk memory could be good start point.
 However, amount of required memory strongly depends on used configuration 
 parameters. If you're planning to keep long history of monitored parameters, 
 you should think of even a couple of gigabytes to have enough space to store the history in 
-the database. 
+the database.
+
+Remember, the more memory you have, the faster database and Zabbix works !
 
 3.2 Installation procedure
 
@@ -260,10 +265,30 @@ mysql -u<username> -p<password>
 cd create/mysql
 cat schema.sql |mysql zabbix -u<username> -p<password>
 
+For PostgreSQL:
+
+psql -U <username>
+> create database zabbix;
+> \q
+
+cd create/postgresql
+
+cat schema.sql|psql -U <username> zabbix
+
 
 3.2.4 Configure include/db.h
 
-#define DB_NAME         ""
+Use this for MySQL database:
+#define USE_MYSQL 1
+
+or
+
+Use this for PostgreSQL:
+#define USE_POSTGRESQL 1
+
+Parameters used regardless of database type:
+
+#define DB_NAME         "zabbix"
 #define DB_USER         ""
 #define DB_PASSWD       ""
 
@@ -315,9 +340,8 @@ killall -HUP inetd
 
 As zabbix:
 
-
-Change these values in frontends/php/include/config.inc:
-
+Change these values in frontends/php/include/db.inc:
+        $DB_TYPE        ="POSTGRESQL"; /* Or "MYSQL" for MySQL */
         $DB_SERVER      ="localhost";
         $DB_DATABASE    ="zabbix";
         $DB_USER        ="";
