@@ -293,6 +293,7 @@
 			($page["file"]=="charts.html")||
 			($page["file"]=="chart.html")||
 			($page["file"]=="about.html")||
+			($page["file"]=="srv_status.html")||
 			($page["file"]=="index.html"))
 		{
 			$sql="select password_required from config";

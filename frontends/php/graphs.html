@@ -44,29 +44,18 @@
 	$result=DBselect("select g.graphid,g.name,g.width,g.height from graphs g order by g.name");
 	echo "<CENTER>";
 	$col=0;
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
 	{
-		if($col==1)
-		{
-			echo "<TR BGCOLOR=#EEEEEE>";
-			$col=0;
-		} else
-		{
-			echo "<TR BGCOLOR=#DDDDDD>";
-			$col=1;
-		}
+		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
+		else		{ echo "<TR BGCOLOR=#DDDDDD>"; }
 	
-		$graphid_=DBget_field($result,$i,0);
-		$name_=DBget_field($result,$i,1);
-		$width_=DBget_field($result,$i,2);
-		$height_=DBget_field($result,$i,3);
-		echo "<TD><a href=\"graph.html?graphid=$graphid_\">$name_</a></TD>";
-		echo "<TD>$width_</TD>";
-		echo "<TD>$height_</TD>";
-		echo "<TD><A HREF=\"graphs.html?graphid=$graphid_#form\">Change</A> - <A HREF=\"graphs.html?register=delete&graphid=$graphid_\">Delete</A></TD>";
+		echo "<TD><a href=\"graph.html?graphid=".$row["graphid"]."\">".$row["name"]."</a></TD>";
+		echo "<TD>".$row["width"]."</TD>";
+		echo "<TD>".$row["height"]."</TD>";
+		echo "<TD><A HREF=\"graphs.html?graphid=".$row["graphid"]."#form\">Change</A> - ";
+		echo "<A HREF=\"graphs.html?register=delete&graphid=".$row["graphid"]."\">Delete</A></TD>";
 		echo "</TR>";
 	}
-
 	echo "</TABLE>";
 ?>
 
@@ -76,9 +65,10 @@
 	if(isset($graphid))
 	{
 		$result=DBselect("select g.graphid,g.name,g.width,g.height from graphs g where graphid=$graphid");
-		$name=DBget_field($result,0,1);
-		$width=DBget_field($result,0,2);
-		$height=DBget_field($result,0,3);
+		$row=DBfetch($result);
+		$name=$row["name"];
+		$width=$row["width"];
+		$height=$row["height"];
 	}
 	else
 	{

@@ -124,7 +124,7 @@
 //	$result2=DBselect("select itemid from graphs_items where graphid=$graphid");
 	for($item=0;$item<DBnum_rows($result2);$item++)
 	{
-		if(($minX!=$maxX)&&($minY!=$maxY))
+		if(isset($minX)&&isset($minY)&&($minX!=$maxX)&&($minY!=$maxY))
 		{
 			for($i=0;$i<$len[$item]-1;$i++)
 			{

@@ -21,29 +21,14 @@
 	echo "<tr><td><b>Next time to check</b></td><td><b>Host</b></td><td><b>Description</b></td></tr>";
 	echo "\n";
 	$col=0;
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
 	{
-		$itemid=DBget_field($result,$i,0);
-		$time=DBget_field($result,$i,1);
-		$description=DBget_field($result,$i,2);
-		$host=DBget_field($result,$i,3);
-
-		$time=date("m.d.Y H:i:s",$time);
-
-		if($col==1)
-		{
-			echo "<tr bgcolor=#EEEEEE>";
-			$col=0;
-		} else
-		{
-			echo "<tr bgcolor=#DDDDDD>";
-			$col=1;
-		}
-		echo "\n";
-		echo "<td>$time</td><td>$host</td><td>$description</td>";
-		echo "\n";
+		if($col++%2==0)	{ echo "<tr bgcolor=#EEEEEE>"; }
+		else		{ echo "<tr bgcolor=#DDDDDD>"; }
+		echo "<td>".date("m.d.Y H:i:s",$row["nextcheck"])."</td>";
+		echo "<td>".$row["host"]."</td>";
+		echo "<td>".$row["description"]."</td>";
 		echo "</tr>"; 
-		echo "\n";
 	}
 	echo "</table>";
 ?>
