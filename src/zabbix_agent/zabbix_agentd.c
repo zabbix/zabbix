@@ -158,7 +158,7 @@ void    daemon_init(void)
 		close(i);
 	}
 
-/*        openlog("zabbix_agentd",LOG_LEVEL_PID,LOG_USER);
+/*	openlog("zabbix_agentd",LOG_LEVEL_PID,LOG_USER);
 	setlogmask(LOG_UPTO(LOG_WARNING));*/
 
 
@@ -197,168 +197,43 @@ void	create_pid_file(void)
 	fclose(f);
 }
 
+int     add_parameter(char *value)
+{
+	char    *value2;
+
+	value2=strstr(value,",");
+	if(NULL == value2)
+	{
+		return  FAIL;
+	}
+	value2[0]=0;
+	value2++;
+	add_user_parameter(value, value2);
+	return  SUCCEED;
+}
+
 void    init_config(void)
 {
 	struct cfg_line cfg[]=
 	{
 /*               PARAMETER      ,VAR    ,FUNC,  TYPE(0i,1s),MANDATORY,MIN,MAX
 */
-		{"Server",&CONFIG_HOSTS_ALLOWED,0,TYPE_STRING,PARM_OPT,0,0},
+		{"Server",&CONFIG_HOSTS_ALLOWED,0,TYPE_STRING,PARM_MAND,0,0},
+		{"PidFile",&CONFIG_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
+		{"LogFile",&CONFIG_LOG_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
+		{"NoTimeWait",&CONFIG_NOTIMEWAIT,0,TYPE_INT,PARM_OPT,0,1},
+		{"ListenPort",&CONFIG_LISTEN_PORT,0,TYPE_INT,PARM_OPT,1024,32767},
+		{"DebugLevel",&CONFIG_LOG_LEVEL,0,TYPE_INT,PARM_OPT,1,3},
+		{"StartAgents",&CONFIG_AGENTD_FORKS,0,TYPE_INT,PARM_OPT,1,16},
+		{"UserParameter",0,&add_parameter,0,0,0,0},
 		{0}
 	};
 	parse_cfg_file("/etc/zabbix/zabbix_agentd.conf",cfg);
-}
-
-
-void	process_config_file(void)
-{
-	FILE	*file;
-	char	line[1024];
-	char	parameter[1024];
-	char	*value;
-	char	*value2;
-	int	lineno;
-	int	i;
-
-	file=fopen("/etc/zabbix/zabbix_agentd.conf","r");
-	if(NULL == file)
-	{
-		zabbix_log( LOG_LEVEL_CRIT, "Cannot open /etc/zabbix/zabbix_agentd.conf");
-		exit(1);
-	}
-
-	lineno=0;
-	while(fgets(line,1024,file) != NULL)
-	{
-		lineno++;
-
-		if(line[0]=='#')	continue;
-		if(strlen(line)==1)	continue;
-
-		strcpy(parameter,line);
-
-		value=strstr(line,"=");
-
-		if(NULL == value)
-		{
-			zabbix_log( LOG_LEVEL_CRIT, "Error in line [%s] Line %d", line, lineno);
-			fclose(file);
-			exit(1);
-		}
-		value++;
-		value[strlen(value)-1]=0;
-
-		parameter[value-line-1]=0;
-
-		zabbix_log( LOG_LEVEL_WARNING, "Parameter [%s] Value [%s]", parameter, value);
-
-		if(strcmp(parameter,"Server")==0)
-		{
-			CONFIG_HOSTS_ALLOWED=strdup(value);
-		}
-		else if(strcmp(parameter,"PidFile")==0)
-		{
-			CONFIG_PID_FILE=strdup(value);
-		}
-		else if(strcmp(parameter,"LogFile")==0)
-		{
-			CONFIG_LOG_FILE=strdup(value);
-		}
-		else if(strcmp(parameter,"Timeout")==0)
-		{
-			i=atoi(value);
-			if( (i<1) || (i>30) )
-			{
-				zabbix_log( LOG_LEVEL_CRIT, "Wrong value of Timeout in line %d. Should be between 1 or 30.", lineno);
-				fclose(file);
-				exit(1);
-			}
-			CONFIG_TIMEOUT=i;
-		}
-		else if(strcmp(parameter,"NoTimeWait")==0)
-		{
-			i=atoi(value);
-			if( (i<0) || (i>1) )
-			{
-				zabbix_log( LOG_LEVEL_CRIT, "Wrong value of NoTimeWait in line %d. Should be either 0 or 1.", lineno);
-				fclose(file);
-				exit(1);
-			}
-			CONFIG_NOTIMEWAIT=i;
-		}
-		else if(strcmp(parameter,"StartAgents")==0)
-		{
-			i=atoi(value);
-			if( (i<1) || (i>16) )
-			{
-				zabbix_log( LOG_LEVEL_CRIT, "Wrong value of StartAgents in line %d. Should be between 1 and 16.", lineno);
-				fclose(file);
-				exit(1);
-			}
-			CONFIG_AGENTD_FORKS=i;
-		}
-		else if(strcmp(parameter,"ListenPort")==0)
-		{
-			i=atoi(value);
-			if( (i<=1024) || (i>32767) )
-			{
-				zabbix_log( LOG_LEVEL_CRIT, "Wrong value of ListenPort in line %d. Should be between 1024 and 32767.", lineno);
-				fclose(file);
-				exit(1);
-			}
-			CONFIG_LISTEN_PORT=i;
-		}
-		else if(strcmp(parameter,"DebugLevel")==0)
-		{
-			if(strcmp(value,"1") == 0)
-			{
-				CONFIG_LOG_LEVEL=LOG_LEVEL_CRIT;
-			}
-			else if(strcmp(value,"2") == 0)
-			{
-				CONFIG_LOG_LEVEL=LOG_LEVEL_WARNING;
-			}
-			else if(strcmp(value,"3") == 0)
-			{
-				CONFIG_LOG_LEVEL=LOG_LEVEL_DEBUG;
-			}
-			else
-			{
-				zabbix_log( LOG_LEVEL_CRIT, "Wrong DebugLevel in line %d", lineno);
-				fclose(file);
-				exit(1);
-			}
-			zabbix_log( LOG_LEVEL_WARNING, "DebugLevel is set to [%s]", value);
-		}
-		else if(strcmp(parameter,"UserParameter")==0)
-		{
-			value2=strstr(value,",");
-			if(NULL == value2)
-			{
-				zabbix_log( LOG_LEVEL_CRIT, "Error in line [%s] Line %d Symbol ',' expected", line, lineno);
-				fclose(file);
-				exit(1);
-			}
-			value2[0]=0;
-			value2++;
-			zabbix_log( LOG_LEVEL_WARNING, "Added user-defined parameter [%s] Command [%s]", value, value2);
-			add_user_parameter(value, value2);
-		}
-		else
-		{
-			zabbix_log( LOG_LEVEL_CRIT, "Unsupported parameter [%s] Line %d", parameter, lineno);
-			fclose(file);
-			exit(1);
-		}
-
-	}
-
 	if(CONFIG_PID_FILE == NULL)
 	{
 		CONFIG_PID_FILE=strdup("/tmp/zabbix_agentd.pid");
 	}
-	fclose(file);
 }
 
 int	check_security(int sockfd)
@@ -551,7 +426,7 @@ int	main()
 
         static struct  sigaction phan;
 
-	process_config_file();
+	init_config();
 	daemon_init();
 
 	phan.sa_handler = &signal_handler;

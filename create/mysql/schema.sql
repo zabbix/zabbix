@@ -165,12 +165,12 @@ CREATE TABLE alarms (
 --
 
 CREATE TABLE functions (
-  functionid int(4) NOT NULL auto_increment,
-  itemid int(4) DEFAULT '0' NOT NULL,
-  triggerid int(4) DEFAULT '0' NOT NULL,
-  lastvalue double(16,4) DEFAULT '0.0000' NOT NULL,
-  function varchar(10) DEFAULT '' NOT NULL,
-  parameter int(4) DEFAULT '0' NOT NULL,
+  functionid		int(4)		NOT NULL auto_increment,
+  itemid		int(4)		DEFAULT '0' NOT NULL,
+  triggerid		int(4)		DEFAULT '0' NOT NULL,
+  lastvalue		varchar(255)	DEFAULT '0.0000' NOT NULL,
+  function		varchar(10)	DEFAULT '' NOT NULL,
+  parameter		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (functionid),
   KEY triggerid (triggerid),
   KEY itemidfunctionparameter (itemid,function,parameter)
@@ -258,9 +258,9 @@ CREATE TABLE items (
 	history		int(4) DEFAULT '0' NOT NULL,
 	lastdelete	int(4) DEFAULT '0' NOT NULL,
 	nextcheck	int(4) DEFAULT '0' NOT NULL,
-	lastvalue	double(16,4) DEFAULT NULL,
+	lastvalue	varchar(255) DEFAULT NULL,
 	lastclock	int(4) DEFAULT NULL,
-	prevvalue	double(16,4) DEFAULT NULL,
+	prevvalue	varchar(255) DEFAULT NULL,
 	status		int(4) DEFAULT '0' NOT NULL,
 	value_type	int(4) DEFAULT '0' NOT NULL,
 	PRIMARY KEY	(itemid),

@@ -101,7 +101,7 @@ int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 				else
 				{
 /* Can this be done without "c" ? */ 
-					c=(char *)cfg[i].variable;
+					c=(char **)cfg[i].variable;
 					*c=(char *)strdup(value);
 				}
 				}
@@ -127,7 +127,7 @@ int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 			}
 			if(cfg[i].type == TYPE_STRING)
 			{
-				c=(char *)cfg[i].variable;
+				c=(char **)cfg[i].variable;
 				if(*c==NULL)
 				{
 					fprintf(stderr, "Missing mandatory parameter [%s]\n", cfg[i].parameter);

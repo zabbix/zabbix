@@ -1,6 +1,6 @@
 #include "config.h"
 
-#include "errno.h"
+#include <errno.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -98,6 +98,8 @@ COMMAND	commands[AGENT_MAX_USER_COMMANDS]=
 	{"memory[cached]"	,CACHEDMEM, 		0, 0},
 	{"memory[free]"		,FREEMEM, 		0, 0},
 
+	{"version[zabbix_agent]",0,	 		VERSION, 0},
+
 	{"diskfree[*]"		,DF, 			0, "/"},
 
 	{"inodefree[*]"		,INODE, 		0, "/"},
@@ -194,7 +196,7 @@ void	test_parameters(void)
 	}
 }
 
-/* The messy function must be rewritten! */
+/* This messy function must be rewritten! */
 char	*process(char *command)
 {
 	char	*p;
@@ -211,7 +213,8 @@ char	*process(char *command)
 	int	ret_str=0;
 
 	for( p=command+strlen(command)-1; p>command && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
-	if( (*p=='\r') || (*p=='\n') ||(*p==' '))
+
+	if( (p[1]=='\r') || (p[1]=='\n') ||(p[1]==' '))
 	{
 		p[1]=0;
 	}
@@ -1219,6 +1222,13 @@ float	DISK_WBLK(void)
 #else
 	return	FAIL;
 #endif
+}
+
+char	*VERSION(void)
+{
+	static	char	*version="1.0beta3\n";
+
+	return	version;
 }
 
 char	*EXECUTE_STR(char *command)

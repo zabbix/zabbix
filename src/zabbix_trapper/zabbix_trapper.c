@@ -75,115 +75,6 @@ void    init_config(void)
 	}
 }
       
-void	process_config_file(void)
-{
-	FILE	*file;
-	char	line[MAX_STRING_LEN+1];
-	char	parameter[MAX_STRING_LEN+1];
-	char	*value;
-	int	lineno;
-	int	i;
-
-	file=fopen("/etc/zabbix/zabbix_trapper.conf","r");
-	if(NULL == file)
-	{
-		zabbix_log( LOG_LEVEL_CRIT, "Cannot open /etc/zabbix/zabbix_trapper.conf");
-		exit(1);
-	}
-
-	lineno=0;
-	while(fgets(line,MAX_STRING_LEN,file) != NULL)
-	{
-		lineno++;
-
-		if(line[0]=='#')	continue;
-		if(strlen(line)==1)	continue;
-
-		strncpy(parameter,line,MAX_STRING_LEN);
-
-		value=strstr(line,"=");
-
-		if(NULL == value)
-		{
-			zabbix_log( LOG_LEVEL_CRIT, "Error in line [%s] Line %d", line, lineno);
-			fclose(file);
-			exit(1);
-		}
-		value++;
-		value[strlen(value)-1]=0;
-
-		parameter[value-line-1]=0;
-
-		zabbix_log( LOG_LEVEL_DEBUG, "Parameter [%s] Value [%s]", parameter, value);
-
-		if(strcmp(parameter,"DebugLevel")==0)
-		{
-			if(strcmp(value,"1") == 0)
-			{
-				CONFIG_LOG_LEVEL=LOG_LEVEL_CRIT;
-			}
-			else if(strcmp(value,"2") == 0)
-			{
-				CONFIG_LOG_LEVEL=LOG_LEVEL_WARNING;
-			}
-			else if(strcmp(value,"3") == 0)
-			{
-				CONFIG_LOG_LEVEL=LOG_LEVEL_DEBUG;
-			}
-			else
-			{
-/*				zabbix_log( LOG_LEVEL_CRIT, "Wrong DebugLevel in line %d", lineno);*/
-				fclose(file);
-				exit(1);
-			}
-		}
-		else if(strcmp(parameter,"Timeout")==0)
-		{
-			i=atoi(value);
-			if( (i<1) || (i>30) )
-			{
-				zabbix_log( LOG_LEVEL_CRIT, "Wrong value of Timeout in line %d. Should be between 1 and 30.", lineno);
-				fclose(file);
-				exit(1);
-			}
-			CONFIG_TIMEOUT=i;
-		}
-		else if(strcmp(parameter,"LogFile")==0)
-		{
-			CONFIG_LOG_FILE=strdup(value);
-		}
-		else if(strcmp(parameter,"DBName")==0)
-		{
-			CONFIG_DBNAME=strdup(value);
-		}
-		else if(strcmp(parameter,"DBUser")==0)
-		{
-			CONFIG_DBUSER=strdup(value);
-		}
-		else if(strcmp(parameter,"DBPassword")==0)
-		{
-			CONFIG_DBPASSWORD=strdup(value);
-		}
-		else if(strcmp(parameter,"DBSocket")==0)
-		{
-			CONFIG_DBSOCKET=strdup(value);
-		}
-		else
-		{
-			zabbix_log( LOG_LEVEL_CRIT, "Unsupported parameter [%s] Line %d", parameter, lineno);
-			fclose(file);
-			exit(1);
-		}
-	}
-	fclose(file);
-	
-	if(CONFIG_DBNAME == NULL)
-	{
-		zabbix_log( LOG_LEVEL_CRIT, "DBName not in config file");
-		exit(1);
-	}
-}
-
 int	main()
 {
 	static	char	s[MAX_STRING_LEN+1];
@@ -209,7 +100,6 @@ int	main()
 		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
 	}
 
-/*	process_config_file();*/
 	init_config();
 	
 	fgets(s,MAX_STRING_LEN,stdin);

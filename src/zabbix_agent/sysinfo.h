@@ -36,6 +36,7 @@ float	UPTIME(void);
 
 float	EXECUTE(char *command);
 char	*EXECUTE_STR(char *command);
+char	*VERSION(void);
 
 float	CHECK_SERVICE_SSH(void);
 float	CHECK_SERVICE_SMTP(void);
