@@ -2,7 +2,7 @@
 	include "include/config.inc";
 	$page["title"] = "Network maps";
 	$page["file"] = "sysmaps.html";
-	show_header($page["title"],0);
+	show_header($page["title"],0,0);
 ?>
 
 <?
@@ -24,6 +24,7 @@
 		if($register=="delete")
 		{
 			delete_sysmap($sysmapid);
+			unset($sysmapid);
 		}
 	}
 ?>
