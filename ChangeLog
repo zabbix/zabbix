@@ -1,5 +1,7 @@
 Not ready yet:
 
+ - network monitoring + monitoring of services for different interfaces
+
  HB:
 
  - Tree like in old Zabbix
