@@ -6,7 +6,7 @@
 ?>
 
 <?
-        if(!check_right("Host","R",0))
+        if(!check_right("Host","W",0))
         {
                 show_table_header("<font color=\"AA0000\">No permissions !</font
 >");

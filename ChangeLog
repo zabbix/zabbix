@@ -28,6 +28,8 @@ snmpget -On localhost public enterprises.ucdavis.memory.memTotalSwap.0]
 
 Changes for 1.0beta4:
 
+ - new column item.trapper_hosts (Alexei)
+ - housekeeping period for items to be set in days (Alexei)
  - authorisation without user name/password (Alexei)
  - default user "guest" (Alexei)
  - added table 'sessions' (Alexei)
