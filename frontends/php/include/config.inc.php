@@ -1050,7 +1050,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<title>$title</title>";
 	}
 
-	echo "<head>";
+	echo "</head>";
 ?>
 
 
