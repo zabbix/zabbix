@@ -30,6 +30,23 @@ TELECENTRS:
 4. SNMP traps. Make possible action definition for the SNMP trap-related
  events.
 
+5. ierarhicheskie mapi.
+
+6. fix. 1kb = 1000b
+
+7. snmp traps kak?
+
+8. fix. esli net dannih za kakoj-to promezhutok vremeni to na grafike
+risuetsa prjamaja linija mezdu real'nimi dannimi. po idee nichego
+risovatsa ne dolzhno voobshe.
+
+dalee pozhelanija:
+
+9. u hosta "5 User defined fields (text or OID)". eto dlja togo chtob
+tehnicheskuju informaciju o hoste mozhno bilo derzhat' tam zhe. eto
+serial number/mesto polozhenija/etc.
+
+10. threads.
 
 OTHER:
 
