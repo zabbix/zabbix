@@ -170,7 +170,7 @@
 	echo "<TD ALIGN=LEFT>";
 		echo("<div align=left>");
 
-		echo("<b>Period:</b>&nbsp;(&nbsp;");
+		echo("<b>Period:</b>&nbsp;");
 
 		$hour=3600;
 		foreach(array(1,2,4,8,12,24) as $count){
@@ -183,7 +183,7 @@
 		echo("[<A HREF=\"charts.php?period=".(30*24*3600).url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">month</A>]&nbsp;");
 		echo("[<A HREF=\"charts.php?period=".(365*24*3600).url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">year</A>]&nbsp;");
 
-            echo("or&nbsp;");
+/*            echo("or&nbsp;");
 		$tmp=$HTTP_GET_VARS["period"]+$hour;
 		echo("[<A HREF=\"charts.php?period=$tmp".url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">");
 		echo("+1h</A>]&nbsp;");
@@ -198,11 +198,9 @@
 		else
 		{
 			echo("[-1h]&nbsp;");
-		}
+		}*/
 
-		echo(")");
-
-		echo(" <b>Back:</b>&nbsp;(&nbsp;");
+		echo(" <b>Back:</b>&nbsp;");
 
 		$day=24;
 		foreach(array(0,1,2,7,14) as $count){
@@ -211,8 +209,6 @@
 			echo($count."d</A>]&nbsp;");
 		}
             
-		echo(")");
-
 		if(isset($HTTP_GET_VARS["keep"]))
 		{
 			echo(" <b>Keep&nbsp;period:</b>&nbsp;");
