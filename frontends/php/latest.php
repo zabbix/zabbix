@@ -54,15 +54,11 @@
 ?>
 
 <?php
-	show_table3_header_begin();
-	echo "&nbsp;".S_LATEST_DATA;
-	show_table3_h_delimiter(60);
-	echo "<span style=\"float:right\">";
-	echo "<form name=\"form2\" method=\"get\" action=\"latest.php\">";
-	echo S_GROUP."&nbsp;";
-	echo "<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
-	echo "<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_ALL_SMALL;
+	$h1="&nbsp;".S_LATEST_DATA;
 
+	$h2=S_GROUP."&nbsp;";
+	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
+	$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_ALL_SMALL;
 	$result=DBselect("select groupid,name from groups order by name");
 	while($row=DBfetch($result))
 	{
@@ -79,14 +75,14 @@
 		}
 		if($cnt!=0)
 		{
-			echo "<option value=\"".$row["groupid"]."\" ".iif(isset($_GET["groupid"])&&($_GET["groupid"]==$row["groupid"]),"selected","").">".$row["name"];
+			$h2=$h2."<option value=\"".$row["groupid"]."\" ".iif(isset($_GET["groupid"])&&($_GET["groupid"]==$row["groupid"]),"selected","").">".$row["name"];
 		}
 	}
-	echo "</select>";
+	$h2=$h2."</select>";
 
-	echo "&nbsp;".S_HOST."&nbsp;";
-	echo "<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
-	echo "<option value=\"0\"".iif(!isset($_GET["hostid"])||($_GET["hostid"]==0),"selected","").">".S_SELECT_HOST_DOT_DOT_DOT;
+	$h2=$h2."&nbsp;".S_HOST."&nbsp;";
+	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
+	$h2=$h2."<option value=\"0\"".iif(!isset($_GET["hostid"])||($_GET["hostid"]==0),"selected","").">".S_SELECT_HOST_DOT_DOT_DOT;
 
 	if(isset($_GET["groupid"]))
 	{
@@ -104,11 +100,11 @@
 		{
 			continue;
 		}
-		echo "<option value=\"".$row["hostid"]."\"".iif(isset($_GET["hostid"])&&($_GET["hostid"]==$row["hostid"]),"selected","").">".$row["host"];
+		$h2=$h2."<option value=\"".$row["hostid"]."\"".iif(isset($_GET["hostid"])&&($_GET["hostid"]==$row["hostid"]),"selected","").">".$row["host"];
 	}
-	echo "</select>";
+	$h2=$h2."</select>";
 
-	echo nbsp("  ");
+	$h2=$h2.nbsp("  ");
 
 	if(isset($_GET["select"])&&($_GET["select"]==""))
 	{
@@ -116,21 +112,20 @@
 	}
 	if(isset($_GET["select"]))
 	{
-		echo $_GET["select"];
+		$h2=$h2.$_GET["select"];
 	}
 	if(isset($_GET["select"]))
 	{
-  		echo "<input class=\"biginput\" type=\"text\" name=\"select\" value=\"".$_GET["select"]."\">";
+  		$h2=$h2."<input class=\"biginput\" type=\"text\" name=\"select\" value=\"".$_GET["select"]."\">";
 	}
 	else
 	{
- 		echo "<input class=\"biginput\" type=\"text\" name=\"select\" value=\"\">";
+ 		$h2=$h2."<input class=\"biginput\" type=\"text\" name=\"select\" value=\"\">";
 	}
-	echo nbsp(" ");
-  	echo "<input class=\"button\" type=\"submit\" name=\"do\" value=\"select\">";
-	echo "</form>";
-	echo "</span>";
-	show_table_header_end();
+	$h2=$h2.nbsp(" ");
+  	$h2=$h2."<input class=\"button\" type=\"submit\" name=\"do\" value=\"select\">";
+
+	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"latest.php\">", "</form>");
 ?>
 
 <?php

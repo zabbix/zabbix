@@ -56,8 +56,6 @@
 
 
 	{
-		show_table3_header_begin();
-
 		if(isset($_GET["graphid"])&&($_GET["graphid"]==0))
 		{
 			unset($_GET["graphid"]);
@@ -67,23 +65,21 @@
 		{
 			$result=DBselect("select name from graphs where graphid=".$_GET["graphid"]);
 			$graph=DBget_field($result,0,0);
-			$graph=iif(isset($_GET["fullscreen"]),
+			$h1=iif(isset($_GET["fullscreen"]),
 				"<a href=\"charts.php?graphid=".$_GET["graphid"]."\">".$graph."</a>",
 				"<a href=\"charts.php?graphid=".$_GET["graphid"]."&fullscreen=1\">".$graph."</a>");
 		}
 		else
 		{
-			$graph=S_SELECT_GRAPH_TO_DISPLAY;
+			$h1=S_SELECT_GRAPH_TO_DISPLAY;
 		}
 
-		echo S_GRAPHS_BIG.nbsp(" / ").$graph;
-// Start of new code
-		show_table3_h_delimiter();
-		echo "<form name=\"form2\" method=\"get\" action=\"charts.php\">";
+		$h1=S_GRAPHS_BIG.nbsp(" / ").$h1;
 
+		$h2="";
 		if(isset($_GET["fullscreen"]))
 		{
-			echo "<input name=\"fullscreen\" type=\"hidden\" value=".$_GET["fullscreen"].">";
+			$h2="<input name=\"fullscreen\" type=\"hidden\" value=".$_GET["fullscreen"].">";
 		}
 
 		if(isset($_GET["graphid"])&&($_GET["graphid"]==0))
@@ -91,8 +87,8 @@
 			unset($_GET["graphid"]);
 		}
 
-		echo "<select class=\"biginput\" name=\"graphid\" onChange=\"submit()\">";
-		echo "<option value=\"0\" ".iif(!isset($_GET["graphid"]),"selected","").">".S_SELECT_GRAPH_DOT_DOT_DOT;
+		$h2=$h2."<select class=\"biginput\" name=\"graphid\" onChange=\"submit()\">";
+		$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["graphid"]),"selected","").">".S_SELECT_GRAPH_DOT_DOT_DOT;
 
 		$result=DBselect("select graphid,name from graphs order by name");
 		while($row=DBfetch($result))
@@ -101,12 +97,11 @@
 			{
 				continue;
 			}
-			echo "<option value=\"".$row["graphid"]."\" ".iif(isset($_GET["graphid"])&&($_GET["graphid"]==$row["graphid"]),"selected","").">".$row["name"];
+			$h2=$h2."<option value=\"".$row["graphid"]."\" ".iif(isset($_GET["graphid"])&&($_GET["graphid"]==$row["graphid"]),"selected","").">".$row["name"];
 		}
-		echo "</select>";
-		echo "</form>";
+		$h2=$h2."</select>";
 
-		show_table_header_end();
+		show_header2($h1,$h2,"<form name=\"form2\" method=\"get\" action=\"charts.php\">","</form>");
 	}
 ?>
 
