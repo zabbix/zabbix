@@ -72,6 +72,7 @@ static	int	CONFIG_AGENTD_FORKS		= AGENTD_FORKS;
 static	int	CONFIG_NOTIMEWAIT		= 0;
 static	int	CONFIG_TIMEOUT			= AGENT_TIMEOUT;
 static	int	CONFIG_LISTEN_PORT		= 10000;
+static	char	*CONFIG_LISTEN_IP		= NULL;
 static	int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 
 void	uninit(void)
@@ -247,6 +248,7 @@ void    init_config(void)
 		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
 		{"NoTimeWait",&CONFIG_NOTIMEWAIT,0,TYPE_INT,PARM_OPT,0,1},
 		{"ListenPort",&CONFIG_LISTEN_PORT,0,TYPE_INT,PARM_OPT,1024,32767},
+		{"ListenIP",&CONFIG_LISTEN_IP,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DebugLevel",&CONFIG_LOG_LEVEL,0,TYPE_INT,PARM_OPT,0,4},
 		{"StartAgents",&CONFIG_AGENTD_FORKS,0,TYPE_INT,PARM_OPT,1,16},
 		{"UserParameter",0,&add_parameter,0,0,0,0},
@@ -340,7 +342,14 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 
 	bzero((char *) &serv_addr, sizeof(serv_addr));
 	serv_addr.sin_family      = AF_INET;
-	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	if(CONFIG_LISTEN_IP == NULL)
+	{
+		serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	}
+	else
+	{
+		serv_addr.sin_addr.s_addr = inet_addr(CONFIG_LISTEN_IP);
+	}
 	serv_addr.sin_port        = htons(port);
 
 	if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)

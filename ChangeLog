@@ -1,5 +1,6 @@
 Changes for 1.0beta10:
 
+ - added parameter ListenIP to zabbix_agentd.conf (Alexei)
  - added pinger.c and pinger.h (Alexei)
  - fixed search of SNMP header files and libs (Alexei)
  - improved performance of Alarm and Alert History (Alexei)
