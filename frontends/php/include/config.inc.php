@@ -2143,7 +2143,7 @@ echo "</head>";
 		if($status != $old_status)
 		{
 			update_trigger_value_to_unknown_by_hostid($hostid);
-			$sql="update hosts set status=$status where hostid=$hostid and status not in (".HOST_STATUS_UNREACHABLE.",".HOST_STATUS_DELETED.")";
+			$sql="update hosts set status=$status where hostid=$hostid and status!=".HOST_STATUS_DELETED;
 			return	DBexecute($sql);
 		}
 		else
@@ -3395,7 +3395,7 @@ echo "</head>";
 		}
 
 
-		$sql="insert into hosts (host,port,status,useip,ip,disable_until) values ('$host',$port,$status,$useip,'$ip',0)";
+		$sql="insert into hosts (host,port,status,useip,ip,disable_until,available) values ('$host',$port,$status,$useip,'$ip',0,".HOST_AVAILABLE_UNKNOWN.")";
 		$result=DBexecute($sql);
 		if(!$result)
 		{
@@ -4289,13 +4289,13 @@ echo "</head>";
 	        $result=DBselect("select count(*) from hosts");
 		$stat["hosts_count"]=DBget_field($result,0,0);
 
-	        $result=DBselect("select count(*) from hosts where status=0");
+	        $result=DBselect("select count(*) from hosts where status=".HOST_STATUS_MONITORED);
 		$stat["hosts_count_monitored"]=DBget_field($result,0,0);
 
-	        $result=DBselect("select count(*) from hosts where status=1");
+	        $result=DBselect("select count(*) from hosts where status!=".HOST_STATUS_MONITORED);
 		$stat["hosts_count_not_monitored"]=DBget_field($result,0,0);
 
-	        $result=DBselect("select count(*) from hosts where status=3");
+	        $result=DBselect("select count(*) from hosts where status=".HOST_STATUS_DELETED);
 		$stat["hosts_count_template"]=DBget_field($result,0,0);
 
 	        $result=DBselect("select count(*) from users");
@@ -4786,7 +4786,7 @@ echo "</head>";
 			$icon=DBget_field($result,$i,8);
 			$url=DBget_field($result,$i,9);
 
-			if( ($status==0)||($status==2))
+			if($status==HOST_STATUS_MONITORED)
 			{
 				$sql="select image from images where imagetype=1 and name='$icon'";
 				$result2=DBselect($sql);

@@ -201,7 +201,7 @@
 	while($row=DBfetch($result))
 	{
 // Check if at least one host with read permission exists for this group
-		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status in (0,2) and h.hostid=i.hostid and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
+		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
 		$cnt=0;
 		while($row2=DBfetch($result2))
 		{
@@ -224,11 +224,11 @@
 
 	if(isset($_GET["groupid"]))
 	{
-		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status in (0,2) and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
 	}
 	else
 	{
-		$sql="select h.hostid,h.host from hosts h,items i where h.status in (0,2) and h.hostid=i.hostid group by h.hostid,h.host order by h.host";
+		$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid group by h.hostid,h.host order by h.host";
 	}
 
 	$result=DBselect($sql);
@@ -367,11 +367,11 @@
 
 		if($onlytrue=='true')
 		{
-			$sql="select t.priority,count(*) from triggers t,hosts h,items i,functions f  where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and h.status in (0,2) and t.triggerid=f.triggerid and t.description $select_cond and i.status=0 $cond group by 1";
+			$sql="select t.priority,count(*) from triggers t,hosts h,items i,functions f  where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and t.triggerid=f.triggerid and t.description $select_cond and i.status=0 $cond group by 1";
 		}
 		else
 		{
-			$sql="select t.priority,count(*) from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=0 and h.status in (0,2) and t.description $select_cond and i.status=0 $cond group by 1";
+			$sql="select t.priority,count(*) from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=0 and h.status=".HOST_STATUS_MONITORED." and t.description $select_cond and i.status=0 $cond group by 1";
 		}
 		$result=DBselect($sql);
 		$p0=$p1=$p2=$p3=$p4=$p5=0;
@@ -497,11 +497,11 @@
 
 	if($onlytrue=='true')
 	{
-		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f  where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and t.description $select_cond and t.triggerid=f.triggerid and i.status in (0,2) and h.status in (0,2) $cond $sort");
+		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f  where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and t.description $select_cond and t.triggerid=f.triggerid and i.status in (0,2) and h.status=".HOST_STATUS_MONITORED." $cond $sort");
 	}
 	else
 	{
-		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=0 and t.description $select_cond and i.status in (0,2) and h.status in (0,2) $cond $sort");
+		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=0 and t.description $select_cond and i.status in (0,2) and h.status=".HOST_STATUS_MONITORED." $cond $sort");
 	}
 	$col=0;
 	while($row=DBfetch($result))

@@ -245,10 +245,10 @@
 		$icon_on=DBget_field($result,$i,9);
 
 
-		$result1=DBselect("select count(distinct t.triggerid) from items i,functions f,triggers t,hosts h where h.hostid=i.hostid and i.hostid=$hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.value=1 and t.status=0 and h.status in (0,2) and i.status=0");
+		$result1=DBselect("select count(distinct t.triggerid) from items i,functions f,triggers t,hosts h where h.hostid=i.hostid and i.hostid=$hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.value=1 and t.status=0 and h.status=".HOST_STATUS_MONITORED." and i.status=0");
 		$count=DBget_field($result1,0,0);
 
-		if( ($status!=1)&&($count>0))
+		if( ($status!=HOST_STATUS_NOT_MONITORED)&&($count>0))
 		{
 			$icon=$icon_on;
 		}
@@ -291,7 +291,7 @@
 			ImageString($im, 2, $x1, $y1, $label,$black);
 		}
 
-		if($status == 1)
+		if($status == HOST_STATUS_NOT_MONITORED)
 		{
 			$color=$darkred;
 #			$label="Not monitored";
@@ -301,7 +301,7 @@
 		{
 			if($count==1)
 			{
-				$result1=DBselect("select distinct t.description,t.triggerid, t.priority from items i,functions f,triggers t,hosts h where h.hostid=i.hostid and i.hostid=$hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.value=1 and t.status=0 and h.status in (0,2) and i.status=0");
+				$result1=DBselect("select distinct t.description,t.triggerid, t.priority from items i,functions f,triggers t,hosts h where h.hostid=i.hostid and i.hostid=$hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.value=1 and t.status=0 and h.status=".HOST_STATUS_MONITORED."  and i.status=0");
 				$label=DBget_field($result1,0,0);
 				if (DBget_field($result1,0,2) > 3)
 					$color=$red;
