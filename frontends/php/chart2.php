@@ -235,7 +235,9 @@
 #		ImageString($im, 2,$shiftX+200*$item+9,$sizeY+$shiftYup+15, $desc[$item], $gray);
 		ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*$item+45,$shiftX+5,$sizeY+$shiftYup+15+9+15*$item+45,$colors[$color[$item]]);
 		ImageRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*$item+45,$shiftX+5,$sizeY+$shiftYup+15+9+15*$item+45,$black);
-		ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*$item+15+45, $host[$item].": ".$desc[$item]." (min:".$itemMin.", avg:".$itemAvg.", max:".$itemMax.")", $black);
+		$str=sprintf("%s: %s [min:%.2f, avg:%.2f, max:%.2f]", $host[$item], $desc[$item], $itemMin, $itemAvg, $itemMax);
+		ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*$item+15+45,$str, $black);
+//		ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*$item+15+45, $host[$item].": ".$desc[$item]." (min:".$itemMin.", avg:".$itemAvg.", max:".$itemMax.")", $black);
 	}
 
 	// grid
