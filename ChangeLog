@@ -1,5 +1,6 @@
 Changes for 1.0beta7:
 
+ - added copyright notice to source files (Alexei)
  - pinger.pl will use mass-send of collected data. No unnecessary forks
    anymore. (Alexei)
  - all <? ?> were changed to <?php ?>. No changes in php.ini required anymore.
