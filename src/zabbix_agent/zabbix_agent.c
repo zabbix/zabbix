@@ -26,6 +26,7 @@
 #include "zabbix_agent.h"
 
 static	char	*config_host_allowed=NULL;
+static	int	CONFIG_TIMEOUT=AGENT_TIMEOUT;
 
 void	signal_handler( int sig )
 {
@@ -48,6 +49,7 @@ void	process_config_file(void)
 	char	*value;
 	char	*value2;
 	int	lineno;
+	int	i;
 
 	file=fopen("/etc/zabbix/zabbix_agent.conf","r");
 	if(NULL == file)
@@ -85,6 +87,17 @@ void	process_config_file(void)
 		{
 			config_host_allowed=strdup(value);
 		}
+		else if(strcmp(parameter,"Timeout")==0)
+		{
+			i=atoi(value);
+			if( (i<1) || (i>30) )
+			{
+//				syslog( LOG_CRIT, "Wrong value of Timeout in line %d. Should be between 1 or 30.", lineno);
+				fclose(file);
+				exit(1);
+			}
+			CONFIG_TIMEOUT=i;
+		}
 		else if(strcmp(parameter,"UserParameter")==0)
 		{
 			value2=strstr(value,",");
@@ -115,6 +128,7 @@ int	check_security(void)
 	struct	sockaddr_in name;
 	int	i;
 
+	i=sizeof(name);
 	if(getpeername(0,  (struct sockaddr *)&name, (size_t *)&i) == 0)
 	{
 		i=sizeof(struct sockaddr_in);
@@ -124,6 +138,12 @@ int	check_security(void)
 		{
 			return	FAIL;
 		}
+	}
+        else
+	{
+//		syslog( LOG_WARNING, "Error getpeername [%m]");
+//		syslog( LOG_WARNING, "Connection rejected");
+		return FAIL;
 	}
 	return	SUCCEED;
 }
@@ -150,9 +170,9 @@ int	main()
 	signal( SIGTERM, signal_handler );
 	signal( SIGALRM, signal_handler );
 
-	alarm(AGENT_TIMEOUT);
-
 	process_config_file();
+
+	alarm(CONFIG_TIMEOUT);
 
 	if(check_security() == FAIL)
 	{

@@ -1,16 +1,19 @@
 Noe ready yet:
 
-[ Add parameter Timeout for the rest of processes ]
-[ Something wrong with zabbix_agentd ] 
-[ Solve problem with getpeername ]
-[ All parameters should contain section "How can be used" in the Manual]
-[ PHP to support non-numerci values ]
+[ Add support for new trigger statuses: MODIFIED/NOTSUPORTED ]
+[ Something wrong with zabbix_agentd (?) ] 
+[ All parameters should contain section "How can be used" in the Manual ]
+[ PHP to support non-numeric values ]
 [ Support for system[proccount] on FreeBSD ]
-[ Patches for PostgreSQL ]
+[ Patches for PostgreSQL& MySQL ]
 [ Common parser (cfg.c) ]
 
 Changes for 1.0beta3:
 
+ - solved problem with getpeername() (Alexei)
+ - support for parameter Timeout for zabbix_trapper (Alexei)
+ - support for parameter Timeout for zabbix_trapperd (Alexei)
+ - support for parameter Timeout for zabbix_agent (Alexei)
  - fixed wrong data in alarms.php (Alexei)
  - swapped warning_on.wav and warning_off.wav (Alexei)
  - support for parameter Timeout for zabbix_agentd (Alexei)
