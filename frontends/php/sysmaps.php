@@ -35,6 +35,7 @@
 <?
 	show_table_header("NETWORK MAPS");
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>Id</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Name</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Width</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Height</B></TD>";
@@ -44,8 +45,13 @@
 	$result=DBselect("select s.sysmapid,s.name,s.width,s.height from sysmaps s order by s.name");
 	echo "<CENTER>";
 	$col=0;
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
 	{
+	        if(!check_right("Network map","R",$row["sysmapid"]))
+	        {
+	                continue;
+	        }
+
 		if($col==1)
 		{
 			echo "<TR BGCOLOR=#EEEEEE>";
@@ -56,14 +62,11 @@
 			$col=1;
 		}
 	
-		$sysmapid_=DBget_field($result,$i,0);
-		$name_=DBget_field($result,$i,1);
-		$width_=DBget_field($result,$i,2);
-		$height_=DBget_field($result,$i,3);
-		echo "<TD><a href=\"sysmap.php?sysmapid=$sysmapid_\">$name_</a></TD>";
-		echo "<TD>$width_</TD>";
-		echo "<TD>$height_</TD>";
-		echo "<TD><A HREF=\"sysmaps.php?sysmapid=$sysmapid_#form\">Change</A> - <A HREF=\"sysmaps.php?register=delete&sysmapid=$sysmapid_\">Delete</A></TD>";
+		echo "<TD>".$row["sysmapid"]."</TD>";
+		echo "<TD><a href=\"sysmap.php?sysmapid=".$row["sysmapid"]."\">".$row["name"]."</a></TD>";
+		echo "<TD>".$row["width"]."</TD>";
+		echo "<TD>".$row["height"]."</TD>";
+		echo "<TD><A HREF=\"sysmaps.php?sysmapid=".$row["sysmapid"]."#form\">Change</A> - <A HREF=\"sysmaps.php?register=delete&sysmapid=".$row["sysmapid"]."\">Delete</A></TD>";
 		echo "</TR>";
 	}
 	echo "</TABLE>";
