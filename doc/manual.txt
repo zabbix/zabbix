@@ -1,18 +1,24 @@
-1. Chapter 1 (Introduction)
+Zabbix Manual 
+================================
+ 
+Please see ../INSTALL for installation instructions.
+
+
+1. Introduction
 
 1.1 About the manual
 1.2 Acknowledgements
 1.3 What is Zabbix ?
 1.4 What does Zabbix offer ?
 
-2. Chapter 2 (Use of Zabbix)
+2. Use of Zabbix
 2.1 Performance monitoring
 2.2 Alarming users
 2.3 Integrity checking
 2.4 Logging services
 2.5 Capacity planning
 
-3. Chapter 3 (Structure)
+3. Overview
 3.1 zabbix_suckerd
 3.2 zabbix_agent
 3.3 zabbix_agentd
@@ -25,30 +31,21 @@
 3.9.1.1 Status of Zabbix
 3.9.1.2 Availability report
 
-4. Chapter 4 (Installation)
+4. Configuration
+4.1 Expressions for Triggers
+4.2 Parameters
+4.3 Supported parameters by platform
 
-4.1 Requirements
-4.2 Installation procedure
-
-5. Chapter 5 (Administration)
-5.1 Zabbix configuration
-5.2 Expressions for triggers
-5.3 Parameters
-5.4 Supported parameters by platform
-
-6. Chapter 6 (Upgrading)
-6.1 Zabbix 1.0alpha8
-6.2 Zabbix 1.0alpha9
-6.3 Zabbix 1.0alpha10
-
-7. Chapter 7 (Misc)
-7.1 pinger.pl
-7.2 PostgreSQL notes
+5. Miscellaneous
+5.1 pinger.pl
+5.2 PostgreSQL notes
 
 Appendix A (Examples of item configuration)
 Appendix B (Examples of trigger configuration)
 
-- Chapter 1 (Introduction)
+
+
+1 Introduction
 
 1.1 About the manual
 
@@ -64,101 +61,72 @@ http://zabbix.sourceforge.net
 
 1.2 Acknowledgements
 
-I want to thank guys from sourceforge.net for providing hosting for
+I want to thank the guys from sourceforge.net for providing hosting for
 the project. 
 
-I also want to thank all the Zabbix users who have sent corrections and suggestions. 
-This sort of feedback helps me make the software better.
+I also want to thank all the Zabbix users who have sent corrections and suggestions.  This sort of feedback helps me make the software better.
 
 1.3 What is Zabbix ?
 
 Zabbix was created by Alexei Vladishev, (alex@gobbo.caves.lv).
 
-Zabbix is software for monitoring various parameters of network and 
-servers. Polling and trapping are supported. All monitored parameters are stored 
-in Zabbix database.  It allows great reporting and data visualisation possibilities.
-Additionally, Zabbix is useful tool for monitoring integrity of servers to avoid break-in
-attempts.
-Stored data is useful source of information for capacity planning.
+Zabbix is software that monitors numerous parameters of a network and the servers on that network.  Zabbix is a useful tool for monitoring the health and integrity of servers.  A flexible notification mechanism allows users to configure e-mail based alerts for virtually any event, allowing fast reaction to server problems. 
 
-Flexible notification mechanism allows to configure e-mail based alerts
-for virtually any pre-defined events. The alarms help to prevent
-possible problems before they actually happen.
+All monitored parameters are stored in a database.  Zabbix offers excellent reporting and data visualisation features based on the stored data, making Zabbix useful for capacity planning.  
 
-Web-based frontend is used to provide fast and efficient way for Zabbix
-configuration and administration.
+Zabbix supports both polling and trapping. 
 
-Properly configured Zabbix can play most important role in monitoring of IT infrastructure
-for companies with even hundreds of servers to monitor. 
+All Zabbix reports and statistics, as well as configuration parameters, are accessed through a web-based frontend.   The web-based front end means that the health of your servers can be assessed from any location.  
 
-The Zabbix software is free for use. However, if support is an issue for you,
-that is an option as well. Please, contact alex@gobbo.caves.lv to get additional
-information on available support levels. 
+Properly configured, Zabbix can play an important role in monitoring IT infrastructure for companies with even hundreds of servers to monitor. 
+
+Zabbix is free of cost.  If support is an issue for you, several options are available as well.  Please, contact alex@gobbo.caves.lv to get additional information on available support levels. 
 
 The latest version of Zabbix can be found at http://zabbix.sourceforge.net.
 
 1.5 What does Zabbix offer ?
 
-The following are amongst the features that Zabbix offer:
+Zabbix offers:
 
- - Support for both polling and traping mechanism
- - agents for Linux (HP-UX, AIX, FreeBSD, OpenBSD are coming soon)
- - server side is running under Linux (other UNIX variants to be supported soon)
- - user authorisation
+ - support for both polling and trapping mechanisms
+ - agents (client software) for Linux (HP-UX, AIX, FreeBSD, OpenBSD are coming soon)
+ - server software for Linux (other UNIX variants to be supported soon)
+ - secure user authorisation
  - two user groups: "Administrators" and "Zabbix users"
- - WEB-based interface
- - E-mail notification in case of predefined events
+ - web-based interface for viewing and configuration
+ - flexible e-mail notification of predefined events
 
-2. Chapter 2 (Use of Zabbix)
+2. Use of Zabbix
 
 2.1 Performance monitoring
 
-One of most important use of Zabbix is performance monitoring. Processor load, number of running processes,
-number of processes, disk activity, status of swap space, memory availability  - that is only part
-of system parameters Zabbix is able to monitor. Zabbix provides a system (database, an application) administrator
-with latest information about performance of server being monitored.
+One of most important uses of Zabbix is performance monitoring.  Processor load, number of running processes, number of processes, disk activity, status of swap space, and memory availability are some of the numerous system parameters Zabbix is able to monitor. Zabbix provides a system administrator with timely information about performance of a server.  In addition, Zabbix can produce trend graphs to help identify bottlenecks in system performance. 
 
-Trends help identify bottlenecks in performance of the system. 
+2.2 Alerting users
 
-2.2 Alarming users
+Having performance monitoring is good, but it is almost useless without a powerful notification mechanism. With Zabbix, an administrator can define virtually any possible condition for a trigger, using flexible expressions.  Any time these expressions become true, an alert will be emailed to any addresses defined by the administrator.
 
-Having performance monitoring is good, but it is almost useless without powerfull notification mechanism. Using Zabbix, 
-you can define virtually any possible condition for a trigger. How ? Using flexible expressions !
-
-Look, how it works.
-
-Suppose, you wish to be notified when file /etc/passwd is changed by someone. You define
-trigger with expression {sourceforge.net:cksum[/etc/passwd].diff(0)}>0. This expression becomes
-true, when current value of checksum for /etc/passwd will be different with previously
-gotten checksum.
-Then, you define list of actions for the trigger. All you want is getting an Email about this event.
-So, you add action for this trigger. When the trigger expression becomes true, you will get Email notification.
+For example, suppose you wish to be notified when /etc/passwd is changed by someone. You define a trigger with expression {sourceforge.net:cksum[/etc/passwd].diff(0)}>0.  The "diff" function is true when the current value received by Zabbix is different than the previous value.  Therefore, this expression will be true whenever /etc/passwd is changed.   Next, you define one or more actions that will be performed when the trigger is true.  Add an action to email your account, you will get email notification anytime /etc/passwd is changed.
 
 2.3 Integrity checking
 
-Zabbix can easily be used for servers' integrity checking. All critical configuration files,
-binaries, kernel, scripts, web server HTML pages can be monitored by Zabbix to be alarmed in case of any modifications
-made on these files.
+Zabbix can easily be used for servers integrity monitoring.  All critical configuration files, binaries, kernel, scripts, and web server HTML pages can be monitored by Zabbix so that the administrator can be alerted to modifications made to these files.
 
 2.4 Logging services
 
-All values of monitored parameters Zabbix stores in database. The collected data can be used later for any purposes.
+All values of monitored parameters are stored in a database. The collected data can be used later for any purposes.
 
 2.5 Capacity planning
 
-Looking at trends of process load (disk usage,database activity, ...)  for period of several weeks (or monthes), 
-system administrator can clearly see when next hardware upgrade should be made.
+Viewing trends of process load, disk usage, database activity, or other important metrics allows a system administrator to clearly see when the next hardware upgrade should be made.
 
-3. Chapter 3 (Structure)
 
-Zabbix basically has client-server architecture. Zabbix server (zabbix_suckerd) periodically
-gets most recent information of parameters for monitored host. It connects to 
-an agent placed on the host, asks for specific information (for example, processor load). Agent
-provides server with requisted information and the server, in its turn, stores received
-value in the database.
 
-It is also possible to use trapping method. In tis case, monitored host sends information
-to Zabbix server.
+3. Overview
+
+Zabbix is structured in a client-server architecture. The Zabbix server (zabbix_suckerd) periodically connects to an agent placed on the monitored host, asks for specific information (processor load, free memory, available inodes, etc). The agent provides the server with the requested information and the server, in turn, stores the received values in the database.
+
+Zabbix also supports the use of a trapping method. In this case, the monitored host sends information to Zabbix server.
 
 3.1 zabbix_suckerd
 
@@ -170,20 +138,18 @@ zabbix_suckerd
 
 DESCRIPTION
 
-The process periodically connects to agents (either Zabbix native or SNMP) to get updated information on parameters being
-monitored.  Also, the process re-calculates status of triggers. It sends alerts to users
-if required.
+The zabbix_suckerd process periodically connects to agents (either Zabbix native or SNMP) to get the values of parameters being monitored.  After receiving the values, the process recalculates the status of Zabbix triggers.  Also, the process sends alerts to users if required.
 
-By default, zabbix_suckerd forks ten copies of itself. It means that Zabbix will be able to get ten monitored parameters
-simultaneously. Modify parameter SUCKER_FORKS in include/common.h if ten is not enough for you. 
+By default, zabbix_suckerd forks ten copies of itself.  This means that Zabbix will be able to get ten monitored parameters simultaneously.  To modify the number of forked processes, change the parameter SUCKER_FORKS in include/common.h. 
 
-One process zabbix_suckerd is used for housekeeping purposes only. It periodically (by default, hourly) deletes outdated information 
-from table history.
+One zabbix_suckerd process is used for housekeeping purposes only.  The housekeeping process periodically (hourly, by default) deletes outdated information from table history.
 
-No switches are supported by zabbix_suckerd.
+No command line switches are supported by zabbix_suckerd.
 
-The process is run as daemon under non-priveledged user account, usually zabbix. Syslog is used to store
-debug information for the process.
+The zabbix_suckerd process is run as a daemon under a non-priveledged user account, usually zabbix.  
+
+Syslog is used to store debug information for the process.
+
 
 3.2 zabbix_agent
 
@@ -195,16 +161,13 @@ zabbix_agent
 
 DESCRIPTION
 
-The process lives on host being monitored. zabbix_agent provides requested information to 
-zabbix_suckerd. zabbix_agent is made to be used with INETD daemon.
+The zabbix_agent process resides on the host being monitored.  Its purpose it to provide requested information to zabbix_suckerd.  The zabbix_agent process is designed to be used with INETD daemon.
 
-Execution time of the process is limited. If agent was not able to get information 
-during 3 seconds, it kills himself. 
+Execution time of the process is limited. If the agent is not able to get the requested information within 3 seconds, it kills itself. 
 
-When connection to zabbix_agent is made, the agent reads /etc/zabbix/zabbix_agent.conf file. This file should exist and contain
-IP address of Zabbix server. Connections from other IPs are rejected.
-
-If possible, use zabbix_agentd. The process does not require extra fork() and exec() calls for every connection.
+When a connection to zabbix_agent is made, the agent reads /etc/zabbix/zabbix_agent.conf in order to determine if the connection is coming from an authorized server.  The zabbix_agent.conf file must exist and contain the IP address of Zabbix server. Connections from other IPs are rejected. 
+ 
+If possible, use of zabbix_agentd (see below) instead of zabbix_agent is recommended.  The zabbix_agentd process does not require extra fork() and exec() calls for every connection.
 
 3.3 zabbix_agentd
 
@@ -216,22 +179,21 @@ zabbix_agentd
 
 DESCRIPTION
 
-The process runs on host being monitored. zabbix_agentd provides requested information to 
-zabbix_suckerd. 
+The zabbix_agentd process resides on the host being monitored. Its purpose is to provide request information to zabbix_suckerd.  This is the daemon version of the zabbix_agent process.  
 
-When executed, it forks himself. Load is balanced between each copy of the process (default is ten).
+When executed, the zabbix_agentd process forks himself (ten times by default).  Load is balanced between each copy of the process.
 
-When connection to zabbix_agentd is made, the agent reads /etc/zabbix/zabbix_agent.conf file. This file should exist and contain
-IP address of Zabbix server. Connections from other IPs are rejected.
+When a connection to zabbix_agent is made, the agent reads /etc/zabbix/zabbix_agent.conf in order to determine if the connection is coming from an authorized server.  The zabbix_agent.conf file must exist and contain the IP address of Zabbix server. Connections from other IPs are rejected.
 
-No switches are supported by zabbix_agentd.
+No command-line switches supported by zabbix_agentd.
 
-The process is run as daemon under non-priveledged user account, usually zabbix. Syslog is used to store
-debug information for the process.
+The process is run as daemon under non-priveledged user account, usually zabbix.  
+
+Syslog is used to store debug information for the process.
 
 3.4 zabbix_trapper
 
-The Zabbix server process.
+The Zabbix trapping server process.
 
 SYNOPSIS
 
@@ -239,15 +201,13 @@ zabbix_trapper
 
 DESCRIPTION
 
-The process is made to support traping. It constantly waits for connections from zabbix_sender
-agents.
+The process provides trapping support for Zabbix.  It constantly waits for connections from zabbix_sender agents.  It is designed to be used with inetd daemon.
 
-If possible, use zabbix_trapperd. The process does not require extra fork() and exec() calls for every connection. Additionally, it does
-not require daemon inetd.
+If possible, it is recommended that zabbix_trapperd is used to provide trapping support.   The zabbix_trapperd process does not require extra fork() and exec() calls for every connection. 
 
 3.5 zabbix_trapperd
 
-Zabbix server process (daemon).
+Zabbix trapping server process (daemon).
 
 SYNOPSIS
 
@@ -257,17 +217,17 @@ DESCRIPTION
 
 The process collects information passed by active agents (zabbix_sender).
 
-By default, zabbix_trapperd forks ten copies of itself.
-Modify parameter TRAPPERD_FORKS in include/common.h if ten is not enough for you. 
+By default, zabbix_trapperd forks ten copies of itself.  The parameter TRAPPERD_FORKS in include/common.h can be changed to modify the number of forked processes. 
 
-No switches are supported by zabbix_trapperd.
+No command-line switches are supported by zabbix_trapperd.
 
-The process is run as daemon under non-priveledged user account, usually zabbix. Syslog is used to store
-debug information for the process.
+The process is run as daemon under non-priveledged user account, usually zabbix.   
+
+Syslog is used to store debug information for the process.
 
 3.6 zabbix_sender
 
-The Zabbix agent (trapping).
+The Zabbix trapping agent.
 
 SYNOPSIS
 
@@ -286,285 +246,69 @@ EXAMPLE:
 
 zabbix_sender zabbix.abcde.com 10001 db.abcde.com:procload 2.34
 
-It means, that zabbix_sender will send information about processor load on host db.abcde.com
-to Zabbix server located at zabbix.acbde.com. Processor load is 2.34.
+In this example, zabbix_sender will send information about processor load on host db.abcde.com to Zabbix server located at zabbix.acbde.com.  The processor load is 2.34.
+
 
 3.7 Database
 
-Database used by Zabbix play most important role. The database is the only source
-of configuration parameters and it stores all history of monitored values.
+Database use plays a very important role in the Zabbix application.  The entire history of received parameter values is stored in the database.   In addition, the database is the sole source of configuration parameters for the application.
 
-Zabbix performance highly depends on efficiency and speed of used database.
+Zabbix performance depends highly on the efficiency and speed of the database used by Zabbix.
  
 3.8 WEB-based frontend
 
-The frontend provides convinient and platform independed way for accessing Zabbix.
-Information provided by the frontend can be either graphical (e.g. graph on disk space
-usage) or text format. Text representation of monitored parameters is made to allow
-easy way for export Zabbix data to other analytical tools.
+The frontend provides a convenient and platform-independent method for accessing Zabbix.  Information provided by the frontend can be either graphical or textual.  While graphical representations usually provide the easiest method to understand trends, the text representation of monitored parameters 
+is intended to provide an easy way to export Zabbix data to other analytical tools.
 
 3.8.1 Reports
 
-Zabbix reports represent collected information in structured way. All reports are produced
-in HTML format.
+Zabbix reports represent collected information in structured way. All reports are produced in HTML format.
 
-Note that report generation could be very time consuming operation. Additionally, if you
-use MySQL or ay other database with table locking, zabbix_suckerd and zabbix_trapper will
-wait until the report is finished.
+Report generation can be a very time consuming operation. Additionally, if you use MySQL or ay other database with table locking, zabbix_suckerd and zabbix_trapper will wait until the report is finished.
 
 3.8.1.1 Status of Zabbix
 
-This report gives general information about Zabbix server including:
+This report gives general information about the Zabbix server including:
 
- - number of records in most important tables
- - are main Zabbix processes running ?
- - other information
+ - whether the main Zabbix process is running?
+ - number of values stored in table history
+ - number of triggers
+ - number of parameters monitored
+ - number of users
+ - number of hosts 
+
 
 3.8.1.2 Availability report
 
-This report calculates amount of time a trigger spent in true and false states. 
+This report calculates amount of time a trigger has been in true and false states. 
 
-Suppose, you want to see this information for trigger "WEB server is down". You run this report and see
-that the trigger was 0.005% in true state and 99.995 percent of time in false state. It means that
-WEB server was unavailable 0.005 percent of time, and availability index is 0.005%. Pretty good !
+For example, suppose you want to know what percentage of the time your web server is down.  Assuming you have been monitoring the web server and have the "WEB server is down" trigger enabled, the availability report will display what percentage of the time the trigger was in the true state (web server down) and in the false state (web server running).  
 
-4. Chapter 4 (Installation)
 
-4.1 Requirements
 
-Zabbix server processes support the following platforms:
+4. Configuration
 
- - Linux 2.xx
- - Support for HP-UX, AIX, FreeBSD and OpenBSD is coming soon
 
-Zabbix agents are available for the following platforms:
+4.1 Expressions for triggers
 
- - Linux 2.xx
- - Support for HP-UX, AIX, FreeBSD and OpenBSD is coming soon
+The expressions used in triggers are very flexible.  You can use them to create complex logical tests regarding monitored statistics.
 
-Zabbix requires the following software to run properly:
-
- - Apache 1.3.12 or later
- - Database engine
-  - MySQL 3.22 or later
-  or
-  - PostgreSQL 7.0.2 or later
- - PHP 4.0 or later, compiled as Apache module with 
- 	- GD module (for PNG images)
-	- MySQL of PostgreSQL module
- - GNU make
- - WEB browser on client side (support for HTML and PNG images required). MS Explorer and Netscape work perfectly.
- - UCD-SNMP library and header files. Required for support of SNMP agents. Optional.
-
-However, Zabbix can work on previous versions of Apache, MySQL, PostgreSQL as well.
-
-Debian Potato and Debian Woody are development and testing platforms I currently use.
-
-I've tried to run Zabbix on PostgreSQL 6.5x with no luck. PostgreSQL crashes after
-one-tree minutes of zabbix_suckerd running. So, PostgreSQL version 7.0.2 or later is strongly
-recommended.
-
-
-Choosing between PostgreSQL and MySQL, I would go for MySQL + InnoDB. Why ? Several reasons exist:
-
-- my recent benchmarks clearly show that PostgreSQL (7.1.x) works at least 10 times slower than MySQL (3.23.29)
-- MySQL MyISAM table is not good choise because of lack of row locking. So, InnoDB is required
-- no need to constantly run "vacuum" command for MySQL
-
-Memory requirements:
-
-Zabbix requires both physical (suprise!) and disk memory. 32 Mb of physical 
-memory and 20 Mb of free disk memory could be good start point.
-However, amount of required disk memory strongly depends on used configuration 
-parameters. If you're planning to keep long history of monitored parameters, 
-you should think of even a couple of gigabytes to have enough space to store the history in 
-the database.
-
-Remember, the more physical memory you have, the faster database and Zabbix works !
-
-4.2 Installation procedure
-
-Basic installation of Zabbix usually takes no more than 15 minutes. However, to make
-process more enjoyable, I would suggest to make cup of tea (or coffee) for yourself.
-Ready ? Let us start ...
-
-4.2.1 Create the Zabbix superuser account: 
-
-This is the user the server will run on.  For production use you should create 
-a separate, unprivileged account ("zabbix" is commonly used).
-
-Running Zabbix as "root","bin", or any other account with special rights is a 
-security risk. Do not do it ! 
-
-
-4.2.2 Untar Zabbix sources:
-
-On Linux, use command tar -xvzf <zabbix.tar.gz>
-
-
-4.2.3 Create the Zabbix database:
-
-For MySQL:
-
-mysql -u<username> -p<password>
-> create database zabbix;
->quit;
-
-cd create/mysql
-cat schema.sql |mysql zabbix -u<username> -p<password>
-cd create/data
-cat data.sql |mysql zabbix -u<username> -p<password>
-
-For PostgreSQL:
-
-psql -U <username>
-> create database zabbix;
-> \q
-
-cd create/postgresql
-cat schema.sql|psql -U <username> zabbix
-cd create/data
-cat data.sql|psql -U <username> zabbix
-
-
-4.2.4 Configure include/db.h
-
-Change the following parameters:
-
-#define DB_NAME         "zabbix"
-#define DB_USER         "zabbix"
-#define DB_PASSWD       "password"
-
-4.2.5 Configure and compile the source code for your system.
-
-./configure --with-mysql  # for MySQL
- or
-./configure --with-pgsql  # for PostgreSQL
-make
-
-If you want to compile client binaries only, run:
-
-./configure
-make
-
-4.2.6 Copy created binaries from bin/ to /opt/zabbix/bin or any other directory. 
-
-4.2.7 Configure /etc/services
-
-Add the following lines to /etc/services:
-
-zabbix_agent    10000/tcp
-zabbix_trap     10001/tcp 
-
-4.2.8 Configure /etc/inetd.conf
-
-Add the following line to /etc/inetd.conf:
-
-zabbix_trap         stream  tcp     nowait.3600    zabbix /opt/zabbix/bin/zabbix_trapper
-
-If you plan to use zabbix_agent (zabbix_agentd does not require this!), the following line must be added:
-
-zabbix_agent        stream  tcp     nowait.3600    zabbix /opt/zabbix/bin/zabbix_agent
-
-
-4.2.9 Restart inetd
-
-killall -HUP inetd
-
-4.2.10 Configure WEB interface
-
-As zabbix:
-
-Change these values in frontends/php/include/db.inc:
-        $DB_TYPE        ="POSTGRESQL"; /* Or "MYSQL" for MySQL */
-        $DB_SERVER      ="localhost";
-        $DB_DATABASE    ="zabbix";
-        $DB_USER        ="";
-        $DB_PWD         =""
-
-mkdir /home/zabbix/html
-cp -R frontends/php/* /home/zabbix/html/
-
-4.2.11 Configure Apache
-
-By default, Apache does not recognize *.html files as PHP scripts. Add the following
-line to Apache configuration files to make Apache think that every *.html file
-is actually PHP script that should be interpreted:
-
-AddType application/x-httpd-php .html
-
-4.2.12 Configure /etc/zabbix/zabbix_agent.conf
-
-You need to configure this file for every host having zabbix_agent installed.
-The file should contain IP address of Zabbix server. Connections from other
-hosts will be denied.
-
-5. Chapter 5 (Administration)
-
-5.1 Zabbix configuration
-
- - Use WEB browser to configure Zabbix (http://localhost/~zabbix)
- - Click on "CONFIG"
-
-Enter "Admin" as login name and leave password field empty.
-
-Set up SMTP parameters. 
-
- - Click on "USERS"
-
-Add yourself to list of Zabbix users. Do not forget to select "Administrators" group.
-
-Delete default "Admin" user.
-
- - Set up available Medias for the user (Click on "Media")
-
- - Add host for monitoring
-
-Be sure that you've installed agent on the host. Otherwise, set status
-to "Not monitored". List of possible parameers for the host will be automatically added.
-
- - Configure ITEMS
-
- - Configure TRIGGERS
-
- - Run zabbix_suckerd
-
-/opt/zabbix/bin/zabbix_suckerd
-
- - Run zabbix_agentd
-
-You should not run zabbix_agentd this if you use zabbix_agent !
-
-Define actions for triggers you are interested in. Note, that you can always use
-macros in both email subject and email body. 
-For example, subject for warning message could look like:
-
-Processor load on www.sf.net is {www.sf.net:system[procload].last(0)}
-
-In this case, you will receive message with subject like "Processor load on www.sf.net is 0.85".
-
-- Create at least one Network Map
-
-The map will greately help you quickly identify where a problem is.
-
-5.2 Expressions for triggers
-
-The following operators supported for triggers:
+The following operators are supported for triggers:
 
 > - more than
 < - less than
 | - logical OR
 & - logical AND
 
-The following functions supported:
+The following functions are supported:
 
-last	- last value, parameter is ignored 
+last	- last (most recent) value, parameter is ignored 
 min	- MIN value for period of time, parameter - time in sec
 max	- MAX value for period of time, parameter - time in sec
 diff	- 1 - if last and previous values are different, 0 - otherwise
 prev	- previous value, parameter is ignored
 
-Simplest useful expression might look as:
+A simple useful expression might look like:
 
 {<server>:<key>.<function>(<parameter>)}<operator><const>
 
@@ -572,17 +316,8 @@ Example 1:
 
 {sourceforge.net:procload.last(0)}>5
 
-It means:
-
-sourceforge.net - server name
-procload	- key name
-
-sourceforge.net:procload gives short name of monitored parameter.
-
-last		- function name
-
-Basically the expression means, processor load of sourceforge.net is more than
-5. The trigger becomes true, when processor load exceeds 5. 
+'sourceforge.net:procload' gives a short name of monitored parameter.  It specifies that the server is 'sourceforge.net' and the key being monitored is
+'procload'.  By using the function 'last(),' we are specifying we are referring to the most recent value.  Finally, '>5' means that the trigger is true whenever the most recent procload measurement from sourceforge.net is greater than 5.
 
 Example 2:
 
@@ -590,8 +325,7 @@ More complex example:
 
 ({sourceforge.net:system[procload].last(0)}>5) | ({sourceforge.net:system[procload].min(600)}>2)
 
-The expression becomes true when either current processor load is more
-than 5 or it was more than 2 during last 10 minutes.
+The expression is true when either the current processor load is more than 5 or the processor load was more than 2 during last 10 minutes.
 
 Example 3:
 
@@ -599,13 +333,11 @@ Use of diff function.
 
 ({sourceforge.net:cksum[/etc/passwd].diff(0)})>0
 
-The expression becomes true when previous value of checksum of /etc/passwd
-differs from last one.
+The expression is true when the previous value of checksum of /etc/passwd differs from the most recent one.
 
-Similiar expressions could be useful to monitor changes in important files, such as
-/etc/passwd, /etc/inetd.conf, /kernel, etc.
+Similiar expressions could be useful to monitor changes in important files, such as /etc/passwd, /etc/inetd.conf, /kernel, etc.
 
-5.3 Parameters
+4.2 Parameters
 
 - memory[total]
 
@@ -645,8 +377,7 @@ Size of given file.
 
 - proc_cnt[*]
 
-Number of processes called "*" running. Standart set of supported processes is: apache,inetd,syslogd,sshd,zabbix_agentd,zabbix_suckerd,
-zabbix_trapperd.
+Number of processes called "*" running. Standard set of supported processes is: apache,inetd,syslogd,sshd,zabbix_agentd,zabbix_suckerd, zabbix_trapperd.
 
 - swap[free]
 
@@ -738,157 +469,87 @@ Check either IMAP server is running and accepting connections.
 Result: 0 - IMAP server is down
 	1 - IMAP server is running
 
-5.4 Supported parameters by platform
+4.3 Supported parameters by platform
 
-PARAMETER / SYSTEM		| Debian Woody | Debian Potato | FreeBSD 4.3 | Solaris 5.8 | HP-UX 11.00 |  AIX 4.3  |
-				|    (i386)    |      (i386)   |    (i386)   | (Ultra-60)  |  9000/800   | (PowerPC) |
+PARAMETER / SYSTEM          | Debian Woody | Debian Potato | FreeBSD 4.3 | Solaris 5.8 | HP-UX 11.00 |  AIX 4.3  |
+                            |    (i386)    |      (i386)   |    (i386)   | (Ultra-60)  |  9000/800   | (PowerPC) |
 ----------------------------------------------------------------------------------------------------------------------
-memory[total]			|	X      |	X      |      -      |      -      |      x      |     -     |
-memory[shared]			|	X      |	X      |      -      |      -      |      -      |     -     |
-memory[buffers]			|	X      |	X      |      -      |      -      |      -      |     -     |
-memory[cached]			|	X      |	X      |      -      |      -      |      -      |     -     |
-memory[free]			|	X      |	X      |      -      |      -      |      x      |     -     |
+memory[total]               |       X      |         X     |      -      |      -      |      x      |     -     |
+memory[shared]              |       X      |         X     |      -      |      -      |      -      |     -     |
+memory[buffers]             |       X      |         X     |      -      |      -      |      -      |     -     |
+memory[cached]              |       X      |         X     |      -      |      -      |      -      |     -     |
+memory[free]                |       X      |         X     |      -      |      -      |      x      |     -     |
 
-diskfree[/]			|	X      |	X      |      X      |      X      |      X      |     X     |
-diskfree[/opt]			|	X      |	X      |      X      |      X      |      X      |     X     |
-diskfree[/tmp]			|	X      |	X      |      X      |      X      |      X      |     X     |
-diskfree[/usr]			|	X      |	X      |      X      |      X      |      X      |     X     |
-diskfree[/home]			|	X      |	X      |      X      |      X      |      X      |     X     |
-diskfree[/var]			|	X      |	X      |      X      |      X      |      X      |     X     |
+diskfree[/]                 |       X      |        X      |      X      |      X      |      X      |     X     |
+diskfree[/opt]              |       X      |        X      |      X      |      X      |      X      |     X     |
+diskfree[/tmp]              |       X      |        X      |      X      |      X      |      X      |     X     |
+diskfree[/usr]              |       X      |        X      |      X      |      X      |      X      |     X     |
+diskfree[/home]             |       X      |        X      |      X      |      X      |      X      |     X     |
+diskfree[/var]              |       X      |        X      |      X      |      X      |      X      |     X     |
 
-inodefree[/]			|	X      |	X      |      X      |      X      |      X      |     X     |
-inodefree[/opt]			|	X      |	X      |      X      |      X      |      X      |     X     |
-inodefree[/tmp]			|	X      |	X      |      X      |      X      |      X      |     X     |
-inodefree[/usr]			|	X      |	X      |      X      |      X      |      X      |     X     |
-inodefree[/home]		|	X      |	X      |      X      |      X      |      X      |     X     |
-inodefree[/var]			|	X      |	X      |      X      |      X      |      X      |     X     |
+inodefree[/]                |       X      |        X      |      X      |      X      |      X      |     X     |
+inodefree[/opt]             |       X      |        X      |      X      |      X      |      X      |     X     |
+inodefree[/tmp]             |       X      |        X      |      X      |      X      |      X      |     X     |
+inodefree[/usr]             |       X      |        X      |      X      |      X      |      X      |     X     |
+inodefree[/home]            |       X      |        X      |      X      |      X      |      X      |     X     |
+inodefree[/var]             |       X      |        X      |      X      |      X      |      X      |     X     |
 
-cksum[/etc/inetd_conf]		|	X      |	X      |      X      |      X      |      X      |     X     |
-cksum[/etc/services]		|	X      |	X      |      X      |      X      |      X      |     X     |
-cksum[/vmlinuz]			|	X      |	X      |      X      |      X      |      X      |     X     |
-cksum[/etc/passwd]		|	X      |	X      |      X      |      X      |      X      |     X     |
-cksum[/usr/sbin/sshd]		|	X      |	X      |      X      |      X      |      X      |     X     |
-cksum[/usr/bin/ssh]		|	X      |	X      |      X      |      X      |      X      |     X     |
-      	
-filesize[/var/log/syslog]	|	X      |	X      |      x      |      X      |      x      |     x     |
+cksum[/etc/inetd_conf]      |       X      |        X      |      X      |      X      |      X      |     X     |
+cksum[/etc/services]        |       X      |        X      |      X      |      X      |      X      |     X     |
+cksum[/vmlinuz]             |       X      |        X      |      X      |      X      |      X      |     X     |
+cksum[/etc/passwd]          |       X      |        X      |      X      |      X      |      X      |     X     |
+cksum[/usr/sbin/sshd]       |       X      |        X      |      X      |      X      |      X      |     X     |
+cksum[/usr/bin/ssh]         |       X      |        X      |      X      |      X      |      X      |     X     |
+      
+filesize[/var/log/syslog]   |       X      |        X      |      x      |      X      |      x      |     x     |
 
-swap[free]			|	X      |	X      |      -      |      -      |      -      |     -     |
-swap[total]			|	X      |	X      |      -      |      -      |      -      |     -     |
+swap[free]                  |       X      |        X      |      -      |      -      |      -      |     -     |
+swap[total]                 |       X      |        X      |      -      |      -      |      -      |     -     |
 
-swap[in]			|	X      |	X      |      -      |      -      |      -      |     -     |
-swap[out]			|	X      |	X      |      -      |      -      |      -      |     -     |
+swap[in]                    |       X      |        X      |      -      |      -      |      -      |     -     |
+swap[out]                   |       X      |        X      |      -      |      -      |      -      |     -     |
 
-system[interrupts]		|	X      |	X      |      -      |      -      |      -      |     -     |
-system[switches]		|	X      |	X      |      -      |      -      |      -      |     -     |
+system[interrupts]          |       X      |        X      |      -      |      -      |      -      |     -     |
+system[switches]            |       X      |        X      |      -      |      -      |      -      |     -     |
 
-io[disk_io]			|	X      |	X      |      -      |      -      |      -      |     -     |
-io[disk_rio]			|	X      |	X      |      -      |      -      |      -      |     -     |
-io[disk_wio]			|	X      |	X      |      -      |      -      |      -      |     -     |
-io[disk_rblk]			|	X      |	X      |      -      |      -      |      -      |     -     |
-io[disk_wblk]			|	X      |	X      |      -      |      -      |      -      |     -     |
+io[disk_io]                 |       X      |        X      |      -      |      -      |      -      |     -     |
+io[disk_rio]                |       X      |        X      |      -      |      -      |      -      |     -     |
+io[disk_wio]                |       X      |        X      |      -      |      -      |      -      |     -     |
+io[disk_rblk]               |       X      |        X      |      -      |      -      |      -      |     -     |
+io[disk_wblk]               |       X      |        X      |      -      |      -      |      -      |     -     |
 
-system[procload]		|	X      |	X      |      X      |      X      |      X      |     -     |
-system[procload5]		|	X      |	X      |      X      |      X      |      X      |     -     |
-system[procload15]		|	X      |	X      |      X      |      X      |      X      |     -     |
-system[proccount]		|	X      |	X      |      -      |      -      |      -      |     -     |
-system[procrunning]		|	X      |	X      |      -      |      -      |      -      |     -     |
-system[uptime]			|	X      |	X      |      -      |      -      |      -      |     -     |
-system[users]			|	X      |	X      |      X      |      X      |      X      |     X     |
+system[procload]            |       X      |        X      |      X      |      X      |      X      |     -     |
+system[procload5]           |       X      |        X      |      X      |      X      |      X      |     -     |
+system[procload15]          |       X      |        X      |      X      |      X      |      X      |     -     |
+system[proccount]           |       X      |        X      |      -      |      -      |      -      |     -     |
+system[procrunning]         |       X      |        X      |      -      |      -      |      -      |     -     |
+system[uptime]              |       X      |        X      |      -      |      -      |      -      |     -     |
+system[users]               |       X      |        X      |      X      |      X      |      X      |     X     |
 
-ping				|	X      |	X      |      X      |      X      |      X      |     X     |
-tcp_count			|	X      |	X      |      X      |      -      |      -      |     X     |
+ping                        |       X      |        X      |      X      |      X      |      X      |     X     |
+tcp_count                   |       X      |        X      |      X      |      -      |      -      |     X     |
 
-net[listen_23]			|	X      |	X      |      -      |      -      |      -      |     -     |
-net[listen_80]			|	X      |	X      |      -      |      -      |      -      |     -     |
+net[listen_23]              |       X      |        X      |      -      |      -      |      -      |     -     |
+net[listen_80]              |       X      |        X      |      -      |      -      |      -      |     -     |
+net[listen_110]             |       X      |        X      |      -      |      -      |      -      |     -     |
+net[listen_143]             |       X      |        X      |      -      |      -      |      -      |     -     |
 
-service_check[ftp]		|	X      |	X      |      ?      |      ?      |      ?      |     ?     |
-service_check[ssh]		|	X      |	X      |      ?      |      ?      |      ?      |     ?     |
-service_check[smtp]		|	X      |	X      |      ?      |      ?      |      ?      |     ?     |
-service_check[pop]		|	X      |	X      |      ?      |      ?      |      ?      |     ?     |
-service_check[nntp]		|	X      |	X      |      ?      |      ?      |      ?      |     ?     |
-service_check[imap]		|	X      |	X      |      ?      |      ?      |      ?      |     ?     |
+service_check[ftp]          |       X      |        X      |      ?      |      ?      |      ?      |     ?     |
+service_check[ssh]          |       X      |        X      |      ?      |      ?      |      ?      |     ?     |
+service_check[smtp]         |       X      |        X      |      ?      |      ?      |      ?      |     ?     |
+service_check[pop]          |       X      |        X      |      ?      |      ?      |      ?      |     ?     |
+service_check[nntp]         |       X      |        X      |      ?      |      ?      |      ?      |     ?     |
+service_check[imap]         |       X      |        X      |      ?      |      ?      |      ?      |     ?     |
 
-proc_cnt[apache]		|	X      |	X      |      -      |      -      |      -      |     -     |
+proc_cnt[apache]            |       X      |        X      |      -      |      -      |      -      |     -     |
 
-6. Chapter 6 (Upgrading)
 
-Upgrade procedure is quite simple. New binaries and frontend
-should be installed according to latest installation instructions.
 
-In order to update database structure, the following steps
-should be performed. Note that before applying database patches,
-all Zabbix processes must be stopped. Also, the process can take
-from 0 seconds (if no patches required) up to several hours. 
+5. Miscellaneous 
 
-For production installations database backup is required !
+5.1 pinger.pl
 
-Step 1. cd upgrades/dbpatches/
-Step 2. In case, if you need to upgrade existing 1.0alpha3 version to 1.0alpha4 version. 
-	cd 1.0alpha3_to_1.0alpha4/
-	(If you jump throw several Zabbix versions, for example, from 1.0alpha1 to 1.0.alpha5, all patches between 1.0alpha1 and 1.0alpha5 must be applied)
-Step 3. Depending on your database engine:
-
-	cd mysql
-	cat patch.sql |mysql zabbix -u<username> -p<password>
-
-	or
-
-	cd postgresql
-	cat patch.sql|psql -U <username> zabbix
-
-Step 4. Read version-specific notes in this chapter.
-
-That is all. Zabbix database is ready. Start Zabbix server processes using usual procedure. 
-
-6.1 Zabbix 1.0alpha8
-
- - Note that zabbix_sucker renamed to zabbix_suckerd
-
- - Replace zabbix_agent with zabbix_agentd
-
-zabbix_agentd runs much faster than 'old' zabbix_agent. Moreover, if
-you do not run inetd, zabbix_agentd is the only choice :)
-
- - PostgreSQL notes.
-
-PostgreSQL does not support modifying of structure of table field.
-Thus, please, change definition of the following fields (MySQL code):
-
-alter table users modify passwd char(32) default '' not null;
-alter table actions modify message text default '' not null;
-alter table alerts modify message text default '' not null;
-
- - Try to use IP address in host definition
-
-This unloads DNS and makes zabbix_suckerd faster.
-
-6.2 Zabbix 1.0alpha9
-
-Do not forget to apply DB patches.
-
-6.3 Zabbix 1.0alpha10
-
-Do not forget to apply DB patches.
-
-Note that parameters net[listen_*] will be replaced by check_service[*] (for example, net[listen_25] -> check_service[smtp]).
-
-6.4 Zabbix 1.0alpha11
-
-Do not forget to apply DB patches.
-
-PostgreSQL users:
-
-Please, delete column triggers.lastcheck manually by reloading whole table.
-Unfortunately, PostgreSQL does not support "alter table triggers drop lastcheck".
-
-New set of parameters appeared in this release: proc_cnt[*]
-
-7. Chapter 7 (Misc)
-
-7.1 pinger.pl
-
-The script is used to periodically sind ICMP pings to list of servers. In case, if it does
-not receive responce from host, it executes:
+The script is used to periodically sind ICMP pings to list of servers. In case, if it does not receive responce from host, it executes:
 
 zabbix_sender <server> <port> <host>:alive 0
 
@@ -896,23 +557,24 @@ otherwise:
 
 zabbix_sender <server> <port> <host>:alive 1
 
-The script is usually called from cron. Configure the script before use. Change location for "hosts"
-file. You must have fping installed to successfully run the script.
+The script is usually called from cron. Configure the script before use.  Change location for "hosts" file.  You must have fping installed to successfully run the script.
 
-7.2 PostgreSQL notes
+5.2 PostgreSQL notes
 
-Performance of PostgreSQL can be significantly improved by executing
-VACUUM command on Zabbix database.
+Performance of PostgreSQL can be significantly improved by executing the VACUUM command on the Zabbix database.
 
-I would suggest execute VACUUM, at least, after the following events:
+I would suggest execution of VACUUM at least after the following events:
 
  - Zabbix is installed
  - 10000 records in table "history"
  - patches applied on Zabbix database
 
-For heavy loaded Zabbix servers, hourly execution of "VACUUM ANALYZE" for all tables except "history"
-is strongly recommended !
+For heavily loaded Zabbix servers, hourly execution of "VACUUM ANALYZE" for all tables except "history" is strongly recommended!  You can use the command 'echo "vacuum verbose analyze"|psql zabbix'.
 
-Command:
 
-echo "vacuum verbose analyze"|psql zabbix
+
+Appendix A
+Coming Soon
+
+Appendix B
+Coming Soon
