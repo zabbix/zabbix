@@ -46,8 +46,8 @@
 	{
 		if($_POST["register"]=="add image")
 		{
-			$result=add_image($_POST["imageid"]);
-			show_messages($result, S_IMAGE_DELETED, S_CANNOT_DELETE_IMAGE);
+			$result=add_image($_POST["name"],$_POST["imagetype"],$_FILES);
+			show_messages($result, S_IMAGE_ADDED, S_CANNOT_ADD_IMAGE);
 			if($result)
 			{
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Image deleted");
@@ -211,6 +211,7 @@
 			$row=DBfetch($result);
 			$name=$row["name"];
 			$imagetype=$row["imagetype"];
+			$imageid=$row["imageid"];
 		}
 
 		$col=0;
@@ -222,6 +223,10 @@
 		echo "<form enctype=\"multipart/form-data\" method=\"post\" action=\"config.php\">";
 		echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"".(1024*1024)."\">";
 		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"3\" size=8>";
+		if(isset($imageid))
+		{
+			echo "<input class=\"biginput\" name=\"imageid\" type=\"hidden\" value=\"$imageid\" size=8>";
+		}
 		echo nbsp(S_NAME);
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"name\" value=\"".$name."\" size=64>";
@@ -245,7 +250,7 @@
 		show_table2_v_delimiter($col++);
 		echo S_UPLOAD;
 		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"file\" type=\"file\">";
+		echo "<input class=\"biginput\" name=\"image\" type=\"file\">";
 
 		show_table2_v_delimiter2();
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add image\">";
