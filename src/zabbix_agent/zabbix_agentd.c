@@ -36,6 +36,7 @@
 
 #include "log.h"
 #include "cfg.h"
+#include "stats.h"
 
 #define	LISTENQ 1024
 
@@ -397,93 +398,6 @@ void	child_main(int i,int listenfd, int addrlen)
 			process_child(connfd);
 		}
 		close(connfd);
-	}
-}
-
-void	collect_stat()
-{
-	#define INTERFACE struct interface_type
-	INTERFACE
-	{
-		char    *interface;
-		int	sent_total;
-		int	sent_load1;
-		int	sent_load5;
-		int	sent_load15;
-		int	received_total;
-		int	received_load1;
-		int	received_load5;
-		int	received_load15;
-	};
-
-	FILE	*file,*fileout;
-	char	*s;
-	char	line[MAX_STRING_LEN+1];
-	int	i,j;
-	int	i1,j1;
-	char	a[MAX_STRING_LEN+1];
-	char	b[MAX_STRING_LEN+1];
-	char	interface[MAX_STRING_LEN+1];
-	char	*token;
-
-	INTERFACE interfaces[128]=
-        {
-			{0}
-	};
-
-	file=fopen("/proc/net/dev","r");
-	if(NULL == file)
-	{
-		fprintf(stderr, "Cannot open config file [%s] [%m]\n","/proc/net/dev");
-		return;
-	}
-	fileout=fopen("/tmp/zabbix_agentd.tmp","w");
-
-	i=0;
-	while(fgets(line,MAX_STRING_LEN,file) != NULL)
-	{
-		if( (s=strstr(line,":")) == NULL)
-			continue;
-		strncpy(interface,line,s-line);
-		interface[s-line]=0;
-		j1=0;
-		for(i1=0;i1<strlen(interface);i1++)
-		{
-			if(interface[i1]!=' ')
-			{
-				interface[j1++]=interface[i1];
-			}
-		}
-		interface[j1]=0;
-		s=strtok(line,":");
-		j=0;
-		while(s)
-		{
-			s = strtok(NULL," ");
-			if(j==0)
-			{
-				printf("Received [%s]\n",s);
-				fprintf(fileout,"netloadin1[%s] %s\n", interface, s);
-			}
-			else if(j==8)
-			{
-				printf("Sent [%s]\n",s);
-				fprintf(fileout,"netloadout1[%s] %s\n", interface, s);
-			}
-			j++;
-		}
-		i++;
-	}
-	fclose(file);
-	fclose(fileout);
-}
-
-void	collect_statistics()
-{
-	for(;;)
-	{
-		collect_stat();
-		sleep(1);
 	}
 }
 

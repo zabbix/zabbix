@@ -1,5 +1,5 @@
-#ifndef MON_SYSINFO_H
-#define MON_SYSINFO_H
+#ifndef ZABBIX_SYSINFO_H
+#define ZABBIX_SYSINFO_H
 
 /* #define TEST_PARAMETERS */
  
