@@ -3669,7 +3669,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<tr>";
 		cr();
 //		echo "<td colspan=2 bgcolor=\"99AABB\" align=right valign=\"top\">";
-		echo "<td class=\"form_row_last\" colspan=2>";
+		echo "<td class=\"form_row_last\" colspan=2 align=right>";
 		cr();
 //		echo "<font size=-1>";
 		cr();
