@@ -12,26 +12,51 @@ body
         line-height:16px;
 }
 
-td.form_row_control
+td.form_row_l
 {
 	color: #000000;
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:10px;
-#	background-color: #CCCCCC;
-	border-color: #000000;
-	border-width:0px;
-	border-bottom-style: dotted;
+	font-weight: bold;
+	border-color: #888888;
+	border-width:1px;
+	border-left-style: solid;
 }
 
-td.form_row
+td.form_row_r
+{
+	color: #000000;
+        font-family:verdana, arial, helvetica, sans-serif;
+        font-size:10px;
+	border-color: #888888;
+	border-width:1px;
+	border-right-style: solid;
+}
+
+td.form_row_first
 {
 	color: #FFFFFF;
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:10px;
 #	background-color: #8dA8Cd;
 	background-color: #6d88ad;
-	border-color: #000000;
-	border-width:0px;
+	border-color: #888888;
+	border-width:1px;
+	border-top-style: solid;
+	border-left-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+}
+
+td.form_row_last
+{
+	color: #FFFFFF;
+        font-family:verdana, arial, helvetica, sans-serif;
+        font-size:10px;
+#	background-color: #8dA8Cd;
+	background-color: #6d88ad;
+	border-color: #888888;
+	border-width:1px;
 	border-top-style: solid;
 	border-left-style: solid;
 	border-right-style: solid;

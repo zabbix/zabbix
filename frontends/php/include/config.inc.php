@@ -3583,7 +3583,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "</td>";
 		cr();
 //		echo "<td colspan=1 bgcolor=CCCCCC align=left valign=\"top\">";
-		echo "<td class=\"form_row_control\" height=24>";
+		echo "<td class=\"form_row_r\" height=24>";
 		cr();
 //		echo "	<font size=-1>";
 		cr();
@@ -3633,7 +3633,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		else			{ echo "<TR BGCOLOR=#CCCCCC>"; }
 		cr();
 //		echo "<td colspan=1 bgcolor=CCCCCC align=left valign=\"top\">";
-		echo "<td class=\"form_row_control\" height=24>";
+		echo "<td class=\"form_row_l\" height=24>";
 		cr();
 //		echo "<font size=-1>";
 		cr();
@@ -3669,7 +3669,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<tr>";
 		cr();
 //		echo "<td colspan=2 bgcolor=\"99AABB\" align=right valign=\"top\">";
-		echo "<td colspan=2 bgcolor=\"6d88ad\" align=right valign=\"top\">";
+		echo "<td class=\"form_row_last\" colspan=2>";
 		cr();
 //		echo "<font size=-1>";
 		cr();
@@ -3683,7 +3683,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	<p align=center>
 	<table class="form" width="50%" cellspacing=0 cellpadding=1>
 	<tr>
-	<td class="form_row" height=24 colspan=2>
+	<td class="form_row_first" height=24 colspan=2>
 <?php
 /*		echo "<table border=0 align=center cellspacing=0 cellpadding=0 width=50% bgcolor=000000>";
 		cr();
