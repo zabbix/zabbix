@@ -243,7 +243,7 @@ int	check_security(int sockfd)
 	int	i;
 	char	*s;
 
-	char	*tmp;
+	char	tmp[MAX_STRING_LEN+1];
 
 	i=sizeof(name);
 
@@ -255,7 +255,7 @@ int	check_security(int sockfd)
 
 		zabbix_log( LOG_LEVEL_DEBUG, "Connection from [%s]. Allowed servers [%s] ",sname, CONFIG_HOSTS_ALLOWED);
 
-		tmp=strdup(CONFIG_HOSTS_ALLOWED);
+		strncpy(tmp,CONFIG_HOSTS_ALLOWED,MAX_STRING_LEN);
         	s=(char *)strtok(tmp,",");
 		while(s!=NULL)
 		{
@@ -279,9 +279,8 @@ int	check_security(int sockfd)
 void	process_child(int sockfd)
 {
 	ssize_t	nread;
-	char	line[1024];
-	char	result[1024];
-	char	*res;
+	char	line[MAX_STRING_LEN+1];
+	char	result[MAX_STRING_LEN+1];
 
         static struct  sigaction phan;
 
@@ -293,7 +292,7 @@ void	process_child(int sockfd)
 	alarm(CONFIG_TIMEOUT);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Before read()");
-	if( (nread = read(sockfd, line, 1024)) < 0)
+	if( (nread = read(sockfd, line, MAX_STRING_LEN)) < 0)
 	{
 		if(errno == EINTR)
 		{
@@ -313,13 +312,8 @@ void	process_child(int sockfd)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Got line:%s", line);
 
-	res=process(line);
+	process(line,result);
 
-	sprintf(result,"%s",res);
-	if(res!=NULL)
-	{	
-		free(res);
-	}
 	zabbix_log( LOG_LEVEL_DEBUG, "Sending back:%s", result);
 	write(sockfd,result,strlen(result));
 
@@ -376,9 +370,10 @@ void	child_main(int i,int listenfd, int addrlen)
 {
 	int	connfd;
 	socklen_t	clilen;
-	struct sockaddr *cliaddr;
+//	struct sockaddr *cliaddr;
+	struct sockaddr cliaddr;
 
-	cliaddr=malloc(addrlen);
+//	cliaddr=malloc(addrlen);
 
 	zabbix_log( LOG_LEVEL_WARNING, "zabbix_agentd %ld started",(long)getpid());
 
@@ -388,7 +383,8 @@ void	child_main(int i,int listenfd, int addrlen)
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("waiting for connection. Requests [%d]", stats_request++);
 #endif
-		connfd=accept(listenfd,cliaddr, &clilen);
+//		connfd=accept(listenfd,cliaddr, &clilen);
+		connfd=accept(listenfd,&cliaddr, &clilen);
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("processing request");
 #endif

@@ -183,21 +183,20 @@ void	test_parameters(void)
 {
 	int	i;
 
-	char	*c;
+	char	c[MAX_STRING_LEN+1];
 
 	i=0;
 	while(0 != commands[i].key)
 	{
-		c=process(commands[i].key);
+		process(commands[i].key,c);
 		printf("Key: [%s]\tResult: [%s]\n",commands[i].key,c);
 		fflush(stdout);
-		free(c);
 		i++;
 	}
 }
 
 /* This messy function must be rewritten! */
-char	*process(char *command)
+void	process(char *command,char *value)
 {
 	char	*p;
 	double	result=0;
@@ -209,7 +208,7 @@ char	*process(char *command)
 	char	key[MAX_STRING_LEN+1];
 	char	param[1024];
 	char	cmd[1024];
-	char	*res,*res2;
+	char	*res2;
 	int	ret_str=0;
 
 	for( p=command+strlen(command)-1; p>command && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
@@ -299,30 +298,31 @@ char	*process(char *command)
 		}
 	}
 
-	res=(char *)malloc(MAX_STRING_LEN+1);
-	if(res == NULL)
-	{
+//	if(res == NULL)
+//	{
 /* Not exactly ... */
-		result=NOTSUPPORTED;
-	}
+//		result=NOTSUPPORTED;
+//	}
 
 	if(ret_str==0)
 	{
-		sprintf(res,"%f",result);
+		sprintf(value,"%f",result);
 	}
 	else
 	{
 		if(result==NOTSUPPORTED)
 		{
-			sprintf(res,"%f",result);
+			sprintf(value,"%f",result);
 		}
 		else
 		{
-			sprintf(res,"%s",res2);
+			sprintf(value,"%s",res2);
+			if(res2!=NULL)
+			{
+				free(res2);
+			}
 		}
 	}
-
-	return	res;
 }
 
 /* Code for cksum is based on code from cksum.c */
@@ -1226,7 +1226,7 @@ float	DISK_WBLK(void)
 
 char	*VERSION(void)
 {
-	static	char	*version="1.0beta3\n";
+	static	char	version[]="1.0beta3\n";
 
 	return	version;
 }
