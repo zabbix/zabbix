@@ -589,12 +589,12 @@ crc_buf2(p, clen, cval)
 	return (0);
 }
 
-/* Solaris. The code is stolen from www.deja.com */
+/* Solaris. */
 #ifndef HAVE_SYSINFO_FREESWAP
 #ifdef HAVE_SYS_SWAP_SWAPTABLE
 void get_swapinfo(int *total, int *fr)
 {
-	register int cnt, i;
+	register int cnt, i, page_size;
 	register int t, f;
 	struct swaptable *swt;
 	struct swapent *ste;
@@ -643,9 +643,11 @@ point them all to the same buffer */
 		ste++;
 	}
 
+	page_size=getpagesize();
+
 	/* fill in the results */
-	*total = t;
-	*fr = f;
+	*total = page_size*t;
+	*fr = page_size*f;
 	free(swt);
 }
 #endif
