@@ -33,10 +33,10 @@ Changes for 1.0beta8:
  - WIN32 agent. Support for new client-server protocol (Victor)
  - WIN32 agent. Added proc_info[] parameter (Victor)
  - WIN32 agent. Added memory[cached] parameter (supported only on Windows XP) (Victor)
- - WIN32 agent. Added logging to system Event Log (Vicotr)
- - WIN32 agent. PDH-related error messages are now more specific (Vicotr)
+ - WIN32 agent. Added logging to system Event Log (Victor)
+ - WIN32 agent. PDH-related error messages are now more specific (Victor)
  - WIN32 agent. Listener thread now will not exit on any accept() error
-   (Vicotr)
+   (Victor)
  - WIN32 agent. Added some parameters for agent statistics monitoring: number 
  of accepted and rejected connections, processing errors, etc. (Victor)
  - WIN32 agent. Fixed bug in calculation of md5_hash[] and cksum[] parameters for
