@@ -557,7 +557,7 @@ void	update_services(int triggerid)
 /*
  * Re-calculate values of triggers
  */ 
-void	update_triggers( int flag, int sucker_num, int lastclock )
+void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 {
 	char c[1024];
 	char exp[8192];
@@ -570,7 +570,7 @@ void	update_triggers( int flag, int sucker_num, int lastclock )
 
 	if(flag == 0)
 	{
-		sprintf(c,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and i.lastclock<=%d and t.istrue!=2 and f.triggerid=t.triggerid and f.itemid%%%d=%d group by t.triggerid,t.expression,t.istrue,t.dep_level",lastclock,SUCKER_FORKS-1,sucker_num-1);
+		sprintf(c,"select t.triggerid,t.expression,t.istrue,t.dep_level from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and i.lastclock<=%d and t.istrue!=2 and f.triggerid=t.triggerid and f.itemid%%%d=%d group by t.triggerid,t.expression,t.istrue,t.dep_level",lastclock,suckers-1,sucker_num-1);
 	}
 	else
 	{
@@ -734,7 +734,7 @@ int	process_data(char *server,char *key, double value)
 
 	process_new_value(&item,value);
 
-	update_triggers( 1, item.itemid, 0 );
+	update_triggers(0, 1, item.itemid, 0 );
  
 	DBfree_result(result);
 
