@@ -283,11 +283,11 @@ void	process_child(int sockfd)
 	zabbix_log( LOG_LEVEL_DEBUG, "Got line:%s", line);
 	if( SUCCEED == process(sockfd,line) )
 	{
-		sprintf(result,"OK\n");
+		snprintf(result,sizeof(result)-1,"OK\n");
 	}
 	else
 	{
-		sprintf(result,"NOT OK\n");
+		snprintf(result,sizeof(result)-1,"NOT OK\n");
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "Sending back [%s]", result);
 	zabbix_log( LOG_LEVEL_DEBUG, "Length [%d]", strlen(result));

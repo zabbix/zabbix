@@ -551,7 +551,7 @@ int	evaluate(int *result,char *exp)
 
 		for(i=l+3;i<=r;i++) exp[i]=' ';
 
-		sprintf(res,exp,value);
+		snprintf(res,sizeof(res)-1,exp,value);
 		strcpy(exp,res);
 		delete_spaces(res);
 		zabbix_log(LOG_LEVEL_DEBUG, "Expression4:[%s]", res );
@@ -590,7 +590,7 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 
 		if( (s = strstr(str,"{HOSTNAME}")) != NULL )
 		{
-			sprintf(sql,"select distinct t.description,h.host from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid", trigger->triggerid);
+			snprintf(sql,sizeof(sql)-1,"select distinct t.description,h.host from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid", trigger->triggerid);
 			result = DBselect(sql);
 
 			if(DBnum_rows(result) == 0)
@@ -617,7 +617,7 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 		{
 			now=time(NULL);
 			tm=localtime(&now);
-			sprintf(tmp,"%.4d.%.2d.%.2d",tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday);
+			snprintf(tmp,sizeof(tmp)-1,"%.4d.%.2d.%.2d",tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday);
 
 			s[0]=0;
 			strcpy(exp, str);
@@ -630,7 +630,7 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 		{
 			now=time(NULL);
 			tm=localtime(&now);
-			sprintf(tmp,"%.2d:%.2d:%.2d",tm->tm_hour,tm->tm_min,tm->tm_sec);
+			snprintf(tmp,sizeof(tmp)-1,"%.2d:%.2d:%.2d",tm->tm_hour,tm->tm_min,tm->tm_sec);
 
 			s[0]=0;
 			strcpy(exp, str);
@@ -752,7 +752,7 @@ int	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 
 		zabbix_log( LOG_LEVEL_DEBUG, "Value5 [%s]", exp );
 
-		sprintf(res,exp,value);
+		snprintf(res,sizeof(res)-1,exp,value);
 		strcpy(exp,res);
 /*		delete_spaces(exp); */
 		zabbix_log( LOG_LEVEL_DEBUG, "Expression4:[%s]", exp );
@@ -819,7 +819,7 @@ int	substitute_functions(char *exp)
 
 		zabbix_log( LOG_LEVEL_DEBUG, "Expression3:[%s]", exp );
 
-		sprintf(res,exp,value);
+		snprintf(res,sizeof(res)-1,exp,value);
 		strcpy(exp,res);
 		delete_spaces(exp);
 		zabbix_log( LOG_LEVEL_DEBUG, "Expression4:[%s]", exp );

@@ -108,7 +108,7 @@ void zabbix_log(int level, const char *fmt, ...)
 	{
 		t=time(NULL);
 		tm=localtime(&t);
-		sprintf(str2,"%.6d:%.4d%.2d%.2d:%.2d%.2d%.2d ",(int)getpid(),tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday,tm->tm_hour,tm->tm_min,tm->tm_sec);
+		snprintf(str2,sizeof(str2)-1,"%.6d:%.4d%.2d%.2d:%.2d%.2d%.2d ",(int)getpid(),tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday,tm->tm_hour,tm->tm_min,tm->tm_sec);
 
 		va_start(ap,fmt);
 		vsnprintf(str,MAX_STRING_LEN,fmt,ap);

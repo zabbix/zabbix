@@ -61,7 +61,7 @@ int	evaluate_COUNT(char *value,DB_ITEM	*item,int parameter)
 
 	now=time(NULL);
 
-	sprintf(sql,"select count(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+	snprintf(sql,sizeof(sql)-1,"select count(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
 
 	result = DBselect(sql);
 	if(DBnum_rows(result) == 0)
@@ -96,7 +96,7 @@ int	evaluate_SUM(char *value,DB_ITEM	*item,int parameter)
 
 	now=time(NULL);
 
-	sprintf(sql,"select sum(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+	snprintf(sql,sizeof(sql)-1,"select sum(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
 
 	result = DBselect(sql);
 	if(DBnum_rows(result) == 0)
@@ -131,7 +131,7 @@ int	evaluate_AVG(char *value,DB_ITEM	*item,int parameter)
 
 	now=time(NULL);
 
-	sprintf(sql,"select avg(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+	snprintf(sql,sizeof(sql)-1,"select avg(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
 
 	result = DBselect(sql);
 	if(DBnum_rows(result) == 0)
@@ -166,7 +166,7 @@ int	evaluate_MIN(char *value,DB_ITEM	*item,int parameter)
 
 	now=time(NULL);
 
-	sprintf(sql,"select min(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+	snprintf(sql,sizeof(sql)-1,"select min(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
 
 	result = DBselect(sql);
 	if(DBnum_rows(result) == 0)
@@ -201,7 +201,7 @@ int	evaluate_MAX(char *value,DB_ITEM *item,int parameter)
 
 	now=time(NULL);
 
-	sprintf(sql,"select max(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+	snprintf(sql,sizeof(sql)-1,"select max(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
 
 	result = DBselect(sql);
 	if(DBnum_rows(result) == 0)
@@ -236,7 +236,7 @@ int	evaluate_DELTA(char *value,DB_ITEM *item,int parameter)
 
 	now=time(NULL);
 
-	sprintf(sql,"select max(value)-min(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+	snprintf(sql,sizeof(sql)-1,"select max(value)-min(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
 
 	result = DBselect(sql);
 	if(DBnum_rows(result) == 0)
@@ -274,9 +274,9 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 		{
 			if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
 			{
-			zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 1");
-				sprintf(value,"%f",item->lastvalue);
-			zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 2");
+				zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 1");
+				snprintf(value,MAX_STRING_LEN-1,"%f",item->lastvalue);
+				zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 2");
 			}
 			else
 			{
@@ -297,7 +297,7 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 		{
 			if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
 			{
-				sprintf(value,"%f",item->prevvalue);
+				snprintf(value,MAX_STRING_LEN-1,"%f",item->prevvalue);
 			}
 			else
 			{
@@ -337,13 +337,13 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 	{
 		now=time(NULL);
                 tm=localtime(&now);
-                sprintf(value,"%.4d%.2d%.2d",tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday);
+                snprintf(value,MAX_STRING_LEN-1,"%.4d%.2d%.2d",tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday);
 	}
 	else if(strcmp(function,"time")==0)
 	{
 		now=time(NULL);
                 tm=localtime(&now);
-                sprintf(value,"%.2d%.2d%.2d",tm->tm_hour,tm->tm_min,tm->tm_sec);
+                snprintf(value,MAX_STRING_LEN-1,"%.2d%.2d%.2d",tm->tm_hour,tm->tm_min,tm->tm_sec);
 	}
 	else if(strcmp(function,"abschange")==0)
 	{
@@ -355,7 +355,7 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 		{
 			if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
 			{
-				sprintf(value,"%f",(float)abs(item->lastvalue-item->prevvalue));
+				snprintf(value,MAX_STRING_LEN-1,"%f",(float)abs(item->lastvalue-item->prevvalue));
 			}
 			else
 			{
@@ -380,7 +380,7 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 		{
 			if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
 			{
-				sprintf(value,"%f",item->lastvalue-item->prevvalue);
+				snprintf(value,MAX_STRING_LEN-1,"%f",item->lastvalue-item->prevvalue);
 			}
 			else
 			{
@@ -449,7 +449,7 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 	else if(strcmp(function,"now")==0)
 	{
 		now=time(NULL);
-                sprintf(value,"%d",(int)now);
+                snprintf(value,MAX_STRING_LEN-1,"%d",(int)now);
 	}
 	else
 	{
@@ -474,7 +474,7 @@ void	update_functions(DB_ITEM *item)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In update_finctions(%d)",item->itemid);
 
-	sprintf(sql,"select function,parameter,itemid from functions where itemid=%d group by 1,2,3 order by 1,2,3",item->itemid);
+	snprintf(sql,sizeof(sql)-1,"select function,parameter,itemid from functions where itemid=%d group by 1,2,3 order by 1,2,3",item->itemid);
 
 	result = DBselect(sql);
 
@@ -497,7 +497,7 @@ void	update_functions(DB_ITEM *item)
 		zabbix_log( LOG_LEVEL_DEBUG, "Result:%f\n",value);
 		if (ret == SUCCEED)
 		{
-			sprintf(sql,"update functions set lastvalue='%s' where itemid=%d and function='%s' and parameter='%s'", value, function.itemid, function.function, function.parameter );
+			snprintf(sql,sizeof(sql)-1,"update functions set lastvalue='%s' where itemid=%d and function='%s' and parameter='%s'", value, function.itemid, function.function, function.parameter );
 			DBexecute(sql);
 		}
 	}
@@ -589,7 +589,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	if(strlen(smtp_helo) != 0)
 	{
 		memset(c,0,MAX_STRING_LEN);
-		sprintf(c,"HELO %s\r\n",smtp_helo);
+		snprintf(c,sizeof(c)-1,"HELO %s\r\n",smtp_helo);
 /*		e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
 		e=write(s,c,strlen(c)); 
 		zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL7");
@@ -621,7 +621,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 			
 	memset(c,0,MAX_STRING_LEN);
 /*	sprintf(c,"MAIL FROM: %s\r\n",smtp_email);*/
-	sprintf(c,"MAIL FROM: <%s>\r\n",smtp_email);
+	snprintf(c,sizeof(c)-1,"MAIL FROM: <%s>\r\n",smtp_email);
 /*	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
 	e=write(s,c,strlen(c)); 
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL9");
@@ -651,7 +651,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	}
 			
 	memset(c,0,MAX_STRING_LEN);
-	sprintf(c,"RCPT TO: <%s>\r\n",mailto);
+	snprintf(c,sizeof(c)-1,"RCPT TO: <%s>\r\n",mailto);
 /*	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
 	e=write(s,c,strlen(c)); 
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL11");
@@ -681,7 +681,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	}
 	
 	memset(c,0,MAX_STRING_LEN);
-	sprintf(c,"DATA\r\n");
+	snprintf(c,sizeof(c)-1,"DATA\r\n");
 /*	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
 	e=write(s,c,strlen(c)); 
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL13");
@@ -711,7 +711,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 
 	memset(c,0,MAX_STRING_LEN);
 /*	sprintf(c,"Subject: %s\r\n%s",mailsubject, mailbody);*/
-	sprintf(c,"From:<%s>\r\nTo:<%s>\r\nSubject: %s\r\n\r\n%s",smtp_email,mailto,mailsubject, mailbody);
+	snprintf(c,sizeof(c)-1,"From:<%s>\r\nTo:<%s>\r\nSubject: %s\r\n\r\n%s",smtp_email,mailto,mailsubject, mailbody);
 /*	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
 	e=write(s,c,strlen(c)); 
 	if(e == -1)
@@ -722,7 +722,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	}
 
 	memset(c,0,MAX_STRING_LEN);
-	sprintf(c,"\r\n.\r\n");
+	snprintf(c,sizeof(c)-1,"\r\n.\r\n");
 /*	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
 	e=write(s,c,strlen(c)); 
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL15");
@@ -751,7 +751,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	}
 	
 	memset(c,0,MAX_STRING_LEN);
-	sprintf(c,"QUIT\r\n");
+	snprintf(c,sizeof(c)-1,"QUIT\r\n");
 /*	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
 	e=write(s,c,strlen(c)); 
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL18");
@@ -779,7 +779,7 @@ void	send_to_user_medias(DB_TRIGGER *trigger,DB_ACTION *action, int userid)
 
 	int	i;
 
-	sprintf(sql,"select mediatypeid,sendto,active,severity from media where active=%d and userid=%d",MEDIA_STATUS_ACTIVE,userid);
+	snprintf(sql,sizeof(sql)-1,"select mediatypeid,sendto,active,severity from media where active=%d and userid=%d",MEDIA_STATUS_ACTIVE,userid);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
@@ -817,7 +817,7 @@ void	send_to_user(DB_TRIGGER *trigger,DB_ACTION *action)
 	}
 	else if(action->recipient == RECIPIENT_TYPE_GROUP)
 	{
-		sprintf(sql,"select u.userid from users u, users_groups ug where ug.usrgrpid=%d and ug.userid=u.userid", action->userid);
+		snprintf(sql,sizeof(sql)-1,"select u.userid from users u, users_groups ug where ug.usrgrpid=%d and ug.userid=u.userid", action->userid);
 		result = DBselect(sql);
 		for(i=0;i<DBnum_rows(result);i++)
 		{
@@ -830,37 +830,6 @@ void	send_to_user(DB_TRIGGER *trigger,DB_ACTION *action)
 		zabbix_log( LOG_LEVEL_WARNING, "Unknown recipient type [%d] for actionid [%d]",action->recipient,action->actionid);
 	}
 }
-
-/*
- * Translate all %s to host names
- */
-/* Not required anymore. Replaced by substitute_simple_macros */
-/*void	substitute_hostname(int triggerid,char *s)
-{
-	char tmp[MAX_STRING_LEN+1];	
-	char sql[MAX_STRING_LEN+1];
-	DB_RESULT *result;
-
-	zabbix_log( LOG_LEVEL_DEBUG, "In substitute_hostname([%d],[%s])",triggerid,s);
-
-	if(strstr(s,"%s") != 0)
-	{
-		sprintf(sql,"select distinct t.description,h.host from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid", triggerid);
-		result = DBselect(sql);
-
-		if(DBnum_rows(result) == 0)
-		{
-			zabbix_log( LOG_LEVEL_DEBUG, "No hostname in substitute_hostname()");
-			DBfree_result(result);
-			return;
-		}
-		strcpy(tmp,s);
-		sprintf(s,tmp,DBget_field(result,0,1));
-
-		DBfree_result(result);
-	}
-	zabbix_log( LOG_LEVEL_DEBUG, "End of substitute_hostname() Result [%s]",s);
-}*/
 
 /*
  * Apply actions if any.
@@ -883,7 +852,7 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "Check dependencies");
 
-		sprintf(sql,"select count(*) from trigger_depends d,triggers t where d.triggerid_down=%d and d.triggerid_up=t.triggerid and t.value=%d",trigger->triggerid, TRIGGER_VALUE_TRUE);
+		snprintf(sql,sizeof(sql)-1,"select count(*) from trigger_depends d,triggers t where d.triggerid_down=%d and d.triggerid_up=t.triggerid and t.value=%d",trigger->triggerid, TRIGGER_VALUE_TRUE);
 		result = DBselect(sql);
 		if(DBnum_rows(result) == 1)
 		{
@@ -901,7 +870,7 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 
 	now = time(NULL);
 
-	sprintf(sql,"select actionid,userid,delay,subject,message,scope,severity,recipient from actions where (scope=%d and triggerid=%d and good=%d and nextcheck<=%d) or (scope=%d and good=%d) or (scope=%d and good=%d)",ACTION_SCOPE_TRIGGER,trigger->triggerid,good,now,ACTION_SCOPE_HOST,good,ACTION_SCOPE_HOSTS,good);
+	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,scope,severity,recipient from actions where (scope=%d and triggerid=%d and good=%d and nextcheck<=%d) or (scope=%d and good=%d) or (scope=%d and good=%d)",ACTION_SCOPE_TRIGGER,trigger->triggerid,good,now,ACTION_SCOPE_HOST,good,ACTION_SCOPE_HOSTS,good);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
@@ -933,7 +902,7 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 			{
 				continue;
 			}
-			sprintf(sql,"select * from actions a,triggers t,hosts h,functions f,items i where a.triggerid=t.triggerid and f.triggerid=t.triggerid and i.itemid=f.itemid and h.hostid=i.hostid and t.triggerid=%d and a.scope=%d",trigger->triggerid,ACTION_SCOPE_HOST);
+			snprintf(sql,sizeof(sql)-1,"select * from actions a,triggers t,hosts h,functions f,items i where a.triggerid=t.triggerid and f.triggerid=t.triggerid and i.itemid=f.itemid and h.hostid=i.hostid and t.triggerid=%d and a.scope=%d",trigger->triggerid,ACTION_SCOPE_HOST);
 /*			zabbix_log( LOG_LEVEL_WARNING, "[%s]",sql);*/
 			result2 = DBselect(sql);
 			if(DBnum_rows(result2)==0)
@@ -984,7 +953,7 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 		}
 
 		send_to_user(trigger,&action);
-		sprintf(sql,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
+		snprintf(sql,sizeof(sql)-1,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
 		DBexecute(sql);
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "Actions applied for trigger %d %d", trigger->triggerid, good );
@@ -1004,7 +973,7 @@ void	update_serv(int serviceid)
 
 	DB_RESULT *result,*result2;
 
-	sprintf(sql,"select l.serviceupid,s.algorithm from services_links l,services s where s.serviceid=l.serviceupid and l.servicedownid=%d",serviceid);
+	snprintf(sql,sizeof(sql)-1,"select l.serviceupid,s.algorithm from services_links l,services s where s.serviceid=l.serviceupid and l.servicedownid=%d",serviceid);
 	result=DBselect(sql);
 	status=0;
 	for(i=0;i<DBnum_rows(result);i++)
@@ -1033,12 +1002,12 @@ void	update_serv(int serviceid)
 
 			if(SERVICE_ALGORITHM_MAX == algorithm)
 			{
-				sprintf(sql,"select count(*),max(status) from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
+				snprintf(sql,sizeof(sql)-1,"select count(*),max(status) from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
 			}
 			/* MIN otherwise */
 			else
 			{
-				sprintf(sql,"select count(*),min(status) from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
+				snprintf(sql,sizeof(sql)-1,"select count(*),min(status) from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
 			}
 			result2=DBselect(sql);
 			if(atoi(DBget_field(result2,0,0))!=0)
@@ -1049,7 +1018,7 @@ void	update_serv(int serviceid)
 
 			now=time(NULL);
 			DBadd_service_alarm(atoi(DBget_field(result,i,0)),status,now);
-			sprintf(sql,"update services set status=%d where serviceid=%d",status,atoi(DBget_field(result,i,0)));
+			snprintf(sql,sizeof(sql)-1,"update services set status=%d where serviceid=%d",status,atoi(DBget_field(result,i,0)));
 			DBexecute(sql);
 		}
 		else
@@ -1059,7 +1028,7 @@ void	update_serv(int serviceid)
 	}
 	DBfree_result(result);
 
-	sprintf(sql,"select serviceupid from services_links where servicedownid=%d",serviceid);
+	snprintf(sql,sizeof(sql)-1,"select serviceupid from services_links where servicedownid=%d",serviceid);
 	result=DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
@@ -1076,11 +1045,11 @@ void	update_services(int triggerid, int status)
 
 	DB_RESULT *result;
 
-	sprintf(sql,"update services set status=%d where triggerid=%d",status,triggerid);
+	snprintf(sql,sizeof(sql)-1,"update services set status=%d where triggerid=%d",status,triggerid);
 	DBexecute(sql);
 
 
-	sprintf(sql,"select serviceid from services where triggerid=%d", triggerid);
+	snprintf(sql,sizeof(sql)-1,"select serviceid from services where triggerid=%d", triggerid);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
@@ -1112,7 +1081,7 @@ void	update_triggers(int itemid)
 /* Does not work for PostgreSQL */
 /*		sprintf(sql,"select t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.dep_level",TRIGGER_STATUS_ENABLED,sucker_num);*/
 /* Is it correct SQL? */
-	sprintf(sql,"select distinct t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value,t.description from triggers t,functions f,items i where i.status<>%d and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d",ITEM_STATUS_NOTSUPPORTED, TRIGGER_STATUS_ENABLED, itemid);
+	snprintf(sql,sizeof(sql)-1,"select distinct t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value,t.description from triggers t,functions f,items i where i.status<>%d and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d",ITEM_STATUS_NOTSUPPORTED, TRIGGER_STATUS_ENABLED, itemid);
 
 	result = DBselect(sql);
 
@@ -1155,7 +1124,7 @@ void	update_triggers(int itemid)
 /*				apply_actions(trigger.triggerid,1);*/
 				apply_actions(&trigger,1);
 	
-				sprintf(sql,"update actions set nextcheck=0 where triggerid=%d and good=0",trigger.triggerid);
+				snprintf(sql,sizeof(sql)-1,"update actions set nextcheck=0 where triggerid=%d and good=0",trigger.triggerid);
 				DBexecute(sql);
 
 				update_services(trigger.triggerid, trigger.priority);
@@ -1182,7 +1151,7 @@ void	update_triggers(int itemid)
 /*				apply_actions(trigger.triggerid,0);*/
 				apply_actions(&trigger,0);
 
-				sprintf(sql,"update actions set nextcheck=0 where triggerid=%d and good=1",trigger.triggerid);
+				snprintf(sql,sizeof(sql)-1,"update actions set nextcheck=0 where triggerid=%d and good=1",trigger.triggerid);
 				DBexecute(sql);
 
 				update_services(trigger.triggerid, 0);
@@ -1206,7 +1175,7 @@ int	get_lastvalue(char *value,char *host,char *key,char *function,char *paramete
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In get_lastvalue()" );
 
-	sprintf(sql, "select i.itemid,i.prevvalue,i.lastvalue,i.value_type from items i,hosts h where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", host, key );
+	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.prevvalue,i.lastvalue,i.value_type from items i,hosts h where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", host, key );
 	result = DBselect(sql);
 
 	if(DBnum_rows(result) == 0)
@@ -1264,7 +1233,7 @@ int	process_data(int sockfd,char *server,char *key,char *value)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_data()");
 
-	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta from items i,hosts h where h.status in (0,2) and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type=%d", server, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
+	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta from items i,hosts h where h.status in (0,2) and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type=%d", server, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
 	result = DBselect(sql);
 
 	if(DBnum_rows(result) == 0)
@@ -1368,7 +1337,7 @@ void	process_new_value(DB_ITEM *item,char *value)
 	{
 		if((item->prevvalue_null == 1) || (strcmp(value,item->lastvalue_str) != 0) || (strcmp(item->prevvalue_str,item->lastvalue_str) != 0) )
 		{
-			sprintf(sql,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=%d",now+item->delay,value,now,item->itemid);
+			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=%d",now+item->delay,value,now,item->itemid);
 			item->prevvalue=item->lastvalue;
 			item->lastvalue=value_double;
 			item->prevvalue_str=item->lastvalue_str;
@@ -1379,7 +1348,7 @@ void	process_new_value(DB_ITEM *item,char *value)
 		}
 		else
 		{
-			sprintf(sql,"update items set nextcheck=%d,lastclock=%d where itemid=%d",now+item->delay,now,item->itemid);
+			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,lastclock=%d where itemid=%d",now+item->delay,now,item->itemid);
 		}
 	}
 	/* Logic for delta */
@@ -1387,11 +1356,11 @@ void	process_new_value(DB_ITEM *item,char *value)
 	{
 		if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
 		{
-			sprintf(sql,"update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",now+item->delay,value_double,(value_double - item->prevorgvalue)/(now-item->lastclock),now,item->itemid);
+			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",now+item->delay,value_double,(value_double - item->prevorgvalue)/(now-item->lastclock),now,item->itemid);
 		}
 		else
 		{
-			sprintf(sql,"update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",now+item->delay,value_double,now,item->itemid);
+			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",now+item->delay,value_double,now,item->itemid);
 		}
 
 		item->prevvalue=item->lastvalue;

@@ -1,7 +1,8 @@
 Changes for 1.0beta13:
 
+ - sprintf() was replaced with snprintf() (Alexei)
  - fix for prefixes K,M and G (Alexei)
- - replace strncpy() with secure strscpy() where possible (Alexei)
+ - strncpy() was replaced with secure strscpy() where possible (Alexei)
  - fixed support for situation when one of graph's metrics has no values
  (Alexei)
  - added '2>/dev/null' to fping to get rid of message on the console (Alexei)

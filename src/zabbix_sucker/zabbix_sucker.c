@@ -271,7 +271,7 @@ int	get_value_SNMP(int version,double *result,char *result_str,DB_ITEM *item)
 	struct snmp_pdu *response;
 
 	#ifdef NEW_APPROACH
-	char temp[255];
+	char temp[MAX_STRING_LEN];
 	#endif
 
 	oid anOID[MAX_OID_LEN];
@@ -292,7 +292,7 @@ int	get_value_SNMP(int version,double *result,char *result_str,DB_ITEM *item)
 	if(item->useip == 1)
 	{
 	#ifdef NEW_APPROACH
-		sprintf(temp, "%s:%d", item->ip, item->snmp_port);
+		snprintf(temp,sizeof(temp)-1,"%s:%d", item->ip, item->snmp_port);
 		session.peername = temp;
 	#else
 		session.peername = item->ip;
@@ -301,7 +301,7 @@ int	get_value_SNMP(int version,double *result,char *result_str,DB_ITEM *item)
 	else
 	{
 	#ifdef NEW_APPROACH
-		sprintf(temp, "%s:%d", item->host, item->snmp_port);
+		snprintf(temp, sizeof(temp)-1, "%s:%d", item->host, item->snmp_port);
 		session.peername = temp;
 	#else
 		session.peername = item->host;
@@ -369,7 +369,7 @@ int	get_value_SNMP(int version,double *result,char *result_str,DB_ITEM *item)
 				 * http://sourceforge.net/tracker/index.php?func=detail&aid=700145&group_id=23494&atid=378683
 				 */ 
 				/*sprintf(result_str,"%ld",(long)*vars->val.integer);*/
-				sprintf(result_str,"%lu",(long)*vars->val.integer);
+				snprintf(result_str,MAX_STRING_LEN-1,"%lu",(long)*vars->val.integer);
 			}
 			else if(vars->type == ASN_OCTET_STR)
 			{
@@ -441,11 +441,11 @@ int	get_value_SIMPLE(double *result,char *result_str,DB_ITEM *item)
 	{
 		if(item->useip==1)
 		{
-			sprintf(c,"check_service[%s,%s]",item->key,item->ip);
+			snprintf(c,sizeof(c)-1,"check_service[%s,%s]",item->key,item->ip);
 		}
 		else
 		{
-			sprintf(c,"check_service[%s,%s]",item->key,item->host);
+			snprintf(c,sizeof(c)-1,"check_service[%s,%s]",item->key,item->host);
 		}
 	}
 	else
@@ -456,11 +456,11 @@ int	get_value_SIMPLE(double *result,char *result_str,DB_ITEM *item)
 		
 		if(item->useip==1)
 		{
-			sprintf(c,"check_service_perf[%s,%s]",s,item->ip);
+			snprintf(c,sizeof(c)-1,"check_service_perf[%s,%s]",s,item->ip);
 		}
 		else
 		{
-			sprintf(c,"check_service_perf[%s,%s]",s,item->host);
+			snprintf(c,sizeof(c)-1,"check_service_perf[%s,%s]",s,item->host);
 		}
 	}
 
@@ -503,7 +503,7 @@ int	get_value_INTERNAL(double *result,char *result_str,DB_ITEM *item)
 		return NOTSUPPORTED;
 	}
 
-	sprintf(result_str,"%f",*result);
+	snprintf(result_str,MAX_STRING_LEN-1,"%f",*result);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "INTERNAL [%s] [%f]", result_str, *result);
 	return SUCCEED;
@@ -579,7 +579,7 @@ int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
 		return	NETWORK_ERROR;
 	}
 
-	sprintf(c,"%s\n",item->key);
+	snprintf(c,sizeof(c)-1,"%s\n",item->key);
 	zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", c);
 	if( write(s,c,strlen(c)) == -1 )
 	{
@@ -723,9 +723,9 @@ int get_minnextcheck(int now)
 		1 == NOT MONITORED
 		2 == UNREACHABLE */ 
 #ifdef TESTTEST
-	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and i.type not in (%d) and h.hostid%%%d=%d and i.key_<>'%s'", now, ITEM_TYPE_TRAPPER, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY);
+	snprintf(sql,sizeof(sql)-1,"select count(*),min(nextcheck) from items i,hosts h where (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and i.type not in (%d) and h.hostid%%%d=%d and i.key_<>'%s'", now, ITEM_TYPE_TRAPPER, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY);
 #else
-	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where (h.status=%d or (h.status=%d and h.disable_until<%d)) and h.hostid=i.hostid and i.status=%d and i.type not in (%d) and i.itemid%%%d=%d and i.key_<>'%s' and i.key_<>'%s' and i.key_<>'%s'", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY);
+	snprintf(sql,sizeof(sql)-1,"select count(*),min(nextcheck) from items i,hosts h where (h.status=%d or (h.status=%d and h.disable_until<%d)) and h.hostid=i.hostid and i.status=%d and i.type not in (%d) and i.itemid%%%d=%d and i.key_<>'%s' and i.key_<>'%s' and i.key_<>'%s'", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY);
 #endif
 	result = DBselect(sql);
 
@@ -761,7 +761,7 @@ void update_key_status(int hostid,int host_status)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In update_key_status()");
 
-	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,i.status from items i,hosts h where h.hostid=i.hostid and h.hostid=%d and i.key_='%s'", hostid,SERVER_STATUS_KEY);
+	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,i.status from items i,hosts h where h.hostid=i.hostid and h.hostid=%d and i.key_='%s'", hostid,SERVER_STATUS_KEY);
 	result = DBselect(sql);
 
 	if( DBnum_rows(result) == 0)
@@ -809,7 +809,7 @@ void update_key_status(int hostid,int host_status)
 		item.value_type=atoi(DBget_field(result,0,17));
 		item.delta=atoi(DBget_field(result,0,18));
 	
-		sprintf(value_str,"%d",host_status);
+		snprintf(value_str,sizeof(value_str)-1,"%d",host_status);
 
 		process_new_value(&item,value_str);
 		update_triggers(item.itemid);
@@ -826,16 +826,16 @@ void	trend(void)
 
 	int		i,j;
 
-	sprintf(sql,"select itemid from items");
+	snprintf(sql,sizeof(sql)-1,"select itemid from items");
 	result2 = DBselect(sql);
 	for(i=0;i<DBnum_rows(result2);i++)
 	{
-		sprintf(sql,"select clock-clock%%3600, count(*),min(value),avg(value),max(value) from history where itemid=%d group by 1",atoi(DBget_field(result2,i,0)));
+		snprintf(sql,sizeof(sql)-1,"select clock-clock%%3600, count(*),min(value),avg(value),max(value) from history where itemid=%d group by 1",atoi(DBget_field(result2,i,0)));
 		result = DBselect(sql);
 	
 		for(j=0;j<DBnum_rows(result);j++)
 		{
-			sprintf(sql,"insert into trends (itemid, clock, num, value_min, value_avg, value_max) values (%d,%d,%d,%g,%g,%g)",atoi(DBget_field(result2,i,0)), atoi(DBget_field(result,j,0)),atoi(DBget_field(result,j,1)),atof(DBget_field(result,j,2)),atof(DBget_field(result,j,3)),atof(DBget_field(result,j,4)));
+			snprintf(sql,sizeof(sql)-1,"insert into trends (itemid, clock, num, value_min, value_avg, value_max) values (%d,%d,%d,%f,%f,%f)",atoi(DBget_field(result2,i,0)), atoi(DBget_field(result,j,0)),atoi(DBget_field(result,j,1)),atof(DBget_field(result,j,2)),atof(DBget_field(result,j,3)),atof(DBget_field(result,j,4)));
 			DBexecute(sql);
 		}
 		DBfree_result(result);
@@ -862,7 +862,7 @@ int get_values(void)
 
 	now = time(NULL);
 
-	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock from items i,hosts h where i.nextcheck<=%d and i.status=%d and i.type not in (%d) and (h.status=%d or (h.status=%d and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d and i.key_<>'%s' and i.key_<>'%s' and i.key_<>'%s' order by i.nextcheck", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY);
+	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock from items i,hosts h where i.nextcheck<=%d and i.status=%d and i.type not in (%d) and (h.status=%d or (h.status=%d and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d and i.key_<>'%s' and i.key_<>'%s' and i.key_<>'%s' order by i.nextcheck", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
@@ -940,7 +940,7 @@ int get_values(void)
 
 			if(network_errors>0)
 			{
-				sprintf(sql,"update hosts set network_errors=0 where hostid=%d and network_errors>0", item.hostid);
+				snprintf(sql,sizeof(sql)-1,"update hosts set network_errors=0 where hostid=%d and network_errors>0", item.hostid);
 				DBexecute(sql);
 			}
 
@@ -977,12 +977,12 @@ int get_values(void)
 				DBupdate_host_status(item.hostid,HOST_STATUS_UNREACHABLE,now);
 				update_key_status(item.hostid,HOST_STATUS_UNREACHABLE);	
 
-				sprintf(sql,"update hosts set network_errors=3 where hostid=%d", item.hostid);
+				snprintf(sql,sizeof(sql)-1,"update hosts set network_errors=3 where hostid=%d", item.hostid);
 				DBexecute(sql);
 			}
 			else
 			{
-				sprintf(sql,"update hosts set network_errors=%d where hostid=%d", network_errors, item.hostid);
+				snprintf(sql,sizeof(sql)-1,"update hosts set network_errors=%d where hostid=%d", network_errors, item.hostid);
 				DBexecute(sql);
 			}
 
@@ -1032,9 +1032,9 @@ int main_nodata_loop()
 
 		now=time(NULL);
 #ifdef HAVE_PGSQL
-		sprintf(sql,"select distinct f.itemid,f.functionid,f.parameter from functions f, items i,hosts h where h.hostid=i.hostid and (h.status=%d or (h.status=%d and h.disable_until<%d)) and i.itemid=f.itemid and f.function='nodata' and i.lastclock+f.parameter::text::integer<=%d and i.status=%d and i.type=%d and f.lastvalue<>1", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
+		snprintf(sql,sizeof(sql)-1,"select distinct f.itemid,f.functionid,f.parameter from functions f, items i,hosts h where h.hostid=i.hostid and (h.status=%d or (h.status=%d and h.disable_until<%d)) and i.itemid=f.itemid and f.function='nodata' and i.lastclock+f.parameter::text::integer<=%d and i.status=%d and i.type=%d and f.lastvalue<>1", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
 #else
-		sprintf(sql,"select distinct f.itemid,f.functionid,f.parameter from functions f, items i,hosts h where h.hostid=i.hostid and (h.status=%d or (h.status=%d and h.disable_until<%d)) and i.itemid=f.itemid and f.function='nodata' and i.lastclock+f.parameter<=%d and i.status=%d and i.type=%d and f.lastvalue<>1", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
+		snprintf(sql,sizeof(sql)-1,"select distinct f.itemid,f.functionid,f.parameter from functions f, items i,hosts h where h.hostid=i.hostid and (h.status=%d or (h.status=%d and h.disable_until<%d)) and i.itemid=f.itemid and f.function='nodata' and i.lastclock+f.parameter<=%d and i.status=%d and i.type=%d and f.lastvalue<>1", HOST_STATUS_MONITORED, HOST_STATUS_UNREACHABLE, now, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
 #endif
 		result = DBselect(sql);
 
@@ -1044,7 +1044,7 @@ int main_nodata_loop()
 			functionid=atoi(DBget_field(result,i,1));
 			parameter=DBget_field(result,i,2);
 
-			sprintf(sql,"update functions set lastvalue='1' where itemid=%d and function='nodata' and parameter='%s'" , itemid, parameter );
+			snprintf(sql,sizeof(sql)-1,"update functions set lastvalue='1' where itemid=%d and function='nodata' and parameter='%s'" , itemid, parameter );
 			DBexecute(sql);
 
 			update_triggers(itemid);

@@ -297,7 +297,7 @@ int     DBget_function_result(double *result,char *functionid)
         char	sql[MAX_STRING_LEN];
 
 /* 0 is added to distinguish between lastvalue==NULL and empty result */
-	sprintf( sql, "select 0,lastvalue from functions where functionid=%s", functionid );
+	snprintf( sql, sizeof(sql)-1, "select 0,lastvalue from functions where functionid=%s", functionid );
 	dbresult = DBselect(sql);
 
 	if(DBnum_rows(dbresult) == 0)
@@ -330,7 +330,7 @@ int	DBget_prev_trigger_value(int triggerid)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_prev_trigger_value()");
 
-	sprintf(sql,"select max(clock) from alarms where triggerid=%d",triggerid);
+	snprintf(sql,sizeof(sql)-1,"select max(clock) from alarms where triggerid=%d",triggerid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
@@ -343,7 +343,7 @@ int	DBget_prev_trigger_value(int triggerid)
 	clock=atoi(DBget_field(result,0,0));
 	DBfree_result(result);
 
-	sprintf(sql,"select max(clock) from alarms where triggerid=%d and clock<%d",triggerid,clock);
+	snprintf(sql,sizeof(sql),"select max(clock) from alarms where triggerid=%d and clock<%d",triggerid,clock);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
@@ -356,7 +356,7 @@ int	DBget_prev_trigger_value(int triggerid)
 	clock=atoi(DBget_field(result,0,0));
 	DBfree_result(result);
 
-	sprintf(sql,"select value from alarms where triggerid=%d and clock=%d",triggerid,clock);
+	snprintf(sql,sizeof(sql)-1,"select value from alarms where triggerid=%d and clock=%d",triggerid,clock);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
@@ -384,7 +384,7 @@ int	latest_alarm(int triggerid, int status)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In latest_alarm()");
 
-	sprintf(sql,"select max(clock) from alarms where triggerid=%d",triggerid);
+	snprintf(sql,sizeof(sql)-1,"select max(clock) from alarms where triggerid=%d",triggerid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
@@ -398,7 +398,7 @@ int	latest_alarm(int triggerid, int status)
 		clock=atoi(DBget_field(result,0,0));
 		DBfree_result(result);
 
-		sprintf(sql,"select value from alarms where triggerid=%d and clock=%d",triggerid,clock);
+		snprintf(sql,sizeof(sql)-1,"select value from alarms where triggerid=%d and clock=%d",triggerid,clock);
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		result = DBselect(sql);
 		if(DBnum_rows(result)==1)
@@ -427,7 +427,7 @@ int	latest_service_alarm(int serviceid, int status)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In latest_service_alarm()");
 
-	sprintf(sql,"select max(clock) from service_alarms where serviceid=%d",serviceid);
+	snprintf(sql,sizeof(sql)-1,"select max(clock) from service_alarms where serviceid=%d",serviceid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
@@ -441,7 +441,7 @@ int	latest_service_alarm(int serviceid, int status)
 		clock=atoi(DBget_field(result,0,0));
 		DBfree_result(result);
 
-		sprintf(sql,"select value from service_alarms where serviceid=%d and clock=%d",serviceid,clock);
+		snprintf(sql,sizeof(sql)-1,"select value from service_alarms where serviceid=%d and clock=%d",serviceid,clock);
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		result = DBselect(sql);
 		if(DBnum_rows(result)==1)
@@ -469,7 +469,7 @@ int	add_alarm(int triggerid,int status,int clock)
 		return SUCCEED;
 	}
 
-	sprintf(sql,"insert into alarms(triggerid,clock,value) values(%d,%d,%d)", triggerid, clock, status);
+	snprintf(sql,sizeof(sql)-1,"insert into alarms(triggerid,clock,value) values(%d,%d,%d)", triggerid, clock, status);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	DBexecute(sql);
 
@@ -489,7 +489,7 @@ int	DBadd_service_alarm(int serviceid,int status,int clock)
 		return SUCCEED;
 	}
 
-	sprintf(sql,"insert into service_alarms(serviceid,clock,value) values(%d,%d,%d)", serviceid, clock, status);
+	snprintf(sql,sizeof(sql)-1,"insert into service_alarms(serviceid,clock,value) values(%d,%d,%d)", serviceid, clock, status);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	DBexecute(sql);
 
@@ -511,12 +511,12 @@ int	DBupdate_trigger_value(int triggerid,int value,int clock)
 	zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value()");
 	add_alarm(triggerid,value,clock);
 
-	sprintf(sql,"update triggers set value=%d,lastchange=%d where triggerid=%d",value,clock,triggerid);
+	snprintf(sql,sizeof(sql)-1,"update triggers set value=%d,lastchange=%d where triggerid=%d",value,clock,triggerid);
 	DBexecute(sql);
 
 	if(TRIGGER_VALUE_UNKNOWN == value)
 	{
-		sprintf(sql,"update functions set lastvalue=NULL where triggerid=%d",triggerid);
+		snprintf(sql,sizeof(sql)-1,"update functions set lastvalue=NULL where triggerid=%d",triggerid);
 		DBexecute(sql);
 	}
 
@@ -538,7 +538,7 @@ void update_triggers_status_to_unknown(int hostid,int clock)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In update_triggers_status_to_unknown()");
 
-	sprintf(sql,"select distinct t.triggerid from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.hostid=%d and i.key_<>'%s'",hostid,SERVER_STATUS_KEY);
+	snprintf(sql,sizeof(sql)-1,"select distinct t.triggerid from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.hostid=%d and i.key_<>'%s'",hostid,SERVER_STATUS_KEY);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
@@ -558,9 +558,9 @@ void  DBdelete_service(int serviceid)
 {
 	char	sql[MAX_STRING_LEN];
 
-	sprintf(sql,"delete from services_links where servicedownid=%d or serviceupid=%d", serviceid, serviceid);
+	snprintf(sql,sizeof(sql)-1,"delete from services_links where servicedownid=%d or serviceupid=%d", serviceid, serviceid);
 	DBexecute(sql);
-	sprintf(sql,"delete from services where serviceid=%d", serviceid);
+	snprintf(sql,sizeof(sql)-1,"delete from services where serviceid=%d", serviceid);
 	DBexecute(sql);
 }
 
@@ -571,7 +571,7 @@ void  DBdelete_services_by_triggerid(int triggerid)
 	DB_RESULT	*result;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBdelete_services_by_triggerid(%d)", triggerid);
-	sprintf(sql,"select serviceid from services where triggerid=%d", triggerid);
+	snprintf(sql,sizeof(sql)-1,"select serviceid from services where triggerid=%d", triggerid);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
@@ -588,20 +588,20 @@ void  DBdelete_trigger(int triggerid)
 {
 	char	sql[MAX_STRING_LEN];
 
-	sprintf(sql,"delete from trigger_depends where triggerid_down=%d or triggerid_up=%d", triggerid, triggerid);
+	snprintf(sql,sizeof(sql)-1,"delete from trigger_depends where triggerid_down=%d or triggerid_up=%d", triggerid, triggerid);
 	DBexecute(sql);
-	sprintf(sql,"delete from functions where triggerid=%d", triggerid);
+	snprintf(sql,sizeof(sql)-1,"delete from functions where triggerid=%d", triggerid);
 	DBexecute(sql);
-	sprintf(sql,"delete from alarms where triggerid=%d", triggerid);
+	snprintf(sql,sizeof(sql)-1,"delete from alarms where triggerid=%d", triggerid);
 	DBexecute(sql);
-	sprintf(sql,"delete from actions where triggerid=%d", triggerid);
+	snprintf(sql,sizeof(sql)-1,"delete from actions where triggerid=%d", triggerid);
 	DBexecute(sql);
 
 	DBdelete_services_by_triggerid(triggerid);
 
-	sprintf(sql,"update sysmaps_links set triggerid=NULL where triggerid=%d", triggerid);
+	snprintf(sql,sizeof(sql)-1,"update sysmaps_links set triggerid=NULL where triggerid=%d", triggerid);
 	DBexecute(sql);
-	sprintf(sql,"delete from triggers where triggerid=%d", triggerid);
+	snprintf(sql,sizeof(sql)-1,"delete from triggers where triggerid=%d", triggerid);
 	DBexecute(sql);
 }
 
@@ -612,7 +612,7 @@ void  DBdelete_triggers_by_itemid(int itemid)
 	DB_RESULT	*result;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBdelete_triggers_by_itemid(%d)", itemid);
-	sprintf(sql,"select triggerid from functions where itemid=%d", itemid);
+	snprintf(sql,sizeof(sql)-1,"select triggerid from functions where itemid=%d", itemid);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
@@ -622,7 +622,7 @@ void  DBdelete_triggers_by_itemid(int itemid)
 	}
 	DBfree_result(result);
 
-	sprintf(sql,"delete from functions where itemid=%d", itemid);
+	snprintf(sql,sizeof(sql)-1,"delete from functions where itemid=%d", itemid);
 	DBexecute(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG,"End of DBdelete_triggers_by_itemid(%d)", itemid);
@@ -632,7 +632,7 @@ void DBdelete_trends_by_itemid(int itemid)
 {
 	char	sql[MAX_STRING_LEN];
 
-	sprintf(sql,"delete from trends where itemid=%d", itemid);
+	snprintf(sql,sizeof(sql)-1,"delete from trends where itemid=%d", itemid);
 	DBexecute(sql);
 }
 
@@ -640,9 +640,9 @@ void DBdelete_history_by_itemid(int itemid)
 {
 	char	sql[MAX_STRING_LEN];
 
-	sprintf(sql,"delete from history where itemid=%d", itemid);
+	snprintf(sql,sizeof(sql)-1,"delete from history where itemid=%d", itemid);
 	DBexecute(sql);
-	sprintf(sql,"delete from history_str where itemid=%d", itemid);
+	snprintf(sql,sizeof(sql)-1,"delete from history_str where itemid=%d", itemid);
 	DBexecute(sql);
 }
 
@@ -656,7 +656,7 @@ void DBdelete_item(int itemid)
 	DBdelete_history_by_itemid(itemid);
 	DBdelete_trends_by_itemid(itemid);
 
-	sprintf(sql,"delete from items where itemid=%d", itemid);
+	snprintf(sql,sizeof(sql)-1,"delete from items where itemid=%d", itemid);
 	DBexecute(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG,"End of DBdelete_item(%d)", itemid);
@@ -669,7 +669,7 @@ void DBdelete_host(int hostid)
 	DB_RESULT	*result;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBdelete_host(%d)", hostid);
-	sprintf(sql,"select itemid from items where hostid=%d", hostid);
+	snprintf(sql,sizeof(sql)-1,"select itemid from items where hostid=%d", hostid);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
@@ -679,10 +679,10 @@ void DBdelete_host(int hostid)
 	}
 	DBfree_result(result);
 
-	sprintf(sql,"delete from hosts_groups where hostid=%d", hostid);
+	snprintf(sql,sizeof(sql)-1,"delete from hosts_groups where hostid=%d", hostid);
 	DBexecute(sql);
 
-	sprintf(sql,"delete from hosts where hostid=%d", hostid);
+	snprintf(sql,sizeof(sql)-1,"delete from hosts where hostid=%d", hostid);
 	DBexecute(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG,"End of DBdelete_host(%d)", hostid);
@@ -702,7 +702,7 @@ void DBupdate_triggers_status_after_restart(void)
 
 	now=time(NULL);
 
-	sprintf(sql,"select distinct t.triggerid from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.nextcheck+i.delay<%d and i.key_<>'%s' and h.status not in (%d,%d)",now,SERVER_STATUS_KEY, HOST_STATUS_DELETED, HOST_STATUS_TEMPLATE);
+	snprintf(sql,sizeof(sql)-1,"select distinct t.triggerid from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.nextcheck+i.delay<%d and i.key_<>'%s' and h.status not in (%d,%d)",now,SERVER_STATUS_KEY, HOST_STATUS_DELETED, HOST_STATUS_TEMPLATE);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
@@ -710,7 +710,7 @@ void DBupdate_triggers_status_after_restart(void)
 	{
 		triggerid=atoi(DBget_field(result,i,0));
 
-		sprintf(sql,"select min(i.nextcheck+i.delay) from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.nextcheck<>0 and t.triggerid=%d and i.type<>%d",triggerid,ITEM_TYPE_TRAPPER);
+		snprintf(sql,sizeof(sql)-1,"select min(i.nextcheck+i.delay) from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.nextcheck<>0 and t.triggerid=%d and i.type<>%d",triggerid,ITEM_TYPE_TRAPPER);
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		result2 = DBselect(sql);
 		if( DBnum_rows(result2) == 0 )
@@ -740,7 +740,7 @@ void DBupdate_host_status(int hostid,int status,int clock)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In update_host_status()");
 
-	sprintf(sql,"select status,disable_until from hosts where hostid=%d",hostid);
+	snprintf(sql,sizeof(sql)-1,"select status,disable_until from hosts where hostid=%d",hostid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
@@ -771,13 +771,13 @@ void DBupdate_host_status(int hostid,int status,int clock)
 
 	if(status==HOST_STATUS_MONITORED)
 	{
-		sprintf(sql,"update hosts set status=%d where hostid=%d",HOST_STATUS_MONITORED,hostid);
+		snprintf(sql,sizeof(sql)-1,"update hosts set status=%d where hostid=%d",HOST_STATUS_MONITORED,hostid);
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		DBexecute(sql);
 	}
 	else if(status==HOST_STATUS_NOT_MONITORED)
 	{
-		sprintf(sql,"update hosts set status=%d where hostid=%d",HOST_STATUS_NOT_MONITORED,hostid);
+		snprintf(sql,sizeof(sql)-1,"update hosts set status=%d where hostid=%d",HOST_STATUS_NOT_MONITORED,hostid);
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		DBexecute(sql);
 	}
@@ -785,11 +785,11 @@ void DBupdate_host_status(int hostid,int status,int clock)
 	{
 		if(disable_until+DELAY_ON_NETWORK_FAILURE>clock)
 		{
-			sprintf(sql,"update hosts set status=%d,disable_until=disable_until+%d where hostid=%d",HOST_STATUS_UNREACHABLE,DELAY_ON_NETWORK_FAILURE,hostid);
+			snprintf(sql,sizeof(sql)-1,"update hosts set status=%d,disable_until=disable_until+%d where hostid=%d",HOST_STATUS_UNREACHABLE,DELAY_ON_NETWORK_FAILURE,hostid);
 		}
 		else
 		{
-			sprintf(sql,"update hosts set status=%d,disable_until=%d where hostid=%d",HOST_STATUS_UNREACHABLE,clock+DELAY_ON_NETWORK_FAILURE,hostid);
+			snprintf(sql,sizeof(sql)-1,"update hosts set status=%d,disable_until=%d where hostid=%d",HOST_STATUS_UNREACHABLE,clock+DELAY_ON_NETWORK_FAILURE,hostid);
 		}
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		DBexecute(sql);
@@ -812,7 +812,7 @@ int	DBupdate_item_status_to_notsupported(int itemid)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBupdate_item_status_to_notsupported()");
 
-	sprintf(sql,"update items set status=%d where itemid=%d",ITEM_STATUS_NOTSUPPORTED,itemid);
+	snprintf(sql,sizeof(sql)-1,"update items set status=%d where itemid=%d",ITEM_STATUS_NOTSUPPORTED,itemid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	DBexecute(sql);
 
@@ -831,7 +831,7 @@ int	DBadd_trend(int itemid, double value, int clock)
 
 	hour=clock-clock%3600;
 
-	sprintf(sql,"select num,value_min,value_avg,value_max from trends where itemid=%d and clock=%d", itemid, hour);
+	snprintf(sql,sizeof(sql)-1,"select num,value_min,value_avg,value_max from trends where itemid=%d and clock=%d", itemid, hour);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
@@ -845,11 +845,11 @@ int	DBadd_trend(int itemid, double value, int clock)
 		if(value>value_avg)	value_max=value;
 		value_avg=(num*value_avg+value)/(num+1);
 		num++;
-		sprintf(sql,"update trends set num=%d, value_min=%g, value_avg=%g, value_max=%g where itemid=%d and clock=%d", num, value_min, value_avg, value_max, itemid, hour);
+		snprintf(sql,sizeof(sql)-1,"update trends set num=%d, value_min=%f, value_avg=%f, value_max=%f where itemid=%d and clock=%d", num, value_min, value_avg, value_max, itemid, hour);
 	}
 	else
 	{
-		sprintf(sql,"insert into trends (clock,itemid,num,value_min,value_avg,value_max) values (%d,%d,%d,%g,%g,%g)", hour, itemid, 1, value, value, value);
+		snprintf(sql,sizeof(sql)-1,"insert into trends (clock,itemid,num,value_min,value_avg,value_max) values (%d,%d,%d,%f,%f,%f)", hour, itemid, 1, value, value, value);
 	}
 	DBexecute(sql);
 
@@ -864,7 +864,7 @@ int	DBadd_history(int itemid, double value, int clock)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history()");
 
-	sprintf(sql,"insert into history (clock,itemid,value) values (%d,%d,%g)",clock,itemid,value);
+	snprintf(sql,sizeof(sql)-1,"insert into history (clock,itemid,value) values (%d,%d,%f)",clock,itemid,value);
 	DBexecute(sql);
 
 	DBadd_trend(itemid, value, clock);
@@ -878,7 +878,7 @@ int	DBadd_history_str(int itemid, char *value, int clock)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_str()");
 
-	sprintf(sql,"insert into history_str (clock,itemid,value) values (%d,%d,'%s')",clock,itemid,value);
+	snprintf(sql,sizeof(sql)-1,"insert into history_str (clock,itemid,value) values (%d,%d,'%s')",clock,itemid,value);
 	DBexecute(sql);
 
 	return SUCCEED;
@@ -892,7 +892,7 @@ int	DBget_items_count(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_items_count()");
 
-	sprintf(sql,"select count(*) from items");
+	snprintf(sql,sizeof(sql)-1,"select count(*) from items");
 
 	result=DBselect(sql);
 
@@ -918,7 +918,7 @@ int	DBget_triggers_count(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_triggers_count()");
 
-	sprintf(sql,"select count(*) from triggers");
+	snprintf(sql,sizeof(sql)-1,"select count(*) from triggers");
 
 	result=DBselect(sql);
 
@@ -944,7 +944,7 @@ int	DBget_items_unsupported_count(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_items_unsupported_count()");
 
-	sprintf(sql, "select count(*) from items where status=%d", ITEM_STATUS_NOTSUPPORTED);
+	snprintf(sql,sizeof(sql)-1,"select count(*) from items where status=%d", ITEM_STATUS_NOTSUPPORTED);
 
 	result=DBselect(sql);
 
@@ -970,7 +970,7 @@ int	DBget_history_count(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_history_count()");
 
-	sprintf(sql,"select count(*) from history");
+	snprintf(sql,sizeof(sql)-1,"select count(*) from history");
 
 	result=DBselect(sql);
 
@@ -996,7 +996,7 @@ int	DBget_trends_count(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_trends_count()");
 
-	sprintf(sql,"select count(*) from trends");
+	snprintf(sql,sizeof(sql)-1,"select count(*) from trends");
 
 	result=DBselect(sql);
 
@@ -1024,7 +1024,7 @@ int	DBget_queue_count(void)
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_queue_count()");
 
 	now=time(NULL);
-	sprintf(sql,"select count(*) from items i,hosts h where i.status=%d and i.type not in (%d) and h.status=%d and i.hostid=h.hostid and i.nextcheck<%d and i.key_<>'status'", ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, HOST_STATUS_MONITORED, now);
+	snprintf(sql,sizeof(sql)-1,"select count(*) from items i,hosts h where i.status=%d and i.type not in (%d) and h.status=%d and i.hostid=h.hostid and i.nextcheck<%d and i.key_<>'status'", ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, HOST_STATUS_MONITORED, now);
 
 	result=DBselect(sql);
 
@@ -1050,7 +1050,7 @@ int	DBadd_alert(int actionid, int mediatypeid, char *sendto, char *subject, char
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_alert()");
 
 	now = time(NULL);
-	sprintf(sql,"insert into alerts (alertid,actionid,clock,mediatypeid,sendto,subject,message,status,retries) values (NULL,%d,%d,%d,'%s','%s','%s',0,0)",actionid,now,mediatypeid,sendto,subject,message);
+	snprintf(sql,sizeof(sql)-1,"insert into alerts (alertid,actionid,clock,mediatypeid,sendto,subject,message,status,retries) values (NULL,%d,%d,%d,'%s','%s','%s',0,0)",actionid,now,mediatypeid,sendto,subject,message);
 	DBexecute(sql);
 
 	return SUCCEED;
@@ -1077,7 +1077,7 @@ void	DBvacuum(void)
 	i=0;
 	while (NULL != (table = table_for_housekeeping[i++]))
 	{
-		sprintf(sql,"vacuum analyze %s", table);
+		snprintf(sql,sizeof(sql)-1,"vacuum analyze %s", table);
 		DBexecute(sql);
 	}
 #endif
