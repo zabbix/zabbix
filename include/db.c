@@ -775,12 +775,39 @@ int	DBupdate_item_status_to_notsupported(int itemid)
 
 int	DBadd_trend(int itemid, double value, int clock)
 {
+	DB_RESULT	*result;
 	char	sql[MAX_STRING_LEN+1];
+	int	hour;
+	int	num;
+	double	value_min, value_avg, value_max;	
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_trend()");
 
-	sprintf(sql,"insert into trends (clock,itemid,num,value_min,value_avg,value_max) values (%d,%d,%d,%g,%g%g)", clock, itemid, 1, value, value, value);
+	hour=clock-clock%3600;
+
+	sprintf(sql,"select num,value_min,value_avg,value_max from trends where itemid=%d and clock=%d", itemid, hour);
+	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
+	result = DBselect(sql);
+
+	if(DBnum_rows(result) == 1)
+	{
+		num=atoi(DBget_field(result,0,0));
+		value_min=atof(DBget_field(result,0,1));
+		value_avg=atof(DBget_field(result,0,2));
+		value_max=atof(DBget_field(result,0,3));
+		if(value<value_min)	value_min=value;
+		if(value>value_avg)	value_max=value;
+		value_avg=(num*value_avg+value)/(num+1);
+		num++;
+		sprintf(sql,"update trends set num=%d, value_min=%g, value_avg=%g, value_max=%g where itemid=%d and clock=%d", num, value_min, value_avg, value_max, itemid, hour);
+	}
+	else
+	{
+		sprintf(sql,"insert into trends (clock,itemid,num,value_min,value_avg,value_max) values (%d,%d,%d,%g,%g,%g)", hour, itemid, 1, value, value, value);
+	}
 	DBexecute(sql);
+
+	DBfree_result(result);
 
 	return SUCCEED;
 }
