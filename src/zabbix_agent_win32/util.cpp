@@ -79,7 +79,7 @@ BOOL ParseCommandLine(int argc,char *argv[])
       }
       else if (!strcmp(argv[i],"standalone"))  // Run in standalone mode
       {
-         optStandalone=TRUE;
+         dwFlags|=AF_STANDALONE;
          return TRUE;
       }
       else if ((!strcmp(argv[i],"install"))||
@@ -126,7 +126,7 @@ BOOL ParseCommandLine(int argc,char *argv[])
       }
       else if (!strcmp(argv[i],"check-config"))
       {
-         optStandalone=TRUE;
+         dwFlags|=AF_STANDALONE;
          printf("Checking configuration file:\n\n");
          ReadConfig();
          return FALSE;

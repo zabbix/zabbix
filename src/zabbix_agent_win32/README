@@ -118,6 +118,10 @@ PerfCounter = <parameter_name>,"<perf_counter_path>",<period>
   Please note double quotes around performance counter path. Samples for
   calculating average value will be taken every second.
 
+LogUnresolvedSymbols = (yes | no)
+  Controls logging of unresolved symbols during agent startup. Values can be
+  strings "yes" or "no" (without quotes).
+
 The following parameters can be presented in configuration file for
 compatibility with UNIX agents but has no effect:
 
