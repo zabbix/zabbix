@@ -223,25 +223,10 @@
 				{
 					echo "</TABLE><BR>";
 				}
-//				echo "<br>";
-//				show_table_header("<A HREF='items.php?hostid=".$row["hostid"]."'>".$row["host"]."</A>");
 				echo "<form method=\"get\" action=\"items.php\">";
 				echo "<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_GET["hostid"]." size=8>";
-				echo "<TABLE BORDER=0 COLS=13  align=center WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
-				echo "<TR BGCOLOR=\"#CCCCCC\">";
-//				echo "<TD WIDTH=3% NOSAVE><B>Sel</B></TD>";
-				echo "<TD WIDTH=8% NOSAVE><B>".S_ID."</B></TD>";
-//				echo "<TD WIDTH=10% NOSAVE><B>".S_HOST."</B></TD>";
-				echo "<TD WIDTH=10% NOSAVE><B>".S_KEY."</B></TD>";
-				echo "<TD WIDTH=10% NOSAVE><B>".S_DESCRIPTION."</B></TD>";
-				echo "<TD WIDTH=5%  NOSAVE><B>".nbsp(S_UPDATE_INTERVAL)."</B></TD>";
-				echo "<TD WIDTH=5%  NOSAVE><B>".S_HISTORY."</B></TD>";
-				echo "<TD WIDTH=5%  NOSAVE><B>".S_TRENDS."</B></TD>";
-				echo "<TD><B>".S_SHORT_NAME."</B></TD>";
-				echo "<TD WIDTH=5% NOSAVE><B>".S_TYPE."</B></TD>";
-				echo "<TD WIDTH=5% NOSAVE><B>".S_STATUS."</B></TD>";
-				echo "<TD WIDTH=5% NOSAVE><B>".S_ACTIONS."</B></TD>";
-				echo "</TR>";
+				table_begin();
+				table_header(array(S_ID,S_KEY,S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),S_HISTORY,S_TRENDS,S_SHORT_NAME,S_TYPE,S_STATUS,S_ACTIONS));
 			}
 			$lasthost=$row["host"];
 		        iif_echo($col++%2 == 1,
@@ -311,7 +296,7 @@
 				"<TD>".S_CHANGE."</TD>");
 			echo "</TR>";
 		}
-		echo "</TABLE>";
+		table_end();
 		show_table2_header_begin();
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Activate selected\" onClick=\"return Confirm('".S_ACTIVATE_SELECTED_ITEMS_Q."');\">";
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Disable selected\" onClick=\"return Confirm('".S_DISABLE_SELECTED_ITEMS_Q."');\">";
