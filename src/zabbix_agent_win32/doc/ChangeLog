@@ -1,3 +1,10 @@
+1.0.0-beta11
+
+* Fixed bug in GetCounterName() function which causes agent crash on
+  Windows Server 2003
+* system[uname] now return correct information on Windows Server 2003
+
+
 1.0.0-beta10
 
 * Added support for non-english Windows versions - thanks to Harald Holzer

@@ -1,5 +1,5 @@
 
-                     ZabbixW32 version 1.0.0-beta10
+                     ZabbixW32 version 1.0.0-beta11
 
 ******************************************************************************
 
@@ -8,8 +8,8 @@ About
 -----
 
 ZabbixW32 is Zabbix agent for Win32 systems. It will work on Windows NT 4.0,
-Windows 2000 and Windows XP. ZabbixW32 doesn't supposed to work on other
-Windows platforms.
+Windows 2000, Windows XP and Windows Server 2003. ZabbixW32 doesn't supposed
+to work on other Windows platforms.
 
 
 Installation
@@ -151,7 +151,7 @@ disktotal[<path>]       <path> can be normal Windows path, like C:\, or UNC
 filesize[<path>]	<path> can be normal Windows path, like C:\, or UNC
 memory[free]
 memory[total]
-memory[cached]		Only on Windows XP
+memory[cached]		Only on Windows XP and Windows Server 2003
 ping
 proc_cnt[<process_name>]
 swap[free]
