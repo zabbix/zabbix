@@ -4903,6 +4903,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return "Bold line";
 		if($drawtype==3)
 			return "Dot";
+		if($drawtype==4)
+			return "Dashed line";
 		return "Unknown";
         }
 
