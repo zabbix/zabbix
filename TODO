@@ -1,5 +1,6 @@
 1.0:
 
+ - change logic for actions: scope =1 (triggerid=hostid), 2 (triggerid = NULL)
  - check simple check FTP under Mandrake 9.0: https://sourceforge.net/forum/message.php?msg_id=2410500
  - improve actions.php to make selection of trigger, host, hosts on the top
  - navigation bar for all graphs and screens
