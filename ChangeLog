@@ -1,5 +1,7 @@
 Changes for 1.0beta11:
 
+ - AC_FUNC_GETLOADAVG changes to AC_REPLACE_FUNCS(getloadavg) in
+ configure.in (Alexei)
  - eliminated compiler's warnings under SUSE v8.2 (Alexei)
  - added src/zabbix_sucker/housekeeper.* (Alexei)
  - new hos status: 'deleted' (Alexei)
