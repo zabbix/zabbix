@@ -67,7 +67,8 @@
 //	$problem=81;
 //	$service["goodsla"]=81;
 
-	$p=min(100-$problem,20);
+//	$p=min(100-$problem,20);
+	$p=min($problem,20);
 	$g=max($service["goodsla"]-80,0);
 
 	ImageFilledRectangle($im,$sizeX-$sizeX*$p/20,1,$sizeX-2,$sizeY-1,$darkred);
