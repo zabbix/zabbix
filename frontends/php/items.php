@@ -7,6 +7,16 @@
 ?>
 
 <?
+        if(!check_right("Host","R",0))
+        {
+                show_table_header("<font color=\"AA0000\">No permissions !</font
+>");
+                show_footer();
+                exit;
+        }
+?>
+
+<?
 	if(isset($register))
 	{
 		if($register=="update")
@@ -46,6 +56,10 @@
 	$result=DBselect("select hostid,host from hosts order by host");
 	while($row=DBfetch($result))
 	{
+        	if(!check_right("Host","R",$row["hostid"]))
+        	{
+			continue;
+		}
 		if(isset($hostid) && ($hostid == $row["hostid"]))
 		{
 			echo "<b>[";
@@ -67,6 +81,10 @@
 		$col=0;
 		while($row=DBfetch($result))
 		{
+        		if(check_right("Item","H",$row["itemid"]))
+			{
+				continue;
+			}
 			if($lasthost != $row["host"])
 			{
 				if($lasthost != "")
@@ -77,6 +95,7 @@
 				show_table_header("<A HREF='items.php?hostid=".$row["hostid"]."'>".$row["host"]."</A>");
 				echo "<TABLE BORDER=0 COLS=13  WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 				echo "<TR>";
+				echo "<TD WIDTH=\"3%\" NOSAVE><B>Id</B></TD>";
 				echo "<TD WIDTH=\"10%\" NOSAVE><B>Host</B></TD>";
 				echo "<TD WIDTH=\"10%\" NOSAVE><B>Key</B></TD>";
 				echo "<TD WIDTH=\"10%\" NOSAVE><B>Description</B></TD>";
@@ -91,6 +110,7 @@
 		        if($col++%2 == 1)	{ echo "<TR BGCOLOR=#DDDDDD>"; }
 			else			{ echo "<TR BGCOLOR=#EEEEEE>"; }
 
+			echo "<TD>".$row["itemid"]."</TD>";
 			echo "<TD>".$row["host"]."</TD>";
 			echo "<TD>".$row["key_"]."</TD>";
 			echo "<TD>".$row["description"]."</TD>";
@@ -141,7 +161,14 @@
 			}
 			echo "</td>";
 	
-			echo "<TD><A HREF=\"items.php?itemid=".$row["itemid"]."#form\">Change</A></TD>";
+        		if(check_right("Item","U",$row["itemid"]))
+			{
+				echo "<TD><A HREF=\"items.php?itemid=".$row["itemid"]."#form\">Change</A></TD>";
+			}
+			else
+			{
+				echo "<TD>Change</TD>";
+			}
 			echo "</TR>";
 		}
 		echo "</TABLE>";

@@ -334,9 +334,10 @@ CREATE TABLE users (
 --
 
 CREATE TABLE rights (
-  userid		int(4)		NOT NULL auto_increment,
+  rightid		int(4)		NOT NULL auto_increment,
+  userid		int(4)		DEFAULT '' NOT NULL,
   name			char(255)	DEFAULT '' NOT NULL,
   permission		char(1)		DEFAULT '' NOT NULL,
   id			int(4),
-  KEY (userid)
+  PRIMARY KEY (rightid)
 );
