@@ -115,6 +115,10 @@
 		$col=0;
 		while($row=DBfetch($result))
 		{
+			if(check_right_on_trigger("R",$row["triggerid"]) == 0)
+			{
+				continue;
+			}
 			if($lasthost!=$row["host"])
 			{
 				if($lasthost!="")

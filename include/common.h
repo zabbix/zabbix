@@ -13,10 +13,16 @@
 #define MAX_STRING_LEN	1024
 
 /* Item types */
-
 #define ITEM_TYPE_ZABBIX	0
 #define ITEM_TYPE_SNMP		1
 #define ITEM_TYPE_TRAPPER	2
+
+/* Trigger statuses */
+#define TRIGGER_STATUS_FALSE	0
+#define TRIGGER_STATUS_TRUE	1
+#define TRIGGER_STATUS_DISABLED	2
+#define TRIGGER_STATUS_UNKNOWN	3
+#define TRIGGER_STATUS_NOTSUPPORTED	4
 
 #define	AGENTD_FORKS	5
 

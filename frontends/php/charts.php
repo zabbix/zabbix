@@ -31,6 +31,10 @@
 		$result=DBselect("select graphid,name from graphs order by name");
 		while($row=DBfetch($result))
 		{
+			if(!check_right("Graph","R",$row["graphid"]))
+			{
+				continue;
+			}
 			if( isset($graphid) && ($graphid == $row["graphid"]) )
 			{
 				echo "<b>[";

@@ -75,14 +75,28 @@
 		echo "<TD><a href=\"items.php?hostid=".$row["hostid"]."\">".$row["host"]."</a></TD>";
 		echo "<TD>".$row["port"]."</TD>";
 		echo "<TD>";
-		if($row["status"] == 0)	
-			echo "<a href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=1\">Monitored</a>";
-		else if($row["status"] == 1)
-			echo "<a href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=0\">Not monitored</a>";
-		else if($row["status"] == 2)
-			echo "Unreachable";
+        	if(check_right("Host","U",$row["hostid"]))
+		{
+			if($row["status"] == 0)	
+				echo "<a href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=1\">Monitored</a>";
+			else if($row["status"] == 1)
+				echo "<a href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=0\">Not monitored</a>";
+			else if($row["status"] == 2)
+				echo "Unreachable";
+			else
+				echo "Unknown";
+		}
 		else
-			echo "Unknown";
+		{
+			if($row["status"] == 0)	
+				echo "Monitored";
+			else if($row["status"] == 1)
+				echo "Not monitored";
+			else if($row["status"] == 2)
+				echo "Unreachable";
+			else
+				echo "Unknown";
+		}
 		echo "</TD>";
         	if(check_right("Host","U",$row["hostid"]))
 		{

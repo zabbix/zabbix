@@ -8,6 +8,16 @@
 	{
 		global $USER_DETAILS;
 
+		if($id!=0)
+		{
+			$sql="select * from rights where name='$right' and permission in ('H') and id=$id and userid=".$USER_DETAILS["userid"];
+			$result=DBselect($sql);
+			if(DBnum_rows($result)>0)
+			{
+				return	0;
+			}
+		}
+
 		$sql="select permission from rights where name='Default permission' and userid=".$USER_DETAILS["userid"];
 		$result=DBselect($sql);
 
@@ -27,14 +37,7 @@
 			$cond="'".$permission."'";
 		}
 
-		if($id==0)
-		{
-			$sql="select * from rights where name='$right' and permission in ($cond) and userid=".$USER_DETAILS["userid"];
-		}
-		else
-		{
-			$sql="select * from rights where name='$right' and permission in ($cond) and (id=$id or id=0) and userid=".$USER_DETAILS["userid"];
-		}
+		$sql="select * from rights where name='$right' and permission in ($cond) and (id=$id or id=0) and userid=".$USER_DETAILS["userid"];
 //		echo $sql;
 
 		$result=DBselect($sql);
@@ -133,6 +136,23 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	}
 
 
+	function	get_graph_by_graphid($graphid)
+	{
+		global	$ERROR_MSG;
+
+		$sql="select * from graphs where graphid=$graphid"; 
+		$result=DBselect($sql);
+		if(DBnum_rows($result) == 1)
+		{
+			return	DBfetch($result);	
+		}
+		else
+		{
+			$ERROR_MSG="No graph with graphid=[$graphid]";
+		}
+		return	$graph;
+	}
+
 	function	get_item_by_itemid($itemid)
 	{
 		global	$ERROR_MSG;
@@ -189,7 +209,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		global	$ERROR_MSG;
 
-		$sql="select smtp_server,smtp_helo,smtp_email,password_required,alarm_history,alert_history from config";
+		$sql="select smtp_server,smtp_helo,smtp_email,alarm_history,alert_history from config";
 		$result=DBselect($sql);
 
 		if(DBnum_rows($result) == 1)
@@ -197,9 +217,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$config["smtp_server"]=DBget_field($result,0,0);
 			$config["smtp_helo"]=DBget_field($result,0,1);
 			$config["smtp_email"]=DBget_field($result,0,2);
-			$config["password_required"]=DBget_field($result,0,3);
-			$config["alarm_history"]=DBget_field($result,0,4);
-			$config["alert_history"]=DBget_field($result,0,5);
+			$config["alarm_history"]=DBget_field($result,0,3);
+			$config["alert_history"]=DBget_field($result,0,4);
 		}
 		else
 		{
@@ -243,7 +262,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		global	$ERROR_MSG;
 
-		$sql="select serviceid,name,triggerid from services where serviceid=$serviceid";
+		$sql="select * from services where serviceid=$serviceid";
 		$result=DBselect($sql);
 		if(Dbnum_rows($result) == 1)
 		{
@@ -450,72 +469,37 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	check_authorisation()
 	{
-		global $page;
-		global $PHP_AUTH_USER,$PHP_AUTH_PW;
-		global $USER_DETAILS;
+		global	$reconnect;	
+		global	$page;
+		global	$PHP_AUTH_USER,$PHP_AUTH_PW;
+		global	$USER_DETAILS;
 
-		if(!isset($PHP_AUTH_USER))
-		{
-			$PHP_AUTH_USER="guest";
-		}
+//		if(!isset($PHP_AUTH_USER))
+//		{
+//			$PHP_AUTH_USER="guest";
+//			$PHP_AUTH_PW="";
+//		}
 
 		$passwd=md5($PHP_AUTH_PW);
 
-		$sql="select g.groupid,u.userid,u.alias,u.name,u.surname from users u,groups g where u.alias='$PHP_AUTH_USER' and u.passwd='$passwd' and u.groupid=g.groupid";
+		$sql="select u.userid,u.alias,u.name,u.surname from users u where u.alias='$PHP_AUTH_USER' and u.passwd='$passwd'";
 		$result=DBselect($sql);
 		if(DBnum_rows($result)==1)
 		{
-			$USER_DETAILS["groupid"]=DBget_field($result,0,0);
-			$USER_DETAILS["userid"]=DBget_field($result,0,1);
-			$USER_DETAILS["alias"]=DBget_field($result,0,2);
-			$USER_DETAILS["name"]=DBget_field($result,0,3);
-			$USER_DETAILS["surname"]=DBget_field($result,0,4);
+			$USER_DETAILS["userid"]=DBget_field($result,0,0);
+			$USER_DETAILS["alias"]=DBget_field($result,0,1);
+			$USER_DETAILS["name"]=DBget_field($result,0,2);
+			$USER_DETAILS["surname"]=DBget_field($result,0,3);
 		}
-		
 
-		if(	($page["file"]=="latest.php")||
-			($page["file"]=="tr_status.php")||
-			($page["file"]=="tr_comments.php")||
-			($page["file"]=="queue.php")||
-			($page["file"]=="latestalarms.php")||
-			($page["file"]=="alarms.php")||
-			($page["file"]=="alerts.php")||
-			($page["file"]=="history.php")||
-			($page["file"]=="maps.php")||
-			($page["file"]=="map.php")||
-			($page["file"]=="charts.php")||
-			($page["file"]=="chart.php")||
-			($page["file"]=="about.php")||
-			($page["file"]=="srv_status.php")||
-			($page["file"]=="index.php"))
-		{
-			$sql="select password_required from config";
-			$result=DBselect($sql);
-
-			if(DBget_field($result,0,0)==0)
-			{
-				return;
-			}
-
-			$sql="select count(*) from users u,groups g where u.alias='$PHP_AUTH_USER' and u.passwd='$passwd' and u.groupid=g.groupid and (g.groupid=1 or g.groupid=2)";
-		}
-		else
-		{
-			$sql="select count(*) from users u,groups g where u.alias='$PHP_AUTH_USER' and u.passwd='$passwd' and u.groupid=g.groupid and g.groupid=1";
-		}
-		$result=DBselect($sql);
-
-//		echo "==",DBget_field($result,0,0),"==";
-
-		if(DBget_field($result,0,0)!=1)
+		if(DBnum_rows($result)!=1)
 		{
 			Header("WWW-authenticate: basic realm=\"Zabbix\"");
 			Header("HTTP/1.0 401 Unauthorized");
+
 			echo "Try to contact Zabbix Administrator to get additional rights :-)\n";
 			exit;
 		}
-
-
 	}
 
 	# Header for HTML pages
@@ -692,6 +676,21 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		<tr>
 		<td colspan=2 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
+				<a href="index.php">
+<?
+				if($page["file"]=="index.php")
+				{
+					echo "<b>[HOME]</b></a>";
+				}
+				else
+				{
+					echo "HOME</a>";
+				}
+?>
+			</font>
+		</td>
+		<td colspan=2 bgcolor=FFFFFF align=center valign="top" width="15%">
+			<font face="Arial,Helvetica" size=2>
 				<a href="about.php">
 <?
 				if($page["file"]=="about.php")
@@ -705,7 +704,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 			</font>
 		</td>
-		<td colspan=3 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=2 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
 				<a href="report1.php">
 <?
@@ -720,7 +719,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 			</font>
 		</td>
-		<td colspan=3 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=2 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
 				<a href="report2.php">
 <?
@@ -1085,7 +1084,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		global	$ERROR_MSG;
 
-		if(!check_right("Trigger comment","U",$row["hostid"]))
+		if(!check_right("Trigger comment","U",$triggerid))
 		{
 			$ERROR_MSG="Insufficient permissions";
 			return	0;
@@ -1116,6 +1115,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	update_host_status($hostid,$status)
 	{
+                global  $ERROR_MSG;
+                if(!check_right("Host","U",0))
+                {
+                        $ERROR_MSG="Insufficient permissions";
+                        return 0;
+                }
+
 		$sql="update hosts set status=$status where hostid=$hostid";
 		return	DBexecute($sql);
 	}
@@ -1286,6 +1292,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		$sql="delete from alerts where actionid=$actionid";
 		return	DBexecute($sql);
 	}
+
+	function	delete_rights_by_userid($userid )
+	{
+		$sql="delete from rights where userid=$userid";
+		return	DBexecute($sql);
+	}
+
 
 	# Delete Action by userid
 
@@ -1569,7 +1582,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Update User definition
 
-	function	update_user($userid,$groupid,$name,$surname,$alias,$passwd)
+	function	update_user($userid,$name,$surname,$alias,$passwd)
 	{
 		global	$ERROR_MSG;
 
@@ -1581,12 +1594,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		if($passwd=="")
 		{
-			$sql="update users set groupid=$groupid,name='$name',surname='$surname',alias='$alias' where userid=$userid";
+			$sql="update users set name='$name',surname='$surname',alias='$alias' where userid=$userid";
 		}
 		else
 		{
 			$passwd=md5($passwd);
-			$sql="update users set groupid=$groupid,name='$name',surname='$surname',alias='$alias',passwd='$passwd' where userid=$userid";
+			$sql="update users set name='$name',surname='$surname',alias='$alias',passwd='$passwd' where userid=$userid";
 		}
 		return DBexecute($sql);
 	}
@@ -1601,7 +1614,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Add User definition
 
-	function	add_user($groupid,$name,$surname,$alias,$passwd)
+	function	add_user($name,$surname,$alias,$passwd)
 	{
 		global	$ERROR_MSG;
 
@@ -1612,7 +1625,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 
 		$passwd=md5($passwd);
-		$sql="insert into users (groupid,name,surname,alias,passwd) values ($groupid,'$name','$surname','$alias','$passwd')";
+		$sql="insert into users (name,surname,alias,passwd) values ('$name','$surname','$alias','$passwd')";
 		return DBexecute($sql);
 	}
 
@@ -1872,7 +1885,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Update configuration
 
-	function	update_config($smtp_server,$smtp_helo,$smtp_email,$password_required,$alarm_history,$alert_history)
+	function	update_config($smtp_server,$smtp_helo,$smtp_email,$alarm_history,$alert_history)
 	{
 		global	$ERROR_MSG;
 
@@ -1882,7 +1895,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return	0;
 		}
 
-		$sql="update config set smtp_server='$smtp_server',smtp_helo='$smtp_helo',smtp_email='$smtp_email',password_required=$password_required,alarm_history=$alarm_history,alert_history=$alert_history";
+		$sql="update config set smtp_server='$smtp_server',smtp_helo='$smtp_helo',smtp_email='$smtp_email',alarm_history=$alarm_history,alert_history=$alert_history";
 		return	DBexecute($sql);
 	}
 
@@ -1962,6 +1975,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		delete_media_by_userid($userid);
 		delete_actions_by_userid($userid);
+		delete_rights_by_userid($userid);
 
 		$sql="delete from users where userid=$userid";
 		return DBexecute($sql);
@@ -2470,6 +2484,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	# Insert form for User permissions
 	function	insert_permissions_form($userid)
 	{
+		echo "<br>";
+
 		show_table2_header_begin();
 		echo "New permission";
 
@@ -2484,6 +2500,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<select name=\"right\">";
 		echo "<option value=\"Configuration of Zabbix\">Configuration of Zabbix";
 		echo "<option value=\"Default permission\">Default permission";
+		echo "<option value=\"Graph\">Graph";
 		echo "<option value=\"Host\">Host";
 		echo "<option value=\"Item\">Item";
 		echo "<option value=\"Network map\">Network map";
@@ -2516,14 +2533,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		if(isset($userid))
 		{
-			$result=DBselect("select u.alias,u.name,u.surname,u.passwd,g.groupid from users u,groups g where u.groupid=g.groupid and u.userid=$userid");
+			$result=DBselect("select u.alias,u.name,u.surname,u.passwd from users u where u.userid=$userid");
 	
 			$alias=DBget_field($result,0,0);
 			$name=DBget_field($result,0,1);
 			$surname=DBget_field($result,0,2);
 #			$password=DBget_field($result,0,3);
 			$password="";
-			$groupid_=DBget_field($result,0,4);
 		}
 		else
 		{
@@ -2531,7 +2547,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$name="";
 			$surname="";
 			$password="";
-			$groupid_=0;
 		}
 
 		show_table2_header_begin();
@@ -2556,26 +2571,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "Surname";
 		show_table2_h_delimiter();
 		echo "<input name=\"surname\" value=\"$surname\" size=20>";
-
-		show_table2_v_delimiter();
-		echo "User group";
-		show_table2_h_delimiter();
-		echo "<select name=\"groupid\">";
-		$result=DBselect("select groupid,name from groups order by name");
-		for($i=0;$i<DBnum_rows($result);$i++)
-		{
-			$groupid=DBget_field($result,$i,0);
-			$name=DBget_field($result,$i,1);
-			if($groupid_==$groupid)
-			{
-				echo "<option value=\"$groupid\" selected>$name";
-			}
-			else
-			{
-				echo "<option value=\"$groupid\">$name";
-			}
-		}
-		echo "</select>";
 
 		show_table2_v_delimiter();
 		echo "Password";
@@ -2883,7 +2878,19 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	function	get_resource_name($permission,$id)
 	{
 		$res="-";
-		if($permission=="Host")
+		if($permission=="Graph")
+		{
+			if(isset($id)&&($id!=0))
+			{
+				$host=get_graph_by_graphid($id);
+				$res=$host["name"];
+			}
+			else
+			{
+				$res="All graphs";
+			}
+		}
+		else if($permission=="Host")
 		{
 			if(isset($id)&&($id!=0))
 			{
@@ -2913,14 +2920,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			if(isset($id)&&($id!=0))
 			{
 				$user=get_user_by_userid($id);
-				$res=$user["name"]." ".$user["surname"];
+				$res=$user["alias"];
 			}
 			else
 			{
 				$res="All users";
 			}
 		}
-		else if($permission=="System map")
+		else if($permission=="Network map")
 		{
 			if(isset($id)&&($id!=0))
 			{
@@ -2929,7 +2936,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			}
 			else
 			{
-				$res="All system maps";
+				$res="All maps";
 			}
 		}
 		return $res;

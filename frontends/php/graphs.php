@@ -35,6 +35,7 @@
 <?
 	show_table_header("GRAPHS");
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TD WIDTH=\"5%\" NOSAVE><B>Id</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Name</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Width</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Height</B></TD>";
@@ -46,9 +47,14 @@
 	$col=0;
 	while($row=DBfetch($result))
 	{
+		if(!check_right("Graph","R",$row["graphid"]))
+		{
+			continue;
+		}
 		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
 		else		{ echo "<TR BGCOLOR=#DDDDDD>"; }
 	
+		echo "<TD>".$row["graphid"]."</TD>";
 		echo "<TD><a href=\"graph.php?graphid=".$row["graphid"]."\">".$row["name"]."</a></TD>";
 		echo "<TD>".$row["width"]."</TD>";
 		echo "<TD>".$row["height"]."</TD>";

@@ -784,6 +784,10 @@ int main_housekeeping_loop()
 	for(;;)
 	{
 #ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("connecting to the database");
+#endif
+		DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+#ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("housekeeper [removing old values]");
 #endif
 
@@ -805,6 +809,7 @@ int main_housekeeping_loop()
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("housekeeper [sleeping for %d hour(s)]", CONFIG_HOUSEKEEPING_FREQUENCY);
 #endif
+		DBclose();
 		sleep(3600*CONFIG_HOUSEKEEPING_FREQUENCY);
 	}
 }
@@ -814,6 +819,7 @@ int main_sucker_loop()
 	int	now;
 	int	nextcheck,sleeptime;
 
+	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
 	for(;;)
 	{
 #ifdef HAVE_FUNCTION_SETPROCTITLE
@@ -910,8 +916,6 @@ int main(int argc, char **argv)
 #ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
 	init_snmp("zabbix_suckerd");
 #endif
-
-	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
 
 	if(sucker_num == 0)
 	{

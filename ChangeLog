@@ -1,7 +1,6 @@
 Not ready yet:
 
 [ CORE. Support for automake ]
-[ CORE. Connect to DB for each request. zabbix_trapperd ]
 
 [ CORE. Support for Service Tree ] 
 [ CORE. Support for flexible permissions ]
@@ -11,12 +10,19 @@ Not ready yet:
 [ PHP. Show diff instead of real values ]
 [ PHP. Show triggers by userid ]
 
-[ CORE. Add support for new trigger statuses: MODIFIED/NOTSUPORTED ]
+[ CORE. Add support for new trigger statuses: DISABLED/UNKNOWN/NOTSUPORTED ]
 
 [ DOCS. All parameters should contain section "How can be used" in the Manual ]
 
 Changes for 1.0beta3:
 
+ - zabbix_suckerd housekeeping process to disconnect from 
+ DB when unactive (Alexei)
+ - support for check_service[http] (Alexei)
+ - drop column config.password_required (Alexei)
+ - drop column users.groupid (Alexei)
+ - drop table groups (Alexei)
+ - added parameter DBConnectOnEach for zabbix_trapperd (Alexei)
  - added default user "guest" (Alexei)
  - more support for flexible permissions (Alexei)
  - added support for Inverse Select in status of triggers (Alexei)

@@ -7,6 +7,16 @@
 ?>
 
 <?
+        if(!check_right("User","R",$userid))
+        {
+                show_table_header("<font color=\"AA0000\">No permissions !</font
+>");
+                show_footer();
+                exit;
+        }
+?>
+
+<?
 	show_table_header("MEDIA");
 ?>
 

@@ -41,6 +41,7 @@ int	CONFIG_LISTEN_PORT		= 10001;
 int	CONFIG_TIMEOUT			= TRAPPER_TIMEOUT;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 int	CONFIG_NOTIMEWAIT		= 0;
+int	CONFIG_CONNECTONEACH		= 0;
 char	*CONFIG_PID_FILE		= NULL;
 char	*CONFIG_LOG_FILE		= NULL;
 char	*CONFIG_DBNAME			= NULL;
@@ -139,6 +140,7 @@ void    init_config(void)
 		{"DBUser",&CONFIG_DBUSER,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBPassword",&CONFIG_DBPASSWORD,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBSocket",&CONFIG_DBSOCKET,0,TYPE_STRING,PARM_OPT,0,0},
+		{"DBConnectOnEach",&CONFIG_CONNECTONEACH,0,TYPE_INT,PARM_OPT,0,1},
 		{"NoTimeWait",&CONFIG_NOTIMEWAIT,0,TYPE_INT,PARM_OPT,0,1},
 		{0}
 	};
@@ -352,7 +354,10 @@ void	child_main(int i,int listenfd, int addrlen)
 
 	zabbix_log( LOG_LEVEL_WARNING, "zabbix_trapperd %ld started",(long)getpid());
 
-	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+	if(0 == CONFIG_CONNECTONEACH)
+	{
+		DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+	}
 
 	for(;;)
 	{
@@ -365,9 +370,21 @@ void	child_main(int i,int listenfd, int addrlen)
 		setproctitle("processing data");
 #endif
 
+		if(1 == CONFIG_CONNECTONEACH)
+		{
+			DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+		}
 		process_child(connfd);
+		if(1 == CONFIG_CONNECTONEACH)
+		{
+			DBclose();
+		}
 
 		close(connfd);
+	}
+	if(0 == CONFIG_CONNECTONEACH)
+	{
+		DBclose();
 	}
 }
 
