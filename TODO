@@ -51,6 +51,8 @@ TELECENTRS:
 
 OTHER:
 
+ - negative values in graphs
+
 We're currently using Zabbix to monitor about 350 routers at our remote
 locations. I have two items configured for each node a simple icmpping to
 see if the router is up, and an SNMP query to check the status of a
