@@ -1,6 +1,5 @@
 TOP PRIORITY:
 
- - check SNMP port number
  - improve graphing capabilities
  - support for net-snmp
  - SNMP trapping
@@ -10,7 +9,6 @@ BUGS:
  - graphs and maps are not displayed properly sometimes
  - BUG. Agent return unsupported in case if UserParameter ends by timeout.
  - add protection from IT Service looping
- - mass-adding of actions
  - BUG. No horizontal lines. Replace ImageDashedLine() to gdImageLine() plus
    ImageSetStyle()
 
@@ -52,6 +50,7 @@ the agent with a predefined API that can return values to suckerd.
 
 Not ready yet:
 
+ - mass-adding of actions
  - BUG. zabbix_sucker should accept parameter regardless of "\n" at the end of line 
  - update docs related to WIN32 agent
  - get rid of long select lists in user forms 
