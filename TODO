@@ -1,7 +1,6 @@
 1.0beta11:
 
  - check user permissions (how to make only one host accessible?)
- - special item. (last-prev)/time  (Update of frontend required!)
  - mess with user groups when running under root
  - support for PREFIX/zabbix/etc (configuration files)
  - trapper item. Source->Alarms do not grow when last status is unknown for
@@ -9,7 +8,6 @@ latest trigger (item type  = TRAPPER)
  - SNMP traps. Condition to switch expression off. New function which would return
  status of the trigger could help. 
 
- - trigger expression for ON->OFF state
  - cannot use "." as key in trigger expressions
  - show date in graps
  - time-navigation for graphs
