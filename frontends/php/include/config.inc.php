@@ -2732,6 +2732,37 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		return $result;
 	}
+
+	function	update_user_group($usrgrpid,$name,$users)
+	{
+		global	$ERROR_MSG;
+
+		if(!check_right("Host","U",0))
+		{
+			$ERROR_MSG="Insufficient permissions";
+			return 0;
+		}
+
+		$sql="select * from usrgrp where name='$name' and usrgrpid<>$usrgrpid";
+		$result=DBexecute($sql);
+		if(DBnum_rows($result)>0)
+		{
+			$ERROR_MSG="Group '$name' already exists";
+			return 0;
+		}
+
+		$sql="update usrgrp set name='$name' where usrgrpid=$usrgrpid";
+		$result=DBexecute($sql);
+		if(!$result)
+		{
+			return	$result;
+		}
+		
+		update_user_groups($usrgrpid,$users);
+
+		return $result;
+	}
+		
 		
 	# Add Host definition
 

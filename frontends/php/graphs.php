@@ -92,9 +92,9 @@
 	}
 	if(DBnum_rows($result)==0)
 	{
-			echo "<TR BGCOLOR=#EEEEEE>";
-			echo "<TD COLSPAN=5 ALIGN=CENTER>-No graphs defined-</TD>";
-			echo "<TR>";
+		echo "<TR BGCOLOR=#EEEEEE>";
+		echo "<TD COLSPAN=5 ALIGN=CENTER>-No graphs defined-</TD>";
+		echo "<TR>";
 	}
 	echo "</TABLE>";
 ?>
