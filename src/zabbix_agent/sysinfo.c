@@ -107,6 +107,8 @@
 #include "common.h"
 #include "sysinfo.h"
 
+void	forward_request(char *proxy,char *command,int port,char *value);
+
 COMMAND	commands[AGENT_MAX_USER_COMMANDS]=
 /* 	KEY		FUNCTION (if double) FUNCTION (if string) PARAM*/
 	{
@@ -322,7 +324,7 @@ void	process(char *command,char *value)
 			port_int=atoi(port);
 		}
 /* Must be fixed !!! */
-/*		forward_request(proxy,command,port_int,value);*/
+		forward_request(proxy,command,port_int,value);
 		return;
 	}
 
@@ -1764,7 +1766,7 @@ double	EXECUTE(char *command)
 
 	return	result;
 }
-/*
+
 void	forward_request(char *proxy,char *command,int port,char *value)
 {
 	char	*haddr;
@@ -1780,7 +1782,9 @@ void	forward_request(char *proxy,char *command,int port,char *value)
 	host = gethostbyname(proxy);
 	if(host == NULL)
 	{
-		return	0;
+		sprintf(value,"%s","ZBX_NETWORK_ERROR\n");
+		close(s);
+		return;
 	}
 
 	haddr=host->h_addr;
@@ -1794,37 +1798,35 @@ void	forward_request(char *proxy,char *command,int port,char *value)
 	s = socket(AF_INET, SOCK_STREAM, 0);
 	if (s == -1)
 	{
+		sprintf(value,"%s","ZBX_NOTSUPPORTED\n");
 		close(s);
-		return	0;
+		return;
 	}
 
 	if (connect(s, (struct sockaddr *) &addr, addrlen) == -1)
 	{
+		sprintf(value,"%s","ZBX_NETWORK_ERROR\n");
 		close(s);
-		return	0;
+		return;
 	}
 
 	if(write(s,command,strlen(command)) == -1)
 	{
+		sprintf(value,"%s","ZBX_NETWORK_ERROR\n");
+		close(s);
+		return;
 	}
-		
 
 	memset(&c, 0, 1024);
-	recv(s, c, 1024, 0);
-	if ( strncmp(c, expect, strlen(expect)) == 0 )
+	if(read(s, c, 1024) == -1)
 	{
-		send(s,sendtoclose,strlen(sendtoclose),0);
+		sprintf(value,"%s","ZBX_ERROR\n");
 		close(s);
-		return	1;
+		return;
 	}
-	else
-	{
-		send(s,sendtoclose,strlen(sendtoclose),0);
-		close(s);
-		return	0;
-	}
+	close(s);
+	strcpy(value,c);
 }
-*/
 
 
 /* 
