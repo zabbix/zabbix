@@ -1,5 +1,7 @@
 Changes for 1.1alpha7:
 
+ - added frontends/php/include/triggers.inc.php (Alexei)
+ - added frontends/php/include/graphs.inc.php (Alexei)
  - added frontends/php/include/audit.inc.php (Alexei)
  - added frontends/php/include/users.inc.php (Alexei)
  - added frontends/php/include/screens.inc.php (Alexei)

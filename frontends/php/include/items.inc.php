@@ -228,4 +228,29 @@
 		}
 		return	$item;
 	}
+
+	# Delete Item definition
+
+	function	delete_item($itemid)
+	{
+		$result=delete_triggers_by_itemid($itemid);
+		if(!$result)
+		{
+			return	$result;
+		}
+		$result=delete_trends_by_itemid($itemid);
+		$result=delete_history_by_itemid($itemid);
+		$sql="delete from graphs_items where itemid=$itemid";
+		if(!$result)
+		{
+			return	$result;
+		}
+		$result=DBexecute($sql);
+		if(!$result)
+		{
+			return	$result;
+		}
+		$sql="delete from items where itemid=$itemid";
+		return	DBexecute($sql);
+	}
 ?>
