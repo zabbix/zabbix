@@ -29,7 +29,8 @@ Changes for 1.0beta3:
  zabbix_trapperd (Alexei)
  - Zabbix processes will show statuses for ps (FreeBSD,...) (Alexei)
  - changes in AUTHORS (Alexei)
- - added support for IP addresses for SNMP-enabled hosts (Alexei) 
+ - added support for IP addresses for SNMP-enabled hosts.
+ Thanks to Denis Ustimenko. (Alexei) 
  - commented #define TEST_PARAMETERS in zabbix_agent.c (Alexei)
  - proc_cnt[apache] was changed to proc_cnt[httpd] (Alexei)
 
