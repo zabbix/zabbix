@@ -390,6 +390,9 @@ int	DBupdate_trigger_value(int triggerid,int value,int clock)
 	sprintf(sql,"update triggers set value=%d,lastchange=%d where triggerid=%d",value,clock,triggerid);
 	DBexecute(sql);
 
+	sprintf(sql,"update functions set lastvalue=NULL where triggerid=%d",triggerid);
+	DBexecute(sql);
+
 #ifdef	IT_HELPDESK
 	update_problems(triggerid,value,clock);
 #endif

@@ -28,11 +28,21 @@ Not ready yet:
  - high level Zabbix schema on paper !
  - permissions for all *.php (charts, graphs , hosts, etc etc )
  - add numeric constants to trigger expressions
+ - support for .str(string) in trigger expressions. Type of
+   functions.parameter needs tp be changed
  - show who is online somewhere (in User config form?)
  - setup demo site
+ - test carefully all trigger expression forms
+ - update function.lastvalue to NULL when trigger's status becomes
+   UNKNOWN (done?)
+ - update trigger status to unknown if cannot evaluate function 
+ - do not dump "Expression cannot be evaluated" in case if function.lastvalue
+   is NULL
 
 Changes for 1.0beta6:
 
+ - support for new trigger function: str() (Alexei)
+ - changed type of functions.parameter to varchar(255) (Alexei)
  - additional colors for graphs (Alexei)
  - in chart3.php: group by <complex expression> changed to group by 1
  (Alexei)

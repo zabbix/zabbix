@@ -373,13 +373,20 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		global	$ERROR_MSG;
 
 //		echo "Validating simple:$expression<br>";
-//		if (eregi('^\{([0-9a-zA-Z\_\.]+)\:([0-9a-zA-Z\_]+)\.((diff)|(min)|(max)|(last)|(nodata))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
-		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.\,]+)\.((diff)|(min)|(max)|(last)|(prev))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
+// Before str()
+// 		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.\,]+)\.((diff)|(min)|(max)|(last)|(prev))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
+//		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.\,]+)\.((diff)|(min)|(max)|(last)|(prev)|(str))\(([0-9a-zA-Z\.\_\/\,]+)\)\}$', $expression, &$arr)) 
+ 		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.\,]+)\.([a-z]{3,4})\(([0-9a-zA-Z\_\/\.\,]+)\)\}$', $expression, &$arr)) 
 		{
 			$host=$arr[1];
 			$key=$arr[2];
 			$function=$arr[3];
-			$parameter=$arr[9];
+			$parameter=$arr[4];
+
+//			echo $host,"<br>";
+//			echo $key,"<br>";
+//			echo $function,"<br>";
+//			echo $parameter,"<br>";
 
 			$sql="select count(*) from hosts h,items i where h.host='$host' and i.key_='$key' and h.hostid=i.hostid";
 			$result=DBselect($sql);
@@ -389,7 +396,19 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				return -1;
 			}
 
-			if(validate_float($parameter)!=0)
+			if(	($function!="last")&&
+				($function!="diff")&&
+				($function!="min") &&
+				($function!="max") &&
+				($function!="prev")&&
+				($function!="str"))
+			{
+				$ERROR_MSG="Unknown function [$function]";
+				return -1;
+			}
+
+
+			if(( $function!="str") && (validate_float($parameter)!=0) )
 			{
 				$ERROR_MSG="[$parameter] is not a float";
 				return -1;
@@ -1133,7 +1152,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 #				}
 #				else
 #				{
-					$sql="insert into functions (itemid,triggerid,function,parameter) values ($itemid,$triggerid,'$function',$parameter)";
+					$sql="insert into functions (itemid,triggerid,function,parameter) values ($itemid,$triggerid,'$function','$parameter')";
 #					echo $sql,"<Br>";
 					$res=DBexecute($sql);
 					if(!$res)
@@ -1456,19 +1475,25 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	1;
 	}
 
+	function	is_service_hardlinked($serviceid)
+	{
+		$sql="select count(*) from services_links where servicedownid=$serviceid and soft=0";
+		$result=DBselect($sql);
+		if(DBget_field($result,0,0)>0)
+		{
+			return	TRUE;
+		}
+		return	FALSE;
+		
+	}
+
 	function	add_service_link($servicedownid,$serviceupid,$softlink)
 	{
 //		global	$ERROR_MSG;
 
-		if($softlink==0)
+		if( ($softlink==0) && (is_service_hardlinked($servicedownid)==TRUE) )
 		{
-			$sql="select count(*) from services_links where servicedownid=$servicedownid and soft=0";
-			$result=DBselect($sql);
-			if(DBget_field($result,0,0)>0)
-			{
-//				$ERROR_MSG="The service is already hard-linked";
-				return	FALSE;
-			}
+			return	FALSE;
 		}
 
 		$sql="insert into services_links (servicedownid,serviceupid,soft) values ($servicedownid,$serviceupid,$softlink)";

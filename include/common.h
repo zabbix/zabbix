@@ -19,6 +19,10 @@
 #define ITEM_TYPE_SNMP		1
 #define ITEM_TYPE_TRAPPER	2
 
+/* Item value types */
+#define ITEM_VALUE_TYPE_FLOAT	0
+#define ITEM_VALUE_TYPE_STR	1
+
 /* Special item key used for storing server status */
 #define SERVER_STATUS_KEY	"status"
 

@@ -804,6 +804,11 @@ FreeBSD 4.3
 \layout Itemize
 
 SCO OpenServer 5.0.5
+\begin_inset Info
+Add the platform to table of supported parameters. Contact Alk for more information.
+\end_inset 
+
+
 \layout Standard
 
 Note that 
@@ -1051,6 +1056,11 @@ is one of most popular daemons that synchronises the host's time with the
 \layout Subsection
 
 Structure of Zabbix distribution
+\begin_inset Info
+More details.
+\end_inset 
+
+
 \layout Standard
 
 Zabbix distribution
@@ -6762,11 +6772,19 @@ prev
  
 \latex no_latex 
 previous value, parameter is ignored
+\layout Description
+
+str find string in last (most recent) value, parameter - string to find.
+ 1 - found, 0 - otherwise
 \layout Standard
 
 Note that all above functions (except 
 \series bold 
 diff
+\series default 
+ and 
+\series bold 
+str
 \series default 
 ) 
 \emph on 
