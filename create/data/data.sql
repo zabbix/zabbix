@@ -149,24 +149,39 @@ INSERT INTO items VALUES (10068,0,'','',161,10001,'Total disk space on /opt','di
 INSERT INTO items VALUES (10069,0,'','',161,10001,'Total disk space on /tmp','disktotal[/tmp]',3600,30,0,0,NULL,NULL,NULL,0,0,'','bytes',1);
 INSERT INTO items VALUES (10070,0,'','',161,10001,'Total disk space on /usr','disktotal[/usr]',3600,30,0,0,NULL,NULL,NULL,0,0,'','bytes',1);
 INSERT INTO items VALUES (10071,0,'','',161,10001,'Total disk space on /home','disktotal[/home]',3600,30,0,0,NULL,NULL,NULL,0,0,'','bytes',1);
-INSERT INTO items VALUES (10072,0,'','',161,10001,'Incoming traffic of interface lo (1min)','netloadin1[lo]',5,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
-INSERT INTO items VALUES (10073,0,'','',161,10001,'Incoming traffic of interface lo (5min)','netloadin5[lo]',10,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
-INSERT INTO items VALUES (10074,0,'','',161,10001,'Incoming traffic of interface lo (15min)','netloadin15[lo]',20,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
-INSERT INTO items VALUES (10075,0,'','',161,10001,'Incoming traffic of interface eth0 (1min)','netloadin1[eth0]',5,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
-INSERT INTO items VALUES (10076,0,'','',161,10001,'Incoming traffic of interface eth0 (5min)','netloadin5[eth0]',10,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
-INSERT INTO items VALUES (10077,0,'','',161,10001,'Incoming traffic of interface eth0 (15min)','netloadin15[eth0]',20,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
-INSERT INTO items VALUES (10078,0,'','',161,10001,'Incoming traffic of interface eth1 (1min)','netloadin1[eth1]',5,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
-INSERT INTO items VALUES (10079,0,'','',161,10001,'Incoming traffic of interface eth1 (5min)','netloadin5[eth1]',10,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
-INSERT INTO items VALUES (10080,0,'','',161,10001,'Incoming traffic of interface eth1 (15min)','netloadin15[eth1]',20,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
-INSERT INTO items VALUES (10081,0,'','',161,10001,'Outgoing traffic of interface lo (1min)','netloadout1[lo]',5,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
-INSERT INTO items VALUES (10082,0,'','',161,10001,'Outgoing traffic of interface lo (5min)','netloadout5[lo]',10,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
-INSERT INTO items VALUES (10083,0,'','',161,10001,'Outgoing traffic of interface lo (15min)','netloadout15[lo]',20,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
-INSERT INTO items VALUES (10084,0,'','',161,10001,'Outgoing traffic of interface eth0 (1min)','netloadout1[eth0]',5,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
-INSERT INTO items VALUES (10085,0,'','',161,10001,'Outgoing traffic of interface eth0 (5min)','netloadout5[eth0]',10,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
-INSERT INTO items VALUES (10086,0,'','',161,10001,'Outgoing traffic of interface eth0 (15min)','netloadout15[eth0]',20,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
-INSERT INTO items VALUES (10087,0,'','',161,10001,'Outgoing traffic of interface eth1 (1min)','netloadout1[eth1]',5,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
-INSERT INTO items VALUES (10088,0,'','',161,10001,'Outgoing traffic of interface eth1 (5min)','netloadout5[eth1]',10,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
-INSERT INTO items VALUES (10089,0,'','',161,10001,'Outgoing traffic of interface eth1 (15min)','netloadout15[eth1]',20,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
+INSERT INTO items VALUES (10072,0,'','',161,10001,'Incoming traffic on interface lo (1min)','netloadin1[lo]',5,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
+INSERT INTO items VALUES (10073,0,'','',161,10001,'Incoming traffic on interface lo (5min)','netloadin5[lo]',10,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
+INSERT INTO items VALUES (10074,0,'','',161,10001,'Incoming traffic on interface lo (15min)','netloadin15[lo]',20,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
+INSERT INTO items VALUES (10075,0,'','',161,10001,'Incoming traffic on interface eth0 (1min)','netloadin1[eth0]',5,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
+INSERT INTO items VALUES (10076,0,'','',161,10001,'Incoming traffic on interface eth0 (5min)','netloadin5[eth0]',10,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
+INSERT INTO items VALUES (10077,0,'','',161,10001,'Incoming traffic on interface eth0 (15min)','netloadin15[eth0]',20,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
+INSERT INTO items VALUES (10078,0,'','',161,10001,'Incoming traffic on interface eth1 (1min)','netloadin1[eth1]',5,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
+INSERT INTO items VALUES (10079,0,'','',161,10001,'Incoming traffic on interface eth1 (5min)','netloadin5[eth1]',10,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
+INSERT INTO items VALUES (10080,0,'','',161,10001,'Incoming traffic on interface eth1 (15min)','netloadin15[eth1]',20,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
+INSERT INTO items VALUES (10081,0,'','',161,10001,'Outgoing traffic on interface lo (1min)','netloadout1[lo]',5,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
+INSERT INTO items VALUES (10082,0,'','',161,10001,'Outgoing traffic on interface lo (5min)','netloadout5[lo]',10,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
+INSERT INTO items VALUES (10083,0,'','',161,10001,'Outgoing traffic on interface lo (15min)','netloadout15[lo]',20,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
+INSERT INTO items VALUES (10084,0,'','',161,10001,'Outgoing traffic on interface eth0 (1min)','netloadout1[eth0]',5,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
+INSERT INTO items VALUES (10085,0,'','',161,10001,'Outgoing traffic on interface eth0 (5min)','netloadout5[eth0]',10,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
+INSERT INTO items VALUES (10086,0,'','',161,10001,'Outgoing traffic on interface eth0 (15min)','netloadout15[eth0]',20,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
+INSERT INTO items VALUES (10087,0,'','',161,10001,'Outgoing traffic on interface eth1 (1min)','netloadout1[eth1]',5,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
+INSERT INTO items VALUES (10088,0,'','',161,10001,'Outgoing traffic on interface eth1 (5min)','netloadout5[eth1]',10,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
+INSERT INTO items VALUES (10089,0,'','',161,10001,'Outgoing traffic on interface eth1 (15min)','netloadout15[eth1]',20,30,0,0,NULL,NULL,NULL,0,0,'','bps',0);
+
+INSERT INTO items VALUES (10400,0,'','',161,10001,'Number of read operations on disk hda (1min)','disk_read_ops1[hda]',5,30,0,0,NULL,NULL,NULL,0,0,'','',0);
+INSERT INTO items VALUES (10401,0,'','',161,10001,'Number of read operations on disk hda (5min)','disk_read_ops5[hda]',10,30,0,0,NULL,NULL,NULL,0,0,'','',0);
+INSERT INTO items VALUES (10402,0,'','',161,10001,'Number of read operations on disk hda (15min)','disk_read_ops15[hda]',20,30,0,0,NULL,NULL,NULL,0,0,'','',0);
+INSERT INTO items VALUES (10403,0,'','',161,10001,'Number of write operations on disk hda (1min)','disk_write_ops1[hda]',5,30,0,0,NULL,NULL,NULL,0,0,'','',0);
+INSERT INTO items VALUES (10404,0,'','',161,10001,'Number of write operations on disk hda (5min)','disk_write_ops5[hda]',10,30,0,0,NULL,NULL,NULL,0,0,'','',0);
+INSERT INTO items VALUES (10405,0,'','',161,10001,'Number of write operations on disk hda (15min)','disk_write_ops15[hda]',20,30,0,0,NULL,NULL,NULL,0,0,'','',0);
+
+INSERT INTO items VALUES (10406,0,'','',161,10001,'Number of read operations on disk hdb (1min)','disk_read_ops1[hdb]',5,30,0,0,NULL,NULL,NULL,0,0,'','',0);
+INSERT INTO items VALUES (10407,0,'','',161,10001,'Number of read operations on disk hdb (5min)','disk_read_ops5[hdb]',10,30,0,0,NULL,NULL,NULL,0,0,'','',0);
+INSERT INTO items VALUES (10408,0,'','',161,10001,'Number of read operations on disk hdb (15min)','disk_read_ops15[hdb]',20,30,0,0,NULL,NULL,NULL,0,0,'','',0);
+INSERT INTO items VALUES (10409,0,'','',161,10001,'Number of write operations on disk hdb (1min)','disk_write_ops1[hdb]',5,30,0,0,NULL,NULL,NULL,0,0,'','',0);
+INSERT INTO items VALUES (10410,0,'','',161,10001,'Number of write operations on disk hdb (5min)','disk_write_ops5[hdb]',10,30,0,0,NULL,NULL,NULL,0,0,'','',0);
+INSERT INTO items VALUES (10411,0,'','',161,10001,'Number of write operations on disk hdb (15min)','disk_write_ops15[hdb]',20,30,0,0,NULL,NULL,NULL,0,0,'','',0);
+
 INSERT INTO items VALUES (10090,0,'','',161,10002,'Free memory','memory[free]',30,30,0,0,NULL,NULL,NULL,0,0,'','bytes',0);
 INSERT INTO items VALUES (10091,0,'','',161,10002,'Free disk space on c:','diskfree[c:]',30,30,0,0,NULL,NULL,NULL,0,0,'','bytes',1);
 INSERT INTO items VALUES (10098,0,'','',161,10002,'Number of processes','system[proccount]',30,30,0,0,NULL,NULL,NULL,0,0,'','',0);
@@ -189,6 +204,7 @@ INSERT INTO items VALUES (10156,0,'','',161,10002,'Total disk space on c:','disk
 INSERT INTO items VALUES (10359,0,'','',161,10002,'Total disk space on d:','disktotal[d:]',3600,30,0,0,NULL,NULL,NULL,0,0,'','bytes',1);
 INSERT INTO items VALUES (10357,0,'','',161,10002,'Checksum of c:\\config.sys','cksum[c:\\config.sys]',600,30,0,0,NULL,NULL,NULL,0,0,'','',0);
 INSERT INTO items VALUES (10358,0,'','',161,10002,'Free disk space on d:','diskfree[d:]',30,30,0,0,NULL,NULL,NULL,0,0,'','bytes',1);
+
 INSERT INTO items VALUES (10298,3,'','',161,10004,'Email (SMTP) server is running','smtp',60,30,0,0,NULL,NULL,NULL,0,0,'','',0);
 INSERT INTO items VALUES (10299,3,'','',161,10004,'FTP server is running','ftp',60,30,0,0,NULL,NULL,NULL,0,0,'','',0);
 INSERT INTO items VALUES (10300,3,'','',161,10004,'SSH server is running','ssh',60,30,0,0,NULL,NULL,NULL,0,0,'','',0);

@@ -141,7 +141,6 @@
 		{
 			echo "<td>unknown</td>";
 		}
-		echo "<td><a href=\"services.php?serviceid=".$row["serviceid"]."&register=delete\">Delete</a></td>";
 		echo "</tr>";
 	}
 	echo "</table>";
