@@ -11,10 +11,6 @@
 	#include "libpq-fe.h"
 #endif
 
-#define	DB_NAME		"zabbix"
-#define	DB_USER		"root"
-#define	DB_PASSWD	""
-
 #define DB_ITEM struct item_type
 #define DB_TRIGGER struct trigger_type
 #define DB_ACTION struct action_type
@@ -96,7 +92,8 @@ DB_ACTION
 	char    *message;
 };
 
-void    DBconnect( void );
+
+void    DBconnect( char *dbname, char *dbuser, char *dbpassword);
 
 int	DBexecute( char *query );
 

@@ -17,15 +17,16 @@
  * Connect to database.
  * If fails, program terminates.
  */ 
-void    DBconnect( void )
+void    DBconnect( char *dbname, char *dbuser, char *dbpassword)
 {
+/*	syslog(LOG_ERR, "[%s] [%s] [%s]\n",dbname, dbuser, dbpassword ); */
 #ifdef	HAVE_MYSQL
-	if( ! mysql_connect( &mysql, NULL, DB_USER, DB_PASSWD ) )
+	if( ! mysql_connect( &mysql, NULL, dbuser, dbpassword ) )
 	{
 		syslog(LOG_ERR, "Failed to connect to database: Error: %s\n",mysql_error(&mysql) );
 		exit( FAIL );
 	}
-	if( mysql_select_db( &mysql, DB_NAME ) != 0 )
+	if( mysql_select_db( &mysql, dbname ) != 0 )
 	{
 		syslog(LOG_ERR, "Failed to select database: Error: %s\n",mysql_error(&mysql) );
 		exit( FAIL );
@@ -33,12 +34,12 @@ void    DBconnect( void )
 #endif
 #ifdef	HAVE_PGSQL
 /*	conn = PQsetdb(pghost, pgport, pgoptions, pgtty, dbName); */
-	conn = PQsetdb(NULL, NULL, NULL, NULL, DB_NAME);
+	conn = PQsetdb(NULL, NULL, NULL, NULL, dbname);
 
 /* check to see that the backend connection was successfully made */
 	if (PQstatus(conn) == CONNECTION_BAD)
 	{
-		syslog(LOG_ERR, "Connection to database '%s' failed.\n", DB_NAME);
+		syslog(LOG_ERR, "Connection to database '%s' failed.\n", dbname);
 		syslog(LOG_ERR, "%s", PQerrorMessage(conn));
 		exit(FAIL);
 	}
