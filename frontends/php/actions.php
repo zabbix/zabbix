@@ -62,8 +62,16 @@
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPATE_ACTION);
 			if($result)
 			{
-				$user=get_user_by_userid($_GET["userid"]);
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ACTION,"User [".$user["alias"]."] when [".$_GET["good"]."] subject [".$_GET["subject"]."]");
+				if(isset($_GET["userid"]))
+				{
+					$user=get_user_by_userid($_GET["userid"]);
+					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ACTION,"User [".$user["alias"]."] when [".$_GET["good"]."] subject [".$_GET["subject"]."]");
+				}
+				else
+				{
+					$group=get_group_by_groupid($_GET["usrgrpid"]);
+					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ACTION,"User [".$group["name"]."] when [".$_GET["good"]."] subject [".$_GET["subject"]."]");
+				}
 			}
 			unset($_GET["actionid"]);
 		}
