@@ -43,6 +43,14 @@ Vel viens wishlists ir pie "IT Services", pielikt pie
  of comments to know who is in charge for the instructions
  - [9] ... find outdated instructions to initiate its renewal (review)
 
+LSB:
+
+ - why SNMP does not work though firewall? It establishes connection to UDP port 3. WHy?
+ - item links to other item in order to show all of them on one graph
+ - Support for Mb, Kb, KBps , MBps ,etc
+ - daily weekly monthly graphs
+ - detailed description for items
+
 TOP PRIORITY:
 
  - fix update of 'status'. When added it never gets updated, if server is already unreachable.
