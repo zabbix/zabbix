@@ -28,7 +28,6 @@
 	$DB_DATABASE	="zabbix";
 	$DB_USER	="root";
 	$DB_PASSWORD	="";
-
 // END OF DATABASE CONFIGURATION
 
 	$USER_DETAILS	="";

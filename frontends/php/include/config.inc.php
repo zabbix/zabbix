@@ -24,8 +24,10 @@
 	include_once 	"include/html.inc.php";
 	include_once 	"include/local_en.inc.php";
 
+// GLOBALS
 	$USER_DETAILS	="";
 	$ERROR_MSG	="";
+// END OF GLOBALS
 
 	function getmicrotime()
 	{
