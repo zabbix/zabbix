@@ -1,12 +1,13 @@
 Changes for 1.0beta11:
 
+ - new item status: 'deleted' (Alexei)
  - fixed autoconf problems under SUSE 8.2 (Alexei)
  - housekeeping to delete hosts having status 'deleted' (Alexei)
  - AC_FUNC_GETLOADAVG changes to AC_REPLACE_FUNCS(getloadavg) in
  configure.in (Alexei)
  - eliminated compiler's warnings under SUSE 8.2 (Alexei)
  - added src/zabbix_sucker/housekeeper.* (Alexei)
- - new hos status: 'deleted' (Alexei)
+ - new host status: 'deleted' (Alexei)
 
 Changes for 1.0beta10:
 
