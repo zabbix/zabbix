@@ -149,7 +149,7 @@
 	while($row=DBfetch($result))
 	{
 // Check if at least one host with read permission exists for this group
-		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status in (0,2) and h.hostid=i.hostid and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
+		$result2=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg where h.status in (0,2) and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
 		$cnt=0;
 		while($row2=DBfetch($result2))
 		{
@@ -170,8 +170,8 @@
 	echo "<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
 
 	$sql=iif(isset($_GET["groupid"]),
-		"select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status in (0,2) and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host",
-		"select h.hostid,h.host from hosts h,items i where h.status in (0,2) and h.hostid=i.hostid group by h.hostid,h.host order by h.host");
+		"select h.hostid,h.host from hosts h,hosts_groups hg where h.status in (0,2) and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host",
+		"select h.hostid,h.host from hosts h where h.status in (0,2) group by h.hostid,h.host order by h.host");
 
 	$result=DBselect($sql);
 	while($row=DBfetch($result))

@@ -1559,8 +1559,8 @@ void	init_threads(void)
 		}
 		else if(i==3)
 		{
-//			rc = pthread_create(&threads[i], NULL, main_pinger_loop, (void *)i);
-			rc = pthread_create(&threads[i], NULL, main_housekeeper_loop, (void *)i);
+			rc = pthread_create(&threads[i], NULL, main_pinger_loop, (void *)i);
+//			rc = pthread_create(&threads[i], NULL, main_housekeeper_loop, (void *)i);
 		}
 		else if(i==4)
 		{
