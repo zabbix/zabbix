@@ -24,13 +24,13 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.25)
+Zabbix Reference Manual for version 1.0 (draft v1.26)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-7 July 2002
+26 July 2002
 \layout Abstract
 
 The document is Reference Manual for Zabbix version 1.0.
@@ -15433,6 +15433,17 @@ MD5 hash of user's password
 \layout Section
 
 Problems and Common Errors
+\layout Subsection
+
+Authentication failed in case if user name and password is correct
+\layout Standard
+
+Check system date on both 
+\series bold 
+Zabbix 
+\series default 
+server and client machine where WEB browser is running.
+ The dfference should not be more than 20 minutes.
 \layout Section
 
 How Zabbix Compares to Other Monitoring Software
