@@ -752,7 +752,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 /*
  * Send message to user. Message will be sent to all medias registered to given user.
  */ 
-void	send_to_user(int actionid,int userid,char *subject,char *message)
+void	send_to_user(DB_TRIGGER *trigger,int actionid,int userid,char *subject,char *message)
 {
 	DB_MEDIA media;
 	char sql[MAX_STRING_LEN+1];
@@ -760,14 +760,22 @@ void	send_to_user(int actionid,int userid,char *subject,char *message)
 
 	int	i;
 
-	sprintf(sql,"select mediatypeid,sendto,active from media where active=%d and userid=%d",MEDIA_STATUS_ACTIVE,userid);
+	sprintf(sql,"select mediatypeid,sendto,active,severity from media where active=%d and userid=%d",MEDIA_STATUS_ACTIVE,userid);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 		media.mediatypeid=atoi(DBget_field(result,i,0));
-		media.active=atoi(DBget_field(result,i,2));
 		media.sendto=DBget_field(result,i,1);
+		media.active=atoi(DBget_field(result,i,2));
+		media.severity=atoi(DBget_field(result,i,3));
+
+		zabbix_log( LOG_LEVEL_DEBUG, "Trigger severity [%d] Media severity [%d]",trigger->priority, media.severity);
+		if(((1<<trigger->priority)&media.severity)==0)
+		{
+			zabbix_log( LOG_LEVEL_DEBUG, "Won't send message");
+			continue;
+		}
 
 		DBadd_alert(actionid,media.mediatypeid,media.sendto,subject,message);
 	}
@@ -919,7 +927,7 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 			zabbix_log( LOG_LEVEL_WARNING, "Unsupported scope [%d] for actionid [%d]", action.scope, action.actionid);
 		}
 
-		send_to_user(action.actionid,action.userid,action.subject,action.message);
+		send_to_user(trigger,action.actionid,action.userid,action.subject,action.message);
 		now = time(NULL);
 		sprintf(sql,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
 		DBexecute(sql);

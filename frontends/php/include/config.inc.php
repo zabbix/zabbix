@@ -2526,9 +2526,15 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Add Media definition
 
-	function	add_media( $userid, $mediatypeid, $sendto)
+	function	add_media( $userid, $mediatypeid, $sendto, $severity)
 	{
-		$sql="insert into media (userid,mediatypeid,sendto,active) values ($userid,'$mediatypeid','$sendto',0)";
+		$c=count($severity);
+		$s=0;
+		for($i=0;$i<$c;$i++)
+		{
+			$s=$s|pow(2,(int)$severity[$i]);
+		}
+		$sql="insert into media (userid,mediatypeid,sendto,active,severity) values ($userid,'$mediatypeid','$sendto',0,$s)";
 		return	DBexecute($sql);
 	}
 

@@ -32,7 +32,7 @@
 		}
 		elseif($HTTP_GET_VARS["register"]=="add")
 		{
-			$result=add_media( $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["mediatypeid"], $HTTP_GET_VARS["sendto"]);
+			$result=add_media( $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["mediatypeid"], $HTTP_GET_VARS["sendto"],$HTTP_GET_VARS["severity"]);
 			show_messages($result,"Media added","Cannot add media");
 		}
 		elseif($HTTP_GET_VARS["register"]=="delete")
@@ -123,6 +123,18 @@
 	echo "Send to";
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"sendto\" size=20>";
+
+	show_table2_v_delimiter();
+	echo "Use if";
+	show_table2_h_delimiter();
+	echo "<select multiple class=\"biginput\" name=\"severity[]\" size=\"5\">";
+	echo "<option value=\"0\" selected>Not classified";
+	echo "<option value=\"1\" selected>Information";
+	echo "<option value=\"2\" selected>Warning";
+	echo "<option value=\"3\" selected>Average";
+	echo "<option value=\"4\" selected>High";
+	echo "<option value=\"5\" selected>Disaster";
+	echo "</select>";
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
