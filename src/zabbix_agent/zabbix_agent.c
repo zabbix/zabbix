@@ -98,7 +98,7 @@ int	main()
 
 #ifdef	TEST_PARAMETERS
 	init_metrics();
-	init_config();
+/*	init_config();*/
 	test_parameters();
 	return	SUCCEED;
 #endif
