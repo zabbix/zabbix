@@ -903,7 +903,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			</font>
 		</td>
 
-		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
+		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
 			<font face="Arial,Helvetica" size=2>
 <?
 				if(check_right("Service","R",0))
@@ -921,26 +921,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 ?>
 			</font>
 		</td>
-
-		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-			<font face="Arial,Helvetica" size=2>
-<?
-				if(check_right("Helpdesk","R",0))
-				{
-					echo "<a href=\"helpdesk.php\">";
-				}
-				if($page["file"]=="helpdesk.php")
-				{
-					echo "<b>[IT HELPDESK]</b></a>";
-				}
-				else
-				{
-					echo "IT HELPDESK</a>";
-				}
-?>
-			</font>
-		</td>
-		</tr>
 
 		<tr>
 		<td colspan=2 bgcolor=FFFFFF align=center valign=top width=15%>
@@ -1182,25 +1162,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				else
 				{
 					echo "IT SERVICES</a>";
-				}
-?>
-			</font>
-		</td>
-
-		<td colspan=1 bgcolor=FFFFFF align=center valign=top width=15%>
-			<font face="Arial,Helvetica" size=2>
-<?
-				if(check_right("Helpdesk","U",0))
-				{
-					echo "<a href=\"helpdesk.php\">";
-				}
-				if($page["file"]=="helpdesk.php")
-				{
-					echo "<b>[IT HELPDESK]</b></a>";
-				}
-				else
-				{
-					echo "IT HELPDESK</a>";
 				}
 ?>
 			</font>
