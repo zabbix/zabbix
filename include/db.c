@@ -321,7 +321,7 @@ int     DBget_function_result(double *result,char *functionid)
         return res;
 }
 
-/* SUCCEED if latest alarm with triggerid has this status */
+/* Returns previous trigger value. If not value found, return TRIGGER_VALUE_FALSE */
 int	DBget_prev_trigger_value(int triggerid)
 {
 	char	sql[MAX_STRING_LEN];
@@ -353,7 +353,10 @@ int	DBget_prev_trigger_value(int triggerid)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
 		DBfree_result(result);
-		return TRIGGER_VALUE_UNKNOWN;
+/* Assume that initially Trigger value is False. Otherwise alarms will not be generated when
+status changes to TRUE for te first time */
+		return TRIGGER_VALUE_FALSE;
+/*		return TRIGGER_VALUE_UNKNOWN;*/
 	}
 	clock=atoi(DBget_field(result,0,0));
 	DBfree_result(result);
