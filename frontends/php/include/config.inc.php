@@ -2694,7 +2694,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					$delay=$action["delay"];
 					$subject=$action["subject"];
 					$message=$action["message"];
-					$sql="insert into actions (triggerid, userid, scope, severity, good, delay, subject, message) values ($triggerid,$itemid,$userid,$scope,$severity,$good,'$subject','$message')";
+					$recipient=$action["recipient"];
+					$sql="insert into actions (triggerid, userid, scope, severity, good, delay, subject, message,recipient) values ($triggerid,$userid,$scope,$severity,$good,$delay,'$subject','$message',$recipient)";
+//					echo "$sql<br>";
 					$result4=DBexecute($sql);
 					$actionid=DBinsert_id($result4,"actions","actionid");
 				}
