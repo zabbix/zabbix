@@ -75,6 +75,11 @@
 		show_table3_h_delimiter();
 		echo "<form name=\"form2\" method=\"get\" action=\"maps.php\">";
 
+		if(isset($_GET["fullscreen"]))
+		{
+			echo "<input name=\"fullscreen\" type=\"hidden\" value=".$_GET["fullscreen"].">";
+		}
+
 		if(isset($_GET["sysmapid"])&&($_GET["sysmapid"]==0))
 		{
 			unset($_GET["sysmapid"]);

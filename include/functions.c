@@ -555,6 +555,7 @@ void	update_functions(DB_ITEM *item)
 	DB_RESULT	*result;
 	char		sql[MAX_STRING_LEN];
 	char		value[MAX_STRING_LEN];
+	char		value_esc[MAX_STRING_LEN];
 	int		ret=SUCCEED;
 	int		i;
 
@@ -583,7 +584,8 @@ void	update_functions(DB_ITEM *item)
 		zabbix_log( LOG_LEVEL_DEBUG, "Result:%f\n",value);
 		if (ret == SUCCEED)
 		{
-			snprintf(sql,sizeof(sql)-1,"update functions set lastvalue='%s' where itemid=%d and function='%s' and parameter='%s'", value, function.itemid, function.function, function.parameter );
+			DBescape_string(value,value_esc,MAX_STRING_LEN);
+			snprintf(sql,sizeof(sql)-1,"update functions set lastvalue='%s' where itemid=%d and function='%s' and parameter='%s'", value_esc, function.itemid, function.function, function.parameter );
 			DBexecute(sql);
 		}
 	}
@@ -1173,6 +1175,7 @@ void	process_new_value(DB_ITEM *item,char *value)
 {
 	int 	now;
 	char	sql[MAX_STRING_LEN];
+	char	value_esc[MAX_STRING_LEN];
 	double	value_double;
 	char	*e;
 
@@ -1225,7 +1228,8 @@ void	process_new_value(DB_ITEM *item,char *value)
 	{
 		if((item->prevvalue_null == 1) || (strcmp(value,item->lastvalue_str) != 0) || (strcmp(item->prevvalue_str,item->lastvalue_str) != 0) )
 		{
-			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=%d",now+item->delay,value,now,item->itemid);
+			DBescape_string(value,value_esc,MAX_STRING_LEN);
+			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=%d",now+item->delay,value_esc,now,item->itemid);
 			item->prevvalue=item->lastvalue;
 			item->lastvalue=value_double;
 			item->prevvalue_str=item->lastvalue_str;

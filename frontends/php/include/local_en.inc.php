@@ -240,7 +240,7 @@
 	define("S_USE_THE_HOST_AS_A_TEMPLATE",		"Use the host as a template");
 	define("S_DELETE_SELECTED_HOST_Q",		"Delete selected host?");
 
-//	config.php
+//	items.php
 	define("S_CONFIGURATION_OF_ITEMS",		"Configuration of items");
 	define("S_CONFIGURATION_OF_ITEMS_BIG",		"CONFIGURATION OF ITEMS");
 	define("S_CANNOT_UPDATE_ITEM",			"Cannot update item");
@@ -258,6 +258,7 @@
 	define("S_DESCRIPTION",				"Description");
 	define("S_UPDATE_INTERVAL",			"Update interval");
 	define("S_HISTORY",				"History");
+	define("S_TRENDS",				"Trends");
 	define("S_SHORT_NAME",				"Short name");
 	define("S_ZABBIX_AGENT",			"Zabbix agent");
 	define("S_SNMPV1_AGENT",			"SNMPv1 agent");
