@@ -109,9 +109,34 @@ float	getPROC(char *file,int lineno,int fieldno)
 	return	result;
 }
 
+float	CACHEDMEM(void)
+{
+	return getPROC("/proc/meminfo",8,2);
+}
+
+float	BUFFERSMEM(void)
+{
+	return getPROC("/proc/meminfo",7,2);
+}
+
+float	SHAREDMEM(void)
+{
+	return getPROC("/proc/meminfo",6,2);
+}
+
+float	TOTALMEM(void)
+{
+	return getPROC("/proc/meminfo",4,2);
+}
+
 float	FREEMEM(void)
 {
 	return getPROC("/proc/meminfo",5,2);
+}
+
+float	UPTIME(void)
+{
+	return getPROC("/proc/uptime",1,1);
 }
 
 float	PING(void)
@@ -137,6 +162,11 @@ float	PROCLOAD15(void)
 float	SWAPFREE(void)
 {
 	return	getPROC("/proc/meminfo",10,2);
+}
+
+float	SWAPTOTAL(void)
+{
+	return	getPROC("/proc/meminfo",9,2);
 }
 
 float	EXECUTE(char *command)

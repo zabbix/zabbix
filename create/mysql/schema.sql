@@ -145,21 +145,21 @@ CREATE TABLE items_template (
 );
 
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (1,1,"Free memory","freemem", 30);
+	values (1,1,"Free memory","memory[free]", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (2,1,"Free disk space on /","root_free", 30);
+	values (2,1,"Free disk space on /","diskfree[/]", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (3,1,"Free disk space on /tmp","tmp_free", 30);
+	values (3,1,"Free disk space on /tmp","diskfree[/tmp]", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (4,1,"Free disk space on /usr","usr_free", 30);
+	values (4,1,"Free disk space on /usr","diskfree[/usr]", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (5,1,"Free number of inodes on /","root_inode", 30);
+	values (5,1,"Free number of inodes on /","inodefree[/]", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (6,1,"Free number of inodes on /opt","opt_inode", 30);
+	values (6,1,"Free number of inodes on /opt","inodefree[/opt]", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (7,1,"Free number of inodes on /tmp","tmp_inode", 30);
+	values (7,1,"Free number of inodes on /tmp","inodefree[/tmp]", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (8,1,"Free number of inodes on /usr","usr_inode", 30);
+	values (8,1,"Free number of inodes on /usr","inodefree[/usr]", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
 	values (9,1,"Number of processes","proccount", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
@@ -171,27 +171,41 @@ insert into items_template (itemtemplateid,platformid,description,key_,delay)
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
 	values (13,1,"Number of running processes","procrunning", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (14,1,"Free swap space","swapfree", 30);
+	values (14,1,"Free swap space (Kb)","swap[free]", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (16,1,"Size of /var/log/syslog","syslog_size", 30);
+	values (16,1,"Size of /var/log/syslog","filesize[/var/log/syslog]", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
 	values (17,1,"Number of users connected","users", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
 	values (18,1,"Number of established TCP connections","tcp_count", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (19,1,"Checksum of /etc/inetd.conf","cksum_inetd", 600);
+	values (19,1,"Checksum of /etc/inetd.conf","cksum[/etc/inetd.conf]", 600);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (20,1,"Checksum of /vmlinuz","cksum_kernel", 600);
+	values (20,1,"Checksum of /vmlinuz","cksum[/vmlinuz]", 600);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (21,1,"Checksum of /etc/passwd","cksum_passwd", 600);
+	values (21,1,"Checksum of /etc/passwd","cksum[/etc/passwd]", 600);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
 	values (22,1,"Ping of server","ping", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (23,1,"Free disk space on /home","home_free", 30);
+	values (23,1,"Free disk space on /home","diskfree[/home]", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (24,1,"Free number of inodes on /home","home_inode", 30);
+	values (24,1,"Free number of inodes on /home","inodefree[/home]", 30);
 insert into items_template (itemtemplateid,platformid,description,key_,delay)
-	values (25,1,"Free disk space on /var","var_free", 30);
+	values (25,1,"Free disk space on /var","diskfree[/var]", 30);
+insert into items_template (itemtemplateid,platformid,description,key_,delay)
+	values (26,1,"Free disk space on /opt","diskfree[/opt]", 30);
+insert into items_template (itemtemplateid,platformid,description,key_,delay)
+	values (27,1,"Host uptime (in sec)","uptime", 300);
+insert into items_template (itemtemplateid,platformid,description,key_,delay)
+	values (28,1,"Total memory (kB)","memory[total]", 1800);
+insert into items_template (itemtemplateid,platformid,description,key_,delay)
+	values (29,1,"Shared memory (kB)","memory[shared]", 30);
+insert into items_template (itemtemplateid,platformid,description,key_,delay)
+	values (30,1,"Buffers memory (kB)","memory[buffers]", 30);
+insert into items_template (itemtemplateid,platformid,description,key_,delay)
+	values (31,1,"Cached memory (kB)","memory[cached]", 30);
+insert into items_template (itemtemplateid,platformid,description,key_,delay)
+	values (32,1,"Total swap space (Kb)","swap[total]", 1800);
 
 #
 # Table structure for table 'triggers_template'
@@ -248,6 +262,10 @@ insert into triggers_template (triggertemplateid,itemtemplateid,description,expr
 	values (24,24,"Low number of free inodes on /home","{:.last(0)}<1000000000");
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (25,25,"Low free disk space on /var","{:.last(0)}<1000000000");
+insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+	values (26,26,"Low free disk space on /opt","{:.last(0)}<1000000000");
+insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+	values (27,27,"Host have just been restarted","{:.last(0)}<600");
 
 #
 # Table structure for table 'items'
