@@ -1008,15 +1008,15 @@
 
 	# Add Host to system map
 
-	function add_host_to_sysmap($sysmapid,$hostid,$label,$x,$y)
+	function add_host_to_sysmap($sysmapid,$hostid,$label,$x,$y,$icon)
 	{
-		$sql="insert into sysmaps_hosts (sysmapid,hostid,label,x,y) values ($sysmapid,$hostid,'$label',$x,$y)";
+		$sql="insert into sysmaps_hosts (sysmapid,hostid,label,x,y,icon) values ($sysmapid,$hostid,'$label',$x,$y,'$icon')";
 		$result=DBexecute($sql);
 	}
 
-	function	update_sysmap_host($shostid,$sysmapid,$hostid,$label,$x,$y)
+	function	update_sysmap_host($shostid,$sysmapid,$hostid,$label,$x,$y,$icon)
 	{
-		$sql="update sysmaps_hosts set hostid=$hostid,label='$label',x=$x,y=$y where shostid=$shostid";
+		$sql="update sysmaps_hosts set hostid=$hostid,label='$label',x=$x,y=$y,icon='$icon' where shostid=$shostid";
 		$result=DBexecute($sql);
 	}
 

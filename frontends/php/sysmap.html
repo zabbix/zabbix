@@ -15,11 +15,11 @@
 	{
 		if($register=="add")
 		{
-			add_host_to_sysmap($sysmapid,$hostid,$label,$x,$y);
+			add_host_to_sysmap($sysmapid,$hostid,$label,$x,$y,$icon);
 		}
 		if($register=="update")
 		{
-			update_sysmap_host($shostid,$sysmapid,$hostid,$label,$x,$y);
+			update_sysmap_host($shostid,$sysmapid,$hostid,$label,$x,$y,$icon);
 		}
 		if($register=="add link")
 		{
@@ -77,10 +77,11 @@
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Label</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>X</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Y</B></TD>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>Icon</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
-	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y from sysmaps_hosts sh,hosts h where sh.sysmapid=$sysmapid and h.hostid=sh.hostid order by h.host");
+	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,sh.icon from sysmaps_hosts sh,hosts h where sh.sysmapid=$sysmapid and h.hostid=sh.hostid order by h.host");
 	echo "<CENTER>";
 	$col=0;
 	for($i=0;$i<DBnum_rows($result);$i++)
@@ -102,11 +103,13 @@
 		$label_=DBget_field($result,$i,4);
 		$x_=DBget_field($result,$i,5);
 		$y_=DBget_field($result,$i,6);
+		$icon_=DBget_field($result,$i,7);
 
 		echo "<TD>$host</TD>";
 		echo "<TD>$label_</TD>";
 		echo "<TD>$x_</TD>";
 		echo "<TD>$y_</TD>";
+		echo "<TD>$icon_</TD>";
 		echo "<TD><A HREF=\"sysmap.html?sysmapid=$sysmapid_&shostid=$shostid_#form\">Change</A> - <A HREF=\"sysmap.html?register=delete&sysmapid=$sysmapid_&shostid=$shostid_\">Delete</A></TD>";
 		echo "</TR>";
 	}
@@ -159,11 +162,12 @@
 
 	if(isset($shostid))
 	{
-		$result=DBselect("select hostid,label,x,y from sysmaps_hosts where shostid=$shostid");
+		$result=DBselect("select hostid,label,x,y,icon from sysmaps_hosts where shostid=$shostid");
 		$hostid=DBget_field($result,0,0);
 		$label=DBget_field($result,0,1);
 		$x=DBget_field($result,0,2);
 		$y=DBget_field($result,0,3);
+		$icon=DBget_field($result,0,4);
 	}
 	else
 	{
@@ -201,6 +205,29 @@
 	echo "</SELECT>";
 
 	show_table2_v_delimiter();
+	echo "Icon";
+	show_table2_h_delimiter();
+	echo "<select name=\"icon\" size=1>";
+	$icons=array();
+	$icons[0]="Server";
+	$icons[1]="Printer";
+	$icons[2]="Router";
+	$icons[3]="Hub";
+	$icons[4]="Notebook";
+	for($i=0;$i<5;$i++)
+	{
+		if(isset($hostid) && ($icon==$icons[$i]))
+		{
+			echo "<OPTION VALUE='".$icons[$i]."' SELECTED>".$icons[$i];
+		}
+		else
+		{
+			echo "<OPTION VALUE='".$icons[$i]."'>".$icons[$i];
+		}
+	}
+	echo "</SELECT>";
+
+	show_table2_v_delimiter();
 	echo "Label";
 	show_table2_h_delimiter();
 	echo "<input name=\"label\" size=32 value=\"$label\">";
@@ -224,17 +251,6 @@
 
 	show_table2_header_end();
 ?>
-
-
-
-
-
-
-
-
-
-
-
 
 <?
 	echo "<br>";
