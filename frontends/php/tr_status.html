@@ -147,11 +147,11 @@
 
 	if($onlytrue=='true')
 	{
-		$result=DBselect("select t.triggerid,t.istrue,t.description,t.lastcheck,t.expression,t.priority,t.lastchange,t.comments from triggers t,hosts h,items i,functions f  where t.istrue=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid $cond order by t.priority desc, t.description");
+		$result=DBselect("select t.triggerid,t.istrue,t.description,t.lastcheck,t.expression,t.priority,t.lastchange,t.comments from triggers t,hosts h,items i,functions f  where t.istrue=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status in (0,2) $cond order by t.priority desc, t.description");
 	}
 	else
 	{
-		$result=DBselect("select t.triggerid,t.istrue,t.description,t.lastcheck,t.expression,t.priority,t.lastchange,t.comments from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid $cond order by t.priority desc, t.description");
+		$result=DBselect("select t.triggerid,t.istrue,t.description,t.lastcheck,t.expression,t.priority,t.lastchange,t.comments from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status in (0,2) $cond order by t.priority desc, t.description");
 	}
 	$col=0;
 	for($i=0;$i<DBnum_rows($result);$i++)
