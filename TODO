@@ -1,5 +1,6 @@
-1.0beta14:
+1.0:
 
+ - fix all reported bugs
  - support for UDP-based checks (DNS, etc)
  - delete sysmap_links when deleting item (PostgreSQL)
  - test trigger scopes
