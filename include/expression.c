@@ -51,7 +51,7 @@ void	rtrim_spaces(char *c)
  */ 
 void	ltrim_spaces(char *c)
 {
-	int i,len,spaces;
+	int i,spaces;
 
 /* Number of left spaces */
 	spaces=0;
