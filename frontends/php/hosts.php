@@ -698,7 +698,8 @@
 	echo "</select>";
 
 	show_table2_v_delimiter($col++);
-	echo nbsp(S_USE_THE_HOST_AS_A_TEMPLATE);
+//	echo nbsp(S_USE_THE_HOST_AS_A_TEMPLATE);
+	echo nbsp(S_USE_TEMPLATES_OF_THIS_HOST);
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"host_templateid\" size=\"1\">";
 	echo "<option value=\"0\" selected>...";

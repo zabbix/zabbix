@@ -276,7 +276,8 @@
 	define("S_NEW_GROUP",				"New group");
 	define("S_USE_IP_ADDRESS",			"Use IP address");
 	define("S_IP_ADDRESS",				"IP address");
-	define("S_USE_THE_HOST_AS_A_TEMPLATE",		"Use the host as a template");
+//	define("S_USE_THE_HOST_AS_A_TEMPLATE",		"Use the host as a template");
+	define("S_USE_TEMPLATES_OF_THIS_HOST",		"Use templates of this host");
 	define("S_DELETE_SELECTED_HOST_Q",		"Delete selected host?");
 	define("S_GROUP_NAME",				"Group name");
 	define("S_HOST_GROUP",				"Host group");
