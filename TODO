@@ -8,6 +8,11 @@ TOP PRIORITY:
  - support of fetch_html[*]
  - link map's line to a trigger
  - monitoring of disk I/O
+ - restructure sources
+ - support for automake
+ - ability to add a library of  userwritten c-functions with dlopen/dlsym to
+the agent with a predefined API that can return values to suckerd (for both 
+suckerd and agentd)
 
 BUGS:
 
