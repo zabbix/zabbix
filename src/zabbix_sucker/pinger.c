@@ -232,7 +232,7 @@ int	do_ping(void)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In do_ping()");
 
-	snprintf(str,sizeof(str)-1,"cat /tmp/zabbix_suckerd.pinger|%s -e 2>/dev/null",CONFIG_FPING_LOCATION);
+	snprintf(str,sizeof(str)-1,"cat /tmp/zabbix_suckerd.pinger | %s -e 2>/dev/null",CONFIG_FPING_LOCATION);
 	
 	f=popen(str,"r");
 	if(f==0)
