@@ -22,6 +22,43 @@ td,tr
 	text-decoration: none;
 }
 
+.unknown
+{
+	color: #AAAAAA;
+}
+
+.off
+{
+	color: #00AA00;
+}
+
+.on
+{
+	color: #AA0000;
+}
+
+.disaster
+{
+	background-color: #FF0000;
+}
+
+.high
+{
+	background-color: #FF8888;
+}
+
+.average
+{
+	background-color: #DDAAAA;
+}
+
+.tborder
+{
+	background-color: #AAAAAA;
+	color: #000000;
+	border: 0px solid #0B198C;
+}
+
 A.footer
 {
 	color:#CCCCCC;

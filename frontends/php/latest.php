@@ -167,9 +167,40 @@
 #		echo "<a href=\"latest.php?hostid=".$_GET["hostid"]."\">$host</a>";
 #		show_table3_v_delimiter();
 
-		echo "<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR=\"AAAAAA\" cellspacing=1 cellpadding=3>";
-//		echo "<TABLE BORDER=0 COLS=4 WIDTH=100% cellspacing=1 cellpadding=3>";
-		cr();
+		table_begin();
+		$header=array();
+		if(isset($_GET["select"]))
+		{
+			$header=array_merge($header,S_HOST);
+		}
+		if(!isset($_GET["sort"])||(isset($_GET["sort"])&&($_GET["sort"]=="description")))
+		{
+			$header=array_merge($header,S_DESCRIPTION_LARGE);
+		}
+		else
+		{
+			if(isset($_GET["select"]))
+				$header=array_merge($header,"<a href=\"latest.php?select=".$_GET["select"]."&sort=description\">".S_DESCRIPTION_SMALL);
+			else
+				$header=array_merge($header,"<a href=\"latest.php?hostid=".$_GET["hostid"]."&sort=description\">".S_DESCRIPTION_SMALL);
+		}
+		if(isset($_GET["sort"])&&($_GET["sort"]=="lastcheck"))
+		{
+			$header=array_merge($header,S_LAST_CHECK_BIG);
+		}
+		else
+		{
+			if(isset($_GET["select"]))
+				$header=array_merge($header,"<a href=\"latest.php?select=".$_GET["select"]."&sort=lastcheck\">".S_LAST_CHECK);
+			else
+			$header=array_merge($header,"<a href=\"latest.php?hostid=".$_GET["hostid"]."&sort=lastcheck\">".S_LAST_CHECK);
+		}
+		$header=array_merge($header,S_LAST_VALUE,S_CHANGE,S_HISTORY);
+
+		table_header($header);
+
+
+/*		cr();
 		echo "<TR BGCOLOR=\"CCCCCC\">";
 		cr();
 		if(isset($_GET["select"]))
@@ -204,12 +235,8 @@
 		cr();
 		echo "<TD WIDTH=5% align=center><B>History</B></TD>";
 		cr();
-//		echo "<TD WIDTH=5% align=center><B>Trends</B></TD>";
-//		cr();
-//		echo "<TD WIDTH=5% align=center><B>Compare</B></TD>";
-//		cr();
 		echo "</TR>";
-		cr();
+		cr();*/
 
 		$col=0;
 		if(isset($_GET["sort"]))
@@ -304,18 +331,10 @@
 				"<td align=center><a href=\"history.php?action=showhistory&itemid=".$row["itemid"]."\">".S_GRAPH."</a></td>",
 				"<td align=center><a href=\"history.php?action=showvalues&period=3600&itemid=".$row["itemid"]."\">".S_HISTORY."</a></td>");
 
-//			iif_echo($row["value_type"]==0,
-//				"<td align=center><a href=\"trends.php?itemid=".$row["itemid"]."\">".S_TREND."</a></td>",
-//				"<td align=center>-</td>");
-
-//			iif_echo($row["value_type"]==0,
-//				"<td align=center><a href=\"compare.php?itemid=".$row["itemid"]."\">".S_COMPARE."</a></td>",
-//				"<td align=center>-</td>");
-
 			echo "</tr>";
 			cr();
 		}
-		echo "</table>";
+		table_end();
 		show_table_header_end();
 	}
 	else
