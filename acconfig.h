@@ -4,6 +4,9 @@
 /* Define if file /proc/loadavg exists */
 #undef HAVE_PROC_LOADAVG
 
+/* Define if function setproctitle() exists */
+#undef HAVE_FUNCTION_SETPROCTITLE
+
 /* Define if file /proc/1/status exists */
 #undef HAVE_PROC_1_STATUS
 

@@ -1,8 +1,13 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(src/zabbix_sucker/zabbix_sucker.c)
+AM_INIT_AUTOMAKE(PACKAGE,all)
+
+AM_CONFIG_HEADER(include/config.h)
+AC_PROG_MAKE_SET
 
 dnl Checks for programs.
 AC_PROG_CC
+AC_PROG_INSTALL
 
 dnl Checks for libraries.
 AC_CHECK_LIB(crypto, main)
@@ -161,6 +166,30 @@ AC_TRY_COMPILE([#include <sys/sysinfo.h>],
 sysinfo.totalswap=0;
 ],
 AC_DEFINE(HAVE_SYSINFO_TOTALSWAP)
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for function setproctitle()
+AC_MSG_CHECKING(for function setproctitle())
+AC_TRY_COMPILE(
+[
+	#include <sys/types.h>
+	#include <unistd.h>
+],
+[
+	setproctitle("Test %d", 1);
+],
+AC_DEFINE(HAVE_FUNCTION_SETPROCTITLE)
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for totalram in struct sysinfo
+AC_MSG_CHECKING(for totalram in struct sysinfo)
+AC_TRY_COMPILE([#include <sys/sysinfo.h>],
+[struct sysinfo sysinfo;
+sysinfo.totalram=0;
+],
+AC_DEFINE(HAVE_SYSINFO_TOTALRAM)
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -352,7 +381,6 @@ fi
 
 AC_SUBST(SUBDIRS)
 
-AC_CONFIG_HEADER(include/config.h)
 AC_OUTPUT(Makefile src/zabbix_sender/Makefile src/zabbix_agent/Makefile \
        	src/zabbix_sucker/Makefile src/zabbix_trapper/Makefile)
 

@@ -36,14 +36,38 @@
 #include "functions.h"
 #include "expression.h"
 
+static	pid_t	*pids=NULL;
+
 int	sucker_num=0;
-int	CONFIG_SUCKER_FORKS		=SUCKER_FORKS;
+int	CONFIG_SUCKERD_FORKS		=SUCKER_FORKS;
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
+char	*CONFIG_PID_FILE		= NULL;
 char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
 char	*CONFIG_DBSOCKET		= NULL;
 
+void	uninit(void)
+{
+	int i;
+
+	if(sucker_num == 0)
+	{
+		if(pids != NULL)
+		{
+			for(i=0;i<CONFIG_SUCKERD_FORKS-1;i++)
+			{
+				kill(pids[i],SIGTERM);
+			}
+		}
+
+		if(unlink(CONFIG_PID_FILE) != 0)
+		{
+			syslog( LOG_WARNING, "Cannot remove PID file [%s]",
+				CONFIG_PID_FILE);
+		}
+	}
+}
 
 void	signal_handler( int sig )
 {
@@ -53,11 +77,21 @@ void	signal_handler( int sig )
  
 		syslog( LOG_DEBUG, "Timeout while executing operation." );
 	}
- 
-	if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
+	else if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
 	{
 		syslog( LOG_ERR, "Got QUIT or INT or TERM signal. Exiting..." );
+		uninit();
 		exit( FAIL );
+	}
+	else if( SIGCHLD == sig )
+	{
+		syslog( LOG_ERR, "One child died. Exiting ..." );
+		uninit();
+		exit( FAIL );
+	}
+	else
+	{
+		syslog( LOG_WARNING, "Got signal [%d]. Ignoring ...", sig);
 	}
 }
 
@@ -121,6 +155,34 @@ Is not supported on HP-UX
 	setlogmask(LOG_UPTO(LOG_WARNING));
 }
 
+void	create_pid_file(void)
+{
+	FILE	*f;
+
+/* Check if PID file already exists */
+	f = fopen(CONFIG_PID_FILE, "r");
+	if(f != NULL)
+	{
+		syslog( LOG_CRIT, "File [%s] exists. Is zabbix_agentd already running ?",
+			CONFIG_PID_FILE);
+		fclose(f);
+		exit(-1);
+	}
+
+	f = fopen(CONFIG_PID_FILE, "w");
+
+	if( f == NULL)
+	{
+		syslog( LOG_CRIT, "Cannot create PID file [%s]. Errno [%d]",
+			CONFIG_PID_FILE, errno);
+		uninit();
+		exit(-1);
+	}
+
+	fprintf(f,"%d",getpid());
+	fclose(f);
+}
+
 void	process_config_file(void)
 {
 	FILE	*file;
@@ -172,7 +234,7 @@ void	process_config_file(void)
 				fclose(file);
 				exit(1);
 			}
-			CONFIG_SUCKER_FORKS=i;
+			CONFIG_SUCKERD_FORKS=i;
 		}
 		else if(strcmp(parameter,"HousekeepingFrequency")==0)
 		{
@@ -206,6 +268,10 @@ void	process_config_file(void)
 				exit(1);
 			}
 		}
+		else if(strcmp(parameter,"PidFile")==0)
+		{
+			CONFIG_PID_FILE=strdup(value);
+		}
 		else if(strcmp(parameter,"DBName")==0)
 		{
 			CONFIG_DBNAME=strdup(value);
@@ -237,6 +303,10 @@ void	process_config_file(void)
 	{
 		syslog( LOG_CRIT, "DBName not in config file");
 		exit(1);
+	}
+	if(CONFIG_PID_FILE == NULL)
+	{
+		CONFIG_PID_FILE=strdup("/tmp/zabbix_suckerd.pid");
 	}
 }
 
@@ -482,7 +552,7 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 	{
 		if( cmp_double(*result,NOTSUPPORTED) == 0)
 		{
-			syslog(LOG_WARNING, "NOTSUPPORTED1 [%s]", c );
+			syslog(LOG_DEBUG, "NOTSUPPORTED1 [%s]", c );
 			return NOTSUPPORTED;
 		}
 		else
@@ -535,7 +605,7 @@ int get_minnextcheck(int now)
 	int		res;
 	int		count;
 
-	sprintf(c,"select count(*),min(nextcheck) from items i,hosts h where i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and i.itemid%%%d=%d",now,CONFIG_SUCKER_FORKS-1,sucker_num-1);
+	sprintf(c,"select count(*),min(nextcheck) from items i,hosts h where i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and i.itemid%%%d=%d",now,CONFIG_SUCKERD_FORKS-1,sucker_num-1);
 	result = DBselect(c);
 
 	if( (result==NULL) || (DBnum_rows(result)==0) )
@@ -577,7 +647,7 @@ int get_values(void)
 
 	now = time(NULL);
 
-	sprintf(c,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, now, CONFIG_SUCKER_FORKS-1,sucker_num-1);
+	sprintf(c,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-1,sucker_num-1);
 	result = DBselect(c);
 
 	rows = DBnum_rows(result);
@@ -672,13 +742,13 @@ int get_values(void)
 		}
 	}
 
-	update_triggers( CONFIG_SUCKER_FORKS, 0, sucker_num, now );
+	update_triggers( CONFIG_SUCKERD_FORKS, 0, sucker_num, now );
 
 	DBfree_result(result);
 	return SUCCEED;
 }
 
-int housekeeping_items(int now)
+int housekeeping_history(int now)
 {
 	char		c[1024];
 	DB_ITEM		item;
@@ -758,10 +828,28 @@ int main_housekeeping_loop()
 
 	for(;;)
 	{
-		housekeeping_items(now);
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("housekeeper [removing old values]");
+#endif
+
+		housekeeping_history(now);
+
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("housekeeper [removing old alarms]");
+#endif
+
 		housekeeping_alarms(now);
+
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("housekeeper [removing old alerts]");
+#endif
+
 		housekeeping_alerts(now);
 		syslog( LOG_DEBUG, "Sleeping for %d hours", CONFIG_HOUSEKEEPING_FREQUENCY);
+
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("housekeeper [sleeping for %d hour(s)]", CONFIG_HOUSEKEEPING_FREQUENCY);
+#endif
 		sleep(3600*CONFIG_HOUSEKEEPING_FREQUENCY);
 	}
 }
@@ -773,6 +861,9 @@ int main_sucker_loop()
 
 	for(;;)
 	{
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("sucker [getting values]");
+#endif
 		now=time(NULL);
 		get_values();
 
@@ -799,7 +890,12 @@ int main_sucker_loop()
 			{
 				sleeptime = SUCKER_DELAY;
 			}
-			syslog( LOG_DEBUG, "Sleeping for %d seconds", sleeptime );
+			syslog( LOG_DEBUG, "Sleeping for %d seconds",
+					sleeptime );
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+			setproctitle("sucker [sleeping for %d seconds]", 
+					sleeptime);
+#endif
 			sleep( sleeptime );
 		}
 		else
@@ -812,6 +908,7 @@ int main_sucker_loop()
 int main(int argc, char **argv)
 {
 	int	i;
+	pid_t	pid;
 
 	struct	sigaction phan;
 
@@ -823,17 +920,24 @@ int main(int argc, char **argv)
 	sigaction(SIGINT, &phan, NULL);
 	sigaction(SIGQUIT, &phan, NULL);
 	sigaction(SIGTERM, &phan, NULL);
+	sigaction(SIGCHLD, &phan, NULL);
 
 	process_config_file();
 
-	for(i=1;i<CONFIG_SUCKER_FORKS;i++)
+	create_pid_file();
+
+	pids=calloc(CONFIG_SUCKERD_FORKS-1,sizeof(pid_t));
+
+	for(i=1;i<CONFIG_SUCKERD_FORKS;i++)
 	{
-		if(fork() == 0)
+		if((pid = fork()) == 0)
 		{
-			/* Do not start all processes at once */
-			sleep(1);
 			sucker_num=i;
 			break;
+		}
+		else
+		{
+			pids[i-1]=pid;
 		}
 	}
 

@@ -32,12 +32,65 @@
 
 static pid_t *pids;
 
+int	parent=0;
+
 int	CONFIG_TRAPPERD_FORKS		= TRAPPERD_FORKS;
 int	CONFIG_LISTEN_PORT		= 10001;
+char	*CONFIG_PID_FILE		= NULL;
 char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
 char	*CONFIG_DBSOCKET		= NULL;
+
+void	uninit(void)
+{
+	int i;
+
+	if(parent == 1)
+	{
+		if(pids != NULL)
+		{
+			for(i = 0; i<CONFIG_TRAPPERD_FORKS; i++)
+			{
+				kill(pids[i],SIGTERM);
+			}
+		}
+
+		if( unlink(CONFIG_PID_FILE) != 0)
+		{
+			syslog( LOG_WARNING, "Cannot remove PID file [%s]",
+				CONFIG_PID_FILE);
+		}
+	}
+}
+
+void	create_pid_file(void)
+{
+	FILE	*f;
+
+/* Check if PID file already exists */
+	f = fopen(CONFIG_PID_FILE, "r");
+	if(f != NULL)
+	{
+		syslog( LOG_CRIT, "File [%s] exists. Is zabbix_agentd already running ?",
+			CONFIG_PID_FILE);
+		fclose(f);
+		exit(-1);
+	}
+
+	f = fopen(CONFIG_PID_FILE, "w");
+
+	if( f == NULL)
+	{
+		syslog( LOG_CRIT, "Cannot create PID file [%s]. Errno [%d]",
+			CONFIG_PID_FILE, errno);
+		uninit();
+		exit(-1);
+	}
+
+	fprintf(f,"%d",getpid());
+	fclose(f);
+}
 
 void	signal_handler( int sig )
 {
@@ -46,11 +99,21 @@ void	signal_handler( int sig )
 		signal( SIGALRM, signal_handler );
 		syslog( LOG_WARNING, "Timeout while answering request");
 	}
- 
-	if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
+	else if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
 	{
 		syslog( LOG_WARNING, "Got signal. Exiting ...");
+		uninit();
 		exit( FAIL );
+	}
+	else if( SIGCHLD == sig )
+	{
+		syslog( LOG_WARNING, "One child process died. Exiting ...");
+		uninit();
+		exit( FAIL );
+	}
+	else
+	{
+		syslog( LOG_WARNING, "Got signal [%d]. Ignoring ...", sig);
 	}
 }
 
@@ -139,6 +202,10 @@ void	process_config_file(void)
 				exit(1);
 			}
 		}
+		else if(strcmp(parameter,"PidFile")==0)
+		{
+			CONFIG_PID_FILE=strdup(value);
+		}
 		else if(strcmp(parameter,"DBName")==0)
 		{
 			CONFIG_DBNAME=strdup(value);
@@ -168,6 +235,10 @@ void	process_config_file(void)
 	{
 		syslog( LOG_CRIT, "DBName not in config file");
 		exit(1);
+	}
+	if(CONFIG_PID_FILE == NULL)
+	{
+		CONFIG_PID_FILE=strdup("/tmp/zabbix_trapperd.pid");
 	}
 	// Check, if we are able to connect
 	DBconnect(CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
@@ -336,7 +407,13 @@ void	child_main(int i,int listenfd, int addrlen)
 	for(;;)
 	{
 		clilen = addrlen;
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("waiting for connection");
+#endif
 		connfd=accept(listenfd,cliaddr, &clilen);
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("processing data");
+#endif
 
 		process_child(connfd);
 
@@ -374,12 +451,15 @@ int	main()
 
 	process_config_file();
 
+	create_pid_file();
+
 	phan.sa_handler = &signal_handler;
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = 0;
 	sigaction(SIGINT, &phan, NULL);
 	sigaction(SIGQUIT, &phan, NULL);
 	sigaction(SIGTERM, &phan, NULL);
+	sigaction(SIGCHLD, &phan, NULL);
 
 	syslog( LOG_WARNING, "zabbix_trapperd started");
 
@@ -398,6 +478,12 @@ int	main()
 		pids[i] = child_make(i, listenfd, addrlen);
 /*		syslog( LOG_WARNING, "zabbix_trapperd #%d started", pids[i]);*/
 	}
+
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("main process");
+#endif
+
+	parent=1;
 
 	for(;;)
 	{
