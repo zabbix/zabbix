@@ -115,7 +115,7 @@ DB_ALERT
 	int	retries;
 };
 
-void    DBconnect( char *dbname, char *dbuser, char *dbpassword, char *dbsocket);
+void    DBconnect(char *dbhost, char *dbname, char *dbuser, char *dbpassword, char *dbsocket);
 void    DBclose(void);
 void    DBvacuum(void);
 
