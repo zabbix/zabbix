@@ -1,5 +1,6 @@
 1.0:
 
+ - add support of interface statistics under Solaris and FreeBSD
  - add support for real 'delta' (last-previous)
  - fix evaluation of complex trigger expressions (diskpercentage)
  - add support for percentages of disk usage and diskused[]
