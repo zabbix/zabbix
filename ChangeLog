@@ -1,5 +1,6 @@
 Changes for 1.1alpha3:
 
+ - fixed wrong use of multiplier for items (Alexei)
  - remover src/zabbix_sucker and src/zabbix_trapper (Alexei)
  - one common process for sucker and trapper: zabbix_server (Alexei)
  - removed column items.lastdelete (Alexei)
