@@ -246,16 +246,9 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 
 	zabbix_log( LOG_LEVEL_WARNING, "In get_value_SNMPv1()");
 
-/*
-	Initialize the SNMP library
-	init_snmp("zabbix_suckerd");
-*/
-
-/*
-*      * Initialize a "session" that defines who we're going to talk to
-*           */
-	snmp_sess_init( &session );                   /* set up defaults */
+	snmp_sess_init( &session );
 	session.version = SNMP_VERSION_1;
+	session.timeout=500000;
 	if(item->useip==1)
 	{
 		session.peername = item->ip;
@@ -265,26 +258,19 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 		session.peername = item->host;
 	}
 	zabbix_log( LOG_LEVEL_WARNING, "Peername [%s]", session.peername);
+	zabbix_log( LOG_LEVEL_WARNING, "Timeout [%d]", session.timeout);
 	session.community = item->snmp_community;
 	zabbix_log( LOG_LEVEL_WARNING, "Community [%s]", session.community);
 	zabbix_log( LOG_LEVEL_WARNING, "OID [%s]", item->snmp_oid);
 	session.community_len = strlen(session.community);
 	zabbix_log( LOG_LEVEL_WARNING, "In get_value_SNMPv1() 0.1");
 
-/*
-*      * Open the session
-*           */
 	SOCK_STARTUP;
-	ss = snmp_open(&session);                     /* establish the session */
+	ss = snmp_open(&session);
 	zabbix_log( LOG_LEVEL_WARNING, "In get_value_SNMPv1() 0.2");
 
-/*
-*      * Create the PDU for the data for our request.
-*           *   1) We're going to GET the system.sysDescr.0 node.
-*                */
 	pdu = snmp_pdu_create(SNMP_MSG_GET);
 	read_objid(item->snmp_oid, anOID, &anOID_len);
-/*    read_objid(".1.3.6.1.2.1.1.1.0", anOID, &anOID_len); */
 
 #if OTHER_METHODS
 	get_node("sysDescr.0", anOID, &anOID_len);
@@ -331,8 +317,6 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 				sp[vars->val_len] = '\0';
 				zabbix_log( LOG_LEVEL_WARNING, "value #%d is a string: %s\n", count++, sp);
 				zabbix_log( LOG_LEVEL_WARNING, "Type:%d", vars->type);
-/*			*result=strtod(sp,&e);
-			zabbix_log( LOG_LEVEL_WARNING, "Value #%d is an integer: %d", count++, *vars->val.integer);*/
 				*result=*vars->val.integer;
 				sprintf(result_str,"%d",*vars->val.integer);
 				free(sp);
