@@ -6,15 +6,12 @@ Not ready yet:
 
 [ CORE. Make Zabbix compile by cc ]
 
-[ PHP. Show diff instead of real values ]
 [ PHP. Show triggers by userid ]
-
-[ CORE. Add support for new trigger statuses: NOTSUPORTED ]
 
 [ DOCS. All parameters should contain section "How can be used" in the Manual ]
 
 Changes for 1.0beta4:
-
+ - improvements in SNMP handling for zabbix_suckerd (Alexei)
  - fixed check for SNMP library in configure.in (Alexei)
  - template host set to empty in Host definition form (Alexei)
  - changes in the Manual (Alexei)
