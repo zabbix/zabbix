@@ -1,5 +1,6 @@
 Changes for 1.1alpha1:
 
+ - added list of hosts for groups and IP addresses in host maintenance (Alexei)
  - fixed MacOS X related compilation issues. Thanks to Charles Galpin. (Alexei)
  - fixed calculation of maximum values for table 'trends'. Thanks to Igor. (Alexei)
  - fixed evaluation of expressions when a number contains spaces (Alexei)
