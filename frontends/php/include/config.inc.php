@@ -3169,17 +3169,36 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		if($diff==0)
 		{
-//			echo "<IMG SRC=\"chart.php?itemid=$itemid&period=$period&from=$from\">";
 			echo "<script language=\"JavaScript\">";
-//			echo "document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&width=\"+(document.width-108)+\"'>\")";
-			echo "document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&width=\"+(document.width-108)+\"'>\")";
+			echo "if (navigator.appName == \"Microsoft Internet Explorer\")";
+			echo "{";
+			echo " document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&width=\"+(document.body.clientWidth-108)+\"'>\")";
+			echo "}";
+			echo "else if (navigator.appName == \"Netscape\")";
+			echo "{";
+			echo " document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&width=\"+(document.width-108)+\"'>\")";
+			echo "}";
+			echo "else";
+			echo "{";
+			echo " document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from'>\")";
+			echo "}";
 			echo "</script>";
 		}
 		else
 		{
-//			echo "<IMG SRC=\"chart_diff.php?itemid=$itemid&period=$period&from=$from\">";
 			echo "<script language=\"JavaScript\">";
-			echo "document.write(\"<IMG SRC='chart_diff.php?itemid=$itemid&period=$period&from=$from&width=\"+(document.width-108)+\"'>\")";
+			echo "if (navigator.appName == \"Microsoft Internet Explorer\")";
+			echo "{";
+			echo " document.write(\"<IMG SRC='chart_diff.php?itemid=$itemid&period=$period&from=$from&width=\"+(document.body.clientWidth-108)+\"'>\")";
+			echo "}";
+			echo "else if (navigator.appName == \"Netscape\")";
+			echo "{";
+			echo " document.write(\"<IMG SRC='chart_diff.php?itemid=$itemid&period=$period&from=$from&width=\"+(document.width-108)+\"'>\")";
+			echo "}";
+			echo "else";
+			echo "{";
+			echo " document.write(\"<IMG SRC='chart_diff.php?itemid=$itemid&period=$period&from=$from'>\")";
+			echo "}";
 			echo "</script>";
 		}
 		echo "</TD>";

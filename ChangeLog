@@ -1,5 +1,6 @@
 Changes for 1.0beta11:
 
+ - fixed calculation of graph width under MS Explorer (Alexei)
  - fixed interpretation of parameter 'from' for graphs (Alexei)
  - removed references to screens_graphs (Alexei)
  - fix for proc_cnt[*] under Solaris (Alexei)
