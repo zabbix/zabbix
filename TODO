@@ -1,5 +1,6 @@
 1.0beta12:
 
+ - zabbix[anything] return 0 instead of unsupported
  - zabbix_agentd to support processor load, swap[*] and memory[*] onder AIX
  - make possible passing of parameters to user script for UserParameters
  like param[*]
