@@ -44,6 +44,12 @@
 			show_messages($result,"Host added","Cannot add host");
 			unset($HTTP_GET_VARS["hostid"]);
 		}
+		if($HTTP_GET_VARS["register"]=="add items from template")
+		{
+			$result=add_using_host_template($HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["host_templateid"]);
+			show_messages($result,"Items added","Cannot add items");
+			unset($HTTP_GET_VARS["hostid"]);
+		}
 		if($HTTP_GET_VARS["register"]=="update")
 		{
 			$result=@update_host($HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["host"],$HTTP_GET_VARS["port"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["useip"],$HTTP_GET_VARS["ip"],$HTTP_GET_VARS["newgroup"],$HTTP_GET_VARS["groups"]);
@@ -432,6 +438,7 @@
 	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
 	if(isset($HTTP_GET_VARS["hostid"]))
 	{
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add items from template\">";
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected host?');\">";
 	}

@@ -2776,6 +2776,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	add_using_host_template($hostid,$host_templateid)
 	{
+		global	$ERROR_MSG;
+
+		if(!isset($host_templateid)||($host_templateid==0))
+		{
+			$ERROR_MSG="Select template first";
+			return 0;
+		}
+
 		$host=get_host_by_hostid($hostid);
 		$sql="select itemid from items where hostid=$host_templateid";
 		$result=DBselect($sql);
