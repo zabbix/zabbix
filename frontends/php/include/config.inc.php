@@ -306,6 +306,23 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	$result;
 	}
 
+	function	get_screen_by_screenid($screenid)
+	{
+		global	$ERROR_MSG;
+
+		$sql="select * from screens where scid=$screenid"; 
+		$result=DBselect($sql);
+		if(DBnum_rows($result) == 1)
+		{
+			return	DBfetch($result);	
+		}
+		else
+		{
+			$ERROR_MSG="No screen with screenid=[$screenid]";
+		}
+		return	$result;
+	}
+
 	function	get_map_by_sysmapid($sysmapid)
 	{
 		global	$ERROR_MSG;
@@ -3213,6 +3230,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<option value=\"Default permission\">Default permission";
 		echo "<option value=\"Graph\">Graph";
 		echo "<option value=\"Host\">Host";
+		echo "<option value=\"Screen\">Screen";
 		echo "<option value=\"Service\">IT Service";
 		echo "<option value=\"Item\">Item";
 		echo "<option value=\"Network map\">Network map";
@@ -3855,6 +3873,18 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			{
 				$host=get_host_by_hostid($id);
 				$res=$host["host"];
+			}
+			else
+			{
+				$res="All hosts";
+			}
+		}
+		else if($permission=="Screen")
+		{
+			if(isset($id)&&($id!=0))
+			{
+				$screen=get_screen_by_screenid($id);
+				$res=$screen["name"];
 			}
 			else
 			{
