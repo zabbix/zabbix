@@ -20,14 +20,14 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = "Screens";
+	$page["title"] = S_SCREENS;
 	$page["file"] = "screenconf.php";
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();
 ?>
 
 <?php
-	show_table_header("CONFIGURATION OF SCREENS");
+	show_table_header(S_CONFIGURATION_OF_SCREENS_BIG);
 	echo "<br>";
 ?>
 
@@ -46,17 +46,17 @@
 		if($HTTP_GET_VARS["register"]=="add")
 		{
 			$result=add_screen($HTTP_GET_VARS["name"],$HTTP_GET_VARS["cols"],$HTTP_GET_VARS["rows"]);
-			show_messages($result,"Screen added","Cannot add screen");
+			show_messages($result,S_SCREEN_ADDED,S_CANNOT_ADD_SCREEN);
 		}
 		if($HTTP_GET_VARS["register"]=="update")
 		{
 			$result=update_screen($HTTP_GET_VARS["screenid"],$HTTP_GET_VARS["name"],$HTTP_GET_VARS["cols"],$HTTP_GET_VARS["rows"]);
-			show_messages($result,"Screen updated","Cannot update screen");
+			show_messages($result, S_SCREEN_UPDATED, S_CANNOT_UPDATE_SCREEN);
 		}
 		if($HTTP_GET_VARS["register"]=="delete")
 		{
 			$result=delete_screen($HTTP_GET_VARS["screenid"]);
-			show_messages($result,"Screen deleted","Cannot delete screen");
+			show_messages($result, S_SCREEN_DELETED, S_CANNOT_DELETE_SCREEN);
 			unset($HTTP_GET_VARS["screenid"]);
 		}
 	}
@@ -65,11 +65,11 @@
 <?php
 	show_table_header("SCREENS");
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TD WIDTH=5% NOSAVE><B>Id</B></TD>";
-	echo "<TD><B>Name</B></TD>";
-	echo "<TD WIDTH=5% NOSAVE><B>Columns</B></TD>";
-	echo "<TD WIDTH=5% NOSAVE><B>Rows</B></TD>";
-	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
+	echo "<TD WIDTH=5% NOSAVE><B>".S_ID."</B></TD>";
+	echo "<TD><B>".S_NAME."</B></TD>";
+	echo "<TD WIDTH=5% NOSAVE><B>".S_COLUMNS."</B></TD>";
+	echo "<TD WIDTH=5% NOSAVE><B>".S_ROWS."</B></TD>";
+	echo "<TD WIDTH=10% NOSAVE><B>".S_ACTIONS."</B></TD>";
 	echo "</TR>";
 
 	$result=DBselect("select screenid,name,cols,rows from screens order by name");
@@ -87,13 +87,13 @@
 		echo "<TD><a href=\"screenedit.php?screenid=".$row["screenid"]."\">".$row["name"]."</a></TD>";
 		echo "<TD>".$row["cols"]."</TD>";
 		echo "<TD>".$row["rows"]."</TD>";
-		echo "<TD><A HREF=\"screenconf.php?screenid=".$row["screenid"]."#form\">Change</A></TD>";
+		echo "<TD><A HREF=\"screenconf.php?screenid=".$row["screenid"]."#form\">".S_CHANGE."</A></TD>";
 		echo "</TR>";
 	}
 	if(DBnum_rows($result)==0)
 	{
 			echo "<TR BGCOLOR=#EEEEEE>";
-			echo "<TD COLSPAN=5 ALIGN=CENTER>-No screens defined-</TD>";
+			echo "<TD COLSPAN=5 ALIGN=CENTER>".S_NO_SCREENS_DEFINED."</TD>";
 			echo "<TR>";
 	}
 	echo "</TABLE>";
@@ -119,7 +119,7 @@
 
 	echo "<br>";
 	show_table2_header_begin();
-	echo "Screen";
+	echo S_SCREEN;
 
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"screenconf.php\">";
@@ -127,17 +127,17 @@
 	{
 		echo "<input class=\"biginput\" name=\"screenid\" type=\"hidden\" value=".$HTTP_GET_VARS["screenid"].">";
 	}
-	echo "Name";
+	echo S_NAME;
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=32>";
 
 	show_table2_v_delimiter();
-	echo "Columns";
+	echo S_COLUMNS;
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"cols\" size=5 value=\"$cols\">";
 
 	show_table2_v_delimiter();
-	echo "Rows";
+	echo S_ROWS;
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"rows\" size=5 value=\"$rows\">";
 
@@ -146,7 +146,7 @@
 	if(isset($HTTP_GET_VARS["screenid"]))
 	{
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete screen?');\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('".S_DELETE_SCREEN_Q."');\">";
 	}
 
 	show_table2_header_end();

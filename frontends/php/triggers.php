@@ -19,11 +19,12 @@
 **/
 ?>
 <?php
-	$page["title"] = "Configuration of triggers";
-	$page["file"] = "triggers.php";
-
 	include "include/config.inc.php";
 	include "include/forms.inc.php";
+
+	$page["title"] = S_CONFIGURATION_OF_TRIGGERS;
+	$page["file"] = "triggers.php";
+
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();
 ?>
@@ -31,8 +32,7 @@
 <?php
         if(!check_anyright("Host","U"))
         {
-                show_table_header("<font color=\"AA0000\">No permissions !</font
->");
+                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
                 show_footer();
                 exit;
         }
@@ -45,17 +45,17 @@
 		if($HTTP_GET_VARS["register"]=="add dependency")
 		{
 			$result=add_trigger_dependency($HTTP_GET_VARS["triggerid"],$HTTP_GET_VARS["depid"]);
-			show_messages($result,"Dependency added","Cannot add dependency");
+			show_messages($result, S_DEPENDENCY_ADDED, S_CANNOT_ADD_DEPENDENCY);
 		}
 		if($HTTP_GET_VARS["register"]=="delete dependency")
 		{
 			$result=delete_trigger_dependency($HTTP_GET_VARS["triggerid"],$HTTP_GET_VARS["dependency"]);
-			show_messages($result,"Dependency deleted","Cannot delete dependency");
+			show_messages($result, S_DEPENDENCY_DELETED, S_CANNOT_DELETE_DEPENDENCY);
 		}
 		if($HTTP_GET_VARS["register"]=="changestatus")
 		{
 			$result=update_trigger_status($HTTP_GET_VARS["triggerid"],$HTTP_GET_VARS["status"]);
-			show_messages($result,"Trigger status updated","Cannot update trigger status");
+			show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 			unset($HTTP_GET_VARS["triggerid"]);
 		}
 		if($HTTP_GET_VARS["register"]=="enable selected")
@@ -68,7 +68,7 @@
 					$result2=update_trigger_status($row["triggerid"],0);
 				}
 			}
-			show_messages(TRUE,"Triggers enabled","Cannot enable triggers");
+			show_messages(TRUE, S_TRIGGERS_ENABLED, S_CANNOT_UPDATE_TRIGGERS);
 		}
 		if($HTTP_GET_VARS["register"]=="disable selected")
 		{
@@ -80,7 +80,7 @@
 					$result2=update_trigger_status($row["triggerid"],1);
 				}
 			}
-			show_messages(TRUE,"Triggers disabled","Cannot disable triggers");
+			show_messages(TRUE, S_TRIGGERS_DISABLED, S_CANNOT_DISABLE_TRIGGERS);
 		}
 		if($HTTP_GET_VARS["register"]=="delete selected")
 		{
@@ -92,7 +92,7 @@
 					$result2=delete_trigger($row["triggerid"]);
 				}
 			}
-			show_messages(TRUE,"Triggers deleted","Cannot delete triggers");
+			show_messages(TRUE, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
 		}
 		if($HTTP_GET_VARS["register"]=="update")
 		{
@@ -103,11 +103,11 @@
 				else			{ $status=0; }
 	
 				$result=update_trigger($HTTP_GET_VARS["triggerid"],$HTTP_GET_VARS["expression"],$HTTP_GET_VARS["description"],$HTTP_GET_VARS["priority"],$status,$HTTP_GET_VARS["comments"],$HTTP_GET_VARS["url"]);
-				show_messages($result,"Trigger updated","Cannot update trigger");
+				show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
 			}
 			else
 			{
-				show_error_message("Invalid trigger expression");
+				show_error_message(S_INVALID_TRIGGER_EXPRESSION);
 			}
 			unset($HTTP_GET_VARS["triggerid"]);
 		}
@@ -119,18 +119,18 @@
 				else			{ $status=0; }
 				
 				$result=add_trigger($HTTP_GET_VARS["expression"],$HTTP_GET_VARS["description"],$HTTP_GET_VARS["priority"],$status,$HTTP_GET_VARS["comments"],$HTTP_GET_VARS["url"]);
-				show_messages($result,"Trigger added","Cannot add trigger");
+				show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 			}
 			else
 			{
-				show_error_message("Invalid trigger expression");
+				show_error_message(S_INVALID_TRIGGER_EXPRESSION);
 			}
 			unset($HTTP_GET_VARS["triggerid"]);
 		}
 		if($HTTP_GET_VARS["register"]=="delete")
 		{
 			$result=delete_trigger($HTTP_GET_VARS["triggerid"]);
-			show_messages($result,"Trigger deleted","Cannot delete trigger");
+			show_messages($result, S_TRIGGER_DELETED, S_CANNOT_DELETE_TRIGGER);
 			unset($HTTP_GET_VARS["triggerid"]);
 		}
 	}
@@ -138,52 +138,50 @@
 
 <?php
 	show_table_header_begin();
-	echo "CONFIGURATION OF TRIGGERS";
+	echo S_CONFIGURATION_OF_TRIGGERS_BIG;
 	show_table_v_delimiter();
 
-//	echo "<font size=2>";
 
-	if(isset($HTTP_GET_VARS["groupid"]))
+// Start of new code
+	echo "<form name=\"form2\" method=\"get\" action=\"triggers.php\">";
+
+	if(isset($HTTP_GET_VARS["groupid"])&&($HTTP_GET_VARS["groupid"]==0))
 	{
-//		echo "all ";
-		echo "<a href='triggers.php'>all</a> ";
+		unset($HTTP_GET_VARS["groupid"]);
 	}
-	else
-	{
-		echo "<b>[<a href='triggers.php'>all</a>]</b> ";
-	}
+
+	echo S_GROUP."&nbsp;";
+	echo "<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
+	echo "<option value=\"0\" ".iif(!isset($HTTP_GET_VARS["groupid"]),"selected","").">".S_ALL_SMALL;
 
 	$result=DBselect("select groupid,name from groups order by name");
-
 	while($row=DBfetch($result))
 	{
-//		if(!check_right("Host","R",$row["hostid"]))
-//		{
-//			continue;
-//		}
-		if( isset($HTTP_GET_VARS["groupid"]) && ($HTTP_GET_VARS["groupid"] == $row["groupid"]) )
+// Check if at least one host with read permission exists for this group
+		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status in (0,2) and h.hostid=i.hostid and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
+		$cnt=0;
+		while($row2=DBfetch($result2))
 		{
-			echo "<b>[";
+			if(!check_right("Host","U",$row2["hostid"]))
+			{
+				continue;
+			}
+			$cnt=1; break;
 		}
-		echo "<a href='triggers.php?groupid=".$row["groupid"]."'>".$row["name"]."</a>";
-		if(isset($HTTP_GET_VARS["groupid"]) && ($HTTP_GET_VARS["groupid"] == $row["groupid"]) )
+		if($cnt!=0)
 		{
-			echo "]</b>";
+			echo "<option value=\"".$row["groupid"]."\" ".iif(isset($HTTP_GET_VARS["groupid"])&&($HTTP_GET_VARS["groupid"]==$row["groupid"]),"selected","").">".$row["name"];
 		}
-		echo " ";
 	}
-?>
+	echo "</select>";
 
-<?php
-	show_table_v_delimiter();
-	if(isset($HTTP_GET_VARS["groupid"]))
-	{
-		$sql="select h.hostid,h.host from hosts h,hosts_groups hg where hg.groupid=".$HTTP_GET_VARS["groupid"]." and hg.hostid=h.hostid order by h.host";
-	}
-	else
-	{
-		$sql="select hostid,host from hosts order by host";
-	}
+	echo "&nbsp;".S_HOST."&nbsp;";
+	echo "<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
+
+	$sql=iif(isset($HTTP_GET_VARS["groupid"]),
+		"select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status in (0,2) and h.hostid=i.hostid and hg.groupid=".$HTTP_GET_VARS["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host",
+		"select h.hostid,h.host from hosts h,items i where h.status in (0,2) and h.hostid=i.hostid group by h.hostid,h.host order by h.host");
+
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
 	{
@@ -191,24 +189,12 @@
 		{
 			continue;
 		}
-		if(isset($HTTP_GET_VARS["hostid"]) && ($row["hostid"] == $HTTP_GET_VARS["hostid"]))
-		{
-			echo "<b>[";
-		}
-		if(isset($HTTP_GET_VARS["groupid"]))
-		{
-			echo "<A HREF=\"triggers.php?hostid=".$row["hostid"]."&groupid=".$HTTP_GET_VARS["groupid"]."\">".$row["host"]."</A>";
-		}
-		else
-		{
-			echo "<A HREF=\"triggers.php?hostid=".$row["hostid"]."\">".$row["host"]."</A>";
-		}
-		if(isset($HTTP_GET_VARS["hostid"]) && ($row["hostid"] == $HTTP_GET_VARS["hostid"]))
-		{
-			echo "]</b>";
-		}
-		echo " ";
+		echo "<option value=\"".$row["hostid"]."\"".iif(isset($HTTP_GET_VARS["hostid"])&&($HTTP_GET_VARS["hostid"]==$row["hostid"]),"selected","").">".$row["host"];
 	}
+	echo "</select>";
+
+	echo "</form>";
+// end of new code
 
 	show_table_header_end();
 ?>
@@ -240,11 +226,11 @@
 				echo "<TABLE BORDER=0 COLS=3 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 				echo "<TR>";
 				echo "<TD WIDTH=\"8%\"><B>Id</B></TD>";
-				echo "<TD><B>Description</B></TD>";
-				echo "<TD><B>Expression</B></TD>";
-				echo "<TD WIDTH=5%><B>Severity</B></TD>";
-				echo "<TD WIDTH=5%><B>Status</B></TD>";
-				echo "<TD WIDTH=15% NOSAVE><B>Actions</B></TD>";
+				echo "<TD><B>".S_DESCRIPTION."</B></TD>";
+				echo "<TD><B>".S_EXPRESSION."</B></TD>";
+				echo "<TD WIDTH=5%><B>".S_SEVERITY."</B></TD>";
+				echo "<TD WIDTH=5%><B>".S_STATUS."</B></TD>";
+				echo "<TD WIDTH=15% NOSAVE><B>".S_ACTIONS."</B></TD>";
 				echo "</TR>\n";
 			}
 			$lasthost=$row["host"];
@@ -263,26 +249,26 @@
 	
 			echo "<TD>".explode_exp($row["expression"],1)."</TD>";
 
-			if($row["priority"]==0)		echo "<TD ALIGN=CENTER>Not classified</TD>";
-			elseif($row["priority"]==1)	echo "<TD ALIGN=CENTER>Information</TD>";
-			elseif($row["priority"]==2)	echo "<TD ALIGN=CENTER>Warning</TD>";
-			elseif($row["priority"]==3)	echo "<TD ALIGN=CENTER BGCOLOR=#DDAAAA>Average</TD>";
-			elseif($row["priority"]==4)	echo "<TD ALIGN=CENTER BGCOLOR=#FF8888>High</TD>";
-			elseif($row["priority"]==5)	echo "<TD ALIGN=CENTER BGCOLOR=RED>Disaster !!!</TD>";
+			if($row["priority"]==0)		echo "<TD ALIGN=CENTER>".S_NOT_CLASSIFIED."</TD>";
+			elseif($row["priority"]==1)	echo "<TD ALIGN=CENTER>".S_INFORMATION."</TD>";
+			elseif($row["priority"]==2)	echo "<TD ALIGN=CENTER>".S_WARNING."</TD>";
+			elseif($row["priority"]==3)	echo "<TD ALIGN=CENTER BGCOLOR=#DDAAAA>".S_AVERAGE."</TD>";
+			elseif($row["priority"]==4)	echo "<TD ALIGN=CENTER BGCOLOR=#FF8888>".S_HIGH."</TD>";
+			elseif($row["priority"]==5)	echo "<TD ALIGN=CENTER BGCOLOR=RED>".S_DISASTER."</TD>";
 			else				echo "<TD ALIGN=CENTER><B>".$row["priority"]."</B></TD>";
 
 			echo "<TD>";
 			if($row["status"] == 1)
 			{
-				echo "<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=0&hostid=".$row["hostid"]."\"><font color=\"AA0000\">Disabled</font></a>";
+				echo "<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=0&hostid=".$row["hostid"]."\"><font color=\"AA0000\">".S_DISABLED."</font></a>";
 			}
 			else if($row["status"] == 2)
 			{
-				echo "<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=1&hostid=".$row["hostid"]."\"><font color=\"AAAAAA\">Unknown</font></a>";
+				echo "<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=1&hostid=".$row["hostid"]."\"><font color=\"AAAAAA\">".S_UNKNOWN."</font></a>";
 			}
 			else
 			{
-				echo "<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=1&hostid=".$row["hostid"]."\"><font color=\"00AA00\">Enabled</font></a>";
+				echo "<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=1&hostid=".$row["hostid"]."\"><font color=\"00AA00\">".S_ENABLED."</font></a>";
 			}
 			$expression=rawurlencode($row["expression"]);
 			echo "</TD>";
@@ -290,11 +276,11 @@
 			echo "<TD>";
 			if(isset($HTTP_GET_VARS["hostid"]))
 			{
-				echo "<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."&hostid=".$row["hostid"]."#form\">Change</A> ";
+				echo "<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."&hostid=".$row["hostid"]."#form\">".S_CHANGE."</A> ";
 			}
 			else
 			{
-				echo "<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."#form\">Change</A> ";
+				echo "<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."#form\">".S_CHANGE."</A> ";
 			}
 			echo "-";
 			if(get_action_count_by_triggerid($row["triggerid"])>0)
@@ -303,16 +289,16 @@
 			}
 			else
 			{
-				echo "<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">Actions</A>";
+				echo "<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">".S_ACTIONS."</A>";
 			}
 			echo "</TD>";
 			echo "</TR>";
 		}
 		echo "</table>";
 		show_table2_header_begin();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"enable selected\" onClick=\"return Confirm('Enable selected triggers?');\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"enable selected\" onClick=\"return Confirm('".S_ENABLE_SELECTED_TRIGGERS_Q."');\">";
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"disable selected\" onClick=\"return Confirm('Disable selected triggers?');\">";
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete selected\" onClick=\"return Confirm('Delete selected triggers?');\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete selected\" onClick=\"return Confirm('".S_DISABLE_SELECTED_TRIGGERS_Q."');\">";
 		show_table2_header_end();
 		echo "</form>";
 	}

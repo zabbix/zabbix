@@ -1,14 +1,43 @@
-1.1:
- - change severities to:
-Information
-Warning
-Error
-Critical
-Panic
+ZABBIX 1.1:
 
+ - support of networks having 100-1000 network devices to monitor
+ - escalation
+ - execution of commands on monitored hosts in case of pre-defined events
+ - repeated notifications
+ - custom multiplier
+ - monitoring of log files
+ - audit log
+ - manual to be in sync with current functionality
+ - improved usability for large setups
+ - new defaul port numbers to avoid confusion with WebMin
+ - background image
+ - downloadable icons
+ - hierarchial maps
+ - support of SNMPv3
+ - anvanced SNMP trapper
+ - hard-linked templates
+ - passing of parameters to user-defined commands (agent)
+ - more supported parameters under FreeBSD, HP-UX and Solaris (cpu times, network stats)
+ - agent proxy
+
+TKOM:
+
+ - alarms forwarding to external systems (using SNMP traps, for example)
+ - maps with background and attractive icons
+ - groups of graphs
+ - auto-discovery script
+ - alarm/trigger sounds
+ - saved custom-time period in graphs and screens
+ - SNMP trap processing
+ - SNMP trap sending
+ - wider service testing possibilities
+
+OTHER:
+
+ - change location of Zabbix Manual in about.php
+ - apply Igor patches for chart.php (calculation of MIN, MAX)
+ - review PHP code for simplifying (urls, iif() )
   - fix screenedit.php permissions
-  - macro {IPADDRESS}
-  - localisation (one file with defines for each language)
 
  Triggers - v ih spiske videljatj trigera u kotorih estj 'depends on'.
  * K primeru, posle virazhenija pistaj tekst v skobkah (depends on) ili inim
@@ -22,9 +51,7 @@ Panic
  * substr, length, poisk pozicii simvola/podstroki (FIND/SEARCH v Excel),
  podscet kolichestva simvola (tipa skoljko tam zapjatih)...
 
-  - check_NNTP should expect 200 not 220
-
-
+ - add requirement for fping to the manual
  - separate login.php and index.php
  - add gaps to graph when no data present
  - make Zabbix reset nextcheck for items when updating or adding a trigger
@@ -39,7 +66,6 @@ trigger wihout actions, etc etc
  5) When adding trigger, next page is without triggers of this host. Is  
  it possible after adding triger to go back to triggers of this host page ?
 
- - background image for maps
  - zabbix thinks that host is unrechable if it receives string for numeric item
 
  - think about implementation of sinchronised items like cpu[usr], cpu[sys], cpu[idle]
@@ -49,22 +75,14 @@ trigger wihout actions, etc etc
 forum Open Discussion for more info.
  - overlib: context sensitive help in PHP frontend
  - add selection of MIN/MAX/AVG for graphs
- - make sure all screens looks good in case of hundreds of servers/groups
  - use oop approach for new development
- - update the manual
- - put manual in HTML to the web
  - rewrite validation and evaluation of expressions (i.e. make >-1 work)
  - support for 'Clone' (graphs and screens)
  - add support of interface statistics under Solaris and FreeBSD
  - add screens and graphs to host templates
- - SNMP trapping
- - SNMP v3
- - pass parameters to UserParameters
- - custom multiplier or more complex expressions
  - calculate MIN value for graphs (do not use '0')
  - infrastructure for reports
  - stacked graphs
- - audit logs
 
  - man pages for all daemons
  - icmppingsec->icmppingmsec
@@ -101,13 +119,9 @@ latest trigger (item type  = TRAPPER)
  - links to Zabbix frontend in alert emails
  - strings items for graphs
  - UserParameter does not appear in the log
- - add support for agent forwarding (proxy)
  - ability to add a library of  userwritten c-functions with dlopen/dlsym to
 the agent with a predefined API that can return values to suckerd (for both 
 suckerd and agentd)
- - monitoring of log files
- - agents to execute command
- - add complete support for SNMP trapping
  - zabbix_trapperd does not start if PostgreSQL and DBConnectOnEach=1
 
  - monitoring of log files

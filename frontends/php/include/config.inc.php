@@ -21,43 +21,11 @@
 <?php
 	include_once 	"include/defines.inc.php";
 	include_once 	"include/db.inc.php";
+	include_once 	"include/html.inc.php";
 	include_once 	"include/local_en.inc.php";
 
 	$USER_DETAILS	="";
 	$ERROR_MSG	="";
-
-	function	nbsp($str)
-	{
-		return str_replace(" ","&nbsp;",$str);;
-	}
-
-	function url1_param($parameter)
-	{
-		global $HTTP_GET_VARS;
-	
-		if(isset($HTTP_GET_VARS[$parameter]))
-		{
-			return "$parameter=".$HTTP_GET_VARS[$parameter];
-		}
-		else
-		{
-			return "";
-		}
-	}
-
-	function url_param($parameter)
-	{
-		global $HTTP_GET_VARS;
-	
-		if(isset($HTTP_GET_VARS[$parameter]))
-		{
-			return "&$parameter=".$HTTP_GET_VARS[$parameter];
-		}
-		else
-		{
-			return "";
-		}
-	}
 
 	function getmicrotime()
 	{
@@ -74,6 +42,18 @@
 		else
 		{
 			return $b;
+		}
+	}
+
+	function	iif_echo($bool,$a,$b)
+	{
+		if($bool)
+		{
+			echo $a;
+		}
+		else
+		{
+			echo $b;
 		}
 	}
 
@@ -3414,6 +3394,19 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		cr();
 	}
 
+	function	show_table3_h_delimiter()
+	{
+//		echo "</font>";
+		cr();
+		echo "</td>";
+		cr();
+		echo "<td width=%10 colspan=1 bgcolor=99AABB align=right valign=\"top\">";
+		cr();
+//		echo "	<font size=-1>";
+		cr();
+	}
+
+
 	function	show_table_v_delimiter()
 	{
 //		echo "</font>";
@@ -3516,6 +3509,25 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 //		echo "	<font size=+1>";
 		cr();
 	}
+
+	function	show_table3_header_begin()
+	{
+		echo "<table border=0 align=center cellspacing=0 cellpadding=0 width=100% bgcolor=000000>";
+		cr();
+		echo "<tr>";
+		cr();
+		echo "<td valign=\"top\">";
+		cr();
+		echo "<table width=100% border=0 cellspacing=1 cellpadding=3>";
+		cr();
+		echo "<tr>";
+		cr();
+		echo "<td colspan=1 bgcolor=99AABB align=left valign=\"top\">";
+		cr();
+//		echo "	<font size=+1>";
+		cr();
+	}
+
 
 	function	show_table2_header_end()
 	{

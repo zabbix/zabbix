@@ -20,7 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = "Availability report";
+	$page["title"] = S_AVAILABILITY_REPORT;
 	$page["file"] = "report2.php";
 	show_header($page["title"],0,0);
 ?>
@@ -28,7 +28,7 @@
 <?php
 	if(!check_anyright("Host","R"))
 	{
-		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_footer();
 		exit;
 	}
@@ -36,7 +36,7 @@
 
 <?php
 	show_table_header_begin();
-	echo "AVAILABILITY REPORT";
+	echo S_AVAILABILITY_REPORT_BIG;
 
 	show_table_v_delimiter();
 
@@ -74,12 +74,12 @@
 		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.value from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.status=0 and t.triggerid=f.triggerid and h.hostid=".$HTTP_GET_VARS["hostid"]." and h.status in (0,2) and i.status=0 order by h.host, t.description");
 		echo "<TABLE BORDER=0 COLS=3 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 		echo "<TR>";
-		echo "<TD><B>Description</B></TD>";
+		echo "<TD><B>".S_DESCRIPTION."</B></TD>";
 //		echo "<TD><B>Expression</B></TD>";
-		echo "<TD WIDTH=5%><B>True</B></TD>";
-		echo "<TD WIDTH=5%><B>False</B></TD>";
-		echo "<TD WIDTH=5%><B>Unknown</B></TD>";
-		echo "<TD WIDTH=5%><B>Graph</B></TD>";
+		echo "<TD WIDTH=5%><B>".S_TRUE."</B></TD>";
+		echo "<TD WIDTH=5%><B>".S_FALSE."</B></TD>";
+		echo "<TD WIDTH=5%><B>".S_UNKNOWN."</B></TD>";
+		echo "<TD WIDTH=5%><B>".S_GRAPH."</B></TD>";
 		echo "</TR>\n";
 		$col=0;
 		while($row=DBfetch($result))
@@ -114,7 +114,7 @@
 			printf("%.4f%%",$availability["unknown"]);
 			echo "</TD>";
 			echo "<TD>";
-			echo "<a href=\"report2.php?hostid=".$HTTP_GET_VARS["hostid"]."&triggerid=".$row["triggerid"]."\">Show</a>";
+			echo "<a href=\"report2.php?hostid=".$HTTP_GET_VARS["hostid"]."&triggerid=".$row["triggerid"]."\">".S_SHOW."</a>";
 			echo "</TD>";
 			echo "</TR>\n";
 		}

@@ -1190,13 +1190,28 @@ void	process_new_value(DB_ITEM *item,char *value)
 			{
 				DBadd_history(item->itemid,value_double,now);
 			}
-			else
+			/* Delta as speed of change */
+			else if(item->delta == 1)
 			{
 				/* Save delta */
 				if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
 				{
 					DBadd_history(item->itemid, (value_double - item->prevorgvalue)/(now-item->lastclock), now);
 				}
+			}
+			/* Real delta: simple difference between values */
+			else if(item->delta == 2)
+			{
+				/* Save delta */
+				if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
+				{
+					DBadd_history(item->itemid, (value_double - item->prevorgvalue), now);
+				}
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Value not stored for itemid [%d]. Unknown delta [%d]", item->itemid, item->delta);
+				return;
 			}
 		}
 		else
@@ -1224,8 +1239,8 @@ void	process_new_value(DB_ITEM *item,char *value)
 			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,lastclock=%d where itemid=%d",now+item->delay,now,item->itemid);
 		}
 	}
-	/* Logic for delta */
-	else
+	/* Logic for delta as speed of change */
+	else if(item->delta == 1)
 	{
 		if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
 		{
@@ -1238,6 +1253,26 @@ void	process_new_value(DB_ITEM *item,char *value)
 
 		item->prevvalue=item->lastvalue;
 		item->lastvalue=(value_double - item->prevorgvalue)/(now-item->lastclock);
+		item->prevvalue_str=item->lastvalue_str;
+	/* Risky !!!*/
+		item->lastvalue_str=value;
+		item->prevvalue_null=item->lastvalue_null;
+		item->lastvalue_null=0;
+	}
+	/* Real delta: simple difference between values */
+	else if(item->delta == 2)
+	{
+		if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
+		{
+			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",now+item->delay,value_double,(value_double - item->prevorgvalue),now,item->itemid);
+		}
+		else
+		{
+			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",now+item->delay,value_double,now,item->itemid);
+		}
+
+		item->prevvalue=item->lastvalue;
+		item->lastvalue=(value_double - item->prevorgvalue);
 		item->prevvalue_str=item->lastvalue_str;
 	/* Risky !!!*/
 		item->lastvalue_str=value;

@@ -19,11 +19,12 @@
 **/
 ?>
 <?php
+	include "include/config.inc.php";
+	include "include/forms.inc.php";
+
 	$page["title"] = S_USERS;
 	$page["file"] = "users.php";
 
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();
 ?>
@@ -184,14 +185,9 @@
 		$sql="select count(*) as count from sessions where userid=".$row["userid"]." and lastaccess-600<".time();
 		$result2=DBselect($sql);
 		$row2=DBfetch($result2);
-		if($row2["count"]>0)
-		{
-			echo "<TD><font color=\"00AA00\">".S_YES."</font></TD>";
-		}
-		else
-		{
-			echo "<TD><font color=\"AA0000\">".S_NO."</font></TD>";
-		}
+		iif_echo($row2["count"]>0,
+			"<TD><font color=\"00AA00\">".S_YES."</font></TD>",
+			"<TD><font color=\"AA0000\">".S_NO."</font></TD>");
 		echo "<TD>";
         	if(check_right("User","U",$row["userid"]))
 		{
@@ -206,7 +202,7 @@
 		}
 		else
 		{
-			echo S_CHANGE." - ".S_MEDIA";
+			echo S_CHANGE." - ".S_MEDIA;
 		}
 		echo "</TD>";
 		echo "</TR>";

@@ -118,6 +118,8 @@
 	define("S_ON_C",				"On");
 	define("S_OFF_C",				"Off");
 	define("S_MOVE",				"Move");
+	define("S_SELECT_GRAPH_DOT_DOT_DOT",		"Select graph...");
+
 // Colors
 	define("S_BLACK",				"Black");
 	define("S_BLUE",				"Blue");
@@ -159,7 +161,7 @@
 	define("S_LATEST_VALUES",			"Latest values");
 	define("S_NO_PERMISSIONS",			"No permissions !");
 	define("S_LATEST_DATA",				"LATEST DATA");
-	define("S_ALL",					"all");
+	define("S_ALL_SMALL",				"all");
 	define("S_DESCRIPTION_LARGE",			"DESCRIPTION");
 	define("S_DESCRIPTION_SMALL",			"Description");
 	define("S_GRAPH",				"Graph");
@@ -217,6 +219,7 @@
 	define("S_VALUES_OF_LAST_HOUR",			"Values of last hour");
 	define("S_VALUES_OF_SPECIFIED_PERIOD",		"Values of specified period");
 	define("S_VALUES_IN_PLAIN_TEXT_FORMAT",		"Values in plain text format");
+	define("S_CLOCK",				"Clock");
 
 //	hosts.php
 	define("S_HOSTS",				"Hosts");
@@ -291,6 +294,8 @@
 	define("S_ACTIVATE_SELECTED_ITEMS_Q",		"Activate selected items?");
 	define("S_DISABLE_SELECTED_ITEMS_Q",		"Disable selected items?");
 	define("S_DELETE_SELECTED_ITEMS_Q",		"Delete selected items?");
+	define("S_EMAIL",				"Email");
+	define("S_SCRIPT",				"Script");
 
 //	latestalarms.php
 	define("S_LATEST_ALARMS",			"Latest alarms");
@@ -316,6 +321,7 @@
 	define("S_NETWORK_MAPS_BIG",			"NETWORK MAPS");
 	define("S_NO_MAPS_TO_DISPLAY",			"No maps to display");
 	define("S_SELECT_MAP_TO_DISPLAY",		"Select map to display");
+	define("S_SELECT_MAP_DOT_DOT_DOT",		"Select map...");
 
 //	media.php
 	define("S_MEDIA",				"Media");
@@ -359,6 +365,166 @@
 	define("S_MENU_TRIGGERS",			"TRIGGERS");
 	define("S_MENU_NETWORK_MAPS",			"NETWORK MAPS");
 	define("S_MENU_GRAPHS",				"GRAPHS");
+
+//	queue.php
+	define("S_QUEUE_BIG",				"QUEUE");
+	define("S_QUEUE_OF_ITEMS_TO_BE_UPDATED_BIG",	"QUEUE OF ITEMS TO BE UPDATED");
+	define("S_NEXT_CHECK",				"Next check");
+	define("S_THE_QUEUE_IS_EMPTY",			"The queue is empty");
+	define("S_TOTAL",				"Total");
+
+//	report1.php
+	define("S_STATUS_OF_ZABBIX",			"Status of Zabbix");
+	define("S_STATUS_OF_ZABBIX_BIG",		"STATUS OF ZABBIX");
+	define("S_PARAMETER",				"Parameter");
+	define("S_VALUE",				"Value");
+	define("S_ZABBIX_SUCKERD_IS_RUNNING",		"zabbix_suckerd is running");
+	define("S_ZABBIX_TRAPPERD_IS_RUNNING",		"zabbix_trapperd is running");
+	define("S_NUMBER_OF_VALUES_STORED",		"Number of values stored");
+	define("S_NUMBER_OF_TRENDS_STORED",		"Number of trends stored");
+	define("S_NUMBER_OF_ALARMS",			"Number of alarms");
+	define("S_NUMBER_OF_ALERTS",			"Number of alerts");
+	define("S_NUMBER_OF_TRIGGERS_ENABLED_DISABLED",	"Number of triggers (enabled/disabled)");
+	define("S_NUMBER_OF_ITEMS_ACTIVE_TRAPPER",	"Number of items (active/trapper/not active/not supported)");
+	define("S_NUMBER_OF_USERS",			"Number of users");
+	define("S_NUMBER_OF_HOSTS_MONITORED",		"Number of hosts (monitored/not monitored/templates)");
+	define("S_YES",					"Yes");
+	define("S_NO",					"No");
+
+//	report2.php
+	define("S_AVAILABILITY_REPORT",			"Availability report");
+	define("S_AVAILABILITY_REPORT_BIG",		"AVAILABILITY REPORT");
+	define("S_SHOW",				"Show");
+	define("S_TRUE",				"True");
+	define("S_FALSE",				"False");
+
+//	screenconf.php
+	define("S_SCREENS",				"Screens");
+	define("S_SCREEN",				"Screen");
+	define("S_CONFIGURATION_OF_SCREENS_BIG",	"CONFIGURATION OF SCREENS");
+	define("S_SCREEN_ADDED",			"Screen added");
+	define("S_CANNOT_ADD_SCREEN",			"Cannot add screen");
+	define("S_SCREEN_UPDATED",			"Screen updated");
+	define("S_CANNOT_UPDATE_SCREEN",		"Cannot update screen");
+	define("S_SCREEN_DELETED",			"Screen deleted");
+	define("S_CANNOT_DELETE_SCREEN",		"Cannot deleted screen");
+	define("S_COLUMNS",				"Columns");
+	define("S_ROWS",				"Rows");
+	define("S_NO_SCREENS_DEFINED",			"No screens defined");
+	define("S_DELETE_SCREEN_Q",			"Delete screen?");
+	define("S_CONFIGURATION_OF_SCREEN_BIG",		"CONFIGURATION OF SCREEN");
+	define("S_SCREEN_CELL_CONFIGURATION",		"Screen cell configuration");
+	define("S_RESOURCE",				"Resource");
+	define("S_SIMPLE_GRAPH",			"Simple graph");
+	define("S_GRAPH_NAME",				"Graph name");
+	define("S_WIDTH",				"Width");
+	define("S_HEIGHT",				"Height");
+	define("S_EMPTY",				"Empty");
+
+//	screenedit.php
+	define("S_MAP",					"Map");
+
+//	screens.php
+	define("S_CUSTOM_SCREENS",			"Custom screens");
+	define("S_SCREENS_BIG",				"SCREENS");
+	define("S_NO_SCREENS_TO_DISPLAY",		"No screens to display");
+	define("S_SELECT_SCREEN_TO_DISPLAY",		"Select screen to display");
+
+//	services.php
+	define("S_IT_SERVICES",				"IT services");
+	define("S_SERVICE_UPDATED",			"Service updated");
+	define("S_CANNOT_UPDATE_SERVICE",		"Cannot update service");
+	define("S_SERVICE_ADDED",			"Service added");
+	define("S_CANNOT_ADD_SERVICE",			"Cannot add service");
+	define("S_LINK_ADDED",				"Link added");
+	define("S_CANNOT_ADD_LINK",			"Cannot add link");
+	define("S_SERVICE_DELETED",			"Service deleted");
+	define("S_CANNOT_DELETE_SERVICE",		"Cannot delete service");
+	define("S_LINK_DELETED",			"Link deleted");
+	define("S_CANNOT_DELETE_LINK",			"Cannot delete link");
+	define("S_STATUS_CALCULATION",			"Status calculation");
+	define("S_NONE",				"None");
+	define("S_MAX_OF_CHILDS",			"MAX of childs");
+	define("S_MIN_OF_CHILDS",			"MIN of childs");
+	define("S_SERVICE_1",				"Service 1");
+	define("S_SERVICE_2",				"Service 2");
+	define("S_SOFT_HARD_LINK",			"Soft/hard link");
+	define("S_SOFT",				"Soft");
+	define("S_HARD",				"Hard");
+	define("S_DO_NOT_CALCULATE",			"Do not calculate");
+	define("S_MAX_BIG",				"MAX");
+	define("S_MIN_BIG",				"MIN");
+	define("S_SHOW_SLA",				"Show SLA");
+	define("S_ACCEPTABLE_SLA_IN_PERCENT",		"Acceptabe SLA (in %)");
+	define("S_LINK_TO_TRIGGER_Q",			"Link to trigger?");
+	define("S_SORT_ORDER_0_999",			"Sort order (0->999)");
+	define("S_DELETE_SERVICE_Q",			"S_DELETE_SERVICE_Q");
+	define("S_LINK_TO",				"Link to");
+	define("S_SOFT_LINK_Q",				"Soft link?");
+	define("S_ADD_SERVER_DETAILS",			"Add server details");
+
+//	srv_status.php
+	define("S_IT_SERVICES",				"IT services");
+	define("S_IT_SERVICES_BIG",			"IT SERVICES");
+	define("S_SERVICE",				"Service");
+	define("S_REASON",				"Reason");
+	define("S_SLA_LAST_7_DAYS",			"SLA (last 7 days)");
+	define("S_PLANNED_CURRENT_SLA",			"Planned/current SLA");
+	define("S_TRIGGER_BIG",				"TRIGGER");
+
+//	triggers.php
+	define("S_CONFIGURATION_OF_TRIGGERS",		"Configuration of triggers");
+	define("S_CONFIGURATION_OF_TRIGGERS_BIG",	"CONFIGURATION OF TRIGGERS");
+	define("S_DEPENDENCY_ADDED",			"Dependency added");
+	define("S_CANNOT_ADD_DEPENDENCY",		"Cannot add dependency");
+	define("S_TRIGGERS_UPDATED",			"Triggers updated");
+	define("S_CANNOT_UPDATE_TRIGGERS",		"Cannot update triggers");
+	define("S_TRIGGERS_DISABLED",			"Triggers disabled");
+	define("S_CANNOT_DISABLE_TRIGGERS",		"Cannot disable triggers");
+	define("S_TRIGGERS_DELETED",			"Triggers deleted");
+	define("S_CANNOT_DELETE_TRIGGERS",		"Cannot delete triggers");
+	define("S_TRIGGER_DELETED",			"Trigger deleted");
+	define("S_CANNOT_DELETE_TRIGGER",		"Cannot delete trigger");
+	define("S_INVALID_TRIGGER_EXPRESSION",		"Invalid trigger expression");
+	define("S_TRIGGER_ADDED",			"Trigger added");
+	define("S_CANNOT_ADD_TRIGGER",			"Cannot add trigger");
+	define("S_SEVERITY",				"Severity");
+	define("S_EXPRESSION",				"Expression");
+	define("S_DISABLED",				"Disabled");
+	define("S_ENABLED",				"Enabled");
+	define("S_ENABLE_SELECTED_TRIGGERS_Q",		"Enable selected triggers?");
+	define("S_DISABLE_SELECTED_TRIGGERS_Q",		"Disable selected triggers?");
+	define("S_CHANGE",				"Change");
+	define("S_TRIGGER_UPDATED",			"Trigger updated");
+	define("S_CANNOT_UPDATE_TRIGGER",		"Cannot update trigger");
+
+//	tr_comments.php
+	define("S_TRIGGER_COMMENTS",			"Trigger comments");
+	define("S_TRIGGER_COMMENTS_BIG",		"TRIGGER COMMENTS");
+	define("S_COMMENT_UPDATED",			"Comment updated");
+	define("S_CANNOT_UPDATE_COMMENT",		"Cannot update comment");
+	define("S_COMMENTS",				"Comments");
+	define("S_ADD",					"Add");
+
+//	tr_status.php
+	define("S_STATUS_OF_TRIGGERS",			"Status of triggers");
+	define("S_STATUS_OF_TRIGGERS_BIG",		"STATUS OF TRIGGERS");
+	define("S_SHOW_ONLY_TRUE",			"Show only true");
+	define("S_HIDE_ACTIONS",			"Hide actions");
+	define("S_SHOW_ACTIONS",			"Show actions");
+	define("S_SHOW_ALL_TRIGGERS",			"Show all triggers");
+	define("S_HIDE_DETAILS",			"Hide details");
+	define("S_SHOW_DETAILS",			"Show details");
+	define("S_SELECT",				"Select");
+	define("S_HIDE_SELECT",				"Hide select");
+	define("S_TRIGGERS_BIG",			"TRIGGERS");
+	define("S_DESCRIPTION_BIG",			"DESCRIPTION");
+	define("S_SEVERITY_BIG",			"SEVERITY");
+	define("S_LAST_CHANGE_BIG",			"LAST CHANGE");
+	define("S_LAST_CHANGE",				"Last change");
+	define("S_ACTIONS",				"Actions");
+	define("S_COMMENTS",				"Comments");
+	define("S_SHOW_ACTIONS",			"Show actions");
 
 //	users.php
 	define("S_USERS",				"Users");

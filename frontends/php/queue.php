@@ -19,31 +19,31 @@
 **/
 ?>
 <?php
-	$page["title"] = "Information about monitoring server";
-	$page["file"] = "queue.php";
-
 	include "include/config.inc.php";
+
+	$page["title"] = S_QUEUE_BIG;
+	$page["file"] = "queue.php";
 	show_header($page["title"],10,0);
 ?>
  
 <?php
 	if(!check_anyright("Host","R"))
 	{
-		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_footer();
 		exit;	
 	}
 ?>
 
 <?php
-	show_table_header("QUEUE OF ITEMS TO BE UPDATED");
+	show_table_header(S_QUEUE_OF_ITEMS_TO_BE_UPDATED_BIG);
 ?>
 <?php
 	$now=time();
 	$result=DBselect("select i.itemid, i.nextcheck, i.description, h.host,h.hostid from items i,hosts h where i.status=0 and i.type not in (2) and h.status=0 and i.hostid=h.hostid and i.nextcheck<$now and i.key_<>'status' order by i.nextcheck");
 	echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";
 	echo "\n";
-	echo "<tr><td><b>Next time to check</b></td><td><b>Host</b></td><td><b>Description</b></td></tr>";
+	echo "<tr><td><b>".S_NEXT_CHECK."</b></td><td><b>".S_HOST."</b></td><td><b>".S_DESCRIPTION."</b></td></tr>";
 	echo "\n";
 	$col=0;
 	while($row=DBfetch($result))
@@ -52,24 +52,22 @@
 		{
 			continue;
 		}
-		if($col++%2==0)	{ echo "<tr bgcolor=#EEEEEE>"; }
-		else		{ echo "<tr bgcolor=#DDDDDD>"; }
-		echo "<td>".date("m.d.Y H:i:s",$row["nextcheck"])."</td>";
-		echo "<td>".$row["host"]."</td>";
-		echo "<td>".$row["description"]."</td>";
+		iif_echo($col++%2==0,
+			"<tr bgcolor=#EEEEEE>",
+			"<tr bgcolor=#DDDDDD>");
+		table_td(date("m.d.Y H:i:s",$row["nextcheck"]),"");
+		table_td($row["host"],"");
+		table_td($row["description"],"");
 		echo "</tr>";
 		cr();
 	}
-	if(DBnum_rows($result)==0)
-	{
-			echo "<TR BGCOLOR=#EEEEEE>";
-			echo "<TD COLSPAN=3 ALIGN=CENTER>-The queue is empty-</TD>";
-			echo "<TR>";
-	}
+	iif_echo(DBnum_rows($result)==0,
+		"<TR BGCOLOR=#EEEEEE><TD COLSPAN=3 ALIGN=CENTER>".S_THE_QUEUE_IS_EMPTY."</TD><TR>",
+		"");
 	echo "</table>";
 ?>
 <?php
-	show_table_header("Total:$col");
+	show_table_header(S_TOTAL.":$col");
 ?>
 
 <?php
