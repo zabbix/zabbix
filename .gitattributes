@@ -1,4 +1,5 @@
 * text=auto !eol
+frontends/php/audio/disaster_on.wav svneol=native#unset
 frontends/php/audio/warning_off.wav svneol=native#unset
 frontends/php/audio/warning_on.wav svneol=native#unset
 frontends/php/images/sysmaps/Hub.png svneol=native#unset

@@ -26,16 +26,23 @@
 	$old=explode(",",$triggers_hash);
 
 //	Number of trigger decreased
+//	echo $new[0]," ",$old[0];
 	if(($old[1]!=$new[1])&&($new[0]<$old[0]))
 	{
-//		echo "<tr>OFF<tr>";
 		$audio="warning_off.wav";
 	}
 //	Number of trigger increased
 	if(($old[1]!=$new[1])&&($new[0]>=$old[0]))
 	{
-//		echo "<tr>ON<tr>";
-		$audio="warning_on.wav";
+// DISASTER
+		if(($new[0]-$old[0])/pow(10,5)>=1)
+		{
+			$audio="disaster_on.wav";
+		}
+		else
+		{
+			$audio="warning_on.wav";
+		}
 	}
 
 //	echo "$tr_hash<br>$triggers_hash<br>".$old[1]."<br>".$new[1];

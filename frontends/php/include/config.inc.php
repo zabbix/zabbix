@@ -276,7 +276,10 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		for($i=0;$i<=5;$i++)
 		{
 	        	$result=DBselect("select count(*) from triggers t,hosts h,items i,functions f  where t.value=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status=0 and t.priority=$i");
-			$priorities+=(1000^$i)*DBget_field($result,0,0);
+//			$priorities+=(1000^$i)*DBget_field($result,0,0);
+			$priorities+=pow(100,$i)*DBget_field($result,0,0);
+//			echo "$i $priorities ",DBget_field($result,0,0),"<br>";
+//			echo pow(100,5)*13;
 		}
 		$triggerids="";
 	       	$result=DBselect("select t.triggerid from triggers t,hosts h,items i,functions f  where t.value=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status=0");
