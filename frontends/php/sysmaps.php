@@ -42,8 +42,6 @@
 		{
 			$result=add_sysmap($_GET["name"],$_GET["width"],$_GET["height"],$_GET["background"]);
 			show_messages($result,"Network map added","Cannot add network map");
-			print_r($_FILES);
-			echo $_FILES["background"]["tmp_name"];
 		}
 		if($_GET["register"]=="update")
 		{
