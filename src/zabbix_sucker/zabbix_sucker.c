@@ -484,10 +484,6 @@ int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
 			zabbix_log(LOG_LEVEL_DEBUG, "NOTSUPPORTED1 [%s]", c );
 			return NOTSUPPORTED;
 		}
-		else
-		{
-			return	FAIL;
-		}
 	}
 
 	strncpy(result_str,c,MAX_STRING_LEN);

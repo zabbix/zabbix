@@ -1157,6 +1157,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$ERROR_MSG="Insufficient permissions";
 			return 0;
 		}
+		if($delay<1)
+		{
+			$ERROR_MSG="Delay cannot be less than 1 second";
+			return 0;
+		}
 
 		$sql="update items set description='$description',key_='$key',hostid=$hostid,delay=$delay,history=$history,lastdelete=0,nextcheck=0,status=$status,type=$type,snmp_community='$snmp_community',snmp_oid='$snmp_oid',value_type=$value_type where itemid=$itemid";
 		return	DBexecute($sql);
@@ -1443,6 +1448,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		if(!check_right("Item","A",0))
 		{
 			$ERROR_MSG="Insufficient permissions";
+			return 0;
+		}
+
+		if($delay<1)
+		{
+			$ERROR_MSG="Delay cannot be less than 1 second";
 			return 0;
 		}
 
