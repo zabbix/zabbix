@@ -1,4 +1,4 @@
- #define	TEST_PARAMETERS 
+#define	TEST_PARAMETERS 
 
 #include "config.h"
 
@@ -25,7 +25,7 @@
 #include "sysinfo.h"
 #include "zabbix_agent.h"
 
-char	*config_host_allowed=NULL;
+static	char	*config_host_allowed=NULL;
 
 void	signal_handler( int sig )
 {
@@ -140,6 +140,7 @@ float	process_input()
 int	main()
 {
 #ifdef	TEST_PARAMETERS
+	process_config_file();
 	test_parameters();
 	return	SUCCEED;
 #endif

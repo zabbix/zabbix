@@ -1,5 +1,7 @@
 Noe ready yet:
 
+[ Add parameter Timeout for the rest of processes ]
+[ Something wrong with zabbix_agentd ] 
 [ Solve problem with getpeername ]
 [ All parameters should contain section "How can be used" in the Manual]
 [ PHP to support non-numerci values ]
@@ -9,6 +11,8 @@ Noe ready yet:
 
 Changes for 1.0beta3:
 
+ - support for parameter Timeout for zabbix_agentd (Alexei)
+ - support for parameter Timeout for zabbix_suckerd (Alexei)
  - do not refresh screen if displayed all triggers (Alexei)
  - fixed "Send message to" in actions.html (Alexei)
  - support for experimental parameter NoTimeWait (Alexei)
