@@ -1756,7 +1756,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		$search=array("{HOSTNAME}");
 		$replace=array($row["host"]);
-		$description = str_replace($search, $replace,$row["description"]);
+//		$description = str_replace($search, $replace,$row["description"]);
+		$description = str_replace("{HOSTNAME}", $row["host"],$row["description"]);
 
 		$description=stripslashes(htmlspecialchars($description));
 
