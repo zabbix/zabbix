@@ -3791,7 +3791,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 			if(isset($HTTP_GET_VARS["usrgrpid"]))
 			{
-				$sql="select count(*) as count from users_groups where usrgrpid=".$HTTP_GET_VARS["usrgrpid"];
+				$sql="select count(*) as count from users_groups where userid=".$row["userid"]." and usrgrpid=".$HTTP_GET_VARS["usrgrpid"];
 				$result2=DBselect($sql);
 				$row2=DBfetch($result2);
 				if($row2["count"]==0)
