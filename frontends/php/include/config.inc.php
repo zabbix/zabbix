@@ -4041,7 +4041,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
         function delete_screen_item($screenitemid)
         {
-                $sql="idelete from screens_items where screenitemid=$screenitemid";
+                $sql="delete from screens_items where screenitemid=$screenitemid";
                 return  DBexecute($sql);
         }
 
