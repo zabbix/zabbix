@@ -13,18 +13,22 @@
 ?>
 
 <?
-	if(isset($limit)&&($limit==200))
-	{
-		echo "[<A HREF=\"alerts.php?limit=50\">";
-		echo "Show last 50</A>]";
-		$limit=" limit 50";
-	}
-	else 
-	{
-		echo "[<A HREF=\"alerts.php?limit=200\">";
-		echo "Show last 200</A>]";
-		$limit=" limit 200";
-	}
+        if(isset($start)&&($start<=0))
+        {
+                unset($start);
+        }
+        if(isset($start))
+        {
+                echo "[<A HREF=\"alerts.php?start=".($start-100)."\">";
+                echo "Show previous 100</A>] ";
+                echo "[<A HREF=\"alerts.php?start=".($start+100)."\">";
+                echo "Show next 100</A>]";
+        }
+        else
+        {
+                echo "[<A HREF=\"alerts.php?start=100\">";
+                echo "Show next 100</A>]";
+        }
 
 	show_table_header_end();
 	echo "<br>";
@@ -35,7 +39,14 @@
 
 <FONT COLOR="#000000">
 <?
-	$sql="select a.alertid,a.clock,a.type,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries from alerts a,actions ac where a.actionid=ac.actionid order by a.clock desc $limit";
+	if(!isset($start))
+	{
+		$sql="select a.alertid,a.clock,a.type,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries from alerts a,actions ac where a.actionid=ac.actionid order by a.clock desc limit 100";
+	}
+	else
+	{
+		$sql="select a.alertid,a.clock,a.type,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries from alerts a,actions ac where a.actionid=ac.actionid order by a.clock desc limit ".($start+100);
+	}
 	$result=DBselect($sql);
 
 	echo "<CENTER>";

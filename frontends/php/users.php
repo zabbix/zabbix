@@ -65,11 +65,9 @@
 
 <?
 	show_table_header("CONFIGURATION OF USERS");
-	echo "<br>";
 ?>
 
 <?
-	show_table_header("USERS");
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR><TD WIDTH=\"3%\"><B>Id</B></TD>";
 	echo "<TD WIDTH=\"10%\"><B>Alias</B></TD>";

@@ -44,11 +44,9 @@
 
 <?
 	show_table_header("CONFIGURATION OF HOSTS");
-	echo "<br>";
 ?>
 
 <?
-	show_table_header("HOSTS");
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR>";
 	echo "<TD WIDTH=\"3%\" NOSAVE><B>Id</B></TD>";
