@@ -80,7 +80,6 @@
 			$this->nodata=1;
 
 			$this->count=array();
-			for($i=0;$i<900;$i++) $count[$i]=0;
 			$this->min=array();
 			$this->max=array();
 			$this->avg=array();
@@ -143,6 +142,17 @@
 		function setBorder($border)
 		{
 			$this->border=$border;
+		}
+
+		function getLastValue($num)
+		{
+			for($i=899;$i>=0;$i--)
+			{
+				if(isset($this->count[$num][$i])&&($this->count[$num][$i]>0))
+				{
+					return $this->avg[$num][$i];
+				}
+			}
 		}
 
 		function drawSmallRectangle()
@@ -245,11 +255,12 @@
 				ImageFilledRectangle($this->im,$this->shiftX,$this->sizeY+$this->shiftY+32+12*$i,$this->shiftX+5,$this->sizeY+$this->shiftY+5+32+12*$i,$this->colors[$this->items[$i]["color"]]);
 				ImageRectangle($this->im,$this->shiftX,$this->sizeY+$this->shiftY+32+12*$i,$this->shiftX+5,$this->sizeY+$this->shiftY+5+32+12*$i,$this->colors["Black"]);
 
-				$str=sprintf("%s: %s [min:%s max:%s]",
+				$str=sprintf("%s: %s [min:%s max:%s last:%s]",
 					str_pad($this->items[$i]["host"],$max_host_len," "),
 					str_pad($this->items[$i]["description"],$max_desc_len," "),
 					convert_units(min($this->min[$i]),$this->items[$i]["units"],$this->items[$i]["multiplier"]),
-					convert_units(max($this->max[$i]),$this->items[$i]["units"],$this->items[$i]["multiplier"]));
+					convert_units(max($this->max[$i]),$this->items[$i]["units"],$this->items[$i]["multiplier"]),
+					convert_units($this->getLastValue($i),$this->items[$i]["units"],$this->items[$i]["multiplier"]));
 	
 				ImageString($this->im, 2,$this->shiftX+9,$this->sizeY+$this->shiftY+27+12*$i,$str, $this->colors["Black"]);
 			}
@@ -409,30 +420,26 @@
 			$minY=0;
 			$maxY=$this->calculateMaxY();
 
-			if(isset($minY)&&isset($maxY)&&($minX!=$maxX)&&($minY!=$maxY))
+			for($item=0;$item<$this->num;$item++)
 			{
-				for($item=0;$item<$this->num;$item++)
+				for($i=0;$i<900;$i++)
 				{
-					for($i=0;$i<900;$i++)
+					if(isset($this->count[$item][$i])&&($this->count[$item][$i]>0))
 					{
-						if(isset($this->count[$item][$i])&&($this->count[$item][$i]>0))
+						for($j=$i-1;$j>=0;$j--)
 						{
-//							for($j=$i-1;($j>=0)&&($j>$i-10);$j--)
-							for($j=$i-1;$j>=0;$j--)
+							if(isset($this->count[$item][$j])&&($this->count[$item][$j]>0))
 							{
-								if(isset($this->count[$item][$j])&&($this->count[$item][$j]>0))
-								{
-									$x1=$this->sizeX*($i-$minX)/($maxX-$minX);
-									$y1=$this->sizeY*($this->avg[$item][$i]-$minY)/($maxY-$minY);
-									$y1=$this->sizeY-$y1;
+								$x1=$this->sizeX*($i-$minX)/($maxX-$minX);
+								$y1=$this->sizeY*($this->avg[$item][$i]-$minY)/($maxY-$minY);
+								$y1=$this->sizeY-$y1;
 
-									$x2=$this->sizeX*($j-$minX)/($maxX-$minX);
-									$y2=$this->sizeY*($this->avg[$item][$j]-$minY)/($maxY-$minY);
-									$y2=$this->sizeY-$y2;
+								$x2=$this->sizeX*($j-$minX)/($maxX-$minX);
+								$y2=$this->sizeY*($this->avg[$item][$j]-$minY)/($maxY-$minY);
+								$y2=$this->sizeY-$y2;
 
-									$this->drawElement($item, $x1+$this->shiftX,$y1+$this->shiftY,$x2+$this->shiftX,$y2+$this->shiftY);
-									break;
-								}
+								$this->drawElement($item, $x1+$this->shiftX,$y1+$this->shiftY,$x2+$this->shiftX,$y2+$this->shiftY);
+								break;
 							}
 						}
 					}
@@ -450,10 +457,8 @@
 			{
 				ImageString($this->im, 2,$this->sizeX/2 -50,$this->sizeY+$this->shiftY+3, "NO DATA FOR THIS PERIOD" , $this->colors["Dark Red"]);
 			}
-			ImageStringUp($this->im,0,imagesx($this->im)-10,imagesy($this->im)-50, "http://zabbix.sourceforge.net", $this->colors["Gray"]);
-	
 
-
+			$this->drawLogo();
 
 			$this->drawLegend();
 		
