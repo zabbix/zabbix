@@ -41,6 +41,7 @@
 		var $min;
 		var $max;
 		var $avg;
+		var $clock;
 		var $count;
 		// Number of items
 		var $num;
@@ -113,6 +114,7 @@
 			$this->min=array();
 			$this->max=array();
 			$this->avg=array();
+			$this->clock=array();
 
 			$this->itemids=array();
 
@@ -517,11 +519,11 @@
 
 			if($this->period<=24*3600)
 			{
-				$sql="select itemid,round(900*((clock+$z)%($p))/($p),0) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid in ($str) and clock>=".$this->from_time." and clock<=".$this->to_time." group by itemid,round(900*((clock+$z)%($p))/($p),0)";
+				$sql="select itemid,round(900*((clock+$z)%($p))/($p),0) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max,max(clock) as clock from history where itemid in ($str) and clock>=".$this->from_time." and clock<=".$this->to_time." group by itemid,round(900*((clock+$z)%($p))/($p),0)";
 			}
 			else
 			{
-				$sql="select itemid,round(900*((clock+$z)%($p))/($p),0) as i,sum(num) as count,avg(value_avg) as avg,min(value_min) as min,max(value_max) as max from trends where itemid in ($str) and clock>=".$this->from_time." and clock<=".$this->to_time." group by itemid,round(900*((clock+$z)%($p))/($p),0)";
+				$sql="select itemid,round(900*((clock+$z)%($p))/($p),0) as i,sum(num) as count,avg(value_avg) as avg,min(value_min) as min,max(value_max) as max,max(clock) as clock from trends where itemid in ($str) and clock>=".$this->from_time." and clock<=".$this->to_time." group by itemid,round(900*((clock+$z)%($p))/($p),0)";
 			}
 //			echo $sql;
 
@@ -533,6 +535,7 @@
 				$this->min[$this->itemids[$row["itemid"]]][$i]=$row["min"];
 				$this->max[$this->itemids[$row["itemid"]]][$i]=$row["max"];
 				$this->avg[$this->itemids[$row["itemid"]]][$i]=$row["avg"];
+				$this->clock[$this->itemids[$row["itemid"]]][$i]=$row["clock"];
 				$this->nodata=0;
 			}
 		}
@@ -582,8 +585,10 @@
 			$minY=$this->calculateMinY();
 			$maxY=$this->calculateMaxY();
 
+			// For each metric
 			for($item=0;$item<$this->num;$item++)
 			{
+				// For each X
 				for($i=0;$i<900;$i++)
 				{
 					if(isset($this->count[$item][$i])&&($this->count[$item][$i]>0))
@@ -600,7 +605,14 @@
 								$y2=$this->sizeY*($this->avg[$item][$j]-$minY)/($maxY-$minY);
 								$y2=$this->sizeY-$y2;
 
-								$this->drawElement($item, $x1+$this->shiftX,$y1+$this->shiftY,$x2+$this->shiftX+1,$y2+$this->shiftY);
+								// Do not draw anything if difference between two points is more than 4*(item refresh period)
+//								if($this->clock[$item][$i]-$this->clock[$item][$j]<4*$this->items[$item]["delay"])
+//								echo 8*($this->to_time-$this->from_time)/900,"<br>";
+//								echo $this->clock[$item][$i]-$this->clock[$item][$j],"<br>";
+								if($this->clock[$item][$i]-$this->clock[$item][$j]<8*($this->to_time-$this->from_time)/900)
+								{
+									$this->drawElement($item, $x1+$this->shiftX,$y1+$this->shiftY,$x2+$this->shiftX+1,$y2+$this->shiftY);
+								}
 								break;
 							}
 						}
