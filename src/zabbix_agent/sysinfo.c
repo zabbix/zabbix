@@ -120,7 +120,6 @@ float	getPROC(char *file,int lineno,int fieldno)
 	for(i=2;i<=fieldno;i++)
 	{
 		t=(char *)strtok(NULL," ");
-		printf("%s\n",t);
 	}
 	fclose(f);
 
