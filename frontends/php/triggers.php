@@ -217,7 +217,7 @@
 	if(isset($HTTP_GET_VARS["hostid"])&&!isset($HTTP_GET_VARS["triggerid"]))
 	{
 
-		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.status,t.value from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$HTTP_GET_VARS["hostid"]." order by h.host,t.description");
+		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.status,t.value,t.priority from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$HTTP_GET_VARS["hostid"]." order by h.host,t.description");
 		$lasthost="";
 		$col=0;
 		while($row=DBfetch($result))
@@ -241,6 +241,7 @@
 				echo "<TD WIDTH=\"8%\"><B>Id</B></TD>";
 				echo "<TD><B>Description</B></TD>";
 				echo "<TD><B>Expression</B></TD>";
+				echo "<TD WIDTH=5%><B>Severity</B></TD>";
 				echo "<TD WIDTH=5%><B>Status</B></TD>";
 				echo "<TD WIDTH=15% NOSAVE><B>Actions</B></TD>";
 				echo "</TR>\n";
@@ -260,6 +261,15 @@
 			echo "<TD>$description</TD>";
 	
 			echo "<TD>".explode_exp($row["expression"],1)."</TD>";
+
+			if($row["priority"]==0)		echo "<TD ALIGN=CENTER>Not classified</TD>";
+			elseif($row["priority"]==1)	echo "<TD ALIGN=CENTER>Information</TD>";
+			elseif($row["priority"]==2)	echo "<TD ALIGN=CENTER>Warning</TD>";
+			elseif($row["priority"]==3)	echo "<TD ALIGN=CENTER BGCOLOR=#DDAAAA>Average</TD>";
+			elseif($row["priority"]==4)	echo "<TD ALIGN=CENTER BGCOLOR=#FF8888>High</TD>";
+			elseif($row["priority"]==5)	echo "<TD ALIGN=CENTER BGCOLOR=RED>Disaster !!!</TD>";
+			else				echo "<TD ALIGN=CENTER><B>".$row["priority"]."</B></TD>";
+
 			echo "<TD>";
 			if($row["status"] == 1)
 			{
@@ -275,6 +285,7 @@
 			}
 			$expression=rawurlencode($row["expression"]);
 			echo "</TD>";
+
 			echo "<TD>";
 			if(isset($HTTP_GET_VARS["hostid"]))
 			{
