@@ -17,9 +17,11 @@
 ?>
 
 <?
-	if(isset($register) && ($register=="update"))
+	if(isset($HTTP_POST_VARS["register"]) && ($HTTP_POST_VARS["register"]=="update"))
 	{
-		$result=update_config($smtp_server,$smtp_helo,$smtp_email,$alarm_history,$alert_history);
+		$result=update_config($HTTP_POST_VARS["smtp_server"],$HTTP_POST_VARS["smtp_helo"],
+			$HTTP_POST_VARS["smtp_email"],$HTTP_POST_VARS["alarm_history"],
+			$HTTP_POST_VARS["alert_history"]);
 		show_messages($result, "Configuration updated", "Configuation was NOT updated");
 	}
 ?>
