@@ -41,7 +41,6 @@ TOP PRIORITY:
  - check Rickard's active(?) agent
  - improve graphing capabilities (MRTG like graphs)
  - monitoring of log files
- - show last 20% in SLA bar
  - show current and planned SLA in IT Services screen
  - set sort priorities for IT Services
  - support of fetch_html[*]
