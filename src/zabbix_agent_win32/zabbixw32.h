@@ -35,7 +35,12 @@
 // Common constants
 //
 
-#define AGENT_VERSION         "1.0.0-beta8(rc1)"
+#ifdef _DEBUG
+#define DEBUG_SUFFIX          "-debug"
+#else
+#define DEBUG_SUFFIX
+#endif
+#define AGENT_VERSION         "1.0.0-beta8(rc2)" DEBUG_SUFFIX
 
 #define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
 
@@ -51,6 +56,10 @@
 #define MAX_ALIAS_NAME        120
 #define MAX_COUNTER_NAME      (MAX_ALIAS_NAME-12)
 
+#define SYSINFO_RC_SUCCESS       0
+#define SYSINFO_RC_NOTSUPPORTED  1
+#define SYSINFO_RC_ERROR         2
+
 
 //
 // Parameter definition structure
@@ -59,8 +68,8 @@
 struct AGENT_COMMAND
 {
    char name[MAX_PARAM_NAME];               // Command's name
-   double (* handler_float)(char *,char *); // Handler if return value is floating point numeric
-   char *(* handler_string)(char *,char *); // Handler if return value is string
+   LONG (* handler_float)(char *,char *,double *); // Handler if return value is floating point numeric
+   LONG (* handler_string)(char *,char *,char **); // Handler if return value is string
    char *arg;                               // Optional command argument
 };
 
@@ -102,6 +111,7 @@ BOOL ParseCommandLine(int argc,char *argv[]);
 char *GetSystemErrorText(DWORD error);
 BOOL MatchString(char *pattern,char *string);
 void StrStrip(char *string);
+void GetParameterInstance(char *param,char *instance,int maxSize);
 
 void CalculateMD5Hash(const unsigned char *data,int nbytes,unsigned char *hash);
 DWORD CalculateCRC32(const unsigned char *data,DWORD nbytes);

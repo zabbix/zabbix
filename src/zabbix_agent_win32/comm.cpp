@@ -101,7 +101,7 @@ static void CommThread(void *param)
    hThread=(HANDLE)_beginthreadex(NULL,0,ProcessingThread,(void *)&rq,0,&tid);
    if (WaitForSingleObject(hThread,confTimeout)==WAIT_TIMEOUT)
    {
-      sprintf(rq.result,"%f",(float)TIMEOUT_ERROR);
+      strcpy(rq.result,"ZBX_ERROR\n");
       WriteLog("Timed out while processing request (%s)\r\n",rq.cmd);
    }
    send(sock,rq.result,strlen(rq.result),0);
