@@ -172,10 +172,8 @@ float	process(char *command)
 	float	(*function)();
 	char	*parameter = NULL;
 
-
 	for( p=command+strlen(command)-1; p>command && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
 	p[1]=0;
-
 	
 	i=0;
 	for(;;)

@@ -255,6 +255,7 @@ CREATE TABLE triggers (
 	lastcheck	int(4) DEFAULT '0' NOT NULL,
 	priority	int(2) DEFAULT '0' NOT NULL,
 	lastchange	int(4) DEFAULT '0' NOT NULL,
+	dep_level	int(2) DEFAULT '0' NOT NULL,
 	comments	blob,
 	PRIMARY KEY	(triggerid),
 	KEY		(istrue)

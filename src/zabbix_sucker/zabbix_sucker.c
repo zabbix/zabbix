@@ -1,3 +1,5 @@
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -5,7 +7,10 @@
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <netdb.h>
+
+#ifdef HAVE_NETDB_H
+	#include <netdb.h>
+#endif
 
 #include <signal.h>
 #include <errno.h>
@@ -14,15 +19,11 @@
 
 #include <syslog.h>
 
-#include "config.h"
-
 /* Required for SNMP support*/
 #ifdef HAVE_UCD_SNMP_UCD_SNMP_CONFIG_H
-
-#include <ucd-snmp/ucd-snmp-config.h>
-#include <ucd-snmp/ucd-snmp-includes.h>
-#include <ucd-snmp/system.h>
-
+	#include <ucd-snmp/ucd-snmp-config.h>
+	#include <ucd-snmp/ucd-snmp-includes.h>
+	#include <ucd-snmp/system.h>
 #endif
 
 #include "common.h"
@@ -421,19 +422,31 @@ int get_values(void)
 				sprintf(c,"update items set NextCheck=%d,PrevValue=LastValue,LastValue=%f,LastClock=%d where ItemId=%d",now+item.delay,value,now,item.itemid);
 				DBexecute(c);
 
+				/*	
 				if( update_functions( item.itemid ) == FAIL)
 				{
 					syslog( LOG_WARNING, "Updating simple functions failed" );
 				}
 
 				update_triggers( item.itemid );
+				*/
 			}
 		}
 		else
 		{
-			syslog( LOG_WARNING, "Wrong value from host [HOST:%s KEY:%s VALUE:%f]", item.host, item.key, value );
+			syslog( LOG_WARNING, "Wrong value received [HOST:%s KEY:%s VALUE:%f]", item.host, item.key, value );
 			syslog( LOG_WARNING, "The value is not stored in database.");
 		}
+	}
+
+	if(rows>0)
+	{
+		if( update_functions( sucker_num ) == FAIL)
+		{
+			syslog( LOG_WARNING, "Updating simple functions failed" );
+		}
+
+		update_triggers( sucker_num );
 	}
 
 	DBfree_result(result);
