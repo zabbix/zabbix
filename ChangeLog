@@ -1,7 +1,9 @@
 Changes for 1.0beta12:
 
+ - fixed processing of trapped values, fixed pinger. Thanks
+ to Sebastien "Slix" Linard. (Alexei) 
  - fixed UserParameter when it replaces existing one. Thanks to
- Sbastien "Slix" Linard. (Alexei) 
+ Sebastien "Slix" Linard. (Alexei) 
  - fixed PostgreSQL schema (Alexei)
 
 Changes for 1.0beta11:
