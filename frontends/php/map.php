@@ -153,6 +153,10 @@
 					ImageLine($im,$x1+$size,$y1+$size,$x2+$size,$y2+$size,$colors[$color_on]);
 					ImageLine($im,$x1+$size,$y1+$size+1,$x2+$size,$y2+$size+1,$colors[$color_on]);
 				}
+				else if($drawtype_on == GRAPH_DRAW_TYPE_DASHEDLINE)
+				{
+					DashedLine($im,$x1+$size,$y1+$size,$x2+$size,$y2+$size,$colors[$color_on]);
+				}
 				else
 				{
 					ImageLine($im,$x1+$size,$y1+$size,$x2+$size,$y2+$size,$colors[$color_on]);
@@ -163,6 +167,11 @@
 				if($drawtype_off == GRAPH_DRAW_TYPE_BOLDLINE)
 				{
 					ImageLine($im,$x1+$size,$y1+$size,$x2+$size,$y2+$size,$colors[$color_off]);
+					ImageLine($im,$x1+$size,$y1+$size+1,$x2+$size,$y2+$size+1,$colors[$color_off]);
+				}
+				else if($drawtype_off == GRAPH_DRAW_TYPE_DASHEDLINE)
+				{
+					DashedLine($im,$x1+$size,$y1+$size,$x2+$size,$y2+$size,$colors[$color_off]);
 				}
 				else
 				{
