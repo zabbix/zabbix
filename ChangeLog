@@ -1,7 +1,9 @@
 Changes for 1.0alpha8:
 
- - zabbix_agent can be tested by defining macro TEST
+ - removed calls to command strip from all Makefile.in
+ - passwords are not stored in plain text. MD5 is used.
 
+ - zabbix_agent can be tested by defining macro TEST
  - added index (triggerid,clock) for table alarms
  - status of triggers will not be shown for disabled and not-supported parameters
  - fixed availability report
