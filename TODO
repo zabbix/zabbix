@@ -23,7 +23,6 @@ latest trigger (item type  = TRAPPER)
  - links to Zabbix frontend in alert emails
  - zabbix to write log to the item (for example: log when item becomes unsupported)
  - strings items for graphs
- - date&time in alert emails
  - support of '-' in trigger expressions (...>-1)
  - UserParameter does not appear in the log
  - add support for agent forwarding (proxy)
@@ -203,7 +202,6 @@ HB:
 
  - test everything under Explorer and Netscape. Especially Graphs,Charts and Maps.
  - BUG. history graph goes left
- - Graphs for specified period and date and time
  - personalisation (refresh rate, graph size, default graph period, etc)
 
  - Tree like in old Zabbix
