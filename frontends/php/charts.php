@@ -123,7 +123,18 @@
 	if(isset($HTTP_GET_VARS["graphid"]))
 	{
 		echo "<script language=\"JavaScript\">";
-		echo "document.write(\"<IMG SRC='chart2.php?graphid=".$HTTP_GET_VARS["graphid"]."&period=".$HTTP_GET_VARS["period"]."&from=".$HTTP_GET_VARS["from"]."&width=\"+(document.width-108)+\"'>\")";
+		echo "if (navigator.appName == \"Microsoft Internet Explorer\")";
+		echo "{";
+		echo "	document.write(\"<IMG SRC='chart2.php?graphid=".$HTTP_GET_VARS["graphid"]."&period=".$HTTP_GET_VARS["period"]."&from=".$HTTP_GET_VARS["from"]."&width=\"+(document.body.clientWidth-108)+\"'>\");";
+		echo "}";
+		echo "else if (navigator.appName == \"Netscape\")";
+		echo "{";
+		echo "	document.write(\"<IMG SRC='chart2.php?graphid=".$HTTP_GET_VARS["graphid"]."&period=".$HTTP_GET_VARS["period"]."&from=".$HTTP_GET_VARS["from"]."&width=\"+(document.width-108)+\"'>\");";
+		echo "}";
+		echo "else";
+		echo "{";
+		echo "	document.write(\"<IMG SRC='chart2.php?graphid=".$HTTP_GET_VARS["graphid"]."&period=".$HTTP_GET_VARS["period"]."&from=".$HTTP_GET_VARS["from"]."'>\");";
+		echo "}";
 		echo "</script>";
 	}
 	else
