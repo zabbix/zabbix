@@ -111,6 +111,14 @@ COMMAND	commands[AGENT_MAX_USER_COMMANDS]=
 
 	{"filesize[*]"		,FILESIZE, 		0, "/etc/passwd"},
 
+	{"netloadin1[*]"	,NETLOADIN1, 		0, "lo"},
+	{"netloadin5[*]"	,NETLOADIN5, 		0, "lo"},
+	{"netloadin15[*]"	,NETLOADIN15, 		0, "lo"},
+
+	{"netloadout1[*]"	,NETLOADOUT1, 		0, "lo"},
+	{"netloadout5[*]"	,NETLOADOUT5, 		0, "lo"},
+	{"netloadout15[*]"	,NETLOADOUT15, 		0, "lo"},
+
 	{"swap[free]"		,SWAPFREE, 		0, 0},
 	{"swap[total]"		,SWAPTOTAL, 		0, 0},
 
@@ -587,6 +595,89 @@ float	PROCCNT(const char * procname)
 	return	FAIL;
 #endif
 }
+
+float	get_stat(const char *key)
+{
+	FILE	*f;
+	char	line[MAX_STRING_LEN+1];
+	char	name1[MAX_STRING_LEN+1];
+	char	name2[MAX_STRING_LEN+1];
+
+	f=fopen("/tmp/zabbix_agentd.tmp","r");
+	if(f==NULL)
+	{
+		return FAIL;
+	}
+	while(fgets(line,MAX_STRING_LEN,f))
+	{
+		if(sscanf(line,"%s %s\n",name1,name2)==2)
+		{
+			if(strcmp(name1,key) == 0)
+			{
+				fclose(f);
+				return atof(name2);
+			}
+		}
+
+	}
+	fclose(f);
+	return FAIL;
+}
+
+float	NETLOADIN1(char *interface)
+{
+	char	key[MAX_STRING_LEN+1];
+
+	sprintf(key,"netloadin1[%s]",interface);
+
+	return	get_stat(key);
+}
+
+float	NETLOADIN5(char *interface)
+{
+	char	key[MAX_STRING_LEN+1];
+
+	sprintf(key,"netloadin5[%s]",interface);
+
+	return	get_stat(key);
+}
+
+float	NETLOADIN15(char *interface)
+{
+	char	key[MAX_STRING_LEN+1];
+
+	sprintf(key,"netloadin15[%s]",interface);
+
+	return	get_stat(key);
+}
+
+float	NETLOADOUT1(char *interface)
+{
+	char	key[MAX_STRING_LEN+1];
+
+	sprintf(key,"netloadout1[%s]",interface);
+
+	return	get_stat(key);
+}
+
+float	NETLOADOUT5(char *interface)
+{
+	char	key[MAX_STRING_LEN+1];
+
+	sprintf(key,"netloadout5[%s]",interface);
+
+	return	get_stat(key);
+}
+
+float	NETLOADOUT15(char *interface)
+{
+	char	key[MAX_STRING_LEN+1];
+
+	sprintf(key,"netloadout15[%s]",interface);
+
+	return	get_stat(key);
+}
+
 
 float	INODE(const char * mountPoint)
 {
