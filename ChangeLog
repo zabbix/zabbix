@@ -44,7 +44,7 @@ Not ready yet:
  - update trigger status to unknown if cannot evaluate function 
  - do not dump "Expression cannot be evaluated" in case if function.lastvalue
    is NULL
- - get rid of register_globals in php.ini
+ - get rid of register_globals in php.ini (use $HTTP_GET_VARS, ...)
 
  TO TEST:
 
