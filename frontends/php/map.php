@@ -36,7 +36,8 @@
 	$background=DBget_field($result,0,3);
 
 //	Header( "Content-type:  text/html"); 
-	Header( "Content-type:  image/png"); 
+	if(MAP_OUTPUT_FORMAT == "JPG")	Header( "Content-type:  image/jpeg"); 
+	else				Header( "Content-type:  image/png"); 
 	Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 
 	check_authorisation();
@@ -334,7 +335,9 @@
 	}
 
 	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, S_ZABBIX_URL, $gray);
+	
+	if(MAP_OUTPUT_FORMAT == "JPG")	ImageJPEG($im);
+	else				ImageOut($im); #default
 
-	ImageOut($im);
 	ImageDestroy($im);
 ?>

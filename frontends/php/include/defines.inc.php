@@ -19,6 +19,11 @@
 **/
 ?>
 <?php
+//	MISC PARAMETERS
+	define("MAP_OUTPUT_FORMAT",		"DEFAULT");
+#	define("MAP_OUTPUT_FORMAT",		"JPG");
+//	END OF MISC PARAMETERS
+
 	define("AUDIT_ACTION_ADD",		0);
 	define("AUDIT_ACTION_UPDATE",		1);
 	define("AUDIT_ACTION_DELETE",		2);
