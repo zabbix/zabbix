@@ -112,8 +112,26 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 			$ERROR_MSG="No user with itemid=[$userid]";
 		}
-		return	$user;
+		return	$result;
 	}
+
+	function	get_map_by_sysmapid($sysmapid)
+	{
+		global	$ERROR_MSG;
+
+		$sql="select * from sysmaps where sysmapid=$sysmapid"; 
+		$result=DBselect($sql);
+		if(DBnum_rows($result) == 1)
+		{
+			return	DBfetch($result);	
+		}
+		else
+		{
+			$ERROR_MSG="No system map with sysmapid=[$sysmapid]";
+		}
+		return	$result;
+	}
+
 
 	function	get_item_by_itemid($itemid)
 	{
@@ -435,6 +453,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		global $page;
 		global $PHP_AUTH_USER,$PHP_AUTH_PW;
 		global $USER_DETAILS;
+
+		if(!isset($PHP_AUTH_USER))
+		{
+			$PHP_AUTH_USER="guest";
+		}
 
 		$passwd=md5($PHP_AUTH_PW);
 
@@ -1062,6 +1085,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		global	$ERROR_MSG;
 
+		if(!check_right("Trigger comment","U",$row["hostid"]))
+		{
+			$ERROR_MSG="Insufficient permissions";
+			return	0;
+		}
+
 		$comments=addslashes($comments);
 		$sql="update triggers set comments='$comments' where triggerid=$triggerid";
 		return	DBexecute($sql);
@@ -1095,6 +1124,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type)
 	{
+		global	$ERROR_MSG;
+
+		if(!check_right("Item","U",$itemid))
+		{
+			$ERROR_MSG="Insufficient permissions";
+			return 0;
+		}
+
 		$sql="update items set description='$description',key_='$key',hostid=$hostid,delay=$delay,history=$history,lastdelete=0,nextcheck=0,status=$status,type=$type,snmp_community='$snmp_community',snmp_oid='$snmp_oid',value_type=$value_type where itemid=$itemid";
 		return	DBexecute($sql);
 	}
@@ -1360,6 +1397,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type)
 	{
+		global	$ERROR_MSG;
+
+		if(!check_right("Item","A",0))
+		{
+			$ERROR_MSG="Insufficient permissions";
+			return 0;
+		}
+
 		$sql="insert into items (description,key_,hostid,delay,history,lastdelete,nextcheck,status,type,snmp_community,snmp_oid,value_type) values ('$description','$key',$hostid,$delay,$history,0,0,$status,$type,'$snmp_community','$snmp_oid',$value_type)";
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"items","itemid");
@@ -1445,6 +1490,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	add_trigger($expression,$description,$priority,$istrue,$comments,$url)
 	{
+		global	$ERROR_MSG;
+
+		if(!check_right("Trigger","A",0))
+		{
+			$ERROR_MSG="Insufficient permissions";
+			return	0;
+		}
+
 		$description=addslashes($description);
 		$sql="insert into triggers  (description,priority,istrue,comments,url) values ('$description',$priority,$istrue,'$comments','$url')";
 #		echo $sql,"<br>";
@@ -1518,6 +1571,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	update_user($userid,$groupid,$name,$surname,$alias,$passwd)
 	{
+		global	$ERROR_MSG;
+
+		if(!check_right("User","U",$userid))
+		{
+			$ERROR_MSG="Insufficient permissions";
+			return 0;
+		}
+
 		if($passwd=="")
 		{
 			$sql="update users set groupid=$groupid,name='$name',surname='$surname',alias='$alias' where userid=$userid";
@@ -1542,6 +1603,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	add_user($groupid,$name,$surname,$alias,$passwd)
 	{
+		global	$ERROR_MSG;
+
+		if(!check_right("User","A",0))
+		{
+			$ERROR_MSG="Insufficient permissions";
+			return 0;
+		}
+
 		$passwd=md5($passwd);
 		$sql="insert into users (groupid,name,surname,alias,passwd) values ($groupid,'$name','$surname','$alias','$passwd')";
 		return DBexecute($sql);
@@ -1598,6 +1667,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	update_sysmap($sysmapid,$name,$width,$height)
 	{
+		global	$ERROR_MSG;
+
+		if(!check_right("Network map","U",$sysmapid))
+		{
+			$ERROR_MSG="Insufficient permissions";
+			return 0;
+		}
+
 		$sql="update sysmaps set name='$name',width=$width,height=$height where sysmapid=$sysmapid";
 		return	DBexecute($sql);
 	}
@@ -1620,6 +1697,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	add_sysmap($name,$width,$height)
 	{
+		global	$ERROR_MSG;
+
+		if(!check_right("Network map","A",0))
+		{
+			$ERROR_MSG="Insufficient permissions";
+			return 0;
+		}
+
 		$sql="insert into sysmaps (name,width,height) values ('$name',$width,$height)";
 		return	DBexecute($sql);
 	}
@@ -1697,6 +1782,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		global	$ERROR_MSG;
 
+		if(!check_right("Host","A",0))
+		{
+			$ERROR_MSG="Insufficient permissions";
+			return 0;
+		}
+
 		if(($template=="true") && ($host_templateid!=0))
 		{
 			$ERROR_MSG="Choose either 'Add zabbix_agent parameters' or 'Use host as template' option";
@@ -1733,6 +1824,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	update_host($hostid,$host,$port,$status,$useip,$ip)
 	{
+		global	$ERROR_MSG;
+
+		if(!check_right("Host","U",$hostid))
+		{
+			$ERROR_MSG="Insufficient permissions";
+			return 0;
+		}
+
 		if($useip=="on")
 		{
 			$useip=1;
@@ -1851,6 +1950,16 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	delete_user($userid)
 	{
+		global	$ERROR_MSG;
+
+		$sql="select * from users where userid=$userid and alias='guest'";
+		$result=DBselect($sql);
+		if(DBnum_rows($result) == 1)
+		{
+			$ERROR_MSG="Cannot delete user 'guest'";
+			return	0;
+		}
+
 		delete_media_by_userid($userid);
 		delete_actions_by_userid($userid);
 
@@ -2377,6 +2486,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<option value=\"Default permission\">Default permission";
 		echo "<option value=\"Host\">Host";
 		echo "<option value=\"Item\">Item";
+		echo "<option value=\"Network map\">Network map";
 		echo "<option value=\"Trigger comment\">Trigger's comment";
 		echo "<option value=\"User\">User";
 		echo "</select>";
@@ -2808,6 +2918,18 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			else
 			{
 				$res="All users";
+			}
+		}
+		else if($permission=="System map")
+		{
+			if(isset($id)&&($id!=0))
+			{
+				$user=get_map_by_sysmapid($id);
+				$res=$user["name"];
+			}
+			else
+			{
+				$res="All system maps";
 			}
 		}
 		return $res;
