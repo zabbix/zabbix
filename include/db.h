@@ -28,11 +28,19 @@
 
 #ifdef HAVE_MYSQL
 	#include "mysql.h"
+	#include "errmsg.h"
+	#include "mysqld_error.h"
 #endif
 
 #ifdef HAVE_PGSQL
 	#include "libpq-fe.h"
 #endif
+
+extern	char	*CONFIG_DBHOST;
+extern	char	*CONFIG_DBNAME;
+extern	char	*CONFIG_DBUSER;
+extern	char	*CONFIG_DBPASSWORD;
+extern	char	*CONFIG_DBSOCKET;
 
 #define DB_HOST		struct host_type
 #define DB_ITEM		struct item_type
@@ -167,7 +175,7 @@ DB_ALERT
 	int	retries;
 };
 
-void    DBconnect(char *dbhost, char *dbname, char *dbuser, char *dbpassword, char *dbsocket);
+void    DBconnect(void);
 void    DBclose(void);
 void    DBvacuum(void);
 

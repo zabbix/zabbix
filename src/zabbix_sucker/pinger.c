@@ -227,7 +227,7 @@ int main_pinger_loop(void)
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("connecting to the database");
 #endif
-		DBconnect(CONFIG_DBHOST, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBSOCKET);
+		DBconnect();
 
 		ret = create_host_file();
 
