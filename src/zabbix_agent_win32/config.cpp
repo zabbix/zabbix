@@ -31,6 +31,35 @@ static int numSubAgents;
 
 
 //
+// Parse UserParameter=... parameter
+// Argument is a parameter name and command line separated by comma
+//
+
+static BOOL AddUserParameter(char *args,int sourceLine)
+{
+   char *cmdLine;
+   char *buffer;
+
+   cmdLine=strchr(args,',');
+   if (cmdLine==NULL)
+   {
+      if (IsStandalone())  
+         printf("Error in configuration file, line %d: missing command line in UserParameter\n",sourceLine);
+      return FALSE;
+   }
+
+   *cmdLine=0;
+   cmdLine++;
+
+   buffer=(char *)malloc(strlen(cmdLine)+32);
+   sprintf(buffer,"__exec{%s}",cmdLine);
+   AddAlias(args,buffer);
+   free(buffer);
+   return TRUE;
+}
+
+
+//
 // Parse SubAgent=... parameter
 // Argument is a module name and command line separated by comma
 //
@@ -311,6 +340,11 @@ BOOL ReadConfig(void)
       else if (!stricmp(buffer,"SubAgent"))
       {
          if (!AddSubAgent(ptr))
+            errors++;
+      }
+      else if (!stricmp(buffer,"UserParameter"))
+      {
+         if (!AddUserParameter(ptr,sourceLine))
             errors++;
       }
       else if ((!stricmp(buffer,"PidFile"))||(!stricmp(buffer,"NoTimeWait"))||

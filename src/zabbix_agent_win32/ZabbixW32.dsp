@@ -103,6 +103,10 @@ SOURCE=.\config.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\execute.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\log.cpp
 # End Source File
 # Begin Source File
