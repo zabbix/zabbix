@@ -141,7 +141,7 @@ int main_alerter_loop()
 #endif
 		DBconnect();
 
-		sprintf(sql,"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path from alerts a,media_type mt where a.status=0 and a.retries<3 and a.mediatypeid=mt.mediatypeid order by a.clock");
+		snprintf(sql,sizeof(sql)-1,"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path from alerts a,media_type mt where a.status=0 and a.retries<3 and a.mediatypeid=mt.mediatypeid order by a.clock");
 		result = DBselect(sql);
 
 		for(i=0;i<DBnum_rows(result);i++)
@@ -175,13 +175,13 @@ int main_alerter_loop()
 			if(res==SUCCEED)
 			{
 				zabbix_log( LOG_LEVEL_DEBUG, "Alert ID [%d] was sent successfully", alert.alertid);
-				sprintf(sql,"update alerts set status=1 where alertid=%d", alert.alertid);
+				snprintf(sql,sizeof(sql)-1,"update alerts set status=1 where alertid=%d", alert.alertid);
 				DBexecute(sql);
 			}
 			else
 			{
 				zabbix_log( LOG_LEVEL_ERR, "Error sending alert ID [%d]", alert.alertid);
-				sprintf(sql,"update alerts set retries=retries+1 where alertid=%d", alert.alertid);
+				snprintf(sql,sizeof(sql)-1,"update alerts set retries=retries+1 where alertid=%d", alert.alertid);
 				DBexecute(sql);
 			}
 

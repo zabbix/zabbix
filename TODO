@@ -16,6 +16,7 @@ latest trigger (item type  = TRAPPER)
  - SNMP traps. Condition to switch expression off. New function which would return
  status of the trigger could help. 
 
+ - when zabbix cannot evaluate expression it does not change status to UNKNOWN but adds ALARM (UNKNOWN) 
  - cannot use "." as key in trigger expressions
  - preset time for graphs
  - support for m,h and d in graphs and in latest values if monitored value in seconds
