@@ -49,7 +49,7 @@
 	$gray=ImageColorAllocate($im,150,150,150); 
 	$white=ImageColorAllocate($im,255,255,255); 
 
-	ImageFilledRectangle($im,0,0,$sizeX,$sizeY,$darkgreen);
+	ImageFilledRectangle($im,0,0,$sizeX,$sizeY,ImageColorAllocate($im,120,200,120));
 	ImageRectangle($im,0,0,$sizeX-1,$sizeY-1,$black);
 
 	$now=time(NULL);
@@ -71,7 +71,7 @@
 	$p=min($problem,20);
 	$g=max($service["goodsla"]-80,0);
 
-	ImageFilledRectangle($im,$sizeX-$sizeX*$p/20,1,$sizeX-2,$sizeY-1,$darkred);
+	ImageFilledRectangle($im,$sizeX-$sizeX*$p/20,1,$sizeX-2,$sizeY-2,ImageColorAllocate($im,200,120,120));
 	ImageLine($im,$sizeX*$g/20,1,$sizeX*$g/20,$sizeY-1,$yellow);
 
 	$s=sprintf("%2.2f%%",$ok);
