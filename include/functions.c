@@ -716,7 +716,7 @@ void	update_triggers(int itemid)
 	DB_RESULT	*result;
 
 	int	i;
-	int	prevvalue;
+/*	int	prevvalue;*/
 
 /* Does not work for PostgreSQL */
 /*		sprintf(sql,"select t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.dep_level",TRIGGER_STATUS_ENABLED,sucker_num);*/
@@ -731,6 +731,7 @@ void	update_triggers(int itemid)
 		trigger.expression=DBget_field(result,i,1);
 		trigger.status=atoi(DBget_field(result,i,2));
 		trigger.priority=atoi(DBget_field(result,i,4));
+
 		trigger.value=atoi(DBget_field(result,i,5));
 		strncpy(exp, trigger.expression, MAX_STRING_LEN);
 		if( evaluate_expression(&b, exp) != 0 )
@@ -739,7 +740,8 @@ void	update_triggers(int itemid)
 			continue;
 		}
 
-		prevvalue=DBget_prev_trigger_value(trigger.triggerid);
+/* Oprimise a little bit */
+/*		prevvalue=DBget_prev_trigger_value(trigger.triggerid);*/
 
 		if(b==1)
 		{
@@ -752,7 +754,9 @@ void	update_triggers(int itemid)
 			||
 			(
 			 (trigger.value == TRIGGER_VALUE_UNKNOWN) &&
-			 (prevvalue == TRIGGER_VALUE_FALSE)
+/* Oprimise a little bit */
+/*			 (prevvalue == TRIGGER_VALUE_FALSE)*/
+			 (DBget_prev_trigger_value(trigger.triggerid) == TRIGGER_VALUE_FALSE)
 			))
 			{
 				now = time(NULL);
@@ -777,7 +781,9 @@ void	update_triggers(int itemid)
 			||
 			(
 			 (trigger.value == TRIGGER_VALUE_UNKNOWN) &&
-			 (prevvalue == TRIGGER_VALUE_TRUE)
+/* Oprimise a little bit */
+/*			 (prevvalue == TRIGGER_VALUE_TRUE)*/
+			 (DBget_prev_trigger_value(trigger.triggerid) == TRIGGER_VALUE_TRUE)
 			))
 			{
 				apply_actions(trigger.triggerid,0);
