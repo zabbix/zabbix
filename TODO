@@ -34,6 +34,7 @@ TKOM:
 
 OTHER:
 
+ - availability report for day/week/month/etc
  - add housekeeping for trends
  - check if items delay works
  - change location of Zabbix Manual in about.php
