@@ -1,5 +1,6 @@
 Changes for 1.0beta7:
 
+ - fixed Select in Status of Triggers (Alexei)
  - precision of Change is set to 2 in Latest Values (Alexei)
  - --enable-static to work on all platforms (Alexei)
  - zabbix_sender to be able to get information from stdin (Alexei)
