@@ -942,6 +942,32 @@ int	DBget_history_count(void)
 	return res;
 }
 
+int	DBget_trends_count(void)
+{
+	int	res;
+	char	sql[MAX_STRING_LEN+1];
+	DB_RESULT	*result;
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_trends_count()");
+
+	sprintf(sql,"select count(*) from trends");
+
+	result=DBselect(sql);
+
+	if(DBnum_rows(result) == 0)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
+		DBfree_result(result);
+		return 0;
+	}
+
+	res  = atoi(DBget_field(result,0,0));
+
+	DBfree_result(result);
+
+	return res;
+}
+
 int	DBget_queue_count(void)
 {
 	int	res;
