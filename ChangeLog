@@ -11,6 +11,12 @@ on.  So when zabbix would check to see if I had been connected for longer than
 
 Hope this helps.
 
+
+Not ready yet:
+
+ - some emails are missing
+ - solution for problems with template-based hosts must be proposed
+
 Changes for 1.0beta5:
 
  - fixed send_email(). According to RFC, DATA should be sent with followed 
