@@ -168,8 +168,6 @@ int	get_value_SNMPv1(double *result,DB_ITEM *item)
 	}
 	else
 	{
-/* FAILURE: print what went wrong! */
-
 		if (status == STAT_SUCCESS)
 		{
 			syslog( LOG_WARNING, "Error in packet\nReason: %s\n",

@@ -83,6 +83,7 @@
 
 	if(isset($graphid))
 	{
+		echo("<center>");
 		echo("<hr>");
 		$tmp=$from+12*14;
 		echo("[<A HREF=\"charts.html?graphid=$graphid&from=$tmp&period=$period\">");
@@ -142,6 +143,7 @@
 		{
 			echo("[Week forward]");
 		}
+		echo("</center>");
 	}
 	
 ?>
