@@ -1,12 +1,13 @@
 Not ready yet:
 
+[ Update task status on SF ]
+
+[ Support for flexible permissions ]
 [ Better validation of trigger expressions ]
-[ Support for nodata() ] 
+[ Support for nodata(). Do we need it ? ] 
 [ Show diff instead of real values ]
 [ Show triggers by userid ]
-[ syslog() to file ]
 [ Add support for new trigger statuses: MODIFIED/NOTSUPORTED ]
-[ Something wrong with zabbix_agentd. Timeout while command execution ] 
 [ All parameters should contain section "How can be used" in the Manual ]
 [ PHP to support non-numeric values ]
 [ Support for system[proccount] on FreeBSD ]
@@ -15,12 +16,13 @@ Not ready yet:
 
 Changes for 1.0beta3:
 
+ - correct handling of timeout situations for zabbix_agentd (Alexei)
+ - added support for non-syslog logging (Alexei)
+ 
  - added parameter LogFile for zabbix_trapper (Alexei)
  - added parameter LogFile for zabbix_trapperd (Alexei)
  - added parameter LogFile for zabbix_agentd (Alexei)
  - added parameter LogFile for zabbix_suckerd (Alexei)
-
- - added partial support for non-syslog logging (Alexei)
  - added files include/log.h and include/log.c (Alexei)
  - solved problem with getpeername() (Alexei)
  - support for parameter Timeout for zabbix_trapper (Alexei)
