@@ -495,7 +495,6 @@ int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
 {
 	int	s;
 	int	len;
-	socklen_t	i;
 	static	char	c[MAX_STRING_LEN+1];
 	char	*e;
 
@@ -577,7 +576,6 @@ int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
 		close(s);
 		return	FAIL;
 	} 
-	i=sizeof(struct sockaddr_in);
 
 	memset(c,0,MAX_STRING_LEN+1);
 	len=read(s,c,MAX_STRING_LEN);
