@@ -9,7 +9,6 @@ dnl AM_CONFIG_HEADER(include/config.h)
 
 dnl Checks for programs.
 AC_PROG_CC
-AC_PROG_INSTALL
 
 dnl Checks for libraries.
 AC_CHECK_LIB(crypto, main)
