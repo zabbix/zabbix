@@ -54,6 +54,19 @@
 	$black=ImageColorAllocate($im,0,0,0); 
 	$gray=ImageColorAllocate($im,150,150,150);
 
+	$colors["Red"]=ImageColorAllocate($im,255,0,0); 
+	$colors["Dark Red"]=ImageColorAllocate($im,150,0,0); 
+	$colors["Green"]=ImageColorAllocate($im,0,255,0); 
+	$colors["Dark Green"]=ImageColorAllocate($im,0,150,0); 
+	$colors["Blue"]=ImageColorAllocate($im,0,0,255); 
+	$colors["Dark Blue"]=ImageColorAllocate($im,0,0,150); 
+	$colors["Yellow"]=ImageColorAllocate($im,255,255,0); 
+	$colors["Dark Yellow"]=ImageColorAllocate($im,150,150,0); 
+	$colors["Cyan"]=ImageColorAllocate($im,0,255,255); 
+	$colors["Black"]=ImageColorAllocate($im,0,0,0); 
+	$colors["Gray"]=ImageColorAllocate($im,150,150,150); 
+	$colors["White"]=ImageColorAllocate($im,255,255,255);
+
 	$x=imagesx($im); 
 	$y=imagesy($im);
   
@@ -62,11 +75,11 @@
 
 	if(!isset($HTTP_GET_VARS["border"]))
 	{
-		ImageRectangle($im,0,0,$width-1,$height-1,$black);
+		ImageRectangle($im,0,0,$width-1,$height-1,$colors["Black"]);
 	}
 
 	$x=imagesx($im)/2-ImageFontWidth(4)*strlen($name)/2;
-	ImageString($im, 4,$x,1, $name , $darkred);
+	ImageString($im, 4,$x,1, $name , $colors["Dark Red"]);
 
 	$str=date("m.d.Y H:i:s",time(NULL));
 	ImageString($im, 0,imagesx($im)-120,imagesy($im)-12,"$str", $gray);
@@ -96,12 +109,16 @@
 
 # Draw connectors 
 
-	$result=DBselect("select shostid1,shostid2,triggerid from sysmaps_links where sysmapid=".$HTTP_GET_VARS["sysmapid"]);
+	$result=DBselect("select shostid1,shostid2,triggerid,color_off,drawtype_off,color_on,drawtype_on from sysmaps_links where sysmapid=".$HTTP_GET_VARS["sysmapid"]);
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		$shostid1=DBget_field($result,$i,0);
 		$shostid2=DBget_field($result,$i,1);
 		$triggerid=DBget_field($result,$i,2);
+		$color_off=DBget_field($result,$i,3);
+		$drawtype_off=DBget_field($result,$i,4);
+		$color_on=DBget_field($result,$i,5);
+		$drawtype_on=DBget_field($result,$i,6);
 
 		$result1=DBselect("select x,y from sysmaps_hosts where shostid=$shostid1");
 		$x1=DBget_field($result1,0,0);
@@ -116,16 +133,31 @@
 			$trigger=get_trigger_by_triggerid($triggerid);
 			if($trigger["value"] == TRIGGER_VALUE_TRUE)
 			{
-				ImageLine($im,$x1+16,$y1+16,$x2+16,$y2+16,$red);
+				if($drawtype_on == GRAPH_DRAW_TYPE_BOLDLINE)
+				{
+					ImageLine($im,$x1+16,$y1+16,$x2+16,$y2+16,$colors[$color_on]);
+					ImageLine($im,$x1+16,$y1+16+1,$x2+16,$y2+16+1,$colors[$color_on]);
+				}
+				else
+				{
+					ImageLine($im,$x1+16,$y1+16,$x2+16,$y2+16,$colors[$color_on]);
+				}
 			}
 			else
 			{
-				ImageLine($im,$x1+16,$y1+16,$x2+16,$y2+16,$black);
+				if($drawtype_off == GRAPH_DRAW_TYPE_BOLDLINE)
+				{
+					ImageLine($im,$x1+16,$y1+16,$x2+16,$y2+16,$colors[$color_off]);
+				}
+				else
+				{
+					ImageLine($im,$x1+16,$y1+16+1,$x2+16,$y2+16+1,$colors[$color_off]);
+				}
 			}
 		}
 		else
 		{
-			ImageLine($im,$x1+16,$y1+16,$x2+16,$y2+16,$black);
+			ImageLine($im,$x1+16,$y1+16,$x2+16,$y2+16,$colors["Black"]);
 		}
 	}
 

@@ -2600,15 +2600,15 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
 
-	function	add_link($sysmapid,$shostid1,$shostid2,$triggerid)
+	function	add_link($sysmapid,$shostid1,$shostid2,$triggerid,$drawtype_off,$color_off,$drawtype_on,$color_on)
 	{
 		if($triggerid == 0)
 		{
-			$sql="insert into sysmaps_links (sysmapid,shostid1,shostid2,triggerid) values ($sysmapid,$shostid1,$shostid2,NULL)";
+			$sql="insert into sysmaps_links (sysmapid,shostid1,shostid2,triggerid,drawtype_off,color_off,drawtype_on,color_on) values ($sysmapid,$shostid1,$shostid2,NULL,$drawtype_off,'$color_off',$drawtype_on,'$color_on')";
 		}
 		else
 		{
-			$sql="insert into sysmaps_links (sysmapid,shostid1,shostid2,triggerid) values ($sysmapid,$shostid1,$shostid2,$triggerid)";
+			$sql="insert into sysmaps_links (sysmapid,shostid1,shostid2,triggerid,drawtype_off,color_off,drawtype_on,color_on) values ($sysmapid,$shostid1,$shostid2,$triggerid,$drawtype_off,'$color_off',$drawtype_on,'$color_on')";
 		}
 		return	DBexecute($sql);
 	}
