@@ -1,5 +1,6 @@
 Changes for 1.0alpha12:
 
+ - changes in timeout handling (Alexei)
  - added support for cksum[*], "*" can be any filename (Alexei)
  - cksum[] does not call external program "cksum" anymore (Alexei)
 

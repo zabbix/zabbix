@@ -206,12 +206,28 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 	char	*e;
 	void	*sigfunc;
 
+	struct	sigaction phan;
+
 	struct hostent *hp;
 
 	struct sockaddr_in myaddr_in;
 	struct sockaddr_in servaddr_in;
 
 	syslog( LOG_DEBUG, "%10s%25s", item->host, item->key );
+
+
+
+	phan.sa_handler = &signal_handler; /* set up sig handler using sigaction() */
+	sigemptyset(&phan.sa_mask);  /* just block alarm signal */
+	phan.sa_flags = 0;
+//	phan.sa_flags = SA_RESTART;
+	sigaction(SIGALRM, &phan, NULL);
+	alarm(1);
+
+
+
+
+
 
 	servaddr_in.sin_family=AF_INET;
 	if(item->useip==1)
@@ -244,18 +260,12 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 	myaddr_in.sin_port=0;
 	myaddr_in.sin_addr.s_addr=INADDR_ANY;
 
-	sigfunc = signal( SIGALRM, signal_handler );
-
-	alarm(SUCKER_TIMEOUT);
-
 	if( connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
 		syslog( LOG_WARNING, "Problem with connect" );
 		close(s);
 		return	FAIL;
 	}
-	alarm(0);
-	signal( SIGALRM, sigfunc );
 
 	sprintf(c,"%s\n",item->key);
 	if( sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
@@ -266,9 +276,6 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 	} 
 	i=sizeof(struct sockaddr_in);
 
-	sigfunc = signal( SIGALRM, signal_handler );
-	alarm(SUCKER_TIMEOUT);
-
 	i=recvfrom(s,c,1023,0,(struct sockaddr *)&servaddr_in,&i);
 	if(i==-1)
 	{
@@ -276,8 +283,6 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 		close(s);
 		return	FAIL;
 	}
-	alarm(0);
-	signal( SIGALRM, sigfunc );
  
 	if( close(s)!=0 )
 	{
@@ -303,6 +308,10 @@ int	get_value_zabbix(double *result,DB_ITEM *item)
 			return	FAIL;
 		}
 	}
+
+	phan.sa_handler = SIG_IGN; /* just ignore signal now */
+        sigaction(SIGALRM, &phan, NULL);
+
 	return SUCCEED;
 }
 
