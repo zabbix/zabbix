@@ -1798,14 +1798,16 @@
 
 	function	calculate_availability($triggerid)
 	{
-	        $result=DBselect("select min(clock),max(clock) from alarms where triggerid=$triggerid");
-		$max=DBget_field($result,0,0);
-		$min=DBget_field($result,0,1);
-
-		if($max=="")
+	        $result=DBselect("select count(*),min(clock),max(clock) from alarms where triggerid=$triggerid");
+		if(DBget_field($result,0,0)>0)
+		{
+			$min=DBget_field($result,0,1);
+			$max=DBget_field($result,0,2);
+		}
+		else
 		{
 			$max=time();
-			$min=time()-24*3600;
+			$min=$max-24*3600;
 		}
 
 		$sql="select clock,istrue from alarms where triggerid=$triggerid and clock>=$min and clock<=$max";
