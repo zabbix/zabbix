@@ -901,6 +901,7 @@ int main_alerter_loop()
 					zabbix_log( LOG_LEVEL_ERR, "Unsupported type of alert [%s] Alert ID [%d]", alert.type, alert.alertid );
 			}
 		}
+		DBfree_result(result);
 
 		DBclose();
 #ifdef HAVE_FUNCTION_SETPROCTITLE
