@@ -107,7 +107,6 @@ DB_ITEM
 	double	prevvalue;
 	char	*prevvalue_str;
 	int     prevvalue_null;
-	time_t  lastdelete;
 	time_t  lastcheck;
 	time_t	nextcheck;
 	int	value_type;
