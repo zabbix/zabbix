@@ -194,42 +194,6 @@ int	evaluate_DIFF(float *diff,int itemid,int parameter)
 	return SUCCEED;
 }
 
-int	evaluate_NODATA(float *nodata,int itemid,int parameter)
-{
-	DB_RESULT	*result;
-
-	char		c[1024];
-	char		*field;
-
-	int		now;
-
-	now=time(NULL);
-
-	sprintf(c,"select value from history where itemid=%d and clock>%d-%d limit 1",itemid,now,parameter);
-
-	result = DBselect(c);
-	if(result==NULL)
-	{
-		DBfree_result(result);
-		return	FAIL;
-	}
-	if(DBnum_rows(result)==0)
-	{
-		DBfree_result(result);
-		return	FAIL;
-	}
-	field = DBget_field(result,0,0);
-	*nodata=0;
-	if( field == NULL )
-	{
-		*nodata=1;
-	}
-
-	DBfree_result(result);
-
-	return SUCCEED;
-}
-
 int	evaluate_FUNCTION(float *value,int itemid,char *function,int parameter)
 {
 	int	ret  = SUCCEED;
@@ -241,10 +205,6 @@ int	evaluate_FUNCTION(float *value,int itemid,char *function,int parameter)
 	else if(strcmp(function,"prev")==0)
 	{
 		ret = evaluate_PREV(value,itemid,parameter);
-	}
-	else if(strcmp(function,"nodata")==0)
-	{
-		ret = evaluate_NODATA(value,itemid,parameter);
 	}
 	else if(strcmp(function,"min")==0)
 	{
