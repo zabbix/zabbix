@@ -871,6 +871,10 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 		}
 		else if(ACTION_SCOPE_HOST==action.scope)
 		{
+			if(trigger->priority<action.severity)
+			{
+				continue;
+			}
 			sprintf(sql,"select * from actions a,triggers t,hosts h,functions f,items i where a.triggerid=t.triggerid and f.triggerid=t.triggerid and i.itemid=f.itemid and h.hostid=i.hostid and t.triggerid=%d and a.scope=%d",trigger->triggerid,ACTION_SCOPE_HOST);
 /*			zabbix_log( LOG_LEVEL_WARNING, "[%s]",sql);*/
 			result2 = DBselect(sql);
