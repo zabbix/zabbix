@@ -1,7 +1,5 @@
 #include "config.h"
 
-#include <string.h>
-
 #include <netdb.h>
 
 #include <syslog.h>
@@ -18,6 +16,7 @@
 #include <arpa/inet.h>
 
 /* No warning for bzero */
+#include <string.h>
 #include <strings.h>
 
 /* For config file operations */

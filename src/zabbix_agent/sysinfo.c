@@ -1,10 +1,12 @@
 #include "config.h"
 
 /* For bcopy */
+#ifdef HAVE_STRING_H
+	#include <string.h>
+#endif
 #ifdef HAVE_STRINGS_H
 	#include <strings.h>
 #endif
-
 #ifdef HAVE_STDIO_H
 	#include <stdio.h>
 #endif
@@ -64,7 +66,10 @@
 	#include <netdb.h>
 #endif
 
-#include <string.h>
+/* Solaris */
+#ifdef HAVE_SYS_SWAP_H
+	#include <sys/swap.h>
+#endif
 
 #include "common.h"
 #include "sysinfo.h"
@@ -179,10 +184,72 @@ void	test_parameters(void)
 		{
 			printf("SUPPORTED Key: %s [%f]\n",key,result);
 		}
+		fflush(stdout);
 
 		i++;
 	}
 }
+
+/* Solaris. The code is stolen from www.deja.com */
+#ifndef HAVE_SYSINFO_FREESWAP
+#ifdef HAVE_SYS_SWAP_H
+void get_swapinfo(int *total, int *fr)
+{
+    register int cnt, i;
+    register int t, f;
+    struct swaptable *swt;
+    struct swapent *ste;
+    static char path[256];
+
+    /* get total number of swap entries */
+    cnt = swapctl(SC_GETNSWP, 0);
+
+    /* allocate enough space to hold count + n swapents */
+    swt = (struct swaptable *)malloc(sizeof(int) +
+             cnt * sizeof(struct swapent));
+    if (swt == NULL)
+    {
+  *total = 0;
+  *fr = 0;
+  return;
+    }
+    swt->swt_n = cnt;
+
+    /* fill in ste_path pointers: we don't care about the paths, so we
+point
+       them all to the same buffer */
+    ste = &(swt->swt_ent[0]);
+    i = cnt;
+    while (--i >= 0)
+    {
+  ste++->ste_path = path;
+    }
+
+    /* grab all swap info */
+    swapctl(SC_LIST, swt);
+
+    /* walk thru the structs and sum up the fields */
+    t = f = 0;
+    ste = &(swt->swt_ent[0]);
+    i = cnt;
+    while (--i >= 0)
+    {
+  /* dont count slots being deleted */
+  if (!(ste->ste_flags & ST_INDEL) &&
+      !(ste->ste_flags & ST_DOINGDEL))
+  {
+      t += ste->ste_pages;
+      f += ste->ste_free;
+  } ste++;
+    }
+
+    /* fill in the results */
+    *total = t;
+    *fr = f;
+    free(swt);
+}
+#endif
+#endif
 
 float	process(char *command)
 {
@@ -722,8 +789,17 @@ float	SWAPFREE(void)
 	{
 		return FAIL;
 	}
+/* Solaris */
+#else
+#ifdef HAVE_SYS_SWAP_H
+	int swaptotal,swapfree;
+
+	get_swapinfo(&swaptotal,&swapfree);
+
+	return	(float)swapfree;
 #else
 	return	FAIL;
+#endif
 #endif
 }
 
@@ -758,8 +834,17 @@ float	SWAPTOTAL(void)
 	{
 		return FAIL;
 	}
+/* Solaris */
+#else
+#ifdef HAVE_SYS_SWAP_H
+	int swaptotal,swapfree;
+
+	get_swapinfo(&swaptotal,&swapfree);
+
+	return	(float)swaptotal;
 #else
 	return	FAIL;
+#endif
 #endif
 }
 
