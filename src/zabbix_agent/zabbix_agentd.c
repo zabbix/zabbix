@@ -87,7 +87,7 @@ void	signal_handler( int sig )
 		uninit();
 		exit( FAIL );
 	}
-/* parent==1 is mandatory ! EXECUTE sends SIGCHLD as well ... */
+/* parent==1 is mandatory ! EXECUTE sends SIGCHLD as well (?) ... */
 	else if( (SIGCHLD == sig) && (parent == 1) )
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "One child process died. Exiting ...");
@@ -406,7 +406,7 @@ void	process_child(int sockfd)
 	ssize_t	nread;
 	char	line[1024];
 	char	result[1024];
-	double	res;
+	char	*res;
 
         static struct  sigaction phan;
 
@@ -440,7 +440,11 @@ void	process_child(int sockfd)
 
 	res=process(line);
 
-	sprintf(result,"%f",res);
+	sprintf(result,"%s",res);
+	if(res!=NULL)
+	{	
+		free(res);
+	}
 	zabbix_log( LOG_LEVEL_DEBUG, "Sending back:%s", result);
 	write(sockfd,result,strlen(result));
 
@@ -547,6 +551,7 @@ int	main()
 
         static struct  sigaction phan;
 
+	process_config_file();
 	daemon_init();
 
 	phan.sa_handler = &signal_handler;
@@ -557,7 +562,6 @@ int	main()
 	sigaction(SIGTERM, &phan, NULL);
 	sigaction(SIGPIPE, &phan, NULL);
 
-	process_config_file();
 
 	if(CONFIG_LOG_FILE == NULL)
 	{

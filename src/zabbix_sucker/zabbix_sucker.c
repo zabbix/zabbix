@@ -471,7 +471,7 @@ int	get_value_zabbix(double *result,char **result_str,DB_ITEM *item)
 	zabbix_log(LOG_LEVEL_DEBUG, "Got string:%10s", c );
 	*result=strtod(c,&e);
 
-	if( (*result==0) && (c==e) )
+	if( (*result==0) && (c==e) && (item->value_type==0) )
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Got empty string from [%s]. Parameter [%s]",item->host, item->key);
 		zabbix_log( LOG_LEVEL_WARNING, "Assuming that agent dropped connection because of access permissions");
@@ -863,6 +863,8 @@ int main(int argc, char **argv)
 
 	struct	sigaction phan;
 
+	init_config();
+
 	daemon_init();
 
 	phan.sa_handler = &signal_handler; /* set up sig handler using sigaction() */
@@ -872,10 +874,6 @@ int main(int argc, char **argv)
 	sigaction(SIGQUIT, &phan, NULL);
 	sigaction(SIGTERM, &phan, NULL);
 	sigaction(SIGCHLD, &phan, NULL);
-
-/*	process_config_file();*/
-/* process_config_file to be removed */
-	init_config();
 
 	if(CONFIG_LOG_FILE == NULL)
 	{
@@ -913,6 +911,7 @@ int main(int argc, char **argv)
 
 	if(sucker_num == 0)
 	{
+/* First instance of zabbix_suckerd does housekeeping procedures */
 		main_housekeeping_loop();
 	}
 	else

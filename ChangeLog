@@ -1,10 +1,10 @@
 Not ready yet:
 
 [ Common parser (cfg.c) ]
-[ Support for system[uname] ]
 
 [ Update task status on SF ]
 
+[ Support for Service Tree ] 
 [ Support for flexible permissions ]
 [ Better validation of trigger expressions ]
 [ Support for nodata(). Do we need it ? ] 
@@ -16,6 +16,9 @@ Not ready yet:
 
 Changes for 1.0beta3:
 
+ - added column value_type to table items_template (Alexei)
+ - support for system[uname] (Alexei)
+ - support for system[hostname] (Alexei)
  - parameter Server can consist of list of Zabbix servers (Alexei)
  - SO_LINGER is default socket option for zabbix_sender (Alexei)
  - added support of NoTimeWait for zabbix_trapperd (Alexei)

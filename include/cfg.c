@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <syslog.h>
 
 #include "common.h"
 #include "cfg.h"
@@ -34,12 +33,14 @@ int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 	int	i,var;
 	int	*pointer;
 	char	**c;
+	int	(*func)();
+
 
 
 	file=fopen(cfg_file,"r");
 	if(NULL == file)
 	{
-		syslog( LOG_CRIT, "Cannot open config file [%s] [%m]",cfg_file);
+		fprintf(stderr, "Cannot open config file [%s] [%m]\n",cfg_file);
 		return	FAIL;
 	}
 
@@ -57,7 +58,7 @@ int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 
 		if(NULL == value)
 		{
-			syslog( LOG_CRIT, "Error in line [%s] Line %d", line, lineno);
+			fprintf(stderr, "Error in line [%s] Line %d\n", line, lineno);
 			return	FAIL;
 		}
 		value++;
@@ -65,13 +66,22 @@ int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 
 		parameter[value-line-1]=0;
 
-/*		syslog( LOG_WARNING, "Parameter [%s] Value [%s]", parameter, value);*/
-
 		i=0;
 		while(cfg[i].parameter != 0)
 		{
 			if(strcmp(cfg[i].parameter, parameter) == 0)
 			{
+				if(cfg[i].function != 0)
+				{
+					func=cfg[i].function;
+					if(func(value)!=SUCCEED)
+					{
+						fprintf(stderr, "Wrong value of [%s] in line %d.\n", cfg[i].parameter, lineno);
+						return	FAIL;
+					}
+				}
+				else
+				{
 				if(cfg[i].type == TYPE_INT)
 				{
 					var=atoi(value);
@@ -79,7 +89,7 @@ int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 					{
 						if( (var<cfg[i].min) || (var>cfg[i].max) )
 						{
-							syslog( LOG_CRIT, "Wrong value of [%s] in line %d. Should be between %d and %d.", cfg[i].parameter, lineno, cfg[i].min, cfg[i].max);
+							fprintf(stderr, "Wrong value of [%s] in line %d. Should be between %d and %d.\n", cfg[i].parameter, lineno, cfg[i].min, cfg[i].max);
 							return	FAIL;
 						}
 						
@@ -87,7 +97,6 @@ int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 /* Can this be done without "pointer" ? */ 	
 					pointer=(int *)cfg[i].variable;
 					*pointer=var;
-					syslog( LOG_WARNING, "Parameter [%s] [%d]", parameter, *pointer);
 				}
 				else
 				{
@@ -95,9 +104,39 @@ int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 					c=(char *)cfg[i].variable;
 					*c=(char *)strdup(value);
 				}
+				}
 			}
 			i++;
 		}
 	}
+
+/* Check for mandatory parameters */
+	i=0;
+	while(cfg[i].parameter != 0)
+	{
+		if(cfg[i].mandatory ==1)
+		{
+			if(cfg[i].type == TYPE_INT)
+			{
+				pointer=(int *)cfg[i].variable;
+				if(*pointer==0)
+				{
+					fprintf(stderr,"Missing mandatory parameter [%s]\n", cfg[i].parameter);
+					return	FAIL;
+				}
+			}
+			if(cfg[i].type == TYPE_STRING)
+			{
+				c=(char *)cfg[i].variable;
+				if(*c==NULL)
+				{
+					fprintf(stderr, "Missing mandatory parameter [%s]\n", cfg[i].parameter);
+					return	FAIL;
+				}
+			}
+		}
+		i++;
+	}
+
 	return	SUCCEED;
 }

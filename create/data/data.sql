@@ -21,132 +21,136 @@ insert into users (userid,groupid,alias,name,surname,passwd) values (1,1,'Admin'
 -- Data for table items_template 
 --
 
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (1,'Free memory','memory[free]', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (2,'Free disk space on /','diskfree[/]', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (3,'Free disk space on /tmp','diskfree[/tmp]', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (4,'Free disk space on /usr','diskfree[/usr]', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (5,'Free number of inodes on /','inodefree[/]', 60);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (6,'Free number of inodes on /opt','inodefree[/opt]', 60);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (7,'Free number of inodes on /tmp','inodefree[/tmp]', 60);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (8,'Free number of inodes on /usr','inodefree[/usr]', 60);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (9,'Number of processes','system[proccount]', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (10,'Processor load','system[procload]', 5);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (11,'Processor load5','system[procload5]', 10);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (12,'Processor load15','system[procload15]', 20);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (13,'Number of running processes','system[procrunning]', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (14,'Free swap space (Kb)','swap[free]', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (16,'Size of /var/log/syslog','filesize[/var/log/syslog]', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (17,'Number of users connected','system[users]', 30);
---insert into items_template (itemtemplateid,description,key_,delay)
---	values (18,'Number of established TCP connections','tcp_count', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (19,'Checksum of /etc/inetd.conf','cksum[/etc/inetd.conf]', 600);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (20,'Checksum of /vmlinuz','cksum[/vmlinuz]', 600);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (21,'Checksum of /etc/passwd','cksum[/etc/passwd]', 600);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (22,'Ping to the server (TCP)','ping', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (23,'Free disk space on /home','diskfree[/home]', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (24,'Free number of inodes on /home','inodefree[/home]', 60);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (25,'Free disk space on /var','diskfree[/var]', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (26,'Free disk space on /opt','diskfree[/opt]', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (27,'Host uptime (in sec)','system[uptime]', 300);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (28,'Total memory (kB)','memory[total]', 1800);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (29,'Shared memory (kB)','memory[shared]', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (30,'Buffers memory (kB)','memory[buffers]', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (31,'Cached memory (kB)','memory[cached]', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (32,'Total swap space (Kb)','swap[total]', 1800);
---insert into items_template (itemtemplateid,description,key_,delay)
---	values (33,'Amount of memory swapped in from disk (kB/s)','swap[in]', 30);
---insert into items_template (itemtemplateid,description,key_,delay)
---	values (34,'Amount of memory swapped to disk (kB/s)','swap[out]', 30);
---insert into items_template (itemtemplateid,description,key_,delay)
---	values (35,'Blocks sent to a block device (blocks/s)','io[in]', 30);
---insert into items_template (itemtemplateid,description,key_,delay)
---	values (36,'Blocks received from a block device (blocks/s)','io[out]', 30);
---insert into items_template (itemtemplateid,description,key_,delay)
---	values (37,'The number of interrupts per second, including the clock','system[interrupts]', 30);
---insert into items_template (itemtemplateid,description,key_,delay)
---	values (38,'The number of context switches per second','system[switches]', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (39,'Email (SMTP) server is running','check_service[smtp]', 60);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (40,'FTP server is running','check_service[ftp]', 60);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (41,'SSH server is running','check_service[ssh]', 60);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (42,'Telnet server is running','net[listen_23]', 60);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (43,'WEB server is running','net[listen_80]', 60);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (44,'POP3 server is running','check_service[pop]', 60);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (45,'IMAP server is running','check_service[imap]', 60);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (46,'Checksum of /usr/sbin/sshd','cksum[/usr/sbin/sshd]', 600);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (47,'Checksum of /usr/bin/ssh','cksum[/usr/bin/ssh]', 600);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (48,'Checksum of /etc/services','cksum[/etc/services]', 600);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (49,'Number of disks read/write operations','io[disk_io]', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (50,'Number of disks read operations','io[disk_rio]', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (51,'Number of disks write operations','io[disk_wio]', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (52,'Number of block read from disks','io[disk_rblk]', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (53,'Number of block written to disks','io[disk_wblk]', 30);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (54,'News (NNTP) server is running','check_service[nntp]', 60);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (55,'Number of running processes inetd','proc_cnt[inetd]', 60);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (56,'Number of running processes apache','proc_cnt[httpd]', 60);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (57,'Number of running processes mysqld','proc_cnt[mysqld]', 60);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (58,'Number of running processes syslogd','proc_cnt[syslogd]', 60);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (59,'Number of running processes sshd','proc_cnt[sshd]', 60);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (60,'Number of running processes zabbix_agentd','proc_cnt[zabbix_agentd]', 60);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (61,'Number of running processes zabbix_suckerd','proc_cnt[zabbix_suckerd]', 60);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (62,'Number of running processes zabbix_trapperd','proc_cnt[zabbix_trapperd]', 60);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (63,'Maximum number of processes','kern[maxproc]', 1800);
-insert into items_template (itemtemplateid,description,key_,delay)
-	values (64,'Maximum number of opened files','kern[maxfiles]', 1800);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (1,'Free memory','memory[free]', 30, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (2,'Free disk space on /','diskfree[/]', 30, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (3,'Free disk space on /tmp','diskfree[/tmp]', 30, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (4,'Free disk space on /usr','diskfree[/usr]', 30, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (5,'Free number of inodes on /','inodefree[/]', 60, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (6,'Free number of inodes on /opt','inodefree[/opt]', 60, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (7,'Free number of inodes on /tmp','inodefree[/tmp]', 60, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (8,'Free number of inodes on /usr','inodefree[/usr]', 60, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (9,'Number of processes','system[proccount]', 30, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (10,'Processor load','system[procload]', 5, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (11,'Processor load5','system[procload5]', 10, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (12,'Processor load15','system[procload15]', 20, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (13,'Number of running processes','system[procrunning]', 30, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (14,'Free swap space (Kb)','swap[free]', 30, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (16,'Size of /var/log/syslog','filesize[/var/log/syslog]', 30, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (17,'Number of users connected','system[users]', 30, 0);
+--insert into items_template (itemtemplateid,description,key_,delay,value_type)
+--	values (18,'Number of established TCP connections','tcp_count', 30, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (19,'Checksum of /etc/inetd.conf','cksum[/etc/inetd.conf]', 600, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (20,'Checksum of /vmlinuz','cksum[/vmlinuz]', 600, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (21,'Checksum of /etc/passwd','cksum[/etc/passwd]', 600, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (22,'Ping to the server (TCP)','ping', 30, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (23,'Free disk space on /home','diskfree[/home]', 30, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (24,'Free number of inodes on /home','inodefree[/home]', 60, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (25,'Free disk space on /var','diskfree[/var]', 30, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (26,'Free disk space on /opt','diskfree[/opt]', 30, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (27,'Host uptime (in sec)','system[uptime]', 300, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (28,'Total memory (kB)','memory[total]', 1800, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (29,'Shared memory (kB)','memory[shared]', 30, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (30,'Buffers memory (kB)','memory[buffers]', 30, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (31,'Cached memory (kB)','memory[cached]', 30, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (32,'Total swap space (Kb)','swap[total]', 1800, 0);
+--insert into items_template (itemtemplateid,description,key_,delay,value_type)
+--	values (33,'Amount of memory swapped in from disk (kB/s)','swap[in]', 30, 0);
+--insert into items_template (itemtemplateid,description,key_,delay,value_type)
+--	values (34,'Amount of memory swapped to disk (kB/s)','swap[out]', 30, 0);
+--insert into items_template (itemtemplateid,description,key_,delay,value_type)
+--	values (35,'Blocks sent to a block device (blocks/s)','io[in]', 30, 0);
+--insert into items_template (itemtemplateid,description,key_,delay,value_type)
+--	values (36,'Blocks received from a block device (blocks/s)','io[out]', 30, 0);
+--insert into items_template (itemtemplateid,description,key_,delay,value_type)
+--	values (37,'The number of interrupts per second, including the clock','system[interrupts]', 30, 0);
+--insert into items_template (itemtemplateid,description,key_,delay,value_type)
+--	values (38,'The number of context switches per second','system[switches]', 30, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (39,'Email (SMTP) server is running','check_service[smtp]', 60, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (40,'FTP server is running','check_service[ftp]', 60, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (41,'SSH server is running','check_service[ssh]', 60, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (42,'Telnet server is running','net[listen_23]', 60, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (43,'WEB server is running','net[listen_80]', 60, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (44,'POP3 server is running','check_service[pop]', 60, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (45,'IMAP server is running','check_service[imap]', 60, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (46,'Checksum of /usr/sbin/sshd','cksum[/usr/sbin/sshd]', 600, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (47,'Checksum of /usr/bin/ssh','cksum[/usr/bin/ssh]', 600, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (48,'Checksum of /etc/services','cksum[/etc/services]', 600, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (49,'Number of disks read/write operations','io[disk_io]', 30, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (50,'Number of disks read operations','io[disk_rio]', 30, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (51,'Number of disks write operations','io[disk_wio]', 30, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (52,'Number of block read from disks','io[disk_rblk]', 30, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (53,'Number of block written to disks','io[disk_wblk]', 30, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (54,'News (NNTP) server is running','check_service[nntp]', 60, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (55,'Number of running processes inetd','proc_cnt[inetd]', 60, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (56,'Number of running processes apache','proc_cnt[httpd]', 60, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (57,'Number of running processes mysqld','proc_cnt[mysqld]', 60, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (58,'Number of running processes syslogd','proc_cnt[syslogd]', 60, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (59,'Number of running processes sshd','proc_cnt[sshd]', 60, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (60,'Number of running processes zabbix_agentd','proc_cnt[zabbix_agentd]', 60, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (61,'Number of running processes zabbix_suckerd','proc_cnt[zabbix_suckerd]', 60, 0);
+insert into items_template (itemtemplateid,description,key_,delay, value_type)
+	values (62,'Number of running processes zabbix_trapperd','proc_cnt[zabbix_trapperd]', 60, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (63,'Maximum number of processes','kern[maxproc]', 1800, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (64,'Maximum number of opened files','kern[maxfiles]', 1800, 0);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (65,'Host name','system[hostname]', 1800, 1);
+insert into items_template (itemtemplateid,description,key_,delay,value_type)
+	values (66,'Host information','system[uname]', 1800, 1);
 
 --
 -- Data for table triggers_template

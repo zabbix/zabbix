@@ -1,7 +1,7 @@
 #ifndef MON_SYSINFO_H
 #define MON_SYSINFO_H
  
-float	process(char *command);
+char	*process(char *command);
 
 void    add_user_parameter(char *key,char *command);
 void	test_parameters(void);
@@ -9,7 +9,7 @@ float	getPROC(char *file,int lineno,int fieldno);
 
 float	BUFFERSMEM(void);
 float	CACHEDMEM(void);
-float   CKSUM(const char * filename);
+float	CKSUM(const char * filename);
 float	FILESIZE(const char * filename);
 float	DF(const char * mountPoint);
 float	DISK_IO(void);
@@ -35,6 +35,7 @@ float	TCP_LISTEN(const char *porthex);
 float	UPTIME(void);
 
 float	EXECUTE(char *command);
+char	*EXECUTE_STR(char *command);
 
 float	CHECK_SERVICE_SSH(void);
 float	CHECK_SERVICE_SMTP(void);
@@ -50,6 +51,7 @@ COMMAND
 {
 	char	*key;
 	void	*function;
+	void	*function_str;
 	char	*parameter;
 };
 

@@ -4,6 +4,24 @@
 	$USER_DETAILS	="";
 	$ERROR_MSG	="";
 
+	function	get_item_by_itemid($itemid)
+	{
+		global	$ERROR_MSG;
+
+//		$sql="select itemid,type,snmp_community,snmp_oid,hostid,description,key_,delay,history,lastdelete, nextcheck,lastvalue, lastclock, prevvalue, status, value_type from items where itemid=$itemid"; 
+		$sql="select * from items where itemid=$itemid"; 
+		$result=DBselect($sql);
+		if(DBnum_rows($result) == 1)
+		{
+			return	DBfetch($result);	
+		}
+		else
+		{
+			$ERROR_MSG="No item with itemid=[$itemid]";
+		}
+		return	$item;
+	}
+
 	function	select_trigger_by_triggerid($triggerid)
 	{
 		global	$ERROR_MSG;
@@ -488,7 +506,7 @@
 ?>
 			</font>
 		</td>
-<? /*?>
+
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
 				<a href="srv_status.php">
@@ -504,7 +522,7 @@
 ?>
 			</font>
 		</td>
-<? */?>
+
 		</tr>
 		<tr>
 		<td colspan=2 bgcolor=FFFFFF align=center valign="top" width="15%">
@@ -537,7 +555,7 @@
 ?>
 			</font>
 		</td>
-		<td colspan=2 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=3 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
 				<a href="report2.php">
 <?
@@ -663,7 +681,7 @@
 ?>
 			</font>
 		</td>
-<? /*?>
+
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
 				<a href="services.php">
@@ -679,7 +697,7 @@
 ?>
 			</font>
 		</td>
-<?*/?>
+
 		</tr>
 		</table>
 	</td>
@@ -908,9 +926,9 @@
 
 	# Update Item definition
 
-	function	update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid)
+	function	update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type)
 	{
-		$sql="update items set description='$description',key_='$key',hostid=$hostid,delay=$delay,history=$history,lastdelete=0,nextcheck=0,status=$status,type=$type,snmp_community='$snmp_community',snmp_oid='$snmp_oid' where itemid=$itemid";
+		$sql="update items set description='$description',key_='$key',hostid=$hostid,delay=$delay,history=$history,lastdelete=0,nextcheck=0,status=$status,type=$type,snmp_community='$snmp_community',snmp_oid='$snmp_oid',value_type=$value_type where itemid=$itemid";
 		return	DBexecute($sql);
 	}
 
@@ -1160,9 +1178,9 @@
 
 	# Add Item definition
 
-	function	add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid)
+	function	add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type)
 	{
-		$sql="insert into items (description,key_,hostid,delay,history,lastdelete,nextcheck,status,type,snmp_community,snmp_oid) values ('$description','$key',$hostid,$delay,$history,0,0,$status,$type,'$snmp_community','$snmp_oid')";
+		$sql="insert into items (description,key_,hostid,delay,history,lastdelete,nextcheck,status,type,snmp_community,snmp_oid,value_type) values ('$description','$key',$hostid,$delay,$history,0,0,$status,$type,'$snmp_community','$snmp_oid',$value_type)";
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"items","itemid");
 	}
@@ -1346,15 +1364,16 @@
 
 	function	add_from_templates($hostid,$host)
 	{
-		$result=DBselect("select itemtemplateid,description,key_,delay from items_template");
+		$result=DBselect("select itemtemplateid,description,key_,delay,value_type from items_template");
 		for($i=0;$i<DBnum_rows($result);$i++) 
 		{
 			$itemtemplateid=DBget_field($result,$i,0);
 			$description=DBget_field($result,$i,1);
 			$key=DBget_field($result,$i,2);
 			$delay=DBget_field($result,$i,3);
+			$value_type=DBget_field($result,$i,4);
 
-			$itemid=add_item($description,$key,$hostid,$delay,30*24*3600,0,0,"","");
+			$itemid=add_item($description,$key,$hostid,$delay,30*24*3600,0,0,"","",$value_type);
 
 			$result2=DBselect("select triggertemplateid,description,expression from triggers_template where itemtemplateid=$itemtemplateid");
 			for($j=0;$j<DBnum_rows($result2);$j++)
@@ -1932,7 +1951,7 @@
 	{
 		if(isset($itemid))
 		{
-			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid from items i,hosts h where i.itemid=$itemid and h.hostid=i.hostid");
+			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type from items i,hosts h where i.itemid=$itemid and h.hostid=i.hostid");
 		
 			$description=DBget_field($result,0,0);
 			$key=DBget_field($result,0,1);
@@ -1944,6 +1963,7 @@
 			$type=DBget_field($result,0,7);
 			$snmp_community=DBget_field($result,0,8);
 			$snmp_oid=DBget_field($result,0,9);
+			$value_type=DBget_field($result,0,10);
 		}
 		else
 		{
@@ -1957,6 +1977,7 @@
 			$type=0;
 			$snmp_community="public";
 			$snmp_oid="interfaces.ifTable.ifEntry.ifInOctets.1";
+			$value_type=0;
 		}
 
 		echo "<br>";
@@ -2044,6 +2065,18 @@
 		echo "<OPTION VALUE=\"3\"";
 		if($status==3) echo "SELECTED";
 		echo ">Not supported";
+		echo "</SELECT>";
+
+		show_table2_v_delimiter();
+		echo "Type of information";
+		show_table2_h_delimiter();
+		echo "<SELECT NAME=\"value_type\" value=\"$value_type\" size=\"1\">";
+		echo "<OPTION VALUE=\"0\"";
+		if($value_type==0) echo "SELECTED";
+		echo ">Numeric";
+		echo "<OPTION VALUE=\"1\"";
+		if($value_type==1) echo "SELECTED";
+		echo ">Character";
 		echo "</SELECT>";
  
 		show_table2_v_delimiter2();
@@ -2245,7 +2278,7 @@
 		if(isset($triggerid))
 		{
 			show_table2_v_delimiter();
-			echo "Dependencies";
+			echo "The trigger depends on";
 			show_table2_h_delimiter();
 			$sql="select t.triggerid,t.description from triggers t,trigger_depends d where t.triggerid=d.triggerid_up and d.triggerid_down=$triggerid";
 			$result1=DBselect($sql);

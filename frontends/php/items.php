@@ -11,7 +11,7 @@
 	{
 		if($register=="update")
 		{
-			$result=update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid);
+			$result=update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type);
 			show_messages($result,"Item updated","Cannot update item");
 			unset($itemid);
 		}
@@ -23,7 +23,7 @@
 		}
 		if($register=="add")
 		{
-			$result=add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid);
+			$result=add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type);
 			show_messages($result,"Item added","Cannot add item");
 			unset($itemid);
 		}
