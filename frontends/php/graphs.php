@@ -3,6 +3,7 @@
 	$page["title"] = "Graphs";
 	$page["file"] = "graphs.php";
 	show_header($page["title"],0,0);
+	insert_confirm_javascript();
 ?>
 
 <?php
@@ -66,8 +67,7 @@
 		echo "<TD><a href=\"graph.php?graphid=".$row["graphid"]."\">".$row["name"]."</a></TD>";
 		echo "<TD>".$row["width"]."</TD>";
 		echo "<TD>".$row["height"]."</TD>";
-		echo "<TD><A HREF=\"graphs.php?graphid=".$row["graphid"]."#form\">Change</A> - ";
-		echo "<A HREF=\"graphs.php?register=delete&graphid=".$row["graphid"]."\">Delete</A></TD>";
+		echo "<TD><A HREF=\"graphs.php?graphid=".$row["graphid"]."#form\">Change</A></TD>";
 		echo "</TR>";
 	}
 	echo "</TABLE>";
@@ -93,7 +93,7 @@
 
 	echo "<br>";
 	show_table2_header_begin();
-	echo "New graph";
+	echo "Graph";
 
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"graphs.php\">";
@@ -120,6 +120,7 @@
 	if(isset($HTTP_GET_VARS["graphid"]))
 	{
 		echo "<input type=\"submit\" name=\"register\" value=\"update\">";
+		echo "<input type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete graph?');\">";
 	}
 
 	show_table2_header_end();

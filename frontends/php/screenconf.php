@@ -3,6 +3,7 @@
 	$page["title"] = "Screens";
 	$page["file"] = "screenconf.php";
 	show_header($page["title"],0,0);
+	insert_confirm_javascript();
 ?>
 
 <?php
@@ -66,8 +67,7 @@
 		echo "<TD><a href=\"screenedit.php?screenid=".$row["screenid"]."\">".$row["name"]."</a></TD>";
 		echo "<TD>".$row["cols"]."</TD>";
 		echo "<TD>".$row["rows"]."</TD>";
-		echo "<TD><A HREF=\"screenconf.php?screenid=".$row["screenid"]."#form\">Change</A> - ";
-		echo "<A HREF=\"screenconf.php?register=delete&screenid=".$row["screenid"]."\">Delete</A></TD>";
+		echo "<TD><A HREF=\"screenconf.php?screenid=".$row["screenid"]."#form\">Change</A></TD>";
 		echo "</TR>";
 	}
 	echo "</TABLE>";
@@ -93,7 +93,7 @@
 
 	echo "<br>";
 	show_table2_header_begin();
-	echo "New screen";
+	echo "Screen";
 
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"screenconf.php\">";
@@ -120,6 +120,7 @@
 	if(isset($HTTP_GET_VARS["screenid"]))
 	{
 		echo "<input type=\"submit\" name=\"register\" value=\"update\">";
+		echo "<input type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete screen?');\">";
 	}
 
 	show_table2_header_end();

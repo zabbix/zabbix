@@ -865,6 +865,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 	<meta name="Author" content="Alexei Vladishev">
 	<link rel="stylesheet" href="css.css">
+
 <?php
 	if($USER_DETAILS['alias']=='guest')
 	{
@@ -882,6 +883,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	echo "<head>";
 ?>
+
+
 	<body>
 <?php
 		if($nomenu == 0)
@@ -3251,7 +3254,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<br>";
 
 		show_table2_header_begin();
-		echo "Item configuration";
+		echo "Item";
  
 		show_table2_v_delimiter();
 		echo "<form method=\"get\" action=\"items.php\">";
@@ -3420,11 +3423,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
  
 		show_table2_v_delimiter2();
 		echo "<input type=\"submit\" name=\"register\" value=\"add\">";
-		echo "<input type=\"submit\" name=\"register\" value=\"add to all hosts\">";
+		echo "<input type=\"submit\" name=\"register\" value=\"add to all hosts\" onClick=\"return Confirm('Add item to all hosts?');\">";
 		if(isset($HTTP_GET_VARS["itemid"]))
 		{
 			echo "<input type=\"submit\" name=\"register\" value=\"update\">";
-			echo "<input type=\"submit\" name=\"register\" value=\"delete\">";
+			echo "<input type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected item?');\">";
 		}
  
 		show_table2_header_end();
@@ -3540,7 +3543,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 
 		show_table2_header_begin();
-		echo "New user";
+		echo "User";
 
 		show_table2_v_delimiter();
 		echo "<form method=\"get\" action=\"users.php\">";
@@ -3577,7 +3580,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		if(isset($userid))
 		{
 			echo "<input type=\"submit\" name=\"register\" value=\"update\">";
-			echo "<input type=\"submit\" name=\"register\" value=\"delete\">";
+			echo "<input type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected user?');\">";
 		}
 
 		show_table2_header_end();
@@ -3715,7 +3718,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		if(isset($triggerid))
 		{
 			echo "<input type=\"submit\" name=\"register\" value=\"update\">";
-			echo "<input type=\"submit\" name=\"register\" value=\"delete\">";
+			echo "<input type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete trigger?');\">";
 		}
 
 		if(isset($triggerid))
@@ -4309,4 +4312,23 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return "Bold line";
 		return "Unknown";
         }
+
+	function insert_confirm_javascript()
+	{
+		echo "<SCRIPT LANGUAGE=\"JavaScript\">";
+
+		echo "function Confirm(msg)";
+		echo "{";
+		echo "	if(confirm( msg))";
+		echo "	{";
+		echo "		return true;";
+		echo "	}";
+		echo "	else";
+		echo "	{";
+		echo "		return false;";
+		echo "	}";
+		echo "}";
+		echo "</SCRIPT>";
+	}
+
 ?>
