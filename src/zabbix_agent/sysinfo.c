@@ -266,7 +266,7 @@ void	test_parameters(void)
 {
 	int	i;
 
-	char	c[MAX_STRING_LEN+1];
+	char	c[MAX_STRING_LEN];
 
 	i=0;
 	while(0 != commands[i].key)
@@ -290,9 +290,9 @@ void	process(char *command,char *value)
 	double	(*function)();
 	char	*(*function_str)() = NULL;
 	char	*parameter = NULL;
-	char	key[MAX_STRING_LEN+1];
-	char	proxy[MAX_STRING_LEN+1];
-	char	port[MAX_STRING_LEN+1];
+	char	key[MAX_STRING_LEN];
+	char	proxy[MAX_STRING_LEN];
+	char	port[MAX_STRING_LEN];
 	int	port_int;
 	char	param[1024];
 	char	cmd[1024];
@@ -310,11 +310,11 @@ void	process(char *command,char *value)
 	if(NULL != n)
 	{
 		n[0]=0;
-		strncpy(proxy,n,MAX_STRING_LEN);
+		strscpy(proxy,n);
 		n=strchr(proxy,':');
 		if(NULL != n)
 		{
-			strncpy(port,n,MAX_STRING_LEN);
+			strscpy(port,n);
 			n[0]=0;
 		}
 		else
@@ -670,8 +670,8 @@ double	SENSOR_TEMP1(void)
 	DIR	*dir;
 	struct	dirent *entries;
 	struct	stat buf;
-	char	filename[MAX_STRING_LEN+1];
-	char	line[MAX_STRING_LEN+1];
+	char	filename[MAX_STRING_LEN];
+	char	line[MAX_STRING_LEN];
 	double	d1,d2,d3;
 
 	FILE	*f;
@@ -684,7 +684,7 @@ double	SENSOR_TEMP1(void)
 
 	while((entries=readdir(dir))!=NULL)
 	{
-		strncpy(filename,"/proc/sys/dev/sensors/",MAX_STRING_LEN);	
+		strscpy(filename,"/proc/sys/dev/sensors/");	
 		strncat(filename,entries->d_name,MAX_STRING_LEN);
 		strncat(filename,"/temp1",MAX_STRING_LEN);
 
@@ -719,8 +719,8 @@ double	SENSOR_TEMP2(void)
 	DIR	*dir;
 	struct	dirent *entries;
 	struct	stat buf;
-	char	filename[MAX_STRING_LEN+1];
-	char	line[MAX_STRING_LEN+1];
+	char	filename[MAX_STRING_LEN];
+	char	line[MAX_STRING_LEN];
 	double	d1,d2,d3;
 
 	FILE	*f;
@@ -733,7 +733,7 @@ double	SENSOR_TEMP2(void)
 
 	while((entries=readdir(dir))!=NULL)
 	{
-		strncpy(filename,"/proc/sys/dev/sensors/",MAX_STRING_LEN);	
+		strscpy(filename,"/proc/sys/dev/sensors/");	
 		strncat(filename,entries->d_name,MAX_STRING_LEN);
 		strncat(filename,"/temp2",MAX_STRING_LEN);
 
@@ -768,8 +768,8 @@ double	SENSOR_TEMP3(void)
 	DIR	*dir;
 	struct	dirent *entries;
 	struct	stat buf;
-	char	filename[MAX_STRING_LEN+1];
-	char	line[MAX_STRING_LEN+1];
+	char	filename[MAX_STRING_LEN];
+	char	line[MAX_STRING_LEN];
 	double	d1,d2,d3;
 
 	FILE	*f;
@@ -782,7 +782,7 @@ double	SENSOR_TEMP3(void)
 
 	while((entries=readdir(dir))!=NULL)
 	{
-		strncpy(filename,"/proc/sys/dev/sensors/",MAX_STRING_LEN);	
+		strscpy(filename,"/proc/sys/dev/sensors/");	
 		strncat(filename,entries->d_name,MAX_STRING_LEN);
 		strncat(filename,"/temp3",MAX_STRING_LEN);
 
@@ -818,7 +818,7 @@ double	PROCCNT(const char * procname)
 	DIR	*dir;
 	struct	dirent *entries;
 	struct	stat buf;
-	char	filename[MAX_STRING_LEN+1];
+	char	filename[MAX_STRING_LEN];
 
 	int	fd;
 /* In the correct procfs.h, the structure name is psinfo_t */
@@ -834,7 +834,7 @@ double	PROCCNT(const char * procname)
 
 	while((entries=readdir(dir))!=NULL)
 	{
-		strncpy(filename,"/proc/",MAX_STRING_LEN);	
+		strscpy(filename,"/proc/");	
 		strncat(filename,entries->d_name,MAX_STRING_LEN);
 		strncat(filename,"/psinfo",MAX_STRING_LEN);
 
@@ -870,10 +870,10 @@ double	PROCCNT(const char * procname)
 	DIR	*dir;
 	struct	dirent *entries;
 	struct	stat buf;
-	char	filename[MAX_STRING_LEN+1];
-	char	line[MAX_STRING_LEN+1];
-	char	name1[MAX_STRING_LEN+1];
-	char	name2[MAX_STRING_LEN+1];
+	char	filename[MAX_STRING_LEN];
+	char	line[MAX_STRING_LEN];
+	char	name1[MAX_STRING_LEN];
+	char	name2[MAX_STRING_LEN];
 
 	FILE	*f;
 
@@ -887,7 +887,7 @@ double	PROCCNT(const char * procname)
 
 	while((entries=readdir(dir))!=NULL)
 	{
-		strncpy(filename,"/proc/",MAX_STRING_LEN);	
+		strscpy(filename,"/proc/");	
 		strncat(filename,entries->d_name,MAX_STRING_LEN);
 		strncat(filename,"/status",MAX_STRING_LEN);
 
@@ -934,9 +934,9 @@ double	PROCCNT(const char * procname)
 double	get_stat(const char *key)
 {
 	FILE	*f;
-	char	line[MAX_STRING_LEN+1];
-	char	name1[MAX_STRING_LEN+1];
-	char	name2[MAX_STRING_LEN+1];
+	char	line[MAX_STRING_LEN];
+	char	name1[MAX_STRING_LEN];
+	char	name2[MAX_STRING_LEN];
 
 	f=fopen("/tmp/zabbix_agentd.tmp","r");
 	if(f==NULL)
@@ -961,7 +961,7 @@ double	get_stat(const char *key)
 
 double	DISKREADOPS1(char *device)
 {
-	char	key[MAX_STRING_LEN+1];
+	char	key[MAX_STRING_LEN];
 
 	sprintf(key,"disk_read_ops1[%s]",device);
 
@@ -970,7 +970,7 @@ double	DISKREADOPS1(char *device)
 
 double	DISKREADOPS5(char *device)
 {
-	char	key[MAX_STRING_LEN+1];
+	char	key[MAX_STRING_LEN];
 
 	sprintf(key,"disk_read_ops5[%s]",device);
 
@@ -979,7 +979,7 @@ double	DISKREADOPS5(char *device)
 
 double	DISKREADOPS15(char *device)
 {
-	char	key[MAX_STRING_LEN+1];
+	char	key[MAX_STRING_LEN];
 
 	sprintf(key,"disk_read_ops15[%s]",device);
 
@@ -988,7 +988,7 @@ double	DISKREADOPS15(char *device)
 
 double	DISKREADBLKS1(char *device)
 {
-	char	key[MAX_STRING_LEN+1];
+	char	key[MAX_STRING_LEN];
 
 	sprintf(key,"disk_read_blks1[%s]",device);
 
@@ -997,7 +997,7 @@ double	DISKREADBLKS1(char *device)
 
 double	DISKREADBLKS5(char *device)
 {
-	char	key[MAX_STRING_LEN+1];
+	char	key[MAX_STRING_LEN];
 
 	sprintf(key,"disk_read_blks5[%s]",device);
 
@@ -1006,7 +1006,7 @@ double	DISKREADBLKS5(char *device)
 
 double	DISKREADBLKS15(char *device)
 {
-	char	key[MAX_STRING_LEN+1];
+	char	key[MAX_STRING_LEN];
 
 	sprintf(key,"disk_read_blks15[%s]",device);
 
@@ -1015,7 +1015,7 @@ double	DISKREADBLKS15(char *device)
 
 double	DISKWRITEOPS1(char *device)
 {
-	char	key[MAX_STRING_LEN+1];
+	char	key[MAX_STRING_LEN];
 
 	sprintf(key,"disk_write_ops1[%s]",device);
 
@@ -1024,7 +1024,7 @@ double	DISKWRITEOPS1(char *device)
 
 double	DISKWRITEOPS5(char *device)
 {
-	char	key[MAX_STRING_LEN+1];
+	char	key[MAX_STRING_LEN];
 
 	sprintf(key,"disk_write_ops5[%s]",device);
 
@@ -1033,7 +1033,7 @@ double	DISKWRITEOPS5(char *device)
 
 double	DISKWRITEOPS15(char *device)
 {
-	char	key[MAX_STRING_LEN+1];
+	char	key[MAX_STRING_LEN];
 
 	sprintf(key,"disk_write_ops15[%s]",device);
 
@@ -1042,7 +1042,7 @@ double	DISKWRITEOPS15(char *device)
 
 double	DISKWRITEBLKS1(char *device)
 {
-	char	key[MAX_STRING_LEN+1];
+	char	key[MAX_STRING_LEN];
 
 	sprintf(key,"disk_write_blks1[%s]",device);
 
@@ -1051,7 +1051,7 @@ double	DISKWRITEBLKS1(char *device)
 
 double	DISKWRITEBLKS5(char *device)
 {
-	char	key[MAX_STRING_LEN+1];
+	char	key[MAX_STRING_LEN];
 
 	sprintf(key,"disk_write_blks5[%s]",device);
 
@@ -1060,7 +1060,7 @@ double	DISKWRITEBLKS5(char *device)
 
 double	DISKWRITEBLKS15(char *device)
 {
-	char	key[MAX_STRING_LEN+1];
+	char	key[MAX_STRING_LEN];
 
 	sprintf(key,"disk_write_blks15[%s]",device);
 
@@ -1069,7 +1069,7 @@ double	DISKWRITEBLKS15(char *device)
 
 double	NETLOADIN1(char *interface)
 {
-	char	key[MAX_STRING_LEN+1];
+	char	key[MAX_STRING_LEN];
 
 	sprintf(key,"netloadin1[%s]",interface);
 
@@ -1078,7 +1078,7 @@ double	NETLOADIN1(char *interface)
 
 double	NETLOADIN5(char *interface)
 {
-	char	key[MAX_STRING_LEN+1];
+	char	key[MAX_STRING_LEN];
 
 	sprintf(key,"netloadin5[%s]",interface);
 
@@ -1087,7 +1087,7 @@ double	NETLOADIN5(char *interface)
 
 double	NETLOADIN15(char *interface)
 {
-	char	key[MAX_STRING_LEN+1];
+	char	key[MAX_STRING_LEN];
 
 	sprintf(key,"netloadin15[%s]",interface);
 
@@ -1096,7 +1096,7 @@ double	NETLOADIN15(char *interface)
 
 double	NETLOADOUT1(char *interface)
 {
-	char	key[MAX_STRING_LEN+1];
+	char	key[MAX_STRING_LEN];
 
 	sprintf(key,"netloadout1[%s]",interface);
 
@@ -1105,7 +1105,7 @@ double	NETLOADOUT1(char *interface)
 
 double	NETLOADOUT5(char *interface)
 {
-	char	key[MAX_STRING_LEN+1];
+	char	key[MAX_STRING_LEN];
 
 	sprintf(key,"netloadout5[%s]",interface);
 
@@ -1114,7 +1114,7 @@ double	NETLOADOUT5(char *interface)
 
 double	NETLOADOUT15(char *interface)
 {
-	char	key[MAX_STRING_LEN+1];
+	char	key[MAX_STRING_LEN];
 
 	sprintf(key,"netloadout15[%s]",interface);
 
@@ -1337,11 +1337,11 @@ double	TCP_LISTEN(const char *porthex)
 {
 #ifdef HAVE_PROC
 	FILE	*f;
-	char	c[MAX_STRING_LEN+1];
+	char	c[MAX_STRING_LEN];
 
-	char	pattern[MAX_STRING_LEN+1]="0050 00000000:0000 0A";
+	char	pattern[MAX_STRING_LEN]="0050 00000000:0000 0A";
 
-	strncpy(pattern,porthex,MAX_STRING_LEN);
+	strscpy(pattern,porthex);
 	strncat(pattern," 00000000:0000 0A", MAX_STRING_LEN);
 
 	f=fopen("/proc/net/tcp","r");
@@ -1371,7 +1371,7 @@ double	getPROC(char *file,int lineno,int fieldno)
 {
 	FILE	*f;
 	char	*t;
-	char	c[MAX_STRING_LEN+1];
+	char	c[MAX_STRING_LEN];
 	double	result;
 	int	i;
 
@@ -1924,7 +1924,7 @@ double	PROCCOUNT(void)
 	DIR	*dir;
 	struct	dirent *entries;
 	struct	stat buf;
-	char	filename[MAX_STRING_LEN+1];
+	char	filename[MAX_STRING_LEN];
 
 	int	fd;
 /* In the correct procfs.h, the structure name is psinfo_t */
@@ -1940,7 +1940,7 @@ double	PROCCOUNT(void)
 
 	while((entries=readdir(dir))!=NULL)
 	{
-		strncpy(filename,"/proc/",MAX_STRING_LEN);	
+		strscpy(filename,"/proc/");	
 		strncat(filename,entries->d_name,MAX_STRING_LEN);
 		strncat(filename,"/psinfo",MAX_STRING_LEN);
 
@@ -2072,7 +2072,7 @@ char	*VERSION(void)
 char	*EXECUTE_STR(char *command)
 {
 	FILE	*f;
-	static	char	c[MAX_STRING_LEN+1];
+	static	char	c[MAX_STRING_LEN];
 
 	f=popen( command,"r");
 	if(f==0)
@@ -2120,7 +2120,7 @@ double	EXECUTE(char *command)
 {
 	FILE	*f;
 	double	result;
-	char	c[MAX_STRING_LEN+1];
+	char	c[MAX_STRING_LEN];
 
 	f=popen( command,"r");
 	if(f==0)
@@ -2296,8 +2296,8 @@ int	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose)
 int	check_ssh(char	*hostname, short port)
 {
 	char	*haddr;
-	char	c[MAX_STRING_LEN+1];
-	char	out[MAX_STRING_LEN+1];
+	char	c[MAX_STRING_LEN];
+	char	out[MAX_STRING_LEN];
 	char	*ssh_proto=NULL;
 	char	*ssh_server=NULL;
 	
@@ -2367,9 +2367,9 @@ double	CHECK_SERVICE_PERF(char *service_and_ip_and_port)
 {
 	char	*c,*c1;
 	int	port=0;
-	char	service[MAX_STRING_LEN+1];
-	char	ip[MAX_STRING_LEN+1];
-	char	port_str[MAX_STRING_LEN+1];
+	char	service[MAX_STRING_LEN];
+	char	ip[MAX_STRING_LEN];
+	char	port_str[MAX_STRING_LEN];
 
 	struct timeval t1,t2;
 	struct timezone tz1,tz2;
@@ -2381,18 +2381,18 @@ double	CHECK_SERVICE_PERF(char *service_and_ip_and_port)
 	gettimeofday(&t1,&tz1);
 
 	c=strchr(service_and_ip_and_port,',');
-	strncpy(service,service_and_ip_and_port,MAX_STRING_LEN);
+	strscpy(service,service_and_ip_and_port);
 
 	if(c != NULL)
 	{
-		strncpy(ip,c+1,MAX_STRING_LEN);
+		strscpy(ip,c+1);
 		service[c-service_and_ip_and_port]=0;
 
 		c1=strchr(ip,',');
 		
 		if(c1!=NULL)
 		{
-			strncpy(port_str,c1+1,MAX_STRING_LEN);
+			strscpy(port_str,c1+1);
 			ip[c1-ip]=0;
 			port=atoi(port_str);
 		}
@@ -2400,7 +2400,7 @@ double	CHECK_SERVICE_PERF(char *service_and_ip_and_port)
 		{
 			if(strchr(ip,'.')==NULL)
 			{
-				strncpy(port_str,ip,MAX_STRING_LEN);
+				strscpy(port_str,ip);
 				port=atoi(port_str);
 				strcpy(ip,"127.0.0.1");
 			}
@@ -2473,25 +2473,25 @@ double	CHECK_SERVICE(char *service_and_ip_and_port)
 {
 	char	*c,*c1;
 	int	port=0;
-	char	service[MAX_STRING_LEN+1];
-	char	ip[MAX_STRING_LEN+1];
-	char	port_str[MAX_STRING_LEN+1];
+	char	service[MAX_STRING_LEN];
+	char	ip[MAX_STRING_LEN];
+	char	port_str[MAX_STRING_LEN];
 
 	int	result;
 
 	c=strchr(service_and_ip_and_port,',');
-	strncpy(service,service_and_ip_and_port,MAX_STRING_LEN);
+	strscpy(service,service_and_ip_and_port);
 
 	if(c != NULL)
 	{
-		strncpy(ip,c+1,MAX_STRING_LEN);
+		strscpy(ip,c+1);
 		service[c-service_and_ip_and_port]=0;
 
 		c1=strchr(ip,',');
 		
 		if(c1!=NULL)
 		{
-			strncpy(port_str,c1+1,MAX_STRING_LEN);
+			strscpy(port_str,c1+1);
 			ip[c1-ip]=0;
 			port=atoi(port_str);
 		}
@@ -2499,7 +2499,7 @@ double	CHECK_SERVICE(char *service_and_ip_and_port)
 		{
 			if(strchr(ip,'.')==NULL)
 			{
-				strncpy(port_str,ip,MAX_STRING_LEN);
+				strscpy(port_str,ip);
 				port=atoi(port_str);
 				strcpy(ip,"127.0.0.1");
 			}
@@ -2561,10 +2561,10 @@ double	CHECK_PORT(char *ip_and_port)
 {
 	char	*c;
 	int	port=0;
-	char	ip[MAX_STRING_LEN+1];
+	char	ip[MAX_STRING_LEN];
 
 	c=strchr(ip_and_port,',');
-	strncpy(ip,ip_and_port,MAX_STRING_LEN);
+	strscpy(ip,ip_and_port);
 
 	if(c != NULL)
 	{

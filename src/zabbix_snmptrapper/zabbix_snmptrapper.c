@@ -198,12 +198,12 @@ int main(int argc, char **argv)
 {
 	int	port;
 	int	ret=SUCCEED;
-	char	line[MAX_STRING_LEN+1];
-	char	port_str[MAX_STRING_LEN+1];
-	char	zabbix_server[MAX_STRING_LEN+1];
-	char	server_key[MAX_STRING_LEN+1];
-	char	value[MAX_STRING_LEN+1];
-	char	str[MAX_STRING_LEN+1];
+	char	line[MAX_STRING_LEN];
+	char	port_str[MAX_STRING_LEN];
+	char	zabbix_server[MAX_STRING_LEN];
+	char	server_key[MAX_STRING_LEN];
+	char	value[MAX_STRING_LEN];
+	char	str[MAX_STRING_LEN];
 
 	char	*hostname;
 	char	*ip;

@@ -157,8 +157,8 @@ DB_ACTION
 	int     delay;
 	int     lastcheck;
 	int	recipient;
-	char    subject[MAX_STRING_LEN+1];
-	char    message[MAX_STRING_LEN+1];
+	char    subject[MAX_STRING_LEN];
+	char    message[MAX_STRING_LEN];
 };
 
 DB_ALERT

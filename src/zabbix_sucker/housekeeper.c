@@ -53,7 +53,7 @@
 /* Remove items having status 'deleted' */
 int housekeeping_items(void)
 {
-	char		sql[MAX_STRING_LEN+1];
+	char		sql[MAX_STRING_LEN];
 	DB_RESULT	*result;
 	int		i,itemid;
 
@@ -71,7 +71,7 @@ int housekeeping_items(void)
 /* Remove hosts having status 'deleted' */
 int housekeeping_hosts(void)
 {
-	char		sql[MAX_STRING_LEN+1];
+	char		sql[MAX_STRING_LEN];
 	DB_RESULT	*result;
 	int		i,hostid;
 
@@ -88,7 +88,7 @@ int housekeeping_hosts(void)
 
 int housekeeping_history(int now)
 {
-	char		sql[MAX_STRING_LEN+1];
+	char		sql[MAX_STRING_LEN];
 	DB_ITEM		item;
 
 	DB_RESULT	*result;
@@ -133,7 +133,7 @@ int housekeeping_history(int now)
 
 int housekeeping_sessions(int now)
 {
-	char	sql[MAX_STRING_LEN+1];
+	char	sql[MAX_STRING_LEN];
 
 	sprintf	(sql,"delete from sessions where lastaccess<%d",now-24*3600);
 	DBexecute(sql);
@@ -143,7 +143,7 @@ int housekeeping_sessions(int now)
 
 int housekeeping_alerts(int now)
 {
-	char		sql[MAX_STRING_LEN+1];
+	char		sql[MAX_STRING_LEN];
 	int		alert_history;
 	DB_RESULT	*result;
 	int		res = SUCCEED;
@@ -170,7 +170,7 @@ int housekeeping_alerts(int now)
 
 int housekeeping_alarms(int now)
 {
-	char		sql[MAX_STRING_LEN+1];
+	char		sql[MAX_STRING_LEN];
 	int		alarm_history;
 	DB_RESULT	*result;
 	int		res = SUCCEED;

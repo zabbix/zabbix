@@ -37,7 +37,7 @@ int	check_security(int sockfd, char *ip_list, int allow_if_empty)
 	int	i;
 	char	*s;
 
-	char	tmp[MAX_STRING_LEN+1];
+	char	tmp[MAX_STRING_LEN];
 
         zabbix_log( LOG_LEVEL_DEBUG, "In check_security()");
 
@@ -57,7 +57,7 @@ int	check_security(int sockfd, char *ip_list, int allow_if_empty)
 
 		zabbix_log( LOG_LEVEL_DEBUG, "Connection from [%s]. Allowed servers [%s] ",sname, ip_list);
 
-		strncpy(tmp,ip_list,MAX_STRING_LEN);
+		strscpy(tmp,ip_list);
         	s=(char *)strtok(tmp,",");
 		while(s!=NULL)
 		{

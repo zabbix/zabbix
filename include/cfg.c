@@ -46,8 +46,8 @@
 int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 {
 	FILE	*file;
-	char	line[MAX_STRING_LEN+1];
-	char	parameter[MAX_STRING_LEN+1];
+	char	line[MAX_STRING_LEN];
+	char	parameter[MAX_STRING_LEN];
 	char	*value;
 	int	lineno;
 	int	i,var;
@@ -71,7 +71,7 @@ int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 		if(line[0]=='#')	continue;
 		if(strlen(line)==1)	continue;
 
-		strncpy(parameter,line,MAX_STRING_LEN);
+		strscpy(parameter,line);
 
 		value=strstr(line,"=");
 
