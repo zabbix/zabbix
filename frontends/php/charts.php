@@ -176,9 +176,26 @@
 		
 		$a=array("1h"=>3600,"2h"=>2*3600,"4h"=>4*3600,"8h"=>8*3600,"12h"=>12*3600,
 			"24h"=>24*3600,"week"=>7*24*3600,"month"=>31*24*3600,"year"=>365*24*3600);
-		foreach($a as $label=>$sec){
-			echo("[-<A HREF=\"charts.php?period=$sec".url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">");
-			echo($label."</A>+]&nbsp;");
+		foreach($a as $label=>$sec)
+		{
+			echo "[";
+			if($HTTP_GET_VARS["period"]>$sec)
+			{
+				$tmp=$HTTP_GET_VARS["period"]-$sec;
+				echo("<A HREF=\"charts.php?period=$tmp".url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">-</A>");
+			}
+			else
+			{
+				echo "-";
+			}
+
+			echo("<A HREF=\"charts.php?period=$sec".url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">");
+			echo($label."</A>");
+
+			$tmp=$HTTP_GET_VARS["period"]+$sec;
+			echo("<A HREF=\"charts.php?period=$tmp".url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">+</A>");
+
+			echo "]&nbsp;";
 		}
 
 //		echo("[<A HREF=\"charts.php?period=".(7*24*3600).url_param("graphid").url_param("from").url_param("keep").url_param("fullscreen")."\">week</A>]&nbsp;");
@@ -223,10 +240,28 @@
 		echo("<b>Move:</b>&nbsp;");
 
 		$day=24;
-		foreach(array(0,1,2,7,14) as $count){
-			$tmp=$day*$count;
-			echo("[-<A HREF=\"charts.php?from=$tmp".url_param("graphid").url_param("period").url_param("keep").url_param("fullscreen")."\">");
-			echo($count."d</A>+]&nbsp;");
+		$a=array("1h"=>1,"2h"=>2,"4h"=>4,"8h"=>8,"12h"=>12,
+			"24h"=>24,"week"=>7*24,"month"=>31*24,"year"=>365*24);
+		foreach($a as $label=>$hours)
+//		foreach(array(0,1,2,7,14) as $count){
+		{
+			echo "[";
+			$tmp=$HTTP_GET_VARS["from"]+$hours;
+			echo("<A HREF=\"charts.php?from=$tmp".url_param("graphid").url_param("period").url_param("keep").url_param("fullscreen")."\">-</A>");
+
+			echo($label);
+
+			if($HTTP_GET_VARS["from"]>=$hours)
+			{
+				$tmp=$HTTP_GET_VARS["from"]-$hours;
+				echo("<A HREF=\"charts.php?from=$tmp".url_param("graphid").url_param("period").url_param("keep").url_param("fullscreen")."\">+</A>");
+			}
+			else
+			{
+				echo "+";
+			}
+
+			echo "]&nbsp;";
 		}
             
 		echo("</div>");
