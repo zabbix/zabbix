@@ -917,11 +917,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				}
 				if($page["file"]=="tr_status.php")
 				{
-					echo "<b>[STATUS OF TRIGGERS]</b></a>";
+					echo "<b>[TRIGGERS]</b></a>";
 				}
 				else
 				{
-					echo "STATUS OF TRIGGERS</a>";
+					echo "TRIGGERS</a>";
 				}
 ?>
 		</td>
@@ -970,11 +970,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 <?php
 				if($page["file"]=="alerts.php")
 				{
-					echo "<b>[ALERT HISTORY]</b></a>";
+					echo "<b>[ALERTS]</b></a>";
 				}
 				else
 				{
-					echo "ALERT HISTORY</a>";
+					echo "ALERTS</a>";
 				}
 ?>
 		</td>
