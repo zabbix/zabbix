@@ -1,4 +1,4 @@
-Changes for 1.1alpha3:
+Changes for 1.1alpha4:
 
  - support of plain text value for screens (Alexei)
  - fixed parsing of command line parameters. Thanks to Slix. (Alexei)
