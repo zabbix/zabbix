@@ -38,8 +38,8 @@
 7.1 pinger.pl
 7.2 PostgreSQL notes
 
-Appendix A (Item configuration examples)
-Appendix B (Trigger configuration examples)
+Appendix A (Examples of item configuration)
+Appendix B (Examples of trigger configuration)
 
 - Chapter 1 (Introduction)
 
@@ -82,7 +82,7 @@ Web-based frontend is used to provide fast and efficient way for Zabbix
 configuration and administration.
 
 Properly configured Zabbix can play most important role in monitoring of IT infrastructure
-for companies with even more than hundred of servers to monitor. 
+for companies with even hundreds of servers to monitor. 
 
 The Zabbix software is free for use. However, if support is an issue for you,
 that is an option as well. Please, contact alex@gobbo.caves.lv to get additional
@@ -161,7 +161,7 @@ zabbix_sucker
 
 DESCRIPTION
 
-The process periodically connects to agents to get updated information on parameters being
+The process periodically connects to agents (either Zavvix native or SNMP) to get updated information on parameters being
 monitored.  Also, the process periodically re-calculates status of triggers. It sends alerts to users
 if required.
 
