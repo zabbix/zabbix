@@ -1,5 +1,6 @@
 Changes for 1.0beta10:
 
+ - fixes in screenedit.php (Alexei)
  - UserParameter does not become UNSUPPORTED anymore (Alexei)
  - added support for zabbix[triggers_count] (Alexei)
  - added support for zabbix[items_unsupported_count] (Alexei)
