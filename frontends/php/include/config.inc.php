@@ -2464,10 +2464,10 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	delete_item($itemid)
 	{
-		$sql="select hostid from items where itemid=$itemid";
-		$result=DBselect($sql);
-		$hostid=DBget_field($result,0,0);
-		delete_sysmaps_host_by_hostid($hostid);
+//		$sql="select hostid from items where itemid=$itemid";
+//		$result=DBselect($sql);
+//		$hostid=DBget_field($result,0,0);
+//		delete_sysmaps_host_by_hostid($hostid);
 
 		$result=delete_triggers_by_itemid($itemid);
 		if(!$result)
