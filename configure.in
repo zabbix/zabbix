@@ -408,7 +408,7 @@ AC_MSG_RESULT(no))
 
 dnl Checks for library functions.
 AC_TYPE_SIGNAL
-#AC_FUNC_GETLOADAVG
+AC_FUNC_GETLOADAVG
 AC_CHECK_FUNCS(socket strtod)
 
 dnl Check if we want to compile everything with static
