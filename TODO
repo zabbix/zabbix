@@ -6,6 +6,7 @@
 latest trigger (item type  = TRAPPER)
  - SNMP traps. Condition to switch expression off.
 
+ - trigger expression for ON->OFF state
  - cannot use "." as key in trigger expressions
  - discuss prefixes diskfree>10K
  - support for suffixes in trigger expressions (K,M,G)
