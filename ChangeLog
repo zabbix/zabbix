@@ -1,5 +1,7 @@
 Changes for 1.0beta11:
 
+ - support for swap sizes >2Gb under Solaris. Thanks to Franky
+ Van Liedekerke. (Alexei)
  - add actions when using templates. (Alexei)
  - fixed refresh of status of triggers. (Alexei) 
  - updated RedHat start-up scripts in misc/init.d/redhat. Thanks
