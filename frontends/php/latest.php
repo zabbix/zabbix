@@ -4,7 +4,6 @@
 	$page["file"] = "latest.php";
 	show_header($page["title"],0,0);
 ?>
-
 <?
 	show_table_header_begin();
 	echo "LATEST DATA";
