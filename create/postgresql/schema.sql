@@ -63,7 +63,7 @@ CREATE TABLE items (
   trapper_hosts		varchar(255)	DEFAULT '' NOT NULL,
   units			varchar(10)	DEFAULT '' NOT NULL,
   multiplier		int4		DEFAULT '0' NOT NULL,
-  delta			int1		DEFAULT '0' NOT NULL,
+  delta			int4		DEFAULT '0' NOT NULL,
   prevorgvalue		float8		DEFAULT NULL,
   PRIMARY KEY (itemid),
   FOREIGN KEY (hostid) REFERENCES hosts
@@ -176,10 +176,10 @@ CREATE TABLE actions (
   subject		varchar(255)	DEFAULT '' NOT NULL,
   message		text		DEFAULT '' NOT NULL,
   nextcheck		int4		DEFAULT '0' NOT NULL,
-  recipient		int1		DEFAULT '0' NOT NULL,
+  recipient		int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (actionid),
-  FOREIGN KEY (triggerid) REFERENCES triggers,
-  FOREIGN KEY (userid) REFERENCES users
+  FOREIGN KEY (triggerid) REFERENCES triggers
+--  FOREIGN KEY (userid) REFERENCES users
 );
 
 --
