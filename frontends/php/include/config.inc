@@ -4,6 +4,27 @@
 	$USER_DETAILS	="";
 	$ERROR_MSG	="";
 
+//	The hash has form <md5sum of triggerid>,<sum of priorities>
+	function	calc_trigger_hash()
+	{
+		$priorities=0;
+		for($i=0;$i<=5;$i++)
+		{
+	        	$result=DBselect("select count(*) from triggers t,hosts h,items i,functions f  where t.istrue=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status in (0,2) and t.priority=$i");
+			$priorities+=(1000^$i)*DBget_field($result,0,0);
+		}
+		$triggerids="";
+	       	$result=DBselect("select t.triggerid from triggers t,hosts h,items i,functions f  where t.istrue=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status in (0,2)");
+		for($i=0;$i<DBnum_rows($result);$i++)
+		{
+			$triggerids="$triggerids,".DBget_field($result,$i,0);
+		}
+		$md5sum=md5($triggerids);
+
+		return	"$priorities,$md5sum";
+
+	}
+
 	function	get_item_by_itemid($itemid)
 	{
 		global	$ERROR_MSG;
@@ -22,7 +43,24 @@
 		return	$item;
 	}
 
-	function	select_trigger_by_triggerid($triggerid)
+	function	get_function_by_functionid($functionid)
+	{
+		global	$ERROR_MSG;
+
+		$sql="select * from functions where functionid=$functionid"; 
+		$result=DBselect($sql);
+		if(DBnum_rows($result) == 1)
+		{
+			return	DBfetch($result);
+		}
+		else
+		{
+			$ERROR_MSG="No function with functionid=[$functionid]";
+		}
+		return	$item;
+	}
+
+	function	get_trigger_by_triggerid($triggerid)
 	{
 		global	$ERROR_MSG;
 
@@ -1476,10 +1514,59 @@
 		return	DBexecute($sql);
 	}
 
+	# Add everything based on host_templateid
+
+	function	add_using_host_template($hostid,$host_templateid)
+	{
+		$sql="select itemid from items where hostid=$host_templateid";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			$item=get_item_by_itemid($row["itemid"]);
+			$itemid=add_item($item["description"],$item["key_"],$hostid,$item["delay"],$item["history"],$item["status"],$item["type"],$item["snmp_community"],$item["snmp_oid"],$item["value_type"]);
+
+			$sql="select distinct t.triggerid from triggers t,functions f where f.itemid=".$row["itemid"]." and f.triggerid=t.triggerid";
+			$result2=DBselect($sql);
+			while($row2=DBfetch($result2))
+			{
+				$trigger=get_trigger_by_triggerid($row2["triggerid"]);
+// Cannot use add_trigger here
+				$sql="insert into triggers  (description,priority,istrue,comments,url) values ('".$trigger["description"]."',".$trigger["priority"].",".$trigger["istrue"].",'".$trigger["comments"]."','".$trigger["url"]."')";
+				$result4=DBexecute($sql);
+				$triggerid=DBinsert_id($result4,"triggers","triggerid");
+
+				$sql="select functionid from functions where triggerid=".$row2["triggerid"]." and itemid=".$row["itemid"];
+				$result3=DBselect($sql);
+				while($row3=DBfetch($result3))
+				{
+					$function=get_function_by_functionid($row3["functionid"]);
+					$sql="insert into functions (itemid,triggerid,function,parameter) values ($itemid,$triggerid,'".$function["function"]."',".$function["parameter"].")";
+					$result4=DBexecute($sql);
+					$functionid=DBinsert_id($result4,"functions","functionid");
+					$sql="update triggers set expression='".$trigger["expression"]."' where triggerid=$triggerid";
+					DBexecute($sql);
+					$trigger["expression"]=str_replace("{".$row3["functionid"]."}","{".$functionid."}",$trigger["expression"]);
+					$sql="update triggers set expression='".$trigger["expression"]."' where triggerid=$triggerid";
+					DBexecute($sql);
+				}
+			}
+		}
+
+		return SUCCEED;
+	}
+
 	# Add Host definition
 
-	function	add_host($host,$port,$status,$template,$useip,$ip)
+	function	add_host($host,$port,$status,$template,$useip,$ip,$host_templateid)
 	{
+		global	$ERROR_MSG;
+
+		if(($template=="true") && ($host_templateid!=0))
+		{
+			$ERROR_MSG="Choose either 'Add zabbix_agent parameters' or 'Use host as template' option";
+			return	0;
+		}
+
 		if( isset($useip) && ($useip=="on") )
 		{
 			$useip=1;
@@ -1500,6 +1587,10 @@
 		if($template=="true")
 		{
 			$result=add_from_templates($hostid,$host);
+		}
+		if($host_templateid != 0)
+		{
+			$result=add_using_host_template($hostid,$host_templateid);
 		}
 		return	$result;
 	}
@@ -2207,7 +2298,7 @@
 	{
 		if(isset($triggerid))
 		{
-			$trigger=select_trigger_by_triggerid($triggerid);
+			$trigger=get_trigger_by_triggerid($triggerid);
 	
 			$expression=explode_exp($trigger["expression"],0);
 			$description=$trigger["description"];
