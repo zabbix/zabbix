@@ -66,14 +66,8 @@
 
 <?php
 	show_table_header("NETWORK MAPS");
-	echo "<TABLE BORDER=0 align=center COLS=4 WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
-	echo "<TR BGCOLOR=\"#CCCCCC\">";
-	echo "<TD WIDTH=3% NOSAVE><B>Id</B></TD>";
-	echo "<TD><B>Name</B></TD>";
-	echo "<TD WIDTH=5% NOSAVE><B>Width</B></TD>";
-	echo "<TD WIDTH=5% NOSAVE><B>Height</B></TD>";
-	echo "<TD WIDTH=15% NOSAVE><B>Actions</B></TD>";
-	echo "</TR>";
+	table_begin();
+	table_header(array(S_ID,S_NAME,S_WIDTH,S_HEIGHT,S_ACTIONS));
 
 	$result=DBselect("select s.sysmapid,s.name,s.width,s.height from sysmaps s order by s.name");
 	$col=0;
@@ -84,22 +78,13 @@
 	                continue;
 	        }
 
-		if($col==1)
-		{
-			echo "<TR BGCOLOR=#EEEEEE>";
-			$col=0;
-		} else
-		{
-			echo "<TR BGCOLOR=#DDDDDD>";
-			$col=1;
-		}
-	
-		echo "<TD>".$row["sysmapid"]."</TD>";
-		echo "<TD><a href=\"sysmap.php?sysmapid=".$row["sysmapid"]."\">".$row["name"]."</a></TD>";
-		echo "<TD>".$row["width"]."</TD>";
-		echo "<TD>".$row["height"]."</TD>";
-		echo "<TD><A HREF=\"sysmaps.php?sysmapid=".$row["sysmapid"]."#form\">Change</A></TD>";
-		echo "</TR>";
+		table_row(array(
+			$row["sysmapid"],
+			"<a href=\"sysmap.php?sysmapid=".$row["sysmapid"]."\">".$row["name"]."</a>",
+			$row["width"],
+			$row["height"],
+			"<A HREF=\"sysmaps.php?sysmapid=".$row["sysmapid"]."#form\">Change</A>"
+			),$col++);
 	}
 	if(DBnum_rows($result)==0)
 	{
@@ -107,7 +92,7 @@
 			echo "<TD COLSPAN=5 ALIGN=CENTER>-No maps defined-</TD>";
 			echo "<TR>";
 	}
-	echo "</TABLE>";
+	table_end();
 ?>
 
 <?php
