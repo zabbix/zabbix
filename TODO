@@ -60,7 +60,6 @@ latest trigger (item type  = TRAPPER)
 the agent with a predefined API that can return values to suckerd (for both 
 suckerd and agentd)
  - monitoring of log files
- - escalation
  - agents to execute command
  - add complete support for SNMP trapping
  - zabbix_trapperd does not start if PostgreSQL and DBConnectOnEach=1
@@ -137,7 +136,6 @@ Vel viens wishlists ir pie "IT Services", pielikt pie
  - [7] SLA algorithm (A - 0%, B - 100% -> availability of AB = 50%)
  - [7] IT Service % must start at 01.01.20xx, not first day of the week
  - [7] ALARMS. Ability to select events by specifying date from/to.
- - [8] escalation (if trigger is ON 30 sec, send email to someone else)
  - [9] History of who and when changed trigger comment. As starting point: who and when
  did latest changes.
  - [9] ... the history to be used to see who did changes and who wrote specific parts
