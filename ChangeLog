@@ -1,9 +1,9 @@
 Changes for 1.0alpha7:
 
+ - added section about configuration of Apache
  - name of server included to descriptions of template triggers
  - link from list of triggers to trigger change form 
  - changed host form to ask about values from template
-
  - deleted link to comments.html in tr_status.html
  - fixed Enabled/Disabled checkbox in trigger form
  - added real links to page About

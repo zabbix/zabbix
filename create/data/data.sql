@@ -30,21 +30,21 @@ insert into items_template (itemtemplateid,description,key_,delay)
 insert into items_template (itemtemplateid,description,key_,delay)
 	values (4,'Free disk space on /usr','diskfree[/usr]', 30);
 insert into items_template (itemtemplateid,description,key_,delay)
-	values (5,'Free number of inodes on /','inodefree[/]', 30);
+	values (5,'Free number of inodes on /','inodefree[/]', 60);
 insert into items_template (itemtemplateid,description,key_,delay)
-	values (6,'Free number of inodes on /opt','inodefree[/opt]', 30);
+	values (6,'Free number of inodes on /opt','inodefree[/opt]', 60);
 insert into items_template (itemtemplateid,description,key_,delay)
-	values (7,'Free number of inodes on /tmp','inodefree[/tmp]', 30);
+	values (7,'Free number of inodes on /tmp','inodefree[/tmp]', 60);
 insert into items_template (itemtemplateid,description,key_,delay)
-	values (8,'Free number of inodes on /usr','inodefree[/usr]', 30);
+	values (8,'Free number of inodes on /usr','inodefree[/usr]', 60);
 insert into items_template (itemtemplateid,description,key_,delay)
 	values (9,'Number of processes','system[proccount]', 30);
 insert into items_template (itemtemplateid,description,key_,delay)
-	values (10,'Processor load','system[procload]', 10);
+	values (10,'Processor load','system[procload]', 5);
 insert into items_template (itemtemplateid,description,key_,delay)
-	values (11,'Processor load5','system[procload5]', 30);
+	values (11,'Processor load5','system[procload5]', 10);
 insert into items_template (itemtemplateid,description,key_,delay)
-	values (12,'Processor load15','system[procload15]', 60);
+	values (12,'Processor load15','system[procload15]', 20);
 insert into items_template (itemtemplateid,description,key_,delay)
 	values (13,'Number of running processes','system[procrunning]', 30);
 insert into items_template (itemtemplateid,description,key_,delay)
@@ -66,7 +66,7 @@ insert into items_template (itemtemplateid,description,key_,delay)
 insert into items_template (itemtemplateid,description,key_,delay)
 	values (23,'Free disk space on /home','diskfree[/home]', 30);
 insert into items_template (itemtemplateid,description,key_,delay)
-	values (24,'Free number of inodes on /home','inodefree[/home]', 30);
+	values (24,'Free number of inodes on /home','inodefree[/home]', 60);
 insert into items_template (itemtemplateid,description,key_,delay)
 	values (25,'Free disk space on /var','diskfree[/var]', 30);
 insert into items_template (itemtemplateid,description,key_,delay)
