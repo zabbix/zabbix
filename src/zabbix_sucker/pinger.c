@@ -211,7 +211,7 @@ int	do_ping(void)
 			}
 			else
 			{
-				snprintf(tmp,sizeof(tmp)-1,"%f",mseconds/100);
+				snprintf(tmp,sizeof(tmp)-1,"%f",mseconds/1000);
 				process_value(SERVER_ICMPPING_KEY,ip,"1");
 				process_value(SERVER_ICMPPINGSEC_KEY,ip,tmp);
 			}
