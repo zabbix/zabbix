@@ -665,7 +665,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="srv_status.php">
 <?
 				if($page["file"]=="srv_status.php")
 				{
@@ -870,7 +869,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="services.php">
 <?
 				if($page["file"]=="services.php")
 				{
