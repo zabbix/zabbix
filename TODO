@@ -14,7 +14,6 @@ BUGS:
  - mass-adding of actions
  - BUG. No horizontal lines. Replace ImageDashedLine() to gdImageLine() plus
    ImageSetStyle()
- - BUG. Plain text values.
 
 PERFORMANCE IMPROVEMENTS:
 

@@ -1166,9 +1166,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		$sql="select clock,value from history where itemid=$itemid and clock>$from and clock<$till order by clock";
 		$result=DBselect($sql);
-		echo $sql;
 
-		echo "<PRE>";
+		echo "<PRE>\n";
 		for($i=0;$i<DBnum_rows($result);$i++)
 		{
 			$clock=DBget_field($result,$i,0);
