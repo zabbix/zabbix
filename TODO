@@ -27,7 +27,6 @@ TKOM:
 
 TELECENTRS:
 
- - in maps: Title: label+hostname
  - hard-linked templates (graphs for new hosts to be added automatically)
  - clickable map in map configuration
  - rus/lat characters for graphs
