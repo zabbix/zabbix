@@ -136,7 +136,14 @@
 ?>
 
 <?php
-	if(isset($HTTP_GET_VARS["mediatypeid"]))
+	$type=@iif(isset($HTTP_GET_VARS["type"]),$HTTP_GET_VARS["type"],0);
+	$description=@iif(isset($HTTP_GET_VARS["description"]),$HTTP_GET_VARS["description"],"");
+	$smtp_server=@iif(isset($HTTP_GET_VARS["smtp_server"]),$HTTP_GET_VARS["smtp_server"],"localhost");
+	$smtp_helo=@iif(isset($HTTP_GET_VARS["smtp_helo"]),$HTTP_GET_VARS["smtp_helo"],"localhost");
+	$smtp_email=@iif(isset($HTTP_GET_VARS["smtp_email"]),$HTTP_GET_VARS["smtp_email"],"zabbix@localhost");
+	$exec_path=@iif(isset($HTTP_GET_VARS["exec_path"]),$HTTP_GET_VARS["exec_path"],"");
+
+	if(isset($HTTP_GET_VARS["mediatypeid"]) && !isset($HTTP_GET_VARS["type"]))
 	{
 		$result=DBselect("select mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path from media_type where mediatypeid=".$HTTP_GET_VARS["mediatypeid"]);
 		$mediatypeid=DBget_field($result,0,0);
@@ -147,15 +154,7 @@
 		$smtp_email=DBget_field($result,0,5);
 		$exec_path=DBget_field($result,0,6);
 	}
-	else
-	{
-		$type=@iif(isset($HTTP_GET_VARS["type"]),$HTTP_GET_VARS["type"],0);
-		$description=@iif(isset($HTTP_GET_VARS["description"]),$HTTP_GET_VARS["description"],"");
-		$smtp_server=@iif(isset($HTTP_GET_VARS["smtp_server"]),$HTTP_GET_VARS["smtp_server"],"localhost");
-		$smtp_helo=@iif(isset($HTTP_GET_VARS["smtp_helo"]),$HTTP_GET_VARS["smtp_helo"],"localhost");
-		$smtp_email=@iif(isset($HTTP_GET_VARS["smtp_email"]),$HTTP_GET_VARS["smtp_email"],"zabbix@localhost");
-		$exec_path=@iif(isset($HTTP_GET_VARS["exec_path"]),$HTTP_GET_VARS["exec_path"],"");
-	}
+
 ?>
 
 <?php
