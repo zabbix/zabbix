@@ -84,15 +84,8 @@
 	}
 	$result=DBselect($sql);
 
-//	echo "<TABLE WIDTH=100% align=center BORDER=0 BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TABLE WIDTH=100% align=center BGCOLOR=\"#AAAAAA\" BORDER=0 cellspacing=1 cellpadding=3>";
-	echo "<TR BGCOLOR=\"#CCCCCC\">";
-	echo "<TD width=20%><b>".S_TIME."</b></TD>";
-	echo "<TD width=10%><b>".S_USER."</b></TD>";
-	echo "<TD width=10%><b>".S_RESOURCE."</b></TD>";
-	echo "<TD width=10%><b>".S_ACTION."</b></TD>";
-	echo "<TD><b>".S_DETAILS."</b></TD>";
-	echo "</TR>";
+	table_begin();
+	table_header(array(S_TIME,S_USER,S_RESOURCE,S_ACTION,S_DETAILS));
 	$col=0;
 	$i=0;
 	while($row=DBfetch($result))
@@ -102,74 +95,65 @@
 		{
 			continue;
 		}
-//		if(!check_right_on_trigger("R",$row["triggerid"]))
-//		{
-//			continue;
-//		}
-		if($col++%2==0)	{ echo "<tr bgcolor=#DDDDDD>"; }
-		else		{ echo "<tr bgcolor=#EEEEEE>"; }
+		if($i>100)	break;
 
-		if($col>100)	break;
-
-		echo "<TD>",date("Y.M.d H:i:s",$row["clock"]),"</TD>";
-		echo "<TD>",$row["alias"],"</TD>";
-		echo "<TD>";
 		if($row["resource"]==AUDIT_RESOURCE_USER)
 		{
-			echo S_USER;
+			$resource=S_USER;
 		}
 		else if($row["resource"]==AUDIT_RESOURCE_ZABBIX_CONFIG)
 		{
-			echo S_CONFIGURATION_OF_ZABBIX;
+			$resource=S_CONFIGURATION_OF_ZABBIX;
 		}
 		else if($row["resource"]==AUDIT_RESOURCE_MEDIA_TYPE)
 		{
-			echo S_MEDIA_TYPE;
+			$resource=S_MEDIA_TYPE;
 		}
 		else if($row["resource"]==AUDIT_RESOURCE_HOST)
 		{
-			echo S_HOST;
+			$resource=S_HOST;
 		}
 		else if($row["resource"]==AUDIT_RESOURCE_ACTION)
 		{
-			echo S_ACTION;
+			$resource=S_ACTION;
 		}
 		else if($row["resource"]==AUDIT_RESOURCE_GRAPH)
 		{
-			echo S_GRAPH;
+			$resource=S_GRAPH;
 		}
 		else if($row["resource"]==AUDIT_RESOURCE_GRAPH_ELEMENT)
 		{
-			echo S_GRAPH_ELEMENT;
+			$resource=S_GRAPH_ELEMENT;
 		}
 		else
 		{
-			echo S_UNKNOWN_RESOURCE;
+			$resource=S_UNKNOWN_RESOURCE;
 		}
-		echo "</TD>";
-		echo "<TD>";
 		if($row["action"]==AUDIT_ACTION_ADD)
 		{
-			echo S_ADDED;
+			$action=S_ADDED;
 		}
 		else if($row["action"]==AUDIT_ACTION_UPDATE)
 		{
-			echo S_UPDATED;
+			$action=S_UPDATED;
 		}
 		else if($row["action"]==AUDIT_ACTION_DELETE)
 		{
-			echo S_DELETED;
+			$action=S_DELETED;
 		}
 		else
 		{
-			echo S_UNKNOWN_ACTION;
+			$action=S_UNKNOWN_ACTION;
 		}
-		echo "</TD>";
-		echo "<TD>",$row["details"],"</TD>";
-		echo "</TR>";
-		cr();
+		table_row(array(
+			date("Y.M.d H:i:s",$row["clock"]),
+			$row["alias"],
+			$resource,
+			$action,
+			$row["details"]
+		),$col++);
 	}
-	echo "</TABLE>";
+	table_end();
 ?>
 </FONT>
 </TR>
