@@ -17,6 +17,7 @@ the agent with a predefined API that can return values to suckerd.
 
 Not ready yet:
 
+ - fix check_right() 
  - agent to send something back in case of timeout
  - monitoring of services for different interfaces
  - get rid of false warning messages (like unable to insert ...)
