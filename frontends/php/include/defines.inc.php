@@ -30,6 +30,9 @@
 	define("AUDIT_RESOURCE_ZABBIX_CONFIG",	2);
 	define("AUDIT_RESOURCE_MEDIA_TYPE",	3);
 	define("AUDIT_RESOURCE_HOST",		4);
+	define("AUDIT_RESOURCE_ACTION",		5);
+	define("AUDIT_RESOURCE_GRAPH",		6);
+
 
 
 	define("HOST_STATUS_MONITORED",		0);

@@ -74,7 +74,12 @@
 		}
 		if($_GET["register"]=="delete")
 		{
+			$host-get_host_by_hostid($_GET["hostid"]);
 			$result=delete_host($_GET["hostid"]);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,"Host [".addslashes($host["name"])."]");
+			}
 			show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 			unset($_GET["hostid"]);
 		}
