@@ -2003,7 +2003,7 @@ int	UPTIME(const char *cmd, const char *parameter,double  *value)
 	/* close kstat */
 	kstat_close(kc);
 	*value=(double)secs;
-	reutrn SYSINFO_RET_OK;
+	return SYSINFO_RET_OK;
 #else
 	return	SYSINFO_RET_FAIL;
 #endif
