@@ -43,27 +43,27 @@
 	echo "<form method=\"get\" action=\"config.php\">";
 	echo "SMTP server";
 	show_table2_h_delimiter();
-	echo "<input name=\"smtp_server\" value=\"".$config["smtp_server"]."\"size=40>";
+	echo "<input class=\"biginput\" name=\"smtp_server\" value=\"".$config["smtp_server"]."\"size=40>";
 
 	show_table2_v_delimiter();
 	echo "Value for SMTP HELO authentification (can be empty)";
 	show_table2_h_delimiter();
-	echo "<input name=\"smtp_helo\" value=\"".$config["smtp_helo"]."\"size=40>";
+	echo "<input class=\"biginput\" name=\"smtp_helo\" value=\"".$config["smtp_helo"]."\"size=40>";
 
 	show_table2_v_delimiter();
 	echo "ZABBIX email address to send alarms from";
 	show_table2_h_delimiter();
-	echo "<input name=\"smtp_email\" value=\"".$config["smtp_email"]."\"size=40>";
+	echo "<input class=\"biginput\" name=\"smtp_email\" value=\"".$config["smtp_email"]."\"size=40>";
 
 	show_table2_v_delimiter();
 	echo "Do not keep alerts older than (in days)";
 	show_table2_h_delimiter();
-	echo "<input name=\"alert_history\" value=\"".$config["alert_history"]."\"size=8>";
+	echo "<input class=\"biginput\" name=\"alert_history\" value=\"".$config["alert_history"]."\"size=8>";
 
 	show_table2_v_delimiter();
 	echo "Do not keep alarms older than (in days)";
 	show_table2_h_delimiter();
-	echo "<input name=\"alarm_history\" value=\"".$config["alarm_history"]."\"size=8>";
+	echo "<input class=\"biginput\" name=\"alarm_history\" value=\"".$config["alarm_history"]."\"size=8>";
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"update\">";

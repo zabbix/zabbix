@@ -99,21 +99,21 @@
 	echo "<form method=\"get\" action=\"graphs.php\">";
 	if(isset($HTTP_GET_VARS["graphid"]))
 	{
-		echo "<input name=\"graphid\" type=\"hidden\" value=".$HTTP_GET_VARS["graphid"].">";
+		echo "<input class=\"biginput\" name=\"graphid\" type=\"hidden\" value=".$HTTP_GET_VARS["graphid"].">";
 	}
 	echo "Name";
 	show_table2_h_delimiter();
-	echo "<input name=\"name\" value=\"$name\" size=32>";
+	echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=32>";
 
 	show_table2_v_delimiter();
 	echo "Width";
 	show_table2_h_delimiter();
-	echo "<input name=\"width\" size=5 value=\"$width\">";
+	echo "<input class=\"biginput\" name=\"width\" size=5 value=\"$width\">";
 
 	show_table2_v_delimiter();
 	echo "Height";
 	show_table2_h_delimiter();
-	echo "<input name=\"height\" size=5 value=\"$height\">";
+	echo "<input class=\"biginput\" name=\"height\" size=5 value=\"$height\">";
 
 	show_table2_v_delimiter2();
 	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
