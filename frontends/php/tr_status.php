@@ -201,7 +201,7 @@
 			<INPUT NAME=\"onlytrue\" TYPE=\"HIDDEN\" value=\"$onlytrue\">
 			<INPUT NAME=\"noactions\" TYPE=\"HIDDEN\" value=\"$noactions\">			
 		        <INPUT NAME=\"select\" TYPE=\"HIDDEN\" value=\"$select\">
-			</form>";	
+			</form>";
 		}
 		show_table_header_end();
 		echo "<br>";

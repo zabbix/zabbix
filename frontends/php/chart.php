@@ -21,7 +21,7 @@
 	$sizeY=200;
 
 	$shiftX=10;
-	$shiftY=13;
+	$shiftY=17;
 
 	$nodata=1;	
 
@@ -59,8 +59,11 @@
 	}
 	$item=get_item_by_itemid($itemid);
 	$host=get_host_by_hostid($item["hostid"]);
-	ImageString($im, 4,$sizeX/2-50,-1, $host["host"].":".$item["description"] , $darkred);
-//	ImageStringUp($im,1,0,$sizeY, $host["host"].":".$item["description"], $darkred);
+
+	$str=$host["host"].":".$item["description"];
+	$x=imagesx($im)/2-ImageFontWidth(4)*strlen($str)/2;
+	ImageString($im, 4,$x,1, $str , $darkred);
+//	ImageString($im, 4,$sizeX/2-50,1, $host["host"].":".$item["description"] , $darkred);
 
 	$from_time = time(NULL)-$period-3600*$from;
 	$to_time   = time(NULL)-3600*$from;
@@ -103,12 +106,7 @@
 			$y1=$sizeY-$y1;
 			$y2=$sizeY-$y2;
 
-//		echo $x1," - ",$x2," - ",$y1," - ",$y2,"<Br>";
 			ImageLine($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX,$y2+$shiftY,$darkgreen);
-//			ImageSetPixel($im,$x2+$shiftX,$y2+$shiftY,$darkred);
-//			ImageSetPixel($im,$x2+$shiftX+1,$y2+$shiftY,$darkred);
-//			ImageSetPixel($im,$x2+$shiftX-1,$y2+$shiftY,$darkred);
-//			ImageSetPixel($im,$x2+$shiftX,$y2+$shiftY+1,$darkred);
 //			ImageSetPixel($im,$x2+$shiftX,$y2+$shiftY-1,$darkred);
 		}
 	}
@@ -139,7 +137,7 @@
 		ImageString($im, 2,$sizeX/2-50,                $sizeY+$shiftY+3, "NO DATA FOUND FOR THIS PERIOD" , $darkred);
 	}
 
-	ImageStringUp($im,0,2*$shiftX+$sizeX+40,$sizeY+2*$shiftY, "http://zabbix.sourceforge.net", $gray);
+	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, "http://zabbix.sourceforge.net", $gray);
 
 	ImagePng($im); 
 	ImageDestroy($im); 

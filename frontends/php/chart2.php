@@ -5,8 +5,10 @@
 	
 #	graphid
 
-#?	period
-#?	from
+#	period
+#	from
+
+	$start_time=time(NULL);
 
 	if(!isset($period))
 	{
@@ -29,14 +31,14 @@
 
 	$nodata=1;	
 
-	Header( "Content-type:  text/html"); 
-//	Header( "Content-type:  image/png"); 
+//	Header( "Content-type:  text/html"); 
+	Header( "Content-type:  image/png"); 
 	Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 
 	$result2=DBselect("select gi.itemid,i.description,gi.color,h.host from graphs_items gi,items i,hosts h where gi.itemid=i.itemid and gi.graphid=$graphid and i.hostid=h.hostid order by gi.gitemid");
 
 	$shiftX=10;
-	$shiftYup=13;
+	$shiftYup=17;
 	$shiftYdown=7+15*DBnum_rows($result2);
 
 	$im = imagecreate($sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10+50); 
@@ -81,7 +83,9 @@
 	}
 
 	$graph=get_graph_by_graphid($graphid);
-	ImageString($im, 4,$sizeX/2-50,-1, $graph["name"] , $darkred);
+	$str=$graph["name"];
+	$x=imagesx($im)/2-ImageFontWidth(4)*strlen($str)/2;
+	ImageString($im, 4,$x,1, $str , $darkred);
 
 	$from_time = time(NULL)-$period-3600*$from;
 	$to_time   = time(NULL)-3600*$from;
@@ -180,7 +184,10 @@
 	}
 
 #	ImageString($im,0,$shiftX+$sizeX-85,$sizeY+$shiftYup+25, "http://zabbix.sourceforge.net", $gray);
-	ImageStringUp($im,0,2*$shiftX+$sizeX+40,$sizeY+$shiftYdown+$shiftYup, "http://zabbix.sourceforge.net", $gray);
+	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, "http://zabbix.sourceforge.net", $gray);
+
+	$end_time=time(NULL);
+	ImageString($im, 0,imagesx($im)-100,imagesy($im)-12,"Generated in ".($end_time-$start_time)." sec", $gray);
 
 	ImagePng($im); 
 	ImageDestroy($im); 

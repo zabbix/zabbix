@@ -7,6 +7,8 @@
 #	type
 #	trendavg
 
+	$start_time=time(NULL);
+
 	if(!isset($type))
 	{
 		$type="15min";
@@ -79,6 +81,26 @@
 	$min=array();
 	$max=array();
 	$avg=array();
+#if($DB_TYPE!="MYSQL")
+if(0)
+{
+//	$sql="select round(900*((clock+3*3600)%(24*3600))/(24*3600)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid=$itemid and clock>$from_time and clock<$to_time group by round(900*((clock+3*3600)%(24*3600))/(24*3600))";
+	$p=$to_time-$from_time;
+	$z=$from_time%$p;
+	$sql="select round(900*((clock+$z)%($p))/($p)) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max from history where itemid=$itemid and clock>$from_time and clock<$to_time group by round(900*((clock+$z)%($p))/($p))";
+	$result=DBselect($sql);
+	while($row=DBfetch($result))
+	{
+		$i=$row["i"];
+		$count[$i]=$row["count"];
+		$min[$i]=$row["min"];
+		$max[$i]=$row["max"];
+		$avg[$i]=$row["avg"];
+		$nodata=0;
+	}
+}
+else
+{
 	for($i=0;$i<900;$i++)
 	{
 		$result=DBselect("select count(value),min(value),max(value),avg(value) from history where itemid=$itemid and clock>$from_time+$i*($to_time-$from_time)/(900-50) and clock<$from_time+($i+1)*($to_time-$from_time)/(900-50)");
@@ -91,6 +113,8 @@
 			$nodata=0;
 		}
 	}
+}
+
 
 	for($i=0;$i<=$sizeY;$i+=$sizeY/5)
 	{
@@ -212,7 +236,10 @@
 	ImageString($im, 1,$shiftX+20, $sizeY+$shiftY+15, "AVG" , $darkyellow);
 	ImageString($im, 1,$shiftX+40, $sizeY+$shiftY+15, "MAX" , $darkred);
 
-	ImageStringUp($im,0,2*$shiftX+$sizeX+40,$sizeY+2*$shiftY, "http://zabbix.sourceforge.net", $gray);
+	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, "http://zabbix.sourceforge.net", $gray);
+
+	$end_time=time(NULL);
+	ImageString($im, 0,imagesx($im)-100,imagesy($im)-12,"Generated in ".($end_time-$start_time)." sec", $gray);
 
 	ImagePng($im); 
 	ImageDestroy($im); 

@@ -41,11 +41,11 @@
 <?
 	if(!isset($start))
 	{
-		$sql="select t.description,a.clock,a.value,t.triggerid from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit 100";
+		$sql="select t.description,a.clock,a.value,t.triggerid from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit 1000";
 	}
 	else
 	{
-		$sql="select t.description,a.clock,a.value,t.triggerid from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit ".($start+100);
+		$sql="select t.description,a.clock,a.value,t.triggerid from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit ".($start+1000);
 	}
 	$result=DBselect($sql);
 
@@ -71,6 +71,8 @@
 		}
 		if($col++%2==0)	{ echo "<tr bgcolor=#DDDDDD>"; }
 		else		{ echo "<tr bgcolor=#EEEEEE>"; }
+
+		if($col>100)	break;
 
 		echo "<TD>",date("Y.M.d H:i:s",$row["clock"]),"</TD>";
 		$description=$row["description"];

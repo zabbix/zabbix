@@ -309,6 +309,10 @@
         {
                 $servicedownid_=DBget_field($result,$i,0);
                 $name_=DBget_field($result,$i,2);
+		if( strstr($name_,"%s"))
+		{
+			$name_=expand_trigger_description(DBget_field($result,$i,1));
+		}
 		echo "<OPTION VALUE='$servicedownid_'>$name_";
         }
         echo "</SELECT>";

@@ -524,6 +524,7 @@ int	get_value(double *result,char *result_str,DB_ITEM *item)
 		res=get_value_SNMPv1(result,result_str,item);
 #else
 		zabbix_log(LOG_LEVEL_WARNING, "Support of SNMP parameters was no compiled in");
+		res=NOTSUPPORTED;
 #endif
 	}
 	else
@@ -542,36 +543,38 @@ int get_minnextcheck(int now)
 	DB_RESULT	*result;
 
 	int		res;
-	int		count;
 
 /* Host status	0 == MONITORED
 		1 == NOT MONITORED
 		2 == UNREACHABLE */ 
+#ifdef TESTTEST
+	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and h.hostid%%%d=%d and i.key_<>'%s'",now,CONFIG_SUCKERD_FORKS-2,sucker_num-2,SERVER_STATUS_KEY);
+#else
 	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and i.itemid%%%d=%d and i.key_<>'%s'",now,CONFIG_SUCKERD_FORKS-2,sucker_num-2,SERVER_STATUS_KEY);
+#endif
 	result = DBselect(sql);
 
-	if( DBis_empty(result) == SUCCEED)
+	if( DBnum_rows(result) == 0)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "No items to update for minnextcheck.");
-		DBfree_result(result);
-		return FAIL; 
+		res = FAIL; 
 	}
-
-	count = atoi(DBget_field(result,0,0));
-
-	if( count == 0 )
+	else
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "No records for get_minnextcheck");
-		DBfree_result(result);
-		return	FAIL;
+		if( atoi(DBget_field(result,0,0)) == 0)
+		{
+			res = FAIL;
+		}
+		else
+		{
+			res = atoi(DBget_field(result,0,1));
+		}
 	}
-
-	res = atoi(DBget_field(result,0,1));
-
 	DBfree_result(result);
+
 	return	res;
 }
-
+/* Update special host's item - "status" */
 void update_key_status(int hostid,int host_status)
 {
 	char		sql[MAX_STRING_LEN+1];
@@ -586,55 +589,55 @@ void update_key_status(int hostid,int host_status)
 	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where h.hostid=i.hostid and h.hostid=%d and i.key_='%s'", hostid,SERVER_STATUS_KEY);
 	result = DBselect(sql);
 
-	if( DBis_empty(result) == SUCCEED)
+	if( DBnum_rows(result) == 0)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "No items to update.");
-		DBfree_result(result);
-		return; 
-	}
-
-	item.itemid=atoi(DBget_field(result,0,0));
-	item.key=DBget_field(result,0,1);
-	item.host=DBget_field(result,0,2);
-	item.port=atoi(DBget_field(result,0,3));
-	item.delay=atoi(DBget_field(result,0,4));
-	item.description=DBget_field(result,0,5);
-	item.nextcheck=atoi(DBget_field(result,0,6));
-	item.type=atoi(DBget_field(result,0,7));
-	item.snmp_community=DBget_field(result,0,8);
-	item.snmp_oid=DBget_field(result,0,9);
-	item.useip=atoi(DBget_field(result,0,10));
-	item.ip=DBget_field(result,0,11);
-	item.history=atoi(DBget_field(result,0,12));
-	s=DBget_field(result,0,13);
-	if(s==NULL)
-	{
-		item.lastvalue_null=1;
 	}
 	else
 	{
-		item.lastvalue_null=0;
-		item.lastvalue_str=s;
-		item.lastvalue=atof(s);
-	}
-	s=DBget_field(result,0,14);
-	if(s==NULL)
-	{
-		item.prevvalue_null=1;
-	}
-	else
-	{
-		item.prevvalue_null=0;
-		item.prevvalue_str=s;
-		item.prevvalue=atof(s);
-	}
-	item.hostid=atoi(DBget_field(result,0,15));
-	item.value_type=atoi(DBget_field(result,0,17));
+		item.itemid=atoi(DBget_field(result,0,0));
+		item.key=DBget_field(result,0,1);
+		item.host=DBget_field(result,0,2);
+		item.port=atoi(DBget_field(result,0,3));
+		item.delay=atoi(DBget_field(result,0,4));
+		item.description=DBget_field(result,0,5);
+		item.nextcheck=atoi(DBget_field(result,0,6));
+		item.type=atoi(DBget_field(result,0,7));
+		item.snmp_community=DBget_field(result,0,8);
+		item.snmp_oid=DBget_field(result,0,9);
+		item.useip=atoi(DBget_field(result,0,10));
+		item.ip=DBget_field(result,0,11);
+		item.history=atoi(DBget_field(result,0,12));
+		s=DBget_field(result,0,13);
+		if(s==NULL)
+		{
+			item.lastvalue_null=1;
+		}
+		else
+		{
+			item.lastvalue_null=0;
+			item.lastvalue_str=s;
+			item.lastvalue=atof(s);
+		}
+		s=DBget_field(result,0,14);
+		if(s==NULL)
+		{
+			item.prevvalue_null=1;
+		}
+		else
+		{
+			item.prevvalue_null=0;
+			item.prevvalue_str=s;
+			item.prevvalue=atof(s);
+		}
+		item.hostid=atoi(DBget_field(result,0,15));
+		item.value_type=atoi(DBget_field(result,0,17));
+	
+		sprintf(value_str,"%d",host_status);
 
-	sprintf(value_str,"%d",host_status);
-
-	process_new_value(&item,value_str);
-	update_triggers(0, 1, item.itemid, 0 );
+		process_new_value(&item,value_str);
+		update_triggers(0, 1, item.itemid, 0 );
+	}
 
 	DBfree_result(result);
 }
@@ -656,16 +659,12 @@ int get_values(void)
 	int	host_status;
 
 	now = time(NULL);
-
+#ifdef TESTTEST
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and h.hostid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-2,sucker_num-2,SERVER_STATUS_KEY);
+#else
 	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-2,sucker_num-2,SERVER_STATUS_KEY);
+#endif
 	result = DBselect(sql);
-
-	if( DBis_empty(result) == SUCCEED)
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "No items to update.");
-		DBfree_result(result);
-		return SUCCEED; 
-	}
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
@@ -778,13 +777,6 @@ int housekeeping_history(int now)
 	sprintf(sql,"select i.itemid,i.lastdelete,i.history from items i where i.lastdelete<=%d", now);
 	result = DBselect(sql);
 
-	if(DBis_empty(result) == SUCCEED)
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "No items to delete.");
-		DBfree_result(result);
-		return SUCCEED; 
-	}
-
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 		item.itemid=atoi(DBget_field(result,i,0));
@@ -809,24 +801,26 @@ int housekeeping_alerts(int now)
 	char		sql[MAX_STRING_LEN+1];
 	int		alert_history;
 	DB_RESULT	*result;
+	int		res = SUCCEED;
 
 	sprintf(sql,"select alert_history from config");
 	result = DBselect(sql);
 
-	if(DBis_empty(result) == SUCCEED)
+	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "No records in table 'config'.");
-		DBfree_result(result);
-		exit (FAIL);
+		res = FAIL;
+	}
+	else
+	{
+		alert_history=atoi(DBget_field(result,0,0));
+
+		sprintf	(sql,"delete from alerts where clock<%d",now-24*3600*alert_history);
+		DBexecute(sql);
 	}
 
-	alert_history=atoi(DBget_field(result,0,0));
-
-	sprintf	(sql,"delete from alerts where clock<%d",now-24*3600*alert_history);
-	DBexecute(sql);
-
 	DBfree_result(result);
-	return SUCCEED;
+	return res;
 }
 
 int housekeeping_alarms(int now)
@@ -834,23 +828,25 @@ int housekeeping_alarms(int now)
 	char		sql[MAX_STRING_LEN+1];
 	int		alarm_history;
 	DB_RESULT	*result;
+	int		res = SUCCEED;
 
 	sprintf(sql,"select alarm_history from config");
 	result = DBselect(sql);
-	if(DBis_empty(result) == SUCCEED)
+	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "No records in table 'config'.");
-		DBfree_result(result);
-		exit (FAIL);
+		res = FAIL;
 	}
+	else
+	{
+		alarm_history=atoi(DBget_field(result,0,0));
 
-	alarm_history=atoi(DBget_field(result,0,0));
-
-	sprintf	(sql,"delete from alarms where clock<%d",now-24*3600*alarm_history);
-	DBexecute(sql);
+		sprintf	(sql,"delete from alarms where clock<%d",now-24*3600*alarm_history);
+		DBexecute(sql);
+	}
 	
 	DBfree_result(result);
-	return SUCCEED;
+	return res;
 }
 
 int main_alerter_loop()
@@ -875,7 +871,7 @@ int main_alerter_loop()
 
 		sprintf(sql,"select smtp_server,smtp_helo,smtp_email from config");
 		result = DBselect(sql);
-		if(DBis_empty(result) == SUCCEED)
+		if(DBnum_rows(result) == 0)
 		{
 			zabbix_log( LOG_LEVEL_ERR, "No records in table 'config'.");
 			DBfree_result(result);
@@ -889,38 +885,35 @@ int main_alerter_loop()
 		sprintf(sql,"select alertid,type,sendto,subject,message,status,retries from alerts where status=0 and retries<3 order by clock");
 		result = DBselect(sql);
 
-		if(DBis_empty(result) != SUCCEED)
-		{	
-			for(i=0;i<DBnum_rows(result);i++)
-			{
-				alert.alertid=atoi(DBget_field(result,i,0));
-				alert.type=DBget_field(result,i,1);
-				alert.sendto=DBget_field(result,i,2);
-				alert.subject=DBget_field(result,i,3);
-				alert.message=DBget_field(result,i,4);
-				alert.status=atoi(DBget_field(result,i,5));
-				alert.retries=atoi(DBget_field(result,i,6));
+		for(i=0;i<DBnum_rows(result);i++)
+		{
+			alert.alertid=atoi(DBget_field(result,i,0));
+			alert.type=DBget_field(result,i,1);
+			alert.sendto=DBget_field(result,i,2);
+			alert.subject=DBget_field(result,i,3);
+			alert.message=DBget_field(result,i,4);
+			alert.status=atoi(DBget_field(result,i,5));
+			alert.retries=atoi(DBget_field(result,i,6));
 
-				if(strcmp(alert.type,ALERT_TYPE_EMAIL)==0)
+			if(strcmp(alert.type,ALERT_TYPE_EMAIL)==0)
+			{
+				if(FAIL == send_mail(smtp_server,smtp_helo,smtp_email,alert.sendto,alert.subject,alert.message))
 				{
-					if(FAIL == send_mail(smtp_server,smtp_helo,smtp_email,alert.sendto,alert.subject,alert.message))
-					{
-						zabbix_log( LOG_LEVEL_ERR, "Error sending email to '%s' Subject:'%s'", alert.sendto, alert.subject);
-						sprintf(sql,"update alerts set retries=retries+1 where alertid=%d", alert.alertid);
-						DBexecute(sql);
-					}
-					else
-					{
-						sprintf(sql,"update alerts set status=1 where alertid=%d", alert.alertid);
-						DBexecute(sql);
-					}
+					zabbix_log( LOG_LEVEL_ERR, "Error sending email to '%s' Subject:'%s'", alert.sendto, alert.subject);
+					sprintf(sql,"update alerts set retries=retries+1 where alertid=%d", alert.alertid);
+					DBexecute(sql);
 				}
 				else
 				{
-						sprintf(sql,"update alerts set retries=3 where alertid=%d", alert.alertid);
-						DBexecute(sql);
-						zabbix_log( LOG_LEVEL_ERR, "Unsupported type of alert [%s] Alert ID [%d]", alert.type, alert.alertid );
+					sprintf(sql,"update alerts set status=1 where alertid=%d", alert.alertid);
+					DBexecute(sql);
 				}
+			}
+			else
+			{
+					sprintf(sql,"update alerts set retries=3 where alertid=%d", alert.alertid);
+					DBexecute(sql);
+					zabbix_log( LOG_LEVEL_ERR, "Unsupported type of alert [%s] Alert ID [%d]", alert.type, alert.alertid );
 			}
 		}	
 		DBfree_result(result);

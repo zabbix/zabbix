@@ -1,22 +1,20 @@
-Not ready yet:
-
- - delete services if trigger is deleted
- - monitoring of log files, Support for string=string.
- - IPFC
- - network map. Connect an icon to a trigger/service
- - fix Next100 and Prev100
- - fix proc_cnt[*]
- - create one common chart.php
- - add MRTG-like graphs
- - add support for /,*,+,- in expressions
- - add support for LDAP
- - add support for Kb,bytes,kps, etc
- - add new screenshots to zabbix.sf.net
-
- - FIX coredump after "Apply actions"
-
 Changes for 1.0beta5:
 
+ - added upgrades/dbpatches/1.0beta4_to_1.0beta5/ with patches (Alexei)
+ - added support for disktotal[*] (Alexei)
+ - added support for inodetotal[*] (Alexei)
+ - added support for *,/,+, and - in trigger expressions (Alexei)
+ - removed frontends/php/chart4.php (Alexei)
+ - update item status to UNSUPPORTED in case if SNMP support was not included
+ into zabbix_suckerd (Alexei)
+ - added mysql_init() to DBconnect() (Alexei)
+ - fixed Next100 and Prev100 for case if some hosts are hidden (Alexei)
+ - added select for latest values (Alexei)
+ - delete related services if trigger is deleted (Alexei)
+ - fixed problem with substitution of macros for messages (Alexei)
+ - eliminated DBis_empty() by replacing to DBnum_rows() (Alexei)
+ - MAX_STRING_LEN increased to 4096 (Alexei)
+ - fixed zabbix_log(). Possible coredump if data contains %s, etc (Alexei)
  - changed grid size for all graphs (Alexei)
  - added frontends/php/chart4.php (Alexei)
  - added frontends/php/compare.php (Alexei)

@@ -4,6 +4,7 @@
 /* time_t */
 #include <time.h>
 #include "config.h"
+#include "common.h"
 
 #ifdef HAVE_MYSQL
 	#include "mysql.h"
@@ -97,8 +98,8 @@ DB_ACTION
 	int     good;
 	int     delay;
 	int     lastcheck;
-	char    *subject;
-	char    *message;
+	char    subject[MAX_STRING_LEN+1];
+	char    message[MAX_STRING_LEN+1];
 };
 
 DB_ALERT
@@ -123,16 +124,16 @@ int	DBexecute( char *query );
 DB_RESULT	*DBselect(char *query);
 char		*DBget_field(DB_RESULT *result, int rownum, int fieldnum);
 int		DBnum_rows(DB_RESULT *result);
-int		DBis_empty(DB_RESULT *result);
+/*int		DBis_empty(DB_RESULT *result);*/
 
 int	DBget_function_result(float *result,char *functionid);
-int	DBupdate_host_status(int hostid,int status,int clock);
+void	DBupdate_host_status(int hostid,int status,int clock);
 int	DBupdate_item_status_to_notsupported(int itemid);
 int	DBadd_history(int itemid, double value);
 int	DBadd_history_str(int itemid, char *value);
 int	DBadd_alarm(int triggerid, int status,int clock);
 int	DBadd_alert(int actionid, char *type, char *sendto, char *subject, char *message);
-int	DBupdate_triggers_status_after_restart(void);
+void	DBupdate_triggers_status_after_restart(void);
 int	DBget_prev_trigger_value(int triggerid);
 
 #endif

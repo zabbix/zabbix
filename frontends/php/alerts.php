@@ -41,11 +41,11 @@
 <?
 	if(!isset($start))
 	{
-		$sql="select a.alertid,a.clock,a.type,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries from alerts a,actions ac where a.actionid=ac.actionid order by a.clock desc limit 100";
+		$sql="select a.alertid,a.clock,a.type,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries from alerts a,actions ac where a.actionid=ac.actionid order by a.clock desc limit 1000";
 	}
 	else
 	{
-		$sql="select a.alertid,a.clock,a.type,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries from alerts a,actions ac where a.actionid=ac.actionid order by a.clock desc limit ".($start+100);
+		$sql="select a.alertid,a.clock,a.type,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries from alerts a,actions ac where a.actionid=ac.actionid order by a.clock desc limit ".($start+1000);
 	}
 	$result=DBselect($sql);
 
@@ -75,6 +75,8 @@
 
 		if($col++%2==0)	{ echo "<tr bgcolor=#DDDDDD>"; }
 		else		{ echo "<tr bgcolor=#EEEEEE>"; }
+
+		if($col>100)	break;
 
 		echo "<TD><a href=\"alarms.php?triggerid=".$row["triggerid"]."\">".date("Y.M.d H:i:s",$row["clock"])."</a></TD>";
 		if($row["type"]=="EMAIL")
