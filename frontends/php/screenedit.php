@@ -145,7 +145,7 @@
 					$host_=DBget_field($result,$i,0);
 					$description_=DBget_field($result,$i,1);
 					$itemid_=DBget_field($result,$i,2);
-					echo "<OPTION VALUE='$itemid_' ".iif($resourceid==$itemid_,"selected","")."'>$host_: $description_";
+					echo "<OPTION VALUE='$itemid_' ".iif($resourceid==$itemid_,"selected","").">$host_: $description_";
 				}
 				echo "</SELECT>";
 			}
