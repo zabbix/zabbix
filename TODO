@@ -34,6 +34,7 @@ TKOM:
 
 OTHER:
 
+ - add failure (timeouts, network errors, etc) reasons to items and hosts
  - use getopt() from unistd.h for config paths
  - get rid of net[listen_*] in templates
  - use assert() for critical functions
