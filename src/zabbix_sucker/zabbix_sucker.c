@@ -334,7 +334,7 @@ int get_minnextcheck(void)
 	int		res;
 	int		count;
 
-	sprintf(c,"select count(*),min(nextcheck) from items i,hosts h where i.status=0 and h.status=0 and h.hostid=i.hostid and i.status=0 and i.itemid%%%d=%d",SUCKER_FORKS,sucker_num);
+	sprintf(c,"select count(*),min(nextcheck) from items i,hosts h where i.status=0 and h.status=0 and h.hostid=i.hostid and i.status=0 and i.itemid%%%d=%d",SUCKER_FORKS-1,sucker_num-1);
 	result = DBselect(c);
 
 	if(result==NULL)
@@ -379,7 +379,7 @@ int get_values(void)
 
 	now = time(NULL);
 
-	sprintf(c,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.history,i.lastdelete,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip from items i,hosts h where i.nextcheck<=%d and i.status=0 and h.status=0 and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, SUCKER_FORKS,sucker_num);
+	sprintf(c,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip from items i,hosts h where i.nextcheck<=%d and i.status=0 and h.status=0 and h.hostid=i.hostid and i.itemid%%%d=%d order by i.nextcheck", now, SUCKER_FORKS-1,sucker_num-1);
 	result = DBselect(c);
 
 	if(result==NULL)
@@ -398,14 +398,12 @@ int get_values(void)
 		item.port=atoi(DBget_field(result,i,3));
 		item.delay=atoi(DBget_field(result,i,4));
 		item.description=DBget_field(result,i,5);
-		item.history=atoi(DBget_field(result,i,6));
-		item.lastdelete=atoi(DBget_field(result,i,7));
-		item.nextcheck=atoi(DBget_field(result,i,8));
-		item.type=atoi(DBget_field(result,i,9));
-		item.snmp_community=DBget_field(result,i,10);
-		item.snmp_oid=DBget_field(result,i,10);
-		item.useip=atoi(DBget_field(result,i,12));
-		item.ip=DBget_field(result,i,13);
+		item.nextcheck=atoi(DBget_field(result,i,6));
+		item.type=atoi(DBget_field(result,i,7));
+		item.snmp_community=DBget_field(result,i,8);
+		item.snmp_oid=DBget_field(result,i,9);
+		item.useip=atoi(DBget_field(result,i,10));
+		item.ip=DBget_field(result,i,11);
 
 		if( get_value(&value,&item) == SUCCEED )
 		{
@@ -436,24 +434,64 @@ int get_values(void)
 			syslog( LOG_WARNING, "Wrong value from host [HOST:%s KEY:%s VALUE:%f]", item.host, item.key, value );
 			syslog( LOG_WARNING, "The value is not stored in database.");
 		}
+	}
 
-		if(item.lastdelete+3600<time(NULL))
-		{
-			now = time(NULL);
-			sprintf	(c,"delete from history where ItemId=%d and Clock<%d-%d",item.itemid,now,item.history);
-			DBexecute(c);
+	DBfree_result(result);
+	return SUCCEED;
+}
+
+int housekeeping_items()
+{
+	char		c[1024];
+	DB_ITEM		item;
+
+	DB_RESULT	*result;
+
+	int		i,rows;
+	int		now;
+
+	now = time(NULL);
+
+	sprintf(c,"select i.itemid,i.lastdelete,i.history from items i where i.lastdelete<=%d", now);
+	result = DBselect(c);
+
+	if(result==NULL)
+	{
+		syslog( LOG_DEBUG, "No items to delete.");
+		DBfree_result(result);
+		return SUCCEED; 
+	}
+	rows = DBnum_rows(result);
+
+	for(i=0;i<rows;i++)
+	{
+		item.itemid=atoi(DBget_field(result,i,0));
+		item.lastdelete=atoi(DBget_field(result,i,1));
+		item.history=atoi(DBget_field(result,i,2));
+
+		now = time(NULL);
+		sprintf	(c,"delete from history where ItemId=%d and Clock<%d-%d",item.itemid,now,item.history);
+		DBexecute(c);
 	
-			now = time(NULL);
-			sprintf(c,"update items set LastDelete=%d where ItemId=%d",now,item.itemid);
-			DBexecute(c);
-		}
-
+		now = time(NULL);
+		sprintf(c,"update items set LastDelete=%d where ItemId=%d",now,item.itemid);
+		DBexecute(c);
 	}
 	DBfree_result(result);
 	return SUCCEED;
 }
 
-int main_loop()
+int main_housekeeping_loop()
+{
+	for(;;)
+	{
+		housekeeping_items();
+		syslog( LOG_DEBUG, "Sleeping for %d seconds", SUCKER_HK);
+		sleep(SUCKER_HK);
+	}
+}
+
+int main_sucker_loop()
 {
 	int	now;
 	int	nextcheck,sleeptime;
@@ -526,7 +564,14 @@ int main(int argc, char **argv)
 
 	DBconnect();
 
-	main_loop();
+	if(sucker_num == 0)
+	{
+		main_housekeeping_loop();
+	}
+	else
+	{
+		main_sucker_loop();
+	}
 
 	return SUCCEED;
 }
