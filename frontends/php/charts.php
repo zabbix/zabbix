@@ -40,29 +40,57 @@
 ?>
 
 <?php
-// BEGIN - IGMI - keep default value
+	if(!isset($_GET["from"]))
+	{
+		$_GET["from"]=0;
+	}
+	if(!isset($_GET["period"]))
+	{
+		$_GET["period"]=3600;
+	}
+
 	if(!isset($_GET["keep"]))
 	{
 		$_GET["keep"]=1;
 	}
-// END - IGMI - keep default value
 
-	if(!isset($_GET["fullscreen"]))
+
 	{
-		show_table_header_begin();
-		echo S_GRAPHS_BIG;
-
-		show_table_v_delimiter();
-// Start of new code
-		echo "<form name=\"form2\" method=\"get\" action=\"charts.php\">";
+		show_table3_header_begin();
 
 		if(isset($_GET["graphid"])&&($_GET["graphid"]==0))
 		{
 			unset($_GET["graphid"]);
 		}
 
-		echo S_GRAPH."&nbsp;";
-		echo "<input name=\"keep\" type=\"hidden\" value=".$_GET["keep"].">";
+		if(isset($_GET["graphid"]))
+		{
+			$result=DBselect("select name from graphs where graphid=".$_GET["graphid"]);
+			$graph=DBget_field($result,0,0);
+			$graph=iif(isset($_GET["fullscreen"]),
+				"<a href=\"charts.php?graphid=".$_GET["graphid"]."\">".$graph."</a>",
+				"<a href=\"charts.php?graphid=".$_GET["graphid"]."&fullscreen=1\">".$graph."</a>");
+		}
+		else
+		{
+			$graph=S_SELECT_GRAPH_TO_DISPLAY;
+		}
+
+		echo S_GRAPHS_BIG.nbsp(" / ").$graph;
+// Start of new code
+		show_table3_h_delimiter();
+		echo "<form name=\"form2\" method=\"get\" action=\"charts.php\">";
+
+		if(isset($_GET["fullscreen"]))
+		{
+			echo "<input name=\"fullscreen\" type=\"hidden\" value=".$_GET["fullscreen"].">";
+		}
+
+		if(isset($_GET["graphid"])&&($_GET["graphid"]==0))
+		{
+			unset($_GET["graphid"]);
+		}
+
 		echo "<select class=\"biginput\" name=\"graphid\" onChange=\"submit()\">";
 		echo "<option value=\"0\" ".iif(!isset($_GET["graphid"]),"selected","").">".S_SELECT_GRAPH_DOT_DOT_DOT;
 
@@ -77,97 +105,12 @@
 		}
 		echo "</select>";
 		echo "</form>";
-// End of new code
 
-/*		echo "<font size=2>";
-
-		$result=DBselect("select graphid,name from graphs order by name");
-		while($row=DBfetch($result))
-		{
-			if(!check_right("Graph","R",$row["graphid"]))
-			{
-				continue;
-			}
-			if( isset($_GET["graphid"]) && ($_GET["graphid"] == $row["graphid"]) )
-			{
-				echo "<b>[";
-			}
-			$str="";
-			if(isset($_GET["keep"]))
-			{
-				if($_GET["keep"] == 1)
-				{
-					if(isset($_GET["from"]))
-					{
-						$str=$str."&from=".$_GET["from"];
-					}
-					if(isset($_GET["period"]))
-					{
-						$str=$str."&period=".$_GET["period"];
-					}
-				}
-				$str=$str."&keep=".$_GET["keep"];
-			}
-			echo "<a href='charts.php?graphid=".$row["graphid"].url_param("stime").$str."'>".$row["name"]."</a>";
-			if(isset($_GET["graphid"]) && ($_GET["graphid"] == $row["graphid"]) )
-			{
-				echo "]</b>";
-			}
-			echo " ";
-		}
-
-		if(DBnum_rows($result) == 0)
-		{
-			echo S_NO_GRAPHS_TO_DISPLAY;;
-		}
-
-		echo "</font>";
-*/
 		show_table_header_end();
-		echo "<br>";
 	}
-
 ?>
 
 <?php
-	if(isset($_GET["graphid"]))
-	{
-		$result=DBselect("select name from graphs where graphid=".$_GET["graphid"]);
-		$row=DBfetch($result);
-		$str="";
-		if(isset($_GET["from"]))
-		{
-			$str=$str."&from=".$_GET["from"];
-		}
-		if(isset($_GET["period"]))
-		{
-			$str=$str."&period=".$_GET["period"];
-		}
-// BEGIN - IGMI - keep support added
-		if(isset($_GET["fullscreen"]))
-		{
-			$map="<a href=\"charts.php?graphid=".$_GET["graphid"].$str."&keep=".$_GET["keep"]."\">".$row["name"]."</a>";
-		}
-		else
-		{
-			$map="<a href=\"charts.php?graphid=".$_GET["graphid"]."&fullscreen=1".$str."&keep=".$_GET["keep"]."\">".$row["name"]."</a>";
-		}
-// END - IGMI - keep support added
-	}
-	else
-	{
-		$map=S_SELECT_GRAPH_TO_DISPLAY;
-	}
-	if(!isset($_GET["from"]))
-	{
-		$_GET["from"]=0;
-	}
-	if(!isset($_GET["period"]))
-	{
-		$_GET["period"]=3600;
-	}
-
-	show_table_header($map);
 	echo "<TABLE BORDER=0 align=center COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR BGCOLOR=#DDDDDD>";
 	echo "<TD ALIGN=CENTER>";
