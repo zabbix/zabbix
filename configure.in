@@ -551,14 +551,18 @@ What SNMP package do you want to use (please select only one):
 			SNMP_INCDIR=/usr/local/net-snmp/include/
 			SNMP_LIBDIR=/usr/local/net-snmp/lib/
 		elif test -f /usr/include/net-snmp/net-snmp-includes.h; then
-			SNMP_INCDIR=/usr/include/net-snmp
-			SNMP_LIBDIR=/usr/lib/net-snmp
+dnl			SNMP_INCDIR=/usr/include/net-snmp
+dnl			SNMP_LIBDIR=/usr/lib/net-snmp
+			SNMP_INCDIR=/usr/include
+			SNMP_LIBDIR=/usr/lib
 		elif test -f /usr/include/net-snmp-includes.h; then
 			SNMP_INCDIR=/usr/include
 			SNMP_LIBDIR=/usr/lib
 		elif test -f /usr/local/include/net-snmp/net-snmp-includes.h; then
-			SNMP_INCDIR=/usr/local/include/net-snmp
-			SNMP_LIBDIR=/usr/local/lib/net-snmp
+dnl			SNMP_INCDIR=/usr/local/include/net-snmp
+dnl			SNMP_LIBDIR=/usr/local/lib/net-snmp
+			SNMP_INCDIR=/usr/local/include
+			SNMP_LIBDIR=/usr/local/lib
 		elif test -f /usr/local/include/net-snmp-includes.h; then
 			SNMP_INCDIR=/usr/local/include
 			SNMP_LIBDIR=/usr/local/lib
@@ -568,8 +572,10 @@ What SNMP package do you want to use (please select only one):
 		fi
    	else
 		if test -f $withval/include/net-snmp/net-snmp-includes.h; then
-   			SNMP_INCDIR=$withval/include/net-snmp
-   			SNMP_LIBDIR=$withval/lib/net-snmp
+dnl   			SNMP_INCDIR=$withval/include/net-snmp
+dnl   			SNMP_LIBDIR=$withval/lib/net-snmp
+   			SNMP_INCDIR=$withval/include
+   			SNMP_LIBDIR=$withval/lib
 		elif test -f $withval/include/net-snmp-includes.h; then
    			SNMP_INCDIR=$withval/include
    			SNMP_LIBDIR=$withval/lib
@@ -611,14 +617,18 @@ AC_ARG_WITH(ucd-snmp,
 			SNMP_INCDIR=/usr/local/ucd-snmp/include/
 			SNMP_LIBDIR=/usr/local/ucd-snmp/lib/
 		elif test -f /usr/include/ucd-snmp/ucd-snmp-config.h; then
-			SNMP_INCDIR=/usr/include/ucd-snmp
-			SNMP_LIBDIR=/usr/lib/ucd-snmp
+dnl			SNMP_INCDIR=/usr/include/ucd-snmp
+dnl			SNMP_LIBDIR=/usr/lib/ucd-snmp
+			SNMP_INCDIR=/usr/include
+			SNMP_LIBDIR=/usr/lib
 		elif test -f /usr/include/ucd-snmp-config.h; then
 			SNMP_INCDIR=/usr/include
 			SNMP_LIBDIR=/usr/lib
 		elif test -f /usr/local/include/ucd-snmp/ucd-snmp-config.h; then
-			SNMP_INCDIR=/usr/local/include/ucd-snmp
-			SNMP_LIBDIR=/usr/local/lib/ucd-snmp
+dnl			SNMP_INCDIR=/usr/local/include/ucd-snmp
+dnl			SNMP_LIBDIR=/usr/local/lib/ucd-snmp
+			SNMP_INCDIR=/usr/local/include
+			SNMP_LIBDIR=/usr/local/lib
 		elif test -f /usr/local/include/ucd-snmp-config.h; then
 			SNMP_INCDIR=/usr/local/include
 			SNMP_LIBDIR=/usr/local/lib
@@ -628,8 +638,10 @@ AC_ARG_WITH(ucd-snmp,
 		fi
    	else
 		if test -f $withval/include/ucd-snmp/ucd-snmp-config.h; then
-   			SNMP_INCDIR=$withval/include/ucd-snmp
-   			SNMP_LIBDIR=$withval/lib/ucd-snmp
+dnl   			SNMP_INCDIR=$withval/include/ucd-snmp
+dnl   			SNMP_LIBDIR=$withval/lib/ucd-snmp
+   			SNMP_INCDIR=$withval/include
+   			SNMP_LIBDIR=$withval/lib
 		elif test -f $withval/include/ucd-snmp-config.h; then
    			SNMP_INCDIR=$withval/include
    			SNMP_LIBDIR=$withval/lib
