@@ -11,7 +11,7 @@ int	is_float(char *c)
 {
 	int i;
 
-	syslog(LOG_DEBUG, "Starting IsFloat:%s", c );
+	syslog(LOG_DEBUG, "Starting is_float:%s", c );
 	for(i=0;i<=strlen(c);i++)
 	{
 		if((c[i]=='(')||(c[i]==')')||(c[i]=='{')||(c[i]=='<')||(c[i]=='>')||(c[i]=='='))
