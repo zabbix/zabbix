@@ -177,6 +177,8 @@ CREATE TABLE actions (
   actionid		int(4)		NOT NULL auto_increment,
   triggerid		int(4)		DEFAULT '0' NOT NULL,
   userid		int(4)		DEFAULT '0' NOT NULL,
+  scope			int(4)		DEFAULT '0' NOT NULL,
+  severity		int(4)		DEFAULT '0' NOT NULL,
   good			int(4)		DEFAULT '0' NOT NULL,
   delay			int(4)		DEFAULT '0' NOT NULL,
   subject		varchar(255)	DEFAULT '' NOT NULL,
