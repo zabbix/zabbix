@@ -126,11 +126,21 @@ void	signal_handler( int sig )
 		uninit();
 		exit( FAIL );
 	}
-	else if( SIGCHLD == sig )
+        else if( (SIGCHLD == sig) && (sucker_num == 0) )
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "One child process died. Exiting ...");
+		uninit();
+		exit( FAIL );
+	}
+/*	else if( SIGCHLD == sig )
 	{
 		zabbix_log( LOG_LEVEL_ERR, "One child died. Exiting ..." );
 		uninit();
 		exit( FAIL );
+	}*/
+	else if( SIGPIPE == sig)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Got SIGPIPE. Where it came from???");
 	}
 	else
 	{
@@ -421,7 +431,7 @@ int	get_value_SIMPLE(double *result,char *result_str,DB_ITEM *item)
 	char	c[MAX_STRING_LEN+1];
 	char	s[MAX_STRING_LEN+1];
 
-	/* The code is ugly. I would rewrite it. Alexei		*/
+	/* The code is ugly. I would rewrite it. Alexei.	*/
 	/* Assumption: host name does not contain '_perf'	*/
 	if(NULL == strstr(item->key,"_perf"))
 	{
@@ -454,7 +464,7 @@ int	get_value_SIMPLE(double *result,char *result_str,DB_ITEM *item)
 	process(c,result_str);
 	*result=strtod(result_str,&e);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "SIMPLE [%s] [%s] [%f]", c, result_str, *result);
+	zabbix_log( LOG_LEVEL_ERR, "SIMPLE [%s] [%s] [%f]", c, result_str, *result);
 	return SUCCEED;
 }
 
@@ -707,7 +717,7 @@ int get_minnextcheck(int now)
 #ifdef TESTTEST
 	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=0 and i.type not in (%d) and h.hostid%%%d=%d and i.key_<>'%s'", now, ITEM_TYPE_TRAPPER, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY);
 #else
-	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=%d and i.type not in (%d) and i.itemid%%%d=%d and i.key_<>'%s'", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY);
+	sprintf(sql,"select count(*),min(nextcheck) from items i,hosts h where (h.status=0 or (h.status=2 and h.disable_until<%d)) and h.hostid=i.hostid and i.status=%d and i.type not in (%d) and i.itemid%%%d=%d and i.key_<>'%s' and i.key_<>'%s'", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY);
 #endif
 	result = DBselect(sql);
 
@@ -820,7 +830,7 @@ int get_values(void)
 #ifdef TESTTEST
 	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,i.snmp_port from items i,hosts h where i.nextcheck<=%d and i.status=0 and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and h.hostid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, now, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY);
 #else
-	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port from items i,hosts h where i.nextcheck<=%d and i.status=%d and i.type not in (%d) and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d and i.key_<>'%s' order by i.nextcheck", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, now, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY);
+	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port from items i,hosts h where i.nextcheck<=%d and i.status=%d and i.type not in (%d) and (h.status=0 or (h.status=2 and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d and i.key_<>'%s' and i.key_<>'%s' order by i.nextcheck", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, now, CONFIG_SUCKERD_FORKS-4,sucker_num-4,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY);
 #endif
 	result = DBselect(sql);
 
@@ -1230,7 +1240,7 @@ int main(int argc, char **argv)
 	sigaction(SIGINT, &phan, NULL);
 	sigaction(SIGQUIT, &phan, NULL);
 	sigaction(SIGTERM, &phan, NULL);
-		sigaction(SIGCHLD, &phan, NULL);
+	sigaction(SIGPIPE, &phan, NULL);
 
 	if(CONFIG_LOG_FILE == NULL)
 	{
@@ -1273,6 +1283,7 @@ int main(int argc, char **argv)
 
 	if( sucker_num == 0)
 	{
+		sigaction(SIGCHLD, &phan, NULL);
 /* First instance of zabbix_suckerd performs housekeeping procedures */
 		zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started. Housekeeper.",sucker_num);
 		main_housekeeping_loop();

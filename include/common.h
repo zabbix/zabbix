@@ -49,6 +49,8 @@
 
 /* Special item key used for storing server status */
 #define SERVER_STATUS_KEY	"status"
+/* Special item key used for ICMP pings */
+#define SERVER_ICMPPING_KEY	"icmpping"
 
 /* Alert types */
 #define ALERT_TYPE_EMAIL	0
