@@ -7,6 +7,8 @@
 /* Define if file /proc/1/status exists */
 #undef HAVE_PROC_1_STATUS
 
+/* Define if sys/swap.h defines struct swaptable*/
+#undef HAVE_SYS_SWAP_SWAPTABLE
 
 /* Define if sys/vmmeter.h defines struct vmtotal*/
 #undef HAVE_SYS_VMMETER_VMTOTAL
