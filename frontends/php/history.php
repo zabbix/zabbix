@@ -91,14 +91,7 @@
 <?php
 	$item=get_item_by_itemid($_GET["itemid"]);
 
-	if($item["value_type"] == 0)
-	{
-		$h1="<A HREF='latest.php?hostid=$hostid'>$host</A> : <a href='trends.php?itemid=".$_GET["itemid"]."'>$description</a>";
-	}
-	else
-	{
-		$h1="<A HREF='latest.php?hostid=$hostid'>$host</A> : $description";
-	}
+	$h1="<A HREF='latest.php?hostid=$hostid'>$host</A> : $description";
 
 	show_table_header($h1);
 
