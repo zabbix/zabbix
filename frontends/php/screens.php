@@ -66,7 +66,10 @@
 			}
 			echo " ";
 		}
-
+		if(DBnum_rows($result) == 0)
+		{
+			echo "No screens to display";
+		}
 
 		echo "</font>";
 		show_table_header_end();
@@ -146,7 +149,7 @@
 	}
 	else
 	{
-		show_table_header("Please select screen to display");		
+		show_table_header("Select screen to display");		
 	}
 ?>
 
