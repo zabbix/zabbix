@@ -1,6 +1,6 @@
 Changes for 1.0beta1:
 
- - added partial support of audible notification (Alexei)
+ - added support of audible notification (Alexei)
  - select criteria in form "Status of Triggers". Thanks to Lauris
 Stiglics. (Alexei)
  - default values for config.alert_history and config.alarm_history are set to
