@@ -96,9 +96,9 @@ insert into items_template (itemtemplateid,description,key_,delay)
 --insert into items_template (itemtemplateid,description,key_,delay)
 --	values (38,'The number of context switches per second','system[switches]', 30);
 insert into items_template (itemtemplateid,description,key_,delay)
-	values (39,'Email (SMTP) server is running','net[listen_25]', 60);
+	values (39,'Email (SMTP) server is running','check_service[smtp]', 60);
 insert into items_template (itemtemplateid,description,key_,delay)
-	values (40,'FTP server is running','net[listen_21]', 60);
+	values (40,'FTP server is running','check_service[ftp]', 60);
 insert into items_template (itemtemplateid,description,key_,delay)
 	values (41,'SSH server is running','check_service[ssh]', 60);
 insert into items_template (itemtemplateid,description,key_,delay)
@@ -106,9 +106,9 @@ insert into items_template (itemtemplateid,description,key_,delay)
 insert into items_template (itemtemplateid,description,key_,delay)
 	values (43,'WEB server is running','net[listen_80]', 60);
 insert into items_template (itemtemplateid,description,key_,delay)
-	values (44,'POP3 server is running','net[listen_110]', 60);
+	values (44,'POP3 server is running','check_service[pop]', 60);
 insert into items_template (itemtemplateid,description,key_,delay)
-	values (45,'IMAP server is running','net[listen_143]', 60);
+	values (45,'IMAP server is running','check_service[imap]', 60);
 insert into items_template (itemtemplateid,description,key_,delay)
 	values (46,'Checksum of /usr/sbin/sshd','cksum[/usr/sbin/sshd]', 600);
 insert into items_template (itemtemplateid,description,key_,delay)
@@ -125,6 +125,8 @@ insert into items_template (itemtemplateid,description,key_,delay)
 	values (52,'Number of block read from disks','io[disk_rblk]', 30);
 insert into items_template (itemtemplateid,description,key_,delay)
 	values (53,'Number of block written to disks','io[disk_wblk]', 30);
+insert into items_template (itemtemplateid,description,key_,delay)
+	values (54,'News (NNTP) server is running','check_service[nntp]', 60);
 
 --
 -- Data for table triggers_template
@@ -194,3 +196,5 @@ insert into triggers_template (triggertemplateid,itemtemplateid,description,expr
 	values (47,47,'/usr/bin/ssh has been changed on server %s','{:.diff(0)}>0');
 insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
 	values (48,48,'/etc/services has been changed on server %s','{:.diff(0)}>0');
+insert into triggers_template (triggertemplateid,itemtemplateid,description,expression)
+	values (54,54,'News (NNTP) server is down on %s','{:.last(0)}<1');
