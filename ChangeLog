@@ -1,5 +1,6 @@
 Changes for 1.1alpha1:
 
+ - fixed typo: getuid() -> getgid() in daemon_init() (Alexei)
  - added housekeeping of trends (Alexei)
  - added column items.trends (Alexei)
  - added escaping of SQL statements where needed (Alexei)
