@@ -291,7 +291,8 @@ Zabbix requires the following software to run properly:
   - PostgreSQL 7.0.2 or later
  - PHP 4.0 or later, compiled as Apache module with GD (for PNG images) with support of PostgreSQL or MySQL
  - GNU make
- - UCD-SNMP library and header files. Required for support of SNMP agents.
+ - WEB browser on client side (support for HTML and PNG images required). MS Explorer and Netscape work perfectly.
+ - UCD-SNMP library and header files. Required for support of SNMP agents. Optional.
 
 However, Zabbix can work on previous versions of Apache, MySQL, PostgreSQL as well.
 
@@ -319,6 +320,10 @@ the database.
 Remember, the more physical memory you have, the faster database and Zabbix works !
 
 4.2 Installation procedure
+
+Basic installation of Zabbix usually takes no more than 15 minutes. However, to make
+process more enjoyable, I would suggest to make cup of tea (or coffee) for yourself.
+Ready ? Then let us start ...
 
 4.2.1 Create the Zabbix superuser account: 
 
@@ -534,7 +539,7 @@ Similiar expressions could be useful to monitor changes in important files, such
 6. Chapter 6 (Upgrading)
 
 Upgrade procedure is quite simple. New binaries and frontend
-should be installed acording to latest installation guide.
+should be installed according to latest installation guide.
 
 In order to update database structure, the following steps
 should be performed. Note that before applying database patches,
@@ -557,7 +562,7 @@ Step 3. Depending on your database engine:
 	cd postgresql
 	cat patch.sql|psql -U <username> zabbix
 
-That is all. Zabbix database is ready. 
+That is all. Zabbix database is ready. Start Zabbix server processes using usual procedure. 
 
 7. Chapter 7 (Misc)
 
@@ -566,11 +571,11 @@ That is all. Zabbix database is ready.
 The script is used to periodically sind ICMP pings to list of servers. In case, if it does
 not receive responce from host, it executes:
 
-zabbix_server <server> <port> <host>:alive 0
+zabbix_sender <server> <port> <host>:alive 0
 
 otherwise:
 
-zabbix_server <server> <port> <host>:alive 1
+zabbix_sender <server> <port> <host>:alive 1
 
 The script is usually called from cron. Configure the script before use. Change location for "hosts"
 file. You must have fping installed to successfully run the script.

@@ -476,7 +476,7 @@ void	send_to_user(int actionid,int userid,char *smtp_server,char *smtp_helo,char
 	int	i,rows;
 	int	now;
 
-	sprintf(c,"select type,sendto,active from media where userid=%d",userid);
+	sprintf(c,"select type,sendto,active from media where active=0 and userid=%d",userid);
 	result = DBselect(c);
 
 	rows=DBnum_rows(result);
@@ -484,27 +484,23 @@ void	send_to_user(int actionid,int userid,char *smtp_server,char *smtp_helo,char
 	for(i=0;i<rows;i++)
 	{
 		media.active=atoi(DBget_field(result,i,2));
-		syslog( LOG_DEBUG, "ACTIVE=%d or %s\n", media.active, DBget_field(result,i,2) );
-		if(media.active!=1) // If media is enabled (active)
-		{
-			media.type=DBget_field(result,i,0);
-			media.sendto=DBget_field(result,i,1);
+		media.type=DBget_field(result,i,0);
+		media.sendto=DBget_field(result,i,1);
 
-			if(strcmp(media.type,"EMAIL")==0)
+		if(strcmp(media.type,"EMAIL")==0)
+		{
+			syslog( LOG_DEBUG, "Email sending to %s %s Subject:%s Message:%s to %d\n", media.type, media.sendto, subject, message, userid );
+			if( FAIL == send_mail(smtp_server,smtp_helo,smtp_email,media.sendto,subject,message))
 			{
-				syslog( LOG_DEBUG, "Email sending to %s %s Subject:%s Message:%s to %d\n", media.type, media.sendto, subject, message, userid );
-				if( FAIL == send_mail(smtp_server,smtp_helo,smtp_email,media.sendto,subject,message))
-				{
-					syslog( LOG_ERR, "Error sending email to '%s' Subject:'%s' to userid:%d\n", media.sendto, subject, userid );
-				}
-				now = time(NULL);
-				sprintf(c,"insert into alerts (alertid,actionid,clock,type,sendto,subject,message) values (NULL,%d,%d,'%s','%s','%s','%s');",actionid,now,media.type,media.sendto,subject,message);
-				DBexecute(c);
-			} 
-			else
-			{
-				syslog( LOG_WARNING, "Type %s is not supported yet", media.type );
+				syslog( LOG_ERR, "Error sending email to '%s' Subject:'%s' to userid:%d\n", media.sendto, subject, userid );
 			}
+			now = time(NULL);
+			sprintf(c,"insert into alerts (alertid,actionid,clock,type,sendto,subject,message) values (NULL,%d,%d,'%s','%s','%s','%s');",actionid,now,media.type,media.sendto,subject,message);
+			DBexecute(c);
+		} 
+		else
+		{
+			syslog( LOG_WARNING, "Type %s is not supported yet", media.type );
 		}
 	}
 	DBfree_result(result);

@@ -28,10 +28,12 @@
 		if($register=="delete_link")
 		{
 			delete_link($linkid);
+			unset($linkid);
 		}
 		if($register=="delete")
 		{
 			delete_sysmaps_host($shostid);
+			unset($shostid);
 		}
 	}
 ?>
