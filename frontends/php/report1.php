@@ -19,10 +19,10 @@
 	<tr bgcolor="#eeeeee">
 	<td>Is zabbix_suckerd running ?</td>
 	<?php
-		$str="No";
-		if(exec("ps axw|grep zabbix_suckerd|wc -l")>0)
+		$str="<font color=\"AA0000\">No</font>";
+		if(exec("ps axw|grep zabbix_suckerd|grep -v grep|wc -l")>0)
 		{
-			$str="Yes";
+			$str="<font color=\"00AA00\">Yes</font>";
 		}
 	?>
 	<td><?php echo $str; ?></td>
@@ -31,27 +31,27 @@
 	<tr bgcolor="#dddddd">
 	<td>Is zabbix_trapperd running ?</td>
 	<?php
-		$str="No";
-		if(exec("ps axw|grep zabbix_trapperd|wc -l")>0)
+		$str="<font color=\"AA0000\">No</font>";
+		if(exec("ps axw|grep zabbix_trapperd|grep -v grep|wc -l")>0)
 		{
-			$str="Yes";
+			$str="<font color=\"00AA00\">Yes</font>";
 		}
 	?>
 	<td><?php echo $str; ?></td>
 	</tr>
 
 	<tr bgcolor="#eeeeee">
-	<td>Number of values stored in table history</td>
+	<td>Number of values stored</td>
 	<td><?php echo $stats["history_count"]; ?></td>
 	</tr>
 
 	<tr bgcolor="#dddddd">
-	<td>Number of values stored in table alarms</td>
+	<td>Number of alarms</td>
 	<td><?php echo $stats["alarms_count"]; ?></td>
 	</tr>
 
 	<tr bgcolor="#eeeeee">
-	<td>Number of values stored in table alerts</td>
+	<td>Number of alerts</td>
 	<td><?php echo $stats["alerts_count"]; ?></td>
 	</tr>
 
