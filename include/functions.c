@@ -763,10 +763,8 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	return SUCCEED;
 }
 
-/*
- * Send message to user. Message will be sent to all medias registered to given user.
- */ 
-void	send_to_user(DB_TRIGGER *trigger,int actionid,int userid,char *subject,char *message)
+/* Cannot use action->userid as it may also represent groupd id*/
+void	send_to_user_medias(DB_TRIGGER *trigger,DB_ACTION *action, int userid)
 {
 	DB_MEDIA media;
 	char sql[MAX_STRING_LEN+1];
@@ -791,9 +789,39 @@ void	send_to_user(DB_TRIGGER *trigger,int actionid,int userid,char *subject,char
 			continue;
 		}
 
-		DBadd_alert(actionid,media.mediatypeid,media.sendto,subject,message);
+		DBadd_alert(action->actionid,media.mediatypeid,media.sendto,action->subject,action->message);
 	}
 	DBfree_result(result);
+}
+
+/*
+ * Send message to user. Message will be sent to all medias registered to given user.
+ */ 
+void	send_to_user(DB_TRIGGER *trigger,DB_ACTION *action)
+{
+	char sql[MAX_STRING_LEN+1];
+	DB_RESULT *result;
+
+	int	i;
+
+	if(action->recipient == RECIPIENT_TYPE_USER)
+	{
+		send_to_user_medias(trigger, action, action->userid);
+	}
+	else if(action->recipient == RECIPIENT_TYPE_GROUP)
+	{
+		sprintf(sql,"select u.userid from users u, users_groups ug where ug.usrgrpid=%d and ug.userid=u.userid", action->userid);
+		result = DBselect(sql);
+		for(i=0;i<DBnum_rows(result);i++)
+		{
+			send_to_user_medias(trigger, action, atoi(DBget_field(result,i,0)));
+		}
+		DBfree_result(result);
+	}
+	else
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Unknown recipient type [%d] for actionid [%d]",action->recipient,action->actionid);
+	}
 }
 
 /*
@@ -865,7 +893,7 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 
 	now = time(NULL);
 
-	sprintf(sql,"select actionid,userid,delay,subject,message,scope,severity from actions where (scope=%d and triggerid=%d and good=%d and nextcheck<=%d) or (scope=%d and good=%d) or (scope=%d and good=%d)",ACTION_SCOPE_TRIGGER,trigger->triggerid,good,now,ACTION_SCOPE_HOST,good,ACTION_SCOPE_HOSTS,good);
+	sprintf(sql,"select actionid,userid,delay,subject,message,scope,severity,recipient from actions where (scope=%d and triggerid=%d and good=%d and nextcheck<=%d) or (scope=%d and good=%d) or (scope=%d and good=%d)",ACTION_SCOPE_TRIGGER,trigger->triggerid,good,now,ACTION_SCOPE_HOST,good,ACTION_SCOPE_HOSTS,good);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
@@ -881,7 +909,7 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 		strncpy(action.message,DBget_field(result,i,4),MAX_STRING_LEN);
 		action.scope=atoi(DBget_field(result,i,5));
 		action.severity=atoi(DBget_field(result,i,6));
-
+		action.recipient=atoi(DBget_field(result,i,7));
 
 		if(ACTION_SCOPE_TRIGGER==action.scope)
 		{
@@ -947,8 +975,7 @@ void	apply_actions(DB_TRIGGER *trigger,int good)
 			zabbix_log( LOG_LEVEL_WARNING, "Unsupported scope [%d] for actionid [%d]", action.scope, action.actionid);
 		}
 
-		send_to_user(trigger,action.actionid,action.userid,action.subject,action.message);
-		now = time(NULL);
+		send_to_user(trigger,&action);
 		sprintf(sql,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
 		DBexecute(sql);
 	}
