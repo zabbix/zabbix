@@ -37,9 +37,11 @@ int	BUFFERSMEM(const char *cmd, const char *parameter,double  *value);
 int	CACHEDMEM(const char *cmd, const char *parameter,double  *value);
 int	CKSUM(const char *cmd, const char *filename,double  *value);
 int	FILESIZE(const char *cmd, const char *filename,double  *value);
-int	DISKFREE(const char *cmd, const char *mountPoint,double  *value);
 int	DISKTOTAL(const char *cmd, const char *mountPoint,double  *value);
+int	DISKFREE(const char *cmd, const char *mountPoint,double  *value);
 int	DISKUSED(const char *cmd, const char *mountPoint,double  *value);
+int	DISKFREE_PERC(const char *cmd, const char *mountPoint,double  *value);
+int	DISKUSED_PERC(const char *cmd, const char *mountPoint,double  *value);
 
 int	DISK_IO(const char *cmd, const char *parameter,double  *value);
 int	DISK_RIO(const char *cmd, const char *parameter,double  *value);
@@ -48,7 +50,8 @@ int	DISK_RBLK(const char *cmd, const char *parameter,double  *value);
 int	DISK_WBLK(const char *cmd, const char *parameter,double  *value);
 int	FREEMEM(const char *cmd, const char *parameter,double  *value);
 
-int	INODE(const char *cmd, const char *mountPoint,double  *value);
+int	INODEFREE(const char *cmd, const char *mountPoint,double  *value);
+int	INODEFREE_PERC(const char *cmd, const char *mountPoint,double  *value);
 int	INODETOTAL(const char *cmd, const char *mountPoint,double  *value);
 
 int	KERNEL_MAXFILES(const char *cmd, const char *parameter,double  *value);
