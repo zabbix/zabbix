@@ -1,5 +1,6 @@
 Changes for 1.0beta10:
 
+ - added src/zabbix_snmptrap (Alexei)
  - fixed support of user-defined height of graphs (Alexei)
  - added frontends/include.classes.inc.php (Alexei)
  - show selected host in Host Add form (Alexei)
