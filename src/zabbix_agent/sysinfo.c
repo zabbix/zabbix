@@ -2386,6 +2386,12 @@ int	EXECUTE_STR(const char *cmd, const char *command,char  **value)
 		}
 	}
 
+	/* We got EOL only */
+	if(c[0] == '\n')
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
 	*value=strdup(c);
 	return	SYSINFO_RET_OK;
 }
@@ -2429,6 +2435,12 @@ int	EXECUTE(const char *cmd, const char *command,double *value)
 			default:
 				return SYSINFO_RET_FAIL;
 		}
+	}
+
+	/* We got EOL only */
+	if(c[0] == '\n')
+	{
+		return SYSINFO_RET_FAIL;
 	}
 
 	sscanf(c, "%lf", &result );
