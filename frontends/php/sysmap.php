@@ -183,7 +183,7 @@
 	echo "New host to display";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"get\" action=\"sysmap.php?sysmapid=".$HTTP_GET_VARS["sysmapid"].">";
+	echo "<form method=\"get\" action=\"sysmap.php?sysmapid=".$HTTP_GET_VARS["sysmapid"]."\">";
 	if(isset($HTTP_GET_VARS["shostid"]))
 	{
 		echo "<input name=\"shostid\" type=\"hidden\" value=".$HTTP_GET_VARS["shostid"].">";
