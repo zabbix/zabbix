@@ -76,16 +76,8 @@
 
 
 	echo "<br>";
-	echo "<TABLE BORDER=0 COLS=3 WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
-	echo "<TR BGCOLOR=\"#CCCCCC\">";
-	echo "<TD WIDTH=15%><B>From</B></TD>";
-	echo "<TD WIDTH=15%><B>Till</B></TD>";
-	echo "<TD WIDTH=10%><B>OK</B></TD>";
-	echo "<TD WIDTH=10%><B>Problems</B></TD>";
-	echo "<TD WIDTH=15%><B>Percentage</B></TD>";
-	echo "<TD><B>SLA</B></TD>";
-	echo "</TR>\n";
-
+	table_begin();
+	table_header(array(S_FROM,S_TILL,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));
 	$col=0;
 	$year=date("Y");
 	for($year=date("Y")-2;$year<=date("Y");$year++)
@@ -109,39 +101,46 @@
 				break;
 			}
 			$stat=calculate_service_availability($service["serviceid"],$period_start,$period_end);
-	
-			if($col++%2==0)	{ echo "<tr bgcolor=#EEEEEE>"; }
-			else		{ echo "<tr bgcolor=#DDDDDD>"; }
 
-			echo "<td>"; echo  date("d M Y",$period_start); echo "</td>";
-			echo "<td>"; echo  date("d M Y",$period_end); echo "</td>";
+			$from=date("d M Y",$period_start);
+			$till=date("d M Y",$period_end);
+	
 			$t=sprintf("%2.2f%%",$stat["problem"]);
 			$t_time=sprintf("%dd %dh %dm",$stat["problem_time"]/(24*3600),($stat["problem_time"]%(24*3600))/3600,($stat["problem_time"]%(3600))/(60));
 			$f=sprintf("%2.2f%%",$stat["ok"]);
 			$f_time=sprintf("%dd %dh %dm",$stat["ok_time"]/(24*3600),($stat["ok_time"]%(24*3600))/3600,($stat["ok_time"]%(3600))/(60));
-			echo "<td>"; echo "<font color=\"00AA00\">$f_time</font>" ; echo "</td>";
-			echo "<td>"; echo "<font color=\"AA0000\">$t_time</a>" ; echo "</td>";
-			echo "<td>"; echo "<font color=\"00AA00\">$f</font>/<font color=\"AA0000\">$t</font>" ; echo "</td>";
+
+			$ok=array("value"=>$f_time,"class"=>"off");
+			$problems=array("value"=>$t_time,"class"=>"on");
+			$percentage=array("value"=>$f,"class"=>"off");
+
 			if($service["showsla"]==1)
 			{
 				if($stat["ok"]>=$service["goodsla"])
 				{
-					echo "<td><font color=\"00AA00\">".$service["goodsla"]."%</font></td>";
+					$sla=array("value"=>$service["goodsla"],"class"=>"off");
 				}
 				else
 				{
-					echo "<td><font color=\"AA0000\">".$service["goodsla"]."%</font></td>";
+					$sla=array("value"=>$service["goodsla"],"class"=>"on");
 				}
 			}
 			else
 			{
-				echo "<td>-</td>";
+				$sla="-";
 			}
 		
-			echo "</tr>";
+			table_row(array(
+				$from,
+				$till,
+				$ok,
+				$problems,
+				$percentage,
+				$sla
+				),$col++);
 		}
 	}
-	echo "</TABLE>";
+	table_end();
 
 	show_footer();
 ?>
