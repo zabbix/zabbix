@@ -1,6 +1,6 @@
 <?
 	$page["title"] = "Alarms";
-	$page["file"] = "alarms.html";
+	$page["file"] = "alarms.php";
 
 	include "include/config.inc";
 	show_header($page["title"],0,0);
@@ -31,13 +31,13 @@
 <?
 	if(isset($limit) && ($limit=="NO"))
 	{
-		echo "[<A HREF=\"alarms.html?triggerid=$triggerid&limit=30\">";
+		echo "[<A HREF=\"alarms.php?triggerid=$triggerid&limit=30\">";
 		echo "Show only last 100</A>]";
 		$limit=" ";
 	}
 	else 
 	{
-		echo "[<A HREF=\"alarms.html?triggerid=$triggerid&limit=NO\">";
+		echo "[<A HREF=\"alarms.php?triggerid=$triggerid&limit=NO\">";
 		echo "Show all</A>]";
 		$limit=" limit 100";
 	}

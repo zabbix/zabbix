@@ -1,5 +1,5 @@
 <?
-	$page["file"]="history.html";
+	$page["file"]="history.php";
 
 	include "include/config.inc";
 
@@ -46,40 +46,40 @@
 
 <?
 	show_table_header_begin();
-	echo "<A HREF='latest.html?hostid=$hostid'>$host</A> : <a href='trends.html?itemid=$itemid'>$description</a>";
+	echo "<A HREF='latest.php?hostid=$hostid'>$host</A> : <a href='trends.php?itemid=$itemid'>$description</a>";
 	show_table_v_delimiter();
 	echo("<DIV ALIGN=CENTER>");
 	if($action =="showhistory")
 	{
-		echo("<b>[<A HREF=\"history.html?action=showhistory&itemid=$itemid\">Last hour graph</A>]</b> ");
+		echo("<b>[<A HREF=\"history.php?action=showhistory&itemid=$itemid\">Last hour graph</A>]</b> ");
 	}
 	else
 	{
-		echo("<A HREF=\"history.html?action=showhistory&itemid=$itemid\">Last hour graph</A> ");
+		echo("<A HREF=\"history.php?action=showhistory&itemid=$itemid\">Last hour graph</A> ");
 	}
 	if($action =="showvalues")
 	{
-		echo("<b>[<A HREF=\"history.html?action=showvalues&itemid=$itemid&period=3600\">Values of last hour</A>]</b> ");
+		echo("<b>[<A HREF=\"history.php?action=showvalues&itemid=$itemid&period=3600\">Values of last hour</A>]</b> ");
 	}
 	else
 	{
-		echo("<A HREF=\"history.html?action=showvalues&itemid=$itemid&period=3600\">Values of last hour</A> ");
+		echo("<A HREF=\"history.php?action=showvalues&itemid=$itemid&period=3600\">Values of last hour</A> ");
 	}
 	if($action =="showfreehist")
 	{
-		echo("<b>[<A HREF=\"history.html?action=showfreehist&itemid=$itemid\">Values of specified period</A>]</b> ");
+		echo("<b>[<A HREF=\"history.php?action=showfreehist&itemid=$itemid\">Values of specified period</A>]</b> ");
 	}
 	else
 	{
-		echo("<A HREF=\"history.html?action=showfreehist&itemid=$itemid\">Values of specified period</A> ");
+		echo("<A HREF=\"history.php?action=showfreehist&itemid=$itemid\">Values of specified period</A> ");
 	}
 	if($action =="showplaintxt")
 	{
-		echo("<b>[<A HREF=\"history.html?action=showplaintxt&itemid=$itemid\">Values in plaint text format</A>]</b> ");
+		echo("<b>[<A HREF=\"history.php?action=showplaintxt&itemid=$itemid\">Values in plaint text format</A>]</b> ");
 	}
 	else
 	{
-		echo("<A HREF=\"history.html?action=showplaintxt&itemid=$itemid\">Values in plaint text format</A> ");
+		echo("<A HREF=\"history.php?action=showplaintxt&itemid=$itemid\">Values in plaint text format</A> ");
 	}
 	echo("</DIV>\n");
 	show_table_header_end();

@@ -1,7 +1,7 @@
 <?
 	include "include/config.inc";
 	$page["title"] = "Network maps";
-	$page["file"] = "maps.html";
+	$page["file"] = "maps.php";
 
 	$nomenu=0;
 	if(isset($fullscreen))
@@ -39,7 +39,7 @@
 			{
 				echo "<b>[";
 			}
-			echo "<a href='maps.html?sysmapid=$sysmapid_'>$name</a>";
+			echo "<a href='maps.php?sysmapid=$sysmapid_'>$name</a>";
 			if(isset($sysmapid) && ($sysmapid == $sysmapid_) )
 			{
 				echo "]</b>";
@@ -65,11 +65,11 @@
 		$map=DBget_field($result,0,0);
 		if(isset($fullscreen))
 		{
-			$map="<a href=\"maps.html?sysmapid=$sysmapid\">".$map."</a>";;
+			$map="<a href=\"maps.php?sysmapid=$sysmapid\">".$map."</a>";;
 		}
 		else
 		{
-			$map="<a href=\"maps.html?sysmapid=$sysmapid&fullscreen=1\">".$map."</a>";;
+			$map="<a href=\"maps.php?sysmapid=$sysmapid&fullscreen=1\">".$map."</a>";;
 		}
 	}
 	else
@@ -100,12 +100,12 @@
 
 			if($status==0)
 			{
-				$map=$map."\n<area shape=rect coords=$x,$y,".($x+32).",".($y+32)." href=\"tr_status.html?hostid=$hostid&noactions=true&onlytrue=true&compact=true\" alt=\"$host\">";
+				$map=$map."\n<area shape=rect coords=$x,$y,".($x+32).",".($y+32)." href=\"tr_status.php?hostid=$hostid&noactions=true&onlytrue=true&compact=true\" alt=\"$host\">";
 			}
 		}
 		$map=$map."\n</map>";
 		echo $map;
-		echo "<IMG SRC=\"map.html?noedit=1&sysmapid=$sysmapid\" border=0 usemap=#links>";
+		echo "<IMG SRC=\"map.php?noedit=1&sysmapid=$sysmapid\" border=0 usemap=#links>";
 	}
 	else
 	{

@@ -1,7 +1,7 @@
 <?
 	include "include/config.inc";
 	$page["title"] = "Status of Zabbix";
-	$page["file"] = "report1.html";
+	$page["file"] = "report1.php";
 	show_header($page["title"],0,0);
 ?>
 

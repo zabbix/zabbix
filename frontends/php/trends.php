@@ -1,7 +1,7 @@
 <?
 	include "include/config.inc";
 	$page["title"] = "Latest values";
-	$page["file"] = "latest.html";
+	$page["file"] = "latest.php";
 	show_header($page["title"],0,0);
 ?>
 
@@ -12,7 +12,7 @@
 	$host=DBget_field($result,0,1);
 	$hostid=DBget_field($result,0,2);
 
-	echo "<A HREF='latest.html?hostid=$hostid'>$host</A> : <a href='history.html?action=showhistory&itemid=$itemid'>$description</a>";
+	echo "<A HREF='latest.php?hostid=$hostid'>$host</A> : <a href='history.php?action=showhistory&itemid=$itemid'>$description</a>";
 
 	show_table_v_delimiter();
 
@@ -20,43 +20,43 @@
 
 	if(isset($type)&&$type=="12hours")
 	{
-		echo "<b>[<a href='trends.html?itemid=$itemid&type=12hours'>12hours</a>]</b> ";
+		echo "<b>[<a href='trends.php?itemid=$itemid&type=12hours'>12hours</a>]</b> ";
 	}
 	else
 	{
-		echo "<a href='trends.html?itemid=$itemid&type=12hours'>12hours</a> ";
+		echo "<a href='trends.php?itemid=$itemid&type=12hours'>12hours</a> ";
 	}
 	if(isset($type)&&$type=="4hours")
 	{
-		echo "<b>[<a href='trends.html?itemid=$itemid&type=4hours'>4hours</a>]</b> ";
+		echo "<b>[<a href='trends.php?itemid=$itemid&type=4hours'>4hours</a>]</b> ";
 	}
 	else
 	{
-		echo "<a href='trends.html?itemid=$itemid&type=4hours'>4hours</a> ";
+		echo "<a href='trends.php?itemid=$itemid&type=4hours'>4hours</a> ";
 	}
 	if(isset($type)&&$type=="hour")
 	{
-		echo "<b>[<a href='trends.html?itemid=$itemid&type=hour'>hour</a>]</b> ";
+		echo "<b>[<a href='trends.php?itemid=$itemid&type=hour'>hour</a>]</b> ";
 	}
 	else
 	{
-		echo "<a href='trends.html?itemid=$itemid&type=hour'>hour</a> ";
+		echo "<a href='trends.php?itemid=$itemid&type=hour'>hour</a> ";
 	}
 	if(isset($type)&&$type=="30min")
 	{
-		echo "<b>[<a href='trends.html?itemid=$itemid&type=30min'>30min</a>]</b> ";
+		echo "<b>[<a href='trends.php?itemid=$itemid&type=30min'>30min</a>]</b> ";
 	}
 	else
 	{
-		echo "<a href='trends.html?itemid=$itemid&type=30min'>30min</a> ";
+		echo "<a href='trends.php?itemid=$itemid&type=30min'>30min</a> ";
 	}
 	if(isset($type)&&$type=="15min")
 	{
-		echo "<b>[<a href='trends.html?itemid=$itemid&type=15min'>15min</a>]</b> ";
+		echo "<b>[<a href='trends.php?itemid=$itemid&type=15min'>15min</a>]</b> ";
 	}
 	else
 	{
-		echo "<a href='trends.html?itemid=$itemid&type=15min'>15min</a> ";
+		echo "<a href='trends.php?itemid=$itemid&type=15min'>15min</a> ";
 	}
 	echo "</font>";
 
@@ -66,11 +66,11 @@
 		show_table_v_delimiter();
 		if(isset($trendavg))
 		{
-			echo "<a href='trends.html?itemid=$itemid&type=$type'>ALL</a> ";
+			echo "<a href='trends.php?itemid=$itemid&type=$type'>ALL</a> ";
 		}
 		else
 		{
-			echo "<a href='trends.html?itemid=$itemid&type=$type&trendavg=1'>AVG</a> ";
+			echo "<a href='trends.php?itemid=$itemid&type=$type&trendavg=1'>AVG</a> ";
 		}
 	}
 
@@ -95,11 +95,11 @@
 	{
 		if(isset($trendavg))
 		{
-			echo "<IMG SRC=\"trend.html?itemid=$itemid&type=$type&trendavg=1\">";
+			echo "<IMG SRC=\"trend.php?itemid=$itemid&type=$type&trendavg=1\">";
 		}
 		else
 		{
-			echo "<IMG SRC=\"trend.html?itemid=$itemid&type=$type\">";
+			echo "<IMG SRC=\"trend.php?itemid=$itemid&type=$type\">";
 		}
 	}
 	else

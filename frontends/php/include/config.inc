@@ -299,21 +299,21 @@
 		}
 		
 
-		if(	($page["file"]=="latest.html")||
-			($page["file"]=="tr_status.html")||
-			($page["file"]=="tr_comments.html")||
-			($page["file"]=="queue.html")||
-			($page["file"]=="latestalarms.html")||
-			($page["file"]=="alarms.html")||
-			($page["file"]=="alerts.html")||
-			($page["file"]=="history.html")||
-			($page["file"]=="maps.html")||
-			($page["file"]=="map.html")||
-			($page["file"]=="charts.html")||
-			($page["file"]=="chart.html")||
-			($page["file"]=="about.html")||
-			($page["file"]=="srv_status.html")||
-			($page["file"]=="index.html"))
+		if(	($page["file"]=="latest.php")||
+			($page["file"]=="tr_status.php")||
+			($page["file"]=="tr_comments.php")||
+			($page["file"]=="queue.php")||
+			($page["file"]=="latestalarms.php")||
+			($page["file"]=="alarms.php")||
+			($page["file"]=="alerts.php")||
+			($page["file"]=="history.php")||
+			($page["file"]=="maps.php")||
+			($page["file"]=="map.php")||
+			($page["file"]=="charts.php")||
+			($page["file"]=="chart.php")||
+			($page["file"]=="about.php")||
+			($page["file"]=="srv_status.php")||
+			($page["file"]=="index.php"))
 		{
 			$sql="select password_required from config";
 			$result=DBselect($sql);
@@ -383,10 +383,10 @@
 		<tr>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="latest.html">
+				<a href="latest.php">
 <?
-				if( 	($page["file"]=="latest.html") ||
-					($page["file"]=="history.html"))
+				if( 	($page["file"]=="latest.php") ||
+					($page["file"]=="history.php"))
 				{
 					echo "<b>[LATEST VALUES]</b></a>";
 				}
@@ -399,9 +399,9 @@
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="tr_status.html?notitle=true&onlytrue=true&noactions=true&compact=true">
+				<a href="tr_status.php?notitle=true&onlytrue=true&noactions=true&compact=true">
 <?
-				if($page["file"]=="tr_status.html")
+				if($page["file"]=="tr_status.php")
 				{
 					echo "<b>[STATUS OF TRIGGERS]</b></a>";
 				}
@@ -414,9 +414,9 @@
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="queue.html">
+				<a href="queue.php">
 <?
-				if($page["file"]=="queue.html")
+				if($page["file"]=="queue.php")
 				{
 					echo "<b>[QUEUE]</b></a>";
 				}
@@ -429,10 +429,10 @@
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="latestalarms.html">
+				<a href="latestalarms.php">
 <?
-				if(($page["file"]=="latestalarms.html") ||
-					($page["file"]=="alarms.html"))
+				if(($page["file"]=="latestalarms.php") ||
+					($page["file"]=="alarms.php"))
 				{
 					echo "<b>[ALARMS]</b></a>";
 				}
@@ -445,9 +445,9 @@
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="alerts.html">
+				<a href="alerts.php">
 <?
-				if($page["file"]=="alerts.html")
+				if($page["file"]=="alerts.php")
 				{
 					echo "<b>[ALERT HISTORY]</b></a>";
 				}
@@ -460,9 +460,9 @@
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="maps.html">
+				<a href="maps.php">
 <?
-				if($page["file"]=="maps.html")
+				if($page["file"]=="maps.php")
 				{
 					echo "<b>[NETWORK MAPS]</b></a>";
 				}
@@ -475,9 +475,9 @@
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="charts.html">
+				<a href="charts.php">
 <?
-				if($page["file"]=="charts.html")
+				if($page["file"]=="charts.php")
 				{
 					echo "<b>[GRAPHS]</b></a>";
 				}
@@ -491,9 +491,9 @@
 <? /*?>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="srv_status.html">
+				<a href="srv_status.php">
 <?
-				if($page["file"]=="srv_status.html")
+				if($page["file"]=="srv_status.php")
 				{
 					echo "<b>[IT SERVICES]</b></a>";
 				}
@@ -509,9 +509,9 @@
 		<tr>
 		<td colspan=2 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="about.html">
+				<a href="about.php">
 <?
-				if($page["file"]=="about.html")
+				if($page["file"]=="about.php")
 				{
 					echo "<b>[ABOUT]</b></a>";
 				}
@@ -524,9 +524,9 @@
 		</td>
 		<td colspan=3 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="report1.html">
+				<a href="report1.php">
 <?
-				if($page["file"]=="report1.html")
+				if($page["file"]=="report1.php")
 				{
 					echo "<b>[STATUS OF ZABBIX]</b></a>";
 				}
@@ -539,9 +539,9 @@
 		</td>
 		<td colspan=2 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="report2.html">
+				<a href="report2.php">
 <?
-				if($page["file"]=="report2.html")
+				if($page["file"]=="report2.php")
 				{
 					echo "<b>[AVAILABILITY REPORT]</b></a>";
 				}
@@ -556,9 +556,9 @@
 		<tr>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="config.html">
+				<a href="config.php">
 <?
-				if($page["file"]=="config.html")
+				if($page["file"]=="config.php")
 				{
 					echo "<b>[CONFIG]</b></a>";
 				}
@@ -571,10 +571,10 @@
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="users.html">
+				<a href="users.php">
 <?
-				if(	($page["file"]=="users.html")||
-					($page["file"]=="media.html"))
+				if(	($page["file"]=="users.php")||
+					($page["file"]=="media.php"))
 				{
 					echo "<b>[USERS]</b></a>";
 				}
@@ -587,9 +587,9 @@
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="hosts.html">
+				<a href="hosts.php">
 <?
-				if($page["file"]=="hosts.html")
+				if($page["file"]=="hosts.php")
 				{
 					echo "<b>[HOSTS]</b></a>";
 				}
@@ -602,9 +602,9 @@
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="10%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="items.html">
+				<a href="items.php">
 <?
-				if($page["file"]=="items.html")
+				if($page["file"]=="items.php")
 				{
 					echo "<b>[ITEMS]</b></a>";
 				}
@@ -617,10 +617,10 @@
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="triggers.html">
+				<a href="triggers.php">
 <?
-				if(	($page["file"]=="triggers.html")||
-					($page["file"]=="actions.html"))
+				if(	($page["file"]=="triggers.php")||
+					($page["file"]=="actions.php"))
 				{
 					echo "<b>[TRIGGERS]</b></a>";
 				}
@@ -633,10 +633,10 @@
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="sysmaps.html">
+				<a href="sysmaps.php">
 <?
-				if(	($page["file"]=="sysmaps.html")||
-					($page["file"]=="sysmap.html"))
+				if(	($page["file"]=="sysmaps.php")||
+					($page["file"]=="sysmap.php"))
 				{
 					echo "<b>[NETWORK MAPS]</b></a>";
 				}
@@ -649,10 +649,10 @@
 		</td>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="graphs.html">
+				<a href="graphs.php">
 <?
-				if(	($page["file"]=="graphs.html")||
-					($page["file"]=="graph.html"))
+				if(	($page["file"]=="graphs.php")||
+					($page["file"]=="graph.php"))
 				{
 					echo "<b>[GRAPHS]</b></a>";
 				}
@@ -666,9 +666,9 @@
 <? /*?>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
-				<a href="services.html">
+				<a href="services.php">
 <?
-				if($page["file"]=="services.html")
+				if($page["file"]=="services.php")
 				{
 					echo "<b>[IT SERVICES]</b></a>";
 				}
@@ -736,7 +736,7 @@
 				}
 				else
 				{
-					$exp=$exp."{<A HREF=\"history.html?action=showhistory&itemid=".DBget_field($res1,0,4)."\">".DBget_field($res1,0,0).":".DBget_field($res1,0,1)."</A>.<B>".DBget_field($res1,0,2)."(</B>".DBget_field($res1,0,3)."<B>)</B>}";
+					$exp=$exp."{<A HREF=\"history.php?action=showhistory&itemid=".DBget_field($res1,0,4)."\">".DBget_field($res1,0,0).":".DBget_field($res1,0,1)."</A>.<B>".DBget_field($res1,0,2)."(</B>".DBget_field($res1,0,3)."<B>)</B>}";
 				}
 				continue;
 			}
@@ -1787,7 +1787,7 @@
 		}
 		echo("<hr>");
 		echo "<center>";
-		echo "<IMG SRC=\"chart.html?itemid=$itemid&period=$period&from=$from\">"; 
+		echo "<IMG SRC=\"chart.php?itemid=$itemid&period=$period&from=$from\">"; 
 		echo "</center>";
 		echo("<hr>");
 
@@ -1795,29 +1795,29 @@
 		echo "<center>";
 		//  Start of <<< WEEK >>> 
 		$tmp=$from+12*14;
-		echo("[<A HREF=\"history.html?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
+		echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
 		echo("Week back</A>] ");
 
 		//  Start of <<< 12h >>> 
 		$tmp=$from+12;
-		echo("[<A HREF=\"history.html?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
+		echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
 		echo("12h back</A>] ");
 		//  End of <<< 12h >>> 
 		
 		//  HOUR BACK
 		$tmp=$from+1;
-		echo("[<A HREF=\"history.html?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
+		echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
 		echo("1h back</A>] ");
 
 		//  Start of --- 
 		$tmp=$period+3600;
-		echo("[<A HREF=\"history.html?action=showhistory&itemid=$itemid&from=$from&period=$tmp\">");
+		echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$from&period=$tmp\">");
 		echo("+1h</A>] ");
 
 		if ($period>3600) 
 		{
 			$tmp=$period-3600;
-			echo("[<A HREF=\"history.html?action=showhistory&itemid=$itemid&from=$from&period=$tmp\">");
+			echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$from&period=$tmp\">");
 			echo("-1h</A>] ");
 		}
 		else
@@ -1829,7 +1829,7 @@
 		if ($from>0) // HOUR FORWARD
 		{
 			$tmp=$from-1;
-			echo("[<A HREF=\"history.html?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
+			echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
 			echo("1h forward</A>] ");
 		}
 		else
@@ -1841,7 +1841,7 @@
 		if (isset($From) && ($From>0))
 		{
 			$tmp=$from-12;
-			echo("[<A HREF=\"history.html?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
+			echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
 			echo("12h forward</A>] ");
 		}
 		else
@@ -1852,7 +1852,7 @@
 		if (isset($From) && ($From>0))
 		{
 			$tmp=$from-12*14;
-			echo("[<A HREF=\"history.html?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
+			echo("[<A HREF=\"history.php?action=showhistory&itemid=$itemid&from=$tmp&period=$period\">");
 			echo("Week forward</A>] ");
 		}
 		else
@@ -1871,7 +1871,7 @@
 		echo "Choose period";
 
 		show_table2_v_delimiter();
-		echo "<form method=\"post\" action=\"history.html\">";
+		echo "<form method=\"post\" action=\"history.php\">";
 		echo "<input name=\"itemid\" type=\"hidden\" value=$itemid size=8>";
 		echo "Period in seconds";
 		show_table2_h_delimiter();
@@ -1898,7 +1898,7 @@
 		echo "Data in plain text format";
 
 		show_table2_v_delimiter();
-		echo "<form method=\"get\" action=\"history.html\">";
+		echo "<form method=\"get\" action=\"history.php\">";
 		echo "<input name=\"itemid\" type=\"Hidden\" value=$itemid size=8>";
 		echo "<input name=\"itemid\" type=\"Hidden\" value=$itemid size=8>";
 		echo "From: (yyyy/mm/dd - HH:MM)";
@@ -1965,7 +1965,7 @@
 		echo "Item configuration";
  
 		show_table2_v_delimiter();
-		echo "<form method=\"post\" action=\"items.html\">";
+		echo "<form method=\"post\" action=\"items.php\">";
 		echo "<input name=\"itemid\" type=hidden value=$itemid size=8>";
 		echo "Description";
 		show_table2_h_delimiter();
@@ -2096,7 +2096,7 @@
 		echo "New user";
 
 		show_table2_v_delimiter();
-		echo "<form method=\"post\" action=\"users.html\">";
+		echo "<form method=\"post\" action=\"users.php\">";
 		if(isset($userid))
 		{
 			echo "<input name=\"userid\" type=\"hidden\" value=\"$userid\" size=8>";
@@ -2188,11 +2188,11 @@
 		show_table2_v_delimiter();
 		if(isset($hostid))
 		{
-			echo "<form method=\"post\" action=\"triggers.html?hostid=$hostid\">";
+			echo "<form method=\"post\" action=\"triggers.php?hostid=$hostid\">";
 		}
 		else
 		{
-			echo "<form method=\"post\" action=\"triggers.html\">";
+			echo "<form method=\"post\" action=\"triggers.php\">";
 		}
 		echo "<input name=\"triggerid\" type=hidden value=$triggerid size=8>";
 		echo "Description";

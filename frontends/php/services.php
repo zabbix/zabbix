@@ -1,6 +1,6 @@
 <?
 	$page["title"] = "High-level representation of monitored data";
-	$page["file"] = "services.html";
+	$page["file"] = "services.php";
 
 	include "include/config.inc";
 	show_header($page["title"],0,0);
@@ -58,8 +58,8 @@
 	{
 		echo "<tr bgcolor=#EEEEEE>";
 		$service=get_service_by_serviceid($serviceid);
-		echo "<td><b><a href=\"services.html?serviceid=".$service["serviceid"]."#form\">".$service["name"]."</a></b></td>";
-		echo "<td><a href=\"services.html?serviceid=".$service["serviceid"]."&register=delete\">Delete</a></td>";
+		echo "<td><b><a href=\"services.php?serviceid=".$service["serviceid"]."#form\">".$service["name"]."</a></b></td>";
+		echo "<td><a href=\"services.php?serviceid=".$service["serviceid"]."&register=delete\">Delete</a></td>";
 		echo "</tr>"; 
 		$col++;
 	}
@@ -85,13 +85,13 @@
 		$childs=get_num_of_service_childs($row["serviceid"]);
 		if(isset($serviceid))
 		{
-			echo "<td><a href=\"services.html?serviceid=".$row["serviceid"]."#form\"> - ".$row["name"]." [$childs]</a></td>";
+			echo "<td><a href=\"services.php?serviceid=".$row["serviceid"]."#form\"> - ".$row["name"]." [$childs]</a></td>";
 		}
 		else
 		{
-			echo "<td><a href=\"services.html?serviceid=".$row["serviceid"]."#form\">".$row["name"]." [$childs]</a></td>";
+			echo "<td><a href=\"services.php?serviceid=".$row["serviceid"]."#form\">".$row["name"]." [$childs]</a></td>";
 		}
-		echo "<td><a href=\"services.html?serviceid=".$row["serviceid"]."&register=delete\">Delete</a></td>";
+		echo "<td><a href=\"services.php?serviceid=".$row["serviceid"]."&register=delete\">Delete</a></td>";
 		echo "</tr>";
 	}
 	echo "</table>";
@@ -116,7 +116,7 @@
 	echo "New service";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"services.html\">";
+	echo "<form method=\"post\" action=\"services.php\">";
 	if(isset($serviceid))
 	{
 		echo "<input name=\"serviceid\" type=\"hidden\" value=$serviceid>";
@@ -184,7 +184,7 @@
 	echo "New link";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"services.html\">";
+	echo "<form method=\"post\" action=\"services.php\">";
 	if(isset($serviceid))
 	{
 		echo "<input name=\"serviceid\" type=\"hidden\" value=$serviceid>";

@@ -1,7 +1,7 @@
 <?
 	include "include/config.inc";
 	$page["title"] = "Configuration of network map";
-	$page["file"] = "sysmap.html";
+	$page["file"] = "sysmap.php";
 	show_header($page["title"],0,0);
 ?>
 
@@ -65,11 +65,11 @@
 			$y_=DBget_field($result,$i,6);
 			$status_=DBget_field($result,$i,7);
 
-			$map=$map."\n<area shape=rect coords=$x_,$y_,".($x_+32).",".($y_+32)." href=\"sysmap.html?sysmapid=$sysmapid_&shostid=$shostid_#form\" alt=\"$host_\">";
+			$map=$map."\n<area shape=rect coords=$x_,$y_,".($x_+32).",".($y_+32)." href=\"sysmap.php?sysmapid=$sysmapid_&shostid=$shostid_#form\" alt=\"$host_\">";
 		}
 		$map=$map."\n</map>";
 		echo $map;
-		echo "<IMG SRC=\"map.html?sysmapid=$sysmapid\" border=0 usemap=#links>";
+		echo "<IMG SRC=\"map.php?sysmapid=$sysmapid\" border=0 usemap=#links>";
 	}
 
 	echo "</TD>";
@@ -115,7 +115,7 @@
 		echo "<TD>$x_</TD>";
 		echo "<TD>$y_</TD>";
 		echo "<TD>$icon_</TD>";
-		echo "<TD><A HREF=\"sysmap.html?sysmapid=$sysmapid_&shostid=$shostid_#form\">Change</A> - <A HREF=\"sysmap.html?register=delete&sysmapid=$sysmapid_&shostid=$shostid_\">Delete</A></TD>";
+		echo "<TD><A HREF=\"sysmap.php?sysmapid=$sysmapid_&shostid=$shostid_#form\">Change</A> - <A HREF=\"sysmap.php?register=delete&sysmapid=$sysmapid_&shostid=$shostid_\">Delete</A></TD>";
 		echo "</TR>";
 	}
 	echo "</TABLE>";
@@ -155,7 +155,7 @@
 
 		echo "<TD>$label1</TD>";
 		echo "<TD>$label2</TD>";
-		echo "<TD><A HREF=\"sysmap.html?sysmapid=$sysmapid&register=delete_link&linkid=$linkid\">Delete</A></TD>";
+		echo "<TD><A HREF=\"sysmap.php?sysmapid=$sysmapid&register=delete_link&linkid=$linkid\">Delete</A></TD>";
 		echo "</TR>";
 	}
 	echo "</TABLE>";
@@ -185,7 +185,7 @@
 	echo "New host to display";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"sysmap.html?sysmapid=$sysmapid\">";
+	echo "<form method=\"post\" action=\"sysmap.php?sysmapid=$sysmapid\">";
 	if(isset($shostid))
 	{
 		echo "<input name=\"shostid\" type=\"hidden\" value=$shostid>";
@@ -262,7 +262,7 @@
 	echo "New connector";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"sysmap.html?sysmapid=$sysmapid\">";
+	echo "<form method=\"post\" action=\"sysmap.php?sysmapid=$sysmapid\">";
 	echo "Host 1";
 	show_table2_h_delimiter();
 	$result=DBselect("select shostid,label from sysmaps_hosts where sysmapid=$sysmapid order by label");
@@ -276,7 +276,7 @@
 	echo "</SELECT>";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"sysmap.html?sysmapid=$sysmapid\">";
+	echo "<form method=\"post\" action=\"sysmap.php?sysmapid=$sysmapid\">";
 	echo "Host 2";
 	show_table2_h_delimiter();
 	$result=DBselect("select shostid,label from sysmaps_hosts where sysmapid=$sysmapid order by label");

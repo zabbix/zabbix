@@ -1,6 +1,6 @@
 <?
 	$page["title"] = "High-level representation of monitored data";
-	$page["file"] = "srv_status.html";
+	$page["file"] = "srv_status.php";
 
 	include "include/config.inc";
 	show_header($page["title"],0,0);
@@ -25,7 +25,7 @@
 	{
 		echo "<tr bgcolor=#EEEEEE>";
 		$service=get_service_by_serviceid($serviceid);
-		echo "<td><b><a href=\"srv_status.html?serviceid=".$service["serviceid"]."\">".$service["name"]."</a></b></td>";
+		echo "<td><b><a href=\"srv_status.php?serviceid=".$service["serviceid"]."\">".$service["name"]."</a></b></td>";
 		echo "</tr>"; 
 		$col++;
 	}
@@ -48,7 +48,7 @@
 			if($col++%2==0)	{ echo "<tr bgcolor=#EEEEEE>"; }
 			else		{ echo "<tr bgcolor=#DDDDDD>"; }
 		}
-//		echo "<td><a href=\"srv_status.html?serviceid=".$row["serviceid"]."\">".$row["name"]."</a></td>";
+//		echo "<td><a href=\"srv_status.php?serviceid=".$row["serviceid"]."\">".$row["name"]."</a></td>";
 		$childs=get_num_of_service_childs($row["serviceid"]);
 		if(isset($row["triggerid"]))
 		{
@@ -68,7 +68,7 @@
 			}
 			else
 			{
-				echo "<td><a href=\"srv_status.html?serviceid=".$row["serviceid"]."\"> - $description</a></td>";
+				echo "<td><a href=\"srv_status.php?serviceid=".$row["serviceid"]."\"> - $description</a></td>";
 			}
 		}
 		else
@@ -79,7 +79,7 @@
 			}
 			else
 			{
-				echo "<td><a href=\"srv_status.html?serviceid=".$row["serviceid"]."\"> $description</a></td>";
+				echo "<td><a href=\"srv_status.php?serviceid=".$row["serviceid"]."\"> $description</a></td>";
 			}
 		}
 		echo "</tr>"; 

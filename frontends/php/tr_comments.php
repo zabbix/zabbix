@@ -1,6 +1,6 @@
 <?
 	$page["title"] = "Trigger comments";
-	$page["file"] = "tr_comments.html";
+	$page["file"] = "tr_comments.php";
 
 	include "include/config.inc";
 	show_header($page["title"],0,0);
@@ -29,7 +29,7 @@
 	echo "Comments";
 
 	show_table2_v_delimiter();
-	echo "<form method=\"post\" action=\"tr_comments.html\">";
+	echo "<form method=\"post\" action=\"tr_comments.php\">";
 	echo "<input name=\"triggerid\" type=\"hidden\" value=$triggerid>";
 	echo "Comments";
 	show_table2_h_delimiter();
