@@ -31,8 +31,8 @@ int	evaluate_MIN(char *value,DB_ITEM	*item,int parameter)
 	DB_RESULT	*result;
 
 	char		sql[MAX_STRING_LEN+1];
-
 	int		now;
+	int		res = SUCCEED;
 
 	if(item->value_type != 0)
 	{
@@ -44,18 +44,18 @@ int	evaluate_MIN(char *value,DB_ITEM	*item,int parameter)
 	sprintf(sql,"select min(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
 
 	result = DBselect(sql);
-	if(DBis_empty(result) == SUCCEED)
+	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for MIN is empty" );
-		DBfree_result(result);
-		return	FAIL;
+		res = FAIL;
 	}
-
-	strncpy(value,DBget_field(result,0,0),MAX_STRING_LEN);
-
+	else
+	{
+		strncpy(value,DBget_field(result,0,0),MAX_STRING_LEN);
+	}
 	DBfree_result(result);
 
-	return SUCCEED;
+	return res;
 }
 
 /*
@@ -66,8 +66,8 @@ int	evaluate_MAX(char *value,DB_ITEM *item,int parameter)
 	DB_RESULT	*result;
 
 	char		sql[MAX_STRING_LEN+1];
-
 	int		now;
+	int		res = SUCCEED;
 
 	if(item->value_type != 0)
 	{
@@ -79,18 +79,18 @@ int	evaluate_MAX(char *value,DB_ITEM *item,int parameter)
 	sprintf(sql,"select max(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
 
 	result = DBselect(sql);
-	if(DBis_empty(result) == SUCCEED)
+	if(DBnum_rows(result) == 0)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
-		DBfree_result(result);
-		return	FAIL;
+		res = FAIL;
 	}
-	
-	strncpy(value,DBget_field(result,0,0),MAX_STRING_LEN);
-
+	else
+	{
+		strncpy(value,DBget_field(result,0,0),MAX_STRING_LEN);
+	}
 	DBfree_result(result);
 
-	return SUCCEED;
+	return res;
 }
 
 /*
@@ -209,13 +209,6 @@ void	update_functions(DB_ITEM *item)
 	sprintf(sql,"select function,parameter,itemid from functions where itemid=%d group by 1,2,3 order by 1,2,3",item->itemid);
 
 	result = DBselect(sql);
-
-	if(DBis_empty(result) == SUCCEED)
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "No functions to update.");
-		DBfree_result(result);
-		return;
-	}
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
@@ -496,13 +489,6 @@ void	send_to_user(int actionid,int userid,char *subject,char *message)
 	sprintf(sql,"select type,sendto,active from media where active=%d and userid=%d",MEDIA_STATUS_ACTIVE,userid);
 	result = DBselect(sql);
 
-	if(DBis_empty(result) == SUCCEED)
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "No active media defined for this user.");
-		DBfree_result(result);
-		return;
-	}
-
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 		media.active=atoi(DBget_field(result,i,2));
@@ -523,12 +509,14 @@ void	substitute_hostname(int triggerid,char *s)
 	char sql[MAX_STRING_LEN+1];
 	DB_RESULT *result;
 
+	zabbix_log( LOG_LEVEL_DEBUG, "In substitute_hostname([%d],[%s])",triggerid,s);
+
 	if(strstr(s,"%s") != 0)
 	{
 		sprintf(sql,"select distinct t.description,h.host from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid", triggerid);
 		result = DBselect(sql);
 
-		if(DBis_empty(result) == SUCCEED)
+		if(DBnum_rows(result) == 0)
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "No hostname in substitute_hostname()");
 			DBfree_result(result);
@@ -539,6 +527,7 @@ void	substitute_hostname(int triggerid,char *s)
 
 		DBfree_result(result);
 	}
+	zabbix_log( LOG_LEVEL_DEBUG, "End of substitute_hostname() Result [%s]",s);
 }
 
 /*
@@ -552,7 +541,7 @@ void	apply_actions(int triggerid,int good)
 
 	char sql[MAX_STRING_LEN+1];
 
-	int	i,rows;
+	int	i;
 	int	now;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In apply_actions()");
@@ -563,7 +552,7 @@ void	apply_actions(int triggerid,int good)
 
 		sprintf(sql,"select count(*) from trigger_depends d,triggers t where d.triggerid_down=%d and d.triggerid_up=t.triggerid and t.value=%d",triggerid, TRIGGER_VALUE_TRUE);
 		result = DBselect(sql);
-		if(DBis_empty(result) == FAIL)
+		if(DBnum_rows(result) == 1)
 		{
 			if(atoi(DBget_field(result,0,0))>0)
 			{
@@ -582,25 +571,17 @@ void	apply_actions(int triggerid,int good)
 	sprintf(sql,"select actionid,userid,delay,subject,message from actions where triggerid=%d and good=%d and nextcheck<=%d",triggerid,good,now);
 	result = DBselect(sql);
 
-	if(DBis_empty(result) == SUCCEED)
+	for(i=0;i<DBnum_rows(result);i++)
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "No actions applied.");
-		DBfree_result(result);
-		return;
-	}
 
-	rows = DBnum_rows(result);
-
-	for(i=0;i<rows;i++)
-	{
 		zabbix_log( LOG_LEVEL_DEBUG, "i=[%d]",i);
 /*		zabbix_log( LOG_LEVEL_DEBUG, "Fetched:%s %s %s %s %s\n",DBget_field(result,i,0),DBget_field(result,i,1),DBget_field(result,i,2),DBget_field(result,i,3),DBget_field(result,i,4));*/
 
 		action.actionid=atoi(DBget_field(result,i,0));
 		action.userid=atoi(DBget_field(result,i,1));
 		action.delay=atoi(DBget_field(result,i,2));
-		action.subject=DBget_field(result,i,3);
-		action.message=DBget_field(result,i,4);
+		strncpy(action.subject,DBget_field(result,i,3),MAX_STRING_LEN);
+		strncpy(action.message,DBget_field(result,i,4),MAX_STRING_LEN);
 
 		substitute_hostname(triggerid,action.message);
 		substitute_hostname(triggerid,action.subject);
@@ -632,48 +613,42 @@ void	update_serv(int serviceid)
 	sprintf(sql,"select l.serviceupid,s.algorithm from services_links l,services s where s.serviceid=l.serviceupid and l.servicedownid=%d",serviceid);
 	result=DBselect(sql);
 	status=0;	
-	if(DBis_empty(result) != SUCCEED)
+	for(i=0;i<DBnum_rows(result);i++)
 	{
-		for(i=0;i<DBnum_rows(result);i++)
+		serviceupid=atoi(DBget_field(result,i,0));
+		algorithm=atoi(DBget_field(result,i,1));
+		if(SERVICE_ALGORITHM_NONE == algorithm)
 		{
-			serviceupid=atoi(DBget_field(result,i,0));
-			algorithm=atoi(DBget_field(result,i,1));
-			if(SERVICE_ALGORITHM_NONE == algorithm)
-			{
 /* Do nothing */
-			}
-			else if(SERVICE_ALGORITHM_MAX == algorithm)
-			{
-				sprintf(sql,"select status from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
-				result2=DBselect(sql);
-				for(j=0;j<DBnum_rows(result2);j++)
-				{
-					if(atoi(DBget_field(result2,j,0))>status)
-					{
-						status=atoi(DBget_field(result2,j,0));
-					}
-				}
-				sprintf(sql,"update services set status=%d where serviceid=%d",status,atoi(DBget_field(result,i,0)));
-				DBexecute(sql);
-				DBfree_result(result2);
-			}
-			else
-			{
-				zabbix_log( LOG_LEVEL_ERR, "Unknown calculation algorithm of service status [%d]", algorithm);
-			}
 		}
-	}	
+		else if(SERVICE_ALGORITHM_MAX == algorithm)
+		{
+			sprintf(sql,"select status from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
+			result2=DBselect(sql);
+			for(j=0;j<DBnum_rows(result2);j++)
+			{
+				if(atoi(DBget_field(result2,j,0))>status)
+				{
+					status=atoi(DBget_field(result2,j,0));
+				}
+			}
+			sprintf(sql,"update services set status=%d where serviceid=%d",status,atoi(DBget_field(result,i,0)));
+			DBexecute(sql);
+			DBfree_result(result2);
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_ERR, "Unknown calculation algorithm of service status [%d]", algorithm);
+		}
+	}
 	DBfree_result(result);
 
 	sprintf(sql,"select serviceupid from services_links where servicedownid=%d",serviceid);
 	result=DBselect(sql);
 
-	if(DBis_empty(result) != SUCCEED)
+	for(i=0;i<DBnum_rows(result);i++)
 	{
-		for(i=0;i<DBnum_rows(result);i++)
-		{
-			update_serv(atoi(DBget_field(result,i,0)));
-		}
+		update_serv(atoi(DBget_field(result,i,0)));
 	}
 	DBfree_result(result);
 }
@@ -691,13 +666,6 @@ void	update_services(int triggerid, int status)
 
 	sprintf(sql,"select serviceid from services where triggerid=%d", triggerid);
 	result = DBselect(sql);
-
-	if(DBis_empty(result) == SUCCEED)
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "No service for this triggerid [%d]", triggerid);
-		DBfree_result(result);
-		return;
-	}
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
@@ -738,13 +706,6 @@ void	update_triggers( int suckers, int flag, int sucker_num, int lastclock )
 	}
 
 	result = DBselect(sql);
-
-	if(DBis_empty(result) == SUCCEED)
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "No triggers to update" );
-		DBfree_result(result);
-		return;
-	}
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
@@ -837,7 +798,7 @@ int	get_lastvalue(char *value,char *host,char *key,char *function,char *paramete
 	sprintf(sql, "select i.itemid,i.prevvalue,i.lastvalue,i.value_type from items i,hosts h where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", host, key );
 	result = DBselect(sql);
 
-	if(DBis_empty(result) == SUCCEED)
+	if(DBnum_rows(result) == 0)
 	{
         	DBfree_result(result);
 		zabbix_log(LOG_LEVEL_WARNING, "Query [%s] returned empty result" );
@@ -896,7 +857,7 @@ int	process_data(int sockfd,char *server,char *key,char *value)
 	sprintf(sql,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts from items i,hosts h where h.status in (0,2) and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d", server, key, ITEM_TYPE_TRAPPER);
 	result = DBselect(sql);
 
-	if(DBis_empty(result) == SUCCEED)
+	if(DBnum_rows(result) == 0)
 	{
 		DBfree_result(result);
 		return  FAIL;

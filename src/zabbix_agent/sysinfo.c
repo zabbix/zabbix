@@ -100,9 +100,12 @@ COMMAND	commands[AGENT_MAX_USER_COMMANDS]=
 
 	{"version[zabbix_agent]",0,	 		VERSION, 0},
 
-	{"diskfree[*]"		,DF, 			0, "/"},
+	{"diskfree[*]"		,DISKFREE,		0, "/"},
+	{"disktotal[*]"		,DISKTOTAL,		0, "/"},
 
 	{"inodefree[*]"		,INODE, 		0, "/"},
+
+	{"inodetotal[*]"	,INODETOTAL, 		0, "/"},
 
 	{"cksum[*]"		,CKSUM, 		0, "/etc/services"},
 
@@ -622,12 +625,52 @@ float	INODE(const char * mountPoint)
 		return s.f_ffree;
 
 	}
-
 	return	FAIL;
 #endif
 }
 
-float	DF(const char * mountPoint)
+float	INODETOTAL(const char * mountPoint)
+{
+#ifdef HAVE_SYS_STATVFS_H
+	struct statvfs   s;
+
+	if ( statvfs( (char *)mountPoint, &s) != 0 )
+	{
+		return  FAIL;
+	}
+
+	return  s.f_files;
+#else
+	struct statfs   s;
+	long            blocks_used;
+	long            blocks_percent_used;
+
+	if ( statfs( (char *)mountPoint, &s) != 0 ) 
+	{
+		return	FAIL;
+	}
+        
+	if ( s.f_blocks > 0 ) {
+		blocks_used = s.f_blocks - s.f_bfree;
+		blocks_percent_used = (long)
+		(blocks_used * 100.0 / (blocks_used + s.f_bavail) + 0.5);
+
+/*		printf(
+		"%7.0f %7.0f  %7.0f  %5ld%%   %s\n"
+		,s.f_blocks * (s.f_bsize / 1024.0)
+		,(s.f_blocks - s.f_bfree)  * (s.f_bsize / 1024.0)
+		,s.f_bavail * (s.f_bsize / 1024.0)
+		,blocks_percent_used
+		,mountPoint);
+*/
+		return s.f_files;
+
+	}
+	return	FAIL;
+#endif
+}
+
+float	DISKFREE(const char * mountPoint)
 {
 #ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
@@ -662,6 +705,48 @@ float	DF(const char * mountPoint)
 		,mountPoint);
 */
 		return s.f_bavail * (s.f_bsize / 1024.0);
+
+	}
+
+	return	FAIL;
+#endif
+}
+
+float	DISKTOTAL(const char * mountPoint)
+{
+#ifdef HAVE_SYS_STATVFS_H
+	struct statvfs   s;
+
+	if ( statvfs( (char *)mountPoint, &s) != 0 )
+	{
+		return  FAIL;
+	}
+
+	return  s.f_blocks * (s.f_bsize / 1024.0);
+#else
+	struct statfs   s;
+	long            blocks_used;
+	long            blocks_percent_used;
+
+	if ( statfs( (char *)mountPoint, &s) != 0 )
+	{
+		return	FAIL;
+	}
+        
+	if ( s.f_blocks > 0 ) {
+		blocks_used = s.f_blocks - s.f_bfree;
+		blocks_percent_used = (long)
+		(blocks_used * 100.0 / (blocks_used + s.f_bavail) + 0.5);
+
+/*		printf(
+		"%7.0f %7.0f  %7.0f  %5ld%%   %s\n"
+		,s.f_blocks * (s.f_bsize / 1024.0)
+		,(s.f_blocks - s.f_bfree)  * (s.f_bsize / 1024.0)
+		,s.f_bavail * (s.f_bsize / 1024.0)
+		,blocks_percent_used
+		,mountPoint);
+*/
+		return s.f_blocks * (s.f_bsize / 1024.0);
 
 	}
 

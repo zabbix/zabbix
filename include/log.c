@@ -79,7 +79,7 @@ void zabbix_log(int level, const char *fmt, ...)
 		vsprintf(str,fmt,ap);
 		strncat(str,"\n",MAX_STRING_LEN);
 		strncat(str2,str,MAX_STRING_LEN);
-		fprintf(log_file,str2);
+		fprintf(log_file,"%s",str2);
 		fflush(log_file);
 		va_end(ap);
 	}

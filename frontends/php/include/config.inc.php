@@ -433,7 +433,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 // 	Replace all <float> <sign> <float> with 0
 //			echo "Expression:$expression<br>";
 			$arr="";
-			if (eregi('^((.)*)([0-9\.]+)([\&\|\>\<\=]{1})([0-9\.]+)((.)*)$', $expression, &$arr)) 
+			if (eregi('^((.)*)([0-9\.]+)([\&\|\>\<\=\+\-\*\/]{1})([0-9\.]+)((.)*)$', $expression, &$arr)) 
 			{
 //				echo "OK<br>";
 //				for($i=0;$i<50;$i++)
@@ -451,7 +451,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					$ERROR_MSG="[".$arr[5]."] is not a float";
 					return -1;
 				}
-				$expression=$arr[1]."0".$arr[6];
+				$expression=$arr[1]."(0)".$arr[6];
 	                }
 			else
 			{
@@ -460,7 +460,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 
 // 	Replace all (float) with 0
-//			echo "Expression2:$expression<br>";
+//			echo "Expression2:[$expression]<br>";
 			$arr="";
 			if (eregi('^((.)*)(\(([0-9\.]+)\))((.)*)$', $expression, &$arr)) 
 			{
@@ -1623,7 +1623,19 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 		$sql="delete from functions where itemid=$itemid";
 		return	DBexecute($sql);
+	}
 
+	# Delete Service definitions by triggerid
+
+	function	delete_services_by_triggerid($triggerid)
+	{
+		$sql="select serviceid from services where triggerid=$triggerid";
+		$result=DBselect($sql);
+		for($i=0;$i<DBnum_rows($result);$i++)
+		{
+			delete_service(DBget_field($result,$i,0));
+		}
+		return	TRUE;
 	}
 
 	# Delete Item definition
@@ -1741,6 +1753,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 			return	$result;
 		}
+		$result=delete_services_by_triggerid($triggerid);
+		if(!$result)
+		{
+			return	$result;
+		}
 
 		$sql="delete from triggers where triggerid=$triggerid";
 		return	DBexecute($sql);
@@ -1832,7 +1849,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			$delay=DBget_field($result,$i,3);
 			$value_type=DBget_field($result,$i,4);
 
-			$itemid=add_item($description,$key,$hostid,$delay,30*24*3600,0,0,"","",$value_type,'');
+			$itemid=add_item($description,$key,$hostid,$delay,30,0,0,"","",$value_type,'');
 
 			$result2=DBselect("select triggertemplateid,description,expression from triggers_template where itemtemplateid=$itemtemplateid");
 			for($j=0;$j<DBnum_rows($result2);$j++)

@@ -2,7 +2,7 @@
 	include "include/config.inc.php";
 	$page["title"] = "Latest values";
 	$page["file"] = "latest.php";
-	show_header($page["title"],0,0);
+	show_header($page["title"],300,0);
 ?>
 
 <?

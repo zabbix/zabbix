@@ -91,7 +91,6 @@
 		echo "</table>\n";
 	}
 ?>
-
 <?
 	show_footer();
 ?>
