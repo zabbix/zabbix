@@ -26,3 +26,14 @@ AC_CHECK_FUNCS(socket strtod)
 
 AC_CONFIG_HEADER(config.h)
 AC_OUTPUT(Makefile)
+
+
+echo
+echo "***********************************************************"
+echo "*            Now run make                                 *"
+echo "*                                                         *"
+echo "*            Thank you for using Zabbix !                 *"
+echo "*          <http://zabbix.sourceforge.net>                *"
+echo "***********************************************************"
+echo
+
