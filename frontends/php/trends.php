@@ -7,70 +7,70 @@
 
 <?
 	show_table_header_begin();
-	$result=DBselect("select i.description,h.host,h.hostid from items i,hosts h where i.hostid=h.hostid and i.itemid=$itemid");
+	$result=DBselect("select i.description,h.host,h.hostid from items i,hosts h where i.hostid=h.hostid and i.itemid=".$HTTP_GET_VARS["itemid"]);
 	$description=DBget_field($result,0,0);
 	$host=DBget_field($result,0,1);
 	$hostid=DBget_field($result,0,2);
 
-	echo "<A HREF='latest.php?hostid=$hostid'>$host</A> : <a href='compare.php?action=showhistory&itemid=$itemid'>$description</a>";
+	echo "<A HREF='latest.php?hostid=$hostid'>$host</A> : <a href='compare.php?action=showhistory&itemid=".$HTTP_GET_VARS["itemid"]."'>$description</a>";
 
 	show_table_v_delimiter();
 
 	echo "<font size=2>";
 
-	if(isset($type)&&$type=="12hours")
+	if(isset($HTTP_GET_VARS["type"])&&$HTTP_GET_VARS["type"]=="12hours")
 	{
-		echo "<b>[<a href='trends.php?itemid=$itemid&type=12hours'>12hours</a>]</b> ";
+		echo "<b>[<a href='trends.php?itemid=".$HTTP_GET_VARS["itemid"]."&type=12hours'>12hours</a>]</b> ";
 	}
 	else
 	{
-		echo "<a href='trends.php?itemid=$itemid&type=12hours'>12hours</a> ";
+		echo "<a href='trends.php?itemid=".$HTTP_GET_VARS["itemid"]."&type=12hours'>12hours</a> ";
 	}
-	if(isset($type)&&$type=="4hours")
+	if(isset($HTTP_GET_VARS["type"])&&$HTTP_GET_VARS["type"]=="4hours")
 	{
-		echo "<b>[<a href='trends.php?itemid=$itemid&type=4hours'>4hours</a>]</b> ";
-	}
-	else
-	{
-		echo "<a href='trends.php?itemid=$itemid&type=4hours'>4hours</a> ";
-	}
-	if(isset($type)&&$type=="hour")
-	{
-		echo "<b>[<a href='trends.php?itemid=$itemid&type=hour'>hour</a>]</b> ";
+		echo "<b>[<a href='trends.php?itemid=".$HTTP_GET_VARS["itemid"]."&type=4hours'>4hours</a>]</b> ";
 	}
 	else
 	{
-		echo "<a href='trends.php?itemid=$itemid&type=hour'>hour</a> ";
+		echo "<a href='trends.php?itemid=".$HTTP_GET_VARS["itemid"]."&type=4hours'>4hours</a> ";
 	}
-	if(isset($type)&&$type=="30min")
+	if(isset($HTTP_GET_VARS["type"])&&$HTTP_GET_VARS["type"]=="hour")
 	{
-		echo "<b>[<a href='trends.php?itemid=$itemid&type=30min'>30min</a>]</b> ";
-	}
-	else
-	{
-		echo "<a href='trends.php?itemid=$itemid&type=30min'>30min</a> ";
-	}
-	if(isset($type)&&$type=="15min")
-	{
-		echo "<b>[<a href='trends.php?itemid=$itemid&type=15min'>15min</a>]</b> ";
+		echo "<b>[<a href='trends.php?itemid=".$HTTP_GET_VARS["itemid"]."&type=hour'>hour</a>]</b> ";
 	}
 	else
 	{
-		echo "<a href='trends.php?itemid=$itemid&type=15min'>15min</a> ";
+		echo "<a href='trends.php?itemid=".$HTTP_GET_VARS["itemid"]."&type=hour'>hour</a> ";
+	}
+	if(isset($HTTP_GET_VARS["type"])&&$HTTP_GET_VARS["type"]=="30min")
+	{
+		echo "<b>[<a href='trends.php?itemid=".$HTTP_GET_VARS["itemid"]."&type=30min'>30min</a>]</b> ";
+	}
+	else
+	{
+		echo "<a href='trends.php?itemid=".$HTTP_GET_VARS["itemid"]."&type=30min'>30min</a> ";
+	}
+	if(isset($HTTP_GET_VARS["type"])&&$HTTP_GET_VARS["type"]=="15min")
+	{
+		echo "<b>[<a href='trends.php?itemid=".$HTTP_GET_VARS["itemid"]."&type=15min'>15min</a>]</b> ";
+	}
+	else
+	{
+		echo "<a href='trends.php?itemid=".$HTTP_GET_VARS["itemid"]."&type=15min'>15min</a> ";
 	}
 	echo "</font>";
 
 
-	if(isset($type))
+	if(isset($HTTP_GET_VARS["type"]))
 	{
 		show_table_v_delimiter();
-		if(isset($trendavg))
+		if(isset($HTTP_GET_VARS["trendavg"]))
 		{
-			echo "<a href='trends.php?itemid=$itemid&type=$type'>ALL</a> ";
+			echo "<a href='trends.php?itemid=".$HTTP_GET_VARS["itemid"]."&type=".$HTTP_GET_VARS["type"]."'>ALL</a> ";
 		}
 		else
 		{
-			echo "<a href='trends.php?itemid=$itemid&type=$type&trendavg=1'>AVG</a> ";
+			echo "<a href='trends.php?itemid=".$HTTP_GET_VARS["itemid"]."&type=".$HTTP_GET_VARS["type"]."&trendavg=1'>AVG</a> ";
 		}
 	}
 
@@ -79,9 +79,9 @@
 ?>
 
 <?
-	if(isset($itemid)&&isset($type))
+	if(isset($HTTP_GET_VARS["itemid"])&&isset($HTTP_GET_VARS["type"]))
 	{
-		show_table_header(strtoupper($type));
+		show_table_header(strtoupper($HTTP_GET_VARS["type"]));
 	}
 	else
 	{
@@ -91,15 +91,15 @@
 	echo "<TR BGCOLOR=#EEEEEE>";
 	echo "<TR BGCOLOR=#DDDDDD>";
 	echo "<TD ALIGN=CENTER>";
-	if(isset($itemid)&&isset($type))
+	if(isset($HTTP_GET_VARS["itemid"])&&isset($HTTP_GET_VARS["type"]))
 	{
-		if(isset($trendavg))
+		if(isset($HTTP_GET_VARS["trendavg"]))
 		{
-			echo "<IMG SRC=\"trend.php?itemid=$itemid&type=$type&trendavg=1\">";
+			echo "<IMG SRC=\"trend.php?itemid=".$HTTP_GET_VARS["itemid"]."&type=".$HTTP_GET_VARS["type"]."&trendavg=1\">";
 		}
 		else
 		{
-			echo "<IMG SRC=\"trend.php?itemid=$itemid&type=$type\">";
+			echo "<IMG SRC=\"trend.php?itemid=".$HTTP_GET_VARS["itemid"]."&type=".$HTTP_GET_VARS["type"]."\">";
 		}
 	}
 	else

@@ -9,27 +9,27 @@
 
 	$start_time=time(NULL);
 
-	if(!isset($type))
+	if(!isset($HTTP_GET_VARS["type"]))
 	{
-		$type="15min";
+		$HTTP_GET_VARS["type"]="15min";
 	}
 
-	if($type == "15min")
+	if($HTTP_GET_VARS["type"] == "15min")
 	{
 		$period=900;
 		$label_format="H:i";
 	}
-	else if($type == "30min")
+	else if($HTTP_GET_VARS["type"] == "30min")
 	{
 		$period=1800;
 		$label_format="H:i";
 	}
-	else if($type == "4hours")
+	else if($HTTP_GET_VARS["type"] == "4hours")
 	{
 		$period=4*3600;
 		$label_format="H:i";
 	}
-	else if($type == "12hours")
+	else if($HTTP_GET_VARS["type"] == "12hours")
 	{
 		$period=12*3600;
 		$label_format="H:i";
@@ -103,7 +103,7 @@ else
 {
 	for($i=0;$i<900;$i++)
 	{
-		$result=DBselect("select count(value),min(value),max(value),avg(value) from history where itemid=$itemid and clock>$from_time+$i*($to_time-$from_time)/(900-50) and clock<$from_time+($i+1)*($to_time-$from_time)/(900-50)");
+		$result=DBselect("select count(value),min(value),max(value),avg(value) from history where itemid=".$HTTP_GET_VARS["itemid"]." and clock>$from_time+$i*($to_time-$from_time)/(900-50) and clock<$from_time+($i+1)*($to_time-$from_time)/(900-50)");
 		$count[$i]=DBget_field($result,0,0);
 		if($count[$i]>0)
 		{
@@ -150,7 +150,7 @@ else
 
 	if($nodata == 0)
 	{
-		if(isset($trendavg))
+		if(isset($HTTP_GET_VARS["trendavg"]))
 		{
 			$maxY=max($avg);
 			$minY=min($avg);
@@ -172,7 +172,7 @@ else
 		{
 			if($count[$i]>0)
 			{
-				if(!isset($trendavg))
+				if(!isset($HTTP_GET_VARS["trendavg"]))
 				{
 					$x1=$sizeX*($i-$minX)/($maxX-$minX);
 					$y1=$sizeY*($max[$i]-$minY)/($maxY-$minY);
@@ -193,7 +193,7 @@ else
 	
 				ImageLine($im,$x1+$shiftX,$y1+$shiftY,$x2+$shiftX,$y2+$shiftY,$darkyellow);
 
-				if(!isset($trendavg))
+				if(!isset($HTTP_GET_VARS["trendavg"]))
 				{
 					$x1=$sizeX*($i-$minX)/($maxX-$minX);
 					$y1=$sizeY*($min[$i]-$minY)/($maxY-$minY);
