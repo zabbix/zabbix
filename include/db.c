@@ -123,9 +123,9 @@ extern	char	*CONFIG_DBSOCKET;*/
  */ 
 int	DBexecute(char *query)
 {
-/*	zabbix_set_log_level(LOG_LEVEL_DEBUG);*/
-	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
+/* Do not include any code here. Will break HAVE_PGSQL section */
 #ifdef	HAVE_MYSQL
+	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
 	while( mysql_query(&mysql,query) != 0)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
@@ -140,6 +140,7 @@ int	DBexecute(char *query)
 #ifdef	HAVE_PGSQL
 	PGresult	*result;
 
+	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
 	result = PQexec(conn,query);
 
 	if( result==NULL)
@@ -168,9 +169,9 @@ int	DBexecute(char *query)
  */ 
 DB_RESULT *DBselect(char *query)
 {
-/*	zabbix_set_log_level(LOG_LEVEL_DEBUG);*/
-	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
+/* Do not include any code here. Will break HAVE_PGSQL section */
 #ifdef	HAVE_MYSQL
+	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
 	while(mysql_query(&mysql,query) != 0)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
@@ -187,6 +188,7 @@ DB_RESULT *DBselect(char *query)
 #ifdef	HAVE_PGSQL
 	PGresult	*result;
 
+	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
 	result = PQexec(conn,query);
 
 	if( result==NULL)
@@ -1099,7 +1101,6 @@ int	DBadd_alert(int actionid, int mediatypeid, char *sendto, char *subject, char
 
 void	DBvacuum(void)
 {
-
 #ifdef	HAVE_PGSQL
 	char *table_for_housekeeping[]={"services", "services_links", "graphs_items", "graphs", "sysmaps_links",
 			"sysmaps_hosts", "sysmaps", "config", "groups", "hosts_groups", "alerts",

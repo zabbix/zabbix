@@ -1,5 +1,6 @@
 Changes for 1.0beta14:
- 
+
+ - fixed compilation of --with-pgsql on non-GCC platforms (Alexei)
  - fixed refresh in actions screen (Alexei) 
  - show severity of triggers in the list (Alexei)
  - fixed trigger update. Value of the trigger sets to UNKNOWN. (Alexei)
