@@ -1,4 +1,11 @@
 1.1:
+ - change severities to:
+Information
+Warning
+Error
+Critical
+Panic
+
  - remove icmpping and others from the QUEUE
  - hardlinked templates (several templates, one host)
  - escalation and repeated notifications
