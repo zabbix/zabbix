@@ -2,7 +2,6 @@
 
  - add severity to media definition.
  - redefine check_service()
- - alternative medias. Add table media_type.
  - add support for agent forwarding (proxy)
 
  - proofread Zabbix Manual  - Ted Rolle <ted@users.sourceforge.net>

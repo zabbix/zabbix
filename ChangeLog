@@ -1,5 +1,7 @@
 Changes for 1.0beta9:
 
+ - added parameter AlertScriptsPath to zabbix_suckerd (Alexei)
+ - added support for alternative medias (Alexei)
  - added src/zabbix_sucker/alerter.h (Alexei)
  - added src/zabbix_sucker/alerter.c (Alexei)
  - removed column alerts.type, added column alerts.mediatypeid (Alexei)
