@@ -1,7 +1,12 @@
 Noe ready yet:
 
+[ Better validation of trigger expressions ]
+[ Support for nodata() ] 
+[ Show diff instead of real values ]
+[ Show triggers by userid ]
+[ syslog() to file ]
 [ Add support for new trigger statuses: MODIFIED/NOTSUPORTED ]
-[ Something wrong with zabbix_agentd (?) ] 
+[ Something wrong with zabbix_agentd. Timeout while command execution ] 
 [ All parameters should contain section "How can be used" in the Manual ]
 [ PHP to support non-numeric values ]
 [ Support for system[proccount] on FreeBSD ]
@@ -9,6 +14,8 @@ Noe ready yet:
 [ Common parser (cfg.c) ]
 
 Changes for 1.0beta3:
+
+ - added files include/log.h and include/log.c (Alexei)
 
  - solved problem with getpeername() (Alexei)
  - support for parameter Timeout for zabbix_trapper (Alexei)
