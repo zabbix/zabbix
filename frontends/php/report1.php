@@ -20,7 +20,7 @@
 	<td>Is zabbix_suckerd running ?</td>
 	<?php
 		$str="No";
-		if(exec("ps aux|grep zabbix_suckerd|wc -l")>0)
+		if(exec("ps axw|grep zabbix_suckerd|wc -l")>0)
 		{
 			$str="Yes";
 		}
@@ -32,7 +32,7 @@
 	<td>Is zabbix_trapperd running ?</td>
 	<?php
 		$str="No";
-		if(exec("ps aux|grep zabbix_trapperd|wc -l")>0)
+		if(exec("ps axw|grep zabbix_trapperd|wc -l")>0)
 		{
 			$str="Yes";
 		}
