@@ -1,9 +1,10 @@
 Changes for 1.0alpha7:
 
+ - added real links to page About
+
  - fullscreen mode for form Status of Triggers
  - minor changes in manual.txt
  - no password to see alarms needed
-
  - fullscreen mode for Network Maps and graphs
  - fixed bug with getting processor load on Linux
  - added /upgrades/dbpatches/1.0alpha6_to_1.0alpha7
