@@ -5,7 +5,6 @@
  - add zabbix[unixtime] and lastupdate() to get rid of nodata()
  - check return code for alert scripts
  - add support for function unixtime()
- - parameter to disable fping
  - zabbix_agentd to support processor load, swap[*] and memory[*] onder AIX
  - make possible passing of parameters to user script for UserParameters
  like param[*]
@@ -145,8 +144,6 @@ TOP PRIORITY:
 BUGS:
 
  - add protection from IT Service looping
- - BUG. No horizontal lines. Replace ImageDashedLine() to gdImageLine() plus
-   ImageSetStyle()
 
 PERFORMANCE IMPROVEMENTS:
 
