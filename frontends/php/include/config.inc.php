@@ -3542,7 +3542,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		cr();
 		echo "</td>";
 		cr();
-		echo "<td colspan=1 bgcolor=CCCCCC align=left valign=\"top\">";
+//		echo "<td colspan=1 bgcolor=CCCCCC align=left valign=\"top\">";
+		echo "<td class=\"form_row_control\" height=24>";
 		cr();
 //		echo "	<font size=-1>";
 		cr();
@@ -3580,7 +3581,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		cr();
 	}
 
-	function	show_table2_v_delimiter()
+	function	show_table2_v_delimiter($rownum=0)
 	{
 //		echo "</font>";
 		cr();
@@ -3588,9 +3589,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		cr();
 		echo "</tr>";
 		cr();
-		echo "<tr>";
+		if($rownum%2 == 1)	{ echo "<TR BGCOLOR=#DDDDDD>"; }
+		else			{ echo "<TR BGCOLOR=#CCCCCC>"; }
 		cr();
-		echo "<td colspan=1 bgcolor=CCCCCC align=left valign=\"top\">";
+//		echo "<td colspan=1 bgcolor=CCCCCC align=left valign=\"top\">";
+		echo "<td class=\"form_row_control\" height=24>";
 		cr();
 //		echo "<font size=-1>";
 		cr();
@@ -3636,7 +3639,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	show_table2_header_begin()
 	{
-		echo "<table border=0 align=center cellspacing=0 cellpadding=0 width=50% bgcolor=000000>";
+?>
+	<p align=center>
+	<table class="form" width="100%" cellspacing=0 cellpadding=1>
+	<tr>
+	<td class="form_row" height=24 colspan=2>
+<?php
+/*		echo "<table border=0 align=center cellspacing=0 cellpadding=0 width=50% bgcolor=000000>";
 		cr();
 		echo "<tr>";
 		cr();
@@ -3646,11 +3655,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		cr();
 		echo "<tr>";
 		cr();
-//		echo "<td colspan=2 bgcolor=99AABB align=center valign=\"top\">";
 		echo "<td colspan=2 bgcolor=6d88ad align=center valign=\"top\">";
-		cr();
-//		echo "	<font size=+1>";
-		cr();
+		cr();*/
 	}
 
 	function	show_table_header_begin()
@@ -3730,20 +3736,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	show_table_header($title)
 	{
-/*		show_table_header_begin();
-		cr();
-		echo $title;
-		cr();
-		show_table_header_end();
-		cr();*/
 ?>
 	<table class="menu" width="100%" cellspacing=0 cellpadding=1>
 	<tr>
-	<td class="sub_menu" height=24 colspan=9><b><?php echo $title; ?></b></td>
+	<td class="sub_menu" height=24 colspan=9><?php echo $title; ?></td>
 	</tr>
 	</table>
 <?php
-
 	}
 
 	function	insert_time_navigator($itemid,$period,$from)

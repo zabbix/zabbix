@@ -4,12 +4,37 @@ body
 #        background-color:#778899;
 #        margin: 3px 3px 3px 3px;
         margin: 0px 0px 0px 0px;
-        padding: 0px 0px 0px 0px;
+        padding: 0px;
         color:black;
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:10px;
 	text-decoration: none;
         line-height:16px;
+}
+
+td.form_row_control
+{
+	color: #000000;
+        font-family:verdana, arial, helvetica, sans-serif;
+        font-size:10px;
+#	background-color: #CCCCCC;
+	border-color: #000000;
+	border-width:0px;
+	border-bottom-style: dotted;
+}
+
+td.form_row
+{
+	color: #FFFFFF;
+        font-family:verdana, arial, helvetica, sans-serif;
+        font-size:10px;
+	background-color: #8dA8Cd;
+	border-color: #000000;
+	border-width:1px;
+	border-top-style: solid;
+	border-left-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
 }
 
 td.sub_menu
@@ -117,6 +142,13 @@ td.top_header_left
 }
 
 table.menu
+{
+	background-color: #FFFFFF;
+	color: #000000;
+	border: 0px solid #000000;
+}
+
+table.form
 {
 	background-color: #FFFFFF;
 	color: #000000;
