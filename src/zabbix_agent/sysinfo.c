@@ -123,14 +123,15 @@ COMMAND	commands[]=
 	{"ping"				,PING, 0},
 	{"tcp_count"			,EXECUTE, "netstat -tn|grep EST|wc -l"},
 
-	{"net[listen_21]"		,TCP_LISTEN, "0015"},
 	{"net[listen_23]"		,TCP_LISTEN, "0017"},
-	{"net[listen_25]"		,TCP_LISTEN, "0019"},
 	{"net[listen_80]"		,TCP_LISTEN, "0050"},
-	{"net[listen_110]"		,TCP_LISTEN, "006E"},
-	{"net[listen_143]"		,TCP_LISTEN, "008F"},
 
 	{"check_service[ssh]"		,CHECK_SERVICE_SSH, 0},
+	{"check_service[smtp]"		,CHECK_SERVICE_SMTP, 0},
+	{"check_service[ftp]"		,CHECK_SERVICE_FTP, 0},
+	{"check_service[pop]"		,CHECK_SERVICE_POP, 0},
+	{"check_service[nntp]"		,CHECK_SERVICE_NNTP, 0},
+	{"check_service[imap]"		,CHECK_SERVICE_IMAP, 0},
 	{0				,0}
 	};
 
@@ -751,10 +752,9 @@ float	EXECUTE(char *command)
 	return	result;
 }
 
-float	CHECK_SERVICE_SSH(void)
+float	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose)
 {
 	char	*haddr;
-	short	hport=22;
 	char	c[1024];
 	
 	int	s;
@@ -764,10 +764,10 @@ float	CHECK_SERVICE_SSH(void)
 
 	struct hostent *host;
 
-	host = gethostbyname("127.0.0.1");
+	host = gethostbyname(hostname);
 	if(host == NULL)
 	{
-		return	FAIL;
+		return	0;
 	}
 
 	haddr=host->h_addr;
@@ -775,35 +775,63 @@ float	CHECK_SERVICE_SSH(void)
 
 	addrlen = sizeof(addr);
 	memset(&addr, 0, addrlen);
-	addr.sin_port = htons(hport);
+	addr.sin_port = htons(port);
 	addr.sin_family = AF_INET;
 	bcopy(haddr, (void *) &addr.sin_addr.s_addr, 4);
 
 	s = socket(AF_INET, SOCK_STREAM, 0);
 	if (s == -1)
 	{
-		return	FAIL;
+		return	0;
 	}
 
 	if (connect(s, (struct sockaddr *) &addr, addrlen) == -1)
 	{
-		return	FAIL;
+		return	0;
 	}
 
 	memset(&c, 0, 1024);
 	recv(s, c, 1024, 0);
-	if (strncmp(c, "SSH", 3) == 0)
+	if (strncmp(c, expect, strlen(expect)) == 0)
 	{
-		sprintf(c,"0\n");
-		send(s,c,3,0);
+		send(s,sendtoclose,strlen(sendtoclose),0);
 		close(s);
 		return	1;
 	}
 	else
 	{
-		sprintf(c,"0\n");
-		send(s,c,3,0);
+		send(s,sendtoclose,strlen(sendtoclose),0);
 		close(s);
-		return	FAIL;
+		return	0;
 	}
+}
+
+float	CHECK_SERVICE_SSH(void)
+{
+	return	tcp_expect("127.0.0.1",22,"SSH","0\n");
+}
+
+float	CHECK_SERVICE_SMTP(void)
+{
+	return	tcp_expect("127.0.0.1",25,"220","");
+}
+
+float	CHECK_SERVICE_FTP(void)
+{
+	return	tcp_expect("127.0.0.1",21,"220","");
+}
+
+float	CHECK_SERVICE_POP(void)
+{
+	return	tcp_expect("127.0.0.1",110,"+OK","");
+}
+
+float	CHECK_SERVICE_NNTP(void)
+{
+	return	tcp_expect("127.0.0.1",119,"220","");
+}
+
+float	CHECK_SERVICE_IMAP(void)
+{
+	return	tcp_expect("127.0.0.1",143,"* OK","a1 LOGOUT\n");
 }

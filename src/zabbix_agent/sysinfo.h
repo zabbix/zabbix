@@ -31,6 +31,11 @@ float	UPTIME(void);
 float	EXECUTE(char *command);
 
 float	CHECK_SERVICE_SSH(void);
+float	CHECK_SERVICE_SMTP(void);
+float	CHECK_SERVICE_FTP(void);
+float	CHECK_SERVICE_POP(void);
+float	CHECK_SERVICE_NNTP(void);
+float	CHECK_SERVICE_IMAP(void);
 
 #define COMMAND struct command_type
 COMMAND
