@@ -19,10 +19,10 @@
 **/
 ?>
 <?php
+	include "include/config.inc.php";
 	$page["title"] = S_MEDIA;
 	$page["file"] = "media.php";
 
-	include "include/config.inc.php";
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();
 ?>
