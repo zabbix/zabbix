@@ -341,6 +341,7 @@ int	get_value_SNMP(int version,double *result,char *result_str,DB_ITEM *item)
 			if(	(vars->type == ASN_INTEGER) ||
 				(vars->type == ASN_UINTEGER)||
 				(vars->type == ASN_COUNTER) ||
+				(vars->type == ASN_TIMETICKS) ||
 				(vars->type == ASN_GAUGE)
 			)
 			{

@@ -1,8 +1,27 @@
+HB:
+
+ - use profiles instead of passing parameters using POST
+
+ - [3] Windows event log checking.
+ - [4] Latest values. Link to page which shows list of all triggers-related
+ to the item.
+ - [4] users.php. Link to page which shows all actions defined for this user.
+ - [5] Configuration of items/triggers. Add Select.
+ - [7] SLA algorithm (A - 0%, B - 100% -> availability of AB = 50%)
+ - [7] IT Service % must start at 01.01.20xx, not first day of the week
+ - [7] ALARMS. Abality to select events by specifying date from/to.
+ - [8] escalation (if trigger is ON 30 sec, send email to someone else)
+ - [9] History of who and when changed trigger comment. As starting point: who and when
+ did latest changes.
+ - [9] ... the history to be used to see who did changes and who wrote specific parts
+ of comments to know who is in charge for the instructions
+ - [9] ... find outdated instructions to initiate its renewal (review)
+ - [9] Special sound file if trigger's status is disaster.
+ - [10] Refresh stop ability. At least for graphs and triggers being selected.
+
 TOP PRIORITY:
 
- - add detailed descriptio of 'status' into the Manual
  - fix update of 'status'. When added it never gets aupdates, if server is already unrechable.
- - support for high performance DB engines like Berkeley DB
  - add support for agent forwarding (proxy)
  - proofread Zabbix Manual  - Ted Rolle <ted@users.sourceforge.net>
  - pay attention to Solaris agent
@@ -12,7 +31,7 @@ TOP PRIORITY:
  - add more checks for forms (check all possible wrong values)
  - improve user-defined graphs
  - check Rickard's active(?) agent
- - improve graphing capabilities
+ - improve graphing capabilities (MRTG like graphs)
  - monitoring of log files
  - show last 20% in SLA bar
  - show current and planned SLA in IT Services screen

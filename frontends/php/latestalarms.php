@@ -41,11 +41,11 @@
 <?php
 	if(!isset($HTTP_GET_VARS["start"]))
 	{
-		$sql="select t.description,a.clock,a.value,t.triggerid from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit 500";
+		$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit 500";
 	}
 	else
 	{
-		$sql="select t.description,a.clock,a.value,t.triggerid from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit ".($HTTP_GET_VARS["start"]+500);
+		$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit ".($HTTP_GET_VARS["start"]+500);
 	}
 	$result=DBselect($sql);
 
@@ -54,6 +54,7 @@
 	echo "<TD width=20%><b>Time</b></TD>";
 	echo "<TD><b>Description</b></TD>";
 	echo "<TD width=10%><b>Value</b></TD>";
+	echo "<TD width=10%><b>Severity</b></TD>";
 	echo "</TR>";
 	$col=0;
 	$i=0;
@@ -92,7 +93,15 @@
 		{
 			echo "<TD><font color=\"AAAAAA\">UNKNOWN</font></TD>";
 		}
+		if($row["priority"]==0)         echo "<TD ALIGN=CENTER>Not classified</TD>";
+		elseif($row["priority"]==1)     echo "<TD ALIGN=CENTER>Information</TD>";
+		elseif($row["priority"]==2)     echo "<TD ALIGN=CENTER>Warning</TD>";
+		elseif($row["priority"]==3)     echo "<TD ALIGN=CENTER BGCOLOR=#DDAAAA>Average</TD>";
+		elseif($row["priority"]==4)     echo "<TD ALIGN=CENTER BGCOLOR=#FF8888>High</TD>";
+		elseif($row["priority"]==5)     echo "<TD ALIGN=CENTER BGCOLOR=RED>Disaster !!!</TD>";
+		else                            echo "<TD ALIGN=CENTER><B>".$row["priority"]."</B></TD>";
 		echo "</TR>";
+		cr();
 	}
 	echo "</TABLE>";
 ?>

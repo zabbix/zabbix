@@ -690,8 +690,11 @@ void	update_serv(int serviceid)
 		{
 /* Do nothing */
 		}
-		else if(SERVICE_ALGORITHM_MAX == algorithm)
+		else if((SERVICE_ALGORITHM_MAX == algorithm)
+			||
+			(SERVICE_ALGORITHM_MIN == algorithm))
 		{
+			/* Why it was so complex ?
 			sprintf(sql,"select status from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
 			result2=DBselect(sql);
 			for(j=0;j<DBnum_rows(result2);j++)
@@ -700,6 +703,22 @@ void	update_serv(int serviceid)
 				{
 					status=atoi(DBget_field(result2,j,0));
 				}
+			}
+			DBfree_result(result2);*/
+
+			if(SERVICE_ALGORITHM_MAX == algorithm)
+			{
+				sprintf(sql,"select count(*),max(status) from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
+			}
+			/* MIN otherwise */
+			else
+			{
+				sprintf(sql,"select count(*),min(status) from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
+			}
+			result2=DBselect(sql);
+			if(atoi(DBget_field(result2,0,0))!=0)
+			{
+				status=atoi(DBget_field(result2,0,1));
 			}
 			DBfree_result(result2);
 

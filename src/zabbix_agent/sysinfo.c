@@ -305,7 +305,7 @@ void	process(char *command,char *value)
 		{
 			port_int=atoi(port);
 		}
-		forward_request(proxy,comman,port_int,value);
+		forward_request(proxy,command,port_int,value);
 		return;
 	}
 
