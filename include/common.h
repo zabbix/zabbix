@@ -21,9 +21,6 @@
 #define	SUCKER_FORKS	11
 #define	SUCKER_DELAY	60
 
-/* Housekeeping frequency */
-#define	SUCKER_HK	3600
-
 #define	SUCKER_TIMEOUT	5
 /* Delay on network failure*/
 #define DELAY_ON_NETWORK_FAILURE 60
