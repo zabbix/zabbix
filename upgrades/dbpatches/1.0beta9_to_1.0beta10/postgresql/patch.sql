@@ -13,10 +13,10 @@ alter table graphs_items alter sortorder set DEFAULT '0';
 update graphs_items set sortorder=0;
 --alter table graphs_items alter sortorder set not null;
 
-update items set units='bps' where key_ like "netload%";
-update items set units='bytes' where key_ like "memory[%]";
-update items set units='bytes' where key_ like "disk%[%]";
-update items set units='bytes' where key_ like "swap[%]";
+update items set units='Bps' where key_ like "netload%";
+update items set units='B' where key_ like "memory[%]";
+update items set units='B' where key_ like "disk%[%]";
+update items set units='B' where key_ like "swap[%]";
 update items set units=' ' where key_ like "inode%[%]";
 
 update items set multiplier=1 where key_ like "disk%[%]";
