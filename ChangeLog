@@ -1,5 +1,6 @@
 Changes for 1.0alpha11:
 
+ - fixes in function PROCCNT (Alexei)
  - changes in documentation (Mike)
  - simplified tcp_listen procedure in zabbix_trapperd.c (Alexei)
  - simplified tcp_listen procedure in zabbix_agentd.c (Alexei)
