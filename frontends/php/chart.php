@@ -48,7 +48,14 @@
 			$host=get_host_by_hostid($this->item["hostid"]);
 			$this->item["host"]=$host["host"];
 
-			$this->date_format="H:i";
+			if($this->period<=3600)
+			{
+				$this->date_format="H:i";
+			}
+			else
+			{
+				$this->date_format="m.d H:i";
+			}
 		}
 
 
