@@ -1,5 +1,6 @@
 Changes for 1.1alpha1:
 
+ - added command line parameters -c <config> and -h to zabbix_trapperd (Alexei)
  - added command line parameters -c <config> and -h to zabbix_agentd (Alexei)
  - added command line parameters -c <config> and -h to zabbix_suckerd (Alexei)
  - added support for customised Y axis for graphs (Alexei)

@@ -280,8 +280,6 @@ DIFFERENT TASKS:
  - better monitoring of log files
  - SNMP trapping
  - SNMP v3
- - auto-discovery
- - Native Windows GUI
  - distributed monitoring
  - backup/restore scripts for server. Backup all (DB, configs, etc).
  - IT Helpdesk
@@ -290,8 +288,6 @@ DIFFERENT TASKS:
  - automated report generation
  - SNMP-walk in WEB interface
  - add UserParameter without restart of an agent
- - write white-paper
- - prepare Power Point presentation
 
 TODO:
 
@@ -328,7 +324,6 @@ HB:
  - BUG. history graph goes left
  - personalisation (refresh rate, graph size, default graph period, etc)
 
- - Tree like in old Zabbix
  - LDAP authorisation (should work with MSWindows LDAP)
  - Reports:
  - more customizable (graphs time range: 1 mont, etc)
@@ -344,10 +339,7 @@ WIN32 Agent:
 
  PLUS:
 
-- Network discovery daemon (?)
 - backup/restore scripts for server. Backup all (DB, configs, etc).
-- Network topology database
-- Automatic network map generation from topology database
 - Support for MD5 checksums
 
  OTHER:
@@ -367,7 +359,5 @@ WIN32 Agent:
 
  - setup demo site
  - different sound files for different severity
- - rename "Alerts" to "Notifications"
  - think about service node types (some nodes will automatically register
   problem)
- - restructure sources (no C files in include/, move some sources into lib, etc)
