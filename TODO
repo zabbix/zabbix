@@ -6,7 +6,6 @@
  - zabbix to write log to the item (for example: log when item becomes unsupported)
  - full screen/normal screen. Period, from must be preserved
  - strings items for graphs
- - abschange() cannot be added in forms
  - date&time in alert emails
  - support of '-' in trigger expressions (...>-1)
  - UserParameter does not appear in the log
