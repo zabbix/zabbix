@@ -40,34 +40,34 @@
 ?>
 
 <?php
-	if(isset($HTTP_GET_VARS["register"]))
+	if(isset($_GET["register"]))
 	{
-		if($HTTP_GET_VARS["register"]=="update")
+		if($_GET["register"]=="update")
 		{
-			$result=update_item($HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["description"],$HTTP_GET_VARS["key"],$HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["delay"],$HTTP_GET_VARS["history"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["type"],$HTTP_GET_VARS["snmp_community"],$HTTP_GET_VARS["snmp_oid"],$HTTP_GET_VARS["value_type"],$HTTP_GET_VARS["trapper_hosts"],$HTTP_GET_VARS["snmp_port"],$HTTP_GET_VARS["units"],$HTTP_GET_VARS["multiplier"],$HTTP_GET_VARS["delta"]);
+			$result=update_item($_GET["itemid"],$_GET["description"],$_GET["key"],$_GET["hostid"],$_GET["delay"],$_GET["history"],$_GET["status"],$_GET["type"],$_GET["snmp_community"],$_GET["snmp_oid"],$_GET["value_type"],$_GET["trapper_hosts"],$_GET["snmp_port"],$_GET["units"],$_GET["multiplier"],$_GET["delta"]);
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 //			unset($itemid);
 		}
-		if($HTTP_GET_VARS["register"]=="changestatus")
+		if($_GET["register"]=="changestatus")
 		{
-			$result=update_item_status($HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["status"]);
+			$result=update_item_status($_GET["itemid"],$_GET["status"]);
 			show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
-			unset($HTTP_GET_VARS["itemid"]);
+			unset($_GET["itemid"]);
 		}
-		if($HTTP_GET_VARS["register"]=="add")
+		if($_GET["register"]=="add")
 		{
-			$result=add_item($HTTP_GET_VARS["description"],$HTTP_GET_VARS["key"],$HTTP_GET_VARS["hostid"],$HTTP_GET_VARS["delay"],$HTTP_GET_VARS["history"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["type"],$HTTP_GET_VARS["snmp_community"],$HTTP_GET_VARS["snmp_oid"],$HTTP_GET_VARS["value_type"],$HTTP_GET_VARS["trapper_hosts"],$HTTP_GET_VARS["snmp_port"],$HTTP_GET_VARS["units"],$HTTP_GET_VARS["multiplier"],$HTTP_GET_VARS["delta"]);
+			$result=add_item($_GET["description"],$_GET["key"],$_GET["hostid"],$_GET["delay"],$_GET["history"],$_GET["status"],$_GET["type"],$_GET["snmp_community"],$_GET["snmp_oid"],$_GET["value_type"],$_GET["trapper_hosts"],$_GET["snmp_port"],$_GET["units"],$_GET["multiplier"],$_GET["delta"]);
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
-			unset($HTTP_GET_VARS["itemid"]);
+			unset($_GET["itemid"]);
 		}
-		if($HTTP_GET_VARS["register"]=="add to all hosts")
+		if($_GET["register"]=="add to all hosts")
 		{
 			$result=DBselect("select hostid,host from hosts order by host");
 			$hosts_ok="";
 			$hosts_notok="";
 			while($row=DBfetch($result))
 			{
-				$result2=add_item($HTTP_GET_VARS["description"],$HTTP_GET_VARS["key"],$row["hostid"],$HTTP_GET_VARS["delay"],$HTTP_GET_VARS["history"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["type"],$HTTP_GET_VARS["snmp_community"],$HTTP_GET_VARS["snmp_oid"],$HTTP_GET_VARS["value_type"],$HTTP_GET_VARS["trapper_hosts"],$HTTP_GET_VARS["snmp_port"],$HTTP_GET_VARS["units"],$HTTP_GET_VARS["multiplier"],$HTTP_GET_VARS["delta"]);
+				$result2=add_item($_GET["description"],$_GET["key"],$row["hostid"],$_GET["delay"],$_GET["history"],$_GET["status"],$_GET["type"],$_GET["snmp_community"],$_GET["snmp_oid"],$_GET["value_type"],$_GET["trapper_hosts"],$_GET["snmp_port"],$_GET["units"],$_GET["multiplier"],$_GET["delta"]);
 				if($result2)
 				{
 					$hosts_ok=$hosts_ok." ".$row["host"];
@@ -78,47 +78,47 @@
 				}
 			}
 			show_messages(TRUE,"Items added]<br>[Success for '$hosts_ok']<br>[Failed for '$hosts_notok'","Cannot add item");
-			unset($HTTP_GET_VARS["itemid"]);
+			unset($_GET["itemid"]);
 		}
-		if($HTTP_GET_VARS["register"]=="delete")
+		if($_GET["register"]=="delete")
 		{
-			$result=delete_item($HTTP_GET_VARS["itemid"]);
+			$result=delete_item($_GET["itemid"]);
 			show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
 			unset($itemid);
 		}
-		if($HTTP_GET_VARS["register"]=="Delete selected")
+		if($_GET["register"]=="Delete selected")
 		{
-			$result=DBselect("select itemid from items where hostid=".$HTTP_GET_VARS["hostid"]);
+			$result=DBselect("select itemid from items where hostid=".$_GET["hostid"]);
 			while($row=DBfetch($result))
 			{
 // $$ is correct here
-				if(isset($HTTP_GET_VARS[$row["itemid"]]))
+				if(isset($_GET[$row["itemid"]]))
 				{
 					$result2=delete_item($row["itemid"]);
 				}
 			}
 			show_messages(TRUE, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
 		}
-		if($HTTP_GET_VARS["register"]=="Activate selected")
+		if($_GET["register"]=="Activate selected")
 		{
-			$result=DBselect("select itemid from items where hostid=".$HTTP_GET_VARS["hostid"]);
+			$result=DBselect("select itemid from items where hostid=".$_GET["hostid"]);
 			while($row=DBfetch($result))
 			{
 // $$ is correct here
-				if(isset($HTTP_GET_VARS[$row["itemid"]]))
+				if(isset($_GET[$row["itemid"]]))
 				{
 					$result2=activate_item($row["itemid"]);
 				}
 			}
 			show_messages(TRUE, S_ITEMS_ACTIVATED, S_CANNOT_ACTIVATE_ITEMS);
 		}
-		if($HTTP_GET_VARS["register"]=="Disable selected")
+		if($_GET["register"]=="Disable selected")
 		{
-			$result=DBselect("select itemid from items where hostid=".$HTTP_GET_VARS["hostid"]);
+			$result=DBselect("select itemid from items where hostid=".$_GET["hostid"]);
 			while($row=DBfetch($result))
 			{
 // $$ is correct here
-				if(isset($HTTP_GET_VARS[$row["itemid"]]))
+				if(isset($_GET[$row["itemid"]]))
 				{
 					$result2=disable_item($row["itemid"]);
 				}
@@ -136,14 +136,14 @@
 // Start of new code
 	echo "<form name=\"form2\" method=\"get\" action=\"items.php\">";
 
-	if(isset($HTTP_GET_VARS["groupid"])&&($HTTP_GET_VARS["groupid"]==0))
+	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
 	{
-		unset($HTTP_GET_VARS["groupid"]);
+		unset($_GET["groupid"]);
 	}
 
 	echo S_GROUP."&nbsp;";
 	echo "<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
-	echo "<option value=\"0\" ".iif(!isset($HTTP_GET_VARS["groupid"]),"selected","").">".S_ALL_SMALL;
+	echo "<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_ALL_SMALL;
 
 	$result=DBselect("select groupid,name from groups order by name");
 	while($row=DBfetch($result))
@@ -161,7 +161,7 @@
 		}
 		if($cnt!=0)
 		{
-			echo "<option value=\"".$row["groupid"]."\" ".iif(isset($HTTP_GET_VARS["groupid"])&&($HTTP_GET_VARS["groupid"]==$row["groupid"]),"selected","").">".$row["name"];
+			echo "<option value=\"".$row["groupid"]."\" ".iif(isset($_GET["groupid"])&&($_GET["groupid"]==$row["groupid"]),"selected","").">".$row["name"];
 		}
 	}
 	echo "</select>";
@@ -169,8 +169,8 @@
 	echo "&nbsp;".S_HOST."&nbsp;";
 	echo "<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
 
-	$sql=iif(isset($HTTP_GET_VARS["groupid"]),
-		"select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status in (0,2) and h.hostid=i.hostid and hg.groupid=".$HTTP_GET_VARS["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host",
+	$sql=iif(isset($_GET["groupid"]),
+		"select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status in (0,2) and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host",
 		"select h.hostid,h.host from hosts h,items i where h.status in (0,2) and h.hostid=i.hostid group by h.hostid,h.host order by h.host");
 
 	$result=DBselect($sql);
@@ -180,7 +180,7 @@
 		{
 			continue;
 		}
-		echo "<option value=\"".$row["hostid"]."\"".iif(isset($HTTP_GET_VARS["hostid"])&&($HTTP_GET_VARS["hostid"]==$row["hostid"]),"selected","").">".$row["host"];
+		echo "<option value=\"".$row["hostid"]."\"".iif(isset($_GET["hostid"])&&($_GET["hostid"]==$row["hostid"]),"selected","").">".$row["host"];
 	}
 	echo "</select>";
 
@@ -190,9 +190,9 @@
 	show_table_header_end();
 
 	$lasthost="";
-	if(isset($HTTP_GET_VARS["hostid"])&&!isset($HTTP_GET_VARS["type"])) 
+	if(isset($_GET["hostid"])&&!isset($_GET["type"])) 
 	{
-		$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.lastdelete,i.nextcheck,h.hostid,i.type from hosts h,items i where h.hostid=i.hostid and h.hostid=".$HTTP_GET_VARS["hostid"]." order by h.host,i.key_,i.description");
+		$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.lastdelete,i.nextcheck,h.hostid,i.type from hosts h,items i where h.hostid=i.hostid and h.hostid=".$_GET["hostid"]." order by h.host,i.key_,i.description");
 		$col=0;
 		while($row=DBfetch($result))
 		{
@@ -209,7 +209,7 @@
 				echo "<br>";
 				show_table_header("<A HREF='items.php?hostid=".$row["hostid"]."'>".$row["host"]."</A>");
 				echo "<form method=\"get\" action=\"items.php\">";
-				echo "<input class=\"biginput\" name=\"hostid\" type=hidden value=".$HTTP_GET_VARS["hostid"]." size=8>";
+				echo "<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_GET["hostid"]." size=8>";
 				echo "<TABLE BORDER=0 COLS=13  align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 				echo "<TR>";
 //				echo "<TD WIDTH=3% NOSAVE><B>Sel</B></TD>";
@@ -271,10 +271,10 @@
 			switch($row["status"])
 			{
 				case 0:
-					echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$HTTP_GET_VARS["hostid"]."&register=changestatus&status=1\"><font color=\"00AA00\">".S_ACTIVE."</font></a>";
+					echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$_GET["hostid"]."&register=changestatus&status=1\"><font color=\"00AA00\">".S_ACTIVE."</font></a>";
 					break;
 				case 1:
-					echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$HTTP_GET_VARS["hostid"]."&register=changestatus&status=0\"><font color=\"AA0000\">".S_NOT_ACTIVE."</font></a>";
+					echo "<a href=\"items.php?itemid=".$row["itemid"]."&hostid=".$_GET["hostid"]."&register=changestatus&status=0\"><font color=\"AA0000\">".S_NOT_ACTIVE."</font></a>";
 					break;
 #				case 2:
 #					echo "Trapper";

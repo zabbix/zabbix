@@ -24,11 +24,11 @@
 	$page["file"] = "screens.php";
 
 	$nomenu=0;
-	if(isset($HTTP_GET_VARS["fullscreen"]))
+	if(isset($_GET["fullscreen"]))
 	{
 		$nomenu=1;
 	}
-	if(isset($HTTP_GET_VARS["screenid"]))
+	if(isset($_GET["screenid"]))
 	{
 		show_header($page["title"],60,$nomenu);
 	}
@@ -39,7 +39,7 @@
 ?>
 
 <?php
-	if(!isset($HTTP_GET_VARS["fullscreen"]))
+	if(!isset($_GET["fullscreen"]))
 	{
 		show_table_header_begin();
 		echo S_SCREENS_BIG;
@@ -55,12 +55,12 @@
 			{
 				continue;
 			}
-			if( isset($HTTP_GET_VARS["screenid"]) && ($HTTP_GET_VARS["screenid"] == $row["screenid"]) )
+			if( isset($_GET["screenid"]) && ($_GET["screenid"] == $row["screenid"]) )
 			{
 				echo "<b>[";
 			}
 			echo "<a href='screens.php?screenid=".$row["screenid"]."'>".$row["name"]."</a>";
-			if(isset($HTTP_GET_VARS["screenid"]) && ($HTTP_GET_VARS["screenid"] == $row["screenid"]) )
+			if(isset($_GET["screenid"]) && ($_GET["screenid"] == $row["screenid"]) )
 			{
 				echo "]</b>";
 			}
@@ -78,19 +78,19 @@
 ?>
 
 <?php
-//	if(isset($HTTP_GET_VARS["screenid"]))
-	if( isset($HTTP_GET_VARS["screenid"]) && check_right("Screen","R",$HTTP_GET_VARS["screenid"]))
+//	if(isset($_GET["screenid"]))
+	if( isset($_GET["screenid"]) && check_right("Screen","R",$_GET["screenid"]))
 	{
-		$screenid=$HTTP_GET_VARS["screenid"];
+		$screenid=$_GET["screenid"];
 		$result=DBselect("select name,cols,rows from screens where screenid=$screenid");
 		$row=DBfetch($result);
-		if(isset($HTTP_GET_VARS["fullscreen"]))
+		if(isset($_GET["fullscreen"]))
 		{
-			$map="<a href=\"screens.php?screenid=".$HTTP_GET_VARS["screenid"]."\">".$row["name"]."</a>";
+			$map="<a href=\"screens.php?screenid=".$_GET["screenid"]."\">".$row["name"]."</a>";
 		}
 		else
 		{
-			$map="<a href=\"screens.php?screenid=".$HTTP_GET_VARS["screenid"]."&fullscreen=1\">".$row["name"]."</a>";
+			$map="<a href=\"screens.php?screenid=".$_GET["screenid"]."&fullscreen=1\">".$row["name"]."</a>";
 		}
 	show_table_header($map);
           echo "<TABLE BORDER=1 COLS=".$row["cols"]." align=center WIDTH=100% BGCOLOR=\"#FFFFFF\"";

@@ -48,12 +48,12 @@
 		{
 			continue;
 		}
-		if( isset($HTTP_GET_VARS["hostid"]) && ($HTTP_GET_VARS["hostid"] == $row["hostid"]) )
+		if( isset($_GET["hostid"]) && ($_GET["hostid"] == $row["hostid"]) )
 		{
 			echo "<b>[";
 		}
 		echo "<a href='report2.php?hostid=".$row["hostid"]."'>".$row["host"]."</a>";
-		if(isset($HTTP_GET_VARS["hostid"]) && ($HTTP_GET_VARS["hostid"] == $row["hostid"]) )
+		if(isset($_GET["hostid"]) && ($_GET["hostid"] == $row["hostid"]) )
 		{
 			echo "]</b>";
 		}
@@ -64,14 +64,14 @@
 ?>
 
 <?php
-	if(isset($HTTP_GET_VARS["hostid"])&&!isset($HTTP_GET_VARS["triggerid"]))
+	if(isset($_GET["hostid"])&&!isset($_GET["triggerid"]))
 	{
 		echo "<br>";
-		$result=DBselect("select host from hosts where hostid=".$HTTP_GET_VARS["hostid"]);
+		$result=DBselect("select host from hosts where hostid=".$_GET["hostid"]);
 		$row=DBfetch($result);
 		show_table_header($row["host"]);
 
-		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.value from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.status=0 and t.triggerid=f.triggerid and h.hostid=".$HTTP_GET_VARS["hostid"]." and h.status in (0,2) and i.status=0 order by h.host, t.description");
+		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.value from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.status=0 and t.triggerid=f.triggerid and h.hostid=".$_GET["hostid"]." and h.status in (0,2) and i.status=0 order by h.host, t.description");
 		echo "<TABLE BORDER=0 COLS=3 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 		echo "<TR>";
 		echo "<TD><B>".S_DESCRIPTION."</B></TD>";
@@ -114,7 +114,7 @@
 			printf("%.4f%%",$availability["unknown"]);
 			echo "</TD>";
 			echo "<TD>";
-			echo "<a href=\"report2.php?hostid=".$HTTP_GET_VARS["hostid"]."&triggerid=".$row["triggerid"]."\">".S_SHOW."</a>";
+			echo "<a href=\"report2.php?hostid=".$_GET["hostid"]."&triggerid=".$row["triggerid"]."\">".S_SHOW."</a>";
 			echo "</TD>";
 			echo "</TR>\n";
 		}
@@ -123,13 +123,13 @@
 ?>
 
 <?php
-	if(isset($HTTP_GET_VARS["triggerid"]))
+	if(isset($_GET["triggerid"]))
 	{
 		echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 		echo "<TR BGCOLOR=#EEEEEE>";
 		echo "<TR BGCOLOR=#DDDDDD>";
 		echo "<TD ALIGN=CENTER>";
-		echo "<IMG SRC=\"chart4.php?triggerid=".$HTTP_GET_VARS["triggerid"]."\" border=0>";
+		echo "<IMG SRC=\"chart4.php?triggerid=".$_GET["triggerid"]."\" border=0>";
 		echo "</TD>";
 		echo "</TR>";
 		echo "</TABLE>";

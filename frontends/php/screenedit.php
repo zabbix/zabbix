@@ -31,7 +31,7 @@
 ?>
 
 <?php
-	if(!check_right("Screen","U",$HTTP_GET_VARS["screenid"]))
+	if(!check_right("Screen","U",$_GET["screenid"]))
 	{
 		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_footer();
@@ -40,38 +40,38 @@
 ?>
 
 <?php
-	if(isset($HTTP_GET_VARS["register"]))
+	if(isset($_GET["register"]))
 	{
-		if($HTTP_GET_VARS["register"]=="add")
+		if($_GET["register"]=="add")
 		{
-//			if(isset($HTTP_GET_VARS["screenitemid"]))
+//			if(isset($_GET["screenitemid"]))
 //			{
-//				delete_screen_item($HTTP_GET_VARS["screenitemid"]);
-//				unset($HTTP_GET_VARS["screenitemid"]);
+//				delete_screen_item($_GET["screenitemid"]);
+//				unset($_GET["screenitemid"]);
 //			}
-			$result=add_screen_item($HTTP_GET_VARS["resource"],$HTTP_GET_VARS["screenid"],$HTTP_GET_VARS["x"],$HTTP_GET_VARS["y"],$HTTP_GET_VARS["resourceid"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
-			unset($HTTP_GET_VARS["x"]);
+			$result=add_screen_item($_GET["resource"],$_GET["screenid"],$_GET["x"],$_GET["y"],$_GET["resourceid"],$_GET["width"],$_GET["height"]);
+			unset($_GET["x"]);
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
-		if($HTTP_GET_VARS["register"]=="delete")
+		if($_GET["register"]=="delete")
 		{
-			$result=delete_screen_item($HTTP_GET_VARS["screenitemid"]);
+			$result=delete_screen_item($_GET["screenitemid"]);
 			show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
-			unset($HTTP_GET_VARS["x"]);
+			unset($_GET["x"]);
 		}
-                if($HTTP_GET_VARS["register"]=="update")
+                if($_GET["register"]=="update")
                 {
-                        $result=update_screen_item($HTTP_GET_VARS["screenitemid"],$HTTP_GET_VARS["resource"],$HTTP_GET_VARS["resourceid"],$HTTP_GET_VARS["width"],$HTTP_GET_VARS["height"]);
+                        $result=update_screen_item($_GET["screenitemid"],$_GET["resource"],$_GET["resourceid"],$_GET["width"],$_GET["height"]);
                         show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
-			unset($HTTP_GET_VARS["x"]);
+			unset($_GET["x"]);
                 }
-		unset($HTTP_GET_VARS["register"]);
+		unset($_GET["register"]);
 
 	}
 ?>
 
 <?php
-	$screenid=$HTTP_GET_VARS["screenid"];
+	$screenid=$_GET["screenid"];
 	$result=DBselect("select name,cols,rows from screens where screenid=$screenid");
 	$row=DBfetch($result);
 	show_table_header("<a href=\"screenedit.php?screenid=$screenid\">".$row["name"]."</a>");
@@ -105,13 +105,13 @@
 			$height=100;
 		}
 
-		if(isset($HTTP_GET_VARS["x"])&&($HTTP_GET_VARS["x"]==$c)&&($HTTP_GET_VARS["y"]==$r))
+		if(isset($_GET["x"])&&($_GET["x"]==$c)&&($_GET["y"]==$r))
 		{
-			$resource=@iif(isset($HTTP_GET_VARS["resource"]),$HTTP_GET_VARS["resource"],$resource);
-			$resourceid=@iif(isset($HTTP_GET_VARS["resourceid"]),$HTTP_GET_VARS["resourceid"],$resourceid);
-			$screenitemid=@iif(isset($HTTP_GET_VARS["screenitemid"]),$HTTP_GET_VARS["screenitemid"],$screenitemid);
-			$width=@iif(isset($HTTP_GET_VARS["width"]),$HTTP_GET_VARS["width"],$width);
-			$height=@iif(isset($HTTP_GET_VARS["height"]),$HTTP_GET_VARS["height"],$height);
+			$resource=@iif(isset($_GET["resource"]),$_GET["resource"],$resource);
+			$resourceid=@iif(isset($_GET["resourceid"]),$_GET["resourceid"],$resourceid);
+			$screenitemid=@iif(isset($_GET["screenitemid"]),$_GET["screenitemid"],$screenitemid);
+			$width=@iif(isset($_GET["width"]),$_GET["width"],$width);
+			$height=@iif(isset($_GET["height"]),$_GET["height"],$height);
 
         		show_table2_header_begin();
         		echo S_SCREEN_CELL_CONFIGURATION;

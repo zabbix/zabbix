@@ -1043,13 +1043,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		global	$page;
 		global	$PHP_AUTH_USER,$PHP_AUTH_PW;
 		global	$USER_DETAILS;
-		global	$HTTP_COOKIE_VARS;
-		global	$HTTP_GET_VARS;
+		global	$_COOKIE;
+		global	$_GET;
 //		global	$sessionid;
 
-		if(isset($HTTP_COOKIE_VARS["sessionid"]))
+		if(isset($_COOKIE["sessionid"]))
 		{
-			$sessionid=$HTTP_COOKIE_VARS["sessionid"];
+			$sessionid=$_COOKIE["sessionid"];
 		}
 		else
 		{

@@ -28,26 +28,26 @@
 	$tr_hash=calc_trigger_hash();
 	setcookie("triggers_hash",$tr_hash,time()+1800);
 
-	if(!isset($HTTP_COOKIE_VARS["triggers_hash"]))
+	if(!isset($_COOKIE["triggers_hash"]))
 	{
 		$triggers_hash="0,0";
 	}
 	else
 	{
-		$triggers_hash=$HTTP_COOKIE_VARS["triggers_hash"];
+		$triggers_hash=$_COOKIE["triggers_hash"];
 	}
 
 	$new=explode(",",$tr_hash);
 	$old=explode(",",$triggers_hash);
 	setcookie("triggers_hash",$tr_hash,time()+1800);
 
-	if(!isset($HTTP_COOKIE_VARS["triggers_hash"]))
+	if(!isset($_COOKIE["triggers_hash"]))
 	{
 		$triggers_hash="0,0";
 	}
 	else
 	{
-		$triggers_hash=$HTTP_COOKIE_VARS["triggers_hash"];
+		$triggers_hash=$_COOKIE["triggers_hash"];
 	}
 
 	$new=explode(",",$tr_hash);
@@ -77,11 +77,11 @@
 ?>
 <?php
 	$refresh=10;
-	if(!isset($HTTP_GET_VARS["onlytrue"])||isset($HTTP_GET_VARS["txt_select"]))
+	if(!isset($_GET["onlytrue"])||isset($_GET["txt_select"]))
 	{
 		$refresh=0;
 	}
-	if(isset($HTTP_GET_VARS["fullscreen"]))
+	if(isset($_GET["fullscreen"]))
 	{
 		show_header($page["title"],$refresh,1);
 	}
@@ -97,7 +97,7 @@
 		show_footer();
 		exit;
 	}
-	if(isset($HTTP_GET_VARS["hostid"])&&!check_right("Host","R",$HTTP_GET_VARS["hostid"]))
+	if(isset($_GET["hostid"])&&!check_right("Host","R",$_GET["hostid"]))
 	{
 		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_footer();
@@ -114,23 +114,23 @@
 
 <?php
  
-	if(!isset($HTTP_GET_VARS["sort"]))
+	if(!isset($_GET["sort"]))
 	{
 		$sort='priority';
 	}
 	else
 	{
-		$sort=$HTTP_GET_VARS["sort"];
+		$sort=$_GET["sort"];
 	}
-	if(!isset($HTTP_GET_VARS["onlytrue"]))
+	if(!isset($_GET["onlytrue"]))
 	{
 		$onlytrue='false';
 	}
 	else
 	{
-		$onlytrue=$HTTP_GET_VARS["onlytrue"];
+		$onlytrue=$_GET["onlytrue"];
 	}
-	if(isset($HTTP_GET_VARS["noactions"])&&($HTTP_GET_VARS["noactions"]!='true'))
+	if(isset($_GET["noactions"])&&($_GET["noactions"]!='true'))
 	{
 		$noactions='false';
 	}
@@ -138,7 +138,7 @@
 	{
 		$noactions='true';
 	}
-	if(isset($HTTP_GET_VARS["compact"])&&($HTTP_GET_VARS["compact"]!='true'))
+	if(isset($_GET["compact"])&&($_GET["compact"]!='true'))
 	{
 		$compact='false';
 	}
@@ -149,25 +149,25 @@
 ?>
 
 <?php
-	if(!isset($HTTP_GET_VARS["select"]))
+	if(!isset($_GET["select"]))
 	{
 		$select="";
 	}
 	else
 	{
-		$select=$HTTP_GET_VARS["select"];
+		$select=$_GET["select"];
 	}
 
-	if(!isset($HTTP_GET_VARS["txt_select"]))
+	if(!isset($_GET["txt_select"]))
 	{
 		$txt_select="";
 	}
 	else
 	{
-		$txt_select=$HTTP_GET_VARS["txt_select"];
+		$txt_select=$_GET["txt_select"];
 	}
 
-	if(isset($HTTP_GET_VARS["btnSelect"])&&($HTTP_GET_VARS["btnSelect"]=="Inverse select"))
+	if(isset($_GET["btnSelect"])&&($_GET["btnSelect"]=="Inverse select"))
 	{
 		$select_cond="not like '%$txt_select%'";
 	}
@@ -176,14 +176,14 @@
 		$select_cond="like '%$txt_select%'";
 	}
 
-	if(!isset($HTTP_GET_VARS["fullscreen"]))
+	if(!isset($_GET["fullscreen"]))
 	{
 		show_table_header_begin();
 		echo S_STATUS_OF_TRIGGERS_BIG;
 	        show_table_v_delimiter();
 
 	        $result=DBselect("select hostid,host from hosts where status in (0,2) order by host");
-	        if(isset($HTTP_GET_VARS["hostid"]))
+	        if(isset($_GET["hostid"]))
 	        {
 	                echo "<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">".S_ALL_SMALL."</A>  ";
 	        }
@@ -197,7 +197,7 @@
 		        {
 				continue;
 			}
-	                if(isset($HTTP_GET_VARS["hostid"]) && ($row["hostid"] == $HTTP_GET_VARS["hostid"]))
+	                if(isset($_GET["hostid"]) && ($row["hostid"] == $_GET["hostid"]))
 	                {
 	                        echo "<b>[<A HREF=\"tr_status.php?hostid=".$row["hostid"]."&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">".$row["host"]."</A>]</b>  ";
 	                }
@@ -211,9 +211,9 @@
 ?>
 
 <?php
-		if(isset($HTTP_GET_VARS["hostid"]))
+		if(isset($_GET["hostid"]))
 		{
-			$cond="&hostid=".$HTTP_GET_VARS["hostid"];
+			$cond="&hostid=".$_GET["hostid"];
 		}
 		else
 		{
@@ -268,14 +268,14 @@
 	}
 
  	$time=date("[H:i:s]",time());
-  	if(isset($HTTP_GET_VARS["fullscreen"]))
+  	if(isset($_GET["fullscreen"]))
 	{
 		show_table_header("<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">".S_TRIGGERS_BIG." $time</A>");
 
 		$cond="";
-		if(isset($HTTP_GET_VARS["hostid"]))
+		if(isset($_GET["hostid"]))
 		{
-			$cond=" and h.hostid=".$HTTP_GET_VARS["hostid"]." ";
+			$cond=" and h.hostid=".$_GET["hostid"]." ";
 		}
 
 		if($onlytrue=='true')
@@ -318,7 +318,7 @@
 	echo "<TABLE BORDER=0 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 
 	echo "<TR ALIGN=CENTER>";
-	if(isset($HTTP_GET_VARS["fullscreen"]))
+	if(isset($_GET["fullscreen"]))
 	{
 		$fullscreen="&fullscreen=1";
 	}
@@ -390,9 +390,9 @@
 	echo "<TD WIDTH=9%><B>".S_COMMENTS."</B></TD>";
 	echo "</TR>\n";
 
-	if(isset($HTTP_GET_VARS["hostid"]))
+	if(isset($_GET["hostid"]))
 	{
-		$cond=" and h.hostid=".$HTTP_GET_VARS["hostid"]." ";
+		$cond=" and h.hostid=".$_GET["hostid"]." ";
 	}
 	else
 	{
@@ -505,9 +505,9 @@
 			echo "<TD>";
 			echo "<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">".S_SHOW_ACTIONS."</A> - ";
 			echo "<A HREF=\"alarms.php?triggerid=".$row["triggerid"]."\">".S_HISTORY."</A> - ";
-			if(isset($HTTP_GET_VARS["hostid"]))
+			if(isset($_GET["hostid"]))
 			{
-				echo "<A HREF=\"triggers.php?hostid=".$HTTP_GET_VARS["hostid"]."&triggerid=".$row["triggerid"]."#form\">".S_CHANGE."</A>";
+				echo "<A HREF=\"triggers.php?hostid=".$_GET["hostid"]."&triggerid=".$row["triggerid"]."#form\">".S_CHANGE."</A>";
 			}
 			else
 			{

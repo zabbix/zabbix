@@ -32,13 +32,13 @@
                 show_footer();
                 exit;
         }
-	if(isset($HTTP_GET_VARS["select"])&&($HTTP_GET_VARS["select"]!=""))
+	if(isset($_GET["select"])&&($_GET["select"]!=""))
 	{
-		unset($HTTP_GET_VARS["groupid"]);
-		unset($HTTP_GET_VARS["hostid"]);
+		unset($_GET["groupid"]);
+		unset($_GET["hostid"]);
 	}
 	
-        if(isset($HTTP_GET_VARS["hostid"])&&!check_right("Host","R",$HTTP_GET_VARS["hostid"]))
+        if(isset($_GET["hostid"])&&!check_right("Host","R",$_GET["hostid"]))
         {
                 show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
                 show_footer();
@@ -55,14 +55,14 @@
 // Start of new code
 	echo "<form name=\"form2\" method=\"get\" action=\"latest.php\">";
 
-	if(isset($HTTP_GET_VARS["groupid"])&&($HTTP_GET_VARS["groupid"]==0))
+	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
 	{
-		unset($HTTP_GET_VARS["groupid"]);
+		unset($_GET["groupid"]);
 	}
 
 	echo S_GROUP."&nbsp;";
 	echo "<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
-	echo "<option value=\"0\" ".iif(!isset($HTTP_GET_VARS["groupid"]),"selected","").">".S_ALL_SMALL;
+	echo "<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_ALL_SMALL;
 
 	$result=DBselect("select groupid,name from groups order by name");
 	while($row=DBfetch($result))
@@ -80,7 +80,7 @@
 		}
 		if($cnt!=0)
 		{
-			echo "<option value=\"".$row["groupid"]."\" ".iif(isset($HTTP_GET_VARS["groupid"])&&($HTTP_GET_VARS["groupid"]==$row["groupid"]),"selected","").">".$row["name"];
+			echo "<option value=\"".$row["groupid"]."\" ".iif(isset($_GET["groupid"])&&($_GET["groupid"]==$row["groupid"]),"selected","").">".$row["name"];
 		}
 	}
 	echo "</select>";
@@ -88,8 +88,8 @@
 	echo "&nbsp;".S_HOST."&nbsp;";
 	echo "<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
 
-	$sql=iif(isset($HTTP_GET_VARS["groupid"]),
-		"select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status in (0,2) and h.hostid=i.hostid and hg.groupid=".$HTTP_GET_VARS["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host",
+	$sql=iif(isset($_GET["groupid"]),
+		"select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status in (0,2) and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host",
 		"select h.hostid,h.host from hosts h,items i where h.status in (0,2) and h.hostid=i.hostid group by h.hostid,h.host order by h.host");
 
 	$result=DBselect($sql);
@@ -99,18 +99,18 @@
 		{
 			continue;
 		}
-		echo "<option value=\"".$row["hostid"]."\"".iif(isset($HTTP_GET_VARS["hostid"])&&($HTTP_GET_VARS["hostid"]==$row["hostid"]),"selected","").">".$row["host"];
+		echo "<option value=\"".$row["hostid"]."\"".iif(isset($_GET["hostid"])&&($_GET["hostid"]==$row["hostid"]),"selected","").">".$row["host"];
 	}
 	echo "</select>";
 
 	echo nbsp("  ");
 
-	if(isset($HTTP_GET_VARS["select"])&&($HTTP_GET_VARS["select"]==""))
+	if(isset($_GET["select"])&&($_GET["select"]==""))
 	{
-		unset($HTTP_GET_VARS["select"]);
+		unset($_GET["select"]);
 	}
-	iif_echo(isset($HTTP_GET_VARS["select"]),
-  		"<input class=\"biginput\" type=\"text\" name=\"select\" value=\"".$HTTP_GET_VARS["select"]."\">",
+	iif_echo(isset($_GET["select"]),
+  		"<input class=\"biginput\" type=\"text\" name=\"select\" value=\"".$_GET["select"]."\">",
   		"<input class=\"biginput\" type=\"text\" name=\"select\" value=\"\">");
 	echo nbsp(" ");
   	echo "<input class=\"button\" type=\"submit\" name=\"do\" value=\"select\">";
@@ -121,65 +121,65 @@
 
 	show_table_header_end();
 
-	if(!isset($HTTP_GET_VARS["sort"]))
+	if(!isset($_GET["sort"]))
 	{
-		$HTTP_GET_VARS["sort"]="description";
+		$_GET["sort"]="description";
 	}
 
-	if(isset($HTTP_GET_VARS["hostid"]))
+	if(isset($_GET["hostid"]))
 	{
-		$result=DBselect("select host from hosts where hostid=".$HTTP_GET_VARS["hostid"]);
+		$result=DBselect("select host from hosts where hostid=".$_GET["hostid"]);
 		if(DBnum_rows($result)==0)
 		{
-			unset($HTTP_GET_VARS["hostid"]);
+			unset($_GET["hostid"]);
 		}
 	}
 
-	if(isset($HTTP_GET_VARS["hostid"])||isset($HTTP_GET_VARS["select"]))
+	if(isset($_GET["hostid"])||isset($_GET["select"]))
 	{
 
 		echo "<br>";
-		if(!isset($HTTP_GET_VARS["select"]))
+		if(!isset($_GET["select"]))
 		{
-			$result=DBselect("select host from hosts where hostid=".$HTTP_GET_VARS["hostid"]);
+			$result=DBselect("select host from hosts where hostid=".$_GET["hostid"]);
 			$host=DBget_field($result,0,0);
-			show_table_header("<a href=\"latest.php?hostid=".$HTTP_GET_VARS["hostid"]."\">$host</a>");
+			show_table_header("<a href=\"latest.php?hostid=".$_GET["hostid"]."\">$host</a>");
 		}
 		else
 		{
-			show_table_header("Description is like *".$HTTP_GET_VARS["select"]."*");
+			show_table_header("Description is like *".$_GET["select"]."*");
 		}
 #		show_table_header_begin();
-#		echo "<a href=\"latest.php?hostid=".$HTTP_GET_VARS["hostid"]."\">$host</a>";
+#		echo "<a href=\"latest.php?hostid=".$_GET["hostid"]."\">$host</a>";
 #		show_table3_v_delimiter();
 
 		echo "<TABLE BORDER=0 COLS=4 WIDTH=100% cellspacing=1 cellpadding=3>";
 		cr();
 		echo "<TR BGCOLOR=\"CCCCCC\">";
 		cr();
-		if(isset($HTTP_GET_VARS["select"]))
+		if(isset($_GET["select"]))
 		{
 			echo "<TD><B>Host</B></TD>";
 		}
-		if(!isset($HTTP_GET_VARS["sort"])||(isset($HTTP_GET_VARS["sort"])&&($HTTP_GET_VARS["sort"]=="description")))
+		if(!isset($_GET["sort"])||(isset($_GET["sort"])&&($_GET["sort"]=="description")))
 		{
 			echo "<TD><B>".S_DESCRIPTION_LARGE."</B></TD>";
 		}
 		else
 		{
-			iif_echo(isset($HTTP_GET_VARS["select"]),
-				"<TD><B><a href=\"latest.php?select=".$HTTP_GET_VARS["select"]."&sort=description\">".S_DESCRIPTION_SMALL."</B></TD>",
-				"<TD><B><a href=\"latest.php?hostid=".$HTTP_GET_VARS["hostid"]."&sort=description\">".S_DESCRIPTION_SMALL."</B></TD>");
+			iif_echo(isset($_GET["select"]),
+				"<TD><B><a href=\"latest.php?select=".$_GET["select"]."&sort=description\">".S_DESCRIPTION_SMALL."</B></TD>",
+				"<TD><B><a href=\"latest.php?hostid=".$_GET["hostid"]."&sort=description\">".S_DESCRIPTION_SMALL."</B></TD>");
 		}
-		if(isset($HTTP_GET_VARS["sort"])&&($HTTP_GET_VARS["sort"]=="lastcheck"))
+		if(isset($_GET["sort"])&&($_GET["sort"]=="lastcheck"))
 		{
 			echo "<TD WIDTH=12%><B>LAST CHECK</B></TD>";
 		}
 		else
 		{
-			iif_echo(isset($HTTP_GET_VARS["select"]),
-				"<TD WIDTH=12%><B><a href=\"latest.php?select=".$HTTP_GET_VARS["select"]."&sort=lastcheck\">Last check</B></TD>",
-				"<TD WIDTH=12%><B><a href=\"latest.php?hostid=".$HTTP_GET_VARS["hostid"]."&sort=lastcheck\">Last check</B></TD>");
+			iif_echo(isset($_GET["select"]),
+				"<TD WIDTH=12%><B><a href=\"latest.php?select=".$_GET["select"]."&sort=lastcheck\">Last check</B></TD>",
+				"<TD WIDTH=12%><B><a href=\"latest.php?hostid=".$_GET["hostid"]."&sort=lastcheck\">Last check</B></TD>");
 		}
 		cr();
 		echo "<TD WIDTH=10%><B>Last value</B></TD>"; 
@@ -196,28 +196,28 @@
 		cr();
 
 		$col=0;
-		if(isset($HTTP_GET_VARS["sort"]))
+		if(isset($_GET["sort"]))
 		{
-			switch ($HTTP_GET_VARS["sort"])
+			switch ($_GET["sort"])
 			{
 				case "description":
-					$HTTP_GET_VARS["sort"]="order by i.description";
+					$_GET["sort"]="order by i.description";
 					break;
 				case "lastcheck":
-					$HTTP_GET_VARS["sort"]="order by i.lastclock";
+					$_GET["sort"]="order by i.lastclock";
 					break;
 				default:
-					$HTTP_GET_VARS["sort"]="order by i.description";
+					$_GET["sort"]="order by i.description";
 					break;
 			}
 		}
 		else
 		{
-			$HTTP_GET_VARS["sort"]="order by i.description";
+			$_GET["sort"]="order by i.description";
 		}
-		$sql=iif(isset($HTTP_GET_VARS["select"]),
-			"select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and i.status=0 and i.description like '%".$HTTP_GET_VARS["select"]."%' ".$HTTP_GET_VARS["sort"],
-			"select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and i.status=0 and h.hostid=".$HTTP_GET_VARS["hostid"]." ".$HTTP_GET_VARS["sort"]);
+		$sql=iif(isset($_GET["select"]),
+			"select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and i.status=0 and i.description like '%".$_GET["select"]."%' ".$_GET["sort"],
+			"select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and i.status=0 and h.hostid=".$_GET["hostid"]." ".$_GET["sort"]);
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
@@ -233,7 +233,7 @@
 				"<tr bgcolor=#DDDDDD>",
 				"<tr bgcolor=#EEEEEE>");
 
-			if(isset($HTTP_GET_VARS["select"]))
+			if(isset($_GET["select"]))
 			{
 				table_td($row["host"],"");
 			}

@@ -26,11 +26,11 @@
 
 	function url1_param($parameter)
 	{
-		global $HTTP_GET_VARS;
+		global $_GET;
 	
-		if(isset($HTTP_GET_VARS[$parameter]))
+		if(isset($_GET[$parameter]))
 		{
-			return "$parameter=".$HTTP_GET_VARS[$parameter];
+			return "$parameter=".$_GET[$parameter];
 		}
 		else
 		{
@@ -40,11 +40,11 @@
 
 	function url_param($parameter)
 	{
-		global $HTTP_GET_VARS;
+		global $_GET;
 	
-		if(isset($HTTP_GET_VARS[$parameter]))
+		if(isset($_GET[$parameter]))
 		{
-			return "&$parameter=".$HTTP_GET_VARS[$parameter];
+			return "&$parameter=".$_GET[$parameter];
 		}
 		else
 		{

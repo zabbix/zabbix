@@ -35,13 +35,13 @@
 ?>
 
 <?php
-	if(!isset($HTTP_GET_VARS["serviceid"]))
+	if(!isset($_GET["serviceid"]))
 	{
 		show_table_header("<font color=\"AA0000\">Undefined serviceid !</font>");
 		show_footer();
 		exit;
 	}
-	$service=get_service_by_serviceid($HTTP_GET_VARS["serviceid"]);
+	$service=get_service_by_serviceid($_GET["serviceid"]);
 ?>
 
 <?php
@@ -57,12 +57,12 @@
 	$year=date("Y");
 	for($year=date("Y")-2;$year<=date("Y");$year++)
 	{
-		if( isset($HTTP_GET_VARS["year"]) && ($HTTP_GET_VARS["year"] == $year) )
+		if( isset($_GET["year"]) && ($_GET["year"] == $year) )
 		{
 			echo "<b>[";
 		}
-		echo "<a href='report3.php?serviceid=".$HTTP_GET_VARS["serviceid"]."&year=$year'>".$year."</a>";
-		if(isset($HTTP_GET_VARS["year"]) && ($HTTP_GET_VARS["year"] == $year) )
+		echo "<a href='report3.php?serviceid=".$_GET["serviceid"]."&year=$year'>".$year."</a>";
+		if(isset($_GET["year"]) && ($_GET["year"] == $year) )
 		{
 			echo "]</b>";
 		}
@@ -90,7 +90,7 @@
 	$year=date("Y");
 	for($year=date("Y")-2;$year<=date("Y");$year++)
 	{
-		if( isset($HTTP_GET_VARS["year"]) && ($HTTP_GET_VARS["year"] != $year) )
+		if( isset($_GET["year"]) && ($_GET["year"] != $year) )
 		{
 			continue;
 		}

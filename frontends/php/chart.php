@@ -23,27 +23,27 @@
 	include "include/classes.inc.php";
 
 	$graph=new Graph();
-	if(isset($HTTP_GET_VARS["period"]))
+	if(isset($_GET["period"]))
 	{
-		$graph->setPeriod($HTTP_GET_VARS["period"]);
+		$graph->setPeriod($_GET["period"]);
 	}
-	if(isset($HTTP_GET_VARS["from"]))
+	if(isset($_GET["from"]))
 	{
-		$graph->setFrom($HTTP_GET_VARS["from"]);
+		$graph->setFrom($_GET["from"]);
 	}
-	if(isset($HTTP_GET_VARS["width"]))
+	if(isset($_GET["width"]))
 	{
-		$graph->setWidth($HTTP_GET_VARS["width"]);
+		$graph->setWidth($_GET["width"]);
 	}
-	if(isset($HTTP_GET_VARS["height"]))
+	if(isset($_GET["height"]))
 	{
-		$graph->setHeight($HTTP_GET_VARS["height"]);
+		$graph->setHeight($_GET["height"]);
 	}
-	if(isset($HTTP_GET_VARS["border"]))
+	if(isset($_GET["border"]))
 	{
 		$graph->setBorder(0);
 	}
-	$graph->addItem($HTTP_GET_VARS["itemid"]);
+	$graph->addItem($_GET["itemid"]);
 
 	$graph->Draw();
 ?>

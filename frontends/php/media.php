@@ -28,7 +28,7 @@
 ?>
 
 <?php
-        if(!check_right("User","U",$HTTP_GET_VARS["userid"]))
+        if(!check_right("User","U",$_GET["userid"]))
         {
                 show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font
 >");
@@ -39,33 +39,33 @@
 
 
 <?php
-	if(isset($HTTP_GET_VARS["register"]))
+	if(isset($_GET["register"]))
 	{
-		if($HTTP_GET_VARS["register"]=="enable")
+		if($_GET["register"]=="enable")
 		{
-			$result=activate_media( $HTTP_GET_VARS["mediaid"] );
+			$result=activate_media( $_GET["mediaid"] );
 			show_messages($result, S_MEDIA_ACTIVATED, S_CANNOT_ACTIVATE_MEDIA);
 		}
-		elseif($HTTP_GET_VARS["register"]=="disable")
+		elseif($_GET["register"]=="disable")
 		{
-			$result=disactivate_media( $HTTP_GET_VARS["mediaid"] );
+			$result=disactivate_media( $_GET["mediaid"] );
 			show_messages($result, S_MEDIA_DISABLED, S_CANNOT_DISABLE_MEDIA);
 		}
-		elseif($HTTP_GET_VARS["register"]=="add")
+		elseif($_GET["register"]=="add")
 		{
-			$result=add_media( $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["mediatypeid"], $HTTP_GET_VARS["sendto"],$HTTP_GET_VARS["severity"],$HTTP_GET_VARS["active"]);
+			$result=add_media( $_GET["userid"], $_GET["mediatypeid"], $_GET["sendto"],$_GET["severity"],$_GET["active"]);
 			show_messages($result, S_MEDIA_ADDED, S_CANNOT_ADD_MEDIA);
 		}
-		elseif($HTTP_GET_VARS["register"]=="update")
+		elseif($_GET["register"]=="update")
 		{
-			$result=update_media($HTTP_GET_VARS["mediaid"], $HTTP_GET_VARS["userid"], $HTTP_GET_VARS["mediatypeid"], $HTTP_GET_VARS["sendto"],$HTTP_GET_VARS["severity"],$HTTP_GET_VARS["active"]);
+			$result=update_media($_GET["mediaid"], $_GET["userid"], $_GET["mediatypeid"], $_GET["sendto"],$_GET["severity"],$_GET["active"]);
 			show_messages($result,S_MEDIA_UPDATED,S_CANNOT_UPDATE_MEDIA);
 		}
-		elseif($HTTP_GET_VARS["register"]=="delete")
+		elseif($_GET["register"]=="delete")
 		{
-			$result=delete_media( $HTTP_GET_VARS["mediaid"] );
+			$result=delete_media( $_GET["mediaid"] );
 			show_messages($result,S_MEDIA_DELETED, S_CANNOT_DELETE_MEDIA);
-			unset($HTTP_GET_VARS["mediaid"]);
+			unset($_GET["mediaid"]);
 		}
 	}
 ?>
@@ -76,7 +76,7 @@
 
 <FONT COLOR="#000000">
 <?php
-	$sql="select m.mediaid,mt.description,m.sendto,m.active from media m,media_type mt where m.mediatypeid=mt.mediatypeid and m.userid=".$HTTP_GET_VARS["userid"]." order by mt.type,m.sendto";
+	$sql="select m.mediaid,mt.description,m.sendto,m.active from media m,media_type mt where m.mediatypeid=mt.mediatypeid and m.userid=".$_GET["userid"]." order by mt.type,m.sendto";
 	$result=DBselect($sql);
 
 	echo "<TABLE BORDER=0 WIDTH=100% align=center BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
@@ -108,15 +108,15 @@
 		echo "<TD>";
 		if(DBget_field($result,$i,3)==0) 
 		{
-			echo "<a href=\"media.php?register=disable&mediaid=$mediaid&userid=".$HTTP_GET_VARS["userid"]."\"><font color=\"00AA00\">".S_ENABLED."</font></A>";
+			echo "<a href=\"media.php?register=disable&mediaid=$mediaid&userid=".$_GET["userid"]."\"><font color=\"00AA00\">".S_ENABLED."</font></A>";
 		}
 		else
 		{
-			echo "<a href=\"media.php?register=enable&mediaid=$mediaid&userid=".$HTTP_GET_VARS["userid"]."\"><font color=\"AA0000\">".S_DISABLED."</font></A>";
+			echo "<a href=\"media.php?register=enable&mediaid=$mediaid&userid=".$_GET["userid"]."\"><font color=\"AA0000\">".S_DISABLED."</font></A>";
 		}
 		echo "</TD>";
 		echo "<TD>";
-		echo "<A HREF=\"media.php?register=change&mediaid=$mediaid&userid=".$HTTP_GET_VARS["userid"]."\">".S_CHANGE."</A>";
+		echo "<A HREF=\"media.php?register=change&mediaid=$mediaid&userid=".$_GET["userid"]."\">".S_CHANGE."</A>";
 		echo "</TD>";
 		echo "</TR>";
 	}
@@ -134,9 +134,9 @@
 </TABLE>
 
 <?php
-	if(isset($HTTP_GET_VARS["mediaid"]))
+	if(isset($_GET["mediaid"]))
 	{
-		$sql="select m.severity,m.sendto,m.active,m.mediatypeid from media m where m.mediaid=".$HTTP_GET_VARS["mediaid"];
+		$sql="select m.severity,m.sendto,m.active,m.mediatypeid from media m where m.mediaid=".$_GET["mediaid"];
 		$result=DBselect($sql);
 		$severity=DBget_field($result,0,0);
 		$sendto=DBget_field($result,0,1);
@@ -157,10 +157,10 @@
 
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"media.php\">";
-	echo "<input name=\"userid\" type=\"hidden\" value=".$HTTP_GET_VARS["userid"].">";
-	if(isset($HTTP_GET_VARS["mediaid"]))
+	echo "<input name=\"userid\" type=\"hidden\" value=".$_GET["userid"].">";
+	if(isset($_GET["mediaid"]))
 	{
-		echo "<input name=\"mediaid\" type=\"hidden\" value=".$HTTP_GET_VARS["mediaid"].">";
+		echo "<input name=\"mediaid\" type=\"hidden\" value=".$_GET["mediaid"].">";
 	}
 	echo S_TYPE;
 	show_table2_h_delimiter();
@@ -222,7 +222,7 @@
 
 	show_table2_v_delimiter2();
 	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
-	if(isset($HTTP_GET_VARS["mediaid"]))
+	if(isset($_GET["mediaid"]))
 	{
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('".S_DELETE_SELECTED_MEDIA_Q."');\">";

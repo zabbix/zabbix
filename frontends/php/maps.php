@@ -24,11 +24,11 @@
 	$page["file"] = "maps.php";
 
 	$nomenu=0;
-	if(isset($HTTP_GET_VARS["fullscreen"]))
+	if(isset($_GET["fullscreen"]))
 	{
 		$nomenu=1;
 	}
-	if(isset($HTTP_GET_VARS["sysmapid"]))
+	if(isset($_GET["sysmapid"]))
 	{
 		show_header($page["title"],30,$nomenu);
 	}
@@ -39,7 +39,7 @@
 ?>
 
 <?php
-	if(isset($HTTP_GET_VARS["sysmapid"])&&!check_right("Network map","R",$HTTP_GET_VARS["sysmapid"]))
+	if(isset($_GET["sysmapid"])&&!check_right("Network map","R",$_GET["sysmapid"]))
 	{
 		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_footer();
@@ -48,22 +48,22 @@
 ?>
 
 <?php
-//	if(!isset($HTTP_GET_VARS["fullscreen"]))
+//	if(!isset($_GET["fullscreen"]))
 	{
 		show_table3_header_begin();
 
-		if(isset($HTTP_GET_VARS["sysmapid"])&&($HTTP_GET_VARS["sysmapid"]==0))
+		if(isset($_GET["sysmapid"])&&($_GET["sysmapid"]==0))
 		{
-			unset($HTTP_GET_VARS["sysmapid"]);
+			unset($_GET["sysmapid"]);
 		}
 
-		if(isset($HTTP_GET_VARS["sysmapid"]))
+		if(isset($_GET["sysmapid"]))
 		{
-			$result=DBselect("select name from sysmaps where sysmapid=".$HTTP_GET_VARS["sysmapid"]);
+			$result=DBselect("select name from sysmaps where sysmapid=".$_GET["sysmapid"]);
 			$map=DBget_field($result,0,0);
-			$map=iif(isset($HTTP_GET_VARS["fullscreen"]),
-				"<a href=\"maps.php?sysmapid=".$HTTP_GET_VARS["sysmapid"]."\">".$map."</a>",
-				"<a href=\"maps.php?sysmapid=".$HTTP_GET_VARS["sysmapid"]."&fullscreen=1\">".$map."</a>");
+			$map=iif(isset($_GET["fullscreen"]),
+				"<a href=\"maps.php?sysmapid=".$_GET["sysmapid"]."\">".$map."</a>",
+				"<a href=\"maps.php?sysmapid=".$_GET["sysmapid"]."&fullscreen=1\">".$map."</a>");
 		}
 		else
 		{
@@ -75,13 +75,13 @@
 		show_table3_h_delimiter();
 		echo "<form name=\"form2\" method=\"get\" action=\"maps.php\">";
 
-		if(isset($HTTP_GET_VARS["sysmapid"])&&($HTTP_GET_VARS["sysmapid"]==0))
+		if(isset($_GET["sysmapid"])&&($_GET["sysmapid"]==0))
 		{
-			unset($HTTP_GET_VARS["sysmapid"]);
+			unset($_GET["sysmapid"]);
 		}
 
 		echo "<select class=\"biginput\" name=\"sysmapid\" onChange=\"submit()\">";
-		echo "<option value=\"0\" ".iif(!isset($HTTP_GET_VARS["groupid"]),"selected","").">".S_SELECT_MAP_DOT_DOT_DOT;
+		echo "<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_SELECT_MAP_DOT_DOT_DOT;
 
 		$result=DBselect("select sysmapid,name from sysmaps order by name");
 		while($row=DBfetch($result))
@@ -90,7 +90,7 @@
 			{
 				continue;
 			}
-			echo "<option value=\"".$row["sysmapid"]."\" ".iif(isset($HTTP_GET_VARS["sysmapid"])&&($HTTP_GET_VARS["sysmapid"]==$row["sysmapid"]),"selected","").">".$row["name"];
+			echo "<option value=\"".$row["sysmapid"]."\" ".iif(isset($_GET["sysmapid"])&&($_GET["sysmapid"]==$row["sysmapid"]),"selected","").">".$row["name"];
 		}
 		echo "</select>";
 		echo "</form>";
@@ -102,13 +102,13 @@
 ?>
 
 <?php
-/*	if(isset($HTTP_GET_VARS["sysmapid"]))
+/*	if(isset($_GET["sysmapid"]))
 	{
-		$result=DBselect("select name from sysmaps where sysmapid=".$HTTP_GET_VARS["sysmapid"]);
+		$result=DBselect("select name from sysmaps where sysmapid=".$_GET["sysmapid"]);
 		$map=DBget_field($result,0,0);
-		$map=iif(isset($HTTP_GET_VARS["fullscreen"]),
-			"<a href=\"maps.php?sysmapid=".$HTTP_GET_VARS["sysmapid"]."\">".$map."</a>",
-			"<a href=\"maps.php?sysmapid=".$HTTP_GET_VARS["sysmapid"]."&fullscreen=1\">".$map."</a>");
+		$map=iif(isset($_GET["fullscreen"]),
+			"<a href=\"maps.php?sysmapid=".$_GET["sysmapid"]."\">".$map."</a>",
+			"<a href=\"maps.php?sysmapid=".$_GET["sysmapid"]."&fullscreen=1\">".$map."</a>");
 	}
 	else
 	{
@@ -122,10 +122,10 @@
 	echo "<TR BGCOLOR=#EEEEEE>";
 	echo "<TR BGCOLOR=#DDDDDD>";
 	echo "<TD ALIGN=CENTER>";
-	if(isset($HTTP_GET_VARS["sysmapid"]))
+	if(isset($_GET["sysmapid"]))
 	{
-		echo get_map_imagemap($HTTP_GET_VARS["sysmapid"]);
-		echo "<IMG SRC=\"map.php?noedit=1&sysmapid=".$HTTP_GET_VARS["sysmapid"]."\" border=0 usemap=#links>";
+		echo get_map_imagemap($_GET["sysmapid"]);
+		echo "<IMG SRC=\"map.php?noedit=1&sysmapid=".$_GET["sysmapid"]."\" border=0 usemap=#links>";
 	}
 	else
 	{

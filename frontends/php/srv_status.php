@@ -29,13 +29,13 @@
 <?php
 	show_table_header(S_IT_SERVICES_BIG);
 
-	if(isset($HTTP_GET_VARS["serviceid"])&&isset($HTTP_GET_VARS["showgraph"]))
+	if(isset($_GET["serviceid"])&&isset($_GET["showgraph"]))
 	{
 		echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 		echo "<TR BGCOLOR=#EEEEEE>";
 		echo "<TR BGCOLOR=#DDDDDD>";
 		echo "<TD ALIGN=CENTER>";
-		echo "<IMG SRC=\"chart5.php?serviceid=".$HTTP_GET_VARS["serviceid"]."\" border=0>";
+		echo "<IMG SRC=\"chart5.php?serviceid=".$_GET["serviceid"]."\" border=0>";
 		echo "</TD>";
 		echo "</TR>";
 		echo "</TABLE>";
@@ -57,10 +57,10 @@
 	echo "</tr>";
 	echo "\n";
 	$col=0;
-	if(isset($HTTP_GET_VARS["serviceid"]))
+	if(isset($_GET["serviceid"]))
 	{
 		echo "<tr bgcolor=#EEEEEE>";
-		$service=get_service_by_serviceid($HTTP_GET_VARS["serviceid"]);
+		$service=get_service_by_serviceid($_GET["serviceid"]);
 		echo "<td><b><a href=\"srv_status.php?serviceid=".$service["serviceid"]."\">".$service["name"]."</a></b></td>";
 		echo "<td>".get_service_status_description($service["status"])."</td>";
 		echo "<td>&nbsp;</td>";
@@ -99,11 +99,11 @@
 	}
 	while($row=DBfetch($result))
 	{
-		if(!isset($HTTP_GET_VARS["serviceid"]) && service_has_parent($row["serviceid"]))
+		if(!isset($_GET["serviceid"]) && service_has_parent($row["serviceid"]))
 		{
 			continue;
 		}
-		if(isset($HTTP_GET_VARS["serviceid"]) && service_has_no_this_parent($HTTP_GET_VARS["serviceid"],$row["serviceid"]))
+		if(isset($_GET["serviceid"]) && service_has_no_this_parent($_GET["serviceid"],$row["serviceid"]))
 		{
 			continue;
 		}
@@ -111,7 +111,7 @@
 		{
 			continue;
 		}
-		if(isset($HTTP_GET_VARS["serviceid"])&&($HTTP_GET_VARS["serviceid"]==$row["serviceid"]))
+		if(isset($_GET["serviceid"])&&($_GET["serviceid"]==$row["serviceid"]))
 		{
 			echo "<tr bgcolor=#99AABB>";
 		}
@@ -136,7 +136,7 @@
 			$trigger_link="";
 			$description=$row["name"];
 		}
-		if(isset($HTTP_GET_VARS["serviceid"]))
+		if(isset($_GET["serviceid"]))
 		{
 			if($childs == 0)
 			{
