@@ -566,7 +566,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				($function!="diff")&&
 				($function!="min") &&
 				($function!="max") &&
+				($function!="avg") &&
+				($function!="sum") &&
+				($function!="count") &&
 				($function!="prev")&&
+				($function!="delta")&&
+				($function!="change")&&
+				($function!="abschange")&&
 				($function!="nodata")&&
 				($function!="str"))
 			{
