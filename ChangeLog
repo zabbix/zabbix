@@ -2,6 +2,8 @@ Changes for 1.0beta1:
 (Fix chart2.html in case of no data)
 (Add support for PostgreSQL and patches)
 
+ - fixed uninterruptable calls to connect() in zabbix_suckerd (Alexei)
+
  - added column "soft" to services_links (Alexei)
  - added function DBfetch to frontends/php/include/db.inc (Alexei)
  - srv_status.html accessible without password (Alexei)
