@@ -171,6 +171,7 @@
 			($page["file"]=="map.html")||
 			($page["file"]=="charts.html")||
 			($page["file"]=="chart.html")||
+			($page["file"]=="about.html")||
 			($page["file"]=="index.html"))
 		{
 			$sql="select password_required from config";
@@ -1663,7 +1664,7 @@
 	}
 
 	# Insert form for Trigger
-	function	insert_trigger_form($triggerid)
+	function	insert_trigger_form($hostid,$triggerid)
 	{
 		if(isset($triggerid))
 		{
@@ -1692,7 +1693,14 @@
 		echo "Trigger configuration";
  
 		show_table2_v_delimiter();
-		echo "<form method=\"post\" action=\"triggers.html\">";
+		if(isset($hostid))
+		{
+			echo "<form method=\"post\" action=\"triggers.html?hostid=$hostid\">";
+		}
+		else
+		{
+			echo "<form method=\"post\" action=\"triggers.html\">";
+		}
 		echo "<input name=\"triggerid\" type=hidden value=$triggerid size=8>";
 		echo "Description";
 		show_table2_h_delimiter();
