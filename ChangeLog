@@ -1,5 +1,7 @@
 Changes for 1.0beta10:
 
+ - fixed problem when adding host from template and function 'str' 
+ is used. Thanks to Jean-Baptiste Mariotte. (Alexei)
  - support of proc_cnt[*] under Solaris. Thanks to Marc Ledent (Alexei)
  - fixed sysinfo() result. Multiplication to mem_unit required (Alexei)
  - better reporting in case of different startup errors (Alexei)
