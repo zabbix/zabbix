@@ -1073,7 +1073,8 @@ cd postgresql cat patch.sql|psql -U <username> zabbix
 
 \layout Standard
 
-Finally, read version specific notes below for any extra procedures.
+Finally, read version specific notes below for any extra procedures and
+ useful information.
 \layout Subsection
 
 Zabbix releases
@@ -1207,6 +1208,16 @@ Zabbix 1.0alpha12
 Do not forget to apply DB patches
 \layout Itemize
 
+IMPORTANT.
+ Parameter cksum[
+\series bold 
+/etc/inetd.conf
+\series default 
+] is not supported.
+ Thsi because of character '.' in argument.
+ This will be fixed in next versions of Zabbix.
+\layout Itemize
+
 Note that character '-' can be used in host names
 \layout Itemize
 
@@ -1240,7 +1251,7 @@ Note that new operator
  added.
 \layout Itemize
 
-Note that Zabbix manual will be distributed in the followinf formats: LyX,
+Note that Zabbix manual will be distributed in the following formats: LyX,
  PS, PDF and plain text.
 \layout Itemize
 

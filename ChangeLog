@@ -1,12 +1,13 @@
 Changes for 1.0alpha12:
 
+ - cksum[/etc/inetd.conf] will not be supporter for a while (Alexei)
+ - diff(0) will not be evaluated as '1' for a fresh item (Alexei)
  - not monitored hosts will not be referenced from System Map (Alexei)
  - not monitored hosts will not be shown in form Status of Triggers (Alexei)
  - in case of network error, zabbix_suckerd will not try to request same parameter
  during next 120 seconds (Alexei)
  - zabbix_trapperd will not exit after timeout (Alexei)
  - added comments to many functions of source code (Alexei)
-
  - added columns alert_history and alarm_history to table config (Alexei)
  - added link from graphs to trends and vs (Alexei)
  - housekeeping process in zabbix_suckerd will also delete old records from tables
@@ -17,7 +18,7 @@ Changes for 1.0alpha12:
  - removed doc/dbstructure (Alexei)
  - removed doc/manual.txt (Alexei)
  - minor changes in manual.lyx (Alexei)
- - added version (draft 1.01) to manual.lyx
+ - added version (draft 1.01) to manual.lyx (Alexei)
  - character '-' can be used to form server name (Alexei)
  - fixed dependencies in functions that delete information for zabbix tables (Alexei)
  - fixed function is_float (Alexei)
