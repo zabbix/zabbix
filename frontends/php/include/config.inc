@@ -305,6 +305,38 @@
 		</td>
 		</tr>
 		<tr>
+		<td colspan=2 bgcolor=FFFFFF align=center valign="top" width="15%">
+			<font face="Arial,Helvetica" size=2>
+				<a href="report1.html">
+<?
+				if($page["file"]=="report1.html")
+				{
+					echo "<b>[STATUS OF ZABBIX]</b></a>";
+				}
+				else
+				{
+					echo "STATUS OF ZABBIX</a>";
+				}
+?>
+			</font>
+		</td>
+		<td colspan=3 bgcolor=FFFFFF align=center valign="top" width="15%">
+			<font face="Arial,Helvetica" size=2>
+				<a href="report2.html">
+<?
+				if($page["file"]=="report2.html")
+				{
+					echo "<b>[AVAILABILITY REPORT]</b></a>";
+				}
+				else
+				{
+					echo "AVAILABILITY REPORT</a>";
+				}
+?>
+			</font>
+		</td>
+		</tr>
+		<tr>
 		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
 				<a href="config.html">
@@ -653,6 +685,12 @@
 		$result=DBexecute($sql);
 	}
 
+	function	delete_actions_by_triggerid($triggerid)
+	{
+		$sql="delete from actions where triggerid=$triggerid";
+		$result=DBexecute($sql);
+	}
+
 	function	delete_alarms_by_triggerid($triggerid)
 	{
 		$sql="delete from alarms where triggerid=$triggerid";
@@ -716,19 +754,25 @@
 	{
 		delete_function_by_triggerid($triggerid);
 		delete_alarms_by_triggerid($triggerid);
+		delete_actions_by_triggerid($triggerid);
 
 		$sql="delete from triggers where triggerid=$triggerid";
 		$result=DBexecute($sql);
-		
 	}
 
 	# Update Trigger definition
 
 	function	update_trigger($triggerid,$expression,$description,$priority,$istrue,$comments)
 	{
-		delete_trigger($triggerid);
+#		delete_trigger($triggerid);
+#		$triggerid=add_trigger($expression,$description,$priority,$istrue,$comments);
 
-		$triggerid=add_trigger($expression,$description,$priority,$istrue,$comments);
+		delete_function_by_triggerid($triggerid);
+
+		$expression=implode_exp($expression,$triggerid);
+		$sql="update triggers set expression='$expression',description='$description',priority=$priority,istrue=$istrue,comments='$comments' where triggerid=$triggerid";
+#		echo $sql,"<Br>";
+		$result=DBexecute($sql);
 	}
 
 	# Update User definition
@@ -753,9 +797,9 @@
 
 	# Add Items and Triggers from template
 
-	function	add_from_templates($hostid,$platformid,$host)
+	function	add_from_templates($hostid,$host)
 	{
-		$result=DBselect("select itemtemplateid,description,key_,delay from items_template where platformid=$platformid");
+		$result=DBselect("select itemtemplateid,description,key_,delay from items_template");
 		for($i=0;$i<DBnum_rows($result);$i++) 
 		{
 			$itemtemplateid=DBget_field($result,$i,0);
@@ -789,13 +833,13 @@
 
 	# Add Host definition
 
-	function	add_host($platformid,$host,$port,$status)
+	function	add_host($host,$port,$status)
 	{
-		$sql="insert into hosts (platformid,host,port,status) values ($platformid,'$host',$port,$status)";
+		$sql="insert into hosts (host,port,status) values ('$host',$port,$status)";
 		$result=DBexecute($sql);
 		$hostid=DBinsert_id($result,"hosts","hostid");
 
-		add_from_templates($hostid,$platformid,$host);
+		add_from_templates($hostid,$host);
 
 	}
 
@@ -1491,4 +1535,108 @@
 		echo "</table>";
 		echo "</table>";
 	}
+
+	function	get_stats()
+	{
+	        $result=DBselect("select count(*) from history");
+		$stat["history_count"]=DBget_field($result,0,0);
+
+	        $result=DBselect("select min(clock),max(clock) from history");
+		$stat["history_min_clock"]=DBget_field($result,0,0);
+		$stat["history_max_clock"]=DBget_field($result,0,1);
+
+	        $result=DBselect("select count(*) from triggers");
+		$stat["triggers_count"]=DBget_field($result,0,0);
+
+	        $result=DBselect("select count(*) from items");
+		$stat["items_count"]=DBget_field($result,0,0);
+
+	        $result=DBselect("select count(*) from hosts");
+		$stat["hosts_count"]=DBget_field($result,0,0);
+
+	        $result=DBselect("select count(*) from users");
+		$stat["users_count"]=DBget_field($result,0,0);
+
+
+		return $stat;
+	}
+
+	function	calculate_availability($triggerid)
+	{
+	        $result=DBselect("select min(clock),max(clock) from history");
+		$ret["history_min_clock"]=DBget_field($result,0,0);
+		$ret["history_max_clock"]=DBget_field($result,0,1);
+
+	        $result=DBselect("select min(clock),max(clock) from alarms");
+		$ret["alarms_min_clock"]=DBget_field($result,0,0);
+		$ret["alarms_max_clock"]=DBget_field($result,0,1);
+
+		$min=min($ret["history_min_clock"],$ret["alarms_min_clock"]);
+		$max=max($ret["history_max_clock"],$ret["alarms_max_clock"]);
+
+		$sql="select clock,istrue from alarms where triggerid=$triggerid and clock>=$min and clock<=$max";
+		$result=DBselect($sql);
+
+// -1,0,1
+		$state=-1;
+		$true_time=0;
+		$false_time=0;
+		$time=$ret["history_min_clock"];
+		$max=time();
+		for($i=0;$i<DBnum_rows($result);$i++)
+		{
+			$clock=DBget_field($result,$i,0);
+			$istrue=DBget_field($result,$i,1);
+
+			$diff=$clock-$time;
+
+			$time=$clock;
+
+			if($state==-1)
+			{
+				$state=$istrue;
+				if($state == 0)
+				{
+					$false_time+=$diff;
+				}
+				if($state == 1)
+				{
+					$true_time+=$diff;
+				}
+			}
+			else if($state==0)
+			{
+				$false_time+=$diff;
+				$state=$istrue;
+			}
+			else if($state==1)
+			{
+				$true_time+=$diff;
+				$state=$istrue;
+			}
+		}
+
+		if(DBnum_rows($result)==0)
+		{
+			$false_time=$max-$ret["history_min_clock"];
+		}
+		else
+		{
+			if($state==0)
+			{
+				$false_time=$false_time+$max-$time;
+			}
+			else
+			{
+				$true_time=$true_time+$max-$time;
+			}
+		}
+
+		$ret["true_time"]=$true_time;
+		$ret["false_time"]=$false_time;
+		$ret["true"]=(100*$true_time)/($true_time+$false_time);
+		$ret["false"]=(100*$false_time)/($true_time+$false_time);
+		return $ret;
+	}
+
 ?>
