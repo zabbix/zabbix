@@ -243,7 +243,14 @@
 		ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*$item+45,$shiftX+5,$sizeY+$shiftYup+15+9+15*$item+45,$colors[$color[$item]]);
 		ImageRectangle($im,$shiftX,$sizeY+$shiftYup+19+15*$item+45,$shiftX+5,$sizeY+$shiftYup+15+9+15*$item+45,$black);
 		$str=sprintf("%s: %s [min:%.2f, avg:%.2f, max:%.2f]", $host[$item], $desc[$item], $itemMin, $itemAvg, $itemMax);
-		ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*$item+15+45,$str, $black);
+		if($width>600)
+		{
+			ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*$item+15+45,$str, $black);
+		}
+		else
+		{
+			ImageString($im, 0,$shiftX+9,$sizeY+$shiftYup+15*$item+17+45,$str, $black);
+		}
 	}
 
 	$startTime=$minX;
