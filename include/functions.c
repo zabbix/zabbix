@@ -1338,20 +1338,20 @@ void	process_new_value(DB_ITEM *item,char *value)
 			/* Should we store delta or original value? */
 			if(item->delta == 0)
 			{
-				DBadd_history(item->itemid,value_double);
+				DBadd_history(item->itemid,value_double,now);
 			}
 			else
 			{
 				/* Save delta */
 				if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
 				{
-					DBadd_history(item->itemid, (value_double - item->prevorgvalue)/(now-item->lastclock));
+					DBadd_history(item->itemid, (value_double - item->prevorgvalue)/(now-item->lastclock), now);
 				}
 			}
 		}
 		else
 		{
-			DBadd_history_str(item->itemid,value);
+			DBadd_history_str(item->itemid,value,now);
 		}
 	}
 
