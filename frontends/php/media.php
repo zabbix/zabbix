@@ -53,12 +53,26 @@
 		}
 		elseif($_GET["register"]=="add")
 		{
-			$result=add_media( $_GET["userid"], $_GET["mediatypeid"], $_GET["sendto"],$_GET["severity"],$_GET["active"]);
+			$severity=array();
+			if(isset($_GET["0"]))	$severity=array_merge($severity,0);
+			if(isset($_GET["1"]))	$severity=array_merge($severity,1);
+			if(isset($_GET["2"]))	$severity=array_merge($severity,2);
+			if(isset($_GET["3"]))	$severity=array_merge($severity,3);
+			if(isset($_GET["4"]))	$severity=array_merge($severity,4);
+			if(isset($_GET["5"]))	$severity=array_merge($severity,5);
+			$result=add_media( $_GET["userid"], $_GET["mediatypeid"], $_GET["sendto"],$severity,$_GET["active"]);
 			show_messages($result, S_MEDIA_ADDED, S_CANNOT_ADD_MEDIA);
 		}
 		elseif($_GET["register"]=="update")
 		{
-			$result=update_media($_GET["mediaid"], $_GET["userid"], $_GET["mediatypeid"], $_GET["sendto"],$_GET["severity"],$_GET["active"]);
+			$severity=array();
+			if(isset($_GET["0"]))	$severity=array_merge($severity,0);
+			if(isset($_GET["1"]))	$severity=array_merge($severity,1);
+			if(isset($_GET["2"]))	$severity=array_merge($severity,2);
+			if(isset($_GET["3"]))	$severity=array_merge($severity,3);
+			if(isset($_GET["4"]))	$severity=array_merge($severity,4);
+			if(isset($_GET["5"]))	$severity=array_merge($severity,5);
+			$result=update_media($_GET["mediaid"], $_GET["userid"], $_GET["mediatypeid"], $_GET["sendto"],$severity,$_GET["active"]);
 			show_messages($result,S_MEDIA_UPDATED,S_CANNOT_UPDATE_MEDIA);
 		}
 		elseif($_GET["register"]=="delete")
@@ -154,7 +168,9 @@
 	show_table2_header_begin();
 	echo S_NEW_MEDIA;
 
-	show_table2_v_delimiter();
+	$col=0;
+
+	show_table2_v_delimiter($col++);
 	echo "<form method=\"get\" action=\"media.php\">";
 	echo "<input name=\"userid\" type=\"hidden\" value=".$_GET["userid"].">";
 	if(isset($_GET["mediaid"]))
@@ -180,13 +196,13 @@
 	}
 	echo "</SELECT>";
 
-	show_table2_v_delimiter();
+	show_table2_v_delimiter($col++);
 	echo nbsp(S_SEND_TO);
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"sendto\" size=20 value='$sendto'>";
 
-	show_table2_v_delimiter();
-	echo nbsp(S_USE_IF_SEVERITY);
+	show_table2_v_delimiter($col++);
+/*	echo nbsp(S_USE_IF_SEVERITY);
 	show_table2_h_delimiter();
 	echo "<select multiple class=\"biginput\" name=\"severity[]\" size=\"5\">";
 	$selected=iif( (1&$severity) == 1,"selected","");
@@ -201,9 +217,24 @@
 	echo "<option value=\"4\" $selected>".S_HIGH;
 	$selected=iif( (32&$severity) ==32,"selected","");
 	echo "<option value=\"5\" $selected>".S_DISASTER;
-	echo "</select>";
+	echo "</select>";*/
 
-	show_table2_v_delimiter();
+	echo nbsp(S_USE_IF_SEVERITY);
+	show_table2_h_delimiter();
+	$checked=iif( (1&$severity) == 1,"checked","");
+	echo "<input type=checkbox name=\"0\" value=\"0\" $checked>".S_NOT_CLASSIFIED."<br>";
+	$checked=iif( (2&$severity) == 2,"checked","");
+	echo "<input type=checkbox name=\"1\" value=\"1\" $checked>".S_INFORMATION."<br>";
+	$checked=iif( (4&$severity) == 4,"checked","");
+	echo "<input type=checkbox name=\"2\" value=\"2\" $checked>".S_WARNING."<br>";
+	$checked=iif( (8&$severity) == 8,"checked","");
+	echo "<input type=checkbox name=\"3\" value=\"3\" $checked>".S_AVERAGE."<br>";
+	$checked=iif( (16&$severity) ==16,"checked","");
+	echo "<input type=checkbox name=\"4\" value=\"4\" $checked>".S_HIGH."<br>";
+	$checked=iif( (32&$severity) ==32,"checked","");
+	echo "<input type=checkbox name=\"5\" value=\"5\" $checked>".S_DISASTER."<br>";
+
+	show_table2_v_delimiter($col++);
 	echo "Status";
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"active\" size=1>";
@@ -219,7 +250,7 @@
 	}
 	echo "</select>";
 
-	show_table2_v_delimiter2();
+	show_table2_v_delimiter2($col++);
 	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
 	if(isset($_GET["mediaid"]))
 	{

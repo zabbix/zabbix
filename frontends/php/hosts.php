@@ -41,7 +41,16 @@
 	{
 		if($_GET["register"]=="add")
 		{
-			$result=add_host($_GET["host"],$_GET["port"],$_GET["status"],$_GET["useip"],$_GET["ip"],$_GET["host_templateid"],$_GET["newgroup"],$_GET["groups"]);
+			$groups=array();
+			$result=DBselect("select groupid from groups");
+			while($row=DBfetch($result))
+			{
+				if(isset($_GET[$row["groupid"]]))
+				{
+					$groups=array_merge($groups,$row["groupid"]);
+				}
+			}
+			$result=add_host($_GET["host"],$_GET["port"],$_GET["status"],$_GET["useip"],$_GET["ip"],$_GET["host_templateid"],$_GET["newgroup"],$groups);
 			show_messages($result, S_HOST_ADDED, S_CANNOT_ADD_HOST);
 			if($result)
 				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_HOST,"Host [".addslashes($_GET["host"])."] IP [".$_GET["ip"]."] Status [".$_GET["status"]."]");
@@ -55,7 +64,16 @@
 		}
 		if($_GET["register"]=="update")
 		{
-			$result=@update_host($_GET["hostid"],$_GET["host"],$_GET["port"],$_GET["status"],$_GET["useip"],$_GET["ip"],$_GET["newgroup"],$_GET["groups"]);
+			$groups=array();
+			$result=DBselect("select groupid from groups");
+			while($row=DBfetch($result))
+			{
+				if(isset($_GET[$row["groupid"]]))
+				{
+					$groups=array_merge($groups,$row["groupid"]);
+				}
+			}
+			$result=@update_host($_GET["hostid"],$_GET["host"],$_GET["port"],$_GET["status"],$_GET["useip"],$_GET["ip"],$_GET["newgroup"],$groups);
 			show_messages($result, S_HOST_UPDATED, S_CANNOT_UPDATE_HOST);
 			if($result)
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,"Host [".addslashes($_GET["host"])."] IP [".$_GET["ip"]."] Status [".$_GET["status"]."]");
@@ -115,7 +133,8 @@
 	$col=0;
 	while($row=DBfetch($result))
 	{
-		$members=array("hide"=>1,"value"=>"");
+//		$members=array("hide"=>1,"value"=>"");
+		$members=array("hide"=>0,"value"=>"");
 		$result1=DBselect("select distinct h.host from hosts h, hosts_groups hg where h.hostid=hg.hostid and hg.groupid=".$row["groupid"]." order by host");
 		for($i=0;$i<DBnum_rows($result1);$i++)
 		{
@@ -354,7 +373,7 @@
 	show_table2_h_delimiter();
 	echo "<input class=\"biginput\" name=\"host\" value=\"$host\" size=20>";
 
-	show_table2_v_delimiter($col++);
+/*	show_table2_v_delimiter($col++);
 	echo S_GROUPS;
 	show_table2_h_delimiter();
 	echo "<select multiple class=\"biginput\" name=\"groups[]\" size=\"5\">";
@@ -379,6 +398,34 @@
 		{
 			echo "<option value=\"".$row["groupid"]."\">".$row["name"];
 		}
+	}
+	echo "</select>";*/
+
+	show_table2_v_delimiter($col++);
+	echo S_GROUPS;
+	show_table2_h_delimiter();
+	$result=DBselect("select distinct groupid,name from groups order by name");
+	while($row=DBfetch($result))
+	{
+		if(isset($_GET["hostid"]))
+		{
+			$sql="select count(*) as count from hosts_groups where hostid=".$_GET["hostid"]." and groupid=".$row["groupid"];
+			$result2=DBselect($sql);
+			$row2=DBfetch($result2);
+			if($row2["count"]==0)
+			{
+				echo "<input type=checkbox name=\"".$row["groupid"]."\">".$row["name"];
+			}
+			else
+			{
+				echo "<input type=checkbox name=\"".$row["groupid"]."\" checked>".$row["name"];
+			}
+		}
+		else
+		{
+			echo "<input type=checkbox name=\"".$row["groupid"]."\">".$row["name"];
+		}
+		echo "<br>";
 	}
 	echo "</select>";
 
