@@ -8,11 +8,12 @@
 
 #include <signal.h>
 
+#include <syslog.h>
+
 #include <time.h>
 
 #include "common.h"
 #include "db.h"
-#include "debug.h"
 
 int	evaluate_LAST(float *last,int itemid,int parameter)
 {
@@ -61,20 +62,20 @@ int	evaluate_MIN(float *min,int itemid,int parameter)
 	result = DBget_result();
 	if(result==NULL)
 	{
-		dbg_write( dbg_proginfo, "Result for MIN is empty" );
+		syslog(LOG_NOTICE, "Result for MIN is empty" );
 		DBfree_result(result);
 		return	FAIL;
 	}
 	if(DBnum_rows(result)==0)
 	{
-		dbg_write( dbg_proginfo, "Result for MIN is empty" );
+		syslog( LOG_NOTICE, "Result for MIN is empty" );
 		DBfree_result(result);
 		return	FAIL;
 	}
 	row = DBfetch_row(result);
 	if( row[0] == NULL )
 	{
-		dbg_write( dbg_proginfo, "Result for MIN is empty" );
+		syslog( LOG_NOTICE, "Result for MIN is empty" );
 		DBfree_result(result);
 		return	FAIL;
 	}
@@ -230,7 +231,7 @@ int	update_functions( int itemid )
 	result = DBget_result();
 	if(result==NULL)
 	{
-		dbg_write( dbg_syswarn, "No functions to update.");
+		syslog( LOG_NOTICE, "No functions to update.");
 		DBfree_result(result);
 		return SUCCEED; 
 	}
@@ -239,7 +240,7 @@ int	update_functions( int itemid )
 	{
 		function.function=row[0];
 		function.parameter=atoi(row[1]);
-		dbg_write( dbg_proginfo, "ItemId:%d Evaluating %s(%d)\n",itemid,function.function,function.parameter);
+		syslog( LOG_DEBUG, "ItemId:%d Evaluating %s(%d)\n",itemid,function.function,function.parameter);
 		if(strcmp(function.function,"last")==0)
 		{
 			ret = evaluate_LAST(&value,itemid,function.parameter);
@@ -266,11 +267,11 @@ int	update_functions( int itemid )
 		}
 		else
 		{
-			dbg_write( dbg_syswarn, "Unknown function:%s\n",function.function);
+			syslog( LOG_WARNING, "Unknown function:%s\n",function.function);
 			DBfree_result(result);
 			return FAIL;
 		}
-		dbg_write( dbg_proginfo, "Result:%f\n",value);
+		syslog( LOG_DEBUG, "Result:%f\n",value);
 		if (ret == SUCCEED)
 		{
 			sprintf(c,"update functions set lastvalue=%f where itemid=%d and function='%s' and parameter=%d", value, itemid, function.function, function.parameter );

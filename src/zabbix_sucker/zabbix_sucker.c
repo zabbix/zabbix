@@ -11,9 +11,10 @@
 
 #include <time.h>
 
+#include <syslog.h>
+
 #include "common.h"
 #include "db.h"
-#include "debug.h"
 #include "functions.h"
 
 void	signal_handler( int sig )
@@ -22,12 +23,12 @@ void	signal_handler( int sig )
 	{
 		signal( SIGALRM, signal_handler );
  
-		dbg_write( dbg_syswarn, "Timeout while executing operation." );
+		syslog( LOG_WARNING, "Timeout while executing operation." );
 	}
  
 	if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
 	{
-		dbg_write( dbg_fatal, "\nGot QUIT or INT or TERM signal. Exiting..." );
+		syslog( LOG_ERR, "\nGot QUIT or INT or TERM signal. Exiting..." );
 		exit( FAIL );
 	}
  
@@ -75,14 +76,14 @@ int	get_value(double *result,char *key,char *host,int port)
 	struct sockaddr_in myaddr_in;
 	struct sockaddr_in servaddr_in;
 
-	dbg_write( dbg_proginfo, "%10s%25s\t", host, key );
+	syslog( LOG_DEBUG, "%10s%25s\t", host, key );
 
 	servaddr_in.sin_family=AF_INET;
 	hp=gethostbyname(host);
 
 	if(hp==NULL)
 	{
-		dbg_write( dbg_syswarn, "Problem with gethostbyname" );
+		syslog( LOG_WARNING, "Problem with gethostbyname" );
 		return	FAIL;
 	}
 
@@ -93,7 +94,7 @@ int	get_value(double *result,char *key,char *host,int port)
 	s=socket(AF_INET,SOCK_STREAM,0);
 	if(s==0)
 	{
-		dbg_write( dbg_syswarn, "Problem with socket" );
+		syslog( LOG_WARNING, "Problem with socket" );
 		return	FAIL;
 	}
  
@@ -107,7 +108,7 @@ int	get_value(double *result,char *key,char *host,int port)
 
 	if( connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
-		dbg_write( dbg_syswarn, "Problem with connect" );
+		syslog( LOG_WARNING, "Problem with connect" );
 		close(s);
 		return	FAIL;
 	}
@@ -117,7 +118,7 @@ int	get_value(double *result,char *key,char *host,int port)
 	sprintf(c,"%s\n",key);
 	if( sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
-		dbg_write( dbg_syswarn, "Problem with sendto" );
+		syslog(LOG_WARNING, "Problem with sendto" );
 		close(s);
 		return	FAIL;
 	} 
@@ -129,7 +130,7 @@ int	get_value(double *result,char *key,char *host,int port)
 	i=recvfrom(s,c,1023,0,(struct sockaddr *)&servaddr_in,&i);
 	if(i==-1)
 	{
-		dbg_write( dbg_syswarn, "Problem with recvfrom [%d]",errno );
+		syslog( LOG_WARNING, "Problem with recvfrom [%d]",errno );
 		close(s);
 		return	FAIL;
 	}
@@ -138,12 +139,11 @@ int	get_value(double *result,char *key,char *host,int port)
  
 	if( close(s)!=0 )
 	{
-		dbg_write( dbg_syswarn, "Problem with close" );
-		
+		syslog(LOG_WARNING, "Problem with close" );
 	}
 	c[i-1]=0;
 
-	dbg_write( dbg_proginfo, "Got string:%10s", c );
+	syslog(LOG_DEBUG, "Got string:%10s", c );
 	*result=strtod(c,&e);
 
 	if( (*result==0) && (c==e) )
@@ -179,13 +179,13 @@ int get_minnextcheck(void)
 	result = DBget_result();
 	if(result==NULL)
 	{
-		dbg_write( dbg_proginfo, "No items to update for minnextcheck.");
+		syslog(LOG_DEBUG, "No items to update for minnextcheck.");
 		DBfree_result(result);
 		return FAIL; 
 	}
 	if(DBnum_rows(result)==0)
 	{
-		dbg_write( dbg_proginfo, "No items to update for minnextcheck.");
+		syslog( LOG_DEBUG, "No items to update for minnextcheck.");
 		DBfree_result(result);
 		return	FAIL;
 	}
@@ -218,7 +218,7 @@ int get_values(void)
 	result = DBget_result();
 	if(result==NULL)
 	{
-		dbg_write( dbg_syswarn, "No items to update.");
+		syslog( LOG_DEBUG, "No items to update.");
 		DBfree_result(result);
 		return SUCCEED; 
 	}
@@ -251,14 +251,14 @@ int get_values(void)
 
 				if( update_functions( item.itemid ) == FAIL)
 				{
-					dbg_write( dbg_syswarn, "Updating simple functions failed" );
+					syslog( LOG_WARNING, "Updating simple functions failed" );
 				}
 			}
 		}
 		else
 		{
-			dbg_write( dbg_syswarn, "Wrong value from host [HOST:%s KEY:%s VALUE:%f]", item.host, item.key, value );
-			dbg_write( dbg_syswarn, "The value is not stored in database.");
+			syslog( LOG_WARNING, "Wrong value from host [HOST:%s KEY:%s VALUE:%f]", item.host, item.key, value );
+			syslog( LOG_WARNING, "The value is not stored in database.");
 		}
 
 		if(item.lastdelete+3600<time(NULL))
@@ -285,10 +285,10 @@ int main_loop()
 		now=time(NULL);
 		get_values();
 
-		dbg_write( dbg_proginfo, "Spent %d seconds while updating values", time(NULL)-now );
+		syslog( LOG_DEBUG, "Spent %d seconds while updating values", time(NULL)-now );
 
 		nextcheck=get_minnextcheck();
-		dbg_write( dbg_proginfo, "Nextcheck:%d Time:%d", nextcheck,time(NULL) );
+		syslog( LOG_DEBUG, "Nextcheck:%d Time:%d", nextcheck,time(NULL) );
 
 		if( FAIL == nextcheck)
 		{
@@ -304,28 +304,32 @@ int main_loop()
 		}
 		if(sleeptime>0)
 		{
-			dbg_write( dbg_proginfo, "Sleeping for %d seconds", sleeptime );
-			dbg_flush();
+			syslog( LOG_DEBUG, "Sleeping for %d seconds", sleeptime );
 			sleep( sleeptime );
 		}
 		else
 		{
-			dbg_write( dbg_proginfo, "No sleeping" );
-			dbg_flush();
+			syslog( LOG_DEBUG, "No sleeping" );
 		}
 	}
 }
 
 int main(int argc, char **argv)
 {
+	int 	ret;
+
 	daemon_init();
 
 	signal( SIGINT,  signal_handler );
 	signal( SIGQUIT, signal_handler );
 	signal( SIGTERM, signal_handler );
 
-	dbg_init( dbg_syswarn, "/var/log/zabbix_sucker.log" );
-//	dbg_init( dbg_proginfo, "/var/log/zabbix_sucker.log" );
+
+	openlog("zabbix_sucker",LOG_PID,LOG_USER);
+//      ret=setlogmask(LOG_UPTO(LOG_DEBUG));
+	ret=setlogmask(LOG_UPTO(LOG_WARNING));
+
+	syslog( LOG_WARNING, "zabbix_sucker started");
 
 	DBconnect();
 

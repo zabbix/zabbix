@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <syslog.h>
 
 #include "db.h"
 #include "common.h"
-#include "debug.h"
 
 MYSQL mysql;
 
@@ -11,23 +11,23 @@ void    DBconnect( void )
 {
 	if( ! mysql_connect( &mysql, NULL, DB_USER, DB_PASSWD ) )
 	{
-		dbg_write( dbg_fatal, "Failed to connect to database: Error: %s\n",mysql_error(&mysql) );
+		syslog(LOG_ERR, "Failed to connect to database: Error: %s\n",mysql_error(&mysql) );
 		exit( FAIL );
 	}
 	if( mysql_select_db( &mysql, DB_NAME ) != 0 )
 	{
-		dbg_write( dbg_fatal, "Failed to select database: Error: %s\n",mysql_error(&mysql) );
+		syslog(LOG_ERR, "Failed to select database: Error: %s\n",mysql_error(&mysql) );
 		exit( FAIL );
 	}
 }
 
 void	DBexecute( char *query )
 {
-	dbg_write( dbg_proginfo, "Executing query:%s\n",query);
+	syslog( LOG_DEBUG, "Executing query:%s\n",query);
 
 	if( mysql_query(&mysql,query) != 0 )
 	{
-		dbg_write( dbg_fatal, "Query failed:%s", mysql_error(&mysql) );
+		syslog(LOG_ERR, "Query failed:%s", mysql_error(&mysql) );
 		exit( FAIL );
 	}
 }
@@ -57,15 +57,13 @@ int     DBget_function_result(float *Result,char *FunctionID)
 	sprintf( c, "select lastvalue from functions where functionid=%s", FunctionID );
 	DBexecute(c);
 
-	dbg_write( dbg_proginfo, "1\n");
- 
         result = DBget_result();
  
         row = DBfetch_row(result);
 	if(row == NULL)
 	{
         	DBfree_result(result);
-		dbg_write( dbg_syswarn, "Query failed for functionid:[%s]", FunctionID );
+		syslog(LOG_WARNING, "Query failed for functionid:[%s]", FunctionID );
 		return FAIL;	
 	}
         *Result=atof(row[0]);
