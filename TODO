@@ -1,5 +1,7 @@
 1.0:
 
+ - show user groups in the list of users. Igor improvement.
+
 ../../include/security.c: In function `check_security':
 ../../include/security.c:52: `socklen_t' undeclared (first use in this
 function)
