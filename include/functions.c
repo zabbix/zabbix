@@ -1494,6 +1494,7 @@ void	apply_actions(DB_TRIGGER *trigger,int trigger_value)
 	int	i,j;
 	int	now;
 
+	zabbix_set_log_level(LOG_LEVEL_DEBUG);
 	zabbix_log( LOG_LEVEL_DEBUG, "In apply_actions(%d,%d)",trigger->triggerid, trigger_value);
 
 	if(TRIGGER_VALUE_TRUE == trigger_value)
@@ -1651,6 +1652,7 @@ void	apply_actions(DB_TRIGGER *trigger,int trigger_value)
 
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "Actions applied for trigger %d %d", trigger->triggerid, trigger_value );
+	zabbix_set_log_level(LOG_LEVEL_WARNING);
 	DBfree_result(result);
 }
 

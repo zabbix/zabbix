@@ -646,8 +646,14 @@ int get_values(void)
 				update_key_status(item.hostid,HOST_STATUS_MONITORED);
 #endif
 
-				break;
+/* Why this break??? Trigger needs to be updated anyway!
+				break;*/
 			}
+#ifdef ZABBIX_THREADS
+		        update_triggers_thread(database, item.itemid);
+#else
+		        update_triggers(item.itemid);
+#endif
 		}
 		else if(res == NOTSUPPORTED)
 		{
@@ -724,16 +730,6 @@ int get_values(void)
 			zabbix_syslog("Getting value of [%s] from host [%s] failed", item.key, item.host );
 			zabbix_log( LOG_LEVEL_WARNING, "The value is not stored in database.");
 		}
-
-		if(res ==  SUCCEED)
-		{
-#ifdef ZABBIX_THREADS
-		        update_triggers_thread(database, item.itemid);
-#else
-		        update_triggers(item.itemid);
-#endif
-		}
-
 	}
 
 	DBfree_result(result);
