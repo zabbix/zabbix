@@ -110,9 +110,18 @@ void	report_stat(int now)
 {
 	FILE	*file;
 
-	int	sum_sent,sum_sent1=0,sum_received1=0,
-		sum_received,sum_sent5=0,sum_received5=0,
-		sum_sent15=0,sum_received15=0;
+	int	time=0,
+		time1=0,
+		time5=0,
+		time15=0,
+		sent=0,
+		sent1=0,
+		sent5=0,
+		sent15=0,
+		received=0,
+		received1=0,
+		received5=0,
+		received15=0;
 
 	int	i,j;
 
@@ -130,76 +139,103 @@ void	report_stat(int now)
 			break;
 		}
 /*		printf("IF [%s]\n",interfaces[i].interface);*/
-		sum_sent=0;sum_sent1=0;sum_received1=0;
-		sum_received=0;sum_sent5=0;sum_received5=0;
-		sum_sent15=0;sum_received15=0;
+		sent=0;sent1=0;received1=0;
+		received=0;sent5=0;received5=0;
+		sent15=0;received15=0;
 
+		time=now+1;
+		time1=now+1;
+		time5=now+1;
+		time15=now+1;
+		for(j=0;j<60*15;j++)
+		{
+			if(interfaces[i].clock[j]==0)
+			{
+				continue;
+			}
+			if(interfaces[i].clock[j]==now)
+			{
+				continue;
+			}
+			if((interfaces[i].clock[j] >= now-60) && (time1 > interfaces[i].clock[j]))
+			{
+				time1=interfaces[i].clock[j];
+			}
+			if((interfaces[i].clock[j] >= now-5*60) && (time5 > interfaces[i].clock[j]))
+			{
+				time5=interfaces[i].clock[j];
+			}
+			if((interfaces[i].clock[j] >= now-15*60) && (time15 > interfaces[i].clock[j]))
+			{
+				time15=interfaces[i].clock[j];
+			}
+		}
 		for(j=0;j<60*15;j++)
 		{
 			if(interfaces[i].clock[j]==now)
 			{
-				sum_sent=interfaces[i].sent[j];
-				sum_received=interfaces[i].received[j];
+				sent=interfaces[i].sent[j];
+				received=interfaces[i].received[j];
 			}
-			if(interfaces[i].clock[j]==now-60)
+			if(interfaces[i].clock[j]==time1)
 			{
-				sum_sent1=interfaces[i].sent[j];
-				sum_received1=interfaces[i].received[j];
+				sent1=interfaces[i].sent[j];
+				received1=interfaces[i].received[j];
 			}
-			if(interfaces[i].clock[j]==now-5*60)
+			if(interfaces[i].clock[j]==time5)
 			{
-				sum_sent5=interfaces[i].sent[j];
-				sum_received5=interfaces[i].received[j];
+				sent5=interfaces[i].sent[j];
+				received5=interfaces[i].received[j];
 			}
-			if(interfaces[i].clock[j]==now-15*60)
+			if(interfaces[i].clock[j]==time15)
 			{
-				sum_sent15=interfaces[i].sent[j];
-				sum_received15=interfaces[i].received[j];
+				sent15=interfaces[i].sent[j];
+				received15=interfaces[i].received[j];
 			}
 		}
-		if((sum_sent!=0)&&(sum_sent1!=0))
+		if((sent!=0)&&(sent1!=0))
 		{
-			fprintf(file,"netloadout1[%s] %f\n", interfaces[i].interface, (float)((sum_sent-sum_sent1)/60));
+			fprintf(file,"netloadout1[%s] %f\n", interfaces[i].interface, (float)((sent-sent1)/(now-time1)));
 		}
 		else
 		{
 			fprintf(file,"netloadout1[%s] 0\n", interfaces[i].interface);
 		}
-		if((sum_sent!=0)&&(sum_sent5!=0))
+		if((sent!=0)&&(sent5!=0))
 		{
-			fprintf(file,"netloadout5[%s] %f\n", interfaces[i].interface, (float)((sum_sent-sum_sent5)/300));
+			fprintf(file,"netloadout5[%s] %f\n", interfaces[i].interface, (float)((sent-sent5)/(now-time5)));
 		}
 		else
 		{
 			fprintf(file,"netloadout5[%s] 0\n", interfaces[i].interface);
 		}
-		if((sum_sent!=0)&&(sum_sent15!=0))
+		if((sent!=0)&&(sent15!=0))
 		{
-			fprintf(file,"netloadout15[%s] %f\n", interfaces[i].interface, (float)((sum_sent-sum_sent15)/900));
+			fprintf(file,"netloadout15[%s] %f\n", interfaces[i].interface, (float)((sent-sent15)/(now-time15)));
 		}
 		else
 		{
 			fprintf(file,"netloadout15[%s] 0\n", interfaces[i].interface);
 		}
-		if((sum_received!=0)&&(sum_received1!=0))
+		if((received!=0)&&(received1!=0))
 		{
-			fprintf(file,"netloadin1[%s] %f\n", interfaces[i].interface, (float)((sum_received-sum_received1)/60));
+			fprintf(file,"netloadin1[%s] %f\n", interfaces[i].interface, (float)((received-received1)/(now-time1)));
 		}
 		else
 		{
 			fprintf(file,"netloadin1[%s] 0\n", interfaces[i].interface);
 		}
-		if((sum_received!=0)&&(sum_received5!=0))
+		if((received!=0)&&(received5!=0))
 		{
-			fprintf(file,"netloadin5[%s] %f\n", interfaces[i].interface, (float)((sum_received-sum_received5)/300));
+			fprintf(file,"netloadin5[%s] %f\n", interfaces[i].interface, (float)((received-received5)/(now-time5)));
 		}
 		else
 		{
 			fprintf(file,"netloadin5[%s] 0\n", interfaces[i].interface);
 		}
-		if((sum_received!=0)&&(sum_received15!=0))
+		if((received!=0)&&(received15!=0))
 		{
-			fprintf(file,"netloadin15[%s] %f\n", interfaces[i].interface, (float)((sum_received-sum_received15)/900));
+			fprintf(file,"netloadin15[%s] %f\n", interfaces[i].interface, (float)((received-received15)/(now-time15)));
 		}
 		else
 		{
