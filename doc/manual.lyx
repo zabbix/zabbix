@@ -24,13 +24,13 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.27)
+Zabbix Reference Manual for version 1.0 (draft v1.28)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-1 August 2002
+2 August 2002
 \layout Abstract
 
 The document is Reference Manual for Zabbix version 1.0.
@@ -2569,7 +2569,7 @@ IMPORTANT.
 status
 \emph default 
 , that can be used for monitoring situations when a host goes down.
- Add this parameter to all hosts beig monitored.
+ Add this parameter to all hosts being monitored.
 \layout Itemize
 
 IMPORTANT.
@@ -2647,6 +2647,41 @@ supports for non-numeric SNMP values
 Zabbix 
 \series default 
 can be compiled by standard Unix compiler (CC)
+\layout Subsubsection
+
+Zabbix 1.0beta5
+\layout Itemize
+
+IMPORTANT.
+ Do not forget to apply DB patches
+\layout Itemize
+
+IMPORTANT.
+ Layout and color schema of all graphs is changed
+\layout Itemize
+
+IMPORTANT.
+ Added support for operators /,*,+, and - in trigger expressions
+\layout Itemize
+
+Configuration file parameter 
+\emph on 
+DBHost 
+\emph default 
+can be used to define database host name
+\layout Itemize
+
+New parameter - 
+\emph on 
+disktotal[*]
+\layout Itemize
+
+New parameter - 
+\emph on 
+inodetotal[*]
+\layout Itemize
+
+Host selection for availability report
 \layout Subsection
 
 ChangeLog
@@ -2939,6 +2974,168 @@ items.delay
 \layout Itemize
 
 values provided by an agent can be less than zero
+\layout Subsubsection
+
+Zabbix 1.0beta5
+\layout Itemize
+
+added parameter 
+\emph on 
+DBHost
+\layout Itemize
+
+added 
+\emph on 
+upgrades/dbpatches/1.0beta4_to_1.0beta5/
+\emph default 
+ with patches
+\layout Itemize
+
+added support for 
+\emph on 
+disktotal[*]
+\layout Itemize
+
+added support for 
+\emph on 
+inodetotal[*]
+\layout Itemize
+
+added support for 
+\emph on 
+*
+\emph default 
+,
+\emph on 
+/
+\emph default 
+,
+\emph on 
++
+\emph default 
+, and 
+\emph on 
+-
+\emph default 
+ in trigger expressions
+\layout Itemize
+
+update item status to UNSUPPORTED in case if SNMP support was not included
+ into 
+\series bold 
+zabbix_suckerd
+\layout Itemize
+
+added 
+\emph on 
+mysql_init()
+\emph default 
+ to 
+\emph on 
+DBconnect()
+\layout Itemize
+
+fixed Next100 and Prev100 for case if some hosts are hidden
+\layout Itemize
+
+added select for latest values 
+\layout Itemize
+
+delete related services if trigger is deleted
+\layout Itemize
+
+fixed problem with substitution of macros for messages
+\layout Itemize
+
+eliminated 
+\emph on 
+DBis_empty()
+\emph default 
+ by replacing to 
+\emph on 
+DBnum_rows()
+\layout Itemize
+
+MAX_STRING_LEN increased to 4096
+\layout Itemize
+
+fixed 
+\emph on 
+zabbix_log()
+\emph default 
+.
+ Possible coredump if data contains %s, etc
+\layout Itemize
+
+changed grid size for all graphs
+\layout Itemize
+
+added 
+\emph on 
+frontends/php/compare.php
+\layout Itemize
+
+redesigned all graphs (changed colors, etc)
+\layout Itemize
+
+host selection for availability report
+\layout Itemize
+
+more fixes to 
+\emph on 
+send_email()
+\layout Itemize
+
+fixed crash in case if MySQL server gone (support for signal PIPE).
+ Thanks to Arturs.
+\layout Itemize
+
+fixed duplicate triggers in Availability Report
+\layout Itemize
+
+fixed division by zero in Availability Report
+\layout Itemize
+
+added 
+\emph on 
+frontends/php/chart3.php
+\layout Itemize
+
+small fix for form "Configuration of network map"
+\layout Itemize
+
+for host templates, %s can be used in trigger description to be substituted
+ with new host name
+\layout Itemize
+
+empty result for 
+\emph on 
+DBselect()
+\emph default 
+ is always checked
+\layout Itemize
+
+fixed 
+\emph on 
+send_email()
+\emph default 
+.
+ According to RFC, DATA should be sent with followed EOL
+\layout Itemize
+
+fixed memory leak in 
+\emph on 
+main_alerter_loop()
+\emph default 
+.
+ Added 
+\emph on 
+DBfree_result()
+\emph default 
+.
+\layout Itemize
+
+fixed missing close of socket in case if connection to SMTP server is rejected
 \layout Section
 
 Zabbix Architecture
@@ -15896,9 +16093,6 @@ create one universal chart.php to be used for graphs, charts, and trends
 add MRTG-like graphs
 \layout Itemize
 
-add support for /,*,+,- in expressions
-\layout Itemize
-
 add support for check_service[ldap]
 \layout Itemize
 
@@ -15965,6 +16159,16 @@ alex@gobbo.caves.lv
 \layout Subsection
 
 Commercial support
+\begin_float footnote 
+\layout Standard
+
+Currently available to Baltic states (Estonia, Latvia and Lithuania) only.
+ Hopefully, other countries will be included in the list as soon as 
+\series bold 
+Zabbix 1.0 (stable) 
+\series default 
+is ready.
+\end_float 
 \layout Standard
 
 
@@ -16102,6 +16306,7 @@ ARTURS ABOLTINS
 \layout Standard
 
 Patch to allow connection to MySQL using UNIX socket.
+ Support for graceful shutdown in case if MySQL server goes down.
 \layout Itemize
 
 

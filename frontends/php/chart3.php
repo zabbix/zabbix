@@ -268,6 +268,17 @@ else
 //		ImageLine($im,$shiftX,$shiftYup+$sizeY/2,$sizeX+$shiftX,$shiftYup+$sizeY/2,$green);
 	}
 
+	$i=intval( 900*(($now+3*3600)%(24*3600))/(24*3600));
+	$x1=$sizeX*($i-$minX)/($maxX-$minX);
+	$y1=$sizeY*($avg[$i]-$minY)/($maxY-$minY);
+	$x2=$x1;
+	$y2=0;
+	$y1=$sizeY-$y1;
+	$y2=$sizeY-$y2;
+
+//	ImageDashedLine($im,$x1+$shiftX,$y1+$shiftYup,$x2+$shiftX,$y2+$shiftYup,$black);
+	ImageDashedLine($im,$x1+$shiftX,$shiftYup,$x2+$shiftX,$sizeY+$shiftYup,$black);
+
 	if($nodata == 0)
 	{
 		for($i=0;$i<=$sizeY;$i+=$sizeY/5)

@@ -40,8 +40,6 @@
 	show_table_header("$description<BR>$expression");
 ?>
 
-<hr>
-
 <?
 	$sql="select a.actionid,a.triggerid,u.alias,a.good,a.delay,a.subject,a.message from actions a,users u where a.userid=u.userid and a.triggerid=$triggerid order by u.alias, a.good desc";
 	$result=DBselect($sql);
