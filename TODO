@@ -6,6 +6,8 @@ Error
 Critical
 Panic
 
+ - localisation (one file with defines for each language)
+
 Triggers - v ih spiske videljatj trigera u kotorih estj 'depends on'.
 * K primeru, posle virazhenija pistaj tekst v skobkah (depends on) ili inim
 metodom !
