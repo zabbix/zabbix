@@ -1,0 +1,56 @@
+TODO:
+
+After using zabbix for a week monitoring 4 linux and 1 sun machine I have a
+small wish-list:
+
+- PHP front end
+ 1. Add items for all hosts at once
+ 2. Add triggers for all hosts at once
+
+- Agent
+ 1. An API so that I can build and active agent into
+    the centralized monitoring point of my application.
+ 2. max/min/average values during the poll pause along with last value to catch
+CPU spikes otherwise invisible (have had these problems with BMC Patrol).
+ 3. Ability to add a library of  userwritten c-functions with dlopen/dlsym to
+the agent with a predefined API that can return values to suckerd.
+
+Not ready yet:
+
+ - agent to send something back in case of timeout
+ - monitoring of services for different interfaces
+ - get rid of false warning messages (like unable to insert ...)
+
+ HB:
+
+ - Tree like in old Zabbix
+ - SNMP trapping
+ - Reports:
+  - more customizable (graphs time range: 1 mont, etc)
+
+ OTHER:
+
+ - check for function parameters in evaluate_simple_expression
+ - make links different if something is already registered (as for medias,
+   actions, etc)
+ - update trigger status to UNKNOWN if cannot evaluate function 
+ - do not dump "Expression cannot be evaluated" in case if function.lastvalue
+   is NULL
+
+ LATER:
+
+ - IT Helpdesk
+ - show who is online somewhere (in User config form?)
+ - setup demo site
+ - add host groups (one to one or one to many?)
+ - add user groups
+ - look for cool icons
+ - different sound files for different severity
+ - distributed monitoring
+ - LDAP authorisation (should work with MSWindows LDAP)
+ - Agent for Windows (can we use nsclient?)
+ - rename "Alerts" to "Notification"
+ - add numeric constants to trigger expressions
+ - get rid of problems with ' and "
+ - think about service node types (some nodes will automatically register
+  problem)
