@@ -1,5 +1,6 @@
 1.1:
 
+ - man pages for all daemons
  - icmppingsec->icmppingmsec
  - disk size is not correct after evaluating macros in the message
  - add support of interface statistics under Solaris and FreeBSD
