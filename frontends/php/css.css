@@ -12,12 +12,30 @@ body
         line-height:16px;
 }
 
+td.sub_menu
+{
+	color: #FFFFFF;
+        font-family:verdana, arial, helvetica, sans-serif;
+        font-size:10px;
+#	background-color: #778899;
+	background-color: #6d88ad;
+	border-color: #000000;
+	border-width:0px;
+	border-top-style: solid;
+	border-left-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+}
+
 td.horizontal_menu
 {
 	color: #FFFFFF;
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:10px;
-	background-color: #6d88ad;
+#	background-color: #6d88ad;
+#	background-color: #778899;
+#	background-color: #42429C;
+	background-color: #4040B0;
 	border-color: #000000;
 	border-width:0px;
 	border-top-style: solid;
@@ -28,6 +46,8 @@ td.horizontal_menu
 
 td.horizontal_menu_n
 {
+#	background-color: #6d88ad;
+#	background-color: #778899;
 	background-color: #AAAAAA;
 	border-color: #000000;
 	border-width:1px;
