@@ -1,5 +1,6 @@
 1.0beta14:
 
+ - Battery.png have to be renamed to UPS.png?
  - test trigger scopes
  - problem when deleting item on PostgreSQL. have to delete trens before the item
  - 'clone' for graphs and screens
