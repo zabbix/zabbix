@@ -121,7 +121,7 @@ int send_alert(DB_ALERT	*alert,DB_MEDIATYPE *mediatype)
 	return res;
 }
 
-int alerter_loop()
+int main_alerter_loop()
 {
 	char	sql[MAX_STRING_LEN+1];
 
