@@ -126,7 +126,7 @@
 	if(isset($_GET["sysmapid"]))
 	{
 		echo get_map_imagemap($_GET["sysmapid"]);
-		echo "<IMG SRC=\"map.php?noedit=1&sysmapid=".$_GET["sysmapid"]."\" border=0 usemap=#links>";
+		echo "<IMG SRC=\"map.php?noedit=1&sysmapid=".$_GET["sysmapid"]."\" border=0 usemap=#links".$_GET["sysmapid"].">";
 	}
 	else
 	{
