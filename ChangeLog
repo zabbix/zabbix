@@ -1,5 +1,7 @@
 Changes for 1.0beta9:
 
+ - added sort order by sortorder for IT Services (Alexei)
+ - added column service.sortorder (Alexei)
  - show last 20% (80%-100%) in SLA bar (Alexei)
  - changes definition of check_service[*]. Now it returns number of seconds
 spent on service check. Tahns to Jürgen Schmitz. (Alexei)

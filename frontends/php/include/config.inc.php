@@ -1623,7 +1623,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return DBexecute($sql);
 	}
 
-	function	update_service($serviceid,$name,$triggerid,$linktrigger,$algorithm,$showsla,$goodsla)
+	function	update_service($serviceid,$name,$triggerid,$linktrigger,$algorithm,$showsla,$goodsla,$sortorder)
 	{
 		if( isset($linktrigger)&&($linktrigger=="on") )
 		{
@@ -1642,11 +1642,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 			$showsla=0;
 		}
-		$sql="update services set name='$name',triggerid=$triggerid,status=0,algorithm=$algorithm,showsla=$showsla,goodsla=$goodsla where serviceid=$serviceid";
+		$sql="update services set name='$name',triggerid=$triggerid,status=0,algorithm=$algorithm,showsla=$showsla,goodsla=$goodsla,sortorder=$sortorder where serviceid=$serviceid";
 		return	DBexecute($sql);
 	}
 
-	function	add_service($serviceid,$name,$triggerid,$linktrigger,$algorithm,$showsla,$goodsla)
+	function	add_service($serviceid,$name,$triggerid,$linktrigger,$algorithm,$showsla,$goodsla,$sortorder)
 	{
 		if( isset($showsla)&&($showsla=="on") )
 		{
@@ -1665,11 +1665,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				$description=expand_trigger_description($triggerid);
 			}
 			$description=addslashes($description);
-			$sql="insert into services (name,triggerid,status,algorithm,showsla,goodsla) values ('$description',$triggerid,0,$algorithm,$showsla,$goodsla)";
+			$sql="insert into services (name,triggerid,status,algorithm,showsla,goodsla,sortorder) values ('$description',$triggerid,0,$algorithm,$showsla,$goodsla,$sortorder)";
 		}
 		else
 		{
-			$sql="insert into services (name,status,algorithm,showsla,goodsla) values ('$name',0,$algorithm,$showsla,$goodsla)";
+			$sql="insert into services (name,status,algorithm,showsla,goodsla,sortorder) values ('$name',0,$algorithm,$showsla,$goodsla,$sortorder)";
 		}
 		$result=DBexecute($sql);
 		if(!$result)

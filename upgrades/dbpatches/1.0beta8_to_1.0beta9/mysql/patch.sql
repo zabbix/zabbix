@@ -1,4 +1,5 @@
 alter table services modify goodsla double(3,2) default '99.9' not null;
+alter table services add sortorder int(4) default '0' not null;
 
 #
 # Table structure for table 'screens'

@@ -24,7 +24,7 @@
 	}
 
 	$now=time();
-	$result=DBselect("select serviceid,name,triggerid,status,showsla from services order by name");
+	$result=DBselect("select serviceid,name,triggerid,status,showsla from services order by sortorder,name");
 	echo "<table border=0 width=100% bgcolor='#CCCCCC' cellspacing=1 cellpadding=3>";
 	echo "\n";
 	echo "<tr>";
