@@ -265,13 +265,13 @@
 
 			if(isset($_GET["hostid"]))
 			{
-				$actions="<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."&hostid=".$row["hostid"]."#form\">".S_CHANGE."</A> ";
+				$actions="<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."&hostid=".$row["hostid"]."#form\">".S_CHANGE."</A>";
 			}
 			else
 			{
-				$actions="<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."#form\">".S_CHANGE."</A> ";
+				$actions="<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."#form\">".S_CHANGE."</A>";
 			}
-			$actions=$actions."-";
+			$actions=$actions." :: ";
 			if(get_action_count_by_triggerid($row["triggerid"])>0)
 			{
 				$actions=$actions."<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\"><b>A</b>ctions</A>";

@@ -222,11 +222,11 @@
 			{
 				if(get_media_count_by_userid($row["userid"])>0)
 				{
-					$actions="<A HREF=\"users.php?register=change&config=".$_GET["config"]."&userid=".$row["userid"]."#form\">".S_CHANGE."</A> - <A HREF=\"media.php?userid=".$row["userid"]."\"><b>M</b>edia</A>";
+					$actions="<A HREF=\"users.php?register=change&config=".$_GET["config"]."&userid=".$row["userid"]."#form\">".S_CHANGE."</A> :: <A HREF=\"media.php?userid=".$row["userid"]."\"><b>M</b>edia</A>";
 				}
 				else
 				{
-					$actions="<A HREF=\"users.php?register=change&config=".$_GET["config"]."&userid=".$row["userid"]."#form\">".S_CHANGE."</A> - <A HREF=\"media.php?userid=".$row["userid"]."\">".S_MEDIA."</A>";
+					$actions="<A HREF=\"users.php?register=change&config=".$_GET["config"]."&userid=".$row["userid"]."#form\">".S_CHANGE."</A> :: <A HREF=\"media.php?userid=".$row["userid"]."\">".S_MEDIA."</A>";
 				}
 			}
 			else

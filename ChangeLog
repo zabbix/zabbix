@@ -1,5 +1,6 @@
 Changes for 1.1alpha5:
 
+ - added frontends/image.php (Alexei)
  - added table 'hosts_templates' (Alexei)
  - added table 'escalations' (Alexei)
  - selection of configuration areas in config.php (Alexei)
