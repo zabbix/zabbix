@@ -1795,7 +1795,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Add Action
 
-	function	add_action( $triggerid, $userid, $good, $delay, $subject, $message, $scope, $severity)
+	function	add_action( $triggerid, $userid, $good, $delay, $subject, $message, $scope, $severity, $recipient, $usrgrpid)
 	{
 		global	$ERROR_MSG;
 
@@ -1805,7 +1805,16 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
                         return 0;
 		}
 
-		$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message,scope,severity) values ($triggerid,$userid,$good,$delay,0,'$subject','$message',$scope,$severity)";
+		if($recipient == RECIPIENT_TYPE_USER)
+		{
+			$id = $userid;
+		}
+		else
+		{
+			$id = $usrgrpid;
+		}
+
+		$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message,scope,severity,recipient) values ($triggerid,$id,$good,$delay,0,'$subject','$message',$scope,$severity,$recipient)";
 		return	DBexecute($sql);
 	}
 
@@ -1989,9 +1998,17 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Update Action
 
-	function	update_action( $actionid, $userid, $good, $delay, $subject, $message, $scope, $severity )
+	function	update_action( $actionid, $userid, $good, $delay, $subject, $message, $scope, $severity, $recipient, $usrgrpid)
 	{
-		$sql="update actions set userid=$userid,good=$good,delay=$delay,nextcheck=0,subject='$subject',message='$message',scope=$scope,severity=$severity where actionid=$actionid";
+		if($recipient == RECIPIENT_TYPE_USER)
+		{
+			$id = $userid;
+		}
+		else
+		{
+			$id = $usrgrpid;
+		}
+		$sql="update actions set userid=$id,good=$good,delay=$delay,nextcheck=0,subject='$subject',message='$message',scope=$scope,severity=$severity,recipient=$recipient where actionid=$actionid";
 		return	DBexecute($sql);
 	}
 
