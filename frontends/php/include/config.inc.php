@@ -5,6 +5,18 @@
 	$USER_DETAILS	="";
 	$ERROR_MSG	="";
 
+	function	iif($bool,$a,$b)
+	{
+		if($bool)
+		{
+			return $a;
+		}
+		else
+		{
+			return $b;
+		}
+	}
+
 	function	get_media_count_by_userid($userid)
 	{
 		$sql="select count(*) as cnt from media where userid=$userid";
