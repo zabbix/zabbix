@@ -409,9 +409,10 @@
 	{
 		show_table_header("<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&fullscreen=1&sort=$sort\">".S_TRIGGERS_BIG." $time</A>");
 	}
-  
-	echo "<TABLE BORDER=0 WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
 
+	table_begin();
+	$header=array();
+  
 	echo "<TR ALIGN=CENTER BGCOLOR=\"#CCCCCC\">";
 	if(isset($_GET["fullscreen"]))
 	{
@@ -423,67 +424,55 @@
 	}
 	if(isset($sort) && $sort=="description")
 	{
-		echo "<TD ALIGN=LEFT><B>".S_DESCRIPTION_BIG;
+		$description=S_DESCRIPTION_BIG;
 	}
 	else
 	{
 		if($select=="TRUE")
-		{
-			echo "<TD ALIGN=LEFT><B><A HREF=\"tr_status.php?sort=description&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">".S_DESCRIPTION."</a>";
-		}
+			$description="<A HREF=\"tr_status.php?sort=description&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">".S_DESCRIPTION;
 		else
-		{
-			echo "<TD ALIGN=LEFT><B><A HREF=\"tr_status.php?sort=description&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$fullscreen$cond\">".S_DESCRIPTION."</a>";
-		}
+			$description="<A HREF=\"tr_status.php?sort=description&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$fullscreen$cond\">".S_DESCRIPTION."</a>";
 	}
-	if($compact!='true') {echo "<BR><FONT SIZE=-1>".S_EXPRESSION."</FONT></B>";}
-	echo "</TD>";
-
-	table_td("<B>".S_STATUS."</B>","WIDTH=%5");
+	if($compact!='true') {$description=$description."<BR><FONT SIZE=-1>".S_EXPRESSION."</FONT></B>";}
+	$header=array_merge($header,$description);
+	$header=array_merge($header,S_STATUS);
 
 	if(!isset($sort)||(isset($sort) && $sort=="priority"))
 	{
-		echo "<TD WIDTH=9% ALIGN=CENTER><B>".S_SEVERITY_BIG."</B></TD>";
+		$header=array_merge($header,S_SEVERITY_BIG);
 	}
 	else
 	{
 		if($select=="TRUE")
-		{
-			echo "<TD ALIGN=CENTER><B><A HREF=\"tr_status.php?sort=priority&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">".S_SEVERITY."</a>";
-		}
+			$header=array_merge($header,"<A HREF=\"tr_status.php?sort=priority&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">".S_SEVERITY."</a>");
 		else
-		{
-			echo "<TD ALIGN=CENTER><B><A HREF=\"tr_status.php?sort=priority&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$fullscreen$cond\">".S_SEVERITY."</a>";
-		}
+			$header=array_merge($header,"<A HREF=\"tr_status.php?sort=priority&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$fullscreen$cond\">".S_SEVERITY."</a>");
 	}
-	if($noactions=='true')
-		echo "<TD WIDTH=12% ALIGN=CENTER>";
-	else
-		echo "<TD WIDTH=5% ALIGN=CENTER>";
 
 	if(isset($sort) && $sort=="lastchange")
 	{
-		echo "<B>".nbsp(S_LAST_CHANGE_BIG);
+		$header=array_merge($header,nbsp(S_LAST_CHANGE_BIG));
 	}
 	else
 	{
 		if($select=="TRUE")
 		{
-			echo "<B><A HREF=\"tr_status.php?sort=lastchange&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">".nbsp(S_LAST_CHANGE)."</a>";
+			$header=array_merge($header,"<A HREF=\"tr_status.php?sort=lastchange&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">".nbsp(S_LAST_CHANGE)."</a>");
 		}
 		else
 		{
-			echo "<B><A HREF=\"tr_status.php?sort=lastchange&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$fullscreen$cond\">".nbsp(S_LAST_CHANGE)."</a>";
+			$header=array_merge($header,"<A HREF=\"tr_status.php?sort=lastchange&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$fullscreen$cond\">".nbsp(S_LAST_CHANGE)."</a>");
 		}
 	}
 	echo "</TD>";
    
 	if($noactions!='true')
-	{  
-		echo "<TD WIDTH=8% NOSAVE><B>".S_ACTIONS."</B></TD>";
+	{
+		$header=array_merge($header,S_ACTIONS);
 	}
-	echo "<TD WIDTH=9%><B>".S_COMMENTS."</B></TD>";
-	echo "</TR>\n";
+	$header=array_merge($header,S_COMMENTS);
+	table_header($header);
+	unset($header);
 
 	if(isset($_GET["hostid"]))
 	{
@@ -540,33 +529,21 @@
 			continue;
 		}
 
+		$elements=array();
 
-		if($col++%2 == 1)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
-		else			{ echo "<TR BGCOLOR=#DDDDDD>"; }
 
-		echo "<TD>";
+		$description=expand_trigger_description($row["triggerid"]);
 
-//		$description=$row["description"];
-
-//		if( strstr($description,"%s"))
-//		{
-			$description=expand_trigger_description($row["triggerid"]);
-//		}
-
-		if($row["url"] == "")
+		if($row["url"] != "")
 		{
-			echo $description;
-		}
-		else
-		{
-			echo "<a href='".$row["url"]."'>$description</a>";
+			$description="<a href='".$row["url"]."'>$description</a>";
 		}
 
 		if($compact!='true')
 		{
-			echo "<BR><FONT COLOR=\"#000000\" SIZE=-2>".explode_exp($row["expression"],1)."</FONT>";
+			$description=$description."<BR><FONT COLOR=\"#000000\" SIZE=-2>".explode_exp($row["expression"],1)."</FONT>";
 		}
-		echo "</TD>";
+
 		if( (time(NULL)-$row["lastchange"])<300)
 		{
 			$blink1="<blink>";
@@ -578,50 +555,56 @@
 			$blink2="";
 		}
 		if($row["value"]==0)
-			{ echo "<TD ALIGN=CENTER>$blink1<FONT COLOR=\"00AA00\">FALSE</FONT>$blink2</TD>";}
+				$value=array("value"=>"$blink1".S_FALSE_BIG."$blink2","class"=>"off");
 		else if($row["value"]==2)
-			{  echo "<TD ALIGN=CENTER>$blink1<FONT COLOR=\"AAAAAA\">UNKNOWN</FONT>$blink2</TD>"; }
+				$value=array("value"=>"$blink1".S_UNKNOWN_BIG."$blink2","class"=>"unknown");
 		else
-			{  echo "<TD ALIGN=CENTER>$blink1<FONT COLOR=\"AA0000\">TRUE</FONT>$blink2</TD>"; }
+				$value=array("value"=>S_TRUE_BIG,"class"=>"on");
 
-		if($row["priority"]==0)		echo "<TD ALIGN=CENTER>".S_NOT_CLASSIFIED."</TD>";
-		elseif($row["priority"]==1)	echo "<TD ALIGN=CENTER>".S_INFORMATION."</TD>";
-		elseif($row["priority"]==2)	echo "<TD ALIGN=CENTER>".S_WARNING."</TD>";
-		elseif($row["priority"]==3)	echo "<TD ALIGN=CENTER BGCOLOR=#DDAAAA>".S_AVERAGE."</TD>";
-		elseif($row["priority"]==4)	echo "<TD ALIGN=CENTER BGCOLOR=#FF8888>".S_HIGH."</TD>";
-		elseif($row["priority"]==5)	echo "<TD ALIGN=CENTER BGCOLOR=RED>".S_DISASTER."</TD>";
-		else				echo "<TD ALIGN=CENTER><B>".$row["priority"]."</B></TD>";
+		if($row["priority"]==0)		$priority=S_NOT_CLASSIFIED;
+		elseif($row["priority"]==1)	$priority=S_INFORMATION;
+		elseif($row["priority"]==2)	$priority=S_WARNING;
+		elseif($row["priority"]==3)	$priority=array("value"=>S_AVERAGE,"class"=>"average");
+		elseif($row["priority"]==4)	$priority=array("value"=>S_HIGH,"class"=>"high");
+		elseif($row["priority"]==5)	$priority=array("value"=>S_DISASTER,"class"=>"disaster");
+		else				$priority=$row["priority"];
 
-		echo "<TD ALIGN=CENTER><A HREF=\"alarms.php?triggerid=".$row["triggerid"]."\">".date("d M H:i:s",$row["lastchange"])."</a>";
-		echo "</TD>";
+		$lastchange="<A HREF=\"alarms.php?triggerid=".$row["triggerid"]."\">".date("d M H:i:s",$row["lastchange"])."</a>";
 
+		$actions=FALSE;
 		if($noactions!='true')
 		{
-			echo "<TD>";
-			echo "<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">".S_SHOW_ACTIONS."</A> - ";
-			echo "<A HREF=\"alarms.php?triggerid=".$row["triggerid"]."\">".S_HISTORY."</A> - ";
+			$actions="<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">".S_SHOW_ACTIONS."</A> - ";
+			$actions=$actions."<A HREF=\"alarms.php?triggerid=".$row["triggerid"]."\">".S_HISTORY."</A> - ";
 			if(isset($_GET["hostid"]))
 			{
-				echo "<A HREF=\"triggers.php?hostid=".$_GET["hostid"]."&triggerid=".$row["triggerid"]."#form\">".S_CHANGE."</A>";
+				$actions=$actions."<A HREF=\"triggers.php?hostid=".$_GET["hostid"]."&triggerid=".$row["triggerid"]."#form\">".S_CHANGE."</A>";
 			}
 			else
 			{
-				echo "<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."#form\">".S_CHANGE."</A>";
+				$actions=$actions."<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."#form\">".S_CHANGE."</A>";
 			}
-			echo "</TD>";
 		}
+		$comments=FALSE;
 		if($row["comments"] != "")
 		{
-			echo "<TD ALIGN=CENTER><A HREF=\"tr_comments.php?triggerid=".$row["triggerid"]."\">".S_SHOW."</a></TD>";
+			$comments="<A HREF=\"tr_comments.php?triggerid=".$row["triggerid"]."\">".S_SHOW."</a>";
 		}
 		else
 		{
-			echo "<TD ALIGN=CENTER><A HREF=\"tr_comments.php?triggerid=".$row["triggerid"]."\">".S_ADD."</a></TD>";
+			$comments="<A HREF=\"tr_comments.php?triggerid=".$row["triggerid"]."\">".S_ADD."</a>";
 		}
-		if($row["value"] == 0)	echo "</TR>\n";
-		cr();
+
+		table_row(array(
+				$description,
+				$value,
+				$priority,
+				$lastchange,
+				$actions,
+				$comments
+				),$col++);
 	}
-	echo "</TABLE>";
+	table_end();
 
 	show_table_header(S_TOTAL.":$col");
 ?>
