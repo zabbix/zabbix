@@ -1,14 +1,14 @@
 Changes for 1.0beta1:
 (Add support for PostgreSQL and patches)
-(Add description of new tables to the manual)
+(Add description of new tables and column URL to the manual)
 
+ - added column URL to table triggers (Alexei)
  - character '.' can be used in definition of monitored paramaters
  (Alexei)
  - added average-only mode for trends (Alexei)
  - fixed bug with unexpected change of item status to NOT SUPPORTED. This
  bug appeared because of incomplete processing of timeout situations (Alexei)
  - constant DELAY_ON_NETWORK_FAILURE is set to 60 (Alexei)
-
  - added column status to table services (Alexei)
  - added user-defined sorting to form "Latest Values" (Alexei)
  - extra debug information in case of network errors in zabbix_suckerd

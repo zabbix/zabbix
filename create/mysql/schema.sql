@@ -282,6 +282,7 @@ CREATE TABLE triggers (
 	triggerid	int(4) NOT NULL auto_increment,
 	expression	varchar(255) DEFAULT '' NOT NULL,
 	description	varchar(255) DEFAULT '' NOT NULL,
+	url		varchar(255) DEFAULT '' NOT NULL,
 	istrue		int(4) DEFAULT '0' NOT NULL,
 	priority	int(2) DEFAULT '0' NOT NULL,
 	lastchange	int(4) DEFAULT '0' NOT NULL,

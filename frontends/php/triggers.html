@@ -33,7 +33,7 @@
 				if(isset($disabled))	{ $istrue=2; }
 				else			{ $istrue=0; }
 	
-				$result=update_trigger($triggerid,$expression,$description,$priority,$istrue,$comments);
+				$result=update_trigger($triggerid,$expression,$description,$priority,$istrue,$comments,$url);
 				show_messages($result,"Trigger updated","Cannot update trigger");
 			}
 			else
@@ -49,7 +49,7 @@
 				if(isset($disabled))	{ $istrue=2; }
 				else			{ $istrue=0; }
 				
-				$result=add_trigger($expression,$description,$priority,$istrue,$comments);
+				$result=add_trigger($expression,$description,$priority,$istrue,$comments,$url);
 				show_messages($result,"Trigger added","Cannot add trigger");
 			}
 			else
