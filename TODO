@@ -1,4 +1,5 @@
 1.1:
+ - proc_cnt[zabbix_asgentd] does not work correctly? 7 instead of 6.
  - remove icmpping and others from the QUEUE
  - hardlinked templates (several templates, one host)
  - escalation and repeated notifications
