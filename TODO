@@ -9,7 +9,6 @@ HIGH PRIORITY:
  - SNMP trapping
  - personalisation (refresh rate, graph size, default graph period, etc)
 * - add protection from IT Service loop
-* - support of template hosts. Remove tables hosts_templates and others
 
 PERFORMANCE IMPROVEMENTS:
 

@@ -19,7 +19,7 @@
 	{
 		if($HTTP_GET_VARS["register"]=="add")
 		{
-			$result=add_host($HTTP_GET_VARS["host"],$HTTP_GET_VARS["port"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["template"],$HTTP_GET_VARS["useip"],$HTTP_GET_VARS["ip"],$HTTP_GET_VARS["host_templateid"],$HTTP_GET_VARS["newgroup"],$HTTP_GET_VARS["groups"]);
+			$result=add_host($HTTP_GET_VARS["host"],$HTTP_GET_VARS["port"],$HTTP_GET_VARS["status"],$HTTP_GET_VARS["useip"],$HTTP_GET_VARS["ip"],$HTTP_GET_VARS["host_templateid"],$HTTP_GET_VARS["newgroup"],$HTTP_GET_VARS["groups"]);
 			show_messages($result,"Host added","Cannot add host");
 			unset($HTTP_GET_VARS["hostid"]);
 		}
@@ -230,11 +230,6 @@
 		echo "<option value=\"3\">Template";
 	}
 	echo "</select>";
-
-	show_table2_v_delimiter();
-	echo "Add parameters supported by zabbix_agent";
-	show_table2_h_delimiter();
-	echo "<INPUT class=\"biginput\" NAME=\"template\" TYPE=\"CHECKBOX\"  VALUE=\"true\" CHECKED>";
 
 	show_table2_v_delimiter();
 	echo "Use the host as a template";
