@@ -324,7 +324,7 @@
 	
         		if(check_right("Item","U",$row["itemid"]))
 			{
-				echo "<TD><A HREF=\"items.php?itemid=".$row["itemid"]."#form\">Change</A></TD>";
+				echo "<TD><A HREF=\"items.php?register=change&itemid=".$row["itemid"]."#form\">Change</A></TD>";
 			}
 			else
 			{
