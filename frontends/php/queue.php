@@ -41,7 +41,8 @@
 
 <?php
 	$now=time();
-	$result=DBselect("select i.itemid, i.nextcheck, i.description, h.host,h.hostid from items i,hosts h where i.status=0 and i.type not in (2) and h.status=".HOST_STATUS_MONITORED." and i.hostid=h.hostid and i.nextcheck<$now and i.key_<>'status' order by i.nextcheck");
+
+	$result=DBselect("select i.itemid, i.nextcheck, i.description, h.host,h.hostid from items i,hosts h where i.status=0 and i.type not in (2) and ((h.status=".HOST_STATUS_MONITORED." and h.available!=".HOST_AVAILABLE_FALSE.") or (h.status=".HOST_STATUS_MONITORED." and h.available=".HOST_AVAILABLE_FALSE." and h.disable_until<=$now)) and i.hostid=h.hostid and i.nextcheck<$now and i.key_ not in ('status','icmpping','icmppingsec','zabbix[log]') order by i.nextcheck");
 	table_begin();
 	table_header(array(S_NEXT_CHECK,S_HOST,S_DESCRIPTION));
 	$col=0;
