@@ -1562,10 +1562,6 @@
 	        $result=DBselect("select count(*) from history");
 		$stat["history_count"]=DBget_field($result,0,0);
 
-	        $result=DBselect("select min(clock),max(clock) from history");
-		$stat["history_min_clock"]=DBget_field($result,0,0);
-		$stat["history_max_clock"]=DBget_field($result,0,1);
-
 	        $result=DBselect("select count(*) from triggers");
 		$stat["triggers_count"]=DBget_field($result,0,0);
 
