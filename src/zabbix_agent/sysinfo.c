@@ -81,6 +81,10 @@
 	#include <sys/time.h>
 #endif
 
+#ifdef HAVE_KSTAT_H
+	#include <kstat.h>
+#endif
+
 #include "common.h"
 #include "sysinfo.h"
 
@@ -1202,7 +1206,25 @@ float	PROCLOAD(void)
 #ifdef HAVE_PROC_LOADAVG
 	return	getPROC("/proc/loadavg",1,1);
 #else
+#ifdef HAVE_KSTAT_H
+	static kstat_ctl_t *kc = NULL;
+	kstat_t *ks;
+	kstat_named_t *kn;
+
+	if (!kc && !(kc = kstat_open()))
+	{
+		return FAIL;
+	}
+	if (!(ks = kstat_lookup(kc, "unix", 0, "system_misc")) ||
+		kstat_read(kc, ks, 0) == -1 ||
+		!(kn = kstat_data_lookup(ks,"avenrun_1min")))
+	{
+		return FAIL;
+	}
+        return kn->value.ul/256.0;
+#else
 	return	FAIL;
+#endif
 #endif
 #endif
 #endif
@@ -1237,7 +1259,25 @@ float	PROCLOAD5(void)
 #ifdef	HAVE_PROC_LOADAVG
 	return	getPROC("/proc/loadavg",1,2);
 #else
+#ifdef HAVE_KSTAT_H
+	static kstat_ctl_t *kc = NULL;
+	kstat_t *ks;
+	kstat_named_t *kn;
+
+	if (!kc && !(kc = kstat_open()))
+	{
+		return FAIL;
+	}
+	if (!(ks = kstat_lookup(kc, "unix", 0, "system_misc")) ||
+		kstat_read(kc, ks, 0) == -1 ||
+		!(kn = kstat_data_lookup(ks,"avenrun_5min")))
+	{
+		return FAIL;
+	}
+        return kn->value.ul/256.0;
+#else
 	return	FAIL;
+#endif
 #endif
 #endif
 #endif
@@ -1266,13 +1306,31 @@ float	PROCLOAD15(void)
 	}
 	else
 	{
-		return dyn.psd_avg_5_min;
+		return dyn.psd_avg_15_min;
 	}
 #else
 #ifdef	HAVE_PROC_LOADAVG
 	return	getPROC("/proc/loadavg",1,3);
 #else
+#ifdef HAVE_KSTAT_H
+	static kstat_ctl_t *kc = NULL;
+	kstat_t *ks;
+	kstat_named_t *kn;
+
+	if (!kc && !(kc = kstat_open()))
+	{
+		return FAIL;
+	}
+	if (!(ks = kstat_lookup(kc, "unix", 0, "system_misc")) ||
+		kstat_read(kc, ks, 0) == -1 ||
+		!(kn = kstat_data_lookup(ks,"avenrun_15min")))
+	{
+		return FAIL;
+	}
+        return kn->value.ul/256.0;
+#else
 	return	FAIL;
+#endif
 #endif
 #endif
 #endif
