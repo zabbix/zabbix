@@ -1739,7 +1739,7 @@
 		echo "Disabled";
 		show_table2_h_delimiter();
 		echo "<INPUT TYPE=\"CHECKBOX\" ";
-		if($istrue==2) { echo "CHECKED"; }
+		if($istrue==2) { echo " CHECKED "; }
 		echo "NAME=\"disabled\"  VALUE=\"true\">";
  
 		show_table2_v_delimiter2();
