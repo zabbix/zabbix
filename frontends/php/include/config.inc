@@ -340,11 +340,11 @@
 <?
 				if($page["file"]=="alerts.html")
 				{
-					echo "<b>[ALERTS]</b></a>";
+					echo "<b>[ALERT HISTORY]</b></a>";
 				}
 				else
 				{
-					echo "ALERTS</a>";
+					echo "ALERT HISTORY</a>";
 				}
 ?>
 			</font>
