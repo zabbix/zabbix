@@ -55,6 +55,8 @@
 #include "expression.h"
 #include "log.h"
 
+#include "../zabbix_agent/sysinfo.h"
+
 static	pid_t	*pids=NULL;
 
 static	int	sucker_num=0;
@@ -389,6 +391,28 @@ int	get_value_SNMPv1(double *result,char *result_str,DB_ITEM *item)
 }
 #endif
 
+int	get_value_SIMPLE(double *result,char *result_str,DB_ITEM *item)
+{
+	char	*e;
+	char	c[MAX_STRING_LEN+1];
+
+	if(item->useip==1)
+	{
+		sprintf(c,"check_service[%s,%s]",item->key,item->ip);
+	}
+	else
+	{
+		sprintf(c,"check_service[%s,%s]",item->key,item->host);
+	}
+
+
+	process(c,result_str);
+	*result=strtod(result_str,&e);
+
+	zabbix_log( LOG_LEVEL_DEBUG, "SIMPLE [%s] [%s] [%f]", c, result_str, *result);
+	return SUCCEED;
+}
+	
 int	get_value_zabbix(double *result,char *result_str,DB_ITEM *item)
 {
 	int	s;
@@ -555,6 +579,10 @@ int	get_value(double *result,char *result_str,DB_ITEM *item)
 		zabbix_log(LOG_LEVEL_WARNING, "Support of SNMP parameters was no compiled in");
 		res=NOTSUPPORTED;
 #endif
+	}
+	else if(item->type == ITEM_TYPE_SIMPLE)
+	{
+		res=get_value_SIMPLE(result,result_str,item);
 	}
 	else
 	{

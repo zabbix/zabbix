@@ -3016,6 +3016,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		echo "<OPTION VALUE=\"2\"";
 		if($type==2) echo "SELECTED";
 		echo ">Zabbix trapper";
+		echo "<OPTION VALUE=\"3\"";
+		if($type==3) echo "SELECTED";
+		echo ">Simple check";
 		echo "</SELECT>";
  
 		show_table2_v_delimiter();

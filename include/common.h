@@ -38,6 +38,7 @@
 #define ITEM_TYPE_ZABBIX	0
 #define ITEM_TYPE_SNMP		1
 #define ITEM_TYPE_TRAPPER	2
+#define ITEM_TYPE_SIMPLE	3
 
 /* Item value types */
 #define ITEM_VALUE_TYPE_FLOAT	0
