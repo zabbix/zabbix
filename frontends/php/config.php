@@ -56,22 +56,6 @@
 	show_table2_header_begin();
 	echo "Configuration";
 
-//	show_table2_v_delimiter();
-//	echo "<form method=\"get\" action=\"config.php\">";
-//	echo "SMTP server";
-//	show_table2_h_delimiter();
-//	echo "<input class=\"biginput\" name=\"smtp_server\" value=\"".$config["smtp_server"]."\"size=40>";
-
-//	show_table2_v_delimiter();
-//	echo "Value for SMTP HELO authentification (can be empty)";
-//	show_table2_h_delimiter();
-//	echo "<input class=\"biginput\" name=\"smtp_helo\" value=\"".$config["smtp_helo"]."\"size=40>";
-
-//	show_table2_v_delimiter();
-//	echo "ZABBIX email address to send alarms from";
-//	show_table2_h_delimiter();
-//	echo "<input class=\"biginput\" name=\"smtp_email\" value=\"".$config["smtp_email"]."\"size=40>";
-
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"config.php\">";
 	echo "Do not keep alerts older than (in days)";
@@ -134,14 +118,7 @@
 	{
 		$result=DBselect("select mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path from media_type where mediatypeid=".$HTTP_GET_VARS["mediatypeid"]);
 		$mediatypeid=DBget_field($result,0,0);
-		if(isset($HTTP_GET_VARS["type"]))
-		{
-			$type=$HTTP_GET_VARS["type"];
-		}
-		else
-		{
-			$type=DBget_field($result,0,1);
-		}
+		$type=@iif(isset($HTTP_GET_VARS["type"]),$HTTP_GET_VARS["type"],DBget_field($result,0,1));
 		$description=DBget_field($result,0,2);
 		$smtp_server=DBget_field($result,0,3);
 		$smtp_helo=DBget_field($result,0,4);
@@ -150,54 +127,12 @@
 	}
 	else
 	{
-		if(isset($HTTP_GET_VARS["type"]))
-		{
-			$type=$HTTP_GET_VARS["type"];
-		}
-		else
-		{
-			$type=0;
-		}
-		if(isset($HTTP_GET_VARS["description"]))
-		{
-			$description=$HTTP_GET_VARS["description"];
-		}
-		else
-		{
-			$description=0;
-		}
-		if(isset($HTTP_GET_VARS["smtp_server"]))
-		{
-			$smtp_server=$HTTP_GET_VARS["smtp_server"];
-		}
-		else
-		{
-			$smtp_server=0;
-		}
-		if(isset($HTTP_GET_VARS["smtp_helo"]))
-		{
-			$smtp_helo=$HTTP_GET_VARS["smtp_helo"];
-		}
-		else
-		{
-			$smtp_helo=0;
-		}
-		if(isset($HTTP_GET_VARS["smtp_email"]))
-		{
-			$smtp_email=$HTTP_GET_VARS["smtp_email"];
-		}
-		else
-		{
-			$smtp_email=0;
-		}
-		if(isset($HTTP_GET_VARS["exec_path"]))
-		{
-			$exec_path=$HTTP_GET_VARS["exec_path"];
-		}
-		else
-		{
-			$exec_path=0;
-		}
+		$type=@iif(isset($HTTP_GET_VARS["type"]),$HTTP_GET_VARS["type"],0);
+		$description=@iif(isset($HTTP_GET_VARS["description"]),$HTTP_GET_VARS["description"],"");
+		$smtp_server=@iif(isset($HTTP_GET_VARS["smtp_server"]),$HTTP_GET_VARS["smtp_server"],"localhost");
+		$smtp_helo=@iif(isset($HTTP_GET_VARS["smtp_helo"]),$HTTP_GET_VARS["smtp_helo"],"localhost");
+		$smtp_email=@iif(isset($HTTP_GET_VARS["smtp_email"]),$HTTP_GET_VARS["smtp_email"],"zabbix@localhost");
+		$exec_path=@iif(isset($HTTP_GET_VARS["exec_path"]),$HTTP_GET_VARS["exec_path"],"");
 	}
 ?>
 
