@@ -183,6 +183,9 @@ void	DBupdate_triggers_status_after_restart(void);
 int	DBget_prev_trigger_value(int triggerid);
 int	DBupdate_trigger_value(int triggerid,int value,int clock);
 
+void	DBdelete_item(int itemid);
+void	DBdelete_host(int hostid);
+
 int	DBget_items_count(void);
 int	DBget_items_unsupported_count(void);
 int	DBget_history_count(void);
