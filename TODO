@@ -34,6 +34,7 @@ TKOM:
 
 OTHER:
 
+ -support of Oracle
  - check if Zabbix send alert while initial unknown->true state change
 
 I think that i found a bug in zabbix_suckerd.
