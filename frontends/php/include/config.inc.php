@@ -3258,12 +3258,24 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 //		echo "$true_time $false_time $unknown_time";
 
 		$total_time=$true_time+$false_time+$unknown_time;
-		$ret["true_time"]=$true_time;
-		$ret["false_time"]=$false_time;
-		$ret["unknown_time"]=$unknown_time;
-		$ret["true"]=(100*$true_time)/$total_time;
-		$ret["false"]=(100*$false_time)/$total_time;
-		$ret["unknown"]=(100*$unknown_time)/$total_time;
+		if($total_time==0)
+		{
+			$ret["true_time"]=0;
+			$ret["false_time"]=0;
+			$ret["unknown_time"]=0;
+			$ret["true"]=0;
+			$ret["false"]=0;
+			$ret["unknown"]=100;
+		}
+		else
+		{
+			$ret["true_time"]=$true_time;
+			$ret["false_time"]=$false_time;
+			$ret["unknown_time"]=$unknown_time;
+			$ret["true"]=(100*$true_time)/$total_time;
+			$ret["false"]=(100*$false_time)/$total_time;
+			$ret["unknown"]=(100*$unknown_time)/$total_time;
+		}
 		return $ret;
 	}
 

@@ -87,9 +87,9 @@ void	signal_handler( int sig )
  
 		zabbix_log( LOG_LEVEL_DEBUG, "Timeout while executing operation." );
 	}
-	else if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
+	else if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig || SIGPIPE == sig )
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Got QUIT or INT or TERM signal. Exiting..." );
+		zabbix_log( LOG_LEVEL_ERR, "Got QUIT or INT or TERM or PIPE signal. Exiting..." );
 		uninit();
 		exit( FAIL );
 	}

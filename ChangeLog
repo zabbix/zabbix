@@ -17,12 +17,17 @@ Not ready yet:
  - get rid of %s in alerts,alarms, etc
  - add MRTG-like graphs
  - HELO can be empty
- - fix division by zero in report2
+ - add support for /,*,+,- in expressions
+
  - trigger OFF does not work. Test on Zabbix.
  - disabled triggers still send emails. Test on Zabbix.
 
 Changes for 1.0beta5:
 
+ - fixed crash in case if MySQL server gone (support for signal PIPE) (Alexei)
+ Thanks to Arturs.
+ - fixed duplicate triggers in Availability Report (Alexei)
+ - fixed division by zero in Availability Report (Alexei)
  - added frontends/php/chart3.php (Alexei)
  - small fix for form "Configuration of network map" (Alexei)
  - for host templates, %s can be used in trigger description to be substituted
