@@ -245,7 +245,7 @@
 
 //				if( strstr($label,"%s"))
 //				{
-					$label=expand_trigger_description(DBget_field($result1,0,1));
+					$label=expand_trigger_description_simple(DBget_field($result1,0,1));
 //				}
 			}
 			else if($count>1)

@@ -1,5 +1,6 @@
 Changes for 1.0beta14:
 
+ - fixed output of special characters in maps (Alexei)
  - fixed permission check for screens (Alexei)
  - delete sysmap information on host removal (Alexei)
  - fixed compilation of the agent under HP-UX (Alexei)
