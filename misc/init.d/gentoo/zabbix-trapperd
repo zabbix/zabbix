@@ -1,0 +1,34 @@
+#!/sbin/runscript
+#
+# Zabbix trapperd start/stop script.
+#
+# Written by A.Tophofen
+PATH=/bin:/usr/bin:/sbin:/usr/sbin:/home/zabbix/bin
+DAEMON=/home/zabbix/bin/zabbix_trapperd
+NAME=zabbix_trapperd
+DESC="Zabbix 1.0"
+PID=/home/zabbix/lock/$NAME.pid
+
+
+
+opts="${opts} reload"
+
+
+depend() {
+		need net
+}
+
+start() {
+	ebegin "Starting $DESC: $NAME"
+	start-stop-daemon --start --pidfile $PID \
+		--exec $DAEMON
+	eend
+}
+stop() {
+	ebegin "Stopping $DESC: $NAME"
+	start-stop-daemon  --stop  --pidfile $PID \
+		--exec $DAEMON
+	eend
+}
+
+
