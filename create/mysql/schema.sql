@@ -107,9 +107,10 @@ CREATE TABLE platforms (
 );
 
 insert into platforms (platformid,platform)	values (1,"Linux (Intel) v2.2");
-insert into platforms (platformid,platform)	values (2,"HP-UX 10.20");
-insert into platforms (platformid,platform)	values (3,"HP-UX 11.00");
-insert into platforms (platformid,platform)	values (4,"AIX 4.3");
+insert into platforms (platformid,platform)	values (2,"HP-UX 10.xx/11.xx");
+insert into platforms (platformid,platform)	values (3,"AIX 4.xx");
+insert into platforms (platformid,platform)	values (4,"MS Windows 98");
+insert into platforms (platformid,platform)	values (4,"MS Windows 2000");
 
 #
 # Table structure for table 'items_template'
