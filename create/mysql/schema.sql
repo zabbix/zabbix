@@ -138,24 +138,27 @@ CREATE TABLE triggers_template (
 #
 
 CREATE TABLE items (
-  itemid int(4) NOT NULL auto_increment,
-  type int(4) DEFAULT '0' NOT NULL,
-  hostid int(4) NOT NULL,
-  description varchar(255) DEFAULT '' NOT NULL,
-  key_ varchar(64) DEFAULT '' NOT NULL,
-  delay int(4) DEFAULT '0' NOT NULL,
-  history int(4) DEFAULT '0' NOT NULL,
-  lastdelete int(4) DEFAULT '0' NOT NULL,
-  nextcheck int(4) DEFAULT '0' NOT NULL,
-  lastvalue double(16,4) DEFAULT NULL,
-  lastclock int(4) DEFAULT NULL,
-  prevvalue double(16,4) DEFAULT NULL,
-  status int(4) DEFAULT '0' NOT NULL,
-  PRIMARY KEY (itemid),
-  UNIQUE shortname (hostid,key_),
-  KEY (hostid),
-  KEY (nextcheck),
-  KEY (status)
+	itemid		int(4) NOT NULL auto_increment,
+	type		int(4) DEFAULT '0' NOT NULL,
+	snmp_community	varchar(64) DEFAULT '' NOT NULL,
+	snmp_oid	varchar(255) DEFAULT '' NOT NULL,
+	description	varchar(255) DEFAULT '' NOT NULL,
+	hostid		int(4) NOT NULL,
+	description	varchar(255) DEFAULT '' NOT NULL,
+	key_		varchar(64) DEFAULT '' NOT NULL,
+	delay		int(4) DEFAULT '0' NOT NULL,
+	history		int(4) DEFAULT '0' NOT NULL,
+	lastdelete	int(4) DEFAULT '0' NOT NULL,
+	nextcheck	int(4) DEFAULT '0' NOT NULL,
+	lastvalue	double(16,4) DEFAULT NULL,
+	lastclock	int(4) DEFAULT NULL,
+	prevvalue	double(16,4) DEFAULT NULL,
+	status		int(4) DEFAULT '0' NOT NULL,
+	PRIMARY KEY (itemid),
+	UNIQUE shortname (hostid,key_),
+	KEY (hostid),
+	KEY (nextcheck),
+	KEY (status)
 );
 
 #
