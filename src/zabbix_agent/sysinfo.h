@@ -81,14 +81,7 @@ char	*EXECUTE_STR(char *command);
 char	*VERSION(void);
 
 double	CHECK_SERVICE(char *service);
-
-/*double	CHECK_SERVICE_SSH(void);
-double	CHECK_SERVICE_SMTP(void);
-double	CHECK_SERVICE_FTP(void);
-double	CHECK_SERVICE_HTTP(void);
-double	CHECK_SERVICE_POP(void);
-double	CHECK_SERVICE_NNTP(void);
-double	CHECK_SERVICE_IMAP(void);*/
+double	CHECK_SERVICE_PERF(char *service);
 
 double	CHECK_PORT(char *ip_and_port);
 
