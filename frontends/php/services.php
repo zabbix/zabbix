@@ -86,6 +86,10 @@
 		{
 			echo "<td>MAX of childs</td>";
 		}
+		else if($service["algorithm"] == SERVICE_ALGORITHM_MIN)
+		{
+			echo "<td>MIN of childs</td>";
+		}
 		else
 		{
 			echo "<td>unknown</td>";
@@ -129,6 +133,10 @@
 		else if($row["algorithm"] == SERVICE_ALGORITHM_MAX)
 		{
 			echo "<td>MAX of childs</td>";
+		}
+		else if($row["algorithm"] == SERVICE_ALGORITHM_MIN)
+		{
+			echo "<td>MIN of childs</td>";
 		}
 		else
 		{
@@ -221,17 +229,26 @@
 		{
 			echo "<OPTION VALUE='0' SELECTED>Do not calculate";
 			echo "<OPTION VALUE='1'>MAX";
+			echo "<OPTION VALUE='2'>MIN";
 		}
-		if($algorithm == SERVICE_ALGORITHM_MAX)
+		else if($HTTP_GET_VARS["algorithm"] == SERVICE_ALGORITHM_MAX)
 		{
 			echo "<OPTION VALUE='0'>Do not calculate";
 			echo "<OPTION VALUE='1' SELECTED>MAX";
+			echo "<OPTION VALUE='2'>MIN";
+		}
+		else if($HTTP_GET_VARS["algorithm"] == SERVICE_ALGORITHM_MIN)
+		{
+			echo "<OPTION VALUE='0'>Do not calculate";
+			echo "<OPTION VALUE='1'>MAX";
+			echo "<OPTION VALUE='2' SELECTED>MIN";
 		}
 	}
 	else
 	{
 		echo "<OPTION VALUE='0'>Do not calculate";
 		echo "<OPTION VALUE='1' SELECTED>MAX";
+		echo "<OPTION VALUE='2'>MIN";
 	}
 	echo "</SELECT>";
 
