@@ -126,3 +126,9 @@ img.bottom
 	background-color: white;
 	margin-right:5px;
 }
+
+ul
+{
+	margin-left: 0;
+	padding-left: 1em;
+}
