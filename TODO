@@ -6,6 +6,8 @@ Error
 Critical
 Panic
 
+ - add gaps to graph when no data present
+ - make Zabbix reset nextcheck for items when updating or adding a trigger
  - remove icmpping and others from the QUEUE
  - hardlinked templates (several templates, one host)
  - escalation and repeated notifications
