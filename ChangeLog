@@ -1,3 +1,12 @@
+Changes for 1.0alpha8:
+
+ - a color for each parameter of graph can be defined
+ - warning in functions evaluate_DIFF has been eliminated
+ - removed columns "Lastdelete" and "Nextcheck" from configuration of items
+ - added patches to upgrades/dbpatches/1.0alpha7_to_1.0alpha8
+ - label "Host" changed to "Parameter" in screen "Conf. of graph"
+ - updated doc/dbstructure
+
 Changes for 1.0alpha7:
 
  - added section about configuration of Apache

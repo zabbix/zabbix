@@ -15,11 +15,7 @@
 	{
 		if($register=="add")
 		{
-			add_item_to_graph($graphid,$itemid);
-		}
-		if($register=="add link")
-		{
-			add_link($sysmapid,$shostid1,$shostid2);
+			add_item_to_graph($graphid,$itemid,$color);
 		}
 		if($register=="delete")
 		{
@@ -45,10 +41,11 @@
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Host</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Parameter</B></TD>";
+	echo "<TD WIDTH=\"10%\" NOSAVE><B>Color</B></TD>";
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
-	$sql="select i.itemid,h.host,i.description,gi.gitemid from hosts h,graphs_items gi,items i where i.itemid=gi.itemid and gi.graphid=$graphid and h.hostid=i.hostid";
+	$sql="select i.itemid,h.host,i.description,gi.gitemid,gi.color from hosts h,graphs_items gi,items i where i.itemid=gi.itemid and gi.graphid=$graphid and h.hostid=i.hostid";
 	$result=DBselect($sql);
 	echo "<CENTER>";
 	$col=0;
@@ -68,9 +65,11 @@
 		$host_=DBget_field($result,$i,1);
 		$description_=DBget_field($result,$i,2);
 		$gitemid_=DBget_field($result,$i,3);
+		$color_=DBget_field($result,$i,4);
 
 		echo "<TD>$host_</TD>";
 		echo "<TD><a href=\"chart.html?itemid=$itemid_&period=3600&from=0\">$description_</a></TD>";
+		echo "<TD>$color_</TD>";
 		echo "<TD><A HREF=\"graph.html?register=delete&graphid=$graphid&gitemid=$gitemid_\">Delete</A></TD>";
 		echo "</TR>";
 	}
@@ -90,7 +89,8 @@
 	{
 		echo "<input name=\"gitemid\" type=\"hidden\" value=$gitemid>";
 	}
-	echo "Host";
+
+	echo "Parameter";
 	show_table2_h_delimiter();
 	$result=DBselect("select h.host,i.description,i.itemid from hosts h,items i where h.hostid=i.hostid order by h.host,i.description");
 	echo "<select name=\"itemid\" size=1>";
@@ -101,6 +101,21 @@
 		$itemid_=DBget_field($result,$i,2);
 		echo "<OPTION VALUE='$itemid_'>$host_: $description_";
 	}
+	echo "</SELECT>";
+
+	show_table2_v_delimiter();
+	echo "Color";
+	show_table2_h_delimiter();
+	echo "<select name=\"color\" size=1>";
+	echo "<OPTION VALUE='Green'>Green";
+	echo "<OPTION VALUE='Dark Green'>Dark green";
+	echo "<OPTION VALUE='Red'>Red";
+	echo "<OPTION VALUE='Dark Red'>Dark red";
+	echo "<OPTION VALUE='Cyan'>Cyan";
+	echo "<OPTION VALUE='Yellow'>Yellow";
+	echo "<OPTION VALUE='Blue'>Blue";
+	echo "<OPTION VALUE='Dark Blue'>Dark Blue";
+	echo "<OPTION VALUE='White'>White";
 	echo "</SELECT>";
 
 	show_table2_v_delimiter2();

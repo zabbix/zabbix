@@ -106,10 +106,6 @@
 			cr();
 			echo "<TD WIDTH=\"5%\" NOSAVE><B>Status</B></TD>";
 			cr();
-			echo "<TD WIDTH=\"5%\" NOSAVE><B>Lastdelete</B></TD>";
-			cr();
-			echo "<TD WIDTH=\"5%\" NOSAVE><B>Nextcheck</B></TD>";
-			cr();
 			echo "<TD WIDTH=\"5%\" NOSAVE><B>Actions</B></TD>";
 			cr();
 			echo "</TR>";
@@ -137,8 +133,6 @@
 		$lastclock=date("y/m/d H:i:s",DBget_field($result,$i,9));
 		$itemid_=DBget_field($result,$i,2);
 		$status=DBget_field($result,$i,9);
-		$lastdelete=date("y/m/d H:i:s",DBget_field($result,$i,10));
-		$nextcheck=date("y/m/d H:i:s",DBget_field($result,$i,11));
 		echo "<TD>$host</TD>";
 		echo "<TD>$key</TD>";
 		echo "<TD>$description</TD>";
@@ -155,9 +149,6 @@
 		elseif($status==10)	echo "Autodisabled";
 		else echo "<TD ALIGN=CENTER><B>$status</B> Unknown</TD>";
 		echo "</td>";
-
-		echo "<TD>$lastdelete</TD>";
-		echo "<TD>$nextcheck</TD>";
 
 		if(isset($hostid_))
 		{
