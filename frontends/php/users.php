@@ -85,6 +85,36 @@
 ?>
 
 <?php
+	show_table_header("CONFIGURATION OF USER GROUPS");
+?>
+
+
+<?php
+	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TR><TD WIDTH=3%><B>Id</B></TD>";
+	echo "<TD><B>Name</B></TD>";
+	echo "<TD WIDTH=10%><B>Actions</B></TD>";
+	echo "</TR>";
+
+	$result=DBselect("select usrgrpid,name from usrgrp order by name");
+	$col=0;
+	while($row=DBfetch($result))
+	{
+		if(!check_right("User group","R",$row["usrgrpid"]))
+		{
+			continue;
+		}
+		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
+		echo "<TD>".$row["usrgrpid"]."</TD>";
+		echo "<TD>".$row["name"]."</TD>";
+		echo "<TD>Change</TD>";
+		echo "</TR>";
+	}
+	echo "</TABLE>";
+	echo "<br>";
+?>
+
+<?php
 	show_table_header("CONFIGURATION OF USERS");
 ?>
 
