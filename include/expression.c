@@ -939,7 +939,14 @@ int	substitute_macros_thread(MYSQL *database, DB_TRIGGER *trigger, DB_ACTION *ac
 		zabbix_log( LOG_LEVEL_DEBUG, "Host:%s", host );
 
 		r1=r1+1;
-		l1=find_char(macro+r1,'.');
+/* Doesn't work if the key contains '.' */
+/*		l1=find_char(macro+r1,'.');*/
+
+		l1=FAIL;
+		for(i=0;(macro+r1)[i]!=0;i++)
+		{
+			if((macro+r1)[i]=='.') l1=i;
+		}
 
 		for(i=r1;i<l1+r1;i++)
 		{
@@ -1058,7 +1065,14 @@ int	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 		zabbix_log( LOG_LEVEL_DEBUG, "Host:%s", host );
 
 		r1=r1+1;
-		l1=find_char(macro+r1,'.');
+/* Doesn't work if the key contains '.' */
+/*		l1=find_char(macro+r1,'.');*/
+
+		l1=FAIL;
+		for(i=0;(macro+r1)[i]!=0;i++)
+		{
+			if((macro+r1)[i]=='.') l1=i;
+		}
 
 		for(i=r1;i<l1+r1;i++)
 		{

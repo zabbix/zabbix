@@ -95,6 +95,7 @@
 	define("S_ALERTS_BIG",				"ALERTS");
 	define("S_TYPE",				"Type");
 	define("S_RECIPIENTS",				"Recipient(s)");
+	define("S_ERROR",				"Error");
 	define("S_SENT",				"sent");
 	define("S_NOT_SENT",				"not sent");
 	define("S_NO_ALERTS",				"No alerts");
@@ -169,7 +170,7 @@
 	define("S_COMPARE",				"Compare");
 
 //	Footer
-	define("S_ZABBIX_VER",				"ZABBIX 1.1alpha2");
+	define("S_ZABBIX_VER",				"ZABBIX 1.1alpha4");
 	define("S_COPYRIGHT_BY",			"Copyright 2001-2004 by ");
 	define("S_CONNECTED_AS",			"Connected as");
 	define("S_ALEXEI_VLADISHEV",			"Alexei Vladishev");

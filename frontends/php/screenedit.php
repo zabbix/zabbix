@@ -113,7 +113,7 @@
 			$width=@iif(isset($_GET["width"]),$_GET["width"],$width);
 			$height=@iif(isset($_GET["height"]),$_GET["height"],$height);
 
-        		show_table2_header_begin();
+        		show_form_begin("screenedit.cell");
         		echo S_SCREEN_CELL_CONFIGURATION;
 
         		echo "<input name=\"screenid\" type=\"hidden\" value=$screenid>";

@@ -1156,12 +1156,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	}
 	if($refresh!=0)
 	{
-		echo "<meta http-equiv=\"refresh\" content=\"$refresh\">";
-		echo "<title>$title [refreshed every $refresh sec]</title>";
+		echo "<meta http-equiv=\"refresh\" content=\"$refresh\">\n";
+		echo "<title>$title [refreshed every $refresh sec]</title>\n";
 	}
 	else
 	{
-		echo "<title>$title</title>";
+		echo "<title>$title</title>\n";
 	}
 
 echo "</head>";
@@ -1670,6 +1670,29 @@ echo "</head>";
 	$i=0;
 	foreach($menu as $label=>$sub)
 	{
+// Check permissions
+		if($label=="configuration")
+		{
+			if(	!check_anyright("Configuration of Zabbix","U")
+				&&!check_anyright("User","U")
+				&&!check_anyright("Host","U")
+				&&!check_anyright("Graph","U")
+				&&!check_anyright("Screen","U")
+				&&!check_anyright("Network map","U")
+				&&!check_anyright("Service","U")
+			)
+			{
+				continue;
+			}
+			if(	!check_anyright("Default permission","R")
+				&&!check_anyright("Host","R")
+			)
+			{
+				continue;
+			}
+
+		}
+// End of check permissions
 		$active=0;
 		foreach($sub["pages"] as $label2)
 		{
@@ -1694,6 +1717,35 @@ echo "</head>";
 	$i=0;
 	foreach($menu[$active_level1]["level2"] as $label=>$sub)
 	{
+// Check permissions
+		if(($sub["url"]=="latest.php")&&!check_anyright("Host","R"))							continue;
+		if(($sub["url"]=="tr_status.php?onlytrue=true&noactions=true&compact=true")&&!check_anyright("Host","R"))	continue;
+		if(($sub["url"]=="queue.php")&&!check_anyright("Host","R"))							continue;
+		if(($sub["url"]=="latestalarms.php")&&!check_anyright("Default permission","R"))				continue;
+		if(($sub["url"]=="alerts.php")&&!check_anyright("Default permission","R"))					continue;
+		if(($sub["url"]=="maps.php")&&!check_anyright("Network map","R"))						continue;
+		if(($sub["url"]=="charts.php")&&!check_anyright("Graph","R"))							continue;
+		if(($sub["url"]=="screens.php")&&!check_anyright("Screen","R"))							continue;
+		if(($sub["url"]=="srv_status.php")&&!check_anyright("Service","R"))						continue;
+		if(($sub["url"]=="about.php")&&!check_anyright("Default permission","R"))					continue;
+		if(($sub["url"]=="report1.php")&&!check_anyright("Default permission","R"))					continue;
+		if(($sub["url"]=="report2.php")&&!check_anyright("Host","R"))							continue;
+		if(($sub["url"]=="config.php")&&!check_anyright("Configuration of Zabbix","U"))					continue;
+		if(($sub["url"]=="users.php")&&!check_anyright("User","U"))							continue;
+		if(($sub["url"]=="media.php")&&!check_anyright("User","U"))							continue;
+		if(($sub["url"]=="audit.php")&&!check_anyright("Audit","U"))							continue;
+		if(($sub["url"]=="hosts.php")&&!check_anyright("Host","U"))							continue;
+		if(($sub["url"]=="items.php")&&!check_anyright("Host","U"))							continue;
+		if(($sub["url"]=="triggers.php")&&!check_anyright("Host","U"))							continue;
+		if(($sub["url"]=="actions.php")&&!check_anyright("Host","U"))							continue;
+		if(($sub["url"]=="sysmaps.php")&&!check_anyright("Network map","U"))						continue;
+		if(($sub["url"]=="sysmap.php")&&!check_anyright("Network map","U"))						continue;
+		if(($sub["url"]=="graphs.php")&&!check_anyright("Graph","U"))							continue;
+		if(($sub["url"]=="graph.php")&&!check_anyright("Graph","U"))							continue;
+		if(($sub["url"]=="screenedit.php")&&!check_anyright("Screen","U"))						continue;
+		if(($sub["url"]=="screenconf.php")&&!check_anyright("Screen","U"))						continue;
+		if(($sub["url"]=="services.php")&&!check_anyright("Service","U"))						continue;
+// End of check permissions
 		if($i==0)
 			echo "<a href=\"".$sub["url"]."\" class=\"highlight\">".$sub["label"]."</a><span class=\"divider\">&nbsp;&nbsp;|&nbsp;&nbsp;</span>";
 		else
@@ -3676,8 +3728,8 @@ echo "</head>";
 	}
 
 
-
-	function	show_table2_header_begin()
+//	function	show_table2_header_begin()
+	function	show_form_begin($help="")
 	{
 ?>
 	<p align=center>
@@ -3685,18 +3737,11 @@ echo "</head>";
 	<tr>
 	<td class="form_row_first" height=24 colspan=2>
 <?php
-/*		echo "<table border=0 align=center cellspacing=0 cellpadding=0 width=50% bgcolor=000000>";
-		cr();
-		echo "<tr>";
-		cr();
-		echo "<td valign=\"top\">";
-		cr();
-		echo "<table width=100% border=0 cellspacing=1 cellpadding=3>";
-		cr();
-		echo "<tr>";
-		cr();
-		echo "<td colspan=2 bgcolor=6d88ad align=center valign=\"top\">";
-		cr();*/
+		if($help!="")
+		{
+			echo "&nbsp;<a href=\"http://www.zabbix.com/manual/v1.1/web.$help.php\">?</a>&nbsp;";
+			cr();
+		}
 	}
 
 	function	show_table_header_begin()
@@ -3993,9 +4038,7 @@ echo "</head>";
 	# Show history
 	function	show_freehist($itemid,$period)
 	{
-
-		echo "<br>";
-		show_table2_header_begin();
+		show_form_begin("history.period");
 		echo "Choose period";
 
 		show_table2_v_delimiter();
@@ -4022,7 +4065,7 @@ echo "</head>";
 	# Show in plain text
 	function	show_plaintxt($itemid,$period)
 	{
-		show_table2_header_begin();
+		show_form_begin("history.plain");
 		echo "Data in plain text format";
 
 		show_table2_v_delimiter();
@@ -4071,6 +4114,7 @@ echo "</head>";
 
 </p>
 </body>
+</html>
 <?php
 	}
 

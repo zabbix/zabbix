@@ -1,12 +1,9 @@
 ZABBIX 1.1:
 
- - fix substitute_mscro() when it has IP address
- - fix custom multiplier, it does not correctly update lastvalue and lastvalue_str
  - RPM for RedHat EL
  - get rid of extra warning messages in W32 agent
- - escalation
+ - escalation and repeated notifications
  - execution of commands on monitored hosts in case of pre-defined events
- - repeated notifications
  - monitoring of log files
  - audit log
  - anvanced SNMP trapper
@@ -51,10 +48,13 @@ serial number/mesto polozhenija/etc.
 
 OTHER:
 
+ - fix incorrect gaps in graphs
+ - check bug with trapper receiving value with ":"
+ - configuration management. Add a page with hardware details for each host.
+ - multi-institution support
  - add acknowledgements
- - put eror string into alerts if cannot send notification
 
- - improve temoval of item related data from history
+ - improve removal of item related data from history
 '-' doesn't work in trigger expressions (a-b=0)
 
  When editing trigger actions in subject it says something
@@ -62,6 +62,8 @@ for instance "low disk space on {HOSTNAME}'s /usr"
 when submitting form, it dumps mysql error, due to non-
 escaped single quote. I believe all user input should be
 escaped before submitting to mysql.
+
+ESCALATION:
 
 Escalation (urovenj escaljacii, pravila izmenenija urovnja):
 * Nabor pravil izmenenija prioriteta triggera/... s techeniem vremeni.
@@ -92,7 +94,6 @@ urovenj eskalacii++;
  - possibility (a button) to recheck unsupported parameters
  - add advanced task scheduler/executor to ZABBIX
  - agent incorrectly returns amount of free/available memory on HP-UX (must be 24GB)
- - add failure (timeouts, network errors, etc) reasons to items and hosts
  - get rid of net[listen_*] in templates
  - use assert() for critical functions
  - check if simple checks  (FTP, SMTP!) works correctly when host name (not IP) is used
@@ -132,7 +133,6 @@ Most of the signal handlers all need to delay or block signals to avoid signal r
  - add requirement for fping to the manual
  - separate login.php and index.php
  - remove icmpping and others from the QUEUE
- - escalation and repeated notifications
 
  - summarising report about triggers/actions/items. Show items without triggers,
 trigger wihout actions, etc etc
@@ -157,15 +157,13 @@ forum Open Discussion for more info.
 
  - icmppingsec->icmppingmsec
  - disk size is not correct after evaluating macros in the message
- - add support for real 'delta' (last-previous)
  - fix evaluation of complex trigger expressions (diskpercentage)
- - add support for percentages of disk usage and diskused[]
  - check if alert and service alert is added after host become reachable again
  - navigation bar for all graphs and screens
- - check bug with trapper receiving value with ":"
 
 LATER:
 
+ - Oracle support
  - zabbix to write log to the item (for example: log when item becomes unsupported)
  - support for UDP-based checks (DNS, etc)
  - preserve selected host group between different screens (trigger maintenance, host maintenance)

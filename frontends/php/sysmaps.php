@@ -112,7 +112,7 @@
 		$background="";
 	}
 
-	show_table2_header_begin();
+	show_form_begin("sysmaps.map");
 	echo "New system map";
 
 	$col=0;

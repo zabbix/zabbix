@@ -1401,13 +1401,16 @@ void DBupdate_triggers_status_after_restart(void)
 }
 
 #ifdef ZABBIX_THREADS
-void DBupdate_host_status_thread(MYSQL *database, int hostid,int status,int clock)
+void DBupdate_host_status_thread(MYSQL *database, int hostid,int status,int clock,char *error)
 {
 	DB_RESULT	*result;
 	char	sql[MAX_STRING_LEN];
+	char	error_esc[MAX_STRING_LEN];
 	int	disable_until;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In update_host_status()");
+
+	DBescape_string(error,error_esc,MAX_STRING_LEN);
 
 	snprintf(sql,sizeof(sql)-1,"select status,disable_until from hosts where hostid=%d",hostid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
@@ -1440,13 +1443,13 @@ void DBupdate_host_status_thread(MYSQL *database, int hostid,int status,int cloc
 
 	if(status==HOST_STATUS_MONITORED)
 	{
-		snprintf(sql,sizeof(sql)-1,"update hosts set status=%d where hostid=%d",HOST_STATUS_MONITORED,hostid);
+		snprintf(sql,sizeof(sql)-1,"update hosts set status=%d,error='' where hostid=%d",HOST_STATUS_MONITORED,hostid);
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		DBexecute_thread(database,sql);
 	}
 	else if(status==HOST_STATUS_NOT_MONITORED)
 	{
-		snprintf(sql,sizeof(sql)-1,"update hosts set status=%d where hostid=%d",HOST_STATUS_NOT_MONITORED,hostid);
+		snprintf(sql,sizeof(sql)-1,"update hosts set status=%d,error='' where hostid=%d",HOST_STATUS_NOT_MONITORED,hostid);
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		DBexecute_thread(database,sql);
 	}
@@ -1454,11 +1457,11 @@ void DBupdate_host_status_thread(MYSQL *database, int hostid,int status,int cloc
 	{
 		if(disable_until+DELAY_ON_NETWORK_FAILURE>clock)
 		{
-			snprintf(sql,sizeof(sql)-1,"update hosts set status=%d,disable_until=disable_until+%d where hostid=%d",HOST_STATUS_UNREACHABLE,DELAY_ON_NETWORK_FAILURE,hostid);
+			snprintf(sql,sizeof(sql)-1,"update hosts set status=%d,disable_until=disable_until+%d,error='%s' where hostid=%d",HOST_STATUS_UNREACHABLE,DELAY_ON_NETWORK_FAILURE,error_esc,hostid);
 		}
 		else
 		{
-			snprintf(sql,sizeof(sql)-1,"update hosts set status=%d,disable_until=%d where hostid=%d",HOST_STATUS_UNREACHABLE,clock+DELAY_ON_NETWORK_FAILURE,hostid);
+			snprintf(sql,sizeof(sql)-1,"update hosts set status=%d,disable_until=%d,error='%s' where hostid=%d",HOST_STATUS_UNREACHABLE,clock+DELAY_ON_NETWORK_FAILURE,error_esc,hostid);
 		}
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		DBexecute_thread(database,sql);
@@ -1476,13 +1479,16 @@ void DBupdate_host_status_thread(MYSQL *database, int hostid,int status,int cloc
 }
 #endif
 
-void DBupdate_host_status(int hostid,int status,int clock)
+void DBupdate_host_status(int hostid,int status,int clock, char *error)
 {
 	DB_RESULT	*result;
 	char	sql[MAX_STRING_LEN];
+	char	error_esc[MAX_STRING_LEN];
 	int	disable_until;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In update_host_status()");
+
+	DBescape_string(error,error_esc,MAX_STRING_LEN);
 
 	snprintf(sql,sizeof(sql)-1,"select status,disable_until from hosts where hostid=%d",hostid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
@@ -1529,11 +1535,11 @@ void DBupdate_host_status(int hostid,int status,int clock)
 	{
 		if(disable_until+DELAY_ON_NETWORK_FAILURE>clock)
 		{
-			snprintf(sql,sizeof(sql)-1,"update hosts set status=%d,disable_until=disable_until+%d where hostid=%d",HOST_STATUS_UNREACHABLE,DELAY_ON_NETWORK_FAILURE,hostid);
+			snprintf(sql,sizeof(sql)-1,"update hosts set status=%d,disable_until=disable_until+%d,error='%s' where hostid=%d",HOST_STATUS_UNREACHABLE,DELAY_ON_NETWORK_FAILURE,error_esc,hostid);
 		}
 		else
 		{
-			snprintf(sql,sizeof(sql)-1,"update hosts set status=%d,disable_until=%d where hostid=%d",HOST_STATUS_UNREACHABLE,clock+DELAY_ON_NETWORK_FAILURE,hostid);
+			snprintf(sql,sizeof(sql)-1,"update hosts set status=%d,disable_until=%d,error='%s' where hostid=%d",HOST_STATUS_UNREACHABLE,clock+DELAY_ON_NETWORK_FAILURE,error_esc,hostid);
 		}
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		DBexecute(sql);
@@ -1551,13 +1557,16 @@ void DBupdate_host_status(int hostid,int status,int clock)
 }
 
 #ifdef ZABBIX_THREADS
-int	DBupdate_item_status_to_notsupported_thread(MYSQL *database, int itemid)
+int	DBupdate_item_status_to_notsupported_thread(MYSQL *database, int itemid, char *error)
 {
 	char	sql[MAX_STRING_LEN];
+	char	error_esc[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBupdate_item_status_to_notsupported()");
 
-	snprintf(sql,sizeof(sql)-1,"update items set status=%d where itemid=%d",ITEM_STATUS_NOTSUPPORTED,itemid);
+	DBescape_string(error,error_esc,MAX_STRING_LEN);
+
+	snprintf(sql,sizeof(sql)-1,"update items set status=%d,error='%s' where itemid=%d",ITEM_STATUS_NOTSUPPORTED,error_esc,itemid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	DBexecute_thread(database, sql);
 
@@ -1565,13 +1574,16 @@ int	DBupdate_item_status_to_notsupported_thread(MYSQL *database, int itemid)
 }
 #endif
 
-int	DBupdate_item_status_to_notsupported(int itemid)
+int	DBupdate_item_status_to_notsupported(int itemid, char *error)
 {
 	char	sql[MAX_STRING_LEN];
+	char	error_esc[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBupdate_item_status_to_notsupported()");
 
-	snprintf(sql,sizeof(sql)-1,"update items set status=%d where itemid=%d",ITEM_STATUS_NOTSUPPORTED,itemid);
+	DBescape_string(error,error_esc,MAX_STRING_LEN);
+
+	snprintf(sql,sizeof(sql)-1,"update items set status=%d,error='%s' where itemid=%d",ITEM_STATUS_NOTSUPPORTED,error_esc,itemid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	DBexecute(sql);
 

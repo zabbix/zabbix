@@ -167,7 +167,6 @@
 ?>
 
 <?php
-	echo "<br>";
 	echo "<a name=\"form\"></a>";
 
 	if(isset($_GET["shostid"]))
@@ -191,7 +190,7 @@
 		$icon_on="";
 	}
 
-	show_table2_header_begin();
+	show_form_begin("sysmap.host");
 	echo "New host to display";
 	$col=0;
 
@@ -294,11 +293,10 @@
 ?>
 
 <?php
-	echo "<br>";
 	$result=DBselect("select shostid,label from sysmaps_hosts where sysmapid=".$_GET["sysmapid"]." order by label");
 	if(DBnum_rows($result)>1)
 	{
-		show_table2_header_begin();
+		show_form_begin("sysmap.connector");
 		echo "New connector";
 		$col=0;
 

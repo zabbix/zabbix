@@ -290,7 +290,7 @@
 			),$col++);
 		}
 		table_end();
-		show_table2_header_begin();
+		show_form_begin();
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"enable selected\" onClick=\"return Confirm('".S_ENABLE_SELECTED_TRIGGERS_Q."');\">";
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"disable selected\" onClick=\"return Confirm('Disable selected triggers?');\">";
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete selected\" onClick=\"return Confirm('".S_DISABLE_SELECTED_TRIGGERS_Q."');\">";

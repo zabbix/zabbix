@@ -84,6 +84,8 @@
 #define SERVER_ICMPPING_KEY	"icmpping"
 /* Special item key used for ICMP ping latency */
 #define SERVER_ICMPPINGSEC_KEY	"icmppingsec"
+/* Special item key used for internal ZABBIX log */
+#define SERVER_ZABBIXLOG_KEY	"zabbix[log]"
 
 /* Alert types */
 #define ALERT_TYPE_EMAIL	0
