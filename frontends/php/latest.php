@@ -109,7 +109,7 @@
 		{
 			$sort="order by i.description";
 		}
-		$result=DBselect("select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and i.status in (0,2) and h.hostid=$hostid $sort");
+		$result=DBselect("select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type from items i,hosts h where h.hostid=i.hostid and h.status in (0,2) and i.status in (0,2) and h.hostid=$hostid $sort");
 		while($row=DBfetch($result))
 		{
 			if($col++%2 == 1)	{ echo "<tr bgcolor=#DDDDDD>"; }
@@ -158,7 +158,14 @@
 				echo "<td><center>-</center></td>";
 			}
 			echo "<td><center><a href=\"history.php?action=showhistory&itemid=".$row["itemid"]."\">Show</a></center></td>";
-			echo "<td><center><a href=\"trends.php?itemid=".$row["itemid"]."\">Show</a></center></td>";
+			if($row["value_type"]==0)
+			{
+				echo "<td><center><a href=\"trends.php?itemid=".$row["itemid"]."\">Show</a></center></td>";
+			}
+			else
+			{
+				echo "<td><center>Show</center></td>";
+			}
 			echo "</tr>";
 		}
 		echo "</table>";
