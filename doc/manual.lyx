@@ -1271,6 +1271,17 @@ Zabbix 1.0beta1
 \layout Itemize
 
 Do not forget to apply DB patches
+\layout Itemize
+
+Added select criteria to form 
+\begin_inset Quotes eld
+\end_inset 
+
+Status of Triggers
+\begin_inset Quotes erd
+\end_inset 
+
+
 \layout Subsection
 
 ChangeLog
@@ -9506,6 +9517,22 @@ Mike Hoolehan
 
 Helping with making the Reference Manual correct and understandable.
  
+\layout Itemize
+
+
+\noun on 
+Lauris ???
+\layout Standard
+
+Select criteria in for 
+\begin_inset Quotes eld
+\end_inset 
+
+Status of Triggers
+\begin_inset Quotes erd
+\end_inset 
+
+
 \layout Subsection
 
 Supporters to Zabbix
