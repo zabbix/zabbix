@@ -1,5 +1,6 @@
 Changes for 1.0beta14:
 
+ - fixed audio in Status of Triggers (Alexei)
  - fixed change of action subject if it contains special characters
  (Alexei)
  - fixed creation of actions from templates (Alexei)

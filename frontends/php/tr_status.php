@@ -28,18 +28,26 @@
 	$tr_hash=calc_trigger_hash();
 	setcookie("triggers_hash",$tr_hash,time()+1800);
 
-	if(!isset($triggers_hash))
+	if(!isset($HTTP_COOKIE_VARS["triggers_hash"]))
 	{
 		$triggers_hash="0,0";
+	}
+	else
+	{
+		$triggers_hash=$HTTP_COOKIE_VARS["triggers_hash"];
 	}
 
 	$new=explode(",",$tr_hash);
 	$old=explode(",",$triggers_hash);
 	setcookie("triggers_hash",$tr_hash,time()+1800);
 
-	if(!isset($triggers_hash))
+	if(!isset($HTTP_COOKIE_VARS["triggers_hash"]))
 	{
 		$triggers_hash="0,0";
+	}
+	else
+	{
+		$triggers_hash=$HTTP_COOKIE_VARS["triggers_hash"];
 	}
 
 	$new=explode(",",$tr_hash);
@@ -99,6 +107,7 @@
 <?php
 	if(isset($audio))
 	{
+//		echo "AUDIO [$audio] [".$old[1].":".$new[1]."] [$triggers_hash] [$tr_hash]";
 		echo "<BGSOUND src=\"audio/$audio\" loop=0>";
 	}
 ?>                                                                                                             
