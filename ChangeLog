@@ -1,5 +1,7 @@
 Changes for 1.0beta10:
 
+ - Alert History renamed to Alerts (Alexei)
+ - Status of Triggers renamed to Triggers (Alexei)
  - added check for kstat library for ./configure (Alexei)
  - added support for zabbix[queue] (Alexei)
  - added basic support for simple graphs in screens (Alexei)
