@@ -1,5 +1,7 @@
 TOP PRIORITY:
 
+ - pay attention to Solaris agent
+ - user parameter to overwrite already supported
  - better viewing of trigger dependencies
  - add description of service_alarms into Manual
  - add complete support for SNMP trapping
