@@ -64,7 +64,7 @@ int	send_value(char *server,int port,char *shortname,char *value)
 	struct sockaddr_in myaddr_in;
 	struct sockaddr_in servaddr_in;
 
-	struct linger ling;
+/*	struct linger ling;*/
 
 	servaddr_in.sin_family=AF_INET;
 	hp=gethostbyname(server);
@@ -84,12 +84,12 @@ int	send_value(char *server,int port,char *shortname,char *value)
 		return	FAIL;
 	}
 
-	ling.l_onoff=1;
-	ling.l_linger=0;
-	if(setsockopt(s,SOL_SOCKET,SO_LINGER,&ling,sizeof(ling))==-1)
-	{
+/*	ling.l_onoff=1;*/
+/*	ling.l_linger=0;*/
+/*	if(setsockopt(s,SOL_SOCKET,SO_LINGER,&ling,sizeof(ling))==-1)*/
+/*	{*/
 /* Ignore */
-	}
+/*	}*/
  
 	myaddr_in.sin_family = AF_INET;
 	myaddr_in.sin_port=0;
