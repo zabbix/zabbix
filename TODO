@@ -1,26 +1,3 @@
-LATEST
-
-DONE:
-
-TELECENTRS
-
-1. Support for custom multipliers.
-2. Background image for system maps
-3. Hierarcy for system maps
-5. Support for SNMPv3.
-
-ZABBIX 1.1
-
- - custom multiplier
- - support of SNMPv3
- - hierarchial maps
- - new defaul port numbers to avoid confusion with WebMin
-
-TKOM:
- - maps with background and attractive icons
-
---------------------------------------------
-
 ZABBIX 1.1:
 
  - RPM for RedHat EL
