@@ -55,3 +55,5 @@ alter table alerts drop type;
 alter table alerts add mediatypeid     int(4) DEFAULT '1' NOT NULL;
 
 insert into media_type (mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path) values (1,0,'Email','localhost','localhost','zabbix@localhost','');
+
+alter table media add severity     int(4) DEFAULT '63' NOT NULL;

@@ -102,6 +102,7 @@ DB_MEDIA
 	int	mediatypeid;
 	char	*sendto;
 	int	active;
+	int	severity;
 };
 
 DB_MEDIATYPE
