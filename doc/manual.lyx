@@ -24,13 +24,13 @@
 
 \layout Title
 \added_space_top vfill 
-Zabbix Reference Manual for version 1.0 (draft v1.18)
+Zabbix Reference Manual for version 1.0 (draft v1.19)
 \layout Author
 
 ALEXEI VLADISHEV
 \layout Date
 
-24 May 2002
+25 May 2002
 \layout Abstract
 
 The document is Reference Manual for Zabbix version 1.0.
@@ -2200,6 +2200,27 @@ Parameter Server is comma-delimited list of Zabbix servers
 \layout Subsubsection
 
 Zabbix 1.0beta4
+\layout Itemize
+
+support for processing of negative values
+\layout Itemize
+
+Parameter 
+\emph on 
+DisableHousekeeping
+\emph default 
+ for 
+\series bold 
+zabbix_suckerd
+\layout Itemize
+
+improvements in SNMP handling
+\layout Itemize
+
+supports for non-numeric SNMP values
+\layout Itemize
+
+can be compiled by standard Unix compiler (CC)
 \layout Subsection
 
 ChangeLog
@@ -4025,7 +4046,8 @@ NULL
 
 \layout Standard
 
-User's password
+User's password.
+ If password is not used, then this parameter must be commented.
 \end_inset 
 </cell>
 </row>
@@ -4911,7 +4933,8 @@ NULL
 
 \layout Standard
 
-User's password
+User's password.
+ If password is not used, this parameter must be commented.
 \end_inset 
 </cell>
 </row>
@@ -5322,7 +5345,8 @@ NULL
 
 \layout Standard
 
-User's password
+User's password.
+ If password is not used, this parameter must be commented.
 \end_inset 
 </cell>
 </row>
@@ -13428,6 +13452,9 @@ all information (configuration, gathered data) is stored in SQL database
 high-level service tree
 \layout Itemize
 
+tested using regression tests
+\layout Itemize
+
 very easy setup
 \layout Itemize
 
@@ -15944,4 +15971,10 @@ The Zabbix home page at
 \end_inset 
 
 
+\layout Part
+
+Appendix
+\layout Section
+
+Warnings and Errors
 \the_end
