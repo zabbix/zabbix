@@ -1,5 +1,11 @@
 Changes for 1.0alpha7:
 
+ - added table graphs_items
+ - lowered default values for triggers
+ - added file frontends/php/chart2.html
+ - added file frontends/php/charts.html
+ - added file frontends/php/graph.html
+
  - added file frontends/php/graphs.html
  - added file frontends/php/images/sysmaps/host.png
  - added file frontends/php/map.html

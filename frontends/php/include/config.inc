@@ -168,6 +168,9 @@
 			($page["file"]=="alerts.html")||
 			($page["file"]=="history.html")||
 			($page["file"]=="maps.html")||
+			($page["file"]=="map.html")||
+			($page["file"]=="charts.html")||
+			($page["file"]=="chart.html")||
 			($page["file"]=="index.html"))
 		{
 			$sql="select password_required from config";
@@ -217,9 +220,13 @@
 	if($refresh!=0)
 	{
 		echo "<meta http-equiv=\"refresh\" content=\"$refresh\">";
+		echo "<title>$title [refreshed every $refresh sec]</title>";
+	}
+	else
+	{
+		echo "<title>$title</title>";
 	}
 ?>
-	<title><? echo $title; ?></title>
 	</head>
 	<body bgcolor="#778899" text="#000000" link="#000000" vlink="#000000" topmargin=4 leftmargin=0 rightmargin=0 marginheight=4>
 
@@ -319,6 +326,21 @@
 ?>
 			</font>
 		</td>
+		<td colspan=1 bgcolor=FFFFFF align=center valign="top" width="15%">
+			<font face="Arial,Helvetica" size=2>
+				<a href="charts.html">
+<?
+				if($page["file"]=="charts.html")
+				{
+					echo "<b>[CHARTS]</b></a>";
+				}
+				else
+				{
+					echo "CHARTS</a>";
+				}
+?>
+			</font>
+		</td>
 		</tr>
 		<tr>
 		<td colspan=3 bgcolor=FFFFFF align=center valign="top" width="15%">
@@ -336,7 +358,7 @@
 ?>
 			</font>
 		</td>
-		<td colspan=3 bgcolor=FFFFFF align=center valign="top" width="15%">
+		<td colspan=4 bgcolor=FFFFFF align=center valign="top" width="15%">
 			<font face="Arial,Helvetica" size=2>
 				<a href="report2.html">
 <?
@@ -435,7 +457,7 @@
 				<a href="sysmaps.html">
 <?
 				if(	($page["file"]=="sysmaps.html")||
-					($page["file"]=="<change>.html"))
+					($page["file"]=="sysmap.html"))
 				{
 					echo "<b>[SYSTEM MAPS]</b></a>";
 				}
@@ -451,13 +473,13 @@
 				<a href="graphs.html">
 <?
 				if(	($page["file"]=="graphs.html")||
-					($page["file"]=="<change>.html"))
+					($page["file"]=="graph.html"))
 				{
-					echo "<b>[GRAPHS]</b></a>";
+					echo "<b>[CHARTS]</b></a>";
 				}
 				else
 				{
-					echo "GRAPHS</a>";
+					echo "CHARTS</a>";
 				}
 ?>
 			</font>
@@ -691,6 +713,12 @@
 		$result=DBexecute($sql);
 	}
 
+	function	delete_graphs_item($gitemid)
+	{
+		$sql="delete from graphs_items where gitemid=$gitemid";
+		$result=DBexecute($sql);
+	}
+
 	# Delete Graph
 
 	function	delete_graph($graphid)
@@ -920,6 +948,12 @@
 	function	add_graph($name,$width,$height)
 	{
 		$sql="insert into graphs (name,width,height) values ('$name',$width,$height)";
+		$result=DBexecute($sql);
+	}
+
+	function	add_item_to_graph($graphid,$itemid)
+	{
+		$sql="insert into graphs_items (graphid,itemid) values ($graphid,$itemid)";
 		$result=DBexecute($sql);
 	}
 
