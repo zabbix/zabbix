@@ -4,6 +4,7 @@
 #include <math.h>
 #include <syslog.h>
 
+#include "functions.h"
 #include "common.h"
 #include "db.h"
 
@@ -285,13 +286,18 @@ int	substitute_macros(char *exp)
 {
 	char	res[1024];
 	char	macro[1024];
-	int	i;
+	char	host[1024];
+	char	key[1024];
+	char	function[1024];
+	char	parameter[1024];
+	int	i,j;
 	int	r,l;
+	int	r1,l1;
 	float	value;
 
-	syslog(LOG_WARNING, "BEGIN substitute_macros" );
+	syslog(LOG_DEBUG, "BEGIN substitute_macros" );
 
-	syslog( LOG_WARNING, "Expression1:%s", exp );
+	syslog( LOG_DEBUG, "Expression1:%s", exp );
 
 	while( find_char(exp,'{') != FAIL )
 	{
@@ -316,29 +322,86 @@ int	substitute_macros(char *exp)
 		} 
 		macro[r-l-1]=0;
 
-		syslog( LOG_WARNING, "Macro:%s", macro );
+		syslog( LOG_DEBUG, "Macro:%s", macro );
 
 		/* macro=="host:key.function(parameter)" */
 
-		/* .................... */
+		r1=find_char(macro,':');
 
-		value=1.234;
+		for(i=0;i<r1;i++)
+		{
+			host[i]=macro[i];
+		} 
+		host[r1]=0;
+
+		syslog( LOG_DEBUG, "Host:%s", host );
+
+		r1=r1+1;
+		l1=find_char(macro+r1,'.');
+
+		for(i=r1;i<l1+r1;i++)
+		{
+			key[i-r1]=macro[i];
+		} 
+		key[l1]=0;
+
+		syslog( LOG_DEBUG, "Key:%s", key );
+
+		l1=l1+r1+1;
+		r1=find_char(macro+l1,'(');
+
+		for(i=l1;i<l1+r1;i++)
+		{
+			function[i-l1]=macro[i];
+		} 
+		function[r1]=0;
+
+		syslog( LOG_DEBUG, "Function:%s", function );
+
+		l1=l1+r1+1;
+		r1=find_char(macro+l1,')');
+
+		for(i=l1;i<l1+r1;i++)
+		{
+			parameter[i-l1]=macro[i];
+		} 
+		parameter[r1]=0;
+
+		syslog( LOG_DEBUG, "Parameter:%s", parameter );
+
+		get_lastvalue(&value,host,key,function,parameter);
 
 		exp[l]='%';
 		exp[l+1]='f';
 		exp[l+2]=' ';
 
-		syslog( LOG_WARNING, "Expression2:%s", exp );
+		syslog( LOG_DEBUG, "Expression2:%s", exp );
 
 		for(i=l+3;i<=r;i++) exp[i]=' ';
 
-		syslog( LOG_WARNING, "Expression3:%s", exp );
+		j=0;
+		for(i=0;i<strlen(exp);i++)
+		{
+			if( (i>=l+3) && (i<=r) )
+				continue;
+			exp[j]=exp[i];
+			if(i==l)
+				exp[j]='%';
+			if(i==l+1)
+				exp[j]='f';
+			j++;
+		}
+		exp[j]=0;
+
+		syslog( LOG_DEBUG, "Expression3:%s", exp );
 
 		sprintf(res,exp,value);
 		strcpy(exp,res);
 //		delete_spaces(exp);
-		syslog( LOG_WARNING, "Expression4:%s", exp );
+		syslog( LOG_DEBUG, "Expression4:%s", exp );
 	}
+
+	syslog( LOG_DEBUG, "Result expression:%s", exp );
 
 	return SUCCEED;
 }
@@ -381,6 +444,7 @@ int	substitute_functions(char *exp)
 			syslog( LOG_WARNING, "Unable to get value by functionid [%s]", functionid );
 			return	FAIL;
 		}
+
 
 		syslog( LOG_DEBUG, "Expression1:%s", exp );
 
