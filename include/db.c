@@ -2333,3 +2333,4 @@ void	DBget_item_from_db(DB_ITEM *item,DB_RESULT *result, int row)
 	item->snmpv3_privpassphrase = DBget_field(result,i,28);
 	item->formula = DBget_field(result,i,29);
 }
+
