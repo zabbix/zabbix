@@ -2094,7 +2094,7 @@ double	DISK_WBLK(void)
 
 char	*VERSION(void)
 {
-	static	char	version[]="1.0beta13\n";
+	static	char	version[]="1.0beta14\n";
 
 	return	version;
 }
