@@ -724,7 +724,7 @@ int	get_lastvalue(char *value,char *host,char *key,char *function,char *paramete
 	int	parm;
 	char	*s;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In get_lastvalue()" );
+	zabbix_log(LOG_LEVEL_WARNING, "In get_lastvalue()" );
 
 	sprintf(sql, "select i.itemid,i.prevvalue,i.lastvalue from items i,hosts h where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", host, key );
 	result = DBselect(sql);
@@ -763,11 +763,11 @@ int	get_lastvalue(char *value,char *host,char *key,char *function,char *paramete
 
 
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Itemid:%d", item.itemid );
+	zabbix_log(LOG_LEVEL_WARNING, "Itemid:%d", item.itemid );
         DBfree_result(result);
 
 	parm=atoi(parameter);
-	zabbix_log(LOG_LEVEL_DEBUG, "Before evaluate_FUNCTION()" );
+	zabbix_log(LOG_LEVEL_WARNING, "Before evaluate_FUNCTION()" );
 
 	return evaluate_FUNCTION(value,&item,function,parm);
 }
