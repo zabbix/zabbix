@@ -35,7 +35,45 @@
 
 	echo "<font size=2>";
 
-	$result=DBselect("select h.hostid,h.host from hosts h,items i where h.status in (0,2) and h.hostid=i.hostid group by h.hostid,h.host order by h.host");
+	if(isset($HTTP_GET_VARS["groupid"]))
+	{
+		echo "all ";
+	}
+	else
+	{
+		echo "<b>[<a href='latest.php'>all</a>]</b> ";
+	}
+
+	$result=DBselect("select groupid,name from groups order by name");
+
+	while($row=DBfetch($result))
+	{
+//		if(!check_right("Host","R",$row["hostid"]))
+//		{
+//			continue;
+//		}
+		if( isset($HTTP_GET_VARS["groupid"]) && ($HTTP_GET_VARS["groupid"] == $row["groupid"]) )
+		{
+			echo "<b>[";
+		}
+		echo "<a href='latest.php?groupid=".$row["groupid"]."'>".$row["name"]."</a>";
+		if(isset($HTTP_GET_VARS["groupid"]) && ($HTTP_GET_VARS["groupid"] == $row["groupid"]) )
+		{
+			echo "]</b>";
+		}
+		echo " ";
+	}
+
+	show_table_v_delimiter();
+
+	if(isset($HTTP_GET_VARS["groupid"]))
+	{
+		$result=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status in (0,2) and h.hostid=i.hostid and hg.groupid=".$HTTP_GET_VARS["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
+	}
+	else
+	{
+		$result=DBselect("select h.hostid,h.host from hosts h,items i where h.status in (0,2) and h.hostid=i.hostid group by h.hostid,h.host order by h.host");
+	}
 
 	while($row=DBfetch($result))
 	{
@@ -47,7 +85,14 @@
 		{
 			echo "<b>[";
 		}
-		echo "<a href='latest.php?hostid=".$row["hostid"]."'>".$row["host"]."</a>";
+		if(isset($HTTP_GET_VARS["groupid"]))
+		{
+			echo "<a href='latest.php?groupid=".$HTTP_GET_VARS["groupid"]."&hostid=".$row["hostid"]."'>".$row["host"]."</a>";
+		}
+		else
+		{
+			echo "<a href='latest.php?hostid=".$row["hostid"]."'>".$row["host"]."</a>";
+		}
 		if(isset($HTTP_GET_VARS["hostid"]) && ($HTTP_GET_VARS["hostid"] == $row["hostid"]) )
 		{
 			echo "]</b>";
