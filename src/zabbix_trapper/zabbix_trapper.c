@@ -43,41 +43,6 @@ void	signal_handler( int sig )
 	exit( FAIL );
 }
 
-int	check_security(void)
-{
-	char	*sname;
-	char	*config;
-	struct	sockaddr_in name;
-	int	i;
-	int	file;
-
-	config=(char *)malloc(16);
-
-	file=open("/etc/zabbix/zabbix_agent.conf",O_RDONLY);
-	if(file == -1)
-	{
-//		printf("Open failed");
-		return FAIL;
-	}
-	i=read(file, config, 16);
-	config[i-1]=0;
-	close(file);
-
-	i=sizeof(struct sockaddr_in);
-
-	if(getpeername(0,  (struct sockaddr *)&name, &i) == 0)
-	{
-//		printf("%d\n",name.sin_port);
-		sname=inet_ntoa(name.sin_addr);
-//		printf("From:=%s=\n",sname);
-		if(strcmp(sname,config)!=0)
-		{
-			return	FAIL;
-		}
-	}
-	return	SUCCEED;
-}
-
 int	process_data(char *server,char *key, double value)
 {
 	char	sql[1024];
@@ -146,12 +111,6 @@ int	main()
 	double	value;
 
 	int	ret=SUCCEED;
-
-
-//	if(check_security() == FAIL)
-//	{
-//		exit(FAIL);
-//	}
 
 	signal( SIGINT,  signal_handler );
 	signal( SIGQUIT, signal_handler );
