@@ -1,5 +1,6 @@
 Changes for 1.1alpha3:
 
+ - fixed parsing of command line parameters. Thanks to Slix. (Alexei)
  - added special item zabbix[log] (Alexei)
  - calculate items.nextcheck as nextcheck+delay (Alexei)
  - fixed time navigation for user-defined graphs (Alexei)
