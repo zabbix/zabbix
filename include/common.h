@@ -51,7 +51,8 @@
 #define SERVER_STATUS_KEY	"status"
 
 /* Alert types */
-#define ALERT_TYPE_EMAIL	"EMAIL"
+#define ALERT_TYPE_EMAIL	0
+#define ALERT_TYPE_EXEC		1
 
 /* Item statuses */
 #define ITEM_STATUS_ACTIVE	0

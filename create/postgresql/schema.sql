@@ -75,9 +75,9 @@ CREATE INDEX items_status on items (status);
 --
 
 CREATE TABLE config (
-  smtp_server		varchar(255)	DEFAULT '' NOT NULL,
-  smtp_helo		varchar(255)	DEFAULT '' NOT NULL,
-  smtp_email		varchar(255)	DEFAULT '' NOT NULL,
+--  smtp_server		varchar(255)	DEFAULT '' NOT NULL,
+--  smtp_helo		varchar(255)	DEFAULT '' NOT NULL,
+--  smtp_email		varchar(255)	DEFAULT '' NOT NULL,
 --  password_required	int4		DEFAULT '0' NOT NULL,
   alert_history		int4		DEFAULT '0' NOT NULL,
   alarm_history		int4		DEFAULT '0' NOT NULL
@@ -177,6 +177,22 @@ CREATE TABLE actions (
 );
 
 --
+-- Table structure for table 'media_type'
+--
+
+CREATE TABLE media_type (
+  mediatypeid		serial,
+  type			int4		DEFAULT '0' NOT NULL,
+  description		varchar(100)	DEFAULT '' NOT NULL,
+  smtp_server		varchar(255)	DEFAULT '' NOT NULL,
+  smtp_helo		varchar(255)	DEFAULT '' NOT NULL,
+  smtp_email		varchar(255)	DEFAULT '' NOT NULL,
+  exec_path		varchar(255)	DEFAULT '' NOT NULL,
+  PRIMARY KEY(mediatypeid)
+);
+
+
+--
 -- Table structure for table 'alerts'
 --
 
@@ -186,12 +202,14 @@ CREATE TABLE alerts (
   clock			int4		DEFAULT '0' NOT NULL,
   status		int4		DEFAULT '0' NOT NULL,
   retries		int4		DEFAULT '0' NOT NULL,
-  type			varchar(10)	DEFAULT '' NOT NULL,
+--  type		varchar(10)	DEFAULT '' NOT NULL,
+  mediatypeid		int4		DEFAULT '0' NOT NULL,
   sendto		varchar(100)	DEFAULT '' NOT NULL,
   subject		varchar(255)	DEFAULT '' NOT NULL,
   message		text		DEFAULT '' NOT NULL,
   PRIMARY KEY (alertid),
-  FOREIGN KEY (actionid) REFERENCES actions
+  FOREIGN KEY (actionid) REFERENCES actions,
+  FOREIGN KEY (mediatypeid) REFERENCES media_type
 );
 
 CREATE INDEX alerts_actionid on alerts (actionid);
@@ -293,11 +311,13 @@ CREATE TABLE triggers_template (
 CREATE TABLE media (
   mediaid		serial,
   userid		int4		DEFAULT '0' NOT NULL,
-  type			varchar(10)	DEFAULT '' NOT NULL,
+--  type		varchar(10)	DEFAULT '' NOT NULL,
+  mediatypeid		int4		DEFAULT '0' NOT NULL,
   sendto		varchar(100)	DEFAULT '' NOT NULL,
   active		int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (mediaid),
-  FOREIGN KEY (userid) REFERENCES users
+  FOREIGN KEY (userid) REFERENCES users,
+  FOREIGN KEY (mediatypeid) REFERENCES media_type,
 );
 
 --

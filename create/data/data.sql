@@ -22,7 +22,13 @@
 -- Data for table config
 --
 
-insert into config (smtp_server,smtp_helo,smtp_email,alert_history,alarm_history) values ('localhost','localhost','zabbix@localhost',365,365);
+--insert into config (smtp_server,smtp_helo,smtp_email,alert_history,alarm_history) values ('localhost','localhost','zabbix@localhost',365,365);
+insert into config (alert_history,alarm_history) values (365,365);
+
+--
+-- Data for table media_type
+--
+insert into media_type (mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path) values (0,0,'Email','localhost','localhost','zabbix@localhost','');
 
 --
 -- Data for table groups

@@ -87,6 +87,12 @@
 #ifdef HAVE_SYS_SYSCTL_H
 	#include <sys/sysctl.h>
 #endif
+
+/* Solaris */
+#ifdef HAVE_SYS_SYSCALL_H
+	#include <sys/syscall.h>
+#endif
+
 /* FreeBSD */
 #ifdef HAVE_VM_VM_PARAM_H
 	#include <vm/vm_param.h>
@@ -576,58 +582,59 @@ crc_buf2(p, clen, cval)
 #ifdef HAVE_SYS_SWAP_SWAPTABLE
 void get_swapinfo(int *total, int *fr)
 {
-    register int cnt, i;
-    register int t, f;
-    struct swaptable *swt;
-    struct swapent *ste;
-    static char path[256];
+	register int cnt, i;
+	register int t, f;
+	struct swaptable *swt;
+	struct swapent *ste;
+	static char path[256];
 
-    /* get total number of swap entries */
-    cnt = swapctl(SC_GETNSWP, 0);
+	/* get total number of swap entries */
+	cnt = swapctl(SC_GETNSWP, 0);
 
-    /* allocate enough space to hold count + n swapents */
-    swt = (struct swaptable *)malloc(sizeof(int) +
-             cnt * sizeof(struct swapent));
-    if (swt == NULL)
-    {
-  *total = 0;
-  *fr = 0;
-  return;
-    }
-    swt->swt_n = cnt;
+	/* allocate enough space to hold count + n swapents */
+	swt = (struct swaptable *)malloc(sizeof(int) +
+		cnt * sizeof(struct swapent));
 
-    /* fill in ste_path pointers: we don't care about the paths, so we
-point
-       them all to the same buffer */
-    ste = &(swt->swt_ent[0]);
-    i = cnt;
-    while (--i >= 0)
-    {
-  ste++->ste_path = path;
-    }
+	if (swt == NULL)
+	{
+		*total = 0;
+		*fr = 0;
+		return;
+	}
+	swt->swt_n = cnt;
 
-    /* grab all swap info */
-    swapctl(SC_LIST, swt);
+/* fill in ste_path pointers: we don't care about the paths, so we
+point them all to the same buffer */
+	ste = &(swt->swt_ent[0]);
+	i = cnt;
+	while (--i >= 0)
+	{
+		ste++->ste_path = path;
+	}
 
-    /* walk thru the structs and sum up the fields */
-    t = f = 0;
-    ste = &(swt->swt_ent[0]);
-    i = cnt;
-    while (--i >= 0)
-    {
-  /* dont count slots being deleted */
-  if (!(ste->ste_flags & ST_INDEL) &&
-      !(ste->ste_flags & ST_DOINGDEL))
-  {
-      t += ste->ste_pages;
-      f += ste->ste_free;
-  } ste++;
-    }
+	/* grab all swap info */
+	swapctl(SC_LIST, swt);
 
-    /* fill in the results */
-    *total = t;
-    *fr = f;
-    free(swt);
+	/* walk thru the structs and sum up the fields */
+	t = f = 0;
+	ste = &(swt->swt_ent[0]);
+	i = cnt;
+	while (--i >= 0)
+	{
+		/* dont count slots being deleted */
+		if (!(ste->ste_flags & ST_INDEL) &&
+		!(ste->ste_flags & ST_DOINGDEL))
+		{
+			t += ste->ste_pages;
+			f += ste->ste_free;
+		}
+		ste++;
+	}
+
+	/* fill in the results */
+	*total = t;
+	*fr = f;
+	free(swt);
 }
 #endif
 #endif
@@ -1783,7 +1790,6 @@ void	forward_request(char *proxy,char *command,int port,char *value)
 	if(host == NULL)
 	{
 		sprintf(value,"%s","ZBX_NETWORK_ERROR\n");
-		close(s);
 		return;
 	}
 

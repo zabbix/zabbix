@@ -760,16 +760,16 @@ void	send_to_user(int actionid,int userid,char *subject,char *message)
 
 	int	i;
 
-	sprintf(sql,"select type,sendto,active from media where active=%d and userid=%d",MEDIA_STATUS_ACTIVE,userid);
+	sprintf(sql,"select mediatypeid,sendto,active from media where active=%d and userid=%d",MEDIA_STATUS_ACTIVE,userid);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
+		media.mediatypeid=atoi(DBget_field(result,i,0));
 		media.active=atoi(DBget_field(result,i,2));
-		media.type=DBget_field(result,i,0);
 		media.sendto=DBget_field(result,i,1);
 
-		DBadd_alert(actionid,media.type,media.sendto,subject,message);
+		DBadd_alert(actionid,media.mediatypeid,media.sendto,subject,message);
 	}
 	DBfree_result(result);
 }

@@ -44,7 +44,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   sys/vfs.h sys/pstat.h sys/sysinfo.h sys/statvfs.h \
   sys/socket.h sys/loadavg.h netinet/in.h arpa/inet.h \
   sys/swap.h sys/vmmeter.h strings.h sys/sysctl.h vm/vm_param.h \
-  sys/time.h kstat.h)
+  sys/time.h kstat.h sys/syscall.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -136,7 +136,7 @@ AC_TRY_COMPILE(
 [
 #include <stdlib.h>
 #include <sys/types.h>
-#include <sys/sysctl.h>
+#include <sys/syscall.h>
 #include <sys/swap.h>
 ],
 [
@@ -154,8 +154,6 @@ AC_TRY_COMPILE(
              cnt * sizeof(struct swapent));
     if (swt == NULL)
     {
-  *total = 0;
-  *fr = 0;
   return;
     }
     swt->swt_n = cnt;
@@ -189,8 +187,6 @@ point
     }
 
     /* fill in the results */
-    *total = t;
-    *fr = f;
     free(swt);
 
 ],

@@ -425,16 +425,19 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		global	$ERROR_MSG;
 
-		$sql="select smtp_server,smtp_helo,smtp_email,alarm_history,alert_history from config";
+//		$sql="select smtp_server,smtp_helo,smtp_email,alarm_history,alert_history from config";
+		$sql="select alarm_history,alert_history from config";
 		$result=DBselect($sql);
 
 		if(DBnum_rows($result) == 1)
 		{
-			$config["smtp_server"]=DBget_field($result,0,0);
-			$config["smtp_helo"]=DBget_field($result,0,1);
-			$config["smtp_email"]=DBget_field($result,0,2);
-			$config["alarm_history"]=DBget_field($result,0,3);
-			$config["alert_history"]=DBget_field($result,0,4);
+			$config["alarm_history"]=DBget_field($result,0,0);
+			$config["alert_history"]=DBget_field($result,0,1);
+//			$config["smtp_server"]=DBget_field($result,0,0);
+//			$config["smtp_helo"]=DBget_field($result,0,1);
+//			$config["smtp_email"]=DBget_field($result,0,2);
+//			$config["alarm_history"]=DBget_field($result,0,3);
+//			$config["alert_history"]=DBget_field($result,0,4);
 		}
 		else
 		{
@@ -729,7 +732,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		if(isset($sessionid))
 		{
-			$sql="select u.userid,u.alias,u.name,u.surname from sessions s,users u where s.sessionid='$sessionid' and s.userid=u.userid and s.lastaccess-600<".time();
+			$sql="select u.userid,u.alias,u.name,u.surname from sessions s,users u where s.sessionid='$sessionid' and s.userid=u.userid and s.lastaccess+900>".time();
 			$result=DBselect($sql);
 			if(DBnum_rows($result)==1)
 			{
@@ -742,6 +745,11 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				$USER_DETAILS["name"]=DBget_field($result,0,2);
 				$USER_DETAILS["surname"]=DBget_field($result,0,3);
 				return;
+			}
+			else
+			{
+				setcookie("sessionid",$sessionid,time()-3600);
+				unset($sessionid);
 			}
 		}
 
@@ -2474,12 +2482,53 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	$result;
 	}
 
+	# Delete Media definition by mediatypeid
+
+	function	delete_media_by_mediatypeid($mediatypeid)
+	{
+		$sql="delete from media where mediatypeid=$mediatypeid";
+		return	DBexecute($sql);
+	}
+
+	# Delete alrtes by mediatypeid
+
+	function	delete_alerts_by_mediatypeid($mediatypeid)
+	{
+		$sql="delete from alerts where mediatypeid=$mediatypeid";
+		return	DBexecute($sql);
+	}
+
+	# Delete media type
+
+	function	delete_mediatype($mediatypeid)
+	{
+		delete_media_by_mediatypeid($mediatypeid);
+		delete_alerts_by_mediatypeid($mediatypeid);
+		$sql="delete from media_type where mediatypeid=$mediatypeid";
+		return	DBexecute($sql);
+	}
+
+	# Update media type
+
+	function	update_mediatype($mediatypeid,$type,$description,$smtp_server,$smtp_helo,$smtp_email,$exec_path)
+	{
+		$sql="update media_type set type=$type,description='$description',smtp_server='$smtp_server',smtp_helo='$smtp_helo',smtp_email='$smtp_email',exec_path='$exec_path' where mediatypeid=$mediatypeid";
+		return	DBexecute($sql);
+	}
+
+	# Add Media type
+
+	function	add_mediatype($type,$description,$smtp_server,$smtp_helo,$smtp_email,$exec_path)
+	{
+		$sql="insert into media_type (type,description,smtp_server,smtp_helo,smtp_email,exec_path) values ($type,'$description','$smtp_server','$smtp_helo','$smtp_email','$exec_path')";
+		return	DBexecute($sql);
+	}
 
 	# Add Media definition
 
-	function	add_media( $userid, $type, $sendto)
+	function	add_media( $userid, $mediatypeid, $sendto)
 	{
-		$sql="insert into media (userid,type,sendto,active) values ($userid,'$type','$sendto',0)";
+		$sql="insert into media (userid,mediatypeid,sendto,active) values ($userid,'$mediatypeid','$sendto',0)";
 		return	DBexecute($sql);
 	}
 
@@ -2507,7 +2556,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Update configuration
 
-	function	update_config($smtp_server,$smtp_helo,$smtp_email,$alarm_history,$alert_history)
+//	function	update_config($smtp_server,$smtp_helo,$smtp_email,$alarm_history,$alert_history)
+	function	update_config($alarm_history,$alert_history)
 	{
 		global	$ERROR_MSG;
 
@@ -2517,7 +2567,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return	0;
 		}
 
-		$sql="update config set smtp_server='$smtp_server',smtp_helo='$smtp_helo',smtp_email='$smtp_email',alarm_history=$alarm_history,alert_history=$alert_history";
+//		$sql="update config set smtp_server='$smtp_server',smtp_helo='$smtp_helo',smtp_email='$smtp_email',alarm_history=$alarm_history,alert_history=$alert_history";
+		$sql="update config set alarm_history=$alarm_history,alert_history=$alert_history";
 		return	DBexecute($sql);
 	}
 
