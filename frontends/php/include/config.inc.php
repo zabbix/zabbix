@@ -1903,6 +1903,14 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return 0;
 		}
 
+		$sql="select count(*) from items where hostid=$hostid and key_='$key'";
+		$result=DBexecute($sql);
+		if(DBget_field($result,0,0)>0)
+		{
+			$ERROR_MSG="An item with the same Key already exists for this host. The key must be unique.";
+			return 0;
+		}
+
 		if($delay<1)
 		{
 			$ERROR_MSG="Delay cannot be less than 1 second";
