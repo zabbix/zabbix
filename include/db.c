@@ -1689,11 +1689,7 @@ int	DBadd_history_thread(MYSQL *database, int itemid, double value, int clock)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history()");
 
-#ifdef	HAVE_MYSQL
-	snprintf(sql,sizeof(sql)-1,"insert delayed into history (clock,itemid,value) values (%d,%d,%f)",clock,itemid,value);
-#else
 	snprintf(sql,sizeof(sql)-1,"insert into history (clock,itemid,value) values (%d,%d,%f)",clock,itemid,value);
-#endif
 	DBexecute_thread(database, sql);
 
 	DBadd_trend_thread(database, itemid, value, clock);
@@ -1708,11 +1704,7 @@ int	DBadd_history(int itemid, double value, int clock)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history()");
 
-#ifdef	HAVE_MYSQL
-	snprintf(sql,sizeof(sql)-1,"insert delayed into history (clock,itemid,value) values (%d,%d,%f)",clock,itemid,value);
-#else
 	snprintf(sql,sizeof(sql)-1,"insert into history (clock,itemid,value) values (%d,%d,%f)",clock,itemid,value);
-#endif
 	DBexecute(sql);
 
 	DBadd_trend(itemid, value, clock);
@@ -1729,11 +1721,7 @@ int	DBadd_history_str_thread(MYSQL *database, int itemid, char *value, int clock
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_str()");
 
 	DBescape_string(value,value_esc,MAX_STRING_LEN);
-#ifdef	HAVE_MYSQL
-	snprintf(sql,sizeof(sql)-1,"insert delayed into history_str (clock,itemid,value) values (%d,%d,'%s')",clock,itemid,value_esc);
-#else
 	snprintf(sql,sizeof(sql)-1,"insert into history_str (clock,itemid,value) values (%d,%d,'%s')",clock,itemid,value_esc);
-#endif
 	DBexecute_thread(database, sql);
 
 	return SUCCEED;
@@ -1748,11 +1736,7 @@ int	DBadd_history_str(int itemid, char *value, int clock)
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_str()");
 
 	DBescape_string(value,value_esc,MAX_STRING_LEN);
-#ifdef	HAVE_MYSQL
-	snprintf(sql,sizeof(sql)-1,"insert delayed into history_str (clock,itemid,value) values (%d,%d,'%s')",clock,itemid,value_esc);
-#else
 	snprintf(sql,sizeof(sql)-1,"insert into history_str (clock,itemid,value) values (%d,%d,'%s')",clock,itemid,value_esc);
-#endif
 	DBexecute(sql);
 
 	return SUCCEED;
