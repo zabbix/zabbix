@@ -14,8 +14,6 @@ and
 should read
 -L/home/spath/net-snmp-5.0.9/lib
 
- - document that --enable-static does not work on Solaris
- - test on HP-UX, AIX and Solaris
  - improve actions.php to make selection of trigger, host, hosts on the top
  - navigation bar for all graphs and screens
  - make support for "Clone"
