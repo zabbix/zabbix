@@ -198,7 +198,7 @@
 #		ImageDestroy($img);
 	}
 
-	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, "http://zabbix.sourceforge.net", $gray);
+	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, "http://www.zabbix.org", $gray);
 
 	ImagePng($im);
 	ImageDestroy($im);
