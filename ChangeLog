@@ -1,5 +1,6 @@
 Changes for 1.0beta14:
 
+ - added W32 install floppy. Thanks to  Fabricio Ferrari. (Alexei)
  - new action type: "ON or OFF" (Alexei)
  - added support of macro {STATUS} (Alexei)
  - pinger to work for all hosts (ip and hostname-based) (Alexei)
