@@ -5,7 +5,7 @@
 
 	$now=time();
 
-	$result=DBselect("select h.host,i.description,i.nextcheck-$now,h.hostid from items i,hosts h where i.itemid=$itemid and h.hostid=i.hostid");
+	$result=DBselect("select h.host,i.description,i.nextcheck-$now,h.hostid from items i,hosts h where i.itemid=".$HTTP_GET_VARS["itemid"]." and h.hostid=i.hostid");
 	$host=DBget_field($result,0,0);
 	$description=DBget_field($result,0,1);
 	$beforenextcheck=DBget_field($result,0,2)+5;
@@ -15,9 +15,9 @@
 	}
 	$hostid=DBget_field($result,0,3);
 
-	if($action=="showhistory")
+	if($HTTP_GET_VARS["action"]=="showhistory")
 	{
-		if(isset($year))
+		if(isset($HTTP_GET_VARS["year"]))
 		{
 			show_header("$host:$description",0,0);
 		}
@@ -26,30 +26,30 @@
 			show_header("$host:$description",$beforenextcheck,0);
 		}
 	}
-	if($action=="showhistory2")
+	if($HTTP_GET_VARS["action"]=="showhistory2")
 	{
 		show_header("$host:$description",0,0);
 	}
-	if($action=="showvalues")
+	if($HTTP_GET_VARS["action"]=="showvalues")
 	{
 		show_header("$host:$description",0,0);
 	}
-	if($action=="showfreehist")
+	if($HTTP_GET_VARS["action"]=="showfreehist")
 	{
 		show_header("$host:$description",0,0);
 	}
-	if($action=="showplaintxt")
+	if($HTTP_GET_VARS["action"]=="showplaintxt")
 	{
 		show_header("$host:$description",0,0);
 	}
 ?>
 
 <?
-	if($action=="plaintext")
+	if($HTTP_GET_VARS["action"]=="plaintext")
 	{
 		$from=mktime($fromhour,$frommin,0,$frommonth,$fromday,$fromyear);
 		$till=mktime($tillhour,$tillmin,0,$tillmonth,$tillday,$tillyear);
-		show_plaintext($itemid, $from, $till);
+		show_plaintext($HTTP_GET_VARS["itemid"], $from, $till);
 		exit;
 	}
 
@@ -57,102 +57,102 @@
 
 <?
 	show_table_header_begin();
-	$item=get_item_by_itemid($itemid);
+	$item=get_item_by_itemid($HTTP_GET_VARS["itemid"]);
 	if($item["value_type"] == 0)
 	{
-		echo "<A HREF='latest.php?hostid=$hostid'>$host</A> : <a href='trends.php?itemid=$itemid'>$description</a>";
+		echo "<A HREF='latest.php?hostid=$hostid'>$host</A> : <a href='trends.php?itemid=".$HTTP_GET_VARS["itemid"]."'>$description</a>";
 	}
 	else
 	{
-		echo "<A HREF='latest.php?hostid=$hostid'>$host</A> : $description";
+		echo "<A HREF='latest.php?hostid=".$HTTP_GET_VARS["hostid"]."'>$host</A> : $description";
 	}
 	show_table_v_delimiter();
 	echo("<DIV ALIGN=CENTER>");
-	if($action =="showhistory")
+	if($HTTP_GET_VARS["action"] =="showhistory")
 	{
-		echo("<b>[<A HREF=\"history.php?action=showhistory&itemid=$itemid\">Last hour graph</A>]</b> ");
+		echo("<b>[<A HREF=\"history.php?action=showhistory&itemid=".$HTTP_GET_VARS["itemid"]."\">Last hour graph</A>]</b> ");
 	}
 	else
 	{
-		$item=get_item_by_itemid($itemid);
+		$item=get_item_by_itemid($HTTP_GET_VARS["itemid"]);
 		if($item["value_type"] == 0)
 		{
-			echo("<A HREF=\"history.php?action=showhistory&itemid=$itemid\">Last hour graph</A> ");
+			echo("<A HREF=\"history.php?action=showhistory&itemid=".$HTTP_GET_VARS["itemid"]."\">Last hour graph</A> ");
 		}
 	}
-	if($action =="showhistory2")
+	if($HTTP_GET_VARS["action"] =="showhistory2")
 	{
-		echo("<b>[<A HREF=\"history.php?action=showhistory2&itemid=$itemid\">Last hour graph (diff)</A>]</b> ");
+		echo("<b>[<A HREF=\"history.php?action=showhistory2&itemid=".$HTTP_GET_VARS["itemid"]."\">Last hour graph (diff)</A>]</b> ");
 	}
 	else
 	{
-		$item=get_item_by_itemid($itemid);
+		$item=get_item_by_itemid($HTTP_GET_VARS["itemid"]);
 		if($item["value_type"] == 0)
 		{
-			echo("<A HREF=\"history.php?action=showhistory2&itemid=$itemid\">Last hour graph (diff)</A> ");
+			echo("<A HREF=\"history.php?action=showhistory2&itemid=".$HTTP_GET_VARS["itemid"]."\">Last hour graph (diff)</A> ");
 		}
 	}
-	if($action =="showvalues")
+	if($HTTP_GET_VARS["action"] =="showvalues")
 	{
-		echo("<b>[<A HREF=\"history.php?action=showvalues&itemid=$itemid&period=3600\">Values of last hour</A>]</b> ");
+		echo("<b>[<A HREF=\"history.php?action=showvalues&itemid=".$HTTP_GET_VARS["itemid"]."&period=3600\">Values of last hour</A>]</b> ");
 	}
 	else
 	{
-		echo("<A HREF=\"history.php?action=showvalues&itemid=$itemid&period=3600\">Values of last hour</A> ");
+		echo("<A HREF=\"history.php?action=showvalues&itemid=".$HTTP_GET_VARS["itemid"]."&period=3600\">Values of last hour</A> ");
 	}
-	if($action =="showfreehist")
+	if($HTTP_GET_VARS["action"] =="showfreehist")
 	{
-		echo("<b>[<A HREF=\"history.php?action=showfreehist&itemid=$itemid\">Values of specified period</A>]</b> ");
-	}
-	else
-	{
-		echo("<A HREF=\"history.php?action=showfreehist&itemid=$itemid\">Values of specified period</A> ");
-	}
-	if($action =="showplaintxt")
-	{
-		echo("<b>[<A HREF=\"history.php?action=showplaintxt&itemid=$itemid\">Values in plaint text format</A>]</b> ");
+		echo("<b>[<A HREF=\"history.php?action=showfreehist&itemid=".$HTTP_GET_VARS["itemid"]."\">Values of specified period</A>]</b> ");
 	}
 	else
 	{
-		echo("<A HREF=\"history.php?action=showplaintxt&itemid=$itemid\">Values in plaint text format</A> ");
+		echo("<A HREF=\"history.php?action=showfreehist&itemid=".$HTTP_GET_VARS["itemid"]."\">Values of specified period</A> ");
+	}
+	if($HTTP_GET_VARS["action"] =="showplaintxt")
+	{
+		echo("<b>[<A HREF=\"history.php?action=showplaintxt&itemid=".$HTTP_GET_VARS["itemid"]."\">Values in plaint text format</A>]</b> ");
+	}
+	else
+	{
+		echo("<A HREF=\"history.php?action=showplaintxt&itemid=".$HTTP_GET_VARS["itemid"]."\">Values in plaint text format</A> ");
 	}
 	echo("</DIV>\n");
 	show_table_header_end();
 	echo("<br>");
 
-	if($action=="showfreehist")
+	if($HTTP_GET_VARS["action"]=="showfreehist")
 	{
-		if(!isset($period))
+		if(!isset($HTTP_GET_VARS["period"]))
 		{
-			show_freehist($itemid,$period);
+			show_freehist($HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["period"]);
 		} 
 		exit;
  
 	}
 
-	if($action=="showplaintxt")
+	if($HTTP_GET_VARS["action"]=="showplaintxt")
 	{
-		if(!isset($period))
+		if(!isset($HTTP_GET_VARS["period"]))
 		{
-			show_plaintxt($itemid,$period);
+			show_plaintxt($HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["period"]);
 		} 
 		exit;
    
 	}
 
-	if($action=="showvalues")
+	if($HTTP_GET_VARS["action"]=="showvalues")
 	{
-		if(!isset($from))
+		if(!isset($HTTP_GET_VARS["from"]))
 		{
-			$from=0;
+			$HTTP_GET_VARS["from"]=0;
 		}
-		if(!isset($period))
+		if(!isset($HTTP_GET_VARS["period"]))
 		{
-			$period=3600;
+			$HTTP_GET_VARS["period"]=3600;
 		}
-		$time=time(NULL)-$period-$from*3600;
-		$till=time(NULL)-$from*3600;
-		$hours=$period/3600;
+		$time=time(NULL)-$HTTP_GET_VARS["period"]-$HTTP_GET_VARS["from"]*3600;
+		$till=time(NULL)-$HTTP_GET_VARS["from"]*3600;
+		$hours=$HTTP_GET_VARS["period"]/3600;
 
 		show_table_header("Showing history of $period seconds($hours h)<BR>[from: ".date("Y.M.d H:i:s",$time)."] [till: ".date("Y.M.d H:i:s",$till)."]");
 
@@ -162,14 +162,14 @@
 		echo "<TD><B>Value</B></TD>";
 		echo "</TR>";
 
-		$item=get_item_by_itemid($itemid);
+		$item=get_item_by_itemid($HTTP_GET_VARS["itemid"]);
 		if($item["value_type"]==0)
 		{
-			$result=DBselect("select clock,value from history where itemid=$itemid and clock>$time and clock<$till order by clock desc");
+			$result=DBselect("select clock,value from history where itemid=".$HTTP_GET_VARS["itemid"]." and clock>$time and clock<$till order by clock desc");
 		}
 		else
 		{
-			$result=DBselect("select clock,value from history_str where itemid=$itemid and clock>$time and clock<$till order by clock desc");
+			$result=DBselect("select clock,value from history_str where itemid=".$HTTP_GET_VARS["itemid"]." and clock>$time and clock<$till order by clock desc");
 		}
 		$col=0;
 		for($i=0;$i<DBnum_rows($result);$i++)
@@ -196,28 +196,28 @@
 		exit;
 	}
 
-	if($action=="showhistory")
+	if($HTTP_GET_VARS["action"]=="showhistory")
 	{
-		if(!isset($period))
+		if(!isset($HTTP_GET_VARS["period"]))
 		{
-			$period=3600;
+			$HTTP_GET_VARS["period"]=3600;
 		}
-		if(!isset($from))
+		if(!isset($HTTP_GET_VARS["from"]))
 		{
-			$from=0;
+			$HTTP_GET_VARS["from"]=0;
 		}
-		if(isset($year))
+		if(isset($HTTP_GET_VARS["year"]))
 		{
-			$from=($now-mktime($hour, 0, 0, $month, $day,$year))/3600;
+			$HTTP_GET_VARS["from"]=($now-mktime($HTTP_GET_VARS["hour"], 0, 0, $HTTP_GET_VARS["month"], $HTTP_GET_VARS["day"],$HTTP_GET_VARS["year"]))/3600;
 		}
-		@show_history($itemid,$from,$period,0);
+		@show_history($HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["from"],$HTTP_GET_VARS["period"],0);
 		show_footer();
 		exit;
 	}
 
-	if($action=="showhistory2")
+	if($HTTP_GET_VARS["action"]=="showhistory2")
 	{
-		@show_history($itemid,$from,$period,1);
+		@show_history($HTTP_GET_VARS["itemid"],$HTTP_GET_VARS["from"],$HTTP_GET_VARS["period"],1);
 		show_footer();
 		exit;
 	}
