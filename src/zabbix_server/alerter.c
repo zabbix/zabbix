@@ -48,6 +48,7 @@
 #include "db.h"
 #include "functions.h"
 #include "log.h"
+#include "zlog.h"
 #include "email.h"
 
 #include "alerter.h"
@@ -101,7 +102,8 @@ int send_alert(DB_ALERT	*alert,DB_MEDIATYPE *mediatype, char *error, int max_err
 			zabbix_log( LOG_LEVEL_DEBUG, "Before executing [%s] [%m]", full_path);
 			if(-1 == execl(full_path,mediatype->exec_path,alert->sendto,alert->subject,alert->message,(char *)0))
 			{
-				zabbix_log( LOG_LEVEL_ERR, "Error executing [%s] [%m]", full_path);
+				zabbix_log( LOG_LEVEL_ERR, "Error executing [%s] [%s]", full_path, strerror(errno));
+				zabbix_syslog("Error executing [%s] [%s]", full_path, strerror(errno));
 				snprintf(error,max_error_len-1,"Error executing [%s] [%s]", full_path, strerror(errno));
 				res = FAIL;
 			}
@@ -118,6 +120,7 @@ int send_alert(DB_ALERT	*alert,DB_MEDIATYPE *mediatype, char *error, int max_err
 	else
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Unsupported media type [%d] for alert ID [%d]", mediatype->type,alert->alertid);
+		zabbix_syslog("Unsupported media type [%d] for alert ID [%d]", mediatype->type,alert->alertid);
 		snprintf(error,max_error_len-1,"Unsupported media type [%d]", mediatype->type);
 		res=FAIL;
 	}
@@ -209,6 +212,7 @@ int main_alerter_loop()
 			else
 			{
 				zabbix_log( LOG_LEVEL_ERR, "Error sending alert ID [%d]", alert.alertid);
+				zabbix_syslog("Error sending alert ID [%d]", alert.alertid);
 				DBescape_string(error,error_esc,MAX_STRING_LEN);
 				snprintf(sql,sizeof(sql)-1,"update alerts set retries=retries+1,error='%s' where alertid=%d", error_esc, alert.alertid);
 #ifdef	ZABBIX_THREADS

@@ -48,6 +48,7 @@
 #include "db.h"
 #include "functions.h"
 #include "log.h"
+#include "zlog.h"
 
 #include "pinger.h"
 
@@ -197,8 +198,8 @@ int create_host_file(void)
 
 	if( f == NULL)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Cannot hosts file [%s] [%s]",
-		"/tmp/zabbix_suckerd.pinger", strerror(errno));
+		zabbix_log( LOG_LEVEL_ERR, "Cannot open file [%s] [%s]", "/tmp/zabbix_suckerd.pinger", strerror(errno));
+		zabbix_syslog("Cannot open file [%s] [%s]", "/tmp/zabbix_suckerd.pinger", strerror(errno));
 		return FAIL;
 	}
 
@@ -267,8 +268,8 @@ int	do_ping(void)
 	f=popen(str,"r");
 	if(f==0)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Cannot execute [%s] [%s]",
-			CONFIG_FPING_LOCATION, strerror(errno));
+		zabbix_log( LOG_LEVEL_ERR, "Cannot execute [%s] [%s]", CONFIG_FPING_LOCATION, strerror(errno));
+		zabbix_syslog("Cannot execute [%s] [%s]", CONFIG_FPING_LOCATION, strerror(errno));
 		return FAIL;
 	}
 
