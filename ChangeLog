@@ -32,6 +32,7 @@ Not ready yet:
 
 Changes for 1.0beta6:
 
+ - additional colors for graphs (Alexei)
  - in chart3.php: group by <complex expression> changed to group by 1
  (Alexei)
  - added housekeeping procedure for table sessions (Alexei)

@@ -50,6 +50,7 @@
 	$blue=ImageColorAllocate($im,0,0,255); 
 	$darkblue=ImageColorAllocate($im,0,0,150); 
 	$yellow=ImageColorAllocate($im,255,255,0); 
+	$darkyellow=ImageColorAllocate($im,150,150,0); 
 	$cyan=ImageColorAllocate($im,0,255,255); 
 	$black=ImageColorAllocate($im,0,0,0); 
 	$white=ImageColorAllocate($im,255,255,255); 
@@ -57,9 +58,11 @@
 
 	$colors=array();
 
+	$colors["Black"]=$black;
 	$colors["Green"]=$green;
 	$colors["Dark Green"]=$darkgreen;
 	$colors["Yellow"]=$yellow;
+	$colors["Dark Yellow"]=$darkyellow;
 	$colors["Blue"]=$blue;
 	$colors["Dark Blue"]=$blue;
 	$colors["White"]=$white;
