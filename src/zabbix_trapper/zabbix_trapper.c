@@ -17,6 +17,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include <time.h>
+
 #include <syslog.h>
 
 #include "common.h"
@@ -61,7 +63,7 @@ int	check_security(void)
 
 	i=sizeof(struct sockaddr_in);
 
-	if(getpeername(0,  &name, &i) == 0)
+	if(getpeername(0,  (struct sockaddr *)&name, &i) == 0)
 	{
 //		printf("%d\n",name.sin_port);
 		sname=inet_ntoa(name.sin_addr);
@@ -79,14 +81,13 @@ int	process_data(char *server,char *key, double value)
 	char	sql[1024];
 	int	itemid;
 	double	lastvalue;
+	int	now;
 
 	DB_RESULT       *result;
-	DB_ROW          row;
 
 	sprintf(sql,"select i.itemid,i.lastvalue from items i,hosts h where h.status=0 and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=2;",server,key);
-	DBexecute(sql);
+	result = DBselect(sql);
 	 
-	result = DBget_result();
 	if(result==NULL)
 	{
 		DBfree_result(result);
@@ -97,26 +98,29 @@ int	process_data(char *server,char *key, double value)
 		DBfree_result(result);
 		return  FAIL;
 	}
-	row = DBfetch_row(result);
-	if( row[0] == NULL )
+
+	if( DBget_field(result,0,0) == NULL )
 	{
 		DBfree_result(result);
 		return  FAIL;
 	}
 
-	itemid=atoi(row[0]);
+	itemid=atoi(DBget_field(result,0,0));
 
-	sprintf(sql,"insert into history (itemid,clock,value) values (%d,unix_timestamp(),%g);",itemid,value);
+	now = time(NULL);
+	sprintf(sql,"insert into history (itemid,clock,value) values (%d,%d,%g);",itemid,now,value);
 	DBexecute(sql);
 
-	if(NULL == row[1])
+	if(NULL == DBget_field(result,0,1))
 	{
-		sprintf(sql,"update items set lastvalue=%g,lastclock=unix_timestamp() where itemid=%d;",value,itemid);
+		now = time(NULL);
+		sprintf(sql,"update items set lastvalue=%g,lastclock=%d where itemid=%d;",value,now,itemid);
 	}
 	else
 	{
-		lastvalue=atof(row[1]);
-		sprintf(sql,"update items set prevvalue=%g,lastvalue=%g,lastclock=unix_timestamp() where itemid=%d;",lastvalue,value,itemid);
+		lastvalue=atof(DBget_field(result,0,1));
+		now = time(NULL);
+		sprintf(sql,"update items set prevvalue=%g,lastvalue=%g,lastclock=%d where itemid=%d;",lastvalue,value,now,itemid);
 	}
 
 	DBexecute(sql);

@@ -7,6 +7,7 @@ AC_PROG_CC
 dnl Checks for libraries.
 dnl Replace `main' with a function in -lmysqlclient:
 AC_CHECK_LIB(mysqlclient, main)
+AC_CHECK_LIB(pq, main)
 
 dnl Checks for header files.
 AC_HEADER_STDC

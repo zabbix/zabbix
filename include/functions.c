@@ -18,14 +18,13 @@
 int	evaluate_LAST(float *last,int itemid,int parameter)
 {
 	DB_RESULT	*result;
-	DB_ROW		row;
 
 	char		c[1024];
+	char		*field;
 
 	sprintf(c,"select lastvalue from items where itemid=%d and lastvalue is not null", itemid );
-	DBexecute(c);
 
-	result = DBget_result();
+	result = DBselect(c);
 	if(result==NULL)
 	{
 		DBfree_result(result);
@@ -36,13 +35,13 @@ int	evaluate_LAST(float *last,int itemid,int parameter)
 		DBfree_result(result);
 		return	FAIL;
 	}
-	row = DBfetch_row(result);
-	if( row[0] == NULL )
+	field = DBget_field(result,0,0);
+	if( field == NULL )
 	{
 		DBfree_result(result);
 		return	FAIL;
 	}
-	*last=atof(row[0]);
+	*last=atof(field);
 
 	DBfree_result(result);
 
@@ -52,14 +51,13 @@ int	evaluate_LAST(float *last,int itemid,int parameter)
 int	evaluate_MIN(float *min,int itemid,int parameter)
 {
 	DB_RESULT	*result;
-	DB_ROW		row;
 
 	char		c[1024];
+	char		*field;
 
 	sprintf(c,"select min(value) from history where clock>unix_timestamp()-%d and itemid=%d",parameter,itemid);
-	DBexecute(c);
 
-	result = DBget_result();
+	result = DBselect(c);
 	if(result==NULL)
 	{
 		syslog(LOG_NOTICE, "Result for MIN is empty" );
@@ -72,14 +70,14 @@ int	evaluate_MIN(float *min,int itemid,int parameter)
 		DBfree_result(result);
 		return	FAIL;
 	}
-	row = DBfetch_row(result);
-	if( row[0] == NULL )
+	field = DBget_field(result,0,0);
+	if( field == NULL )
 	{
 		syslog( LOG_NOTICE, "Result for MIN is empty" );
 		DBfree_result(result);
 		return	FAIL;
 	}
-	*min=atof(row[0]);
+	*min=atof(field);
 
 	DBfree_result(result);
 
@@ -89,14 +87,13 @@ int	evaluate_MIN(float *min,int itemid,int parameter)
 int	evaluate_MAX(float *max,int itemid,int parameter)
 {
 	DB_RESULT	*result;
-	DB_ROW		row;
 
 	char		c[1024];
+	char		*field;
 
 	sprintf(c,"select max(value) from history where clock>unix_timestamp()-%d and itemid=%d",parameter,itemid);
-	DBexecute(c);
 
-	result = DBget_result();
+	result = DBselect(c);
 	if(result==NULL)
 	{
 		DBfree_result(result);
@@ -107,13 +104,13 @@ int	evaluate_MAX(float *max,int itemid,int parameter)
 		DBfree_result(result);
 		return	FAIL;
 	}
-	row = DBfetch_row(result);
-	if( row[0] == NULL )
+	field = DBget_field(result,0,0);
+	if( field == NULL )
 	{
 		DBfree_result(result);
 		return	FAIL;
 	}	
-	*max=atof(row[0]);
+	*max=atof(field);
 
 	DBfree_result(result);
 
@@ -123,14 +120,13 @@ int	evaluate_MAX(float *max,int itemid,int parameter)
 int	evaluate_PREV(float *prev,int itemid,int parameter)
 {
 	DB_RESULT	*result;
-	DB_ROW		row;
 
 	char		c[1024];
+	char		*field;
 
 	sprintf(c,"select prevvalue from items where itemid=%d and prevvalue is not null", itemid );
-	DBexecute(c);
 
-	result = DBget_result();
+	result = DBselect(c);
 	if(result==NULL)
 	{
 		DBfree_result(result);
@@ -141,13 +137,13 @@ int	evaluate_PREV(float *prev,int itemid,int parameter)
 		DBfree_result(result);
 		return	FAIL;
 	}
-	row = DBfetch_row(result);
-	if( row[0] == NULL )
+	field = DBget_field(result,0,0);
+	if( field == NULL )
 	{
 		DBfree_result(result);
 		return	FAIL;
 	}
-	*prev=atof(row[0]);
+	*prev=atof(field);
 
 	DBfree_result(result);
 
@@ -186,14 +182,13 @@ int	evaluate_DIFF(float *diff,int itemid,int parameter)
 int	evaluate_NODATA(float *nodata,int itemid,int parameter)
 {
 	DB_RESULT	*result;
-	DB_ROW		row;
 
 	char		c[1024];
+	char		*field;
 
 	sprintf(c,"select value from history where itemid=%d and clock>unix_timestamp()-%d limit 1",itemid,parameter);
-	DBexecute(c);
 
-	result = DBget_result();
+	result = DBselect(c);
 	if(result==NULL)
 	{
 		DBfree_result(result);
@@ -204,9 +199,9 @@ int	evaluate_NODATA(float *nodata,int itemid,int parameter)
 		DBfree_result(result);
 		return	FAIL;
 	}
-	row = DBfetch_row(result);
+	field = DBget_field(result,0,0);
 	*nodata=0;
-	if(row == NULL)
+	if( field == NULL )
 	{
 		*nodata=1;
 	}
@@ -220,15 +215,14 @@ int	update_functions( int itemid )
 {
 	FUNCTION	function;
 	DB_RESULT	*result;
-	DB_ROW		row;
 	char		c[1024];
 	float		value;
 	int		ret=SUCCEED;
+	int		i,rows;
 
 	sprintf(c,"select function,parameter from functions where itemid=%d group by 1,2 order by 1,2",itemid );
-	DBexecute(c);
 
-	result = DBget_result();
+	result = DBselect(c);
 	if(result==NULL)
 	{
 		syslog( LOG_NOTICE, "No functions to update.");
@@ -236,10 +230,18 @@ int	update_functions( int itemid )
 		return SUCCEED; 
 	}
 
-	while ( (row = DBfetch_row(result)) != NULL )
+	rows=DBnum_rows(result);
+	if(rows == 0)
 	{
-		function.function=row[0];
-		function.parameter=atoi(row[1]);
+		syslog( LOG_NOTICE, "No functions to update.");
+		DBfree_result(result);
+		return SUCCEED; 
+	}
+
+	for(i=0;i<rows;i++)
+	{
+		function.function=DBget_field(result,i,0);
+		function.parameter=atoi(DBget_field(result,i,1));
 		syslog( LOG_DEBUG, "ItemId:%d Evaluating %s(%d)\n",itemid,function.function,function.parameter);
 		if(strcmp(function.function,"last")==0)
 		{
