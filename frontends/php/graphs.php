@@ -136,11 +136,11 @@
 	echo "<input class=\"biginput\" name=\"height\" size=5 value=\"$height\">";
 
 	show_table2_v_delimiter2();
-	echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
 	if(isset($HTTP_GET_VARS["graphid"]))
 	{
-		echo "<input type=\"submit\" name=\"register\" value=\"update\">";
-		echo "<input type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete graph?');\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete graph?');\">";
 	}
 
 	show_table2_header_end();

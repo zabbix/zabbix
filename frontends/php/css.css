@@ -93,3 +93,26 @@ img.bottom
 	border-color: black;
 	background-color: white;
 }
+
+.button
+{
+	font-family: Verdana, Helvetica, Geneva;
+	font-size: 12px;
+	border: solid;
+	border-width: 1px;
+	border-color: black;
+	background-color: white;
+	margin-right:5px;
+}
+
+.button:hover
+{
+	font-family: Verdana, Helvetica, Geneva;
+	font-size: 12px;
+	text-decoration: underline;
+	border: solid;
+	border-width: 1px;
+	border-color: black;
+	background-color: white;
+	margin-right:5px;
+}

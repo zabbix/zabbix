@@ -338,12 +338,12 @@
 	show_table2_v_delimiter2();
 	if(!isset($triggerid)||($triggerid==""))
 	{
-		echo "<input type=\"submit\" name=\"register\" value=\"add\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
 	}
 	if(isset($HTTP_GET_VARS["serviceid"]))
 	{
-		echo "<input type=\"submit\" name=\"register\" value=\"update\">";
-		echo "<input type=\"submit\" name=\"register\" value=\"delete\"  onClick=\"return Confirm('Delete service?');\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\"  onClick=\"return Confirm('Delete service?');\">";
 	}
 
 	show_table2_header_end();
@@ -403,7 +403,7 @@
 	echo "<INPUT class=\"biginput\" TYPE=\"CHECKBOX\" NAME=\"softlink\" VALUE=\"true\" checked>";
 
 	show_table2_v_delimiter2();
-	echo "<input type=\"submit\" name=\"register\" value=\"add link\">";
+	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add link\">";
 
 	show_table2_header_end();
 ?>
@@ -433,7 +433,7 @@
         echo "</SELECT>";
 
 	show_table2_v_delimiter2();
-	echo "<input type=\"submit\" name=\"register\" value=\"add server\">";
+	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add server\">";
 
 	show_table2_header_end();
 	}
