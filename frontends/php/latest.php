@@ -305,11 +305,18 @@
 
 			if(isset($row["lastvalue"]))
 			{
-				if(round($row["lastvalue"])==$row["lastvalue"])
+				if($row["value_type"] == 0 )
+				{
+					echo "<td>"; echo convert_units($row["lastvalue"],$row["units"],$row["multiplier"]); echo "</td>";
+				}
+				else
+				{
+					echo "<td>"; echo nbsp(htmlspecialchars(substr($row["lastvalue"],0,20)." ...")); echo "</td>";
+				}
+/*				if(round($row["lastvalue"])==$row["lastvalue"])
 				{ 
 					if($row["value_type"] == 0 )
 					{
-//						echo "<td>"; printf("%.0f %s",$row["lastvalue"],$row["units"]); echo "</td>";
 						echo "<td>"; echo convert_units($row["lastvalue"],$row["units"],$row["multiplier"]); echo "</td>";
 					}
 					else
@@ -319,15 +326,15 @@
 				}
 				else
 				{
-//					echo "<td>"; printf("%.2f %s",$row["lastvalue"],$row["units"]); echo "</td>";
 					echo "<td>"; echo convert_units($row["lastvalue"],$row["units"],$row["multiplier"]); echo "</td>";
-				}
+				}*/
 			}
 			else
 			{
 				echo "<td align=center>-</td>";
 			}
-			if( isset($row["lastvalue"]) && isset($row["prevvalue"]) && $row["lastvalue"]-$row["prevvalue"] != 0 )
+			if( isset($row["lastvalue"]) && isset($row["prevvalue"]) &&
+				($row["value_type"] == 0) && ($row["lastvalue"]-$row["prevvalue"] != 0) )
 			{
 //				echo "<td>"; echo $row["lastvalue"]-$row["prevvalue"]; echo "</td>";
 //	sprintf("%+0.2f"); does not work
