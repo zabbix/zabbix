@@ -252,14 +252,14 @@ Different information about specific process(es).
                      than read and write operations
        gdiobj      - Number of GDI objects used by process
        userobj     - Number of USER objects used by process
-    <type>      - representation type (meaningful when more than one process with the same
-                  name exists). Valid values are:
+    <type>      - representation type (meaningful when more than one process
+                  with the same name exists). Valid values are:
          min - minimal value among all processes named <process>
          max - maximal value among all processes named <process>
          avg - average value for all processes named <process>
          sum - sum of values for all processes named <process>
 Examples:
-1. To get amount of physical memory taken by all Internet Explorer processes.
+1. To get amount of physical memory taken by all Internet Explorer processes,
 use the following parameter:
    proc_info[iexplore.exe:wkset:sum]
 2. To get average number of page faults for Internet Explorer processes,
