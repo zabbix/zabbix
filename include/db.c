@@ -1050,7 +1050,9 @@ int	DBadd_alert(int actionid, int mediatypeid, char *sendto, char *subject, char
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_alert()");
 
 	now = time(NULL);
-	snprintf(sql,sizeof(sql)-1,"insert into alerts (alertid,actionid,clock,mediatypeid,sendto,subject,message,status,retries) values (NULL,%d,%d,%d,'%s','%s','%s',0,0)",actionid,now,mediatypeid,sendto,subject,message);
+/* Does not work on PostgreSQL */
+/*	snprintf(sql,sizeof(sql)-1,"insert into alerts (alertid,actionid,clock,mediatypeid,sendto,subject,message,status,retries) values (NULL,%d,%d,%d,'%s','%s','%s',0,0)",actionid,now,mediatypeid,sendto,subject,message);*/
+	snprintf(sql,sizeof(sql)-1,"insert into alerts (actionid,clock,mediatypeid,sendto,subject,message,status,retries) values (%d,%d,%d,'%s','%s','%s',0,0)",actionid,now,mediatypeid,sendto,subject,message);
 	DBexecute(sql);
 
 	return SUCCEED;
