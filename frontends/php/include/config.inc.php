@@ -2137,18 +2137,10 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Update Action
 
-	function	update_action( $actionid, $userid, $good, $delay, $subject, $message, $scope, $severity, $recipient, $usrgrpid)
+	function	update_action( $actionid, $triggerid, $userid, $good, $delay, $subject, $message, $scope, $severity, $recipient, $usrgrpid)
 	{
-		if($recipient == RECIPIENT_TYPE_USER)
-		{
-			$id = $userid;
-		}
-		else
-		{
-			$id = $usrgrpid;
-		}
-		$sql="update actions set userid=$id,good=$good,delay=$delay,nextcheck=0,subject='$subject',message='$message',scope=$scope,severity=$severity,recipient=$recipient where actionid=$actionid";
-		return	DBexecute($sql);
+		delete_action($actionid);
+		return add_action( $triggerid, $userid, $good, $delay, $subject, $message, $scope, $severity, $recipient, $usrgrpid);
 	}
 
 	function	delete_graphs_item($gitemid)
@@ -2391,7 +2383,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	delete_actions_by_triggerid($triggerid)
 	{
-		$sql="delete from actions where triggerid=$triggerid";
+		$sql="delete from actions where triggerid=$triggerid and scope=0";
 		return	DBexecute($sql);
 	}
 
