@@ -172,6 +172,10 @@
 	define("S_NO_IMAGES_DEFINED",			"No images defined");
 	define("S_BACKGROUND",				"Background");
 	define("S_UPLOAD",				"Upload");
+	define("S_IMAGE_ADDED",				"Image added");
+	define("S_CANNOT_ADD_IMAGE",			"Cannot add image");
+	define("S_IMAGE_DELETED",			"Image deleted");
+	define("S_CANNOT_DELETE_IMAGE",			"Cannot delete image");
 
 //	Latest values
 	define("S_LATEST_VALUES",			"Latest values");
