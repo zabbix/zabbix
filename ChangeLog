@@ -16,10 +16,10 @@ Not ready yet (1.0beta4):
 snmpget -On localhost public enterprises.ucdavis.memory.memTotalSwap.0]
 
 [ PHP. Navigation by time period for graphs and trends ]
-[ PHP. Report2 to view only hosts visible to user ]
 
 Changes for 1.0beta4:
 
+ - check permissions for Availability report (Alexei)
  - added parameter SenderFrequency to zabbix_suckerd configuration 
  file (Alexei)
  - added frontends/include/defines.inc.php (Alexei)
