@@ -4301,12 +4301,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
                 {
                         return  $result;
                 }
-                $sql="delete from screens_graphs where screenid=$screenid";
-                $result=DBexecute($sql);
-                if(!$result)
-                {
-                        return  $result;
-                }
                 $sql="delete from screens where screenid=$screenid";
                 return  DBexecute($sql);
         }
@@ -4319,14 +4313,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
                 return  DBexecute($sql);
         }
 
-        function add_screen_graph($screenid,$x,$y,$itemid,$width,$height)
-        {
-                $sql="delete from screens_graphs where screenid=$screenid and x=$x and y=$y";
-                DBexecute($sql);
-                $sql="insert into screens_graphs (screenid,x,y,itemid,width,height) values ($screenid,$x,$y,$itemid,$width,$height)";
-                return  DBexecute($sql);
-        }
-
         function update_screen_item($screenitemid,$resource,$resourceid,$width,$height)
         {
                 $sql="update screens_items set resource=$resource,resourceid=$resourceid,width=$width,height=$height where screenitemid=$screenitemid";
@@ -4336,12 +4322,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
         function delete_screen_item($screenitemid)
         {
                 $sql="delete from screens_items where screenitemid=$screenitemid";
-                return  DBexecute($sql);
-        }
-
-        function delete_screen_graph($screengraphid)
-        {
-                $sql="delete from screens_graphs where screengraphid=$screengraphid";
                 return  DBexecute($sql);
         }
 
