@@ -18,6 +18,8 @@
 	Header( "Content-type:  image/png"); 
 	Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 
+	check_authorisation();
+
 	$im = imagecreate($width,$height); 
   
 	$red=ImageColorAllocate($im,255,0,0); 
@@ -37,6 +39,13 @@
 #	ImageFilledRectangle($im,0,0,$width,$height,$black);
 	ImageFilledRectangle($im,0,0,$width,$height,$white);
 	ImageRectangle($im,0,0,$width-1,$height-1,$black);
+
+	if(!check_right("Network map","R",$HTTP_GET_VARS["sysmapid"]))
+	{
+		ImagePng($im); 
+		ImageDestroy($im); 
+		exit();
+	}
 
 	if(!isset($HTTP_GET_VARS["noedit"]))
 	{

@@ -6,6 +6,15 @@
 ?>
 
 <?
+	if(!check_right("Network map","U",$HTTP_GET_VARS["sysmapid"]))
+	{
+		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+		show_footer();
+		exit;
+	}
+?>
+
+<?
 	show_table_header("CONFIGURATION OF NETWORK MAP");
 	echo "<br>";
 ?>

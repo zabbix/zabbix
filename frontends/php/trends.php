@@ -6,6 +6,15 @@
 ?>
 
 <?
+	if(!check_right("Item","R",$HTTP_GET_VARS["itemid"]))
+	{
+		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+		show_footer();
+		exit;
+	}
+?>
+
+<?
 	show_table_header_begin();
 	$result=DBselect("select i.description,h.host,h.hostid from items i,hosts h where i.hostid=h.hostid and i.itemid=".$HTTP_GET_VARS["itemid"]);
 	$description=DBget_field($result,0,0);

@@ -3,6 +3,7 @@
 
 	include "include/config.inc.php";
 
+
 	$now=time();
 
 	$result=DBselect("select h.host,i.description,i.nextcheck-$now,h.hostid from items i,hosts h where i.itemid=".$HTTP_GET_VARS["itemid"]." and h.hostid=i.hostid");
@@ -42,6 +43,14 @@
 	{
 		show_header("$host:$description",0,0);
 	}
+
+	if(!check_right("Item","R",$HTTP_GET_VARS["itemid"]))
+	{
+		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+		show_footer();
+		exit;
+	}
+
 ?>
 
 <?
