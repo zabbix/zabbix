@@ -133,11 +133,83 @@
 	$h2=$h2."<select class=\"biginput\" name=\"config\" onChange=\"submit()\">";
 	$h2=$h2."<option value=\"0\" ".iif(isset($_GET["config"])&&$_GET["config"]==0,"selected","").">".S_HOSTS;
 	$h2=$h2."<option value=\"1\" ".iif(isset($_GET["config"])&&$_GET["config"]==1,"selected","").">".S_HOST_GROUPS;
+	$h2=$h2."<option value=\"2\" ".iif(isset($_GET["config"])&&$_GET["config"]==2,"selected","").">".S_TEMPLATES;
 	$h2=$h2."</select>";
 
 	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"hosts.php\">", "</form>");
 ?>
 
+
+
+
+<?php
+	if($_GET["config"]==2)
+	{
+	$h1=S_CONFIGURATION_OF_TEMPLATES_LINKAGE;
+
+	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
+	{
+		unset($_GET["groupid"]);
+	}
+	if(isset($_GET["hostid"])&&($_GET["hostid"]==0))
+	{
+		unset($_GET["hostid"]);
+	}
+
+	$h2=S_GROUP."&nbsp;";
+	$h2=$h2."<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_GET["config"]."\">";
+	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
+	$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_ALL_SMALL;
+
+	$result=DBselect("select groupid,name from groups order by name");
+	while($row=DBfetch($result))
+	{
+// Check if at least one host with read permission exists for this group
+		$result2=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg where hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
+		$cnt=0;
+		while($row2=DBfetch($result2))
+		{
+			if(!check_right("Host","U",$row2["hostid"]))
+			{
+				continue;
+			}
+			$cnt=1; break;
+		}
+		if($cnt!=0)
+		{
+			$h2=$h2."<option value=\"".$row["groupid"]."\" ".iif(isset($_GET["groupid"])&&($_GET["groupid"]==$row["groupid"]),"selected","").">".$row["name"];
+		}
+	}
+	$h2=$h2."</select>";
+
+	$h2=$h2."&nbsp;".S_HOST."&nbsp;";
+	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
+	$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["hostid"]),"selected","").">".S_SELECT_HOST_DOT_DOT_DOT;
+
+	if(isset($_GET["groupid"]))
+	{
+		$sql="select h.hostid,h.host from hosts h,hosts_groups hg where hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+	}
+	else
+	{
+		$sql="select h.hostid,h.host from hosts h group by h.hostid,h.host order by h.host";
+	}
+
+	$result=DBselect($sql);
+	while($row=DBfetch($result))
+	{
+		if(!check_right("Host","U",$row["hostid"]))
+		{
+			continue;
+		}
+		$h2=$h2."<option value=\"".$row["hostid"]."\"".iif(isset($_GET["hostid"])&&($_GET["hostid"]==$row["hostid"]),"selected","").">".$row["host"];
+	}
+	$h2=$h2."</select>";
+
+	echo "<br>";
+	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"hosts.php\">", "</form>");
+	}
+?>
 
 <?php
 	if($_GET["config"]==1)
@@ -187,6 +259,43 @@
 	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
 	{
 		unset($_GET["groupid"]);
+	}
+?>
+
+<?
+	if(isset($_GET["hostid"])&&($_GET["config"]==2))
+	{
+		table_begin();
+		table_header(array(S_HOST,S_TEMPLATE,S_ITEMS,S_TRIGGERS,S_ACTIONS,S_GRAPHS,S_SCREENS,S_ACTIONS));
+
+		$result=DBselect("select hostid,templateid,items,triggers,actions,graphs,screens from hosts_templates where hostid=".$_GET["hostid"]);
+		$col=0;
+		while($row=DBfetch($result))
+		{
+			$host=get_host_by_hostid($row["hostid"]);
+			$template=get_host_by_hostid($row["templateid"]);
+//		$members=array("hide"=>1,"value"=>"");
+#			$actions="<A HREF=\"hosts.php?config=".$_GET["config"]."&groupid=".$row["groupid"]."#form\">".S_CHANGE."</A>";
+			$actions="ZZZ";
+
+			table_row(array(
+				$host["host"],
+				$template["host"],
+				get_template_permission_str($row["items"]),
+				get_template_permission_str($row["triggers"]),
+				get_template_permission_str($row["actions"]),
+				get_template_permission_str($row["graphs"]),
+				get_template_permission_str($row["screens"]),
+				$actions
+				),$col++);
+		}
+		if(DBnum_rows($result)==0)
+		{
+				echo "<TR BGCOLOR=#EEEEEE>";
+				echo "<TD COLSPAN=4 ALIGN=CENTER>".S_NO_HOST_GROUPS_DEFINED."</TD>";
+				echo "<TR>";
+		}
+		table_end();
 	}
 ?>
 
@@ -341,7 +450,7 @@
 <?php
 	if($_GET["config"]==1)
 	{
-		insert_hostgroups_form($_GET["groupid"]);
+		@insert_hostgroups_form($_GET["groupid"]);
 	}
 ?>
 
