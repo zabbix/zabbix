@@ -28,12 +28,12 @@
 //
 
 USER_COUNTER *userCounterList=NULL;
-float statProcUtilization[MAX_CPU+1];
-float statProcUtilization5[MAX_CPU+1];
-float statProcUtilization15[MAX_CPU+1];
-float statProcLoad=0;
-float statProcLoad5=0;
-float statProcLoad15=0;
+double statProcUtilization[MAX_CPU+1];
+double statProcUtilization5[MAX_CPU+1];
+double statProcUtilization15[MAX_CPU+1];
+double statProcLoad=0;
+double statProcLoad5=0;
+double statProcLoad15=0;
 
 
 //
@@ -57,7 +57,7 @@ void CollectorThread(void *)
    PDH_RAW_COUNTER rawCounter;      // Generic raw counter for various parameters
    PDH_STATUS status;
    SYSTEM_INFO sysInfo;
-   DWORD i,cpuHistoryIdx,cpuQueueHistoryIdx;
+   DWORD i,cpuHistoryIdx,cpuQueueHistoryIdx,dwSleepTime;
    USER_COUNTER *cptr;
    PDH_STATISTICS statData;
 
@@ -66,9 +66,9 @@ void CollectorThread(void *)
 
    // Prepare for CPU utilization collection
    memset(cpuUsageHistory,0,sizeof(LONG)*(MAX_CPU+1)*900);
-   memset(statProcUtilization,0,sizeof(float)*(MAX_CPU+1));
-   memset(statProcUtilization5,0,sizeof(float)*(MAX_CPU+1));
-   memset(statProcUtilization15,0,sizeof(float)*(MAX_CPU+1));
+   memset(statProcUtilization,0,sizeof(double)*(MAX_CPU+1));
+   memset(statProcUtilization5,0,sizeof(double)*(MAX_CPU+1));
+   memset(statProcUtilization15,0,sizeof(double)*(MAX_CPU+1));
 
    if (PdhOpenQuery(NULL,0,&query)!=ERROR_SUCCESS)
    {
@@ -157,7 +157,7 @@ void CollectorThread(void *)
             if (n==-1)
                n=899;
          }
-         statProcUtilization[i]=((float)sum)/(float)60;
+         statProcUtilization[i]=((double)sum)/(double)60;
 
          // Calculate average cpu usage for last five minutes
          for(n=cpuHistoryIdx,j=0,sum=0;j<300;j++)
@@ -166,12 +166,12 @@ void CollectorThread(void *)
             if (n==-1)
                n=899;
          }
-         statProcUtilization5[i]=((float)sum)/(float)300;
+         statProcUtilization5[i]=((double)sum)/(double)300;
 
          // Calculate average cpu usage for last fifteen minutes
          for(j=0,sum=0;j<900;j++)
             sum+=cpuUsageHistory[i][j];
-         statProcUtilization15[i]=((float)sum)/(float)900;
+         statProcUtilization15[i]=((double)sum)/(double)900;
       }
       cpuHistoryIdx++;
       if (cpuHistoryIdx==900)
@@ -190,7 +190,7 @@ void CollectorThread(void *)
          if (n==-1)
             n=899;
       }
-      statProcLoad=((float)sum)/(float)60;
+      statProcLoad=((double)sum)/(double)60;
 
       // Calculate average processor(s) load for last five minutes
       for(n=cpuQueueHistoryIdx,j=0,sum=0;j<300;j++)
@@ -199,12 +199,12 @@ void CollectorThread(void *)
          if (n==-1)
             n=899;
       }
-      statProcLoad5=((float)sum)/(float)300;
+      statProcLoad5=((double)sum)/(double)300;
 
       // Calculate average processor(s) load for last fifteen minutes
       for(j=0,sum=0;j<900;j++)
          sum+=cpuQueueHistory[j];
-      statProcLoad15=((float)sum)/(float)900;
+      statProcLoad15=((double)sum)/(double)900;
 
       cpuQueueHistoryIdx++;
       if (cpuQueueHistoryIdx==900)
@@ -219,14 +219,20 @@ void CollectorThread(void *)
                cptr->currPos=0;
             PdhComputeCounterStatistics(cptr->handle,PDH_FMT_DOUBLE,cptr->currPos,
                                         cptr->interval,cptr->rawValueArray,&statData);
-            cptr->lastValue=(float)statData.mean.doubleValue;
+            cptr->lastValue=statData.mean.doubleValue;
          }
 
+      // Calculate time spent on sample processing and issue warning if it exceeds threshold
       dwTicksElapsed=GetTickCount()-dwTicksStart;
-      if (dwTicksElapsed>100)
-         WriteLog("Processing took more then 100 milliseconds (%d milliseconds)\r\n",dwTicksElapsed);
+      if (dwTicksElapsed>confMaxProcTime)
+         WriteLog("Processing took more then %d milliseconds (%d milliseconds)\r\n",
+                  confMaxProcTime,dwTicksElapsed);
+
+      // Calculate sleeping time. We will sleep not less than 500 milliseconds even
+      // if processing takes more than 500 milliseconds
+      dwSleepTime=(dwTicksElapsed>500) ? 500 : (1000-dwTicksElapsed);
    }
-   while(WaitForSingleObject(eventShutdown,1000)==WAIT_TIMEOUT);
+   while(WaitForSingleObject(eventShutdown,dwSleepTime)==WAIT_TIMEOUT);
 
    PdhCloseQuery(query);
 }

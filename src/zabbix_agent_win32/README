@@ -1,5 +1,5 @@
 
-                     ZabbixW32 version 1.0.0-alpha2
+                     ZabbixW32 version 1.0.0-alpha3
 
 ******************************************************************************
 
@@ -45,6 +45,10 @@ And possible options are:
                      (default is C:\zabbix_agentd.conf)
 
 
+Configuration file
+------------------
+
+
 Parameters supported by Zabbix Win32 Agent
 ------------------------------------------
 
@@ -80,6 +84,13 @@ cpu_util5[<instance>]	Average specific CPU utilization (in percents) for last
                         5 minutes, where <instance> is zero-based CPU number
 cpu_util15[<instance>]	Average specific CPU utilization (in percents) for last
                         15 minutes, where <instance> is zero-based CPU number
+perf_counter[<path>]    Value of any performance counter, where <path> is the 
+			counter path (you can use Performance Monitor to obtain
+			list of available counters). Please note that this
+			parameter will return correct value only for counters
+			which requires just one sample (like "\System\Threads").
+			It will not work as expected for counters that requires
+			more than one sample - like CPU utilization.
 service_state[<srv>]	State of service <srv>. The following states can be
          		returned:
 			   0 - Running
@@ -91,5 +102,6 @@ service_state[<srv>]	State of service <srv>. The following states can be
 			   6 - Stopped
 			   7 - Unknown
 			 255 - SCM communication error
-			Please not that <srv> should be service name,
-			not display name! 
+			Please note that <srv> should be real service name (as
+			it seen in service properties under "Name:"), not
+			service display name! 
