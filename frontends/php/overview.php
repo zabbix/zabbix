@@ -80,6 +80,12 @@
 	}
 	$h2=$h2."</select>";
 
+	$h2=$h2."&nbsp;".S_TYPE."&nbsp;";
+	$h2=$h2."<select class=\"biginput\" name=\"type\" onChange=\"submit()\">";
+	$h2=$h2."<option value=\"0\" ".iif(isset($_GET["type"])&&($_GET["type"]==0),"selected","").">".S_TRIGGERS;
+	$h2=$h2."<option value=\"1\" ".iif(isset($_GET["type"])&&($_GET["type"]==1),"selected","").">".S_DATA;
+	$h2=$h2."</select>";
+
 	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"overview.php\">", "</form>");
 ?>
 
@@ -89,8 +95,7 @@
 		$_GET["sort"]="description";
 	}
 
-	if(0)
-//	if(isset($_GET["groupid"]))
+	if(isset($_GET["groupid"])&&isset($_GET["type"])&&($_GET["type"]==1))
 	{
 		table_begin();
 		$header=array("&nbsp;");
@@ -154,7 +159,7 @@
 		table_end();
 		show_table_header_end();
 	}
-	if(isset($_GET["groupid"]))
+	else if(isset($_GET["groupid"])&&isset($_GET["type"])&&($_GET["type"]==0))
 	{
 		table_begin();
 		$header=array("&nbsp;");
