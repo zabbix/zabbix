@@ -3,12 +3,6 @@
 
 	include "include/config.inc";
 
-	if(!isset($itemid))
-	{
-		echo "Missing <B>itemid</B> Parameter - See System Administror";
-		exit;
-	}
-
 	$now=time();
 
 	$result=DBselect("select h.host,i.description,i.nextcheck-$now,h.hostid from items i,hosts h where i.itemid=$itemid and h.hostid=i.hostid");
