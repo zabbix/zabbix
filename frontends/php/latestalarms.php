@@ -14,15 +14,15 @@
 ?>
 
 <?php
-	if(isset($start)&&($start<=0))
+	if(isset($HTTP_GET_VARS["start"])&&($HTTP_GET_VARS["start"]<=0))
 	{
-		unset($start);
+		unset($HTTP_GET_VARS["start"]);
 	}
-	if(isset($start))
+	if(isset($HTTP_GET_VARS["start"]))
 	{
-		echo "[<A HREF=\"latestalarms.php?start=".($start-100)."\">";
+		echo "[<A HREF=\"latestalarms.php?start=".($HTTP_GET_VARS["start"]-100)."\">";
 		echo "Show previous 100</A>] ";
-		echo "[<A HREF=\"latestalarms.php?start=".($start+100)."\">";
+		echo "[<A HREF=\"latestalarms.php?start=".($HTTP_GET_VARS["start"]+100)."\">";
 		echo "Show next 100</A>]";
 	}
 	else 
@@ -39,13 +39,13 @@
 
 <FONT COLOR="#000000">
 <?php
-	if(!isset($start))
+	if(!isset($HTTP_GET_VARS["start"]))
 	{
-		$sql="select t.description,a.clock,a.value,t.triggerid from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit 1000";
+		$sql="select t.description,a.clock,a.value,t.triggerid from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit 500";
 	}
 	else
 	{
-		$sql="select t.description,a.clock,a.value,t.triggerid from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit ".($start+1000);
+		$sql="select t.description,a.clock,a.value,t.triggerid from alarms a,triggers t where t.triggerid=a.triggerid order by clock desc limit ".($HTTP_GET_VARS["start"]+500);
 	}
 	$result=DBselect($sql);
 
@@ -60,7 +60,7 @@
 	while($row=DBfetch($result))
 	{
 		$i++;
-		if(isset($start)&&($i<$start))
+		if(isset($HTTP_GET_VARS["start"])&&($i<$HTTP_GET_VARS["start"]))
 		{
 			continue;
 		}

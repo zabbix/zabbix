@@ -8,7 +8,7 @@
 \paperfontsize 10
 \spacing single 
 \papersize Default
-\paperpackage a4
+\paperpackage widemarginsa4
 \use_geometry 0
 \use_amsmath 0
 \paperorientation portrait
