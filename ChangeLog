@@ -1,3 +1,7 @@
+Changes for 1.1alpha6:
+
+ - fixed va_copy() detection (Alexei)
+
 Changes for 1.1alpha5:
  
  - fixed mouse navigation for multiple maps in one screen (Alexei)
