@@ -111,7 +111,7 @@ int		DBis_empty(DB_RESULT *result);
 
 int	DBget_function_result(float *result,char *functionid);
 int	DBupdate_host_status(int hostid,int status);
-int	DBupdate_item_status_to_unsupported(int itemid);
+int	DBupdate_item_status_to_notsupported(int itemid);
 int	DBadd_history(int itemid, double value);
 int	DBadd_history_str(int itemid, char *value);
 int	DBadd_alarm(int triggerid, int status);
