@@ -137,7 +137,7 @@
 		$config=select_config();
 
 		$col=0;
-		show_form_begin("config");
+		show_form_begin("config.housekeeper");
 		echo S_HOUSEKEEPER;
 
 		show_table2_v_delimiter($col++);
@@ -215,7 +215,7 @@
 		}
 
 		$col=0;
-		show_form_begin("config");
+		show_form_begin("config.images");
 		echo S_IMAGE;
 
 		show_table2_v_delimiter($col++);
@@ -327,7 +327,7 @@
 ?>
 
 <?php
-		show_form_begin("config");
+		show_form_begin("config.medias");
 		echo S_MEDIA;
 
 		$col=0;
