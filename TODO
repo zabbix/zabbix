@@ -1,5 +1,7 @@
 1.0:
 
+ - check simple check FTP under Mandrake 9.0: https://sourceforge.net/forum/message.php?msg_id=2410500
+
 Under Solaris:
 
 -I/home/spath/net-snmp-5.0.9/include/net-snmp
