@@ -1,5 +1,6 @@
 Changes for 1.0beta14:
 
+ - fixed displaying of string value in the Latest Values (Alexei)
  - fixed simple check when port specified. Order of IP and PORT is
  arbitrary now (Alexei)
  - fixed pinger to correc calculate number of seconds (Alexei)
