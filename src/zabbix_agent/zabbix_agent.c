@@ -1,4 +1,4 @@
-/* #define	TEST_PARAMETERS */
+/*#define	TEST_PARAMETERS*/
 
 #include "config.h"
 
