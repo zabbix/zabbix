@@ -1827,6 +1827,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			return 0;
 		}
 
+		$description=addslashes($description);
+
 		$sql="insert into items (description,key_,hostid,delay,history,lastdelete,nextcheck,status,type,snmp_community,snmp_oid,value_type,trapper_hosts) values ('$description','$key',$hostid,$delay,$history,0,0,$status,$type,'$snmp_community','$snmp_oid',$value_type,'$trapper_hosts')";
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"items","itemid");
@@ -2196,7 +2198,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 // Cannot use add_trigger here
 				$description=$trigger["description"];
 #				$description=str_replace("%s",$host["host"],$description);	
-				$sql="insert into triggers  (description,priority,status,comments,url,value) values ('$description',".$trigger["priority"].",".$trigger["status"].",'".$trigger["comments"]."','".$trigger["url"]."',2)";
+				$sql="insert into triggers  (description,priority,status,comments,url,value) values ('".addslashes($description)."',".$trigger["priority"].",".$trigger["status"].",'".$trigger["comments"]."','".$trigger["url"]."',2)";
 				$result4=DBexecute($sql);
 				$triggerid=DBinsert_id($result4,"triggers","triggerid");
 
