@@ -173,7 +173,7 @@ int get_minnextcheck(void)
 
 	int		res;
 
-	sprintf(c,"select min(nextcheck) from items i,hosts h where i.status=0 and h.status=0 and h.hostid=i.hostid");
+	sprintf(c,"select min(nextcheck) from items i,hosts h where i.status=0 and h.status=0 and h.hostid=i.hostid and i.status=0");
 	DBexecute(c);
 
 	result = DBget_result();
@@ -324,8 +324,8 @@ int main(int argc, char **argv)
 	signal( SIGQUIT, signal_handler );
 	signal( SIGTERM, signal_handler );
 
-//	dbg_init( dbg_syswarn, "/var/log/zabbix_sucker.log" );
-	dbg_init( dbg_proginfo, "/var/log/zabbix_sucker.log" );
+	dbg_init( dbg_syswarn, "/var/log/zabbix_sucker.log" );
+//	dbg_init( dbg_proginfo, "/var/log/zabbix_sucker.log" );
 
 	DBconnect();
 
