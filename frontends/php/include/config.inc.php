@@ -64,6 +64,46 @@
 
 	function	convert_units($value,$units,$multiplier)
 	{
+// Special processing for seconds
+		if($units=="s")
+		{
+			$ret="";
+
+			$t=floor($value/(365*24*3600));
+			if($t>0)
+			{
+				$ret=$t."y";
+				$value=$value-$t*(365*24*3600);
+			}
+			$t=floor($value/(30*24*3600));
+			if($t>0)
+			{
+				$ret=$ret.$t."m";
+				$value=$value-$t*(30*24*3600);
+			}
+			$t=floor($value/(24*3600));
+			if($t>0)
+			{
+				$ret=$ret.$t."d";
+				$value=$value-$t*(24*3600);
+			}
+			$t=floor($value/(3600));
+			if($t>0)
+			{
+				$ret=$ret.$t."h";
+				$value=$value-$t*(3600);
+			}
+			$t=floor($value/(60));
+			if($t>0)
+			{
+				$ret=$ret.$t."m";
+				$value=$value-$t*(60);
+			}
+			$ret=$ret.$value."s";
+		
+			return $ret;	
+		}
+
 		$u="";
 
 		$value=$value*pow(1024,(int)$multiplier);
