@@ -388,7 +388,9 @@ Change these values.
 4.2.5 Configure and compile the source code for your system.
 
 cd src/zabbix_sucker
-./configure
+./configure --with-mysql  # for MySQL
+ or
+./configure --with-pgsql  # for PostgreSQL
 make
 
 cd src/zabbix_agent
@@ -396,7 +398,9 @@ cd src/zabbix_agent
 make
 
 cd src/zabbix_trapper
-./configure
+./configure --with-mysql  # for MySQL
+ or
+./configure --with-pgsql  # for PostgreSQL
 make
 
 cd src/zabbix_sender
