@@ -690,6 +690,6 @@ echo "***********************************************************"
 echo "*            Now run 'make'                               *"
 echo "*                                                         *"
 echo "*            Thank you for using Zabbix!                  *"
-echo "*              <http://www.zabbix.org>                    *"
+echo "*              <http://www.zabbix.com>                    *"
 echo "***********************************************************"
 echo
