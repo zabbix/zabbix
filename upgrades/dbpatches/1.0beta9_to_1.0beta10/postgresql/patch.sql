@@ -1,6 +1,8 @@
 alter table items add  units           varchar(10)     DEFAULT '' NOT NULL;
 
 update items set units='bps' where key_ like "netload%";
+update items set units='bytes' where key_ like "memory[%]";
+update items set units='bytes' where key_ like "disk%[%]";
 
 CREATE TABLE stats (
   itemid                int4            DEFAULT '0' NOT NULL,
