@@ -1,5 +1,8 @@
 Changes for 1.0alpha12:
 
+ - new type of parameters: parameter[*], actual value of "*" can
+ be passed from Zabbix server (Alexei)
+
  - zabbix_agentd will lower scheduling priority to 5 (Alexei)
  - fixed broken customized graphs, file chart2.html (Alexei)
 
