@@ -28,14 +28,16 @@
 
 	$grid=50;
 
-	$result=DBselect("select name,width,height from sysmaps where sysmapid=".$HTTP_GET_VARS["sysmapid"]);
+	$result=DBselect("select name,width,height,use_background,background from sysmaps where sysmapid=".$HTTP_GET_VARS["sysmapid"]);
 
 	$name=DBget_field($result,0,0);
 	$width=DBget_field($result,0,1);
 	$height=DBget_field($result,0,2);
+	$use_background=DBget_field($result,0,3);
+	$background=DBget_field($result,0,4);
 
-//	Header( "Content-type:  text/html"); 
-	Header( "Content-type:  image/png"); 
+	Header( "Content-type:  text/html"); 
+//	Header( "Content-type:  image/png"); 
 	Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 
 	check_authorisation();
@@ -78,7 +80,15 @@
 	$y=imagesy($im);
   
 #	ImageFilledRectangle($im,0,0,$width,$height,$black);
-	ImageFilledRectangle($im,0,0,$width,$height,$white);
+	if($use_background==1)
+	{
+		$back=ImageCreateFromString($background);
+		ImageCopy($im,$back,0,0,0,0,imagesx($back),imagesy($back));
+	}
+	else
+	{
+		ImageFilledRectangle($im,0,0,$width,$height,$white);
+	}
 
 	if(!isset($HTTP_GET_VARS["border"]))
 	{

@@ -149,8 +149,6 @@
 	define("S_DO_NOT_KEEP_ALARMS_OLDER_THAN",	"Do not keep alarms older than (in days)");
 	define("S_AVAILABLE_MEDIA_TYPES",		"AVAILABLE MEDIA TYPES");
 	define("S_NO_MEDIA_TYPES_DEFINED",		"No media types defined");
-	define("S_MEDIA",				"Media");
-	define("S_DESCRIPTION",				"Description");
 	define("S_SMTP_SERVER",				"SMTP server");
 	define("S_SMTP_HELO",				"SMTP helo");
 	define("S_SMTP_EMAIL",				"SMTP email");
@@ -165,7 +163,6 @@
 	define("S_DESCRIPTION_LARGE",			"DESCRIPTION");
 	define("S_DESCRIPTION_SMALL",			"Description");
 	define("S_GRAPH",				"Graph");
-	define("S_HISTORY",				"History");
 	define("S_TREND",				"Trend");
 	define("S_COMPARE",				"Compare");
 
@@ -179,16 +176,11 @@
 	define("S_CONFIGURATION_OF_GRAPH",		"Configuration of graph");
 	define("S_CONFIGURATION_OF_GRAPH_BIG",		"CONFIGURATION OF GRAPH");
 	define("S_ITEM_ADDED",				"Item added");
-	define("S_CANNOT_ADD_ITEM",			"Cannot add item");
 	define("S_ITEM_UPDATED",			"Item updated");
-	define("S_CANNOT_UPDATE_ITEM",			"Cannot update item");
-	define("S_ITEM_DELETED",			"Item deleted");
-	define("S_CANNOT_DELETE_ITEM",			"Cannot delete item");
 	define("S_SORT_ORDER_UPDATED",			"Sort order updated");
 	define("S_CANNOT_UPDATE_SORT_ORDER",		"Cannot update sort order");
 	define("S_DISPLAYED_PARAMETERS_BIG",		"DISPLAYED PARAMETERS");
 	define("S_SORT_ORDER",				"Sort order");
-	define("S_HOST",				"Host");
 	define("S_PARAMETER",				"Parameter");
 	define("S_COLOR",				"Color");
 	define("S_UP",					"Up");
@@ -200,16 +192,11 @@
 	define("S_CONFIGURATION_OF_GRAPHS",		"Configuration of graphs");
 	define("S_CONFIGURATION_OF_GRAPHS_BIG",		"CONFIGURATION OF GRAPHS");
 	define("S_GRAPH_ADDED",				"Graph added");
-	define("S_CANNOT_ADD_GRAPH",			"Cannot add graph");
 	define("S_GRAPH_UPDATED",			"Graph updated");
 	define("S_CANNOT_UPDATE_GRAPH",			"Cannot update graph");
 	define("S_GRAPH_DELETED",			"Graph deleted");
 	define("S_CANNOT_DELETE_GRAPH",			"Cannot delete graph");
 	define("S_ID",					"Id");
-	define("S_NAME",				"Name");
-	define("S_WIDTH",				"Width");
-	define("S_HEIGHT",				"Height");
-	define("S_ACTIONS",				"Actions");
 	define("S_NO_GRAPHS_DEFINED",			"No graphs defined");
 	define("S_DELETE_GRAPH_Q",			"Delete graph?");
 
@@ -233,14 +220,7 @@
 	define("S_CANNOT_UPDATE_HOST_STATUS",		"Cannot update host status");
 	define("S_HOST_DELETED",			"Host deleted");
 	define("S_CANNOT_DELETE_HOST",			"Cannot delete host");
-	define("S_GROUP_ADDED",				"Group added");
-	define("S_CANNOT_ADD_GROUP",			"Cannot add group");
-	define("S_GROUP_DELETED",			"Group deleted");
-	define("S_CANNOT_DELETE_GROUP",			"Cannot delete group");
-	define("S_GROUP_UPDATED",			"Group updated");
-	define("S_CANNOT_UPDATE_GROUP",			"Cannot update group");
 	define("S_CONFIGURATION_OF_HOST_GROUPS",	"CONFIGURATION OF HOST GROUPS");
-	define("S_MEMBERS",				"Members");
 	define("S_NO_HOST_GROUPS_DEFINED",		"No host groups defined");
 	define("S_NO_HOSTS_DEFINED",			"No hosts defined");
 	define("S_CONFIGURATION_OF_HOSTS_BIG",		"CONFIGURATION OF HOSTS");
@@ -263,11 +243,9 @@
 //	config.php
 	define("S_CONFIGURATION_OF_ITEMS",		"Configuration of items");
 	define("S_CONFIGURATION_OF_ITEMS_BIG",		"CONFIGURATION OF ITEMS");
-	define("S_ITEM_UPDATED",			"Item updated");
 	define("S_CANNOT_UPDATE_ITEM",			"Cannot update item");
 	define("S_STATUS_UPDATED",			"Status updated");
 	define("S_CANNOT_UPDATE_STATUS",		"Cannot update status");
-	define("S_ITEM_ADDED",				"Item added");
 	define("S_CANNOT_ADD_ITEM",			"Cannot add item");
 	define("S_ITEM_DELETED",			"Item deleted");
 	define("S_CANNOT_DELETE_ITEM",			"Cannot delete item");
@@ -300,16 +278,6 @@
 //	latestalarms.php
 	define("S_LATEST_ALARMS",			"Latest alarms");
 	define("S_HISTORY_OF_ALARMS_BIG",		"HISTORY OF ALARMS");
-	define("S_ALARMS_BIG",				"ALARMS");
-	define("S_TIME",				"Time");
-	define("S_SEVERITY",				"Severity");
-	define("S_UNKNOWN_BIG",				"UNKNOWN");
-	define("S_NOT_CLASSIFIED",			"Not classified");
-	define("S_INFORMATION",				"Information");
-	define("S_WARNING",				"Warning");
-	define("S_AVERAGE",				"Average");
-	define("S_HIGH",				"High");
-	define("S_DISASTER",				"Disaster");
 
 //	map.php
 	define("S_OK_BIG",				"OK");
@@ -337,8 +305,6 @@
 	define("S_MEDIA_DELETED",			"Media deleted");
 	define("S_CANNOT_DELETE_MEDIA",			"Cannot delete media");
 	define("S_SEND_TO",				"Send to");
-	define("S_ENABLED",				"Enabled");
-	define("S_DISABLED",				"Disabled");
 	define("S_NO_MEDIA_DEFINED",			"No media defined");
 	define("S_NEW_MEDIA",				"New media");
 	define("S_USE_IF_SEVERITY",			"Use if severity");
@@ -362,9 +328,6 @@
 	define("S_MENU_USERS",				"USERS");
 	define("S_MENU_HOSTS",				"HOSTS");
 	define("S_MENU_ITEMS",				"ITEMS");
-	define("S_MENU_TRIGGERS",			"TRIGGERS");
-	define("S_MENU_NETWORK_MAPS",			"NETWORK MAPS");
-	define("S_MENU_GRAPHS",				"GRAPHS");
 
 //	queue.php
 	define("S_QUEUE_BIG",				"QUEUE");
@@ -376,7 +339,6 @@
 //	report1.php
 	define("S_STATUS_OF_ZABBIX",			"Status of Zabbix");
 	define("S_STATUS_OF_ZABBIX_BIG",		"STATUS OF ZABBIX");
-	define("S_PARAMETER",				"Parameter");
 	define("S_VALUE",				"Value");
 	define("S_ZABBIX_SUCKERD_IS_RUNNING",		"zabbix_suckerd is running");
 	define("S_ZABBIX_TRAPPERD_IS_RUNNING",		"zabbix_trapperd is running");
@@ -464,7 +426,6 @@
 	define("S_ADD_SERVER_DETAILS",			"Add server details");
 
 //	srv_status.php
-	define("S_IT_SERVICES",				"IT services");
 	define("S_IT_SERVICES_BIG",			"IT SERVICES");
 	define("S_SERVICE",				"Service");
 	define("S_REASON",				"Reason");
@@ -503,7 +464,6 @@
 	define("S_TRIGGER_COMMENTS_BIG",		"TRIGGER COMMENTS");
 	define("S_COMMENT_UPDATED",			"Comment updated");
 	define("S_CANNOT_UPDATE_COMMENT",		"Cannot update comment");
-	define("S_COMMENTS",				"Comments");
 	define("S_ADD",					"Add");
 
 //	tr_status.php
@@ -522,9 +482,7 @@
 	define("S_SEVERITY_BIG",			"SEVERITY");
 	define("S_LAST_CHANGE_BIG",			"LAST CHANGE");
 	define("S_LAST_CHANGE",				"Last change");
-	define("S_ACTIONS",				"Actions");
 	define("S_COMMENTS",				"Comments");
-	define("S_SHOW_ACTIONS",			"Show actions");
 
 //	users.php
 	define("S_USERS",				"Users");

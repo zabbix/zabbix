@@ -1,5 +1,6 @@
 Changes for 1.1alpha1:
 
+ - added basic support of background images (Alexei)
  - added frontends/php/include/html.inc.php (Alexei)
  - added support for real delta. item.delta=2. (Alexei)
  - new selection for triggers.php (Alexei)
