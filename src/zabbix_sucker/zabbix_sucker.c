@@ -317,7 +317,7 @@ int main_loop()
 		}
 		if(sleeptime>0)
 		{
-			syslog( LOG_WARNING, "Sleeping for %d seconds", sleeptime );
+			syslog( LOG_DEBUG, "Sleeping for %d seconds", sleeptime );
 			sleep( sleeptime );
 		}
 		else
@@ -338,7 +338,7 @@ int main(int argc, char **argv)
 	signal( SIGQUIT, signal_handler );
 	signal( SIGTERM, signal_handler );
 
-	for(i=1;i<SUCKER_FORKS-1;i++)
+	for(i=1;i<SUCKER_FORKS;i++)
 	{
 		if(fork() == 0)
 		{
@@ -351,7 +351,7 @@ int main(int argc, char **argv)
 //	ret=setlogmask(LOG_UPTO(LOG_DEBUG));
 	ret=setlogmask(LOG_UPTO(LOG_WARNING));
 
-	syslog( LOG_WARNING, "zabbix_sucker started");
+	syslog( LOG_WARNING, "zabbix_sucker #%d started",sucker_num);
 
 	DBconnect();
 
