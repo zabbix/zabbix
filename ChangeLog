@@ -1,8 +1,10 @@
 Changes for 1.0alpha8:
 
+ - fixed availability report
+ - optimization of chart.html
+
  - added trend.html
  - added trends.html
-
  - improved performance of network map
  - added column icon to table sysmaps_hosts
  - added images Hub.png, Notebook.png, Printer.png, Router.png, Server.png, host.png
