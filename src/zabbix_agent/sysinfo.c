@@ -1840,7 +1840,27 @@ int	TOTALMEM(const char *cmd, const char *parameter,double  *value)
 	*value=(double)(v.t_rm<<2);
 	return SYSINFO_RET_OK;
 #else
+#ifdef HAVE_SYS_SYSCTL_H
+	static int mib[] = { CTL_HW, HW_PHYSMEM };
+	size_t len;
+	unsigned int memory;
+	int ret;
+	
+	len=sizeof(memory);
+
+	if(0==sysctl(mib,2,&memory,&len,NULL,0))
+	{
+		*value=(double)memory;
+		ret=SYSINFO_RET_OK;
+	}
+	else
+	{
+		ret=SYSINFO_RET_FAIL;
+	}
+	return ret;
+#else
 	return	SYSINFO_RET_FAIL;
+#endif
 #endif
 #endif
 #endif
