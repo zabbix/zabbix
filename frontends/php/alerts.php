@@ -50,7 +50,7 @@
 	$col=0;
 	while($row=DBfetch($result))
 	{
-                if(!check_right("User","R",$row["userid"]))
+		if(!check_right_on_trigger("R",$row["triggerid"]))
                 {
 			continue;
 		}
