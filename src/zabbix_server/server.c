@@ -120,7 +120,7 @@ void	uninit(void)
 	{
 		if(pids != NULL)
 		{
-			for(i=0;i<CONFIG_SUCKERD_FORKS-1;i++)
+			for(i=0;i<CONFIG_SUCKERD_FORKS+CONFIG_TRAPPERD_FORKS-1;i++)
 			{
 				if(kill(pids[i],SIGTERM) !=0 )
 				{
@@ -1254,7 +1254,11 @@ pid_t	child_trapper_make(int i,int listenfd, int addrlen)
 
 	if((pid = fork()) >0)
 	{
-			return (pid);
+		return (pid);
+	}
+	else
+	{
+//		sucker_num=i;
 	}
 
 	/* never returns */
@@ -1331,7 +1335,7 @@ int main(int argc, char **argv)
 	return 0;
 #endif
 	DBclose();
-	pids=calloc(CONFIG_SUCKERD_FORKS-1,sizeof(pid_t));
+	pids=calloc(CONFIG_SUCKERD_FORKS+CONFIG_TRAPPERD_FORKS-1,sizeof(pid_t));
 
 #ifdef ZABBIX_THREADS
 	my_init();
@@ -1372,8 +1376,6 @@ int main(int argc, char **argv)
 
 		listenfd = tcp_listen(host,CONFIG_LISTEN_PORT,&addrlen);
 
-		pids = calloc(CONFIG_TRAPPERD_FORKS, sizeof(pid_t));
-
 		for(i = CONFIG_SUCKERD_FORKS; i< CONFIG_SUCKERD_FORKS+CONFIG_TRAPPERD_FORKS; i++)
 		{
 			pids[i] = child_trapper_make(i, listenfd, addrlen);
@@ -1386,7 +1388,7 @@ int main(int argc, char **argv)
 	else if(sucker_num == 1)
 	{
 /* Second instance of zabbix_suckerd sends alerts to users */
-		zabbix_log( LOG_LEVEL_WARNING, " #server %d started [Alerter]",sucker_num);
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Alerter]",sucker_num);
 		main_alerter_loop();
 	}
 	else if(sucker_num == 2)
