@@ -250,6 +250,8 @@
 		else if( ($screenitemid!=0) && ($resource==3) )
 		{
 			show_screen_plaintext($resourceid);
+			echo "<p align=center>";
+			echo "<a href=screenedit.php?register=edit&screenid=$screenid&x=$c&y=$r>".S_CHANGE."</a>";
 		}
 		else
 		{
