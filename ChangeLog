@@ -1,6 +1,5 @@
 Changes for 1.1alpha1:
 
- - added experimental poller (Alexei)
  - added housekeeping of trends (Alexei)
  - added column items.trends (Alexei)
  - added escaping of SQL statements where needed (Alexei)
