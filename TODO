@@ -1,5 +1,6 @@
 1.1:
  - hardlinked templates (several templates, one host)
+ - escalation and repeated notifications
 
  - make sure all screens looks good in case of hundreds of servers/groups
  - use oop approach for new development
@@ -12,10 +13,11 @@
  - SNMP trapping
  - SNMP v3
  - pass parameters to UserParameters
- - custom multiplier
+ - custom multiplier or more complex expressions
  - calculate MIN value for graphs (do not use '0')
  - infrastructure for reports
  - stacked graphs
+ - audit logs
 
  - man pages for all daemons
  - icmppingsec->icmppingmsec
@@ -176,7 +178,6 @@ DIFFERENT TASKS:
  - auto-discovery
  - Native Windows GUI
  - distributed monitoring
- - audit log
  - backup/restore scripts for server. Backup all (DB, configs, etc).
  - IT Helpdesk
  - personalisation (refresh rate, graph size, default graph period, etc)
