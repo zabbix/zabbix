@@ -66,7 +66,6 @@ BUGS:
  - add protection from IT Service looping
  - BUG. No horizontal lines. Replace ImageDashedLine() to gdImageLine() plus
    ImageSetStyle()
- - BUG. Interface counters fail on bounced interface
 
 PERFORMANCE IMPROVEMENTS:
 
