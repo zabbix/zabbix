@@ -39,6 +39,13 @@
 ?>
 
 <?php
+// BEGIN - IGMI - keep default value
+	if(!isset($HTTP_GET_VARS["keep"]))
+	{
+		$HTTP_GET_VARS["keep"]=1;
+	}
+// END - IGMI - keep default value
+
 	if(!isset($HTTP_GET_VARS["fullscreen"]))
 	{
 		show_table_header_begin();
@@ -59,7 +66,26 @@
 			{
 				echo "<b>[";
 			}
-			echo "<a href='charts.php?graphid=".$row["graphid"]."'>".$row["name"]."</a>";
+// BEGIN - IGMI - keep support
+			$str="";
+			if(isset($HTTP_GET_VARS["keep"]))
+			{
+				if($HTTP_GET_VARS["keep"] == 1)
+				{
+					if(isset($HTTP_GET_VARS["from"]))
+					{
+						$str=$str."&from=".$HTTP_GET_VARS["from"];
+					}
+					if(isset($HTTP_GET_VARS["period"]))
+					{
+						$str=$str."&period=".$HTTP_GET_VARS["period"];
+					}
+				}
+				$str=$str."&keep=".$HTTP_GET_VARS["keep"];
+			}
+			echo "<a href='charts.php?graphid=".$row["graphid"].$str."'>".$row["name"]."</a>";
+// END - IGMI - keep support
+//			echo "<a href='charts.php?graphid=".$row["graphid"]."'>".$row["name"]."</a>";
 			if(isset($HTTP_GET_VARS["graphid"]) && ($HTTP_GET_VARS["graphid"] == $row["graphid"]) )
 			{
 				echo "]</b>";
@@ -93,14 +119,16 @@
 		{
 			$str=$str."&period=".$HTTP_GET_VARS["period"];
 		}
+// BEGIN - IGMI - keep support added
 		if(isset($HTTP_GET_VARS["fullscreen"]))
 		{
-			$map="<a href=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."$str\">".$row["name"]."</a>";
+			$map="<a href=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"].$str."&keep=".$HTTP_GET_VARS["keep"]."\">".$row["name"]."</a>";
 		}
 		else
 		{
-			$map="<a href=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&fullscreen=1$str\">".$row["name"]."</a>";
+			$map="<a href=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&fullscreen=1".$str."&keep=".$HTTP_GET_VARS["keep"]."\">".$row["name"]."</a>";
 		}
+// END - IGMI - keep support added
 	}
 	else
 	{
@@ -123,18 +151,7 @@
 	if(isset($HTTP_GET_VARS["graphid"]))
 	{
 		echo "<script language=\"JavaScript\">";
-		echo "if (navigator.appName == \"Microsoft Internet Explorer\")";
-		echo "{";
-		echo "	document.write(\"<IMG SRC='chart2.php?graphid=".$HTTP_GET_VARS["graphid"]."&period=".$HTTP_GET_VARS["period"]."&from=".$HTTP_GET_VARS["from"]."&width=\"+(document.body.clientWidth-108)+\"'>\");";
-		echo "}";
-		echo "else if (navigator.appName == \"Netscape\")";
-		echo "{";
-		echo "	document.write(\"<IMG SRC='chart2.php?graphid=".$HTTP_GET_VARS["graphid"]."&period=".$HTTP_GET_VARS["period"]."&from=".$HTTP_GET_VARS["from"]."&width=\"+(document.width-108)+\"'>\");";
-		echo "}";
-		echo "else";
-		echo "{";
-		echo "	document.write(\"<IMG SRC='chart2.php?graphid=".$HTTP_GET_VARS["graphid"]."&period=".$HTTP_GET_VARS["period"]."&from=".$HTTP_GET_VARS["from"]."'>\");";
-		echo "}";
+		echo "document.write(\"<IMG SRC='chart2.php?graphid=".$HTTP_GET_VARS["graphid"]."&period=".$HTTP_GET_VARS["period"]."&from=".$HTTP_GET_VARS["from"]."&width=\"+(document.width-108)+\"'>\")";
 		echo "</script>";
 	}
 	else
@@ -145,69 +162,64 @@
 	echo "</TR>";
 	echo "</TABLE>";
 
-	if(isset($HTTP_GET_VARS["graphid"])&&(!isset($HTTP_GET_VARS["fullscreen"])))
+	if(isset($HTTP_GET_VARS["graphid"])/*&&(!isset($HTTP_GET_VARS["fullscreen"]))*/)
 	{
+// BEGIN - IGMI - just another way of navigation
 		echo("<div align=center>");
-		echo("<hr>");
-		$tmp=$HTTP_GET_VARS["from"]+12*14;
-		echo("[<A HREF=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&from=$tmp&period=".$HTTP_GET_VARS["period"]."\">");
-		echo("Week back</A>] ");
 
-		$tmp=$HTTP_GET_VARS["from"]+12;
-		echo("[<A HREF=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&from=$tmp&period=".$HTTP_GET_VARS["period"]."\">");
-		echo("12h back</A>] ");
-		
-		$tmp=$HTTP_GET_VARS["from"]+1;
-		echo("[<A HREF=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&from=$tmp&period=".$HTTP_GET_VARS["period"]."\">");
-		echo("1h back</A>] ");
+		echo("<b>Set&nbsp;Period:</b>&nbsp;(&nbsp;");
 
-		$tmp=$HTTP_GET_VARS["period"]+3600;
-		echo("[<A HREF=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&from=".$HTTP_GET_VARS["from"]."&period=$tmp\">");
-		echo("+1h</A>] ");
+		$hour=3600;
+		foreach(array(1,2,4,8,12,24) as $count){
+			$tmp=$hour*$count;
+			echo("[<A HREF=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&from=".$HTTP_GET_VARS["from"]."&period=".$tmp."&keep=".$HTTP_GET_VARS["keep"]."\">");
+			echo($count."h</A>]&nbsp;");
+		}
 
-		if ($HTTP_GET_VARS["period"]>3600) 
+            echo("or&nbsp;");
+		$tmp=$HTTP_GET_VARS["period"]+$hour;
+		echo("[<A HREF=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&from=".$HTTP_GET_VARS["from"]."&period=".$tmp."&keep=".$HTTP_GET_VARS["keep"]."\">");
+		echo("+1h</A>]&nbsp;");
+
+		if ($HTTP_GET_VARS["period"]>$hour) 
 		{
-			$tmp=$HTTP_GET_VARS["period"]-3600;
-			echo("[<A HREF=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&from=".$HTTP_GET_VARS["from"]."&period=$tmp\">");
-			echo("-1h</A>] ");
+			$tmp=$HTTP_GET_VARS["period"]-$hour;
+			echo("[<A HREF=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&from=".$HTTP_GET_VARS["from"]."&period=".$tmp."&keep=".$HTTP_GET_VARS["keep"]."\">");
+			echo("-1h</A>]&nbsp;");
 		}
 		else
 		{
-			echo("[-1h]");
+			echo("[-1h]&nbsp;");
 		}
-	
-		if ($HTTP_GET_VARS["from"]>0) // HOUR FORWARD
+
+		echo(")");
+
+		echo(" <b>Go&nbsp;Back:</b>&nbsp;(&nbsp;");
+
+		$day=24;
+		foreach(array(0,1,2,7,14) as $count){
+			$tmp=$day*$count;
+			echo("[<A HREF=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&from=".$tmp."&period=".$HTTP_GET_VARS["period"]."&keep=".$HTTP_GET_VARS["keep"]."\">");
+			echo($count."d</A>]&nbsp;");
+		}
+            
+		echo(")");
+
+		if(isset($HTTP_GET_VARS["keep"]))
 		{
-			$tmp=$HTTP_GET_VARS["from"]-1;
-			echo("[<A HREF=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&from=$tmp&period=".$HTTP_GET_VARS["period"]."\">");
-			echo("1h forward</A>] ");
+			echo(" <b>Keep&nbsp;period&nbsp;=</b>&nbsp;");
+			if($HTTP_GET_VARS["keep"] == 1)
+			{
+				echo("<A HREF=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&from=".$HTTP_GET_VARS["from"]."&period=".$HTTP_GET_VARS["period"]."&keep=0\">Off</a>");
+			}
+			else
+			{
+				echo("<A HREF=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&from=".$HTTP_GET_VARS["from"]."&period=".$HTTP_GET_VARS["period"]."&keep=1\">On</a>");
+			}
 		}
-		else
-		{
-			echo("[1h forward]");  
-		}
-		if (isset($HTTP_GET_VARS["from"]) && ($HTTP_GET_VARS["from"]>0))
-		{
-			$tmp=$HTTP_GET_VARS["from"]-12;
-			echo("[<A HREF=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&from=$tmp&period=".$HTTP_GET_VARS["period"]."\">");
-			echo("12h forward</A>] ");
-		}
-		else
-		{
-			echo("[12h forward]");
-		}
-	
-		if (isset($HTTP_GET_VARS["from"]) && ($HTTP_GET_VARS["from"]>0))
-		{
-			$tmp=$HTTP_GET_VARS["from"]-12*14;
-			echo("[<A HREF=\"charts.php?graphid=".$HTTP_GET_VARS["graphid"]."&from=$tmp&period=".$HTTP_GET_VARS["period"]."\">");
-			echo("Week forward</A>] ");
-		}
-		else
-		{
-			echo("[Week forward]");
-		}
+
 		echo("</div>");
+// END - IGMI - just another way of navigation
 	}
 	
 ?>
