@@ -86,6 +86,11 @@
 			$result=add_user_group($HTTP_GET_VARS["name"], $HTTP_GET_VARS["users"]);
 			show_messages($result, "Group added", "Cannot add group");
 		}
+		if($HTTP_GET_VARS["register"]=="update group")
+		{
+			$result=update_user_group($HTTP_GET_VARS["usrgrpid"], $HTTP_GET_VARS["name"], $HTTP_GET_VARS["users"]);
+			show_messages($result, "Group updated", "Cannot update group");
+		}
 		if($HTTP_GET_VARS["register"]=="delete group")
 		{
 			$result=delete_user_group($HTTP_GET_VARS["usrgrpid"]);
