@@ -1,5 +1,6 @@
 Changes for 1.1alpha7:
 
+ - fixed memory[free] for HP-UX when >4GB of memory (Alexei)
  - hard-linked templates works when deleting an action (Alexei)
  - hard-linked templates works when adding an action (Alexei)
  - added frontends/php/include/hosts.inc.php (Alexei)
