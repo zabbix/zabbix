@@ -54,7 +54,7 @@
 		function initColors()
 		{
 // I should rename No Alpha to Alpha at some point to get rid of some confusion
-			if(function_exists("ImageColorExactAlpha")&&function_exists("ImageCreateTrueColor"))
+			if(function_exists("ImageColorExactAlpha")&&function_exists("ImageCreateTrueColor")&&@imagecreatetruecolor(1,1))
 			{
 				$this->colors["Red"]=		ImageColorExactAlpha($this->im,255,0,0,50); 
 				$this->colors["Dark Red"]=	ImageColorExactAlpha($this->im,150,0,0,50); 
@@ -505,7 +505,7 @@
 
 			check_authorisation();
 		
-			if(function_exists("ImageColorExactAlpha")&&function_exists("ImageCreateTrueColor"))
+			if(function_exists("ImageColorExactAlpha")&&function_exists("ImageCreateTrueColor")&&@imagecreatetruecolor(1,1))
 			{
 				$this->im = ImageCreateTrueColor($this->sizeX+$this->shiftX+61,$this->sizeY+$this->shiftY+62+12*$this->num+8);
 			}

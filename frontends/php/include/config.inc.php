@@ -4943,7 +4943,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 			if( ($status==0)||($status==2))
 			{
-				if(function_exists("imagecreatetruecolor"))
+				if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
 				{
 					$map=$map."\n<area shape=rect coords=$x,$y,".($x+48).",".($y+48)." href=\"tr_status.php?hostid=$hostid&noactions=true&onlytrue=true&compact=true\" alt=\"$host\">";
 				}

@@ -40,7 +40,7 @@
 
 	check_authorisation();
 
-	if(function_exists("imagecreatetruecolor"))
+	if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
 	{
 		$im = imagecreatetruecolor($width,$height);
 	}
@@ -135,7 +135,7 @@
 		$x2=DBget_field($result1,0,0);
 		$y2=DBget_field($result1,0,1);
 
-		if(function_exists("imagecreatetruecolor"))
+		if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
 		{
 			$size=48/2;
 		}
@@ -203,7 +203,7 @@
 
 		if(@gettype($icons["$icon"])!="resource")
 		{
-			if(function_exists("imagecreatetruecolor"))
+			if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
 			{
 				$icons[$icon]=ImageCreateFromPNG("images/sysmaps/$icon.png");
 			}
