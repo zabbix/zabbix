@@ -4608,6 +4608,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	        $result=DBselect("select count(*) from hosts where status=1");
 		$stat["hosts_count_not_monitored"]=DBget_field($result,0,0);
 
+	        $result=DBselect("select count(*) from hosts where status=3");
+		$stat["hosts_count_template"]=DBget_field($result,0,0);
+
 	        $result=DBselect("select count(*) from users");
 		$stat["users_count"]=DBget_field($result,0,0);
 
