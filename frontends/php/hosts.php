@@ -78,26 +78,26 @@
         	if(check_right("Host","U",$row["hostid"]))
 		{
 			if($row["status"] == 0)	
-				echo "<a href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=1\">Monitored</a>";
+				echo "<a href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=1\"><font color=\"00AA00\">Monitored</font></a>";
 			else if($row["status"] == 1)
-				echo "<a href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=0\">Not monitored</a>";
+				echo "<a href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=0\"><font color=\"AA0000\">Not monitored</font></a>";
 			else if($row["status"] == 2)
-				echo "Unreachable";
+				echo "<font color=\"AAAAAA\">Unreachable</font>";
 			else if($row["status"] == 3)
-				echo "Template";
+				echo "<font color=\"AAAAAA\">Template</font>";
 			else
 				echo "Unknown";
 		}
 		else
 		{
 			if($row["status"] == 0)	
-				echo "Monitored";
+				echo "<font color=\"00AA00\">Monitored</font>";
 			else if($row["status"] == 1)
-				echo "Not monitored";
+				echo "<font color=\"AA0000\">Not monitored</font>";
 			else if($row["status"] == 2)
-				echo "Unreachable";
+				echo "<font color=\"AAAAAA\">Unreachable</font>";
 			else if($row["status"] == 3)
-				echo "Template";
+				echo "<font color=\"AAAAAA\">Template</font>";
 			else
 				echo "Unknown";
 		}
