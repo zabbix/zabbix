@@ -1,3 +1,5 @@
+/*#define	TEST_PARAMETERS*/
+
 #include "config.h"
 
 #include <stdlib.h>
@@ -79,6 +81,10 @@ float	process_input()
 
 int	main()
 {
+#ifdef	TEST_PARAMETERS
+	test_parameters();
+	return	SUCCEED;
+#endif
 	if(check_security() == FAIL)
 	{
 		exit(FAIL);

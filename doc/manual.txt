@@ -32,6 +32,7 @@
 5. Chapter 5 (Administration)
 5.1 Zabbix configuration
 5.2 Expressions for triggers
+5.3 Supported parameters by platform
 
 6. Chapter 6 (Upgrading)
 6.1 Zabbix 1.0alpha8
@@ -332,11 +333,12 @@ I've tried to run Zabbix on PostgreSQL 6.5x with no luck. PostgreSQL crashes aft
 one-tree minutes of zabbix_suckerd running. So, PostgreSQL version 7.0.2 or later is strongly
 recommended.
 
-For small installations MySQL is best choice. However, if you plan to monitor more than
-10-20 servers and keep long history of monitored parameters, PostgreSQL is preferred. Why ? 
-Because MySQL locks whole table during execution of SQL statements.
 
-Additionally, if you plan to use PostgreSQL, fast CPU required. 
+Choosing between PostgreSQL and MySQL, I would go for MySQL + InnoDB. Why ? Several reasons exist:
+
+- my recent benchmarks clearly show that PostgreSQL (7.1.x) works at least 10 times slower than MySQL (3.23.29)
+- MySQL MyISAM table is not good choise because of lack of row locking. So, InnoDB is required
+- no need to constantly run "vacuum" command for MySQL
 
 Memory requirements:
 
@@ -571,6 +573,75 @@ differs from last one.
 
 Similiar expressions could be useful to monitor changes in important files, such as
 /etc/passwd, /etc/inetd.conf, /kernel, etc.
+
+5.3 Supported parameters by platform
+
+PARAMETER			| DEBIAN WOODY | Solaris | HP-UX 11.00 | FreeBSD
+				|    (i386)    | 
+---------------------------------------------------------------------------------------
+memory[total]			|	X      |
+memory[shared]			|	X      |
+memory[buffers]			|	X      |
+memory[cached]			|	X      |
+memory[free]			|	X      |
+
+diskfree[/]			|	X      |
+diskfree[/opt]			|	X      |
+diskfree[/tmp]			|	X      |
+diskfree[/usr]			|	X      |
+diskfree[/home]			|	X      |
+diskfree[/var]			|	X      |
+
+inodefree[/]			|	X      |
+inodefree[/opt]			|	X      |
+inodefree[/tmp]			|	X      |
+inodefree[/usr]			|	X      |
+inodefree[/home]		|	X      |
+inodefree[/var]			|	X      |
+
+cksum[/etc/inetd_conf]		|	X      |
+cksum[/etc/services]		|	X      |
+cksum[/vmlinuz]			|	X      |
+cksum[/etc/passwd]		|	X      |
+cksum[/usr/sbin/sshd]		|	X      |
+cksum[/usr/bin/ssh]		|	X      |
+      
+filesize[/var/log/syslog]	|	X      |
+
+swap[free]			|	X      |
+swap[total]			|	X      |
+
+swap[in]			|	X      |
+swap[out]			|	X      |
+
+system[interrupts]		|	X      |
+system[switches]		|	X      |
+
+io[disk_io]			|	X      |
+io[disk_rio]			|	X      |
+io[disk_wio]			|	X      |
+io[disk_rblk]			|	X      |
+io[disk_wblk]			|	X      |
+
+system[procload]		|	X      |
+system[procload5]		|	X      |
+system[procload15]		|	X      |
+system[proccount]		|	X      |
+system[procrunning]		|	X      |
+system[uptime]			|	X      |
+system[users]			|	X      |
+
+ping				|	X      |
+tcp_count			|	X      |
+
+net[listen_21]			|	X      |
+net[listen_22]			|	X      |
+net[listen_23]			|	X      |
+net[listen_25]			|	X      |
+net[listen_80]			|	X      |
+net[listen_110]			|	X      |
+net[listen_143]			|	X      |
+
 
 6. Chapter 6 (Upgrading)
 
