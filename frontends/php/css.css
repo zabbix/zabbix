@@ -176,6 +176,11 @@ A.on:link
 	background-color: #DDAAAA;
 }
 
+.normal
+{
+	background-color: #AADDAA;
+}
+
 td.top_header_left
 {
 	background-color: #FFFFFF;

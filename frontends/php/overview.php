@@ -89,7 +89,8 @@
 		$_GET["sort"]="description";
 	}
 
-	if(isset($_GET["groupid"]))
+	if(0)
+//	if(isset($_GET["groupid"]))
 	{
 		table_begin();
 		$header=array("&nbsp;");
@@ -144,6 +145,77 @@
 				else
 				{
 					$value="-";
+				}
+				$rows=array_merge($rows,array($value));
+			}
+
+			table_row($rows, $col++);
+		}
+		table_end();
+		show_table_header_end();
+	}
+	if(isset($_GET["groupid"]))
+	{
+		table_begin();
+		$header=array("&nbsp;");
+		$hosts=array();
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg,functions f,triggers t where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid and t.triggerid=f.triggerid and f.itemid=i.itemid group by h.hostid,h.host order by h.host";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			$header=array_merge($header,array($row["host"]));
+			$hosts=array_merge($hosts,array($row["hostid"]));
+		}
+		table_header($header);
+
+		$col=0;
+		if(isset($_GET["sort"]))
+		{
+			switch ($_GET["sort"])
+			{
+				case "description":
+					$_GET["sort"]="order by i.description";
+					break;
+				case "lastcheck":
+					$_GET["sort"]="order by i.lastclock";
+					break;
+				default:
+					$_GET["sort"]="order by i.description";
+					break;
+			}
+		}
+		else
+		{
+			$_GET["sort"]="order by i.description";
+		}
+//		$sql="select distinct description from items order by 1;";
+		$sql="select distinct t.description from hosts h,items i,hosts_groups hg,triggers t,functions f where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid and t.triggerid=f.triggerid and f.itemid=i.itemid order by 1";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			$rows=array(nbsp($row["description"]));
+			foreach($hosts as $hostid)
+			{
+				$sql="select t.status,t.value from triggers t,functions f,items i where f.triggerid=t.triggerid and i.itemid=f.itemid and i.hostid=$hostid and t.description='".addslashes($row["description"])."'";
+				$result2=DBselect($sql);
+				if(DBnum_rows($result2)==1)
+				{
+					$row2=DBfetch($result2);
+					if($row2["status"]==0)
+					{
+						if($row2["value"] == TRIGGER_VALUE_FALSE)
+							$value=array("value"=>"&nbsp;","class"=>"normal");
+						else
+							$value=array("value"=>"&nbsp;","class"=>"high");
+					}
+					else
+					{
+						$value="&nbsp;";
+					}
+				}
+				else
+				{
+					$value="&nbsp;";
 				}
 				$rows=array_merge($rows,array($value));
 			}
