@@ -178,6 +178,11 @@ A.on:link
 	background-color: #DDAAAA;
 }
 
+.unknown_trigger
+{
+	background-color: #BCBCBC;
+}
+
 .normal
 {
 	background-color: #AADDAA;
