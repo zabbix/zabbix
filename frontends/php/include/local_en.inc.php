@@ -20,6 +20,9 @@
 ?>
 <?php
 
+	define("S_DATE_FORMAT_YMDHMS",				"d M H:i:s");
+	define("S_DATE_FORMAT_YMD",				"d M Y");
+
 //	about.php
 	define("S_ABOUT_ZABBIX",			"About ZABBIX");
 	define("S_INFORMATION_ABOUT_ZABBIX",		"Information about ZABBIX (v1.1alpha6)");

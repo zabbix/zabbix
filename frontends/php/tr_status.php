@@ -561,7 +561,7 @@
 		elseif($row["priority"]==5)	$priority=array("value"=>S_DISASTER,"class"=>"disaster");
 		else				$priority=$row["priority"];
 
-		$lastchange="<A HREF=\"alarms.php?triggerid=".$row["triggerid"]."\">".date("d M H:i:s",$row["lastchange"])."</a>";
+		$lastchange="<A HREF=\"alarms.php?triggerid=".$row["triggerid"]."\">".date(S_DATE_FORMAT_YMDHMS,$row["lastchange"])."</a>";
 
 		$actions=array("hide"=>1);
 		if($noactions!='true')

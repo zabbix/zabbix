@@ -102,8 +102,8 @@
 			}
 			$stat=calculate_service_availability($service["serviceid"],$period_start,$period_end);
 
-			$from=date("d M Y",$period_start);
-			$till=date("d M Y",$period_end);
+			$from=date(S_DATE_FORMAT_YMD,$period_start);
+			$till=date(S_DATE_FORMAT_YMD,$period_end);
 	
 			$t=sprintf("%2.2f%%",$stat["problem"]);
 			$t_time=sprintf("%dd %dh %dm",$stat["problem_time"]/(24*3600),($stat["problem_time"]%(24*3600))/3600,($stat["problem_time"]%(3600))/(60));

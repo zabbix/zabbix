@@ -1403,7 +1403,7 @@ echo "</head>";
 		while($row=DBfetch($result))
 		{
 			table_row(array(
-				date("d M H:i:s",$row["clock"]),
+				date(S_DATE_FORMAT_YMDHMS,$row["clock"]),
 				$row["value"],
 				),$col++);
 		}
@@ -3792,7 +3792,7 @@ echo "</head>";
 		else
 		{
 			$till=time(NULL)-$from*3600;
-			$till=date("d M - H:i:s",$till);   
+			$till=date(S_DATE_FORMAT_YMDHMS,$till);   
 		}
 
 		if (!isset($period))
