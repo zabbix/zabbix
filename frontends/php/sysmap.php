@@ -268,7 +268,15 @@
 	$icons[1]="Workstation";
 	$icons[2]="Printer";
 	$icons[3]="Hub";
-	for($i=0;$i<4;$i++)
+	$icons[4]="Battery";
+	$icons[5]="Display";
+	$icons[6]="Network";
+	$icons[7]="Palm";
+	$icons[8]="Phone";
+	$icons[9]="PrinterLaser";
+	$icons[10]="Satellite";
+	$icons[11]="Terminal";
+	for($i=0;$i<12;$i++)
 	{
 		if(isset($HTTP_GET_VARS["shostid"]) && ($icon==$icons[$i]))
 //		if(isset($HTTP_GET_VARS["hostid"]) && ($HTTP_GET_VARS["icon"]==$icons[$i]))
