@@ -361,7 +361,9 @@
 	show_table2_v_delimiter();
 	echo nbsp("Use IP address");
 	show_table2_h_delimiter();
-	echo "<INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"useip\" $useip onChange=\"submit()\">";
+// onChange does not work on some browsers: MacOS, KDE browser
+//	echo "<INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"useip\" $useip onChange=\"submit()\">";
+	echo "<INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"useip\" $useip onClick=\"submit()\">";
 
 	if($useip=="checked")
 	{
