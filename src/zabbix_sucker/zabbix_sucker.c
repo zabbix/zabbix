@@ -202,18 +202,15 @@ void	process_config_file(void)
 		}
 		else if(strcmp(parameter,"DBName")==0)
 		{
-			CONFIG_DBNAME=(char *)malloc(strlen(value));
-			strcpy(CONFIG_DBNAME,value);
+			CONFIG_DBNAME=strdup(value);
 		}
 		else if(strcmp(parameter,"DBUser")==0)
 		{
-			CONFIG_DBUSER=(char *)malloc(strlen(value));
-			strcpy(CONFIG_DBUSER,value);
+			CONFIG_DBUSER=strdup(value);
 		}
 		else if(strcmp(parameter,"DBPassword")==0)
 		{
-			CONFIG_DBPASSWORD=(char *)malloc(strlen(value));
-			strcpy(CONFIG_DBPASSWORD,value);
+			CONFIG_DBPASSWORD=strdup(value);
 		}
 		else
 		{
