@@ -1,5 +1,6 @@
 Changes for 1.1alpha7:
 
+ - fixed simple checks (Alexei)
  - fixed startup of housekeeper (Alexei)
  - added frontends/php/include/triggers.inc.php (Alexei)
  - added frontends/php/include/graphs.inc.php (Alexei)
