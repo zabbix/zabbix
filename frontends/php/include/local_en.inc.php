@@ -258,6 +258,7 @@
 	define("S_DELETE_SELECTED_HOST_Q",		"Delete selected host?");
 	define("S_GROUP_NAME",				"Group name");
 	define("S_HOST_GROUP",				"Host group");
+	define("S_HOST_GROUPS",				"Host groups");
 
 //	items.php
 	define("S_CONFIGURATION_OF_ITEMS",		"Configuration of items");

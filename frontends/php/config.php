@@ -98,7 +98,7 @@
 	$h2=$h2."<option value=\"2\" ".iif(isset($_GET["config"])&&$_GET["config"]==2,"selected","").">".S_ESCALATION_RULES;
 	$h2=$h2."</select>";
 
-	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"config.php\">", "</form>");
+	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"config.php\">", "</form>");
 
 
 #	show_table_header(S_CONFIGURATION_OF_ZABBIX_BIG);
