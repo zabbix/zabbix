@@ -178,7 +178,7 @@
 		function period2str($period)
 		{
 			$minute=60; $hour=$minute*60; $day=$hour*24;
-			$str.=" ( ";
+			$str = " ( ";
 
 			$days=floor($this->period/$day);
 			$hours=floor(($this->period%$day)/$hour);
