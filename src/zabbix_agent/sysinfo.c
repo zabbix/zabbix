@@ -93,7 +93,6 @@ COMMAND	commands[]=
 	{"io[disk_wblk]"		,DISK_WBLK, 0},
 
 	{"system[procload]"		,PROCLOAD, 0},
-	{"test"				,TEST, 0},
 	{"system[procload5]"		,PROCLOAD5, 0},
 	{"system[procload15]"		,PROCLOAD15, 0},
 	{"system[proccount]"		,PROCCOUNT, 0},
@@ -581,20 +580,6 @@ float	SWAPFREE(void)
 #else
 	return	FAIL;
 #endif
-}
-
-float	TEST(void)
-{
-	struct sysinfo info;
-
-	if( 0 == sysinfo(&info))
-	{
-		return	(float)info.freeswap;
-	}
-	else
-	{
-		return	FAIL;
-	}
 }
 
 float	PROCCOUNT(void)

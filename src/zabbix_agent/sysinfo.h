@@ -28,7 +28,6 @@ float	SWAPFREE(void);
 float	SWAPTOTAL(void);
 float	TCP_LISTEN(const char *porthex);
 float	UPTIME(void);
-float	TEST(void);
 float	EXECUTE(char *command);
 
 #define COMMAND struct command_type
