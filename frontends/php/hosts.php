@@ -123,7 +123,7 @@
 			$members["value"]=$members["value"].DBget_field($result1,$i,0);
 			if($i<DBnum_rows($result1)-1)
 			{
-				$members["value"]=$members["value"].",&nbsp;";
+				$members["value"]=$members["value"].", ";
 			}
 		}
 		$members["value"]=$members["value"]."&nbsp;";
