@@ -2305,6 +2305,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 			add_group_to_host($hostid,$newgroup);
 		}
+
+		update_profile("HOST_PORT",$port);
+		
 		return	$result;
 	}
 
@@ -2373,6 +2376,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	function	delete_media_by_userid($userid)
 	{
 		$sql="delete from media where userid=$userid";
+		return	DBexecute($sql);
+	}
+
+	function	delete_profiles_by_userid($userid)
+	{
+		$sql="delete from profiles where userid=$userid";
 		return	DBexecute($sql);
 	}
 
@@ -2489,6 +2498,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		delete_media_by_userid($userid);
 		delete_actions_by_userid($userid);
 		delete_rights_by_userid($userid);
+		delete_profiles_by_userid($userid);
 
 		$sql="delete from users where userid=$userid";
 		return DBexecute($sql);
@@ -3815,4 +3825,53 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 		return $res;
 	}
+
+	function	get_profile($idx,$default_value)
+	{
+		global $USER_DETAILS;
+
+		if($USER_DETAILS["alias"]=="guest")
+		{
+			return $default_value;
+		}
+
+		$sql="select value from profiles where userid=".$USER_DETAILS["userid"]." and idx='$idx'";
+		$result=DBselect($sql);
+
+		if(DBnum_rows($result)==0)
+		{
+			return $default_value;
+		}
+		else
+		{
+			$row=DBfetch($result);
+			return $row["value"];
+		}
+	}
+
+	function	update_profile($idx,$value)
+	{
+		global $USER_DETAILS;
+
+		if($USER_DETAILS["alias"]=="guest")
+		{
+			return;
+		}
+
+		$sql="select value from profiles where userid=".$USER_DETAILS["userid"]." and idx='$idx'";
+		$result=DBselect($sql);
+
+		if(DBnum_rows($result)==0)
+		{
+			$sql="insert into profiles (userid,idx,value) values (".$USER_DETAILS["userid"].",'$idx','$value')";
+			DBexecute($sql);
+		}
+		else
+		{
+			$row=DBfetch($result);
+			$sql="update profiles set value='$value' where userid=".$USER_DETAILS["userid"]." and idx='$idx'";
+			DBexecute($sql);
+		}
+	}
+
 ?>

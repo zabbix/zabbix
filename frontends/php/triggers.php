@@ -213,8 +213,7 @@
 			{
 				echo "<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."#form\">Change</A> ";
 			}
-//			echo "-<A HREF=\"actions.php?triggerid=".$row["triggerid"]."&description=".$row["description"]."\">ShowActions</A>";
-			echo "-<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">ShowActions</A>";
+			echo "-<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">Actions</A>";
 			echo "</TD>";
 			echo "</TR>";
 		}

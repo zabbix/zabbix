@@ -1,5 +1,7 @@
 Changes for 1.0beta8:
 
+ - personalisation (remember default port number for hosts) (Alexei)
+ - added table 'profiles' (Alexei)
  - assured uniqueness of host names (Alexei)
  - added upgrades/dbpatches/1.0beta7_to_1.0beta8/ with patches (Alexei)
  - mass update for triggers (activate, deactivate, delete) (Alexei)
