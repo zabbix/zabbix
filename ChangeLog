@@ -1,5 +1,6 @@
 Changes for 1.0beta8:
 
+ - fixed bug in host addition procedure when template host is used (Alexei) 
  - different colors for different status of items, triggers, users
  (Alexei)
 
