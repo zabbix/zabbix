@@ -1616,7 +1616,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 					array("label"=>"Latest data","url"=>"latest.php"),
 					array("label"=>"Triggers","url"=>"tr_status.php?onlytrue=true&noactions=true&compact=true"),
 					array("label"=>"Queue","url"=>"queue.php"),
-					array("label"=>"Alarms","url"=>"latestalarms.php"),
+					array("label"=>"Actions","url"=>"latestalarms.php"),
 					array("label"=>"Alerts","url"=>"alerts.php"),
 					array("label"=>"Maps","url"=>"maps.php"),
 					array("label"=>"Graphs","url"=>"charts.php"),
