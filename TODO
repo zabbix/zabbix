@@ -1,9 +1,9 @@
 1.0beta9:
 
  - redefine check_service()
- - alternative medias !
-
+ - alternative medias. Add table media_type.
  - add support for agent forwarding (proxy)
+
  - proofread Zabbix Manual  - Ted Rolle <ted@users.sourceforge.net>
  - add complete support for SNMP trapping
  - improve graphing capabilities (MRTG like graphs)
