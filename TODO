@@ -23,12 +23,12 @@ HIGH PRIORITY:
  - SNMP trapping
  - personalisation (refresh rate, graph size, default graph period, etc)
  - BUG. When W2000 with SNMP agent restarted, items will becomes Not Supported
+ - BUG. Pricision is lost for bug numbers. Convert all float types to double.
 
 REGISTERED BUGS:
 
  - improper handling of special characters i.e. ',", etc
  - graphs and maps not displayed sometimes
- 
 
 
 TODO:
