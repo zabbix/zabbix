@@ -107,7 +107,9 @@
 		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
 		echo "<TD>".$row["usrgrpid"]."</TD>";
 		echo "<TD>".$row["name"]."</TD>";
-		echo "<TD>Change</TD>";
+		echo "<TD>";
+		echo "<A HREF=\"users.php?usrgrpid=".$row["usrgrpid"]."#form\">Change</A>";
+		echo "</TD>";
 		echo "</TR>";
 	}
 	echo "</TABLE>";
