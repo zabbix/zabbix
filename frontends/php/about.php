@@ -81,7 +81,7 @@
 	<font face="Helvetica"><a href="http://sourceforge.net/mail/?group_id=23494">Mailing lists</a></font><br>
 </TD>
 <TD>
-	Very useful source of information (will be soon).
+	Zabbix-related mailing lists.
 </TD>
 </TR>
 </TABLE>
