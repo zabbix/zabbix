@@ -1,11 +1,12 @@
 HIGH PRIORITY:
 
+ - improve performance of Alarms and Alerts in PHP frontend
+ - improve speed of pinger.pl. Use built-in Perl functions.
  - BUG. Agent return unsupported in case if UserParameter ends by timeout.
  - monitoring of servers without Zabbix agent installed
  - check Rickard's multythreaded agent
  - check new Mariusz patches
  - support ':','\' between [] (example, diskspace[c:])
- - add/evaluate Windows agent
  - BUG. Avoid situations when PID file is not deleted.
  - BUG. Map does not show host status in case of trigger based on trapper
  - BUG. When ran first time, some triggers becomes TRUE (like files was changed)
@@ -16,7 +17,7 @@ HIGH PRIORITY:
  - get rid of long select lists in user forms 
  - do not dump "Expression cannot be evaluated" in case if function.lastvalue
    is NULL
- - support fo netload under other platforms
+ - support for netload under other platforms
  - support for disk loads
  - better monitoring of log files
  - IT Helpdesk

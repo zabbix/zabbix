@@ -22,7 +22,7 @@
 		$result=update_config($HTTP_GET_VARS["smtp_server"],$HTTP_GET_VARS["smtp_helo"],
 			$HTTP_GET_VARS["smtp_email"],$HTTP_GET_VARS["alarm_history"],
 			$HTTP_GET_VARS["alert_history"]);
-		show_messages($result, "Configuration updated", "Configuation was NOT updated");
+		show_messages($result, "Configuration updated", "Configuration was NOT updated");
 	}
 ?>
 
