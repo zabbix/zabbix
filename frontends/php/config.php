@@ -301,6 +301,53 @@
 				echo "<TR>";
 		}
 		table_end();
+
+
+		echo "<br>";
+		show_table_header(S_ESCALATION_DETAILS_BIG);
+
+		table_begin();
+		table_header(array(S_STEP,S_DESCRIPTION_SMALL,S_ACTIONS));
+
+		table_row(array(
+			1,
+			"30 seconds on this level",
+			"Increase escalation level"),$col++);
+		table_row(array(
+			2,
+			"60 seconds on this level",
+			"Increase escalation level"),$col++);
+		table_row(array(
+			1,
+			"",
+			"Increase severity"),$col++);
+		table_row(array(
+			1,
+			"",
+			"Set escalation level to 5"),$col++);
+		table_row(array(
+			1,
+			"",
+			"Increase administrative hierarcy"),$col++);
+
+		$result=DBselect("select escalationid, name from escalations order by name");
+		$col=0;
+		while($row=DBfetch($result))
+		{
+			break;
+			$actions="<a href=\"config.php?config=2&register=change&escalationid=".$row["escalationid"]."\">".S_CHANGE."</a>";
+			table_row(array(
+				$row["escalationid"],
+				$row["name"],
+				$actions),$col++);
+		}
+		if(DBnum_rows($result)==0)
+		{
+				echo "<TR BGCOLOR=#EEEEEE>";
+				echo "<TD COLSPAN=3 ALIGN=CENTER>".S_NO_ESCALATION_DETAILS."</TD>";
+				echo "<TR>";
+		}
+		table_end();
 	}
 ?>
 
