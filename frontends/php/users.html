@@ -58,31 +58,19 @@
 	echo "<TD WIDTH=\"10%\" NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
-	$result=DBselect("select u.userid,u.alias,u.name,u.surname,g.name from users u,groups g where u.groupid=g.groupid order by g.name,u.alias");
+	$result=DBselect("select u.userid,u.alias,u.name,u.surname,g.name as grp from users u,groups g where u.groupid=g.groupid order by g.name,u.alias");
 	echo "<CENTER>";
 	$col=0;
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
 	{
-		if($col==1)
-		{
-			echo "<TR BGCOLOR=#EEEEEE>";
-			$col=0;
-		} else
-		{
-			echo "<TR BGCOLOR=#DDDDDD>";
-			$col=1;
-		}
+		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
+		else		{ echo "<TR BGCOLOR=#DDDDDD>"; }
 	
-		$alias=DBget_field($result,$i,1);
-		$name=DBget_field($result,$i,2);
-		$surname=DBget_field($result,$i,3);
-		$group=DBget_field($result,$i,4);
-		$userid_=DBget_field($result,$i,0);
-		echo "<TD>$group</TD>";
-		echo "<TD>$alias</TD>";
-		echo "<TD>$name</TD>";
-		echo "<TD>$surname</TD>";
-		echo "<TD><A HREF=\"users.html?register=change&userid=$userid_\">Change</A> - <A HREF=\"media.html?userid=$userid_\">Media</A>";
+		echo "<TD>".$row["grp"]."</TD>";
+		echo "<TD>".$row["alias"]."</TD>";
+		echo "<TD>".$row["name"]."</TD>";
+		echo "<TD>".$row["surname"]."</TD>";
+		echo "<TD><A HREF=\"users.html?register=change&userid=".$row["userid"]."\">Change</A> - <A HREF=\"media.html?userid=".$row["userid"]."\">Media</A>";
 		echo "</TD>";
 		echo "</TR>";
 	}

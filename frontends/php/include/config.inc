@@ -73,6 +73,23 @@
 		return	$host;
 	}
 
+	function	get_service_by_serviceid($serviceid)
+	{
+		global	$ERROR_MSG;
+
+		$sql="select serviceid,name,triggerid from services where serviceid=$serviceid";
+		$result=DBselect($sql);
+		if(Dbnum_rows($result) == 1)
+		{
+			return	DBfetch($result);
+		}
+		else
+		{
+			$ERROR_MSG="No service with serviceid=[$serviceid]";
+		}
+		return	FALSE;
+	}
+
 	function	show_messages($bool,$msg,$errmsg)
 	{
 		global	$ERROR_MSG;
@@ -891,6 +908,29 @@
 		return	DBexecute($sql);
 	}
 
+	function	service_has_parent($serviceid)
+	{
+		$sql="select count(*) from services_links where servicedownid=$serviceid";
+		$result=DBselect($sql);
+		if(DBget_field($result,0,0)>0)
+		{
+			return	TRUE;
+		}
+		return	FALSE;
+	}
+
+	function	service_has_no_this_parent($parentid,$serviceid)
+	{
+		$sql="select count(*) from services_links where serviceupid=$parentid and servicedownid=$serviceid";
+		$result=DBselect($sql);
+		if(DBget_field($result,0,0)>0)
+		{
+			return	FALSE;
+		}
+		return	TRUE;
+	}
+
+
 	function	add_service($name,$triggerid,$linktrigger)
 	{
 		if( isset($linktrigger)&&($linktrigger=="on") )
@@ -904,9 +944,16 @@
 		return	DBexecute($sql);
 	}
 
-	function	add_service_link($servicedownid,$serviceupid)
+	function	add_service_link($servicedownid,$serviceupid,$softlink)
 	{
-		$sql="insert into services_links (servicedownid,serviceupid) values ($servicedownid,$serviceupid)";
+		if(isset($softlink) && ($softlink=="on"))
+		{
+			$sql="insert into services_links (servicedownid,serviceupid,soft) values ($servicedownid,$serviceupid,1)";
+		}
+		else
+		{
+			$sql="insert into services_links (servicedownid,serviceupid,soft) values ($servicedownid,$serviceupid,0)";
+		}
 		return	DBexecute($sql);
 	}
 
@@ -2203,7 +2250,7 @@
 		echo "<table border=\"0\" cellspacing=\"0\" cellpadding=\"3\" width=\"100%\" bgcolor=\"#666666\">";
 		echo "<tr><td align=center>";
 		echo "<font face=\"Arial,Helvetica\" size=1>";
-		echo "<a href=\"http://zabbix.sourceforge.net\">ZABBIX</a> Copyright 2000,2001 by <a href=\"mailto:alex@gobbo.caves.lv\">Alexei Vladishev</a>";
+		echo "<a href=\"http://zabbix.sourceforge.net\">ZABBIX</a> Copyright 2000,2001,2002 by <a href=\"mailto:alex@gobbo.caves.lv\">Alexei Vladishev</a>";
 		echo "</font>";
 		echo "</td></tr>";
 		echo "</table>";
