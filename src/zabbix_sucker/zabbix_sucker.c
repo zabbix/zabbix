@@ -39,15 +39,16 @@
 
 static	pid_t	*pids=NULL;
 
-int	sucker_num=0;
-int	CONFIG_SUCKERD_FORKS		=SUCKER_FORKS;
-int	CONFIG_NOTIMEWAIT		=0;
-int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
+static	int	sucker_num=0;
+static	int	CONFIG_SUCKERD_FORKS		=SUCKER_FORKS;
+static	int	CONFIG_NOTIMEWAIT		=0;
+static	int	CONFIG_TIMEOUT			=SUCKER_TIMEOUT;
+static	int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
 static	char	*CONFIG_PID_FILE		= NULL;
-char	*CONFIG_DBNAME			= NULL;
-char	*CONFIG_DBUSER			= NULL;
-char	*CONFIG_DBPASSWORD		= NULL;
-char	*CONFIG_DBSOCKET		= NULL;
+static	char	*CONFIG_DBNAME			= NULL;
+static	char	*CONFIG_DBUSER			= NULL;
+static	char	*CONFIG_DBPASSWORD		= NULL;
+static	char	*CONFIG_DBSOCKET		= NULL;
 
 void	uninit(void)
 {
@@ -221,8 +222,8 @@ void	init_config(void)
 void	process_config_file(void)
 {
 	FILE	*file;
-	char	line[1024];
-	char	parameter[1024];
+	char	line[1024+1];
+	char	parameter[1024+1];
 	char	*value;
 	int	lineno;
 	int	i;
@@ -270,6 +271,17 @@ void	process_config_file(void)
 				exit(1);
 			}
 			CONFIG_SUCKERD_FORKS=i;
+		}
+		else if(strcmp(parameter,"Timeout")==0)
+		{
+			i=atoi(value);
+			if( (i<1) || (i>30) )
+			{
+				syslog( LOG_CRIT, "Wrong value of Timeout in line %d. Should be between 1 and 30.", lineno);
+				fclose(file);
+				exit(1);
+			}
+			CONFIG_TIMEOUT=i;
 		}
 		else if(strcmp(parameter,"NoTimeWait")==0)
 		{
@@ -636,7 +648,7 @@ int	get_value(double *result,char **result_str,DB_ITEM *item)
 	phan.sa_flags = 0;
 	sigaction(SIGALRM, &phan, NULL);
 
-	alarm(SUCKER_TIMEOUT);
+	alarm(CONFIG_TIMEOUT);
 
 	if(item->type == ITEM_TYPE_ZABBIX)
 	{

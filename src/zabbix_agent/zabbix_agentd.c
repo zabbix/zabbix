@@ -42,11 +42,12 @@ int	parent=0;
 /* Number of processed requests */
 int	stats_request=0;
 
-char	*CONFIG_HOST_ALLOWED=NULL;
-char	*CONFIG_PID_FILE=NULL;
-int	CONFIG_AGENTD_FORKS=AGENTD_FORKS;
-int	CONFIG_NOTIMEWAIT=0;
-int	CONFIG_LISTEN_PORT=10000;
+static	char	*CONFIG_HOST_ALLOWED=NULL;
+static	char	*CONFIG_PID_FILE=NULL;
+static	int	CONFIG_AGENTD_FORKS=AGENTD_FORKS;
+static	int	CONFIG_NOTIMEWAIT=0;
+static	int	CONFIG_TIMEOUT=AGENT_TIMEOUT;
+static	int	CONFIG_LISTEN_PORT=10000;
 
 void	uninit(void)
 {
@@ -83,7 +84,8 @@ void	signal_handler( int sig )
 		uninit();
 		exit( FAIL );
 	}
-	else if( SIGCHLD == sig )
+/* parent==1 is mandatory ! EXECUTE sends SIGCHLD as well ... */
+	else if( (SIGCHLD == sig) && (parent == 1) )
 	{
 		syslog( LOG_WARNING, "One child process died. Exiting ...");
 		uninit();
@@ -238,6 +240,17 @@ void	process_config_file(void)
 		{
 			CONFIG_PID_FILE=strdup(value);
 		}
+		else if(strcmp(parameter,"Timeout")==0)
+		{
+			i=atoi(value);
+			if( (i<1) || (i>30) )
+			{
+				syslog( LOG_CRIT, "Wrong value of Timeout in line %d. Should be between 1 or 30.", lineno);
+				fclose(file);
+				exit(1);
+			}
+			CONFIG_TIMEOUT=i;
+		}
 		else if(strcmp(parameter,"NoTimeWait")==0)
 		{
 			i=atoi(value);
@@ -367,7 +380,7 @@ void	process_child(int sockfd)
 	phan.sa_flags = 0;
 	sigaction(SIGALRM, &phan, NULL);
 
-	alarm(AGENT_TIMEOUT);
+	alarm(CONFIG_TIMEOUT);
 
 	syslog( LOG_DEBUG, "Before read()");
 	if( (nread = read(sockfd, line, 1024)) < 0)
@@ -507,7 +520,6 @@ int	main()
 	sigaction(SIGINT, &phan, NULL);
 	sigaction(SIGQUIT, &phan, NULL);
 	sigaction(SIGTERM, &phan, NULL);
-	sigaction(SIGCHLD, &phan, NULL);
 
 	process_config_file();
 
@@ -532,6 +544,9 @@ int	main()
 	}
 
 	parent=1;
+
+/* For parent only. To avoid problems with EXECUTE */
+	sigaction(SIGCHLD, &phan, NULL);
 
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 	setproctitle("main process");
