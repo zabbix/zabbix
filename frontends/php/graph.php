@@ -75,6 +75,7 @@
 
 	show_table_header("DISPLAYED PARAMETERS");
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+	echo "<TD WIDTH=5% NOSAVE><B>Sort order</B></TD>";
 	echo "<TD WIDTH=10% NOSAVE><B>Host</B></TD>";
 	echo "<TD WIDTH=10% NOSAVE><B>Parameter</B></TD>";
 	echo "<TD WIDTH=10% NOSAVE><B>Type</B></TD>";
@@ -82,7 +83,7 @@
 	echo "<TD WIDTH=10% NOSAVE><B>Actions</B></TD>";
 	echo "</TR>";
 
-	$sql="select i.itemid,h.host,i.description,gi.gitemid,gi.color,gi.drawtype from hosts h,graphs_items gi,items i where i.itemid=gi.itemid and gi.graphid=".$HTTP_GET_VARS["graphid"]." and h.hostid=i.hostid";
+	$sql="select i.itemid,h.host,i.description,gi.gitemid,gi.color,gi.drawtype,gi.sortorder from hosts h,graphs_items gi,items i where i.itemid=gi.itemid and gi.graphid=".$HTTP_GET_VARS["graphid"]." and h.hostid=i.hostid order by gi.sortorder";
 	$result=DBselect($sql);
 	$col=0;
 	while($row=DBfetch($result))
@@ -90,14 +91,14 @@
 		if($col++%2==0)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
 		else		{ echo "<TR BGCOLOR=#DDDDDD>"; }
 
+		echo "<TD>".$row["sortorder"]."</TD>";
 		echo "<TD>".$row["host"]."</TD>";
 		echo "<TD><a href=\"chart.php?itemid=".$row["itemid"]."&period=3600&from=0\">".$row["description"]."</a></TD>";
 		echo "<TD>".get_drawtype_description($row["drawtype"])."</TD>";
 		echo "<TD>".$row["color"]."</TD>";
 		echo "<TD>";
 		echo "<A HREF=\"graph.php?graphid=".$HTTP_GET_VARS["graphid"]."&gitemid=".$row["gitemid"]."#form\">Change</A>";
-		echo " - ";
-		echo "<A HREF=\"graph.php?register=delete&graphid=".$HTTP_GET_VARS["graphid"]."&gitemid=".$row["gitemid"]."\">Delete</A>";
+		echo "</A>";
 		echo "</TD>";
 		echo "</TR>";
 	}
@@ -179,6 +180,7 @@
 	if(isset($itemid))
 	{
 		echo "<input type=\"submit\" name=\"register\" value=\"update\">";
+		echo "<input type=\"submit\" name=\"register\" value=\"delete\">";
 	}
 
 	show_table2_header_end();

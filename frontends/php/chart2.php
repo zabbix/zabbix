@@ -60,7 +60,7 @@
 	$graph->setHeight($height);
 	$graph->setHeader(DBget_field($result,0,0));
 
-	$result=DBselect("select gi.itemid,i.description,gi.color,h.host,gi.drawtype from graphs_items gi,items i,hosts h where gi.itemid=i.itemid and gi.graphid=".$HTTP_GET_VARS["graphid"]." and i.hostid=h.hostid order by gi.gitemid");
+	$result=DBselect("select gi.itemid,i.description,gi.color,h.host,gi.drawtype from graphs_items gi,items i,hosts h where gi.itemid=i.itemid and gi.graphid=".$HTTP_GET_VARS["graphid"]." and i.hostid=h.hostid order by gi.sortorder");
 
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
