@@ -55,7 +55,6 @@ serial number/mesto polozhenija/etc.
 
 OTHER:
 
- - specify date format in local_en rather than hardcoded
  - check bug with trapper receiving value with ":"
  - configuration management. Add a page with hardware details for each host.
  - multi-institution support

@@ -283,7 +283,7 @@
 
 			iif_echo(!isset($row["lastclock"]),
 				"<div align=center>-</div>",
-				date("d M H:i:s",$row["lastclock"]));
+				date(S_DATE_FORMAT_YMDHMS,$row["lastclock"]));
 			echo "</font></td>";
 
 			if(isset($row["lastvalue"]))
