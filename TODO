@@ -1,13 +1,5 @@
 1.0:
 
-
-../../include/security.c: In function `check_security':
-../../include/security.c:52: `socklen_t' undeclared (first use in this
-function)
-../../include/security.c:52: (Each undeclared identifier is reported only once
-../../include/security.c:52: for each function it appears in.)
-../../include/security.c:52: parse error before `)'
-
  - add support of interface statistics under Solaris and FreeBSD
  - add support for real 'delta' (last-previous)
  - fix evaluation of complex trigger expressions (diskpercentage)
