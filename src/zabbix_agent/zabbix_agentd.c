@@ -47,6 +47,7 @@ int	stats_request=0;
 static	char	*CONFIG_HOSTS_ALLOWED		= NULL;
 static	char	*CONFIG_PID_FILE		= NULL;
 static	char	*CONFIG_LOG_FILE		= NULL;
+static	char	*CONFIG_STAT_FILE		= NULL;
 static	int	CONFIG_AGENTD_FORKS		= AGENTD_FORKS;
 static	int	CONFIG_NOTIMEWAIT		= 0;
 static	int	CONFIG_TIMEOUT			= AGENT_TIMEOUT;
@@ -222,6 +223,7 @@ void    init_config(void)
 		{"Server",&CONFIG_HOSTS_ALLOWED,0,TYPE_STRING,PARM_MAND,0,0},
 		{"PidFile",&CONFIG_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"LogFile",&CONFIG_LOG_FILE,0,TYPE_STRING,PARM_OPT,0,0},
+		{"StatFile",&CONFIG_STAT_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
 		{"NoTimeWait",&CONFIG_NOTIMEWAIT,0,TYPE_INT,PARM_OPT,0,1},
 		{"ListenPort",&CONFIG_LISTEN_PORT,0,TYPE_INT,PARM_OPT,1024,32767},
@@ -234,6 +236,10 @@ void    init_config(void)
 	if(CONFIG_PID_FILE == NULL)
 	{
 		CONFIG_PID_FILE=strdup("/tmp/zabbix_agentd.pid");
+	}
+	if(CONFIG_STAT_FILE == NULL)
+	{
+		CONFIG_STAT_FILE=strdup("/tmp/zabbix_agentd.tmp");
 	}
 }
 /*
@@ -394,7 +400,7 @@ void	child_main(int i,int listenfd, int addrlen)
 	}
 }
 
-void	collect_statistics()
+void	collect_stat()
 {
 	#define INTERFACE struct interface_type
 	INTERFACE
@@ -410,12 +416,14 @@ void	collect_statistics()
 		int	received_load15;
 	};
 
-	FILE	*file;
+	FILE	*file,*fileout;
 	char	*s;
 	char	line[MAX_STRING_LEN+1];
-	int	i;
+	int	i,j;
+	int	i1,j1;
 	char	a[MAX_STRING_LEN+1];
 	char	b[MAX_STRING_LEN+1];
+	char	interface[MAX_STRING_LEN+1];
 	char	*token;
 
 	INTERFACE interfaces[128]=
@@ -429,21 +437,54 @@ void	collect_statistics()
 		fprintf(stderr, "Cannot open config file [%s] [%m]\n","/proc/net/dev");
 		return;
 	}
+	fileout=fopen("/tmp/zabbix_agentd.tmp","w");
 
 	i=0;
 	while(fgets(line,MAX_STRING_LEN,file) != NULL)
 	{
-		if(strstr(line,":") == NULL)
+		if( (s=strstr(line,":")) == NULL)
 			continue;
+		strncpy(interface,line,s-line);
+		interface[s-line]=0;
+		j1=0;
+		for(i1=0;i1<strlen(interface);i1++)
+		{
+			if(interface[i1]!=' ')
+			{
+				interface[j1++]=interface[i1];
+			}
+		}
+		interface[j1]=0;
 		s=strtok(line,":");
+		j=0;
 		while(s)
 		{
 			s = strtok(NULL," ");
-			printf("[%s]\n",s);
+			if(j==0)
+			{
+				printf("Received [%s]\n",s);
+				fprintf(fileout,"netloadin1[%s] %s\n", interface, s);
+			}
+			else if(j==8)
+			{
+				printf("Sent [%s]\n",s);
+				fprintf(fileout,"netloadout1[%s] %s\n", interface, s);
+			}
+			j++;
 		}
 		i++;
 	}
 	fclose(file);
+	fclose(fileout);
+}
+
+void	collect_statistics()
+{
+	for(;;)
+	{
+		collect_stat();
+		sleep(1);
+	}
 }
 
 pid_t	child_make(int i,int listenfd, int addrlen)
@@ -472,9 +513,6 @@ int	main()
 
         static struct  sigaction phan;
 	
-	collect_statistics();
-	exit;
-
 	init_config();
 	daemon_init();
 
