@@ -311,10 +311,12 @@
 	define("S_TRENDS",				"Trends");
 	define("S_SHORT_NAME",				"Short name");
 	define("S_ZABBIX_AGENT",			"ZABBIX agent");
+	define("S_ZABBIX_AGENT_ACTIVE",			"ZABBIX agent (active)");
 	define("S_SNMPV1_AGENT",			"SNMPv1 agent");
 	define("S_ZABBIX_TRAPPER",			"ZABBIX trapper");
 	define("S_SIMPLE_CHECK",			"Simple check");
 	define("S_SNMPV2_AGENT",			"SNMPv2 agent");
+	define("S_SNMPV3_AGENT",			"SNMPv3 agent");
 	define("S_ZABBIX_INTERNAL",			"ZABBIX internal");
 	define("S_ZABBIX_UNKNOWN",			"Unknown");
 	define("S_ACTIVE",				"Active");

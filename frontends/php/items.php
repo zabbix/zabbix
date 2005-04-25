@@ -228,6 +228,9 @@
 				case 0:
 					$type=S_ZABBIX_AGENT;
 					break;
+				case 7:
+					$type=S_ZABBIX_AGENT_ACTIVE;
+					break;
 				case 1:
 					$type=S_SNMPV1_AGENT;
 					break;
@@ -239,6 +242,9 @@
 					break;
 				case 4:
 					$type=S_SNMPV2_AGENT;
+					break;
+				case 6:
+					$type=S_SNMPV3_AGENT;
 					break;
 				case 5:
 					$type=S_ZABBIX_INTERNAL;
