@@ -314,6 +314,10 @@
 		if($type==ITEM_TYPE_ZABBIX) echo "SELECTED";
 		echo ">Zabbix agent";
 
+		echo "<OPTION VALUE=\"7\"";
+		if($type==ITEM_TYPE_ZABBIX_ACTIVE) echo "SELECTED";
+		echo ">Zabbix agent (active)";
+
 		echo "<OPTION VALUE=\"3\"";
 		if($type==ITEM_TYPE_SIMPLE) echo "SELECTED";
 		echo ">Simple check";
@@ -329,6 +333,7 @@
 		echo "<OPTION VALUE=\"6\"";
 		if($type==ITEM_TYPE_SNMPV3) echo "SELECTED";
 		echo ">SNMPv3 agent";
+
 
 		echo "<OPTION VALUE=\"2\"";
 		if($type==ITEM_TYPE_TRAPPER) echo "SELECTED";
