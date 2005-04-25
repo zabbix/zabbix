@@ -73,6 +73,7 @@
 	define("ITEM_TYPE_SNMPV2C",4);
 	define("ITEM_TYPE_INTERNAL",5);
 	define("ITEM_TYPE_SNMPV3",6);
+	define("ITEM_TYPE_ZABBIX_ACTIVE",7);
 
 	define("ITEM_VALUE_TYPE_FLOAT",0);
 	define("ITEM_VALUE_TYPE_STR",1);
