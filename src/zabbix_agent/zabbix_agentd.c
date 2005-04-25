@@ -57,6 +57,7 @@
 #include "log.h"
 #include "cfg.h"
 #include "stats.h"
+#include "active.h"
 
 #define	LISTENQ 1024
 
@@ -74,6 +75,7 @@ static	int	CONFIG_AGENTD_FORKS		= AGENTD_FORKS;
 static	int	CONFIG_NOTIMEWAIT		= 0;
 static	int	CONFIG_TIMEOUT			= AGENT_TIMEOUT;
 static	int	CONFIG_LISTEN_PORT		= 10050;
+static	int	CONFIG_SERVER_PORT		= 10051;
 static	char	*CONFIG_LISTEN_IP		= NULL;
 static	int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 
@@ -235,6 +237,7 @@ void    init_config(void)
 		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
 		{"NoTimeWait",&CONFIG_NOTIMEWAIT,0,TYPE_INT,PARM_OPT,0,1},
 		{"ListenPort",&CONFIG_LISTEN_PORT,0,TYPE_INT,PARM_OPT,1024,32767},
+		{"ServerPort",&CONFIG_SERVER_PORT,0,TYPE_INT,PARM_OPT,1024,32767},
 		{"ListenIP",&CONFIG_LISTEN_IP,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DebugLevel",&CONFIG_LOG_LEVEL,0,TYPE_INT,PARM_OPT,0,4},
 		{"StartAgents",&CONFIG_AGENTD_FORKS,0,TYPE_INT,PARM_OPT,1,16},
@@ -363,7 +366,7 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 	return	sockfd;
 }
 
-void	child_main(int i,int listenfd, int addrlen)
+void	child_passive_main(int i,int listenfd, int addrlen)
 {
 	int	connfd;
 	socklen_t	clilen;
@@ -389,7 +392,7 @@ void	child_main(int i,int listenfd, int addrlen)
 	}
 }
 
-pid_t	child_make(int i,int listenfd, int addrlen)
+pid_t	child_passive_make(int i,int listenfd, int addrlen)
 {
 	pid_t	pid;
 
@@ -399,7 +402,7 @@ pid_t	child_make(int i,int listenfd, int addrlen)
 	}
 
 	/* never returns */
-	child_main(i, listenfd, addrlen);
+	child_passive_main(i, listenfd, addrlen);
 
 	/* avoid compilator warning */
 	return 0;
@@ -470,10 +473,13 @@ int	main(int argc, char **argv)
 
 	pids = calloc(CONFIG_AGENTD_FORKS, sizeof(pid_t));
 
-	for(i = 0; i<CONFIG_AGENTD_FORKS; i++)
+	for(i = 0; i<CONFIG_AGENTD_FORKS-1; i++)
 	{
-		pids[i] = child_make(i, listenfd, addrlen);
+		pids[i] = child_passive_make(i, listenfd, addrlen);
 	}
+
+	/* Initialize thread for active checks */
+	pids[CONFIG_AGENTD_FORKS-1] = child_active_make(CONFIG_AGENTD_FORKS-1, CONFIG_HOSTS_ALLOWED, CONFIG_SERVER_PORT);
 
 	parent=1;
 
