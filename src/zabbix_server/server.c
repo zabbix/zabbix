@@ -1146,7 +1146,10 @@ void	process_trapper_child(int sockfd)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "After read() 2 [%d]",nread);
 
-	line[nread-1]=0;
+	if(nread>0)
+	{
+		line[nread-1]=0;
+	}
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Got line:%s", line);
 	if( SUCCEED == process_trap(sockfd,line) )
