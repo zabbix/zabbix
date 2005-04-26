@@ -5,7 +5,7 @@ LIBS    = @LIBS@ @MYSQL_LFLAGS@ @PGSQL_LFLAGS@ @SNMP_LFLAGS@ @LDAP_LFLAGS@
 
 all:
 
-	@CC@ -o ../../bin/zabbix_server @CFLAGS@ -I../../include $(INCLUDE) server.c ../../include/db.c ../../include/functions.c ../../include/expression.c ../../include/cfg.c ../../include/log.c ../../include/security.c ../../include/pid.c ../../include/email.c ../../include/snprintf.c ../zabbix_agent/sysinfo.c ../../include/md5.c ../../include/zlog.c alerter.c pinger.c housekeeper.c checks_simple.c checks_snmp.c checks_agent.c checks_internal.c -Wall $(LIBS) 
+	@CC@ -o ../../bin/zabbix_server @CFLAGS@ -I../../include $(INCLUDE) server.c ../../include/db.c ../../include/functions.c ../../include/expression.c ../../include/cfg.c ../../include/log.c ../../include/security.c ../../include/pid.c ../../include/email.c ../../include/snprintf.c ../zabbix_agent/sysinfo.c ../../include/md5.c ../../include/zlog.c alerter.c pinger.c housekeeper.c checks_simple.c checks_snmp.c checks_agent.c checks_internal.c trapper.c -Wall $(LIBS) 
 
 clean:
 	rm -f *.o 
