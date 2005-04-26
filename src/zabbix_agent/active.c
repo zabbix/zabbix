@@ -57,50 +57,11 @@
 #include "stats.h"
 #include "active.h"
 
-void    child_passive_main(int i,char *server, int port)
-{
-	zabbix_log( LOG_LEVEL_WARNING, "zabbix_agentd %ld started",(long)getpid());
-
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-	setproctitle("before getting list of active checks");
-#endif
-	get_active_checks(server, port);
-
-	for(;;)
-	{
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("processing active checks");
-#endif
-		process_active_checks();
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("sleeping for 10 seconds");
-#endif
-		sleep(10);
-	}
-}
-
-pid_t	child_active_make(int i,char *server, int port)
-{
-	pid_t	pid;
-
-	if((pid = fork()) >0)
-	{
-			return (pid);
-	}
-
-	/* never returns */
-	child_passive_main(i, server, port);
-
-	/* avoid compilator warning */
-	return 0;
-}
-
 int	get_active_checks(char *server, int port, char *error, int max_error_len)
 {
 	int	s;
 	int	len;
 	char	c[MAX_STRING_LEN];
-	char	*e;
 
 	struct hostent *hp;
 
@@ -182,71 +143,88 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 	} 
 
 	memset(c,0,MAX_STRING_LEN);
-	len=read(s,c,MAX_STRING_LEN);
-	if(len == -1)
+
+
+	for(;;)
 	{
-		switch (errno)
+		len=read(s,c,MAX_STRING_LEN);
+		if(len == -1)
 		{
-			case 	EINTR:
-					zabbix_log( LOG_LEVEL_WARNING, "Timeout while receiving data from [%s]",server );
-					snprintf(error,max_error_len-1,"Timeout while receiving data from [%s]",server);
-					break;
-			case	ECONNRESET:
-					zabbix_log( LOG_LEVEL_WARNING, "Connection reset by peer.");
-					snprintf(error,max_error_len-1,"Connection reset by peer.");
-					close(s);
-					return	NETWORK_ERROR;
-			default:
-				zabbix_log( LOG_LEVEL_WARNING, "Error while receiving data from [%s] [%s]",server, strerror(errno));
-				snprintf(error,max_error_len-1,"Error while receiving data from [%s] [%s]",server, strerror(errno));
-		} 
-		close(s);
-		return	FAIL;
+			switch (errno)
+			{
+				case 	EINTR:
+						zabbix_log( LOG_LEVEL_WARNING, "Timeout while receiving data from [%s]",server );
+						snprintf(error,max_error_len-1,"Timeout while receiving data from [%s]",server);
+						break;
+				case	ECONNRESET:
+						zabbix_log( LOG_LEVEL_WARNING, "Connection reset by peer.");
+						snprintf(error,max_error_len-1,"Connection reset by peer.");
+						close(s);
+						return	NETWORK_ERROR;
+				default:
+					zabbix_log( LOG_LEVEL_WARNING, "Error while receiving data from [%s] [%s]",server, strerror(errno));
+					snprintf(error,max_error_len-1,"Error while receiving data from [%s] [%s]",server, strerror(errno));
+			} 
+			close(s);
+			return	FAIL;
+		}
+		else
+		{
+			if(len>0)
+			{
+				c[len-1]=0;
+			}
+			if(strcmp(c,"ZBX_EOF") == 0)
+			{
+/* No more checks. End of file. */
+				break;
+			}
+			// Add new check to the list
+		}
 	}
 
 	if( close(s)!=0 )
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Problem with close [%s]", strerror(errno));
 	}
-	zabbix_log(LOG_LEVEL_DEBUG, "Got string:[%d] [%s]", len, c);
-	if(len>0)
-	{
-		c[len-1]=0;
-	}
-
-	*result=strtod(c,&e);
-
-	/* The section should be improved */
-	if( (*result==0) && (c==e) && (item->value_type==0) && (strcmp(c,"ZBX_NOTSUPPORTED") != 0) && (strcmp(c,"ZBX_ERROR") != 0) )
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Got empty string from [%s] IP [%s] Parameter [%s]", item->host, item->ip, item->key);
-		zabbix_log( LOG_LEVEL_WARNING, "Assuming that agent dropped connection because of access permissions");
-		snprintf(error,max_error_len-1,"Got empty string from [%s] IP [%s] Parameter [%s]", item->host, item->ip, item->key);
-		return	NETWORK_ERROR;
-	}
-
-	/* Should be deleted in Zabbix 1.0 stable */
-	if( cmp_double(*result,NOTSUPPORTED) == 0)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "NOTSUPPORTED1 [%s]", c );
-		return NOTSUPPORTED;
-	}
-	if( strcmp(c,"ZBX_NOTSUPPORTED") == 0)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "NOTSUPPORTED2 [%s]", c );
-		snprintf(error,max_error_len-1,"Not supported by ZABBIX agent");
-		return NOTSUPPORTED;
-	}
-	if( strcmp(c,"ZBX_ERROR") == 0)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "AGENT_ERROR [%s]", c );
-		snprintf(error,max_error_len-1,"ZABBIX agent non-critical error");
-		return AGENT_ERROR;
-	}
-
-	strcpy(result_str,c);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "RESULT_STR [%s]", c );
 
 	return SUCCEED;
+}
+
+void    child_active_main(int i,char *server, int port)
+{
+	zabbix_log( LOG_LEVEL_WARNING, "zabbix_agentd %ld started",(long)getpid());
+
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+	setproctitle("before getting list of active checks");
+#endif
+	get_active_checks(server, port);
+
+	for(;;)
+	{
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("processing active checks");
+#endif
+		process_active_checks();
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("sleeping for 10 seconds");
+#endif
+		sleep(10);
+	}
+}
+
+pid_t	child_active_make(int i,char *server, int port)
+{
+	pid_t	pid;
+
+	if((pid = fork()) >0)
+	{
+			return (pid);
+	}
+
+	/* never returns */
+	child_active_main(i, server, port);
+
+	/* avoid compilator warning */
+	return 0;
 }
