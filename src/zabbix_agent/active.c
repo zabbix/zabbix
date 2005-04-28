@@ -180,6 +180,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 				break;
 			}
 			// Add new check to the list
+			// add_new_check(c);
 		}
 	}
 
