@@ -194,12 +194,14 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 
 void    child_active_main(int i,char *server, int port)
 {
+	char	error[MAX_STRING_LEN];
+
 	zabbix_log( LOG_LEVEL_WARNING, "zabbix_agentd %ld started",(long)getpid());
 
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 	setproctitle("before getting list of active checks");
 #endif
-	get_active_checks(server, port);
+	get_active_checks(server, port, error, sizeof(error));
 
 	for(;;)
 	{
