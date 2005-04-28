@@ -59,6 +59,7 @@ int	process_trap(int sockfd,char *s)
 {
 	char	*p;
 	char	*server,*key,*value_string;
+	char	result[MAX_STRING_LEN];
 
 	int	ret=SUCCEED;
 
@@ -92,6 +93,23 @@ int	process_trap(int sockfd,char *s)
 		}
 
 		ret=process_data(sockfd,server,key,value_string);
+		if( SUCCEED == ret)
+		{
+			snprintf(result,sizeof(result)-1,"OK\n");
+		}
+		else
+		{
+			snprintf(result,sizeof(result)-1,"NOT OK\n");
+		}
+		zabbix_log( LOG_LEVEL_DEBUG, "Sending back [%s]", result);
+		zabbix_log( LOG_LEVEL_DEBUG, "Length [%d]", strlen(result));
+		zabbix_log( LOG_LEVEL_DEBUG, "Sockfd [%d]", sockfd);
+		if( write(sockfd,result,strlen(result)) == -1)
+		{
+			zabbix_log( LOG_LEVEL_WARNING, "Error sending result back [%s]",strerror(errno));
+			zabbix_syslog("Trapper: error sending result back [%s]",strerror(errno));
+		}
+		zabbix_log( LOG_LEVEL_DEBUG, "After write()");
 	}	
 	return ret;
 }
@@ -100,7 +118,6 @@ void	process_trapper_child(int sockfd)
 {
 	ssize_t	nread;
 	char	line[MAX_STRING_LEN];
-	char	result[MAX_STRING_LEN];
 	static struct  sigaction phan;
 
 	phan.sa_handler = &signal_handler;
@@ -134,23 +151,9 @@ void	process_trapper_child(int sockfd)
 	}
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Got line:%s", line);
-	if( SUCCEED == process_trap(sockfd,line) )
-	{
-		snprintf(result,sizeof(result)-1,"OK\n");
-	}
-	else
-	{
-		snprintf(result,sizeof(result)-1,"NOT OK\n");
-	}
-	zabbix_log( LOG_LEVEL_DEBUG, "Sending back [%s]", result);
-	zabbix_log( LOG_LEVEL_DEBUG, "Length [%d]", strlen(result));
-	zabbix_log( LOG_LEVEL_DEBUG, "Sockfd [%d]", sockfd);
-	if( write(sockfd,result,strlen(result)) == -1)
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Error sending result back [%s]",strerror(errno));
-		zabbix_syslog("Trapper: error sending result back [%s]",strerror(errno));
-	}
-	zabbix_log( LOG_LEVEL_DEBUG, "After write()");
+
+	process_trap(sockfd,line);
+
 	alarm(0);
 }
 
