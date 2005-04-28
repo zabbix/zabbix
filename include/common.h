@@ -55,6 +55,7 @@
 #define ITEM_TYPE_SNMPv2c	4
 #define ITEM_TYPE_INTERNAL	5
 #define ITEM_TYPE_SNMPv3	6
+#define ITEM_TYPE_ZABBIX_ACTIVE	7
 
 /* Item value types */
 #define ITEM_VALUE_TYPE_FLOAT	0
