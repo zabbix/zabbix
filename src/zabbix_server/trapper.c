@@ -65,26 +65,34 @@ int	process_trap(int sockfd,char *s)
 	for( p=s+strlen(s)-1; p>s && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
 	p[1]=0;
 
-	server=(char *)strtok(s,":");
-	if(NULL == server)
+/* Request for list of active checks */
+	if(strcmp(s,"ZBX_GET_ACTIVE_CHECKS") == 0)
 	{
-		return FAIL;
+		ret=send_list_of_active_check(sockfd);
 	}
-
-	key=(char *)strtok(NULL,":");
-	if(NULL == key)
+/* Process information sent by zabbix_sender */
+	else
 	{
-		return FAIL;
-	}
+		server=(char *)strtok(s,":");
+		if(NULL == server)
+		{
+			return FAIL;
+		}
 
-	value_string=(char *)strtok(NULL,":");
-	if(NULL == value_string)
-	{
-		return FAIL;
-	}
+		key=(char *)strtok(NULL,":");
+		if(NULL == key)
+		{
+			return FAIL;
+		}
 
-	ret=process_data(sockfd,server,key,value_string);
+		value_string=(char *)strtok(NULL,":");
+		if(NULL == value_string)
+		{
+			return FAIL;
+		}
 
+		ret=process_data(sockfd,server,key,value_string);
+	}	
 	return ret;
 }
 
