@@ -68,7 +68,7 @@ int	process_trap(int sockfd,char *s)
 /* Request for list of active checks */
 	if(strcmp(s,"ZBX_GET_ACTIVE_CHECKS") == 0)
 	{
-		ret=send_list_of_active_check(sockfd);
+		ret=send_list_of_active_checks(sockfd);
 	}
 /* Process information sent by zabbix_sender */
 	else
