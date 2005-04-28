@@ -69,7 +69,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 
 	struct linger ling;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "get_active_checks: host[%s] port[%d]", server, port);
+	zabbix_log( LOG_LEVEL_WARNING, "get_active_checks: host[%s] port[%d]", server, port);
 
 	servaddr_in.sin_family=AF_INET;
 	hp=gethostbyname(server);
@@ -87,7 +87,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 
 	s=socket(AF_INET,SOCK_STREAM,0);
 
-	if(CONFIG_NOTIMEWAIT == 1)
+/*	if(CONFIG_NOTIMEWAIT == 1)
 	{
 		ling.l_onoff=1;
 		ling.l_linger=0;
@@ -95,7 +95,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot setsockopt SO_LINGER [%s]", strerror(errno));
 		}
-	}
+	}*/
 	if(s == -1)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot create socket [%s]",
@@ -124,8 +124,8 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 		return	NETWORK_ERROR;
 	}
 
-	snprintf(c,sizeof(c)-1,"%s\n","ZBX_SEND_ACTIVE_ITEMS");
-	zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", c);
+	snprintf(c,sizeof(c)-1,"%s\n","ZBX_GET_ACTIVE_CHECKS");
+	zabbix_log(LOG_LEVEL_WARNING, "Sending [%s]", c);
 	if( write(s,c,strlen(c)) == -1 )
 	{
 		switch (errno)
@@ -147,6 +147,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 
 	for(;;)
 	{
+		zabbix_log(LOG_LEVEL_WARNING, "Reading");
 		len=read(s,c,MAX_STRING_LEN);
 		if(len == -1)
 		{
@@ -174,8 +175,10 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 			{
 				c[len-1]=0;
 			}
+			zabbix_log(LOG_LEVEL_WARNING, "Read [%s]", c);
 			if(strcmp(c,"ZBX_EOF") == 0)
 			{
+				zabbix_log( LOG_LEVEL_WARNING, "Received ZBX_EOF]");
 /* No more checks. End of file. */
 				break;
 			}
@@ -190,6 +193,11 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 	}
 
 	return SUCCEED;
+}
+
+void	process_active_checks()
+{
+	sleep(1);
 }
 
 void    child_active_main(int i,char *server, int port)

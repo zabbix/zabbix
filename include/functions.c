@@ -2219,7 +2219,7 @@ int	send_list_of_active_checks(int sockfd)
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
-		snprintf(s,sizeof(s)-1,"%s:%s\n",DBget_field(result,i,0),DBget_field(result,i,1));
+		snprintf(s,sizeof(s)-1,"%s:%s\n%s:%s\n",DBget_field(result,i,0),DBget_field(result,i,1),DBget_field(result,i,0),DBget_field(result,i,1));
 		if( write(sockfd,s,strlen(s)) == -1 )
 		{
 			switch (errno)
