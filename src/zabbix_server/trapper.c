@@ -66,7 +66,7 @@ int	process_trap(int sockfd,char *s)
 	for( p=s+strlen(s)-1; p>s && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
 	p[1]=0;
 
-	zabbix_log( LOG_LEVEL_WARNING, "Trapper got [%s]", s);
+	zabbix_log( LOG_LEVEL_DEBUG, "Trapper got [%s]", s);
 
 /* Request for list of active checks */
 	if(strcmp(s,"ZBX_GET_ACTIVE_CHECKS") == 0)
