@@ -480,6 +480,9 @@ int	main(int argc, char **argv)
 
 	/* Initialize thread for active checks */
 	pids[CONFIG_AGENTD_FORKS-1] = child_active_make(CONFIG_AGENTD_FORKS-1, CONFIG_HOSTS_ALLOWED, CONFIG_SERVER_PORT);
+	// DELETE THIS LINE
+	child_active_make(CONFIG_AGENTD_FORKS-1, CONFIG_HOSTS_ALLOWED, CONFIG_SERVER_PORT);
+	child_active_make(CONFIG_AGENTD_FORKS-1, CONFIG_HOSTS_ALLOWED, CONFIG_SERVER_PORT);
 
 	parent=1;
 
