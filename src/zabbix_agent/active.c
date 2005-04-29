@@ -195,9 +195,129 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 	return SUCCEED;
 }
 
+int	send_value(char *server,int port,char *shortname,char *value)
+{
+	int	i,s;
+	char	tosend[1024];
+	char	result[1024];
+	struct hostent *hp;
+
+	struct sockaddr_in myaddr_in;
+	struct sockaddr_in servaddr_in;
+
+	zabbix_log( LOG_LEVEL_WARNING, "In send_value()");
+
+	servaddr_in.sin_family=AF_INET;
+	hp=gethostbyname(server);
+
+	if(hp==NULL)
+	{
+		return	FAIL;
+	}
+
+	servaddr_in.sin_addr.s_addr=((struct in_addr *)(hp->h_addr))->s_addr;
+
+	servaddr_in.sin_port=htons(port);
+
+	s=socket(AF_INET,SOCK_STREAM,0);
+	if(s == -1)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Error in socket() [%s] [%s]",server, strerror(errno));
+		return	FAIL;
+	}
+
+/*	ling.l_onoff=1;*/
+/*	ling.l_linger=0;*/
+/*	if(setsockopt(s,SOL_SOCKET,SO_LINGER,&ling,sizeof(ling))==-1)*/
+/*	{*/
+/* Ignore */
+/*	}*/
+ 
+	myaddr_in.sin_family = AF_INET;
+	myaddr_in.sin_port=0;
+	myaddr_in.sin_addr.s_addr=INADDR_ANY;
+
+	if( connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Error in connect() [%s] [%s]",server, strerror(errno));
+		close(s);
+		return	FAIL;
+	}
+
+	snprintf(tosend,sizeof(tosend)-1,"%s:%s\n",shortname,value);
+
+	if( sendto(s,tosend,strlen(tosend),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Error in sendto() [%s] [%s]",server, strerror(errno));
+		perror("sendto");
+		close(s);
+		return	FAIL;
+	} 
+	i=sizeof(struct sockaddr_in);
+/*	i=recvfrom(s,result,1023,0,(struct sockaddr *)&servaddr_in,(size_t *)&i);*/
+	i=recvfrom(s,result,1023,0,(struct sockaddr *)&servaddr_in,(socklen_t *)&i);
+	if(s==-1)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Error in recvfrom() [%s] [%s]",server, strerror(errno));
+		perror("recfrom");
+		close(s);
+		return	FAIL;
+	}
+
+	result[i-1]=0;
+
+	if(strcmp(result,"OK") == 0)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "OK");
+	}
+	else
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "NOT OK");
+	}
+ 
+	if( close(s)!=0 )
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Error in close() [%s] [%s]",server, strerror(errno));
+		perror("close");
+		
+	}
+
+	return SUCCEED;
+}
+
 void	process_active_checks()
 {
-	sleep(1);
+	char	value[MAX_STRING_LEN];
+	char	*metrics[]={
+		"diskfree[/]",
+		"disktotal[/]",
+		"diskused[/]",
+		"inodefree[/]",
+		"inodetotoal[/]",
+		"memory[buffers]",
+		"memory[shared]",
+		"memory[free]",
+		"memory[total]",
+		"system[procload]",
+		"system[procload5]",
+		"system[procload15]",
+		"swap[free]",
+		"swap[total]",
+		"version[zabbix_agent]",
+		NULL};
+	int	i;
+
+	char	shortname[MAX_STRING_LEN];
+
+
+	i=0;
+	while(metrics[i]!=NULL)
+	{
+		process(metrics[i], value);
+		snprintf(shortname, MAX_STRING_LEN-1,"%s:%s","a0",metrics[i]);
+		send_value("127.0.0.1",10051,shortname,value);
+		i++;
+	}
 }
 
 void    child_active_main(int i,char *server, int port)
@@ -220,7 +340,7 @@ void    child_active_main(int i,char *server, int port)
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("sleeping for 10 seconds");
 #endif
-		sleep(10);
+//		sleep(1);
 	}
 }
 

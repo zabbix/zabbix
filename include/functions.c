@@ -2219,7 +2219,7 @@ int	send_list_of_active_checks(int sockfd)
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
-		snprintf(s,sizeof(s)-1,"%s:%s\n%s:%s\n",DBget_field(result,i,0),DBget_field(result,i,1),DBget_field(result,i,0),DBget_field(result,i,1));
+		snprintf(s,sizeof(s)-1,"%s:%s\n",DBget_field(result,i,0),DBget_field(result,i,1));
 		if( write(sockfd,s,strlen(s)) == -1 )
 		{
 			switch (errno)
@@ -2265,7 +2265,7 @@ int	process_data(int sockfd,char *server,char *key,char *value)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_data()");
 
-	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta,i.units,i.multiplier,i.formula from items i,hosts h where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type=%d", HOST_STATUS_MONITORED, server, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
+	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta,i.units,i.multiplier,i.formula from items i,hosts h where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type in (%d,%d)", HOST_STATUS_MONITORED, server, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE);
 	result = DBselect(sql);
 
 	if(DBnum_rows(result) == 0)
