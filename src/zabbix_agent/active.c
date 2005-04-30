@@ -57,17 +57,68 @@
 #include "stats.h"
 #include "active.h"
 
+METRIC	*metrics=NULL;
+
+void	add_check(char *key, int refresh)
+{
+
+	int i;
+
+	for(i=0;;i++)
+	{
+		if(metrics[i].key == NULL)
+		{
+
+			metrics[i].key=strdup(key);
+			metrics[i].refresh=refresh;
+			metrics[i].status=ITEM_STATUS_ACTIVE;
+
+			metrics=realloc(metrics,(i+2)*sizeof(METRIC));
+			metrics[i+1].key=NULL;
+			break;
+		}
+	}
+}
+
+/* Parse list of active checks received from server */
+int	parse_list_of_checks(char *str)
+{
+	char *line;
+	char *key, *refresh;
+	char *s1, *s2;
+
+	metrics=malloc(sizeof(METRIC));
+	metrics[0].key=NULL;
+
+	line=(char *)strtok_r(str,"\n",&s1);
+	while(line!=NULL)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Parsed [%s]", line);
+
+		if(strcmp(line,"ZBX_EOF")==0)	break;
+
+		key=(char *)strtok_r(line,":",&s2);
+		zabbix_log( LOG_LEVEL_WARNING, "Key [%s]", key);
+		refresh=(char *)strtok_r(NULL,":",&s2);
+		zabbix_log( LOG_LEVEL_WARNING, "Refresh [%s]", refresh);
+
+		add_check(key, atoi(refresh));
+
+		line=(char *)strtok_r(NULL,"\n",&s1);
+	}
+
+	return SUCCEED;
+}
+
 int	get_active_checks(char *server, int port, char *error, int max_error_len)
 {
 	int	s;
 	int	len;
-	char	c[MAX_STRING_LEN];
+	char	c[MAX_BUF_LEN];
 
 	struct hostent *hp;
 
 	struct sockaddr_in servaddr_in;
-
-	struct linger ling;
 
 	zabbix_log( LOG_LEVEL_WARNING, "get_active_checks: host[%s] port[%d]", server, port);
 
@@ -87,15 +138,6 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 
 	s=socket(AF_INET,SOCK_STREAM,0);
 
-/*	if(CONFIG_NOTIMEWAIT == 1)
-	{
-		ling.l_onoff=1;
-		ling.l_linger=0;
-		if(setsockopt(s,SOL_SOCKET,SO_LINGER,&ling,sizeof(ling))==-1)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot setsockopt SO_LINGER [%s]", strerror(errno));
-		}
-	}*/
 	if(s == -1)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot create socket [%s]",
@@ -145,47 +187,31 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 	memset(c,0,MAX_STRING_LEN);
 
 
-	for(;;)
+	zabbix_log(LOG_LEVEL_WARNING, "Reading");
+	len=read(s,c,MAX_BUF_LEN-1);
+	if(len == -1)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Reading");
-		len=read(s,c,MAX_STRING_LEN);
-		if(len == -1)
+		switch (errno)
 		{
-			switch (errno)
-			{
-				case 	EINTR:
-						zabbix_log( LOG_LEVEL_WARNING, "Timeout while receiving data from [%s]",server );
-						snprintf(error,max_error_len-1,"Timeout while receiving data from [%s]",server);
-						break;
-				case	ECONNRESET:
-						zabbix_log( LOG_LEVEL_WARNING, "Connection reset by peer.");
-						snprintf(error,max_error_len-1,"Connection reset by peer.");
-						close(s);
-						return	NETWORK_ERROR;
-				default:
+			case 	EINTR:
+					zabbix_log( LOG_LEVEL_WARNING, "Timeout while receiving data from [%s]",server );
+					snprintf(error,max_error_len-1,"Timeout while receiving data from [%s]",server);
+					break;
+			case	ECONNRESET:
+					zabbix_log( LOG_LEVEL_WARNING, "Connection reset by peer.");
+					snprintf(error,max_error_len-1,"Connection reset by peer.");
+					close(s);
+					return	NETWORK_ERROR;
+			default:
 					zabbix_log( LOG_LEVEL_WARNING, "Error while receiving data from [%s] [%s]",server, strerror(errno));
 					snprintf(error,max_error_len-1,"Error while receiving data from [%s] [%s]",server, strerror(errno));
-			} 
-			close(s);
-			return	FAIL;
-		}
-		else
-		{
-			if(len>0)
-			{
-				c[len-1]=0;
-			}
-			zabbix_log(LOG_LEVEL_WARNING, "Read [%s]", c);
-			if(strcmp(c,"ZBX_EOF") == 0)
-			{
-				zabbix_log( LOG_LEVEL_WARNING, "Received ZBX_EOF]");
-/* No more checks. End of file. */
-				break;
-			}
-			// Add new check to the list
-			// add_new_check(c);
-		}
+		} 
+		close(s);
+		return	FAIL;
 	}
+	zabbix_log(LOG_LEVEL_WARNING, "Read [%s]", c);
+
+	parse_list_of_checks(c);
 
 	if( close(s)!=0 )
 	{
@@ -288,35 +314,20 @@ int	send_value(char *server,int port,char *shortname,char *value)
 void	process_active_checks()
 {
 	char	value[MAX_STRING_LEN];
-	char	*metrics[]={
-		"diskfree[/]",
-		"disktotal[/]",
-		"diskused[/]",
-		"inodefree[/]",
-		"inodetotal[/]",
-		"memory[buffers]",
-		"memory[shared]",
-		"memory[cached]",
-		"memory[total]",
-		"system[procload]",
-		"system[procload5]",
-		"system[procload15]",
-		"swap[free]",
-		"swap[total]",
-		"version[zabbix_agent]",
-		NULL};
 	int	i;
 
 	char	shortname[MAX_STRING_LEN];
 
 
-	i=0;
-	while(metrics[i]!=NULL)
+	for(i=0;;i++)
 	{
-		process(metrics[i], value);
-		snprintf(shortname, MAX_STRING_LEN-1,"%s:%s","a0",metrics[i]);
+		if(metrics[i].key == NULL)	break;
+
+		process(metrics[i].key, value);
+
+		snprintf(shortname, MAX_STRING_LEN-1,"%s:%s","a0",metrics[i].key);
+		zabbix_log( LOG_LEVEL_WARNING, "%s",shortname);
 		send_value("127.0.0.1",10051,shortname,value);
-		i++;
 	}
 }
 

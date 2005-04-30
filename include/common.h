@@ -46,6 +46,7 @@
 #else
 	#define MAX_STRING_LEN	4096
 #endif
+#define MAX_BUF_LEN	65000
 
 /* Item types */
 #define ITEM_TYPE_ZABBIX	0
