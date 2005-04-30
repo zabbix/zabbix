@@ -2237,7 +2237,7 @@ int	send_list_of_active_checks(int sockfd)
 	}
 	DBfree_result(result);
 
-	snprintf(s,sizeof(s)-1,"%s\n","ZBX_EOF:ZBX_EOF:ZBX_EOF:ZBX_EOF:ZBX_EOF");
+	snprintf(s,sizeof(s)-1,"%s\n","ZBX_EOF");
 	zabbix_log( LOG_LEVEL_WARNING, "Sending [%s]", s);
 	if( write(sockfd,s,strlen(s)) == -1 )
 	{
@@ -2252,6 +2252,7 @@ int	send_list_of_active_checks(int sockfd)
 		close(sockfd);
 		return  FAIL;
 	}
+
 	return  SUCCEED;
 }
 
