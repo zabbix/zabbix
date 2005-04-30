@@ -205,7 +205,7 @@ int	send_value(char *server,int port,char *shortname,char *value)
 	struct sockaddr_in myaddr_in;
 	struct sockaddr_in servaddr_in;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In send_value()");
+	zabbix_log( LOG_LEVEL_DEBUG, "In send_value()");
 
 	servaddr_in.sin_family=AF_INET;
 	hp=gethostbyname(server);
@@ -268,11 +268,11 @@ int	send_value(char *server,int port,char *shortname,char *value)
 
 	if(strcmp(result,"OK") == 0)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "OK");
+		zabbix_log( LOG_LEVEL_DEBUG, "OK");
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "NOT OK");
+		zabbix_log( LOG_LEVEL_WARNING, "NOT OK [%s]", shortname);
 	}
  
 	if( close(s)!=0 )
@@ -293,10 +293,10 @@ void	process_active_checks()
 		"disktotal[/]",
 		"diskused[/]",
 		"inodefree[/]",
-		"inodetotoal[/]",
+		"inodetotal[/]",
 		"memory[buffers]",
 		"memory[shared]",
-		"memory[free]",
+		"memory[cached]",
 		"memory[total]",
 		"system[procload]",
 		"system[procload5]",
