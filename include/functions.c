@@ -2220,6 +2220,7 @@ int	send_list_of_active_checks(int sockfd)
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 		snprintf(s,sizeof(s)-1,"%s:%s\n",DBget_field(result,i,0),DBget_field(result,i,1));
+		zabbix_log( LOG_LEVEL_WARNING, "Sending [%s]", s);
 		if( write(sockfd,s,strlen(s)) == -1 )
 		{
 			switch (errno)
@@ -2236,7 +2237,8 @@ int	send_list_of_active_checks(int sockfd)
 	}
 	DBfree_result(result);
 
-	snprintf(s,sizeof(s)-1,"%s\n","ZBX_EOF");
+	snprintf(s,sizeof(s)-1,"%s\n","ZBX_EOF:ZBX_EOF:ZBX_EOF:ZBX_EOF:ZBX_EOF");
+	zabbix_log( LOG_LEVEL_WARNING, "Sending [%s]", s);
 	if( write(sockfd,s,strlen(s)) == -1 )
 	{
 		switch (errno)
