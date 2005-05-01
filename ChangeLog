@@ -1,5 +1,7 @@
 Changes for 1.1alpha8:
 
+ - new item type: active check (Alexei)
+ - new mandatory parameter for zabbix_agentd.conf - Hostname (Alexei)
  - started development of active agent checks (Alexei)
  - hard-linked templates works when deleting graph element (Alexei)
  - hard-linked templates works when adding graph element (Alexei)
