@@ -120,14 +120,14 @@ int	parse_list_of_checks(char *str)
 	line=(char *)strtok_r(str,"\n",&s1);
 	while(line!=NULL)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Parsed [%s]", line);
+		zabbix_log( LOG_LEVEL_DEBUG, "Parsed [%s]", line);
 
 		if(strcmp(line,"ZBX_EOF")==0)	break;
 
 		key=(char *)strtok_r(line,":",&s2);
-		zabbix_log( LOG_LEVEL_WARNING, "Key [%s]", key);
+		zabbix_log( LOG_LEVEL_DEBUG, "Key [%s]", key);
 		refresh=(char *)strtok_r(NULL,":",&s2);
-		zabbix_log( LOG_LEVEL_WARNING, "Refresh [%s]", refresh);
+		zabbix_log( LOG_LEVEL_DEBUG, "Refresh [%s]", refresh);
 
 		add_check(key, atoi(refresh));
 
@@ -147,7 +147,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 
 	struct sockaddr_in servaddr_in;
 
-	zabbix_log( LOG_LEVEL_WARNING, "get_active_checks: host[%s] port[%d]", server, port);
+	zabbix_log( LOG_LEVEL_DEBUG, "get_active_checks: host[%s] port[%d]", server, port);
 
 	servaddr_in.sin_family=AF_INET;
 	hp=gethostbyname(server);
@@ -194,7 +194,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 	}
 
 	snprintf(c,sizeof(c)-1,"%s\n%s\n","ZBX_GET_ACTIVE_CHECKS",CONFIG_HOSTNAME);
-	zabbix_log(LOG_LEVEL_WARNING, "Sending [%s]", c);
+	zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", c);
 	if( write(s,c,strlen(c)) == -1 )
 	{
 		switch (errno)
@@ -214,7 +214,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 	memset(c,0,MAX_STRING_LEN);
 
 
-	zabbix_log(LOG_LEVEL_WARNING, "Reading");
+	zabbix_log(LOG_LEVEL_DEBUG, "Before read");
 	len=read(s,c,MAX_BUF_LEN-1);
 	if(len == -1)
 	{
@@ -236,7 +236,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 		close(s);
 		return	FAIL;
 	}
-	zabbix_log(LOG_LEVEL_WARNING, "Read [%s]", c);
+	zabbix_log(LOG_LEVEL_DEBUG, "Read [%s]", c);
 
 	parse_list_of_checks(c);
 
@@ -323,7 +323,7 @@ int	send_value(char *server,int port,char *shortname,char *value)
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "NOT OK [%s]", shortname);
+		zabbix_log( LOG_LEVEL_DEBUG, "NOT OK [%s]", shortname);
 	}
  
 	if( close(s)!=0 )
@@ -352,7 +352,7 @@ int	process_active_checks()
 		process(metrics[i].key, value);
 
 		snprintf(shortname, MAX_STRING_LEN-1,"%s:%s",CONFIG_HOSTNAME,metrics[i].key);
-		zabbix_log( LOG_LEVEL_WARNING, "%s",shortname);
+		zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
 		if(send_value("127.0.0.1",10051,shortname,value) == FAIL)
 		{
 			ret = FAIL;
@@ -412,7 +412,7 @@ void    child_active_main(int i,char *server, int port)
 			{
 				sleeptime = 60;
 			}
-			zabbix_log( LOG_LEVEL_WARNING, "Sleeping for %d seconds",
+			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
 					sleeptime );
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 			setproctitle("sucker [sleeping for %d seconds]", 
@@ -424,7 +424,6 @@ void    child_active_main(int i,char *server, int port)
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "No sleeping" );
 		}
-//		sleep(1);
 	}
 }
 
