@@ -372,9 +372,16 @@ void    child_active_main(int i,char *server, int port)
 	zabbix_log( LOG_LEVEL_WARNING, "zabbix_agentd %ld started",(long)getpid());
 
 #ifdef HAVE_FUNCTION_SETPROCTITLE
-	setproctitle("before getting list of active checks");
+	setproctitle("getting list of active checks");
 #endif
-	get_active_checks(server, port, error, sizeof(error));
+	while(get_active_checks(server, port, error, sizeof(error)) != SUCCEED)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Getting list of active checks failed. Will retry after 60 seconds");
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("sucker [sleeping for %d seconds]", 60);
+#endif
+		sleep(60);
+	}
 
 	for(;;)
 	{
