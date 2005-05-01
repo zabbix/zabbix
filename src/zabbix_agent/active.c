@@ -302,7 +302,6 @@ int	send_value(char *server,int port,char *shortname,char *value)
 	if( sendto(s,tosend,strlen(tosend),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Error in sendto() [%s] [%s]",server, strerror(errno));
-		perror("sendto");
 		close(s);
 		return	FAIL;
 	} 
@@ -312,7 +311,6 @@ int	send_value(char *server,int port,char *shortname,char *value)
 	if(s==-1)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Error in recvfrom() [%s] [%s]",server, strerror(errno));
-		perror("recfrom");
 		close(s);
 		return	FAIL;
 	}
@@ -331,17 +329,16 @@ int	send_value(char *server,int port,char *shortname,char *value)
 	if( close(s)!=0 )
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Error in close() [%s] [%s]",server, strerror(errno));
-		perror("close");
-		
 	}
 
 	return SUCCEED;
 }
 
-void	process_active_checks()
+int	process_active_checks()
 {
 	char	value[MAX_STRING_LEN];
 	int	i, now;
+	int	ret = SUCCEED;
 
 	char	shortname[MAX_STRING_LEN];
 
@@ -356,10 +353,15 @@ void	process_active_checks()
 
 		snprintf(shortname, MAX_STRING_LEN-1,"%s:%s",CONFIG_HOSTNAME,metrics[i].key);
 		zabbix_log( LOG_LEVEL_WARNING, "%s",shortname);
-		send_value("127.0.0.1",10051,shortname,value);
+		if(send_value("127.0.0.1",10051,shortname,value) == FAIL)
+		{
+			ret = FAIL;
+			break;
+		}
 
 		metrics[i].nextcheck=time(NULL)+metrics[i].refresh;
 	}
+	return ret;
 }
 
 void    child_active_main(int i,char *server, int port)
@@ -379,10 +381,11 @@ void    child_active_main(int i,char *server, int port)
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("processing active checks");
 #endif
-		process_active_checks();
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("sleeping for 10 seconds");
-#endif
+		if(process_active_checks() == FAIL)
+		{
+			sleep(60);
+			continue;
+		}
 		nextcheck=get_min_nextcheck();
 		if( FAIL == nextcheck)
 		{
