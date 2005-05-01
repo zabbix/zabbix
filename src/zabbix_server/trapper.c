@@ -57,7 +57,7 @@
 
 int	process_trap(int sockfd,char *s)
 {
-	char	*p;
+	char	*p,*line,*host;
 	char	*server,*key,*value_string;
 	char	result[MAX_STRING_LEN];
 
@@ -69,9 +69,11 @@ int	process_trap(int sockfd,char *s)
 	zabbix_log( LOG_LEVEL_DEBUG, "Trapper got [%s]", s);
 
 /* Request for list of active checks */
-	if(strcmp(s,"ZBX_GET_ACTIVE_CHECKS") == 0)
+	if(strncmp(s,"ZBX_GET_ACTIVE_CHECKS", strlen("ZBX_GET_ACTIVE_CHECKS")) == 0)
 	{
-		ret=send_list_of_active_checks(sockfd);
+		line=strtok(s,"\n");
+		host=strtok(NULL,"\n");
+		ret=send_list_of_active_checks(sockfd, host);
 	}
 /* Process information sent by zabbix_sender */
 	else

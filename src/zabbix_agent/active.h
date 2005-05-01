@@ -20,11 +20,14 @@
 #ifndef ZABBIX_ACTIVE_H
 #define ZABBIX_ACTIVE_H
 
+extern char	*CONFIG_HOSTNAME;
+
 #define METRIC struct metric_type
 METRIC
 {
 	char	*key;
 	int	refresh;
+	int	nextcheck;
 	int	status;
 };
 

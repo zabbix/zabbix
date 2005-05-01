@@ -66,18 +66,18 @@ int	parent=0;
 /* Number of processed requests */
 int	stats_request=0;
 
-static	char	*CONFIG_HOSTS_ALLOWED		= NULL;
-static	char	*CONFIG_FILE			= NULL;
-static	char	*CONFIG_PID_FILE		= NULL;
-static	char	*CONFIG_LOG_FILE		= NULL;
-/*static	char	*CONFIG_STAT_FILE		= NULL;*/
-static	int	CONFIG_AGENTD_FORKS		= AGENTD_FORKS;
-static	int	CONFIG_NOTIMEWAIT		= 0;
-static	int	CONFIG_TIMEOUT			= AGENT_TIMEOUT;
-static	int	CONFIG_LISTEN_PORT		= 10050;
-static	int	CONFIG_SERVER_PORT		= 10051;
-static	char	*CONFIG_LISTEN_IP		= NULL;
-static	int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
+char	*CONFIG_HOSTS_ALLOWED		= NULL;
+char	*CONFIG_HOSTNAME		= NULL;
+char	*CONFIG_FILE			= NULL;
+char	*CONFIG_PID_FILE		= NULL;
+char	*CONFIG_LOG_FILE		= NULL;
+int	CONFIG_AGENTD_FORKS		= AGENTD_FORKS;
+int	CONFIG_NOTIMEWAIT		= 0;
+int	CONFIG_TIMEOUT			= AGENT_TIMEOUT;
+int	CONFIG_LISTEN_PORT		= 10050;
+int	CONFIG_SERVER_PORT		= 10051;
+char	*CONFIG_LISTEN_IP		= NULL;
+int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 
 void	uninit(void)
 {
@@ -231,6 +231,7 @@ void    init_config(void)
 /*               PARAMETER      ,VAR    ,FUNC,  TYPE(0i,1s),MANDATORY,MIN,MAX
 */
 		{"Server",&CONFIG_HOSTS_ALLOWED,0,TYPE_STRING,PARM_MAND,0,0},
+		{"Hostname",&CONFIG_HOSTNAME,0,TYPE_STRING,PARM_MAND,0,0},
 		{"PidFile",&CONFIG_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"LogFile",&CONFIG_LOG_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 /*		{"StatFile",&CONFIG_STAT_FILE,0,TYPE_STRING,PARM_OPT,0,0},*/
@@ -480,9 +481,6 @@ int	main(int argc, char **argv)
 
 	/* Initialize thread for active checks */
 	pids[CONFIG_AGENTD_FORKS-1] = child_active_make(CONFIG_AGENTD_FORKS-1, CONFIG_HOSTS_ALLOWED, CONFIG_SERVER_PORT);
-	// DELETE THIS LINE
-	child_active_make(CONFIG_AGENTD_FORKS-1, CONFIG_HOSTS_ALLOWED, CONFIG_SERVER_PORT);
-	child_active_make(CONFIG_AGENTD_FORKS-1, CONFIG_HOSTS_ALLOWED, CONFIG_SERVER_PORT);
 
 	parent=1;
 

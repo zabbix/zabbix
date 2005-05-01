@@ -2203,7 +2203,7 @@ int	get_lastvalue(char *value,char *host,char *key,char *function,char *paramete
 }
 
 /* For zabbix_trapper(d) */
-int	send_list_of_active_checks(int sockfd)
+int	send_list_of_active_checks(int sockfd, char *host)
 {
 	char	sql[MAX_STRING_LEN];
 	char	s[MAX_STRING_LEN];
@@ -2213,7 +2213,7 @@ int	send_list_of_active_checks(int sockfd)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In send_list_of_active_checks()");
 
-	snprintf(sql,sizeof(sql)-1,"select i.key_,i.delay from items i,hosts h where i.hostid=h.hostid and h.status=%d and i.status=%d and i.type=%d", HOST_STATUS_MONITORED, ITEM_STATUS_ACTIVE, ITEM_TYPE_ZABBIX_ACTIVE);
+	snprintf(sql,sizeof(sql)-1,"select i.key_,i.delay from items i,hosts h where i.hostid=h.hostid and h.status=%d and i.status=%d and i.type=%d and h.host='%s'", HOST_STATUS_MONITORED, ITEM_STATUS_ACTIVE, ITEM_TYPE_ZABBIX_ACTIVE, host);
 
 	result = DBselect(sql);
 
