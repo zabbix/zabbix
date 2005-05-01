@@ -31,7 +31,7 @@ void    update_triggers (int itemid);
 int	get_lastvalue(char *value,char *host,char *key,char *function,char *parameter);
 int	process_data(int sockfd,char *server,char *key, char *value);
 void	process_new_value(DB_ITEM *item,char *value);
-int	send_list_of_active_checks(int sockfd);
+int	send_list_of_active_checks(int sockfd, char *host);
 
 #ifdef ZABBIX_THREADS
 void	update_triggers_thread(MYSQL *database, int itemid);

@@ -27,6 +27,8 @@
 #include <unistd.h>
 #include <signal.h>
 
+#include <time.h>
+
 #include <errno.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -59,6 +61,30 @@
 
 METRIC	*metrics=NULL;
 
+int	get_min_nextcheck()
+{
+	int i;
+	int min=-1;
+	int nodata=0;
+
+	for(i=0;;i++)
+	{
+		if(metrics[i].key == NULL)	break;
+
+		nodata=1;
+		if( (metrics[i].nextcheck < min) || (min == -1))
+		{
+			min=metrics[i].nextcheck;
+		}
+	}
+
+	if(nodata==0)
+	{
+		return	FAIL;
+	}
+	return min;
+}
+
 void	add_check(char *key, int refresh)
 {
 
@@ -71,6 +97,7 @@ void	add_check(char *key, int refresh)
 
 			metrics[i].key=strdup(key);
 			metrics[i].refresh=refresh;
+			metrics[i].nextcheck=0;
 			metrics[i].status=ITEM_STATUS_ACTIVE;
 
 			metrics=realloc(metrics,(i+2)*sizeof(METRIC));
@@ -166,7 +193,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 		return	NETWORK_ERROR;
 	}
 
-	snprintf(c,sizeof(c)-1,"%s\n","ZBX_GET_ACTIVE_CHECKS");
+	snprintf(c,sizeof(c)-1,"%s\n%s\n","ZBX_GET_ACTIVE_CHECKS",CONFIG_HOSTNAME);
 	zabbix_log(LOG_LEVEL_WARNING, "Sending [%s]", c);
 	if( write(s,c,strlen(c)) == -1 )
 	{
@@ -314,26 +341,31 @@ int	send_value(char *server,int port,char *shortname,char *value)
 void	process_active_checks()
 {
 	char	value[MAX_STRING_LEN];
-	int	i;
+	int	i, now;
 
 	char	shortname[MAX_STRING_LEN];
 
+	now=time(NULL);
 
 	for(i=0;;i++)
 	{
 		if(metrics[i].key == NULL)	break;
+		if(metrics[i].nextcheck>now)	continue;
 
 		process(metrics[i].key, value);
 
-		snprintf(shortname, MAX_STRING_LEN-1,"%s:%s","a0",metrics[i].key);
+		snprintf(shortname, MAX_STRING_LEN-1,"%s:%s",CONFIG_HOSTNAME,metrics[i].key);
 		zabbix_log( LOG_LEVEL_WARNING, "%s",shortname);
 		send_value("127.0.0.1",10051,shortname,value);
+
+		metrics[i].nextcheck=time(NULL)+metrics[i].refresh;
 	}
 }
 
 void    child_active_main(int i,char *server, int port)
 {
 	char	error[MAX_STRING_LEN];
+	int	sleeptime, nextcheck;
 
 	zabbix_log( LOG_LEVEL_WARNING, "zabbix_agentd %ld started",(long)getpid());
 
@@ -351,6 +383,37 @@ void    child_active_main(int i,char *server, int port)
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("sleeping for 10 seconds");
 #endif
+		nextcheck=get_min_nextcheck();
+		if( FAIL == nextcheck)
+		{
+			sleeptime=60;
+		}
+		else
+		{
+			sleeptime=nextcheck-time(NULL);
+			if(sleeptime<0)
+			{
+				sleeptime=0;
+			}
+		}
+		if(sleeptime>0)
+		{
+			if(sleeptime > 60)
+			{
+				sleeptime = 60;
+			}
+			zabbix_log( LOG_LEVEL_WARNING, "Sleeping for %d seconds",
+					sleeptime );
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+			setproctitle("sucker [sleeping for %d seconds]", 
+					sleeptime);
+#endif
+			sleep( sleeptime );
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_DEBUG, "No sleeping" );
+		}
 //		sleep(1);
 	}
 }

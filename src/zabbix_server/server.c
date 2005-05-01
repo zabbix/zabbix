@@ -53,7 +53,6 @@
 #include "alerter.h"
 #include "pinger.h"
 #include "housekeeper.h"
-#include "housekeeper.h"
 #include "trapper.h"
 
 #include "checks_agent.h"
