@@ -3,6 +3,7 @@
  - finish hard-linked templates
  - escalations and repeated notifications
  - daily/weekly/monthly SLA reporting
+ - add encryption between server and agents
 
 ZABBIX 1.1:
 
