@@ -429,6 +429,7 @@
 	define("S_MENU_AUDIT",				"AUDIT");
 
 //	overview.php
+	define("S_SELECT_GROUP_DOT_DOT_DOT",		"Select group ...");
 	define("S_OVERVIEW",				"Overview");
 	define("S_OVERVIEW_BIG",			"OVERVIEW");
 	define("S_EXCL",				"!");
