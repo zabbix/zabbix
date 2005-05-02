@@ -64,7 +64,7 @@
 
 	$h2=S_GROUP."&nbsp;";
 	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
-	$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_ALL_SMALL;
+	$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_SELECT_GROUP_DOT_DOT_DOT;
 	$result=DBselect("select groupid,name from groups order by name");
 	while($row=DBfetch($result))
 	{

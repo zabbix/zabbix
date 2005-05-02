@@ -345,6 +345,8 @@ int	get_value(double *result,char *result_str,DB_ITEM *item, char *error, int ma
 		res=NOTSUPPORTED;
 	}
 	alarm(0);
+	/* Delete EOL characters from result string */
+	delete_reol(result_str);
 	return res;
 }
 

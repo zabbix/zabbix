@@ -534,7 +534,7 @@ void	process(char *command,char *value)
 		}
 		else
 		{
-			snprintf(value,MAX_STRING_LEN-1,"%s",res2);
+			snprintf(value,MAX_STRING_LEN-1,"%s\n",res2);
 			free(res2);
 		}
 	}
@@ -2520,7 +2520,7 @@ int	DISK_WBLK(const char *cmd, const char *parameter,double  *value)
 
 int	VERSION(const char *cmd, const char *parameter,char  **value)
 {
-	static	char	version[]="1.1alpha7\n";
+	static	char	version[]="1.1alpha7";
 
 	*value=strdup(version);
 	return	SYSINFO_RET_OK;
