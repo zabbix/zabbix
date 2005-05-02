@@ -29,6 +29,7 @@ int	find_char(char *str,char c);
 int	substitute_functions(char *exp);
 int	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp);
 int     evaluate_expression (int *result,char *expression);
+void	delete_reol(char *c);
 
 #ifdef ZABBIX_THREADS
 int	substitute_macros_thread(MYSQL *database, DB_TRIGGER *trigger, DB_ACTION *action, char *exp);

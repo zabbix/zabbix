@@ -155,6 +155,25 @@ int	is_double(char *c)
 }
 
 /*
+ * Delete all right EOL characters from
+ */ 
+void	delete_reol(char *c)
+{
+	int i,j;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "Before deleting EOL:%s", c );
+
+	j=0;
+	for(i=(int)strlen(c)-1;i>=0;i--)
+	{
+		if( c[i] != '\n')	break;
+		c[i]=0;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "After deleting EOL:%s", c );
+}
+
+/*
  * Delete all spaces from given string
  */ 
 void	delete_spaces(char *c)
