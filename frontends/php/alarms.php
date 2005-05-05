@@ -35,55 +35,33 @@
 ?>
 
 <?php
-	show_table_header_begin();
-	echo S_ALARMS_BIG;
- 
-	show_table_v_delimiter(); 
-
-	if(!isset($_GET["triggerid"]))
+	if(isset($_GET["limit"]) && ($_GET["limit"]=="NO"))
 	{
-		echo "<div align=center><B>No triggerID!!!!</B><BR>Please Contact Server Adminstrator</div>";
-		show_footer();
-		exit;
+		$limit="";
 	}
 	else
 	{
-		$trigger=get_trigger_by_triggerid($_GET["triggerid"]);
-
-		$Expression=$trigger["expression"];
-		$Description=$trigger["description"];
-//		$Priority=$trigger["priority"];
-	}
-?>
-
-<?php
-	if(isset($_GET["limit"]) && ($_GET["limit"]=="NO"))
-	{
-		echo "[<A HREF=\"alarms.php?triggerid=".$_GET["triggerid"]."&limit=30\">";
-		echo S_SHOW_ONLY_LAST_100;
-		echo "</A>]";
-		$limit=" ";
-	}
-	else 
-	{
-		echo "[<A HREF=\"alarms.php?triggerid=".$_GET["triggerid"]."&limit=NO\">";
-		echo S_SHOW_ALL;
-		echo "</A>]";
-		$limit=" limit 100";
+		$limit="limit 100";
+		$_GET["limit"] = 100;
 	}
 
-	show_table_header_end();
-	echo "<br>";
-?>
+	$trigger=get_trigger_by_triggerid($_GET["triggerid"]);
 
+	$expression=$trigger["expression"];
 
-<?php
-	$Expression=explode_exp($Expression,1);
-//	if( strstr($Description,"%s"))
-//	{
-		$Description=expand_trigger_description($trigger["triggerid"]);
-//	}
-	show_table_header("$Description<BR><font size=-1>$Expression</font>");
+	$expression=explode_exp($expression,1);
+	$description=expand_trigger_description($_GET["triggerid"]);
+
+	$h1=S_ALARMS_BIG.":$description<br>$expression";
+
+	$h2="";
+	$h2=$h2."<input name=\"triggerid\" type=\"hidden\" value=".$_GET["triggerid"].">";
+	$h2=$h2."<select class=\"biginput\" name=\"limit\" onChange=\"submit()\">";
+	$h2=$h2."<option value=\"NO\" ".iif($_GET["limit"]=="NO","selected","").">".S_SHOW_ALL;
+	$h2=$h2."<option value=\"100\" ".iif($_GET["limit"]=="100","selected","").">".S_SHOW_ONLY_LAST_100;
+	$h2=$h2."</select>";
+
+	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"alarms.php\">", "</form>");
 ?>
 
 <FONT COLOR="#000000">
@@ -111,25 +89,25 @@
 //		table_td(date("Y.M.d H:i:s",$row["clock"]),"");
 		if($row["value"]==1)
 		{
-			$istrue=S_TRUE_BIG;
+			$istrue=array("value"=>S_TRUE_BIG,"class"=>"on");
 			$truesum=$truesum+$leng;
 			$sum=$truesum;
 		}
 		elseif($row["value"]==0)
 		{
-			$istrue=S_FALSE_BIG;
+			$istrue=array("value"=>S_FALSE_BIG,"class"=>"off");
 			$falsesum=$falsesum+$leng;
 			$sum=$falsesum;
 		}
 		elseif($row["value"]==3)
 		{
-			$istrue=S_DISABLED_BIG;
+			$istrue=array("value"=>S_DISABLED_BIG,"class"=>"unknown");
 			$dissum=$dissum+$leng;
 			$sum=$dissum;
 		}
 		elseif($row["value"]==2)
 		{
-			$istrue=S_UNKNOWN_BIG;
+			$istrue=array("value"=>S_UNKNOWN_BIG,"class"=>"unknown");
 			$dissum=$dissum+$leng;
 			$sum=$dissum;
 		}
