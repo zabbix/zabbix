@@ -2277,21 +2277,31 @@ int	process_data(int sockfd,char *server,char *key,char *value)
 		return  FAIL;
 	}
 
+	item.key=DBget_field(result,0,1);
+	item.host=DBget_field(result,0,2);
+	item.type=atoi(DBget_field(result,0,7));
 	item.trapper_hosts=DBget_field(result,0,16);
-	if(check_security(sockfd,item.trapper_hosts,1) == FAIL)
+
+	if( (item.type==ITEM_TYPE_ZABBIX_ACTIVE) && (check_security(sockfd,item.trapper_hosts,1) == FAIL))
 	{
 		DBfree_result(result);
 		return  FAIL;
 	}
+
+	zabbix_log( LOG_LEVEL_WARNING, "Processing [%s]", value);
+
+	if(strcmp(value,"ZBX_NOTSUPPORTED") ==0)
+	{
+			zabbix_log( LOG_LEVEL_WARNING, "Active parameter [%s] is not supported by agent on host [%s]", item.key, item.host );
+			zabbix_syslog("Active parameter [%s] is not supported by agent on host [%s]", item.key, item.host );
+			DBupdate_item_status_to_notsupported(item.itemid, "Not supported by agent");
+	}
 	
 	item.itemid=atoi(DBget_field(result,0,0));
-	item.key=DBget_field(result,0,1);
-	item.host=DBget_field(result,0,2);
 	item.port=atoi(DBget_field(result,0,3));
 	item.delay=atoi(DBget_field(result,0,4));
 	item.description=DBget_field(result,0,5);
 	item.nextcheck=atoi(DBget_field(result,0,6));
-	item.type=atoi(DBget_field(result,0,7));
 	item.snmp_community=DBget_field(result,0,8);
 	item.snmp_oid=DBget_field(result,0,9);
 	item.useip=atoi(DBget_field(result,0,10));
