@@ -473,12 +473,14 @@
 	define("S_FALSE",				"False");
 
 //	report3.php
+	define("S_IT_SERVICES_AVAILABILITY_REPORT_BIG",	"IT SERVICES AVAILABILITY REPORT");
 	define("S_FROM",				"From");
 	define("S_TILL",				"Till");
 	define("S_OK",					"Ok");
 	define("S_PROBLEMS",				"Problems");
 	define("S_PERCENTAGE",				"Percentage");
 	define("S_SLA",					"SLA");
+	define("S_YEAR",				"Year");
 
 //	screenconf.php
 	define("S_SCREENS",				"Screens");
