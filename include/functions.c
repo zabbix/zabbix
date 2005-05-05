@@ -2288,7 +2288,7 @@ int	process_data(int sockfd,char *server,char *key,char *value)
 		return  FAIL;
 	}
 
-	zabbix_log( LOG_LEVEL_WARNING, "Processing [%s]", value);
+	zabbix_log( LOG_LEVEL_DEBUG, "Processing [%s]", value);
 
 	if(strcmp(value,"ZBX_NOTSUPPORTED") ==0)
 	{
