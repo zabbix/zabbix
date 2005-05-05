@@ -382,8 +382,9 @@ int	process_active_checks()
 
 	for(i=0;;i++)
 	{
-		if(metrics[i].key == NULL)	break;
-		if(metrics[i].nextcheck>now)	continue;
+		if(metrics[i].key == NULL)			break;
+		if(metrics[i].nextcheck>now)			continue;
+		if(metrics[i].status!=ITEM_STATUS_ACTIVE)	continue;
 
 		process(metrics[i].key, value);
 
@@ -395,6 +396,12 @@ int	process_active_checks()
 			break;
 		}
 
+		if(strcmp(value,"ZBX_NOTSUPPORTED\n")==0)
+		{
+			metrics[i].status=ITEM_STATUS_NOTSUPPORTED;
+			zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.", metrics[i].key);
+		}
+
 		metrics[i].nextcheck=time(NULL)+metrics[i].refresh;
 	}
 	return ret;
@@ -402,7 +409,7 @@ int	process_active_checks()
 
 void	refresh_metrics(char *server, int port, char *error, int max_error_len)
 {
-	zabbix_log( LOG_LEVEL_DEBUG, "In refresh_metrics()");
+	zabbix_log( LOG_LEVEL_WARNING, "In refresh_metrics()");
 
 	while(get_active_checks(server, port, error, sizeof(error)) != SUCCEED)
 	{
