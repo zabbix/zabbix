@@ -45,37 +45,31 @@
 ?>
 
 <?php
-	show_table_header_begin();
-	echo "IT SERVICES AVAILABILITY REPORT";
-	echo "<br>";
-	echo "<a href=\"srv_status.php?serviceid=".$service["serviceid"]."\">",$service["name"],"</a>";;
+	if(!isset($_GET["show"]))
+	{
+		$_GET["show"]=0;
+	}
 
-	show_table_v_delimiter();
+	$h1=S_IT_SERVICES_AVAILABILITY_REPORT_BIG;
+	$h1=$h1.":"."<a href=\"srv_status.php?serviceid=".$service["serviceid"]."\">".$service["name"]."</a>";
 
+#	$h2=S_GROUP."&nbsp;";
+	$h2=S_YEAR."&nbsp;";
+	$h2=$h2."<input name=\"serviceid\" type=\"hidden\" value=".$_GET["serviceid"].">";
+	$h2=$h2."<select class=\"biginput\" name=\"year\" onChange=\"submit()\">";
 	$result=DBselect("select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid group by h.hostid,h.host order by h.host");
 
 	$year=date("Y");
 	for($year=date("Y")-2;$year<=date("Y");$year++)
 	{
-		if( isset($_GET["year"]) && ($_GET["year"] == $year) )
-		{
-			echo "<b>[";
-		}
-		echo "<a href='report3.php?serviceid=".$_GET["serviceid"]."&year=$year'>".$year."</a>";
-		if(isset($_GET["year"]) && ($_GET["year"] == $year) )
-		{
-			echo "]</b>";
-		}
-		echo " ";
+		$h2=$h2."<option value=\"$year\" ".iif(isset($_GET["year"])&&($_GET["year"]==$year),"selected","").">".$year;
 	}
+	$h2=$h2."</select>";
 
-	show_table_header_end();
+	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"report3.php\">", "</form>");
 ?>
 
 <?php
-
-
-	echo "<br>";
 	table_begin();
 	table_header(array(S_FROM,S_TILL,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));
 	$col=0;
