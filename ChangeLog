@@ -1,5 +1,6 @@
 Changes for 1.1alpha8:
 
+ - added parameter RefreshActiveChecks to zabbix_agentd.conf (Alexei)
  - better report3.php (Alexei)
  - better alarms.php (Alexei)
  - new item type: active check (Alexei)
