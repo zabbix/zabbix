@@ -61,6 +61,42 @@
 
 METRIC	*metrics=NULL;
 
+void	init_list()
+{
+	zabbix_log( LOG_LEVEL_DEBUG, "In init_list()");
+
+	if(metrics==NULL)
+	{
+		metrics=malloc(sizeof(METRIC));
+		metrics[0].key=NULL;
+	}
+	else
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Metrics are already initialised");
+	}
+}
+void	delete_all_metrics()
+{
+	int i,count=0;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In delete_all_metrics()");
+	for(i=0;;i++)
+	{
+		if(metrics[i].key == NULL)	break;
+
+		count++;
+	}
+
+	for(i=count-1;i>=0;i--)
+	{
+		free(metrics[i].key);
+	}
+	free(metrics);
+
+	metrics=NULL;
+	init_list();
+}
+
 int	get_min_nextcheck()
 {
 	int i;
@@ -114,8 +150,8 @@ int	parse_list_of_checks(char *str)
 	char *key, *refresh;
 	char *s1, *s2;
 
-	metrics=malloc(sizeof(METRIC));
-	metrics[0].key=NULL;
+	init_list();
+	delete_all_metrics();
 
 	line=(char *)strtok_r(str,"\n",&s1);
 	while(line!=NULL)
@@ -364,16 +400,10 @@ int	process_active_checks()
 	return ret;
 }
 
-void    child_active_main(int i,char *server, int port)
+void	refresh_metrics(char *server, int port, char *error, int max_error_len)
 {
-	char	error[MAX_STRING_LEN];
-	int	sleeptime, nextcheck;
+	zabbix_log( LOG_LEVEL_WARNING, "In refresh_metrics()");
 
-	zabbix_log( LOG_LEVEL_WARNING, "zabbix_agentd %ld started",(long)getpid());
-
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-	setproctitle("getting list of active checks");
-#endif
 	while(get_active_checks(server, port, error, sizeof(error)) != SUCCEED)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Getting list of active checks failed. Will retry after 60 seconds");
@@ -382,6 +412,22 @@ void    child_active_main(int i,char *server, int port)
 #endif
 		sleep(60);
 	}
+}
+
+void    child_active_main(int i,char *server, int port)
+{
+	char	error[MAX_STRING_LEN];
+	int	sleeptime, nextcheck;
+	int	nextrefresh;
+
+	zabbix_log( LOG_LEVEL_WARNING, "zabbix_agentd %ld started",(long)getpid());
+
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+	setproctitle("getting list of active checks");
+#endif
+
+	refresh_metrics(server, port, error, sizeof(error));
+	nextrefresh=time(NULL)+CONFIG_REFRESH_ACTIVE_CHECKS;
 
 	for(;;)
 	{
@@ -423,6 +469,12 @@ void    child_active_main(int i,char *server, int port)
 		else
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "No sleeping" );
+		}
+
+		if(time(NULL)>=nextrefresh)
+		{
+			refresh_metrics(server, port, error, sizeof(error));
+			nextrefresh=time(NULL)+CONFIG_REFRESH_ACTIVE_CHECKS;
 		}
 	}
 }

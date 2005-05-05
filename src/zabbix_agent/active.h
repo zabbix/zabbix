@@ -21,6 +21,7 @@
 #define ZABBIX_ACTIVE_H
 
 extern char	*CONFIG_HOSTNAME;
+extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
 
 #define METRIC struct metric_type
 METRIC
