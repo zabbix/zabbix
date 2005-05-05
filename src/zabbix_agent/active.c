@@ -72,7 +72,7 @@ void	init_list()
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Metrics are already initialised");
+		zabbix_log( LOG_LEVEL_DEBUG, "Metrics are already initialised");
 	}
 }
 void	delete_all_metrics()
@@ -402,7 +402,7 @@ int	process_active_checks()
 
 void	refresh_metrics(char *server, int port, char *error, int max_error_len)
 {
-	zabbix_log( LOG_LEVEL_WARNING, "In refresh_metrics()");
+	zabbix_log( LOG_LEVEL_DEBUG, "In refresh_metrics()");
 
 	while(get_active_checks(server, port, error, sizeof(error)) != SUCCEED)
 	{
