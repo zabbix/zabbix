@@ -139,6 +139,8 @@
 			if(DBnum_rows($result2)==0)
 			{
 				add_item($item["description"],$item["key_"],$row["hostid"],$item["delay"],$item["history"],$item["status"],$item["type"],$item["snmp_community"],$item["snmp_oid"],$item["value_type"],$item["trapper_hosts"],$item["snmp_port"],$item["units"],$item["multiplier"],$item["delta"],$item["snmpv3_securityname"],$item["snmpv3_securitylevel"],$item["snmpv3_authpassphrase"],$item["snmpv3_privpassphrase"],$item["formula"],$item["trends"]);
+				$host=get_host_by_hostid($row["hostid"]);
+				info("Added to host ".$host["host"]);
 			}
 		}
 	}
