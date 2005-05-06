@@ -78,7 +78,11 @@
                         $ERROR_MSG="Insufficient permissions";
                         return 0;
 		}
-		$sql="update items set status=$status where itemid=$itemid";
+		if($status==ITEM_STATUS_ACTIVE)
+			$sql="update items set status=$status,error=\"\" where itemid=$itemid";
+		else
+			$sql="update items set status=$status where itemid=$itemid";
+
 		return	DBexecute($sql);
 	}
 
