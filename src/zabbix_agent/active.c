@@ -370,7 +370,7 @@ int	send_value(char *server,int port,char *shortname,char *value)
 	return SUCCEED;
 }
 
-int	process_active_checks()
+int	process_active_checks(char *server, int port)
 {
 	char	value[MAX_STRING_LEN];
 	int	i, now;
@@ -390,7 +390,7 @@ int	process_active_checks()
 
 		snprintf(shortname, MAX_STRING_LEN-1,"%s:%s",CONFIG_HOSTNAME,metrics[i].key);
 		zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
-		if(send_value("127.0.0.1",10051,shortname,value) == FAIL)
+		if(send_value(server,port,shortname,value) == FAIL)
 		{
 			ret = FAIL;
 			break;
@@ -441,7 +441,7 @@ void    child_active_main(int i,char *server, int port)
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("processing active checks");
 #endif
-		if(process_active_checks() == FAIL)
+		if(process_active_checks(server, port) == FAIL)
 		{
 			sleep(60);
 			continue;
