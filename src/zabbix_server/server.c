@@ -236,7 +236,7 @@ void	daemon_init(void)
 
 void usage(char *prog)
 {
-	printf("zabbix_server - ZABBIX server process v1.1alpha7\n");
+	printf("zabbix_server - ZABBIX server process v1.1alpha8\n");
 	printf("Usage: %s [-h] [-c <file>]\n", prog);
 	printf("\nOptions:\n");
 	printf("  -c <file>   Specify configuration file. Default is /etc/zabbix/zabbix_server.conf\n");
