@@ -140,7 +140,7 @@
 			{
 				add_item($item["description"],$item["key_"],$row["hostid"],$item["delay"],$item["history"],$item["status"],$item["type"],$item["snmp_community"],$item["snmp_oid"],$item["value_type"],$item["trapper_hosts"],$item["snmp_port"],$item["units"],$item["multiplier"],$item["delta"],$item["snmpv3_securityname"],$item["snmpv3_securitylevel"],$item["snmpv3_authpassphrase"],$item["snmpv3_privpassphrase"],$item["formula"],$item["trends"]);
 				$host=get_host_by_hostid($row["hostid"]);
-				info("Added to host ".$host["host"]);
+				info("Added to linked host ".$host["host"]);
 			}
 		}
 	}
@@ -166,6 +166,8 @@
 			while($row2=DBfetch($result2))
 			{
 				delete_item($row2["itemid"]);
+				$host=get_host_by_hostid($row["hostid"]);
+				info("Deleted from linked host ".$host["host"]);
 			}
 		}
 	}
@@ -192,6 +194,8 @@
 			{
 				$row2=DBfetch($result2);
 				update_item($row2["itemid"],$item["description"],$item["key_"],$row["hostid"],$item["delay"],$item["history"],$item["status"],$item["type"],$item["snmp_community"],$item["snmp_oid"],$item["value_type"],$item["trapper_hosts"],$item["snmp_port"],$item["units"],$item["multiplier"],$item["delta"],$item["snmpv3_securityname"],$item["snmpv3_securitylevel"],$item["snmpv3_authpassphrase"],$item["snmpv3_privpassphrase"],$item["formula"],$item["trends"]);
+				$host=get_host_by_hostid($row["hostid"]);
+				info("Updated for linked host ".$host["host"]);
 			}
 		}
 	}
