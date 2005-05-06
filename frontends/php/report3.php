@@ -45,9 +45,9 @@
 ?>
 
 <?php
-	if(!isset($_GET["show"]))
+	if(!isset($_GET["period"]))
 	{
-		$_GET["show"]=0;
+		$_GET["period"]="weekly";
 	}
 
 	$h1=S_IT_SERVICES_AVAILABILITY_REPORT_BIG;
@@ -66,11 +66,156 @@
 	}
 	$h2=$h2."</select>";
 
+	$h2=$h2."&nbsp;".S_PERIOD."&nbsp;";
+	$h2=$h2."<select class=\"biginput\" name=\"period\" onChange=\"submit()\">";
+	$h2=$h2."<option value=\"daily\" ".iif($_GET["period"]=="daily","selected","").">".S_DAILY;
+	$h2=$h2."<option value=\"weekly\" ".iif($_GET["period"]=="weekly","selected","").">".S_WEEKLY;
+	$h2=$h2."<option value=\"monthly\" ".iif($_GET["period"]=="monthly","selected","").">".S_MONTHLY;
+	$h2=$h2."<option value=\"yearly\" ".iif($_GET["period"]=="yearly","selected","").">".S_YEARLY;
+	$h2=$h2."</select>";
+
 	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"report3.php\">", "</form>");
 ?>
 
 <?php
 	table_begin();
+	if($_GET["period"]=="yearly")
+	{
+		table_header(array(S_YEAR,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));
+		for($year=date("Y")-5;$year<=date("Y");$year++)
+		{
+			$start=mktime(0,0,0,1,1,$year);
+			$end=mktime(0,0,0,1,1,$year+1);
+			$stat=calculate_service_availability($service["serviceid"],$start,$end);
+
+			$t=sprintf("%2.2f%%",$stat["problem"]);
+			$t_time=sprintf("%dd %dh %dm",$stat["problem_time"]/(24*3600),($stat["problem_time"]%(24*3600))/3600,($stat["problem_time"]%(3600))/(60));
+			$f=sprintf("%2.2f%%",$stat["ok"]);
+			$f_time=sprintf("%dd %dh %dm",$stat["ok_time"]/(24*3600),($stat["ok_time"]%(24*3600))/3600,($stat["ok_time"]%(3600))/(60));
+
+			$ok=array("value"=>$f_time,"class"=>"off");
+			$problems=array("value"=>$t_time,"class"=>"on");
+			$percentage=array("value"=>$f,"class"=>"off");
+
+			if($service["showsla"]==1)
+			{
+				if($stat["ok"]>=$service["goodsla"])
+				{
+					$sla=array("value"=>$service["goodsla"],"class"=>"off");
+				}
+				else
+				{
+					$sla=array("value"=>$service["goodsla"],"class"=>"on");
+				}
+			}
+			else
+			{
+				$sla="-";
+			}
+			table_row(array(
+				$year,
+				$ok,
+				$problems,
+				$percentage,
+				$sla
+				),$col++);
+		}
+	}
+	else if($_GET["period"]=="monthly")
+	{
+		table_header(array(S_MONTH,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));
+		for($month=1;$month<=12;$month++)
+		{
+			$start=mktime(0,0,0,$month,1,$_GET["year"]);
+			$end=mktime(0,0,0,$month+1,1,$_GET["year"]);
+
+			if($start>time())	break;
+
+			$stat=calculate_service_availability($service["serviceid"],$start,$end);
+
+			$t=sprintf("%2.2f%%",$stat["problem"]);
+			$t_time=sprintf("%dd %dh %dm",$stat["problem_time"]/(24*3600),($stat["problem_time"]%(24*3600))/3600,($stat["problem_time"]%(3600))/(60));
+			$f=sprintf("%2.2f%%",$stat["ok"]);
+			$f_time=sprintf("%dd %dh %dm",$stat["ok_time"]/(24*3600),($stat["ok_time"]%(24*3600))/3600,($stat["ok_time"]%(3600))/(60));
+
+			$ok=array("value"=>$f_time,"class"=>"off");
+			$problems=array("value"=>$t_time,"class"=>"on");
+			$percentage=array("value"=>$f,"class"=>"off");
+
+			if($service["showsla"]==1)
+			{
+				if($stat["ok"]>=$service["goodsla"])
+				{
+					$sla=array("value"=>$service["goodsla"],"class"=>"off");
+				}
+				else
+				{
+					$sla=array("value"=>$service["goodsla"],"class"=>"on");
+				}
+			}
+			else
+			{
+				$sla="-";
+			}
+			table_row(array(
+				date("M Y",$start),
+				$ok,
+				$problems,
+				$percentage,
+				$sla
+				),$col++);
+		}
+	}
+	else if($_GET["period"]=="daily")
+	{
+		table_header(array(S_DAY,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));
+		$s=mktime(0,0,0,1,1,$_GET["year"]);
+		$e=mktime(0,0,0,1,1,$_GET["year"]+1);
+		for($day=$s;$day<$e;$day+=24*3600)
+		{
+			$start=$day;
+			$end=$day+24*3600;
+
+			if($start>time())	break;
+
+			$stat=calculate_service_availability($service["serviceid"],$start,$end);
+
+			$t=sprintf("%2.2f%%",$stat["problem"]);
+			$t_time=sprintf("%dd %dh %dm",$stat["problem_time"]/(24*3600),($stat["problem_time"]%(24*3600))/3600,($stat["problem_time"]%(3600))/(60));
+			$f=sprintf("%2.2f%%",$stat["ok"]);
+			$f_time=sprintf("%dd %dh %dm",$stat["ok_time"]/(24*3600),($stat["ok_time"]%(24*3600))/3600,($stat["ok_time"]%(3600))/(60));
+
+			$ok=array("value"=>$f_time,"class"=>"off");
+			$problems=array("value"=>$t_time,"class"=>"on");
+			$percentage=array("value"=>$f,"class"=>"off");
+
+			if($service["showsla"]==1)
+			{
+				if($stat["ok"]>=$service["goodsla"])
+				{
+					$sla=array("value"=>$service["goodsla"],"class"=>"off");
+				}
+				else
+				{
+					$sla=array("value"=>$service["goodsla"],"class"=>"on");
+				}
+			}
+			else
+			{
+				$sla="-";
+			}
+			table_row(array(
+				date("d M Y",$start),
+				$ok,
+				$problems,
+				$percentage,
+				$sla
+				),$col++);
+		}
+	}
+	else
+	{
+	//--------Weekly-------------
 	table_header(array(S_FROM,S_TILL,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));
 	$col=0;
 	$year=date("Y");
@@ -133,6 +278,8 @@
 				$sla
 				),$col++);
 		}
+	}
+	//--------Weekly-------------
 	}
 	table_end();
 
