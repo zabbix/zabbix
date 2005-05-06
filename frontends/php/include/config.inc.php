@@ -40,6 +40,20 @@
 	include_once 	"include/services.inc.php";
 	include_once 	"include/maps.inc.php";
 
+	function error($msg)
+	{
+		global $ERROR_MSG;
+
+		if(is_array($ERROR_MSG))
+		{
+			array_push($ERROR_MSG,$msg);
+		}
+		else
+		{
+			$ERROR_MSG=array($msg);
+		}
+	}
+
 	function getmicrotime()
 	{
 		list($usec, $sec) = explode(" ",microtime()); 
@@ -583,8 +597,6 @@
 
 	function	get_group_by_groupid($groupid)
 	{
-		global	$ERROR_MSG;
-
 		$sql="select * from groups where groupid=$groupid"; 
 		$result=DBselect($sql);
 		if(DBnum_rows($result) == 1)
@@ -593,15 +605,13 @@
 		}
 		else
 		{
-			$ERROR_MSG="No groups with groupid=[$groupid]";
+			error("No groups with groupid=[$groupid]");
 		}
 		return	$result;
 	}
 
 	function	get_action_by_actionid($actionid)
 	{
-		global	$ERROR_MSG;
-
 		$sql="select * from actions where actionid=$actionid"; 
 		$result=DBselect($sql);
 		if(DBnum_rows($result) == 1)
@@ -610,15 +620,13 @@
 		}
 		else
 		{
-			$ERROR_MSG="No action with actionid=[$actionid]";
+			error("No action with actionid=[$actionid]");
 		}
 		return	$result;
 	}
 
 	function	get_usergroup_by_usrgrpid($usrgrpid)
 	{
-		global	$ERROR_MSG;
-
 		$result=DBselect("select usrgrpid,name from usrgrp where usrgrpid=$usrgrpid"); 
 		if(DBnum_rows($result) == 1)
 		{
@@ -626,7 +634,7 @@
 		}
 		else
 		{
-			$ERROR_MSG="No user group with usrgrpid=[$usrgrpid]";
+			error("No user group with usrgrpid=[$usrgrpid]");
 		}
 		return	$result;
 	}
@@ -647,8 +655,6 @@
 
 	function	get_function_by_functionid($functionid)
 	{
-		global	$ERROR_MSG;
-
 		$sql="select * from functions where functionid=$functionid"; 
 		$result=DBselect($sql);
 		if(DBnum_rows($result) == 1)
@@ -657,15 +663,13 @@
 		}
 		else
 		{
-			$ERROR_MSG="No function with functionid=[$functionid]";
+			error("No function with functionid=[$functionid]");
 		}
 		return	$item;
 	}
 
 	function	select_config()
 	{
-		global	$ERROR_MSG;
-
 //		$sql="select smtp_server,smtp_helo,smtp_email,alarm_history,alert_history from config";
 		$sql="select alarm_history,alert_history from config";
 		$result=DBselect($sql);
@@ -682,7 +686,7 @@
 		}
 		else
 		{
-			$ERROR_MSG="Unable to select configuration";
+			error("Unable to select configuration");
 		}
 		return	$config;
 	}
@@ -701,18 +705,20 @@
 			$color="#223344";
 		}
 		echo "<p align=center>";
-//		echo "<font size=+1 color='$color'>";
 		echo "<font color='$color'>";
-		if($ERROR_MSG=="")
-		{
-			echo "<b>[$msg]</b>";
-		}
-		else
-		{
-			echo "<b>[$msg. $ERROR_MSG]</b>";
-		}
+		echo "<b>[$msg]</b>";
 		echo "</font>";
 		echo "</p>";
+
+		if(is_array($ERROR_MSG))
+		{
+			echo "<p align=center class=\"error\">";
+			while(list($key, $val)=each($ERROR_MSG))
+			{
+				echo $val."<br>";
+			}
+			echo "</p>";
+		}
 	}
 
 	function	show_message($msg)
@@ -741,8 +747,6 @@
 // Does expression match server:key.function(param) ?
 	function	validate_simple_expression($expression)
 	{
-		global	$ERROR_MSG;
-
 //		echo "Validating simple:$expression<br>";
 // Before str()
 // 		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.\,]+)\.((diff)|(min)|(max)|(last)|(prev))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
@@ -763,7 +767,7 @@
 			$result=DBselect($sql);
 			if(DBget_field($result,0,0)!=1)
 			{
-				$ERROR_MSG="No such host ($host) or monitored parameter ($key)";
+				error("No such host ($host) or monitored parameter ($key)");
 				return -1;
 			}
 
@@ -785,20 +789,20 @@
 				($function!="now")&&
 				($function!="str"))
 			{
-				$ERROR_MSG="Unknown function [$function]";
+				error("Unknown function [$function]");
 				return -1;
 			}
 
 
 			if(( $function!="str") && (validate_float($parameter)!=0) )
 			{
-				$ERROR_MSG="[$parameter] is not a float";
+				error("[$parameter] is not a float");
 				return -1;
 			}
 		}
 		else
 		{
-			$ERROR_MSG="Expression [$expression] does not match to [server:key.func(param)]";
+			error("Expression [$expression] does not match to [server:key.func(param)]");
 			return -1;
 		}
 		return 0;
@@ -806,8 +810,6 @@
 
 	function	validate_expression($expression)
 	{
-		global	$ERROR_MSG;
-
 //		echo "Validating expression: $expression<br>";
 
 		$ok=0;
@@ -852,12 +854,12 @@
 //				}
 				if(validate_float($arr[3])!=0)
 				{
-					$ERROR_MSG="[".$arr[3]."] is not a float";
+					error("[".$arr[3]."] is not a float");
 					return -1;
 				}
 				if(validate_float($arr[5])!=0)
 				{
-					$ERROR_MSG="[".$arr[5]."] is not a float";
+					error("[".$arr[5]."] is not a float");
 					return -1;
 				}
 				$expression=$arr[1]."(0)".$arr[6];
@@ -881,7 +883,7 @@
 //				}
 				if(validate_float($arr[4])!=0)
 				{
-					$ERROR_MSG="[".$arr[4]."] is not a float";
+					error("[".$arr[4]."] is not a float");
 					return -1;
 				}
 				$expression=$arr[1]."0".$arr[5];
@@ -1415,10 +1417,9 @@ echo "</head>";
 
 	function	update_host_status($hostid,$status)
 	{
-                global  $ERROR_MSG;
                 if(!check_right("Host","U",0))
                 {
-                        $ERROR_MSG="Insufficient permissions";
+                        error("Insufficient permissions");
                         return 0;
                 }
 
@@ -1439,8 +1440,6 @@ echo "</head>";
 
 	function	add_image($name,$imagetype,$files)
 	{
-		global	$ERROR_MSG;
-
 		if(isset($files))
 		{
 			if($files["image"]["error"]==0)
@@ -1452,13 +1451,13 @@ echo "</head>";
 			}
 			else
 			{
-				$ERROR_MSG="Image size must be less than 1Mb";
+				error("Image size must be less than 1Mb");
 				return FALSE;
 			}
 		}
 		else
 		{
-			$ERROR_MSG="Select image to download";
+			error("Select image to download");
 			return FALSE;
 		}
 	}
@@ -1566,11 +1565,9 @@ echo "</head>";
 
 	function	add_using_host_template($hostid,$host_templateid)
 	{
-		global	$ERROR_MSG;
-
 		if(!isset($host_templateid)||($host_templateid==0))
 		{
-			$ERROR_MSG="Select template first";
+			error("Select template first");
 			return 0;
 		}
 
@@ -1680,11 +1677,9 @@ echo "</head>";
 
 	function	add_host_group($name,$hosts)
 	{
-		global	$ERROR_MSG;
-
 //		if(!check_right("Host","A",0))
 //		{
-//			$ERROR_MSG="Insufficient permissions";
+//			error("Insufficient permissions");
 //			return 0;
 //		}
 
@@ -1692,7 +1687,7 @@ echo "</head>";
 		$result=DBexecute($sql);
 		if(DBnum_rows($result)>0)
 		{
-			$ERROR_MSG="Group '$name' already exists";
+			error("Group '$name' already exists");
 			return 0;
 		}
 
@@ -1712,11 +1707,9 @@ echo "</head>";
 
 	function	add_user_group($name,$users)
 	{
-		global	$ERROR_MSG;
-
 		if(!check_right("Host","A",0))
 		{
-			$ERROR_MSG="Insufficient permissions";
+			error("Insufficient permissions");
 			return 0;
 		}
 
@@ -1724,7 +1717,7 @@ echo "</head>";
 		$result=DBexecute($sql);
 		if(DBnum_rows($result)>0)
 		{
-			$ERROR_MSG="Group '$name' already exists";
+			error("Group '$name' already exists");
 			return 0;
 		}
 
@@ -1744,11 +1737,9 @@ echo "</head>";
 
 	function	update_host_group($groupid,$name,$users)
 	{
-		global	$ERROR_MSG;
-
 //		if(!check_right("Host","U",0))
 //		{
-//			$ERROR_MSG="Insufficient permissions";
+//			error("Insufficient permissions");
 //			return 0;
 //		}
 
@@ -1756,7 +1747,7 @@ echo "</head>";
 		$result=DBexecute($sql);
 		if(DBnum_rows($result)>0)
 		{
-			$ERROR_MSG="Group '$name' already exists";
+			error("Group '$name' already exists");
 			return 0;
 		}
 
@@ -1774,11 +1765,9 @@ echo "</head>";
 
 	function	update_user_group($usrgrpid,$name,$users)
 	{
-		global	$ERROR_MSG;
-
 		if(!check_right("Host","U",0))
 		{
-			$ERROR_MSG="Insufficient permissions";
+			error("Insufficient permissions");
 			return 0;
 		}
 
@@ -1786,7 +1775,7 @@ echo "</head>";
 		$result=DBexecute($sql);
 		if(DBnum_rows($result)>0)
 		{
-			$ERROR_MSG="Group '$name' already exists";
+			error("Group '$name' already exists");
 			return 0;
 		}
 
@@ -1817,11 +1806,9 @@ echo "</head>";
 	# Sync host with hard-linked template
 	function	sync_host_with_template($hostid,$templateid,$items,$triggers,$actions,$graphs,$screens)
 	{
-		global	$ERROR_MSG;
-
 		if(!isset($templateid)||($templateid==0))
 		{
-			$ERROR_MSG="Select template first";
+			error("Select template first");
 			return 0;
 		}
 
@@ -1925,8 +1912,6 @@ echo "</head>";
 
 	function	get_mediatype_by_mediatypeid($mediatypeid)
 	{
-		global	$ERROR_MSG;
-
 		$sql="select * from media_type where mediatypeid=$mediatypeid";
 		$result=DBselect($sql);
 		if(DBnum_rows($result) == 1)
@@ -1935,7 +1920,7 @@ echo "</head>";
 		}
 		else
 		{
-			$ERROR_MSG="No media type with with mediatypeid=[$mediatypeid]";
+			error("No media type with with mediatypeid=[$mediatypeid]");
 		}
 		return	$item;
 	}
@@ -2024,11 +2009,9 @@ echo "</head>";
 //	function	update_config($smtp_server,$smtp_helo,$smtp_email,$alarm_history,$alert_history)
 	function	update_config($alarm_history,$alert_history)
 	{
-		global	$ERROR_MSG;
-
 		if(!check_right("Configuration of Zabbix","U",0))
 		{
-			$ERROR_MSG="Insufficient permissions";
+			error("Insufficient permissions");
 			return	0;
 		}
 
@@ -2065,8 +2048,6 @@ echo "</head>";
 
 	function	delete_user_group($usrgrpid)
 	{
-		global	$ERROR_MSG;
-
 		$sql="delete from users_groups where usrgrpid=$usrgrpid";
 		DBexecute($sql);
 		$sql="delete from usrgrp where usrgrpid=$usrgrpid";
@@ -2077,13 +2058,11 @@ echo "</head>";
 
 	function	delete_user($userid)
 	{
-		global	$ERROR_MSG;
-
 		$sql="select * from users where userid=$userid and alias='guest'";
 		$result=DBselect($sql);
 		if(DBnum_rows($result) == 1)
 		{
-			$ERROR_MSG="Cannot delete user 'guest'";
+			error("Cannot delete user 'guest'");
 			return	0;
 		}
 

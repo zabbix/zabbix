@@ -31,11 +31,9 @@
 
 	function	add_action( $triggerid, $userid, $good, $delay, $subject, $message, $scope, $severity, $recipient, $usrgrpid)
 	{
-		global	$ERROR_MSG;
-
 		if(!check_right_on_trigger("A",$triggerid))
 		{
-                        $ERROR_MSG="Insufficient permissions";
+                        error("Insufficient permissions");
                         return 0;
 		}
 

@@ -178,8 +178,6 @@
 
 	function	add_service_link($servicedownid,$serviceupid,$softlink)
 	{
-		global	$ERROR_MSG;
-
 		if( ($softlink==0) && (is_service_hardlinked($servicedownid)==TRUE) )
 		{
 			return	FALSE;
@@ -187,7 +185,7 @@
 
 		if($servicedownid==$serviceupid)
 		{
-			$ERROR_MSG="Cannot link service to itself.";
+			error("Cannot link service to itself.");
 			return	FALSE;
 		}
 
@@ -325,8 +323,6 @@
 
 	function	get_num_of_service_childs($serviceid)
 	{
-		global	$ERROR_MSG;
-
 		$sql="select count(*) from services_links where serviceupid=$serviceid";
 		$result=DBselect($sql);
 		return	DBget_field($result,0,0);
@@ -334,8 +330,6 @@
 
 	function	get_service_by_serviceid($serviceid)
 	{
-		global	$ERROR_MSG;
-
 		$sql="select * from services where serviceid=$serviceid";
 		$result=DBselect($sql);
 		if(Dbnum_rows($result) == 1)
@@ -344,7 +338,7 @@
 		}
 		else
 		{
-			$ERROR_MSG="No service with serviceid=[$serviceid]";
+			error("No service with serviceid=[$serviceid]");
 		}
 		return	FALSE;
 	}

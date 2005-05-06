@@ -21,11 +21,9 @@
 <?php
         function        add_screen($name,$cols,$rows)
         {
-                global  $ERROR_MSG;
-
                 if(!check_right("Screen","A",0))
                 {
-                        $ERROR_MSG="Insufficient permissions";
+                        error("Insufficient permissions");
                         return 0;
                 }
 
@@ -35,11 +33,9 @@
 
         function        update_screen($screenid,$name,$cols,$rows)
         {
-                global  $ERROR_MSG;
-
                 if(!check_right("Screen","U",0))
                 {
-                        $ERROR_MSG="Insufficient permissions";
+                        error("Insufficient permissions");
                         return 0;
                 }
 
@@ -81,8 +77,6 @@
 
 	function	get_screen_by_screenid($screenid)
 	{
-		global	$ERROR_MSG;
-
 		$sql="select * from screens where screenid=$screenid"; 
 		$result=DBselect($sql);
 		if(DBnum_rows($result) == 1)
@@ -91,7 +85,7 @@
 		}
 		else
 		{
-			$ERROR_MSG="No screen with screenid=[$screenid]";
+			error("No screen with screenid=[$screenid]");
 		}
 		return	$result;
 	}

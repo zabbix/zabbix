@@ -23,11 +23,9 @@
 
 	function	add_user($name,$surname,$alias,$passwd,$url)
 	{
-		global	$ERROR_MSG;
-
 		if(!check_right("User","A",0))
 		{
-			$ERROR_MSG="Insufficient permissions";
+			error("Insufficient permissions");
 			return 0;
 		}
 		
@@ -41,11 +39,9 @@
 
 	function	update_user($userid,$name,$surname,$alias,$passwd, $url)
 	{
-		global	$ERROR_MSG;
-
 		if(!check_right("User","U",$userid))
 		{
-			$ERROR_MSG="Insufficient permissions";
+			error("Insufficient permissions");
 			return 0;
 		}
 
@@ -71,8 +67,6 @@
 
 	function	get_user_by_userid($userid)
 	{
-		global	$ERROR_MSG;
-
 		$sql="select * from users where userid=$userid"; 
 		$result=DBselect($sql);
 		if(DBnum_rows($result) == 1)
@@ -81,7 +75,7 @@
 		}
 		else
 		{
-			$ERROR_MSG="No user with itemid=[$userid]";
+			error("No user with itemid=[$userid]");
 		}
 		return	$result;
 	}

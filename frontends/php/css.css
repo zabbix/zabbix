@@ -255,6 +255,14 @@ p.uppercase {text-transform: uppercase}
 p.margin {margin-left: 10pt}
 	
 	
+p.error
+{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	border: 1px dashed #000000;
+	color:#AA0000;
+	background-color: #FFFFFF;
+}
 	
 table.home
 {
