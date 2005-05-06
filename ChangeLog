@@ -1,5 +1,6 @@
 Changes for 1.1alpha8:
 
+ - daily/weekly/monthly/yearle SLA statistics (Alexei)
  - added parameter RefreshActiveChecks to zabbix_agentd.conf (Alexei)
  - better report3.php (Alexei)
  - better alarms.php (Alexei)
