@@ -23,11 +23,9 @@
 
 	function	add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends)
 	{
-		global	$ERROR_MSG;
-
 		if(!check_right("Item","A",0))
 		{
-			$ERROR_MSG="Insufficient permissions";
+			error("Insufficient permissions");
 			return 0;
 		}
 
@@ -35,19 +33,19 @@
 		$result=DBexecute($sql);
 		if(DBget_field($result,0,0)>0)
 		{
-			$ERROR_MSG="An item with the same Key already exists for this host. The key must be unique.";
+			error("An item with the same Key already exists for this host. The key must be unique.");
 			return 0;
 		}
 
 		if($delay<1)
 		{
-			$ERROR_MSG="Delay cannot be less than 1 second";
+			error("Delay cannot be less than 1 second");
 			return 0;
 		}
 
 		if( ($snmp_port<1)||($snmp_port>65535))
 		{
-			$ERROR_MSG="Invalid SNMP port";
+			error("Invalid SNMP port");
 			return 0;
 		}
 
@@ -71,11 +69,9 @@
 
 	function	update_item_status($itemid,$status)
 	{
-		global	$ERROR_MSG;
-
                 if(!check_right("Item","U",0))
 		{
-                        $ERROR_MSG="Insufficient permissions";
+                        error("Insufficient permissions");
                         return 0;
 		}
 		if($status==ITEM_STATUS_ACTIVE)
@@ -90,22 +86,20 @@
 
 	function	update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends)
 	{
-		global	$ERROR_MSG;
-
 		if(!check_right("Item","U",$itemid))
 		{
-			$ERROR_MSG="Insufficient permissions";
+			error("Insufficient permissions");
 			return 0;
 		}
 		if($delay<1)
 		{
-			$ERROR_MSG="Delay cannot be less than 1 second";
+			error("Delay cannot be less than 1 second");
 			return 0;
 		}
 
 		if( ($snmp_port<1)||($snmp_port>65535))
 		{
-			$ERROR_MSG="Invalid SNMP port";
+			error("Invalid SNMP port");
 			return 0;
 		}
 
@@ -218,8 +212,6 @@
 
 	function	get_item_by_itemid($itemid)
 	{
-		global	$ERROR_MSG;
-
 		$sql="select * from items where itemid=$itemid"; 
 		$result=DBselect($sql);
 		if(DBnum_rows($result) == 1)
@@ -228,7 +220,7 @@
 		}
 		else
 		{
-			$ERROR_MSG="No item with itemid=[$itemid]";
+			error("No item with itemid=[$itemid]");
 		}
 		return	$item;
 	}

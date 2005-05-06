@@ -21,8 +21,6 @@
 <?php
 	function	get_map_by_sysmapid($sysmapid)
 	{
-		global	$ERROR_MSG;
-
 		$sql="select * from sysmaps where sysmapid=$sysmapid"; 
 		$result=DBselect($sql);
 		if(DBnum_rows($result) == 1)
@@ -31,7 +29,7 @@
 		}
 		else
 		{
-			$ERROR_MSG="No system map with sysmapid=[$sysmapid]";
+			error("No system map with sysmapid=[$sysmapid]");
 		}
 		return	$result;
 	}
@@ -60,11 +58,9 @@
 
 	function	update_sysmap($sysmapid,$name,$width,$height,$background,$label_type)
 	{
-		global	$ERROR_MSG;
-
 		if(!check_right("Network map","U",$sysmapid))
 		{
-			$ERROR_MSG="Insufficient permissions";
+			error("Insufficient permissions");
 			return 0;
 		}
 
@@ -76,11 +72,9 @@
 
 	function	add_sysmap($name,$width,$height,$background,$label_type)
 	{
-		global	$ERROR_MSG;
-
 		if(!check_right("Network map","A",0))
 		{
-			$ERROR_MSG="Insufficient permissions";
+			error("Insufficient permissions");
 			return 0;
 		}
 
