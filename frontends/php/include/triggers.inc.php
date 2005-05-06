@@ -21,11 +21,9 @@
 <?php
 	function	update_trigger_comments($triggerid,$comments)
 	{
-		global	$ERROR_MSG;
-
 		if(!check_right("Trigger comment","U",$triggerid))
 		{
-			$ERROR_MSG="Insufficient permissions";
+			error("Insufficient permissions");
 			return	0;
 		}
 
@@ -38,11 +36,9 @@
 
 	function	update_trigger_status($triggerid,$status)
 	{
-		global	$ERROR_MSG;
-
 		if(!check_right_on_trigger("U",$triggerid))
 		{
-                        $ERROR_MSG="Insufficient permissions";
+                        error("Insufficient permissions");
                         return 0;
 		}
 		add_alarm($triggerid,2);
@@ -103,11 +99,9 @@
 
 	function	add_trigger($expression,$description,$priority,$status,$comments,$url)
 	{
-		global	$ERROR_MSG;
-
 //		if(!check_right("Trigger","A",0))
 //		{
-//			$ERROR_MSG="Insufficient permissions";
+//			error("Insufficient permissions");
 //			return	0;
 //		}
 
@@ -136,13 +130,11 @@
 
 	function	delete_trigger($triggerid)
 	{
-		global	$ERROR_MSG;
-
 		$sql="select count(*) from trigger_depends where triggerid_down=$triggerid or triggerid_up=$triggerid";
 		$result=DBexecute($sql);
 		if(DBget_field($result,0,0)>0)
 		{
-			$ERROR_MSG="Delete dependencies first";
+			error("Delete dependencies first");
 			return	FALSE;
 		}
 
@@ -178,11 +170,9 @@
 
 	function	update_trigger($triggerid,$expression,$description,$priority,$status,$comments,$url)
 	{
-		global	$ERROR_MSG;
-
 		if(!check_right_on_trigger("U",$triggerid))
 		{
-                        $ERROR_MSG="Insufficient permissions";
+                        error("Insufficient permissions");
                         return 0;
 		}
 
@@ -218,8 +208,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	get_trigger_by_triggerid($triggerid)
 	{
-		global	$ERROR_MSG;
-
 		$sql="select triggerid,expression,description,status,priority,lastchange,dep_level,comments,url,value from triggers where triggerid=$triggerid";
 		$result=DBselect($sql);
 		if(DBnum_rows($result) == 1)
@@ -228,7 +216,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 		else
 		{
-			$ERROR_MSG="No trigger with triggerid=[$triggerid]";
+			error("No trigger with triggerid=[$triggerid]");
 		}
 		return	$trigger;
 	}

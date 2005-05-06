@@ -23,11 +23,9 @@
 
 	function	add_graph($name,$width,$height,$yaxistype,$yaxismin,$yaxismax)
 	{
-		global	$ERROR_MSG;
-
 		if(!check_right("Graph","A",0))
 		{
-			$ERROR_MSG="Insufficient permissions";
+			error("Insufficient permissions");
 			return 0;
 		}
 
@@ -53,11 +51,9 @@
 
 	function	update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax)
 	{
-		global	$ERROR_MSG;
-
 		if(!check_right("Graph","U",0))
 		{
-			$ERROR_MSG="Insufficient permissions";
+			error("Insufficient permissions");
 			return 0;
 		}
 
@@ -87,8 +83,6 @@
 
 	function	get_graphitem_by_gitemid($gitemid)
 	{
-		global	$ERROR_MSG;
-
 		$sql="select * from graphs_items where gitemid=$gitemid"; 
 		$result=DBselect($sql);
 		if(DBnum_rows($result) == 1)
@@ -97,15 +91,13 @@
 		}
 		else
 		{
-			$ERROR_MSG="No graph item with gitemid=[$gitemid]";
+			error("No graph item with gitemid=[$gitemid]");
 		}
 		return	$result;
 	}
 
 	function	get_graph_by_graphid($graphid)
 	{
-		global	$ERROR_MSG;
-
 		$sql="select * from graphs where graphid=$graphid"; 
 		$result=DBselect($sql);
 		if(DBnum_rows($result) == 1)
@@ -114,7 +106,7 @@
 		}
 		else
 		{
-			$ERROR_MSG="No graph with graphid=[$graphid]";
+			error("No graph with graphid=[$graphid]");
 		}
 		return	$result;
 	}

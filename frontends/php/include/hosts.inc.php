@@ -23,17 +23,15 @@
 
 	function	add_host($host,$port,$status,$useip,$ip,$host_templateid,$newgroup,$groups)
 	{
-		global	$ERROR_MSG;
-
 		if(!check_right("Host","A",0))
 		{
-			$ERROR_MSG="Insufficient permissions";
+			error("Insufficient permissions");
 			return 0;
 		}
 
  		if (!eregi('^([0-9a-zA-Z\_\.-]+)$', $host, &$arr)) 
 		{
-			$ERROR_MSG="Hostname should contain 0-9a-zA-Z_.- characters only";
+			error("Hostname should contain 0-9a-zA-Z_.- characters only");
 			return 0;
 		}
 
@@ -41,7 +39,7 @@
 		$result=DBexecute($sql);
 		if(DBnum_rows($result)>0)
 		{
-			$ERROR_MSG="Host '$host' already exists";
+			error("Host '$host' already exists");
 			return 0;
 		}
 
@@ -83,17 +81,15 @@
 
 	function	update_host($hostid,$host,$port,$status,$useip,$ip,$newgroup,$groups)
 	{
-		global	$ERROR_MSG;
-
 		if(!check_right("Host","U",$hostid))
 		{
-			$ERROR_MSG="Insufficient permissions";
+			error("Insufficient permissions");
 			return 0;
 		}
 
  		if (!eregi('^([0-9a-zA-Z\_\.-]+)$', $host, &$arr)) 
 		{
-			$ERROR_MSG="Hostname should contain 0-9a-zA-Z_.- characters only";
+			error("Hostname should contain 0-9a-zA-Z_.- characters only");
 			return 0;
 		}
 
@@ -101,7 +97,7 @@
 		$result=DBexecute($sql);
 		if(DBnum_rows($result)>0)
 		{
-			$ERROR_MSG="Host '$host' already exists";
+			error("Host '$host' already exists");
 			return 0;
 		}
 
@@ -178,8 +174,6 @@
 
 	function	delete_host_group($groupid)
 	{
-		global	$ERROR_MSG;
-
 		$sql="delete from hosts_groups where groupid=$groupid";
 		DBexecute($sql);
 		$sql="delete from groups where groupid=$groupid";
@@ -188,8 +182,6 @@
 
 	function	get_host_by_hostid($hostid)
 	{
-		global	$ERROR_MSG;
-
 		$sql="select hostid,host,useip,ip,port,status from hosts where hostid=$hostid";
 		$result=DBselect($sql);
 		if(DBnum_rows($result) == 1)
@@ -203,7 +195,7 @@
 		}
 		else
 		{
-			$ERROR_MSG="No host with hostid=[$hostid]";
+			error("No host with hostid=[$hostid]");
 		}
 		return	$host;
 	}
