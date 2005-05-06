@@ -22,6 +22,7 @@
 // GLOBALS
 	$USER_DETAILS	="";
 	$ERROR_MSG	="";
+	$INFO_MSG	="";
 // END OF GLOBALS
 
 	include_once 	"include/defines.inc.php";
@@ -39,6 +40,20 @@
 	include_once 	"include/actions.inc.php";
 	include_once 	"include/services.inc.php";
 	include_once 	"include/maps.inc.php";
+
+	function info($msg)
+	{
+		global $INFO_MSG;
+
+		if(is_array($INFO_MSG))
+		{
+			array_push($INFO_MSG,$msg);
+		}
+		else
+		{
+			$INFO_MSG=array($msg);
+		}
+	}
 
 	function error($msg)
 	{
@@ -694,6 +709,7 @@
 	function	show_messages($bool,$msg,$errmsg)
 	{
 		global	$ERROR_MSG;
+		global	$INFO_MSG;
 
 		if(!$bool)
 		{
@@ -709,6 +725,16 @@
 		echo "<b>[$msg]</b>";
 		echo "</font>";
 		echo "</p>";
+
+		if(is_array($INFO_MSG))
+		{
+			echo "<p align=center class=\"info\">";
+			while(list($key, $val)=each($INFO_MSG))
+			{
+				echo $val."<br>";
+			}
+			echo "</p>";
+		}
 
 		if(is_array($ERROR_MSG))
 		{
