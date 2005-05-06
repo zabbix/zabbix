@@ -480,7 +480,13 @@
 	define("S_PROBLEMS",				"Problems");
 	define("S_PERCENTAGE",				"Percentage");
 	define("S_SLA",					"SLA");
+	define("S_DAY",					"Day");
+	define("S_MONTH",				"Month");
 	define("S_YEAR",				"Year");
+	define("S_DAILY",				"Daily");
+	define("S_WEEKLY",				"Weekly");
+	define("S_MONTHLY",				"Monthly");
+	define("S_YEARLY",				"Yearly");
 
 //	screenconf.php
 	define("S_SCREENS",				"Screens");
