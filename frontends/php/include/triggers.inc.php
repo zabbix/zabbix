@@ -387,6 +387,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				$expression=str_replace("{".$row2["functionid"]."}","{".$functionid."}",$trigger["expression"]);
 				$sql="update triggers set expression='$expression' where triggerid=$triggerid_new";
 				DBexecute($sql);
+
+				$host=get_host_by_hostid($row["hostid"]);
+				info("Added trigger to linked host ".$host["host"]);
 			}
 		}
 	}
@@ -422,6 +425,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			while($row2=DBfetch($result2))
 			{
 				delete_trigger($row2["triggerid"]);
+
+				$host=get_host_by_hostid($row["hostid"]);
+				info("Deleted trigger from linked host ".$host["host"]);
 			}
 
 		}

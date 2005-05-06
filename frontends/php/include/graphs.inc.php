@@ -136,14 +136,18 @@
 
 			$sql="select distinct g.graphid from graphs g,graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and g.graphid=gi.graphid and g.name='".addslashes($graph["name"])."'";
 			$result2=DBselect($sql);
+			$host=get_host_by_hostid($result["hostid"]);
 			while($row2=DBfetch($result2))
 			{
 				add_item_to_graph($row2["graphid"],$itemid,$graph_item["color"],$graph_item["drawtype"],$graph_item["sortorder"]);
+				info("Added graph element to graph ".$graph["name"]." of linked host ".$host["host"]);
 			}
 			if(DBnum_rows($result2)==0)
 			{
 				$graphid=add_graph($graph["name"],$graph["width"],$graph["height"],$graph["yaxistype"],$graph["yaxismin"],$graph["yaxismax"]);
+				info("Added graph ".$graph["name"]." of linked host ".$host["host"]);
 				add_item_to_graph($graphid,$itemid,$graph_item["color"],$graph_item["drawtype"],$graph_item["sortorder"]);
+				info("Added graph element to graph ".$graph["name"]." of linked host ".$host["host"]);
 			}
 		}
 	}
@@ -171,17 +175,21 @@
 			$row2=DBfetch($result2);
 			$itemid=$row2["itemid"];
 
+			$host=get_host_by_hostid($result["hostid"]);
+
 			$sql="select distinct gi.gitemid,gi.graphid from graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and i.itemid=$itemid";
 			$result2=DBselect($sql);
 			while($row2=DBfetch($result2))
 			{
 				delete_graphs_item($row2["gitemid"]);
+				info("Deleted graph element ".$item["key_"]." from linked host ".$host["host"]);
 				$sql="select count(*) as count from graphs_items where graphid=".$row2["graphid"];
 				$result3=DBselect($sql);
 				$row3=DBfetch($result3);
 				if($row3["count"]==0)
 				{
 					delete_graph($row2["graphid"]);
+					info("Deleted graph from linked host ".$host["host"]);
 				}
 			}
 		}
