@@ -419,6 +419,7 @@ int	main(int argc, char **argv)
 
 	char		host[128];
 	int		ch;
+	char		*s;
 
         static struct  sigaction phan;
 
@@ -482,7 +483,8 @@ int	main(int argc, char **argv)
 	}
 
 	/* Initialize thread for active checks */
-	pids[CONFIG_AGENTD_FORKS-1] = child_active_make(CONFIG_AGENTD_FORKS-1, CONFIG_HOSTS_ALLOWED, CONFIG_SERVER_PORT);
+	s=strtok(CONFIG_HOSTS_ALLOWED,",");
+	pids[CONFIG_AGENTD_FORKS-1] = child_active_make(CONFIG_AGENTD_FORKS-1, s, CONFIG_SERVER_PORT);
 
 	parent=1;
 
