@@ -247,8 +247,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 		return	FAIL;
 	} 
 
-	memset(c,0,MAX_STRING_LEN);
-
+	memset(c,0,MAX_BUF_LEN);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Before read");
 	len=read(s,c,MAX_BUF_LEN-1);

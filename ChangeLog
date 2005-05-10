@@ -1,5 +1,9 @@
 Changes for 1.1alpha8:
 
+ - changed MAX_STRING_LEN to MAX_BUF_LEN in memset() in active.c (Alexei)
+
+Changes for 1.1alpha8:
+
  - better error reporting for GUI (Alexei)
  - daily/weekly/monthly/yearly SLA statistics (Alexei)
  - added parameter ServerPort to zabbix_agentd.conf (Alexei)
