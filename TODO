@@ -1,5 +1,6 @@
 1.1alpha9:
 
+ - fix read loop in active.c. Do while() { read(); } instead.
  - finish hard-linked templates
  - escalations and repeated notifications
  - add encryption between server and agents
