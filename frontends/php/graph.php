@@ -53,7 +53,7 @@
 				$item=get_item_by_itemid($_GET["itemid"]);
 				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH_ELEMENT,"Graph ID [".$_GET["graphid"]."] Name [".$graph["name"]."] Added [".$item["description"]."]");
 			}
-			show_messages($result,S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
+			show_messages($gitemid,S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
 		if($_GET["register"]=="update")
 		{
