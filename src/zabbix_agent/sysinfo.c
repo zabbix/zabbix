@@ -176,6 +176,7 @@ COMMAND	agent_commands[]=
 	{"md5sum[*]"		,0, 			MD5SUM, "/etc/services"},
 
 	{"filesize[*]"		,FILESIZE, 		0, "/etc/passwd"},
+	{"file[*]"		,ISFILE, 		0, "/etc/passwd"},
 
 	{"cpu[idle1]"		,CPUIDLE1, 		0, 0},
 	{"cpu[idle5]"		,CPUIDLE5, 		0, 0},
@@ -802,6 +803,26 @@ int	FILESIZE(const char *cmd, const char *filename,double  *value)
 	}
 	return	SYSINFO_RET_FAIL;
 }
+
+int	ISFILE(const char *cmd, const char *filename,double  *value)
+{
+	struct stat	buf;
+
+	*value=(double)0;
+
+	/* File exists */
+	if(stat(filename,&buf) == 0)
+	{
+		/* Regular file */
+		if(S_ISREG(buf.st_mode))
+		{
+			*value=(double)1;
+		}
+	}
+	/* File does not exist or any other error */
+	return SYSINFO_RET_OK;
+}
+
 
 int	SENSOR_TEMP1(const char *cmd, const char *param,double  *value)
 {
