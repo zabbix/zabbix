@@ -85,7 +85,7 @@
 		}
 
 		$h2=$h2."<select class=\"biginput\" name=\"sysmapid\" onChange=\"submit()\">";
-		$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_SELECT_MAP_DOT_DOT_DOT;
+		$h2=$h2.form_select("sysmapid",0,S_SELECT_MAP_DOT_DOT_DOT);
 
 		$result=DBselect("select sysmapid,name from sysmaps order by name");
 		while($row=DBfetch($result))
@@ -94,7 +94,7 @@
 			{
 				continue;
 			}
-			$h2=$h2."<option value=\"".$row["sysmapid"]."\" ".iif(isset($_GET["sysmapid"])&&($_GET["sysmapid"]==$row["sysmapid"]),"selected","").">".$row["name"];
+			$h2=$h2.form_select("sysmapid",$row["sysmapid"],$row["name"]);
 		}
 		$h2=$h2."</select>";
 

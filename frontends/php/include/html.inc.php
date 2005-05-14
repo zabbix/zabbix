@@ -24,6 +24,13 @@
 		return str_replace(" ","&nbsp;",$str);;
 	}
 
+	function form_select($var, $value, $label)
+	{
+		global $_GET;
+	
+		return "<option value=\"$value\" ".iif(isset($_GET[$var])&&$_GET[$var]==$value,"selected","").">$label";
+	}
+
 	function url1_param($parameter)
 	{
 		global $_GET;

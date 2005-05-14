@@ -66,7 +66,7 @@
 		}
 
 		$h2=$h2."<select class=\"biginput\" name=\"screenid\" onChange=\"submit()\">";
-		$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["screenid"]),"selected","").">".S_SELECT_SCREEN_DOT_DOT_DOT;
+		$h2=$h2.form_select("screenid",0,S_SELECT_SCREEN_DOT_DOT_DOT);
 
 		$result=DBselect("select screenid,name from screens order by name");
 		while($row=DBfetch($result))
@@ -75,7 +75,7 @@
 			{
 				continue;
 			}
-			$h2=$h2."<option value=\"".$row["screenid"]."\" ".iif(isset($_GET["screenid"])&&($_GET["screenid"]==$row["screenid"]),"selected","").">".$row["name"];
+			$h2=$h2.form_select("screenid",$row["screenid"],$row["name"]);
 		}
 		$h2=$h2."</select>";
 

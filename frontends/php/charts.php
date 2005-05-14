@@ -81,7 +81,7 @@
 
 	$h2=S_GROUP."&nbsp;";
 	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
-	$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_ALL_SMALL;
+	$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
 	$result=DBselect("select groupid,name from groups order by name");
 	while($row=DBfetch($result))
 	{
@@ -98,14 +98,14 @@
 		}
 		if($cnt!=0)
 		{
-			$h2=$h2."<option value=\"".$row["groupid"]."\" ".iif(isset($_GET["groupid"])&&($_GET["groupid"]==$row["groupid"]),"selected","").">".$row["name"];
+			$h2=$h2.form_select("groupid",$row["groupid"],$row["name"]);
 		}
 	}
 	$h2=$h2."</select>";
 
 	$h2=$h2."&nbsp;".S_HOST."&nbsp;";
 	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
-	$h2=$h2."<option value=\"0\"".iif(!isset($_GET["hostid"])||($_GET["hostid"]==0),"selected","").">".S_SELECT_HOST_DOT_DOT_DOT;
+	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
 
 	if(isset($_GET["groupid"]))
 	{
@@ -123,7 +123,7 @@
 		{
 			continue;
 		}
-		$h2=$h2."<option value=\"".$row["hostid"]."\"".iif(isset($_GET["hostid"])&&($_GET["hostid"]==$row["hostid"]),"selected","").">".$row["host"];
+		$h2=$h2.form_select("hostid",$row["hostid"],$row["host"]);
 	}
 	$h2=$h2."</select>";
 
@@ -139,7 +139,7 @@
 
 	$h2=$h2."&nbsp;".S_GRAPH."&nbsp;";
 	$h2=$h2."<select class=\"biginput\" name=\"graphid\" onChange=\"submit()\">";
-	$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["graphid"]),"selected","").">".S_SELECT_GRAPH_DOT_DOT_DOT;
+	$h2=$h2.form_select("graphid",0,S_SELECT_GRAPH_DOT_DOT_DOT);
 
 	if(isset($_GET["hostid"])&&($_GET["hostid"]!=0))
 	{
@@ -150,7 +150,7 @@
 			{
 				continue;
 			}
-			$h2=$h2."<option value=\"".$row["graphid"]."\" ".iif(isset($_GET["graphid"])&&($_GET["graphid"]==$row["graphid"]),"selected","").">".$row["name"];
+			$h2=$h2.form_select("graphid",$row["graphid"],$row["name"]);
 		}
 	}
 	$h2=$h2."</select>";

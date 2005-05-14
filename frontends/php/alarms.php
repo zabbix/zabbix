@@ -57,8 +57,8 @@
 	$h2="";
 	$h2=$h2."<input name=\"triggerid\" type=\"hidden\" value=".$_GET["triggerid"].">";
 	$h2=$h2."<select class=\"biginput\" name=\"limit\" onChange=\"submit()\">";
-	$h2=$h2."<option value=\"NO\" ".iif($_GET["limit"]=="NO","selected","").">".S_SHOW_ALL;
-	$h2=$h2."<option value=\"100\" ".iif($_GET["limit"]=="100","selected","").">".S_SHOW_ONLY_LAST_100;
+	$h2=$h2.form_select("limit","NO",S_SHOW_ALL);
+	$h2=$h2.form_select("limit","100",S_SHOW_ONLY_LAST_100);
 	$h2=$h2."</select>";
 
 	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"alarms.php\">", "</form>");
