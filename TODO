@@ -4,16 +4,16 @@
  - finish hard-linked templates
  - escalations and repeated notifications
  - add encryption between server and agents
+ - monitoring of log files
+ - more supported parameters under FreeBSD, HP-UX and Solaris (cpu times, network stats)
+ - disk stats under Linux 2.6.x
 
 ZABBIX 1.1:
 
  - execution of commands on monitored hosts in case of pre-defined events
- - monitoring of log files
  - audit log
  - anvanced SNMP trapper
- - more supported parameters under FreeBSD, HP-UX and Solaris (cpu times, network stats)
 
- - disk stats under Linux 2.6.x
  - handle unavailability of MySQL gracefully
  - check SUSE 9.2 startup scripts. Parameter -u is misplaced.
  - test everything on 64bit platforms:
