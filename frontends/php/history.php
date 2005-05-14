@@ -102,11 +102,11 @@
 #	$h2=S_GROUP."&nbsp;";
 	$h2="<input class=\"biginput\" name=\"itemid\" type=\"hidden\" value=\"".$_GET["itemid"]."\">";
 	$h2=$h2."<select class=\"biginput\" name=\"action\" onChange=\"submit()\">";
-	$h2=$h2."<option value=\"showhistory\" ".iif(isset($_GET["action"])&&$_GET["action"]=="showhistory","selected","").">".S_LAST_HOUR_GRAPH;
-	$h2=$h2."<option value=\"showhistory2\" ".iif(isset($_GET["action"])&&$_GET["action"]=="showhistory2","selected","").">".S_LAST_HOUR_GRAPH_DIFF;
-	$h2=$h2."<option value=\"showvalues\" ".iif(isset($_GET["action"])&&$_GET["action"]=="showvalues","selected","").">".S_VALUES_OF_LAST_HOUR;
-	$h2=$h2."<option value=\"showfreehist\" ".iif(isset($_GET["action"])&&$_GET["action"]=="showfreehist","selected","").">".S_VALUES_OF_SPECIFIED_PERIOD;
-	$h2=$h2."<option value=\"showplaintxt\" ".iif(isset($_GET["action"])&&$_GET["action"]=="showplaintxt","selected","").">".S_VALUES_IN_PLAIN_TEXT_FORMAT;
+	$h2=$h2.form_select("action","showhistory",S_LAST_HOUR_GRAPH);
+	$h2=$h2.form_select("action","showhistory2",S_LAST_HOUR_GRAPH_DIFF);
+	$h2=$h2.form_select("action","showvalues",S_VALUES_OF_LAST_HOUR);
+	$h2=$h2.form_select("action","showfreehist",S_VALUES_OF_SPECIFIED_PERIOD);
+	$h2=$h2.form_select("action","showplaintxt",S_VALUES_IN_PLAIN_TEXT_FORMAT);
 	$h2=$h2."</select>";
 
 	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"history.php\">", "</form>");
