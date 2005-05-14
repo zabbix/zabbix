@@ -46,8 +46,8 @@
 #	$h2=S_GROUP."&nbsp;";
 	$h2="";
 	$h2=$h2."<select class=\"biginput\" name=\"show\" onChange=\"submit()\">";
-	$h2=$h2."<option value=\"0\" ".iif($_GET["show"]==0,"selected","").">".S_OVERVIEW;
-	$h2=$h2."<option value=\"1\" ".iif($_GET["show"]==1,"selected","").">".S_DETAILS;
+	$h2=$h2.form_select("show",0,S_OVERVIEW);
+	$h2=$h2.form_select("show",1,S_DETAILS);
 	$h2=$h2."</select>";
 
 	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"queue.php\">", "</form>");

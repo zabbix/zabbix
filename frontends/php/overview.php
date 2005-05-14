@@ -64,7 +64,7 @@
 
 	$h2=S_GROUP."&nbsp;";
 	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
-	$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_SELECT_GROUP_DOT_DOT_DOT;
+	$h2=$h2.form_select("groupid",0,S_SELECT_GROUP_DOT_DOT_DOT);
 	$result=DBselect("select groupid,name from groups order by name");
 	while($row=DBfetch($result))
 	{
@@ -81,15 +81,15 @@
 		}
 		if($cnt!=0)
 		{
-			$h2=$h2."<option value=\"".$row["groupid"]."\" ".iif(isset($_GET["groupid"])&&($_GET["groupid"]==$row["groupid"]),"selected","").">".$row["name"];
+			$h2=$h2.form_select("groupid",$row["groupid"],$row["name"]);
 		}
 	}
 	$h2=$h2."</select>";
 
 	$h2=$h2."&nbsp;".S_TYPE."&nbsp;";
 	$h2=$h2."<select class=\"biginput\" name=\"type\" onChange=\"submit()\">";
-	$h2=$h2."<option value=\"0\" ".iif(isset($_GET["type"])&&($_GET["type"]==0),"selected","").">".S_TRIGGERS;
-	$h2=$h2."<option value=\"1\" ".iif(isset($_GET["type"])&&($_GET["type"]==1),"selected","").">".S_DATA;
+	$h2=$h2.form_select("type",0,S_TRIGGERS);
+	$h2=$h2.form_select("type",1,S_DATA);
 	$h2=$h2."</select>";
 
 	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"overview.php\">", "</form>");

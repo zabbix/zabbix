@@ -119,10 +119,10 @@
 #	$h2=S_GROUP."&nbsp;";
 	$h2="";
 	$h2=$h2."<select class=\"biginput\" name=\"config\" onChange=\"submit()\">";
-	$h2=$h2."<option value=\"0\" ".iif(isset($_GET["config"])&&$_GET["config"]==0,"selected","").">".S_HOUSEKEEPER;
-	$h2=$h2."<option value=\"1\" ".iif(isset($_GET["config"])&&$_GET["config"]==1,"selected","").">".S_MEDIA_TYPES;
-	$h2=$h2."<option value=\"2\" ".iif(isset($_GET["config"])&&$_GET["config"]==2,"selected","").">".S_ESCALATION_RULES;
-	$h2=$h2."<option value=\"3\" ".iif(isset($_GET["config"])&&$_GET["config"]==3,"selected","").">".S_IMAGES;
+	$h2=$h2.form_select("config",0,S_HOUSEKEEPER);
+	$h2=$h2.form_select("config",1,S_MEDIA_TYPES);
+	$h2=$h2.form_select("config",2,S_ESCALATION_RULES);
+	$h2=$h2.form_select("config",3,S_IMAGES);
 	$h2=$h2."</select>";
 
 	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"config.php\">", "</form>");

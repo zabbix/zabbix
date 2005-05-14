@@ -187,9 +187,9 @@
 #	$h2=S_GROUP."&nbsp;";
 	$h2="";
 	$h2=$h2."<select class=\"biginput\" name=\"config\" onChange=\"submit()\">";
-	$h2=$h2."<option value=\"0\" ".iif(isset($_GET["config"])&&$_GET["config"]==0,"selected","").">".S_HOSTS;
-	$h2=$h2."<option value=\"1\" ".iif(isset($_GET["config"])&&$_GET["config"]==1,"selected","").">".S_HOST_GROUPS;
-	$h2=$h2."<option value=\"2\" ".iif(isset($_GET["config"])&&$_GET["config"]==2,"selected","").">".S_HOSTS_TEMPLATES_LINKAGE;
+	$h2=$h2.form_select("config",0,S_HOSTS);
+	$h2=$h2.form_select("config",1,S_HOST_GROUPS);
+	$h2=$h2.form_select("config",2,S_HOSTS_TEMPLATES_LINKAGE);
 	$h2=$h2."</select>";
 
 	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"hosts.php\">", "</form>");
@@ -214,7 +214,7 @@
 	$h2=$h2."<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_GET["config"]."\">";
 	$h2=$h2."<input class=\"biginput\" name=\"hostid\" type=\"hidden\" value=\"".$_GET["hostid"]."\">";
 	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
-	$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["groupid"]),"selected","").">".S_ALL_SMALL;
+	$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
 
 	$result=DBselect("select groupid,name from groups order by name");
 	while($row=DBfetch($result))
@@ -232,14 +232,14 @@
 		}
 		if($cnt!=0)
 		{
-			$h2=$h2."<option value=\"".$row["groupid"]."\" ".iif(isset($_GET["groupid"])&&($_GET["groupid"]==$row["groupid"]),"selected","").">".$row["name"];
+			$h2=$h2.form_select("groupid",$row["groupid"],$row["name"]);
 		}
 	}
 	$h2=$h2."</select>";
 
 	$h2=$h2."&nbsp;".S_HOST."&nbsp;";
 	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
-	$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["hostid"]),"selected","").">".S_SELECT_HOST_DOT_DOT_DOT;
+	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
 
 	if(isset($_GET["groupid"]))
 	{
@@ -257,7 +257,7 @@
 		{
 			continue;
 		}
-		$h2=$h2."<option value=\"".$row["hostid"]."\"".iif(isset($_GET["hostid"])&&($_GET["hostid"]==$row["hostid"]),"selected","").">".$row["host"];
+		$h2=$h2.form_select("hostid",$row["hostid"],$row["host"]);
 	}
 	$h2=$h2."</select>";
 
@@ -369,7 +369,7 @@
 
 	$h2=S_GROUP."&nbsp;";
 	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
-	$h2=$h2."<option value=\"0\" ".iif(!isset($_GET["groupid"])," selected","").">".S_ALL_SMALL;
+	$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
 	$result=DBselect("select groupid,name from groups order by name");
 	while($row=DBfetch($result))
 	{
@@ -386,7 +386,7 @@
 		}
 		if($cnt!=0)
 		{
-			$h2=$h2."<option value=\"".$row["groupid"]."\" ".iif(isset($_GET["groupid"])&&($_GET["groupid"]==$row["groupid"]),"selected","").">".$row["name"];
+			$h2=$h2.form_select("groupid",$row["groupid"],$row["name"]);
 		}
 	}
 	$h2=$h2."</select>";

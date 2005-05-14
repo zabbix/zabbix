@@ -62,16 +62,16 @@
 	$year=date("Y");
 	for($year=date("Y")-2;$year<=date("Y");$year++)
 	{
-		$h2=$h2."<option value=\"$year\" ".iif(isset($_GET["year"])&&($_GET["year"]==$year),"selected","").">".$year;
+		$h2=$h2.form_select("year",$year,$year);
 	}
 	$h2=$h2."</select>";
 
 	$h2=$h2."&nbsp;".S_PERIOD."&nbsp;";
 	$h2=$h2."<select class=\"biginput\" name=\"period\" onChange=\"submit()\">";
-	$h2=$h2."<option value=\"daily\" ".iif($_GET["period"]=="daily","selected","").">".S_DAILY;
-	$h2=$h2."<option value=\"weekly\" ".iif($_GET["period"]=="weekly","selected","").">".S_WEEKLY;
-	$h2=$h2."<option value=\"monthly\" ".iif($_GET["period"]=="monthly","selected","").">".S_MONTHLY;
-	$h2=$h2."<option value=\"yearly\" ".iif($_GET["period"]=="yearly","selected","").">".S_YEARLY;
+	$h2=$h2.form_select("period","daily",S_DAILY);
+	$h2=$h2.form_select("period","weekly",S_WEEKLY);
+	$h2=$h2.form_select("period","monthly",S_MONTHLY);
+	$h2=$h2.form_select("period","yearly",S_YEARLY);
 	$h2=$h2."</select>";
 
 	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"report3.php\">", "</form>");
