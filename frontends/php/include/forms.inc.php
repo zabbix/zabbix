@@ -639,6 +639,7 @@
 		{
 			echo "<input name=\"usrgrpid\" type=\"hidden\" value=\"$usrgrpid\" size=8>";
 		}
+		echo "<input name=\"config\" type=\"hidden\" value=\"1\" size=8>";
 		echo S_GROUP_NAME;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=30>";

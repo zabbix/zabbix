@@ -1,5 +1,6 @@
 Changes for 1.1alpha8:
 
+ - minor fix for users.php (Alexei)
  - fixed graph.php. Thanks to Michael Durket. (Alexei)
  - added SuSE 9.2 startup scripts. Thanks to Kiepe Andre. (Alexei)
  - changed MAX_STRING_LEN to MAX_BUF_LEN in memset() in active.c (Alexei)
