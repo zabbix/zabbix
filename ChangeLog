@@ -1,5 +1,6 @@
 Changes for 1.1alpha8:
 
+ - changed definition of services.goodsla to double(5.2) (Alexei)
  - minor fix for users.php (Alexei)
  - fixed graph.php. Thanks to Michael Durket. (Alexei)
  - added SuSE 9.2 startup scripts. Thanks to Kiepe Andre. (Alexei)
