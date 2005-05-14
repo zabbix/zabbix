@@ -80,6 +80,8 @@ int	INODEFREE(const char *cmd, const char *mountPoint,double  *value);
 int	INODEFREE_PERC(const char *cmd, const char *mountPoint,double  *value);
 int	INODETOTAL(const char *cmd, const char *mountPoint,double  *value);
 
+int	ISFILE(const char *cmd, const char *filename,double  *value);
+
 int	KERNEL_MAXFILES(const char *cmd, const char *parameter,double  *value);
 int	KERNEL_MAXPROC(const char *cmd, const char *parameter,double  *value);
 int	NETLOADIN1(const char *cmd, const char *parameter,double  *value);
