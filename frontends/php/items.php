@@ -109,6 +109,7 @@
 // $$ is correct here
 				if(isset($_GET[$row["itemid"]]))
 				{
+					delete_item_from_templates($row["itemid"]);
 					$result2=delete_item($row["itemid"]);
 				}
 			}
