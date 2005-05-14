@@ -1,5 +1,6 @@
 Changes for 1.1alpha8:
 
+ - improved history.php (Alexei)
  - delete items from linked hosts when using checkboxes (Alexei)
  - changed definition of services.goodsla to double(5.2) (Alexei)
  - minor fix for users.php (Alexei)
