@@ -89,64 +89,30 @@
 ?>
 
 <?php
+	if(!isset($_GET["config"]))
+	{
+		$_GET["config"]=0;
+	}
+
+#	$h1=S_CONFIGURATION_OF_USERS_AND_USER_GROUPS;
 	$item=get_item_by_itemid($_GET["itemid"]);
 
 	$h1="<A HREF='latest.php?hostid=$hostid'>$host</A> : $description";
 
-	show_table_header($h1);
+#	$h2=S_GROUP."&nbsp;";
+	$h2="<input class=\"biginput\" name=\"itemid\" type=\"hidden\" value=\"".$_GET["itemid"]."\">";
+	$h2=$h2."<select class=\"biginput\" name=\"action\" onChange=\"submit()\">";
+	$h2=$h2."<option value=\"showhistory\" ".iif(isset($_GET["action"])&&$_GET["action"]=="showhistory","selected","").">".S_LAST_HOUR_GRAPH;
+	$h2=$h2."<option value=\"showhistory2\" ".iif(isset($_GET["action"])&&$_GET["action"]=="showhistory2","selected","").">".S_LAST_HOUR_GRAPH_DIFF;
+	$h2=$h2."<option value=\"showvalues\" ".iif(isset($_GET["action"])&&$_GET["action"]=="showvalues","selected","").">".S_VALUES_OF_LAST_HOUR;
+	$h2=$h2."<option value=\"showfreehist\" ".iif(isset($_GET["action"])&&$_GET["action"]=="showfreehist","selected","").">".S_VALUES_OF_SPECIFIED_PERIOD;
+	$h2=$h2."<option value=\"showplaintxt\" ".iif(isset($_GET["action"])&&$_GET["action"]=="showplaintxt","selected","").">".S_VALUES_IN_PLAIN_TEXT_FORMAT;
+	$h2=$h2."</select>";
 
-	$h1="";
-	if($_GET["action"] =="showhistory")
-	{
-		$h1=$h1."<b>[<A HREF=\"history.php?action=showhistory&itemid=".$_GET["itemid"]."\">".S_LAST_HOUR_GRAPH."</A>]</b> ";
-	}
-	else
-	{
-		$item=get_item_by_itemid($_GET["itemid"]);
-		if($item["value_type"] == 0)
-		{
-			$h1=$h1."<A HREF=\"history.php?action=showhistory&itemid=".$_GET["itemid"]."\">".S_LAST_HOUR_GRAPH."</A> ";
-		}
-	}
-	if($_GET["action"] =="showhistory2")
-	{
-		$h1=$h1."<b>[<A HREF=\"history.php?action=showhistory2&itemid=".$_GET["itemid"]."\">".S_LAST_HOUR_GRAPH_DIFF."</A>]</b> ";
-	}
-	else
-	{
-		$item=get_item_by_itemid($_GET["itemid"]);
-		if($item["value_type"] == 0)
-		{
-			$h1=$h1."<A HREF=\"history.php?action=showhistory2&itemid=".$_GET["itemid"]."\">".S_LAST_HOUR_GRAPH_DIFF."</A> ";
-		}
-	}
-	if($_GET["action"] =="showvalues")
-	{
-		$h1=$h1."<b>[<A HREF=\"history.php?action=showvalues&itemid=".$_GET["itemid"]."&period=3600\">".S_VALUES_OF_LAST_HOUR."</A>]</b> ";
-	}
-	else
-	{
-		$h1=$h1."<A HREF=\"history.php?action=showvalues&itemid=".$_GET["itemid"]."&period=3600\">".S_VALUES_OF_LAST_HOUR."</A> ";
-	}
-	if($_GET["action"] =="showfreehist")
-	{
-		$h1=$h1."<b>[<A HREF=\"history.php?action=showfreehist&itemid=".$_GET["itemid"]."\">".S_VALUES_OF_SPECIFIED_PERIOD."</A>]</b> ";
-	}
-	else
-	{
-		$h1=$h1."<A HREF=\"history.php?action=showfreehist&itemid=".$_GET["itemid"]."\">".S_VALUES_OF_SPECIFIED_PERIOD."</A> ";
-	}
-	if($_GET["action"] =="showplaintxt")
-	{
-		$h1=$h1."<b>[<A HREF=\"history.php?action=showplaintxt&itemid=".$_GET["itemid"]."\">".S_VALUES_IN_PLAIN_TEXT_FORMAT."</A>]</b> ";
-	}
-	else
-	{
-		$h1=$h1."<A HREF=\"history.php?action=showplaintxt&itemid=".$_GET["itemid"]."\">".S_VALUES_IN_PLAIN_TEXT_FORMAT."</A> ";
-	}
-	show_table_header($h1);
-	echo	"<br>";
+	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"history.php\">", "</form>");
+?>
 
+<?php
 	if($_GET["action"]=="showfreehist")
 	{
 		if(!isset($_GET["period"]))
