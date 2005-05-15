@@ -1,6 +1,6 @@
 /* 
-** Zabbix
-** Copyright (C) 2000,2001,2002,2003,2004 Alexei Vladishev
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,10 +55,11 @@
 
 #include "trapper.h"
 
-int	process_trap(int sockfd,char *s)
+int	process_trap(int sockfd,char *s, int max_len)
 {
 	char	*p,*line,*host;
 	char	*server,*key,*value_string;
+	char	copy[MAX_STRING_LEN];
 	char	result[MAX_STRING_LEN];
 
 	int	ret=SUCCEED;
@@ -78,6 +79,8 @@ int	process_trap(int sockfd,char *s)
 /* Process information sent by zabbix_sender */
 	else
 	{
+		strscpy(copy,s);
+
 		server=(char *)strtok(s,":");
 		if(NULL == server)
 		{
@@ -90,11 +93,16 @@ int	process_trap(int sockfd,char *s)
 			return FAIL;
 		}
 
-		value_string=(char *)strtok(NULL,":");
+		value_string=strchr(copy,':');
+		value_string=strchr(value_string+1,':');
+
+/*		value_string=(char *)strtok(NULL,":");*/
 		if(NULL == value_string)
 		{
 			return FAIL;
 		}
+		/* It points to ':', so have to increment */
+		value_string++;
 
 		ret=process_data(sockfd,server,key,value_string);
 		if( SUCCEED == ret)
@@ -156,7 +164,7 @@ void	process_trapper_child(int sockfd)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Got line:%s", line);
 
-	process_trap(sockfd,line);
+	process_trap(sockfd,line, MAX_STRING_LEN);
 
 	alarm(0);
 }

@@ -1,6 +1,6 @@
 -- 
--- Zabbix
--- Copyright (C) 2000,2001,2002,2003 Alexei Vladishev
+-- ZABBIX
+-- Copyright (C) 2000-2005 SIA Zabbix
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -186,7 +186,7 @@ CREATE TABLE audit (
   PRIMARY KEY (auditid)
 );
 
-CREATE UNIQUE INDEX audit_userid_clock on audit (userid,clock);
+CREATE INDEX audit_userid_clock on audit (userid,clock);
 CREATE INDEX audit_clock on audit (clock);
 
 --

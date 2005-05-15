@@ -1,6 +1,6 @@
 /* 
-** Zabbix
-** Copyright (C) 2000,2001,2002,2003,2004 Alexei Vladishev
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,6 +58,7 @@
 #include "cfg.h"
 #include "stats.h"
 #include "active.h"
+#include "logfiles.h"
 
 METRIC	*metrics=NULL;
 
@@ -72,29 +73,20 @@ void	init_list()
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Metrics are already initialised");
+		zabbix_log( LOG_LEVEL_WARNING, "Metrics are already initialised");
 	}
 }
-void	delete_all_metrics()
+void	disable_all_metrics()
 {
-	int i,count=0;
+	int i;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In delete_all_metrics()");
 	for(i=0;;i++)
 	{
 		if(metrics[i].key == NULL)	break;
 
-		count++;
+		metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
 	}
-
-	for(i=count-1;i>=0;i--)
-	{
-		free(metrics[i].key);
-	}
-	free(metrics);
-
-	metrics=NULL;
-	init_list();
 }
 
 int	get_min_nextcheck()
@@ -123,21 +115,32 @@ int	get_min_nextcheck()
 
 void	add_check(char *key, int refresh)
 {
-
 	int i;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In add check [%s]", key);
 
 	for(i=0;;i++)
 	{
 		if(metrics[i].key == NULL)
 		{
-
 			metrics[i].key=strdup(key);
 			metrics[i].refresh=refresh;
 			metrics[i].nextcheck=0;
 			metrics[i].status=ITEM_STATUS_ACTIVE;
+			metrics[i].lastlogsize=0;
 
 			metrics=realloc(metrics,(i+2)*sizeof(METRIC));
 			metrics[i+1].key=NULL;
+			break;
+		}
+		else if(strcmp(metrics[i].key,key)==0)
+		{
+			if(metrics[i].refresh!=refresh)
+			{
+				metrics[i].nextcheck=0;
+			}
+			metrics[i].refresh=refresh;
+			metrics[i].status=ITEM_STATUS_ACTIVE;
 			break;
 		}
 	}
@@ -150,8 +153,7 @@ int	parse_list_of_checks(char *str)
 	char *key, *refresh;
 	char *s1, *s2;
 
-	init_list();
-	delete_all_metrics();
+	disable_all_metrics();
 
 	line=(char *)strtok_r(str,"\n",&s1);
 	while(line!=NULL)
@@ -377,10 +379,12 @@ int	send_value(char *server,int port,char *shortname,char *value)
 int	process_active_checks(char *server, int port)
 {
 	char	value[MAX_STRING_LEN];
-	int	i, now;
+	int	i, now, count;
 	int	ret = SUCCEED;
 
 	char	shortname[MAX_STRING_LEN];
+	char	c[MAX_STRING_LEN];
+	char	*filename;
 
 	now=time(NULL);
 
@@ -390,20 +394,52 @@ int	process_active_checks(char *server, int port)
 		if(metrics[i].nextcheck>now)			continue;
 		if(metrics[i].status!=ITEM_STATUS_ACTIVE)	continue;
 
-		process(metrics[i].key, value);
-
-		snprintf(shortname, MAX_STRING_LEN-1,"%s:%s",CONFIG_HOSTNAME,metrics[i].key);
-		zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
-		if(send_value(server,port,shortname,value) == FAIL)
+		/* Special processing for log files */
+		if(strncmp(metrics[i].key,"log[",4) == 0)
 		{
-			ret = FAIL;
-			break;
+			strscpy(c,metrics[i].key);
+			filename=strtok(c,"[]");
+			filename=strtok(NULL,"[]");
+
+			count=0;
+			while(process_log(filename,metrics[i].lastlogsize,value) == 0)
+			{
+				snprintf(shortname, MAX_STRING_LEN-1,"%s:%s",CONFIG_HOSTNAME,metrics[i].key);
+				zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
+				if(send_value(server,port,shortname,value) == FAIL)
+				{
+					ret = FAIL;
+					break;
+				}
+				if(strcmp(value,"ZBX_NOTSUPPORTED\n")==0)
+				{
+					metrics[i].status=ITEM_STATUS_NOTSUPPORTED;
+					zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.", metrics[i].key);
+					break;
+				}
+				metrics[i].lastlogsize+=strlen(value);
+				count++;
+				/* Do not flood ZABBIX server if file grows too fast */
+				if(count >= MAX_LINES_PER_SECOND*metrics[i].refresh)	break;
+			}
 		}
-
-		if(strcmp(value,"ZBX_NOTSUPPORTED\n")==0)
+		else
 		{
-			metrics[i].status=ITEM_STATUS_NOTSUPPORTED;
-			zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.", metrics[i].key);
+			process(metrics[i].key, value);
+
+			snprintf(shortname, MAX_STRING_LEN-1,"%s:%s",CONFIG_HOSTNAME,metrics[i].key);
+			zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
+			if(send_value(server,port,shortname,value) == FAIL)
+			{
+				ret = FAIL;
+				break;
+			}
+
+			if(strcmp(value,"ZBX_NOTSUPPORTED\n")==0)
+			{
+				metrics[i].status=ITEM_STATUS_NOTSUPPORTED;
+				zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.", metrics[i].key);
+			}
 		}
 
 		metrics[i].nextcheck=time(NULL)+metrics[i].refresh;
@@ -436,6 +472,8 @@ void    child_active_main(int i,char *server, int port)
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 	setproctitle("getting list of active checks");
 #endif
+
+	init_list();
 
 	refresh_metrics(server, port, error, sizeof(error));
 	nextrefresh=time(NULL)+CONFIG_REFRESH_ACTIVE_CHECKS;

@@ -1,7 +1,7 @@
 <?php
 /* 
-** Zabbix
-** Copyright (C) 2000,2001,2002,2003,2004 Alexei Vladishev
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -151,7 +151,7 @@
 
 		echo "<TABLE BORDER=0 COLS=2 ALIGN=CENTER WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
 		echo "<TR BGCOLOR=\"#CCCCCC\">";
-		echo "<TD><B>".S_CLOCK."</B></TD>";
+		echo "<TD><B>".S_TIMESTAMP."</B></TD>";
 		echo "<TD><B>".S_VALUE."</B></TD>";
 		echo "</TR>";
 

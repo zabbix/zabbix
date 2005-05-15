@@ -17,10 +17,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
+#ifndef ZABBIX_LOGFILES_H
+#define ZABBIX_LOGFILES_H
 
-#ifndef ZABBIX_EMAIL_H
-#define ZABBIX_EMAIL_H
-
-int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,char *mailsubject,char *mailbody, char *error, int max_error_len);
+int   process_log(char *filename,int lastlogsize, char *value);
 
 #endif

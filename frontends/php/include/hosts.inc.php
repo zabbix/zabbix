@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000,2001,2002,2003,2004 Alexei Vladishev
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -198,5 +198,31 @@
 			error("No host with hostid=[$hostid]");
 		}
 		return	$host;
+	}
+
+	# Update Host status
+
+	function	update_host_status($hostid,$status)
+	{
+                if(!check_right("Host","U",0))
+                {
+                        error("Insufficient permissions");
+                        return 0;
+                }
+
+		$sql="select status,host from hosts where hostid=$hostid";
+		$result=DBselect($sql);
+		$old_status=DBget_field($result,0,0);
+		if($status != $old_status)
+		{
+			update_trigger_value_to_unknown_by_hostid($hostid);
+			$sql="update hosts set status=$status where hostid=$hostid and status!=".HOST_STATUS_DELETED;
+			info("Updated status of host ".DBget_field($result,0,1));
+			return	DBexecute($sql);
+		}
+		else
+		{
+			return 1;
+		}
 	}
 ?>
