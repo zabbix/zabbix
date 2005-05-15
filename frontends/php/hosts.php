@@ -1,7 +1,7 @@
 <?php
 /* 
-** Zabbix
-** Copyright (C) 2000,2001,2002,2003,2004 Alexei Vladishev
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -172,6 +172,32 @@
 		{
 			$result=update_host_group($_GET["groupid"], $_GET["name"], $_GET["hosts"]);
 			show_messages($result, S_GROUP_UPDATED, _S_CANNOT_UPDATE_GROUP);
+		}
+		if($_GET["register"]=="start monitoring")
+		{
+			$result=DBselect("select hostid from hosts_groups where groupid=".$_GET["groupid"]);
+			while($row=DBfetch($result))
+			{
+				$res=update_host_status($row["hostid"],HOST_STATUS_MONITORED);
+				if($res)
+				{
+					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,"New status [".HOST_STATUS_MONITORED."]");
+				}
+			}
+			show_messages(1,S_HOST_STATUS_UPDATED,S_CANNOT_UPDATE_HOST_STATUS);
+		}
+		if($_GET["register"]=="stop monitoring")
+		{
+			$result=DBselect("select hostid from hosts_groups where groupid=".$_GET["groupid"]);
+			while($row=DBfetch($result))
+			{
+				$res=update_host_status($row["hostid"],HOST_STATUS_NOT_MONITORED);
+				if($res)
+				{
+					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,"New status [".HOST_STATUS_NOT_MONITORED."]");
+				}
+			}
+			show_messages(1,S_HOST_STATUS_UPDATED,S_CANNOT_UPDATE_HOST_STATUS);
 		}
 	}
 ?>

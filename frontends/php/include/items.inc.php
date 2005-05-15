@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000,2001,2002,2003,2004 Alexei Vladishev
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,6 +62,10 @@
 
 		$sql="insert into items (description,key_,hostid,delay,history,nextcheck,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula,trends) values ('$description','$key',$hostid,$delay,$history,0,$status,$type,'$snmp_community','$snmp_oid',$value_type,'$trapper_hosts',$snmp_port,'$units',$multiplier,$delta,'$snmpv3_securityname',$snmpv3_securitylevel,'$snmpv3_authpassphrase','$snmpv3_privpassphrase','$formula',$trends)";
 		$result=DBexecute($sql);
+		if($result)
+		{
+			info("Added new item $key");
+		}
 		return DBinsert_id($result,"items","itemid");
 	}
 
@@ -115,7 +119,12 @@
 		$snmpv3_privpassphrase=addslashes($snmpv3_privpassphrase);
 
 		$sql="update items set description='$description',key_='$key',hostid=$hostid,delay=$delay,history=$history,nextcheck=0,status=$status,type=$type,snmp_community='$snmp_community',snmp_oid='$snmp_oid',value_type=$value_type,trapper_hosts='$trapper_hosts',snmp_port=$snmp_port,units='$units',multiplier=$multiplier,delta=$delta,snmpv3_securityname='$snmpv3_securityname',snmpv3_securitylevel=$snmpv3_securitylevel,snmpv3_authpassphrase='$snmpv3_authpassphrase',snmpv3_privpassphrase='$snmpv3_privpassphrase',formula='$formula',trends=$trends where itemid=$itemid";
-		return	DBexecute($sql);
+		$result=DBexecute($sql);
+		if($result)
+		{
+			info("Item $key updated");
+		}
+		return $result;
 	}
 
 	# Add item to hardlinked hosts
@@ -253,6 +262,11 @@
 			return	$result;
 		}
 		$sql="delete from items where itemid=$itemid";
-		return	DBexecute($sql);
+		$result=DBexecute($sql);
+		if($result)
+		{
+			info("Item $key deleted");
+		}
+		return $result;
 	}
 ?>

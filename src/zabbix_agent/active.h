@@ -1,6 +1,6 @@
 /* 
-** Zabbix
-** Copyright (C) 2000,2001,2002,2003,2004 Alexei Vladishev
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
 extern char	*CONFIG_HOSTNAME;
 extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
 
+#define MAX_LINES_PER_SECOND	10
+
 #define METRIC struct metric_type
 METRIC
 {
@@ -30,6 +32,7 @@ METRIC
 	int	refresh;
 	int	nextcheck;
 	int	status;
+	int	lastlogsize;
 };
 
 pid_t   child_active_make(int i,char *server, int port);
