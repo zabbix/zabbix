@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000,2001,2002,2003,2004 Alexei Vladishev
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -607,6 +607,8 @@
 		{
 			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update group\">";
 			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete group\" onClick=\"return Confirm('Delete selected group?');\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"start monitoring\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"stop monitoring\">";
 		}
 		echo "</form>";
 		show_table2_header_end();

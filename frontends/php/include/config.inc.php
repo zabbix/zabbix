@@ -1,7 +1,7 @@
 <?php
 /*
-** Zabbix
-** Copyright (C) 2000,2001,2002,2003,2004 Alexei Vladishev
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1439,31 +1439,6 @@ echo "</head>";
 		return $exp;
 	}
 
-	# Update Host status
-
-	function	update_host_status($hostid,$status)
-	{
-                if(!check_right("Host","U",0))
-                {
-                        error("Insufficient permissions");
-                        return 0;
-                }
-
-		$sql="select status from hosts where hostid=$hostid";
-		$result=DBselect($sql);
-		$old_status=DBget_field($result,0,0);
-		if($status != $old_status)
-		{
-			update_trigger_value_to_unknown_by_hostid($hostid);
-			$sql="update hosts set status=$status where hostid=$hostid and status!=".HOST_STATUS_DELETED;
-			return	DBexecute($sql);
-		}
-		else
-		{
-			return 1;
-		}
-	}
-
 	function	add_image($name,$imagetype,$files)
 	{
 		if(isset($files))
@@ -2592,7 +2567,7 @@ echo "</head>";
 <p>
 <table class="menu" width="100%" cellspacing=0 cellpadding=5>
 <tr>
-<td class="horizontal_menu" height=24 colspan=9 align=center><b><?php echo "<a href=\"http://www.zabbix.com\" class=\"highlight\">".S_ZABBIX_VER."</a>&nbsp;".S_COPYRIGHT_BY."<a href=\"mailto:alex@gobbo.caves.lv\" class=\"highlight\">".S_ALEXEI_VLADISHEV."</a>"; ?></b></td>
+<td class="horizontal_menu" height=24 colspan=9 align=center><b><?php echo "<a href=\"http://www.zabbix.com\" class=\"highlight\">".S_ZABBIX_VER."</a>&nbsp;".S_COPYRIGHT_BY."<a href=\"mailto:alex@gobbo.caves.lv\" class=\"highlight\">".S_SIA_ZABBIX."</a>"; ?></b></td>
 <td class="horizontal_menu" height=24 colspan=9 align=right><b><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><?php echo " ".S_CONNECTED_AS."&nbsp;".$USER_DETAILS["alias"];?></b></td>
 </tr>
 </table>

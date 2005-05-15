@@ -1,6 +1,6 @@
 -- 
--- Zabbix
--- Copyright (C) 2000,2001,2002,2003 Alexei Vladishev
+-- ZABBIX
+-- Copyright (C) 2000-2005 SIA Zabbix
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -416,7 +416,7 @@ CREATE TABLE audit (
   resource		int(4)		DEFAULT '0' NOT NULL,
   details		varchar(128)	DEFAULT '0' NOT NULL,
   PRIMARY KEY (auditid),
-  UNIQUE (userid,clock),
+  KEY (userid,clock),
   KEY (clock)
 ) type=InnoDB;
 

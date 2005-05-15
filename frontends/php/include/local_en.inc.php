@@ -1,7 +1,7 @@
 <?php
 /* 
-** Zabbix
-** Copyright (C) 2000,2001,2002,2003,2004 Alexei Vladishev
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -195,7 +195,7 @@
 	define("S_ZABBIX_VER",				"ZABBIX 1.1alpha8");
 	define("S_COPYRIGHT_BY",			"Copyright 2001-2005 by ");
 	define("S_CONNECTED_AS",			"Connected as");
-	define("S_ALEXEI_VLADISHEV",			"Alexei Vladishev");
+	define("S_SIA_ZABBIX",				"SIA Zabbix");
 
 //	graph.php
 	define("S_CONFIGURATION_OF_GRAPH",		"Configuration of graph");
@@ -237,7 +237,7 @@
 	define("S_VALUES_OF_LAST_HOUR",			"Values of last hour");
 	define("S_VALUES_OF_SPECIFIED_PERIOD",		"Values of specified period");
 	define("S_VALUES_IN_PLAIN_TEXT_FORMAT",		"Values in plain text format");
-	define("S_CLOCK",				"Clock");
+	define("S_TIMESTAMP",				"Timestamp");
 
 //	hosts.php
 	define("S_HOSTS",				"Hosts");
