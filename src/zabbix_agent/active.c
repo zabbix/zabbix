@@ -178,6 +178,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 	int	s;
 	int	len;
 	char	c[MAX_BUF_LEN];
+	char	tmp[MAX_STRING_LEN];
 
 	struct hostent *hp;
 
@@ -250,26 +251,30 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 	memset(c,0,MAX_BUF_LEN);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Before read");
-	len=read(s,c,MAX_BUF_LEN-1);
-	if(len == -1)
+
+	while((len=read(s,tmp,MAX_BUF_LEN-1))>0)
 	{
-		switch (errno)
+		if(len == -1)
 		{
-			case 	EINTR:
-					zabbix_log( LOG_LEVEL_WARNING, "Timeout while receiving data from [%s]",server );
-					snprintf(error,max_error_len-1,"Timeout while receiving data from [%s]",server);
-					break;
-			case	ECONNRESET:
-					zabbix_log( LOG_LEVEL_WARNING, "Connection reset by peer.");
-					snprintf(error,max_error_len-1,"Connection reset by peer.");
-					close(s);
-					return	NETWORK_ERROR;
-			default:
-					zabbix_log( LOG_LEVEL_WARNING, "Error while receiving data from [%s] [%s]",server, strerror(errno));
-					snprintf(error,max_error_len-1,"Error while receiving data from [%s] [%s]",server, strerror(errno));
-		} 
-		close(s);
-		return	FAIL;
+			switch (errno)
+			{
+				case 	EINTR:
+						zabbix_log( LOG_LEVEL_WARNING, "Timeout while receiving data from [%s]",server );
+						snprintf(error,max_error_len-1,"Timeout while receiving data from [%s]",server);
+						break;
+				case	ECONNRESET:
+						zabbix_log( LOG_LEVEL_WARNING, "Connection reset by peer.");
+						snprintf(error,max_error_len-1,"Connection reset by peer.");
+						close(s);
+						return	NETWORK_ERROR;
+				default:
+						zabbix_log( LOG_LEVEL_WARNING, "Error while receiving data from [%s] [%s]",server, strerror(errno));
+						snprintf(error,max_error_len-1,"Error while receiving data from [%s] [%s]",server, strerror(errno));
+			} 
+			close(s);
+			return	FAIL;
+		}
+		strncat(c,tmp,MAX_BUF_LEN-1);
 	}
 	zabbix_log(LOG_LEVEL_DEBUG, "Read [%s]", c);
 
