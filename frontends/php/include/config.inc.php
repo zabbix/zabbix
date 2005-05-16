@@ -2567,7 +2567,7 @@ echo "</head>";
 <p>
 <table class="menu" width="100%" cellspacing=0 cellpadding=5>
 <tr>
-<td class="horizontal_menu" height=24 colspan=9 align=center><b><?php echo "<a href=\"http://www.zabbix.com\" class=\"highlight\">".S_ZABBIX_VER."</a>&nbsp;".S_COPYRIGHT_BY."<a href=\"mailto:alex@gobbo.caves.lv\" class=\"highlight\">".S_SIA_ZABBIX."</a>"; ?></b></td>
+<td class="horizontal_menu" height=24 colspan=9 align=center><b><?php echo "<a href=\"http://www.zabbix.com\" class=\"highlight\">".S_ZABBIX_VER."</a>&nbsp;".S_COPYRIGHT_BY."<a href=\"http://www.zabbix.com\" class=\"highlight\">".S_SIA_ZABBIX."</a>"; ?></b></td>
 <td class="horizontal_menu" height=24 colspan=9 align=right><b><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><?php echo " ".S_CONNECTED_AS."&nbsp;".$USER_DETAILS["alias"];?></b></td>
 </tr>
 </table>

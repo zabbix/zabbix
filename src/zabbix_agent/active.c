@@ -402,7 +402,7 @@ int	process_active_checks(char *server, int port)
 			filename=strtok(NULL,"[]");
 
 			count=0;
-			while(process_log(filename,metrics[i].lastlogsize,value) == 0)
+			while(process_log(filename,&metrics[i].lastlogsize,value) == 0)
 			{
 				snprintf(shortname, MAX_STRING_LEN-1,"%s:%s",CONFIG_HOSTNAME,metrics[i].key);
 				zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
@@ -417,7 +417,6 @@ int	process_active_checks(char *server, int port)
 					zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.", metrics[i].key);
 					break;
 				}
-				metrics[i].lastlogsize+=strlen(value);
 				count++;
 				/* Do not flood ZABBIX server if file grows too fast */
 				if(count >= MAX_LINES_PER_SECOND*metrics[i].refresh)	break;
