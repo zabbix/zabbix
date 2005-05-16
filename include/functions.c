@@ -2277,6 +2277,7 @@ int	process_data(int sockfd,char *server,char *key,char *value)
 		return  FAIL;
 	}
 
+	item.itemid=atoi(DBget_field(result,0,0));
 	item.key=DBget_field(result,0,1);
 	item.host=DBget_field(result,0,2);
 	item.type=atoi(DBget_field(result,0,7));
@@ -2297,7 +2298,6 @@ int	process_data(int sockfd,char *server,char *key,char *value)
 			DBupdate_item_status_to_notsupported(item.itemid, "Not supported by agent");
 	}
 	
-	item.itemid=atoi(DBget_field(result,0,0));
 	item.port=atoi(DBget_field(result,0,3));
 	item.delay=atoi(DBget_field(result,0,4));
 	item.description=DBget_field(result,0,5);

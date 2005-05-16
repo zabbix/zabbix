@@ -1,6 +1,6 @@
 Changes for 1.1alpha8:
 
- - change copyright to SIA Zabbix (Alexei)
+ - changed copyright to SIA Zabbix (Alexei)
  - added basic support for log[*] (Alexei)
  - fixed processing of traps having character ':' (Alexei)
  - added logfiles.h and logfiles.c (Alexei)
