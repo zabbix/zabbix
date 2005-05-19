@@ -9,6 +9,7 @@
 
 ZABBIX 1.1:
 
+ - add HTML block to the screen cell (to see external data, images, etc)
  - execution of commands on monitored hosts in case of pre-defined events
  - audit log
  - anvanced SNMP trapper
