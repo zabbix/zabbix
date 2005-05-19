@@ -1,4 +1,8 @@
-Changes for 1.1alpha8:
+Changes for 1.1alpha10:
+
+ - minor modifications of DB schema. Unnecessary indexes dropped. (Alexei)
+
+Changes for 1.1alpha9:
 
  - changed copyright to SIA Zabbix (Alexei)
  - added basic support for log[*] (Alexei)
