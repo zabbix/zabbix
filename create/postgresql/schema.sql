@@ -80,7 +80,7 @@ CREATE TABLE items (
 );
 
 CREATE UNIQUE INDEX items_hostid_key on items (hostid,key_);
-CREATE INDEX items_hostid on items (hostid);
+--CREATE INDEX items_hostid on items (hostid);
 CREATE INDEX items_nextcheck on items (nextcheck);
 CREATE INDEX items_status on items (status);
 
@@ -153,7 +153,7 @@ CREATE TABLE trigger_depends (
   PRIMARY KEY		(triggerid_down, triggerid_up)
 );
 
-CREATE INDEX trigger_depends_down on trigger_depends (triggerid_down);
+--CREATE INDEX trigger_depends_down on trigger_depends (triggerid_down);
 CREATE INDEX trigger_depends_up   on trigger_depends (triggerid_up);
 
 --
@@ -480,7 +480,7 @@ CREATE TABLE services_links (
   PRIMARY KEY (linkid)
 );
 
-CREATE INDEX services_links_serviceupid on services_links (serviceupid);
+--CREATE INDEX services_links_serviceupid on services_links (serviceupid);
 CREATE INDEX services_links_servicedownid on services_links (servicedownid);
 CREATE UNIQUE INDEX services_links_upidownid on services_links (serviceupid, servicedownid);
 
@@ -528,7 +528,7 @@ CREATE TABLE profiles (
   PRIMARY KEY (profileid)
 );
 
-CREATE INDEX profiles_userid on profiles (userid);
+--CREATE INDEX profiles_userid on profiles (userid);
 CREATE UNIQUE INDEX profiles_userid_idx on profiles (userid,idx);
 
 --
