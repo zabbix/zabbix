@@ -44,7 +44,7 @@ CREATE TABLE services_links (
   servicedownid		int(4)		DEFAULT '0' NOT NULL,
   soft			int(1)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (linkid),
-  KEY (serviceupid),
+--  KEY (serviceupid),
   KEY (servicedownid),
   UNIQUE (serviceupid,servicedownid)
 ) type=InnoDB;
@@ -320,7 +320,7 @@ CREATE TABLE items (
 
 	PRIMARY KEY	(itemid),
 	UNIQUE		shortname (hostid,key_),
-	KEY		(hostid),
+--	KEY		(hostid),
 	KEY		(nextcheck),
 	KEY		(status)
 ) type=InnoDB;
@@ -385,7 +385,7 @@ CREATE TABLE trigger_depends (
 	triggerid_down	int(4) DEFAULT '0' NOT NULL,
 	triggerid_up	int(4) DEFAULT '0' NOT NULL,
 	PRIMARY KEY	(triggerid_down, triggerid_up),
-	KEY		(triggerid_down),
+--	KEY		(triggerid_down),
 	KEY		(triggerid_up)
 ) type=InnoDB;
 
@@ -513,7 +513,7 @@ CREATE TABLE profiles (
   idx			varchar(64)	DEFAULT '' NOT NULL,
   value			varchar(64)	DEFAULT '' NOT NULL,
   PRIMARY KEY (profileid),
-  KEY (userid),
+--  KEY (userid),
   UNIQUE (userid,idx)
 ) type=InnoDB;
 
