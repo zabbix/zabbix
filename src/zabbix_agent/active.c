@@ -100,7 +100,8 @@ int	get_min_nextcheck()
 		if(metrics[i].key == NULL)	break;
 
 		nodata=1;
-		if( (metrics[i].nextcheck < min) || (min == -1))
+		if( (metrics[i].status == ITEM_STATUS_ACTIVE) &&
+		    ((metrics[i].nextcheck < min) || (min == -1)))
 		{
 			min=metrics[i].nextcheck;
 		}
