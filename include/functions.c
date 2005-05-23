@@ -2539,9 +2539,17 @@ void	process_new_value(DB_ITEM *item,char *value)
 				return;
 			}
 		}
-		else
+		else if(item->value_type==ITEM_VALUE_TYPE_STR)
 		{
 			DBadd_history_str(item->itemid,value_str,now);
+		}
+		else if(item->value_type==ITEM_VALUE_TYPE_LOG)
+		{
+			DBadd_history_log(item->itemid,value_str,now);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_ERR, "Unknown value type [%d] for itemid [%d]", item->value_type,item->itemid);
 		}
 	}
 
