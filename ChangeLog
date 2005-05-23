@@ -1,5 +1,6 @@
 Changes for 1.1alpha10:
 
+ - added table 'history_log' (Alexei)
  - fixed issue with high agent's CPU usage for active checks (Alexei)
  - minor modifications of DB schema. Unnecessary indexes dropped. (Alexei)
 
