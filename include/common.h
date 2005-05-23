@@ -61,6 +61,7 @@
 /* Item value types */
 #define ITEM_VALUE_TYPE_FLOAT	0
 #define ITEM_VALUE_TYPE_STR	1
+#define ITEM_VALUE_TYPE_LOG	2
 
 /* Item snmpv3 security levels */
 #define ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV	0

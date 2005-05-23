@@ -336,6 +336,7 @@
 	define("S_STORE_VALUE",				"Store value");
 	define("S_NUMERIC",				"Numeric");
 	define("S_CHARACTER",				"Character");
+	define("S_LOG",					"Log");
 	define("S_AS_IS",				"As is");
 	define("S_DELTA_SPEED_PER_SECOND",		"Delta (speed per second)");
 	define("S_DELTA_SIMPLE_CHANGE",			"Delta (simple change)");

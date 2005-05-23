@@ -506,6 +506,9 @@
 		echo "<OPTION VALUE=\"1\"";
 		if($value_type==1) echo "SELECTED";
 		echo ">".S_CHARACTER;
+		echo "<OPTION VALUE=\"2\"";
+		if($value_type==2) echo "SELECTED";
+		echo ">".S_LOG;
 		echo "</SELECT>";
 
 		show_table2_v_delimiter($col++);
