@@ -1,5 +1,6 @@
 Changes for 1.1alpha10:
 
+ - updated startup scripts for SuSE 9.2 and 9.3. Thanks to Andre. (Alexei) 
  - added selection of hosts for event history (Alexei)
  - new item type - 'log' (Alexei)
  - added table 'history_log' (Alexei)
