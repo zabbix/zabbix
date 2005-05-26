@@ -168,6 +168,18 @@ int housekeeping_history_and_trends(int now)
 		DBexecute(sql);
 #endif
 
+/* Delete HISTORY_LOG */
+#ifdef HAVE_MYSQL
+		snprintf(sql,sizeof(sql)-1,"delete from history_log where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
+#else
+		snprintf(sql,sizeof(sql)-1,"delete from history_log where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
+#endif
+#ifdef ZABBIX_THREADS
+		DBexecute_thread(database, sql);
+#else
+		DBexecute(sql);
+#endif
+
 /* Delete HISTORY_TRENDS */
 #ifdef HAVE_MYSQL
 		snprintf(sql,sizeof(sql)-1,"delete from trends where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.trends,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
