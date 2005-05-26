@@ -142,12 +142,12 @@
 
 		show_table2_v_delimiter($col++);
 		echo "<form method=\"get\" action=\"config.php\">";
-		echo nbsp(S_DO_NOT_KEEP_ALERTS_OLDER_THAN);
+		echo nbsp(S_DO_NOT_KEEP_ACTIONS_OLDER_THAN);
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"alert_history\" value=\"".$config["alert_history"]."\" size=8>";
 
 		show_table2_v_delimiter($col++);
-		echo nbsp(S_DO_NOT_KEEP_ALARMS_OLDER_THAN);
+		echo nbsp(S_DO_NOT_KEEP_EVENTS_OLDER_THAN);
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"alarm_history\" value=\"".$config["alarm_history"]."\" size=8>";
 
