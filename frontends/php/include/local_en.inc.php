@@ -151,8 +151,8 @@
 	define("S_MEDIA_TYPE_DELETED",			"Media type deleted");
 	define("S_MEDIA_TYPE_WAS_NOT_DELETED",		"Media type was not deleted");
 	define("S_CONFIGURATION",			"Configuration");
-	define("S_DO_NOT_KEEP_ALERTS_OLDER_THAN",	"Do not keep alerts older than (in days)");
-	define("S_DO_NOT_KEEP_ALARMS_OLDER_THAN",	"Do not keep alarms older than (in days)");
+	define("S_DO_NOT_KEEP_ACTIONS_OLDER_THAN",	"Do not keep actions older than (in days)");
+	define("S_DO_NOT_KEEP_EVENTS_OLDER_THAN",	"Do not keep events older than (in days)");
 	define("S_MEDIA_TYPES_BIG",			"MEDIA TYPES");
 	define("S_NO_MEDIA_TYPES_DEFINED",		"No media types defined");
 	define("S_SMTP_SERVER",				"SMTP server");

@@ -50,7 +50,53 @@
 <?php
 	$h1="&nbsp;".S_HISTORY_OF_EVENTS_BIG;
 
-	$h2="";
+	$h2=S_GROUP."&nbsp;";
+	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
+	$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
+	$result=DBselect("select groupid,name from groups order by name");
+	while($row=DBfetch($result))
+	{
+// Check if at least one host with read permission exists for this group
+		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
+		$cnt=0;
+		while($row2=DBfetch($result2))
+		{
+			if(!check_right("Host","R",$row2["hostid"]))
+			{
+				continue;
+			}
+			$cnt=1; break;
+		}
+		if($cnt!=0)
+		{
+			$h2=$h2.form_select("groupid",$row["groupid"],$row["name"]);
+		}
+	}
+	$h2=$h2."</select>";
+
+	$h2=$h2."&nbsp;".S_HOST."&nbsp;";
+	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
+	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
+
+	if(isset($_GET["groupid"]))
+	{
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+	}
+	else
+	{
+		$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid group by h.hostid,h.host order by h.host";
+	}
+
+	$result=DBselect($sql);
+	while($row=DBfetch($result))
+	{
+		if(!check_right("Host","R",$row["hostid"]))
+		{
+			continue;
+		}
+		$h2=$h2.form_select("hostid",$row["hostid"],$row["host"]);
+	}
+	$h2=$h2."</select>&nbsp;";
 	if(isset($_GET["start"]))
 	{
 		$h2=$h2."<input class=\"biginput\" name=\"start\" type=hidden value=".$_GET["start"]." size=8>";
@@ -61,25 +107,34 @@
   		$h2=$h2."<input class=\"button\" type=\"submit\" disabled name=\"do\" value=\"<< Prev 100\">";
 	}
   	$h2=$h2."<input class=\"button\" type=\"submit\" name=\"do\" value=\"Next 100 >>\">";
-	show_header2($h1,$h2,"<form name=\"form2\" method=\"get\" action=\"latestalarms.php\">","</form>");
 
+	show_header2($h1,$h2,"<form name=\"form2\" method=\"get\" action=\"latestalarms.php\">","</form>");
 ?>
 
-<FONT COLOR="#000000">
 <?php
+	if(!isset($_GET["start"]))
+	{
+		$_GET["start"]=0;
+	}
+	if(isset($_GET["hostid"])&&($_GET["hostid"] == 0))
+	{
+		unset($_GET["hostid"]);
+	}
 	$sql="select max(alarmid) as max from alarms";
 	$result=DBselect($sql);
 	$row=DBfetch($result);
 	$maxalarmid=@iif(DBnum_rows($result)>0,$row["max"],0);
 
-	if(!isset($_GET["start"]))
+//	$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t where t.triggerid=a.triggerid and a.alarmid>$maxalarmid-".($_GET["start"]+200)." order by clock desc limit ".($_GET["start"]+200);
+	if(isset($_GET["hostid"]))
 	{
-		$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t where t.triggerid=a.triggerid and a.alarmid>$maxalarmid-200 order by clock desc limit 200";
+		$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t,hosts h,items i,functions f where t.triggerid=a.triggerid and f.triggerid=t.triggerid and f.itemid=i.itemid and i.hostid=h.hostid and h.hostid=".$_GET["hostid"]." and a.alarmid>$maxalarmid-".($_GET["start"]+200)." order by clock desc limit ".($_GET["start"]+200);
 	}
 	else
 	{
-		$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t where t.triggerid=a.triggerid and a.alarmid>$maxalarmid-".($_GET["start"]+200)." order by clock desc limit ".($_GET["start"]+200);
+		$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t,hosts h,items i,functions f where t.triggerid=a.triggerid and f.triggerid=t.triggerid and f.itemid=i.itemid and i.hostid=h.hostid and a.alarmid>$maxalarmid-".($_GET["start"]+200)." order by clock desc limit ".($_GET["start"]+200);
 	}
+
 	$result=DBselect($sql);
 
 	table_begin();
@@ -131,7 +186,6 @@
 	}
 	table_end();
 ?>
-</FONT>
 </TR>
 </TABLE>
 
