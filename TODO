@@ -16,7 +16,6 @@ ZABBIX 1.1:
 
  - handle unavailability of MySQL gracefully
  - check SUSE 9.2 startup scripts. Parameter -u is misplaced.
- - test everything on 64bit platforms:
  - apply patches for DNS checks
 
 TKOM:
