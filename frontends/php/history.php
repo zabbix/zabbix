@@ -156,9 +156,13 @@
 		echo "</TR>";
 
 		$item=get_item_by_itemid($_GET["itemid"]);
-		if($item["value_type"]==0)
+		if($item["value_type"]==ITEM_VALUE_TYPE_FLOAT)
 		{
 			$sql="select clock,value from history where itemid=".$_GET["itemid"]." and clock>$time and clock<$till order by clock desc";
+		}
+		else if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
+		{
+			$sql="select clock,value from history_log where itemid=".$_GET["itemid"]." and clock>$time and clock<$till order by clock desc";
 		}
 		else
 		{
