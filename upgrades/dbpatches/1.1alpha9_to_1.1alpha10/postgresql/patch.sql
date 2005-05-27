@@ -3,10 +3,11 @@
 --
 
 CREATE TABLE history_log (
+  id			serial,
   itemid                int4            DEFAULT '0' NOT NULL,
   clock                 int4            DEFAULT '0' NOT NULL,
   value                 varchar(255)    DEFAULT '' NOT NULL,
---  PRIMARY KEY (itemid,clock),
+  PRIMARY KEY (id),
   FOREIGN KEY (itemid) REFERENCES items
 );
 
