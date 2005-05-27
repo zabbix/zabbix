@@ -13,6 +13,7 @@ ZABBIX 1.1:
  - execution of commands on monitored hosts in case of pre-defined events
  - audit log
  - anvanced SNMP trapper
+ - add acknowledgements
 
  - handle unavailability of MySQL gracefully
  - check SUSE 9.2 startup scripts. Parameter -u is misplaced.
@@ -58,10 +59,8 @@ serial number/mesto polozhenija/etc.
 
 OTHER:
 
- - check bug with trapper receiving value with ":"
  - configuration management. Add a page with hardware details for each host.
  - multi-institution support
- - add acknowledgements
 
  - improve removal of item related data from history
 '-' doesn't work in trigger expressions (a-b=0)
@@ -104,7 +103,6 @@ urovenj eskalacii++;
  - add advanced task scheduler/executor to ZABBIX
  - agent incorrectly returns amount of free/available memory on HP-UX (must be 24GB)
  - get rid of net[listen_*] in templates
- - use assert() for critical functions
  - check if simple checks  (FTP, SMTP!) works correctly when host name (not IP) is used
 I found that if I use the fully qualified name of my host, all simple checks
 are working, but they failed if I simply use the hostname.
