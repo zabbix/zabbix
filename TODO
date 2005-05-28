@@ -1,9 +1,8 @@
-1.1alpha9:
+1.1alpha10:
 
  - finish hard-linked templates
  - escalations and repeated notifications
  - add encryption between server and agents
- - monitoring of log files
  - more supported parameters under FreeBSD, HP-UX and Solaris (cpu times, network stats)
  - disk stats under Linux 2.6.x
 
@@ -32,7 +31,6 @@ TKOM:
 
 TELECENTRS:
 
- - hard-linked templates (graphs for new hosts to be added automatically)
  - clickable map in map configuration
  - rus/lat characters for graphs
 <?
@@ -157,7 +155,6 @@ forum Open Discussion for more info.
  - rewrite validation and evaluation of expressions (i.e. make >-1 work)
  - support for 'Clone' (graphs and screens)
  - add support of interface statistics under Solaris and FreeBSD
- - add screens and graphs to host templates
  - calculate MIN value for graphs (do not use '0')
  - infrastructure for reports
  - stacked graphs
@@ -165,19 +162,15 @@ forum Open Discussion for more info.
  - disk size is not correct after evaluating macros in the message
  - fix evaluation of complex trigger expressions (diskpercentage)
  - check if alert and service alert is added after host become reachable again
- - navigation bar for all graphs and screens
 
 LATER:
 
  - Oracle support
- - zabbix to write log to the item (for example: log when item becomes unsupported)
  - support for UDP-based checks (DNS, etc)
  - preserve selected host group between different screens (trigger maintenance, host maintenance)
  - add zabbix[unixtime] and lastupdate() and tick() to get rid of nodata()
  - check return code for alert scripts
  - zabbix_agentd to support processor load, swap[*] and memory[*] onder AIX
- - make possible passing of parameters to user script for UserParameters
- like param[*]
  - make session expiration time configurable in config.php
  - mess with user groups when running under root
  - support for PREFIX/zabbix/etc (configuration files)
@@ -336,8 +329,6 @@ HB:
  - personalisation (refresh rate, graph size, default graph period, etc)
 
  - LDAP authorisation (should work with MSWindows LDAP)
- - Reports:
- - more customizable (graphs time range: 1 mont, etc)
 
 WIN32 Agent:
 

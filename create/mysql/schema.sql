@@ -318,6 +318,8 @@ CREATE TABLE items (
 	formula		varchar(255) DEFAULT '0' NOT NULL,
 	error		varchar(128) DEFAULT '' NOT NULL,
 
+	lastlogsize	int(4) DEFAULT '0' NOT NULL,
+
 	PRIMARY KEY	(itemid),
 	UNIQUE		shortname (hostid,key_),
 --	KEY		(hostid),
@@ -337,6 +339,7 @@ CREATE TABLE media (
 	sendto		varchar(100) DEFAULT '' NOT NULL,
 	active		int(4) DEFAULT '0' NOT NULL,
 	severity	int(4) DEFAULT '63' NOT NULL,
+	period		varchar(100) DEFAULT '1-7,00:00-23:59' NOT NULL,
 	PRIMARY KEY	(mediaid),
 	KEY		(userid),
 	KEY		(mediatypeid)
@@ -542,6 +545,7 @@ CREATE TABLE screens_items (
   height		int(4)		DEFAULT '200' NOT NULL,
   x			int(4)		DEFAULT '0' NOT NULL,
   y			int(4)		DEFAULT '0' NOT NULL,
+  colspan		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY  (screenitemid)
 ) TYPE=InnoDB;
 

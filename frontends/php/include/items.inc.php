@@ -118,6 +118,9 @@
 		$snmpv3_authpassphrase=addslashes($snmpv3_authpassphrase);
 		$snmpv3_privpassphrase=addslashes($snmpv3_privpassphrase);
 
+		$sql="update items set lastlogsize=0 where itemid=$itemid and key_<>'$key'";
+		DBexecute($sql);
+
 		$sql="update items set description='$description',key_='$key',hostid=$hostid,delay=$delay,history=$history,nextcheck=0,status=$status,type=$type,snmp_community='$snmp_community',snmp_oid='$snmp_oid',value_type=$value_type,trapper_hosts='$trapper_hosts',snmp_port=$snmp_port,units='$units',multiplier=$multiplier,delta=$delta,snmpv3_securityname='$snmpv3_securityname',snmpv3_securitylevel=$snmpv3_securitylevel,snmpv3_authpassphrase='$snmpv3_authpassphrase',snmpv3_privpassphrase='$snmpv3_privpassphrase',formula='$formula',trends=$trends where itemid=$itemid";
 		$result=DBexecute($sql);
 		if($result)

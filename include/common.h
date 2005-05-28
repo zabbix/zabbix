@@ -20,13 +20,10 @@
 
 /*#define TESTTEST*/
 
-/*
-#define	ZABBIX_THREADS
-*/
-#define	IT_HELPDESK
-
 #ifndef ZABBIX_COMMON_H
 #define ZABBIX_COMMON_H
+
+#define	ZABBIX_VERSION	"1.1alpha10"
  
 #define	SUCCEED		0
 #define	FAIL		(-1)

@@ -29,10 +29,6 @@ extern	char	*CONFIG_DBPASSWORD;
 extern	char	*CONFIG_DBSOCKET;
 extern	char	*CONFIG_FPING_LOCATION;
 
-#ifdef ZABBIX_THREADS
-void *main_housekeeper_loop();
-#else
 int main_housekeeper_loop();
-#endif
 
 #endif

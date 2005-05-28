@@ -60,7 +60,7 @@
 			if(isset($_GET["3"]))	$severity=array_merge($severity,array(3));
 			if(isset($_GET["4"]))	$severity=array_merge($severity,array(4));
 			if(isset($_GET["5"]))	$severity=array_merge($severity,array(5));
-			$result=add_media( $_GET["userid"], $_GET["mediatypeid"], $_GET["sendto"],$severity,$_GET["active"]);
+			$result=add_media( $_GET["userid"], $_GET["mediatypeid"], $_GET["sendto"],$severity,$_GET["active"],$_GET["period"]);
 			show_messages($result, S_MEDIA_ADDED, S_CANNOT_ADD_MEDIA);
 		}
 		elseif($_GET["register"]=="update")
@@ -72,7 +72,7 @@
 			if(isset($_GET["3"]))	$severity=array_merge($severity,array(3));
 			if(isset($_GET["4"]))	$severity=array_merge($severity,array(4));
 			if(isset($_GET["5"]))	$severity=array_merge($severity,array(5));
-			$result=update_media($_GET["mediaid"], $_GET["userid"], $_GET["mediatypeid"], $_GET["sendto"],$severity,$_GET["active"]);
+			$result=update_media($_GET["mediaid"], $_GET["userid"], $_GET["mediatypeid"], $_GET["sendto"],$severity,$_GET["active"],$_GET["period"]);
 			show_messages($result,S_MEDIA_UPDATED,S_CANNOT_UPDATE_MEDIA);
 		}
 		elseif($_GET["register"]=="delete")
@@ -89,11 +89,11 @@
 ?>
 
 <?php
-	$sql="select m.mediaid,mt.description,m.sendto,m.active from media m,media_type mt where m.mediatypeid=mt.mediatypeid and m.userid=".$_GET["userid"]." order by mt.type,m.sendto";
+	$sql="select m.mediaid,mt.description,m.sendto,m.active,m.period from media m,media_type mt where m.mediatypeid=mt.mediatypeid and m.userid=".$_GET["userid"]." order by mt.type,m.sendto";
 	$result=DBselect($sql);
 
 	table_begin();
-	table_header(array(S_TYPE, S_SEND_TO,S_STATUS,S_ACTIONS));
+	table_header(array(S_TYPE,S_SEND_TO,S_WHEN_ACTIVE,S_STATUS,S_ACTIONS));
 
 	$col=0;
 	while($row=DBfetch($result))
@@ -110,6 +110,7 @@
 		table_row(array(
 			$row["description"],
 			$row["sendto"],
+			$row["period"],
 			$status,
 			$actions
 			),$col++);
@@ -126,12 +127,13 @@
 <?php
 	if(isset($_GET["mediaid"]))
 	{
-		$sql="select m.severity,m.sendto,m.active,m.mediatypeid from media m where m.mediaid=".$_GET["mediaid"];
+		$sql="select m.severity,m.sendto,m.active,m.mediatypeid,m.period from media m where m.mediaid=".$_GET["mediaid"];
 		$result=DBselect($sql);
 		$severity=DBget_field($result,0,0);
 		$sendto=DBget_field($result,0,1);
 		$active=DBget_field($result,0,2);
 		$mediatypeid=DBget_field($result,0,3);
+		$period=DBget_field($result,0,4);
 	}
 	else
 	{
@@ -139,6 +141,7 @@
 		$severity=63;
 		$mediatypeid=-1;
 		$active=0;
+		$period="1-7,00:00-23:59";
 	}
 
 	show_form_begin("media.media");
@@ -178,23 +181,11 @@
 	echo "<input class=\"biginput\" name=\"sendto\" size=20 value='$sendto'>";
 
 	show_table2_v_delimiter($col++);
-/*	echo nbsp(S_USE_IF_SEVERITY);
+	echo nbsp(S_WHEN_ACTIVE);
 	show_table2_h_delimiter();
-	echo "<select multiple class=\"biginput\" name=\"severity[]\" size=\"5\">";
-	$selected=iif( (1&$severity) == 1,"selected","");
-	echo "<option value=\"0\" $selected>".S_NOT_CLASSIFIED;
-	$selected=iif( (2&$severity) == 2,"selected","");
-	echo "<option value=\"1\" $selected>".S_INFORMATION;
-	$selected=iif( (4&$severity) == 4,"selected","");
-	echo "<option value=\"2\" $selected>".S_WARNING;
-	$selected=iif( (8&$severity) == 8,"selected","");
-	echo "<option value=\"3\" $selected>".S_AVERAGE;
-	$selected=iif( (16&$severity) ==16,"selected","");
-	echo "<option value=\"4\" $selected>".S_HIGH;
-	$selected=iif( (32&$severity) ==32,"selected","");
-	echo "<option value=\"5\" $selected>".S_DISASTER;
-	echo "</select>";*/
+	echo "<input class=\"biginput\" name=\"period\" size=48 value='$period'>";
 
+	show_table2_v_delimiter($col++);
 	echo nbsp(S_USE_IF_SEVERITY);
 	show_table2_h_delimiter();
 	$checked=iif( (1&$severity) == 1,"checked","");
