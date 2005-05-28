@@ -122,6 +122,7 @@ DB_ITEM
 	char	*snmpv3_privpassphrase;
 
 	char	*formula;
+	int	lastlogsize;
 };
  
 DB_FUNCTION
@@ -142,6 +143,7 @@ DB_MEDIA
 /*	char	*type;*/
 	int	mediatypeid;
 	char	*sendto;
+	char	*period;
 	int	active;
 	int	severity;
 };
@@ -197,44 +199,6 @@ DB_ALERT
 };
 
 void    DBconnect(void);
-#ifdef ZABBIX_THREADS
-void    DBconnect_thread(MYSQL *database);
-void    DBclose_thread(MYSQL *database);
-int	DBexecute_thread(MYSQL *database,char *query );
-DB_RESULT	*DBselect_thread(MYSQL *database, char *query);
-
-void DBdelete_item_thread(MYSQL *database, int itemid);
-void  DBdelete_triggers_by_itemid_thread(MYSQL *database, int itemid);
-void DBdelete_history_by_itemid_thread(MYSQL *database, int itemid);
-void DBdelete_trends_by_itemid_thread(MYSQL *database, int itemid);
-void  DBdelete_trigger_thread(MYSQL *database, int triggerid);
-void  DBdelete_services_by_triggerid_thread(MYSQL *database, int triggerid);
-void	DBdelete_host_thread(MYSQL *database, int hostid);
-void	DBvacuum_thread(MYSQL *database);
-void	DBdelete_service_thread(MYSQL *database, int serviceid);
-void	DBdelete_sysmaps_links_by_shostid_thread(MYSQL *database, int shostid);
-void	DBupdate_host_availability_thread(MYSQL *database, int hostid,int available,int clock,char *error);
-int	DBupdate_item_status_to_notsupported_thread(MYSQL *database, int itemid, char *error);
-int	DBadd_history_thread(MYSQL *database, int itemid, double value, int clock);
-int	DBadd_trend_thread(MYSQL *database, int itemid, double value, int clock);
-int	DBadd_history_str_thread(MYSQL *database, int itemid, char *value, int clock);
-int	DBupdate_trigger_value_thread(MYSQL *database,int triggerid,int value,int clock);
-int	add_alarm_thread(MYSQL *database, int triggerid,int status,int clock);
-int	latest_alarm_thread(MYSQL *database,int triggerid, int status);
-int	DBadd_service_alarm_thread(MYSQL *database, int serviceid,int status,int clock);
-int	latest_service_alarm_thread(MYSQL *database, int serviceid, int status);
-int	DBget_prev_trigger_value_thread(MYSQL *database, int triggerid);
-int	DBadd_alert_thread(MYSQL *database, int actionid, int mediatypeid, char *sendto, char *subject, char *message);
-int     DBget_function_result_thread(MYSQL *database, double *result,char *functionid);
-
-int	DBget_items_count_thread(MYSQL *database);
-int	DBget_items_unsupported_count_thread(MYSQL *database);
-int	DBget_history_count_thread(MYSQL *database);
-int	DBget_history_str_count_thread(MYSQL *database);
-int	DBget_trends_count_thread(MYSQL *database);
-int	DBget_triggers_count_thread(MYSQL *database);
-int	DBget_queue_count_thread(MYSQL *database);
-#endif
 
 void    DBclose(void);
 void    DBvacuum(void);

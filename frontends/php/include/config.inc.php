@@ -1957,7 +1957,7 @@ echo "</head>";
 
 	# Add Media definition
 
-	function	add_media( $userid, $mediatypeid, $sendto, $severity, $active)
+	function	add_media( $userid, $mediatypeid, $sendto, $severity, $active, $period)
 	{
 		$c=count($severity);
 		$s=0;
@@ -1965,13 +1965,13 @@ echo "</head>";
 		{
 			$s=$s|pow(2,(int)$severity[$i]);
 		}
-		$sql="insert into media (userid,mediatypeid,sendto,active,severity) values ($userid,'$mediatypeid','$sendto',$active,$s)";
+		$sql="insert into media (userid,mediatypeid,sendto,active,severity,period) values ($userid,'$mediatypeid','$sendto',$active,$s,'$period')";
 		return	DBexecute($sql);
 	}
 
 	# Update Media definition
 
-	function	update_media($mediaid, $userid, $mediatypeid, $sendto, $severity, $active)
+	function	update_media($mediaid, $userid, $mediatypeid, $sendto, $severity, $active, $period)
 	{
 		$c=count($severity);
 		$s=0;
@@ -1979,7 +1979,7 @@ echo "</head>";
 		{
 			$s=$s|pow(2,(int)$severity[$i]);
 		}
-		$sql="update media set userid=$userid, mediatypeid=$mediatypeid, sendto='$sendto', active=$active,severity=$s where mediaid=$mediaid";
+		$sql="update media set userid=$userid, mediatypeid=$mediatypeid, sendto='$sendto', active=$active,severity=$s,period=`$period` where mediaid=$mediaid";
 		return	DBexecute($sql);
 	}
 

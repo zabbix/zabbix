@@ -52,7 +52,7 @@
 		}
 		if($_GET["register"]=="add server")
 		{
-			$result=add_host_to_services($_GET["hostid"],$_GET["serviceid"]);
+			$result=add_host_to_services($_GET["serverid"],$_GET["serviceid"]);
 			show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 		}
 		if($_GET["register"]=="add link")
@@ -229,6 +229,11 @@
 	echo S_SERVICE;
 	$col=0;
 
+	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
+	{
+		unset($_GET["groupid"]);
+	}
+
 	show_table2_v_delimiter($col++);
 	echo "<form method=\"get\" action=\"services.php\">";
 	if(isset($_GET["serviceid"]))
@@ -308,27 +313,80 @@
 	show_table2_v_delimiter($col++);
 	echo S_TRIGGER;
 	show_table2_h_delimiter();
-        $result=DBselect("select triggerid,description from triggers order by description");
-        echo "<select class=\"biginput\" name=\"triggerid\" size=1>";
-        for($i=0;$i<DBnum_rows($result);$i++)
-        {
-                $triggerid_=DBget_field($result,$i,0);
+	$h2="<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
+	$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
+	$result=DBselect("select groupid,name from groups order by name");
+	while($row=DBfetch($result))
+	{
+// Check if at least one host with read permission exists for this group
+		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
+		$cnt=0;
+		while($row2=DBfetch($result2))
+		{
+			if(!check_right("Host","R",$row2["hostid"]))
+			{
+				continue;
+			}
+			$cnt=1; break;
+		}
+		if($cnt!=0)
+		{
+			$h2=$h2.form_select("groupid",$row["groupid"],$row["name"]);
+		}
+	}
+	$h2=$h2."</select>&nbsp;";
+
+	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
+	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
+
+	if(isset($_GET["groupid"]))
+	{
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+	}
+	else
+	{
+		$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid group by h.hostid,h.host order by h.host";
+	}
+
+	$result=DBselect($sql);
+	while($row=DBfetch($result))
+	{
+		if(!check_right("Host","R",$row["hostid"]))
+		{
+			continue;
+		}
+		$h2=$h2.form_select("hostid",$row["hostid"],$row["host"]);
+	}
+	$h2=$h2."</select>&nbsp;";
+	echo $h2;
+
+	if(isset($_GET["hostid"]))
+	{
+		show_table2_v_delimiter($col++);
+		echo "&nbsp;";
+		show_table2_h_delimiter();
+	        $result=DBselect("select t.triggerid,t.description from triggers t,functions f, hosts h, items i where h.hostid=i.hostid and f.itemid=i.itemid and t.triggerid=f.triggerid and h.hostid=".$_GET["hostid"]." order by t.description");
+	        echo "<select class=\"biginput\" name=\"triggerid\" size=1>";
+	        for($i=0;$i<DBnum_rows($result);$i++)
+	        {
+	                $triggerid_=DBget_field($result,$i,0);
 //                $description_=DBget_field($result,$i,1);
 //		if( strstr($description_,"%s"))
 //		{
-			$description_=expand_trigger_description($triggerid_);
+				$description_=expand_trigger_description($triggerid_);
 //		}
 //		if(isset($_GET["triggerid"]) && ($_GET["triggerid"]==$triggerid_))
-		if(isset($triggerid) && ($triggerid==$triggerid_))
-                {
-                        echo "<OPTION VALUE='$triggerid_' SELECTED>$description_";
-                }
-                else
-                {
-                        echo "<OPTION VALUE='$triggerid_'>$description_";
-                }
-        }
-        echo "</SELECT>";
+			if(isset($triggerid) && ($triggerid==$triggerid_))
+	                {
+	                        echo "<OPTION VALUE='$triggerid_' SELECTED>$description_";
+	                }
+	                else
+	                {
+	                        echo "<OPTION VALUE='$triggerid_'>$description_";
+	                }
+	        }
+	        echo "</SELECT>";
+	}
 
 	show_table2_v_delimiter($col++);
 	echo nbsp(S_SORT_ORDER_0_999);
@@ -433,7 +491,7 @@
 	echo S_SERVER;
 	show_table2_h_delimiter();
 	$result=DBselect("select hostid,host from hosts order by host");
-        echo "<select class=\"biginput\" name=\"hostid\" size=1>";
+        echo "<select class=\"biginput\" name=\"serverid\" size=1>";
         while($row=DBfetch($result))
         {
 		echo "<OPTION VALUE='".$row["hostid"]."'>".$row["host"];

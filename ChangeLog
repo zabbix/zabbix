@@ -1,5 +1,12 @@
 Changes for 1.1alpha10:
 
+ - improved monitoring of log files (Alexei)
+ - removed all pthread code (Alexei)
+ - added column items.lastlogsize (Alexei)
+ - added column screens_items.colspan (Alexei)
+ - support of colspan in screens (Alexei)
+ - added column media.period (Alexei)
+ - activity period for medias (Alexei)
  - updated startup scripts for SuSE 9.2 and 9.3. Thanks to Andre. (Alexei) 
  - added selection of hosts for event history (Alexei)
  - new item type - 'log' (Alexei)

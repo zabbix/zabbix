@@ -436,27 +436,32 @@
 		show_table_header(S_ESCALATION_DETAILS_BIG);
 
 		table_begin();
-		table_header(array(S_STEP,S_DESCRIPTION_SMALL,S_ACTIONS));
+		table_header(array(S_LEVEL,S_DELAY_BEFORE_ACTION,S_TIME,S_ACTIONS));
 
 		table_row(array(
 			1,
-			"30 seconds on this level",
-			"Increase escalation level"),$col++);
+			"30",
+			"1-5,09:00-18:00",
+			"Execute action"),$col++);
 		table_row(array(
 			2,
-			"60 seconds on this level",
-			"Increase escalation level"),$col++);
+			"30",
+			"2-7,00:00-23:59",
+			"Execute action"),$col++);
 		table_row(array(
-			1,
-			"",
+			3,
+			"30",
+			"09:00-18:00",
+			"Execute action"),$col++);
+		table_row(array(
+			4,
+			"0",
+			"09:00-18:00",
 			"Increase severity"),$col++);
 		table_row(array(
-			1,
-			"",
-			"Set escalation level to 5"),$col++);
-		table_row(array(
-			1,
-			"",
+			5,
+			"300",
+			"09:00-18:00",
 			"Increase administrative hierarcy"),$col++);
 
 		$result=DBselect("select escalationid, name from escalations order by name");

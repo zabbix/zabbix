@@ -25,7 +25,7 @@
 
 //	about.php
 	define("S_ABOUT_ZABBIX",			"About ZABBIX");
-	define("S_INFORMATION_ABOUT_ZABBIX",		"Information about ZABBIX (v1.1alpha9)");
+	define("S_INFORMATION_ABOUT_ZABBIX",		"Information about ZABBIX (v1.1alpha10)");
 	define("S_HOMEPAGE_OF_ZABBIX",			"Homepage of ZABBIX");
 	define("S_HOMEPAGE_OF_ZABBIX_DETAILS",		"This is home page of ZABBIX.");
 	define("S_LATEST_ZABBIX_MANUAL",		"Latest ZABBIX Manual");
@@ -168,7 +168,8 @@
 	define("S_NO_ESCALATION_RULES_DEFINED",		"No escalation rules defined");
 	define("S_NO_ESCALATION_DETAILS",		"No escalation details");
 	define("S_ESCALATION_DETAILS_BIG",		"ESCALATION DETAILS");
-	define("S_STEP",				"Step");
+	define("S_LEVEL",				"Level");
+	define("S_DELAY_BEFORE_ACTION",			"Delay before action");
 	define("S_IMAGES",				"Images");
 	define("S_IMAGE",				"Image");
 	define("S_IMAGES_BIG",				"IMAGES");
@@ -192,7 +193,7 @@
 	define("S_COMPARE",				"Compare");
 
 //	Footer
-	define("S_ZABBIX_VER",				"ZABBIX 1.1alpha9");
+	define("S_ZABBIX_VER",				"ZABBIX 1.1alpha10");
 	define("S_COPYRIGHT_BY",			"Copyright 2001-2005 by ");
 	define("S_CONNECTED_AS",			"Connected as");
 	define("S_SIA_ZABBIX",				"SIA Zabbix");
@@ -404,6 +405,7 @@
 	define("S_MEDIA_DELETED",			"Media deleted");
 	define("S_CANNOT_DELETE_MEDIA",			"Cannot delete media");
 	define("S_SEND_TO",				"Send to");
+	define("S_WHEN_ACTIVE",				"When active");
 	define("S_NO_MEDIA_DEFINED",			"No media defined");
 	define("S_NEW_MEDIA",				"New media");
 	define("S_USE_IF_SEVERITY",			"Use if severity");
@@ -515,6 +517,7 @@
 //	screenedit.php
 	define("S_MAP",					"Map");
 	define("S_PLAIN_TEXT",				"Plain text");
+	define("S_COLSPAN",				"Colspan");
 
 //	screens.php
 	define("S_CUSTOM_SCREENS",			"Custom screens");
