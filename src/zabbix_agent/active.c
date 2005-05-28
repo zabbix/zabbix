@@ -114,7 +114,7 @@ int	get_min_nextcheck()
 	return min;
 }
 
-void	add_check(char *key, int refresh)
+void	add_check(char *key, int refresh, int lastlogsize)
 {
 	int i;
 
@@ -128,7 +128,7 @@ void	add_check(char *key, int refresh)
 			metrics[i].refresh=refresh;
 			metrics[i].nextcheck=0;
 			metrics[i].status=ITEM_STATUS_ACTIVE;
-			metrics[i].lastlogsize=0;
+			metrics[i].lastlogsize=lastlogsize;
 
 			metrics=realloc(metrics,(i+2)*sizeof(METRIC));
 			metrics[i+1].key=NULL;
@@ -141,6 +141,7 @@ void	add_check(char *key, int refresh)
 				metrics[i].nextcheck=0;
 			}
 			metrics[i].refresh=refresh;
+			metrics[i].lastlogsize=lastlogsize;
 			metrics[i].status=ITEM_STATUS_ACTIVE;
 			break;
 		}
@@ -151,7 +152,7 @@ void	add_check(char *key, int refresh)
 int	parse_list_of_checks(char *str)
 {
 	char *line;
-	char *key, *refresh;
+	char *key, *refresh, *lastlogsize;
 	char *s1, *s2;
 
 	disable_all_metrics();
@@ -167,8 +168,10 @@ int	parse_list_of_checks(char *str)
 		zabbix_log( LOG_LEVEL_DEBUG, "Key [%s]", key);
 		refresh=(char *)strtok_r(NULL,":",&s2);
 		zabbix_log( LOG_LEVEL_DEBUG, "Refresh [%s]", refresh);
+		lastlogsize=(char *)strtok_r(NULL,":",&s2);
+		zabbix_log( LOG_LEVEL_DEBUG, "Lastlogsize [%s]", lastlogsize);
 
-		add_check(key, atoi(refresh));
+		add_check(key, atoi(refresh), atoi(lastlogsize));
 
 		line=(char *)strtok_r(NULL,"\n",&s1);
 	}
@@ -380,6 +383,7 @@ int	send_value(char *server,int port,char *shortname,char *value)
 int	process_active_checks(char *server, int port)
 {
 	char	value[MAX_STRING_LEN];
+	char	value_tmp[MAX_STRING_LEN];
 	int	i, now, count;
 	int	ret = SUCCEED;
 
@@ -407,7 +411,8 @@ int	process_active_checks(char *server, int port)
 			{
 				snprintf(shortname, MAX_STRING_LEN-1,"%s:%s",CONFIG_HOSTNAME,metrics[i].key);
 				zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
-				if(send_value(server,port,shortname,value) == FAIL)
+				snprintf(value_tmp, MAX_STRING_LEN-1,"%d:%s",metrics[i].lastlogsize,value);
+				if(send_value(server,port,shortname,value_tmp) == FAIL)
 				{
 					ret = FAIL;
 					break;

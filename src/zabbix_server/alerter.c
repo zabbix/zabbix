@@ -130,11 +130,7 @@ int send_alert(DB_ALERT	*alert,DB_MEDIATYPE *mediatype, char *error, int max_err
 	return res;
 }
 
-#ifdef ZABBIX_THREADS
-void *main_alerter_loop()
-#else
 int main_alerter_loop()
-#endif
 {
 	char	sql[MAX_STRING_LEN];
 	char	error[MAX_STRING_LEN];
@@ -144,17 +140,9 @@ int main_alerter_loop()
 
 	struct	sigaction phan;
 
-#ifdef ZABBIX_THREADS
-	DB_HANDLE	database;
-#endif
-
 	DB_RESULT	*result;
 	DB_ALERT	alert;
 	DB_MEDIATYPE	mediatype;
-
-#ifdef ZABBIX_THREADS
-	my_thread_init();
-#endif
 
 	for(;;)
 	{
@@ -162,18 +150,10 @@ int main_alerter_loop()
 		setproctitle("connecting to the database");
 #endif
 
-#ifdef	ZABBIX_THREADS
-		DBconnect_thread(&database);
-#else
 		DBconnect();
-#endif
 
 		snprintf(sql,sizeof(sql)-1,"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path from alerts a,media_type mt where a.status=0 and a.retries<3 and a.mediatypeid=mt.mediatypeid order by a.clock");
-#ifdef	ZABBIX_THREADS
-		result = DBselect_thread(&database, sql);
-#else
 		result = DBselect(sql);
-#endif
 
 		for(i=0;i<DBnum_rows(result);i++)
 		{
@@ -215,21 +195,13 @@ int main_alerter_loop()
 				zabbix_syslog("Error sending alert ID [%d]", alert.alertid);
 				DBescape_string(error,error_esc,MAX_STRING_LEN);
 				snprintf(sql,sizeof(sql)-1,"update alerts set retries=retries+1,error='%s' where alertid=%d", error_esc, alert.alertid);
-#ifdef	ZABBIX_THREADS
-				DBexecute_thread(&database,sql);
-#else
 				DBexecute(sql);
-#endif
 			}
 
 		}
 		DBfree_result(result);
 
-#ifdef	ZABBIX_THREADS
-		DBclose_thread(&database);
-#else
 		DBclose();
-#endif
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("sender [sleeping for %d seconds]", CONFIG_SENDER_FREQUENCY);
 #endif

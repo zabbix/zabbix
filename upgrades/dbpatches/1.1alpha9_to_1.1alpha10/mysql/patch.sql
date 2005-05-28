@@ -10,3 +10,8 @@ CREATE TABLE history_log (
   PRIMARY KEY (id),
   KEY itemidclock (itemid, clock)
 ) type=InnoDB;
+
+
+alter table media add	period		varchar(100)	DEFAULT '1-7,00:00-23:59' NOT NULL;
+alter table screens_items add	colspan		int(4)	DEFAULT '0' NOT NULL;
+alter table items add	lastlogsize		int(4)	DEFAULT '0' NOT NULL;

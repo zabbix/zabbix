@@ -104,10 +104,10 @@
           echo "<TR>";
           for($c=0;$c<$row["cols"];$c++)
           {
-                echo "<TD align=\"center\" valign=\"top\">\n";
 
 		$sql="select * from screens_items where screenid=$screenid and x=$c and y=$r";
 		$iresult=DBSelect($sql);
+		$colspan=0;
 		if(DBnum_rows($iresult)>0)
 		{
 			$irow=DBfetch($iresult);
@@ -116,8 +116,18 @@
 			$resourceid=$irow["resourceid"];
 			$width=$irow["width"];
 			$height=$irow["height"];
+			$colspan=$irow["colspan"];
 		}
 
+		if($colspan==0)
+		{
+               		echo "<TD align=\"center\" valign=\"top\">\n";
+		}
+		else
+		{
+               		echo "<TD align=\"center\" valign=\"top\" colspan=\"$colspan\">\n";
+			$c=$c+$colspan-1;
+		}
 		if(DBnum_rows($iresult)>0)
 		{
 			if($resource == 0)

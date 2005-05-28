@@ -97,6 +97,7 @@
 		$h2=$h2.form_select("hostid",$row["hostid"],$row["host"]);
 	}
 	$h2=$h2."</select>&nbsp;";
+
 	if(isset($_GET["start"]))
 	{
 		$h2=$h2."<input class=\"biginput\" name=\"start\" type=hidden value=".$_GET["start"]." size=8>";

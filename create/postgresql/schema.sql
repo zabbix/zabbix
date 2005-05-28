@@ -75,6 +75,7 @@ CREATE TABLE items (
   snmpv3_privpassphrase	varchar(64)	DEFAULT '' NOT NULL,
   formula		varchar(255)	DEFAULT '{.last(0)}' NOT NULL,
   error			varchar(128)	DEFAULT '' NOT NULL,
+  lastlogsize		int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (itemid),
   FOREIGN KEY (hostid) REFERENCES hosts
 );
@@ -357,6 +358,7 @@ CREATE TABLE media (
   sendto		varchar(100)	DEFAULT '' NOT NULL,
   active		int4		DEFAULT '0' NOT NULL,
   severity		int4		DEFAULT '63' NOT NULL,
+  period		varchar(100)	DEFAULT '1-7,00:00-23:59' NOT NULL,
   PRIMARY KEY (mediaid),
   FOREIGN KEY (userid) REFERENCES users,
   FOREIGN KEY (mediatypeid) REFERENCES media_type
@@ -556,6 +558,7 @@ CREATE TABLE screens_items (
   height		int4		DEFAULT '200' NOT NULL,
   x			int4		DEFAULT '0' NOT NULL,
   y			int4		DEFAULT '0' NOT NULL,
+  colspan		int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY  (screenitemid)
 );
 

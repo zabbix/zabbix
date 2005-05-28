@@ -49,7 +49,7 @@
 //				delete_screen_item($_GET["screenitemid"]);
 //				unset($_GET["screenitemid"]);
 //			}
-			$result=add_screen_item($_GET["resource"],$_GET["screenid"],$_GET["x"],$_GET["y"],$_GET["resourceid"],$_GET["width"],$_GET["height"]);
+			$result=add_screen_item($_GET["resource"],$_GET["screenid"],$_GET["x"],$_GET["y"],$_GET["resourceid"],$_GET["width"],$_GET["height"],$_GET["colspan"]);
 			unset($_GET["x"]);
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
@@ -61,7 +61,7 @@
 		}
                 if($_GET["register"]=="update")
                 {
-                        $result=update_screen_item($_GET["screenitemid"],$_GET["resource"],$_GET["resourceid"],$_GET["width"],$_GET["height"]);
+                        $result=update_screen_item($_GET["screenitemid"],$_GET["resource"],$_GET["resourceid"],$_GET["width"],$_GET["height"],$_GET["colspan"]);
                         show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 			unset($_GET["x"]);
                 }
@@ -81,11 +81,6 @@
 	echo "<TR>";
 	for($c=0;$c<$row["cols"];$c++)
 	{
-		echo "<TD align=\"center\" valign=\"top\">\n";
-
-		echo "<a name=\"form\"></a>";
-		echo "<form method=\"get\" action=\"screenedit.php\">";
-
 		$iresult=DBSelect("select * from screens_items where screenid=$screenid and x=$c and y=$r");
         	if(DBnum_rows($iresult)>0)
         	{
@@ -95,6 +90,7 @@
 			$resourceid=$irow["resourceid"];
 			$width=$irow["width"];
 			$height=$irow["height"];
+			$colspan=$irow["colspan"];
         	}
 		else
 		{
@@ -103,7 +99,19 @@
 			$resourceid=0;
 			$width=500;
 			$height=100;
+			$colspan=0;
 		}
+		if($colspan==0)
+		{
+			echo "<TD align=\"center\" valign=\"top\">\n";
+		}
+		else
+		{
+			echo "<TD align=\"center\" valign=\"top\" colspan=\"$colspan\">\n";
+			$c=$c+$colspan-1;
+		}
+		echo "<a name=\"form\"></a>";
+		echo "<form method=\"get\" action=\"screenedit.php\">";
 
 		if(isset($_GET["x"])&&($_GET["x"]==$c)&&($_GET["y"]==$r))
 		{
@@ -112,6 +120,7 @@
 			$screenitemid=@iif(isset($_GET["screenitemid"]),$_GET["screenitemid"],$screenitemid);
 			$width=@iif(isset($_GET["width"]),$_GET["width"],$width);
 			$height=@iif(isset($_GET["height"]),$_GET["height"],$height);
+			$colspan=@iif(isset($_GET["colspan"]),$_GET["colspan"],$colspan);
 
         		show_form_begin("screenedit.cell");
         		echo S_SCREEN_CELL_CONFIGURATION;
@@ -224,6 +233,11 @@
 				echo "<input class=\"biginput\" name=\"width\" type=\"hidden\" size=5 value=\"$width\">";
 				echo "<input class=\"biginput\" name=\"height\" type=\"hidden\" size=5 value=\"$height\">";
 			}
+
+			show_table2_v_delimiter();
+			echo S_COLSPAN;
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"colspan\" size=2 value=\"$colspan\">";
 
 			show_table2_v_delimiter2();
 			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";

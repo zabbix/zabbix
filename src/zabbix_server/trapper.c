@@ -45,10 +45,6 @@
 #include "log.h"
 #include "zlog.h"
 
-#ifdef ZABBIX_THREADS
-	#include <pthread.h>
-#endif
-
 #include "common.h"
 #include "functions.h"
 #include "expression.h"

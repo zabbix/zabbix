@@ -31,6 +31,11 @@
 		}
 		if( isset($linktrigger)&&($linktrigger=="on") )
 		{
+			if(!isset($triggerid))
+			{
+				error("Choose trigger first");
+				return false;
+			}
 //			$trigger=get_trigger_by_triggerid($triggerid);
 //			$description=$trigger["description"];
 //			if( strstr($description,"%s"))
