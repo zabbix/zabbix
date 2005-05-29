@@ -221,16 +221,16 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 		switch (errno)
 		{
 			case EINTR:
-				zabbix_log( LOG_LEVEL_WARNING, "Timeout while connecting to [%s]",server);
-				snprintf(error,max_error_len-1,"Timeout while connecting to [%s]",server);
+				zabbix_log( LOG_LEVEL_WARNING, "Timeout while connecting to [%s:%d]",server,port);
+				snprintf(error,max_error_len-1,"Timeout while connecting to [%s:%d]",server,port);
 				break;
 			case EHOSTUNREACH:
-				zabbix_log( LOG_LEVEL_WARNING, "No route to host [%s]",server);
-				snprintf(error,max_error_len-1,"No route to host [%s]",server);
+				zabbix_log( LOG_LEVEL_WARNING, "No route to host [%s:%d]",server,port);
+				snprintf(error,max_error_len-1,"No route to host [%s:%d]",server,port);
 				break;
 			default:
-				zabbix_log( LOG_LEVEL_WARNING, "Cannot connect to [%s] [%s]",server, strerror(errno));
-				snprintf(error,max_error_len-1,"Cannot connect to [%s] [%s]",server, strerror(errno));
+				zabbix_log( LOG_LEVEL_WARNING, "Cannot connect to [%s:%d] [%s]",server,port,strerror(errno));
+				snprintf(error,max_error_len-1,"Cannot connect to [%s:%d] [%s]",server,port,strerror(errno));
 		} 
 		close(s);
 		return	NETWORK_ERROR;
@@ -243,12 +243,12 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 		switch (errno)
 		{
 			case EINTR:
-				zabbix_log( LOG_LEVEL_WARNING, "Timeout while sending data to [%s]",server );
-				snprintf(error,max_error_len-1,"Timeout while sending data to [%s]",server);
+				zabbix_log( LOG_LEVEL_WARNING, "Timeout while sending data to [%s:%d]",server,port);
+				snprintf(error,max_error_len-1,"Timeout while sending data to [%s:%d]",server,port);
 				break;
 			default:
-				zabbix_log( LOG_LEVEL_WARNING, "Error while sending data to [%s] [%s]",server, strerror(errno));
-				snprintf(error,max_error_len-1,"Error while sending data to [%s] [%s]",server, strerror(errno));
+				zabbix_log( LOG_LEVEL_WARNING, "Error while sending data to [%s:%d] [%s]",server,port,strerror(errno));
+				snprintf(error,max_error_len-1,"Error while sending data to [%s:%d] [%s]",server,port,strerror(errno));
 		} 
 		close(s);
 		return	FAIL;
@@ -265,8 +265,8 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 			switch (errno)
 			{
 				case 	EINTR:
-						zabbix_log( LOG_LEVEL_WARNING, "Timeout while receiving data from [%s]",server );
-						snprintf(error,max_error_len-1,"Timeout while receiving data from [%s]",server);
+						zabbix_log( LOG_LEVEL_WARNING, "Timeout while receiving data from [%s:%d]",server,port);
+						snprintf(error,max_error_len-1,"Timeout while receiving data from [%s:%d]",server,port);
 						break;
 				case	ECONNRESET:
 						zabbix_log( LOG_LEVEL_WARNING, "Connection reset by peer.");
@@ -274,8 +274,8 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 						close(s);
 						return	NETWORK_ERROR;
 				default:
-						zabbix_log( LOG_LEVEL_WARNING, "Error while receiving data from [%s] [%s]",server, strerror(errno));
-						snprintf(error,max_error_len-1,"Error while receiving data from [%s] [%s]",server, strerror(errno));
+						zabbix_log( LOG_LEVEL_WARNING, "Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
+						snprintf(error,max_error_len-1,"Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
 			} 
 			close(s);
 			return	FAIL;
@@ -321,7 +321,7 @@ int	send_value(char *server,int port,char *shortname,char *value)
 	s=socket(AF_INET,SOCK_STREAM,0);
 	if(s == -1)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Error in socket() [%s] [%s]",server, strerror(errno));
+		zabbix_log( LOG_LEVEL_WARNING, "Error in socket() [%s:%d] [%s]",server,port, strerror(errno));
 		return	FAIL;
 	}
 
@@ -338,7 +338,7 @@ int	send_value(char *server,int port,char *shortname,char *value)
 
 	if( connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Error in connect() [%s] [%s]",server, strerror(errno));
+		zabbix_log( LOG_LEVEL_WARNING, "Error in connect() [%s:%d] [%s]",server, port, strerror(errno));
 		close(s);
 		return	FAIL;
 	}
@@ -347,7 +347,7 @@ int	send_value(char *server,int port,char *shortname,char *value)
 
 	if( sendto(s,tosend,strlen(tosend),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Error in sendto() [%s] [%s]",server, strerror(errno));
+		zabbix_log( LOG_LEVEL_WARNING, "Error in sendto() [%s:%d] [%s]",server, port, strerror(errno));
 		close(s);
 		return	FAIL;
 	} 
@@ -356,7 +356,7 @@ int	send_value(char *server,int port,char *shortname,char *value)
 	i=recvfrom(s,result,1023,0,(struct sockaddr *)&servaddr_in,(socklen_t *)&i);
 	if(s==-1)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Error in recvfrom() [%s] [%s]",server, strerror(errno));
+		zabbix_log( LOG_LEVEL_WARNING, "Error in recvfrom() [%s:%d] [%s]",server,port, strerror(errno));
 		close(s);
 		return	FAIL;
 	}
