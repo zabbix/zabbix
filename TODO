@@ -24,7 +24,6 @@ ZABBIX 1.1:
 TKOM:
 
  - alarms forwarding to external systems (using SNMP traps, for example)
- - auto-discovery script
  - alarm/trigger sounds
  - SNMP trap processing
  - SNMP trap sending
@@ -191,7 +190,6 @@ the agent with a predefined API that can return values to suckerd (for both
 suckerd and agentd)
  - zabbix_trapperd does not start if PostgreSQL and DBConnectOnEach=1
 
- - monitoring of log files
  - [10] Refresh stop ability. At least for graphs and triggers being selected.
  - [10] IT Services. Show downtimes for weeks.
  - [10] IT Services. User view, show algorithm.
