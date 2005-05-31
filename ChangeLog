@@ -1,5 +1,6 @@
 Changes for 1.1alpha11:
 
+ - fixed selection of host in Event History (Alexei)
  - fixed short php tags in PHP frontend (Alexei)
 
 Changes for 1.1alpha10:
