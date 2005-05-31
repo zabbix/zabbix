@@ -1,5 +1,9 @@
 Changes for 1.1alpha10:
 
+ - fixed short php tags in PHP frontend (Alexei)
+
+Changes for 1.1alpha10:
+
  - improved monitoring of log files (Alexei)
  - removed all pthread code (Alexei)
  - added column items.lastlogsize (Alexei)

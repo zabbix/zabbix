@@ -18,7 +18,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 ?>
-<?
+<?php
 	function	nbsp($str)
 	{
 		return str_replace(" ","&nbsp;",$str);;

@@ -343,7 +343,7 @@
 	}
 ?>
 
-<?
+<?php
 	if(isset($_GET["hostid"])&&($_GET["config"]==2))
 	{
 		table_begin();
