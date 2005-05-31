@@ -1,14 +1,11 @@
-1.1alpha10:
+1.1alpha11:
 
  - finish hard-linked templates
  - escalations and repeated notifications
  - add encryption between server and agents
- - more supported parameters under FreeBSD, HP-UX and Solaris (cpu times, network stats)
- - disk stats under Linux 2.6.x
 
 ZABBIX 1.1:
 
- - add HTML block to the screen cell (to see external data, images, etc)
  - execution of commands on monitored hosts in case of pre-defined events
  - audit log
  - anvanced SNMP trapper
@@ -17,6 +14,9 @@ ZABBIX 1.1:
  - handle unavailability of MySQL gracefully
  - check SUSE 9.2 startup scripts. Parameter -u is misplaced.
  - apply patches for DNS checks
+ - add HTML block to the screen cell (to see external data, images, etc)
+ - disk stats under Linux 2.6.x
+ - more supported parameters under FreeBSD, HP-UX and Solaris (cpu times, network stats)
 
 TKOM:
 
