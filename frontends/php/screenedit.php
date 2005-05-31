@@ -49,7 +49,7 @@
 //				delete_screen_item($_GET["screenitemid"]);
 //				unset($_GET["screenitemid"]);
 //			}
-			$result=add_screen_item($_GET["resource"],$_GET["screenid"],$_GET["x"],$_GET["y"],$_GET["resourceid"],$_GET["width"],$_GET["height"],$_GET["colspan"]);
+			$result=add_screen_item($_GET["resource"],$_GET["screenid"],$_GET["x"],$_GET["y"],$_GET["resourceid"],$_GET["width"],$_GET["height"],$_GET["colspan"],$_GET["rowspan"]);
 			unset($_GET["x"]);
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
@@ -61,7 +61,7 @@
 		}
                 if($_GET["register"]=="update")
                 {
-                        $result=update_screen_item($_GET["screenitemid"],$_GET["resource"],$_GET["resourceid"],$_GET["width"],$_GET["height"],$_GET["colspan"]);
+                        $result=update_screen_item($_GET["screenitemid"],$_GET["resource"],$_GET["resourceid"],$_GET["width"],$_GET["height"],$_GET["colspan"],$_GET["rowspan"]);
                         show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 			unset($_GET["x"]);
                 }
@@ -91,6 +91,7 @@
 			$width=$irow["width"];
 			$height=$irow["height"];
 			$colspan=$irow["colspan"];
+			$rowspan=$irow["rowspan"];
         	}
 		else
 		{
@@ -100,16 +101,20 @@
 			$width=500;
 			$height=100;
 			$colspan=0;
+			$rowspan=0;
 		}
-		if($colspan==0)
+		$tmp="";
+		if($colspan!=0)
 		{
-			echo "<TD align=\"center\" valign=\"top\">\n";
-		}
-		else
-		{
-			echo "<TD align=\"center\" valign=\"top\" colspan=\"$colspan\">\n";
+			$tmp=$tmp." colspan=\"$colspan\" ";
 			$c=$c+$colspan-1;
 		}
+		if($rowspan!=0)
+		{
+			$tmp=$tmp." rowspan=\"$rowspan\" ";
+#			$r=$r+$rowspan-1;
+		}
+		echo "<TD align=\"center\" valign=\"top\" $tmp>\n";
 		echo "<a name=\"form\"></a>";
 		echo "<form method=\"get\" action=\"screenedit.php\">";
 
@@ -121,6 +126,7 @@
 			$width=@iif(isset($_GET["width"]),$_GET["width"],$width);
 			$height=@iif(isset($_GET["height"]),$_GET["height"],$height);
 			$colspan=@iif(isset($_GET["colspan"]),$_GET["colspan"],$colspan);
+			$rowspan=@iif(isset($_GET["rowspan"]),$_GET["rowspan"],$colspan);
 
         		show_form_begin("screenedit.cell");
         		echo S_SCREEN_CELL_CONFIGURATION;
@@ -235,9 +241,14 @@
 			}
 
 			show_table2_v_delimiter();
-			echo S_COLSPAN;
+			echo S_COLUMN_SPAN;
 			show_table2_h_delimiter();
 			echo "<input class=\"biginput\" name=\"colspan\" size=2 value=\"$colspan\">";
+
+			show_table2_v_delimiter();
+			echo S_ROW_SPAN;
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"rowspan\" size=2 value=\"$rowspan\">";
 
 			show_table2_v_delimiter2();
 			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
