@@ -45,6 +45,10 @@
 	{
 		unset($_GET["start"]);
 	}
+	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
+	{
+		unset($_GET{"groupid"});
+	}
 ?>
 
 <?php
