@@ -108,6 +108,7 @@
 		$sql="select * from screens_items where screenid=$screenid and x=$c and y=$r";
 		$iresult=DBSelect($sql);
 		$colspan=0;
+		$rowspan=0;
 		if(DBnum_rows($iresult)>0)
 		{
 			$irow=DBfetch($iresult);
@@ -117,17 +118,21 @@
 			$width=$irow["width"];
 			$height=$irow["height"];
 			$colspan=$irow["colspan"];
+			$rowspan=$irow["rowspan"];
 		}
 
-		if($colspan==0)
+		$tmp="";
+		if($colspan!=0)
 		{
-               		echo "<TD align=\"center\" valign=\"top\">\n";
-		}
-		else
-		{
-               		echo "<TD align=\"center\" valign=\"top\" colspan=\"$colspan\">\n";
+			$tmp=$tmp." colspan=\"$colspan\" ";
 			$c=$c+$colspan-1;
 		}
+		if($rowspan!=0)
+		{
+			$tmp=$tmp." rowspan=\"$rowspan\" ";
+#			$r=$r+$rowspan-1;
+		}
+               	echo "<TD align=\"center\" valign=\"top\" $tmp>\n";
 		if(DBnum_rows($iresult)>0)
 		{
 			if($resource == 0)
