@@ -546,6 +546,7 @@ CREATE TABLE screens_items (
   x			int(4)		DEFAULT '0' NOT NULL,
   y			int(4)		DEFAULT '0' NOT NULL,
   colspan		int(4)		DEFAULT '0' NOT NULL,
+  rowspan		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY  (screenitemid)
 ) TYPE=InnoDB;
 

@@ -1,6 +1,5 @@
 1.1alpha11:
 
- - add support for row span in screens
  - finish hard-linked templates
  - escalations and repeated notifications
  - add encryption between server and agents

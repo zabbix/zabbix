@@ -517,7 +517,8 @@
 //	screenedit.php
 	define("S_MAP",					"Map");
 	define("S_PLAIN_TEXT",				"Plain text");
-	define("S_COLSPAN",				"Colspan");
+	define("S_COLUMN_SPAN",				"Column span");
+	define("S_ROW_SPAN",				"Row span");
 
 //	screens.php
 	define("S_CUSTOM_SCREENS",			"Custom screens");
