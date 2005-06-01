@@ -1,5 +1,6 @@
 Changes for 1.1alpha11:
 
+ - fixed parameter of strncpy() in active.c (Alexei)
  - added column screens_items.rowspan (Alexei)
  - support of rowspan in screens (Alexei)
  - fixed selection of host in Event History (Alexei)
