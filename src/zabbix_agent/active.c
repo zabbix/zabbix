@@ -280,7 +280,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 			close(s);
 			return	FAIL;
 		}
-		strncat(c,tmp,MAX_BUF_LEN-1);
+		strncat(c,tmp,len);
 	}
 	zabbix_log(LOG_LEVEL_DEBUG, "Read [%s]", c);
 
