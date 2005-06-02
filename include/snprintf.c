@@ -86,7 +86,7 @@
 #include <stdio.h>
  /* make the compiler happy with an empty file */
  void dummy_snprintf(void) {} 
-#else
+#endif
 
 #ifdef HAVE_LONG_DOUBLE
 #define LDOUBLE long double
@@ -121,6 +121,7 @@
 	#define VA_COPY(dest, src) (dest) = (src)
 #endif
 
+#if !defined(HAVE_SNPRINTF)
 static size_t dopr(char *buffer, size_t maxlen, const char *format, 
 		   va_list args_in);
 static void fmtstr(char *buffer, size_t *currlen, size_t maxlen,
@@ -797,7 +798,6 @@ static void dopr_outch(char *buffer, size_t *currlen, size_t maxlen, char c)
  */
 /* Alexei Does not work under HP-UX */
 /*#if !defined(HAVE_SNPRINTF) || !defined(HAVE_C99_SNPRINTF)*/
-#if !defined(HAVE_SNPRINTF)
  int snprintf(char *str,size_t count,const char *fmt,...)
 {
 	size_t ret;
@@ -808,9 +808,6 @@ static void dopr_outch(char *buffer, size_t *currlen, size_t maxlen, char c)
 	va_end(ap);
 	return ret;
 }
-#endif
-
-#endif 
 
 #ifndef HAVE_VASPRINTF
  int vasprintf(char **ptr, const char *format, va_list ap)
@@ -986,3 +983,5 @@ static void dopr_outch(char *buffer, size_t *currlen, size_t maxlen, char c)
 	return 0;
 }
 #endif /* SNPRINTF_TEST */
+
+#endif /* !SNPRINTF */
