@@ -267,7 +267,7 @@ COMMAND	agent_commands[]=
 	{0}
 	};
 
-void	add_metric(char *key, void *function,void *function_str,char *parameter )
+void	add_metric(char *key, int (*function)(),int (*function_str)(),char *parameter )
 {
 
 	int i;
