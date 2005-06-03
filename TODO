@@ -4,6 +4,7 @@
  - escalations and repeated notifications
  - add encryption between server and agents
  - auto-discovery
+ - make expressions less sensible. Ignore spaces.
 
 ZABBIX 1.1:
 
