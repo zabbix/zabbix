@@ -47,6 +47,34 @@
 		return	$result;
 	}
 
+	# Update escalation definition
+
+	function	update_escalation($escalationid,$name,$dflt)
+	{
+		if(!check_right("Configuration of Zabbix","U",0))
+		{
+			error("Insufficient permissions");
+			return	0;
+		}
+
+		$sql="update escalations set name='$name',dflt=$dflt where escalationid=$escalationid";
+		$result=DBexecute($sql);
+		if(!$result)
+		{
+			return	$result;
+		}
+
+		if($dflt==1)
+		{
+			$sql="update escalations set dflt=0 where escalationid<>$escalationid";
+			$result=DBexecute($sql);
+			info("Default escalation is set to '$name'");
+		}
+		
+		return	$result;
+	}
+
+
 	# Delete escalation definition
 
 	function	delete_escalation($escalationid)

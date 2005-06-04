@@ -42,6 +42,9 @@
 <?php
 	if(isset($_POST["config"]))	$_GET["config"]=$_POST["config"];
 
+	$_GET["config"]=@iif(isset($_GET["config"]),$_GET["config"],get_profile("web.config.config",0));
+	update_profile("web.config.config",$_GET["config"]);
+
 # For images
 	if(isset($_POST["register"]))
 	{
@@ -83,9 +86,19 @@
 			$result=add_escalation($_GET["name"],$dflt);
 			if($result)
 			{
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ESCALATION,"Escalation [".addslashes($_GET["name"])."]");
+				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ESCALATION,"Escalation [".addslashes($_GET["name"])."]");
 			}
 			show_messages($result, S_ESCALATION_ADDED, S_ESCALATION_WAS_NOT_ADDED);
+		}
+		if($_GET["register"]=="update escalation")
+		{
+			$dflt=iif(isset($_GET["dflt"])&&($_GET["dflt"]=="on"),1,0);
+			$result=update_escalation($_GET["escalationid"],$_GET["name"],$dflt);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ESCALATION,"Escalation [".addslashes($_GET["name"])."]");
+			}
+			show_messages($result, S_ESCALATION_UPDATED, S_ESCALATION_WAS_NOT_UPDATED);
 		}
 		if($_GET["register"]=="delete escalation")
 		{
@@ -130,10 +143,6 @@
 ?>
 
 <?php
-	if(!isset($_GET["config"]))
-	{
-		$_GET["config"]=0;
-	}
 
 	$h1=S_CONFIGURATION_OF_ZABBIX_BIG;
 
