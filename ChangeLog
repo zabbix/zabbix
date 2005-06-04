@@ -1,5 +1,6 @@
 Changes for 1.1alpha11:
 
+ - added parameter DisableActive for zabbix_agentd (Alexei)
  - trigger expressions may contain spaces (Alexei)
  - improvements for snprintf.c (Alexei)
  - added table escalation_rules (Alexei)
