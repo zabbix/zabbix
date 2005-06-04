@@ -89,6 +89,25 @@
 			}
 			show_messages($result, S_ESCALATION_RULE_ADDED, S_ESCALATION_RULE_WAS_NOT_ADDED);
 		}
+		if($_GET["register"]=="update rule")
+		{
+			$result=update_escalation_rule($_GET["escalationruleid"],$_GET["level"],$_GET["period"],$_GET["delay"],$_GET["actiontype"]);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ESCALATION_RULE,"Escalation rule ID [".addslashes($_GET["escalationruleid"])."]");
+			}
+			show_messages($result, S_ESCALATION_RULE_UPDATED, S_ESCALATION_RULE_WAS_NOT_UPDATED);
+		}
+		if($_GET["register"]=="delete rule")
+		{
+			$result=delete_escalation_rule($_GET["escalationruleid"]);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_ESCALATION_RULE,"Escalation rule ID [".addslashes($_GET["escalationruleid"])."]");
+			}
+			unset($_GET["escalationruleid"]);
+			show_messages($result, S_ESCALATION_RULE_DELETED, S_ESCALATION_RULE_WAS_NOT_DELETED);
+		}
 		if($_GET["register"]=="add escalation")
 		{
 			$dflt=iif(isset($_GET["dflt"])&&($_GET["dflt"]=="on"),1,0);
@@ -481,24 +500,26 @@
 			show_table_header(S_ESCALATION_RULES);
 
 			table_begin();
-			table_header(array(S_LEVEL,S_TIME,S_DELAY_BEFORE_ACTION,S_ACTIONS));
+			table_header(array(S_LEVEL,S_PERIOD,S_DELAY_BEFORE_ACTION,S_DO,S_ACTIONS));
 
 			$result=DBselect("select * from escalation_rules order by level");
 			$col=0;
 			while($row=DBfetch($result))
 			{
-				$actions="<a href=\"config.php?config=2&register=change&escalationruleid=".$row["escalationruleid"]."\">".S_CHANGE."</a>";
+				$actions="<a href=\"config.php?config=2&register=change&escalationid=".$_GET["escalationid"]."&escalationruleid=".$row["escalationruleid"]."\">".S_CHANGE."</a>";
+				$actiontypes=array("Do nothing","Execute action","Increase severity","Increase administrative hierarcy");
+
 				table_row(array(
 					$row["level"],
 					$row["period"],
 					$row["delay"],
-					$row["action"],
+					$actiontypes[$row["actiontype"]],
 					$actions),$col++);
 			}
 			if(DBnum_rows($result)==0)
 			{
 					echo "<TR BGCOLOR=#EEEEEE>";
-					echo "<TD COLSPAN=4 ALIGN=CENTER>".S_NO_ESCALATION_DETAILS."</TD>";
+					echo "<TD COLSPAN=5 ALIGN=CENTER>".S_NO_ESCALATION_DETAILS."</TD>";
 					echo "<TR>";
 			}
 			table_end();

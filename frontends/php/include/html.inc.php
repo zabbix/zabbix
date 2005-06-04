@@ -31,6 +31,11 @@
 		return "<option value=\"$value\" ".iif(isset($_GET[$var])&&$_GET[$var]==$value,"selected","").">$label";
 	}
 
+	function form_input($name, $value, $size)
+	{
+		return "<input class=\"biginput\" name=\"$name\" size=$size value=\"$value\">";
+	}
+
 	function url1_param($parameter)
 	{
 		global $_GET;

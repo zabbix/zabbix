@@ -122,4 +122,39 @@
 
 		return	$result;
 	}
+
+	# Update escalation rule definition
+
+	function	update_escalation_rule($escalationruleid,$level,$period,$delay,$actiontype)
+	{
+		if(!check_right("Configuration of Zabbix","U",0))
+		{
+			error("Insufficient permissions");
+			return	0;
+		}
+
+		$sql="update escalation_rules set level=$level,period='$period',delay=$delay,actiontype=$actiontype where escalationruleid=$escalationruleid";
+		$result=DBexecute($sql);
+		return	$result;
+	}
+
+	# Delete escalation rule definition
+
+	function	delete_escalation_rule($escalationruleid)
+	{
+		if(!check_right("Configuration of Zabbix","U",0))
+		{
+			error("Insufficient permissions");
+			return	0;
+		}
+
+		$sql="delete from escalation_rules where escalationruleid=$escalationruleid";
+		$result=DBexecute($sql);
+		if(!$result)
+		{
+			return	$result;
+		}
+
+		return	$result;
+	}
 ?>
