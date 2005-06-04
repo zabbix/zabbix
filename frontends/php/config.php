@@ -80,6 +80,15 @@
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Alarm history [".$_GET["alarm_history"]."] alert history [".$_GET["alert_history"]."]");
 			}
 		}
+		if($_GET["register"]=="add rule")
+		{
+			$result=add_escalation_rule($_GET["escalationid"],$_GET["level"],$_GET["period"],$_GET["delay"],$_GET["actiontype"]);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ESCALATION_RULE,"Escalation ID [".addslashes($_GET["escalationid"])."]");
+			}
+			show_messages($result, S_ESCALATION_RULE_ADDED, S_ESCALATION_RULE_WAS_NOT_ADDED);
+		}
 		if($_GET["register"]=="add escalation")
 		{
 			$dflt=iif(isset($_GET["dflt"])&&($_GET["dflt"]=="on"),1,0);
@@ -466,61 +475,36 @@
 
 		insert_escalation_form($_GET["escalationid"]);
 
-		echo "<br>";
-		show_table_header(S_ESCALATION_RULES);
-
-		table_begin();
-		table_header(array(S_LEVEL,S_TIME,S_DELAY_BEFORE_ACTION,S_ACTIONS));
-
-		table_row(array(
-			0,
-			"1-5,09:00-18:00",
-			"300",
-			"Do nothing"),$col++);
-		table_row(array(
-			1,
-			"1-5,09:00-18:00",
-			"30",
-			"Execute action"),$col++);
-		table_row(array(
-			2,
-			"2-7,00:00-23:59",
-			"30",
-			"Execute action"),$col++);
-		table_row(array(
-			3,
-			"09:00-18:00",
-			"30",
-			"Execute action"),$col++);
-		table_row(array(
-			4,
-			"09:00-18:00",
-			"0",
-			"Increase severity"),$col++);
-		table_row(array(
-			5,
-			"09:00-18:00",
-			"300",
-			"Increase administrative hierarcy"),$col++);
-
-		$result=DBselect("select escalationid, name from escalations order by name");
-		$col=0;
-		while($row=DBfetch($result))
+		if(isset($_GET["escalationid"]))
 		{
-			break;
-			$actions="<a href=\"config.php?config=2&register=change&escalationid=".$row["escalationid"]."\">".S_CHANGE."</a>";
-			table_row(array(
-				$row["escalationid"],
-				$row["name"],
-				$actions),$col++);
+			echo "<br>";
+			show_table_header(S_ESCALATION_RULES);
+
+			table_begin();
+			table_header(array(S_LEVEL,S_TIME,S_DELAY_BEFORE_ACTION,S_ACTIONS));
+
+			$result=DBselect("select * from escalation_rules order by level");
+			$col=0;
+			while($row=DBfetch($result))
+			{
+				$actions="<a href=\"config.php?config=2&register=change&escalationruleid=".$row["escalationruleid"]."\">".S_CHANGE."</a>";
+				table_row(array(
+					$row["level"],
+					$row["period"],
+					$row["delay"],
+					$row["action"],
+					$actions),$col++);
+			}
+			if(DBnum_rows($result)==0)
+			{
+					echo "<TR BGCOLOR=#EEEEEE>";
+					echo "<TD COLSPAN=4 ALIGN=CENTER>".S_NO_ESCALATION_DETAILS."</TD>";
+					echo "<TR>";
+			}
+			table_end();
+
+			insert_escalation_rule_form($_GET["escalationid"],$_GET["escalationruleid"]);
 		}
-		if(DBnum_rows($result)==0)
-		{
-				echo "<TR BGCOLOR=#EEEEEE>";
-				echo "<TD COLSPAN=3 ALIGN=CENTER>".S_NO_ESCALATION_DETAILS."</TD>";
-				echo "<TR>";
-		}
-		table_end();
 	}
 ?>
 

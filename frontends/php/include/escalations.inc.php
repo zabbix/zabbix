@@ -101,4 +101,25 @@
 
 		return	$result;
 	}
+
+	# Add escalation rule definition
+
+	function	add_escalation_rule($escalationid,$level,$period,$delay,$actiontype)
+	{
+		if(!check_right("Configuration of Zabbix","U",0))
+		{
+			error("Insufficient permissions");
+			return	0;
+		}
+
+		$sql="insert into escalation_rules (escalationid,level,period,delay,actiontype) values ($escalationid,$level,'$period',$delay,$actiontype)";
+		$result=DBexecute($sql);
+		if(!$result)
+		{
+			return	$result;
+		}
+		$escalationruleid=DBinsert_id($result,"escalation_rules","escalationruleid");
+
+		return	$result;
+	}
 ?>

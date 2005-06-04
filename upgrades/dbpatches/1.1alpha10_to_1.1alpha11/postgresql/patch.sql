@@ -21,11 +21,12 @@ CREATE UNIQUE INDEX escalations_name on escalations (name);
 --
 
 CREATE TABLE escalation_rules (
-  ruleid		serial,
+  escalationruleid	serial,
   escalationid		int4		DEFAULT '0' NOT NULL,
-  period		varchar(100)	DEFAULT '1-7,00:00-23:59' NOT NULL,
   level			int4		DEFAULT '0' NOT NULL,
+  period		varchar(100)	DEFAULT '1-7,00:00-23:59' NOT NULL,
+  delay			int4		DEFAULT '0' NOT NULL,
   actiontype		int4		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (ruleid),
+  PRIMARY KEY (escalationruleid),
   FOREIGN KEY (escalationid) REFERENCES escalations
 );

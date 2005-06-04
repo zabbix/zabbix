@@ -85,6 +85,7 @@
 			if(!$result)
 			{
 				error("SQL error: ".mysql_error());
+				error("Query: $query");
 			}
 			return $result;
 		}
