@@ -168,6 +168,7 @@
 	define("S_NO_ESCALATION_RULES_DEFINED",		"No escalation rules defined");
 	define("S_NO_ESCALATION_DETAILS",		"No escalation details");
 	define("S_ESCALATION_DETAILS_BIG",		"ESCALATION DETAILS");
+	define("S_DEFAULT",				"Default");
 	define("S_LEVEL",				"Level");
 	define("S_DELAY_BEFORE_ACTION",			"Delay before action");
 	define("S_IMAGES",				"Images");
