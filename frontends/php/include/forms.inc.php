@@ -1110,4 +1110,76 @@
 
 		show_table2_header_end();
 	}
+
+	# Insert escalation rule form
+	function	insert_escalation_rule_form($escalationid,$escalationruleid)
+	{
+		if(isset($escalationruleid))
+		{
+			$result=DBselect("select * from escalation_rules  where escalationruleid=$escalationruleid");
+
+			$row=DBfetch($result);
+	
+			$level=$row["level"];
+			$period=$row["period"];
+			$delay=$row["delay"];
+			$actiontype=$row["actiontype"];
+		}
+		else
+		{
+			$level=1;
+			$period="1-7,00:00-23:59";
+			$delay=0;
+			$actiontype=0;
+		}
+
+		$col=0;
+
+		show_form_begin("escalationrule");
+		echo S_ESCALATION_RULE;
+
+		show_table2_v_delimiter($col++);
+		echo "<form method=\"get\" action=\"config.php\">";
+		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_GET["config"]."\" size=8>";
+		echo "<input class=\"biginput\" name=\"escalationid\" type=\"hidden\" value=\"$escalationid\" size=8>";
+		if(isset($escalationruleid))
+		{
+			echo "<input class=\"biginput\" name=\"escalationruleid\" type=\"hidden\" value=\"$escalationruleid\" size=8>";
+		}
+
+		echo S_LEVEL;
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"level\" size=2 value=\"$level\">";
+
+		show_table2_v_delimiter($col++);
+		echo S_PERIOD;
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"period\" size=32 value=\"$period\">";
+
+		show_table2_v_delimiter($col++);
+		echo S_DELAY;
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"delay\" size=32 value=\"$delay\">";
+
+		show_table2_v_delimiter($col++);
+		echo S_ACTION;
+		show_table2_h_delimiter();
+		echo "<SELECT class=\"biginput\" NAME=\"actiontype\" size=\"1\">";
+		echo "<OPTION VALUE=\"0\" "; if($actiontype==0) echo "SELECTED"; echo ">Do nothing";
+		echo "<OPTION VALUE=\"1\" "; if($actiontype==1) echo "SELECTED"; echo ">Execute actions";
+		echo "<OPTION VALUE=\"2\" "; if($actiontype==2) echo "SELECTED"; echo ">Increase severity";
+		echo "<OPTION VALUE=\"3\" "; if($actiontype==3) echo "SELECTED"; echo ">Increase administrative hierarcy";
+		echo "</SELECT>";
+
+
+		show_table2_v_delimiter2($col++);
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add rule\">";
+		if(isset($escalationid))
+		{
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update rule\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete rule\" onClick=\"return Confirm('Delete selected escalation rule?');\">";
+		}
+
+		show_table2_header_end();
+	}
 ?>
