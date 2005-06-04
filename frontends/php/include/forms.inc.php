@@ -1149,20 +1149,20 @@
 
 		echo S_LEVEL;
 		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"level\" size=2 value=\"$level\">";
+		echo form_input("level",$level,2);
 
 		show_table2_v_delimiter($col++);
 		echo S_PERIOD;
 		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"period\" size=32 value=\"$period\">";
+		echo form_input("period",$period,32);
 
 		show_table2_v_delimiter($col++);
 		echo S_DELAY;
 		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"delay\" size=32 value=\"$delay\">";
+		echo form_input("delay",$delay,32);
 
 		show_table2_v_delimiter($col++);
-		echo S_ACTION;
+		echo S_DO;
 		show_table2_h_delimiter();
 		echo "<SELECT class=\"biginput\" NAME=\"actiontype\" size=\"1\">";
 		echo "<OPTION VALUE=\"0\" "; if($actiontype==0) echo "SELECTED"; echo ">Do nothing";
