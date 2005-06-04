@@ -1,5 +1,6 @@
 Changes for 1.1alpha11:
 
+ - trigger expressions may contain spaces (Alexei)
  - improvements for snprintf.c (Alexei)
  - added table escalation_rules (Alexei)
  - fixed parameter of strncpy() in active.c (Alexei)
