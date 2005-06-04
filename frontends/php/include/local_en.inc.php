@@ -173,10 +173,16 @@
 	define("S_ESCALATION_WAS_NOT_ADDED",		"Escalation was not added");
 	define("S_ESCALATION_RULE_ADDED",		"Escalation rule added");
 	define("S_ESCALATION_RULE_WAS_NOT_ADDED",	"Escalation rule was not added");
+	define("S_ESCALATION_RULE_UPDATED",		"Escalation rule updated");
+	define("S_ESCALATION_RULE_WAS_NOT_UPDATED",	"Escalation rule was not updated");
+	define("S_ESCALATION_RULE_DELETED",		"Escalation rule deleted");
+	define("S_ESCALATION_RULE_WAS_NOT_DELETED",	"Escalation rule was not deleted");
 	define("S_ESCALATION_UPDATED",			"Escalation updated");
 	define("S_ESCALATION_WAS_NOT_UPDATED",		"Escalation was not updated");
 	define("S_ESCALATION_DELETED",			"Escalation deleted");
 	define("S_ESCALATION_WAS_NOT_DELETED",		"Escalation was not deleted");
+	define("S_ESCALATION_RULE",			"Escalation rule");
+	define("S_DO",					"Do");
 	define("S_DEFAULT",				"Default");
 	define("S_IS_DEFAULT",				"Is default");
 	define("S_LEVEL",				"Level");
