@@ -20,6 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
+	include "include/forms.inc.php";
 
 	$page["title"] = S_CONFIGURATION_OF_ZABBIX;
 	$page["file"] = "config.php";
@@ -75,6 +76,26 @@
 			{
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Alarm history [".$_GET["alarm_history"]."] alert history [".$_GET["alert_history"]."]");
 			}
+		}
+		if($_GET["register"]=="add escalation")
+		{
+			$dflt=iif(isset($_GET["dflt"])&&($_GET["dflt"]=="on"),1,0);
+			$result=add_escalation($_GET["name"],$dflt);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ESCALATION,"Escalation [".addslashes($_GET["name"])."]");
+			}
+			show_messages($result, S_ESCALATION_ADDED, S_ESCALATION_WAS_NOT_ADDED);
+		}
+		if($_GET["register"]=="delete escalation")
+		{
+			$result=delete_escalation($_GET["escalationid"]);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_ESCALATION,"Escalation ID [".addslashes($_GET["$escalationid"])."]");
+			}
+			unset($_GET["escalationid"]);
+			show_messages($result, S_ESCALATION_DELETED, S_ESCALATION_WAS_NOT_DELETED);
 		}
 		if($_GET["register"]=="add")
 		{
@@ -413,28 +434,31 @@
 		table_begin();
 		table_header(array(S_ID,S_DESCRIPTION_SMALL,S_DEFAULT,S_ACTIONS));
 
-		$result=DBselect("select escalationid, name from escalations order by name");
+		$result=DBselect("select * from escalations order by name");
 		$col=0;
 		while($row=DBfetch($result))
 		{
+			$yes=iif($row["dflt"]==1,array("value"=>S_YES,"class"=>"on"),array("value"=>S_NO,"class"=>"off"));
+
 			$actions="<a href=\"config.php?config=2&register=change&escalationid=".$row["escalationid"]."\">".S_CHANGE."</a>";
 			table_row(array(
 				$row["escalationid"],
 				$row["name"],
-				array("value"=>S_YES,"class"=>"on"),
+				$yes,
 				$actions),$col++);
 		}
 		if(DBnum_rows($result)==0)
 		{
 				echo "<TR BGCOLOR=#EEEEEE>";
-				echo "<TD COLSPAN=3 ALIGN=CENTER>".S_NO_ESCALATION_RULES_DEFINED."</TD>";
+				echo "<TD COLSPAN=4 ALIGN=CENTER>".S_NO_ESCALATION_RULES_DEFINED."</TD>";
 				echo "<TR>";
 		}
 		table_end();
 
+		insert_escalation_form($_GET["escalationid"]);
 
 		echo "<br>";
-		show_table_header(S_ESCALATION_DETAILS_BIG);
+		show_table_header(S_ESCALATION_RULES);
 
 		table_begin();
 		table_header(array(S_LEVEL,S_TIME,S_DELAY_BEFORE_ACTION,S_ACTIONS));

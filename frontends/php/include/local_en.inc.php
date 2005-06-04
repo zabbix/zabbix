@@ -25,7 +25,7 @@
 
 //	about.php
 	define("S_ABOUT_ZABBIX",			"About ZABBIX");
-	define("S_INFORMATION_ABOUT_ZABBIX",		"Information about ZABBIX (v1.1alpha10)");
+	define("S_INFORMATION_ABOUT_ZABBIX",		"Information about ZABBIX (v1.1alpha11)");
 	define("S_HOMEPAGE_OF_ZABBIX",			"Homepage of ZABBIX");
 	define("S_HOMEPAGE_OF_ZABBIX_DETAILS",		"This is home page of ZABBIX.");
 	define("S_LATEST_ZABBIX_MANUAL",		"Latest ZABBIX Manual");
@@ -164,11 +164,17 @@
 	define("S_HOUSEKEEPER",				"Housekeeper");
 	define("S_MEDIA_TYPES",				"Media types");
 	define("S_ESCALATION_RULES",			"Escalation rules");
+	define("S_ESCALATION",				"Escalation");
 	define("S_ESCALATION_RULES_BIG",		"ESCALATION RULES");
 	define("S_NO_ESCALATION_RULES_DEFINED",		"No escalation rules defined");
 	define("S_NO_ESCALATION_DETAILS",		"No escalation details");
 	define("S_ESCALATION_DETAILS_BIG",		"ESCALATION DETAILS");
+	define("S_ESCALATION_ADDED",			"Escalation added");
+	define("S_ESCALATION_WAS_NOT_ADDED",		"Escalation was not added");
+	define("S_ESCALATION_DELETED",			"Escalation deleted");
+	define("S_ESCALATION_WAS_NOT_DELETED",		"Escalation was not deleted");
 	define("S_DEFAULT",				"Default");
+	define("S_IS_DEFAULT",				"Is default");
 	define("S_LEVEL",				"Level");
 	define("S_DELAY_BEFORE_ACTION",			"Delay before action");
 	define("S_IMAGES",				"Images");
@@ -194,7 +200,7 @@
 	define("S_COMPARE",				"Compare");
 
 //	Footer
-	define("S_ZABBIX_VER",				"ZABBIX 1.1alpha10");
+	define("S_ZABBIX_VER",				"ZABBIX 1.1alpha11");
 	define("S_COPYRIGHT_BY",			"Copyright 2001-2005 by ");
 	define("S_CONNECTED_AS",			"Connected as");
 	define("S_SIA_ZABBIX",				"SIA Zabbix");

@@ -78,15 +78,13 @@
 	{
 		global $DB,$DB_TYPE;
 
-#		echo $query,"<br>";
-
 		if($DB_TYPE == "MYSQL")
 		{
 			$result=mysql_query($query,$DB);
 
 			if(!$result)
 			{
-				echo "ERROR EXECUTING: $query<br>";
+				error("SQL error: ".mysql_error());
 			}
 			return $result;
 		}

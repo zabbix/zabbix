@@ -1059,4 +1059,55 @@
 
 		show_table2_header_end();
 	}
+
+	# Insert escalation form
+	function	insert_escalation_form($escalationid)
+	{
+		if(isset($escalationid))
+		{
+			$result=DBselect("select * from escalations  where escalationid=$escalationid");
+
+			$row=DBfetch($result);
+	
+			$name=$row["name"];
+			$dflt=$row["dflt"];
+		}
+		else
+		{
+			$name="";
+			$dflt=0;
+		}
+
+		$col=0;
+
+		show_form_begin("escalations");
+		echo S_ESCALATION;
+
+		show_table2_v_delimiter($col++);
+		echo "<form method=\"get\" action=\"config.php\">";
+		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_GET["config"]."\" size=8>";
+		if(isset($escalationid))
+		{
+			echo "<input class=\"biginput\" name=\"escalationid\" type=\"hidden\" value=\"$escalationid\" size=8>";
+		}
+
+		echo S_NAME;
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"name\" size=32 value=\"$name\">";
+
+		show_table2_v_delimiter($col++);
+		echo S_IS_DEFAULT;
+		show_table2_h_delimiter();
+		echo "<input type=checkbox ".iif($dflt==1,"checked","")." name=\"dflt\">";
+
+		show_table2_v_delimiter2($col++);
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add escalation\">";
+		if(isset($escalationid))
+		{
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update escalation\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete escalation\" onClick=\"return Confirm('Delete selected escalation?');\">";
+		}
+
+		show_table2_header_end();
+	}
 ?>
