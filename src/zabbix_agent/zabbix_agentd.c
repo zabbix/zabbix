@@ -73,6 +73,7 @@ char	*CONFIG_PID_FILE		= NULL;
 char	*CONFIG_LOG_FILE		= NULL;
 int	CONFIG_AGENTD_FORKS		= AGENTD_FORKS;
 int	CONFIG_NOTIMEWAIT		= 0;
+int	CONFIG_DISABLE_ACTIVE		= 0;
 int	CONFIG_TIMEOUT			= AGENT_TIMEOUT;
 int	CONFIG_LISTEN_PORT		= 10050;
 int	CONFIG_SERVER_PORT		= 10051;
@@ -236,6 +237,7 @@ void    init_config(void)
 		{"PidFile",&CONFIG_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"LogFile",&CONFIG_LOG_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 /*		{"StatFile",&CONFIG_STAT_FILE,0,TYPE_STRING,PARM_OPT,0,0},*/
+		{"DisableActive",&CONFIG_DISABLE_ACTIVE,0,TYPE_INT,PARM_OPT,0,1},
 		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
 		{"NoTimeWait",&CONFIG_NOTIMEWAIT,0,TYPE_INT,PARM_OPT,0,1},
 		{"ListenPort",&CONFIG_LISTEN_PORT,0,TYPE_INT,PARM_OPT,1024,32767},
@@ -483,8 +485,11 @@ int	main(int argc, char **argv)
 	}
 
 	/* Initialize thread for active checks */
-	s=strtok(CONFIG_HOSTS_ALLOWED,",");
-	pids[CONFIG_AGENTD_FORKS-1] = child_active_make(CONFIG_AGENTD_FORKS-1, s, CONFIG_SERVER_PORT);
+	if(CONFIG_DISABLE_ACTIVE==0)
+	{
+		s=strtok(CONFIG_HOSTS_ALLOWED,",");
+		pids[CONFIG_AGENTD_FORKS-1] = child_active_make(CONFIG_AGENTD_FORKS-1, s, CONFIG_SERVER_PORT);
+	}
 
 	parent=1;
 
