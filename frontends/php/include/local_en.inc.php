@@ -171,6 +171,8 @@
 	define("S_ESCALATION_DETAILS_BIG",		"ESCALATION DETAILS");
 	define("S_ESCALATION_ADDED",			"Escalation added");
 	define("S_ESCALATION_WAS_NOT_ADDED",		"Escalation was not added");
+	define("S_ESCALATION_UPDATED",			"Escalation updated");
+	define("S_ESCALATION_WAS_NOT_UPDATED",		"Escalation was not updated");
 	define("S_ESCALATION_DELETED",			"Escalation deleted");
 	define("S_ESCALATION_WAS_NOT_DELETED",		"Escalation was not deleted");
 	define("S_DEFAULT",				"Default");
