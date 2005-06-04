@@ -761,7 +761,7 @@
 	function	validate_float($str)
 	{
 //		echo "Validating float:$str<br>";
-		if (eregi('^([0-9]+)((\.)?)([0-9]*[KMG]{0,1})$', $str, &$arr)) 
+		if (eregi('^[ ]*([0-9]+)((\.)?)([0-9]*[KMG]{0,1})[ ]*$', $str, &$arr)) 
 		{
 			return 0;
 		}
@@ -845,7 +845,7 @@
 		{
 //			echo "Expression:$expression<br>";
 			$arr="";
-			if (eregi('^((.)*)(\{((.)*)\})((.)*)$', $expression, &$arr)) 
+			if (eregi('^((.)*)[ ]*(\{((.)*)\})[ ]*((.)*)$', $expression, &$arr)) 
 			{
 //				for($i=0;$i<20;$i++)
 //				{
@@ -871,7 +871,7 @@
 // 	Replace all <float> <sign> <float> <K|M|G> with 0
 //			echo "Expression:$expression<br>";
 			$arr="";
-			if (eregi('^((.)*)([0-9\.]+[A-Z]{0,1})([\&\|\>\<\=\+\-\*\/\#]{1})([0-9\.]+[A-Z]{0,1})((.)*)$', $expression, &$arr)) 
+			if (eregi('^((.)*)([0-9\.]+[A-Z]{0,1})[ ]*([\&\|\>\<\=\+\-\*\/\#]{1})[ ]*([0-9\.]+[A-Z]{0,1})((.)*)$', $expression, &$arr)) 
 			{
 //				echo "OK<br>";
 //				for($i=0;$i<50;$i++)
@@ -900,7 +900,7 @@
 // 	Replace all (float) with 0
 //			echo "Expression2:[$expression]<br>";
 			$arr="";
-			if (eregi('^((.)*)(\(([0-9\.]+)\))((.)*)$', $expression, &$arr)) 
+			if (eregi('^((.)*)(\(([ 0-9\.]+)\))((.)*)$', $expression, &$arr)) 
 			{
 //				echo "OK<br>";
 //				for($i=0;$i<30;$i++)
