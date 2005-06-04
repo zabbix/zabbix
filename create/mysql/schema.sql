@@ -621,6 +621,7 @@ CREATE TABLE images (
 CREATE TABLE escalations (
   escalationid		int(4)		NOT NULL auto_increment,
   name			varchar(64)	DEFAULT '0' NOT NULL,
+  dflt			int(2)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (escalationid),
   UNIQUE (name)
 ) type=InnoDB;
@@ -632,6 +633,7 @@ CREATE TABLE escalations (
 CREATE TABLE escalation_rules (
   ruleid		int(4)		NOT NULL auto_increment,
   escalationid		int(4)		DEFAULT '0' NOT NULL,
+  period		varchar(100)	DEFAULT '1-7,00:00-23:59' NOT NULL,
   level			int(4)		DEFAULT '0' NOT NULL,
   actiontype		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (ruleid),
