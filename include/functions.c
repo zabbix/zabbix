@@ -1026,7 +1026,7 @@ void	update_triggers(int itemid)
 {
 	char	sql[MAX_STRING_LEN];
 	char	exp[MAX_STRING_LEN];
-	int	b;
+	int	exp_value;
 	int	now;
 	DB_TRIGGER	trigger;
 	DB_RESULT	*result;
@@ -1053,7 +1053,7 @@ void	update_triggers(int itemid)
 		trigger.value=atoi(DBget_field(result,i,5));
 		trigger.description=DBget_field(result,i,6);
 		strscpy(exp, trigger.expression);
-		if( evaluate_expression(&b, exp) != 0 )
+		if( evaluate_expression(&exp_value, exp) != 0 )
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated.",trigger.expression);
 			zabbix_syslog("Expression [%s] cannot be evaluated.",trigger.expression);
@@ -1063,9 +1063,9 @@ void	update_triggers(int itemid)
 /* Oprimise a little bit */
 		prevvalue=DBget_prev_trigger_value(trigger.triggerid);
 
-		zabbix_log( LOG_LEVEL_DEBUG, "b trigger.value prevvalue [%d] [%d] [%d]", b, trigger.value, prevvalue);
+		zabbix_log( LOG_LEVEL_DEBUG, "exp_value trigger.value prevvalue [%d] [%d] [%d]", exp_value, trigger.value, prevvalue);
 
-		if(TRIGGER_VALUE_TRUE == b)
+		if(TRIGGER_VALUE_TRUE == exp_value)
 		{
 			if(trigger.value != TRIGGER_VALUE_TRUE)
 			{
@@ -1081,19 +1081,17 @@ void	update_triggers(int itemid)
 /*			 (DBget_prev_trigger_value(trigger.triggerid) == TRIGGER_VALUE_FALSE)*/
 			))
 			{
-				now = time(NULL);
-/*				apply_actions(trigger.triggerid,1);*/
 				apply_actions(&trigger,1);
-	
+
+				/* Why? */
 				snprintf(sql,sizeof(sql)-1,"update actions set nextcheck=0 where triggerid=%d and good=0",trigger.triggerid);
 				DBexecute(sql);
 
 				update_services(trigger.triggerid, trigger.priority);
 			}
-
 		}
 
-		if(TRIGGER_VALUE_FALSE == b)
+		if(TRIGGER_VALUE_FALSE == exp_value)
 		{
 			if(trigger.value != TRIGGER_VALUE_FALSE)
 			{
@@ -1109,9 +1107,9 @@ void	update_triggers(int itemid)
 /*			 (DBget_prev_trigger_value(trigger.triggerid) == TRIGGER_VALUE_TRUE)*/
 			))
 			{
-/*				apply_actions(trigger.triggerid,0);*/
 				apply_actions(&trigger,0);
 
+				/* Why? */
 				snprintf(sql,sizeof(sql)-1,"update actions set nextcheck=0 where triggerid=%d and good=1",trigger.triggerid);
 				DBexecute(sql);
 
