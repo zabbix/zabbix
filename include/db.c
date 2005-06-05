@@ -547,7 +547,7 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now)
 				((trigger->prevvalue == TRIGGER_VALUE_TRUE) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_FALSE)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value. Before apply_actions. Triggerid [%d]", trigger->triggerid);
-				apply_actions(trigger,new_value);
+				apply_actions(trigger,alarmid,new_value);
 				if(new_value == TRIGGER_VALUE_TRUE)
 				{
 					update_services(trigger->triggerid, trigger->priority);
@@ -1359,3 +1359,25 @@ void	DBget_item_from_db(DB_ITEM *item,DB_RESULT *result, int row)
 	item->host_available=atoi(DBget_field(result,i,30));
 }
 
+int     DBget_default_escalation_id()
+{
+	DB_RESULT *dbresult;
+	int	res = SUCCEED;
+
+        char	sql[MAX_STRING_LEN];
+
+/* 0 is added to distinguish between lastvalue==NULL and empty result */
+	snprintf( sql, sizeof(sql)-1, "select escalationid from escalations where dflt=1");
+	dbresult = DBselect(sql);
+
+	if(DBnum_rows(dbresult) == 0)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "No default escalation defined");
+		zabbix_syslog("No default escalation defined");
+		res = FAIL;
+	}
+	res = atoi(DBget_field(dbresult,0,0));
+        DBfree_result(dbresult);
+
+	return res;
+}

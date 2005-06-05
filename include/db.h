@@ -199,6 +199,17 @@ DB_ALERT
 	int	retries;
 };
 
+DB_ESCALATION_LOG
+{
+	int 	triggerid;
+	int	alarmid;
+	int	escalationid;
+	int	level;
+	int	adminlevel;
+	int	nextcheck;
+	int	status;
+};
+
 void    DBconnect(void);
 
 void    DBclose(void);
@@ -224,6 +235,7 @@ void	DBupdate_triggers_status_after_restart(void);
 int	DBget_prev_trigger_value(int triggerid);
 /*int	DBupdate_trigger_value(int triggerid,int value,int clock);*/
 int     DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now);
+int     DBget_default_escalation_id();
 
 void	DBdelete_item(int itemid);
 void	DBdelete_host(int hostid);
