@@ -467,6 +467,7 @@ int	add_alarm(int triggerid,int status,int clock)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_alarm()");
 
+	/* Latest alarm has the same status? */
 	if(latest_alarm(triggerid,status) == SUCCEED)
 	{
 		return SUCCEED;

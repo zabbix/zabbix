@@ -642,6 +642,19 @@ CREATE TABLE escalation_rules (
 ) type=InnoDB;
 
 --
+-- Table structure for table 'escalation_log'
+--
+
+CREATE TABLE escalation_log (
+  alarmid		int(4)		DEFAULT '0' NOT NULL,
+  escalationid		int(4)		DEFAULT '0' NOT NULL,
+  level			int(4)		DEFAULT '0' NOT NULL,
+  adminlevel		int(4)		DEFAULT '0' NOT NULL,
+  nextcheck		int(4)		DEFAULT '0' NOT NULL,
+  PRIMARY KEY (alarmid,escalationid)
+) type=InnoDB;
+
+--
 -- Table structure for table 'hosts_templates'
 --
 
