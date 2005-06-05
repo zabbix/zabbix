@@ -166,6 +166,7 @@ DB_TRIGGER
 	char	*description;
 	int	status;
 	int	value;
+	int	prevvalue;
 	int	priority;
 };
 
@@ -221,7 +222,8 @@ int	DBadd_service_alarm(int serviceid,int status,int clock);
 int	DBadd_alert(int actionid, int mediatypeid, char *sendto, char *subject, char *message);
 void	DBupdate_triggers_status_after_restart(void);
 int	DBget_prev_trigger_value(int triggerid);
-int	DBupdate_trigger_value(int triggerid,int value,int clock);
+/*int	DBupdate_trigger_value(int triggerid,int value,int clock);*/
+int     DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now);
 
 void	DBdelete_item(int itemid);
 void	DBdelete_host(int hostid);

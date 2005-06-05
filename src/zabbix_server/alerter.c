@@ -191,7 +191,7 @@ int main_alerter_loop()
 			}
 			else
 			{
-				zabbix_log( LOG_LEVEL_ERR, "Error sending alert ID [%d]", alert.alertid);
+				zabbix_log( LOG_LEVEL_DEBUG, "Error sending alert ID [%d]", alert.alertid);
 				zabbix_syslog("Error sending alert ID [%d]", alert.alertid);
 				DBescape_string(error,error_esc,MAX_STRING_LEN);
 				snprintf(sql,sizeof(sql)-1,"update alerts set retries=retries+1,error='%s' where alertid=%d", error_esc, alert.alertid);

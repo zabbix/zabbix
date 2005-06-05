@@ -784,6 +784,7 @@ void	apply_actions(DB_TRIGGER *trigger,int trigger_value)
 /*	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,scope,severity,recipient,good from actions where (scope=%d and triggerid=%d and good=%d and nextcheck<=%d) or (scope=%d and good=%d) or (scope=%d and good=%d)",ACTION_SCOPE_TRIGGER,trigger->triggerid,trigger_value,now,ACTION_SCOPE_HOST,trigger_value,ACTION_SCOPE_HOSTS,trigger_value);*/
 	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,scope,severity,recipient,good from actions where (scope=%d and triggerid=%d and (good=%d or good=2) and nextcheck<=%d) or (scope=%d and (good=%d or good=2)) or (scope=%d and (good=%d or good=2))",ACTION_SCOPE_TRIGGER,trigger->triggerid,trigger_value,now,ACTION_SCOPE_HOST,trigger_value,ACTION_SCOPE_HOSTS,trigger_value);
 	result = DBselect(sql);
+	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
@@ -1032,7 +1033,6 @@ void	update_triggers(int itemid)
 	DB_RESULT	*result;
 
 	int	i;
-	int	prevvalue;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In update_triggers [%d]", itemid);
 
@@ -1061,11 +1061,14 @@ void	update_triggers(int itemid)
 		}
 
 /* Oprimise a little bit */
-		prevvalue=DBget_prev_trigger_value(trigger.triggerid);
+/*		trigger.prevvalue=DBget_prev_trigger_value(trigger.triggerid);*/
 
-		zabbix_log( LOG_LEVEL_DEBUG, "exp_value trigger.value prevvalue [%d] [%d] [%d]", exp_value, trigger.value, prevvalue);
+		zabbix_log( LOG_LEVEL_DEBUG, "exp_value trigger.value trigger.prevvalue [%d] [%d] [%d]", exp_value, trigger.value, trigger.prevvalue);
 
-		if(TRIGGER_VALUE_TRUE == exp_value)
+		now = time(NULL);
+		DBupdate_trigger_value(&trigger, exp_value, now);
+
+/*		if(TRIGGER_VALUE_TRUE == exp_value)
 		{
 			if(trigger.value != TRIGGER_VALUE_TRUE)
 			{
@@ -1076,14 +1079,11 @@ void	update_triggers(int itemid)
 			||
 			(
 			 (trigger.value == TRIGGER_VALUE_UNKNOWN) &&
-/* Optimise a little bit. This optimisation does not work because DBupdate_trigger_value may add alarm! */
-			 (prevvalue == TRIGGER_VALUE_FALSE)
-/*			 (DBget_prev_trigger_value(trigger.triggerid) == TRIGGER_VALUE_FALSE)*/
+			 (trigger.prevvalue == TRIGGER_VALUE_FALSE)
 			))
 			{
 				apply_actions(&trigger,1);
 
-				/* Why? */
 				snprintf(sql,sizeof(sql)-1,"update actions set nextcheck=0 where triggerid=%d and good=0",trigger.triggerid);
 				DBexecute(sql);
 
@@ -1102,20 +1102,17 @@ void	update_triggers(int itemid)
 			||
 			(
 			 (trigger.value == TRIGGER_VALUE_UNKNOWN) &&
-/* Optimise a little bit. This optimisation does not work because DBupdate_trigger_value may add alarm! */
-			 (prevvalue == TRIGGER_VALUE_TRUE)
-/*			 (DBget_prev_trigger_value(trigger.triggerid) == TRIGGER_VALUE_TRUE)*/
+			 (trigger.prevvalue == TRIGGER_VALUE_TRUE)
 			))
 			{
 				apply_actions(&trigger,0);
 
-				/* Why? */
 				snprintf(sql,sizeof(sql)-1,"update actions set nextcheck=0 where triggerid=%d and good=1",trigger.triggerid);
 				DBexecute(sql);
 
 				update_services(trigger.triggerid, 0);
 			}
-		}
+		}*/
 	}
 	DBfree_result(result);
 }
