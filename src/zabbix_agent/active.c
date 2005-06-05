@@ -182,9 +182,8 @@ int	parse_list_of_checks(char *str)
 int	get_active_checks(char *server, int port, char *error, int max_error_len)
 {
 	int	s;
-	int	len;
+	int	len,amount_read;
 	char	c[MAX_BUF_LEN];
-	char	tmp[MAX_STRING_LEN];
 
 	struct hostent *hp;
 
@@ -258,7 +257,37 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Before read");
 
-	while((len=read(s,tmp,MAX_BUF_LEN-1))>0)
+	amount_read = 0;
+
+	do
+	{
+		len=read(s,c+amount_read,(MAX_BUF_LEN-1)-amount_read);
+		if (len > 0)
+			amount_read += len;
+		if(len == -1)
+		{
+			switch (errno)
+			{
+				case 	EINTR:
+						zabbix_log( LOG_LEVEL_WARNING, "Timeout while receiving data from [%s:%d]",server,port);
+						snprintf(error,max_error_len-1,"Timeout while receiving data from [%s:%d]",server,port);
+						break;
+				case	ECONNRESET:
+						zabbix_log( LOG_LEVEL_WARNING, "Connection reset by peer.");
+						snprintf(error,max_error_len-1,"Connection reset by peer.");
+						close(s);
+						return	NETWORK_ERROR;
+				default:
+						zabbix_log( LOG_LEVEL_WARNING, "Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
+						snprintf(error,max_error_len-1,"Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
+			} 
+			close(s);
+			return	FAIL;
+		}
+	}
+	while (len > 0);
+
+/*	while((len=read(s,tmp,MAX_BUF_LEN-1))>0)
 	{
 		if(len == -1)
 		{
@@ -282,7 +311,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 		}
 		strncat(c,tmp,len);
 	}
-	zabbix_log(LOG_LEVEL_DEBUG, "Read [%s]", c);
+	zabbix_log(LOG_LEVEL_DEBUG, "Read [%s]", c);*/
 
 	parse_list_of_checks(c);
 
