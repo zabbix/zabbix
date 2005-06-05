@@ -227,6 +227,19 @@ char	*DBget_field(DB_RESULT *result, int rownum, int fieldnum)
 }
 
 /*
+ * Get value of autoincrement field for last insert or update statement
+ */ 
+int	DBinsert_id()
+{
+#ifdef	HAVE_MYSQL
+	return mysql_insert_id(&mysql);
+#endif
+#ifdef	HAVE_PGSQL
+	NOT IMPLEMENTED YET
+#endif
+}
+
+/*
  * Return SUCCEED if result conains no records
  */ 
 /*int	DBis_empty(DB_RESULT *result)
@@ -461,21 +474,27 @@ int	latest_service_alarm(int serviceid, int status)
 	return ret;
 }
 
-int	add_alarm(int triggerid,int status,int clock)
+/* Returns alarmid or 0 */
+int	add_alarm(int triggerid,int status,int clock,int *alarmid)
 {
 	char	sql[MAX_STRING_LEN];
+
+	*alarmid=0;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_alarm()");
 
 	/* Latest alarm has the same status? */
 	if(latest_alarm(triggerid,status) == SUCCEED)
 	{
-		return SUCCEED;
+		zabbix_log(LOG_LEVEL_WARNING,"Alarm for triggerid [%d] status [%d] already exists",triggerid,status);
+		return FAIL;
 	}
 
 	snprintf(sql,sizeof(sql)-1,"insert into alarms(triggerid,clock,value) values(%d,%d,%d)", triggerid, clock, status);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	DBexecute(sql);
+
+	*alarmid=DBinsert_id();
 
 	zabbix_log(LOG_LEVEL_DEBUG,"End of add_alarm()");
 	
@@ -502,6 +521,53 @@ int	DBadd_service_alarm(int serviceid,int status,int clock)
 	return SUCCEED;
 }
 
+int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now)
+{
+	char	sql[MAX_STRING_LEN];
+	int	alarmid;
+	int	ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value[%d,%d,%d]", trigger->triggerid, new_value, now);
+
+	if(trigger->value != new_value)
+	{
+		trigger->prevvalue=DBget_prev_trigger_value(trigger->triggerid);
+		if(add_alarm(trigger->triggerid,new_value,now,&alarmid) == SUCCEED)
+		{
+			snprintf(sql,sizeof(sql)-1,"update triggers set value=%d,lastchange=%d where triggerid=%d",new_value,now,trigger->triggerid);
+			DBexecute(sql);
+			if(TRIGGER_VALUE_UNKNOWN == new_value)
+			{
+				snprintf(sql,sizeof(sql)-1,"update functions set lastvalue=NULL where triggerid=%d",trigger->triggerid);
+				DBexecute(sql);
+			}
+			if(	((trigger->value == TRIGGER_VALUE_TRUE) && (new_value == TRIGGER_VALUE_FALSE)) ||
+				((trigger->value == TRIGGER_VALUE_FALSE) && (new_value == TRIGGER_VALUE_TRUE)) ||
+				((trigger->prevvalue == TRIGGER_VALUE_FALSE) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_TRUE)) ||
+				((trigger->prevvalue == TRIGGER_VALUE_TRUE) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_FALSE)))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value. Before apply_actions. Triggerid [%d]", trigger->triggerid);
+				apply_actions(trigger,new_value);
+				if(new_value == TRIGGER_VALUE_TRUE)
+				{
+					update_services(trigger->triggerid, trigger->priority);
+				}
+				else
+				{
+					update_services(trigger->triggerid, 0);
+				}
+			}
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING,"Alarm not added for triggerid [%d]", trigger->triggerid);
+			ret = FAIL;
+		}
+	}
+	return ret;
+}
+
+/*
 int	DBupdate_trigger_value(int triggerid,int value,int clock)
 {
 	char	sql[MAX_STRING_LEN];
@@ -521,26 +587,28 @@ int	DBupdate_trigger_value(int triggerid,int value,int clock)
 	zabbix_log(LOG_LEVEL_DEBUG,"End of update_trigger_value()");
 	return SUCCEED;
 }
+*/
 
 void update_triggers_status_to_unknown(int hostid,int clock)
 {
 	int	i;
 	char	sql[MAX_STRING_LEN];
-	int	triggerid;
 
 	DB_RESULT	*result;
+	DB_TRIGGER	trigger;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In update_triggers_status_to_unknown()");
 
 /*	snprintf(sql,sizeof(sql)-1,"select distinct t.triggerid from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.hostid=%d and i.key_<>'%s'",hostid,SERVER_STATUS_KEY);*/
-	snprintf(sql,sizeof(sql)-1,"select distinct t.triggerid from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.hostid=%d and i.key_ not in ('%s','%s','%s')",hostid,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY);
+	snprintf(sql,sizeof(sql)-1,"select distinct t.triggerid,t.value from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.hostid=%d and i.key_ not in ('%s','%s','%s')",hostid,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
-		triggerid=atoi(DBget_field(result,i,0));
-		DBupdate_trigger_value(triggerid,TRIGGER_VALUE_UNKNOWN,clock);
+		trigger.triggerid=atoi(DBget_field(result,i,0));
+		trigger.value=atoi(DBget_field(result,i,1));
+		DBupdate_trigger_value(&trigger,TRIGGER_VALUE_UNKNOWN,clock);
 	}
 
 	DBfree_result(result);
@@ -721,25 +789,27 @@ void DBupdate_triggers_status_after_restart(void)
 {
 	int	i;
 	char	sql[MAX_STRING_LEN];
-	int	triggerid, lastchange;
+	int	lastchange;
 	int	now;
 
 	DB_RESULT	*result;
 	DB_RESULT	*result2;
+	DB_TRIGGER	trigger;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBupdate_triggers_after_restart()");
 
 	now=time(NULL);
 
-	snprintf(sql,sizeof(sql)-1,"select distinct t.triggerid from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.nextcheck+i.delay<%d and i.key_<>'%s' and h.status not in (%d,%d)",now,SERVER_STATUS_KEY, HOST_STATUS_DELETED, HOST_STATUS_TEMPLATE);
+	snprintf(sql,sizeof(sql)-1,"select distinct t.triggerid,t.value from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.nextcheck+i.delay<%d and i.key_<>'%s' and h.status not in (%d,%d)",now,SERVER_STATUS_KEY, HOST_STATUS_DELETED, HOST_STATUS_TEMPLATE);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
-		triggerid=atoi(DBget_field(result,i,0));
+		trigger.triggerid=atoi(DBget_field(result,i,0));
+		trigger.value=atoi(DBget_field(result,i,1));
 
-		snprintf(sql,sizeof(sql)-1,"select min(i.nextcheck+i.delay) from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.nextcheck<>0 and t.triggerid=%d and i.type<>%d",triggerid,ITEM_TYPE_TRAPPER);
+		snprintf(sql,sizeof(sql)-1,"select min(i.nextcheck+i.delay) from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.nextcheck<>0 and t.triggerid=%d and i.type<>%d",trigger.triggerid,ITEM_TYPE_TRAPPER);
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		result2 = DBselect(sql);
 		if( DBnum_rows(result2) == 0 )
@@ -752,7 +822,7 @@ void DBupdate_triggers_status_after_restart(void)
 		lastchange=atoi(DBget_field(result2,0,0));
 		DBfree_result(result2);
 
-		DBupdate_trigger_value(triggerid,TRIGGER_VALUE_UNKNOWN,lastchange);
+		DBupdate_trigger_value(&trigger,TRIGGER_VALUE_UNKNOWN,lastchange);
 	}
 
 	DBfree_result(result);

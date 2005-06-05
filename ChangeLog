@@ -1,5 +1,6 @@
 Changes for 1.1alpha11:
 
+ - simplified code for trigger status updated (Alexei)
  - better read loop in active.c (Alexei)
  - added parameter DisableActive for zabbix_agentd (Alexei)
  - trigger expressions may contain spaces (Alexei)
