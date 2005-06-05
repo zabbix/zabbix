@@ -10,6 +10,7 @@
  - new item status: not available. If agent doesn't acept parameter.
  - new function for item status to enable sending of notification in case if an item changes status to unknown (for example)
  - housekeeper. Set item.housekeep to '0' for deleted items
+ - procload for AIX. See email from Juha
 
 ZABBIX 1.1:
 
