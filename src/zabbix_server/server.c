@@ -655,7 +655,7 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 
 	if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "Cannot bind to port %d. Another zabbix_trapperd running ?", port);
+		zabbix_log( LOG_LEVEL_CRIT, "Cannot bind to port %d. Another zabbix_server running ?", port);
 		exit(1);
 	}
 	

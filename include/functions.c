@@ -742,11 +742,29 @@ void	send_to_user(DB_TRIGGER *trigger,DB_ACTION *action)
 	}
 }
 
+void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
+{
+	int escalationid;
+	char sql[MAX_STRING_LEN];
+
+	zabbix_log( LOG_LEVEL_WARNING, "In apply_actions(triggerid:%d,alarmid:%d,trigger_value:%d)",trigger->triggerid, alarmid, trigger_value);
+
+	if((escalationid=DBget_default_escalation_id())>0)
+	{
+		snprintf(sql,sizeof(sql)-1,"insert into escalation_log (triggerid,alarmid,escalationid,level,adminlevel,nextcheck,nextcheck) values (%d,%d,%d,%d,%d,%d,%d)", trigger->triggerid, alarmid, escalationid, 0, 0, 0, 0);
+		DBexecute(sql);
+	}
+	else
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "No default escalation defined");
+	}
+}
+
 /*
  * Apply actions if any.
  */ 
 /*void	apply_actions(int triggerid,int good)*/
-void	apply_actions(DB_TRIGGER *trigger,int trigger_value)
+void	apply_actions_old(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 {
 	DB_RESULT *result,*result2,*result3;
 	
@@ -757,7 +775,7 @@ void	apply_actions(DB_TRIGGER *trigger,int trigger_value)
 	int	i,j;
 	int	now;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In apply_actions(%d,%d)",trigger->triggerid, trigger_value);
+	zabbix_log( LOG_LEVEL_WARNING, "In apply_actions(triggerid:%d,alarmid:%d,trigger_value:%d)",trigger->triggerid, alarmid, trigger_value);
 
 	if(TRIGGER_VALUE_TRUE == trigger_value)
 	{
