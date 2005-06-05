@@ -646,12 +646,15 @@ CREATE TABLE escalation_rules (
 --
 
 CREATE TABLE escalation_log (
+  triggerid		int(4)		DEFAULT '0' NOT NULL,
   alarmid		int(4)		DEFAULT '0' NOT NULL,
   escalationid		int(4)		DEFAULT '0' NOT NULL,
   level			int(4)		DEFAULT '0' NOT NULL,
   adminlevel		int(4)		DEFAULT '0' NOT NULL,
   nextcheck		int(4)		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (alarmid,escalationid)
+  status		int(4)		DEFAULT '0' NOT NULL,
+  PRIMARY KEY (alarmid,escalationid),
+  KEY (triggerid)
 ) type=InnoDB;
 
 --
