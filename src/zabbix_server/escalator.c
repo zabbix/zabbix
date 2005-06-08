@@ -55,7 +55,7 @@
 
 int process_escalation(DB_ESCALATION_LOG *escalation_log)
 {
-	int	i;
+	int	i,now;
 	char	sql[MAX_STRING_LEN];
 
 	DB_RESULT		*result;
@@ -77,9 +77,51 @@ int process_escalation(DB_ESCALATION_LOG *escalation_log)
 		escalation_rule.actiontype=atoi(DBget_field(result,i,5));
 
 		zabbix_log( LOG_LEVEL_WARNING, "Selected escalationrule ID [%d]", escalation_rule.escalationruleid);
-		if(escalation_log->level >= escalation_log->level)
+		now=time(NULL);
+		if(escalation_log->nextcheck <= now)
 		{
+			/* ADD check_period() !!! */
+			switch (escalation_rule.actiontype)
+			{
+				case ESCALATION_ACTION_NOTHING:
+					zabbix_log( LOG_LEVEL_WARNING, "ESCALATION_ACTION_NOTHING");
+					escalation_log->nextcheck = escalation_rule.delay+now;
+					snprintf(sql,sizeof(sql)-1,"update escalation_log set nextcheck=%d,level=level+1 where escalationlogid=%d", escalation_log->nextcheck, escalation_log->escalationlogid);
+					zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
+					DBexecute(sql);
+					break;
+				case ESCALATION_ACTION_EXEC_ACTION:
+					zabbix_log( LOG_LEVEL_WARNING, "ESCALATION_ACTION_EXEC_ACTION");
+					escalation_log->nextcheck = escalation_rule.delay+now;
+					snprintf(sql,sizeof(sql)-1,"update escalation_log set nextcheck=%d,level=level+1 where escalationlogid=%d", escalation_log->nextcheck, escalation_log->escalationlogid);
+					zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
+					DBexecute(sql);
+					break;
+				case ESCALATION_ACTION_INC_SEVERITY:
+					zabbix_log( LOG_LEVEL_WARNING, "ESCALATION_ACTION_INC_SEVERITY");
+					escalation_log->nextcheck = escalation_rule.delay+now;
+					snprintf(sql,sizeof(sql)-1,"update escalation_log set nextcheck=%d,level=level+1 where escalationlogid=%d", escalation_log->nextcheck, escalation_log->escalationlogid);
+					zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
+					DBexecute(sql);
+					break;
+				case ESCALATION_ACTION_INC_ADMIN:
+					zabbix_log( LOG_LEVEL_WARNING, "ESCALATION_ACTION_INC_ADMIN");
+					escalation_log->nextcheck = escalation_rule.delay+now;
+					snprintf(sql,sizeof(sql)-1,"update escalation_log set nextcheck=%d,level=level+1 where escalationlogid=%d", escalation_log->nextcheck, escalation_log->escalationlogid);
+					zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
+					DBexecute(sql);
+					break;
+				default:
+					zabbix_log( LOG_LEVEL_ERR, "Unknow escalation action type [%d]", escalation_rule.actiontype);
+			}
 		}
+	}
+	if(DBnum_rows(result)==0)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "No more escalation levels");
+		snprintf(sql,sizeof(sql)-1,"update escalation_log set status=1 where escalationlogid=%d", escalation_log->escalationlogid);
+		zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
+		DBexecute(sql);
 	}
 	DBfree_result(result);
 
