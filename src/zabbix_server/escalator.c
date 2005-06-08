@@ -53,6 +53,11 @@
 
 #include "escalator.h"
 
+int process_escalation(DB_ESCALATION_LOG *escalation_log)
+{
+	return SUCCEED;
+}
+
 int main_escalator_loop()
 {
 	char	sql[MAX_STRING_LEN];
@@ -60,65 +65,45 @@ int main_escalator_loop()
 	char	error_esc[MAX_STRING_LEN];
 
 	int	i,res;
+	int	now;
 
 	struct	sigaction phan;
 
-	DB_RESULT	*result;
-	DB_ALERT	alert;
-	DB_MEDIATYPE	mediatype;
+	DB_ESCALATION_LOG	escalation_log;
 
 	for(;;)
 	{
+		zabbix_log( LOG_LEVEL_WARNING, "Selecting data from escalation_log]");
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("connecting to the database");
 #endif
 
 		DBconnect();
 
-		snprintf(sql,sizeof(sql)-1,"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path from alerts a,media_type mt where a.status=0 and a.retries<3 and a.mediatypeid=mt.mediatypeid order by a.clock");
+		now=time(NULL);
+		snprintf(sql,sizeof(sql)-1,"select escalationlogid,triggerid, alarmid, escalationid, level, adminlevel, nextcheck, status from escalation_log where status=0 and nextcheck<=%d", now);
 		result = DBselect(sql);
 
 		for(i=0;i<DBnum_rows(result);i++)
 		{
-			alert.alertid=atoi(DBget_field(result,i,0));
-			alert.mediatypeid=atoi(DBget_field(result,i,1));
-			alert.sendto=DBget_field(result,i,2);
-			alert.subject=DBget_field(result,i,3);
-			alert.message=DBget_field(result,i,4);
-			alert.status=atoi(DBget_field(result,i,5));
-			alert.retries=atoi(DBget_field(result,i,6));
+			escalation_log.escalationlogid=atoi(DBget_field(result,i,0));
+			escalation_log.triggerid=atoi(DBget_field(result,i,1));
+			escalation_log.alarmid=atoi(DBget_field(result,i,2));
+			escalation_log.escalationid=atoi(DBget_field(result,i,3));
+			escalation_log.level=atoi(DBget_field(result,i,4));
+			escalation_log.adminlevel=atoi(DBget_field(result,i,5));
+			escalation_log.nextcheck=atoi(DBget_field(result,i,6));
+			escalation_log.status=atoi(DBget_field(result,i,7));
 
-			mediatype.mediatypeid=atoi(DBget_field(result,i,7));
-			mediatype.type=atoi(DBget_field(result,i,8));
-			mediatype.description=DBget_field(result,i,9);
-			mediatype.smtp_server=DBget_field(result,i,10);
-			mediatype.smtp_helo=DBget_field(result,i,11);
-			mediatype.smtp_email=DBget_field(result,i,12);
-			mediatype.exec_path=DBget_field(result,i,13);
-
-			phan.sa_handler = &signal_handler;
-			sigemptyset(&phan.sa_mask);
-			phan.sa_flags = 0;
-			sigaction(SIGALRM, &phan, NULL);
-
-			/* Hardcoded value */
-			alarm(10);
-			res=send_alert(&alert,&mediatype,error,sizeof(error));
-			alarm(0);
+			res=process_escalation(&escalation_log);
 
 			if(res==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "Alert ID [%d] was sent successfully", alert.alertid);
-				snprintf(sql,sizeof(sql)-1,"update alerts set status=1 where alertid=%d", alert.alertid);
-				DBexecute(sql);
+				zabbix_log( LOG_LEVEL_WARNING, "Processing escalation_log ID [%d]", escalation_log.escalationlogid);
 			}
 			else
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "Error sending alert ID [%d]", alert.alertid);
-				zabbix_syslog("Error sending alert ID [%d]", alert.alertid);
-				DBescape_string(error,error_esc,MAX_STRING_LEN);
-				snprintf(sql,sizeof(sql)-1,"update alerts set retries=retries+1,error='%s' where alertid=%d", error_esc, alert.alertid);
-				DBexecute(sql);
+				zabbix_log( LOG_LEVEL_WARNING, "Processing escalation_log ID [%d] failed", escalation_log.escalationlogid);
 			}
 
 		}
@@ -126,7 +111,7 @@ int main_escalator_loop()
 
 		DBclose();
 #ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("sender [sleeping for %d seconds]", CONFIG_SENDER_FREQUENCY);
+		setproctitle("escalator [sleeping for %d seconds]", CONFIG_SENDER_FREQUENCY);
 #endif
 
 		sleep(CONFIG_SENDER_FREQUENCY);
