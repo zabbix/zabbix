@@ -776,31 +776,31 @@ int main(int argc, char **argv)
 			pids[i-i] = child_trapper_make(i, listenfd, addrlen);
 		}
 
-/* First instance of zabbix_suckerd performs housekeeping procedures */
+/* First instance of zabbix_server performs housekeeping procedures */
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Housekeeper]",sucker_num);
 		main_housekeeper_loop();
 	}
 	else if(sucker_num == 1)
 	{
-/* Second instance of zabbix_suckerd sends alerts to users */
+/* Second instance of zabbix_server sends alerts to users */
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Alerter]",sucker_num);
 		main_alerter_loop();
 	}
 	else if(sucker_num == 2)
 	{
-/* Third instance of zabbix_suckerd periodically re-calculates 'nodata' functions */
+/* Third instance of zabbix_server periodically re-calculates 'nodata' functions */
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [nodata() calculator]",sucker_num);
 		main_nodata_loop();
 	}
 	else if(sucker_num == 3)
 	{
-/* Fourth instance of zabbix_suckerd periodically pings hosts */
+/* Fourth instance of zabbix_server periodically pings hosts */
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [ICMP pinger]",sucker_num);
 		main_pinger_loop();
 	}
 	else if(sucker_num == 4)
 	{
-/* Fourth instance of zabbix_suckerd periodically pings hosts */
+/* Fourth instance of zabbix_server escalates notifications */
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Escalator]",sucker_num);
 		main_pinger_loop();
 	}

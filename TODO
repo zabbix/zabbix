@@ -12,6 +12,7 @@
  - procload for AIX. See email from Juha
  - fix templates for complex triggers
  - support of automake
+ - rename sucker to poller. Make seperate poller.c
 
 ZABBIX 1.1:
 

@@ -202,6 +202,7 @@ DB_ALERT
 
 DB_ESCALATION_LOG
 {
+	int 	escalationlogid;
 	int 	triggerid;
 	int	alarmid;
 	int	escalationid;
