@@ -1,5 +1,6 @@
 Changes for 1.1alpha11:
 
+ - nodata() will be calculated regardless of its previous value (Alexei)
  - simplified code for trigger status updated (Alexei)
  - better read loop in active.c (Alexei)
  - added parameter DisableActive for zabbix_agentd (Alexei)
