@@ -4,7 +4,6 @@
  - escalations and repeated notifications
  - add encryption between server and agents
  - auto-discovery
- - check nodata() calculation (check SQL)
  - how to disable unrechable hosts
  - show axis in graphs if no data
  - new item status: not available. If agent doesn't acept parameter.

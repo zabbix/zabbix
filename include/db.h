@@ -52,6 +52,7 @@ extern	char	*CONFIG_DBSOCKET;
 #define DB_FUNCTION	struct function_type
 #define DB_MEDIA	struct media_type
 #define DB_MEDIATYPE	struct mediatype_type
+#define DB_ESCALATION_LOG	struct escalation_log_type
 
 #ifdef HAVE_MYSQL
 	#define	DB_RESULT	MYSQL_RES
