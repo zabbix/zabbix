@@ -12,6 +12,7 @@
  - housekeeper. Set item.housekeep to '0' for deleted items
  - procload for AIX. See email from Juha
  - fix templates for complex triggers
+ - support of automake
 
 ZABBIX 1.1:
 
