@@ -78,6 +78,12 @@
 #define RECIPIENT_TYPE_USER	0
 #define RECIPIENT_TYPE_GROUP	1
 
+/* Escalation actions */
+#define ESCALATION_ACTION_NOTHING	0
+#define ESCALATION_ACTION_EXEC_ACTION	1
+#define ESCALATION_ACTION_INC_SEVERITY	2
+#define ESCALATION_ACTION_INC_ADMIN	3
+
 /* Special item key used for storing server status */
 #define SERVER_STATUS_KEY	"status"
 /* Special item key used for ICMP pings */
