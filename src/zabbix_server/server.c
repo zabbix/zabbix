@@ -802,7 +802,7 @@ int main(int argc, char **argv)
 	{
 /* Fourth instance of zabbix_server escalates notifications */
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Escalator]",sucker_num);
-		main_pinger_loop();
+		main_escalator_loop();
 	}
 	else
 	{
