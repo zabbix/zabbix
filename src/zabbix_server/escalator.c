@@ -55,25 +55,51 @@
 
 int process_escalation(DB_ESCALATION_LOG *escalation_log)
 {
+	int	i;
+	char	sql[MAX_STRING_LEN];
+
+	DB_RESULT		*result;
+	DB_ESCALATION_RULE	escalation_rule;
+
+	zabbix_log( LOG_LEVEL_WARNING, "In process_escalation()");
+
+	snprintf(sql,sizeof(sql)-1,"select escalationruleid, escalationid,level,period,delay,actiontype from escalation_rules where escalationid=%d and level>=%d order by level", escalation_log->escalationid, escalation_log->level);
+	zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
+	result = DBselect(sql);
+
+	for(i=0;i<DBnum_rows(result);i++)
+	{
+		escalation_rule.escalationruleid=atoi(DBget_field(result,i,0));
+		escalation_rule.escalationid=atoi(DBget_field(result,i,1));
+		escalation_rule.level=atoi(DBget_field(result,i,2));
+		escalation_rule.period=DBget_field(result,i,3);
+		escalation_rule.delay=atoi(DBget_field(result,i,4));
+		escalation_rule.actiontype=atoi(DBget_field(result,i,5));
+
+		zabbix_log( LOG_LEVEL_WARNING, "Selected escalationrule ID [%d]", escalation_rule.escalationruleid);
+		if(escalation_log->level >= escalation_log->level)
+		{
+		}
+	}
+	DBfree_result(result);
+
 	return SUCCEED;
 }
 
 int main_escalator_loop()
 {
 	char	sql[MAX_STRING_LEN];
-	char	error[MAX_STRING_LEN];
-	char	error_esc[MAX_STRING_LEN];
 
 	int	i,res;
 	int	now;
 
-	struct	sigaction phan;
+	DB_RESULT	*result;
 
 	DB_ESCALATION_LOG	escalation_log;
 
 	for(;;)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Selecting data from escalation_log]");
+		zabbix_log( LOG_LEVEL_WARNING, "Selecting data from escalation_log");
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("connecting to the database");
 #endif
@@ -111,9 +137,9 @@ int main_escalator_loop()
 
 		DBclose();
 #ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("escalator [sleeping for %d seconds]", CONFIG_SENDER_FREQUENCY);
+		setproctitle("escalator [sleeping for %d seconds]", 10);
 #endif
 
-		sleep(CONFIG_SENDER_FREQUENCY);
+		sleep(10);
 	}
 }
