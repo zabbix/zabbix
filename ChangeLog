@@ -1,5 +1,6 @@
 Changes for 1.1alpha11:
 
+ - better modulatisation of code (Alexei)
  - added src/zabbix_server/escalator.[ch] (Alexei)
  - nodata() will be calculated regardless of its previous value (Alexei)
  - simplified code for trigger status updated (Alexei)
