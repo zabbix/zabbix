@@ -1,1 +1,1 @@
-SUBDIRS = zbxlog zbxcrypto
+SUBDIRS = zbxlog zbxcrypto zbxpid zbxnet zbxconf
