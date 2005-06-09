@@ -28,6 +28,7 @@ AM_CONFIG_HEADER(include/config.h)
 
 dnl Checks for programs.
 AC_PROG_CC
+AC_PROG_RUNLIB
 
 dnl Checks for libraries.
 dnl Check for crypto moved under SNMP
@@ -768,7 +769,8 @@ AC_SUBST(SUBDIRS)
 
 dnl AC_CONFIG_HEADER(include/config.h)
 
-AC_OUTPUT(Makefile src/Makefile src/zabbix_sender/Makefile src/zabbix_agent/Makefile src/zabbix_server/Makefile)
+AC_OUTPUT(Makefile src/Makefile src/libs/Makefile src/libs/zbxlog/Makefile src/zabbix_sender/Makefile\
+	src/zabbix_agent/Makefile src/zabbix_server/Makefile)
 
 echo
 echo "***********************************************************"
