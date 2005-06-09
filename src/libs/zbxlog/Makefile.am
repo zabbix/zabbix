@@ -1,3 +1,3 @@
 SUBDIRS=.
-lib_LIBRARIES = zbxlog.a
-zbxlog_a_SOURCES = log.c
+lib_LIBRARIES=libzbxlog.a
+libzbxlog_a_SOURCES=log.c
