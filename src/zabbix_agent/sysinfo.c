@@ -156,7 +156,7 @@ COMMAND	agent_commands[]=
 	{"memory[cached]"	,CACHEDMEM, 		0, 0},
 	{"memory[free]"		,FREEMEM, 		0, 0},
 
-	{"version[zabbix_agent]",0,	 		VERSION, 0},
+	{"version[zabbix_agent]",0,	 		STRVERSION, 0},
 
 	{"diskfree[*]"		,DISKFREE,		0, "/"},
 	{"disktotal[*]"		,DISKTOTAL,		0, "/"},
@@ -2539,7 +2539,7 @@ int	DISK_WBLK(const char *cmd, const char *parameter,double  *value)
 #endif
 }
 
-int	VERSION(const char *cmd, const char *parameter,char  **value)
+int	STRVERSION(const char *cmd, const char *parameter,char  **value)
 {
 	static	char	version[]=ZABBIX_VERSION;
 
