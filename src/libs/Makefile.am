@@ -1,1 +1,1 @@
-SUBDIRS = zbxlog
+SUBDIRS = zbxlog zbxcrypto
