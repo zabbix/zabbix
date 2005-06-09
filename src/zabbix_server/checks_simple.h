@@ -28,8 +28,7 @@
 #include "config.h"
 #include "db.h"
 #include "log.h"
-
-#include "../zabbix_agent/sysinfo.h"
+#include "sysinfo.h"
 
 extern	int	get_value_simple(double *result,char *result_str,DB_ITEM *item,char *error, int max_error_len);
 
