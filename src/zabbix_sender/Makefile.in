@@ -73,9 +73,9 @@ PGSQL_INCLUDE = @PGSQL_INCLUDE@
 PGSQL_LFLAGS = @PGSQL_LFLAGS@
 SNMP_INCLUDE = @SNMP_INCLUDE@
 SNMP_LFLAGS = @SNMP_LFLAGS@
-SUBDIRS = @SUBDIRS@
 VERSION = @VERSION@
 
+SUBDIRS = .
 bin_PROGRAMS = zabbix_sender
 zabbix_sender_SOURCES = zabbix_sender.c
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
