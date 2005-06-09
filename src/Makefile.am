@@ -1,1 +1,1 @@
-SUBDIRS = zabbix_agent zabbix_server
+SUBDIRS = zabbix_agent zabbix_sender zabbix_server
