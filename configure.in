@@ -768,8 +768,7 @@ AC_SUBST(SUBDIRS)
 
 dnl AC_CONFIG_HEADER(include/config.h)
 
-AC_OUTPUT(Makefile src/Makefile src/zabbix_sender/Makefile src/zabbix_agent/Makefile\
-       	src/zabbix_server/Makefile)
+AC_OUTPUT(Makefile src/Makefile src/zabbix_sender/Makefile src/zabbix_agent/Makefile src/zabbix_server/Makefile)
 
 echo
 echo "***********************************************************"
