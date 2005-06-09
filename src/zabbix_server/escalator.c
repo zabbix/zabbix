@@ -57,6 +57,7 @@ int process_escalation(DB_ESCALATION_LOG *escalation_log)
 {
 	int	i,now;
 	char	sql[MAX_STRING_LEN];
+	int	processed_level;
 
 	DB_RESULT		*result;
 	DB_ESCALATION_RULE	escalation_rule;
@@ -67,6 +68,8 @@ int process_escalation(DB_ESCALATION_LOG *escalation_log)
 	zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
 	result = DBselect(sql);
 
+	processed_level=escalation_log->level;
+
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 		escalation_rule.escalationruleid=atoi(DBget_field(result,i,0));
@@ -75,6 +78,8 @@ int process_escalation(DB_ESCALATION_LOG *escalation_log)
 		escalation_rule.period=DBget_field(result,i,3);
 		escalation_rule.delay=atoi(DBget_field(result,i,4));
 		escalation_rule.actiontype=atoi(DBget_field(result,i,5));
+
+		if(processed_level > escalation_rule.level)	break;
 
 		zabbix_log( LOG_LEVEL_WARNING, "Selected escalationrule ID [%d]", escalation_rule.escalationruleid);
 		now=time(NULL);
@@ -118,7 +123,7 @@ int process_escalation(DB_ESCALATION_LOG *escalation_log)
 				default:
 					zabbix_log( LOG_LEVEL_ERR, "Unknow escalation action type [%d]", escalation_rule.actiontype);
 			}
-			break;
+			processed_level= escalation_rule.level;
 		}
 	}
 	if(DBnum_rows(result)==0)
