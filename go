@@ -1,7 +1,9 @@
 #!/bin/sh
 
 mkdir bin
-autoheader
+aclocal
 autoconf
+autoheader
+automake
 ./configure --with-mysql
 make

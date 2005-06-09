@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -40,10 +40,10 @@ pkgincludedir = $(includedir)/@PACKAGE@
 
 top_builddir = .
 
-#ACLOCAL = @ACLOCAL@
-#AUTOCONF = @AUTOCONF@
-#AUTOMAKE = @AUTOMAKE@
-#AUTOHEADER = @AUTOHEADER@
+ACLOCAL = @ACLOCAL@
+AUTOCONF = @AUTOCONF@
+AUTOMAKE = @AUTOMAKE@
+AUTOHEADER = @AUTOHEADER@
 
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
@@ -57,29 +57,96 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
+host_alias = @host_alias@
+host_triplet = @host@
 CC = @CC@
+HAVE_LIB = @HAVE_LIB@
+LDAP_INCLUDE = @LDAP_INCLUDE@
+LDAP_LFLAGS = @LDAP_LFLAGS@
+LIB = @LIB@
+LTLIB = @LTLIB@
+MAKEINFO = @MAKEINFO@
+MYSQL_INCLUDE = @MYSQL_INCLUDE@
+MYSQL_LFLAGS = @MYSQL_LFLAGS@
 PACKAGE = @PACKAGE@
+PGSQL_INCLUDE = @PGSQL_INCLUDE@
+PGSQL_LFLAGS = @PGSQL_LFLAGS@
+SNMP_INCLUDE = @SNMP_INCLUDE@
+SNMP_LFLAGS = @SNMP_LFLAGS@
 VERSION = @VERSION@
 
-HAVE_MYSQL = @HAVE_MYSQL@
-HAVE_PGSQL = @HAVE_PGSQL@
-
-SUBDIRS = @SUBDIRS@
-#SUBDIRS = src/zabbix_agent src/zabbix_sender src/zabbix_sucker src/zabbix_trapper
-
+SUBDIRS = src
+ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_HEADER = ./src/config.h ./src/config.h
+CONFIG_HEADER = ./include/config.h
 CONFIG_CLEAN_FILES = 
 DIST_COMMON =  README AUTHORS COPYING ChangeLog INSTALL Makefile.am \
-Makefile.in configure configure.in install-sh src/config.h.in \
-src/stamp-h1.in src/stamp-h2.in
+Makefile.in NEWS TODO acconfig.h aclocal.m4 config.guess config.sub \
+configure configure.in include/config.h.in include/stamp-h.in \
+install-sh missing mkinstalldirs
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = gtar
+TAR = tar
 GZIP_ENV = --best
-all: 
+all: all-redirect
+.SUFFIXES:
+$(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu Makefile
+
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
+	cd $(top_builddir) \
+	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
+
+$(ACLOCAL_M4):  configure.in 
+	cd $(srcdir) && $(ACLOCAL)
+
+config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
+	$(SHELL) ./config.status --recheck
+$(srcdir)/configure: $(srcdir)/configure.in $(ACLOCAL_M4) $(CONFIGURE_DEPENDENCIES)
+	cd $(srcdir) && $(AUTOCONF)
+
+include/config.h: include/stamp-h
+	@if test ! -f $@; then \
+		rm -f include/stamp-h; \
+		$(MAKE) include/stamp-h; \
+	else :; fi
+include/stamp-h: $(srcdir)/include/config.h.in $(top_builddir)/config.status
+	cd $(top_builddir) \
+	  && CONFIG_FILES= CONFIG_HEADERS=include/config.h \
+	     $(SHELL) ./config.status
+	@echo timestamp > include/stamp-h 2> /dev/null
+$(srcdir)/include/config.h.in: $(srcdir)/include/stamp-h.in
+	@if test ! -f $@; then \
+		rm -f $(srcdir)/include/stamp-h.in; \
+		$(MAKE) $(srcdir)/include/stamp-h.in; \
+	else :; fi
+$(srcdir)/include/stamp-h.in: $(top_srcdir)/configure.in $(ACLOCAL_M4) acconfig.h
+	cd $(top_srcdir) && $(AUTOHEADER)
+	@echo timestamp > $(srcdir)/include/stamp-h.in 2> /dev/null
+
+mostlyclean-hdr:
+
+clean-hdr:
+
+distclean-hdr:
+	-rm -f include/config.h
+
+maintainer-clean-hdr:
+
+# This directory's subdirectories are mostly independent; you can cd
+# into them and run `make' without going through this Makefile.
+# To change the values of `make' variables: instead of editing Makefiles,
+# (1) if the variable is set in `config.status', edit `config.status'
+#     (which will cause the Makefiles to be regenerated when you run `make');
+# (2) otherwise, pass the desired values on the `make' command line.
+
+@SET_MAKE@
+
+all-recursive install-data-recursive install-exec-recursive \
+installdirs-recursive install-recursive uninstall-recursive  \
+check-recursive installcheck-recursive info-recursive dvi-recursive:
 	@set fnord $(MAKEFLAGS); amf=$$2; \
 	dot_seen=no; \
 	target=`echo $@ | sed s/-recursive//`; \
@@ -87,12 +154,16 @@ all:
 	  echo "Making $$target in $$subdir"; \
 	  if test "$$subdir" = "."; then \
 	    dot_seen=yes; \
+	    local_target="$$target-am"; \
 	  else \
 	    local_target="$$target"; \
 	  fi; \
 	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
 	   || case "$$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; \
 	done; \
+	if test "$$dot_seen" = "no"; then \
+	  $(MAKE) $(AM_MAKEFLAGS) "$$target-am" || exit 1; \
+	fi; test -z "$$fail"
 
 mostlyclean-recursive clean-recursive distclean-recursive \
 maintainer-clean-recursive:
@@ -100,7 +171,7 @@ maintainer-clean-recursive:
 	dot_seen=no; \
 	rev=''; list='$(SUBDIRS)'; for subdir in $$list; do \
 	  rev="$$subdir $$rev"; \
-	  test "$$subdir" = "." && dot_seen=yes; \
+	  test "$$subdir" != "." || dot_seen=yes; \
 	done; \
 	test "$$dot_seen" = "no" && rev=". $$rev"; \
 	target=`echo $@ | sed s/-recursive//`; \
@@ -142,7 +213,7 @@ TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) $(LISP)
 	  awk '    { files[$$0] = 1; } \
 	       END { for (i in files) print i; }'`; \
 	test -z "$(ETAGS_ARGS)$$unique$(LISP)$$tags" \
-	  || (cd $(srcdir) && etags $(ETAGS_ARGS) $$tags  $$unique $(LISP) -o $$here/TAGS)
+	  || (cd $(srcdir) && etags -o $$here/TAGS $(ETAGS_ARGS) $$tags  $$unique $(LISP))
 
 mostlyclean-tags:
 
@@ -199,7 +270,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
@@ -220,7 +291,7 @@ info-am:
 info: info-recursive
 dvi-am:
 dvi: dvi-recursive
-#check-am: all-am
+check-am: all-am
 check: check-recursive
 installcheck-am:
 installcheck: installcheck-recursive
@@ -230,12 +301,12 @@ install-exec: install-exec-recursive
 install-data-am:
 install-data: install-data-recursive
 
-#install-am: all-am
-#	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+install-am: all-am
+	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 install: install-recursive
 uninstall-am:
 uninstall: uninstall-recursive
-#all-am: Makefile
+all-am: Makefile
 all-redirect: all-recursive
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
@@ -263,7 +334,7 @@ clean: clean-recursive
 distclean-am:  distclean-hdr distclean-tags distclean-generic clean-am
 
 distclean: distclean-recursive
-	-rm -f config.status include/config.h
+	-rm -f config.status
 
 maintainer-clean-am:  maintainer-clean-hdr maintainer-clean-tags \
 		maintainer-clean-generic distclean-am
