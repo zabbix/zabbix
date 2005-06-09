@@ -772,7 +772,7 @@ AC_SUBST(RANLIB)
 
 dnl AC_CONFIG_HEADER(include/config.h)
 
-AC_OUTPUT(Makefile src/Makefile src/libs/Makefile src/libs/zbxlog/Makefile src/libs/zbxcrypto/Makefile\
+AC_OUTPUT(Makefile src/Makefile src/libs/Makefile src/libs/zbxlog/Makefile src/libs/zbxcrypto/Makefile \
 	src/zabbix_sender/Makefile src/zabbix_agent/Makefile src/zabbix_server/Makefile)
 
 echo

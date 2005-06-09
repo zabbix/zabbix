@@ -1,3 +1,3 @@
 SUBDIRS=.
-lib_LIBRARIES = zbxcrypto.a
-zbxcrypto_a_SOURCES = md5.c
+lib_LIBRARIES=libzbxcrypto.a
+libzbxcrypto_a_SOURCES=md5.c
