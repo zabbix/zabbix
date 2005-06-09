@@ -20,11 +20,11 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT(src/zabbix_server/server.c)
 
-dnl AM_INIT_AUTOMAKE(PACKAGE,all)
+AM_INIT_AUTOMAKE(ZABBIX,1.1alpha11)
 
 AC_PROG_MAKE_SET
 
-dnl AM_CONFIG_HEADER(include/config.h)
+AM_CONFIG_HEADER(include/config.h)
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -766,16 +766,16 @@ fi
 
 AC_SUBST(SUBDIRS)
 
-AC_CONFIG_HEADER(include/config.h)
+dnl AC_CONFIG_HEADER(include/config.h)
 
-AC_OUTPUT(Makefile src/zabbix_sender/Makefile src/zabbix_agent/Makefile\
+AC_OUTPUT(Makefile src/Makefile src/zabbix_sender/Makefile src/zabbix_agent/Makefile\
        	src/zabbix_server/Makefile)
 
 echo
 echo "***********************************************************"
 echo "*            Now run 'make'                               *"
 echo "*                                                         *"
-echo "*            Thank you for using Zabbix!                  *"
+echo "*            Thank you for using ZABBIX!                  *"
 echo "*              <http://www.zabbix.com>                    *"
 echo "***********************************************************"
 echo
