@@ -46,7 +46,7 @@
 #include "common.h"
 #include "cfg.h"
 #include "db.h"
-#include "functions.h"
+#include "../functions.h"
 #include "log.h"
 #include "zlog.h"
 #include "email.h"
