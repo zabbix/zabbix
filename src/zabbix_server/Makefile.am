@@ -1,4 +1,4 @@
-SUBDIRS = pinger .
+SUBDIRS = pinger escalator .
 INCLUDES=-I@top_srcdir@/include @MYSQL_INCLUDE@
 
 bin_PROGRAMS = zabbix_server
