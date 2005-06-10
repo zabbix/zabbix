@@ -80,8 +80,8 @@ SUBDIRS = pinger .
 INCLUDES = -I@top_srcdir@/include @MYSQL_INCLUDE@
 
 bin_PROGRAMS = zabbix_server
-zabbix_server_SOURCES = alerter.c housekeeper.c checks_simple.c checks_snmp.c checks_agent.c checks_internal.c trapper.c escalator.c expression.c actions.c zlog.c functions.c server.c
-zabbix_server_LDADD = ../libs/zbxsysinfo/libzbxsysinfo.a ../libs/zbxlog/libzbxlog.a ../libs/zbxpid/libzbxpid.a ../libs/zbxconf/libzbxconf.a ../libs/zbxdbhigh/libzbxdbhigh.a ../libs/zbxemail/libzbxemail.a ../libs/zbxcrypto/libzbxcrypto.a ../libs/zbxnet/libzbxnet.a pinger/libzbxpinger.a
+zabbix_server_SOURCES = alerter.c housekeeper.c checks_simple.c checks_snmp.c checks_agent.c checks_internal.c trapper.c expression.c actions.c zlog.c functions.c server.c
+zabbix_server_LDADD = ../libs/zbxsysinfo/libzbxsysinfo.a ../libs/zbxlog/libzbxlog.a ../libs/zbxpid/libzbxpid.a ../libs/zbxconf/libzbxconf.a ../libs/zbxdbhigh/libzbxdbhigh.a ../libs/zbxemail/libzbxemail.a ../libs/zbxcrypto/libzbxcrypto.a ../libs/zbxnet/libzbxnet.a pinger/libzbxpinger.a escalator/libzbxescalator.a
 zabbix_server_LDFLAGS = @MYSQL_LFLAGS@ @PGSQL_LFLAGS@
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = ../../include/config.h
@@ -94,13 +94,14 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 zabbix_server_OBJECTS =  alerter.o housekeeper.o checks_simple.o \
-checks_snmp.o checks_agent.o checks_internal.o trapper.o escalator.o \
-expression.o actions.o zlog.o functions.o server.o
+checks_snmp.o checks_agent.o checks_internal.o trapper.o expression.o \
+actions.o zlog.o functions.o server.o
 zabbix_server_DEPENDENCIES =  ../libs/zbxsysinfo/libzbxsysinfo.a \
 ../libs/zbxlog/libzbxlog.a ../libs/zbxpid/libzbxpid.a \
 ../libs/zbxconf/libzbxconf.a ../libs/zbxdbhigh/libzbxdbhigh.a \
 ../libs/zbxemail/libzbxemail.a ../libs/zbxcrypto/libzbxcrypto.a \
-../libs/zbxnet/libzbxnet.a pinger/libzbxpinger.a
+../libs/zbxnet/libzbxnet.a pinger/libzbxpinger.a \
+escalator/libzbxescalator.a
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
@@ -114,8 +115,8 @@ TAR = tar
 GZIP_ENV = --best
 DEP_FILES =  .deps/actions.P .deps/alerter.P .deps/checks_agent.P \
 .deps/checks_internal.P .deps/checks_simple.P .deps/checks_snmp.P \
-.deps/escalator.P .deps/expression.P .deps/functions.P \
-.deps/housekeeper.P .deps/server.P .deps/trapper.P .deps/zlog.P
+.deps/expression.P .deps/functions.P .deps/housekeeper.P .deps/server.P \
+.deps/trapper.P .deps/zlog.P
 SOURCES = $(zabbix_server_SOURCES)
 OBJECTS = $(zabbix_server_OBJECTS)
 
