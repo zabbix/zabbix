@@ -50,7 +50,7 @@
 #include "escalator/escalator.h"
 #include "pinger/pinger.h"
 #include "housekeeper/housekeeper.h"
-#include "trapper.h"
+#include "trapper/trapper.h"
 
 #include "checks_agent.h"
 #include "checks_internal.h"
