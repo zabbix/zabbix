@@ -46,8 +46,8 @@
 #include "zlog.h"
 
 #include "common.h"
-#include "functions.h"
-#include "expression.h"
+#include "../functions.h"
+#include "../expression.h"
 
 #include "trapper.h"
 
