@@ -726,6 +726,37 @@ crc_buf2(p, clen, cval)
 	return (0);
 }
 
+int	FILESIZE(const char *cmd, const char *filename,double  *value)
+{
+	struct stat	buf;
+
+	if(stat(filename,&buf) == 0)
+	{
+		*value=(double)buf.st_size;
+		return SYSINFO_RET_OK;
+	}
+	return	SYSINFO_RET_FAIL;
+}
+
+int	ISFILE(const char *cmd, const char *filename,double  *value)
+{
+	struct stat	buf;
+
+	*value=(double)0;
+
+	/* File exists */
+	if(stat(filename,&buf) == 0)
+	{
+		/* Regular file */
+		if(S_ISREG(buf.st_mode))
+		{
+			*value=(double)1;
+		}
+	}
+	/* File does not exist or any other error */
+	return SYSINFO_RET_OK;
+}
+
 int	PROCCNT(const char *cmd, const char *procname,double  *value)
 {
 #ifdef	HAVE_PROC_0_PSINFO
