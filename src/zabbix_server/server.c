@@ -46,7 +46,7 @@
 #include "functions.h"
 #include "expression.h"
 
-#include "alerter.h"
+#include "alerter/alerter.h"
 #include "escalator/escalator.h"
 #include "pinger/pinger.h"
 #include "housekeeper/housekeeper.h"
