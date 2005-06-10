@@ -61,7 +61,7 @@
 
 static	pid_t	*pids=NULL;
 
-static	int	sucker_num=0;
+static	int	server_num=0;
 
 int	CONFIG_SUCKERD_FORKS		=SUCKER_FORKS;
 /* For trapper */
@@ -92,7 +92,7 @@ void	uninit(void)
 {
 	int i;
 
-	if(sucker_num == 0)
+	if(server_num == 0)
 	{
 		if(pids != NULL)
 		{
@@ -127,7 +127,7 @@ void	signal_handler( int sig )
 		uninit();
 		exit( FAIL );
 	}
-        else if( (SIGCHLD == sig) && (sucker_num == 0) )
+        else if( (SIGCHLD == sig) && (server_num == 0) )
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "One child process died. Exiting ...");
 		uninit();
@@ -333,7 +333,7 @@ int get_minnextcheck(int now)
 /* Host status	0 == MONITORED
 		1 == NOT MONITORED
 		2 == UNREACHABLE */ 
-	snprintf(sql,sizeof(sql)-1,"select count(*),min(nextcheck) from items i,hosts h where ((h.status=%d and h.available!=%d) or (h.status=%d and h.available=%d and h.disable_until<%d)) and h.hostid=i.hostid and i.status=%d and i.type not in (%d,%d) and i.itemid%%%d=%d and i.key_ not in ('%s','%s','%s','%s')", HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE,HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, CONFIG_SUCKERD_FORKS-5,sucker_num-5,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY,SERVER_ZABBIXLOG_KEY);
+	snprintf(sql,sizeof(sql)-1,"select count(*),min(nextcheck) from items i,hosts h where ((h.status=%d and h.available!=%d) or (h.status=%d and h.available=%d and h.disable_until<%d)) and h.hostid=i.hostid and i.status=%d and i.type not in (%d,%d) and i.itemid%%%d=%d and i.key_ not in ('%s','%s','%s','%s')", HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE,HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, CONFIG_SUCKERD_FORKS-5,server_num-5,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY,SERVER_ZABBIXLOG_KEY);
 	result = DBselect(sql);
 
 	if( DBnum_rows(result) == 0)
@@ -432,7 +432,7 @@ int get_values(void)
 
 	now = time(NULL);
 
-	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,h.available from items i,hosts h where i.nextcheck<=%d and i.status=%d and i.type not in (%d,%d) and ((h.status=%d and h.available!=%d) or (h.status=%d and h.available=%d and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d and i.key_ not in ('%s','%s','%s','%s') order by i.nextcheck", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now, CONFIG_SUCKERD_FORKS-5,sucker_num-5,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY,SERVER_ZABBIXLOG_KEY);
+	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,h.available from items i,hosts h where i.nextcheck<=%d and i.status=%d and i.type not in (%d,%d) and ((h.status=%d and h.available!=%d) or (h.status=%d and h.available=%d and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d and i.key_ not in ('%s','%s','%s','%s') order by i.nextcheck", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now, CONFIG_SUCKERD_FORKS-5,server_num-5,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY,SERVER_ZABBIXLOG_KEY);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
@@ -574,7 +574,7 @@ int main_nodata_loop()
 	}
 }
 
-int main_sucker_loop()
+int main_poller_loop()
 {
 	int	now;
 	int	nextcheck,sleeptime;
@@ -584,7 +584,7 @@ int main_sucker_loop()
 	for(;;)
 	{
 #ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("sucker [getting values]");
+		setproctitle("poller [getting values]");
 #endif
 		now=time(NULL);
 		get_values();
@@ -615,7 +615,7 @@ int main_sucker_loop()
 			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
 					sleeptime );
 #ifdef HAVE_FUNCTION_SETPROCTITLE
-			setproctitle("sucker [sleeping for %d seconds]", 
+			setproctitle("poller [sleeping for %d seconds]", 
 					sleeptime);
 #endif
 			sleep( sleeptime );
@@ -746,7 +746,7 @@ int main(int argc, char **argv)
 	{
 		if((pid = fork()) == 0)
 		{
-			sucker_num=i;
+			server_num=i;
 			break;
 		}
 		else
@@ -755,11 +755,11 @@ int main(int argc, char **argv)
 		}
 	}
 
-/*	zabbix_log( LOG_LEVEL_WARNING, "zabbix_suckerd #%d started",sucker_num);*/
+/*	zabbix_log( LOG_LEVEL_WARNING, "zabbix_server #%d started",server_num);*/
 
 
 
-	if( sucker_num == 0)
+	if( server_num == 0)
 	{
 		sigaction(SIGCHLD, &phan, NULL);
 /* Run trapper processes then do housekeeping */
@@ -777,43 +777,43 @@ int main(int argc, char **argv)
 		}
 
 /* First instance of zabbix_server performs housekeeping procedures */
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Housekeeper]",sucker_num);
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Housekeeper]",server_num);
 		main_housekeeper_loop();
 	}
-	else if(sucker_num == 1)
+	else if(server_num == 1)
 	{
 /* Second instance of zabbix_server sends alerts to users */
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Alerter]",sucker_num);
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Alerter]",server_num);
 		main_alerter_loop();
 	}
-	else if(sucker_num == 2)
+	else if(server_num == 2)
 	{
 /* Third instance of zabbix_server periodically re-calculates 'nodata' functions */
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [nodata() calculator]",sucker_num);
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [nodata() calculator]",server_num);
 		main_nodata_loop();
 	}
-	else if(sucker_num == 3)
+	else if(server_num == 3)
 	{
 /* Fourth instance of zabbix_server periodically pings hosts */
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [ICMP pinger]",sucker_num);
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [ICMP pinger]",server_num);
 		main_pinger_loop();
 	}
-	else if(sucker_num == 4)
+	else if(server_num == 4)
 	{
 /* Fourth instance of zabbix_server escalates notifications */
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Escalator]",sucker_num);
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Escalator]",server_num);
 		main_escalator_loop();
 	}
 	else
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Sucker. SNMP:ON]",sucker_num);
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Sucker. SNMP:ON]",server_num);
 #else
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Sucker. SNMP:OFF]",sucker_num);
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Sucker. SNMP:OFF]",server_num);
 #endif
 
-		main_sucker_loop();
+		main_poller_loop();
 	}
 
 	return SUCCEED;

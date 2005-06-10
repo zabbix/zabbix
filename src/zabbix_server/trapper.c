@@ -210,7 +210,7 @@ pid_t	child_trapper_make(int i,int listenfd, int addrlen)
 	}
 	else
 	{
-//		sucker_num=i;
+/*		server_num=i; */
 	}
 
 	/* never returns */
