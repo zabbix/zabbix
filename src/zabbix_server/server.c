@@ -49,7 +49,7 @@
 #include "alerter.h"
 #include "escalator/escalator.h"
 #include "pinger/pinger.h"
-#include "housekeeper.h"
+#include "housekeeper/housekeeper.h"
 #include "trapper.h"
 
 #include "checks_agent.h"

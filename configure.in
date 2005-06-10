@@ -775,7 +775,7 @@ AC_OUTPUT(Makefile src/Makefile src/libs/Makefile src/libs/zbxlog/Makefile src/l
 	src/libs/zbxpid/Makefile src/libs/zbxnet/Makefile src/libs/zbxconf/Makefile src/zabbix_sender/Makefile \
 	src/libs/zbxdbhigh/Makefile src/libs/zbxemail/Makefile src/libs/zbxsysinfo/Makefile \
 	src/zabbix_server/pinger/Makefile src/zabbix_server/escalator/Makefile src/zabbix_agent/Makefile \
-	src/zabbix_server/Makefile)
+	src/zabbix_server/housekeeper/Makefile src/zabbix_server/Makefile)
 
 echo
 echo "***********************************************************"
