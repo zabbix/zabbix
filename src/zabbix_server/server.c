@@ -48,7 +48,7 @@
 
 #include "alerter.h"
 #include "escalator.h"
-#include "pinger.h"
+#include "pinger/pinger.h"
 #include "housekeeper.h"
 #include "trapper.h"
 
