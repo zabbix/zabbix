@@ -53,7 +53,7 @@
 
 #include "escalator.h"
 
-int process_escalation(DB_ESCALATION_LOG *escalation_log)
+static int process_escalation(DB_ESCALATION_LOG *escalation_log)
 {
 	int	i,now;
 	char	sql[MAX_STRING_LEN];
