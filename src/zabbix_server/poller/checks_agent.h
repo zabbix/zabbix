@@ -38,7 +38,6 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
-#include "expression.h"
 
 extern  int     CONFIG_NOTIMEWAIT;
 
