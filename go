@@ -1,10 +1,10 @@
 #!/bin/sh
 
-mkdir bin
 aclocal
 autoconf
 autoheader
 automake -a
 automake
-./configure --with-mysql
+./configure --with-mysql --prefix=/home/zabbix
 make
+make install
