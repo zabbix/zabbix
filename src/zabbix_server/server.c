@@ -52,16 +52,17 @@
 
 #include "alerter/alerter.h"
 #include "escalator/escalator.h"
+#include "housekeeper/housekeeper.h"
 #include "pinger/pinger.h"
 #include "poller/poller.h"
-#include "housekeeper/housekeeper.h"
+#include "timer/timer.h"
 #include "trapper/trapper.h"
 
 #define       LISTENQ 1024
 
 pid_t	*pids=NULL;
 
-static	int	server_num=0;
+int	server_num=0;
 
 int	CONFIG_SUCKERD_FORKS		=SUCKER_FORKS;
 /* For trapper */
@@ -88,6 +89,21 @@ char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
 char	*CONFIG_DBSOCKET		= NULL;
 
+/******************************************************************************
+ *                                                                            *
+ * Function: uninit                                                           *
+ *                                                                            *
+ * Purpose: kill all child processes, if any, and exit                        *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 void	uninit(void)
 {
 	int i;
@@ -113,6 +129,21 @@ void	uninit(void)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: signal_handler                                                   *
+ *                                                                            *
+ * Purpose: handle signals                                                    *
+ *                                                                            *
+ * Parameters: sig - signal id                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 void	signal_handler( int sig )
 {
 	if( SIGALRM == sig )
@@ -149,6 +180,21 @@ void	signal_handler( int sig )
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: daemon-init                                                      *
+ *                                                                            *
+ * Purpose: init process as daemon                                            *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: it doesn't allow running under 'root'                            *
+ *                                                                            *
+ ******************************************************************************/
 void	daemon_init(void)
 {
 	int		i;
@@ -210,6 +256,21 @@ void	daemon_init(void)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: usage                                                            *
+ *                                                                            *
+ * Purpose: print infor about command line parameters and exit                *
+ *                                                                            *
+ * Parameters: prog - name of process, normally 'zabbix_server'               *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 void usage(char *prog)
 {
 	printf("zabbix_server - ZABBIX server process %s\n", ZABBIX_VERSION);
@@ -220,6 +281,21 @@ void usage(char *prog)
 	exit(-1);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: init_config                                                      *
+ *                                                                            *
+ * Purpose: parse config file and update configuration parameters             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: will terminate process if parsing fails                          *
+ *                                                                            *
+ ******************************************************************************/
 void	init_config(void)
 {
 	static struct cfg_line cfg[]=
@@ -300,55 +376,6 @@ void	trend(void)
 	DBfree_result(result2);
 }
 
-int main_nodata_loop()
-{
-	char	sql[MAX_STRING_LEN];
-	int	i,now;
-
-	int	itemid,functionid;
-	char	*parameter;
-
-	DB_RESULT	*result;
-
-	for(;;)
-	{
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("updating nodata() functions");
-#endif
-
-		DBconnect();
-
-		now=time(NULL);
-#ifdef HAVE_PGSQL
-		snprintf(sql,sizeof(sql)-1,"select distinct f.itemid,f.functionid,f.parameter from functions f, items i,hosts h where h.hostid=i.hostid and ((h.status=%d and h.available!=%d) or (h.status=%d and h.available=%d and h.disable_until<%d)) and i.itemid=f.itemid and f.function='nodata' and i.lastclock+f.parameter::text::integer<=%d and i.status=%d and i.type=%d", HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
-#else
-		snprintf(sql,sizeof(sql)-1,"select distinct f.itemid,f.functionid,f.parameter from functions f, items i,hosts h where h.hostid=i.hostid and ((h.status=%d and h.available!=%d) or (h.status=%d and h.available=%d and h.disable_until<%d)) and i.itemid=f.itemid and f.function='nodata' and i.lastclock+f.parameter<=%d and i.status=%d and i.type=%d", HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
-#endif
-
-		result = DBselect(sql);
-
-		for(i=0;i<DBnum_rows(result);i++)
-		{
-			itemid=atoi(DBget_field(result,i,0));
-			functionid=atoi(DBget_field(result,i,1));
-			parameter=DBget_field(result,i,2);
-
-			snprintf(sql,sizeof(sql)-1,"update functions set lastvalue='1' where itemid=%d and function='nodata' and parameter='%s'" , itemid, parameter );
-			DBexecute(sql);
-
-			update_triggers(itemid);
-		}
-
-		DBfree_result(result);
-		DBclose();
-
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("sleeping for 30 sec");
-#endif
-		sleep(30);
-	}
-}
-
 int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 {
 	int	sockfd;
@@ -393,6 +420,21 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 	return  sockfd;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: main                                                             *
+ *                                                                            *
+ * Purpose: executes server processes                                         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 int main(int argc, char **argv)
 {
 	int	ch;
@@ -510,9 +552,9 @@ int main(int argc, char **argv)
 	}
 	else if(server_num == 2)
 	{
-/* Third instance of zabbix_server periodically re-calculates 'nodata' functions */
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [nodata() calculator]",server_num);
-		main_nodata_loop();
+/* Third instance of zabbix_server periodically re-calculates time-related functions */
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Timer]",server_num);
+		main_timer_loop();
 	}
 	else if(server_num == 3)
 	{

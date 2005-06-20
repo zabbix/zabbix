@@ -52,8 +52,23 @@
 
 #include "pinger.h"
 
-/* Could be improved */
-int	is_ip(char *ip)
+/******************************************************************************
+ *                                                                            *
+ * Function: is_ip                                                            *
+ *                                                                            *
+ * Purpose: is string IP address                                              *
+ *                                                                            *
+ * Parameters: ip - string                                                    *
+ *                                                                            *
+ * Return value: SUCCEED - is IP address                                      * 
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: could be improved                                                *
+ *                                                                            *
+ ******************************************************************************/
+static int is_ip(char *ip)
 {
 	int i;
 	char c;
@@ -87,7 +102,25 @@ int	is_ip(char *ip)
 	return res;
 }
 
-int	process_value(char *key, char *host, char *value)
+/******************************************************************************
+ *                                                                            *
+ * Function: process_new_value                                                *
+ *                                                                            *
+ * Purpose: process new item value                                            *
+ *                                                                            *
+ * Parameters: key - item key                                                 *
+ *             host - host name                                               *
+ *             value - new value of the item                                  *
+ *                                                                            *
+ * Return value: SUCCEED - new value sucesfully processed                     *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: can be done in process_data()                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int process_value(char *key, char *host, char *value)
 {
 	char	sql[MAX_STRING_LEN];
 
@@ -166,7 +199,23 @@ int	process_value(char *key, char *host, char *value)
 	return SUCCEED;
 }
 
-int create_host_file(void)
+/******************************************************************************
+ *                                                                            *
+ * Function: create_host_file                                                 *
+ *                                                                            *
+ * Purpose: creates file which contains list of hosts to ping                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: SUCCEED - the file was created succesfully                   *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int create_host_file(void)
 {
 	char	sql[MAX_STRING_LEN];
 	FILE	*f;
@@ -222,7 +271,23 @@ int create_host_file(void)
 }
 
 
-int	do_ping(void)
+/******************************************************************************
+ *                                                                            *
+ * Function: do_ping                                                          *
+ *                                                                            *
+ * Purpose: ping hosts listed in the host files                               *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: SUCCEED - successfully processed                             *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: use external binary 'fping' to avoid superuser priviledges       *
+ *                                                                            *
+ ******************************************************************************/
+static int do_ping(void)
 {
 	FILE	*f;
 	char	ip[MAX_STRING_LEN];
@@ -286,7 +351,22 @@ int	do_ping(void)
 	return	SUCCEED;
 }
 
-int main_pinger_loop()
+/******************************************************************************
+ *                                                                            *
+ * Function: main_pinger_loop                                                 *
+ *                                                                            *
+ * Purpose: periodically perform ICMP pings                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: never returns                                                    *
+ *                                                                            *
+ ******************************************************************************/
+void main_pinger_loop()
 {
 	int ret = SUCCEED;
 

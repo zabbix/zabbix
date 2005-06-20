@@ -53,13 +53,44 @@
 
 #include "alerter.h"
 
-void	signal_handler2( int sig )
+/******************************************************************************
+ *                                                                            *
+ * Function: signal_handler                                                   *
+ *                                                                            *
+ * Purpose: dummy signal handler                                              *
+ *                                                                            *
+ * Parameters: sign - signal id                                               *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void signal_handler2( int sig )
 {
 	zabbix_log( LOG_LEVEL_DEBUG, "Got signal [%d]", sig);
 }
 
-/* Send alert */
-int send_alert(DB_ALERT	*alert,DB_MEDIATYPE *mediatype, char *error, int max_error_len)
+/******************************************************************************
+ *                                                                            *
+ * Function: execute_action                                                   *
+ *                                                                            *
+ * Purpose: executa an action depending on mediatype                          *
+ *                                                                            *
+ * Parameters: alert - alert details                                          *
+ *             mediatype - media details                                      *
+ *                                                                            *
+ * Return value: SUCCESS - action executed sucesfully                         * 
+ *               FAIL - otherwise, error will contain error message           *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, int max_error_len)
 {
 	int res=FAIL;
 	struct	sigaction phan;
@@ -67,7 +98,7 @@ int send_alert(DB_ALERT	*alert,DB_MEDIATYPE *mediatype, char *error, int max_err
 
 	char	full_path[MAX_STRING_LEN];
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In send_alert()");
+	zabbix_log( LOG_LEVEL_DEBUG, "In execute_action()");
 
 	if(mediatype->type==ALERT_TYPE_EMAIL)
 	{
@@ -125,11 +156,26 @@ int send_alert(DB_ALERT	*alert,DB_MEDIATYPE *mediatype, char *error, int max_err
 		res=FAIL;
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "End of send_alert()");
+	zabbix_log( LOG_LEVEL_DEBUG, "End of execute_action()");
 
 	return res;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: main_alerter_loop                                                *
+ *                                                                            *
+ * Purpose: periodically check table alerts and send notifications if needed  *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              * 
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: never returns                                                    *
+ *                                                                            *
+ ******************************************************************************/
 int main_alerter_loop()
 {
 	char	sql[MAX_STRING_LEN];
@@ -180,7 +226,7 @@ int main_alerter_loop()
 
 			/* Hardcoded value */
 			alarm(10);
-			res=send_alert(&alert,&mediatype,error,sizeof(error));
+			res=execute_action(&alert,&mediatype,error,sizeof(error));
 			alarm(0);
 
 			if(res==SUCCEED)

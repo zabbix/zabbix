@@ -50,8 +50,23 @@
 
 #include "housekeeper.h"
 
-/* Remove items having status 'deleted' */
-int housekeeping_items(void)
+/******************************************************************************
+ *                                                                            *
+ * Function: housekeeping_items                                               *
+ *                                                                            *
+ * Purpose: remove items having status 'deleted'                              *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: SUCCEED - items deleted succesfully                          *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int housekeeping_items(void)
 {
 	char		sql[MAX_STRING_LEN];
 	DB_RESULT	*result;
@@ -68,7 +83,22 @@ int housekeeping_items(void)
 	return SUCCEED;
 }
 
-/* Remove hosts having status 'deleted' */
+/******************************************************************************
+ *                                                                            *
+ * Function: housekeeping_hosts                                               *
+ *                                                                            *
+ * Purpose: remove hosts having status 'deleted'                              *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: SUCCEED - hosts deleted succesfully                          *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 int housekeeping_hosts(void)
 {
 	char		sql[MAX_STRING_LEN];
@@ -86,6 +116,22 @@ int housekeeping_hosts(void)
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: housekeeping_history_and_trends                                  *
+ *                                                                            *
+ * Purpose: remove outdated information from history and trends               *
+ *                                                                            *
+ * Parameters: now - current timestamp                                        *
+ *                                                                            *
+ * Return value: SUCCEED - information removed succesfully                    *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 int housekeeping_history_and_trends(int now)
 {
 	char		sql[MAX_STRING_LEN];
@@ -95,8 +141,6 @@ int housekeeping_history_and_trends(int now)
 
 	int		i;
 
-/* How lastdelete is used ??? */
-/*	snprintf(sql,sizeof(sql)-1,"select itemid,lastdelete,history,delay,trends from items where lastdelete<=%d", now);*/
 	snprintf(sql,sizeof(sql)-1,"select itemid,history,delay,trends from items");
 	result = DBselect(sql);
 

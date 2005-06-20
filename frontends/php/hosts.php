@@ -34,6 +34,9 @@
 		show_footer();
 		exit;
 	}
+
+	$_GET["config"]=@iif(isset($_GET["config"]),$_GET["config"],get_profile("web.hosts.config",0));
+	update_profile("web.hosts.config",$_GET["config"]);
 ?>
 
 <?php

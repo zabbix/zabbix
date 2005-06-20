@@ -34,9 +34,23 @@
 #include "log.h"
 #include "zlog.h"
 
-/* Update special host's item - "zabbix[log]" */
+/******************************************************************************
+ *                                                                            *
+ * Function: zabbix_syslog                                                    *
+ *                                                                            *
+ * Purpose: save internal warning or error message in item zabbix[log]        *
+ *                                                                            *
+ * Parameters: va_list arguments                                              *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: do nothing if no zabbix[log] items                               *
+ *                                                                            *
+ ******************************************************************************/
 void zabbix_syslog(const char *fmt, ...)
-{
+{ 
 	int		i;
 	va_list		ap;
 	char		sql[MAX_STRING_LEN];

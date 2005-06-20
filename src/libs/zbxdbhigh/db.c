@@ -496,6 +496,14 @@ int	add_alarm(int triggerid,int status,int clock,int *alarmid)
 
 	*alarmid=DBinsert_id();
 
+	/* Cancel currently active escalations */
+	if(status == TRIGGER_VALUE_FALSE || status == TRIGGER_VALUE_TRUE)
+	{
+		snprintf(sql,sizeof(sql)-1,"update escalation_log set status=1 where triggerid=%d and status=0", triggerid);
+		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
+		DBexecute(sql);
+	}
+
 	zabbix_log(LOG_LEVEL_DEBUG,"End of add_alarm()");
 	
 	return SUCCEED;
