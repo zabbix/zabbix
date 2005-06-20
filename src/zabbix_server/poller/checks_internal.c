@@ -20,6 +20,23 @@
 #include "common.h"
 #include "checks_internal.h"
 
+/******************************************************************************
+ *                                                                            *
+ * Function: get_value_internal                                               *
+ *                                                                            *
+ * Purpose: retrieve data from ZABBIX server (internally supported intems)    *
+ *                                                                            *
+ * Parameters: item - item we are interested in                               *
+ *                                                                            *
+ * Return value: SUCCEED - data succesfully retrieved and stored in result    *
+ *                         and result_str (as string)                         *
+ *               NOTSUPPORTED - requested item is not supported               *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 int	get_value_internal(double *result,char *result_str,DB_ITEM *item,char *error,int max_error_len)
 {
 	if(strcmp(item->key,"zabbix[triggers]")==0)

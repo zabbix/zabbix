@@ -17,15 +17,17 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
+#ifndef ZABBIX_TIMER_H
+#define ZABBIX_TIMER_H
 
-#ifndef ZABBIX_FUNCTIONS_H
-#define ZABBIX_FUNCTIONS_H
+/*
+extern	void	signal_handler(int);
+extern  int     server_num;
 
-#include "common.h"
-#include "db.h"
+extern  int     CONFIG_TIMEOUT;
+extern  int     CONFIG_SUCKERD_FORKS;
+*/
 
-void    update_triggers (int itemid);
-int	process_data(int sockfd,char *server,char *key, char *value);
-void	process_new_value(DB_ITEM *item,char *value);
+int main_timer_loop();
 
 #endif

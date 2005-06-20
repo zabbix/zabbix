@@ -18,14 +18,12 @@
 **/
 
 
-#ifndef ZABBIX_FUNCTIONS_H
-#define ZABBIX_FUNCTIONS_H
+#ifndef ZABBIX_TRAPPER_ACTIVE_H
+#define ZABBIX_TRAPPER_ACTIVE_H
 
 #include "common.h"
 #include "db.h"
 
-void    update_triggers (int itemid);
-int	process_data(int sockfd,char *server,char *key, char *value);
-void	process_new_value(DB_ITEM *item,char *value);
+int	send_list_of_active_checks(int sockfd, char *host);
 
 #endif
