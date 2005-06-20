@@ -47,8 +47,22 @@
 #include "actions.h"
 #include "expression.h"
 
-/* 1 - within period, 0 - out of period */
-int	check_time_period(char *period)
+/******************************************************************************
+ *                                                                            *
+ * Function: check_time_period                                                *
+ *                                                                            *
+ * Purpose: check if current time is within given period                      *
+ *                                                                            *
+ * Parameters: period - time period in format [d1-d2,hh:mm-hh:mm]*            *
+ *                                                                            *
+ * Return value: 0 - out of period, 1 - within the period                     *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static	int	check_time_period(char *period)
 {
 	time_t	now;
 	char	tmp[MAX_STRING_LEN];
@@ -94,8 +108,24 @@ int	check_time_period(char *period)
 	return ret;
 }
 
-/* Cannot use action->userid as it may also represent groupd id*/
-void	send_to_user_medias(DB_TRIGGER *trigger,DB_ACTION *action, int userid)
+/******************************************************************************
+ *                                                                            *
+ * Function: send_to_user_medias                                              *
+ *                                                                            *
+ * Purpose: send notifications to user's medias (email, sms, whatever)        *
+ *                                                                            *
+ * Parameters: trigger - trigger data                                         *
+ *             action  - action data                                          *
+ *             userid  - user id                                              *
+ *                                                                            *
+ * Return value: nothing                                                      *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: Cannot use action->userid as it may also be groupid              *
+ *                                                                            *
+ ******************************************************************************/
+static	void	send_to_user_medias(DB_TRIGGER *trigger,DB_ACTION *action, int userid)
 {
 	DB_MEDIA media;
 	char sql[MAX_STRING_LEN];
@@ -131,10 +161,23 @@ void	send_to_user_medias(DB_TRIGGER *trigger,DB_ACTION *action, int userid)
 	DBfree_result(result);
 }
 
-/*
- * Send message to user. Message will be sent to all medias registered to given user.
- */ 
-void	send_to_user(DB_TRIGGER *trigger,DB_ACTION *action)
+/******************************************************************************
+ *                                                                            *
+ * Function: send_to_user                                                     *
+ *                                                                            *
+ * Purpose: send notifications to user or user groupd                         *
+ *                                                                            *
+ * Parameters: trigger - trigger data                                         *
+ *             action  - action data                                          *
+ *                                                                            *
+ * Return value: nothing                                                      *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: action->recipient specifies user or group                        *
+ *                                                                            *
+ ******************************************************************************/
+static	void	send_to_user(DB_TRIGGER *trigger,DB_ACTION *action)
 {
 	char sql[MAX_STRING_LEN];
 	DB_RESULT *result;
@@ -171,7 +214,7 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 
 	if((escalationid=DBget_default_escalation_id())>0)
 	{
-		snprintf(sql,sizeof(sql)-1,"insert into escalation_log (triggerid,alarmid,escalationid,level,adminlevel,nextcheck,status) values (%d,%d,%d,%d,%d,%d,%d)", trigger->triggerid, alarmid, escalationid, 0, 0, 0, 0);
+		snprintf(sql,sizeof(sql)-1,"insert into escalation_log (triggerid,alarmid,escalationid,level,adminlevel,nextcheck,status,actiontype) values (%d,%d,%d,%d,%d,%d,%d,%d)", trigger->triggerid, alarmid, escalationid, 0, 0, 0, 0, ESCALATION_ACTION_NOTHING);
 		DBexecute(sql);
 	}
 	else

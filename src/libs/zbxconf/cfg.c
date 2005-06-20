@@ -25,24 +25,23 @@
 #include "common.h"
 #include "cfg.h"
 
-/*	struct cfg_line
-	{
-		char	*parameter,
-		void	*variable,
-		int	type;
-		int	mandatory;
-		int	min;
-		int	max;
-	};
-*/
-
-/*	struct cfg_line cfg[]=
-	{*/
-/*		 PARAMETER	,VAR	,FUNC,	TYPE(0i,1s),MANDATORY,MIN,MAX	*/
-/*		{"StartSuckers",&Suckers,0,	0          ,1	      ,2,255},
-		{0}
-	};*/
-
+/******************************************************************************
+ *                                                                            *
+ * Function: parse_cfg_file                                                   *
+ *                                                                            *
+ * Purpose: parse configuration file                                          *
+ *                                                                            *
+ * Parameters: cfg_file - full name of config filesocker descriptor           *
+ *             cfg - pointer to configuration parameter structure             *
+ *                                                                            *
+ * Return value: SUCCEED - parsed succesfully                                 *
+ *               FAIL - error processing config file                          *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 {
 	FILE	*file;

@@ -31,6 +31,6 @@ extern	char	*CONFIG_FPING_LOCATION;
 
 extern	void	signal_handler( int sig );
 
-int main_pinger_loop();
+void main_pinger_loop();
 
 #endif

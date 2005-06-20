@@ -18,14 +18,16 @@
 **/
 
 
-#ifndef ZABBIX_FUNCTIONS_H
-#define ZABBIX_FUNCTIONS_H
+#ifndef ZABBIX_EVALFUNC_H
+#define ZABBIX_EVALFUNC_H
 
 #include "common.h"
 #include "db.h"
 
-void    update_triggers (int itemid);
-int	process_data(int sockfd,char *server,char *key, char *value);
-void	process_new_value(DB_ITEM *item,char *value);
+#define	EVALUATE_FUNCTION_NORMAL	0
+#define	EVALUATE_FUNCTION_SUFFIX	1
+
+int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, int flag);
+int	evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *parameter);
 
 #endif

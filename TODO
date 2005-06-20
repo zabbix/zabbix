@@ -4,15 +4,16 @@
  - escalations and repeated notifications
  - add encryption between server and agents
  - auto-discovery
- - how to disable unrechable hosts
+ - how to disable unreachable hosts
  - show axis in graphs if no data
- - new item status: not available. If agent doesn't acept parameter.
+ - new item status: not available. If agent doesn't accept parameter.
  - new function for item status to enable sending of notification in case if an item changes status to unknown (for example)
  - housekeeper. Set item.housekeep to '0' for deleted items
  - procload for AIX. See email from Juha
  - fix templates for complex triggers
  - support of automake
- - rename sucker to poller. Make seperate poller.c
+ - do not show deleted hosts & items
+ - do zabbix_sender for windows
 
 ZABBIX 1.1:
 

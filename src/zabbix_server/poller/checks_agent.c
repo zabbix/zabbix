@@ -19,6 +19,26 @@
 
 #include "checks_agent.h"
 
+/******************************************************************************
+ *                                                                            *
+ * Function: get_value_agent                                                  *
+ *                                                                            *
+ * Purpose: retrieve data from ZABBIX agent                                   *
+ *                                                                            *
+ * Parameters: item - item we are interested in                               *
+ *                                                                            *
+ * Return value: SUCCEED - data succesfully retrieved and stored in result    *
+ *                         and result_str (as string)                         *
+ *               NETWORK_ERROR - network related error occured                *
+ *               NOTSUPPORTED - item not supported by the agent               *
+ *               AGENT_ERROR - uncritical error on agent side occured         *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: error will contain error message                                 *
+ *                                                                            *
+ ******************************************************************************/
 int	get_value_agent(double *result,char *result_str,DB_ITEM *item,char *error,int max_error_len)
 {
 	int	s;

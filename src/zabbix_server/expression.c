@@ -24,14 +24,27 @@
 #include <math.h>
 
 #include "functions.h"
+#include "evalfunc.h"
 #include "common.h"
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
 
-/*
- * Delete all right spaces from given string
- */ 
+/******************************************************************************
+ *                                                                            *
+ * Function: rtrim_spaces                                                     *
+ *                                                                            *
+ * Purpose: delete all right spaces for the string                            *
+ *                                                                            *
+ * Parameters: c - string to trim spaces                                      *
+ *                                                                            *
+ * Return value: string without right spaces                                  *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 void	rtrim_spaces(char *c)
 {
 	int i,len;
@@ -47,15 +60,27 @@ void	rtrim_spaces(char *c)
 	}
 }
 
-/*
- * Delete all left spaces from given string
- */ 
+/******************************************************************************
+ *                                                                            *
+ * Function: ltrim_spaces                                                     *
+ *                                                                            *
+ * Purpose: delete all left spaces for the string                             *
+ *                                                                            *
+ * Parameters: c - string to trim spaces                                      *
+ *                                                                            *
+ * Return value: string without left spaces                                   *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 void	ltrim_spaces(char *c)
 {
-	int i,spaces;
-
+	int i;
 /* Number of left spaces */
-	spaces=0;
+	int spaces=0;
+
 	for(i=0;c[i]!=0;i++)
 	{
 		if( c[i] == ' ')
@@ -72,16 +97,42 @@ void	ltrim_spaces(char *c)
 	c[strlen(c)-spaces]=0;
 }
 
-/*
- * Delete all left and right spaces from given string
- */ 
+/******************************************************************************
+ *                                                                            *
+ * Function: lrtrim_spaces                                                    *
+ *                                                                            *
+ * Purpose: delete all left and right spaces for the string                   *
+ *                                                                            *
+ * Parameters: c - string to trim spaces                                      *
+ *                                                                            *
+ * Return value: string without left and right spaces                         *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 void	lrtrim_spaces(char *c)
 {
 	ltrim_spaces(c);
 	rtrim_spaces(c);
 }
 
-/* Convert string to double. This function supports prefixes 'K', 'M', 'G' */
+/******************************************************************************
+ *                                                                            *
+ * Function: str2double                                                       *
+ *                                                                            *
+ * Purpose: convert string to double                                          *
+ *                                                                            *
+ * Parameters: str - string to convert                                        *
+ *                                                                            *
+ * Return value: converted double value                                       *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: the function automatically processes prefixes 'K','M','G'        *
+ *                                                                            *
+ ******************************************************************************/
 double	str2double(char *str)
 {
 	if(str[strlen(str)-1] == 'K')
@@ -102,9 +153,22 @@ double	str2double(char *str)
 	return atof(str);
 }
 
-/*
- * Return 0 if arguments are equal (differs less than 0.000001), 1 - otherwise
- */
+/******************************************************************************
+ *                                                                            *
+ * Function: cmp_double                                                       *
+ *                                                                            *
+ * Purpose: compares two float values                                         *
+ *                                                                            *
+ * Parameters: a,b - floats to compare                                        *
+ *                                                                            *
+ * Return value:  0 - the values are equal                                    *
+ *                1 - otherwise                                               *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: equal == differs less than 0.000001                              *
+ *                                                                            *
+ ******************************************************************************/
 int	cmp_double(double a,double b)
 {
 	if(fabs(a-b)<0.000001)
@@ -114,11 +178,22 @@ int	cmp_double(double a,double b)
 	return	1;
 }
 
-/*
- * Return SUCCEED if parameter has format X.X<prefix> or X, where X is [0..9]{1,n}
- * In other words, parameter is float number :)
- * Prefix: K,M,G (kilo, mega, giga)
- */
+/******************************************************************************
+ *                                                                            *
+ * Function: is_double                                                        *
+ *                                                                            *
+ * Purpose: check if the string is float                                      *
+ *                                                                            *
+ * Parameters: c - string to check                                            *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is float                               *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: the functions support prefixes K,M,G                             *
+ *                                                                            *
+ ******************************************************************************/
 int	is_double(char *c)
 {
 	int i;
@@ -154,9 +229,21 @@ int	is_double(char *c)
 	return SUCCEED;
 }
 
-/*
- * Delete all right EOL characters from
- */ 
+/******************************************************************************
+ *                                                                            *
+ * Function: delete_reol                                                      *
+ *                                                                            *
+ * Purpose: delete all right EOL characters                                   *
+ *                                                                            *
+ * Parameters: c - string to delete EOL                                       *
+ *                                                                            *
+ * Return value:  the string wtihout EOL                                      *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 void	delete_reol(char *c)
 {
 	int i,j;
@@ -173,9 +260,21 @@ void	delete_reol(char *c)
 	zabbix_log(LOG_LEVEL_DEBUG, "After deleting EOL:%s", c );
 }
 
-/*
- * Delete all spaces from given string
- */ 
+/******************************************************************************
+ *                                                                            *
+ * Function: delete_spaces                                                    *
+ *                                                                            *
+ * Purpose: delete all spaces                                                 *
+ *                                                                            *
+ * Parameters: c - string to delete spaces                                    *
+ *                                                                            *
+ * Return value:  the string wtihout spaces                                   *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 void	delete_spaces(char *c)
 {
 	int i,j;
@@ -183,7 +282,6 @@ void	delete_spaces(char *c)
 	zabbix_log( LOG_LEVEL_DEBUG, "Before deleting spaces:%s", c );
 
 	j=0;
-/*	for(i=0;i<(int)strlen(c);i++)*/
 	for(i=0;c[i]!=0;i++)
 	{
 		if( c[i] != ' ')
@@ -197,16 +295,29 @@ void	delete_spaces(char *c)
 	zabbix_log(LOG_LEVEL_DEBUG, "After deleting spaces:%s", c );
 }
 
-/*
- * Locate character in given string. FAIL - not found, otherwise character position is returned
- */
+/******************************************************************************
+ *                                                                            *
+ * Function: find_char                                                        *
+ *                                                                            *
+ * Purpose: locate a character in the string                                  *
+ *                                                                            *
+ * Parameters: str - string                                                   *
+ *             c - character to find                                          *
+ *                                                                            *
+ * Return value:  position of the character                                   *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 int	find_char(char *str,char c)
 {
 	int i;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Before find_char:%s[%c]", str, c );
 
-/*	for(i=0;i<(int)strlen(str);i++)*/
 	for(i=0;str[i]!=0;i++)
 	{
 		if(str[i]==c) return i;
@@ -214,10 +325,24 @@ int	find_char(char *str,char c)
 	return	FAIL;
 }
 
-/*
- * Evaluate simple expression
- * Simple expression is either <float> or <float> <operator> <float>
- */ 
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_simple                                                  *
+ *                                                                            *
+ * Purpose: evaluate simple expression                                        *
+ *                                                                            *
+ * Parameters: exp - expression string                                        *
+ *                                                                            *
+ * Return value:  SUCCEED - evaluated succesfully, result - value of the exp  *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: format: <float> or <float> <operator> <float>                    *
+ *                                                                            *
+ *           It is recursive function!                                        *
+ *                                                                            *
+ ******************************************************************************/
 int	evaluate_simple (double *result,char *exp)
 {
 	double	value1,value2;
@@ -226,7 +351,7 @@ int	evaluate_simple (double *result,char *exp)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Evaluating simple expression [%s]", exp );
 
-/* Remove left and right spaces */
+	/* Remove left and right spaces */
 	lrtrim_spaces(exp);
 
 	if( is_double(exp) == SUCCEED )
@@ -244,7 +369,6 @@ int	evaluate_simple (double *result,char *exp)
 		strscpy( first, exp );
 		first[l]=0;
 		j=0;
-/*		for(i=l+1;i<(int)strlen(exp);i++)*/
 		for(i=l+1;exp[i]!=0;i++)
 		{
 			second[j]=exp[i];
@@ -283,7 +407,6 @@ int	evaluate_simple (double *result,char *exp)
 		strscpy( first, exp );
 		first[l]=0;
 		j=0;
-/*		for(i=l+1;i<(int)strlen(exp);i++)*/
 		for(i=l+1;exp[i]!=0;i++)
 		{
 			second[j]=exp[i];
@@ -320,7 +443,6 @@ int	evaluate_simple (double *result,char *exp)
 		strscpy(first, exp);
 		first[l]=0;
 		j=0;
-/*		for(i=l+1;i<(int)strlen(exp);i++)*/
 		for(i=l+1;exp[i]!=0;i++)
 		{
 			second[j]=exp[i];
@@ -356,7 +478,6 @@ int	evaluate_simple (double *result,char *exp)
 		strscpy(first, exp);
 		first[l]=0;
 		j=0;
-/*		for(i=l+1;i<(int)strlen(exp);i++)*/
 		for(i=l+1;exp[i]!=0;i++)
 		{
 			second[j]=exp[i];
@@ -394,7 +515,6 @@ int	evaluate_simple (double *result,char *exp)
 		strscpy(first, exp);
 		first[l]=0;
 		j=0;
-/*		for(i=l+1;i<(int)strlen(exp);i++)*/
 		for(i=l+1;exp[i]!=0;i++)
 		{
 			second[j]=exp[i];
@@ -423,7 +543,6 @@ int	evaluate_simple (double *result,char *exp)
 		strscpy(first, exp);
 		first[l]=0;
 		j=0;
-/*		for(i=l+1;i<(int)strlen(exp);i++)*/
 		for(i=l+1;exp[i]!=0;i++)
 		{
 			second[j]=exp[i];
@@ -461,7 +580,6 @@ int	evaluate_simple (double *result,char *exp)
 		strscpy(first, exp);
 		first[l]=0;
 		j=0;
-/*		for(i=l+1;i<(int)strlen(exp);i++)*/
 		for(i=l+1;exp[i]!=0;i++)
 		{
 			second[j]=exp[i];
@@ -490,7 +608,6 @@ int	evaluate_simple (double *result,char *exp)
 		strscpy(first, exp);
 		first[l]=0;
 		j=0;
-/*		for(i=l+1;i<(int)strlen(exp);i++)*/
 		for(i=l+1;exp[i]!=0;i++)
 		{
 			second[j]=exp[i];
@@ -519,7 +636,6 @@ int	evaluate_simple (double *result,char *exp)
 		strscpy(first, exp);
 		first[l]=0;
 		j=0;
-/*		for(i=l+1;i<(int)strlen(exp);i++)*/
 		for(i=l+1;exp[i]!=0;i++)
 		{
 			second[j]=exp[i];
@@ -555,7 +671,6 @@ int	evaluate_simple (double *result,char *exp)
 		strscpy(first, exp);
 		first[l]=0;
 		j=0;
-/*		for(i=l+1;i<(int)strlen(exp);i++)*/
 		for(i=l+1;exp[i]!=0;i++)
 		{
 			second[j]=exp[i];
@@ -592,9 +707,22 @@ int	evaluate_simple (double *result,char *exp)
 	return SUCCEED;
 }
 
-/*
- * Evaluate expression. Example of input expression: ({15}>10)|({123}=1) 
- */ 
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate                                                         *
+ *                                                                            *
+ * Purpose: evaluate simplified expression                                    *
+ *                                                                            *
+ * Parameters: exp - expression string                                        *
+ *                                                                            *
+ * Return value:  SUCCEED - evaluated succesfully, result - value of the exp  *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: example: ({15}>10)|({123}=1)                                     *
+ *                                                                            *
+ ******************************************************************************/
 int	evaluate(int *result,char *exp)
 {
 	double	value;
@@ -665,9 +793,25 @@ int	evaluate(int *result,char *exp)
 	return SUCCEED;
 }
 
-/* Translate {DATE}, {TIME} */
-/* Doesn't work yet */
-void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_simple_macros                                         *
+ *                                                                            *
+ * Purpose: substitute simple macros in data string with real values          *
+ *                                                                            *
+ * Parameters: data - data string                                             *
+ *             trigger - trigger structure                                    *
+ *             action - action structure                                      *
+ *                                                                            *
+ * Return value:  SUCCEED - substituted succesfully, data - updated data      *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: {DATE},{TIME},{HOSTNAME},{IPADDRESS},{STATUS}                    *
+ *                                                                            *
+ ******************************************************************************/
+void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data)
 {
 	int	found = SUCCEED;
 	char	*s;
@@ -680,11 +824,11 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 
 	DB_RESULT *result;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros [%s]",exp);
+	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros [%s]",data);
 
 	while (found == SUCCEED)
 	{
-		strscpy(str, exp);
+		strscpy(str, data);
 
 
 		if( (s = strstr(str,"{HOSTNAME}")) != NULL )
@@ -708,9 +852,9 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 			}
 
 			s[0]=0;
-			strcpy(exp, str);
-			strncat(exp, tmp, MAX_STRING_LEN);
-			strncat(exp, s+strlen("{HOSTNAME}"), MAX_STRING_LEN);
+			strcpy(data, str);
+			strncat(data, tmp, MAX_STRING_LEN);
+			strncat(data, s+strlen("{HOSTNAME}"), MAX_STRING_LEN);
 
 			found = SUCCEED;
 		}
@@ -734,9 +878,9 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 			}
 
 			s[0]=0;
-			strcpy(exp, str);
-			strncat(exp, tmp, MAX_STRING_LEN);
-			strncat(exp, s+strlen("{IPADDRESS}"), MAX_STRING_LEN);
+			strcpy(data, str);
+			strncat(data, tmp, MAX_STRING_LEN);
+			strncat(data, s+strlen("{IPADDRESS}"), MAX_STRING_LEN);
 
 			found = SUCCEED;
 		}
@@ -747,9 +891,9 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 			snprintf(tmp,sizeof(tmp)-1,"%.4d.%.2d.%.2d",tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday);
 
 			s[0]=0;
-			strcpy(exp, str);
-			strncat(exp, tmp, MAX_STRING_LEN);
-			strncat(exp, s+strlen("{DATE}"), MAX_STRING_LEN);
+			strcpy(data, str);
+			strncat(data, tmp, MAX_STRING_LEN);
+			strncat(data, s+strlen("{DATE}"), MAX_STRING_LEN);
 
 			found = SUCCEED;
 		}
@@ -760,9 +904,9 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 			snprintf(tmp,sizeof(tmp)-1,"%.2d:%.2d:%.2d",tm->tm_hour,tm->tm_min,tm->tm_sec);
 
 			s[0]=0;
-			strcpy(exp, str);
-			strncat(exp, tmp, MAX_STRING_LEN);
-			strncat(exp, s+strlen("{TIME}"), MAX_STRING_LEN);
+			strcpy(data, str);
+			strncat(data, tmp, MAX_STRING_LEN);
+			strncat(data, s+strlen("{TIME}"), MAX_STRING_LEN);
 
 			found = SUCCEED;
 		}
@@ -779,9 +923,9 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 			}
 
 			s[0]=0;
-			strcpy(exp, str);
-			strncat(exp, tmp, MAX_STRING_LEN);
-			strncat(exp, s+strlen("{STATUS}"), MAX_STRING_LEN);
+			strcpy(data, str);
+			strncat(data, tmp, MAX_STRING_LEN);
+			strncat(data, s+strlen("{STATUS}"), MAX_STRING_LEN);
 
 			found = SUCCEED;
 		}
@@ -791,16 +935,30 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 		}
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Result expression [%s]", exp );
+	zabbix_log( LOG_LEVEL_DEBUG, "Result expression [%s]", data );
 }
 
-/*
- * Translate "{127.0.0.1:system[procload].last(0)}" to "1.34" 
- */
-/*
- * Make this function more secure. Get rid of snprintf. Utilise substr()
-*/
-int	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_macros                                                *
+ *                                                                            *
+ * Purpose: substitute macros in data string with real values                 *
+ *                                                                            *
+ * Parameters: data - data string                                             *
+ *             trigger - trigger structure                                    *
+ *             action - action structure                                      *
+ *                                                                            *
+ * Return value:  SUCCEED - substituted succesfully, data - updated data      *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: example: "{127.0.0.1:system[procload].last(0)}" to "1.34"        *
+ *                                                                            *
+ * Make this function more secure. Get rid of snprintf. Utilise substr()      *
+ *                                                                            *
+ ******************************************************************************/
+int	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data)
 {
 	char	res[MAX_STRING_LEN];
 	char	macro[MAX_STRING_LEN];
@@ -813,32 +971,32 @@ int	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 	int	r,l;
 	int	r1,l1;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_macros([%s])",exp);
+	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_macros([%s])",data);
 
-	substitute_simple_macros(trigger, action, exp);
+	substitute_simple_macros(trigger, action, data);
 
-	while( find_char(exp,'{') != FAIL )
+	while( find_char(data,'{') != FAIL )
 	{
-		l=find_char(exp,'{');
-		r=find_char(exp,'}');
+		l=find_char(data,'{');
+		r=find_char(data,'}');
 
 		if( r == FAIL )
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Cannot find right bracket. Expression:[%s]", exp );
-			zabbix_syslog("Cannot find right bracket. Expression:[%s]", exp );
+			zabbix_log( LOG_LEVEL_WARNING, "Cannot find right bracket. Expression:[%s]", data );
+			zabbix_syslog("Cannot find right bracket. Expression:[%s]", data );
 			return	FAIL;
 		}
 
 		if( r < l )
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Right bracket is before left one. Expression:[%s]", exp );
-			zabbix_syslog("Right bracket is before left one. Expression:[%s]", exp );
+			zabbix_log( LOG_LEVEL_WARNING, "Right bracket is before left one. Expression:[%s]", data );
+			zabbix_syslog("Right bracket is before left one. Expression:[%s]", data );
 			return	FAIL;
 		}
 
 		for(i=l+1;i<r;i++)
 		{
-			macro[i-l-1]=exp[i];
+			macro[i-l-1]=data[i];
 		} 
 		macro[r-l-1]=0;
 
@@ -896,34 +1054,47 @@ int	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *exp)
 
 		zabbix_log( LOG_LEVEL_DEBUG, "Parameter:%s", parameter );
 
-		i=get_lastvalue(value,host,key,function,parameter);
+		i=evaluate_FUNCTION2(value,host,key,function,parameter);
 		zabbix_log( LOG_LEVEL_DEBUG, "Value3 [%s]", value );
 
 
-		zabbix_log( LOG_LEVEL_DEBUG, "Value4 [%s]", exp );
-		exp[l]='%';
-		exp[l+1]='s';
+		zabbix_log( LOG_LEVEL_DEBUG, "Value4 [%s]", data );
+		data[l]='%';
+		data[l+1]='s';
 
-		zabbix_log( LOG_LEVEL_DEBUG, "Value41 [%s]", exp+l+2 );
-		zabbix_log( LOG_LEVEL_DEBUG, "Value42 [%s]", exp+r+1 );
-		strcpy(exp+l+2,exp+r+1);
+		zabbix_log( LOG_LEVEL_DEBUG, "Value41 [%s]", data+l+2 );
+		zabbix_log( LOG_LEVEL_DEBUG, "Value42 [%s]", data+r+1 );
+		strcpy(data+l+2,data+r+1);
 
-		zabbix_log( LOG_LEVEL_DEBUG, "Value5 [%s]", exp );
+		zabbix_log( LOG_LEVEL_DEBUG, "Value5 [%s]", data );
 
-		snprintf(res,sizeof(res)-1,exp,value);
-		strcpy(exp,res);
-/*		delete_spaces(exp); */
-		zabbix_log( LOG_LEVEL_DEBUG, "Expression4:[%s]", exp );
+		snprintf(res,sizeof(res)-1,data,value);
+		strcpy(data,res);
+/*		delete_spaces(data); */
+		zabbix_log( LOG_LEVEL_DEBUG, "Expression4:[%s]", data );
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Result expression:%s", exp );
+	zabbix_log( LOG_LEVEL_DEBUG, "Result expression:%s", data );
 
 	return SUCCEED;
 }
 
-/*
- * Translate "({15}>10)|({123}=0)" to "(6.456>10)|(0=0)" 
- */
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_functions                                             *
+ *                                                                            *
+ * Purpose: substitute expression functions with theirs values                *
+ *                                                                            *
+ * Parameters: exp - expression string                                        *
+ *                                                                            *
+ * Return value:  SUCCEED - evaluated succesfully, exp - updated expression   *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: example: "({15}>10)|({123}=0)" => "(6.456>10)|(0=0)              *
+ *                                                                            *
+ ******************************************************************************/
 int	substitute_functions(char *exp)
 {
 	double	value;
@@ -990,9 +1161,23 @@ int	substitute_functions(char *exp)
 	return SUCCEED;
 }
 
-/*
- * Evaluate complex expression. Example: ({127.0.0.1:system[procload].last(0)}>1)|({127.0.0.1:system[procload].max(300)}>3)
- */ 
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_expression                                              *
+ *                                                                            *
+ * Purpose: evaluate expression                                               *
+ *                                                                            *
+ * Parameters: exp - expression string                                        *
+ *                                                                            *
+ * Return value:  SUCCEED - evaluated succesfully, result - value of the exp  *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: example: ({a0:system[procload].last(0)}>1)|                      *
+ *                    ({a0:system[procload].max(300)}>3)                      *
+ *                                                                            *
+ ******************************************************************************/
 int	evaluate_expression(int *result,char *expression)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_expression(%s)", expression );
@@ -1009,4 +1194,3 @@ int	evaluate_expression(int *result,char *expression)
 	zabbix_syslog("Evaluation of expression [%s] failed", expression );
 	return FAIL;
 }
-
