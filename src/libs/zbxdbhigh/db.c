@@ -1389,3 +1389,59 @@ int     DBget_default_escalation_id()
 
 	return res;
 }
+
+/*-----------------------------------------------------------------------------
+ *
+ * Function   : DBget_trigger_by_triggerid 
+ *
+ * Purpose    : get trigger data from DBby triggerid
+ *
+ * Parameters : triggerid - ID of the trigger
+ *
+ * Returns    : SUCCEED - trigger data retrieved sucesfully
+ *              FAIL - otherwise
+ *
+ * Author     : Alexei Vladishev
+ *
+ * Comments   :
+ *
+ ----------------------------------------------------------------------------*/
+int	DBget_trigger_by_triggerid(int triggerid, DB_TRIGGER *trigger)
+{
+	char	sql[MAX_STRING_LEN];
+	DB_RESULT	*result;
+
+	int	i;
+	int	ret = SUCCEED;
+
+	zabbix_log( LOG_LEVEL_WARNING, "In DBget_trigger_by_triggerid [%d]", triggerid);
+	sleep(1);
+	zabbix_log( LOG_LEVEL_WARNING, "In DBget_trigger_by_triggerid [%d] Sizeoftrigger->description [%d]", triggerid,sizeof(trigger->description));
+
+	snprintf(sql,sizeof(sql)-1,"select triggerid,expression,status,priority,value,description from triggers where triggerid=%d", triggerid);
+
+	result = DBselect(sql);
+
+	if(DBnum_rows(result) == 1)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Exp [%s][%s]", DBget_field(result,0,1), DBget_field(result,0,5));
+
+		trigger->triggerid=atoi(DBget_field(result,0,0));
+		strscpy(trigger->expression, DBget_field(result,0,1));
+		zabbix_log( LOG_LEVEL_WARNING, "Exp [%s][%s]", DBget_field(result,0,1), trigger->expression);
+
+		trigger->status=atoi(DBget_field(result,0,2));
+		trigger->priority=atoi(DBget_field(result,0,3));
+		trigger->value=atoi(DBget_field(result,0,4));
+		strscpy(trigger->description, DBget_field(result,0,5));
+		zabbix_log( LOG_LEVEL_WARNING, "Desc [%s][%s]", DBget_field(result,0,5), trigger->description);
+	}
+	else
+	{
+		ret = FAIL;
+	}
+
+	DBfree_result(result);
+
+	return ret;
+}

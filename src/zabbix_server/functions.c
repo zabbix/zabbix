@@ -350,12 +350,12 @@ void	update_triggers(int itemid)
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 		trigger.triggerid=atoi(DBget_field(result,i,0));
-		trigger.expression=DBget_field(result,i,1);
+		strscpy(trigger.expression,DBget_field(result,i,1));
 		trigger.status=atoi(DBget_field(result,i,2));
 		trigger.priority=atoi(DBget_field(result,i,4));
-
 		trigger.value=atoi(DBget_field(result,i,5));
-		trigger.description=DBget_field(result,i,6);
+		strscpy(trigger.description,DBget_field(result,i,6));
+
 		strscpy(exp, trigger.expression);
 		if( evaluate_expression(&exp_value, exp) != 0 )
 		{
