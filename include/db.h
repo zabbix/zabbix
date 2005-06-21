@@ -80,6 +80,14 @@ DB_HOST
 #define	MAX_ITEM_SNMP_COMMUNITY_LEN	64
 #define	MAX_ITEM_SNMP_OID_LEN	255
 
+/* Trigger related defines */
+#define TRIGGER_DESCRIPTION_LEN		255
+#define TRIGGER_DESCRIPTION_LEN_MAX	TRIGGER_DESCRIPTION_LEN+1
+#define TRIGGER_EXPRESSION_LEN		255
+#define TRIGGER_EXPRESSION_LEN_MAX	TRIGGER_EXPRESSION_LEN+1
+#define TRIGGER_URL_LEN			255
+#define TRIGGER_URL_LEN_MAX		TRIGGER_URL_LEN+1
+
 DB_ITEM
 {
 	int	itemid;
@@ -164,8 +172,8 @@ DB_MEDIATYPE
 DB_TRIGGER
 {
 	int	triggerid;
-	char	*expression;
-	char	*description;
+	char	expression[TRIGGER_EXPRESSION_LEN_MAX];
+	char	description[TRIGGER_DESCRIPTION_LEN_MAX];
 	int	status;
 	int	value;
 	int	prevvalue;
@@ -263,4 +271,6 @@ int	DBget_queue_count(void);
 
 void    DBescape_string(char *from, char *to, int maxlen);
 void    DBget_item_from_db(DB_ITEM *item,DB_RESULT *result, int row);
+
+int	DBget_trigger_by_triggerid(int triggerid, DB_TRIGGER *trigger);
 #endif
