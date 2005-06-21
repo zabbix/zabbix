@@ -221,6 +221,7 @@
 		$showsla=0;
 		$goodsla=99.05;
 		$sortorder=0;
+		$algorithm=0;
 		unset($triggerid);
 	}
 
@@ -265,7 +266,7 @@
 			echo "<OPTION VALUE='1' SELECTED>".S_MAX_BIG;
 			echo "<OPTION VALUE='2'>".S_MIN_BIG;
 		}
-		else if($_GET["algorithm"] == SERVICE_ALGORITHM_MIN)
+		else if($algorithm == SERVICE_ALGORITHM_MIN)
 		{
 			echo "<OPTION VALUE='0'>".S_DO_NOT_CALCULATE;
 			echo "<OPTION VALUE='1'>".S_MAX_BIG;
