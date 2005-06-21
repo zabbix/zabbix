@@ -62,13 +62,15 @@ static int process_escalation(DB_ESCALATION_LOG *escalation_log)
 	DB_RESULT		*result;
 	DB_ESCALATION_RULE	escalation_rule;
 
+	DB_TRIGGER	trigger;
+
 	zabbix_log( LOG_LEVEL_WARNING, "In process_escalation()");
 
 	snprintf(sql,sizeof(sql)-1,"select escalationruleid, escalationid,level,period,delay,actiontype from escalation_rules where escalationid=%d and level>=%d order by level", escalation_log->escalationid, escalation_log->level);
 	zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
 	result = DBselect(sql);
 
-	processed_level=escalation_log->level;
+/*	processed_level=escalation_log->level;*/
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
@@ -79,7 +81,7 @@ static int process_escalation(DB_ESCALATION_LOG *escalation_log)
 		escalation_rule.delay=atoi(DBget_field(result,i,4));
 		escalation_rule.actiontype=atoi(DBget_field(result,i,5));
 
-		if(processed_level > escalation_rule.level)	break;
+/*		if(processed_level > escalation_rule.level)	break;*/
 
 		zabbix_log( LOG_LEVEL_WARNING, "Selected escalationrule ID [%d]", escalation_rule.escalationruleid);
 		now=time(NULL);
@@ -102,7 +104,14 @@ static int process_escalation(DB_ESCALATION_LOG *escalation_log)
 					break;
 				case ESCALATION_ACTION_EXEC_ACTION:
 					zabbix_log( LOG_LEVEL_WARNING, "ESCALATION_ACTION_EXEC_ACTION");
-/*					apply_actions_old(DB_TRIGGER *trigger,int alarmid,int trigger_value)*/
+					if(DBget_trigger_by_triggerid(escalation_log->triggerid,&trigger) == SUCCEED)
+					{
+						apply_actions_old(&trigger,escalation_log->alarmid,TRIGGER_VALUE_TRUE);
+					}
+					else
+					{
+						zabbix_log( LOG_LEVEL_WARNING, "Cannot execute actions. No trigger with triggerid [%d]", escalation_log->triggerid);
+					}
 					break;
 				case ESCALATION_ACTION_INC_SEVERITY:
 					zabbix_log( LOG_LEVEL_WARNING, "ESCALATION_ACTION_INC_SEVERITY");
@@ -143,7 +152,22 @@ static int process_escalation(DB_ESCALATION_LOG *escalation_log)
 	return SUCCEED;
 }
 
-int main_escalator_loop()
+/*-----------------------------------------------------------------------------
+ *
+ * Function   : main_escalator_loop 
+ *
+ * Purpose    : periodically process active escalations
+ *
+ * Parameters :
+ *
+ * Returns    : 
+ *
+ * Author     : Alexei Vladishev
+ *
+ * Comments   : Never returns
+ *
+ ----------------------------------------------------------------------------*/
+void main_escalator_loop()
 {
 	char	sql[MAX_STRING_LEN];
 
