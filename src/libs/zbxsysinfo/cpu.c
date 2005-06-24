@@ -123,6 +123,10 @@
 	#include <mach/mach_host.h>
 #endif
 
+/* AIX CPU */
+#ifdef HAVE_KNLIST_H
+	#include <knlist.h>
+#endif
 
 #ifdef HAVE_KSTAT_H
 	#include <kstat.h>
@@ -193,6 +197,41 @@ int	CPUSYSTEM15(const char *cmd, const char *param,double  *value)
 {
 	return	get_stat("cpu[system15]",value);
 }
+
+/* AIX CPU info */
+#ifdef HAVE_KNLIST_H
+static int getloadavg_kmem(double loadavg[], int nelem)
+{
+	struct nlist nl;
+	int kmem, i;
+	long avenrun[3];
+
+	nl.n_name = "avenrun";
+	nl.n_value = 0;
+
+	if(knlist(&nl, 1, sizeof(nl)))
+	{
+		return FAIL;
+	}
+	if((kmem = open("/dev/kmem", 0, 0)) <= 0)
+	{
+		return FAIL;
+	}
+
+	if(pread(kmem, avenrun, sizeof(avenrun), nl.n_value) <
+				sizeof(avenrun))
+	{
+		return FAIL;
+	}
+
+	for(i=0;i<nelem;i++)
+	{
+		loadavg[i] = (double) avenrun[i] / 65535;
+	}
+	return SUCCEED;
+}
+#endif
+
 int	PROCLOAD(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_GETLOADAVG
@@ -242,7 +281,19 @@ int	PROCLOAD(const char *cmd, const char *parameter,double  *value)
         *value=(double)kn->value.ul/256.0;
 	return SYSINFO_RET_OK;
 #else
+#ifdef HAVE_KNLIST_H
+	double loadavg[3];
+
+	if(getloadavg_kmem(loadavg,3) == FAIL)
+	{
+		return STSINFO_RET_FAIL;
+	}
+
+        *value=loadavg[0];
+	return SYSINFO_RET_OK;
+#else
 	return	SYSINFO_RET_FAIL;
+#endif
 #endif
 #endif
 #endif
@@ -298,7 +349,19 @@ int	PROCLOAD5(const char *cmd, const char *parameter,double  *value)
         *value=(double)kn->value.ul/256.0;
 	return SYSINFO_RET_OK;
 #else
+#ifdef HAVE_KNLIST_H
+	double loadavg[3];
+
+	if(getloadavg_kmem(loadavg,3) == FAIL)
+	{
+		return STSINFO_RET_FAIL;
+	}
+
+        *value=loadavg[1];
+	return SYSINFO_RET_OK;
+#else
 	return	SYSINFO_RET_FAIL;
+#endif
 #endif
 #endif
 #endif
@@ -354,7 +417,19 @@ int	PROCLOAD15(const char *cmd, const char *parameter,double  *value)
         *value=(double)kn->value.ul/256.0;
 	return SYSINFO_RET_OK;
 #else
+#ifdef HAVE_KNLIST_H
+	double loadavg[3];
+
+	if(getloadavg_kmem(loadavg,3) == FAIL)
+	{
+		return STSINFO_RET_FAIL;
+	}
+
+        *value=loadavg[2];
+	return SYSINFO_RET_OK;
+#else
 	return	SYSINFO_RET_FAIL;
+#endif
 #endif
 #endif
 #endif
