@@ -26,6 +26,6 @@ extern  int     server_num;
 extern  int     CONFIG_TIMEOUT;
 extern  int     CONFIG_SUCKERD_FORKS;
 
-int main_escalator_loop();
+void main_poller_loop();
 
 #endif
