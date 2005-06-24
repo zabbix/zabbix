@@ -6,6 +6,6 @@ autoheader
 automake -a
 automake
 # Change ./configure options if needed
-./configure --with-mysql --prefix=/home/zabbix/zabbix
+./configure --with-mysql --prefix=/home/alexei/zabbix
 make
 make install
