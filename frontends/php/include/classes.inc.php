@@ -45,8 +45,6 @@
 		var $count;
 		// Number of items
 		var $num;
-		// 1 - if thereis nothing to draw
-		var $nodata;
 
 		var $header;
 
@@ -107,7 +105,6 @@
 			$this->shiftY=17;
 			$this->border=1;
 			$this->num=0;
-			$this->nodata=1;
 			$this->yaxistype=GRAPH_YAXIS_TYPE_CALCULATED;
 
 			$this->count=array();
@@ -298,23 +295,17 @@
 				DashedLine($this->im,$i*$this->sizeX/24+$this->shiftX,$this->shiftY,$i*$this->sizeX/24+$this->shiftX,$this->sizeY+$this->shiftY,$this->colors["Gray"]);
 			}
 
-// Some data exists, so draw time line
-
-// Draw the grid regardless of data
-//			if($this->nodata==0)
+			$old_day=-1;
+			for($i=0;$i<=24;$i++)
 			{
-				$old_day=-1;
-				for($i=0;$i<=24;$i++)
+				ImageStringUp($this->im, 1,$i*$this->sizeX/24+$this->shiftX-3, $this->sizeY+$this->shiftY+57, date("      H:i",$this->from_time+$i*$this->period/24) , $this->colors["Black No Alpha"]);
+
+				$new_day=date("d",$this->from_time+$i*$this->period/24);
+				if( ($old_day != $new_day) ||($i==24))
 				{
-					ImageStringUp($this->im, 1,$i*$this->sizeX/24+$this->shiftX-3, $this->sizeY+$this->shiftY+57, date("      H:i",$this->from_time+$i*$this->period/24) , $this->colors["Black No Alpha"]);
+					$old_day=$new_day;
+					ImageStringUp($this->im, 1,$i*$this->sizeX/24+$this->shiftX-3, $this->sizeY+$this->shiftY+57, date("m.d H:i",$this->from_time+$i*$this->period/24) , $this->colors["Dark Red No Alpha"]);
 
-					$new_day=date("d",$this->from_time+$i*$this->period/24);
-					if( ($old_day != $new_day) ||($i==24))
-					{
-						$old_day=$new_day;
-						ImageStringUp($this->im, 1,$i*$this->sizeX/24+$this->shiftX-3, $this->sizeY+$this->shiftY+57, date("m.d H:i",$this->from_time+$i*$this->period/24) , $this->colors["Dark Red No Alpha"]);
-
-					}
 				}
 			}
 		}
@@ -329,17 +320,6 @@
 				ImageDestroy($this->im); 
 				exit;
 			}
-		}
-
-		function noDataFound()
-		{
-			$this->drawGrid();
-
-			ImageString($this->im, 2,$this->sizeX/2-50,                $this->sizeY+$this->shiftY+40, "NO DATA FOUND FOR THIS PERIOD" , $this->colors["Dark Red No Alpha"]);
-			ImageStringUp($this->im,0,imagesx($this->im)-10,imagesy($this->im)-50, "http://www.zabbix.com", $this->colors["Gray"]);
-			ImageOut($this->im); 
-			ImageDestroy($this->im); 
-			exit;
 		}
 
 		function drawLogo()
@@ -540,7 +520,6 @@
 				$this->max[$this->itemids[$row["itemid"]]][$i]=$row["max"];
 				$this->avg[$this->itemids[$row["itemid"]]][$i]=$row["avg"];
 				$this->clock[$this->itemids[$row["itemid"]]][$i]=$row["clock"];
-				$this->nodata=0;
 			}
 		}
 
@@ -571,16 +550,12 @@
 
 			if($this->num==0)
 			{
-				$this->noDataFound();
+//				$this->noDataFound();
 			}
 			$this->checkPermissions();
 
 			$this->selectData();
 
-			if($this->nodata==1)
-			{
-				$this->noDataFound();
-			}
 			$this->drawGrid();
 		
 			$maxX=900;
@@ -633,16 +608,9 @@
 				}
 			}
 		
-			if($this->nodata == 0)
+			for($i=0;$i<=6;$i++)
 			{
-				for($i=0;$i<=6;$i++)
-				{
-					ImageString($this->im, 1, $this->sizeX+5+$this->shiftX, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, convert_units($this->sizeY*$i/6*($maxY-$minY)/$this->sizeY+$minY,$this->items[0]["units"]) , $this->colors["Dark Red No Alpha"]);
-				}
-			}
-			else
-			{
-				ImageString($this->im, 2,$this->sizeX/2 -50,$this->sizeY+$this->shiftY+3, "NO DATA FOR THIS PERIOD" , $this->colors["Dark Red No Alpha"]);
+				ImageString($this->im, 1, $this->sizeX+5+$this->shiftX, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, convert_units($this->sizeY*$i/6*($maxY-$minY)/$this->sizeY+$minY,$this->items[0]["units"]) , $this->colors["Dark Red No Alpha"]);
 			}
 
 			$this->drawLogo();
