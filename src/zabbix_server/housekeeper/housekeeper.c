@@ -99,7 +99,7 @@ static int housekeeping_items(void)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int housekeeping_hosts(void)
+static int housekeeping_hosts(void)
 {
 	char		sql[MAX_STRING_LEN];
 	DB_RESULT	*result;
@@ -132,7 +132,7 @@ int housekeeping_hosts(void)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int housekeeping_history_and_trends(int now)
+static int housekeeping_history_and_trends(int now)
 {
 	char		sql[MAX_STRING_LEN];
 	DB_ITEM		item;
@@ -192,7 +192,7 @@ int housekeeping_history_and_trends(int now)
 	return SUCCEED;
 }
 
-int housekeeping_sessions(int now)
+static int housekeeping_sessions(int now)
 {
 	char	sql[MAX_STRING_LEN];
 
@@ -202,7 +202,7 @@ int housekeeping_sessions(int now)
 	return SUCCEED;
 }
 
-int housekeeping_alerts(int now)
+static int housekeeping_alerts(int now)
 {
 	char		sql[MAX_STRING_LEN];
 	int		alert_history;
@@ -229,7 +229,7 @@ int housekeeping_alerts(int now)
 	return res;
 }
 
-int housekeeping_alarms(int now)
+static int housekeeping_alarms(int now)
 {
 	char		sql[MAX_STRING_LEN];
 	int		alarm_history;

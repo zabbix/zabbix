@@ -63,7 +63,7 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_COUNT(char *value, DB_ITEM *item, int parameter)
+static int evaluate_COUNT(char *value, DB_ITEM *item, int parameter)
 {
 	DB_RESULT	*result;
 
@@ -112,7 +112,7 @@ int	evaluate_COUNT(char *value, DB_ITEM *item, int parameter)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_SUM(char *value,DB_ITEM	*item,int parameter)
+static int evaluate_SUM(char *value,DB_ITEM	*item,int parameter)
 {
 	DB_RESULT	*result;
 
@@ -161,7 +161,7 @@ int	evaluate_SUM(char *value,DB_ITEM	*item,int parameter)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_AVG(char *value,DB_ITEM	*item,int parameter)
+static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter)
 {
 	DB_RESULT	*result;
 
@@ -211,7 +211,7 @@ int	evaluate_AVG(char *value,DB_ITEM	*item,int parameter)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_MIN(char *value,DB_ITEM	*item,int parameter)
+static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter)
 {
 	DB_RESULT	*result;
 
@@ -261,7 +261,7 @@ int	evaluate_MIN(char *value,DB_ITEM	*item,int parameter)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_MAX(char *value,DB_ITEM *item,int parameter)
+static int evaluate_MAX(char *value,DB_ITEM *item,int parameter)
 {
 	DB_RESULT	*result;
 
@@ -311,7 +311,7 @@ int	evaluate_MAX(char *value,DB_ITEM *item,int parameter)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_DELTA(char *value,DB_ITEM *item,int parameter)
+static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter)
 {
 	DB_RESULT	*result;
 
@@ -364,7 +364,7 @@ int	evaluate_DELTA(char *value,DB_ITEM *item,int parameter)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, int flag)
+int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, int flag)
 {
 	int	ret  = SUCCEED;
 	time_t  now;
@@ -659,7 +659,7 @@ int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
  * Comments: Used for evaluation of notification macros                       *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *parameter)
+int evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *parameter)
 {
 	DB_ITEM	item;
 	DB_RESULT *result;

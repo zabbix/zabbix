@@ -62,7 +62,7 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static	int	check_time_period(char *period)
+static	int	check_time_period(const char *period)
 {
 	time_t	now;
 	char	tmp[MAX_STRING_LEN];
