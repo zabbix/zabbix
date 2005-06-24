@@ -161,15 +161,21 @@
 	{
 		global $DB_TYPE;
 
-		if($DB_TYPE=="MYSQL")
+		$ret = FAIL;
+
+		for($i=0;$i<100;$i++)
 		{
-			$sql="update hosts set status=".HOST_STATUS_DELETED.",host=concat(host,\" [DELETED]\") where hostid=$hostid";
+			if($DB_TYPE=="MYSQL")
+			{
+				$sql="update hosts set status=".HOST_STATUS_DELETED.",host=concat(host,\" [DEL$i]\") where hostid=$hostid";
+			}
+			else
+			{
+				$sql="update hosts set status=".HOST_STATUS_DELETED.",host=host||' [DEL$i]' where hostid=$hostid";
+			}
+			if($ret = DBexecute($sql))	break;
 		}
-		else
-		{
-			$sql="update hosts set status=".HOST_STATUS_DELETED.",host=host||' [DELETED]' where hostid=$hostid";
-		}
-		return	DBexecute($sql);
+		return	$ret;
 	}
 
 	function	delete_host_group($groupid)
