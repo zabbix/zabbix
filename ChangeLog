@@ -1,5 +1,6 @@
 Changes for 1.1alpha11:
 
+ - draw graph's timeline even if no data exists (Alexei)
  - added support of system[procload] under AIX. Thanks to Moisio Juha. (Alexei)
  - fixed selection of IT Service calculation algorithm (Alexei)
  - added column escalation_log.actiontype (Alexei)

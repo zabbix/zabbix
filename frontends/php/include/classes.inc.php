@@ -299,7 +299,9 @@
 			}
 
 // Some data exists, so draw time line
-			if($this->nodata==0)
+
+// Draw the grid regardless of data
+//			if($this->nodata==0)
 			{
 				$old_day=-1;
 				for($i=0;$i<=24;$i++)
@@ -333,7 +335,7 @@
 		{
 			$this->drawGrid();
 
-			ImageString($this->im, 2,$this->sizeX/2-50,                $this->sizeY+$this->shiftY+3, "NO DATA FOUND FOR THIS PERIOD" , $this->colors["Dark Red No Alpha"]);
+			ImageString($this->im, 2,$this->sizeX/2-50,                $this->sizeY+$this->shiftY+40, "NO DATA FOUND FOR THIS PERIOD" , $this->colors["Dark Red No Alpha"]);
 			ImageStringUp($this->im,0,imagesx($this->im)-10,imagesy($this->im)-50, "http://www.zabbix.com", $this->colors["Gray"]);
 			ImageOut($this->im); 
 			ImageDestroy($this->im); 
@@ -548,8 +550,8 @@
 
 //			$this->im = imagecreate($this->sizeX+$this->shiftX+61,$this->sizeY+2*$this->shiftY+40);
 
-			Header( "Content-type:  text/html"); 
-//			Header( "Content-type:  image/png"); 
+//			Header( "Content-type:  text/html"); 
+			Header( "Content-type:  image/png"); 
 			Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 
 			check_authorisation();
@@ -574,11 +576,11 @@
 			$this->checkPermissions();
 
 			$this->selectData();
+
 			if($this->nodata==1)
 			{
 				$this->noDataFound();
 			}
-
 			$this->drawGrid();
 		
 			$maxX=900;
