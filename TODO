@@ -9,7 +9,6 @@
  - new function for item status to enable sending of notification in case if an item changes status to unknown (for example)
  - housekeeper. Set item.housekeep to '0' for deleted items
  - fix templates for complex triggers
- - do not show deleted hosts & items
  - do zabbix_sender for windows
 
 ZABBIX 1.1:
