@@ -240,6 +240,21 @@ int	DBinsert_id()
 }
 
 /*
+ * Returs number of affected rows of last select, update, delete or replace
+ */
+long    DBaffected_rows()
+{
+#ifdef  HAVE_MYSQL
+	/* It actually returns my_ulonglong */
+	return (long)mysql_affected_rows(&mysql);
+#endif
+#ifdef  HAVE_PGSQL
+	NOT IMPLEMENTED YET
+#endif
+}
+
+
+/*
  * Return SUCCEED if result conains no records
  */ 
 /*int	DBis_empty(DB_RESULT *result)
