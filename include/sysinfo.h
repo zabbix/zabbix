@@ -107,6 +107,7 @@ int	SHAREDMEM(const char *cmd, const char *parameter,double  *value);
 int	TOTALMEM(const char *cmd, const char *parameter,double  *value);
 int	PROCCNT(const char *cmd, const char *parameter,double  *value);
 int	PROCCOUNT(const char *cmd, const char *parameter,double  *value);
+
 int	PROCLOAD(const char *cmd, const char *parameter,double  *value);
 int	PROCLOAD5(const char *cmd, const char *parameter,double  *value);
 int	PROCLOAD15(const char *cmd, const char *parameter,double  *value);
