@@ -177,11 +177,11 @@ int	get_value_agent(double *result,char *result_str,DB_ITEM *item,char *error,in
 	}
 
 	/* Should be deleted in Zabbix 1.0 stable */
-	if( cmp_double(*result,NOTSUPPORTED) == 0)
+/*	if( cmp_double(*result,NOTSUPPORTED) == 0)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "NOTSUPPORTED1 [%s]", c );
 		return NOTSUPPORTED;
-	}
+	}*/
 	if( strcmp(c,"ZBX_NOTSUPPORTED") == 0)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "NOTSUPPORTED2 [%s]", c );
