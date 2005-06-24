@@ -277,7 +277,7 @@ int get_values(void)
 	return SUCCEED;
 }
 
-int main_poller_loop()
+void main_poller_loop()
 {
 	int	now;
 	int	nextcheck,sleeptime;
