@@ -237,7 +237,7 @@ void    DBclose(void);
 void    DBvacuum(void);
 
 int	DBexecute( char *query );
-
+long	DBaffected_rows();
 
 DB_RESULT	*DBselect(char *query);
 char		*DBget_field(DB_RESULT *result, int rownum, int fieldnum);
