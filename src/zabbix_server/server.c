@@ -572,9 +572,9 @@ int main(int argc, char **argv)
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Sucker. SNMP:ON]",server_num);
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller. SNMP:ON]",server_num);
 #else
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Sucker. SNMP:OFF]",server_num);
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller. SNMP:OFF]",server_num);
 #endif
 
 		main_poller_loop();

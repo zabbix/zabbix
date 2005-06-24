@@ -180,7 +180,7 @@ void main_escalator_loop()
 
 	for(;;)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Selecting data from escalation_log");
+		zabbix_log( LOG_LEVEL_DEBUG, "Selecting data from escalation_log");
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("connecting to the database");
 #endif
