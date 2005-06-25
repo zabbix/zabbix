@@ -58,6 +58,7 @@ void zabbix_syslog(const char *fmt, ...)
 
 	DB_ITEM		item;
 	DB_RESULT	*result;
+	int		update_tr;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In zabbix_log()");
 
@@ -79,8 +80,11 @@ void zabbix_syslog(const char *fmt, ...)
 			value_str[MAX_STRING_LEN]=0;
 			va_end(ap);
 
-			process_new_value(&item,value_str);
-			update_triggers(item.itemid);
+			process_new_value(&item,value_str,&update_tr);
+			if(update_tr == 1)
+			{
+				update_triggers(item.itemid);
+			}
 		}
 	}
 

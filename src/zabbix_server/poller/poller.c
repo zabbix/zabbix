@@ -139,6 +139,7 @@ static void update_key_status(int hostid,int host_status)
 {
 	char		sql[MAX_STRING_LEN];
 	char		value_str[MAX_STRING_LEN];
+	int		update_tr;
 
 	DB_ITEM		item;
 	DB_RESULT	*result;
@@ -158,8 +159,11 @@ static void update_key_status(int hostid,int host_status)
 	
 		snprintf(value_str,sizeof(value_str)-1,"%d",host_status);
 
-		process_new_value(&item,value_str);
-		update_triggers(item.itemid);
+		process_new_value(&item,value_str,&update_tr);
+		if(update_tr == 1)
+		{
+			update_triggers(item.itemid);
+		}
 	}
 
 	DBfree_result(result);
@@ -179,6 +183,7 @@ int get_values(void)
 	int		now;
 	int		res;
 	DB_ITEM		item;
+	int		update_tr;
 
 	error[0]=0;
 
@@ -196,7 +201,7 @@ int get_values(void)
 		
 		if(res == SUCCEED )
 		{
-			process_new_value(&item,value_str);
+			process_new_value(&item,value_str,&update_tr);
 
 			if(item.host_network_errors>0)
 			{
@@ -216,7 +221,10 @@ int get_values(void)
 /* Why this break??? Trigger needs to be updated anyway!
 				break;*/
 			}
-		        update_triggers(item.itemid);
+			if(update_tr == 1)
+			{
+		        	update_triggers(item.itemid);
+			}
 		}
 		else if(res == NOTSUPPORTED)
 		{
