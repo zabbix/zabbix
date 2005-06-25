@@ -1,5 +1,7 @@
 Changes for 1.1alpha11:
 
+ - performance optimization: do not update functions and triggers if same
+ value received (Alexei)
  - do not show deleted hosts/items and triggers (Alexei)
  - draw graph's timeline even if no data exists (Alexei)
  - added support of system[procload] under AIX. Thanks to Moisio Juha. (Alexei)
