@@ -215,7 +215,7 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 	if((escalationid=DBget_default_escalation_id())>0)
 	{
 		snprintf(sql,sizeof(sql)-1,"insert into escalation_log (triggerid,alarmid,escalationid,level,adminlevel,nextcheck,status,actiontype) values (%d,%d,%d,%d,%d,%d,%d,%d)", trigger->triggerid, alarmid, escalationid, 0, 0, 0, 0, ESCALATION_ACTION_NOTHING);
-//		DBexecute(sql);
+		DBexecute(sql);
 	}
 	else
 	{

@@ -46,6 +46,7 @@
 
 #include "evalfunc.h"
 #include "functions.h"
+#include "expression.h"
 
 /******************************************************************************
  *                                                                            *
@@ -203,7 +204,7 @@ void	update_services_rec(int serviceid)
 	int	i;
 	int	status;
 	int	serviceupid, algorithm;
-	int	now;
+	time_t	now;
 
 	DB_RESULT *result,*result2;
 
@@ -332,7 +333,7 @@ void	update_triggers(int itemid)
 	char	sql[MAX_STRING_LEN];
 	char	exp[MAX_STRING_LEN];
 	int	exp_value;
-	int	now;
+	time_t	now;
 	DB_TRIGGER	trigger;
 	DB_RESULT	*result;
 
@@ -516,7 +517,7 @@ int	process_data(int sockfd,char *server,char *key,char *value)
  ******************************************************************************/
 void	process_new_value(DB_ITEM *item,char *value)
 {
-	int 	now;
+	time_t 	now;
 	char	sql[MAX_STRING_LEN];
 	char	value_esc[MAX_STRING_LEN];
 	char	value_str[MAX_STRING_LEN];
@@ -594,7 +595,7 @@ void	process_new_value(DB_ITEM *item,char *value)
 		{
 			DBescape_string(value_str,value_esc,MAX_STRING_LEN);
 /*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=%d",now+item->delay,value_esc,now,item->itemid);*/
-			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),value_esc,now,item->itemid);
+			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),value_esc,(int)now,item->itemid);
 			item->prevvalue=item->lastvalue;
 			item->lastvalue=value_double;
 			item->prevvalue_str=item->lastvalue_str;
@@ -606,7 +607,7 @@ void	process_new_value(DB_ITEM *item,char *value)
 		else
 		{
 /*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,lastclock=%d where itemid=%d",now+item->delay,now,item->itemid);*/
-			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),now,item->itemid);
+			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),(int)now,item->itemid);
 		}
 	}
 	/* Logic for delta as speed of change */
@@ -615,12 +616,12 @@ void	process_new_value(DB_ITEM *item,char *value)
 		if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
 		{
 /*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",now+item->delay,value_double,(value_double - item->prevorgvalue)/(now-item->lastclock),now,item->itemid);*/
-			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),value_double,(value_double - item->prevorgvalue)/(now-item->lastclock),now,item->itemid);
+			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),value_double,(value_double - item->prevorgvalue)/(now-item->lastclock),(int)now,item->itemid);
 		}
 		else
 		{
 /*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",now+item->delay,value_double,now,item->itemid);*/
-			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),value_double,now,item->itemid);
+			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),value_double,(int)now,item->itemid);
 		}
 
 		item->prevvalue=item->lastvalue;
@@ -637,12 +638,12 @@ void	process_new_value(DB_ITEM *item,char *value)
 		if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
 		{
 /*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",now+item->delay,value_double,(value_double - item->prevorgvalue),now,item->itemid);*/
-			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),value_double,(value_double - item->prevorgvalue),now,item->itemid);
+			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),value_double,(value_double - item->prevorgvalue),(int)now,item->itemid);
 		}
 		else
 		{
 /*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",now+item->delay,value_double,now,item->itemid);*/
-			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),value_double,now,item->itemid);
+			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),value_double,(int)now,item->itemid);
 		}
 
 		item->prevvalue=item->lastvalue;

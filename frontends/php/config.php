@@ -181,6 +181,7 @@
 	$h2=$h2.form_select("config",1,S_MEDIA_TYPES);
 	$h2=$h2.form_select("config",2,S_ESCALATION_RULES);
 	$h2=$h2.form_select("config",3,S_IMAGES);
+	$h2=$h2.form_select("config",4,S_AUTODISCOVERY);
 	$h2=$h2."</select>";
 
 	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"config.php\">", "</form>");
