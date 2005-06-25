@@ -197,6 +197,7 @@
 	define("S_CANNOT_ADD_IMAGE",			"Cannot add image");
 	define("S_IMAGE_DELETED",			"Image deleted");
 	define("S_CANNOT_DELETE_IMAGE",			"Cannot delete image");
+	define("S_AUTODISCOVERY",			"Autodiscovery");
 
 //	Latest values
 	define("S_LATEST_VALUES",			"Latest values");

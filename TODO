@@ -128,13 +128,11 @@ Most of the signal handlers all need to delay or block signals to avoid signal r
  - in user administration, add many resources from a list (not by one ID)
  - availability report for day/week/month/etc
  - check if items delay works
- - apply Igor patches for chart.php (calculation of MIN, MAX)
  - review PHP code for simplifying (urls, iif() )
  - fix screenedit.php permissions
 
  Kak naschet dopolnenij k time & date:
  * tipa month, day, year, hour, minute, ...
- * osobenno weekday polezno - dabi ne podnimatj triggeri po vihodnim :)
 
  Nu i k 'str' dodlstj csjakie vsjakosti tipa
  * substr, length, poisk pozicii simvola/podstroki (FIND/SEARCH v Excel),
@@ -282,8 +280,7 @@ TOP PRIORITY:
  - add more checks for forms (check all possible wrong values)
  - support of fetch_html[*]
  - restructure sources
- - support for automake
- - zabbix_agentd to support processor load, swap[*] and memory[*] onder AIX
+ - zabbix_agentd to support swap[*] and memory[*] onder AIX
 
 BUGS:
 
@@ -320,7 +317,6 @@ I made changes to the PHP frontend and zabbix_sucker.c to enable the user to spe
 (From: "Dave McCrudden" <dmccrudden@custcare.com.au>)
 
 
- - BUG. zabbix_sucker should accept parameter regardless of "\n" at the end of line 
  - do not send notifications at certain periods of time. Do not monitor services at certain periods of time.
  - decrease number of TCP connections between server and agent
  - add triggers for all hosts at once
