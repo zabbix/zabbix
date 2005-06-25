@@ -64,6 +64,7 @@ void main_timer_loop()
 	int	i,now;
 
 	int	itemid,functionid;
+	char	*function;
 	char	*parameter;
 
 	DB_RESULT	*result;
@@ -80,7 +81,7 @@ void main_timer_loop()
 #ifdef HAVE_PGSQL
 		snprintf(sql,sizeof(sql)-1,"select distinct f.itemid,f.functionid,f.parameter from functions f, items i,hosts h where h.hostid=i.hostid and ((h.status=%d and h.available!=%d) or (h.status=%d and h.available=%d and h.disable_until<%d)) and i.itemid=f.itemid and f.function in ('nodata','date','dayofweek','time','now') and i.lastclock+f.parameter::text::integer<=%d and i.status=%d and i.type=%d", HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
 #else
-		snprintf(sql,sizeof(sql)-1,"select distinct f.itemid,f.functionid,f.parameter from functions f, items i,hosts h where h.hostid=i.hostid and ((h.status=%d and h.available!=%d) or (h.status=%d and h.available=%d and h.disable_until<%d)) and i.itemid=f.itemid and f.function in ('nodata','date','dayofweek','time','now') and i.lastclock+f.parameter<=%d and i.status=%d and i.type=%d", HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
+		snprintf(sql,sizeof(sql)-1,"select distinct f.itemid,f.functionid,f.parameter,f.function from functions f, items i,hosts h where h.hostid=i.hostid and ((h.status=%d and h.available!=%d) or (h.status=%d and h.available=%d and h.disable_until<%d)) and i.itemid=f.itemid and f.function in ('nodata','date','dayofweek','time','now') and i.lastclock+f.parameter<=%d and i.status=%d and i.type=%d", HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER);
 #endif
 
 		result = DBselect(sql);
@@ -90,8 +91,9 @@ void main_timer_loop()
 			itemid=atoi(DBget_field(result,i,0));
 			functionid=atoi(DBget_field(result,i,1));
 			parameter=DBget_field(result,i,2);
+			function=DBget_field(result,i,3);
 
-			snprintf(sql,sizeof(sql)-1,"update functions set lastvalue='1' where itemid=%d and function='nodata' and parameter='%s'" , itemid, parameter );
+			snprintf(sql,sizeof(sql)-1,"update functions set lastvalue='1' where itemid=%d and function='%s' and parameter='%s'" , itemid, function, parameter );
 			DBexecute(sql);
 
 			update_triggers(itemid);
