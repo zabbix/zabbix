@@ -1,5 +1,6 @@
 1.1alpha11:
 
+ - centralised management of agent configuration files
  - apply Lukas patches (external items, setproctitle(), select all
 in frontend, configurable number of second for checking unreachable hosts) 
  - finish hard-linked templates
