@@ -361,3 +361,119 @@ WIN32 Agent:
  - different sound files for different severity
  - think about service node types (some nodes will automatically register
   problem)
+
+ POSTGRESQL:
+
+> Some corrections for  zabbix 1.1alpha9, PostgreQL version
+> 1.)data.sql record for  itemid = 17201 is missing in table items
+>
+> 2.)  schema.sql some rows are commented using --; not valid pgsql syntax
+>
+> 3.)  schema.sql script for table images is missing
+>
+> CREATE TABLE images
+> (
+>    imageid serial NOT NULL,
+>    imagetype int4 NOT NULL DEFAULT 0,
+>    name varchar(64) NOT NULL DEFAULT 0,
+>    image oid NOT NULL,
+>    CONSTRAINT pk_imageid PRIMARY KEY (imageid),
+>    CONSTRAINT unq_type_name UNIQUE (imagetype, name)
+> )
+> WITH OIDS;
+> ALTER TABLE images OWNER TO zabbix;
+>
+>
+> 4.) fill table images - little bit problem. Blob objects can be added
+> only by pgsql supeuser
+>
+> My working work:
+>
+> Please, correct text in doc (paragraph 3):
+>
+> shell> cd ../data
+> shell> cat data.sql|psql -U <username> zabbix
+> # new
+> shell> cd ../data
+> shell> cat images.sql|sed s%addr%$PWD%|psql -U postgres zabbix
+> # end new
+>
+> file images.sql is icluded as images1.sql
+>
+>
+> (This mail was send to limo - Lukas Macura)
+> Bye Mike
+>
+>
+> New for rel ....10
+>
+> Changelog:
+> - added column items.lastlogsize (Alexei)
+> - added column screens_items.colspan (Alexei)
+> - added column media.period (Alexei)
+> - minor modifications of DB schema. Unnecessary indexes dropped. (Alexei)
+>
+> This changes are not included in patch.sql
+>
+> I can contribute with this things.
+>
+> Bye Mike
+>
+> --
+> Michal K?ivka
+>
+> m.krivka@vlp.cz
+> ICQ: 295 942 520
+>
+
+> --
+> -- Zabbix
+> -- Copyright (C) 2000,2001,2002,2003,2004 Alexei Vladishev
+> --
+> -- This program is free software; you can redistribute it and/or modify
+> -- it under the terms of the GNU General Public License as published by
+> -- the Free Software Foundation; either version 2 of the License, or
+> -- (at your option) any later version.
+> --
+> -- This program is distributed in the hope that it will be useful,
+> -- but WITHOUT ANY WARRANTY; without even the implied warranty of
+> -- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> -- GNU General Public License for more details.
+> --
+> -- You should have received a copy of the GNU General Public License
+> -- along with this program; if not, write to the Free Software
+> -- Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+> --
+>
+> --
+> -- Dumping data for table `images`
+> --
+>
+> insert into images values('1','1','Hub',lo_import('./images/Hub.png'));
+> insert into images values('2','1','Hub (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Hub_small.png'));
+> insert into images values('3','1','Network',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Network.png'));
+> insert into images values('4','1','Network (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Network_small.pn
+g'));
+> insert into images values('5','1','Notebook',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Notebook.png'));
+> insert into images values('6','1','Notebook (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Notebook_small.
+png'));
+> insert into images values('7','1','Phone',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Phone.png'));
+> insert into images values('8','1','Phone (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Phone_small.png'))
+;
+> insert into images values('9','1','Printer',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Printer.png'));
+> insert into images values('10','1','Printer (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Printer_small.p
+ng'));
+> insert into images values('11','1','Router',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Router.png'));
+> insert into images values('12','1','Router (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Router_small.png
+'));
+> insert into images values('13','1','Satellite',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Satellite.png'));
+> insert into images values('14','1','Satellite (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Satellite_sma
+ll.png'));
+> insert into images values('15','1','Server',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Server.png'));
+> insert into images values('16','1','Server (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Server_small.png
+'));
+> insert into images values('17','1','UPS',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/UPS.png'));
+> insert into images values('18','1','UPS (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/UPS_small.png'));
+> insert into images values('19','1','Workstation',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Workstation.png'));
+> insert into images values('20','1','Workstation (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Workstation
+_small.png'));
