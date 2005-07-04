@@ -80,6 +80,7 @@
 			else					$sec_rest++;
 
 		}
+		$col=0;
 		table_header(array(S_DELAY,S_COUNT));
 		$elements=array(S_5_SECONDS,$sec_5);
 		table_row($elements,$col++);

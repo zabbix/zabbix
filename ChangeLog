@@ -1,5 +1,18 @@
 Changes for 1.1alpha11:
 
+ - new utility zabbix_get (Alexei)
+ - added src/zabbix_get/* (Alexei)
+ - user timeout time is configurable (Alexei)
+ - added support of locales on user level (Alexei)
+ - added support of user profiles (Alexei)
+ - removed include/local_en.inc.php
+ - added include/locales/.htaccess (Alexei)
+ - added include/locales/en_en.inc.php (Alexei)
+ - added include/locales/de_de.inc.php (Alexei)
+ - added include/locales/en_en.inc.php (Alexei)
+ - added column users.lang (Alexei)
+ - added column users.autologout (Alexei)
+ - added frontends/php/profile.php (Alexei)
  - performance optimization: do not update functions and triggers if same
  value received (Alexei)
  - do not show deleted hosts/items and triggers (Alexei)

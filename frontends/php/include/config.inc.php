@@ -26,7 +26,7 @@
 // END OF GLOBALS
 
 	include_once 	"include/defines.inc.php";
-	include_once 	"include/local_en.inc.php";
+//	include_once 	"include/locales/en_en.inc.php";
 	include_once 	"include/db.inc.php";
 	include_once 	"include/html.inc.php";
 
@@ -959,7 +959,7 @@
 
 		if(isset($sessionid))
 		{
-			$sql="select u.userid,u.alias,u.name,u.surname from sessions s,users u where s.sessionid='$sessionid' and s.userid=u.userid and s.lastaccess+900>".time();
+			$sql="select u.userid,u.alias,u.name,u.surname,u.lang from sessions s,users u where s.sessionid='$sessionid' and s.userid=u.userid and s.lastaccess+900>".time();
 			$result=DBselect($sql);
 			if(DBnum_rows($result)==1)
 			{
@@ -971,6 +971,7 @@
 				$USER_DETAILS["alias"]=DBget_field($result,0,1);
 				$USER_DETAILS["name"]=DBget_field($result,0,2);
 				$USER_DETAILS["surname"]=DBget_field($result,0,3);
+				$USER_DETAILS["lang"]=DBget_field($result,0,4);
 				return;
 			}
 			else
@@ -980,7 +981,7 @@
 			}
 		}
 
-                $sql="select u.userid,u.alias,u.name,u.surname from users u where u.alias='guest'";
+                $sql="select u.userid,u.alias,u.name,u.surname,u.lang from users u where u.alias='guest'";
                 $result=DBselect($sql);
                 if(DBnum_rows($result)==1)
                 {
@@ -988,6 +989,7 @@
                         $USER_DETAILS["alias"]=DBget_field($result,0,1);
                         $USER_DETAILS["name"]=DBget_field($result,0,2);
                         $USER_DETAILS["surname"]=DBget_field($result,0,3);
+                        $USER_DETAILS["lang"]=DBget_field($result,0,4);
 			return;
 		}
 
@@ -1018,6 +1020,7 @@
 		if($noauth!=1)
 		{
 			check_authorisation();
+			include "include/locales/".$USER_DETAILS["lang"].".inc.php";
 		}
 
 ?>
@@ -1057,7 +1060,7 @@ echo "</head>";
 	$menu=array(
 		"view"=>array(
 				"label"=>"View",
-				"pages"=>array("overview.php","latest.php","tr_status.php","queue.php","latestalarms.php","alerts.php","maps.php","charts.php","screens.php","srv_status.php","alarms.php","history.php","tr_comments.php","report3.php"),
+				"pages"=>array("overview.php","latest.php","tr_status.php","queue.php","latestalarms.php","alerts.php","maps.php","charts.php","screens.php","srv_status.php","alarms.php","history.php","tr_comments.php","report3.php","profile.php"),
 				"level2"=>array(
 					array("label"=>"Overview","url"=>"overview.php"),
 					array("label"=>"Latest data","url"=>"latest.php"),
@@ -1108,7 +1111,7 @@ echo "</head>";
 <table border=0 cellspacing=0 cellpadding=5 width="100%" bgcolor="#FFFFFF">
 <tr>
 <td width="118" height="31" class="top_header_left"><img width="118" height="31" src="images/general/zabbix.png" border="0" alt="ZABBIX"></td>
-<td width="662" class="top_header_right"><a href="http://www.zabbix.com/manual/v1.1/index.php" class="small_font">|Help|</a></td>
+<td width="662" class="top_header_right"><a href="http://www.zabbix.com/manual/v1.1/index.php" class="small_font"><?php echo S_HELP;?></a>&nbsp;|&nbsp;<a href="profile.php" class="small_font"><?php echo S_PROFILE;?></a></td>
 </tr>
 </table>
 

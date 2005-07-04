@@ -44,6 +44,9 @@ extern	char	*CONFIG_DBUSER;
 extern	char	*CONFIG_DBPASSWORD;
 extern	char	*CONFIG_DBSOCKET;
 
+#define DB_FULL_DELETE	0
+#define DB_PART_DELETE	1
+
 #define DB_HOST		struct host_type
 #define DB_ITEM		struct item_type
 #define DB_TRIGGER	struct trigger_type
