@@ -129,7 +129,7 @@ static int delete_host(int hostid)
 		DBexecute(sql);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG,"End of DBdelete_host(%d)", hostid);
+	zabbix_log(LOG_LEVEL_DEBUG,"End of delete_host(%d)", hostid);
 
 	return res;
 }
