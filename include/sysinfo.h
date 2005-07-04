@@ -36,8 +36,6 @@ COMMAND
 	char	*parameter;
 };
 
-
- 
 void	process(char *command, char *value);
 void	init_metrics();
 

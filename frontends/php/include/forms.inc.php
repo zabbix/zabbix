@@ -21,7 +21,7 @@
 <?php
 	include_once 	"include/defines.inc.php";
 	include_once 	"include/db.inc.php";
-	include_once 	"include/local_en.inc.php";
+//	include_once 	"include/local_en.inc.php";
 
 	# Insert host template form
 	function	insert_template_form($hostid, $hosttemplateid)
@@ -135,11 +135,11 @@
 	}
 
 	# Insert form for User
-	function	insert_user_form($userid)
+	function	insert_user_form($userid,$profile=0)
 	{
 		if(isset($userid))
 		{
-			$result=DBselect("select u.alias,u.name,u.surname,u.passwd,u.url from users u where u.userid=$userid");
+			$result=DBselect("select u.alias,u.name,u.surname,u.passwd,u.url,u.autologout,u.lang from users u where u.userid=$userid");
 	
 			$alias=DBget_field($result,0,0);
 			$name=DBget_field($result,0,1);
@@ -147,6 +147,8 @@
 #			$password=DBget_field($result,0,3);
 			$password="";
 			$url=DBget_field($result,0,4);
+			$autologout=DBget_field($result,0,5);
+			$lang=DBget_field($result,0,6);
 		}
 		else
 		{
@@ -155,6 +157,8 @@
 			$surname="";
 			$password="";
 			$url="";
+			$autologout="900";
+			$lang="en_gb";
 		}
 
 		$col=0;
@@ -162,26 +166,32 @@
 		show_form_begin("users.users");
 		echo S_USER;
 
-		show_table2_v_delimiter($col++);
-		echo "<form method=\"get\" action=\"users.php\">";
+		if($profile==0) echo "<form method=\"get\" action=\"users.php\">";
+		else echo "<form method=\"get\" action=\"profile.php\">";
+
 		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_GET["config"]."\" size=8>";
 		if(isset($userid))
 		{
 			echo "<input class=\"biginput\" name=\"userid\" type=\"hidden\" value=\"$userid\" size=8>";
 		}
-		echo S_ALIAS;
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"alias\" value=\"$alias\" size=20>";
 
-		show_table2_v_delimiter($col++);
-		echo S_NAME;
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=20>";
+		if($profile==0)
+		{
+			show_table2_v_delimiter($col++);
+			echo S_ALIAS;
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"alias\" value=\"$alias\" size=20>";
 
-		show_table2_v_delimiter($col++);
-		echo S_SURNAME;
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"surname\" value=\"$surname\" size=20>";
+			show_table2_v_delimiter($col++);
+			echo S_NAME;
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=20>";
+
+			show_table2_v_delimiter($col++);
+			echo S_SURNAME;
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"surname\" value=\"$surname\" size=20>";
+		}
 
 		show_table2_v_delimiter($col++);
 		echo S_PASSWORD;
@@ -193,17 +203,44 @@
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" type=\"password\" name=\"password2\" value=\"$password\" size=20>";
 
+		$languages=array(	"en_gb"=>S_ENGLISH_GB,
+					"de_de"=>S_GERMAN_DE,
+					"fr_fr"=>S_FRENCH_FR
+				);
+
+		show_table2_v_delimiter($col++);
+		echo S_LANGUAGE;
+		show_table2_h_delimiter();
+		echo "<SELECT class=\"biginput\" NAME=\"lang\" value=\"$lang\">";
+		foreach($languages as $l=>$language)
+		{
+			echo "<OPTION VALUE=\"$l\""; if($lang==$l) echo "SELECTED"; echo ">".$language;
+		}
+		echo "</SELECT>";
+
+		show_table2_v_delimiter($col++);
+		echo S_AUTO_LOGOUT_IN_SEC;
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"autologout\" value=\"$autologout\" size=5>";
+
 		show_table2_v_delimiter($col++);
 		echo S_URL_AFTER_LOGIN;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"url\" value=\"$url\" size=50>";
 
 		show_table2_v_delimiter2($col++);
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
-		if(isset($userid))
+		if($profile==0)
 		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected user?');\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
+			if(isset($userid))
+			{
+				echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
+				echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected user?');\">";
+			}
+		}
+		else
+		{
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update profile\">";
 		}
 
 		show_table2_header_end();

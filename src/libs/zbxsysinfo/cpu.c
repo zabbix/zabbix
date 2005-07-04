@@ -286,7 +286,7 @@ int	PROCLOAD(const char *cmd, const char *parameter,double  *value)
 
 	if(getloadavg_kmem(loadavg,3) == FAIL)
 	{
-		return STSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
         *value=loadavg[0];

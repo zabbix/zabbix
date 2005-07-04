@@ -21,7 +21,7 @@
 <?php
 	# Add User definition
 
-	function	add_user($name,$surname,$alias,$passwd,$url)
+	function	add_user($name,$surname,$alias,$passwd,$url,$autologout,$lang)
 	{
 		if(!check_right("User","A",0))
 		{
@@ -31,13 +31,13 @@
 		
 
 		$passwd=md5($passwd);
-		$sql="insert into users (name,surname,alias,passwd,url) values ('$name','$surname','$alias','$passwd','$url')";
+		$sql="insert into users (name,surname,alias,passwd,url,autologout,lang) values ('$name','$surname','$alias','$passwd','$url',$autologout,'$lang')";
 		return DBexecute($sql);
 	}
 
 	# Update User definition
 
-	function	update_user($userid,$name,$surname,$alias,$passwd, $url)
+	function	update_user($userid,$name,$surname,$alias,$passwd, $url,$autologout,$lang)
 	{
 		if(!check_right("User","U",$userid))
 		{
@@ -47,12 +47,36 @@
 
 		if($passwd=="")
 		{
-			$sql="update users set name='$name',surname='$surname',alias='$alias',url='$url' where userid=$userid";
+			$sql="update users set name='$name',surname='$surname',alias='$alias',url='$url',autologout=$autologout,lang='$lang' where userid=$userid";
 		}
 		else
 		{
 			$passwd=md5($passwd);
-			$sql="update users set name='$name',surname='$surname',alias='$alias',passwd='$passwd',url='$url' where userid=$userid";
+			$sql="update users set name='$name',surname='$surname',alias='$alias',passwd='$passwd',url='$url',autologout=$autologout,lang='$lang' where userid=$userid";
+		}
+		return DBexecute($sql);
+	}
+
+	# Update User Profile
+
+	function	update_user_profile($userid,$passwd, $url,$autologout,$lang)
+	{
+		global $USER_DETAILS;
+
+		if($userid!=$USER_DETAILS["userid"])
+		{
+			error("Insufficient permissions");
+			return 0;
+		}
+
+		if($passwd=="")
+		{
+			$sql="update users set url='$url',autologout=$autologout,lang='$lang' where userid=$userid";
+		}
+		else
+		{
+			$passwd=md5($passwd);
+			$sql="update users set passwd='$passwd',url='$url',autologout=$autologout,lang='$lang' where userid=$userid";
 		}
 		return DBexecute($sql);
 	}
