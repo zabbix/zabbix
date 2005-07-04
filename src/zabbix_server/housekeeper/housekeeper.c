@@ -50,6 +50,90 @@
 
 #include "housekeeper.h"
 
+static int delete_history(int itemid)
+{
+	char	sql[MAX_STRING_LEN];
+
+	snprintf(sql,sizeof(sql)-1,"delete from history where itemid=%d limit 500", itemid);
+	DBexecute(sql);
+
+	return DBaffected_rows();
+}
+
+static int delete_trends(int itemid)
+{
+	char	sql[MAX_STRING_LEN];
+
+	snprintf(sql,sizeof(sql)-1,"delete from trends where itemid=%d limit 500", itemid);
+	DBexecute(sql);
+
+	return DBaffected_rows();
+}
+
+static int delete_item(int itemid)
+{
+	char	sql[MAX_STRING_LEN];
+	int	res = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In delete_item(%d)", itemid);
+
+	res = delete_history(itemid);
+
+	if(res == 0)
+	{
+		res = delete_trends(itemid);
+	}
+
+	if(res == 0)
+	{
+		DBdelete_triggers_by_itemid(itemid);
+
+		snprintf(sql,sizeof(sql)-1,"delete from items where itemid=%d", itemid);
+		DBexecute(sql);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG,"End of delete_item(%d)", itemid);
+
+	return res;	
+}
+
+static int delete_host(int hostid)
+{
+	int	i, itemid;
+	char	sql[MAX_STRING_LEN];
+	DB_RESULT	*result;
+	int	res = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In delete_host(%d)", hostid);
+	snprintf(sql,sizeof(sql)-1,"select itemid from items where hostid=%d", hostid);
+	result = DBselect(sql);
+
+	for(i=0;i<DBnum_rows(result);i++)
+	{
+		itemid=atoi(DBget_field(result,i,0));
+		res += delete_item(itemid);
+	}
+	DBfree_result(result);
+
+	if(res==0)
+	{
+		DBdelete_sysmaps_hosts_by_hostid(hostid);
+
+		snprintf(sql,sizeof(sql)-1,"delete from actions where triggerid=%d and scope=%d", hostid, ACTION_SCOPE_HOST);
+		DBexecute(sql);
+
+		snprintf(sql,sizeof(sql)-1,"delete from hosts_groups where hostid=%d", hostid);
+		DBexecute(sql);
+
+		snprintf(sql,sizeof(sql)-1,"delete from hosts where hostid=%d", hostid);
+		DBexecute(sql);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG,"End of DBdelete_host(%d)", hostid);
+
+	return res;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: housekeeping_items                                               *
@@ -77,7 +161,7 @@ static int housekeeping_items(void)
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 		itemid=atoi(DBget_field(result,i,0));
-		DBdelete_item(itemid);
+		delete_item(itemid);
 	}
 	DBfree_result(result);
 	return SUCCEED;
@@ -110,7 +194,7 @@ static int housekeeping_hosts(void)
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 		hostid=atoi(DBget_field(result,i,0));
-		DBdelete_host(hostid);
+		delete_host(hostid);
 	}
 	DBfree_result(result);
 	return SUCCEED;

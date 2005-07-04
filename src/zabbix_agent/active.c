@@ -489,7 +489,7 @@ void	refresh_metrics(char *server, int port, char *error, int max_error_len)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Getting list of active checks failed. Will retry after 60 seconds");
 #ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("sucker [sleeping for %d seconds]", 60);
+		setproctitle("poller [sleeping for %d seconds]", 60);
 #endif
 		sleep(60);
 	}
@@ -544,7 +544,7 @@ void    child_active_main(int i,char *server, int port)
 			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
 					sleeptime );
 #ifdef HAVE_FUNCTION_SETPROCTITLE
-			setproctitle("sucker [sleeping for %d seconds]", 
+			setproctitle("poller [sleeping for %d seconds]", 
 					sleeptime);
 #endif
 			sleep( sleeptime );

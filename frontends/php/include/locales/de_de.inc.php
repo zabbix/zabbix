@@ -672,7 +672,7 @@
 	define("S_CONFIGURATION_OF_TEMPLATES_LINKAGE",	"CONFIGURATION OF TEMPLATES LINKAGE");
 	define("S_LINKED_TEMPLATES_BIG",		"LINKED TEMPLATES");
 	define("S_NO_USER_GROUPS_DEFINED",		"No user groups defined");
-	define("S_ALIAS",				"Alias");
+	define("S_ALIAS",				"TEST");
 	define("S_NAME",				"Name");
 	define("S_SURNAME",				"Surname");
 	define("S_IS_ONLINE_Q",				"Is online?");
@@ -686,6 +686,7 @@
 	define("S_PASSWORD",				"Password");
 	define("S_PASSWORD_ONCE_AGAIN",			"Password (once again)");
 	define("S_URL_AFTER_LOGIN",			"URL (after login)");
+	define("S_AUTO_LOGOUT_IN_SEC",			"Auto-logout (in sec,0 - disable)");
 
 //	audit.php
 	define("S_AUDIT_LOG",				"Audit log");
@@ -699,4 +700,17 @@
 	define("S_LOGGED_OUT",				"Logged out");
 	define("S_MEDIA_TYPE",				"Media type");
 	define("S_GRAPH_ELEMENT",			"Graph element");
+
+//	profile.php
+	define("S_USER_PROFILE_BIG",			"USER PROFILE");
+	define("S_LANGUAGE",				"Language");
+	define("S_ENGLISH_GB",				"English (GB)");
+	define("S_FRENCH_FR",				"French (FR)");
+	define("S_GERMAN_DE",				"German (DE)");
+
+//	Menu
+
+	define("S_HELP",				"Help");
+	define("S_PROFILE",				"Profile");
+
 ?>

@@ -732,22 +732,6 @@ void DBdelete_history_by_itemid(int itemid)
 	DBexecute(sql);
 }
 
-void DBdelete_item(int itemid)
-{
-	char	sql[MAX_STRING_LEN];
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBdelete_item(%d)", itemid);
-
-	DBdelete_triggers_by_itemid(itemid);
-	DBdelete_history_by_itemid(itemid);
-	DBdelete_trends_by_itemid(itemid);
-
-	snprintf(sql,sizeof(sql)-1,"delete from items where itemid=%d", itemid);
-	DBexecute(sql);
-
-	zabbix_log(LOG_LEVEL_DEBUG,"End of DBdelete_item(%d)", itemid);
-}
-
 void DBdelete_sysmaps_links_by_shostid(int shostid)
 {
 	char	sql[MAX_STRING_LEN];
@@ -775,6 +759,16 @@ void DBdelete_sysmaps_hosts_by_hostid(int hostid)
 
 	snprintf(sql,sizeof(sql)-1,"delete from sysmaps_hosts where hostid=%d", hostid);
 	DBexecute(sql);
+}
+
+int DBdelete_history_pertial(int itemid)
+{
+	char	sql[MAX_STRING_LEN];
+
+	snprintf(sql,sizeof(sql)-1,"delete from history where itemid=%d limit 500", itemid);
+	DBexecute(sql);
+
+	return DBaffected_rows();
 }
 
 void DBdelete_host(int hostid)

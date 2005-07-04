@@ -48,7 +48,7 @@
 		{
 			if($_GET["password1"]==$_GET["password2"])
 			{
-				$result=add_user($_GET["name"],$_GET["surname"],$_GET["alias"],$_GET["password1"],$_GET["url"]);
+				$result=add_user($_GET["name"],$_GET["surname"],$_GET["alias"],$_GET["password1"],$_GET["url"],$_GET["autologout"],$_GET["lang"]);
 				show_messages($result, S_USER_ADDED, S_CANNOT_ADD_USER);
 				if($result)
 					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_USER,"User alias [".addslashes($_GET["alias"])."] name [".addslashes($_GET["name"])."] surname [".addslashes($_GET["surname"])."]]");
@@ -82,7 +82,7 @@
 		{
 			if($_GET["password1"]==$_GET["password2"])
 			{
-				$result=update_user($_GET["userid"],$_GET["name"],$_GET["surname"],$_GET["alias"],$_GET["password1"],$_GET["url"]);
+				$result=update_user($_GET["userid"],$_GET["name"],$_GET["surname"],$_GET["alias"],$_GET["password1"],$_GET["url"],$_GET["autologout"],$_GET["lang"]);
 				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 				if($result)
 					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,"User alias [".addslashes($_GET["alias"])."] name [".addslashes($_GET["name"])."] surname [".addslashes($_GET["surname"])."]]");
