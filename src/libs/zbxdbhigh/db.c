@@ -771,37 +771,6 @@ int DBdelete_history_pertial(int itemid)
 	return DBaffected_rows();
 }
 
-void DBdelete_host(int hostid)
-{
-	int	i, itemid;
-	char	sql[MAX_STRING_LEN];
-	DB_RESULT	*result;
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBdelete_host(%d)", hostid);
-	snprintf(sql,sizeof(sql)-1,"select itemid from items where hostid=%d", hostid);
-	result = DBselect(sql);
-
-	for(i=0;i<DBnum_rows(result);i++)
-	{
-		itemid=atoi(DBget_field(result,i,0));
-		DBdelete_item(itemid);
-	}
-	DBfree_result(result);
-
-	DBdelete_sysmaps_hosts_by_hostid(hostid);
-
-	snprintf(sql,sizeof(sql)-1,"delete from actions where triggerid=%d and scope=%d", hostid, ACTION_SCOPE_HOST);
-	DBexecute(sql);
-
-	snprintf(sql,sizeof(sql)-1,"delete from hosts_groups where hostid=%d", hostid);
-	DBexecute(sql);
-
-	snprintf(sql,sizeof(sql)-1,"delete from hosts where hostid=%d", hostid);
-	DBexecute(sql);
-
-	zabbix_log(LOG_LEVEL_DEBUG,"End of DBdelete_host(%d)", hostid);
-}
-
 void DBupdate_triggers_status_after_restart(void)
 {
 	int	i;
