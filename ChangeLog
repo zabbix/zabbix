@@ -1,5 +1,6 @@
 Changes for 1.1alpha11:
 
+ - housekeeper improved to delete hosts sequentially (Alexei)
  - new utility zabbix_get (Alexei)
  - added src/zabbix_get/* (Alexei)
  - user timeout time is configurable (Alexei)
