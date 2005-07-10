@@ -20,7 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = S_CUSTOM_GRAPHS;
+	$page["title"] = "S_CUSTOM_GRAPHS";
 	$page["file"] = "charts.php";
 
 	$nomenu=0;

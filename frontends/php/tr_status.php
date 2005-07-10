@@ -21,7 +21,7 @@
 <?php
 	include "include/config.inc.php";
 	$page["file"] = "tr_status.php";
-	$page["title"] = S_STATUS_OF_TRIGGERS;
+	$page["title"] = "S_STATUS_OF_TRIGGERS";
 ?>
 <?php
 	$tr_hash=calc_trigger_hash();

@@ -21,7 +21,7 @@
 <?php
 	include "include/config.inc.php";
 
-	$page["title"] = S_QUEUE_BIG;
+	$page["title"] = "S_QUEUE_BIG";
 	$page["file"] = "queue.php";
 	show_header($page["title"],10,0);
 ?>

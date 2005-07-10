@@ -22,7 +22,7 @@
 	include "include/config.inc.php";
 	include "include/forms.inc.php";
 
-	$page["title"] = S_USERS;
+	$page["title"] = "S_USERS";
 	$page["file"] = "users.php";
 
 	show_header($page["title"],0,0);

@@ -20,7 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = "Configuration of network map";
+	$page["title"] = "S_CONFIGURATION_OF_NETWORK_MAP";
 	$page["file"] = "sysmap.php";
 	show_header($page["title"],0,0);
 ?>

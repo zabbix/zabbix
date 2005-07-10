@@ -22,7 +22,7 @@
 	include "include/config.inc.php";
 	include "include/forms.inc.php";
 
-        $page["title"] = S_CONFIGURATION_OF_ITEMS;
+        $page["title"] = "S_CONFIGURATION_OF_ITEMS";
         $page["file"] = "items.php";
 
 	show_header($page["title"],0,0);

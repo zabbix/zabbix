@@ -20,7 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = "User defined screens";
+	$page["title"] = "S_CUSTOM_SCREENS";
 	$page["file"] = "screens.php";
 
 	$nomenu=0;
