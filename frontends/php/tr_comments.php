@@ -20,7 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = S_TRIGGER_COMMENTS;
+	$page["title"] = "S_TRIGGER_COMMENTS";
 	$page["file"] = "tr_comments.php";
 	show_header($page["title"],0,0);
 ?>

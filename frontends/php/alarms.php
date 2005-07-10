@@ -20,7 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = S_ALARMS;
+	$page["title"] = "S_ALARMS";
 	$page["file"] = "alarms.php";
 	show_header($page["title"],0,0);
 ?>

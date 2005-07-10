@@ -20,7 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = S_CONFIGURATION_OF_GRAPH;
+	$page["title"] = "S_CONFIGURATION_OF_GRAPH";
 	$page["file"] = "graph.php";
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();

@@ -204,8 +204,10 @@
 		echo "<input class=\"biginput\" type=\"password\" name=\"password2\" value=\"$password\" size=20>";
 
 		$languages=array(	"en_gb"=>S_ENGLISH_GB,
+					"fr_fr"=>S_FRENCH_FR,
 					"de_de"=>S_GERMAN_DE,
-					"fr_fr"=>S_FRENCH_FR
+					"lv_lv"=>S_LATVIAN_LV,
+					"ru_ru"=>S_RUSSIAN_RU
 				);
 
 		show_table2_v_delimiter($col++);

@@ -337,6 +337,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 
 		$trigger=get_trigger_by_triggerid($triggerid);
+		$expression_old=$trigger["expression"];
 
 		$sql="select distinct h.hostid from hosts h,functions f, items i where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid=$triggerid";
 		$result=DBselect($sql);
@@ -355,7 +356,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 			if($row["triggers"]&1 == 0)	continue;
 
-			$sql="insert into triggers  (description,priority,status,comments,url,value,expression) values ('".addslashes($trigger["description"])."',".$trigger["priority"].",".$trigger["status"].",'".addslashes($trigger["comments"])."','".addslashes($trigger["url"])."',2,'".$trigger["expression"]."')";
+			$sql="insert into triggers  (description,priority,status,comments,url,value,expression) values ('".addslashes($trigger["description"])."',".$trigger["priority"].",".$trigger["status"].",'".addslashes($trigger["comments"])."','".addslashes($trigger["url"])."',2,'$expression_old')";
 			$result4=DBexecute($sql);
 			$triggerid_new=DBinsert_id($result4,"triggers","triggerid");
 
@@ -382,9 +383,10 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				$result4=DBexecute($sql);
 				$functionid=DBinsert_id($result4,"functions","functionid");
 
-				$sql="update triggers set expression='".$trigger["expression"]."' where triggerid=$triggerid_new";
+				$sql="update triggers set expression='$expression_old' where triggerid=$triggerid_new";
 				DBexecute($sql);
-				$expression=str_replace("{".$row2["functionid"]."}","{".$functionid."}",$trigger["expression"]);
+				$expression=str_replace("{".$row2["functionid"]."}","{".$functionid."}",$expression_old);
+				$expression_old=$expression;
 				$sql="update triggers set expression='$expression' where triggerid=$triggerid_new";
 				DBexecute($sql);
 

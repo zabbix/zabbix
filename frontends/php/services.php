@@ -21,7 +21,7 @@
 <?php
 	include "include/config.inc.php";
 
-	$page["title"] = S_IT_SERVICES;
+	$page["title"] = "S_IT_SERVICES";
 	$page["file"] = "services.php";
 
 	show_header($page["title"],0,0);

@@ -26,9 +26,9 @@
 // END OF GLOBALS
 
 	include_once 	"include/defines.inc.php";
-//	include_once 	"include/locales/en_en.inc.php";
 	include_once 	"include/db.inc.php";
 	include_once 	"include/html.inc.php";
+	include_once 	"include/locales.inc.php";
 
 	include_once 	"include/audit.inc.php";
 	include_once 	"include/escalations.inc.php";
@@ -959,7 +959,7 @@
 
 		if(isset($sessionid))
 		{
-			$sql="select u.userid,u.alias,u.name,u.surname,u.lang from sessions s,users u where s.sessionid='$sessionid' and s.userid=u.userid and s.lastaccess+900>".time();
+			$sql="select u.userid,u.alias,u.name,u.surname,u.lang from sessions s,users u where s.sessionid='$sessionid' and s.userid=u.userid and s.lastaccess+u.autologout>".time();
 			$result=DBselect($sql);
 			if(DBnum_rows($result)==1)
 			{
@@ -1017,17 +1017,21 @@
 		global $page;
 		global $USER_DETAILS;
 
+		include_once "include/locales/en_gb.inc.php";
+
 		if($noauth!=1)
 		{
 			check_authorisation();
-			include "include/locales/".$USER_DETAILS["lang"].".inc.php";
+			include_once "include/locales/".$USER_DETAILS["lang"].".inc.php";
 		}
+
+		process_locales();
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=<?php echo S_HTML_CHARSET; ?>">
 <meta name="Author" content="Alexei Vladishev">
 <link rel="stylesheet" href="css.css">
 
@@ -1036,6 +1040,7 @@
 	{
 		$refresh=2*$refresh;
 	}
+	if(defined($title))	$title=constant($title);
 	if($refresh!=0)
 	{
 		echo "<meta http-equiv=\"refresh\" content=\"$refresh\">\n";
@@ -1111,7 +1116,13 @@ echo "</head>";
 <table border=0 cellspacing=0 cellpadding=5 width="100%" bgcolor="#FFFFFF">
 <tr>
 <td width="118" height="31" class="top_header_left"><img width="118" height="31" src="images/general/zabbix.png" border="0" alt="ZABBIX"></td>
+<?php
+	if($USER_DETAILS["alias"]=="guest") {
+?>
+<td width="662" class="top_header_right"><a href="http://www.zabbix.com/manual/v1.1/index.php" class="small_font"><?php echo S_HELP;?></a></td>
+<?php	} else { ?>
 <td width="662" class="top_header_right"><a href="http://www.zabbix.com/manual/v1.1/index.php" class="small_font"><?php echo S_HELP;?></a>&nbsp;|&nbsp;<a href="profile.php" class="small_font"><?php echo S_PROFILE;?></a></td>
+<?php } ?>
 </tr>
 </table>
 

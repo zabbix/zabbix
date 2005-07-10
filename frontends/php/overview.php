@@ -20,7 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = S_OVERVIEW;
+	$page["title"] = "S_OVERVIEW";
 	$page["file"] = "overview.php";
 	show_header($page["title"],0,0);
 ?>

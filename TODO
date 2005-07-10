@@ -11,7 +11,6 @@ in frontend, configurable number of second for checking unreachable hosts)
  - how to disable unreachable hosts
  - new item status: not available. If agent doesn't accept parameter.
  - new function for item status to enable sending of notification in case if an item changes status to unknown (for example)
- - fix templates for complex triggers
  - do zabbix_sender for windows
 
 ZABBIX 1.1:

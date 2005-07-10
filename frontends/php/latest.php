@@ -20,7 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = S_LATEST_VALUES;
+	$page["title"] = "S_LATEST_VALUES";
 	$page["file"] = "latest.php";
 	show_header($page["title"],0,0);
 ?>
