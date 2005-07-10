@@ -20,7 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = S_ABOUT_ZABBIX;
+	$page["title"] = "S_ABOUT_ZABBIX";
 	$page["file"] = "about.php";
 	show_header($page["title"],0,0);
 ?>

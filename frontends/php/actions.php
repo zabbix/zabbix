@@ -20,7 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"]=S_ACTIONS;
+	$page["title"]="S_ACTIONS";
 	$page["file"]="actions.php";
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();

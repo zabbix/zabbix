@@ -20,7 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = "IT Services availability report";
+	$page["title"] = "S_IT_SERVICES_AVAILABILITY_REPORT";
 	$page["file"] = "report3.php";
 	show_header($page["title"],0,0);
 ?>

@@ -20,7 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = S_MEDIA;
+	$page["title"] = "S_MEDIA";
 	$page["file"] = "media.php";
 
 	show_header($page["title"],0,0);

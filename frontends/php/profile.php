@@ -22,11 +22,20 @@
 	include "include/config.inc.php";
 	include "include/forms.inc.php";
 
-	$page["title"] = S_USER_PROFILE;
+	$page["title"] = "S_USER_PROFILE";
 	$page["file"] = "profile.php";
 
 	show_header($page["title"],0,0);
 //	insert_confirm_javascript();
+?>
+
+<?php
+	if($USER_DETAILS["alias"]=="guest")
+	{
+		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
+		show_footer();
+		exit;
+	}
 ?>
 
 <?php
