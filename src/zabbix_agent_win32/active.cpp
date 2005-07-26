@@ -130,6 +130,11 @@ void	add_check(char *key, int refresh, int lastlogsize)
 {
 	int i;
 
+	char tmp[1024];
+
+	sprintf(tmp,"In add_check([%s,%d,%d])",key,refresh,lastlogsize);
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tmp);
+
 	for(i=0;;i++)
 	{
 		if(metrics[i].key == NULL)
@@ -164,21 +169,26 @@ int	parse_list_of_checks(char *str)
 	char *line;
 	char key[MAX_STRING_LEN], refresh[MAX_STRING_LEN], lastlogsize[MAX_STRING_LEN];
 	//char *s1, *s2;
+	int r,l;
+
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","In parse_list_of_checks()");
 
 	disable_all_metrics();
 
 	line=(char *)strtok(str,"\n");
 	while(line!=NULL)
 	{
+		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",line);
 		if(strcmp(line,"ZBX_EOF")==0)	break;
 
-		scanf("%s:%s:%s",line,key,refresh,lastlogsize);
+		sscanf(line,"%s:%d:%d",key,&r,&l);
 
 //		key=(char *)strtok_r(line,":",&s2);
 //		refresh=(char *)strtok_r(NULL,":",&s2);
 //		lastlogsize=(char *)strtok_r(NULL,":",&s2);
 		
-		add_check(key, atoi(refresh), atoi(lastlogsize));
+		//add_check(key, atoi(refresh), atoi(lastlogsize));
+		add_check(key, r, l);
 
 		line=(char *)strtok(NULL,"\n");
 	}
@@ -199,6 +209,9 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 
 //	zabbix_log( LOG_LEVEL_DEBUG, "get_active_checks: host[%s] port[%d]", server, port);
 
+	sprintf(error,"get_active_checks: host[%s] port[%d]", server, port);
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",error);
+
 	servaddr_in.sin_family=AF_INET;
 	hp=gethostbyname(server);
 
@@ -206,6 +219,8 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 	{
 //		zabbix_log( LOG_LEVEL_WARNING, "gethostbyname() failed [%s]", hstrerror(h_errno));
 //		sprintf(error,"gethostbyname() failed [%s]", hstrerror(h_errno));
+WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","gethostbyname() failed");
+
 		return	NETWORK_ERROR;
 	}
 
@@ -220,9 +235,10 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 //		zabbix_log(LOG_LEVEL_WARNING, "Cannot create socket [%s]",
 //				strerror(errno));
 		sprintf(error,"Cannot create socket [%s]", strerror(errno));
+		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",error);
 		return	FAIL;
 	}
- 
+ WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","Before connect()");
 	if( connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
 		switch (errno)
@@ -230,21 +246,26 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 			case WSAETIMEDOUT:
 //				zabbix_log( LOG_LEVEL_WARNING, "Timeout while connecting to [%s:%d]",server,port);
 				sprintf(error,"Timeout while connecting to [%s:%d]",server,port);
+				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",error);
 				break;
 			case WSAEHOSTUNREACH:
 //				zabbix_log( LOG_LEVEL_WARNING, "No route to host [%s:%d]",server,port);
 				sprintf(error,"No route to host [%s:%d]",server,port);
+				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",error);
 				break;
 			default:
 //				zabbix_log( LOG_LEVEL_WARNING, "Cannot connect to [%s:%d] [%s]",server,port,strerror(errno));
 				sprintf(error,"Cannot connect to [%s:%d] [%s]",server,port,strerror(errno));
+				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",error);
 		} 
 		closesocket(s);
 		return	NETWORK_ERROR;
 	}
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","After connect()");
 
 	sprintf(c,"%s\n%s\n","ZBX_GET_ACTIVE_CHECKS",confHostname);
 //	zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", c);
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","Before sendto()");
 	if( sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 //	if( write(s,c,strlen(c)) == -1 )
 	{
@@ -261,6 +282,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 		closesocket(s);
 		return	FAIL;
 	} 
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","After sendto()");
 
 	memset(c,0,MAX_BUF_LEN);
 
@@ -271,11 +293,16 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 	do
 	{
 		len=sizeof(struct sockaddr_in);
+		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","Before recvfrom()");
 		len=recvfrom(s,c+amount_read,MAX_BUF_LEN-1-amount_read,0,(struct sockaddr *)&servaddr_in,(int *)&len);
-
+		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","After recvfrom()");
+		
 //		len=read(s,c+amount_read,(MAX_BUF_LEN-1)-amount_read);
 		if (len > 0)
+		{
 			amount_read += len;
+			WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",c);
+		}
 		if(len == -1)
 		{
 			switch (errno)
@@ -283,15 +310,18 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 				case 	WSAETIMEDOUT:
 //						zabbix_log( LOG_LEVEL_WARNING, "Timeout while receiving data from [%s:%d]",server,port);
 						sprintf(error,"Timeout while receiving data from [%s:%d]",server,port);
+						WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",error);
 						break;
 				case	WSAECONNRESET:
 //						zabbix_log( LOG_LEVEL_WARNING, "Connection reset by peer.");
 						sprintf(error,"Connection reset by peer.");
+						WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",error);
 						closesocket(s);
 						return	NETWORK_ERROR;
 				default:
 //						zabbix_log( LOG_LEVEL_WARNING, "Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
 						sprintf(error,"Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
+						WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",error);
 			} 
 			closesocket(s);
 			return	FAIL;
@@ -340,18 +370,23 @@ int	send_value(char *server,int port,char *shortname,char *value)
 	int	i,s;
 	char	tosend[1024];
 	char	result[1024];
+	char	tmp[1024];
 	struct hostent *hp;
 
 	struct sockaddr_in myaddr_in;
 	struct sockaddr_in servaddr_in;
 
 //	zabbix_log( LOG_LEVEL_DEBUG, "In send_value()");
+	sprintf(tmp,"In send_value([%s,%d,%s,%s])",server,port,shortname,value);
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tmp);
 
 	servaddr_in.sin_family=AF_INET;
 	hp=gethostbyname(server);
 
 	if(hp==NULL)
 	{
+		sprintf(tmp,"gethostbyname() failed");
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tmp);
 		return	FAIL;
 	}
 
@@ -380,6 +415,8 @@ int	send_value(char *server,int port,char *shortname,char *value)
 	if( connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
 //		zabbix_log( LOG_LEVEL_WARNING, "Error in connect() [%s:%d] [%s]",server, port, strerror(errno));
+		sprintf(tmp,"Error in connect()");
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tmp);
 		closesocket(s);
 		return	FAIL;
 	}
@@ -456,6 +493,9 @@ int	process_active_checks(char *server, int port)
 			{
 				sprintf(shortname, "%s:%s",confHostname,metrics[i].key);
 //				zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
+
+				
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",confHostname);
 				sprintf(value_tmp,"%d:%s",metrics[i].lastlogsize,value);
 				if(send_value(server,port,shortname,value_tmp) == FAIL)
 				{
@@ -492,6 +532,7 @@ int	process_active_checks(char *server, int port)
 
 			sprintf(shortname,"%s:%s",confHostname,metrics[i].key);
 //			zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
+			WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",shortname);
 			if(send_value(server,port,shortname,rq.result) == FAIL)
 			{
 				ret = FAIL;
@@ -513,18 +554,20 @@ int	process_active_checks(char *server, int port)
 void	refresh_metrics(char *server, int port, char *error, int max_error_len)
 {
 //	zabbix_log( LOG_LEVEL_DEBUG, "In refresh_metrics()");
-
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","In refresh_metrics()");
 	while(get_active_checks(server, port, error, sizeof(error)) != SUCCEED)
 	{
 //		zabbix_log( LOG_LEVEL_WARNING, "Getting list of active checks failed. Will retry after 60 seconds");
 #ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("poller [sleeping for %d seconds]", 60);
+		setproctitle("poller [sleeping for %d seconds]", 60*1000);
 #endif
-		Sleep(60);
+		sprintf(error,"poller [sleeping for %d seconds]", 60*1000);
+		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",error);
+		Sleep(60*1000);
 	}
 }
 
-void    child_active_main(int i,char *server, int port)
+void    ActiveChecksThread(void *)
 {
 	char	error[MAX_STRING_LEN];
 	int	sleeptime, nextcheck;
@@ -536,9 +579,11 @@ void    child_active_main(int i,char *server, int port)
 	setproctitle("getting list of active checks");
 #endif
 
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","Before init_list()");
 	init_list();
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","After init_list()");
 
-	refresh_metrics(server, port, error, sizeof(error));
+	refresh_metrics(confServer, confServerPort, error, sizeof(error));
 	nextrefresh=time(NULL)+300;
 
 	for(;;)
@@ -546,9 +591,9 @@ void    child_active_main(int i,char *server, int port)
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("processing active checks");
 #endif
-		if(process_active_checks(server, port) == FAIL)
+		if(process_active_checks(confServer, confServerPort) == FAIL)
 		{
-			Sleep(60);
+			Sleep(60*1000);
 			continue;
 		}
 		nextcheck=get_min_nextcheck();
@@ -572,11 +617,12 @@ void    child_active_main(int i,char *server, int port)
 			}
 //			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
 //					sleeptime );
+			WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"e","Sleeping for %d seconds",sleeptime);
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 			setproctitle("poller [sleeping for %d seconds]", 
 					sleeptime);
 #endif
-			Sleep( sleeptime );
+			Sleep( sleeptime*1000 );
 		}
 		else
 		{
@@ -585,7 +631,7 @@ void    child_active_main(int i,char *server, int port)
 
 		if(time(NULL)>=nextrefresh)
 		{
-			refresh_metrics(server, port, error, sizeof(error));
+			refresh_metrics(confServer, confServerPort, error, sizeof(error));
 			nextrefresh=time(NULL)+300;
 		}
 	}

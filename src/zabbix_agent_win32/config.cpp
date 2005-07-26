@@ -160,6 +160,10 @@ static int ParseServerList(char *args,int sourceLine)
       if (eptr!=NULL)
          *eptr=0;
 
+	if(confServerCount==0)
+	{
+		strcpy(confServer,sptr);
+	}
       confServerAddr[confServerCount]=inet_addr(sptr);
       if (confServerAddr[confServerCount]==INADDR_NONE)
       {
@@ -269,6 +273,23 @@ BOOL ReadConfig(void)
          else
          {
             confListenPort=(WORD)n;
+         }
+      }
+      else if (!stricmp(buffer,"ServerPort"))
+      {
+         int n;
+
+         n=atoi(ptr);
+         if ((n<1)||(n>65535))
+         {
+            confServerPort=10051;
+            errors++;
+            if (IsStandalone())
+               printf("Error in configuration file, line %d: invalid port number (%s)\n",sourceLine,ptr);
+         }
+         else
+         {
+            confServerPort=(WORD)n;
          }
       }
       else if (!stricmp(buffer,"Alias"))
