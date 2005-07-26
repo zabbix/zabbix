@@ -1,0 +1,592 @@
+/* 
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+**/
+
+//#include "config.h"
+
+/*#include <netdb.h>
+
+#include <stdlib.h>
+#include <stdio.h>
+
+#include <unistd.h>
+#include <signal.h>
+
+#include <time.h>
+
+#include <errno.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>*/
+
+/* No warning for bzero */
+#include <string.h>
+#include <time.h>
+
+/*#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>*/
+
+/* For setpriority */
+/*#include <sys/time.h>
+#include <sys/resource.h>
+*/
+
+/* Required for getpwuid */
+/*#include <pwd.h>
+
+#include "common.h"
+#include "sysinfo.h"
+
+#include "pid.h"
+#include "log.h"
+#include "cfg.h"
+#include "stats.h"
+#include "active.h"
+#include "logfiles.h"
+*/
+
+#include "zabbixw32.h"
+
+#define MAX_LINES_PER_SECOND	10
+
+#define METRIC struct metric_type
+METRIC
+{
+	char	*key;
+	int	refresh;
+	int	nextcheck;
+	int	status;
+	int	lastlogsize;
+};
+
+
+
+
+METRIC	*metrics=NULL;
+
+void	init_list()
+{
+	if(metrics==NULL)
+	{
+		metrics=(METRIC *)malloc(sizeof(METRIC));
+		metrics[0].key=NULL;
+	}
+}
+
+void	disable_all_metrics()
+{
+	int i;
+
+	for(i=0;;i++)
+	{
+		if(metrics[i].key == NULL)	break;
+
+		metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
+	}
+}
+
+int	get_min_nextcheck()
+{
+	int i;
+	int min=-1;
+	int nodata=0;
+
+	for(i=0;;i++)
+	{
+		if(metrics[i].key == NULL)	break;
+
+		nodata=1;
+		if( (metrics[i].status == ITEM_STATUS_ACTIVE) &&
+		    ((metrics[i].nextcheck < min) || (min == -1)))
+		{
+			min=metrics[i].nextcheck;
+		}
+	}
+
+	if(nodata==0)
+	{
+		return	FAIL;
+	}
+	return min;
+}
+
+void	add_check(char *key, int refresh, int lastlogsize)
+{
+	int i;
+
+	for(i=0;;i++)
+	{
+		if(metrics[i].key == NULL)
+		{
+			metrics[i].key=strdup(key);
+			metrics[i].refresh=refresh;
+			metrics[i].nextcheck=0;
+			metrics[i].status=ITEM_STATUS_ACTIVE;
+			metrics[i].lastlogsize=lastlogsize;
+
+			metrics=(METRIC *)realloc(metrics,(i+2)*sizeof(METRIC));
+			metrics[i+1].key=NULL;
+			break;
+		}
+		else if(strcmp(metrics[i].key,key)==0)
+		{
+			if(metrics[i].refresh!=refresh)
+			{
+				metrics[i].nextcheck=0;
+			}
+			metrics[i].refresh=refresh;
+			metrics[i].lastlogsize=lastlogsize;
+			metrics[i].status=ITEM_STATUS_ACTIVE;
+			break;
+		}
+	}
+}
+
+/* Parse list of active checks received from server */
+int	parse_list_of_checks(char *str)
+{
+	char *line;
+	char key[MAX_STRING_LEN], refresh[MAX_STRING_LEN], lastlogsize[MAX_STRING_LEN];
+	//char *s1, *s2;
+
+	disable_all_metrics();
+
+	line=(char *)strtok(str,"\n");
+	while(line!=NULL)
+	{
+		if(strcmp(line,"ZBX_EOF")==0)	break;
+
+		scanf("%s:%s:%s",line,key,refresh,lastlogsize);
+
+//		key=(char *)strtok_r(line,":",&s2);
+//		refresh=(char *)strtok_r(NULL,":",&s2);
+//		lastlogsize=(char *)strtok_r(NULL,":",&s2);
+		
+		add_check(key, atoi(refresh), atoi(lastlogsize));
+
+		line=(char *)strtok(NULL,"\n");
+	}
+
+	return SUCCEED;
+}
+
+int	get_active_checks(char *server, int port, char *error, int max_error_len)
+{
+//	int	s;
+	SOCKET s;
+	int	len,amount_read;
+	char	c[MAX_BUF_LEN];
+
+	struct hostent *hp;
+
+	struct sockaddr_in servaddr_in;
+
+//	zabbix_log( LOG_LEVEL_DEBUG, "get_active_checks: host[%s] port[%d]", server, port);
+
+	servaddr_in.sin_family=AF_INET;
+	hp=gethostbyname(server);
+
+	if(hp==NULL)
+	{
+//		zabbix_log( LOG_LEVEL_WARNING, "gethostbyname() failed [%s]", hstrerror(h_errno));
+//		sprintf(error,"gethostbyname() failed [%s]", hstrerror(h_errno));
+		return	NETWORK_ERROR;
+	}
+
+	servaddr_in.sin_addr.s_addr=((struct in_addr *)(hp->h_addr))->s_addr;
+
+	servaddr_in.sin_port=htons(port);
+
+	s=socket(AF_INET,SOCK_STREAM,0);
+
+	if(s == -1)
+	{
+//		zabbix_log(LOG_LEVEL_WARNING, "Cannot create socket [%s]",
+//				strerror(errno));
+		sprintf(error,"Cannot create socket [%s]", strerror(errno));
+		return	FAIL;
+	}
+ 
+	if( connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
+	{
+		switch (errno)
+		{
+			case WSAETIMEDOUT:
+//				zabbix_log( LOG_LEVEL_WARNING, "Timeout while connecting to [%s:%d]",server,port);
+				sprintf(error,"Timeout while connecting to [%s:%d]",server,port);
+				break;
+			case WSAEHOSTUNREACH:
+//				zabbix_log( LOG_LEVEL_WARNING, "No route to host [%s:%d]",server,port);
+				sprintf(error,"No route to host [%s:%d]",server,port);
+				break;
+			default:
+//				zabbix_log( LOG_LEVEL_WARNING, "Cannot connect to [%s:%d] [%s]",server,port,strerror(errno));
+				sprintf(error,"Cannot connect to [%s:%d] [%s]",server,port,strerror(errno));
+		} 
+		closesocket(s);
+		return	NETWORK_ERROR;
+	}
+
+	sprintf(c,"%s\n%s\n","ZBX_GET_ACTIVE_CHECKS",confHostname);
+//	zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", c);
+	if( sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
+//	if( write(s,c,strlen(c)) == -1 )
+	{
+		switch (errno)
+		{
+			case WSAETIMEDOUT:
+//				zabbix_log( LOG_LEVEL_WARNING, "Timeout while sending data to [%s:%d]",server,port);
+				sprintf(error,"Timeout while sending data to [%s:%d]",server,port);
+				break;
+			default:
+//				zabbix_log( LOG_LEVEL_WARNING, "Error while sending data to [%s:%d] [%s]",server,port,strerror(errno));
+				sprintf(error,"Error while sending data to [%s:%d] [%s]",server,port,strerror(errno));
+		} 
+		closesocket(s);
+		return	FAIL;
+	} 
+
+	memset(c,0,MAX_BUF_LEN);
+
+	//zabbix_log(LOG_LEVEL_DEBUG, "Before read");
+
+	amount_read = 0;
+
+	do
+	{
+		len=sizeof(struct sockaddr_in);
+		len=recvfrom(s,c+amount_read,MAX_BUF_LEN-1-amount_read,0,(struct sockaddr *)&servaddr_in,(int *)&len);
+
+//		len=read(s,c+amount_read,(MAX_BUF_LEN-1)-amount_read);
+		if (len > 0)
+			amount_read += len;
+		if(len == -1)
+		{
+			switch (errno)
+			{
+				case 	WSAETIMEDOUT:
+//						zabbix_log( LOG_LEVEL_WARNING, "Timeout while receiving data from [%s:%d]",server,port);
+						sprintf(error,"Timeout while receiving data from [%s:%d]",server,port);
+						break;
+				case	WSAECONNRESET:
+//						zabbix_log( LOG_LEVEL_WARNING, "Connection reset by peer.");
+						sprintf(error,"Connection reset by peer.");
+						closesocket(s);
+						return	NETWORK_ERROR;
+				default:
+//						zabbix_log( LOG_LEVEL_WARNING, "Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
+						sprintf(error,"Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
+			} 
+			closesocket(s);
+			return	FAIL;
+		}
+	}
+	while (len > 0);
+
+/*	while((len=read(s,tmp,MAX_BUF_LEN-1))>0)
+	{
+		if(len == -1)
+		{
+			switch (errno)
+			{
+				case 	WSAETIMEDOUT:
+						zabbix_log( LOG_LEVEL_WARNING, "Timeout while receiving data from [%s:%d]",server,port);
+						snprintf(error,max_error_len-1,"Timeout while receiving data from [%s:%d]",server,port);
+						break;
+				case	ECONNRESET:
+						zabbix_log( LOG_LEVEL_WARNING, "Connection reset by peer.");
+						snprintf(error,max_error_len-1,"Connection reset by peer.");
+						close(s);
+						return	NETWORK_ERROR;
+				default:
+						zabbix_log( LOG_LEVEL_WARNING, "Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
+						snprintf(error,max_error_len-1,"Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
+			} 
+			close(s);
+			return	FAIL;
+		}
+		strncat(c,tmp,len);
+	}
+	zabbix_log(LOG_LEVEL_DEBUG, "Read [%s]", c);*/
+
+	parse_list_of_checks(c);
+
+	if( closesocket(s)!=0 )
+	{
+//		zabbix_log(LOG_LEVEL_WARNING, "Problem with close [%s]", strerror(errno));
+	}
+
+	return SUCCEED;
+}
+
+int	send_value(char *server,int port,char *shortname,char *value)
+{
+	int	i,s;
+	char	tosend[1024];
+	char	result[1024];
+	struct hostent *hp;
+
+	struct sockaddr_in myaddr_in;
+	struct sockaddr_in servaddr_in;
+
+//	zabbix_log( LOG_LEVEL_DEBUG, "In send_value()");
+
+	servaddr_in.sin_family=AF_INET;
+	hp=gethostbyname(server);
+
+	if(hp==NULL)
+	{
+		return	FAIL;
+	}
+
+	servaddr_in.sin_addr.s_addr=((struct in_addr *)(hp->h_addr))->s_addr;
+
+	servaddr_in.sin_port=htons(port);
+
+	s=socket(AF_INET,SOCK_STREAM,0);
+	if(s == -1)
+	{
+//		zabbix_log( LOG_LEVEL_WARNING, "Error in socket() [%s:%d] [%s]",server,port, strerror(errno));
+		return	FAIL;
+	}
+
+/*	ling.l_onoff=1;*/
+/*	ling.l_linger=0;*/
+/*	if(setsockopt(s,SOL_SOCKET,SO_LINGER,&ling,sizeof(ling))==-1)*/
+/*	{*/
+/* Ignore */
+/*	}*/
+ 
+	myaddr_in.sin_family = AF_INET;
+	myaddr_in.sin_port=0;
+	myaddr_in.sin_addr.s_addr=INADDR_ANY;
+
+	if( connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
+	{
+//		zabbix_log( LOG_LEVEL_WARNING, "Error in connect() [%s:%d] [%s]",server, port, strerror(errno));
+		closesocket(s);
+		return	FAIL;
+	}
+
+	sprintf(tosend,"%s:%s\n",shortname,value);
+
+	if( sendto(s,tosend,strlen(tosend),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
+	{
+//		zabbix_log( LOG_LEVEL_WARNING, "Error in sendto() [%s:%d] [%s]",server, port, strerror(errno));
+		closesocket(s);
+		return	FAIL;
+	} 
+	i=sizeof(struct sockaddr_in);
+/*	i=recvfrom(s,result,1023,0,(struct sockaddr *)&servaddr_in,(size_t *)&i);*/
+	i=recvfrom(s,result,1023,0,(struct sockaddr *)&servaddr_in,(int *)&i);
+	if(s==-1)
+	{
+//		zabbix_log( LOG_LEVEL_WARNING, "Error in recvfrom() [%s:%d] [%s]",server,port, strerror(errno));
+		closesocket(s);
+		return	FAIL;
+	}
+
+	result[i-1]=0;
+
+	if(strcmp(result,"OK") == 0)
+	{
+//		zabbix_log( LOG_LEVEL_DEBUG, "OK");
+	}
+	else
+	{
+//		zabbix_log( LOG_LEVEL_DEBUG, "NOT OK [%s]", shortname);
+	}
+ 
+	if( closesocket(s)!=0 )
+	{
+//		zabbix_log( LOG_LEVEL_WARNING, "Error in close() [%s] [%s]",server, strerror(errno));
+	}
+
+	return SUCCEED;
+}
+
+int	process_active_checks(char *server, int port)
+{
+	   REQUEST rq;
+   HANDLE hThread=NULL;
+   unsigned int tid;
+
+	char	value[MAX_STRING_LEN];
+	char	value_tmp[MAX_STRING_LEN];
+	int	i, now, count;
+	int	ret = SUCCEED;
+
+	char	shortname[MAX_STRING_LEN];
+	char	c[MAX_STRING_LEN];
+	char	*filename;
+
+	now=time(NULL);
+
+	for(i=0;;i++)
+	{
+		if(metrics[i].key == NULL)			break;
+		if(metrics[i].nextcheck>now)			continue;
+		if(metrics[i].status!=ITEM_STATUS_ACTIVE)	continue;
+
+		/* Special processing for log files */
+		if(strncmp(metrics[i].key,"log[",4) == 0)
+		{
+			strscpy(c,metrics[i].key);
+			filename=strtok(c,"[]");
+			filename=strtok(NULL,"[]");
+
+			count=0;
+			while(process_log(filename,&metrics[i].lastlogsize,value) == 0)
+			{
+				sprintf(shortname, "%s:%s",confHostname,metrics[i].key);
+//				zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
+				sprintf(value_tmp,"%d:%s",metrics[i].lastlogsize,value);
+				if(send_value(server,port,shortname,value_tmp) == FAIL)
+				{
+					ret = FAIL;
+					break;
+				}
+				if(strcmp(value,"ZBX_NOTSUPPORTED\n")==0)
+				{
+					metrics[i].status=ITEM_STATUS_NOTSUPPORTED;
+//					zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.", metrics[i].key);
+					break;
+				}
+				count++;
+				/* Do not flood ZABBIX server if file grows too fast */
+				if(count >= MAX_LINES_PER_SECOND*metrics[i].refresh)	break;
+			}
+		}
+		else
+		{
+			strcpy(rq.cmd,metrics[i].key);
+
+			   
+   hThread=(HANDLE)_beginthreadex(NULL,0,ProcessingThread,(void *)&rq,0,&tid);
+   if (WaitForSingleObject(hThread,confTimeout)==WAIT_TIMEOUT)
+   {
+      strcpy(rq.result,"ZBX_ERROR\n");
+      WriteLog(MSG_REQUEST_TIMEOUT,EVENTLOG_WARNING_TYPE,"s",rq.cmd);
+      statTimedOutRequests++;
+   }
+
+   //send(sock,rq.result,strlen(rq.result),0);
+
+			//process(metrics[i].key, value);
+
+			sprintf(shortname,"%s:%s",confHostname,metrics[i].key);
+//			zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
+			if(send_value(server,port,shortname,rq.result) == FAIL)
+			{
+				ret = FAIL;
+				break;
+			}
+
+			if(strcmp(value,"ZBX_NOTSUPPORTED\n")==0)
+			{
+				metrics[i].status=ITEM_STATUS_NOTSUPPORTED;
+//				zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.", metrics[i].key);
+			}
+		}
+
+		metrics[i].nextcheck=time(NULL)+metrics[i].refresh;
+	}
+	return ret;
+}
+
+void	refresh_metrics(char *server, int port, char *error, int max_error_len)
+{
+//	zabbix_log( LOG_LEVEL_DEBUG, "In refresh_metrics()");
+
+	while(get_active_checks(server, port, error, sizeof(error)) != SUCCEED)
+	{
+//		zabbix_log( LOG_LEVEL_WARNING, "Getting list of active checks failed. Will retry after 60 seconds");
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("poller [sleeping for %d seconds]", 60);
+#endif
+		Sleep(60);
+	}
+}
+
+void    child_active_main(int i,char *server, int port)
+{
+	char	error[MAX_STRING_LEN];
+	int	sleeptime, nextcheck;
+	int	nextrefresh;
+
+//	zabbix_log( LOG_LEVEL_WARNING, "zabbix_agentd %ld started",(long)getpid());
+
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+	setproctitle("getting list of active checks");
+#endif
+
+	init_list();
+
+	refresh_metrics(server, port, error, sizeof(error));
+	nextrefresh=time(NULL)+300;
+
+	for(;;)
+	{
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("processing active checks");
+#endif
+		if(process_active_checks(server, port) == FAIL)
+		{
+			Sleep(60);
+			continue;
+		}
+		nextcheck=get_min_nextcheck();
+		if( FAIL == nextcheck)
+		{
+			sleeptime=60;
+		}
+		else
+		{
+			sleeptime=nextcheck-time(NULL);
+			if(sleeptime<0)
+			{
+				sleeptime=0;
+			}
+		}
+		if(sleeptime>0)
+		{
+			if(sleeptime > 60)
+			{
+				sleeptime = 60;
+			}
+//			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
+//					sleeptime );
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+			setproctitle("poller [sleeping for %d seconds]", 
+					sleeptime);
+#endif
+			Sleep( sleeptime );
+		}
+		else
+		{
+//			zabbix_log( LOG_LEVEL_DEBUG, "No sleeping" );
+		}
+
+		if(time(NULL)>=nextrefresh)
+		{
+			refresh_metrics(server, port, error, sizeof(error));
+			nextrefresh=time(NULL)+300;
+		}
+	}
+}

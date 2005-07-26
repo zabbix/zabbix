@@ -34,6 +34,8 @@ HANDLE eventCollectorStarted;
 DWORD dwFlags=AF_USE_EVENT_LOG;
 char confFile[MAX_PATH]="C:\\zabbix_agentd.conf";
 char logFile[MAX_PATH]="{EventLog}";
+char confHostname[MAX_PATH]="0.0.0.0";
+
 WORD confListenPort=10050; // Alexei: New defailt port 10000 -> 10050
 DWORD confServerAddr[MAX_SERVERS];
 DWORD confServerCount=0;

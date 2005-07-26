@@ -242,6 +242,11 @@ BOOL ReadConfig(void)
             strncpy(logFile,ptr,MAX_PATH-1);
          }
       }
+	  else if (!stricmp(buffer,"Hostname"))
+	  {
+	        memset(confHostname,0,MAX_PATH);
+            strncpy(confHostname,ptr,MAX_PATH-1);
+	  }
       else if (!stricmp(buffer,"Server"))
       {
          int rc;

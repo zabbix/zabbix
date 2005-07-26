@@ -87,6 +87,10 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=.\active.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\alias.cpp
 # End Source File
 # Begin Source File
@@ -108,6 +112,10 @@ SOURCE=.\execute.cpp
 # Begin Source File
 
 SOURCE=.\log.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\logfiles.cpp
 # End Source File
 # Begin Source File
 
