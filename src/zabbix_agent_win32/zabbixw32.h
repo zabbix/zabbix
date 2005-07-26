@@ -201,6 +201,7 @@ void Main(void);
 
 void ListenerThread(void *);
 void CollectorThread(void *);
+void ActiveChecksThread(void *);
 
 void ProcessCommand(char *cmd,char *result);
 
@@ -225,9 +226,11 @@ extern DWORD g_dwLogLevel;
 extern char confFile[];
 extern char logFile[];
 extern char confHostname[];
+extern char confServer[];
 extern DWORD confServerAddr[];
 extern DWORD confServerCount;
 extern WORD confListenPort;
+extern WORD confServerPort;
 extern DWORD confTimeout;
 extern DWORD confMaxProcTime;
 
