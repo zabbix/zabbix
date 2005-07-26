@@ -27,11 +27,6 @@
 // Request structure
 //
 
-struct REQUEST
-{
-   char cmd[MAX_ZABBIX_CMD_LEN];
-   char result[MAX_STRING_LEN];
-};
 
 
 //
@@ -63,7 +58,7 @@ static BOOL IsValidServerAddr(DWORD addr)
 // Request processing thread
 //
 
-static unsigned int __stdcall ProcessingThread(void *arg)
+unsigned int __stdcall ProcessingThread(void *arg)
 {
    ProcessCommand(((REQUEST *)arg)->cmd,((REQUEST *)arg)->result);
    return 0;

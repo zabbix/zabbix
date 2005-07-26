@@ -160,6 +160,12 @@ struct SUBAGENT_NAME
    char *cmdLine;
 };
 
+struct REQUEST
+{
+   char cmd[MAX_ZABBIX_CMD_LEN];
+   char result[MAX_STRING_LEN];
+};
+
 
 //
 // Functions
@@ -203,6 +209,8 @@ BOOL ReadConfig(void);
 BOOL AddAlias(char *name,char *value);
 void ExpandAlias(char *orig,char *expanded);
 
+unsigned int __stdcall ProcessingThread(void *arg);
+int   process_log(char *filename,int *lastlogsize, char *value);
 
 //
 // Global variables
@@ -216,6 +224,7 @@ extern DWORD g_dwLogLevel;
 
 extern char confFile[];
 extern char logFile[];
+extern char confHostname[];
 extern DWORD confServerAddr[];
 extern DWORD confServerCount;
 extern WORD confListenPort;
