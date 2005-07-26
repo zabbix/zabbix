@@ -194,4 +194,10 @@ Language=English
 DNS lookup failed for host %1
 .
 
+MessageId=
+SymbolicName=MSG_ACTIVE_CHECKS
+Language=English
+Active checks [%1]
+.
+
 ;#endif
