@@ -1,5 +1,6 @@
 Changes for 1.1alpha11:
 
+ - WIN32 agent: support of active checks (Alexei)
  - fixed addition of complex triggers for linked hosts (Alexei)
  - housekeeper improved to delete hosts sequentially (Alexei)
  - new utility zabbix_get (Alexei)
