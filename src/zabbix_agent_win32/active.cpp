@@ -158,14 +158,34 @@ void	add_check(char *key, int refresh, int lastlogsize)
 	}
 }
 
+// Return position of Nth delimiter from right size, 0 - otherwise
+int strnrchr(char *str, int num, char delim)
+{
+	int i=0;
+	int n=0;
+
+	for(i=strlen(str)-1;i>=0;i--)
+	{
+		if(str[i]==delim) n++;
+		if(n==num) break;
+	}
+	if(i==-1) i=0;
+	return i;
+}
+
 /* Parse list of active checks received from server */
 int	parse_list_of_checks(char *str)
 {
 	char line[MAX_BUF_LEN];
-	char *key,*refresh,*lastlogsize;
+	char 
+		key[MAX_STRING_LEN],
+		refresh[MAX_STRING_LEN],
+		lastlogsize[MAX_STRING_LEN];
 	//char *s1, *s2;
 	char *pos;
 	char *str_copy;
+	int i;
+	int p1,p2,p3;
 
 	disable_all_metrics();
 
@@ -183,9 +203,25 @@ int	parse_list_of_checks(char *str)
 
 //		sscanf(line,"%s:%d:%d",key,&r,&l);
 
-		key=(char *)strtok(line,":");
-		refresh=(char *)strtok(NULL,":");
-		lastlogsize=(char *)strtok(NULL,":");
+		p2=strnrchr(line,1,':');
+		p1=strnrchr(line,2,':');
+				
+		memset(key,0,sizeof(key));
+		memset(refresh,0,sizeof(refresh));
+		memset(lastlogsize,0,sizeof(lastlogsize));
+
+		strcpy(lastlogsize,line+p2+1);
+//		WriteLog(MSG_SOCKET_ERROR,EVENTLOG_ERROR_TYPE,"s",lastlogsize);
+		
+		strncpy(key,line,p1);
+//		WriteLog(MSG_SOCKET_ERROR,EVENTLOG_ERROR_TYPE,"s",key);
+		
+		strncpy(refresh,line+p1+1,p2-p1-1);
+//		WriteLog(MSG_SOCKET_ERROR,EVENTLOG_ERROR_TYPE,"s",refresh);
+		
+//		key=(char *)strtok(line,":");
+//		refresh=(char *)strtok(NULL,":");
+//		lastlogsize=(char *)strtok(NULL,":");
 		
 		add_check(key, atoi(refresh), atoi(lastlogsize));
 //		add_check(key, r, l);
@@ -416,6 +452,8 @@ int	send_value(char *server,int port,char *shortname,char *value)
 
 	sprintf(tosend,"%s:%s\n",shortname,value);
 
+//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tosend);
+
 	if( sendto(s,tosend,strlen(tosend),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
 //		zabbix_log( LOG_LEVEL_WARNING, "Error in sendto() [%s:%d] [%s]",server, port, strerror(errno));
@@ -480,7 +518,7 @@ int	process_active_checks(char *server, int port)
 		if(metrics[i].nextcheck>now)			continue;
 		if(metrics[i].status!=ITEM_STATUS_ACTIVE)	continue;
 
-		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",metrics[i].key);
+//		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",metrics[i].key);
 		/* Special processing for log files */
 		if(strncmp(metrics[i].key,"log[",4) == 0)
 		{
@@ -599,7 +637,7 @@ void    ActiveChecksThread(void *)
 
 //	zabbix_log( LOG_LEVEL_WARNING, "zabbix_agentd %ld started",(long)getpid());
 
-	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",confServerPort);
+//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",confServerPort);
 
 	init_list();
 
