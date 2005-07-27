@@ -480,6 +480,7 @@ int	process_active_checks(char *server, int port)
 		if(metrics[i].nextcheck>now)			continue;
 		if(metrics[i].status!=ITEM_STATUS_ACTIVE)	continue;
 
+		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",metrics[i].key);
 		/* Special processing for log files */
 		if(strncmp(metrics[i].key,"log[",4) == 0)
 		{
@@ -489,6 +490,37 @@ int	process_active_checks(char *server, int port)
 
 			count=0;
 			while(process_log(filename,&metrics[i].lastlogsize,value) == 0)
+			{
+				sprintf(shortname, "%s:%s",confHostname,metrics[i].key);
+//				zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
+				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",shortname);
+
+				sprintf(value_tmp,"%d:%s",metrics[i].lastlogsize,value);
+				if(send_value(server,port,shortname,value_tmp) == FAIL)
+				{
+					ret = FAIL;
+					break;
+				}
+				if(strcmp(value,"ZBX_NOTSUPPORTED\n")==0)
+				{
+					metrics[i].status=ITEM_STATUS_NOTSUPPORTED;
+//					zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.", metrics[i].key);
+					break;
+				}
+				count++;
+				/* Do not flood ZABBIX server if file grows too fast */
+				if(count >= MAX_LINES_PER_SECOND*metrics[i].refresh)	break;
+			}
+		}
+		/* Special processing for log files */
+		else if(strncmp(metrics[i].key,"eventlog[",9) == 0)
+		{
+			strscpy(c,metrics[i].key);
+			filename=strtok(c,"[]");
+			filename=strtok(NULL,"[]");
+
+			count=0;
+			while(process_eventlog(filename,&metrics[i].lastlogsize,value) == 0)
 			{
 				sprintf(shortname, "%s:%s",confHostname,metrics[i].key);
 //				zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
@@ -566,6 +598,8 @@ void    ActiveChecksThread(void *)
 	int	nextrefresh;
 
 //	zabbix_log( LOG_LEVEL_WARNING, "zabbix_agentd %ld started",(long)getpid());
+
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",confServerPort);
 
 	init_list();
 

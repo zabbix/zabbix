@@ -212,6 +212,7 @@ void ExpandAlias(char *orig,char *expanded);
 
 unsigned int __stdcall ProcessingThread(void *arg);
 int   process_log(char *filename,int *lastlogsize, char *value);
+int   process_eventlog(char *source,int *lastlogsize, char *value);
 
 //
 // Global variables
