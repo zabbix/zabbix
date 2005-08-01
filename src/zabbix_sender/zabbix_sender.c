@@ -54,11 +54,14 @@ void    signal_handler( int sig )
 	exit( FAIL );
 }
 
-int	send_value(char *server,int port,char *shortname,char *value)
+static int send_value(char *server,int port,char *hostname, char *key,char *value)
 {
 	int	i,s;
-	char	tosend[1024];
-	char	result[1024];
+	char	tosend[MAX_STRING_LEN];
+	char	result[MAX_STRING_LEN];
+	char	hostname_b64[3*MAX_STRING_LEN];
+	char	key_b64[3*MAX_STRING_LEN];
+	char	value_b64[3*MAX_STRING_LEN];
 	struct hostent *hp;
 
 	struct sockaddr_in myaddr_in;
@@ -101,7 +104,18 @@ int	send_value(char *server,int port,char *shortname,char *value)
 		return	FAIL;
 	}
 
-	snprintf(tosend,sizeof(tosend)-1,"%s:%s\n",shortname,value);
+/* Send <req><host>SERVER_B64</host><key>KEY_B64</key><data>VALUE_B64</data></req> */
+
+	memset(hostname_b64,0,sizeof(hostname_b64));
+	memset(key_b64,0,sizeof(key_b64));
+	memset(value_b64,0,sizeof(value_b64));
+
+	str_base64_encode(hostname, hostname_b64, strlen(hostname));
+	str_base64_encode(key, key_b64, strlen(key));
+	str_base64_encode(value, value_b64, strlen(value));
+
+//	snprintf(tosend,sizeof(tosend)-1,"%s:%s\n",shortname,value);
+	snprintf(tosend,sizeof(tosend)-1,"<req><host>%s</host><key>%s</key><data>%s</data></req>",hostname_b64,key_b64,value_b64);
 
 	if( sendto(s,tosend,strlen(tosend),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
@@ -111,7 +125,7 @@ int	send_value(char *server,int port,char *shortname,char *value)
 	} 
 	i=sizeof(struct sockaddr_in);
 /*	i=recvfrom(s,result,1023,0,(struct sockaddr *)&servaddr_in,(size_t *)&i);*/
-	i=recvfrom(s,result,1023,0,(struct sockaddr *)&servaddr_in,(socklen_t *)&i);
+	i=recvfrom(s,result,MAX_STRING_LEN-1,0,(struct sockaddr *)&servaddr_in,(socklen_t *)&i);
 	if(s==-1)
 	{
 		perror("recfrom");
@@ -142,7 +156,8 @@ int main(int argc, char **argv)
 	char	line[MAX_STRING_LEN];
 	char	port_str[MAX_STRING_LEN];
 	char	zabbix_server[MAX_STRING_LEN];
-	char	server_key[MAX_STRING_LEN];
+	char	server[MAX_STRING_LEN];
+	char	key[MAX_STRING_LEN];
 	char	value[MAX_STRING_LEN];
 	char	*s;
 
@@ -151,13 +166,13 @@ int main(int argc, char **argv)
 	signal( SIGTERM, signal_handler );
 	signal( SIGALRM, signal_handler );
 
-	if(argc == 5)
+	if(argc == 6)
 	{
 		port=atoi(argv[2]);
 
 		alarm(SENDER_TIMEOUT);
 
-		ret = send_value(argv[1],port,argv[3],argv[4]);
+		ret = send_value(argv[1],port,argv[3],argv[4],argv[5]);
 
 		alarm(0);
 	}
@@ -169,22 +184,23 @@ int main(int argc, char **argv)
 /*			printf("[%s]\n",line);*/
 			alarm(SENDER_TIMEOUT);
 
-			s=(char *)strtok(line," ");
 			strscpy(zabbix_server,s);
 			s=(char *)strtok(NULL," ");
 			strscpy(port_str,s);
 			s=(char *)strtok(NULL," ");
-			strscpy(server_key,s);
+			strscpy(server,s);
+			s=(char *)strtok(NULL," ");
+			strscpy(key,s);
 			s=(char *)strtok(NULL," ");
 			strscpy(value,s);
-			ret = send_value(zabbix_server,atoi(port_str),server_key,value);
+			ret = send_value(zabbix_server,atoi(port_str),server,key,value);
 
 			alarm(0);
 		}
 	}
 	else
 	{
-		printf("Usage: zabbix_sender <Zabbix server> <port> <server:key> <value>\n");
+		printf("Usage: zabbix_sender <Zabbix server> <port> <server> <key> <value>\n");
 		printf("If no arguments are given, zabbix_sender expects list of parameters\n");
 		printf("from standard input.\n");
 		
