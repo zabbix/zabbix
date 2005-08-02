@@ -59,6 +59,7 @@ int	process_trap(int sockfd,char *s, int max_len)
 	char	result[MAX_STRING_LEN];
 	char	host_b64[MAX_STRING_LEN],key_b64[MAX_STRING_LEN],value_b64[MAX_STRING_LEN];
 	char	host_dec[MAX_STRING_LEN],key_dec[MAX_STRING_LEN],value_dec[MAX_STRING_LEN];
+	char	lastlogsize[MAX_STRING_LEN];
 
 	int	ret=SUCCEED;
 	int 	i;
@@ -83,7 +84,7 @@ int	process_trap(int sockfd,char *s, int max_len)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "XML received [%s]", s);
 
-			comms_parse_response(s,host_dec,key_dec, value_dec, sizeof(host_dec)-1);
+			comms_parse_response(s,host_dec,key_dec,value_dec,lastlogsize, sizeof(host_dec)-1);
 
 			server=host_dec;
 			value_string=value_dec;
@@ -114,9 +115,10 @@ int	process_trap(int sockfd,char *s, int max_len)
 			}
 			/* It points to ':', so have to increment */
 			value_string++;
+			lastlogsize[0]=0;
 		}
 
-		ret=process_data(sockfd,server,key,value_string);
+		ret=process_data(sockfd,server,key,value_string,lastlogsize);
 		if( SUCCEED == ret)
 		{
 			snprintf(result,sizeof(result)-1,"OK\n");
