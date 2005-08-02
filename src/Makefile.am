@@ -1,1 +1,6 @@
-SUBDIRS = libs zabbix_agent zabbix_get zabbix_sender zabbix_server
+if SERVER
+	DIRS = libs zabbix_agent zabbix_get zabbix_sender zabbix_server
+else
+	DIRS = libs zabbix_agent zabbix_get zabbix_sender
+endif
+SUBDIRS = $(DIRS)
