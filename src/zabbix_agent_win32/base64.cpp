@@ -1,11 +1,15 @@
+#include "zabbixw32.h"
+
+#define MAX_B64_SIZE 16*1024
+
 static char base64_set [] =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 void str_base64_encode(char *p_str, char *p_b64str, int in_size);
 void str_base64_decode(char *p_b64str, char *p_str, int *p_out_size);
-char char_base64_encode(unsigned char uc);
-unsigned char char_base64_decode(char c);
-int is_base64 (char c);
+static char char_base64_encode(unsigned char uc);
+static unsigned char char_base64_decode(char c);
+static int is_base64 (char c);
 
 /*------------------------------------------------------------------------
  *
@@ -20,7 +24,7 @@ int is_base64 (char c);
  * Comments	:
  *
  *----------------------------------------------------------------------*/
-private int is_base64 (char c)
+static int is_base64 (char c)
 {
 	if ( (c >= '0' && c <= '9')
 	  || (c >= 'a' && c <= 'z')
@@ -48,7 +52,7 @@ private int is_base64 (char c)
  * Comments	:
  *
  *----------------------------------------------------------------------*/
-private char char_base64_encode(unsigned char uc)
+static char char_base64_encode(unsigned char uc)
 {
 	return base64_set[uc];
 }
@@ -66,7 +70,7 @@ private char char_base64_encode(unsigned char uc)
  * Comments	:
  *
  *----------------------------------------------------------------------*/
-private unsigned char char_base64_decode(char c)
+static unsigned char char_base64_decode(char c)
 {
 	if (c >= 'A' && c <= 'Z')
 	{
@@ -104,7 +108,7 @@ private unsigned char char_base64_decode(char c)
  * Comments	:
  *
  *----------------------------------------------------------------------*/
-public void str_base64_encode(char *p_str, char *p_b64str, int in_size)
+void str_base64_encode(char *p_str, char *p_b64str, int in_size)
 {
 	int 	i;
 	unsigned char from1=0,from2=0,from3=0;
@@ -155,11 +159,11 @@ public void str_base64_encode(char *p_str, char *p_b64str, int in_size)
 			*(p_b64str++) = '=';	/* Padding */
 		};
 
-		if ( i % (76/4*3) == 0)
+/*		if ( i % (76/4*3) == 0)
 		{
 			*(p_b64str++) = '\r';
 			*(p_b64str++) = '\n';
-		}
+		}*/
 	};
 	
 	return;
@@ -179,7 +183,7 @@ public void str_base64_encode(char *p_str, char *p_b64str, int in_size)
  * Comments	:
  *
  *----------------------------------------------------------------------*/
-public void str_base64_decode(char *p_b64str, char *p_str, int *p_out_size)
+void str_base64_decode(char *p_b64str, char *p_str, int *p_out_size)
 {
 	int i;
 	int j = 0;
