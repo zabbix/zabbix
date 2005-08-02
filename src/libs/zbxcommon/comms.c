@@ -1,4 +1,5 @@
 #include "common.h"
+#include "log.h"
 
 int	comms_create_request(char *host, char *key, char *data, char *request,int maxlen)
 {
@@ -28,6 +29,10 @@ int	comms_parse_response(char *xml,char *host,char *key, char *data, int maxlen)
 	char host_b64[MAX_STRING_LEN];
 	char key_b64[MAX_STRING_LEN];
 	char data_b64[MAX_STRING_LEN];
+
+	memset(host_b64,0,sizeof(host_b64));
+	memset(key_b64,0,sizeof(key_b64));
+	memset(data_b64,0,sizeof(data_b64));
 
 	xml_get_data(xml, "host", host_b64, sizeof(host_b64)-1);
 	xml_get_data(xml, "key", key_b64, sizeof(key_b64)-1);
