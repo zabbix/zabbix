@@ -323,7 +323,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 	return SUCCEED;
 }
 
-int	send_value(char *server,int port,char *shortname,char *value)
+int	send_value(char *server,int port,char *host, char *key,char *value)
 {
 	int	i,s;
 	char	tosend[1024];
@@ -372,7 +372,8 @@ int	send_value(char *server,int port,char *shortname,char *value)
 		return	FAIL;
 	}
 
-	snprintf(tosend,sizeof(tosend)-1,"%s:%s\n",shortname,value);
+	comms_create_request(host, key, value, tosend,sizeof(tosend)-1);
+//	snprintf(tosend,sizeof(tosend)-1,"%s:%s\n",shortname,value);
 
 	if( sendto(s,tosend,strlen(tosend),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
@@ -398,7 +399,7 @@ int	send_value(char *server,int port,char *shortname,char *value)
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "NOT OK [%s]", shortname);
+		zabbix_log( LOG_LEVEL_DEBUG, "NOT OK [%s:%s]", host, key);
 	}
  
 	if( close(s)!=0 )
@@ -438,10 +439,11 @@ int	process_active_checks(char *server, int port)
 			count=0;
 			while(process_log(filename,&metrics[i].lastlogsize,value) == 0)
 			{
-				snprintf(shortname, MAX_STRING_LEN-1,"%s:%s",CONFIG_HOSTNAME,metrics[i].key);
-				zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
+//				snprintf(shortname, MAX_STRING_LEN-1,"%s:%s",CONFIG_HOSTNAME,metrics[i].key);
+//				zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
 				snprintf(value_tmp, MAX_STRING_LEN-1,"%d:%s",metrics[i].lastlogsize,value);
-				if(send_value(server,port,shortname,value_tmp) == FAIL)
+
+				if(send_value(server,port,CONFIG_HOSTNAME,metrics[i].key,value_tmp) == FAIL)
 				{
 					ret = FAIL;
 					break;
@@ -461,9 +463,9 @@ int	process_active_checks(char *server, int port)
 		{
 			process(metrics[i].key, value);
 
-			snprintf(shortname, MAX_STRING_LEN-1,"%s:%s",CONFIG_HOSTNAME,metrics[i].key);
-			zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
-			if(send_value(server,port,shortname,value) == FAIL)
+//			snprintf(shortname, MAX_STRING_LEN-1,"%s:%s",CONFIG_HOSTNAME,metrics[i].key);
+//			zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
+			if(send_value(server,port,CONFIG_HOSTNAME,metrics[i].key,value) == FAIL)
 			{
 				ret = FAIL;
 				break;
