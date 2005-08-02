@@ -323,7 +323,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 	return SUCCEED;
 }
 
-int	send_value(char *server,int port,char *host, char *key,char *value)
+int	send_value(char *server,int port,char *host, char *key,char *value, char *lastlogsize)
 {
 	int	i,s;
 	char	tosend[1024];
@@ -333,7 +333,7 @@ int	send_value(char *server,int port,char *host, char *key,char *value)
 	struct sockaddr_in myaddr_in;
 	struct sockaddr_in servaddr_in;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In send_value()");
+	zabbix_log( LOG_LEVEL_WARNING, "In send_value([%s])",lastlogsize);
 
 	servaddr_in.sin_family=AF_INET;
 	hp=gethostbyname(server);
@@ -372,8 +372,9 @@ int	send_value(char *server,int port,char *host, char *key,char *value)
 		return	FAIL;
 	}
 
-	comms_create_request(host, key, value, tosend,sizeof(tosend)-1);
+	comms_create_request(host, key, value, lastlogsize, tosend, sizeof(tosend)-1);
 //	snprintf(tosend,sizeof(tosend)-1,"%s:%s\n",shortname,value);
+	zabbix_log( LOG_LEVEL_WARNING, "XML before sonding [%s]",tosend);
 
 	if( sendto(s,tosend,strlen(tosend),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
@@ -413,7 +414,7 @@ int	send_value(char *server,int port,char *host, char *key,char *value)
 int	process_active_checks(char *server, int port)
 {
 	char	value[MAX_STRING_LEN];
-	char	value_tmp[MAX_STRING_LEN];
+	char	lastlogsize[MAX_STRING_LEN];
 	int	i, now, count;
 	int	ret = SUCCEED;
 
@@ -441,9 +442,9 @@ int	process_active_checks(char *server, int port)
 			{
 //				snprintf(shortname, MAX_STRING_LEN-1,"%s:%s",CONFIG_HOSTNAME,metrics[i].key);
 //				zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
-				snprintf(value_tmp, MAX_STRING_LEN-1,"%d:%s",metrics[i].lastlogsize,value);
+				snprintf(lastlogsize, MAX_STRING_LEN-1,"%d",metrics[i].lastlogsize);
 
-				if(send_value(server,port,CONFIG_HOSTNAME,metrics[i].key,value_tmp) == FAIL)
+				if(send_value(server,port,CONFIG_HOSTNAME,metrics[i].key,value,lastlogsize) == FAIL)
 				{
 					ret = FAIL;
 					break;
@@ -461,11 +462,12 @@ int	process_active_checks(char *server, int port)
 		}
 		else
 		{
+			lastlogsize[0]=0;
 			process(metrics[i].key, value);
 
 //			snprintf(shortname, MAX_STRING_LEN-1,"%s:%s",CONFIG_HOSTNAME,metrics[i].key);
 //			zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
-			if(send_value(server,port,CONFIG_HOSTNAME,metrics[i].key,value) == FAIL)
+			if(send_value(server,port,CONFIG_HOSTNAME,metrics[i].key,value,lastlogsize) == FAIL)
 			{
 				ret = FAIL;
 				break;
