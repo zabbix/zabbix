@@ -12,24 +12,30 @@ int xml_get_data(char *xml,char *tag, char *data, int maxlen)
 	char tag_close[MAX_STRING_LEN];
 	int len;
 
-        zabbix_log( LOG_LEVEL_WARNING, "In xml_get_data([%s],[%s])", xml, tag);
+        zabbix_log( LOG_LEVEL_DEBUG, "In xml_get_data([%s],[%s],[%d])", xml, tag, maxlen);
 
 	snprintf(tag_open,MAX_STRING_LEN-1,"<%s>",tag);
 	snprintf(tag_close,MAX_STRING_LEN-1,"</%s>",tag);
 
 	if(NULL==(start=strstr(xml,tag_open)))
 	{
+		zabbix_log( LOG_LEVEL_DEBUG, "Cannot find [%s]", tag_open);
 		ret = FAIL;
 	}
 
 	if(NULL==(end=strstr(xml,tag_close)))
 	{
+		zabbix_log( LOG_LEVEL_DEBUG, "Cannot find [%s]", tag_close);
 		ret = FAIL;
 	}
 
 	if(ret == SUCCEED)
 	{
-		if(end<start)	ret = FAIL;
+		if(end<start)
+		{
+			zabbix_log( LOG_LEVEL_DEBUG, "end<start");
+			ret = FAIL;
+		}
 	}
 
 	if(ret == SUCCEED)
@@ -41,7 +47,7 @@ int xml_get_data(char *xml,char *tag, char *data, int maxlen)
 		strncpy(data, start+strlen(tag_open),len);
 	}
 
-        zabbix_log( LOG_LEVEL_WARNING, "In xml_get_data. Data [%s]", data);
+	if(ret == SUCCEED) zabbix_log( LOG_LEVEL_DEBUG, "In xml_get_data. Len [%d}. Data [%s]", len, data);
 
 	return ret;
 }
