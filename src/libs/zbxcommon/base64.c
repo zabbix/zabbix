@@ -157,11 +157,11 @@ void str_base64_encode(char *p_str, char *p_b64str, int in_size)
 			*(p_b64str++) = '=';	/* Padding */
 		};
 
-		if ( i % (76/4*3) == 0)
+/*		if ( i % (76/4*3) == 0)
 		{
 			*(p_b64str++) = '\r';
 			*(p_b64str++) = '\n';
-		}
+		}*/
 	};
 	
 	return;
