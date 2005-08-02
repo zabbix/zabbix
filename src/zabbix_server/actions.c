@@ -238,7 +238,7 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 	int	i,j;
 	int	now;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In apply_actions(triggerid:%d,alarmid:%d,trigger_value:%d)",trigger->triggerid, alarmid, trigger_value);
+	zabbix_log( LOG_LEVEL_DEBUG, "In apply_actions(triggerid:%d,alarmid:%d,trigger_value:%d)",trigger->triggerid, alarmid, trigger_value);
 
 	if(TRIGGER_VALUE_TRUE == trigger_value)
 	{
