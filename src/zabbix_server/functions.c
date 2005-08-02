@@ -383,6 +383,7 @@ void	update_triggers(int itemid)
  *             server - server name                                           *
  *             key - item's key                                               *
  *             value - new value of server:key                                *
+ *             lastlogsize - if key=log[*], last size of log file             *
  *                                                                            *
  * Return value: SUCCEED - new value processed sucesfully                     *
  *               FAIL - otherwise                                             *
@@ -392,7 +393,7 @@ void	update_triggers(int itemid)
  * Comments: for trapper server process                                       *
  *                                                                            *
  ******************************************************************************/
-int	process_data(int sockfd,char *server,char *key,char *value)
+int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize)
 {
 	char	sql[MAX_STRING_LEN];
 
