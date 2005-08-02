@@ -83,25 +83,11 @@ int	process_trap(int sockfd,char *s, int max_len)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "XML received [%s]", s);
 
-			xml_get_data(s, "host", host_b64, MAX_STRING_LEN);
-			xml_get_data(s, "key", key_b64, MAX_STRING_LEN);
-			xml_get_data(s, "data", value_b64, MAX_STRING_LEN);
+			comms_parse_response(s,host_dec,key_dec, value_dec, sizeof(host_dec)-1);
 
-			memset(key_dec,0,sizeof(key_dec));
-			memset(host_dec,0,sizeof(host_dec));
-			memset(value_dec,0,sizeof(value_dec));
-
-			str_base64_decode(host_b64, host_dec, &i);
-			str_base64_decode(key_b64, key_dec, &i);
-			str_base64_decode(value_b64, value_dec, &i);
-
-			zabbix_log( LOG_LEVEL_DEBUG, "Server [%s]->[%s]", host_b64, host_dec);
-			zabbix_log( LOG_LEVEL_DEBUG, "Value [%s]->[%s]", value_b64, value_dec);
-			zabbix_log( LOG_LEVEL_DEBUG, "Host [%s]->[%s]", host_b64, host_dec);
-
-			host=host_dec;
-			value_string=value_dec;
 			server=host_dec;
+			value_string=value_dec;
+			key=key_dec;
 		}
 		else
 		{
