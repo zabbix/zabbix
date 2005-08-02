@@ -205,7 +205,7 @@ static	void	send_to_user(DB_TRIGGER *trigger,DB_ACTION *action)
 	}
 }
 
-void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
+void	apply_actions_new(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 {
 	int escalationid;
 	char sql[MAX_STRING_LEN];
@@ -227,7 +227,7 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
  * Apply actions if any.
  */ 
 /*void	apply_actions(int triggerid,int good)*/
-void	apply_actions_old(DB_TRIGGER *trigger,int alarmid,int trigger_value)
+void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 {
 	DB_RESULT *result,*result2,*result3;
 	
