@@ -400,10 +400,9 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 	DB_RESULT       *result;
 	DB_ITEM	item;
 	char	*s;
-	char	lastlogsize[MAX_STRING_LEN];
 	int	update_tr;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In process_data([%s],[%s],[%s])",server,key,value);
+	zabbix_log( LOG_LEVEL_WARNING, "In process_data([%s],[%s],[%s],[%s])",server,key,value,lastlogsize);
 
 	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta,i.units,i.multiplier,i.formula from items i,hosts h where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type in (%d,%d)", HOST_STATUS_MONITORED, server, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE);
 	result = DBselect(sql);
@@ -475,7 +474,7 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 	s=value;
 	if(strncmp(item.key,"log[",4)==0)
 	{
-		s=strchr(value,':');
+/*		s=strchr(value,':');
 		if(s == NULL)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Wrong value received for item [%s:%s]", item.host, item.key);
@@ -485,7 +484,7 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 		s++;
 
 		strncpy(lastlogsize, value, s-value-1);
-		lastlogsize[s-value-1]=0;
+		lastlogsize[s-value-1]=0;*/
 
 		item.lastlogsize=atoi(lastlogsize);
 		zabbix_log(LOG_LEVEL_DEBUG, "Value [%s] S [%s] Lastlogsize [%s] [%d]", value, s, lastlogsize, s-value-1);
