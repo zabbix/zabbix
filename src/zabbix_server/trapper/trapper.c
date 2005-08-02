@@ -83,9 +83,9 @@ int	process_trap(int sockfd,char *s, int max_len)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "XML received [%s]", s);
 
-			xml_get_data(s, host_b64, "host", MAX_STRING_LEN);
-			xml_get_data(s, key_b64, "key", MAX_STRING_LEN);
-			xml_get_data(s, value_b64, "data", MAX_STRING_LEN);
+			xml_get_data(s, "host", host_b64, MAX_STRING_LEN);
+			xml_get_data(s, "key", key_b64, MAX_STRING_LEN);
+			xml_get_data(s, "data", value_b64, MAX_STRING_LEN);
 
 			memset(key_dec,0,sizeof(key_dec));
 			memset(host_dec,0,sizeof(host_dec));
@@ -95,9 +95,9 @@ int	process_trap(int sockfd,char *s, int max_len)
 			str_base64_decode(key_b64, key_dec, &i);
 			str_base64_decode(value_b64, value_dec, &i);
 
-			zabbix_log( LOG_LEVEL_WARNING, "Server [%s]->[%s]", host_b64, host_dec);
-			zabbix_log( LOG_LEVEL_WARNING, "Value [%s]->[%s]", value_b64, value_dec);
-			zabbix_log( LOG_LEVEL_WARNING, "Host [%s]->[%s]", host_b64, host_dec);
+			zabbix_log( LOG_LEVEL_DEBUG, "Server [%s]->[%s]", host_b64, host_dec);
+			zabbix_log( LOG_LEVEL_DEBUG, "Value [%s]->[%s]", value_b64, value_dec);
+			zabbix_log( LOG_LEVEL_DEBUG, "Host [%s]->[%s]", host_b64, host_dec);
 
 			host=host_dec;
 			value_string=value_dec;
