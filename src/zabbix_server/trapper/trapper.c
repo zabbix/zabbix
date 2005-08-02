@@ -82,7 +82,7 @@ int	process_trap(int sockfd,char *s, int max_len)
 		/* New XML protocol? */
 		if(s[0]=='<')
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "XML received [%s]", s);
+			zabbix_log( LOG_LEVEL_DEBUG, "XML received [%s]", s);
 
 			comms_parse_response(s,host_dec,key_dec,value_dec,lastlogsize, sizeof(host_dec)-1);
 
