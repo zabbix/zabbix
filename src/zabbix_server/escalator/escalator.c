@@ -101,7 +101,7 @@ static int process_escalation(DB_ESCALATION_LOG *escalation_log)
 					zabbix_log( LOG_LEVEL_WARNING, "ESCALATION_ACTION_EXEC_ACTION");
 					if(DBget_trigger_by_triggerid(escalation_log->triggerid,&trigger) == SUCCEED)
 					{
-						apply_actions_old(&trigger,escalation_log->alarmid,TRIGGER_VALUE_TRUE);
+						apply_actions(&trigger,escalation_log->alarmid,TRIGGER_VALUE_TRUE);
 					}
 					else
 					{
