@@ -217,6 +217,7 @@ int   process_eventlog(char *source,int *lastlogsize, char *value);
 void str_base64_encode(char *p_str, char *p_b64str, int in_size);
 void str_base64_decode(char *p_b64str, char *p_str, int *p_out_size);
 
+int	comms_create_request(char *host, char *key, char *data, char *lastlogsize, char *request,int maxlen);
 
 int xml_get_data(char *xml,char *tag, char *data, int maxlen);
 
