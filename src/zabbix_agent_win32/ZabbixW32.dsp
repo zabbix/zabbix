@@ -95,6 +95,10 @@ SOURCE=.\alias.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\base64.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\collect.cpp
 # End Source File
 # Begin Source File
@@ -144,6 +148,14 @@ SOURCE=.\sysinfo.cpp
 # Begin Source File
 
 SOURCE=.\util.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\xml.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\xml_comms.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"
