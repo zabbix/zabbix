@@ -1,5 +1,6 @@
-1.1alpha11:
+1.1alpha12:
 
+ - fix value #2 has unknow type (SNMP, Counter 32)
  - make agents return error message if not supported or not available
  - centralised management of agent configuration files
  - apply Lukas patches (external items, setproctitle(), select all
