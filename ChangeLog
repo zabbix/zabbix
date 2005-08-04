@@ -1,3 +1,8 @@
+Changes for 1.1alpha12:
+
+ - fixed src/zabbix_server/Makefile.am for SNMP-enabled compilation (Alexei)
+
+
 Changes for 1.1alpha11:
 
  - new configuration optio --enable-server (Alexei)
