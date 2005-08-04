@@ -454,6 +454,7 @@ AC_ARG_ENABLE(static,[
   --enable-static         Build statically linked binaries],
 			CFLAGS="-static $CFLAGS"
 			LIBS="")
+
 AC_ARG_ENABLE(server,
 [  --enable-server         Turn on build of server],
 [case "${enableval}" in
@@ -462,6 +463,15 @@ AC_ARG_ENABLE(server,
   *) AC_MSG_ERROR(bad value ${enableval} for --enable-server) ;;
 esac],[server=false])
 AM_CONDITIONAL(SERVER, test x$server = xtrue)
+
+AC_ARG_ENABLE(agent,
+[  --enable-agent          Turn on build of agent],
+[case "${enableval}" in
+  yes) agent=true ;;
+  no)  agent=false ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-agent) ;;
+esac],[agent=false])
+AM_CONDITIONAL(AGENT, test x$agent = xtrue)
 
 AC_MSG_CHECKING(for MySQL support)
 AC_ARG_WITH(mysql,
@@ -767,12 +777,12 @@ if test "$have_db" != "yes"; then
 	echo "configure: No database selected! Use --with-XXX where XXX is your preferred database type";
 	echo "configure: Server processes (zabbix_suckerd and zabbix_trapper) will not be created !";
 
-	SUBDIRS="src/zabbix_agent src/zabbix_sender"
-else
-	SUBDIRS="src/zabbix_agent src/zabbix_sender src/zabbix_server"
+#	SUBDIRS="src/zabbix_agent src/zabbix_sender"
+#else
+#	SUBDIRS="src/zabbix_agent src/zabbix_sender src/zabbix_server"
 fi
 
-AC_SUBST(SUBDIRS)
+#AC_SUBST(SUBDIRS)
 
 RANLIB="ranlib"
 AC_SUBST(RANLIB)
