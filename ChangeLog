@@ -1,5 +1,6 @@
 Changes for 1.1alpha12:
 
+ - fixed compilation of inodes.c under *BSD (Alexei)
  - support of option --enable-agent (Alexei)
  - support of all types of SNMP metrics (Alexei)
  - fixed src/zabbix_server/Makefile.am for SNMP-enabled compilation (Alexei)
