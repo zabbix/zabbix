@@ -708,6 +708,6 @@ CREATE TABLE hosts_profiles (
   software		blob		DEFAULT '' NOT NULL,
   contact		blob		DEFAULT '' NOT NULL,
   location		blob		DEFAULT '' NOT NULL,
-  notes			lob		DEFAULT '' NOT NULL,
+  notes			blob		DEFAULT '' NOT NULL,
   PRIMARY KEY (hostid)
 ) type=InnoDB;
