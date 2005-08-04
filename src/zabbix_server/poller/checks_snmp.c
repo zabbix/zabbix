@@ -196,6 +196,10 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item,char *error, in
 /*			if(	(vars->type == ASN_INTEGER) ||*/
 			if(	(vars->type == ASN_UINTEGER)||
 				(vars->type == ASN_COUNTER) ||
+#ifdef OPAQUE_SPECIAL_TYPES
+				(vars->type == ASN_COUNTER64) ||
+				(vars->type == ASN_UNSIGNED64) ||
+#endif
 				(vars->type == ASN_TIMETICKS) ||
 				(vars->type == ASN_GAUGE)
 			)
@@ -208,11 +212,30 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item,char *error, in
 				/*sprintf(result_str,"%ld",(long)*vars->val.integer);*/
 				snprintf(result_str,MAX_STRING_LEN-1,"%lu",(long)*vars->val.integer);
 			}
-			else if(vars->type == ASN_INTEGER)
+			else if(vars->type == ASN_INTEGER
+#define ASN_FLOAT           (ASN_APPLICATION | 8)
+#define ASN_DOUBLE          (ASN_APPLICATION | 9)
+
+#ifdef OPAQUE_SPECIAL_TYPES
+				|| (vars->type == ASN_INTEGER64)
+#endif
+			)
 			{
 				*result=(long)*vars->val.integer;
 				snprintf(result_str,MAX_STRING_LEN-1,"%ld",(long)*vars->val.integer);
 			}
+#ifdef OPAQUE_SPECIAL_TYPES
+			else if(vars->type == ASN_FLOAT)
+			{
+				*result=(double)*vars->val.floatVal;
+				snprintf(result_str,MAX_STRING_LEN-1,"%f",(double)*vars->val.floatVal);
+			}
+			else if(vars->type == ASN_DOUBLE)
+			{
+				*result=(double)*vars->val.doubleVal;
+				snprintf(result_str,MAX_STRING_LEN-1,"%lf",(double)*vars->val.doubleVal);
+			}
+#endif
 			else if(vars->type == ASN_OCTET_STR)
 			{
 				memcpy(result_str,vars->val.string,vars->val_len);
@@ -245,8 +268,8 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item,char *error, in
 			{
 /* count is not really used. Has to be removed */ 
 				count++;
-				zabbix_log(LOG_LEVEL_WARNING,"value #%d has unknow type",count);
-				snprintf(error,max_error_len-1,"value #%d has unknow type",count);
+				zabbix_log(LOG_LEVEL_WARNING,"value #%d has unknow type [%d]",count,vars->type);
+				snprintf(error,max_error_len-1,"value #%d has unknow type [%d]",count,vars->type);
 				ret  = NOTSUPPORTED;
 			}
 		}
