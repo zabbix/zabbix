@@ -1,6 +1,7 @@
+if AGENT
+AGENT_DIRS = libs zabbix_agent zabbix_get zabbix_sender
+endif
 if SERVER
-DIRS = libs zabbix_agent zabbix_get zabbix_sender zabbix_server
-else !SERVER
-DIRS = libs zabbix_agent zabbix_get zabbix_sender
-endif !SERVER
-SUBDIRS = $(DIRS)
+SERVER_DIRS = libs zabbix_server
+endif
+SUBDIRS = $(AGENT_DIRS) $(SERVER_DIRS)
