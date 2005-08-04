@@ -1,4 +1,4 @@
-SUBDIRS = .
+SUBDIRS =
 bin_PROGRAMS = zabbix_agent zabbix_agentd
 zabbix_agentd_SOURCES = active.c  cpustat.c  diskdevices.c  interfaces.c  logfiles.c  stats.c  zabbix_agentd.c
 zabbix_agentd_LDADD = ../libs/zbxsysinfo/libzbxsysinfo.a ../libs/zbxlog/libzbxlog.a ../libs/zbxcrypto/libzbxcrypto.a \
