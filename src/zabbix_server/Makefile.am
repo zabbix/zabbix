@@ -1,4 +1,4 @@
-SUBDIRS = alerter escalator housekeeper pinger poller timer trapper .
+SUBDIRS = alerter escalator housekeeper pinger poller timer trapper
 INCLUDES=-I@top_srcdir@/include @MYSQL_INCLUDE@ @SNMP_INCLUDE@
 
 bin_PROGRAMS = zabbix_server
