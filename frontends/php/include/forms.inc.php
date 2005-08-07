@@ -206,8 +206,10 @@
 		$languages=array(	"en_gb"=>S_ENGLISH_GB,
 					"fr_fr"=>S_FRENCH_FR,
 					"de_de"=>S_GERMAN_DE,
+					"it_it"=>S_ITALIAN_IT,
 					"lv_lv"=>S_LATVIAN_LV,
-					"ru_ru"=>S_RUSSIAN_RU
+					"ru_ru"=>S_RUSSIAN_RU,
+					"sp_sp"=>S_SPANISH_SP
 				);
 
 		show_table2_v_delimiter($col++);
