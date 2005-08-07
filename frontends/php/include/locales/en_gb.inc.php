@@ -712,8 +712,10 @@
 	"S_ENGLISH_GB"=>			"English (GB)",
 	"S_FRENCH_FR"=>				"French (FR)",
 	"S_GERMAN_DE"=>				"German (DE)",
+	"S_ITALIAN_IT"=>			"Italian (IT)",
 	"S_LATVIAN_LV"=>			"Latvian (LV)",
 	"S_RUSSIAN_RU"=>			"Russian (RU)",
+	"S_SPANISH_SP"=>			"Spanish (SP)",
 
 //	index.php
 	"S_ZABBIX_BIG"=>			"ZABBIX",
