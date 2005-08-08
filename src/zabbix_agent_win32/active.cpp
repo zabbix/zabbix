@@ -452,7 +452,7 @@ int	send_value(char *server,int port,char *host, char *key,char *value,char *las
 	comms_create_request(host,key,value,lastlogsize,tosend,sizeof(tosend)-1);
 //	sprintf(tosend,"%s:%s\n",shortname,value);
 
-//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tosend);
+				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tosend);
 
 	if( sendto(s,tosend,strlen(tosend),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
@@ -562,7 +562,10 @@ int	process_active_checks(char *server, int port)
 //				sprintf(shortname, "%s:%s",confHostname,metrics[i].key);
 //				zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
 
-				sprintf(lastlogsize,"%s",metrics[i].lastlogsize);
+//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","In loop()");
+//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",value);
+
+				sprintf(lastlogsize,"%d",metrics[i].lastlogsize);
 				if(send_value(server,port,confHostname,metrics[i].key,value,lastlogsize) == FAIL)
 				{
 					ret = FAIL;
@@ -575,6 +578,7 @@ int	process_active_checks(char *server, int port)
 					break;
 				}
 				count++;
+//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","End of loop()");
 				/* Do not flood ZABBIX server if file grows too fast */
 				if(count >= MAX_LINES_PER_SECOND*metrics[i].refresh)	break;
 			}
