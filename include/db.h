@@ -136,6 +136,7 @@ DB_ITEM
 
 	char	*formula;
 	int	lastlogsize;
+	int	timestamp;
 };
  
 DB_FUNCTION
