@@ -1,5 +1,4 @@
-#include    <Windows.h>
-#include    <stdio.h>
+#include "zabbixw32.h"
 
 #define DllExport   __declspec( dllexport )
 #define MAX_INSERT_STRS 8
@@ -13,30 +12,46 @@ DllExport   long    MyGetAEventLog(char *pAppName,HANDLE hAppLog,long
 which,double *pTime,char *pSource,char *pMessage,long *pType,long
 *pCategory);
 
-// test the calls
-void    main()
+int process_eventlog_new(char *source,int *lastlogsize, char *value)
 {
+
     HANDLE  hAppLog;
-    long    nRecords,Latest;
+    long    nRecords,Latest=1;
     long    i;
     double  time;
     char    src[1024],msg[1024];
     long    type,category;
+	char zzz[1024];
 
 // open up event log
-    if (!MyOpenEventLog("Application",&hAppLog,&nRecords,&Latest))
-    {
-        for (i = nRecords + 1;--i;++Latest)                 // loop thruall records
-        {
-            if (Latest > nRecords)                          // need totreat as circular que
-                Latest = 1;
+//    if (!MyOpenEventLog("Application",&hAppLog,&nRecords,&Latest))
+    if (!MyOpenEventLog(source,&hAppLog,&nRecords,&Latest))
 
-MyGetAEventLog("Application",hAppLog,Latest,&time,src,msg,&type,&category);
-            printf("Src = %s, Msg = %s, type = %d, Category = %d\n",src,msg,type,category);
-        }
+    {
+//        for (i = nRecords + 1;--i;++Latest)
+		for (i = 0; i<nRecords;i++)
+        {
+//           if (Latest > nRecords)                          // need totreat as circular que
+//               Latest = 1;
+
+			if(*lastlogsize <= i)
+			{
+
+//				MyGetAEventLog("Application",hAppLog,Latest,&time,src,msg,&type,&category);
+				MyGetAEventLog(source,hAppLog,Latest,&time,src,msg,&type,&category);
+				sprintf(zzz,"Src = %s, Msg = %s, type = %d, Category = %d\n",src,msg,type,category);
+				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",Latest);
+				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",zzz);
+				*lastlogsize = Latest;
+				MyCloseEventLog(hAppLog);
+				return 1;
+			}
+			Latest++;
+		}
         MyCloseEventLog(hAppLog);
     }
 
+	return 1;
 }
 
 // open event logger and return number of records

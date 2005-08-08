@@ -212,7 +212,8 @@ void ExpandAlias(char *orig,char *expanded);
 
 unsigned int __stdcall ProcessingThread(void *arg);
 int   process_log(char *filename,int *lastlogsize, char *value);
-int   process_eventlog(char *source,int *lastlogsize, char *value);
+//int   process_eventlog(char *source,int *lastlogsize, char *value);
+int process_eventlog_new(char *source,int *lastlogsize, char *value);
 
 void str_base64_encode(char *p_str, char *p_b64str, int in_size);
 void str_base64_decode(char *p_b64str, char *p_str, int *p_out_size);
