@@ -25,7 +25,7 @@
 #include "db.h"
 
 void    update_triggers (int itemid);
-int	process_data(int sockfd,char *server,char *key, char *value,char *lastlogsize);
+int	process_data(int sockfd,char *server,char *key, char *value,char *lastlogsize,char *timestamp);
 void	process_new_value(DB_ITEM *item,char *value,int *update_triggers);
 
 #endif

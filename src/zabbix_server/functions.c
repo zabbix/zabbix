@@ -393,7 +393,7 @@ void	update_triggers(int itemid)
  * Comments: for trapper server process                                       *
  *                                                                            *
  ******************************************************************************/
-int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize)
+int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize, char *timestamp)
 {
 	char	sql[MAX_STRING_LEN];
 
@@ -489,7 +489,8 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 		lastlogsize[s-value-1]=0;*/
 
 		item.lastlogsize=atoi(lastlogsize);
-		zabbix_log(LOG_LEVEL_DEBUG, "Value [%s] S [%s] Lastlogsize [%s] [%d]", value, s, lastlogsize, s-value-1);
+		item.timestamp=atoi(timestamp);
+		zabbix_log(LOG_LEVEL_WARNING, "Value [%s] Lastlogsize [%s] Timestamp [%s]", value, lastlogsize, timestamp);
 	}
 
 	process_new_value(&item,s,&update_tr);
