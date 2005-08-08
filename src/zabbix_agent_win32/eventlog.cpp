@@ -21,30 +21,31 @@ int process_eventlog_new(char *source,int *lastlogsize, char *value)
     double  time;
     char    src[1024],msg[1024];
     long    type,category;
-	char zzz[1024];
-
+	
 // open up event log
 //    if (!MyOpenEventLog("Application",&hAppLog,&nRecords,&Latest))
     if (!MyOpenEventLog(source,&hAppLog,&nRecords,&Latest))
+	{
 
-    {
+    
 //        for (i = nRecords + 1;--i;++Latest)
 		for (i = 0; i<nRecords;i++)
         {
 //           if (Latest > nRecords)                          // need totreat as circular que
 //               Latest = 1;
-
+//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","i");
+//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",i);
 			if(*lastlogsize <= i)
 			{
 
 //				MyGetAEventLog("Application",hAppLog,Latest,&time,src,msg,&type,&category);
 				MyGetAEventLog(source,hAppLog,Latest,&time,src,msg,&type,&category);
-				sprintf(zzz,"Src = %s, Msg = %s, type = %d, Category = %d\n",src,msg,type,category);
+				sprintf(value,"Src = %s, Msg = %s, type = %d, Category = %d\n",src,msg,type,category);
 				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",Latest);
-				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",zzz);
+				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",value);
 				*lastlogsize = Latest;
 				MyCloseEventLog(hAppLog);
-				return 1;
+				return 0;
 			}
 			Latest++;
 		}

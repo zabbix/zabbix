@@ -1,5 +1,6 @@
 Changes for 1.1alpha12:
 
+ - support of monitoring of W32 Event Logs (Alexei)
  - Italian translation (Alexei)
  - Spanish translation (Alexei)
  - fixed compilation of inodes.c under *BSD (Alexei)
