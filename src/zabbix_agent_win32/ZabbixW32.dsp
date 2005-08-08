@@ -111,6 +111,10 @@ SOURCE=.\config.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\eventlog.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\execute.cpp
 # End Source File
 # Begin Source File
