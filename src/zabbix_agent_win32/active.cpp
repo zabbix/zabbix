@@ -392,7 +392,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 	return SUCCEED;
 }
 
-int	send_value(char *server,int port,char *host, char *key,char *value,char *lastlogsize)
+int	send_value(char *server,int port,char *host, char *key,char *value,char *lastlogsize, char *timestamp)
 {
 	int	i,s;
 	char	tosend[1024];
@@ -449,7 +449,7 @@ int	send_value(char *server,int port,char *host, char *key,char *value,char *las
 		return	FAIL;
 	}
 
-	comms_create_request(host,key,value,lastlogsize,tosend,sizeof(tosend)-1);
+	comms_create_request(host,key,value,lastlogsize,timestamp,tosend,sizeof(tosend)-1);
 //	sprintf(tosend,"%s:%s\n",shortname,value);
 
 				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tosend);
@@ -501,8 +501,11 @@ int	process_active_checks(char *server, int port)
    HANDLE hThread=NULL;
    unsigned int tid;
 
+
 	char	value[MAX_STRING_LEN];
 	char	lastlogsize[MAX_STRING_LEN];
+	char	timestamp[MAX_STRING_LEN];
+
 	int	i, now, count;
 	int	ret = SUCCEED;
 
@@ -521,6 +524,7 @@ int	process_active_checks(char *server, int port)
 		/* Special processing for log files */
 		if(strncmp(metrics[i].key,"log[",4) == 0)
 		{
+			timestamp[0]=0;
 			strscpy(c,metrics[i].key);
 			filename=strtok(c,"[]");
 			filename=strtok(NULL,"[]");
@@ -533,7 +537,7 @@ int	process_active_checks(char *server, int port)
 //				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",shortname);
 
 				sprintf(lastlogsize,"%d",metrics[i].lastlogsize);
-				if(send_value(server,port,confHostname,metrics[i].key, value, lastlogsize) == FAIL)
+				if(send_value(server,port,confHostname,metrics[i].key, value, lastlogsize,timestamp) == FAIL)
 				{
 					ret = FAIL;
 					break;
@@ -557,7 +561,7 @@ int	process_active_checks(char *server, int port)
 			filename=strtok(NULL,"[]");
 
 			count=0;
-			while(process_eventlog_new(filename,&metrics[i].lastlogsize,value) == 0)
+			while(process_eventlog_new(filename,&metrics[i].lastlogsize, timestamp, value) == 0)
 			{
 //				sprintf(shortname, "%s:%s",confHostname,metrics[i].key);
 //				zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
@@ -566,7 +570,7 @@ int	process_active_checks(char *server, int port)
 //				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",value);
 
 				sprintf(lastlogsize,"%d",metrics[i].lastlogsize);
-				if(send_value(server,port,confHostname,metrics[i].key,value,lastlogsize) == FAIL)
+				if(send_value(server,port,confHostname,metrics[i].key,value,lastlogsize,timestamp) == FAIL)
 				{
 					ret = FAIL;
 					break;
@@ -585,6 +589,7 @@ int	process_active_checks(char *server, int port)
 		}
 		else
 		{
+			timestamp[0]=0;
 			lastlogsize[0]=0;
 			strcpy(rq.cmd,metrics[i].key);
 
@@ -602,7 +607,7 @@ int	process_active_checks(char *server, int port)
 
 			//sprintf(shortname,"%s:%s",confHostname,metrics[i].key);
 //			zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
-			if(send_value(server,port,confHostname,metrics[i].key,rq.result,lastlogsize) == FAIL)
+			if(send_value(server,port,confHostname,metrics[i].key,rq.result,lastlogsize, timestamp) == FAIL)
 			{
 				ret = FAIL;
 				break;
