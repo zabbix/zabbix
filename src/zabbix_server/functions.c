@@ -588,7 +588,7 @@ void	process_new_value(DB_ITEM *item,char *value, int *update_tr)
 		}
 		else if(item->value_type==ITEM_VALUE_TYPE_LOG)
 		{
-			DBadd_history_log(item->itemid,value_str,now);
+			DBadd_history_log(item->itemid,value_str,now,item->timestamp);
 			snprintf(sql,sizeof(sql)-1,"update items set lastlogsize=%d where itemid=%d",item->lastlogsize,item->itemid);
 			DBexecute(sql);
 		}
