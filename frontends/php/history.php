@@ -152,6 +152,10 @@
 		echo "<TABLE BORDER=0 COLS=2 ALIGN=CENTER WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
 		echo "<TR BGCOLOR=\"#CCCCCC\">";
 		echo "<TD><B>".S_TIMESTAMP."</B></TD>";
+		if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
+		{
+			echo "<TD><B>".S_LOCAL."</B></TD>";
+		}
 		echo "<TD><B>".S_VALUE."</B></TD>";
 		echo "</TR>";
 
@@ -162,7 +166,7 @@
 		}
 		else if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
 		{
-			$sql="select clock,value from history_log where itemid=".$_GET["itemid"]." and clock>$time and clock<$till order by id desc, clock desc";
+			$sql="select clock,value,timestamp from history_log where itemid=".$_GET["itemid"]." and clock>$time and clock<$till order by id desc, clock desc";
 		}
 		else
 		{
@@ -185,13 +189,25 @@
 			$value=DBget_field($result,$i,1);
 			$clock=date("Y.M.d H:i:s",$clock);
 			echo "<TD>$clock</TD>";
+			if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
+			{
+				$local=DBget_field($result,$i,2);
+				if($local==0)
+				{
+					echo "<TD>&nbsp;</TD>";
+				}
+				else
+				{
+					echo "<TD>".date("Y.M.d H:i:s",$local)."</TD>";
+				}
+			}
 			if($item["value_type"]==ITEM_VALUE_TYPE_FLOAT)
 			{
 				echo "<TD>$value</TD>";
 			}
 			else
 			{
-				echo "<TD>".htmlspecialchars($value)."</TD>";
+				echo "<TD><pre>".htmlspecialchars($value)."</pre></TD>";
 			}
 			echo "</TR>";
 		}
