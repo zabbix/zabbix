@@ -261,6 +261,7 @@
 	"S_VALUES_OF_SPECIFIED_PERIOD"=>	"Values of specified period",
 	"S_VALUES_IN_PLAIN_TEXT_FORMAT"=>	"Values in plain text format",
 	"S_TIMESTAMP"=>				"Timestamp",
+	"S_LOCAL"=>				"Local",
 
 //	hosts.php
 	"S_HOSTS"=>				"Hosts",
