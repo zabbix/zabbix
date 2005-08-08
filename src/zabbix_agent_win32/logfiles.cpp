@@ -90,7 +90,7 @@ int   process_log(char *filename,int *lastlogsize, char *value)
 	return 0;
 }
 
-int process_eventlog(char *source,int *lastlogsize, char *value)
+int process_eventlog(char *source,int *lastlogsize, int *timestamp, char *value)
 {
     HANDLE h;
     EVENTLOGRECORD *pevlr; 
@@ -147,6 +147,7 @@ int process_eventlog(char *source,int *lastlogsize, char *value)
 					WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",value);
 			
 					*lastlogsize=dwThisRecord;
+					
 					break;
 				}
  
