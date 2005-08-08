@@ -10,15 +10,16 @@ DllExport   long    MyCloseEventLog(HANDLE hAppLog);
 DllExport   long    MyClearEventLog(HANDLE hAppLog);
 DllExport   long    MyGetAEventLog(char *pAppName,HANDLE hAppLog,long
 which,double *pTime,char *pSource,char *pMessage,long *pType,long
-*pCategory);
+*pCategory, int *timestamp);
 
-int process_eventlog_new(char *source,int *lastlogsize, char *value)
+int process_eventlog_new(char *source,int *lastlogsize, char *timestamp, char *value)
 {
 
     HANDLE  hAppLog;
     long    nRecords,Latest=1;
     long    i;
     double  time;
+	int	t;
     char    src[1024],msg[1024];
     long    type,category;
 	
@@ -39,7 +40,8 @@ int process_eventlog_new(char *source,int *lastlogsize, char *value)
 			{
 
 //				MyGetAEventLog("Application",hAppLog,Latest,&time,src,msg,&type,&category);
-				MyGetAEventLog(source,hAppLog,Latest,&time,src,msg,&type,&category);
+				MyGetAEventLog(source,hAppLog,Latest,&time,src,msg,&type,&category,&t);
+				sprintf(timestamp,"%d",t);
 				sprintf(value,"Src = %s, Msg = %s, type = %d, Category = %d\n",src,msg,type,category);
 				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",Latest);
 				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",value);
@@ -94,8 +96,7 @@ DllExport   long    MyClearEventLog(HANDLE hAppLog)
 
 // get Nth error from event log. 1 is the first.
 DllExport   long    MyGetAEventLog(char *pAppName,HANDLE hAppLog,long
-which,double *pTime,char *pSource,char *pMessage,long *pType,long
-*pCategory)
+which,double *pTime,char *pSource,char *pMessage,long *pType,long *pCategory, int *timestamp)
 {
     EVENTLOGRECORD  *pELR;
     BYTE            bBuffer[1024];                      /* hold the event
@@ -215,6 +216,9 @@ insert strings for the message */
     *pType = pELR->EventType;                           // return event type
 
     *pCategory = pELR->EventCategory;                   // return category
+
+	*timestamp=pELR->TimeGenerated;
+
 
 /* Free the buffer that FormatMessage allocated for us. */
     LocalFree((HLOCAL) msgBuf);
