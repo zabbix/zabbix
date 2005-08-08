@@ -147,10 +147,6 @@ SOURCE=.\sysinfo.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\tmp.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\util.cpp
 # End Source File
 # Begin Source File
