@@ -557,7 +557,7 @@ int	process_active_checks(char *server, int port)
 			filename=strtok(NULL,"[]");
 
 			count=0;
-			while(process_eventlog(filename,&metrics[i].lastlogsize,value) == 0)
+			while(process_eventlog_new(filename,&metrics[i].lastlogsize,value) == 0)
 			{
 //				sprintf(shortname, "%s:%s",confHostname,metrics[i].key);
 //				zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
