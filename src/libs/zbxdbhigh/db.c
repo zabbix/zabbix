@@ -983,7 +983,7 @@ int	DBadd_history_log(int itemid, char *value, int clock, int timestamp)
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_log()");
 
 	DBescape_string(value,value_esc,MAX_STRING_LEN);
-	snprintf(sql,sizeof(sql)-1,"insert into history_log (clock,itemid,timestamp,value) values (%d,%d,'%s')",clock,itemid,timestamp,value_esc);
+	snprintf(sql,sizeof(sql)-1,"insert into history_log (clock,itemid,timestamp,value) values (%d,%d,%d,'%s')",clock,itemid,timestamp,value_esc);
 	DBexecute(sql);
 
 	return SUCCEED;
