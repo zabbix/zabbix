@@ -137,6 +137,8 @@ DB_ITEM
 	char	*formula;
 	int	lastlogsize;
 	int	timestamp;
+	int	eventlog_severity;
+	char	*eventlog_source;
 };
  
 DB_FUNCTION
@@ -252,7 +254,7 @@ void	DBupdate_host_availability(int hostid,int available,int clock,char *error);
 int	DBupdate_item_status_to_notsupported(int itemid, char *error);
 int	DBadd_trend(int itemid, double value, int clock);
 int	DBadd_history(int itemid, double value, int clock);
-int	DBadd_history_log(int itemid, char *value, int clock, int timestamp);
+int	DBadd_history_log(int itemid, char *value, int clock, int timestamp, char *source, int severity);
 int	DBadd_history_str(int itemid, char *value, int clock);
 int	DBadd_service_alarm(int serviceid,int status,int clock);
 int	DBadd_alert(int actionid, int mediatypeid, char *sendto, char *subject, char *message);
