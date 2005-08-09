@@ -12,7 +12,7 @@ DllExport   long    MyGetAEventLog(char *pAppName,HANDLE hAppLog,long
 which,double *pTime,char *pSource,char *pMessage,long *pType,long
 *pCategory, int *timestamp);
 
-int process_eventlog_new(char *source,int *lastlogsize, char *timestamp, char *value)
+int process_eventlog_new(char *source,int *lastlogsize, char *timestamp, char *src, char *severity, char *message)
 {
 
     HANDLE  hAppLog;
@@ -20,7 +20,7 @@ int process_eventlog_new(char *source,int *lastlogsize, char *timestamp, char *v
     long    i;
     double  time;
 	int	t;
-    char    src[1024],msg[1024];
+    char    msg[1024];
     long    type,category;
 	
 // open up event log
@@ -42,9 +42,10 @@ int process_eventlog_new(char *source,int *lastlogsize, char *timestamp, char *v
 //				MyGetAEventLog("Application",hAppLog,Latest,&time,src,msg,&type,&category);
 				MyGetAEventLog(source,hAppLog,Latest,&time,src,msg,&type,&category,&t);
 				sprintf(timestamp,"%d",t);
-				sprintf(value,"Src = %s, Msg = %s, type = %d, Category = %d\n",src,msg,type,category);
+				sprintf(severity,"%ld",type);
+				sprintf(message,"Src = %s, Msg = %s, type = %d, Category = %d\n",src,msg,type,category);
 				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",Latest);
-				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",value);
+				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",message);
 				*lastlogsize = Latest;
 				MyCloseEventLog(hAppLog);
 				return 0;
