@@ -393,7 +393,8 @@ void	update_triggers(int itemid)
  * Comments: for trapper server process                                       *
  *                                                                            *
  ******************************************************************************/
-int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize, char *timestamp)
+int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize, char *timestamp,
+			char *source, char *severity)
 {
 	char	sql[MAX_STRING_LEN];
 
@@ -490,6 +491,8 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 
 		item.lastlogsize=atoi(lastlogsize);
 		item.timestamp=atoi(timestamp);
+		item.eventlog_severity=atoi(severity);
+		item.eventlog_source=atoi(source);
 		zabbix_log(LOG_LEVEL_WARNING, "Value [%s] Lastlogsize [%s] Timestamp [%s]", value, lastlogsize, timestamp);
 	}
 
@@ -588,7 +591,7 @@ void	process_new_value(DB_ITEM *item,char *value, int *update_tr)
 		}
 		else if(item->value_type==ITEM_VALUE_TYPE_LOG)
 		{
-			DBadd_history_log(item->itemid,value_str,now,item->timestamp);
+			DBadd_history_log(item->itemid,value_str,now,item->timestamp,item->eventlog_source,item->eventlog_severity);
 			snprintf(sql,sizeof(sql)-1,"update items set lastlogsize=%d where itemid=%d",item->lastlogsize,item->itemid);
 			DBexecute(sql);
 		}

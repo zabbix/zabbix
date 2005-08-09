@@ -975,15 +975,17 @@ int	DBadd_history_str(int itemid, char *value, int clock)
 	return SUCCEED;
 }
 
-int	DBadd_history_log(int itemid, char *value, int clock, int timestamp)
+int	DBadd_history_log(int itemid, char *value, int clock, int timestamp,char *source, int severity)
 {
 	char	sql[MAX_STRING_LEN];
 	char	value_esc[MAX_STRING_LEN];
+	char	source_esc[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_log()");
 
 	DBescape_string(value,value_esc,MAX_STRING_LEN);
-	snprintf(sql,sizeof(sql)-1,"insert into history_log (clock,itemid,timestamp,value) values (%d,%d,%d,'%s')",clock,itemid,timestamp,value_esc);
+	DBescape_string(source,source_esc,MAX_STRING_LEN);
+	snprintf(sql,sizeof(sql)-1,"insert into history_log (clock,itemid,timestamp,value,source,severity) values (%d,%d,%d,'%s','%s',%d)",clock,itemid,timestamp,value_esc,source_esc,severity);
 	DBexecute(sql);
 
 	return SUCCEED;
