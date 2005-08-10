@@ -1,6 +1,8 @@
 Changes for 1.1alpha12:
 
- - added columns history_log.timestamp (Alexei)
+ - added column history_log.severity (Alexei)
+ - added column history_log.source (Alexei)
+ - added column history_log.timestamp (Alexei)
  - support of monitoring of W32 Event Logs (Alexei)
  - Italian translation (Alexei)
  - Spanish translation (Alexei)
