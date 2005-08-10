@@ -492,7 +492,7 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 		item.lastlogsize=atoi(lastlogsize);
 		item.timestamp=atoi(timestamp);
 		item.eventlog_severity=atoi(severity);
-		item.eventlog_source=atoi(source);
+		item.eventlog_source=source;
 		zabbix_log(LOG_LEVEL_WARNING, "Value [%s] Lastlogsize [%s] Timestamp [%s]", value, lastlogsize, timestamp);
 	}
 
