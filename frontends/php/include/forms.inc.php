@@ -1223,4 +1223,116 @@
 
 		show_table2_header_end();
 	}
+
+	# Insert host profile form
+	function	insert_host_profile_form($hostid)
+	{
+		$selected=0;
+
+		if(isset($hostid))
+		{
+			$result=DBselect("select * from hosts_profiles where hostid=$hostid");
+
+			if(DBnum_rows($result)==1)
+			{
+				$row=DBfetch($result);
+
+				$selected=1;
+				$devicetype=$row["devicetype"];
+				$name=$row["name"];
+				$os=$row["os"];
+				$serialno=$row["serialno"];
+				$tag=$row["tag"];
+				$macaddress=$row["macaddress"];
+				$hardware=$row["hardware"];
+				$software=$row["software"];
+				$contact=$row["contact"];
+				$location=$row["location"];
+				$notes=$row["notes"];
+			}
+		}
+		if($selected==0)
+		{
+			$devicetype="";
+			$name="";
+			$os="";
+			$serialno="";
+			$tag="";
+			$macaddress="";
+			$hardware="";
+			$software="";
+			$contact="";
+			$location="";
+			$notes="";
+		}
+
+		$col=0;
+
+		show_form_begin("host_profile");
+		echo S_HOST_PROFILE;
+
+		show_table2_v_delimiter($col++);
+		echo "<form method=\"get\" action=\"hosts.php\">";
+		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_GET["config"]."\" size=8>";
+		echo "<input class=\"biginput\" name=\"hostid\" type=\"hidden\" value=\"$hostid\" size=8>";
+
+		echo S_DEVICE_TYPE;
+		show_table2_h_delimiter();
+		echo form_input("devicetype",$devicetype,64);
+
+		show_table2_v_delimiter($col++);
+		echo S_NAME;
+		show_table2_h_delimiter();
+		echo form_input("name",$name,64);
+
+		show_table2_v_delimiter($col++);
+		echo S_OS;
+		show_table2_h_delimiter();
+		echo form_input("os",$os,64);
+
+		show_table2_v_delimiter($col++);
+		echo S_SERIALNO;
+		show_table2_h_delimiter();
+		echo form_input("serialno",$serialno,64);
+
+		show_table2_v_delimiter($col++);
+		echo S_TAG;
+		show_table2_h_delimiter();
+		echo form_input("tag",$tag,64);
+
+		show_table2_v_delimiter($col++);
+		echo S_HARDWARE;
+		show_table2_h_delimiter();
+		echo form_input("hardware",$hardware,64);
+
+		show_table2_v_delimiter($col++);
+		echo S_SOFTWARE;
+		show_table2_h_delimiter();
+		echo form_input("software",$software,64);
+
+		show_table2_v_delimiter($col++);
+		echo S_CONTACT;
+		show_table2_h_delimiter();
+		echo form_input("contact",$contact,64);
+
+		show_table2_v_delimiter($col++);
+		echo S_LOCATION;
+		show_table2_h_delimiter();
+		echo form_input("location",$location,64);
+
+		show_table2_v_delimiter($col++);
+		echo S_NOTES;
+		show_table2_h_delimiter();
+		echo form_input("notes",$notes,64);
+
+		show_table2_v_delimiter2($col++);
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add profile\">";
+		if(isset($escalationid))
+		{
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update profile\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete profile\" onClick=\"return Confirm('Delete selected profile?');\">";
+		}
+
+		show_table2_header_end();
+	}
 ?>
