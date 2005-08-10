@@ -36,6 +36,11 @@
 		return "<input class=\"biginput\" name=\"$name\" size=$size value=\"$value\">";
 	}
 
+	function form_textarea($name, $value, $cols, $rows)
+	{
+		return "<textarea name=\"$name\" cols=\"$cols\" ROWS=\"$rows\" wrap=\"soft\">$value</TEXTAREA>";
+	}
+
 	function url1_param($parameter)
 	{
 		global $_GET;

@@ -1303,27 +1303,27 @@
 		show_table2_v_delimiter($col++);
 		echo S_HARDWARE;
 		show_table2_h_delimiter();
-		echo form_input("hardware",$hardware,64);
+		echo form_textarea("hardware",$hardware,50,4);
 
 		show_table2_v_delimiter($col++);
 		echo S_SOFTWARE;
 		show_table2_h_delimiter();
-		echo form_input("software",$software,64);
+		echo form_textarea("software",$software,50,4);
 
 		show_table2_v_delimiter($col++);
 		echo S_CONTACT;
 		show_table2_h_delimiter();
-		echo form_input("contact",$contact,64);
+		echo form_textarea("contact",$contact,50,4);
 
 		show_table2_v_delimiter($col++);
 		echo S_LOCATION;
 		show_table2_h_delimiter();
-		echo form_input("location",$location,64);
+		echo form_textarea("location",$location,50,4);
 
 		show_table2_v_delimiter($col++);
 		echo S_NOTES;
 		show_table2_h_delimiter();
-		echo form_input("notes",$notes,64);
+		echo form_textarea("notes",$notes,50,4);
 
 		show_table2_v_delimiter2($col++);
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add profile\">";
