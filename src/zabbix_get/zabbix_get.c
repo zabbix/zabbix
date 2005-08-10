@@ -132,6 +132,8 @@ static int	get_value(char *server,int port,char *key,char *value)
 
 /*	struct linger ling;*/
 
+/*	printf("get_value([%s],[%d],[%s])",server,port,key);*/
+
 	servaddr_in.sin_family=AF_INET;
 	hp=gethostbyname(server);
 
@@ -211,8 +213,8 @@ int main(int argc, char **argv)
 	int	port = 10050;
 	int	ret=SUCCEED;
 	char	value[MAX_STRING_LEN];
-	char	*host;
-	char	*key;
+	char	*host=NULL;
+	char	*key=NULL;
 	int	ch;
 
 	/* Parse the command-line. */
@@ -235,23 +237,31 @@ int main(int argc, char **argv)
 		break;
 	}
 
-
-	signal( SIGINT,  signal_handler );
-	signal( SIGQUIT, signal_handler );
-	signal( SIGTERM, signal_handler );
-	signal( SIGALRM, signal_handler );
-
-	alarm(SENDER_TIMEOUT);
-
-/*	printf("Host [%s] Port [%d] Key [%s]\n",host,port,key);*/
-
-	ret = get_value(host,port,key,value);
-
-	alarm(0);
+	if( (host==NULL) || (key==NULL))
+	{
+		usage(argv[0]);
+		ret = FAIL;
+	}
 
 	if(ret == SUCCEED)
 	{
-		printf("%s\n",value);
+		signal( SIGINT,  signal_handler );
+		signal( SIGQUIT, signal_handler );
+		signal( SIGTERM, signal_handler );
+		signal( SIGALRM, signal_handler );
+
+		alarm(SENDER_TIMEOUT);
+
+/*	printf("Host [%s] Port [%d] Key [%s]\n",host,port,key);*/
+
+		ret = get_value(host,port,key,value);
+
+		alarm(0);
+
+		if(ret == SUCCEED)
+		{
+			printf("%s\n",value);
+		}
 	}
 
 	return ret;
