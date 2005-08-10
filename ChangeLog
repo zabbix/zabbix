@@ -1,5 +1,6 @@
 Changes for 1.1alpha12:
 
+ - column history_log.value altered to TEXT (Alexei)
  - fixed zabbix_get to correctly parse command line parameters (Alexei)
  - fixed compilation issues (hstrerror) under Solaris (Alexei)
  - added column history_log.severity (Alexei)
