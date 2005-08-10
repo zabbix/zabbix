@@ -1,7 +1,7 @@
 1.1alpha12:
 
+ - fix linkage of triggers (more than one host linked to a trigger)
  - host profiles
- - fix crashes of zabbix_get and zabbix_sender
  - make agents return error message if not supported or not available
  - centralised management of agent configuration files
  - apply Lukas patches (external items, setproctitle(), select all
