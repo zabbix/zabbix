@@ -325,6 +325,13 @@
 	"S_CONTACT"=>				"Contact",
 	"S_LOCATION"=>				"Location",
 	"S_NOTES"=>				"Notes",
+	"S_MACADDRESS"=>			"MAC Address",
+	"S_PROFILE_ADDED"=>			"Profile added",
+	"S_CANNOT_ADD_PROFILE"=>		"Cannot add profile",
+	"S_PROFILE_UPDATED"=>			"Profile updated",
+	"S_CANNOT_UPDATE_PROFILE"=>		"Cannot update profile",
+	"S_PROFILE_DELETED"=>			"Profile deleted",
+	"S_CANNOT_DELETE_PROFILE"=>		"Cannot delete profile",
 
 //	items.php
 	"S_CONFIGURATION_OF_ITEMS"=>		"Configuration of items",
