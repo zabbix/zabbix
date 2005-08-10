@@ -634,6 +634,26 @@ CREATE TABLE escalations (
 CREATE UNIQUE INDEX escalations_name on escalations (name);
 
 --
+-- Table structure for table 'escalation_log'
+--
+
+CREATE TABLE escalation_log (
+  escalationlogid       serial,
+  triggerid             int4		DEFAULT '0' NOT NULL,
+  alarmid               int4		DEFAULT '0' NOT NULL,
+  escalationid          int4		DEFAULT '0' NOT NULL,
+  actiontype            int4		DEFAULT '0' NOT NULL,
+  level                 int4		DEFAULT '0' NOT NULL,
+  adminlevel            int4		DEFAULT '0' NOT NULL,
+  nextcheck             int4		DEFAULT '0' NOT NULL,
+  status                int4		DEFAULT '0' NOT NULL,
+  PRIMARY KEY (escalationlogid)
+);
+
+CREATE INDEX escalations_log_alarmid_escalationid on escalations_log (alarmid,escalationid);
+CREATE INDEX escalations_log_triggerid on escalations_log (triggerid);
+
+--
 -- Table structure for table 'escalation_rules'
 --
 
