@@ -262,6 +262,7 @@
 	"S_VALUES_IN_PLAIN_TEXT_FORMAT"=>	"Values in plain text format",
 	"S_TIMESTAMP"=>				"Timestamp",
 	"S_LOCAL"=>				"Local",
+	"S_SOURCE"=>				"Source",
 
 //	hosts.php
 	"S_HOSTS"=>				"Hosts",
