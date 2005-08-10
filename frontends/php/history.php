@@ -155,6 +155,8 @@
 		if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
 		{
 			echo "<TD><B>".S_LOCAL."</B></TD>";
+			echo "<TD><B>".S_SOURCE."</B></TD>";
+			echo "<TD><B>".S_SEVERITY."</B></TD>";
 		}
 		echo "<TD><B>".S_VALUE."</B></TD>";
 		echo "</TR>";
@@ -166,7 +168,7 @@
 		}
 		else if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
 		{
-			$sql="select clock,value,timestamp from history_log where itemid=".$_GET["itemid"]." and clock>$time and clock<$till order by id desc, clock desc";
+			$sql="select clock,value,timestamp,source,severity from history_log where itemid=".$_GET["itemid"]." and clock>$time and clock<$till order by id desc, clock desc";
 		}
 		else
 		{
@@ -192,6 +194,9 @@
 			if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
 			{
 				$local=DBget_field($result,$i,2);
+				$source=DBget_field($result,$i,3);
+				$severity=DBget_field($result,$i,4);
+
 				if($local==0)
 				{
 					echo "<TD>&nbsp;</TD>";
@@ -200,6 +205,8 @@
 				{
 					echo "<TD>".date("Y.M.d H:i:s",$local)."</TD>";
 				}
+				echo "<TD>$source</TD>";
+				echo "<TD>$severity</TD>";
 			}
 			if($item["value_type"]==ITEM_VALUE_TYPE_FLOAT)
 			{
