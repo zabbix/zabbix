@@ -98,6 +98,21 @@
 			show_messages($result, S_TEMPLATE_LINKAGE_DELETED, S_CANNOT_DELETE_TEMPLATE_LINKAGE);
 			unset($_GET["hosttemplateid"]);
 		}	
+		if($_GET["register"]=="add profile")
+		{
+			$result=add_host_profile($_GET["hostid"],$_GET["devicetype"],$_GET["name"],$_GET["os"],$_GET["serialno"],$_GET["tag"],$_GET["macaddress"],$_GET["hardware"],$_GET["software"],$_GET["contact"],$_GET["location"],$_GET["notes"]);
+			show_messages($result, S_PROFILE_ADDED, S_CANNOT_ADD_PROFILE);
+		}
+		if($_GET["register"]=="update profile")
+		{
+			$result=update_host_profile($_GET["hostid"],$_GET["devicetype"],$_GET["name"],$_GET["os"],$_GET["serialno"],$_GET["tag"],$_GET["macaddress"],$_GET["hardware"],$_GET["software"],$_GET["contact"],$_GET["location"],$_GET["notes"]);
+			show_messages($result, S_PROFILE_UPDATED, S_CANNOT_UPDATE_PROFILE);
+		}
+		if($_GET["register"]=="delete profile")
+		{
+			$result=delete_host_profile($_GET["hostid"]);
+			show_messages($result, S_PROFILE_DELETED, S_CANNOT_DELETE_PROFILE);
+		}
 		if($_GET["register"]=="add")
 		{
 			$groups=array();
