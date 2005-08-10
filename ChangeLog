@@ -1,5 +1,6 @@
 Changes for 1.1alpha12:
 
+ - fixed compilation issues (hstrerror) under Solaris (Alexei)
  - added column history_log.severity (Alexei)
  - added column history_log.source (Alexei)
  - added column history_log.timestamp (Alexei)
