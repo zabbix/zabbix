@@ -31,3 +31,22 @@ CREATE TABLE escalation_rules (
   PRIMARY KEY (escalationruleid),
   KEY (escalationid)
 ) type=InnoDB;
+
+--
+-- Table structure for table 'escalation_log'
+--
+
+CREATE TABLE escalation_log (
+  escalationlogid       int(4)          NOT NULL auto_increment,
+  triggerid             int(4)          DEFAULT '0' NOT NULL,
+  alarmid               int(4)          DEFAULT '0' NOT NULL,
+  escalationid          int(4)          DEFAULT '0' NOT NULL,
+  actiontype            int(4)          DEFAULT '0' NOT NULL,
+  level                 int(4)          DEFAULT '0' NOT NULL,
+  adminlevel            int(4)          DEFAULT '0' NOT NULL,
+  nextcheck             int(4)          DEFAULT '0' NOT NULL,
+  status                int(4)          DEFAULT '0' NOT NULL,
+  PRIMARY KEY (escalationlogid),
+  KEY (alarmid,escalationid),
+  KEY (triggerid)
+) type=InnoDB;
