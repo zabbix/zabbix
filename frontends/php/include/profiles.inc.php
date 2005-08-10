@@ -19,216 +19,92 @@
 **/
 ?>
 <?php
-	# Add Host definition
+	# Add Host Profile
 
-	function	add_host($host,$port,$status,$useip,$ip,$host_templateid,$newgroup,$groups)
+	function	add_host_profile($hostid,$devicetype,$name,$os,$serialno,$tag,$macaddress,$hardware,$software,$contact,$location,$notes)
 	{
-		if(!check_right("Host","A",0))
+		// If user has update permission then ok
+		if(!check_right("Host","U",0))
 		{
 			error("Insufficient permissions");
 			return 0;
 		}
 
- 		if (!eregi('^([0-9a-zA-Z\_\.-]+)$', $host, &$arr)) 
-		{
-			error("Hostname should contain 0-9a-zA-Z_.- characters only");
-			return 0;
-		}
-
-		$sql="select * from hosts where host='$host'";
+		$sql="select * from hosts_profiles where hostid=$hostid";
 		$result=DBexecute($sql);
 		if(DBnum_rows($result)>0)
 		{
-			error("Host '$host' already exists");
+			error("Host profile already exists");
 			return 0;
 		}
 
-		if( isset($useip) && ($useip=="on") )
-		{
-			$useip=1;
-		}
-		else
-		{
-			$useip=0;
-		}
+		$devicetype=addslashes($devicetype);
+		$name=addslashes($name);
+		$os=addslashes($os);
+		$serialno=addslashes($serialno);
+		$tag=addslashes($tag);
+		$macaddress=addslashes($macaddress);
+		$hardware=addslashes($hardware);
+		$software=addslashes($software);
+		$contact=addslashes($contact);
+		$location=addslashes($location);
+		$notes=addslashes($notes);
 
-
-		$sql="insert into hosts (host,port,status,useip,ip,disable_until,available) values ('$host',$port,$status,$useip,'$ip',0,".HOST_AVAILABLE_UNKNOWN.")";
+		$sql="insert into hosts_profiles (hostid,devicetype,name,os,serialno,tag,macaddress,hardware,software,contact,location,notes) values ($hostid,'$devicetype','$name','$os','$serialno','$tag','$macaddress','$hardware','$software','$contact','$location','$notes')";
 		$result=DBexecute($sql);
-		if(!$result)
-		{
-			return	$result;
-		}
-		
-		$hostid=DBinsert_id($result,"hosts","hostid");
-
-		if($host_templateid != 0)
-		{
-			add_templates_to_host($hostid,$host_templateid);
-//			$result=add_using_host_template($hostid,$host_templateid);
-			sync_host_with_templates($hostid);
-		}
-		update_host_groups($hostid,$groups);
-		if($newgroup != "")
-		{
-			add_group_to_host($hostid,$newgroup);
-		}
-
-		update_profile("HOST_PORT",$port);
 		
 		return	$result;
 	}
 
-	function	update_host($hostid,$host,$port,$status,$useip,$ip,$newgroup,$groups)
+	# Update Host Profile
+
+	function	update_host_profile($hostid,$devicetype,$name,$os,$serialno,$tag,$macaddress,$hardware,$software,$contact,$location,$notes)
 	{
-		if(!check_right("Host","U",$hostid))
+		// If user has update permission then ok
+		if(!check_right("Host","U",0))
 		{
 			error("Insufficient permissions");
 			return 0;
 		}
 
- 		if (!eregi('^([0-9a-zA-Z\_\.-]+)$', $host, &$arr)) 
+		$sql="select * from hosts_profiles where hostid=$hostid";
+		$result=DBexecute($sql);
+		if(DBnum_rows($result)==0)
 		{
-			error("Hostname should contain 0-9a-zA-Z_.- characters only");
+			error("Host profile does not exist");
 			return 0;
 		}
 
-		$sql="select * from hosts where host='$host' and hostid<>$hostid";
+		$devicetype=addslashes($devicetype);
+		$name=addslashes($name);
+		$os=addslashes($os);
+		$serialno=addslashes($serialno);
+		$tag=addslashes($tag);
+		$macaddress=addslashes($macaddress);
+		$hardware=addslashes($hardware);
+		$software=addslashes($software);
+		$contact=addslashes($contact);
+		$location=addslashes($location);
+		$notes=addslashes($notes);
+
+		$sql="update hosts_profiles set hostid=$hostid,devicetype='$devicetype',name='$name',os='$os',serialno='$serialno',tag='$tag',macaddress='$macaddress',hardware='$hardware',software='$software',contact='$contact',location='$location',notes='$notes'";
 		$result=DBexecute($sql);
-		if(DBnum_rows($result)>0)
-		{
-			error("Host '$host' already exists");
-			return 0;
-		}
-
-
-		if($useip=="on")
-		{
-			$useip=1;
-		}
-		else
-		{
-			$useip=0;
-		}
-		$sql="update hosts set host='$host',port=$port,useip=$useip,ip='$ip' where hostid=$hostid";
-		$result=DBexecute($sql);
-
-
-		update_host_status($hostid, $status);
-		update_host_groups($hostid,$groups);
-		if($newgroup != "")
-		{
-			add_group_to_host($hostid,$newgroup);
-		}
+		
 		return	$result;
 	}
 
-	# Add templates linked to template host to the host
+	# Delete Host Profile
 
-	function	add_templates_to_host($hostid,$host_templateid)
+	function	delete_host_profile($hostid)
 	{
-		$sql="select * from hosts_templates where hostid=$host_templateid";
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
+		if(!check_right("Host","U",0))
 		{
-			add_template_linkage($hostid,$row["templateid"],$row["items"],$row["triggers"],$row["actions"],
-						$row["graphs"],$row["screens"]);
+			error("Insufficient permissions");
+			return 0;
 		}
-	}
+		$sql="delete from hosts_profiles where hostid=$hostid";
+		$result=DBexecute($sql);
 
-	function	delete_groups_by_hostid($hostid)
-	{
-		$sql="select groupid from hosts_groups where hostid=$hostid";
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
-			$sql="delete from hosts_groups where hostid=$hostid and groupid=".$row["groupid"];
-			DBexecute($sql);
-			$sql="select count(*) as count from hosts_groups where groupid=".$row["groupid"];
-			$result2=DBselect($sql);
-			$row2=DBfetch($result2);
-			if($row2["count"]==0)
-			{
-				$sql="delete from groups where groupid=".$row["groupid"];
-				DBexecute($sql);
-			}
-		}
-	}
-
-	# Delete Host
-
-	function	delete_host($hostid)
-	{
-		global $DB_TYPE;
-
-		$ret = FAIL;
-
-		for($i=0;$i<100;$i++)
-		{
-			if($DB_TYPE=="MYSQL")
-			{
-				$sql="update hosts set status=".HOST_STATUS_DELETED.",host=concat(host,\" [DEL$i]\") where hostid=$hostid";
-			}
-			else
-			{
-				$sql="update hosts set status=".HOST_STATUS_DELETED.",host=host||' [DEL$i]' where hostid=$hostid";
-			}
-			if($ret = DBexecute($sql))	break;
-		}
-		return	$ret;
-	}
-
-	function	delete_host_group($groupid)
-	{
-		$sql="delete from hosts_groups where groupid=$groupid";
-		DBexecute($sql);
-		$sql="delete from groups where groupid=$groupid";
-		return DBexecute($sql);
-	}
-
-	function	get_host_by_hostid($hostid)
-	{
-		$sql="select hostid,host,useip,ip,port,status from hosts where hostid=$hostid";
-		$result=DBselect($sql);
-		if(DBnum_rows($result) == 1)
-		{
-			$host["hostid"]=DBget_field($result,0,0);
-			$host["host"]=DBget_field($result,0,1);
-			$host["useip"]=DBget_field($result,0,2);
-			$host["ip"]=DBget_field($result,0,3);
-			$host["port"]=DBget_field($result,0,4);
-			$host["status"]=DBget_field($result,0,5);
-		}
-		else
-		{
-			error("No host with hostid=[$hostid]");
-		}
-		return	$host;
-	}
-
-	# Update Host status
-
-	function	update_host_status($hostid,$status)
-	{
-                if(!check_right("Host","U",0))
-                {
-                        error("Insufficient permissions");
-                        return 0;
-                }
-
-		$sql="select status,host from hosts where hostid=$hostid";
-		$result=DBselect($sql);
-		$old_status=DBget_field($result,0,0);
-		if($status != $old_status)
-		{
-			update_trigger_value_to_unknown_by_hostid($hostid);
-			$sql="update hosts set status=$status where hostid=$hostid and status!=".HOST_STATUS_DELETED;
-			info("Updated status of host ".DBget_field($result,0,1));
-			return	DBexecute($sql);
-		}
-		else
-		{
-			return 1;
-		}
+		return $result;
 	}
 ?>

@@ -39,6 +39,7 @@
 	include_once 	"include/screens.inc.php";
 	include_once 	"include/triggers.inc.php";
 	include_once 	"include/actions.inc.php";
+	include_once 	"include/profiles.inc.php";
 	include_once 	"include/services.inc.php";
 	include_once 	"include/maps.inc.php";
 

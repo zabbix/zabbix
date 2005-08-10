@@ -1301,6 +1301,11 @@
 		echo form_input("tag",$tag,64);
 
 		show_table2_v_delimiter($col++);
+		echo S_MACADDRESS;
+		show_table2_h_delimiter();
+		echo form_input("macaddress",$macaddress,64);
+
+		show_table2_v_delimiter($col++);
 		echo S_HARDWARE;
 		show_table2_h_delimiter();
 		echo form_textarea("hardware",$hardware,50,4);
@@ -1327,7 +1332,7 @@
 
 		show_table2_v_delimiter2($col++);
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add profile\">";
-		if(isset($escalationid))
+		if(isset($hostid))
 		{
 			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update profile\">";
 			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete profile\" onClick=\"return Confirm('Delete selected profile?');\">";
