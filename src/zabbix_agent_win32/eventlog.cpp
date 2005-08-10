@@ -20,7 +20,7 @@ int process_eventlog_new(char *source,int *lastlogsize, char *timestamp, char *s
     long    i;
     double  time;
 	int	t;
-    char    msg[1024];
+//    char    msg[1024];
     long    type,category;
 	
 // open up event log
@@ -40,10 +40,10 @@ int process_eventlog_new(char *source,int *lastlogsize, char *timestamp, char *s
 			{
 
 //				MyGetAEventLog("Application",hAppLog,Latest,&time,src,msg,&type,&category);
-				MyGetAEventLog(source,hAppLog,Latest,&time,src,msg,&type,&category,&t);
+				MyGetAEventLog(source,hAppLog,Latest,&time,src,message,&type,&category,&t);
 				sprintf(timestamp,"%d",t);
 				sprintf(severity,"%ld",type);
-				sprintf(message,"Src = %s, Msg = %s, type = %d, Category = %d\n",src,msg,type,category);
+//				sprintf(message,"Src = %s, Msg = %s, type = %d, Category = %d\n",src,msg,type,category);
 				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",Latest);
 				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",message);
 				*lastlogsize = Latest;
