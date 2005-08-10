@@ -453,7 +453,7 @@ int	send_value(char *server,int port,char *host, char *key,char *value,char *las
 	comms_create_request(host,key,value,lastlogsize,timestamp,source,severity,tosend,sizeof(tosend)-1);
 //	sprintf(tosend,"%s:%s\n",shortname,value);
 
-				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tosend);
+//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tosend);
 
 	if( sendto(s,tosend,strlen(tosend),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{

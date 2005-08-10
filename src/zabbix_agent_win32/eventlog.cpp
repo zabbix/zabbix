@@ -42,10 +42,11 @@ int process_eventlog_new(char *source,int *lastlogsize, char *timestamp, char *s
 //				MyGetAEventLog("Application",hAppLog,Latest,&time,src,msg,&type,&category);
 				MyGetAEventLog(source,hAppLog,Latest,&time,src,message,&type,&category,&t);
 				sprintf(timestamp,"%d",t);
+//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",type);
 				sprintf(severity,"%ld",type);
 //				sprintf(message,"Src = %s, Msg = %s, type = %d, Category = %d\n",src,msg,type,category);
-				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",Latest);
-				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",message);
+//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",Latest);
+//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",severity);
 				*lastlogsize = Latest;
 				MyCloseEventLog(hAppLog);
 				return 0;
@@ -215,8 +216,9 @@ insert strings for the message */
     *pTime = (double)pELR->TimeGenerated;
 
     *pType = pELR->EventType;                           // return event type
-
-    *pCategory = pELR->EventCategory;                   // return category
+//WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","YO");
+//WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",pELR->EventType);    
+	*pCategory = pELR->EventCategory;                   // return category
 
 	*timestamp=pELR->TimeGenerated;
 
