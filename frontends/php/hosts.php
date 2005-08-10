@@ -757,6 +757,8 @@
 
 	show_table2_header_end();
 //	end of if($_GET["config"]==1)
+
+		insert_host_profile_form($_GET["hostid"]);
 	}
 ?>
 

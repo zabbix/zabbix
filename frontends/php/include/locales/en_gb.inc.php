@@ -314,6 +314,17 @@
 	"S_AVAILABILITY"=>			"Availability",
 	"S_AVAILABLE"=>				"Available",
 	"S_NOT_AVAILABLE"=>			"Not available",
+//	Host profiles
+	"S_HOST_PROFILE"=>			"Host profile",
+	"S_DEVICE_TYPE"=>			"Device type",
+	"S_OS"=>				"OS",
+	"S_SERIALNO"=>				"SerialNo",
+	"S_TAG"=>				"Tag",
+	"S_HARDWARE"=>				"Hardware",
+	"S_SOFTWARE"=>				"Software",
+	"S_CONTACT"=>				"Contact",
+	"S_LOCATION"=>				"Location",
+	"S_NOTES"=>				"Notes",
 
 //	items.php
 	"S_CONFIGURATION_OF_ITEMS"=>		"Configuration of items",
