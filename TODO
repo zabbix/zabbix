@@ -1,5 +1,6 @@
 1.1alpha12:
 
+ - add correct severity for eventlog[] 
  - add timestamp templates
  - fix linkage of triggers (more than one host linked to a trigger)
  - host profiles
