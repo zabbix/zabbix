@@ -1,5 +1,6 @@
 Changes for 1.1alpha12:
 
+ - time-related functions will be calculated regardless of host status (Alexei)
  - added support of hosts profiles (Alexei)
  - column history_log.value altered to TEXT (Alexei)
  - fixed zabbix_get to correctly parse command line parameters (Alexei)
