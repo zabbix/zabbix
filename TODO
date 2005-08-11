@@ -1,7 +1,6 @@
 1.1alpha12:
 
  - add timestamp templates
- - change 1.1alpha11->1.1alpha12 everywhere
  - fix linkage of triggers (more than one host linked to a trigger)
  - host profiles
  - make agents return error message if not supported or not available
