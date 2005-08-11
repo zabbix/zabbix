@@ -20,6 +20,9 @@
 ?>
 <?php
 	include "include/config.inc.php";
+	include_once "include/locales/en_gb.inc.php";
+
+	process_locales();
 
 #	PARAMETERS:
 

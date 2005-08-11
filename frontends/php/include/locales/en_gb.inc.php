@@ -414,6 +414,7 @@
 	"S_HOST_1"=>				"Host 1",
 	"S_HOST_2"=>				"Host 2",
 	"S_LINK_STATUS_INDICATOR"=>		"Link status indicator",
+	"S_CONFIGURATION_OF_NETWORK_MAPS"=>	"Configuration of network maps",
 
 //	map.php
 	"S_OK_BIG"=>				"OK",
