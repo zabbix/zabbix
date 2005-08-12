@@ -207,14 +207,14 @@
 				}
 				echo "<TD>$source</TD>";
 
-		                if($row["severity"]==0)         $severity=S_NOT_CLASSIFIED;
-		                elseif($row["severity"]==1)     $severity=S_INFORMATION;
-		                elseif($row["severity"]==2)     $severity=S_WARNING;
-		                elseif($row["severity"]==3)     $severity=array("value"=>S_AVERAGE,"class"=>"average");
-		                elseif($row["severity"]==4)     $severity=array("value"=>S_HIGH,"class"=>"high");
-		                elseif($row["severity"]==5)     $severity=array("value"=>S_DISASTER,"class"=>"disaster");
-		                elseif($row["severity"]==6)     $severity=S_AUDIT_SUCCESS;
-		                elseif($row["severity"]==7)     $severity=S_AUDIT_FAILURE;
+		                if($severity==0)         $severity=S_NOT_CLASSIFIED;
+		                elseif($severity==1)     $severity=S_INFORMATION;
+		                elseif($severity==2)     $severity=S_WARNING;
+		                elseif($severity==3)     $severity=array("value"=>S_AVERAGE,"class"=>"average");
+		                elseif($severity==4)     $severity=array("value"=>S_HIGH,"class"=>"high");
+		                elseif($severity==5)     $severity=array("value"=>S_DISASTER,"class"=>"disaster");
+		                elseif($severity==6)     $severity=S_AUDIT_SUCCESS;
+		                elseif($severity==7)     $severity=S_AUDIT_FAILURE;
 		                else                            $severity=$row["priority"];
 
 				echo "<TD>$severity</TD>";
