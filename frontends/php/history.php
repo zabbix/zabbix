@@ -206,6 +206,17 @@
 					echo "<TD>".date("Y.M.d H:i:s",$local)."</TD>";
 				}
 				echo "<TD>$source</TD>";
+
+		                if($row["severity"]==0)         $severity=S_NOT_CLASSIFIED;
+		                elseif($row["severity"]==1)     $severity=S_INFORMATION;
+		                elseif($row["severity"]==2)     $severity=S_WARNING;
+		                elseif($row["severity"]==3)     $severity=array("value"=>S_AVERAGE,"class"=>"average");
+		                elseif($row["severity"]==4)     $severity=array("value"=>S_HIGH,"class"=>"high");
+		                elseif($row["severity"]==5)     $severity=array("value"=>S_DISASTER,"class"=>"disaster");
+		                elseif($row["severity"]==6)     $severity=S_AUDIT_SUCCESS;
+		                elseif($row["severity"]==7)     $severity=S_AUDIT_FAILURE;
+		                else                            $severity=$row["priority"];
+
 				echo "<TD>$severity</TD>";
 			}
 			if($item["value_type"]==ITEM_VALUE_TYPE_FLOAT)
