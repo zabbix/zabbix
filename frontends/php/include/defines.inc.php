@@ -100,6 +100,15 @@
 	define("RECIPIENT_TYPE_USER",0);
 	define("RECIPIENT_TYPE_GROUP",1);
 
+	define("LOGFILE_SEVERITY_NOT_CLASSIFIED",0);
+	define("LOGFILE_SEVERITY_INFORMATION",1);
+	define("LOGFILE_SEVERITY_WARNING",2);
+	define("LOGFILE_SEVERITY_AVERAGE",3);
+	define("LOGFILE_SEVERITY_HIGH",4);
+	define("LOGFILE_SEVERITY_DISASTER",5);
+	define("LOGFILE_SEVERITY_AUDIT_SUCCESS",6);
+	define("LOGFILE_SEVERITY_AUDIT_FAILURE",7);
+
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if (!function_exists('version_compare'))
 	{
