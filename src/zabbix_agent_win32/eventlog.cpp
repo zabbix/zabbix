@@ -45,6 +45,11 @@ int process_eventlog_new(char *source,int *lastlogsize, char *timestamp, char *s
 //					WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","YO");
 //					WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",type);
 //				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",t);
+					if(type==EVENTLOG_ERROR_TYPE)	type=4;
+					else if(type==EVENTLOG_AUDIT_FAILURE)	type=7;
+					else if(type==EVENTLOG_AUDIT_SUCCESS)	type=8;
+					else if(type==EVENTLOG_INFORMATION_TYPE)	type=1;
+					else if(type==EVENTLOG_WARNING_TYPE)	type=2;
 					sprintf(severity,"%d",type);
 //				sprintf(message,"Src = %s, Msg = %s, type = %d, Category = %d\n",src,msg,type,category);
 //				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",Latest);
