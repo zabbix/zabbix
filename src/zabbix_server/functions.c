@@ -401,7 +401,6 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 	DB_RESULT       *result;
 	DB_ITEM	item;
 	char	*s;
-	int	update_tr;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_data([%s],[%s],[%s],[%s])",server,key,value,lastlogsize);
 
@@ -496,12 +495,9 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 		zabbix_log(LOG_LEVEL_DEBUG, "Value [%s] Lastlogsize [%s] Timestamp [%s]", value, lastlogsize, timestamp);
 	}
 
-	process_new_value(&item,s,&update_tr);
+	process_new_value(&item,s);
 
-	if(update_tr==1)
-	{
-		update_triggers(item.itemid);
-	}
+	update_triggers(item.itemid);
  
 	DBfree_result(result);
 
@@ -517,15 +513,12 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
  * Parameters: item - item data                                               *
  *             value - new value of the item                                  *
  *                                                                            *
- * Return value: update_tr=0 - update of triggers is not required             *
- *               update_tr=1 - update of triggers is required                 *
- *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: for trapper poller process                                       *
  *                                                                            *
  ******************************************************************************/
-void	process_new_value(DB_ITEM *item,char *value, int *update_tr)
+void	process_new_value(DB_ITEM *item,char *value)
 {
 	time_t 	now;
 	char	sql[MAX_STRING_LEN];
@@ -534,8 +527,6 @@ void	process_new_value(DB_ITEM *item,char *value, int *update_tr)
 	double	value_double;
 	double	multiplier;
 	char	*e;
-
-	*update_tr = 1;
 
 	now = time(NULL);
 
@@ -620,7 +611,6 @@ void	process_new_value(DB_ITEM *item,char *value, int *update_tr)
 		{
 /*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,lastclock=%d where itemid=%d",now+item->delay,now,item->itemid);*/
 			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),(int)now,item->itemid);
-			*update_tr=0;
 		}
 	}
 	/* Logic for delta as speed of change */
@@ -669,8 +659,5 @@ void	process_new_value(DB_ITEM *item,char *value, int *update_tr)
 	}
 	DBexecute(sql);
 
-	if(*update_tr == 1)
-	{
-		update_functions( item );
-	}
+	update_functions( item );
 }
