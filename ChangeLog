@@ -1,5 +1,6 @@
 Changes for 1.1beta1:
 
+ - fixed update of triggers in certain situations (Alexei)
  - French translation (Alexei)
  - German translation. Thanks to J. Pawlowski (Alexei)
 

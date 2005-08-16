@@ -127,7 +127,6 @@ static int process_value(char *key, char *host, char *value)
 	DB_RESULT       *result;
 	DB_ITEM	item;
 	char	*s;
-	int	update_tr;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_value()");
 
@@ -192,11 +191,8 @@ static int process_value(char *key, char *host, char *value)
 	item.multiplier=atoi(DBget_field(result,0,19));
 	item.formula=DBget_field(result,0,20);
 
-	process_new_value(&item,value,&update_tr);
-	if(update_tr == 1)
-	{
-		update_triggers(item.itemid);
-	}
+	process_new_value(&item,value);
+	update_triggers(item.itemid);
  
 	DBfree_result(result);
 
