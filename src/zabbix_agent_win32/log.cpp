@@ -60,6 +60,7 @@ void InitLog(void)
       strftime(tbuf,32,"%d-%b-%Y %H:%M:%S",loc);
       sprintf(buffer,"**************************************************************\r\n[%s] Log file opened\r\n",tbuf);
       WriteFile(hLog,buffer,strlen(buffer),&size,NULL);
+	  FlushFileBuffers(hLog);
 
       mutexLogAccess=CreateMutex(NULL,FALSE,NULL);
    }
