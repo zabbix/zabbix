@@ -93,12 +93,14 @@ void	disable_all_metrics()
 {
 	int i;
 
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","disable_all_metrics: start");
 	for(i=0;;i++)
 	{
 		if(metrics[i].key == NULL)	break;
 
 		metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
 	}
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","disable_all_metrics: end");
 }
 
 int	get_min_nextcheck()
@@ -106,6 +108,8 @@ int	get_min_nextcheck()
 	int i;
 	int min=-1;
 	int nodata=0;
+
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","get_min_nextcheck: start");
 
 	for(i=0;;i++)
 	{
@@ -121,14 +125,19 @@ int	get_min_nextcheck()
 
 	if(nodata==0)
 	{
+		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","get_min_nextcheck: end: FAIL");
 		return	FAIL;
 	}
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","get_min_nextcheck: end");
+
 	return min;
 }
 
 void	add_check(char *key, int refresh, int lastlogsize)
 {
 	int i;
+
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","add_check: start");
 
 	for(i=0;;i++)
 	{
@@ -156,6 +165,7 @@ void	add_check(char *key, int refresh, int lastlogsize)
 			break;
 		}
 	}
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","add_check: end");
 }
 
 // Return position of Nth delimiter from right size, 0 - otherwise
@@ -164,12 +174,14 @@ int strnrchr(char *str, int num, char delim)
 	int i=0;
 	int n=0;
 
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","strnrchr: start");
 	for(i=strlen(str)-1;i>=0;i--)
 	{
 		if(str[i]==delim) n++;
 		if(n==num) break;
 	}
 	if(i==-1) i=0;
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","strnrchr: end");
 	return i;
 }
 
@@ -186,6 +198,7 @@ int	parse_list_of_checks(char *str)
 	char *str_copy;
 	int p1,p2;
 
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","parse_list_of_checks: start");
 	disable_all_metrics();
 
 	str_copy=str;
@@ -230,6 +243,7 @@ int	parse_list_of_checks(char *str)
 		pos=strchr(str_copy,'\n');
 	}
 
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","parse_list_of_checks: end");
 	return SUCCEED;
 }
 
@@ -245,6 +259,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 	struct sockaddr_in servaddr_in;
 
 //	zabbix_log( LOG_LEVEL_DEBUG, "get_active_checks: host[%s] port[%d]", server, port);
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","get_active_checks: start");
 
 	servaddr_in.sin_family=AF_INET;
 	hp=gethostbyname(server);
@@ -389,6 +404,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 //		zabbix_log(LOG_LEVEL_WARNING, "Problem with close [%s]", strerror(errno));
 	}
 
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","get_active_checks: end");
 	return SUCCEED;
 }
 
@@ -405,6 +421,7 @@ int	send_value(char *server,int port,char *host, char *key,char *value,char *las
 	struct sockaddr_in servaddr_in;
 
 //	zabbix_log( LOG_LEVEL_DEBUG, "In send_value()");
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","send_value: start");
 
 	servaddr_in.sin_family=AF_INET;
 	hp=gethostbyname(server);
@@ -493,6 +510,7 @@ sprintf(tmp,"Error in recvfrom()");
 //		zabbix_log( LOG_LEVEL_WARNING, "Error in close() [%s] [%s]",server, strerror(errno));
 	}
 
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","send_value: end");
 	return SUCCEED;
 }
 
@@ -515,6 +533,7 @@ int	process_active_checks(char *server, int port)
 	char	c[MAX_STRING_LEN];
 	char	*filename;
 
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_active_checks: start");
 	now=time(NULL);
 
 	for(i=0;;i++)
@@ -561,9 +580,12 @@ int	process_active_checks(char *server, int port)
 		/* Special processing for log files */
 		else if(strncmp(metrics[i].key,"eventlog[",9) == 0)
 		{
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_active_checks: 1");
+
 			strscpy(c,metrics[i].key);
 			filename=strtok(c,"[]");
 			filename=strtok(NULL,"[]");
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_active_checks: 2");
 
 			count=0;
 			while(process_eventlog_new(filename,&metrics[i].lastlogsize, timestamp, source, severity, value) == 0)
@@ -574,6 +596,7 @@ int	process_active_checks(char *server, int port)
 //				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","In loop()");
 //				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",value);
 
+				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_active_checks: 3");
 				sprintf(lastlogsize,"%d",metrics[i].lastlogsize);
 				if(send_value(server,port,confHostname,metrics[i].key,value,lastlogsize,timestamp,source,severity) == FAIL)
 				{
@@ -590,6 +613,7 @@ int	process_active_checks(char *server, int port)
 //				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","End of loop()");
 				/* Do not flood ZABBIX server if file grows too fast */
 				if(count >= MAX_LINES_PER_SECOND*metrics[i].refresh)	break;
+				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_active_checks: 4");
 			}
 		}
 		else
@@ -630,11 +654,13 @@ int	process_active_checks(char *server, int port)
 
 		metrics[i].nextcheck=time(NULL)+metrics[i].refresh;
 	}
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_active_checks: end");
 	return ret;
 }
 
 void	refresh_metrics(char *server, int port, char *error, int max_error_len)
 {
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","refresh_metrics: start");
 //	zabbix_log( LOG_LEVEL_DEBUG, "In refresh_metrics()");
 	while(get_active_checks(server, port, error, sizeof(error)) != SUCCEED)
 	{
@@ -644,6 +670,7 @@ void	refresh_metrics(char *server, int port, char *error, int max_error_len)
 #endif
 		Sleep(60*1000);
 	}
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","refresh_metrics: end");
 }
 
 void    ActiveChecksThread(void *)
@@ -656,6 +683,8 @@ void    ActiveChecksThread(void *)
 
 //	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",confServerPort);
 
+
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","ActiveChecksThread: start");
 	init_list();
 
 	refresh_metrics(confServer, confServerPort, error, sizeof(error));
@@ -663,6 +692,7 @@ void    ActiveChecksThread(void *)
 
 	for(;;)
 	{
+		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","ActiveChecksThread: loop 1");
 		if(process_active_checks(confServer, confServerPort) == FAIL)
 		{
 			Sleep(60*1000);
@@ -702,5 +732,7 @@ void    ActiveChecksThread(void *)
 			refresh_metrics(confServer, confServerPort, error, sizeof(error));
 			nextrefresh=time(NULL)+300;
 		}
+		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","ActiveChecksThread: loop 2");
 	}
+	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","ActiveChecksThread: end");
 }
