@@ -200,4 +200,16 @@ Language=English
 Active checks [%1]
 .
 
+MessageId=
+SymbolicName=MSG_GET_COMPUTER_NAME_FAILED
+Language=English
+GetComputerName failed: %1
+.
+
+MessageId=
+SymbolicName=MSG_LOOKUP_FAILED
+Language=English
+PdhLookupPerfNameByIndex failed: %1
+.
+
 ;#endif
