@@ -424,8 +424,12 @@ char *GetCounterName(DWORD index)
 		counterName->next = perfCounterList;
 
 		sprintf(hostname, "\\\\");
-		dwSize = MAX_COMPUTERNAME_LENGTH;
-		GetComputerName((char *) &hostname + 2, &dwSize);
+		dwSize = MAX_COMPUTERNAME_LENGTH+1;
+		if(GetComputerName((char *) &hostname + 2, &dwSize)!=ERROR_SUCCESS)
+		{
+			WriteLog(MSG_GET_COMPUTER_NAME_FAILED,EVENTLOG_ERROR_TYPE,
+				"s",GetSystemErrorText(GetLastError()));
+		}
 
 		dwSize = MAX_COUNTER_NAME;
 		if (PdhLookupPerfNameByIndex((char *)&hostname, index, (char *)&counterName->name, &dwSize)==ERROR_SUCCESS)
@@ -434,6 +438,8 @@ char *GetCounterName(DWORD index)
 		} 
 		else 
 		{
+			WriteLog(MSG_LOOKUP_FAILED,EVENTLOG_ERROR_TYPE,
+				"s", GetSystemErrorText(GetLastError()));
 			free(counterName);
 			return "UnknownPerformanceCounter";
 		}
