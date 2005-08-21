@@ -425,7 +425,7 @@ char *GetCounterName(DWORD index)
 
 		sprintf(hostname, "\\\\");
 		dwSize = MAX_COMPUTERNAME_LENGTH+1;
-		if(GetComputerName((char *) &hostname + 2, &dwSize)!=ERROR_SUCCESS)
+		if(GetComputerName((char *) &hostname + 2, &dwSize)==0)
 		{
 			WriteLog(MSG_GET_COMPUTER_NAME_FAILED,EVENTLOG_ERROR_TYPE,
 				"s",GetSystemErrorText(GetLastError()));
