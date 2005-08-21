@@ -235,7 +235,7 @@ int	DBinsert_id()
 	return mysql_insert_id(&mysql);
 #endif
 #ifdef	HAVE_PGSQL
-	NOT IMPLEMENTED YET
+#error	SUPPORT OF POSTGRESQL NOT IMPLEMENTED YET
 #endif
 }
 
