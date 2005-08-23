@@ -392,7 +392,7 @@ void	test_parameters(void)
 
 /* This messy function must be rewritten!
  */
-void	process(char *command,char *value)
+int	process(char *command,char *value)
 {
 	char	*p;
 	double	result=0;
@@ -408,6 +408,7 @@ void	process(char *command,char *value)
 	char	*res2 = NULL;
 	int	ret_str=0;
 	double	value_double;
+	int	ret = SUCCEED;
 
 	for( p=command+strlen(command)-1; p>command && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
 
@@ -522,10 +523,12 @@ void	process(char *command,char *value)
 /* New protocol */
 /*			sprintf(value,"%f",result);*/
 		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_NOTSUPPORTED\n");
+		ret = FAIL;
 	}
 	else if(result==TIMEOUT_ERROR)
 	{
 		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_ERROR\n");
+		ret = FAIL;
 	}
 	else
 	{
@@ -539,7 +542,7 @@ void	process(char *command,char *value)
 			free(res2);
 		}
 	}
-
+	return ret;
 }
 
 /* MD5 sum calculation */

@@ -36,7 +36,7 @@ COMMAND
 	char	*parameter;
 };
 
-void	process(char *command, char *value);
+int	process(char *command, char *value);
 void	init_metrics();
 
 void    add_user_parameter(char *key,char *command);
