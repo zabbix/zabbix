@@ -1,5 +1,6 @@
 Changes for 1.1beta1:
 
+ - parameter Hostname is optional. If not specified, hostname is used. (Alexei)
  - fixed processing of W32 performance counters. Problem with long computer names. (Alexei)
  - fixed crash of WIN32 agent when processing eventlog[]. Many thanks to Simon Lund. (Alexei)
  - fixed update of triggers in certain situations (Alexei)
