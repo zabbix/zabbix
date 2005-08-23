@@ -1,6 +1,5 @@
 1.1beta1:
 
- - make Hostname mandatory, take real hostname if not defined.
  - add timestamp templates
  - fix linkage of triggers (more than one host linked to a trigger)
  - host profiles

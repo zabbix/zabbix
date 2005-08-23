@@ -228,12 +228,14 @@ void usage(char *prog)
 
 void    init_config(void)
 {
+	char	tmp[MAX_STRING_LEN];
+	
 	struct cfg_line cfg[]=
 	{
 /*               PARAMETER      ,VAR    ,FUNC,  TYPE(0i,1s),MANDATORY,MIN,MAX
 */
 		{"Server",&CONFIG_HOSTS_ALLOWED,0,TYPE_STRING,PARM_MAND,0,0},
-		{"Hostname",&CONFIG_HOSTNAME,0,TYPE_STRING,PARM_MAND,0,0},
+		{"Hostname",&CONFIG_HOSTNAME,0,TYPE_STRING,PARM_OPT,0,0},
 		{"PidFile",&CONFIG_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"LogFile",&CONFIG_LOG_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 /*		{"StatFile",&CONFIG_STAT_FILE,0,TYPE_STRING,PARM_OPT,0,0},*/
@@ -261,6 +263,20 @@ void    init_config(void)
 	{
 		CONFIG_PID_FILE=strdup("/tmp/zabbix_agentd.pid");
 	}
+
+	if(CONFIG_HOSTNAME == NULL)
+	{
+		if(SUCCEED == process("system[hostname]",tmp))
+		{
+			CONFIG_HOSTNAME=strdup(tmp);
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_CRIT, "Hostname is not defined");
+			exit(1);
+		}
+	}
+
 /*	if(CONFIG_STAT_FILE == NULL)
 	{
 		CONFIG_STAT_FILE=strdup("/tmp/zabbix_agentd.tmp");
@@ -461,6 +477,7 @@ int	main(int argc, char **argv)
 	{
 		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
 	}
+	zabbix_log( LOG_LEVEL_CRIT, "Hostname [%s]", CONFIG_HOSTNAME);
 
 	if( FAIL == create_pid_file(CONFIG_PID_FILE))
 	{
