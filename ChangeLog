@@ -1,5 +1,6 @@
 Changes for 1.1beta1:
 
+ - updated system.uname, system.uptime, system.users.num (Alexei)
  - parameter system[uptime] renamed to system.uptime[] (Alexei)
  - added parameter fs.file.atime[] (Alexei)
  - added parameter fs.file.ctime[] (Alexei)
