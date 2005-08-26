@@ -258,7 +258,8 @@ COMMAND	agent_commands[]=
 	{"system[hostname]"	,0,		EXECUTE_STR, "hostname"},
 	{"system.localtime"	,SYSTEM_LOCALTIME,	0, 0},
 	{"system[uname]"	,0,		EXECUTE_STR, "uname -a"},
-	{"system[uptime]"	,UPTIME,	0, 0},
+	{"system[uptime]"	,SYSTEM_UPTIME,	0, 0},
+	{"system.uptime"	,SYSTEM_UPTIME,	0, 0},
 	{"system[users]"	,EXECUTE, 	0,"who|wc -l"},
 
 	{"ping"			,PING, 		0, 0},
