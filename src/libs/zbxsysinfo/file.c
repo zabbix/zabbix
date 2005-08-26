@@ -94,7 +94,7 @@ int	FS_FILE_SIZE(const char *cmd, const char *filename,double  *value)
 	return	SYSINFO_RET_FAIL;
 }
 
-int	ISFILE(const char *cmd, const char *filename,double  *value)
+int	FS_FILE_EXISTS(const char *cmd, const char *filename,double  *value)
 {
 	struct stat	buf;
 

@@ -178,7 +178,8 @@ COMMAND	agent_commands[]=
 	{"filesize[*]"		,FS_FILE_SIZE, 		0, "/etc/passwd"},
 	{"fs.file.size[*]"	,FS_FILE_SIZE, 		0, "/etc/passwd"},
 
-	{"file[*]"		,ISFILE, 		0, "/etc/passwd"},
+	{"file[*]"		,FS_FILE_EXISTS,	0, "/etc/passwd"},
+	{"fs.file.exists[*]"	,FS_FILE_EXISTS,	0, "/etc/passwd"},
 
 	{"cpu[idle1]"		,CPUIDLE1, 		0, 0},
 	{"cpu[idle5]"		,CPUIDLE5, 		0, 0},
