@@ -48,6 +48,10 @@
 ?>
 
 <?php
+	update_profile("web.menu.view.last",$page["file"]);
+?>
+
+<?php
 	$h1="&nbsp;".S_ALERT_HISTORY_BIG;
 
 	$h2="";
@@ -65,6 +69,7 @@
 
 	show_header2($h1,$h2,"<form name=\"form2\" method=\"get\" action=\"alerts.php\">","</form>");
 ?>
+
 
 <FONT COLOR="#000000">
 <?php

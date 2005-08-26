@@ -24,6 +24,7 @@
 	$page["title"] = "S_STATUS_OF_TRIGGERS";
 ?>
 <?php
+
 	$tr_hash=calc_trigger_hash();
 	setcookie("triggers_hash",$tr_hash,time()+1800);
 
@@ -80,6 +81,14 @@
 	{
 		$refresh=0;
 	}
+	if(!isset($_GET["onlytrue"]))
+	{
+		$_GET["onlytrue"]="true";
+	}
+	if(!isset($_GET["noactions"]))
+	{
+		$_GET["noactions"]="true";
+	}
 	if(isset($_GET["fullscreen"]))
 	{
 		show_header($page["title"],$refresh,1);
@@ -102,6 +111,7 @@
 		show_footer();
 		exit;
 	}
+	update_profile("web.menu.view.last",$page["file"]);
 ?>
 <?php
 	if(isset($audio))

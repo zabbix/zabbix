@@ -57,6 +57,7 @@
 	{
 		unset($_GET["groupid"]);
 	}
+	update_profile("web.menu.view.last",$page["file"]);
 ?>
 
 <?php

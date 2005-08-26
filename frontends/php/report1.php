@@ -26,6 +26,10 @@
 ?>
 
 <?php
+	update_profile("web.menu.reports.last",$page["file"]);
+?>
+
+<?php
 	show_table_header(S_STATUS_OF_ZABBIX_BIG);
 
 	table_begin();

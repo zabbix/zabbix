@@ -35,6 +35,10 @@
 ?>
 
 <?php
+	update_profile("web.menu.reports.last",$page["file"]);
+?>
+
+<?php
 	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
 	{
 		unset($_GET["groupid"]);

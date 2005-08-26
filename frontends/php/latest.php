@@ -56,10 +56,11 @@
 <?php
 	$_GET["hostid"]=@iif(isset($_GET["hostid"]),$_GET["hostid"],get_profile("web.latest.hostid",0));
 	update_profile("web.latest.hostid",$_GET["hostid"]);
+	update_profile("web.menu.view.last",$page["file"]);
 ?>
 
 <?php
-	$h1="&nbsp;".S_LATEST_DATA;
+	$h1="&nbsp;".S_LATEST_DATA_BIG;
 
 	$h2=S_GROUP."&nbsp;";
 	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";

@@ -1065,50 +1065,50 @@ echo "</head>";
 <?php
 	$menu=array(
 		"view"=>array(
-				"label"=>"View",
+				"label"=>S_VIEW,
 				"pages"=>array("overview.php","latest.php","tr_status.php","queue.php","latestalarms.php","alerts.php","maps.php","charts.php","screens.php","srv_status.php","alarms.php","history.php","tr_comments.php","report3.php","profile.php"),
 				"level2"=>array(
-					array("label"=>"Overview","url"=>"overview.php"),
-					array("label"=>"Latest data","url"=>"latest.php"),
-					array("label"=>"Triggers","url"=>"tr_status.php?onlytrue=true&amp;noactions=true&amp;compact=true"),
-					array("label"=>"Queue","url"=>"queue.php"),
-					array("label"=>"Events","url"=>"latestalarms.php"),
-					array("label"=>"Actions","url"=>"alerts.php"),
-					array("label"=>"Maps","url"=>"maps.php"),
-					array("label"=>"Graphs","url"=>"charts.php"),
-					array("label"=>"Screens","url"=>"screens.php"),
-					array("label"=>"IT Services","url"=>"srv_status.php")
+					array("label"=>S_OVERVIEW,"url"=>"overview.php"),
+					array("label"=>S_LATEST_DATA,"url"=>"latest.php"),
+					array("label"=>S_TRIGGERS,"url"=>"tr_status.php"),
+					array("label"=>S_QUEUE,"url"=>"queue.php"),
+					array("label"=>S_EVENTS,"url"=>"latestalarms.php"),
+					array("label"=>S_ACTIONS,"url"=>"alerts.php"),
+					array("label"=>S_MAPS,"url"=>"maps.php"),
+					array("label"=>S_GRAPHS,"url"=>"charts.php"),
+					array("label"=>S_SCREENS,"url"=>"screens.php"),
+					array("label"=>S_IT_SERVICES,"url"=>"srv_status.php")
 					)
 				),
 		"reports"=>array(
-				"label"=>"Reports",
+				"label"=>S_REPORTS,
 				"pages"=>array("report1.php","report2.php"),
 				"level2"=>array(
-					array("label"=>"Status of ZABBIX","url"=>"report1.php"),
-					array("label"=>"Availability report","url"=>"report2.php")
+					array("label"=>S_STATUS_OF_ZABBIX,"url"=>"report1.php"),
+					array("label"=>S_AVAILABILITY_REPORT,"url"=>"report2.php")
 					)
 				),
 		"configuration"=>array(
-				"label"=>"Configuration",
+				"label"=>S_CONFIGURATION,
 				"pages"=>array("config.php","users.php","audit.php","hosts.php","items.php","triggers.php","sysmaps.php","graphs.php","screenconf.php","services.php","sysmap.php","media.php","screenedit.php","actions.php","graph.php"),
 				"level2"=>array(
-					array("label"=>"General","url"=>"config.php"),
-					array("label"=>"Users","url"=>"users.php"),
-					array("label"=>"Audit","url"=>"audit.php"),
-					array("label"=>"Hosts","url"=>"hosts.php"),
-					array("label"=>"Items","url"=>"items.php"),
-					array("label"=>"Triggers","url"=>"triggers.php"),
-					array("label"=>"Maps","url"=>"sysmaps.php"),
-					array("label"=>"Graphs","url"=>"graphs.php"),
-					array("label"=>"Screens","url"=>"screenconf.php"),
-					array("label"=>"IT Services","url"=>"services.php")
+					array("label"=>S_GENERAL,"url"=>"config.php"),
+					array("label"=>S_USERS,"url"=>"users.php"),
+					array("label"=>S_AUDIT,"url"=>"audit.php"),
+					array("label"=>S_HOSTS,"url"=>"hosts.php"),
+					array("label"=>S_ITEMS,"url"=>"items.php"),
+					array("label"=>S_TRIGGERS,"url"=>"triggers.php"),
+					array("label"=>S_MAPS,"url"=>"sysmaps.php"),
+					array("label"=>S_GRAPHS,"url"=>"graphs.php"),
+					array("label"=>S_SCREENS,"url"=>"screenconf.php"),
+					array("label"=>S_IT_SERVICES,"url"=>"services.php")
 					)
 				),
 		"login"=>array(
-				"label"=>"Login",
+				"label"=>S_LOGIN,
 				"pages"=>array("index.php"),
 				"level2"=>array(
-					array("label"=>"Login","url"=>"index.php"),
+					array("label"=>S_LOGIN,"url"=>"index.php"),
 					)
 				),
 		);
@@ -1165,10 +1165,18 @@ echo "</head>";
 				$active_level1=$label;
 			}
 		}
+		if($i==0)	$url=get_profile("web.menu.view.last",0);
+		else if($i==1)	$url=get_profile("web.menu.reports.last",0);
+		else if($i==2)	$url=get_profile("web.menu.config.last",0);
+		if($url=="0")	$url=$sub["level2"][0]["url"];
 		if($active==1)
-			echo "<td class=\"horizontal_menu\" height=24 colspan=9><b><a href=\"".$sub["level2"][0]["url"]."\" class=\"highlight\">".$sub["label"]."</a></b></td>";
+		{
+			echo "<td class=\"horizontal_menu\" height=24 colspan=9><b><a href=\"$url\" class=\"highlight\">".$sub["label"]."</a></b></td>";
+		}
 		else
-			echo "<td class=\"horizontal_menu_n\" height=24 colspan=9><b><a href=\"".$sub["level2"][0]["url"]."\" class=\"highlight\">".$sub["label"]."</a></b></td>";
+		{
+			echo "<td class=\"horizontal_menu_n\" height=24 colspan=9><b><a href=\"$url\" class=\"highlight\">".$sub["label"]."</a></b></td>";
+		}
 		$i++;
 	}
 ?>
