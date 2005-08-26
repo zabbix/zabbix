@@ -119,10 +119,10 @@ int	SENSOR_TEMP2(const char *cmd, const char *parameter,double  *value);
 int	SENSOR_TEMP3(const char *cmd, const char *parameter,double  *value);
 
 int	SYSTEM_LOCALTIME(const char *cmd, const char *parameter,double  *value);
+int	SYSTEM_UPTIME(const char *cmd, const char *parameter,double  *value);
 
 int	SWAPFREE(const char *cmd, const char *parameter,double  *value);
 int	SWAPTOTAL(const char *cmd, const char *parameter,double  *value);
-int	UPTIME(const char *cmd, const char *parameter,double  *value);
 
 int	TCP_LISTEN(const char *cmd, const char *porthex,double  *value);
 
