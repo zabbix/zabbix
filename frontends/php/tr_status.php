@@ -131,14 +131,7 @@
 	{
 		$sort=$_GET["sort"];
 	}
-	if(!isset($_GET["onlytrue"]))
-	{
-		$onlytrue='false';
-	}
-	else
-	{
-		$onlytrue=$_GET["onlytrue"];
-	}
+	$onlytrue=$_GET["onlytrue"];
 	if(isset($_GET["noactions"])&&($_GET["noactions"]!='true'))
 	{
 		$noactions='false';
@@ -324,7 +317,7 @@
 		}
 		else
 		{
-			$h1=$h1."[<A HREF=\"tr_status.php?noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond\">".S_SHOW_ALL_TRIGGERS."</A>] ";
+			$h1=$h1."[<A HREF=\"tr_status.php?onlytrue=false&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond\">".S_SHOW_ALL_TRIGGERS."</A>] ";
 		}
 		if($noactions!='true')
 		{
