@@ -40,6 +40,10 @@
 ?>
 
 <?php
+	update_profile("web.menu.config.last",$page["file"]);
+?>
+
+<?php
 	if(isset($_POST["config"]))	$_GET["config"]=$_POST["config"];
 
 	$_GET["config"]=@iif(isset($_GET["config"]),$_GET["config"],get_profile("web.config.config",0));

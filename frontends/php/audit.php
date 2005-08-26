@@ -26,6 +26,10 @@
 ?>
 
 <?php
+	update_profile("web.menu.config.last",$page["file"]);
+?>
+
+<?php
 	if(isset($_GET["start"])&&isset($_GET["do"])&&($_GET["do"]=="<< Prev 100"))
 	{
 		$_GET["start"]-=100;

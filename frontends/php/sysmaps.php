@@ -33,6 +33,7 @@
 		show_footer();
 		exit;
 	}
+	update_profile("web.menu.config.last",$page["file"]);
 ?>
 
 <?php

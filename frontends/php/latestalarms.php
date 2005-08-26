@@ -52,6 +52,10 @@
 ?>
 
 <?php
+	update_profile("web.menu.view.last",$page["file"]);
+?>
+
+<?php
 	$h1="&nbsp;".S_HISTORY_OF_EVENTS_BIG;
 
 	$h2=S_GROUP."&nbsp;";
