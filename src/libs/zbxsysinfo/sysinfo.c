@@ -175,7 +175,9 @@ COMMAND	agent_commands[]=
 
 	{"md5sum[*]"		,0, 			MD5SUM, "/etc/services"},
 
-	{"filesize[*]"		,FILESIZE, 		0, "/etc/passwd"},
+	{"filesize[*]"		,FS_FILE_SIZE, 		0, "/etc/passwd"},
+	{"fs.file.size[*]"	,FS_FILE_SIZE, 		0, "/etc/passwd"},
+
 	{"file[*]"		,ISFILE, 		0, "/etc/passwd"},
 
 	{"cpu[idle1]"		,CPUIDLE1, 		0, 0},
@@ -249,6 +251,7 @@ COMMAND	agent_commands[]=
 	{"system[procrunning]"	,EXECUTE, 	0, "cat /proc/loadavg|cut -f1 -d'/'|cut -f4 -d' '"},
 #endif
 	{"system[hostname]"	,0,		EXECUTE_STR, "hostname"},
+	{"system.localtime"	,SYSTEM_LOCALTIME,	0, 0},
 	{"system[uname]"	,0,		EXECUTE_STR, "uname -a"},
 	{"system[uptime]"	,UPTIME,	0, 0},
 	{"system[users]"	,EXECUTE, 	0,"who|wc -l"},
