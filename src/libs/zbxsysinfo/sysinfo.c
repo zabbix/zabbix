@@ -172,16 +172,15 @@ COMMAND	agent_commands[]=
 	{"inodetotal[*]"	,INODETOTAL, 		0, "/"},
 
 	{"cksum[*]"		,CKSUM, 		0, "/etc/services"},
-
-	{"md5sum[*]"		,0, 			MD5SUM, "/etc/services"},
-
+	{"fs.file.cksum[*]"	,FS_FILE_CKSUM,		0, "/etc/services"},
+	{"md5sum[*]"		,0, 			FS_FILE_MD5SUM, "/etc/services"},
+	{"fs.file.md5sum[*]"	,0, 			FS_FILE_MD5SUM, "/etc/services"},
 	{"fs.file.atime[*]"	,FS_FILE_ATIME,		0, "/etc/passwd"},
 	{"fs.file.ctime[*]"	,FS_FILE_CTIME,		0, "/etc/passwd"},
 	{"fs.file.mtime[*]"	,FS_FILE_MTIME,		0, "/etc/passwd"},
 
 	{"filesize[*]"		,FS_FILE_SIZE, 		0, "/etc/passwd"},
 	{"fs.file.size[*]"	,FS_FILE_SIZE, 		0, "/etc/passwd"},
-
 	{"file[*]"		,FS_FILE_EXISTS,	0, "/etc/passwd"},
 	{"fs.file.exists[*]"	,FS_FILE_EXISTS,	0, "/etc/passwd"},
 
@@ -559,7 +558,7 @@ int	process(char *command,char *value)
 
 /* MD5 sum calculation */
 
-int	MD5SUM(const char *cmd, const char *filename, char **value)
+int	FS_FILE_MD5SUM(const char *cmd, const char *filename, char **value)
 {
 	int	fd;
 	int	i,nr;
@@ -673,7 +672,7 @@ static u_long crctab[] = {
  * on failure.  Errno is set on failure.
  */
 
-int	CKSUM(const char *cmd, const char *filename,double  *value)
+int	FS_FILE_CKSUM(const char *cmd, const char *filename,double  *value)
 {
 	register u_char *p;
 	register int nr;
