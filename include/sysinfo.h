@@ -45,7 +45,6 @@ int	getPROC(char *file,int lineno,int fieldno, double *value);
 
 int	BUFFERSMEM(const char *cmd, const char *parameter,double  *value);
 int	CACHEDMEM(const char *cmd, const char *parameter,double  *value);
-int	CKSUM(const char *cmd, const char *filename,double  *value);
 
 int	CPUIDLE1(const char *cmd, const char *parameter,double  *value);
 int	CPUIDLE5(const char *cmd, const char *parameter,double  *value);
@@ -74,7 +73,9 @@ int	DISK_WBLK(const char *cmd, const char *parameter,double  *value);
 int	FREEMEM(const char *cmd, const char *parameter,double  *value);
 
 int	FS_FILE_ATIME(const char *cmd, const char *filename,double  *value);
+int	FS_FILE_CKSUM(const char *cmd, const char *filename,double  *value);
 int	FS_FILE_CTIME(const char *cmd, const char *filename,double  *value);
+int	FS_FILE_MD5SUM(const char *cmd, const char *filename, char **value);
 int	FS_FILE_MTIME(const char *cmd, const char *filename,double  *value);
 int	FS_FILE_SIZE(const char *cmd, const char *filename,double  *value);
 int	FS_FILE_EXISTS(const char *cmd, const char *filename,double  *value);
@@ -130,7 +131,6 @@ int	EXECUTE(const char *cmd, const char *command,double  *value);
 int	EXECUTE_STR(const char *cmd, const char *command, const char *parameter, char  **value);
 int	STRVERSION(const char *cmd, const char *command,char **value);
 
-int	MD5SUM(const char *cmd, const char *filename, char **value);
 
 int	CHECK_SERVICE(const char *cmd, const char *service,double  *value);
 int	CHECK_SERVICE_PERF(const char *cmd, const char *service,double  *value);

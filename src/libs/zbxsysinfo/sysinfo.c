@@ -171,7 +171,7 @@ COMMAND	agent_commands[]=
 
 	{"inodetotal[*]"	,INODETOTAL, 		0, "/"},
 
-	{"cksum[*]"		,CKSUM, 		0, "/etc/services"},
+	{"cksum[*]"		,FS_FILE_CKSUM, 	0, "/etc/services"},
 	{"fs.file.cksum[*]"	,FS_FILE_CKSUM,		0, "/etc/services"},
 	{"md5sum[*]"		,0, 			FS_FILE_MD5SUM, "/etc/services"},
 	{"fs.file.md5sum[*]"	,0, 			FS_FILE_MD5SUM, "/etc/services"},
