@@ -1,5 +1,6 @@
 Changes for 1.1beta1:
 
+ - parameter isfile[] renamed to fs.file.exists[] (Alexei)
  - parameter filesize[] renamed to fs.file.size[] (Alexei)
  - added parameter system.localtime (Alexei)
  - parameter Hostname is optional. If not specified, hostname is used. (Alexei)
