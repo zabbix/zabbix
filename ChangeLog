@@ -1,5 +1,6 @@
 Changes for 1.1beta1:
 
+ - updated fs.file.md5sum and fs.file.cksum (Alexei)
  - misc usability fixes for PHP interface (Alexei)
  - updated system.uname, system.uptime, system.users.num (Alexei)
  - parameter system[uptime] renamed to system.uptime[] (Alexei)
