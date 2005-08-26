@@ -256,11 +256,14 @@ COMMAND	agent_commands[]=
 	{"system[procrunning]"	,EXECUTE, 	0, "cat /proc/loadavg|cut -f1 -d'/'|cut -f4 -d' '"},
 #endif
 	{"system[hostname]"	,0,		EXECUTE_STR, "hostname"},
+	{"system.hostname"	,0,		EXECUTE_STR, "hostname"},
 	{"system.localtime"	,SYSTEM_LOCALTIME,	0, 0},
 	{"system[uname]"	,0,		EXECUTE_STR, "uname -a"},
+	{"system.uname"	,0,		EXECUTE_STR, "uname -a"},
 	{"system[uptime]"	,SYSTEM_UPTIME,	0, 0},
 	{"system.uptime"	,SYSTEM_UPTIME,	0, 0},
 	{"system[users]"	,EXECUTE, 	0,"who|wc -l"},
+	{"system.users.num"	,EXECUTE, 	0,"who|wc -l"},
 
 	{"ping"			,PING, 		0, 0},
 /*	{"tcp_count"		,EXECUTE, 	0, "netstat -tn|grep EST|wc -l"}, */
