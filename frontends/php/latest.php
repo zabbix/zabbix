@@ -54,6 +54,11 @@
 ?>
 
 <?php
+	$_GET["hostid"]=@iif(isset($_GET["hostid"]),$_GET["hostid"],get_profile("web.latest.hostid",0));
+	update_profile("web.latest.hostid",$_GET["hostid"]);
+?>
+
+<?php
 	$h1="&nbsp;".S_LATEST_DATA;
 
 	$h2=S_GROUP."&nbsp;";

@@ -431,7 +431,7 @@
 					}
 				}
 	
-				if($maxY>0)
+				if(isset($maxY)&&($maxY>0))
 				{
 					$exp = floor(log10($maxY));
 					$mant = $maxY/pow(10,$exp);
@@ -500,6 +500,7 @@
 				$str=$str.$this->items[$i]["itemid"].",";
 			}
 			$str=substr($str,0,strlen($str)-1);
+			if($str=="")	$str=-1;
 
 			if($this->period<=24*3600)
 			{
