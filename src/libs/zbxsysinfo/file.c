@@ -82,7 +82,7 @@
 #include "common.h"
 #include "sysinfo.h"
 
-int	FILESIZE(const char *cmd, const char *filename,double  *value)
+int	FS_FILE_SIZE(const char *cmd, const char *filename,double  *value)
 {
 	struct stat	buf;
 

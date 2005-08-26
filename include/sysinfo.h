@@ -60,7 +60,6 @@ int	CPUSYSTEM1(const char *cmd, const char *parameter,double  *value);
 int	CPUSYSTEM5(const char *cmd, const char *parameter,double  *value);
 int	CPUSYSTEM15(const char *cmd, const char *parameter,double  *value);
 
-int	FILESIZE(const char *cmd, const char *filename,double  *value);
 int	DISKTOTAL(const char *cmd, const char *mountPoint,double  *value);
 int	DISKFREE(const char *cmd, const char *mountPoint,double  *value);
 int	DISKUSED(const char *cmd, const char *mountPoint,double  *value);
@@ -73,6 +72,8 @@ int	DISK_WIO(const char *cmd, const char *parameter,double  *value);
 int	DISK_RBLK(const char *cmd, const char *parameter,double  *value);
 int	DISK_WBLK(const char *cmd, const char *parameter,double  *value);
 int	FREEMEM(const char *cmd, const char *parameter,double  *value);
+
+int	FS_FILE_SIZE(const char *cmd, const char *filename,double  *value);
 
 int	INODEFREE(const char *cmd, const char *mountPoint,double  *value);
 int	INODEFREE_PERC(const char *cmd, const char *mountPoint,double  *value);
@@ -113,6 +114,8 @@ int	PROCLOAD15(const char *cmd, const char *parameter,double  *value);
 int	SENSOR_TEMP1(const char *cmd, const char *parameter,double  *value);
 int	SENSOR_TEMP2(const char *cmd, const char *parameter,double  *value);
 int	SENSOR_TEMP3(const char *cmd, const char *parameter,double  *value);
+
+int	SYSTEM_LOCALTIME(const char *cmd, const char *parameter,double  *value);
 
 int	SWAPFREE(const char *cmd, const char *parameter,double  *value);
 int	SWAPTOTAL(const char *cmd, const char *parameter,double  *value);
