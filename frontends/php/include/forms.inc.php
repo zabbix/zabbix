@@ -317,7 +317,7 @@
 
 		$col=0; 
 		show_table2_v_delimiter($col++);
-		echo "<form method=\"get\" action=\"items.php\">";
+		echo "<form method=\"get\" action=\"items.php#form\">";
 		if(isset($_GET["itemid"]))
 		{
 			echo "<input class=\"biginput\" name=\"itemid\" type=hidden value=".$_GET["itemid"].">";

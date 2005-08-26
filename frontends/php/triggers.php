@@ -50,6 +50,11 @@
 ?>
 
 <?php
+	$_GET["hostid"]=@iif(isset($_GET["hostid"]),$_GET["hostid"],get_profile("web.latest.hostid",0));
+	update_profile("web.latest.hostid",$_GET["hostid"]);
+?>
+
+<?php
 	if(isset($_GET["register"]))
 	{
 		if($_GET["register"]=="add dependency")
