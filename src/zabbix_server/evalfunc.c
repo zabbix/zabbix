@@ -524,7 +524,7 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
 	}
 	else if(strcmp(function,"diff")==0)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Evaluating diff [%s] [%s]",item->lastvalue_str,item->prevvalue_str);
+		zabbix_log( LOG_LEVEL_DEBUG, "Evaluating diff [%s] [%s]",item->lastvalue_str,item->prevvalue_str);
 		if((item->lastvalue_null==1)||(item->prevvalue_null==1))
 		{
 			ret = FAIL;
