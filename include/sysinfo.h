@@ -73,6 +73,9 @@ int	DISK_RBLK(const char *cmd, const char *parameter,double  *value);
 int	DISK_WBLK(const char *cmd, const char *parameter,double  *value);
 int	FREEMEM(const char *cmd, const char *parameter,double  *value);
 
+int	FS_FILE_ATIME(const char *cmd, const char *filename,double  *value);
+int	FS_FILE_CTIME(const char *cmd, const char *filename,double  *value);
+int	FS_FILE_MTIME(const char *cmd, const char *filename,double  *value);
 int	FS_FILE_SIZE(const char *cmd, const char *filename,double  *value);
 int	FS_FILE_EXISTS(const char *cmd, const char *filename,double  *value);
 

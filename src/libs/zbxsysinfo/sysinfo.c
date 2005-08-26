@@ -175,6 +175,10 @@ COMMAND	agent_commands[]=
 
 	{"md5sum[*]"		,0, 			MD5SUM, "/etc/services"},
 
+	{"fs.file.atime[*]"	,FS_FILE_ATIME,		0, "/etc/passwd"},
+	{"fs.file.ctime[*]"	,FS_FILE_CTIME,		0, "/etc/passwd"},
+	{"fs.file.mtime[*]"	,FS_FILE_MTIME,		0, "/etc/passwd"},
+
 	{"filesize[*]"		,FS_FILE_SIZE, 		0, "/etc/passwd"},
 	{"fs.file.size[*]"	,FS_FILE_SIZE, 		0, "/etc/passwd"},
 

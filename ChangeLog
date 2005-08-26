@@ -1,5 +1,8 @@
 Changes for 1.1beta1:
 
+ - added parameter fs.file.atime[] (Alexei)
+ - added parameter fs.file.ctime[] (Alexei)
+ - added parameter fs.file.mtime[] (Alexei)
  - parameter isfile[] renamed to fs.file.exists[] (Alexei)
  - parameter filesize[] renamed to fs.file.size[] (Alexei)
  - added parameter system.localtime (Alexei)

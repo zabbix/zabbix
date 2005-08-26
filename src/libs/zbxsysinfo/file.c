@@ -94,6 +94,42 @@ int	FS_FILE_SIZE(const char *cmd, const char *filename,double  *value)
 	return	SYSINFO_RET_FAIL;
 }
 
+int	FS_FILE_ATIME(const char *cmd, const char *filename,double  *value)
+{
+	struct stat	buf;
+
+	if(stat(filename,&buf) == 0)
+	{
+		*value=(double)buf.st_atime;
+		return SYSINFO_RET_OK;
+	}
+	return	SYSINFO_RET_FAIL;
+}
+
+int	FS_FILE_CTIME(const char *cmd, const char *filename,double  *value)
+{
+	struct stat	buf;
+
+	if(stat(filename,&buf) == 0)
+	{
+		*value=(double)buf.st_ctime;
+		return SYSINFO_RET_OK;
+	}
+	return	SYSINFO_RET_FAIL;
+}
+
+int	FS_FILE_MTIME(const char *cmd, const char *filename,double  *value)
+{
+	struct stat	buf;
+
+	if(stat(filename,&buf) == 0)
+	{
+		*value=(double)buf.st_ctime;
+		return SYSINFO_RET_OK;
+	}
+	return	SYSINFO_RET_FAIL;
+}
+
 int	FS_FILE_EXISTS(const char *cmd, const char *filename,double  *value)
 {
 	struct stat	buf;
