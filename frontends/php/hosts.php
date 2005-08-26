@@ -37,6 +37,7 @@
 
 	$_GET["config"]=@iif(isset($_GET["config"]),$_GET["config"],get_profile("web.hosts.config",0));
 	update_profile("web.hosts.config",$_GET["config"]);
+	update_profile("web.menu.config.last",$page["file"]);
 ?>
 
 <?php

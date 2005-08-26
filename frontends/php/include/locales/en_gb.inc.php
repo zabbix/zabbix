@@ -206,7 +206,7 @@
 //	Latest values
 	"S_LATEST_VALUES"=>			"Latest values",
 	"S_NO_PERMISSIONS"=>			"No permissions !",
-	"S_LATEST_DATA"=>			"LATEST DATA",
+	"S_LATEST_DATA_BIG"=>			"LATEST DATA",
 	"S_ALL_SMALL"=>				"all",
 	"S_DESCRIPTION_LARGE"=>			"DESCRIPTION",
 	"S_DESCRIPTION_SMALL"=>			"Description",
@@ -538,6 +538,7 @@
 	"S_SCREENS"=>				"Screens",
 	"S_SCREEN"=>				"Screen",
 	"S_CONFIGURATION_OF_SCREENS_BIG"=>	"CONFIGURATION OF SCREENS",
+	"S_CONFIGURATION_OF_SCREENS"=>		"Configuration of screens",
 	"S_SCREEN_ADDED"=>			"Screen added",
 	"S_CANNOT_ADD_SCREEN"=>			"Cannot add screen",
 	"S_SCREEN_UPDATED"=>			"Screen updated",
@@ -745,5 +746,14 @@
 
 	"S_HELP"=>				"Help",
 	"S_PROFILE"=>				"Profile",
+	"S_VIEW"=>				"View",
+	"S_QUEUE"=>				"Queue",
+	"S_EVENTS"=>				"Events",
+	"S_MAPS"=>				"Maps",
+	"S_REPORTS"=>				"Reports",
+	"S_GENERAL"=>				"General",
+	"S_AUDIT"=>				"Audit",
+	"S_LOGIN"=>				"Login",
+	"S_LATEST_DATA"=>			"Latest data",
 	);
 ?>

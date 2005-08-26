@@ -48,6 +48,12 @@
 ?>
 
 <?php
+	$_GET["sysmapid"]=@iif(isset($_GET["sysmapid"]),$_GET["sysmapid"],get_profile("web.maps.sysmapid",0));
+	update_profile("web.maps.sysmapid",$_GET["sysmapid"]);
+	update_profile("web.menu.view.last",$page["file"]);
+?>
+
+<?php
 //	if(!isset($_GET["fullscreen"]))
 	{
 		show_table3_header_begin();

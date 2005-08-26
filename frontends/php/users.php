@@ -42,6 +42,10 @@
 ?>
 
 <?php
+	update_profile("web.menu.config.last",$page["file"]);
+?>
+
+<?php
 	if(isset($_GET["register"]))
 	{
 		if($_GET["register"]=="add")

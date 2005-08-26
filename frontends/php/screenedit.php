@@ -20,7 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = "S_CONFIGURATION_OF_SCREEN";
+	$page["title"] = "S_CONFIGURATION_OF_SCREENS";
 	$page["file"] = "screenedit.php";
 	show_header($page["title"],0,0);
 ?>

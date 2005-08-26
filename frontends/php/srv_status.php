@@ -24,6 +24,10 @@
 	$page["file"] = "srv_status.php";
 	show_header($page["title"],30,0);
 ?>
+
+<?php
+	update_profile("web.menu.view.last",$page["file"]);
+?>
  
 <?php
 	show_table_header(S_IT_SERVICES_BIG);
