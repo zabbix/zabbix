@@ -135,7 +135,7 @@
 #include "common.h"
 #include "sysinfo.h"
 
-int	UPTIME(const char *cmd, const char *parameter,double  *value)
+int	SYSTEM_UPTIME(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_SYSINFO_UPTIME
 	struct sysinfo info;
