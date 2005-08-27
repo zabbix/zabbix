@@ -2003,7 +2003,7 @@ echo "</head>";
 		{
 			$s=$s|pow(2,(int)$severity[$i]);
 		}
-		$sql="update media set userid=$userid, mediatypeid=$mediatypeid, sendto='$sendto', active=$active,severity=$s,period=`$period` where mediaid=$mediaid";
+		$sql="update media set userid=$userid, mediatypeid=$mediatypeid, sendto='$sendto', active=$active,severity=$s,period='$period' where mediaid=$mediaid";
 		return	DBexecute($sql);
 	}
 
