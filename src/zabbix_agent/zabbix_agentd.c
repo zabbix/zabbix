@@ -180,7 +180,7 @@ void    daemon_init(void)
 	}
 
 	chdir("/");
-	umask(0);
+	umask(022);
 
 	for(i=0;i<MAXFD;i++)
 	{
