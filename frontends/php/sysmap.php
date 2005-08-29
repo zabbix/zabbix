@@ -83,7 +83,7 @@
 	if(isset($_GET["sysmapid"]))
 	{
 		$map="\n<map name=links".$_GET["sysmapid"]."_".rand(0,100000).">";
-		$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status from sysmaps_hosts sh,hosts h where sh.sysmapid=".$_GET["sysmapid"]." and h.hostid=sh.hostid");
+		$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status from sysmaps_hosts sh,hosts h where sh.sysmapid=".$_GET["sysmapid"]." and h.status not in (".HOST_STATUS_DELETED.") and h.hostid=sh.hostid");
 		for($i=0;$i<DBnum_rows($result);$i++)
 		{
 			$host_=DBget_field($result,$i,0);
@@ -117,7 +117,7 @@
 	table_begin();
 	table_header(array(S_HOST,S_LABEL,S_X,S_Y,S_ICON,S_ACTIONS));
 
-	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,sh.icon from sysmaps_hosts sh,hosts h where sh.sysmapid=".$_GET["sysmapid"]." and h.hostid=sh.hostid order by h.host");
+	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,sh.icon from sysmaps_hosts sh,hosts h where sh.sysmapid=".$_GET["sysmapid"]." and h.status not in (".HOST_STATUS_DELETED.") and h.hostid=sh.hostid order by h.host");
 	$col=0;
 	while($row=DBfetch($result))
 	{
@@ -206,7 +206,7 @@
 	}
 	echo "Host";
 	show_table2_h_delimiter();
-	$result=DBselect("select hostid,host from hosts order by host");
+	$result=DBselect("select hostid,host from hosts where status not in (".HOST_STATUS_DELETED.") order by host");
 	echo "<select class=\"biginput\" name=\"hostid\" size=1>";
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
@@ -293,7 +293,7 @@
 ?>
 
 <?php
-	$result=DBselect("select shostid,label from sysmaps_hosts where sysmapid=".$_GET["sysmapid"]." order by label");
+	$result=DBselect("select shostid,label,hostid from sysmaps_hosts where sysmapid=".$_GET["sysmapid"]." order by label");
 	if(DBnum_rows($result)>1)
 	{
 		show_form_begin("sysmap.connector");
@@ -310,13 +310,14 @@
 		{
 			$shostid_=DBget_field($result,$i,0);
 			$label=DBget_field($result,$i,1);
+			$host=get_host_by_hostid(DBget_field($result,$i,2));
 			if(isset($_GET["shostid"])&&($_GET["shostid"]==$shostid_))
 			{
-				echo "<OPTION VALUE='$shostid_' SELECTED>$label";
+				echo "<OPTION VALUE='$shostid_' SELECTED>".$host["host"].":$label";
 			}
 			else
 			{
-				echo "<OPTION VALUE='$shostid_'>$label";
+				echo "<OPTION VALUE='$shostid_'>".$host["host"].":$label";
 			}
 		}
 		echo "</SELECT>";
@@ -330,7 +331,8 @@
 		{
 			$shostid_=DBget_field($result,$i,0);
 			$label=DBget_field($result,$i,1);
-			echo "<OPTION VALUE='$shostid_'>$label";
+			$host=get_host_by_hostid(DBget_field($result,$i,2));
+			echo "<OPTION VALUE='$shostid_'>".$host["host"].":$label";
 		}
 		echo "</SELECT>";
 

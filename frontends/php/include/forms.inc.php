@@ -330,7 +330,7 @@
 		echo S_HOST;
 		show_table2_h_delimiter();
 		echo "<select class=\"biginput\" name=\"hostid\" value=\"3\">";
-	        $result=DBselect("select hostid,host from hosts order by host");
+	        $result=DBselect("select hostid,host from hosts where status not in (".HOST_STATUS_DELETED.")order by host");
 	        for($i=0;$i<DBnum_rows($result);$i++)
 	        {
 	                $hostid_=DBget_field($result,$i,0);
