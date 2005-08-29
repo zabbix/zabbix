@@ -48,7 +48,7 @@
 			$gitemid=add_item_to_graph($_GET["graphid"],$_GET["itemid"],$_GET["color"],$_GET["drawtype"],$_GET["sortorder"]);
 			if($gitemid)
 			{
-				add_graph_item_to_templates($gitemid);
+				add_graph_item_to_linked_hosts($gitemid);
 				$graph=get_graph_by_graphid($_GET["graphid"]);
 				$item=get_item_by_itemid($_GET["itemid"]);
 				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH_ELEMENT,"Graph ID [".$_GET["graphid"]."] Name [".$graph["name"]."] Added [".$item["description"]."]");

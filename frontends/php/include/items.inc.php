@@ -186,7 +186,7 @@
 
 	# Add item to hardlinked hosts
 
-	function	add_item_to_templates($itemid)
+	function	add_item_to_linked_hosts($itemid,$hostid=0)
 	{
 		if($itemid<=0)
 		{
@@ -195,7 +195,15 @@
 
 		$item=get_item_by_itemid($itemid);
 
-		$sql="select hostid,templateid,items from hosts_templates where templateid=".$item["hostid"];
+		// Link with one host only
+		if($hostid!=0)
+		{
+			$sql="select hostid,templateid,items from hosts_templates where hostid=$hostid and templateid=".$item["hostid"];
+		}
+		else
+		{
+			$sql="select hostid,templateid,items from hosts_templates where templateid=".$item["hostid"];
+		}
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
