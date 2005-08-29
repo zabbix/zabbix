@@ -135,7 +135,7 @@
 				else			{ $status=0; }
 				
 				$triggerid=add_trigger($_GET["expression"],$_GET["description"],$_GET["priority"],$status,$_GET["comments"],$_GET["url"]);
-				add_trigger_to_templates($triggerid);
+				add_trigger_to_linked_hosts($triggerid);
 				show_messages($triggerid, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 			}
 			else

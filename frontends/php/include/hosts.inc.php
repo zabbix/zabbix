@@ -65,7 +65,6 @@
 		if($host_templateid != 0)
 		{
 			add_templates_to_host($hostid,$host_templateid);
-//			$result=add_using_host_template($hostid,$host_templateid);
 			sync_host_with_templates($hostid);
 		}
 		update_host_groups($hostid,$groups);

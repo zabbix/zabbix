@@ -1,5 +1,6 @@
 Changes for 1.1beta1:
 
+ - misc fixes for host-templates linkage (Alexei)
  - fixed addition of triggers to linked hosts (Alexei)
  - group functions for item manipulations (Alexei)
  - changes umask(0) to umask(022) to prevent world-wrtie access (Alexei)

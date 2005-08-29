@@ -97,7 +97,7 @@
 		if($_GET["register"]=="add")
 		{
 			$itemid=add_item($_GET["description"],$_GET["key"],$_GET["hostid"],$_GET["delay"],$_GET["history"],$_GET["status"],$_GET["type"],$_GET["snmp_community"],$_GET["snmp_oid"],$_GET["value_type"],$_GET["trapper_hosts"],$_GET["snmp_port"],$_GET["units"],$_GET["multiplier"],$_GET["delta"],$_GET["snmpv3_securityname"],$_GET["snmpv3_securitylevel"],$_GET["snmpv3_authpassphrase"],$_GET["snmpv3_privpassphrase"],$_GET["formula"],$_GET["trends"]);
-			add_item_to_templates($itemid);
+			add_item_to_linked_hosts($itemid);
 			show_messages($itemid, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 			unset($_GET["itemid"]);
 			unset($itemid);
