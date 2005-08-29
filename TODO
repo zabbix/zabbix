@@ -2,7 +2,6 @@
 
  - add timestamp templates
  - fix linkage of triggers (more than one host linked to a trigger)
- - host profiles
  - make agents return error message if not supported or not available
  - centralised management of agent configuration files
  - apply Lukas patches (external items, setproctitle(), select all
