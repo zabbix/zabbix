@@ -19,6 +19,56 @@
 **/
 ?>
 <?php
+	# Update Item definition for selected group
+
+	function	update_item_in_group($groupid,$itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends)
+	{
+		$sql="select i.itemid,i.hostid from hosts_groups hg,items i where hg.groupid=$groupid and i.key_=\"$key\" and hg.hostid=i.hostid";
+		$result=DBexecute($sql);
+		while($row=DBfetch($result))
+		{
+			update_item($row["itemid"],$description,$key,$row["hostid"],$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends);
+		}
+		return 1;
+	}
+
+	# Delete Item definition from selected group
+
+	function	delete_item_from_group($groupid,$itemid)
+	{
+		if(!isset($itemid))
+		{
+			return 0;
+		}
+
+		$item=get_item_by_itemid($itemid);
+		if(!$item)
+		{
+			return 0;
+		}
+
+		$sql="select i.itemid from hosts_groups hg,items i where hg.groupid=$groupid and i.key_=\"".$item["key_"]."\" and hg.hostid=i.hostid";
+		$result=DBexecute($sql);
+		while($row=DBfetch($result))
+		{
+			delete_item($row["itemid"]);
+		}
+		return 1;
+	}
+
+	# Add Item definition to selected group
+
+	function	add_item_to_group($groupid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends)
+	{
+		$sql="select hostid from hosts_groups where groupid=$groupid";
+		$result=DBexecute($sql);
+		while($row=DBfetch($result))
+		{
+			add_item($description,$key,$row["hostid"],$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends);
+		}
+		return 1;
+	}
+
 	# Add Item definition
 
 	function	add_item($description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends)
@@ -29,11 +79,13 @@
 			return 0;
 		}
 
+		$host=get_host_by_hostid($hostid);
+
 		$sql="select count(*) from items where hostid=$hostid and key_='$key'";
 		$result=DBexecute($sql);
 		if(DBget_field($result,0,0)>0)
 		{
-			error("An item with the same Key already exists for this host. The key must be unique.");
+			error("An item with the same Key already exists for host ".$host["host"].". The key must be unique.");
 			return 0;
 		}
 
@@ -125,7 +177,8 @@
 		$result=DBexecute($sql);
 		if($result)
 		{
-			info("Item $key updated");
+			$host=get_host_by_hostid($hostid);
+			info("Item ".$host["host"].":$key updated");
 		}
 		return $result;
 	}
@@ -264,11 +317,13 @@
 		{
 			return	$result;
 		}
+		$item=get_item_by_itemid($itemid);
+		$host=get_host_by_hostid($item["hostid"]);
 		$sql="delete from items where itemid=$itemid";
 		$result=DBexecute($sql);
 		if($result)
 		{
-			info("Item $key deleted");
+			info("Item ".$host["host"].":".$item["key_"]." deleted");
 		}
 		return $result;
 	}
