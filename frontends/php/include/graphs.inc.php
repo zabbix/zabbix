@@ -201,4 +201,198 @@
 			}
 		}
 	}
+
+	function	navigation_bar($url)
+	{
+		$h1=S_NAVIGATE;
+		$h2=S_PERIOD."&nbsp;";
+		$h2=$h2."<select class=\"biginput\" name=\"period\" onChange=\"submit()\">";
+		$h2=$h2.form_select("period",3600,"1h");
+		$h2=$h2.form_select("period",2*3600,"2h");
+		$h2=$h2.form_select("period",4*3600,"4h");
+		$h2=$h2.form_select("period",8*3600,"8h");
+		$h2=$h2.form_select("period",12*3600,"12h");
+		$h2=$h2.form_select("period",24*3600,"24h");
+		$h2=$h2.form_select("period",7*24*3600,"week");
+		$h2=$h2.form_select("period",31*24*3600,"month");
+		$h2=$h2.form_select("period",365*24*3600,"year");
+		$h2=$h2."</select>";
+		$h2=$h2."<select class=\"biginput\" name=\"inc\" onChange=\"submit()\">";
+		$h2=$h2.form_select("inc",3600,S_INCREASE);
+		$h2=$h2.form_select("inc",3600,"+1h");
+		$h2=$h2.form_select("inc",4*3600,"+4h");
+		$h2=$h2.form_select("inc",24*3600,"+24h");
+		$h2=$h2.form_select("inc",7*24*3600,"+week");
+		$h2=$h2.form_select("inc",31*24*3600,"+month");
+		$h2=$h2.form_select("inc",365*24*3600,"+year");
+		$h2=$h2."</select>";
+		$h2=$h2."<select class=\"biginput\" name=\"dec\" onChange=\"submit()\">";
+		$h2=$h2.form_select("dec",3600,S_DECREASE);
+		$h2=$h2.form_select("dec",3600,"-1h");
+		$h2=$h2.form_select("dec",4*3600,"-4h");
+		$h2=$h2.form_select("dec",24*3600,"-24h");
+		$h2=$h2.form_select("dec",7*24*3600,"-week");
+		$h2=$h2.form_select("dec",31*24*3600,"-month");
+		$h2=$h2.form_select("dec",365*24*3600,"-year");
+		$h2=$h2."</select>";
+		$h2=$h2."&nbsp;".S_MOVE."&nbsp;";
+		$h2=$h2."<select class=\"biginput\" name=\"left\" onChange=\"submit()\">";
+		$h2=$h2.form_select("left",3600,S_LEFT_DIR);
+		$h2=$h2.form_select("left",3600,"+1h");
+		$h2=$h2.form_select("left",4*3600,"+4h");
+		$h2=$h2.form_select("left",24*3600,"+24h");
+		$h2=$h2.form_select("left",7*24*3600,"+week");
+		$h2=$h2.form_select("left",31*24*3600,"+month");
+		$h2=$h2.form_select("left",365*24*3600,"+year");
+		$h2=$h2."</select>";
+		$h2=$h2."<select class=\"biginput\" name=\"right\" onChange=\"submit()\">";
+		$h2=$h2.form_select("right",3600,S_RIGHT_DIR);
+		$h2=$h2.form_select("right",3600,"-1h");
+		$h2=$h2.form_select("right",4*3600,"-4h");
+		$h2=$h2.form_select("right",24*3600,"-24h");
+		$h2=$h2.form_select("right",7*24*3600,"-week");
+		$h2=$h2.form_select("right",31*24*3600,"-month");
+		$h2=$h2.form_select("right",365*24*3600,"-year");
+		$h2=$h2."</select>";
+		$h2=$h2."&nbsp;";
+		$h2=$h2."<input name=\"stime\" size=18 class=\"biginput\" value=\"yyyymmddhhmm\" size=12>";
+		$h2=$h2."&nbsp;";
+		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"action\" value=\"go\">";
+
+		show_header2($h1,$h2,"<form name=\"form2\" method=\"get\" action=\"$url\">","</form>");
+
+		return;
+
+		echo "<TABLE BORDER=0 align=center COLS=2 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=1>";
+		echo "<TR BGCOLOR=#FFFFFF>";
+		echo "<TD ALIGN=LEFT>";
+
+		echo "<div align=left>";
+		echo "<b>".S_PERIOD.":</b>&nbsp;";
+
+		$hour=3600;
+		
+		$a=array(S_1H=>3600,S_2H=>2*3600,S_4H=>4*3600,S_8H=>8*3600,S_12H=>12*3600,
+			S_24H=>24*3600,S_WEEK_SMALL=>7*24*3600,S_MONTH_SMALL=>31*24*3600,S_YEAR_SMALL=>365*24*3600);
+		foreach($a as $label=>$sec)
+		{
+			echo "[";
+			if($_GET["period"]>$sec)
+			{
+				$tmp=$_GET["period"]-$sec;
+				echo("<A HREF=\"$url&period=$tmp".url_param("graphid").url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">-</A>");
+			}
+			else
+			{
+				echo "-";
+			}
+
+			echo("<A HREF=\"$url?period=$sec".url_param("graphid").url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">");
+			echo($label."</A>");
+
+			$tmp=$_GET["period"]+$sec;
+			echo("<A HREF=\"$url?period=$tmp".url_param("graphid").url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">+</A>");
+
+			echo "]&nbsp;";
+		}
+
+		echo("</div>");
+
+		echo "</TD>";
+		echo "<TD BGCOLOR=#FFFFFF WIDTH=15% ALIGN=RIGHT>";
+		echo "<b>".nbsp(S_KEEP_PERIOD).":</b>&nbsp;";
+		if($_GET["keep"] == 1)
+		{
+			echo("[<A HREF=\"$url?keep=0".url_param("graphid").url_param("from").url_param("period").url_param("fullscreen")."\">".S_ON_C."</a>]");
+		}
+		else
+		{
+			echo("[<A HREF=\"$url?keep=1".url_param("graphid").url_param("from").url_param("period").url_param("fullscreen")."\">".S_OFF_C."</a>]");
+		}
+		echo "</TD>";
+		echo "</TR>";
+		echo "<TR BGCOLOR=#FFFFFF>";
+		echo "<TD>";
+		if(isset($_GET["stime"]))
+		{
+			echo "<div align=left>" ;
+			echo "<b>".S_MOVE.":</b>&nbsp;" ;
+
+			$day=24;
+// $a already defined
+			$a=array("1h"=>1,"2h"=>2,"4h"=>4,"8h"=>8,"12h"=>12,
+				"24h"=>24,"week"=>7*24,"month"=>31*24,"year"=>365*24);
+			foreach($a as $label=>$hours)
+			{
+				echo "[";
+
+				$stime=$_GET["stime"];
+				$tmp=mktime(substr($stime,8,2),substr($stime,10,2),0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
+				$tmp=$tmp-3600*$hours;
+				$tmp=date("YmdHi",$tmp);
+				echo("<A HREF=\"$url?stime=$tmp".url_param("graphid").url_param("period").url_param("keep").url_param("fullscreen")."\">-</A>");
+	
+				echo($label);
+	
+				$stime=$_GET["stime"];
+				$tmp=mktime(substr($stime,8,2),substr($stime,10,2),0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
+				$tmp=$tmp+3600*$hours;
+				$tmp=date("YmdHi",$tmp);
+				echo("<A HREF=\"$url?stime=$tmp".url_param("graphid").url_param("period").url_param("keep").url_param("fullscreen")."\">+</A>");
+	
+				echo "]&nbsp;";
+			}
+			echo("</div>");
+		}
+		else
+		{
+			echo "<div align=left>";
+			echo "<b>".S_MOVE.":</b>&nbsp;";
+	
+			$day=24;
+// $a already defined
+			$a=array("1h"=>1,"2h"=>2,"4h"=>4,"8h"=>8,"12h"=>12,
+				"24h"=>24,"week"=>7*24,"month"=>31*24,"year"=>365*24);
+			foreach($a as $label=>$hours)
+			{
+				echo "[";
+				$tmp=$_GET["from"]+$hours;
+				echo("<A HREF=\"$url?from=$tmp".url_param("graphid").url_param("period").url_param("keep").url_param("fullscreen")."\">-</A>");
+
+				echo($label);
+
+				if($_GET["from"]>=$hours)
+				{
+					$tmp=$_GET["from"]-$hours;
+					echo("<A HREF=\"$url?from=$tmp".url_param("graphid").url_param("period").url_param("keep").url_param("fullscreen")."\">+</A>");
+				}
+				else
+				{
+					echo "+";
+				}
+
+				echo "]&nbsp;";
+			}
+			echo("</div>");
+		}
+		echo "</TD>";
+		echo "<TD BGCOLOR=#FFFFFF WIDTH=15% ALIGN=RIGHT>";
+		echo "<form method=\"put\" action=\"$url\">";
+		echo "<input name=\"graphid\" type=\"hidden\" value=\"".$_GET["graphid"]."\" size=12>";
+		echo "<input name=\"period\" type=\"hidden\" value=\"".(9*3600)."\" size=12>";
+		if(isset($_GET["stime"]))
+		{
+			echo "<input name=\"stime\" class=\"biginput\" value=\"".$_GET["stime"]."\" size=12>";
+		}
+		else
+		{
+			echo "<input name=\"stime\" class=\"biginput\" value=\"yyyymmddhhmm\" size=12>";
+		}
+		echo "&nbsp;";
+		echo "<input class=\"button\" type=\"submit\" name=\"action\" value=\"go\">";
+		echo "</form>";
+		echo "</TD>";
+		echo "</TR>";
+		echo "</TABLE>";
+	}
 ?>
