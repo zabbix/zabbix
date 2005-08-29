@@ -128,6 +128,12 @@
 	"S_ON_C"=>				"On",
 	"S_OFF_C"=>				"Off",
 	"S_MOVE"=>				"Move",
+	"S_NAVIGATE"=>				"Navigate",
+	"S_INCREASE"=>				"Increase",
+	"S_DECREASE"=>				"Decrease",
+	"S_NAVIGATE"=>				"Navigate",
+	"S_RIGHT_DIR"=>				"Right",
+	"S_LEFT_DIR"=>				"Left",
 	"S_SELECT_GRAPH_DOT_DOT_DOT"=>		"Select graph...",
 
 // Colors

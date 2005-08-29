@@ -183,6 +183,9 @@
 
 	if(isset($_GET["graphid"])/*&&(!isset($_GET["fullscreen"]))*/)
 	{
+
+		navigation_bar("charts.php");
+
 // BEGIN - IGMI - just another way of navigation
 	echo "<TABLE BORDER=0 align=center COLS=2 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=1>";
 	echo "<TR BGCOLOR=#FFFFFF>";

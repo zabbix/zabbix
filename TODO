@@ -1,5 +1,6 @@
 1.1beta1:
 
+ - finish navigation bar
  - add timestamp templates
  - fix linkage of triggers (more than one host linked to a trigger)
  - make agents return error message if not supported or not available
