@@ -257,7 +257,10 @@
 
 	$h2=S_GROUP."&nbsp;";
 	$h2=$h2."<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_GET["config"]."\">";
-	$h2=$h2."<input class=\"biginput\" name=\"hostid\" type=\"hidden\" value=\"".$_GET["hostid"]."\">";
+	if(isset($_GET["hostid"]))
+	{
+		$h2=$h2."<input class=\"biginput\" name=\"hostid\" type=\"hidden\" value=\"".$_GET["hostid"]."\">";
+	}
 	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
 
@@ -399,7 +402,7 @@
 	}
 	if(isset($_GET["hostid"])&&$_GET["config"]==2)
 	{
-		insert_template_form($_GET["hostid"], $_GET["hosttemplateid"]);
+		@insert_template_form($_GET["hostid"], $_GET["hosttemplateid"]);
 	}
 ?>
 

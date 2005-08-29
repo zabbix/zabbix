@@ -582,6 +582,45 @@
 			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
 			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected item?');\">";
 		}
+
+		show_table2_v_delimiter($col++);
+		echo S_GROUP;
+		show_table2_h_delimiter();
+		$h2="";
+	        $h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
+
+	        $result=DBselect("select groupid,name from groups order by name");
+	        while($row=DBfetch($result))
+	        {
+// Check if at least one host with read permission exists for this group
+	                $result2=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg where hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid and h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host");
+	                $cnt=0;
+	                while($row2=DBfetch($result2))
+	                {
+	                        if(!check_right("Host","U",$row2["hostid"]))
+	                        {
+	                                continue;
+	                        }
+	                        $cnt=1; break;
+	                }
+	                if($cnt!=0)
+       	         {
+	                        $h2=$h2.form_select("groupid",$row["groupid"],$row["name"]);
+	                }
+	        }
+		$h2=$h2."</select>";
+		echo $h2;
+
+		show_table2_v_delimiter2();
+		echo "<select class=\"biginput\" name=\"action\">";
+		echo "<option value=\"add to group\">".S_ADD_TO_GROUP;
+		if(isset($_GET["itemid"]))
+		{
+			echo "<option value=\"update in group\">".S_UPDATE_IN_GROUP;
+			echo "<option value=\"delete from group\">".S_DELETE_FROM_GROUP;
+		}
+		echo "</select>";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"do\">";
  
 		show_table2_header_end();
 	}

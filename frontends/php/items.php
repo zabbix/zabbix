@@ -59,6 +59,28 @@
 <?php
 	if(isset($_GET["register"]))
 	{
+		if($_GET["register"]=="do")
+		{
+			if($_GET["action"]=="add to group")
+			{
+				$itemid=add_item_to_group($_GET["groupid"],$_GET["description"],$_GET["key"],$_GET["hostid"],$_GET["delay"],$_GET["history"],$_GET["status"],$_GET["type"],$_GET["snmp_community"],$_GET["snmp_oid"],$_GET["value_type"],$_GET["trapper_hosts"],$_GET["snmp_port"],$_GET["units"],$_GET["multiplier"],$_GET["delta"],$_GET["snmpv3_securityname"],$_GET["snmpv3_securitylevel"],$_GET["snmpv3_authpassphrase"],$_GET["snmpv3_privpassphrase"],$_GET["formula"],$_GET["trends"]);
+				show_messages($itemid, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
+				unset($_GET["itemid"]);
+				unset($itemid);
+			}
+			if($_GET["action"]=="update in group")
+			{
+				$result=update_item_in_group($_GET["groupid"],$_GET["itemid"],$_GET["description"],$_GET["key"],$_GET["hostid"],$_GET["delay"],$_GET["history"],$_GET["status"],$_GET["type"],$_GET["snmp_community"],$_GET["snmp_oid"],$_GET["value_type"],$_GET["trapper_hosts"],$_GET["snmp_port"],$_GET["units"],$_GET["multiplier"],$_GET["delta"],$_GET["snmpv3_securityname"],$_GET["snmpv3_securitylevel"],$_GET["snmpv3_authpassphrase"],$_GET["snmpv3_privpassphrase"],$_GET["formula"],$_GET["trends"]);
+				show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
+				unset($_GET["itemid"]);
+			}
+			if($_GET["action"]=="delete from group")
+			{
+				$result=delete_item_from_group($_GET["groupid"],$_GET["itemid"]);
+				show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
+				unset($_GET["itemid"]);
+			}
+		}
 		if($_GET["register"]=="update")
 		{
 			$result=update_item($_GET["itemid"],$_GET["description"],$_GET["key"],$_GET["hostid"],$_GET["delay"],$_GET["history"],$_GET["status"],$_GET["type"],$_GET["snmp_community"],$_GET["snmp_oid"],$_GET["value_type"],$_GET["trapper_hosts"],$_GET["snmp_port"],$_GET["units"],$_GET["multiplier"],$_GET["delta"],$_GET["snmpv3_securityname"],$_GET["snmpv3_securitylevel"],$_GET["snmpv3_authpassphrase"],$_GET["snmpv3_privpassphrase"],$_GET["formula"],$_GET["trends"]);
@@ -105,7 +127,7 @@
 			delete_item_from_templates($_GET["itemid"]);
 			$result=delete_item($_GET["itemid"]);
 			show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
-			unset($itemid);
+			unset($_GET["itemid"]);
 		}
 		if($_GET["register"]=="Delete selected")
 		{
