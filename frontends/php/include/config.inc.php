@@ -2438,6 +2438,30 @@ echo "</head>";
 		{
 			echo "<option value=\"21600\">6 hours";
 		}
+		if($period==86400)
+		{
+			echo "<option value=\"86400\" selected>24 hours";
+		}
+		else
+		{
+			echo "<option value=\"86400\">24 hours";
+		}
+		if($period==604800)
+		{
+			echo "<option value=\"604800\" selected>one week";
+		}
+		else
+		{
+			echo "<option value=\"604800\">one week";
+		}
+		if($period==2419200)
+		{
+			echo "<option value=\"2419200\" selected>one month";
+		}
+		else
+		{
+			echo "<option value=\"2419200\">one month";
+		}
 		echo "</select>";
 
 		echo "<input class=\"button\" type=\"submit\" name=\"action\" value=\"showhistory\">";
