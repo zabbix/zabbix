@@ -332,6 +332,9 @@
 	"S_CANNOT_UPDATE_PROFILE"=>		"Cannot update profile",
 	"S_PROFILE_DELETED"=>			"Profile deleted",
 	"S_CANNOT_DELETE_PROFILE"=>		"Cannot delete profile",
+	"S_ADD_TO_GROUP"=>			"Add to group",
+	"S_DELETE_FROM_GROUP"=>			"Delete from group",
+	"S_UPDATE_IN_GROUP"=>			"Update in group",
 
 //	items.php
 	"S_CONFIGURATION_OF_ITEMS"=>		"Configuration of items",
