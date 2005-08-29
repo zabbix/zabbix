@@ -116,7 +116,8 @@
 		$result=DBexecute($sql);
 		if($result)
 		{
-			info("Added new item $key");
+			$host=get_host_by_hostid($hostid);
+			info("Added new item ".$host["host"].":$key");
 		}
 		return DBinsert_id($result,"items","itemid");
 	}
