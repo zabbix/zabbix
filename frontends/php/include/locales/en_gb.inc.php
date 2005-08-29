@@ -335,6 +335,9 @@
 	"S_ADD_TO_GROUP"=>			"Add to group",
 	"S_DELETE_FROM_GROUP"=>			"Delete from group",
 	"S_UPDATE_IN_GROUP"=>			"Update in group",
+	"S_DELETE_SELECTED_HOSTS_Q"=>		"Delete selected hosts?",
+	"S_DISABLE_SELECTED_HOSTS_Q"=>		"Disable selected hosts?",
+	"S_ACTIVATE_SELECTED_HOSTS_Q"=>		"Activate selected hosts?",
 
 //	items.php
 	"S_CONFIGURATION_OF_ITEMS"=>		"Configuration of items",

@@ -78,6 +78,8 @@
 	{
 		global $DB,$DB_TYPE;
 
+#		echo $query."<br>";
+
 		if($DB_TYPE == "MYSQL")
 		{
 			$result=mysql_query($query,$DB);
