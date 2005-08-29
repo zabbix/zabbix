@@ -111,7 +111,7 @@
 		return	$result;
 	}
 
-	function		add_graph_item_to_templates($gitemid)
+	function		add_graph_item_to_linked_hosts($gitemid,$hostid=0)
 	{
 		if($gitemid<=0)
 		{
@@ -122,7 +122,14 @@
 		$graph=get_graph_by_graphid($graph_item["graphid"]);
 		$item=get_item_by_itemid($graph_item["itemid"]);
 
-		$sql="select hostid,templateid,graphs from hosts_templates where templateid=".$item["hostid"];
+		if($hostid==0)
+		{
+			$sql="select hostid,templateid,graphs from hosts_templates where templateid=".$item["hostid"];
+		}
+		else
+		{
+			$sql="select hostid,templateid,graphs from hosts_templates where hostid=$hostid and templateid=".$item["hostid"];
+		}
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
@@ -136,7 +143,7 @@
 
 			$sql="select distinct g.graphid from graphs g,graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and g.graphid=gi.graphid and g.name='".addslashes($graph["name"])."'";
 			$result2=DBselect($sql);
-			$host=get_host_by_hostid($result["hostid"]);
+			$host=get_host_by_hostid($row["hostid"]);
 			while($row2=DBfetch($result2))
 			{
 				add_item_to_graph($row2["graphid"],$itemid,$graph_item["color"],$graph_item["drawtype"],$graph_item["sortorder"]);

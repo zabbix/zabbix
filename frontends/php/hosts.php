@@ -131,12 +131,6 @@
 				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_HOST,"Host [".addslashes($_GET["host"])."] IP [".$_GET["ip"]."] Status [".$_GET["status"]."]");
 			unset($_GET["hostid"]);
 		}
-		if($_GET["register"]=="add items from template")
-		{
-			$result=add_using_host_template($_GET["hostid"],$_GET["host_templateid"]);
-			show_messages($result, S_ITEMS_ADDED, S_CANNOT_ADD_ITEMS);
-			unset($_GET["hostid"]);
-		}
 		if($_GET["register"]=="update")
 		{
 			$groups=array();
@@ -464,6 +458,7 @@
 		{
 			continue;
 		}
+		$id="<INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"".$row["hostid"]."\"> ".$row["hostid"];
 		$host="<a href=\"items.php?hostid=".$row["hostid"]."\">".$row["host"]."</a>";
 
 		if($row["useip"]==1)
@@ -544,7 +539,7 @@
 			$actions=S_CHANGE;
 		}
 		table_row(array(
-			$row["hostid"],
+			$id,
 			$host,
 			$ip,
 			$row["port"],

@@ -41,7 +41,7 @@
 		if($_GET["register"]=="add")
 		{
 			$actionid=add_action( $_GET["triggerid"], $_GET["userid"], $_GET["good"], $_GET["delay"], $_GET["subject"], $_GET["message"],$_GET["scope"],$_GET["severity"],$_GET["recipient"],$_GET["usrgrpid"]);
-			add_action_to_templates($actionid);
+			add_action_to_linked_hosts($actionid);
 			show_messages($actionid,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
 			if($actionid)
 			{

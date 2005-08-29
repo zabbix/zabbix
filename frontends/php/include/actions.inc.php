@@ -101,7 +101,7 @@
 
 	# Add action to hardlinked hosts
 
-	function	add_action_to_templates($actionid)
+	function	add_action_to_linked_hosts($actionid,$hostid=0)
 	{
 		if($actionid<=0)
 		{
@@ -117,12 +117,18 @@
 		{
 			return;
 		}
-
 		$row=DBfetch($result);
 
-		$hostid=$row["hostid"];
+		$host_template=get_host_by_hostid($row["hostid"]);
 
-		$sql="select hostid,templateid,actions from hosts_templates where templateid=$hostid";
+		if($hostid==0)
+		{
+			$sql="select hostid,templateid,actions from hosts_templates where templateid=".$row["hostid"];
+		}
+		else
+		{
+			$sql="select hostid,templateid,actions from hosts_templates where hostid=$hostid and templateid=".$row["hostid"];
+		}
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
@@ -132,7 +138,9 @@
 			$result2=DBselect($sql);
 			while($row2=DBfetch($result2))
 			{
-				add_action($row2["triggerid"], $action["userid"], $action["good"], $action["delay"], $action["subject"], $action["message"], $action["scope"], $action["severity"], $action["recipient"], $action["userid"]);
+				$host=get_host_by_hostid($row["hostid"]);
+				$message=str_replace("{".$host_template["host"].":", "{".$host["host"].":", $action["message"]);
+				add_action($row2["triggerid"], $action["userid"], $action["good"], $action["delay"], $action["subject"], $message, $action["scope"], $action["severity"], $action["recipient"], $action["userid"]);
 			}
 		}
 	}

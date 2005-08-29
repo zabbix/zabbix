@@ -1586,75 +1586,6 @@ echo "</head>";
 		return	DBexecute($sql);
 	}
 
-	# Add everything based on host_templateid
-
-	function	add_using_host_template($hostid,$host_templateid)
-	{
-		if(!isset($host_templateid)||($host_templateid==0))
-		{
-			error("Select template first");
-			return 0;
-		}
-
-		$host=get_host_by_hostid($hostid);
-		$sql="select itemid from items where hostid=$host_templateid";
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
-			$item=get_item_by_itemid($row["itemid"]);
-			$itemid=add_item($item["description"],$item["key_"],$hostid,$item["delay"],$item["history"],$item["status"],$item["type"],$item["snmp_community"],$item["snmp_oid"],$item["value_type"],"",$item["snmp_port"],$item["units"],$item["multiplier"],$item["delta"],$item["snmpv3_securityname"],$item["snmpv3_securitylevel"],$item["snmpv3_authpassphrase"],$item["snmpv3_privpassphrase"],$item["formula"],$item["trends"]);
-
-			$sql="select distinct t.triggerid from triggers t,functions f where f.itemid=".$row["itemid"]." and f.triggerid=t.triggerid";
-			$result2=DBselect($sql);
-			while($row2=DBfetch($result2))
-			{
-				$trigger=get_trigger_by_triggerid($row2["triggerid"]);
-// Cannot use add_trigger here
-				$description=$trigger["description"];
-#				$description=str_replace("%s",$host["host"],$description);	
-				$sql="insert into triggers  (description,priority,status,comments,url,value) values ('".addslashes($description)."',".$trigger["priority"].",".$trigger["status"].",'".addslashes($trigger["comments"])."','".addslashes($trigger["url"])."',2)";
-				$result4=DBexecute($sql);
-				$triggerid=DBinsert_id($result4,"triggers","triggerid");
-
-				$sql="select functionid from functions where triggerid=".$row2["triggerid"]." and itemid=".$row["itemid"];
-				$result3=DBselect($sql);
-				while($row3=DBfetch($result3))
-				{
-					$function=get_function_by_functionid($row3["functionid"]);
-					$sql="insert into functions (itemid,triggerid,function,parameter) values ($itemid,$triggerid,'".$function["function"]."','".$function["parameter"]."')";
-					$result4=DBexecute($sql);
-					$functionid=DBinsert_id($result4,"functions","functionid");
-					$sql="update triggers set expression='".$trigger["expression"]."' where triggerid=$triggerid";
-					DBexecute($sql);
-					$trigger["expression"]=str_replace("{".$row3["functionid"]."}","{".$functionid."}",$trigger["expression"]);
-					$sql="update triggers set expression='".$trigger["expression"]."' where triggerid=$triggerid";
-					DBexecute($sql);
-				}
-				# Add actions
-				$sql="select actionid from actions where scope=0 and triggerid=".$row2["triggerid"];
-				$result3=DBselect($sql);
-				while($row3=DBfetch($result3))
-				{
-					$action=get_action_by_actionid($row3["actionid"]);
-					$userid=$action["userid"];
-					$scope=$action["scope"];
-					$severity=$action["severity"];
-					$good=$action["good"];
-					$delay=$action["delay"];
-					$subject=addslashes($action["subject"]);
-					$message=addslashes($action["message"]);
-					$recipient=$action["recipient"];
-					$sql="insert into actions (triggerid, userid, scope, severity, good, delay, subject, message,recipient) values ($triggerid,$userid,$scope,$severity,$good,$delay,'$subject','$message',$recipient)";
-//					echo "$sql<br>";
-					$result4=DBexecute($sql);
-					$actionid=DBinsert_id($result4,"actions","actionid");
-				}
-			}
-		}
-
-		return TRUE;
-	}
-
 	function	add_group_to_host($hostid,$newgroup)
 	{
 		$sql="insert into groups (groupid,name) values (NULL,'$newgroup')";
@@ -1837,83 +1768,36 @@ echo "</head>";
 			return 0;
 		}
 
-		$host=get_host_by_hostid($hostid);
+		// Sync items
 		$sql="select itemid from items where hostid=$templateid";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
-		{
-			$item=get_item_by_itemid($row["itemid"]);
-			$itemid=add_item($item["description"],$item["key_"],$hostid,$item["delay"],$item["history"],$item["status"],$item["type"],$item["snmp_community"],$item["snmp_oid"],$item["value_type"],"",$item["snmp_port"],$item["units"],$item["multiplier"],$item["delta"],$item["snmpv3_securityname"],$item["snmpv3_securitylevel"],$item["snmpv3_authpassphrase"],$item["snmpv3_privpassphrase"],$item["formula"],$item["trends"]);
-
-			$sql="select distinct t.triggerid from triggers t,functions f where f.itemid=".$row["itemid"]." and f.triggerid=t.triggerid";
-			$result2=DBselect($sql);
-			while($row2=DBfetch($result2))
-			{
-				$trigger=get_trigger_by_triggerid($row2["triggerid"]);
-// Cannot use add_trigger here
-				$description=$trigger["description"];
-#				$description=str_replace("%s",$host["host"],$description);	
-				$sql="insert into triggers  (description,priority,status,comments,url,value) values ('".addslashes($description)."',".$trigger["priority"].",".$trigger["status"].",'".addslashes($trigger["comments"])."','".addslashes($trigger["url"])."',2)";
-				$result4=DBexecute($sql);
-				$triggerid=DBinsert_id($result4,"triggers","triggerid");
-
-				$sql="select functionid from functions where triggerid=".$row2["triggerid"]." and itemid=".$row["itemid"];
-				$result3=DBselect($sql);
-				while($row3=DBfetch($result3))
-				{
-					$function=get_function_by_functionid($row3["functionid"]);
-					$sql="insert into functions (itemid,triggerid,function,parameter) values ($itemid,$triggerid,'".$function["function"]."','".$function["parameter"]."')";
-					$result4=DBexecute($sql);
-					$functionid=DBinsert_id($result4,"functions","functionid");
-					$sql="update triggers set expression='".$trigger["expression"]."' where triggerid=$triggerid";
-					DBexecute($sql);
-					$trigger["expression"]=str_replace("{".$row3["functionid"]."}","{".$functionid."}",$trigger["expression"]);
-					$sql="update triggers set expression='".$trigger["expression"]."' where triggerid=$triggerid";
-					DBexecute($sql);
-				}
-				# Add actions
-				$sql="select actionid from actions where scope=0 and triggerid=".$row2["triggerid"];
-				$result3=DBselect($sql);
-				while($row3=DBfetch($result3))
-				{
-					$action=get_action_by_actionid($row3["actionid"]);
-					$userid=$action["userid"];
-					$scope=$action["scope"];
-					$severity=$action["severity"];
-					$good=$action["good"];
-					$delay=$action["delay"];
-					$subject=addslashes($action["subject"]);
-					$message=addslashes($action["message"]);
-					$recipient=$action["recipient"];
-					$sql="insert into actions (triggerid, userid, scope, severity, good, delay, subject, message,recipient) values ($triggerid,$userid,$scope,$severity,$good,$delay,'$subject','$message',$recipient)";
-//					echo "$sql<br>";
-					$result4=DBexecute($sql);
-					$actionid=DBinsert_id($result4,"actions","actionid");
-				}
-			}
+		{	
+			add_item_to_linked_hosts($row["itemid"],$hostid);
 		}
 
-		# Add graphs
-		$sql="select distinct g.graphid from graphs g,items i, hosts h,graphs_items gi where h.hostid=$templateid and i.hostid=h.hostid and gi.itemid=i.itemid and g.graphid=gi.graphid";
+		// Sync triggers
+		$sql="select distinct t.triggerid from hosts h, items i,triggers t,functions f where h.hostid=$templateid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.itemid=f.itemid";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
-		{
-			$graph=get_graph_by_graphid($row["graphid"]);
-			$graphid=add_graph($graph["name"],$graph["width"],$graph["height"],$graph["yaxistype"],$graph["yaxismin"],$graph["yaxismax"]);
-			$sql="select distinct gi.gitemid from graphs_items gi,graphs g,items i,hosts h  where gi.itemid=i.itemid and h.hostid=$templateid and i.hostid=h.hostid and g.graphid=gi.graphid and gi.itemid=i.itemid and g.graphid=".$graph["graphid"];
-			$result2=DBselect($sql);
-			while($row=DBfetch($result2))
-			{
-				$gitem=get_graphitem_by_gitemid($row["gitemid"]);
-				$item=get_item_by_itemid($gitem["itemid"]);
-				$sql="select * from items where key_='".$item["key_"]."' and hostid=$hostid";
-				$result3=DBselect($sql);
-				if(DBnum_rows($result3)==1)
-				{
-					$row2=DBfetch($result3);
-					add_item_to_graph($graphid,$row2["itemid"],$gitem["color"],$gitem["drawtype"],$gitem["sortorder"]);
-				}
-			}
+		{	
+			add_trigger_to_linked_hosts($row["triggerid"],$hostid);
+		}
+
+		// Sync actions
+		$sql="select distinct a.actionid from actions a,hosts h, items i,triggers t,functions f where h.hostid=$templateid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.itemid=f.itemid";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{	
+			add_action_to_linked_hosts($row["actionid"],$hostid);
+		}
+
+		// Sync graphs
+		$sql="select distinct gi.gitemid from graphs g,graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=$templateid and g.graphid=gi.graphid";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{	
+			add_graph_item_to_linked_hosts($row["gitemid"],$hostid);
 		}
 
 		return TRUE;

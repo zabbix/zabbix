@@ -329,7 +329,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	# Add item to hardlinked hosts
 
-	function	add_trigger_to_templates($triggerid)
+	function	add_trigger_to_linked_hosts($triggerid,$hostid=0)
 	{
 		if($triggerid<=0)
 		{
@@ -347,9 +347,15 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		$row=DBfetch($result);
 
-		$hostid=$row["hostid"];
-
-		$sql="select hostid,templateid,triggers from hosts_templates where templateid=$hostid";
+		if($hostid==0)
+		{
+			$sql="select hostid,templateid,triggers from hosts_templates where templateid=".$row["hostid"];
+		}
+		// Link to one host only
+		else
+		{
+			$sql="select hostid,templateid,triggers from hosts_templates where hostid=$hostid and templateid=".$row["hostid"];
+		}
 		$result=DBselect($sql);
 		// Loop: linked hosts
 		while($row=DBfetch($result))
