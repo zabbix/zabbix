@@ -160,7 +160,7 @@
 	{
 		global $DB_TYPE;
 
-		$ret = FAIL;
+		$ret = FALSE;
 
 		for($i=0;$i<100;$i++)
 		{

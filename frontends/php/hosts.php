@@ -212,6 +212,58 @@
 			}
 			show_messages(1,S_HOST_STATUS_UPDATED,S_CANNOT_UPDATE_HOST_STATUS);
 		}
+		if($_GET["register"]=="Activate selected")
+		{
+			$result=DBselect("select hostid from hosts");
+			while($row=DBfetch($result))
+			{
+// $$ is correct here
+				if(isset($_GET[$row["hostid"]]))
+				{
+					$res=update_host_status($row["hostid"],HOST_STATUS_MONITORED);
+					if($res)
+					{
+						add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,"New status [".HOST_STATUS_MONITORED."]");
+					}
+				}
+			}
+			show_messages(1,S_HOST_STATUS_UPDATED,S_CANNOT_UPDATE_HOST_STATUS);
+		}
+		if($_GET["register"]=="Disable selected")
+		{
+			$result=DBselect("select hostid from hosts");
+			while($row=DBfetch($result))
+			{
+// $$ is correct here
+				if(isset($_GET[$row["hostid"]]))
+				{
+					$res=update_host_status($row["hostid"],HOST_STATUS_NOT_MONITORED);
+					if($res)
+					{
+						add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,"New status [".HOST_STATUS_NOT_MONITORED."]");
+					}
+				}
+			}
+			show_messages(1,S_HOST_STATUS_UPDATED,S_CANNOT_UPDATE_HOST_STATUS);
+		}
+		if($_GET["register"]=="Delete selected")
+		{
+			$result=DBselect("select hostid from hosts");
+			while($row=DBfetch($result))
+			{
+// $$ is correct here
+				if(isset($_GET[$row["hostid"]]))
+				{
+					$host=get_host_by_hostid($row["hostid"]);
+					$res=delete_host($row["hostid"]);
+					if($res)
+					{
+						add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,"Host [".addslashes($host["host"])."]");
+					}
+				}
+			}
+			show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
+		}
 	}
 ?>
 
@@ -322,7 +374,7 @@
 		{
 //		$members=array("hide"=>1,"value"=>"");
 			$members=array("hide"=>0,"value"=>"");
-			$result1=DBselect("select distinct h.host from hosts h, hosts_groups hg where h.hostid=hg.hostid and hg.groupid=".$row["groupid"]." order by host");
+			$result1=DBselect("select distinct h.host from hosts h, hosts_groups hg where h.hostid=hg.hostid and hg.groupid=".$row["groupid"]." and h.status not in (".HOST_STATUS_DELETED.") order by host");
 			for($i=0;$i<DBnum_rows($result1);$i++)
 			{
 				$members["hide"]=0;
@@ -416,7 +468,7 @@
 	while($row=DBfetch($result))
 	{
 // Check if at least one host with read permission exists for this group
-		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.hostid=i.hostid and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
+		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.hostid=i.hostid and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid and h.status not in (".HOST_STATUS_DELETED.")group by h.hostid,h.host order by h.host");
 		$cnt=0;
 		while($row2=DBfetch($result2))
 		{
@@ -440,6 +492,7 @@
 <?php
 	table_begin();
 	table_header(array(S_ID,S_HOST,S_IP,S_PORT,S_STATUS,S_AVAILABILITY,S_ERROR,S_ACTIONS));
+	echo "<form method=\"get\" action=\"hosts.php\">";
 
 	if(isset($_GET["groupid"]))
 	{
@@ -556,6 +609,12 @@
 			echo "<TR>";
 	}
 	table_end();
+	show_form_begin();
+	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Activate selected\" onClick=\"return Confirm('".S_ACTIVATE_SELECTED_HOSTS_Q."');\">";
+	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Disable selected\" onClick=\"return Confirm('".S_DISABLE_SELECTED_HOSTS_Q."');\">";
+	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Delete selected\" onClick=\"return Confirm('".S_DELETE_SELECTED_HOSTS_Q."');\">";
+	show_table2_header_end();
+	echo "</form>";
 }
 ?>
 
