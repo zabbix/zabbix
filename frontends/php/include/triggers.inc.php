@@ -337,7 +337,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		}
 
 		$trigger=get_trigger_by_triggerid($triggerid);
-		$expression_old=$trigger["expression"];
 
 		$sql="select distinct h.hostid from hosts h,functions f, items i where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid=$triggerid";
 		$result=DBselect($sql);
@@ -350,10 +349,13 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		$hostid=$row["hostid"];
 
-		$sql="select hostid,templateid,items from hosts_templates where templateid=$hostid";
+		$sql="select hostid,templateid,triggers from hosts_templates where templateid=$hostid";
 		$result=DBselect($sql);
+		// Loop: linked hosts
 		while($row=DBfetch($result))
 		{
+			$expression_old=$trigger["expression"];
+
 			if($row["triggers"]&1 == 0)	continue;
 
 			$sql="insert into triggers  (description,priority,status,comments,url,value,expression) values ('".addslashes($trigger["description"])."',".$trigger["priority"].",".$trigger["status"].",'".addslashes($trigger["comments"])."','".addslashes($trigger["url"])."',2,'$expression_old')";
@@ -363,6 +365,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 			$sql="select i.key_,f.parameter,f.function,f.functionid from functions f,items i where i.itemid=f.itemid and f.triggerid=$triggerid";
 			$result2=DBselect($sql);
+			// Loop: functions
 			while($row2=DBfetch($result2))
 			{
 				$sql="select itemid from items where key_=\"".$row2["key_"]."\" and hostid=".$row["hostid"];
@@ -380,8 +383,8 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				$item=get_item_by_itemid($row3["itemid"]);
 
 				$sql="insert into functions (itemid,triggerid,function,parameter) values (".$item["itemid"].",$triggerid_new,'".$row2["function"]."','".$row2["parameter"]."')";
-				$result4=DBexecute($sql);
-				$functionid=DBinsert_id($result4,"functions","functionid");
+				$result5=DBexecute($sql);
+				$functionid=DBinsert_id($result5,"functions","functionid");
 
 				$sql="update triggers set expression='$expression_old' where triggerid=$triggerid_new";
 				DBexecute($sql);
