@@ -2423,9 +2423,11 @@ echo "</head>";
 		echo "</TR>";
 		echo "</TABLE>";
 		echo "</center>";
-		echo("<hr>");
-		insert_time_navigator($itemid,$period,$from);
-		echo("<hr>");
+//		echo("<hr>");
+		navigation_bar("history.php");
+//		insert_time_navigator($itemid,$period,$from);
+		
+//		echo("<hr>");
 	}
 
 	# Show history
