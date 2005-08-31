@@ -187,7 +187,7 @@
 		navigation_bar("charts.php");
 
 // BEGIN - IGMI - just another way of navigation
-	echo "<TABLE BORDER=0 align=center COLS=2 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=1>";
+/*	echo "<TABLE BORDER=0 align=center COLS=2 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=1>";
 	echo "<TR BGCOLOR=#FFFFFF>";
 	echo "<TD ALIGN=LEFT>";
 
@@ -322,6 +322,7 @@
 	echo "</TABLE>";
 
 // END - IGMI - just another way of navigation
+*/
 	}
 	
 ?>

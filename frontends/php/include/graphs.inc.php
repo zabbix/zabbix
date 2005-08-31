@@ -259,6 +259,19 @@
 		$h2=$h2."&nbsp;";
 		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"action\" value=\"go\">";
 
+		if(isset($_GET["graphid"])&&($_GET["graphid"]!=0))
+		{
+			$h2=$h2."<input name=\"graphid\" type=\"hidden\" value=\"".$_GET["graphid"]."\" size=12>";
+		}
+		if(isset($_GET["itemid"])&&($_GET["itemid"]!=0))
+		{
+			$h2=$h2."<input name=\"itemid\" type=\"hidden\" value=\"".$_GET["itemid"]."\" size=12>";
+		}
+		if(isset($_GET["action"]))
+		{
+			$h2=$h2."<input name=\"action\" type=\"hidden\" value=\"".$_GET["action"]."\" size=22>";
+		}
+
 		show_header2($h1,$h2,"<form name=\"form2\" method=\"get\" action=\"$url\">","</form>");
 
 		return;

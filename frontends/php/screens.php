@@ -168,6 +168,7 @@
           echo "</TR>\n";
           }
           echo "</TABLE>";
+		navigation_bar("screens.php");
 	}
 	else
 	{
