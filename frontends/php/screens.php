@@ -39,6 +39,10 @@
 ?>
 
 <?php
+	navigation_bar_calc();
+?>
+
+<?php
 	$_GET["screenid"]=@iif(isset($_GET["screenid"]),$_GET["screenid"],get_profile("web.screens.screenid",0));
 	update_profile("web.screens.screenid",$_GET["screenid"]);
 	update_profile("web.menu.view.last",$page["file"]);
@@ -143,11 +147,11 @@
 		{
 			if($resource == 0)
 			{
-				echo "<a href=charts.php?graphid=$resourceid><img src='chart2.php?graphid=$resourceid&width=$width&height=$height&period=3600&border=0' border=0></a>";
+				echo "<a href=charts.php?graphid=$resourceid><img src='chart2.php?graphid=$resourceid&width=$width&height=$height&".url_param("period").url_param("from")."border=0' border=0></a>";
 			}
 			else if($resource == 1)
 			{
-				echo "<a href=history.php?action=showhistory&itemid=$resourceid><img src='chart.php?itemid=$resourceid&width=$width&height=$height&period=3600&border=0' border=0></a>";
+				echo "<a href=history.php?action=showhistory&itemid=$resourceid><img src='chart.php?itemid=$resourceid&width=$width&height=$height&".url_param("period").url_param("from")."border=0' border=0></a>";
 			}
 			else if($resource == 2)
 			{
