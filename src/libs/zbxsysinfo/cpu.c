@@ -232,7 +232,7 @@ static int getloadavg_kmem(double loadavg[], int nelem)
 }
 #endif
 
-int	PROCLOAD(const char *cmd, const char *parameter,double  *value)
+int	SYSTEM_CPU_LOAD1(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_GETLOADAVG
 	double	load[3];
@@ -300,7 +300,7 @@ int	PROCLOAD(const char *cmd, const char *parameter,double  *value)
 #endif
 }
 
-int	PROCLOAD5(const char *cmd, const char *parameter,double  *value)
+int	SYSTEM_CPU_LOAD5(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_GETLOADAVG
 	double	load[3];
@@ -368,7 +368,7 @@ int	PROCLOAD5(const char *cmd, const char *parameter,double  *value)
 #endif
 }
 
-int	PROCLOAD15(const char *cmd, const char *parameter,double  *value)
+int	SYSTEM_CPU_LOAD15(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_GETLOADAVG
 	double	load[3];

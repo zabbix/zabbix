@@ -203,7 +203,7 @@ point them all to the same buffer */
 #endif
 #endif
 
-int	SWAPFREE(const char *cmd, const char *parameter,double  *value)
+int	SYSTEM_SWAP_FREE(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_SYSINFO_FREESWAP
 	struct sysinfo info;
@@ -236,7 +236,7 @@ int	SWAPFREE(const char *cmd, const char *parameter,double  *value)
 #endif
 }
 
-int	SWAPTOTAL(const char *cmd, const char *parameter,double  *value)
+int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_SYSINFO_TOTALSWAP
 	struct sysinfo info;

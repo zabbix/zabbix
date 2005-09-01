@@ -111,9 +111,9 @@ int	TOTALMEM(const char *cmd, const char *parameter,double  *value);
 int	PROCCNT(const char *cmd, const char *parameter,double  *value);
 int	PROCCOUNT(const char *cmd, const char *parameter,double  *value);
 
-int	PROCLOAD(const char *cmd, const char *parameter,double  *value);
-int	PROCLOAD5(const char *cmd, const char *parameter,double  *value);
-int	PROCLOAD15(const char *cmd, const char *parameter,double  *value);
+int	SYSTEM_CPU_LOAD1(const char *cmd, const char *parameter,double  *value);
+int	SYSTEM_CPU_LOAD5(const char *cmd, const char *parameter,double  *value);
+int	SYSTEM_CPU_LOAD15(const char *cmd, const char *parameter,double  *value);
 
 int	SENSOR_TEMP1(const char *cmd, const char *parameter,double  *value);
 int	SENSOR_TEMP2(const char *cmd, const char *parameter,double  *value);
@@ -122,14 +122,14 @@ int	SENSOR_TEMP3(const char *cmd, const char *parameter,double  *value);
 int	SYSTEM_LOCALTIME(const char *cmd, const char *parameter,double  *value);
 int	SYSTEM_UPTIME(const char *cmd, const char *parameter,double  *value);
 
-int	SWAPFREE(const char *cmd, const char *parameter,double  *value);
-int	SWAPTOTAL(const char *cmd, const char *parameter,double  *value);
+int	SYSTEM_SWAP_FREE(const char *cmd, const char *parameter,double  *value);
+int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *parameter,double  *value);
 
 int	TCP_LISTEN(const char *cmd, const char *porthex,double  *value);
 
 int	EXECUTE(const char *cmd, const char *command,double  *value);
 int	EXECUTE_STR(const char *cmd, const char *command, const char *parameter, char  **value);
-int	STRVERSION(const char *cmd, const char *command,char **value);
+int	AGENT_VERSION(const char *cmd, const char *command,char **value);
 
 
 int	CHECK_SERVICE(const char *cmd, const char *service,double  *value);
