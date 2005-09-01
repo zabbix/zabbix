@@ -26,7 +26,7 @@ AC_PROG_MAKE_SET
 
 AM_CONFIG_HEADER(include/config.h)
 
-AC_CANONICAL_SYSTEM
+dnl AC_CANONICAL_SYSTEM
 
 dnl Checks for programs.
 AC_PROG_CC
