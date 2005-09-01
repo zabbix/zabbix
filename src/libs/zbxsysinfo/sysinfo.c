@@ -168,6 +168,10 @@ COMMAND	agent_commands[]=
 	{"system[procload]"	,SYSTEM_CPU_LOAD1, 	0, 0},
 	{"system[procload5]"	,SYSTEM_CPU_LOAD5, 	0, 0},
 	{"system[procload15]"	,SYSTEM_CPU_LOAD15, 	0, 0},
+	{"system[hostname]"	,0,		EXECUTE_STR, "hostname"},
+	{"system[uname]"	,0,		EXECUTE_STR, "uname -a"},
+	{"system[uptime]"	,SYSTEM_UPTIME,	0, 0},
+	{"system[users]"	,EXECUTE, 	0,"who|wc -l"},
 	{"version[zabbix_agent]",	0, 		AGENT_VERSION, 0},
 /* New naming  */
 	{"kern[maxfiles]"	,KERNEL_MAXFILES,	0, 0},
@@ -221,13 +225,21 @@ COMMAND	agent_commands[]=
 	{"system.cpu.user5"	,SYSTEM_CPU_USER5, 		0, 0},
 	{"system.cpu.user15"	,SYSTEM_CPU_USER15, 		0, 0},
 
-	{"netloadin1[*]"	,NETLOADIN1, 		0, "lo"},
-	{"netloadin5[*]"	,NETLOADIN5, 		0, "lo"},
-	{"netloadin15[*]"	,NETLOADIN15, 		0, "lo"},
+	{"netloadin1[*]"	,NET_IF_IBYTES1,	0, "lo"},
+	{"netloadin5[*]"	,NET_IF_IBYTES5,	0, "lo"},
+	{"netloadin15[*]"	,NET_IF_IBYTES15,	0, "lo"},
 
-	{"netloadout1[*]"	,NETLOADOUT1, 		0, "lo"},
-	{"netloadout5[*]"	,NETLOADOUT5, 		0, "lo"},
-	{"netloadout15[*]"	,NETLOADOUT15, 		0, "lo"},
+	{"net.if.ibytes1[*]"	,NET_IF_IBYTES1,	0, "lo"},
+	{"net.if.ibytes5[*]"	,NET_IF_IBYTES5,	0, "lo"},
+	{"net.if.ibytes15[*]"	,NET_IF_IBYTES15,	0, "lo"},
+
+	{"netloadout1[*]"	,NET_IF_OBYTES1,	0, "lo"},
+	{"netloadout5[*]"	,NET_IF_OBYTES5, 	0, "lo"},
+	{"netloadout15[*]"	,NET_IF_OBYTES15,	0, "lo"},
+
+	{"net.if.obytes1[*]"	,NET_IF_OBYTES1,	0, "lo"},
+	{"net.if.obytes5[*]"	,NET_IF_OBYTES5,	0, "lo"},
+	{"net.if.obytes15[*]"	,NET_IF_OBYTES15,	0, "lo"},
 
 	{"disk_read_ops1[*]"	,DISKREADOPS1, 		0, "hda"},
 	{"disk_read_ops5[*]"	,DISKREADOPS5, 		0, "hda"},
@@ -278,14 +290,10 @@ COMMAND	agent_commands[]=
 #ifdef HAVE_PROC_LOADAVG
 	{"system[procrunning]"	,EXECUTE, 	0, "cat /proc/loadavg|cut -f1 -d'/'|cut -f4 -d' '"},
 #endif
-	{"system[hostname]"	,0,		EXECUTE_STR, "hostname"},
 	{"system.hostname"	,0,		EXECUTE_STR, "hostname"},
 	{"system.localtime"	,SYSTEM_LOCALTIME,	0, 0},
-	{"system[uname]"	,0,		EXECUTE_STR, "uname -a"},
 	{"system.uname"	,0,		EXECUTE_STR, "uname -a"},
-	{"system[uptime]"	,SYSTEM_UPTIME,	0, 0},
 	{"system.uptime"	,SYSTEM_UPTIME,	0, 0},
-	{"system[users]"	,EXECUTE, 	0,"who|wc -l"},
 	{"system.users.num"	,EXECUTE, 	0,"who|wc -l"},
 
 	{"ping"			,PING, 		0, 0},
@@ -927,7 +935,7 @@ int	get_stat(const char *key, double *value)
 	return SYSINFO_RET_FAIL;
 }
 
-int	NETLOADIN1(const char *cmd, const char *parameter,double  *value)
+int	NET_IF_IBYTES1(const char *cmd, const char *parameter,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
@@ -936,7 +944,7 @@ int	NETLOADIN1(const char *cmd, const char *parameter,double  *value)
 	return	get_stat(key,value);
 }
 
-int	NETLOADIN5(const char *cmd, const char *parameter,double  *value)
+int	NET_IF_IBYTES5(const char *cmd, const char *parameter,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
@@ -945,7 +953,7 @@ int	NETLOADIN5(const char *cmd, const char *parameter,double  *value)
 	return	get_stat(key,value);
 }
 
-int	NETLOADIN15(const char *cmd, const char *parameter,double  *value)
+int	NET_IF_IBYTES15(const char *cmd, const char *parameter,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
@@ -954,7 +962,7 @@ int	NETLOADIN15(const char *cmd, const char *parameter,double  *value)
 	return	get_stat(key,value);
 }
 
-int	NETLOADOUT1(const char *cmd, const char *parameter,double  *value)
+int	NET_IF_OBYTES1(const char *cmd, const char *parameter,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
@@ -963,7 +971,7 @@ int	NETLOADOUT1(const char *cmd, const char *parameter,double  *value)
 	return	get_stat(key,value);
 }
 
-int	NETLOADOUT5(const char *cmd, const char *parameter,double  *value)
+int	NET_IF_OBYTES5(const char *cmd, const char *parameter,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 
@@ -972,7 +980,7 @@ int	NETLOADOUT5(const char *cmd, const char *parameter,double  *value)
 	return	get_stat(key,value);
 }
 
-int	NETLOADOUT15(const char *cmd, const char *parameter,double  *value)
+int	NET_IF_OBYTES15(const char *cmd, const char *parameter,double  *value)
 {
 	char	key[MAX_STRING_LEN];
 

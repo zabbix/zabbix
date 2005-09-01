@@ -87,12 +87,15 @@ int	INODETOTAL(const char *cmd, const char *mountPoint,double  *value);
 
 int	KERNEL_MAXFILES(const char *cmd, const char *parameter,double  *value);
 int	KERNEL_MAXPROC(const char *cmd, const char *parameter,double  *value);
-int	NETLOADIN1(const char *cmd, const char *parameter,double  *value);
-int	NETLOADIN5(const char *cmd, const char *parameter,double  *value);
-int	NETLOADIN15(const char *cmd, const char *parameter,double  *value);
-int	NETLOADOUT1(const char *cmd, const char *parameter,double  *value);
-int	NETLOADOUT5(const char *cmd, const char *parameter,double  *value);
-int	NETLOADOUT15(const char *cmd, const char *parameter,double  *value);
+
+int	NET_IF_IBYTES1(const char *cmd, const char *parameter,double  *value);
+int	NET_IF_IBYTES5(const char *cmd, const char *parameter,double  *value);
+int	NET_IF_IBYTES15(const char *cmd, const char *parameter,double  *value);
+
+int	NET_IF_OBYTES1(const char *cmd, const char *parameter,double  *value);
+int	NET_IF_OBYTES5(const char *cmd, const char *parameter,double  *value);
+int	NET_IF_OBYTES15(const char *cmd, const char *parameter,double  *value);
+
 int	DISKREADOPS1(const char *cmd, const char *parameter,double  *value);
 int	DISKREADOPS5(const char *cmd, const char *parameter,double  *value);
 int	DISKREADOPS15(const char *cmd, const char *parameter,double  *value);
