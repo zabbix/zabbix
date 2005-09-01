@@ -1,5 +1,6 @@
 Changes for 1.1beta1:
 
+ - all network load related metrics renamed to net.if.xxx (Alexei)
  - all swap-related metrics renamed to system.swap.xxx (Alexei)
  - all CPU-related metrics renamed to system.cpu.xxx (Alexei)
  - misc fixes for host-templates linkage (Alexei)
