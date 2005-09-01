@@ -139,61 +139,61 @@
 #include "common.h"
 #include "sysinfo.h"
 
-int	CPUIDLE1(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_IDLE1(const char *cmd, const char *param,double  *value)
 {
 	return	get_stat("cpu[idle1]",value);
 }
 
-int	CPUIDLE5(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_IDLE5(const char *cmd, const char *param,double  *value)
 {
 	return	get_stat("cpu[idle5]",value);
 }
 
-int	CPUIDLE15(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_IDLE15(const char *cmd, const char *param,double  *value)
 {
 	return	get_stat("cpu[idle15]",value);
 }
 
-int	CPUNICE1(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_NICE1(const char *cmd, const char *param,double  *value)
 {
 	return	get_stat("cpu[nice1]",value);
 }
 
-int	CPUNICE5(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_NICE5(const char *cmd, const char *param,double  *value)
 {
 	return	get_stat("cpu[nice5]",value);
 }
-int	CPUNICE15(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_NICE15(const char *cmd, const char *param,double  *value)
 {
 	return	get_stat("cpu[nice15]",value);
 }
 
-int	CPUUSER1(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_USER1(const char *cmd, const char *param,double  *value)
 {
 	return	get_stat("cpu[user1]",value);
 }
 
-int	CPUUSER5(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_USER5(const char *cmd, const char *param,double  *value)
 {
 	return	get_stat("cpu[user5]",value);
 }
 
-int	CPUUSER15(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_USER15(const char *cmd, const char *param,double  *value)
 {
 	return	get_stat("cpu[user15]",value);
 }
 
-int	CPUSYSTEM1(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_SYS1(const char *cmd, const char *param,double  *value)
 {
 	return	get_stat("cpu[system1]",value);
 }
 
-int	CPUSYSTEM5(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_SYS5(const char *cmd, const char *param,double  *value)
 {
 	return	get_stat("cpu[system5]",value);
 }
 
-int	CPUSYSTEM15(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_SYS15(const char *cmd, const char *param,double  *value)
 {
 	return	get_stat("cpu[system15]",value);
 }

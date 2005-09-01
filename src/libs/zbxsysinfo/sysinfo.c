@@ -184,21 +184,37 @@ COMMAND	agent_commands[]=
 	{"file[*]"		,FS_FILE_EXISTS,	0, "/etc/passwd"},
 	{"fs.file.exists[*]"	,FS_FILE_EXISTS,	0, "/etc/passwd"},
 
-	{"cpu[idle1]"		,CPUIDLE1, 		0, 0},
-	{"cpu[idle5]"		,CPUIDLE5, 		0, 0},
-	{"cpu[idle15]"		,CPUIDLE15, 		0, 0},
+	{"cpu[idle1]"		,SYSTEM_CPU_IDLE1, 		0, 0},
+	{"cpu[idle5]"		,SYSTEM_CPU_IDLE5, 		0, 0},
+	{"cpu[idle15]"		,SYSTEM_CPU_IDLE15, 		0, 0},
 
-	{"cpu[nice1]"		,CPUNICE1, 		0, 0},
-	{"cpu[nice5]"		,CPUNICE5, 		0, 0},
-	{"cpu[nice15]"		,CPUNICE15, 		0, 0},
+	{"system.cpu.idle1"	,SYSTEM_CPU_IDLE1, 		0, 0},
+	{"system.cpu.idle5"	,SYSTEM_CPU_IDLE5, 		0, 0},
+	{"system.cpu.idle15"	,SYSTEM_CPU_IDLE15, 		0, 0},
 
-	{"cpu[user1]"		,CPUUSER1, 		0, 0},
-	{"cpu[user5]"		,CPUUSER5, 		0, 0},
-	{"cpu[user15]"		,CPUUSER15, 		0, 0},
+	{"cpu[nice1]"		,SYSTEM_CPU_NICE1, 		0, 0},
+	{"cpu[nice5]"		,SYSTEM_CPU_NICE5, 		0, 0},
+	{"cpu[nice15]"		,SYSTEM_CPU_NICE15, 		0, 0},
 
-	{"cpu[system1]"		,CPUSYSTEM1, 		0, 0},
-	{"cpu[system5]"		,CPUSYSTEM5, 		0, 0},
-	{"cpu[system15]"	,CPUSYSTEM15, 		0, 0},
+	{"system.cpu.nice1"	,SYSTEM_CPU_NICE1, 		0, 0},
+	{"system.cpu.nice5"	,SYSTEM_CPU_NICE5, 		0, 0},
+	{"system.cpu.nice15"	,SYSTEM_CPU_NICE15, 		0, 0},
+
+	{"cpu[user1]"		,SYSTEM_CPU_USER1, 		0, 0},
+	{"cpu[user5]"		,SYSTEM_CPU_USER5, 		0, 0},
+	{"cpu[user15]"		,SYSTEM_CPU_USER15, 		0, 0},
+
+	{"system.cpu.user1"	,SYSTEM_CPU_USER1, 		0, 0},
+	{"system.cpu.user5"	,SYSTEM_CPU_USER5, 		0, 0},
+	{"system.cpu.user15"	,SYSTEM_CPU_USER15, 		0, 0},
+
+	{"cpu[system1]"		,SYSTEM_CPU_SYS1, 		0, 0},
+	{"cpu[system5]"		,SYSTEM_CPU_SYS5, 		0, 0},
+	{"cpu[system15]"	,SYSTEM_CPU_SYS15, 		0, 0},
+
+	{"system.cpu.sys1"	,SYSTEM_CPU_SYS1, 		0, 0},
+	{"system.cpu.sys5"	,SYSTEM_CPU_SYS5, 		0, 0},
+	{"system.cpu.sys15"	,SYSTEM_CPU_SYS15, 		0, 0},
 
 	{"netloadin1[*]"	,NETLOADIN1, 		0, "lo"},
 	{"netloadin5[*]"	,NETLOADIN5, 		0, "lo"},
