@@ -145,6 +145,31 @@ COMMAND	*commands=NULL;
 COMMAND	agent_commands[]=
 /* 	KEY		FUNCTION (if double) FUNCTION (if string) PARAM*/
 	{
+
+/* Outdated */
+	{"cksum[*]"		,FS_FILE_CKSUM, 	0, "/etc/services"},
+	{"cpu[idle1]"		,SYSTEM_CPU_IDLE1, 	0, 0},
+	{"cpu[idle5]"		,SYSTEM_CPU_IDLE5, 	0, 0},
+	{"cpu[idle15]"		,SYSTEM_CPU_IDLE15, 	0, 0},
+	{"cpu[nice1]"		,SYSTEM_CPU_NICE1, 	0, 0},
+	{"cpu[nice5]"		,SYSTEM_CPU_NICE5, 	0, 0},
+	{"cpu[nice15]"		,SYSTEM_CPU_NICE15, 	0, 0},
+	{"cpu[system1]"		,SYSTEM_CPU_SYS1, 	0, 0},
+	{"cpu[system5]"		,SYSTEM_CPU_SYS5, 	0, 0},
+	{"cpu[system15]"	,SYSTEM_CPU_SYS15, 	0, 0},
+	{"cpu[user1]"		,SYSTEM_CPU_USER1, 	0, 0},
+	{"cpu[user5]"		,SYSTEM_CPU_USER5, 	0, 0},
+	{"cpu[user15]"		,SYSTEM_CPU_USER15, 	0, 0},
+	{"file[*]"		,FS_FILE_EXISTS,	0, "/etc/passwd"},
+	{"filesize[*]"		,FS_FILE_SIZE, 		0, "/etc/passwd"},
+	{"md5sum[*]"		,0, 			FS_FILE_MD5SUM, "/etc/services"},
+	{"swap[free]"		,SYSTEM_SWAP_FREE,	0, 0},
+	{"swap[total]"		,SYSTEM_SWAP_TOTAL,	0, 0},
+	{"system[procload]"	,SYSTEM_CPU_LOAD1, 	0, 0},
+	{"system[procload5]"	,SYSTEM_CPU_LOAD5, 	0, 0},
+	{"system[procload15]"	,SYSTEM_CPU_LOAD15, 	0, 0},
+	{"version[zabbix_agent]",	0, 		AGENT_VERSION, 0},
+/* New naming  */
 	{"kern[maxfiles]"	,KERNEL_MAXFILES,	0, 0},
 	{"kern[maxproc]"	,KERNEL_MAXPROC, 	0, 0},
 
@@ -156,7 +181,7 @@ COMMAND	agent_commands[]=
 	{"memory[cached]"	,CACHEDMEM, 		0, 0},
 	{"memory[free]"		,FREEMEM, 		0, 0},
 
-	{"version[zabbix_agent]",0,	 		STRVERSION, 0},
+	{"agent.version",		0, 		AGENT_VERSION, 0},
 
 	{"diskfree[*]"		,DISKFREE,		0, "/"},
 	{"disktotal[*]"		,DISKTOTAL,		0, "/"},
@@ -171,50 +196,30 @@ COMMAND	agent_commands[]=
 
 	{"inodetotal[*]"	,INODETOTAL, 		0, "/"},
 
-	{"cksum[*]"		,FS_FILE_CKSUM, 	0, "/etc/services"},
 	{"fs.file.cksum[*]"	,FS_FILE_CKSUM,		0, "/etc/services"},
-	{"md5sum[*]"		,0, 			FS_FILE_MD5SUM, "/etc/services"},
 	{"fs.file.md5sum[*]"	,0, 			FS_FILE_MD5SUM, "/etc/services"},
 	{"fs.file.atime[*]"	,FS_FILE_ATIME,		0, "/etc/passwd"},
 	{"fs.file.ctime[*]"	,FS_FILE_CTIME,		0, "/etc/passwd"},
 	{"fs.file.mtime[*]"	,FS_FILE_MTIME,		0, "/etc/passwd"},
 
-	{"filesize[*]"		,FS_FILE_SIZE, 		0, "/etc/passwd"},
 	{"fs.file.size[*]"	,FS_FILE_SIZE, 		0, "/etc/passwd"},
-	{"file[*]"		,FS_FILE_EXISTS,	0, "/etc/passwd"},
 	{"fs.file.exists[*]"	,FS_FILE_EXISTS,	0, "/etc/passwd"},
-
-	{"cpu[idle1]"		,SYSTEM_CPU_IDLE1, 		0, 0},
-	{"cpu[idle5]"		,SYSTEM_CPU_IDLE5, 		0, 0},
-	{"cpu[idle15]"		,SYSTEM_CPU_IDLE15, 		0, 0},
 
 	{"system.cpu.idle1"	,SYSTEM_CPU_IDLE1, 		0, 0},
 	{"system.cpu.idle5"	,SYSTEM_CPU_IDLE5, 		0, 0},
 	{"system.cpu.idle15"	,SYSTEM_CPU_IDLE15, 		0, 0},
 
-	{"cpu[nice1]"		,SYSTEM_CPU_NICE1, 		0, 0},
-	{"cpu[nice5]"		,SYSTEM_CPU_NICE5, 		0, 0},
-	{"cpu[nice15]"		,SYSTEM_CPU_NICE15, 		0, 0},
-
 	{"system.cpu.nice1"	,SYSTEM_CPU_NICE1, 		0, 0},
 	{"system.cpu.nice5"	,SYSTEM_CPU_NICE5, 		0, 0},
 	{"system.cpu.nice15"	,SYSTEM_CPU_NICE15, 		0, 0},
 
-	{"cpu[user1]"		,SYSTEM_CPU_USER1, 		0, 0},
-	{"cpu[user5]"		,SYSTEM_CPU_USER5, 		0, 0},
-	{"cpu[user15]"		,SYSTEM_CPU_USER15, 		0, 0},
+	{"system.cpu.sys1"	,SYSTEM_CPU_SYS1, 		0, 0},
+	{"system.cpu.sys5"	,SYSTEM_CPU_SYS5, 		0, 0},
+	{"system.cpu.sys15"	,SYSTEM_CPU_SYS15, 		0, 0},
 
 	{"system.cpu.user1"	,SYSTEM_CPU_USER1, 		0, 0},
 	{"system.cpu.user5"	,SYSTEM_CPU_USER5, 		0, 0},
 	{"system.cpu.user15"	,SYSTEM_CPU_USER15, 		0, 0},
-
-	{"cpu[system1]"		,SYSTEM_CPU_SYS1, 		0, 0},
-	{"cpu[system5]"		,SYSTEM_CPU_SYS5, 		0, 0},
-	{"cpu[system15]"	,SYSTEM_CPU_SYS15, 		0, 0},
-
-	{"system.cpu.sys1"	,SYSTEM_CPU_SYS1, 		0, 0},
-	{"system.cpu.sys5"	,SYSTEM_CPU_SYS5, 		0, 0},
-	{"system.cpu.sys15"	,SYSTEM_CPU_SYS15, 		0, 0},
 
 	{"netloadin1[*]"	,NETLOADIN1, 		0, "lo"},
 	{"netloadin5[*]"	,NETLOADIN5, 		0, "lo"},
@@ -244,8 +249,8 @@ COMMAND	agent_commands[]=
 	{"sensor[temp2]"	,SENSOR_TEMP2, 		0, 0},
 	{"sensor[temp3]"	,SENSOR_TEMP3, 		0, 0},
 
-	{"swap[free]"		,SWAPFREE, 		0, 0},
-	{"swap[total]"		,SWAPTOTAL, 		0, 0},
+	{"system.swap.free"	,SYSTEM_SWAP_FREE,	0, 0},
+	{"system.swap.total"	,SYSTEM_SWAP_TOTAL, 	0, 0},
 
 /****************************************
   	All these perameters require more than 1 second to retrieve.
@@ -263,10 +268,13 @@ COMMAND	agent_commands[]=
 	{"io[disk_rblk]"	,DISK_RBLK, 	0, 0},
 	{"io[disk_wblk]"	,DISK_WBLK, 	0, 0},
 
-	{"system[procload]"	,PROCLOAD, 	0, 0},
-	{"system[procload5]"	,PROCLOAD5, 	0, 0},
-	{"system[procload15]"	,PROCLOAD15, 	0, 0},
+
+	{"system.cpu.load1"	,SYSTEM_CPU_LOAD1,	0, 0},
+	{"system.cpu.load5"	,SYSTEM_CPU_LOAD5,	0, 0},
+	{"system.cpu.load15"	,SYSTEM_CPU_LOAD15,	0, 0},
+
 	{"system[proccount]"	,PROCCOUNT, 	0, 0},
+
 #ifdef HAVE_PROC_LOADAVG
 	{"system[procrunning]"	,EXECUTE, 	0, "cat /proc/loadavg|cut -f1 -d'/'|cut -f4 -d' '"},
 #endif
@@ -1206,7 +1214,7 @@ int	PROCCOUNT(const char *cmd, const char *parameter,double  *value)
 #endif
 }
 
-int	STRVERSION(const char *cmd, const char *parameter,char  **value)
+int	AGENT_VERSION(const char *cmd, const char *parameter,char  **value)
 {
 	static	char	version[]=ZABBIX_VERSION;
 
