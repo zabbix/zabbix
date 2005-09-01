@@ -56,7 +56,6 @@ int process_eventlog_new(char *source,int *lastlogsize, char *timestamp, char *s
 				{
 					WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_eventlog_new: if 3");
 					sprintf(timestamp,"%ld",t);
-					WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","YO");
 //					WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",type);
 //				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",t);
 					if(type==EVENTLOG_ERROR_TYPE)	type=4;
@@ -69,15 +68,15 @@ int process_eventlog_new(char *source,int *lastlogsize, char *timestamp, char *s
 //				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",Latest);
 //					WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",severity);
 					*lastlogsize = Latest;
-					WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_eventlog_new: if 4");
+					WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pen:4");
 					MyCloseEventLog(hAppLog);
-					WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_eventlog_new: if 5");
+					WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pen:5");
 					return 0;
 				}
-				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_eventlog_new: if 6");
+				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pen:6");
 			}
 			Latest++;
-			WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_eventlog_new: for 8");
+			WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pen:8");
 		}
 		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_eventlog_new: 6");
         MyCloseEventLog(hAppLog);
