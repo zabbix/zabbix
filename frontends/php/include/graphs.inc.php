@@ -202,6 +202,32 @@
 		}
 	}
 
+	function	navigation_bar_calc()
+	{
+		if(!isset($_GET["period"]))	$_GET["period"]=3600;
+		if(!isset($_GET["from"]))	$_GET["from"]=0;
+
+		if(isset($_GET["inc"]))		$_GET["period"]= $_GET["period"]+$_GET["inc"];
+		if(isset($_GET["dec"]))		$_GET["period"]= $_GET["period"]-$_GET["dec"];
+
+		if(isset($_GET["left"]))	$_GET["from"]= $_GET["from"]+$_GET["left"];
+		if(isset($_GET["right"]))	$_GET["from"]= $_GET["from"]-$_GET["right"];
+
+		unset($_GET["inc"]);
+		unset($_GET["dec"]);
+		unset($_GET["left"]);
+		unset($_GET["right"]);
+
+		if($_GET["from"]<=0)		$_GET["from"]=0;
+		if($_GET["period"]<=0)		$_GET["period"]=3600;
+
+		if(isset($_GET["reset"]))
+		{
+			$_GET["period"]=3600;
+			$_GET["from"]=0;
+		}
+	}
+
 	function	navigation_bar($url)
 	{
 		$h1=S_NAVIGATE;
@@ -217,17 +243,8 @@
 		$h2=$h2.form_select("period",31*24*3600,"month");
 		$h2=$h2.form_select("period",365*24*3600,"year");
 		$h2=$h2."</select>";
-		$h2=$h2."<select class=\"biginput\" name=\"inc\" onChange=\"submit()\">";
-		$h2=$h2.form_select("inc",3600,S_INCREASE);
-		$h2=$h2.form_select("inc",3600,"+1h");
-		$h2=$h2.form_select("inc",4*3600,"+4h");
-		$h2=$h2.form_select("inc",24*3600,"+24h");
-		$h2=$h2.form_select("inc",7*24*3600,"+week");
-		$h2=$h2.form_select("inc",31*24*3600,"+month");
-		$h2=$h2.form_select("inc",365*24*3600,"+year");
-		$h2=$h2."</select>";
 		$h2=$h2."<select class=\"biginput\" name=\"dec\" onChange=\"submit()\">";
-		$h2=$h2.form_select("dec",3600,S_DECREASE);
+		$h2=$h2.form_select("dec",0,S_DECREASE);
 		$h2=$h2.form_select("dec",3600,"-1h");
 		$h2=$h2.form_select("dec",4*3600,"-4h");
 		$h2=$h2.form_select("dec",24*3600,"-24h");
@@ -235,29 +252,39 @@
 		$h2=$h2.form_select("dec",31*24*3600,"-month");
 		$h2=$h2.form_select("dec",365*24*3600,"-year");
 		$h2=$h2."</select>";
+		$h2=$h2."<select class=\"biginput\" name=\"inc\" onChange=\"submit()\">";
+		$h2=$h2.form_select("inc",0,S_INCREASE);
+		$h2=$h2.form_select("inc",3600,"+1h");
+		$h2=$h2.form_select("inc",4*3600,"+4h");
+		$h2=$h2.form_select("inc",24*3600,"+24h");
+		$h2=$h2.form_select("inc",7*24*3600,"+week");
+		$h2=$h2.form_select("inc",31*24*3600,"+month");
+		$h2=$h2.form_select("inc",365*24*3600,"+year");
+		$h2=$h2."</select>";
 		$h2=$h2."&nbsp;".S_MOVE."&nbsp;";
 		$h2=$h2."<select class=\"biginput\" name=\"left\" onChange=\"submit()\">";
-		$h2=$h2.form_select("left",3600,S_LEFT_DIR);
-		$h2=$h2.form_select("left",3600,"+1h");
-		$h2=$h2.form_select("left",4*3600,"+4h");
-		$h2=$h2.form_select("left",24*3600,"+24h");
-		$h2=$h2.form_select("left",7*24*3600,"+week");
-		$h2=$h2.form_select("left",31*24*3600,"+month");
-		$h2=$h2.form_select("left",365*24*3600,"+year");
+		$h2=$h2.form_select("left",0,S_LEFT_DIR);
+		$h2=$h2.form_select("left",1,"-1h");
+		$h2=$h2.form_select("left",4,"-4h");
+		$h2=$h2.form_select("left",24,"-24h");
+		$h2=$h2.form_select("left",7*24,"-week");
+		$h2=$h2.form_select("left",31*24,"-month");
+		$h2=$h2.form_select("left",365*24,"-year");
 		$h2=$h2."</select>";
 		$h2=$h2."<select class=\"biginput\" name=\"right\" onChange=\"submit()\">";
-		$h2=$h2.form_select("right",3600,S_RIGHT_DIR);
-		$h2=$h2.form_select("right",3600,"-1h");
-		$h2=$h2.form_select("right",4*3600,"-4h");
-		$h2=$h2.form_select("right",24*3600,"-24h");
-		$h2=$h2.form_select("right",7*24*3600,"-week");
-		$h2=$h2.form_select("right",31*24*3600,"-month");
-		$h2=$h2.form_select("right",365*24*3600,"-year");
+		$h2=$h2.form_select("right",0,S_RIGHT_DIR);
+		$h2=$h2.form_select("right",1,"+1h");
+		$h2=$h2.form_select("right",4,"+4h");
+		$h2=$h2.form_select("right",24,"+24h");
+		$h2=$h2.form_select("right",7*24,"+week");
+		$h2=$h2.form_select("right",31*24,"+month");
+		$h2=$h2.form_select("right",365*24,"+year");
 		$h2=$h2."</select>";
 		$h2=$h2."&nbsp;";
 		$h2=$h2."<input name=\"stime\" size=18 class=\"biginput\" value=\"yyyymmddhhmm\" size=12>";
 		$h2=$h2."&nbsp;";
 		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"action\" value=\"go\">";
+		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"reset\" value=\"reset\">";
 
 		if(isset($_GET["graphid"])&&($_GET["graphid"]!=0))
 		{
@@ -270,6 +297,14 @@
 		if(isset($_GET["action"]))
 		{
 			$h2=$h2."<input name=\"action\" type=\"hidden\" value=\"".$_GET["action"]."\" size=22>";
+		}
+		if(isset($_GET["from"]))
+		{
+			$h2=$h2."<input name=\"from\" type=\"hidden\" value=\"".$_GET["from"]."\" size=22>";
+		}
+		if(isset($_GET["fullscreen"]))
+		{
+			$h2=$h2."<input name=\"fullscreen\" type=\"hidden\" value=\"".$_GET["fullscreen"]."\" size=22>";
 		}
 
 		show_header2($h1,$h2,"<form name=\"form2\" method=\"get\" action=\"$url\">","</form>");

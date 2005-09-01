@@ -1271,6 +1271,10 @@ echo "</head>";
 		{
 			$sql="select clock,value from history where itemid=$itemid and clock>$from and clock<$till order by clock";
 		}
+		if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
+		{
+			$sql="select clock,value from history_log where itemid=$itemid and clock>$from and clock<$till order by clock";
+		}
 		else
 		{
 			$sql="select clock,value from history_str where itemid=$itemid and clock>$from and clock<$till order by clock";
