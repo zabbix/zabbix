@@ -78,6 +78,10 @@
 ?>
 
 <?php
+	navigation_bar_calc();
+?>
+
+<?php
 	if($_GET["action"]=="plaintext")
 	{
 		$from=mktime($_GET["fromhour"],$_GET["frommin"],0,$_GET["frommonth"],$_GET["fromday"],$_GET["fromyear"]);

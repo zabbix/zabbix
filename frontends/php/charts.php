@@ -36,12 +36,14 @@
 	{
 		show_header($page["title"],0,$nomenu);
 	}
+	navigation_bar_calc();
 
 ?>
 
 <?php
 	$_GET["hostid"]=@iif(isset($_GET["hostid"]),$_GET["hostid"],get_profile("web.latest.hostid",0));
 	update_profile("web.latest.hostid",$_GET["hostid"]);
+	update_profile("web.menu.view.last",$page["file"]);
 ?>
 
 <?php
