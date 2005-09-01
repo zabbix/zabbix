@@ -290,6 +290,10 @@
 		{
 			$h2=$h2."<input name=\"graphid\" type=\"hidden\" value=\"".$_GET["graphid"]."\" size=12>";
 		}
+		if(isset($_GET["screenid"])&&($_GET["screenid"]!=0))
+		{
+			$h2=$h2."<input name=\"screenid\" type=\"hidden\" value=\"".$_GET["screenid"]."\" size=12>";
+		}
 		if(isset($_GET["itemid"])&&($_GET["itemid"]!=0))
 		{
 			$h2=$h2."<input name=\"itemid\" type=\"hidden\" value=\"".$_GET["itemid"]."\" size=12>";
