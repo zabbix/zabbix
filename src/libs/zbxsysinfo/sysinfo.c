@@ -163,6 +163,12 @@ COMMAND	agent_commands[]=
 	{"file[*]"		,FS_FILE_EXISTS,	0, "/etc/passwd"},
 	{"filesize[*]"		,FS_FILE_SIZE, 		0, "/etc/passwd"},
 	{"md5sum[*]"		,0, 			FS_FILE_MD5SUM, "/etc/services"},
+	{"netloadin1[*]"	,NET_IF_IBYTES1,	0, "lo"},
+	{"netloadin5[*]"	,NET_IF_IBYTES5,	0, "lo"},
+	{"netloadin15[*]"	,NET_IF_IBYTES15,	0, "lo"},
+	{"netloadout1[*]"	,NET_IF_OBYTES1,	0, "lo"},
+	{"netloadout5[*]"	,NET_IF_OBYTES5, 	0, "lo"},
+	{"netloadout15[*]"	,NET_IF_OBYTES15,	0, "lo"},
 	{"swap[free]"		,SYSTEM_SWAP_FREE,	0, 0},
 	{"swap[total]"		,SYSTEM_SWAP_TOTAL,	0, 0},
 	{"system[procload]"	,SYSTEM_CPU_LOAD1, 	0, 0},
@@ -200,43 +206,30 @@ COMMAND	agent_commands[]=
 
 	{"inodetotal[*]"	,INODETOTAL, 		0, "/"},
 
-	{"fs.file.cksum[*]"	,FS_FILE_CKSUM,		0, "/etc/services"},
-	{"fs.file.md5sum[*]"	,0, 			FS_FILE_MD5SUM, "/etc/services"},
 	{"fs.file.atime[*]"	,FS_FILE_ATIME,		0, "/etc/passwd"},
+	{"fs.file.cksum[*]"	,FS_FILE_CKSUM,		0, "/etc/services"},
 	{"fs.file.ctime[*]"	,FS_FILE_CTIME,		0, "/etc/passwd"},
-	{"fs.file.mtime[*]"	,FS_FILE_MTIME,		0, "/etc/passwd"},
-
-	{"fs.file.size[*]"	,FS_FILE_SIZE, 		0, "/etc/passwd"},
 	{"fs.file.exists[*]"	,FS_FILE_EXISTS,	0, "/etc/passwd"},
+	{"fs.file.md5sum[*]"	,0, 			FS_FILE_MD5SUM, "/etc/services"},
+	{"fs.file.mtime[*]"	,FS_FILE_MTIME,		0, "/etc/passwd"},
+	{"fs.file.size[*]"	,FS_FILE_SIZE, 		0, "/etc/passwd"},
 
 	{"system.cpu.idle1"	,SYSTEM_CPU_IDLE1, 		0, 0},
 	{"system.cpu.idle5"	,SYSTEM_CPU_IDLE5, 		0, 0},
 	{"system.cpu.idle15"	,SYSTEM_CPU_IDLE15, 		0, 0},
-
 	{"system.cpu.nice1"	,SYSTEM_CPU_NICE1, 		0, 0},
 	{"system.cpu.nice5"	,SYSTEM_CPU_NICE5, 		0, 0},
 	{"system.cpu.nice15"	,SYSTEM_CPU_NICE15, 		0, 0},
-
 	{"system.cpu.sys1"	,SYSTEM_CPU_SYS1, 		0, 0},
 	{"system.cpu.sys5"	,SYSTEM_CPU_SYS5, 		0, 0},
 	{"system.cpu.sys15"	,SYSTEM_CPU_SYS15, 		0, 0},
-
 	{"system.cpu.user1"	,SYSTEM_CPU_USER1, 		0, 0},
 	{"system.cpu.user5"	,SYSTEM_CPU_USER5, 		0, 0},
 	{"system.cpu.user15"	,SYSTEM_CPU_USER15, 		0, 0},
 
-	{"netloadin1[*]"	,NET_IF_IBYTES1,	0, "lo"},
-	{"netloadin5[*]"	,NET_IF_IBYTES5,	0, "lo"},
-	{"netloadin15[*]"	,NET_IF_IBYTES15,	0, "lo"},
-
 	{"net.if.ibytes1[*]"	,NET_IF_IBYTES1,	0, "lo"},
 	{"net.if.ibytes5[*]"	,NET_IF_IBYTES5,	0, "lo"},
 	{"net.if.ibytes15[*]"	,NET_IF_IBYTES15,	0, "lo"},
-
-	{"netloadout1[*]"	,NET_IF_OBYTES1,	0, "lo"},
-	{"netloadout5[*]"	,NET_IF_OBYTES5, 	0, "lo"},
-	{"netloadout15[*]"	,NET_IF_OBYTES15,	0, "lo"},
-
 	{"net.if.obytes1[*]"	,NET_IF_OBYTES1,	0, "lo"},
 	{"net.if.obytes5[*]"	,NET_IF_OBYTES5,	0, "lo"},
 	{"net.if.obytes15[*]"	,NET_IF_OBYTES15,	0, "lo"},
