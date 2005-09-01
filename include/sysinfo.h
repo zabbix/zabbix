@@ -108,7 +108,7 @@ int	DISKWRITEOPS15(const char *cmd, const char *parameter,double  *value);
 int	DISKWRITEBLKS1(const char *cmd, const char *parameter,double  *value);
 int	DISKWRITEBLKS5(const char *cmd, const char *parameter,double  *value);
 int	DISKWRITEBLKS15(const char *cmd, const char *parameter,double  *value);
-int	PING(const char *cmd, const char *parameter,double  *value);
+int	AGENT_PING(const char *cmd, const char *parameter,double  *value);
 int	SHAREDMEM(const char *cmd, const char *parameter,double  *value);
 int	TOTALMEM(const char *cmd, const char *parameter,double  *value);
 int	PROCCNT(const char *cmd, const char *parameter,double  *value);
