@@ -169,6 +169,7 @@ COMMAND	agent_commands[]=
 	{"netloadout1[*]"	,NET_IF_OBYTES1,	0, "lo"},
 	{"netloadout5[*]"	,NET_IF_OBYTES5, 	0, "lo"},
 	{"netloadout15[*]"	,NET_IF_OBYTES15,	0, "lo"},
+	{"ping"			,AGENT_PING, 		0, 0},
 	{"swap[free]"		,SYSTEM_SWAP_FREE,	0, 0},
 	{"swap[total]"		,SYSTEM_SWAP_TOTAL,	0, 0},
 	{"system[procload]"	,SYSTEM_CPU_LOAD1, 	0, 0},
@@ -289,7 +290,7 @@ COMMAND	agent_commands[]=
 	{"system.uptime"	,SYSTEM_UPTIME,	0, 0},
 	{"system.users.num"	,EXECUTE, 	0,"who|wc -l"},
 
-	{"ping"			,PING, 		0, 0},
+	{"agent.ping"		,AGENT_PING, 		0, 0},
 /*	{"tcp_count"		,EXECUTE, 	0, "netstat -tn|grep EST|wc -l"}, */
 
 	{"net[listen_23]"	,TCP_LISTEN, 	0, "0017"},
@@ -1096,7 +1097,7 @@ int	KERNEL_MAXPROC(const char *cmd, const char *parameter,double  *value)
 #endif
 }
 
-int	PING(const char *cmd, const char *parameter,double  *value)
+int	AGENT_PING(const char *cmd, const char *parameter,double  *value)
 {
 	*value=1;
 	return SYSINFO_RET_OK;
