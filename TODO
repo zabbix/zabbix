@@ -54,15 +54,10 @@ END OF TELECENTRS
 
 dalee pozhelanija:
 
-9. u hosta "5 User defined fields (text or OID)". eto dlja togo chtob
-tehnicheskuju informaciju o hoste mozhno bilo derzhat' tam zhe. eto
-serial number/mesto polozhenija/etc.
-
 10. threads.
 
 OTHER:
 
- - configuration management. Add a page with hardware details for each host.
  - multi-institution support
 
  - improve removal of item related data from history
@@ -162,8 +157,6 @@ forum Open Discussion for more info.
  - infrastructure for reports
  - stacked graphs
 
- - disk size is not correct after evaluating macros in the message
- - fix evaluation of complex trigger expressions (diskpercentage)
  - check if alert and service alert is added after host become reachable again
 
 LATER:
@@ -185,7 +178,6 @@ latest trigger (item type  = TRAPPER)
  - when zabbix cannot evaluate expression it does not change status to UNKNOWN but adds ALARM (UNKNOWN) 
  - preset time for graphs
 
- - finish src/zabbix_snmptrapper
  - links to Zabbix frontend in alert emails
  - strings items for graphs
  - ability to add a library of  userwritten c-functions with dlopen/dlsym to
@@ -198,8 +190,6 @@ suckerd and agentd)
  - [10] IT Services. User view, show algorithm.
  - [10] BUG. When adding new service, service name is wrong.
  - [10] IT Services. SLA for a period of time only (09:00-18:00)
-
- - monitoring of Windows event log
 
 LS:
 
@@ -243,7 +233,6 @@ graphs:
 
 HP:
 
- - use profiles instead of passing parameters using POST
  - add threshold,min,max line for user-defined graphs
  - 
 Vel viens wishlists ir pie "IT Services", pielikt pie 
@@ -270,7 +259,6 @@ Vel viens wishlists ir pie "IT Services", pielikt pie
 
 LS:
 
- - daily weekly monthly graphs
  - detailed description for items
 
 TOP PRIORITY:
@@ -279,7 +267,6 @@ TOP PRIORITY:
  - pay attention to Solaris agent
  - add more checks for forms (check all possible wrong values)
  - support of fetch_html[*]
- - restructure sources
  - zabbix_agentd to support swap[*] and memory[*] onder AIX
 
 BUGS:
