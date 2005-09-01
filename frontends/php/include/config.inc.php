@@ -2359,7 +2359,7 @@ echo "</head>";
 
 	# Show History Graph
 
-	function	show_history($itemid,$from,$period,$diff)
+	function	show_history($itemid,$from,$period)
 	{
 		if (!isset($from))
 		{
@@ -2389,49 +2389,27 @@ echo "</head>";
 		echo "<TR BGCOLOR=#DDDDDD>";
 		echo "<TD ALIGN=CENTER>";
 
-		if($diff==0)
-		{
-			echo "<script language=\"JavaScript\">";
-			echo "if (navigator.appName == \"Microsoft Internet Explorer\")";
-			echo "{";
-			echo " document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&width=\"+(document.body.clientWidth-108)+\"'>\")";
-			echo "}";
-			echo "else if (navigator.appName == \"Netscape\")";
-			echo "{";
-			echo " document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&width=\"+(document.width-108)+\"'>\")";
-			echo "}";
-			echo "else";
-			echo "{";
-			echo " document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from'>\")";
-			echo "}";
-			echo "</script>";
-		}
-		else
-		{
-			echo "<script language=\"JavaScript\">";
-			echo "if (navigator.appName == \"Microsoft Internet Explorer\")";
-			echo "{";
-			echo " document.write(\"<IMG SRC='chart_diff.php?itemid=$itemid&period=$period&from=$from&width=\"+(document.body.clientWidth-108)+\"'>\")";
-			echo "}";
-			echo "else if (navigator.appName == \"Netscape\")";
-			echo "{";
-			echo " document.write(\"<IMG SRC='chart_diff.php?itemid=$itemid&period=$period&from=$from&width=\"+(document.width-108)+\"'>\")";
-			echo "}";
-			echo "else";
-			echo "{";
-			echo " document.write(\"<IMG SRC='chart_diff.php?itemid=$itemid&period=$period&from=$from'>\")";
-			echo "}";
-			echo "</script>";
-		}
+		echo "<script language=\"JavaScript\">";
+		echo "if (navigator.appName == \"Microsoft Internet Explorer\")";
+		echo "{";
+		echo " document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&width=\"+(document.body.clientWidth-108)+\"'>\")";
+		echo "}";
+		echo "else if (navigator.appName == \"Netscape\")";
+		echo "{";
+		echo " document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&width=\"+(document.width-108)+\"'>\")";
+		echo "}";
+		echo "else";
+		echo "{";
+		echo " document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from'>\")";
+		echo "}";
+		echo "</script>";
+
 		echo "</TD>";
 		echo "</TR>";
 		echo "</TABLE>";
 		echo "</center>";
-//		echo("<hr>");
+
 		navigation_bar("history.php");
-//		insert_time_navigator($itemid,$period,$from);
-		
-//		echo("<hr>");
 	}
 
 	# Show history

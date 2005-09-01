@@ -47,10 +47,6 @@
 			show_header("$host:$description",$beforenextcheck,0);
 		}
 	}
-	if($_GET["action"]=="showhistory2")
-	{
-		show_header("$host:$description",0,0);
-	}
 	if($_GET["action"]=="showvalues")
 	{
 		show_header("$host:$description",0,0);
@@ -107,7 +103,6 @@
 	$h2="<input class=\"biginput\" name=\"itemid\" type=\"hidden\" value=\"".$_GET["itemid"]."\">";
 	$h2=$h2."<select class=\"biginput\" name=\"action\" onChange=\"submit()\">";
 	$h2=$h2.form_select("action","showhistory",S_LAST_HOUR_GRAPH);
-	$h2=$h2.form_select("action","showhistory2",S_LAST_HOUR_GRAPH_DIFF);
 	$h2=$h2.form_select("action","showvalues",S_VALUES_OF_LAST_HOUR);
 	$h2=$h2.form_select("action","showfreehist",S_VALUES_OF_SPECIFIED_PERIOD);
 	$h2=$h2.form_select("action","showplaintxt",S_VALUES_IN_PLAIN_TEXT_FORMAT);
@@ -119,17 +114,13 @@
 <?php
 	if($_GET["action"]=="showfreehist")
 	{
-		if(!isset($_GET["period"]))
-		{
-			show_freehist($_GET["itemid"],$_GET["period"]);
-		} 
+		show_freehist($_GET["itemid"],$_GET["period"]);
 		exit;
- 
 	}
 
 	if($_GET["action"]=="showplaintxt")
 	{
-		if(!isset($_GET["period"]))
+//		if(!isset($_GET["period"]))
 		{
 			show_plaintxt($_GET["itemid"],$_GET["period"]);
 		} 
@@ -253,16 +244,8 @@
 		{
 			$_GET["from"]=($now-mktime($_GET["hour"], 0, 0, $_GET["month"], $_GET["day"],$_GET["year"]))/3600;
 		}
-		@show_history($_GET["itemid"],$_GET["from"],$_GET["period"],0);
+		@show_history($_GET["itemid"],$_GET["from"],$_GET["period"]);
 		show_footer();
 		exit;
 	}
-
-	if($_GET["action"]=="showhistory2")
-	{
-		@show_history($_GET["itemid"],$_GET["from"],$_GET["period"],1);
-		show_footer();
-		exit;
-	}
-
 ?>
