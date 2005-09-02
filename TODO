@@ -14,7 +14,6 @@
 ZABBIX 1.1:
 
  - execution of commands on monitored hosts in case of pre-defined events
- - audit log
  - anvanced SNMP trapper
  - add acknowledgements
 
