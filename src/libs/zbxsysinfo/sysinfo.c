@@ -163,8 +163,13 @@ COMMAND	agent_commands[]=
 	{"diskfree[*]"		,VFS_FS_FREE,		0, "/"},
 	{"disktotal[*]"		,VFS_FS_TOTAL,		0, "/"},
 	{"diskused[*]"		,VFS_FS_USED,		0, "/"},
+	{"diskfree_perc[*]"	,VFS_FS_PFREE,		0, "/"},
+	{"diskused_perc[*]"	,VFS_FS_PUSED,		0, "/"},
 	{"file[*]"		,VFS_FILE_EXISTS,	0, "/etc/passwd"},
 	{"filesize[*]"		,VFS_FILE_SIZE, 		0, "/etc/passwd"},
+	{"inodefree[*]"		,VFS_FS_INODE_FREE,	0, "/"},
+	{"inodetotal[*]"	,VFS_FS_INODE_TOTAL,	0, "/"},
+	{"inodefree_perc[*]"	,VFS_FS_INODE_PFREE,	0, "/"},
 	{"md5sum[*]"		,0, 			VFS_FILE_MD5SUM, "/etc/services"},
 	{"netloadin1[*]"	,NET_IF_IBYTES1,	0, "lo"},
 	{"netloadin5[*]"	,NET_IF_IBYTES5,	0, "lo"},
@@ -201,16 +206,12 @@ COMMAND	agent_commands[]=
 	{"vfs.fs.total[*]"	,VFS_FS_TOTAL,		0, "/"},
 	{"vfs.fs.used[*]"	,VFS_FS_USED,		0, "/"},
 
-	{"diskfree_perc[*]"	,VFS_FS_PFREE,		0, "/"},
-	{"diskused_perc[*]"	,VFS_FS_PUSED,		0, "/"},
 	{"vfs.fs.pfree[*]"	,VFS_FS_PFREE,		0, "/"},
 	{"vfs.fs.pused[*]"	,VFS_FS_PUSED,		0, "/"},
 
-	{"inodefree[*]"		,INODEFREE, 		0, "/"},
-
-	{"inodefree_perc[*]"	,INODEFREE_PERC,	0, "/"},
-
-	{"inodetotal[*]"	,INODETOTAL, 		0, "/"},
+	{"vfs.fs.inode.free[*]"	,VFS_FS_INODE_FREE,	0, "/"},
+	{"vfs.fs.inode.total[*]",VFS_FS_INODE_TOTAL,	0, "/"},
+	{"vfs.fs.inode.pfree[*]",VFS_FS_INODE_PFREE,	0, "/"},
 
 	{"vfs.file.atime[*]"	,VFS_FILE_ATIME,		0, "/etc/passwd"},
 	{"vfs.file.cksum[*]"	,VFS_FILE_CKSUM,		0, "/etc/services"},
