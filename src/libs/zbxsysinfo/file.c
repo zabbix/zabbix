@@ -82,7 +82,7 @@
 #include "common.h"
 #include "sysinfo.h"
 
-int	FS_FILE_SIZE(const char *cmd, const char *filename,double  *value)
+int	VFS_FILE_SIZE(const char *cmd, const char *filename,double  *value)
 {
 	struct stat	buf;
 
@@ -94,7 +94,7 @@ int	FS_FILE_SIZE(const char *cmd, const char *filename,double  *value)
 	return	SYSINFO_RET_FAIL;
 }
 
-int	FS_FILE_ATIME(const char *cmd, const char *filename,double  *value)
+int	VFS_FILE_ATIME(const char *cmd, const char *filename,double  *value)
 {
 	struct stat	buf;
 
@@ -106,7 +106,7 @@ int	FS_FILE_ATIME(const char *cmd, const char *filename,double  *value)
 	return	SYSINFO_RET_FAIL;
 }
 
-int	FS_FILE_CTIME(const char *cmd, const char *filename,double  *value)
+int	VFS_FILE_CTIME(const char *cmd, const char *filename,double  *value)
 {
 	struct stat	buf;
 
@@ -118,7 +118,7 @@ int	FS_FILE_CTIME(const char *cmd, const char *filename,double  *value)
 	return	SYSINFO_RET_FAIL;
 }
 
-int	FS_FILE_MTIME(const char *cmd, const char *filename,double  *value)
+int	VFS_FILE_MTIME(const char *cmd, const char *filename,double  *value)
 {
 	struct stat	buf;
 
@@ -130,7 +130,7 @@ int	FS_FILE_MTIME(const char *cmd, const char *filename,double  *value)
 	return	SYSINFO_RET_FAIL;
 }
 
-int	FS_FILE_EXISTS(const char *cmd, const char *filename,double  *value)
+int	VFS_FILE_EXISTS(const char *cmd, const char *filename,double  *value)
 {
 	struct stat	buf;
 
