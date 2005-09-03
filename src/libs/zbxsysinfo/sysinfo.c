@@ -170,6 +170,8 @@ COMMAND	agent_commands[]=
 	{"inodefree[*]"		,VFS_FS_INODE_FREE,	0, "/"},
 	{"inodetotal[*]"	,VFS_FS_INODE_TOTAL,	0, "/"},
 	{"inodefree_perc[*]"	,VFS_FS_INODE_PFREE,	0, "/"},
+	{"kern[maxfiles]"	,KERNEL_MAXFILES,	0, 0},
+	{"kern[maxproc]"	,KERNEL_MAXPROC, 	0, 0},
 	{"md5sum[*]"		,0, 			VFS_FILE_MD5SUM, "/etc/services"},
 	{"netloadin1[*]"	,NET_IF_IBYTES1,	0, "lo"},
 	{"netloadin5[*]"	,NET_IF_IBYTES5,	0, "lo"},
@@ -178,6 +180,7 @@ COMMAND	agent_commands[]=
 	{"netloadout5[*]"	,NET_IF_OBYTES5, 	0, "lo"},
 	{"netloadout15[*]"	,NET_IF_OBYTES15,	0, "lo"},
 	{"ping"			,AGENT_PING, 		0, 0},
+	{"proc_cnt[*]"		,PROC_NUM, 		0, "inetd"},
 	{"swap[free]"		,SYSTEM_SWAP_FREE,	0, 0},
 	{"swap[total]"		,SYSTEM_SWAP_TOTAL,	0, 0},
 	{"system[procload]"	,SYSTEM_CPU_LOAD1, 	0, 0},
@@ -189,10 +192,13 @@ COMMAND	agent_commands[]=
 	{"system[users]"	,EXECUTE, 	0,"who|wc -l"},
 	{"version[zabbix_agent]",	0, 		AGENT_VERSION, 0},
 /* New naming  */
-	{"kern[maxfiles]"	,KERNEL_MAXFILES,	0, 0},
-	{"kern[maxproc]"	,KERNEL_MAXPROC, 	0, 0},
 
-	{"proc_cnt[*]"		,PROCCNT, 		0, "inetd"},
+	{"agent.version",		0, 		AGENT_VERSION, 0},
+
+	{"kernel.maxfiles]"	,KERNEL_MAXFILES,	0, 0},
+	{"kernel.maxproc"	,KERNEL_MAXPROC, 	0, 0},
+
+	{"proc.num[*]"		,PROC_NUM, 		0, "inetd"},
 
 	{"memory[total]"	,TOTALMEM, 		0, 0},
 	{"memory[shared]"	,SHAREDMEM, 		0, 0},
@@ -200,7 +206,6 @@ COMMAND	agent_commands[]=
 	{"memory[cached]"	,CACHEDMEM, 		0, 0},
 	{"memory[free]"		,FREEMEM, 		0, 0},
 
-	{"agent.version",		0, 		AGENT_VERSION, 0},
 
 	{"vfs.fs.free[*]"	,VFS_FS_FREE,		0, "/"},
 	{"vfs.fs.total[*]"	,VFS_FS_TOTAL,		0, "/"},
@@ -772,7 +777,7 @@ crc_buf2(p, clen, cval)
 	return (0);
 }
 
-int	PROCCNT(const char *cmd, const char *procname,double  *value)
+int	PROC_NUM(const char *cmd, const char *procname,double  *value)
 {
 #ifdef	HAVE_PROC_0_PSINFO
 	DIR	*dir;

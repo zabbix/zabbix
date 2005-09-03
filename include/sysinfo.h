@@ -111,7 +111,7 @@ int	DISKWRITEBLKS15(const char *cmd, const char *parameter,double  *value);
 int	AGENT_PING(const char *cmd, const char *parameter,double  *value);
 int	SHAREDMEM(const char *cmd, const char *parameter,double  *value);
 int	TOTALMEM(const char *cmd, const char *parameter,double  *value);
-int	PROCCNT(const char *cmd, const char *parameter,double  *value);
+int	PROC_NUM(const char *cmd, const char *parameter,double  *value);
 int	PROCCOUNT(const char *cmd, const char *parameter,double  *value);
 
 int	SYSTEM_CPU_LOAD1(const char *cmd, const char *parameter,double  *value);
