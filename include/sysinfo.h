@@ -80,9 +80,9 @@ int	VFS_FILE_MTIME(const char *cmd, const char *filename,double  *value);
 int	VFS_FILE_SIZE(const char *cmd, const char *filename,double  *value);
 int	VFS_FILE_EXISTS(const char *cmd, const char *filename,double  *value);
 
-int	INODEFREE(const char *cmd, const char *mountPoint,double  *value);
-int	INODEFREE_PERC(const char *cmd, const char *mountPoint,double  *value);
-int	INODETOTAL(const char *cmd, const char *mountPoint,double  *value);
+int	VFS_FS_INODE_FREE(const char *cmd, const char *mountPoint,double  *value);
+int	VFS_FS_INODE_PFREE(const char *cmd, const char *mountPoint,double  *value);
+int	VFS_FS_INODE_TOTAL(const char *cmd, const char *mountPoint,double  *value);
 
 
 int	KERNEL_MAXFILES(const char *cmd, const char *parameter,double  *value);

@@ -51,7 +51,7 @@
 
 #include "md5.h"
 
-int	INODEFREE(const char *cmd, const char *mountPoint,double  *value)
+int	VFS_FS_INODE_FREE(const char *cmd, const char *mountPoint,double  *value)
 {
 #ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
@@ -94,7 +94,7 @@ int	INODEFREE(const char *cmd, const char *mountPoint,double  *value)
 #endif
 }
 
-int	INODETOTAL(const char *cmd, const char *mountPoint,double  *value)
+int	VFS_FS_INODE_TOTAL(const char *cmd, const char *mountPoint,double  *value)
 {
 #ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
@@ -137,17 +137,17 @@ int	INODETOTAL(const char *cmd, const char *mountPoint,double  *value)
 #endif
 }
 
-int	INODEFREE_PERC(const char *cmd, const char *mountPoint,double  *value)
+int	VFS_FS_INODE_PFREE(const char *cmd, const char *mountPoint,double  *value)
 {
 	double	total;
 	double	free;
 
-	if(SYSINFO_RET_OK != INODETOTAL(cmd, mountPoint, &total))
+	if(SYSINFO_RET_OK != VFS_FS_INODE_TOTAL(cmd, mountPoint, &total))
 	{
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(SYSINFO_RET_OK != INODEFREE(cmd, mountPoint, &free))
+	if(SYSINFO_RET_OK != VFS_FS_INODE_FREE(cmd, mountPoint, &free))
 	{
 		return SYSINFO_RET_FAIL;
 	}
