@@ -135,7 +135,7 @@
 #include "common.h"
 #include "sysinfo.h"
 
-int	CACHEDMEM(const char *cmd, const char *parameter,double  *value)
+int	VM_MEMORY_CACHED(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_PROC
 /* Get CACHED memory in bytes */
@@ -171,7 +171,7 @@ int	CACHEDMEM(const char *cmd, const char *parameter,double  *value)
 #endif
 }
 
-int	BUFFERSMEM(const char *cmd, const char *parameter,double  *value)
+int	VM_MEMORY_BUFFERS(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_SYSINFO_BUFFERRAM
 	struct sysinfo info;
@@ -194,7 +194,7 @@ int	BUFFERSMEM(const char *cmd, const char *parameter,double  *value)
 #endif
 }
 
-int	SHAREDMEM(const char *cmd, const char *parameter,double  *value)
+int	VM_MEMORY_SHARED(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_SYSINFO_SHAREDRAM
 	struct sysinfo info;
@@ -231,7 +231,7 @@ int	SHAREDMEM(const char *cmd, const char *parameter,double  *value)
 #endif
 }
 
-int	TOTALMEM(const char *cmd, const char *parameter,double  *value)
+int	VM_MEMORY_TOTAL(const char *cmd, const char *parameter,double  *value)
 {
 /* Solaris */
 #ifdef HAVE_UNISTD_SYSCONF
@@ -312,7 +312,7 @@ int	TOTALMEM(const char *cmd, const char *parameter,double  *value)
 #endif
 }
 
-int	FREEMEM(const char *cmd, const char *parameter,double  *value)
+int	VM_MEMORY_FREE(const char *cmd, const char *parameter,double  *value)
 {
 /* Solaris */
 #ifdef HAVE_UNISTD_SYSCONF
