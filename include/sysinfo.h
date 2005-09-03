@@ -59,11 +59,11 @@ int	SYSTEM_CPU_SYS1(const char *cmd, const char *parameter,double  *value);
 int	SYSTEM_CPU_SYS5(const char *cmd, const char *parameter,double  *value);
 int	SYSTEM_CPU_SYS15(const char *cmd, const char *parameter,double  *value);
 
-int	DISKTOTAL(const char *cmd, const char *mountPoint,double  *value);
-int	DISKFREE(const char *cmd, const char *mountPoint,double  *value);
-int	DISKUSED(const char *cmd, const char *mountPoint,double  *value);
-int	DISKFREE_PERC(const char *cmd, const char *mountPoint,double  *value);
-int	DISKUSED_PERC(const char *cmd, const char *mountPoint,double  *value);
+int	VFS_FS_TOTAL(const char *cmd, const char *mountPoint,double  *value);
+int	VFS_FS_FREE(const char *cmd, const char *mountPoint,double  *value);
+int	VFS_FS_USED(const char *cmd, const char *mountPoint,double  *value);
+int	VFS_FS_PFREE(const char *cmd, const char *mountPoint,double  *value);
+int	VFS_FS_PUSED(const char *cmd, const char *mountPoint,double  *value);
 
 int	DISK_IO(const char *cmd, const char *parameter,double  *value);
 int	DISK_RIO(const char *cmd, const char *parameter,double  *value);
@@ -72,13 +72,13 @@ int	DISK_RBLK(const char *cmd, const char *parameter,double  *value);
 int	DISK_WBLK(const char *cmd, const char *parameter,double  *value);
 int	FREEMEM(const char *cmd, const char *parameter,double  *value);
 
-int	FS_FILE_ATIME(const char *cmd, const char *filename,double  *value);
-int	FS_FILE_CKSUM(const char *cmd, const char *filename,double  *value);
-int	FS_FILE_CTIME(const char *cmd, const char *filename,double  *value);
-int	FS_FILE_MD5SUM(const char *cmd, const char *filename, char **value);
-int	FS_FILE_MTIME(const char *cmd, const char *filename,double  *value);
-int	FS_FILE_SIZE(const char *cmd, const char *filename,double  *value);
-int	FS_FILE_EXISTS(const char *cmd, const char *filename,double  *value);
+int	VFS_FILE_ATIME(const char *cmd, const char *filename,double  *value);
+int	VFS_FILE_CKSUM(const char *cmd, const char *filename,double  *value);
+int	VFS_FILE_CTIME(const char *cmd, const char *filename,double  *value);
+int	VFS_FILE_MD5SUM(const char *cmd, const char *filename, char **value);
+int	VFS_FILE_MTIME(const char *cmd, const char *filename,double  *value);
+int	VFS_FILE_SIZE(const char *cmd, const char *filename,double  *value);
+int	VFS_FILE_EXISTS(const char *cmd, const char *filename,double  *value);
 
 int	INODEFREE(const char *cmd, const char *mountPoint,double  *value);
 int	INODEFREE_PERC(const char *cmd, const char *mountPoint,double  *value);
