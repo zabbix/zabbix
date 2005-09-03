@@ -147,7 +147,7 @@ COMMAND	agent_commands[]=
 	{
 
 /* Outdated */
-	{"cksum[*]"		,FS_FILE_CKSUM, 	0, "/etc/services"},
+	{"cksum[*]"		,VFS_FILE_CKSUM, 	0, "/etc/services"},
 	{"cpu[idle1]"		,SYSTEM_CPU_IDLE1, 	0, 0},
 	{"cpu[idle5]"		,SYSTEM_CPU_IDLE5, 	0, 0},
 	{"cpu[idle15]"		,SYSTEM_CPU_IDLE15, 	0, 0},
@@ -160,9 +160,12 @@ COMMAND	agent_commands[]=
 	{"cpu[user1]"		,SYSTEM_CPU_USER1, 	0, 0},
 	{"cpu[user5]"		,SYSTEM_CPU_USER5, 	0, 0},
 	{"cpu[user15]"		,SYSTEM_CPU_USER15, 	0, 0},
-	{"file[*]"		,FS_FILE_EXISTS,	0, "/etc/passwd"},
-	{"filesize[*]"		,FS_FILE_SIZE, 		0, "/etc/passwd"},
-	{"md5sum[*]"		,0, 			FS_FILE_MD5SUM, "/etc/services"},
+	{"diskfree[*]"		,VFS_FS_FREE,		0, "/"},
+	{"disktotal[*]"		,VFS_FS_TOTAL,		0, "/"},
+	{"diskused[*]"		,VFS_FS_USED,		0, "/"},
+	{"file[*]"		,VFS_FILE_EXISTS,	0, "/etc/passwd"},
+	{"filesize[*]"		,VFS_FILE_SIZE, 		0, "/etc/passwd"},
+	{"md5sum[*]"		,0, 			VFS_FILE_MD5SUM, "/etc/services"},
 	{"netloadin1[*]"	,NET_IF_IBYTES1,	0, "lo"},
 	{"netloadin5[*]"	,NET_IF_IBYTES5,	0, "lo"},
 	{"netloadin15[*]"	,NET_IF_IBYTES15,	0, "lo"},
@@ -194,12 +197,14 @@ COMMAND	agent_commands[]=
 
 	{"agent.version",		0, 		AGENT_VERSION, 0},
 
-	{"diskfree[*]"		,DISKFREE,		0, "/"},
-	{"disktotal[*]"		,DISKTOTAL,		0, "/"},
-	{"diskused[*]"		,DISKUSED,		0, "/"},
+	{"vfs.fs.free[*]"	,VFS_FS_FREE,		0, "/"},
+	{"vfs.fs.total[*]"	,VFS_FS_TOTAL,		0, "/"},
+	{"vfs.fs.used[*]"	,VFS_FS_USED,		0, "/"},
 
-	{"diskfree_perc[*]"	,DISKFREE_PERC,		0, "/"},
-	{"diskused_perc[*]"	,DISKUSED_PERC,		0, "/"},
+	{"diskfree_perc[*]"	,VFS_FS_PFREE,		0, "/"},
+	{"diskused_perc[*]"	,VFS_FS_PUSED,		0, "/"},
+	{"vfs.fs.pfree[*]"	,VFS_FS_PFREE,		0, "/"},
+	{"vfs.fs.pused[*]"	,VFS_FS_PUSED,		0, "/"},
 
 	{"inodefree[*]"		,INODEFREE, 		0, "/"},
 
@@ -207,13 +212,13 @@ COMMAND	agent_commands[]=
 
 	{"inodetotal[*]"	,INODETOTAL, 		0, "/"},
 
-	{"fs.file.atime[*]"	,FS_FILE_ATIME,		0, "/etc/passwd"},
-	{"fs.file.cksum[*]"	,FS_FILE_CKSUM,		0, "/etc/services"},
-	{"fs.file.ctime[*]"	,FS_FILE_CTIME,		0, "/etc/passwd"},
-	{"fs.file.exists[*]"	,FS_FILE_EXISTS,	0, "/etc/passwd"},
-	{"fs.file.md5sum[*]"	,0, 			FS_FILE_MD5SUM, "/etc/services"},
-	{"fs.file.mtime[*]"	,FS_FILE_MTIME,		0, "/etc/passwd"},
-	{"fs.file.size[*]"	,FS_FILE_SIZE, 		0, "/etc/passwd"},
+	{"vfs.file.atime[*]"	,VFS_FILE_ATIME,		0, "/etc/passwd"},
+	{"vfs.file.cksum[*]"	,VFS_FILE_CKSUM,		0, "/etc/services"},
+	{"vfs.file.ctime[*]"	,VFS_FILE_CTIME,		0, "/etc/passwd"},
+	{"vfs.file.exists[*]"	,VFS_FILE_EXISTS,	0, "/etc/passwd"},
+	{"vfs.file.md5sum[*]"	,0, 			VFS_FILE_MD5SUM, "/etc/services"},
+	{"vfs.file.mtime[*]"	,VFS_FILE_MTIME,		0, "/etc/passwd"},
+	{"vfs.file.size[*]"	,VFS_FILE_SIZE, 		0, "/etc/passwd"},
 
 	{"system.cpu.idle1"	,SYSTEM_CPU_IDLE1, 		0, 0},
 	{"system.cpu.idle5"	,SYSTEM_CPU_IDLE5, 		0, 0},
@@ -584,7 +589,7 @@ int	process(char *command,char *value)
 
 /* MD5 sum calculation */
 
-int	FS_FILE_MD5SUM(const char *cmd, const char *filename, char **value)
+int	VFS_FILE_MD5SUM(const char *cmd, const char *filename, char **value)
 {
 	int	fd;
 	int	i,nr;
@@ -698,7 +703,7 @@ static u_long crctab[] = {
  * on failure.  Errno is set on failure.
  */
 
-int	FS_FILE_CKSUM(const char *cmd, const char *filename,double  *value)
+int	VFS_FILE_CKSUM(const char *cmd, const char *filename,double  *value)
 {
 	register u_char *p;
 	register int nr;

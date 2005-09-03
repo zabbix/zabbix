@@ -135,17 +135,17 @@
 #include "common.h"
 #include "sysinfo.h"
 
-int	DISKUSED_PERC(const char *cmd, const char *mountPoint,double  *value)
+int	VFS_FS_PUSED(const char *cmd, const char *mountPoint,double  *value)
 {
 	double	total;
 	double	used;
 
-	if(SYSINFO_RET_OK != DISKTOTAL(cmd, mountPoint, &total))
+	if(SYSINFO_RET_OK != VFS_FS_TOTAL(cmd, mountPoint, &total))
 	{
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(SYSINFO_RET_OK != DISKUSED(cmd, mountPoint, &used))
+	if(SYSINFO_RET_OK != VFS_FS_USED(cmd, mountPoint, &used))
 	{
 		return SYSINFO_RET_FAIL;
 	}
@@ -159,17 +159,17 @@ int	DISKUSED_PERC(const char *cmd, const char *mountPoint,double  *value)
 	return SYSINFO_RET_OK;
 }
 
-int	DISKFREE_PERC(const char *cmd, const char *mountPoint,double  *value)
+int	VFS_FS_PFREE(const char *cmd, const char *mountPoint,double  *value)
 {
 	double	total;
 	double	free;
 
-	if(SYSINFO_RET_OK != DISKTOTAL(cmd, mountPoint, &total))
+	if(SYSINFO_RET_OK != VFS_FS_TOTAL(cmd, mountPoint, &total))
 	{
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(SYSINFO_RET_OK != DISKFREE(cmd, mountPoint, &free))
+	if(SYSINFO_RET_OK != VFS_FS_FREE(cmd, mountPoint, &free))
 	{
 		return SYSINFO_RET_FAIL;
 	}
@@ -183,7 +183,7 @@ int	DISKFREE_PERC(const char *cmd, const char *mountPoint,double  *value)
 	return SYSINFO_RET_OK;
 }
 
-int	DISKFREE(const char *cmd, const char *mountPoint,double  *value)
+int	VFS_FS_FREE(const char *cmd, const char *mountPoint,double  *value)
 {
 #ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
@@ -228,7 +228,7 @@ int	DISKFREE(const char *cmd, const char *mountPoint,double  *value)
 #endif
 }
 
-int	DISKUSED(const char *cmd, const char *mountPoint,double  *value)
+int	VFS_FS_USED(const char *cmd, const char *mountPoint,double  *value)
 {
 #ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
@@ -273,7 +273,7 @@ int	DISKUSED(const char *cmd, const char *mountPoint,double  *value)
 #endif
 }
 
-int	DISKTOTAL(const char *cmd, const char *mountPoint,double  *value)
+int	VFS_FS_TOTAL(const char *cmd, const char *mountPoint,double  *value)
 {
 #ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
