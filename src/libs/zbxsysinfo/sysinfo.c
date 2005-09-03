@@ -173,6 +173,11 @@ COMMAND	agent_commands[]=
 	{"kern[maxfiles]"	,KERNEL_MAXFILES,	0, 0},
 	{"kern[maxproc]"	,KERNEL_MAXPROC, 	0, 0},
 	{"md5sum[*]"		,0, 			VFS_FILE_MD5SUM, "/etc/services"},
+	{"memory[buffers]"	,VM_MEMORY_BUFFERS,	0, 0},
+	{"memory[cached]"	,VM_MEMORY_CACHED, 	0, 0},
+	{"memory[free]"		,VM_MEMORY_FREE, 	0, 0},
+	{"memory[shared]"	,VM_MEMORY_SHARED, 	0, 0},
+	{"memory[total]"	,VM_MEMORY_TOTAL,	0, 0},
 	{"netloadin1[*]"	,NET_IF_IBYTES1,	0, "lo"},
 	{"netloadin5[*]"	,NET_IF_IBYTES5,	0, "lo"},
 	{"netloadin15[*]"	,NET_IF_IBYTES15,	0, "lo"},
@@ -200,12 +205,11 @@ COMMAND	agent_commands[]=
 
 	{"proc.num[*]"		,PROC_NUM, 		0, "inetd"},
 
-	{"memory[total]"	,TOTALMEM, 		0, 0},
-	{"memory[shared]"	,SHAREDMEM, 		0, 0},
-	{"memory[buffers]"	,BUFFERSMEM, 		0, 0},
-	{"memory[cached]"	,CACHEDMEM, 		0, 0},
-	{"memory[free]"		,FREEMEM, 		0, 0},
-
+	{"vm.memory.total"	,VM_MEMORY_TOTAL,	0, 0},
+	{"vm.memory.shared"	,VM_MEMORY_SHARED,	0, 0},
+	{"vm.memory.buffers"	,VM_MEMORY_BUFFERS,	0, 0},
+	{"vm.memory.cached"	,VM_MEMORY_CACHED, 	0, 0},
+	{"vm.memory.free"	,VM_MEMORY_FREE, 	0, 0},
 
 	{"vfs.fs.free[*]"	,VFS_FS_FREE,		0, "/"},
 	{"vfs.fs.total[*]"	,VFS_FS_TOTAL,		0, "/"},

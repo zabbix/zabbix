@@ -43,8 +43,8 @@ void    add_user_parameter(char *key,char *command);
 void	test_parameters(void);
 int	getPROC(char *file,int lineno,int fieldno, double *value);
 
-int	BUFFERSMEM(const char *cmd, const char *parameter,double  *value);
-int	CACHEDMEM(const char *cmd, const char *parameter,double  *value);
+int	VM_MEMORY_BUFFERS(const char *cmd, const char *parameter,double  *value);
+int	VM_MEMORY_CACHED(const char *cmd, const char *parameter,double  *value);
 
 int	SYSTEM_CPU_IDLE1(const char *cmd, const char *parameter,double  *value);
 int	SYSTEM_CPU_IDLE5(const char *cmd, const char *parameter,double  *value);
@@ -70,7 +70,7 @@ int	DISK_RIO(const char *cmd, const char *parameter,double  *value);
 int	DISK_WIO(const char *cmd, const char *parameter,double  *value);
 int	DISK_RBLK(const char *cmd, const char *parameter,double  *value);
 int	DISK_WBLK(const char *cmd, const char *parameter,double  *value);
-int	FREEMEM(const char *cmd, const char *parameter,double  *value);
+int	VM_MEMORY_FREE(const char *cmd, const char *parameter,double  *value);
 
 int	VFS_FILE_ATIME(const char *cmd, const char *filename,double  *value);
 int	VFS_FILE_CKSUM(const char *cmd, const char *filename,double  *value);
@@ -109,8 +109,8 @@ int	DISKWRITEBLKS1(const char *cmd, const char *parameter,double  *value);
 int	DISKWRITEBLKS5(const char *cmd, const char *parameter,double  *value);
 int	DISKWRITEBLKS15(const char *cmd, const char *parameter,double  *value);
 int	AGENT_PING(const char *cmd, const char *parameter,double  *value);
-int	SHAREDMEM(const char *cmd, const char *parameter,double  *value);
-int	TOTALMEM(const char *cmd, const char *parameter,double  *value);
+int	VM_MEMORY_SHARED(const char *cmd, const char *parameter,double  *value);
+int	VM_MEMORY_TOTAL(const char *cmd, const char *parameter,double  *value);
 int	PROC_NUM(const char *cmd, const char *parameter,double  *value);
 int	PROCCOUNT(const char *cmd, const char *parameter,double  *value);
 
