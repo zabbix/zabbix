@@ -412,7 +412,7 @@ int	send_value(char *server,int port,char *host, char *key,char *value,char *las
 			   char *timestamp, char *source, char *severity)
 {
 	int	i,s;
-	char	tosend[1024];
+	char	tosend[4*MAX_STRING_LEN];
 	char	result[1024];
 	char	tmp[1024];
 	struct hostent *hp;
@@ -466,8 +466,15 @@ int	send_value(char *server,int port,char *host, char *key,char *value,char *las
 		closesocket(s);
 		return	FAIL;
 	}
-
+//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","send_value: 1");
 	comms_create_request(host,key,value,lastlogsize,timestamp,source,severity,tosend,sizeof(tosend)-1);
+
+//	i=strlen(tosend);
+//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",i);
+
+//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tosend);
+
+//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","send_value: 2");
 //	sprintf(tosend,"%s:%s\n",shortname,value);
 
 //				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tosend);
@@ -481,9 +488,11 @@ sprintf(tmp,"Error in sendto()");
 		closesocket(s);
 		return	FAIL;
 	} 
+//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","send_value: 3");
 	i=sizeof(struct sockaddr_in);
 /*	i=recvfrom(s,result,1023,0,(struct sockaddr *)&servaddr_in,(size_t *)&i);*/
 	i=recvfrom(s,result,1023,0,(struct sockaddr *)&servaddr_in,(int *)&i);
+//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","send_value: 4");
 	if(s==-1)
 	{
 //		zabbix_log( LOG_LEVEL_WARNING, "Error in recvfrom() [%s:%d] [%s]",server,port, strerror(errno));
@@ -494,7 +503,9 @@ sprintf(tmp,"Error in recvfrom()");
 		return	FAIL;
 	}
 
+//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","send_value: 5");
 	result[i-1]=0;
+//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","send_value: 6");
 
 	if(strcmp(result,"OK") == 0)
 	{
@@ -533,7 +544,7 @@ int	process_active_checks(char *server, int port)
 	char	c[MAX_STRING_LEN];
 	char	*filename;
 
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_active_checks: start");
+//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pac: start");
 	now=time(NULL);
 
 	for(i=0;;i++)
@@ -560,12 +571,21 @@ int	process_active_checks(char *server, int port)
 //				zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
 //				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",shortname);
 
+//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pac: 1");
 				sprintf(lastlogsize,"%d",metrics[i].lastlogsize);
+//				for(int j=0;j<=MAX_STRING_LEN;j++)
+//				{
+//					value[j]='0';
+//				}
+//				value[MAX_STRING_LEN]=0;
+//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pac: 2");
+//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",value);
 				if(send_value(server,port,confHostname,metrics[i].key, value, lastlogsize,timestamp,source,severity) == FAIL)
 				{
 					ret = FAIL;
 					break;
 				}
+//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pac: 3");
 				if(strcmp(value,"ZBX_NOTSUPPORTED\n")==0)
 				{
 					metrics[i].status=ITEM_STATUS_NOTSUPPORTED;
@@ -593,10 +613,10 @@ int	process_active_checks(char *server, int port)
 //				sprintf(shortname, "%s:%s",confHostname,metrics[i].key);
 //				zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
 
-				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pac:in loop()");
-				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",value);
+//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pac:in loop()");
+//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",value);
 
-				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pac:3");
+//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pac:3");
 				sprintf(lastlogsize,"%d",metrics[i].lastlogsize);
 				if(send_value(server,port,confHostname,metrics[i].key,value,lastlogsize,timestamp,source,severity) == FAIL)
 				{
@@ -610,10 +630,10 @@ int	process_active_checks(char *server, int port)
 					break;
 				}
 				count++;
-				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pac: end of loop()");
+//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pac: end of loop()");
 				/* Do not flood ZABBIX server if file grows too fast */
 				if(count >= MAX_LINES_PER_SECOND*metrics[i].refresh)	break;
-				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pac: 4");
+//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pac: 4");
 			}
 		}
 		else
