@@ -1,15 +1,14 @@
 body
 {
         background-color:#e5e5e5;
-#        background-color:#778899;
-#        margin: 3px 3px 3px 3px;
+        margin: 3px 3px 3px 3px;
         margin: 0px 0px 0px 0px;
         padding: 0px;
         color:black;
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:10px;
 	text-decoration: none;
-        line-height:16px;
+       line-height:16px;
 }
 
 form {margin: 0px}
@@ -19,8 +18,6 @@ td.form_row_l
 	color: #000000;
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:11px;
-#	font-weight: bold;
-#	border-color: #888888;
 	border-color: #222255;
 	border-width:1px;
 	border-left-style: solid;
@@ -32,7 +29,6 @@ td.form_row_r
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:11px;
 	border-color: #222255;
-#	border-color: #888888;
 	border-width:1px;
 	border-right-style: solid;
 }
@@ -44,9 +40,7 @@ td.form_row_first
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:11px;
 	font-weight: bold;
-#	background-color: #6d88ad;
 	border-color: #222255;
-#	border-color: #888888;
 	border-width:1px;
 	border-top-style: solid;
 	border-left-style: solid;
@@ -59,10 +53,8 @@ td.form_row_last
 	color: #FFFFFF;
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:11px;
-#	background-color: #6d88ad;
 	background: #5C7099 url(images/gradients/table_head2.gif) repeat-x top left;
 	border-color: #222255;
-#	border-color: #888888;
 	border-width:1px;
 	border-top-style: solid;
 	border-left-style: solid;
@@ -91,10 +83,6 @@ td.horizontal_menu
 	color: #FFFFFF;
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:10px;
-#	background-color: #6d88ad;
-#	background-color: #778899;
-#	background-color: #42429C;
-#	background-color: #4d688d;
 	background: #5C7099 url(images/gradients/table_head.gif) repeat-x top left;
 	border-color: #000000;
 	border-width:0px;
@@ -332,7 +320,6 @@ img.bottom
 	border: solid;
 	border-width: 1px;
 	border-color: gray;
-#	background-color: #dddddd;
 	background: gray url(images/gradients/button.gif) repeat-x top left;
 	margin-right:5px;
 }
