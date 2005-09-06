@@ -477,7 +477,6 @@ int	main(int argc, char **argv)
 	{
 		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
 	}
-	zabbix_log( LOG_LEVEL_CRIT, "Hostname [%s]", CONFIG_HOSTNAME);
 
 	if( FAIL == create_pid_file(CONFIG_PID_FILE))
 	{
