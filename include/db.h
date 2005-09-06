@@ -263,7 +263,7 @@ int	DBadd_alert(int actionid, int mediatypeid, char *sendto, char *subject, char
 void	DBupdate_triggers_status_after_restart(void);
 int	DBget_prev_trigger_value(int triggerid);
 /*int	DBupdate_trigger_value(int triggerid,int value,int clock);*/
-int     DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now);
+int     DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *reason);
 int     DBget_default_escalation_id();
 
 int	DBget_items_count(void);
