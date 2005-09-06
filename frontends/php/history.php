@@ -51,6 +51,10 @@
 	{
 		show_header("$host:$description",0,0);
 	}
+	if($_GET["action"]=="showlatest")
+	{
+		show_header("$host:$description",0,0);
+	}
 	if($_GET["action"]=="showfreehist")
 	{
 		show_header("$host:$description",0,0);
@@ -104,6 +108,7 @@
 	$h2=$h2."<select class=\"biginput\" name=\"action\" onChange=\"submit()\">";
 	$h2=$h2.form_select("action","showhistory",S_LAST_HOUR_GRAPH);
 	$h2=$h2.form_select("action","showvalues",S_VALUES_OF_LAST_HOUR);
+	$h2=$h2.form_select("action","showlatest",S_500_LATEST_VALUES);
 	$h2=$h2.form_select("action","showfreehist",S_VALUES_OF_SPECIFIED_PERIOD);
 	$h2=$h2.form_select("action","showplaintxt",S_VALUES_IN_PLAIN_TEXT_FORMAT);
 	$h2=$h2."</select>";
@@ -245,6 +250,95 @@
 			$_GET["from"]=($now-mktime($_GET["hour"], 0, 0, $_GET["month"], $_GET["day"],$_GET["year"]))/3600;
 		}
 		@show_history($_GET["itemid"],$_GET["from"],$_GET["period"]);
+		show_footer();
+		exit;
+	}
+
+	if($_GET["action"]=="showlatest")
+	{
+
+		table_begin();
+		$item=get_item_by_itemid($_GET["itemid"]);
+
+		if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
+		{
+			table_header(array(S_TIMESTAMP, S_LOCAL, S_SOURCE, S_SEVERITY, S_VALUE));
+		}
+		else
+		{
+			table_header(array(S_TIMESTAMP, S_VALUE));
+		}
+
+		if($item["value_type"]==ITEM_VALUE_TYPE_FLOAT)
+		{
+			$sql="select clock,value from history where itemid=".$_GET["itemid"]." order by clock desc limit 500";
+		}
+		else if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
+		{
+			$sql="select clock,value,timestamp,source,severity from history_log where itemid=".$_GET["itemid"]." order by id desc, clock desc limit 500";
+		}
+		else
+		{
+			$sql="select clock,value from history_str where itemid=".$_GET["itemid"]." order by clock desc limit 500";
+		}
+		$result=DBselect($sql);
+		$col=0;
+		while($row=DBfetch($result))
+		{
+			$clock=$row["clock"];
+			$clock=date("Y.M.d H:i:s",$row["clock"]);
+			$value=$row["value"];
+
+			if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
+			{
+				$local=$row["timestamp"];
+				$source=$row["source"];
+				$severity=$row["severity"];
+
+				if($local==0)
+				{
+					$local="&nbsp";
+				}
+				{
+					$local=date("Y.M.d H:i:s",$local);
+				}
+
+		                if($severity==0)         $severity=S_NOT_CLASSIFIED;
+		                elseif($severity==1)     $severity=S_INFORMATION;
+		                elseif($severity==2)     $severity=S_WARNING;
+		                elseif($severity==3)     $severity=array("value"=>S_AVERAGE,"class"=>"average");
+		                elseif($severity==4)     $severity=array("value"=>S_HIGH,"class"=>"high");
+		                elseif($severity==5)     $severity=array("value"=>S_DISASTER,"class"=>"disaster");
+		                elseif($severity==6)     $severity=S_AUDIT_SUCCESS;
+		                elseif($severity==7)     $severity=S_AUDIT_FAILURE;
+
+			}
+			if($item["value_type"]!=ITEM_VALUE_TYPE_FLOAT)
+			{
+				$value="<pre>".htmlspecialchars($value)."</pre>";
+			}
+			if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
+			{
+				table_row(array(
+					$clock,
+					$local,
+					$source,
+					$severity,
+					$value
+		                        ),
+	                        $col++);
+			}
+			else
+			{
+				table_row(array(
+					$clock,
+					$value
+		                        ),
+	                        $col++);
+			}
+		}
+		table_end();
+ 
 		show_footer();
 		exit;
 	}
