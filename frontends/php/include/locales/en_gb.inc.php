@@ -359,6 +359,7 @@
 	"S_ITEMS_ACTIVATED"=>			"Items activated",
 	"S_CANNOT_ACTIVATE_ITEMS"=>		"Cannot activate items",
 	"S_ITEMS_DISABLED"=>			"Items disabled",
+	"S_CANNOT_DISABLE_ITEMS"=>		"Cannot disable items",
 	"S_KEY"=>				"Key",
 	"S_DESCRIPTION"=>			"Description",
 	"S_UPDATE_INTERVAL"=>			"Update interval",

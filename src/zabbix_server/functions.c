@@ -378,7 +378,10 @@ void	calc_timestamp(char *line,int *timestamp, char *format)
 	int hh=0,mm=0,ss=0,yyyy=0,dd=0,MM=0;
 	int hhc=0,mmc=0,ssc=0,yyyyc=0,ddc=0,MMc=0;
 	int i,num;
-	struct  tm      *tm;
+	struct  tm      tm;
+	time_t t;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In calc_timestamp()");
 
 	hh=mm=ss=yyyy=dd=MM=0;
 
@@ -389,42 +392,51 @@ void	calc_timestamp(char *line,int *timestamp, char *format)
 
 		switch ((char) format[i]) {
 			case 'h':
-				hh=hh+hhc*num;
+				hh=10*hh+num;
 				hhc++;
 				break;
 			case 'm':
-				mm=mm+mmc*num;
+				mm=10*mm+num;
 				mmc++;
 				break;
 			case 's':
-				ss=ss+ssc*num;
+				ss=10*ss+num;
 				ssc++;
 				break;
 			case 'y':
-				yyyy=yyyy+yyyyc*num;
+				yyyy=10*yyyy+num;
 				yyyyc++;
 				break;
 			case 'd':
-				dd=dd+ddc*num;
+				dd=10*dd+num;
 				ddc++;
 				break;
 			case 'M':
-				MM=MM+MMc*num;
+				MM=10*MM+num;
 				MMc++;
 				break;
 		}
 	}
 
+	zabbix_log( LOG_LEVEL_DEBUG, "hh [%d] mm [%d] ss [%d] yyyy [%d] dd [%d] MM [%d]",hh,mm,ss,yyyy,dd,MM);
+
 	if(hh!=0&&mm!=0&&ss!=0&&yyyy!=0&&dd!=0&&MM!=0)
 	{
-		tm->tm_sec=ss;
-		tm->tm_min=mm;
-		tm->tm_hour=hh;
-		tm->tm_mday=dd;
-		tm->tm_mon=MM;
-		tm->tm_year=yyyy;
-		*timestamp=mktime(tm);
+		tm.tm_sec=ss;
+		tm.tm_min=mm;
+		tm.tm_hour=hh;
+		tm.tm_mday=dd;
+		tm.tm_mon=MM;
+		tm.tm_year=yyyy-1900;
+
+		t=mktime(&tm);
+		if(t>0)
+		{
+			*timestamp=t;
+		}
 	}
+	zabbix_log( LOG_LEVEL_DEBUG, "end timestamp [%d]", t);
+	zabbix_log( LOG_LEVEL_DEBUG, "end timestamp [%d]", *timestamp);
 }
 
 /******************************************************************************
