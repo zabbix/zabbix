@@ -63,14 +63,14 @@
 		{
 			if($_GET["action"]=="add to group")
 			{
-				$itemid=add_item_to_group($_GET["groupid"],$_GET["description"],$_GET["key"],$_GET["hostid"],$_GET["delay"],$_GET["history"],$_GET["status"],$_GET["type"],$_GET["snmp_community"],$_GET["snmp_oid"],$_GET["value_type"],$_GET["trapper_hosts"],$_GET["snmp_port"],$_GET["units"],$_GET["multiplier"],$_GET["delta"],$_GET["snmpv3_securityname"],$_GET["snmpv3_securitylevel"],$_GET["snmpv3_authpassphrase"],$_GET["snmpv3_privpassphrase"],$_GET["formula"],$_GET["trends"]);
+				$itemid=add_item_to_group($_GET["groupid"],$_GET["description"],$_GET["key"],$_GET["hostid"],$_GET["delay"],$_GET["history"],$_GET["status"],$_GET["type"],$_GET["snmp_community"],$_GET["snmp_oid"],$_GET["value_type"],$_GET["trapper_hosts"],$_GET["snmp_port"],$_GET["units"],$_GET["multiplier"],$_GET["delta"],$_GET["snmpv3_securityname"],$_GET["snmpv3_securitylevel"],$_GET["snmpv3_authpassphrase"],$_GET["snmpv3_privpassphrase"],$_GET["formula"],$_GET["trends"],$_GET["logtimefmt"]);
 				show_messages($itemid, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 				unset($_GET["itemid"]);
 				unset($itemid);
 			}
 			if($_GET["action"]=="update in group")
 			{
-				$result=update_item_in_group($_GET["groupid"],$_GET["itemid"],$_GET["description"],$_GET["key"],$_GET["hostid"],$_GET["delay"],$_GET["history"],$_GET["status"],$_GET["type"],$_GET["snmp_community"],$_GET["snmp_oid"],$_GET["value_type"],$_GET["trapper_hosts"],$_GET["snmp_port"],$_GET["units"],$_GET["multiplier"],$_GET["delta"],$_GET["snmpv3_securityname"],$_GET["snmpv3_securitylevel"],$_GET["snmpv3_authpassphrase"],$_GET["snmpv3_privpassphrase"],$_GET["formula"],$_GET["trends"]);
+				$result=update_item_in_group($_GET["groupid"],$_GET["itemid"],$_GET["description"],$_GET["key"],$_GET["hostid"],$_GET["delay"],$_GET["history"],$_GET["status"],$_GET["type"],$_GET["snmp_community"],$_GET["snmp_oid"],$_GET["value_type"],$_GET["trapper_hosts"],$_GET["snmp_port"],$_GET["units"],$_GET["multiplier"],$_GET["delta"],$_GET["snmpv3_securityname"],$_GET["snmpv3_securitylevel"],$_GET["snmpv3_authpassphrase"],$_GET["snmpv3_privpassphrase"],$_GET["formula"],$_GET["trends"],$_GET["logtimefmt"]);
 				show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 				unset($_GET["itemid"]);
 			}
@@ -83,7 +83,7 @@
 		}
 		if($_GET["register"]=="update")
 		{
-			$result=update_item($_GET["itemid"],$_GET["description"],$_GET["key"],$_GET["hostid"],$_GET["delay"],$_GET["history"],$_GET["status"],$_GET["type"],$_GET["snmp_community"],$_GET["snmp_oid"],$_GET["value_type"],$_GET["trapper_hosts"],$_GET["snmp_port"],$_GET["units"],$_GET["multiplier"],$_GET["delta"],$_GET["snmpv3_securityname"],$_GET["snmpv3_securitylevel"],$_GET["snmpv3_authpassphrase"],$_GET["snmpv3_privpassphrase"],$_GET["formula"],$_GET["trends"]);
+			$result=update_item($_GET["itemid"],$_GET["description"],$_GET["key"],$_GET["hostid"],$_GET["delay"],$_GET["history"],$_GET["status"],$_GET["type"],$_GET["snmp_community"],$_GET["snmp_oid"],$_GET["value_type"],$_GET["trapper_hosts"],$_GET["snmp_port"],$_GET["units"],$_GET["multiplier"],$_GET["delta"],$_GET["snmpv3_securityname"],$_GET["snmpv3_securitylevel"],$_GET["snmpv3_authpassphrase"],$_GET["snmpv3_privpassphrase"],$_GET["formula"],$_GET["trends"],$_GET["logtimefmt"]);
 			update_item_in_templates($_GET["itemid"]);
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 //			unset($itemid);
@@ -96,7 +96,7 @@
 		}
 		if($_GET["register"]=="add")
 		{
-			$itemid=add_item($_GET["description"],$_GET["key"],$_GET["hostid"],$_GET["delay"],$_GET["history"],$_GET["status"],$_GET["type"],$_GET["snmp_community"],$_GET["snmp_oid"],$_GET["value_type"],$_GET["trapper_hosts"],$_GET["snmp_port"],$_GET["units"],$_GET["multiplier"],$_GET["delta"],$_GET["snmpv3_securityname"],$_GET["snmpv3_securitylevel"],$_GET["snmpv3_authpassphrase"],$_GET["snmpv3_privpassphrase"],$_GET["formula"],$_GET["trends"]);
+			$itemid=add_item($_GET["description"],$_GET["key"],$_GET["hostid"],$_GET["delay"],$_GET["history"],$_GET["status"],$_GET["type"],$_GET["snmp_community"],$_GET["snmp_oid"],$_GET["value_type"],$_GET["trapper_hosts"],$_GET["snmp_port"],$_GET["units"],$_GET["multiplier"],$_GET["delta"],$_GET["snmpv3_securityname"],$_GET["snmpv3_securitylevel"],$_GET["snmpv3_authpassphrase"],$_GET["snmpv3_privpassphrase"],$_GET["formula"],$_GET["trends"],$_GET["logtimefmt"]);
 			add_item_to_linked_hosts($itemid);
 			show_messages($itemid, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 			unset($_GET["itemid"]);
@@ -109,7 +109,7 @@
 			$hosts_notok="";
 			while($row=DBfetch($result))
 			{
-				$result2=add_item($_GET["description"],$_GET["key"],$row["hostid"],$_GET["delay"],$_GET["history"],$_GET["status"],$_GET["type"],$_GET["snmp_community"],$_GET["snmp_oid"],$_GET["value_type"],$_GET["trapper_hosts"],$_GET["snmp_port"],$_GET["units"],$_GET["multiplier"],$_GET["delta"],$_GET["snmpv3_securityname"],$_GET["snmpv3_securitylevel"],$_GET["snmpv3_authpassphrase"],$_GET["snmpv3_privpassphrase"],$_GET["formula"],$_GET["trends"]);
+				$result2=add_item($_GET["description"],$_GET["key"],$row["hostid"],$_GET["delay"],$_GET["history"],$_GET["status"],$_GET["type"],$_GET["snmp_community"],$_GET["snmp_oid"],$_GET["value_type"],$_GET["trapper_hosts"],$_GET["snmp_port"],$_GET["units"],$_GET["multiplier"],$_GET["delta"],$_GET["snmpv3_securityname"],$_GET["snmpv3_securitylevel"],$_GET["snmpv3_authpassphrase"],$_GET["snmpv3_privpassphrase"],$_GET["formula"],$_GET["trends"],$_GET["logtimefmt"]);
 				if($result2)
 				{
 					$hosts_ok=$hosts_ok." ".$row["host"];
