@@ -373,6 +373,60 @@ void	update_triggers(int itemid)
 	DBfree_result(result);
 }
 
+void	calc_timestamp(char *line,int *timestamp, char *format)
+{
+	int hh=0,mm=0,ss=0,yyyy=0,dd=0,MM=0;
+	int hhc=0,mmc=0,ssc=0,yyyyc=0,ddc=0,MMc=0;
+	int i,num;
+	struct  tm      *tm;
+
+	hh=mm=ss=yyyy=dd=MM=0;
+
+	for(i=0;(format[i]!=0)&&(line[i]!=0);i++)
+	{
+		if(isdigit(line[i])==0)	continue;
+		num=(int)line[i]-48;
+
+		switch ((char) format[i]) {
+			case 'h':
+				hh=hh+hhc*num;
+				hhc++;
+				break;
+			case 'm':
+				mm=mm+mmc*num;
+				mmc++;
+				break;
+			case 's':
+				ss=ss+ssc*num;
+				ssc++;
+				break;
+			case 'y':
+				yyyy=yyyy+yyyyc*num;
+				yyyyc++;
+				break;
+			case 'd':
+				dd=dd+ddc*num;
+				ddc++;
+				break;
+			case 'M':
+				MM=MM+MMc*num;
+				MMc++;
+				break;
+		}
+	}
+
+	if(hh!=0&&mm!=0&&ss!=0&&yyyy!=0&&dd!=0&&MM!=0)
+	{
+		tm->tm_sec=ss;
+		tm->tm_min=mm;
+		tm->tm_hour=hh;
+		tm->tm_mday=dd;
+		tm->tm_mon=MM;
+		tm->tm_year=yyyy;
+		*timestamp=mktime(tm);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: process_data                                                     *
@@ -404,7 +458,7 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_data([%s],[%s],[%s],[%s])",server,key,value,lastlogsize);
 
-	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta,i.units,i.multiplier,i.formula from items i,hosts h where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type in (%d,%d)", HOST_STATUS_MONITORED, server, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE);
+	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta,i.units,i.multiplier,i.formula,i.logtimefmt from items i,hosts h where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type in (%d,%d)", HOST_STATUS_MONITORED, server, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE);
 	result = DBselect(sql);
 
 	if(DBnum_rows(result) == 0)
@@ -470,6 +524,7 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 	item.units=DBget_field(result,0,18);
 	item.multiplier=atoi(DBget_field(result,0,19));
 	item.formula=DBget_field(result,0,20);
+	item.logtimefmt=DBget_field(result,0,21);
 
 	s=value;
 	if(	(strncmp(item.key,"log[",4)==0) ||
@@ -490,6 +545,9 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 
 		item.lastlogsize=atoi(lastlogsize);
 		item.timestamp=atoi(timestamp);
+
+		calc_timestamp(value,&item.timestamp,item.logtimefmt);
+
 		item.eventlog_severity=atoi(severity);
 		item.eventlog_source=source;
 		zabbix_log(LOG_LEVEL_DEBUG, "Value [%s] Lastlogsize [%s] Timestamp [%s]", value, lastlogsize, timestamp);

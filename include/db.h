@@ -139,6 +139,8 @@ DB_ITEM
 	int	timestamp;
 	int	eventlog_severity;
 	char	*eventlog_source;
+
+	char	*logtimefmt;
 };
  
 DB_FUNCTION
