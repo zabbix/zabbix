@@ -408,6 +408,7 @@
 	"S_DO_NOT_USE"=>			"Do not use",
 	"S_USE_MULTIPLIER"=>			"Use multiplier",
 	"S_SELECT_HOST_DOT_DOT_DOT"=>		"Select host...",
+	"S_LOG_TIME_FORMAT"=>			"Log time format",
 
 //	latestalarms.php
 	"S_LATEST_EVENTS"=>			"Latest events",

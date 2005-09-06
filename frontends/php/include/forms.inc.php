@@ -280,10 +280,11 @@
 		$snmpv3_privpassphrase=@iif(isset($_GET["snmpv3_privpassphrase"]),$_GET["snmpv3_privpassphrase"],"")
 ;
 		$formula=@iif(isset($_GET["formula"]),$_GET["formula"],"1");
+		$logtimefmt=@iif(isset($_GET["logtimefmt"]),$_GET["logtimefmt"],"");
 
 		if(isset($_GET["register"])&&($_GET["register"] == "change"))
 		{
-			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.snmp_port,i.units,i.multiplier,h.hostid,i.delta,i.trends,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula from items i,hosts h where i.itemid=".$_GET["itemid"]." and h.hostid=i.hostid");
+			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.snmp_port,i.units,i.multiplier,h.hostid,i.delta,i.trends,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,i.logtimefmt from items i,hosts h where i.itemid=".$_GET["itemid"]." and h.hostid=i.hostid");
 		
 			$description=DBget_field($result,0,0);
 			$key=DBget_field($result,0,1);
@@ -310,6 +311,7 @@
 			$snmpv3_privpassphrase=DBget_field($result,0,21);
 
 			$formula=DBget_field($result,0,22);
+			$logtimefmt=DBget_field($result,0,23);
 		}
 
 		show_form_begin("items.item");
@@ -472,18 +474,26 @@
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"key\" value=\"$key\" size=40>";
 
-		show_table2_v_delimiter($col++);
-		echo S_UNITS;
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"units\" value=\"$units\" size=10>";
+		if($value_type==ITEM_VALUE_TYPE_FLOAT)
+		{
+			show_table2_v_delimiter($col++);
+			echo S_UNITS;
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"units\" value=\"$units\" size=10>";
 
-		show_table2_v_delimiter($col++);
-		echo S_USE_MULTIPLIER;
-		show_table2_h_delimiter();
-		echo "<SELECT class=\"biginput\" NAME=\"multiplier\" value=\"$multiplier\" size=\"1\" onChange=\"submit()\">";
-		echo "<OPTION VALUE=\"0\""; if($multiplier==0) echo "SELECTED"; echo ">".S_DO_NOT_USE;
-		echo "<OPTION VALUE=\"1\" "; if($multiplier==1) echo "SELECTED"; echo ">".S_CUSTOM_MULTIPLIER;
-		echo "</SELECT>";
+			show_table2_v_delimiter($col++);
+			echo S_USE_MULTIPLIER;
+			show_table2_h_delimiter();
+			echo "<SELECT class=\"biginput\" NAME=\"multiplier\" value=\"$multiplier\" size=\"1\" onChange=\"submit()\">";
+			echo "<OPTION VALUE=\"0\""; if($multiplier==0) echo "SELECTED"; echo ">".S_DO_NOT_USE;
+			echo "<OPTION VALUE=\"1\" "; if($multiplier==1) echo "SELECTED"; echo ">".S_CUSTOM_MULTIPLIER;
+			echo "</SELECT>";
+		}
+		else
+		{
+			echo "<input class=\"biginput\" name=\"units\" type=hidden value=\"$units\">";
+			echo "<input class=\"biginput\" name=\"multiplier\" type=hidden value=\"0\">";
+		}
 
 		if($multiplier == 1)
 		{
@@ -540,7 +550,7 @@
 		show_table2_v_delimiter($col++);
 		echo nbsp(S_TYPE_OF_INFORMATION);
 		show_table2_h_delimiter();
-		echo "<SELECT class=\"biginput\" NAME=\"value_type\" value=\"$value_type\" size=\"1\">";
+		echo "<SELECT class=\"biginput\" NAME=\"value_type\" value=\"$value_type\" size=\"1\" onChange=\"submit()\">";
 		echo "<OPTION VALUE=\"0\"";
 		if($value_type==0) echo "SELECTED";
 		echo ">".S_NUMERIC;
@@ -552,14 +562,33 @@
 		echo ">".S_LOG;
 		echo "</SELECT>";
 
-		show_table2_v_delimiter($col++);
-		echo nbsp(S_STORE_VALUE);
-		show_table2_h_delimiter();
-		echo "<SELECT class=\"biginput\" NAME=\"delta\" value=\"$delta\" size=\"1\">";
-		echo "<OPTION VALUE=\"0\" "; if($delta==0) echo "SELECTED"; echo ">".S_AS_IS;
-		echo "<OPTION VALUE=\"1\" "; if($delta==1) echo "SELECTED"; echo ">".S_DELTA_SPEED_PER_SECOND;
-		echo "<OPTION VALUE=\"2\" "; if($delta==2) echo "SELECTED"; echo ">".S_DELTA_SIMPLE_CHANGE;
-		echo "</SELECT>";
+		if($value_type==ITEM_VALUE_TYPE_LOG)
+		{
+			show_table2_v_delimiter($col++);
+			echo nbsp(S_LOG_TIME_FORMAT);
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"logtimefmt\" value=\"$logtimefmt\" size=16>";
+		}
+		else
+		{
+			echo "<input class=\"biginput\" name=\"logtimefmt\" type=hidden value=\"$logtimefmt\">";
+		}
+
+		if($value_type==ITEM_VALUE_TYPE_FLOAT)
+		{
+			show_table2_v_delimiter($col++);
+			echo nbsp(S_STORE_VALUE);
+			show_table2_h_delimiter();
+			echo "<SELECT class=\"biginput\" NAME=\"delta\" value=\"$delta\" size=\"1\">";
+			echo "<OPTION VALUE=\"0\" "; if($delta==0) echo "SELECTED"; echo ">".S_AS_IS;
+			echo "<OPTION VALUE=\"1\" "; if($delta==1) echo "SELECTED"; echo ">".S_DELTA_SPEED_PER_SECOND;
+			echo "<OPTION VALUE=\"2\" "; if($delta==2) echo "SELECTED"; echo ">".S_DELTA_SIMPLE_CHANGE;
+			echo "</SELECT>";
+		}
+		else
+		{
+			echo "<input class=\"biginput\" name=\"delta\" type=hidden value=\"1\">";
+		}
 
 		if($type==2)
 		{
