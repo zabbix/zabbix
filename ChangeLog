@@ -1,6 +1,6 @@
 Changes for 1.1beta1:
 
- - added columt items.logtimefmt (Alexei)
+ - added column items.logtimefmt (Alexei)
  - added support of timestamp format for log files (Alexei)
  - all network load related metrics renamed to net.if.xxx (Alexei)
  - all swap-related metrics renamed to system.swap.xxx (Alexei)
