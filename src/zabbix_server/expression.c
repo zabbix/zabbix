@@ -343,7 +343,7 @@ int	find_char(char *str,char c)
  *           It is recursive function!                                        *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_simple (double *result,char *exp)
+int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 {
 	double	value1,value2;
 	char	first[MAX_STRING_LEN],second[MAX_STRING_LEN];
@@ -375,10 +375,10 @@ int	evaluate_simple (double *result,char *exp)
 			j++;
 		}
 		second[j]=0;
-		if( evaluate_simple(&value1,first) == FAIL )
+		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
-			zabbix_syslog("Cannot evaluate expression [%s]", first );
+			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_syslog(error);
 			return FAIL;
 		}
 		if( value1 == 1)
@@ -386,10 +386,10 @@ int	evaluate_simple (double *result,char *exp)
 			*result=value1;
 			return SUCCEED;
 		}
-		if( evaluate_simple(&value2,second) == FAIL )
+		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
-			zabbix_syslog("Cannot evaluate expression [%s]", second );
+			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_syslog(error);
 			return FAIL;
 		}
 		if( value2 == 1)
@@ -414,16 +414,16 @@ int	evaluate_simple (double *result,char *exp)
 		}
 		second[j]=0;
 		zabbix_log(LOG_LEVEL_DEBUG, "[%s] [%s]",first,second );
-		if( evaluate_simple(&value1,first) == FAIL )
+		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
-			zabbix_syslog("Cannot evaluate expression [%s]", first );
+			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_syslog(error);
 			return FAIL;
 		}
-		if( evaluate_simple(&value2,second) == FAIL )
+		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
-			zabbix_syslog("Cannot evaluate expression [%s]", second );
+			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_syslog(error);
 			return FAIL;
 		}
 		if( (value1 == 1) && (value2 == 1) )
@@ -449,16 +449,16 @@ int	evaluate_simple (double *result,char *exp)
 			j++;
 		}
 		second[j]=0;
-		if( evaluate_simple(&value1,first) == FAIL )
+		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
-			zabbix_syslog("Cannot evaluate expression [%s]", first );
+			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_syslog(error);
 			return FAIL;
 		}
-		if( evaluate_simple(&value2,second) == FAIL )
+		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
-			zabbix_syslog("Cannot evaluate expression [%s]", second );
+			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_syslog(error);
 			return FAIL;
 		}
 		if( value1 > value2 )
@@ -485,16 +485,16 @@ int	evaluate_simple (double *result,char *exp)
 		}
 		second[j]=0;
 		zabbix_log(LOG_LEVEL_DEBUG, "[%s] [%s]",first,second );
-		if( evaluate_simple(&value1,first) == FAIL )
+		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
-			zabbix_syslog("Cannot evaluate expression [%s]", first );
+			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_syslog(error);
 			return FAIL;
 		}
-		if( evaluate_simple(&value2,second) == FAIL )
+		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
-			zabbix_syslog("Cannot evaluate expression [%s]", second );
+			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_syslog(error);
 			return FAIL;
 		}
 		if( value1 < value2 )
@@ -521,16 +521,16 @@ int	evaluate_simple (double *result,char *exp)
 			j++;
 		}
 		second[j]=0;
-		if( evaluate_simple(&value1,first) == FAIL )
+		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
-			zabbix_syslog("Cannot evaluate expression [%s]", first );
+			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_syslog(error);
 			return FAIL;
 		}
-		if( evaluate_simple(&value2,second) == FAIL )
+		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
-			zabbix_syslog("Cannot evaluate expression [%s]", second );
+			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_syslog(error);
 			return FAIL;
 		}
 		*result=value1*value2;
@@ -549,22 +549,23 @@ int	evaluate_simple (double *result,char *exp)
 			j++;
 		}
 		second[j]=0;
-		if( evaluate_simple(&value1,first) == FAIL )
+		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
-			zabbix_syslog("Cannot evaluate expression [%s]", first );
+			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_syslog(error);
 			return FAIL;
 		}
-		if( evaluate_simple(&value2,second) == FAIL )
+		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
-			zabbix_syslog("Cannot evaluate expression [%s]", second );
+			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_syslog(error);
 			return FAIL;
 		}
 		if(cmp_double(value2,0) == 0)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Division by zero. Cannot evaluate expression [%s/%s]", first,second );
-			zabbix_syslog("Division by zero. Cannot evaluate expression [%s/%s]", first,second );
+			snprintf(error,maxerrlen-1,"Division by zero. Cannot evaluate expression [%s/%s]", first,second);
+			zabbix_log(LOG_LEVEL_WARNING, error);
+			zabbix_syslog(error);
 			return FAIL;
 		}
 		else
@@ -586,16 +587,16 @@ int	evaluate_simple (double *result,char *exp)
 			j++;
 		}
 		second[j]=0;
-		if( evaluate_simple(&value1,first) == FAIL )
+		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
-			zabbix_syslog("Cannot evaluate expression [%s]", first );
+			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_syslog(error);
 			return FAIL;
 		}
-		if( evaluate_simple(&value2,second) == FAIL )
+		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
-			zabbix_syslog("Cannot evaluate expression [%s]", second );
+			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_syslog(error);
 			return FAIL;
 		}
 		*result=value1+value2;
@@ -614,16 +615,16 @@ int	evaluate_simple (double *result,char *exp)
 			j++;
 		}
 		second[j]=0;
-		if( evaluate_simple(&value1,first) == FAIL )
+		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
-			zabbix_syslog("Cannot evaluate expression [%s]", first );
+			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_syslog(error);
 			return FAIL;
 		}
-		if( evaluate_simple(&value2,second) == FAIL )
+		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
-			zabbix_syslog("Cannot evaluate expression [%s]", second );
+			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_syslog(error);
 			return FAIL;
 		}
 		*result=value1-value2;
@@ -642,16 +643,16 @@ int	evaluate_simple (double *result,char *exp)
 			j++;
 		}
 		second[j]=0;
-		if( evaluate_simple(&value1,first) == FAIL )
+		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
-			zabbix_syslog("Cannot evaluate expression [%s]", first );
+			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_syslog(error);
 			return FAIL;
 		}
-		if( evaluate_simple(&value2,second) == FAIL )
+		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
-			zabbix_syslog("Cannot evaluate expression [%s]", second );
+			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_syslog(error);
 			return FAIL;
 		}
 		if( cmp_double(value1,value2) ==0 )
@@ -677,16 +678,16 @@ int	evaluate_simple (double *result,char *exp)
 			j++;
 		}
 		second[j]=0;
-		if( evaluate_simple(&value1,first) == FAIL )
+		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", first );
-			zabbix_syslog("Cannot evaluate expression [%s]", first );
+			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_syslog(error);
 			return FAIL;
 		}
-		if( evaluate_simple(&value2,second) == FAIL )
+		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Cannot evaluate expression [%s]", second );
-			zabbix_syslog("Cannot evaluate expression [%s]", second );
+			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_syslog(error);
 			return FAIL;
 		}
 		if( cmp_double(value1,value2) != 0 )
@@ -701,8 +702,10 @@ int	evaluate_simple (double *result,char *exp)
 	}
 	else
 	{
-			zabbix_log( LOG_LEVEL_WARNING, "Format error or unsupported operator.  Exp: [%s]", exp );
-			return FAIL;
+		snprintf(error,maxerrlen-1,"Format error or unsupported operator.  Exp: [%s]", exp);
+		zabbix_log(LOG_LEVEL_WARNING, error);
+		zabbix_syslog(error);
+		return FAIL;
 	}
 	return SUCCEED;
 }
@@ -723,7 +726,7 @@ int	evaluate_simple (double *result,char *exp)
  * Comments: example: ({15}>10)|({123}=1)                                     *
  *                                                                            *
  ******************************************************************************/
-int	evaluate(int *result,char *exp)
+int	evaluate(int *result,char *exp, char *error, int maxerrlen)
 {
 	double	value;
 	char	res[MAX_STRING_LEN];
@@ -748,8 +751,9 @@ int	evaluate(int *result,char *exp)
 		}
 		if( r == -1 )
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot find left bracket [(]. Expression:[%s]", exp );
-			zabbix_syslog("Cannot find left bracket [(]. Expression:[%s]", exp );
+			snprintf(error, maxerrlen-1, "Cannot find left bracket [(]. Expression:[%s]", exp);
+			zabbix_log(LOG_LEVEL_WARNING, error);
+			zabbix_syslog(error);
 			return	FAIL;
 		}
 		for(i=l+1;i<r;i++)
@@ -758,11 +762,11 @@ int	evaluate(int *result,char *exp)
 		} 
 		simple[r-l-1]=0;
 
-		if( evaluate_simple( &value, simple ) != SUCCEED )
+		if( evaluate_simple( &value, simple, error, maxerrlen ) != SUCCEED )
 		{
 			/* Changed to LOG_LEVEL_DEBUG */
-			zabbix_log( LOG_LEVEL_DEBUG, "Unable to evaluate simple expression1 [%s]", simple );
-			zabbix_syslog("Unable to evaluate simple expression1 [%s]", simple );
+			zabbix_log( LOG_LEVEL_DEBUG, error);
+			zabbix_syslog(error);
 			return	FAIL;
 		}
 
@@ -782,14 +786,15 @@ int	evaluate(int *result,char *exp)
 		delete_spaces(res);
 		zabbix_log(LOG_LEVEL_DEBUG, "Expression4:[%s]", res );
 	}
-	if( evaluate_simple( &value, res ) != SUCCEED )
+	if( evaluate_simple( &value, res, error, maxerrlen ) != SUCCEED )
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Unable to evaluate simple expression2 [%s]", simple );
-		zabbix_syslog("Unable to evaluate simple expression2 [%s]", simple );
+		zabbix_log(LOG_LEVEL_WARNING, error);
+		zabbix_syslog(error);
 		return	FAIL;
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "Evaluate end:[%lf]", value );
 	*result=value;
+
 	return SUCCEED;
 }
 
@@ -1086,6 +1091,8 @@ int	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data)
  * Purpose: substitute expression functions with theirs values                *
  *                                                                            *
  * Parameters: exp - expression string                                        *
+ *             error - place error message here if any                        *
+ *             maxerrlen - max length of error msg                            *
  *                                                                            *
  * Return value:  SUCCEED - evaluated succesfully, exp - updated expression   *
  *                FAIL - otherwise                                            *
@@ -1095,7 +1102,7 @@ int	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data)
  * Comments: example: "({15}>10)|({123}=0)" => "(6.456>10)|(0=0)              *
  *                                                                            *
  ******************************************************************************/
-int	substitute_functions(char *exp)
+int	substitute_functions(char *exp, char *error, int maxerrlen)
 {
 	double	value;
 	char	functionid[MAX_STRING_LEN];
@@ -1110,14 +1117,16 @@ int	substitute_functions(char *exp)
 		r=find_char(exp,'}');
 		if( r == FAIL )
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Cannot find right bracket. Expression:[%s]", exp );
-			zabbix_syslog("Cannot find right bracket. Expression:[%s]", exp );
+			snprintf(error,maxerrlen-1,"Cannot find right bracket. Expression:[%s]", exp);
+			zabbix_log( LOG_LEVEL_WARNING, error);
+			zabbix_syslog(error);
 			return	FAIL;
 		}
 		if( r < l )
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Right bracket is before left one. Expression:[%s]", exp );
-			zabbix_syslog("Right bracket is before left one. Expression:[%s]", exp );
+			snprintf(error,maxerrlen-1, "Right bracket is before left one. Expression:[%s]", exp);
+			zabbix_log( LOG_LEVEL_WARNING, error);
+			zabbix_syslog(error);
 			return	FAIL;
 		}
 
@@ -1130,8 +1139,9 @@ int	substitute_functions(char *exp)
 		if( DBget_function_result( &value, functionid ) != SUCCEED )
 		{
 /* It may happen because of functions.lastvalue is NULL, so this is not warning  */
-			zabbix_log( LOG_LEVEL_DEBUG, "Unable to get value for functionid [%s]", functionid );
-			zabbix_syslog("Unable to get value for functionid [%s]", functionid );
+			snprintf(error,maxerrlen-1, "Unable to get value for functionid [%s]", functionid);
+			zabbix_log( LOG_LEVEL_DEBUG, error);
+			zabbix_syslog(error);
 			return	FAIL;
 		}
 
@@ -1158,6 +1168,7 @@ int	substitute_functions(char *exp)
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "Expression:[%s]", exp );
 	zabbix_log( LOG_LEVEL_DEBUG, "END substitute_functions" );
+
 	return SUCCEED;
 }
 
@@ -1168,9 +1179,12 @@ int	substitute_functions(char *exp)
  * Purpose: evaluate expression                                               *
  *                                                                            *
  * Parameters: exp - expression string                                        *
+ *             error - place rrror message if any                             *
+ *             maxerrlen - max length of error message                        *
  *                                                                            *
  * Return value:  SUCCEED - evaluated succesfully, result - value of the exp  *
  *                FAIL - otherwise                                            *
+ *                error - error message                                       *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -1178,19 +1192,20 @@ int	substitute_functions(char *exp)
  *                    ({a0:system[procload].max(300)}>3)                      *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_expression(int *result,char *expression)
+int	evaluate_expression(int *result,char *expression, char *error, int maxerrlen)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_expression(%s)", expression );
 
 	delete_spaces(expression);
-	if( substitute_functions(expression) == SUCCEED)
+	if( substitute_functions(expression, error, maxerrlen) == SUCCEED)
 	{
-		if( evaluate(result, expression) == SUCCEED)
+		if( evaluate(result, expression, error, maxerrlen) == SUCCEED)
 		{
 			return SUCCEED;
 		}
 	}
-	zabbix_log(LOG_LEVEL_WARNING, "Evaluation of expression [%s] failed", expression );
-	zabbix_syslog("Evaluation of expression [%s] failed", expression );
+	zabbix_log(LOG_LEVEL_WARNING, "Evaluation of expression [%s] failed [%s]", expression, error );
+	zabbix_syslog("Evaluation of expression [%s] failed [%s]", expression, error );
+
 	return FAIL;
 }

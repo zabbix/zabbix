@@ -139,6 +139,7 @@ CREATE TABLE triggers (
   lastchange		int4		DEFAULT '0' NOT NULL,
   dep_level		int2		DEFAULT '0' NOT NULL,
   comments		text,
+  error			varchar(128)	DEFAULT '' NOT NULL,
   PRIMARY KEY (triggerid)
 );
 
