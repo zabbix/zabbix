@@ -220,11 +220,11 @@
 	if(isset($_GET["hostid"])&&!isset($_GET["triggerid"]))
 	{
 		table_begin();
-		table_header(array(S_ID,S_DESCRIPTION,S_EXPRESSION, S_SEVERITY, S_STATUS, S_ACTIONS));
+		table_header(array(S_ID,S_DESCRIPTION,S_EXPRESSION, S_SEVERITY, S_STATUS, S_ERROR, S_ACTIONS));
 		echo "<form method=\"get\" action=\"triggers.php\">";
 		echo "<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_GET["hostid"]." size=8>";
 
-		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.status,t.value,t.priority from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$_GET["hostid"]." order by h.host,t.description");
+		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.status,t.value,t.priority,t.error from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$_GET["hostid"]." order by h.host,t.description");
 		$col=0;
 		while($row=DBfetch($result))
 		{
@@ -271,6 +271,11 @@
 			}
 //			$expression=rawurlencode($row["expression"]);
 
+			if($row["error"]=="")
+			{
+				$row["error"]="&nbsp;";
+			}
+
 			if(isset($_GET["hostid"]))
 			{
 				$actions="<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."&hostid=".$row["hostid"]."#form\">".S_CHANGE."</A>";
@@ -294,6 +299,7 @@
 				explode_exp($row["expression"],1),
 				$priority,
 				$status,
+				$row["error"],
 				$actions
 			),$col++);
 		}

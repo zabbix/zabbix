@@ -363,13 +363,16 @@ void	update_triggers(int itemid)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated [%s]",trigger.expression, error);
 			zabbix_syslog("Expression [%s] cannot be evaluated [%s]",trigger.expression, error);
+
+			now = time(NULL);
+			DBupdate_trigger_value(&trigger, exp_value, now, error);
 			continue;
 		}
 
 		zabbix_log( LOG_LEVEL_DEBUG, "exp_value trigger.value trigger.prevvalue [%d] [%d] [%d]", exp_value, trigger.value, trigger.prevvalue);
 
 		now = time(NULL);
-		DBupdate_trigger_value(&trigger, exp_value, now);
+		DBupdate_trigger_value(&trigger, exp_value, now, NULL);
 	}
 	DBfree_result(result);
 }

@@ -626,7 +626,7 @@ int	DBupdate_trigger_value(int triggerid,int value,int clock)
 }
 */
 
-void update_triggers_status_to_unknown(int hostid,int clock)
+void update_triggers_status_to_unknown(int hostid,int clock,char *reason)
 {
 	int	i;
 	char	sql[MAX_STRING_LEN];
@@ -645,7 +645,7 @@ void update_triggers_status_to_unknown(int hostid,int clock)
 	{
 		trigger.triggerid=atoi(DBget_field(result,i,0));
 		trigger.value=atoi(DBget_field(result,i,1));
-		DBupdate_trigger_value(&trigger,TRIGGER_VALUE_UNKNOWN,clock);
+		DBupdate_trigger_value(&trigger,TRIGGER_VALUE_UNKNOWN,clock,reason);
 	}
 
 	DBfree_result(result);
@@ -822,7 +822,7 @@ void DBupdate_triggers_status_after_restart(void)
 		lastchange=atoi(DBget_field(result2,0,0));
 		DBfree_result(result2);
 
-		DBupdate_trigger_value(&trigger,TRIGGER_VALUE_UNKNOWN,lastchange);
+		DBupdate_trigger_value(&trigger,TRIGGER_VALUE_UNKNOWN,lastchange,"ZABBIX was down.");
 	}
 
 	DBfree_result(result);
@@ -898,7 +898,7 @@ void DBupdate_host_availability(int hostid,int available,int clock, char *error)
 		return;
 	}
 
-	update_triggers_status_to_unknown(hostid,clock);
+	update_triggers_status_to_unknown(hostid,clock,"Host is unavailable.");
 	zabbix_log(LOG_LEVEL_DEBUG,"End of update_host_availability()");
 
 	return;
