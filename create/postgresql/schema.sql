@@ -76,6 +76,7 @@ CREATE TABLE items (
   formula		varchar(255)	DEFAULT '{.last(0)}' NOT NULL,
   error			varchar(128)	DEFAULT '' NOT NULL,
   lastlogsize		int4		DEFAULT '0' NOT NULL,
+  logtimefmt		varchar(64)	DEFAULT '' NOT NULL,
   PRIMARY KEY (itemid),
   FOREIGN KEY (hostid) REFERENCES hosts
 );
