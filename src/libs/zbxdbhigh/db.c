@@ -544,20 +544,34 @@ int	DBadd_service_alarm(int serviceid,int status,int clock)
 	return SUCCEED;
 }
 
-int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now)
+int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *reason)
 {
 	char	sql[MAX_STRING_LEN];
 	int	alarmid;
 	int	ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value[%d,%d,%d]", trigger->triggerid, new_value, now);
+	if(reason==NULL)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value[%d,%d,%d]", trigger->triggerid, new_value, now);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value[%d,%d,%d,%s]", trigger->triggerid, new_value, now, reason);
+	}
 
 	if(trigger->value != new_value)
 	{
 		trigger->prevvalue=DBget_prev_trigger_value(trigger->triggerid);
 		if(add_alarm(trigger->triggerid,new_value,now,&alarmid) == SUCCEED)
 		{
-			snprintf(sql,sizeof(sql)-1,"update triggers set value=%d,lastchange=%d where triggerid=%d",new_value,now,trigger->triggerid);
+			if(reason==NULL)
+			{
+				snprintf(sql,sizeof(sql)-1,"update triggers set value=%d,lastchange=%d,error='' where triggerid=%d",new_value,now,trigger->triggerid);
+			}
+			else
+			{
+				snprintf(sql,sizeof(sql)-1,"update triggers set value=%d,lastchange=%d,error='%s' where triggerid=%d",new_value,now,trigger->triggerid,reason);
+			}
 			DBexecute(sql);
 			if(TRIGGER_VALUE_UNKNOWN == new_value)
 			{

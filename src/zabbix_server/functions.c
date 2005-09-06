@@ -332,6 +332,7 @@ void	update_triggers(int itemid)
 {
 	char	sql[MAX_STRING_LEN];
 	char	exp[MAX_STRING_LEN];
+	char	error[MAX_STRING_LEN];
 	int	exp_value;
 	time_t	now;
 	DB_TRIGGER	trigger;
@@ -358,10 +359,10 @@ void	update_triggers(int itemid)
 		strscpy(trigger.description,DBget_field(result,i,6));
 
 		strscpy(exp, trigger.expression);
-		if( evaluate_expression(&exp_value, exp) != 0 )
+		if( evaluate_expression(&exp_value, exp, error, sizeof(error)) != 0 )
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated.",trigger.expression);
-			zabbix_syslog("Expression [%s] cannot be evaluated.",trigger.expression);
+			zabbix_log( LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated [%s]",trigger.expression, error);
+			zabbix_syslog("Expression [%s] cannot be evaluated [%s]",trigger.expression, error);
 			continue;
 		}
 
