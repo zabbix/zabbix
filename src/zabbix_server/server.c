@@ -491,7 +491,7 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server...");
+	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABBIX %s.", ZABBIX_VERSION);
 
 /* Need to set trigger status to UNKNOWN since last run */
 	DBconnect();
