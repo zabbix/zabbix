@@ -1,5 +1,6 @@
 Changes for 1.1beta1:
 
+ - new server configuration parameter DBPort (Alexei)
  - added column triggers.error (Alexei)
  - added error reason if trigger is in UNKNOWN state (Alexei)
  - added column items.logtimefmt (Alexei)
