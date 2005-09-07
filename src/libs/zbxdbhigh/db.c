@@ -64,7 +64,7 @@ void    DBconnect(void)
 	/* For MySQL >3.22.00 */
 	/*	if( ! mysql_connect( &mysql, NULL, dbuser, dbpassword ) )*/
 		mysql_init(&mysql);
-		if( ! mysql_real_connect( &mysql, CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, 3306, CONFIG_DBSOCKET,0 ) )
+		if( ! mysql_real_connect( &mysql, CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBPORT, CONFIG_DBSOCKET,0 ) )
 		{
 			fprintf(stderr, "Failed to connect to database: Error: %s\n",mysql_error(&mysql) );
 			zabbix_log(LOG_LEVEL_ERR, "Failed to connect to database: Error: %s",mysql_error(&mysql) );

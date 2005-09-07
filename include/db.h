@@ -43,6 +43,7 @@ extern	char	*CONFIG_DBNAME;
 extern	char	*CONFIG_DBUSER;
 extern	char	*CONFIG_DBPASSWORD;
 extern	char	*CONFIG_DBSOCKET;
+extern	int	CONFIG_DBPORT;
 
 #define DB_FULL_DELETE	0
 #define DB_PART_DELETE	1
