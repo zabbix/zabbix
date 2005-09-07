@@ -46,7 +46,7 @@
 		return	DBexecute($sql);
 	}
 
-	# "Processor load on %s is 5" to "Processor load on www.sf.net is 5"
+	# "Processor load on {HOSTNAME} is 5" to "Processor load on www.sf.net is 5"
 	function	expand_trigger_description_simple($triggerid)
 	{
 		$sql="select distinct t.description,h.host from triggers t,functions f,items i,hosts h where t.triggerid=$triggerid and f.triggerid=t.triggerid and f.itemid=i.itemid and i.hostid=h.hostid";
@@ -56,9 +56,10 @@
 
 //		$description=str_replace("%s",$row["host"],$row["description"]);
 
-		$search=array("{HOSTNAME}");
-		$replace=array($row["host"]);
+//		$search=array("{HOSTNAME}");
+//		$replace=array($row["host"]);
 //		$description = str_replace($search, $replace,$row["description"]);
+
 		$description = str_replace("{HOSTNAME}", $row["host"],$row["description"]);
 
 		return $description;
