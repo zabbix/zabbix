@@ -124,7 +124,7 @@ int	VFS_FILE_MTIME(const char *cmd, const char *filename,double  *value)
 
 	if(stat(filename,&buf) == 0)
 	{
-		*value=(double)buf.st_ctime;
+		*value=(double)buf.st_mtime;
 		return SYSINFO_RET_OK;
 	}
 	return	SYSINFO_RET_FAIL;
