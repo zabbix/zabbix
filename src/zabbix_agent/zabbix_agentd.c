@@ -483,7 +483,7 @@ int	main(int argc, char **argv)
 		return -1;
 	}
 
-	zabbix_log( LOG_LEVEL_WARNING, "zabbix_agentd started");
+	zabbix_log( LOG_LEVEL_WARNING, "zabbix_agentd started. ZABBIX %s.", ZABBIX_VERSION);
 
 	if(gethostname(host,127) != 0)
 	{
