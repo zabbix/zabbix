@@ -232,6 +232,7 @@ char	*DBget_field(DB_RESULT *result, int rownum, int fieldnum)
 int	DBinsert_id()
 {
 #ifdef	HAVE_MYSQL
+	zabbix_log(LOG_LEVEL_WARNING, "In DBinsert_id()" );
 	return mysql_insert_id(&mysql);
 #endif
 #ifdef	HAVE_PGSQL
@@ -496,7 +497,7 @@ int	add_alarm(int triggerid,int status,int clock,int *alarmid)
 
 	*alarmid=0;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In add_alarm()");
+	zabbix_log(LOG_LEVEL_WARNING,"In add_alarm(%d,%d,%d)",triggerid, status, *alarmid);
 
 	/* Latest alarm has the same status? */
 	if(latest_alarm(triggerid,status) == SUCCEED)
@@ -509,7 +510,9 @@ int	add_alarm(int triggerid,int status,int clock,int *alarmid)
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	DBexecute(sql);
 
+	zabbix_log(LOG_LEVEL_WARNING,"Before");
 	*alarmid=DBinsert_id();
+	zabbix_log(LOG_LEVEL_WARNING,"After");
 
 	/* Cancel currently active escalations */
 	if(status == TRIGGER_VALUE_FALSE || status == TRIGGER_VALUE_TRUE)
