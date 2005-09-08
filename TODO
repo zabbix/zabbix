@@ -24,7 +24,6 @@ ZABBIX 1.1:
  - disk stats under Linux 2.6.x
  - more supported parameters under FreeBSD, HP-UX and Solaris (cpu times, network stats)
  - centralised agent upgrade
- - saved custom-time period in graphs and screens
 
 TKOM:
 
