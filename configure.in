@@ -26,7 +26,7 @@ AC_PROG_MAKE_SET
 
 AM_CONFIG_HEADER(include/config.h)
 
-dnl AC_CANONICAL_SYSTEM
+AC_CANONICAL_HOST
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -792,6 +792,50 @@ AC_SUBST(RANLIB)
 
 dnl AC_CONFIG_HEADER(include/config.h)
 
+# Cheks for host_os 
+case "$host_os" in
+linux*)
+	ZBX_OS="linux"
+
+	AC_MSG_RESULT([ok (${host_os})])
+
+	# Ok, this is linux. Check the kernel version
+	AC_MSG_CHECKING([for the kernel version])
+
+        kernel=`uname -r`
+
+        case "${kernel}" in
+             2.6.*) 
+        	    AC_MSG_RESULT([2.6 family (${kernel})])
+        	    AC_DEFINE([KERNEL_2_6], 1, [Define to 1 if you're using Linux 2.6.x])
+        	    ;;
+
+             2.4.*) 
+        	    AC_MSG_RESULT([2.4 family (${kernel})])
+        	    AC_DEFINE([KERNEL_2_4], 1, [Define to 1 if you're using Linux 2.4.x])
+        	    ;;
+
+             *) 
+        	    AC_MSG_RESULT([unsupported (${kernel})])
+        	    AC_MSG_ERROR([ZABBIX works on kernels 2.4, 2.6])
+        	    ;;
+        esac
+;;
+*freebsd*)
+	ZBX_OS="freebsd"
+
+	AC_MSG_RESULT([ok (${host_os})])
+;;
+*)
+	ZBX_OS="unknown"
+
+	AC_MSG_RESULT([ok (${host_os})])
+dnl	AC_MSG_ERROR(${host_os} not supported)
+;;
+esac
+
+AC_SUBST(ZBX_OS)
+
 AC_OUTPUT(Makefile src/Makefile src/libs/Makefile src/libs/zbxlog/Makefile src/libs/zbxcrypto/Makefile  \
 	src/libs/zbxpid/Makefile src/libs/zbxnet/Makefile src/libs/zbxconf/Makefile src/zabbix_sender/Makefile \
 	src/libs/zbxdbhigh/Makefile src/libs/zbxemail/Makefile src/libs/zbxsysinfo/Makefile \
@@ -799,6 +843,16 @@ AC_OUTPUT(Makefile src/Makefile src/libs/Makefile src/libs/zbxlog/Makefile src/l
 	src/zabbix_server/housekeeper/Makefile src/zabbix_server/alerter/Makefile src/zabbix_server/Makefile \
 	src/zabbix_server/trapper/Makefile src/zabbix_server/poller/Makefile src/zabbix_server/timer/Makefile \
 	src/zabbix_get/Makefile src/libs/zbxcommon/Makefile)
+
+echo "
+
+Configuration:
+
+  Detected OS:      ${host_os}
+  Install path:     ${prefix}
+  Compiler:         ${CC}
+  Compiler flags:   ${CFLAGS}
+  Linker flags:     ${LIBS}"
 
 echo
 echo "***********************************************************"
