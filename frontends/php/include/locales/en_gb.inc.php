@@ -758,6 +758,7 @@
 
 //	hostprofiles.php
 	"S_HOST_PROFILES"=>			"Host profiles",
+	"S_HOST_PROFILES_BIG"=>			"HOST PROFILES",
 
 //	Menu
 
