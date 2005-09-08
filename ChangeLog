@@ -1,5 +1,6 @@
 Changes for 1.1beta1:
 
+ - added screen Host Profiles (Alexei)
  - new server configuration parameter DBPort (Alexei)
  - added column triggers.error (Alexei)
  - added error reason if trigger is in UNKNOWN state (Alexei)

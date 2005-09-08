@@ -1066,7 +1066,7 @@ echo "</head>";
 	$menu=array(
 		"view"=>array(
 				"label"=>S_VIEW,
-				"pages"=>array("overview.php","latest.php","tr_status.php","queue.php","latestalarms.php","alerts.php","maps.php","charts.php","screens.php","srv_status.php","alarms.php","history.php","tr_comments.php","report3.php","profile.php"),
+				"pages"=>array("overview.php","latest.php","tr_status.php","queue.php","latestalarms.php","alerts.php","maps.php","charts.php","screens.php","srv_status.php","alarms.php","history.php","tr_comments.php","report3.php","profile.php","hostprofiles.php"),
 				"level2"=>array(
 					array("label"=>S_OVERVIEW,"url"=>"overview.php"),
 					array("label"=>S_LATEST_DATA,"url"=>"latest.php"),
@@ -1077,7 +1077,8 @@ echo "</head>";
 					array("label"=>S_MAPS,"url"=>"maps.php"),
 					array("label"=>S_GRAPHS,"url"=>"charts.php"),
 					array("label"=>S_SCREENS,"url"=>"screens.php"),
-					array("label"=>S_IT_SERVICES,"url"=>"srv_status.php")
+					array("label"=>S_IT_SERVICES,"url"=>"srv_status.php"),
+					array("label"=>S_HOST_PROFILES,"url"=>"hostprofiles.php")
 					)
 				),
 		"reports"=>array(
