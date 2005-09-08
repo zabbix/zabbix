@@ -107,7 +107,7 @@
 //		}
 
 #		$description=addslashes($description);
-		$sql="insert into triggers  (description,priority,status,comments,url,value) values ('$description',$priority,$status,'$comments','$url',2)";
+		$sql="insert into triggers  (description,priority,status,comments,url,value,error) values ('$description',$priority,$status,'$comments','$url',2,'Trigger just added. No status update so far.')";
 #		echo $sql,"<br>";
 		$result=DBexecute($sql);
 		if(!$result)
