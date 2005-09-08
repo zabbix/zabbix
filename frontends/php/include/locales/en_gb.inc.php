@@ -756,6 +756,9 @@
 //	index.php
 	"S_ZABBIX_BIG"=>			"ZABBIX",
 
+//	hostprofiles.php
+	"S_HOST_PROFILES"=>			"Host profiles",
+
 //	Menu
 
 	"S_HELP"=>				"Help",
