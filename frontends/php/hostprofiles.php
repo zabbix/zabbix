@@ -20,6 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
+	include "include/forms.inc.php";
 	$page["title"] = "S_HOST_PROFILES";
 	$page["file"] = "hostprofiles.php";
 	show_header($page["title"],0,0);
@@ -32,11 +33,6 @@
                 show_footer();
                 exit;
         }
-	if(isset($_GET["select"])&&($_GET["select"]!=""))
-	{
-		unset($_GET["groupid"]);
-		unset($_GET["hostid"]);
-	}
 	
         if(isset($_GET["hostid"])&&!check_right("Host","R",$_GET["hostid"]))
         {
@@ -114,7 +110,11 @@
 ?>
 
 <?php
-	if(isset($_GET["hostid"])||isset($_GET["select"]))
+	if(isset($_GET["hostid"])&&($_GET["hostid"]!=0))
+	{
+		insert_host_profile_form($_GET["hostid"],1);
+	}
+	else
 	{
 		table_begin();
 		$header=array();
@@ -123,7 +123,14 @@
 		table_header($header);
 
 		$col=0;
-		$sql="select h.hostid,h.host,p.name,p.os,p.serialno,p.tag,p.macaddress from hosts h,hosts_profiles p where h.hostid=p.hostid and h.hostid=".$_GET["hostid"];
+		if(isset($_GET["groupid"])&&($_GET["groupid"]!=0))
+		{
+			$sql="select h.hostid,h.host,p.name,p.os,p.serialno,p.tag,p.macaddress from hosts h,hosts_profiles p,hosts_groups hg where h.hostid=p.hostid and h.hostid=hg.hostid and hg.groupid=".$_GET["groupid"]." order by h.host";
+		}
+		else
+		{
+			$sql="select h.hostid,h.host,p.name,p.os,p.serialno,p.tag,p.macaddress from hosts h,hosts_profiles p where h.hostid=p.hostid order by h.host";
+		}
 
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
@@ -147,10 +154,6 @@
 
 		table_end();
 		show_table_header_end();
-	}
-	else
-	{
-		table_nodata();
 	}
 ?>
 

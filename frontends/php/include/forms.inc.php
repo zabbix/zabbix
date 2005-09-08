@@ -1293,7 +1293,7 @@
 	}
 
 	# Insert host profile form
-	function	insert_host_profile_form($hostid)
+	function	insert_host_profile_form($hostid,$readonly=0)
 	{
 		$selected=0;
 
@@ -1341,7 +1341,10 @@
 
 		show_table2_v_delimiter($col++);
 		echo "<form method=\"get\" action=\"hosts.php\">";
-		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_GET["config"]."\" size=8>";
+		if(isset($_GET["config"]))
+		{
+			echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_GET["config"]."\" size=8>";
+		}
 		echo "<input class=\"biginput\" name=\"hostid\" type=\"hidden\" value=\"$hostid\" size=8>";
 
 		echo S_DEVICE_TYPE;
@@ -1399,11 +1402,18 @@
 		echo form_textarea("notes",$notes,50,4);
 
 		show_table2_v_delimiter2($col++);
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add profile\">";
-		if(isset($hostid))
+		if($readonly==0)
 		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update profile\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete profile\" onClick=\"return Confirm('Delete selected profile?');\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add profile\">";
+			if(isset($hostid))
+			{
+				echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update profile\">";
+				echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete profile\" onClick=\"return Confirm('Delete selected profile?');\">";
+			}
+		}
+		else
+		{
+			echo "&nbsp;";
 		}
 
 		show_table2_header_end();
