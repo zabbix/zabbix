@@ -338,4 +338,33 @@
 		}
 		return $result;
 	}
+
+	function	get_n_param($key, $num)
+	{
+		$param="";
+
+//		echo $key." ".$num."<br>";
+
+//		$params=split('[\[\]\,]', $description);
+		$params=preg_split('/[\]\[,]/', $key);
+
+		if(isset($params[$num]))
+		{
+			$param=$params[$num];
+		}
+
+		return $param;
+	}
+
+	function	item_description($description, $key)
+	{
+		$descr=$description;
+
+		for($i=9;$i>0;$i--)
+		{
+			$descr=str_replace("$$i",get_n_param($key,$i),$descr);
+		}
+
+		return $descr;
+	}
 ?>

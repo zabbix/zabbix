@@ -257,9 +257,9 @@
 			$_GET["sort"]="order by i.description";
 		}
 		if(isset($_GET["select"]))
-			$sql="select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier from items i,hosts h where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 and i.description like '%".$_GET["select"]."%' ".$_GET["sort"];
+			$sql="select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier,i.key_ from items i,hosts h where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 and i.description like '%".$_GET["select"]."%' ".$_GET["sort"];
 		else
-			$sql="select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier from items i,hosts h where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 and h.hostid=".$_GET["hostid"]." ".$_GET["sort"];
+			$sql="select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier,i.key_ from items i,hosts h where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 and h.hostid=".$_GET["hostid"]." ".$_GET["sort"];
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
@@ -279,7 +279,7 @@
 			{
 				table_td($row["host"],"");
 			}
-			table_td($row["description"],"");
+			table_td(item_description($row["description"],$row["key_"]),"");
 
 			echo "<td>";
 			if($row["status"] == 2)
