@@ -26,9 +26,9 @@
 
 	$now=time();
 
-	$result=DBselect("select h.host,i.description,i.nextcheck-$now,h.hostid from items i,hosts h where i.itemid=".$_GET["itemid"]." and h.hostid=i.hostid");
+	$result=DBselect("select h.host,i.description,i.nextcheck-$now,h.hostid,i.key_ from items i,hosts h where i.itemid=".$_GET["itemid"]." and h.hostid=i.hostid");
 	$host=DBget_field($result,0,0);
-	$description=DBget_field($result,0,1);
+	$description=item_description(DBget_field($result,0,1),DBget_field($result,0,4));
 	$beforenextcheck=DBget_field($result,0,2)+5;
 	if($beforenextcheck<=0)
 	{
