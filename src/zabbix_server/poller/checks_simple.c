@@ -24,11 +24,37 @@ int	get_value_simple(double *result,char *result_str,DB_ITEM *item,char *error, 
 	char	*e,*t;
 	char	c[MAX_STRING_LEN];
 	char	s[MAX_STRING_LEN];
+	char	param[MAX_STRING_LEN];
 	int	ret = SUCCEED;
+	char	*l,*r;
 
 	/* The code is ugly. I would rewrite it. Alexei.	*/
 	/* Assumption: host name does not contain '_perf'	*/
-	if(NULL == strstr(item->key,"_perf"))
+
+	if(0 == strncmp(item->key,"dns",3))
+	{
+		if(item->useip==1)
+		{
+			l=strstr(item->key,"[");
+			r=strstr(item->key,"]");
+			if(l==NULL || r==NULL)
+				snprintf(c,sizeof(c)-1,"%s",item->key);
+			else
+			{
+				strncpy( param,l+1, r-l-1);
+				param[r-l-1]=0;
+/*				snprintf(c,sizeof(c)-1,"dns[%s,%s]",item->ip,param);*/
+				snprintf(c,sizeof(c)-1,"dns[%s]",param);
+			}
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_WARNING, "You must use IP address in Host %s definition", item->host);
+			snprintf(error,max_error_len-1,"You must use IP address in Host %s definition", item->host);
+			return NOTSUPPORTED;
+		}
+	}
+	else if(NULL == strstr(item->key,"_perf"))
 	{
 		if(item->useip==1)
 		{
@@ -54,7 +80,6 @@ int	get_value_simple(double *result,char *result_str,DB_ITEM *item,char *error, 
 			snprintf(c,sizeof(c)-1,"check_service_perf[%s,%s]",s,item->host);
 		}
 	}
-
 
 	process(c,result_str);
 

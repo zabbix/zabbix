@@ -1,5 +1,6 @@
 Changes for 1.1beta1:
 
+ - added support for dns[ip,domain] (Alexei)
  - added screen Host Profiles (Alexei)
  - new server configuration parameter DBPort (Alexei)
  - added column triggers.error (Alexei)

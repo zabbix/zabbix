@@ -138,5 +138,6 @@ int	AGENT_VERSION(const char *cmd, const char *command,char **value);
 int	CHECK_SERVICE(const char *cmd, const char *service,double  *value);
 int	CHECK_SERVICE_PERF(const char *cmd, const char *service,double  *value);
 int	CHECK_PORT(const char *cmd, const char *ip_and_port,double  *value);
+int	CHECK_DNS(const char *cmd, const char *service,double  *value);
 
 #endif
