@@ -120,7 +120,7 @@
 	echo "<TD WIDTH=10% NOSAVE><B>".S_ACTIONS."</B></TD>";
 	echo "</TR>";
 
-	$sql="select i.itemid,h.host,i.description,gi.gitemid,gi.color,gi.drawtype,gi.sortorder from hosts h,graphs_items gi,items i where i.itemid=gi.itemid and gi.graphid=".$_GET["graphid"]." and h.hostid=i.hostid order by gi.sortorder";
+	$sql="select i.itemid,h.host,i.description,gi.gitemid,gi.color,gi.drawtype,gi.sortorder,i.key_ from hosts h,graphs_items gi,items i where i.itemid=gi.itemid and gi.graphid=".$_GET["graphid"]." and h.hostid=i.hostid order by gi.sortorder";
 	$result=DBselect($sql);
 	$col=0;
 	while($row=DBfetch($result))
@@ -130,7 +130,7 @@
 
 		echo "<TD>".$row["sortorder"]."</TD>";
 		echo "<TD>".$row["host"]."</TD>";
-		echo "<TD><a href=\"chart.php?itemid=".$row["itemid"]."&period=3600&from=0\">".$row["description"]."</a></TD>";
+		echo "<TD><a href=\"chart.php?itemid=".$row["itemid"]."&period=3600&from=0\">".item_description($row["description"],$row["key_"])."</a></TD>";
 		echo "<TD>".get_drawtype_description($row["drawtype"])."</TD>";
 		echo "<TD>".$row["color"]."</TD>";
 		echo "<TD>";
@@ -176,12 +176,12 @@
 
 	echo S_PARAMETER;
 	show_table2_h_delimiter();
-	$result=DBselect("select h.host,i.description,i.itemid from hosts h,items i where h.hostid=i.hostid and h.status in(".HOST_STATUS_MONITORED.",".HOST_STATUS_TEMPLATE.") and i.status=".ITEM_STATUS_ACTIVE." order by h.host,i.description");
+	$result=DBselect("select h.host,i.description,i.itemid,i.key_ from hosts h,items i where h.hostid=i.hostid and h.status in(".HOST_STATUS_MONITORED.",".HOST_STATUS_TEMPLATE.") and i.status=".ITEM_STATUS_ACTIVE." order by h.host,i.description");
 	echo "<select name=\"itemid\" size=1>";
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		$host_=DBget_field($result,$i,0);
-		$description_=DBget_field($result,$i,1);
+		$description_=item_description(DBget_field($result,$i,1),DBget_field($result,$i,3));
 		$itemid_=DBget_field($result,$i,2);
 		if(isset($itemid)&&($itemid==$itemid_))
 		{

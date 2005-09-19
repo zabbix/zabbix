@@ -1,5 +1,6 @@
 Changes for 1.1beta1:
 
+ - added support of macros $1,..., $9 (Alexei)
  - added support for dns[ip,domain] (Alexei)
  - added screen Host Profiles (Alexei)
  - new server configuration parameter DBPort (Alexei)

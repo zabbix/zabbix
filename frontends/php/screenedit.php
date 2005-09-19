@@ -154,13 +154,13 @@
 				show_table2_v_delimiter();
 				echo nbsp(S_PARAMETER);
 				show_table2_h_delimiter();
-				$result=DBselect("select h.host,i.description,i.itemid from hosts h,items i where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 order by h.host,i.description");
+				$result=DBselect("select h.host,i.description,i.itemid,i.key_ from hosts h,items i where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 order by h.host,i.description");
 				echo "<select name=\"resourceid\" size=1>";
 				echo "<OPTION VALUE='0'>(none)";
 				for($i=0;$i<DBnum_rows($result);$i++)
 				{
 					$host_=DBget_field($result,$i,0);
-					$description_=DBget_field($result,$i,1);
+					$description_=item_description(DBget_field($result,$i,1),DBget_field($result,$i,3));
 					$itemid_=DBget_field($result,$i,2);
 					echo "<OPTION VALUE='$itemid_' ".iif($resourceid==$itemid_,"selected","").">$host_: $description_";
 				}
@@ -172,13 +172,13 @@
 				show_table2_v_delimiter();
 				echo nbsp(S_PARAMETER);
 				show_table2_h_delimiter();
-				$result=DBselect("select h.host,i.description,i.itemid from hosts h,items i where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 order by h.host,i.description");
+				$result=DBselect("select h.host,i.description,i.itemid,i.key_ from hosts h,items i where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 order by h.host,i.description");
 				echo "<select name=\"resourceid\" size=1>";
 				echo "<OPTION VALUE='0'>(none)";
 				for($i=0;$i<DBnum_rows($result);$i++)
 				{
 					$host_=DBget_field($result,$i,0);
-					$description_=DBget_field($result,$i,1);
+					$description_=item_description(DBget_field($result,$i,1),DBget_field($result,$i,3));
 					$itemid_=DBget_field($result,$i,2);
 					echo "<OPTION VALUE='$itemid_' ".iif($resourceid==$itemid_,"selected","").">$host_: $description_";
 				}
