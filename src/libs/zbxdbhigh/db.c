@@ -232,7 +232,7 @@ char	*DBget_field(DB_RESULT *result, int rownum, int fieldnum)
 int	DBinsert_id()
 {
 #ifdef	HAVE_MYSQL
-	zabbix_log(LOG_LEVEL_WARNING, "In DBinsert_id()" );
+	zabbix_log(LOG_LEVEL_DEBUG, "In DBinsert_id()" );
 	return mysql_insert_id(&mysql);
 #endif
 #ifdef	HAVE_PGSQL
@@ -497,26 +497,24 @@ int	add_alarm(int triggerid,int status,int clock,int *alarmid)
 
 	*alarmid=0;
 
-	zabbix_log(LOG_LEVEL_WARNING,"In add_alarm(%d,%d,%d)",triggerid, status, *alarmid);
+	zabbix_log(LOG_LEVEL_DEBUG,"In add_alarm(%d,%d,%d)",triggerid, status, *alarmid);
 
 	/* Latest alarm has the same status? */
 	if(latest_alarm(triggerid,status) == SUCCEED)
 	{
-		zabbix_log(LOG_LEVEL_WARNING,"Alarm for triggerid [%d] status [%d] already exists",triggerid,status);
+		zabbix_log(LOG_LEVEL_DEBUG,"Alarm for triggerid [%d] status [%d] already exists",triggerid,status);
 		return FAIL;
 	}
 
 	snprintf(sql,sizeof(sql)-1,"insert into alarms(triggerid,clock,value) values(%d,%d,%d)", triggerid, clock, status);
-	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	DBexecute(sql);
 
-	zabbix_log(LOG_LEVEL_WARNING,"Before");
 	*alarmid=DBinsert_id();
-	zabbix_log(LOG_LEVEL_WARNING,"After");
 
 	/* Cancel currently active escalations */
 	if(status == TRIGGER_VALUE_FALSE || status == TRIGGER_VALUE_TRUE)
 	{
+		zabbix_log(LOG_LEVEL_DEBUG,"Before SQL");
 		snprintf(sql,sizeof(sql)-1,"update escalation_log set status=1 where triggerid=%d and status=0", triggerid);
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		DBexecute(sql);
@@ -573,7 +571,7 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 			}
 			else
 			{
-				snprintf(sql,sizeof(sql)-1,"update triggers set value=%d,lastchange=%d,error='%s' where triggerid=%d",new_value,now,trigger->triggerid,reason);
+				snprintf(sql,sizeof(sql)-1,"update triggers set value=%d,lastchange=%d,error='%s' where triggerid=%d",new_value,now,reason, trigger->triggerid);
 			}
 			DBexecute(sql);
 			if(TRIGGER_VALUE_UNKNOWN == new_value)
@@ -600,7 +598,7 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING,"Alarm not added for triggerid [%d]", trigger->triggerid);
+			zabbix_log(LOG_LEVEL_DEBUG,"Alarm not added for triggerid [%d]", trigger->triggerid);
 			ret = FAIL;
 		}
 	}
