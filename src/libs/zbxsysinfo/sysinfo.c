@@ -132,6 +132,16 @@
 	#include <ldap.h>
 #endif
 
+/* DNS */
+#include <ctype.h>
+
+#include <netinet/in.h>
+#include <netdb.h>
+#include <errno.h>
+#include <arpa/nameser.h>
+#include <resolv.h>
+/* End of DNS includes */
+
 #include "common.h"
 #include "sysinfo.h"
 
@@ -314,6 +324,7 @@ COMMAND	agent_commands[]=
 	{"check_port[*]"	,CHECK_PORT, 	0, "80"},
 
 	{"check_service[*]"	,CHECK_SERVICE, 	0, "ssh,127.0.0.1,22"},
+	{"dns[*]"		,CHECK_DNS,		0, "127.0.0.1,localhost"},
 	{"check_service_perf[*]",CHECK_SERVICE_PERF, 	0, "ssh,127.0.0.1,22"},
 
 	{0}
@@ -1420,7 +1431,7 @@ void	forward_request(char *proxy,char *command,int port,char *value)
  * 0 - NOT OK
  * 1 - OK
  * */
-int	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose, int *value_int)
+int	tcp_expect(char	*hostname, short port, char *request,char *expect,char *sendtoclose, int *value_int)
 {
 	char	*haddr;
 	char	c[1024];
@@ -1461,6 +1472,11 @@ int	tcp_expect(char	*hostname, short port, char *expect,char *sendtoclose, int *
 		close(s);
 		*value_int = 0;
 		return SYSINFO_RET_OK;
+	}
+
+	if( request != NULL)
+	{
+		send(s,request,strlen(request),0);
 	}
 
 	if( expect == NULL)
@@ -1694,39 +1710,39 @@ int	CHECK_SERVICE_PERF(const char *cmd, const char *service_and_ip_and_port,doub
 	else if(strcmp(service,"smtp") == 0)
 	{
 		if(port == 0)	port=25;
-		result=tcp_expect(ip,port,"220","QUIT\n",&value_int);
+		result=tcp_expect(ip,port,NULL,"220","QUIT\n",&value_int);
 	}
 	else if(strcmp(service,"ftp") == 0)
 	{
 		if(port == 0)	port=21;
-		result=tcp_expect(ip,port,"220","",&value_int);
+		result=tcp_expect(ip,port,NULL,"220","",&value_int);
 	}
 	else if(strcmp(service,"http") == 0)
 	{
 		if(port == 0)	port=80;
-		result=tcp_expect(ip,port,NULL,"",&value_int);
+		result=tcp_expect(ip,port,NULL,NULL,"",&value_int);
 	}
 	else if(strcmp(service,"pop") == 0)
 	{
 		if(port == 0)	port=110;
-		result=tcp_expect(ip,port,"+OK","",&value_int);
+		result=tcp_expect(ip,port,NULL,"+OK","",&value_int);
 	}
 	else if(strcmp(service,"nntp") == 0)
 	{
 		if(port == 0)	port=119;
 /* 220 is incorrect */
 /*		result=tcp_expect(ip,port,"220","");*/
-		result=tcp_expect(ip,port,"200","",&value_int);
+		result=tcp_expect(ip,port,NULL,"200","",&value_int);
 	}
 	else if(strcmp(service,"imap") == 0)
 	{
 		if(port == 0)	port=143;
-		result=tcp_expect(ip,port,"* OK","a1 LOGOUT\n",&value_int);
+		result=tcp_expect(ip,port,NULL,"* OK","a1 LOGOUT\n",&value_int);
 	}
 	else if(strcmp(service,"tcp") == 0)
 	{
 		if(port == 0)	port=80;
-		result=tcp_expect(ip,port,NULL,"",&value_int);
+		result=tcp_expect(ip,port,NULL,NULL,"",&value_int);
 	}
 	else
 	{
@@ -1855,39 +1871,39 @@ int	CHECK_SERVICE(const char *cmd, const char *service_and_ip_and_port,double  *
 	else if(strcmp(service,"smtp") == 0)
 	{
 		if(port == 0)	port=25;
-		result=tcp_expect(ip,port,"220","QUIT\n",&value_int);
+		result=tcp_expect(ip,port,NULL,"220","QUIT\n",&value_int);
 	}
 	else if(strcmp(service,"ftp") == 0)
 	{
 		if(port == 0)	port=21;
-		result=tcp_expect(ip,port,"220","",&value_int);
+		result=tcp_expect(ip,port,NULL,"220","",&value_int);
 	}
 	else if(strcmp(service,"http") == 0)
 	{
 		if(port == 0)	port=80;
-		result=tcp_expect(ip,port,NULL,"",&value_int);
+		result=tcp_expect(ip,port,NULL,NULL,"",&value_int);
 	}
 	else if(strcmp(service,"pop") == 0)
 	{
 		if(port == 0)	port=110;
-		result=tcp_expect(ip,port,"+OK","",&value_int);
+		result=tcp_expect(ip,port,NULL,"+OK","",&value_int);
 	}
 	else if(strcmp(service,"nntp") == 0)
 	{
 		if(port == 0)	port=119;
 /* 220 is incorrect */
 /*		result=tcp_expect(ip,port,"220","");*/
-		result=tcp_expect(ip,port,"200","",&value_int);
+		result=tcp_expect(ip,port,NULL,"200","",&value_int);
 	}
 	else if(strcmp(service,"imap") == 0)
 	{
 		if(port == 0)	port=143;
-		result=tcp_expect(ip,port,"* OK","a1 LOGOUT\n",&value_int);
+		result=tcp_expect(ip,port,NULL,"* OK","a1 LOGOUT\n",&value_int);
 	}
 	else if(strcmp(service,"tcp") == 0)
 	{
 		if(port == 0)	port=80;
-		result=tcp_expect(ip,port,NULL,"",&value_int);
+		result=tcp_expect(ip,port,NULL,NULL,"",&value_int);
 	}
 	else
 	{
@@ -1921,7 +1937,83 @@ int	CHECK_PORT(const char *cmd, const char *ip_and_port,double  *value)
 		strcpy(ip,"127.0.0.1");
 	}
 
-	result = tcp_expect(ip,port,NULL,"",&value_int);
+	result = tcp_expect(ip,port,NULL,NULL,"",&value_int);
 	*value = (double)value_int;
 	return result;
+}
+
+
+int	CHECK_DNS(const char *cmd, const char *ip_and_zone,double  *value)
+{
+	char	*c;
+	int		result;
+	char	ip[MAX_STRING_LEN];
+	char	zone[MAX_STRING_LEN];
+	char	respbuf[PACKETSZ];
+	struct	in_addr in;
+
+	extern struct __res_state _res;
+	extern char *h_errlist[];
+
+	memset(&ip, 0, MAX_STRING_LEN);
+	memset(&zone, 0, MAX_STRING_LEN);
+
+	c=strchr(ip_and_zone,',');
+	if(c != NULL)
+	{
+		strncpy(ip,ip_and_zone,c-ip_and_zone);
+		ip[c-ip_and_zone]=0;
+		strscpy(zone,c+1);
+	}
+	else
+	{
+		if(strlen(ip_and_zone)>0)
+		{
+			if(isdigit(ip_and_zone[strlen(ip_and_zone)-1]))
+			{
+				strcpy(ip,ip_and_zone);
+				strcpy(zone,"localhost");
+			}
+			else
+			{
+				strcpy(ip,"127.0.0.1");
+				strcpy(zone,ip_and_zone);
+			}
+		}
+		else
+		{
+			strcpy(ip,"127.0.0.1");
+			strcpy(zone,"localhost");
+		}
+	}
+
+	result = inet_aton(ip, &in);
+	if(result != 1)
+	{
+		value = 0;
+		return SYSINFO_RET_FAIL;
+	}
+
+	res_init();
+
+/*
+	_res.nsaddr.sin_addr=in;
+	_res.nscount=1;
+	_res.options= (RES_INIT|RES_AAONLY) & ~RES_RECURSE;
+	_res.retrans=5;
+	_res.retry=1;
+*/
+
+	h_errno=0;
+
+	_res.nsaddr_list[0].sin_addr = in;
+	_res.nsaddr_list[0].sin_family = AF_INET;
+	_res.nsaddr_list[0].sin_port = htons(NS_DEFAULTPORT);
+	_res.nscount = 1; 
+	_res.retrans=5;
+
+	result=res_query(zone,ns_c_in,ns_t_soa,respbuf,sizeof(respbuf));
+	*value = result!=-1 ? 1 : 0;
+
+	return SYSINFO_RET_OK;
 }
