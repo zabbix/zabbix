@@ -764,7 +764,8 @@
 
 	"S_HELP"=>				"Help",
 	"S_PROFILE"=>				"Profile",
-	"S_VIEW"=>				"View",
+	"S_MONITORING"=>			"Monitoring",
+	"S_CONFIGURATION_MANAGEMENT"=>		"Configuration management",
 	"S_QUEUE"=>				"Queue",
 	"S_EVENTS"=>				"Events",
 	"S_MAPS"=>				"Maps",
