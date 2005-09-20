@@ -374,6 +374,8 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
 	float	value_float_abs;
 	char	suffix[MAX_STRING_LEN];
 
+	int	fuzlow, fuzhig;
+
 	int	day;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() Function [%s] flag [%d]",function,flag);
@@ -578,6 +580,29 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
 	{
 		now=time(NULL);
                 snprintf(value,MAX_STRING_LEN-1,"%d",(int)now);
+	}
+	else if(strcmp(function,"fuzzytime")==0)
+	{
+		now=time(NULL);
+		fuzlow=(int)(now+atoi(parameter));
+		fuzhig=(int)(now-atoi(parameter));
+
+		if(item->lastvalue_null==1)
+		{
+				ret = FAIL;
+		}
+		else
+		{
+				zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() fuzzytime [%s] [%s]",value,item->lastvalue);
+			if((item->lastvalue>=fuzlow)&&(item->lastvalue<=fuzhig))
+			{
+				strcpy(value,"1");
+			}
+			else
+			{
+				strcpy(value,"0");
+			}
+		}
 	}
 	else
 	{
