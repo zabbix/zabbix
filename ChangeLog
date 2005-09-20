@@ -1,5 +1,6 @@
 Changes for 1.1beta1:
 
+ - support of function fuzzytime(). Thanks to James Wells. (Alexei)
  - added menu structure for configuration management (Alexei)
  - added support of macros $1,..., $9 (Alexei)
  - added support for dns[ip,domain] (Alexei)
