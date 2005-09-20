@@ -1065,8 +1065,8 @@ echo "</head>";
 <?php
 	$menu=array(
 		"view"=>array(
-				"label"=>S_VIEW,
-				"pages"=>array("overview.php","latest.php","tr_status.php","queue.php","latestalarms.php","alerts.php","maps.php","charts.php","screens.php","srv_status.php","alarms.php","history.php","tr_comments.php","report3.php","profile.php","hostprofiles.php"),
+				"label"=>S_MONITORING,
+				"pages"=>array("overview.php","latest.php","tr_status.php","queue.php","latestalarms.php","alerts.php","maps.php","charts.php","screens.php","srv_status.php","alarms.php","history.php","tr_comments.php","report3.php","profile.php"),
 				"level2"=>array(
 					array("label"=>S_OVERVIEW,"url"=>"overview.php"),
 					array("label"=>S_LATEST_DATA,"url"=>"latest.php"),
@@ -1077,8 +1077,14 @@ echo "</head>";
 					array("label"=>S_MAPS,"url"=>"maps.php"),
 					array("label"=>S_GRAPHS,"url"=>"charts.php"),
 					array("label"=>S_SCREENS,"url"=>"screens.php"),
-					array("label"=>S_IT_SERVICES,"url"=>"srv_status.php"),
-					array("label"=>S_HOST_PROFILES,"url"=>"hostprofiles.php")
+					array("label"=>S_IT_SERVICES,"url"=>"srv_status.php")
+					)
+				),
+		"cm"=>array(
+				"label"=>S_CONFIGURATION_MANAGEMENT,
+				"pages"=>array("hostprofiles.php"),
+				"level2"=>array(
+					array("label"=>S_HOSTS,"url"=>"hostprofiles.php")
 					)
 				),
 		"reports"=>array(
@@ -1167,8 +1173,11 @@ echo "</head>";
 			}
 		}
 		if($i==0)	$url=get_profile("web.menu.view.last",0);
-		else if($i==1)	$url=get_profile("web.menu.reports.last",0);
-		else if($i==2)	$url=get_profile("web.menu.config.last",0);
+		else if($i==1)	$url=get_profile("web.menu.cm.last",0);
+		else if($i==2)	$url=get_profile("web.menu.reports.last",0);
+		else if($i==3)	$url=get_profile("web.menu.config.last",0);
+		else if($i==4)	$url="0";
+
 		if($url=="0")	$url=$sub["level2"][0]["url"];
 		if($active==1)
 		{
