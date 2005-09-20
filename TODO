@@ -1,6 +1,5 @@
 1.1beta1:
 
- - add macros $1, $2, $3 or {1} {2} {3} to wherever possible
  - make agents return error message if not supported or not available
  - centralised management of agent configuration files
  - escalations and repeated notifications
@@ -18,7 +17,6 @@ ZABBIX 1.1:
  - add acknowledgements
 
  - handle unavailability of MySQL gracefully
- - apply patches for DNS checks
  - add HTML block to the screen cell (to see external data, images, etc)
  - disk stats under Linux 2.6.x
  - more supported parameters under FreeBSD, HP-UX and Solaris (cpu times, network stats)
