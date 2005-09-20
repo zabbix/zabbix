@@ -32,6 +32,24 @@
 #include "common.h"
 #include "log.h"
 
+/******************************************************************************
+ *                                                                            *
+ * Function: check_security                                                   *
+ *                                                                            *
+ * Purpose: check if connection initiator is in list of IP addresses          *
+ *                                                                            *
+ * Parameters: sockfd - socker descriptor                                     *
+ *             ip_list - comma-delimited list of IP addresses                 *
+ *             allow_if_empty - allow connection if no IP given               *
+ *                                                                            *
+ * Return value: SUCCEED - connection allowed                                 *
+ *               FAIL - connection is not allowed                             *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 int	check_security(int sockfd, char *ip_list, int allow_if_empty)
 {
 	char	*sname;
