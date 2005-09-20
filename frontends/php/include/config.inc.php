@@ -960,7 +960,7 @@
 
 		if(isset($sessionid))
 		{
-			$sql="select u.userid,u.alias,u.name,u.surname,u.lang from sessions s,users u where s.sessionid='$sessionid' and s.userid=u.userid and s.lastaccess+u.autologout>".time();
+			$sql="select u.userid,u.alias,u.name,u.surname,u.lang from sessions s,users u where s.sessionid='$sessionid' and s.userid=u.userid and ((s.lastaccess+u.autologout>".time().") or (u.autologout=0))";
 			$result=DBselect($sql);
 			if(DBnum_rows($result)==1)
 			{
