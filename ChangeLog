@@ -1,3 +1,7 @@
+Changes for 1.1beta2:
+
+ - added path to SNMP headers in Makefiles (Alexei)
+
 Changes for 1.1beta1:
 
  - fixed never logout option (Alexei)
