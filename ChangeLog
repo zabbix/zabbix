@@ -1,5 +1,6 @@
 Changes for 1.1beta2:
 
+ - new parameter for zabbix_agentd, show list of supported parameters (Alexei)
  - added path to SNMP headers in Makefiles (Alexei)
 
 Changes for 1.1beta1:
