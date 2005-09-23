@@ -797,6 +797,7 @@ case "$host_os" in
 linux*)
 	arch="linux"
 	AM_CONDITIONAL(CONFIG_HOST_LINUX, test "x$arch" = "xlinux")
+	AC_SUBST(CONFIG_HOST_LINUX)
 
 	AC_MSG_RESULT([ok (${host_os})])
 

@@ -81,7 +81,7 @@ int	get_value_simple(double *result,char *result_str,DB_ITEM *item,char *error, 
 		}
 	}
 
-	process(c,result_str);
+	process(c,result_str,0);
 
 	if(strcmp(result_str,"ZBX_NOTSUPPORTED\n") == 0)
 	{

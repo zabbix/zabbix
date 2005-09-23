@@ -446,7 +446,7 @@ void	test_parameters(void)
 	i=0;
 	while(0 != commands[i].key)
 	{
-		process(commands[i].key,c);
+		process(commands[i].key,c,1);
 		printf("Key: [%s]\tResult: [%s]\n",commands[i].key,c);
 		fflush(stdout);
 		i++;
@@ -455,7 +455,7 @@ void	test_parameters(void)
 
 /* This messy function must be rewritten!
  */
-int	process(char *command,char *value)
+int	process(char *command,char *value, int test)
 {
 	char	*p;
 	double	result=0;
@@ -519,12 +519,16 @@ int	process(char *command,char *value)
 					/* Command returns string, not double */
 					ret_str=1;
 				}
-#ifdef TEST_PARAMETERS
-				parameter=commands[i].parameter;
-#else
-				cmd_line_param = param;
-				parameter=param;
-#endif
+
+				if(test ==1)
+				{
+					parameter=commands[i].parameter;
+				}
+				else
+				{
+					cmd_line_param = param;
+					parameter=param;
+				}
 				break;
 			}
 		}

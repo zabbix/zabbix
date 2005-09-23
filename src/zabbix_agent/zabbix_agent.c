@@ -123,7 +123,7 @@ int	main()
 	}
 
 	fgets(s,MAX_STRING_LEN,stdin);
-	process(s,value);
+	process(s,value,0);
 
 	printf("%s\n",value);
 
