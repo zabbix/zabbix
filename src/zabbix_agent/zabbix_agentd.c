@@ -81,6 +81,8 @@ int	CONFIG_REFRESH_ACTIVE_CHECKS	= 120;
 char	*CONFIG_LISTEN_IP		= NULL;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 
+void    init_config(void);
+
 void	uninit(void)
 {
 	int i;
@@ -219,10 +221,19 @@ int     add_parameter(char *value)
 void usage(char *prog)
 {
 	printf("zabbix_agentd - ZABBIX agent (daemon) v1.1\n");
-	printf("Usage: %s [-h] [-c <file>]\n", prog);
+	printf("Usage: %s [-h] [-c <file>] [-p]\n", prog);
 	printf("\nOptions:\n");
 	printf("  -c <file>   Specify configuration file\n");
+	printf("  -p          Print supported metrics and exit\n");
 	printf("  -h          Help\n");
+	exit(-1);
+}
+
+void	print_supported()
+{
+	init_metrics();
+	init_config();
+	test_parameters();
 	exit(-1);
 }
 
@@ -266,7 +277,7 @@ void    init_config(void)
 
 	if(CONFIG_HOSTNAME == NULL)
 	{
-		if(SUCCEED == process("system[hostname]",tmp))
+		if(SUCCEED == process("system[hostname]",tmp, 0))
 		{
 			CONFIG_HOSTNAME=strdup(tmp);
 		}
@@ -321,7 +332,7 @@ void	process_child(int sockfd)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Got line:%s", line);
 
-	process(line,result);
+	process(line,result,0);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Sending back:%s", result);
 	i=write(sockfd,result,strlen(result));
@@ -442,13 +453,16 @@ int	main(int argc, char **argv)
         static struct  sigaction phan;
 
 /* Parse the command-line. */
-	while ((ch = getopt(argc, argv, "c:h")) != EOF)
+	while ((ch = getopt(argc, argv, "c:h:p")) != EOF)
 		switch ((char) ch) {
 		case 'c':
 			CONFIG_FILE = optarg;
 			break;
 		case 'h':
 			usage(argv[0]);
+			break;
+		case 'p':
+			print_supported();
 			break;
 		default:
 			usage(argv[0]);

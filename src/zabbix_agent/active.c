@@ -463,7 +463,7 @@ int	process_active_checks(char *server, int port)
 		else
 		{
 			lastlogsize[0]=0;
-			process(metrics[i].key, value);
+			process(metrics[i].key, value, 0);
 
 //			snprintf(shortname, MAX_STRING_LEN-1,"%s:%s",CONFIG_HOSTNAME,metrics[i].key);
 //			zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
