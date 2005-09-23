@@ -157,6 +157,7 @@ COMMAND	agent_commands[]=
 	{
 
 /* Outdated */
+
 	{"cksum[*]"		,VFS_FILE_CKSUM, 	0, "/etc/services"},
 	{"cpu[idle1]"		,SYSTEM_CPU_IDLE1, 	0, 0},
 	{"cpu[idle5]"		,SYSTEM_CPU_IDLE5, 	0, 0},
@@ -208,6 +209,7 @@ COMMAND	agent_commands[]=
 	{"version[zabbix_agent]",	0, 		AGENT_VERSION, 0},
 /* New naming  */
 
+	{"agent.ping"		,AGENT_PING, 		0, 0},
 	{"agent.version",		0, 		AGENT_VERSION, 0},
 
 	{"kernel.maxfiles]"	,KERNEL_MAXFILES,	0, 0},
@@ -280,8 +282,19 @@ COMMAND	agent_commands[]=
 	{"sensor[temp2]"	,SENSOR_TEMP2, 		0, 0},
 	{"sensor[temp3]"	,SENSOR_TEMP3, 		0, 0},
 
+	{"system.cpu.load1"	,SYSTEM_CPU_LOAD1,	0, 0},
+	{"system.cpu.load5"	,SYSTEM_CPU_LOAD5,	0, 0},
+	{"system.cpu.load15"	,SYSTEM_CPU_LOAD15,	0, 0},
+
+	{"system.hostname"	,0,			EXECUTE_STR, "hostname"},
+	{"system.localtime"	,SYSTEM_LOCALTIME,	0, 0},
+
 	{"system.swap.free"	,SYSTEM_SWAP_FREE,	0, 0},
 	{"system.swap.total"	,SYSTEM_SWAP_TOTAL, 	0, 0},
+
+	{"system.uname"		,0,			EXECUTE_STR, "uname -a"},
+	{"system.uptime"	,SYSTEM_UPTIME,		0, 0},
+	{"system.users.num"	,EXECUTE, 		0,"who|wc -l"},
 
 /****************************************
   	All these perameters require more than 1 second to retrieve.
@@ -300,22 +313,13 @@ COMMAND	agent_commands[]=
 	{"io[disk_wblk]"	,DISK_WBLK, 	0, 0},
 
 
-	{"system.cpu.load1"	,SYSTEM_CPU_LOAD1,	0, 0},
-	{"system.cpu.load5"	,SYSTEM_CPU_LOAD5,	0, 0},
-	{"system.cpu.load15"	,SYSTEM_CPU_LOAD15,	0, 0},
 
 	{"system[proccount]"	,PROCCOUNT, 	0, 0},
 
 #ifdef HAVE_PROC_LOADAVG
 	{"system[procrunning]"	,EXECUTE, 	0, "cat /proc/loadavg|cut -f1 -d'/'|cut -f4 -d' '"},
 #endif
-	{"system.hostname"	,0,		EXECUTE_STR, "hostname"},
-	{"system.localtime"	,SYSTEM_LOCALTIME,	0, 0},
-	{"system.uname"	,0,		EXECUTE_STR, "uname -a"},
-	{"system.uptime"	,SYSTEM_UPTIME,	0, 0},
-	{"system.users.num"	,EXECUTE, 	0,"who|wc -l"},
 
-	{"agent.ping"		,AGENT_PING, 		0, 0},
 /*	{"tcp_count"		,EXECUTE, 	0, "netstat -tn|grep EST|wc -l"}, */
 
 	{"net[listen_23]"	,TCP_LISTEN, 	0, "0017"},
