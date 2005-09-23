@@ -451,7 +451,14 @@ void	test_parameters(void)
 	while(0 != commands[i].key)
 	{
 		process(commands[i].key,c,1);
-		printf("Key: [%s]\tResult: [%s]\n",commands[i].key,c);
+		if((commands[i].parameter==0))
+		{
+			printf("%-30s [%s]\n",commands[i].key,c);
+		}
+		else
+		{
+			printf("%-30s[%s] [%s]\n",commands[i].key,commands[i].parameter,c);
+		}
 		fflush(stdout);
 		i++;
 	}
