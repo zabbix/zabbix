@@ -795,7 +795,8 @@ dnl AC_CONFIG_HEADER(include/config.h)
 # Cheks for host_os 
 case "$host_os" in
 linux*)
-	ZBX_OS="linux"
+	arch="linux"
+	AM_CONDITIONAL(CONFIG_HOST_LINUX, test "x$arch" = "xlinux")
 
 	AC_MSG_RESULT([ok (${host_os})])
 
