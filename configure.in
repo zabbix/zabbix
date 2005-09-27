@@ -796,8 +796,6 @@ dnl AC_CONFIG_HEADER(include/config.h)
 case "$host_os" in
 linux*)
 	arch="linux"
-	AM_CONDITIONAL(CONFIG_HOST_LINUX, test "x$arch" = "xlinux")
-	AC_SUBST(CONFIG_HOST_LINUX)
 
 	AC_MSG_RESULT([ok (${host_os})])
 
@@ -823,8 +821,8 @@ linux*)
         	    ;;
         esac
 ;;
-*freebsd*)
-	ZBX_OS="freebsd"
+*solaris*)
+	arch="solaris"
 
 	AC_MSG_RESULT([ok (${host_os})])
 ;;
@@ -836,7 +834,11 @@ dnl	AC_MSG_ERROR(${host_os} not supported)
 ;;
 esac
 
-AC_SUBST(ZBX_OS)
+AM_CONDITIONAL(CONFIG_HOST_LINUX, test "x$arch" = "xlinux")
+AC_SUBST(CONFIG_HOST_LINUX)
+
+AM_CONDITIONAL(CONFIG_HOST_SOLARIS, test "x$arch" = "xsolaris")
+AC_SUBST(CONFIG_HOST_SOLARIS)
 
 AC_OUTPUT(Makefile src/Makefile src/libs/Makefile src/libs/zbxlog/Makefile src/libs/zbxcrypto/Makefile  \
 	src/libs/zbxpid/Makefile src/libs/zbxnet/Makefile src/libs/zbxconf/Makefile src/zabbix_sender/Makefile \
