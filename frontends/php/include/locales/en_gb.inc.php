@@ -621,6 +621,9 @@
 	"S_TRIGGER"=>				"Trigger",
 	"S_SERVER"=>				"Server",
 	"S_DELETE"=>				"Delete",
+	"S_DELETE_SELECTED_SERVICES"=>		"Delete selected services?",
+	"S_SERVICES_DELETED"=>			"Services deleted",
+	"S_CANNOT_DELETE_SERVICES"=>		"Cannot delete services",
 
 //	srv_status.php
 	"S_IT_SERVICES_BIG"=>			"IT SERVICES",

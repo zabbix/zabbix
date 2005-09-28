@@ -80,6 +80,24 @@
 			$result=delete_service_link($_GET["linkid"]);
 			show_messages($result, S_LINK_DELETED, S_CANNOT_DELETE_LINK);
 		}
+		if($_GET["register"]=="Delete selected")
+		{
+			$result=DBselect("select serviceid from services");
+			while($row=DBfetch($result))
+			{
+// $$ is correct here
+				if(isset($_GET[$row["serviceid"]]))
+				{
+					delete_service($row["serviceid"]);
+					if(isset($_GET["serviceid"]))
+					{
+						if($row["serviceid"]==$_GET["serviceid"])
+							unset($_GET["serviceid"]);
+					}
+				}
+			}
+			show_messages(TRUE, S_SERVICES_DELETED, S_CANNOT_DELETE_SERVICES);
+		}
 	}
 ?>
 
@@ -90,15 +108,27 @@
 	$result=DBselect("select serviceid,name,algorithm from services order by sortorder,name");
 	echo "<table border=0 width=100% bgcolor='#AAAAAA' cellspacing=1 cellpadding=3>";
 	echo "<tr bgcolor='#CCCCCC'>";
+	echo "<td><b>".S_ID."</b></td>";
 	echo "<td><b>".S_SERVICE."</b></td>";
 	echo "<td width=20%><b>".S_STATUS_CALCULATION."</b></td>";
 	echo "</tr>";
+
+	echo "<form method=\"get\" action=\"services.php\">";
+	if(isset($_GET["serviceid"]))
+	{
+		echo "<input class=\"biginput\" name=\"serviceid\" type=hidden value=".$_GET["serviceid"]." size=8>";
+	}
 
 	$col=0;
 	if(isset($_GET["serviceid"]))
 	{
 		echo "<tr bgcolor=#EEEEEE>";
+
 		$service=get_service_by_serviceid($_GET["serviceid"]);
+
+		$input="<INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"".$service["serviceid"]."\"> ".$service["serviceid"];
+		echo "<td>$input</td>";
+
 		echo "<td><b><a href=\"services.php?serviceid=".$service["serviceid"]."#form\">".$service["name"]."</a></b></td>";
 		if($service["algorithm"] == SERVICE_ALGORITHM_NONE)
 		{
@@ -138,6 +168,11 @@
 			if($col++%2==0)	{ echo "<tr bgcolor=#EEEEEE>"; }
 			else		{ echo "<tr bgcolor=#DDDDDD>"; }
 		}
+
+		$input="<INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"".$row["serviceid"]."\"> ".$row["serviceid"];
+
+		echo "<td>$input</td>";
+
 		$childs=get_num_of_service_childs($row["serviceid"]);
 		if(isset($_GET["serviceid"]))
 		{
@@ -166,6 +201,13 @@
 		echo "</tr>";
 	}
 	echo "</table>";
+?>
+
+<?php
+		show_form_begin();
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Delete selected\" onClick=\"return Confirm('".S_DELETE_SELECTED_SERVICES."');\">";
+		show_table2_header_end();
+		echo "</form>";
 ?>
 
 <?php
