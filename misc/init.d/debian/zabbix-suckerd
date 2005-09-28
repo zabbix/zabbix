@@ -2,7 +2,7 @@
 #
 # Zabbix daemon start/stop script.
 #
-# Written by Alexei Vladishev <alex@gobbo.caves.lv>.
+# Written by Alexei Vladishev <alexei.vladishev@zabbix.com>.
 
 PATH=/bin:/usr/bin:/sbin:/usr/sbin:/home/zabbix/bin
 DAEMON=/home/zabbix/bin/zabbix_suckerd
