@@ -159,7 +159,7 @@ install -m 755 misc/init.d/suse/9.1/zabbix_* %{buildroot}%{_sysconfdir}/init.d/
 * Fri Jan 29 2005 Dirk Datzert <dirk@datzert.de>
 - update to 1.1aplha6
 
-* Tue Jun 01 2003 Alexei Vladishev <alex@gobbo.caves.lv>
+* Tue Jun 01 2003 Alexei Vladishev <alexei.vladishev@zabbix.com>
 - update to 1.0beta10 
 
 * Tue Jun 01 2003 Harald Holzer <hholzer@may.co.at>
