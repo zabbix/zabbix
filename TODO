@@ -1,5 +1,9 @@
-1.1beta1:
+1.1beta2:
 
+ - Repeated notifications
+ - Basic auto-discovery
+ - Monitoring of NTP servers
+ - Regular expressions in agent
  - make agents return error message if not supported or not available
  - centralised management of agent configuration files
  - escalations and repeated notifications
