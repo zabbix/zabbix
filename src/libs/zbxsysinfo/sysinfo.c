@@ -234,12 +234,14 @@ COMMAND	agent_commands[]=
 	{"vfs.fs.inode.total[*]",VFS_FS_INODE_TOTAL,	0, "/"},
 	{"vfs.fs.inode.pfree[*]",VFS_FS_INODE_PFREE,	0, "/"},
 
-	{"vfs.file.atime[*]"	,VFS_FILE_ATIME,		0, "/etc/passwd"},
-	{"vfs.file.cksum[*]"	,VFS_FILE_CKSUM,		0, "/etc/services"},
-	{"vfs.file.ctime[*]"	,VFS_FILE_CTIME,		0, "/etc/passwd"},
+	{"vfs.file.atime[*]"	,VFS_FILE_ATIME,	0, "/etc/passwd"},
+	{"vfs.file.cksum[*]"	,VFS_FILE_CKSUM,	0, "/etc/services"},
+	{"vfs.file.ctime[*]"	,VFS_FILE_CTIME,	0, "/etc/passwd"},
 	{"vfs.file.exists[*]"	,VFS_FILE_EXISTS,	0, "/etc/passwd"},
 	{"vfs.file.md5sum[*]"	,0, 			VFS_FILE_MD5SUM, "/etc/services"},
 	{"vfs.file.mtime[*]"	,VFS_FILE_MTIME,		0, "/etc/passwd"},
+	{"vfs.file.regexp[*]"	,0, 			VFS_FILE_REGEXP, "/etc/passwd,root"},
+	{"vfs.file.regmatch[*]"	,VFS_FILE_REGMATCH, 	0, "/etc/passwd,root"},
 	{"vfs.file.size[*]"	,VFS_FILE_SIZE, 		0, "/etc/passwd"},
 
 	{"system.cpu.idle1"	,SYSTEM_CPU_IDLE1, 		0, 0},
