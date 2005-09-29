@@ -42,6 +42,7 @@ void	init_metrics();
 void    add_user_parameter(char *key,char *command);
 void	test_parameters(void);
 int	getPROC(char *file,int lineno,int fieldno, double *value);
+int	get_param(char *param, int num, char *buf, int maxlen);
 
 int	VM_MEMORY_BUFFERS(const char *cmd, const char *parameter,double  *value);
 int	VM_MEMORY_CACHED(const char *cmd, const char *parameter,double  *value);
@@ -77,6 +78,8 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *filename,double  *value);
 int	VFS_FILE_CTIME(const char *cmd, const char *filename,double  *value);
 int	VFS_FILE_MD5SUM(const char *cmd, const char *filename, char **value);
 int	VFS_FILE_MTIME(const char *cmd, const char *filename,double  *value);
+int	VFS_FILE_REGEXP(const char *cmd, const char *filename, char **value);
+int	VFS_FILE_REGMATCH(const char *cmd, const char *filename,double  *value);
 int	VFS_FILE_SIZE(const char *cmd, const char *filename,double  *value);
 int	VFS_FILE_EXISTS(const char *cmd, const char *filename,double  *value);
 
