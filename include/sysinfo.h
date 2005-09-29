@@ -42,7 +42,8 @@ void	init_metrics();
 void    add_user_parameter(char *key,char *command);
 void	test_parameters(void);
 int	getPROC(char *file,int lineno,int fieldno, double *value);
-int	get_param(char *param, int num, char *buf, int maxlen);
+int	get_param(const char *param, int num, char *buf, int maxlen);
+char	*zbx_regexp_match(const char *string, char *pattern, int *len);
 
 int	VM_MEMORY_BUFFERS(const char *cmd, const char *parameter,double  *value);
 int	VM_MEMORY_CACHED(const char *cmd, const char *parameter,double  *value);
