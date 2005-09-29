@@ -82,6 +82,8 @@
 #include "common.h"
 #include "sysinfo.h"
 
+#define MAX_FILE_LEN 1024*1024
+
 int	VFS_FILE_SIZE(const char *cmd, const char *filename,double  *value)
 {
 	struct stat	buf;
@@ -147,4 +149,137 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *filename,double  *value)
 	}
 	/* File does not exist or any other error */
 	return SYSINFO_RET_OK;
+}
+
+int	VFS_FILE_REGEXP(const char *cmd, const char *param, char **value)
+{
+	char	filename[MAX_STRING_LEN];
+	char	regexp[MAX_STRING_LEN];
+	FILE	*f = NULL;
+	char	*buf = NULL;
+	int	len;
+	char	tmp[MAX_STRING_LEN];
+	char	*c;
+
+	int	ret = SYSINFO_RET_OK;
+
+	memset(tmp,0,MAX_STRING_LEN);
+
+	if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
+	{
+		ret = SYSINFO_RET_FAIL;
+	}
+
+	if(get_param(param, 2, regexp, MAX_STRING_LEN) != 0)
+	{
+		ret = SYSINFO_RET_FAIL;
+	}
+
+	if(ret == SYSINFO_RET_OK)
+	{
+		f=fopen(filename,"r");
+		if(f==NULL)
+		{
+			ret = SYSINFO_RET_FAIL;
+		}
+	}
+
+	if(ret == SYSINFO_RET_OK)
+	{
+		buf=(char *)malloc((size_t)MAX_FILE_LEN);
+		if(buf == NULL)
+		{
+			ret = SYSINFO_RET_FAIL;
+		}
+		else
+		{
+			memset(buf,0,100);
+		}
+	}
+
+
+	if(ret == SYSINFO_RET_OK)
+	{
+		if(0 == fread(buf, 1, MAX_FILE_LEN-1, f))
+		{
+			ret = SYSINFO_RET_FAIL;
+		}
+	}
+
+	if(buf != NULL)
+	{
+		free(buf);
+	}
+
+	if(f != NULL)
+	{
+		close(f);
+	}
+
+	c=zbx_regexp_match(buf, regexp, &len);
+
+	if(c == NULL)
+	{
+		tmp[0]=0;
+	}
+	else
+	{
+		strncpy(tmp,c,len);
+	}
+
+	*value = strdup(tmp);
+
+	return	ret;
+}
+
+char	*zbx_regexp_match(const char *string, char *pattern, int *len)
+{
+	int	status;
+	char	*c;
+
+	regex_t	re;
+	regmatch_t match;
+
+	char c[1024];
+
+	*len=0;
+
+	if (regcomp(&re, pattern, REG_EXTENDED | REG_ICASE | REG_NEWLINE) != 0)
+	{
+		return(NULL);
+	}
+
+	status = regexec(&re, string, (size_t) 1, &match, 0);
+
+	/* Not matched */
+	if (status != 0)
+	{
+		return(NULL);
+	}
+
+	c=string+match.rm_so;
+	*len=match.rm_eo - match.rm_so;
+	
+	regfree(&re);
+
+	return	c;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+	return ret;
+}
+
+int	VFS_FILE_REGMATCH(const char *cmd, const char *filename,double  *value)
+{
 }
