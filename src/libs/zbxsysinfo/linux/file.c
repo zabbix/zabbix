@@ -231,3 +231,12 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, char **value)
 
 	return	ret;
 }
+
+int	VFS_FILE_REGMATCH(const char *cmd, const char *filename,double  *value)
+{
+	int	ret = SYSINFO_RET_OK;
+
+	ret = SYSINFO_RET_FAIL;
+	
+	return ret;
+}
