@@ -17,9 +17,12 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
+#include "common.h"
 #include "config.h"
 
-int	get_param(char *param, int num, char *buf, int maxlen)
+#include <string.h>
+
+int	get_param(const char *param, int num, char *buf, int maxlen)
 {
 	char	tmp[MAX_STRING_LEN];
 	char	*s;
