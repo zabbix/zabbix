@@ -1,5 +1,6 @@
 1.1beta2:
 
+ - fix crash of zabbix_sender
  - fix add from template
  - Repeated notifications
  - Basic auto-discovery

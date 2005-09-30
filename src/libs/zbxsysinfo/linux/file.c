@@ -175,6 +175,7 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, char **value)
 		ret = SYSINFO_RET_FAIL;
 	}
 
+
 	if(ret == SYSINFO_RET_OK)
 	{
 		f=fopen(filename,"r");
@@ -193,10 +194,9 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, char **value)
 		}
 		else
 		{
-			memset(buf,0,100);
+			memset(buf,0,MAX_FILE_LEN);
 		}
 	}
-
 
 	if(ret == SYSINFO_RET_OK)
 	{
@@ -206,37 +206,54 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, char **value)
 		}
 	}
 
+
+	if(f != NULL)
+	{
+		fclose(f);
+	}
+
+	if(ret == SYSINFO_RET_OK)
+	{
+		c=zbx_regexp_match(buf, regexp, &len);
+
+		if(c == NULL)
+		{
+			tmp[0]=0;
+		}
+		else
+		{
+			strncpy(tmp,c,len);
+		}
+
+		*value = strdup(tmp);
+	}
+
 	if(buf != NULL)
 	{
 		free(buf);
 	}
 
-	if(f != NULL)
-	{
-		close(f);
-	}
-
-	c=zbx_regexp_match(buf, regexp, &len);
-
-	if(c == NULL)
-	{
-		tmp[0]=0;
-	}
-	else
-	{
-		strncpy(tmp,c,len);
-	}
-
-	*value = strdup(tmp);
-
 	return	ret;
 }
 
-int	VFS_FILE_REGMATCH(const char *cmd, const char *filename,double  *value)
+int	VFS_FILE_REGMATCH(const char *cmd, const char *param,double  *value)
 {
+	char	filename[MAX_STRING_LEN];
+	char	regexp[MAX_STRING_LEN];
+
 	int	ret = SYSINFO_RET_OK;
 
+	if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
+	{
+		ret = SYSINFO_RET_FAIL;
+	}
+
+	if(get_param(param, 2, regexp, MAX_STRING_LEN) != 0)
+	{
+		ret = SYSINFO_RET_FAIL;
+	}
+
 	ret = SYSINFO_RET_FAIL;
-	
+
 	return ret;
 }
