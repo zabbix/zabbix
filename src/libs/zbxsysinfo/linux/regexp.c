@@ -20,16 +20,19 @@ char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
 
 	*len=0;
 
+
 	if (regcomp(&re, pattern, REG_EXTENDED | REG_ICASE | REG_NEWLINE) != 0)
 	{
 		return(NULL);
 	}
+
 
 	status = regexec(&re, string, (size_t) 1, &match, 0);
 
 	/* Not matched */
 	if (status != 0)
 	{
+		regfree(&re);
 		return(NULL);
 	}
 
