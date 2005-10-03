@@ -207,7 +207,11 @@
 	"S_CANNOT_ADD_IMAGE"=>			"Cannot add image",
 	"S_IMAGE_DELETED"=>			"Image deleted",
 	"S_CANNOT_DELETE_IMAGE"=>		"Cannot delete image",
-	"S_AUTODISCOVERY"=>			"Autodiscovery",
+	"S_AUTOREGISTRATION"=>			"Autoregistration",
+	"S_AUTOREGISTRATION_RULES_BIG"=>	"AUTOREGISTRATION RULES",
+	"S_PRIORITY"=>				"Priority",
+	"S_PATTERN"=>				"Pattern",
+	"S_NO_AUTOREGISTRATION_RULES_DEFINED"=>	"No autoregistration rules defined",
 
 //	Latest values
 	"S_LATEST_VALUES"=>			"Latest values",

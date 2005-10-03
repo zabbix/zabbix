@@ -142,6 +142,33 @@
 			unset($_GET["escalationid"]);
 			show_messages($result, S_ESCALATION_DELETED, S_ESCALATION_WAS_NOT_DELETED);
 		}
+		if($_GET["register"]=="add autoregistration")
+		{
+			$result=add_autoregistration($_GET["pattern"],$_GET["priority"],$_GET["hostid"]);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_AUTOREGISTRATION,"Autoregistration [".addslashes($_GET["pattern"])."]");
+			}
+			show_messages($result, S_AUTOREGISTRATION_ADDED, S_AUTOREGISTRATION_WAS_NOT_ADDED);
+		}
+		if($_GET["register"]=="update autoregistration")
+		{
+			$result=update_autoregistration($_GET["id"],$_GET["pattern"],$_GET["priority"],$_GET["hostid"]);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_AUTOREGISTRATION,"Autoregistration [".addslashes($_GET["pattern"])."]");
+			}
+			show_messages($result, S_AUTOREGISTRATION_UPDATED, S_AUTOREGISTRATION_WAS_NOT_UPDATED);
+		}
+		if($_GET["register"]=="delete autoregistration")
+		{
+			$result=delete_autoregistration($_GET["id"]);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_AUTOREGISTRATION,"Autoregistration [".addslashes($_GET["pattern"])."]");
+			}
+			show_messages($result, S_AUTOREGISTRATION_DELETED, S_AUTOREGISTRATION_WAS_NOT_DELETED);
+		}
 		if($_GET["register"]=="add")
 		{
 			$result=add_mediatype($_GET["type"],$_GET["description"],$_GET["smtp_server"],$_GET["smtp_helo"],$_GET["smtp_email"],$_GET["exec_path"]);
@@ -185,11 +212,10 @@
 	$h2=$h2.form_select("config",1,S_MEDIA_TYPES);
 	$h2=$h2.form_select("config",2,S_ESCALATION_RULES);
 	$h2=$h2.form_select("config",3,S_IMAGES);
-	$h2=$h2.form_select("config",4,S_AUTODISCOVERY);
+	$h2=$h2.form_select("config",4,S_AUTOREGISTRATION);
 	$h2=$h2."</select>";
 
 	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"config.php\">", "</form>");
-
 
 #	show_table_header(S_CONFIGURATION_OF_ZABBIX_BIG);
 ?>
@@ -531,6 +557,40 @@
 
 			insert_escalation_rule_form($_GET["escalationid"],$_GET["escalationruleid"]);
 		}
+	}
+?>
+
+<?php
+	if($_GET["config"]==4)
+	{
+		echo "<br>";
+		show_table_header(S_AUTOREGISTRATION_RULES_BIG);
+
+		table_begin();
+		table_header(array(S_ID,S_PRIORITY,S_PATTERN,S_HOST,S_ACTIONS));
+
+		$result=DBselect("select * from autoreg order by priority");
+		$col=0;
+		while($row=DBfetch($result))
+		{
+			$host=get_host_by_hostid($row["hostid"]);
+			$actions="<a href=\"config.php?config=4&register=change&id=".$row["id"]."\">".S_CHANGE."</a>";
+			table_row(array(
+				$row["id"],
+				$row["priority"],
+				$row["pattern"],
+				$host["host"],
+				$actions),$col++);
+		}
+		if(DBnum_rows($result)==0)
+		{
+				echo "<TR BGCOLOR=#EEEEEE>";
+				echo "<TD COLSPAN=4 ALIGN=CENTER>".S_NO_AUTOREGISTRATION_RULES_DEFINED."</TD>";
+				echo "<TR>";
+		}
+		table_end();
+
+		@insert_autoregistration_form($_GET["id"]);
 	}
 ?>
 
