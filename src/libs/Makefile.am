@@ -1,7 +1,7 @@
 if AGENT
-AGENT_DIRS = zbxlog zbxcrypto zbxpid zbxnet zbxconf zbxsysinfo zbxcommon
+AGENT_DIRS = zbxcommon zbxlog zbxcrypto zbxpid zbxnet zbxconf zbxsysinfo
 endif
 if SERVER
-SERVER_DIRS = zbxlog zbxcrypto zbxpid zbxnet zbxconf zbxdbhigh zbxemail zbxsysinfo zbxcommon
+SERVER_DIRS = zbxcommon zbxlog zbxcrypto zbxpid zbxnet zbxconf zbxdbhigh zbxemail zbxsysinfo
 endif
 SUBDIRS=$(AGENT_DIRS) $(SERVER_DIRS)

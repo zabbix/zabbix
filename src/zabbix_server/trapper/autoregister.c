@@ -30,6 +30,9 @@
 #include "log.h"
 #include "zlog.h"
 
+#include <sys/types.h>
+#include <regex.h>
+
 #include "common.h"
 
 int	autoregister(char *server)
@@ -52,7 +55,7 @@ int	autoregister(char *server)
 		pattern=DBget_field(result,i,0);
 	}
 
-	DBfreeResult(result);
+	DBfree_result(result);
 
 	return ret;
 }
