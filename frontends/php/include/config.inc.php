@@ -31,6 +31,7 @@
 	include_once 	"include/locales.inc.php";
 
 	include_once 	"include/audit.inc.php";
+	include_once 	"include/autoregistration.inc.php";
 	include_once 	"include/escalations.inc.php";
 	include_once 	"include/hosts.inc.php";
 	include_once 	"include/users.inc.php";

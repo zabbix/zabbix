@@ -29,7 +29,7 @@
 
 //	about.php
 	"S_ABOUT_ZABBIX"=>			"About ZABBIX",
-	"S_INFORMATION_ABOUT_ZABBIX"=>		"Information about ZABBIX (v1.1beta1)",
+	"S_INFORMATION_ABOUT_ZABBIX"=>		"Information about ZABBIX (v1.1beta2)",
 	"S_HOMEPAGE_OF_ZABBIX"=>		"Homepage of ZABBIX",
 	"S_HOMEPAGE_OF_ZABBIX_DETAILS"=>	"This is home page of ZABBIX.",
 	"S_LATEST_ZABBIX_MANUAL"=>		"Latest ZABBIX Manual",
@@ -212,6 +212,12 @@
 	"S_PRIORITY"=>				"Priority",
 	"S_PATTERN"=>				"Pattern",
 	"S_NO_AUTOREGISTRATION_RULES_DEFINED"=>	"No autoregistration rules defined",
+	"S_AUTOREGISTRATION_ADDED"=>		"Autoregistration added",
+	"S_CANNOT_ADD_AUTOREGISTRATION"=>	"Canot add autoregistration",
+	"S_AUTOREGISTRATION_UPDATED"=>		"Autoregistration updated",
+	"S_AUTOREGISTRATION_WAS_NOT_UPDATED"=>	"Autoregistration was not updated",
+	"S_AUTOREGISTRATION_DELETED"=>		"Autoregistration deleted",
+	"S_AUTOREGISTRATION_WAS_NOT_DELETED"=>	"Autoregistration was not deleted",
 
 //	Latest values
 	"S_LATEST_VALUES"=>			"Latest values",
@@ -225,7 +231,7 @@
 	"S_COMPARE"=>				"Compare",
 
 //	Footer
-	"S_ZABBIX_VER"=>			"ZABBIX 1.1beta1",
+	"S_ZABBIX_VER"=>			"ZABBIX 1.1beta2",
 	"S_COPYRIGHT_BY"=>			"Copyright 2001-2005 by ",
 	"S_CONNECTED_AS"=>			"Connected as",
 	"S_SIA_ZABBIX"=>			"SIA Zabbix",
