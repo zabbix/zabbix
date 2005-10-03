@@ -48,6 +48,8 @@
 #include "functions.h"
 #include "expression.h"
 
+extern int autoregister(char *server);
+
 /******************************************************************************
  *                                                                            *
  * Function: del_zeroes                                                       *
@@ -479,8 +481,24 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 
 	if(DBnum_rows(result) == 0)
 	{
-		DBfree_result(result);
-		return  FAIL;
+		zabbix_log( LOG_LEVEL_WARNING, "Before checking autoregistration for [%s]",server);
+
+		if(autoregister(server) == SUCCEED)
+		{
+			DBfree_result(result);
+
+			result = DBselect(sql);
+			if(DBnum_rows(result) == 0)
+			{
+				DBfree_result(result);
+				return  FAIL;
+			}
+		}
+		else
+		{
+			DBfree_result(result);
+			return  FAIL;
+		}
 	}
 
 	item.itemid=atoi(DBget_field(result,0,0));
