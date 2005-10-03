@@ -97,3 +97,12 @@ int	autoregister(char *server)
 
 	return ret;
 }
+
+void	register_new_host(server, hostid)
+{
+	int	hostid;
+
+	hostid = add_new_host(server, 10050, HOST_STATUS_MONITORED, 0, "", 0, HOST_AVAILABLE_UNKNOWN);
+
+
+}
