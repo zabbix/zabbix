@@ -35,6 +35,24 @@
 
 #include "common.h"
 
+int	host_exists(char *server)
+{
+	DB_RESULT	*result;
+	char	sql[MAX_STRING_LEN];
+	int	ret = SUCCEED;
+
+	snprintf(sql,sizeof(sql)-1,"select hostid from hosts order where host='%s'", server);
+	result = DBselect(sql);
+
+	if(DBnum_rows(result) == 0)
+	{
+		ret = FAIL;
+	}
+	DBfree_result(result);
+
+	return ret;
+}
+
 int	autoregister(char *server)
 {
 	DB_RESULT	*result;
@@ -43,16 +61,36 @@ int	autoregister(char *server)
 	char	sql[MAX_STRING_LEN];
 	char	*pattern;
 	int	i;
+	int	len;
+	int	hostid;
 	
 	zabbix_log( LOG_LEVEL_WARNING, "In autoregister(%s)",server);
 
-	snprintf(sql,sizeof(sql)-1,"select id,pattern,priority,hostid from functions order by priority");
+	if(host_exists(server) == SUCCEED)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Host [%d] already exists. Do nothing.", server);
+		return FAIL;
+	}
+
+	snprintf(sql,sizeof(sql)-1,"select id,pattern,hostid from functions order by priority");
 
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 		pattern=DBget_field(result,i,0);
+		hostid=atoi(DBget_field(result,i,2));
+
+		if(zbx_regexp_match(server, pattern, &len) != 0)
+		{
+			zabbix_log( LOG_LEVEL_WARNING, "Matched [%s] [%s]",server,pattern);
+			register_new_host(server, hostid);
+			break;
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_WARNING, "No match [%s] [%s]",server,pattern);
+		}
 	}
 
 	DBfree_result(result);
