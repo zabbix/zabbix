@@ -573,13 +573,21 @@
 		$col=0;
 		while($row=DBfetch($result))
 		{
-			$host=get_host_by_hostid($row["hostid"]);
+			if($row["hostid"]==0)
+			{
+				$name="&nbsp;";
+			}
+			else
+			{
+				$host=get_host_by_hostid($row["hostid"]);
+				$name=$host["host"];
+			}
 			$actions="<a href=\"config.php?config=4&register=change&id=".$row["id"]."\">".S_CHANGE."</a>";
 			table_row(array(
 				$row["id"],
 				$row["priority"],
 				$row["pattern"],
-				$host["host"],
+				$name,
 				$actions),$col++);
 		}
 		if(DBnum_rows($result)==0)
