@@ -1,5 +1,6 @@
 Changes for 1.1beta2:
 
+ - added new table autoreg (Alexei)
  - added support of vfs.file.regmatch[] and vfs.file.regexp[] (Alexei)
  - added mass-delete function for IT Services (Alexei)
  - fixed compilation of LDAP functionality (Alexei)
