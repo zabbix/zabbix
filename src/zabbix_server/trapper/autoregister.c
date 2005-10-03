@@ -34,19 +34,25 @@
 
 int	autoregister(char *server)
 {
-	char	*p,*line,*host;
-	char	*server,*key,*value_string;
-	char	copy[MAX_STRING_LEN];
-	char	result[MAX_STRING_LEN];
-	char	host_b64[MAX_STRING_LEN],key_b64[MAX_STRING_LEN],value_b64[MAX_STRING_LEN];
-	char	host_dec[MAX_STRING_LEN],key_dec[MAX_STRING_LEN],value_dec[MAX_STRING_LEN];
-	char	lastlogsize[MAX_STRING_LEN];
-	char	timestamp[MAX_STRING_LEN];
-	char	source[MAX_STRING_LEN];
-	char	severity[MAX_STRING_LEN];
+	DB_RESULT	*result;
 
 	int	ret=SUCCEED;
-	int 	i;
+	char	sql[MAX_STRING_LEN];
+	char	*pattern;
+	int	i;
+	
+	zabbix_log( LOG_LEVEL_WARNING, "In autoregister(%s)",server);
+
+	snprintf(sql,sizeof(sql)-1,"select id,pattern,priority,hostid from functions order by priority");
+
+	result = DBselect(sql);
+
+	for(i=0;i<DBnum_rows(result);i++)
+	{
+		pattern=DBget_field(result,i,0);
+	}
+
+	DBfreeResult(result);
 
 	return ret;
 }
