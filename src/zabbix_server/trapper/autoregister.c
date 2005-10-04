@@ -35,23 +35,6 @@
 
 #include "common.h"
 
-int	host_exists(char *server)
-{
-	DB_RESULT	*result;
-	char	sql[MAX_STRING_LEN];
-	int	ret = SUCCEED;
-
-	snprintf(sql,sizeof(sql)-1,"select hostid from hosts order where host='%s'", server);
-	result = DBselect(sql);
-
-	if(DBnum_rows(result) == 0)
-	{
-		ret = FAIL;
-	}
-	DBfree_result(result);
-
-	return ret;
-}
 
 int	autoregister(char *server)
 {
@@ -66,7 +49,7 @@ int	autoregister(char *server)
 	
 	zabbix_log( LOG_LEVEL_WARNING, "In autoregister(%s)",server);
 
-	if(host_exists(server) == SUCCEED)
+	if(DBhost_exists(server) == SUCCEED)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Host [%d] already exists. Do nothing.", server);
 		return FAIL;
@@ -98,7 +81,7 @@ int	autoregister(char *server)
 	return ret;
 }
 
-static	void	register_new_host(char *server, int hostid)
+void	register_new_host(char *server, int hostid)
 {
 	int	id;
 
