@@ -54,20 +54,19 @@ void    signal_handler( int sig )
 	exit( FAIL );
 }
 
-static int send_value(char *server,int port,char *hostname, char *key,char *value)
+static int send_value(char *server,int port,char *hostname, char *key,char *value, char *lastlogsize)
 {
 	int	i,s;
 	char	tosend[MAX_STRING_LEN];
 	char	result[MAX_STRING_LEN];
-	char	hostname_b64[3*MAX_STRING_LEN];
-	char	key_b64[3*MAX_STRING_LEN];
-	char	value_b64[3*MAX_STRING_LEN];
 	struct hostent *hp;
 
 	struct sockaddr_in myaddr_in;
 	struct sockaddr_in servaddr_in;
 
 /*	struct linger ling;*/
+
+/*	printf("In send_value(%s,%d,%s,%s,%s)\n", server, port, hostname, key, value);*/
 
 	servaddr_in.sin_family=AF_INET;
 	hp=gethostbyname(server);
@@ -106,7 +105,7 @@ static int send_value(char *server,int port,char *hostname, char *key,char *valu
 
 /* Send <req><host>SERVER_B64</host><key>KEY_B64</key><data>VALUE_B64</data></req> */
 
-	comms_create_request(hostname, key, value, tosend,sizeof(tosend)-1);
+	comms_create_request(hostname, key, value, lastlogsize, tosend, sizeof(tosend)-1);
 
 //	snprintf(tosend,sizeof(tosend)-1,"%s:%s\n",shortname,value);
 //	snprintf(tosend,sizeof(tosend)-1,"<req><host>%s</host><key>%s</key><data>%s</data></req>",hostname_b64,key_b64,value_b64);
@@ -166,7 +165,7 @@ int main(int argc, char **argv)
 
 		alarm(SENDER_TIMEOUT);
 
-		ret = send_value(argv[1],port,argv[3],argv[4],argv[5]);
+		ret = send_value(argv[1],port,argv[3],argv[4],argv[5],"0");
 
 		alarm(0);
 	}
@@ -187,7 +186,7 @@ int main(int argc, char **argv)
 			strscpy(key,s);
 			s=(char *)strtok(NULL," ");
 			strscpy(value,s);
-			ret = send_value(zabbix_server,atoi(port_str),server,key,value);
+			ret = send_value(zabbix_server,atoi(port_str),server,key,value,"0");
 
 			alarm(0);
 		}

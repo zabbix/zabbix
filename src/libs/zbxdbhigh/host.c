@@ -56,7 +56,7 @@ int	DBhost_exists(char *server)
 	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 
-	snprintf(sql,sizeof(sql)-1,"select hostid from hosts order where host='%s'", server);
+	snprintf(sql,sizeof(sql)-1,"select hostid from hosts where host='%s'", server);
 	result = DBselect(sql);
 
 	if(DBnum_rows(result) == 0)

@@ -55,13 +55,13 @@ int	autoregister(char *server)
 		return FAIL;
 	}
 
-	snprintf(sql,sizeof(sql)-1,"select id,pattern,hostid from functions order by priority");
+	snprintf(sql,sizeof(sql)-1,"select id,pattern,hostid from autoreg order by priority");
 
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
-		pattern=DBget_field(result,i,0);
+		pattern=DBget_field(result,i,1);
 		hostid=atoi(DBget_field(result,i,2));
 
 		if(zbx_regexp_match(server, pattern, &len) != 0)
