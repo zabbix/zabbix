@@ -98,7 +98,7 @@ int	autoregister(char *server)
 	return ret;
 }
 
-void	register_new_host(char *server, int hostid)
+static	void	register_new_host(char *server, int hostid)
 {
 	int	id;
 
