@@ -181,44 +181,46 @@ int 	DBadd_item_to_linked_hosts(int itemid, int hostid)
 	int	ret = SUCCEED;
 	int	i;
 
+	zabbix_log( LOG_LEVEL_WARNING, "In DBadd_item_to_linked_hosts(%d,%d)", itemid, hostid);
+
 	snprintf(sql,sizeof(sql)-1,"select description,key_,hostid,delay,history,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula,trends,logtimefmt from items where itemid=%d", itemid);
 	result3=DBselect(sql);
 
-	if(DBnum_rows(result)==0)
+	if(DBnum_rows(result3)==0)
 	{
 		DBfree_result(result3);
 		return FAIL;
 	}
 
-	item.description=DBget_field(result,0,0);
-	item.key=DBget_field(result,0,1);
-	item.hostid=atoi(DBget_field(result,0,2));
-	item.delay=atoi(DBget_field(result,0,3));
-	item.history=atoi(DBget_field(result,0,4));
-	item.status=atoi(DBget_field(result,0,5));
-	item.type=atoi(DBget_field(result,0,6));
-	item.snmp_community=DBget_field(result,0,7);
-	item.snmp_oid=DBget_field(result,0,8);
-	item.value_type=atoi(DBget_field(result,0,9));
-	item.trapper_hosts=DBget_field(result,0,10);
-	item.snmp_port=atoi(DBget_field(result,0,11));
-	item.units=DBget_field(result,0,12);
-	item.multiplier=atoi(DBget_field(result,0,13));
-	item.delta=atoi(DBget_field(result,0,14));
-	item.snmpv3_securityname=DBget_field(result,0,15);
-	item.snmpv3_securitylevel=atoi(DBget_field(result,0,16));
-	item.snmpv3_authpassphrase=DBget_field(result,0,17);
-	item.snmpv3_privpassphrase=DBget_field(result,0,18);
-	item.formula=DBget_field(result,0,19);
-	item.trends=atoi(DBget_field(result,0,20));
-	item.logtimefmt=DBget_field(result,0,21);
+	item.description=DBget_field(result3,0,0);
+	item.key=DBget_field(result3,0,1);
+	item.hostid=atoi(DBget_field(result3,0,2));
+	item.delay=atoi(DBget_field(result3,0,3));
+	item.history=atoi(DBget_field(result3,0,4));
+	item.status=atoi(DBget_field(result3,0,5));
+	item.type=atoi(DBget_field(result3,0,6));
+	item.snmp_community=DBget_field(result3,0,7);
+	item.snmp_oid=DBget_field(result3,0,8);
+	item.value_type=atoi(DBget_field(result3,0,9));
+	item.trapper_hosts=DBget_field(result3,0,10);
+	item.snmp_port=atoi(DBget_field(result3,0,11));
+	item.units=DBget_field(result3,0,12);
+	item.multiplier=atoi(DBget_field(result3,0,13));
+	item.delta=atoi(DBget_field(result3,0,14));
+	item.snmpv3_securityname=DBget_field(result3,0,15);
+	item.snmpv3_securitylevel=atoi(DBget_field(result3,0,16));
+	item.snmpv3_authpassphrase=DBget_field(result3,0,17);
+	item.snmpv3_privpassphrase=DBget_field(result3,0,18);
+	item.formula=DBget_field(result3,0,19);
+	item.trends=atoi(DBget_field(result3,0,20));
+	item.logtimefmt=DBget_field(result3,0,21);
 
 	zabbix_log( LOG_LEVEL_WARNING, "OK");
 
 	/* Link with one host only */
 	if(hostid!=0)
 	{
-		snprintf(sql,sizeof(sql)-1,"select hostid,templateid,items from hosts_templates where hostid=$hostid and templateid=%d", item.hostid);
+		snprintf(sql,sizeof(sql)-1,"select hostid,templateid,items from hosts_templates where hostid=%d and templateid=%d", hostid, item.hostid);
 	}
 	else
 	{
@@ -246,10 +248,23 @@ int 	DBadd_item_to_linked_hosts(int itemid, int hostid)
 int	DBadd_item(char *description, char *key, int hostid, int delay, int history, int status, int type, char *snmp_community, char *snmp_oid,int value_type,char *trapper_hosts,int snmp_port,char *units,int multiplier,int delta, char *snmpv3_securityname,int snmpv3_securitylevel,char *snmpv3_authpassphrase,char *snmpv3_privpassphrase,char *formula,int trends,char *logtimefmt)
 {
 	char	sql[MAX_STRING_LEN];
+	char	key_esc[MAX_STRING_LEN];
+	char	description_esc[MAX_STRING_LEN];
+	char	logtimefmt_esc[MAX_STRING_LEN];
+	char	snmpv3_securityname_esc[MAX_STRING_LEN];
+	char	snmpv3_authpassphrase_esc[MAX_STRING_LEN];
+	char	snmpv3_privpassphrase_esc[MAX_STRING_LEN];
 
 	zabbix_log( LOG_LEVEL_WARNING, "In DBadd_item()");
 
-	snprintf(sql,sizeof(sql)-1,"insert into items (description,key_,hostid,delay,history,nextcheck,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula,trends,logtimefmt) values ('%s','%s',%d,%d,%d,0,%d,%d,'%s','%s',%d,'%s',%d,'%s',%d,%d,'%s',%s,'%s','%s','%s',%d,'%s')", description, key, hostid,delay,history,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula,trends,logtimefmt);
+	DBescape_string(key,key_esc,MAX_STRING_LEN);
+	DBescape_string(description,description_esc,MAX_STRING_LEN);
+	DBescape_string(logtimefmt,logtimefmt_esc,MAX_STRING_LEN);
+	DBescape_string(snmpv3_securityname,snmpv3_securityname_esc,MAX_STRING_LEN);
+	DBescape_string(snmpv3_authpassphrase,snmpv3_authpassphrase_esc,MAX_STRING_LEN);
+	DBescape_string(snmpv3_privpassphrase,snmpv3_privpassphrase_esc,MAX_STRING_LEN);
+
+	snprintf(sql,sizeof(sql)-1,"insert into items (description,key_,hostid,delay,history,nextcheck,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula,trends,logtimefmt) values ('%s','%s',%d,%d,%d,0,%d,%d,'%s','%s',%d,'%s',%d,'%s',%d,%d,'%s',%d,'%s','%s','%s',%d,'%s')", description_esc, key_esc, hostid,delay,history,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,snmpv3_securityname_esc,snmpv3_securitylevel,snmpv3_authpassphrase_esc,snmpv3_privpassphrase_esc,formula,trends,logtimefmt_esc);
 
 	return DBexecute(sql);
 }
