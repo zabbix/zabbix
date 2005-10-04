@@ -279,5 +279,5 @@ void    DBescape_string(char *from, char *to, int maxlen);
 void    DBget_item_from_db(DB_ITEM *item,DB_RESULT *result, int row);
 
 int	DBget_trigger_by_triggerid(int triggerid, DB_TRIGGER *trigger);
-int	DBadd_new_host(server, port, status, useip, ip, disable_until, available);
+int	DBadd_new_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 #endif
