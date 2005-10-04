@@ -51,7 +51,7 @@ int	autoregister(char *server)
 
 	if(DBhost_exists(server) == SUCCEED)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Host [%d] already exists. Do nothing.", server);
+		zabbix_log( LOG_LEVEL_WARNING, "Host [%s] already exists. Do nothing.", server);
 		return FAIL;
 	}
 
@@ -81,11 +81,23 @@ int	autoregister(char *server)
 	return ret;
 }
 
-void	register_new_host(char *server, int hostid)
+void	register_new_host(char *server, int host_templateid)
 {
-	int	id;
+	int	hostid;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In register_new_host(%s,%d)", server, hostid);
+	zabbix_log( LOG_LEVEL_WARNING, "In register_new_host(%s,%d)", server, host_templateid);
 
-	id = DBadd_new_host(server, 10050, HOST_STATUS_MONITORED, 0, "", 0, HOST_AVAILABLE_UNKNOWN);
+	hostid = DBadd_new_host(server, 10050, HOST_STATUS_MONITORED, 0, "", 0, HOST_AVAILABLE_UNKNOWN);
+
+	zabbix_log( LOG_LEVEL_WARNING, "Added new host with hostid [%d]", hostid);
+
+	/* Use hostid as a template */
+	if( (hostid>0) && (host_templateid!=0))
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Using hostid [%d] as a template", host_templateid);
+
+		DBadd_templates_to_host(hostid,host_templateid);
+		DBsync_host_with_templates(hostid);
+
+	}
 }
