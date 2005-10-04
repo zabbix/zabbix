@@ -804,7 +804,7 @@
 	echo "<select class=\"biginput\" name=\"host_templateid\" size=\"1\">";
 	echo "<option value=\"0\" selected>...";
 //	$result=DBselect("select host,hostid from hosts where status=3 order by host");
-	$result=DBselect("select host,hostid from hosts order by host");
+	$result=DBselect("select host,hostid from hosts where status not in (".HOST_STATUS_DELETED.") order by host");
 	while($row=DBfetch($result))
 	{
 		if($host_templateid == $row["hostid"])
