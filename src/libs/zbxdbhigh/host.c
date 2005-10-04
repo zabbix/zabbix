@@ -21,10 +21,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-/* for setproctitle() */
-#include <sys/types.h>
-#include <unistd.h>
-
 #include <string.h>
 #include <strings.h>
 
@@ -52,4 +48,22 @@ int	DBadd_new_host(char *server, int port, int status, int useip, char *ip, int 
 	}
 
 	return hostid;
+}
+
+int	DBhost_exists(char *server)
+{
+	DB_RESULT	*result;
+	char	sql[MAX_STRING_LEN];
+	int	ret = SUCCEED;
+
+	snprintf(sql,sizeof(sql)-1,"select hostid from hosts order where host='%s'", server);
+	result = DBselect(sql);
+
+	if(DBnum_rows(result) == 0)
+	{
+		ret = FAIL;
+	}
+	DBfree_result(result);
+
+	return ret;
 }
