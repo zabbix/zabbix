@@ -236,7 +236,7 @@ int 	DBadd_item_to_linked_hosts(int itemid, int hostid)
 		result2=DBselect(sql);
 		if(DBnum_rows(result2)==0)
 		{
-			DBadd_item(item.description,item.key,item.hostid,item.delay,item.history,item.status,item.type,item.snmp_community,item.snmp_oid,item.value_type,item.trapper_hosts,item.snmp_port,item.units,item.multiplier,item.delta,item.snmpv3_securityname,item.snmpv3_securitylevel,item.snmpv3_authpassphrase,item.snmpv3_privpassphrase,item.formula,item.trends,item.logtimefmt);
+			DBadd_item(item.description,item.key,hostid,item.delay,item.history,item.status,item.type,item.snmp_community,item.snmp_oid,item.value_type,item.trapper_hosts,item.snmp_port,item.units,item.multiplier,item.delta,item.snmpv3_securityname,item.snmpv3_securitylevel,item.snmpv3_authpassphrase,item.snmpv3_privpassphrase,item.formula,item.trends,item.logtimefmt);
 		}
 		DBfree_result(result2);
 	}
