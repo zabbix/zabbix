@@ -17,7 +17,10 @@ int	comms_create_request(char *host, char *key, char *data, char *lastlogsize, c
 	str_base64_encode(host, host_b64, strlen(host));
 	str_base64_encode(key, key_b64, strlen(key));
 	str_base64_encode(data, data_b64, strlen(data));
-	str_base64_encode(lastlogsize, lastlogsize_b64, strlen(lastlogsize));
+	if(lastlogsize[0]!=0)
+	{
+		str_base64_encode(lastlogsize, lastlogsize_b64, strlen(lastlogsize));
+	}
 
 	if(lastlogsize[0]==0)
 	{
