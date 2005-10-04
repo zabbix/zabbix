@@ -98,11 +98,11 @@ int	autoregister(char *server)
 	return ret;
 }
 
-void	register_new_host(server, hostid)
+void	register_new_host(char *server, int hostid)
 {
-	int	hostid;
+	int	id;
 
-	hostid = add_new_host(server, 10050, HOST_STATUS_MONITORED, 0, "", 0, HOST_AVAILABLE_UNKNOWN);
+	zabbix_log( LOG_LEVEL_WARNING, "In register_new_host(%s,%d)", server, hostid);
 
-
+	id = DBadd_new_host(server, 10050, HOST_STATUS_MONITORED, 0, "", 0, HOST_AVAILABLE_UNKNOWN);
 }
