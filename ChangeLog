@@ -1,5 +1,6 @@
 Changes for 1.1beta2:
 
+ - do not show deleted hosts in host selection (Alexei)
  - fixed crash of zabbix_sender (Alexei)
  - added new table autoreg (Alexei)
  - added support of vfs.file.regmatch[] and vfs.file.regexp[] (Alexei)
