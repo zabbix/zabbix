@@ -97,6 +97,7 @@ DB_ITEM
 	int	itemid;
 	int	hostid;
 	int	type;
+	int	status;
 	char	*description;
 	char	*key;
 	char	*host;

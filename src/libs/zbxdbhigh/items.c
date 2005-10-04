@@ -148,7 +148,7 @@ int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,i
 	result = DBselect(sql);
 	for(i=0;i<DBnum_rows(result);i++)
 	{
-		DBadd_trigger_to_linked_hosts(atoi(DBget_field(result,i,0)),hostid);
+//		DBadd_trigger_to_linked_hosts(atoi(DBget_field(result,i,0)),hostid);
 	}
 	DBfree_result(result);
 
@@ -157,7 +157,7 @@ int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,i
 	result = DBselect(sql);
 	for(i=0;i<DBnum_rows(result);i++)
 	{
-		DBadd_action_to_linked_hosts(atoi(DBget_field(result,i,0)),hostid);
+//		DBadd_action_to_linked_hosts(atoi(DBget_field(result,i,0)),hostid);
 	}
 	DBfree_result(result);
 
@@ -166,9 +166,90 @@ int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,i
 	result = DBselect(sql);
 	for(i=0;i<DBnum_rows(result);i++)
 	{
-		DBadd_graph_item_to_linked_hosts(atoi(DBget_field(result,i,0)),hostid);
+//		DBadd_graph_item_to_linked_hosts(atoi(DBget_field(result,i,0)),hostid);
 	}
 	DBfree_result(result);
 
 	return SUCCEED;
+}
+
+int 	DBadd_item_to_linked_hosts(int itemid, int hostid)
+{
+	DB_ITEM	item;
+	DB_RESULT	*result,*result2,*result3;
+	char	sql[MAX_STRING_LEN];
+	int	ret = SUCCEED;
+	int	i;
+
+	snprintf(sql,sizeof(sql)-1,"select description,key_,hostid,delay,history,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula,trends,logtimefmt from items where itemid=%d", itemid);
+	result3=DBselect(sql);
+
+	if(DBnum_rows(result)==0)
+	{
+		DBfree_result(result3);
+		return FAIL;
+	}
+
+	item.description=DBget_field(result,0,0);
+	item.key=DBget_field(result,0,1);
+	item.hostid=atoi(DBget_field(result,0,2));
+	item.delay=atoi(DBget_field(result,0,3));
+	item.history=atoi(DBget_field(result,0,4));
+	item.status=atoi(DBget_field(result,0,5));
+	item.type=atoi(DBget_field(result,0,6));
+	item.snmp_community=DBget_field(result,0,7);
+	item.snmp_oid=DBget_field(result,0,8);
+	item.value_type=atoi(DBget_field(result,0,9));
+	item.trapper_hosts=DBget_field(result,0,10);
+	item.snmp_port=atoi(DBget_field(result,0,11));
+	item.units=DBget_field(result,0,12);
+	item.multiplier=atoi(DBget_field(result,0,13));
+	item.delta=atoi(DBget_field(result,0,14));
+	item.snmpv3_securityname=DBget_field(result,0,15);
+	item.snmpv3_securitylevel=atoi(DBget_field(result,0,16));
+	item.snmpv3_authpassphrase=DBget_field(result,0,17);
+	item.snmpv3_privpassphrase=DBget_field(result,0,18);
+	item.formula=DBget_field(result,0,19);
+	item.trends=atoi(DBget_field(result,0,20));
+	item.logtimefmt=DBget_field(result,0,21);
+
+	zabbix_log( LOG_LEVEL_WARNING, "OK");
+
+	/* Link with one host only */
+	if(hostid!=0)
+	{
+		snprintf(sql,sizeof(sql)-1,"select hostid,templateid,items from hosts_templates where hostid=$hostid and templateid=%d", item.hostid);
+	}
+	else
+	{
+		snprintf(sql,sizeof(sql)-1,"select hostid,templateid,items from hosts_templates where templateid=%d", item.hostid);
+	}
+
+	result = DBselect(sql);
+	for(i=0;i<DBnum_rows(result);i++)
+	{
+		if(atoi(DBget_field(result,i,2))&1 == 0)	continue;
+
+		snprintf(sql,sizeof(sql)-1,"select itemid from items where key_='%s' and hostid=%d", item.key, atoi(DBget_field(result,i,0)));
+		result2=DBselect(sql);
+		if(DBnum_rows(result2)==0)
+		{
+			DBadd_item(item.description,item.key,item.hostid,item.delay,item.history,item.status,item.type,item.snmp_community,item.snmp_oid,item.value_type,item.trapper_hosts,item.snmp_port,item.units,item.multiplier,item.delta,item.snmpv3_securityname,item.snmpv3_securitylevel,item.snmpv3_authpassphrase,item.snmpv3_privpassphrase,item.formula,item.trends,item.logtimefmt);
+		}
+		DBfree_result(result2);
+	}
+
+	DBfree_result(result);
+	DBfree_result(result3);
+}
+
+int	DBadd_item(char *description, char *key, int hostid, int delay, int history, int status, int type, char *snmp_community, char *snmp_oid,int value_type,char *trapper_hosts,int snmp_port,char *units,int multiplier,int delta, char *snmpv3_securityname,int snmpv3_securitylevel,char *snmpv3_authpassphrase,char *snmpv3_privpassphrase,char *formula,int trends,char *logtimefmt)
+{
+	char	sql[MAX_STRING_LEN];
+
+	zabbix_log( LOG_LEVEL_WARNING, "In DBadd_item()");
+
+	snprintf(sql,sizeof(sql)-1,"insert into items (description,key_,hostid,delay,history,nextcheck,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula,trends,logtimefmt) values ('%s','%s',%d,%d,%d,0,%d,%d,'%s','%s',%d,'%s',%d,'%s',%d,%d,'%s',%s,'%s','%s','%s',%d,'%s')", description, key, hostid,delay,history,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula,trends,logtimefmt);
+
+	return DBexecute(sql);
 }
