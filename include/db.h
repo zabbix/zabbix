@@ -71,14 +71,6 @@ extern	int	CONFIG_DBPORT;
 
 #define	MAX_HOST_HOST_LEN	64
 
-DB_HOST
-{
-	int     hostid;
-	char    *host;
-	int     useip;
-	char    *ip;
-};
-
 #define	MAX_ITEM_KEY_LEN	64
 #define	MAX_ITEM_IP_LEN		15
 #define	MAX_ITEM_SNMP_COMMUNITY_LEN	64
@@ -93,6 +85,27 @@ DB_HOST
 #define TRIGGER_URL_LEN_MAX		TRIGGER_URL_LEN+1
 #define TRIGGER_COMMENTS_LEN		4096
 #define TRIGGER_COMMENTS_LEN_MAX	TRIGGER_URL_LEN+1
+
+#define HOST_HOST_LEN			64
+#define HOST_HOST_LEN_MAX		HOST_HOST_LEN+1
+#define HOST_IP_LEN			15
+#define HOST_IP_LEN_MAX			HOST_IP_LEN+1
+#define HOST_ERROR_LEN			128
+#define HOST_ERROR_LEN_MAX		HOST_ERROR_LEN+1
+
+DB_HOST
+{
+	int     hostid;
+	char    host[HOST_HOST_LEN_MAX];
+	int     useip;
+	char    ip[HOST_IP_LEN_MAX];
+	int	port;
+	int	status;
+	int	disable_until;
+	int	network_errors;
+	char	error[HOST_ERROR_LEN_MAX];
+	int	available;
+};
 
 DB_ITEM
 {
