@@ -172,3 +172,37 @@ int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,i
 
 	return SUCCEED;
 }
+
+int	DBget_host_by_hostid(int hostid,DB_HOST *host)
+{
+	DB_RESULT	*result;
+	char	sql[MAX_STRING_LEN];
+	int	ret = SUCCEED;
+
+	zabbix_log( LOG_LEVEL_WARNING, "In DBget_host_by_hostid(%d)", hostid);
+
+	snprintf(sql,sizeof(sql)-1,"select hostid,host,useip,ip,port,status,disable_until,network_errors,error,available from hosts where hostid=%d", hostid);
+	result=DBselect(sql);
+
+	if(DBnum_rows(result)==0)
+	{
+		ret = FAIL;
+	}
+	else
+	{
+		host->hostid=atoi(DBget_field(result,0,0));
+		strscpy(host->host,DBget_field(result,0,1));
+		host->useip=atoi(DBget_field(result,0,2));
+		strscpy(host->ip,DBget_field(result,0,3));
+		host->port=atoi(DBget_field(result,0,4));
+		host->status=atoi(DBget_field(result,0,5));
+		host->disable_until=atoi(DBget_field(result,0,6));
+		host->network_errors=atoi(DBget_field(result,0,7));
+		strscpy(host->error,DBget_field(result,0,8));
+		host->available=atoi(DBget_field(result,0,9));
+	}
+
+	DBfree_result(result);
+
+	return ret;
+}
