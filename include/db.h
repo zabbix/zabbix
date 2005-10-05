@@ -58,6 +58,7 @@ extern	int	CONFIG_DBPORT;
 #define DB_MEDIATYPE	struct mediatype_type
 #define DB_ESCALATION_RULE	struct escalation_rule_type
 #define DB_ESCALATION_LOG	struct escalation_log_type
+#define DB_GRAPH_ITEM	struct graph_item_type
 
 #ifdef HAVE_MYSQL
 	#define	DB_RESULT	MYSQL_RES
@@ -92,6 +93,11 @@ extern	int	CONFIG_DBPORT;
 #define HOST_IP_LEN_MAX			HOST_IP_LEN+1
 #define HOST_ERROR_LEN			128
 #define HOST_ERROR_LEN_MAX		HOST_ERROR_LEN+1
+#define HOST_ERROR_LEN			128
+#define HOST_ERROR_LEN_MAX		HOST_ERROR_LEN+1
+
+#define GRAPH_ITEM_COLOR_LEN		32
+#define GRAPH_ITEM_COLOR_LEN_MAX	GRAPH_ITEM_COLOR_LEN+1
 
 DB_HOST
 {
@@ -105,6 +111,16 @@ DB_HOST
 	int	network_errors;
 	char	error[HOST_ERROR_LEN_MAX];
 	int	available;
+};
+
+DB_GRAPH_ITEM
+{
+	int	gitemid;
+	int	graphid;
+	int	itemid;
+	int	drawtype;
+	int	sortorder;
+	char	color[GRAPH_ITEM_COLOR_LEN_MAX];
 };
 
 DB_ITEM

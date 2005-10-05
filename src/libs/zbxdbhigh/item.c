@@ -148,7 +148,7 @@ int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,i
 	result = DBselect(sql);
 	for(i=0;i<DBnum_rows(result);i++)
 	{
-//		DBadd_trigger_to_linked_hosts(atoi(DBget_field(result,i,0)),hostid);
+		DBadd_trigger_to_linked_hosts(atoi(DBget_field(result,i,0)),hostid);
 	}
 	DBfree_result(result);
 
@@ -157,7 +157,7 @@ int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,i
 	result = DBselect(sql);
 	for(i=0;i<DBnum_rows(result);i++)
 	{
-//		DBadd_action_to_linked_hosts(atoi(DBget_field(result,i,0)),hostid);
+		DBadd_action_to_linked_hosts(atoi(DBget_field(result,i,0)),hostid);
 	}
 	DBfree_result(result);
 
@@ -166,7 +166,7 @@ int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,i
 	result = DBselect(sql);
 	for(i=0;i<DBnum_rows(result);i++)
 	{
-//		DBadd_graph_item_to_linked_hosts(atoi(DBget_field(result,i,0)),hostid);
+		DBadd_graph_item_to_linked_hosts(atoi(DBget_field(result,i,0)),hostid);
 	}
 	DBfree_result(result);
 
