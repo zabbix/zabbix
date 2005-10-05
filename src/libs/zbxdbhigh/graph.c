@@ -88,20 +88,27 @@ int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid)
 
 	if(hostid==0)
 	{
-		$sql="select hostid,templateid,graphs from hosts_templates where templateid=".$item["hostid"];
+		snprintf(sql,sizeof(sql)-1,"select hostid,templateid,graphs from hosts_templates where templateid=%d", item.hostid);
 	}
 	else
 	{
-		$sql="select hostid,templateid,graphs from hosts_templates where hostid=$hostid and templateid=".$item["hostid"];
+		snprintf(sql,sizeof(sql)-1,"select hostid,templateid,graphs from hosts_templates where hostid=%d and templateid=%d", hostid, item.hostid);
 	}
-	$result=DBselect($sql);
-	while($row=DBfetch($result))
-	{
-		if($row["graphs"]&1 == 0)	continue;
 
-		$sql="select i.itemid from items i where i.key_='".$item["key_"]."' and i.hostid=".$row["hostid"];
-		$result2=DBselect($sql);
-		if(DBnum_rows($result2)==0)	continue;
+	result=DBselect(sql);
+	for(i=0;i<DBnum_rows(result);i++)
+	{
+		if(atoi(DBget_field(result,i,2))&1 == 0)	continue;
+
+		snprintf(sql,sizeof(sql)-1,"select i.itemid from items i where i.key_='%s' and i.hostid=%d", item.key, atoi(DBget_field(result,i,0)));
+
+		result2=DBselect(sql);
+		if(DBnum_rows(result2)==0)
+		{
+			DBfree_result(result2);
+			continue;
+		}
+
 		$row2=DBfetch($result2);
 		$itemid=$row2["itemid"];
 
