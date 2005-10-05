@@ -43,6 +43,18 @@
 <?php
 	if(isset($_GET["register"]))
 	{
+		if($_GET["register"]=="add items from template")
+		{
+			if(isset($_GET["host_templateid"])&&($_GET["host_templateid"]!=0))
+			{
+				$result=sync_items_with_template_host($_GET["hostid"],$_GET["host_templateid"]);
+				show_messages(TRUE,S_ITEMS_ADDED,S_CANNOT_ADD_ITEMS);
+			}
+			else
+			{
+				show_messages(FALSE,"",S_SELECT_HOST_TEMPLATE_FIRST);
+			}
+		}	
 		if($_GET["register"]=="add linkage")
 		{	
 			$items=0;
@@ -54,7 +66,7 @@
 			if(isset($_GET["triggers_update"]))	$triggers=$triggers|2;
 			if(isset($_GET["triggers_delete"]))	$triggers=$triggers|4;
 			$actions=0;
-			if(isset($_GET["actions_add"]))	$actions=$actions|1;
+			if(isset($_GET["actions_add"]))		$actions=$actions|1;
 			if(isset($_GET["actions_update"]))	$actions=$actions|2;
 			if(isset($_GET["actions_delete"]))	$actions=$actions|4;
 			$graphs=0;
