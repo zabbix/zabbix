@@ -354,6 +354,7 @@
 	"S_DELETE_SELECTED_HOSTS_Q"=>		"Delete selected hosts?",
 	"S_DISABLE_SELECTED_HOSTS_Q"=>		"Disable selected hosts?",
 	"S_ACTIVATE_SELECTED_HOSTS_Q"=>		"Activate selected hosts?",
+	"S_SELECT_HOST_TEMPLATE_FIRST"=>	"Select host template first",
 
 //	items.php
 	"S_CONFIGURATION_OF_ITEMS"=>		"Configuration of items",

@@ -1,5 +1,6 @@
 Changes for 1.1beta2:
 
+ - fixed "Add items from template" functionality (Alexei)
  - do not show deleted hosts in host selection (Alexei)
  - fixed crash of zabbix_sender (Alexei)
  - added new table autoreg (Alexei)
