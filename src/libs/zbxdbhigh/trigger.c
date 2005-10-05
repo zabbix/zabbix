@@ -276,6 +276,8 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 	int	i;
+	int	functionid, triggerid_new;
+	char	expression_old[MAX_TRIGGER_EXPRESSION_LEN];
 
 	zabbix_log( LOG_LEVEL_WARNING, "In DBadd_trigger_to_linked_hosts(%d,%d)",triggerid, hostid);
 $sql="insert into triggers  (description,priority,status,comments,url,value,expression) values ('".addslashes($trigger["description"])."',".$trigger["priority"].",".$trigger["status"].",'".addslashes($trigger["comments"])."','".addslashes($trigger["url"])."',2,'$expression_old')";
@@ -289,78 +291,90 @@ $sql="insert into triggers  (description,priority,status,comments,url,value,expr
 	}
 
 	trigger.triggerid = triggerid;
-	strscpy(trigger.expression, DBget_field(result2,0,6));
 	strscpy(trigger.description, DBget_field(result2,0,0));
 	trigger.priority=atoi(DBget_field(result2,0,1));
 	trigger.status=atoi(DBget_field(result2,0,2));
+	strscpy(trigger.comments, DBget_field(result2,0,3));
+	strscpy(trigger.url, DBget_field(result2,0,4));
 	trigger.value=atoi(DBget_field(result2,0,5));
+	strscpy(trigger.expression, DBget_field(result2,0,6));
 	trigger.prevvalue=atoi(DBget_field(result2,0,7));
 
-	$trigger=get_trigger_by_triggerid($triggerid);
+	DBfree_result(result2);
 
-		$sql="select distinct h.hostid from hosts h,functions f, items i where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid=$triggerid";
-		$result=DBselect($sql);
-		if(DBnum_rows($result)!=1)
-		{
-			return;
-		}
+	snprintf(sql,sizeof(sql)-1,"select distinct h.hostid from hosts h,functions f, items i where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid=%d", triggerid);
+	result=DBselect(sql);
 
-		$row=DBfetch($result);
-
-		if($hostid==0)
-		{
-			$sql="select hostid,templateid,triggers from hosts_templates where templateid=".$row["hostid"];
-		}
-		// Link to one host only
-		else
-		{
-			$sql="select hostid,templateid,triggers from hosts_templates where hostid=$hostid and templateid=".$row["hostid"];
-		}
-		$result=DBselect($sql);
-		// Loop: linked hosts
-		while($row=DBfetch($result))
-		{
-			$expression_old=$trigger["expression"];
-
-			if($row["triggers"]&1 == 0)	continue;
-
-			$sql="insert into triggers  (description,priority,status,comments,url,value,expression) values ('".addslashes($trigger["description"])."',".$trigger["priority"].",".$trigger["status"].",'".addslashes($trigger["comments"])."','".addslashes($trigger["url"])."',2,'$expression_old')";
-			$result4=DBexecute($sql);
-			$triggerid_new=DBinsert_id($result4,"triggers","triggerid");
-
-
-			$sql="select i.key_,f.parameter,f.function,f.functionid from functions f,items i where i.itemid=f.itemid and f.triggerid=$triggerid";
-			$result2=DBselect($sql);
-			// Loop: functions
-			while($row2=DBfetch($result2))
-			{
-				$sql="select itemid from items where key_=\"".$row2["key_"]."\" and hostid=".$row["hostid"];
-				$result3=DBselect($sql);
-				if(DBnum_rows($result3)!=1)
-				{
-					$sql="delete from triggers where triggerid=$triggerid_new";
-					DBexecute($sql);
-					$sql="delete from functions where triggerid=$triggerid_new";
-					DBexecute($sql);
-					break;
-				}
-				$row3=DBfetch($result3);
-
-				$item=get_item_by_itemid($row3["itemid"]);
-
-				$sql="insert into functions (itemid,triggerid,function,parameter) values (".$item["itemid"].",$triggerid_new,'".$row2["function"]."','".$row2["parameter"]."')";
-				$result5=DBexecute($sql);
-				$functionid=DBinsert_id($result5,"functions","functionid");
-
-				$sql="update triggers set expression='$expression_old' where triggerid=$triggerid_new";
-				DBexecute($sql);
-				$expression=str_replace("{".$row2["functionid"]."}","{".$functionid."}",$expression_old);
-				$expression_old=$expression;
-				$sql="update triggers set expression='$expression' where triggerid=$triggerid_new";
-				DBexecute($sql);
-
-				$host=get_host_by_hostid($row["hostid"]);
-				info("Added trigger to linked host ".$host["host"]);
-			}
-		}
+	if(DBnum_rows(result)!=1)
+	{
+		return FAIL;
 	}
+
+	if(hostid==0)
+	{
+		snprintf(sql,sizeof(sql)-1,"select hostid,templateid,triggers from hosts_templates where templateid=%d", atoi(DBget_field(result,0,0)));
+	}
+	/* Link to one host only */
+	else
+	{
+		snprintf(sql,sizeof(sql)-1,"select hostid,templateid,triggers from hosts_templates where hostid=%d and templateid=%d", hostid, atoi(DBget_field(result,0,0)));
+	}
+	DBfree_result(result);
+
+	result=DBselect(sql);
+
+	/* Loop: linked hosts */
+	for(i=0;i<DBnum_rows(result);i++)
+	{
+		strscpy(expression_old, trigger.expression);
+
+		if(atoi(DBget_field(result,i,2))&1 == 0)	continue;
+
+		DBescape_string(trigger.description,description_esc,MAX_TRIGGER_DESCRIPTION_LEN);
+		DBescape_string(trigger.comments,description_esc,MAX_TRIGGER_COMMENTS_LEN);
+		DBescape_string(trigger.url,url_esc,MAX_TRIGGER_URL_LEN);
+
+		snprintf(sql,sizeof(sql)-1,"insert into triggers  (description,priority,status,comments,url,value,expression) values ('%s',%d,%d,'%s','%s',2,'%s')",description_esc, trigger.priority, trigger.status, comments_esc, url_esc, expression_old);
+
+		result4=DBexecute(sql);
+		triggerid_new=DBinsert_id();
+		DBfree_result(result4);
+
+
+		snprintf(sql,sizeof(sql)-1,"select i.key_,f.parameter,f.function,f.functionid from functions f,items i where i.itemid=f.itemid and f.triggerid=%d", triggerid);
+		result2=DBselect(sql);
+		// Loop: functions
+		for(j=0;j<DBnum_rows(result2);j++)
+		{
+			snprintf(sql,sizeof(sql)-1,"select itemid from items where key_='%s' and hostid=%d", DBget_field(result2,j,0), atoi(DBget_field(result,i,0)));
+			result3=DBselect(sql);
+			if(DBnum_rows(result3)!=1)
+			{
+				snprintf(sql,sizeof(sql)-1,"delete from triggers where triggerid=%d", triggerid_new);
+				DBexecute(sql);
+				snprintf(sql,sizeof(sql)-1,"delete from functions where triggerid=%d", triggerid_new);
+				DBexecute(sql);
+				break;
+			}
+			$row3=DBfetch($result3);
+
+			snprintf(sql,sizeof(sql)-1,"insert into functions (itemid,triggerid,function,parameter) values (%d,%d,'%s','%s')", atoi(DBget_field(result3,0,0)), triggerid_new, DBget_field(result2,j,1), DBget_field(result2,j,2));
+
+			result5=DBexecute(sql);
+			functionid=DBinsert_id();
+
+			snprintf(sql,sizeof(sql)-1,"update triggers set expression='%s' where triggerid=%d", expression_old, triggerid_new );
+			DBexecute($sql);
+
+			$expression=str_replace("{".$row2["functionid"]."}","{".$functionid."}",$expression_old);
+			$expression_old=$expression;
+
+			snprintf(sql,sizeof(sql)-1,"update triggers set expression='%s' where triggerid=%d", expression, triggerid_new );
+			DBexecute($sql);
+		}
+		DBfree_result(result2);
+	}
+	DBfree_result(result);
+
+	return SUCCEED;
+}
