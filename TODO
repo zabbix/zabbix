@@ -1,6 +1,5 @@
 1.1beta2:
 
- - fix add from template
  - Repeated notifications
  - Basic auto-discovery
  - Monitoring of NTP servers
