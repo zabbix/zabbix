@@ -242,7 +242,7 @@ static int create_host_file(void)
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
-		host.ip=DBget_field(result,i,0);
+		strscpy(host.ip,DBget_field(result,i,0));
 /*		host.host=DBget_field(result,i,2);*/
 
 		fprintf(f,"%s\n",host.ip);
@@ -257,7 +257,7 @@ static int create_host_file(void)
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
-		host.host=DBget_field(result,i,0);
+		strscpy(host.host,DBget_field(result,i,0));
 
 		fprintf(f,"%s\n",host.host);
 
