@@ -187,6 +187,7 @@ DB_TRIGGER
 	char	expression[TRIGGER_EXPRESSION_LEN_MAX];
 	char	description[TRIGGER_DESCRIPTION_LEN_MAX];
 	char	url[TRIGGER_URL_LEN_MAX];
+	char	comments[TRIGGER_COMMENTS_LEN_MAX];
 	int	status;
 	int	value;
 	int	prevvalue;

@@ -29,6 +29,55 @@
 #include "zlog.h"
 #include "common.h"
 
+/* Has to be rewritten to avoi malloc */
+char *string_replace(char *str, const char *sub_str1, const char *sub_str2)
+{
+        char *new_str;
+        const char *p;
+        const char *q;
+        const char *r;
+        char *t;
+        signed long len;
+        signed long diff;
+        unsigned long count = 0;
+
+        if ( (p=strstr(str, sub_str1)) == NULL )
+                return str;
+        ++count;
+
+        len = strlen(sub_str1);
+
+        /* count the number of occurances of sub_str1 */
+        for ( p+=len; (p=strstr(p, sub_str1)) != NULL; p+=len )
+                ++count;
+
+        diff = strlen(sub_str2) - len;
+
+        /* allocate new memory */
+        if ( (new_str=(char *)malloc((strlen(str) + count*diff)*sizeof(char)))
+                        == NULL )
+                return NULL;
+
+        q = str;
+        t = new_str;
+        for (p=strstr(str, sub_str1); p!=NULL; p=strstr(p, sub_str1))
+        {
+                /* copy until next occurance of sub_str1 */
+                for ( ; q < p; *t++ = *q++)
+                        ;
+                q += len;
+                p = q;
+                for ( r = sub_str2; *t++ = *r++; )
+                        ;
+                --t;
+        }
+        /* copy the tail of str */
+        while ( *t++ = *q++ )
+                ;
+        return new_str;
+
+} 
+
 int	DBadd_new_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available)
 {
 	char	sql[MAX_STRING_LEN];
@@ -274,13 +323,18 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 	DB_TRIGGER	trigger;
 	DB_RESULT	*result,*result2,*result3;
 	char	sql[MAX_STRING_LEN];
+	char	old[MAX_STRING_LEN];
+	char	new[MAX_STRING_LEN];
 	int	ret = SUCCEED;
-	int	i;
+	int	i,j;
 	int	functionid, triggerid_new;
-	char	expression_old[MAX_TRIGGER_EXPRESSION_LEN];
+	char	expression_old[TRIGGER_EXPRESSION_LEN_MAX];
+	char	*expression;
+	char	comments_esc[TRIGGER_COMMENTS_LEN_MAX];
+	char	url_esc[TRIGGER_URL_LEN_MAX];
+	char	description_esc[TRIGGER_DESCRIPTION_LEN_MAX];
 
 	zabbix_log( LOG_LEVEL_WARNING, "In DBadd_trigger_to_linked_hosts(%d,%d)",triggerid, hostid);
-$sql="insert into triggers  (description,priority,status,comments,url,value,expression) values ('".addslashes($trigger["description"])."',".$trigger["priority"].",".$trigger["status"].",'".addslashes($trigger["comments"])."','".addslashes($trigger["url"])."',2,'$expression_old')";
 
 	snprintf(sql,sizeof(sql)-1,"select description, priority,status,comments,url,value,expression,prevvalue from triggers where triggerid=%d", triggerid);
 	result2=DBselect(sql);
@@ -330,16 +384,14 @@ $sql="insert into triggers  (description,priority,status,comments,url,value,expr
 
 		if(atoi(DBget_field(result,i,2))&1 == 0)	continue;
 
-		DBescape_string(trigger.description,description_esc,MAX_TRIGGER_DESCRIPTION_LEN);
-		DBescape_string(trigger.comments,description_esc,MAX_TRIGGER_COMMENTS_LEN);
-		DBescape_string(trigger.url,url_esc,MAX_TRIGGER_URL_LEN);
+		DBescape_string(trigger.description,description_esc,TRIGGER_DESCRIPTION_LEN_MAX);
+		DBescape_string(trigger.comments,description_esc,TRIGGER_COMMENTS_LEN_MAX);
+		DBescape_string(trigger.url,url_esc,TRIGGER_URL_LEN_MAX);
 
 		snprintf(sql,sizeof(sql)-1,"insert into triggers  (description,priority,status,comments,url,value,expression) values ('%s',%d,%d,'%s','%s',2,'%s')",description_esc, trigger.priority, trigger.status, comments_esc, url_esc, expression_old);
 
-		result4=DBexecute(sql);
+		DBexecute(sql);
 		triggerid_new=DBinsert_id();
-		DBfree_result(result4);
-
 
 		snprintf(sql,sizeof(sql)-1,"select i.key_,f.parameter,f.function,f.functionid from functions f,items i where i.itemid=f.itemid and f.triggerid=%d", triggerid);
 		result2=DBselect(sql);
@@ -356,21 +408,25 @@ $sql="insert into triggers  (description,priority,status,comments,url,value,expr
 				DBexecute(sql);
 				break;
 			}
-			$row3=DBfetch($result3);
 
 			snprintf(sql,sizeof(sql)-1,"insert into functions (itemid,triggerid,function,parameter) values (%d,%d,'%s','%s')", atoi(DBget_field(result3,0,0)), triggerid_new, DBget_field(result2,j,1), DBget_field(result2,j,2));
 
-			result5=DBexecute(sql);
+			DBexecute(sql);
 			functionid=DBinsert_id();
 
 			snprintf(sql,sizeof(sql)-1,"update triggers set expression='%s' where triggerid=%d", expression_old, triggerid_new );
-			DBexecute($sql);
+			DBexecute(sql);
 
-			$expression=str_replace("{".$row2["functionid"]."}","{".$functionid."}",$expression_old);
-			$expression_old=$expression;
+			snprintf(old, sizeof(old)-1,"{%d}", atoi(DBget_field(result2,j,3)));
+			snprintf(new, sizeof(new)-1,"{%d}", functionid);
+
+			/* Possible memory leak here as expression can be malloced */
+			expression=string_replace(expression_old, old, new);
+
+			strscpy(expression_old, expression);
 
 			snprintf(sql,sizeof(sql)-1,"update triggers set expression='%s' where triggerid=%d", expression, triggerid_new );
-			DBexecute($sql);
+			DBexecute(sql);
 		}
 		DBfree_result(result2);
 	}
@@ -378,3 +434,5 @@ $sql="insert into triggers  (description,priority,status,comments,url,value,expr
 
 	return SUCCEED;
 }
+
+
