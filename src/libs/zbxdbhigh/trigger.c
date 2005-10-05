@@ -436,3 +436,35 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 }
 
 
+int	DBget_trigger_by_triggerid(int triggerid,DB_TRIGGER *trigger)
+{
+	DB_RESULT	*result;
+	char	sql[MAX_STRING_LEN];
+	int	ret = SUCCEED;
+
+	zabbix_log( LOG_LEVEL_WARNING, "In DBget_trigger_by_triggerid(%d)", triggerid);
+
+	snprintf(sql,sizeof(sql)-1,"select triggerid, expression,description,url,comments,status,value,prevvalue,priority from triggers where triggerid=%d", triggerid);
+	result=DBselect(sql);
+
+	if(DBnum_rows(result)==0)
+	{
+		ret = FAIL;
+	}
+	else
+	{
+		trigger->triggerid=atoi(DBget_field(result,0,0));
+		strscpy(trigger->expression,DBget_field(result,0,1));
+		strscpy(trigger->description,DBget_field(result,0,2));
+		strscpy(trigger->url,DBget_field(result,0,3));
+		strscpy(trigger->comments,DBget_field(result,0,4));
+		trigger->status=atoi(DBget_field(result,0,5));
+		trigger->value=atoi(DBget_field(result,0,6));
+		trigger->prevvalue=atoi(DBget_field(result,0,7));
+		trigger->priority=atoi(DBget_field(result,0,8));
+	}
+
+	DBfree_result(result);
+
+	return ret;
+}

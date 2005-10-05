@@ -29,47 +29,118 @@
 #include "zlog.h"
 #include "common.h"
 
+int	DBget_action_by_actionid(int actionid,DB_ACTION *action)
+{
+	DB_RESULT	*result;
+	char	sql[MAX_STRING_LEN];
+	int	ret = SUCCEED;
 
-	function	add_action_to_linked_hosts($actionid,$hostid=0)
+	zabbix_log( LOG_LEVEL_WARNING, "In DBget_action_by_actionid(%d)", actionid);
+
+	snprintf(sql,sizeof(sql)-1,"select triggerid,userid,scope,severity,good,delay,recipient,subject,message from actions where actionid=%d", actionid);
+	result=DBselect(sql);
+
+	if(DBnum_rows(result)==0)
 	{
-		if($actionid<=0)
-		{
-			return;
-		}
-
-		$action=get_action_by_actionid($actionid);
-		$trigger=get_trigger_by_triggerid($action["triggerid"]);
-
-		$sql="select distinct h.hostid from hosts h,functions f, items i where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid=".$action["triggerid"];
-		$result=DBselect($sql);
-		if(DBnum_rows($result)!=1)
-		{
-			return;
-		}
-		$row=DBfetch($result);
-
-		$host_template=get_host_by_hostid($row["hostid"]);
-
-		if($hostid==0)
-		{
-			$sql="select hostid,templateid,actions from hosts_templates where templateid=".$row["hostid"];
-		}
-		else
-		{
-			$sql="select hostid,templateid,actions from hosts_templates where hostid=$hostid and templateid=".$row["hostid"];
-		}
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
-			if($row["actions"]&1 == 0)	continue;
-
-			$sql="select distinct f.triggerid from functions f,items i,triggers t where t.description='".addslashes($trigger["description"])."' and t.triggerid=f.triggerid and i.itemid=f.itemid and i.hostid=".$row["hostid"];
-			$result2=DBselect($sql);
-			while($row2=DBfetch($result2))
-			{
-				$host=get_host_by_hostid($row["hostid"]);
-				$message=str_replace("{".$host_template["host"].":", "{".$host["host"].":", $action["message"]);
-				add_action($row2["triggerid"], $action["userid"], $action["good"], $action["delay"], $action["subject"], $message, $action["scope"], $action["severity"], $action["recipient"], $action["userid"]);
-			}
-		}
+		ret = FAIL;
 	}
+	else
+	{
+		action->actionid=actionid;
+		action->triggerid=atoi(DBget_field(result,0,0));
+		action->userid=atoi(DBget_field(result,0,1));
+		action->scope=atoi(DBget_field(result,0,2));
+		action->severity=atoi(DBget_field(result,0,3));
+		action->good=atoi(DBget_field(result,0,4));
+		action->delay=atoi(DBget_field(result,0,5));
+		action->recipient=atoi(DBget_field(result,0,6));
+		strscpy(action->subject,DBget_field(result,0,7));
+		strscpy(action->message,DBget_field(result,0,8));
+	}
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+int	DBadd_action_to_linked_hosts(int actionid,int hostid)
+{
+	DB_ACTION	action;
+	DB_TRIGGER	trigger;
+	DB_HOST		host;
+	DB_HOST		host_template;
+	DB_RESULT	*result,*result2;
+
+	char	sql[MAX_STRING_LEN];
+	char	description_esc[TRIGGER_DESCRIPTION_LEN_MAX];
+	char	old[MAX_STRING_LEN];
+	char	new[MAX_STRING_LEN];
+	char	*message;
+	int	ret = SUCCEED;
+	int	i,j;
+	int	triggerid,hostid_tmp;
+
+	zabbix_log( LOG_LEVEL_WARNING, "In DBadd_action_to_linked_hosts(%d,%d)", actionid, hostid);
+
+	if(DBget_action_by_actionid(actionid,&action) == FAIL)
+	{
+		return FAIL;
+	}
+
+	if(DBget_trigger_by_triggerid(action.triggerid,&trigger) == FAIL)
+	{
+		return FAIL;
+	}
+
+	snprintf(sql,sizeof(sql)-1,"select distinct h.hostid from hosts h,functions f, items i where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid=%d", action.triggerid);
+	result=DBselect(sql);
+
+	if(DBnum_rows(result)!=1)
+	{
+		DBfree_result(result);
+		return FAIL;
+	}
+
+	hostid_tmp=atoi(DBget_field(result,0,0));
+
+	DBfree_result(result);
+
+	if(DBget_host_by_hostid(hostid_tmp,&host_template) == FAIL)
+	{
+		return FAIL;
+	}
+	if(hostid==0)
+	{
+		snprintf(sql,sizeof(sql)-1,"select hostid,templateid,actions from hosts_templates where templateid=%d", hostid_tmp);
+	}
+	else
+	{
+		snprintf(sql,sizeof(sql)-1,"select hostid,templateid,actions from hosts_templates where hostid=%d and templateid=%d", hostid, hostid_tmp);
+	}
+
+	result=DBselect(sql);
+	for(i=0;i<DBnum_rows(result);i++)
+	{
+		if(atoi(DBget_field(result,i,2))&1 == 0)	continue;
+
+		DBescape_string(trigger.description,description_esc,TRIGGER_DESCRIPTION_LEN_MAX);
+
+		snprintf(sql,sizeof(sql)-1,"select distinct f.triggerid from functions f,items i,triggers t where t.description='%s' and t.triggerid=f.triggerid and i.itemid=f.itemid and i.hostid=%d", description_esc, atoi(DBget_field(result,i,0)));
+		result2=DBselect(sql);
+		for(j=0;j<DBnum_rows(result2);j++)
+		{
+			if(DBget_host_by_hostid(atoi(DBget_field(result,i,0)),&host) == FAIL)	continue;
+
+			snprintf(old,sizeof(sql)-1,"{%s:",host_template.host);
+			snprintf(new,sizeof(sql)-1,"{%s:",host.host);
+
+			message=string_replace(action.message, old, new);
+
+			DBadd_action(atoi(DBget_field(result2,j,0)), action.userid, action.good, action.delay, action.subject, message, action.scope, action.severity, action.recipient, action.userid);
+		}
+		DBfree_result(result2);
+	}
+	DBfree_result(result2);
+
+	return SUCCEED;
+}
