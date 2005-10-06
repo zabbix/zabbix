@@ -29,6 +29,37 @@
 #include "zlog.h"
 #include "common.h"
 
+int	DBadd_action(int triggerid, int userid, int good, int delay, char *subject, char *message, int scope, int severity, int recipient, int usrgrpid)
+{
+	char	sql[MAX_STRING_LEN];
+	int	actionid;
+	char	subject_esc[ACTION_SUBJECT_LEN_MAX];
+	char	message_esc[MAX_STRING_LEN];
+
+	DBescape_string(subject,subject_esc,ACTION_SUBJECT_LEN_MAX);
+	DBescape_string(message,message_esc,MAX_STRING_LEN);
+
+	if(recipient == RECIPIENT_TYPE_GROUP)
+	{
+		userid = usrgrpid;
+	}
+
+	snprintf(sql, sizeof(sql)-1,"insert into actions (triggerid, userid, good, delay, subject, message, scope, severity, recipient, userid) values (%d, %d, %d, %d, '%s', '%s', %d, %d, %d, %d)", triggerid, userid, good, delay, subject_esc, message_esc, scope, severity, recipient, userid);
+	if(FAIL == DBexecute(sql))
+	{
+		return FAIL;
+	}
+
+	actionid=DBinsert_id();
+
+	if(actionid==0)
+	{
+		return FAIL;
+	}
+
+	return actionid;
+}
+
 int	DBget_action_by_actionid(int actionid,DB_ACTION *action)
 {
 	DB_RESULT	*result;

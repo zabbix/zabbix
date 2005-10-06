@@ -58,6 +58,7 @@ extern	int	CONFIG_DBPORT;
 #define DB_MEDIATYPE	struct mediatype_type
 #define DB_ESCALATION_RULE	struct escalation_rule_type
 #define DB_ESCALATION_LOG	struct escalation_log_type
+#define DB_GRAPH	struct graph_type
 #define DB_GRAPH_ITEM	struct graph_item_type
 
 #ifdef HAVE_MYSQL
@@ -96,8 +97,17 @@ extern	int	CONFIG_DBPORT;
 #define HOST_ERROR_LEN			128
 #define HOST_ERROR_LEN_MAX		HOST_ERROR_LEN+1
 
+#define ITEM_KEY_LEN			64
+#define ITEM_KEY_LEN_MAX		ITEM_KEY_LEN+1
+
+#define GRAPH_NAME_LEN			128
+#define GRAPH_NAME_LEN_MAX		GRAPH_NAME_LEN+1
+
 #define GRAPH_ITEM_COLOR_LEN		32
 #define GRAPH_ITEM_COLOR_LEN_MAX	GRAPH_ITEM_COLOR_LEN+1
+
+#define ACTION_SUBJECT_LEN		255
+#define ACTION_SUBJECT_LEN_MAX		ACTION_SUBJECT_LEN+1
 
 DB_HOST
 {
@@ -111,6 +121,17 @@ DB_HOST
 	int	network_errors;
 	char	error[HOST_ERROR_LEN_MAX];
 	int	available;
+};
+
+DB_GRAPH
+{
+	int	graphid;
+	char	name[GRAPH_NAME_LEN_MAX];
+	int	width;
+	int	height;
+	int	yaxistype;
+	double	yaxismin;
+	double	yaxismax;
 };
 
 DB_GRAPH_ITEM
@@ -130,7 +151,7 @@ DB_ITEM
 	int	type;
 	int	status;
 	char	*description;
-	char	*key;
+	char	key[ITEM_KEY_LEN_MAX];
 	char	*host;
 	int	host_status;
 	int	host_available;
@@ -234,7 +255,7 @@ DB_ACTION
 	int     delay;
 	int     lastcheck;
 	int	recipient;
-	char    subject[MAX_STRING_LEN];
+	char    subject[ACTION_SUBJECT_LEN_MAX];
 	char    message[MAX_STRING_LEN];
 };
 
@@ -315,5 +336,12 @@ void    DBget_item_from_db(DB_ITEM *item,DB_RESULT *result, int row);
 int	DBadd_new_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBhost_exists(char *server);
 
+int	DBget_item_by_itemid(int itemid,DB_ITEM *item);
+
 int	DBget_trigger_by_triggerid(int triggerid,DB_TRIGGER *trigger);
+
+int	DBadd_graph(char *name, int width, int height, int yaxistype, double yaxismin, double yaxismax);
+int	DBget_graph_item_by_gitemid(int gitemid, DB_GRAPH_ITEM *graph_item);
+int	DBget_graph_by_graphid(int graphid, DB_GRAPH *graph);
+int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid);
 #endif
