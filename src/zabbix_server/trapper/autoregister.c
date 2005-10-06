@@ -35,6 +35,7 @@
 
 #include "common.h"
 
+void	register_new_host(char *server, int host_templateid);
 
 int	autoregister(char *server)
 {

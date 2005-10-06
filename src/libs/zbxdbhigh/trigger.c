@@ -171,7 +171,7 @@ int	DBget_trigger_by_triggerid(int triggerid,DB_TRIGGER *trigger)
 
 	zabbix_log( LOG_LEVEL_WARNING, "In DBget_trigger_by_triggerid(%d)", triggerid);
 
-	snprintf(sql,sizeof(sql)-1,"select triggerid, expression,description,url,comments,status,value,prevvalue,priority from triggers where triggerid=%d", triggerid);
+	snprintf(sql,sizeof(sql)-1,"select triggerid, expression,description,url,comments,status,value,priority from triggers where triggerid=%d", triggerid);
 	result=DBselect(sql);
 
 	if(DBnum_rows(result)==0)
@@ -187,8 +187,7 @@ int	DBget_trigger_by_triggerid(int triggerid,DB_TRIGGER *trigger)
 		strscpy(trigger->comments,DBget_field(result,0,4));
 		trigger->status=atoi(DBget_field(result,0,5));
 		trigger->value=atoi(DBget_field(result,0,6));
-		trigger->prevvalue=atoi(DBget_field(result,0,7));
-		trigger->priority=atoi(DBget_field(result,0,8));
+		trigger->priority=atoi(DBget_field(result,0,7));
 	}
 
 	DBfree_result(result);
