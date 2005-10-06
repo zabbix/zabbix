@@ -36,7 +36,6 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 	char	sql[MAX_STRING_LEN];
 	char	old[MAX_STRING_LEN];
 	char	new[MAX_STRING_LEN];
-	int	ret = SUCCEED;
 	int	i,j;
 	int	functionid, triggerid_new;
 	char	expression_old[TRIGGER_EXPRESSION_LEN_MAX];
@@ -47,7 +46,7 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 
 	zabbix_log( LOG_LEVEL_WARNING, "In DBadd_trigger_to_linked_hosts(%d,%d)",triggerid, hostid);
 
-	snprintf(sql,sizeof(sql)-1,"select description, priority,status,comments,url,value,expression,prevvalue from triggers where triggerid=%d", triggerid);
+	snprintf(sql,sizeof(sql)-1,"select description, priority,status,comments,url,value,expression from triggers where triggerid=%d", triggerid);
 	result2=DBselect(sql);
 	if(DBnum_rows(result2)==0)
 	{
@@ -57,13 +56,13 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 
 	trigger.triggerid = triggerid;
 	strscpy(trigger.description, DBget_field(result2,0,0));
+	zabbix_log( LOG_LEVEL_WARNING, "DESC1 [%s] [%s]", trigger.description, DBget_field(result2,0,0));
 	trigger.priority=atoi(DBget_field(result2,0,1));
 	trigger.status=atoi(DBget_field(result2,0,2));
 	strscpy(trigger.comments, DBget_field(result2,0,3));
 	strscpy(trigger.url, DBget_field(result2,0,4));
 	trigger.value=atoi(DBget_field(result2,0,5));
 	strscpy(trigger.expression, DBget_field(result2,0,6));
-	trigger.prevvalue=atoi(DBget_field(result2,0,7));
 
 	DBfree_result(result2);
 
@@ -93,13 +92,15 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 	{
 		strscpy(expression_old, trigger.expression);
 
-		if(atoi(DBget_field(result,i,2))&1 == 0)	continue;
+		if( (atoi(DBget_field(result,i,2))&1) == 0)	continue;
 
 		DBescape_string(trigger.description,description_esc,TRIGGER_DESCRIPTION_LEN_MAX);
-		DBescape_string(trigger.comments,description_esc,TRIGGER_COMMENTS_LEN_MAX);
+		zabbix_log( LOG_LEVEL_WARNING, "DESC2 [%s] [%s]", trigger.description, description_esc);
+		DBescape_string(trigger.comments,comments_esc,TRIGGER_COMMENTS_LEN_MAX);
 		DBescape_string(trigger.url,url_esc,TRIGGER_URL_LEN_MAX);
 
 		snprintf(sql,sizeof(sql)-1,"insert into triggers  (description,priority,status,comments,url,value,expression) values ('%s',%d,%d,'%s','%s',2,'%s')",description_esc, trigger.priority, trigger.status, comments_esc, url_esc, expression_old);
+		zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]",sql);
 
 		DBexecute(sql);
 		triggerid_new=DBinsert_id();
@@ -120,7 +121,7 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 				break;
 			}
 
-			snprintf(sql,sizeof(sql)-1,"insert into functions (itemid,triggerid,function,parameter) values (%d,%d,'%s','%s')", atoi(DBget_field(result3,0,0)), triggerid_new, DBget_field(result2,j,1), DBget_field(result2,j,2));
+			snprintf(sql,sizeof(sql)-1,"insert into functions (itemid,triggerid,function,parameter) values (%d,%d,'%s','%s')", atoi(DBget_field(result3,0,0)), triggerid_new, DBget_field(result2,j,2), DBget_field(result2,j,1));
 
 			DBexecute(sql);
 			functionid=DBinsert_id();

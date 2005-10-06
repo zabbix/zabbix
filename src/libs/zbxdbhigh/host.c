@@ -34,7 +34,7 @@ int	DBadd_host(char *server, int port, int status, int useip, char *ip, int disa
 	char	sql[MAX_STRING_LEN];
 	int	hostid;
 
-	snprintf(sql, sizeof(sql)-1,"insert into hosts (host,port,status,useip,ip,disable_until,available) values ('%s',%d,%d,%d,'%d',%d,%d)", server, port, status, useip, ip, disable_until, available);
+	snprintf(sql, sizeof(sql)-1,"insert into hosts (host,port,status,useip,ip,disable_until,available) values ('%s',%d,%d,%d,'%s',%d,%d)", server, port, status, useip, ip, disable_until, available);
 	if(FAIL == DBexecute(sql))
 	{
 		return FAIL;
@@ -72,7 +72,6 @@ int	DBadd_templates_to_host(int hostid,int host_templateid)
 {
 	DB_RESULT	*result;
 	char	sql[MAX_STRING_LEN];
-	int	ret = SUCCEED;
 	int	i;
 
 	zabbix_log( LOG_LEVEL_WARNING, "In DBadd_templates_to_host(%d,%d)", hostid, host_templateid);
@@ -88,6 +87,8 @@ int	DBadd_templates_to_host(int hostid,int host_templateid)
 	}
 
 	DBfree_result(result);
+
+	return SUCCEED;
 }
 
 int	DBadd_template_linkage(int hostid,int templateid,int items,int triggers,int actions,int graphs,int screens)
@@ -105,7 +106,6 @@ int	DBsync_host_with_templates(int hostid)
 {
 	DB_RESULT	*result;
 	char	sql[MAX_STRING_LEN];
-	int	ret = SUCCEED;
 	int	i;
 
 	zabbix_log( LOG_LEVEL_WARNING, "In DBsync_host_with_templates(%d)", hostid);
@@ -129,7 +129,6 @@ int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,i
 {
 	DB_RESULT	*result;
 	char	sql[MAX_STRING_LEN];
-	int	ret = SUCCEED;
 	int	i;
 
 	zabbix_log( LOG_LEVEL_WARNING, "In DBsync_host_with_template(%d,%d)", hostid, templateid);
@@ -203,6 +202,8 @@ int	DBget_host_by_hostid(int hostid,DB_HOST *host)
 	}
 
 	DBfree_result(result);
+
+	zabbix_log( LOG_LEVEL_WARNING, "End of DBget_host_by_hostid");
 
 	return ret;
 }

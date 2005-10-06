@@ -304,8 +304,9 @@ int	DBexecute( char *query );
 long	DBaffected_rows();
 
 DB_RESULT	*DBselect(char *query);
-char		*DBget_field(DB_RESULT *result, int rownum, int fieldnum);
-int		DBnum_rows(DB_RESULT *result);
+char	*DBget_field(DB_RESULT *result, int rownum, int fieldnum);
+int	DBnum_rows(DB_RESULT *result);
+int	DBinsert_id();
 
 int	DBget_function_result(double *result,char *functionid);
 void	DBupdate_host_availability(int hostid,int available,int clock,char *error);
@@ -335,10 +336,20 @@ void    DBget_item_from_db(DB_ITEM *item,DB_RESULT *result, int row);
 
 int	DBadd_new_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBhost_exists(char *server);
+int	DBget_host_by_hostid(int hostid,DB_HOST *host);
+int	DBsync_host_with_templates(int hostid);
+int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,int actions,int graphs,int screens);
+
+int	DBadd_template_linkage(int hostid,int templateid,int items,int triggers,int actions,int graphs,int screens);
 
 int	DBget_item_by_itemid(int itemid,DB_ITEM *item);
+int	DBadd_item_to_linked_hosts(int itemid, int hostid);
+int	DBadd_item(char *description, char *key, int hostid, int delay, int history, int status, int type, char *snmp_community, char *snmp_oid,int value_type,char *trapper_hosts,int snmp_port,char *units,int multiplier,int delta, char *snmpv3_securityname,int snmpv3_securitylevel,char *snmpv3_authpassphrase,char *snmpv3_privpassphrase,char *formula,int trends,char *logtimefmt);
+
+int	DBadd_action_to_linked_hosts(int actionid,int hostid);
 
 int	DBget_trigger_by_triggerid(int triggerid,DB_TRIGGER *trigger);
+int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid);
 
 int	DBadd_graph(char *name, int width, int height, int yaxistype, double yaxismin, double yaxismax);
 int	DBget_graph_item_by_gitemid(int gitemid, DB_GRAPH_ITEM *graph_item);
