@@ -74,7 +74,7 @@ int	DBadd_templates_to_host(int hostid,int host_templateid)
 	char	sql[MAX_STRING_LEN];
 	int	i;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In DBadd_templates_to_host(%d,%d)", hostid, host_templateid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In DBadd_templates_to_host(%d,%d)", hostid, host_templateid);
 
 	snprintf(sql,sizeof(sql)-1,"select templateid,items,triggers,actions,graphs,screens from hosts_templates where hostid=%d", host_templateid);
 	result = DBselect(sql);
@@ -95,7 +95,7 @@ int	DBadd_template_linkage(int hostid,int templateid,int items,int triggers,int 
 {
 	char	sql[MAX_STRING_LEN];
 
-	zabbix_log( LOG_LEVEL_WARNING, "In DBadd_template_linkage(%d)", hostid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In DBadd_template_linkage(%d)", hostid);
 
 	snprintf(sql,sizeof(sql)-1,"insert into hosts_templates (hostid,templateid,items,triggers,actions,graphs,screens) values (%d,%d,%d,%d,%d,%d,%d)",hostid, templateid, items, triggers, actions, graphs, screens);
 
@@ -108,7 +108,7 @@ int	DBsync_host_with_templates(int hostid)
 	char	sql[MAX_STRING_LEN];
 	int	i;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In DBsync_host_with_templates(%d)", hostid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In DBsync_host_with_templates(%d)", hostid);
 
 	snprintf(sql,sizeof(sql)-1,"select templateid,items,triggers,actions,graphs,screens from hosts_templates where hostid=%d", hostid);
 	result = DBselect(sql);
@@ -131,7 +131,7 @@ int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,i
 	char	sql[MAX_STRING_LEN];
 	int	i;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In DBsync_host_with_template(%d,%d)", hostid, templateid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In DBsync_host_with_template(%d,%d)", hostid, templateid);
 
 	/* Sync items */
 	snprintf(sql,sizeof(sql)-1,"select itemid from items where hostid=%d", templateid);
@@ -178,7 +178,7 @@ int	DBget_host_by_hostid(int hostid,DB_HOST *host)
 	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In DBget_host_by_hostid(%d)", hostid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In DBget_host_by_hostid(%d)", hostid);
 
 	snprintf(sql,sizeof(sql)-1,"select hostid,host,useip,ip,port,status,disable_until,network_errors,error,available from hosts where hostid=%d", hostid);
 	result=DBselect(sql);
@@ -203,7 +203,7 @@ int	DBget_host_by_hostid(int hostid,DB_HOST *host)
 
 	DBfree_result(result);
 
-	zabbix_log( LOG_LEVEL_WARNING, "End of DBget_host_by_hostid");
+	zabbix_log( LOG_LEVEL_DEBUG, "End of DBget_host_by_hostid");
 
 	return ret;
 }
