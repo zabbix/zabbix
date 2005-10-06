@@ -20,7 +20,7 @@
 #ifndef ZABBIX_COMMON_H
 #define ZABBIX_COMMON_H
 
-#define	ZABBIX_VERSION	"1.1beta1"
+#define	ZABBIX_VERSION	"1.1beta2"
  
 #define	SUCCEED		0
 #define	FAIL		(-1)
