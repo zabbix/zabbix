@@ -196,8 +196,13 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 
 	if(hp==NULL)
 	{
+#ifdef	HAVE_HSTRERROR		
 		zabbix_log( LOG_LEVEL_WARNING, "gethostbyname() failed [%s]", hstrerror(h_errno));
 		snprintf(error,max_error_len-1,"gethostbyname() failed [%s]", hstrerror(h_errno));
+#else
+		zabbix_log( LOG_LEVEL_WARNING, "gethostbyname() failed [%d]", h_errno);
+		snprintf(error,max_error_len-1,"gethostbyname() failed [%d]", h_errno);
+#endif
 		return	NETWORK_ERROR;
 	}
 
