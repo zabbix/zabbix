@@ -418,7 +418,6 @@ int	process_active_checks(char *server, int port)
 	int	i, now, count;
 	int	ret = SUCCEED;
 
-	char	shortname[MAX_STRING_LEN];
 	char	c[MAX_STRING_LEN];
 	char	*filename;
 

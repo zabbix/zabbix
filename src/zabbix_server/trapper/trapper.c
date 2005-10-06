@@ -57,7 +57,6 @@ int	process_trap(int sockfd,char *s, int max_len)
 	char	*server,*key,*value_string;
 	char	copy[MAX_STRING_LEN];
 	char	result[MAX_STRING_LEN];
-	char	host_b64[MAX_STRING_LEN],key_b64[MAX_STRING_LEN],value_b64[MAX_STRING_LEN];
 	char	host_dec[MAX_STRING_LEN],key_dec[MAX_STRING_LEN],value_dec[MAX_STRING_LEN];
 	char	lastlogsize[MAX_STRING_LEN];
 	char	timestamp[MAX_STRING_LEN];
@@ -65,7 +64,6 @@ int	process_trap(int sockfd,char *s, int max_len)
 	char	severity[MAX_STRING_LEN];
 
 	int	ret=SUCCEED;
-	int 	i;
 
 	for( p=s+strlen(s)-1; p>s && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
 	p[1]=0;
