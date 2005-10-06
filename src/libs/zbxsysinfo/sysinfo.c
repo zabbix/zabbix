@@ -2025,11 +2025,17 @@ int	CHECK_DNS(const char *cmd, const char *ip_and_zone,double  *value)
 
 	_res.nsaddr_list[0].sin_addr = in;
 	_res.nsaddr_list[0].sin_family = AF_INET;
-	_res.nsaddr_list[0].sin_port = htons(NS_DEFAULTPORT);
+/*	_res.nsaddr_list[0].sin_port = htons(NS_DEFAULTPORT);*/
+
+	_res.nsaddr_list[0].sin_port = htons(53);
 	_res.nscount = 1; 
 	_res.retrans=5;
 
+#ifdef	C_IN
+	result=res_query(zone,C_IN,T_SOA,respbuf,sizeof(respbuf));
+#else
 	result=res_query(zone,ns_c_in,ns_t_soa,respbuf,sizeof(respbuf));
+#endif
 	*value = result!=-1 ? 1 : 0;
 
 	return SYSINFO_RET_OK;
