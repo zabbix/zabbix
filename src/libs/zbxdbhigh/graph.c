@@ -124,15 +124,6 @@ int	DBget_graph_by_graphid(int graphid, DB_GRAPH *graph)
 	}
 	else
 	{
-
-		        int     graphid;
-			        char    name[GRAPH_NAME_LEN_MAX];
-				        int     width;
-					        int     height;
-						        int     yaxistype;
-							        double  yaxismin;
-								        double  yaxismax;
-
 		graph->graphid=atoi(DBget_field(result,0,0));
 		strscpy(graph->name,DBget_field(result,0,1));
 		graph->width=atoi(DBget_field(result,0,2));
@@ -153,10 +144,9 @@ int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid)
 	DB_ITEM	item;
 	DB_GRAPH_ITEM	graph_item;
 	DB_GRAPH	graph;
-	DB_RESULT	*result,*result2,*result3;
+	DB_RESULT	*result,*result2;
 	char	sql[MAX_STRING_LEN];
 	char	name_esc[GRAPH_NAME_LEN_MAX];
-	int	ret = SUCCEED;
 	int	i,j;
 	int	graphid;
 	int	itemid;
@@ -187,12 +177,15 @@ int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid)
 		snprintf(sql,sizeof(sql)-1,"select hostid,templateid,graphs from hosts_templates where hostid=%d and templateid=%d", hostid, item.hostid);
 	}
 
+	zabbix_log( LOG_LEVEL_WARNING, "\tSQL [%s]", sql);
+
 	result=DBselect(sql);
 	for(i=0;i<DBnum_rows(result);i++)
 	{
-		if(atoi(DBget_field(result,i,2))&1 == 0)	continue;
+		if( (atoi(DBget_field(result,i,2))&1) == 0)	continue;
 
 		snprintf(sql,sizeof(sql)-1,"select i.itemid from items i where i.key_='%s' and i.hostid=%d", item.key, atoi(DBget_field(result,i,0)));
+		zabbix_log( LOG_LEVEL_WARNING, "\t\tSQL [%s]", sql);
 
 		result2=DBselect(sql);
 		if(DBnum_rows(result2)==0)
