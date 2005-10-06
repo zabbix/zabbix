@@ -1,11 +1,12 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <regex.h>
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
 
+#include <sys/types.h>
+#include <regex.h>
 
 #define MAX_FILE_LEN	1024*1024
 
