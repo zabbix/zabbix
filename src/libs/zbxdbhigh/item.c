@@ -37,7 +37,7 @@ int	DBget_item_by_itemid(int itemid,DB_ITEM *item)
 
 	zabbix_log( LOG_LEVEL_WARNING, "In DBget_item_by_itemid(%d)", itemid);
 
-	snprintf(sql,sizeof(sql)-1,"select itemid,key_ from items where itemid=%d", itemid);
+	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.hostid from items i,hosts h where h.hostid=i.hostid and i.itemid=%d", itemid);
 	result=DBselect(sql);
 
 	if(DBnum_rows(result)==0)
@@ -48,6 +48,7 @@ int	DBget_item_by_itemid(int itemid,DB_ITEM *item)
 	{
 		item->itemid=atoi(DBget_field(result,0,0));
 		strscpy(item->key,DBget_field(result,0,1));
+		item->hostid=atoi(DBget_field(result,0,2));
 	}
 
 	DBfree_result(result);
@@ -60,7 +61,6 @@ int 	DBadd_item_to_linked_hosts(int itemid, int hostid)
 	DB_ITEM	item;
 	DB_RESULT	*result,*result2,*result3;
 	char	sql[MAX_STRING_LEN];
-	int	ret = SUCCEED;
 	int	i;
 
 	zabbix_log( LOG_LEVEL_WARNING, "In DBadd_item_to_linked_hosts(%d,%d)", itemid, hostid);
@@ -112,7 +112,7 @@ int 	DBadd_item_to_linked_hosts(int itemid, int hostid)
 	result = DBselect(sql);
 	for(i=0;i<DBnum_rows(result);i++)
 	{
-		if(atoi(DBget_field(result,i,2))&1 == 0)	continue;
+		if( (atoi(DBget_field(result,i,2))&1) == 0)	continue;
 
 		snprintf(sql,sizeof(sql)-1,"select itemid from items where key_='%s' and hostid=%d", item.key, atoi(DBget_field(result,i,0)));
 		result2=DBselect(sql);
@@ -125,6 +125,8 @@ int 	DBadd_item_to_linked_hosts(int itemid, int hostid)
 
 	DBfree_result(result);
 	DBfree_result(result3);
+
+	return SUCCEED;
 }
 
 int	DBadd_item(char *description, char *key, int hostid, int delay, int history, int status, int type, char *snmp_community, char *snmp_oid,int value_type,char *trapper_hosts,int snmp_port,char *units,int multiplier,int delta, char *snmpv3_securityname,int snmpv3_securitylevel,char *snmpv3_authpassphrase,char *snmpv3_privpassphrase,char *formula,int trends,char *logtimefmt)
