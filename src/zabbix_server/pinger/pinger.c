@@ -149,7 +149,7 @@ static int process_value(char *key, char *host, char *value)
 	}
 
 	item.itemid=atoi(DBget_field(result,0,0));
-	item.key=DBget_field(result,0,1);
+	strscpy(item.key,DBget_field(result,0,1));
 	item.host=DBget_field(result,0,2);
 	item.port=atoi(DBget_field(result,0,3));
 	item.delay=atoi(DBget_field(result,0,4));

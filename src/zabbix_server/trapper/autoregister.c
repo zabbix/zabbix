@@ -87,7 +87,7 @@ void	register_new_host(char *server, int host_templateid)
 
 	zabbix_log( LOG_LEVEL_WARNING, "In register_new_host(%s,%d)", server, host_templateid);
 
-	hostid = DBadd_new_host(server, 10050, HOST_STATUS_MONITORED, 0, "", 0, HOST_AVAILABLE_UNKNOWN);
+	hostid = DBadd_host(server, 10050, HOST_STATUS_MONITORED, 0, "", 0, HOST_AVAILABLE_UNKNOWN);
 
 	zabbix_log( LOG_LEVEL_WARNING, "Added new host with hostid [%d]", hostid);
 

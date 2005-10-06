@@ -1289,7 +1289,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_RESULT *result, int row)
 	i=row;
 
 	item->itemid=atoi(DBget_field(result,i,0));
-	item->key=DBget_field(result,i,1);
+	strscpy(item->key,DBget_field(result,i,1));
 	item->host=DBget_field(result,i,2);
 	item->port=atoi(DBget_field(result,i,3));
 	item->delay=atoi(DBget_field(result,i,4));
