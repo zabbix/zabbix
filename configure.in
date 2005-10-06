@@ -451,6 +451,7 @@ AC_CHECK_FUNCS(snprintf)
 AC_CHECK_FUNCS(vasprintf)
 AC_CHECK_FUNCS(asprintf)
 AC_CHECK_FUNCS(vsnprintf)
+AC_CHECK_FUNCS(hstrerror)
 
 dnl Check if we want to compile everything with static
 AC_ARG_ENABLE(static,[

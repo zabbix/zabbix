@@ -66,8 +66,13 @@ int	get_value_agent(double *result,char *result_str,DB_ITEM *item,char *error,in
 
 	if(hp==NULL)
 	{
+#ifdef	HAVE_HSTRERROR
 		zabbix_log( LOG_LEVEL_WARNING, "gethostbyname() failed [%s]", hstrerror(h_errno));
 		snprintf(error,max_error_len-1,"gethostbyname() failed [%s]", hstrerror(h_errno));
+#else
+		zabbix_log( LOG_LEVEL_WARNING, "gethostbyname() failed [%d]", h_errno);
+		snprintf(error,max_error_len-1,"gethostbyname() failed [%d]", h_errno);
+#endif
 		return	NETWORK_ERROR;
 	}
 
