@@ -1,5 +1,6 @@
 Changes for 1.1beta2:
 
+ - fixed compilation issues under FreeBSD (Alexei)
  - fixed compilation of hstrerror() under misc platforms (Alexei)
  - fixed compilation issues of Unix agent on non-Linux platforms (Alexei)
  - added support of autoregistration of new hosts (Alexei)
