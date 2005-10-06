@@ -378,7 +378,7 @@ int	send_value(char *server,int port,char *host, char *key,char *value, char *la
 	}
 
 	comms_create_request(host, key, value, lastlogsize, tosend, sizeof(tosend)-1);
-//	snprintf(tosend,sizeof(tosend)-1,"%s:%s\n",shortname,value);
+/*	snprintf(tosend,sizeof(tosend)-1,"%s:%s\n",shortname,value); */
 	zabbix_log( LOG_LEVEL_DEBUG, "XML before sonding [%s]",tosend);
 
 	if( sendto(s,tosend,strlen(tosend),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
@@ -444,8 +444,8 @@ int	process_active_checks(char *server, int port)
 			count=0;
 			while(process_log(filename,&metrics[i].lastlogsize,value) == 0)
 			{
-//				snprintf(shortname, MAX_STRING_LEN-1,"%s:%s",CONFIG_HOSTNAME,metrics[i].key);
-//				zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
+/*				snprintf(shortname, MAX_STRING_LEN-1,"%s:%s",CONFIG_HOSTNAME,metrics[i].key);
+				zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname); */
 				snprintf(lastlogsize, MAX_STRING_LEN-1,"%d",metrics[i].lastlogsize);
 
 				if(send_value(server,port,CONFIG_HOSTNAME,metrics[i].key,value,lastlogsize) == FAIL)
@@ -469,8 +469,8 @@ int	process_active_checks(char *server, int port)
 			lastlogsize[0]=0;
 			process(metrics[i].key, value, 0);
 
-//			snprintf(shortname, MAX_STRING_LEN-1,"%s:%s",CONFIG_HOSTNAME,metrics[i].key);
-//			zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
+/*			snprintf(shortname, MAX_STRING_LEN-1,"%s:%s",CONFIG_HOSTNAME,metrics[i].key);
+			zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname); */
 			if(send_value(server,port,CONFIG_HOSTNAME,metrics[i].key,value,lastlogsize) == FAIL)
 			{
 				ret = FAIL;
