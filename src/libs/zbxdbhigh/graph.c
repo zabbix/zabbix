@@ -83,7 +83,7 @@ int	DBget_graph_item_by_gitemid(int gitemid, DB_GRAPH_ITEM *graph_item)
 	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In DBget_graph_item_by_gitemid(%d)", gitemid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In DBget_graph_item_by_gitemid(%d)", gitemid);
 
 	snprintf(sql,sizeof(sql)-1,"select gitemid, graphid, itemid, drawtype, sortorder, color from graphs_items where gitemid=%d", gitemid);
 	result=DBselect(sql);
@@ -113,7 +113,7 @@ int	DBget_graph_by_graphid(int graphid, DB_GRAPH *graph)
 	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In DBget_graph_by_graphid(%d)", graphid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In DBget_graph_by_graphid(%d)", graphid);
 
 	snprintf(sql,sizeof(sql)-1,"select graphid,name,width,height,yaxistype,yaxismin,yaxismax from graphs where graphid=%d", graphid);
 	result=DBselect(sql);
@@ -151,7 +151,7 @@ int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid)
 	int	graphid;
 	int	itemid;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In DBadd_graph_item_to_linked_hosts(%d,%d)", gitemid, hostid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In DBadd_graph_item_to_linked_hosts(%d,%d)", gitemid, hostid);
 
 	if(DBget_graph_item_by_gitemid(gitemid, &graph_item)==FAIL)
 	{
@@ -177,7 +177,7 @@ int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid)
 		snprintf(sql,sizeof(sql)-1,"select hostid,templateid,graphs from hosts_templates where hostid=%d and templateid=%d", hostid, item.hostid);
 	}
 
-	zabbix_log( LOG_LEVEL_WARNING, "\tSQL [%s]", sql);
+	zabbix_log( LOG_LEVEL_DEBUG, "\tSQL [%s]", sql);
 
 	result=DBselect(sql);
 	for(i=0;i<DBnum_rows(result);i++)
@@ -185,7 +185,7 @@ int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid)
 		if( (atoi(DBget_field(result,i,2))&1) == 0)	continue;
 
 		snprintf(sql,sizeof(sql)-1,"select i.itemid from items i where i.key_='%s' and i.hostid=%d", item.key, atoi(DBget_field(result,i,0)));
-		zabbix_log( LOG_LEVEL_WARNING, "\t\tSQL [%s]", sql);
+		zabbix_log( LOG_LEVEL_DEBUG, "\t\tSQL [%s]", sql);
 
 		result2=DBselect(sql);
 		if(DBnum_rows(result2)==0)

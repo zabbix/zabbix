@@ -66,7 +66,7 @@ int	DBget_action_by_actionid(int actionid,DB_ACTION *action)
 	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In DBget_action_by_actionid(%d)", actionid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In DBget_action_by_actionid(%d)", actionid);
 
 	snprintf(sql,sizeof(sql)-1,"select triggerid,userid,scope,severity,good,delay,recipient,subject,message from actions where actionid=%d", actionid);
 	result=DBselect(sql);
@@ -110,7 +110,7 @@ int	DBadd_action_to_linked_hosts(int actionid,int hostid)
 	int	i,j;
 	int	hostid_tmp;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In DBadd_action_to_linked_hosts(%d,%d)", actionid, hostid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In DBadd_action_to_linked_hosts(%d,%d)", actionid, hostid);
 
 	if(DBget_action_by_actionid(actionid,&action) == FAIL)
 	{
@@ -123,7 +123,7 @@ int	DBadd_action_to_linked_hosts(int actionid,int hostid)
 	}
 
 	snprintf(sql,sizeof(sql)-1,"select distinct h.hostid from hosts h,functions f, items i where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid=%d", action.triggerid);
-	zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
+	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
 	result=DBselect(sql);
 
 	if(DBnum_rows(result)!=1)
@@ -148,22 +148,22 @@ int	DBadd_action_to_linked_hosts(int actionid,int hostid)
 	{
 		snprintf(sql,sizeof(sql)-1,"select hostid,templateid,actions from hosts_templates where hostid=%d and templateid=%d", hostid, hostid_tmp);
 	}
-	zabbix_log( LOG_LEVEL_WARNING, "SQL2 [%s]", sql);
+	zabbix_log( LOG_LEVEL_DEBUG, "SQL2 [%s]", sql);
 
 	result=DBselect(sql);
 	for(i=0;i<DBnum_rows(result);i++)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "In loop [%d]", i);
+		zabbix_log( LOG_LEVEL_DEBUG, "In loop [%d]", i);
 		if( (atoi(DBget_field(result,i,2))&1) == 0)	continue;
 
 		DBescape_string(trigger.description,description_esc,TRIGGER_DESCRIPTION_LEN_MAX);
 
 		snprintf(sql,sizeof(sql)-1,"select distinct f.triggerid from functions f,items i,triggers t where t.description='%s' and t.triggerid=f.triggerid and i.itemid=f.itemid and i.hostid=%d", description_esc, atoi(DBget_field(result,i,0)));
-		zabbix_log( LOG_LEVEL_WARNING, "SQL3 [%s]", sql);
+		zabbix_log( LOG_LEVEL_DEBUG, "SQL3 [%s]", sql);
 		result2=DBselect(sql);
 		for(j=0;j<DBnum_rows(result2);j++)
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "In loop2 [%d]", j);
+			zabbix_log( LOG_LEVEL_DEBUG, "In loop2 [%d]", j);
 			if(DBget_host_by_hostid(atoi(DBget_field(result,i,0)),&host) == FAIL)	continue;
 
 			snprintf(old,sizeof(sql)-1,"{%s:",host_template.host);
@@ -171,7 +171,7 @@ int	DBadd_action_to_linked_hosts(int actionid,int hostid)
 
 			message=string_replace(action.message, old, new);
 
-			zabbix_log( LOG_LEVEL_WARNING, "Before DBadd_action");
+			zabbix_log( LOG_LEVEL_DEBUG, "Before DBadd_action");
 			DBadd_action(atoi(DBget_field(result2,j,0)), action.userid, action.good, action.delay, action.subject, message, action.scope, action.severity, action.recipient, action.userid);
 		}
 		DBfree_result(result2);

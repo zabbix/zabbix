@@ -35,7 +35,7 @@ int	DBget_item_by_itemid(int itemid,DB_ITEM *item)
 	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In DBget_item_by_itemid(%d)", itemid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In DBget_item_by_itemid(%d)", itemid);
 
 	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.hostid from items i,hosts h where h.hostid=i.hostid and i.itemid=%d", itemid);
 	result=DBselect(sql);
@@ -63,7 +63,7 @@ int 	DBadd_item_to_linked_hosts(int itemid, int hostid)
 	char	sql[MAX_STRING_LEN];
 	int	i;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In DBadd_item_to_linked_hosts(%d,%d)", itemid, hostid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In DBadd_item_to_linked_hosts(%d,%d)", itemid, hostid);
 
 	snprintf(sql,sizeof(sql)-1,"select description,key_,hostid,delay,history,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula,trends,logtimefmt from items where itemid=%d", itemid);
 	result3=DBselect(sql);
@@ -97,7 +97,7 @@ int 	DBadd_item_to_linked_hosts(int itemid, int hostid)
 	item.trends=atoi(DBget_field(result3,0,20));
 	item.logtimefmt=DBget_field(result3,0,21);
 
-	zabbix_log( LOG_LEVEL_WARNING, "OK");
+	zabbix_log( LOG_LEVEL_DEBUG, "OK");
 
 	/* Link with one host only */
 	if(hostid!=0)
@@ -139,7 +139,7 @@ int	DBadd_item(char *description, char *key, int hostid, int delay, int history,
 	char	snmpv3_authpassphrase_esc[MAX_STRING_LEN];
 	char	snmpv3_privpassphrase_esc[MAX_STRING_LEN];
 
-	zabbix_log( LOG_LEVEL_WARNING, "In DBadd_item()");
+	zabbix_log( LOG_LEVEL_DEBUG, "In DBadd_item()");
 
 	DBescape_string(key,key_esc,MAX_STRING_LEN);
 	DBescape_string(description,description_esc,MAX_STRING_LEN);
