@@ -17,7 +17,7 @@ cp /usr/share/automake-1.9/install-sh	install-sh
 cp /usr/share/automake-1.9/missing	missing
 
 echo Press any key to continue
-read
+#read
 
 ./configure --enable-agent --enable-server --with-mysql --prefix=/home/zabbix/zabbix
 make install
