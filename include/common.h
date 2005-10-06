@@ -167,4 +167,9 @@
 /* Secure string copy */
 #define strscpy(x,y) { strncpy(x,y,sizeof(x)); x[sizeof(x)-1]=0; }
 
+int	comms_create_request(char *host, char *key, char *data, char *lastlogsize, char *request,int maxlen);
+int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastlogsize, char *timestamp,
+		               char *source, char *severity, int maxlen);
+
+
 #endif
