@@ -1,7 +1,6 @@
 1.1beta2:
 
  - Repeated notifications
- - Basic auto-discovery
  - Monitoring of NTP servers
  - Regular expressions in agent
  - make agents return error message if not supported or not available
