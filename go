@@ -16,5 +16,8 @@ cp /usr/share/automake-1.9/depcomp	depcomp
 cp /usr/share/automake-1.9/install-sh	install-sh
 cp /usr/share/automake-1.9/missing	missing
 
-#./configure --enable-agent --enable-server --with-mysql --prefix=/home/zabbix/zabbix
-#make install
+echo Press any key to continue
+read
+
+./configure --enable-agent --enable-server --with-mysql --prefix=/home/zabbix/zabbix
+make install
