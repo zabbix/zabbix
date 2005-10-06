@@ -502,7 +502,7 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 	}
 
 	item.itemid=atoi(DBget_field(result,0,0));
-	item.key=DBget_field(result,0,1);
+	strscpy(item.key,DBget_field(result,0,1));
 	item.host=DBget_field(result,0,2);
 	item.type=atoi(DBget_field(result,0,7));
 	item.trapper_hosts=DBget_field(result,0,16);

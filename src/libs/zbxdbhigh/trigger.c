@@ -29,30 +29,6 @@
 #include "zlog.h"
 #include "common.h"
 
-int	DBadd_item(char *description, char *key, int hostid, int delay, int history, int status, int type, char *snmp_community, char *snmp_oid,int value_type,char *trapper_hosts,int snmp_port,char *units,int multiplier,int delta, char *snmpv3_securityname,int snmpv3_securitylevel,char *snmpv3_authpassphrase,char *snmpv3_privpassphrase,char *formula,int trends,char *logtimefmt)
-{
-	char	sql[MAX_STRING_LEN];
-	char	key_esc[MAX_STRING_LEN];
-	char	description_esc[MAX_STRING_LEN];
-	char	logtimefmt_esc[MAX_STRING_LEN];
-	char	snmpv3_securityname_esc[MAX_STRING_LEN];
-	char	snmpv3_authpassphrase_esc[MAX_STRING_LEN];
-	char	snmpv3_privpassphrase_esc[MAX_STRING_LEN];
-
-	zabbix_log( LOG_LEVEL_WARNING, "In DBadd_item()");
-
-	DBescape_string(key,key_esc,MAX_STRING_LEN);
-	DBescape_string(description,description_esc,MAX_STRING_LEN);
-	DBescape_string(logtimefmt,logtimefmt_esc,MAX_STRING_LEN);
-	DBescape_string(snmpv3_securityname,snmpv3_securityname_esc,MAX_STRING_LEN);
-	DBescape_string(snmpv3_authpassphrase,snmpv3_authpassphrase_esc,MAX_STRING_LEN);
-	DBescape_string(snmpv3_privpassphrase,snmpv3_privpassphrase_esc,MAX_STRING_LEN);
-
-	snprintf(sql,sizeof(sql)-1,"insert into items (description,key_,hostid,delay,history,nextcheck,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula,trends,logtimefmt) values ('%s','%s',%d,%d,%d,0,%d,%d,'%s','%s',%d,'%s',%d,'%s',%d,%d,'%s',%d,'%s','%s','%s',%d,'%s')", description_esc, key_esc, hostid,delay,history,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,snmpv3_securityname_esc,snmpv3_securitylevel,snmpv3_authpassphrase_esc,snmpv3_privpassphrase_esc,formula,trends,logtimefmt_esc);
-
-	return DBexecute(sql);
-}
-
 int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 {
 	DB_TRIGGER	trigger;
