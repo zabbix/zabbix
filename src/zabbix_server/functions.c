@@ -35,6 +35,8 @@
 #include <sys/socket.h>
 #include <errno.h>
 
+#include <ctype.h>
+
 /* Functions: pow(), round() */
 #include <math.h>
 
@@ -49,46 +51,6 @@
 #include "expression.h"
 
 extern int autoregister(char *server);
-
-/******************************************************************************
- *                                                                            *
- * Function: del_zeroes                                                       *
- *                                                                            *
- * Purpose: delete all right '0' and '.' for the string                       *
- *                                                                            *
- * Parameters: s - string to trim '0'                                         *
- *                                                                            *
- * Return value: string without right '0'                                     *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:  10.0100 => 10.01, 10. => 10                                                                 *
- *                                                                            *
- ******************************************************************************/
-void del_zeroes(char *s)
-{
-	int     i;
-
-	if(strchr(s,'.')!=NULL)
-	{
-		for(i=strlen(s)-1;;i--)
-		{
-			if(s[i]=='0')
-			{
-				s[i]=0;
-			}
-			else if(s[i]=='.')
-			{
-				s[i]=0;
-				break;
-			}
-			else
-			{
-				break;
-			}
-		}
-	}
-}
 
 /******************************************************************************
  *                                                                            *

@@ -44,7 +44,7 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 	char	url_esc[TRIGGER_URL_LEN_MAX];
 	char	description_esc[TRIGGER_DESCRIPTION_LEN_MAX];
 
-	zabbix_log( LOG_LEVEL_WARNING, "In DBadd_trigger_to_linked_hosts(%d,%d)",triggerid, hostid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In DBadd_trigger_to_linked_hosts(%d,%d)",triggerid, hostid);
 
 	snprintf(sql,sizeof(sql)-1,"select description, priority,status,comments,url,value,expression from triggers where triggerid=%d", triggerid);
 	result2=DBselect(sql);
@@ -56,7 +56,7 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 
 	trigger.triggerid = triggerid;
 	strscpy(trigger.description, DBget_field(result2,0,0));
-	zabbix_log( LOG_LEVEL_WARNING, "DESC1 [%s] [%s]", trigger.description, DBget_field(result2,0,0));
+	zabbix_log( LOG_LEVEL_DEBUG, "DESC1 [%s] [%s]", trigger.description, DBget_field(result2,0,0));
 	trigger.priority=atoi(DBget_field(result2,0,1));
 	trigger.status=atoi(DBget_field(result2,0,2));
 	strscpy(trigger.comments, DBget_field(result2,0,3));
@@ -95,12 +95,12 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 		if( (atoi(DBget_field(result,i,2))&1) == 0)	continue;
 
 		DBescape_string(trigger.description,description_esc,TRIGGER_DESCRIPTION_LEN_MAX);
-		zabbix_log( LOG_LEVEL_WARNING, "DESC2 [%s] [%s]", trigger.description, description_esc);
+		zabbix_log( LOG_LEVEL_DEBUG, "DESC2 [%s] [%s]", trigger.description, description_esc);
 		DBescape_string(trigger.comments,comments_esc,TRIGGER_COMMENTS_LEN_MAX);
 		DBescape_string(trigger.url,url_esc,TRIGGER_URL_LEN_MAX);
 
 		snprintf(sql,sizeof(sql)-1,"insert into triggers  (description,priority,status,comments,url,value,expression) values ('%s',%d,%d,'%s','%s',2,'%s')",description_esc, trigger.priority, trigger.status, comments_esc, url_esc, expression_old);
-		zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]",sql);
+		zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]",sql);
 
 		DBexecute(sql);
 		triggerid_new=DBinsert_id();
@@ -170,7 +170,7 @@ int	DBget_trigger_by_triggerid(int triggerid,DB_TRIGGER *trigger)
 	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In DBget_trigger_by_triggerid(%d)", triggerid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In DBget_trigger_by_triggerid(%d)", triggerid);
 
 	snprintf(sql,sizeof(sql)-1,"select triggerid, expression,description,url,comments,status,value,priority from triggers where triggerid=%d", triggerid);
 	result=DBselect(sql);
