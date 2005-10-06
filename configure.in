@@ -833,7 +833,7 @@ hpux*)
 	AC_MSG_RESULT([ok (${host_os})])
 ;;
 *)
-	ZBX_OS="unknown"
+	arch="unknown"
 
 	AC_MSG_RESULT([ok (${host_os})])
 dnl	AC_MSG_ERROR(${host_os} not supported)
