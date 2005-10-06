@@ -832,6 +832,16 @@ hpux*)
 
 	AC_MSG_RESULT([ok (${host_os})])
 ;;
+freebsd*)
+	arch="freebsd"
+
+	AC_MSG_RESULT([ok (${host_os})])
+;;
+openbsd*)
+	arch="openbsd"
+
+	AC_MSG_RESULT([ok (${host_os})])
+;;
 *)
 	arch="unknown"
 
@@ -848,6 +858,12 @@ AC_SUBST(CONFIG_HOST_SOLARIS)
 
 AM_CONDITIONAL(CONFIG_HOST_HPUX, test "x$arch" = "xhpux")
 AC_SUBST(CONFIG_HOST_HPUX)
+
+AM_CONDITIONAL(CONFIG_HOST_FREEBSD, test "x$arch" = "xfreebsd")
+AC_SUBST(CONFIG_HOST_FREEBSD)
+
+AM_CONDITIONAL(CONFIG_HOST_OPENBSD, test "x$arch" = "xopenbsd")
+AC_SUBST(CONFIG_HOST_OPENBSD)
 
 AM_CONDITIONAL(CONFIG_HOST_UNKNOWN, test "x$arch" = "xunknown")
 AC_SUBST(CONFIG_HOST_UNKNOWN)
