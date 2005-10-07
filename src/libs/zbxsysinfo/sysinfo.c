@@ -455,11 +455,11 @@ void	test_parameters(void)
 		process(commands[i].key,c,1);
 		if((commands[i].parameter==0))
 		{
-			printf("%-30s [%s]\n",commands[i].key,c);
+			printf("%-30.30s[%s]\n",commands[i].key,c);
 		}
 		else
 		{
-			printf("%-30s[%s] [%s]\n",commands[i].key,commands[i].parameter,c);
+			printf("%-30.30s[%s] [%s]\n",commands[i].key,commands[i].parameter,c);
 		}
 		fflush(stdout);
 		i++;
