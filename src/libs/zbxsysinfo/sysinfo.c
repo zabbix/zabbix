@@ -466,8 +466,6 @@ void	test_parameters(void)
 	}
 }
 
-/* This messy function must be rewritten!
- */
 int	process(char *command,char *value, int test)
 {
 	char	*p;
