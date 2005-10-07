@@ -350,6 +350,8 @@ int	DBadd_action_to_linked_hosts(int actionid,int hostid);
 
 int	DBget_trigger_by_triggerid(int triggerid,DB_TRIGGER *trigger);
 int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid);
+void	DBdelete_triggers_by_itemid(int itemid);
+void	DBdelete_sysmaps_hosts_by_hostid(int hostid);
 
 int	DBadd_graph(char *name, int width, int height, int yaxistype, double yaxismin, double yaxismax);
 int	DBget_graph_item_by_gitemid(int gitemid, DB_GRAPH_ITEM *graph_item);
