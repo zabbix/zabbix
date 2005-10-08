@@ -18,6 +18,9 @@ cp /usr/share/automake-1.9/missing	missing
 
 echo Press any key to continue
 #read
+cd ~zabbix
+rm -f zabbix.tgz
+tar cvzf zabbix.tgz zabbix
 
-./configure --enable-agent --enable-server --with-mysql --prefix=/home/zabbix/zabbix
-make install
+#./configure --enable-agent --enable-server --with-mysql --prefix=/home/zabbix/zabbix
+#make install

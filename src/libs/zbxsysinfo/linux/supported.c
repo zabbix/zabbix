@@ -18,6 +18,7 @@
 **/
 
 #include "config.h"
+#include "sysinfo.h"
 
 COMMAND	parameters_specific[]=
 /* 	KEY		FUNCTION (if double) FUNCTION (if string) PARAM*/
