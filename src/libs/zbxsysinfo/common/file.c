@@ -20,64 +20,15 @@
 #include "config.h"
 
 #include <errno.h>
-
 #include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/stat.h>
+
+/* stat() */
 #include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
-/* Definitions of uint32_t under OS/X */
-#ifdef HAVE_STDINT_H
-	#include <stdint.h>
-#endif
-#ifdef HAVE_STRINGS_H
-	#include <strings.h>
-#endif
-#ifdef HAVE_FCNTL_H
-	#include <fcntl.h>
-#endif
-#ifdef HAVE_DIRENT_H
-	#include <dirent.h>
-#endif
-/* Linux */
-#ifdef HAVE_SYS_VFS_H
-	#include <sys/vfs.h>
-#endif
-#ifdef HAVE_SYS_SYSINFO_H
-	#include <sys/sysinfo.h>
-#endif
-/* Solaris */
-#ifdef HAVE_SYS_STATVFS_H
-	#include <sys/statvfs.h>
-#endif
-/* Solaris */
-#ifdef HAVE_SYS_PROCFS_H
-/* This is needed to access the correct procfs.h definitions */
-	#define _STRUCTURED_PROC 1
-	#include <sys/procfs.h>
-#endif
-#ifdef HAVE_SYS_LOADAVG_H
-	#include <sys/loadavg.h>
-#endif
-#ifdef HAVE_SYS_SOCKET_H
-	#include <sys/socket.h>
-#endif
-#ifdef HAVE_NETINET_IN_H
-	#include <netinet/in.h>
-#endif
-#ifdef HAVE_ARPA_INET_H
-	#include <arpa/inet.h>
-#endif
-/* OpenBSD/Solaris */
-#ifdef HAVE_SYS_PARAM_H
-	#include <sys/param.h>
-#endif
-
-#ifdef HAVE_SYS_MOUNT_H
-	#include <sys/mount.h>
-#endif
+/* FILE */
+#include <stdio.h>
 
 #include "common.h"
 #include "sysinfo.h"
