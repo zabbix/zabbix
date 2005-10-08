@@ -152,6 +152,8 @@ void	forward_request(char *proxy,char *command,int port,char *value);
 /*COMMAND	commands[AGENT_MAX_USER_COMMANDS]=*/
 COMMAND	*commands=NULL;
 
+extern COMMAND parameters_specific[];
+
 COMMAND	parameters_common[]=
 /* 	KEY		FUNCTION (if double) FUNCTION (if string) PARAM*/
 	{
