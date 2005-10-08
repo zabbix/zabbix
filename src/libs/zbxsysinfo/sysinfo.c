@@ -152,12 +152,14 @@ void	forward_request(char *proxy,char *command,int port,char *value);
 /*COMMAND	commands[AGENT_MAX_USER_COMMANDS]=*/
 COMMAND	*commands=NULL;
 
-COMMAND	agent_commands[]=
+COMMAND	parameters_common[]=
 /* 	KEY		FUNCTION (if double) FUNCTION (if string) PARAM*/
 	{
+	{"system.localtime"	,SYSTEM_LOCALTIME,	0, 0},
+	{0}
+	};
 
-/* Outdated */
-
+/*
 	{"cksum[*]"		,VFS_FILE_CKSUM, 	0, "/etc/services"},
 	{"cpu[idle1]"		,SYSTEM_CPU_IDLE1, 	0, 0},
 	{"cpu[idle5]"		,SYSTEM_CPU_IDLE5, 	0, 0},
@@ -207,7 +209,6 @@ COMMAND	agent_commands[]=
 	{"system[uptime]"	,SYSTEM_UPTIME,	0, 0},
 	{"system[users]"	,EXECUTE, 	0,"who|wc -l"},
 	{"version[zabbix_agent]",	0, 		AGENT_VERSION, 0},
-/* New naming  */
 
 	{"agent.ping"		,AGENT_PING, 		0, 0},
 	{"agent.version",		0, 		AGENT_VERSION, 0},
@@ -289,7 +290,6 @@ COMMAND	agent_commands[]=
 	{"system.cpu.load15"	,SYSTEM_CPU_LOAD15,	0, 0},
 
 	{"system.hostname"	,0,			EXECUTE_STR, "hostname"},
-	{"system.localtime"	,SYSTEM_LOCALTIME,	0, 0},
 
 	{"system.swap.free"	,SYSTEM_SWAP_FREE,	0, 0},
 	{"system.swap.total"	,SYSTEM_SWAP_TOTAL, 	0, 0},
@@ -297,16 +297,6 @@ COMMAND	agent_commands[]=
 	{"system.uname"		,0,			EXECUTE_STR, "uname -a"},
 	{"system.uptime"	,SYSTEM_UPTIME,		0, 0},
 	{"system.users.num"	,EXECUTE, 		0,"who|wc -l"},
-
-/****************************************
-  	All these perameters require more than 1 second to retrieve.
-
-  	{"swap[in]"		,EXECUTE, 0, "vmstat -n 1 2|tail -1|cut -b37-40"},
-	{"swap[out]"		,EXECUTE, 0, "vmstat -n 1 2|tail -1|cut -b41-44"},
-
-	{"system[interrupts]"	,EXECUTE, 0, "vmstat -n 1 2|tail -1|cut -b57-61"},
-	{"system[switches]"	,EXECUTE, 0, "vmstat -n 1 2|tail -1|cut -b62-67"},
-***************************************/
 
 	{"io[disk_io]"		,DISK_IO,  	0, 0},
 	{"io[disk_rio]"		,DISK_RIO, 	0, 0},
@@ -322,8 +312,6 @@ COMMAND	agent_commands[]=
 	{"system[procrunning]"	,EXECUTE, 	0, "cat /proc/loadavg|cut -f1 -d'/'|cut -f4 -d' '"},
 #endif
 
-/*	{"tcp_count"		,EXECUTE, 	0, "netstat -tn|grep EST|wc -l"}, */
-
 	{"net[listen_23]"	,TCP_LISTEN, 	0, "0017"},
 	{"net[listen_80]"	,TCP_LISTEN, 	0, "0050"},
 
@@ -335,6 +323,7 @@ COMMAND	agent_commands[]=
 
 	{0}
 	};
+*/
 
 void	add_metric(char *key, int (*function)(),int (*function_str)(),char *parameter )
 {
@@ -406,9 +395,14 @@ void	init_metrics()
 	commands=malloc(sizeof(COMMAND));
 	commands[0].key=NULL;
 
-	for(i=0;agent_commands[i].key!=0;i++)
+	for(i=0;parameters_common[i].key!=0;i++)
 	{
-		add_metric(agent_commands[i].key, agent_commands[i].function, agent_commands[i].function_str, agent_commands[i].parameter);
+		add_metric(parameters_common[i].key, parameters_common[i].function, parameters_common[i].function_str, parameters_common[i].parameter);
+	}
+
+	for(i=0;parameters_specific[i].key!=0;i++)
+	{
+		add_metric(parameters_specific[i].key, parameters_specific[i].function, parameters_specific[i].function_str, parameters_specific[i].parameter);
 	}
 }
 
