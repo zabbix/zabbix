@@ -16,6 +16,7 @@ cp /usr/share/automake-1.9/depcomp	depcomp
 cp /usr/share/automake-1.9/install-sh	install-sh
 cp /usr/share/automake-1.9/missing	missing
 
+sleep 2
 echo Press any key to continue
 #read
 cd ~zabbix
