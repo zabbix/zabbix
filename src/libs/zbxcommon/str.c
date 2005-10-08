@@ -90,3 +90,27 @@ void del_zeroes(char *s)
 		}
 	}
 }
+
+int	get_param(const char *param, int num, char *buf, int maxlen)
+{
+	char	tmp[MAX_STRING_LEN];
+	char	*s;
+	int	ret = 1;
+	int	i=0;
+
+	strscpy(tmp,param);
+	s=(char *)strtok(tmp,",");
+	while(s!=NULL)
+	{
+		i++;
+		if(i == num)
+		{
+			strncpy(buf,s,maxlen);
+			ret = 0;
+			break;
+		}
+		s=(char *)strtok(NULL,";");
+	}
+
+	return ret;
+}
