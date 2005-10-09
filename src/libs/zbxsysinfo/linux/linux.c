@@ -20,7 +20,7 @@
 #include "config.h"
 #include "sysinfo.h"
 
-int	VM_MEMORY_BUFFERS(const char *cmd, const char *parameter,double  *value);
+/*int	VM_MEMORY_BUFFERS(const char *cmd, const char *parameter,double  *value);*/
 int	VM_MEMORY_CACHED(const char *cmd, const char *parameter,double  *value);
 
 int	SYSTEM_CPU_IDLE1(const char *cmd, const char *parameter,double  *value);
