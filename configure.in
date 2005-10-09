@@ -796,7 +796,7 @@ dnl AC_CONFIG_HEADER(include/config.h)
 # Cheks for host_os 
 case "$host_os" in
 linux*)
-	arch="linux"
+	ARCH="linux"
 
 	AC_MSG_RESULT([ok (${host_os})])
 
@@ -823,50 +823,52 @@ linux*)
         esac
 ;;
 *solaris*)
-	arch="solaris"
+	ARCH="solaris"
 
 	AC_MSG_RESULT([ok (${host_os})])
 ;;
 hpux*)
-	arch="hpux"
+	ARCH="hpux"
 
 	AC_MSG_RESULT([ok (${host_os})])
 ;;
 freebsd*)
-	arch="freebsd"
+	ARCH="freebsd"
 
 	AC_MSG_RESULT([ok (${host_os})])
 ;;
 openbsd*)
-	arch="openbsd"
+	ARCH="openbsd"
 
 	AC_MSG_RESULT([ok (${host_os})])
 ;;
 *)
-	arch="unknown"
+	ARCH="unknown"
 
 	AC_MSG_RESULT([ok (${host_os})])
 dnl	AC_MSG_ERROR(${host_os} not supported)
 ;;
 esac
 
-AM_CONDITIONAL(CONFIG_HOST_LINUX, test "x$arch" = "xlinux")
+AM_CONDITIONAL(CONFIG_HOST_LINUX, test "x$ARCH" = "xlinux")
 AC_SUBST(CONFIG_HOST_LINUX)
 
-AM_CONDITIONAL(CONFIG_HOST_SOLARIS, test "x$arch" = "xsolaris")
+AM_CONDITIONAL(CONFIG_HOST_SOLARIS, test "x$ARCH" = "xsolaris")
 AC_SUBST(CONFIG_HOST_SOLARIS)
 
-AM_CONDITIONAL(CONFIG_HOST_HPUX, test "x$arch" = "xhpux")
+AM_CONDITIONAL(CONFIG_HOST_HPUX, test "x$ARCH" = "xhpux")
 AC_SUBST(CONFIG_HOST_HPUX)
 
-AM_CONDITIONAL(CONFIG_HOST_FREEBSD, test "x$arch" = "xfreebsd")
+AM_CONDITIONAL(CONFIG_HOST_FREEBSD, test "x$ARCH" = "xfreebsd")
 AC_SUBST(CONFIG_HOST_FREEBSD)
 
-AM_CONDITIONAL(CONFIG_HOST_OPENBSD, test "x$arch" = "xopenbsd")
+AM_CONDITIONAL(CONFIG_HOST_OPENBSD, test "x$ARCH" = "xopenbsd")
 AC_SUBST(CONFIG_HOST_OPENBSD)
 
-AM_CONDITIONAL(CONFIG_HOST_UNKNOWN, test "x$arch" = "xunknown")
+AM_CONDITIONAL(CONFIG_HOST_UNKNOWN, test "x$ARCH" = "xunknown")
 AC_SUBST(CONFIG_HOST_UNKNOWN)
+
+AC_SUBST(ARCH)
 
 AC_OUTPUT(Makefile src/Makefile src/libs/Makefile src/libs/zbxlog/Makefile src/libs/zbxcrypto/Makefile  \
 	src/libs/zbxpid/Makefile src/libs/zbxnet/Makefile src/libs/zbxconf/Makefile src/zabbix_sender/Makefile \
