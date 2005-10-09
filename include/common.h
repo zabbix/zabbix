@@ -38,7 +38,7 @@
 #ifdef ZBX_POLLER
 	#define MAX_STRING_LEN	800
 #else
-	#define MAX_STRING_LEN	4096
+	#define MAX_STRING_LEN	2048
 #endif
 #define MAX_BUF_LEN	65000
 
