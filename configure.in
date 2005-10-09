@@ -822,6 +822,16 @@ linux*)
         	    ;;
         esac
 ;;
+aix*)
+	ARCH="aix"
+
+	AC_MSG_RESULT([ok (${host_os})])
+;;
+darwin*|rhapsody*)
+	ARCH="osx"
+
+	AC_MSG_RESULT([ok (${host_os})])
+;;
 *solaris*)
 	ARCH="solaris"
 
@@ -850,23 +860,23 @@ dnl	AC_MSG_ERROR(${host_os} not supported)
 ;;
 esac
 
-AM_CONDITIONAL(CONFIG_HOST_LINUX, test "x$ARCH" = "xlinux")
-AC_SUBST(CONFIG_HOST_LINUX)
+dnl AM_CONDITIONAL(CONFIG_HOST_LINUX, test "x$ARCH" = "xlinux")
+dnl AC_SUBST(CONFIG_HOST_LINUX)
 
-AM_CONDITIONAL(CONFIG_HOST_SOLARIS, test "x$ARCH" = "xsolaris")
-AC_SUBST(CONFIG_HOST_SOLARIS)
+dnl AM_CONDITIONAL(CONFIG_HOST_SOLARIS, test "x$ARCH" = "xsolaris")
+dnl AC_SUBST(CONFIG_HOST_SOLARIS)
 
-AM_CONDITIONAL(CONFIG_HOST_HPUX, test "x$ARCH" = "xhpux")
-AC_SUBST(CONFIG_HOST_HPUX)
+dnl AM_CONDITIONAL(CONFIG_HOST_HPUX, test "x$ARCH" = "xhpux")
+dnl AC_SUBST(CONFIG_HOST_HPUX)
 
-AM_CONDITIONAL(CONFIG_HOST_FREEBSD, test "x$ARCH" = "xfreebsd")
-AC_SUBST(CONFIG_HOST_FREEBSD)
+dnl AM_CONDITIONAL(CONFIG_HOST_FREEBSD, test "x$ARCH" = "xfreebsd")
+dnl AC_SUBST(CONFIG_HOST_FREEBSD)
 
-AM_CONDITIONAL(CONFIG_HOST_OPENBSD, test "x$ARCH" = "xopenbsd")
-AC_SUBST(CONFIG_HOST_OPENBSD)
+dnl AM_CONDITIONAL(CONFIG_HOST_OPENBSD, test "x$ARCH" = "xopenbsd")
+dnl AC_SUBST(CONFIG_HOST_OPENBSD)
 
-AM_CONDITIONAL(CONFIG_HOST_UNKNOWN, test "x$ARCH" = "xunknown")
-AC_SUBST(CONFIG_HOST_UNKNOWN)
+dnl AM_CONDITIONAL(CONFIG_HOST_UNKNOWN, test "x$ARCH" = "xunknown")
+dnl AC_SUBST(CONFIG_HOST_UNKNOWN)
 
 AC_SUBST(ARCH)
 
