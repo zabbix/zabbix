@@ -126,7 +126,6 @@ int	SENSOR_TEMP1(const char *cmd, const char *parameter,double  *value);
 int	SENSOR_TEMP2(const char *cmd, const char *parameter,double  *value);
 int	SENSOR_TEMP3(const char *cmd, const char *parameter,double  *value);
 
-int	SYSTEM_LOCALTIME(const char *cmd, const char *parameter,double  *value);
 int	SYSTEM_UPTIME(const char *cmd, const char *parameter,double  *value);
 
 int	SYSTEM_SWAP_FREE(const char *cmd, const char *parameter,double  *value);
