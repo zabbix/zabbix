@@ -107,8 +107,8 @@ static int send_value(char *server,int port,char *hostname, char *key,char *valu
 
 	comms_create_request(hostname, key, value, lastlogsize, tosend, sizeof(tosend)-1);
 
-//	snprintf(tosend,sizeof(tosend)-1,"%s:%s\n",shortname,value);
-//	snprintf(tosend,sizeof(tosend)-1,"<req><host>%s</host><key>%s</key><data>%s</data></req>",hostname_b64,key_b64,value_b64);
+/*	snprintf(tosend,sizeof(tosend)-1,"%s:%s\n",shortname,value);
+	snprintf(tosend,sizeof(tosend)-1,"<req><host>%s</host><key>%s</key><data>%s</data></req>",hostname_b64,key_b64,value_b64); */
 
 	if( sendto(s,tosend,strlen(tosend),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
