@@ -847,6 +847,11 @@ freebsd*)
 
 	AC_MSG_RESULT([ok (${host_os})])
 ;;
+netbsd*)
+	ARCH="netbsd"
+
+	AC_MSG_RESULT([ok (${host_os})])
+;;
 osf*)
 	ARCH="osf"
 
@@ -894,7 +899,7 @@ AC_OUTPUT(Makefile src/Makefile src/libs/Makefile src/libs/zbxlog/Makefile src/l
 	src/zabbix_get/Makefile src/libs/zbxcommon/Makefile src/libs/zbxsysinfo/linux/Makefile \
 	src/libs/zbxsysinfo/aix/Makefile src/libs/zbxsysinfo/freebsd/Makefile src/libs/zbxsysinfo/hpux/Makefile \
 	src/libs/zbxsysinfo/openbsd/Makefile src/libs/zbxsysinfo/osx/Makefile src/libs/zbxsysinfo/solaris/Makefile \
-	src/libs/zbxsysinfo/osf/Makefile src/libs/zbxsysinfo/unknown/Makefile)
+	src/libs/zbxsysinfo/osf/Makefile src/libs/zbxsysinfo/netbsd/Makefile src/libs/zbxsysinfo/unknown/Makefile)
 
 echo "
 
