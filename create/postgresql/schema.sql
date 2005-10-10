@@ -240,6 +240,7 @@ CREATE TABLE media_type (
 CREATE TABLE alerts (
   alertid		serial,
   actionid		int4		DEFAULT '0' NOT NULL,
+  triggerid		int4		DEFAULT '0' NOT NULL,
   clock			int4		DEFAULT '0' NOT NULL,
 --  type		varchar(10)	DEFAULT '' NOT NULL,
   mediatypeid		int4		DEFAULT '0' NOT NULL,
@@ -251,6 +252,7 @@ CREATE TABLE alerts (
   error			varchar(128)	DEFAULT '' NOT NULL,
   PRIMARY KEY (alertid),
   FOREIGN KEY (actionid) REFERENCES actions,
+  FOREIGN KEY (triggerid) REFERENCES triggers,
   FOREIGN KEY (mediatypeid) REFERENCES media_type
 );
 

@@ -94,6 +94,10 @@
 #define ALERT_TYPE_EMAIL	0
 #define ALERT_TYPE_EXEC		1
 
+/* Alert statuses */
+#define ALERT_STATUS_NOT_SENT	0
+#define ALERT_STATUS_SENT	1
+
 /* Item statuses */
 #define ITEM_STATUS_ACTIVE	0
 #define ITEM_STATUS_DISABLED	1
