@@ -9,3 +9,5 @@ CREATE TABLE autoreg (
   hostid                int4            DEFAULT '0' NOT NULL,
   PRIMARY KEY (id)
 );
+
+alter table alerts add triggerid             int4          DEFAULT '0' NOT NULL after actionid;

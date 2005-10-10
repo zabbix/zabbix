@@ -182,7 +182,7 @@ int main_alerter_loop()
 	char	error[MAX_STRING_LEN];
 	char	error_esc[MAX_STRING_LEN];
 
-	int	i,res;
+	int	i,res, now;
 
 	struct	sigaction phan;
 
@@ -198,7 +198,10 @@ int main_alerter_loop()
 
 		DBconnect();
 
-		snprintf(sql,sizeof(sql)-1,"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path from alerts a,media_type mt where a.status=0 and a.retries<3 and a.mediatypeid=mt.mediatypeid order by a.clock");
+		now  = time(NULL);
+
+/*		snprintf(sql,sizeof(sql)-1,"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path from alerts a,media_type mt where a.status=0 and a.retries<3 and a.mediatypeid=mt.mediatypeid order by a.clock"); */
+		snprintf(sql,sizeof(sql)-1,"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path,a.delay from alerts a,media_type mt where a.status=%d and a.retries<3 and a.repeats<=a.maxrepeats and a.nextcheck>=%d and a.mediatypeid=mt.mediatypeid order by a.clock", ALERT_STATUS_NOT_SENT, now);
 		result = DBselect(sql);
 
 		for(i=0;i<DBnum_rows(result);i++)
@@ -219,6 +222,8 @@ int main_alerter_loop()
 			mediatype.smtp_email=DBget_field(result,i,12);
 			mediatype.exec_path=DBget_field(result,i,13);
 
+			alert.delay=atoi(DBget_field(result,i,14));
+
 			phan.sa_handler = &signal_handler;
 			sigemptyset(&phan.sa_mask);
 			phan.sa_flags = 0;
@@ -232,7 +237,9 @@ int main_alerter_loop()
 			if(res==SUCCEED)
 			{
 				zabbix_log( LOG_LEVEL_DEBUG, "Alert ID [%d] was sent successfully", alert.alertid);
-				snprintf(sql,sizeof(sql)-1,"update alerts set status=1 where alertid=%d", alert.alertid);
+				snprintf(sql,sizeof(sql)-1,"update alerts set repeats=repeats+1, nextcheck=%d where alertid=%d", now+alert.delay, alert.alertid);
+				DBexecute(sql);
+				snprintf(sql,sizeof(sql)-1,"update alerts set status=%d where alertid=%d and repeats>maxrepeats", ALERT_STATUS_SENT, alert.alertid);
 				DBexecute(sql);
 			}
 			else

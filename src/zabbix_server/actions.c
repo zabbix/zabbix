@@ -156,7 +156,7 @@ static	void	send_to_user_medias(DB_TRIGGER *trigger,DB_ACTION *action, int useri
 			continue;
 		}
 
-		DBadd_alert(action->actionid,media.mediatypeid,media.sendto,action->subject,action->message);
+		DBadd_alert(action->actionid,trigger->triggerid, media.mediatypeid,media.sendto,action->subject,action->message);
 	}
 	DBfree_result(result);
 }
