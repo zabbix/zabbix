@@ -6,7 +6,6 @@
  - centralised management of agent configuration files
  - escalations and repeated notifications
  - add encryption between server and agents
- - auto-discovery
  - how to disable unreachable hosts
  - new item status: not available. If agent doesn't accept parameter.
  - new function for item status to enable sending of notification in case if an item changes status to unknown (for example)
