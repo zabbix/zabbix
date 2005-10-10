@@ -170,6 +170,7 @@ CREATE TABLE hosts_groups (
 CREATE TABLE alerts (
   alertid		int(4)		NOT NULL auto_increment,
   actionid		int(4)		DEFAULT '0' NOT NULL,
+  triggerid		int(4)		DEFAULT '0' NOT NULL,
   clock			int(4)		DEFAULT '0' NOT NULL,
 --  type		varchar(10)	DEFAULT '' NOT NULL,
   mediatypeid		int(4)		DEFAULT '0' NOT NULL,
@@ -182,6 +183,7 @@ CREATE TABLE alerts (
   PRIMARY KEY (alertid),
   INDEX (actionid),
   KEY clock (clock),
+  KEY clock (triggerid),
   KEY status_retries (status, retries),
   KEY mediatypeid (mediatypeid)
 ) type=InnoDB;

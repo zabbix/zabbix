@@ -9,3 +9,5 @@ CREATE TABLE autoreg (
   hostid                int(4)          DEFAULT '0' NOT NULL,
   PRIMARY KEY (id)
 ) type=InnoDB;
+
+alter table alerts add triggerid	int(4)	DEFAULT '0' NOT NULL after actionid;
