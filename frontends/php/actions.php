@@ -40,7 +40,8 @@
 	{
 		if($_GET["register"]=="add")
 		{
-			$actionid=add_action( $_GET["triggerid"], $_GET["userid"], $_GET["good"], $_GET["delay"], $_GET["subject"], $_GET["message"],$_GET["scope"],$_GET["severity"],$_GET["recipient"],$_GET["usrgrpid"]);
+			if($_GET["repeat"]==0)	$_GET["maxrepeats"]=0;
+			$actionid=add_action( $_GET["triggerid"], $_GET["userid"], $_GET["good"], $_GET["delay"], $_GET["subject"], $_GET["message"],$_GET["scope"],$_GET["severity"],$_GET["recipient"],$_GET["usrgrpid"],$_GET["maxrepeats"],$_GET["repeatdelay"]);
 			add_action_to_linked_hosts($actionid);
 			show_messages($actionid,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
 			if($actionid)
@@ -59,8 +60,9 @@
 		}
 		if($_GET["register"]=="update")
 		{
-			$result=update_action( $_GET["actionid"], $_GET["triggerid"], $_GET["userid"], $_GET["good"], $_GET["delay"], $_GET["subject"], $_GET["message"],$_GET["scope"],$_GET["severity"],$_GET["recipient"],$_GET["usrgrpid"]);
-			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPATE_ACTION);
+			if($_GET["repeat"]==0)	$_GET["maxrepeats"]=0;
+			$result=update_action( $_GET["actionid"], $_GET["triggerid"], $_GET["userid"], $_GET["good"], $_GET["delay"], $_GET["subject"], $_GET["message"],$_GET["scope"],$_GET["severity"],$_GET["recipient"],$_GET["usrgrpid"],$_GET["maxrepeats"],$_GET["repeatdelay"]);
+			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
 			if($result)
 			{
 				if(isset($_GET["userid"]))
@@ -220,8 +222,8 @@
 		$scope=@iif(isset($_GET["scope"]),$_GET["scope"],DBget_field($result,0,7));
 		$severity=DBget_field($result,0,8);
 		$recipient=@iif(isset($_GET["recipient"]),$_GET["recipient"],DBget_field($result,0,9));
-		$maxrepeats=DBget_field($result,0,9);
-		$repeatdelay=DBget_field($result,0,10);
+		$maxrepeats=DBget_field($result,0,10);
+		$repeatdelay=DBget_field($result,0,11);
 		if($maxrepeats==0)
 		{
 			$repeat=0;
@@ -391,8 +393,8 @@
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"repeat\" size=\"1\" onChange=\"submit()\">";
 
-	echo "<option value=\"0\""; if($maxrepeats==0) echo " selected"; echo ">".S_NO_REPEATS;
-	echo "<option value=\"1\""; if($maxrepeats!=0) echo " selected"; echo ">".S_REPEAT;
+	echo "<option value=\"0\""; if($repeat==0) echo " selected"; echo ">".S_NO_REPEATS;
+	echo "<option value=\"1\""; if($repeat==1) echo " selected"; echo ">".S_REPEAT;
 	echo "</select>";
 
 	if($repeat>0)
@@ -401,6 +403,11 @@
 		echo S_NUMBER_OF_REPEATS;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"maxrepeats\" value=\"$maxrepeats\" size=2>";
+
+		show_table2_v_delimiter($col++);
+		echo S_DELAY_BETWEEN_REPEATS;
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"repeatdelay\" value=\"$repeatdelay\" size=2>";
 	}
 
 	show_table2_v_delimiter2();
