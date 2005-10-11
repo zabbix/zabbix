@@ -114,3 +114,16 @@ int	get_param(const char *param, int num, char *buf, int maxlen)
 
 	return ret;
 }
+
+int	num_param(const char *param)
+{
+	int	i;
+	int	ret = 1;
+
+	for(i=0;param[i]!=0;i++)
+	{
+		if(param[i]==',')	ret++;
+	}
+
+	return ret;
+}
