@@ -224,7 +224,11 @@
 		$recipient=@iif(isset($_GET["recipient"]),$_GET["recipient"],DBget_field($result,0,9));
 		$maxrepeats=DBget_field($result,0,10);
 		$repeatdelay=DBget_field($result,0,11);
-		if($maxrepeats==0)
+		if(isset($_GET["repeat"]))
+		{
+			$repeat=$_GET["repeat"];
+		}
+		else if($maxrepeats==0)
 		{
 			$repeat=0;
 		}
