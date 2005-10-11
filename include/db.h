@@ -246,17 +246,19 @@ DB_TRIGGER
 
 DB_ACTION
 {
-	int     actionid;
-	int     triggerid;
-	int     userid;
-	int     scope;
-	int     severity;
-	int     good;
-	int     delay;
-	int     lastcheck;
+	int	actionid;
+	int	triggerid;
+	int	userid;
+	int	scope;
+	int	severity;
+	int	good;
+	int	delay;
+	int	lastcheck;
 	int	recipient;
-	char    subject[ACTION_SUBJECT_LEN_MAX];
-	char    message[MAX_STRING_LEN];
+	char	subject[ACTION_SUBJECT_LEN_MAX];
+	char	message[MAX_STRING_LEN];
+	int	maxrepeats;
+	int	repeatdelay;
 };
 
 DB_ALERT
@@ -317,7 +319,7 @@ int	DBadd_history(int itemid, double value, int clock);
 int	DBadd_history_log(int itemid, char *value, int clock, int timestamp, char *source, int severity);
 int	DBadd_history_str(int itemid, char *value, int clock);
 int	DBadd_service_alarm(int serviceid,int status,int clock);
-int	DBadd_alert(int actionid, int triggerid, int mediatypeid, char *sendto, char *subject, char *message);
+int	DBadd_alert(int actionid, int triggerid, int mediatypeid, char *sendto, char *subject, char *message, int maxrepeats, int repeatdelay);
 void	DBupdate_triggers_status_after_restart(void);
 int	DBget_prev_trigger_value(int triggerid);
 /*int	DBupdate_trigger_value(int triggerid,int value,int clock);*/

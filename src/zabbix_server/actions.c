@@ -263,7 +263,7 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 	now = time(NULL);
 
 /*	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,scope,severity,recipient,good from actions where (scope=%d and triggerid=%d and good=%d and nextcheck<=%d) or (scope=%d and good=%d) or (scope=%d and good=%d)",ACTION_SCOPE_TRIGGER,trigger->triggerid,trigger_value,now,ACTION_SCOPE_HOST,trigger_value,ACTION_SCOPE_HOSTS,trigger_value);*/
-	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,scope,severity,recipient,good from actions where (scope=%d and triggerid=%d and (good=%d or good=2) and nextcheck<=%d) or (scope=%d and (good=%d or good=2)) or (scope=%d and (good=%d or good=2))",ACTION_SCOPE_TRIGGER,trigger->triggerid,trigger_value,now,ACTION_SCOPE_HOST,trigger_value,ACTION_SCOPE_HOSTS,trigger_value);
+	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,scope,severity,recipient,good,maxrepeats,repeatdelay from actions where (scope=%d and triggerid=%d and (good=%d or good=2) and nextcheck<=%d) or (scope=%d and (good=%d or good=2)) or (scope=%d and (good=%d or good=2))",ACTION_SCOPE_TRIGGER,trigger->triggerid,trigger_value,now,ACTION_SCOPE_HOST,trigger_value,ACTION_SCOPE_HOSTS,trigger_value);
 	result = DBselect(sql);
 	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
 
@@ -282,6 +282,8 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 		action.severity=atoi(DBget_field(result,i,6));
 		action.recipient=atoi(DBget_field(result,i,7));
 		action.good=atoi(DBget_field(result,i,8));
+		action.maxrepeats=atoi(DBget_field(result,i,9));
+		action.repeatdelay=atoi(DBget_field(result,i,10));
 
 		if(ACTION_SCOPE_TRIGGER==action.scope)
 		{
