@@ -210,6 +210,8 @@ CREATE TABLE actions (
   message		text		DEFAULT '' NOT NULL,
   nextcheck		int4		DEFAULT '0' NOT NULL,
   recipient		int4		DEFAULT '0' NOT NULL,
+  maxrepeats		int4		DEFAULT '0' NOT NULL,
+  repeatdelay		int4		DEFAULT '600' NOT NULL,
   PRIMARY KEY (actionid)
 --  depends on scope. Could be hostid or 0.
 --  FOREIGN KEY (triggerid) REFERENCES triggers

@@ -16,3 +16,6 @@ alter table alerts add repeats			int4		DEFAULT '0' NOT NULL;
 alter table alerts add maxrepeats		int4		DEFAULT '0' NOT NULL;
 alter table alerts add nextcheck		int4		DEFAULT '0' NOT NULL;
 alter table alerts add delay			int4		DEFAULT '0' NOT NULL;
+
+alter table actions add maxrepeats	int4		DEFAULT '0' NOT NULL;
+alter table actions add repeatdelay	int4		DEFAULT '600' NOT NULL;
