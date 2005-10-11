@@ -180,6 +180,11 @@ CREATE TABLE alerts (
   status		int(4)		DEFAULT '0' NOT NULL,
   retries		int(4)		DEFAULT '0' NOT NULL,
   error			varchar(128)	DEFAULT '' NOT NULL,
+  repeats		int(4)		DEFAULT '0' NOT NULL,
+  maxrepeats		int(4)		DEFAULT '0' NOT NULL,
+  nextcheck		int(4)		DEFAULT '0' NOT NULL,
+  delay			int(4)		DEFAULT '0' NOT NULL,
+
   PRIMARY KEY (alertid),
   INDEX (actionid),
   KEY clock (clock),
