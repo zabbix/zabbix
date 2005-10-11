@@ -10,4 +10,9 @@ CREATE TABLE autoreg (
   PRIMARY KEY (id)
 );
 
-alter table alerts add triggerid             int4          DEFAULT '0' NOT NULL after actionid;
+alter table alerts add triggerid		int4          DEFAULT '0' NOT NULL after actionid;
+
+alter table alerts add repeats			int4		DEFAULT '0' NOT NULL;
+alter table alerts add maxrepeats		int4		DEFAULT '0' NOT NULL;
+alter table alerts add nextcheck		int4		DEFAULT '0' NOT NULL;
+alter table alerts add delay			int4		DEFAULT '0' NOT NULL;

@@ -11,3 +11,7 @@ CREATE TABLE autoreg (
 ) type=InnoDB;
 
 alter table alerts add triggerid	int(4)	DEFAULT '0' NOT NULL after actionid;
+alter table alerts add repeats		int(4)		DEFAULT '0' NOT NULL;
+alter table alerts add maxrepeats	int(4)		DEFAULT '0' NOT NULL;
+alter table alerts add nextcheck	int(4)		DEFAULT '0' NOT NULL;
+alter table alerts add delay		int(4)		DEFAULT '0' NOT NULL;
