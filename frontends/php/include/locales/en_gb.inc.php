@@ -80,6 +80,10 @@
 	"S_AVERAGE"=>				"Average",
 	"S_HIGH"=>				"High",
 	"S_DISASTER"=>				"Disaster",
+	"S_REPEAT"=>				"Repeat",
+	"S_REPEATS"=>				"Repeats",
+	"S_NO_REPEATS"=>			"No repeats",
+	"S_NUMBER_OF_REPEATS"=>			"Number of repeats",
 
 //	alarms.php
 	"S_ALARMS"=>				"Alarms",
