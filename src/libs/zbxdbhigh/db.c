@@ -1206,7 +1206,7 @@ int	DBget_queue_count(void)
 	return res;
 }
 
-int	DBadd_alert(int actionid, int triggerid,  int mediatypeid, char *sendto, char *subject, char *message)
+int	DBadd_alert(int actionid, int triggerid,  int mediatypeid, char *sendto, char *subject, char *message, int maxrepeats, int repeatdelay)
 {
 	int	now;
 	char	sql[MAX_STRING_LEN];
@@ -1222,7 +1222,7 @@ int	DBadd_alert(int actionid, int triggerid,  int mediatypeid, char *sendto, cha
 	DBescape_string(sendto,sendto_esc,MAX_STRING_LEN);
 	DBescape_string(subject,subject_esc,MAX_STRING_LEN);
 	DBescape_string(message,message_esc,MAX_STRING_LEN);
-	snprintf(sql,sizeof(sql)-1,"insert into alerts (actionid,triggerid,clock,mediatypeid,sendto,subject,message,status,retries) values (%d,%d,%d,%d,'%s','%s','%s',0,0)",actionid,triggerid,now,mediatypeid,sendto_esc,subject_esc,message_esc);
+	snprintf(sql,sizeof(sql)-1,"insert into alerts (actionid,triggerid,clock,mediatypeid,sendto,subject,message,status,retries,maxrepeats,delay) values (%d,%d,%d,%d,'%s','%s','%s',0,0)",actionid,triggerid,now,mediatypeid,sendto_esc,subject_esc,message_esc, maxrepeats, repeatdelay);
 	DBexecute(sql);
 
 	return SUCCEED;
