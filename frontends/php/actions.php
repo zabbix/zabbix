@@ -40,7 +40,12 @@
 	{
 		if($_GET["register"]=="add")
 		{
-			if($_GET["repeat"]==0)	$_GET["maxrepeats"]=0;
+			if($_GET["repeat"]==0)
+			{
+				$_GET["maxrepeats"]=0;
+				$_GET["repeatdelay"]=600;
+			}
+
 			$actionid=add_action( $_GET["triggerid"], $_GET["userid"], $_GET["good"], $_GET["delay"], $_GET["subject"], $_GET["message"],$_GET["scope"],$_GET["severity"],$_GET["recipient"],$_GET["usrgrpid"],$_GET["maxrepeats"],$_GET["repeatdelay"]);
 			add_action_to_linked_hosts($actionid);
 			show_messages($actionid,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
@@ -60,7 +65,11 @@
 		}
 		if($_GET["register"]=="update")
 		{
-			if($_GET["repeat"]==0)	$_GET["maxrepeats"]=0;
+			if($_GET["repeat"]==0)
+			{
+				$_GET["maxrepeats"]=0;
+				$_GET["repeatdelay"]=600;
+			}
 			$result=update_action( $_GET["actionid"], $_GET["triggerid"], $_GET["userid"], $_GET["good"], $_GET["delay"], $_GET["subject"], $_GET["message"],$_GET["scope"],$_GET["severity"],$_GET["recipient"],$_GET["usrgrpid"],$_GET["maxrepeats"],$_GET["repeatdelay"]);
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
 			if($result)
