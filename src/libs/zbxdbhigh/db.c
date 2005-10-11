@@ -523,7 +523,7 @@ int	add_alarm(int triggerid,int status,int clock,int *alarmid)
 	/* Cancel currently active alerts */
 	if(status == TRIGGER_VALUE_FALSE || status == TRIGGER_VALUE_TRUE)
 	{
-		snprintf(sql,sizeof(sql)-1,"update alerts set retries=3,error='Trigger changed its status. WIll not send repeats.' where triggerid=%d and repeats>0", triggerid);
+		snprintf(sql,sizeof(sql)-1,"update alerts set retries=3,error='Trigger changed its status. WIll not send repeats.' where triggerid=%d and repeats>0 and status=%d", triggerid, ALERT_STATUS_NOT_SENT);
 		DBexecute(sql);
 	}
 
