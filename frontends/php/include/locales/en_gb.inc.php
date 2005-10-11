@@ -84,6 +84,7 @@
 	"S_REPEATS"=>				"Repeats",
 	"S_NO_REPEATS"=>			"No repeats",
 	"S_NUMBER_OF_REPEATS"=>			"Number of repeats",
+	"S_DELAY_BETWEEN_REPEATS"=>		"Delay between repeats",
 
 //	alarms.php
 	"S_ALARMS"=>				"Alarms",

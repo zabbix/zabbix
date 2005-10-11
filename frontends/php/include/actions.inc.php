@@ -21,15 +21,15 @@
 <?php
 	# Update Action
 
-	function	update_action( $actionid, $triggerid, $userid, $good, $delay, $subject, $message, $scope, $severity, $recipient, $usrgrpid)
+	function	update_action( $actionid, $triggerid, $userid, $good, $delay, $subject, $message, $scope, $severity, $recipient, $usrgrpid, $maxrepeats, $repeatdelay)
 	{
 		delete_action($actionid);
-		return add_action( $triggerid, $userid, $good, $delay, $subject, $message, $scope, $severity, $recipient, $usrgrpid);
+		return add_action( $triggerid, $userid, $good, $delay, $subject, $message, $scope, $severity, $recipient, $usrgrpid, $maxrepeats, $repeatdelay);
 	}
 
 	# Add Action
 
-	function	add_action( $triggerid, $userid, $good, $delay, $subject, $message, $scope, $severity, $recipient, $usrgrpid)
+	function	add_action( $triggerid, $userid, $good, $delay, $subject, $message, $scope, $severity, $recipient, $usrgrpid, $maxrepeats, $repeatdelay)
 	{
 		if(!check_right_on_trigger("A",$triggerid))
 		{
@@ -48,7 +48,7 @@
 
 		if($scope==2)
 		{
-			$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message,scope,severity,recipient) values (0,$id,$good,$delay,0,'*Automatically generated*','*Automatically generated*',$scope,$severity,$recipient)";
+			$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message,scope,severity,recipient,maxrepeats,repeatdelay) values (0,$id,$good,$delay,0,'*Automatically generated*','*Automatically generated*',$scope,$severity,$recipient,$maxrepeats,$repeatdelay)";
 			$result=DBexecute($sql);
 			return DBinsert_id($result,"actions","actionid");
 		}
@@ -59,7 +59,7 @@
 			$result=DBselect($sql);
 			while($row=DBfetch($result))
 			{
-				$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message,scope,severity,recipient) values (".$row["hostid"].",$id,$good,$delay,0,'*Automatically generated*','*Automatically generated*',$scope,$severity,$recipient)";
+				$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message,scope,severity,recipientmaxrepeats,repeatdelay) values (".$row["hostid"].",$id,$good,$delay,0,'*Automatically generated*','*Automatically generated*',$scope,$severity,$recipient,$maxrepeats,$repeatdelay)";
 //				echo "$sql<br>";
 				DBexecute($sql);
 			}
@@ -67,7 +67,7 @@
 		}
 		else
 		{
-			$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message,scope,severity,recipient) values ($triggerid,$id,$good,$delay,0,'$subject','$message',$scope,$severity,$recipient)";
+			$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message,scope,severity,recipient,maxrepeats,repeatdelay) values ($triggerid,$id,$good,$delay,0,'$subject','$message',$scope,$severity,$recipient,$maxrepeats,$repeatdelay)";
 			$result=DBexecute($sql);
 			return DBinsert_id($result,"actions","actionid");
 		}
@@ -140,7 +140,7 @@
 			{
 				$host=get_host_by_hostid($row["hostid"]);
 				$message=str_replace("{".$host_template["host"].":", "{".$host["host"].":", $action["message"]);
-				add_action($row2["triggerid"], $action["userid"], $action["good"], $action["delay"], $action["subject"], $message, $action["scope"], $action["severity"], $action["recipient"], $action["userid"]);
+				add_action($row2["triggerid"], $action["userid"], $action["good"], $action["delay"], $action["subject"], $message, $action["scope"], $action["severity"], $action["recipient"], $action["userid"], $action["maxrepeats"],$action["repeatdelay"]);
 			}
 		}
 	}
