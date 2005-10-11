@@ -28,6 +28,10 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#ifdef HAVE_PWD_H
+#	include <pwd.h>
+#endif
+
 /* Definitions of uint32_t under OS/X */
 #ifdef HAVE_STDINT_H
 	#include <stdint.h>
@@ -639,20 +643,32 @@ crc_buf2(p, clen, cval)
 	return (0);
 }
 
-int	PROC_NUM(const char *cmd, const char *procname,double  *value)
+int	PROC_NUM(const char *cmd, const char *param,double  *value)
 {
-#ifdef	HAVE_PROC_0_PSINFO
+#if defined(HAVE_PROC_0_PSINFO)
 	DIR	*dir;
 	struct	dirent *entries;
 	struct	stat buf;
+	
 	char	filename[MAX_STRING_LEN];
-
+	char    procname[MAX_STRING_LEN];
+	
 	int	fd;
 /* In the correct procfs.h, the structure name is psinfo_t */
 	psinfo_t psinfo;
 
 	int	proccount=0;
 
+	if(num_param(param) > 1)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+        if(get_param(param, 1, procname, MAX_STRING_LEN) != 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}	
+	
 	dir=opendir("/proc");
 	if(NULL == dir)
 	{
@@ -672,12 +688,13 @@ int	PROC_NUM(const char *cmd, const char *procname,double  *value)
 			{
 				if (read (fd, &psinfo, sizeof(psinfo)) == -1)
 				{
+					close(fd);
 					closedir(dir);
 					return SYSINFO_RET_FAIL;
 				}
 				else
 				{
-					if(strcmp(procname,psinfo.pr_fname)==0)
+					if(strcmp(procname, psinfo.pr_fname)==0)
 					{
 						proccount++;
 					}
@@ -693,19 +710,60 @@ int	PROC_NUM(const char *cmd, const char *procname,double  *value)
 	closedir(dir);
 	*value=(double)proccount;
 	return	SYSINFO_RET_OK;
-#else
-#ifdef	HAVE_PROC_1_STATUS
+	
+#elif defined(HAVE_PROC_1_STATUS)
+
+/*
+#define FDI(f, m) fprintf(stderr, "DEBUG INFO: " f "\n" , m) // show debug info to stderr
+#define SDI(m) FSI("%s", m) // string info
+#define IDI(i) FSI("%i", i) // integer info
+*/
+	
 	DIR	*dir;
 	struct	dirent *entries;
 	struct	stat buf;
 	char	filename[MAX_STRING_LEN];
 	char	line[MAX_STRING_LEN];
+	
 	char	name1[MAX_STRING_LEN];
 	char	name2[MAX_STRING_LEN];
+	
+	char	procname[MAX_STRING_LEN];
+	char	usrname[MAX_STRING_LEN];
+	
+	int	proc_ok = 0;
+	int 	usr_ok = 0;
+	
+	struct	passwd *usrinfo;
+	int	proc_uid = 0;
 
 	FILE	*f;
 
 	int	proccount=0;
+
+	if(num_param(param) > 2)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(get_param(param, 1, procname, MAX_STRING_LEN) != 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}	
+	
+	if(get_param(param, 2, usrname, MAX_STRING_LEN) != 0)
+	{
+		usrname[0] = 0;
+		usrinfo = NULL;
+	}
+	else
+	{
+		usrinfo = getpwnam(usrname);
+		if(usrinfo == NULL)
+		{
+			return SYSINFO_RET_FAIL;
+		}
+	}
 
 	dir=opendir("/proc");
 	if(NULL == dir)
@@ -715,6 +773,9 @@ int	PROC_NUM(const char *cmd, const char *procname,double  *value)
 
 	while((entries=readdir(dir))!=NULL)
 	{
+		proc_ok = 0;
+		usr_ok = 0;
+		
 		strscpy(filename,"/proc/");	
 		strncat(filename,entries->d_name,MAX_STRING_LEN);
 		strncat(filename,"/status",MAX_STRING_LEN);
@@ -734,34 +795,64 @@ int	PROC_NUM(const char *cmd, const char *procname,double  *value)
 				continue;
 			}
 			fgets(line,MAX_STRING_LEN,f);
-			fclose(f);
 
 			if(sscanf(line,"%s\t%s\n",name1,name2)==2)
                         {
-				/* For Linux only */
                                 if(strcmp(name1,"Name:") == 0)
                                 {
                                         if(strcmp(procname,name2)==0)
                                         {
-                                                proccount++;
+                                                proc_ok = 1;
                                         }
                                 }
-				/* Assuming that this is FreeBSD. First field is process name */
-				else if(strcmp(procname,name1)==0)
-				{
-					proccount++;
-				}
-/*                                else
-                                {
-                                        closedir(dir);
-                                        return  SYSINFO_RET_FAIL;
-                                }*/
                         }
                         else
                         {
-                                closedir(dir);
-                                return  SYSINFO_RET_FAIL;
+				fclose(f);
+                                continue;
                         }
+			
+			if(proc_ok == 0) 
+			{
+				fclose(f);
+				continue;
+			}
+			
+			if(usrinfo != NULL)
+			{
+				
+				while(fgets(line, MAX_STRING_LEN, f) != NULL)
+				{	
+				
+					if(sscanf(line, "%s\t%i\n", name1, &proc_uid) != 2)
+					{
+						continue;
+					}
+					
+					if(strcmp(name1,"Uid:") != 0)
+					{
+						continue;
+					}
+					
+					if(usrinfo->pw_uid == proc_uid)
+					{
+						usr_ok = 1;
+						break;
+					}
+				}
+			}
+			else
+			{
+				usr_ok = 1;
+			}
+			
+			if(proc_ok && usr_ok)
+			{
+				proccount++;
+			}
+			
+					
+			fclose(f);
 		}
 	}
 	closedir(dir);
@@ -769,7 +860,6 @@ int	PROC_NUM(const char *cmd, const char *procname,double  *value)
 	return SYSINFO_RET_OK;
 #else
 	return	SYSINFO_RET_FAIL;
-#endif
 #endif
 }
 
