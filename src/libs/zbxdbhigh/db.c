@@ -1222,7 +1222,7 @@ int	DBadd_alert(int actionid, int triggerid,  int mediatypeid, char *sendto, cha
 	DBescape_string(sendto,sendto_esc,MAX_STRING_LEN);
 	DBescape_string(subject,subject_esc,MAX_STRING_LEN);
 	DBescape_string(message,message_esc,MAX_STRING_LEN);
-	snprintf(sql,sizeof(sql)-1,"insert into alerts (actionid,triggerid,clock,mediatypeid,sendto,subject,message,status,retries,maxrepeats,delay) values (%d,%d,%d,%d,'%s','%s','%s',0,0)",actionid,triggerid,now,mediatypeid,sendto_esc,subject_esc,message_esc, maxrepeats, repeatdelay);
+	snprintf(sql,sizeof(sql)-1,"insert into alerts (actionid,triggerid,clock,mediatypeid,sendto,subject,message,status,retries,maxrepeats,delay) values (%d,%d,%d,%d,'%s','%s','%s',0,0,%d,%d)",actionid,triggerid,now,mediatypeid,sendto_esc,subject_esc,message_esc, maxrepeats, repeatdelay);
 	DBexecute(sql);
 
 	return SUCCEED;
