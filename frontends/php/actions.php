@@ -115,11 +115,11 @@
 		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.recipient,a.scope from actions a where (a.triggerid=".$_GET["triggerid"]." and a.scope=0) or (a.scope=2 or a.scope=1) order by a.recipient desc";
 	}*/
 //	echo $sql;
-	$sql="select actionid,userid,delay,subject,message,scope,severity,recipient,good,triggerid from actions where (scope=0 and triggerid=".$_GET["triggerid"].") or scope=1 or scope=2";
+	$sql="select actionid,userid,delay,subject,message,scope,severity,recipient,good,triggerid,maxrepeats,repeatdelay from actions where (scope=0 and triggerid=".$_GET["triggerid"].") or scope=1 or scope=2";
 	$result=DBselect($sql);
 
 	table_begin();
-	table_header(array(S_SCOPE,S_SEND_MESSAGE_TO,S_WHEN_TRIGGER,S_DELAY,S_SUBJECT,S_ACTIONS));
+	table_header(array(S_SCOPE,S_SEND_MESSAGE_TO,S_WHEN_TRIGGER,S_DELAY,S_SUBJECT,S_REPEATS,S_ACTIONS));
 	$col=0;
 	while($row=DBfetch($result))
 	{
@@ -167,6 +167,16 @@
 #			echo "<TD><FONT COLOR=\"#AA0000\">".S_ON."</FONT>/<FONT COLOR=\"#00AA00\">OFF</FONT></TD>";
 			$good=array("value"=>S_ON."/".S_OFF,"class"=>"on");
 		}
+
+		if($row["maxrepeats"] == 0)
+		{
+			$maxrepeats=S_NO_REPEATS;
+		}
+		else
+		{
+			$maxrepeats=$row["maxrepeats"];
+		}
+
 		$actions="<A HREF=\"actions.php?register=edit&actionid=".$row["actionid"]."&triggerid=".$_GET["triggerid"]."#form\">Change</A>";
 
 		table_row(array(
@@ -175,6 +185,7 @@
 			$good,
 			htmlspecialchars($row["delay"]),
 			htmlspecialchars($row["subject"]),
+			$maxrepeats,
 			$actions
 			),$col++);
 	}
@@ -195,7 +206,7 @@
 
 	if(isset($_GET["actionid"]))
 	{
-		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.scope,a.severity,a.recipient from actions a where a.actionid=".$_GET["actionid"];
+		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.scope,a.severity,a.recipient,a.maxrepeats,a.repeatdelay from actions a where a.actionid=".$_GET["actionid"];
 		$result=DBselect($sql);
 
 		$actionid=DBget_field($result,0,0);
@@ -209,6 +220,16 @@
 		$scope=@iif(isset($_GET["scope"]),$_GET["scope"],DBget_field($result,0,7));
 		$severity=DBget_field($result,0,8);
 		$recipient=@iif(isset($_GET["recipient"]),$_GET["recipient"],DBget_field($result,0,9));
+		$maxrepeats=DBget_field($result,0,9);
+		$repeatdelay=DBget_field($result,0,10);
+		if($maxrepeats==0)
+		{
+			$repeat=0;
+		}
+		else
+		{
+			$repeat=1;
+		}
 	}
 	else
 	{
@@ -224,6 +245,9 @@
 		$recipient=@iif(isset($_GET["recipient"]),$_GET["recipient"],RECIPIENT_TYPE_GROUP);
 //		$severity=0;
 		$severity=@iif(isset($_GET["severity"]),$_GET["severity"],0);
+		$maxrepeats=@iif(isset($_GET["maxrepeats"]),$_GET["maxrepeats"],0);
+		$repeatdelay=@iif(isset($_GET["repeatdelay"]),$_GET["repeatdelay"],600);
+		$repeat=@iif(isset($_GET["repeat"]),$_GET["repeat"],0);
 
 		$sql="select i.description, h.host, i.key_ from hosts h, items i,functions f where f.triggerid=".$_GET["triggerid"]." and h.hostid=i.hostid and f.itemid=i.itemid order by i.description";
 		$result=DBselect($sql);
@@ -243,6 +267,8 @@
 			$message=$message."---------End--------\n";
 		}
 	}
+
+
 	show_form_begin("actions.action");
 	echo nbsp(S_NEW_ACTION);
 	$col=0;
@@ -358,6 +384,23 @@
 	else
 	{
 		echo "<input name=\"severity\" type=\"hidden\" value=$severity>";
+	}
+
+	show_table2_v_delimiter($col++);
+	echo nbsp(S_REPEAT);
+	show_table2_h_delimiter();
+	echo "<select class=\"biginput\" name=\"repeat\" size=\"1\" onChange=\"submit()\">";
+
+	echo "<option value=\"0\""; if($maxrepeats==0) echo " selected"; echo ">".S_NO_REPEATS;
+	echo "<option value=\"1\""; if($maxrepeats!=0) echo " selected"; echo ">".S_REPEAT;
+	echo "</select>";
+
+	if($repeat>0)
+	{
+		show_table2_v_delimiter($col++);
+		echo S_NUMBER_OF_REPEATS;
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"maxrepeats\" value=\"$maxrepeats\" size=2>";
 	}
 
 	show_table2_v_delimiter2();
