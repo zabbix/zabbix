@@ -1,6 +1,5 @@
-1.1beta2:
+1.1beta3:
 
- - Repeated notifications
  - Monitoring of NTP servers
  - make agents return error message if not supported or not available
  - centralised management of agent configuration files
@@ -13,6 +12,12 @@
 
 ZABBIX 1.1:
 
+> -Should the update linkage buttons synchronize the stuff between the host and
+ his templates....... this is very usefull?
+ -Did you know what is very very very bad..... not having a add triggers and
+ graphs from this host button.... like the one that adds items.
+ -Can u make possible to change the simple graph..... like changing it to
+ bold....
  - execution of commands on monitored hosts in case of pre-defined events
  - anvanced SNMP trapper
  - add acknowledgements
