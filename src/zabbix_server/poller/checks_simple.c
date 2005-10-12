@@ -32,7 +32,7 @@ int	get_value_simple(double *result,char *result_str,DB_ITEM *item,char *error, 
 
 	zabbix_log( LOG_LEVEL_WARNING, "In get_value_simple([%s]", item->key);
 
-	if(0 == strncmp(item->key,"service.ntp",3))
+	if(0 == strncmp(item->key,"service.ntp",11))
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "In service.ntp");
 		l=strstr(item->key,"[");
@@ -45,6 +45,7 @@ int	get_value_simple(double *result,char *result_str,DB_ITEM *item,char *error, 
 			param[r-l-1]=0;
 			snprintf(c,sizeof(c)-1,"service.ntp[%s]",param);
 		}
+		zabbix_log( LOG_LEVEL_WARNING, "In service.ntp [%s]", c);
 	}
 	else if(0 == strncmp(item->key,"dns",3))
 	{
