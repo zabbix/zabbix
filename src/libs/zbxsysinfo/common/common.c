@@ -1808,6 +1808,11 @@ int	CHECK_SERVICE(const char *cmd, const char *service_and_ip_and_port,double  *
 		if(port == 0)	port=22;
 		result=check_ssh(ip,port,&value_int);
 	}
+	else if(strcmp(service,"service.ntp") == 0)
+	{
+		if(port == 0)	port=123;
+		result=check_ntp(ip,port,&value_int);
+	}
 #ifdef HAVE_LDAP
 	else if(strcmp(service,"ldap") == 0)
 	{
