@@ -30,8 +30,11 @@ int	get_value_simple(double *result,char *result_str,DB_ITEM *item,char *error, 
 
 	/* Assumption: host name does not contain '_perf'	*/
 
+	zabbix_log( LOG_LEVEL_WARNING, "In get_value_simple([%s]", item->key);
+
 	if(0 == strncmp(item->key,"service.ntp",3))
 	{
+		zabbix_log( LOG_LEVEL_WARNING, "In service.ntp");
 		l=strstr(item->key,"[");
 		r=strstr(item->key,"]");
 		if(l==NULL || r==NULL)
@@ -40,7 +43,7 @@ int	get_value_simple(double *result,char *result_str,DB_ITEM *item,char *error, 
 		{
 			strncpy( param,l+1, r-l-1);
 			param[r-l-1]=0;
-			snprintf(c,sizeof(c)-1,"dns[%s]",param);
+			snprintf(c,sizeof(c)-1,"service.ntp[%s]",param);
 		}
 	}
 	else if(0 == strncmp(item->key,"dns",3))
@@ -106,6 +109,6 @@ int	get_value_simple(double *result,char *result_str,DB_ITEM *item,char *error, 
 		*result=strtod(result_str,&e);
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "SIMPLE [%s] [%s] [%f] RET [%d]", c, result_str, *result, ret);
+	zabbix_log( LOG_LEVEL_WARNING, "SIMPLE [%s] [%s] [%f] RET [%d]", c, result_str, *result, ret);
 	return ret;
 }
