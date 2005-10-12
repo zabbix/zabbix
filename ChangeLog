@@ -1,5 +1,6 @@
 Changes for 1.1beta2:
 
+ - added support of service.ntp[host,port] (Alexei)
  - added support of proc.mem[process,user,mode] (Eugene)
  - added columns actions.maxrepeats, actions.repeatdelay (Alexei)
  - improved support of proc.num[process,<user name>] (Eugene)

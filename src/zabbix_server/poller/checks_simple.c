@@ -28,10 +28,22 @@ int	get_value_simple(double *result,char *result_str,DB_ITEM *item,char *error, 
 	int	ret = SUCCEED;
 	char	*l,*r;
 
-	/* The code is ugly. I would rewrite it. Alexei.	*/
 	/* Assumption: host name does not contain '_perf'	*/
 
-	if(0 == strncmp(item->key,"dns",3))
+	if(0 == strncmp(item->key,"service.ntp",3))
+	{
+		l=strstr(item->key,"[");
+		r=strstr(item->key,"]");
+		if(l==NULL || r==NULL)
+			snprintf(c,sizeof(c)-1,"%s",item->key);
+		else
+		{
+			strncpy( param,l+1, r-l-1);
+			param[r-l-1]=0;
+			snprintf(c,sizeof(c)-1,"dns[%s]",param);
+		}
+	}
+	else if(0 == strncmp(item->key,"dns",3))
 	{
 		if(item->useip==1)
 		{
