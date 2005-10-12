@@ -694,7 +694,14 @@ int	PROC_NUM(const char *cmd, const char *param,double  *value)
 				}
 				else
 				{
-					if(strcmp(procname, psinfo.pr_fname)==0)
+					if(procname[0] != 0)
+					{
+						if(strcmp(procname, psinfo.pr_fname)==0)
+						{
+							proccount++;
+						}
+					}
+					else
 					{
 						proccount++;
 					}
@@ -734,7 +741,7 @@ int	PROC_NUM(const char *cmd, const char *param,double  *value)
 	int	proc_ok = 0;
 	int 	usr_ok = 0;
 	
-	struct	passwd *usrinfo;
+	struct	passwd *usrinfo = NULL;
 	int	proc_uid = 0;
 
 	FILE	*f;
@@ -754,14 +761,17 @@ int	PROC_NUM(const char *cmd, const char *param,double  *value)
 	if(get_param(param, 2, usrname, MAX_STRING_LEN) != 0)
 	{
 		usrname[0] = 0;
-		usrinfo = NULL;
 	}
 	else
 	{
-		usrinfo = getpwnam(usrname);
-		if(usrinfo == NULL)
+		if(usrname[0] != 0)
 		{
-			return SYSINFO_RET_FAIL;
+	                usrinfo = getpwnam(usrname);
+        	        if(usrinfo == NULL)
+                	{
+				/* incorrect user name */
+	                        return SYSINFO_RET_FAIL;
+			}			        
 		}
 	}
 
@@ -794,36 +804,36 @@ int	PROC_NUM(const char *cmd, const char *param,double  *value)
 			{
 				continue;
 			}
-			fgets(line,MAX_STRING_LEN,f);
 
-			if(sscanf(line,"%s\t%s\n",name1,name2)==2)
-                        {
-                                if(strcmp(name1,"Name:") == 0)
-                                {
-                                        if(strcmp(procname,name2)==0)
-                                        {
-                                                proc_ok = 1;
-                                        }
-                                }
-                        }
-                        else
-                        {
-				fclose(f);
-                                continue;
-                        }
-			
-			if(proc_ok == 0) 
+			if(procname[0] != 0)
 			{
-				fclose(f);
-				continue;
+				fgets(line,MAX_STRING_LEN,f);
+				if(sscanf(line,"%s\t%s\n",name1,name2)==2)
+                	        {
+                        	        if(strcmp(name1,"Name:") == 0)
+                                	{
+	                                        if(strcmp(procname,name2)==0)
+        	                                {
+                	                                proc_ok = 1;
+                        	                }
+	                                }
+        	                }
+			
+				if(proc_ok == 0) 
+				{
+					fclose(f);
+					continue;
+				}
+			}
+			else
+			{
+				proc_ok = 1;
 			}
 			
 			if(usrinfo != NULL)
 			{
-				
 				while(fgets(line, MAX_STRING_LEN, f) != NULL)
 				{	
-				
 					if(sscanf(line, "%s\t%i\n", name1, &proc_uid) != 2)
 					{
 						continue;

@@ -91,6 +91,51 @@ void del_zeroes(char *s)
 	}
 }
 
+
+int	get_param(const char *param, int num, char *buf, int maxlen)
+{
+	char	tmp[MAX_STRING_LEN];
+	char	*s;
+	int	ret = 1;
+	int	i = 0;
+	int	idx = 0;
+
+	strscpy(tmp,param);
+
+	s = &tmp[0];
+	
+	for(i=0; tmp[i] != '\0'; i++)
+	{
+		if(tmp[i] == ',')
+		{
+			idx++;
+			if(idx == num)
+			{
+				tmp[i]='\0';
+				strncpy(buf, s, maxlen);
+				tmp[i]=',';
+				ret = 0;
+				break;
+				
+			}
+			s = &tmp[i+1];
+		}
+	}
+
+	if(ret != 0)
+	{
+		idx++;
+		if(idx == num)
+		{
+			strncpy(buf, s, maxlen);
+			ret = 0;
+		}
+	}
+	
+	return ret;
+}
+
+/*
 int	get_param(const char *param, int num, char *buf, int maxlen)
 {
 	char	tmp[MAX_STRING_LEN];
@@ -109,11 +154,12 @@ int	get_param(const char *param, int num, char *buf, int maxlen)
 			ret = 0;
 			break;
 		}
-		s=(char *)strtok(NULL,";");
+		s=(char *)strtok(NULL,",");
 	}
 
 	return ret;
 }
+*/
 
 int	num_param(const char *param)
 {

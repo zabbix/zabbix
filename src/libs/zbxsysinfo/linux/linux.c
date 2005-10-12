@@ -91,6 +91,7 @@ int	AGENT_PING(const char *cmd, const char *parameter,double  *value);
 int	VM_MEMORY_SHARED(const char *cmd, const char *parameter,double  *value);
 int	VM_MEMORY_TOTAL(const char *cmd, const char *parameter,double  *value);
 int	PROC_NUM(const char *cmd, const char *parameter,double  *value);
+int     PROC_MEMORY(const char *cmd, const char *param, double  *value);
 int	PROCCOUNT(const char *cmd, const char *parameter,double  *value);
 
 int	SYSTEM_CPU_LOAD1(const char *cmd, const char *parameter,double  *value);
@@ -182,6 +183,7 @@ COMMAND	parameters_specific[]=
 	{"kernel.maxproc"	,KERNEL_MAXPROC, 	0, 0},
 
 	{"proc.num[*]"		,PROC_NUM, 		0, "inetd"},
+	{"proc.mem[*]"		,PROC_MEMORY, 		0, "inetd,root,sum"},
 
 	{"vm.memory.total"	,VM_MEMORY_TOTAL,	0, 0},
 	{"vm.memory.shared"	,VM_MEMORY_SHARED,	0, 0},
