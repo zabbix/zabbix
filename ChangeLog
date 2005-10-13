@@ -1,3 +1,7 @@
+Changes for 1.1beta3:
+
+ - added processing of SNMP counter64 (Alexei)
+
 Changes for 1.1beta2:
 
  - added support of service.ntp,host,port (Alexei)
