@@ -188,7 +188,7 @@ CREATE TABLE alerts (
   PRIMARY KEY (alertid),
   INDEX (actionid),
   KEY clock (clock),
-  KEY clock (triggerid),
+  KEY triggerid (triggerid),
   KEY status_retries (status, retries),
   KEY mediatypeid (mediatypeid)
 ) type=InnoDB;
