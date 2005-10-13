@@ -4,6 +4,7 @@
 #include <netdb.h>
 #include <errno.h>
 #include <time.h>
+#include <stdio.h>
 
 #include "common.h"
 #include "sysinfo.h"
@@ -178,6 +179,7 @@ those printed by the verbose options. */
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     };
 
+
 /* Work out and format the current local time.  Note that some semi-ANSI
 systems do not set the return value from (s)printf. */
 
@@ -221,6 +223,8 @@ int	check_ntp(char *host, int port, int *value_int)
 	ntp_data data;
 	unsigned char	packet[NTP_PACKET_MIN];
 
+    	*value_int = 0;
+
 	make_packet(&data);
 
 	servaddr_in.sin_family=AF_INET;
@@ -228,8 +232,8 @@ int	check_ntp(char *host, int port, int *value_int)
 
 	if(hp==NULL)
 	{
-/*		printf("gethostbyname() failed [%s]", hstrerror(h_errno));*/
-		return	SYSINFO_RET_FAIL;
+/*		fprintf(stderr, "gethostbyname(%s) failed [%s]", host, hstrerror(h_errno));*/
+		return	SYSINFO_RET_OK;
 	}
 
 	servaddr_in.sin_addr.s_addr=((struct in_addr *)(hp->h_addr))->s_addr;
@@ -240,8 +244,8 @@ int	check_ntp(char *host, int port, int *value_int)
 
 	if(s == -1)
 	{
-/*		printf("Cannot create socket [%s]", strerror(errno));*/
-		return	SYSINFO_RET_FAIL;
+/*		fprintf(stderr, "Cannot create socket [%s]", strerror(errno));*/
+		return	SYSINFO_RET_OK;
 	}
  
 	if( connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
@@ -255,8 +259,9 @@ int	check_ntp(char *host, int port, int *value_int)
 			default:
 				break;
 		} 
+/*		fprintf(stderr, "Cannot connect [%s]", strerror(errno));*/
 		close(s);
-		return	SYSINFO_RET_FAIL;
+		return	SYSINFO_RET_OK;
 	}
 
 	pack_ntp(packet,NTP_PACKET_MIN,&data);
@@ -270,8 +275,9 @@ int	check_ntp(char *host, int port, int *value_int)
 			default:
 				break;
 		} 
+/*		fprintf(stderr, "Cannot write [%s]", strerror(errno));*/
 		close(s);
-		return	SYSINFO_RET_FAIL;
+		return	SYSINFO_RET_OK;
 	} 
 
 	memset(c,0,MAX_STRING_LEN);
@@ -288,8 +294,9 @@ int	check_ntp(char *host, int port, int *value_int)
 			default:
 					break;
 		} 
+/*		fprintf(stderr, "Cannot read0 [%d]", errno);*/
 		close(s);
-		return	SYSINFO_RET_FAIL;
+		return	SYSINFO_RET_OK;
 	}
 	close(s);
 
