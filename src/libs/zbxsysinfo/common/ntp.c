@@ -6,12 +6,13 @@
 #include <time.h>
 #include <stdio.h>
 
-#ifdef HAVE_SYS_TIME
-	#include <sys/time.h>
-#endif
-
+#include "config.h"
 #include "common.h"
 #include "sysinfo.h"
+
+#ifdef HAVE_SYS_TIME_H
+	#include <sys/time.h>
+#endif
 
 #define JAN_1970   2208988800.0        /* 1970 - 1900 in seconds */
 #define NTP_SCALE  4294967296.0        /* 2^32, of course! */
