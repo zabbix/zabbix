@@ -815,11 +815,6 @@ linux*)
         	    AC_MSG_RESULT([2.4 family (${kernel})])
         	    AC_DEFINE([KERNEL_2_4], 1, [Define to 1 if you're using Linux 2.4.x])
         	    ;;
-
-             *) 
-        	    AC_MSG_RESULT([unsupported (${kernel})])
-        	    AC_MSG_ERROR([ZABBIX works on kernels 2.4, 2.6])
-        	    ;;
         esac
 ;;
 aix*)
