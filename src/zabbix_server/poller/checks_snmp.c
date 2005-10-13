@@ -197,7 +197,6 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item,char *error, in
 			if(	(vars->type == ASN_UINTEGER)||
 				(vars->type == ASN_COUNTER) ||
 #ifdef OPAQUE_SPECIAL_TYPES
-				(vars->type == ASN_COUNTER64) ||
 				(vars->type == ASN_UNSIGNED64) ||
 #endif
 				(vars->type == ASN_TIMETICKS) ||
@@ -211,6 +210,10 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item,char *error, in
 				 */ 
 				/*sprintf(result_str,"%ld",(long)*vars->val.integer);*/
 				snprintf(result_str,MAX_STRING_LEN-1,"%lu",(long)*vars->val.integer);
+			}
+			else if(vars->type == ASN_COUNTER64)
+			{
+				*result=((long)*vars->val.counter64.high<<32)+(long)*vars->val.counter64.low;
 			}
 			else if(vars->type == ASN_INTEGER
 #define ASN_FLOAT           (ASN_APPLICATION | 8)
