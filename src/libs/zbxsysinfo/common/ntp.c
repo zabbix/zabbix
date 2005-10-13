@@ -6,6 +6,10 @@
 #include <time.h>
 #include <stdio.h>
 
+#ifdef HAVE_SYS_TIME
+	#include <sys/time.h>
+#endif
+
 #include "common.h"
 #include "sysinfo.h"
 
