@@ -214,7 +214,7 @@ int	check_ntp(char *host, int port, int *value_int)
 {
 	int	s;
 	int	len;
-	char	c[MAX_STRING_LEN];
+	unsigned char	c[MAX_STRING_LEN];
 	char	*e;
 
 	struct hostent *hp;

@@ -167,16 +167,17 @@ static int	get_value(char *server,int port,char *key,char *value)
 
 	snprintf(tosend,sizeof(tosend)-1,"%s\n",key);
 
-	if( sendto(s,tosend,strlen(tosend),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
+	if(write(s,tosend,strlen(tosend)) == -1)
+/*	if( sendto(s,tosend,strlen(tosend),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )*/
 	{
 		fprintf(stderr, "Error: %s\n", strerror(errno));
 		close(s);
 		return	FAIL;
 	} 
-	i=sizeof(struct sockaddr_in);
-/*	i=recvfrom(s,result,1023,0,(struct sockaddr *)&servaddr_in,(size_t *)&i);*/
-	i=recvfrom(s,value,1023,0,(struct sockaddr *)&servaddr_in,(socklen_t *)&i);
-	if(s==-1)
+/*	i=sizeof(struct sockaddr_in);
+	i=recvfrom(s,value,1023,0,(struct sockaddr *)&servaddr_in,(socklen_t *)&i);*/
+	i=read(s,value, MAX_STRING_LEN-1);
+	if(i==-1)
 	{
 		fprintf(stderr, "Error: %s\n", strerror(errno));
 		close(s);

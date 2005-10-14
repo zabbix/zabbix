@@ -1,6 +1,7 @@
 Changes for 1.1beta3:
 
- - Japanese translation. Thanks to Kodai Terashima. (Alexei):
+ - fixed compilation warnings under HP-UX 11.00 (Alexei)
+ - Japanese translation. Thanks to Kodai Terashima. (Alexei)
  - added processing of SNMP counter64 (Alexei)
 
 Changes for 1.1beta2:

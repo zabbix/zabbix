@@ -502,9 +502,9 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *filename, char **value)
 
 /* Convert MD5 hash to text form */
 	for(i=0;i<MD5_DIGEST_SIZE;i++)
-		sprintf(&hashText[i<<1],"%02x",hash[i]);
+		sprintf((char *)&hashText[i<<1],"%02x",hash[i]);
 
-	*value=strdup(hashText);
+	*value=strdup((char *)hashText);
 
 	return SYSINFO_RET_OK;
 }
