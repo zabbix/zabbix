@@ -387,9 +387,9 @@ int	send_value(char *server,int port,char *host, char *key,char *value, char *la
 		close(s);
 		return	FAIL;
 	} 
-	i=sizeof(struct sockaddr_in);
-/*	i=recvfrom(s,result,1023,0,(struct sockaddr *)&servaddr_in,(size_t *)&i);*/
-	i=recvfrom(s,result,1023,0,(struct sockaddr *)&servaddr_in,(socklen_t *)&i);
+/*	i=sizeof(struct sockaddr_in);
+	i=recvfrom(s,result,1023,0,(struct sockaddr *)&servaddr_in,(socklen_t *)&i);*/
+	i = read(s,result,MAX_STRING_LEN-1);
 	if(s==-1)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Error in recvfrom() [%s:%d] [%s]",server,port, strerror(errno));
