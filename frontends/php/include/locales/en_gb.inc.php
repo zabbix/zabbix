@@ -771,6 +771,7 @@
 	"S_LATVIAN_LV"=>			"Latvian (LV)",
 	"S_RUSSIAN_RU"=>			"Russian (RU)",
 	"S_SPANISH_SP"=>			"Spanish (SP)",
+	"S_JAPANESE_JP"=>			"Japanese (JP)",
 
 //	index.php
 	"S_ZABBIX_BIG"=>			"ZABBIX",

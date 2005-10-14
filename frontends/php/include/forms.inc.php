@@ -209,7 +209,8 @@
 					"it_it"=>S_ITALIAN_IT,
 					"lv_lv"=>S_LATVIAN_LV,
 					"ru_ru"=>S_RUSSIAN_RU,
-					"sp_sp"=>S_SPANISH_SP
+					"sp_sp"=>S_SPANISH_SP,
+					"ja_jp"=>S_JAPANESE_JP
 				);
 
 		show_table2_v_delimiter($col++);
