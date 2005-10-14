@@ -110,18 +110,19 @@ static int send_value(char *server,int port,char *hostname, char *key,char *valu
 /*	snprintf(tosend,sizeof(tosend)-1,"%s:%s\n",shortname,value);
 	snprintf(tosend,sizeof(tosend)-1,"<req><host>%s</host><key>%s</key><data>%s</data></req>",hostname_b64,key_b64,value_b64); */
 
-	if( sendto(s,tosend,strlen(tosend),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
+	if(write(s, tosend,strlen(tosend)) == -1)
+/*	if( sendto(s,tosend,strlen(tosend),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )*/
 	{
-		perror("sendto");
+		perror("write");
 		close(s);
 		return	FAIL;
 	} 
 	i=sizeof(struct sockaddr_in);
-/*	i=recvfrom(s,result,1023,0,(struct sockaddr *)&servaddr_in,(size_t *)&i);*/
-	i=recvfrom(s,result,MAX_STRING_LEN-1,0,(struct sockaddr *)&servaddr_in,(socklen_t *)&i);
-	if(s==-1)
+/*	i=recvfrom(s,result,MAX_STRING_LEN-1,0,(struct sockaddr *)&servaddr_in,(socklen_t *)&i);*/
+	i=read(s,result,MAX_STRING_LEN-1);
+	if(i==-1)
 	{
-		perror("recfrom");
+		perror("read");
 		close(s);
 		return	FAIL;
 	}
