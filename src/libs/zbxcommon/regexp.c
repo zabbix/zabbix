@@ -37,7 +37,7 @@ char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
 		return(NULL);
 	}
 
-	c=string+match.rm_so;
+	c=(char *)string+match.rm_so;
 	*len=match.rm_eo - match.rm_so;
 	
 	regfree(&re);
