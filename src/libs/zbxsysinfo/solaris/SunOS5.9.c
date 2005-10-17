@@ -1044,6 +1044,9 @@ static int	FREEMEM(const char *cmd, const char *parameter,double  *value)
 	return SYSINFO_RET_OK;
 }
 
+/*
+ * ADDED
+ * 
 static int KERNEL_MAXPROC(const char *cmd, const char *parameter,double  *value)
 {
   int result = SYSINFO_RET_FAIL;
@@ -1075,6 +1078,7 @@ static int KERNEL_MAXPROC(const char *cmd, const char *parameter,double  *value)
 
   return result;
 }
+*/
 
 static int UPTIME(const char *cmd, const char *parameter,double  *value)
    {
@@ -1242,6 +1246,9 @@ int SWAPTOTAL(const char *cmd, const char *parameter,double  *value)
    return result;
 }
 
+/*
+ * ADDED
+ * 
 static int SWAPIN(const char *cmd, const char *parameter,double  *value)
 {
   kstat_ctl_t *kc;
@@ -1276,7 +1283,11 @@ static int SWAPIN(const char *cmd, const char *parameter,double  *value)
 
   return ((cpu_count > 0) ? SYSINFO_RET_OK : SYSINFO_RET_FAIL);
 }
+*/
 
+/*
+ * ADDED
+ * 
 static int SWAPOUT(const char *cmd, const char *parameter,double  *value)
 {
   kstat_ctl_t *kc;
@@ -1311,7 +1322,7 @@ static int SWAPOUT(const char *cmd, const char *parameter,double  *value)
 
   return ((cpu_count > 0) ? SYSINFO_RET_OK : SYSINFO_RET_FAIL);
 }
-
+*/
 
 static int PROCCOUNT(const char *cmd, const char *parameter,double  *value)
    {
@@ -1343,6 +1354,9 @@ static int PROCCOUNT(const char *cmd, const char *parameter,double  *value)
 	return result;
    }
 
+/*
+ * ADDED
+ * 
 static int PROCRUNNING(const char *cmd, const char *parameter,double  *value)
 {
 	DIR	*dir;
@@ -1351,7 +1365,8 @@ static int PROCRUNNING(const char *cmd, const char *parameter,double  *value)
 	char	filename[MAX_STRING_LEN];
 
 	int	fd;
-/* In the correct procfs.h, the structure name is psinfo_t */
+// In the correct procfs.h, the structure name is psinfo_t
+
 	psinfo_t psinfo;
 
 	int	proccount=0;
@@ -1371,16 +1386,16 @@ static int PROCRUNNING(const char *cmd, const char *parameter,double  *value)
 		if(stat(filename,&buf)==0)
 		{
 			fd = open (filename, O_RDONLY);
-			if (fd != -1)
+			if(fd != -1)
 			{
-				if (read (fd, &psinfo, sizeof(psinfo)) == -1)
+				if(read (fd, &psinfo, sizeof(psinfo)) == -1)
 				{
 					closedir(dir);
 					return SYSINFO_RET_FAIL;
 				}
 				else
 				{
-				   if (psinfo.pr_lwp.pr_state == SRUN)
+					if(psinfo.pr_lwp.pr_state == SRUN)
 					{
 						proccount++;
 					}
@@ -1397,7 +1412,11 @@ static int PROCRUNNING(const char *cmd, const char *parameter,double  *value)
 	*value=(double)proccount;
 	return	SYSINFO_RET_OK;
 }
+*/
 
+/*
+ * ADDED
+ * 
 static int CSWITCHES(const char *cmd, const char *parameter,double  *value)
 {
   kstat_ctl_t *kc;
@@ -1432,6 +1451,7 @@ static int CSWITCHES(const char *cmd, const char *parameter,double  *value)
 
   return ((cpu_count > 0) ? SYSINFO_RET_OK : SYSINFO_RET_FAIL);
 }
+*/
 
 static int TCP_LISTEN(const char *cmd, const char *parameter,double  *value)
 {
@@ -1444,6 +1464,9 @@ static int TCP_LISTEN(const char *cmd, const char *parameter,double  *value)
   return EXECUTE(NULL, command, value);
 }
 
+/* 
+ * ADDED
+ * 
 static int INTERRUPTS(const char *cmd, const char *parameter,double  *value)
 {
   kstat_ctl_t *kc;
@@ -1478,7 +1501,11 @@ static int INTERRUPTS(const char *cmd, const char *parameter,double  *value)
 
   return ((cpu_count > 0) ? SYSINFO_RET_OK : SYSINFO_RET_FAIL);
 }
+*/
 
+/* 
+ * ALREADY ADDED
+ * 
 #ifdef HAVE_LDAP
 static int check_ldap(char *hostname, short port,int *value)
 {
@@ -1536,6 +1563,7 @@ static int check_ldap(char *hostname, short port,int *value)
 	return	SYSINFO_RET_OK;
 }
 #endif
+*/
 
 COMMAND agent_commands[]=
 /*      KEY             FUNCTION (if double) FUNCTION (if string) PARAM*/
