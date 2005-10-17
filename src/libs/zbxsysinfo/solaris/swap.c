@@ -268,3 +268,120 @@ int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *parameter,double  *value)
 #endif
 #endif
 }
+
+#define	DO_SWP_IN	1
+#define DO_PG_IN	2
+#define	DO_SWP_OUT	3
+#define DO_PG_OUT	4
+
+static int	SYSTEM_SWAP(const char *cmd, const char *param, double *value)
+{
+    kstat_ctl_t	    *kc;
+    kstat_t	    *k;
+    cpu_stat_t	    *cpu;
+    
+    int	    cpu_count = 0;
+    double  swapin= 0.0;
+    
+    int	    do_info;
+    char    swp_info[MAX_STRING_LEN];
+    
+    if(num_param(param) > 1)
+    {
+        return SYSINFO_RET_FAIL;
+    }
+
+    if(get_param(param, 1, swp_info, MAX_STRING_LEN) != 0)
+    {
+        return SYSINFO_RET_FAIL;
+    }
+    
+    if(strcmp(swp_info,"swapin") == 0)
+    {
+        do_info = DO_SWP_IN;
+    }
+    else if(strcmp(swp_info,"pgswapin") == 0)
+    {
+        do_info = DO_PG_IN;
+    }
+    else if(strcmp(swp_info,"swapout") == 0)
+    {
+        do_info = DO_SWP_OUT;
+    }
+    else if(strcmp(swp_info,"pgswapout") == 0)
+    {
+        do_info = DO_PG_OUT;
+    }
+    else
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    
+    kc = kstat_open();
+
+    if(kc != NULL)
+    {    
+	k = kc->kc_chain;
+  	while (k != NULL)
+	{
+	    if( (strncmp(k->ks_name, "cpu_stat", 8) == 0) &&
+		(kstat_read(kc, k, NULL) != -1) )
+	    {
+		cpu = (cpu_stat_t*) k->ks_data;
+		if(do_info ==  DO_SWP_IN)
+		{
+		   /* uint_t   swapin;	    	// swapins */
+		   swapin += (double) cpu->cpu_vminfo.swapin;
+		}
+		else if(do_info ==  DO_PG_IN)
+		{
+		   /* uint_t   pgswapin;	// pages swapped in */
+		   swapin += (double) cpu->cpu_vminfo.pgswapin;
+		}
+		else if(do_info ==  DO_SWP_OUT)
+		{
+		   /* uint_t   swapout;	    	// swapout */
+		   swapin += (double) cpu->cpu_vminfo.swapin;
+		}
+		else if(do_info ==  DO_PG_OUT)
+		{
+		   /* uint_t   pgswapout;	// pages swapped out */
+		   swapin += (double) cpu->cpu_vminfo.swapin;
+		}
+		cpu_count += 1;
+  	    }
+	    k = k->ks_next;
+        }
+	kstat_close(kc);
+    }
+
+    *value = swapin;
+    
+    if(cpu_count == 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    return SYSINFO_RET_OK;
+}
+
+int	SYSTEM_SWAP_IN_NUM(const char *cmd, const char *param, double *value)
+{
+	return SYSTEM_SWAP(cmd, "swapin", value);
+}
+
+int	SYSTEM_SWAP_IN_PAGES(const char *cmd, const char *param, double *value)
+{
+	return SYSTEM_SWAP(cmd, "pgswapin", value);
+}
+
+int	SYSTEM_SWAP_OUT_NUM(const char *cmd, const char *param, double *value)
+{
+	return SYSTEM_SWAP(cmd, "swapout", value);
+}
+
+int	SYSTEM_SWAP_OUT_PAGES(const char *cmd, const char *param, double *value)
+{
+	return SYSTEM_SWAP(cmd, "pgswapout", value);
+}
+

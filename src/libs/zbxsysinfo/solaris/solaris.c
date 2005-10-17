@@ -66,6 +66,7 @@ int	VFS_FS_INODE_TOTAL(const char *cmd, const char *mountPoint,double  *value);
 
 int	KERNEL_MAXFILES(const char *cmd, const char *parameter,double  *value);
 int	KERNEL_MAXPROC(const char *cmd, const char *parameter,double  *value);
+int	SYSTEM_KERNEL_MAXPROC(const char *cmd, const char *parameter, double  *value);
 
 int	NET_IF_IBYTES1(const char *cmd, const char *parameter,double  *value);
 int	NET_IF_IBYTES5(const char *cmd, const char *parameter,double  *value);
@@ -90,16 +91,27 @@ int	DISKWRITEBLKS15(const char *cmd, const char *parameter,double  *value);
 int	AGENT_PING(const char *cmd, const char *parameter,double  *value);
 int	VM_MEMORY_SHARED(const char *cmd, const char *parameter,double  *value);
 int	VM_MEMORY_TOTAL(const char *cmd, const char *parameter,double  *value);
+
 int	PROC_NUM(const char *cmd, const char *parameter,double  *value);
+int	PROC_MEMORY(const char *cmd, const char *param, double  *value);
+
 int	PROCCOUNT(const char *cmd, const char *parameter,double  *value);
 
 int	SYSTEM_CPU_LOAD1(const char *cmd, const char *parameter,double  *value);
 int	SYSTEM_CPU_LOAD5(const char *cmd, const char *parameter,double  *value);
 int	SYSTEM_CPU_LOAD15(const char *cmd, const char *parameter,double  *value);
+int	SYSTEM_CPU_INTR(const char *cmd, const char *parameter, double *value);
+int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *parameter, double *value);
 
 int	SENSOR_TEMP1(const char *cmd, const char *parameter,double  *value);
 int	SENSOR_TEMP2(const char *cmd, const char *parameter,double  *value);
 int	SENSOR_TEMP3(const char *cmd, const char *parameter,double  *value);
+
+
+int	SYSTEM_SWAP_IN_NUM(const char *cmd, const char *param, double *value);
+int	SYSTEM_SWAP_IN_PAGES(const char *cmd, const char *param, double *value);
+int	SYSTEM_SWAP_OUT_NUM(const char *cmd, const char *param, double *value);
+int	SYSTEM_SWAP_OUT_PAGES(const char *cmd, const char *param, double *value);
 
 int	SYSTEM_UPTIME(const char *cmd, const char *parameter,double  *value);
 
@@ -148,7 +160,7 @@ COMMAND	parameters_specific[]=
 	{"inodetotal[*]"	,VFS_FS_INODE_TOTAL,	0, "/"},
 	{"inodefree_perc[*]"	,VFS_FS_INODE_PFREE,	0, "/"},
 	{"kern[maxfiles]"	,KERNEL_MAXFILES,	0, 0},
-	{"kern[maxproc]"	,KERNEL_MAXPROC, 	0, 0},
+	{"kern[maxproc]"	,SYSTEM_KERNEL_MAXPROC, 0, 0},
 	{"md5sum[*]"		,0, 			VFS_FILE_MD5SUM, "/etc/services"},
 	{"memory[buffers]"	,VM_MEMORY_BUFFERS,	0, 0},
 	{"memory[cached]"	,VM_MEMORY_CACHED, 	0, 0},
@@ -173,15 +185,18 @@ COMMAND	parameters_specific[]=
 	{"system[uptime]"	,SYSTEM_UPTIME,	0, 0},
 	{"system[users]"	,EXECUTE, 	0,"who|wc -l"},
 	{"version[zabbix_agent]",	0, 		AGENT_VERSION, 0},
+	{"system[interrupts]"	,SYSTEM_CPU_INTR,	0, 0},
+	{"system[switches]"	,SYSTEM_CPU_SWITCHES,	0, 0},
 /* New naming  */
 
 	{"agent.ping"		,AGENT_PING, 		0, 0},
 	{"agent.version",		0, 		AGENT_VERSION, 0},
 
 	{"kernel.maxfiles]"	,KERNEL_MAXFILES,	0, 0},
-	{"kernel.maxproc"	,KERNEL_MAXPROC, 	0, 0},
+	{"kernel.maxproc"	,SYSTEM_KERNEL_MAXPROC, 0, 0},
 
-	{"proc.num[*]"		,PROC_NUM, 		0, "inetd"},
+	{"proc.num[*]"		,PROC_NUM, 	        0, "inetd"},
+	{"proc.mem[*]"		,PROC_MEMORY, 	    0, "inetd"},
 
 	{"vm.memory.total"	,VM_MEMORY_TOTAL,	0, 0},
 	{"vm.memory.shared"	,VM_MEMORY_SHARED,	0, 0},
@@ -258,6 +273,12 @@ COMMAND	parameters_specific[]=
 
 	{"system.swap.free"	,SYSTEM_SWAP_FREE,	0, 0},
 	{"system.swap.total"	,SYSTEM_SWAP_TOTAL, 	0, 0},
+        {"swap[in]"             ,SYSTEM_SWAP_IN_NUM,    0, 0},
+        {"system.swap.in.num"   ,SYSTEM_SWAP_IN_NUM,    0, 0},
+        {"system.swap.in.pages" ,SYSTEM_SWAP_IN_PAGES,  0, 0},
+        {"swap[out]"            ,SYSTEM_SWAP_OUT_NUM,   0, 0},
+        {"system.swap.out.num"  ,SYSTEM_SWAP_OUT_NUM,   0, 0},
+        {"system.swap.out.pages",SYSTEM_SWAP_OUT_PAGES, 0, 0},
 
 	{"system.uname"		,0,			EXECUTE_STR, "uname -a"},
 	{"system.uptime"	,SYSTEM_UPTIME,		0, 0},
@@ -268,10 +289,12 @@ COMMAND	parameters_specific[]=
 
   	{"swap[in]"		,EXECUTE, 0, "vmstat -n 1 2|tail -1|cut -b37-40"},
 	{"swap[out]"		,EXECUTE, 0, "vmstat -n 1 2|tail -1|cut -b41-44"},
-
-	{"system[interrupts]"	,EXECUTE, 0, "vmstat -n 1 2|tail -1|cut -b57-61"},
+	{"system[interrupts]"   ,EXECUTE, 0, "vmstat -n 1 2|tail -1|cut -b57-61"},
 	{"system[switches]"	,EXECUTE, 0, "vmstat -n 1 2|tail -1|cut -b62-67"},
 ***************************************/
+
+	{"system.cpu.switches"	,SYSTEM_CPU_SWITCHES,	0, 0},
+	{"system.cpu.intr"	,SYSTEM_CPU_INTR,	0, 0},
 
 	{"io[disk_io]"		,DISK_IO,  	0, 0},
 	{"io[disk_rio]"		,DISK_RIO, 	0, 0},
@@ -283,10 +306,12 @@ COMMAND	parameters_specific[]=
 
 	{"system[proccount]"	,PROCCOUNT, 	0, 0},
 
-#ifdef HAVE_PROC_LOADAVG
-	{"system[procrunning]"	,EXECUTE, 	0, "cat /proc/loadavg|cut -f1 -d'/'|cut -f4 -d' '"},
-#endif
 
+ #ifdef HAVE_PROC_LOADAVG
+    {"system[procrunning]"	,EXECUTE, 	0, "cat /proc/loadavg|cut -f1 -d'/'|cut -f4 -d' '"},
+ #endif
+ 
+	    
 /*	{"tcp_count"		,EXECUTE, 	0, "netstat -tn|grep EST|wc -l"}, */
 
 	{"net[listen_23]"	,TCP_LISTEN, 	0, "0017"},
