@@ -1,5 +1,7 @@
 #!/bin/sh
 
+clear
+
 aclocal
 autoconf
 autoheader
