@@ -78,7 +78,6 @@
 #ifdef HAVE_SYS_MOUNT_H
 	#include <sys/mount.h>
 #endif
-
 /* HP-UX */
 #ifdef HAVE_SYS_PSTAT_H
 	#include <sys/pstat.h>
@@ -366,6 +365,160 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *parameter,double  *value)
 #endif
 #endif
 #endif
+}
+	       
+int	SYSTEM_CPU_SWAPIN(const char *cmd, const char *parameter, double *value)
+{
+    kstat_ctl_t	    *kc;
+    kstat_t	    *k;
+    cpu_stat_t	    *cpu;
+    
+    int	    cpu_count = 0;
+    double  swapin= 0.0;
+    
+    kc = kstat_open();
+
+    if(kc != NULL)
+    {    
+	k = kc->kc_chain;
+  	while (k != NULL)
+	{
+	    if( (strncmp(k->ks_name, "cpu_stat", 8) == 0) &&
+		(kstat_read(kc, k, NULL) != -1) )
+	    {
+		cpu = (cpu_stat_t*) k->ks_data;
+		/* uint_t   swapin;	    // swapins */
+		swapin += (double) cpu->cpu_vminfo.swapin;
+		cpu_count += 1;
+  	    }
+	    k = k->ks_next;
+        }
+	kstat_close(kc);
+    }
+
+    *value = swapin;
+    
+    if(cpu_count == 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    return SYSINFO_RET_OK;
+}
+
+int	SYSTEM_CPU_SWAPOUT(const char *cmd, const char *parameter, double *value)
+{
+    kstat_ctl_t	    *kc;
+    kstat_t	    *k;
+    cpu_stat_t	    *cpu;
+    
+    int	    cpu_count = 0;
+    double  swapout = 0.0;
+    
+    kc = kstat_open();
+
+    if(kc != NULL)
+    {    
+	k = kc->kc_chain;
+  	while (k != NULL)
+	{
+	    if( (strncmp(k->ks_name, "cpu_stat", 8) == 0) &&
+		(kstat_read(kc, k, NULL) != -1) )
+	    {
+		cpu = (cpu_stat_t*) k->ks_data;
+		/* uint_t   swapout;	    // swapouts */
+		swapout +=  (double) cpu->cpu_vminfo.swapout;
+		cpu_count += 1;
+  	    }
+	    k = k->ks_next;
+        }
+	kstat_close(kc);
+    }
+
+    *value = swapout;
+    
+    if(cpu_count == 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    return SYSINFO_RET_OK;
+}
+
+int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *parameter, double *value)
+{
+    kstat_ctl_t	    *kc;
+    kstat_t	    *k;
+    cpu_stat_t	    *cpu;
+    
+    int	    cpu_count = 0;
+    double  swt_count = 0.0;
+    
+    kc = kstat_open();
+
+    if(kc != NULL)
+    {    
+	k = kc->kc_chain;
+  	while (k != NULL)
+	{
+	    if( (strncmp(k->ks_name, "cpu_stat", 8) == 0) &&
+		(kstat_read(kc, k, NULL) != -1) )
+	    {
+		cpu = (cpu_stat_t*) k->ks_data;
+		swt_count += (double) cpu->cpu_sysinfo.pswitch;
+		cpu_count += 1;
+  	    }
+	    k = k->ks_next;
+        }
+	kstat_close(kc);
+    }
+
+    *value = swt_count;
+    
+    if(cpu_count == 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    return SYSINFO_RET_OK;
+}
+
+int	SYSTEM_CPU_INTR(const char *cmd, const char *parameter, double *value)
+{
+    kstat_ctl_t	    *kc;
+    kstat_t	    *k;
+    cpu_stat_t	    *cpu;
+    
+    int	    cpu_count = 0;
+    double  intr_count = 0.0;
+    
+    kc = kstat_open();
+
+    if(kc != NULL)
+    {    
+	k = kc->kc_chain;
+  	while (k != NULL)
+	{
+	    if( (strncmp(k->ks_name, "cpu_stat", 8) == 0) &&
+		(kstat_read(kc, k, NULL) != -1) )
+	    {
+		cpu = (cpu_stat_t*) k->ks_data;
+		intr_count += (double) cpu->cpu_sysinfo.intr;
+		cpu_count += 1;
+  	    }
+	    k = k->ks_next;
+        }
+	kstat_close(kc);
+    }
+
+    *value = intr_count;
+    
+    if(cpu_count == 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    
+    return SYSINFO_RET_OK;
 }
 
 int	SYSTEM_CPU_LOAD15(const char *cmd, const char *parameter,double  *value)

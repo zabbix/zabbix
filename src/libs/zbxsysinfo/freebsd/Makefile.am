@@ -1,6 +1,6 @@
 SUBDIRS=
 
-libzbxsysinfo2_a_SOURCES=freebsd.c cpu.c diskio.c diskspace.c inodes.c memory.c sensors.c swap.c uptime.c
+libzbxsysinfo2_a_SOURCES=freebsd.c cpu.c diskio.c diskspace.c inodes.c memory.c proc.c sensors.c swap.c uptime.c
 
 lib_LIBRARIES=libzbxsysinfo2.a
 libzbxsysinfo2_a_LIBADD = ../../zbxcommon/libzbxcommon.a ../../zbxcrypto/libzbxcrypto.a
