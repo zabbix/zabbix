@@ -1,5 +1,14 @@
 Changes for 1.1beta3:
 
+ - improved support of proc.num[<process>,<user name>,<all|run|sleep|zomb>] (Eugene)
+ - improved support of proc.mem[<process>,<user name>,<max|min|sum|avg>] (Eugene)
+ - added support of system.swap.in.num (Eugene)
+ - added support of system.swap.in.pages (Eugene)
+ - added support of system.swap.out.in (Eugene)
+ - added support of system.swap.out.pages (Eugene)
+ - added support of system.cpu.intr (Eugene)
+ - added support of system.cpu.switches (Eugene)
+ - added support of kernel.max.proc (Eugene)
  - fixed compilation warnings under HP-UX 11.00 (Alexei)
  - Japanese translation. Thanks to Kodai Terashima. (Alexei)
  - added processing of SNMP counter64 (Alexei)
