@@ -20,5 +20,7 @@ automake
 #rm -f zabbix.tgz
 #tar cvzf zabbix.tgz zabbix
 #exit
-./configure --enable-agent --enable-server --with-mysql --prefix=`pwd`
-make install
+echo Making...
+./configure --enable-agent --enable-server --with-mysql --prefix=`pwd` 2>WARNINGS >/dev/null
+echo Installing...
+make install >/dev/null
