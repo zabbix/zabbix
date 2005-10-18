@@ -58,9 +58,6 @@
 	#include <sys/statvfs.h>
 #endif
 
-#ifdef HAVE_SYS_PROC_H
-#   include <sys/proc.h>
-#endif
 /* Solaris */
 #ifdef HAVE_SYS_PROCFS_H
 /* This is needed to access the correct procfs.h definitions */
@@ -122,6 +119,9 @@
 /* FreeBSD */
 #ifdef HAVE_SYS_TIME_H
 	#include <sys/time.h>
+#endif
+#ifdef HAVE_SYS_PROC_H
+	#include <sys/proc.h>
 #endif
 
 #ifdef HAVE_MACH_HOST_INFO_H
