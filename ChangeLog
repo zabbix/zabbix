@@ -1,5 +1,6 @@
 Changes for 1.1beta3:
 
+ - fixed processing of SNMP counter64 objects (ALexei)
  - improved support of proc.num[<process>,<user name>,<all|run|sleep|zomb>] (Eugene)
  - improved support of proc.mem[<process>,<user name>,<max|min|sum|avg>] (Eugene)
  - added support of system.swap.in.num (Eugene)
