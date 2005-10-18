@@ -30,9 +30,9 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item,char *error, in
 	struct snmp_pdu *pdu;
 	struct snmp_pdu *response;
 
-	#ifdef NEW_APPROACH
+#ifdef NEW_APPROACH
 	char temp[MAX_STRING_LEN];
-	#endif
+#endif
 
 	oid anOID[MAX_OID_LEN];
 	size_t anOID_len = MAX_OID_LEN;
@@ -213,7 +213,7 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item,char *error, in
 			}
 			else if(vars->type == ASN_COUNTER64)
 			{
-				*result=((long)*vars->val.counter64.high<<32)+(long)*vars->val.counter64.low;
+				*result=((long)(vars->val.counter64->high)<<32)+(long)(vars->val.counter64->low);
 			}
 			else if(vars->type == ASN_INTEGER
 #define ASN_FLOAT           (ASN_APPLICATION | 8)
@@ -281,7 +281,7 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item,char *error, in
 	{
 		if (status == STAT_SUCCESS)
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Error in packet\nReason: %s\n",
+			zabbix_log( LOG_LEVEL_WARNING, "SNMP error in packet. Reason: %s\n",
 				snmp_errstring(response->errstat));
 			if(response->errstat == SNMP_ERR_NOSUCHNAME)
 			{
@@ -299,15 +299,15 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item,char *error, in
 			zabbix_log( LOG_LEVEL_WARNING, "Timeout while connecting to [%s]",
 					session.peername);
 			snprintf(error,max_error_len-1,"Timeout while connecting to [%s]",session.peername);
-			snmp_sess_perror("snmpget", ss);
+/*			snmp_sess_perror("snmpget", ss);*/
 			ret = NETWORK_ERROR;
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Error [%d]",
+			zabbix_log( LOG_LEVEL_WARNING, "SNMP error [%d]",
 					status);
 			snprintf(error,max_error_len-1,"SNMP error [%d]",status);
-			snmp_sess_perror("snmpget", ss);
+/*			snmp_sess_perror("snmpget", ss);*/
 			ret=FAIL;
 		}
 	}
