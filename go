@@ -23,6 +23,6 @@ automake
 #tar cvzf zabbix.tgz zabbix
 #exit
 echo Making...
-./configure --enable-agent --enable-server --with-mysql --prefix=`pwd` 2>WARNINGS >/dev/null
+./configure --enable-agent --enable-server --with-mysql --with-net-snmp --prefix=`pwd` 2>WARNINGS >/dev/null
 echo Installing...
 make install >/dev/null
