@@ -28,9 +28,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#ifdef HAVE_SYS_PARAM_H
-	#include <sys/param.h>
-#endif
 
 #ifdef HAVE_PWD_H
 #	include <pwd.h>
@@ -118,6 +115,9 @@
 /* FreeBSD */
 #ifdef HAVE_SYS_VMMETER_H
 	#include <sys/vmmeter.h>
+#endif
+#ifdef HAVE_SYS_PARAM_H
+	#include <sys/param.h>
 #endif
 /* FreeBSD */
 #ifdef HAVE_SYS_TIME_H
