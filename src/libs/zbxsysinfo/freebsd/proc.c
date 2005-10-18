@@ -28,6 +28,10 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#ifdef HAVE_SYS_PARAM_H
+	#include <sys/param.h>
+#endif
+
 #ifdef HAVE_PWD_H
 #	include <pwd.h>
 #endif
@@ -79,10 +83,6 @@
 	#include <arpa/inet.h>
 #endif
 /* OpenBSD/Solaris */
-#ifdef HAVE_SYS_PARAM_H
-	#include <sys/param.h>
-#endif
-
 #ifdef HAVE_SYS_MOUNT_H
 	#include <sys/mount.h>
 #endif
