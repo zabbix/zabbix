@@ -47,6 +47,9 @@
 #include "common.h"
 #include "sysinfo.h"
 
+/*
+ * ADDED to /solaric/diskio.c
+ *   
 typedef struct busy_data
 {
   hrtime_t clock;
@@ -95,7 +98,11 @@ typedef struct disk_data
   RBLOCKS_DATA rblocks;
   WBLOCKS_DATA wblocks;
  } DISK_DATA;
+*/
 
+/*
+ * ADDED to /solaric/net.c
+ *   
 typedef union value_overlay
 {
   union 
@@ -139,9 +146,13 @@ typedef struct network_data
   OPACKETS_DATA op;
 } NETWORK_DATA;
 
-static DISK_DATA *disks;
-
 static NETWORK_DATA *interfaces;
+*/
+
+/*
+ * ADDED to /solaric/diskio.c
+ *   
+static DISK_DATA *disks;
 
 static DISK_DATA *get_disk_data_record(const char *device)
 {
@@ -178,7 +189,11 @@ static DISK_DATA *get_disk_data_record(const char *device)
 
   return p;
 }
+*/
 
+/*
+ * ADDED to /solaric/net.c
+ *   
 static NETWORK_DATA *get_net_data_record(const char *device)
 {
   NETWORK_DATA *p;
@@ -214,7 +229,11 @@ static NETWORK_DATA *get_net_data_record(const char *device)
 
   return p;
 }
+*/
 
+/*
+ * SKIPPED
+ *
 static int  PROCCNT(const char *cmd, const char *procname,double  *value)
 {
 	DIR	*dir;
@@ -223,7 +242,7 @@ static int  PROCCNT(const char *cmd, const char *procname,double  *value)
 	char	filename[MAX_STRING_LEN];
 
 	int	fd;
-/* In the correct procfs.h, the structure name is psinfo_t */
+// In the correct procfs.h, the structure name is psinfo_t 
 	psinfo_t psinfo;
 
 	int	proccount=0;
@@ -269,7 +288,11 @@ static int  PROCCNT(const char *cmd, const char *procname,double  *value)
 	*value=(double)proccount;
 	return	SYSINFO_RET_OK;
 }
+*/
 
+/*
+ * ADDED to /solaric/diskio.c
+ *   
 static int get_disk_kstat_record(const char *name,
                                  hrtime_t *crtime,
                                  hrtime_t *snaptime, 
@@ -509,7 +532,11 @@ static int DISKSVC(const char *cmd, const char *device, double  *value)
 
    return result;
 }
+*/
 
+/*
+ * ADDED to /solaric/cpu.c
+ *   
 static int get_cpu_data(uint64_t *idle,
                         uint64_t *system,
                         uint64_t *user,
@@ -689,7 +716,11 @@ static int CPUIOWAIT(const char *cmd, const char *param,double  *value)
 
    return result;
 }
+*/
 
+/*
+ * ADDED to /solaric/net.c
+ *   
 static int get_named_field(const char *name, 
                            const char *field,
                            kstat_named_t *returned_data,
@@ -963,7 +994,11 @@ static int NETCOLLOUT(const char *cmd, const char *parameter,double  *value)
 
   return result;
 }
+*/
 
+/*
+ * ADDED
+ * 
 int	INODEFREE(const char *cmd, const char *mountPoint,double  *value)
 {
 	struct statvfs   s;
@@ -976,7 +1011,11 @@ int	INODEFREE(const char *cmd, const char *mountPoint,double  *value)
 	*value=s.f_favail;
 	return SYSINFO_RET_OK;
 }
+*/
 
+/*
+ * ADDED
+ * 
 int	INODETOTAL(const char *cmd, const char *mountPoint,double  *value)
 {
 	struct statvfs   s;
@@ -989,7 +1028,11 @@ int	INODETOTAL(const char *cmd, const char *mountPoint,double  *value)
 	*value=s.f_files;
 	return SYSINFO_RET_OK;
 }
+*/
 
+/*
+ * ADDED
+ * 
 int	DISKFREE(const char *cmd, const char *mountPoint,double  *value)
 {
 	struct statvfs   s;
@@ -999,11 +1042,15 @@ int	DISKFREE(const char *cmd, const char *mountPoint,double  *value)
 		return  SYSINFO_RET_FAIL;
 	}
 
-/*	return  s.f_bavail * (s.f_bsize / 1024.0);*/
+//	return  s.f_bavail * (s.f_bsize / 1024.0);
 	*value=s.f_bavail * (s.f_frsize / 1024.0);
 	return SYSINFO_RET_OK;
 }
+*/
 
+/*
+ * ADDED
+ * 
 int	DISKUSED(const char *cmd, const char *mountPoint,double  *value)
 {
 	struct statvfs   s;
@@ -1013,11 +1060,15 @@ int	DISKUSED(const char *cmd, const char *mountPoint,double  *value)
 		return  SYSINFO_RET_FAIL;
 	}
 
-/*	return  (s.f_blocks-s.f_bavail) * (s.f_bsize / 1024.0);*/
+//	return  (s.f_blocks-s.f_bavail) * (s.f_bsize / 1024.0);
 	*value=(s.f_blocks-s.f_bavail) * (s.f_frsize / 1024.0);
 	return SYSINFO_RET_OK;
 }
+*/
 
+/*
+ * ADDED
+ * 
 int	DISKTOTAL(const char *cmd, const char *mountPoint,double  *value)
 {
 	struct statvfs   s;
@@ -1027,22 +1078,31 @@ int	DISKTOTAL(const char *cmd, const char *mountPoint,double  *value)
 		return  SYSINFO_RET_FAIL;
 	}
 
-/*	return  s.f_blocks * (s.f_bsize / 1024.0);*/
+//	return  s.f_blocks * (s.f_bsize / 1024.0);
 	*value= s.f_blocks * (s.f_frsize / 1024.0);
 	return SYSINFO_RET_OK;
 }
+*/
 
+/*
+ * ADDED
+ * 
 static int	TOTALMEM(const char *cmd, const char *parameter,double  *value)
 {
 	*value=(double)sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGESIZE);
 	return SYSINFO_RET_OK;
 }
+*/
 
+/*
+ * ADDED
+ * 
 static int	FREEMEM(const char *cmd, const char *parameter,double  *value)
 {
 	*value=(double)sysconf(_SC_AVPHYS_PAGES)*sysconf(_SC_PAGESIZE);
 	return SYSINFO_RET_OK;
 }
+*/
 
 /*
  * ADDED
@@ -1080,6 +1140,9 @@ static int KERNEL_MAXPROC(const char *cmd, const char *parameter,double  *value)
 }
 */
 
+/*
+ * ADDED
+ * 
 static int UPTIME(const char *cmd, const char *parameter,double  *value)
    {
       int result = SYSINFO_RET_FAIL;
@@ -1112,7 +1175,11 @@ static int UPTIME(const char *cmd, const char *parameter,double  *value)
 
 	return result;
    }
+*/
 
+/*
+ * ADDED
+ * 
 static int	PROCLOAD(const char *cmd, const char *parameter,double  *value)
 {
 	double	load[3];
@@ -1127,7 +1194,11 @@ static int	PROCLOAD(const char *cmd, const char *parameter,double  *value)
 		return SYSINFO_RET_FAIL;	
 	}
 }
+*/
 
+/*
+ * ADDED
+ * 
 static int	PROCLOAD5(const char *cmd, const char *parameter,double  *value)
 {
 	double	load[3];
@@ -1142,7 +1213,11 @@ static int	PROCLOAD5(const char *cmd, const char *parameter,double  *value)
 		return SYSINFO_RET_FAIL;	
 	}
 }
+*/
 
+/*
+ * ADDED
+ * 
 static int	PROCLOAD15(const char *cmd, const char *parameter,double  *value)
 {
 	double	load[3];
@@ -1157,7 +1232,11 @@ static int	PROCLOAD15(const char *cmd, const char *parameter,double  *value)
 		return SYSINFO_RET_FAIL;	
 	}
 }
+*/
 
+/*
+ * ADDED
+ * 
 static int get_swap_data(uint64_t *resv,
                          uint64_t *avail,
                          uint64_t *free)
@@ -1245,6 +1324,7 @@ int SWAPTOTAL(const char *cmd, const char *parameter,double  *value)
 
    return result;
 }
+*/
 
 /*
  * ADDED
@@ -1324,6 +1404,9 @@ static int SWAPOUT(const char *cmd, const char *parameter,double  *value)
 }
 */
 
+/*
+ * SKIPPED
+ *
 static int PROCCOUNT(const char *cmd, const char *parameter,double  *value)
    {
       int result = SYSINFO_RET_FAIL;
@@ -1353,6 +1436,7 @@ static int PROCCOUNT(const char *cmd, const char *parameter,double  *value)
 
 	return result;
    }
+*/
 
 /*
  * ADDED
@@ -1453,6 +1537,9 @@ static int CSWITCHES(const char *cmd, const char *parameter,double  *value)
 }
 */
 
+/* 
+ * ADDED to /solaris/net.c
+ * 
 static int TCP_LISTEN(const char *cmd, const char *parameter,double  *value)
 {
   char command[MAX_STRING_LEN];
@@ -1463,6 +1550,7 @@ static int TCP_LISTEN(const char *cmd, const char *parameter,double  *value)
    
   return EXECUTE(NULL, command, value);
 }
+*/
 
 /* 
  * ADDED

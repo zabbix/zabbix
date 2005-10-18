@@ -137,14 +137,18 @@
 
 #include "md5.h"
 
+
+#if 1
+
 /* Solaris. */
+
 #ifndef HAVE_SYSINFO_FREESWAP
 #ifdef HAVE_SYS_SWAP_SWAPTABLE
 void get_swapinfo(double *total, double *fr)
 {
 	register int cnt, i, page_size;
 /* Support for >2Gb */
-/*	register int t, f;*/
+/*	register int t, f; */
 	double	t, f;
 	struct swaptable *swt;
 	struct swapent *ste;
@@ -166,7 +170,7 @@ void get_swapinfo(double *total, double *fr)
 	swt->swt_n = cnt;
 
 /* fill in ste_path pointers: we don't care about the paths, so we
-point them all to the same buffer */
+ point them all to the same buffer */
 	ste = &(swt->swt_ent[0]);
 	i = cnt;
 	while (--i >= 0)
@@ -236,6 +240,8 @@ int	SYSTEM_SWAP_FREE(const char *cmd, const char *parameter,double  *value)
 #endif
 }
 
+
+
 int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_SYSINFO_TOTALSWAP
@@ -268,6 +274,102 @@ int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *parameter,double  *value)
 #endif
 #endif
 }
+#endif
+
+#if 0
+static int get_swap_data(
+    uint64_t *resv,
+    uint64_t *avail,
+    uint64_t *free
+    )
+{
+  kstat_ctl_t	*kc;
+  kstat_t	*ksp;
+  vminfo_t	*vm;
+
+  uint64_t  oresv;
+  uint64_t  ofree;
+  uint64_t  oavail;
+
+  int	result = SYSINFO_RET_FAIL;
+  int	i;
+
+  kc = kstat_open();
+  if (kc)
+    {
+      ksp = kstat_lookup(kc, "unix", 0, "vminfo");
+      if ((ksp) && (kstat_read(kc, ksp, NULL) != -1))
+	{
+           vm = (vminfo_t *) ksp->ks_data;
+#if 0
+	   *resv = vm->swap_resv;
+           *free = vm->swap_free;
+           *avail = vm->swap_avail;
+                        
+           result = SYSINFO_RET_OK;
+#else
+           oresv = vm->swap_resv;
+           ofree = vm->swap_free;
+           oavail = vm->swap_avail;
+
+           for (i = 0; i < 12; i++)
+              {
+                 usleep(100000);
+                 if (kstat_read(kc, ksp, NULL) != -1)
+		   {
+                      vm = (vminfo_t *) ksp->ks_data;
+                      if ((oresv != vm->swap_resv) || (ofree != vm->swap_free) || (oavail != vm->swap_avail))
+	                 {  
+			    *resv = vm->swap_resv - oresv;
+                            *free = vm->swap_free - ofree;
+                            *avail = vm->swap_avail - oavail;
+                          
+                             result = SYSINFO_RET_OK;
+			     break;
+                         }
+		   }
+              }
+#endif
+        }
+      kstat_close(kc);
+    }
+  return result;
+}
+	  
+int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, double  *value)
+{
+  int      result;
+  uint64_t resv = 0;
+  uint64_t avail =0;
+  uint64_t free = 0;
+
+  result = get_swap_data(&resv, &avail, &free);
+
+  if (result == SYSINFO_RET_OK)
+    {
+      *value = free * sysconf(_SC_PAGESIZE);
+    }
+   return result;
+}
+
+int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, double  *value)
+{
+  int      result;
+  uint64_t resv = 0;
+  uint64_t avail =0;
+  uint64_t free = 0;
+  uint64_t swap_total_bytes = 0;
+
+  result = get_swap_data(&resv, &avail, &free);
+
+  if (result == SYSINFO_RET_OK)
+    {
+      swap_total_bytes = (resv + avail) * sysconf(_SC_PAGESIZE);
+      *value = (double) swap_total_bytes;
+    }
+   return result;
+}
+#endif 
 
 #define	DO_SWP_IN	1
 #define DO_PG_IN	2

@@ -135,6 +135,36 @@
 #include "common.h"
 #include "sysinfo.h"
 
+#if 1
+int	SYSTEM_UPTIME(const char *cmd, const char *param,double  *value)
+{
+    kstat_ctl_t   *kc;
+    kstat_t       *kp;
+    kstat_named_t *kn;
+
+    time_t now;
+    
+    int result = SYSINFO_RET_FAIL;
+
+    kc = kstat_open();
+
+    if (kc)
+    {
+	kp = kstat_lookup(kc, "unix", 0, "system_misc");
+        if ((kp) && (kstat_read(kc, kp, 0) != -1))
+	{
+	    kn = (kstat_named_t*) kstat_data_lookup(kp, "boot_time");
+            time(&now);
+	    *value=difftime(now, (time_t) kn->value.ul);
+            result = SYSINFO_RET_OK;
+        }
+	kstat_close(kc);
+    }
+    return result;
+}
+#endif
+
+#if 0
 int	SYSTEM_UPTIME(const char *cmd, const char *parameter,double  *value)
 {
 #ifdef HAVE_SYSINFO_UPTIME
@@ -215,3 +245,5 @@ int	SYSTEM_UPTIME(const char *cmd, const char *parameter,double  *value)
 #endif
 #endif
 }
+#endif
+
