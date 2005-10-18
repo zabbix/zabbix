@@ -1,5 +1,10 @@
 Changes for 1.1beta3:
 
+ - added support of system.cpu.util[<idle|user|kernel|wait>] (Eugene)
+ - added support of net.listen.tcp[portdec] (Eugene)
+ - changed system.uptime (Eugene)
+ - changed net[listen_80] (Eugene)
+ - changed net[listen_23] (Eugene)
  - fixed processing of SNMP counter64 objects (ALexei)
  - improved support of proc.num[<process>,<user name>,<all|run|sleep|zomb>] (Eugene)
  - improved support of proc.mem[<process>,<user name>,<max|min|sum|avg>] (Eugene)
