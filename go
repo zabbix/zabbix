@@ -2,6 +2,7 @@
 
 clear
 
+echo Pre-making...
 aclocal
 autoconf
 autoheader
