@@ -76,6 +76,10 @@ int	NET_IF_OBYTES1(const char *cmd, const char *parameter,double  *value);
 int	NET_IF_OBYTES5(const char *cmd, const char *parameter,double  *value);
 int	NET_IF_OBYTES15(const char *cmd, const char *parameter,double  *value);
 
+int	NET_TCP_LISTEN(const char *cmd, const char *parameter,double  *value);
+
+int	TCP_LISTEN(const char *cmd, const char *porthex,double  *value);
+
 int	DISKREADOPS1(const char *cmd, const char *parameter,double  *value);
 int	DISKREADOPS5(const char *cmd, const char *parameter,double  *value);
 int	DISKREADOPS15(const char *cmd, const char *parameter,double  *value);
@@ -88,6 +92,7 @@ int	DISKWRITEOPS15(const char *cmd, const char *parameter,double  *value);
 int	DISKWRITEBLKS1(const char *cmd, const char *parameter,double  *value);
 int	DISKWRITEBLKS5(const char *cmd, const char *parameter,double  *value);
 int	DISKWRITEBLKS15(const char *cmd, const char *parameter,double  *value);
+
 int	AGENT_PING(const char *cmd, const char *parameter,double  *value);
 int	VM_MEMORY_SHARED(const char *cmd, const char *parameter,double  *value);
 int	VM_MEMORY_TOTAL(const char *cmd, const char *parameter,double  *value);
@@ -102,6 +107,7 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *parameter,double  *value);
 int	SYSTEM_CPU_LOAD15(const char *cmd, const char *parameter,double  *value);
 int	SYSTEM_CPU_INTR(const char *cmd, const char *parameter, double *value);
 int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *parameter, double *value);
+int	SYSTEM_CPU_UTILIZATION(const char *cmd, const char *param,double  *value);
 
 int	SENSOR_TEMP1(const char *cmd, const char *parameter,double  *value);
 int	SENSOR_TEMP2(const char *cmd, const char *parameter,double  *value);
@@ -117,8 +123,6 @@ int	SYSTEM_UPTIME(const char *cmd, const char *parameter,double  *value);
 
 int	SYSTEM_SWAP_FREE(const char *cmd, const char *parameter,double  *value);
 int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *parameter,double  *value);
-
-int	TCP_LISTEN(const char *cmd, const char *porthex,double  *value);
 
 int	EXECUTE(const char *cmd, const char *command,double  *value);
 int	EXECUTE_STR(const char *cmd, const char *command, const char *parameter, char  **value);
@@ -238,12 +242,35 @@ COMMAND	parameters_specific[]=
 	{"system.cpu.user5"	,SYSTEM_CPU_USER5, 		0, 0},
 	{"system.cpu.user15"	,SYSTEM_CPU_USER15, 		0, 0},
 
+	{"system.cpu.util[*]"    ,SYSTEM_CPU_UTILIZATION,	0, "idle"},
+    
 	{"net.if.ibytes1[*]"	,NET_IF_IBYTES1,	0, "lo"},
 	{"net.if.ibytes5[*]"	,NET_IF_IBYTES5,	0, "lo"},
 	{"net.if.ibytes15[*]"	,NET_IF_IBYTES15,	0, "lo"},
 	{"net.if.obytes1[*]"	,NET_IF_OBYTES1,	0, "lo"},
 	{"net.if.obytes5[*]"	,NET_IF_OBYTES5,	0, "lo"},
 	{"net.if.obytes15[*]"	,NET_IF_OBYTES15,	0, "lo"},
+	
+	{"net.listen.tcp[*]"	,NET_TCP_LISTEN,	0, "80"},
+
+/*	{"tcp_count"		,EXECUTE, 	0, "netstat -tn|grep EST|wc -l"}, */
+
+	{"net[listen_23]"	,NET_TCP_LISTEN,    0, "23"},
+	{"net[listen_80]"	,NET_TCP_LISTEN,    0, "80"},
+
+/****************************************
+	Don't work, see solaris/net.c
+	
+	{"net.in.load[*]"       ,NET_IN_LOAD,		0, "lo"},
+        {"net.in.pack[*]"	,NET_IN_PACKETS,	0, "lo"},
+        {"net.in.err[*]"	,NET_IN_ERRORS,		0, "lo"},
+			        
+        {"net.out.load[*]"      ,NET_OUT_LOAD,		0, "lo"},
+        {"net.out.pack[*]"	,NET_OUT_PACKETS,	0, "lo"},
+        {"net.out.err[*]"	,NET_OUT_ERRORS,	0, "lo"},
+
+        {"net.out.coll[*]"      ,NET_COLLISIONS,	0, "lo"},
+***************************************/
 
 	{"disk_read_ops1[*]"	,DISKREADOPS1, 		0, "hda"},
 	{"disk_read_ops5[*]"	,DISKREADOPS5, 		0, "hda"},
@@ -260,6 +287,17 @@ COMMAND	parameters_specific[]=
 	{"disk_write_blks1[*]"	,DISKWRITEBLKS1,	0, "hda"},
 	{"disk_write_blks5[*]"	,DISKWRITEBLKS5,	0, "hda"},
 	{"disk_write_blks15[*]"	,DISKWRITEBLKS15,	0, "hda"},
+
+/****************************************
+	Don't work, see solaris/diskio.c
+  	
+        {"disk_read_ops[*]"     ,DISKREADOPS,           0, "hda"},
+        {"disk_read_kbs[*]"     ,DISKREADBLOCKS,        0, "hda"},
+        {"disk_write_ops[*]"    ,DISKWRITEOPS,          0, "hda"},
+        {"disk_write_kbs[*]"    ,DISKWRITEBLOCKS,       0, "hda"},
+        {"disk_busy[*]"         ,DISKBUSY,              0, "hda"},
+        {"disk_svc[*]"          ,DISKSVC,               0, "hda"},
+***************************************/
 
 	{"sensor[temp1]"	,SENSOR_TEMP1, 		0, 0},
 	{"sensor[temp2]"	,SENSOR_TEMP2, 		0, 0},
@@ -312,11 +350,6 @@ COMMAND	parameters_specific[]=
  #endif
  
 	    
-/*	{"tcp_count"		,EXECUTE, 	0, "netstat -tn|grep EST|wc -l"}, */
-
-	{"net[listen_23]"	,TCP_LISTEN, 	0, "0017"},
-	{"net[listen_80]"	,TCP_LISTEN, 	0, "0050"},
-
 	{"check_port[*]"	,CHECK_PORT, 	0, "80"},
 
 	{"check_service[*]"	,CHECK_SERVICE, 	0, "ssh,127.0.0.1,22"},
