@@ -197,39 +197,112 @@ int	SYSTEM_CPU_SYS15(const char *cmd, const char *param,double  *value)
 	return	get_stat("cpu[system15]",value);
 }
 
-/* AIX CPU info */
-#ifdef HAVE_KNLIST_H
-static int getloadavg_kmem(double loadavg[], int nelem)
+static int get_cpu_data(unsigned long long *idle,
+                        unsigned long long *system,
+                        unsigned long long *user,
+                        unsigned long long *iowait)
 {
-	struct nlist nl;
-	int kmem, i;
-	long avenrun[3];
+    kstat_ctl_t	*kc;
+    kstat_t	*k;
+    cpu_stat_t	*cpu;
+       	
+    int cpu_count = 0;
+    
+    *idle = 0LL;
+    *system = 0LL;
+    *user = 0LL;
+    *iowait = 0LL;
 
-	nl.n_name = "avenrun";
-	nl.n_value = 0;
+    kc = kstat_open();
+    if (kc)
+    {
+    	k = kc->kc_chain;
+	while (k)
+	{
+	    if ((strncmp(k->ks_name, "cpu_stat", 8) == 0)
+		&& (kstat_read(kc, k, NULL) != -1)
+	    )
+	    {
+		cpu = (cpu_stat_t *) k->ks_data;
 
-	if(knlist(&nl, 1, sizeof(nl)))
-	{
-		return FAIL;
-	}
-	if((kmem = open("/dev/kmem", 0, 0)) <= 0)
-	{
-		return FAIL;
-	}
+		*idle	+=  cpu->cpu_sysinfo.cpu[CPU_IDLE];
+		*system +=  cpu->cpu_sysinfo.cpu[CPU_KERNEL];
+		*iowait +=  cpu->cpu_sysinfo.cpu[CPU_WAIT];
+		*user	+=  cpu->cpu_sysinfo.cpu[CPU_USER];
 
-	if(pread(kmem, avenrun, sizeof(avenrun), nl.n_value) <
-				sizeof(avenrun))
-	{
-		return FAIL;
-	}
-
-	for(i=0;i<nelem;i++)
-	{
-		loadavg[i] = (double) avenrun[i] / 65535;
-	}
-	return SUCCEED;
+		cpu_count += 1;
+  	    }
+	    k = k->ks_next;
+        }
+	kstat_close(kc);
+    }
+    return cpu_count;
 }
-#endif
+
+#define CPU_I 0
+#define CPU_U 1
+#define CPU_K 2
+#define CPU_W 3
+
+int	SYSTEM_CPU_UTILIZATION(const char *cmd, const char *param,double  *value)
+{
+    unsigned long long cpu_val[4];
+    unsigned long long interval_size;
+
+    char cpu_info[MAX_STRING_LEN];
+    
+    int info_id = 0;
+    
+    int result = SYSINFO_RET_FAIL;
+
+    if(num_param(param) > 1)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    if(get_param(param, 1, cpu_info, MAX_STRING_LEN) != 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    else
+    {
+        strscpy(cpu_info, "idle");
+    }
+    
+    if(strcmp(cpu_info,"idle") == 0)
+    {
+        info_id = CPU_I;
+    }
+    else if(strcmp(cpu_info,"user") == 0)
+    {
+        info_id = CPU_U;
+    }
+    else if(strcmp(cpu_info,"kernel") == 0)
+    {
+        info_id = CPU_K;
+    }
+    else if(strcmp(cpu_info,"wait") == 0)
+    {
+	info_id = CPU_W;
+    }
+    else
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    
+    if (get_cpu_data(&cpu_val[CPU_I], &cpu_val[CPU_K], &cpu_val[CPU_U], &cpu_val[CPU_W]))
+    {
+        interval_size =	cpu_val[CPU_I] + cpu_val[CPU_K] + cpu_val[CPU_U] + cpu_val[CPU_W];
+        
+	if (interval_size > 0)
+	{
+	    *value = (cpu_val[info_id] * 100.0)/interval_size;
+
+            result = SYSINFO_RET_OK;
+        }
+    }
+    return result;
+}
 
 int	SYSTEM_CPU_LOAD1(const char *cmd, const char *parameter,double  *value)
 {
@@ -246,56 +319,7 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *parameter,double  *value)
 		return SYSINFO_RET_FAIL;	
 	}
 #else
-#ifdef	HAVE_SYS_PSTAT_H
-	struct	pst_dynamic dyn;
-
-	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-	else
-	{
-		*value=(double)dyn.psd_avg_1_min;
-		return SYSINFO_RET_OK;
-	}
-#else
-#ifdef HAVE_PROC_LOADAVG
-	return	getPROC("/proc/loadavg",1,1,value);
-#else
-#ifdef HAVE_KSTAT_H
-	static kstat_ctl_t *kc = NULL;
-	kstat_t *ks;
-	kstat_named_t *kn;
-
-	if (!kc && !(kc = kstat_open()))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-	if (!(ks = kstat_lookup(kc, "unix", 0, "system_misc")) ||
-		kstat_read(kc, ks, 0) == -1 ||
-		!(kn = kstat_data_lookup(ks,"avenrun_1min")))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-        *value=(double)kn->value.ul/256.0;
-	return SYSINFO_RET_OK;
-#else
-#ifdef HAVE_KNLIST_H
-	double loadavg[3];
-
-	if(getloadavg_kmem(loadavg,3) == FAIL)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-        *value=loadavg[0];
-	return SYSINFO_RET_OK;
-#else
 	return	SYSINFO_RET_FAIL;
-#endif
-#endif
-#endif
-#endif
 #endif
 }
 
@@ -314,135 +338,27 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *parameter,double  *value)
 		return SYSINFO_RET_FAIL;	
 	}
 #else
-#ifdef	HAVE_SYS_PSTAT_H
-	struct	pst_dynamic dyn;
-
-	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-	else
-	{
-		*value=(double)dyn.psd_avg_5_min;
-		return SYSINFO_RET_OK;
-	}
-#else
-#ifdef	HAVE_PROC_LOADAVG
-	return	getPROC("/proc/loadavg",1,2,value);
-#else
-#ifdef HAVE_KSTAT_H
-	static kstat_ctl_t *kc = NULL;
-	kstat_t *ks;
-	kstat_named_t *kn;
-
-	if (!kc && !(kc = kstat_open()))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-	if (!(ks = kstat_lookup(kc, "unix", 0, "system_misc")) ||
-		kstat_read(kc, ks, 0) == -1 ||
-		!(kn = kstat_data_lookup(ks,"avenrun_5min")))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-        *value=(double)kn->value.ul/256.0;
-	return SYSINFO_RET_OK;
-#else
-#ifdef HAVE_KNLIST_H
-	double loadavg[3];
-
-	if(getloadavg_kmem(loadavg,3) == FAIL)
-	{
-		return STSINFO_RET_FAIL;
-	}
-
-        *value=loadavg[1];
-	return SYSINFO_RET_OK;
-#else
 	return	SYSINFO_RET_FAIL;
-#endif
-#endif
-#endif
-#endif
 #endif
 }
 	       
-int	SYSTEM_CPU_SWAPIN(const char *cmd, const char *parameter, double *value)
+int	SYSTEM_CPU_LOAD15(const char *cmd, const char *parameter,double  *value)
 {
-    kstat_ctl_t	    *kc;
-    kstat_t	    *k;
-    cpu_stat_t	    *cpu;
-    
-    int	    cpu_count = 0;
-    double  swapin= 0.0;
-    
-    kc = kstat_open();
+#ifdef HAVE_GETLOADAVG
+	double	load[3];
 
-    if(kc != NULL)
-    {    
-	k = kc->kc_chain;
-  	while (k != NULL)
+	if(getloadavg(load, 3))
 	{
-	    if( (strncmp(k->ks_name, "cpu_stat", 8) == 0) &&
-		(kstat_read(kc, k, NULL) != -1) )
-	    {
-		cpu = (cpu_stat_t*) k->ks_data;
-		/* uint_t   swapin;	    // swapins */
-		swapin += (double) cpu->cpu_vminfo.swapin;
-		cpu_count += 1;
-  	    }
-	    k = k->ks_next;
-        }
-	kstat_close(kc);
-    }
-
-    *value = swapin;
-    
-    if(cpu_count == 0)
-    {
-	return SYSINFO_RET_FAIL;
-    }
-
-    return SYSINFO_RET_OK;
-}
-
-int	SYSTEM_CPU_SWAPOUT(const char *cmd, const char *parameter, double *value)
-{
-    kstat_ctl_t	    *kc;
-    kstat_t	    *k;
-    cpu_stat_t	    *cpu;
-    
-    int	    cpu_count = 0;
-    double  swapout = 0.0;
-    
-    kc = kstat_open();
-
-    if(kc != NULL)
-    {    
-	k = kc->kc_chain;
-  	while (k != NULL)
+		*value=load[2];	
+		return SYSINFO_RET_OK;
+	}
+	else
 	{
-	    if( (strncmp(k->ks_name, "cpu_stat", 8) == 0) &&
-		(kstat_read(kc, k, NULL) != -1) )
-	    {
-		cpu = (cpu_stat_t*) k->ks_data;
-		/* uint_t   swapout;	    // swapouts */
-		swapout +=  (double) cpu->cpu_vminfo.swapout;
-		cpu_count += 1;
-  	    }
-	    k = k->ks_next;
-        }
-	kstat_close(kc);
-    }
-
-    *value = swapout;
-    
-    if(cpu_count == 0)
-    {
-	return SYSINFO_RET_FAIL;
-    }
-
-    return SYSINFO_RET_OK;
+		return SYSINFO_RET_FAIL;	
+	}
+#else
+	return	SYSINFO_RET_FAIL;
+#endif
 }
 
 int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *parameter, double *value)
@@ -521,70 +437,3 @@ int	SYSTEM_CPU_INTR(const char *cmd, const char *parameter, double *value)
     return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_CPU_LOAD15(const char *cmd, const char *parameter,double  *value)
-{
-#ifdef HAVE_GETLOADAVG
-	double	load[3];
-
-	if(getloadavg(load, 3))
-	{
-		*value=load[2];	
-		return SYSINFO_RET_OK;
-	}
-	else
-	{
-		return SYSINFO_RET_FAIL;	
-	}
-#else
-#ifdef	HAVE_SYS_PSTAT_H
-	struct	pst_dynamic dyn;
-
-	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-	else
-	{
-		*value=(double)dyn.psd_avg_15_min;
-		return SYSINFO_RET_OK;
-	}
-#else
-#ifdef	HAVE_PROC_LOADAVG
-	return	getPROC("/proc/loadavg",1,3,value);
-#else
-#ifdef HAVE_KSTAT_H
-	static kstat_ctl_t *kc = NULL;
-	kstat_t *ks;
-	kstat_named_t *kn;
-
-	if (!kc && !(kc = kstat_open()))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-	if (!(ks = kstat_lookup(kc, "unix", 0, "system_misc")) ||
-		kstat_read(kc, ks, 0) == -1 ||
-		!(kn = kstat_data_lookup(ks,"avenrun_15min")))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-        *value=(double)kn->value.ul/256.0;
-	return SYSINFO_RET_OK;
-#else
-#ifdef HAVE_KNLIST_H
-	double loadavg[3];
-
-	if(getloadavg_kmem(loadavg,3) == FAIL)
-	{
-		return STSINFO_RET_FAIL;
-	}
-
-        *value=loadavg[2];
-	return SYSINFO_RET_OK;
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
-#endif
-#endif
-#endif
-#endif
-}
