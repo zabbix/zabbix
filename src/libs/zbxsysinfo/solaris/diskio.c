@@ -135,11 +135,6 @@
 #include "common.h"
 #include "sysinfo.h"
 
-#if 0
-
-/* !!!    don't work on solaris     !!! 
-   !!! missing 'hda' field in kstat !!! */
-
 typedef struct busy_data
 {
   hrtime_t clock;
@@ -245,8 +240,8 @@ static int get_disk_kstat_record(const char *name,
 
       if (kt)
 	{
-	  if (    (kt->ks_type == KSTAT_TYPE_IO)
-               && (kstat_read(kc, kt, returned_data) != -1)
+	  if ((kt->ks_type == KSTAT_TYPE_IO) && 
+              (kstat_read(kc, kt, returned_data) != -1)
 	     )
             {
                *crtime = kt->ks_crtime;
@@ -296,7 +291,7 @@ int	DISKREADOPS(const char *cmd, const char *device,double  *value)
   return result;
 }
 
-static int DISKREADBLOCKS(const char *cmd, const char *device,double  *value)
+int DISKREADBLOCKS(const char *cmd, const char *device,double  *value)
 {
   int result = SYSINFO_RET_FAIL;
   DISK_DATA *p;
@@ -331,7 +326,7 @@ static int DISKREADBLOCKS(const char *cmd, const char *device,double  *value)
   return result;
 }
 
-static int DISKWRITEOPS(const char *cmd, const char *device,double  *value)
+int DISKWRITEOPS(const char *cmd, const char *device,double  *value)
 {
   int result = SYSINFO_RET_FAIL;
   DISK_DATA *p;
@@ -366,7 +361,7 @@ static int DISKWRITEOPS(const char *cmd, const char *device,double  *value)
   return result;
 }
 
-static int DISKWRITEBLOCKS(const char *cmd, const char *device,double  *value)
+int DISKWRITEBLOCKS(const char *cmd, const char *device,double  *value)
 {
   int result = SYSINFO_RET_FAIL;
   DISK_DATA *p;
@@ -401,7 +396,7 @@ static int DISKWRITEBLOCKS(const char *cmd, const char *device,double  *value)
   return result;
 }
 
-static int DISKBUSY(const char *cmd, const char *device, double  *value)
+int DISKBUSY(const char *cmd, const char *device, double  *value)
 {
   int result = SYSINFO_RET_FAIL;
   DISK_DATA *p;
@@ -432,7 +427,7 @@ static int DISKBUSY(const char *cmd, const char *device, double  *value)
    return result;
 }
 
-static int DISKSVC(const char *cmd, const char *device, double  *value)
+int DISKSVC(const char *cmd, const char *device, double  *value)
 {
   int result = SYSINFO_RET_FAIL;
   DISK_DATA *p;
@@ -466,8 +461,6 @@ static int DISKSVC(const char *cmd, const char *device, double  *value)
 
    return result;
 }
-
-#endif
 
 int	DISKREADOPS1(const char *cmd, const char *device,double  *value)
 {
