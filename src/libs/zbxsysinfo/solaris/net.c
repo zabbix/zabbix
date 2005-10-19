@@ -172,7 +172,7 @@ static NETWORK_DATA *get_net_data_record(const char *device)
 	p = (NETWORK_DATA *) calloc(1, sizeof(NETWORK_DATA));
 	if (p)
 	{
-	    p->name = strndup(device,MAX_TRING_LEN);
+	    p->name = strdup(device);
 	    if (p->name)
             {
 		p->next = interfaces;
