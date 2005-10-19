@@ -113,11 +113,6 @@
 #define IDI(i) FDI("%i", i) // integer info
 */
 
-#if 0
-
-/* !!!    don't work on solaris     !!! 
-   !!! missing 'lo' field in kstat !!! */
-
 typedef union value_overlay
 {
   union 
@@ -154,9 +149,9 @@ typedef struct opackets_data
 typedef struct network_data
 {
   struct network_data *next;
-  char *name;
-  RBYTES_DATA rb;
-  OBYTES_DATA ob;
+  char 		*name;
+  RBYTES_DATA 	rb;
+  OBYTES_DATA 	ob;
   RPACKETS_DATA rp;
   OPACKETS_DATA op;
 } NETWORK_DATA;
@@ -177,7 +172,7 @@ static NETWORK_DATA *get_net_data_record(const char *device)
 	p = (NETWORK_DATA *) calloc(1, sizeof(NETWORK_DATA));
 	if (p)
 	{
-	    p->name = strdup(device);
+	    p->name = strndup(device,MAX_TRING_LEN);
 	    if (p->name)
             {
 		p->next = interfaces;
@@ -213,9 +208,12 @@ static int get_named_field(
         if ((kp) && (kstat_read(kc, kp, 0) != -1))
 	{
 	    kn = (kstat_named_t*) kstat_data_lookup(kp, field);
-            *snaptime = kp->ks_snaptime;
-            *returned_data = *kn;
-            result = SYSINFO_RET_OK;
+	    if(kn)
+	    {
+            	*snaptime = kp->ks_snaptime;
+            	*returned_data = *kn;
+            	result = SYSINFO_RET_OK;
+	    }
         }
 	kstat_close(kc);
     }
@@ -400,8 +398,6 @@ int	NET_COLLISIONS(const char *cmd, const char *parameter,double  *value)
 
     return result;
 }
-
-#endif
 
 int	NET_TCP_LISTEN(const char *cmd, const char *parameter,double  *value)
 {

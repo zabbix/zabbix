@@ -20,6 +20,8 @@
 #include "config.h"
 #include "sysinfo.h"
 
+
+
 int	VM_MEMORY_BUFFERS(const char *cmd, const char *parameter,double  *value);
 int	VM_MEMORY_CACHED(const char *cmd, const char *parameter,double  *value);
 
@@ -76,9 +78,29 @@ int	NET_IF_OBYTES1(const char *cmd, const char *parameter,double  *value);
 int	NET_IF_OBYTES5(const char *cmd, const char *parameter,double  *value);
 int	NET_IF_OBYTES15(const char *cmd, const char *parameter,double  *value);
 
+int	NET_IF_OBYTES(const char *cmd, const char *parameter,double  *value);
+int	NET_IF_OBYTES15(const char *cmd, const char *parameter,double  *value);
+
 int	NET_TCP_LISTEN(const char *cmd, const char *parameter,double  *value);
 
 int	TCP_LISTEN(const char *cmd, const char *porthex,double  *value);
+
+int     NET_IN_LOAD(const char *cmd, const char *parameter,double  *value);
+int     NET_IN_PACKETS(const char *cmd, const char *parameter,double  *value);
+int     NET_IN_ERRORS(const char *cmd, const char *parameter,double  *value);
+
+int     NET_OUT_LOAD(const char *cmd, const char *parameter,double  *value);
+int     NET_OUT_PACKETS(const char *cmd, const char *parameter,double  *value);
+int     NET_OUT_ERRORS(const char *cmd, const char *parameter,double  *value);
+
+int     NET_COLLISIONS(const char *cmd, const char *parameter,double  *value);
+
+int     DISKREADOPS(const char *cmd, const char *parameter,double  *value);
+int     DISKREADBLOCKS(const char *cmd, const char *parameter,double  *value);
+int     DISKWRITEOPS(const char *cmd, const char *parameter,double  *value);
+int     DISKWRITEBLOCKS(const char *cmd, const char *parameter,double  *value);
+int     DISKBUSY(const char *cmd, const char *parameter,double  *value);
+int     DISKSVC(const char *cmd, const char *parameter,double  *value);
 
 int	DISKREADOPS1(const char *cmd, const char *parameter,double  *value);
 int	DISKREADOPS5(const char *cmd, const char *parameter,double  *value);
@@ -258,19 +280,15 @@ COMMAND	parameters_specific[]=
 	{"net[listen_23]"	,NET_TCP_LISTEN,    0, "23"},
 	{"net[listen_80]"	,NET_TCP_LISTEN,    0, "80"},
 
-/****************************************
-	Don't work, see solaris/net.c
-	
-	{"net.in.load[*]"       ,NET_IN_LOAD,		0, "lo"},
-        {"net.in.pack[*]"	,NET_IN_PACKETS,	0, "lo"},
-        {"net.in.err[*]"	,NET_IN_ERRORS,		0, "lo"},
+	{"net.in.load[*]"       ,NET_IN_LOAD,		0, "hme0"},
+        {"net.in.pack[*]"	,NET_IN_PACKETS,	0, "hme0"},
+        {"net.in.err[*]"	,NET_IN_ERRORS,		0, "hme0"},
 			        
-        {"net.out.load[*]"      ,NET_OUT_LOAD,		0, "lo"},
-        {"net.out.pack[*]"	,NET_OUT_PACKETS,	0, "lo"},
-        {"net.out.err[*]"	,NET_OUT_ERRORS,	0, "lo"},
+        {"net.out.load[*]"      ,NET_OUT_LOAD,		0, "hme0"},
+        {"net.out.pack[*]"	,NET_OUT_PACKETS,	0, "hme0"},
+        {"net.out.err[*]"	,NET_OUT_ERRORS,	0, "hme0"},
 
-        {"net.out.coll[*]"      ,NET_COLLISIONS,	0, "lo"},
-***************************************/
+        {"net.out.coll[*]"      ,NET_COLLISIONS,	0, "hme0"},
 
 	{"disk_read_ops1[*]"	,DISKREADOPS1, 		0, "hda"},
 	{"disk_read_ops5[*]"	,DISKREADOPS5, 		0, "hda"},
@@ -288,16 +306,12 @@ COMMAND	parameters_specific[]=
 	{"disk_write_blks5[*]"	,DISKWRITEBLKS5,	0, "hda"},
 	{"disk_write_blks15[*]"	,DISKWRITEBLKS15,	0, "hda"},
 
-/****************************************
-	Don't work, see solaris/diskio.c
-  	
-        {"disk_read_ops[*]"     ,DISKREADOPS,           0, "hda"},
-        {"disk_read_kbs[*]"     ,DISKREADBLOCKS,        0, "hda"},
-        {"disk_write_ops[*]"    ,DISKWRITEOPS,          0, "hda"},
-        {"disk_write_kbs[*]"    ,DISKWRITEBLOCKS,       0, "hda"},
-        {"disk_busy[*]"         ,DISKBUSY,              0, "hda"},
-        {"disk_svc[*]"          ,DISKSVC,               0, "hda"},
-***************************************/
+        {"disk_read_ops[*]"     ,DISKREADOPS,           0, "sd0"},
+        {"disk_read_kbs[*]"     ,DISKREADBLOCKS,        0, "sd0"},
+        {"disk_write_ops[*]"    ,DISKWRITEOPS,          0, "sd0"},
+        {"disk_write_kbs[*]"    ,DISKWRITEBLOCKS,       0, "sd0"},
+        {"disk_busy[*]"         ,DISKBUSY,              0, "sd0"},
+        {"disk_svc[*]"          ,DISKSVC,               0, "sd0"},
 
 	{"sensor[temp1]"	,SENSOR_TEMP1, 		0, 0},
 	{"sensor[temp2]"	,SENSOR_TEMP2, 		0, 0},
