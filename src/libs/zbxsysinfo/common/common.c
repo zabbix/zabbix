@@ -1741,9 +1741,9 @@ int	CHECK_DNS(const char *cmd, const char *ip_and_zone,double  *value)
 	_res.retrans=5;
 
 #ifdef	C_IN
-	result=res_query(zone,C_IN,T_SOA,respbuf,sizeof(respbuf));
+	result=res_query(zone,C_IN,T_SOA,(unsigned char *)respbuf,sizeof(respbuf));
 #else
-	result=res_query(zone,ns_c_in,ns_t_soa,respbuf,sizeof(respbuf));
+	result=res_query(zone,ns_c_in,ns_t_soa,(unsigned char *)respbuf,sizeof(respbuf));
 #endif
 	*value = result!=-1 ? 1 : 0;
 
