@@ -1,5 +1,18 @@
 Changes for 1.1beta3:
 
+ - added support of disk_read_ops[*] (Eugene)
+ - added support of disk_read_kbs[*] (Eugene)
+ - added support of disk_write_ops[*] (Eugene)
+ - added support of disk_write_kbs[*] (Eugene)
+ - added support of disk_busy[*] (Eugene)
+ - added support of disk_svc[*] (Eugene)
+ - added support of net.out.err[*] (Eugene)
+ - added support of net.out.pack[*] (Eugene)
+ - added support of net.out.load[*] (Eugene)
+ - added support of net.in.err[*] (Eugene)
+ - added support of net.in.pack[*] (Eugene)
+ - added support of net.in.load[*] (Eugene)
+ - added support of net.out.coll[*] (Eugene)
  - added support of system.cpu.util[<idle|user|kernel|wait>] (Eugene)
  - added support of net.listen.tcp[portdec] (Eugene)
  - changed system.uptime (Eugene)
