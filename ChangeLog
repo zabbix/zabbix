@@ -1,5 +1,7 @@
 Changes for 1.1beta3:
 
+ - fixed autoheader warnings (Eugene)
+ - removed file acconfig.h (Eugene)
  - added support of vfs.dev.read.bytes[*] (Eugene)
  - added support of vfs.dev.read.operations[*] (Eugene)
  - added support of vfs.dev.write.bytes[*] (Eugene)
