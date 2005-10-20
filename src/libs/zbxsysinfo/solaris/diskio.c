@@ -135,6 +135,16 @@
 #include "common.h"
 #include "sysinfo.h"
 
+/*
+#define FDI(f, m) fprintf(stderr, "DEBUG INFO: " f "\n" , m) // show debug info to stderr
+#define SDI(m) FDI("%s", m) // string info
+#define IDI(i) FDI("%i", i) // integer info
+*/
+
+#if 0
+/*
+ * hidden
+ */
 typedef struct busy_data
 {
   hrtime_t clock;
@@ -175,7 +185,7 @@ typedef struct wblocks_data
 typedef struct disk_data
 {
   struct disk_data *next;
-  char *name;
+  char name[MAX_STRING_LEN];
   BUSY_DATA busy;
   SVC_TIME_DATA svc;
   READ_IOS_DATA reads;
@@ -183,17 +193,18 @@ typedef struct disk_data
   RBLOCKS_DATA rblocks;
   WBLOCKS_DATA wblocks;
 } DISK_DATA;
+#endif
 
-static DISK_DATA *disks;
-
+#if 0
+/*
+ * hidden
+ */
 static DISK_DATA *get_disk_data_record(const char *device)
 {
+  static DISK_DATA *disks;
   DISK_DATA *p;
 
-  p = disks;
-
-  while ((p) && (strcmp(p->name, device) != 0))
-    p = p->next;  
+  for(p = disks; (p) && (strncmp(p->name, device, MAX_STRING_LEN) != 0); p = p->next)
 
   if (p == (DISK_DATA *) NULL)
     {
@@ -201,7 +212,7 @@ static DISK_DATA *get_disk_data_record(const char *device)
 
       if (p)
 	{
-	  p->name = strdup(device);
+	  strncpy(p->name, device, MAX_STRING_LEN);
 
           if (p->name)
             {
@@ -221,7 +232,12 @@ static DISK_DATA *get_disk_data_record(const char *device)
 
   return p;
 }
+#endif
 
+#if 0
+/*
+ * hidden
+ */
 static int get_disk_kstat_record(const char *name,
                                  hrtime_t *crtime,
                                  hrtime_t *snaptime, 
@@ -240,8 +256,8 @@ static int get_disk_kstat_record(const char *name,
 
       if (kt)
 	{
-	  if ((kt->ks_type == KSTAT_TYPE_IO) && 
-              (kstat_read(kc, kt, returned_data) != -1)
+	  if (    (kt->ks_type == KSTAT_TYPE_IO)
+               && (kstat_read(kc, kt, returned_data) != -1)
 	     )
             {
                *crtime = kt->ks_crtime;
@@ -255,178 +271,12 @@ static int get_disk_kstat_record(const char *name,
 
   return result;
 }
+#endif 
 
-int	DISKREADOPS(const char *cmd, const char *device,double  *value)
-{
-  int result = SYSINFO_RET_FAIL;
-  DISK_DATA *p;
-
-  p = get_disk_data_record(device);
-
-  if (p)
-    {
-       hrtime_t crtime, snaptime;
-       kstat_io_t kio;
-
-       result = get_disk_kstat_record(device, &crtime, &snaptime, &kio);
-
-       if (result == SYSINFO_RET_OK)
-          {
-             int interval_seconds;
-
-             interval_seconds = (snaptime - p->reads.clock) / 1000000000;
-
-             if (interval_seconds > 0)
-               *value = (kio.reads - p->reads.reads) / interval_seconds;
-
-   	     else 
-                *value = 0.0;
-
-            p->reads.clock = snaptime;
-
-            p->reads.reads = kio.reads;
-          }
-    }
-
-  return result;
-}
-
-int DISKREADBLOCKS(const char *cmd, const char *device,double  *value)
-{
-  int result = SYSINFO_RET_FAIL;
-  DISK_DATA *p;
-
-  p = get_disk_data_record(device);
-
-  if (p)
-    {
-       hrtime_t crtime, snaptime;
-       kstat_io_t kio;
-
-       result = get_disk_kstat_record(device, &crtime, &snaptime, &kio);
-
-       if (result == SYSINFO_RET_OK)
-          {
-	     int interval_seconds;
-
-             interval_seconds = (snaptime - p->rblocks.clock) / 1000000000;
-
-             if (interval_seconds > 0)
-                *value = ((kio.nread - p->rblocks.nread) / 1024.0) / interval_seconds;
-
-   	     else 
-                *value = 0.0; 
-
-            p->rblocks.clock = snaptime;
-
-            p->rblocks.nread = kio.nread;
-          }
-    }
-
-  return result;
-}
-
-int DISKWRITEOPS(const char *cmd, const char *device,double  *value)
-{
-  int result = SYSINFO_RET_FAIL;
-  DISK_DATA *p;
-
-  p = get_disk_data_record(device);
-
-  if (p)
-    {
-       hrtime_t crtime, snaptime;
-       kstat_io_t kio;
-
-       result = get_disk_kstat_record(device, &crtime, &snaptime, &kio);
-
-       if (result == SYSINFO_RET_OK)
-          {
-	     int interval_seconds;
-
-             interval_seconds = (snaptime - p->writes.clock) / 1000000000;
-
-	     if (interval_seconds > 0)
-                *value = (kio.writes - p->writes.writes) / interval_seconds;
-
-  	     else 
-                *value = 0.0; 
-
-            p->writes.clock = snaptime;
-
-            p->writes.writes = kio.writes;
-          }
-    }
-
-  return result;
-}
-
-int DISKWRITEBLOCKS(const char *cmd, const char *device,double  *value)
-{
-  int result = SYSINFO_RET_FAIL;
-  DISK_DATA *p;
-
-  p = get_disk_data_record(device);
-
-  if (p)
-    {
-       hrtime_t crtime, snaptime;
-       kstat_io_t kio;
-
-       result = get_disk_kstat_record(device, &crtime, &snaptime, &kio);
-
-       if (result == SYSINFO_RET_OK)
-          {
-	     int interval_seconds;
-
-             interval_seconds = (snaptime - p->wblocks.clock) / 1000000000;
-
-             if (interval_seconds > 0)
-                *value = ((kio.nwritten - p->wblocks.nwritten) / 1024.0) / interval_seconds;
-
-	     else 
-                *value = 0.0; 
-
-            p->wblocks.clock = snaptime;
-
-            p->wblocks.nwritten = kio.nwritten;
-          }
-    }
-
-  return result;
-}
-
-int DISKBUSY(const char *cmd, const char *device, double  *value)
-{
-  int result = SYSINFO_RET_FAIL;
-  DISK_DATA *p;
-
-  p = get_disk_data_record(device);
-
-  if (p)
-    {
-       hrtime_t crtime, snaptime;
-       kstat_io_t kio;
-
-       result = get_disk_kstat_record(device, &crtime, &snaptime, &kio);
-
-       if (result == SYSINFO_RET_OK)
-          {
-             if (snaptime > p->busy.clock)
-                *value = ((kio.rtime - p->busy.rtime) * 100.0) / (snaptime - p->busy.clock);
-
-   	     else 
-               *value = 0.0;
-
-             p->busy.clock = snaptime;
-
-             p->busy.rtime = kio.rtime;
-          }
-    }
-
-   return result;
-}
-
+#if 0
+/*
+ * hidden
+ */
 int DISKSVC(const char *cmd, const char *device, double  *value)
 {
   int result = SYSINFO_RET_FAIL;
@@ -460,6 +310,163 @@ int DISKSVC(const char *cmd, const char *device, double  *value)
     }
 
    return result;
+}
+#endif
+
+#if 0
+/*
+ * hidden
+ */
+int DISKBUSY(const char *cmd, const char *device, double  *value)
+{
+  int result = SYSINFO_RET_FAIL;
+  DISK_DATA *p;
+
+  p = get_disk_data_record(device);
+
+  if (p)
+    {
+       hrtime_t crtime, snaptime;
+       kstat_io_t kio;
+
+       result = get_disk_kstat_record(device, &crtime, &snaptime, &kio);
+
+       if (result == SYSINFO_RET_OK)
+          {
+             if (snaptime > p->busy.clock)
+                *value = ((kio.rtime - p->busy.rtime) * 100.0) / (snaptime - p->busy.clock);
+
+   	     else 
+               *value = 0.0;
+
+             p->busy.clock = snaptime;
+
+             p->busy.rtime = kio.rtime;
+          }
+    }
+
+   return result;
+}
+#endif
+
+static int get_kstat_io(
+    const char *name,
+    kstat_io_t *returned_data
+    )
+{
+    int result = SYSINFO_RET_FAIL;
+    kstat_ctl_t *kc;
+    kstat_t *kt;
+
+    kc = kstat_open();
+    if (kc)
+    {
+	kt = kstat_lookup(kc, NULL, -1, (char *) name);
+	if (kt)
+	{
+	    if (kt->ks_type == KSTAT_TYPE_IO)
+	    {	
+		if(kstat_read(kc, kt, returned_data) != -1)
+		{
+		    result = SYSINFO_RET_OK;
+		}
+            }
+        }
+	kstat_close(kc);
+    }
+    return result;
+}
+
+int	VFS_DEV_READ_BYTES(const char *cmd, const char *param, double  *value)
+{
+    kstat_io_t kio;
+    char	device[MAX_STRING_LEN];
+    int	result;
+
+    if(num_param(param) > 1)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    if(get_param(param, 1, device, MAX_STRING_LEN) != 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    
+    result = get_kstat_io(device, &kio);
+
+    *value = kio.reads;
+
+    return result;
+}
+
+int	VFS_DEV_READ_OPERATIONS(const char *cmd, const char *param, double  *value)
+{
+    kstat_io_t kio;
+    char	device[MAX_STRING_LEN];
+    int	result;
+
+    if(num_param(param) > 1)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    if(get_param(param, 1, device, MAX_STRING_LEN) != 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    
+    result = get_kstat_io(device, &kio);
+
+    *value = kio.nread;
+
+    return result;
+}
+
+int	VFS_DEV_WRITE_BYTES(const char *cmd, const char *param, double  *value)
+{
+    kstat_io_t kio;
+    char	device[MAX_STRING_LEN];
+    int	result;
+
+    if(num_param(param) > 1)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    if(get_param(param, 1, device, MAX_STRING_LEN) != 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    
+    result = get_kstat_io(device, &kio);
+
+    *value = kio.writes;
+
+    return result;
+}
+
+int	VFS_DEV_WRITE_OPERATIONS(const char *cmd, const char *param, double  *value)
+{
+    kstat_io_t kio;
+    char	device[MAX_STRING_LEN];
+    int	result;
+
+    if(num_param(param) > 1)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    if(get_param(param, 1, device, MAX_STRING_LEN) != 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    
+    result = get_kstat_io(device, &kio);
+
+    *value = kio.nwritten;
+
+    return result;
 }
 
 int	DISKREADOPS1(const char *cmd, const char *device,double  *value)
