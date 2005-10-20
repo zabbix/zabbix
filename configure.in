@@ -69,14 +69,14 @@ AC_TRY_COMPILE(
 #include <sys/socket.h>],
 [socklen_t s;],
 AC_MSG_RESULT(yes),
-AC_DEFINE(socklen_t, int)
+AC_DEFINE(socklen_t, int, [Define socklen_t type])
 AC_MSG_RESULT(no))
 
 dnl Check for /proc filesystem
 AC_MSG_CHECKING(for /proc filesystem)
 if test -d /proc; then
 	AC_MSG_RESULT(yes)
-	AC_DEFINE(HAVE_PROC)
+	AC_DEFINE(HAVE_PROC,1,[Define to 1 if '/proc' file system should be used.])
 else
 	AC_MSG_RESULT(no)
 fi
@@ -85,7 +85,7 @@ dnl Check for file /proc/1/status
 AC_MSG_CHECKING(for file /proc/1/status)
 if test -r /proc/1/status; then
 	AC_MSG_RESULT(yes)
-	AC_DEFINE(HAVE_PROC_1_STATUS)
+	AC_DEFINE(HAVE_PROC_1_STATUS,1,[Define to 1 if file '/proc/1/status' should be used.])
 else
 	AC_MSG_RESULT(no)
 fi
@@ -94,7 +94,7 @@ dnl Check for file /proc/0/psinfo (Solaris)
 AC_MSG_CHECKING(for file /proc/0/psinfo)
 if test -r /proc/0/psinfo; then
 	AC_MSG_RESULT(yes)
-	AC_DEFINE(HAVE_PROC_0_PSINFO)
+	AC_DEFINE(HAVE_PROC_0_PSINFO,1,[Define to 1 if file '/proc/0/psinfo' should be used.])
 else
 	AC_MSG_RESULT(no)
 fi
@@ -103,7 +103,7 @@ dnl Check for file /proc/loadavg
 AC_MSG_CHECKING(for file /proc/loadavg)
 if test -r /proc/loadavg; then
 	AC_MSG_RESULT(yes)
-	AC_DEFINE(HAVE_PROC_LOADAVG)
+	AC_DEFINE(HAVE_PROC_LOADAVG,1,[Define to 1 if file '/proc/loadavg' should be used.])
 else
 	AC_MSG_RESULT(no)
 fi
@@ -112,7 +112,7 @@ dnl Check for file /proc/net/dev
 AC_MSG_CHECKING(for file /proc/net/dev)
 if test -r /proc/net/dev; then
 	AC_MSG_RESULT(yes)
-	AC_DEFINE(HAVE_PROC_NET_DEV)
+	AC_DEFINE(HAVE_PROC_NET_DEV,1,[Define to 1 if file /proc/net/dev' should be used.])
 else
 	AC_MSG_RESULT(no)
 fi
@@ -123,7 +123,7 @@ AC_TRY_COMPILE([#include <sys/sysinfo.h>],
 [struct sysinfo sysinfo;
 sysinfo.mem_unit=0;
 ],
-AC_DEFINE(HAVE_SYSINFO_MEM_UNIT)
+AC_DEFINE(HAVE_SYSINFO_MEM_UNIT,1,[Define to 1 if 'sysinfo.mem_unit' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -133,7 +133,7 @@ AC_TRY_COMPILE([#include <sys/sysinfo.h>],
 [struct sysinfo sysinfo;
 sysinfo.freeswap=0;
 ],
-AC_DEFINE(HAVE_SYSINFO_FREESWAP)
+AC_DEFINE(HAVE_SYSINFO_FREESWAP,1,[Define to 1 if 'sysinfo.freeswap' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -148,7 +148,7 @@ AC_TRY_COMPILE(
 
 	i=setpriority(PRIO_PROCESS,0,5);
 ],
-AC_DEFINE(HAVE_SYS_RESOURCE_SETPRIORITY)
+AC_DEFINE(HAVE_SYS_RESOURCE_SETPRIORITY,1,[Define to 1 if function 'setpriority' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -163,7 +163,7 @@ AC_TRY_COMPILE(
 	i=sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PHYS_PAGES);
 	i=sysconf(_SC_AVPHYS_PAGES)*sysconf(_SC_PHYS_PAGES);
 ],
-AC_DEFINE(HAVE_UNISTD_SYSCONF)
+AC_DEFINE(HAVE_UNISTD_SYSCONF,1,[Define to 1 if function 'sysconf' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -179,7 +179,7 @@ AC_TRY_COMPILE(
 	
 	__va_copy(dst,src);
 ],
-AC_DEFINE(HAVE___VA_COPY)
+AC_DEFINE(HAVE___VA_COPY,1,[Define to 1 if function '__va_copy' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -202,7 +202,7 @@ AC_TRY_COMPILE(
 
 	sysctl(mib,2,&v,&len,NULL,0);
 ],
-AC_DEFINE(HAVE_SYS_VMMETER_VMTOTAL)
+AC_DEFINE(HAVE_SYS_VMMETER_VMTOTAL,1,[Define to 1 if struct 'vmtotal' exist .])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -266,7 +266,7 @@ point
     free(swt);
 
 ],
-AC_DEFINE(HAVE_SYS_SWAP_SWAPTABLE)
+AC_DEFINE(HAVE_SYS_SWAP_SWAPTABLE,1,[Define to 1 if struct 'swaptable' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -276,7 +276,7 @@ AC_TRY_COMPILE([#include <sys/sysinfo.h>],
 [struct sysinfo sysinfo;
 sysinfo.totalswap=0;
 ],
-AC_DEFINE(HAVE_SYSINFO_TOTALSWAP)
+AC_DEFINE(HAVE_SYSINFO_TOTALSWAP,1,[Define to 1 if 'sysinfo.totalswap' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -300,7 +300,7 @@ AC_TRY_COMPILE(
         len=sizeof(uptime);
         sysctl(mib,2,&uptime,&len,0,0);
 ],
-AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME)
+AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME,1,[Define to 1 if 'KERN_BOOTTIME' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -320,7 +320,7 @@ AC_TRY_COMPILE(
         len=sizeof(maxfiles);
         sysctl(mib,2,&maxfiles,&len,0,0);
 ],
-AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_MAXFILES)
+AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_MAXFILES,1,[Define to 1 if 'KERN_MAXFILES' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -340,7 +340,7 @@ AC_TRY_COMPILE(
         len=sizeof(maxproc);
         sysctl(mib,2,&maxproc,&len,0,0);
 ],
-AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_MAXPROC)
+AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_MAXPROC,1,[Define to 1 if 'KERN_MAXPROC' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -355,7 +355,7 @@ AC_TRY_LINK(
 	seteuid(0);
 	setegid(0);
 ],
-AC_DEFINE(HAVE_FUNCTION_SETEUID)
+AC_DEFINE(HAVE_FUNCTION_SETEUID,1,[Define to 1 if function 'seteuid' and 'setegid' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -369,7 +369,7 @@ AC_TRY_LINK(
 [
 	setproctitle("Test %d", 1);
 ],
-AC_DEFINE(HAVE_FUNCTION_SETPROCTITLE)
+AC_DEFINE(HAVE_FUNCTION_SETPROCTITLE,1,[Define to 1 if function 'setproctitle' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -379,17 +379,7 @@ AC_TRY_COMPILE([#include <sys/sysinfo.h>],
 [struct sysinfo sysinfo;
 sysinfo.totalram=0;
 ],
-AC_DEFINE(HAVE_SYSINFO_TOTALRAM)
-AC_MSG_RESULT(yes),
-AC_MSG_RESULT(no))
-
-dnl Check for totalram in struct sysinfo
-AC_MSG_CHECKING(for totalram in struct sysinfo)
-AC_TRY_COMPILE([#include <sys/sysinfo.h>],
-[struct sysinfo sysinfo;
-sysinfo.totalram=0;
-],
-AC_DEFINE(HAVE_SYSINFO_TOTALRAM)
+AC_DEFINE(HAVE_SYSINFO_TOTALRAM,1,[Define to 1 if 'sysinfo.totalram' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -399,7 +389,7 @@ AC_TRY_COMPILE([#include <sys/sysinfo.h>],
 [struct sysinfo sysinfo;
 sysinfo.sharedram=0;
 ],
-AC_DEFINE(HAVE_SYSINFO_SHAREDRAM)
+AC_DEFINE(HAVE_SYSINFO_SHAREDRAM,1,[Define to 1 if 'sysinfo.sharedram' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -409,7 +399,7 @@ AC_TRY_COMPILE([#include <sys/sysinfo.h>],
 [struct sysinfo sysinfo;
 sysinfo.bufferram=0;
 ],
-AC_DEFINE(HAVE_SYSINFO_BUFFERRAM)
+AC_DEFINE(HAVE_SYSINFO_BUFFERRAM,1,[Define to 1 if 'sysinfo.bufferram' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -419,7 +409,7 @@ AC_TRY_COMPILE([#include <sys/sysinfo.h>],
 [struct sysinfo sysinfo;
 sysinfo.freeram=0;
 ],
-AC_DEFINE(HAVE_SYSINFO_FREERAM)
+AC_DEFINE(HAVE_SYSINFO_FREERAM,1,[Define to 1 if 'sysinfo.freeram' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -429,7 +419,7 @@ AC_TRY_COMPILE([#include <sys/sysinfo.h>],
 [struct sysinfo sysinfo;
 sysinfo.uptime=0;
 ],
-AC_DEFINE(HAVE_SYSINFO_UPTIME)
+AC_DEFINE(HAVE_SYSINFO_UPTIME,1,[Define to 1 if 'sysinfo.uptime' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -439,7 +429,7 @@ AC_TRY_COMPILE([#include <sys/sysinfo.h>],
 [struct sysinfo sysinfo;
 sysinfo.procs=0;
 ],
-AC_DEFINE(HAVE_SYSINFO_PROCS)
+AC_DEFINE(HAVE_SYSINFO_PROCS,1,[Define to 1 if 'sysinfo.procs' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -523,7 +513,7 @@ What DBMS do you want to use (please select only one):
 dnl    MYSQL_LFLAGS="-L$MYSQL_LIBDIR -lmysqlclient_r"
     MYSQL_LFLAGS="-L$MYSQL_LIBDIR -lmysqlclient"
 
-    AC_DEFINE(HAVE_MYSQL)
+    AC_DEFINE(HAVE_MYSQL,1,[Define to 1 if MySQL should be enabled.])
     AC_MSG_RESULT(yes)
     have_db=yes
     dnl MySQL requires -lm sometime
@@ -584,7 +574,7 @@ dnl To avoid linking of crypt with the agent
 dnl    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt, LIBS="-lcrypt $LIBS"))
     AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  PGSQL_LFLAGS="-lcrypt $PGSQL_LFLAGS"))
 
-    AC_DEFINE(HAVE_PGSQL)
+    AC_DEFINE(HAVE_PGSQL,1,[Define to 1 if PostgreSQL should be enabled.])
     AC_MSG_RESULT(yes)
     have_db=yes
   else
@@ -651,8 +641,8 @@ dnl   			SNMP_LIBDIR=$withval/lib/net-snmp
     SNMP_LFLAGS="-L$SNMP_LIBDIR -lnetsnmp $SNMP_LFLAGS"
 
 
-    AC_DEFINE(HAVE_NETSNMP)
-    AC_DEFINE(HAVE_SNMP)
+    AC_DEFINE(HAVE_NETSNMP,1,[Define to 1 if NETSNMP should be enabled.])
+    AC_DEFINE(HAVE_SNMP,1,[Define to 1 if SNMP should be enabled.])
     AC_MSG_RESULT(yes)
 
   else
@@ -715,8 +705,8 @@ dnl   			SNMP_LIBDIR=$withval/lib/ucd-snmp
     SNMP_INCLUDE=-I$SNMP_INCDIR
     SNMP_LFLAGS="-L$SNMP_LIBDIR -lsnmp $SNMP_LFLAGS"
 
-    AC_DEFINE(HAVE_UCDSNMP)
-    AC_DEFINE(HAVE_SNMP)
+    AC_DEFINE(HAVE_UCDSNMP,1,[Define to 1 if UCDSNMP should be enabled.])
+    AC_DEFINE(HAVE_SNMP,1,[Define to 1 if SNMP should be enabled.])
     AC_MSG_RESULT(yes)
 
   else
@@ -766,7 +756,7 @@ If you want to check LDAP servers:
     LDAP_LFLAGS="-L$LDAP_LIBDIR -lldap $LDAP_LFLAGS"
 
 
-    AC_DEFINE(HAVE_LDAP)
+    AC_DEFINE(HAVE_LDAP,1,[Define to 1 if LDAP should be enabled.])
     AC_MSG_RESULT(yes)
 
   else
