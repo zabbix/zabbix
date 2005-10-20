@@ -247,21 +247,21 @@ COMMAND	parameters_specific[]=
 	{"vfs.file.regmatch[*]"	,VFS_FILE_REGMATCH, 	0, "/etc/passwd,root"},
 	{"vfs.file.size[*]"	,VFS_FILE_SIZE, 		0, "/etc/passwd"},
 
-	{"vfs.dev.read.ops1[*]"	        ,DISKREADOPS1, 		0, "sd0"},
-	{"vfs.dev.read.ops5[*]"	        ,DISKREADOPS5, 		0, "sd0"},
-	{"vfs.dev.read.ops15[*]"	,DISKREADOPS15,		0, "sd0"},
+	{"disk_read_ops1[*]"	        ,DISKREADOPS1, 		0, "sd0"},
+	{"disk_read_ops5[*]"	        ,DISKREADOPS5, 		0, "sd0"},
+	{"disk_read_ops15[*]"	,DISKREADOPS15,		0, "sd0"},
 
-	{"vfs.dev.read.blks1[*]"	,DISKREADBLKS1,		0, "sd0"},
-	{"vfs.dev.read.blks5[*]"	,DISKREADBLKS5,		0, "sd0"},
-	{"vfs.dev.read.blks15[*]"	,DISKREADBLKS15,	0, "sd0"},
+	{"disk_read_blks1[*]"	,DISKREADBLKS1,		0, "sd0"},
+	{"disk_read_blks5[*]"	,DISKREADBLKS5,		0, "sd0"},
+	{"disk_read_blks15[*]"	,DISKREADBLKS15,	0, "sd0"},
 
-	{"vfs.dev.write.ops1[*]"	,DISKWRITEOPS1, 	0, "sd0"},
-	{"vfs.dev.write.ops5[*]"	,DISKWRITEOPS5, 	0, "sd0"},
-	{"vfs.dev.write.ops15[*]"	,DISKWRITEOPS15,	0, "sd0"},
+	{"disk_write_ops1[*]"	,DISKWRITEOPS1, 	0, "sd0"},
+	{"disk_write_ops5[*]"	,DISKWRITEOPS5, 	0, "sd0"},
+	{"disk_write_ops15[*]"	,DISKWRITEOPS15,	0, "sd0"},
 
-	{"vfs.dev.write.blks1[*]"	,DISKWRITEBLKS1,	0, "sd0"},
-	{"vfs.dev.write.blks5[*]"	,DISKWRITEBLKS5,	0, "sd0"},
-	{"vfs.dev.write.blks15[*]"	,DISKWRITEBLKS15,	0, "sd0"},
+	{"disk_write_blks1[*]"	,DISKWRITEBLKS1,	0, "sd0"},
+	{"disk_write_blks5[*]"	,DISKWRITEBLKS5,	0, "sd0"},
+	{"disk_write_blks15[*]"	,DISKWRITEBLKS15,	0, "sd0"},
 
         {"vfs.dev.read.bytes[*]"	,VFS_DEV_READ_BYTES,		0, "sd0"},
         {"vfs.dev.read.operations[*]"   ,VFS_DEV_READ_OPERATIONS,       0, "sd0"},
