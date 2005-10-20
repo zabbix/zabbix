@@ -113,6 +113,7 @@
 #define IDI(i) FDI("%i", i) // integer info
 */
 
+#if 0
 typedef union value_overlay
 {
   union 
@@ -187,12 +188,12 @@ static NETWORK_DATA *get_net_data_record(const char *device)
     }
   return p;
 }
+#endif
 
-static int get_named_field(
+static int get_kstat_named_field(
     const char *name, 
     const char *field,
-    kstat_named_t *returned_data,
-    hrtime_t *snaptime
+    kstat_named_t *returned_data
     )
 {
     int result = SYSINFO_RET_FAIL;
@@ -204,13 +205,12 @@ static int get_named_field(
     kc = kstat_open();
     if (kc)
     {
-	kp = kstat_lookup(kc, NULL, -1, name);
+	kp = kstat_lookup(kc, NULL, -1, (char*) name);
         if ((kp) && (kstat_read(kc, kp, 0) != -1))
 	{
-	    kn = (kstat_named_t*) kstat_data_lookup(kp, field);
+	    kn = (kstat_named_t*) kstat_data_lookup(kp, (char*) field);
 	    if(kn)
 	    {
-            	*snaptime = kp->ks_snaptime;
             	*returned_data = *kn;
             	result = SYSINFO_RET_OK;
 	    }
@@ -220,192 +220,202 @@ static int get_named_field(
     return result;
 }
 
-int	NET_IN_LOAD(const char *cmd, const char *parameter,double  *value)
+int	NET_IF_IN_BYTES(const char *cmd, const char *param,double  *value)
 {
-    int result = SYSINFO_RET_FAIL;
-    NETWORK_DATA *p;
     kstat_named_t kn;
-    hrtime_t snaptime;
-    int interval_seconds;
+    char    interface[MAX_STRING_LEN];
+    int	    result;
 
-    p = get_net_data_record(parameter);
-    if(p)
+    if(num_param(param) > 1)
     {
-	result = get_named_field(parameter, "rbytes64", &kn, &snaptime);
-	if (result == SYSINFO_RET_OK)
-	{
-	    interval_seconds = (snaptime - p->rb.clock) / 1000000000;
-	    *value = (double) (kn.value.ui64 - p->rb.rbytes.u.ui64) / interval_seconds;
-	    p->rb.rbytes.u.ui64 = kn.value.ui64;
-	    p->rb.clock = snaptime;
-        }
-	else
-	{
-            result = get_named_field(parameter, "rbytes", &kn, &snaptime);
-            if (result == SYSINFO_RET_OK)
-	    {
-		interval_seconds = (snaptime - p->rb.clock) / 1000000000;
-	        *value = (double) (kn.value.ui32 - p->rb.rbytes.u.ui32) / interval_seconds;
-                p->rb.rbytes.u.ui32 = kn.value.ui32;
-                p->rb.clock = snaptime;
-            }
-        }
+	return SYSINFO_RET_FAIL;
     }
-  return result;
-}
 
-int	NET_IN_PACKETS(const char *cmd, const char *parameter,double  *value)
-{
-    int result = SYSINFO_RET_FAIL;
-    NETWORK_DATA *p;
-    int interval_seconds;
-    kstat_named_t kn;
-    hrtime_t snaptime;
+    if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
     
-    p = get_net_data_record(parameter);
-    if(p)
-    {
-	result = get_named_field(parameter, "ipackets64", &kn, &snaptime);
-        if (result == SYSINFO_RET_OK)
-	{
-	    interval_seconds = (snaptime - p->rp.clock) / 1000000000;
-	    *value = (double) (kn.value.ui64 - p->rp.rpackets.u.ui64) / interval_seconds;
-            p->rp.rpackets.u.ui64 = kn.value.ui64;
-            p->rp.clock = snaptime;
-        }
-        else
-        {
-            result = get_named_field(parameter, "ipacket", &kn, &snaptime);
-            if (result == SYSINFO_RET_OK)
-	    {
-		interval_seconds = (snaptime - p->rp.clock) / 1000000000;
-	        *value = (double) (kn.value.ui32 - p->rp.rpackets.u.ui32) / interval_seconds;
-                p->rp.rpackets.u.ui32 = kn.value.ui32;
-                p->rp.clock = snaptime;
-            }
-        }
-    }
-  return result;
-}
-
-int	NET_IN_ERRORS(const char *cmd, const char *parameter,double  *value)
-{
-    int result;
-    kstat_named_t kn;
-    hrtime_t snaptime;
-  
-    result = get_named_field(parameter, "ierrors", &kn, &snaptime);
-
+    result = get_kstat_named_field(interface, "rbytes64", &kn);
     if (result == SYSINFO_RET_OK)
-	*value = (double) kn.value.ui32;
-
-  return result;
-}
-
-int	NET_OUT_LOAD(const char *cmd, const char *parameter,double  *value)
-{
-    int result = SYSINFO_RET_FAIL;
-    NETWORK_DATA *p;
-    kstat_named_t kn;
-    hrtime_t snaptime;
-    int interval_seconds;
-
-    p = get_net_data_record(parameter);
-    if (p)
     {
-        result = get_named_field(parameter, "obytes64", &kn, &snaptime);
-
-        if (result == SYSINFO_RET_OK)
-	{
-	    interval_seconds = (snaptime - p->ob.clock) / 1000000000;
-	    *value = (double) (kn.value.ui64 - p->ob.obytes.u.ui64) / interval_seconds;
-            p->ob.obytes.u.ui64 = kn.value.ui64;
-            p->ob.clock = snaptime;
-        }
-        else
-        {
-	    result = get_named_field(parameter, "obytes", &kn, &snaptime);
-            if (result == SYSINFO_RET_OK)
-	    {
-		interval_seconds = (snaptime - p->ob.clock) / 1000000000;
-	        *value = (double) (kn.value.ui32 - p->ob.obytes.u.ui32) / interval_seconds;
-                p->ob.obytes.u.ui32 = kn.value.ui32;
-                p->ob.clock = snaptime;
-            }
-        }
+	*value = (double)kn.value.ui64;
     }
+    else
+    {
+	result = get_kstat_named_field(interface, "rbytes", &kn);
+	*value = (double)kn.value.ui32;
+    }
+    
     return result;
 }
 
-int	NET_OUT_PACKETS(const char *cmd, const char *parameter,double  *value)
+int	NET_IF_IN_PACKETS(const char *cmd, const char *param, double  *value)
 {
-    int result = SYSINFO_RET_FAIL;
-    NETWORK_DATA *p;
     kstat_named_t kn;
-    hrtime_t snaptime;
-    int interval_seconds;
+    char    interface[MAX_STRING_LEN];
+    int	    result;
 
-    p = get_net_data_record(parameter);
-    if (p)
+    if(num_param(param) > 1)
     {
-	result = get_named_field(parameter, "opackets64", &kn, &snaptime);
-        if (result == SYSINFO_RET_OK)
-	{
-	    interval_seconds = (snaptime - p->op.clock) / 1000000000;
-	    *value = (double) (kn.value.ui64 - p->op.opackets.u.ui64) / interval_seconds;
-            p->op.opackets.u.ui64 = kn.value.ui64;
-            p->op.clock = snaptime;
-        }
-	else
-	{
-	    result = get_named_field(parameter, "opacket", &kn, &snaptime);
-            if (result == SYSINFO_RET_OK)
-	    {
-		interval_seconds = (snaptime - p->op.clock) / 1000000000;
-	        *value = (double) (kn.value.ui32 - p->op.opackets.u.ui32) / interval_seconds;
-                p->op.opackets.u.ui32 = kn.value.ui32;
-                p->op.clock = snaptime;
-            }
-        }
+	return SYSINFO_RET_FAIL;
     }
-  return result;
-}
 
-int	NET_OUT_ERRORS(const char *cmd, const char *parameter,double  *value)
-{
-    int result;
-    kstat_named_t kn;
-    hrtime_t snaptime;
-  
-    result = get_named_field(parameter, "oerrors", &kn, &snaptime);
-
+    if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    
+    result = get_kstat_named_field(interface, "ipackets64", &kn);
     if (result == SYSINFO_RET_OK)
-	*value = (double) kn.value.ui32;
-
+    {
+	*value = (double)kn.value.ui64;
+    }
+    else
+    {
+	result = get_kstat_named_field(interface, "ipackets", &kn);
+	*value = (double)kn.value.ui32;
+    }
+    
     return result;
 }
 
-int	NET_COLLISIONS(const char *cmd, const char *parameter,double  *value)
+int	NET_IF_IN_ERRORS(const char *cmd, const char *param, double  *value)
 {
-    int result;
     kstat_named_t kn;
-    hrtime_t snaptime;
-  
-    result = get_named_field(parameter, "collisions", &kn, &snaptime);
+    char    interface[MAX_STRING_LEN];
+    int	    result;
 
-    if (result == SYSINFO_RET_OK)
-	*value = (double) kn.value.ui32;
+    if(num_param(param) > 1)
+    {
+	return SYSINFO_RET_FAIL;
+    }
 
+    if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    
+    result = get_kstat_named_field(interface, "ierrors", &kn);
+
+    *value = (double)kn.value.ui32;
+    
     return result;
 }
 
-int	NET_TCP_LISTEN(const char *cmd, const char *parameter,double  *value)
+int	NET_IF_OUT_BYTES(const char *cmd, const char *param,double  *value)
+{
+    kstat_named_t kn;
+    char    interface[MAX_STRING_LEN];
+    int	    result;
+
+    if(num_param(param) > 1)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    
+    result = get_kstat_named_field(interface, "obytes64", &kn);
+    if (result == SYSINFO_RET_OK)
+    {
+	*value = (double)kn.value.ui64;
+    }
+    else
+    {
+	result = get_kstat_named_field(interface, "obytes", &kn);
+	*value = (double)kn.value.ui32;
+    }
+    
+    return result;
+}
+
+int	NET_IF_OUT_PACKETS(const char *cmd, const char *param,double  *value)
+{
+    kstat_named_t kn;
+    char    interface[MAX_STRING_LEN];
+    int	    result;
+
+    if(num_param(param) > 1)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    
+    result = get_kstat_named_field(interface, "opackets64", &kn);
+    if (result == SYSINFO_RET_OK)
+    {
+	*value = (double)kn.value.ui64;
+    }
+    else
+    {
+	result = get_kstat_named_field(interface, "opackets", &kn);
+	*value = (double)kn.value.ui32;
+    }
+    
+    return result;
+}
+
+int	NET_IF_OUT_ERRORS(const char *cmd, const char *param,double  *value)
+{
+    kstat_named_t kn;
+    char    interface[MAX_STRING_LEN];
+    int	    result;
+
+    if(num_param(param) > 1)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    
+    result = get_kstat_named_field(interface, "oerrors", &kn);
+
+    *value = (double)kn.value.ui32;
+    
+    return result;
+}
+
+int	NET_IF_COLLISIONS(const char *cmd, const char *param,double  *value)
+{
+    kstat_named_t kn;
+    char    interface[MAX_STRING_LEN];
+    int	    result;
+
+    if(num_param(param) > 1)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    
+    result = get_kstat_named_field(interface, "collisions", &kn);
+
+    *value = (double)kn.value.ui32;
+    
+    return result;
+}
+
+int	NET_TCP_LISTEN(const char *cmd, const char *param,double  *value)
 {
   char command[MAX_STRING_LEN];
   
   memset(command, '\0', sizeof(command));
 
-  snprintf(command, sizeof(command)-1, "netstat -an | grep '*.%s' | wc -l", parameter);
+  snprintf(command, sizeof(command)-1, "netstat -an | grep '*.%s' | wc -l", param);
    
   return EXECUTE(NULL, command, value);
 }

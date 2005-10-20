@@ -81,26 +81,22 @@ int	NET_IF_OBYTES15(const char *cmd, const char *parameter,double  *value);
 int	NET_IF_OBYTES(const char *cmd, const char *parameter,double  *value);
 int	NET_IF_OBYTES15(const char *cmd, const char *parameter,double  *value);
 
+int	NET_IF_COLLISIONS(const char *cmd, const char *param,double  *value);
+int	NET_IF_OUT_ERRORS(const char *cmd, const char *parameter,double  *value);
+int	NET_IF_OUT_PACKETS(const char *cmd, const char *parameter,double  *value);
+int	NET_IF_OUT_BYTES(const char *cmd, const char *parameter,double  *value);
+int	NET_IF_IN_ERRORS(const char *cmd, const char *parameter,double  *value);
+int	NET_IF_IN_PACKETS(const char *cmd, const char *parameter,double  *value);
+int	NET_IF_IN_BYTES(const char *cmd, const char *parameter,double  *value);
+
 int	NET_TCP_LISTEN(const char *cmd, const char *parameter,double  *value);
 
 int	TCP_LISTEN(const char *cmd, const char *porthex,double  *value);
 
-int     NET_IN_LOAD(const char *cmd, const char *parameter,double  *value);
-int     NET_IN_PACKETS(const char *cmd, const char *parameter,double  *value);
-int     NET_IN_ERRORS(const char *cmd, const char *parameter,double  *value);
-
-int     NET_OUT_LOAD(const char *cmd, const char *parameter,double  *value);
-int     NET_OUT_PACKETS(const char *cmd, const char *parameter,double  *value);
-int     NET_OUT_ERRORS(const char *cmd, const char *parameter,double  *value);
-
-int     NET_COLLISIONS(const char *cmd, const char *parameter,double  *value);
-
-int     DISKREADOPS(const char *cmd, const char *parameter,double  *value);
-int     DISKREADBLOCKS(const char *cmd, const char *parameter,double  *value);
-int     DISKWRITEOPS(const char *cmd, const char *parameter,double  *value);
-int     DISKWRITEBLOCKS(const char *cmd, const char *parameter,double  *value);
-int     DISKBUSY(const char *cmd, const char *parameter,double  *value);
-int     DISKSVC(const char *cmd, const char *parameter,double  *value);
+int     VFS_DEV_READ_BYTES(const char *cmd, const char *param,double  *value);
+int     VFS_DEV_READ_OPERATIONS(const char *cmd, const char *param,double  *value);
+int     VFS_DEV_WRITE_BYTES(const char *cmd, const char *param,double  *value);
+int     VFS_DEV_WRITE_OPERATIONS(const char *cmd, const char *param,double  *value);
 
 int	DISKREADOPS1(const char *cmd, const char *parameter,double  *value);
 int	DISKREADOPS5(const char *cmd, const char *parameter,double  *value);
@@ -251,6 +247,27 @@ COMMAND	parameters_specific[]=
 	{"vfs.file.regmatch[*]"	,VFS_FILE_REGMATCH, 	0, "/etc/passwd,root"},
 	{"vfs.file.size[*]"	,VFS_FILE_SIZE, 		0, "/etc/passwd"},
 
+	{"vfs.dev.read.ops1[*]"	        ,DISKREADOPS1, 		0, "sd0"},
+	{"vfs.dev.read.ops5[*]"	        ,DISKREADOPS5, 		0, "sd0"},
+	{"vfs.dev.read.ops15[*]"	,DISKREADOPS15,		0, "sd0"},
+
+	{"vfs.dev.read.blks1[*]"	,DISKREADBLKS1,		0, "sd0"},
+	{"vfs.dev.read.blks5[*]"	,DISKREADBLKS5,		0, "sd0"},
+	{"vfs.dev.read.blks15[*]"	,DISKREADBLKS15,	0, "sd0"},
+
+	{"vfs.dev.write.ops1[*]"	,DISKWRITEOPS1, 	0, "sd0"},
+	{"vfs.dev.write.ops5[*]"	,DISKWRITEOPS5, 	0, "sd0"},
+	{"vfs.dev.write.ops15[*]"	,DISKWRITEOPS15,	0, "sd0"},
+
+	{"vfs.dev.write.blks1[*]"	,DISKWRITEBLKS1,	0, "sd0"},
+	{"vfs.dev.write.blks5[*]"	,DISKWRITEBLKS5,	0, "sd0"},
+	{"vfs.dev.write.blks15[*]"	,DISKWRITEBLKS15,	0, "sd0"},
+
+        {"vfs.dev.read.bytes[*]"	,VFS_DEV_READ_BYTES,		0, "sd0"},
+        {"vfs.dev.read.operations[*]"   ,VFS_DEV_READ_OPERATIONS,       0, "sd0"},
+        {"vfs.dev.write.bytes[*]"	,VFS_DEV_WRITE_BYTES,		0, "sd0"},
+        {"vfs.dev.write.operations[*]"  ,VFS_DEV_WRITE_OPERATIONS,	0, "sd0"},
+
 	{"system.cpu.idle1"	,SYSTEM_CPU_IDLE1, 		0, 0},
 	{"system.cpu.idle5"	,SYSTEM_CPU_IDLE5, 		0, 0},
 	{"system.cpu.idle15"	,SYSTEM_CPU_IDLE15, 		0, 0},
@@ -266,52 +283,26 @@ COMMAND	parameters_specific[]=
 
 	{"system.cpu.util[*]"    ,SYSTEM_CPU_UTILIZATION,	0, "idle"},
     
-	{"net.if.ibytes1[*]"	,NET_IF_IBYTES1,	0, "lo"},
-	{"net.if.ibytes5[*]"	,NET_IF_IBYTES5,	0, "lo"},
-	{"net.if.ibytes15[*]"	,NET_IF_IBYTES15,	0, "lo"},
-	{"net.if.obytes1[*]"	,NET_IF_OBYTES1,	0, "lo"},
-	{"net.if.obytes5[*]"	,NET_IF_OBYTES5,	0, "lo"},
-	{"net.if.obytes15[*]"	,NET_IF_OBYTES15,	0, "lo"},
+	{"net.if.ibytes1[*]"	,NET_IF_IBYTES1,	0, "hme0"},
+	{"net.if.ibytes5[*]"	,NET_IF_IBYTES5,	0, "hme0"},
+	{"net.if.ibytes15[*]"	,NET_IF_IBYTES15,	0, "hme0"},
+	{"net.if.obytes1[*]"	,NET_IF_OBYTES1,	0, "hme0"},
+	{"net.if.obytes5[*]"	,NET_IF_OBYTES5,	0, "hme0"},
+	{"net.if.obytes15[*]"	,NET_IF_OBYTES15,	0, "hme0"},
+
+	{"net.if.in.bytes[*]"       ,NET_IF_IN_BYTES,        0, "hme0"},
+        {"net.if.in.packets[*]"     ,NET_IF_IN_PACKETS,      0, "hme0"},
+        {"net.if.in.errors[*]"      ,NET_IF_IN_ERRORS,       0, "hme0"},
+
+        {"net.if.out.bytes[*]"      ,NET_IF_OUT_BYTES,       0, "hme0"},
+        {"net.if.out.packets[*]"    ,NET_IF_OUT_PACKETS,     0, "hme0"},
+        {"net.if.out.errors[*]"     ,NET_IF_OUT_ERRORS,      0, "hme0"},
+
+        {"net.if.collisions[*]"     ,NET_IF_COLLISIONS,      0, "hme0"},	
 	
 	{"net.listen.tcp[*]"	,NET_TCP_LISTEN,	0, "80"},
 
 /*	{"tcp_count"		,EXECUTE, 	0, "netstat -tn|grep EST|wc -l"}, */
-
-	{"net[listen_23]"	,NET_TCP_LISTEN,    0, "23"},
-	{"net[listen_80]"	,NET_TCP_LISTEN,    0, "80"},
-
-	{"net.in.load[*]"       ,NET_IN_LOAD,		0, "hme0"},
-        {"net.in.pack[*]"	,NET_IN_PACKETS,	0, "hme0"},
-        {"net.in.err[*]"	,NET_IN_ERRORS,		0, "hme0"},
-			        
-        {"net.out.load[*]"      ,NET_OUT_LOAD,		0, "hme0"},
-        {"net.out.pack[*]"	,NET_OUT_PACKETS,	0, "hme0"},
-        {"net.out.err[*]"	,NET_OUT_ERRORS,	0, "hme0"},
-
-        {"net.out.coll[*]"      ,NET_COLLISIONS,	0, "hme0"},
-
-	{"disk_read_ops1[*]"	,DISKREADOPS1, 		0, "hda"},
-	{"disk_read_ops5[*]"	,DISKREADOPS5, 		0, "hda"},
-	{"disk_read_ops15[*]"	,DISKREADOPS15,		0, "hda"},
-
-	{"disk_read_blks1[*]"	,DISKREADBLKS1,		0, "hda"},
-	{"disk_read_blks5[*]"	,DISKREADBLKS5,		0, "hda"},
-	{"disk_read_blks15[*]"	,DISKREADBLKS15,	0, "hda"},
-
-	{"disk_write_ops1[*]"	,DISKWRITEOPS1, 	0, "hda"},
-	{"disk_write_ops5[*]"	,DISKWRITEOPS5, 	0, "hda"},
-	{"disk_write_ops15[*]"	,DISKWRITEOPS15,	0, "hda"},
-
-	{"disk_write_blks1[*]"	,DISKWRITEBLKS1,	0, "hda"},
-	{"disk_write_blks5[*]"	,DISKWRITEBLKS5,	0, "hda"},
-	{"disk_write_blks15[*]"	,DISKWRITEBLKS15,	0, "hda"},
-
-        {"disk_read_ops[*]"     ,DISKREADOPS,           0, "sd0"},
-        {"disk_read_kbs[*]"     ,DISKREADBLOCKS,        0, "sd0"},
-        {"disk_write_ops[*]"    ,DISKWRITEOPS,          0, "sd0"},
-        {"disk_write_kbs[*]"    ,DISKWRITEBLOCKS,       0, "sd0"},
-        {"disk_busy[*]"         ,DISKBUSY,              0, "sd0"},
-        {"disk_svc[*]"          ,DISKSVC,               0, "sd0"},
 
 	{"sensor[temp1]"	,SENSOR_TEMP1, 		0, 0},
 	{"sensor[temp2]"	,SENSOR_TEMP2, 		0, 0},
