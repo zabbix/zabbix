@@ -1,3 +1,5 @@
+#include <strong.h>
+
 #include "common.h"
 #include "log.h"
 
