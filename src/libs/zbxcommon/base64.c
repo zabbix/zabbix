@@ -1,3 +1,5 @@
+#include <string.h>
+
 #define MAX_B64_SIZE 16*1024
 
 static char base64_set [] =
