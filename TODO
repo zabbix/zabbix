@@ -25,7 +25,6 @@ ZABBIX 1.1:
  - handle unavailability of MySQL gracefully
  - add HTML block to the screen cell (to see external data, images, etc)
  - disk stats under Linux 2.6.x
- - more supported parameters under FreeBSD, HP-UX and Solaris (cpu times, network stats)
  - centralised agent upgrade
 
 TKOM:
