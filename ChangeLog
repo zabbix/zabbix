@@ -1,5 +1,6 @@
 Changes for 1.1beta3:
 
+ - added new item status: NOT AVAIALBLE (Alexei)
  - fixed autoheader warnings (Eugene)
  - removed file acconfig.h (Eugene)
  - added support of vfs.dev.read.bytes[*] (Eugene)
@@ -16,7 +17,7 @@ Changes for 1.1beta3:
  - added support of system.cpu.util[<idle|user|kernel|wait>] (Eugene)
  - added support of net.listen.tcp[portdec] (Eugene)
  - changed system.uptime (Eugene)
- - fixed processing of SNMP counter64 objects (ALexei)
+ - fixed processing of SNMP counter64 objects (Alexei)
  - improved support of proc.num[<process>,<user name>,<all|run|sleep|zomb>] (Eugene)
  - improved support of proc.mem[<process>,<user name>,<max|min|sum|avg>] (Eugene)
  - added support of system.swap.in.num (Eugene)
