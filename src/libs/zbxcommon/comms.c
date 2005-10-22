@@ -1,4 +1,4 @@
-#include <strong.h>
+#include <string.h>
 
 #include "common.h"
 #include "log.h"
