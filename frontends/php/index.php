@@ -25,33 +25,33 @@
 	include "include/config.inc.php";
 	include "include/forms.inc.php";
 
-	if(isset($_POST["password"]))
+	if(isset($_REQUEST["password"]))
 	{
-		$password=$_POST["password"];
+		$password=$_REQUEST["password"];
 	}
 	else
 	{
 		unset($password);
 	}
-	if(isset($_POST["name"]))
+	if(isset($_REQUEST["name"]))
 	{
-		$name=$_POST["name"];
+		$name=$_REQUEST["name"];
 	}
 	else
 	{
 		unset($name);
 	}
-	if(isset($_POST["register"]))
+	if(isset($_REQUEST["register"]))
 	{
-		$register=$_POST["register"];
+		$register=$_REQUEST["register"];
 	}
 	else
 	{
 		unset($register);
 	}
-	if(isset($_GET["reconnect"]))
+	if(isset($_REQUEST["reconnect"]))
 	{
-		$reconnect=$_GET["reconnect"];
+		$reconnect=$_REQUEST["reconnect"];
 	}
 	else
 	{

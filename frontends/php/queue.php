@@ -36,9 +36,9 @@
 ?>
 
 <?php
-	if(!isset($_GET["show"]))
+	if(!isset($_REQUEST["show"]))
 	{
-		$_GET["show"]=0;
+		$_REQUEST["show"]=0;
 	}
 
 	$h1=S_QUEUE_OF_ITEMS_TO_BE_UPDATED_BIG;
@@ -60,7 +60,7 @@
 
 	$result=DBselect("select i.itemid, i.nextcheck, i.description, h.host,h.hostid from items i,hosts h where i.status=0 and i.type not in (2) and ((h.status=".HOST_STATUS_MONITORED." and h.available!=".HOST_AVAILABLE_FALSE.") or (h.status=".HOST_STATUS_MONITORED." and h.available=".HOST_AVAILABLE_FALSE." and h.disable_until<=$now)) and i.hostid=h.hostid and i.nextcheck<$now and i.key_ not in ('status','icmpping','icmppingsec','zabbix[log]') order by i.nextcheck");
 	table_begin();
-	if($_GET["show"]==0)
+	if($_REQUEST["show"]==0)
 	{
 		$sec_5=0;
 		$sec_10=0;

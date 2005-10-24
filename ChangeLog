@@ -1,5 +1,6 @@
 Changes for 1.1beta3:
 
+ - all $_GET and $_POST replaced by $_REQUEST. Thanks to James Wells. (Alexei)
  - added new item status: NOT AVAIALBLE (Alexei)
  - fixed autoheader warnings (Eugene)
  - removed file acconfig.h (Eugene)

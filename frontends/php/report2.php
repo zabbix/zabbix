@@ -39,9 +39,9 @@
 ?>
 
 <?php
-	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
+	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
 	{
-		unset($_GET["groupid"]);
+		unset($_REQUEST["groupid"]);
 	}
 
 	$h1="&nbsp;".S_AVAILABILITY_REPORT_BIG;
@@ -74,9 +74,9 @@
 	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
 
-	if(isset($_GET["groupid"]))
+	if(isset($_REQUEST["groupid"]))
 	{
-		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
 	}
 	else
 	{
@@ -98,14 +98,14 @@
 ?>
 
 <?php
-	if(isset($_GET["hostid"])&&!isset($_GET["triggerid"]))
+	if(isset($_REQUEST["hostid"])&&!isset($_REQUEST["triggerid"]))
 	{
 		echo "<br>";
-		$result=DBselect("select host from hosts where hostid=".$_GET["hostid"]);
+		$result=DBselect("select host from hosts where hostid=".$_REQUEST["hostid"]);
 		$row=DBfetch($result);
 		show_table_header($row["host"]);
 
-		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.value from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.status=0 and t.triggerid=f.triggerid and h.hostid=".$_GET["hostid"]." and h.status=".HOST_STATUS_MONITORED." and i.status=0 order by h.host, t.description");
+		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.value from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.status=0 and t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]." and h.status=".HOST_STATUS_MONITORED." and i.status=0 order by h.host, t.description");
 		table_begin();
 		table_header(array(S_DESCRIPTION,S_TRUE,S_FALSE,S_UNKNOWN,S_GRAPH));
 		$col=0;
@@ -125,7 +125,7 @@
 			$true=array("value"=>sprintf("%.4f%%",$availability["true"]), "class"=>"on");
 			$false=array("value"=>sprintf("%.4f%%",$availability["false"]), "class"=>"off");
 			$unknown=array("value"=>sprintf("%.4f%%",$availability["unknown"]), "class"=>"unknown");
-			$actions="<a href=\"report2.php?hostid=".$_GET["hostid"]."&triggerid=".$row["triggerid"]."\">".S_SHOW."</a>";
+			$actions="<a href=\"report2.php?hostid=".$_REQUEST["hostid"]."&triggerid=".$row["triggerid"]."\">".S_SHOW."</a>";
 
 			table_row(array(
 				$description,
@@ -140,13 +140,13 @@
 ?>
 
 <?php
-	if(isset($_GET["triggerid"]))
+	if(isset($_REQUEST["triggerid"]))
 	{
 		echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 		echo "<TR BGCOLOR=#EEEEEE>";
 		echo "<TR BGCOLOR=#DDDDDD>";
 		echo "<TD ALIGN=CENTER>";
-		echo "<IMG SRC=\"chart4.php?triggerid=".$_GET["triggerid"]."\" border=0>";
+		echo "<IMG SRC=\"chart4.php?triggerid=".$_REQUEST["triggerid"]."\" border=0>";
 		echo "</TD>";
 		echo "</TR>";
 		echo "</TABLE>";

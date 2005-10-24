@@ -32,13 +32,13 @@
                 show_footer();
                 exit;
         }
-	if(isset($_GET["select"])&&($_GET["select"]!=""))
+	if(isset($_REQUEST["select"])&&($_REQUEST["select"]!=""))
 	{
-		unset($_GET["groupid"]);
-		unset($_GET["hostid"]);
+		unset($_REQUEST["groupid"]);
+		unset($_REQUEST["hostid"]);
 	}
 	
-        if(isset($_GET["hostid"])&&!check_right("Host","R",$_GET["hostid"]))
+        if(isset($_REQUEST["hostid"])&&!check_right("Host","R",$_REQUEST["hostid"]))
         {
                 show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
                 show_footer();
@@ -47,15 +47,15 @@
 ?>
 
 <?php
-	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
+	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
 	{
-		unset($_GET["groupid"]);
+		unset($_REQUEST["groupid"]);
 	}
 ?>
 
 <?php
-	$_GET["hostid"]=@iif(isset($_GET["hostid"]),$_GET["hostid"],get_profile("web.latest.hostid",0));
-	update_profile("web.latest.hostid",$_GET["hostid"]);
+	$_REQUEST["hostid"]=@iif(isset($_REQUEST["hostid"]),$_REQUEST["hostid"],get_profile("web.latest.hostid",0));
+	update_profile("web.latest.hostid",$_REQUEST["hostid"]);
 	update_profile("web.menu.view.last",$page["file"]);
 ?>
 
@@ -90,9 +90,9 @@
 	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
 
-	if(isset($_GET["groupid"]))
+	if(isset($_REQUEST["groupid"]))
 	{
-		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
 	}
 	else
 	{
@@ -112,15 +112,15 @@
 
 	$h2=$h2.nbsp("  ");
 
-	if(isset($_GET["select"])&&($_GET["select"]==""))
+	if(isset($_REQUEST["select"])&&($_REQUEST["select"]==""))
 	{
-		unset($_GET["select"]);
+		unset($_REQUEST["select"]);
 	}
 //	$h2=$h2.S_SELECT;
 //	$h2=$h2.nbsp("  ");
-	if(isset($_GET["select"]))
+	if(isset($_REQUEST["select"]))
 	{
-  		$h2=$h2."<input class=\"biginput\" type=\"text\" name=\"select\" value=\"".$_GET["select"]."\">";
+  		$h2=$h2."<input class=\"biginput\" type=\"text\" name=\"select\" value=\"".$_REQUEST["select"]."\">";
 	}
 	else
 	{
@@ -133,65 +133,65 @@
 ?>
 
 <?php
-	if(!isset($_GET["sort"]))
+	if(!isset($_REQUEST["sort"]))
 	{
-		$_GET["sort"]="description";
+		$_REQUEST["sort"]="description";
 	}
 
-	if(isset($_GET["hostid"]))
+	if(isset($_REQUEST["hostid"]))
 	{
-		$result=DBselect("select host from hosts where hostid=".$_GET["hostid"]);
+		$result=DBselect("select host from hosts where hostid=".$_REQUEST["hostid"]);
 		if(DBnum_rows($result)==0)
 		{
-			unset($_GET["hostid"]);
+			unset($_REQUEST["hostid"]);
 		}
 	}
 
-	if(isset($_GET["hostid"])||isset($_GET["select"]))
+	if(isset($_REQUEST["hostid"])||isset($_REQUEST["select"]))
 	{
 
 //		echo "<br>";
-		if(!isset($_GET["select"])||($_GET["select"] == ""))
+		if(!isset($_REQUEST["select"])||($_REQUEST["select"] == ""))
 		{
-			$result=DBselect("select host from hosts where hostid=".$_GET["hostid"]);
+			$result=DBselect("select host from hosts where hostid=".$_REQUEST["hostid"]);
 			$host=DBget_field($result,0,0);
-//			show_table_header("<a href=\"latest.php?hostid=".$_GET["hostid"]."\">$host</a>");
+//			show_table_header("<a href=\"latest.php?hostid=".$_REQUEST["hostid"]."\">$host</a>");
 		}
 		else
 		{
-//			show_table_header("Description is like *".$_GET["select"]."*");
+//			show_table_header("Description is like *".$_REQUEST["select"]."*");
 		}
 #		show_table_header_begin();
-#		echo "<a href=\"latest.php?hostid=".$_GET["hostid"]."\">$host</a>";
+#		echo "<a href=\"latest.php?hostid=".$_REQUEST["hostid"]."\">$host</a>";
 #		show_table3_v_delimiter();
 
 		table_begin();
 		$header=array();
-		if(isset($_GET["select"]))
+		if(isset($_REQUEST["select"]))
 		{
 			$header=array_merge($header,array(S_HOST));
 		}
-		if(!isset($_GET["sort"])||(isset($_GET["sort"])&&($_GET["sort"]=="description")))
+		if(!isset($_REQUEST["sort"])||(isset($_REQUEST["sort"])&&($_REQUEST["sort"]=="description")))
 		{
 			$header=array_merge($header,array(S_DESCRIPTION_LARGE));
 		}
 		else
 		{
-			if(isset($_GET["select"]))
-				$header=array_merge($header,array("<a href=\"latest.php?select=".$_GET["select"]."&sort=description\">".S_DESCRIPTION_SMALL));
+			if(isset($_REQUEST["select"]))
+				$header=array_merge($header,array("<a href=\"latest.php?select=".$_REQUEST["select"]."&sort=description\">".S_DESCRIPTION_SMALL));
 			else
-				$header=array_merge($header,array("<a href=\"latest.php?hostid=".$_GET["hostid"]."&sort=description\">".S_DESCRIPTION_SMALL));
+				$header=array_merge($header,array("<a href=\"latest.php?hostid=".$_REQUEST["hostid"]."&sort=description\">".S_DESCRIPTION_SMALL));
 		}
-		if(isset($_GET["sort"])&&($_GET["sort"]=="lastcheck"))
+		if(isset($_REQUEST["sort"])&&($_REQUEST["sort"]=="lastcheck"))
 		{
 			$header=array_merge($header,array(S_LAST_CHECK_BIG));
 		}
 		else
 		{
-			if(isset($_GET["select"]))
-				$header=array_merge($header,array("<a href=\"latest.php?select=".$_GET["select"]."&sort=lastcheck\">".S_LAST_CHECK));
+			if(isset($_REQUEST["select"]))
+				$header=array_merge($header,array("<a href=\"latest.php?select=".$_REQUEST["select"]."&sort=lastcheck\">".S_LAST_CHECK));
 			else
-			$header=array_merge($header,array("<a href=\"latest.php?hostid=".$_GET["hostid"]."&sort=lastcheck\">".S_LAST_CHECK));
+			$header=array_merge($header,array("<a href=\"latest.php?hostid=".$_REQUEST["hostid"]."&sort=lastcheck\">".S_LAST_CHECK));
 		}
 		$header=array_merge($header,array(S_LAST_VALUE,S_CHANGE,S_HISTORY));
 
@@ -201,30 +201,30 @@
 /*		cr();
 		echo "<TR BGCOLOR=\"CCCCCC\">";
 		cr();
-		if(isset($_GET["select"]))
+		if(isset($_REQUEST["select"]))
 		{
 			echo "<TD><B>Host</B></TD>";
 		}
-		if(!isset($_GET["sort"])||(isset($_GET["sort"])&&($_GET["sort"]=="description")))
+		if(!isset($_REQUEST["sort"])||(isset($_REQUEST["sort"])&&($_REQUEST["sort"]=="description")))
 		{
 			echo "<TD><B>".S_DESCRIPTION_LARGE."</B></TD>";
 		}
 		else
 		{
-			iif_echo(isset($_GET["select"]),
-				"<TD><B><a href=\"latest.php?select=".$_GET["select"]."&sort=description\">".S_DESCRIPTION_SMALL."</B></TD>",
-				"<TD><B><a href=\"latest.php?hostid=".$_GET["hostid"]."&sort=description\">".S_DESCRIPTION_SMALL."</B></TD>");
+			iif_echo(isset($_REQUEST["select"]),
+				"<TD><B><a href=\"latest.php?select=".$_REQUEST["select"]."&sort=description\">".S_DESCRIPTION_SMALL."</B></TD>",
+				"<TD><B><a href=\"latest.php?hostid=".$_REQUEST["hostid"]."&sort=description\">".S_DESCRIPTION_SMALL."</B></TD>");
 		}
-		if(isset($_GET["sort"])&&($_GET["sort"]=="lastcheck"))
+		if(isset($_REQUEST["sort"])&&($_REQUEST["sort"]=="lastcheck"))
 		{
 			echo "<TD WIDTH=12%><B>LAST CHECK</B></TD>";
 		}
 		else
 		{
-			if(isset($_GET["select"]))
-				echo "<TD WIDTH=12%><B><a href=\"latest.php?select=".$_GET["select"]."&sort=lastcheck\">Last check</B></TD>";
+			if(isset($_REQUEST["select"]))
+				echo "<TD WIDTH=12%><B><a href=\"latest.php?select=".$_REQUEST["select"]."&sort=lastcheck\">Last check</B></TD>";
 			else
-				echo "<TD WIDTH=12%><B><a href=\"latest.php?hostid=".$_GET["hostid"]."&sort=lastcheck\">Last check</B></TD>";
+				echo "<TD WIDTH=12%><B><a href=\"latest.php?hostid=".$_REQUEST["hostid"]."&sort=lastcheck\">Last check</B></TD>";
 		}
 		cr();
 		echo "<TD WIDTH=10%><B>Last value</B></TD>"; 
@@ -237,29 +237,29 @@
 		cr();*/
 
 		$col=0;
-		if(isset($_GET["sort"]))
+		if(isset($_REQUEST["sort"]))
 		{
-			switch ($_GET["sort"])
+			switch ($_REQUEST["sort"])
 			{
 				case "description":
-					$_GET["sort"]="order by i.description";
+					$_REQUEST["sort"]="order by i.description";
 					break;
 				case "lastcheck":
-					$_GET["sort"]="order by i.lastclock";
+					$_REQUEST["sort"]="order by i.lastclock";
 					break;
 				default:
-					$_GET["sort"]="order by i.description";
+					$_REQUEST["sort"]="order by i.description";
 					break;
 			}
 		}
 		else
 		{
-			$_GET["sort"]="order by i.description";
+			$_REQUEST["sort"]="order by i.description";
 		}
-		if(isset($_GET["select"]))
-			$sql="select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier,i.key_ from items i,hosts h where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 and i.description like '%".$_GET["select"]."%' ".$_GET["sort"];
+		if(isset($_REQUEST["select"]))
+			$sql="select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier,i.key_ from items i,hosts h where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 and i.description like '%".$_REQUEST["select"]."%' ".$_REQUEST["sort"];
 		else
-			$sql="select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier,i.key_ from items i,hosts h where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 and h.hostid=".$_GET["hostid"]." ".$_GET["sort"];
+			$sql="select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier,i.key_ from items i,hosts h where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 and h.hostid=".$_REQUEST["hostid"]." ".$_REQUEST["sort"];
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
@@ -275,7 +275,7 @@
 				"<tr bgcolor=#DDDDDD>",
 				"<tr bgcolor=#EEEEEE>");
 
-			if(isset($_GET["select"]))
+			if(isset($_REQUEST["select"]))
 			{
 				table_td($row["host"],"");
 			}

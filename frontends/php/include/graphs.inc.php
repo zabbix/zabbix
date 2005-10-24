@@ -204,27 +204,27 @@
 
 	function	navigation_bar_calc()
 	{
-		if(!isset($_GET["period"]))	$_GET["period"]=3600;
-		if(!isset($_GET["from"]))	$_GET["from"]=0;
+		if(!isset($_REQUEST["period"]))	$_REQUEST["period"]=3600;
+		if(!isset($_REQUEST["from"]))	$_REQUEST["from"]=0;
 
-		if(isset($_GET["inc"]))		$_GET["period"]= $_GET["period"]+$_GET["inc"];
-		if(isset($_GET["dec"]))		$_GET["period"]= $_GET["period"]-$_GET["dec"];
+		if(isset($_REQUEST["inc"]))		$_REQUEST["period"]= $_REQUEST["period"]+$_REQUEST["inc"];
+		if(isset($_REQUEST["dec"]))		$_REQUEST["period"]= $_REQUEST["period"]-$_REQUEST["dec"];
 
-		if(isset($_GET["left"]))	$_GET["from"]= $_GET["from"]+$_GET["left"];
-		if(isset($_GET["right"]))	$_GET["from"]= $_GET["from"]-$_GET["right"];
+		if(isset($_REQUEST["left"]))	$_REQUEST["from"]= $_REQUEST["from"]+$_REQUEST["left"];
+		if(isset($_REQUEST["right"]))	$_REQUEST["from"]= $_REQUEST["from"]-$_REQUEST["right"];
 
-		unset($_GET["inc"]);
-		unset($_GET["dec"]);
-		unset($_GET["left"]);
-		unset($_GET["right"]);
+		unset($_REQUEST["inc"]);
+		unset($_REQUEST["dec"]);
+		unset($_REQUEST["left"]);
+		unset($_REQUEST["right"]);
 
-		if($_GET["from"]<=0)		$_GET["from"]=0;
-		if($_GET["period"]<=0)		$_GET["period"]=3600;
+		if($_REQUEST["from"]<=0)		$_REQUEST["from"]=0;
+		if($_REQUEST["period"]<=0)		$_REQUEST["period"]=3600;
 
-		if(isset($_GET["reset"]))
+		if(isset($_REQUEST["reset"]))
 		{
-			$_GET["period"]=3600;
-			$_GET["from"]=0;
+			$_REQUEST["period"]=3600;
+			$_REQUEST["from"]=0;
 		}
 	}
 
@@ -286,29 +286,29 @@
 		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"action\" value=\"go\">";
 		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"reset\" value=\"reset\">";
 
-		if(isset($_GET["graphid"])&&($_GET["graphid"]!=0))
+		if(isset($_REQUEST["graphid"])&&($_REQUEST["graphid"]!=0))
 		{
-			$h2=$h2."<input name=\"graphid\" type=\"hidden\" value=\"".$_GET["graphid"]."\" size=12>";
+			$h2=$h2."<input name=\"graphid\" type=\"hidden\" value=\"".$_REQUEST["graphid"]."\" size=12>";
 		}
-		if(isset($_GET["screenid"])&&($_GET["screenid"]!=0))
+		if(isset($_REQUEST["screenid"])&&($_REQUEST["screenid"]!=0))
 		{
-			$h2=$h2."<input name=\"screenid\" type=\"hidden\" value=\"".$_GET["screenid"]."\" size=12>";
+			$h2=$h2."<input name=\"screenid\" type=\"hidden\" value=\"".$_REQUEST["screenid"]."\" size=12>";
 		}
-		if(isset($_GET["itemid"])&&($_GET["itemid"]!=0))
+		if(isset($_REQUEST["itemid"])&&($_REQUEST["itemid"]!=0))
 		{
-			$h2=$h2."<input name=\"itemid\" type=\"hidden\" value=\"".$_GET["itemid"]."\" size=12>";
+			$h2=$h2."<input name=\"itemid\" type=\"hidden\" value=\"".$_REQUEST["itemid"]."\" size=12>";
 		}
-		if(isset($_GET["action"]))
+		if(isset($_REQUEST["action"]))
 		{
-			$h2=$h2."<input name=\"action\" type=\"hidden\" value=\"".$_GET["action"]."\" size=22>";
+			$h2=$h2."<input name=\"action\" type=\"hidden\" value=\"".$_REQUEST["action"]."\" size=22>";
 		}
-		if(isset($_GET["from"]))
+		if(isset($_REQUEST["from"]))
 		{
-			$h2=$h2."<input name=\"from\" type=\"hidden\" value=\"".$_GET["from"]."\" size=22>";
+			$h2=$h2."<input name=\"from\" type=\"hidden\" value=\"".$_REQUEST["from"]."\" size=22>";
 		}
-		if(isset($_GET["fullscreen"]))
+		if(isset($_REQUEST["fullscreen"]))
 		{
-			$h2=$h2."<input name=\"fullscreen\" type=\"hidden\" value=\"".$_GET["fullscreen"]."\" size=22>";
+			$h2=$h2."<input name=\"fullscreen\" type=\"hidden\" value=\"".$_REQUEST["fullscreen"]."\" size=22>";
 		}
 
 		show_header2($h1,$h2,"<form name=\"form2\" method=\"get\" action=\"$url\">","</form>");
@@ -329,9 +329,9 @@
 		foreach($a as $label=>$sec)
 		{
 			echo "[";
-			if($_GET["period"]>$sec)
+			if($_REQUEST["period"]>$sec)
 			{
-				$tmp=$_GET["period"]-$sec;
+				$tmp=$_REQUEST["period"]-$sec;
 				echo("<A HREF=\"$url&period=$tmp".url_param("graphid").url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">-</A>");
 			}
 			else
@@ -342,7 +342,7 @@
 			echo("<A HREF=\"$url?period=$sec".url_param("graphid").url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">");
 			echo($label."</A>");
 
-			$tmp=$_GET["period"]+$sec;
+			$tmp=$_REQUEST["period"]+$sec;
 			echo("<A HREF=\"$url?period=$tmp".url_param("graphid").url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">+</A>");
 
 			echo "]&nbsp;";
@@ -353,7 +353,7 @@
 		echo "</TD>";
 		echo "<TD BGCOLOR=#FFFFFF WIDTH=15% ALIGN=RIGHT>";
 		echo "<b>".nbsp(S_KEEP_PERIOD).":</b>&nbsp;";
-		if($_GET["keep"] == 1)
+		if($_REQUEST["keep"] == 1)
 		{
 			echo("[<A HREF=\"$url?keep=0".url_param("graphid").url_param("from").url_param("period").url_param("fullscreen")."\">".S_ON_C."</a>]");
 		}
@@ -365,7 +365,7 @@
 		echo "</TR>";
 		echo "<TR BGCOLOR=#FFFFFF>";
 		echo "<TD>";
-		if(isset($_GET["stime"]))
+		if(isset($_REQUEST["stime"]))
 		{
 			echo "<div align=left>" ;
 			echo "<b>".S_MOVE.":</b>&nbsp;" ;
@@ -378,7 +378,7 @@
 			{
 				echo "[";
 
-				$stime=$_GET["stime"];
+				$stime=$_REQUEST["stime"];
 				$tmp=mktime(substr($stime,8,2),substr($stime,10,2),0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
 				$tmp=$tmp-3600*$hours;
 				$tmp=date("YmdHi",$tmp);
@@ -386,7 +386,7 @@
 	
 				echo($label);
 	
-				$stime=$_GET["stime"];
+				$stime=$_REQUEST["stime"];
 				$tmp=mktime(substr($stime,8,2),substr($stime,10,2),0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
 				$tmp=$tmp+3600*$hours;
 				$tmp=date("YmdHi",$tmp);
@@ -408,14 +408,14 @@
 			foreach($a as $label=>$hours)
 			{
 				echo "[";
-				$tmp=$_GET["from"]+$hours;
+				$tmp=$_REQUEST["from"]+$hours;
 				echo("<A HREF=\"$url?from=$tmp".url_param("graphid").url_param("period").url_param("keep").url_param("fullscreen")."\">-</A>");
 
 				echo($label);
 
-				if($_GET["from"]>=$hours)
+				if($_REQUEST["from"]>=$hours)
 				{
-					$tmp=$_GET["from"]-$hours;
+					$tmp=$_REQUEST["from"]-$hours;
 					echo("<A HREF=\"$url?from=$tmp".url_param("graphid").url_param("period").url_param("keep").url_param("fullscreen")."\">+</A>");
 				}
 				else
@@ -430,11 +430,11 @@
 		echo "</TD>";
 		echo "<TD BGCOLOR=#FFFFFF WIDTH=15% ALIGN=RIGHT>";
 		echo "<form method=\"put\" action=\"$url\">";
-		echo "<input name=\"graphid\" type=\"hidden\" value=\"".$_GET["graphid"]."\" size=12>";
+		echo "<input name=\"graphid\" type=\"hidden\" value=\"".$_REQUEST["graphid"]."\" size=12>";
 		echo "<input name=\"period\" type=\"hidden\" value=\"".(9*3600)."\" size=12>";
-		if(isset($_GET["stime"]))
+		if(isset($_REQUEST["stime"]))
 		{
-			echo "<input name=\"stime\" class=\"biginput\" value=\"".$_GET["stime"]."\" size=12>";
+			echo "<input name=\"stime\" class=\"biginput\" value=\"".$_REQUEST["stime"]."\" size=12>";
 		}
 		else
 		{

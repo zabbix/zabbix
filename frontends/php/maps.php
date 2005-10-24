@@ -24,11 +24,11 @@
 	$page["file"] = "maps.php";
 
 	$nomenu=0;
-	if(isset($_GET["fullscreen"]))
+	if(isset($_REQUEST["fullscreen"]))
 	{
 		$nomenu=1;
 	}
-	if(isset($_GET["sysmapid"]))
+	if(isset($_REQUEST["sysmapid"]))
 	{
 		show_header($page["title"],30,$nomenu);
 	}
@@ -39,7 +39,7 @@
 ?>
 
 <?php
-	if(isset($_GET["sysmapid"])&&!check_right("Network map","R",$_GET["sysmapid"]))
+	if(isset($_REQUEST["sysmapid"])&&!check_right("Network map","R",$_REQUEST["sysmapid"]))
 	{
 		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_footer();
@@ -48,28 +48,28 @@
 ?>
 
 <?php
-	$_GET["sysmapid"]=@iif(isset($_GET["sysmapid"]),$_GET["sysmapid"],get_profile("web.maps.sysmapid",0));
-	update_profile("web.maps.sysmapid",$_GET["sysmapid"]);
+	$_REQUEST["sysmapid"]=@iif(isset($_REQUEST["sysmapid"]),$_REQUEST["sysmapid"],get_profile("web.maps.sysmapid",0));
+	update_profile("web.maps.sysmapid",$_REQUEST["sysmapid"]);
 	update_profile("web.menu.view.last",$page["file"]);
 ?>
 
 <?php
-//	if(!isset($_GET["fullscreen"]))
+//	if(!isset($_REQUEST["fullscreen"]))
 	{
 		show_table3_header_begin();
 
-		if(isset($_GET["sysmapid"])&&($_GET["sysmapid"]==0))
+		if(isset($_REQUEST["sysmapid"])&&($_REQUEST["sysmapid"]==0))
 		{
-			unset($_GET["sysmapid"]);
+			unset($_REQUEST["sysmapid"]);
 		}
 
-		if(isset($_GET["sysmapid"]))
+		if(isset($_REQUEST["sysmapid"]))
 		{
-			$result=DBselect("select name from sysmaps where sysmapid=".$_GET["sysmapid"]);
+			$result=DBselect("select name from sysmaps where sysmapid=".$_REQUEST["sysmapid"]);
 			$h1=DBget_field($result,0,0);
-			$h1=iif(isset($_GET["fullscreen"]),
-				"<a href=\"maps.php?sysmapid=".$_GET["sysmapid"]."\">".$h1."</a>",
-				"<a href=\"maps.php?sysmapid=".$_GET["sysmapid"]."&fullscreen=1\">".$h1."</a>");
+			$h1=iif(isset($_REQUEST["fullscreen"]),
+				"<a href=\"maps.php?sysmapid=".$_REQUEST["sysmapid"]."\">".$h1."</a>",
+				"<a href=\"maps.php?sysmapid=".$_REQUEST["sysmapid"]."&fullscreen=1\">".$h1."</a>");
 		}
 		else
 		{
@@ -80,14 +80,14 @@
 
 		$h2="";
 
-		if(isset($_GET["fullscreen"]))
+		if(isset($_REQUEST["fullscreen"]))
 		{
-			$h2=$h2."<input name=\"fullscreen\" type=\"hidden\" value=".$_GET["fullscreen"].">";
+			$h2=$h2."<input name=\"fullscreen\" type=\"hidden\" value=".$_REQUEST["fullscreen"].">";
 		}
 
-		if(isset($_GET["sysmapid"])&&($_GET["sysmapid"]==0))
+		if(isset($_REQUEST["sysmapid"])&&($_REQUEST["sysmapid"]==0))
 		{
-			unset($_GET["sysmapid"]);
+			unset($_REQUEST["sysmapid"]);
 		}
 
 		$h2=$h2."<select class=\"biginput\" name=\"sysmapid\" onChange=\"submit()\">";
@@ -109,13 +109,13 @@
 ?>
 
 <?php
-/*	if(isset($_GET["sysmapid"]))
+/*	if(isset($_REQUEST["sysmapid"]))
 	{
-		$result=DBselect("select name from sysmaps where sysmapid=".$_GET["sysmapid"]);
+		$result=DBselect("select name from sysmaps where sysmapid=".$_REQUEST["sysmapid"]);
 		$map=DBget_field($result,0,0);
-		$map=iif(isset($_GET["fullscreen"]),
-			"<a href=\"maps.php?sysmapid=".$_GET["sysmapid"]."\">".$map."</a>",
-			"<a href=\"maps.php?sysmapid=".$_GET["sysmapid"]."&fullscreen=1\">".$map."</a>");
+		$map=iif(isset($_REQUEST["fullscreen"]),
+			"<a href=\"maps.php?sysmapid=".$_REQUEST["sysmapid"]."\">".$map."</a>",
+			"<a href=\"maps.php?sysmapid=".$_REQUEST["sysmapid"]."&fullscreen=1\">".$map."</a>");
 	}
 	else
 	{
@@ -129,10 +129,10 @@
 	echo "<TR BGCOLOR=\"#EEEEEE\">";
 	echo "<TR BGCOLOR=\"#DDDDDD\">";
 	echo "<TD ALIGN=CENTER>";
-	if(isset($_GET["sysmapid"]))
+	if(isset($_REQUEST["sysmapid"]))
 	{
-		echo get_map_imagemap($_GET["sysmapid"]);
-		echo "<IMG SRC=\"map.php?noedit=1&sysmapid=".$_GET["sysmapid"]."\" border=0 usemap=#links".$_GET["sysmapid"].">";
+		echo get_map_imagemap($_REQUEST["sysmapid"]);
+		echo "<IMG SRC=\"map.php?noedit=1&sysmapid=".$_REQUEST["sysmapid"]."\" border=0 usemap=#links".$_REQUEST["sysmapid"].">";
 	}
 	else
 	{

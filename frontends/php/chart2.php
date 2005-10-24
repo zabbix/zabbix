@@ -23,37 +23,37 @@
 	include "include/classes.inc.php";
 
 	$graph=new Graph();
-	if(isset($_GET["period"]))
+	if(isset($_REQUEST["period"]))
 	{
-		$graph->setPeriod($_GET["period"]);
+		$graph->setPeriod($_REQUEST["period"]);
 	}
-	if(isset($_GET["from"]))
+	if(isset($_REQUEST["from"]))
 	{
-		$graph->setFrom($_GET["from"]);
+		$graph->setFrom($_REQUEST["from"]);
 	}
-	if(isset($_GET["stime"]))
+	if(isset($_REQUEST["stime"]))
 	{
-		$graph->setSTime($_GET["stime"]);
+		$graph->setSTime($_REQUEST["stime"]);
 	}
-	if(isset($_GET["border"]))
+	if(isset($_REQUEST["border"]))
 	{
 		$graph->setBorder(0);
 	}
 
-	$result=DBselect("select name,width,height,yaxistype,yaxismin,yaxismax from graphs where graphid=".$_GET["graphid"]);
+	$result=DBselect("select name,width,height,yaxistype,yaxismin,yaxismax from graphs where graphid=".$_REQUEST["graphid"]);
 
 	$name=DBget_field($result,0,0);
-	if(isset($_GET["width"])&&$_GET["width"]>0)
+	if(isset($_REQUEST["width"])&&$_REQUEST["width"]>0)
 	{
-		$width=$_GET["width"];
+		$width=$_REQUEST["width"];
 	}
 	else
 	{
 		$width=DBget_field($result,0,1);
 	}
-	if(isset($_GET["height"])&&$_GET["height"]>0)
+	if(isset($_REQUEST["height"])&&$_REQUEST["height"]>0)
 	{
-		$height=$_GET["height"];
+		$height=$_REQUEST["height"];
 	}
 	else
 	{
@@ -67,7 +67,7 @@
 	$graph->setYAxisMin(DBget_field($result,0,4));
 	$graph->setYAxisMax(DBget_field($result,0,5));
 
-	$result=DBselect("select gi.itemid,i.description,gi.color,h.host,gi.drawtype from graphs_items gi,items i,hosts h where gi.itemid=i.itemid and gi.graphid=".$_GET["graphid"]." and i.hostid=h.hostid order by gi.sortorder");
+	$result=DBselect("select gi.itemid,i.description,gi.color,h.host,gi.drawtype from graphs_items gi,items i,hosts h where gi.itemid=i.itemid and gi.graphid=".$_REQUEST["graphid"]." and i.hostid=h.hostid order by gi.sortorder");
 
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{

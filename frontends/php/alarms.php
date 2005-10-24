@@ -26,7 +26,7 @@
 ?>
 
 <?php
-	if(!check_right_on_trigger("R",$_GET["triggerid"]))
+	if(!check_right_on_trigger("R",$_REQUEST["triggerid"]))
         {
                 show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
                 show_footer();
@@ -35,27 +35,27 @@
 ?>
 
 <?php
-	if(isset($_GET["limit"]) && ($_GET["limit"]=="NO"))
+	if(isset($_REQUEST["limit"]) && ($_REQUEST["limit"]=="NO"))
 	{
 		$limit="";
 	}
 	else
 	{
 		$limit="limit 100";
-		$_GET["limit"] = 100;
+		$_REQUEST["limit"] = 100;
 	}
 
-	$trigger=get_trigger_by_triggerid($_GET["triggerid"]);
+	$trigger=get_trigger_by_triggerid($_REQUEST["triggerid"]);
 
 	$expression=$trigger["expression"];
 
 	$expression=explode_exp($expression,1);
-	$description=expand_trigger_description($_GET["triggerid"]);
+	$description=expand_trigger_description($_REQUEST["triggerid"]);
 
 	$h1=S_ALARMS_BIG.":$description<br>$expression";
 
 	$h2="";
-	$h2=$h2."<input name=\"triggerid\" type=\"hidden\" value=".$_GET["triggerid"].">";
+	$h2=$h2."<input name=\"triggerid\" type=\"hidden\" value=".$_REQUEST["triggerid"].">";
 	$h2=$h2."<select class=\"biginput\" name=\"limit\" onChange=\"submit()\">";
 	$h2=$h2.form_select("limit","NO",S_SHOW_ALL);
 	$h2=$h2.form_select("limit","100",S_SHOW_ONLY_LAST_100);
@@ -66,7 +66,7 @@
 
 <FONT COLOR="#000000">
 <?php
-	$sql="select clock,value,triggerid from alarms where triggerid=".$_GET["triggerid"]." order by clock desc $limit";
+	$sql="select clock,value,triggerid from alarms where triggerid=".$_REQUEST["triggerid"]." order by clock desc $limit";
 	$result=DBselect($sql);
 
 	table_begin();

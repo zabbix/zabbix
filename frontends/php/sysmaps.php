@@ -37,23 +37,23 @@
 ?>
 
 <?php
-	if(isset($_GET["register"]))
+	if(isset($_REQUEST["register"]))
 	{
-		if($_GET["register"]=="add")
+		if($_REQUEST["register"]=="add")
 		{
-			$result=add_sysmap($_GET["name"],$_GET["width"],$_GET["height"],$_GET["background"],$_GET["label_type"]);
+			$result=add_sysmap($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["background"],$_REQUEST["label_type"]);
 			show_messages($result,"Network map added","Cannot add network map");
 		}
-		if($_GET["register"]=="update")
+		if($_REQUEST["register"]=="update")
 		{
-			$result=update_sysmap($_GET["sysmapid"],$_GET["name"],$_GET["width"],$_GET["height"],$_GET["background"],$_GET["label_type"]);
+			$result=update_sysmap($_REQUEST["sysmapid"],$_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["background"],$_REQUEST["label_type"]);
 			show_messages($result,"Network map updated","Cannot update network map");
 		}
-		if($_GET["register"]=="delete")
+		if($_REQUEST["register"]=="delete")
 		{
-			$result=delete_sysmap($_GET["sysmapid"]);
+			$result=delete_sysmap($_REQUEST["sysmapid"]);
 			show_messages($result,"Network map deleted","Cannot delete network map");
-			unset($_GET["sysmapid"]);
+			unset($_REQUEST["sysmapid"]);
 		}
 	}
 ?>
@@ -97,9 +97,9 @@
 <?php
 	echo "<a name=\"form\"></a>";
 
-	if(isset($_GET["sysmapid"]))
+	if(isset($_REQUEST["sysmapid"]))
 	{
-		$result=DBselect("select * from sysmaps where sysmapid=".$_GET["sysmapid"]);
+		$result=DBselect("select * from sysmaps where sysmapid=".$_REQUEST["sysmapid"]);
 		$row=DBfetch($result);
 		$name=$row["name"];
 		$width=$row["width"];
@@ -123,9 +123,9 @@
 
 	show_table2_v_delimiter($col++);
 	echo "<form method=\"get\" enctype=\"multipart/form-data\" action=\"sysmaps.php\">";
-	if(isset($_GET["sysmapid"]))
+	if(isset($_REQUEST["sysmapid"]))
 	{
-		echo "<input class=\"biginput\" name=\"sysmapid\" type=\"hidden\" value=".$_GET["sysmapid"].">";
+		echo "<input class=\"biginput\" name=\"sysmapid\" type=\"hidden\" value=".$_REQUEST["sysmapid"].">";
 	}
 	echo S_NAME;
 	show_table2_h_delimiter();
@@ -150,7 +150,7 @@
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		$name=DBget_field($result,$i,0);
-		if(isset($_GET["sysmapid"]) && ($background==$name))
+		if(isset($_REQUEST["sysmapid"]) && ($background==$name))
 		{
 			echo "<OPTION VALUE='".$name."' SELECTED>".$name;
 		}
@@ -209,7 +209,7 @@
 
 	show_table2_v_delimiter2();
 	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
-	if(isset($_GET["sysmapid"]))
+	if(isset($_REQUEST["sysmapid"]))
 	{
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete system map?');\">";

@@ -27,7 +27,7 @@
 ?>
 
 <?php
-	if(($_GET["triggerid"]!=0)&&!check_right_on_trigger("U",$_GET["triggerid"]))
+	if(($_REQUEST["triggerid"]!=0)&&!check_right_on_trigger("U",$_REQUEST["triggerid"]))
 	{
 		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_footer();
@@ -36,97 +36,97 @@
 ?>
 
 <?php
-	if(isset($_GET["register"]))
+	if(isset($_REQUEST["register"]))
 	{
-		if($_GET["register"]=="add")
+		if($_REQUEST["register"]=="add")
 		{
-			if($_GET["repeat"]==0)
+			if($_REQUEST["repeat"]==0)
 			{
-				$_GET["maxrepeats"]=0;
-				$_GET["repeatdelay"]=600;
+				$_REQUEST["maxrepeats"]=0;
+				$_REQUEST["repeatdelay"]=600;
 			}
 
-			$actionid=add_action( $_GET["triggerid"], $_GET["userid"], $_GET["good"], $_GET["delay"], $_GET["subject"], $_GET["message"],$_GET["scope"],$_GET["severity"],$_GET["recipient"],$_GET["usrgrpid"],$_GET["maxrepeats"],$_GET["repeatdelay"]);
+			$actionid=add_action( $_REQUEST["triggerid"], $_REQUEST["userid"], $_REQUEST["good"], $_REQUEST["delay"], $_REQUEST["subject"], $_REQUEST["message"],$_REQUEST["scope"],$_REQUEST["severity"],$_REQUEST["recipient"],$_REQUEST["usrgrpid"],$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"]);
 			add_action_to_linked_hosts($actionid);
 			show_messages($actionid,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
 			if($actionid)
 			{
-				if(isset($_GET["userid"]))
+				if(isset($_REQUEST["userid"]))
 				{
-					$user=get_user_by_userid($_GET["userid"]);
-					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ACTION,"User [".$user["alias"]."] when [".$_GET["good"]."] subject [".$_GET["subject"]."]");
+					$user=get_user_by_userid($_REQUEST["userid"]);
+					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ACTION,"User [".$user["alias"]."] when [".$_REQUEST["good"]."] subject [".$_REQUEST["subject"]."]");
 				}
 				else
 				{
-					$group=get_group_by_groupid($_GET["usrgrpid"]);
-					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ACTION,"User [".$group["name"]."] when [".$_GET["good"]."] subject [".$_GET["subject"]."]");
+					$group=get_group_by_groupid($_REQUEST["usrgrpid"]);
+					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ACTION,"User [".$group["name"]."] when [".$_REQUEST["good"]."] subject [".$_REQUEST["subject"]."]");
 				}
 			}
 		}
-		if($_GET["register"]=="update")
+		if($_REQUEST["register"]=="update")
 		{
-			if($_GET["repeat"]==0)
+			if($_REQUEST["repeat"]==0)
 			{
-				$_GET["maxrepeats"]=0;
-				$_GET["repeatdelay"]=600;
+				$_REQUEST["maxrepeats"]=0;
+				$_REQUEST["repeatdelay"]=600;
 			}
-			$result=update_action( $_GET["actionid"], $_GET["triggerid"], $_GET["userid"], $_GET["good"], $_GET["delay"], $_GET["subject"], $_GET["message"],$_GET["scope"],$_GET["severity"],$_GET["recipient"],$_GET["usrgrpid"],$_GET["maxrepeats"],$_GET["repeatdelay"]);
+			$result=update_action( $_REQUEST["actionid"], $_REQUEST["triggerid"], $_REQUEST["userid"], $_REQUEST["good"], $_REQUEST["delay"], $_REQUEST["subject"], $_REQUEST["message"],$_REQUEST["scope"],$_REQUEST["severity"],$_REQUEST["recipient"],$_REQUEST["usrgrpid"],$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"]);
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
 			if($result)
 			{
-				if(isset($_GET["userid"]))
+				if(isset($_REQUEST["userid"]))
 				{
-					$user=get_user_by_userid($_GET["userid"]);
-					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ACTION,"User [".$user["alias"]."] when [".$_GET["good"]."] subject [".$_GET["subject"]."]");
+					$user=get_user_by_userid($_REQUEST["userid"]);
+					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ACTION,"User [".$user["alias"]."] when [".$_REQUEST["good"]."] subject [".$_REQUEST["subject"]."]");
 				}
 				else
 				{
-					$group=get_group_by_groupid($_GET["usrgrpid"]);
-					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ACTION,"User [".$group["name"]."] when [".$_GET["good"]."] subject [".$_GET["subject"]."]");
+					$group=get_group_by_groupid($_REQUEST["usrgrpid"]);
+					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ACTION,"User [".$group["name"]."] when [".$_REQUEST["good"]."] subject [".$_REQUEST["subject"]."]");
 				}
 			}
-			unset($_GET["actionid"]);
+			unset($_REQUEST["actionid"]);
 		}
-		if($_GET["register"]=="delete")
+		if($_REQUEST["register"]=="delete")
 		{
-			delete_action_from_templates($_GET["actionid"]);
-			$result=delete_action($_GET["actionid"]);
+			delete_action_from_templates($_REQUEST["actionid"]);
+			$result=delete_action($_REQUEST["actionid"]);
 			show_messages($result,S_ACTION_DELETED,S_CANNOT_DELETE_ACTION);
 			if($result)
 			{
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_ACTION,"When [".$_GET["good"]."] subject [".$_GET["subject"]."]");
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_ACTION,"When [".$_REQUEST["good"]."] subject [".$_REQUEST["subject"]."]");
 			}
-			unset($_GET["actionid"]);
+			unset($_REQUEST["actionid"]);
 		}
 	}
 ?>
 
 <?php
-	$trigger=get_trigger_by_triggerid($_GET["triggerid"]);
+	$trigger=get_trigger_by_triggerid($_REQUEST["triggerid"]);
 	$expression=explode_exp($trigger["expression"],1);
 //	$description=$trigger["description"];
 //	if( strstr($description,"%s"))
 //	{
-		$description=expand_trigger_description($_GET["triggerid"]);
+		$description=expand_trigger_description($_REQUEST["triggerid"]);
 //	}
 	show_table_header("$description<BR>$expression");
 ?>
 
 <?php
-/*	if(isset($_GET["scope"])&&($_GET["scope"]==2))
+/*	if(isset($_REQUEST["scope"])&&($_REQUEST["scope"]==2))
 	{
 		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.recipient,a.scope from actions a order by a.scope desc";
 	}
-	elseif(isset($_GET["scope"])&&($_GET["scope"]==1))
+	elseif(isset($_REQUEST["scope"])&&($_REQUEST["scope"]==1))
 	{
 		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.recipient,a.scope from actions a where a.scope=2 or a.scope=1 order by a.recipient desc";
 	}
 	else
 	{
-		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.recipient,a.scope from actions a where (a.triggerid=".$_GET["triggerid"]." and a.scope=0) or (a.scope=2 or a.scope=1) order by a.recipient desc";
+		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.recipient,a.scope from actions a where (a.triggerid=".$_REQUEST["triggerid"]." and a.scope=0) or (a.scope=2 or a.scope=1) order by a.recipient desc";
 	}*/
 //	echo $sql;
-	$sql="select actionid,userid,delay,subject,message,scope,severity,recipient,good,triggerid,maxrepeats,repeatdelay from actions where (scope=0 and triggerid=".$_GET["triggerid"].") or scope=1 or scope=2";
+	$sql="select actionid,userid,delay,subject,message,scope,severity,recipient,good,triggerid,maxrepeats,repeatdelay from actions where (scope=0 and triggerid=".$_REQUEST["triggerid"].") or scope=1 or scope=2";
 	$result=DBselect($sql);
 
 	table_begin();
@@ -137,7 +137,7 @@
 
 		if($row["scope"] == 1)
 		{
-			$sql="select h.hostid from triggers t,hosts h,functions f,items i where f.triggerid=t.triggerid and h.hostid=i.hostid and i.itemid=f.itemid and t.triggerid=".$_GET["triggerid"];
+			$sql="select h.hostid from triggers t,hosts h,functions f,items i where f.triggerid=t.triggerid and h.hostid=i.hostid and i.itemid=f.itemid and t.triggerid=".$_REQUEST["triggerid"];
 //			echo "$sql<br>";
 			$result2=DBselect($sql);
 			$found=0;
@@ -188,7 +188,7 @@
 			$maxrepeats=$row["maxrepeats"];
 		}
 
-		$actions="<A HREF=\"actions.php?register=edit&actionid=".$row["actionid"]."&triggerid=".$_GET["triggerid"]."#form\">Change</A>";
+		$actions="<A HREF=\"actions.php?register=edit&actionid=".$row["actionid"]."&triggerid=".$_REQUEST["triggerid"]."#form\">Change</A>";
 
 		table_row(array(
 			get_scope_description($row["scope"]),
@@ -215,9 +215,9 @@
 <?php
 	echo "<a name=\"form\"></a>";
 
-	if(isset($_GET["actionid"]))
+	if(isset($_REQUEST["actionid"]))
 	{
-		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.scope,a.severity,a.recipient,a.maxrepeats,a.repeatdelay from actions a where a.actionid=".$_GET["actionid"];
+		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.scope,a.severity,a.recipient,a.maxrepeats,a.repeatdelay from actions a where a.actionid=".$_REQUEST["actionid"];
 		$result=DBselect($sql);
 
 		$actionid=DBget_field($result,0,0);
@@ -228,14 +228,14 @@
 		$subject=htmlspecialchars(DBget_field($result,0,4));
 		$message=DBget_field($result,0,5);
 		$uid=DBget_field($result,0,6);
-		$scope=@iif(isset($_GET["scope"]),$_GET["scope"],DBget_field($result,0,7));
+		$scope=@iif(isset($_REQUEST["scope"]),$_REQUEST["scope"],DBget_field($result,0,7));
 		$severity=DBget_field($result,0,8);
-		$recipient=@iif(isset($_GET["recipient"]),$_GET["recipient"],DBget_field($result,0,9));
+		$recipient=@iif(isset($_REQUEST["recipient"]),$_REQUEST["recipient"],DBget_field($result,0,9));
 		$maxrepeats=DBget_field($result,0,10);
 		$repeatdelay=DBget_field($result,0,11);
-		if(isset($_GET["repeat"]))
+		if(isset($_REQUEST["repeat"]))
 		{
-			$repeat=$_GET["repeat"];
+			$repeat=$_REQUEST["repeat"];
 		}
 		else if($maxrepeats==0)
 		{
@@ -248,27 +248,27 @@
 	}
 	else
 	{
-		$trigger=get_trigger_by_triggerid($_GET["triggerid"]);
+		$trigger=get_trigger_by_triggerid($_REQUEST["triggerid"]);
 		$description=htmlspecialchars(stripslashes($trigger["description"]));
 
 //		$delay=30;
-		$delay=@iif(isset($_GET["delay"]),$_GET["delay"],30);
+		$delay=@iif(isset($_REQUEST["delay"]),$_REQUEST["delay"],30);
 //		$subject=$description;
-		$subject=@iif(isset($_GET["subject"]),$_GET["subject"],$description);
-		$scope=@iif(isset($_GET["scope"]),$_GET["scope"],0);
-		$good=@iif(isset($_GET["good"]),$_GET["good"],1);
-		$recipient=@iif(isset($_GET["recipient"]),$_GET["recipient"],RECIPIENT_TYPE_GROUP);
+		$subject=@iif(isset($_REQUEST["subject"]),$_REQUEST["subject"],$description);
+		$scope=@iif(isset($_REQUEST["scope"]),$_REQUEST["scope"],0);
+		$good=@iif(isset($_REQUEST["good"]),$_REQUEST["good"],1);
+		$recipient=@iif(isset($_REQUEST["recipient"]),$_REQUEST["recipient"],RECIPIENT_TYPE_GROUP);
 //		$severity=0;
-		$severity=@iif(isset($_GET["severity"]),$_GET["severity"],0);
-		$maxrepeats=@iif(isset($_GET["maxrepeats"]),$_GET["maxrepeats"],0);
-		$repeatdelay=@iif(isset($_GET["repeatdelay"]),$_GET["repeatdelay"],600);
-		$repeat=@iif(isset($_GET["repeat"]),$_GET["repeat"],0);
+		$severity=@iif(isset($_REQUEST["severity"]),$_REQUEST["severity"],0);
+		$maxrepeats=@iif(isset($_REQUEST["maxrepeats"]),$_REQUEST["maxrepeats"],0);
+		$repeatdelay=@iif(isset($_REQUEST["repeatdelay"]),$_REQUEST["repeatdelay"],600);
+		$repeat=@iif(isset($_REQUEST["repeat"]),$_REQUEST["repeat"],0);
 
-		$sql="select i.description, h.host, i.key_ from hosts h, items i,functions f where f.triggerid=".$_GET["triggerid"]." and h.hostid=i.hostid and f.itemid=i.itemid order by i.description";
+		$sql="select i.description, h.host, i.key_ from hosts h, items i,functions f where f.triggerid=".$_REQUEST["triggerid"]." and h.hostid=i.hostid and f.itemid=i.itemid order by i.description";
 		$result=DBselect($sql);
-		if(isset($_GET["message"]))
+		if(isset($_REQUEST["message"]))
 		{
-			$message=$_GET["message"];
+			$message=$_REQUEST["message"];
 		}
 		else
 		{
@@ -290,10 +290,10 @@
 
 	show_table2_v_delimiter($col++);
 	echo "<form method=\"get\" action=\"actions.php\">";
-	echo "<input name=\"triggerid\" type=\"hidden\" value=".$_GET["triggerid"].">";
-	if(isset($_GET["actionid"]))
+	echo "<input name=\"triggerid\" type=\"hidden\" value=".$_REQUEST["triggerid"].">";
+	if(isset($_REQUEST["actionid"]))
 	{
-		echo "<input name=\"actionid\" type=\"hidden\" value=".$_GET["actionid"].">";
+		echo "<input name=\"actionid\" type=\"hidden\" value=".$_REQUEST["actionid"].">";
 	}
 	echo nbsp(S_SEND_MESSAGE_TO);
 	show_table2_h_delimiter();

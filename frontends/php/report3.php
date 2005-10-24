@@ -35,19 +35,19 @@
 ?>
 
 <?php
-	if(!isset($_GET["serviceid"]))
+	if(!isset($_REQUEST["serviceid"]))
 	{
 		show_table_header("<font color=\"AA0000\">Undefined serviceid !</font>");
 		show_footer();
 		exit;
 	}
-	$service=get_service_by_serviceid($_GET["serviceid"]);
+	$service=get_service_by_serviceid($_REQUEST["serviceid"]);
 ?>
 
 <?php
-	if(!isset($_GET["period"]))
+	if(!isset($_REQUEST["period"]))
 	{
-		$_GET["period"]="weekly";
+		$_REQUEST["period"]="weekly";
 	}
 
 	$h1=S_IT_SERVICES_AVAILABILITY_REPORT_BIG;
@@ -55,7 +55,7 @@
 
 #	$h2=S_GROUP."&nbsp;";
 	$h2=S_YEAR."&nbsp;";
-	$h2=$h2."<input name=\"serviceid\" type=\"hidden\" value=".$_GET["serviceid"].">";
+	$h2=$h2."<input name=\"serviceid\" type=\"hidden\" value=".$_REQUEST["serviceid"].">";
 	$h2=$h2."<select class=\"biginput\" name=\"year\" onChange=\"submit()\">";
 	$result=DBselect("select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid group by h.hostid,h.host order by h.host");
 
@@ -79,7 +79,7 @@
 
 <?php
 	table_begin();
-	if($_GET["period"]=="yearly")
+	if($_REQUEST["period"]=="yearly")
 	{
 		table_header(array(S_YEAR,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));
 		for($year=date("Y")-5;$year<=date("Y");$year++)
@@ -121,13 +121,13 @@
 				),$col++);
 		}
 	}
-	else if($_GET["period"]=="monthly")
+	else if($_REQUEST["period"]=="monthly")
 	{
 		table_header(array(S_MONTH,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));
 		for($month=1;$month<=12;$month++)
 		{
-			$start=mktime(0,0,0,$month,1,$_GET["year"]);
-			$end=mktime(0,0,0,$month+1,1,$_GET["year"]);
+			$start=mktime(0,0,0,$month,1,$_REQUEST["year"]);
+			$end=mktime(0,0,0,$month+1,1,$_REQUEST["year"]);
 
 			if($start>time())	break;
 
@@ -166,11 +166,11 @@
 				),$col++);
 		}
 	}
-	else if($_GET["period"]=="daily")
+	else if($_REQUEST["period"]=="daily")
 	{
 		table_header(array(S_DAY,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));
-		$s=mktime(0,0,0,1,1,$_GET["year"]);
-		$e=mktime(0,0,0,1,1,$_GET["year"]+1);
+		$s=mktime(0,0,0,1,1,$_REQUEST["year"]);
+		$e=mktime(0,0,0,1,1,$_REQUEST["year"]+1);
 		for($day=$s;$day<$e;$day+=24*3600)
 		{
 			$start=$day;
@@ -221,7 +221,7 @@
 	$year=date("Y");
 	for($year=date("Y")-2;$year<=date("Y");$year++)
 	{
-		if( isset($_GET["year"]) && ($_GET["year"] != $year) )
+		if( isset($_REQUEST["year"]) && ($_REQUEST["year"] != $year) )
 		{
 			continue;
 		}

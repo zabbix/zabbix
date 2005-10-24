@@ -31,7 +31,7 @@
 
 	check_authorisation();
 
-	$result=DBselect("select image from images where imageid=".$_GET["imageid"]);
+	$result=DBselect("select image from images where imageid=".$_REQUEST["imageid"]);
 	$row=DBfetch($result);
 	$image=ImageCreateFromString($row["image"]);
 

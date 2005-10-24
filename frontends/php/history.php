@@ -26,7 +26,7 @@
 
 	$now=time();
 
-	$result=DBselect("select h.host,i.description,i.nextcheck-$now,h.hostid,i.key_ from items i,hosts h where i.itemid=".$_GET["itemid"]." and h.hostid=i.hostid");
+	$result=DBselect("select h.host,i.description,i.nextcheck-$now,h.hostid,i.key_ from items i,hosts h where i.itemid=".$_REQUEST["itemid"]." and h.hostid=i.hostid");
 	$host=DBget_field($result,0,0);
 	$description=item_description(DBget_field($result,0,1),DBget_field($result,0,4));
 	$beforenextcheck=DBget_field($result,0,2)+5;
@@ -36,9 +36,9 @@
 	}
 	$hostid=DBget_field($result,0,3);
 
-	if($_GET["action"]=="showhistory")
+	if($_REQUEST["action"]=="showhistory")
 	{
-		if(isset($_GET["year"]))
+		if(isset($_REQUEST["year"]))
 		{
 			show_header("$host:$description",0,0);
 		}
@@ -47,28 +47,28 @@
 			show_header("$host:$description",$beforenextcheck,0);
 		}
 	}
-	if($_GET["action"]=="showvalues")
+	if($_REQUEST["action"]=="showvalues")
 	{
 		show_header("$host:$description",0,0);
 	}
-	if($_GET["action"]=="showlatest")
+	if($_REQUEST["action"]=="showlatest")
 	{
 		show_header("$host:$description",0,0);
 	}
-	if($_GET["action"]=="showfreehist")
+	if($_REQUEST["action"]=="showfreehist")
 	{
 		show_header("$host:$description",0,0);
 	}
-	if($_GET["action"]=="showplaintxt")
+	if($_REQUEST["action"]=="showplaintxt")
 	{
 		show_header("$host:$description",0,0);
 	}
-	if($_GET["action"]=="plaintext")
+	if($_REQUEST["action"]=="plaintext")
 	{
 		show_header("$host:$description",0,1);
 	}
 
-	if(!check_right("Item","R",$_GET["itemid"]))
+	if(!check_right("Item","R",$_REQUEST["itemid"]))
 	{
 		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_footer();
@@ -82,29 +82,29 @@
 ?>
 
 <?php
-	if($_GET["action"]=="plaintext")
+	if($_REQUEST["action"]=="plaintext")
 	{
-		$from=mktime($_GET["fromhour"],$_GET["frommin"],0,$_GET["frommonth"],$_GET["fromday"],$_GET["fromyear"]);
-		$till=mktime($_GET["tillhour"],$_GET["tillmin"],0,$_GET["tillmonth"],$_GET["tillday"],$_GET["tillyear"]);
-		show_plaintext($_GET["itemid"], $from, $till);
+		$from=mktime($_REQUEST["fromhour"],$_REQUEST["frommin"],0,$_REQUEST["frommonth"],$_REQUEST["fromday"],$_REQUEST["fromyear"]);
+		$till=mktime($_REQUEST["tillhour"],$_REQUEST["tillmin"],0,$_REQUEST["tillmonth"],$_REQUEST["tillday"],$_REQUEST["tillyear"]);
+		show_plaintext($_REQUEST["itemid"], $from, $till);
 		exit;
 	}
 
 ?>
 
 <?php
-	if(!isset($_GET["config"]))
+	if(!isset($_REQUEST["config"]))
 	{
-		$_GET["config"]=0;
+		$_REQUEST["config"]=0;
 	}
 
 #	$h1=S_CONFIGURATION_OF_USERS_AND_USER_GROUPS;
-	$item=get_item_by_itemid($_GET["itemid"]);
+	$item=get_item_by_itemid($_REQUEST["itemid"]);
 
 	$h1="<A HREF='latest.php?hostid=$hostid'>$host</A> : $description";
 
 #	$h2=S_GROUP."&nbsp;";
-	$h2="<input class=\"biginput\" name=\"itemid\" type=\"hidden\" value=\"".$_GET["itemid"]."\">";
+	$h2="<input class=\"biginput\" name=\"itemid\" type=\"hidden\" value=\"".$_REQUEST["itemid"]."\">";
 	$h2=$h2."<select class=\"biginput\" name=\"action\" onChange=\"submit()\">";
 	$h2=$h2.form_select("action","showhistory",S_LAST_HOUR_GRAPH);
 	$h2=$h2.form_select("action","showvalues",S_VALUES_OF_LAST_HOUR);
@@ -117,37 +117,37 @@
 ?>
 
 <?php
-	if($_GET["action"]=="showfreehist")
+	if($_REQUEST["action"]=="showfreehist")
 	{
-		show_freehist($_GET["itemid"],$_GET["period"]);
+		show_freehist($_REQUEST["itemid"],$_REQUEST["period"]);
 		exit;
 	}
 
-	if($_GET["action"]=="showplaintxt")
+	if($_REQUEST["action"]=="showplaintxt")
 	{
-//		if(!isset($_GET["period"]))
+//		if(!isset($_REQUEST["period"]))
 		{
-			show_plaintxt($_GET["itemid"],$_GET["period"]);
+			show_plaintxt($_REQUEST["itemid"],$_REQUEST["period"]);
 		} 
 		exit;
    
 	}
 
-	if($_GET["action"]=="showvalues")
+	if($_REQUEST["action"]=="showvalues")
 	{
-		if(!isset($_GET["from"]))
+		if(!isset($_REQUEST["from"]))
 		{
-			$_GET["from"]=0;
+			$_REQUEST["from"]=0;
 		}
-		if(!isset($_GET["period"]))
+		if(!isset($_REQUEST["period"]))
 		{
-			$_GET["period"]=3600;
+			$_REQUEST["period"]=3600;
 		}
-		$time=time(NULL)-$_GET["period"]-$_GET["from"]*3600;
-		$till=time(NULL)-$_GET["from"]*3600;
-		$hours=$_GET["period"]/3600;
+		$time=time(NULL)-$_REQUEST["period"]-$_REQUEST["from"]*3600;
+		$till=time(NULL)-$_REQUEST["from"]*3600;
+		$hours=$_REQUEST["period"]/3600;
 
-		show_table_header("Showing history of ".$_GET["period"]." seconds($hours h)<BR>[from: ".date("Y.M.d H:i:s",$time)."] [till: ".date("Y.M.d H:i:s",$till)."]");
+		show_table_header("Showing history of ".$_REQUEST["period"]." seconds($hours h)<BR>[from: ".date("Y.M.d H:i:s",$time)."] [till: ".date("Y.M.d H:i:s",$till)."]");
 
 		echo "<TABLE BORDER=0 COLS=2 ALIGN=CENTER WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
 		echo "<TR BGCOLOR=\"#CCCCCC\">";
@@ -161,18 +161,18 @@
 		echo "<TD><B>".S_VALUE."</B></TD>";
 		echo "</TR>";
 
-		$item=get_item_by_itemid($_GET["itemid"]);
+		$item=get_item_by_itemid($_REQUEST["itemid"]);
 		if($item["value_type"]==ITEM_VALUE_TYPE_FLOAT)
 		{
-			$sql="select clock,value from history where itemid=".$_GET["itemid"]." and clock>$time and clock<$till order by clock desc";
+			$sql="select clock,value from history where itemid=".$_REQUEST["itemid"]." and clock>$time and clock<$till order by clock desc";
 		}
 		else if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
 		{
-			$sql="select clock,value,timestamp,source,severity from history_log where itemid=".$_GET["itemid"]." and clock>$time and clock<$till order by id desc, clock desc";
+			$sql="select clock,value,timestamp,source,severity from history_log where itemid=".$_REQUEST["itemid"]." and clock>$time and clock<$till order by id desc, clock desc";
 		}
 		else
 		{
-			$sql="select clock,value from history_str where itemid=".$_GET["itemid"]." and clock>$time and clock<$till order by clock desc";
+			$sql="select clock,value from history_str where itemid=".$_REQUEST["itemid"]." and clock>$time and clock<$till order by clock desc";
 		}
 		$result=DBselect($sql);
 		$col=0;
@@ -235,30 +235,30 @@
 		exit;
 	}
 
-	if($_GET["action"]=="showhistory")
+	if($_REQUEST["action"]=="showhistory")
 	{
-		if(!isset($_GET["period"]))
+		if(!isset($_REQUEST["period"]))
 		{
-			$_GET["period"]=3600;
+			$_REQUEST["period"]=3600;
 		}
-		if(!isset($_GET["from"]))
+		if(!isset($_REQUEST["from"]))
 		{
-			$_GET["from"]=0;
+			$_REQUEST["from"]=0;
 		}
-		if(isset($_GET["year"]))
+		if(isset($_REQUEST["year"]))
 		{
-			$_GET["from"]=($now-mktime($_GET["hour"], 0, 0, $_GET["month"], $_GET["day"],$_GET["year"]))/3600;
+			$_REQUEST["from"]=($now-mktime($_REQUEST["hour"], 0, 0, $_REQUEST["month"], $_REQUEST["day"],$_REQUEST["year"]))/3600;
 		}
-		@show_history($_GET["itemid"],$_GET["from"],$_GET["period"]);
+		@show_history($_REQUEST["itemid"],$_REQUEST["from"],$_REQUEST["period"]);
 		show_footer();
 		exit;
 	}
 
-	if($_GET["action"]=="showlatest")
+	if($_REQUEST["action"]=="showlatest")
 	{
 
 		table_begin();
-		$item=get_item_by_itemid($_GET["itemid"]);
+		$item=get_item_by_itemid($_REQUEST["itemid"]);
 
 		if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
 		{
@@ -271,15 +271,15 @@
 
 		if($item["value_type"]==ITEM_VALUE_TYPE_FLOAT)
 		{
-			$sql="select clock,value from history where itemid=".$_GET["itemid"]." order by clock desc limit 500";
+			$sql="select clock,value from history where itemid=".$_REQUEST["itemid"]." order by clock desc limit 500";
 		}
 		else if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
 		{
-			$sql="select clock,value,timestamp,source,severity from history_log where itemid=".$_GET["itemid"]." order by id desc, clock desc limit 500";
+			$sql="select clock,value,timestamp,source,severity from history_log where itemid=".$_REQUEST["itemid"]." order by id desc, clock desc limit 500";
 		}
 		else
 		{
-			$sql="select clock,value from history_str where itemid=".$_GET["itemid"]." order by clock desc limit 500";
+			$sql="select clock,value from history_str where itemid=".$_REQUEST["itemid"]." order by clock desc limit 500";
 		}
 		$result=DBselect($sql);
 		$col=0;

@@ -32,7 +32,7 @@
 ?>
 
 <?php
-	if(!check_right("Graph","R",$_GET["graphid"]))
+	if(!check_right("Graph","R",$_REQUEST["graphid"]))
 	{
 		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_footer();
@@ -41,71 +41,71 @@
 ?>
 
 <?php
-	if(isset($_GET["register"]))
+	if(isset($_REQUEST["register"]))
 	{
-		if($_GET["register"]=="add")
+		if($_REQUEST["register"]=="add")
 		{
-			$gitemid=add_item_to_graph($_GET["graphid"],$_GET["itemid"],$_GET["color"],$_GET["drawtype"],$_GET["sortorder"]);
+			$gitemid=add_item_to_graph($_REQUEST["graphid"],$_REQUEST["itemid"],$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"]);
 			if($gitemid)
 			{
 				add_graph_item_to_linked_hosts($gitemid);
-				$graph=get_graph_by_graphid($_GET["graphid"]);
-				$item=get_item_by_itemid($_GET["itemid"]);
-				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH_ELEMENT,"Graph ID [".$_GET["graphid"]."] Name [".$graph["name"]."] Added [".$item["description"]."]");
+				$graph=get_graph_by_graphid($_REQUEST["graphid"]);
+				$item=get_item_by_itemid($_REQUEST["itemid"]);
+				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH_ELEMENT,"Graph ID [".$_REQUEST["graphid"]."] Name [".$graph["name"]."] Added [".$item["description"]."]");
 			}
 			show_messages($gitemid,S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
-		if($_GET["register"]=="update")
+		if($_REQUEST["register"]=="update")
 		{
-			$result=update_graph_item($_GET["gitemid"],$_GET["itemid"],$_GET["color"],$_GET["drawtype"],$_GET["sortorder"]);
+			$result=update_graph_item($_REQUEST["gitemid"],$_REQUEST["itemid"],$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"]);
 			if($result)
 			{
-				$graphitem=get_graphitem_by_gitemid($_GET["gitemid"]);
+				$graphitem=get_graphitem_by_gitemid($_REQUEST["gitemid"]);
 				$graph=get_graph_by_graphid($graphitem["graphid"]);
 				$item=get_item_by_itemid($graphitem["itemid"]);
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_GRAPH_ELEMENT,"Graph ID [".$graphitem["graphid"]."] Name [".$graph["name"]."] Updated [".$item["description"]."]");
 			}
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
-		if($_GET["register"]=="delete")
+		if($_REQUEST["register"]=="delete")
 		{
-			delete_graph_item_from_templates($_GET["gitemid"]);
-			$graphitem=get_graphitem_by_gitemid($_GET["gitemid"]);
+			delete_graph_item_from_templates($_REQUEST["gitemid"]);
+			$graphitem=get_graphitem_by_gitemid($_REQUEST["gitemid"]);
 			$graph=get_graph_by_graphid($graphitem["graphid"]);
 			$item=get_item_by_itemid($graphitem["itemid"]);
-			$result=delete_graphs_item($_GET["gitemid"]);
+			$result=delete_graphs_item($_REQUEST["gitemid"]);
 			if($result)
 			{
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH_ELEMENT,"Graph ID [".$graphitem["graphid"]."] Name [".$graph["name"]."] Deleted [".$item["description"]."]");
 			}
 			show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
-			unset($_GET["gitemid"]);
+			unset($_REQUEST["gitemid"]);
 		}
-		if($_GET["register"]=="up")
+		if($_REQUEST["register"]=="up")
 		{
-			$sql="update graphs_items set sortorder=sortorder-1 where sortorder>0 and gitemid=".$_GET["gitemid"];
+			$sql="update graphs_items set sortorder=sortorder-1 where sortorder>0 and gitemid=".$_REQUEST["gitemid"];
 			$result=DBexecute($sql);
 			show_messages($result, S_SORT_ORDER_UPDATED, S_CANNOT_UPDATE_SORT_ORDER);
-			unset($_GET["gitemid"]);
+			unset($_REQUEST["gitemid"]);
 		}
-		if($_GET["register"]=="down")
+		if($_REQUEST["register"]=="down")
 		{
-			$sql="update graphs_items set sortorder=sortorder+1 where sortorder<100 and gitemid=".$_GET["gitemid"];
+			$sql="update graphs_items set sortorder=sortorder+1 where sortorder<100 and gitemid=".$_REQUEST["gitemid"];
 			$result=DBexecute($sql);
 			show_messages($result, S_SORT_ORDER_UPDATED, S_CANNOT_UPDATE_SORT_ORDER);
-			unset($_GET["gitemid"]);
+			unset($_REQUEST["gitemid"]);
 		}
 	}
 ?>
 
 <?php
-	$result=DBselect("select name from graphs where graphid=".$_GET["graphid"]);
+	$result=DBselect("select name from graphs where graphid=".$_REQUEST["graphid"]);
 	$row=DBfetch($result);
 	show_table_header($row["name"]);
 	echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR BGCOLOR=#DDDDDD>";
 	echo "<TD ALIGN=CENTER>";
-	echo "<IMG SRC=\"chart2.php?graphid=".$_GET["graphid"]."&period=3600&from=0\">";
+	echo "<IMG SRC=\"chart2.php?graphid=".$_REQUEST["graphid"]."&period=3600&from=0\">";
 	echo "</TD>";
 	echo "</TR>";
 	echo "</TABLE>";
@@ -120,7 +120,7 @@
 	echo "<TD WIDTH=10% NOSAVE><B>".S_ACTIONS."</B></TD>";
 	echo "</TR>";
 
-	$sql="select i.itemid,h.host,i.description,gi.gitemid,gi.color,gi.drawtype,gi.sortorder,i.key_ from hosts h,graphs_items gi,items i where i.itemid=gi.itemid and gi.graphid=".$_GET["graphid"]." and h.hostid=i.hostid order by gi.sortorder";
+	$sql="select i.itemid,h.host,i.description,gi.gitemid,gi.color,gi.drawtype,gi.sortorder,i.key_ from hosts h,graphs_items gi,items i where i.itemid=gi.itemid and gi.graphid=".$_REQUEST["graphid"]." and h.hostid=i.hostid order by gi.sortorder";
 	$result=DBselect($sql);
 	$col=0;
 	while($row=DBfetch($result))
@@ -134,11 +134,11 @@
 		echo "<TD>".get_drawtype_description($row["drawtype"])."</TD>";
 		echo "<TD>".$row["color"]."</TD>";
 		echo "<TD>";
-		echo "<A HREF=\"graph.php?graphid=".$_GET["graphid"]."&gitemid=".$row["gitemid"]."#form\">".S_CHANGE."</A>";
+		echo "<A HREF=\"graph.php?graphid=".$_REQUEST["graphid"]."&gitemid=".$row["gitemid"]."#form\">".S_CHANGE."</A>";
 		echo " - ";
-		echo "<A HREF=\"graph.php?graphid=".$_GET["graphid"]."&gitemid=".$row["gitemid"]."&register=up\">".S_UP."</A>";
+		echo "<A HREF=\"graph.php?graphid=".$_REQUEST["graphid"]."&gitemid=".$row["gitemid"]."&register=up\">".S_UP."</A>";
 		echo " - ";
-		echo "<A HREF=\"graph.php?graphid=".$_GET["graphid"]."&gitemid=".$row["gitemid"]."&register=down\">".S_DOWN."</A>";
+		echo "<A HREF=\"graph.php?graphid=".$_REQUEST["graphid"]."&gitemid=".$row["gitemid"]."&register=down\">".S_DOWN."</A>";
 		echo "</TD>";
 		echo "</TR>";
 	}
@@ -149,9 +149,9 @@
 	echo "<br>";
 	echo "<a name=\"form\"></a>";
 
-	if(isset($_GET["gitemid"]))
+	if(isset($_REQUEST["gitemid"]))
 	{
-		$sql="select itemid,color,drawtype,sortorder from graphs_items where gitemid=".$_GET["gitemid"];
+		$sql="select itemid,color,drawtype,sortorder from graphs_items where gitemid=".$_REQUEST["gitemid"];
 		$result=DBselect($sql);
 		$itemid=DBget_field($result,0,0);
 		$color=DBget_field($result,0,1);
@@ -168,10 +168,10 @@
 
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"graph.php\">";
-	echo "<input name=\"graphid\" type=\"hidden\" value=".$_GET["graphid"].">";
-	if(isset($_GET["gitemid"]))
+	echo "<input name=\"graphid\" type=\"hidden\" value=".$_REQUEST["graphid"].">";
+	if(isset($_REQUEST["gitemid"]))
 	{
-		echo "<input name=\"gitemid\" type=\"hidden\" value=".$_GET["gitemid"].">";
+		echo "<input name=\"gitemid\" type=\"hidden\" value=".$_REQUEST["gitemid"].">";
 	}
 
 	echo S_PARAMETER;
