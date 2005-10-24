@@ -1,5 +1,6 @@
 Changes for 1.1beta3:
 
+ - configurable refresh rate. Thanks to James Wells. (Alexei)
  - update images. Thanks to James Wells. (Alexei)
  - all $_GET and $_POST replaced by $_REQUEST. Thanks to James Wells. (Alexei)
  - added new item status: NOT AVAIALBLE (Alexei)

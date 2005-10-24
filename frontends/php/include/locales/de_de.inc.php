@@ -701,6 +701,7 @@
 	"S_PASSWORD_ONCE_AGAIN"=>		"Kennwort (Wiederholung)",
 	"S_URL_AFTER_LOGIN"=>			"URL-Umleitung nach Login",
 	"S_AUTO_LOGOUT_IN_SEC"=>		"Inaktivit&auml;tslimit in Sekunden (0 = deaktiviert)",
+	"S_SCREEN_REFRESH"=>			"Refresh (in seconds)",
 
 //	audit.php
 	"S_AUDIT_LOG"=>				"Aktivit&auml;tsprotokoll",

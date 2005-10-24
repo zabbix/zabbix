@@ -30,7 +30,7 @@
 	}
 	if(isset($_REQUEST["sysmapid"]))
 	{
-		show_header($page["title"],30,$nomenu);
+		show_header($page["title"],1,$nomenu);
 	}
 	else
 	{

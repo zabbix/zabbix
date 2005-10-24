@@ -961,7 +961,7 @@
 
 		if(isset($sessionid))
 		{
-			$sql="select u.userid,u.alias,u.name,u.surname,u.lang from sessions s,users u where s.sessionid='$sessionid' and s.userid=u.userid and ((s.lastaccess+u.autologout>".time().") or (u.autologout=0))";
+			$sql="select u.userid,u.alias,u.name,u.surname,u.lang,u.refresh from sessions s,users u where s.sessionid='$sessionid' and s.userid=u.userid and ((s.lastaccess+u.autologout>".time().") or (u.autologout=0))";
 			$result=DBselect($sql);
 			if(DBnum_rows($result)==1)
 			{
@@ -974,6 +974,7 @@
 				$USER_DETAILS["name"]=DBget_field($result,0,2);
 				$USER_DETAILS["surname"]=DBget_field($result,0,3);
 				$USER_DETAILS["lang"]=DBget_field($result,0,4);
+				$USER_DETAILS["refresh"]=DBget_field($result,0,5);
 				return;
 			}
 			else
@@ -983,7 +984,7 @@
 			}
 		}
 
-                $sql="select u.userid,u.alias,u.name,u.surname,u.lang from users u where u.alias='guest'";
+                $sql="select u.userid,u.alias,u.name,u.surname,u.lang,u.refresh from users u where u.alias='guest'";
                 $result=DBselect($sql);
                 if(DBnum_rows($result)==1)
                 {
@@ -992,6 +993,7 @@
                         $USER_DETAILS["name"]=DBget_field($result,0,2);
                         $USER_DETAILS["surname"]=DBget_field($result,0,3);
                         $USER_DETAILS["lang"]=DBget_field($result,0,4);
+                        $USER_DETAILS["refresh"]=DBget_field($result,0,5);
 			return;
 		}
 
@@ -1008,13 +1010,13 @@
 
 	# Header for HTML pages
 
-	function	show_header($title,$refresh,$nomenu)
+	function	show_header($title,$dorefresh,$nomenu)
 	{
-		show_special_header($title,$refresh,$nomenu,0);
+		show_special_header($title,$dorefresh,$nomenu,0);
 	}
 
 
-	function	show_special_header($title,$refresh,$nomenu,$noauth)
+	function	show_special_header($title,$dorefresh,$nomenu,$noauth)
 	{
 		global $page;
 		global $USER_DETAILS;
@@ -1038,15 +1040,15 @@
 <link rel="stylesheet" href="css.css">
 
 <?php
-	if($USER_DETAILS['alias']=='guest')
-	{
-		$refresh=2*$refresh;
-	}
+//	if($USER_DETAILS['alias']=='guest')
+//	{
+//		$refresh=2*$refresh;
+//	}
 	if(defined($title))	$title=constant($title);
-	if($refresh!=0)
+	if($dorefresh && $USER_DETAILS["refresh"])
 	{
-		echo "<meta http-equiv=\"refresh\" content=\"$refresh\">\n";
-		echo "<title>$title [refreshed every $refresh sec]</title>\n";
+		echo "<meta http-equiv=\"refresh\" content=\"".$USER_DETAILS["refresh"]."\">\n";
+		echo "<title>$title [refreshed every ".$USER_DETAILS["refresh"]." sec]</title>\n";
 	}
 	else
 	{

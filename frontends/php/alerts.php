@@ -22,7 +22,7 @@
 	include "include/config.inc.php";
 	$page["title"] = "S_ALERT_HISTORY_SMALL";
 	$page["file"] = "alerts.php";
-	show_header($page["title"],30,0);
+	show_header($page["title"],1,0);
 ?>
 
 <?php
