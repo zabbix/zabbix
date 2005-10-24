@@ -26,28 +26,28 @@
 ?>
 
 <?php
-	if(isset($_GET["start"])&&isset($_GET["do"])&&($_GET["do"]=="<< Prev 100"))
+	if(isset($_REQUEST["start"])&&isset($_REQUEST["do"])&&($_REQUEST["do"]=="<< Prev 100"))
 	{
-		$_GET["start"]-=100;
+		$_REQUEST["start"]-=100;
 	}
-	if(isset($_GET["do"])&&($_GET["do"]=="Next 100 >>"))
+	if(isset($_REQUEST["do"])&&($_REQUEST["do"]=="Next 100 >>"))
 	{
-		if(isset($_GET["start"]))
+		if(isset($_REQUEST["start"]))
 		{
-			$_GET["start"]+=100;
+			$_REQUEST["start"]+=100;
 		}
 		else
 		{
-			$_GET["start"]=100;
+			$_REQUEST["start"]=100;
 		}
 	}
-	if(isset($_GET["start"])&&($_GET["start"]<=0))
+	if(isset($_REQUEST["start"])&&($_REQUEST["start"]<=0))
 	{
-		unset($_GET["start"]);
+		unset($_REQUEST["start"]);
 	}
-	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
+	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
 	{
-		unset($_GET{"groupid"});
+		unset($_REQUEST{"groupid"});
 	}
 ?>
 
@@ -86,9 +86,9 @@
 	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
 
-	if(isset($_GET["groupid"]))
+	if(isset($_REQUEST["groupid"]))
 	{
-		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
 	}
 	else
 	{
@@ -106,9 +106,9 @@
 	}
 	$h2=$h2."</select>&nbsp;";
 
-	if(isset($_GET["start"]))
+	if(isset($_REQUEST["start"]))
 	{
-		$h2=$h2."<input class=\"biginput\" name=\"start\" type=hidden value=".$_GET["start"]." size=8>";
+		$h2=$h2."<input class=\"biginput\" name=\"start\" type=hidden value=".$_REQUEST["start"]." size=8>";
   		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"do\" value=\"<< Prev 100\">";
 	}
 	else
@@ -121,27 +121,27 @@
 ?>
 
 <?php
-	if(!isset($_GET["start"]))
+	if(!isset($_REQUEST["start"]))
 	{
-		$_GET["start"]=0;
+		$_REQUEST["start"]=0;
 	}
-	if(isset($_GET["hostid"])&&($_GET["hostid"] == 0))
+	if(isset($_REQUEST["hostid"])&&($_REQUEST["hostid"] == 0))
 	{
-		unset($_GET["hostid"]);
+		unset($_REQUEST["hostid"]);
 	}
 	$sql="select max(alarmid) as max from alarms";
 	$result=DBselect($sql);
 	$row=DBfetch($result);
 	$maxalarmid=@iif(DBnum_rows($result)>0,$row["max"],0);
 
-//	$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t where t.triggerid=a.triggerid and a.alarmid>$maxalarmid-".($_GET["start"]+200)." order by clock desc limit ".($_GET["start"]+200);
-	if(isset($_GET["hostid"]))
+//	$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t where t.triggerid=a.triggerid and a.alarmid>$maxalarmid-".($_REQUEST["start"]+200)." order by clock desc limit ".($_REQUEST["start"]+200);
+	if(isset($_REQUEST["hostid"]))
 	{
-		$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t,hosts h,items i,functions f where t.triggerid=a.triggerid and f.triggerid=t.triggerid and f.itemid=i.itemid and i.hostid=h.hostid and h.hostid=".$_GET["hostid"]." and a.alarmid>$maxalarmid-".($_GET["start"]+200)." order by clock desc limit ".($_GET["start"]+200);
+		$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t,hosts h,items i,functions f where t.triggerid=a.triggerid and f.triggerid=t.triggerid and f.itemid=i.itemid and i.hostid=h.hostid and h.hostid=".$_REQUEST["hostid"]." and a.alarmid>$maxalarmid-".($_REQUEST["start"]+200)." order by clock desc limit ".($_REQUEST["start"]+200);
 	}
 	else
 	{
-		$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t,hosts h,items i,functions f where t.triggerid=a.triggerid and f.triggerid=t.triggerid and f.itemid=i.itemid and i.hostid=h.hostid and a.alarmid>$maxalarmid-".($_GET["start"]+200)." order by clock desc limit ".($_GET["start"]+200);
+		$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t,hosts h,items i,functions f where t.triggerid=a.triggerid and f.triggerid=t.triggerid and f.itemid=i.itemid and i.hostid=h.hostid and a.alarmid>$maxalarmid-".($_REQUEST["start"]+200)." order by clock desc limit ".($_REQUEST["start"]+200);
 	}
 
 	$result=DBselect($sql);
@@ -153,7 +153,7 @@
 	while($row=DBfetch($result))
 	{
 		$i++;
-		if(isset($_GET["start"])&&($i<$_GET["start"]))
+		if(isset($_REQUEST["start"])&&($i<$_REQUEST["start"]))
 		{
 			continue;
 		}

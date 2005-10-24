@@ -42,58 +42,58 @@
 ?>
 
 <?php
-	if(isset($_GET["register"]))
+	if(isset($_REQUEST["register"]))
 	{
-		if($_GET["register"]=="add")
+		if($_REQUEST["register"]=="add")
 		{
-			$result=add_graph($_GET["name"],$_GET["width"],$_GET["height"],$_GET["yaxistype"],$_GET["yaxismin"],$_GET["yaxismax"]);
+			$result=add_graph($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"]);
 			if($result)
 			{
-				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,"Graph [".addslashes($_GET["name"])."]");
+				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,"Graph [".addslashes($_REQUEST["name"])."]");
 			}
 			show_messages($result, S_GRAPH_ADDED, S_CANNOT_ADD_GRAPH);
 		}
-		if($_GET["register"]=="update")
+		if($_REQUEST["register"]=="update")
 		{
-			$result=update_graph($_GET["graphid"],$_GET["name"],$_GET["width"],$_GET["height"],$_GET["yaxistype"],$_GET["yaxismin"],$_GET["yaxismax"]);
+			$result=update_graph($_REQUEST["graphid"],$_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"]);
 			if($result)
 			{
-				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,"Graph ID [".$_GET["graphid"]."] Graph [".addslashes($_GET["name"])."]");
+				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,"Graph ID [".$_REQUEST["graphid"]."] Graph [".addslashes($_REQUEST["name"])."]");
 			}
 			show_messages($result, S_GRAPH_UPDATED, S_CANNOT_UPDATE_GRAPH);
 		}
-		if($_GET["register"]=="delete")
+		if($_REQUEST["register"]=="delete")
 		{
-			$graph=get_graph_by_graphid($_GET["graphid"]);
-			$result=delete_graph($_GET["graphid"]);
+			$graph=get_graph_by_graphid($_REQUEST["graphid"]);
+			$result=delete_graph($_REQUEST["graphid"]);
 			if($result)
 			{
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,"Graph [".addslashes($graph["name"])."]");
 			}
 			show_messages($result, S_GRAPH_DELETED, S_CANNOT_DELETE_GRAPH);
-			unset($_GET["graphid"]);
+			unset($_REQUEST["graphid"]);
 		}
 	}
 ?>
 
 <?php
-	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
+	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
 	{
-		unset($_GET["groupid"]);
+		unset($_REQUEST["groupid"]);
 	}
 
-	if(isset($_GET["graphid"])&&($_GET["graphid"]==0))
+	if(isset($_REQUEST["graphid"])&&($_REQUEST["graphid"]==0))
 	{
-		unset($_GET["graphid"]);
+		unset($_REQUEST["graphid"]);
 	}
 
-	if(isset($_GET["graphid"]))
+	if(isset($_REQUEST["graphid"]))
 	{
-		$result=DBselect("select name from graphs where graphid=".$_GET["graphid"]);
+		$result=DBselect("select name from graphs where graphid=".$_REQUEST["graphid"]);
 		$graph=DBget_field($result,0,0);
-		$h1=iif(isset($_GET["fullscreen"]),
-			"<a href=\"charts.php?graphid=".$_GET["graphid"]."\">".$graph."</a>",
-			"<a href=\"charts.php?graphid=".$_GET["graphid"]."&fullscreen=1\">".$graph."</a>");
+		$h1=iif(isset($_REQUEST["fullscreen"]),
+			"<a href=\"charts.php?graphid=".$_REQUEST["graphid"]."\">".$graph."</a>",
+			"<a href=\"charts.php?graphid=".$_REQUEST["graphid"]."&fullscreen=1\">".$graph."</a>");
 	}
 	else
 	{
@@ -130,9 +130,9 @@
 	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
 
-	if(isset($_GET["groupid"]))
+	if(isset($_REQUEST["groupid"]))
 	{
-		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid and h.status not in (".HOST_STATUS_DELETED.") group by h.hostid,h.host order by h.host";
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and h.status not in (".HOST_STATUS_DELETED.") group by h.hostid,h.host order by h.host";
 	}
 	else
 	{
@@ -157,9 +157,9 @@
 	table_begin();
 	table_header(array(S_ID,S_NAME,S_WIDTH,S_HEIGHT,S_ACTIONS));
 
-	if(isset($_GET["hostid"])&&($_GET["hostid"]!=0))
+	if(isset($_REQUEST["hostid"])&&($_REQUEST["hostid"]!=0))
 	{
-		$result=DBselect("select distinct g.graphid,g.name,g.width,g.height from graphs g,items i,graphs_items gi where gi.itemid=i.itemid and g.graphid=gi.graphid and i.hostid=".$_GET["hostid"]." order by g.name");
+		$result=DBselect("select distinct g.graphid,g.name,g.width,g.height from graphs g,items i,graphs_items gi where gi.itemid=i.itemid and g.graphid=gi.graphid and i.hostid=".$_REQUEST["hostid"]." order by g.name");
 	}
 	else
 	{
@@ -173,7 +173,7 @@
 			continue;
 		}
 
-		if(!isset($_GET["hostid"]))
+		if(!isset($_REQUEST["hostid"]))
 		{
 			$sql="select * from graphs_items where graphid=".$row["graphid"];
 			$result2=DBselect($sql);

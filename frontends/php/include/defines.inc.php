@@ -111,7 +111,7 @@
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if (!function_exists('version_compare'))
 	{
-		$_GET = $HTTP_GET_VARS;
+		$_REQUEST = $HTTP_GET_VARS;
 		$_POST = $HTTP_POST_VARS;
 		$_COOKIE = $HTTP_COOKIE_VARS;
 	}

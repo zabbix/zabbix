@@ -26,7 +26,7 @@
 ?>
 
 <?php
-	if(!check_right("Trigger comment","R",$_GET["triggerid"]))
+	if(!check_right("Trigger comment","R",$_REQUEST["triggerid"]))
 	{
 		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_footer();
@@ -39,15 +39,15 @@
 ?>
 
 <?php
-	if(isset($_GET["register"]) && ($_GET["register"]=="update"))
+	if(isset($_REQUEST["register"]) && ($_REQUEST["register"]=="update"))
 	{
-		$result=update_trigger_comments($_GET["triggerid"],$_GET["comments"]);
+		$result=update_trigger_comments($_REQUEST["triggerid"],$_REQUEST["comments"]);
 		show_messages($result, S_COMMENT_UPDATED, S_CANNO_UPDATE_COMMENT);
 	}
 ?>
 
 <?php
-	$result=DBselect("select comments from triggers where triggerid=".$_GET["triggerid"]);
+	$result=DBselect("select comments from triggers where triggerid=".$_REQUEST["triggerid"]);
 	$comments=stripslashes(DBget_field($result,0,0));
 ?>
 
@@ -57,7 +57,7 @@
 
 	show_table2_v_delimiter();
 	echo "<form method=\"get\" action=\"tr_comments.php\">";
-	echo "<input name=\"triggerid\" type=\"hidden\" value=".$_GET["triggerid"].">";
+	echo "<input name=\"triggerid\" type=\"hidden\" value=".$_REQUEST["triggerid"].">";
 	echo S_COMMENTS;
 	show_table2_h_delimiter();
 	echo "<textarea name=\"comments\" cols=100 ROWS=\"25\" wrap=\"soft\">$comments</TEXTAREA>";

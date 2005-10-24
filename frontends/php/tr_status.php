@@ -77,19 +77,19 @@
 ?>
 <?php
 	$refresh=10;
-	if(!isset($_GET["onlytrue"])||isset($_GET["txt_select"]))
+	if(!isset($_REQUEST["onlytrue"])||isset($_REQUEST["txt_select"]))
 	{
 		$refresh=0;
 	}
-	if(!isset($_GET["onlytrue"]))
+	if(!isset($_REQUEST["onlytrue"]))
 	{
-		$_GET["onlytrue"]="true";
+		$_REQUEST["onlytrue"]="true";
 	}
-	if(!isset($_GET["noactions"]))
+	if(!isset($_REQUEST["noactions"]))
 	{
-		$_GET["noactions"]="true";
+		$_REQUEST["noactions"]="true";
 	}
-	if(isset($_GET["fullscreen"]))
+	if(isset($_REQUEST["fullscreen"]))
 	{
 		show_header($page["title"],$refresh,1);
 	}
@@ -105,7 +105,7 @@
 		show_footer();
 		exit;
 	}
-	if(isset($_GET["hostid"])&&!check_right("Host","R",$_GET["hostid"]))
+	if(isset($_REQUEST["hostid"])&&!check_right("Host","R",$_REQUEST["hostid"]))
 	{
 		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_footer();
@@ -123,16 +123,16 @@
 
 <?php
  
-	if(!isset($_GET["sort"]))
+	if(!isset($_REQUEST["sort"]))
 	{
 		$sort='priority';
 	}
 	else
 	{
-		$sort=$_GET["sort"];
+		$sort=$_REQUEST["sort"];
 	}
-	$onlytrue=$_GET["onlytrue"];
-	if(isset($_GET["noactions"])&&($_GET["noactions"]!='true'))
+	$onlytrue=$_REQUEST["onlytrue"];
+	if(isset($_REQUEST["noactions"])&&($_REQUEST["noactions"]!='true'))
 	{
 		$noactions='false';
 	}
@@ -140,7 +140,7 @@
 	{
 		$noactions='true';
 	}
-	if(isset($_GET["compact"])&&($_GET["compact"]!='true'))
+	if(isset($_REQUEST["compact"])&&($_REQUEST["compact"]!='true'))
 	{
 		$compact='false';
 	}
@@ -151,25 +151,25 @@
 ?>
 
 <?php
-	if(!isset($_GET["select"]))
+	if(!isset($_REQUEST["select"]))
 	{
 		$select="";
 	}
 	else
 	{
-		$select=$_GET["select"];
+		$select=$_REQUEST["select"];
 	}
 
-	if(!isset($_GET["txt_select"]))
+	if(!isset($_REQUEST["txt_select"]))
 	{
 		$txt_select="";
 	}
 	else
 	{
-		$txt_select=$_GET["txt_select"];
+		$txt_select=$_REQUEST["txt_select"];
 	}
 
-	if(isset($_GET["btnSelect"])&&($_GET["btnSelect"]=="Inverse select"))
+	if(isset($_REQUEST["btnSelect"])&&($_REQUEST["btnSelect"]=="Inverse select"))
 	{
 		$select_cond="not like '%$txt_select%'";
 	}
@@ -184,9 +184,9 @@
 
 
 <?php
-	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
+	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
 	{
-		unset($_GET["groupid"]);
+		unset($_REQUEST["groupid"]);
 	}
 ?>
 
@@ -194,8 +194,8 @@
 	$h1="&nbsp;".S_STATUS_OF_TRIGGERS_BIG;
 
 	$h2="";
-	$h2=$h2."<input name=\"onlytrue\" type=\"hidden\" value=\"".$_GET["onlytrue"]."\">";
-	$h2=$h2."<input name=\"noactions\" type=\"hidden\" value=\"".$_GET["noactions"]."\">";
+	$h2=$h2."<input name=\"onlytrue\" type=\"hidden\" value=\"".$_REQUEST["onlytrue"]."\">";
+	$h2=$h2."<input name=\"noactions\" type=\"hidden\" value=\"".$_REQUEST["noactions"]."\">";
 	$h2=$h2.S_GROUP."&nbsp;";
 	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
@@ -225,9 +225,9 @@
 	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
 
-	if(isset($_GET["groupid"]))
+	if(isset($_REQUEST["groupid"]))
 	{
-		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
 	}
 	else
 	{
@@ -247,13 +247,13 @@
 
 	$h2=$h2.nbsp("  ");
 
-	if(isset($_GET["select"])&&($_GET["select"]==""))
+	if(isset($_REQUEST["select"])&&($_REQUEST["select"]==""))
 	{
-		unset($_GET["select"]);
+		unset($_REQUEST["select"]);
 	}
-	if(isset($_GET["select"]))
+	if(isset($_REQUEST["select"]))
 	{
-  		$h2=$h2."<input class=\"biginput\" type=\"text\" name=\"select\" value=\"".$_GET["select"]."\">";
+  		$h2=$h2."<input class=\"biginput\" type=\"text\" name=\"select\" value=\"".$_REQUEST["select"]."\">";
 	}
 	else
 	{
@@ -266,14 +266,14 @@
 ?>
 
 <?php
-	if(!isset($_GET["fullscreen"]))
+	if(!isset($_REQUEST["fullscreen"]))
 	{
 /*		show_table_header_begin();
 		echo S_STATUS_OF_TRIGGERS_BIG;
 	        show_table_v_delimiter();
 
 	        $result=DBselect("select hostid,host from hosts where status in (0,2) order by host");
-	        if(isset($_GET["hostid"]))
+	        if(isset($_REQUEST["hostid"]))
 	        {
 	                echo "<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">".S_ALL_SMALL."</A>  ";
 	        }
@@ -287,7 +287,7 @@
 		        {
 				continue;
 			}
-	                if(isset($_GET["hostid"]) && ($row["hostid"] == $_GET["hostid"]))
+	                if(isset($_REQUEST["hostid"]) && ($row["hostid"] == $_REQUEST["hostid"]))
 	                {
 	                        echo "<b>[<A HREF=\"tr_status.php?hostid=".$row["hostid"]."&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">".$row["host"]."</A>]</b>  ";
 	                }
@@ -302,9 +302,9 @@
 
 <?php
 		$h1="";
-		if(isset($_GET["hostid"]))
+		if(isset($_REQUEST["hostid"]))
 		{
-			$cond="&hostid=".$_GET["hostid"];
+			$cond="&hostid=".$_REQUEST["hostid"];
 		}
 		else
 		{
@@ -358,14 +358,14 @@
 	}
 
  	$time=date("[H:i:s]",time());
-  	if(isset($_GET["fullscreen"]))
+  	if(isset($_REQUEST["fullscreen"]))
 	{
 		show_table_header("<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">".S_TRIGGERS_BIG." $time</A>");
 
 		$cond="";
-		if(isset($_GET["hostid"]))
+		if(isset($_REQUEST["hostid"]))
 		{
-			$cond=" and h.hostid=".$_GET["hostid"]." ";
+			$cond=" and h.hostid=".$_REQUEST["hostid"]." ";
 		}
 
 		if($onlytrue=='true')
@@ -409,7 +409,7 @@
 	$header=array();
   
 	echo "<TR ALIGN=CENTER BGCOLOR=\"#CCCCCC\">";
-	if(isset($_GET["fullscreen"]))
+	if(isset($_REQUEST["fullscreen"]))
 	{
 		$fullscreen="&fullscreen=1";
 	}
@@ -469,9 +469,9 @@
 	table_header($header);
 	unset($header);
 
-	if(isset($_GET["hostid"]))
+	if(isset($_REQUEST["hostid"]))
 	{
-		$cond=" and h.hostid=".$_GET["hostid"]." ";
+		$cond=" and h.hostid=".$_REQUEST["hostid"]." ";
 	}
 	else
 	{
@@ -571,9 +571,9 @@
 		{
 			$actions="<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">".S_SHOW_ACTIONS."</A> - ";
 			$actions=$actions."<A HREF=\"alarms.php?triggerid=".$row["triggerid"]."\">".S_HISTORY."</A> - ";
-			if(isset($_GET["hostid"]))
+			if(isset($_REQUEST["hostid"]))
 			{
-				$actions=$actions."<A HREF=\"triggers.php?hostid=".$_GET["hostid"]."&triggerid=".$row["triggerid"]."#form\">".S_CHANGE."</A>";
+				$actions=$actions."<A HREF=\"triggers.php?hostid=".$_REQUEST["hostid"]."&triggerid=".$row["triggerid"]."#form\">".S_CHANGE."</A>";
 			}
 			else
 			{

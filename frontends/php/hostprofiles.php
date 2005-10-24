@@ -34,7 +34,7 @@
                 exit;
         }
 	
-        if(isset($_GET["hostid"])&&!check_right("Host","R",$_GET["hostid"]))
+        if(isset($_REQUEST["hostid"])&&!check_right("Host","R",$_REQUEST["hostid"]))
         {
                 show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
                 show_footer();
@@ -43,15 +43,15 @@
 ?>
 
 <?php
-	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
+	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
 	{
-		unset($_GET["groupid"]);
+		unset($_REQUEST["groupid"]);
 	}
 ?>
 
 <?php
-	$_GET["hostid"]=@iif(isset($_GET["hostid"]),$_GET["hostid"],get_profile("web.latest.hostid",0));
-	update_profile("web.latest.hostid",$_GET["hostid"]);
+	$_REQUEST["hostid"]=@iif(isset($_REQUEST["hostid"]),$_REQUEST["hostid"],get_profile("web.latest.hostid",0));
+	update_profile("web.latest.hostid",$_REQUEST["hostid"]);
 	update_profile("web.menu.cm.last",$page["file"]);
 ?>
 
@@ -86,9 +86,9 @@
 	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
 
-	if(isset($_GET["groupid"]))
+	if(isset($_REQUEST["groupid"]))
 	{
-		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
 	}
 	else
 	{
@@ -110,9 +110,9 @@
 ?>
 
 <?php
-	if(isset($_GET["hostid"])&&($_GET["hostid"]!=0))
+	if(isset($_REQUEST["hostid"])&&($_REQUEST["hostid"]!=0))
 	{
-		insert_host_profile_form($_GET["hostid"],1);
+		insert_host_profile_form($_REQUEST["hostid"],1);
 	}
 	else
 	{
@@ -123,9 +123,9 @@
 		table_header($header);
 
 		$col=0;
-		if(isset($_GET["groupid"])&&($_GET["groupid"]!=0))
+		if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]!=0))
 		{
-			$sql="select h.hostid,h.host,p.name,p.os,p.serialno,p.tag,p.macaddress from hosts h,hosts_profiles p,hosts_groups hg where h.hostid=p.hostid and h.hostid=hg.hostid and hg.groupid=".$_GET["groupid"]." order by h.host";
+			$sql="select h.hostid,h.host,p.name,p.os,p.serialno,p.tag,p.macaddress from hosts h,hosts_profiles p,hosts_groups hg where h.hostid=p.hostid and h.hostid=hg.hostid and hg.groupid=".$_REQUEST["groupid"]." order by h.host";
 		}
 		else
 		{

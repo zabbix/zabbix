@@ -54,8 +54,8 @@
 	$now=time(NULL);
 	$period_start=$now-7*24*3600;
 	$period_end=$now;
-	$service=get_service_by_serviceid($_GET["serviceid"]);
-	$stat=calculate_service_availability($_GET["serviceid"],$period_start,$period_end);
+	$service=get_service_by_serviceid($_REQUEST["serviceid"]);
+	$stat=calculate_service_availability($_REQUEST["serviceid"],$period_start,$period_end);
 		
 	$problem=$stat["problem"];
 	$ok=$stat["ok"];

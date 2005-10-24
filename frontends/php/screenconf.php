@@ -42,23 +42,23 @@
 ?>
 
 <?php
-	if(isset($_GET["register"]))
+	if(isset($_REQUEST["register"]))
 	{
-		if($_GET["register"]=="add")
+		if($_REQUEST["register"]=="add")
 		{
-			$result=add_screen($_GET["name"],$_GET["cols"],$_GET["rows"]);
+			$result=add_screen($_REQUEST["name"],$_REQUEST["cols"],$_REQUEST["rows"]);
 			show_messages($result,S_SCREEN_ADDED,S_CANNOT_ADD_SCREEN);
 		}
-		if($_GET["register"]=="update")
+		if($_REQUEST["register"]=="update")
 		{
-			$result=update_screen($_GET["screenid"],$_GET["name"],$_GET["cols"],$_GET["rows"]);
+			$result=update_screen($_REQUEST["screenid"],$_REQUEST["name"],$_REQUEST["cols"],$_REQUEST["rows"]);
 			show_messages($result, S_SCREEN_UPDATED, S_CANNOT_UPDATE_SCREEN);
 		}
-		if($_GET["register"]=="delete")
+		if($_REQUEST["register"]=="delete")
 		{
-			$result=delete_screen($_GET["screenid"]);
+			$result=delete_screen($_REQUEST["screenid"]);
 			show_messages($result, S_SCREEN_DELETED, S_CANNOT_DELETE_SCREEN);
-			unset($_GET["screenid"]);
+			unset($_REQUEST["screenid"]);
 		}
 	}
 ?>
@@ -96,9 +96,9 @@
 <?php
 	echo "<a name=\"form\"></a>";
 
-	if(isset($_GET["screenid"]))
+	if(isset($_REQUEST["screenid"]))
 	{
-		$result=DBselect("select screenid,name,cols,rows from screens g where screenid=".$_GET["screenid"]);
+		$result=DBselect("select screenid,name,cols,rows from screens g where screenid=".$_REQUEST["screenid"]);
 		$row=DBfetch($result);
 		$name=$row["name"];
 		$cols=$row["cols"];
@@ -117,9 +117,9 @@
 
 	show_table2_v_delimiter($col++);
 	echo "<form method=\"get\" action=\"screenconf.php\">";
-	if(isset($_GET["screenid"]))
+	if(isset($_REQUEST["screenid"]))
 	{
-		echo "<input class=\"biginput\" name=\"screenid\" type=\"hidden\" value=".$_GET["screenid"].">";
+		echo "<input class=\"biginput\" name=\"screenid\" type=\"hidden\" value=".$_REQUEST["screenid"].">";
 	}
 	echo S_NAME;
 	show_table2_h_delimiter();
@@ -137,7 +137,7 @@
 
 	show_table2_v_delimiter2();
 	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
-	if(isset($_GET["screenid"]))
+	if(isset($_REQUEST["screenid"]))
 	{
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('".S_DELETE_SCREEN_Q."');\">";

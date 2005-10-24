@@ -60,8 +60,8 @@
 
 		show_table2_v_delimiter($col++);
 		echo "<form method=\"get\" action=\"hosts.php\">";
-		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_GET["config"]."\" size=8>";
-		echo "<input class=\"biginput\" name=\"hostid\" type=\"hidden\" value=\"".$_GET["hostid"]."\" size=8>";
+		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_REQUEST["config"]."\" size=8>";
+		echo "<input class=\"biginput\" name=\"hostid\" type=\"hidden\" value=\"".$_REQUEST["hostid"]."\" size=8>";
 		if(isset($hosttemplateid))
 		{
 			echo "<input class=\"biginput\" name=\"hosttemplateid\" type=\"hidden\" value=\"$hosttemplateid\" size=8>";
@@ -169,7 +169,7 @@
 		if($profile==0) echo "<form method=\"get\" action=\"users.php\">";
 		else echo "<form method=\"get\" action=\"profile.php\">";
 
-		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_GET["config"]."\" size=8>";
+		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_REQUEST["config"]."\" size=8>";
 		if(isset($userid))
 		{
 			echo "<input class=\"biginput\" name=\"userid\" type=\"hidden\" value=\"$userid\" size=8>";
@@ -254,38 +254,38 @@
 	# Insert form for Item information
 	function	insert_item_form()
 	{
-		global  $_GET;
+		global  $_REQUEST;
 
-		$description=@iif(isset($_GET["description"]),$_GET["description"],"");
-		$key=@iif(isset($_GET["key"]),$_GET["key"],"");
-		$host=@iif(isset($_GET["host"]),$_GET["host"],"");
-		$port=@iif(isset($_GET["port"]),$_GET["port"],10050);
-		$delay=@iif(isset($_GET["delay"]),$_GET["delay"],30);
-		$history=@iif(isset($_GET["history"]),$_GET["history"],90);
-		$trends=@iif(isset($_GET["trends"]),$_GET["trends"],365);
-		$status=@iif(isset($_GET["status"]),$_GET["status"],0);
-		$type=@iif(isset($_GET["type"]),$_GET["type"],0);
-		$snmp_community=@iif(isset($_GET["snmp_community"]),$_GET["snmp_community"],"public");
-		$snmp_oid=@iif(isset($_GET["snmp_oid"]),$_GET["snmp_oid"],"interfaces.ifTable.ifEntry.ifInOctets.1");
-		$value_type=@iif(isset($_GET["value_type"]),$_GET["value_type"],0);
-		$trapper_hosts=@iif(isset($_GET["trapper_hosts"]),$_GET["trapper_hosts"],"");
-		$snmp_port=@iif(isset($_GET["snmp_port"]),$_GET["snmp_port"],161);
-		$units=@iif(isset($_GET["units"]),$_GET["units"],'');
-		$multiplier=@iif(isset($_GET["multiplier"]),$_GET["multiplier"],0);
-		$hostid=@iif(isset($_GET["hostid"]),$_GET["hostid"],0);
-		$delta=@iif(isset($_GET["delta"]),$_GET["delta"],0);
+		$description=@iif(isset($_REQUEST["description"]),$_REQUEST["description"],"");
+		$key=@iif(isset($_REQUEST["key"]),$_REQUEST["key"],"");
+		$host=@iif(isset($_REQUEST["host"]),$_REQUEST["host"],"");
+		$port=@iif(isset($_REQUEST["port"]),$_REQUEST["port"],10050);
+		$delay=@iif(isset($_REQUEST["delay"]),$_REQUEST["delay"],30);
+		$history=@iif(isset($_REQUEST["history"]),$_REQUEST["history"],90);
+		$trends=@iif(isset($_REQUEST["trends"]),$_REQUEST["trends"],365);
+		$status=@iif(isset($_REQUEST["status"]),$_REQUEST["status"],0);
+		$type=@iif(isset($_REQUEST["type"]),$_REQUEST["type"],0);
+		$snmp_community=@iif(isset($_REQUEST["snmp_community"]),$_REQUEST["snmp_community"],"public");
+		$snmp_oid=@iif(isset($_REQUEST["snmp_oid"]),$_REQUEST["snmp_oid"],"interfaces.ifTable.ifEntry.ifInOctets.1");
+		$value_type=@iif(isset($_REQUEST["value_type"]),$_REQUEST["value_type"],0);
+		$trapper_hosts=@iif(isset($_REQUEST["trapper_hosts"]),$_REQUEST["trapper_hosts"],"");
+		$snmp_port=@iif(isset($_REQUEST["snmp_port"]),$_REQUEST["snmp_port"],161);
+		$units=@iif(isset($_REQUEST["units"]),$_REQUEST["units"],'');
+		$multiplier=@iif(isset($_REQUEST["multiplier"]),$_REQUEST["multiplier"],0);
+		$hostid=@iif(isset($_REQUEST["hostid"]),$_REQUEST["hostid"],0);
+		$delta=@iif(isset($_REQUEST["delta"]),$_REQUEST["delta"],0);
 
-		$snmpv3_securityname=@iif(isset($_GET["snmpv3_securityname"]),$_GET["snmpv3_securityname"],"");
-		$snmpv3_securitylevel=@iif(isset($_GET["snmpv3_securitylevel"]),$_GET["snmpv3_securitylevel"],0);
-		$snmpv3_authpassphrase=@iif(isset($_GET["snmpv3_authpassphrase"]),$_GET["snmpv3_authpassphrase"],"");
-		$snmpv3_privpassphrase=@iif(isset($_GET["snmpv3_privpassphrase"]),$_GET["snmpv3_privpassphrase"],"")
+		$snmpv3_securityname=@iif(isset($_REQUEST["snmpv3_securityname"]),$_REQUEST["snmpv3_securityname"],"");
+		$snmpv3_securitylevel=@iif(isset($_REQUEST["snmpv3_securitylevel"]),$_REQUEST["snmpv3_securitylevel"],0);
+		$snmpv3_authpassphrase=@iif(isset($_REQUEST["snmpv3_authpassphrase"]),$_REQUEST["snmpv3_authpassphrase"],"");
+		$snmpv3_privpassphrase=@iif(isset($_REQUEST["snmpv3_privpassphrase"]),$_REQUEST["snmpv3_privpassphrase"],"")
 ;
-		$formula=@iif(isset($_GET["formula"]),$_GET["formula"],"1");
-		$logtimefmt=@iif(isset($_GET["logtimefmt"]),$_GET["logtimefmt"],"");
+		$formula=@iif(isset($_REQUEST["formula"]),$_REQUEST["formula"],"1");
+		$logtimefmt=@iif(isset($_REQUEST["logtimefmt"]),$_REQUEST["logtimefmt"],"");
 
-		if(isset($_GET["register"])&&($_GET["register"] == "change"))
+		if(isset($_REQUEST["register"])&&($_REQUEST["register"] == "change"))
 		{
-			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.snmp_port,i.units,i.multiplier,h.hostid,i.delta,i.trends,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,i.logtimefmt from items i,hosts h where i.itemid=".$_GET["itemid"]." and h.hostid=i.hostid");
+			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.snmp_port,i.units,i.multiplier,h.hostid,i.delta,i.trends,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,i.logtimefmt from items i,hosts h where i.itemid=".$_REQUEST["itemid"]." and h.hostid=i.hostid");
 		
 			$description=DBget_field($result,0,0);
 			$key=DBget_field($result,0,1);
@@ -294,7 +294,7 @@
 			$delay=DBget_field($result,0,4);
 			$history=DBget_field($result,0,5);
 			$status=DBget_field($result,0,6);
-			$type=iif(isset($_GET["type"]),isset($_GET["type"]),DBget_field($result,0,7));
+			$type=iif(isset($_REQUEST["type"]),isset($_REQUEST["type"]),DBget_field($result,0,7));
 			$snmp_community=DBget_field($result,0,8);
 			$snmp_oid=DBget_field($result,0,9);
 			$value_type=DBget_field($result,0,10);
@@ -321,9 +321,9 @@
 		$col=0; 
 		show_table2_v_delimiter($col++);
 		echo "<form method=\"get\" action=\"items.php#form\">";
-		if(isset($_GET["itemid"]))
+		if(isset($_REQUEST["itemid"]))
 		{
-			echo "<input class=\"biginput\" name=\"itemid\" type=hidden value=".$_GET["itemid"].">";
+			echo "<input class=\"biginput\" name=\"itemid\" type=hidden value=".$_REQUEST["itemid"].">";
 		}
 		echo S_DESCRIPTION;
 		show_table2_h_delimiter();
@@ -607,7 +607,7 @@
 		show_table2_v_delimiter2();
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add to all hosts\" onClick=\"return Confirm('Add item to all hosts?');\">";
-		if(isset($_GET["itemid"]))
+		if(isset($_REQUEST["itemid"]))
 		{
 			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
 			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected item?');\">";
@@ -644,7 +644,7 @@
 		show_table2_v_delimiter2();
 		echo "<select class=\"biginput\" name=\"action\">";
 		echo "<option value=\"add to group\">".S_ADD_TO_GROUP;
-		if(isset($_GET["itemid"]))
+		if(isset($_REQUEST["itemid"]))
 		{
 			echo "<option value=\"update in group\">".S_UPDATE_IN_GROUP;
 			echo "<option value=\"delete from group\">".S_DELETE_FROM_GROUP;
@@ -658,7 +658,7 @@
 	# Insert form for Host Groups
 	function	insert_hostgroups_form($groupid)
 	{
-		global  $_GET;
+		global  $_REQUEST;
 
 		$col=0;
 
@@ -678,9 +678,9 @@
 
 		show_table2_v_delimiter($col++);
 		echo "<form method=\"get\" action=\"hosts.php\">";
-		if(isset($_GET["groupid"]))
+		if(isset($_REQUEST["groupid"]))
 		{
-			echo "<input name=\"groupid\" type=\"hidden\" value=\"".$_GET["groupid"]."\" size=8>";
+			echo "<input name=\"groupid\" type=\"hidden\" value=\"".$_REQUEST["groupid"]."\" size=8>";
 		}
 		echo S_GROUP_NAME;
 		show_table2_h_delimiter();
@@ -693,9 +693,9 @@
 		$result=DBselect("select distinct hostid,host from hosts order by host");
 		while($row=DBfetch($result))
 		{
-			if(isset($_GET["groupid"]))
+			if(isset($_REQUEST["groupid"]))
 			{
-				$sql="select count(*) as count from hosts_groups where hostid=".$row["hostid"]." and groupid=".$_GET["groupid"];
+				$sql="select count(*) as count from hosts_groups where hostid=".$row["hostid"]." and groupid=".$_REQUEST["groupid"];
 				$result2=DBselect($sql);
 				$row2=DBfetch($result2);
 				if($row2["count"]==0)
@@ -716,7 +716,7 @@
 
 		show_table2_v_delimiter2();
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add group\">";
-		if(isset($_GET["groupid"]))
+		if(isset($_REQUEST["groupid"]))
 		{
 			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update group\">";
 			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete group\" onClick=\"return Confirm('Delete selected group?');\">";
@@ -730,7 +730,7 @@
 	# Insert form for User Groups
 	function	insert_usergroups_form($usrgrpid)
 	{
-		global  $_GET;
+		global  $_REQUEST;
 
 		$col=0;
 
@@ -766,9 +766,9 @@
 		$result=DBselect("select distinct userid,alias from users order by alias");
 		while($row=DBfetch($result))
 		{
-			if(isset($_GET["usrgrpid"]))
+			if(isset($_REQUEST["usrgrpid"]))
 			{
-				$sql="select count(*) as count from users_groups where userid=".$row["userid"]." and usrgrpid=".$_GET["usrgrpid"];
+				$sql="select count(*) as count from users_groups where userid=".$row["userid"]." and usrgrpid=".$_REQUEST["usrgrpid"];
 				$result2=DBselect($sql);
 				$row2=DBfetch($result2);
 				if($row2["count"]==0)
@@ -793,9 +793,9 @@
 		$result=DBselect("select distinct userid,alias from users order by alias");
 		while($row=DBfetch($result))
 		{
-			if(isset($_GET["usrgrpid"]))
+			if(isset($_REQUEST["usrgrpid"]))
 			{
-				$sql="select count(*) as count from users_groups where userid=".$row["userid"]." and usrgrpid=".$_GET["usrgrpid"];
+				$sql="select count(*) as count from users_groups where userid=".$row["userid"]." and usrgrpid=".$_REQUEST["usrgrpid"];
 				$result2=DBselect($sql);
 				$row2=DBfetch($result2);
 				if($row2["count"]==0)
@@ -816,7 +816,7 @@
 
 		show_table2_v_delimiter2();
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add group\">";
-		if(isset($_GET["usrgrpid"]))
+		if(isset($_REQUEST["usrgrpid"]))
 		{
 			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update group\">";
 			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete group\" onClick=\"return Confirm('Delete selected group?');\">";
@@ -874,7 +874,7 @@
 
 	function	insert_login_form()
 	{
-		global	$_GET;
+		global	$_REQUEST;
 
 		$col=0;
 
@@ -886,7 +886,7 @@
 
 		echo "Login name";
 		show_table2_h_delimiter();
-//		echo "<input name=\"name\" value=\"".$_GET["name"]."\" size=20>";
+//		echo "<input name=\"name\" value=\"".$_REQUEST["name"]."\" size=20>";
 		echo "<input class=\"biginput\" name=\"name\" value=\"\" size=20>";
 
 		show_table2_v_delimiter($col++);
@@ -1089,18 +1089,18 @@
 
 	function	insert_graph_form()
 	{
-		global  $_GET;
+		global  $_REQUEST;
 
-		$name=@iif(isset($_GET["name"]),$_GET["name"],"");
-		$width=@iif(isset($_GET["width"]),$_GET["width"],900);
-		$height=@iif(isset($_GET["height"]),$_GET["height"],200);
-		$yaxistype=@iif(isset($_GET["yaxistype"]),$_GET["yaxistype"],GRAPH_YAXIS_TYPE_CALCULATED);
-		$yaxismin=@iif(isset($_GET["yaxismin"]),$_GET["yaxismin"],0.00);
-		$yaxismax=@iif(isset($_GET["yaxismax"]),$_GET["yaxismax"],100.00);
+		$name=@iif(isset($_REQUEST["name"]),$_REQUEST["name"],"");
+		$width=@iif(isset($_REQUEST["width"]),$_REQUEST["width"],900);
+		$height=@iif(isset($_REQUEST["height"]),$_REQUEST["height"],200);
+		$yaxistype=@iif(isset($_REQUEST["yaxistype"]),$_REQUEST["yaxistype"],GRAPH_YAXIS_TYPE_CALCULATED);
+		$yaxismin=@iif(isset($_REQUEST["yaxismin"]),$_REQUEST["yaxismin"],0.00);
+		$yaxismax=@iif(isset($_REQUEST["yaxismax"]),$_REQUEST["yaxismax"],100.00);
 
-		if(isset($_GET["graphid"])&&!isset($_GET["name"]))
+		if(isset($_REQUEST["graphid"])&&!isset($_REQUEST["name"]))
 		{
-			$result=DBselect("select g.graphid,g.name,g.width,g.height,g.yaxistype,g.yaxismin,g.yaxismax from graphs g where graphid=".$_GET["graphid"]);
+			$result=DBselect("select g.graphid,g.name,g.width,g.height,g.yaxistype,g.yaxismin,g.yaxismax from graphs g where graphid=".$_REQUEST["graphid"]);
 			$row=DBfetch($result);
 			$name=$row["name"];
 			$width=$row["width"];
@@ -1115,9 +1115,9 @@
 
 		show_table2_v_delimiter();
 		echo "<form method=\"get\" action=\"graphs.php\">";
-		if(isset($_GET["graphid"]))
+		if(isset($_REQUEST["graphid"]))
 		{
-			echo "<input class=\"biginput\" name=\"graphid\" type=\"hidden\" value=".$_GET["graphid"].">";
+			echo "<input class=\"biginput\" name=\"graphid\" type=\"hidden\" value=".$_REQUEST["graphid"].">";
 		}
 		echo S_NAME; 
 		show_table2_h_delimiter();
@@ -1161,7 +1161,7 @@
 
 		show_table2_v_delimiter2();
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
-		if(isset($_GET["graphid"]))
+		if(isset($_REQUEST["graphid"]))
 		{
 			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
 			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('".S_DELETE_GRAPH_Q."');\">";
@@ -1195,7 +1195,7 @@
 
 		show_table2_v_delimiter($col++);
 		echo "<form method=\"get\" action=\"config.php\">";
-		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_GET["config"]."\" size=8>";
+		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_REQUEST["config"]."\" size=8>";
 		if(isset($escalationid))
 		{
 			echo "<input class=\"biginput\" name=\"escalationid\" type=\"hidden\" value=\"$escalationid\" size=8>";
@@ -1250,7 +1250,7 @@
 
 		show_table2_v_delimiter($col++);
 		echo "<form method=\"get\" action=\"config.php\">";
-		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_GET["config"]."\" size=8>";
+		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_REQUEST["config"]."\" size=8>";
 		echo "<input class=\"biginput\" name=\"escalationid\" type=\"hidden\" value=\"$escalationid\" size=8>";
 		if(isset($escalationruleid))
 		{
@@ -1342,9 +1342,9 @@
 
 		show_table2_v_delimiter($col++);
 		echo "<form method=\"get\" action=\"hosts.php\">";
-		if(isset($_GET["config"]))
+		if(isset($_REQUEST["config"]))
 		{
-			echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_GET["config"]."\" size=8>";
+			echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_REQUEST["config"]."\" size=8>";
 		}
 		echo "<input class=\"biginput\" name=\"hostid\" type=\"hidden\" value=\"$hostid\" size=8>";
 
@@ -1447,7 +1447,7 @@
 
 		show_table2_v_delimiter($col++);
 		echo "<form method=\"get\" action=\"config.php\">";
-		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_GET["config"]."\" size=8>";
+		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_REQUEST["config"]."\" size=8>";
 		if(isset($id))
 		{
 			echo "<input class=\"biginput\" name=\"id\" type=\"hidden\" value=\"$id\" size=8>";

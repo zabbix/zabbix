@@ -26,9 +26,9 @@
 
 	function form_select($var, $value, $label)
 	{
-		global $_GET;
+		global $_REQUEST;
 	
-		return "<option value=\"$value\" ".iif(isset($_GET[$var])&&$_GET[$var]==$value,"selected","").">$label";
+		return "<option value=\"$value\" ".iif(isset($_REQUEST[$var])&&$_REQUEST[$var]==$value,"selected","").">$label";
 	}
 
 	function form_input($name, $value, $size)
@@ -43,11 +43,11 @@
 
 	function url1_param($parameter)
 	{
-		global $_GET;
+		global $_REQUEST;
 	
-		if(isset($_GET[$parameter]))
+		if(isset($_REQUEST[$parameter]))
 		{
-			return "$parameter=".$_GET[$parameter];
+			return "$parameter=".$_REQUEST[$parameter];
 		}
 		else
 		{
@@ -57,11 +57,11 @@
 
 	function url_param($parameter)
 	{
-		global $_GET;
+		global $_REQUEST;
 	
-		if(isset($_GET[$parameter]))
+		if(isset($_REQUEST[$parameter]))
 		{
-			return "&$parameter=".$_GET[$parameter];
+			return "&$parameter=".$_REQUEST[$parameter];
 		}
 		else
 		{

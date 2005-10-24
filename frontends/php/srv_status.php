@@ -32,13 +32,13 @@
 <?php
 	show_table_header(S_IT_SERVICES_BIG);
 
-	if(isset($_GET["serviceid"])&&isset($_GET["showgraph"]))
+	if(isset($_REQUEST["serviceid"])&&isset($_REQUEST["showgraph"]))
 	{
 		echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 		echo "<TR BGCOLOR=#EEEEEE>";
 		echo "<TR BGCOLOR=#DDDDDD>";
 		echo "<TD ALIGN=CENTER>";
-		echo "<IMG SRC=\"chart5.php?serviceid=".$_GET["serviceid"]."\" border=0>";
+		echo "<IMG SRC=\"chart5.php?serviceid=".$_REQUEST["serviceid"]."\" border=0>";
 		echo "</TD>";
 		echo "</TR>";
 		echo "</TABLE>";
@@ -51,10 +51,10 @@
 	table_begin();
 	table_header(array(S_SERVICE,S_STATUS,S_REASON,S_SLA_LAST_7_DAYS,nbsp(S_PLANNED_CURRENT_SLA),S_GRAPH));
 	$col=0;
-	if(isset($_GET["serviceid"]))
+	if(isset($_REQUEST["serviceid"]))
 	{
 		echo "<tr bgcolor=#EEEEEE>";
-		$service=get_service_by_serviceid($_GET["serviceid"]);
+		$service=get_service_by_serviceid($_REQUEST["serviceid"]);
 		echo "<td><b><a href=\"srv_status.php?serviceid=".$service["serviceid"]."\">".$service["name"]."</a></b></td>";
 		echo "<td>".get_service_status_description($service["status"])."</td>";
 		echo "<td>&nbsp;</td>";
@@ -93,11 +93,11 @@
 	}
 	while($row=DBfetch($result))
 	{
-		if(!isset($_GET["serviceid"]) && service_has_parent($row["serviceid"]))
+		if(!isset($_REQUEST["serviceid"]) && service_has_parent($row["serviceid"]))
 		{
 			continue;
 		}
-		if(isset($_GET["serviceid"]) && service_has_no_this_parent($_GET["serviceid"],$row["serviceid"]))
+		if(isset($_REQUEST["serviceid"]) && service_has_no_this_parent($_REQUEST["serviceid"],$row["serviceid"]))
 		{
 			continue;
 		}
@@ -105,7 +105,7 @@
 		{
 			continue;
 		}
-		if(isset($_GET["serviceid"])&&($_GET["serviceid"]==$row["serviceid"]))
+		if(isset($_REQUEST["serviceid"])&&($_REQUEST["serviceid"]==$row["serviceid"]))
 		{
 			echo "<tr bgcolor=#99AABB>";
 		}
@@ -125,7 +125,7 @@
 			$trigger_link="";
 			$description=$row["name"];
 		}
-		if(isset($_GET["serviceid"]))
+		if(isset($_REQUEST["serviceid"]))
 		{
 			if($childs == 0)
 			{
