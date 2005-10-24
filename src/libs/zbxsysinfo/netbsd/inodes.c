@@ -51,7 +51,7 @@
 
 #include "md5.h"
 
-int	VFS_FS_INODE_FREE(const char *cmd, const char *mountPoint,double  *value)
+int	VFS_FS_INODE_FREE(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
 {
 #ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
@@ -94,7 +94,7 @@ int	VFS_FS_INODE_FREE(const char *cmd, const char *mountPoint,double  *value)
 #endif
 }
 
-int	VFS_FS_INODE_TOTAL(const char *cmd, const char *mountPoint,double  *value)
+int	VFS_FS_INODE_TOTAL(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
 {
 #ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
@@ -137,17 +137,17 @@ int	VFS_FS_INODE_TOTAL(const char *cmd, const char *mountPoint,double  *value)
 #endif
 }
 
-int	VFS_FS_INODE_PFREE(const char *cmd, const char *mountPoint,double  *value)
+int	VFS_FS_INODE_PFREE(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
 {
 	double	total;
 	double	free;
 
-	if(SYSINFO_RET_OK != VFS_FS_INODE_TOTAL(cmd, mountPoint, &total))
+	if(SYSINFO_RET_OK != VFS_FS_INODE_TOTAL(cmd, mountPoint, &total, msg, mlen_max))
 	{
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(SYSINFO_RET_OK != VFS_FS_INODE_FREE(cmd, mountPoint, &free))
+	if(SYSINFO_RET_OK != VFS_FS_INODE_FREE(cmd, mountPoint, &free, msg, mlen_max))
 	{
 		return SYSINFO_RET_FAIL;
 	}

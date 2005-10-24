@@ -135,154 +135,154 @@
 #include "common.h"
 #include "sysinfo.h"
 
-int	DISKREADOPS1(const char *cmd, const char *device,double  *value)
+int	DISKREADOPS1(const char *cmd, const char *device,double  *value, const char *msg, int mlen_max)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_read_ops1[%s]",device);
 
-	return	get_stat(key,value);
+	return	get_stat(key,value,msg,mlen_max);
 }
 
-int	DISKREADOPS5(const char *cmd, const char *device,double  *value)
+int	DISKREADOPS5(const char *cmd, const char *device,double  *value, const char *msg, int mlen_max)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_read_ops5[%s]",device);
 
-	return	get_stat(key,value);
+	return	get_stat(key,value,msg,mlen_max);
 }
 
-int	DISKREADOPS15(const char *cmd, const char *device,double  *value)
+int	DISKREADOPS15(const char *cmd, const char *device,double  *value, const char *msg, int mlen_max)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_read_ops15[%s]",device);
 
-	return	get_stat(key,value);
+	return	get_stat(key,value,msg,mlen_max);
 }
 
-int	DISKREADBLKS1(const char *cmd, const char *device,double  *value)
+int	DISKREADBLKS1(const char *cmd, const char *device,double  *value, const char *msg, int mlen_max)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_read_blks1[%s]",device);
 
-	return	get_stat(key,value);
+	return	get_stat(key,value,msg,mlen_max);
 }
 
-int	DISKREADBLKS5(const char *cmd, const char *device,double  *value)
+int	DISKREADBLKS5(const char *cmd, const char *device,double  *value, const char *msg, int mlen_max)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_read_blks5[%s]",device);
 
-	return	get_stat(key,value);
+	return	get_stat(key,value,msg,mlen_max);
 }
 
-int	DISKREADBLKS15(const char *cmd, const char *device,double  *value)
+int	DISKREADBLKS15(const char *cmd, const char *device,double  *value, const char *msg, int mlen_max)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_read_blks15[%s]",device);
 
-	return	get_stat(key,value);
+	return	get_stat(key,value,msg,mlen_max);
 }
 
-int	DISKWRITEOPS1(const char *cmd, const char *device,double  *value)
+int	DISKWRITEOPS1(const char *cmd, const char *device,double  *value, const char *msg, int mlen_max)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_write_ops1[%s]",device);
 
-	return	get_stat(key,value);
+	return	get_stat(key,value,msg,mlen_max);
 }
 
-int	DISKWRITEOPS5(const char *cmd, const char *device,double  *value)
+int	DISKWRITEOPS5(const char *cmd, const char *device,double  *value, const char *msg, int mlen_max)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_write_ops5[%s]",device);
 
-	return	get_stat(key,value);
+	return	get_stat(key,value,msg,mlen_max);
 }
 
-int	DISKWRITEOPS15(const char *cmd, const char *device,double  *value)
+int	DISKWRITEOPS15(const char *cmd, const char *device,double  *value, const char *msg, int mlen_max)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_write_ops15[%s]",device);
 
-	return	get_stat(key,value);
+	return	get_stat(key,value,msg,mlen_max);
 }
 
-int	DISKWRITEBLKS1(const char *cmd, const char *device,double  *value)
+int	DISKWRITEBLKS1(const char *cmd, const char *device,double  *value, const char *msg, int mlen_max)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_write_blks1[%s]",device);
 
-	return	get_stat(key,value);
+	return	get_stat(key,value,msg,mlen_max);
 }
 
-int	DISKWRITEBLKS5(const char *cmd, const char *device,double  *value)
+int	DISKWRITEBLKS5(const char *cmd, const char *device,double  *value, const char *msg, int mlen_max)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_write_blks5[%s]",device);
 
-	return	get_stat(key,value);
+	return	get_stat(key,value,msg,mlen_max);
 }
 
-int	DISKWRITEBLKS15(const char *cmd, const char *device,double  *value)
+int	DISKWRITEBLKS15(const char *cmd, const char *device,double  *value, const char *msg, int mlen_max)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"disk_write_blks15[%s]",device);
 
-	return	get_stat(key,value);
+	return	get_stat(key,value,msg,mlen_max);
 }
 
-int	DISK_IO(const char *cmd, const char *parameter,double  *value)
+int	DISK_IO(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 #ifdef	HAVE_PROC
-	return	getPROC("/proc/stat",2,2,value);
+	return	getPROC("/proc/stat",2,2,value,msg,mlen_max);
 #else
 	return	SYSINFO_RET_FAIL;
 #endif
 }
 
-int	DISK_RIO(const char *cmd, const char *parameter,double  *value)
+int	DISK_RIO(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 #ifdef	HAVE_PROC
-	return	getPROC("/proc/stat",3,2,value);
+	return	getPROC("/proc/stat",3,2,value,msg,mlen_max);
 #else
 	return	SYSINFO_RET_FAIL;
 #endif
 }
 
-int	DISK_WIO(const char *cmd, const char *parameter,double  *value)
+int	DISK_WIO(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 #ifdef	HAVE_PROC
-	return	getPROC("/proc/stat",4,2,value);
+	return	getPROC("/proc/stat",4,2,value,msg,mlen_max);
 #else
 	return	SYSINFO_RET_FAIL;
 #endif
 }
 
-int	DISK_RBLK(const char *cmd, const char *parameter,double  *value)
+int	DISK_RBLK(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 #ifdef	HAVE_PROC
-	return	getPROC("/proc/stat",5,2,value);
+	return	getPROC("/proc/stat",5,2,value,msg,mlen_max);
 #else
 	return	SYSINFO_RET_FAIL;
 #endif
 }
 
-int	DISK_WBLK(const char *cmd, const char *parameter,double  *value)
+int	DISK_WBLK(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 #ifdef	HAVE_PROC
-	return	getPROC("/proc/stat",6,2,value);
+	return	getPROC("/proc/stat",6,2,value,msg,mlen_max);
 #else
 	return	SYSINFO_RET_FAIL;
 #endif

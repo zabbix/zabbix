@@ -234,7 +234,7 @@ static NETWORK_DATA *get_net_data_record(const char *device)
 /*
  * SKIPPED
  *
-static int  PROCCNT(const char *cmd, const char *procname,double  *value)
+static int  PROCCNT(const char *cmd, const char *procname,double  *value, const char *msg, int mlen_max)
 {
 	DIR	*dir;
 	struct	dirent *entries;
@@ -327,7 +327,7 @@ static int get_disk_kstat_record(const char *name,
   return result;
 }
 
-static int DISKREADOPS(const char *cmd, const char *device,double  *value)
+static int DISKREADOPS(const char *cmd, const char *device,double  *value, const char *msg, int mlen_max)
 {
   int result = SYSINFO_RET_FAIL;
   DISK_DATA *p;
@@ -362,7 +362,7 @@ static int DISKREADOPS(const char *cmd, const char *device,double  *value)
   return result;
 }
 
-static int DISKREADBLOCKS(const char *cmd, const char *device,double  *value)
+static int DISKREADBLOCKS(const char *cmd, const char *device,double  *value, const char *msg, int mlen_max)
 {
   int result = SYSINFO_RET_FAIL;
   DISK_DATA *p;
@@ -397,7 +397,7 @@ static int DISKREADBLOCKS(const char *cmd, const char *device,double  *value)
   return result;
 }
 
-static int DISKWRITEOPS(const char *cmd, const char *device,double  *value)
+static int DISKWRITEOPS(const char *cmd, const char *device,double  *value, const char *msg, int mlen_max)
 {
   int result = SYSINFO_RET_FAIL;
   DISK_DATA *p;
@@ -432,7 +432,7 @@ static int DISKWRITEOPS(const char *cmd, const char *device,double  *value)
   return result;
 }
 
-static int DISKWRITEBLOCKS(const char *cmd, const char *device,double  *value)
+static int DISKWRITEBLOCKS(const char *cmd, const char *device,double  *value, const char *msg, int mlen_max)
 {
   int result = SYSINFO_RET_FAIL;
   DISK_DATA *p;
@@ -467,7 +467,7 @@ static int DISKWRITEBLOCKS(const char *cmd, const char *device,double  *value)
   return result;
 }
 
-static int DISKBUSY(const char *cmd, const char *device, double  *value)
+static int DISKBUSY(const char *cmd, const char *device, double  *value, const char *msg, int mlen_max)
 {
   int result = SYSINFO_RET_FAIL;
   DISK_DATA *p;
@@ -498,7 +498,7 @@ static int DISKBUSY(const char *cmd, const char *device, double  *value)
    return result;
 }
 
-static int DISKSVC(const char *cmd, const char *device, double  *value)
+static int DISKSVC(const char *cmd, const char *device, double  *value, const char *msg, int mlen_max)
 {
   int result = SYSINFO_RET_FAIL;
   DISK_DATA *p;
@@ -581,7 +581,7 @@ static int get_cpu_data(uint64_t *idle,
   return cpu_count;
 }
 
-static int CPUIDLE(const char *cmd, const char *param, double  *value)
+static int CPUIDLE(const char *cmd, const char *param, double  *value, const char *msg, int mlen_max)
 {
    static uint64_t idle[2];
    static uint64_t system[2];
@@ -615,7 +615,7 @@ static int CPUIDLE(const char *cmd, const char *param, double  *value)
    return result;
 }
 
-static int CPUUSER(const char *cmd, const char *param,double  *value)
+static int CPUUSER(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
    static unsigned long long idle[2];
    static unsigned long long system[2];
@@ -649,7 +649,7 @@ static int CPUUSER(const char *cmd, const char *param,double  *value)
    return result;
 }
 
-static int CPUSYSTEM(const char *cmd, const char *param,double  *value)
+static int CPUSYSTEM(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
    static unsigned long long idle[2];
    static unsigned long long system[2];
@@ -683,7 +683,7 @@ static int CPUSYSTEM(const char *cmd, const char *param,double  *value)
    return result;
 }
 
-static int CPUIOWAIT(const char *cmd, const char *param,double  *value)
+static int CPUIOWAIT(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
    static unsigned long long idle[2];
    static unsigned long long system[2];
@@ -757,7 +757,7 @@ static int get_named_field(const char *name,
    }
 
 
-static int NETLOADIN(const char *cmd, const char *parameter,double  *value)
+static int NETLOADIN(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   int result = SYSINFO_RET_FAIL;
   NETWORK_DATA *p;
@@ -806,7 +806,7 @@ static int NETLOADIN(const char *cmd, const char *parameter,double  *value)
   return result;
 }
 
-static int NETPACKETSIN(const char *cmd, const char *parameter,double  *value)
+static int NETPACKETSIN(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   int result = SYSINFO_RET_FAIL;
   NETWORK_DATA *p;
@@ -855,7 +855,7 @@ static int NETPACKETSIN(const char *cmd, const char *parameter,double  *value)
   return result;
 }
 
-static int NETERRSIN(const char *cmd, const char *parameter,double  *value)
+static int NETERRSIN(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   int result;
   kstat_named_t kn;
@@ -869,7 +869,7 @@ static int NETERRSIN(const char *cmd, const char *parameter,double  *value)
   return result;
 }
 
-static int NETLOADOUT(const char *cmd, const char *parameter,double  *value)
+static int NETLOADOUT(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   int result = SYSINFO_RET_FAIL;
   NETWORK_DATA *p;
@@ -918,7 +918,7 @@ static int NETLOADOUT(const char *cmd, const char *parameter,double  *value)
   return result;
 }
 
-static int NETPACKETSOUT(const char *cmd, const char *parameter,double  *value)
+static int NETPACKETSOUT(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   int result = SYSINFO_RET_FAIL;
   NETWORK_DATA *p;
@@ -967,7 +967,7 @@ static int NETPACKETSOUT(const char *cmd, const char *parameter,double  *value)
   return result;
 }
 
-static int NETERRSOUT(const char *cmd, const char *parameter,double  *value)
+static int NETERRSOUT(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   int result;
   kstat_named_t kn;
@@ -981,7 +981,7 @@ static int NETERRSOUT(const char *cmd, const char *parameter,double  *value)
   return result;
 }
 
-static int NETCOLLOUT(const char *cmd, const char *parameter,double  *value)
+static int NETCOLLOUT(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   int result;
   kstat_named_t kn;
@@ -999,7 +999,7 @@ static int NETCOLLOUT(const char *cmd, const char *parameter,double  *value)
 /*
  * ADDED
  * 
-int	INODEFREE(const char *cmd, const char *mountPoint,double  *value)
+int	INODEFREE(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
 {
 	struct statvfs   s;
 
@@ -1016,7 +1016,7 @@ int	INODEFREE(const char *cmd, const char *mountPoint,double  *value)
 /*
  * ADDED
  * 
-int	INODETOTAL(const char *cmd, const char *mountPoint,double  *value)
+int	INODETOTAL(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
 {
 	struct statvfs   s;
 
@@ -1033,7 +1033,7 @@ int	INODETOTAL(const char *cmd, const char *mountPoint,double  *value)
 /*
  * ADDED
  * 
-int	DISKFREE(const char *cmd, const char *mountPoint,double  *value)
+int	DISKFREE(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
 {
 	struct statvfs   s;
 
@@ -1051,7 +1051,7 @@ int	DISKFREE(const char *cmd, const char *mountPoint,double  *value)
 /*
  * ADDED
  * 
-int	DISKUSED(const char *cmd, const char *mountPoint,double  *value)
+int	DISKUSED(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
 {
 	struct statvfs   s;
 
@@ -1069,7 +1069,7 @@ int	DISKUSED(const char *cmd, const char *mountPoint,double  *value)
 /*
  * ADDED
  * 
-int	DISKTOTAL(const char *cmd, const char *mountPoint,double  *value)
+int	DISKTOTAL(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
 {
 	struct statvfs   s;
 
@@ -1087,7 +1087,7 @@ int	DISKTOTAL(const char *cmd, const char *mountPoint,double  *value)
 /*
  * ADDED
  * 
-static int	TOTALMEM(const char *cmd, const char *parameter,double  *value)
+static int	TOTALMEM(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	*value=(double)sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGESIZE);
 	return SYSINFO_RET_OK;
@@ -1097,7 +1097,7 @@ static int	TOTALMEM(const char *cmd, const char *parameter,double  *value)
 /*
  * ADDED
  * 
-static int	FREEMEM(const char *cmd, const char *parameter,double  *value)
+static int	FREEMEM(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	*value=(double)sysconf(_SC_AVPHYS_PAGES)*sysconf(_SC_PAGESIZE);
 	return SYSINFO_RET_OK;
@@ -1107,7 +1107,7 @@ static int	FREEMEM(const char *cmd, const char *parameter,double  *value)
 /*
  * ADDED
  * 
-static int KERNEL_MAXPROC(const char *cmd, const char *parameter,double  *value)
+static int KERNEL_MAXPROC(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   int result = SYSINFO_RET_FAIL;
   kstat_ctl_t *kc;
@@ -1143,7 +1143,7 @@ static int KERNEL_MAXPROC(const char *cmd, const char *parameter,double  *value)
 /*
  * ADDED
  * 
-static int UPTIME(const char *cmd, const char *parameter,double  *value)
+static int UPTIME(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
    {
       int result = SYSINFO_RET_FAIL;
       kstat_ctl_t   *kc;
@@ -1180,7 +1180,7 @@ static int UPTIME(const char *cmd, const char *parameter,double  *value)
 /*
  * ADDED
  * 
-static int	PROCLOAD(const char *cmd, const char *parameter,double  *value)
+static int	PROCLOAD(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	double	load[3];
 
@@ -1199,7 +1199,7 @@ static int	PROCLOAD(const char *cmd, const char *parameter,double  *value)
 /*
  * ADDED
  * 
-static int	PROCLOAD5(const char *cmd, const char *parameter,double  *value)
+static int	PROCLOAD5(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	double	load[3];
 
@@ -1218,7 +1218,7 @@ static int	PROCLOAD5(const char *cmd, const char *parameter,double  *value)
 /*
  * ADDED
  * 
-static int	PROCLOAD15(const char *cmd, const char *parameter,double  *value)
+static int	PROCLOAD15(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	double	load[3];
 
@@ -1292,7 +1292,7 @@ static int get_swap_data(uint64_t *resv,
   return result;
 }
 
-static int SWAPFREE(const char *cmd, const char *parameter,double  *value)
+static int SWAPFREE(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   int result;
   uint64_t resv, avail, free;
@@ -1307,7 +1307,7 @@ static int SWAPFREE(const char *cmd, const char *parameter,double  *value)
    return result;
 }
 
-int SWAPTOTAL(const char *cmd, const char *parameter,double  *value)
+int SWAPTOTAL(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   int result;
   uint64_t resv, avail, free;
@@ -1329,7 +1329,7 @@ int SWAPTOTAL(const char *cmd, const char *parameter,double  *value)
 /*
  * ADDED
  * 
-static int SWAPIN(const char *cmd, const char *parameter,double  *value)
+static int SWAPIN(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   kstat_ctl_t *kc;
   int cpu_count = 0;
@@ -1368,7 +1368,7 @@ static int SWAPIN(const char *cmd, const char *parameter,double  *value)
 /*
  * ADDED
  * 
-static int SWAPOUT(const char *cmd, const char *parameter,double  *value)
+static int SWAPOUT(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   kstat_ctl_t *kc;
   int cpu_count = 0;
@@ -1407,7 +1407,7 @@ static int SWAPOUT(const char *cmd, const char *parameter,double  *value)
 /*
  * SKIPPED
  *
-static int PROCCOUNT(const char *cmd, const char *parameter,double  *value)
+static int PROCCOUNT(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
    {
       int result = SYSINFO_RET_FAIL;
       kstat_ctl_t *kc;
@@ -1441,7 +1441,7 @@ static int PROCCOUNT(const char *cmd, const char *parameter,double  *value)
 /*
  * ADDED
  * 
-static int PROCRUNNING(const char *cmd, const char *parameter,double  *value)
+static int PROCRUNNING(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	DIR	*dir;
 	struct	dirent *entries;
@@ -1501,7 +1501,7 @@ static int PROCRUNNING(const char *cmd, const char *parameter,double  *value)
 /*
  * ADDED
  * 
-static int CSWITCHES(const char *cmd, const char *parameter,double  *value)
+static int CSWITCHES(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   kstat_ctl_t *kc;
   int cpu_count = 0;
@@ -1540,7 +1540,7 @@ static int CSWITCHES(const char *cmd, const char *parameter,double  *value)
 /* 
  * ADDED to /solaris/net.c
  * 
-static int TCP_LISTEN(const char *cmd, const char *parameter,double  *value)
+static int TCP_LISTEN(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   char command[MAX_STRING_LEN];
   
@@ -1548,14 +1548,14 @@ static int TCP_LISTEN(const char *cmd, const char *parameter,double  *value)
 
   snprintf(command, sizeof command-1, "netstat -an | grep '*.%s' | wc -l", parameter);
    
-  return EXECUTE(NULL, command, value);
+  return EXECUTE(NULL, command, value, msg, mlen_max);
 }
 */
 
 /* 
  * ADDED
  * 
-static int INTERRUPTS(const char *cmd, const char *parameter,double  *value)
+static int INTERRUPTS(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   kstat_ctl_t *kc;
   int cpu_count = 0;
@@ -1595,7 +1595,7 @@ static int INTERRUPTS(const char *cmd, const char *parameter,double  *value)
  * ALREADY ADDED
  * 
 #ifdef HAVE_LDAP
-static int check_ldap(char *hostname, short port,int *value)
+static int check_ldap(char *hostname, short port,int *value, const char *msg, int mlen_max)
 {
 	int rc;
 	LDAP *ldap;
