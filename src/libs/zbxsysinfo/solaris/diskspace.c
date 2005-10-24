@@ -135,54 +135,6 @@
 #include "common.h"
 #include "sysinfo.h"
 
-int	VFS_FS_PUSED(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
-{
-	double	total;
-	double	used;
-
-	if(SYSINFO_RET_OK != VFS_FS_TOTAL(cmd, mountPoint, &total, msg, mlen_max))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	if(SYSINFO_RET_OK != VFS_FS_USED(cmd, mountPoint, &used, msg, mlen_max))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	if(total == 0)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	*value = 100*used/total;
-	return SYSINFO_RET_OK;
-}
-
-int	VFS_FS_PFREE(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
-{
-	double	total;
-	double	free;
-
-	if(SYSINFO_RET_OK != VFS_FS_TOTAL(cmd, mountPoint, &total, msg, mlen_max))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	if(SYSINFO_RET_OK != VFS_FS_FREE(cmd, mountPoint, &free, msg, mlen_max))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	if(total == 0)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	*value = 100*free/total;
-	return SYSINFO_RET_OK;
-}
-
 int	VFS_FS_FREE(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
 {
 #ifdef HAVE_SYS_STATVFS_H
@@ -235,5 +187,53 @@ int	VFS_FS_TOTAL(const char *cmd, const char *mountPoint,double  *value, const c
 #else
 	return	SYSINFO_RET_FAIL;
 #endif
+}
+
+int	VFS_FS_PUSED(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
+{
+	double	total;
+	double	used;
+
+	if(SYSINFO_RET_OK != VFS_FS_TOTAL(cmd, mountPoint, &total, msg, mlen_max))
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(SYSINFO_RET_OK != VFS_FS_USED(cmd, mountPoint, &used, msg, mlen_max))
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(total == 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	*value = 100*used/total;
+	return SYSINFO_RET_OK;
+}
+
+int	VFS_FS_PFREE(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
+{
+	double	total;
+	double	free;
+
+	if(SYSINFO_RET_OK != VFS_FS_TOTAL(cmd, mountPoint, &total, msg, mlen_max))
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(SYSINFO_RET_OK != VFS_FS_FREE(cmd, mountPoint, &free, msg, mlen_max))
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(total == 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	*value = 100*free/total;
+	return SYSINFO_RET_OK;
 }
 
