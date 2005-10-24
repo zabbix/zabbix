@@ -201,6 +201,9 @@
 	"S_CANNOT_ADD_IMAGE"=>			"Cannot add image",
 	"S_IMAGE_DELETED"=>			"Image deleted",
 	"S_CANNOT_DELETE_IMAGE"=>		"Cannot delete image",
+	"S_IMAGE_UPDATED"=>			"Image updated",
+	"S_CANNOT_UPDATE_IMAGE"=>		"Cannot update image",
+	"S_UPDATE_SELECTED_IMAGE"=>		"Update selected image?",
 	"S_AUTODISCOVERY"=>			"Autodiscovery",
 
 //	Latest values

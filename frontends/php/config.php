@@ -72,6 +72,16 @@
 			}
 			unset($_REQUEST["imageid"]);
 		}
+		if($_REQUEST["register"]=="update image")
+		{
+			$result=update_image($_REQUEST["imageid"],$_REQUEST["name"],$_REQUEST["imagetype"],$_FILES);
+			show_messages($result, S_IMAGE_UPDATED, S_CANNOT_UPDATE_IMAGE);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Image updated");
+			}
+			unset($_REQUEST["imageid"]);
+		}
 	}
 	if(isset($_REQUEST["register"]))
 	{
@@ -345,6 +355,7 @@
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add image\">";
 		if(isset($_REQUEST["imageid"]))
 		{
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update image\" onClick=\"return Confirm('".S_UPDATE_SELECTED_IMAGE."');\">";
 			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete image\" onClick=\"return Confirm('".S_DELETE_SELECTED_IMAGE."');\">";
 		}
 

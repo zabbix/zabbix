@@ -1502,6 +1502,30 @@ echo "</head>";
 		}
 	}
 
+	function	update_image($imageid,$name,$imagetype,$files)
+	{
+		if(isset($files))
+		{
+			if($files["image"]["error"]==0)
+			if($files["image"]["size"]<1024*1024)
+			{
+				$image=addslashes(fread(fopen($files["image"]["tmp_name"],"r"),filesize($files["image"]["tmp_name"])));
+				$sql="update images set name='$name',imagetype='$imagetype',image='$image' where imageid='$imageid'";
+				return	DBexecute($sql);
+			}
+			else
+			{
+				error("Image size must be less than 1Mb");
+				return FALSE;
+			}
+		}
+		else
+		{
+			error("Select image to download");
+			return FALSE;
+		}
+	}
+
 	function	delete_image($imageid)
 	{
 		$sql="delete from images where imageid=$imageid";
