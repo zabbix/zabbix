@@ -100,7 +100,7 @@
 #include "sysinfo.h"
 
 
-int	SYSTEM_KERNEL_MAXPROC(const char *cmd, const char *parameter, double  *value)
+int	SYSTEM_KERNEL_MAXPROC(const char *cmd, const char *parameter, double  *value, const char *msg, int mlen_max)
 {
     int result = SYSINFO_RET_FAIL;
     kstat_ctl_t *kc;

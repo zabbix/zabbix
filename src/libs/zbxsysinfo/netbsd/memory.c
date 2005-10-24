@@ -135,13 +135,13 @@
 #include "common.h"
 #include "sysinfo.h"
 
-int	VM_MEMORY_CACHED(const char *cmd, const char *parameter,double  *value)
+int	VM_MEMORY_CACHED(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 #ifdef HAVE_PROC
 /* Get CACHED memory in bytes */
-/*	return getPROC("/proc/meminfo",8,2);*/
+/*	return getPROC("/proc/meminfo",8,2,msg,mlen_max);*/
 /* It does not work for both 2.4 and 2.6 */
-/*	return getPROC("/proc/meminfo",2,7);*/
+/*	return getPROC("/proc/meminfo",2,7,msg,mlen_max);*/
 	FILE	*f;
 	char	*t;
 	char	c[MAX_STRING_LEN];
@@ -171,7 +171,7 @@ int	VM_MEMORY_CACHED(const char *cmd, const char *parameter,double  *value)
 #endif
 }
 
-int	VM_MEMORY_BUFFERS(const char *cmd, const char *parameter,double  *value)
+int	VM_MEMORY_BUFFERS(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 #ifdef HAVE_SYSINFO_BUFFERRAM
 	struct sysinfo info;
@@ -194,7 +194,7 @@ int	VM_MEMORY_BUFFERS(const char *cmd, const char *parameter,double  *value)
 #endif
 }
 
-int	VM_MEMORY_SHARED(const char *cmd, const char *parameter,double  *value)
+int	VM_MEMORY_SHARED(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 #ifdef HAVE_SYSINFO_SHAREDRAM
 	struct sysinfo info;
@@ -231,7 +231,7 @@ int	VM_MEMORY_SHARED(const char *cmd, const char *parameter,double  *value)
 #endif
 }
 
-int	VM_MEMORY_TOTAL(const char *cmd, const char *parameter,double  *value)
+int	VM_MEMORY_TOTAL(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 /* Solaris */
 #ifdef HAVE_UNISTD_SYSCONF
@@ -312,7 +312,7 @@ int	VM_MEMORY_TOTAL(const char *cmd, const char *parameter,double  *value)
 #endif
 }
 
-int	VM_MEMORY_FREE(const char *cmd, const char *parameter,double  *value)
+int	VM_MEMORY_FREE(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 /* Solaris */
 #ifdef HAVE_UNISTD_SYSCONF

@@ -176,6 +176,7 @@ char	*string_replace(char *str, const char *sub_str1, const char *sub_str2);
 void	del_zeroes(char *s);
 int	get_param(const char *param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
+int     get_stat(const char *key, double *value, const char *msg, int mlen_max);
 
 int	comms_create_request(char *host, char *key, char *data, char *lastlogsize, char *request,int maxlen);
 int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastlogsize, char *timestamp,

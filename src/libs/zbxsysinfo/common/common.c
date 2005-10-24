@@ -155,14 +155,14 @@
 
 #include "md5.h"
 
-void	forward_request(char *proxy,char *command,int port,char *value);
+void	forward_request(char *proxy,char *command,int port,char *value, const char *msg, int mlen_max);
 
 COMMAND	*commands=NULL;
 
 extern COMMAND parameters_specific[];
-extern	int	SYSTEM_LOCALTIME(const char *cmd, const char *parameter,double  *value);
+extern	int	SYSTEM_LOCALTIME(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
 
-int     EXECUTE_STR(const char *cmd, const char *command, const char *parameter, char  **value);
+int     EXECUTE_STR(const char *cmd, const char *command, const char *parameter, char  **value, const char *msg, int mlen_max);
 
 COMMAND	parameters_common[]=
 /* 	KEY		FUNCTION (if double) FUNCTION (if string) PARAM*/
@@ -465,7 +465,7 @@ int	process(char *command,char *value, int test)
 
 /* MD5 sum calculation */
 
-int	VFS_FILE_MD5SUM(const char *cmd, const char *filename, char **value)
+int	VFS_FILE_MD5SUM(const char *cmd, const char *filename, char **value, const char *msg, int mlen_max)
 {
 	int	fd;
 	int	i,nr;
@@ -579,7 +579,7 @@ static u_long crctab[] = {
  * on failure.  Errno is set on failure.
  */
 
-int	VFS_FILE_CKSUM(const char *cmd, const char *filename,double  *value)
+int	VFS_FILE_CKSUM(const char *cmd, const char *filename,double  *value, const char *msg, int mlen_max)
 {
 	register u_char *p;
 	register int nr;
@@ -647,7 +647,7 @@ crc_buf2(p, clen, cval)
 	return (0);
 }
 
-int	get_stat(const char *key, double *value)
+int	get_stat(const char *key, double *value, const char *msg, int mlen_max)
 {
 	FILE	*f;
 	char	line[MAX_STRING_LEN];
@@ -676,61 +676,61 @@ int	get_stat(const char *key, double *value)
 	return SYSINFO_RET_FAIL;
 }
 
-int	NET_IF_IBYTES1(const char *cmd, const char *parameter,double  *value)
+int	NET_IF_IBYTES1(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"netloadin1[%s]",parameter);
 
-	return	get_stat(key,value);
+	return	get_stat(key,value,msg,mlen_max);
 }
 
-int	NET_IF_IBYTES5(const char *cmd, const char *parameter,double  *value)
+int	NET_IF_IBYTES5(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"netloadin5[%s]",parameter);
 
-	return	get_stat(key,value);
+	return	get_stat(key,value,msg,mlen_max);
 }
 
-int	NET_IF_IBYTES15(const char *cmd, const char *parameter,double  *value)
+int	NET_IF_IBYTES15(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"netloadin15[%s]",parameter);
 
-	return	get_stat(key,value);
+	return	get_stat(key,value,msg,mlen_max);
 }
 
-int	NET_IF_OBYTES1(const char *cmd, const char *parameter,double  *value)
+int	NET_IF_OBYTES1(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"netloadout1[%s]",parameter);
 
-	return	get_stat(key,value);
+	return	get_stat(key,value,msg,mlen_max);
 }
 
-int	NET_IF_OBYTES5(const char *cmd, const char *parameter,double  *value)
+int	NET_IF_OBYTES5(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"netloadout5[%s]",parameter);
 
-	return	get_stat(key,value);
+	return	get_stat(key,value,msg,mlen_max);
 }
 
-int	NET_IF_OBYTES15(const char *cmd, const char *parameter,double  *value)
+int	NET_IF_OBYTES15(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	char	key[MAX_STRING_LEN];
 
 	snprintf(key,sizeof(key)-1,"netloadout15[%s]",parameter);
 
-	return	get_stat(key,value);
+	return	get_stat(key,value,msg,mlen_max);
 }
 
-int	TCP_LISTEN(const char *cmd, const char *porthex,double  *value)
+int	TCP_LISTEN(const char *cmd, const char *porthex,double  *value, const char *msg, int mlen_max)
 {
 #ifdef HAVE_PROC
 	FILE	*f;
@@ -766,7 +766,7 @@ int	TCP_LISTEN(const char *cmd, const char *porthex,double  *value)
 }
 
 #ifdef	HAVE_PROC
-int	getPROC(char *file,int lineno,int fieldno, double *value)
+int	getPROC(char *file,int lineno,int fieldno, double *value, const char *msg, int mlen_max)
 {
 	FILE	*f;
 	char	*t;
@@ -797,7 +797,7 @@ int	getPROC(char *file,int lineno,int fieldno, double *value)
 }
 #endif
 
-int	KERNEL_MAXFILES(const char *cmd, const char *parameter,double  *value)
+int	KERNEL_MAXFILES(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 #ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXFILES
 	int	mib[2],len;
@@ -820,7 +820,7 @@ int	KERNEL_MAXFILES(const char *cmd, const char *parameter,double  *value)
 #endif
 }
 
-int	KERNEL_MAXPROC(const char *cmd, const char *parameter,double  *value)
+int	KERNEL_MAXPROC(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 #ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXPROC
 	int	mib[2],len;
@@ -844,13 +844,13 @@ int	KERNEL_MAXPROC(const char *cmd, const char *parameter,double  *value)
 #endif
 }
 
-int	AGENT_PING(const char *cmd, const char *parameter,double  *value)
+int	AGENT_PING(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	*value=1;
 	return SYSINFO_RET_OK;
 }
 
-int	PROCCOUNT(const char *cmd, const char *parameter,double  *value)
+int	PROCCOUNT(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 #ifdef HAVE_SYSINFO_PROCS
 	struct sysinfo info;
@@ -963,7 +963,7 @@ int	PROCCOUNT(const char *cmd, const char *parameter,double  *value)
 #endif
 }
 
-int	AGENT_VERSION(const char *cmd, const char *parameter,char  **value)
+int	AGENT_VERSION(const char *cmd, const char *parameter,char  **value, const char *msg, int mlen_max)
 {
 	static	char	version[]=ZABBIX_VERSION;
 
@@ -971,7 +971,7 @@ int	AGENT_VERSION(const char *cmd, const char *parameter,char  **value)
 	return	SYSINFO_RET_OK;
 }
 
-int	EXECUTE_STR(const char *cmd, const char *command, const char *parameter, char  **value)
+int	EXECUTE_STR(const char *cmd, const char *command, const char *parameter, char  **value, const char *msg, int mlen_max)
 {
 	FILE	*f;
 	static	char	c[MAX_STRING_LEN];
@@ -1034,7 +1034,7 @@ int	EXECUTE_STR(const char *cmd, const char *command, const char *parameter, cha
 	return	SYSINFO_RET_OK;
 }
 
-int	EXECUTE(const char *cmd, const char *command,double *value)
+int	EXECUTE(const char *cmd, const char *command,double *value, const char *msg, int mlen_max)
 {
 	FILE	*f;
 	double	result;
@@ -1087,7 +1087,7 @@ int	EXECUTE(const char *cmd, const char *command,double *value)
 	return	SYSINFO_RET_OK;
 }
 
-void	forward_request(char *proxy,char *command,int port,char *value)
+void	forward_request(char *proxy,char *command,int port,char *value, const char *msg, int mlen_max)
 {
 	char	*haddr;
 	char	c[1024];
@@ -1226,7 +1226,7 @@ int	tcp_expect(char	*hostname, short port, char *request,char *expect,char *send
 }
 
 #ifdef HAVE_LDAP
-int    check_ldap(char *hostname, short port,int *value)
+int    check_ldap(char *hostname, short port,int *value, const char *msg, int mlen_max)
 {
 	int rc;
 	LDAP *ldap;
@@ -1288,7 +1288,7 @@ int    check_ldap(char *hostname, short port,int *value)
  *  0- NOT OK
  *  1 - OK
  * */
-int	check_ssh(char	*hostname, short port, int *value)
+int	check_ssh(char	*hostname, short port, int *value, const char *msg, int mlen_max)
 {
 	char	*haddr;
 	char	c[MAX_STRING_LEN];
@@ -1363,7 +1363,7 @@ int	check_ssh(char	*hostname, short port, int *value)
 
 /* Example check_service[ssh], check_service[smtp,29],check_service[ssh,127.0.0.1,22]*/
 /* check_service[ssh,127.0.0.1,ssh] */
-int	CHECK_SERVICE_PERF(const char *cmd, const char *service_and_ip_and_port,double  *value)
+int	CHECK_SERVICE_PERF(const char *cmd, const char *service_and_ip_and_port,double  *value, const char *msg, int mlen_max)
 {
 	char	*c,*c1;
 	int	port=0;
@@ -1419,7 +1419,7 @@ int	CHECK_SERVICE_PERF(const char *cmd, const char *service_and_ip_and_port,doub
 	if(strcmp(service,"ssh") == 0)
 	{
 		if(port == 0)	port=22;
-		result=check_ssh(ip,port,&value_int);
+		result=check_ssh(ip,port,&value_int,msg,mlen_max);
 	}
 #ifdef HAVE_LDAP
 	else if(strcmp(service,"ldap") == 0)
@@ -1486,7 +1486,7 @@ int	CHECK_SERVICE_PERF(const char *cmd, const char *service_and_ip_and_port,doub
 
 /* Example check_service[ssh], check_service[smtp,29],check_service[ssh,127.0.0.1,22]*/
 /* check_service[ssh,127.0.0.1,ssh] */
-int	CHECK_SERVICE(const char *cmd, const char *service_and_ip_and_port,double  *value)
+int	CHECK_SERVICE(const char *cmd, const char *service_and_ip_and_port,double  *value, const char *msg, int mlen_max)
 {
 	int	port=0;
 	char	service[MAX_STRING_LEN];
@@ -1580,7 +1580,7 @@ int	CHECK_SERVICE(const char *cmd, const char *service_and_ip_and_port,double  *
 	if(strcmp(service,"ssh") == 0)
 	{
 		if(port == 0)	port=22;
-		result=check_ssh(ip,port,&value_int);
+		result=check_ssh(ip,port,&value_int,msg,mlen_max);
 	}
 	else if(strcmp(service,"service.ntp") == 0)
 	{
@@ -1641,7 +1641,7 @@ int	CHECK_SERVICE(const char *cmd, const char *service_and_ip_and_port,double  *
 	return result;
 }
 
-int	CHECK_PORT(const char *cmd, const char *ip_and_port,double  *value)
+int	CHECK_PORT(const char *cmd, const char *ip_and_port,double  *value, const char *msg, int mlen_max)
 {
 	char	*c;
 	int	port=0;
@@ -1669,7 +1669,7 @@ int	CHECK_PORT(const char *cmd, const char *ip_and_port,double  *value)
 }
 
 
-int	CHECK_DNS(const char *cmd, const char *ip_and_zone,double  *value)
+int	CHECK_DNS(const char *cmd, const char *ip_and_zone,double  *value, const char *msg, int mlen_max)
 {
 	char	*c;
 	int		result;
@@ -1679,7 +1679,7 @@ int	CHECK_DNS(const char *cmd, const char *ip_and_zone,double  *value)
 	struct	in_addr in;
 
 	extern struct __res_state _res;
-	extern char *h_errlist[];
+	/* extern char *h_errlist[]; */
 
 	memset(&ip, 0, MAX_STRING_LEN);
 	memset(&zone, 0, MAX_STRING_LEN);
