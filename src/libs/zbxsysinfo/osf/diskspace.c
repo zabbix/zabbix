@@ -135,6 +135,96 @@
 #include "common.h"
 #include "sysinfo.h"
 
+int	VFS_FS_USED(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
+{
+#ifdef HAVE_SYS_STATVFS_H
+	struct statvfs   s;
+
+	if ( statvfs( (char *)mountPoint, &s) != 0 )
+	{
+		return  SYSINFO_RET_FAIL;
+	}
+
+/*	return  (s.f_blocks-s.f_bavail) * (s.f_bsize / 1024.0);*/
+	*value=(s.f_blocks-s.f_bavail) * (s.f_frsize / 1024.0);
+	return SYSINFO_RET_OK;
+#else
+	struct statfs   s;
+	long            blocks_used;
+	long            blocks_percent_used;
+
+	if ( statfs( (char *)mountPoint, &s) != 0 )
+	{
+		return	SYSINFO_RET_FAIL;
+	}
+        
+	if ( s.f_blocks > 0 ) {
+		blocks_used = s.f_blocks - s.f_bfree;
+		blocks_percent_used = (long)
+		(blocks_used * 100.0 / (blocks_used + s.f_bavail) + 0.5);
+
+/*		printf(
+		"%7.0f %7.0f  %7.0f  %5ld%%   %s\n"
+		,s.f_blocks * (s.f_bsize / 1024.0)
+		,(s.f_blocks - s.f_bfree)  * (s.f_bsize / 1024.0)
+		,s.f_bavail * (s.f_bsize / 1024.0)
+		,blocks_percent_used
+		,mountPoint);
+*/
+		*value=blocks_used * (s.f_bsize / 1024.0);
+		return SYSINFO_RET_OK;
+
+	}
+
+	return	SYSINFO_RET_FAIL;
+#endif
+}
+
+int	VFS_FS_TOTAL(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
+{
+#ifdef HAVE_SYS_STATVFS_H
+	struct statvfs   s;
+
+	if ( statvfs( (char *)mountPoint, &s) != 0 )
+	{
+		return  SYSINFO_RET_FAIL;
+	}
+
+/*	return  s.f_blocks * (s.f_bsize / 1024.0);*/
+	*value= s.f_blocks * (s.f_frsize / 1024.0);
+	return SYSINFO_RET_OK;
+#else
+	struct statfs   s;
+	long            blocks_used;
+	long            blocks_percent_used;
+
+	if ( statfs( (char *)mountPoint, &s) != 0 )
+	{
+		return	SYSINFO_RET_FAIL;
+	}
+        
+	if ( s.f_blocks > 0 ) {
+		blocks_used = s.f_blocks - s.f_bfree;
+		blocks_percent_used = (long)
+		(blocks_used * 100.0 / (blocks_used + s.f_bavail) + 0.5);
+
+/*		printf(
+		"%7.0f %7.0f  %7.0f  %5ld%%   %s\n"
+		,s.f_blocks * (s.f_bsize / 1024.0)
+		,(s.f_blocks - s.f_bfree)  * (s.f_bsize / 1024.0)
+		,s.f_bavail * (s.f_bsize / 1024.0)
+		,blocks_percent_used
+		,mountPoint);
+*/
+		*value=s.f_blocks * (s.f_bsize / 1024.0);
+		return SYSINFO_RET_OK;
+
+	}
+
+	return	SYSINFO_RET_FAIL;
+#endif
+}
+
 int	VFS_FS_PUSED(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
 {
 	double	total;
@@ -228,92 +318,3 @@ int	VFS_FS_FREE(const char *cmd, const char *mountPoint,double  *value, const ch
 #endif
 }
 
-int	VFS_FS_USED(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
-{
-#ifdef HAVE_SYS_STATVFS_H
-	struct statvfs   s;
-
-	if ( statvfs( (char *)mountPoint, &s) != 0 )
-	{
-		return  SYSINFO_RET_FAIL;
-	}
-
-/*	return  (s.f_blocks-s.f_bavail) * (s.f_bsize / 1024.0);*/
-	*value=(s.f_blocks-s.f_bavail) * (s.f_frsize / 1024.0);
-	return SYSINFO_RET_OK;
-#else
-	struct statfs   s;
-	long            blocks_used;
-	long            blocks_percent_used;
-
-	if ( statfs( (char *)mountPoint, &s) != 0 )
-	{
-		return	SYSINFO_RET_FAIL;
-	}
-        
-	if ( s.f_blocks > 0 ) {
-		blocks_used = s.f_blocks - s.f_bfree;
-		blocks_percent_used = (long)
-		(blocks_used * 100.0 / (blocks_used + s.f_bavail) + 0.5);
-
-/*		printf(
-		"%7.0f %7.0f  %7.0f  %5ld%%   %s\n"
-		,s.f_blocks * (s.f_bsize / 1024.0)
-		,(s.f_blocks - s.f_bfree)  * (s.f_bsize / 1024.0)
-		,s.f_bavail * (s.f_bsize / 1024.0)
-		,blocks_percent_used
-		,mountPoint);
-*/
-		*value=blocks_used * (s.f_bsize / 1024.0);
-		return SYSINFO_RET_OK;
-
-	}
-
-	return	SYSINFO_RET_FAIL;
-#endif
-}
-
-int	VFS_FS_TOTAL(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
-{
-#ifdef HAVE_SYS_STATVFS_H
-	struct statvfs   s;
-
-	if ( statvfs( (char *)mountPoint, &s) != 0 )
-	{
-		return  SYSINFO_RET_FAIL;
-	}
-
-/*	return  s.f_blocks * (s.f_bsize / 1024.0);*/
-	*value= s.f_blocks * (s.f_frsize / 1024.0);
-	return SYSINFO_RET_OK;
-#else
-	struct statfs   s;
-	long            blocks_used;
-	long            blocks_percent_used;
-
-	if ( statfs( (char *)mountPoint, &s) != 0 )
-	{
-		return	SYSINFO_RET_FAIL;
-	}
-        
-	if ( s.f_blocks > 0 ) {
-		blocks_used = s.f_blocks - s.f_bfree;
-		blocks_percent_used = (long)
-		(blocks_used * 100.0 / (blocks_used + s.f_bavail) + 0.5);
-
-/*		printf(
-		"%7.0f %7.0f  %7.0f  %5ld%%   %s\n"
-		,s.f_blocks * (s.f_bsize / 1024.0)
-		,(s.f_blocks - s.f_bfree)  * (s.f_bsize / 1024.0)
-		,s.f_bavail * (s.f_bsize / 1024.0)
-		,blocks_percent_used
-		,mountPoint);
-*/
-		*value=s.f_blocks * (s.f_bsize / 1024.0);
-		return SYSINFO_RET_OK;
-
-	}
-
-	return	SYSINFO_RET_FAIL;
-#endif
-}
