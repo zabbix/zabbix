@@ -36,13 +36,13 @@
 #define SDI(m) FDI("%s", m) // string info
 #define IDI(i) FDI("%i", i) // integer info
 */
-int	PROC_MEMORY(const char *cmd, const char *param,double  *value)
+int	PROC_MEMORY(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
     /* in this moment this function for this platform unsupported */
     return	SYSINFO_RET_FAIL;
 }
 
-int	PROC_NUM(const char *cmd, const char *param,double  *value)
+int	PROC_NUM(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
     /* in this moment this function for this platform unsupported */
     return	SYSINFO_RET_FAIL;

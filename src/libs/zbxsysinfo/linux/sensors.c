@@ -137,7 +137,7 @@
 
 #include "md5.h"
 
-int	SENSOR_TEMP1(const char *cmd, const char *param,double  *value)
+int	SENSOR_TEMP1(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
 	DIR	*dir;
 	struct	dirent *entries;
@@ -187,7 +187,7 @@ int	SENSOR_TEMP1(const char *cmd, const char *param,double  *value)
 	return	SYSINFO_RET_FAIL;
 }
 
-int	SENSOR_TEMP2(const char *cmd, const char *param,double  *value)
+int	SENSOR_TEMP2(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
 	DIR	*dir;
 	struct	dirent *entries;
@@ -237,7 +237,7 @@ int	SENSOR_TEMP2(const char *cmd, const char *param,double  *value)
 	return	SYSINFO_RET_FAIL;
 }
 
-int	SENSOR_TEMP3(const char *cmd, const char *param,double  *value)
+int	SENSOR_TEMP3(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
 	DIR	*dir;
 	struct	dirent *entries;

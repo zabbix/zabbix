@@ -207,7 +207,7 @@ void get_swapinfo(double *total, double *fr)
 #endif
 #endif
 
-int	SYSTEM_SWAP_FREE(const char *cmd, const char *parameter,double  *value)
+int	SYSTEM_SWAP_FREE(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 #ifdef HAVE_SYSINFO_FREESWAP
 	struct sysinfo info;
@@ -242,7 +242,7 @@ int	SYSTEM_SWAP_FREE(const char *cmd, const char *parameter,double  *value)
 
 
 
-int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *parameter,double  *value)
+int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 #ifdef HAVE_SYSINFO_TOTALSWAP
 	struct sysinfo info;
@@ -336,7 +336,7 @@ static int get_swap_data(
   return result;
 }
 	  
-int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, double  *value)
+int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, double  *value, const char *msg, int mlen_max)
 {
   int      result;
   uint64_t resv = 0;
@@ -352,7 +352,7 @@ int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, double  *value)
    return result;
 }
 
-int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, double  *value)
+int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, double  *value, const char *msg, int mlen_max)
 {
   int      result;
   uint64_t resv = 0;
@@ -376,7 +376,7 @@ int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, double  *value)
 #define	DO_SWP_OUT	3
 #define DO_PG_OUT	4
 
-static int	SYSTEM_SWAP(const char *cmd, const char *param, double *value)
+static int	SYSTEM_SWAP(const char *cmd, const char *param, double *value, const char *msg, int mlen_max)
 {
     kstat_ctl_t	    *kc;
     kstat_t	    *k;
@@ -467,23 +467,23 @@ static int	SYSTEM_SWAP(const char *cmd, const char *param, double *value)
     return SYSINFO_RET_OK;
 }
 
-int	SYSTEM_SWAP_IN_NUM(const char *cmd, const char *param, double *value)
+int	SYSTEM_SWAP_IN_NUM(const char *cmd, const char *param, double *value, const char *msg, int mlen_max)
 {
-	return SYSTEM_SWAP(cmd, "swapin", value);
+	return SYSTEM_SWAP(cmd, "swapin", value, msg, mlen_max);
 }
 
-int	SYSTEM_SWAP_IN_PAGES(const char *cmd, const char *param, double *value)
+int	SYSTEM_SWAP_IN_PAGES(const char *cmd, const char *param, double *value, const char *msg, int mlen_max)
 {
-	return SYSTEM_SWAP(cmd, "pgswapin", value);
+	return SYSTEM_SWAP(cmd, "pgswapin", value, msg, mlen_max);
 }
 
-int	SYSTEM_SWAP_OUT_NUM(const char *cmd, const char *param, double *value)
+int	SYSTEM_SWAP_OUT_NUM(const char *cmd, const char *param, double *value, const char *msg, int mlen_max)
 {
-	return SYSTEM_SWAP(cmd, "swapout", value);
+	return SYSTEM_SWAP(cmd, "swapout", value, msg, mlen_max);
 }
 
-int	SYSTEM_SWAP_OUT_PAGES(const char *cmd, const char *param, double *value)
+int	SYSTEM_SWAP_OUT_PAGES(const char *cmd, const char *param, double *value, const char *msg, int mlen_max)
 {
-	return SYSTEM_SWAP(cmd, "pgswapout", value);
+	return SYSTEM_SWAP(cmd, "pgswapout", value, msg, mlen_max);
 }
 

@@ -22,135 +22,135 @@
 
 
 
-int	VM_MEMORY_BUFFERS(const char *cmd, const char *parameter,double  *value);
-int	VM_MEMORY_CACHED(const char *cmd, const char *parameter,double  *value);
+int	VM_MEMORY_BUFFERS(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	VM_MEMORY_CACHED(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
 
-int	SYSTEM_CPU_IDLE1(const char *cmd, const char *parameter,double  *value);
-int	SYSTEM_CPU_IDLE5(const char *cmd, const char *parameter,double  *value);
-int	SYSTEM_CPU_IDLE15(const char *cmd, const char *parameter,double  *value);
-int	SYSTEM_CPU_USER1(const char *cmd, const char *parameter,double  *value);
-int	SYSTEM_CPU_USER5(const char *cmd, const char *parameter,double  *value);
-int	SYSTEM_CPU_USER15(const char *cmd, const char *parameter,double  *value);
-int	SYSTEM_CPU_NICE1(const char *cmd, const char *parameter,double  *value);
-int	SYSTEM_CPU_NICE5(const char *cmd, const char *parameter,double  *value);
-int	SYSTEM_CPU_NICE15(const char *cmd, const char *parameter,double  *value);
-int	SYSTEM_CPU_SYS1(const char *cmd, const char *parameter,double  *value);
-int	SYSTEM_CPU_SYS5(const char *cmd, const char *parameter,double  *value);
-int	SYSTEM_CPU_SYS15(const char *cmd, const char *parameter,double  *value);
+int	SYSTEM_CPU_IDLE1(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	SYSTEM_CPU_IDLE5(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	SYSTEM_CPU_IDLE15(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	SYSTEM_CPU_USER1(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	SYSTEM_CPU_USER5(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	SYSTEM_CPU_USER15(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	SYSTEM_CPU_NICE1(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	SYSTEM_CPU_NICE5(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	SYSTEM_CPU_NICE15(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	SYSTEM_CPU_SYS1(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	SYSTEM_CPU_SYS5(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	SYSTEM_CPU_SYS15(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
 
-int	VFS_FS_TOTAL(const char *cmd, const char *mountPoint,double  *value);
-int	VFS_FS_FREE(const char *cmd, const char *mountPoint,double  *value);
-int	VFS_FS_USED(const char *cmd, const char *mountPoint,double  *value);
-int	VFS_FS_PFREE(const char *cmd, const char *mountPoint,double  *value);
-int	VFS_FS_PUSED(const char *cmd, const char *mountPoint,double  *value);
+int	VFS_FS_TOTAL(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max);
+int	VFS_FS_FREE(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max);
+int	VFS_FS_USED(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max);
+int	VFS_FS_PFREE(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max);
+int	VFS_FS_PUSED(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max);
 
-int	DISK_IO(const char *cmd, const char *parameter,double  *value);
-int	DISK_RIO(const char *cmd, const char *parameter,double  *value);
-int	DISK_WIO(const char *cmd, const char *parameter,double  *value);
-int	DISK_RBLK(const char *cmd, const char *parameter,double  *value);
-int	DISK_WBLK(const char *cmd, const char *parameter,double  *value);
-int	VM_MEMORY_FREE(const char *cmd, const char *parameter,double  *value);
+int	DISK_IO(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	DISK_RIO(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	DISK_WIO(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	DISK_RBLK(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	DISK_WBLK(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	VM_MEMORY_FREE(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
 
-int	VFS_FILE_ATIME(const char *cmd, const char *filename,double  *value);
-int	VFS_FILE_CKSUM(const char *cmd, const char *filename,double  *value);
-int	VFS_FILE_CTIME(const char *cmd, const char *filename,double  *value);
-int	VFS_FILE_MD5SUM(const char *cmd, const char *filename, char **value);
-int	VFS_FILE_MTIME(const char *cmd, const char *filename,double  *value);
-int	VFS_FILE_REGEXP(const char *cmd, const char *filename, char **value);
-int	VFS_FILE_REGMATCH(const char *cmd, const char *filename,double  *value);
-int	VFS_FILE_SIZE(const char *cmd, const char *filename,double  *value);
-int	VFS_FILE_EXISTS(const char *cmd, const char *filename,double  *value);
+int	VFS_FILE_ATIME(const char *cmd, const char *filename,double  *value, const char *msg, int mlen_max);
+int	VFS_FILE_CKSUM(const char *cmd, const char *filename,double  *value, const char *msg, int mlen_max);
+int	VFS_FILE_CTIME(const char *cmd, const char *filename,double  *value, const char *msg, int mlen_max);
+int	VFS_FILE_MD5SUM(const char *cmd, const char *filename, char **value, const char *msg, int mlen_max);
+int	VFS_FILE_MTIME(const char *cmd, const char *filename,double  *value, const char *msg, int mlen_max);
+int	VFS_FILE_REGEXP(const char *cmd, const char *filename, char **value, const char *msg, int mlen_max);
+int	VFS_FILE_REGMATCH(const char *cmd, const char *filename,double  *value, const char *msg, int mlen_max);
+int	VFS_FILE_SIZE(const char *cmd, const char *filename,double  *value, const char *msg, int mlen_max);
+int	VFS_FILE_EXISTS(const char *cmd, const char *filename,double  *value, const char *msg, int mlen_max);
 
-int	VFS_FS_INODE_FREE(const char *cmd, const char *mountPoint,double  *value);
-int	VFS_FS_INODE_PFREE(const char *cmd, const char *mountPoint,double  *value);
-int	VFS_FS_INODE_TOTAL(const char *cmd, const char *mountPoint,double  *value);
-
-
-int	KERNEL_MAXFILES(const char *cmd, const char *parameter,double  *value);
-int	KERNEL_MAXPROC(const char *cmd, const char *parameter,double  *value);
-int	SYSTEM_KERNEL_MAXPROC(const char *cmd, const char *parameter, double  *value);
-
-int	NET_IF_IBYTES1(const char *cmd, const char *parameter,double  *value);
-int	NET_IF_IBYTES5(const char *cmd, const char *parameter,double  *value);
-int	NET_IF_IBYTES15(const char *cmd, const char *parameter,double  *value);
-
-int	NET_IF_OBYTES1(const char *cmd, const char *parameter,double  *value);
-int	NET_IF_OBYTES5(const char *cmd, const char *parameter,double  *value);
-int	NET_IF_OBYTES15(const char *cmd, const char *parameter,double  *value);
-
-int	NET_IF_OBYTES(const char *cmd, const char *parameter,double  *value);
-int	NET_IF_OBYTES15(const char *cmd, const char *parameter,double  *value);
-
-int	NET_IF_COLLISIONS(const char *cmd, const char *param,double  *value);
-int	NET_IF_OUT_ERRORS(const char *cmd, const char *parameter,double  *value);
-int	NET_IF_OUT_PACKETS(const char *cmd, const char *parameter,double  *value);
-int	NET_IF_OUT_BYTES(const char *cmd, const char *parameter,double  *value);
-int	NET_IF_IN_ERRORS(const char *cmd, const char *parameter,double  *value);
-int	NET_IF_IN_PACKETS(const char *cmd, const char *parameter,double  *value);
-int	NET_IF_IN_BYTES(const char *cmd, const char *parameter,double  *value);
-
-int	NET_TCP_LISTEN(const char *cmd, const char *parameter,double  *value);
-
-int	TCP_LISTEN(const char *cmd, const char *porthex,double  *value);
-
-int     VFS_DEV_READ_BYTES(const char *cmd, const char *param,double  *value);
-int     VFS_DEV_READ_OPERATIONS(const char *cmd, const char *param,double  *value);
-int     VFS_DEV_WRITE_BYTES(const char *cmd, const char *param,double  *value);
-int     VFS_DEV_WRITE_OPERATIONS(const char *cmd, const char *param,double  *value);
-
-int	DISKREADOPS1(const char *cmd, const char *parameter,double  *value);
-int	DISKREADOPS5(const char *cmd, const char *parameter,double  *value);
-int	DISKREADOPS15(const char *cmd, const char *parameter,double  *value);
-int	DISKREADBLKS1(const char *cmd, const char *parameter,double  *value);
-int	DISKREADBLKS5(const char *cmd, const char *parameter,double  *value);
-int	DISKREADBLKS15(const char *cmd, const char *parameter,double  *value);
-int	DISKWRITEOPS1(const char *cmd, const char *parameter,double  *value);
-int	DISKWRITEOPS5(const char *cmd, const char *parameter,double  *value);
-int	DISKWRITEOPS15(const char *cmd, const char *parameter,double  *value);
-int	DISKWRITEBLKS1(const char *cmd, const char *parameter,double  *value);
-int	DISKWRITEBLKS5(const char *cmd, const char *parameter,double  *value);
-int	DISKWRITEBLKS15(const char *cmd, const char *parameter,double  *value);
-
-int	AGENT_PING(const char *cmd, const char *parameter,double  *value);
-int	VM_MEMORY_SHARED(const char *cmd, const char *parameter,double  *value);
-int	VM_MEMORY_TOTAL(const char *cmd, const char *parameter,double  *value);
-
-int	PROC_NUM(const char *cmd, const char *parameter,double  *value);
-int	PROC_MEMORY(const char *cmd, const char *param, double  *value);
-
-int	PROCCOUNT(const char *cmd, const char *parameter,double  *value);
-
-int	SYSTEM_CPU_LOAD1(const char *cmd, const char *parameter,double  *value);
-int	SYSTEM_CPU_LOAD5(const char *cmd, const char *parameter,double  *value);
-int	SYSTEM_CPU_LOAD15(const char *cmd, const char *parameter,double  *value);
-int	SYSTEM_CPU_INTR(const char *cmd, const char *parameter, double *value);
-int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *parameter, double *value);
-int	SYSTEM_CPU_UTILIZATION(const char *cmd, const char *param,double  *value);
-
-int	SENSOR_TEMP1(const char *cmd, const char *parameter,double  *value);
-int	SENSOR_TEMP2(const char *cmd, const char *parameter,double  *value);
-int	SENSOR_TEMP3(const char *cmd, const char *parameter,double  *value);
+int	VFS_FS_INODE_FREE(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max);
+int	VFS_FS_INODE_PFREE(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max);
+int	VFS_FS_INODE_TOTAL(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max);
 
 
-int	SYSTEM_SWAP_IN_NUM(const char *cmd, const char *param, double *value);
-int	SYSTEM_SWAP_IN_PAGES(const char *cmd, const char *param, double *value);
-int	SYSTEM_SWAP_OUT_NUM(const char *cmd, const char *param, double *value);
-int	SYSTEM_SWAP_OUT_PAGES(const char *cmd, const char *param, double *value);
+int	KERNEL_MAXFILES(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	KERNEL_MAXPROC(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	SYSTEM_KERNEL_MAXPROC(const char *cmd, const char *parameter, double  *value, const char *msg, int mlen_max);
 
-int	SYSTEM_UPTIME(const char *cmd, const char *parameter,double  *value);
+int	NET_IF_IBYTES1(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	NET_IF_IBYTES5(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	NET_IF_IBYTES15(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
 
-int	SYSTEM_SWAP_FREE(const char *cmd, const char *parameter,double  *value);
-int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *parameter,double  *value);
+int	NET_IF_OBYTES1(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	NET_IF_OBYTES5(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	NET_IF_OBYTES15(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
 
-int	EXECUTE(const char *cmd, const char *command,double  *value);
-int	EXECUTE_STR(const char *cmd, const char *command, const char *parameter, char  **value);
-int	AGENT_VERSION(const char *cmd, const char *command,char **value);
+int	NET_IF_OBYTES(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	NET_IF_OBYTES15(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+
+int	NET_IF_COLLISIONS(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max);
+int	NET_IF_OUT_ERRORS(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	NET_IF_OUT_PACKETS(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	NET_IF_OUT_BYTES(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	NET_IF_IN_ERRORS(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	NET_IF_IN_PACKETS(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	NET_IF_IN_BYTES(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+
+int	NET_TCP_LISTEN(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+
+int	TCP_LISTEN(const char *cmd, const char *porthex,double  *value, const char *msg, int mlen_max);
+
+int     VFS_DEV_READ_BYTES(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max);
+int     VFS_DEV_READ_OPERATIONS(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max);
+int     VFS_DEV_WRITE_BYTES(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max);
+int     VFS_DEV_WRITE_OPERATIONS(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max);
+
+int	DISKREADOPS1(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	DISKREADOPS5(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	DISKREADOPS15(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	DISKREADBLKS1(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	DISKREADBLKS5(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	DISKREADBLKS15(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	DISKWRITEOPS1(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	DISKWRITEOPS5(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	DISKWRITEOPS15(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	DISKWRITEBLKS1(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	DISKWRITEBLKS5(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	DISKWRITEBLKS15(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+
+int	AGENT_PING(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	VM_MEMORY_SHARED(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	VM_MEMORY_TOTAL(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+
+int	PROC_NUM(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	PROC_MEMORY(const char *cmd, const char *param, double  *value, const char *msg, int mlen_max);
+
+int	PROCCOUNT(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+
+int	SYSTEM_CPU_LOAD1(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	SYSTEM_CPU_LOAD5(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	SYSTEM_CPU_LOAD15(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	SYSTEM_CPU_INTR(const char *cmd, const char *parameter, double *value, const char *msg, int mlen_max);
+int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *parameter, double *value, const char *msg, int mlen_max);
+int	SYSTEM_CPU_UTILIZATION(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max);
+
+int	SENSOR_TEMP1(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	SENSOR_TEMP2(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	SENSOR_TEMP3(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
 
 
-int	CHECK_SERVICE(const char *cmd, const char *service,double  *value);
-int	CHECK_SERVICE_PERF(const char *cmd, const char *service,double  *value);
-int	CHECK_PORT(const char *cmd, const char *ip_and_port,double  *value);
-int	CHECK_DNS(const char *cmd, const char *service,double  *value);
+int	SYSTEM_SWAP_IN_NUM(const char *cmd, const char *param, double *value, const char *msg, int mlen_max);
+int	SYSTEM_SWAP_IN_PAGES(const char *cmd, const char *param, double *value, const char *msg, int mlen_max);
+int	SYSTEM_SWAP_OUT_NUM(const char *cmd, const char *param, double *value, const char *msg, int mlen_max);
+int	SYSTEM_SWAP_OUT_PAGES(const char *cmd, const char *param, double *value, const char *msg, int mlen_max);
+
+int	SYSTEM_UPTIME(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+
+int	SYSTEM_SWAP_FREE(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+
+int	EXECUTE(const char *cmd, const char *command,double  *value, const char *msg, int mlen_max);
+int	EXECUTE_STR(const char *cmd, const char *command, const char *parameter, char  **value, const char *msg, int mlen_max);
+int	AGENT_VERSION(const char *cmd, const char *command,char **value, const char *msg, int mlen_max);
+
+
+int	CHECK_SERVICE(const char *cmd, const char *service,double  *value, const char *msg, int mlen_max);
+int	CHECK_SERVICE_PERF(const char *cmd, const char *service,double  *value, const char *msg, int mlen_max);
+int	CHECK_PORT(const char *cmd, const char *ip_and_port,double  *value, const char *msg, int mlen_max);
+int	CHECK_DNS(const char *cmd, const char *service,double  *value, const char *msg, int mlen_max);
 
 COMMAND	parameters_specific[]=
 /* 	KEY		FUNCTION (if double) FUNCTION (if string) PARAM*/

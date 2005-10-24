@@ -55,7 +55,7 @@
 #define DO_MIN 2
 #define DO_AVG 3
 				    
-int     PROC_MEMORY(const char *cmd, const char *param, double  *value)
+int     PROC_MEMORY(const char *cmd, const char *param, double  *value, const char *msg, int mlen_max)
 {
 #if defined(HAVE_PROC_1_STATUS)
 
@@ -302,7 +302,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, double  *value)
 #endif
 }
 
-int	    PROC_NUM(const char *cmd, const char *param, double *value)
+int	    PROC_NUM(const char *cmd, const char *param, double *value, const char *msg, int mlen_max)
 {
 #if defined(HAVE_PROC_1_STATUS)
 

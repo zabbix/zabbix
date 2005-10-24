@@ -220,7 +220,7 @@ static int get_kstat_named_field(
     return result;
 }
 
-int	NET_IF_IN_BYTES(const char *cmd, const char *param,double  *value)
+int	NET_IF_IN_BYTES(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
     kstat_named_t kn;
     char    interface[MAX_STRING_LEN];
@@ -250,7 +250,7 @@ int	NET_IF_IN_BYTES(const char *cmd, const char *param,double  *value)
     return result;
 }
 
-int	NET_IF_IN_PACKETS(const char *cmd, const char *param, double  *value)
+int	NET_IF_IN_PACKETS(const char *cmd, const char *param, double  *value, const char *msg, int mlen_max)
 {
     kstat_named_t kn;
     char    interface[MAX_STRING_LEN];
@@ -280,7 +280,7 @@ int	NET_IF_IN_PACKETS(const char *cmd, const char *param, double  *value)
     return result;
 }
 
-int	NET_IF_IN_ERRORS(const char *cmd, const char *param, double  *value)
+int	NET_IF_IN_ERRORS(const char *cmd, const char *param, double  *value, const char *msg, int mlen_max)
 {
     kstat_named_t kn;
     char    interface[MAX_STRING_LEN];
@@ -303,7 +303,7 @@ int	NET_IF_IN_ERRORS(const char *cmd, const char *param, double  *value)
     return result;
 }
 
-int	NET_IF_OUT_BYTES(const char *cmd, const char *param,double  *value)
+int	NET_IF_OUT_BYTES(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
     kstat_named_t kn;
     char    interface[MAX_STRING_LEN];
@@ -333,7 +333,7 @@ int	NET_IF_OUT_BYTES(const char *cmd, const char *param,double  *value)
     return result;
 }
 
-int	NET_IF_OUT_PACKETS(const char *cmd, const char *param,double  *value)
+int	NET_IF_OUT_PACKETS(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
     kstat_named_t kn;
     char    interface[MAX_STRING_LEN];
@@ -363,7 +363,7 @@ int	NET_IF_OUT_PACKETS(const char *cmd, const char *param,double  *value)
     return result;
 }
 
-int	NET_IF_OUT_ERRORS(const char *cmd, const char *param,double  *value)
+int	NET_IF_OUT_ERRORS(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
     kstat_named_t kn;
     char    interface[MAX_STRING_LEN];
@@ -386,7 +386,7 @@ int	NET_IF_OUT_ERRORS(const char *cmd, const char *param,double  *value)
     return result;
 }
 
-int	NET_IF_COLLISIONS(const char *cmd, const char *param,double  *value)
+int	NET_IF_COLLISIONS(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
     kstat_named_t kn;
     char    interface[MAX_STRING_LEN];
@@ -409,7 +409,7 @@ int	NET_IF_COLLISIONS(const char *cmd, const char *param,double  *value)
     return result;
 }
 
-int	NET_TCP_LISTEN(const char *cmd, const char *param,double  *value)
+int	NET_TCP_LISTEN(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
   char command[MAX_STRING_LEN];
   
@@ -417,6 +417,6 @@ int	NET_TCP_LISTEN(const char *cmd, const char *param,double  *value)
 
   snprintf(command, sizeof(command)-1, "netstat -an | grep '*.%s' | wc -l", param);
    
-  return EXECUTE(NULL, command, value);
+  return EXECUTE(NULL, command, value, msg, mlen_max);
 }
 

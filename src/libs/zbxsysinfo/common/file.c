@@ -35,7 +35,7 @@
 
 #define MAX_FILE_LEN 1024*1024
 
-int	VFS_FILE_SIZE(const char *cmd, const char *filename,double  *value)
+int	VFS_FILE_SIZE(const char *cmd, const char *filename,double  *value, const char *msg, int mlen_max)
 {
 	struct stat	buf;
 
@@ -47,7 +47,7 @@ int	VFS_FILE_SIZE(const char *cmd, const char *filename,double  *value)
 	return	SYSINFO_RET_FAIL;
 }
 
-int	VFS_FILE_ATIME(const char *cmd, const char *filename,double  *value)
+int	VFS_FILE_ATIME(const char *cmd, const char *filename,double  *value, const char *msg, int mlen_max)
 {
 	struct stat	buf;
 
@@ -59,7 +59,7 @@ int	VFS_FILE_ATIME(const char *cmd, const char *filename,double  *value)
 	return	SYSINFO_RET_FAIL;
 }
 
-int	VFS_FILE_CTIME(const char *cmd, const char *filename,double  *value)
+int	VFS_FILE_CTIME(const char *cmd, const char *filename,double  *value, const char *msg, int mlen_max)
 {
 	struct stat	buf;
 
@@ -71,7 +71,7 @@ int	VFS_FILE_CTIME(const char *cmd, const char *filename,double  *value)
 	return	SYSINFO_RET_FAIL;
 }
 
-int	VFS_FILE_MTIME(const char *cmd, const char *filename,double  *value)
+int	VFS_FILE_MTIME(const char *cmd, const char *filename,double  *value, const char *msg, int mlen_max)
 {
 	struct stat	buf;
 
@@ -83,7 +83,7 @@ int	VFS_FILE_MTIME(const char *cmd, const char *filename,double  *value)
 	return	SYSINFO_RET_FAIL;
 }
 
-int	VFS_FILE_EXISTS(const char *cmd, const char *filename,double  *value)
+int	VFS_FILE_EXISTS(const char *cmd, const char *filename,double  *value, const char *msg, int mlen_max)
 {
 	struct stat	buf;
 
@@ -102,7 +102,7 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *filename,double  *value)
 	return SYSINFO_RET_OK;
 }
 
-int	VFS_FILE_REGEXP(const char *cmd, const char *param, char **value)
+int	VFS_FILE_REGEXP(const char *cmd, const char *param, char **value, const char *msg, int mlen_max)
 {
 	char	filename[MAX_STRING_LEN];
 	char	regexp[MAX_STRING_LEN];
@@ -187,7 +187,7 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, char **value)
 	return	ret;
 }
 
-int	VFS_FILE_REGMATCH(const char *cmd, const char *param,double  *value)
+int	VFS_FILE_REGMATCH(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
 	char	filename[MAX_STRING_LEN];
 	char	regexp[MAX_STRING_LEN];

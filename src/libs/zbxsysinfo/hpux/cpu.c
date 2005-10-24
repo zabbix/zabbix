@@ -139,63 +139,63 @@
 #include "common.h"
 #include "sysinfo.h"
 
-int	SYSTEM_CPU_IDLE1(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_IDLE1(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
-	return	get_stat("cpu[idle1]",value);
+	return	get_stat("cpu[idle1]",value,msg,mlen_max);
 }
 
-int	SYSTEM_CPU_IDLE5(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_IDLE5(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
-	return	get_stat("cpu[idle5]",value);
+	return	get_stat("cpu[idle5]",value,msg,mlen_max);
 }
 
-int	SYSTEM_CPU_IDLE15(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_IDLE15(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
-	return	get_stat("cpu[idle15]",value);
+	return	get_stat("cpu[idle15]",value,msg,mlen_max);
 }
 
-int	SYSTEM_CPU_NICE1(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_NICE1(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
-	return	get_stat("cpu[nice1]",value);
+	return	get_stat("cpu[nice1]",value,msg,mlen_max);
 }
 
-int	SYSTEM_CPU_NICE5(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_NICE5(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
-	return	get_stat("cpu[nice5]",value);
+	return	get_stat("cpu[nice5]",value,msg,mlen_max);
 }
-int	SYSTEM_CPU_NICE15(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_NICE15(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
-	return	get_stat("cpu[nice15]",value);
-}
-
-int	SYSTEM_CPU_USER1(const char *cmd, const char *param,double  *value)
-{
-	return	get_stat("cpu[user1]",value);
+	return	get_stat("cpu[nice15]",value,msg,mlen_max);
 }
 
-int	SYSTEM_CPU_USER5(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_USER1(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
-	return	get_stat("cpu[user5]",value);
+	return	get_stat("cpu[user1]",value,msg,mlen_max);
 }
 
-int	SYSTEM_CPU_USER15(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_USER5(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
-	return	get_stat("cpu[user15]",value);
+	return	get_stat("cpu[user5]",value,msg,mlen_max);
 }
 
-int	SYSTEM_CPU_SYS1(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_USER15(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
-	return	get_stat("cpu[system1]",value);
+	return	get_stat("cpu[user15]",value,msg,mlen_max);
 }
 
-int	SYSTEM_CPU_SYS5(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_SYS1(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
-	return	get_stat("cpu[system5]",value);
+	return	get_stat("cpu[system1]",value,msg,mlen_max);
 }
 
-int	SYSTEM_CPU_SYS15(const char *cmd, const char *param,double  *value)
+int	SYSTEM_CPU_SYS5(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
-	return	get_stat("cpu[system15]",value);
+	return	get_stat("cpu[system5]",value,msg,mlen_max);
+}
+
+int	SYSTEM_CPU_SYS15(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
+{
+	return	get_stat("cpu[system15]",value,msg,mlen_max);
 }
 
 /* AIX CPU info */
@@ -261,7 +261,7 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *parameter,double  *value)
 	}
 #else
 #ifdef HAVE_PROC_LOADAVG
-	return	getPROC("/proc/loadavg",1,1,value);
+	return	getPROC("/proc/loadavg",1,1,value,msg,mlen_max);
 #else
 #ifdef HAVE_KSTAT_H
 	static kstat_ctl_t *kc = NULL;
@@ -300,7 +300,7 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *parameter,double  *value)
 #endif
 }
 
-int	SYSTEM_CPU_LOAD5(const char *cmd, const char *parameter,double  *value)
+int	SYSTEM_CPU_LOAD5(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 #ifdef HAVE_GETLOADAVG
 	double	load[3];
@@ -329,7 +329,7 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *parameter,double  *value)
 	}
 #else
 #ifdef	HAVE_PROC_LOADAVG
-	return	getPROC("/proc/loadavg",1,2,value);
+	return	getPROC("/proc/loadavg",1,2,value,msg,mlen_max);
 #else
 #ifdef HAVE_KSTAT_H
 	static kstat_ctl_t *kc = NULL;
@@ -368,7 +368,7 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *parameter,double  *value)
 #endif
 }
 
-int	SYSTEM_CPU_LOAD15(const char *cmd, const char *parameter,double  *value)
+int	SYSTEM_CPU_LOAD15(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 #ifdef HAVE_GETLOADAVG
 	double	load[3];
@@ -397,7 +397,7 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *parameter,double  *value)
 	}
 #else
 #ifdef	HAVE_PROC_LOADAVG
-	return	getPROC("/proc/loadavg",1,3,value);
+	return	getPROC("/proc/loadavg",1,3,value,msg,mlen_max);
 #else
 #ifdef HAVE_KSTAT_H
 	static kstat_ctl_t *kc = NULL;

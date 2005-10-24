@@ -136,7 +136,7 @@
 #include "sysinfo.h"
 
 #if 1
-int	SYSTEM_UPTIME(const char *cmd, const char *param,double  *value)
+int	SYSTEM_UPTIME(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
 {
     kstat_ctl_t   *kc;
     kstat_t       *kp;
@@ -165,7 +165,7 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param,double  *value)
 #endif
 
 #if 0
-int	SYSTEM_UPTIME(const char *cmd, const char *parameter,double  *value)
+int	SYSTEM_UPTIME(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 #ifdef HAVE_SYSINFO_UPTIME
 	struct sysinfo info;

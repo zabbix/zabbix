@@ -24,7 +24,7 @@
 #include "common.h"
 #include "sysinfo.h"
 
-int	SYSTEM_LOCALTIME(const char *cmd, const char *parameter,double  *value)
+int	SYSTEM_LOCALTIME(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
 	int ret = SYSINFO_RET_OK;
 
