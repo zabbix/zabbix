@@ -208,6 +208,9 @@
 	"S_CANNOT_ADD_IMAGE"=>			"Grafik konnte nicht gespeichert werden",
 	"S_IMAGE_DELETED"=>			"Grafik gel&ouml;scht",
 	"S_CANNOT_DELETE_IMAGE"=>		"Grafik konnte nicht gel&ouml;scht werden",
+	"S_IMAGE_UPDATED"=>			"Grafik updated",
+	"S_CANNOT_UPDATE_IMAGE"=>		"Grafik konnte nicht update",
+	"S_UPDATE_SELECTED_IMAGE"=>		"Update selected image?",
 	"S_AUTODISCOVERY"=>			"Automatische Auswahl",
 
 //	Latest values
