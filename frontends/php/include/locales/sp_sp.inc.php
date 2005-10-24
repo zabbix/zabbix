@@ -694,6 +694,7 @@
 	"S_PASSWORD_ONCE_AGAIN"=>		"Contraseña (una vez más)",
 	"S_URL_AFTER_LOGIN"=>			"URL (después del login)",
 	"S_AUTO_LOGOUT_IN_SEC"=>		"Auto-logout (en segs=>0 - deshabilitado)",
+	"S_SCREEN_REFRESH"=>                    "Refresh (in seconds)",
 
 //	audit.php
 	"S_AUDIT_LOG"=>				"Log de Auditoria",

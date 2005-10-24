@@ -139,7 +139,7 @@
 	{
 		if(isset($userid))
 		{
-			$result=DBselect("select u.alias,u.name,u.surname,u.passwd,u.url,u.autologout,u.lang from users u where u.userid=$userid");
+			$result=DBselect("select u.alias,u.name,u.surname,u.passwd,u.url,u.autologout,u.lang,u.refresh from users u where u.userid=$userid");
 	
 			$alias=DBget_field($result,0,0);
 			$name=DBget_field($result,0,1);
@@ -149,6 +149,7 @@
 			$url=DBget_field($result,0,4);
 			$autologout=DBget_field($result,0,5);
 			$lang=DBget_field($result,0,6);
+			$refresh=DBget_field($result,0,7);
 		}
 		else
 		{
@@ -159,6 +160,7 @@
 			$url="";
 			$autologout="900";
 			$lang="en_gb";
+			$refresh="30";
 		}
 
 		$col=0;
@@ -232,6 +234,11 @@
 		echo S_URL_AFTER_LOGIN;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"url\" value=\"$url\" size=50>";
+
+		show_table2_v_delimiter($col++);
+		echo S_SCREEN_REFRESH;
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"refresh\" value=\"$refresh\" size=5>";
 
 		show_table2_v_delimiter2($col++);
 		if($profile==0)

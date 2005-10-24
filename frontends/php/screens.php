@@ -30,7 +30,7 @@
 	}
 	if(isset($_REQUEST["screenid"]))
 	{
-		show_header($page["title"],60,$nomenu);
+		show_header($page["title"],1,$nomenu);
 	}
 	else
 	{
