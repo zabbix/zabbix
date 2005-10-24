@@ -28,20 +28,20 @@
 
 	$start_time=time(NULL);
 
-	if(!isset($_GET["type"]))
+	if(!isset($_REQUEST["type"]))
 	{
-		$_GET["type"]="week";
+		$_REQUEST["type"]="week";
 	}
 
-	if($_GET["type"] == "month")
+	if($_REQUEST["type"] == "month")
 	{
 		$period=30*24*3600;
 	}
-	else if($_GET["type"] == "week")
+	else if($_REQUEST["type"] == "week")
 	{
 		$period=7*24*3600;
 	}
-	else if($_GET["type"] == "year")
+	else if($_REQUEST["type"] == "year")
 	{
 		$period=365*24*3600;
 	}
@@ -88,7 +88,7 @@
 	ImageFilledRectangle($im,0,0,$x,$y,$white);
 	ImageRectangle($im,0,0,$x-1,$y-1,$black);
 
-	if(!check_right_on_trigger("R",$_GET["triggerid"]))
+	if(!check_right_on_trigger("R",$_REQUEST["triggerid"]))
 	{
 //		show_table_header("<font color=\"AA0000\">No permissions !</font>");
 //		show_footer();
@@ -98,12 +98,12 @@
 	}
 
 
-//	$trigger=get_trigger_by_triggerid($_GET["triggerid"]);
+//	$trigger=get_trigger_by_triggerid($_REQUEST["triggerid"]);
 //	$str=$trigger["description"];
 
 //	if( strstr($str,"%s"))
 //	{
-		$str=expand_trigger_description($_GET["triggerid"]);
+		$str=expand_trigger_description($_REQUEST["triggerid"]);
 //	}
 
 	$str=$str." (year ".date("Y").")";
@@ -129,7 +129,7 @@
 	{
 		$period_start=$start+7*24*3600*$i;
 		$period_end=$start+7*24*3600*($i+1);
-		$stat=calculate_availability($_GET["triggerid"],$period_start,$period_end);
+		$stat=calculate_availability($_REQUEST["triggerid"],$period_start,$period_end);
 		
 		$true[$i]=$stat["true"];
 		$false[$i]=$stat["false"];

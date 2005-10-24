@@ -30,24 +30,24 @@
 ?>
 
 <?php
-	if(isset($_GET["start"])&&isset($_GET["do"])&&($_GET["do"]=="<< Prev 100"))
+	if(isset($_REQUEST["start"])&&isset($_REQUEST["do"])&&($_REQUEST["do"]=="<< Prev 100"))
 	{
-		$_GET["start"]-=100;
+		$_REQUEST["start"]-=100;
 	}
-	if(isset($_GET["do"])&&($_GET["do"]=="Next 100 >>"))
+	if(isset($_REQUEST["do"])&&($_REQUEST["do"]=="Next 100 >>"))
 	{
-		if(isset($_GET["start"]))
+		if(isset($_REQUEST["start"]))
 		{
-			$_GET["start"]+=100;
+			$_REQUEST["start"]+=100;
 		}
 		else
 		{
-			$_GET["start"]=100;
+			$_REQUEST["start"]=100;
 		}
 	}
-	if(isset($_GET["start"])&&($_GET["start"]<=0))
+	if(isset($_REQUEST["start"])&&($_REQUEST["start"]<=0))
 	{
-		unset($_GET["start"]);
+		unset($_REQUEST["start"]);
 	}
 ?>
 
@@ -56,9 +56,9 @@
 	echo "&nbsp;".S_AUDIT_LOG_BIG;
 	show_table3_h_delimiter(20);
 	echo "<form name=\"form2\" method=\"get\" action=\"audit.php\">";
-	if(isset($_GET["start"]))
+	if(isset($_REQUEST["start"]))
 	{
-		echo "<input class=\"biginput\" name=\"start\" type=hidden value=".$_GET["start"]." size=8>";
+		echo "<input class=\"biginput\" name=\"start\" type=hidden value=".$_REQUEST["start"]." size=8>";
   		echo "<input class=\"button\" type=\"submit\" name=\"do\" value=\"<< Prev 100\">";
 	}
 	else
@@ -76,13 +76,13 @@
 	$row=DBfetch($result);
 	$maxauditid=@iif(DBnum_rows($result)>0,$row["max"],0);
 
-	if(!isset($_GET["start"]))
+	if(!isset($_REQUEST["start"]))
 	{
 		$sql="select u.alias,a.clock,a.action,a.resource,a.details from audit a, users u where u.userid=a.userid and a.auditid>$maxauditid-200 order by clock desc limit 200";
 	}
 	else
 	{
-		$sql="select u.alias,a.clock,a.action,a.resource,a.details from audit a, users u where u.userid=a.userid and a.auditid>$maxauditid-".($_GET["start"]+200)." order by clock desc limit ".($_GET["start"]+200);
+		$sql="select u.alias,a.clock,a.action,a.resource,a.details from audit a, users u where u.userid=a.userid and a.auditid>$maxauditid-".($_REQUEST["start"]+200)." order by clock desc limit ".($_REQUEST["start"]+200);
 
 	}
 	$result=DBselect($sql);
@@ -94,7 +94,7 @@
 	while($row=DBfetch($result))
 	{
 		$i++;
-		if(isset($_GET["start"])&&($i<$_GET["start"]))
+		if(isset($_REQUEST["start"])&&($i<$_REQUEST["start"]))
 		{
 			continue;
 		}

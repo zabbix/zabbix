@@ -39,102 +39,102 @@
 ?>
 
 <?php
-	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
+	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
 	{
-		unset($_GET["groupid"]);
+		unset($_REQUEST["groupid"]);
 	}
-	if(isset($_GET["hostid"])&&($_GET["hostid"]==0))
+	if(isset($_REQUEST["hostid"])&&($_REQUEST["hostid"]==0))
 	{
-		unset($_GET["hostid"]);
+		unset($_REQUEST["hostid"]);
 	}
 ?>
 
 <?php
-	$_GET["hostid"]=@iif(isset($_GET["hostid"]),$_GET["hostid"],get_profile("web.latest.hostid",0));
-	update_profile("web.latest.hostid",$_GET["hostid"]);
+	$_REQUEST["hostid"]=@iif(isset($_REQUEST["hostid"]),$_REQUEST["hostid"],get_profile("web.latest.hostid",0));
+	update_profile("web.latest.hostid",$_REQUEST["hostid"]);
 	update_profile("web.menu.config.last",$page["file"]);
 ?>
 
 <?php
-	if(isset($_GET["register"]))
+	if(isset($_REQUEST["register"]))
 	{
-		if($_GET["register"]=="add dependency")
+		if($_REQUEST["register"]=="add dependency")
 		{
-			$result=add_trigger_dependency($_GET["triggerid"],$_GET["depid"]);
+			$result=add_trigger_dependency($_REQUEST["triggerid"],$_REQUEST["depid"]);
 			show_messages($result, S_DEPENDENCY_ADDED, S_CANNOT_ADD_DEPENDENCY);
 		}
-		if($_GET["register"]=="delete dependency")
+		if($_REQUEST["register"]=="delete dependency")
 		{
-			$result=delete_trigger_dependency($_GET["triggerid"],$_GET["dependency"]);
+			$result=delete_trigger_dependency($_REQUEST["triggerid"],$_REQUEST["dependency"]);
 			show_messages($result, S_DEPENDENCY_DELETED, S_CANNOT_DELETE_DEPENDENCY);
 		}
-		if($_GET["register"]=="changestatus")
+		if($_REQUEST["register"]=="changestatus")
 		{
-			$result=update_trigger_status($_GET["triggerid"],$_GET["status"]);
+			$result=update_trigger_status($_REQUEST["triggerid"],$_REQUEST["status"]);
 			show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
-			unset($_GET["triggerid"]);
+			unset($_REQUEST["triggerid"]);
 		}
-		if($_GET["register"]=="enable selected")
+		if($_REQUEST["register"]=="enable selected")
 		{
-			$result=DBselect("select distinct t.triggerid from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$_GET["hostid"]);
+			$result=DBselect("select distinct t.triggerid from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]);
 			while($row=DBfetch($result))
 			{
-				if(isset($_GET[$row["triggerid"]]))
+				if(isset($_REQUEST[$row["triggerid"]]))
 				{
 					$result2=update_trigger_status($row["triggerid"],0);
 				}
 			}
 			show_messages(TRUE, S_TRIGGERS_ENABLED, S_CANNOT_UPDATE_TRIGGERS);
 		}
-		if($_GET["register"]=="disable selected")
+		if($_REQUEST["register"]=="disable selected")
 		{
-			$result=DBselect("select distinct t.triggerid from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$_GET["hostid"]);
+			$result=DBselect("select distinct t.triggerid from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]);
 			while($row=DBfetch($result))
 			{
-				if(isset($_GET[$row["triggerid"]]))
+				if(isset($_REQUEST[$row["triggerid"]]))
 				{
 					$result2=update_trigger_status($row["triggerid"],1);
 				}
 			}
 			show_messages(TRUE, S_TRIGGERS_DISABLED, S_CANNOT_DISABLE_TRIGGERS);
 		}
-		if($_GET["register"]=="delete selected")
+		if($_REQUEST["register"]=="delete selected")
 		{
-			$result=DBselect("select distinct t.triggerid from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$_GET["hostid"]);
+			$result=DBselect("select distinct t.triggerid from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]);
 			while($row=DBfetch($result))
 			{
-				if(isset($_GET[$row["triggerid"]]))
+				if(isset($_REQUEST[$row["triggerid"]]))
 				{
 					$result2=delete_trigger($row["triggerid"]);
 				}
 			}
 			show_messages(TRUE, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
 		}
-		if($_GET["register"]=="update")
+		if($_REQUEST["register"]=="update")
 		{
-			if(validate_expression($_GET["expression"])==0)
+			if(validate_expression($_REQUEST["expression"])==0)
 			{
 				$now=mktime();
-				if(isset($_GET["disabled"]))	{ $status=1; }
+				if(isset($_REQUEST["disabled"]))	{ $status=1; }
 				else			{ $status=0; }
 	
-				$result=update_trigger($_GET["triggerid"],$_GET["expression"],$_GET["description"],$_GET["priority"],$status,$_GET["comments"],$_GET["url"]);
+				$result=update_trigger($_REQUEST["triggerid"],$_REQUEST["expression"],$_REQUEST["description"],$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"]);
 				show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
 			}
 			else
 			{
 				show_error_message(S_INVALID_TRIGGER_EXPRESSION);
 			}
-			unset($_GET["triggerid"]);
+			unset($_REQUEST["triggerid"]);
 		}
-		if($_GET["register"]=="add")
+		if($_REQUEST["register"]=="add")
 		{
-			if(validate_expression($_GET["expression"])==0)
+			if(validate_expression($_REQUEST["expression"])==0)
 			{
-				if(isset($_GET["disabled"]))	{ $status=1; }
+				if(isset($_REQUEST["disabled"]))	{ $status=1; }
 				else			{ $status=0; }
 				
-				$triggerid=add_trigger($_GET["expression"],$_GET["description"],$_GET["priority"],$status,$_GET["comments"],$_GET["url"]);
+				$triggerid=add_trigger($_REQUEST["expression"],$_REQUEST["description"],$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"]);
 				add_trigger_to_linked_hosts($triggerid);
 				show_messages($triggerid, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 			}
@@ -142,14 +142,14 @@
 			{
 				show_error_message(S_INVALID_TRIGGER_EXPRESSION);
 			}
-			unset($_GET["triggerid"]);
+			unset($_REQUEST["triggerid"]);
 		}
-		if($_GET["register"]=="delete")
+		if($_REQUEST["register"]=="delete")
 		{
-			delete_trigger_from_templates($_GET["triggerid"]);
-			$result=delete_trigger($_GET["triggerid"]);
+			delete_trigger_from_templates($_REQUEST["triggerid"]);
+			$result=delete_trigger($_REQUEST["triggerid"]);
 			show_messages($result, S_TRIGGER_DELETED, S_CANNOT_DELETE_TRIGGER);
-			unset($_GET["triggerid"]);
+			unset($_REQUEST["triggerid"]);
 		}
 	}
 ?>
@@ -158,9 +158,9 @@
 <?php
 	$h1=S_CONFIGURATION_OF_TRIGGERS_BIG;;
 
-	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
+	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
 	{
-		unset($_GET["groupid"]);
+		unset($_REQUEST["groupid"]);
 	}
 
 	$h2=S_GROUP."&nbsp;";
@@ -192,9 +192,9 @@
 	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
 
-	if(isset($_GET["groupid"]))
+	if(isset($_REQUEST["groupid"]))
 	{
-		$sql="select h.hostid,h.host from hosts h,hosts_groups hg where hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid and h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host";
+		$sql="select h.hostid,h.host from hosts h,hosts_groups hg where hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host";
 	}
 	else
 	{
@@ -217,14 +217,14 @@
 
 <?php
 
-	if(isset($_GET["hostid"])&&!isset($_GET["triggerid"]))
+	if(isset($_REQUEST["hostid"])&&!isset($_REQUEST["triggerid"]))
 	{
 		table_begin();
 		table_header(array(S_ID,S_DESCRIPTION,S_EXPRESSION, S_SEVERITY, S_STATUS, S_ERROR, S_ACTIONS));
 		echo "<form method=\"get\" action=\"triggers.php\">";
-		echo "<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_GET["hostid"]." size=8>";
+		echo "<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_REQUEST["hostid"]." size=8>";
 
-		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.status,t.value,t.priority,t.error from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$_GET["hostid"]." order by h.host,t.description");
+		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.status,t.value,t.priority,t.error from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]." order by h.host,t.description");
 		$col=0;
 		while($row=DBfetch($result))
 		{
@@ -276,7 +276,7 @@
 				$row["error"]="&nbsp;";
 			}
 
-			if(isset($_GET["hostid"]))
+			if(isset($_REQUEST["hostid"]))
 			{
 				$actions="<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."&hostid=".$row["hostid"]."#form\">".S_CHANGE."</A>";
 			}
@@ -318,7 +318,7 @@
 	if(DBget_field($result,0,0)>0)
 	{
 		echo "<a name=\"form\"></a>";
-		@insert_trigger_form($_GET["hostid"],$_GET["triggerid"]);
+		@insert_trigger_form($_REQUEST["hostid"],$_REQUEST["triggerid"]);
 	} 
 ?>
 

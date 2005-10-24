@@ -26,24 +26,24 @@
 ?>
 
 <?php
-	if(isset($_GET["start"])&&isset($_GET["do"])&&($_GET["do"]=="<< Prev 100"))
+	if(isset($_REQUEST["start"])&&isset($_REQUEST["do"])&&($_REQUEST["do"]=="<< Prev 100"))
 	{
-		$_GET["start"]-=100;
+		$_REQUEST["start"]-=100;
 	}
-	if(isset($_GET["do"])&&($_GET["do"]=="Next 100 >>"))
+	if(isset($_REQUEST["do"])&&($_REQUEST["do"]=="Next 100 >>"))
 	{
-		if(isset($_GET["start"]))
+		if(isset($_REQUEST["start"]))
 		{
-			$_GET["start"]+=100;
+			$_REQUEST["start"]+=100;
 		}
 		else
 		{
-			$_GET["start"]=100;
+			$_REQUEST["start"]=100;
 		}
 	}
-	if(isset($_GET["start"])&&($_GET["start"]<=0))
+	if(isset($_REQUEST["start"])&&($_REQUEST["start"]<=0))
 	{
-		unset($_GET["start"]);
+		unset($_REQUEST["start"]);
 	}
 ?>
 
@@ -56,9 +56,9 @@
 
 	$h2="";
 
-	if(isset($_GET["start"]))
+	if(isset($_REQUEST["start"]))
 	{
-		$h2=$h2."<input class=\"biginput\" name=\"start\" type=hidden value=".$_GET["start"]." size=8>";
+		$h2=$h2."<input class=\"biginput\" name=\"start\" type=hidden value=".$_REQUEST["start"]." size=8>";
   		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"do\" value=\"<< Prev 100\">";
 	}
 	else
@@ -78,13 +78,13 @@
 	$row=DBfetch($result);
 	$maxalertid=@iif(DBnum_rows($result)>0,$row["max"],0);
 
-	if(!isset($_GET["start"]))
+	if(!isset($_REQUEST["start"]))
 	{
 		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries,ac.scope,a.error from alerts a,actions ac,media_type mt where a.actionid=ac.actionid and mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200 order by a.clock desc limit 200";
 	}
 	else
 	{
-		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries,ac.scope,a.error from alerts a,actions ac,media_type mt where a.actionid=ac.actionid and mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200-".$_GET["start"]." order by a.clock desc limit ".($_GET["start"]+500);
+		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries,ac.scope,a.error from alerts a,actions ac,media_type mt where a.actionid=ac.actionid and mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200-".$_REQUEST["start"]." order by a.clock desc limit ".($_REQUEST["start"]+500);
 	}
 	$result=DBselect($sql);
 
@@ -95,7 +95,7 @@
 	while($row=DBfetch($result))
 	{
 		$zzz++;	
-		if(isset($_GET["start"])&&($zzz<$_GET["start"]))
+		if(isset($_REQUEST["start"])&&($zzz<$_REQUEST["start"]))
 		{
 			continue;
 		}

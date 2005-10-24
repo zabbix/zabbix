@@ -947,7 +947,7 @@
 		global	$PHP_AUTH_USER,$PHP_AUTH_PW;
 		global	$USER_DETAILS;
 		global	$_COOKIE;
-		global	$_GET;
+		global	$_REQUEST;
 //		global	$sessionid;
 
 		if(isset($_COOKIE["sessionid"]))
@@ -2899,9 +2899,9 @@ echo "</head>";
 		foreach($a as $label=>$sec)
 		{
 			echo "[";
-			if($_GET["period"]>$sec)
+			if($_REQUEST["period"]>$sec)
 			{
-				$tmp=$_GET["period"]-$sec;
+				$tmp=$_REQUEST["period"]-$sec;
 				echo("<A HREF=\"charts.php?period=$tmp".url_param($resource).url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">-</A>");
 			}
 			else
@@ -2912,7 +2912,7 @@ echo "</head>";
 			echo("<A HREF=\"charts.php?period=$sec".url_param($resource).url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">");
 			echo($label."</A>");
 
-			$tmp=$_GET["period"]+$sec;
+			$tmp=$_REQUEST["period"]+$sec;
 			echo("<A HREF=\"charts.php?period=$tmp".url_param($resource).url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">+</A>");
 
 			echo "]&nbsp;";
@@ -2923,7 +2923,7 @@ echo "</head>";
 	echo "</TD>";
 	echo "<TD BGCOLOR=#FFFFFF WIDTH=15% ALIGN=RIGHT>";
 	echo "<b>".nbsp(S_KEEP_PERIOD).":</b>&nbsp;";
-		if($_GET["keep"] == 1)
+		if($_REQUEST["keep"] == 1)
 		{
 			echo("[<A HREF=\"charts.php?keep=0".url_param($resource).url_param("from").url_param("period").url_param("fullscreen")."\">".S_ON_C."</a>]");
 		}
@@ -2935,7 +2935,7 @@ echo "</head>";
 	echo "</TR>";
 	echo "<TR BGCOLOR=#FFFFFF>";
 	echo "<TD>";
-	if(isset($_GET["stime"]))
+	if(isset($_REQUEST["stime"]))
 	{
 		echo "<div align=left>" ;
 		echo "<b>".S_MOVE.":</b>&nbsp;" ;
@@ -2948,7 +2948,7 @@ echo "</head>";
 		{
 			echo "[";
 
-			$stime=$_GET["stime"];
+			$stime=$_REQUEST["stime"];
 			$tmp=mktime(substr($stime,8,2),substr($stime,10,2),0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
 			$tmp=$tmp-3600*$hours;
 			$tmp=date("YmdHi",$tmp);
@@ -2956,7 +2956,7 @@ echo "</head>";
 
 			echo($label);
 
-			$stime=$_GET["stime"];
+			$stime=$_REQUEST["stime"];
 			$tmp=mktime(substr($stime,8,2),substr($stime,10,2),0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
 			$tmp=$tmp+3600*$hours;
 			$tmp=date("YmdHi",$tmp);
@@ -2978,14 +2978,14 @@ echo "</head>";
 		foreach($a as $label=>$hours)
 		{
 			echo "[";
-			$tmp=$_GET["from"]+$hours;
+			$tmp=$_REQUEST["from"]+$hours;
 			echo("<A HREF=\"charts.php?from=$tmp".url_param($resource).url_param("period").url_param("keep").url_param("fullscreen")."\">-</A>");
 
 			echo($label);
 
-			if($_GET["from"]>=$hours)
+			if($_REQUEST["from"]>=$hours)
 			{
-				$tmp=$_GET["from"]-$hours;
+				$tmp=$_REQUEST["from"]-$hours;
 				echo("<A HREF=\"charts.php?from=$tmp".url_param($resource).url_param("period").url_param("keep").url_param("fullscreen")."\">+</A>");
 			}
 			else
@@ -3001,11 +3001,11 @@ echo "</head>";
 	echo "<TD BGCOLOR=#FFFFFF WIDTH=15% ALIGN=RIGHT>";
 //		echo("<div align=left>");
 		echo "<form method=\"put\" action=\"charts.php\">";
-		echo "<input name=\"graphid\" type=\"hidden\" value=\"".$_GET[$resource]."\" size=12>";
+		echo "<input name=\"graphid\" type=\"hidden\" value=\"".$_REQUEST[$resource]."\" size=12>";
 		echo "<input name=\"period\" type=\"hidden\" value=\"".(9*3600)."\" size=12>";
-		if(isset($_GET["stime"]))
+		if(isset($_REQUEST["stime"]))
 		{
-			echo "<input name=\"stime\" class=\"biginput\" value=\"".$_GET["stime"]."\" size=12>";
+			echo "<input name=\"stime\" class=\"biginput\" value=\"".$_REQUEST["stime"]."\" size=12>";
 		}
 		else
 		{

@@ -24,11 +24,11 @@
 	$page["file"] = "screens.php";
 
 	$nomenu=0;
-	if(isset($_GET["fullscreen"]))
+	if(isset($_REQUEST["fullscreen"]))
 	{
 		$nomenu=1;
 	}
-	if(isset($_GET["screenid"]))
+	if(isset($_REQUEST["screenid"]))
 	{
 		show_header($page["title"],60,$nomenu);
 	}
@@ -43,24 +43,24 @@
 ?>
 
 <?php
-	$_GET["screenid"]=@iif(isset($_GET["screenid"]),$_GET["screenid"],get_profile("web.screens.screenid",0));
-	update_profile("web.screens.screenid",$_GET["screenid"]);
+	$_REQUEST["screenid"]=@iif(isset($_REQUEST["screenid"]),$_REQUEST["screenid"],get_profile("web.screens.screenid",0));
+	update_profile("web.screens.screenid",$_REQUEST["screenid"]);
 	update_profile("web.menu.view.last",$page["file"]);
 ?>
 
 <?php
-		if(isset($_GET["screenid"])&&($_GET["screenid"]==0))
+		if(isset($_REQUEST["screenid"])&&($_REQUEST["screenid"]==0))
 		{
-			unset($_GET["screenid"]);
+			unset($_REQUEST["screenid"]);
 		}
 
-		if(isset($_GET["screenid"]))
+		if(isset($_REQUEST["screenid"]))
 		{
-			$result=DBselect("select name from screens where screenid=".$_GET["screenid"]);
+			$result=DBselect("select name from screens where screenid=".$_REQUEST["screenid"]);
 			$map=DBget_field($result,0,0);
-			$map=iif(isset($_GET["fullscreen"]),
-				"<a href=\"screens.php?screenid=".$_GET["screenid"]."\">".$map."</a>",
-				"<a href=\"screens.php?screenid=".$_GET["screenid"]."&fullscreen=1\">".$map."</a>");
+			$map=iif(isset($_REQUEST["fullscreen"]),
+				"<a href=\"screens.php?screenid=".$_REQUEST["screenid"]."\">".$map."</a>",
+				"<a href=\"screens.php?screenid=".$_REQUEST["screenid"]."&fullscreen=1\">".$map."</a>");
 		}
 		else
 		{
@@ -70,9 +70,9 @@
 		$h1=S_SCREENS_BIG.nbsp(" / ").$map;
 
 		$h2="";
-		if(isset($_GET["fullscreen"]))
+		if(isset($_REQUEST["fullscreen"]))
 		{
-			$h2=$h2."<input name=\"fullscreen\" type=\"hidden\" value=".$_GET["fullscreen"].">";
+			$h2=$h2."<input name=\"fullscreen\" type=\"hidden\" value=".$_REQUEST["fullscreen"].">";
 		}
 
 		$h2=$h2."<select class=\"biginput\" name=\"screenid\" onChange=\"submit()\">";
@@ -93,19 +93,19 @@
 ?>
 
 <?php
-//	if(isset($_GET["screenid"]))
-	if( isset($_GET["screenid"]) && check_right("Screen","R",$_GET["screenid"]))
+//	if(isset($_REQUEST["screenid"]))
+	if( isset($_REQUEST["screenid"]) && check_right("Screen","R",$_REQUEST["screenid"]))
 	{
-		$screenid=$_GET["screenid"];
+		$screenid=$_REQUEST["screenid"];
 		$result=DBselect("select name,cols,rows from screens where screenid=$screenid");
 		$row=DBfetch($result);
-/*		if(isset($_GET["fullscreen"]))
+/*		if(isset($_REQUEST["fullscreen"]))
 		{
-			$map="<a href=\"screens.php?screenid=".$_GET["screenid"]."\">".$row["name"]."</a>";
+			$map="<a href=\"screens.php?screenid=".$_REQUEST["screenid"]."\">".$row["name"]."</a>";
 		}
 		else
 		{
-			$map="<a href=\"screens.php?screenid=".$_GET["screenid"]."&fullscreen=1\">".$row["name"]."</a>";
+			$map="<a href=\"screens.php?screenid=".$_REQUEST["screenid"]."&fullscreen=1\">".$row["name"]."</a>";
 		}
 	show_table_header($map);*/
           echo "<TABLE BORDER=1 COLS=".$row["cols"]." align=center WIDTH=100% BGCOLOR=\"#FFFFFF\"";

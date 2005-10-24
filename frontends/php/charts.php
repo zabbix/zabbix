@@ -24,11 +24,11 @@
 	$page["file"] = "charts.php";
 
 	$nomenu=0;
-	if(isset($_GET["fullscreen"]))
+	if(isset($_REQUEST["fullscreen"]))
 	{
 		$nomenu=1;
 	}
-	if(isset($_GET["graphid"]) && !isset($_GET["period"]) && !isset($_GET["stime"]))
+	if(isset($_REQUEST["graphid"]) && !isset($_REQUEST["period"]) && !isset($_REQUEST["stime"]))
 	{
 		show_header($page["title"],30,$nomenu);
 	}
@@ -41,43 +41,43 @@
 ?>
 
 <?php
-	$_GET["hostid"]=@iif(isset($_GET["hostid"]),$_GET["hostid"],get_profile("web.latest.hostid",0));
-	update_profile("web.latest.hostid",$_GET["hostid"]);
+	$_REQUEST["hostid"]=@iif(isset($_REQUEST["hostid"]),$_REQUEST["hostid"],get_profile("web.latest.hostid",0));
+	update_profile("web.latest.hostid",$_REQUEST["hostid"]);
 	update_profile("web.menu.view.last",$page["file"]);
 ?>
 
 <?php
-	if(!isset($_GET["from"]))
+	if(!isset($_REQUEST["from"]))
 	{
-		$_GET["from"]=0;
+		$_REQUEST["from"]=0;
 	}
-	if(!isset($_GET["period"]))
+	if(!isset($_REQUEST["period"]))
 	{
-		$_GET["period"]=3600;
-	}
-
-	if(!isset($_GET["keep"]))
-	{
-		$_GET["keep"]=1;
+		$_REQUEST["period"]=3600;
 	}
 
-	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
+	if(!isset($_REQUEST["keep"]))
 	{
-		unset($_GET["groupid"]);
+		$_REQUEST["keep"]=1;
 	}
 
-	if(isset($_GET["graphid"])&&($_GET["graphid"]==0))
+	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
 	{
-		unset($_GET["graphid"]);
+		unset($_REQUEST["groupid"]);
 	}
 
-	if(isset($_GET["graphid"]))
+	if(isset($_REQUEST["graphid"])&&($_REQUEST["graphid"]==0))
 	{
-		$result=DBselect("select name from graphs where graphid=".$_GET["graphid"]);
+		unset($_REQUEST["graphid"]);
+	}
+
+	if(isset($_REQUEST["graphid"]))
+	{
+		$result=DBselect("select name from graphs where graphid=".$_REQUEST["graphid"]);
 		$graph=DBget_field($result,0,0);
-		$h1=iif(isset($_GET["fullscreen"]),
-			"<a href=\"charts.php?graphid=".$_GET["graphid"]."\">".$graph."</a>",
-			"<a href=\"charts.php?graphid=".$_GET["graphid"]."&fullscreen=1\">".$graph."</a>");
+		$h1=iif(isset($_REQUEST["fullscreen"]),
+			"<a href=\"charts.php?graphid=".$_REQUEST["graphid"]."\">".$graph."</a>",
+			"<a href=\"charts.php?graphid=".$_REQUEST["graphid"]."&fullscreen=1\">".$graph."</a>");
 	}
 	else
 	{
@@ -114,9 +114,9 @@
 	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
 
-	if(isset($_GET["groupid"]))
+	if(isset($_REQUEST["groupid"]))
 	{
-		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
 	}
 	else
 	{
@@ -134,23 +134,23 @@
 	}
 	$h2=$h2."</select>";
 
-	if(isset($_GET["fullscreen"]))
+	if(isset($_REQUEST["fullscreen"]))
 	{
-		$h2="<input name=\"fullscreen\" type=\"hidden\" value=".$_GET["fullscreen"].">";
+		$h2="<input name=\"fullscreen\" type=\"hidden\" value=".$_REQUEST["fullscreen"].">";
 	}
 
-	if(isset($_GET["graphid"])&&($_GET["graphid"]==0))
+	if(isset($_REQUEST["graphid"])&&($_REQUEST["graphid"]==0))
 	{
-		unset($_GET["graphid"]);
+		unset($_REQUEST["graphid"]);
 	}
 
 	$h2=$h2."&nbsp;".S_GRAPH."&nbsp;";
 	$h2=$h2."<select class=\"biginput\" name=\"graphid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("graphid",0,S_SELECT_GRAPH_DOT_DOT_DOT);
 
-	if(isset($_GET["hostid"])&&($_GET["hostid"]!=0))
+	if(isset($_REQUEST["hostid"])&&($_REQUEST["hostid"]!=0))
 	{
-		$result=DBselect("select distinct g.graphid,g.name from graphs g,graphs_items gi,items i where i.itemid=gi.itemid and g.graphid=gi.graphid and i.hostid=".$_GET["hostid"]." order by g.name");
+		$result=DBselect("select distinct g.graphid,g.name from graphs g,graphs_items gi,items i where i.itemid=gi.itemid and g.graphid=gi.graphid and i.hostid=".$_REQUEST["hostid"]." order by g.name");
 		while($row=DBfetch($result))
 		{
 			if(!check_right("Graph","R",$row["graphid"]))
@@ -169,10 +169,10 @@
 	echo "<TABLE BORDER=0 align=center COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR BGCOLOR=#DDDDDD>";
 	echo "<TD ALIGN=CENTER>";
-	if(isset($_GET["graphid"]))
+	if(isset($_REQUEST["graphid"]))
 	{
 		echo "<script language=\"JavaScript\">";
-		echo "document.write(\"<IMG SRC='chart2.php?graphid=".$_GET["graphid"].url_param("stime")."&period=".$_GET["period"]."&from=".$_GET["from"]."&width=\"+(document.width-108)+\"'>\")";
+		echo "document.write(\"<IMG SRC='chart2.php?graphid=".$_REQUEST["graphid"].url_param("stime")."&period=".$_REQUEST["period"]."&from=".$_REQUEST["from"]."&width=\"+(document.width-108)+\"'>\")";
 		echo "</script>";
 	}
 	else
@@ -183,7 +183,7 @@
 	echo "</TR>";
 	echo "</TABLE>";
 
-	if(isset($_GET["graphid"])/*&&(!isset($_GET["fullscreen"]))*/)
+	if(isset($_REQUEST["graphid"])/*&&(!isset($_REQUEST["fullscreen"]))*/)
 	{
 
 		navigation_bar("charts.php");
@@ -203,9 +203,9 @@
 		foreach($a as $label=>$sec)
 		{
 			echo "[";
-			if($_GET["period"]>$sec)
+			if($_REQUEST["period"]>$sec)
 			{
-				$tmp=$_GET["period"]-$sec;
+				$tmp=$_REQUEST["period"]-$sec;
 				echo("<A HREF=\"charts.php?period=$tmp".url_param("graphid").url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">-</A>");
 			}
 			else
@@ -216,7 +216,7 @@
 			echo("<A HREF=\"charts.php?period=$sec".url_param("graphid").url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">");
 			echo($label."</A>");
 
-			$tmp=$_GET["period"]+$sec;
+			$tmp=$_REQUEST["period"]+$sec;
 			echo("<A HREF=\"charts.php?period=$tmp".url_param("graphid").url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">+</A>");
 
 			echo "]&nbsp;";
@@ -227,7 +227,7 @@
 	echo "</TD>";
 	echo "<TD BGCOLOR=#FFFFFF WIDTH=15% ALIGN=RIGHT>";
 	echo "<b>".nbsp(S_KEEP_PERIOD).":</b>&nbsp;";
-		if($_GET["keep"] == 1)
+		if($_REQUEST["keep"] == 1)
 		{
 			echo("[<A HREF=\"charts.php?keep=0".url_param("graphid").url_param("from").url_param("period").url_param("fullscreen")."\">".S_ON_C."</a>]");
 		}
@@ -239,7 +239,7 @@
 	echo "</TR>";
 	echo "<TR BGCOLOR=#FFFFFF>";
 	echo "<TD>";
-	if(isset($_GET["stime"]))
+	if(isset($_REQUEST["stime"]))
 	{
 		echo "<div align=left>" ;
 		echo "<b>".S_MOVE.":</b>&nbsp;" ;
@@ -252,7 +252,7 @@
 		{
 			echo "[";
 
-			$stime=$_GET["stime"];
+			$stime=$_REQUEST["stime"];
 			$tmp=mktime(substr($stime,8,2),substr($stime,10,2),0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
 			$tmp=$tmp-3600*$hours;
 			$tmp=date("YmdHi",$tmp);
@@ -260,7 +260,7 @@
 
 			echo($label);
 
-			$stime=$_GET["stime"];
+			$stime=$_REQUEST["stime"];
 			$tmp=mktime(substr($stime,8,2),substr($stime,10,2),0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
 			$tmp=$tmp+3600*$hours;
 			$tmp=date("YmdHi",$tmp);
@@ -282,14 +282,14 @@
 		foreach($a as $label=>$hours)
 		{
 			echo "[";
-			$tmp=$_GET["from"]+$hours;
+			$tmp=$_REQUEST["from"]+$hours;
 			echo("<A HREF=\"charts.php?from=$tmp".url_param("graphid").url_param("period").url_param("keep").url_param("fullscreen")."\">-</A>");
 
 			echo($label);
 
-			if($_GET["from"]>=$hours)
+			if($_REQUEST["from"]>=$hours)
 			{
-				$tmp=$_GET["from"]-$hours;
+				$tmp=$_REQUEST["from"]-$hours;
 				echo("<A HREF=\"charts.php?from=$tmp".url_param("graphid").url_param("period").url_param("keep").url_param("fullscreen")."\">+</A>");
 			}
 			else
@@ -305,11 +305,11 @@
 	echo "<TD BGCOLOR=#FFFFFF WIDTH=15% ALIGN=RIGHT>";
 //		echo("<div align=left>");
 		echo "<form method=\"put\" action=\"charts.php\">";
-		echo "<input name=\"graphid\" type=\"hidden\" value=\"".$_GET["graphid"]."\" size=12>";
+		echo "<input name=\"graphid\" type=\"hidden\" value=\"".$_REQUEST["graphid"]."\" size=12>";
 		echo "<input name=\"period\" type=\"hidden\" value=\"".(9*3600)."\" size=12>";
-		if(isset($_GET["stime"]))
+		if(isset($_REQUEST["stime"]))
 		{
-			echo "<input name=\"stime\" class=\"biginput\" value=\"".$_GET["stime"]."\" size=12>";
+			echo "<input name=\"stime\" class=\"biginput\" value=\"".$_REQUEST["stime"]."\" size=12>";
 		}
 		else
 		{

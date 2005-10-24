@@ -38,13 +38,13 @@
                 show_footer();
                 exit;
         }
-	if(isset($_GET["select"])&&($_GET["select"]!=""))
+	if(isset($_REQUEST["select"])&&($_REQUEST["select"]!=""))
 	{
-		unset($_GET["groupid"]);
-		unset($_GET["hostid"]);
+		unset($_REQUEST["groupid"]);
+		unset($_REQUEST["hostid"]);
 	}
 	
-        if(isset($_GET["hostid"])&&!check_right("Host","R",$_GET["hostid"]))
+        if(isset($_REQUEST["hostid"])&&!check_right("Host","R",$_REQUEST["hostid"]))
         {
                 show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
                 show_footer();
@@ -53,9 +53,9 @@
 ?>
 
 <?php
-	if(isset($_GET["groupid"])&&($_GET["groupid"]==0))
+	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
 	{
-		unset($_GET["groupid"]);
+		unset($_REQUEST["groupid"]);
 	}
 	update_profile("web.menu.view.last",$page["file"]);
 ?>
@@ -97,17 +97,17 @@
 ?>
 
 <?php
-	if(!isset($_GET["sort"]))
+	if(!isset($_REQUEST["sort"]))
 	{
-		$_GET["sort"]="description";
+		$_REQUEST["sort"]="description";
 	}
 
-	if(isset($_GET["groupid"])&&isset($_GET["type"])&&($_GET["type"]==SHOW_DATA))
+	if(isset($_REQUEST["groupid"])&&isset($_REQUEST["type"])&&($_REQUEST["type"]==SHOW_DATA))
 	{
 		table_begin();
 		$header=array("&nbsp;");
 		$hosts=array();
-		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
@@ -117,27 +117,27 @@
 		table_header($header);
 
 		$col=0;
-		if(isset($_GET["sort"]))
+		if(isset($_REQUEST["sort"]))
 		{
-			switch ($_GET["sort"])
+			switch ($_REQUEST["sort"])
 			{
 				case "description":
-					$_GET["sort"]="order by i.description";
+					$_REQUEST["sort"]="order by i.description";
 					break;
 				case "lastcheck":
-					$_GET["sort"]="order by i.lastclock";
+					$_REQUEST["sort"]="order by i.lastclock";
 					break;
 				default:
-					$_GET["sort"]="order by i.description";
+					$_REQUEST["sort"]="order by i.description";
 					break;
 			}
 		}
 		else
 		{
-			$_GET["sort"]="order by i.description";
+			$_REQUEST["sort"]="order by i.description";
 		}
 //		$sql="select distinct description from items order by 1;";
-		$sql="select distinct i.description from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid order by 1";
+		$sql="select distinct i.description from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid order by 1";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
@@ -181,12 +181,12 @@
 		}
 		table_end();
 	}
-	else if(isset($_GET["groupid"])&&isset($_GET["type"])&&($_GET["type"]==SHOW_TRIGGERS))
+	else if(isset($_REQUEST["groupid"])&&isset($_REQUEST["type"])&&($_REQUEST["type"]==SHOW_TRIGGERS))
 	{
 		table_begin();
 		$header=array("&nbsp;");
 		$hosts=array();
-		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg,functions f,triggers t where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid and t.triggerid=f.triggerid and f.itemid=i.itemid group by h.hostid,h.host order by h.host";
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg,functions f,triggers t where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and t.triggerid=f.triggerid and f.itemid=i.itemid group by h.hostid,h.host order by h.host";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
@@ -196,27 +196,27 @@
 		table_header($header);
 
 		$col=0;
-		if(isset($_GET["sort"]))
+		if(isset($_REQUEST["sort"]))
 		{
-			switch ($_GET["sort"])
+			switch ($_REQUEST["sort"])
 			{
 				case "description":
-					$_GET["sort"]="order by i.description";
+					$_REQUEST["sort"]="order by i.description";
 					break;
 				case "lastcheck":
-					$_GET["sort"]="order by i.lastclock";
+					$_REQUEST["sort"]="order by i.lastclock";
 					break;
 				default:
-					$_GET["sort"]="order by i.description";
+					$_REQUEST["sort"]="order by i.description";
 					break;
 			}
 		}
 		else
 		{
-			$_GET["sort"]="order by i.description";
+			$_REQUEST["sort"]="order by i.description";
 		}
 //		$sql="select distinct description from items order by 1;";
-		$sql="select distinct t.description from hosts h,items i,hosts_groups hg,triggers t,functions f where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_GET["groupid"]." and hg.hostid=h.hostid and t.triggerid=f.triggerid and f.itemid=i.itemid order by 1";
+		$sql="select distinct t.description from hosts h,items i,hosts_groups hg,triggers t,functions f where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and t.triggerid=f.triggerid and f.itemid=i.itemid order by 1";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{

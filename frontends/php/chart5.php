@@ -28,20 +28,20 @@
 
 	$start_time=time(NULL);
 
-	if(!isset($_GET["type"]))
+	if(!isset($_REQUEST["type"]))
 	{
-		$_GET["type"]="week";
+		$_REQUEST["type"]="week";
 	}
 
-	if($_GET["type"] == "month")
+	if($_REQUEST["type"] == "month")
 	{
 		$period=30*24*3600;
 	}
-	else if($_GET["type"] == "week")
+	else if($_REQUEST["type"] == "week")
 	{
 		$period=7*24*3600;
 	}
-	else if($_GET["type"] == "year")
+	else if($_REQUEST["type"] == "year")
 	{
 		$period=365*24*3600;
 	}
@@ -88,7 +88,7 @@
 	ImageFilledRectangle($im,0,0,$x,$y,$white);
 	ImageRectangle($im,0,0,$x-1,$y-1,$black);
 
-//	if(!check_right_on_trigger("R",$_GET["triggerid"]))
+//	if(!check_right_on_trigger("R",$_REQUEST["triggerid"]))
 //	{
 //		ImageOut($im); 
 //		ImageDestroy($im); 
@@ -96,7 +96,7 @@
 //	}
 
 
-	$service=get_service_by_serviceid($_GET["serviceid"]);
+	$service=get_service_by_serviceid($_REQUEST["serviceid"]);
 
 	$str=$service["name"]." (year ".date("Y").")";
 	$x=imagesx($im)/2-ImageFontWidth(4)*strlen($str)/2;
@@ -120,7 +120,7 @@
 	{
 		$period_start=$start+7*24*3600*$i;
 		$period_end=$start+7*24*3600*($i+1);
-		$stat=calculate_service_availability($_GET["serviceid"],$period_start,$period_end);
+		$stat=calculate_service_availability($_REQUEST["serviceid"],$period_start,$period_end);
 		
 		$problem[$i]=$stat["problem"];
 		$ok[$i]=$stat["ok"];
