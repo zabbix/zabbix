@@ -78,7 +78,7 @@
 	if(isset($register)&&($register=="Enter"))
 	{
 		$password=md5($password);
-		$sql="select u.userid,u.alias,u.name,u.surname,u.url from users u where u.alias='$name' and u.passwd='$password'";
+		$sql="select u.userid,u.alias,u.name,u.surname,u.url,u.refresh from users u where u.alias='$name' and u.passwd='$password'";
 		$result=DBselect($sql);
 		if(DBnum_rows($result)==1)
 		{
@@ -87,6 +87,7 @@
 			$USER_DETAILS["name"]=DBget_field($result,0,2);
 			$USER_DETAILS["surname"]=DBget_field($result,0,3);
 			$USER_DETAILS["url"]=DBget_field($result,0,4);
+			$USER_DETAILS["refresh"]=DBget_field($result,0,5);
 			$sessionid=md5(time().$password.$name.rand(0,10000000));
 			setcookie("sessionid",$sessionid,time()+3600);
 // Required !

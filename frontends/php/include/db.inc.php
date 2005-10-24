@@ -30,7 +30,8 @@
 	$DB_PASSWORD	="";
 // END OF DATABASE CONFIGURATION
 
-	$USER_DETAILS	="";
+//	$USER_DETAILS	="";
+	global $USER_DETAILS;
 
 	if($DB_TYPE == "MYSQL")
 	{

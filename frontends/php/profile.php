@@ -45,7 +45,7 @@
 		{
 			if($_REQUEST["password1"]==$_REQUEST["password2"])
 			{
-				$result=update_user_profile($_REQUEST["userid"],$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],$_REQUEST["lang"]);
+				$result=update_user_profile($_REQUEST["userid"],$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],$_REQUEST["lang"],$_REQUEST["refresh"]);
 				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 				if($result)
 					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,"User ID [".$_REQUEST["userid"]."]");

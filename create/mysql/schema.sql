@@ -416,6 +416,7 @@ CREATE TABLE users (
   url			varchar(255)	DEFAULT '' NOT NULL,
   autologout		int(4)		DEFAULT '900' NOT NULL,
   lang			varchar(5)	DEFAULT 'en_gb' NOT NULL,
+  refresh		int(4)		DEFAULT '30' NOT NULL,
   PRIMARY KEY (userid),
   UNIQUE (alias)
 ) type=InnoDB;

@@ -76,11 +76,6 @@
 //	echo "$tr_hash<br>$triggers_hash<br>".$old[1]."<br>".$new[1];
 ?>
 <?php
-	$refresh=10;
-	if(!isset($_REQUEST["onlytrue"])||isset($_REQUEST["txt_select"]))
-	{
-		$refresh=0;
-	}
 	if(!isset($_REQUEST["onlytrue"]))
 	{
 		$_REQUEST["onlytrue"]="true";
@@ -91,11 +86,11 @@
 	}
 	if(isset($_REQUEST["fullscreen"]))
 	{
-		show_header($page["title"],$refresh,1);
+		show_header($page["title"],1,1);
 	}
 	else
 	{
-		show_header($page["title"],$refresh,0);
+		show_header($page["title"],1,0);
 	}
 ?>
 <?php

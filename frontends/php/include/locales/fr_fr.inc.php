@@ -694,6 +694,7 @@
 	"S_PASSWORD_ONCE_AGAIN"=>		"Mot de passe (une autre fois)",
 	"S_URL_AFTER_LOGIN"=>			"URL (après connexion)",
 	"S_AUTO_LOGOUT_IN_SEC"=>		"Déconnection automatique (dans =>0 secondes - désactiver)",
+	"S_SCREEN_REFRESH"=>                    "Refresh (in seconds)",
 
 //	audit.php
 	"S_AUDIT_LOG"=>				"Journal de vérification",

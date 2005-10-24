@@ -44,7 +44,8 @@
 		}
 		else
 		{
-			show_header("$host:$description",$beforenextcheck,0);
+//			show_header("$host:$description",$beforenextcheck,0);
+			show_header("$host:$description",1,0);
 		}
 	}
 	if($_REQUEST["action"]=="showvalues")

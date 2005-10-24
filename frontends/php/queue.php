@@ -23,7 +23,7 @@
 
 	$page["title"] = "S_QUEUE_BIG";
 	$page["file"] = "queue.php";
-	show_header($page["title"],10,0);
+	show_header($page["title"],1,0);
 ?>
  
 <?php

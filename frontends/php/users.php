@@ -52,7 +52,7 @@
 		{
 			if($_REQUEST["password1"]==$_REQUEST["password2"])
 			{
-				$result=add_user($_REQUEST["name"],$_REQUEST["surname"],$_REQUEST["alias"],$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],$_REQUEST["lang"]);
+				$result=add_user($_REQUEST["name"],$_REQUEST["surname"],$_REQUEST["alias"],$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],$_REQUEST["lang"],$_REQUEST["refresh"]);
 				show_messages($result, S_USER_ADDED, S_CANNOT_ADD_USER);
 				if($result)
 					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_USER,"User alias [".addslashes($_REQUEST["alias"])."] name [".addslashes($_REQUEST["name"])."] surname [".addslashes($_REQUEST["surname"])."]]");
@@ -86,7 +86,7 @@
 		{
 			if($_REQUEST["password1"]==$_REQUEST["password2"])
 			{
-				$result=update_user($_REQUEST["userid"],$_REQUEST["name"],$_REQUEST["surname"],$_REQUEST["alias"],$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],$_REQUEST["lang"]);
+				$result=update_user($_REQUEST["userid"],$_REQUEST["name"],$_REQUEST["surname"],$_REQUEST["alias"],$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],$_REQUEST["lang"],$_REQUEST["refresh"]);
 				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 				if($result)
 					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,"User alias [".addslashes($_REQUEST["alias"])."] name [".addslashes($_REQUEST["name"])."] surname [".addslashes($_REQUEST["surname"])."]]");
