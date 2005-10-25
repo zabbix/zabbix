@@ -1,5 +1,6 @@
 1.1beta3:
 
+ - check if there is memory leak in W32 agent
  - integrate James' refresh rate patch
  - make agents return error message if not supported or not available
  - centralised management of agent configuration files
