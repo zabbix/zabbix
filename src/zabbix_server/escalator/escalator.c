@@ -53,6 +53,8 @@
 
 #include "escalator.h"
 
+extern void    apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value);
+
 static int process_escalation(DB_ESCALATION_LOG *escalation_log)
 {
 	int	i,now;

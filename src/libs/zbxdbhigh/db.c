@@ -41,6 +41,9 @@
 	PGconn	*conn;
 #endif
 
+extern void    apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value);
+extern void    update_services(int triggerid, int status);
+
 void	DBclose(void)
 {
 #ifdef	HAVE_MYSQL

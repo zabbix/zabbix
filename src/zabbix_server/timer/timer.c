@@ -43,6 +43,8 @@
 
 #include "common.h"
 
+extern void    update_triggers(int itemid);
+
 /******************************************************************************
  *                                                                            *
  * Function: main_timer_loop                                                  *

@@ -51,6 +51,8 @@
 
 #include "trapper.h"
 
+extern int    send_list_of_active_checks(int sockfd, char *host);
+
 int	process_trap(int sockfd,char *s, int max_len)
 {
 	char	*p,*line,*host;

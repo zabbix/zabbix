@@ -49,6 +49,7 @@
 #include "common.h"
 #include "functions.h"
 #include "expression.h"
+#include "sysinfo.h"
 
 #include "alerter/alerter.h"
 #include "escalator/escalator.h"
