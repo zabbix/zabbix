@@ -27,8 +27,8 @@
 #define	SYSINFO_RET_FAIL	1
 #define	SYSINFO_RET_TIMEOUT	2
 
-#define COMMAND struct command_type
-COMMAND
+#define ZBX_METRIC struct zbx_metric_type
+ZBX_METRIC
 {
 	char	*key;
 	int	(*function)();
