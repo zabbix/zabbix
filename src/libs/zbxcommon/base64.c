@@ -113,7 +113,6 @@ void str_base64_encode(char *p_str, char *p_b64str, int in_size)
 	int 	i;
 	unsigned char from1=0,from2=0,from3=0;
 	unsigned char to1=0,to2=0,to3=0,to4=0;
-	char	*p_b64init = p_b64str;
 
 	if ( 0 == in_size )
 	{

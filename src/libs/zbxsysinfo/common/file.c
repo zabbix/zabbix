@@ -30,6 +30,8 @@
 /* FILE */
 #include <stdio.h>
 
+#include <stdlib.h>
+
 #include "common.h"
 #include "sysinfo.h"
 

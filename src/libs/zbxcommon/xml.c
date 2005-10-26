@@ -1,6 +1,7 @@
 #include "common.h"
 #include "log.h"
 
+#include <stdio.h>
 #include <string.h>
 
 /* Get DATA from <tag>DATA</tag> */

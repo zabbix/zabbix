@@ -178,9 +178,19 @@ int	get_param(const char *param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
 int     get_stat(const char *key, double *value, const char *msg, int mlen_max);
 
+int	xml_get_data(char *xml,char *tag, char *data, int maxlen);
 int	comms_create_request(char *host, char *key, char *data, char *lastlogsize, char *request,int maxlen);
 int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastlogsize, char *timestamp,
 		               char *source, char *severity, int maxlen);
 
+/* Base64 functions */
+void	str_base64_encode(char *p_str, char *p_b64str, int in_size);
+void	str_base64_decode(char *p_b64str, char *p_str, int *p_out_size);
+
+/* Regular expressions */
+char    *zbx_regexp_match(const char *string, const char *pattern, int *len);
+
+/* Misc functions */
+int	cmp_double(double a,double b);
 
 #endif
