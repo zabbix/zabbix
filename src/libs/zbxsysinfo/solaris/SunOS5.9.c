@@ -1653,7 +1653,7 @@ static int check_ldap(char *hostname, short port,int *value, const char *msg, in
 #endif
 */
 
-COMMAND agent_commands[]=
+ZBX_METRIC agent_commands[]=
 /*      KEY             FUNCTION (if double) FUNCTION (if string) PARAM*/
         {
 	  /*
