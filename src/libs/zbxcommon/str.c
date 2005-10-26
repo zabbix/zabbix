@@ -41,12 +41,12 @@ char *string_replace(char *str, const char *sub_str1, const char *sub_str2)
                         ;
                 q += len;
                 p = q;
-                for ( r = sub_str2; *t++ = *r++; )
+                for ( r = sub_str2; (*t++ = *r++); )
                         ;
                 --t;
         }
         /* copy the tail of str */
-        while ( *t++ = *q++ )
+        while ( (*t++ = *q++) )
                 ;
         return new_str;
 
