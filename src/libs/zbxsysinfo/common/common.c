@@ -1697,7 +1697,7 @@ int	CHECK_DNS(const char *cmd, const char *ip_and_zone,double  *value, const cha
 	{
 		if(strlen(ip_and_zone)>0)
 		{
-			if(isdigit(ip_and_zone[strlen(ip_and_zone)-1]))
+			if(isdigit((int)ip_and_zone[strlen(ip_and_zone)-1]))
 			{
 				strcpy(ip,ip_and_zone);
 				strcpy(zone,"localhost");
