@@ -1,5 +1,6 @@
 Changes for 1.1beta3:
 
+ - fixed several warnings when compiling with -Wall flag (Alexei)
  - added new item parameter: message (Eugene)
  - configurable refresh rate. Thanks to James Wells. (Alexei)
  - update images. Thanks to James Wells. (Alexei)

@@ -124,7 +124,6 @@ static int	get_value(char *server,int port,char *key,char *value)
 {
 	int	i,s;
 	char	tosend[1024];
-	char	result[1024];
 	struct hostent *hp;
 
 	struct sockaddr_in myaddr_in;

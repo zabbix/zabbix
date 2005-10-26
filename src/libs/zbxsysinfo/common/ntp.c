@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <unistd.h>
+
 #include "config.h"
 #include "common.h"
 #include "sysinfo.h"
@@ -193,7 +195,7 @@ systems do not set the return value from (s)printf. */
     errno = 0;
     if ((gmt = localtime(&now)) == NULL)
     {
-        printf("unable to work out local time",NULL);
+        printf("unable to work out local time");
 	return -1;
     }
     len = 24;
@@ -216,13 +218,10 @@ int	check_ntp(char *host, int port, int *value_int)
 	int	s;
 	int	len;
 	unsigned char	c[MAX_STRING_LEN];
-	char	*e;
 
 	struct hostent *hp;
 
 	struct sockaddr_in servaddr_in;
-
-	struct linger ling;
 
 	char	text[50];
 

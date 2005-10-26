@@ -337,11 +337,12 @@ int	DBget_queue_count(void);
 void    DBescape_string(char *from, char *to, int maxlen);
 void    DBget_item_from_db(DB_ITEM *item,DB_RESULT *result, int row);
 
-int	DBadd_new_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
+int	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBhost_exists(char *server);
 int	DBget_host_by_hostid(int hostid,DB_HOST *host);
 int	DBsync_host_with_templates(int hostid);
 int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,int actions,int graphs,int screens);
+int	DBadd_templates_to_host(int hostid,int host_templateid);
 
 int	DBadd_template_linkage(int hostid,int templateid,int items,int triggers,int actions,int graphs,int screens);
 
