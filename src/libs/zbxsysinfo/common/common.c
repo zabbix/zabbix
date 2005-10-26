@@ -155,12 +155,14 @@
 
 #include "md5.h"
 
+
 void	forward_request(char *proxy,char *command,int port,char *value, const char *msg, int mlen_max);
 
 COMMAND	*commands=NULL;
 
 extern COMMAND parameters_specific[];
 extern	int	SYSTEM_LOCALTIME(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
+extern	 int     check_ntp(char *host, int port, int *value_int);
 
 int     EXECUTE_STR(const char *cmd, const char *command, const char *parameter, char  **value, const char *msg, int mlen_max);
 
