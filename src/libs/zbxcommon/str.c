@@ -1,6 +1,7 @@
 #include "common.h"
 
 #include <string.h>
+#include <stdlib.h>
 
 /* Has to be rewritten to avoi malloc */
 char *string_replace(char *str, const char *sub_str1, const char *sub_str2)
@@ -27,7 +28,7 @@ char *string_replace(char *str, const char *sub_str1, const char *sub_str2)
         diff = strlen(sub_str2) - len;
 
         /* allocate new memory */
-        if ( (new_str=(char *)malloc((strlen(str) + count*diff)*sizeof(char)))
+        if ( (new_str=(char *)malloc((size_t)(strlen(str) + count*diff)*sizeof(char)))
                         == NULL )
                 return NULL;
 

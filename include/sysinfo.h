@@ -42,6 +42,5 @@ void	init_metrics();
 void    add_user_parameter(char *key,char *command);
 void	test_parameters(void);
 int	getPROC(char *file,int lineno,int fieldno, double *value, const char *msg, int mlen_max);
-char	*zbx_regexp_match(const char *string, char *pattern, int *len);
 
 #endif

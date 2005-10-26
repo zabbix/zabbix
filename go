@@ -24,6 +24,8 @@ automake
 #tar cvzf zabbix.tgz zabbix
 #exit
 echo Making...
+export CFLAGS="-Wall"
 ./configure --enable-agent --enable-server --with-mysql --with-net-snmp --prefix=`pwd` 2>WARNINGS >/dev/null
 echo Installing...
-make install >/dev/null
+make clean >/dev/null
+make install 2>>WARNINGS >/dev/null
