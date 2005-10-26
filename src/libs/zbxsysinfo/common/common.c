@@ -158,15 +158,15 @@
 
 void	forward_request(char *proxy,char *command,int port,char *value, const char *msg, int mlen_max);
 
-COMMAND	*commands=NULL;
+ZBX_METRIC *commands=NULL;
 
-extern COMMAND parameters_specific[];
+extern ZBX_METRIC parameters_specific[];
 extern	int	SYSTEM_LOCALTIME(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max);
 extern	 int     check_ntp(char *host, int port, int *value_int);
 
 int     EXECUTE_STR(const char *cmd, const char *command, const char *parameter, char  **value, const char *msg, int mlen_max);
 
-COMMAND	parameters_common[]=
+ZBX_METRIC	parameters_common[]=
 /* 	KEY		FUNCTION (if double) FUNCTION (if string) PARAM*/
 	{
 	{"system.localtime"	,SYSTEM_LOCALTIME,	0, 0},
@@ -195,7 +195,7 @@ void	add_metric(char *key, int (*function)(),int (*function_str)(),char *paramet
 			commands[i].function=function;
 			commands[i].function_str=function_str;
 
-			commands=realloc(commands,(i+2)*sizeof(COMMAND));
+			commands=realloc(commands,(i+2)*sizeof(ZBX_METRIC));
 			commands[i+1].key=NULL;
 			break;
 		}
@@ -215,7 +215,7 @@ void	add_user_parameter(char *key,char *command)
 			commands[i].function_str=&EXECUTE_STR;
 			commands[i].parameter=strdup(command);
 
-			commands=realloc(commands,(i+2)*sizeof(COMMAND));
+			commands=realloc(commands,(i+2)*sizeof(ZBX_METRIC));
 			commands[i+1].key=NULL;
 
 			break;
@@ -240,7 +240,7 @@ void	init_metrics()
 {
 	int 	i;
 
-	commands=malloc(sizeof(COMMAND));
+	commands=malloc(sizeof(ZBX_METRIC));
 	commands[0].key=NULL;
 
 	for(i=0;parameters_common[i].key!=0;i++)

@@ -121,7 +121,7 @@ int	CHECK_SERVICE_PERF(const char *cmd, const char *service,double  *value, cons
 int	CHECK_PORT(const char *cmd, const char *ip_and_port,double  *value, const char *msg, int mlen_max);
 int	CHECK_DNS(const char *cmd, const char *service,double  *value, const char *msg, int mlen_max);
 
-COMMAND	parameters_specific[]=
+ZBX_METRIC	parameters_specific[]=
 /* 	KEY		FUNCTION (if double) FUNCTION (if string) PARAM*/
 	{
 
