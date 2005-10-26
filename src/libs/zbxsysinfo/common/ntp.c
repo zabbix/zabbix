@@ -61,7 +61,7 @@ the time from the beginning of the century to the Epoch!) */
     errno = 0;
     if (gettimeofday(&current,NULL))
     {
-	    exit(-1);
+	    /* No processing of error condition here */
     }
     return offset+current.tv_sec+1.0e-6*current.tv_usec;
 }
