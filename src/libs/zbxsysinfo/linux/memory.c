@@ -19,123 +19,10 @@
 
 #include "config.h"
 
-#include <errno.h>
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-
-/* Definitions of uint32_t under OS/X */
-#ifdef HAVE_STDINT_H
-	#include <stdint.h>
-#endif
-#ifdef HAVE_STRINGS_H
-	#include <strings.h>
-#endif
-#ifdef HAVE_FCNTL_H
-	#include <fcntl.h>
-#endif
-#ifdef HAVE_DIRENT_H
-	#include <dirent.h>
-#endif
-/* Linux */
-#ifdef HAVE_SYS_VFS_H
-	#include <sys/vfs.h>
-#endif
-#ifdef HAVE_SYS_SYSINFO_H
-	#include <sys/sysinfo.h>
-#endif
-/* Solaris */
-#ifdef HAVE_SYS_STATVFS_H
-	#include <sys/statvfs.h>
-#endif
-/* Solaris */
-#ifdef HAVE_SYS_PROCFS_H
-/* This is needed to access the correct procfs.h definitions */
-	#define _STRUCTURED_PROC 1
-	#include <sys/procfs.h>
-#endif
-#ifdef HAVE_SYS_LOADAVG_H
-	#include <sys/loadavg.h>
-#endif
-#ifdef HAVE_SYS_SOCKET_H
-	#include <sys/socket.h>
-#endif
-#ifdef HAVE_NETINET_IN_H
-	#include <netinet/in.h>
-#endif
-#ifdef HAVE_ARPA_INET_H
-	#include <arpa/inet.h>
-#endif
-/* OpenBSD/Solaris */
-#ifdef HAVE_SYS_PARAM_H
-	#include <sys/param.h>
-#endif
-
-#ifdef HAVE_SYS_MOUNT_H
-	#include <sys/mount.h>
-#endif
-
-/* HP-UX */
-#ifdef HAVE_SYS_PSTAT_H
-	#include <sys/pstat.h>
-#endif
-
-#ifdef HAVE_NETDB_H
-	#include <netdb.h>
-#endif
-
-/* Solaris */
-#ifdef HAVE_SYS_SWAP_H
-	#include <sys/swap.h>
-#endif
-
-/* FreeBSD */
-#ifdef HAVE_SYS_SYSCTL_H
-	#include <sys/sysctl.h>
-#endif
-
-/* Solaris */
-#ifdef HAVE_SYS_SYSCALL_H
-	#include <sys/syscall.h>
-#endif
-
-/* FreeBSD */
-#ifdef HAVE_VM_VM_PARAM_H
-	#include <vm/vm_param.h>
-#endif
-/* FreeBSD */
-#ifdef HAVE_SYS_VMMETER_H
-	#include <sys/vmmeter.h>
-#endif
-/* FreeBSD */
-#ifdef HAVE_SYS_TIME_H
-	#include <sys/time.h>
-#endif
-
-#ifdef HAVE_MACH_HOST_INFO_H
-	#include <mach/host_info.h>
-#endif
-#ifdef HAVE_MACH_MACH_HOST_H
-	#include <mach/mach_host.h>
-#endif
-
-
-#ifdef HAVE_KSTAT_H
-	#include <kstat.h>
-#endif
-
-#ifdef HAVE_LDAP
-	#include <ldap.h>
-#endif
-
 #include "common.h"
 #include "sysinfo.h"
 
-int	VM_MEMORY_CACHED(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
+int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_PROC
 /* Get CACHED memory in bytes */
@@ -145,8 +32,12 @@ int	VM_MEMORY_CACHED(const char *cmd, const char *parameter,double  *value, cons
 	FILE	*f;
 	char	*t;
 	char	c[MAX_STRING_LEN];
-	double	result = SYSINFO_RET_FAIL;
+	double	res = 0;
 
+	assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+		
 	f=fopen("/proc/meminfo","r");
 	if(NULL == f)
 	{
@@ -158,30 +49,40 @@ int	VM_MEMORY_CACHED(const char *cmd, const char *parameter,double  *value, cons
 		{
 			t=(char *)strtok(c," ");
 			t=(char *)strtok(NULL," ");
-			sscanf(t, "%lf", &result );
+			sscanf(t, "%lf", &res );
 			break;
 		}
 	}
 	fclose(f);
 
-	*value=result;
+	result->type |= AR_DOUBLE;	
+	result->dbl=res;
 	return SYSINFO_RET_OK;
 #else
+	assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+		
 	return SYSINFO_RET_FAIL;
 #endif
 }
 
-int	VM_MEMORY_BUFFERS(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
+int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_SYSINFO_BUFFERRAM
 	struct sysinfo info;
 
+	assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+		
 	if( 0 == sysinfo(&info))
 	{
+		result->type |= AR_DOUBLE;	
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		*value=(double)info.bufferram * (double)info.mem_unit;
+		result->dbl=(double)info.bufferram * (double)info.mem_unit;
 #else
-		*value=(double)info.bufferram;
+		result->dbl=(double)info.bufferram;
 #endif
 		return SYSINFO_RET_OK;
 	}
@@ -190,21 +91,30 @@ int	VM_MEMORY_BUFFERS(const char *cmd, const char *parameter,double  *value, con
 		return SYSINFO_RET_FAIL;
 	}
 #else
+	assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+		
 	return	SYSINFO_RET_FAIL;
 #endif
 }
 
-int	VM_MEMORY_SHARED(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
+int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_SYSINFO_SHAREDRAM
 	struct sysinfo info;
 
+	assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+		
 	if( 0 == sysinfo(&info))
 	{
+		result->type |= AR_DOUBLE;	
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		*value=(double)info.sharedram * (double)info.mem_unit;
+		result->dbl=(double)info.sharedram * (double)info.mem_unit;
 #else
-		*value=(double)info.sharedram;
+		result->dbl=(double)info.sharedram;
 #endif
 		return SYSINFO_RET_OK;
 	}
@@ -217,13 +127,18 @@ int	VM_MEMORY_SHARED(const char *cmd, const char *parameter,double  *value, cons
 	int mib[2],len;
 	struct vmtotal v;
 
+	assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+		
 	len=sizeof(struct vmtotal);
 	mib[0]=CTL_VM;
 	mib[1]=VM_METER;
 
 	sysctl(mib,2,&v,&len,NULL,0);
 
-	*value=(double)(v.t_armshr<<2);
+	result->type |= AR_DOUBLE;	
+	result->dbl=(double)(v.t_armshr<<2);
 	return SYSINFO_RET_OK;
 #else
 	return	SYSINFO_RET_FAIL;
@@ -231,17 +146,26 @@ int	VM_MEMORY_SHARED(const char *cmd, const char *parameter,double  *value, cons
 #endif
 }
 
-int	VM_MEMORY_TOTAL(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
+int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 /* Solaris */
 #ifdef HAVE_UNISTD_SYSCONF
-	*value=(double)sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGESIZE);
+	assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+		
+	result->type |= AR_DOUBLE;	
+	result->dbl=(double)sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGESIZE);
 	return SYSINFO_RET_OK;
 #else
 #ifdef HAVE_SYS_PSTAT_H
 	struct	pst_static pst;
 	long	page;
 
+	assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+		
 	if(pstat_getstatic(&pst, sizeof(pst), (size_t)1, 0) == -1)
 	{
 		return SYSINFO_RET_FAIL;
@@ -251,19 +175,25 @@ int	VM_MEMORY_TOTAL(const char *cmd, const char *parameter,double  *value, const
 		/* Get page size */	
 		page = pst.page_size;
 		/* Total physical memory in bytes */	
-		*value=(double)page*pst.physical_memory;
+		result->type |= AR_DOUBLE;	
+		result->dbl=(double)page*pst.physical_memory;
 		return SYSINFO_RET_OK;
 	}
 #else
 #ifdef HAVE_SYSINFO_TOTALRAM
 	struct sysinfo info;
 
+	assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+		
 	if( 0 == sysinfo(&info))
 	{
+		result->type |= AR_DOUBLE;	
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		*value=(double)info.totalram * (double)info.mem_unit;
+		result->dbl=(double)info.totalram * (double)info.mem_unit;
 #else
-		*value=(double)info.totalram;
+		result->dbl=(double)info.totalram;
 #endif
 		return SYSINFO_RET_OK;
 	}
@@ -276,13 +206,18 @@ int	VM_MEMORY_TOTAL(const char *cmd, const char *parameter,double  *value, const
 	int mib[2],len;
 	struct vmtotal v;
 
+	assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+		
 	len=sizeof(struct vmtotal);
 	mib[0]=CTL_VM;
 	mib[1]=VM_METER;
 
 	sysctl(mib,2,&v,&len,NULL,0);
 
-	*value=(double)(v.t_rm<<2);
+	result->type |= AR_DOUBLE;	
+	result->dbl=(double)(v.t_rm<<2);
 	return SYSINFO_RET_OK;
 #else
 #ifdef HAVE_SYS_SYSCTL_H
@@ -291,11 +226,16 @@ int	VM_MEMORY_TOTAL(const char *cmd, const char *parameter,double  *value, const
 	unsigned int memory;
 	int ret;
 	
+	assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+		
 	len=sizeof(memory);
 
 	if(0==sysctl(mib,2,&memory,&len,NULL,0))
 	{
-		*value=(double)memory;
+		result->type |= AR_DOUBLE;	
+		result->dbl=(double)memory;
 		ret=SYSINFO_RET_OK;
 	}
 	else
@@ -304,6 +244,10 @@ int	VM_MEMORY_TOTAL(const char *cmd, const char *parameter,double  *value, const
 	}
 	return ret;
 #else
+	assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+		
 	return	SYSINFO_RET_FAIL;
 #endif
 #endif
@@ -312,11 +256,16 @@ int	VM_MEMORY_TOTAL(const char *cmd, const char *parameter,double  *value, const
 #endif
 }
 
-int	VM_MEMORY_FREE(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
+int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 /* Solaris */
 #ifdef HAVE_UNISTD_SYSCONF
-	*value=(double)sysconf(_SC_AVPHYS_PAGES)*sysconf(_SC_PAGESIZE);
+	assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+		
+	result->type |= AR_DOUBLE;	
+	result->dbl=(double)sysconf(_SC_AVPHYS_PAGES)*sysconf(_SC_PAGESIZE);
 	return SYSINFO_RET_OK;
 #else
 #ifdef HAVE_SYS_PSTAT_H
@@ -324,6 +273,10 @@ int	VM_MEMORY_FREE(const char *cmd, const char *parameter,double  *value, const 
 	struct	pst_dynamic dyn;
 	long	page;
 
+	assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+		
 	if(pstat_getstatic(&pst, sizeof(pst), (size_t)1, 0) == -1)
 	{
 		return SYSINFO_RET_FAIL;
@@ -352,7 +305,8 @@ int	VM_MEMORY_FREE(const char *cmd, const char *parameter,double  *value, const 
 */
 		/* Free memory in bytes */
 
-			*value=(double)dyn.psd_free * page;
+			result->type |= AR_DOUBLE;	
+			result->dbl=(double)dyn.psd_free * page;
 			return SYSINFO_RET_OK;
 		}
 	}
@@ -360,12 +314,17 @@ int	VM_MEMORY_FREE(const char *cmd, const char *parameter,double  *value, const 
 #ifdef HAVE_SYSINFO_FREERAM
 	struct sysinfo info;
 
+	assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+		
 	if( 0 == sysinfo(&info))
 	{
+		result->type |= AR_DOUBLE;	
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		*value=(double)info.freeram * (double)info.mem_unit;
+		result->dbl=(double)info.freeram * (double)info.mem_unit;
 #else
-		*value=(double)info.freeram;
+		result->dbl=(double)info.freeram;
 #endif
 		return SYSINFO_RET_OK;
 	}
@@ -378,13 +337,18 @@ int	VM_MEMORY_FREE(const char *cmd, const char *parameter,double  *value, const 
 	int mib[2],len;
 	struct vmtotal v;
 
+	assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+		
 	len=sizeof(struct vmtotal);
 	mib[0]=CTL_VM;
 	mib[1]=VM_METER;
 
 	sysctl(mib,2,&v,&len,NULL,0);
 
-	*value=(double)(v.t_free<<2);
+	result->type |= AR_DOUBLE;	
+	result->dbl=(double)(v.t_free<<2);
 	return SYSINFO_RET_OK;
 #else
 /* OS/X */
@@ -395,6 +359,10 @@ int	VM_MEMORY_FREE(const char *cmd, const char *parameter,double  *value, const 
 	kern_return_t kret;
 	int ret;
 	
+	assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+		
 	pagesize = 0;
 	kret = host_page_size (mach_host_self(), &pagesize);
 
@@ -412,7 +380,8 @@ int	VM_MEMORY_FREE(const char *cmd, const char *parameter,double  *value, const 
 
 		pu = pw+pa+pi;
 
-		*value=(double)pf;
+		result->type |= AR_DOUBLE;	
+		result->dbl=(double)pf;
 		ret = SYSINFO_RET_OK;
 	}
 	else
@@ -421,6 +390,10 @@ int	VM_MEMORY_FREE(const char *cmd, const char *parameter,double  *value, const 
 	}
 	return ret;
 #else
+	assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+		
 	return	SYSINFO_RET_FAIL;
 #endif
 #endif
@@ -428,3 +401,51 @@ int	VM_MEMORY_FREE(const char *cmd, const char *parameter,double  *value, const 
 #endif
 #endif
 }
+
+int     OLD_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+        char    key[MAX_STRING_LEN];
+        int     ret;
+
+        assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+
+        if(num_param(param) > 1)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, key, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(strcmp(key,"buffers") == 0)
+        {
+                ret = VM_MEMORY_BUFFERS(cmd, param, flags, result);
+        }
+        else if(strcmp(key,"cached") == 0)
+        {
+                ret = VM_MEMORY_CACHED(cmd, param, flags, result);
+        }
+        else if(strcmp(key,"free") == 0)
+        {
+                ret = VM_MEMORY_FREE(cmd, param, flags, result);
+        }
+        else if(strcmp(key,"shared") == 0)
+        {
+                ret = VM_MEMORY_SHARED(cmd, param, flags, result);
+        }
+        else if(strcmp(key,"total") == 0)
+        {
+                ret = VM_MEMORY_TOTAL(cmd, param, flags, result);
+        }
+        else
+        {
+                ret = SYSINFO_RET_FAIL;
+        }
+
+        return ret;
+}
+

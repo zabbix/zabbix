@@ -20,10 +20,6 @@
 #ifndef ZABBIX_CHECKS_SIMPLE_H
 #define ZABBIX_CHECKS_SIMPLE_H
 
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "common.h"
 #include "config.h"
 #include "db.h"

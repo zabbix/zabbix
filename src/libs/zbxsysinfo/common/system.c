@@ -19,16 +19,19 @@
 
 #include "config.h"
 
-#include <time.h>
-
 #include "common.h"
 #include "sysinfo.h"
 
-int	SYSTEM_LOCALTIME(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
+int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	int ret = SYSINFO_RET_OK;
 
-	*value=(double)time(NULL);
+	assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+	
+	result->type |= AR_DOUBLE;
+	result->dbl = (double)time(NULL);
 
 	return ret;
 }

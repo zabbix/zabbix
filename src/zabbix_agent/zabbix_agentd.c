@@ -239,8 +239,7 @@ void	print_supported()
 
 void    init_config(void)
 {
-	char	tmp[MAX_STRING_LEN];
-	
+	AGENT_RESULT	result;	
 	struct cfg_line cfg[]=
 	{
 /*               PARAMETER      ,VAR    ,FUNC,  TYPE(0i,1s),MANDATORY,MIN,MAX
@@ -277,11 +276,16 @@ void    init_config(void)
 
 	if(CONFIG_HOSTNAME == NULL)
 	{
-		if(SUCCEED == process("system[hostname]",tmp, 0))
+	  	if(SUCCEED == process("system[hostname]", 0, &result))
 		{
-			CONFIG_HOSTNAME=strdup(tmp);
+	        	if(result.type & AR_STRING)
+			{
+				CONFIG_HOSTNAME=strdup(result.str);
+			}
+	        	free_result(&result);
 		}
-		else
+
+		if(CONFIG_HOSTNAME == NULL)
 		{
 			zabbix_log( LOG_LEVEL_CRIT, "Hostname is not defined");
 			exit(1);
@@ -298,10 +302,11 @@ void	process_child(int sockfd)
 {
 	ssize_t	nread;
 	char	line[MAX_STRING_LEN];
-	char	result[MAX_STRING_LEN];
+	char	value[MAX_STRING_LEN];
 	int	i;
 
-        static struct  sigaction phan;
+        static struct  	sigaction phan;
+	AGENT_RESULT	result;
 
 	phan.sa_handler = &signal_handler; /* set up sig handler using sigaction() */
 	sigemptyset(&phan.sa_mask);
@@ -332,10 +337,17 @@ void	process_child(int sockfd)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Got line:%s", line);
 
-	process(line,result,0);
-
-	zabbix_log( LOG_LEVEL_DEBUG, "Sending back:%s", result);
-	i=write(sockfd,result,strlen(result));
+  	process(line, 0, &result);
+        if(result.type & AR_DOUBLE)
+                 snprintf(value, MAX_STRING_LEN-1, "%f", result.dbl);
+        else if(result.type & AR_STRING)
+                 snprintf(value, MAX_STRING_LEN-1, "%s", result.str);
+        else if(result.type & AR_MESSAGE)
+                 snprintf(value, MAX_STRING_LEN-1, "%s", result.msg);
+        free_result(&result);
+					
+	zabbix_log( LOG_LEVEL_DEBUG, "Sending back:%s", value);
+	i=write(sockfd, value, strlen(value));
 	if(i == -1)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Error writing to socket [%s]",

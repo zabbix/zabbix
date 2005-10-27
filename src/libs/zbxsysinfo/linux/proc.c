@@ -19,43 +19,15 @@
 
 #include "config.h"
 
-#include <errno.h>
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-
-#ifdef HAVE_PWD_H
-#	include <pwd.h>
-#endif
-#ifdef HAVE_DIRENT_H
-	#include <dirent.h>
-#endif
-#ifdef HAVE_STRINGS_H
-	#include <strings.h>
-#endif
-
 #include "common.h"
 #include "sysinfo.h"
 
-/*
-#define FDI(f, m) fprintf(stderr, "DEBUG INFO: " f "\n" , m) // show debug info to stderr
-#define SDI(m) FDI("%s", m) // string info
-#define IDI(i) FDI("%i", i) // integer info
-*/
-
-#define MAX(a, b) ((a)>(b) ? (a) : (b))
-#define MIN(a, b) ((a)<(b) ? (a) : (b))
-				    
 #define DO_SUM 0
 #define DO_MAX 1
 #define DO_MIN 2
 #define DO_AVG 3
 				    
-int     PROC_MEMORY(const char *cmd, const char *param, double  *value, const char *msg, int mlen_max)
+int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #if defined(HAVE_PROC_1_STATUS)
 
@@ -85,6 +57,10 @@ int     PROC_MEMORY(const char *cmd, const char *param, double  *value, const ch
     double	memsize = -1;
     int	proccount = 0;
 
+        assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+	
         if(num_param(param) > 3)
         {
                 return SYSINFO_RET_FAIL;
@@ -295,14 +271,15 @@ int     PROC_MEMORY(const char *cmd, const char *param, double  *value, const ch
         memsize /= (double)proccount;
     }
     
-    *value = memsize;
+    result->type |= AR_DOUBLE;
+    result->dbl = memsize;
     return SYSINFO_RET_OK;
 #else
 	return	SYSINFO_RET_FAIL;
 #endif
 }
 
-int	    PROC_NUM(const char *cmd, const char *param, double *value, const char *msg, int mlen_max)
+int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #if defined(HAVE_PROC_1_STATUS)
 
@@ -328,6 +305,10 @@ int	    PROC_NUM(const char *cmd, const char *param, double *value, const char *
 
     FILE    *f;
 
+        assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+	
         int	proccount = 0;
     
         if(num_param(param) > 3)
@@ -503,7 +484,8 @@ int	    PROC_NUM(const char *cmd, const char *param, double *value, const char *
     }
     closedir(dir);
 
-    *value = (double) proccount;
+    result->type |= AR_DOUBLE;
+    result->dbl = (double) proccount;
     return SYSINFO_RET_OK;
 #else
     return	SYSINFO_RET_FAIL;
