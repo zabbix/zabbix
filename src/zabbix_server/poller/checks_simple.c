@@ -19,15 +19,15 @@
 
 #include "checks_simple.h"
 
-int	get_value_simple(double *result,char *result_str,DB_ITEM *item,char *error, int max_error_len)
+int	get_value_simple(double *result_dbl, char *result_str,DB_ITEM *item, char *error, int max_error_len)
 {
-	char	*e,*t;
+	char	*t;
 	char	c[MAX_STRING_LEN];
 	char	s[MAX_STRING_LEN];
 	char	param[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 	char	*l,*r;
-
+	AGENT_RESULT 	result;
 	/* Assumption: host name does not contain '_perf'	*/
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_simple([%s]", item->key);
@@ -102,7 +102,16 @@ int	get_value_simple(double *result,char *result_str,DB_ITEM *item,char *error, 
 		}
 	}
 
-	process(c,result_str,0);
+
+	process(c, 0, &result);
+        if(result.type & AR_DOUBLE)
+                 snprintf(result_str, MAX_STRING_LEN-1, "%lf", result.dbl);
+        else if(result.type & AR_STRING)
+                 snprintf(result_str, MAX_STRING_LEN-1, "%s", result.str);
+        else if(result.type & AR_MESSAGE)
+                 snprintf(result_str, MAX_STRING_LEN-1, "%s", result.msg);
+        free_result(&result);
+	
 
 	if(strcmp(result_str,"ZBX_NOTSUPPORTED\n") == 0)
 	{
@@ -112,9 +121,9 @@ int	get_value_simple(double *result,char *result_str,DB_ITEM *item,char *error, 
 	}
 	else
 	{
-		*result=strtod(result_str,&e);
+		*result_dbl = result.dbl;
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "SIMPLE [%s] [%s] [%f] RET [%d]", c, result_str, *result, ret);
+	zabbix_log( LOG_LEVEL_DEBUG, "SIMPLE [%s] [%s] [%f] RET [%d]", c, result_str, *result_dbl, ret);
 	return ret;
 }

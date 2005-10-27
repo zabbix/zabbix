@@ -25,8 +25,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef HAVE_ASSERT_H
+#	include <assert.h>
+#endif
+
 #ifdef HAVE_ARPA_INET_H
 #	include <arpa/inet.h>
+#endif
+
+#ifdef HAVE_ARPA_NAMESER_H
+#	include <arpa/nameser.h>
 #endif
 
 #ifdef HAVE_CTYPE_H
@@ -121,6 +129,10 @@
 
 #ifdef HAVE_SYS_PSTAT_H
 #	include <sys/pstat.h>
+#endif
+
+#ifdef HAVE_RESOLV_H
+#	include <resolv.h>
 #endif
 
 #ifdef HAVE_SYS_SOCKET_H

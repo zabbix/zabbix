@@ -19,54 +19,58 @@
 
 #include "config.h"
 
-#include <errno.h>
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-
-/* Linux */
-#ifdef HAVE_SYS_VFS_H
-	#include <sys/vfs.h>
-#endif
-/* Solaris */
-#ifdef HAVE_SYS_STATVFS_H
-	#include <sys/statvfs.h>
-#endif
-
-/* FreeBSD/MacOS/OpenBSD/Solaris */
-#ifdef HAVE_SYS_PARAM_H
-        #include <sys/param.h>
-#endif
-
-#ifdef HAVE_SYS_MOUNT_H
-        #include <sys/mount.h>
-#endif
-
 #include "common.h"
 #include "sysinfo.h"
 
 #include "md5.h"
 
-int	VFS_FS_INODE_FREE(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
+int	VFS_FS_INODE_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
+	char 	mountPoint[MAX_STRING_LEN];
+	
+	assert(result);
+
+	memset(result, 0, sizeof(AGENT_RESULT));
+
+        if(num_param(param) > 1)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }	
 
 	if ( statvfs( (char *)mountPoint, &s) != 0 )
 	{
 		return  SYSINFO_RET_FAIL;
 	}
 
-	*value=s.f_favail;
+	result->type |= AR_DOUBLE;
+	result->dbl = (double)s.f_favail;
 	return SYSINFO_RET_OK;
 #else
 	struct statfs   s;
 	long            blocks_used;
 	long            blocks_percent_used;
+	char 	mountPoint[MAX_STRING_LEN];
+	
+	assert(result);
+
+	memset(result, 0, sizeof(AGENT_RESULT));
+
+        if(num_param(param) > 1)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }	
 
 	if ( statfs( (char *)mountPoint, &s) != 0 ) 
 	{
@@ -86,7 +90,8 @@ int	VFS_FS_INODE_FREE(const char *cmd, const char *mountPoint,double  *value, co
 		,blocks_percent_used
 		,mountPoint);
 */
-		*value=s.f_ffree;
+		result->type |= AR_DOUBLE;
+		result->dbl = (double)(s.f_ffree);
 		return SYSINFO_RET_OK;
 
 	}
@@ -94,22 +99,54 @@ int	VFS_FS_INODE_FREE(const char *cmd, const char *mountPoint,double  *value, co
 #endif
 }
 
-int	VFS_FS_INODE_TOTAL(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
+int	VFS_FS_INODE_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
+	char 	mountPoint[MAX_STRING_LEN];
+	
+	assert(result);
+
+	memset(result, 0, sizeof(AGENT_RESULT));
+
+        if(num_param(param) > 1)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }	
 
 	if ( statvfs( (char *)mountPoint, &s) != 0 )
 	{
 		return  SYSINFO_RET_FAIL;
 	}
 
-	*value=s.f_files;
+	s.f_files;
+	result->type |= AR_DOUBLE;
+	result->dbl = (double)(s.f_files);
 	return SYSINFO_RET_OK;
 #else
 	struct statfs   s;
 	long            blocks_used;
 	long            blocks_percent_used;
+	char 	mountPoint[MAX_STRING_LEN];
+	
+	assert(result);
+
+	memset(result, 0, sizeof(AGENT_RESULT));
+
+        if(num_param(param) > 1)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }	
 
 	if ( statfs( (char *)mountPoint, &s) != 0 ) 
 	{
@@ -129,7 +166,8 @@ int	VFS_FS_INODE_TOTAL(const char *cmd, const char *mountPoint,double  *value, c
 		,blocks_percent_used
 		,mountPoint);
 */
-		*value=s.f_files;
+		result->type |= AR_DOUBLE;
+		result->dbl = (double)(s.f_files);
 		return SYSINFO_RET_OK;
 
 	}
@@ -137,26 +175,45 @@ int	VFS_FS_INODE_TOTAL(const char *cmd, const char *mountPoint,double  *value, c
 #endif
 }
 
-int	VFS_FS_INODE_PFREE(const char *cmd, const char *mountPoint,double  *value, const char *msg, int mlen_max)
+int	VFS_FS_INODE_PFREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	double	total;
-	double	free;
+	AGENT_RESULT	total_result;
+	AGENT_RESULT	free_result;
+	char 	mountPoint[MAX_STRING_LEN];
+	
+	assert(result);
 
-	if(SYSINFO_RET_OK != VFS_FS_INODE_TOTAL(cmd, mountPoint, &total, msg, mlen_max))
+	memset(result, 0, sizeof(AGENT_RESULT));
+
+        if(num_param(param) > 1)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }	
+
+	if(SYSINFO_RET_OK != VFS_FS_INODE_TOTAL(cmd, mountPoint, flags, &total_result))
 	{
+		memcpy(result, &total_result, sizeof(AGENT_RESULT));
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(SYSINFO_RET_OK != VFS_FS_INODE_FREE(cmd, mountPoint, &free, msg, mlen_max))
+	if(SYSINFO_RET_OK != VFS_FS_INODE_FREE(cmd, mountPoint, flags, &free_result))
 	{
+		memcpy(result, &free_result, sizeof(AGENT_RESULT));
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(total == 0)
+	if(total_result.dbl == 0)
 	{
 		return SYSINFO_RET_FAIL;
 	}
-
-	*value = 100*free/total;
+	
+	result->type |= AR_DOUBLE;
+	result->dbl = 100.0 * free_result.dbl / total_result.dbl;
 	return SYSINFO_RET_OK;
 }
+

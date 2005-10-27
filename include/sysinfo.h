@@ -30,17 +30,34 @@
 #define ZBX_METRIC struct zbx_metric_type
 ZBX_METRIC
 {
-	char	*key;
-	int	(*function)();
-        int	(*function_str)();
-	char	*parameter;
+	char		*key;
+	unsigned	flags;
+	int		(*function)();
+	char		*main_param;
+	char		*test_param;
 };
 
-int	process(char *command, char *value, int test);
+/* flags for command */
+#define CF_USEUPARAM	1	/* use user param */
+
+/* flags for process */
+
+#define PF_TEST	1
+
+int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
 void	init_metrics();
 
 void    add_user_parameter(char *key,char *command);
 void	test_parameters(void);
-int	getPROC(char *file,int lineno,int fieldno, double *value, const char *msg, int mlen_max);
+
+int     check_ntp(char *host, int port, int *value_int);
+
+int     get_stat(const char *key, unsigned flags, AGENT_RESULT *result);
+
+#ifdef  HAVE_PROC
+int     getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *result);
+#endif
+
+char	*zbx_regexp_match(const char *string, char *pattern, int *len);
 
 #endif

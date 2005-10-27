@@ -18,104 +18,171 @@
 **/
 
 #include "config.h"
-
-#include <errno.h>
-#include <string.h>
-
-/* stat() */
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-
-/* FILE */
-#include <stdio.h>
-
-#include <stdlib.h>
-
 #include "common.h"
 #include "sysinfo.h"
 
-#define MAX_FILE_LEN 1024*1024
+#define MAX_FILE_LEN (1024*1024)
 
-int	VFS_FILE_SIZE(const char *cmd, const char *filename,double  *value, const char *msg, int mlen_max)
+int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct stat	buf;
+	char	filename[MAX_STRING_LEN];
 
+        assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+
+        if(num_param(param) > 1)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+	
 	if(stat(filename,&buf) == 0)
 	{
-		*value=(double)buf.st_size;
+		result->type |= AR_DOUBLE;
+		result->dbl = (double)buf.st_size;
 		return SYSINFO_RET_OK;
 	}
 	return	SYSINFO_RET_FAIL;
 }
 
-int	VFS_FILE_ATIME(const char *cmd, const char *filename,double  *value, const char *msg, int mlen_max)
+int	VFS_FILE_ATIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct stat	buf;
+	char    filename[MAX_STRING_LEN];
 
+        assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+
+        if(num_param(param) > 1)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+	
 	if(stat(filename,&buf) == 0)
 	{
-		*value=(double)buf.st_atime;
+		result->type |= AR_DOUBLE;
+		result->dbl = (double)buf.st_atime;
 		return SYSINFO_RET_OK;
 	}
 	return	SYSINFO_RET_FAIL;
 }
 
-int	VFS_FILE_CTIME(const char *cmd, const char *filename,double  *value, const char *msg, int mlen_max)
+int	VFS_FILE_CTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct stat	buf;
+	char    filename[MAX_STRING_LEN];
+
+        assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+
+        if(num_param(param) > 1)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }
 
 	if(stat(filename,&buf) == 0)
 	{
-		*value=(double)buf.st_ctime;
+		result->type |= AR_DOUBLE;
+		result->dbl = (double)buf.st_ctime;
 		return SYSINFO_RET_OK;
 	}
 	return	SYSINFO_RET_FAIL;
 }
 
-int	VFS_FILE_MTIME(const char *cmd, const char *filename,double  *value, const char *msg, int mlen_max)
+int	VFS_FILE_MTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct stat	buf;
+	char    filename[MAX_STRING_LEN];
 
+        assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+
+        if(num_param(param) > 1)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+	
 	if(stat(filename,&buf) == 0)
 	{
-		*value=(double)buf.st_mtime;
+		result->type |= AR_DOUBLE;
+		result->dbl = (double)buf.st_mtime;
 		return SYSINFO_RET_OK;
 	}
 	return	SYSINFO_RET_FAIL;
 }
 
-int	VFS_FILE_EXISTS(const char *cmd, const char *filename,double  *value, const char *msg, int mlen_max)
+int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct stat	buf;
+	char    filename[MAX_STRING_LEN];
 
-	*value=(double)0;
+        assert(result);
 
+        memset(result, 0, sizeof(AGENT_RESULT));
+
+        if(num_param(param) > 1)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+	result->type |= AR_DOUBLE;
 	/* File exists */
 	if(stat(filename,&buf) == 0)
 	{
 		/* Regular file */
 		if(S_ISREG(buf.st_mode))
 		{
-			*value=(double)1;
+			result->dbl = (double)1;
 		}
 	}
 	/* File does not exist or any other error */
 	return SYSINFO_RET_OK;
 }
 
-int	VFS_FILE_REGEXP(const char *cmd, const char *param, char **value, const char *msg, int mlen_max)
+int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	filename[MAX_STRING_LEN];
 	char	regexp[MAX_STRING_LEN];
 	FILE	*f = NULL;
-	char	*buf = NULL;
 	int	len;
 	char	tmp[MAX_STRING_LEN];
 	char	*c;
 
 	int	ret = SYSINFO_RET_OK;
+	char	*buf = NULL;
 
+        assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
 	memset(tmp,0,MAX_STRING_LEN);
 
 	if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
@@ -137,17 +204,16 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, char **value, const char
 			ret = SYSINFO_RET_FAIL;
 		}
 	}
-
 	if(ret == SYSINFO_RET_OK)
 	{
-		buf=(char *)malloc((size_t)MAX_FILE_LEN);
+		buf = (char*)malloc((size_t)MAX_FILE_LEN);
 		if(buf == NULL)
 		{
 			ret = SYSINFO_RET_FAIL;
 		}
 		else
 		{
-			memset(buf,0,MAX_FILE_LEN);
+			memset(buf,0,(size_t)MAX_FILE_LEN);
 		}
 	}
 
@@ -178,7 +244,8 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, char **value, const char
 			strncpy(tmp,c,len);
 		}
 
-		*value = strdup(tmp);
+		result->type |= AR_STRING;
+		result->str = strdup(tmp);
 	}
 
 	if(buf != NULL)
@@ -189,13 +256,17 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, char **value, const char
 	return	ret;
 }
 
-int	VFS_FILE_REGMATCH(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
+int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	filename[MAX_STRING_LEN];
 	char	regexp[MAX_STRING_LEN];
 
 	int	ret = SYSINFO_RET_OK;
 
+        assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+	
 	if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
 	{
 		ret = SYSINFO_RET_FAIL;
