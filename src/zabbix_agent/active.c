@@ -426,6 +426,8 @@ int	process_active_checks(char *server, int port)
 	char	c[MAX_STRING_LEN];
 	char	*filename;
 
+	AGENT_RESULT	result;
+
 	now=time(NULL);
 
 	for(i=0;;i++)
@@ -467,7 +469,15 @@ int	process_active_checks(char *server, int port)
 		else
 		{
 			lastlogsize[0]=0;
-			process(metrics[i].key, value, 0);
+			
+			process(metrics[i].key, 0, &result);
+			if(result.type & AR_DOUBLE)
+				 snprintf(value, MAX_STRING_LEN-1, "%f", result.dbl);
+			else if(result.type & AR_STRING)
+                                 snprintf(value, MAX_STRING_LEN-1, "%s", result.str);
+			else if(result.type & AR_MESSAGE)
+                                 snprintf(value, MAX_STRING_LEN-1, "%s", result.msg);
+			free_result(&result);
 
 /*			snprintf(shortname, MAX_STRING_LEN-1,"%s:%s",CONFIG_HOSTNAME,metrics[i].key);
 			zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname); */

@@ -19,25 +19,6 @@
 
 #include "config.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-
-#include <unistd.h>
-#include <signal.h>
-
-#include <errno.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-
-/* For bcopy */
-#include <string.h>
-
-/* For config file operations */
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
 #include "common.h"
 #include "cfg.h"
 #include "log.h"
@@ -95,6 +76,7 @@ int	main()
 {
 	char	s[MAX_STRING_LEN];
 	char	value[MAX_STRING_LEN];
+	AGENT_RESULT	result;
 
 #ifdef	TEST_PARAMETERS
 	init_metrics();
@@ -123,8 +105,16 @@ int	main()
 	}
 
 	fgets(s,MAX_STRING_LEN,stdin);
-	process(s,value,0);
-
+	
+	process(s, 0, &result);
+	if(result.type & AR_DOUBLE)
+		snprintf(value, MAX_STRING_LEN-1, "%f", result.dbl);
+	else if(result.type & AR_STRING)
+		snprintf(value, MAX_STRING_LEN-1, "%s", result.str);
+	else if(result.type & AR_MESSAGE)
+		snprintf(value, MAX_STRING_LEN-1, "%s", result.msg);
+	free_result(&result);
+  
 	printf("%s\n",value);
 
 	fflush(stdout);
@@ -133,3 +123,4 @@ int	main()
 
 	return SUCCEED;
 }
+

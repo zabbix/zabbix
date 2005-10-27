@@ -20,6 +20,8 @@
 #ifndef ZABBIX_COMMON_H
 #define ZABBIX_COMMON_H
 
+#include "sysinc.h"
+
 #define	ZABBIX_VERSION	"1.1beta2"
  
 #define	SUCCEED		0
@@ -30,6 +32,12 @@
 #define	AGENT_ERROR	(-5)
 
 #define	MAXFD	64
+
+/* show debug info to stderr */
+#define FDI(f, m) fprintf(stderr, "DEBUG INFO: " f "\n" , m)
+#define SDI(m) FDI("%s", m)
+#define IDI(i) FDI("%i", i)
+
 
 /*
 #define ZBX_POLLER
@@ -169,19 +177,59 @@
 #define	TRAPPER_TIMEOUT		5
 #define	SNMPTRAPPER_TIMEOUT	5
 
+#ifndef MAX
+#	define MAX(a, b) ((a)>(b) ? (a) : (b))
+#endif
+
+#ifndef MIN					   
+#	define MIN(a, b) ((a)<(b) ? (a) : (b))
+#endif
+				    
 /* Secure string copy */
 #define strscpy(x,y) { strncpy(x,y,sizeof(x)); x[sizeof(x)-1]=0; }
+
+/* list structure as item of agent return vaile */					 
+#define LIST_ITEM struct list_item_s
+LIST_ITEM {
+	char name[MAX_STRING_LEN];
+};	
+
+#define LIST struct list_s
+LIST {
+	int 		cnt;
+	LIST_ITEM 	*item;
+};	
+					   
+/* agent return value */					 
+#define AGENT_RESULT struct result_s
+AGENT_RESULT {
+	int 	type;
+	double 	dbl;
+	char 	*str;
+	char 	*msg;
+	LIST 	list;
+};
+
+/* agent result types */
+#define AR_DOUBLE   1
+#define AR_STRING   2
+#define AR_MESSAGE  4
+#define AR_LIST     8
+
+
+void   	free_result(AGENT_RESULT *result);
 
 char	*string_replace(char *str, const char *sub_str1, const char *sub_str2);
 void	del_zeroes(char *s);
 int	get_param(const char *param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
-int     get_stat(const char *key, double *value, const char *msg, int mlen_max);
 
 int	xml_get_data(char *xml,char *tag, char *data, int maxlen);
 int	comms_create_request(char *host, char *key, char *data, char *lastlogsize, char *request,int maxlen);
 int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastlogsize, char *timestamp,
 		               char *source, char *severity, int maxlen);
+
+int 	parse_command(const char *command, char *cmd, int cmd_max_len, char *param, int param_max_len);
 
 /* Base64 functions */
 void	str_base64_encode(char *p_str, char *p_b64str, int in_size);
