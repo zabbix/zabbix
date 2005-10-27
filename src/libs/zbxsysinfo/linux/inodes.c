@@ -124,7 +124,6 @@ int	VFS_FS_INODE_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT
 		return  SYSINFO_RET_FAIL;
 	}
 
-	s.f_files;
 	result->type |= AR_DOUBLE;
 	result->dbl = (double)(s.f_files);
 	return SYSINFO_RET_OK;

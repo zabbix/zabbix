@@ -28,9 +28,15 @@
 ZBX_METRIC *commands=NULL;
 extern ZBX_METRIC parameters_specific[];
 
-void	forward_request(char *proxy,char *command,int port,char *value, const char *msg, int mlen_max);
+int	forward_request(char *proxy, char *command, int port, unsigned flags, AGENT_RESULT *result);
 int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+
+int     SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int     SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int     SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+
+int     SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 ZBX_METRIC	parameters_common[]=
 /*      KEY                     FLAG    FUNCTION        ADD_PARAM       TEST_PARAM */
@@ -39,7 +45,7 @@ ZBX_METRIC	parameters_common[]=
 	{0}
 	};
 
-void	add_metric(COMMAND *new)
+void	add_metric(ZBX_METRIC *new)
 {
 
 	int i;
