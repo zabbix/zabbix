@@ -58,6 +58,4 @@ int     get_stat(const char *key, unsigned flags, AGENT_RESULT *result);
 int     getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *result);
 #endif
 
-char	*zbx_regexp_match(const char *string, char *pattern, int *len);
-
 #endif
