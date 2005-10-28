@@ -22,6 +22,158 @@
 #include "common.h"
 #include "sysinfo.h"
 
+int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+
+#define DEV_FNCLIST struct dev_fnclist_s
+DEV_FNCLIST
+{
+	char *type;
+	char *mode;
+	int (*function)();
+};
+
+	DEV_FNCLIST fl[] = 
+	{
+		{"ops",	"avg1" ,	DISKWRITEOPS1},
+		{"ops",	"avg5" ,	DISKWRITEOPS5},
+		{"ops",	"avg15",	DISKWRITEOPS15},
+		{"bps",	"avg1" ,	DISKWRITEBLKS1},
+		{"bps",	"avg5" ,	DISKWRITEBLKS5},
+		{"bps",	"avg15",	DISKWRITEBLKS15},
+		{0,	0,		0}
+	};
+
+	char devname[MAX_STRING_LEN];
+	char type[MAX_STRING_LEN];
+	char mode[MAX_STRING_LEN];
+	int i;
+	
+        assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+	
+        if(num_param(param) > 3)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, devname, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+	
+	if(get_param(param, 2, type, MAX_STRING_LEN) != 0)
+        {
+                type[0] = '\0';
+        }
+        if(type[0] == '\0')
+	{
+		/* default parameter */
+		sprintf(type, "bps");
+	}
+	
+	if(get_param(param, 3, mode, MAX_STRING_LEN) != 0)
+        {
+                mode[0] = '\0';
+        }
+	
+        if(mode[0] == '\0')
+	{
+		/* default parameter */
+		sprintf(mode, "avg1");
+	}
+	
+	for(i=0; fl[i].type!=0; i++)
+	{
+		if(strncmp(type, fl[i].type, MAX_STRING_LEN)==0)
+		{
+			if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
+			{
+				return (fl[i].function)(cmd, devname, flags, result);
+			}
+		}
+	}
+	
+	return SYSINFO_RET_FAIL;
+}
+
+int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+
+#define DEV_FNCLIST struct dev_fnclist_s
+DEV_FNCLIST
+{
+	char *type;
+	char *mode;
+	int (*function)();
+};
+
+	DEV_FNCLIST fl[] = 
+	{
+		{"ops",	"avg1" ,	DISKREADOPS1},
+		{"ops",	"avg5" ,	DISKREADOPS5},
+		{"ops",	"avg15",	DISKREADOPS15},
+		{"bps",	"avg1" ,	DISKREADBLKS1},
+		{"bps",	"avg5" ,	DISKREADBLKS5},
+		{"bps",	"avg15",	DISKREADBLKS15},
+		{0,	0,		0}
+	};
+
+	char devname[MAX_STRING_LEN];
+	char type[MAX_STRING_LEN];
+	char mode[MAX_STRING_LEN];
+	int i;
+	
+        assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+	
+        if(num_param(param) > 3)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, devname, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+	
+	if(get_param(param, 2, type, MAX_STRING_LEN) != 0)
+        {
+                type[0] = '\0';
+        }
+        if(type[0] == '\0')
+	{
+		/* default parameter */
+		sprintf(type, "bps");
+	}
+	
+	if(get_param(param, 3, mode, MAX_STRING_LEN) != 0)
+        {
+                mode[0] = '\0';
+        }
+	
+        if(mode[0] == '\0')
+	{
+		/* default parameter */
+		sprintf(mode, "avg1");
+	}
+	
+	for(i=0; fl[i].type!=0; i++)
+	{
+		if(strncmp(type, fl[i].type, MAX_STRING_LEN)==0)
+		{
+			if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
+			{
+				return (fl[i].function)(cmd, devname, flags, result);
+			}
+		}
+	}
+	
+	return SYSINFO_RET_FAIL;
+}
+
 int	DISKREADOPS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	key[MAX_STRING_LEN];
