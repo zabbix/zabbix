@@ -59,7 +59,7 @@
 			$result=DBselect($sql);
 			while($row=DBfetch($result))
 			{
-				$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message,scope,severity,recipientmaxrepeats,repeatdelay) values (".$row["hostid"].",$id,$good,$delay,0,'*Automatically generated*','*Automatically generated*',$scope,$severity,$recipient,$maxrepeats,$repeatdelay)";
+				$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message,scope,severity,recipient,maxrepeats,repeatdelay) values (".$row["hostid"].",$id,$good,$delay,0,'*Automatically generated*','*Automatically generated*',$scope,$severity,$recipient,$maxrepeats,$repeatdelay)";
 //				echo "$sql<br>";
 				DBexecute($sql);
 			}
