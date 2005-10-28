@@ -1,6 +1,7 @@
 Changes for 1.1beta3:
 
- - developed new interface for test functions. Result returns with srtuct.(Eugene)
+ - grouped commands in to the new command with parameters for linux (Eugene)
+ - developed new interface for test functions. Result returns with srtuct (Eugene)
  - recreated process() function. (Eugene)
  - fixed several warnings when compiling with -Wall flag (Alexei)
  - added new item parameter: message (Eugene)
