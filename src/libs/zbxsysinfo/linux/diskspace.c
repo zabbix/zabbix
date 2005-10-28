@@ -22,6 +22,65 @@
 #include "common.h"
 #include "sysinfo.h"
 
+int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+
+#define FS_FNCLIST struct fs_fnclist_s
+FS_FNCLIST
+{
+	char *mode;
+	int (*function)();
+};
+
+	FS_FNCLIST fl[] = 
+	{
+		{"free" ,	VFS_FS_FREE},
+		{"total" ,	VFS_FS_TOTAL},
+		{"used",	VFS_FS_USED},
+		{"pfree" ,	VFS_FS_PFREE},
+		{"pused" ,	VFS_FS_PUSED},
+		{0,		0}
+	};
+
+	char fsname[MAX_STRING_LEN];
+	char mode[MAX_STRING_LEN];
+	int i;
+	
+        assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+	
+        if(num_param(param) > 2)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, fsname, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+	
+	if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
+        {
+                mode[0] = '\0';
+        }
+        if(mode[0] == '\0')
+	{
+		/* default parameter */
+		sprintf(mode, "total");
+	}
+	
+	for(i=0; fl[i].mode!=0; i++)
+	{
+		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
+		{
+			return (fl[i].function)(cmd, fsname, flags, result);
+		}
+	}
+	
+	return SYSINFO_RET_FAIL;
+}
+
 int	VFS_FS_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_SYS_STATVFS_H

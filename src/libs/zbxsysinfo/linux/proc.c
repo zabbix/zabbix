@@ -82,17 +82,22 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
                     usrinfo = getpwnam(usrname);
                     if(usrinfo == NULL)
                     {
-                /* incorrect user name */
+	                /* incorrect user name */
                             return SYSINFO_RET_FAIL;
-            }			        
+	            }			        
         }
     }
 
     if(get_param(param, 3, mode, MAX_STRING_LEN) != 0)
     {
-        strscpy(mode, "sum");
+       mode[0] = '\0';
     }
 
+    if(mode[0] == '\0')
+    {
+        strscpy(mode, "sum");
+    }
+    
     if(strcmp(mode,"avg") == 0)
     {
         do_task = DO_AVG;
@@ -338,10 +343,15 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
             }
         }
     
-        if(get_param(param, 3, procstat, MAX_STRING_LEN) != 0)
-        {
-            strscpy(procstat,"all");
-        }
+	if(get_param(param, 3, procstat, MAX_STRING_LEN) != 0)
+	{
+		procstat[0] = '\0';
+	}
+
+	if(procstat[0] == '\0')
+	{
+		strscpy(procstat, "all");
+	}
     
         if(strcmp(procstat,"run") == 0)
         {
