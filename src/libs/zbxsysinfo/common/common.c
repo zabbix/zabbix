@@ -1879,7 +1879,7 @@ int	CHECK_DNS(const char *cmd, const char *ip_and_zone, unsigned flags, AGENT_RE
 	return SYSINFO_RET_OK;
 }
 
-int     SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int     SYSTEM_UNUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
         assert(result);
 
@@ -1897,7 +1897,7 @@ int     SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_R
         return EXECUTE_STR(cmd, "uname -a", flags, result);
 }
 
-int     SYSTEM_UNUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int     SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
         assert(result);
 

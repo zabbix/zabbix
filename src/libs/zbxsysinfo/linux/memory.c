@@ -22,6 +22,59 @@
 #include "common.h"
 #include "sysinfo.h"
 
+int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+#define MEM_FNCLIST struct mem_fnclist_s
+MEM_FNCLIST
+{
+	char *mode;
+	int (*function)();
+};
+
+	MEM_FNCLIST fl[] = 
+	{
+		{"free",	DISKWRITEOPS1},
+		{"shared",	DISKWRITEOPS5},
+		{"total",	DISKWRITEOPS15},
+		{"buffers",	DISKWRITEBLKS1},
+		{"cached",	DISKWRITEBLKS5},
+		{"free",	DISKWRITEBLKS15},
+		{0,	0}
+	};
+        char    mode[MAX_STRING_LEN];
+	int i;
+
+        assert(result);
+
+        memset(result, 0, sizeof(AGENT_RESULT));
+
+        if(num_param(param) > 1)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, mode, MAX_STRING_LEN) != 0)
+        {
+                mode[0] = '\0';
+        }
+
+        if(mode[0] == '\0')
+	{
+		/* default parameter */
+		sprintf(mode, "total");
+	}
+	
+	for(i=0; fl[i].mode!=0; i++)
+	{
+		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
+		{
+			return (fl[i].function)(cmd, param, flags, result);
+		}
+	}
+	
+	return SYSINFO_RET_FAIL;
+}
+
 int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_PROC
@@ -400,52 +453,5 @@ int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RES
 #endif
 #endif
 #endif
-}
-
-int     OLD_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-        char    key[MAX_STRING_LEN];
-        int     ret;
-
-        assert(result);
-
-        memset(result, 0, sizeof(AGENT_RESULT));
-
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-
-        if(get_param(param, 1, key, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-
-        if(strcmp(key,"buffers") == 0)
-        {
-                ret = VM_MEMORY_BUFFERS(cmd, param, flags, result);
-        }
-        else if(strcmp(key,"cached") == 0)
-        {
-                ret = VM_MEMORY_CACHED(cmd, param, flags, result);
-        }
-        else if(strcmp(key,"free") == 0)
-        {
-                ret = VM_MEMORY_FREE(cmd, param, flags, result);
-        }
-        else if(strcmp(key,"shared") == 0)
-        {
-                ret = VM_MEMORY_SHARED(cmd, param, flags, result);
-        }
-        else if(strcmp(key,"total") == 0)
-        {
-                ret = VM_MEMORY_TOTAL(cmd, param, flags, result);
-        }
-        else
-        {
-                ret = SYSINFO_RET_FAIL;
-        }
-
-        return ret;
 }
 
