@@ -30,7 +30,7 @@ int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 
         if(num_param(param) > 1)
         {
@@ -58,7 +58,7 @@ int	VFS_FILE_ATIME(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 
         if(num_param(param) > 1)
         {
@@ -86,7 +86,7 @@ int	VFS_FILE_CTIME(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 
         if(num_param(param) > 1)
         {
@@ -114,7 +114,7 @@ int	VFS_FILE_MTIME(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 
         if(num_param(param) > 1)
         {
@@ -142,7 +142,7 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 
         if(num_param(param) > 1)
         {
@@ -182,7 +182,7 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 	memset(tmp,0,MAX_STRING_LEN);
 
 	if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
@@ -265,7 +265,7 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 	
 	if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
 	{

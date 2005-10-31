@@ -28,7 +28,7 @@ int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 	
 	result->type |= AR_DOUBLE;
 	result->dbl = (double)time(NULL);

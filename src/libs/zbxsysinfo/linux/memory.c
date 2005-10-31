@@ -46,7 +46,7 @@ MEM_FNCLIST
 
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 
         if(num_param(param) > 1)
         {
@@ -89,7 +89,7 @@ int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	f=fopen("/proc/meminfo","r");
 	if(NULL == f)
@@ -114,7 +114,7 @@ int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, AGENT_R
 #else
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	return SYSINFO_RET_FAIL;
 #endif
@@ -127,7 +127,7 @@ int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	if( 0 == sysinfo(&info))
 	{
@@ -146,7 +146,7 @@ int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags, AGENT_
 #else
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	return	SYSINFO_RET_FAIL;
 #endif
@@ -159,7 +159,7 @@ int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	if( 0 == sysinfo(&info))
 	{
@@ -182,7 +182,7 @@ int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	len=sizeof(struct vmtotal);
 	mib[0]=CTL_VM;
@@ -205,7 +205,7 @@ int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 #ifdef HAVE_UNISTD_SYSCONF
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	result->type |= AR_DOUBLE;	
 	result->dbl=(double)sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGESIZE);
@@ -217,7 +217,7 @@ int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	if(pstat_getstatic(&pst, sizeof(pst), (size_t)1, 0) == -1)
 	{
@@ -238,7 +238,7 @@ int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	if( 0 == sysinfo(&info))
 	{
@@ -261,7 +261,7 @@ int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	len=sizeof(struct vmtotal);
 	mib[0]=CTL_VM;
@@ -281,7 +281,7 @@ int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	len=sizeof(memory);
 
@@ -299,7 +299,7 @@ int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 #else
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	return	SYSINFO_RET_FAIL;
 #endif
@@ -315,7 +315,7 @@ int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RES
 #ifdef HAVE_UNISTD_SYSCONF
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	result->type |= AR_DOUBLE;	
 	result->dbl=(double)sysconf(_SC_AVPHYS_PAGES)*sysconf(_SC_PAGESIZE);
@@ -328,7 +328,7 @@ int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	if(pstat_getstatic(&pst, sizeof(pst), (size_t)1, 0) == -1)
 	{
@@ -369,7 +369,7 @@ int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	if( 0 == sysinfo(&info))
 	{
@@ -392,7 +392,7 @@ int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	len=sizeof(struct vmtotal);
 	mib[0]=CTL_VM;
@@ -414,7 +414,7 @@ int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	pagesize = 0;
 	kret = host_page_size (mach_host_self(), &pagesize);
@@ -445,7 +445,7 @@ int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RES
 #else
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	return	SYSINFO_RET_FAIL;
 #endif
