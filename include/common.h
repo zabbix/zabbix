@@ -216,7 +216,10 @@ AGENT_RESULT {
 #define AR_MESSAGE  4
 #define AR_LIST     8
 
-
+int   	copy_list(LIST *src, LIST *dist);
+void 	free_list(LIST *list);
+void   	clean_result(AGENT_RESULT *result);
+int    	copy_result(AGENT_RESULT *src, AGENT_RESULT *dist);
 void   	free_result(AGENT_RESULT *result);
 
 char	*string_replace(char *str, const char *sub_str1, const char *sub_str2);
