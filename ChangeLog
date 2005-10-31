@@ -1,5 +1,6 @@
 Changes for 1.1beta3:
 
+ - optimized sysinfo functions for linux system (Eugene)
  - grouped commands in to the new command with parameters for linux (Eugene)
  - developed new interface for test functions. Result returns with srtuct (Eugene)
  - recreated process() function. (Eugene)

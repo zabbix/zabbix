@@ -50,7 +50,7 @@ FS_FNCLIST
 	
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 	
         if(num_param(param) > 2)
         {
@@ -83,216 +83,162 @@ FS_FNCLIST
 	return SYSINFO_RET_FAIL;
 }
 
-int	VFS_FS_INODE_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	get_fs_inodes_stat(char *fs, double *total, double *free, double *usage)
 {
-	char 	mountPoint[MAX_STRING_LEN];
 #ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
 #else
 	struct statfs   s;
 #endif
 	
-	assert(result);
-
-	memset(result, 0, sizeof(AGENT_RESULT));
-
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-
-        if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }	
-
+	assert(fs);
+	
 #ifdef HAVE_SYS_STATVFS_H
-	if ( statvfs( (char *)mountPoint, &s) != 0 ) 
+	if ( statvfs( fs, &s) != 0 ) 
 #else
-	if ( statfs( (char *)mountPoint, &s) != 0 ) 
+	if ( statfs( fs, &s) != 0 ) 
 #endif
 	{
 		return	SYSINFO_RET_FAIL;
 	}
         
-	if ( s.f_blocks > 0 ) {
-		result->type |= AR_DOUBLE;
+	if(total)
+		(*total) = (double)(s.f_files);
 #ifdef HAVE_SYS_STATVFS_H
-		result->dbl = (double)(s.f_favail);
+	if(free)
+		(*free)  = (double)(s.f_favail);
+	if(usage)
+		(*usage) = (double)(s.f_files - s.f_favail);
 #else
-		result->dbl = (double)(s.f_ffree);
+	if(free)
+		(*free)  = (double)(s.ffree);
+	if(usage)
+		(*usage) = (double)(s.f_files - s.f_ffree);
 #endif
-		return SYSINFO_RET_OK;
-	}
-	return	SYSINFO_RET_FAIL;
+	return SYSINFO_RET_OK;
 }
 
 int	VFS_FS_INODE_USED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char 	mountPoint[MAX_STRING_LEN];
-#ifdef HAVE_SYS_STATVFS_H
-	struct statvfs   s;
-#else
-	struct statfs   s;
-#endif
+	double	value = 0;
 	
 	assert(result);
 
-	memset(result, 0, sizeof(AGENT_RESULT));
+	clean_result(result);
 
         if(num_param(param) > 1)
-        {
                 return SYSINFO_RET_FAIL;
-        }
 
         if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
-        {
                 return SYSINFO_RET_FAIL;
-        }	
 
-#ifdef HAVE_SYS_STATVFS_H
-	if ( statvfs( (char *)mountPoint, &s) != 0 ) 
-#else
-	if ( statfs( (char *)mountPoint, &s) != 0 ) 
-#endif
-	{
-		return	SYSINFO_RET_FAIL;
-	}
-        
-	if ( s.f_blocks > 0 ) {
-		result->type |= AR_DOUBLE;
-#ifdef HAVE_SYS_STATVFS_H
-	struct statvfs   s;
-		result->dbl = (double)(s.f_files - s.f_favail);
-#else
-		result->dbl = (double)(s.f_files - s.f_ffree);
-#endif
-		return SYSINFO_RET_OK;
-	}
-	return	SYSINFO_RET_FAIL;
+	if(get_fs_inodes_stat(mountPoint, NULL, NULL, &value) != SYSINFO_RET_OK)
+		return  SYSINFO_RET_FAIL;
+	
+	result->type |= AR_DOUBLE;
+	result->dbl = value;
+		
+	return SYSINFO_RET_OK;
+}
+
+int	VFS_FS_INODE_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	char 	mountPoint[MAX_STRING_LEN];
+	double	value = 0;
+	
+	assert(result);
+
+	clean_result(result);
+
+        if(num_param(param) > 1)
+                return SYSINFO_RET_FAIL;
+
+        if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
+                return SYSINFO_RET_FAIL;
+
+	if(get_fs_inodes_stat(mountPoint, NULL, &value, NULL) != SYSINFO_RET_OK)
+		return  SYSINFO_RET_FAIL;
+	
+	result->type |= AR_DOUBLE;
+	result->dbl = value;
+		
+	return SYSINFO_RET_OK;
 }
 
 int	VFS_FS_INODE_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char 	mountPoint[MAX_STRING_LEN];
-#ifdef HAVE_SYS_STATVFS_H
-	struct statvfs   s;
-#else
-	struct statfs   s;
-#endif
+	double	value = 0;
 	
 	assert(result);
 
-	memset(result, 0, sizeof(AGENT_RESULT));
+	clean_result(result);
 
         if(num_param(param) > 1)
-        {
                 return SYSINFO_RET_FAIL;
-        }
 
         if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }	
 
-#ifdef HAVE_SYS_STATVFS_H
-	if ( statvfs( (char *)mountPoint, &s) != 0 ) 
-#else
-	if ( statfs( (char *)mountPoint, &s) != 0 ) 
-#endif
-	{
-		return	SYSINFO_RET_FAIL;
-	}
-        
-	if ( s.f_blocks > 0 ) {
-		result->type |= AR_DOUBLE;
-		result->dbl = (double)(s.f_files);
-		return SYSINFO_RET_OK;
-	}
-	return	SYSINFO_RET_FAIL;
+	if(get_fs_inodes_stat(mountPoint, &value, NULL, NULL) != SYSINFO_RET_OK)
+		return  SYSINFO_RET_FAIL;
+	
+	result->type |= AR_DOUBLE;
+	result->dbl = value;
+		
+	return SYSINFO_RET_OK;
 }
 
 int	VFS_FS_INODE_PFREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	AGENT_RESULT	total_result;
-	AGENT_RESULT	free_result;
 	char 	mountPoint[MAX_STRING_LEN];
+	double	tot_val = 0;
+	double	free_val = 0;
 	
 	assert(result);
 
-	memset(result, 0, sizeof(AGENT_RESULT));
+	clean_result(result);
 
         if(num_param(param) > 1)
-        {
                 return SYSINFO_RET_FAIL;
-        }
 
         if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
-        {
                 return SYSINFO_RET_FAIL;
-        }	
 
-	if(SYSINFO_RET_OK != VFS_FS_INODE_TOTAL(cmd, mountPoint, flags, &total_result))
-	{
-		memcpy(result, &total_result, sizeof(AGENT_RESULT));
-		return SYSINFO_RET_FAIL;
-	}
-
-	if(SYSINFO_RET_OK != VFS_FS_INODE_FREE(cmd, mountPoint, flags, &free_result))
-	{
-		memcpy(result, &free_result, sizeof(AGENT_RESULT));
-		return SYSINFO_RET_FAIL;
-	}
-
-	if(total_result.dbl == 0)
-	{
-		return SYSINFO_RET_FAIL;
-	}
+	if(get_fs_inodes_stat(mountPoint, &tot_val, &free_val, NULL) != SYSINFO_RET_OK)
+		return  SYSINFO_RET_FAIL;
 	
 	result->type |= AR_DOUBLE;
-	result->dbl = 100.0 * free_result.dbl / total_result.dbl;
+	result->dbl = (100.0 * free_val) / tot_val;
+		
 	return SYSINFO_RET_OK;
 }
 
 int	VFS_FS_INODE_PUSED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	AGENT_RESULT	total_result;
-	AGENT_RESULT	used_result;
 	char 	mountPoint[MAX_STRING_LEN];
+	double	tot_val = 0;
+	double	usg_val = 0;
 	
 	assert(result);
 
-	memset(result, 0, sizeof(AGENT_RESULT));
+	clean_result(result);
 
         if(num_param(param) > 1)
-        {
                 return SYSINFO_RET_FAIL;
-        }
 
         if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
-        {
                 return SYSINFO_RET_FAIL;
-        }	
 
-	if(SYSINFO_RET_OK != VFS_FS_INODE_TOTAL(cmd, mountPoint, flags, &total_result))
-	{
-		memcpy(result, &total_result, sizeof(AGENT_RESULT));
-		return SYSINFO_RET_FAIL;
-	}
-
-	if(SYSINFO_RET_OK != VFS_FS_INODE_USED(cmd, mountPoint, flags, &used_result))
-	{
-		memcpy(result, &used_result, sizeof(AGENT_RESULT));
-		return SYSINFO_RET_FAIL;
-	}
-
-	if(total_result.dbl == 0)
-	{
-		return SYSINFO_RET_FAIL;
-	}
+	if(get_fs_inodes_stat(mountPoint, &tot_val, NULL, &usg_val) != SYSINFO_RET_OK)
+		return  SYSINFO_RET_FAIL;
 	
 	result->type |= AR_DOUBLE;
-	result->dbl = 100.0 * used_result.dbl / total_result.dbl;
+	result->dbl = (100.0 * usg_val) / tot_val;
+		
 	return SYSINFO_RET_OK;
 }
 

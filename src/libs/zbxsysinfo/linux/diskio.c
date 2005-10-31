@@ -51,7 +51,7 @@ DEV_FNCLIST
 	
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 	
         if(num_param(param) > 3)
         {
@@ -127,7 +127,7 @@ DEV_FNCLIST
 	
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 	
         if(num_param(param) > 3)
         {
@@ -334,7 +334,7 @@ int	OLD_IO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *res
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 
         if(num_param(param) > 1)
         {

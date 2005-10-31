@@ -46,7 +46,7 @@ CPU_FNCLIST
 	
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 	
         if(num_param(param) > 2)
         {
@@ -122,7 +122,7 @@ CPU_FNCLIST
 	
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 	
         if(num_param(param) > 3)
         {
@@ -283,7 +283,7 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	if(getloadavg(load, 3))
 	{
@@ -301,7 +301,7 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 
 	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
 	{
@@ -324,7 +324,7 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 	
 	if (!kc && !(kc = kstat_open()))
 	{
@@ -345,7 +345,7 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	if(getloadavg_kmem(loadavg,3) == FAIL)
 	{
@@ -358,7 +358,7 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 #else
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 	return	SYSINFO_RET_FAIL;
 #endif
 #endif
@@ -374,7 +374,7 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	if(getloadavg(load, 3))
 	{
@@ -392,7 +392,7 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 	
 	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
 	{
@@ -415,7 +415,7 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	if (!kc && !(kc = kstat_open()))
 	{
@@ -436,7 +436,7 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 
 	if(getloadavg_kmem(loadavg,3) == FAIL)
 	{
@@ -449,7 +449,7 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_R
 #else
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 	return	SYSINFO_RET_FAIL;
 #endif
 #endif
@@ -465,7 +465,7 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 
 	if(getloadavg(load, 3))
 	{
@@ -483,7 +483,7 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
 	{
@@ -506,7 +506,7 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	if (!kc && !(kc = kstat_open()))
 	{
@@ -527,7 +527,7 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 	
 	if(getloadavg_kmem(loadavg,3) == FAIL)
 	{
@@ -540,7 +540,7 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 #else
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 	return	SYSINFO_RET_FAIL;
 #endif
 #endif

@@ -89,13 +89,17 @@ void	add_user_parameter(char *key,char *command)
 
 	if(parse_command(key, usr_cmd, MAX_STRING_LEN, usr_param, MAX_STRING_LEN))
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Can't add user specifed key [%s]. Incorrect key!", key);
+		zabbix_log( LOG_LEVEL_WARNING, "Can't add user specifed key \"%s\". Incorrect key!", key);
 		return;
 	}
 	if(strncmp(usr_param, "*", MAX_STRING_LEN) == 0)
+	{
 		flag |= CF_USEUPARAM;
-	else if(usr_param[0] != 0)
-		zabbix_log( LOG_LEVEL_WARNING, "Can't add user specifed key [%s]. Incorrect key!", key);
+	}
+	else if(usr_param[0] != 0){
+		zabbix_log( LOG_LEVEL_WARNING, "Can't add user specifed key \"%s\". Incorrect key!", key);
+		return;
+	}
 		
 	for(i=0;;i++)
 	{
@@ -117,7 +121,8 @@ void	add_user_parameter(char *key,char *command)
 		/* Replace existing parameters */
 		if(strcmp(commands[i].key, key) == 0)
 		{
-			free(commands[i].key);
+			if(commands[i].key)
+				free(commands[i].key);
 			if(commands[i].main_param)	
 				free(commands[i].main_param);
 			if(commands[i].test_param)	
@@ -182,6 +187,40 @@ void    escape_string(char *from, char *to, int maxlen)
 	to[maxlen-1]=0;
 }
 
+void	free_list(LIST *list)
+{
+	/* nothin to do */
+}
+
+int	copy_list(LIST *src, LIST *dist)
+{
+	/* nothin to do */
+	return 0;
+}
+
+int 	copy_result(AGENT_RESULT *src, AGENT_RESULT *dist)
+{
+	assert(src);
+	assert(dist);
+	
+	free_result(dist);
+	dist->type = src->type;
+	dist->dbl = src->dbl;
+	if(src->str)
+	{
+		dist->str = strdup(src->str);
+		if(!dist->str)
+			return 1;
+	}
+	if(src->msg)
+	{
+		dist->msg = strdup(src->msg);
+		if(!dist->msg)
+			return 1;
+	}
+	return copy_list(&(src->list), &(dist->list));
+}
+
 void	free_result(AGENT_RESULT *result)
 {
 
@@ -195,13 +234,14 @@ void	free_result(AGENT_RESULT *result)
 		free(result->msg);
 		result->msg = NULL;
 	}
-	if(result->type & AR_LIST)
-	{
-		/*
-		 *  write code to free memory
-		 *  for result->list 
-		 */
-	}
+	free_list(&(result->list));
+}
+
+void	clean_result(AGENT_RESULT *result)
+{
+	free_result(result);
+	result->type = 0;
+	result->dbl = 0;	
 }
 
 int parse_command(
@@ -253,7 +293,6 @@ void	test_parameters(void)
 	for(i=0; 0 != commands[i].key; i++)
 	{
 		process(commands[i].key, PF_TEST, &result);
-
 		if(result.type & AR_DOUBLE)
 		{
 			printf(" [d|%lf]", result.dbl);
@@ -291,8 +330,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		
 
         assert(result);
-
-        memset(result, 0, sizeof(AGENT_RESULT));	
+        clean_result(result);	
 	
 	strncpy(usr_command, in_command, MAX_STRING_LEN);
 	usr_command_len = strlen(usr_command);
@@ -336,7 +374,6 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 				((flags & PF_TEST) && commands[i].test_param) ? commands[i].test_param : usr_param
 				);
 		}
-
 		err = function(usr_command, param, flags, result);
 
 		if(err == SYSINFO_RET_FAIL)
@@ -351,14 +388,18 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	
 	if(flags & PF_TEST)
 	{
+		printf("%s", usr_cmd);
 		if(commands[i].flags & CF_USEUPARAM)
 		{
-			strncat(usr_command, "[", MAX_STRING_LEN);
-			strncat(usr_command, param, MAX_STRING_LEN);
-			strncat(usr_command, "]", MAX_STRING_LEN);
-		}
+			printf("[%s]", param);
+			i = strlen(param)+2;
+		} else	i = 0;
+		i += strlen(usr_cmd);
 		
-		printf("%-35s", usr_command);
+#define COLUMN_2_X 45
+		i = i > COLUMN_2_X ? 1 : (COLUMN_2_X - i);
+	
+		printf("%-*.*s", i, i, " ");
 	}
 
 	if(err == NOTSUPPORTED)
@@ -401,7 +442,7 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	
 	assert(result);
 	
-	memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);	
 
         if(num_param(param) > 1)
         {
@@ -530,7 +571,7 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	assert(result);
 
-	memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);	
 
 	if(num_param(param) > 1)
         {
@@ -609,7 +650,7 @@ int	get_stat(const char *key, unsigned flags, AGENT_RESULT *result)
 
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);	
 
 	f=fopen("/tmp/zabbix_agentd.tmp","r");
 	if(f==NULL)
@@ -698,7 +739,7 @@ int	TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);	
 
         if(num_param(param) > 1)
         {
@@ -750,7 +791,7 @@ int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *r
         
 	assert(result);
 
-	memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);	
 		
 	f=fopen(file,"r");
 	if(NULL == f)
@@ -786,7 +827,7 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	assert(result);
 
-	memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);	
 
 	len=sizeof(maxfiles);
 
@@ -814,7 +855,7 @@ int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	assert(result);
 
-	memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);	
 	
 	len=sizeof(maxproc);
 
@@ -839,7 +880,7 @@ int     OLD_KERNEL(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
         assert(result);
 
-	memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);	
 
         if(num_param(param) > 1)
         {
@@ -871,7 +912,7 @@ int	AGENT_PING(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 {
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);	
 	
 	result->type |= AR_DOUBLE;
 	result->dbl = 1;
@@ -885,7 +926,7 @@ int	PROCCOUNT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));	
+        clean_result(result);	
 	
 	if( 0 == sysinfo(&info))
 	{
@@ -911,7 +952,7 @@ int	PROCCOUNT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	int	proccount=0;
         assert(result);
 
-	memset(result, 0, sizeof(AGENT_RESULT));
+	clean_result(result);
 		
 	dir=opendir("/proc");
 	if(NULL == dir)
@@ -967,7 +1008,7 @@ int	PROCCOUNT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 
 	dir=opendir("/proc");
 	if(NULL == dir)
@@ -1015,7 +1056,7 @@ int	AGENT_VERSION(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 	assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 		
 	result->type |= AR_STRING;
 	result->str = strdup(version);
@@ -1030,7 +1071,7 @@ int     OLD_VERSION(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 
         if(num_param(param) > 1)
         {
@@ -1059,10 +1100,11 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	FILE	*f;
 	char	c[MAX_STRING_LEN];
 	char	command[MAX_STRING_LEN];
+	int	i;
 
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 	
 	strncpy(command, param, MAX_STRING_LEN);
 
@@ -1110,7 +1152,16 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	{
 		return SYSINFO_RET_FAIL;
 	}
-
+	
+	for(i=strlen(c); i>0; i--)
+	{
+		if(c[i] == '\n')
+		{
+			c[i] = '\0';
+			break;
+		}
+	}
+	
 	result->type |= AR_STRING;
 	result->str = strdup(c);
 	
@@ -1124,7 +1175,7 @@ int	EXECUTE(const char *cmd, const char *command, unsigned flags, AGENT_RESULT *
 
         assert(result);
 
-	memset(result, 0, sizeof(AGENT_RESULT));
+	clean_result(result);
 		
 	f=popen( command,"r");
 	if(f==0)
@@ -1187,7 +1238,7 @@ int	forward_request(char *proxy, char *command, int port, unsigned flags, AGENT_
 
 	assert(result);
 
-	memset(result, 0, sizeof(AGENT_RESULT));
+	clean_result(result);
 		
 	host = gethostbyname(proxy);
 	if(host == NULL)
@@ -1487,7 +1538,7 @@ int	CHECK_SERVICE_PERF(const char *cmd, const char *service_and_ip_and_port, uns
 
         assert(result);
 
-	memset(result, 0, sizeof(AGENT_RESULT));
+	clean_result(result);
 
 	gettimeofday(&t1,&tz1);
 
@@ -1612,7 +1663,7 @@ int	CHECK_SERVICE(const char *cmd, const char *service_and_ip_and_port, unsigned
 
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 	
 	/* Default IP address */
 	strscpy(ip,"127.0.0.1");
@@ -1768,7 +1819,7 @@ int	CHECK_PORT(const char *cmd, const char *ip_and_port, unsigned flags, AGENT_R
 
         assert(result);
 
-	memset(result, 0, sizeof(AGENT_RESULT));
+	clean_result(result);
 	
 	c=strchr(ip_and_port,',');
 	strscpy(ip,ip_and_port);
@@ -1806,7 +1857,7 @@ int	CHECK_DNS(const char *cmd, const char *ip_and_zone, unsigned flags, AGENT_RE
 
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 	
 	memset(&ip, 0, MAX_STRING_LEN);
 	memset(&zone, 0, MAX_STRING_LEN);
@@ -1883,7 +1934,7 @@ int     SYSTEM_UNUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 
         return EXECUTE(cmd, "who|wc -l", flags, result);
 }
@@ -1892,7 +1943,7 @@ int     SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_R
 {
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 
         return EXECUTE_STR(cmd, "uname -a", flags, result);
 }
@@ -1901,7 +1952,7 @@ int     SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGEN
 {
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 
         return EXECUTE_STR(cmd, "hostname", flags, result);
 }
@@ -1913,7 +1964,7 @@ int     OLD_SYSTEM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
         assert(result);
 
-        memset(result, 0, sizeof(AGENT_RESULT));
+        clean_result(result);
 
         if(num_param(param) > 1)
         {
