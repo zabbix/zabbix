@@ -19,125 +19,12 @@
 
 #include "config.h"
 
-#include <errno.h>
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-
-/* Definitions of uint32_t under OS/X */
-#ifdef HAVE_STDINT_H
-	#include <stdint.h>
-#endif
-#ifdef HAVE_STRINGS_H
-	#include <strings.h>
-#endif
-#ifdef HAVE_FCNTL_H
-	#include <fcntl.h>
-#endif
-#ifdef HAVE_DIRENT_H
-	#include <dirent.h>
-#endif
-/* Linux */
-#ifdef HAVE_SYS_VFS_H
-	#include <sys/vfs.h>
-#endif
-#ifdef HAVE_SYS_SYSINFO_H
-	#include <sys/sysinfo.h>
-#endif
-/* Solaris */
-#ifdef HAVE_SYS_STATVFS_H
-	#include <sys/statvfs.h>
-#endif
-/* Solaris */
-#ifdef HAVE_SYS_PROCFS_H
-/* This is needed to access the correct procfs.h definitions */
-	#define _STRUCTURED_PROC 1
-	#include <sys/procfs.h>
-#endif
-#ifdef HAVE_SYS_LOADAVG_H
-	#include <sys/loadavg.h>
-#endif
-#ifdef HAVE_SYS_SOCKET_H
-	#include <sys/socket.h>
-#endif
-#ifdef HAVE_NETINET_IN_H
-	#include <netinet/in.h>
-#endif
-#ifdef HAVE_ARPA_INET_H
-	#include <arpa/inet.h>
-#endif
-/* OpenBSD/Solaris */
-#ifdef HAVE_SYS_PARAM_H
-	#include <sys/param.h>
-#endif
-
-#ifdef HAVE_SYS_MOUNT_H
-	#include <sys/mount.h>
-#endif
-
-/* HP-UX */
-#ifdef HAVE_SYS_PSTAT_H
-	#include <sys/pstat.h>
-#endif
-
-#ifdef HAVE_NETDB_H
-	#include <netdb.h>
-#endif
-
-/* Solaris */
-#ifdef HAVE_SYS_SWAP_H
-	#include <sys/swap.h>
-#endif
-
-/* FreeBSD */
-#ifdef HAVE_SYS_SYSCTL_H
-	#include <sys/sysctl.h>
-#endif
-
-/* Solaris */
-#ifdef HAVE_SYS_SYSCALL_H
-	#include <sys/syscall.h>
-#endif
-
-/* FreeBSD */
-#ifdef HAVE_VM_VM_PARAM_H
-	#include <vm/vm_param.h>
-#endif
-/* FreeBSD */
-#ifdef HAVE_SYS_VMMETER_H
-	#include <sys/vmmeter.h>
-#endif
-/* FreeBSD */
-#ifdef HAVE_SYS_TIME_H
-	#include <sys/time.h>
-#endif
-
-#ifdef HAVE_MACH_HOST_INFO_H
-	#include <mach/host_info.h>
-#endif
-#ifdef HAVE_MACH_MACH_HOST_H
-	#include <mach/mach_host.h>
-#endif
-
-
-#ifdef HAVE_KSTAT_H
-	#include <kstat.h>
-#endif
-
-#ifdef HAVE_LDAP
-	#include <ldap.h>
-#endif
-
 #include "common.h"
 #include "sysinfo.h"
 
 #include "md5.h"
 
-int	SENSOR_TEMP1(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
+static int	SENSOR_TEMP1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	DIR	*dir;
 	struct	dirent *entries;
@@ -148,6 +35,10 @@ int	SENSOR_TEMP1(const char *cmd, const char *param,double  *value, const char *
 
 	FILE	*f;
 
+        assert(result);
+
+        clean_result(result);	
+	
 	dir=opendir("/proc/sys/dev/sensors");
 	if(NULL == dir)
 	{
@@ -173,7 +64,8 @@ int	SENSOR_TEMP1(const char *cmd, const char *param,double  *value, const char *
 			if(sscanf(line,"%lf\t%lf\t%lf\n",&d1, &d2, &d3) == 3)
 			{
 				closedir(dir);
-				*value=d3;
+				result->type |= AR_DOUBLE;
+				result->dbl = d3;
 				return  SYSINFO_RET_OK;
 			}
 			else
@@ -187,7 +79,7 @@ int	SENSOR_TEMP1(const char *cmd, const char *param,double  *value, const char *
 	return	SYSINFO_RET_FAIL;
 }
 
-int	SENSOR_TEMP2(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
+static int	SENSOR_TEMP2(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	DIR	*dir;
 	struct	dirent *entries;
@@ -198,6 +90,10 @@ int	SENSOR_TEMP2(const char *cmd, const char *param,double  *value, const char *
 
 	FILE	*f;
 
+        assert(result);
+
+        clean_result(result);	
+	
 	dir=opendir("/proc/sys/dev/sensors");
 	if(NULL == dir)
 	{
@@ -223,7 +119,8 @@ int	SENSOR_TEMP2(const char *cmd, const char *param,double  *value, const char *
 			if(sscanf(line,"%lf\t%lf\t%lf\n",&d1, &d2, &d3) == 3)
 			{
 				closedir(dir);
-				*value=d3;
+				result->type |= AR_DOUBLE;
+				result->dbl = d3;
 				return  SYSINFO_RET_OK;
 			}
 			else
@@ -237,7 +134,7 @@ int	SENSOR_TEMP2(const char *cmd, const char *param,double  *value, const char *
 	return	SYSINFO_RET_FAIL;
 }
 
-int	SENSOR_TEMP3(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
+static int	SENSOR_TEMP3(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	DIR	*dir;
 	struct	dirent *entries;
@@ -248,6 +145,10 @@ int	SENSOR_TEMP3(const char *cmd, const char *param,double  *value, const char *
 
 	FILE	*f;
 
+        assert(result);
+
+        clean_result(result);	
+	
 	dir=opendir("/proc/sys/dev/sensors");
 	if(NULL == dir)
 	{
@@ -273,7 +174,8 @@ int	SENSOR_TEMP3(const char *cmd, const char *param,double  *value, const char *
 			if(sscanf(line,"%lf\t%lf\t%lf\n",&d1, &d2, &d3) == 3)
 			{
 				closedir(dir);
-				*value=d3;
+				result->type |= AR_DOUBLE;
+				result->dbl = d3;
 				return  SYSINFO_RET_OK;
 			}
 			else
@@ -286,3 +188,43 @@ int	SENSOR_TEMP3(const char *cmd, const char *param,double  *value, const char *
 	closedir(dir);
 	return	SYSINFO_RET_FAIL;
 }
+
+int     OLD_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+        char    key[MAX_STRING_LEN];
+        int     ret;
+
+        assert(result);
+
+        clean_result(result);
+
+        if(num_param(param) > 1)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, key, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(strcmp(key,"temp1") == 0)
+        {
+                ret = SENSOR_TEMP1(cmd, param, flags, result);
+        }
+        else if(strcmp(key,"temp2") == 0)
+        {
+                ret = SENSOR_TEMP2(cmd, param, flags, result);
+        }
+        else if(strcmp(key,"temp3") == 0)
+        {
+                ret = SENSOR_TEMP3(cmd, param, flags, result);
+        }
+        else
+        {
+                ret = SYSINFO_RET_FAIL;
+        }
+
+        return ret;
+}
+
