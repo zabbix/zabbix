@@ -22,6 +22,114 @@
 #include "common.h"
 #include "sysinfo.h"
 
+static int	DISKREADOPS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	char	key[MAX_STRING_LEN];
+
+	snprintf(key,sizeof(key)-1,"disk_read_ops1[%s]",param);
+
+	return	get_stat(key, flags, result);
+}
+
+static int	DISKREADOPS5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	char	key[MAX_STRING_LEN];
+
+	snprintf(key,sizeof(key)-1,"disk_read_ops5[%s]",param);
+
+	return	get_stat(key, flags, result);
+}
+
+static int	DISKREADOPS15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	char	key[MAX_STRING_LEN];
+
+	snprintf(key,sizeof(key)-1,"disk_read_ops15[%s]",param);
+
+	return	get_stat(key, flags, result);
+}
+
+static int	DISKREADBLKS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	char	key[MAX_STRING_LEN];
+
+	snprintf(key,sizeof(key)-1,"disk_read_blks1[%s]",param);
+
+	return	get_stat(key, flags, result);
+}
+
+static int	DISKREADBLKS5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	char	key[MAX_STRING_LEN];
+
+	snprintf(key,sizeof(key)-1,"disk_read_blks5[%s]",param);
+
+	return	get_stat(key, flags, result);
+}
+
+static int	DISKREADBLKS15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	char	key[MAX_STRING_LEN];
+
+	snprintf(key,sizeof(key)-1,"disk_read_blks15[%s]",param);
+
+	return	get_stat(key, flags, result);
+}
+
+static int	DISKWRITEOPS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	char	key[MAX_STRING_LEN];
+
+	snprintf(key,sizeof(key)-1,"disk_write_ops1[%s]",param);
+
+	return	get_stat(key, flags, result);
+}
+
+static int	DISKWRITEOPS5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	char	key[MAX_STRING_LEN];
+
+	snprintf(key,sizeof(key)-1,"disk_write_ops5[%s]",param);
+
+	return	get_stat(key, flags, result);
+}
+
+static int	DISKWRITEOPS15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	char	key[MAX_STRING_LEN];
+
+	snprintf(key,sizeof(key)-1,"disk_write_ops15[%s]",param);
+
+	return	get_stat(key, flags, result);
+}
+
+static int	DISKWRITEBLKS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	char	key[MAX_STRING_LEN];
+
+	snprintf(key,sizeof(key)-1,"disk_write_blks1[%s]",param);
+
+	return	get_stat(key, flags, result);
+}
+
+static int	DISKWRITEBLKS5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	char	key[MAX_STRING_LEN];
+
+	snprintf(key,sizeof(key)-1,"disk_write_blks5[%s]",param);
+
+	return	get_stat(key, flags, result);
+}
+
+static int	DISKWRITEBLKS15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	char	key[MAX_STRING_LEN];
+
+	snprintf(key,sizeof(key)-1,"disk_write_blks15[%s]",param);
+
+	return	get_stat(key, flags, result);
+}
+
 int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 
@@ -174,115 +282,7 @@ DEV_FNCLIST
 	return SYSINFO_RET_FAIL;
 }
 
-int	DISKREADOPS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	snprintf(key,sizeof(key)-1,"disk_read_ops1[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-int	DISKREADOPS5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	snprintf(key,sizeof(key)-1,"disk_read_ops5[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-int	DISKREADOPS15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	snprintf(key,sizeof(key)-1,"disk_read_ops15[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-int	DISKREADBLKS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	snprintf(key,sizeof(key)-1,"disk_read_blks1[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-int	DISKREADBLKS5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	snprintf(key,sizeof(key)-1,"disk_read_blks5[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-int	DISKREADBLKS15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	snprintf(key,sizeof(key)-1,"disk_read_blks15[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-int	DISKWRITEOPS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	snprintf(key,sizeof(key)-1,"disk_write_ops1[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-int	DISKWRITEOPS5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	snprintf(key,sizeof(key)-1,"disk_write_ops5[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-int	DISKWRITEOPS15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	snprintf(key,sizeof(key)-1,"disk_write_ops15[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-int	DISKWRITEBLKS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	snprintf(key,sizeof(key)-1,"disk_write_blks1[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-int	DISKWRITEBLKS5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	snprintf(key,sizeof(key)-1,"disk_write_blks5[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-int	DISKWRITEBLKS15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	snprintf(key,sizeof(key)-1,"disk_write_blks15[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-int	DISK_IO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	DISK_IO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef	HAVE_PROC
 	return	getPROC("/proc/stat",2,2, flags, result);
@@ -291,7 +291,7 @@ int	DISK_IO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *re
 #endif
 }
 
-int	DISK_RIO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	DISK_RIO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef	HAVE_PROC
 	return	getPROC("/proc/stat",3,2, flags, result);
@@ -300,7 +300,7 @@ int	DISK_RIO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 #endif
 }
 
-int	DISK_WIO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	DISK_WIO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef	HAVE_PROC
 	return	getPROC("/proc/stat",4,2, flags, result);
@@ -309,7 +309,7 @@ int	DISK_WIO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 #endif
 }
 
-int	DISK_RBLK(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	DISK_RBLK(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef	HAVE_PROC
 	return	getPROC("/proc/stat",5,2, flags, result);
@@ -318,7 +318,7 @@ int	DISK_RBLK(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 #endif
 }
 
-int	DISK_WBLK(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	DISK_WBLK(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef	HAVE_PROC
 	return	getPROC("/proc/stat",6,2, flags, result);

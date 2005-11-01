@@ -24,7 +24,7 @@
 
 #include "md5.h"
 
-int	SENSOR_TEMP1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	SENSOR_TEMP1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	DIR	*dir;
 	struct	dirent *entries;
@@ -79,7 +79,7 @@ int	SENSOR_TEMP1(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	return	SYSINFO_RET_FAIL;
 }
 
-int	SENSOR_TEMP2(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	SENSOR_TEMP2(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	DIR	*dir;
 	struct	dirent *entries;
@@ -134,7 +134,7 @@ int	SENSOR_TEMP2(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	return	SYSINFO_RET_FAIL;
 }
 
-int	SENSOR_TEMP3(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	SENSOR_TEMP3(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	DIR	*dir;
 	struct	dirent *entries;
