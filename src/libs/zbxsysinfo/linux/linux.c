@@ -237,16 +237,16 @@ ZBX_METRIC	parameters_specific[]=
 	{"net.tcp.service",	CF_USEUPARAM,	CHECK_SERVICE, 		0,	"ssh,127.0.0.1,22"},
 	{"net.tcp.service.perf",CF_USEUPARAM,	CHECK_SERVICE_PERF, 	0,	"ssh,127.0.0.1,22"},
 	
-	{"net.if.in",		CF_USEUPARAM,	NET_IF_IN,	0,	"lo,bytes,avg1"},
-	{"net.if.out",		CF_USEUPARAM,	NET_IF_OUT,	0,	"lo,bytes,avg1"},
+	{"net.if.in",		CF_USEUPARAM,	NET_IF_IN,	0,	"lo,bytes"},
+	{"net.if.out",		CF_USEUPARAM,	NET_IF_OUT,	0,	"lo,bytes"},
 
 	{"vfs.fs.size",		CF_USEUPARAM,	VFS_FS_SIZE,	0,	"/,free"},
 	{"vfs.fs.inode",	CF_USEUPARAM,	VFS_FS_INODE,	0,	"/,free"},
 
-	{"vfs.memory.size",	CF_USEUPARAM,	VM_MEMORY_SIZE,	0,	"free"},
-	
 	{"vfs.dev.read",	CF_USEUPARAM,	VFS_DEV_READ,	0,	"hda,ops,avg1"},
 	{"vfs.dev.write",	CF_USEUPARAM,	VFS_DEV_WRITE,	0,	"hda,ops,avg1"},
+	
+	{"vm.memory.size",	CF_USEUPARAM,	VM_MEMORY_SIZE,	0,	"free"},
 	
 	{"proc.num",		CF_USEUPARAM,	PROC_NUM,	0,	"inetd,,"},
 	{"proc.mem",		CF_USEUPARAM,	PROC_MEMORY,	0,	"inetd,,"},

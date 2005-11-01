@@ -22,6 +22,12 @@
 #include "common.h"
 #include "sysinfo.h"
 
+static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+static int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+
 int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #define MEM_FNCLIST struct mem_fnclist_s
@@ -33,12 +39,11 @@ MEM_FNCLIST
 
 	MEM_FNCLIST fl[] = 
 	{
-		{"free",	DISKWRITEOPS1},
-		{"shared",	DISKWRITEOPS5},
-		{"total",	DISKWRITEOPS15},
-		{"buffers",	DISKWRITEBLKS1},
-		{"cached",	DISKWRITEBLKS5},
-		{"free",	DISKWRITEBLKS15},
+		{"free",	VM_MEMORY_FREE},
+		{"shared",	VM_MEMORY_SHARED},
+		{"total",	VM_MEMORY_TOTAL},
+		{"buffers",	VM_MEMORY_BUFFERS},
+		{"cached",	VM_MEMORY_CACHED},
 		{0,	0}
 	};
         char    mode[MAX_STRING_LEN];
@@ -75,7 +80,7 @@ MEM_FNCLIST
 	return SYSINFO_RET_FAIL;
 }
 
-int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_PROC
 /* Get CACHED memory in bytes */
@@ -120,7 +125,7 @@ int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, AGENT_R
 #endif
 }
 
-int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_SYSINFO_BUFFERRAM
 	struct sysinfo info;
@@ -152,7 +157,7 @@ int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags, AGENT_
 #endif
 }
 
-int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_SYSINFO_SHAREDRAM
 	struct sysinfo info;
@@ -175,8 +180,7 @@ int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, AGENT_R
 	{
 		return SYSINFO_RET_FAIL;
 	}
-#else
-#ifdef HAVE_SYS_VMMETER_VMTOTAL
+#elif defined(HAVE_SYS_VMMETER_VMTOTAL)
 	int mib[2],len;
 	struct vmtotal v;
 
@@ -196,10 +200,9 @@ int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, AGENT_R
 #else
 	return	SYSINFO_RET_FAIL;
 #endif
-#endif
 }
 
-int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 /* Solaris */
 #ifdef HAVE_UNISTD_SYSCONF
@@ -210,8 +213,7 @@ int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	result->type |= AR_DOUBLE;	
 	result->dbl=(double)sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGESIZE);
 	return SYSINFO_RET_OK;
-#else
-#ifdef HAVE_SYS_PSTAT_H
+#elif defined(HAVE_SYS_PSTAT_H)
 	struct	pst_static pst;
 	long	page;
 
@@ -232,8 +234,7 @@ int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		result->dbl=(double)page*pst.physical_memory;
 		return SYSINFO_RET_OK;
 	}
-#else
-#ifdef HAVE_SYSINFO_TOTALRAM
+#elif defined(HAVE_SYSINFO_TOTALRAM)
 	struct sysinfo info;
 
 	assert(result);
@@ -254,8 +255,7 @@ int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	{
 		return SYSINFO_RET_FAIL;
 	}
-#else
-#ifdef HAVE_SYS_VMMETER_VMTOTAL
+#elif defined(HAVE_SYS_VMMETER_VMTOTAL)
 	int mib[2],len;
 	struct vmtotal v;
 
@@ -272,8 +272,7 @@ int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	result->type |= AR_DOUBLE;	
 	result->dbl=(double)(v.t_rm<<2);
 	return SYSINFO_RET_OK;
-#else
-#ifdef HAVE_SYS_SYSCTL_H
+#elif defined(HAVE_SYS_SYSCTL_H)
 	static int mib[] = { CTL_HW, HW_PHYSMEM };
 	size_t len;
 	unsigned int memory;
@@ -303,13 +302,9 @@ int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		
 	return	SYSINFO_RET_FAIL;
 #endif
-#endif
-#endif
-#endif
-#endif
 }
 
-int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 /* Solaris */
 #ifdef HAVE_UNISTD_SYSCONF
@@ -320,8 +315,7 @@ int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	result->type |= AR_DOUBLE;	
 	result->dbl=(double)sysconf(_SC_AVPHYS_PAGES)*sysconf(_SC_PAGESIZE);
 	return SYSINFO_RET_OK;
-#else
-#ifdef HAVE_SYS_PSTAT_H
+#elif defined(HAVE_SYS_PSTAT_H)
 	struct	pst_static pst;
 	struct	pst_dynamic dyn;
 	long	page;
@@ -363,8 +357,7 @@ int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RES
 			return SYSINFO_RET_OK;
 		}
 	}
-#else
-#ifdef HAVE_SYSINFO_FREERAM
+#elif defined(HAVE_SYSINFO_FREERAM)
 	struct sysinfo info;
 
 	assert(result);
@@ -385,8 +378,7 @@ int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	{
 		return SYSINFO_RET_FAIL;
 	}
-#else
-#ifdef HAVE_SYS_VMMETER_VMTOTAL
+#elif defined(HAVE_SYS_VMMETER_VMTOTAL)
 	int mib[2],len;
 	struct vmtotal v;
 
@@ -403,9 +395,8 @@ int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	result->type |= AR_DOUBLE;	
 	result->dbl=(double)(v.t_free<<2);
 	return SYSINFO_RET_OK;
-#else
 /* OS/X */
-#ifdef HAVE_MACH_HOST_INFO_H
+#elif defined(HAVE_MACH_HOST_INFO_H)
 	vm_statistics_data_t page_info;
 	vm_size_t pagesize;
 	mach_msg_type_number_t count;
@@ -448,10 +439,6 @@ int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RES
         clean_result(result);
 		
 	return	SYSINFO_RET_FAIL;
-#endif
-#endif
-#endif
-#endif
 #endif
 }
 
