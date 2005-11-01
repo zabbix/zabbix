@@ -29,10 +29,6 @@
 #	include <assert.h>
 #endif
 
-#ifdef HAVE_ARPA_INET_H
-#	include <arpa/inet.h>
-#endif
-
 #ifdef HAVE_ARPA_NAMESER_H
 #	include <arpa/nameser.h>
 #endif
@@ -107,10 +103,6 @@
 
 #ifdef HAVE_SYS_LOADAVG_H
 #	include <sys/loadavg.h>
-#endif
-
-#ifdef HAVE_SYS_MOUNT_H
-#	include <sys/mount.h>
 #endif
 
 #ifdef HAVE_SYS_PARAM_H
@@ -203,5 +195,12 @@
 #	include <vm/vm_param.h>
 #endif
 
+#ifdef HAVE_ARPA_INET_H
+#	include <arpa/inet.h>
 #endif
 
+#ifdef HAVE_SYS_MOUNT_H
+#	include <sys/mount.h>
+#endif
+
+#endif
