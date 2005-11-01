@@ -1,5 +1,6 @@
 Changes for 1.1beta3:
 
+ - added support of new sysinfo function interface for aix (Eugene)
  - optimized sysinfo functions for solaris system (Eugene)
  - added support of new sysinfo function interface for solaris (Eugene)
  - optimized sysinfo functions for linux system (Eugene)

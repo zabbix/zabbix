@@ -27,65 +27,6 @@ int     OLD_CPU(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	return	get_stat(cmd, flags, result);
 }
 
-int	SYSTEM_CPU_IDLE1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[idle1]",flags, result);
-}
-
-int	SYSTEM_CPU_IDLE5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[idle5]",flags, result);
-}
-
-int	SYSTEM_CPU_IDLE15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[idle15]",flags, result);
-}
-
-int	SYSTEM_CPU_NICE1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[nice1]",flags, result);
-}
-
-int	SYSTEM_CPU_NICE5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[nice5]",flags, result);
-}
-int	SYSTEM_CPU_NICE15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[nice15]",flags, result);
-}
-
-int	SYSTEM_CPU_USER1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[user1]",flags, result);
-}
-
-int	SYSTEM_CPU_USER5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[user5]",flags, result);
-}
-
-int	SYSTEM_CPU_USER15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[user15]",flags, result);
-}
-
-int	SYSTEM_CPU_SYS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[system1]",flags, result);
-}
-
-int	SYSTEM_CPU_SYS5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[system5]",flags, result);
-}
-
-int	SYSTEM_CPU_SYS15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[system15]",flags, result);
-}
-
 static int get_cpu_data(unsigned long long *idle,
                         unsigned long long *system,
                         unsigned long long *user,
@@ -211,6 +152,78 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
     return ret;
 }
 
+static int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+#ifdef HAVE_GETLOADAVG
+	double	load[3];
+
+	assert(result);
+
+        clean_result(result);
+		
+	if(getloadavg(load, 3))
+	{
+		result->type |= AR_DOUBLE;
+		result->dbl = load[0];
+		return SYSINFO_RET_OK;
+	}
+	else
+	{
+		return SYSINFO_RET_FAIL;	
+	}
+#else
+	return	SYSINFO_RET_FAIL;
+#endif
+}
+
+static int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+#ifdef HAVE_GETLOADAVG
+	double	load[3];
+
+	assert(result);
+
+        clean_result(result);
+		
+	if(getloadavg(load, 3))
+	{
+		result->type = AR_DOUBLE;
+		result->dbl = load[1];
+		return SYSINFO_RET_OK;
+	}
+	else
+	{
+		return SYSINFO_RET_FAIL;	
+	}
+#else
+	return	SYSINFO_RET_FAIL;
+#endif
+}
+	       
+static int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+#ifdef HAVE_GETLOADAVG
+	double	load[3];
+
+	assert(result);
+
+        clean_result(result);
+		
+	if(getloadavg(load, 3))
+	{
+		result->type = AR_DOUBLE;
+		result->dbl =load[2];	
+		return SYSINFO_RET_OK;
+	}
+	else
+	{
+		return SYSINFO_RET_FAIL;	
+	}
+#else
+	return	SYSINFO_RET_FAIL;
+#endif
+}
+
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 
@@ -274,78 +287,6 @@ CPU_FNCLIST
 	}
 	
 	return SYSINFO_RET_FAIL;
-}
-
-int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef HAVE_GETLOADAVG
-	double	load[3];
-
-	assert(result);
-
-        clean_result(result);
-		
-	if(getloadavg(load, 3))
-	{
-		result->type |= AR_DOUBLE;
-		result->dbl = load[0];
-		return SYSINFO_RET_OK;
-	}
-	else
-	{
-		return SYSINFO_RET_FAIL;	
-	}
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
-}
-
-int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef HAVE_GETLOADAVG
-	double	load[3];
-
-	assert(result);
-
-        clean_result(result);
-		
-	if(getloadavg(load, 3))
-	{
-		result->type = AR_DOUBLE;
-		result->dbl = load[1];
-		return SYSINFO_RET_OK;
-	}
-	else
-	{
-		return SYSINFO_RET_FAIL;	
-	}
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
-}
-	       
-int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef HAVE_GETLOADAVG
-	double	load[3];
-
-	assert(result);
-
-        clean_result(result);
-		
-	if(getloadavg(load, 3))
-	{
-		result->type = AR_DOUBLE;
-		result->dbl =load[2];	
-		return SYSINFO_RET_OK;
-	}
-	else
-	{
-		return SYSINFO_RET_FAIL;	
-	}
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
 }
 
 int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)

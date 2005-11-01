@@ -28,16 +28,6 @@
 ZBX_METRIC *commands=NULL;
 extern ZBX_METRIC parameters_specific[];
 
-int	forward_request(char *proxy, char *command, int port, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-
-int     SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int     SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int     SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-
-int     SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-
 ZBX_METRIC	parameters_common[]=
 /*      KEY                     FLAG    FUNCTION        ADD_PARAM       TEST_PARAM */
 	{
@@ -1990,15 +1980,15 @@ int     OLD_SYSTEM(const char *cmd, const char *param, unsigned flags, AGENT_RES
         }
         else if(strcmp(key,"procload") == 0)
         {
-                ret = SYSTEM_CPU_LOAD1(cmd, param, flags, result);
+                ret = SYSTEM_CPU_LOAD(cmd, "all,avg1", flags, result);
         }
         else if(strcmp(key,"procload5") == 0)
         {
-                ret = SYSTEM_CPU_LOAD5(cmd, param, flags, result);
+                ret = SYSTEM_CPU_LOAD(cmd, "all,avg5", flags, result);
         }
         else if(strcmp(key,"procload15") == 0)
         {
-                ret = SYSTEM_CPU_LOAD15(cmd, param, flags, result);
+                ret = SYSTEM_CPU_LOAD(cmd, "all,avg15", flags, result);
         }
         else if(strcmp(key,"hostname") == 0)
         {

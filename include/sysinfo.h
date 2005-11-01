@@ -77,9 +77,6 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 int     PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int     SENSOR_TEMP1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int     SENSOR_TEMP2(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int     SENSOR_TEMP3(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
@@ -115,68 +112,5 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 /* internal system functions */
 int	EXECUTE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-
-int	NET_IF_IN_BYTES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	NET_IF_IN_PACKETS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	NET_IF_IN_ERRORS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	NET_IF_OUT_BYTES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	NET_IF_OUT_PACKETS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	NET_IF_OUT_ERRORS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-
-int	SYSTEM_CPU_IDLE1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_CPU_IDLE5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_CPU_IDLE15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_CPU_USER1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_CPU_USER5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_CPU_USER15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_CPU_NICE1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_CPU_NICE5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_CPU_NICE15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_CPU_SYS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_CPU_SYS5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_CPU_SYS15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-
-int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-
-int	VFS_FS_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	VFS_FS_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	VFS_FS_USED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	VFS_FS_PFREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	VFS_FS_PUSED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-
-int	DISK_IO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-
-int	VFS_FS_INODE_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	VFS_FS_INODE_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int     VFS_FS_INODE_USED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	VFS_FS_INODE_PFREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int     VFS_FS_INODE_PUSED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-
-int	NET_IF_IBYTES1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	NET_IF_IBYTES5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	NET_IF_IBYTES15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-
-int	NET_IF_OBYTES1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	NET_IF_OBYTES5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	NET_IF_OBYTES15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-
-int	DISKREADOPS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	DISKREADOPS5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	DISKREADOPS15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	DISKREADBLKS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	DISKREADBLKS5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	DISKREADBLKS15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-
-int	DISKWRITEOPS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	DISKWRITEOPS5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	DISKWRITEOPS15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	DISKWRITEBLKS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	DISKWRITEBLKS5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	DISKWRITEBLKS15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-
-int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 #endif

@@ -22,64 +22,6 @@
 #include "common.h"
 #include "sysinfo.h"
 
-static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-static int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-
-int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#define MEM_FNCLIST struct mem_fnclist_s
-MEM_FNCLIST
-{
-	char *mode;
-	int (*function)();
-};
-
-	MEM_FNCLIST fl[] = 
-	{
-		{"free",	VM_MEMORY_FREE},
-		{"shared",	VM_MEMORY_SHARED},
-		{"total",	VM_MEMORY_TOTAL},
-		{"buffers",	VM_MEMORY_BUFFERS},
-		{"cached",	VM_MEMORY_CACHED},
-		{0,	0}
-	};
-        char    mode[MAX_STRING_LEN];
-	int i;
-
-        assert(result);
-
-        clean_result(result);
-
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-
-        if(get_param(param, 1, mode, MAX_STRING_LEN) != 0)
-        {
-                mode[0] = '\0';
-        }
-
-        if(mode[0] == '\0')
-	{
-		/* default parameter */
-		sprintf(mode, "total");
-	}
-	
-	for(i=0; fl[i].mode!=0; i++)
-	{
-		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
-		{
-			return (fl[i].function)(cmd, param, flags, result);
-		}
-	}
-	
-	return SYSINFO_RET_FAIL;
-}
-
 static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_PROC
@@ -440,5 +382,57 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 		
 	return	SYSINFO_RET_FAIL;
 #endif
+}
+
+int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+#define MEM_FNCLIST struct mem_fnclist_s
+MEM_FNCLIST
+{
+	char *mode;
+	int (*function)();
+};
+
+	MEM_FNCLIST fl[] = 
+	{
+		{"free",	VM_MEMORY_FREE},
+		{"shared",	VM_MEMORY_SHARED},
+		{"total",	VM_MEMORY_TOTAL},
+		{"buffers",	VM_MEMORY_BUFFERS},
+		{"cached",	VM_MEMORY_CACHED},
+		{0,	0}
+	};
+        char    mode[MAX_STRING_LEN];
+	int i;
+
+        assert(result);
+
+        clean_result(result);
+
+        if(num_param(param) > 1)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, mode, MAX_STRING_LEN) != 0)
+        {
+                mode[0] = '\0';
+        }
+
+        if(mode[0] == '\0')
+	{
+		/* default parameter */
+		sprintf(mode, "total");
+	}
+	
+	for(i=0; fl[i].mode!=0; i++)
+	{
+		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
+		{
+			return (fl[i].function)(cmd, param, flags, result);
+		}
+	}
+	
+	return SYSINFO_RET_FAIL;
 }
 
