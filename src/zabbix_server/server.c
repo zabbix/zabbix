@@ -56,6 +56,7 @@
 #include "housekeeper/housekeeper.h"
 #include "pinger/pinger.h"
 #include "poller/poller.h"
+#include "poller/checks_snmp.h"
 #include "timer/timer.h"
 #include "trapper/trapper.h"
 
