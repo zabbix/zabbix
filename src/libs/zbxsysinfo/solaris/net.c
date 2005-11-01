@@ -252,7 +252,7 @@ static int	NET_IF_OUT_ERRORS(const char *cmd, const char *param, unsigned flags,
     return ret;
 }
 
-static int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
     kstat_named_t kn;
     char    interface[MAX_STRING_LEN];
@@ -283,7 +283,7 @@ static int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags,
     return ret;
 }
 
-static int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
     char command[MAX_STRING_LEN];
 
@@ -298,7 +298,7 @@ static int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AG
     return EXECUTE(NULL, command, flags, result);
 }
 
-static int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 
 #define NET_FNCLIST struct net_fnclist_s
