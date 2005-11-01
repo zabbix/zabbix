@@ -19,109 +19,15 @@
 
 #include "config.h"
 
-#include <errno.h>
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-
-#ifdef HAVE_PWD_H
-#	include <pwd.h>
-#endif
-
-/* Definitions of uint32_t under OS/X */
-#ifdef HAVE_STDINT_H
-	#include <stdint.h>
-#endif
-#ifdef HAVE_STRINGS_H
-	#include <strings.h>
-#endif
-#ifdef HAVE_FCNTL_H
-	#include <fcntl.h>
-#endif
-#ifdef HAVE_DIRENT_H
-	#include <dirent.h>
-#endif
-/* Linux */
-#ifdef HAVE_SYS_VFS_H
-	#include <sys/vfs.h>
-#endif
-#ifdef HAVE_SYS_SYSINFO_H
-	#include <sys/sysinfo.h>
-#endif
-/* Solaris */
-#ifdef HAVE_SYS_STATVFS_H
-	#include <sys/statvfs.h>
-#endif
-
-#ifdef HAVE_SYS_PROC_H
-#   include <sys/proc.h>
-#endif
-/* Solaris */
-#ifdef HAVE_SYS_PROCFS_H
-/* This is needed to access the correct procfs.h definitions */
-	#define _STRUCTURED_PROC 1
-	#include <sys/procfs.h>
-#endif
-#ifdef HAVE_SYS_LOADAVG_H
-	#include <sys/loadavg.h>
-#endif
-#ifdef HAVE_SYS_SOCKET_H
-	#include <sys/socket.h>
-#endif
-#ifdef HAVE_NETINET_IN_H
-	#include <netinet/in.h>
-#endif
-#ifdef HAVE_ARPA_INET_H
-	#include <arpa/inet.h>
-#endif
-/* OpenBSD/Solaris */
-#ifdef HAVE_SYS_PARAM_H
-	#include <sys/param.h>
-#endif
-
-#ifdef HAVE_SYS_MOUNT_H
-	#include <sys/mount.h>
-#endif
-
-/* Solaris */
-#ifdef HAVE_SYS_SWAP_H
-	#include <sys/swap.h>
-#endif
-
-#ifdef HAVE_SYS_SYSCALL_H
-	#include <sys/syscall.h>
-#endif
-
-#ifdef HAVE_KSTAT_H
-	#include <kstat.h>
-#endif
-
-#ifdef HAVE_LDAP
-	#include <ldap.h>
-#endif
-
 #include "common.h"
 #include "sysinfo.h"
 
-/*
-#define FDI(f, m) fprintf(stderr, "DEBUG INFO: " f "\n" , m) // show debug info to stderr
-#define SDI(m) FDI("%s", m) // string info
-#define IDI(i) FDI("%i", i) // integer info
-*/
-
-#define MAX(a, b) ((a)>(b) ? (a) : (b))
-#define MIN(a, b) ((a)<(b) ? (a) : (b))
-				    
 #define DO_SUM 0
 #define DO_MAX 1
 #define DO_MIN 2
 #define DO_AVG 3
 
-int	PROC_MEMORY(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
+int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #if defined(HAVE_PROC_0_PSINFO)
     DIR     *dir;
@@ -147,34 +53,47 @@ int	PROC_MEMORY(const char *cmd, const char *param,double  *value, const char *m
     double	memsize = -1;
     int		proccount = 0;
 
-        if(num_param(param) > 3)
-        {
-            return SYSINFO_RET_FAIL;
-        }
+    assert(result);
 
-        if(get_param(param, 1, procname, MAX_STRING_LEN) != 0)
-        {
-            return SYSINFO_RET_FAIL;
-        }
-    
-        if(get_param(param, 2, usrname, MAX_STRING_LEN) != 0)
-        {
-            usrname[0] = 0;
-        }
-        else
-        {
-        if(usrname[0] != 0)
-        {
-            usrinfo = getpwnam(usrname);
-            if(usrinfo == NULL)
-            {
-                /* incorrect user name */
-                return SYSINFO_RET_FAIL;
-            }			        
-        }
+    clean_result(result);
+
+    if(num_param(param) > 3)
+    {
+        return SYSINFO_RET_FAIL;
     }
 
+    if(get_param(param, 1, procname, MAX_STRING_LEN) != 0)
+    {
+        return SYSINFO_RET_FAIL;
+    }
+
+    if(get_param(param, 2, usrname, MAX_STRING_LEN) != 0)
+    {
+        usrname[0] = '\0';
+    }
+	
+    if(usrname[0] == '\0')
+    {
+	usrname[0] = 0;
+    }
+
+    if(usrname[0] != 0)
+    {
+        usrinfo = getpwnam(usrname);
+        if(usrinfo == NULL)
+        {
+            /* incorrect user name */
+            return SYSINFO_RET_FAIL;
+        }			        
+    }
+    
+
     if(get_param(param, 3, mode, MAX_STRING_LEN) != 0)
+    {
+	mode[0] = '\0';
+    }
+    
+    if(mode[0] == '\0')
     {
         strscpy(mode, "sum");
     }
@@ -299,15 +218,20 @@ int	PROC_MEMORY(const char *cmd, const char *param,double  *value, const char *m
     {
         memsize /= (double)proccount;
     }
-    
-    *value = memsize;
+   
+    result->type |= AR_DOUBLE;
+    result->dbl = memsize;
     return SYSINFO_RET_OK;
 #else
+        assert(result);
+
+        clean_result(result);
+ 
 	return	SYSINFO_RET_FAIL;
 #endif
 }
 
-int	PROC_NUM(const char *cmd, const char *param,double  *value, const char *msg, int mlen_max)
+int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #if defined(HAVE_PROC_0_PSINFO)
     DIR	*dir;
@@ -332,7 +256,11 @@ int	PROC_NUM(const char *cmd, const char *param,double  *value, const char *msg,
     psinfo_t	psinfo;
 
     int		proccount=0;
-    
+   
+        assert(result);
+
+        clean_result(result);
+ 
         if(num_param(param) > 3)
         {
             return SYSINFO_RET_FAIL;
@@ -344,23 +272,30 @@ int	PROC_NUM(const char *cmd, const char *param,double  *value, const char *msg,
         }	
     
         if(get_param(param, 2, usrname, MAX_STRING_LEN) != 0)
+	{
+	    usrname[0] = '\0';
+	}
+
+	if(usrname[0] == '\0')
         {
                 usrname[0] = 0;
         }
-        else
+        if(usrname[0] != 0)
         {
-            if(usrname[0] != 0)
+            usrinfo = getpwnam(usrname);
+            if(usrinfo == NULL)
             {
-                usrinfo = getpwnam(usrname);
-                if(usrinfo == NULL)
-                {
-                    /* incorrect user name */
-                    return SYSINFO_RET_FAIL;
-                }			        
-            }
+                /* incorrect user name */
+                return SYSINFO_RET_FAIL;
+            }			        
         }
     
         if(get_param(param, 3, procstat, MAX_STRING_LEN) != 0)
+	{
+	    procstat[0] = '\0';
+	}
+
+	if(procstat[0] == '\0')
         {
             strscpy(procstat,"all");
         }
@@ -469,9 +404,15 @@ int	PROC_NUM(const char *cmd, const char *param,double  *value, const char *msg,
             }
         }
         closedir(dir);
-        *value=(double)proccount;
+
+	result->type |= AR_DOUBLE;
+	result->dbl = (double) proccount;
         return	SYSINFO_RET_OK;
 #else
+        assert(result);
+
+        clean_result(result);
+ 
         return	SYSINFO_RET_FAIL;
 #endif	
 }

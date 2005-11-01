@@ -102,19 +102,26 @@ int     VFS_FS_INODE(const char *cmd, const char *param, unsigned flags, AGENT_R
 int     VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
+int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	CHECK_SERVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	CHECK_SERVICE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 /* internal system functions */
+int	EXECUTE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
-int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	NET_IF_IN_BYTES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	NET_IF_IN_PACKETS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	NET_IF_IN_ERRORS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	NET_IF_OUT_BYTES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	NET_IF_OUT_PACKETS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	NET_IF_OUT_ERRORS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 int	SYSTEM_CPU_IDLE1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	SYSTEM_CPU_IDLE5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
@@ -140,10 +147,6 @@ int	VFS_FS_PFREE(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 int	VFS_FS_PUSED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 int	DISK_IO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	DISK_RIO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	DISK_WIO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	DISK_RBLK(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int	DISK_WBLK(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 int	VFS_FS_INODE_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	VFS_FS_INODE_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);

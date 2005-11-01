@@ -183,6 +183,7 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
         assert(result);
 
         clean_result(result);
+
 	memset(tmp,0,MAX_STRING_LEN);
 
 	if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
