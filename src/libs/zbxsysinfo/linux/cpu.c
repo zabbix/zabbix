@@ -22,69 +22,68 @@
 #include "common.h"
 #include "sysinfo.h"
 
-int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	SYSTEM_CPU_IDLE1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+	return	get_stat("cpu[idle1]", flags, result);
+}
 
-#define CPU_FNCLIST struct cpu_fnclist_s
-CPU_FNCLIST
+static int	SYSTEM_CPU_IDLE5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char *mode;
-	int (*function)();
-};
+	return	get_stat("cpu[idle5]", flags, result);
+}
 
-	CPU_FNCLIST fl[] = 
-	{
-		{"avg1" ,	SYSTEM_CPU_LOAD1},
-		{"avg5" ,	SYSTEM_CPU_LOAD5},
-		{"avg15",	SYSTEM_CPU_LOAD15},
-		{0,		0}
-	};
+static int	SYSTEM_CPU_IDLE15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	return	get_stat("cpu[idle15]", flags, result);
+}
 
-	char cpuname[MAX_STRING_LEN];
-	char mode[MAX_STRING_LEN];
-	int i;
-	
-        assert(result);
+static int	SYSTEM_CPU_NICE1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	return	get_stat("cpu[nice1]", flags, result);
+}
 
-        clean_result(result);
-	
-        if(num_param(param) > 2)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+static int	SYSTEM_CPU_NICE5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	return	get_stat("cpu[nice5]", flags, result);
+}
+static int	SYSTEM_CPU_NICE15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	return	get_stat("cpu[nice15]", flags, result);
+}
 
-        if(get_param(param, 1, cpuname, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-	if(cpuname[0] == '\0')
-	{
-		/* default parameter */
-		sprintf(cpuname, "all");
-	}
-	if(strncmp(cpuname, "all", MAX_STRING_LEN))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-	
-	if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
-        {
-                mode[0] = '\0';
-        }
-        if(mode[0] == '\0')
-	{
-		/* default parameter */
-		sprintf(mode, "avg1");
-	}
-	for(i=0; fl[i].mode!=0; i++)
-	{
-		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
-		{
-			return (fl[i].function)(cmd, param, flags, result);
-		}
-	}
-	
-	return SYSINFO_RET_FAIL;
+static int	SYSTEM_CPU_USER1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	return	get_stat("cpu[user1]", flags, result);
+}
+
+static int	SYSTEM_CPU_USER5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	return	get_stat("cpu[user5]", flags, result);
+}
+
+static int	SYSTEM_CPU_USER15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	return	get_stat("cpu[user15]", flags, result);
+}
+
+static int	SYSTEM_CPU_SYS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	return	get_stat("cpu[system1]", flags, result);
+}
+
+static int	SYSTEM_CPU_SYS5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	return	get_stat("cpu[system5]", flags, result);
+}
+
+static int	SYSTEM_CPU_SYS15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	return	get_stat("cpu[system15]", flags, result);
+}
+
+int     OLD_CPU(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	return	get_stat(cmd, flags, result);
 }
 
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -174,72 +173,7 @@ CPU_FNCLIST
 			}
 		}
 	}
-	
 	return SYSINFO_RET_FAIL;
-}
-
-int     OLD_CPU(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat(cmd, flags, result);
-}
-
-int	SYSTEM_CPU_IDLE1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[idle1]", flags, result);
-}
-
-int	SYSTEM_CPU_IDLE5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[idle5]", flags, result);
-}
-
-int	SYSTEM_CPU_IDLE15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[idle15]", flags, result);
-}
-
-int	SYSTEM_CPU_NICE1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[nice1]", flags, result);
-}
-
-int	SYSTEM_CPU_NICE5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[nice5]", flags, result);
-}
-int	SYSTEM_CPU_NICE15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[nice15]", flags, result);
-}
-
-int	SYSTEM_CPU_USER1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[user1]", flags, result);
-}
-
-int	SYSTEM_CPU_USER5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[user5]", flags, result);
-}
-
-int	SYSTEM_CPU_USER15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[user15]", flags, result);
-}
-
-int	SYSTEM_CPU_SYS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[system1]", flags, result);
-}
-
-int	SYSTEM_CPU_SYS5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[system5]", flags, result);
-}
-
-int	SYSTEM_CPU_SYS15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[system15]", flags, result);
 }
 
 /* AIX CPU info */
@@ -547,5 +481,70 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 #endif
 #endif
 #endif
+}
+
+int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+
+#define CPU_FNCLIST struct cpu_fnclist_s
+CPU_FNCLIST
+{
+	char *mode;
+	int (*function)();
+};
+
+	CPU_FNCLIST fl[] = 
+	{
+		{"avg1" ,	SYSTEM_CPU_LOAD1},
+		{"avg5" ,	SYSTEM_CPU_LOAD5},
+		{"avg15",	SYSTEM_CPU_LOAD15},
+		{0,		0}
+	};
+
+	char cpuname[MAX_STRING_LEN];
+	char mode[MAX_STRING_LEN];
+	int i;
+	
+        assert(result);
+
+        clean_result(result);
+	
+        if(num_param(param) > 2)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, cpuname, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+	if(cpuname[0] == '\0')
+	{
+		/* default parameter */
+		sprintf(cpuname, "all");
+	}
+	if(strncmp(cpuname, "all", MAX_STRING_LEN))
+	{
+		return SYSINFO_RET_FAIL;
+	}
+	
+	if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
+        {
+                mode[0] = '\0';
+        }
+        if(mode[0] == '\0')
+	{
+		/* default parameter */
+		sprintf(mode, "avg1");
+	}
+	for(i=0; fl[i].mode!=0; i++)
+	{
+		if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
+		{
+			return (fl[i].function)(cmd, param, flags, result);
+		}
+	}
+	
+	return SYSINFO_RET_FAIL;
 }
 

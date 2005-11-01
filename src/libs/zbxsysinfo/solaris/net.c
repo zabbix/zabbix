@@ -52,6 +52,252 @@ static int get_kstat_named_field(
     return ret;
 }
 
+static int	NET_IF_IN_BYTES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+    kstat_named_t kn;
+    char    interface[MAX_STRING_LEN];
+    int	    ret;
+
+    assert(result);
+
+    clean_result(result);
+	
+    if(num_param(param) > 1)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    
+    ret = get_kstat_named_field(interface, "rbytes64", &kn);
+    if (ret == SYSINFO_RET_OK)
+    {
+	result->type |= AR_DOUBLE;
+        result->dbl = (double)kn.value.ui64;
+    }
+    else
+    {
+	ret = get_kstat_named_field(interface, "rbytes", &kn);
+	result->type |= AR_DOUBLE;
+        result->dbl = (double)kn.value.ui32;
+    }
+    
+    return ret;
+}
+
+static int	NET_IF_IN_PACKETS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+    kstat_named_t kn;
+    char    interface[MAX_STRING_LEN];
+    int	    ret;
+
+    assert(result);
+
+    clean_result(result);
+	
+    if(num_param(param) > 1)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    
+    ret = get_kstat_named_field(interface, "ipackets64", &kn);
+    if (ret == SYSINFO_RET_OK)
+    {
+	result->type |= AR_DOUBLE;
+        result->dbl = (double)kn.value.ui64;
+    }
+    else
+    {
+	ret = get_kstat_named_field(interface, "ipackets", &kn);
+	result->type |= AR_DOUBLE;
+        result->dbl = (double)kn.value.ui32;
+    }
+    
+    return ret;
+}
+
+static int	NET_IF_IN_ERRORS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+    kstat_named_t kn;
+    char    interface[MAX_STRING_LEN];
+    int	    ret;
+
+    assert(result);
+
+    clean_result(result);
+	
+    if(num_param(param) > 1)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    
+    ret = get_kstat_named_field(interface, "ierrors", &kn);
+
+    result->type |= AR_DOUBLE;
+    result->dbl = (double)kn.value.ui32;
+    
+    return ret;
+}
+
+static int	NET_IF_OUT_BYTES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+    kstat_named_t kn;
+    char    interface[MAX_STRING_LEN];
+    int	    ret;
+
+    assert(result);
+
+    clean_result(result);
+	
+    if(num_param(param) > 1)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    
+    ret = get_kstat_named_field(interface, "obytes64", &kn);
+    if (ret == SYSINFO_RET_OK)
+    {
+	result->type |= AR_DOUBLE;
+        result->dbl = (double)kn.value.ui64;
+    }
+    else
+    {
+	ret = get_kstat_named_field(interface, "obytes", &kn);
+	result->type |= AR_DOUBLE;
+        result->dbl = (double)kn.value.ui32;
+    }
+    
+    return ret;
+}
+
+static int	NET_IF_OUT_PACKETS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+    kstat_named_t kn;
+    char    interface[MAX_STRING_LEN];
+    int	    ret;
+
+    assert(result);
+
+    clean_result(result);
+	
+    if(num_param(param) > 1)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    
+    ret = get_kstat_named_field(interface, "opackets64", &kn);
+    if (ret == SYSINFO_RET_OK)
+    {
+	result->type |= AR_DOUBLE;
+        result->dbl = (double)kn.value.ui64;
+    }
+    else
+    {
+	ret = get_kstat_named_field(interface, "opackets", &kn);
+	result->type |= AR_DOUBLE;
+        result->dbl = (double)kn.value.ui32;
+    }
+    
+    return ret;
+}
+
+static int	NET_IF_OUT_ERRORS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+    kstat_named_t kn;
+    char    interface[MAX_STRING_LEN];
+    int	    ret;
+
+    assert(result);
+
+    clean_result(result);
+	
+    if(num_param(param) > 1)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    
+    ret = get_kstat_named_field(interface, "oerrors", &kn);
+
+    result->type |= AR_DOUBLE;
+    result->dbl = (double)kn.value.ui32;
+    
+    return ret;
+}
+
+int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+    kstat_named_t kn;
+    char    interface[MAX_STRING_LEN];
+    int	    ret;
+
+    assert(result);
+    
+    clean_result(result);
+    
+    if(num_param(param) > 1)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    
+    ret = get_kstat_named_field(interface, "collisions", &kn);
+
+    if(ret == SYSINFO_RET_OK)
+    {
+	result->type |= AR_DOUBLE;
+	result->dbl = (double)kn.value.ui32;
+    }
+    
+    return ret;
+}
+
+int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+    char command[MAX_STRING_LEN];
+
+    assert(result);
+    
+    clean_result(result);
+    
+    memset(command, '\0', sizeof(command));
+
+    snprintf(command, sizeof(command)-1, "netstat -an | grep '*.%s' | wc -l", param);
+   
+    return EXECUTE(NULL, command, flags, result);
+}
+
 int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 
@@ -163,251 +409,5 @@ NET_FNCLIST
 	}
 	
 	return SYSINFO_RET_FAIL;
-}
-
-int	NET_IF_IN_BYTES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-    kstat_named_t kn;
-    char    interface[MAX_STRING_LEN];
-    int	    ret;
-
-    assert(result);
-
-    clean_result(result);
-	
-    if(num_param(param) > 1)
-    {
-	return SYSINFO_RET_FAIL;
-    }
-
-    if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
-    {
-	return SYSINFO_RET_FAIL;
-    }
-    
-    ret = get_kstat_named_field(interface, "rbytes64", &kn);
-    if (ret == SYSINFO_RET_OK)
-    {
-	result->type |= AR_DOUBLE;
-        result->dbl = (double)kn.value.ui64;
-    }
-    else
-    {
-	ret = get_kstat_named_field(interface, "rbytes", &kn);
-	result->type |= AR_DOUBLE;
-        result->dbl = (double)kn.value.ui32;
-    }
-    
-    return ret;
-}
-
-int	NET_IF_IN_PACKETS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-    kstat_named_t kn;
-    char    interface[MAX_STRING_LEN];
-    int	    ret;
-
-    assert(result);
-
-    clean_result(result);
-	
-    if(num_param(param) > 1)
-    {
-	return SYSINFO_RET_FAIL;
-    }
-
-    if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
-    {
-	return SYSINFO_RET_FAIL;
-    }
-    
-    ret = get_kstat_named_field(interface, "ipackets64", &kn);
-    if (ret == SYSINFO_RET_OK)
-    {
-	result->type |= AR_DOUBLE;
-        result->dbl = (double)kn.value.ui64;
-    }
-    else
-    {
-	ret = get_kstat_named_field(interface, "ipackets", &kn);
-	result->type |= AR_DOUBLE;
-        result->dbl = (double)kn.value.ui32;
-    }
-    
-    return ret;
-}
-
-int	NET_IF_IN_ERRORS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-    kstat_named_t kn;
-    char    interface[MAX_STRING_LEN];
-    int	    ret;
-
-    assert(result);
-
-    clean_result(result);
-	
-    if(num_param(param) > 1)
-    {
-	return SYSINFO_RET_FAIL;
-    }
-
-    if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
-    {
-	return SYSINFO_RET_FAIL;
-    }
-    
-    ret = get_kstat_named_field(interface, "ierrors", &kn);
-
-    result->type |= AR_DOUBLE;
-    result->dbl = (double)kn.value.ui32;
-    
-    return ret;
-}
-
-int	NET_IF_OUT_BYTES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-    kstat_named_t kn;
-    char    interface[MAX_STRING_LEN];
-    int	    ret;
-
-    assert(result);
-
-    clean_result(result);
-	
-    if(num_param(param) > 1)
-    {
-	return SYSINFO_RET_FAIL;
-    }
-
-    if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
-    {
-	return SYSINFO_RET_FAIL;
-    }
-    
-    ret = get_kstat_named_field(interface, "obytes64", &kn);
-    if (ret == SYSINFO_RET_OK)
-    {
-	result->type |= AR_DOUBLE;
-        result->dbl = (double)kn.value.ui64;
-    }
-    else
-    {
-	ret = get_kstat_named_field(interface, "obytes", &kn);
-	result->type |= AR_DOUBLE;
-        result->dbl = (double)kn.value.ui32;
-    }
-    
-    return ret;
-}
-
-int	NET_IF_OUT_PACKETS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-    kstat_named_t kn;
-    char    interface[MAX_STRING_LEN];
-    int	    ret;
-
-    assert(result);
-
-    clean_result(result);
-	
-    if(num_param(param) > 1)
-    {
-	return SYSINFO_RET_FAIL;
-    }
-
-    if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
-    {
-	return SYSINFO_RET_FAIL;
-    }
-    
-    ret = get_kstat_named_field(interface, "opackets64", &kn);
-    if (ret == SYSINFO_RET_OK)
-    {
-	result->type |= AR_DOUBLE;
-        result->dbl = (double)kn.value.ui64;
-    }
-    else
-    {
-	ret = get_kstat_named_field(interface, "opackets", &kn);
-	result->type |= AR_DOUBLE;
-        result->dbl = (double)kn.value.ui32;
-    }
-    
-    return ret;
-}
-
-int	NET_IF_OUT_ERRORS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-    kstat_named_t kn;
-    char    interface[MAX_STRING_LEN];
-    int	    ret;
-
-    assert(result);
-
-    clean_result(result);
-	
-    if(num_param(param) > 1)
-    {
-	return SYSINFO_RET_FAIL;
-    }
-
-    if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
-    {
-	return SYSINFO_RET_FAIL;
-    }
-    
-    ret = get_kstat_named_field(interface, "oerrors", &kn);
-
-    result->type |= AR_DOUBLE;
-    result->dbl = (double)kn.value.ui32;
-    
-    return ret;
-}
-
-int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-    kstat_named_t kn;
-    char    interface[MAX_STRING_LEN];
-    int	    ret;
-
-    assert(result);
-    
-    clean_result(result);
-    
-    if(num_param(param) > 1)
-    {
-	return SYSINFO_RET_FAIL;
-    }
-
-    if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
-    {
-	return SYSINFO_RET_FAIL;
-    }
-    
-    ret = get_kstat_named_field(interface, "collisions", &kn);
-
-    if(ret == SYSINFO_RET_OK)
-    {
-	result->type |= AR_DOUBLE;
-	result->dbl = (double)kn.value.ui32;
-    }
-    
-    return ret;
-}
-
-int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-    char command[MAX_STRING_LEN];
-
-    assert(result);
-    
-    clean_result(result);
-    
-    memset(command, '\0', sizeof(command));
-
-    snprintf(command, sizeof(command)-1, "netstat -an | grep '*.%s' | wc -l", param);
-   
-    return EXECUTE(NULL, command, flags, result);
 }
 

@@ -244,4 +244,5 @@ char    *zbx_regexp_match(const char *string, const char *pattern, int *len);
 /* Misc functions */
 int	cmp_double(double a,double b);
 
+int       SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 #endif
