@@ -309,12 +309,12 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
     long int	lvalue = 0;
 
     FILE    *f;
+	int	proccount = 0;
 
         assert(result);
 
         clean_result(result);
 	
-        int	proccount = 0;
     
         if(num_param(param) > 3)
         {
