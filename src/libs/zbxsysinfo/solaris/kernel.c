@@ -25,7 +25,7 @@
 
 int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-    int result = SYSINFO_RET_FAIL;
+    int ret = SYSINFO_RET_FAIL;
     kstat_ctl_t *kc;
     kstat_t	*kt;
     struct var	*v;
@@ -48,13 +48,13 @@ int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RES
 				/* int	v_proc;	    Max processes system wide */
 				result->type |= AR_DOUBLE;
 				result->dbl = (double)v->v_proc;
-				result = SYSINFO_RET_OK;
+				ret = SYSINFO_RET_OK;
 			}
 		}
 		kstat_close(kc);
 	}
 
-	return result;
+	return ret;
 }
 
 int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
