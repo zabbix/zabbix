@@ -540,7 +540,7 @@
 	"S_NUMBER_OF_TRIGGERS_ENABLED_DISABLED"=>"トリガー数 (有効/無効)",
 	"S_NUMBER_OF_ITEMS_ACTIVE_TRAPPER"=>	"アイテム数 (有効/トラッパー/無効/取得不可)",
 	"S_NUMBER_OF_USERS"=>			"ユーザー数",
-	"S_NUMBER_OF_HOSTS_MONITORED"=>		"ホスト数 (有効/無効/テンプレート)",
+	"S_NUMBER_OF_HOSTS_MONITORED"=>		"ホスト数 (有効/無効/テンプレート/deleted)",
 	"S_YES"=>				"Yes",
 	"S_NO"=>				"No",
 

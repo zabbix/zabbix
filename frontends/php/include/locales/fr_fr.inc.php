@@ -489,7 +489,7 @@
 	"S_NUMBER_OF_TRIGGERS_ENABLED_DISABLED"=>"Nombre de déclencheurs (activés/désactivés)",
 	"S_NUMBER_OF_ITEMS_ACTIVE_TRAPPER"=>	"Nombre d'items (actifs/collecteurs/inactifs/non supportés)",
 	"S_NUMBER_OF_USERS"=>					"Nombre d'utilisateurs",
-	"S_NUMBER_OF_HOSTS_MONITORED"=>			"Nombre d'hôtes (surveillés/non surveillés/modèles)",
+	"S_NUMBER_OF_HOSTS_MONITORED"=>			"Nombre d'hôtes (surveillés/non surveillés/modèles/deleted)",
 	"S_YES"=>								"Oui",
 	"S_NO"=>								"Non",
 

@@ -220,6 +220,19 @@
 	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
 
+	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]!=0))
+	{
+		$groupcond=" and hg.hostid=h.hostid and hg.groupid=".$_REQUEST["groupid"]." ";
+		$groupname=",hosts_groups hg";
+	}
+	else
+	{
+		$groupcond="";
+		$groupname="";
+	}
+	$sql="select h.hostid,h.host from hosts h,items i".$groupname." where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid $groupcond group by h.hostid,h.host order by h.host";
+
+/*
 	if(isset($_REQUEST["groupid"]))
 	{
 		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
@@ -228,6 +241,7 @@
 	{
 		$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid group by h.hostid,h.host order by h.host";
 	}
+*/
 
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
@@ -365,11 +379,11 @@
 
 		if($onlytrue=='true')
 		{
-			$sql="select t.priority,count(*) from triggers t,hosts h,items i,functions f  where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and t.triggerid=f.triggerid and t.description $select_cond and i.status=0 $cond group by 1";
+			$sql="select t.priority,count(*) from triggers t,hosts h,items i,functions f".$groupname."  where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and t.triggerid=f.triggerid and t.description $select_cond and i.status=0 $cond $groupcond group by 1";
 		}
 		else
 		{
-			$sql="select t.priority,count(*) from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=0 and h.status=".HOST_STATUS_MONITORED." and t.description $select_cond and i.status=0 $cond group by 1";
+			$sql="select t.priority,count(*) from triggers t,hosts h,items i,functions f".$groupname." where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=0 and h.status=".HOST_STATUS_MONITORED." and t.description $select_cond and i.status=0 $cond $groupcond group by 1";
 		}
 		$result=DBselect($sql);
 		$p0=$p1=$p2=$p3=$p4=$p5=0;
@@ -495,11 +509,11 @@
 
 	if($onlytrue=='true')
 	{
-		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f  where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and t.description $select_cond and t.triggerid=f.triggerid and i.status in (0,2) and h.status=".HOST_STATUS_MONITORED." $cond $sort");
+		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f".$groupname." where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and t.description $select_cond and t.triggerid=f.triggerid and i.status in (0,2) and h.status=".HOST_STATUS_MONITORED." $cond $groupcond $sort");
 	}
 	else
 	{
-		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f  where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=0 and t.description $select_cond and i.status in (0,2) and h.status=".HOST_STATUS_MONITORED." $cond $sort");
+		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f".$groupname." where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=0 and t.description $select_cond and i.status in (0,2) and h.status=".HOST_STATUS_MONITORED." $cond $groupcond $sort");
 	}
 	$col=0;
 	while($row=DBfetch($result))

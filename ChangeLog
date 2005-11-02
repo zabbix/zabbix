@@ -1,5 +1,10 @@
 Changes for 1.1beta3:
 
+ - Applied ServerByName patch. (James)
+ - First pass at optimization of MySQL queries on reports page. (James)
+ - Fixed Groupid selection in triggers page (James)
+ - Fixed Update Profile in profiles page (James)
+ - Fixed Number Of Hosts in reports page (James)
  - optimized sysinfo functions for solaris system (Eugene)
  - optimized sysinfo functions for linux system (Eugene)
  - grouped commands in to the new command with parameters for linux (Eugene)
