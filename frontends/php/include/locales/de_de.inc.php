@@ -496,7 +496,7 @@
 	"S_NUMBER_OF_TRIGGERS_ENABLED_DISABLED"=>"Anzahl der Ausl&ouml;ser (aktiviert/deaktiviert)",
 	"S_NUMBER_OF_ITEMS_ACTIVE_TRAPPER"=>	"Anzahl der Elemente (aktiviert/Empf&auml;nger/deaktiviert/nicht unterst&uuml;tzt)",
 	"S_NUMBER_OF_USERS"=>			"Anzahl der Benutzer",
-	"S_NUMBER_OF_HOSTS_MONITORED"=>		"Anzahl der Systeme (&uuml;berwacht/nicht &uuml;berwacht/Vorlagen)",
+	"S_NUMBER_OF_HOSTS_MONITORED"=>		"Anzahl der Systeme (&uuml;berwacht/nicht &uuml;berwacht/Vorlagen/deleted)",
 	"S_YES"=>				"Ja",
 	"S_NO"=>				"Nein",
 

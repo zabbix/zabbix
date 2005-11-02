@@ -491,7 +491,7 @@
 	"S_NUMBER_OF_TRIGGERS_ENABLED_DISABLED"=>"Numero di inneschi (abilitati/disabilitati)",
 	"S_NUMBER_OF_ITEMS_ACTIVE_TRAPPER"=>	"Numero di parametri (attivi/trapper/non attivi/non supportati)",
 	"S_NUMBER_OF_USERS"=>			"Numero di utenti",
-	"S_NUMBER_OF_HOSTS_MONITORED"=>		"Numero di dispositivi (abilitati/disabilitati/modelli)",
+	"S_NUMBER_OF_HOSTS_MONITORED"=>		"Numero di dispositivi (abilitati/disabilitati/modelli/deleted)",
 	"S_YES"=>				"Sì",
 	"S_NO"=>				"No",
 
