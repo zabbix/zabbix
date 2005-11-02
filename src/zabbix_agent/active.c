@@ -428,6 +428,8 @@ int	process_active_checks(char *server, int port)
 
 	AGENT_RESULT	result;
 
+	memset(&result, 0, sizeof(AGENT_RESULT));
+
 	now=time(NULL);
 
 	for(i=0;;i++)
