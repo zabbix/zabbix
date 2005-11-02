@@ -49,6 +49,10 @@
 #	include <strings.h>
 #endif
 
+#ifdef HAVE_SYS_TIME_H
+#	include <sys/time.h>
+#endif
+
 #ifdef HAVE_ARPA_NAMESER_H
 #	include <arpa/nameser.h>
 #endif
@@ -161,10 +165,6 @@
 
 #ifdef HAVE_SYS_SYSMACROS_H
 #	include <sys/sysmacros.h>
-#endif
-
-#ifdef HAVE_SYS_TIME_H
-#	include <sys/time.h>
 #endif
 
 #ifdef HAVE_SYS_VAR_H
