@@ -52,7 +52,7 @@ static int	get_fs_inodes_stat(char *fs, double *total, double *free, double *usa
 		(*usage) = (double)(s.f_files - s.f_favail);
 #else
 	if(free)
-		(*free)  = (double)(s.ffree);
+		(*free)  = (double)(s.f_ffree);
 	if(usage)
 		(*usage) = (double)(s.f_files - s.f_ffree);
 #endif
