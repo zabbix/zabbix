@@ -306,7 +306,7 @@ void	collect_stats_cpustat(FILE *outfile)
 	file=fopen("/proc/stat","r");
 	if(NULL == file)
 	{
-		fprintf(stderr, "Cannot open [%s] [%m]\n","/proc/stat");
+		fprintf(stderr, "Cannot open [%s] [%s]\n","/proc/stat", strerror(errno));
 		return;
 	}
 	i=0;
