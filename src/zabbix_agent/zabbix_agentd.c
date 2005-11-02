@@ -239,7 +239,6 @@ void	print_supported()
 
 void    init_config(void)
 {
-	AGENT_RESULT	result;	
 	struct cfg_line cfg[]=
 	{
 /*               PARAMETER      ,VAR    ,FUNC,  TYPE(0i,1s),MANDATORY,MIN,MAX
@@ -261,7 +260,10 @@ void    init_config(void)
 		{"UserParameter",0,&add_parameter,0,0,0,0},
 		{0}
 	};
+	AGENT_RESULT	result;	
 
+	memset(&result, 0, sizeof(AGENT_RESULT));
+	
 	if(CONFIG_FILE == NULL)
 	{
 		CONFIG_FILE=strdup("/etc/zabbix/zabbix_agentd.conf");
@@ -308,6 +310,8 @@ void	process_child(int sockfd)
         static struct  	sigaction phan;
 	AGENT_RESULT	result;
 
+	memset(&result, 0, sizeof(AGENT_RESULT));
+	
 	phan.sa_handler = &signal_handler; /* set up sig handler using sigaction() */
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = 0;

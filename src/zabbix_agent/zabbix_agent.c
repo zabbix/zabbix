@@ -78,6 +78,8 @@ int	main()
 	char	value[MAX_STRING_LEN];
 	AGENT_RESULT	result;
 
+	memset(&result, 0, sizeof(AGENT_RESULT));
+
 #ifdef	TEST_PARAMETERS
 	init_metrics();
 /*	init_config();*/
