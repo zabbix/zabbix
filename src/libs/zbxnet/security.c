@@ -22,6 +22,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <netdb.h>
 
 #include <string.h>
 
@@ -52,12 +53,12 @@
  ******************************************************************************/
 int	check_security(int sockfd, char *ip_list, int allow_if_empty)
 {
-	char	*sname;
 	struct	sockaddr_in name;
 	int	i;
-	char	*s;
+	char	*sip, *host;
+	struct  hostent *hp;
 
-	char	tmp[MAX_STRING_LEN];
+	char	tmp[MAX_STRING_LEN], sname[MAX_STRING_LEN];
 
         zabbix_log( LOG_LEVEL_DEBUG, "In check_security()");
 
@@ -68,24 +69,32 @@ int	check_security(int sockfd, char *ip_list, int allow_if_empty)
 
 	i=sizeof(name);
 
-/*	if(getpeername(sockfd,  (struct sockaddr *)&name, (size_t *)&i) == 0)*/
 	if(getpeername(sockfd,  (struct sockaddr *)&name, (socklen_t *)&i) == 0)
 	{
 		i=sizeof(struct sockaddr_in);
 
-		sname=inet_ntoa(name.sin_addr);
+		strcpy(sname,inet_ntoa(name.sin_addr));
 
 		zabbix_log( LOG_LEVEL_DEBUG, "Connection from [%s]. Allowed servers [%s] ",sname, ip_list);
 
 		strscpy(tmp,ip_list);
-        	s=(char *)strtok(tmp,",");
-		while(s!=NULL)
+        	host=(char *)strtok(tmp,",");
+		while(host!=NULL)
 		{
-			if(strcmp(sname, s)==0)
+			/* Allow IP addresses or DNS names for authorization */
+			if((hp=gethostbyname(host)) == 0)
 			{
-				return	SUCCEED;
+				zabbix_log( LOG_LEVEL_WARNING, "Error gethostbyname, can not resolve [%s]",host);
 			}
-                	s=(char *)strtok(NULL,",");
+			else
+			{
+				sip=inet_ntoa(*((struct in_addr *)hp->h_addr));
+				if(strcmp(sname, sip)==0)
+				{
+					return	SUCCEED;
+				}
+			}
+                	host=(char *)strtok(NULL,",");
 		}
 	}
 	else

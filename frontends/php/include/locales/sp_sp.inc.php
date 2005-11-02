@@ -489,7 +489,7 @@
 	"S_NUMBER_OF_TRIGGERS_ENABLED_DISABLED"=>"Número de triggers (habilitado/deshabilitado)",
 	"S_NUMBER_OF_ITEMS_ACTIVE_TRAPPER"=>	"Number of items (active/trapper/not active/not supported)",
 	"S_NUMBER_OF_USERS"=>			"Número de usuarios",
-	"S_NUMBER_OF_HOSTS_MONITORED"=>		"Número de items (active/trapper/no activos/no soportados)",
+	"S_NUMBER_OF_HOSTS_MONITORED"=>		"Número de items (active/trapper/no activos/no soportados/deleted)",
 	"S_YES"=>				"Sí",
 	"S_NO"=>				"No",
 

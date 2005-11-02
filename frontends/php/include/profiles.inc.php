@@ -87,7 +87,7 @@
 		$location=addslashes($location);
 		$notes=addslashes($notes);
 
-		$sql="update hosts_profiles set hostid=$hostid,devicetype='$devicetype',name='$name',os='$os',serialno='$serialno',tag='$tag',macaddress='$macaddress',hardware='$hardware',software='$software',contact='$contact',location='$location',notes='$notes'";
+		$sql="update hosts_profiles set devicetype='$devicetype',name='$name',os='$os',serialno='$serialno',tag='$tag',macaddress='$macaddress',hardware='$hardware',software='$software',contact='$contact',location='$location',notes='$notes' where hostid=$hostid";
 		$result=DBexecute($sql);
 		
 		return	$result;

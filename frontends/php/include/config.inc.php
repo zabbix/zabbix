@@ -234,7 +234,7 @@
 	
 	function	get_media_count_by_userid($userid)
 	{
-		$sql="select count(*) as cnt from media where userid=$userid";
+		$sql="select count(mediaid) as cnt from media where userid=$userid";
 		$result=DBselect($sql);
 		$row=DBfetch($result);
 		return $row["cnt"]; 
@@ -244,13 +244,13 @@
 	{
 		$cnt=0;
 
-		$sql="select count(*) as cnt from actions where triggerid=$triggerid and scope=0";
+		$sql="select count(actionid) as cnt from actions where triggerid=$triggerid and scope=0";
 		$result=DBselect($sql);
 		$row=DBfetch($result);
 
 		$cnt=$cnt+$row["cnt"];
 
-		$sql="select count(*) as cnt from actions where scope=2";
+		$sql="select count(actionid) as cnt from actions where scope=2";
 		$result=DBselect($sql);
 		$row=DBfetch($result);
 
@@ -1392,7 +1392,7 @@ echo "</head>";
 				$itemid=DBget_field($res,0,0);
 #				echo "ITEMID:$itemid<BR>";
 	
-#				$sql="select functionid,count(*) from functions where function='$function' and parameter=$parameter group by 1";
+#				$sql="select functionid,count(functionid) from functions where function='$function' and parameter=$parameter group by 1";
 #				echo $sql,"<Br>";
 #				$res=DBselect($sql);
 #
@@ -2532,55 +2532,70 @@ echo "</head>";
 
 	function	get_stats()
 	{
-	        $result=DBselect("select count(*) from history");
-		$stat["history_count"]=DBget_field($result,0,0);
+	global $DB_TYPE;
+	if ($DB_TYPE == "MYSQL")
+	{
+	        $result=DBselect("show table status like 'history'");
+		$stat["history_count"]=DBget_field($result,0,3);
 
-	        $result=DBselect("select count(*) from trends");
-		$stat["trends_count"]=DBget_field($result,0,0);
+	        $result=DBselect("show table status like 'trends'");
+		$stat["trends_count"]=DBget_field($result,0,3);
+	}
+	else
+	{
+	        $result=DBselect("select count(itemid) from history");
+		$stat["history_count"]=DBget_field($result,0,3);
 
-	        $result=DBselect("select count(*) from alarms");
+	        $result=DBselect("select count(itemid) from trends");
+		$stat["trends_count"]=DBget_field($result,0,3);
+	}
+
+	        $result=DBselect("select count(alarmid) from alarms");
 		$stat["alarms_count"]=DBget_field($result,0,0);
 
-	        $result=DBselect("select count(*) from alerts");
+	        $result=DBselect("select count(alertid) from alerts");
 		$stat["alerts_count"]=DBget_field($result,0,0);
 
-	        $result=DBselect("select count(*) from triggers");
+	        $result=DBselect("select count(triggerid) from triggers");
 		$stat["triggers_count"]=DBget_field($result,0,0);
 
-	        $result=DBselect("select count(*) from triggers where status=0");
+	        $result=DBselect("select count(triggerid) from triggers where status=0");
 		$stat["triggers_count_enabled"]=DBget_field($result,0,0);
 
-	        $result=DBselect("select count(*) from triggers where status=1");
+	        $result=DBselect("select count(triggerid) from triggers where status=1");
 		$stat["triggers_count_disabled"]=DBget_field($result,0,0);
 
-	        $result=DBselect("select count(*) from items");
+	        $result=DBselect("select count(itemid) from items");
 		$stat["items_count"]=DBget_field($result,0,0);
 
-	        $result=DBselect("select count(*) from items where status=0");
+	        $result=DBselect("select count(itemid) from items where status=0");
 		$stat["items_count_active"]=DBget_field($result,0,0);
 
-	        $result=DBselect("select count(*) from items where status=1");
+	        $result=DBselect("select count(itemid) from items where status=1");
 		$stat["items_count_not_active"]=DBget_field($result,0,0);
 
-	        $result=DBselect("select count(*) from items where status=3");
+	        $result=DBselect("select count(itemid) from items where status=3");
 		$stat["items_count_not_supported"]=DBget_field($result,0,0);
 
-	        $result=DBselect("select count(*) from items where type=2");
+	        $result=DBselect("select count(itemid) from items where type=2");
 		$stat["items_count_trapper"]=DBget_field($result,0,0);
 
-	        $result=DBselect("select count(*) from hosts");
+	        $result=DBselect("select count(hostid) from hosts");
 		$stat["hosts_count"]=DBget_field($result,0,0);
 
-	        $result=DBselect("select count(*) from hosts where status=".HOST_STATUS_MONITORED);
+	        $result=DBselect("select count(hostid) from hosts where status=".HOST_STATUS_MONITORED);
 		$stat["hosts_count_monitored"]=DBget_field($result,0,0);
 
-	        $result=DBselect("select count(*) from hosts where status!=".HOST_STATUS_MONITORED);
+	        $result=DBselect("select count(hostid) from hosts where status!=".HOST_STATUS_MONITORED);
 		$stat["hosts_count_not_monitored"]=DBget_field($result,0,0);
 
-	        $result=DBselect("select count(*) from hosts where status=".HOST_STATUS_DELETED);
+	        $result=DBselect("select count(hostid) from hosts where status=".HOST_STATUS_TEMPLATE);
 		$stat["hosts_count_template"]=DBget_field($result,0,0);
 
-	        $result=DBselect("select count(*) from users");
+	        $result=DBselect("select count(hostid) from hosts where status=".HOST_STATUS_DELETED);
+		$stat["hosts_count_deleted"]=DBget_field($result,0,0);
+
+	        $result=DBselect("select count(userid) from users");
 		$stat["users_count"]=DBget_field($result,0,0);
 
 
