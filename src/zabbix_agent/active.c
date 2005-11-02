@@ -331,8 +331,8 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 int	send_value(char *server,int port,char *host, char *key,char *value, char *lastlogsize)
 {
 	int	i,s;
-	char	tosend[1024];
-	char	result[1024];
+	char	tosend[MAX_STRING_LEN];
+	char	result[MAX_STRING_LEN];
 	struct hostent *hp;
 
 	struct sockaddr_in myaddr_in;
