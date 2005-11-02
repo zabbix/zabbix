@@ -58,7 +58,7 @@ int zabbix_open_log(int type,int level, const char *filename)
 		log_file = fopen(filename,"a+");
 		if(log_file == NULL)
 		{
-			fprintf(stderr, "Unable to open debug file [%s] [%m]\n", filename);
+			fprintf(stderr, "Unable to open debug file [%s] [%s]\n", filename, strerror(errno));
 			return	FAIL;
 		}
 		log_type = LOG_TYPE_FILE;

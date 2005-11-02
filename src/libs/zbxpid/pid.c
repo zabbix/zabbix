@@ -46,9 +46,9 @@ int	create_pid_file(const char *pidfile)
 			pidfile);
 		if(fclose(f) != 0)
 		{
-			fprintf(stderr, "Cannot close file [%s] [%m]", pidfile);
-			zabbix_log( LOG_LEVEL_WARNING, "Cannot close file [%s] [%m]",
-				pidfile);
+			fprintf(stderr, "Cannot close file [%s] [%s]", pidfile, strerror(errno));
+			zabbix_log( LOG_LEVEL_WARNING, "Cannot close file [%s] [%s]",
+				pidfile, strerror(errno));
 		}
 
 		return FAIL;
@@ -58,10 +58,10 @@ int	create_pid_file(const char *pidfile)
 
 	if( f == NULL)
 	{
-		fprintf(stderr, "Cannot create PID file [%s] [%m]\n",
-			pidfile);
-		zabbix_log( LOG_LEVEL_CRIT, "Cannot create PID file [%s] [%m]",
-			pidfile);
+		fprintf(stderr, "Cannot create PID file [%s] [%s]\n",
+			pidfile, strerror(errno));
+		zabbix_log( LOG_LEVEL_CRIT, "Cannot create PID file [%s] [%s]",
+			pidfile, strerror(errno));
 
 		return FAIL;
 	}
@@ -69,9 +69,9 @@ int	create_pid_file(const char *pidfile)
 	fprintf(f,"%d",(int)getpid());
 	if(fclose(f) != 0)
 	{
-		fprintf(stderr, "Cannot close file [%s] [%m]", pidfile);
-		zabbix_log( LOG_LEVEL_WARNING, "Cannot close file [%s] [%m]",
-			pidfile);
+		fprintf(stderr, "Cannot close file [%s] [%s]", pidfile, strerror(errno));
+		zabbix_log( LOG_LEVEL_WARNING, "Cannot close file [%s] [%s]",
+			pidfile, strerror(errno));
 	}
 
 	return SUCCEED;
