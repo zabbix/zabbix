@@ -279,6 +279,8 @@ void	test_parameters(void)
 {
 	int	i;
 	AGENT_RESULT	result;
+
+	memset(&result, 0, sizeof(AGENT_RESULT));
 	
 	for(i=0; 0 != commands[i].key; i++)
 	{
