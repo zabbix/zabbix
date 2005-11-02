@@ -22,41 +22,6 @@
 #include "common.h"
 #include "sysinfo.h"
 
-
-int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-    int result = SYSINFO_RET_FAIL;
-    kstat_ctl_t *kc;
-    kstat_t	*kt;
-    struct var	*v;
-    
-	assert(result);
-
-	clean_result(result);	
-
-	kc = kstat_open();
-	if(kc)
-	{
-		kt = kstat_lookup(kc, "unix", 0, "var");
-		if(kt)
-		{
-			if((kt->ks_type == KSTAT_TYPE_RAW) &&
-				(kstat_read(kc, kt, NULL) != -1))
-			{
-				v = (struct var *) kt->ks_data;
-
-				/* int	v_proc;	    Max processes system wide */
-				result->type |= AR_DOUBLE;
-				result->dbl = (double)v->v_proc;
-				result = SYSINFO_RET_OK;
-			}
-		}
-		kstat_close(kc);
-	}
-
-	return result;
-}
-
 int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXFILES
@@ -79,6 +44,35 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	result->type |= AR_DOUBLE;
      	result->dbl = (double)(maxfiles);
+	return SYSINFO_RET_OK;
+#else
+	return	SYSINFO_RET_FAIL;
+#endif
+}
+
+int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+#ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXPROC
+	int	mib[2],len;
+	int	maxproc;
+
+	assert(result);
+
+        clean_result(result);	
+	
+	mib[0]=CTL_KERN;
+	mib[1]=KERN_MAXPROC;
+
+	len=sizeof(maxproc);
+
+	if(sysctl(mib,2,&maxproc,(size_t *)&len,NULL,0) != 0)
+	{
+		return	SYSINFO_RET_FAIL;
+/*		printf("Errno [%m]");*/
+	}
+
+	result->type |= AR_DOUBLE;
+	result->dbl = (double)(maxproc);
 	return SYSINFO_RET_OK;
 #else
 	return	SYSINFO_RET_FAIL;
