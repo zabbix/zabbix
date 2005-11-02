@@ -29,20 +29,32 @@
 #	include <assert.h>
 #endif
 
-#ifdef HAVE_ARPA_NAMESER_H
-#	include <arpa/nameser.h>
+#ifdef HAVE_ERRNO_H
+#	include <errno.h>
 #endif
 
 #ifdef HAVE_CTYPE_H
 #	include <ctype.h>
 #endif
 
-#ifdef HAVE_DIRENT_H
-#	include <dirent.h>
+#ifdef HAVE_SYS_TYPES_H
+#	include <sys/types.h>
 #endif
 
-#ifdef HAVE_ERRNO_H
-#	include <errno.h>
+#ifdef HAVE_STRING_H
+#	include <string.h>
+#endif
+
+#ifdef HAVE_STRINGS_H
+#	include <strings.h>
+#endif
+
+#ifdef HAVE_ARPA_NAMESER_H
+#	include <arpa/nameser.h>
+#endif
+
+#ifdef HAVE_DIRENT_H
+#	include <dirent.h>
 #endif
 
 #ifdef HAVE_FCNTL_H
@@ -91,14 +103,6 @@
 
 #ifdef HAVE_STDINT_H
 #	include <stdint.h>
-#endif
-
-#ifdef HAVE_STRING_H
-#	include <string.h>
-#endif
-
-#ifdef HAVE_STRINGS_H
-#	include <strings.h>
 #endif
 
 #ifdef HAVE_SYS_LOADAVG_H
@@ -161,10 +165,6 @@
 
 #ifdef HAVE_SYS_TIME_H
 #	include <sys/time.h>
-#endif
-
-#ifdef HAVE_SYS_TYPES_H
-#	include <sys/types.h>
 #endif
 
 #ifdef HAVE_SYS_VAR_H
