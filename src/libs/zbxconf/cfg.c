@@ -58,7 +58,7 @@ int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 	file=fopen(cfg_file,"r");
 	if(NULL == file)
 	{
-		fprintf(stderr, "Cannot open config file [%s] [%m]\n",cfg_file);
+		fprintf(stderr, "Cannot open config file [%s] [%s]\n",cfg_file,strerror(errno));
 		return	FAIL;
 	}
 

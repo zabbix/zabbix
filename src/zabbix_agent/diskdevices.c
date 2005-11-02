@@ -127,7 +127,7 @@ void	init_stats_diskdevices()
 	file=fopen("/proc/stat","r");
 	if(NULL == file)
 	{
-		fprintf(stderr, "Cannot open [%s] [%m]\n","/proc/stat");
+		fprintf(stderr, "Cannot open [%s] [%s]\n","/proc/stat", strerror(errno));
 		return;
 	}
 	i=0;
@@ -471,7 +471,7 @@ void	collect_stats_diskdevices(FILE *outfile)
 	file=fopen("/proc/stat","r");
 	if(NULL == file)
 	{
-		fprintf(stderr, "Cannot open [%s] [%m]\n","/proc/stat");
+		fprintf(stderr, "Cannot open [%s] [%s]\n","/proc/stat", strerror(errno));
 		return;
 	}
 	i=0;
