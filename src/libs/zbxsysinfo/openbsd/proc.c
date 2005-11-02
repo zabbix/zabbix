@@ -50,7 +50,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 
     struct  passwd *usrinfo = NULL;
-    long int	lvalue = 0;
+    long long int	llvalue = 0;
 
     FILE    *f;
 
@@ -179,7 +179,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
                 while(fgets(line, MAX_STRING_LEN, f) != NULL)
                 {	
                 
-                    if(sscanf(line, "%s\t%li\n", name1, &lvalue) != 2)
+                    if(sscanf(line, "%s\t%lli\n", name1, &llvalue) != 2)
                     {
                         continue;
                     }
@@ -189,7 +189,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
                         continue;
                     }
                     
-                    if(usrinfo->pw_uid == (uid_t)(lvalue))
+                    if(usrinfo->pw_uid == (uid_t)(llvalue))
                     {
                         usr_ok = 1;
                         break;
@@ -206,7 +206,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
                 while(fgets(line, MAX_STRING_LEN, f) != NULL)
                 {	
                 
-                    if(sscanf(line, "%s\t%li %s\n", name1, &lvalue, name2) != 3)
+                    if(sscanf(line, "%s\t%lli %s\n", name1, &llvalue, name2) != 3)
                     {
                         continue;
                     }
@@ -220,38 +220,38 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
                     
                     if(strcasecmp(name2, "kB") == 0)
                     {
-                        lvalue <<= 10;
+                        llvalue <<= 10;
                     }
                     else if(strcasecmp(name2, "mB") == 0)
                     {
-                        lvalue <<= 20;
+                        llvalue <<= 20;
                     }
                     else if(strcasecmp(name2, "GB") == 0)
                     {
-                        lvalue <<= 30;
+                        llvalue <<= 30;
                     }
                     else if(strcasecmp(name2, "TB") == 0)
                     {
-                        lvalue <<= 40;
+                        llvalue <<= 40;
                     }
                     
                     if(memsize < 0)
                     {
-                        memsize = (double) lvalue;
+                        memsize = (double) llvalue;
                     }
                     else
                     {
                         if(do_task == DO_MAX)
                         {
-                            memsize = MAX(memsize, (double) lvalue);
+                            memsize = MAX(memsize, (double) llvalue);
                         }
                         else if(do_task == DO_MIN)
                         {
-                            memsize = MIN(memsize, (double) lvalue);
+                            memsize = MIN(memsize, (double) llvalue);
                         }
                         else
                         {
-                            memsize +=  (double) lvalue;
+                            memsize +=  (double) llvalue;
                         }
                     }
                     
@@ -309,12 +309,12 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
     long int	lvalue = 0;
 
     FILE    *f;
+	int	proccount = 0;
 
         assert(result);
 
         clean_result(result);
 	
-        int	proccount = 0;
     
         if(num_param(param) > 3)
         {
