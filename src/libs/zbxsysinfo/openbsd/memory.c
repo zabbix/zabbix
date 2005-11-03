@@ -22,30 +22,6 @@
 #include "common.h"
 #include "sysinfo.h"
 
-static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	int 	mib[2];
-	size_t len;
-	struct vmtotal v;
-	int ret=SYSINFO_RET_FAIL;
-	
-	assert(result);
-
-        clean_result(result);
-		
-	len=sizeof(v);
-	mib[0]=CTL_VM;
-	mib[1]=VM_METER;
-
-	if(0==sysctl(mib,2,&v,&len,NULL,0))
-	{
-		result->type |= AR_DOUBLE;	
-		result->dbl=(double)(t_vmshr * sysconf(_SC_PAGESIZE));
-		ret=SYSINFO_RET_OK;
-	}
-	return ret;
-}
-
 static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	int 	mib[2];
@@ -106,7 +82,6 @@ MEM_FNCLIST
 	MEM_FNCLIST fl[] = 
 	{
 		{"free",	VM_MEMORY_FREE},
-		{"shared",	VM_MEMORY_SHARED},
 		{"total",	VM_MEMORY_TOTAL},
 		{0,	0}
 	};
