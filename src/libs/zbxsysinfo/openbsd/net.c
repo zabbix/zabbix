@@ -31,13 +31,14 @@ static struct nlist kernel_symbols[] =
 
 #define IFNET_ID 0
 
-static int get_ifdata(const char *device, struct if_data *result)
+static int get_ifdata(const char *device, struct ifnet *result)
 {
 	struct ifnet_head	head;
 	struct ifnet 		*ifp;
 	
 	char 	ifname[IFNAMSIZ+1];
 	kvm_t 	*kp;
+	int	len = 0;
 	int 	ret = SYSINFO_RET_FAIL;
 	
 	kp = kvm_open(NULL, NULL, NULL, O_RDONLY, NULL);
@@ -57,7 +58,7 @@ static int get_ifdata(const char *device, struct if_data *result)
 			len = sizeof(struct ifnet_head);
 			if(kvm_read(kp, kernel_symbols[IFNET_ID].n_value, &head, len) >= len)
 			{
-				len = sizeof(struct if_data);
+				len = sizeof(struct ifnet);
 				for(ifp = head.tqh_first; ifp; ifp = result->if_list.tqe_next)
 				{
 					if(kvm_read(kp, (u_long) ifp, result, len) < len)
@@ -86,7 +87,7 @@ static int get_ifdata(const char *device, struct if_data *result)
 
 static int      NET_IF_IN_BYTES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	struct if_data value;
+	struct ifnet value;
 	char    interface[MAX_STRING_LEN];
 	int     ret = SYSINFO_RET_FAIL;
 
@@ -118,7 +119,7 @@ static int      NET_IF_IN_BYTES(const char *cmd, const char *param, unsigned fla
 
 static int      NET_IF_IN_PACKETS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	struct if_data value;
+	struct ifnet value;
 	char    interface[MAX_STRING_LEN];
 	int     ret = SYSINFO_RET_FAIL;
 
@@ -150,7 +151,7 @@ static int      NET_IF_IN_PACKETS(const char *cmd, const char *param, unsigned f
 
 static int      NET_IF_IN_ERRORS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	struct if_data value;
+	struct ifnet value;
 	char    interface[MAX_STRING_LEN];
 	int     ret = SYSINFO_RET_FAIL;
 
@@ -182,7 +183,7 @@ static int      NET_IF_IN_ERRORS(const char *cmd, const char *param, unsigned fl
 
 int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-LIST struct net_fnclist_s
+#define NET_FNCLIST struct net_fnclist_s
 NET_FNCLIST
 {
         char *mode;
@@ -238,7 +239,7 @@ NET_FNCLIST
 
 static int      NET_IF_OUT_BYTES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	struct if_data value;
+	struct ifnet value;
 	char    interface[MAX_STRING_LEN];
 	int     ret = SYSINFO_RET_FAIL;
 
@@ -270,7 +271,7 @@ static int      NET_IF_OUT_BYTES(const char *cmd, const char *param, unsigned fl
 
 static int      NET_IF_OUT_PACKETS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	struct if_data value;
+	struct ifnet value;
 	char    interface[MAX_STRING_LEN];
 	int     ret = SYSINFO_RET_FAIL;
 
@@ -302,7 +303,7 @@ static int      NET_IF_OUT_PACKETS(const char *cmd, const char *param, unsigned 
 
 static int      NET_IF_OUT_ERRORS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	struct if_data value;
+	struct ifnet value;
 	char    interface[MAX_STRING_LEN];
 	int     ret = SYSINFO_RET_FAIL;
 
@@ -334,7 +335,7 @@ static int      NET_IF_OUT_ERRORS(const char *cmd, const char *param, unsigned f
 
 int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-LIST struct net_fnclist_s
+#define NET_FNCLIST struct net_fnclist_s
 NET_FNCLIST
 {
         char *mode;
@@ -388,9 +389,18 @@ NET_FNCLIST
         return SYSINFO_RET_FAIL;
 }
 
-static int      NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	struct if_data value;
+        assert(result);
+
+        clean_result(result);
+	
+	return SYSINFO_RET_FAIL;
+}
+
+int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	struct ifnet value;
 	char    interface[MAX_STRING_LEN];
 	int     ret = SYSINFO_RET_FAIL;
 
