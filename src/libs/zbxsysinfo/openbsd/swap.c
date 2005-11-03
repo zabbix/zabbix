@@ -25,164 +25,75 @@
 #include "md5.h"
 
 
-/* Solaris. */
-#ifndef HAVE_SYSINFO_FREESWAP
-#ifdef HAVE_SYS_SWAP_SWAPTABLE
-void get_swapinfo(double *total, double *fr)
+static void get_swap_size(double *total, double *free)
 {
-	register int cnt, i, page_size;
-/* Support for >2Gb */
-/*	register int t, f;*/
-	double	t, f;
-	struct swaptable *swt;
-	struct swapent *ste;
-	static char path[256];
+	int	mib[2];
+        size_t  len;
+        struct uvmexp vm;
 
-	/* get total number of swap entries */
-	cnt = swapctl(SC_GETNSWP, 0);
+	mib[0]=CTL_VM;
+	mib[1]=VM_UVMEXP;
 
-	/* allocate enough space to hold count + n swapents */
-	swt = (struct swaptable *)malloc(sizeof(int) +
-		cnt * sizeof(struct swapent));
+	len=sizeof vm;
 
-	if (swt == NULL)
-	{
-		*total = 0;
-		*fr = 0;
-		return;
-	}
-	swt->swt_n = cnt;
-
-/* fill in ste_path pointers: we don't care about the paths, so we
-point them all to the same buffer */
-	ste = &(swt->swt_ent[0]);
-	i = cnt;
-	while (--i >= 0)
-	{
-		ste++->ste_path = path;
-	}
-
-	/* grab all swap info */
-	swapctl(SC_LIST, swt);
-
-	/* walk thru the structs and sum up the fields */
-	t = f = 0;
-	ste = &(swt->swt_ent[0]);
-	i = cnt;
-	while (--i >= 0)
-	{
-		/* dont count slots being deleted */
-		if (!(ste->ste_flags & ST_INDEL) &&
-		!(ste->ste_flags & ST_DOINGDEL))
-		{
-			t += ste->ste_pages;
-			f += ste->ste_free;
-		}
-		ste++;
-	}
-
-	page_size=getpagesize();
-
-	/* fill in the results */
-	*total = page_size*t;
-	*fr = page_size*f;
-	free(swt);
-}
-#endif
-#endif
-
-static int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef HAVE_SYSINFO_FREESWAP
-	struct sysinfo info;
-
-	assert(result);
-
-        clean_result(result);
-
-	if( 0 == sysinfo(&info))
-	{
-		result->type |= AR_DOUBLE;
-#ifdef HAVE_SYSINFO_MEM_UNIT
-		result->dbl = (double)info.freeswap * (double)info.mem_unit;
-#else
-		result->dbl = (double)info.freeswap;
-#endif
-		return SYSINFO_RET_OK;
-	}
-	else
+	if(sysctl(mib,2,&vm,&len,NULL,0) == -1)
 	{
 		return SYSINFO_RET_FAIL;
 	}
-/* Solaris */
-#else
-#ifdef HAVE_SYS_SWAP_SWAPTABLE
-	double swaptotal,swapfree;
 
-	assert(result);
+	if(total)
+	{
+		/* int swpages;    number of PAGE_SIZE'ed swap pages */
+		/* int pagesize;   size of a page (PAGE_SIZE): must be power of 2 */
+		(*total) = (double)(((long) vm.swpages) * vm.pagesize);
+	}
+	if(free)
+	{
+		/* int swpages;    number of PAGE_SIZE'ed swap pages */
+		/* int swpginuse;  number of swap pages in use */
+		/* int pagesize;   size of a page (PAGE_SIZE): must be power of 2 */
+		(*free) = (double)(((long) (vm.swpages - vm.swpginuse)) * vm.pagesize);
+	}
+
+	return SYSINFO_RET_OK;
+}
+
+static int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	double value;
+	int ret = SYSINFO_RET_FAIL;
+
+        assert(result);
 
         clean_result(result);
-
-	get_swapinfo(&swaptotal,&swapfree);
+	
+	ret = get_swap_size(NULL, &value);
+	
+	if(ret != SYSINFO_RET_OK)
+		return ret;
 
 	result->type |= AR_DOUBLE;
-	result->dbl = swapfree;
-	return SYSINFO_RET_OK;
-#else
-	assert(result);
-
-        clean_result(result);
-
-	return	SYSINFO_RET_FAIL;
-#endif
-#endif
+	result->dbl = value;
+	return ret;
 }
 
 static int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_SYSINFO_TOTALSWAP
-	struct sysinfo info;
+	double value;
+	int ret = SYSINFO_RET_FAIL;
 
-	assert(result);
-
-        clean_result(result);
-
-	if( 0 == sysinfo(&info))
-	{
-		result->type |= AR_DOUBLE;
-#ifdef HAVE_SYSINFO_MEM_UNIT
-		result->dbl = (double)info.totalswap * (double)info.mem_unit;
-#else
-		result->dbl = (double)info.totalswap;
-#endif
-		return SYSINFO_RET_OK;
-	}
-	else
-	{
-		return SYSINFO_RET_FAIL;
-	}
-/* Solaris */
-#else
-#ifdef HAVE_SYS_SWAP_SWAPTABLE
-	double swaptotal,swapfree;
-
-	assert(result);
+        assert(result);
 
         clean_result(result);
-
-	get_swapinfo(&swaptotal,&swapfree);
 	
+	ret = get_swap_size(&value, NULL);
+	
+	if(ret != SYSINFO_RET_OK)
+		return ret;
+
 	result->type |= AR_DOUBLE;
-	result->dbl = (double)swaptotal;
-	return SYSINFO_RET_OK;
-#else
-	assert(result);
-
-        clean_result(result);
-
-	return	SYSINFO_RET_FAIL;
-#endif
-#endif
+	result->dbl = value;
+	return ret;
 }
 
 int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -288,3 +199,158 @@ int     OLD_SWAP(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
         return ret;
 }
 
+int	get_swap_io(double *swapin, double *pgswapin, double *swapout, double *pgswapout)
+{
+	int	mib[2];
+        size_t len;
+        struct uvmexp vm;
+
+	mib[0]=CTL_VM;
+	mib[1]=VM_UVMEXP;
+
+	len = sizeof(vm);
+
+	if(sysctl(mib,2,&vm,&len,NULL,0) == -1)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+	    
+	if(swapin)
+	{
+		/* int swapins;           swapins */
+		(*swapin) += (double) vm.swapins;
+	}
+	if(pgswapin)
+	{
+		/* int pgswapin;           pages swapped in  */
+		(*pgswapin) += (double) vm.pgswapin;
+	}
+	if(swapout)
+	{
+		/* int swapouts;           swapouts */
+		(*swapout) += (double) vm.swapouts;
+	}
+	if(pgswapout)
+	{
+		/* int pgswapout;          pages swapped out  */
+		(*pgswapout) += (double) vm.pgswapout;
+	}
+	
+	return SYSINFO_RET_OK;
+}
+
+int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+    int	    ret = SYSINFO_RET_FAIL;
+    char    swapdev[MAX_STRING_LEN];
+    char    mode[MAX_STRING_LEN];
+    double  value = 0;
+        
+    assert(result);
+
+    clean_result(result);
+	
+    if(num_param(param) > 2)
+    {
+        return SYSINFO_RET_FAIL;
+    }
+
+    if(get_param(param, 1, swapdev, MAX_STRING_LEN) != 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    if(swapdev[0] == '\0')
+    {
+	/* default parameter */
+	sprintf(swapdev, "all");
+    }
+
+    if(strncmp(swapdev, "all", MAX_STRING_LEN))
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    
+    if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
+    {
+        return SYSINFO_RET_FAIL;
+    }
+    
+    if(strcmp(mode,"count") == 0)
+    {
+	ret = get_swap_io(&value, NULL, NULL, NULL);
+    }
+    else if(strcmp(mode,"pages") == 0)
+    {
+	ret = get_swap_io(NULL, &value, NULL, NULL);
+    }
+    else
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    if(ret != SYSINFO_RET_OK)
+	return ret;
+
+    result->type |= AR_DOUBLE;
+    result->dbl = value;
+    return ret;
+}
+
+int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+    int	    ret = SYSINFO_RET_FAIL;
+    char    swapdev[MAX_STRING_LEN];
+    char    mode[MAX_STRING_LEN];
+    double  value = 0;
+        
+    assert(result);
+
+    clean_result(result);
+	
+    if(num_param(param) > 2)
+    {
+        return SYSINFO_RET_FAIL;
+    }
+
+    if(get_param(param, 1, swapdev, MAX_STRING_LEN) != 0)
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    if(swapdev[0] == '\0')
+    {
+	/* default parameter */
+	sprintf(swapdev, "all");
+    }
+
+    if(strncmp(swapdev, "all", MAX_STRING_LEN))
+    {
+	return SYSINFO_RET_FAIL;
+    }
+    
+    if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
+    {
+        return SYSINFO_RET_FAIL;
+    }
+    
+    if(strcmp(mode,"count") == 0)
+    {
+	ret = get_swap_io(NULL, NULL, &value, NULL);
+    }
+    else if(strcmp(mode,"pages") == 0)
+    {
+	ret = get_swap_io(NULL, NULL, NULL, &value);
+    }
+    else
+    {
+	return SYSINFO_RET_FAIL;
+    }
+
+    if(ret != SYSINFO_RET_OK)
+	return ret;
+
+    result->type |= AR_DOUBLE;
+    result->dbl = value;
+    return ret;
+}
