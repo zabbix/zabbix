@@ -40,7 +40,7 @@ static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, 
 	if(0==sysctl(mib,2,&v,&len,NULL,0))
 	{
 		result->type |= AR_DOUBLE;	
-		result->dbl=(double)(t_rmshr * sysconf(_SC_PAGESIZE));
+		result->dbl=(double)(t_vmshr * sysconf(_SC_PAGESIZE));
 		ret=SYSINFO_RET_OK;
 	}
 	return ret;
