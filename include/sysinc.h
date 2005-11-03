@@ -135,6 +135,10 @@
 #	include <resolv.h>
 #endif
 
+#ifdef HAVE_SYS_DKSTAT_H
+#	include <sys/dkstat.h>
+#endif
+
 #ifdef HAVE_SYS_SOCKET_H
 #	include <sys/socket.h>
 #endif
