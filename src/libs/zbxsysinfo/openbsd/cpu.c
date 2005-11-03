@@ -278,3 +278,21 @@ CPU_FNCLIST
 	return SYSINFO_RET_FAIL;
 }
 
+int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+        assert(result);
+
+        clean_result(result);
+	
+	return SYSINFO_RET_FAIL;
+}
+
+int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+        assert(result);
+
+        clean_result(result);
+	
+	return SYSINFO_RET_FAIL;
+}
+
