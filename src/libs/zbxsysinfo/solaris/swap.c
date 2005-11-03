@@ -317,17 +317,17 @@ int	get_swap_io(double *swapin, double *pgswapin, double *swapout, double *pgswa
 		   /* uint_t   swapin;	    	// swapins */
 		   (*swapin) += (double) cpu->cpu_vminfo.swapin;
 		}
-		else if(pgswapin)
+		if(pgswapin)
 		{
 		   /* uint_t   pgswapin;	// pages swapped in */
 		  (*pgswapin) += (double) cpu->cpu_vminfo.pgswapin;
 		}
-		else if(swapout)
+		if(swapout)
 		{
 		   /* uint_t   swapout;	    	// swapout */
 		   (*swapout) += (double) cpu->cpu_vminfo.swapout;
 		}
-		else if(pgswapout)
+		if(pgswapout)
 		{
 		   /* uint_t   pgswapout;	// pages swapped out */
 		  (*pgswapout) += (double) cpu->cpu_vminfo.pgswapout;

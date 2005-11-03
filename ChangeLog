@@ -1,5 +1,6 @@
 Changes for 1.1beta3:
 
+ - integrated 'OpenBSD3.7.c' functionality (Eugene)
  - Applied ServerByName patch. (James)
  - First pass at optimization of MySQL queries on reports page. (James)
  - Fixed Groupid selection in triggers page (James)

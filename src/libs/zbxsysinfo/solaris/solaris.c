@@ -262,6 +262,8 @@ ZBX_METRIC	parameters_specific[]=
 	{"system.cpu.load",	CF_USEUPARAM,	SYSTEM_CPU_LOAD,	0,	"all,avg1"},
 	
 	{"system.swap.size",	CF_USEUPARAM,	SYSTEM_SWAP_SIZE,	0,	"all,free"},
+	{"system.swap.in",	CF_USEUPARAM,	SYSTEM_SWAP_SIZE,	0,	"all"},
+	{"system.swap.out",	CF_USEUPARAM,	SYSTEM_SWAP_SIZE,	0,	"all,count"},
 	
 	{"system.hostname",	0,	SYSTEM_HOSTNAME,	0,	0},
 
