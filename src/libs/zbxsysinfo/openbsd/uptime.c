@@ -25,9 +25,10 @@
 int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	int	mib[2];
-        size_t len;
+        size_t	len;
 	struct timeval	uptime;
 	int	now;
+	int	ret = SYSINFO_RET_FAIL;
 
 	assert(result);
 	clean_result(result);
@@ -37,15 +38,15 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 	len=sizeof(uptime);
 
-	if(sysctl(mib,2,&uptime,(size_t *)&len,NULL,0) != 0)
+	if(sysctl(mib,2,&uptime,(size_t *)&len,NULL,0) == 0)
 	{
-		return	SYSINFO_RET_FAIL;
+		now=time(NULL);
+
+		result->type |= AR_DOUBLE;
+		result->dbl = (double)(now-uptime.tv_sec);
+
+		ret = SYSINFO_RET_OK;
 	}
-
-	now=time(NULL);
-
-	result->type |= AR_DOUBLE;
-	result->dbl = (double)(now-uptime.tv_sec);
-
-	return SYSINFO_RET_OK;
+	return ret;
 }
+
