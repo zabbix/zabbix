@@ -22,7 +22,8 @@
 #include "common.h"
 #include "sysinfo.h"
 
-static int get_disk_stats(const char *device, struct diskstats *returned_stats)
+/*
+static int get_disk_stats(const char *device, struct diskstats *result)
 {
 	int ret = SYSINFO_RET_FAIL;
 	int mib[2];
@@ -63,6 +64,7 @@ static int get_disk_stats(const char *device, struct diskstats *returned_stats)
 	}
 	return ret;
 }
+*/
 
 static int	VFS_DEV_READ_BYTES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
@@ -73,7 +75,7 @@ static int	VFS_DEV_READ_BYTES(const char *cmd, const char *param, unsigned flags
 	assert(result);
 
         clean_result(result);
-	
+/*	
         if(num_param(param) > 1)
         {
                 return SYSINFO_RET_FAIL;
@@ -90,7 +92,7 @@ static int	VFS_DEV_READ_BYTES(const char *cmd, const char *param, unsigned flags
 		result->dbl = ds.ds_rbytes;
 		ret = SYSINFO_RET_OK;
 	}
-	
+*/
 	return ret;
 }
 
@@ -103,7 +105,7 @@ static int	VFS_DEV_READ_OPERATIONS(const char *cmd, const char *param, unsigned 
 	assert(result);
 
         clean_result(result);
-	
+/*	
         if(num_param(param) > 1)
         {
                 return SYSINFO_RET_FAIL;
@@ -120,7 +122,7 @@ static int	VFS_DEV_READ_OPERATIONS(const char *cmd, const char *param, unsigned 
 		result->dbl = ds.ds_rxfer;
 		ret = SYSINFO_RET_OK;
 	}
-	
+*/	
 	return ret;
 }
 
@@ -133,7 +135,7 @@ static int	VFS_DEV_WRITE_BYTES(const char *cmd, const char *param, unsigned flag
 	assert(result);
 
         clean_result(result);
-	
+/*	
         if(num_param(param) > 1)
         {
                 return SYSINFO_RET_FAIL;
@@ -150,7 +152,7 @@ static int	VFS_DEV_WRITE_BYTES(const char *cmd, const char *param, unsigned flag
 		result->dbl = ds.ds_wbytes;
 		ret = SYSINFO_RET_OK;
 	}
-	
+*/	
 	return ret;
 }
 
@@ -159,7 +161,7 @@ static int	VFS_DEV_WRITE_OPERATIONS(const char *cmd, const char *param, unsigned
 	char devname[MAX_STRING_LEN];
 	struct diskstats ds;
 	int ret = SYSINFO_RET_FAIL;
-        
+/*       
 	assert(result);
 
         clean_result(result);
@@ -180,7 +182,7 @@ static int	VFS_DEV_WRITE_OPERATIONS(const char *cmd, const char *param, unsigned
 		result->dbl = ds.ds_wxfer;
 		ret = SYSINFO_RET_OK;
 	}
-	
+*/	
 	return ret;
 }
 
