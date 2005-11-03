@@ -33,7 +33,7 @@ static int get_cpu_data(unsigned long long *idle,
                         unsigned long long *system,
                         unsigned long long *intr)
 {
-	static u_int64_t last[CPUSTATES];
+	u_int64_t value[CPUSTATES];
 	int ret = SYSINFO_RET_FAIL;
 	int mib[2];
 	size_t l; 
@@ -43,10 +43,10 @@ static int get_cpu_data(unsigned long long *idle,
 
 	l = sizeof(value);
 
-	if (sysctl(mib, 2, value, &l, null, 0) == 0 ) 
+	if (sysctl(mib, 2, value, &l, NULL, 0) == 0 ) 
 	{
 		(*idle)	= value[CP_IDLE];
-		(*usr) 	= value[CP_USER];
+		(*user)	= value[CP_USER];
 		(*nice)	= value[CP_NICE];
 		(*system) = value[CP_SYS];
 		(*intr)	= value[CP_INTR];
@@ -87,7 +87,7 @@ CPU_PARAMLIST
     char cpuname[MAX_STRING_LEN];
     char mode[MAX_STRING_LEN];
 
-    int info_id = 0;
+    int i;
 
     int ret = SYSINFO_RET_FAIL;
 
