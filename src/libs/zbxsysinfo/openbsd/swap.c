@@ -25,7 +25,7 @@
 #include "md5.h"
 
 
-static void get_swap_size(double *total, double *free)
+static int get_swap_size(double *total, double *free)
 {
 	int	mib[2];
         size_t  len;
