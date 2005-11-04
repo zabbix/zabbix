@@ -1,5 +1,8 @@
 Changes for 1.1beta3:
 
+ - Updated displayed version in UI to 1.1beta3 (James)
+ - Applied span inconsistency patch.  Thanks to Elkor (James)
+ - Added dbpatches to support 'User Configurable Refresh' (James)
  - integrated 'OpenBSD3.7.c' functionality (Eugene)
  - Applied ServerByName patch. (James)
  - First pass at optimization of MySQL queries on reports page. (James)

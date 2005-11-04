@@ -31,7 +31,7 @@
 
 //	about.php
 	"S_ABOUT_ZABBIX"=>			"Cos'è ZABBIX",
-	"S_INFORMATION_ABOUT_ZABBIX"=>		"Informazioni su ZABBIX (v1.1beta1)",
+	"S_INFORMATION_ABOUT_ZABBIX"=>		"Informazioni su ZABBIX (v1.1beta3)",
 	"S_HOMEPAGE_OF_ZABBIX"=>		"Questa è la homepage di ZABBIX",
 	"S_HOMEPAGE_OF_ZABBIX_DETAILS"=>	"Questa è la homepage di ZABBIX.",
 	"S_LATEST_ZABBIX_MANUAL"=>		"Il manuale più recente di ZABBIX",
@@ -220,7 +220,7 @@
 	"S_COMPARE"=>				"Compara",
 
 //	Footer
-	"S_ZABBIX_VER"=>			"ZABBIX 1.1beta1",
+	"S_ZABBIX_VER"=>			"ZABBIX 1.1beta3",
 	"S_COPYRIGHT_BY"=>			"Copyright 2001-2005 by ",
 	"S_CONNECTED_AS"=>			"Connesso come utente: ",
 	"S_SIA_ZABBIX"=>			"SIA Zabbix",
