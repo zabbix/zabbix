@@ -218,22 +218,22 @@ int	get_swap_io(double *swapin, double *pgswapin, double *swapout, double *pgswa
 	if(swapin)
 	{
 		/* int swapins;           swapins */
-		(*swapin) += (double) vm.swapins;
+		(*swapin) = (double) vm.swapins;
 	}
 	if(pgswapin)
 	{
 		/* int pgswapin;           pages swapped in  */
-		(*pgswapin) += (double) vm.pgswapin;
+		(*pgswapin) = (double) vm.pgswapin;
 	}
 	if(swapout)
 	{
 		/* int swapouts;           swapouts */
-		(*swapout) += (double) vm.swapouts;
+		(*swapout) = (double) vm.swapouts;
 	}
 	if(pgswapout)
 	{
 		/* int pgswapout;          pages swapped out  */
-		(*pgswapout) += (double) vm.pgswapout;
+		(*pgswapout) = (double) vm.pgswapout;
 	}
 	
 	return SYSINFO_RET_OK;

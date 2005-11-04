@@ -286,29 +286,21 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#if defined(HAVE_PROC_1_STATUS)
 
-    DIR     *dir;
-    struct  dirent *entries;
-    struct  stat buf;
-    char    filename[MAX_STRING_LEN];
-    char    line[MAX_STRING_LEN];
+	char    procname[MAX_STRING_LEN];
+	char    usrname[MAX_STRING_LEN];
+	char    procstat[MAX_STRING_LEN];
 
-    char    name1[MAX_STRING_LEN];
-    char    name2[MAX_STRING_LEN];
+	char	p_stat = 0;;
+    
+	int	proc_ok = 0;
+	int	usr_ok = 0;
+	int	stat_ok = 0;
 
-    char    procname[MAX_STRING_LEN];
-    char    usrname[MAX_STRING_LEN];
-    char    procstat[MAX_STRING_LEN];
+	struct  passwd *usrinfo = NULL;
 
-    int     proc_ok = 0;
-    int     usr_ok = 0;
-    int     stat_ok = 0;
-
-    struct  passwd *usrinfo = NULL;
-    long int	lvalue = 0;
-
-    FILE    *f;
+	kvm_t   *kp;
+    
 	int	proccount = 0;
 
         assert(result);
@@ -355,15 +347,15 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
     
         if(strcmp(procstat,"run") == 0)
         {
-            strscpy(procstat,"R");	
+		p_stat = SRUN;
         }
         else if(strcmp(procstat,"sleep") == 0)
         {
-            strscpy(procstat,"S");	
+		p_stat = SSLEEP;
         }
         else if(strcmp(procstat,"zomb") == 0)
         {
-            strscpy(procstat,"Z");	
+		p_stat = SZOMB;
         }
         else if(strcmp(procstat,"all") == 0)
         {
@@ -380,124 +372,65 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
             return SYSINFO_RET_FAIL;
         }
 
-        while((entries=readdir(dir))!=NULL)
-        {
-            proc_ok = 0;
-            stat_ok = 0;
-            usr_ok = 0;
-    
-/* Self is a symbolic link. It leads to incorrect results for proc_cnt[zabbix_agentd] */
-/* Better approach: check if /proc/x/ is symbolic link */
-            if(strncmp(entries->d_name,"self",MAX_STRING_LEN) == 0)
-            {
-                continue;
-            }
+	kp = kvm_open(NULL,NULL,NULL,O_RDONLY,NULL);
+	if(kp)
+	{
+		proc = kvm_getproc2(kp,KERN_PROC_ALL,0,sizeof(struct kinfo_proc2),&count);
+		if (proc)
+		{
+			for (i = 0; i < count; i++)
+			{
+				proc_ok = 0;
+				stat_ok = 0;
+				usr_ok = 0;
+                
+				if(procname[0] != 0)
+                		{
+					if(strcmp(procname, kp_proc[i].proc.p_comm)==0)
+					{
+						proc_ok = 1;
+					}
+				}
+				else
+				{
+					proc_ok = 1;
+				}
 
-            strscpy(filename,"/proc/");	
-            strncat(filename,entries->d_name,MAX_STRING_LEN);
-            strncat(filename,"/status",MAX_STRING_LEN);
-
-            if(stat(filename,&buf)==0)
-            {
-                f=fopen(filename,"r");
-                if(f==NULL)
-                {
-                    continue;
-                }
-    
-                if(procname[0] != 0)
-                {
-                    fgets(line,MAX_STRING_LEN,f);
-                    if(sscanf(line,"%s\t%s\n",name1,name2)==2)
-                    {
-                        if(strcmp(name1,"Name:") == 0)
-                        {
-                            if(strcmp(procname,name2)==0)
-                            {
-                                proc_ok = 1;
-                            }
-                        }
-                    }
+				if(procstat[0] != 0)
+				{
+					if(p_stat == kp_proc[i].proc.p_stat 
+						|| (kp_proc[i].proc.p_stat == SDEAD && p_stat == SZOMB))
+					{
+						stat_ok = 1;
+					}
+				}
+				else
+				{
+					stat_ok = 1;
+				}
                 
-                    if(proc_ok == 0) 
-                    {
-                        fclose(f);
-                        continue;
-                    }
-                }
-                else
-                {
-                    proc_ok = 1;
-                }
-
-                if(procstat[0] != 0)
-                {
-                    while(fgets(line, MAX_STRING_LEN, f) != NULL)
-                    {	
-                    
-                        if(sscanf(line, "%s\t%s\n", name1, name2) != 2)
-                        {
-                            continue;
-                        }
-                        
-                        if(strcmp(name1,"State:") != 0)
-                        {
-                            continue;
-                        }
-                        
-                        if(strcmp(name2, procstat))
-                        {
-                            stat_ok = 1;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    stat_ok = 1;
-                }
+				if(usrinfo != NULL)
+				{
+					if(usrinfo->pw_uid == kp_proc[i].proc.p_cred->p_ruid)
+					{
+						usr_ok = 1;
+					}
+				}
+				else
+				{
+					usr_ok = 1;
+				}
                 
-                if(usrinfo != NULL)
-                {
-                    while(fgets(line, MAX_STRING_LEN, f) != NULL)
-                    {	
-                    
-                        if(sscanf(line, "%s\t%li\n", name1, &lvalue) != 2)
-                        {
-                            continue;
-                        }
-                        
-                        if(strcmp(name1,"Uid:") != 0)
-                        {
-                            continue;
-                        }
-                        
-                        if(usrinfo->pw_uid == (uid_t)(lvalue))
-                        {
-                            usr_ok = 1;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    usr_ok = 1;
-                }
-                
-                if(proc_ok && stat_ok && usr_ok)
-                {
-                    proccount++;
-                }
-                
-                fclose(f);
-            }
-    }
-    closedir(dir);
+				if(proc_ok && stat_ok && usr_ok)
+				{
+					proccount++;
+				}
+			}
+		}
+	}
 
     result->type |= AR_DOUBLE;
     result->dbl = (double) proccount;
     return SYSINFO_RET_OK;
-#else
-    return	SYSINFO_RET_FAIL;
-#endif
 }
+
