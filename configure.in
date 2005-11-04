@@ -42,6 +42,7 @@ AC_CHECK_LIB(socket, main)
 AC_CHECK_LIB(kstat, main)
 AC_CHECK_LIB(nsl, main)
 AC_CHECK_LIB(resolv, main)
+AC_CHECK_LIB(kvm, main)
 dnl AC_CHECK_LIB(pthread, pthread_exit, LIBS="-pthread $LIBS")
 
 dnl Checks for header files.
