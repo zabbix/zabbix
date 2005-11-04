@@ -426,11 +426,12 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 			}
 		}
 		kvm_close(kp);
+	
+		result->type |= AR_DOUBLE;
+		result->dbl = (double) proccount;
 		ret = SYSINFO_RET_OK;
 	}
 
-    result->type |= AR_DOUBLE;
-    result->dbl = (double) proccount;
-    return ret;
+	return ret;
 }
 
