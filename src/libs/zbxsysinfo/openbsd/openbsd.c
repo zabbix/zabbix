@@ -257,13 +257,13 @@ ZBX_METRIC	parameters_specific[]=
 	{"proc.num",		CF_USEUPARAM,	PROC_NUM,	0,	"inetd,,"},
 	{"proc.mem",		CF_USEUPARAM,	PROC_MEMORY,	0,	"inetd,,"},
 
-	{"system.cpu.util",	CF_USEUPARAM,	SYSTEM_CPU_UTIL,	0,	"all,user,avg1"},
+	{"system.cpu.util",	CF_USEUPARAM,	SYSTEM_CPU_UTIL,	0,	"all,idle"},
 
 	{"system.cpu.load",	CF_USEUPARAM,	SYSTEM_CPU_LOAD,	0,	"all,avg1"},
 
 	{"system.swap.size",	CF_USEUPARAM,	SYSTEM_SWAP_SIZE,	0,	"all,free"},
-	{"system.swap.in",      CF_USEUPARAM,   SYSTEM_SWAP_SIZE,       0,      "all,pages"},
-	{"system.swap.out",     CF_USEUPARAM,   SYSTEM_SWAP_SIZE,       0,      "all,count"},	
+	{"system.swap.in",      CF_USEUPARAM,   SYSTEM_SWAP_IN,         0,      "all,pages"},
+	{"system.swap.out",     CF_USEUPARAM,   SYSTEM_SWAP_OUT,        0,      "all,count"},	
 
 	{"system.hostname",	0,	SYSTEM_HOSTNAME,	0,	0},
 
