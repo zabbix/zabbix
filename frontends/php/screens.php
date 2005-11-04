@@ -135,13 +135,21 @@
 		if($colspan!=0)
 		{
 			$tmp=$tmp." colspan=\"$colspan\" ";
+			if($rowspan!=0)
+                	{
+				$spancheck[$c][$r]=1;
+			}
 			$c=$c+$colspan-1;
 		}
 		if($rowspan!=0)
 		{
 			$tmp=$tmp." rowspan=\"$rowspan\" ";
+			$spancheck[$c][$r]=1;
 #			$r=$r+$rowspan-1;
 		}
+
+		if($spancheck[$c][$r-1]!=1)
+		{
                	echo "<TD align=\"center\" valign=\"top\" $tmp>\n";
 		if(DBnum_rows($iresult)>0)
 		{
@@ -163,11 +171,12 @@
 				show_screen_plaintext($resourceid);
 			}
 		}
-		else
+		else 
 		{
 			echo "&nbsp;";
 		}
 		echo "</TD>";
+		}
           }
           echo "</TR>\n";
           }
