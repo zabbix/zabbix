@@ -286,12 +286,13 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-
+	struct kinfo_proc *proc;
+	
 	char    procname[MAX_STRING_LEN];
 	char    usrname[MAX_STRING_LEN];
 	char    procstat[MAX_STRING_LEN];
 
-	char	p_stat = 0;;
+	char	p_stat = 0;
     
 	int	proc_ok = 0;
 	int	usr_ok = 0;
@@ -302,6 +303,9 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	kvm_t   *kp;
     
 	int	proccount = 0;
+	int	count;
+	int	i;
+	int	ret = SYSINFO_RET_FAIL;
 
         assert(result);
 
@@ -366,16 +370,10 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
             return SYSINFO_RET_FAIL;
         }
 		
-        dir=opendir("/proc");
-        if(NULL == dir)
-        {
-            return SYSINFO_RET_FAIL;
-        }
-
 	kp = kvm_open(NULL,NULL,NULL,O_RDONLY,NULL);
 	if(kp)
 	{
-		proc = kvm_getproc2(kp,KERN_PROC_ALL,0,sizeof(struct kinfo_proc2),&count);
+		proc = kvm_getproc(kp, KERN_PROC_ALL, 0, &count);
 		if (proc)
 		{
 			for (i = 0; i < count; i++)
@@ -386,7 +384,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                 
 				if(procname[0] != 0)
                 		{
-					if(strcmp(procname, kp_proc[i].proc.p_comm)==0)
+					if(strcmp(procname, proc[i].kp_proc.p_comm)==0)
 					{
 						proc_ok = 1;
 					}
@@ -398,8 +396,8 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 				if(procstat[0] != 0)
 				{
-					if(p_stat == kp_proc[i].proc.p_stat 
-						|| (kp_proc[i].proc.p_stat == SDEAD && p_stat == SZOMB))
+					if(p_stat == proc[i].kp_proc.p_stat 
+						|| (proc[i].kp_proc.p_stat == SDEAD && p_stat == SZOMB))
 					{
 						stat_ok = 1;
 					}
@@ -411,7 +409,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                 
 				if(usrinfo != NULL)
 				{
-					if(usrinfo->pw_uid == kp_proc[i].proc.p_cred->p_ruid)
+					if(usrinfo->pw_uid == proc[i].kp_proc.p_cred->p_ruid)
 					{
 						usr_ok = 1;
 					}
@@ -427,10 +425,12 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 				}
 			}
 		}
+		kvm_close(kp);
+		ret = SYSINFO_RET_OK;
 	}
 
     result->type |= AR_DOUBLE;
     result->dbl = (double) proccount;
-    return SYSINFO_RET_OK;
+    return ret;
 }
 
