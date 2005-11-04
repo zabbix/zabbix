@@ -29,7 +29,7 @@
 
 //	about.php
 	"S_ABOUT_ZABBIX"=>			"ZABBIXについて",
-	"S_INFORMATION_ABOUT_ZABBIX"=>		"ZABBIXの情報 (v1.1beta2)",
+	"S_INFORMATION_ABOUT_ZABBIX"=>		"ZABBIXの情報 (v1.1beta3)",
 	"S_HOMEPAGE_OF_ZABBIX"=>		"ZABBIXホームページ",
 	"S_HOMEPAGE_OF_ZABBIX_DETAILS"=>	"ZABBIX本家のホームページ",
 	"S_LATEST_ZABBIX_MANUAL"=>		"ZABBIXマニュアル",
@@ -239,7 +239,7 @@
 	"S_COMPARE"=>				"Compare",
 
 //	Footer
-	"S_ZABBIX_VER"=>			"ZABBIX 1.1beta2",
+	"S_ZABBIX_VER"=>			"ZABBIX 1.1beta3",
 	"S_COPYRIGHT_BY"=>			"Copyright 2001-2005 by ",
 	"S_CONNECTED_AS"=>			"Connected as",
 	"S_SIA_ZABBIX"=>			"SIA Zabbix",

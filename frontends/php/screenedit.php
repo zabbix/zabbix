@@ -104,16 +104,30 @@
 			$rowspan=0;
 		}
 		$tmp="";
-		if($colspan!=0)
+		if($colspan>1)
+		//if($colspan!=0)
 		{
 			$tmp=$tmp." colspan=\"$colspan\" ";
+			if($rowspan>1)
+			{
+				 $spancheck[$c][$r]=1;
+                        }
+			/*if ($colspan=1)
+			{
+				$colspan=0;
+			}
+			$c=$c+$colspan;*/
 			$c=$c+$colspan-1;
 		}
-		if($rowspan!=0)
+		if($rowspan>1)
+		//if($rowspan!=0)
 		{
 			$tmp=$tmp." rowspan=\"$rowspan\" ";
+			$spancheck[$c][$r]=1;
 #			$r=$r+$rowspan-1;
 		}
+		if ($spancheck[$c][$r-1]!=1)
+		{
 		echo "<TD align=\"center\" valign=\"top\" $tmp>\n";
 		echo "<a name=\"form\"></a>";
 		echo "<form method=\"get\" action=\"screenedit.php\">";
@@ -126,7 +140,7 @@
 			$width=@iif(isset($_REQUEST["width"]),$_REQUEST["width"],$width);
 			$height=@iif(isset($_REQUEST["height"]),$_REQUEST["height"],$height);
 			$colspan=@iif(isset($_REQUEST["colspan"]),$_REQUEST["colspan"],$colspan);
-			$rowspan=@iif(isset($_REQUEST["rowspan"]),$_REQUEST["rowspan"],$colspan);
+			$rowspan=@iif(isset($_REQUEST["rowspan"]),$_REQUEST["rowspan"],$rowspan);
 
         		show_form_begin("screenedit.cell");
         		echo S_SCREEN_CELL_CONFIGURATION;
@@ -285,6 +299,8 @@
 		echo "</form>\n";
         
 		echo "</TD>";
+		}	
+		
         }
         echo "</TR>\n";
         }
