@@ -179,6 +179,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 						}
 					}
 				}
+			}
 		
 		kvm_close(kp);
 	
