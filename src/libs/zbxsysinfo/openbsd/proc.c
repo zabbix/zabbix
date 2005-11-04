@@ -373,7 +373,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	kp = kvm_open(NULL,NULL,NULL,O_RDONLY,NULL);
 	if(kp)
 	{
-		proc = kvm_getproc(kp, KERN_PROC_ALL, 0, &count);
+		proc = kvm_getprocs(kp, KERN_PROC_ALL, 0, &count);
 		if (proc)
 		{
 			for (i = 0; i < count; i++)
