@@ -55,7 +55,7 @@ ZBX_METRIC	parameters_specific[]=
 	{"kern[maxfiles]",	0,	0,	0,	0},
 	{"kern[maxproc]",	0,	0,	0,	0},
 */
-	{"memory",		CF_USEUPARAM,	OLD_MEMORY,	0,	"buffers"},
+	{"memory",		CF_USEUPARAM,	OLD_MEMORY,	0,	"total"},
 /*
 	{"memory[buffers]",	0,	0,	0,	0},
 	{"memory[cached]",	0,	0, 	0,	0},
