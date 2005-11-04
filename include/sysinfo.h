@@ -80,6 +80,8 @@ int     NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RES
 int     SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int     SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int     SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     SYSTEM_UNUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);

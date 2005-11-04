@@ -288,3 +288,15 @@ int     OLD_SWAP(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
         return ret;
 }
 
+int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+    /* in this moment this function for this platform unsupported */
+    return	SYSINFO_RET_FAIL;
+}
+
+int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+    /* in this moment this function for this platform unsupported */
+    return	SYSINFO_RET_FAIL;
+}
+
