@@ -187,15 +187,15 @@
 #	include <sys/vmmeter.h>
 #endif
 
-#ifdef HAVE_SYS_nlist_H
+#ifdef HAVE_NLIST_H
 #	include <nlist.h>
 #endif
 
-#ifdef HAVE_SYS_NET_IF_H
+#ifdef HAVE_NET_IF_H
 #	include <net/if.h>
 #endif
 
-#ifdef HAVE_SYS_KVM_H
+#ifdef HAVE_KVM_H
 #	include <kvm.h>
 #endif
 
