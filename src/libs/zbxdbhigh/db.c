@@ -54,6 +54,8 @@ void	DBclose(void)
 #endif
 }
 
+static int have_db_err = 0;
+
 /*
  * Connect to the database.
  * If fails, program terminates.
@@ -66,27 +68,31 @@ void    DBconnect(void)
 #ifdef	HAVE_MYSQL
 	/* For MySQL >3.22.00 */
 	/*	if( ! mysql_connect( &mysql, NULL, dbuser, dbpassword ) )*/
+
 		mysql_init(&mysql);
-		if( ! mysql_real_connect( &mysql, CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBPORT, CONFIG_DBSOCKET,0 ) )
+
+	    if( ! mysql_real_connect( &mysql, CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBPORT, CONFIG_DBSOCKET,0 ) )
 		{
-			fprintf(stderr, "Failed to connect to database: Error: %s\n",mysql_error(&mysql) );
-			zabbix_log(LOG_LEVEL_ERR, "Failed to connect to database: Error: %s",mysql_error(&mysql) );
-			if( (ER_SERVER_SHUTDOWN != mysql_errno(&mysql)) && (CR_SERVER_GONE_ERROR != mysql_errno(&mysql)))
-			{
-				exit(FAIL);
-			}
+            /* Don't print the log message EVERY loop */
+            if ( ! have_db_err)
+            {
+			    zabbix_log(LOG_LEVEL_ERR, "Failed to connect to database: Error: %s",mysql_error(&mysql) );
+		        zabbix_log(LOG_LEVEL_ERR, "Will retry to connect to the database every 30 seconds");
+                have_db_err = 1;
+            }
 		}
 		else
 		{
-			if( mysql_select_db( &mysql, CONFIG_DBNAME ) != 0 )
+            mysql.reconnect = 1;
 
+			if( mysql_select_db( &mysql, CONFIG_DBNAME ) != 0 )
 			{
-				fprintf(stderr, "Failed to select database: Error: %s\n",mysql_error(&mysql) );
 				zabbix_log(LOG_LEVEL_ERR, "Failed to select database: Error: %s",mysql_error(&mysql) );
 				exit( FAIL );
 			}
 			else
 			{
+                have_db_err = 0;
 				break;
 			}
 		}
@@ -97,21 +103,19 @@ void    DBconnect(void)
 		conn = PQsetdbLogin(CONFIG_DBHOST, NULL, NULL, NULL, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD );
 
 /* check to see that the backend connection was successfully made */
-		if (PQstatus(conn) != CONNECTION_OK)
+		if (PQstatus(conn) != CONNECTION_OK && !have_db_err)
 		{
-			fprintf(stderr, "Connection to database '%s' failed.\n", CONFIG_DBNAME);
 			zabbix_log(LOG_LEVEL_ERR, "Connection to database '%s' failed.\n", CONFIG_DBNAME);
-			fprintf(stderr, "%s\n", PQerrorMessage(conn));
 			zabbix_log(LOG_LEVEL_ERR, "%s", PQerrorMessage(conn));
-			exit(FAIL);
+	        zabbix_log(LOG_LEVEL_ERR, "Will retry to connect to the database every 30 seconds");
+            have_db_err = 1;
 		}
 		else
 		{
+            have_db_err = 0;
 			break;
 		}
 #endif
-		fprintf(stderr, "Will retry to connect to the database after 30 seconds\n");
-		zabbix_log(LOG_LEVEL_ERR, "Will retry to connect to the database after 30 seconds");
 		sleep(30);
 	}
 }
@@ -125,15 +129,21 @@ int	DBexecute(char *query)
 /* Do not include any code here. Will break HAVE_PGSQL section */
 #ifdef	HAVE_MYSQL
 	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
+
 	while( mysql_query(&mysql,query) != 0)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s [%d]", mysql_error(&mysql), mysql_errno(&mysql) );
-		if( (ER_SERVER_SHUTDOWN != mysql_errno(&mysql)) && (CR_SERVER_GONE_ERROR != mysql_errno(&mysql)))
+
+		if( (ER_SERVER_SHUTDOWN   != mysql_errno(&mysql)) && 
+            (CR_SERVER_GONE_ERROR != mysql_errno(&mysql)) &&
+            (CR_CONNECTION_ERROR  != mysql_errno(&mysql)))
 		{
 			return FAIL;
 		}
-		sleep(30);
+
+        DBclose();
+        DBconnect();
 	}
 #endif
 #ifdef	HAVE_PGSQL
@@ -171,17 +181,23 @@ DB_RESULT *DBselect(char *query)
 /* Do not include any code here. Will break HAVE_PGSQL section */
 #ifdef	HAVE_MYSQL
 	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
+
 	while(mysql_query(&mysql,query) != 0)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s [%d]", mysql_error(&mysql), mysql_errno(&mysql) );
-		if( (ER_SERVER_SHUTDOWN != mysql_errno(&mysql)) && (CR_SERVER_GONE_ERROR != mysql_errno(&mysql)))
+
+		if( (ER_SERVER_SHUTDOWN   != mysql_errno(&mysql)) && 
+            (CR_SERVER_GONE_ERROR != mysql_errno(&mysql)) &&
+            (CR_CONNECTION_ERROR  != mysql_errno(&mysql)))
 		{
 			exit(FAIL);
 		}
-		sleep(30);
+
+        DBclose();
+        DBconnect();
 	}
-/*	zabbix_set_log_level(LOG_LEVEL_WARNING);*/
+
 	return	mysql_store_result(&mysql);
 #endif
 #ifdef	HAVE_PGSQL

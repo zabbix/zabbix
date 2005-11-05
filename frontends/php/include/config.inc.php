@@ -1100,7 +1100,7 @@ echo "</head>";
 				),
 		"configuration"=>array(
 				"label"=>S_CONFIGURATION,
-				"pages"=>array("config.php","users.php","audit.php","hosts.php","items.php","triggers.php","sysmaps.php","graphs.php","screenconf.php","services.php","sysmap.php","media.php","screenedit.php","actions.php","graph.php"),
+				"pages"=>array("config.php","users.php","audit.php","hosts.php","items.php","triggers.php","sysmaps.php","graphs.php","screenconf.php","services.php","sysmap.php","media.php","screenedit.php","actions.php","graph.php","servers.php"),
 				"level2"=>array(
 					array("label"=>S_GENERAL,"url"=>"config.php"),
 					array("label"=>S_USERS,"url"=>"users.php"),
@@ -1111,6 +1111,7 @@ echo "</head>";
 					array("label"=>S_MAPS,"url"=>"sysmaps.php"),
 					array("label"=>S_GRAPHS,"url"=>"graphs.php"),
 					array("label"=>S_SCREENS,"url"=>"screenconf.php"),
+					array("label"=>S_MENU_SERVERS,"url"=>"servers.php"),
 					array("label"=>S_IT_SERVICES,"url"=>"services.php")
 					)
 				),

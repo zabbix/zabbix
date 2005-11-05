@@ -289,10 +289,11 @@
 ;
 		$formula=@iif(isset($_REQUEST["formula"]),$_REQUEST["formula"],"1");
 		$logtimefmt=@iif(isset($_REQUEST["logtimefmt"]),$_REQUEST["logtimefmt"],"");
+		$serverid=@iif(isset($_REQUEST["serverid"]),$_REQUEST["serverid"],1);
 
 		if(isset($_REQUEST["register"])&&($_REQUEST["register"] == "change"))
 		{
-			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.snmp_port,i.units,i.multiplier,h.hostid,i.delta,i.trends,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,i.logtimefmt from items i,hosts h where i.itemid=".$_REQUEST["itemid"]." and h.hostid=i.hostid");
+			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.snmp_port,i.units,i.multiplier,h.hostid,i.delta,i.trends,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,i.logtimefmt,i.serverid from items i,hosts h where i.itemid=".$_REQUEST["itemid"]." and h.hostid=i.hostid");
 		
 			$description=DBget_field($result,0,0);
 			$key=DBget_field($result,0,1);
@@ -320,6 +321,7 @@
 
 			$formula=DBget_field($result,0,22);
 			$logtimefmt=DBget_field($result,0,23);
+			$serverid=DBget_field($result,0,24);
 		}
 
 		show_form_begin("items.item");
@@ -355,6 +357,33 @@
 			}
 	        }
 		echo "</select>";
+
+	        $result=DBselect("select serverid,host from servers");
+		if(DBnum_rows($result)>=2)
+		{
+			show_table2_v_delimiter($col++);
+			echo S_SERVERNAME;
+			show_table2_h_delimiter();
+			echo "<select class=\"biginput\" name=\"serverid\" value=\"1\">";
+		        while($row=DBfetch($result))
+		        {
+		                $serverid_=$row["serverid"];
+		                $host_=$row["host"];
+				if($serverid==$serverid_)
+				{
+		                	echo "<option value=\"$serverid_\" selected>$host_";
+				}
+				else
+				{
+		                	echo "<option value=\"$serverid_\">$host_";
+				}
+		        }
+			echo "</select>";
+		}
+		else
+		{
+		echo "<input type=\"hidden\" value=1 name=\"serverid\">";
+		}
 
 		show_table2_v_delimiter($col++);
 		echo S_TYPE;
@@ -1495,4 +1524,57 @@
 
 		show_table2_header_end();
 	}
+
+
+
+
+
+
+	function	insert_zabbix_server_form($page,$serverid=0,$create=1)
+	{
+		$host = $serverip = $serverport = "";
+		$col=0;
+
+		$sql="select s.serverid,s.host,s.ip,s.port from servers s where s.serverid=$serverid";
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			$host=$row["host"];
+			$serverip=$row["ip"];
+			$serverport=$row["port"];
+		}
+
+		show_form_begin("index.servers");
+		echo "Servers";
+
+		show_table2_v_delimiter($col++);
+		echo "<form method=\"post\" action=\"$page\">";
+
+		echo S_SERVER_HOST;
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"host\" value=\"$host\" size=20>";
+
+		show_table2_v_delimiter($col++);
+		echo S_SERVER_IP;
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"serverip\" value=\"$serverip\" size=20>";
+
+		show_table2_v_delimiter($col++);
+		echo S_SERVER_PORT;
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"serverport\" value=\"$serverport\" size=20>";
+
+		show_table2_v_delimiter2();
+		if($serverid==0)
+		{
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Add\">";
+		}
+		else
+		{
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Update\">";
+		}
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Delete\">";
+		show_table2_header_end();
+	}
+
 ?>
