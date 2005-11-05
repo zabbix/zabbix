@@ -22,7 +22,7 @@
 
 #include "sysinc.h"
 
-#define	ZABBIX_VERSION	"1.1beta2"
+#define	ZABBIX_VERSION	"1.1beta3"
  
 #define	SUCCEED		0
 #define	FAIL		(-1)
@@ -30,6 +30,16 @@
 #define	NETWORK_ERROR	(-3)
 #define	TIMEOUT_ERROR	(-4)
 #define	AGENT_ERROR	(-5)
+
+/*
+ * Default Server ID is 1
+ */
+#define SERVERD_ID      1
+
+/*
+ * Default Server ID is 1
+ */
+#define	SERVERD_ID	1
 
 #define	MAXFD	64
 

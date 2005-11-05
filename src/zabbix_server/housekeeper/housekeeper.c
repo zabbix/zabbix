@@ -105,7 +105,7 @@ static int delete_host(int hostid)
 	int	res = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In delete_host(%d)", hostid);
-	snprintf(sql,sizeof(sql)-1,"select itemid from items where hostid=%d", hostid);
+	snprintf(sql,sizeof(sql)-1,"select itemid from items where hostid=%d and serverid=%d", hostid,CONFIG_SERVERD_ID);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
@@ -156,7 +156,7 @@ static int housekeeping_items(void)
 	DB_RESULT	*result;
 	int		i,itemid;
 
-	snprintf(sql,sizeof(sql)-1,"select itemid from items where status=%d", ITEM_STATUS_DELETED);
+	snprintf(sql,sizeof(sql)-1,"select itemid from items where status=%d and serverid=%d", ITEM_STATUS_DELETED,CONFIG_SERVERD_ID);
 	result = DBselect(sql);
 	for(i=0;i<DBnum_rows(result);i++)
 	{
@@ -189,7 +189,7 @@ static int housekeeping_hosts(void)
 	DB_RESULT	*result;
 	int		i,hostid;
 
-	snprintf(sql,sizeof(sql)-1,"select hostid from hosts where status=%d", HOST_STATUS_DELETED);
+	snprintf(sql,sizeof(sql)-1,"select hostid from hosts where status=%d and serverid=%d", HOST_STATUS_DELETED,CONFIG_SERVERD_ID);
 	result = DBselect(sql);
 	for(i=0;i<DBnum_rows(result);i++)
 	{
@@ -225,7 +225,7 @@ static int housekeeping_history_and_trends(int now)
 
 	int		i;
 
-	snprintf(sql,sizeof(sql)-1,"select itemid,history,delay,trends from items");
+	snprintf(sql,sizeof(sql)-1,"select itemid,history,delay,trends from items, where serverid=%d",CONFIG_SERVERD_ID);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
