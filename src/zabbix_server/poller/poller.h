@@ -24,6 +24,7 @@ extern	void	signal_handler(int);
 extern  int     server_num;
 
 extern  int     CONFIG_TIMEOUT;
+extern  int     CONFIG_SERVERD_ID;
 extern  int     CONFIG_SUCKERD_FORKS;
 
 void main_poller_loop();

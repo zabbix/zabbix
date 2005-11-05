@@ -1,5 +1,7 @@
 Changes for 1.1beta3:
 
+ - Applied MySQL reconnect patch. (James)
+ - Applied multiple server patch. (James)
  - Applied graph generation fix.  Thanks to Elkor (James)
  - Updated displayed version in UI to 1.1beta3 (James)
  - Applied span inconsistency patch.  Thanks to Elkor (James)

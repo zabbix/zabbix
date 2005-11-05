@@ -30,6 +30,14 @@
 ?>
 
 <?php
+	$serverlist=array();
+	$result=DBselect("select distinct serverid,host from servers");
+	$servers=DBnum_rows($result);
+	while($row=DBfetch($result))
+	{
+		$serverlist=$serverlist + array($row["serverid"]=>$row["host"]);
+	}
+
         if(!check_anyright("Host","U"))
         {
                 show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font
@@ -63,14 +71,14 @@
 		{
 			if($_REQUEST["action"]=="add to group")
 			{
-				$itemid=add_item_to_group($_REQUEST["groupid"],$_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],$_REQUEST["logtimefmt"]);
+				$itemid=add_item_to_group($_REQUEST["groupid"],$_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],$_REQUEST["logtimefmt"],$_REQUEST["serverid"]);
 				show_messages($itemid, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 				unset($_REQUEST["itemid"]);
 				unset($itemid);
 			}
 			if($_REQUEST["action"]=="update in group")
 			{
-				$result=update_item_in_group($_REQUEST["groupid"],$_REQUEST["itemid"],$_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],$_REQUEST["logtimefmt"]);
+				$result=update_item_in_group($_REQUEST["groupid"],$_REQUEST["itemid"],$_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],$_REQUEST["logtimefmt"],$_REQUEST["serverid"]);
 				show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 				unset($_REQUEST["itemid"]);
 			}
@@ -83,7 +91,7 @@
 		}
 		if($_REQUEST["register"]=="update")
 		{
-			$result=update_item($_REQUEST["itemid"],$_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],$_REQUEST["logtimefmt"]);
+			$result=update_item($_REQUEST["itemid"],$_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],$_REQUEST["logtimefmt"],$_REQUEST["serverid"]);
 			update_item_in_templates($_REQUEST["itemid"]);
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 //			unset($itemid);
@@ -96,7 +104,7 @@
 		}
 		if($_REQUEST["register"]=="add")
 		{
-			$itemid=add_item($_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],$_REQUEST["logtimefmt"]);
+			$itemid=add_item($_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],$_REQUEST["logtimefmt"],$_REQUEST["serverid"]);
 			add_item_to_linked_hosts($itemid);
 			show_messages($itemid, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 			unset($_REQUEST["itemid"]);
@@ -109,7 +117,7 @@
 			$hosts_notok="";
 			while($row=DBfetch($result))
 			{
-				$result2=add_item($_REQUEST["description"],$_REQUEST["key"],$row["hostid"],$_REQUEST["delay"],$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],$_REQUEST["logtimefmt"]);
+				$result2=add_item($_REQUEST["description"],$_REQUEST["key"],$row["hostid"],$_REQUEST["delay"],$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],$_REQUEST["logtimefmt"],$_REQUEST["serverid"]);
 				if($result2)
 				{
 					$hosts_ok=$hosts_ok." ".$row["host"];
@@ -238,10 +246,17 @@
 //	if(isset($_REQUEST["hostid"])&&!isset($_REQUEST["type"])) 
 	{
 		table_begin();
+		if($servers==1||$servers==0)
+		{
 		table_header(array(S_ID,S_KEY,S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,S_ERROR,S_ACTIONS));
+		}
+		else
+		{
+			table_header(array(S_ID,S_SERVERNAME,S_KEY,S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,S_ERROR,S_ACTIONS));
+		}
 		echo "<form method=\"get\" action=\"items.php\">";
 		echo "<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_REQUEST["hostid"]." size=8>";
-		$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.nextcheck,h.hostid,i.type,i.trends,i.error from hosts h,items i where h.hostid=i.hostid and h.hostid=".$_REQUEST["hostid"]." order by h.host,i.key_,i.description");
+		$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.nextcheck,h.hostid,i.type,i.trends,i.serverid,i.error from hosts h,items i where h.hostid=i.hostid and h.hostid=".$_REQUEST["hostid"]." order by h.host,i.key_,i.description");
 		$col=0;
 		while($row=DBfetch($result))
 		{
@@ -311,9 +326,27 @@
 			{
 				$error=array("value"=>$row["error"],"class"=>"on");
 			}
-
+			if($servers==1||$servers==0)
+			{
+				table_row(array(
+					$input,
+					$row["key_"],
+					$row["description"],
+					$row["delay"],
+					$row["history"],
+					$row["trends"],
+					$type,
+					$status,
+					$error,
+					$actions
+					),$col++);
+			}
+			else
+			{
+				$serverid=$row["serverid"];
 			table_row(array(
 				$input,
+					$serverlist[$serverid],
 				$row["key_"],
 				$row["description"],
 				$row["delay"],
@@ -324,6 +357,7 @@
 				$error,
 				$actions
 				),$col++);
+		}
 		}
 		table_end();
 

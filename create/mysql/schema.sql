@@ -275,6 +275,7 @@ CREATE TABLE history_str (
 
 CREATE TABLE hosts (
 	hostid		int(4)		NOT NULL auto_increment,
+	serverid	int(4)		DEFAULT '1' NOT NULL,
 	host		varchar(64)	DEFAULT '' NOT NULL,
 	useip		int(1)		DEFAULT '1' NOT NULL,
 	ip		varchar(15)	DEFAULT '127.0.0.1' NOT NULL,
@@ -288,6 +289,7 @@ CREATE TABLE hosts (
 	PRIMARY KEY	(hostid),
 	UNIQUE		(host),
 	KEY		(status)
+	KEY		(serverid)
 ) type=InnoDB;
 
 --
@@ -301,6 +303,7 @@ CREATE TABLE items (
 	snmp_oid	varchar(255) DEFAULT '' NOT NULL,
 	snmp_port	int(4) DEFAULT '161' NOT NULL,
 	hostid		int(4) NOT NULL,
+	serverid	int(4) DEFAULT '1' NOT NULL,
 	description	varchar(255) DEFAULT '' NOT NULL,
 	key_		varchar(64) DEFAULT '' NOT NULL,
 	delay		int(4) DEFAULT '0' NOT NULL,
@@ -738,3 +741,13 @@ CREATE TABLE autoreg (
   hostid		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (id)
 ) type=InnoDB;
+
+CREATE TABLE servers (
+	serverid	int(4)		NOT NULL auto_increment,
+	host		varchar(64)	DEFAULT '' NOT NULL,
+	ip		varchar(15)	DEFAULT '127.0.0.1' NOT NULL,
+	port		int(4)		DEFAULT '0' NOT NULL,
+	PRIMARY KEY	(serverid),
+	UNIQUE		(host)
+) type=InnoDB;
+

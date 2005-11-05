@@ -379,6 +379,7 @@
 	"S_CANNOT_ACTIVATE_ITEMS"=>		"Cannot activate items",
 	"S_ITEMS_DISABLED"=>			"Items disabled",
 	"S_CANNOT_DISABLE_ITEMS"=>		"Cannot disable items",
+	"S_SERVERNAME"=>			"Server Name",
 	"S_KEY"=>				"Key",
 	"S_DESCRIPTION"=>			"Description",
 	"S_UPDATE_INTERVAL"=>			"Update interval",
@@ -497,6 +498,7 @@
 	"S_MENU_GRAPHS"=>			"GRAPHS",
 	"S_MENU_SCREENS"=>			"SCREENS",
 	"S_MENU_IT_SERVICES"=>			"IT SERVICES",
+	"S_MENU_SERVERS"=>			"Zabbix Servers",
 	"S_MENU_HOME"=>				"HOME",
 	"S_MENU_ABOUT"=>			"ABOUT",
 	"S_MENU_STATUS_OF_ZABBIX"=>		"STATUS OF ZABBIX",
@@ -784,6 +786,13 @@
 	"S_HOST_PROFILES"=>			"Host profiles",
 	"S_HOST_PROFILES_BIG"=>			"HOST PROFILES",
 
+//	servers.php
+	"S_SERVER_SERVERID"=>			"Server ID",
+	"S_SERVER_HOST"=>			"Server Name",
+	"S_SERVER_IP"=>				"Server IP",
+	"S_SERVER_PORT"=>			"Server Port",
+
+//	Menu
 //	Menu
 
 	"S_HELP"=>				"Help",

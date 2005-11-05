@@ -27,6 +27,7 @@ extern  int     server_num;
 extern  int     CONFIG_TIMEOUT;
 extern  int     CONFIG_SUCKERD_FORKS;
 */
+extern  int     CONFIG_SERVERD_ID;
 
 int main_timer_loop();
 
