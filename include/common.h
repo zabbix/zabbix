@@ -22,6 +22,12 @@
 
 #include "sysinc.h"
 
+#if __WORDSIZE == 64
+#	define ZBX_FS_UI64 "%lu"
+#else
+#	define ZBX_FS_UI64 "%llu"
+#endif
+
 #define	ZABBIX_VERSION	"1.1beta3"
  
 #define	SUCCEED		0
