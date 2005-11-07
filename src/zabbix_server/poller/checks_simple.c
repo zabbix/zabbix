@@ -106,6 +106,8 @@ int	get_value_simple(double *result_dbl, char *result_str,DB_ITEM *item, char *e
 	process(c, 0, &result);
         if(result.type & AR_DOUBLE)
                  snprintf(result_str, MAX_STRING_LEN-1, "%lf", result.dbl);
+        else if(result.type & AR_UINT64)
+                 snprintf(result_str, MAX_STRING_LEN-1, ZBX_FS_UI64, result.ui64);
         else if(result.type & AR_STRING)
                  snprintf(result_str, MAX_STRING_LEN-1, "%s", result.str);
         else if(result.type & AR_MESSAGE)
