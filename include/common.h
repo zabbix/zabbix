@@ -213,18 +213,20 @@ LIST {
 /* agent return value */					 
 #define AGENT_RESULT struct result_s
 AGENT_RESULT {
-	int 	type;
-	double 	dbl;
-	char 	*str;
-	char 	*msg;
-	LIST 	list;
+	int	 	type;
+	uint64_t	ui64;
+	double		dbl;
+	char		*str;
+	char		*msg;
+	LIST		list;
 };
 
 /* agent result types */
-#define AR_DOUBLE   1
-#define AR_STRING   2
-#define AR_MESSAGE  4
-#define AR_LIST     8
+#define AR_UINT64	1
+#define AR_DOUBLE	2
+#define AR_STRING	4
+#define AR_MESSAGE	8
+#define AR_LIST		16
 
 int   	copy_list(LIST *src, LIST *dist);
 void 	free_list(LIST *list);
