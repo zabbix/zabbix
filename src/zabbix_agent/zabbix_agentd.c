@@ -344,6 +344,8 @@ void	process_child(int sockfd)
   	process(line, 0, &result);
         if(result.type & AR_DOUBLE)
                  snprintf(value, MAX_STRING_LEN-1, "%f", result.dbl);
+        else if(result.type & AR_UINT64)
+                 snprintf(value, MAX_STRING_LEN-1, ZBX_FS_UI64, result.ui64);
         else if(result.type & AR_STRING)
                  snprintf(value, MAX_STRING_LEN-1, "%s", result.str);
         else if(result.type & AR_MESSAGE)
