@@ -289,6 +289,10 @@ void	test_parameters(void)
 		{
 			printf(" [d|%lf]", result.dbl);
 		}
+		if(result.type & AR_UINT64)
+		{
+			printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
+		}
 		if(result.type & AR_STRING)
 		{
 			printf(" [s|%s]", result.str);

@@ -223,4 +223,11 @@
 #	include <sys/mount.h>
 #endif
 
+
+#if __WORDSIZE == 64
+#	define ZBX_FS_UI64 "%llu"
+#else
+#	define ZBX_FS_UI64 "%lu"
+#endif
+
 #endif
