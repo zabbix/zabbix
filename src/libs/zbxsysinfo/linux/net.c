@@ -22,24 +22,205 @@
 #include "common.h"
 #include "sysinfo.h"
 
+struct net_stat_s {
+	unsigned long ibytes;
+	unsigned long ipackets;
+	unsigned long ierr;
+	unsigned long idrop;
+	unsigned long obytes;
+	unsigned long opackets;
+	unsigned long oerr;
+	unsigned long odrop;
+};
+
+static int get_net_stat(const char *interface, struct net_stat_s *result)
+{
+	int ret = SYSINFO_RET_FAIL;
+	char line[MAX_STRING_LEN];
+
+	char name[MAX_STRING_LEN];
+	unsigned long tmp = 0;
+	
+	FILE *f;
+	char	*p;
+
+	assert(result);
+
+	f=fopen("/proc/net/dev","r");
+	if(f)
+	{
+		
+		while(fgets(line,MAX_STRING_LEN,f) != NULL)
+		{
+
+			p = strstr(line,":");
+			if(p) p[0]='\t';
+			
+			if(sscanf(line,"%s\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\n",
+				name, 
+				&(result->ibytes), 	/* bytes */
+				&(result->ipackets),	/* packets */
+				&(result->ierr), 	/* errs */
+				&(result->idrop),	/* drop */
+			        &(tmp), 		/* fifo */
+				&(tmp),			/* frame */
+				&(tmp), 		/* compressed */
+				&(tmp),			/* multicast */
+				&(result->obytes), 	/* bytes */
+				&(result->opackets),	/* packets*/
+				&(result->oerr),	/* errs */
+				&(result->odrop)	/* drop */
+				) == 13)
+			{
+				if(strncmp(name, interface, MAX_STRING_LEN) == 0)
+				{
+					ret = SYSINFO_RET_OK;
+					break;
+				}
+			}
+		}
+	}
+
+	if(ret != SYSINFO_RET_OK)
+	{
+		memset(result, 0, sizeof(struct net_stat_s));
+	}
+	
+	return ret;
+}
+
 int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-
-        assert(result);
+	struct net_stat_s	ns;
+	
+	char	interface[MAX_STRING_LEN];
+	char	mode[MAX_STRING_LEN];
+	
+	int ret = SYSINFO_RET_FAIL;
+        
+	assert(result);
 
         clean_result(result);
+
+        if(num_param(param) > 2)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }
 	
-	return SYSINFO_RET_FAIL;
+	if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
+        {
+                mode[0] = '\0';
+        }
+        if(mode[0] == '\0')
+	{
+		/* default parameter */
+		sprintf(mode, "bytes");
+	}
+
+	ret = get_net_stat(interface, &ns);
+	
+
+	if(ret == SYSINFO_RET_OK)
+	{
+		if(strncmp(mode, "bytes", MAX_STRING_LEN) == 0)
+		{
+			result->type |= AR_DOUBLE;
+			result->dbl = (double)(ns.ibytes);
+		} 
+		else if(strncmp(mode, "packets", MAX_STRING_LEN) == 0)
+		{
+			result->type |= AR_DOUBLE;
+			result->dbl = (double)(ns.ipackets);
+		}
+		else if(strncmp(mode, "errors", MAX_STRING_LEN) == 0)
+		{
+			result->type |= AR_DOUBLE;
+			result->dbl = (double)(ns.ierr);
+		}
+		else if(strncmp(mode, "dropped", MAX_STRING_LEN) == 0)
+		{
+			result->type |= AR_DOUBLE;
+			result->dbl = (double)(ns.idrop);
+		}
+		else
+		{
+			ret = SYSINFO_RET_FAIL;
+		}
+	}
+	
+	return ret;
 }
 
 int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-
-        assert(result);
+	struct net_stat_s	ns;
+	
+	char	interface[MAX_STRING_LEN];
+	char	mode[MAX_STRING_LEN];
+	
+	int ret = SYSINFO_RET_FAIL;
+        
+	assert(result);
 
         clean_result(result);
+
+        if(num_param(param) > 2)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }
 	
-	return SYSINFO_RET_FAIL;
+	if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
+        {
+                mode[0] = '\0';
+        }
+        if(mode[0] == '\0')
+	{
+		/* default parameter */
+		sprintf(mode, "bytes");
+	}
+
+	ret = get_net_stat(interface, &ns);
+	
+
+	if(ret == SYSINFO_RET_OK)
+	{
+		if(strncmp(mode, "bytes", MAX_STRING_LEN) == 0)
+		{
+			result->type |= AR_DOUBLE;
+			result->dbl = (double)(ns.obytes);
+		} 
+		else if(strncmp(mode, "packets", MAX_STRING_LEN) == 0)
+		{
+			result->type |= AR_DOUBLE;
+			result->dbl = (double)(ns.opackets);
+		}
+		else if(strncmp(mode, "errors", MAX_STRING_LEN) == 0)
+		{
+			result->type |= AR_DOUBLE;
+			result->dbl = (double)(ns.oerr);
+		}
+		else if(strncmp(mode, "dropped", MAX_STRING_LEN) == 0)
+		{
+			result->type |= AR_DOUBLE;
+			result->dbl = (double)(ns.odrop);
+		}
+		else
+		{
+			ret = SYSINFO_RET_FAIL;
+		}
+	}
+	
+	return ret;
 }
 
 int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -59,3 +240,4 @@ int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AG
 	
 	return SYSINFO_RET_FAIL;
 }
+
