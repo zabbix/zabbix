@@ -274,8 +274,8 @@ static int	VFS_DEV_READ_BYTES(const char *cmd, const char *param, unsigned flags
     if(ret == SYSINFO_RET_OK)
     {
 	result->type |= AR_DOUBLE;
-	/* uint_t reads;    number of read operations */
-	result->dbl = kio.reads;
+	/* u_longlong_t nread;	number of bytes read */
+        result->dbl = kio.nread;
     }
 
     return ret;
@@ -291,8 +291,8 @@ static int	VFS_DEV_READ_OPERATIONS(const char *cmd, const char *param, unsigned 
     if(ret == SYSINFO_RET_OK)
     {
         result->type |= AR_DOUBLE;
-	/* u_longlong_t nread;	number of bytes read */
-        result->dbl = kio.nread;
+	/* uint_t reads;    number of read operations */
+	result->dbl = kio.reads;
     }
 
     return ret;
@@ -308,8 +308,8 @@ static int	VFS_DEV_WRITE_BYTES(const char *cmd, const char *param, unsigned flag
     if(ret == SYSINFO_RET_OK)
     {
         result->type |= AR_DOUBLE;
-	/* uint_t   writes;    number of write operations */
-        result->dbl = kio.writes;
+	/* u_longlong_t nwritten;   number of bytes written */
+        result->dbl = kio.nwritten;
     }
 
     return ret;
@@ -325,8 +325,8 @@ static int	VFS_DEV_WRITE_OPERATIONS(const char *cmd, const char *param, unsigned
     if(ret == SYSINFO_RET_OK)
     {
         result->type |= AR_DOUBLE;
-	/* u_longlong_t nwritten;   number of bytes written */
-        result->dbl = kio.nwritten;
+	/* uint_t   writes;    number of write operations */
+        result->dbl = kio.writes;
     }
 
     return ret;

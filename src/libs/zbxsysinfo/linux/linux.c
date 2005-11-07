@@ -170,21 +170,21 @@ ZBX_METRIC	parameters_specific[]=
 	{"net.if.obytes15",	CF_USEUPARAM,	NET_IF_OBYTES15,0,	"lo"},
 */
 /*
-	{"disk_read_ops1",	CF_USEUPARAM,	DISKREADOPS1, 	0,	"hda"},
-	{"disk_read_ops5",	CF_USEUPARAM,	DISKREADOPS5, 	0,	"hda"},
-	{"disk_read_ops15",	CF_USEUPARAM,	DISKREADOPS15,	0,	"hda"},
+	{"disk_read_ops1",	CF_USEUPARAM,	DISKREADOPS1, 	0,	"sda"},
+	{"disk_read_ops5",	CF_USEUPARAM,	DISKREADOPS5, 	0,	"sda"},
+	{"disk_read_ops15",	CF_USEUPARAM,	DISKREADOPS15,	0,	"sda"},
 
-	{"disk_read_blks1",	CF_USEUPARAM,	DISKREADBLKS1,	0,	"hda"},
-	{"disk_read_blks5",	CF_USEUPARAM,	DISKREADBLKS5,	0,	"hda"},
-	{"disk_read_blks15",	CF_USEUPARAM,	DISKREADBLKS15,	0,	"hda"},
+	{"disk_read_blks1",	CF_USEUPARAM,	DISKREADBLKS1,	0,	"sda"},
+	{"disk_read_blks5",	CF_USEUPARAM,	DISKREADBLKS5,	0,	"sda"},
+	{"disk_read_blks15",	CF_USEUPARAM,	DISKREADBLKS15,	0,	"sda"},
 
-	{"disk_write_ops1",	CF_USEUPARAM,	DISKWRITEOPS1, 	0,	"hda"},
-	{"disk_write_ops5",	CF_USEUPARAM,	DISKWRITEOPS5, 	0,	"hda"},
-	{"disk_write_ops15",	CF_USEUPARAM,	DISKWRITEOPS15,	0,	"hda"},
+	{"disk_write_ops1",	CF_USEUPARAM,	DISKWRITEOPS1, 	0,	"sda"},
+	{"disk_write_ops5",	CF_USEUPARAM,	DISKWRITEOPS5, 	0,	"sda"},
+	{"disk_write_ops15",	CF_USEUPARAM,	DISKWRITEOPS15,	0,	"sda"},
 
-	{"disk_write_blks1",	CF_USEUPARAM,	DISKWRITEBLKS1,	0,	"hda"},
-	{"disk_write_blks5",	CF_USEUPARAM,	DISKWRITEBLKS5,	0,	"hda"},
-	{"disk_write_blks15",	CF_USEUPARAM,	DISKWRITEBLKS15,0,	"hda"},
+	{"disk_write_blks1",	CF_USEUPARAM,	DISKWRITEBLKS1,	0,	"sda"},
+	{"disk_write_blks5",	CF_USEUPARAM,	DISKWRITEBLKS5,	0,	"sda"},
+	{"disk_write_blks15",	CF_USEUPARAM,	DISKWRITEBLKS15,0,	"sda"},
 */
 /*
 	{"system.cpu.load1",	0,	SYSTEM_CPU_LOAD1,	0,	0},
@@ -249,8 +249,8 @@ ZBX_METRIC	parameters_specific[]=
 	{"vfs.fs.size",		CF_USEUPARAM,	VFS_FS_SIZE,	0,	"/,free"},
 	{"vfs.fs.inode",	CF_USEUPARAM,	VFS_FS_INODE,	0,	"/,free"},
 
-	{"vfs.dev.read",	CF_USEUPARAM,	VFS_DEV_READ,	0,	"hda,ops,avg1"},
-	{"vfs.dev.write",	CF_USEUPARAM,	VFS_DEV_WRITE,	0,	"hda,ops,avg1"},
+	{"vfs.dev.read",	CF_USEUPARAM,	VFS_DEV_READ,	0,	"sda,operations"},
+	{"vfs.dev.write",	CF_USEUPARAM,	VFS_DEV_WRITE,	0,	"sda,sectors"},
 
 	{"vm.memory.size",	CF_USEUPARAM,	VM_MEMORY_SIZE,	0,	"free"},
 
