@@ -31,6 +31,7 @@ struct net_stat_s {
 	unsigned long opackets;
 	unsigned long oerr;
 	unsigned long odrop;
+	unsigned long colls;
 };
 
 static int get_net_stat(const char *interface, struct net_stat_s *result)
@@ -56,7 +57,8 @@ static int get_net_stat(const char *interface, struct net_stat_s *result)
 			p = strstr(line,":");
 			if(p) p[0]='\t';
 			
-			if(sscanf(line,"%s\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\n",
+			if(sscanf(line,"%s\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t \
+					    %lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\n",
 				name, 
 				&(result->ibytes), 	/* bytes */
 				&(result->ipackets),	/* packets */
@@ -69,8 +71,12 @@ static int get_net_stat(const char *interface, struct net_stat_s *result)
 				&(result->obytes), 	/* bytes */
 				&(result->opackets),	/* packets*/
 				&(result->oerr),	/* errs */
-				&(result->odrop)	/* drop */
-				) == 13)
+				&(result->odrop),	/* drop */
+			        &(tmp), 		/* fifo */
+				&(result->colls),	/* icolls */
+			        &(tmp), 		/* carrier */
+			        &(tmp)	 		/* compressed */
+				) == 17)
 			{
 				if(strncmp(name, interface, MAX_STRING_LEN) == 0)
 				{
@@ -234,10 +240,36 @@ int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT
 
 int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-        assert(result);
+	struct net_stat_s	ns;
+	
+	char	interface[MAX_STRING_LEN];
+	
+	int ret = SYSINFO_RET_FAIL;
+        
+	assert(result);
 
         clean_result(result);
+
+        if(num_param(param) > 1)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }
 	
-	return SYSINFO_RET_FAIL;
+
+	ret = get_net_stat(interface, &ns);
+	
+
+	if(ret == SYSINFO_RET_OK)
+	{
+		result->type |= AR_DOUBLE;
+		result->dbl = (double)(ns.colls);
+	}
+	
+	return ret;
 }
 
