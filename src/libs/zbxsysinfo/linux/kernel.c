@@ -24,30 +24,33 @@
 
 int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXFILES
-	int	mib[2],len;
-	int	maxfiles;
+	int ret = SYSINFO_RET_FAIL;
+	char line[MAX_STRING_LEN];
+
+	unsigned long value = 0;
+	
+	FILE 	*f;
 
 	assert(result);
 
         clean_result(result);	
 
-	mib[0]=CTL_KERN;
-	mib[1]=KERN_MAXFILES;
-
-	len=sizeof(maxfiles);
-
-	if(sysctl(mib,2,&maxfiles,(size_t *)&len,NULL,0) != 0)
+	f=fopen("/proc/sys/fs/file-max","r");
+	if(f)
 	{
-		return	SYSINFO_RET_FAIL;
+		if(fgets(line,MAX_STRING_LEN,f) != NULL);
+		{
+			if(sscanf(line,"%lu\n", &value) == 1)
+			{
+				result->type |= AR_DOUBLE;
+				result->dbl = (double) value;
+				ret = SYSINFO_RET_OK;
+			}
+		}
+		fclose(f);
 	}
 
-	result->type |= AR_DOUBLE;
-     	result->dbl = (double)(maxfiles);
-	return SYSINFO_RET_OK;
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
+	return ret;
 }
 
 int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
