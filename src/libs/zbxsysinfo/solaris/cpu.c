@@ -187,7 +187,7 @@ static int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, 
 		
 	if(getloadavg(load, 3))
 	{
-		result->type = AR_DOUBLE;
+		result->type |= AR_DOUBLE;
 		result->dbl = load[1];
 		return SYSINFO_RET_OK;
 	}
@@ -211,7 +211,7 @@ static int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags,
 		
 	if(getloadavg(load, 3))
 	{
-		result->type = AR_DOUBLE;
+		result->type |= AR_DOUBLE;
 		result->dbl =load[2];	
 		return SYSINFO_RET_OK;
 	}
@@ -326,7 +326,7 @@ int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGEN
 	return SYSINFO_RET_FAIL;
     }
 
-    result->type = AR_DOUBLE;
+    result->type |= AR_DOUBLE;
     result->dbl = swt_count;
     
     return SYSINFO_RET_OK;
@@ -369,7 +369,7 @@ int	SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	return SYSINFO_RET_FAIL;
     }
     
-    result->type = AR_DOUBLE;
+    result->type |= AR_DOUBLE;
     result->dbl = intr_count;
     
     return SYSINFO_RET_OK;
