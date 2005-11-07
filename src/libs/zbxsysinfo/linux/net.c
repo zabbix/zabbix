@@ -85,6 +85,7 @@ static int get_net_stat(const char *interface, struct net_stat_s *result)
 				}
 			}
 		}
+		fclose(f);
 	}
 
 	if(ret != SYSINFO_RET_OK)
