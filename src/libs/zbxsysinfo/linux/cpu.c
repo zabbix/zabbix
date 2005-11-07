@@ -559,10 +559,37 @@ int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, 
 
 int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+	int ret = SYSINFO_RET_FAIL;
+	char line[MAX_STRING_LEN];
+
+	char name[MAX_STRING_LEN];
+	unsigned long value = 0;
+	
+	FILE *f;
+
         assert(result);
 
         clean_result(result);
-	
-	return SYSINFO_RET_FAIL;
+
+	f=fopen("/proc/stat","r");
+	if(f)
+	{
+		while(fgets(line,MAX_STRING_LEN,f) != NULL)
+		{
+			if(sscanf(line,"%s\t%lu\n", name, &value) != 2) 
+				continue;
+		
+			if(strncmp(name, "intr", MAX_STRING_LEN) == 0)
+			{
+				result->type |= AR_UINT64;
+				result->ui64 = (uint64_t) value;
+				ret = SYSINFO_RET_OK;
+				break;
+			}
+		}
+		fclose(f);
+	}
+
+	return ret;
 }
 
