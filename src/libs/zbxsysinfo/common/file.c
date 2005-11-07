@@ -261,13 +261,17 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 {
 	char	filename[MAX_STRING_LEN];
 	char	regexp[MAX_STRING_LEN];
+	FILE	*f = NULL;
+	int	len;
+	char	*c;
 
 	int	ret = SYSINFO_RET_OK;
+	char	*buf = NULL;
 
         assert(result);
 
         clean_result(result);
-	
+
 	if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
 	{
 		ret = SYSINFO_RET_FAIL;
@@ -278,7 +282,62 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 		ret = SYSINFO_RET_FAIL;
 	}
 
-	ret = SYSINFO_RET_FAIL;
 
-	return ret;
+	if(ret == SYSINFO_RET_OK)
+	{
+		f=fopen(filename,"r");
+		if(f==NULL)
+		{
+			ret = SYSINFO_RET_FAIL;
+		}
+	}
+	if(ret == SYSINFO_RET_OK)
+	{
+		buf = (char*)malloc((size_t)MAX_FILE_LEN);
+		if(buf == NULL)
+		{
+			ret = SYSINFO_RET_FAIL;
+		}
+		else
+		{
+			memset(buf,0,(size_t)MAX_FILE_LEN);
+		}
+	}
+
+	if(ret == SYSINFO_RET_OK)
+	{
+		if(0 == fread(buf, 1, MAX_FILE_LEN-1, f))
+		{
+			ret = SYSINFO_RET_FAIL;
+		}
+	}
+
+
+	if(f != NULL)
+	{
+		fclose(f);
+	}
+
+	if(ret == SYSINFO_RET_OK)
+	{
+		c=zbx_regexp_match(buf, regexp, &len);
+
+		if(c == NULL)
+		{
+			result->type |= AR_UINT64;
+			result->ui64 = 0;
+		}
+		else
+		{
+			result->type |= AR_UINT64;
+			result->ui64 = 1;
+		}
+	}
+
+	if(buf != NULL)
+	{
+		free(buf);
+	}
+
+	return	ret;
 }

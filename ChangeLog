@@ -1,5 +1,6 @@
 Changes for 1.1beta3:
 
+ - fixed vfs.file.regmatch[*] (Alexei)
  - added support of net.if.collisions[*] for Linux (Eugene)
  - added support of net.if.in[*] for Linux (Eugene)
  - added support of net.if.out[*] for Linux (Eugene)

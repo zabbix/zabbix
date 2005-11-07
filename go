@@ -2,6 +2,8 @@
 
 clear
 
+rm -f WARNINGS
+
 echo Pre-making...
 aclocal
 autoconf
@@ -26,10 +28,10 @@ automake
 echo Configuring...
 export CFLAGS="-Wall"
 #export CFLAGS="-Wall -pedantic"
-./configure --enable-agent --enable-server --with-mysql --prefix=`pwd`
+./configure --enable-agent --enable-server --with-mysql --prefix=`pwd` 2>>WARNINGS >/dev/null
 echo Cleaning...
-make clean
+make clean 2>>WARNINGS >/dev/null
 echo Making...
-make
+make 2>>WARNINGS >/dev/null
 #echo Installing...
 make install 2>>WARNINGS >/dev/null
