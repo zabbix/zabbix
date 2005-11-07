@@ -110,6 +110,7 @@ static int get_disk_stat(const char *interface, struct disk_stat_s *result)
 				break;
 			}
 		}
+		fclose(f);
 	}
 
 	if(ret != SYSINFO_RET_OK)
