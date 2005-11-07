@@ -1,5 +1,7 @@
 Changes for 1.1beta3:
 
+ - added support of vfs.dev.read[*] for Linux (Eugene)
+ - added support of vfs.dev.write[*] for Linux (Eugene)
  - fixed vfs.file.regmatch[*] (Alexei)
  - added support of net.if.collisions[*] for Linux (Eugene)
  - added support of net.if.in[*] for Linux (Eugene)
