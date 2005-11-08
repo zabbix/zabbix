@@ -107,7 +107,7 @@ typedef union value_overlay
 {
   union 
   {
-    uint64_t ui64;
+    zbx_uint64_t ui64;
     uint32_t ui32;
   } u;
 } VALUE_OVERLAY;
@@ -537,10 +537,10 @@ static int DISKSVC(const char *cmd, const char *device, double  *value, const ch
 /*
  * ADDED to /solaric/cpu.c
  *   
-static int get_cpu_data(uint64_t *idle,
-                        uint64_t *system,
-                        uint64_t *user,
-                        uint64_t *iowait)
+static int get_cpu_data(zbx_uint64_t *idle,
+                        zbx_uint64_t *system,
+                        zbx_uint64_t *user,
+                        zbx_uint64_t *iowait)
 {
   kstat_ctl_t *kc;
   int cpu_count = 0;
@@ -583,16 +583,16 @@ static int get_cpu_data(uint64_t *idle,
 
 static int CPUIDLE(const char *cmd, const char *param, double  *value, const char *msg, int mlen_max)
 {
-   static uint64_t idle[2];
-   static uint64_t system[2];
-   static uint64_t user[2];
-   static uint64_t iowait[2];
+   static zbx_uint64_t idle[2];
+   static zbx_uint64_t system[2];
+   static zbx_uint64_t user[2];
+   static zbx_uint64_t iowait[2];
 
    int result = SYSINFO_RET_FAIL;
 
    if (get_cpu_data(&idle[1], &system[1], &user[1], &iowait[1]))
       {
-         uint64_t interval_size;
+         zbx_uint64_t interval_size;
 
          interval_size =    (idle[1] - idle[0])
 	                  + (system[1] - system[0])
@@ -1237,9 +1237,9 @@ static int	PROCLOAD15(const char *cmd, const char *parameter,double  *value, con
 /*
  * ADDED
  * 
-static int get_swap_data(uint64_t *resv,
-                         uint64_t *avail,
-                         uint64_t *free)
+static int get_swap_data(zbx_uint64_t *resv,
+                         zbx_uint64_t *avail,
+                         zbx_uint64_t *free)
 {
   int result = SYSINFO_RET_FAIL;
   kstat_ctl_t *kc;
@@ -1256,7 +1256,7 @@ static int get_swap_data(uint64_t *resv,
 	{
            vminfo_t *vm;
            int i;
-           uint64_t oresv, ofree, oavail;
+           zbx_uint64_t oresv, ofree, oavail;
 
            vm = (vminfo_t *) ksp->ks_data;
 
@@ -1295,7 +1295,7 @@ static int get_swap_data(uint64_t *resv,
 static int SWAPFREE(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   int result;
-  uint64_t resv, avail, free;
+  zbx_uint64_t resv, avail, free;
 
   result = get_swap_data(&resv, &avail, &free);
 
@@ -1310,13 +1310,13 @@ static int SWAPFREE(const char *cmd, const char *parameter,double  *value, const
 int SWAPTOTAL(const char *cmd, const char *parameter,double  *value, const char *msg, int mlen_max)
 {
   int result;
-  uint64_t resv, avail, free;
+  zbx_uint64_t resv, avail, free;
 
   result = get_swap_data(&resv, &avail, &free);
 
   if (result == SYSINFO_RET_OK)
     {
-      uint64_t swap_total_bytes;
+      zbx_uint64_t swap_total_bytes;
 
       swap_total_bytes = (resv + avail) * sysconf(_SC_PAGESIZE);
       *value = (double) swap_total_bytes;

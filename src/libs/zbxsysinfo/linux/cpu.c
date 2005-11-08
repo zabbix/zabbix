@@ -582,7 +582,7 @@ int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGEN
 			if(strncmp(name, "intr", MAX_STRING_LEN) == 0)
 			{
 				result->type |= AR_UINT64;
-				result->ui64 = (uint64_t) value;
+				result->ui64 = (zbx_uint64_t) value;
 				ret = SYSINFO_RET_OK;
 				break;
 			}

@@ -62,6 +62,12 @@ void InitLog(void)
       WriteFile(hLog,buffer,strlen(buffer),&size,NULL);
 	  FlushFileBuffers(hLog);
 
+      if (hLog!=INVALID_HANDLE_VALUE)
+	  {
+         CloseHandle(hLog);
+		 hLog = INVALID_HANDLE_VALUE;
+	  }
+
       mutexLogAccess=CreateMutex(NULL,FALSE,NULL);
    }
 }
@@ -73,48 +79,77 @@ void InitLog(void)
 
 void CloseLog(void)
 {
-   if (dwFlags & AF_USE_EVENT_LOG)
-   {
-      DeregisterEventSource(hLog);
-   }
-   else
-   {
-      if (hLog!=INVALID_HANDLE_VALUE)
-         CloseHandle(hLog);
-      if (mutexLogAccess!=INVALID_HANDLE_VALUE)
-         CloseHandle(mutexLogAccess);
-   }
+	if (dwFlags & AF_USE_EVENT_LOG)
+	{
+		DeregisterEventSource(hLog);
+	}
+	else
+	{
+		if (hLog!=INVALID_HANDLE_VALUE)
+		{
+		 CloseHandle(hLog);
+		 hLog = INVALID_HANDLE_VALUE;
+		}
+		if (mutexLogAccess!=INVALID_HANDLE_VALUE)
+			CloseHandle(mutexLogAccess);
+	}
 }
 
 
 //
 // Write record to log file
 //
-
 static void WriteLogToFile(char *message)
 {
-   char buffer[64];
-   DWORD size;
-   time_t t;
-   struct tm *loc;
+	char buffer[64];
+	char logFile_old[MAX_STRING_LEN+5];
+	DWORD size;
+	time_t t;
+	struct tm *loc;
 
-   // Prevent simultaneous write to log file
-   WaitForSingleObject(mutexLogAccess,INFINITE);
+	hLog=CreateFile(logFile,GENERIC_WRITE,FILE_SHARE_READ,NULL,OPEN_ALWAYS,
+						FILE_ATTRIBUTE_NORMAL,NULL);
+	if (hLog==INVALID_HANDLE_VALUE)
+		return;
+	SetFilePointer(hLog,0,NULL,FILE_END);
 
-   t=time(NULL);
-   loc=localtime(&t);
-   strftime(buffer,32,"[%d-%b-%Y %H:%M:%S] ",loc);
-   WriteFile(hLog,buffer,strlen(buffer),&size,NULL);
-   if (IsStandalone())
-      printf("%s",buffer);
+	t=time(NULL);
+	loc=localtime(&t);
+	strftime(buffer,32,"[%d-%b-%Y %H:%M:%S] ",loc);
 
-   WriteFile(hLog,message,strlen(message),&size,NULL);
-   if (IsStandalone())
-      printf("%s",message);
+	// Prevent simultaneous write to log file
+	if (mutexLogAccess!=INVALID_HANDLE_VALUE)
+		WaitForSingleObject(mutexLogAccess,INFINITE);
 
-   ReleaseMutex(mutexLogAccess);
+	WriteFile(hLog,buffer,strlen(buffer),&size,NULL);
+	if (IsStandalone())
+		printf("%s",buffer);
+
+	WriteFile(hLog,message,strlen(message),&size,NULL);
+	if (IsStandalone())
+		printf("%s",message);
+
+	size = GetFileSize(hLog, NULL);
+
+	if (hLog!=INVALID_HANDLE_VALUE)
+	{
+		CloseHandle(hLog);
+		hLog = INVALID_HANDLE_VALUE;
+	}
+
+	if(size > MAX_LOG_FILE_LEN)
+	{
+		strscpy(logFile_old, logFile);
+		strncat(logFile_old, ".old", MAX_STRING_LEN);
+		if(MoveFileEx(logFile, logFile_old, MOVEFILE_REPLACE_EXISTING)!=0)
+		{
+/*			exit(1);*/
+		}
+	}
+
+	if (mutexLogAccess!=INVALID_HANDLE_VALUE)
+		ReleaseMutex(mutexLogAccess);
 }
-
 
 //
 // Write log record

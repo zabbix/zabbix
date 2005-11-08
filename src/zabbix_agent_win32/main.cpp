@@ -260,6 +260,7 @@ void Main(void)
 
 int main(int argc,char *argv[])
 {
+
    if (!ParseCommandLine(argc,argv))
       return 1;
 
