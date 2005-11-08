@@ -1,5 +1,6 @@
 Changes for 1.1beta3:
 
+ - improved loging to file for windows (Eugene)
  - added support of system.cpu.intr for Linux (Eugene)
  - added support of kernel.maxfiles for Linux (Eugene)
  - added support of vfs.dev.read[*] for Linux (Eugene)

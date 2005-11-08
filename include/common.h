@@ -22,14 +22,22 @@
 
 #include "sysinc.h"
 
-#if __WORDSIZE == 64
-#	define ZBX_FS_UI64 "%lu"
-#else
+#if defined(WIN32)
+#	define zbx_uint64_t __int64
 #	define ZBX_FS_UI64 "%llu"
+#else
+#	define zbx_uint64_t uint64_t
+#	if __WORDSIZE == 64
+#		define ZBX_FS_UI64 "%lu"
+#	else
+#		define ZBX_FS_UI64 "%llu"
+#	endif
 #endif
 
 #define	ZABBIX_VERSION	"1.1beta3"
- 
+
+#define MAX_LOG_FILE_LEN (1024*1024)
+
 #define	SUCCEED		0
 #define	FAIL		(-1)
 #define	NOTSUPPORTED	(-2)
@@ -220,7 +228,7 @@ LIST {
 #define AGENT_RESULT struct result_s
 AGENT_RESULT {
 	int	 	type;
-	uint64_t	ui64;
+	zbx_uint64_t	ui64;
 	double		dbl;
 	char		*str;
 	char		*msg;

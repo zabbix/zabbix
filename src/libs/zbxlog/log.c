@@ -129,7 +129,7 @@ void zabbix_log(int level, const char *fmt, ...)
 
 		if(stat(log_filename,&buf) == 0)
 		{
-			if(buf.st_size>1024*1024)
+			if(buf.st_size > MAX_LOG_FILE_LEN)
 			{
 				strscpy(filename_old,log_filename);
 				strncat(filename_old,".old",MAX_STRING_LEN);

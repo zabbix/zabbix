@@ -22,7 +22,7 @@ int process_eventlog_new(char *source,int *lastlogsize, char *timestamp, char *s
 	DWORD    t,type;
 	WORD	category;
 
-	char tmp[1024];
+//	char tmp[1024];
 
 //	sprintf(tmp,"process_event_log_new([%s],[%d],[%s],[%s],[%s])", source,*lastlogsize, timestamp, src,message);
 	

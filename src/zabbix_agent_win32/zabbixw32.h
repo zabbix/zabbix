@@ -28,7 +28,7 @@
 #include <stdio.h>
 #include <pdh.h>
 #include <psapi.h>
-#include "../../include/common.h"
+#include "common.h"
 #include "md5.h"
 #include "messages.h"
 #include "zabbix_subagent.h"
