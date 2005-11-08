@@ -20,7 +20,9 @@
 #ifndef ZABBIX_SYSINC_H
 #define ZABBIX_SYSINC_H
 
-#include "config.h"
+#if !defined(WIN32)
+#	include "config.h"
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>

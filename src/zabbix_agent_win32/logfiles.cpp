@@ -140,7 +140,7 @@ int process_eventlog(char *source,int *lastlogsize, int *timestamp, char *value)
             // and source name.
 				
 			//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",dwThisRecord);
-				if(dwThisRecord++ >= *lastlogsize)
+				if((dwThisRecord++) >= ((DWORD)(*lastlogsize)))
 				{
 					sprintf(value, "%03d  Event ID 0x%08X  Event type ", 
 					dwThisRecord, pevlr->EventID);
