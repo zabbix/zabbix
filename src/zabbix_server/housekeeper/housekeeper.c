@@ -225,7 +225,7 @@ static int housekeeping_history_and_trends(int now)
 
 	int		i;
 
-	snprintf(sql,sizeof(sql)-1,"select itemid,history,delay,trends from items, where serverid=%d",CONFIG_SERVERD_ID);
+	snprintf(sql,sizeof(sql)-1,"select itemid,history,delay,trends from items where serverid=%d",CONFIG_SERVERD_ID);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
