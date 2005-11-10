@@ -26,8 +26,8 @@ automake
 #tar cvzf zabbix.tgz zabbix
 #exit
 echo Configuring...
-export CFLAGS="-Wall"
-#export CFLAGS="-Wall -pedantic"
+#export CFLAGS="-Wall"
+export CFLAGS="-Wall -pedantic"
 ./configure --enable-agent --enable-server --with-mysql --prefix=`pwd` 2>>WARNINGS >/dev/null
 echo Cleaning...
 make clean 2>>WARNINGS >/dev/null
