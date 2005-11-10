@@ -1,5 +1,6 @@
 1.1beta3:
 
+ - configurable default period for graphs (Max)
  - change DOUBLE to UINT64 where required
  - check if there is a memory leak in W32 agent
  - make agents return error message if not supported or not available
