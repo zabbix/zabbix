@@ -136,23 +136,23 @@ int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	{
 		if(strncmp(mode, "bytes", MAX_STRING_LEN) == 0)
 		{
-			result->type |= AR_DOUBLE;
-			result->dbl = (double)(ns.ibytes);
+			result->type |= AR_UINT64;
+			result->ui64 = (zbx_uint64_t)(ns.ibytes);
 		} 
 		else if(strncmp(mode, "packets", MAX_STRING_LEN) == 0)
 		{
-			result->type |= AR_DOUBLE;
-			result->dbl = (double)(ns.ipackets);
+			result->type |= AR_UINT64;
+			result->ui64 = (zbx_uint64_t)(ns.ipackets);
 		}
 		else if(strncmp(mode, "errors", MAX_STRING_LEN) == 0)
 		{
-			result->type |= AR_DOUBLE;
-			result->dbl = (double)(ns.ierr);
+			result->type |= AR_UINT64;
+			result->ui64 = (zbx_uint64_t)(ns.ierr);
 		}
 		else if(strncmp(mode, "dropped", MAX_STRING_LEN) == 0)
 		{
-			result->type |= AR_DOUBLE;
-			result->dbl = (double)(ns.idrop);
+			result->type |= AR_UINT64;
+			result->ui64 = (zbx_uint64_t)(ns.idrop);
 		}
 		else
 		{
@@ -203,23 +203,23 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	{
 		if(strncmp(mode, "bytes", MAX_STRING_LEN) == 0)
 		{
-			result->type |= AR_DOUBLE;
-			result->dbl = (double)(ns.obytes);
+			result->type |= AR_UINT64;
+			result->ui64 = (zbx_uint64_t)(ns.obytes);
 		} 
 		else if(strncmp(mode, "packets", MAX_STRING_LEN) == 0)
 		{
-			result->type |= AR_DOUBLE;
-			result->dbl = (double)(ns.opackets);
+			result->type |= AR_UINT64;
+			result->ui64 = (zbx_uint64_t)(ns.opackets);
 		}
 		else if(strncmp(mode, "errors", MAX_STRING_LEN) == 0)
 		{
-			result->type |= AR_DOUBLE;
-			result->dbl = (double)(ns.oerr);
+			result->type |= AR_UINT64;
+			result->ui64 = (zbx_uint64_t)(ns.oerr);
 		}
 		else if(strncmp(mode, "dropped", MAX_STRING_LEN) == 0)
 		{
-			result->type |= AR_DOUBLE;
-			result->dbl = (double)(ns.odrop);
+			result->type |= AR_UINT64;
+			result->ui64 = (zbx_uint64_t)(ns.odrop);
 		}
 		else
 		{
@@ -267,8 +267,8 @@ int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AG
 
 	if(ret == SYSINFO_RET_OK)
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = (double)(ns.colls);
+		result->type |= AR_UINT64;
+		result->ui64 = (zbx_uint64_t)(ns.colls);
 	}
 	
 	return ret;

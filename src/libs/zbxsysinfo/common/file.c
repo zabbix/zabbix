@@ -44,8 +44,8 @@ int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	
 	if(stat(filename,&buf) == 0)
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = (double)buf.st_size;
+		result->type |= AR_UINT64;
+		result->ui64 = (zbx_uint64_t)buf.st_size;
 		return SYSINFO_RET_OK;
 	}
 	return	SYSINFO_RET_FAIL;
@@ -72,8 +72,8 @@ int	VFS_FILE_ATIME(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	
 	if(stat(filename,&buf) == 0)
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = (double)buf.st_atime;
+		result->type |= AR_UINT64;
+		result->ui64 = (zbx_uint64_t)buf.st_atime;
 		return SYSINFO_RET_OK;
 	}
 	return	SYSINFO_RET_FAIL;
@@ -100,8 +100,8 @@ int	VFS_FILE_CTIME(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	if(stat(filename,&buf) == 0)
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = (double)buf.st_ctime;
+		result->type |= AR_UINT64;
+		result->ui64 = (zbx_uint64_t)buf.st_ctime;
 		return SYSINFO_RET_OK;
 	}
 	return	SYSINFO_RET_FAIL;
@@ -128,8 +128,8 @@ int	VFS_FILE_MTIME(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	
 	if(stat(filename,&buf) == 0)
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = (double)buf.st_mtime;
+		result->type |= AR_UINT64;
+		result->ui64 = (zbx_uint64_t)buf.st_mtime;
 		return SYSINFO_RET_OK;
 	}
 	return	SYSINFO_RET_FAIL;
@@ -154,14 +154,14 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RE
                 return SYSINFO_RET_FAIL;
         }
 
-	result->type |= AR_DOUBLE;
+	result->type |= AR_UINT64;
 	/* File exists */
 	if(stat(filename,&buf) == 0)
 	{
 		/* Regular file */
 		if(S_ISREG(buf.st_mode))
 		{
-			result->dbl = (double)1;
+			result->ui64 = (zbx_uint64_t)1;
 		}
 	}
 	/* File does not exist or any other error */
