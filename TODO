@@ -23,7 +23,6 @@ ZABBIX 1.1:
  - anvanced SNMP trapper
  - add acknowledgements
 
- - handle unavailability of MySQL gracefully
  - add HTML block to the screen cell (to see external data, images, etc)
  - centralised agent upgrade
 
