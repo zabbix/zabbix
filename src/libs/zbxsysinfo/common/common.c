@@ -611,8 +611,8 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	cval = ~crc;
 
-	result->type |= AR_DOUBLE;
-	result->dbl = (double)cval;
+	result->type |= AR_UINT64;
+	result->ui64 = (zbx_uint64_t)cval;
 
 	return	SYSINFO_RET_OK;
 }
@@ -660,8 +660,8 @@ int	get_stat(const char *key, unsigned flags, AGENT_RESULT *result)
 			if(strcmp(name1,key) == 0)
 			{
 				fclose(f);
-				result->type |= AR_DOUBLE;
-				result->dbl = atof(name2);
+				result->type |= AR_UINT64;
+				result->ui64 = (zbx_uint64_t)atoi(name2);
 				return SYSINFO_RET_OK;
 			}
 		}
@@ -761,15 +761,15 @@ int	TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 		if(NULL != strstr(c,pattern))
 		{
 			fclose(f);
-			result->type |= AR_DOUBLE;
-			result->dbl = 1;
+			result->type |= AR_UINT64;
+			result->ui64 = 1;
 			return SYSINFO_RET_OK;
 		}
 	}
 	fclose(f);
 
-	result->type |= AR_DOUBLE;
-	result->dbl = 0;
+	result->type |= AR_UINT64;
+	result->ui64 = 0;
 	
 	return SYSINFO_RET_OK;
 #else
@@ -818,8 +818,8 @@ int	AGENT_PING(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 
         clean_result(result);	
 	
-	result->type |= AR_DOUBLE;
-	result->dbl = 1;
+	result->type |= AR_UINT64;
+	result->ui64 = 1;
 	return SYSINFO_RET_OK;
 }
 
@@ -834,8 +834,8 @@ int	PROCCOUNT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	
 	if( 0 == sysinfo(&info))
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = (double)info.procs;
+		result->type |= AR_UINT64;
+		result->ui64 = (zbx_uint64_t)info.procs;
 		return SYSINFO_RET_OK;
 	}
 	else
@@ -894,8 +894,8 @@ int	PROCCOUNT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	}
 	closedir(dir);
 	
-	result->type |= AR_DOUBLE;
-	result->dbl = (double)proccount;
+	result->type |= AR_UINT64;
+	result->ui64 = (zbx_uint64_t)proccount;
 	
 	return SYSINFO_RET_OK;
 #else
@@ -943,8 +943,8 @@ int	PROCCOUNT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	}
 	closedir(dir);
 
-	result->type |= AR_DOUBLE;
-	result->dbl = (double)proccount;
+	result->type |= AR_UINT64;
+	result->ui64 = (zbx_uint64_t)proccount;
 	
 	return SYSINFO_RET_OK;
 #else
@@ -1741,8 +1741,8 @@ int	CHECK_PORT(const char *cmd, const char *ip_and_port, unsigned flags, AGENT_R
 
 	ret = tcp_expect(ip,port,NULL,NULL,"",&value_int);
 	
-	result->type |= AR_DOUBLE;
-	result->dbl = (double)value_int;
+	result->type |= AR_UINT64;
+	result->ui64 = (zbx_uint64_t)value_int;
 	return ret;
 }
 
@@ -1798,8 +1798,8 @@ int	CHECK_DNS(const char *cmd, const char *ip_and_zone, unsigned flags, AGENT_RE
 	res = inet_aton(ip, &in);
 	if(res != 1)
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = 0;
+		result->type |= AR_UINT64;
+		result->ui64 = 0;
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -1828,8 +1828,8 @@ int	CHECK_DNS(const char *cmd, const char *ip_and_zone, unsigned flags, AGENT_RE
 #else
 	res=res_query(zone,ns_c_in,ns_t_soa,(unsigned char *)respbuf,sizeof(respbuf));
 #endif
-	result->type |= AR_DOUBLE;
-       	result->dbl = (double)(res != -1 ? 1 : 0);
+	result->type |= AR_UINT64;
+       	result->ui64 = (zbx_uint64_t)(res != -1 ? 1 : 0);
 
 	return SYSINFO_RET_OK;
 }
