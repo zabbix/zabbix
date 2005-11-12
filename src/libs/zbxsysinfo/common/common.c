@@ -287,7 +287,7 @@ void	test_parameters(void)
 		process(commands[i].key, PF_TEST, &result);
 		if(result.type & AR_DOUBLE)
 		{
-			printf(" [d|%lf]", result.dbl);
+			printf(" [d|" ZBX_FS_DBL "]", result.dbl);
 		}
 		if(result.type & AR_UINT64)
 		{

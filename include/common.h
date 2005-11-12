@@ -34,6 +34,8 @@
 #	endif
 #endif
 
+#define	ZBX_FS_DBL	"%f"
+
 #define	ZABBIX_VERSION	"1.1beta3"
 
 #define MAX_LOG_FILE_LEN (1024*1024)
