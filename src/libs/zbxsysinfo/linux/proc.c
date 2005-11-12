@@ -309,7 +309,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
     long int	lvalue = 0;
 
     FILE    *f;
-	int	proccount = 0;
+	zbx_uint64_t	proccount = 0;
 
         assert(result);
 
@@ -494,8 +494,8 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
     }
     closedir(dir);
 
-    result->type |= AR_DOUBLE;
-    result->dbl = (double) proccount;
+    result->type |= AR_UINT64;
+    result->ui64 = proccount;
     return SYSINFO_RET_OK;
 #else
     return	SYSINFO_RET_FAIL;
