@@ -22,7 +22,7 @@
 #include "common.h"
 #include "sysinfo.h"
 
-int	get_fs_size_stat(char *fs, double *total, double *free, double *usage)
+int	get_fs_size_stat(char *fs, zbx_uint64_t *total, zbx_uint64_t *free, zbx_uint64_t *usage)
 {
 #ifdef HAVE_SYS_STATVFS_H
         struct statvfs   s;
@@ -43,18 +43,18 @@ int	get_fs_size_stat(char *fs, double *total, double *free, double *usage)
 
 #ifdef HAVE_SYS_STATVFS_H
         if(total)
-                (*total) = (double)(s.f_blocks * (s.f_frsize / 1024.0));
+                (*total) = (zbx_uint64_t)(s.f_blocks * (s.f_frsize / 1024.0));
         if(free)
-                (*free)  = (double)(s.f_bavail * (s.f_frsize / 1024.0));
+                (*free)  = (zbx_uint64_t)(s.f_bavail * (s.f_frsize / 1024.0));
         if(usage)
-                (*usage) = (double)((s.f_blocks - s.f_bavail) * (s.f_frsize / 1024.0));
+                (*usage) = (zbx_uint64_t)((s.f_blocks - s.f_bavail) * (s.f_frsize / 1024.0));
 #else
         if(total)
-                (*total) = (double)(s.f_blocks * (s.f_bsize / 1024.0));
+                (*total) = (zbx_uint64_t)(s.f_blocks * (s.f_bsize / 1024.0));
         if(free)
-                (*free)  = (double)(s.f_bfree * (s.f_bsize / 1024.0));
+                (*free)  = (zbx_uint64_t)(s.f_bfree * (s.f_bsize / 1024.0));
         if(usage)
-                (*usage) = (double)((s.f_blocks - s.f_bfree) * (s.f_bsize / 1024.0));
+                (*usage) = (zbx_uint64_t)((s.f_blocks - s.f_bfree) * (s.f_bsize / 1024.0));
 #endif
         return SYSINFO_RET_OK;
 }
@@ -62,7 +62,7 @@ int	get_fs_size_stat(char *fs, double *total, double *free, double *usage)
 static int	VFS_FS_USED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
         char    mountPoint[MAX_STRING_LEN];
-        double  value = 0;
+        zbx_uint64_t  value = 0;
 
         assert(result);
 
@@ -77,8 +77,8 @@ static int	VFS_FS_USED(const char *cmd, const char *param, unsigned flags, AGENT
         if(get_fs_size_stat(mountPoint, NULL, NULL, &value) != SYSINFO_RET_OK)
                 return  SYSINFO_RET_FAIL;
 
-        result->type |= AR_DOUBLE;
-        result->dbl = value;
+        result->type |= AR_UINT64;
+        result->ui64 = value;
 
         return SYSINFO_RET_OK;
 }
@@ -86,7 +86,7 @@ static int	VFS_FS_USED(const char *cmd, const char *param, unsigned flags, AGENT
 static int	VFS_FS_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
         char    mountPoint[MAX_STRING_LEN];
-        double  value = 0;
+        zbx_uint64_t  value = 0;
 
         assert(result);
 
@@ -101,8 +101,8 @@ static int	VFS_FS_FREE(const char *cmd, const char *param, unsigned flags, AGENT
         if(get_fs_size_stat(mountPoint, NULL, &value, NULL) != SYSINFO_RET_OK)
                 return  SYSINFO_RET_FAIL;
 
-        result->type |= AR_DOUBLE;
-        result->dbl = value;
+        result->type |= AR_UINT64;
+        result->ui64 = value;
 
         return SYSINFO_RET_OK;
 }
@@ -110,7 +110,7 @@ static int	VFS_FS_FREE(const char *cmd, const char *param, unsigned flags, AGENT
 static int	VFS_FS_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
         char    mountPoint[MAX_STRING_LEN];
-        double  value = 0;
+        zbx_uint64_t  value = 0;
 
         assert(result);
 
@@ -127,8 +127,8 @@ static int	VFS_FS_TOTAL(const char *cmd, const char *param, unsigned flags, AGEN
         if(get_fs_size_stat(mountPoint, &value, NULL, NULL) != SYSINFO_RET_OK)
                 return  SYSINFO_RET_FAIL;
 
-        result->type |= AR_DOUBLE;
-        result->dbl = value;
+        result->type |= AR_UINT64;
+        result->ui64 = value;
 
         return SYSINFO_RET_OK;
 
@@ -137,8 +137,8 @@ static int	VFS_FS_TOTAL(const char *cmd, const char *param, unsigned flags, AGEN
 static int	VFS_FS_PFREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
         char    mountPoint[MAX_STRING_LEN];
-        double  tot_val = 0;
-        double  free_val = 0;
+        zbx_uint64_t  tot_val = 0;
+        zbx_uint64_t  free_val = 0;
 
         assert(result);
 
@@ -154,7 +154,7 @@ static int	VFS_FS_PFREE(const char *cmd, const char *param, unsigned flags, AGEN
                 return  SYSINFO_RET_FAIL;
 
         result->type |= AR_DOUBLE;
-        result->dbl = (100.0 * free_val) / tot_val;
+        result->dbl = (100.0 * (double)free_val) / (double)tot_val;
 
         return SYSINFO_RET_OK;
 }
@@ -162,8 +162,8 @@ static int	VFS_FS_PFREE(const char *cmd, const char *param, unsigned flags, AGEN
 static int	VFS_FS_PUSED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
         char    mountPoint[MAX_STRING_LEN];
-        double  tot_val = 0;
-        double  usg_val = 0;
+        zbx_uint64_t  tot_val = 0;
+        zbx_uint64_t  usg_val = 0;
 
         assert(result);
 
@@ -179,7 +179,7 @@ static int	VFS_FS_PUSED(const char *cmd, const char *param, unsigned flags, AGEN
                 return  SYSINFO_RET_FAIL;
 
         result->type |= AR_DOUBLE;
-        result->dbl = (100.0 * usg_val) / tot_val;
+        result->dbl = (100.0 * (double)usg_val) / (double)tot_val;
 
         return SYSINFO_RET_OK;
 }
