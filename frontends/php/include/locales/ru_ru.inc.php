@@ -724,6 +724,23 @@
 //	index.php
 	"S_ZABBIX_BIG"=>			"ZABBIX",
 
+//	bulkloader.php
+	"S_MENU_BULKLOADER"=>			"Bulkloader",
+	"S_BULKLOADER_MAIN"=>			"Bulkloader: Main Page",
+	"S_BULKLOADER_HOSTS"=>			"Bulkloader: Hosts",
+	"S_BULKLOADER_ITEMS"=>			"Bulkloader: Items",
+	"S_BULKLOADER_USERS"=>			"Bulkloader: Users",
+	"S_BULKLOADER_TRIGGERS"=>		"Bulkloader: Triggers",
+	"S_BULKLOADER_ACTIONS"=>		"Bulkloader: Actions",
+	"S_BULKLOADER_ITSERVICES"=>		"Bulkloader: IT Services",
+
+	"S_BULKLOADER_IMPORT_HOSTS"=>		"Import Hosts",
+	"S_BULKLOADER_IMPORT_ITEMS"=>		"Import Items",
+	"S_BULKLOADER_IMPORT_USERS"=>		"Import Users",
+	"S_BULKLOADER_IMPORT_TRIGGERS"=>	"Import Triggers",
+	"S_BULKLOADER_IMPORT_ACTIONS"=>		"Import Actions",
+	"S_BULKLOADER_IMPORT_ITSERVICES"=>	"Import IT Services",
+
 //	Menu
 
 	"S_HELP"=>				"Help",
