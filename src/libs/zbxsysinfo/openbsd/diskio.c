@@ -68,8 +68,8 @@ static int get_disk_stats(const char *device, struct diskstats *result)
 
 static int	VFS_DEV_READ_BYTES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char devname[MAX_STRING_LEN];
-	struct diskstats ds;
+/*	char devname[MAX_STRING_LEN];
+	struct diskstats ds;*/
 	int ret = SYSINFO_RET_FAIL;
         
 	assert(result);
