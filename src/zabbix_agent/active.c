@@ -474,7 +474,7 @@ int	process_active_checks(char *server, int port)
 			
 			process(metrics[i].key, 0, &result);
 			if(result.type & AR_DOUBLE)
-				 snprintf(value, MAX_STRING_LEN-1, "%lf", result.dbl);
+				 snprintf(value, MAX_STRING_LEN-1, ZBX_FS_DBL, result.dbl);
 			else if(result.type & AR_UINT64)
                                  snprintf(value, MAX_STRING_LEN-1, ZBX_FS_UI64, result.ui64);
 			else if(result.type & AR_STRING)
