@@ -1,5 +1,6 @@
 1.1beta3:
 
+ - fix undeleted warning for host and trigger statuses
  - configurable default period for graphs (Max)
  - change DOUBLE to UINT64 where required
  - make agents return error message if not supported or not available
