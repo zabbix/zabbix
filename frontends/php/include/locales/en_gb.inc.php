@@ -765,6 +765,7 @@
 	"S_LOGGED_OUT"=>			"Logged out",
 	"S_MEDIA_TYPE"=>			"Media type",
 	"S_GRAPH_ELEMENT"=>			"Graph element",
+	"S_UNKNOWN_RESOURCE"=>			"Unknown resource",
 
 //	profile.php
 	"S_USER_PROFILE_BIG"=>			"USER PROFILE",
