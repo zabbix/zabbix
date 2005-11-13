@@ -48,14 +48,14 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
     int     usr_ok = 0;
     int	    do_task = DO_SUM;
 
-
     struct  passwd *usrinfo = NULL;
-    long long int	llvalue = 0;
+    zbx_uint64_t	llvalue = 0;
 
     FILE    *f;
 
-    double	memsize = -1;
-    int	proccount = 0;
+    zbx_uint64_t memsize;
+    int first=0;
+    zbx_uint64_t	proccount = 0;
 
         assert(result);
 
@@ -179,7 +179,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
                 while(fgets(line, MAX_STRING_LEN, f) != NULL)
                 {	
                 
-                    if(sscanf(line, "%s\t%lli\n", name1, &llvalue) != 2)
+                    if(sscanf(line, "%s\t" ZBX_FS_UI64 "\n", name1, &llvalue) != 2)
                     {
                         continue;
                     }
@@ -206,7 +206,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
                 while(fgets(line, MAX_STRING_LEN, f) != NULL)
                 {	
                 
-                    if(sscanf(line, "%s\t%lli %s\n", name1, &llvalue, name2) != 3)
+                    if(sscanf(line, "%s\t" ZBX_FS_UI64 " %s\n", name1, &llvalue, name2) != 3)
                     {
                         continue;
                     }
@@ -235,23 +235,24 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
                         llvalue <<= 40;
                     }
                     
-                    if(memsize < 0)
+                    if(first == 0)
                     {
-                        memsize = (double) llvalue;
+                        memsize = llvalue;
+			first  = 1;
                     }
                     else
                     {
                         if(do_task == DO_MAX)
                         {
-                            memsize = MAX(memsize, (double) llvalue);
+                            memsize = MAX(memsize, llvalue);
                         }
                         else if(do_task == DO_MIN)
                         {
-                            memsize = MIN(memsize, (double) llvalue);
+                            memsize = MIN(memsize, llvalue);
                         }
                         else
                         {
-                            memsize +=  (double) llvalue;
+                            memsize +=  llvalue;
                         }
                     }
                     
@@ -265,7 +266,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
     }
     closedir(dir);
     
-    if(memsize < 0)
+    if(first == 0)
     {
         /* incorrect process name */
         memsize = 0;
@@ -273,11 +274,14 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
     
     if(do_task == DO_AVG)
     {
-        memsize /= (double)proccount;
+    	result->type |= AR_DOUBLE;
+    	result->dbl = (double)memsize/(double)proccount;
     }
-    
-    result->type |= AR_DOUBLE;
-    result->dbl = memsize;
+    else
+    {
+	    result->type |= AR_UINT64;
+	    result->ui64 = memsize;
+    }
     return SYSINFO_RET_OK;
 #else
 	return	SYSINFO_RET_FAIL;

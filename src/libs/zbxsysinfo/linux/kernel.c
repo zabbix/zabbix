@@ -27,7 +27,7 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	int ret = SYSINFO_RET_FAIL;
 	char line[MAX_STRING_LEN];
 
-	unsigned long value = 0;
+	zbx_uint64_t value = 0;
 	
 	FILE 	*f;
 
@@ -40,10 +40,10 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	{
 		if(fgets(line,MAX_STRING_LEN,f) != NULL);
 		{
-			if(sscanf(line,"%lu\n", &value) == 1)
+			if(sscanf(line,ZBX_FS_UI64 "\n", &value) == 1)
 			{
-				result->type |= AR_DOUBLE;
-				result->dbl = (double) value;
+				result->type |= AR_UINT64;
+				result->ui64 = (zbx_uint64_t) value;
 				ret = SYSINFO_RET_OK;
 			}
 		}
