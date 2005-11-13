@@ -24,7 +24,7 @@
 
 #include "md5.h"
 
-static int	get_fs_inodes_stat(char *fs, double *total, double *free, double *usage)
+static int	get_fs_inodes_stat(char *fs, zbx_uint64_t *total, zbx_uint64_t *free, zbx_uint64_t *usage)
 {
 #ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
@@ -44,17 +44,17 @@ static int	get_fs_inodes_stat(char *fs, double *total, double *free, double *usa
 	}
         
 	if(total)
-		(*total) = (double)(s.f_files);
+		(*total) = (zbx_uint64_t)(s.f_files);
 #ifdef HAVE_SYS_STATVFS_H
 	if(free)
-		(*free)  = (double)(s.f_favail);
+		(*free)  = (zbx_uint64_t)(s.f_favail);
 	if(usage)
-		(*usage) = (double)(s.f_files - s.f_favail);
+		(*usage) = (zbx_uint64_t)(s.f_files - s.f_favail);
 #else
 	if(free)
-		(*free)  = (double)(s.f_ffree);
+		(*free)  = (zbx_uint64_t)(s.f_ffree);
 	if(usage)
-		(*usage) = (double)(s.f_files - s.f_ffree);
+		(*usage) = (zbx_uint64_t)(s.f_files - s.f_ffree);
 #endif
 	return SYSINFO_RET_OK;
 }
@@ -62,7 +62,7 @@ static int	get_fs_inodes_stat(char *fs, double *total, double *free, double *usa
 static int	VFS_FS_INODE_USED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char 	mountPoint[MAX_STRING_LEN];
-	double	value = 0;
+	zbx_uint64_t	value = 0;
 	
 	assert(result);
 
@@ -77,8 +77,8 @@ static int	VFS_FS_INODE_USED(const char *cmd, const char *param, unsigned flags,
 	if(get_fs_inodes_stat(mountPoint, NULL, NULL, &value) != SYSINFO_RET_OK)
 		return  SYSINFO_RET_FAIL;
 	
-	result->type |= AR_DOUBLE;
-	result->dbl = value;
+	result->type |= AR_UINT64;
+	result->ui64 = value;
 		
 	return SYSINFO_RET_OK;
 }
@@ -86,7 +86,7 @@ static int	VFS_FS_INODE_USED(const char *cmd, const char *param, unsigned flags,
 static int	VFS_FS_INODE_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char 	mountPoint[MAX_STRING_LEN];
-	double	value = 0;
+	zbx_uint64_t	value = 0;
 	
 	assert(result);
 
@@ -101,8 +101,8 @@ static int	VFS_FS_INODE_FREE(const char *cmd, const char *param, unsigned flags,
 	if(get_fs_inodes_stat(mountPoint, NULL, &value, NULL) != SYSINFO_RET_OK)
 		return  SYSINFO_RET_FAIL;
 	
-	result->type |= AR_DOUBLE;
-	result->dbl = value;
+	result->type |= AR_UINT64;
+	result->ui64 = value;
 		
 	return SYSINFO_RET_OK;
 }
@@ -110,7 +110,7 @@ static int	VFS_FS_INODE_FREE(const char *cmd, const char *param, unsigned flags,
 static int	VFS_FS_INODE_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char 	mountPoint[MAX_STRING_LEN];
-	double	value = 0;
+	zbx_uint64_t	value = 0;
 	
 	assert(result);
 
@@ -127,8 +127,8 @@ static int	VFS_FS_INODE_TOTAL(const char *cmd, const char *param, unsigned flags
 	if(get_fs_inodes_stat(mountPoint, &value, NULL, NULL) != SYSINFO_RET_OK)
 		return  SYSINFO_RET_FAIL;
 	
-	result->type |= AR_DOUBLE;
-	result->dbl = value;
+	result->type |= AR_UINT64;
+	result->ui64 = value;
 		
 	return SYSINFO_RET_OK;
 }
@@ -136,8 +136,8 @@ static int	VFS_FS_INODE_TOTAL(const char *cmd, const char *param, unsigned flags
 static int	VFS_FS_INODE_PFREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char 	mountPoint[MAX_STRING_LEN];
-	double	tot_val = 0;
-	double	free_val = 0;
+	zbx_uint64_t	tot_val = 0;
+	zbx_uint64_t	free_val = 0;
 	
 	assert(result);
 
@@ -153,7 +153,7 @@ static int	VFS_FS_INODE_PFREE(const char *cmd, const char *param, unsigned flags
 		return  SYSINFO_RET_FAIL;
 	
 	result->type |= AR_DOUBLE;
-	result->dbl = (100.0 * free_val) / tot_val;
+	result->dbl = (100.0 * (double)free_val) / (double)tot_val;
 		
 	return SYSINFO_RET_OK;
 }
@@ -161,8 +161,8 @@ static int	VFS_FS_INODE_PFREE(const char *cmd, const char *param, unsigned flags
 static int	VFS_FS_INODE_PUSED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char 	mountPoint[MAX_STRING_LEN];
-	double	tot_val = 0;
-	double	usg_val = 0;
+	zbx_uint64_t	tot_val = 0;
+	zbx_uint64_t	usg_val = 0;
 	
 	assert(result);
 
@@ -178,7 +178,7 @@ static int	VFS_FS_INODE_PUSED(const char *cmd, const char *param, unsigned flags
 		return  SYSINFO_RET_FAIL;
 	
 	result->type |= AR_DOUBLE;
-	result->dbl = (100.0 * usg_val) / tot_val;
+	result->dbl = (100.0 * (double)usg_val) / (double)tot_val;
 		
 	return SYSINFO_RET_OK;
 }
