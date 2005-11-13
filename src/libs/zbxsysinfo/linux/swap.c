@@ -24,76 +24,8 @@
 
 #include "md5.h"
 
-
-/* Solaris. */
-#ifndef HAVE_SYSINFO_FREESWAP
-#ifdef HAVE_SYS_SWAP_SWAPTABLE
-void get_swapinfo(double *total, double *fr)
-{
-	register int cnt, i, page_size;
-/* Support for >2Gb */
-/*	register int t, f;*/
-	double	t, f;
-	struct swaptable *swt;
-	struct swapent *ste;
-	static char path[256];
-
-	/* get total number of swap entries */
-	cnt = swapctl(SC_GETNSWP, 0);
-
-	/* allocate enough space to hold count + n swapents */
-	swt = (struct swaptable *)malloc(sizeof(int) +
-		cnt * sizeof(struct swapent));
-
-	if (swt == NULL)
-	{
-		*total = 0;
-		*fr = 0;
-		return;
-	}
-	swt->swt_n = cnt;
-
-/* fill in ste_path pointers: we don't care about the paths, so we
-point them all to the same buffer */
-	ste = &(swt->swt_ent[0]);
-	i = cnt;
-	while (--i >= 0)
-	{
-		ste++->ste_path = path;
-	}
-
-	/* grab all swap info */
-	swapctl(SC_LIST, swt);
-
-	/* walk thru the structs and sum up the fields */
-	t = f = 0;
-	ste = &(swt->swt_ent[0]);
-	i = cnt;
-	while (--i >= 0)
-	{
-		/* dont count slots being deleted */
-		if (!(ste->ste_flags & ST_INDEL) &&
-		!(ste->ste_flags & ST_DOINGDEL))
-		{
-			t += ste->ste_pages;
-			f += ste->ste_free;
-		}
-		ste++;
-	}
-
-	page_size=getpagesize();
-
-	/* fill in the results */
-	*total = page_size*t;
-	*fr = page_size*f;
-	free(swt);
-}
-#endif
-#endif
-
 static int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_SYSINFO_FREESWAP
 	struct sysinfo info;
 
 	assert(result);
@@ -102,11 +34,11 @@ static int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, 
 
 	if( 0 == sysinfo(&info))
 	{
-		result->type |= AR_DOUBLE;
+		result->type |= AR_UINT64;
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		result->dbl = (double)info.freeswap * (double)info.mem_unit;
+		result->ui64 = (zbx_uint64_t)info.freeswap * (zbx_uint64_t)info.mem_unit;
 #else
-		result->dbl = (double)info.freeswap;
+		result->ui64 = (zbx_uint64_t)info.freeswap;
 #endif
 		return SYSINFO_RET_OK;
 	}
@@ -114,33 +46,10 @@ static int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, 
 	{
 		return SYSINFO_RET_FAIL;
 	}
-/* Solaris */
-#else
-#ifdef HAVE_SYS_SWAP_SWAPTABLE
-	double swaptotal,swapfree;
-
-	assert(result);
-
-        clean_result(result);
-
-	get_swapinfo(&swaptotal,&swapfree);
-
-	result->type |= AR_DOUBLE;
-	result->dbl = swapfree;
-	return SYSINFO_RET_OK;
-#else
-	assert(result);
-
-        clean_result(result);
-
-	return	SYSINFO_RET_FAIL;
-#endif
-#endif
 }
 
 static int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_SYSINFO_TOTALSWAP
 	struct sysinfo info;
 
 	assert(result);
@@ -149,11 +58,11 @@ static int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags,
 
 	if( 0 == sysinfo(&info))
 	{
-		result->type |= AR_DOUBLE;
+		result->type |= AR_UINT64;
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		result->dbl = (double)info.totalswap * (double)info.mem_unit;
+		result->ui64 = (zbx_uint64_t)info.totalswap * (zbx_uint64_t)info.mem_unit;
 #else
-		result->dbl = (double)info.totalswap;
+		result->ui64 = (zbx_uint64_t)info.totalswap;
 #endif
 		return SYSINFO_RET_OK;
 	}
@@ -161,28 +70,6 @@ static int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags,
 	{
 		return SYSINFO_RET_FAIL;
 	}
-/* Solaris */
-#else
-#ifdef HAVE_SYS_SWAP_SWAPTABLE
-	double swaptotal,swapfree;
-
-	assert(result);
-
-        clean_result(result);
-
-	get_swapinfo(&swaptotal,&swapfree);
-	
-	result->type |= AR_DOUBLE;
-	result->dbl = (double)swaptotal;
-	return SYSINFO_RET_OK;
-#else
-	assert(result);
-
-        clean_result(result);
-
-	return	SYSINFO_RET_FAIL;
-#endif
-#endif
 }
 
 int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
