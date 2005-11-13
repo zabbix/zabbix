@@ -35,3 +35,9 @@ echo Making...
 make 2>>WARNINGS >/dev/null
 #echo Installing...
 make install 2>>WARNINGS >/dev/null
+
+echo
+echo WARNINGS
+echo "-----------------------------------"
+cat WARNINGS
+echo "-----------------------------------"
