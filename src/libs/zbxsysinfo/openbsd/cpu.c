@@ -163,7 +163,7 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 		
 	if(getloadavg(load, 3))
 	{
@@ -182,7 +182,7 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 		
 	if(getloadavg(load, 3))
 	{
@@ -201,7 +201,7 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 		
 	if(getloadavg(load, 3))
 	{
@@ -237,7 +237,7 @@ CPU_FNCLIST
 	
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 	
         if(num_param(param) > 2)
         {
@@ -282,7 +282,7 @@ int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, 
 {
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 	
 	return SYSINFO_RET_FAIL;
 }
@@ -291,7 +291,7 @@ int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGEN
 {
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 	
 	return SYSINFO_RET_FAIL;
 }

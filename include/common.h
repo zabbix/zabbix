@@ -144,6 +144,7 @@
 #define ITEM_VALUE_TYPE_FLOAT	0
 #define ITEM_VALUE_TYPE_STR	1
 #define ITEM_VALUE_TYPE_LOG	2
+#define ITEM_VALUE_TYPE_UINT64	3
 
 /* Item snmpv3 security levels */
 #define ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV	0
@@ -300,7 +301,7 @@ AGENT_RESULT {
 
 int   	copy_list(LIST *src, LIST *dist);
 void 	free_list(LIST *list);
-void   	clean_result(AGENT_RESULT *result);
+void   	init_result(AGENT_RESULT *result);
 int    	copy_result(AGENT_RESULT *src, AGENT_RESULT *dist);
 void   	free_result(AGENT_RESULT *result);
 

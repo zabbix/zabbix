@@ -37,45 +37,62 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	get_value_internal(double *result,char *result_str,DB_ITEM *item,char *error,int max_error_len)
+int	get_value_internal(DB_ITEM *item, AGENT_RESULT *result)
 {
+	zbx_uint64_t	i;
+	char		error[MAX_STRING_LEN];
+
+	init_result(result);
+
 	if(strcmp(item->key,"zabbix[triggers]")==0)
 	{
-		*result=DBget_triggers_count();
+		i = (zbx_uint64_t)DBget_triggers_count();
+		result->type |= AR_UINT64;
+		result->ui64 |= i;
 	}
 	else if(strcmp(item->key,"zabbix[items]")==0)
 	{
-		*result=DBget_items_count();
+		i = (zbx_uint64_t)DBget_items_count();
+		result->type != AR_UINT64;
+		result->ui64 != i;
 	}
 	else if(strcmp(item->key,"zabbix[items_unsupported]")==0)
 	{
-		*result=DBget_items_unsupported_count();
+		i=DBget_items_unsupported_count();
+		result->type |= AR_UINT64;
+		result->ui64 |= i;
 	}
 	else if(strcmp(item->key,"zabbix[history]")==0)
 	{
-		*result=DBget_history_count();
+		i=DBget_history_count();
+		result->type |= AR_UINT64;
+		result->ui64 |= i;
 	}
 	else if(strcmp(item->key,"zabbix[history_str]")==0)
 	{
-		*result=DBget_history_str_count();
+		i=DBget_history_str_count();
+		result->type |= AR_UINT64;
+		result->ui64 |= i;
 	}
 	else if(strcmp(item->key,"zabbix[trends]")==0)
 	{
-		*result=DBget_trends_count();
+		i=DBget_trends_count();
+		result->type |= AR_UINT64;
+		result->ui64 |= i;
 	}
 	else if(strcmp(item->key,"zabbix[queue]")==0)
 	{
-		*result=DBget_queue_count();
+		i=DBget_queue_count();
+		result->type |= AR_UINT64;
+		result->ui64 |= i;
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Internal check [%s] is not supported", item->key);
-		snprintf(error,max_error_len-1,"Internal check [%s] is not supported", item->key);
+		snprintf(error,MAX_STRING_LEN-1,"Internal check [%s] is not supported", item->key);
+		zabbix_log( LOG_LEVEL_WARNING, error);
+		result->str=strdup(error);
 		return NOTSUPPORTED;
 	}
 
-	snprintf(result_str,MAX_STRING_LEN-1,"%f",*result);
-
-	zabbix_log( LOG_LEVEL_DEBUG, "INTERNAL [%s] [%f]", result_str, *result);
 	return SUCCEED;
 }

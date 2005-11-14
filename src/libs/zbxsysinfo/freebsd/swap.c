@@ -98,7 +98,7 @@ static int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, 
 
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 
 	if( 0 == sysinfo(&info))
 	{
@@ -121,7 +121,7 @@ static int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, 
 
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 
 	get_swapinfo(&swaptotal,&swapfree);
 
@@ -131,7 +131,7 @@ static int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, 
 #else
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 
 	return	SYSINFO_RET_FAIL;
 #endif
@@ -145,7 +145,7 @@ static int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags,
 
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 
 	if( 0 == sysinfo(&info))
 	{
@@ -168,7 +168,7 @@ static int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags,
 
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 
 	get_swapinfo(&swaptotal,&swapfree);
 	
@@ -178,7 +178,7 @@ static int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags,
 #else
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 
 	return	SYSINFO_RET_FAIL;
 #endif
@@ -208,7 +208,7 @@ SWP_FNCLIST
 	
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 	
         if(num_param(param) > 2)
         {
@@ -260,7 +260,7 @@ int     OLD_SWAP(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 
         if(num_param(param) > 1)
         {

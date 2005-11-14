@@ -107,7 +107,7 @@ int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
         
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 
         if(num_param(param) > 2)
         {
@@ -174,7 +174,7 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
         
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 
         if(num_param(param) > 2)
         {
@@ -234,7 +234,7 @@ int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT
 {
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 	
 	return SYSINFO_RET_FAIL;
 }
@@ -249,7 +249,7 @@ int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AG
         
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 
         if(num_param(param) > 1)
         {

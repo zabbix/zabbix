@@ -30,7 +30,7 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	assert(result);
 
-        clean_result(result);	
+        init_result(result);	
 
 	mib[0]=CTL_KERN;
 	mib[1]=KERN_MAXFILES;
@@ -58,7 +58,7 @@ int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	assert(result);
 
-        clean_result(result);	
+        init_result(result);	
 	
 	mib[0]=CTL_KERN;
 	mib[1]=KERN_MAXPROC;
@@ -86,7 +86,7 @@ int     OLD_KERNEL(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
         assert(result);
 
-        clean_result(result);	
+        init_result(result);	
 
         if(num_param(param) > 1)
         {

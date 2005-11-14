@@ -225,13 +225,17 @@ void	free_result(AGENT_RESULT *result)
 		result->msg = NULL;
 	}
 	free_list(&(result->list));
+
+	init_result(result);
 }
 
-void	clean_result(AGENT_RESULT *result)
+void	init_result(AGENT_RESULT *result)
 {
-	free_result(result);
+	result->str = NULL;
+	result->msg = NULL;
 	result->type = 0;
 	result->dbl = 0;	
+	result->ui64 = 0;	
 }
 
 int parse_command(
@@ -326,7 +330,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		
 
         assert(result);
-        clean_result(result);	
+        init_result(result);	
 	
 	strncpy(usr_command, in_command, MAX_STRING_LEN);
 	usr_command_len = strlen(usr_command);
@@ -405,7 +409,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 			result->type |= AR_MESSAGE;
 			result->msg = strdup("ZBX_NOTSUPPORTED");
 		}
-		ret = FAIL;
+		ret = NOTSUPPORTED;
 	}
 	else if(err == TIMEOUT_ERROR)
 	{
@@ -414,7 +418,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 			result->type |= AR_MESSAGE;
 			result->msg = strdup("ZBX_ERROR");
 		}
-		ret = FAIL;
+		ret = TIMEOUT_ERROR;
 	}
 	
 	return ret;
@@ -438,7 +442,7 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	
 	assert(result);
 	
-        clean_result(result);	
+        init_result(result);	
 
         if(num_param(param) > 1)
         {
@@ -567,7 +571,7 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	assert(result);
 
-        clean_result(result);	
+        init_result(result);	
 
 	if(num_param(param) > 1)
         {
@@ -646,7 +650,7 @@ int	get_stat(const char *key, unsigned flags, AGENT_RESULT *result)
 
         assert(result);
 
-        clean_result(result);	
+        init_result(result);	
 
 	f=fopen("/tmp/zabbix_agentd.tmp","r");
 	if(f==NULL)
@@ -735,7 +739,7 @@ int	TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 
         assert(result);
 
-        clean_result(result);	
+        init_result(result);	
 
         if(num_param(param) > 1)
         {
@@ -787,7 +791,7 @@ int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *r
         
 	assert(result);
 
-        clean_result(result);	
+        init_result(result);	
 		
 	f=fopen(file,"r");
 	if(NULL == f)
@@ -816,7 +820,7 @@ int	AGENT_PING(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 {
         assert(result);
 
-        clean_result(result);	
+        init_result(result);	
 	
 	result->type |= AR_UINT64;
 	result->ui64 = 1;
@@ -830,7 +834,7 @@ int	PROCCOUNT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 
         assert(result);
 
-        clean_result(result);	
+        init_result(result);	
 	
 	if( 0 == sysinfo(&info))
 	{
@@ -856,7 +860,7 @@ int	PROCCOUNT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	int	proccount=0;
         assert(result);
 
-	clean_result(result);
+	init_result(result);
 		
 	dir=opendir("/proc");
 	if(NULL == dir)
@@ -912,7 +916,7 @@ int	PROCCOUNT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 
 	dir=opendir("/proc");
 	if(NULL == dir)
@@ -960,7 +964,7 @@ int	AGENT_VERSION(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 		
 	result->type |= AR_STRING;
 	result->str = strdup(version);
@@ -975,7 +979,7 @@ int     OLD_VERSION(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 
         if(num_param(param) > 1)
         {
@@ -1008,7 +1012,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 	
 	strncpy(command, param, MAX_STRING_LEN);
 
@@ -1079,7 +1083,7 @@ int	EXECUTE(const char *cmd, const char *command, unsigned flags, AGENT_RESULT *
 
         assert(result);
 
-	clean_result(result);
+	init_result(result);
 		
 	f=popen( command,"r");
 	if(f==0)
@@ -1142,7 +1146,7 @@ int	forward_request(char *proxy, char *command, int port, unsigned flags, AGENT_
 
 	assert(result);
 
-	clean_result(result);
+	init_result(result);
 		
 	host = gethostbyname(proxy);
 	if(host == NULL)
@@ -1442,7 +1446,7 @@ int	CHECK_SERVICE_PERF(const char *cmd, const char *service_and_ip_and_port, uns
 
         assert(result);
 
-	clean_result(result);
+	init_result(result);
 
 	gettimeofday(&t1,&tz1);
 
@@ -1567,7 +1571,7 @@ int	CHECK_SERVICE(const char *cmd, const char *service_and_ip_and_port, unsigned
 
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 	
 	/* Default IP address */
 	strscpy(ip,"127.0.0.1");
@@ -1723,7 +1727,7 @@ int	CHECK_PORT(const char *cmd, const char *ip_and_port, unsigned flags, AGENT_R
 
         assert(result);
 
-	clean_result(result);
+	init_result(result);
 	
 	c=strchr(ip_and_port,',');
 	strscpy(ip,ip_and_port);
@@ -1761,7 +1765,7 @@ int	CHECK_DNS(const char *cmd, const char *ip_and_zone, unsigned flags, AGENT_RE
 
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 	
 	memset(&ip, 0, MAX_STRING_LEN);
 	memset(&zone, 0, MAX_STRING_LEN);
@@ -1838,7 +1842,7 @@ int     SYSTEM_UNUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 
         return EXECUTE(cmd, "who|wc -l", flags, result);
 }
@@ -1847,7 +1851,7 @@ int     SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_R
 {
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 
         return EXECUTE_STR(cmd, "uname -a", flags, result);
 }
@@ -1856,7 +1860,7 @@ int     SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGEN
 {
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 
         return EXECUTE_STR(cmd, "hostname", flags, result);
 }
@@ -1868,7 +1872,7 @@ int     OLD_SYSTEM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 
         if(num_param(param) > 1)
         {

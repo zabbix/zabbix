@@ -52,7 +52,7 @@ static int	VFS_FS_INODE_USED(const char *cmd, const char *param, unsigned flags,
 	
 	assert(result);
 
-	clean_result(result);
+	init_result(result);
 
         if(num_param(param) > 1)
                 return SYSINFO_RET_FAIL;
@@ -76,7 +76,7 @@ static int	VFS_FS_INODE_FREE(const char *cmd, const char *param, unsigned flags,
 	
 	assert(result);
 
-	clean_result(result);
+	init_result(result);
 
         if(num_param(param) > 1)
                 return SYSINFO_RET_FAIL;
@@ -100,7 +100,7 @@ static int	VFS_FS_INODE_TOTAL(const char *cmd, const char *param, unsigned flags
 	
 	assert(result);
 
-	clean_result(result);
+	init_result(result);
 
         if(num_param(param) > 1)
                 return SYSINFO_RET_FAIL;
@@ -127,7 +127,7 @@ static int	VFS_FS_INODE_PFREE(const char *cmd, const char *param, unsigned flags
 	
 	assert(result);
 
-	clean_result(result);
+	init_result(result);
 
         if(num_param(param) > 1)
                 return SYSINFO_RET_FAIL;
@@ -152,7 +152,7 @@ static int	VFS_FS_INODE_PUSED(const char *cmd, const char *param, unsigned flags
 	
 	assert(result);
 
-	clean_result(result);
+	init_result(result);
 
         if(num_param(param) > 1)
                 return SYSINFO_RET_FAIL;
@@ -195,7 +195,7 @@ FS_FNCLIST
 	
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 	
         if(num_param(param) > 2)
         {
