@@ -443,7 +443,7 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 
 	if(DBnum_rows(result) == 0)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Before checking autoregistration for [%s]",server);
+		zabbix_log( LOG_LEVEL_DEBUG, "Before checking autoregistration for [%s]",server);
 
 		if(autoregister(server) == SUCCEED)
 		{
