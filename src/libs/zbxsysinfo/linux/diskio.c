@@ -130,7 +130,7 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 	
         if(num_param(param) > 2)
         {
@@ -187,7 +187,7 @@ int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 	
         if(num_param(param) > 2)
         {
@@ -287,7 +287,7 @@ int	OLD_IO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *res
 
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 
         if(num_param(param) > 1)
         {

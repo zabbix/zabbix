@@ -31,7 +31,7 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 	
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 		
 	len=sizeof(v);
 	mib[0]=CTL_VM;
@@ -55,7 +55,7 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 	
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 		
 	len=sizeof(v);
 	mib[0]=CTL_VM;
@@ -91,7 +91,7 @@ MEM_FNCLIST
 
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 
         if(num_param(param) > 1)
         {

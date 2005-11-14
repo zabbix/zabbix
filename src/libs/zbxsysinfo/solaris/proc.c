@@ -55,7 +55,7 @@ int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
     assert(result);
 
-    clean_result(result);
+    init_result(result);
 
     if(num_param(param) > 3)
     {
@@ -225,7 +225,7 @@ int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 #else
         assert(result);
 
-        clean_result(result);
+        init_result(result);
  
 	return	SYSINFO_RET_FAIL;
 #endif
@@ -259,7 +259,7 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
    
         assert(result);
 
-        clean_result(result);
+        init_result(result);
  
         if(num_param(param) > 3)
         {
@@ -411,7 +411,7 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 #else
         assert(result);
 
-        clean_result(result);
+        init_result(result);
  
         return	SYSINFO_RET_FAIL;
 #endif	

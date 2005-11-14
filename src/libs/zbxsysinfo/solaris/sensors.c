@@ -37,7 +37,7 @@ int	SENSOR_TEMP1(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
         assert(result);
 
-        clean_result(result);	
+        init_result(result);	
 	
 	dir=opendir("/proc/sys/dev/sensors");
 	if(NULL == dir)
@@ -92,7 +92,7 @@ int	SENSOR_TEMP2(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
         assert(result);
 
-        clean_result(result);	
+        init_result(result);	
 	
 	dir=opendir("/proc/sys/dev/sensors");
 	if(NULL == dir)
@@ -147,7 +147,7 @@ int	SENSOR_TEMP3(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
         assert(result);
 
-        clean_result(result);	
+        init_result(result);	
 	
 	dir=opendir("/proc/sys/dev/sensors");
 	if(NULL == dir)
@@ -196,7 +196,7 @@ int     OLD_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 
         if(num_param(param) > 1)
         {

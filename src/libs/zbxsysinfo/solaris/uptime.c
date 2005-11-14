@@ -35,7 +35,7 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
     assert(result);
 
-    clean_result(result);
+    init_result(result);
 
     kc = kstat_open();
 
@@ -64,7 +64,7 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 
 	if( 0 == sysinfo(&info))
 	{
@@ -84,7 +84,7 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 
 	mib[0]=CTL_KERN;
 	mib[1]=KERN_BOOTTIME;
@@ -113,7 +113,7 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 	
 	hz = sysconf(_SC_CLK_TCK);
 
@@ -148,7 +148,7 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 #else
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 
 	return	SYSINFO_RET_FAIL;
 #endif

@@ -52,7 +52,9 @@
 #include "checks_simple.h"
 #include "checks_snmp.h"
 
-int	get_value(double *result,char *result_str,DB_ITEM *item, char *error, int max_error_len)
+AGENT_RESULT    result;
+
+int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 {
 	int res=FAIL;
 
@@ -67,12 +69,12 @@ int	get_value(double *result,char *result_str,DB_ITEM *item, char *error, int ma
 
 	if(item->type == ITEM_TYPE_ZABBIX)
 	{
-		res=get_value_agent(result,result_str,item,error,max_error_len);
+		res=get_value_agent(item, result);
 	}
 	else if( (item->type == ITEM_TYPE_SNMPv1) || (item->type == ITEM_TYPE_SNMPv2c))
 	{
 #ifdef HAVE_SNMP
-		res=get_value_snmp(result,result_str,item,error, max_error_len);
+		res=get_value_snmp(item, result);
 #else
 		zabbix_log(LOG_LEVEL_WARNING, "Support of SNMP parameters was no compiled in");
 		zabbix_syslog("Support of SNMP parameters was no compiled in. Cannot process [%s:%s]", item->host, item->key);
@@ -81,11 +83,11 @@ int	get_value(double *result,char *result_str,DB_ITEM *item, char *error, int ma
 	}
 	else if(item->type == ITEM_TYPE_SIMPLE)
 	{
-		res=get_value_simple(result,result_str,item,error,max_error_len);
+		res=get_value_simple(item, result);
 	}
 	else if(item->type == ITEM_TYPE_INTERNAL)
 	{
-		res=get_value_internal(result,result_str,item,error,max_error_len);
+		res=get_value_internal(item, result);
 	}
 	else
 	{
@@ -94,8 +96,7 @@ int	get_value(double *result,char *result_str,DB_ITEM *item, char *error, int ma
 		res=NOTSUPPORTED;
 	}
 	alarm(0);
-	/* Delete EOL characters from result string */
-	delete_reol(result_str);
+
 	return res;
 }
 
@@ -165,38 +166,50 @@ static void update_key_status(int hostid,int host_status)
 	DBfree_result(result);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: get_values                                                       *
+ *                                                                            *
+ * Purpose: retrieve values of metrics from monitored hosts                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: always SUCCEED                                                   *
+ *                                                                            *
+ ******************************************************************************/
 int get_values(void)
 {
-	double		value;
-	char		value_str[MAX_STRING_LEN];
 	char		sql[MAX_STRING_LEN];
 
-	char		error[MAX_STRING_LEN];
- 
 	DB_RESULT	*result;
 
 	int		i;
 	int		now;
 	int		res;
 	DB_ITEM		item;
-
-	error[0]=0;
+	AGENT_RESULT	agent;
+	int	stop;
 
 	now = time(NULL);
 
 	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,h.available from items i,hosts h where i.nextcheck<=%d and i.status=%d and i.type not in (%d,%d) and ((h.status=%d and h.available!=%d) or (h.status=%d and h.available=%d and h.disable_until<=%d)) and h.hostid=i.hostid and i.itemid%%%d=%d and i.key_ not in ('%s','%s','%s','%s') and i.serverid=%d order by i.nextcheck", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now, CONFIG_SUCKERD_FORKS-5,server_num-5,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY,SERVER_ZABBIXLOG_KEY,CONFIG_SERVERD_ID);
 	result = DBselect(sql);
 
-	for(i=0;i<DBnum_rows(result);i++)
+	for(stop=i=0;i<DBnum_rows(result)&&stop==0;i++)
 	{
 		DBget_item_from_db(&item,result, i);
 
-		res = get_value(&value,value_str,&item,error,sizeof(error));
-		zabbix_log( LOG_LEVEL_DEBUG, "GOT VALUE [%s]", value_str );
+		init_result(&agent);
+		res = get_value(&item, &agent);
+		zabbix_log( LOG_LEVEL_DEBUG, "GOT VALUE TYPE [%s]", agent.type);
 		
 		if(res == SUCCEED )
 		{
-			process_new_value(&item,value_str);
+			process_new_value(&item,&agent);
 
 			if(item.host_network_errors>0)
 			{
@@ -232,7 +245,7 @@ int get_values(void)
 				DBupdate_host_availability(item.hostid,HOST_AVAILABLE_TRUE,now,error);
 				update_key_status(item.hostid,HOST_STATUS_MONITORED);	
 
-				break;
+				stop=1;
 			}
 		}
 		else if(res == NETWORK_ERROR)
@@ -254,7 +267,7 @@ int get_values(void)
 				DBexecute(sql);
 			}
 
-			break;
+			stop=1;
 		}
 /* Possibly, other logic required? */
 		else if(res == AGENT_ERROR)
@@ -263,7 +276,7 @@ int get_values(void)
 			zabbix_syslog("Getting value of [%s] from host [%s] failed (ZBX_ERROR)", item.key, item.host );
 			zabbix_log( LOG_LEVEL_WARNING, "The value is not stored in database.");
 
-			break;
+			stop=1;
 		}
 		else
 		{
@@ -271,6 +284,7 @@ int get_values(void)
 			zabbix_syslog("Getting value of [%s] from host [%s] failed", item.key, item.host );
 			zabbix_log( LOG_LEVEL_WARNING, "The value is not stored in database.");
 		}
+		free(result(&agent));
 	}
 
 	DBfree_result(result);

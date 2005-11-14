@@ -74,7 +74,7 @@ static int	VFS_DEV_READ_BYTES(const char *cmd, const char *param, unsigned flags
         
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 /*	
         if(num_param(param) > 1)
         {
@@ -104,7 +104,7 @@ static int	VFS_DEV_READ_OPERATIONS(const char *cmd, const char *param, unsigned 
         
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 /*	
         if(num_param(param) > 1)
         {
@@ -134,7 +134,7 @@ static int	VFS_DEV_WRITE_BYTES(const char *cmd, const char *param, unsigned flag
         
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 /*	
         if(num_param(param) > 1)
         {
@@ -164,7 +164,7 @@ static int	VFS_DEV_WRITE_OPERATIONS(const char *cmd, const char *param, unsigned
 /*       
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 	
         if(num_param(param) > 1)
         {
@@ -209,7 +209,7 @@ DEV_FNCLIST
 	
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 	
         if(num_param(param) > 3)
         {
@@ -266,7 +266,7 @@ DEV_FNCLIST
 	
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 	
         if(num_param(param) > 3)
         {
@@ -352,7 +352,7 @@ int	OLD_IO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *res
 
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 
         if(num_param(param) > 1)
         {
