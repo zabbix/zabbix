@@ -324,6 +324,20 @@ CREATE TABLE history (
 CREATE INDEX history_i_c on history (itemid, clock);
 
 --
+-- Table structure for table 'history_uint'
+--
+
+CREATE TABLE history_uint (
+  itemid		int4		DEFAULT '0' NOT NULL,
+  clock			int4		DEFAULT '0' NOT NULL,
+  value			double precision	DEFAULT '0' NOT NULL,
+--  PRIMARY KEY (itemid,clock),
+  FOREIGN KEY (itemid) REFERENCES items
+);
+
+CREATE INDEX history_uint_i_c on history_uint (itemid, clock);
+
+--
 -- Table structure for table 'history_str'
 --
 

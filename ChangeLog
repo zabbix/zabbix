@@ -1,5 +1,6 @@
 Changes for 1.1beta3:
 
+ - added table history_uint (Alexei)
  - fixed memory leak for windows agent (Eugene)
  - fixed windows agent hanging (Eugene)
  - reverted graph generation fix (Alexei)
