@@ -867,7 +867,14 @@ void DBupdate_host_availability(int hostid,int available,int clock, char *error)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In update_host_availability()");
 
-	DBescape_string(error,error_esc,MAX_STRING_LEN);
+	if(error!=NULL)
+	{
+		DBescape_string(error,error_esc,MAX_STRING_LEN);
+	}
+	else
+	{
+		strscpy(error_esc,"");
+	}
 
 	snprintf(sql,sizeof(sql)-1,"select available,disable_until from hosts where hostid=%d",hostid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
@@ -938,7 +945,14 @@ int	DBupdate_item_status_to_notsupported(int itemid, char *error)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBupdate_item_status_to_notsupported()");
 
-	DBescape_string(error,error_esc,MAX_STRING_LEN);
+	if(error!=NULL)
+	{
+		DBescape_string(error,error_esc,MAX_STRING_LEN);
+	}
+	else
+	{
+		strscpy(error_esc,"");
+	}
 
 	snprintf(sql,sizeof(sql)-1,"update items set status=%d,error='%s' where itemid=%d",ITEM_STATUS_NOTSUPPORTED,error_esc,itemid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);

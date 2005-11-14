@@ -53,8 +53,8 @@ int	get_value_internal(DB_ITEM *item, AGENT_RESULT *result)
 	else if(strcmp(item->key,"zabbix[items]")==0)
 	{
 		i = (zbx_uint64_t)DBget_items_count();
-		result->type != AR_UINT64;
-		result->ui64 != i;
+		result->type |= AR_UINT64;
+		result->ui64 |= i;
 	}
 	else if(strcmp(item->key,"zabbix[items_unsupported]")==0)
 	{
