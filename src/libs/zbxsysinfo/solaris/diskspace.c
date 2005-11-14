@@ -66,7 +66,7 @@ int	VFS_FS_USED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 
         if(num_param(param) > 1)
                 return SYSINFO_RET_FAIL;
@@ -90,7 +90,7 @@ int	VFS_FS_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 
         if(num_param(param) > 1)
                 return SYSINFO_RET_FAIL;
@@ -114,7 +114,7 @@ int	VFS_FS_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 
         if(num_param(param) > 1)
                 return SYSINFO_RET_FAIL;
@@ -142,7 +142,7 @@ int	VFS_FS_PFREE(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 
         if(num_param(param) > 1)
                 return SYSINFO_RET_FAIL;
@@ -167,7 +167,7 @@ int	VFS_FS_PUSED(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 
         if(num_param(param) > 1)
                 return SYSINFO_RET_FAIL;
@@ -210,7 +210,7 @@ FS_FNCLIST
 	
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 	
         if(num_param(param) > 2)
         {

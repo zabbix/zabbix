@@ -93,7 +93,7 @@ static int      NET_IF_IN_BYTES(const char *cmd, const char *param, unsigned fla
 
 	assert(result);
 
-	clean_result(result);
+	init_result(result);
 
 	if(num_param(param) > 1)
 	{
@@ -125,7 +125,7 @@ static int      NET_IF_IN_PACKETS(const char *cmd, const char *param, unsigned f
 
 	assert(result);
 
-	clean_result(result);
+	init_result(result);
 
 	if(num_param(param) > 1)
 	{
@@ -157,7 +157,7 @@ static int      NET_IF_IN_ERRORS(const char *cmd, const char *param, unsigned fl
 
 	assert(result);
 
-	clean_result(result);
+	init_result(result);
 
 	if(num_param(param) > 1)
 	{
@@ -204,7 +204,7 @@ NET_FNCLIST
 
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 
         if(num_param(param) > 2)
         {
@@ -245,7 +245,7 @@ static int      NET_IF_OUT_BYTES(const char *cmd, const char *param, unsigned fl
 
 	assert(result);
 
-	clean_result(result);
+	init_result(result);
 
 	if(num_param(param) > 1)
 	{
@@ -277,7 +277,7 @@ static int      NET_IF_OUT_PACKETS(const char *cmd, const char *param, unsigned 
 
 	assert(result);
 
-	clean_result(result);
+	init_result(result);
 
 	if(num_param(param) > 1)
 	{
@@ -309,7 +309,7 @@ static int      NET_IF_OUT_ERRORS(const char *cmd, const char *param, unsigned f
 
 	assert(result);
 
-	clean_result(result);
+	init_result(result);
 
 	if(num_param(param) > 1)
 	{
@@ -356,7 +356,7 @@ NET_FNCLIST
 
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 
         if(num_param(param) > 2)
         {
@@ -393,7 +393,7 @@ int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT
 {
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 	
 	return SYSINFO_RET_FAIL;
 }
@@ -406,7 +406,7 @@ int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AG
 
 	assert(result);
 
-	clean_result(result);
+	init_result(result);
 
 	if(num_param(param) > 1)
 	{

@@ -45,7 +45,7 @@ MEM_FNCLIST
 
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 
         if(num_param(param) > 1)
         {
@@ -79,7 +79,7 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 #ifdef HAVE_UNISTD_SYSCONF
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 		
 	result->type |= AR_DOUBLE;	
 	result->dbl=(double)sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGESIZE);
@@ -87,7 +87,7 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 #else
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 		
 	return	SYSINFO_RET_FAIL;
 #endif
@@ -98,7 +98,7 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 #ifdef HAVE_UNISTD_SYSCONF
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 		
 	result->type |= AR_DOUBLE;	
 	result->dbl=(double)sysconf(_SC_AVPHYS_PAGES)*sysconf(_SC_PAGESIZE);
@@ -106,7 +106,7 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 #else
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 		
 	return	SYSINFO_RET_FAIL;
 #endif

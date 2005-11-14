@@ -59,7 +59,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 	
         if(num_param(param) > 3)
         {
@@ -317,7 +317,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
         assert(result);
 
-        clean_result(result);
+        init_result(result);
 	
     
         if(num_param(param) > 3)

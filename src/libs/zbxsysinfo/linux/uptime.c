@@ -28,7 +28,7 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 	assert(result);
 
-        clean_result(result);
+        init_result(result);
 
 	if( 0 == sysinfo(&info))
 	{

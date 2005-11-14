@@ -29,6 +29,6 @@
 #include "db.h"
 #include "log.h"
 
-extern	int	get_value_internal(double *result,char *result_str,DB_ITEM *item,char *error,int max_error_len);
+extern	int	get_value_internal(DB_ITEM *item, AGENT_RESULT *result);
 
 #endif
