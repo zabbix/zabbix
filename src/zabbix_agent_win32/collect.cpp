@@ -55,7 +55,7 @@ static DWORD collectorTimesHistory[60];
 void CollectorThread(void *)
 {
    HQUERY query;
-   HCOUNTER cntCpuUsage[MAX_CPU+1],cntCpuQueue;
+   PDH_HCOUNTER cntCpuUsage[MAX_CPU+1],cntCpuQueue;
    PDH_FMT_COUNTERVALUE value;
    PDH_RAW_COUNTER rawCpuUsage1[MAX_CPU+1],rawCpuUsage2[MAX_CPU+1];
    PDH_RAW_COUNTER rawCounter;      // Generic raw counter for various parameters
@@ -65,6 +65,9 @@ void CollectorThread(void *)
    USER_COUNTER *cptr;
    PDH_STATISTICS statData;
    char counterPath[MAX_COUNTER_PATH * 2 + 50];
+
+INIT_CHECK_MEMORY(main);
+//LOG_DEBUG_INFO("s", "CollectorThread start");
 
    GetSystemInfo(&sysInfo);
 
@@ -79,8 +82,8 @@ void CollectorThread(void *)
 
    if (PdhOpenQuery(NULL,0,&query)!=ERROR_SUCCESS)
    {
-      WriteLog(MSG_PDH_OPEN_QUERY_FAILED,EVENTLOG_ERROR_TYPE,"e",GetLastError());
-      return;
+		WriteLog(MSG_PDH_OPEN_QUERY_FAILED,EVENTLOG_ERROR_TYPE,"e",GetLastError());
+		goto lbl_End;
    }
 
    sprintf(counterPath,"\\%s(_Total)\\%s",GetCounterName(PCI_PROCESSOR),GetCounterName(PCI_PROCESSOR_TIME));
@@ -89,9 +92,9 @@ void CollectorThread(void *)
    {
       WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"ss",
                (char *) &counterPath, GetPdhErrorText(status));
-      PdhCloseQuery(query);
-      return;
+      goto lbl_CloseQuery;
    }
+
    for(i=0;i<sysInfo.dwNumberOfProcessors;i++)
    {
       sprintf(counterPath,"\\%s(%d)\\%s", GetCounterName(PCI_PROCESSOR), i, GetCounterName(PCI_PROCESSOR_TIME));
@@ -99,8 +102,7 @@ void CollectorThread(void *)
       {
          WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"ss",
                   counterPath,GetPdhErrorText(status));
-         PdhCloseQuery(query);
-         return;
+         goto lbl_FreeCounters;
       }
    }
 
@@ -108,9 +110,9 @@ void CollectorThread(void *)
    {
       WriteLog(MSG_PDH_COLLECT_QUERY_DATA_FAILED,EVENTLOG_ERROR_TYPE,"s",
                GetPdhErrorText(status));
-      PdhCloseQuery(query);
-      return;
+      goto lbl_FreeCounters;
    }
+
    for(i=0;i<sysInfo.dwNumberOfProcessors;i++)
       PdhGetRawCounterValue(cntCpuUsage[i],NULL,&rawCpuUsage2[i]);
 
@@ -123,8 +125,7 @@ void CollectorThread(void *)
    {
       WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"ss",
                (char *) &counterPath,GetPdhErrorText(status));
-      PdhCloseQuery(query);
-      return;
+      goto lbl_FreeCounters;
    }
 
    memset(cpuQueueHistory,0,sizeof(LONG)*900);
@@ -145,11 +146,15 @@ void CollectorThread(void *)
    // Data collection loop
    WriteLog(MSG_COLLECTOR_INIT_OK,EVENTLOG_INFORMATION_TYPE,NULL);
    SetEvent(eventCollectorStarted);
+
    do
    {
       LONG sum;
       int j,n;
       DWORD dwTicksStart,dwTicksElapsed;
+
+INIT_CHECK_MEMORY(do);
+//LOG_DEBUG_INFO("CollectorThread: loop 1");
 
       dwTicksStart=GetTickCount();
       if ((status=PdhCollectQueryData(query))!=ERROR_SUCCESS)
@@ -159,6 +164,7 @@ void CollectorThread(void *)
       // Process CPU utilization data
       for(i=0;i<=sysInfo.dwNumberOfProcessors;i++)
       {
+
          PdhGetRawCounterValue(cntCpuUsage[i],NULL,&rawCpuUsage1[i]);
          PdhCalculateCounterFromRawValue(cntCpuUsage[i],PDH_FMT_LONG,
                                          &rawCpuUsage1[i],&rawCpuUsage2[i],&value);
@@ -256,12 +262,30 @@ void CollectorThread(void *)
       // Change maximum processing time if needed
       if ((double)dwTicksElapsed>statMaxCollectorTime)
          statMaxCollectorTime=(double)dwTicksElapsed;
-
       // Calculate sleeping time. We will sleep not less than 500 milliseconds even
       // if processing takes more than 500 milliseconds
       dwSleepTime=(dwTicksElapsed>500) ? 500 : (1000-dwTicksElapsed);
-   }
-   while(WaitForSingleObject(eventShutdown,dwSleepTime)==WAIT_TIMEOUT);
 
+CHECK_MEMORY(do, "CollectorThread","end do");
+   } while(WaitForSingleObject(eventShutdown,dwSleepTime)==WAIT_TIMEOUT);
+
+lbl_FreeCounters:
+	PdhRemoveCounter(cntCpuQueue);
+
+	if(cptr)
+		PdhRemoveCounter(cptr->handle);
+
+	for(i=0; i<(MAX_CPU+1); i++)
+		PdhRemoveCounter(cntCpuUsage[i]);
+	
+
+lbl_CloseQuery:
    PdhCloseQuery(query);
+
+lbl_End:
+
+//LOG_DEBUG_INFO("s", "CollectorThread end");
+CHECK_MEMORY(main, "CollectorThread","end");
+
+	_endthread();
 }

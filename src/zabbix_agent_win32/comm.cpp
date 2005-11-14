@@ -46,11 +46,15 @@ double statAcceptErrors=0;
 static BOOL IsValidServerAddr(DWORD addr)
 {
    DWORD i;
+   BOOL ret= FALSE;
 
+INIT_CHECK_MEMORY(main);
    for(i=0;i<confServerCount;i++)
       if (addr==confServerAddr[i])
-         return TRUE;
-   return FALSE;
+         ret = TRUE;
+
+CHECK_MEMORY(main, "ProcessingThread", "end");
+   return ret;
 }
 
 
@@ -60,8 +64,12 @@ static BOOL IsValidServerAddr(DWORD addr)
 
 unsigned int __stdcall ProcessingThread(void *arg)
 {
-   ProcessCommand(((REQUEST *)arg)->cmd,((REQUEST *)arg)->result);
-   return 0;
+INIT_CHECK_MEMORY(main);
+	ProcessCommand(((REQUEST *)arg)->cmd,((REQUEST *)arg)->result);
+CHECK_MEMORY(main, "ProcessingThread", "end");
+
+	_endthreadex(0);
+	return 0;
 }
 
 
@@ -79,6 +87,9 @@ static void CommThread(void *param)
    HANDLE hThread=NULL;
    unsigned int tid;
 
+//LOG_DEBUG_INFO("CommThread start");
+
+INIT_CHECK_MEMORY(main);
    sock=(SOCKET)param;
 
    // Wait for command from server
@@ -102,25 +113,24 @@ static void CommThread(void *param)
    rq.cmd[rc-1]=0;
 
    hThread=(HANDLE)_beginthreadex(NULL,0,ProcessingThread,(void *)&rq,0,&tid);
+
    if (WaitForSingleObject(hThread,confTimeout)==WAIT_TIMEOUT)
    {
       strcpy(rq.result,"ZBX_ERROR\n");
       WriteLog(MSG_REQUEST_TIMEOUT,EVENTLOG_WARNING_TYPE,"s",rq.cmd);
       statTimedOutRequests++;
    }
+   CloseHandle(hThread);
+
    send(sock,rq.result,strlen(rq.result),0);
 
    // Terminate session
 end_session:
    shutdown(sock,2);
    closesocket(sock);
+   _endthread();
 
-   // Now wait for processing thread completion if we start one
-   if (hThread!=NULL)
-   {
-      WaitForSingleObject(hThread,INFINITE);
-      CloseHandle(hThread);
-   }
+CHECK_MEMORY(main, "CommThread", "end");
 }
 
 
@@ -134,10 +144,14 @@ void ListenerThread(void *)
    struct sockaddr_in servAddr;
    int iSize,errorCount=0;
 
+INIT_CHECK_MEMORY(main);
+//LOG_DEBUG_INFO("s", "ListenerThread start");
+
    // Create socket
    if ((sock=socket(AF_INET,SOCK_STREAM,0))==-1)
    {
       WriteLog(MSG_SOCKET_ERROR,EVENTLOG_ERROR_TYPE,"e",WSAGetLastError());
+	  _endthread();
       exit(1);
    }
 
@@ -151,6 +165,7 @@ void ListenerThread(void *)
    if (bind(sock,(struct sockaddr *)&servAddr,sizeof(struct sockaddr_in))!=0)
    {
       WriteLog(MSG_BIND_ERROR,EVENTLOG_ERROR_TYPE,"e",WSAGetLastError());
+	  _endthread();
       exit(1);
    }
 
@@ -160,6 +175,9 @@ void ListenerThread(void *)
    // Wait for connection requests
    while(1)
    {
+//LOG_DEBUG_INFO("s","ListenerThread while 1");
+INIT_CHECK_MEMORY(while);
+
       iSize=sizeof(struct sockaddr_in);
       if ((sockClient=accept(sock,(struct sockaddr *)&servAddr,&iSize))==-1)
       {
@@ -182,7 +200,9 @@ void ListenerThread(void *)
       if (IsValidServerAddr(servAddr.sin_addr.S_un.S_addr))
       {
          statAcceptedRequests++;
+
          _beginthread(CommThread,0,(void *)sockClient);
+
       }
       else     // Unauthorized connection
       {
@@ -190,5 +210,11 @@ void ListenerThread(void *)
          shutdown(sockClient,2);
          closesocket(sockClient);
       }
+CHECK_MEMORY(while, "ListenerThread", "while");
    }
+
+CHECK_MEMORY(main, "ListenerThread", "end");
+//WriteLog(MSG_SOCKET_ERROR,EVENTLOG_ERROR_TYPE,"s","ListenerThread end");
+
+	_endthread();
 }

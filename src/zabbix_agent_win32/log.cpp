@@ -29,72 +29,8 @@
 // Static data
 //
 
-static HANDLE hLog=INVALID_HANDLE_VALUE;
 static HANDLE mutexLogAccess;
-
-
-//
-// Initialize log
-//
-
-void InitLog(void)
-{
-   if (dwFlags & AF_USE_EVENT_LOG)
-   {
-      hLog=RegisterEventSource(NULL,ZABBIX_EVENT_SOURCE);
-   }
-   else
-   {
-      char tbuf[32],buffer[256];
-      struct tm *loc;
-      time_t t;
-      DWORD size;
-   
-      hLog=CreateFile(logFile,GENERIC_WRITE,FILE_SHARE_READ,NULL,OPEN_ALWAYS,
-                        FILE_ATTRIBUTE_NORMAL,NULL);
-      if (hLog==INVALID_HANDLE_VALUE)
-         return;
-      SetFilePointer(hLog,0,NULL,FILE_END);
-      t=time(NULL);
-      loc=localtime(&t);
-      strftime(tbuf,32,"%d-%b-%Y %H:%M:%S",loc);
-      sprintf(buffer,"**************************************************************\r\n[%s] Log file opened\r\n",tbuf);
-      WriteFile(hLog,buffer,strlen(buffer),&size,NULL);
-	  FlushFileBuffers(hLog);
-
-      if (hLog!=INVALID_HANDLE_VALUE)
-	  {
-         CloseHandle(hLog);
-		 hLog = INVALID_HANDLE_VALUE;
-	  }
-
-      mutexLogAccess=CreateMutex(NULL,FALSE,NULL);
-   }
-}
-
-
-//
-// Close log
-//
-
-void CloseLog(void)
-{
-	if (dwFlags & AF_USE_EVENT_LOG)
-	{
-		DeregisterEventSource(hLog);
-	}
-	else
-	{
-		if (hLog!=INVALID_HANDLE_VALUE)
-		{
-		 CloseHandle(hLog);
-		 hLog = INVALID_HANDLE_VALUE;
-		}
-		if (mutexLogAccess!=INVALID_HANDLE_VALUE)
-			CloseHandle(mutexLogAccess);
-	}
-}
-
+static HANDLE hLog=INVALID_HANDLE_VALUE;
 
 //
 // Write record to log file
@@ -107,10 +43,14 @@ static void WriteLogToFile(char *message)
 	time_t t;
 	struct tm *loc;
 
-	hLog=CreateFile(logFile,GENERIC_WRITE,FILE_SHARE_READ,NULL,OPEN_ALWAYS,
+	if (mutexLogAccess!=INVALID_HANDLE_VALUE)
+		WaitForSingleObject(mutexLogAccess,INFINITE);
+
+	hLog = CreateFile(logFile,GENERIC_WRITE,FILE_SHARE_READ,NULL,OPEN_ALWAYS,
 						FILE_ATTRIBUTE_NORMAL,NULL);
 	if (hLog==INVALID_HANDLE_VALUE)
 		return;
+
 	SetFilePointer(hLog,0,NULL,FILE_END);
 
 	t=time(NULL);
@@ -118,16 +58,14 @@ static void WriteLogToFile(char *message)
 	strftime(buffer,32,"[%d-%b-%Y %H:%M:%S] ",loc);
 
 	// Prevent simultaneous write to log file
-	if (mutexLogAccess!=INVALID_HANDLE_VALUE)
-		WaitForSingleObject(mutexLogAccess,INFINITE);
 
 	WriteFile(hLog,buffer,strlen(buffer),&size,NULL);
 	if (IsStandalone())
 		printf("%s",buffer);
 
 	WriteFile(hLog,message,strlen(message),&size,NULL);
-	if (IsStandalone())
-		printf("%s",message);
+
+	FlushFileBuffers(hLog);
 
 	size = GetFileSize(hLog, NULL);
 
@@ -149,6 +87,49 @@ static void WriteLogToFile(char *message)
 
 	if (mutexLogAccess!=INVALID_HANDLE_VALUE)
 		ReleaseMutex(mutexLogAccess);
+
+	if (IsStandalone())
+		printf("%s",message);
+	
+}
+
+//
+// Initialize log
+//
+
+void InitLog(void)
+{
+   if (dwFlags & AF_USE_EVENT_LOG)
+   {
+      hLog=RegisterEventSource(NULL,ZABBIX_EVENT_SOURCE);
+   }
+   else
+   {
+      char buffer[256];
+
+	  mutexLogAccess=CreateMutex(NULL,FALSE,NULL);
+
+      sprintf(buffer,"*************** Log file opened ****************\r\n");
+	  WriteLogToFile(buffer);
+   }
+}
+
+
+//
+// Close log
+//
+
+void CloseLog(void)
+{
+	if (dwFlags & AF_USE_EVENT_LOG)
+	{
+		DeregisterEventSource(hLog);
+	}
+	else
+	{
+		if (mutexLogAccess!=INVALID_HANDLE_VALUE)
+			CloseHandle(mutexLogAccess);
+	}
 }
 
 //
@@ -180,7 +161,7 @@ void WriteLog(DWORD msg,WORD wType,char *format...)
    {
       va_start(args,format);
 
-      for(;(format[numStrings]!=0)&&(numStrings<16);numStrings++)
+      for(numStrings=0; (format[numStrings]!=0)&&(numStrings<16); numStrings++)
       {
          switch(format[numStrings])
          {
@@ -226,6 +207,7 @@ void WriteLog(DWORD msg,WORD wType,char *format...)
 
    if (dwFlags & AF_USE_EVENT_LOG)
    {
+
       ReportEvent(hLog,wType,0,msg,NULL,numStrings,0,(const char **)strings,NULL);
    }
    else
@@ -240,13 +222,16 @@ void WriteLog(DWORD msg,WORD wType,char *format...)
       }
       else
       {
+
          char message[64];
 
          sprintf(message,"MSG 0x%08X - Unable to find message text\r\n",msg);
+
          WriteLogToFile(message);
       }
    }
 
    while(--numStrings>=0)
-      free(strings[numStrings]);
+      if(strings[numStrings]) 
+		  free(strings[numStrings]);
 }
