@@ -21,69 +21,39 @@ int process_eventlog_new(char *source,int *lastlogsize, char *timestamp, char *s
     double  time;
 	DWORD    t,type;
 	WORD	category;
+	int		ret = 1;
 
-//	char tmp[1024];
+INIT_CHECK_MEMORY(main);
 
-//	sprintf(tmp,"process_event_log_new([%s],[%d],[%s],[%s],[%s])", source,*lastlogsize, timestamp, src,message);
-	
-// open up event log
-//    if (!MyOpenEventLog("Application",&hAppLog,&nRecords,&Latest))
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_eventlog_new: start");
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tmp);
     if (!MyOpenEventLog(source,&hAppLog,&nRecords,&Latest))
 	{
-//		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_eventlog_new: if 1");
-
-    
-//        for (i = nRecords + 1;--i;++Latest)
 		for (i = 0; i<nRecords;i++)
         {
-//			WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_eventlog_new: for 1");
-//           if (Latest > nRecords)                          // need totreat as circular que
-//               Latest = 1;
-//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","i");
-//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",i);
-//			WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_eventlog_new: for 1.1");
-//			sprintf(tmp,"[%d],[%d],[%d]", i, nRecords, *lastlogsize);
-//			WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tmp);
-//			WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_eventlog_new: for 1.2");
 			if(*lastlogsize <= i)
 			{
 
-//				MyGetAEventLog("Application",hAppLog,Latest,&time,src,msg,&type,&category);
-//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_eventlog_new: if 2");
 				if(0 == MyGetAEventLog(source,hAppLog,Latest,&time,src,message,&type,&category,&t))
 				{
-//					WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_eventlog_new: if 3");
 					sprintf(timestamp,"%ld",t);
-//					WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",type);
-//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",t);
+
 					if(type==EVENTLOG_ERROR_TYPE)	type=4;
 					else if(type==EVENTLOG_AUDIT_FAILURE)	type=7;
 					else if(type==EVENTLOG_AUDIT_SUCCESS)	type=8;
 					else if(type==EVENTLOG_INFORMATION_TYPE)	type=1;
 					else if(type==EVENTLOG_WARNING_TYPE)	type=2;
 					sprintf(severity,"%d",type);
-//				sprintf(message,"Src = %s, Msg = %s, type = %d, Category = %d\n",src,msg,type,category);
-//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",Latest);
-//					WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",severity);
 					*lastlogsize = Latest;
-//					WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pen:4");
-					MyCloseEventLog(hAppLog);
-//					WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pen:5");
-					return 0;
+					ret = 0;
+					break;
 				}
-//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pen:6");
 			}
 			Latest++;
-//			WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pen:8");
 		}
-//		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_eventlog_new: 6");
         MyCloseEventLog(hAppLog);
-//		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_eventlog_new: 7");
     }
-//WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_eventlog_new: end");
-	return 1;
+CHECK_MEMORY(main, "process_eventlog_new","end");
+
+	return ret;
 }
 
 // open event logger and return number of records
@@ -93,19 +63,22 @@ DllExport   long    MyOpenEventLog(char *pAppName,HANDLE
     HANDLE  hAppLog;                                    /* handle to the
 application log */
 
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyOpenEventLog: start");
+INIT_CHECK_MEMORY(main);
+
+//	LOG_DEBUG_INFO("s","MyOpenEventLog: start");
     *pEventHandle = 0;
     *pNumRecords = 0;
     hAppLog = OpenEventLog(NULL,pAppName);              // open log file
     if (!hAppLog)
 	{
-		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyOpenEventLog: 1");
+		LOG_DEBUG_INFO("s","MyOpenEventLog: 1");
         return(GetLastError());
 	}
     GetNumberOfEventLogRecords(hAppLog,(unsigned long*)pNumRecords);// get number of records
     GetOldestEventLogRecord(hAppLog,(unsigned long*)pLatestRecord);
     *pEventHandle = hAppLog;
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyOpenEventLog: end");
+//	LOG_DEBUG_INFO("s","MyOpenEventLog: end");
+    CHECK_MEMORY(main, "MyOpenEventLog", "end");
     return(0);
 
 }
@@ -113,24 +86,27 @@ application log */
 // close event logger
 DllExport   long    MyCloseEventLog(HANDLE hAppLog)
 {
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyCloseEventLog: start");
+INIT_CHECK_MEMORY(main);
+//	LOG_DEBUG_INFO("s","MyCloseEventLog: start");
     if (hAppLog)
         CloseEventLog(hAppLog);
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyCloseEventLog: end");
-    return(0);
-
+//	LOG_DEBUG_INFO("s","MyCloseEventLog: end");
+    CHECK_MEMORY(main, "MyCloseEventLog", "end");
+	return(0);
 }
 
 // clear event log
 DllExport   long    MyClearEventLog(HANDLE hAppLog)
 {
-	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyClearEventLog: start");
+INIT_CHECK_MEMORY(main);
+LOG_DEBUG_INFO("s","MyClearEventLog: start");
     if (!(ClearEventLog(hAppLog,0)))
 	{
-		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyClearEventLog: end1");
+LOG_DEBUG_INFO("s","MyClearEventLog: end1");
         return(GetLastError());
 	}
-	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyClearEventLog: end2");
+LOG_DEBUG_INFO("s","MyClearEventLog: end2");
+CHECK_MEMORY(main, "MyClearEventLog", "end");
     return(0);
 
 }
@@ -147,176 +123,184 @@ log record raw data */
     char            temp[MAX_PATH];
     char            MsgDll[MAX_PATH];                   /* the name of the
 message DLL */
-    HKEY            hk;
+    HKEY            hk = NULL;
     DWORD           Data;
     DWORD           Type;
-    HINSTANCE       hLib;                               /* handle to the
+    HINSTANCE       hLib = NULL;                        /* handle to the
 messagetable DLL */
     char            *pCh,*pFile,*pNextFile;
     char            *aInsertStrs[MAX_INSERT_STRS];      // array of pointers to insert
     long            i;
-    LPTSTR          msgBuf;                             // hold text of the error message that we
-    long            err;
+    LPTSTR          msgBuf = NULL;                       // hold text of the error message that we
+    long            err = 0;
+	void *tmpp = NULL;
 
-	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyGetAEventLog: start");
+INIT_CHECK_MEMORY(main);
+
+LOG_DEBUG_INFO("s","MyGetAEventLog: start");
     if (!hAppLog)
 	{
-		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyGetAEventLog: 1");
+LOG_DEBUG_INFO("s","MyGetAEventLog: 1");
         return(0);
 	}
+
     bSuccess = ReadEventLog(hAppLog,                    /* event-log handle */
                 EVENTLOG_SEEK_READ |                    /* read forward */
                 EVENTLOG_FORWARDS_READ,                 /* sequential read */
-                which,                                  /* which record to
-read 1 is first */
+                which,                                  /* which record to read 1 is first */
                 bBuffer,                                /* address of buffer */
                 sizeof(bBuffer),                        /* size of buffer */
-                &dwRead,                                /* count of bytes
-read */
-                &dwNeeded);                             /* bytes in next
-record */
+                &dwRead,                                /* count of bytes read */
+                &dwNeeded);                             /* bytes in next record */
+
     if (!bSuccess)
 	{
-		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyGetAEventLog: 2");
-        return(GetLastError());
+LOG_DEBUG_INFO("s","MyGetAEventLog: 2");
+		err = GetLastError();
+		if(err==0) err = 1;
 	}
-    pELR = (EVENTLOGRECORD*)bBuffer;                    // point to data
 
-    strcpy(pSource,((char*)pELR + sizeof(EVENTLOGRECORD)));// copy source name
-// build path to message dll
-    strcpy(temp,"SYSTEM\\CurrentControlSet\\Services\\EventLog\\");
-    strcat(temp,pAppName);
-    strcat(temp,"\\");
-    strcat(temp,((char*)pELR + sizeof(EVENTLOGRECORD)));
-    if (RegOpenKey(HKEY_LOCAL_MACHINE, temp, &hk))
+	if(err == 0)
 	{
-		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyGetAEventLog: 3");
-        return(GetLastError());
+		pELR = (EVENTLOGRECORD*)bBuffer;                    // point to data
+
+		strcpy(pSource,((char*)pELR + sizeof(EVENTLOGRECORD)));// copy source name
+	// build path to message dll
+		strcpy(temp,"SYSTEM\\CurrentControlSet\\Services\\EventLog\\");
+		strcat(temp,pAppName);
+		strcat(temp,"\\");
+		strcat(temp,((char*)pELR + sizeof(EVENTLOGRECORD)));
+		if (RegOpenKey(HKEY_LOCAL_MACHINE, temp, &hk))
+		{
+LOG_DEBUG_INFO("s","MyGetAEventLog: 3");
+			err = GetLastError();
+			if(err==0) err = 1;
+		}
 	}
-    Data = MAX_PATH;
-    if (RegQueryValueEx(hk,                             /* handle of key
-to query        */
-            "EventMessageFile",                         /* value
-name            */
-            NULL,                                       /* must be
-NULL          */
-            &Type,                                      /* address of type
-value           */
-            (UCHAR*)temp,                               /* address of
-value data */
-            &Data))                                     /* length of value
-data  */
+
+	if(err == 0)
 	{
-		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyGetAEventLog: 4");
-        return(GetLastError());
+		Data = MAX_PATH;
+		if (RegQueryValueEx(hk,			/* handle of key to query */
+				"EventMessageFile",     /* value name             */
+				NULL,                   /* must be NULL           */
+				&Type,                  /* address of type value  */
+				(UCHAR*)temp,           /* address of value data  */
+				&Data))                 /* length of value data   */
+		{
+LOG_DEBUG_INFO("s","MyGetAEventLog: 4");
+			err = GetLastError();
+			if(err==0) err = 1;
+		}
+
+		pFile = temp;
 	}
-    pFile = temp;
-    err = 1;
-
-    for (;;)
-    {
-		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyGetAEventLog: for 1");
-		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",pFile);
-		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyGetAEventLog: for 1.1");
-
-
-        if ((pNextFile = strchr(pFile,';')))
+    
+	if(err == 0)
+	{
+		for (;;)
 		{
-			WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyGetAEventLog: for 1.2");
-            *pNextFile = 0;
-		}
-		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyGetAEventLog: for 1.3");
+LOG_DEBUG_INFO("s","MyGetAEventLog: for 1");
+LOG_DEBUG_INFO("s",pFile);
+LOG_DEBUG_INFO("s","MyGetAEventLog: for 1.1");
 
 
-        if (!ExpandEnvironmentStrings(pFile, MsgDll, MAX_PATH))
-		{
-			WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyGetAEventLog: for 2");
-            return(GetLastError());
-		}
-		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyGetAEventLog: for 2.1");
-        if (!(hLib = LoadLibraryEx(MsgDll, NULL, LOAD_LIBRARY_AS_DATAFILE)))
-		{
-			WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyGetAEventLog: for 3");
-            return(1);
-		}
+	        if ((pNextFile = strchr(pFile,';')))
+			{
+			    *pNextFile = 0;
+			}
+LOG_DEBUG_INFO("s","MyGetAEventLog: for 1.3");
+
+			if (!ExpandEnvironmentStrings(pFile, MsgDll, MAX_PATH))
+			{
+	            err = GetLastError();
+				if(err==0) err = 1;
+				break;
+			}
+LOG_DEBUG_INFO("s","MyGetAEventLog: for 2.1");
+		    if (!(hLib = LoadLibraryEx(MsgDll, NULL, LOAD_LIBRARY_AS_DATAFILE)))
+			{
+				err = 1;
+				break;
+			}
+LOG_DEBUG_INFO("s","MyGetAEventLog: 4");
 
 /* prepare the array of insert strings for FormatMessage - the
             insert strings are in the log entry. */
-        pCh = (char *)((LPBYTE)pELR + pELR->StringOffset);
-			WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyGetAEventLog: 4");
+			pCh = (char *)((LPBYTE)pELR + pELR->StringOffset);
 
-        for (i = 0; i < pELR->NumStrings && i < MAX_INSERT_STRS; i++)
-        {
-			WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyGetAEventLog: 5");
-            aInsertStrs[i] = pCh;
-            pCh += strlen(pCh) + 1;                         /* point to
-next string */
-        }
-		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyGetAEventLog: 6");
+			for (i = 0; i < pELR->NumStrings && i < MAX_INSERT_STRS; i++)
+			{
+LOG_DEBUG_INFO("s","MyGetAEventLog: 5");
+				aInsertStrs[i] = pCh;
+				pCh += strlen(pCh) + 1;		/* point to next string */
+			}
+LOG_DEBUG_INFO("s","MyGetAEventLog: 6");
 
 
 /* Format the message from the message DLL with the insert strings */
-        if (FormatMessage(
-                FORMAT_MESSAGE_FROM_HMODULE |               /* get the
-message from the DLL */
-                FORMAT_MESSAGE_ALLOCATE_BUFFER |            /* allocate
-the msg buffer for us */
-                FORMAT_MESSAGE_ARGUMENT_ARRAY |             /* lpArgs is
-an array of pointers */
+			if (FormatMessage(
+                FORMAT_MESSAGE_FROM_HMODULE |		/* get the message from the DLL */
+                FORMAT_MESSAGE_ALLOCATE_BUFFER |    /* allocate the msg buffer for us */
+                FORMAT_MESSAGE_ARGUMENT_ARRAY |     /* lpArgs is an array of pointers */
                 //60,
-				/* line length
-for the mesages */
+				/* line length for the mesages */
 				FORMAT_MESSAGE_FROM_SYSTEM,
-                hLib,                                       /* the
-messagetable DLL handle */
-                pELR->EventID,                              /* message ID */
-                MAKELANGID(LANG_NEUTRAL, SUBLANG_ENGLISH_US),/* language ID */
-                (LPTSTR) &msgBuf,                           /* address of
-pointer to buffer for message */
-                MAX_MSG_LENGTH,                             /* maximum
-size of the message buffer */
-                aInsertStrs))                               /* array of
-insert strings for the message */
-		{
-			WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyGetAEventLog: 7");
-                    break;
-		}
-WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyGetAEventLog: 8");
-        FreeLibrary(hLib);
+                hLib,								/* the messagetable DLL handle */
+                pELR->EventID,                      /* message ID */
+                MAKELANGID(LANG_NEUTRAL, SUBLANG_ENGLISH_US),	/* language ID */
+                (LPTSTR) &msgBuf,                   /* address of pointer to buffer for message */
+                MAX_MSG_LENGTH,                     /* maximum size of the message buffer */
+                aInsertStrs))                       /* array of insert strings for the message */
+			{
+				err = 0;
+				break;
+			}
 
-		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyGetAEventLog: 9");
-		if (!pNextFile)                                     // more files to read ?
-        {
-            RegCloseKey(hk);
-            i = GetLastError();
-			WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyGetAEventLog: 10");
-            return(i);
-        }
-        pFile = ++pNextFile;
+LOG_DEBUG_INFO("s","MyGetAEventLog: 9");
+			if (!pNextFile)							/* more files to read ? */
+			{
+LOG_DEBUG_INFO("s","MyGetAEventLog: 10");
+			    RegCloseKey(hk);
+		        err = GetLastError();
+	            if(err == 0) err = 1;
+				break;
+			}
+			pFile = ++pNextFile;
+
+			LocalFree((HLOCAL) msgBuf);
+			msgBuf = NULL;
+			FreeLibrary(hLib);
+			hLib = NULL;
+		}
     }
 
-    strcpy(pMessage,msgBuf);                                // copy message
+	if(err == 0)
+	{
+		strcpy(pMessage,msgBuf);                                // copy message
 
-    *pTime = (double)pELR->TimeGenerated;
+		*pTime = (double)pELR->TimeGenerated;
 
-    *pType = pELR->EventType;                           // return event type
-	*pCategory = pELR->EventCategory;                   // return category
+		*pType = pELR->EventType;                           // return event type
+		*pCategory = pELR->EventCategory;                   // return category
 
-	*timestamp=pELR->TimeGenerated;
+		*timestamp=pELR->TimeGenerated;
 
+LOG_DEBUG_INFO("s","MyGetAEventLog: 11");
+	}
 
 /* Free the buffer that FormatMessage allocated for us. */
-    LocalFree((HLOCAL) msgBuf);
-
+    if(msgBuf) LocalFree((HLOCAL) msgBuf);
 /* free the message DLL since we don't know if we'll need it again */
-	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyGetAEventLog: 11");
-    FreeLibrary(hLib);
-	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyGetAEventLog: 12");
-    RegCloseKey(hk);
+    if(hLib) FreeLibrary(hLib);
+    if(hk)	RegCloseKey(hk);
 
-//WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","Y");
-//WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",*pType);    
-WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","MyGetAEventLog: end");
-    return(0);
+LOG_DEBUG_INFO("s","Y");
+LOG_DEBUG_INFO("d",*pType);    
+LOG_DEBUG_INFO("s","MyGetAEventLog: pMessage");
+LOG_DEBUG_INFO("s",pMessage);
+
+CHECK_MEMORY(main, "MyGetAEventLog", "end");
+    return err;
 
 } 

@@ -25,6 +25,60 @@
 #if defined(WIN32)
 #	define zbx_uint64_t __int64
 #	define ZBX_FS_UI64 "%llu"
+
+#	ifdef _DEBUG
+#		include "crtdbg.h"
+
+#		define LOG_DEBUG_INFO(type, msg) \
+			WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE, type , msg);
+
+#		define REINIT_CHECK_MEMORY(a) \
+			_CrtMemCheckpoint(& ## a ## oldMemState)
+
+#		define INIT_CHECK_MEMORY(a) \
+			char a ## DumpMessage[0xFFFF]; \
+			_CrtMemState  a ## oldMemState, a ## newMemState, a ## diffMemState; \
+			REINIT_CHECK_MEMORY(a)
+
+#		define CHECK_MEMORY(a, fncname, msg) \
+			_CrtMemCheckpoint(& ## a ## newMemState); \
+			if(_CrtMemDifference(& ## a ## diffMemState, & ## a ## oldMemState, & ## a ## newMemState)) \
+			{ \
+				sprintf(a ## DumpMessage, \
+					"%s\n" \
+					"free:  %10li bytes in %10li blocks\n" \
+					"normal:%10li bytes in %10li blocks\n" \
+					"CRT:   %10li bytes in %10li blocks\n" \
+					"ignore:%10li bytes in %10li blocks\n" \
+					"client:%10li bytes in %10li blocks\n" \
+					"max:   %10li bytes in %10li blocks", \
+					 \
+					fncname ": (" #a ") Memory changed! (" msg ")\n", \
+					 \
+					(long) a ## diffMemState.lSizes[_FREE_BLOCK], \
+					(long) a ## diffMemState.lCounts[_FREE_BLOCK], \
+					 \
+					(long) a ## diffMemState.lSizes[_NORMAL_BLOCK], \
+					(long) a ## diffMemState.lCounts[_NORMAL_BLOCK], \
+					 \
+					(long) a ## diffMemState.lSizes[_CRT_BLOCK], \
+					(long) a ## diffMemState.lCounts[_CRT_BLOCK], \
+					 \
+					(long) a ## diffMemState.lSizes[_IGNORE_BLOCK], \
+					(long) a ## diffMemState.lCounts[_IGNORE_BLOCK], \
+					 \
+					(long) a ## diffMemState.lSizes[_CLIENT_BLOCK], \
+					(long) a ## diffMemState.lCounts[_CLIENT_BLOCK], \
+					 \
+					(long) a ## diffMemState.lSizes[_MAX_BLOCKS], \
+					(long) a ## diffMemState.lCounts[_MAX_BLOCKS]); \
+				 LOG_DEBUG_INFO("s", a ## DumpMessage) \
+			}
+#	else
+#		define INIT_CHECK_MEMORY(a) ((void)0)
+#		define CHECK_MEMORY(a, fncname, msg) ((void)0)
+#		define LOG_DEBUG_INFO(a, b) ((void)0)
+#	endif
 #else
 #	define zbx_uint64_t uint64_t
 #	if __WORDSIZE == 64

@@ -78,6 +78,8 @@ static void ImportSymbols(void)
 {
    HMODULE hModule;
 
+INIT_CHECK_MEMORY(main);
+
    hModule=GetModuleHandle("USER32.DLL");
    if (hModule!=NULL)
    {
@@ -108,6 +110,7 @@ static void ImportSymbols(void)
    {
       WriteLog(MSG_NO_DLL,EVENTLOG_WARNING_TYPE,"s","PSAPI.DLL");
    }
+CHECK_MEMORY(main, "ImportSymbols", "end");
 }
 
 
@@ -118,44 +121,67 @@ static void ImportSymbols(void)
 static BOOL LoadSubAgent(char *name,char *cmdLine)
 {
    SUBAGENT *sbi;
+   BOOL ret = TRUE;
+
    int rc;
 
    sbi=(SUBAGENT *)malloc(sizeof(SUBAGENT));
+
    sbi->hModule=LoadLibrary(name);
    if (sbi->hModule==NULL)
    {
       WriteLog(MSG_LOAD_FAILED,EVENTLOG_ERROR_TYPE,"se",name,GetLastError());
-      free(sbi);
-      return FALSE;
+	  ret = FALSE;
+	  goto lbl_FreeSbi;
    }
 
-   sbi->init=(int (__zabbix_api *)(char *,SUBAGENT_COMMAND **))GetProcAddress(sbi->hModule,"zabbix_subagent_init");
+   sbi->init	=(int  (__zabbix_api *)(char *,SUBAGENT_COMMAND **))GetProcAddress(sbi->hModule,"zabbix_subagent_init");
    sbi->shutdown=(void (__zabbix_api *)(void))GetProcAddress(sbi->hModule,"zabbix_subagent_shutdown");
-   if ((sbi->init==NULL)||(sbi->shutdown==NULL))
+   if ((sbi->init==NULL) || (sbi->shutdown==NULL))
    {
       WriteLog(MSG_NO_ENTRY_POINTS,EVENTLOG_ERROR_TYPE,"s",name);
-      FreeLibrary(sbi->hModule);
-      free(sbi);
-      return FALSE;
+	  ret = FALSE;
+	  goto lbl_CloseLibrary;
    }
 
-   if ((rc=sbi->init(cmdLine,&sbi->cmdList))!=0)
+   if ((rc=sbi->init(cmdLine, &sbi->cmdList))!=0)
    {
-      WriteLog(MSG_SUBAGENT_INIT_FAILED,EVENTLOG_ERROR_TYPE,"sd",name,rc);
-      FreeLibrary(sbi->hModule);
-      free(sbi);
-      return FALSE;
+      WriteLog(MSG_SUBAGENT_INIT_FAILED, EVENTLOG_ERROR_TYPE, "sd", name, rc);
+	  ret = FALSE;
+	  goto lbl_CloseLibrary;
    }
 
    // Add new subagent to chain
-   sbi->next=subagentList;
-   subagentList=sbi;
+   sbi->next = subagentList;
+   subagentList = sbi;
+
+   FreeLibrary(sbi->hModule);
 
    WriteLog(MSG_SUBAGENT_LOADED,EVENTLOG_INFORMATION_TYPE,"s",name);
 
-   return TRUE;
+lbl_CloseLibrary:
+	FreeLibrary(sbi->hModule);
+
+lbl_FreeSbi:
+	if(ret == FALSE)
+		free(sbi);
+
+	return ret;
 }
 
+static void	FreeSubagentList(void)
+{
+	SUBAGENT	*curr;
+	SUBAGENT	*next;
+		
+	next = subagentList;
+	while(next!=NULL)
+	{
+		curr = next;
+		next = curr->next;
+		free(curr);
+	}
+}
 
 //
 // Initialization routine
@@ -170,22 +196,16 @@ BOOL Initialize(void)
    // Initialize Windows Sockets API
    WSAStartup(0x0002,&sockInfo);
 
-   InitLog();
-
    // Dynamically import functions that may not be presented in all Windows versions
    ImportSymbols();
 
    // Load subagents
    if (subagentNameList!=NULL)
    {
-      for(i=0;subagentNameList[i].name!=NULL;i++)
-      {
+      for(i=0; subagentNameList[i].name!=NULL; i++)
          LoadSubAgent(subagentNameList[i].name,subagentNameList[i].cmdLine);
-         free(subagentNameList[i].name);
-         if (subagentNameList[i].cmdLine!=NULL)
-            free(subagentNameList[i].cmdLine);
-      }
-      free(subagentNameList);
+
+	  FreeSubagentNameList();
    }
 
    // Create synchronization stuff
@@ -197,11 +217,13 @@ BOOL Initialize(void)
    AddAlias("system[uptime]",counterPath);
 
    // Start TCP/IP listener and collector threads
+
    _beginthread(CollectorThread,0,NULL);
    WaitForSingleObject(eventCollectorStarted,INFINITE);  // Allow collector thread to initialize
-   _beginthread(ListenerThread,0,NULL);
-   _beginthread(ActiveChecksThread,0,NULL);
 
+   _beginthread(ListenerThread,0,NULL);
+
+   _beginthread(ActiveChecksThread,0,NULL);
 
    CloseHandle(eventCollectorStarted);
 
@@ -216,9 +238,8 @@ BOOL Initialize(void)
 void Shutdown(void)
 {
    SetEvent(eventShutdown);
-   Sleep(1000);      // Allow other threads to terminate
+   Sleep(2000);      // Allow other threads to terminate
    WriteLog(MSG_AGENT_SHUTDOWN,EVENTLOG_INFORMATION_TYPE,NULL);
-   CloseLog();
 }
 
 
@@ -260,12 +281,23 @@ void Main(void)
 
 int main(int argc,char *argv[])
 {
+	int ret = 0;
+
+INIT_CHECK_MEMORY(main);
 
    if (!ParseCommandLine(argc,argv))
-      return 1;
+   {
+      ret = 1;
+	  goto lbl_End;
+   }
 
    if (!ReadConfig())
-      return 1;
+   {
+      ret = 1;
+	  goto lbl_End;
+   }
+
+   InitLog();
 
    if (!IsStandalone())
    {
@@ -276,9 +308,29 @@ int main(int argc,char *argv[])
       if (!Initialize())
       {
          printf("Zabbix Win32 agent initialization failed\n");
-         return 1;
+	     ret = 1;
+		 goto lbl_End;
       }
       Main();
    }
-   return 0;
+
+lbl_End:
+	CloseHandle(eventShutdown);
+
+	FreeSubagentList();
+	FreeSubagentNameList();
+	FreeCounterList();
+	FreeUserCounterList();
+	FreeAliasList();
+
+CHECK_MEMORY(main, "main","end")
+#ifdef _DEBUG
+	else LOG_DEBUG_INFO("s", "main: Memory OK!");
+#else
+	;
+#endif //_DEBUG
+
+   CloseLog();
+
+   return ret;
 }

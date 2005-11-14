@@ -102,5 +102,6 @@ LONG H_CheckTcpPort(char *cmd,char *arg,double *value)
 
    closesocket(sock);
    *value=0;      // Connection successful
+
    return SYSINFO_RC_SUCCESS;
 }
