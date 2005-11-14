@@ -45,7 +45,6 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 	int	len;
 	char	c[MAX_STRING_LEN];
 	char	error[MAX_STRING_LEN];
-	char	*e;
 
 	struct hostent *hp;
 
