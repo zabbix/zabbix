@@ -22,7 +22,6 @@
 
 #include "zabbixw32.h"
 
-
 LONG H_Execute(char *cmd,char *arg,char **value)
 {
    char *ptr1,*ptr2;
@@ -75,8 +74,9 @@ LONG H_Execute(char *cmd,char *arg,char **value)
    // Rewind temporary file for reading
    SetFilePointer(hOutput,0,NULL,FILE_BEGIN);
 
+   *value=(char *)malloc(MAX_STRING_LEN);	// Called and freed in function "ProcessCommand", pointer "strResult"
+
    // Read process output
-   *value=(char *)malloc(MAX_STRING_LEN);
    ReadFile(hOutput,*value,MAX_STRING_LEN-1,&dwBytes,NULL);
    (*value)[dwBytes]=0;
    ptr1=strchr(*value,'\n');

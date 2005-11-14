@@ -52,6 +52,8 @@ void GetParameterInstance(char *param,char *instance,int maxSize)
 {
    char *ptr1,*ptr2;
 
+INIT_CHECK_MEMORY(main);
+
    instance[0]=0;    // Default is empty string
    ptr1=strchr(param,'[');
    ptr2=strchr(ptr1,']');
@@ -61,6 +63,7 @@ void GetParameterInstance(char *param,char *instance,int maxSize)
    ptr1++;
    memcpy(instance,ptr1,min(ptr2-ptr1,maxSize-1));
    instance[min(ptr2-ptr1,maxSize-1)]=0;
+CHECK_MEMORY(main,"GetParameterInstance","end");
 }
 
 
@@ -105,6 +108,7 @@ static LONG H_ProcUtil(char *cmd,char *arg,double *value)
 {
    char proc[16];
    int procnum;
+
 
    if ((DWORD)arg & 0x80)  // bit 7 is set if we are called for specific instance
    {
@@ -167,6 +171,7 @@ static LONG H_ProcCountSpecific(char *cmd,char *arg,double *value)
    char procName[MAX_PATH];
    HANDLE hProcess;
 
+
    GetParameterInstance(cmd,procName,MAX_PATH-1);
    EnumProcesses(procList,sizeof(DWORD)*MAX_PROCESSES,&dwSize);
    procCount=dwSize/sizeof(DWORD);
@@ -200,6 +205,9 @@ static LONG H_ProcCountSpecific(char *cmd,char *arg,double *value)
 
 static LONG H_MemoryInfo(char *cmd,char *arg,double *value)
 {
+
+
+
    if (!strcmp(cmd,"memory[cached]"))
    {
       PERFORMANCE_INFORMATION pfi;
@@ -261,6 +269,7 @@ static LONG H_HostName(char *cmd,char *arg,char **value)
    DWORD dwSize;
    char buffer[MAX_COMPUTERNAME_LENGTH+1];
 
+
    dwSize=MAX_COMPUTERNAME_LENGTH+1;
    GetComputerName(buffer,&dwSize);
    *value=strdup(buffer);
@@ -276,6 +285,8 @@ static LONG H_DiskInfo(char *cmd,char *arg,double *value)
 {
    char path[MAX_PATH];
    ULARGE_INTEGER freeBytes,totalBytes;
+
+
 
    GetParameterInstance(cmd,path,MAX_PATH-1);
    if (!GetDiskFreeSpaceEx(path,&freeBytes,&totalBytes,NULL))
@@ -299,6 +310,7 @@ static LONG H_ServiceState(char *cmd,char *arg,double *value)
 {
    SC_HANDLE mgr,service;
    char serviceName[MAX_PATH];
+
 
    GetParameterInstance(cmd,serviceName,MAX_PATH-1);
 
@@ -356,6 +368,7 @@ static LONG H_PerfCounter(char *cmd,char *arg,double *value)
    PDH_STATUS status;
    char counterName[MAX_PATH];
 
+
    GetParameterInstance(cmd,counterName,MAX_PATH-1);
 
    if (PdhOpenQuery(NULL,0,&query)!=ERROR_SUCCESS)
@@ -377,6 +390,7 @@ static LONG H_PerfCounter(char *cmd,char *arg,double *value)
    {
       WriteLog(MSG_PDH_COLLECT_QUERY_DATA_FAILED,EVENTLOG_ERROR_TYPE,"s",
                GetSystemErrorText(GetLastError()));
+	  PdhRemoveCounter(&counter);
       PdhCloseQuery(query);
       return SYSINFO_RC_ERROR;
    }
@@ -384,6 +398,7 @@ static LONG H_PerfCounter(char *cmd,char *arg,double *value)
    PdhGetRawCounterValue(counter,NULL,&rawData);
    PdhCalculateCounterFromRawValue(counter,PDH_FMT_DOUBLE,
                                    &rawData,NULL,&counterValue);
+   PdhRemoveCounter(&counter);
 
    PdhCloseQuery(query);
    *value=counterValue.doubleValue;
@@ -399,6 +414,7 @@ static LONG H_UserCounter(char *cmd,char *arg,double *value)
 {
    USER_COUNTER *counter;
    char *ptr1,*ptr2;
+
 
    ptr1=strchr(cmd,'{');
    ptr2=strchr(cmd,'}');
@@ -426,6 +442,8 @@ static LONG H_MD5Hash(char *cmd,char *arg,char **value)
    HANDLE hFile,hFileMapping;
    DWORD dwSize,dwSizeHigh;
    int i;
+
+
 
    // Get file name from parameter name and open it
    GetParameterInstance(cmd,fileName,MAX_PATH-1);
@@ -462,6 +480,7 @@ static LONG H_MD5Hash(char *cmd,char *arg,char **value)
       }
    }
 
+
    CalculateMD5Hash(data,dwSize,hash);
 
    // Unmap and close file
@@ -491,6 +510,8 @@ static LONG H_CRC32(char *cmd,char *arg,double *value)
    HANDLE hFile,hFileMapping;
    DWORD dwSize,dwSizeHigh,crc;
    unsigned char *data;
+
+INIT_CHECK_MEMORY(main);
 
    // Get file name from parameter name and open it
    GetParameterInstance(cmd,fileName,MAX_PATH-1);
@@ -523,6 +544,9 @@ static LONG H_CRC32(char *cmd,char *arg,double *value)
                   fileName,GetSystemErrorText(GetLastError()));
          CloseHandle(hFileMapping);
          CloseHandle(hFile);
+
+CHECK_MEMORY(main, "H_FileSize","data==NULL");
+
          return SYSINFO_RC_ERROR;
       }
    }
@@ -538,6 +562,9 @@ static LONG H_CRC32(char *cmd,char *arg,double *value)
    CloseHandle(hFile);
 
    *value=(double)crc;
+
+CHECK_MEMORY(main, "H_FileSize","end");
+
    return SYSINFO_RC_SUCCESS;
 }
 
@@ -552,14 +579,22 @@ static LONG H_FileSize(char *cmd,char *arg,double *value)
    HANDLE hFind;
    WIN32_FIND_DATA findData;
 
+INIT_CHECK_MEMORY(main);
+
    GetParameterInstance(cmd,fileName,MAX_PATH-1);
 
    hFind=FindFirstFile(fileName,&findData);
    if (hFind==INVALID_HANDLE_VALUE)
+   {
+CHECK_MEMORY(main, "H_FileSize","INVALID_HANDLE_VALUE");
       return SYSINFO_RC_NOTSUPPORTED;
+   }
    FindClose(hFind);
 
    *value=(double)findData.nFileSizeLow+(double)(((__int64)findData.nFileSizeHigh) << 32);
+
+CHECK_MEMORY(main, "H_FileSize","end");
+
    return SYSINFO_RC_SUCCESS;
 }
 
@@ -574,6 +609,8 @@ static LONG H_SystemUname(char *cmd,char *arg,char **value)
    char *cpuType,computerName[MAX_COMPUTERNAME_LENGTH+1],osVersion[256],buffer[1024];
    SYSTEM_INFO sysInfo;
    OSVERSIONINFO versionInfo;
+
+INIT_CHECK_MEMORY(main);
 
    dwSize=MAX_COMPUTERNAME_LENGTH+1;
    GetComputerName(computerName,&dwSize);
@@ -634,6 +671,9 @@ static LONG H_SystemUname(char *cmd,char *arg,char **value)
    sprintf(buffer,"Windows %s %d.%d.%d %s %s",computerName,versionInfo.dwMajorVersion,
            versionInfo.dwMinorVersion,versionInfo.dwBuildNumber,osVersion,cpuType);
    *value=strdup(buffer);
+
+CHECK_MEMORY(main, "H_SystemUname","end");
+
    return SYSINFO_RC_SUCCESS;
 }
 
@@ -699,10 +739,12 @@ void ProcessCommand(char *received_cmd,char *result)
    SUBAGENT *sbi;
    BOOL isSubagentCommand=FALSE;
 
+INIT_CHECK_MEMORY(main);
+
    ExpandAlias(received_cmd,cmd);
 
    // Find match for command in subagents
-   for(sbi=subagentList;sbi!=NULL;sbi=sbi->next)
+   for(sbi=subagentList; sbi!=NULL; sbi=sbi->next)
    {
       for(i=0;;i++)
       {
@@ -759,10 +801,6 @@ finish_cmd_processing:;
          {
             strncpy(result,strResult,MAX_STRING_LEN-1);
             strcat(result,"\n");
-            if (isSubagentCommand)
-               zfree(strResult);
-            else
-               free(strResult);
          }
          statProcessedRequests++;
          break;
@@ -780,4 +818,14 @@ finish_cmd_processing:;
          statFailedRequests++;
          break;
    }
+
+   if(strResult)
+   {
+	   if (isSubagentCommand)
+		   zfree(strResult);
+	   else
+		   free(strResult);
+   }
+
+   CHECK_MEMORY(main, "ProcessCommand","end");
 }

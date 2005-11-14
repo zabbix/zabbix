@@ -191,6 +191,7 @@ void ZabbixInstallEventSource(char *path);
 void ZabbixRemoveEventSource(void);
 
 char *GetCounterName(DWORD index);
+
 void InitLog(void);
 void CloseLog(void);
 void WriteLog(DWORD msg,WORD wType,char *format...);
@@ -246,9 +247,18 @@ extern DWORD confTimeout;
 extern DWORD confMaxProcTime;
 
 extern USER_COUNTER *userCounterList;
+void	FreeUserCounterList(void);
+
 extern SUBAGENT *subagentList;
+void	FreeSubagentList(void);
+
 extern SUBAGENT_NAME *subagentNameList;
+void	FreeSubagentNameList(void);
+
 extern PERFCOUNTER *perfCounterList;
+void	FreeCounterList(void);
+
+void	FreeAliasList(void);
 
 extern double statProcUtilization[];
 extern double statProcUtilization5[];

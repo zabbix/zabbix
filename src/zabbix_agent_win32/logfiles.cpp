@@ -55,12 +55,14 @@ int   process_log(char *filename,int *lastlogsize, char *value)
 		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_NOTSUPPORTED\n");
 		return 1;
 	}*/
+INIT_CHECK_MEMORY(main);
 
 	f=fopen(filename,"r");
 	if(NULL == f)
 	{
 //		zabbix_log( LOG_LEVEL_WARNING, "Cannot open [%s] [%s]", filename, strerror(errno));
 		sprintf(value,"%s","ZBX_NOTSUPPORTED\n");
+CHECK_MEMORY(main, "process_log", "fopen");
 		return 1;
 	}
 
@@ -74,6 +76,7 @@ int   process_log(char *filename,int *lastlogsize, char *value)
 //		zabbix_log( LOG_LEVEL_WARNING, "Cannot set postition to [%d] for [%s] [%s]", *lastlogsize, filename, strerror(errno));
 		sprintf(value,"%s","ZBX_NOTSUPPORTED\n");
 		fclose(f);
+CHECK_MEMORY(main, "process_log", "fseek");
 		return 1;
 	}
 
@@ -81,12 +84,14 @@ int   process_log(char *filename,int *lastlogsize, char *value)
 	{
 		/* EOF */
 		fclose(f);
+CHECK_MEMORY(main, "process_log", "fgets");
 		return 1;
 	}
 	fclose(f);
 
 	*lastlogsize+=strlen(value);
 
+CHECK_MEMORY(main, "process_log", "end");
 	return 0;
 }
 
@@ -97,9 +102,10 @@ int process_eventlog(char *source,int *lastlogsize, int *timestamp, char *value)
     BYTE bBuffer[1024*64]; 
     DWORD dwRead, dwNeeded, dwThisRecord; 
 
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","Lastlogsize:");
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",*lastlogsize);
+LOG_DEBUG_INFO("s","Lastlogsize:");
+LOG_DEBUG_INFO("d",*lastlogsize);
 
+INIT_CHECK_MEMORY(main);
 	
     // Open the Application event log. 
  
@@ -108,7 +114,8 @@ int process_eventlog(char *source,int *lastlogsize, int *timestamp, char *value)
     if (h == NULL) 
     {
 		sprintf(value,"%s","ZBX_NOTSUPPORTED\n");
-		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","Could not open event log");
+		LOG_DEBUG_INFO("s","Could not open event log");
+CHECK_MEMORY(main, "process_eventlog", "OpenEventLog");
 		return 1;
     }
  
@@ -117,7 +124,7 @@ int process_eventlog(char *source,int *lastlogsize, int *timestamp, char *value)
     // Get the record number of the oldest event log record.
 
     GetOldestEventLogRecord(h, &dwThisRecord);
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d", dwThisRecord);
+// LOG_DEBUG_INFO("d", dwThisRecord);
 
 	    // Opening the event log positions the file pointer for this 
     // handle at the beginning of the log. Read the event log records 
@@ -133,13 +140,13 @@ int process_eventlog(char *source,int *lastlogsize, int *timestamp, char *value)
                 &dwNeeded))   // bytes in next record 
    {
     					//while (dwRead > 0) 
-//		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d", dwRead);
+//		LOG_DEBUG_INFO("d", dwRead);
 			if (dwRead > 0) 
         { 
             // Print the record number, event identifier, type, 
             // and source name.
 				
-			//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",dwThisRecord);
+			//	LOG_DEBUG_INFO("d",dwThisRecord);
 				if((dwThisRecord++) >= ((DWORD)(*lastlogsize)))
 				{
 					sprintf(value, "%03d  Event ID 0x%08X  Event type ", 
@@ -188,5 +195,8 @@ int process_eventlog(char *source,int *lastlogsize, int *timestamp, char *value)
 		
 	 
     CloseEventLog(h); 
+
+CHECK_MEMORY(main, "process_eventlog", "end");
+
 	return 0;
 }

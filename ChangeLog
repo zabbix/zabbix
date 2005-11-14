@@ -1,5 +1,7 @@
 Changes for 1.1beta3:
 
+ - fixed memory leak for windows agent (Eugene)
+ - fixed windows agent hanging (Eugene)
  - reverted graph generation fix (Alexei)
  - improved loging to file for windows (Eugene)
  - added support of system.cpu.intr for Linux (Eugene)

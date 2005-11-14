@@ -39,23 +39,32 @@ static BOOL AddUserParameter(char *args,int sourceLine)
 {
    char *cmdLine;
    char *buffer;
+   BOOL ret = TRUE;
+
+INIT_CHECK_MEMORY(main);
 
    cmdLine=strchr(args,',');
    if (cmdLine==NULL)
    {
       if (IsStandalone())  
          printf("Error in configuration file, line %d: missing command line in UserParameter\n",sourceLine);
-      return FALSE;
+      ret = FALSE;
+   }
+   else
+   {
+		*cmdLine=0;
+		cmdLine++;
+
+		buffer=(char *)malloc(strlen(cmdLine)+32);
+		sprintf(buffer,"__exec{%s}",cmdLine);
+		AddAlias(args,buffer);
+		free(buffer);
+		ret = TRUE;
    }
 
-   *cmdLine=0;
-   cmdLine++;
+CHECK_MEMORY(main, "AddUserParameter", "end");
 
-   buffer=(char *)malloc(strlen(cmdLine)+32);
-   sprintf(buffer,"__exec{%s}",cmdLine);
-   AddAlias(args,buffer);
-   free(buffer);
-   return TRUE;
+   return ret;
 }
 
 
@@ -67,6 +76,8 @@ static BOOL AddUserParameter(char *args,int sourceLine)
 static BOOL AddSubAgent(char *args)
 {
    char *cmdLine;
+
+INIT_CHECK_MEMORY(main);
 
    cmdLine=strchr(args,',');
    if (cmdLine!=NULL)
@@ -81,9 +92,25 @@ static BOOL AddSubAgent(char *args)
    numSubAgents++;
    subagentNameList[numSubAgents].name=NULL;
 
+CHECK_MEMORY(main, "AddSubAgent", "end");
+
    return TRUE;
 }
 
+void	FreeSubagentNameList(void)
+{
+	int i =0;
+   if (subagentNameList!=NULL)
+   {
+      for(i=0; subagentNameList[i].name!=NULL; i++)
+      {
+         free(subagentNameList[i].name);
+         if (subagentNameList[i].cmdLine!=NULL)
+            free(subagentNameList[i].cmdLine);
+      }
+      free(subagentNameList);
+   }
+}
 
 //
 // Parse PerfCounter=... parameter and add new performance counter
@@ -97,53 +124,93 @@ static BOOL AddPerformanceCounter(char *args)
    char *ptr1,*ptr2,*eptr,buffer[MAX_ALIAS_NAME];
    USER_COUNTER *counter;
    int i;
+   BOOL ret = TRUE;
+
+INIT_CHECK_MEMORY(main);
 
    ptr1=strchr(args,',');
    if (ptr1==NULL)
-      return FALSE;     // Invalid syntax
+      ret = FALSE;     // Invalid syntax
 
-   *ptr1=0;
-   ptr1++;
-   StrStrip(args);
-   StrStrip(ptr1);
-   if (*ptr1!='"')
-      return FALSE;     // Invalid syntax
-   ptr1++;
-   ptr2=strchr(ptr1,'"');
-   if (ptr2==NULL)
-      return FALSE;     // Invalid syntax
-   *ptr2=0;
-   ptr2++;
-   StrStrip(ptr2);
-   if (*ptr2!=',')
-      return FALSE;     // Invalid syntax
-   ptr2++;
-   StrStrip(ptr2);
+   if(ret == TRUE)
+   {
+		*ptr1=0;
+		ptr1++;
+		StrStrip(args);
+		StrStrip(ptr1);
+		if (*ptr1!='"')
+			ret = FALSE;     // Invalid syntax
+   }
 
-   i=strtol(ptr2,&eptr,10);
-   if ((*eptr!=0)||     // Not a decimal number
-       (i<1)||(i>1800)) // Interval value out of range
-      return FALSE;     // Invalid syntax
+   if(ret == TRUE)
+   {
+		ptr1++;
+		ptr2=strchr(ptr1,'"');
+		if (ptr2==NULL)
+			ret = FALSE;     // Invalid syntax
+   }
 
-   // Add internal alias
-   sprintf(buffer,"__usercnt{%s}",args);
-   if (!AddAlias(args,buffer))
-      return FALSE;
+   if(ret == TRUE)
+   {
+		*ptr2=0;
+		ptr2++;
+		StrStrip(ptr2);
+		if (*ptr2!=',')
+			ret = FALSE;     // Invalid syntax
+   }
 
-   counter=(USER_COUNTER *)malloc(sizeof(USER_COUNTER));
-   memset(counter,0,sizeof(USER_COUNTER));
+   if(ret == TRUE)
+   {
+		ptr2++;
+		StrStrip(ptr2);
 
-   strncpy(counter->name,args,MAX_COUNTER_NAME-1);
-   strncpy(counter->counterPath,ptr1,MAX_PATH-1);
-   counter->interval=i;
-   counter->rawValueArray=(PDH_RAW_COUNTER *)malloc(sizeof(PDH_RAW_COUNTER)*counter->interval);
+		i=strtol(ptr2,&eptr,10);
+		if ((*eptr!=0)||     // Not a decimal number
+			(i<1)||(i>1800)) // Interval value out of range
+			ret = FALSE;     // Invalid syntax
+   }
 
-   // Add to the list
-   counter->next=userCounterList;
-   userCounterList=counter;
-   return TRUE;
+   if(ret == TRUE)
+   {
+		// Add internal alias
+		sprintf(buffer,"__usercnt{%s}",args);
+		if (!AddAlias(args,buffer))
+			ret = FALSE;
+   }
+
+   if(ret == TRUE)
+   {
+		counter=(USER_COUNTER *)malloc(sizeof(USER_COUNTER));
+		memset(counter,0,sizeof(USER_COUNTER));
+
+		strncpy(counter->name,args,MAX_COUNTER_NAME-1);
+		strncpy(counter->counterPath,ptr1,MAX_PATH-1);
+		counter->interval=i;
+		counter->rawValueArray=(PDH_RAW_COUNTER *)malloc(sizeof(PDH_RAW_COUNTER)*counter->interval);
+
+		// Add to the list
+		counter->next=userCounterList;
+		userCounterList=counter;
+   }
+
+CHECK_MEMORY(main, "AddPerformanceCounter", "end");
+   return ret;
 }
 
+void	FreeUserCounterList(void)
+{
+	USER_COUNTER	*curr;
+	USER_COUNTER	*next;
+		
+	next = userCounterList;
+	while(next!=NULL)
+	{
+		curr = next;
+		next = curr->next;
+		free(curr->rawValueArray);
+		free(curr);
+	}
+}
 
 //
 // Parse Server=... parameter
@@ -153,6 +220,8 @@ static int ParseServerList(char *args,int sourceLine)
 {
    char *sptr,*eptr;
    int errors=0;
+
+INIT_CHECK_MEMORY(main);
 
    for(sptr=args;(sptr!=(char *)1)&&(confServerCount<MAX_SERVERS);sptr=eptr+1)
    {
@@ -177,6 +246,8 @@ static int ParseServerList(char *args,int sourceLine)
       }
    }
 
+CHECK_MEMORY(main, "ParseServerList", "end");
+
    return errors;
 }
 
@@ -191,6 +262,8 @@ BOOL ReadConfig(void)
    char *ptr,buffer[4096];
    int sourceLine=0,errors=0;
 
+INIT_CHECK_MEMORY(main);
+
    if (IsStandalone())
       printf("Using configuration file \"%s\"\n",confFile);
 
@@ -199,6 +272,7 @@ BOOL ReadConfig(void)
    {
       if (IsStandalone())
          printf("Unable to open configuration file: %s\n",strerror(errno));
+CHECK_MEMORY(main, "ReadConfig", "fopen==NULL");
       return FALSE;
    }
 
@@ -394,5 +468,8 @@ BOOL ReadConfig(void)
       printf("Configuration file OK\n");
 
    fclose(cfg);
+
+CHECK_MEMORY(main, "ReadConfig", "end");
+
    return TRUE;
 }

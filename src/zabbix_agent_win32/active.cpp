@@ -75,12 +75,9 @@ METRIC
 	int	lastlogsize;
 };
 
-
-
-
 METRIC	*metrics=NULL;
 
-void	init_list()
+static void	InitMetrics()
 {
 	if(metrics==NULL)
 	{
@@ -89,18 +86,31 @@ void	init_list()
 	}
 }
 
+static void	FreeMetrics(void)
+{
+	int i;
+	for(i=0;;i++)
+	{
+		if(metrics[i].key == NULL)	break;
+		free(metrics[i].key);
+		metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
+	}
+	free(metrics);
+}
+
 void	disable_all_metrics()
 {
 	int i;
-
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","disable_all_metrics: start");
+INIT_CHECK_MEMORY(main);
+//	LOG_DEBUG_INFO("s","disable_all_metrics: start");
 	for(i=0;;i++)
 	{
 		if(metrics[i].key == NULL)	break;
 
 		metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
 	}
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","disable_all_metrics: end");
+//	LOG_DEBUG_INFO("s","disable_all_metrics: end");
+CHECK_MEMORY(main,"disable_all_metrics","end");
 }
 
 int	get_min_nextcheck()
@@ -109,7 +119,9 @@ int	get_min_nextcheck()
 	int min=-1;
 	int nodata=0;
 
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","get_min_nextcheck: start");
+INIT_CHECK_MEMORY(main);
+
+//	LOG_DEBUG_INFO("s","get_min_nextcheck: start");
 
 	for(i=0;;i++)
 	{
@@ -125,11 +137,12 @@ int	get_min_nextcheck()
 
 	if(nodata==0)
 	{
-//		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","get_min_nextcheck: end: FAIL");
-		return	FAIL;
+//		LOG_DEBUG_INFO("s","get_min_nextcheck: end: FAIL");
+		min = FAIL;
 	}
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","get_min_nextcheck: end");
+//	LOG_DEBUG_INFO("s","get_min_nextcheck: end");
 
+CHECK_MEMORY(main,"add_check","end");
 	return min;
 }
 
@@ -137,7 +150,7 @@ void	add_check(char *key, int refresh, int lastlogsize)
 {
 	int i;
 
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","add_check: start");
+//	LOG_DEBUG_INFO("s","add_check: start");
 
 	for(i=0;;i++)
 	{
@@ -165,7 +178,7 @@ void	add_check(char *key, int refresh, int lastlogsize)
 			break;
 		}
 	}
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","add_check: end");
+//	LOG_DEBUG_INFO("s","add_check: end");
 }
 
 // Return position of Nth delimiter from right size, 0 - otherwise
@@ -174,14 +187,17 @@ int strnrchr(char *str, int num, char delim)
 	int i=0;
 	int n=0;
 
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","strnrchr: start");
+INIT_CHECK_MEMORY(main);
+
+//	LOG_DEBUG_INFO("s","strnrchr: start");
 	for(i=strlen(str)-1;i>=0;i--)
 	{
 		if(str[i]==delim) n++;
 		if(n==num) break;
 	}
 	if(i==-1) i=0;
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","strnrchr: end");
+//	LOG_DEBUG_INFO("s","strnrchr: end");
+CHECK_MEMORY(main,"strnrchr","end");
 	return i;
 }
 
@@ -198,7 +214,7 @@ int	parse_list_of_checks(char *str)
 	char *str_copy;
 	int p1,p2;
 
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","parse_list_of_checks: start");
+//	LOG_DEBUG_INFO("s","parse_list_of_checks: start");
 	disable_all_metrics();
 
 	str_copy=str;
@@ -243,7 +259,7 @@ int	parse_list_of_checks(char *str)
 		pos=strchr(str_copy,'\n');
 	}
 
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","parse_list_of_checks: end");
+//	LOG_DEBUG_INFO("s","parse_list_of_checks: end");
 	return SUCCEED;
 }
 
@@ -259,7 +275,6 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 	struct sockaddr_in servaddr_in;
 
 //	zabbix_log( LOG_LEVEL_DEBUG, "get_active_checks: host[%s] port[%d]", server, port);
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","get_active_checks: start");
 
 	servaddr_in.sin_family=AF_INET;
 	hp=gethostbyname(server);
@@ -268,7 +283,6 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 	{
 //		zabbix_log( LOG_LEVEL_WARNING, "gethostbyname() failed [%s]", hstrerror(h_errno));
 //		sprintf(error,"gethostbyname() failed [%s]", hstrerror(h_errno));
-
 		return	NETWORK_ERROR;
 	}
 
@@ -284,6 +298,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 //				strerror(errno));
 		return	FAIL;
 	}
+
 	if( connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
 		switch (errno)
@@ -309,6 +324,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 
 	sprintf(c,"%s\n%s\n","ZBX_GET_ACTIVE_CHECKS",confHostname);
 //	zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", c);
+
 	if( sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 //	if( write(s,c,strlen(c)) == -1 )
 	{
@@ -404,7 +420,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 //		zabbix_log(LOG_LEVEL_WARNING, "Problem with close [%s]", strerror(errno));
 	}
 
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","get_active_checks: end");
+//	LOG_DEBUG_INFO("s","get_active_checks: end");
 	return SUCCEED;
 }
 
@@ -416,12 +432,18 @@ int	send_value(char *server,int port,char *host, char *key,char *value,char *las
 	char	result[1024];
 	char	tmp[1024];
 	struct hostent *hp;
-
 	struct sockaddr_in myaddr_in;
 	struct sockaddr_in servaddr_in;
+	int		ret = SUCCEED;
 
 //	zabbix_log( LOG_LEVEL_DEBUG, "In send_value()");
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","send_value: start");
+//LOG_DEBUG_INFO("s","send_value: start");
+//LOG_DEBUG_INFO("s","send_value: key");
+//LOG_DEBUG_INFO("s",key);
+//LOG_DEBUG_INFO("s","send_value: value");
+//LOG_DEBUG_INFO("s",value);
+
+INIT_CHECK_MEMORY(main);
 
 	servaddr_in.sin_family=AF_INET;
 	hp=gethostbyname(server);
@@ -429,8 +451,9 @@ int	send_value(char *server,int port,char *host, char *key,char *value,char *las
 	if(hp==NULL)
 	{
 		sprintf(tmp,"gethostbyname() failed");
-	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tmp);
-		return	FAIL;
+		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tmp);
+		ret = FAIL;
+		goto lbl_End;
 	}
 
 	servaddr_in.sin_addr.s_addr=((struct in_addr *)(hp->h_addr))->s_addr;
@@ -443,8 +466,8 @@ int	send_value(char *server,int port,char *host, char *key,char *value,char *las
 //		zabbix_log( LOG_LEVEL_WARNING, "Error in socket() [%s:%d] [%s]",server,port, strerror(errno));
 		sprintf(tmp,"Error in socket()");
 	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tmp);
-
-		return	FAIL;
+		ret = FAIL;
+		goto lbl_End;
 	}
 
 /*	ling.l_onoff=1;*/
@@ -464,20 +487,21 @@ int	send_value(char *server,int port,char *host, char *key,char *value,char *las
 		sprintf(tmp,"Error in connect()");
 	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tmp);
 		closesocket(s);
-		return	FAIL;
+		ret = FAIL;
+		goto lbl_End;
 	}
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","send_value: 1");
+//	LOG_DEBUG_INFO("s","send_value: 1");
 	comms_create_request(host,key,value,lastlogsize,timestamp,source,severity,tosend,sizeof(tosend)-1);
 
 //	i=strlen(tosend);
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",i);
+//	LOG_DEBUG_INFO("d",i);
 
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tosend);
+//	LOG_DEBUG_INFO("s",tosend);
 
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","send_value: 2");
+//	LOG_DEBUG_INFO("s","send_value: 2");
 //	sprintf(tosend,"%s:%s\n",shortname,value);
 
-//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tosend);
+//	LOG_DEBUG_INFO("s",tosend);
 
 	if( sendto(s,tosend,strlen(tosend),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
@@ -486,34 +510,38 @@ sprintf(tmp,"Error in sendto()");
 	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tmp);
 
 		closesocket(s);
-		return	FAIL;
+		ret = FAIL;
+		goto lbl_End;
 	} 
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","send_value: 3");
+//	LOG_DEBUG_INFO("s","send_value: 3");
 	i=sizeof(struct sockaddr_in);
 /*	i=recvfrom(s,result,1023,0,(struct sockaddr *)&servaddr_in,(size_t *)&i);*/
 	i=recvfrom(s,result,1023,0,(struct sockaddr *)&servaddr_in,(int *)&i);
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","send_value: 4");
+//	LOG_DEBUG_INFO("s","send_value: 4");
 	if(s==-1)
 	{
 //		zabbix_log( LOG_LEVEL_WARNING, "Error in recvfrom() [%s:%d] [%s]",server,port, strerror(errno));
-sprintf(tmp,"Error in recvfrom()");
+	sprintf(tmp,"Error in recvfrom()");
 	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tmp);
 
 		closesocket(s);
-		return	FAIL;
+		ret = FAIL;
+		goto lbl_End;
 	}
 
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","send_value: 5");
+//	LOG_DEBUG_INFO("s","send_value: 5");
 	result[i-1]=0;
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","send_value: 6");
+//	LOG_DEBUG_INFO("s","send_value: 6");
 
 	if(strcmp(result,"OK") == 0)
 	{
 //		zabbix_log( LOG_LEVEL_DEBUG, "OK");
+//	LOG_DEBUG_INFO("s","send result = OK");
 	}
 	else
 	{
 //		zabbix_log( LOG_LEVEL_DEBUG, "NOT OK [%s]", shortname);
+//	LOG_DEBUG_INFO("s","send result = NOT OK");
 	}
  
 	if( closesocket(s)!=0 )
@@ -521,8 +549,12 @@ sprintf(tmp,"Error in recvfrom()");
 //		zabbix_log( LOG_LEVEL_WARNING, "Error in close() [%s] [%s]",server, strerror(errno));
 	}
 
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","send_value: end");
-	return SUCCEED;
+//	LOG_DEBUG_INFO("s","send_value: end");
+
+lbl_End:
+
+CHECK_MEMORY(main, "send_value", "end");
+	return ret;
 }
 
 int	process_active_checks(char *server, int port)
@@ -544,7 +576,9 @@ int	process_active_checks(char *server, int port)
 	char	c[MAX_STRING_LEN];
 	char	*filename;
 
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pac: start");
+INIT_CHECK_MEMORY(main);
+
+//	LOG_DEBUG_INFO("s","pac: start");
 	now=time(NULL);
 
 	for(i=0;;i++)
@@ -553,7 +587,7 @@ int	process_active_checks(char *server, int port)
 		if(metrics[i].nextcheck>now)			continue;
 		if(metrics[i].status!=ITEM_STATUS_ACTIVE)	continue;
 
-//		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",metrics[i].key);
+//		LOG_DEBUG_INFO("s",metrics[i].key);
 		/* Special processing for log files */
 		if(strncmp(metrics[i].key,"log[",4) == 0)
 		{
@@ -569,23 +603,23 @@ int	process_active_checks(char *server, int port)
 			{
 //				sprintf(shortname, "%s:%s",confHostname,metrics[i].key);
 //				zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
-//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",shortname);
+//				LOG_DEBUG_INFO("s",shortname);
 
-//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pac: 1");
+//				LOG_DEBUG_INFO("s","pac: 1");
 				sprintf(lastlogsize,"%d",metrics[i].lastlogsize);
 //				for(int j=0;j<=MAX_STRING_LEN;j++)
 //				{
 //					value[j]='0';
 //				}
 //				value[MAX_STRING_LEN]=0;
-//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pac: 2");
-//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",value);
+				LOG_DEBUG_INFO("s","pac: 2");
+				LOG_DEBUG_INFO("s",value);
 				if(send_value(server,port,confHostname,metrics[i].key, value, lastlogsize,timestamp,source,severity) == FAIL)
 				{
 					ret = FAIL;
 					break;
 				}
-//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pac: 3");
+//				LOG_DEBUG_INFO("s","pac: 3");
 				if(strcmp(value,"ZBX_NOTSUPPORTED\n")==0)
 				{
 					metrics[i].status=ITEM_STATUS_NOTSUPPORTED;
@@ -600,12 +634,12 @@ int	process_active_checks(char *server, int port)
 		/* Special processing for log files */
 		else if(strncmp(metrics[i].key,"eventlog[",9) == 0)
 		{
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_active_checks: 1");
+//	LOG_DEBUG_INFO("s","process_active_checks: 1");
 
 			strscpy(c,metrics[i].key);
 			filename=strtok(c,"[]");
 			filename=strtok(NULL,"[]");
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_active_checks: 2");
+//	LOG_DEBUG_INFO("s","process_active_checks: 2");
 
 			count=0;
 			while(process_eventlog_new(filename,&metrics[i].lastlogsize, timestamp, source, severity, value) == 0)
@@ -613,10 +647,13 @@ int	process_active_checks(char *server, int port)
 //				sprintf(shortname, "%s:%s",confHostname,metrics[i].key);
 //				zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
 
-//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pac:in loop()");
-//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",value);
+//				LOG_DEBUG_INFO("s","pac:in loop()");
+//				LOG_DEBUG_INFO("s","pac: metrics[i].key");
+//				LOG_DEBUG_INFO("s",metrics[i].key);
+//				LOG_DEBUG_INFO("s","pac: value");
+//				LOG_DEBUG_INFO("s",value);
 
-//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pac:3");
+//				LOG_DEBUG_INFO("s","pac:3");
 				sprintf(lastlogsize,"%d",metrics[i].lastlogsize);
 				if(send_value(server,port,confHostname,metrics[i].key,value,lastlogsize,timestamp,source,severity) == FAIL)
 				{
@@ -630,10 +667,10 @@ int	process_active_checks(char *server, int port)
 					break;
 				}
 				count++;
-//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pac: end of loop()");
+//				LOG_DEBUG_INFO("s","pac: end of loop()");
 				/* Do not flood ZABBIX server if file grows too fast */
 				if(count >= MAX_LINES_PER_SECOND*metrics[i].refresh)	break;
-//				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","pac: 4");
+//				LOG_DEBUG_INFO("s","pac: 4");
 			}
 		}
 		else
@@ -646,12 +683,14 @@ int	process_active_checks(char *server, int port)
 			strcpy(rq.cmd,metrics[i].key);
 
 			   
-   hThread=(HANDLE)_beginthreadex(NULL,0,ProcessingThread,(void *)&rq,0,&tid);
-   if (WaitForSingleObject(hThread,confTimeout)==WAIT_TIMEOUT)
-   {
-      strcpy(rq.result,"ZBX_ERROR\n");
-      statTimedOutRequests++;
-   }
+		   hThread=(HANDLE)_beginthreadex(NULL,0,ProcessingThread,(void *)&rq,0,&tid);
+
+		   if (WaitForSingleObject(hThread,confTimeout)==WAIT_TIMEOUT)
+		   {
+			  strcpy(rq.result,"ZBX_ERROR\n");
+			  statTimedOutRequests++;
+		   }
+		   CloseHandle(hThread);
 
    //send(sock,rq.result,strlen(rq.result),0);
 
@@ -674,13 +713,14 @@ int	process_active_checks(char *server, int port)
 
 		metrics[i].nextcheck=time(NULL)+metrics[i].refresh;
 	}
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","process_active_checks: end");
+//	LOG_DEBUG_INFO("s","process_active_checks: end");
+CHECK_MEMORY(main, "process_active_checks", "end");
 	return ret;
 }
 
 void	refresh_metrics(char *server, int port, char *error, int max_error_len)
 {
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","refresh_metrics: start");
+//	LOG_DEBUG_INFO("s","refresh_metrics: start");
 //	zabbix_log( LOG_LEVEL_DEBUG, "In refresh_metrics()");
 	while(get_active_checks(server, port, error, sizeof(error)) != SUCCEED)
 	{
@@ -690,7 +730,7 @@ void	refresh_metrics(char *server, int port, char *error, int max_error_len)
 #endif
 		Sleep(60*1000);
 	}
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","refresh_metrics: end");
+//	LOG_DEBUG_INFO("s","refresh_metrics: end");
 }
 
 void    ActiveChecksThread(void *)
@@ -699,33 +739,36 @@ void    ActiveChecksThread(void *)
 	int	sleeptime, nextcheck;
 	int	nextrefresh;
 
-//	zabbix_log( LOG_LEVEL_WARNING, "zabbix_agentd %ld started",(long)getpid());
+INIT_CHECK_MEMORY(main);
 
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"d",confServerPort);
+//	LOG_DEBUG_INFO("s", "ActiveChecksThread start");
 
+//	LOG_DEBUG_INFO("d",confServerPort);
 
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","ActiveChecksThread: start");
-	init_list();
+	InitMetrics();
 
 	refresh_metrics(confServer, confServerPort, error, sizeof(error));
-	nextrefresh=time(NULL)+300;
+	nextrefresh=time(NULL)+10;
 
-	for(;;)
+	for(;;)	
 	{
-//		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","ActiveChecksThread: loop 1");
+INIT_CHECK_MEMORY(for);
+//LOG_DEBUG_INFO("s","ActiveChecksThread: loop 1");
 		if(process_active_checks(confServer, confServerPort) == FAIL)
 		{
-			Sleep(60*1000);
+			Sleep(10*1000);
+CHECK_MEMORY(for, "ActiveChecksThread", "end for 1");
 			continue;
 		}
-		nextcheck=get_min_nextcheck();
-		if( FAIL == nextcheck)
+
+		nextcheck = get_min_nextcheck();
+		if(nextcheck = FAIL)
 		{
-			sleeptime=60;
+			sleeptime=10;
 		}
 		else
 		{
-			sleeptime=nextcheck-time(NULL);
+			sleeptime = nextcheck-time(NULL);
 			if(sleeptime<0)
 			{
 				sleeptime=0;
@@ -733,9 +776,9 @@ void    ActiveChecksThread(void *)
 		}
 		if(sleeptime>0)
 		{
-			if(sleeptime > 60)
+			if(sleeptime > 10)
 			{
-				sleeptime = 60;
+				sleeptime = 10;
 			}
 //			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
 //					sleeptime );
@@ -750,9 +793,17 @@ void    ActiveChecksThread(void *)
 		if(time(NULL)>=nextrefresh)
 		{
 			refresh_metrics(confServer, confServerPort, error, sizeof(error));
-			nextrefresh=time(NULL)+300;
+			nextrefresh=time(NULL)+10;
 		}
-//		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","ActiveChecksThread: loop 2");
+
+//		LOG_DEBUG_INFO("s","ActiveChecksThread: loop 2");
+CHECK_MEMORY(for, "ActiveChecksThread", "end for");
 	}
-//	WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","ActiveChecksThread: end");
+/**/
+	FreeMetrics();
+
+CHECK_MEMORY(main, "ActiveChecksThread", "end");
+//LOG_DEBUG_INFO("s", "ActiveChecksThread end");
+
+	_endthread();
 }

@@ -138,6 +138,9 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 			strscpy(expression_old, expression);
 
 			snprintf(sql,sizeof(sql)-1,"update triggers set expression='%s' where triggerid=%d", expression, triggerid_new );
+
+			free(expression);
+
 			DBexecute(sql);
 		}
 		DBfree_result(result2);

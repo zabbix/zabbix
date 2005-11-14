@@ -59,18 +59,23 @@ static void Help(void)
 BOOL ParseCommandLine(int argc,char *argv[])
 {
    int i;
+   BOOL ret = TRUE;
+
+INIT_CHECK_MEMORY(main);
 
    for(i=1;i<argc;i++)
    {
       if (!strcmp(argv[i],"help"))    // Display help and exit
       {
          Help();
-         return FALSE;
+         ret = FALSE;
+		 goto lbl_end;
       }
       else if (!strcmp(argv[i],"version"))    // Display version and exit
       {
          printf("Zabbix Win32 Agent Version " AGENT_VERSION " Build of " __DATE__ "\n");
-         return FALSE;
+         ret = FALSE;
+		 goto lbl_end;
       }
       else if (!strcmp(argv[i],"--config"))  // Config file
       {
@@ -80,7 +85,8 @@ BOOL ParseCommandLine(int argc,char *argv[])
       else if (!strcmp(argv[i],"standalone"))  // Run in standalone mode
       {
          dwFlags|=AF_STANDALONE;
-         return TRUE;
+         ret = TRUE;
+		 goto lbl_end;
       }
       else if ((!strcmp(argv[i],"install"))||
                (!strcmp(argv[i],"install-events")))
@@ -102,44 +108,53 @@ BOOL ParseCommandLine(int argc,char *argv[])
             ZabbixCreateService(path);
          else
             ZabbixInstallEventSource(path);
-         return FALSE;
+         ret = FALSE;
+		 goto lbl_end;
       }
       else if (!strcmp(argv[i],"remove"))
       {
          ZabbixRemoveService();
-         return FALSE;
+         ret = FALSE;
+		 goto lbl_end;
       }
       else if (!strcmp(argv[i],"remove-events"))
       {
          ZabbixRemoveEventSource();
-         return FALSE;
+         ret = FALSE;
+		 goto lbl_end;
       }
       else if (!strcmp(argv[i],"start"))
       {
          ZabbixStartService();
-         return FALSE;
+         ret = FALSE;
+		 goto lbl_end;
       }
       else if (!strcmp(argv[i],"stop"))
       {
          ZabbixStopService();
-         return FALSE;
+         ret = FALSE;
+		 goto lbl_end;
       }
       else if (!strcmp(argv[i],"check-config"))
       {
          dwFlags|=AF_STANDALONE;
          printf("Checking configuration file:\n\n");
          ReadConfig();
-         return FALSE;
+         ret = FALSE;
+		 goto lbl_end;
       }
       else
       {
          printf("ERROR: Invalid command line argument\n\n");
          Help();
-         return FALSE;
+         ret = FALSE;
+		 goto lbl_end;
       }
    }
+lbl_end:
+CHECK_MEMORY(main,"GetSystemErrorText","end");
 
-   return TRUE;
+   return ret;
 }
 
 
@@ -151,6 +166,8 @@ char *GetSystemErrorText(DWORD error)
 {
    char *msgBuf;
    static char staticBuffer[1024];
+
+INIT_CHECK_MEMORY(main);
 
    if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | 
                      FORMAT_MESSAGE_FROM_SYSTEM | 
@@ -168,6 +185,8 @@ char *GetSystemErrorText(DWORD error)
       sprintf(staticBuffer,"MSG 0x%08X - Unable to find message text",error);
    }
 
+CHECK_MEMORY(main,"GetSystemErrorText","end");
+
    return staticBuffer;
 }
 
@@ -182,11 +201,15 @@ char *ExtractWord(char *line,char *buffer)
 {
    char *ptr,*bptr;
 
+INIT_CHECK_MEMORY(main);
+
    for(ptr=line;(*ptr==' ')||(*ptr=='\t');ptr++);  // Skip initial spaces
    // Copy word to buffer
    for(bptr=buffer;(*ptr!=' ')&&(*ptr!='\t')&&(*ptr!=0);ptr++,bptr++)
       *bptr=*ptr;
    *bptr=0;
+
+   CHECK_MEMORY(main,"MatchString","end");
    return ptr;
 }
 
@@ -201,6 +224,8 @@ BOOL MatchString(char *pattern,char *string)
 
    SPtr=string;
    MPtr=pattern;
+
+INIT_CHECK_MEMORY(main);
 
    while(*MPtr!=0)
    {
@@ -255,6 +280,7 @@ BOOL MatchString(char *pattern,char *string)
       }
    }
 
+CHECK_MEMORY(main,"MatchString","end");
    return *SPtr==0 ? TRUE : FALSE;
 }
 
@@ -267,11 +293,15 @@ void StrStrip(char *str)
 {
    int i;
 
+INIT_CHECK_MEMORY(main);
+
    for(i=0;(str[i]!=0)&&((str[i]==' ')||(str[i]=='\t'));i++);
    if (i>0)
       memmove(str,&str[i],strlen(&str[i])+1);
    for(i=strlen(str)-1;(i>=0)&&((str[i]==' ')||(str[i]=='\t'));i--);
    str[i+1]=0;
+
+CHECK_MEMORY(main,"StrStrip","end");
 }
 
 
@@ -283,9 +313,13 @@ void CalculateMD5Hash(const unsigned char *data,int nbytes,unsigned char *hash)
 {
 	md5_state_t state;
 
+INIT_CHECK_MEMORY(main);
+
 	md5_init(&state);
 	md5_append(&state,(const md5_byte_t *)data,nbytes);
 	md5_finish(&state,(md5_byte_t *)hash);
+
+CHECK_MEMORY(main,"CalculateMD5Hash","end");
 }
 
 
@@ -359,6 +393,8 @@ DWORD CalculateCRC32(const unsigned char *data,DWORD nbytes)
 	register DWORD crc,len;
    register const unsigned char *ptr;
 
+INIT_CHECK_MEMORY(main);
+
 	crc=0;
 	for(len=nbytes,ptr=data;len>0;ptr++,len--)
       crc=(crc << 8)^crctab[(crc >> 24)^(*ptr)];
@@ -366,6 +402,8 @@ DWORD CalculateCRC32(const unsigned char *data,DWORD nbytes)
 	// Include the length of the data block
 	for (len=nbytes;len!=0;len>>=8)
       crc=(crc << 8)^crctab[(crc >> 24)^(len & 0xFF)];
+
+CHECK_MEMORY(main,"GetPdhErrorText","end2");
 
 	return ~crc;
 }
@@ -380,6 +418,8 @@ char *GetPdhErrorText(DWORD error)
    char *msgBuf;
    static char staticBuffer[1024];
 
+INIT_CHECK_MEMORY(main);
+
    if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | 
                      FORMAT_MESSAGE_FROM_HMODULE | 
                      FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -390,10 +430,12 @@ char *GetPdhErrorText(DWORD error)
       msgBuf[strcspn(msgBuf,"\r\n")]=0;
       strncpy(staticBuffer,msgBuf,1023);
       LocalFree(msgBuf);
+CHECK_MEMORY(main,"GetPdhErrorText","end1");
       return staticBuffer;
    }
    else
    {
+CHECK_MEMORY(main,"GetPdhErrorText","end2");
       return GetSystemErrorText(error);
    }
 }
@@ -444,5 +486,20 @@ char *GetCounterName(DWORD index)
 			return "UnknownPerformanceCounter";
 		}
 	}
+
 	return (char *)&counterName->name;
+}
+
+void FreeCounterList(void)
+{
+	PERFCOUNTER	*curr;
+	PERFCOUNTER	*next;
+		
+	next = perfCounterList;
+	while(next!=NULL)
+	{
+		curr = next;
+		next = curr->next;
+		free(curr);
+	}
 }

@@ -172,6 +172,9 @@ int	DBadd_action_to_linked_hosts(int actionid,int hostid)
 			message=string_replace(action.message, old, new);
 
 			zabbix_log( LOG_LEVEL_DEBUG, "Before DBadd_action");
+
+			free(message);
+
 			DBadd_action(atoi(DBget_field(result2,j,0)), action.userid, action.good, action.delay, action.subject, message, action.scope, action.severity, action.recipient, action.userid);
 		}
 		DBfree_result(result2);
