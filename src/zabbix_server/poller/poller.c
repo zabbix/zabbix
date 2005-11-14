@@ -139,7 +139,8 @@ static int get_minnextcheck(int now)
 static void update_key_status(int hostid,int host_status)
 {
 	char		sql[MAX_STRING_LEN];
-	char		value_str[MAX_STRING_LEN];
+/*	char		value_str[MAX_STRING_LEN];*/
+	AGENT_RESULT	agent;
 
 	DB_ITEM		item;
 	DB_RESULT	*result;
@@ -157,9 +158,15 @@ static void update_key_status(int hostid,int host_status)
 	{
 		DBget_item_from_db(&item,result,0);
 	
-		snprintf(value_str,sizeof(value_str)-1,"%d",host_status);
+/*		snprintf(value_str,sizeof(value_str)-1,"%d",host_status);*/
 
-		process_new_value(&item,value_str);
+		init_result(&agent);
+		agent.type |= AR_UINT64;
+		agent.ui64=(zbx_uint64_t)host_status;
+		process_new_value(&item,&agent);
+/*		process_new_value(&item,value_str);*/
+		free_result(&agent);
+
 		update_triggers(item.itemid);
 	}
 
@@ -223,7 +230,7 @@ int get_values(void)
 				item.host_available=HOST_AVAILABLE_TRUE;
 				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
 				zabbix_syslog("Enabling host [%s]", item.host );
-				DBupdate_host_availability(item.hostid,HOST_AVAILABLE_TRUE,now,error);
+				DBupdate_host_availability(item.hostid,HOST_AVAILABLE_TRUE,now,agent.msg);
 				update_key_status(item.hostid,HOST_STATUS_MONITORED);
 
 /* Why this break??? Trigger needs to be updated anyway!
@@ -235,14 +242,14 @@ int get_values(void)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Parameter [%s] is not supported by agent on host [%s]", item.key, item.host );
 			zabbix_syslog("Parameter [%s] is not supported by agent on host [%s]", item.key, item.host );
-			DBupdate_item_status_to_notsupported(item.itemid, error);
+			DBupdate_item_status_to_notsupported(item.itemid, agent.str);
 /*			if(HOST_STATUS_UNREACHABLE == item.host_status)*/
 			if(HOST_AVAILABLE_TRUE != item.host_available)
 			{
 				item.host_available=HOST_AVAILABLE_TRUE;
 				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
 				zabbix_syslog("Enabling host [%s]", item.host );
-				DBupdate_host_availability(item.hostid,HOST_AVAILABLE_TRUE,now,error);
+				DBupdate_host_availability(item.hostid,HOST_AVAILABLE_TRUE,now,agent.msg);
 				update_key_status(item.hostid,HOST_STATUS_MONITORED);	
 
 				stop=1;
@@ -255,7 +262,7 @@ int get_values(void)
 			{
 				zabbix_log( LOG_LEVEL_WARNING, "Host [%s] will be checked after [%d] seconds", item.host, DELAY_ON_NETWORK_FAILURE );
 				zabbix_syslog("Host [%s] will be checked after [%d] seconds", item.host, DELAY_ON_NETWORK_FAILURE );
-				DBupdate_host_availability(item.hostid,HOST_AVAILABLE_FALSE,now,error);
+				DBupdate_host_availability(item.hostid,HOST_AVAILABLE_FALSE,now,agent.msg);
 				update_key_status(item.hostid,HOST_AVAILABLE_FALSE);	
 
 				snprintf(sql,sizeof(sql)-1,"update hosts set network_errors=3 where hostid=%d", item.hostid);
@@ -284,7 +291,7 @@ int get_values(void)
 			zabbix_syslog("Getting value of [%s] from host [%s] failed", item.key, item.host );
 			zabbix_log( LOG_LEVEL_WARNING, "The value is not stored in database.");
 		}
-		free(result(&agent));
+		free_result(&agent);
 	}
 
 	DBfree_result(result);

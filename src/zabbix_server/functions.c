@@ -577,17 +577,18 @@ void	process_new_value(DB_ITEM *item,char *value)
 	time_t 	now;
 	char	sql[MAX_STRING_LEN];
 	char	value_esc[MAX_STRING_LEN];
-	char	value_str[MAX_STRING_LEN];
-	double	value_double;
+/*	char	value_str[MAX_STRING_LEN];
+	double	value_double;*/
 	double	multiplier;
 	char	*e;
 
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_new_value()");
+
 	now = time(NULL);
 
-	strscpy(value_str, value);
+/*	strscpy(value_str, value);*/
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In process_new_value()");
-	value_double=strtod(value_str,&e);
+/*	value_double=strtod(value_str,&e);*/
 
 	if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (item->multiplier == ITEM_MULTIPLIER_USE))
 	{
