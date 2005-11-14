@@ -21,3 +21,16 @@ CREATE TABLE servers (
 );
 insert into servers values(1,'DEFAULT','127.0.0.1',10051);
 
+--
+-- Table structure for table 'history_uint'
+--
+
+CREATE TABLE history_uint (
+  itemid		int4		DEFAULT '0' NOT NULL,
+  clock			int4		DEFAULT '0' NOT NULL,
+  value			double precision	DEFAULT '0' NOT NULL,
+--  PRIMARY KEY (itemid,clock),
+  FOREIGN KEY (itemid) REFERENCES items
+);
+
+CREATE INDEX history_uint_i_c on history_uint (itemid, clock);
