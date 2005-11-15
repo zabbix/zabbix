@@ -37,8 +37,7 @@ static ALIAS *aliasList=NULL;
 
 BOOL AddAlias(char *name,char *value)
 {
-   ALIAS *alias;
-   BOOL ret = TRUE;
+/*
 
    // Find alias in the list
 	for(alias=aliasList;alias!=NULL;alias=alias->next)
@@ -68,6 +67,51 @@ BOOL AddAlias(char *name,char *value)
 	}
 
    return ret;
+*/
+   ALIAS *alias;
+   BOOL ret = FALSE;
+
+	for(alias=aliasList; ; alias=alias->next)
+	{
+		/* Add new parameters */
+		if(alias == NULL)
+		{
+			alias=(ALIAS *)malloc(sizeof(ALIAS));
+			if (alias==NULL)
+			{
+				memset(alias,0,sizeof(ALIAS));
+				strncpy(alias->name, name, MAX_ALIAS_NAME-1);
+				alias->value = (char *)malloc(strlen(value)+1);
+				strcpy(alias->value,value);
+				alias->next=aliasList;
+				aliasList=alias;
+
+				ret = TRUE;
+			}
+			break;
+		}
+
+		/* Replace existing parameters */
+		if (strcmp(alias->name, name) == 0)
+		{
+			if(alias->value)
+				free(alias->value);
+
+			memset(alias, 0, sizeof(ALIAS));
+			
+			strncpy(alias->name, name, MAX_ALIAS_NAME-1);
+			
+			alias->value = (char *)malloc(strlen(value)+1);
+			strcpy(alias->value, value);
+
+			alias->next = aliasList;
+			aliasList = alias;
+
+			ret = TRUE;
+			break;
+		}
+	}
+	return ret;
 }
 
 void	FreeAliasList(void)
