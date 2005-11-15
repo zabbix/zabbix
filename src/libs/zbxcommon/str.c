@@ -167,6 +167,9 @@ int	num_param(const char *param)
 	int	i;
 	int	ret = 1;
 
+	if(param == NULL) 
+		return 0;
+	
 	for(i=0;param[i]!=0;i++)
 	{
 		if(param[i]==',')	ret++;
@@ -174,3 +177,4 @@ int	num_param(const char *param)
 
 	return ret;
 }
+
