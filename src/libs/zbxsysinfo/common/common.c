@@ -77,18 +77,19 @@ void	add_user_parameter(char *key,char *command)
 	char	usr_param[MAX_STRING_LEN];
 	unsigned	flag = 0;
 
-	if(parse_command(key, usr_cmd, MAX_STRING_LEN, usr_param, MAX_STRING_LEN))
+	i = parse_command(key, usr_cmd, MAX_STRING_LEN, usr_param, MAX_STRING_LEN);
+	if(i == 0)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Can't add user specifed key \"%s\". Incorrect key!", key);
 		return;
-	}
-	if(strncmp(usr_param, "*", MAX_STRING_LEN) == 0)
+	} 
+	else if(i == 2) /* with specifed parameters */
 	{
+		if(usr_param[0] != '\0'){ /* must be emprty parameters */
+			zabbix_log( LOG_LEVEL_WARNING, "Can't add user specifed key \"%s\". Incorrect key!", key);
+			return;
+		}
 		flag |= CF_USEUPARAM;
-	}
-	else if(usr_param[0] != 0){
-		zabbix_log( LOG_LEVEL_WARNING, "Can't add user specifed key \"%s\". Incorrect key!", key);
-		return;
 	}
 		
 	for(i=0;;i++)
@@ -238,7 +239,7 @@ void	init_result(AGENT_RESULT *result)
 	result->ui64 = 0;	
 }
 
-int parse_command(
+int parse_command( /* return value: 0 - error; 1 - command without parameters; 2 - command with parameters */
 		const char *command,
 		char *cmd,
 		int cmd_max_len,
@@ -248,6 +249,7 @@ int parse_command(
 {
 	char *pl, *pr;
 	char localstr[MAX_STRING_LEN];
+	int ret = 2;
 
 	strncpy(localstr, command, MAX_STRING_LEN);
 	
@@ -260,10 +262,10 @@ int parse_command(
 	pr = strstr(localstr, "]");
 
 	if(pl > pr)
-		return 1;
+		return 0;
 
 	if((pl && !pr) || (!pl && pr))
-		return 1;
+		return 0;
 	
 	if(pl != NULL)
 		pl[0] = 0;
@@ -275,8 +277,11 @@ int parse_command(
 
 	if(pl && pr && param)
 		strncpy(param, &pl[1] , param_max_len);
+
+	if(!pl && !pr)
+		ret = 1;
 	
-	return 0;
+	return ret;
 }
 
 void	test_parameters(void)
@@ -312,6 +317,59 @@ void	test_parameters(void)
 	}
 }
 
+int	replace_param(const char *cmd, const char *param, char *out, int outlen)
+{
+	int ret = SUCCEED;
+	char buf[MAX_STRING_LEN];
+	char command[MAX_STRING_LEN];
+	char *pl, *pr;
+	
+	assert(out);
+
+	out[0] = '\0';
+
+	if(!cmd && !param)
+		return ret;
+	
+	strncpy(command, cmd, MAX_STRING_LEN);
+			
+	pl = command;
+	while((pr = strchr(pl, '$')) && outlen > 0)
+	{
+		pr[0] = '\0';
+		strncat(out, pl, outlen);
+		outlen -= MIN(strlen(pl), outlen);
+		pr[0] = '$';
+		
+		if (pr[1] >= '0' && pr[1] <= '9')
+		{
+			buf[0] = '\0';
+
+			if(pr[1] == '0')
+			{
+				strncpy(buf, cmd, MAX_STRING_LEN);
+			}
+			else
+			{
+				get_param(param, (int)(pr[1] - '0'), buf, MAX_STRING_LEN);
+			}
+			
+			strncat(out, buf, outlen);
+			outlen -= MIN(strlen(buf), outlen);
+					
+			pl = pr + 2;
+			continue;
+		}
+		pl = pr + 1;
+		strncat(out, "$", outlen);
+		outlen -= 1;
+	}
+	strncat(out, pl, outlen);
+	outlen -= MIN(strlen(pl), outlen);
+	
+	return ret;
+}
+
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 {
 	char	*p;
@@ -344,7 +402,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	
 	function=0;
 	
-	if(parse_command(usr_command, usr_cmd, MAX_STRING_LEN, usr_param, MAX_STRING_LEN) == 0)
+	if(parse_command(usr_command, usr_cmd, MAX_STRING_LEN, usr_param, MAX_STRING_LEN) != 0)
 	{
 
 		for(i=0; commands[i].key != 0; i++)
@@ -361,25 +419,40 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	{
 		param[0] = '\0';	
 		
-		if(commands[i].main_param && (commands[i].flags & CF_USEUPARAM))
+		if(commands[i].flags & CF_USEUPARAM)
 		{
-			snprintf(param, MAX_STRING_LEN, "%s \"%s\"",
+			if(flags & PF_TEST && commands[i].test_param)
+			{
+				strncpy(usr_param, commands[i].test_param, MAX_STRING_LEN);
+			}
+		} 
+		else
+		{
+			usr_param[0] = '\0';
+		}
+		
+		if(commands[i].main_param)
+		{
+			err = replace_param(
 				commands[i].main_param,
-				((flags & PF_TEST) && commands[i].test_param) ? commands[i].test_param : usr_param
-				);
+				usr_param,
+				param,
+				MAX_STRING_LEN);
 		}
-		else if(commands[i].flags & CF_USEUPARAM)
+		else
 		{
-			snprintf(param, MAX_STRING_LEN, "%s",
-				((flags & PF_TEST) && commands[i].test_param) ? commands[i].test_param : usr_param
-				);
+			snprintf(param, MAX_STRING_LEN, "%s", usr_param);
 		}
-		err = function(usr_command, param, flags, result);
 
-		if(err == SYSINFO_RET_FAIL)
-			err = NOTSUPPORTED;
-		else if(err == SYSINFO_RET_TIMEOUT)
-			err = TIMEOUT_ERROR;
+		if(err != FAIL)
+		{
+			err = function(usr_command, param, flags, result);
+
+			if(err == SYSINFO_RET_FAIL)
+				err = NOTSUPPORTED;
+			else if(err == SYSINFO_RET_TIMEOUT)
+				err = TIMEOUT_ERROR;
+		}
 	}
 	else
 	{
@@ -1015,7 +1088,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
         init_result(result);
 	
 	strncpy(command, param, MAX_STRING_LEN);
-
+	
 	f=popen(command,"r");
 	if(f==0)
 	{
