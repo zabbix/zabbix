@@ -572,7 +572,7 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
  * Comments: for trapper poller process                                       *
  *                                                                            *
  ******************************************************************************/
-void	process_new_value(DB_ITEM *item,char *value)
+void	process_new_value(DB_ITEM *item, AGENT_RESULT *value)
 {
 	time_t 	now;
 	char	sql[MAX_STRING_LEN];
@@ -590,39 +590,64 @@ void	process_new_value(DB_ITEM *item,char *value)
 
 /*	value_double=strtod(value_str,&e);*/
 
-	if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (item->multiplier == ITEM_MULTIPLIER_USE))
+	if(item->multiplier == ITEM_MULTIPLIER_USE)
 	{
-		multiplier = strtod(item->formula,&e);
-		value_double = value_double * multiplier;
-		snprintf(value_str,sizeof(value_str)-1,"%f",value_double);
+		if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_DOUBLE))
+		{
+			multiplier = strtod(item->formula,&e);
+			value->dbl = value->dbl * multiplier;
+		}
+		if( (item->value_type==ITEM_VALUE_TYPE_UINT64) && (value->type & AR_UINT64))
+		{
+			value->ui64 = value->ui64 * (zbx_uint64_t)atoll(item->formula);
+		}
 	}
 
 	if(item->history>0)
 	{
-		if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
+		if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) || (item->value_type==ITEM_VALUE_TYPE_UINT64))
 		{
 			/* Should we store delta or original value? */
 			if(item->delta == ITEM_STORE_AS_IS)
 			{
-				DBadd_history(item->itemid,value_double,now);
+				if(value->type & AR_UINT64)
+				{
+					DBadd_history_uint(item->itemid,value->ui64,now);
+				}
+				if(value->type & AR_DOUBLE)
+				{
+					DBadd_history(item->itemid,value->dbl,now);
+				}
 			}
 			/* Delta as speed of change */
 			else if(item->delta == ITEM_STORE_SPEED_PER_SECOND)
 			{
 				/* Save delta */
-				if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
-				{
-					DBadd_history(item->itemid, (value_double - item->prevorgvalue)/(now-item->lastclock), now);
-				}
+				if(value->type & AR_DOUBLE)
+					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value->dbl))
+					{
+						DBadd_history(item->itemid, (value->dbl - item->prevorgvalue)/(now-item->lastclock), now);
+					}
+				if(value->type & AR_UINT64)
+					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value->ui64))
+					{
+						DBadd_history_uint(item->itemid, (zbx_uint64_t)(value->ui64 - item->prevorgvalue)/(now-item->lastclock), now);
+					}
 			}
 			/* Real delta: simple difference between values */
 			else if(item->delta == ITEM_STORE_SIMPLE_CHANGE)
 			{
 				/* Save delta */
-				if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
-				{
-					DBadd_history(item->itemid, (value_double - item->prevorgvalue), now);
-				}
+				if(value->type & AR_DOUBLE)
+					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value->dbl) )
+					{
+						DBadd_history(item->itemid, (value->dbl - item->prevorgvalue), now);
+					}
+				if(value->type & AR_UINT64)
+					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value->ui64) )
+					{
+						DBadd_history_uint(item->itemid, (value->ui64 - item->prevorgvalue), now);
+					}
 			}
 			else
 			{
