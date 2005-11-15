@@ -1112,7 +1112,8 @@ echo "</head>";
 					array("label"=>S_GRAPHS,"url"=>"graphs.php"),
 					array("label"=>S_SCREENS,"url"=>"screenconf.php"),
 					array("label"=>S_MENU_SERVERS,"url"=>"servers.php"),
-					array("label"=>S_IT_SERVICES,"url"=>"services.php")
+					array("label"=>S_IT_SERVICES,"url"=>"services.php"),
+					array("label"=>S_MENU_BULKLOADER,"url"=>"bulkloader.php")
 					)
 				),
 		"login"=>array(
@@ -1670,6 +1671,19 @@ echo "</head>";
 		{
 			$sql="insert into hosts_groups (hostid,groupid) values ($hostid,".$groups[$i].")";
 			DBexecute($sql);
+		}
+	}
+
+	function	add_group($group)
+	{
+		$result=DBexecute("insert into groups (name) values ('$group')");
+		if($result)
+		{
+			return DBinsert_id($result,"groups","name");
+		}
+		else
+		{
+			return 0;
 		}
 	}
 
