@@ -77,7 +77,7 @@ int	main()
 	char	s[MAX_STRING_LEN];
 	char	value[MAX_STRING_LEN];
 	AGENT_RESULT	result;
-
+	
 	memset(&result, 0, sizeof(AGENT_RESULT));
 
 #ifdef	TEST_PARAMETERS

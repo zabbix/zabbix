@@ -310,6 +310,8 @@ void	del_zeroes(char *s);
 int	get_param(const char *param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
 
+int	replace_param(const char *cmd, const char *param, char *out, int outlen); //TMP!!!
+
 int	xml_get_data(char *xml,char *tag, char *data, int maxlen);
 int	comms_create_request(char *host, char *key, char *data, char *lastlogsize, char *request,int maxlen);
 int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastlogsize, char *timestamp,
