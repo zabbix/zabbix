@@ -1,5 +1,6 @@
 Changes for 1.1beta3:
 
+ - startup script for Tru64 (Alexei)
  - added parameters support for user specifed functions "$1 $2 .. $9" (Eugene)
  - added table history_uint (Alexei)
  - fixed memory leak for windows agent (Eugene)
