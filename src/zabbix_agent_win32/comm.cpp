@@ -53,7 +53,7 @@ INIT_CHECK_MEMORY(main);
       if (addr==confServerAddr[i])
          ret = TRUE;
 
-CHECK_MEMORY(main, "ProcessingThread", "end");
+CHECK_MEMORY(main, "IsValidServerAddr", "end");
    return ret;
 }
 
