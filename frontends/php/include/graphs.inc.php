@@ -34,15 +34,15 @@
 		return DBinsert_id($result,"graphs","graphid");
 	}
 
-	function	update_graph_item($gitemid,$itemid,$color,$drawtype,$sortorder)
+	function	update_graph_item($gitemid,$itemid,$color,$drawtype,$sortorder,$yaxisside)
 	{
-		$sql="update graphs_items set itemid=$itemid,color='$color',drawtype=$drawtype,sortorder=$sortorder where gitemid=$gitemid";
+		$sql="update graphs_items set itemid=$itemid,color='$color',drawtype=$drawtype,sortorder=$sortorder,yaxisside=$yaxisside where gitemid=$gitemid";
 		return	DBexecute($sql);
 	}
 
-	function	add_item_to_graph($graphid,$itemid,$color,$drawtype,$sortorder)
+	function	add_item_to_graph($graphid,$itemid,$color,$drawtype,$sortorder,$yaxisside)
 	{
-		$sql="insert into graphs_items (graphid,itemid,color,drawtype,sortorder) values ($graphid,$itemid,'$color',$drawtype,$sortorder)";
+		$sql="insert into graphs_items (graphid,itemid,color,drawtype,sortorder) values ($graphid,$itemid,'$color',$drawtype,$sortorder,$yaxisside)";
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"graphs_items","gitemid");
 	}
@@ -146,14 +146,14 @@
 			$host=get_host_by_hostid($row["hostid"]);
 			while($row2=DBfetch($result2))
 			{
-				add_item_to_graph($row2["graphid"],$itemid,$graph_item["color"],$graph_item["drawtype"],$graph_item["sortorder"]);
+				add_item_to_graph($row2["graphid"],$itemid,$graph_item["color"],$graph_item["drawtype"],$graph_item["sortorder"],$graph_item["taxisside"]);
 				info("Added graph element to graph ".$graph["name"]." of linked host ".$host["host"]);
 			}
 			if(DBnum_rows($result2)==0)
 			{
 				$graphid=add_graph($graph["name"],$graph["width"],$graph["height"],$graph["yaxistype"],$graph["yaxismin"],$graph["yaxismax"]);
 				info("Added graph ".$graph["name"]." of linked host ".$host["host"]);
-				add_item_to_graph($graphid,$itemid,$graph_item["color"],$graph_item["drawtype"],$graph_item["sortorder"]);
+				add_item_to_graph($graphid,$itemid,$graph_item["color"],$graph_item["drawtype"],$graph_item["sortorder"],$graph_item["yaxisside"]);
 				info("Added graph element to graph ".$graph["name"]." of linked host ".$host["host"]);
 			}
 		}

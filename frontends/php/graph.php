@@ -45,7 +45,7 @@
 	{
 		if($_REQUEST["register"]=="add")
 		{
-			$gitemid=add_item_to_graph($_REQUEST["graphid"],$_REQUEST["itemid"],$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"]);
+			$gitemid=add_item_to_graph($_REQUEST["graphid"],$_REQUEST["itemid"],$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"],$_REQUEST["yaxisside"]);
 			if($gitemid)
 			{
 				add_graph_item_to_linked_hosts($gitemid);
@@ -57,7 +57,7 @@
 		}
 		if($_REQUEST["register"]=="update")
 		{
-			$result=update_graph_item($_REQUEST["gitemid"],$_REQUEST["itemid"],$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"]);
+			$result=update_graph_item($_REQUEST["gitemid"],$_REQUEST["itemid"],$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"],$_REQUEST["yaxisside"]);
 			if($result)
 			{
 				$graphitem=get_graphitem_by_gitemid($_REQUEST["gitemid"]);
@@ -151,16 +151,18 @@
 
 	if(isset($_REQUEST["gitemid"]))
 	{
-		$sql="select itemid,color,drawtype,sortorder from graphs_items where gitemid=".$_REQUEST["gitemid"];
+		$sql="select itemid,color,drawtype,sortorder,yaxisside from graphs_items where gitemid=".$_REQUEST["gitemid"];
 		$result=DBselect($sql);
 		$itemid=DBget_field($result,0,0);
 		$color=DBget_field($result,0,1);
 		$drawtype=DBget_field($result,0,2);
 		$sortorder=DBget_field($result,0,3);
+		$yaxisside=DBget_field($result,0,4);
 	}
 	else
 	{
 		$sortorder=0;
+		$yaxisside=1;
 	}
 
 	show_form_begin("graph.item");
@@ -202,6 +204,14 @@
 	echo "<OPTION VALUE='1' ".iif(isset($drawtype)&&($drawtype==1),"SELECTED","").">".get_drawtype_description(1);
 	echo "<OPTION VALUE='2' ".iif(isset($drawtype)&&($drawtype==2),"SELECTED","").">".get_drawtype_description(2);
 	echo "<OPTION VALUE='3' ".iif(isset($drawtype)&&($drawtype==3),"SELECTED","").">".get_drawtype_description(3);
+	echo "</SELECT>";
+
+	show_table2_v_delimiter();
+	echo S_YAXIS_SIDE;
+	show_table2_h_delimiter();
+	echo "<SELECT class=\"biginput\" NAME=\"yaxisside\" size=\"1\"\">";
+	echo "<OPTION VALUE=\"1\" "; if($yaxisside==GRAPH_YAXIS_SIDE_RIGHT)	echo "SELECTED"; echo ">".S_RIGHT;
+	echo "<OPTION VALUE=\"0\" "; if($yaxisside==GRAPH_YAXIS_SIDE_LEFT)	echo "SELECTED"; echo ">".S_LEFT;
 	echo "</SELECT>";
 
 	show_table2_v_delimiter();

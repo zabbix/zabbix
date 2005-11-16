@@ -155,7 +155,7 @@
 			$this->items[$this->itemids[$itemid]]["drawtype"]=$drawtype;
 		}
 
-		function setAxisSide($itemid,$axisside)
+		function setYAxisSide($itemid,$axisside)
 		{
 			$this->items[$this->itemids[$itemid]]["axisside"]=$axisside;
 			if($axisside == GRAPH_YAXIS_SIDE_LEFT)
