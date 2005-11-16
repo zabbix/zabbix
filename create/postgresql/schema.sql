@@ -465,6 +465,7 @@ CREATE TABLE graphs (
   yaxistype		int2		DEFAULT '0' NOT NULL,
   yaxismin		float8		DEFAULT '0' NOT NULL,
   yaxismax		float8		DEFAULT '0' NOT NULL,
+  yaxisside		int2		DEFAULT '1' NOT NULL,
   PRIMARY KEY (graphid),
   UNIQUE (name)
 );

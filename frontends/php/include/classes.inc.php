@@ -33,6 +33,8 @@
 		var $yaxistype;
 		var $yaxismin;
 		var $yaxismax;
+		var $yaxisleft;
+		var $yaxisright;
 
 		// items[num].data.min[max|avg]
 		var $items;
@@ -106,6 +108,8 @@
 			$this->border=1;
 			$this->num=0;
 			$this->yaxistype=GRAPH_YAXIS_TYPE_CALCULATED;
+			$this->yaxisright=0;
+			$this->yaxisleft=0;
 
 			$this->count=array();
 			$this->min=array();
@@ -136,6 +140,8 @@
 			$this->itemids[$this->items[$this->num]["itemid"]]=$this->num;
 			$this->items[$this->num]["color"]="Dark Green";
 			$this->items[$this->num]["drawtype"]=GRAPH_DRAW_TYPE_LINE;
+			$this->items[$this->num]["axisside"]=GRAPH_YAXIS_SIDE_RIGHT;
+			$this->yaxisright=1;
 			$this->num++;
 		}
 
@@ -147,6 +153,19 @@
 		function setDrawtype($itemid,$drawtype)
 		{
 			$this->items[$this->itemids[$itemid]]["drawtype"]=$drawtype;
+		}
+
+		function setAxisSide($itemid,$axisside)
+		{
+			$this->items[$this->itemids[$itemid]]["axisside"]=$axisside;
+			if($axisside == GRAPH_YAXIS_SIDE_LEFT)
+			{
+				$this->yaxisleft=1;
+			}
+			else
+			{
+				$this->yaxisright=1;
+			}
 		}
 
 		function setPeriod($period)
@@ -264,7 +283,6 @@
 			}
 
 			$str=$str.$this->period2str($this->period);
-
 
 			if($this->sizeX < 300)
 			{
@@ -394,8 +412,8 @@
 			}
 		}
 
-// Calculation of maximum Y
-		function calculateMinY()
+// Calculation of maximum Y left axis side
+		function calculateMinYleft()
 		{
 			if($this->yaxistype==GRAPH_YAXIS_TYPE_FIXED)
 			{
@@ -407,8 +425,21 @@
 			}
 		}
 
-// Calculation of maximum Y
-		function calculateMaxY()
+// Calculation of maximum Y right axis side
+		function calculateMinYright()
+		{
+			if($this->yaxistype==GRAPH_YAXIS_TYPE_FIXED)
+			{
+				return $this->yaxismin;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+
+// Calculation of maximum Y right side
+		function calculateMaxYright()
 		{
 			if($this->yaxistype==GRAPH_YAXIS_TYPE_FIXED)
 			{
@@ -419,6 +450,7 @@
 				unset($maxY);
 				for($i=0;$i<$this->num;$i++)
 				{
+					if($this->items[$i]["axisside"] != GRAPH_YAXIS_SIDE_RIGHT)	continue;
 					if(!isset($maxY)&&(isset($this->max[$i])))
 					{
 						if(count($this->max[$i])>0)
@@ -445,31 +477,51 @@
 	
 				$mant=(floor($mant*1.1*10/6)+1)*6/10;
 	
-	/*			if($mant<1.5)
+				$maxY = $mant*pow(10,$exp);
+	
+				return $maxY;
+			}
+		}
+
+// Calculation of maximum Y left side
+		function calculateMaxYleft()
+		{
+			if($this->yaxistype==GRAPH_YAXIS_TYPE_FIXED)
+			{
+				return $this->yaxismax;
+			}
+			else
+			{
+				unset($maxY);
+				for($i=0;$i<$this->num;$i++)
 				{
-					$mant=1.5;
+					if($this->items[$i]["axisside"] != GRAPH_YAXIS_SIDE_LEFT)	continue;
+					if(!isset($maxY)&&(isset($this->max[$i])))
+					{
+						if(count($this->max[$i])>0)
+						{
+							$maxY=max($this->max[$i]);
+						}
+					}
+					else
+					{
+						$maxY=@iif($maxY<max($this->max[$i]),max($this->max[$i]),$maxY);
+					}
 				}
-				elseif($mant<2)
+	
+				if(isset($maxY)&&($maxY>0))
 				{
-					$mant=2;
-				}
-				elseif($mant<3)
-				{
-					$mant=3;
-				}
-				elseif($mant<5)
-				{
-					$mant=5;
-				}
-				elseif($mant<8)
-				{
-					$mant=8;
+					$exp = floor(log10($maxY));
+					$mant = $maxY/pow(10,$exp);
 				}
 				else
 				{
-					$mant=10;
+					$exp=0;
+					$mant=0;
 				}
-	*/
+	
+				$mant=(floor($mant*1.1*10/6)+1)*6/10;
+	
 				$maxY = $mant*pow(10,$exp);
 	
 				return $maxY;
@@ -531,8 +583,8 @@
 
 //			$this->im = imagecreate($this->sizeX+$this->shiftX+61,$this->sizeY+2*$this->shiftY+40);
 
-//			Header( "Content-type:  text/html"); 
-			Header( "Content-type:  image/png"); 
+			Header( "Content-type:  text/html"); 
+#			Header( "Content-type:  image/png"); 
 			Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 
 			check_authorisation();
@@ -554,6 +606,7 @@
 			{
 //				$this->noDataFound();
 			}
+
 			$this->checkPermissions();
 
 			$this->selectData();
@@ -563,12 +616,25 @@
 			$maxX=900;
 			$minX=0;
 
-			$minY=$this->calculateMinY();
-			$maxY=$this->calculateMaxY();
+			$minYleft=$this->calculateMinYleft();
+			$minYright=$this->calculateMinYright();
+			$maxYleft=$this->calculateMaxYleft();
+			$maxYright=$this->calculateMaxYright();
 
 			// For each metric
 			for($item=0;$item<$this->num;$item++)
 			{
+				if($this->items[$item]["axisside"] == GRAPH_YAXIS_SIDE_RIGHT)
+				{
+					$minY=$minYright;
+					$maxY=$maxYright;
+				}
+				else
+				{
+					$minY=$minYleft;
+					$maxY=$maxYleft;
+				}
+
 				// For each X
 				for($i=0;$i<900;$i++)
 				{
@@ -609,11 +675,18 @@
 					}
 				}
 			}
-		
-			for($i=0;$i<=6;$i++)
-			{
-				ImageString($this->im, 1, $this->sizeX+5+$this->shiftX, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, convert_units($this->sizeY*$i/6*($maxY-$minY)/$this->sizeY+$minY,$this->items[0]["units"]) , $this->colors["Dark Red No Alpha"]);
-			}
+	
+			if($this->yaxisright == 1)	
+				for($i=0;$i<=6;$i++)
+				{
+					ImageString($this->im, 1, $this->sizeX+5+$this->shiftX, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, convert_units($this->sizeY*$i/6*($maxYright-$minYright)/$this->sizeY+$minYright,$this->items[0]["units"]) , $this->colors["Dark Red No Alpha"]);
+				}
+
+			if($this->yaxisleft == 1)	
+				for($i=0;$i<=6;$i++)
+				{
+					ImageString($this->im, 1, 5, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, convert_units($this->sizeY*$i/6*($maxYleft-$minYleft)/$this->sizeY+$minYleft,$this->items[0]["units"]) , $this->colors["Dark Red No Alpha"]);
+				}
 
 			$this->drawLogo();
 

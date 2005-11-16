@@ -32,3 +32,5 @@ CREATE TABLE history_uint (
 --  PRIMARY KEY (itemid,clock)
   KEY itemidclock (itemid, clock)
 ) type=InnoDB;
+
+alter table graphs add  yaxisside		int(1)		DEFAULT '1' NOT NULL;
