@@ -431,12 +431,15 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 			char *source, char *severity)
 {
 	char	sql[MAX_STRING_LEN];
+	AGENT_RESULT	agent;
 
 	DB_RESULT       *result;
 	DB_ITEM	item;
 	char	*s;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_data([%s],[%s],[%s],[%s])",server,key,value,lastlogsize);
+
+	init_result(&agent);
 
 	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta,i.units,i.multiplier,i.formula,i.logtimefmt from items i,hosts h where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type in (%d,%d)", HOST_STATUS_MONITORED, server, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE);
 	result = DBselect(sql);
@@ -527,18 +530,6 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 		(strncmp(item.key,"eventlog[",9)==0)
 	)
 	{
-/*		s=strchr(value,':');
-		if(s == NULL)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Wrong value received for item [%s:%s]", item.host, item.key);
-			DBfree_result(result);
-			return FAIL;
-		}
-		s++;
-
-		strncpy(lastlogsize, value, s-value-1);
-		lastlogsize[s-value-1]=0;*/
-
 		item.lastlogsize=atoi(lastlogsize);
 		item.timestamp=atoi(timestamp);
 
@@ -549,11 +540,16 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 		zabbix_log(LOG_LEVEL_DEBUG, "Value [%s] Lastlogsize [%s] Timestamp [%s]", value, lastlogsize, timestamp);
 	}
 
-	process_new_value(&item,s);
+	agent.type |= AR_STRING;
+	agent.str=strdup(value);
+
+	process_new_value(&item,&agent);
 
 	update_triggers(item.itemid);
  
 	DBfree_result(result);
+
+	free_result(&agent);
 
 	return SUCCEED;
 }
@@ -658,11 +654,11 @@ void	process_new_value(DB_ITEM *item, AGENT_RESULT *value)
 		}
 		else if(item->value_type==ITEM_VALUE_TYPE_STR)
 		{
-			DBadd_history_str(item->itemid,value_str,now);
+			DBadd_history_str(item->itemid,value->str,now);
 		}
 		else if(item->value_type==ITEM_VALUE_TYPE_LOG)
 		{
-			DBadd_history_log(item->itemid,value_str,now,item->timestamp,item->eventlog_source,item->eventlog_severity);
+			DBadd_history_log(item->itemid,value->str,now,item->timestamp,item->eventlog_source,item->eventlog_severity);
 			snprintf(sql,sizeof(sql)-1,"update items set lastlogsize=%d where itemid=%d",item->lastlogsize,item->itemid);
 			DBexecute(sql);
 		}
