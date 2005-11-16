@@ -34,3 +34,5 @@ CREATE TABLE history_uint (
 );
 
 CREATE INDEX history_uint_i_c on history_uint (itemid, clock);
+
+alter table graphs add  yaxisside		int2		DEFAULT '1' NOT NULL;
