@@ -67,13 +67,14 @@
 	$graph->setYAxisMin(DBget_field($result,0,4));
 	$graph->setYAxisMax(DBget_field($result,0,5));
 
-	$result=DBselect("select gi.itemid,i.description,gi.color,h.host,gi.drawtype from graphs_items gi,items i,hosts h where gi.itemid=i.itemid and gi.graphid=".$_REQUEST["graphid"]." and i.hostid=h.hostid order by gi.sortorder");
+	$result=DBselect("select gi.itemid,i.description,gi.color,h.host,gi.drawtype,gi.yaxisside from graphs_items gi,items i,hosts h where gi.itemid=i.itemid and gi.graphid=".$_REQUEST["graphid"]." and i.hostid=h.hostid order by gi.sortorder");
 
 	for($i=0;$i<DBnum_rows($result);$i++)
 	{
 		$graph->addItem(DBget_field($result,$i,0));
 		$graph->setColor(DBget_field($result,$i,0), DBget_field($result,$i,2));
 		$graph->setDrawtype(DBget_field($result,$i,0), DBget_field($result,$i,4));
+		$graph->setYAxisSide(DBget_field($result,$i,0), DBget_field($result,$i,5));
 	}
 
 	$graph->Draw();
