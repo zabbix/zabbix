@@ -60,6 +60,7 @@ CREATE TABLE graphs_items (
   drawtype		int(4)		DEFAULT '0' NOT NULL,
   sortorder		int(4)		DEFAULT '0' NOT NULL,
   color			varchar(32)	DEFAULT 'Dark Green' NOT NULL,
+  yaxisside		int(1)		DEFAULT '1' NOT NULL,
   PRIMARY KEY (gitemid)
 ) type=InnoDB;
 
@@ -75,7 +76,6 @@ CREATE TABLE graphs (
   yaxistype		int(1)		DEFAULT '0' NOT NULL,
   yaxismin		double(16,4)	DEFAULT '0' NOT NULL,
   yaxismax		double(16,4)	DEFAULT '0' NOT NULL,
-  yaxisside		int(1)		DEFAULT '1' NOT NULL,
   PRIMARY KEY (graphid),
   KEY (name)
 ) type=InnoDB;

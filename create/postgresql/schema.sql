@@ -465,7 +465,6 @@ CREATE TABLE graphs (
   yaxistype		int2		DEFAULT '0' NOT NULL,
   yaxismin		float8		DEFAULT '0' NOT NULL,
   yaxismax		float8		DEFAULT '0' NOT NULL,
-  yaxisside		int2		DEFAULT '1' NOT NULL,
   PRIMARY KEY (graphid),
   UNIQUE (name)
 );
@@ -483,6 +482,7 @@ CREATE TABLE graphs_items (
   drawtype		int4		DEFAULT '0' NOT NULL,
   sortorder		int4		DEFAULT '0' NOT NULL,
   color			varchar(32)	DEFAULT 'Dark Green' NOT NULL,
+  yaxisside		int2		DEFAULT '1' NOT NULL,
   PRIMARY KEY (gitemid),
   FOREIGN KEY (graphid) REFERENCES graphs,
   FOREIGN KEY (itemid) REFERENCES items
