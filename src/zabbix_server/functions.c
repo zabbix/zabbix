@@ -556,48 +556,23 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 
 /******************************************************************************
  *                                                                            *
- * Function: process_new_value                                                *
+ * Function: add_history                                                      *
  *                                                                            *
- * Purpose: process new item value                                            *
+ * Purpose: add new value to history                                          *
  *                                                                            *
  * Parameters: item - item data                                               *
  *             value - new value of the item                                  *
+ *             now   - new value of the item                                  *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: for trapper poller process                                       *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	process_new_value(DB_ITEM *item, AGENT_RESULT *value)
+static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 {
-	time_t 	now;
 	char	sql[MAX_STRING_LEN];
-	char	value_esc[MAX_STRING_LEN];
-/*	char	value_str[MAX_STRING_LEN];
-	double	value_double;*/
-	double	multiplier;
-	char	*e;
-
-	zabbix_log( LOG_LEVEL_DEBUG, "In process_new_value()");
-
-	now = time(NULL);
-
-/*	strscpy(value_str, value);*/
-
-/*	value_double=strtod(value_str,&e);*/
-
-	if(item->multiplier == ITEM_MULTIPLIER_USE)
-	{
-		if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_DOUBLE))
-		{
-			multiplier = strtod(item->formula,&e);
-			value->dbl = value->dbl * multiplier;
-		}
-		if( (item->value_type==ITEM_VALUE_TYPE_UINT64) && (value->type & AR_UINT64))
-		{
-			value->ui64 = value->ui64 * (zbx_uint64_t)atoll(item->formula);
-		}
-	}
+	int ret = SUCCEED;
 
 	if(item->history>0)
 	{
@@ -649,7 +624,7 @@ void	process_new_value(DB_ITEM *item, AGENT_RESULT *value)
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Value not stored for itemid [%d]. Unknown delta [%d]", item->itemid, item->delta);
 				zabbix_syslog("Value not stored for itemid [%d]. Unknown delta [%d]", item->itemid, item->delta);
-				return;
+				ret = FAIL;
 			}
 		}
 		else if(item->value_type==ITEM_VALUE_TYPE_STR)
@@ -667,6 +642,45 @@ void	process_new_value(DB_ITEM *item, AGENT_RESULT *value)
 			zabbix_log(LOG_LEVEL_ERR, "Unknown value type [%d] for itemid [%d]", item->value_type,item->itemid);
 		}
 	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: update_item                                                      *
+ *                                                                            *
+ * Purpose: update item info after new value is received                      *
+ *                                                                            *
+ * Parameters: item - item data                                               *
+ *             value - new value of the item                                  *
+ *             now   - current timestamp                                      * 
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	update_item(DB_ITEM *item, AGENT_RESULT *value, int now)
+{
+	char	sql[MAX_STRING_LEN];
+	char	value_esc[MAX_STRING_LEN];
+	char	value_str[MAX_STRING_LEN];
+	double	value_double;
+	int ret = SUCCEED;
+
+	if(value->type & AR_UINT64)
+	{
+		snprintf(value_str,MAX_STRING_LEN-1,ZBX_FS_UI64, value->ui64);
+		value_double = (double)value->ui64;
+	}
+	if(value->type & AR_DOUBLE)
+	{
+		snprintf(value_str,MAX_STRING_LEN-1,"%f", value->dbl);
+		value_double = value->dbl;
+	}
+	if(value->type & AR_STRING)
+		strscpy(value_str, value->str);
 
 	if(item->delta == ITEM_STORE_AS_IS)
 	{
@@ -716,12 +730,10 @@ void	process_new_value(DB_ITEM *item, AGENT_RESULT *value)
 	{
 		if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
 		{
-/*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",now+item->delay,value_double,(value_double - item->prevorgvalue),now,item->itemid);*/
 			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),value_double,(value_double - item->prevorgvalue),(int)now,item->itemid);
 		}
 		else
 		{
-/*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",now+item->delay,value_double,now,item->itemid);*/
 			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),value_double,(int)now,item->itemid);
 		}
 
@@ -734,6 +746,55 @@ void	process_new_value(DB_ITEM *item, AGENT_RESULT *value)
 		item->lastvalue_null=0;
 	}
 	DBexecute(sql);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_new_value                                                *
+ *                                                                            *
+ * Purpose: process new item value                                            *
+ *                                                                            *
+ * Parameters: item - item data                                               *
+ *             value - new value of the item                                  *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: for trapper poller process                                       *
+ *                                                                            *
+ ******************************************************************************/
+void	process_new_value(DB_ITEM *item, AGENT_RESULT *value)
+{
+	time_t 	now;
+/*	char	value_str[MAX_STRING_LEN];
+	double	value_double;*/
+	double	multiplier;
+	char	*e;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_new_value()");
+
+	now = time(NULL);
+
+/*	strscpy(value_str, value);*/
+
+/*	value_double=strtod(value_str,&e);*/
+
+	if(item->multiplier == ITEM_MULTIPLIER_USE)
+	{
+		if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_DOUBLE))
+		{
+			multiplier = strtod(item->formula,&e);
+			value->dbl = value->dbl * multiplier;
+		}
+		if( (item->value_type==ITEM_VALUE_TYPE_UINT64) && (value->type & AR_UINT64))
+		{
+			value->ui64 = value->ui64 * (zbx_uint64_t)atoll(item->formula);
+		}
+	}
+
+	add_history(item, value, now);
+	update_item(item, value, now);
 
 	update_functions( item );
 }
