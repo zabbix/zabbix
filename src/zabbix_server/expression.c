@@ -231,37 +231,6 @@ int	is_double(char *c)
 
 /******************************************************************************
  *                                                                            *
- * Function: delete_reol                                                      *
- *                                                                            *
- * Purpose: delete all right EOL characters                                   *
- *                                                                            *
- * Parameters: c - string to delete EOL                                       *
- *                                                                            *
- * Return value:  the string wtihout EOL                                      *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-void	delete_reol(char *c)
-{
-	int i,j;
-
-	zabbix_log( LOG_LEVEL_DEBUG, "Before deleting EOL:%s", c );
-
-	j=0;
-	for(i=(int)strlen(c)-1;i>=0;i--)
-	{
-		if( c[i] != '\n')	break;
-		c[i]=0;
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "After deleting EOL:%s", c );
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: delete_spaces                                                    *
  *                                                                            *
  * Purpose: delete all spaces                                                 *
