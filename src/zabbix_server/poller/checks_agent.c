@@ -176,13 +176,14 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Problem with close [%s]", strerror(errno));
 	}
-	zabbix_log(LOG_LEVEL_DEBUG, "Got string:[%d] [%s]", len, c);
-	if(len>0)
+
+	delete_reol(c);
+
+/*	if(len>0)
 	{
 		c[len-1]=0;
-	}
-
-
+	}*/
+	zabbix_log(LOG_LEVEL_DEBUG, "Got string:[%d] [%s]", len, c);
 
 	if( strcmp(c,"ZBX_NOTSUPPORTED") == 0)
 	{
