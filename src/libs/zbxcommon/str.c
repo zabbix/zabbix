@@ -178,3 +178,29 @@ int	num_param(const char *param)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: delete_reol                                                      *
+ *                                                                            *
+ * Purpose: delete all right EOL characters                                   *
+ *                                                                            *
+ * Parameters: c - string to delete EOL                                       *
+ *                                                                            *
+ * Return value:  the string wtihout EOL                                      *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	delete_reol(char *c)
+{
+	int i,j;
+
+	j=0;
+	for(i=(int)strlen(c)-1;i>=0;i--)
+	{
+		if( c[i] != '\n')	break;
+		c[i]=0;
+	}
+}

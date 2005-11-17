@@ -315,6 +315,7 @@ void   	free_result(AGENT_RESULT *result);
 
 char	*string_replace(char *str, const char *sub_str1, const char *sub_str2);
 void	del_zeroes(char *s);
+void	delete_reol(char *c);
 int	get_param(const char *param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
 
