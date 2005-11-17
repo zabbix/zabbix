@@ -120,7 +120,7 @@ static int is_ip(char *ip)
  * Comments: can be done in process_data()                                    *
  *                                                                            *
  ******************************************************************************/
-static int process_value(char *key, char *host, char *value)
+static int process_value(char *key, char *host, AGENT_RESULT *value)
 {
 	char	sql[MAX_STRING_LEN];
 
@@ -296,6 +296,7 @@ static int do_ping(void)
 	double	mseconds;
 	char	*c;
 	int	alive;
+	AGENT_RESULT	value;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In do_ping()");
 
@@ -331,16 +332,29 @@ static int do_ping(void)
 		{
 			*c=0;
 			zabbix_log( LOG_LEVEL_DEBUG, "IP [%s] alive [%d]", ip, alive);
+
 			if(0 == alive)
 			{
-				process_value(SERVER_ICMPPING_KEY,ip,"0");
-				process_value(SERVER_ICMPPINGSEC_KEY,ip,"0");
+				init_result(&value);
+				value.type |= AR_DOUBLE;
+
+				value.dbl = (double)0;
+				process_value(SERVER_ICMPPING_KEY,ip,&value);
+				value.dbl = (double)0;
+				process_value(SERVER_ICMPPINGSEC_KEY,ip,&value);
+
+				free_result(&value);
 			}
 			else
 			{
-				snprintf(tmp,sizeof(tmp)-1,"%f",mseconds/1000);
-				process_value(SERVER_ICMPPING_KEY,ip,"1");
-				process_value(SERVER_ICMPPINGSEC_KEY,ip,tmp);
+				init_result(&value);
+				value.type |= AR_DOUBLE;
+
+				value.dbl = (double)1;
+				process_value(SERVER_ICMPPING_KEY,ip,&value);
+				value.dbl = (double)(mseconds/1000);
+				process_value(SERVER_ICMPPINGSEC_KEY,ip,&value);
+				free_result(&value);
 			}
 		}
 	}
