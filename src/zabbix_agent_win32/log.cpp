@@ -193,12 +193,12 @@ void WriteLog(DWORD msg,WORD wType,char *format...)
                else
                {
                   strings[numStrings]=(char *)malloc(64);
-                  sprintf(strings[numStrings],"MSG 0x%08X - Unable to find message text",error);
+                  sprintf(strings[numStrings],"1. MSG 0x%08X - Unable to find message text",error);
                }
                break;
             default:
                strings[numStrings]=(char *)malloc(32);
-               sprintf(strings[numStrings],"BAD FORMAT (0x%08X)",va_arg(args,DWORD));
+               sprintf(strings[numStrings],"BAD FORMAT [%c] (0x%08X)", format[numStrings], va_arg(args,DWORD));
                break;
          }
       }
@@ -208,7 +208,7 @@ void WriteLog(DWORD msg,WORD wType,char *format...)
    if (dwFlags & AF_USE_EVENT_LOG)
    {
 
-      ReportEvent(hLog,wType,0,msg,NULL,numStrings,0,(const char **)strings,NULL);
+      ReportEvent(hLog,wType,0,msg,NULL,(unsigned short)(numStrings),0,(const char **)strings,NULL);
    }
    else
    {
@@ -225,7 +225,7 @@ void WriteLog(DWORD msg,WORD wType,char *format...)
 
          char message[64];
 
-         sprintf(message,"MSG 0x%08X - Unable to find message text\r\n",msg);
+         sprintf(message,"2. MSG 0x%08X - Unable to find message text [0x%X]\r\n",msg , GetLastError());
 
          WriteLogToFile(message);
       }

@@ -22,15 +22,22 @@
 
 #include "sysinc.h"
 
+
+
 #if defined(WIN32)
 #	define zbx_uint64_t __int64
 #	define ZBX_FS_UI64 "%llu"
 
 #	ifdef _DEBUG
-#		include "crtdbg.h"
-
 #		define LOG_DEBUG_INFO(type, msg) \
-			WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE, type , msg);
+			WriteLog(MSG_GET_COMPUTER_NAME_FAILED,EVENTLOG_ERROR_TYPE, type , msg)
+//#		define ENABLE_CHECK_MEMOTY
+#	else
+#		define LOG_DEBUG_INFO(a, b) ((void)0)
+#	endif
+
+#	if defined(ENABLE_CHECK_MEMOTY)
+#		include "crtdbg.h"
 
 #		define REINIT_CHECK_MEMORY(a) \
 			_CrtMemCheckpoint(& ## a ## oldMemState)
@@ -72,12 +79,11 @@
 					 \
 					(long) a ## diffMemState.lSizes[_MAX_BLOCKS], \
 					(long) a ## diffMemState.lCounts[_MAX_BLOCKS]); \
-				 LOG_DEBUG_INFO("s", a ## DumpMessage) \
+				 LOG_DEBUG_INFO("s", a ## DumpMessage); \
 			}
 #	else
 #		define INIT_CHECK_MEMORY(a) ((void)0)
 #		define CHECK_MEMORY(a, fncname, msg) ((void)0)
-#		define LOG_DEBUG_INFO(a, b) ((void)0)
 #	endif
 #else
 #	define zbx_uint64_t uint64_t
@@ -87,6 +93,8 @@
 #		define ZBX_FS_UI64 "%llu"
 #	endif
 #endif
+
+#define ZBX_UNUSED(a) ((void)0)(a)
 
 #define	ZBX_FS_DBL	"%f"
 

@@ -127,20 +127,18 @@ INIT_CHECK_MEMORY(main);
 	{
 		if(metrics[i].key == NULL)	break;
 
-		nodata=1;
 		if( (metrics[i].status == ITEM_STATUS_ACTIVE) &&
 		    ((metrics[i].nextcheck < min) || (min == -1)))
 		{
+			nodata=1;
 			min=metrics[i].nextcheck;
 		}
 	}
 
 	if(nodata==0)
 	{
-//		LOG_DEBUG_INFO("s","get_min_nextcheck: end: FAIL");
 		min = FAIL;
 	}
-//	LOG_DEBUG_INFO("s","get_min_nextcheck: end");
 
 CHECK_MEMORY(main,"add_check","end");
 	return min;
@@ -282,13 +280,13 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 	if(hp==NULL)
 	{
 //		zabbix_log( LOG_LEVEL_WARNING, "gethostbyname() failed [%s]", hstrerror(h_errno));
-//		sprintf(error,"gethostbyname() failed [%s]", hstrerror(h_errno));
+//		_snprintf(error, max_error_len,"gethostbyname() failed [%s]", hstrerror(h_errno));
 		return	NETWORK_ERROR;
 	}
 
 	servaddr_in.sin_addr.s_addr=((struct in_addr *)(hp->h_addr))->s_addr;
 
-	servaddr_in.sin_port=htons(port);
+	servaddr_in.sin_port=htons((unsigned short)port);
 
 	s=socket(AF_INET,SOCK_STREAM,0);
 
@@ -305,17 +303,17 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 		{
 			case WSAETIMEDOUT:
 //				zabbix_log( LOG_LEVEL_WARNING, "Timeout while connecting to [%s:%d]",server,port);
-				sprintf(error,"Timeout while connecting to [%s:%d]",server,port);
+				_snprintf(error, max_error_len, "Timeout while connecting to [%s:%d]",server,port);
 				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",error);
 				break;
 			case WSAEHOSTUNREACH:
 //				zabbix_log( LOG_LEVEL_WARNING, "No route to host [%s:%d]",server,port);
-				sprintf(error,"No route to host [%s:%d]",server,port);
+				_snprintf(error, max_error_len,"No route to host [%s:%d]",server,port);
 				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",error);
 				break;
 			default:
 //				zabbix_log( LOG_LEVEL_WARNING, "Cannot connect to [%s:%d] [%s]",server,port,strerror(errno));
-				sprintf(error,"Cannot connect to [%s:%d] [%s]",server,port,strerror(errno));
+				_snprintf(error, max_error_len,"Cannot connect to [%s:%d] [%s]",server,port,strerror(errno));
 				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",error);
 		} 
 		closesocket(s);
@@ -332,13 +330,13 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 		{
 			case WSAETIMEDOUT:
 //				zabbix_log( LOG_LEVEL_WARNING, "Timeout while sending data to [%s:%d]",server,port);
-				sprintf(error,"Timeout while sending data to [%s:%d]",server,port);
+				_snprintf(error, max_error_len,"Timeout while sending data to [%s:%d]",server,port);
 				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",error);
 
 				break;
 			default:
 //				zabbix_log( LOG_LEVEL_WARNING, "Error while sending data to [%s:%d] [%s]",server,port,strerror(errno));
-				sprintf(error,"Error while sending data to [%s:%d] [%s]",server,port,strerror(errno));
+				_snprintf(error, max_error_len,"Error while sending data to [%s:%d] [%s]",server,port,strerror(errno));
 				WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",error);
 		} 
 		closesocket(s);
@@ -367,18 +365,18 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 			{
 				case 	WSAETIMEDOUT:
 //						zabbix_log( LOG_LEVEL_WARNING, "Timeout while receiving data from [%s:%d]",server,port);
-						sprintf(error,"Timeout while receiving data from [%s:%d]",server,port);
+						_snprintf(error, max_error_len,"Timeout while receiving data from [%s:%d]",server,port);
 						WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",error);
 						break;
 				case	WSAECONNRESET:
 //						zabbix_log( LOG_LEVEL_WARNING, "Connection reset by peer.");
-						sprintf(error,"Connection reset by peer.");
+						_snprintf(error, max_error_len,"Connection reset by peer.");
 						WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",error);
 						closesocket(s);
 						return	NETWORK_ERROR;
 				default:
 //						zabbix_log( LOG_LEVEL_WARNING, "Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
-						sprintf(error,"Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
+						_snprintf(error, max_error_len,"Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
 						WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",error);
 			} 
 			closesocket(s);
@@ -458,7 +456,7 @@ INIT_CHECK_MEMORY(main);
 
 	servaddr_in.sin_addr.s_addr=((struct in_addr *)(hp->h_addr))->s_addr;
 
-	servaddr_in.sin_port=htons(port);
+	servaddr_in.sin_port=htons((unsigned short)port);
 
 	s=socket(AF_INET,SOCK_STREAM,0);
 	if(s == -1)
@@ -713,7 +711,7 @@ INIT_CHECK_MEMORY(main);
 
 		metrics[i].nextcheck=time(NULL)+metrics[i].refresh;
 	}
-//	LOG_DEBUG_INFO("s","process_active_checks: end");
+//LOG_DEBUG_INFO("s","process_active_checks: end");
 CHECK_MEMORY(main, "process_active_checks", "end");
 	return ret;
 }
@@ -722,7 +720,7 @@ void	refresh_metrics(char *server, int port, char *error, int max_error_len)
 {
 //	LOG_DEBUG_INFO("s","refresh_metrics: start");
 //	zabbix_log( LOG_LEVEL_DEBUG, "In refresh_metrics()");
-	while(get_active_checks(server, port, error, sizeof(error)) != SUCCEED)
+	while(get_active_checks(server, port, error, max_error_len) != SUCCEED)
 	{
 //		zabbix_log( LOG_LEVEL_WARNING, "Getting list of active checks failed. Will retry after 60 seconds");
 #ifdef HAVE_FUNCTION_SETPROCTITLE
@@ -747,7 +745,7 @@ INIT_CHECK_MEMORY(main);
 
 	InitMetrics();
 
-	refresh_metrics(confServer, confServerPort, error, sizeof(error));
+	refresh_metrics(confServer, confServerPort, error, MAX_STRING_LEN);
 	nextrefresh=time(NULL)+10;
 
 	for(;;)	
@@ -762,8 +760,9 @@ CHECK_MEMORY(for, "ActiveChecksThread", "end for 1");
 		}
 
 		nextcheck = get_min_nextcheck();
-		if(nextcheck = FAIL)
+		if(nextcheck == FAIL)
 		{
+//LOG_DEBUG_INFO("s","sleeptime=10");
 			sleeptime=10;
 		}
 		else
@@ -774,6 +773,8 @@ CHECK_MEMORY(for, "ActiveChecksThread", "end for 1");
 				sleeptime=0;
 			}
 		}
+//LOG_DEBUG_INFO("s","sleeptime");
+//LOG_DEBUG_INFO("d",sleeptime);
 		if(sleeptime>0)
 		{
 			if(sleeptime > 10)

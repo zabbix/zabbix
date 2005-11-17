@@ -182,7 +182,7 @@ INIT_CHECK_MEMORY(main);
    }
    else
    {
-      sprintf(staticBuffer,"MSG 0x%08X - Unable to find message text",error);
+      sprintf(staticBuffer,"3. MSG 0x%08X - Unable to find message text [0x%X]", error , GetLastError());
    }
 
 CHECK_MEMORY(main,"GetSystemErrorText","end");
@@ -256,7 +256,7 @@ INIT_CHECK_MEMORY(main);
             BPtr=MPtr;           // Text block begins here
             while((*MPtr!=0)&&(*MPtr!='?')&&(*MPtr!='*'))
                MPtr++;     // Find the end of text block
-            while(1)
+            for(;;)
             {
                while((*SPtr!=0)&&(*SPtr!=*BPtr))
                   SPtr++;

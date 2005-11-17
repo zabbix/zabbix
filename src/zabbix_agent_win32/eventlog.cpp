@@ -137,10 +137,10 @@ messagetable DLL */
 
 INIT_CHECK_MEMORY(main);
 
-LOG_DEBUG_INFO("s","MyGetAEventLog: start");
+//LOG_DEBUG_INFO("s","MyGetAEventLog: start");
     if (!hAppLog)
 	{
-LOG_DEBUG_INFO("s","MyGetAEventLog: 1");
+//LOG_DEBUG_INFO("s","MyGetAEventLog: 1");
         return(0);
 	}
 
@@ -155,7 +155,7 @@ LOG_DEBUG_INFO("s","MyGetAEventLog: 1");
 
     if (!bSuccess)
 	{
-LOG_DEBUG_INFO("s","MyGetAEventLog: 2");
+//LOG_DEBUG_INFO("s","MyGetAEventLog: 2");
 		err = GetLastError();
 		if(err==0) err = 1;
 	}
@@ -172,7 +172,7 @@ LOG_DEBUG_INFO("s","MyGetAEventLog: 2");
 		strcat(temp,((char*)pELR + sizeof(EVENTLOGRECORD)));
 		if (RegOpenKey(HKEY_LOCAL_MACHINE, temp, &hk))
 		{
-LOG_DEBUG_INFO("s","MyGetAEventLog: 3");
+//LOG_DEBUG_INFO("s","MyGetAEventLog: 3");
 			err = GetLastError();
 			if(err==0) err = 1;
 		}
@@ -188,7 +188,7 @@ LOG_DEBUG_INFO("s","MyGetAEventLog: 3");
 				(UCHAR*)temp,           /* address of value data  */
 				&Data))                 /* length of value data   */
 		{
-LOG_DEBUG_INFO("s","MyGetAEventLog: 4");
+//LOG_DEBUG_INFO("s","MyGetAEventLog: 4");
 			err = GetLastError();
 			if(err==0) err = 1;
 		}
@@ -200,16 +200,16 @@ LOG_DEBUG_INFO("s","MyGetAEventLog: 4");
 	{
 		for (;;)
 		{
-LOG_DEBUG_INFO("s","MyGetAEventLog: for 1");
-LOG_DEBUG_INFO("s",pFile);
-LOG_DEBUG_INFO("s","MyGetAEventLog: for 1.1");
+//LOG_DEBUG_INFO("s","MyGetAEventLog: for 1");
+//LOG_DEBUG_INFO("s",pFile);
+//LOG_DEBUG_INFO("s","MyGetAEventLog: for 1.1");
 
 
 	        if ((pNextFile = strchr(pFile,';')))
 			{
 			    *pNextFile = 0;
 			}
-LOG_DEBUG_INFO("s","MyGetAEventLog: for 1.3");
+//LOG_DEBUG_INFO("s","MyGetAEventLog: for 1.3");
 
 			if (!ExpandEnvironmentStrings(pFile, MsgDll, MAX_PATH))
 			{
@@ -217,13 +217,13 @@ LOG_DEBUG_INFO("s","MyGetAEventLog: for 1.3");
 				if(err==0) err = 1;
 				break;
 			}
-LOG_DEBUG_INFO("s","MyGetAEventLog: for 2.1");
+//LOG_DEBUG_INFO("s","MyGetAEventLog: for 2.1");
 		    if (!(hLib = LoadLibraryEx(MsgDll, NULL, LOAD_LIBRARY_AS_DATAFILE)))
 			{
 				err = 1;
 				break;
 			}
-LOG_DEBUG_INFO("s","MyGetAEventLog: 4");
+//LOG_DEBUG_INFO("s","MyGetAEventLog: 4");
 
 /* prepare the array of insert strings for FormatMessage - the
             insert strings are in the log entry. */
@@ -231,11 +231,11 @@ LOG_DEBUG_INFO("s","MyGetAEventLog: 4");
 
 			for (i = 0; i < pELR->NumStrings && i < MAX_INSERT_STRS; i++)
 			{
-LOG_DEBUG_INFO("s","MyGetAEventLog: 5");
+//LOG_DEBUG_INFO("s","MyGetAEventLog: 5");
 				aInsertStrs[i] = pCh;
 				pCh += strlen(pCh) + 1;		/* point to next string */
 			}
-LOG_DEBUG_INFO("s","MyGetAEventLog: 6");
+//LOG_DEBUG_INFO("s","MyGetAEventLog: 6");
 
 
 /* Format the message from the message DLL with the insert strings */
@@ -257,10 +257,10 @@ LOG_DEBUG_INFO("s","MyGetAEventLog: 6");
 				break;
 			}
 
-LOG_DEBUG_INFO("s","MyGetAEventLog: 9");
+//LOG_DEBUG_INFO("s","MyGetAEventLog: 9");
 			if (!pNextFile)							/* more files to read ? */
 			{
-LOG_DEBUG_INFO("s","MyGetAEventLog: 10");
+//LOG_DEBUG_INFO("s","MyGetAEventLog: 10");
 			    RegCloseKey(hk);
 		        err = GetLastError();
 	            if(err == 0) err = 1;
@@ -286,7 +286,7 @@ LOG_DEBUG_INFO("s","MyGetAEventLog: 10");
 
 		*timestamp=pELR->TimeGenerated;
 
-LOG_DEBUG_INFO("s","MyGetAEventLog: 11");
+//LOG_DEBUG_INFO("s","MyGetAEventLog: 11");
 	}
 
 /* Free the buffer that FormatMessage allocated for us. */
@@ -295,10 +295,10 @@ LOG_DEBUG_INFO("s","MyGetAEventLog: 11");
     if(hLib) FreeLibrary(hLib);
     if(hk)	RegCloseKey(hk);
 
-LOG_DEBUG_INFO("s","Y");
-LOG_DEBUG_INFO("d",*pType);    
-LOG_DEBUG_INFO("s","MyGetAEventLog: pMessage");
-LOG_DEBUG_INFO("s",pMessage);
+//LOG_DEBUG_INFO("s","Y");
+//LOG_DEBUG_INFO("d",*pType);    
+//LOG_DEBUG_INFO("s","MyGetAEventLog: pMessage");
+//LOG_DEBUG_INFO("s",pMessage);
 
 CHECK_MEMORY(main, "MyGetAEventLog", "end");
     return err;
