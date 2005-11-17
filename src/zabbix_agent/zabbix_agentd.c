@@ -401,7 +401,8 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 
 	if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "Cannot bind to port %d. Another zabbix_agentd already running ?", port);
+		zabbix_log( LOG_LEVEL_CRIT, "Cannot bind to port %d. Error [%s]. Another zabbix_agentd already running ?",
+				port, strerror(errno));
 		exit(1);
 	}
 
