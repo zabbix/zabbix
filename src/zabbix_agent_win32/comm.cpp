@@ -79,13 +79,13 @@ CHECK_MEMORY(main, "ProcessingThread", "end");
 
 static void CommThread(void *param)
 {
-   SOCKET sock;
-   int rc;
-   REQUEST rq;
+	SOCKET sock;
+	int rc;
+	REQUEST rq;
 	struct timeval timeout;
 	FD_SET rdfs;
-   HANDLE hThread=NULL;
-   unsigned int tid;
+	HANDLE hThread=NULL;
+	unsigned int tid;
 
 //LOG_DEBUG_INFO("CommThread start");
 
@@ -94,7 +94,7 @@ INIT_CHECK_MEMORY(main);
 
    // Wait for command from server
 	FD_ZERO(&rdfs);
-	FD_SET(sock,&rdfs);
+	FD_SET(sock,&rdfs); // ignore warrning
 	timeout.tv_sec=COMMAND_TIMEOUT;
 	timeout.tv_usec=0;
 	if (select(sock+1,&rdfs,NULL,NULL,&timeout)==0)
@@ -173,7 +173,7 @@ INIT_CHECK_MEMORY(main);
    listen(sock,SOMAXCONN);
 
    // Wait for connection requests
-   while(1)
+   for(;;)
    {
 //LOG_DEBUG_INFO("s","ListenerThread while 1");
 INIT_CHECK_MEMORY(while);

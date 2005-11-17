@@ -105,6 +105,7 @@ int process_eventlog(char *source,int *lastlogsize, int *timestamp, char *value)
 LOG_DEBUG_INFO("s","Lastlogsize:");
 LOG_DEBUG_INFO("d",*lastlogsize);
 
+
 INIT_CHECK_MEMORY(main);
 	
     // Open the Application event log. 

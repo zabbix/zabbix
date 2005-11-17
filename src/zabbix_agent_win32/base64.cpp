@@ -74,25 +74,25 @@ static unsigned char char_base64_decode(char c)
 {
 	if (c >= 'A' && c <= 'Z')
 	{
-		return c - 'A';
+		return (unsigned char)(c - 'A');
 	}
 	
 	if (c >= 'a' && c <= 'z')
 	{
-		return c - 'a' + 26;
+		return (unsigned char)(c - 'a' + 26);
 	}
 	
 	if (c >= '0' && c <= '9')
 	{
-		return c - '0' + 52;
+		return (unsigned char)(c - '0' + 52);
 	}
 	
 	if (c == '+')
 	{
-		return 62;
+		return (unsigned char)(62);
 	}
 	
-	return 63;
+	return (unsigned char)(63);
 }
 /*------------------------------------------------------------------------
  *
@@ -133,10 +133,10 @@ void str_base64_encode(char *p_str, char *p_b64str, int in_size)
 		}
 
 		to1 = to2 = to3 = to4 = 0;
-		to1 = (from1>>2) & 0x3f;
-		to2 = ((from1&0x3)<<4)|(from2>>4);
-		to3 = ((from2&0xf)<<2)|(from3>>6);
-		to4 = from3&0x3f;
+		to1 = (unsigned char)((from1>>2) & 0x3f);
+		to2 = (unsigned char)(((from1&0x3)<<4)|(from2>>4));
+		to3 = (unsigned char)(((from2&0xf)<<2)|(from3>>6));
+		to4 = (unsigned char)(from3&0x3f);
 
 		*(p_b64str++) = char_base64_encode(to1);
 		*(p_b64str++) = char_base64_encode(to2);
@@ -238,16 +238,16 @@ void str_base64_decode(char *p_b64str, char *p_str, int *p_out_size)
 		to3 = char_base64_decode(from3);
 		to4 = char_base64_decode(from4);
 
-		*(p_str++) = ( (to1<<2)|(to2>>4) );
+		*(p_str++) = (char)((to1<<2)|(to2>>4));
 		(*p_out_size)++;
 		if (from3 != '=')
 		{
-			*(p_str++) = ( ((to2&0xf)<<4)|(to3>>2) );
+			*(p_str++) = (char)(((to2&0xf)<<4)|(to3>>2));
 			(*p_out_size)++;
 		}
 		if (from4 != '=')
 		{
-			*(p_str++) =  ( ((to3&0x3)<<6)|to4 );
+			*(p_str++) =  (char)(((to3&0x3)<<6)|to4);
 			(*p_out_size)++;
 		}
 	}
