@@ -1022,10 +1022,10 @@ int	DBadd_history_uint(int itemid, zbx_uint64_t value, int clock)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_uint()");
 
-	snprintf(sql,sizeof(sql)-1,"insert into history (clock,itemid,value) values (%d,%d," ZBX_FS_UINT64 ")",clock,itemid,value);
+	snprintf(sql,sizeof(sql)-1,"insert into history (clock,itemid,value) values (%d,%d," ZBX_FS_UI64 ")",clock,itemid,value);
 	DBexecute(sql);
 
-	DBadd_trend(itemid, value, clock);
+	DBadd_trend(itemid, (double)value, clock);
 
 	return SUCCEED;
 }
