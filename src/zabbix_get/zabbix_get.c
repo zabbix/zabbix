@@ -183,7 +183,7 @@ static int	get_value(char *server,int port,char *key,char *value)
 		return	FAIL;
 	}
 
-	value[i-1]=0;
+	delete_reol(value);
 
 	if( close(s)!=0 )
 	{
