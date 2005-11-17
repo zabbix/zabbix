@@ -214,7 +214,14 @@ BOOL Initialize(void)
 
    // Internal command aliases
    sprintf(counterPath,"perf_counter[\\%s\\%s]",GetCounterName(PCI_SYSTEM),GetCounterName(PCI_SYSTEM_UP_TIME));
-   AddAlias("system[uptime]",counterPath);
+	if(AddAlias("system[uptime]",counterPath))
+	{
+LOG_DEBUG_INFO("s","AddAlias == OK");
+	}
+	else
+	{
+LOG_DEBUG_INFO("s","AddAlias == FAIL");
+	}
 
    // Start TCP/IP listener and collector threads
 
@@ -324,7 +331,7 @@ lbl_End:
 	FreeAliasList();
 
 CHECK_MEMORY(main, "main","end")
-#ifdef _DEBUG
+#if defined(ENABLE_CHECK_MEMOTY)
 	else LOG_DEBUG_INFO("s", "main: Memory OK!");
 #else
 	;

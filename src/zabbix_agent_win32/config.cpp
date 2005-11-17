@@ -121,16 +121,19 @@ void	FreeSubagentNameList(void)
 
 static BOOL AddPerformanceCounter(char *args)
 {
-   char *ptr1,*ptr2,*eptr,buffer[MAX_ALIAS_NAME];
+   char 
+	   *ptr1=NULL,
+	   *ptr2=NULL,
+	   *eptr,buffer[MAX_ALIAS_NAME];
    USER_COUNTER *counter;
-   int i;
-   BOOL ret = TRUE;
+   int i=0;
+   BOOL ret = FALSE;
 
 INIT_CHECK_MEMORY(main);
 
    ptr1=strchr(args,',');
-   if (ptr1==NULL)
-      ret = FALSE;     // Invalid syntax
+   if (ptr1!=NULL)      // Invalid syntax
+      ret = TRUE;
 
    if(ret == TRUE)
    {

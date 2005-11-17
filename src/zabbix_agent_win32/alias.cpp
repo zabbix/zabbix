@@ -38,6 +38,8 @@ static ALIAS *aliasList=NULL;
 BOOL AddAlias(char *name,char *value)
 {
 /*
+   ALIAS *alias;
+   BOOL ret = FALSE;
 
    // Find alias in the list
 	for(alias=aliasList;alias!=NULL;alias=alias->next)
@@ -67,9 +69,10 @@ BOOL AddAlias(char *name,char *value)
 	}
 
    return ret;
-*/
-   ALIAS *alias;
-   BOOL ret = FALSE;
+/**/
+
+	ALIAS *alias;
+	BOOL ret = FALSE;
 
 	for(alias=aliasList; ; alias=alias->next)
 	{
@@ -77,7 +80,7 @@ BOOL AddAlias(char *name,char *value)
 		if(alias == NULL)
 		{
 			alias=(ALIAS *)malloc(sizeof(ALIAS));
-			if (alias==NULL)
+			if (alias!=NULL)
 			{
 				memset(alias,0,sizeof(ALIAS));
 				strncpy(alias->name, name, MAX_ALIAS_NAME-1);

@@ -55,19 +55,32 @@ static DWORD collectorTimesHistory[60];
 void CollectorThread(void *)
 {
    HQUERY query;
-   PDH_HCOUNTER cntCpuUsage[MAX_CPU+1],cntCpuQueue;
    PDH_FMT_COUNTERVALUE value;
-   PDH_RAW_COUNTER rawCpuUsage1[MAX_CPU+1],rawCpuUsage2[MAX_CPU+1];
    PDH_RAW_COUNTER rawCounter;      // Generic raw counter for various parameters
    PDH_STATUS status;
    SYSTEM_INFO sysInfo;
-   DWORD i,cpuHistoryIdx,cpuQueueHistoryIdx,collectorTimesIdx,dwSleepTime;
-   USER_COUNTER *cptr;
+   USER_COUNTER *cptr = NULL;
    PDH_STATISTICS statData;
    char counterPath[MAX_COUNTER_PATH * 2 + 50];
 
+   PDH_HCOUNTER 
+		cntCpuUsage[MAX_CPU+1], 
+		cntCpuQueue=NULL;
+
+   PDH_RAW_COUNTER 
+		rawCpuUsage1[MAX_CPU+1],
+		rawCpuUsage2[MAX_CPU+1];
+
+   DWORD 
+	   i = 0,
+	   cpuHistoryIdx = 0,
+	   cpuQueueHistoryIdx = 0,
+	   collectorTimesIdx = 0,
+	   dwSleepTime = 0;
+
+
 INIT_CHECK_MEMORY(main);
-//LOG_DEBUG_INFO("s", "CollectorThread start");
+LOG_DEBUG_INFO("s", "CollectorThread start");
 
    GetSystemInfo(&sysInfo);
 
@@ -86,7 +99,11 @@ INIT_CHECK_MEMORY(main);
 		goto lbl_End;
    }
 
+
    sprintf(counterPath,"\\%s(_Total)\\%s",GetCounterName(PCI_PROCESSOR),GetCounterName(PCI_PROCESSOR_TIME));
+
+LOG_DEBUG_INFO("s","counterPath1");
+LOG_DEBUG_INFO("s",counterPath);
 
    if ((status=PdhAddCounter(query,counterPath, 0, &cntCpuUsage[0]))!=ERROR_SUCCESS)
    {
@@ -98,6 +115,10 @@ INIT_CHECK_MEMORY(main);
    for(i=0;i<sysInfo.dwNumberOfProcessors;i++)
    {
       sprintf(counterPath,"\\%s(%d)\\%s", GetCounterName(PCI_PROCESSOR), i, GetCounterName(PCI_PROCESSOR_TIME));
+
+LOG_DEBUG_INFO("s","counterPath2");
+LOG_DEBUG_INFO("s",counterPath);
+
       if ((status=PdhAddCounter(query,counterPath,0,&cntCpuUsage[i+1]))!=ERROR_SUCCESS)
       {
          WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"ss",
@@ -120,6 +141,9 @@ INIT_CHECK_MEMORY(main);
 
    sprintf((char *) &counterPath, "\\%s\\%s", GetCounterName(PCI_SYSTEM), GetCounterName(PCI_PROCESSOR_QUEUE_LENGTH));
 
+LOG_DEBUG_INFO("s","counterPath3");
+LOG_DEBUG_INFO("s",counterPath);
+
    // Prepare for CPU execution queue usage collection
    if ((status=PdhAddCounter(query,(char *) &counterPath,0,&cntCpuQueue))!=ERROR_SUCCESS)
    {
@@ -134,6 +158,10 @@ INIT_CHECK_MEMORY(main);
    // Add user counters to query
    for(cptr=userCounterList;cptr!=NULL;cptr=cptr->next)
    {
+
+LOG_DEBUG_INFO("s","counterPath4");
+LOG_DEBUG_INFO("s",counterPath);
+
       if ((status=PdhAddCounter(query,cptr->counterPath,0,&cptr->handle))!=ERROR_SUCCESS)
       {
          cptr->interval=-1;   // Flag for unsupported counters
@@ -154,12 +182,14 @@ INIT_CHECK_MEMORY(main);
       DWORD dwTicksStart,dwTicksElapsed;
 
 INIT_CHECK_MEMORY(do);
-//LOG_DEBUG_INFO("CollectorThread: loop 1");
+LOG_DEBUG_INFO("s", "CollectorThread: loop 1");
 
       dwTicksStart=GetTickCount();
       if ((status=PdhCollectQueryData(query))!=ERROR_SUCCESS)
+	  {
          WriteLog(MSG_PDH_COLLECT_QUERY_DATA_FAILED,EVENTLOG_ERROR_TYPE,"s",
                   GetPdhErrorText(status));
+	  }
 
       // Process CPU utilization data
       for(i=0;i<=sysInfo.dwNumberOfProcessors;i++)
@@ -284,7 +314,7 @@ lbl_CloseQuery:
 
 lbl_End:
 
-//LOG_DEBUG_INFO("s", "CollectorThread end");
+LOG_DEBUG_INFO("s", "CollectorThread end");
 CHECK_MEMORY(main, "CollectorThread","end");
 
 	_endthread();
