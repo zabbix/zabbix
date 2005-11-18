@@ -124,8 +124,9 @@
 						$tmpGroupID=create_Host_Group($tmpGroup);
 						add_Host_To_Group($tmpGroupID,$tmpHostID);
 					}
+					add_template_linkage($tmpHostID,$hostTemplate,7,7,7,7,7);
+					DBexecute("update hosts set serverid=$hostServer where hostid='$tmpHostID'");
 				}
-				DBexecute("update hosts set serverid=$hostServer where hostid='$tmpHostID'");
 				break;
 			case "USER":
 				list($tmpName,$tmpSurname,$tmpAlias,$tmpPasswd,$tmpURL,$tmpAutologout,$tmpLang,$tmpRefresh,$tmpUserGroups) = explode(",",$tmpField,9);
