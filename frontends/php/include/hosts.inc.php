@@ -67,7 +67,10 @@
 			add_templates_to_host($hostid,$host_templateid);
 			sync_host_with_templates($hostid);
 		}
-		update_host_groups($hostid,$groups);
+		if($groups != "")
+		{
+			update_host_groups($hostid,$groups);
+		}
 		if($newgroup != "")
 		{
 			add_group_to_host($hostid,$newgroup);
