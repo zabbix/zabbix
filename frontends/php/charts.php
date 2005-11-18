@@ -36,7 +36,7 @@
 	{
 		show_header($page["title"],0,$nomenu);
 	}
-	navigation_bar_calc();
+	$effectiveperiod=navigation_bar_calc();
 
 ?>
 
@@ -51,9 +51,9 @@
 	{
 		$_REQUEST["from"]=0;
 	}
-	if(!isset($_REQUEST["period"]))
+	if(!isset($effectiveperiod))
 	{
-		$_REQUEST["period"]=3600;
+		$effectiveperiod=3600;
 	}
 
 	if(!isset($_REQUEST["keep"]))
@@ -172,7 +172,7 @@
 	if(isset($_REQUEST["graphid"]))
 	{
 		echo "<script language=\"JavaScript\">";
-		echo "document.write(\"<IMG SRC='chart2.php?graphid=".$_REQUEST["graphid"].url_param("stime")."&period=".$_REQUEST["period"]."&from=".$_REQUEST["from"]."&width=\"+(document.width-108)+\"'>\")";
+		echo "document.write(\"<IMG SRC='chart2.php?graphid=".$_REQUEST["graphid"].url_param("stime")."&period=".$effectiveperiod."&from=".$_REQUEST["from"]."&width=\"+(document.width-108)+\"'>\")";
 		echo "</script>";
 	}
 	else

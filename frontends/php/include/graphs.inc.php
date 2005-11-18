@@ -207,14 +207,16 @@
 		if(!isset($_REQUEST["period"]))	$_REQUEST["period"]=3600;
 		if(!isset($_REQUEST["from"]))	$_REQUEST["from"]=0;
 
-		if(isset($_REQUEST["inc"]))		$_REQUEST["period"]= $_REQUEST["period"]+$_REQUEST["inc"];
-		if(isset($_REQUEST["dec"]))		$_REQUEST["period"]= $_REQUEST["period"]-$_REQUEST["dec"];
+		if(isset($_REQUEST["inc"]))		$workingperiod= $_REQUEST["period"]+$_REQUEST["inc"];
+		if(isset($_REQUEST["dec"]))		$workingperiod= $workingperiod-$_REQUEST["dec"];
+		//if(isset($_REQUEST["inc"]))		$_REQUEST["period"]= $_REQUEST["period"]+$_REQUEST["inc"];
+		//if(isset($_REQUEST["dec"]))		$_REQUEST["period"]= $_REQUEST["period"]-$_REQUEST["dec"];
 
 		if(isset($_REQUEST["left"]))	$_REQUEST["from"]= $_REQUEST["from"]+$_REQUEST["left"];
 		if(isset($_REQUEST["right"]))	$_REQUEST["from"]= $_REQUEST["from"]-$_REQUEST["right"];
 
-		unset($_REQUEST["inc"]);
-		unset($_REQUEST["dec"]);
+		//unset($_REQUEST["inc"]);
+		//unset($_REQUEST["dec"]);
 		unset($_REQUEST["left"]);
 		unset($_REQUEST["right"]);
 
@@ -225,7 +227,9 @@
 		{
 			$_REQUEST["period"]=3600;
 			$_REQUEST["from"]=0;
+			$workingperiod=3600;
 		}
+		return $workingperiod;
 	}
 
 	function	navigation_bar($url)

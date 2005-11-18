@@ -1674,19 +1674,6 @@ echo "</head>";
 		}
 	}
 
-	function	add_group($group)
-	{
-		$result=DBexecute("insert into groups (name) values ('$group')");
-		if($result)
-		{
-			return DBinsert_id($result,"groups","name");
-		}
-		else
-		{
-			return 0;
-		}
-	}
-
 	function	add_host_group($name,$hosts)
 	{
 //		if(!check_right("Host","A",0))
