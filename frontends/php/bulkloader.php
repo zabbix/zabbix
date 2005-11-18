@@ -109,30 +109,23 @@
 					$hostServer=1;
 				}
 
-				//  Determine which group(s) this host belongs to, create any group(s) necessary;
-				$hostGroups=array();
-				$groupnum=0;
-				foreach(explode(',',rtrim(rtrim($tmpHostGroups," "),"\n")) as $tmpGroup)
+				//  Now that we have all the values we need process them for this host
+				$result=add_host($tmpHost,$hostPort,$hostStat,$hostUseIP,$tmpHostIP,$hostTemplate,'','');
+				show_messages($result,'Host added: '. $tmpHost,'Cannot add host: '. $tmpHost);;
+
+				//  Here we update the hosts_groups manually.  This will create new groups if needed
+				//  And add this host to any group listed.
+				$row=DBfetch(DBselect("select distinct(hostid) from hosts where host='$tmpHost'"));
+				$tmpHostID=$row["hostid"];
+				if($tmpHostID)
 				{
-					$groupnum++;
-					$sqlResult=DBselect("select distinct(groupid) from groups where name='$tmpGroup'");
-					if(DBnum_rows($sqlResult)==0)
+					foreach(explode(',',rtrim(rtrim($tmpHostGroups," "),"\n")) as $tmpGroup)
 					{
-						// Create new group
-						$hostGroups=array_merge($hostGroups,array(create_Host_Group($tmpGroup)));
-					}
-					else
-					{
-						//  Found Existing Group;
-						$row=DBfetch($sqlResult);
-						$hostGroups=array_merge($hostGroups,array($row["groupid"]));
+						$tmpGroupID=create_Host_Group($tmpGroup);
+						add_Host_To_Group($tmpGroupID,$tmpHostID);
 					}
 				}
-
-				//  Now that we have all the values we need process them for this host
-				$result=add_host($tmpHost,$hostPort,$hostStat,$hostUseIP,$tmpHostIP,$hostTemplate,'',$hostGroups);
-				show_messages($result,'Host added: '. $tmpHost,'Cannot add host: '. $tmpHost);;
-				DBselect("update hosts set serverid=$hostServer where host='$tmpHost'");
+				DBexecute("update hosts set serverid=$hostServer where hostid='$tmpHostID'");
 				break;
 			case "USER":
 				list($tmpName,$tmpSurname,$tmpAlias,$tmpPasswd,$tmpURL,$tmpAutologout,$tmpLang,$tmpRefresh,$tmpUserGroups) = explode(",",$tmpField,9);
