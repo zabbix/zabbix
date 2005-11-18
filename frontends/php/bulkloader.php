@@ -19,6 +19,7 @@
 **/
 	include "include/config.inc.php";
 	include "include/forms.inc.php";
+	include "include/bulkloader.inc.php";
 	$page["file"] = "bulkloader.php";
 	$page["title"] = "S_BULKLOADER_MAIN";
 	$fileuploaded=0;
@@ -111,20 +112,19 @@
 				//  Determine which group(s) this host belongs to, create any group(s) necessary;
 				$hostGroups=array();
 				$groupnum=0;
-//				$tmpGroupList=explode(',',rtrim(rtrim($tmpHostGroups," "),"\n"));
 				foreach(explode(',',rtrim(rtrim($tmpHostGroups," "),"\n")) as $tmpGroup)
 				{
 					$groupnum++;
-					$sqlResult=DBSelect("select distinct(groupid) from groups where name='$tmpGroup'");
+					$sqlResult=DBselect("select distinct(groupid) from groups where name='$tmpGroup'");
 					if(DBnum_rows($sqlResult)==0)
 					{
 						// Create new group
-						$hostGroups=array_merge($hostGroups,array(add_group($tmpGroup)));
+						$hostGroups=array_merge($hostGroups,array(create_Host_Group($tmpGroup)));
 					}
 					else
 					{
 						//  Found Existing Group;
-						$row=DBFetch($sqlResult);
+						$row=DBfetch($sqlResult);
 						$hostGroups=array_merge($hostGroups,array($row["groupid"]));
 					}
 				}
@@ -135,7 +135,26 @@
 				DBselect("update hosts set serverid=$hostServer where host='$tmpHost'");
 				break;
 			case "USER":
-				echo "Importing Users is not yet implemented";
+				list($tmpName,$tmpSurname,$tmpAlias,$tmpPasswd,$tmpURL,$tmpAutologout,$tmpLang,$tmpRefresh,$tmpUserGroups) = explode(",",$tmpField,9);
+				$autologout=@iif($tmpAutologout==NULL,900,$tmpAutologout);
+				$lang=@iif($tmpLang==NULL,'en_gb',$tmpLang);
+				$refresh=@iif($tmpRefresh==NULL,30,$tmpRefresh);
+				$passwd=@iif($tmpPasswd==NULL,md5($tmpAlias),md5($tmpPasswd));
+				$result=@iif($tmpAlias==NULL,0,add_user($tmpName,$tmpSurname,$tmpAlias,$passwd,$tmpURL,$autologout,$lang,$refresh));
+				show_messages($result, S_USER_ADDED .': '. $tmpAlias, S_CANNOT_ADD_USER .': '. $tmpAlias);
+				$row=DBfetch(DBselect("select distinct(userid) from users where alias='$tmpAlias'"));
+				$tmpUserID=$row["userid"];
+				if($tmpUserID)
+				{
+					foreach(explode(',',rtrim(rtrim($tmpUserGroups," "),"\n")) as $tmpGroup)
+					{
+						$tmpGroupID=create_User_Group($tmpGroup);
+						add_User_To_Group($tmpGroupID,$tmpUserID);
+					}
+				}
+				break;
+			case "PERM":
+				echo "Importing User Permissions is not yet implemented";
 				break;
 			case "ITEM":
 				echo "Importing Items is not yet implemented";
@@ -157,11 +176,6 @@
 	}
 	table_begin();
 	table_row(array(
-		"Currently, The bulk loader, only loads Host Entries."
-		), 0);
-	table_end();
-	table_begin();
-	table_row(array(
 		'Host Entry Format.',
 		'HOST,&lt;Hostname&gt;,&lt;Host IP&gt;,&lt;Host Port&gt;,&lt;Host Status&gt;,&lt;Template Host&gt;,&lt;Zabbix Server&gt;,&lt;Host Group(s)&gt<BR>'.
 		'&nbsp;&nbsp;&nbsp;<STRONG>HOST</STRONG>: This is the command to tell the bulk loader that this entry is a host<BR>'.
@@ -172,6 +186,31 @@
 		'&nbsp;&nbsp;&nbsp;<STRONG>Template Host</STRONG>: This field contains the full name of the Template host, otherwise the host will not use a template.<BR>'.
 		'&nbsp;&nbsp;&nbsp;<STRONG>Zabbix Server</STRONG>: This field contains the full name of the Zabbix server.  If it is blank or the server does not exist, it is assumed that this host in on the default Zabbix Server.<BR>'.
 		'&nbsp;&nbsp;&nbsp;<STRONG>Host Group(s)</STRONG>: This field contains the name of the group or groups, comma seperated, that this host belongs to. If this field is empty then it it assumed that this host belongs to no groups.  If this contains one or more groups that are not in the Zabbix Server, the groups will be created and this host added to those groups.<BR>'.
+
+		''
+		), 2);
+	table_row(array(
+		'User Entry Format.',
+		'USER,&lt;User First Name&gt;,&lt;User Surname&gt;,&lt;Login Name&gt;,&lt;Password&gt;,&lt;URL&gt;,&lt;Auto Logout Time&gt;,&lt;Language&gt;,&lt;Screen Refresh Time&gt;,&lt;Host Group(s)&gt<BR>'.
+		'&nbsp;&nbsp;&nbsp;<STRONG>USER</STRONG>: This is the command to tell the bulk loader that this entry is a User<BR>'.
+		'&nbsp;&nbsp;&nbsp;<STRONG>User First Name</STRONG>:  This is the users first name<BR>'.
+		'&nbsp;&nbsp;&nbsp;<STRONG>User Surname</STRONG>:  This is the users last name<BR>'.
+		'&nbsp;&nbsp;&nbsp;<STRONG>Login Name</STRONG>:   This is the name the user will login with.  NOTE: User will not be created if this is blank.<BR>'.
+		'&nbsp;&nbsp;&nbsp;<STRONG>Password</STRONG>: This is the password that user will login with. If blank, this will default to the login name.<BR>'.
+		'&nbsp;&nbsp;&nbsp;<STRONG>URL</STRONG>: This is the URL the user is redirected to upon login.<BR>'.
+		'&nbsp;&nbsp;&nbsp;<STRONG>Auto Logout Time</STRONG>: This is the number of seconds before an idle user will be logged off.  If blank, this will default to 900 seconds.<BR>'.
+		'&nbsp;&nbsp;&nbsp;<STRONG>Language</STRONG>: This is the the language that that Zabbix will display to the user.  If blank, this will default to en_gb. Valid Choices are;<BR>'.
+			'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&gt; en_gb -- English<BR>'.
+			'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&gt; fr_fr -- French<BR>'.
+			'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&gt; de_de -- German<BR>'.
+			'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&gt; it_it -- Itallian<BR>'.
+			'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&gt; ja_ja -- Japanese<BR>'.
+			'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&gt; lv_lv -- Latvian<BR>'.
+			'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&gt; ru_ru -- Russian<BR>'.
+			'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&gt; sp_sp -- Spanish<BR>'.
+			''.
+		'&nbsp;&nbsp;&nbsp;<STRONG>Screen Refresh Time</STRONG>: This is the number of seconds before monitoring pages will refresh.  If blank, this will default to 30 seconds.<BR>'.
+		'&nbsp;&nbsp;&nbsp;<STRONG>User Group(s)</STRONG>: This is a comma separated list of user groups that the user belongs to.  If this contains one or more groups that are not in the Zabbix Server, the groups will be created and user added to those groups.<BR>'.
 
 		''
 		), 2);

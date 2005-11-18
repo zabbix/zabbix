@@ -59,6 +59,10 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item,char *error, in
 	{
 		session.version = SNMP_VERSION_2c;
 	}
+	else if(item->type == ITEM_TYPE_SNMPv3)
+	{
+		session.version = SNMP_VERSION_3;
+	}
 	else
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Error in get_value_SNMP. Wrong item type [%d]. Must be SNMP.", item->type);
@@ -90,6 +94,7 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item,char *error, in
 	{
 		session.community = item->snmp_community;
 		session.community_len = strlen(session.community);
+		zabbix_log( LOG_LEVEL_DEBUG, "SNMP [%s@%s:%d]",session.community, session.peername, session.remote_port);
 	}
 	else if(session.version == SNMP_VERSION_3)
 	{
@@ -106,38 +111,60 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item,char *error, in
 		else if(item->snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV)
 		{
 			session.securityLevel = SNMP_SEC_LEVEL_AUTHNOPRIV;
-		}
-		else if(item->snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV)
-		{
-			session.securityLevel = SNMP_SEC_LEVEL_AUTHPRIV;
-		}
-		else
-		{
-			zabbix_log( LOG_LEVEL_ERR, "Unsupported SNMPv3 security level [%d]", item->snmpv3_securitylevel);
-			snprintf(error,max_error_len-1,"Unsupported SNMPv3 security level [%d]", item->snmpv3_securitylevel);
-			return FAIL;
-		}
+			
+			/* set the authentication method to MD5 */
+			session.securityAuthProto = usmHMACMD5AuthProtocol;
+			session.securityAuthProtoLen = USM_AUTH_PROTO_MD5_LEN;
+			session.securityAuthKeyLen = USM_AUTH_KU_LEN;
 
-		/* set the authentication method to MD5 */
-		session.securityAuthProto = usmHMACMD5AuthProtocol;
-		session.securityAuthProtoLen = sizeof(usmHMACMD5AuthProtocol)/sizeof(oid);
-		session.securityAuthKeyLen = USM_AUTH_KU_LEN;
-
-		/* set the authentication key to a MD5 hashed version of our
-		passphrase "The UCD Demo Password" (which must be at least 8
-		characters long) */
-
-		/* Where item->snmpv3_privpassphrase has to be used? */
-		if (generate_Ku(session.securityAuthProto,
+			if (generate_Ku(session.securityAuthProto,
 				session.securityAuthProtoLen,
 				(u_char *) item->snmpv3_authpassphrase, strlen(item->snmpv3_authpassphrase),
 				session.securityAuthKey,
 				&session.securityAuthKeyLen) != SNMPERR_SUCCESS)
-		{
+			{
 			zabbix_log( LOG_LEVEL_ERR, "Error generating Ku from authentication pass phrase.");
 			snprintf(error,max_error_len-1,"Error generating Ku from authentication pass phrase.");
 			return FAIL;
+			}
 		}
+		else if(item->snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV)
+		{
+			session.securityLevel = SNMP_SEC_LEVEL_AUTHPRIV;
+
+			/* set the authentication method to MD5 */
+			session.securityAuthProto = usmHMACMD5AuthProtocol;
+			session.securityAuthProtoLen = USM_AUTH_PROTO_MD5_LEN;
+			session.securityAuthKeyLen = USM_AUTH_KU_LEN;
+
+			if (generate_Ku(session.securityAuthProto,
+				session.securityAuthProtoLen,
+				(u_char *) item->snmpv3_authpassphrase, strlen(item->snmpv3_authpassphrase),
+				session.securityAuthKey,
+				&session.securityAuthKeyLen) != SNMPERR_SUCCESS)
+			{
+			zabbix_log( LOG_LEVEL_ERR, "Error generating Ku from authentication pass phrase.");
+			snprintf(error,max_error_len-1,"Error generating Ku from authentication pass phrase.");
+			return FAIL;
+			}
+			
+			/* set the private method to DES */
+			session.securityPrivProto = usmDESPrivProtocol;
+    			session.securityPrivProtoLen = USM_PRIV_PROTO_DES_LEN;
+			session.securityPrivKeyLen = USM_PRIV_KU_LEN;
+			
+			if (generate_Ku(session.securityAuthProto,
+				session.securityAuthProtoLen,
+		                (u_char *) item->snmpv3_privpassphrase, strlen(item->snmpv3_privpassphrase),
+				session.securityPrivKey,
+				&session.securityPrivKeyLen) != SNMPERR_SUCCESS) 
+			{
+			zabbix_log( LOG_LEVEL_ERR, "Error generating Ku from priv pass phrase: %s.",item->snmpv3_privpassphrase);
+			snprintf(error,max_error_len-1,"Error generating Ku from priv pass phrase.");
+			return FAIL;
+			}
+		}
+	zabbix_log( LOG_LEVEL_DEBUG, "SNMPv3 [%s@%s:%d]",session.securityName, session.peername, session.remote_port);
 	}
 	else
 	{
@@ -146,7 +173,6 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item,char *error, in
 		return FAIL;
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "SNMP [%s@%s:%d]",session.community, session.peername, session.remote_port);
 	zabbix_log( LOG_LEVEL_DEBUG, "OID [%s]", item->snmp_oid);
 
 	SOCK_STARTUP;
@@ -271,8 +297,8 @@ int	get_value_snmp(double *result,char *result_str,DB_ITEM *item,char *error, in
 			{
 /* count is not really used. Has to be removed */ 
 				count++;
-				zabbix_log(LOG_LEVEL_WARNING,"value #%d has unknow type [%d]",count,vars->type);
-				snprintf(error,max_error_len-1,"value #%d has unknow type [%d]",count,vars->type);
+				zabbix_log(LOG_LEVEL_WARNING,"value #%d has unknow type [%X]",count,vars->type);
+				snprintf(error,max_error_len-1,"value #%d has unknow type [%X]",count,vars->type);
 				ret  = NOTSUPPORTED;
 			}
 		}
