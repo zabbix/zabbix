@@ -28,8 +28,7 @@ include_once    "include/config.inc.php";
 	//  Returns: 0 if unable to create, otherwise it returns the groupID
 	function        create_Host_Group($group)
 	{
-		$sql="select * from groups where name='$group'";
-		$result=DBselect("select distinct(groupid) from groups where name='$name'");
+		$result=DBselect("select distinct(groupid) from groups where name='$group'");
 		if(DBnum_rows($result)>0)
 		{
 			$row=DBfetch($result);
@@ -47,11 +46,26 @@ include_once    "include/config.inc.php";
 		}
 	}
 
+	//  This function adds host to a host group based on ID numbers.
+	//  Returns: 0 on failure, otherwise it returns 1
+	function	add_Host_To_Group($groupid=0,$hostid=0)
+	{
+		if($groupid==0||$hostid==0)
+		{
+			return 0;
+		}
+		$result=DBexecute("insert into hosts_groups (groupid,hostid) values ($groupid,$hostid)");
+		if($result)
+		{
+			return 1;
+		}
+		return 0;	
+	}
+
 	//  This function takes a user group name and populates the database.
 	//  Returns: 0 if unable to create, otherwise it returns the groupID
 	function        create_User_Group($group)
 	{
-		$sql="select * from groups where name='$group'";
 		$result=DBselect("select distinct(usrgrpid) from usrgrp where name='$group'");
 		if(DBnum_rows($result)>0)
 		{
@@ -66,7 +80,7 @@ include_once    "include/config.inc.php";
 		}
 		else
 		{
-		return 0;
+			return 0;
 		}
 	}
 
