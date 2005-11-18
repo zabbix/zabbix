@@ -71,13 +71,13 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 	{
 		res=get_value_agent(item, result);
 	}
-	else if( (item->type == ITEM_TYPE_SNMPv1) || (item->type == ITEM_TYPE_SNMPv2c))
+	else if( (item->type == ITEM_TYPE_SNMPv1) || (item->type == ITEM_TYPE_SNMPv2c) || (item->type == ITEM_TYPE_SNMPv3))
 	{
 #ifdef HAVE_SNMP
 		res=get_value_snmp(item, result);
 #else
-		zabbix_log(LOG_LEVEL_WARNING, "Support of SNMP parameters was no compiled in");
-		zabbix_syslog("Support of SNMP parameters was no compiled in. Cannot process [%s:%s]", item->host, item->key);
+		zabbix_log(LOG_LEVEL_WARNING, "Support of SNMP parameters was not compiled in");
+		zabbix_syslog("Support of SNMP parameters was not compiled in. Cannot process [%s:%s]", item->host, item->key);
 		res=NOTSUPPORTED;
 #endif
 	}

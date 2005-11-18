@@ -79,7 +79,7 @@
 ?>
 
 <?php
-	navigation_bar_calc();
+	$effectiveperiod=navigation_bar_calc();
 ?>
 
 <?php
@@ -120,15 +120,15 @@
 <?php
 	if($_REQUEST["action"]=="showfreehist")
 	{
-		show_freehist($_REQUEST["itemid"],$_REQUEST["period"]);
+		show_freehist($_REQUEST["itemid"],$effectiveperiod);
 		exit;
 	}
 
 	if($_REQUEST["action"]=="showplaintxt")
 	{
-//		if(!isset($_REQUEST["period"]))
+//		if(!isset($effectiveperiod))
 		{
-			show_plaintxt($_REQUEST["itemid"],$_REQUEST["period"]);
+			show_plaintxt($_REQUEST["itemid"],$effectiveperiod);
 		} 
 		exit;
    
@@ -140,15 +140,15 @@
 		{
 			$_REQUEST["from"]=0;
 		}
-		if(!isset($_REQUEST["period"]))
+		if(!isset($effectiveperiod))
 		{
-			$_REQUEST["period"]=3600;
+			$effectiveperiod=3600;
 		}
-		$time=time(NULL)-$_REQUEST["period"]-$_REQUEST["from"]*3600;
+		$time=time(NULL)-$effectiveperiod-$_REQUEST["from"]*3600;
 		$till=time(NULL)-$_REQUEST["from"]*3600;
-		$hours=$_REQUEST["period"]/3600;
+		$hours=$effectiveperiod/3600;
 
-		show_table_header("Showing history of ".$_REQUEST["period"]." seconds($hours h)<BR>[from: ".date("Y.M.d H:i:s",$time)."] [till: ".date("Y.M.d H:i:s",$till)."]");
+		show_table_header("Showing history of ".$effectiveperiod." seconds($hours h)<BR>[from: ".date("Y.M.d H:i:s",$time)."] [till: ".date("Y.M.d H:i:s",$till)."]");
 
 		echo "<TABLE BORDER=0 COLS=2 ALIGN=CENTER WIDTH=100% BGCOLOR=\"#AAAAAA\" cellspacing=1 cellpadding=3>";
 		echo "<TR BGCOLOR=\"#CCCCCC\">";
@@ -238,9 +238,9 @@
 
 	if($_REQUEST["action"]=="showhistory")
 	{
-		if(!isset($_REQUEST["period"]))
+		if(!isset($effectiveperiod))
 		{
-			$_REQUEST["period"]=3600;
+			$effectiveperiod=3600;
 		}
 		if(!isset($_REQUEST["from"]))
 		{
@@ -250,7 +250,7 @@
 		{
 			$_REQUEST["from"]=($now-mktime($_REQUEST["hour"], 0, 0, $_REQUEST["month"], $_REQUEST["day"],$_REQUEST["year"]))/3600;
 		}
-		@show_history($_REQUEST["itemid"],$_REQUEST["from"],$_REQUEST["period"]);
+		@show_history($_REQUEST["itemid"],$_REQUEST["from"],$effectiveperiod);
 		show_footer();
 		exit;
 	}
