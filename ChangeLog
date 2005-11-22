@@ -1,5 +1,6 @@
 Changes for 1.1beta3:
 
+ - fixed autoregistration (Alexei)
  - added preliminary bulk host and bulk user loader.  (James)
  - applied Graph Dropdown fix.  Thanks to Elkor (James)
  - applied SNMPv3 fix.  Thanks to Sauron (James)  --  Please note I do not
