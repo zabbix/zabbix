@@ -109,16 +109,6 @@
 #define	TIMEOUT_ERROR	(-4)
 #define	AGENT_ERROR	(-5)
 
-/*
- * Default Server ID is 1
- */
-#define SERVERD_ID      1
-
-/*
- * Default Server ID is 1
- */
-#define	SERVERD_ID	1
-
 #define	MAXFD	64
 
 /* show debug info to stderr */
