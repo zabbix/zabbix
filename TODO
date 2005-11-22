@@ -25,6 +25,7 @@ ZABBIX 1.1:
 
  - add HTML block to the screen cell (to see external data, images, etc)
  - centralised agent upgrade
+ - take advantage of 'make dist'
 
 TKOM:
 
