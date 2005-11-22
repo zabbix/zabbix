@@ -789,12 +789,6 @@
 	"S_HOST_PROFILES"=>			"Host profiles",
 	"S_HOST_PROFILES_BIG"=>			"HOST PROFILES",
 
-//	servers.php
-	"S_SERVER_SERVERID"=>			"Server ID",
-	"S_SERVER_HOST"=>			"Server Name",
-	"S_SERVER_IP"=>				"Server IP",
-	"S_SERVER_PORT"=>			"Server Port",
-
 //	bulkloader.php
 	"S_MENU_BULKLOADER"=>			"Bulkloader",
 	"S_BULKLOADER_MAIN"=>			"Bulkloader: Main Page",

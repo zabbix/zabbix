@@ -96,19 +96,6 @@
 					$hostTemplate=0;
 				}
 
-				//  Determine which Zabbix server this host defaults to
-				$sql="select distinct(serverid) from servers where host='$tmpHostServer'";
-				$sqlResult=DBselect($sql);
-				if(DBnum_rows($sqlResult)==1)
-				{
-					$row=DBfetch($sqlResult);
-					$hostServer=$row["serverid"];
-				}
-				else
-				{
-					$hostServer=1;
-				}
-
 				//  Now that we have all the values we need process them for this host
 				$result=add_host($tmpHost,$hostPort,$hostStat,$hostUseIP,$tmpHostIP,$hostTemplate,'','');
 				show_messages($result,'Host added: '. $tmpHost,'Cannot add host: '. $tmpHost);;
@@ -126,7 +113,6 @@
 					}
 					add_template_linkage($tmpHostID,$hostTemplate,7,7,7,7,7);
 					sync_host_with_template($tmpHostID,$hostTemplate,7,7,7,7,7);
-					DBexecute("update hosts set serverid=$hostServer where hostid='$tmpHostID'");
 				}
 				break;
 			case "USER":
