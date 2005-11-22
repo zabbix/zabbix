@@ -49,6 +49,7 @@
 
 
 /*int	get_value_SNMP(int version,double *result,char *result_str,DB_ITEM *item);*/
-int	get_value_snmp(double *result,char *result_str,DB_ITEM *item,char *error, int max_error_len);
+/*int	get_value_snmp(double *result,char *result_str,DB_ITEM *item,char *error, int max_error_len);*/
+int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value);
 
 #endif
