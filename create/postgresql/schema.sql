@@ -25,7 +25,6 @@
 
 CREATE TABLE hosts (
   hostid		serial,
-  serverid 		int4 		DEFAULT '1' 		NOT NULL,
   host			varchar(64)	DEFAULT '' 		NOT NULL,
   useip			int4		DEFAULT '0'		NOT NULL,
   ip			varchar(15)	DEFAULT '127.0.0.1'	NOT NULL,
@@ -36,12 +35,10 @@ CREATE TABLE hosts (
   error			varchar(128)	DEFAULT ''		NOT NULL,
   available		int4		DEFAULT '0'		NOT NULL,
   PRIMARY KEY (hostid)
-  FOREIGN KEY (serverid) REFERENCES servers
 );
 
 CREATE INDEX hosts_status on hosts (status);
 CREATE UNIQUE INDEX hosts_host on hosts (host);
-CREATE INDEX hosts_server on hosts (serverid);
 
 --
 -- Table structure for table 'items'
@@ -54,7 +51,6 @@ CREATE TABLE items (
   snmp_oid		varchar(255)	DEFAULT ''	NOT NULL,
   snmp_port		int4		DEFAULT '161'	NOT NULL,
   hostid		int4		NOT NULL,
-  serverid 		int4	 	DEFAULT '1' NOT NULL,
   description		varchar(255)	DEFAULT '' NOT NULL,
   key_			varchar(64)	DEFAULT '' NOT NULL,
   delay			int4		DEFAULT '0' NOT NULL,
@@ -83,14 +79,12 @@ CREATE TABLE items (
   logtimefmt		varchar(64)	DEFAULT '' NOT NULL,
   PRIMARY KEY (itemid),
   FOREIGN KEY (hostid) REFERENCES hosts
-  FOREIGN KEY (serverid) REFERENCES servers
 );
 
 CREATE UNIQUE INDEX items_hostid_key on items (hostid,key_);
 --CREATE INDEX items_hostid on items (hostid);
 CREATE INDEX items_nextcheck on items (nextcheck);
 CREATE INDEX items_status on items (status);
-CREATE INDEX items_server on items (serverid);
 
 --
 -- Table structure for table 'config'
@@ -746,19 +740,6 @@ CREATE TABLE autoreg (
   pattern               varchar(255)	DEFAULT '' NOT NULL,
   hostid                int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (id)
-);
-
---
---  Table structure for table 'servers'
---
-
-CREATE TABLE servers (
-	serverid        serial
-	host            varchar(64)     DEFAULT '' NOT NULL,
-	ip              varchar(15)     DEFAULT '127.0.0.1' NOT NULL,
-	port            int4            DEFAULT '0' NOT NULL,
-	PRIMARY KEY     (serverid),
-	PRIMARY KEY (serverid)
 );
 
 VACUUM ANALYZE;
