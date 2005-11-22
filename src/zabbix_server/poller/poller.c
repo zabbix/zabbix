@@ -212,7 +212,7 @@ int get_values(void)
 
 		init_result(&agent);
 		res = get_value(&item, &agent);
-		zabbix_log( LOG_LEVEL_DEBUG, "GOT VALUE TYPE [%s]", agent.type);
+		zabbix_log( LOG_LEVEL_DEBUG, "GOT VALUE TYPE [%d]", agent.type);
 		
 		if(res == SUCCEED )
 		{
