@@ -66,7 +66,6 @@ pid_t	*pids=NULL;
 
 int	server_num=0;
 
-int	CONFIG_SERVERD_ID		=SERVERD_ID;
 int	CONFIG_SUCKERD_FORKS		=SUCKER_FORKS;
 /* For trapper */
 int	CONFIG_TRAPPERD_FORKS		= TRAPPERD_FORKS;
@@ -305,7 +304,6 @@ void	init_config(void)
 	static struct cfg_line cfg[]=
 	{
 /*		 PARAMETER	,VAR	,FUNC,	TYPE(0i,1s),MANDATORY,MIN,MAX	*/
-		{"Server",&CONFIG_SERVERD_ID,0,TYPE_INT,PARM_OPT,1,255},
 		{"StartSuckers",&CONFIG_SUCKERD_FORKS,0,TYPE_INT,PARM_OPT,6,255},
 		{"HousekeepingFrequency",&CONFIG_HOUSEKEEPING_FREQUENCY,0,TYPE_INT,PARM_OPT,1,24},
 		{"SenderFrequency",&CONFIG_SENDER_FREQUENCY,0,TYPE_INT,PARM_OPT,5,3600},

@@ -1,5 +1,6 @@
 Changes for 1.1beta3:
 
+ - reverted multiple server patch on server side (Alexei)
  - fixed autoregistration (Alexei)
  - added preliminary bulk host and bulk user loader.  (James)
  - applied Graph Dropdown fix.  Thanks to Elkor (James)
