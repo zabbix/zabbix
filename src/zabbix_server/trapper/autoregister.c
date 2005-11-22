@@ -34,8 +34,9 @@
 #include <regex.h>
 
 #include "common.h"
+#include "autoregister.h"
 
-void	register_new_host(char *server, int host_templateid);
+static void	register_new_host(char *server, int host_templateid);
 
 int	autoregister(char *server)
 {
@@ -82,7 +83,7 @@ int	autoregister(char *server)
 	return ret;
 }
 
-void	register_new_host(char *server, int host_templateid)
+static void	register_new_host(char *server, int host_templateid)
 {
 	int	hostid;
 
