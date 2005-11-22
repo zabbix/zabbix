@@ -49,6 +49,7 @@
 #include "../functions.h"
 #include "../expression.h"
 
+#include "autoregister.h"
 #include "trapper.h"
 
 extern int    send_list_of_active_checks(int sockfd, char *host);
@@ -77,6 +78,14 @@ int	process_trap(int sockfd,char *s, int max_len)
 	{
 		line=strtok(s,"\n");
 		host=strtok(NULL,"\n");
+		if(autoregister(host) == SUCCEED)
+		{
+			zabbix_log( LOG_LEVEL_DEBUG, "New host registered [%s]", host);
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_DEBUG, "Host already exists [%s]", host);
+		}
 		ret=send_list_of_active_checks(sockfd, host);
 	}
 /* Process information sent by zabbix_sender */
