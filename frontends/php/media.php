@@ -118,7 +118,7 @@
 	if(DBnum_rows($result)==0)
 	{
 		echo "<TR BGCOLOR=#EEEEEE>";
-		echo "<TD COLSPAN=4 ALIGN=CENTER>".S_NO_MEDIA_DEFINED."</TD>";
+		echo "<TD COLSPAN=5 ALIGN=CENTER>".S_NO_MEDIA_DEFINED."</TD>";
 		echo "<TR>";
 	}
 	table_end();
