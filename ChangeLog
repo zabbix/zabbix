@@ -1,5 +1,6 @@
 Changes for 1.1beta3:
 
+ - added script for GUI regression testing (Alexei)
  - reverted multiple server patch (Alexei)
  - fixed autoregistration (Alexei)
  - added preliminary bulk host and bulk user loader.  (James)
