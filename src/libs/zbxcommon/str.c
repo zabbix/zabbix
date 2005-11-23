@@ -195,9 +195,8 @@ int	num_param(const char *param)
  ******************************************************************************/
 void	delete_reol(char *c)
 {
-	int i,j;
+	int i;
 
-	j=0;
 	for(i=(int)strlen(c)-1;i>=0;i--)
 	{
 		if( c[i] != '\n')	break;
