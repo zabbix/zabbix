@@ -136,6 +136,22 @@ def GUI_Config_Hosts_Groups():
 	TestGUI('Hosts->Host groups->Delete', "hosts.php", "groupid="+str(id)+"&name=Regression&register=delete+group", "Group deleted")
 	TestDBCount("groups","name='Regression'", 0)
 
+def GUI_Config_Items():
+	print "GUI_Config_Items"
+	TestGUI('Hosts->Add', "hosts.php", "host=regression&newgroup=&useip=on&ip=127.0.0.1&port=10050&status=0&host_templateid=0&register=add#form", "Host added")
+	TestDBCount("hosts","host='regression'", 1)
+	hostid = DBGetID("hosts","host='regression'", "hostid")
+
+	TestGUI('Items->Add', "items.php", "description=Processor+load&hostid="+str(hostid)+"&type=0&snmp_community=public&snmp_oid=interfaces.ifTable.ifEntry.ifInOctets.1&snmp_port=161&snmpv3_securityname=&snmpv3_securitylevel=0&snmpv3_authpassphrase=&snmpv3_privpassphrase=&key=system.cpu.load%5Ball%2Cavg1%5D&units=&multiplier=0&formula=1&delay=5&history=90&trends=365&status=0&value_type=0&logtimefmt=&delta=0&trapper_hosts=&register=add&groupid=1&action=add+to+group#form", "Item added")
+	TestDBCount("items","key_='system.cpu.load[all,avg1]'", 1)
+	itemid = DBGetID("items","key_='system.cpu.load[all,avg1]'", "itemid")
+
+	TestGUI('Items->Update', "items.php", "itemid="+str(itemid)+"&description=Processor+load&hostid="+str(hostid)+"&type=7&snmp_community=public&snmp_oid=interfaces.ifTable.ifEntry.ifInOctets.1&snmp_port=161&snmpv3_securityname=&snmpv3_securitylevel=0&snmpv3_authpassphrase=&snmpv3_privpassphrase=&key=system.cpu.load%5Ball%2Cavg5%5D&units=&multiplier=1&formula=1&delay=4&history=91&trends=364&status=0&value_type=0&logtimefmt=&delta=0&trapper_hosts=&register=update&groupid=1&action=add+to+group#form", "Item updated")
+	TestDBCount("items","key_='system.cpu.load[all,avg5]' and itemid="+str(itemid), 1)
+
+	TestGUI('Items->Delete', "items.php", "itemid="+str(itemid)+"&register=delete", "Item deleted")
+	TestDBCount("items","itemid="+str(itemid), 0)
+
 def GUI_Config_Maps():
 	print "GUI_Config_Maps"
 	TestGUI('Configuration->Maps->Add', "sysmaps.php", "name=Regression&width=800&height=600&background=&label_type=0&register=add", "Network map added")
@@ -182,6 +198,7 @@ GUI_Config_Users()
 GUI_Config_Media()
 GUI_Config_Hosts()
 GUI_Config_Hosts_Groups()
+GUI_Config_Items()
 GUI_Config_Maps()
 GUI_Config_Screens()
 GUI_Config_Services()
