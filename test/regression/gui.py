@@ -41,7 +41,7 @@ def TestGUI(name, page, gets, expect):
 def InitDB():
 ###	os.system('rm -rf /home/test/zabbix')
 ###	os.system('cd /home/test; . ./env')
-	print "Init DB"
+###	print "Init DB"
 	os.system('echo "drop database test"|mysql -uroot')
 	os.system('echo "create database test"|mysql -uroot')
 	os.system('cat /home/test/zabbix/create/mysql/schema.sql|mysql -uroot test')
@@ -83,6 +83,34 @@ def GUI_Config_General_Mediatype():
 	TestDBCount("media_type","description='Zzz' and type=0", 1)
 	TestGUI('General->Media type->Delete', "config.php", "mediatypeid=2&config=1&description=Zzz&type=0&exec_path=&smtp_server=localhost&smtp_helo=localhost&smtp_email=zabbix%40localhost&register=delete", "Media type deleted")
 	TestDBCount("media_type","description='Zzz'", 0)
+
+def GUI_Config_Users():
+	print "GUI_Config_Users"
+	TestGUI('Users->Add', "users.php", "config=0&alias=Regression&name=Name&surname=Surname&password1=password&password2=password&lang=en_gb&autologout=123&url=zabbix&refresh=34&register=add", "User added")
+	TestDBCount("users","alias='Regression' and name='Name' and surname='Surname' and passwd='5f4dcc3b5aa765d61d8327deb882cf99' and url='zabbix' and autologout=123 and lang='en_gb' and refresh=34", 1)
+	id = DBGetID("users","alias='Regression'", "userid")
+
+	TestGUI('Users->Update', "users.php", "userid="+str(id)+"&right=Configuration+of+Zabbix&permission=R&id=0&config=0&alias=Regression2&name=Name2&surname=Surname2&password1=password2&password2=password2&lang=fr_fr&autologout=321&url=zabbix2&refresh=43&register=update", "User updated")
+	TestDBCount("users","alias='Regression2' and name='Name2' and surname='Surname2' and passwd='6cb75f652a9b52798eb6cf2201057c73' and url='zabbix2' and autologout=321 and lang='fr_fr' and refresh=43 and userid="+str(id), 1)
+
+	TestGUI('Users->Delete', "users.php", "userid="+str(id)+"&right=Configuration+of+Zabbix&permission=R&id=0&config=0&alias=Regression2&name=Name2&surname=Surname2&password1=&password2=&lang=fr_fr&autologout=321&url=zabbix2&refresh=43&register=delete", "User deleted")
+	TestDBCount("users","userid="+str(id), 0)
+
+def GUI_Config_Media():
+	print "GUI_Config_Media"
+	TestGUI('Users->Add', "users.php", "config=0&alias=Regression&name=Name&surname=Surname&password1=password&password2=password&lang=en_gb&autologout=123&url=zabbix&refresh=34&register=add", "User added")
+	TestDBCount("users","alias='Regression' and name='Name' and surname='Surname' and passwd='5f4dcc3b5aa765d61d8327deb882cf99' and url='zabbix' and autologout=123 and lang='en_gb' and refresh=34", 1)
+	userid = DBGetID("users","alias='Regression'", "userid")
+
+	TestGUI('Media->Add', "media.php", "userid="+str(userid)+"&mediatypeid=1&sendto=alex%40zabbix.com&period=1-7%2C00%3A00-23%3A59&0=0&1=1&2=2&3=3&4=4&5=5&active=0&register=add", "Media added")
+	TestDBCount("media","userid="+str(userid)+" and severity=63 and mediatypeid=1 and sendto='alex@zabbix.com' and active=0 and period='1-7,00:00-23:59'", 1)
+	mediaid = DBGetID("media","userid="+str(userid)+" and severity=63 and mediatypeid=1 and sendto='alex@zabbix.com' and active=0 and period='1-7,00:00-23:59'", "mediaid")
+
+	TestGUI('Media->Update', "media.php", "userid="+str(userid)+"&mediaid="+str(mediaid)+"&mediatypeid=1&sendto=test%40zabbix.com&period=1-5%2C10%3A00-22%3A00&4=4&5=5&active=1&register=update", "Media updated")
+	TestDBCount("media","mediaid="+str(mediaid)+" and userid="+str(userid)+" and severity=48 and mediatypeid=1 and sendto='test@zabbix.com' and active=1 and period='1-5,10:00-22:00'", 1)
+
+	TestGUI('Media->Delete', "media.php", "userid="+str(userid)+"&mediaid="+str(mediaid)+"&mediatypeid=1&sendto=test%40zabbix.com&period=1-5%2C10%3A00-22%3A00&4=4&5=5&active=1&register=delete", "Media deleted")
+	TestDBCount("media","mediaid="+str(mediaid),0)
 
 def GUI_Config_Hosts():
 	print "GUI_Config_Hosts"
@@ -150,6 +178,8 @@ InitDB()
 GUI_Login()
 GUI_Config_General_Housekeeper()
 GUI_Config_General_Mediatype()
+GUI_Config_Users()
+GUI_Config_Media()
 GUI_Config_Hosts()
 GUI_Config_Hosts_Groups()
 GUI_Config_Maps()
