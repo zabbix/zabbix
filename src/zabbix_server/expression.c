@@ -180,7 +180,7 @@ int	cmp_double(double a,double b)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_double                                                        *
+ * Function: is_double_prefix                                                 *
  *                                                                            *
  * Purpose: check if the string is float                                      *
  *                                                                            *
@@ -194,7 +194,7 @@ int	cmp_double(double a,double b)
  * Comments: the functions support prefixes K,M,G                             *
  *                                                                            *
  ******************************************************************************/
-int	is_double(char *c)
+int	is_double_prefix(char *c)
 {
 	int i;
 	int dot=-1;
@@ -323,7 +323,7 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 	/* Remove left and right spaces */
 	lrtrim_spaces(exp);
 
-	if( is_double(exp) == SUCCEED )
+	if( is_double_prefix(exp) == SUCCEED )
 	{
 /*		*result=atof(exp);*/
 /* str2double support prefixes */
