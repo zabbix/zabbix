@@ -126,7 +126,7 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 		return	NETWORK_ERROR;
 	}
 
-	snprintf(c,sizeof(c)-1,"%s\n",item->key);
+	snprintf(c, MAX_STRING_LEN - 1, "%s\n",item->key);
 	zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", c);
 	if( write(s,c,strlen(c)) == -1 )
 	{
@@ -147,7 +147,7 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 	} 
 
 	memset(c,0,MAX_STRING_LEN);
-	len=read(s,c,MAX_STRING_LEN);
+	len=read(s, c, MAX_STRING_LEN);
 	if(len == -1)
 	{
 		switch (errno)
@@ -181,7 +181,7 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 
 /*	if(len>0)
 	{
-		c[len-1]=0;
+		c[len]=0;
 	}*/
 	zabbix_log(LOG_LEVEL_DEBUG, "Got string:[%d] [%s]", len, c);
 
