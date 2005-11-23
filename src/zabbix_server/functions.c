@@ -574,25 +574,33 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 	char	sql[MAX_STRING_LEN];
 	int ret = SUCCEED;
 
+	zabbix_log( LOG_LEVEL_WARNING, "In add_history(%d,%X)", item->itemid, value->type);
+
 	if(item->history>0)
 	{
+zabbix_log( LOG_LEVEL_WARNING, "history>0");
 		if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) || (item->value_type==ITEM_VALUE_TYPE_UINT64))
 		{
+zabbix_log( LOG_LEVEL_WARNING, "2");
 			/* Should we store delta or original value? */
 			if(item->delta == ITEM_STORE_AS_IS)
 			{
+zabbix_log( LOG_LEVEL_WARNING, "3");
 				if(value->type & AR_UINT64)
 				{
+zabbix_log( LOG_LEVEL_WARNING, "4");
 					DBadd_history_uint(item->itemid,value->ui64,now);
 				}
 				if(value->type & AR_DOUBLE)
 				{
+zabbix_log( LOG_LEVEL_WARNING, "5");
 					DBadd_history(item->itemid,value->dbl,now);
 				}
 			}
 			/* Delta as speed of change */
 			else if(item->delta == ITEM_STORE_SPEED_PER_SECOND)
 			{
+zabbix_log( LOG_LEVEL_WARNING, "6");
 				/* Save delta */
 				if(value->type & AR_DOUBLE)
 					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value->dbl))
@@ -668,6 +676,8 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, int now)
 	char	value_str[MAX_STRING_LEN];
 	double	value_double;
 	int ret = SUCCEED;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In update_item()");
 
 	if(value->type & AR_UINT64)
 	{
