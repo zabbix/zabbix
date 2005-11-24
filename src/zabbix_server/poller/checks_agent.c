@@ -207,10 +207,25 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 		return	NETWORK_ERROR;
 	}
 
-	result->type |= AR_STRING;
-	result->str = strdup(c);
+	set_result_type(result, c);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "RESULT_STR [%s]", result->str );
+	if(is_uint(c) == SUCCEED)
+	{
+		result->type |= AR_UINT64;
+		result->ui64 = (zbx_uint64_t)atoll(c);
+	}
+	else if(is_double(c) == SUCCEED)
+	{
+		result->type |= AR_DOUBLE;
+		result->dbl = (double)atof(c);
+	}
+	else
+	{
+		result->type |= AR_STRING;
+		result->str = strdup(c);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "RESULT_STR [%c]", c);
 
 	return SUCCEED;
 }

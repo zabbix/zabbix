@@ -305,9 +305,14 @@ void   	free_result(AGENT_RESULT *result);
 
 char	*string_replace(char *str, const char *sub_str1, const char *sub_str2);
 void	del_zeroes(char *s);
+int	is_double_prefix(char *c);
+int	is_double(char *c);
+int	is_uint(char *c);
 void	delete_reol(char *c);
 int	get_param(const char *param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
+
+void	set_result_type(AGENT_RESULT *result, char *c);
 
 int	replace_param(const char *cmd, const char *param, char *out, int outlen); //TMP!!!
 

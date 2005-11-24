@@ -540,8 +540,7 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 		zabbix_log(LOG_LEVEL_DEBUG, "Value [%s] Lastlogsize [%s] Timestamp [%s]", value, lastlogsize, timestamp);
 	}
 
-	agent.type |= AR_STRING;
-	agent.str=strdup(value);
+	set_result_type(&agent, value);
 
 	process_new_value(&item,&agent);
 
