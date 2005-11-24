@@ -41,15 +41,16 @@
 	}
 
 	$result=DBselect("select name,width,height,yaxistype,yaxismin,yaxismax from graphs where graphid=".$_REQUEST["graphid"]);
+	$row=DBfetch($result);
 
-	$name=DBget_field($result,0,0);
+	$name=$row["name"];
 	if(isset($_REQUEST["width"])&&$_REQUEST["width"]>0)
 	{
 		$width=$_REQUEST["width"];
 	}
 	else
 	{
-		$width=DBget_field($result,0,1);
+		$width=$row["width"];
 	}
 	if(isset($_REQUEST["height"])&&$_REQUEST["height"]>0)
 	{
@@ -57,24 +58,24 @@
 	}
 	else
 	{
-		$height=DBget_field($result,0,2);
+		$height=$row["height"];
 	}
 
 	$graph->setWidth($width);
 	$graph->setHeight($height);
-	$graph->setHeader(DBget_field($result,0,0));
-	$graph->setYAxisType(DBget_field($result,0,3));
-	$graph->setYAxisMin(DBget_field($result,0,4));
-	$graph->setYAxisMax(DBget_field($result,0,5));
+	$graph->setHeader($row["name"]);
+	$graph->setYAxisType($row["yaxistype"]);
+	$graph->setYAxisMin($row["yaxismin"]);
+	$graph->setYAxisMax($row["yaxismax"]);
 
 	$result=DBselect("select gi.itemid,i.description,gi.color,h.host,gi.drawtype,gi.yaxisside from graphs_items gi,items i,hosts h where gi.itemid=i.itemid and gi.graphid=".$_REQUEST["graphid"]." and i.hostid=h.hostid order by gi.sortorder");
 
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
 	{
-		$graph->addItem(DBget_field($result,$i,0));
-		$graph->setColor(DBget_field($result,$i,0), DBget_field($result,$i,2));
-		$graph->setDrawtype(DBget_field($result,$i,0), DBget_field($result,$i,4));
-		$graph->setYAxisSide(DBget_field($result,$i,0), DBget_field($result,$i,5));
+		$graph->addItem($row["itemid"]);
+		$graph->setColor($row["itemid"], $row["color"]);
+		$graph->setDrawtype($row["itemid"], $row["drawtype"]);
+		$graph->setYAxisSide($row["itemid"], $row["yaxisside"]);
 	}
 
 	$graph->Draw();

@@ -415,13 +415,14 @@
 		if(isset($_REQUEST["register"]) && ($_REQUEST["register"] == "change"))
 		{
 			$result=DBselect("select mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path from media_type where mediatypeid=".$_REQUEST["mediatypeid"]);
-			$mediatypeid=DBget_field($result,0,0);
-			$type=@iif(isset($_REQUEST["type"]),$_REQUEST["type"],DBget_field($result,0,1));
-			$description=DBget_field($result,0,2);
-			$smtp_server=DBget_field($result,0,3);
-			$smtp_helo=DBget_field($result,0,4);
-			$smtp_email=DBget_field($result,0,5);
-			$exec_path=DBget_field($result,0,6);
+			$row=DBfetch($result);
+			$mediatypeid=$row["mediatypeid"];
+			$type=@iif(isset($_REQUEST["type"]),$_REQUEST["type"],$row["type"]);
+			$description=$row["description"];
+			$smtp_server=$row["smtp_server"];
+			$smtp_helo=$row["smtp_helo"];
+			$smtp_email=$row["smtp_email"];
+			$exec_path=$row["exec_path"];
 		}
 
 ?>

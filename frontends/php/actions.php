@@ -217,22 +217,21 @@
 
 	if(isset($_REQUEST["actionid"]))
 	{
-		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.scope,a.severity,a.recipient,a.maxrepeats,a.repeatdelay from actions a where a.actionid=".$_REQUEST["actionid"];
-		$result=DBselect($sql);
+		$action=get_action_by_actionid($_REQUEST["actionid"]);
 
-		$actionid=DBget_field($result,0,0);
-		$triggerid=DBget_field($result,0,1);
-		$good=DBget_field($result,0,2);
-		$delay=DBget_field($result,0,3);
+		$actionid=$action["actionid"];
+		$triggerid=$action["triggerid"];
+		$good=$action["good"];
+		$delay=$action["delay"];
 		// Otherwise symbols like ",' will not be shown
-		$subject=htmlspecialchars(DBget_field($result,0,4));
-		$message=DBget_field($result,0,5);
-		$uid=DBget_field($result,0,6);
-		$scope=@iif(isset($_REQUEST["scope"]),$_REQUEST["scope"],DBget_field($result,0,7));
-		$severity=DBget_field($result,0,8);
-		$recipient=@iif(isset($_REQUEST["recipient"]),$_REQUEST["recipient"],DBget_field($result,0,9));
-		$maxrepeats=DBget_field($result,0,10);
-		$repeatdelay=DBget_field($result,0,11);
+		$subject=htmlspecialchars($action["subject"]);
+		$message=$action["message"];
+		$uid=$action["uid"];
+		$scope=@iif(isset($_REQUEST["scope"]),$_REQUEST["scope"],$action["scope"]);
+		$severity=$action["severity"];
+		$recipient=@iif(isset($_REQUEST["recipient"]),$_REQUEST["recipient"],$action["recipient"]);
+		$maxrepeats=$action["maxrepeats"];
+		$repeatdelay=$action["repeatdelay"];
 		if(isset($_REQUEST["repeat"]))
 		{
 			$repeat=$_REQUEST["repeat"];

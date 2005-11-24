@@ -74,7 +74,8 @@
 	if(isset($_REQUEST["graphid"]))
 	{
 		$result=DBselect("select name from graphs where graphid=".$_REQUEST["graphid"]);
-		$graph=DBget_field($result,0,0);
+		$row=DBfetch($result);
+		$graph=$row["name"];
 		$h1=iif(isset($_REQUEST["fullscreen"]),
 			"<a href=\"charts.php?graphid=".$_REQUEST["graphid"]."\">".$graph."</a>",
 			"<a href=\"charts.php?graphid=".$_REQUEST["graphid"]."&fullscreen=1\">".$graph."</a>");
