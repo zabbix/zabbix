@@ -263,7 +263,7 @@ void Main(void)
       int ch;
 
       printf("\n*** Zabbix Win32 agent operational. Press ESC to terminate. ***\n");
-      while(1)
+      for(;;)
       {
          ch=getch();
          if (ch==0)

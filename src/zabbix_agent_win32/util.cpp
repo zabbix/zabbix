@@ -45,7 +45,7 @@ static void Help(void)
           "   version         : Display version information\n\n"
           "And possible options are:\n"
           "   --config <file> : Specify alternate configuration file\n"
-          "                     (default is C:\\zabbix_agentd.conf)\n\n");
+          "                     (default is %s)\n\n", confFile);
 }
 
 
@@ -56,10 +56,11 @@ static void Help(void)
 //    FALSE  otherwise
 //
 
-BOOL ParseCommandLine(int argc,char *argv[])
+int ParseCommandLine(int argc,char *argv[])
 {
    int i;
-   BOOL ret = TRUE;
+   int ret = TRUE;
+   char path[MAX_PATH];
 
 INIT_CHECK_MEMORY(main);
 
@@ -68,13 +69,13 @@ INIT_CHECK_MEMORY(main);
       if (!strcmp(argv[i],"help"))    // Display help and exit
       {
          Help();
-         ret = FALSE;
+		 exit(0);
 		 goto lbl_end;
       }
       else if (!strcmp(argv[i],"version"))    // Display version and exit
       {
          printf("Zabbix Win32 Agent Version " AGENT_VERSION " Build of " __DATE__ "\n");
-         ret = FALSE;
+		 exit(0);
 		 goto lbl_end;
       }
       else if (!strcmp(argv[i],"--config"))  // Config file
@@ -91,63 +92,52 @@ INIT_CHECK_MEMORY(main);
       else if ((!strcmp(argv[i],"install"))||
                (!strcmp(argv[i],"install-events")))
       {
-         char path[MAX_PATH],*ptr;
-
-         ptr=strrchr(argv[0],'\\');
-         if (ptr!=NULL)
-            ptr++;
-         else
-            ptr=argv[0];
-
-         _fullpath(path,ptr,255);
-
-         if (stricmp(&path[strlen(path)-4],".exe"))
-            strcat(path,".exe");
+         _fullpath(path,argv[0],MAX_PATH);
 
          if (!strcmp(argv[i],"install"))
-            ZabbixCreateService(path);
+            ret = ZabbixCreateService(path);
          else
-            ZabbixInstallEventSource(path);
-         ret = FALSE;
+            ret = ZabbixInstallEventSource(path);
+		 exit(ret);
 		 goto lbl_end;
       }
       else if (!strcmp(argv[i],"remove"))
       {
-         ZabbixRemoveService();
-         ret = FALSE;
+         ret = ZabbixRemoveService();
+		 exit(ret);
 		 goto lbl_end;
       }
       else if (!strcmp(argv[i],"remove-events"))
       {
-         ZabbixRemoveEventSource();
-         ret = FALSE;
+         ret = ZabbixRemoveEventSource();
+		 exit(ret);
 		 goto lbl_end;
       }
       else if (!strcmp(argv[i],"start"))
       {
-         ZabbixStartService();
-         ret = FALSE;
+         ret = ZabbixStartService();
+		 exit(ret);
 		 goto lbl_end;
       }
       else if (!strcmp(argv[i],"stop"))
       {
-         ZabbixStopService();
-         ret = FALSE;
+         ret = ZabbixStopService();
+		 exit(ret);
 		 goto lbl_end;
       }
       else if (!strcmp(argv[i],"check-config"))
       {
          dwFlags|=AF_STANDALONE;
          printf("Checking configuration file:\n\n");
-         ReadConfig();
-         ret = FALSE;
+         ret = ReadConfig();
+		 exit(ret);
 		 goto lbl_end;
       }
       else
       {
          printf("ERROR: Invalid command line argument\n\n");
          Help();
-         ret = FALSE;
+		 exit(1);
 		 goto lbl_end;
       }
    }

@@ -437,11 +437,11 @@ static LONG H_UserCounter(char *cmd,char *arg,double *value)
 
 static LONG H_MD5Hash(char *cmd,char *arg,char **value)
 {
-   char fileName[MAX_PATH],hashText[MD5_DIGEST_SIZE*2+1];
-   unsigned char *data,hash[MD5_DIGEST_SIZE];
-   HANDLE hFile,hFileMapping;
-   DWORD dwSize,dwSizeHigh;
-   int i;
+   char fileName[MAX_PATH], hashText[MD5_DIGEST_SIZE*2+1];
+   unsigned char *data=NULL, hash[MD5_DIGEST_SIZE];
+   HANDLE hFile=NULL,hFileMapping=NULL;
+   DWORD dwSize=0, dwSizeHigh=0;
+   int i=0;
 
 
 
