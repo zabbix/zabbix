@@ -81,7 +81,6 @@
 
 #define IsStandalone() (dwFlags & AF_STANDALONE)
 
-
 //
 // Parameter definition structure
 //
@@ -182,13 +181,13 @@ void CalculateMD5Hash(const unsigned char *data,int nbytes,unsigned char *hash);
 DWORD CalculateCRC32(const unsigned char *data,DWORD nbytes);
 
 void InitService(void);
-void ZabbixCreateService(char *execName);
-void ZabbixRemoveService(void);
-void ZabbixStartService(void);
-void ZabbixStopService(void);
+int ZabbixCreateService(char *execName);
+int ZabbixRemoveService(void);
+int ZabbixStartService(void);
+int ZabbixStopService(void);
 
-void ZabbixInstallEventSource(char *path);
-void ZabbixRemoveEventSource(void);
+int ZabbixInstallEventSource(char *path);
+int ZabbixRemoveEventSource(void);
 
 char *GetCounterName(DWORD index);
 
