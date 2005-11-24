@@ -381,7 +381,12 @@ int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RES
     
     if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
     {
-        return SYSINFO_RET_FAIL;
+	mode[0] = '\0';
+    }
+    
+    if(mode[0] == '\0')
+    {
+        strscpy(mode, "count");
     }
     
     if(strcmp(mode,"count") == 0)
@@ -439,7 +444,12 @@ int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RE
     
     if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
     {
-        return SYSINFO_RET_FAIL;
+	mode[0] = '\0';
+    }
+    
+    if(mode[0] == '\0')
+    {
+        strscpy(mode, "count");
     }
     
     if(strcmp(mode,"count") == 0)
