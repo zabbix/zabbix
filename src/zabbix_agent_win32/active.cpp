@@ -746,7 +746,7 @@ INIT_CHECK_MEMORY(main);
 	InitMetrics();
 
 	refresh_metrics(confServer, confServerPort, error, MAX_STRING_LEN);
-	nextrefresh=time(NULL)+10;
+	nextrefresh=time(NULL)+300;
 
 	for(;;)	
 	{
@@ -754,7 +754,7 @@ INIT_CHECK_MEMORY(for);
 //LOG_DEBUG_INFO("s","ActiveChecksThread: loop 1");
 		if(process_active_checks(confServer, confServerPort) == FAIL)
 		{
-			Sleep(10*1000);
+			Sleep(60*1000);
 CHECK_MEMORY(for, "ActiveChecksThread", "end for 1");
 			continue;
 		}
@@ -762,8 +762,7 @@ CHECK_MEMORY(for, "ActiveChecksThread", "end for 1");
 		nextcheck = get_min_nextcheck();
 		if(nextcheck == FAIL)
 		{
-//LOG_DEBUG_INFO("s","sleeptime=10");
-			sleeptime=10;
+			sleeptime=60;
 		}
 		else
 		{
@@ -777,9 +776,9 @@ CHECK_MEMORY(for, "ActiveChecksThread", "end for 1");
 //LOG_DEBUG_INFO("d",sleeptime);
 		if(sleeptime>0)
 		{
-			if(sleeptime > 10)
+			if(sleeptime > 60)
 			{
-				sleeptime = 10;
+				sleeptime = 60;
 			}
 //			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
 //					sleeptime );
@@ -794,7 +793,7 @@ CHECK_MEMORY(for, "ActiveChecksThread", "end for 1");
 		if(time(NULL)>=nextrefresh)
 		{
 			refresh_metrics(confServer, confServerPort, error, sizeof(error));
-			nextrefresh=time(NULL)+10;
+			nextrefresh=time(NULL)+300;
 		}
 
 //		LOG_DEBUG_INFO("s","ActiveChecksThread: loop 2");
