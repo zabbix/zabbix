@@ -575,6 +575,13 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 
 	zabbix_log( LOG_LEVEL_WARNING, "In add_history(%d,%X)", item->itemid, value->type);
 
+	if(value->type & AR_UINT64)
+		zabbix_log( LOG_LEVEL_WARNING, "In add_history(%d,UINT64:" ZBX_FS_UI64 ")", item->itemid, value->ui64);
+	if(value->type & AR_STRING)
+		zabbix_log( LOG_LEVEL_WARNING, "In add_history(%d,STRING:%s)", item->itemid, value->str);
+	if(value->type & AR_DOUBLE)
+		zabbix_log( LOG_LEVEL_WARNING, "In add_history(%d,DOUBLE:" ZBX_FS_DBL ")", item->itemid, value->dbl);
+
 	if(item->history>0)
 	{
 zabbix_log( LOG_LEVEL_WARNING, "history>0");
@@ -636,11 +643,15 @@ zabbix_log( LOG_LEVEL_WARNING, "6");
 		}
 		else if(item->value_type==ITEM_VALUE_TYPE_STR)
 		{
-			DBadd_history_str(item->itemid,value->str,now);
+			zabbix_log( LOG_LEVEL_WARNING, "7");
+			if(value->type & AR_STRING)
+				DBadd_history_str(item->itemid,value->str,now);
 		}
 		else if(item->value_type==ITEM_VALUE_TYPE_LOG)
 		{
-			DBadd_history_log(item->itemid,value->str,now,item->timestamp,item->eventlog_source,item->eventlog_severity);
+			zabbix_log( LOG_LEVEL_WARNING, "8");
+			if(value->type & AR_STRING)
+				DBadd_history_log(item->itemid,value->str,now,item->timestamp,item->eventlog_source,item->eventlog_severity);
 			snprintf(sql,sizeof(sql)-1,"update items set lastlogsize=%d where itemid=%d",item->lastlogsize,item->itemid);
 			DBexecute(sql);
 		}
@@ -649,6 +660,8 @@ zabbix_log( LOG_LEVEL_WARNING, "6");
 			zabbix_log(LOG_LEVEL_ERR, "Unknown value type [%d] for itemid [%d]", item->value_type,item->itemid);
 		}
 	}
+
+	zabbix_log( LOG_LEVEL_WARNING, "End of add_history");
 
 	return ret;
 }
