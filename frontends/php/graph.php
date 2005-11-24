@@ -153,11 +153,12 @@
 	{
 		$sql="select itemid,color,drawtype,sortorder,yaxisside from graphs_items where gitemid=".$_REQUEST["gitemid"];
 		$result=DBselect($sql);
-		$itemid=DBget_field($result,0,0);
-		$color=DBget_field($result,0,1);
-		$drawtype=DBget_field($result,0,2);
-		$sortorder=DBget_field($result,0,3);
-		$yaxisside=DBget_field($result,0,4);
+		$row=DBfetch($result);
+		$itemid=$row["itemid"];
+		$color=$row["color"];
+		$drawtype=$row["drawtype"];
+		$sortorder=$row["sortorder"];
+		$yaxisside=$row["yaxisside"];
 	}
 	else
 	{
@@ -180,11 +181,11 @@
 	show_table2_h_delimiter();
 	$result=DBselect("select h.host,i.description,i.itemid,i.key_ from hosts h,items i where h.hostid=i.hostid and h.status in(".HOST_STATUS_MONITORED.",".HOST_STATUS_TEMPLATE.") and i.status=".ITEM_STATUS_ACTIVE." order by h.host,i.description");
 	echo "<select name=\"itemid\" size=1>";
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
 	{
-		$host_=DBget_field($result,$i,0);
-		$description_=item_description(DBget_field($result,$i,1),DBget_field($result,$i,3));
-		$itemid_=DBget_field($result,$i,2);
+		$host_=$row["host"];
+		$description_=item_description($row["itemid"],$row["key_"]);
+		$itemid_=$row["itemid"];
 		if(isset($itemid)&&($itemid==$itemid_))
 		{
 			echo "<OPTION VALUE='$itemid_' SELECTED>$host_: $description_";
