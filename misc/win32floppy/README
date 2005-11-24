@@ -1,13 +1,65 @@
-This are small contribution to Zabbix 1.0 [http://www.zabbix.org]
-I thought it could make it more useful.
+/* 
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+**/
 
-	Fabricio Ferrari, Jan 2004
-	Porto Alegre, Brasil
-	[fabricio@ferrari.pro.br]
+SYNOPSIS
+	install.bat "host name" "server IP" [ "install dir" ] [ "config dir" ]
 
-HOWTO:
+	uninstall.bat [ "install dir" ]
 
- - format a floppy
- - copy install.bat, ZabbixW32.exe, and zabbix_agentd.conf to the floppy
+DESCRIPTION
+	install.bat - installation script, which copy executiable file to 
+	"install dir", create configureation file in "config dir" with 
+	default parameters, install ZABBIX Agent as service and start service.
+	
+	uninstall.bat - uninstallation script, which stop ZABBIX Agent service
+	and remove servise from system. uninstall.bat DON'T remove files, you
+	must manualy remove all files.
 
-Use the floppy to quickly install W32 agent!
+	NOTE: For installation scrip using file 'ZabbixW32.exe' must bee 
+	accessiable from current '.' directory.
+	For example: You may copy 'install.bat' 'uninstall.bat' and 'ZabbixW32.exe'
+	in to the one directory and start intallation.
+
+OPTIONS
+	"host name"
+		ZABBIX Agent hostname which be used for active checks.
+
+	"server IP"
+		ZABBIX Server ip address
+
+	"install dir"
+		installation directory for bynary files. 
+		Default value is %PROGRAMFILES%/zabbix
+
+	"config dir"
+		directory for configuration file.
+		Default value is "install dir"
+
+USAGE
+	install.bat localhost 127.0.0.1 c:/zabbix
+	uninstall.bat c:/zabbix
+
+	install.bat "My Host Name" 192.168.5.1 d:/programs/zabbix_bin d:/programs/zabbix_conf 
+	uninstall.bat d:/programs/zabbix_bin
+
+AUTHOR
+	Eugene Grigorjev, Nov 2005
+	eugene.grigorjev@zabbix.com
+	http://www.zabbix.com
+
