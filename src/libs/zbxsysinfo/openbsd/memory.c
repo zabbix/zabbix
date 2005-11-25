@@ -39,8 +39,7 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 
 	if(0==sysctl(mib,2,&v,&len,NULL,0))
 	{
-		result->type |= AR_DOUBLE;	
-		result->dbl=(double)((v.t_rm+v.t_free) * sysconf(_SC_PAGESIZE));
+		SET_UI64_RESULT(result, (v.t_rm+v.t_free) * sysconf(_SC_PAGESIZE));
 		ret=SYSINFO_RET_OK;
 	}
 	return ret;
@@ -63,8 +62,7 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 
 	if(0==sysctl(mib,2,&v,&len,NULL,0))
 	{
-		result->type |= AR_DOUBLE;	
-		result->dbl=(double)(v.t_free * sysconf(_SC_PAGESIZE));
+		SET_UI64_RESULT(result, v.t_free * sysconf(_SC_PAGESIZE));
 		ret=SYSINFO_RET_OK;
 	}
 	return ret;

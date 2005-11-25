@@ -109,8 +109,7 @@ static int      NET_IF_IN_BYTES(const char *cmd, const char *param, unsigned fla
 	
 	if(ret == SYSINFO_RET_OK)
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = value.if_ibytes;
+		SET_UI64_RESULT(result, value.if_ibytes);
 		ret = SYSINFO_RET_OK;
 	}
 	
@@ -141,8 +140,7 @@ static int      NET_IF_IN_PACKETS(const char *cmd, const char *param, unsigned f
 	
 	if(ret == SYSINFO_RET_OK)
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = value.if_ipackets;
+		SET_UI64_RESULT(result, value.if_ipackets);
 		ret = SYSINFO_RET_OK;
 	}
 	
@@ -173,8 +171,7 @@ static int      NET_IF_IN_ERRORS(const char *cmd, const char *param, unsigned fl
 	
 	if(ret == SYSINFO_RET_OK)
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = value.if_ierrors;
+		SET_UI64_RESULT(result, value.if_ierrors);
 		ret = SYSINFO_RET_OK;
 	}
 	
@@ -261,8 +258,7 @@ static int      NET_IF_OUT_BYTES(const char *cmd, const char *param, unsigned fl
 	
 	if(ret == SYSINFO_RET_OK)
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = value.if_obytes;
+		SET_UI64_RESULT(result, value.if_obytes);
 		ret = SYSINFO_RET_OK;
 	}
 	
@@ -293,8 +289,7 @@ static int      NET_IF_OUT_PACKETS(const char *cmd, const char *param, unsigned 
 	
 	if(ret == SYSINFO_RET_OK)
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = value.if_opackets;
+		SET_UI64_RESULT(result, value.if_opackets);
 		ret = SYSINFO_RET_OK;
 	}
 	
@@ -325,8 +320,7 @@ static int      NET_IF_OUT_ERRORS(const char *cmd, const char *param, unsigned f
 	
 	if(ret == SYSINFO_RET_OK)
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = value.if_oerrors;
+		SET_UI64_RESULT(result, value.if_oerrors);
 		ret = SYSINFO_RET_OK;
 	}
 	
@@ -422,8 +416,7 @@ int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AG
 	
 	if(ret == SYSINFO_RET_OK)
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = value.if_collisions;
+		SET_UI64_RESULT(result, value.if_collisions);
 		ret = SYSINFO_RET_OK;
 	}
 	

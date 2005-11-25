@@ -55,8 +55,7 @@ static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, 
 	}
 	fclose(f);
 
-	result->type |= AR_DOUBLE;	
-	result->dbl=res;
+	SET_UI64_RESULT(result, res);
 	return SYSINFO_RET_OK;
 #else
 	assert(result);
@@ -78,11 +77,10 @@ static int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags,
 		
 	if( 0 == sysinfo(&info))
 	{
-		result->type |= AR_DOUBLE;	
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		result->dbl=(double)info.bufferram * (double)info.mem_unit;
+		SET_UI64_RESULT(result, info.bufferram * info.mem_unit);
 #else
-		result->dbl=(double)info.bufferram;
+		SET_UI64_RESULT(result, info.bufferram);
 #endif
 		return SYSINFO_RET_OK;
 	}
@@ -110,11 +108,10 @@ static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, 
 		
 	if( 0 == sysinfo(&info))
 	{
-		result->type |= AR_DOUBLE;	
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		result->dbl=(double)info.sharedram * (double)info.mem_unit;
+		SET_UI64_RESULT(result, info.sharedram * info.mem_unit);
 #else
-		result->dbl=(double)info.sharedram;
+		SET_UI64_RESULT(result, info.sharedram);
 #endif
 		return SYSINFO_RET_OK;
 	}
@@ -136,8 +133,7 @@ static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, 
 
 	sysctl(mib,2,&v,&len,NULL,0);
 
-	result->type |= AR_DOUBLE;	
-	result->dbl=(double)(v.t_armshr<<2);
+	SET_UI64_RESULT(result, v.t_armshr<<2);
 	return SYSINFO_RET_OK;
 #else
 	return	SYSINFO_RET_FAIL;
@@ -152,8 +148,7 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 
         init_result(result);
 		
-	result->type |= AR_DOUBLE;	
-	result->dbl=(double)sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGESIZE);
+	SET_UI64_RESULT(result, sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGESIZE));
 	return SYSINFO_RET_OK;
 #elif defined(HAVE_SYS_PSTAT_H)
 	struct	pst_static pst;
@@ -172,8 +167,7 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 		/* Get page size */	
 		page = pst.page_size;
 		/* Total physical memory in bytes */	
-		result->type |= AR_DOUBLE;	
-		result->dbl=(double)page*pst.physical_memory;
+		SET_UI64_RESULT(result, page*pst.physical_memory);
 		return SYSINFO_RET_OK;
 	}
 #elif defined(HAVE_SYSINFO_TOTALRAM)
@@ -185,11 +179,10 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 		
 	if( 0 == sysinfo(&info))
 	{
-		result->type |= AR_DOUBLE;	
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		result->dbl=(double)info.totalram * (double)info.mem_unit;
+		SET_UI64_RESULT(result, info.totalram * info.mem_unit);
 #else
-		result->dbl=(double)info.totalram;
+		SET_UI64_RESULT(result, info.totalram);
 #endif
 		return SYSINFO_RET_OK;
 	}
@@ -211,8 +204,7 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 
 	sysctl(mib,2,&v,&len,NULL,0);
 
-	result->type |= AR_DOUBLE;	
-	result->dbl=(double)(v.t_rm<<2);
+	SET_UI64_RESULT(result, v.t_rm<<2);
 	return SYSINFO_RET_OK;
 #elif defined(HAVE_SYS_SYSCTL_H)
 	static int mib[] = { CTL_HW, HW_PHYSMEM };
@@ -228,8 +220,7 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 
 	if(0==sysctl(mib,2,&memory,&len,NULL,0))
 	{
-		result->type |= AR_DOUBLE;	
-		result->dbl=(double)memory;
+		SET_UI64_RESULT(result, memory);
 		ret=SYSINFO_RET_OK;
 	}
 	else
@@ -254,8 +245,7 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 
         init_result(result);
 		
-	result->type |= AR_DOUBLE;	
-	result->dbl=(double)sysconf(_SC_AVPHYS_PAGES)*sysconf(_SC_PAGESIZE);
+	SET_UI64_RESULT(result, sysconf(_SC_AVPHYS_PAGES)*sysconf(_SC_PAGESIZE));
 	return SYSINFO_RET_OK;
 #elif defined(HAVE_SYS_PSTAT_H)
 	struct	pst_static pst;
@@ -294,8 +284,7 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 */
 		/* Free memory in bytes */
 
-			result->type |= AR_DOUBLE;	
-			result->dbl=(double)dyn.psd_free * page;
+			SET_UI64_RESULT(result, dyn.psd_free * page);
 			return SYSINFO_RET_OK;
 		}
 	}
@@ -308,11 +297,10 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 		
 	if( 0 == sysinfo(&info))
 	{
-		result->type |= AR_DOUBLE;	
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		result->dbl=(double)info.freeram * (double)info.mem_unit;
-#else
-		result->dbl=(double)info.freeram;
+		SET_UI64_RESULT(result, info.freeram * info.mem_unit);
+#else	
+		SET_UI64_RESULT(result, info.freeram);
 #endif
 		return SYSINFO_RET_OK;
 	}
@@ -334,8 +322,7 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 
 	sysctl(mib,2,&v,&len,NULL,0);
 
-	result->type |= AR_DOUBLE;	
-	result->dbl=(double)(v.t_free<<2);
+	SET_UI64_RESULT(result, v.t_free<<2);
 	return SYSINFO_RET_OK;
 /* OS/X */
 #elif defined(HAVE_MACH_HOST_INFO_H)
@@ -366,8 +353,7 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 
 		pu = pw+pa+pi;
 
-		result->type |= AR_DOUBLE;	
-		result->dbl=(double)pf;
+		SET_UI64_RESULT(result, pf);
 		ret = SYSINFO_RET_OK;
 	}
 	else

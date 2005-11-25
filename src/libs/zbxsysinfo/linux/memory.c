@@ -54,8 +54,7 @@ static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, 
 	}
 	fclose(f);
 
-	result->type |= AR_UINT64;	
-	result->ui64 = res;
+	SET_UI64_RESULT(result, res);
 	return SYSINFO_RET_OK;
 }
 
@@ -70,11 +69,10 @@ static int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags,
 		
 	if( 0 == sysinfo(&info))
 	{
-		result->type |= AR_UINT64;	
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		result->ui64=(zbx_uint64_t)info.bufferram * (zbx_uint64_t)info.mem_unit;
+		SET_UI64_RESULT(result, (zbx_uint64_t)info.bufferram * (zbx_uint64_t)info.mem_unit);
 #else
-		result->ui64=(zbx_uint64_t)info.bufferram;
+		SET_UI64_RESULT(result, info.bufferram);
 #endif
 		return SYSINFO_RET_OK;
 	}
@@ -102,11 +100,10 @@ static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, 
 		
 	if( 0 == sysinfo(&info))
 	{
-		result->type |= AR_UINT64;
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		result->ui64=(zbx_uint64_t)info.sharedram * (zbx_uint64_t)info.mem_unit;
+		SET_UI64_RESULT(result, (zbx_uint64_t)info.sharedram * (zbx_uint64_t)info.mem_unit);
 #else
-		result->ui64=(zbx_uint64_t)info.sharedram;
+		SET_UI64_RESULT(result, info.sharedram);
 #endif
 		return SYSINFO_RET_OK;
 	}
@@ -128,8 +125,7 @@ static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, 
 
 	sysctl(mib,2,&v,&len,NULL,0);
 
-	result->type |= AR_UINT64;	
-	result->ui64=(zbx_uint64_t)(v.t_armshr<<2);
+	SET_UI64_RESULT(result, v.t_armshr<<2); 
 	return SYSINFO_RET_OK;
 #else
 	return	SYSINFO_RET_FAIL;
@@ -144,8 +140,7 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 
         init_result(result);
 		
-	result->type |= AR_DOUBLE;	
-	result->dbl=(double)sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGESIZE);
+	SET_UI64_RESULT(result, sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGESIZE));
 	return SYSINFO_RET_OK;
 #elif defined(HAVE_SYS_PSTAT_H)
 	struct	pst_static pst;
@@ -164,8 +159,7 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 		/* Get page size */	
 		page = pst.page_size;
 		/* Total physical memory in bytes */	
-		result->type |= AR_UINT64;	
-		result->ui64=(zbx_uint64_t)page*pst.physical_memory;
+		SET_UI64_RESULT(result, page*pst.physical_memory);
 		return SYSINFO_RET_OK;
 	}
 #elif defined(HAVE_SYSINFO_TOTALRAM)
@@ -177,11 +171,10 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 		
 	if( 0 == sysinfo(&info))
 	{
-		result->type |= AR_UINT64;	
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		result->ui64=(zbx_uint64_t)info.totalram * (zbx_uint64_t)info.mem_unit;
+		SET_UI64_RESULT(result, (zbx_uint64_t)info.totalram * (zbx_uint64_t)info.mem_unit);
 #else
-		result->ui64=(zbx_uint64_t)info.totalram;
+		SET_UI64_RESULT(result, info.totalram);
 #endif
 		return SYSINFO_RET_OK;
 	}
@@ -203,8 +196,7 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 
 	sysctl(mib,2,&v,&len,NULL,0);
 
-	result->type |= AR_UINT64;	
-	result->ui64=(zbx_uint64_t)(v.t_rm<<2);
+	SET_UI64_RESULT(result, v.t_rm<<2);
 	return SYSINFO_RET_OK;
 #else
 	assert(result);
@@ -226,11 +218,10 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 		
 	if( 0 == sysinfo(&info))
 	{
-		result->type |= AR_UINT64;	
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		result->ui64=(zbx_uint64_t)info.freeram * (zbx_uint64_t)info.mem_unit;
+		SET_UI64_RESULT(result, (zbx_uint64_t)info.freeram * (zbx_uint64_t)info.mem_unit);
 #else
-		result->ui64=(zbx_uint64_t)info.freeram;
+		SET_UI64_RESULT(result, info.freeram);
 #endif
 		return SYSINFO_RET_OK;
 	}

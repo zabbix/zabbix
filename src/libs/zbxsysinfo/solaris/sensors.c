@@ -24,7 +24,7 @@
 
 #include "md5.h"
 
-int	SENSOR_TEMP1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	get_sensor(const char *name, unsigned flags, AGENT_RESULT *result)
 {
 	DIR	*dir;
 	struct	dirent *entries;
@@ -49,7 +49,7 @@ int	SENSOR_TEMP1(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	{
 		strscpy(filename,"/proc/sys/dev/sensors/");	
 		strncat(filename,entries->d_name,MAX_STRING_LEN);
-		strncat(filename,"/temp1",MAX_STRING_LEN);
+		strncat(filename,name,MAX_STRING_LEN);
 
 		if(stat(filename,&buf)==0)
 		{
@@ -64,118 +64,7 @@ int	SENSOR_TEMP1(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 			if(sscanf(line,"%lf\t%lf\t%lf\n",&d1, &d2, &d3) == 3)
 			{
 				closedir(dir);
-				result->type |= AR_DOUBLE;
-				result->dbl = d3;
-				return  SYSINFO_RET_OK;
-			}
-			else
-			{
-				closedir(dir);
-				return  SYSINFO_RET_FAIL;
-			}
-		}
-	}
-	closedir(dir);
-	return	SYSINFO_RET_FAIL;
-}
-
-int	SENSOR_TEMP2(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	DIR	*dir;
-	struct	dirent *entries;
-	struct	stat buf;
-	char	filename[MAX_STRING_LEN];
-	char	line[MAX_STRING_LEN];
-	double	d1,d2,d3;
-
-	FILE	*f;
-
-        assert(result);
-
-        init_result(result);	
-	
-	dir=opendir("/proc/sys/dev/sensors");
-	if(NULL == dir)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	while((entries=readdir(dir))!=NULL)
-	{
-		strscpy(filename,"/proc/sys/dev/sensors/");	
-		strncat(filename,entries->d_name,MAX_STRING_LEN);
-		strncat(filename,"/temp2",MAX_STRING_LEN);
-
-		if(stat(filename,&buf)==0)
-		{
-			f=fopen(filename,"r");
-			if(f==NULL)
-			{
-				continue;
-			}
-			fgets(line,MAX_STRING_LEN,f);
-			fclose(f);
-
-			if(sscanf(line,"%lf\t%lf\t%lf\n",&d1, &d2, &d3) == 3)
-			{
-				closedir(dir);
-				result->type |= AR_DOUBLE;
-				result->dbl = d3;
-				return  SYSINFO_RET_OK;
-			}
-			else
-			{
-				closedir(dir);
-				return  SYSINFO_RET_FAIL;
-			}
-		}
-	}
-	closedir(dir);
-	return	SYSINFO_RET_FAIL;
-}
-
-int	SENSOR_TEMP3(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	DIR	*dir;
-	struct	dirent *entries;
-	struct	stat buf;
-	char	filename[MAX_STRING_LEN];
-	char	line[MAX_STRING_LEN];
-	double	d1,d2,d3;
-
-	FILE	*f;
-
-        assert(result);
-
-        init_result(result);	
-	
-	dir=opendir("/proc/sys/dev/sensors");
-	if(NULL == dir)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	while((entries=readdir(dir))!=NULL)
-	{
-		strscpy(filename,"/proc/sys/dev/sensors/");	
-		strncat(filename,entries->d_name,MAX_STRING_LEN);
-		strncat(filename,"/temp3",MAX_STRING_LEN);
-
-		if(stat(filename,&buf)==0)
-		{
-			f=fopen(filename,"r");
-			if(f==NULL)
-			{
-				continue;
-			}
-			fgets(line,MAX_STRING_LEN,f);
-			fclose(f);
-
-			if(sscanf(line,"%lf\t%lf\t%lf\n",&d1, &d2, &d3) == 3)
-			{
-				closedir(dir);
-				result->type |= AR_DOUBLE;
-				result->dbl = d3;
+				SET_DBL_RESULT(result, d3);
 				return  SYSINFO_RET_OK;
 			}
 			else
@@ -210,15 +99,15 @@ int     OLD_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
         if(strcmp(key,"temp1") == 0)
         {
-                ret = SENSOR_TEMP1(cmd, param, flags, result);
+                ret = get_sensor("temp1", flags, result);
         }
         else if(strcmp(key,"temp2") == 0)
         {
-                ret = SENSOR_TEMP2(cmd, param, flags, result);
+                ret = get_sensor("temp2", flags, result);
         }
         else if(strcmp(key,"temp3") == 0)
         {
-                ret = SENSOR_TEMP3(cmd, param, flags, result);
+                ret = get_sensor("temp3", flags, result);
         }
         else
         {

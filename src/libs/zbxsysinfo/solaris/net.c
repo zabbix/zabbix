@@ -75,14 +75,12 @@ static int	NET_IF_IN_BYTES(const char *cmd, const char *param, unsigned flags, A
     ret = get_kstat_named_field(interface, "rbytes64", &kn);
     if (ret == SYSINFO_RET_OK)
     {
-	result->type |= AR_DOUBLE;
-        result->dbl = (double)kn.value.ui64;
+	SET_UI64_RESULT(result, kn.value.ui64);
     }
     else
     {
 	ret = get_kstat_named_field(interface, "rbytes", &kn);
-	result->type |= AR_DOUBLE;
-        result->dbl = (double)kn.value.ui32;
+	SET_UI64_RESULT(result, kn.value.ui32);
     }
     
     return ret;
@@ -111,14 +109,12 @@ static int	NET_IF_IN_PACKETS(const char *cmd, const char *param, unsigned flags,
     ret = get_kstat_named_field(interface, "ipackets64", &kn);
     if (ret == SYSINFO_RET_OK)
     {
-	result->type |= AR_DOUBLE;
-        result->dbl = (double)kn.value.ui64;
+	SET_UI64_RESULT(result, kn.value.ui64);
     }
     else
     {
 	ret = get_kstat_named_field(interface, "ipackets", &kn);
-	result->type |= AR_DOUBLE;
-        result->dbl = (double)kn.value.ui32;
+	SET_UI64_RESULT(result, kn.value.ui32);
     }
     
     return ret;
@@ -146,8 +142,7 @@ static int	NET_IF_IN_ERRORS(const char *cmd, const char *param, unsigned flags, 
     
     ret = get_kstat_named_field(interface, "ierrors", &kn);
 
-    result->type |= AR_DOUBLE;
-    result->dbl = (double)kn.value.ui32;
+	SET_UI64_RESULT(result, kn.value.ui32);
     
     return ret;
 }
@@ -175,14 +170,12 @@ static int	NET_IF_OUT_BYTES(const char *cmd, const char *param, unsigned flags, 
     ret = get_kstat_named_field(interface, "obytes64", &kn);
     if (ret == SYSINFO_RET_OK)
     {
-	result->type |= AR_DOUBLE;
-        result->dbl = (double)kn.value.ui64;
+	SET_UI64_RESULT(result, kn.value.ui64);
     }
     else
     {
 	ret = get_kstat_named_field(interface, "obytes", &kn);
-	result->type |= AR_DOUBLE;
-        result->dbl = (double)kn.value.ui32;
+	SET_UI64_RESULT(result, kn.value.ui32);
     }
     
     return ret;
@@ -211,14 +204,12 @@ static int	NET_IF_OUT_PACKETS(const char *cmd, const char *param, unsigned flags
     ret = get_kstat_named_field(interface, "opackets64", &kn);
     if (ret == SYSINFO_RET_OK)
     {
-	result->type |= AR_DOUBLE;
-        result->dbl = (double)kn.value.ui64;
+	SET_UI64_RESULT(result, kn.value.ui64);
     }
     else
     {
 	ret = get_kstat_named_field(interface, "opackets", &kn);
-	result->type |= AR_DOUBLE;
-        result->dbl = (double)kn.value.ui32;
+	SET_UI64_RESULT(result, kn.value.ui32);
     }
     
     return ret;
@@ -246,8 +237,7 @@ static int	NET_IF_OUT_ERRORS(const char *cmd, const char *param, unsigned flags,
     
     ret = get_kstat_named_field(interface, "oerrors", &kn);
 
-    result->type |= AR_DOUBLE;
-    result->dbl = (double)kn.value.ui32;
+	SET_UI64_RESULT(result, kn.value.ui32);
     
     return ret;
 }
@@ -276,8 +266,7 @@ int	NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_
 
     if(ret == SYSINFO_RET_OK)
     {
-	result->type |= AR_DOUBLE;
-	result->dbl = (double)kn.value.ui32;
+	SET_UI64_RESULT(result, kn.value.ui32);
     }
     
     return ret;

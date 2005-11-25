@@ -143,8 +143,7 @@ CPU_PARAMLIST
 
 				if (interval_size > 0)
 				{
-					result->type |= AR_DOUBLE;
-					result->dbl = (cpu_val[pl[i].id] * 100.0)/interval_size;
+					SET_DBL_RESULT(result, ((double)cpu_val[pl[i].id] * 100.0)/(double)interval_size);
 		
 					ret = SYSINFO_RET_OK;
 				}
@@ -167,8 +166,7 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 		
 	if(getloadavg(load, 3))
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = load[0];
+		SET_DBL_RESULT(result, load[0]);
 		ret = SYSINFO_RET_OK;
 	}
 	
@@ -186,8 +184,7 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_R
 		
 	if(getloadavg(load, 3))
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = load[1];
+		SET_DBL_RESULT(result, load[1]);
 		ret = SYSINFO_RET_OK;
 	}
 	
@@ -205,8 +202,7 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 		
 	if(getloadavg(load, 3))
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = load[2];
+		SET_DBL_RESULT(result, load[2]);
 		ret = SYSINFO_RET_OK;
 	}
 	

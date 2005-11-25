@@ -102,11 +102,10 @@ int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	if( 0 == sysinfo(&info))
 	{
-		result->type |= AR_DOUBLE;
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		result->dbl = (double)info.freeswap * (double)info.mem_unit;
+		SET_UI64_RESULT(result, (zbx_uint64_t)info.freeswap * (zbx_uint64_t)info.mem_unit);
 #else
-		result->dbl = (double)info.freeswap;
+		SET_UI64_RESILT(result, info.freeswap);
 #endif
 		return SYSINFO_RET_OK;
 	}
@@ -125,8 +124,7 @@ int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	get_swapinfo(&swaptotal,&swapfree);
 
-	result->type |= AR_DOUBLE;
-	result->dbl = swapfree;
+	SET_UI64_RESULT(result, swapfree);
 	return SYSINFO_RET_OK;
 #else
 	assert(result);
@@ -149,11 +147,10 @@ int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	if( 0 == sysinfo(&info))
 	{
-		result->type |= AR_DOUBLE;
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		result->dbl = (double)info.totalswap * (double)info.mem_unit;
+		SET_UI64_RESILT(result, (zbx_uint64_t)info.totalswap * (zbx_uint64_t)info.mem_unit);
 #else
-		result->dbl = (double)info.totalswap;
+		SET_UI64_RESILT(result, info.totalswap);
 #endif
 		return SYSINFO_RET_OK;
 	}
@@ -172,8 +169,7 @@ int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	get_swapinfo(&swaptotal,&swapfree);
 	
-	result->type |= AR_DOUBLE;
-	result->dbl = (double)swaptotal;
+	SET_UI64_RESULT(result, swaptotal);
 	return SYSINFO_RET_OK;
 #else
 	assert(result);
@@ -405,8 +401,7 @@ int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RES
     if(ret != SYSINFO_RET_OK)
 	return ret;
 
-    result->type |= AR_DOUBLE;
-    result->dbl = value;
+    SET_UI64_RESULT(result, value);
     return ret;
 }
 
@@ -468,8 +463,7 @@ int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RE
     if(ret != SYSINFO_RET_OK)
 	return ret;
 
-    result->type |= AR_DOUBLE;
-    result->dbl = value;
+    SET_UI64_RESULT(result, value);
     return ret;
 }
 

@@ -297,6 +297,30 @@ AGENT_RESULT {
 #define AR_MESSAGE	8
 #define AR_LIST		16
 
+#define SET_DBL_RESULT(res, val) \
+	{ \
+	(res)->type |= AR_DOUBLE; \
+	(res)->dbl = (double)(val); \
+	}
+
+#define SET_UI64_RESULT(res, val) \
+	{ \
+	(res)->type |= AR_UINT64; \
+	(res)->ui64 = (zbx_uint64_t)(val); \
+	}
+
+#define SET_STR_RESULT(res, val) \
+	{ \
+	(res)->type |= AR_STRING; \
+	(res)->str = (char*)(val); \
+	} 
+
+#define SET_MSG_RESULT(res, val) \
+	{ \
+	(res)->type |= AR_MESSAGE; \
+	(res)->msg = (char*)(val); \
+	}
+
 int   	copy_list(LIST *src, LIST *dist);
 void 	free_list(LIST *list);
 void   	init_result(AGENT_RESULT *result);

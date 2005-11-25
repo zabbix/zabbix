@@ -30,8 +30,7 @@ int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_R
 
         init_result(result);
 	
-	result->type |= AR_UINT64;
-	result->ui64 = (zbx_uint64_t)time(NULL);
+	SET_UI64_RESULT(result, time(NULL));
 
 	return ret;
 }

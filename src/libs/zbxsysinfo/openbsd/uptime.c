@@ -42,8 +42,7 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	{
 		now=time(NULL);
 
-		result->type |= AR_DOUBLE;
-		result->dbl = (double)(now-uptime.tv_sec);
+		SET_UI64_RESULT(result, now - uptime.tv_sec);
 
 		ret = SYSINFO_RET_OK;
 	}

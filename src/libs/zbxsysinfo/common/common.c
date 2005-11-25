@@ -218,13 +218,13 @@ void	free_result(AGENT_RESULT *result)
 	if(result->type & AR_STRING)
 	{
 		free(result->str);
-		result->str = NULL;
 	}
+	
 	if(result->type & AR_MESSAGE)
 	{
 		free(result->msg);
-		result->msg = NULL;
 	}
+
 	free_list(&(result->list));
 
 	init_result(result);
@@ -479,8 +479,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	{
 		if(!(result->type & AR_MESSAGE))
 		{
-			result->type |= AR_MESSAGE;
-			result->msg = strdup("ZBX_NOTSUPPORTED");
+			SET_MSG_RESULT(result, strdup("ZBX_NOTSUPPORTED"));
 		}
 		ret = NOTSUPPORTED;
 	}
@@ -488,8 +487,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	{
 		if(!(result->type & AR_MESSAGE))
 		{
-			result->type |= AR_MESSAGE;
-			result->msg = strdup("ZBX_ERROR");
+			SET_MSG_RESULT(result, strdup("ZBX_ERROR"));
 		}
 		ret = TIMEOUT_ERROR;
 	}
@@ -558,8 +556,7 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	for(i=0;i<MD5_DIGEST_SIZE;i++)
 		sprintf((char *)&hashText[i<<1],"%02x",hash[i]);
 
-	result->type |= AR_STRING;
-	result->str = strdup((char *)hashText);
+	SET_STR_RESULT(result, strdup((char*)hashText));
 
 	return SYSINFO_RET_OK;
 }
@@ -688,8 +685,7 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	cval = ~crc;
 
-	result->type |= AR_UINT64;
-	result->ui64 = (zbx_uint64_t)cval;
+	SET_UI64_RESULT(result, cval);
 
 	return	SYSINFO_RET_OK;
 }
@@ -737,8 +733,7 @@ int	get_stat(const char *key, unsigned flags, AGENT_RESULT *result)
 			if(strcmp(name1,key) == 0)
 			{
 				fclose(f);
-				result->type |= AR_UINT64;
-				result->ui64 = (zbx_uint64_t)atoi(name2);
+				SET_UI64_RESULT(result, atoi(name2));
 				return SYSINFO_RET_OK;
 			}
 		}
@@ -838,15 +833,13 @@ int	TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 		if(NULL != strstr(c,pattern))
 		{
 			fclose(f);
-			result->type |= AR_UINT64;
-			result->ui64 = 1;
+			SET_UI64_RESULT(result, 1);
 			return SYSINFO_RET_OK;
 		}
 	}
 	fclose(f);
 
-	result->type |= AR_UINT64;
-	result->ui64 = 0;
+	SET_UI64_RESULT(result, 0);
 	
 	return SYSINFO_RET_OK;
 #else
@@ -861,6 +854,7 @@ int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *r
 	char	*t;
 	char	c[MAX_STRING_LEN];
 	int	i;
+	double	value = 0;
         
 	assert(result);
 
@@ -882,8 +876,8 @@ int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *r
 	}
 	fclose(f);
 
-	result->type |= AR_DOUBLE;
-	sscanf(t, "%lf", &(result->dbl));
+	sscanf(t, "%lf", &value);
+	SET_DBL_RESULT(result, value);
 
 	return SYSINFO_RET_OK;
 }
@@ -895,8 +889,7 @@ int	AGENT_PING(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 
         init_result(result);	
 	
-	result->type |= AR_UINT64;
-	result->ui64 = 1;
+	SET_UI64_RESULT(result, 1);
 	return SYSINFO_RET_OK;
 }
 
@@ -911,8 +904,7 @@ int	PROCCOUNT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	
 	if( 0 == sysinfo(&info))
 	{
-		result->type |= AR_UINT64;
-		result->ui64 = (zbx_uint64_t)info.procs;
+		SET_UI64_RESULT(result, info.procs);
 		return SYSINFO_RET_OK;
 	}
 	else
@@ -971,8 +963,7 @@ int	PROCCOUNT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	}
 	closedir(dir);
 	
-	result->type |= AR_UINT64;
-	result->ui64 = (zbx_uint64_t)proccount;
+	SET_UI64_RESULT(result,	proccount);
 	
 	return SYSINFO_RET_OK;
 #else
@@ -1020,8 +1011,7 @@ int	PROCCOUNT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	}
 	closedir(dir);
 
-	result->type |= AR_UINT64;
-	result->ui64 = (zbx_uint64_t)proccount;
+	SET_UI64_RESULT(result,	proccount);
 	
 	return SYSINFO_RET_OK;
 #else
@@ -1039,8 +1029,7 @@ int	AGENT_VERSION(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
         init_result(result);
 		
-	result->type |= AR_STRING;
-	result->str = strdup(version);
+	SET_STR_RESULT(result, strdup(version));
 	
 	return	SYSINFO_RET_OK;
 }
@@ -1143,8 +1132,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		}
 	}
 	
-	result->type |= AR_STRING;
-	result->str = strdup(c);
+	SET_STR_RESULT(result, strdup(c));
 	
 	return	SYSINFO_RET_OK;
 }
@@ -1153,6 +1141,7 @@ int	EXECUTE(const char *cmd, const char *command, unsigned flags, AGENT_RESULT *
 {
 	FILE	*f;
 	char	c[MAX_STRING_LEN];
+	double	value = 0;
 
         assert(result);
 
@@ -1199,8 +1188,8 @@ int	EXECUTE(const char *cmd, const char *command, unsigned flags, AGENT_RESULT *
 		return SYSINFO_RET_FAIL;
 	}
 
-	result->type |= AR_DOUBLE;
-	sscanf(c, "%lf", &(result->dbl) );
+	sscanf(c, "%lf", &value);
+	SET_DBL_RESULT(result, value);
 
 	return	SYSINFO_RET_OK;
 }
@@ -1209,7 +1198,6 @@ int	forward_request(char *proxy, char *command, int port, unsigned flags, AGENT_
 {
 	char	*haddr;
 	char	c[1024];
-	char	value[MAX_STRING_LEN];
 	
 	int	s;
 	struct	sockaddr_in addr;
@@ -1224,9 +1212,7 @@ int	forward_request(char *proxy, char *command, int port, unsigned flags, AGENT_
 	host = gethostbyname(proxy);
 	if(host == NULL)
 	{
-		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_NETWORK_ERROR");
-		result->type |= AR_MESSAGE;
-		result->msg = strdup(value);
+		SET_MSG_RESULT(result, strdup("ZBX_NETWORK_ERROR"));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -1241,44 +1227,35 @@ int	forward_request(char *proxy, char *command, int port, unsigned flags, AGENT_
 	s = socket(AF_INET, SOCK_STREAM, 0);
 	if (s == -1)
 	{
-		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_NOTSUPPORTED");
-		result->type |= AR_MESSAGE;
-		result->msg = strdup(value);
 		close(s);
+		SET_MSG_RESULT(result, strdup("ZBX_NOTSUPPORTED"));
 		return SYSINFO_RET_FAIL;
 	}
 
 	if (connect(s, (struct sockaddr *) &addr, addrlen) == -1)
 	{
-		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_NETWORK_ERROR");
 		close(s);
-		result->type |= AR_MESSAGE;
-		result->msg = strdup(value);
+		SET_MSG_RESULT(result, strdup("ZBX_NETWORK_ERROR"));
 		return SYSINFO_RET_FAIL;
 	}
 
 	if(write(s,command,strlen(command)) == -1)
 	{
-		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_NETWORK_ERROR");
-		result->type |= AR_MESSAGE;
-		result->msg = strdup(value);
 		close(s);
+		SET_MSG_RESULT(result, strdup("ZBX_NETWORK_ERROR"));
 		return SYSINFO_RET_FAIL;
 	}
 
 	memset(&c, 0, 1024);
 	if(read(s, c, 1024) == -1)
 	{
-		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_ERROR");
-		result->type |= AR_MESSAGE;
-		result->msg = strdup(value);
 		close(s);
+		SET_MSG_RESULT(result, strdup("ZBX_ERROR"));
 		return SYSINFO_RET_FAIL;
 	}
 	close(s);
 	
-        result->type |= AR_STRING;
-        result->str = strdup(c);	
+	SET_STR_RESULT(result, strdup(c));
 
 	return	SYSINFO_RET_OK;
 }
@@ -1617,13 +1594,11 @@ int	CHECK_SERVICE_PERF(const char *cmd, const char *service_and_ip_and_port, uns
 		gettimeofday(&t2,&tz2);
    		exec_time=(t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec);
 
-		result->type |= AR_DOUBLE;
-		result->dbl = (double)exec_time / 1000000.0;
+		SET_DBL_RESULT(result, exec_time / 1000000.0);
 		return SYSINFO_RET_OK;
 	}
 	
-	result->type |= AR_DOUBLE;
-	result->dbl = 0;
+	SET_DBL_RESULT(result, 0.0);
 
 	return SYSINFO_RET_OK;
 }
@@ -1784,8 +1759,7 @@ int	CHECK_SERVICE(const char *cmd, const char *service_and_ip_and_port, unsigned
 		ret=SYSINFO_RET_FAIL;
 	}
 
-	result->type |= AR_DOUBLE;
-	result->dbl = (double)value_int;
+	SET_DBL_RESULT(result, value_int);
 
 	return ret;
 }
@@ -1818,8 +1792,7 @@ int	CHECK_PORT(const char *cmd, const char *ip_and_port, unsigned flags, AGENT_R
 
 	ret = tcp_expect(ip,port,NULL,NULL,"",&value_int);
 	
-	result->type |= AR_UINT64;
-	result->ui64 = (zbx_uint64_t)value_int;
+	SET_UI64_RESULT(result, value_int);
 	return ret;
 }
 
@@ -1875,8 +1848,7 @@ int	CHECK_DNS(const char *cmd, const char *ip_and_zone, unsigned flags, AGENT_RE
 	res = inet_aton(ip, &in);
 	if(res != 1)
 	{
-		result->type |= AR_UINT64;
-		result->ui64 = 0;
+		SET_UI64_RESULT(result,0);
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -1905,8 +1877,7 @@ int	CHECK_DNS(const char *cmd, const char *ip_and_zone, unsigned flags, AGENT_RE
 #else
 	res=res_query(zone,ns_c_in,ns_t_soa,(unsigned char *)respbuf,sizeof(respbuf));
 #endif
-	result->type |= AR_UINT64;
-       	result->ui64 = (zbx_uint64_t)(res != -1 ? 1 : 0);
+	SET_UI64_RESULT(result, res != -1 ? 1 : 0);
 
 	return SYSINFO_RET_OK;
 }
