@@ -1360,7 +1360,7 @@ echo "</head>";
 				$res=DBselect($sql);
 				$row=DBfetch($res);
 
-				$itemid=row["itemid"];
+				$itemid=$row["itemid"];
 #				echo "ITEMID:$itemid<BR>";
 	
 				$sql="insert into functions (itemid,triggerid,function,parameter) values ($itemid,$triggerid,'$function','$parameter')";
