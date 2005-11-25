@@ -17,7 +17,7 @@
 ### along with this program; if not, write to the Free Software
 ### Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-import re, httplib, sys, time, os, MySQLdb
+import unittest, re, httplib, sys, time, os, MySQLdb
 
 connection = MySQLdb.connect(host="localhost",
             user="root", passwd="", db="test" )   
