@@ -22,7 +22,6 @@
 #include "common.h"
 #include "sysinfo.h"
 
-#if 1
 int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
     kstat_ctl_t   *kc;
@@ -44,116 +43,13 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	kp = kstat_lookup(kc, "unix", 0, "system_misc");
         if ((kp) && (kstat_read(kc, kp, 0) != -1))
 	{
-	    kn = (kstat_named_t*) kstat_data_lookup(kp, "boot_time");
-            time(&now);
-	    result->type |= AR_DOUBLE;
-	    result->dbl = difftime(now, (time_t) kn->value.ul);
-            ret = SYSINFO_RET_OK;
+		kn = (kstat_named_t*) kstat_data_lookup(kp, "boot_time");
+		time(&now);
+		SET_UI64_RESULT(result, difftime(now, (time_t) kn->value.ul));
+		ret = SYSINFO_RET_OK;
         }
 	kstat_close(kc);
     }
     return ret;
 }
-#endif
-
-#if 0
-int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef HAVE_SYSINFO_UPTIME
-	struct sysinfo info;
-
-	assert(result);
-
-        init_result(result);
-
-	if( 0 == sysinfo(&info))
-	{
-		result->type |= AR_DOUBLE;
-		result->dbl = (double)info.uptime;
-		return SYSINFO_RET_OK;
-	}
-	else
-	{
-		return SYSINFO_RET_FAIL;
-	}
-#else
-#ifdef HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME
-	int	mib[2],len;
-	struct timeval	uptime;
-	int	now;
-
-	assert(result);
-
-        init_result(result);
-
-	mib[0]=CTL_KERN;
-	mib[1]=KERN_BOOTTIME;
-
-	len=sizeof(uptime);
-
-	if(sysctl(mib,2,&uptime,(size_t *)&len,NULL,0) != 0)
-	{
-		return	SYSINFO_RET_FAIL;
-/*		printf("Errno [%m]\n");*/
-	}
-
-	now=time(NULL);
-	result->type |= AR_DOUBLE;
-	result->dbl = (double)(now-uptime.tv_sec);
-	return SYSINFO_RET_OK;
-#else
-/* Solaris */
-#ifdef HAVE_KSTAT_H
-	kstat_ctl_t   *kc;
-	kstat_t       *kp;
-	kstat_named_t *kn;
-
-	long          hz;
-	long          secs;
-
-        assert(result);
-
-        init_result(result);
-	
-	hz = sysconf(_SC_CLK_TCK);
-
-	/* open kstat */
-	kc = kstat_open();
-	if (0 == kc)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	/* read uptime counter */
-	kp = kstat_lookup(kc, "unix", 0, "system_misc");
-	if (0 == kp)
-	{
-		kstat_close(kc);
-		return SYSINFO_RET_FAIL;
-	}
-
-	if(-1 == kstat_read(kc, kp, 0))
-	{
-		kstat_close(kc);
-		return SYSINFO_RET_FAIL;
-	}
-	kn = (kstat_named_t*)kstat_data_lookup(kp, "clk_intr");
-	secs = kn->value.ul / hz;
-
-	/* close kstat */
-	kstat_close(kc);
-	result->type |= AR_DOUBLE;
-	result->dbl = (double)secs;
-	return SYSINFO_RET_OK;
-#else
-        assert(result);
-
-        init_result(result);
-
-	return	SYSINFO_RET_FAIL;
-#endif
-#endif
-#endif
-}
-#endif
 

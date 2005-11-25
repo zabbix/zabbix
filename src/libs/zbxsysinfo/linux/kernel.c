@@ -42,8 +42,7 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		{
 			if(sscanf(line,ZBX_FS_UI64 "\n", &value) == 1)
 			{
-				result->type |= AR_UINT64;
-				result->ui64 = (zbx_uint64_t) value;
+				SET_UI64_RESULT(result, value);
 				ret = SYSINFO_RET_OK;
 			}
 		}
@@ -74,8 +73,7 @@ int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RES
 /*		printf("Errno [%m]");*/
 	}
 
-	result->type |= AR_DOUBLE;
-	result->dbl = (double)(maxproc);
+	SET_UI64_RESULT(result, maxproc);
 	return SYSINFO_RET_OK;
 #else
 	return	SYSINFO_RET_FAIL;

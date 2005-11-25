@@ -161,8 +161,7 @@ static void update_key_status(int hostid,int host_status)
 /*		snprintf(value_str,sizeof(value_str)-1,"%d",host_status);*/
 
 		init_result(&agent);
-		agent.type |= AR_UINT64;
-		agent.ui64=(zbx_uint64_t)host_status;
+		SET_UI64_RESULT(&agent, host_status);
 		process_new_value(&item,&agent);
 /*		process_new_value(&item,value_str);*/
 		free_result(&agent);

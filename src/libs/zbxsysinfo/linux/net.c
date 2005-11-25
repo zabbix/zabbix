@@ -136,23 +136,19 @@ int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	{
 		if(strncmp(mode, "bytes", MAX_STRING_LEN) == 0)
 		{
-			result->type |= AR_UINT64;
-			result->ui64 = (zbx_uint64_t)(ns.ibytes);
+			SET_UI64_RESULT(result, ns.ibytes);
 		} 
 		else if(strncmp(mode, "packets", MAX_STRING_LEN) == 0)
 		{
-			result->type |= AR_UINT64;
-			result->ui64 = (zbx_uint64_t)(ns.ipackets);
+			SET_UI64_RESULT(result, ns.ipackets);
 		}
 		else if(strncmp(mode, "errors", MAX_STRING_LEN) == 0)
 		{
-			result->type |= AR_UINT64;
-			result->ui64 = (zbx_uint64_t)(ns.ierr);
+			SET_UI64_RESULT(result, ns.ierr);
 		}
 		else if(strncmp(mode, "dropped", MAX_STRING_LEN) == 0)
 		{
-			result->type |= AR_UINT64;
-			result->ui64 = (zbx_uint64_t)(ns.idrop);
+			SET_UI64_RESULT(result, ns.idrop);
 		}
 		else
 		{
@@ -203,23 +199,19 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	{
 		if(strncmp(mode, "bytes", MAX_STRING_LEN) == 0)
 		{
-			result->type |= AR_UINT64;
-			result->ui64 = (zbx_uint64_t)(ns.obytes);
+			SET_UI64_RESULT(result, ns.obytes);
 		} 
 		else if(strncmp(mode, "packets", MAX_STRING_LEN) == 0)
 		{
-			result->type |= AR_UINT64;
-			result->ui64 = (zbx_uint64_t)(ns.opackets);
+			SET_UI64_RESULT(result, ns.opackets);
 		}
 		else if(strncmp(mode, "errors", MAX_STRING_LEN) == 0)
 		{
-			result->type |= AR_UINT64;
-			result->ui64 = (zbx_uint64_t)(ns.oerr);
+			SET_UI64_RESULT(result, ns.oerr);
 		}
 		else if(strncmp(mode, "dropped", MAX_STRING_LEN) == 0)
 		{
-			result->type |= AR_UINT64;
-			result->ui64 = (zbx_uint64_t)(ns.odrop);
+			SET_UI64_RESULT(result, ns.odrop);
 		}
 		else
 		{
@@ -267,8 +259,7 @@ int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AG
 
 	if(ret == SYSINFO_RET_OK)
 	{
-		result->type |= AR_UINT64;
-		result->ui64 = (zbx_uint64_t)(ns.colls);
+		SET_UI64_RESULT(result, ns.colls);
 	}
 	
 	return ret;

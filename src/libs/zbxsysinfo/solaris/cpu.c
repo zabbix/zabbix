@@ -143,8 +143,7 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
         
 	if (interval_size > 0)
 	{
-	    result->type |= AR_DOUBLE;
-	    result->dbl = (cpu_val[info_id] * 100.0)/interval_size;
+		SET_DBL_RESULT(result, (cpu_val[info_id] * 100.0)/interval_size);
 
             ret = SYSINFO_RET_OK;
         }
@@ -163,8 +162,7 @@ static int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, 
 		
 	if(getloadavg(load, 3))
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = load[0];
+		SET_DBL_RESULT(result, load[0]);
 		return SYSINFO_RET_OK;
 	}
 	else
@@ -187,8 +185,7 @@ static int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, 
 		
 	if(getloadavg(load, 3))
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = load[1];
+		SET_DBL_RESULT(result, load[1]);
 		return SYSINFO_RET_OK;
 	}
 	else
@@ -211,8 +208,7 @@ static int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags,
 		
 	if(getloadavg(load, 3))
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl =load[2];	
+		SET_DBL_RESULT(result, load[2]);
 		return SYSINFO_RET_OK;
 	}
 	else
@@ -326,8 +322,7 @@ int	SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGEN
 	return SYSINFO_RET_FAIL;
     }
 
-    result->type |= AR_DOUBLE;
-    result->dbl = swt_count;
+	SET_UI64_RESULT(result, swt_count);
     
     return SYSINFO_RET_OK;
 }
@@ -369,8 +364,7 @@ int	SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	return SYSINFO_RET_FAIL;
     }
     
-    result->type |= AR_DOUBLE;
-    result->dbl = intr_count;
+	SET_UI64_RESULT(result, intr_count);
     
     return SYSINFO_RET_OK;
 }

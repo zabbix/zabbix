@@ -336,11 +336,13 @@ static int do_ping(void)
 			if(0 == alive)
 			{
 				init_result(&value);
-				value.type |= AR_DOUBLE;
-
-				value.dbl = (double)0;
+				
+				SET_DBL_RESULT(&value, 0);
+				
 				process_value(SERVER_ICMPPING_KEY,ip,&value);
-				value.dbl = (double)0;
+				
+				SET_DBL_RESULT(&value, 0);
+				
 				process_value(SERVER_ICMPPINGSEC_KEY,ip,&value);
 
 				free_result(&value);
@@ -348,11 +350,13 @@ static int do_ping(void)
 			else
 			{
 				init_result(&value);
-				value.type |= AR_DOUBLE;
 
-				value.dbl = (double)1;
+				SET_DBL_RESULT(&value, 0);
+				
 				process_value(SERVER_ICMPPING_KEY,ip,&value);
-				value.dbl = (double)(mseconds/1000);
+				
+				SET_DBL_RESULT(&value, mseconds/1000);
+
 				process_value(SERVER_ICMPPINGSEC_KEY,ip,&value);
 				free_result(&value);
 			}

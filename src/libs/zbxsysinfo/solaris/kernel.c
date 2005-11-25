@@ -46,8 +46,7 @@ int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RES
 				v = (struct var *) kt->ks_data;
 
 				/* int	v_proc;	    Max processes system wide */
-				result->type |= AR_DOUBLE;
-				result->dbl = (double)v->v_proc;
+				SET_UI64_RESULT(result, v->v_proc);
 				ret = SYSINFO_RET_OK;
 			}
 		}
@@ -77,8 +76,7 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return	SYSINFO_RET_FAIL;
 	}
 
-	result->type |= AR_DOUBLE;
-     	result->dbl = (double)(maxfiles);
+	SET_UI64_RESULT(result, maxfiles);
 	return SYSINFO_RET_OK;
 #else
 	return	SYSINFO_RET_FAIL;

@@ -88,8 +88,7 @@ static int	VFS_DEV_READ_BYTES(const char *cmd, const char *param, unsigned flags
 	
 	if(get_disk_stats(devname, &ds) == SYSINFO_RET_OK)
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = ds.ds_rbytes;
+		SET_UI64_RESULT(result,  ds.ds_rbytes);
 		ret = SYSINFO_RET_OK;
 	}
 */
@@ -118,8 +117,7 @@ static int	VFS_DEV_READ_OPERATIONS(const char *cmd, const char *param, unsigned 
 	
 	if(get_disk_stats(devname, &ds) == SYSINFO_RET_OK)
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = ds.ds_rxfer;
+		SET_UI64_RESULT(result, ds.ds_rxfer);
 		ret = SYSINFO_RET_OK;
 	}
 */	
@@ -148,8 +146,7 @@ static int	VFS_DEV_WRITE_BYTES(const char *cmd, const char *param, unsigned flag
 	
 	if(get_disk_stats(devname, &ds) == SYSINFO_RET_OK)
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = ds.ds_wbytes;
+		SET_UI64_RESULT(result, ds.ds_wbytes);
 		ret = SYSINFO_RET_OK;
 	}
 */	
@@ -178,8 +175,7 @@ static int	VFS_DEV_WRITE_OPERATIONS(const char *cmd, const char *param, unsigned
 	
 	if(get_disk_stats(devname, &ds) == SYSINFO_RET_OK)
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = ds.ds_wxfer;
+		SET_UI64_RESULT(result, ds.ds_wxfer);
 		ret = SYSINFO_RET_OK;
 	}
 */	

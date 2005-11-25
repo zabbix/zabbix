@@ -221,8 +221,7 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 		
 	if(getloadavg(load, 3))
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = load[0];
+		SET_DBL_RESULT(result, load[0]);
 		return SYSINFO_RET_OK;
 	}
 	else
@@ -243,8 +242,7 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 	}
 	else
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = (double)dyn.psd_avg_1_min;
+		SET_DBL_RESULT(result, dyn.psd_avg_1_min);
 		return SYSINFO_RET_OK;
 	}
 #else
@@ -270,8 +268,7 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 	{
 		return SYSINFO_RET_FAIL;
 	}
-        result->type |= AR_DOUBLE;
-	result->dbl = (double)kn->value.ul/256.0;
+	SET_DBL_RESULT(result, ((double)kn->value.ul)/256.0);
 	return SYSINFO_RET_OK;
 #else
 #ifdef HAVE_KNLIST_H
@@ -286,8 +283,7 @@ int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_R
 		return SYSINFO_RET_FAIL;
 	}
 
-        result->type |= AR_DOUBLE;
-	result->dbl = loadavg[0];
+	SET_DBL_RESULT(result, loadavg[0])
 	return SYSINFO_RET_OK;
 #else
 	assert(result);
@@ -312,8 +308,7 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_R
 		
 	if(getloadavg(load, 3))
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = load[1];
+		SET_DBL_RESULT(result, load[1]);
 		return SYSINFO_RET_OK;
 	}
 	else
@@ -334,8 +329,7 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_R
 	}
 	else
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = (double)dyn.psd_avg_5_min;
+		SET_DBL_RESULT(result, dyn.psd_avg_5_min);
 		return SYSINFO_RET_OK;
 	}
 #else
@@ -361,8 +355,7 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_R
 	{
 		return SYSINFO_RET_FAIL;
 	}
-        result->type |= AR_DOUBLE;
-	result->dbl = (double)kn->value.ul/256.0;
+	SET_DBL_RESULT(result, ((double)kn->value.ul)/256.0);
 	return SYSINFO_RET_OK;
 #else
 #ifdef HAVE_KNLIST_H
@@ -377,8 +370,7 @@ int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_R
 		return STSINFO_RET_FAIL;
 	}
 
-        result->type |= AR_DOUBLE;
-	result->dbl = loadavg[1];
+	SET_DBL_RESULT(result, loadavg[1]); 
 	return SYSINFO_RET_OK;
 #else
 	assert(result);
@@ -403,8 +395,7 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	if(getloadavg(load, 3))
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = load[2];	
+		SET_DBL_RESULT(result, load[2]); 
 		return SYSINFO_RET_OK;
 	}
 	else
@@ -425,8 +416,7 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 	}
 	else
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = (double)dyn.psd_avg_15_min;
+		SET_DBL_RESULT(result, dyn.psd_avg_15_min); 
 		return SYSINFO_RET_OK;
 	}
 #else
@@ -452,8 +442,7 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 	{
 		return SYSINFO_RET_FAIL;
 	}
-        result->type |= AR_DOUBLE;
-	result->dbl = (double)kn->value.ul/256.0;
+	SET_DBL_RESULT(result, ((double)kn->value.ul)/256.0); 
 	return SYSINFO_RET_OK;
 #else
 #ifdef HAVE_KNLIST_H
@@ -468,8 +457,7 @@ int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_
 		return STSINFO_RET_FAIL;
 	}
 
-        result->type |= AR_DOUBLE;
-	result->dbl = loadavg[2];
+	SET_DBL_RESULT(result, loadavg[2]);
 	return SYSINFO_RET_OK;
 #else
 	assert(result);
@@ -581,8 +569,7 @@ int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGEN
 		
 			if(strncmp(name, "intr", MAX_STRING_LEN) == 0)
 			{
-				result->type |= AR_UINT64;
-				result->ui64 = (zbx_uint64_t) value;
+				SET_UI64_RESULT(result, value);
 				ret = SYSINFO_RET_OK;
 				break;
 			}

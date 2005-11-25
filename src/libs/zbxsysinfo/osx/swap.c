@@ -102,11 +102,10 @@ static int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, 
 
 	if( 0 == sysinfo(&info))
 	{
-		result->type |= AR_DOUBLE;
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		result->dbl = (double)info.freeswap * (double)info.mem_unit;
+		SET_UI64_RESULT(result, (zbx_uint64_t)info.freeswap * (zbx_uint64_t)info.mem_unit);
 #else
-		result->dbl = (double)info.freeswap;
+		SET_UI64_RESULT(result, info.freeswap);
 #endif
 		return SYSINFO_RET_OK;
 	}
@@ -125,8 +124,7 @@ static int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, 
 
 	get_swapinfo(&swaptotal,&swapfree);
 
-	result->type |= AR_DOUBLE;
-	result->dbl = swapfree;
+	SET_UI64_RESULT(result, swapfree);
 	return SYSINFO_RET_OK;
 #else
 	assert(result);
@@ -149,11 +147,10 @@ static int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags,
 
 	if( 0 == sysinfo(&info))
 	{
-		result->type |= AR_DOUBLE;
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		result->dbl = (double)info.totalswap * (double)info.mem_unit;
+		SET_UI64_RESULT(result, (zbx_uint64_t)info.totalswap * (zbx_uint64_t)info.mem_unit);
 #else
-		result->dbl = (double)info.totalswap;
+		SET_UI64_RESULT(result, info.totalswap);
 #endif
 		return SYSINFO_RET_OK;
 	}
@@ -172,8 +169,7 @@ static int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags,
 
 	get_swapinfo(&swaptotal,&swapfree);
 	
-	result->type |= AR_DOUBLE;
-	result->dbl = (double)swaptotal;
+	SET_UI64_RESULT(result, swaptotal);
 	return SYSINFO_RET_OK;
 #else
 	assert(result);

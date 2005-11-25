@@ -32,8 +32,7 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 	if( 0 == sysinfo(&info))
 	{
-		result->type |= AR_UINT64;
-		result->ui64 = (zbx_uint64_t)info.uptime;
+		SET_UI64_RESULT(result, info.uptime);
 		return SYSINFO_RET_OK;
 	}
 	else

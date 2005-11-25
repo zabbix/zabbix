@@ -1,5 +1,6 @@
 Changes for 1.1beta3:
 
+ - added "SET_<TYPE>_RESULT" macross (Eugene)
  - new W32 un/install floppy. (Eugene)
  - added script for GUI regression testing (Alexei)
  - reverted multiple server patch (Alexei)

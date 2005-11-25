@@ -274,13 +274,11 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
     
     if(do_task == DO_AVG)
     {
-    	result->type |= AR_DOUBLE;
-    	result->dbl = (double)memsize/(double)proccount;
+	SET_DBL_RESULT(result, proccount == 0 ? 0 : ((double)memsize/(double)proccount));
     }
     else
     {
-	    result->type |= AR_UINT64;
-	    result->ui64 = memsize;
+	SET_UI64_RESULT(result, memsize);
     }
     return SYSINFO_RET_OK;
 #else
@@ -498,8 +496,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
     }
     closedir(dir);
 
-    result->type |= AR_UINT64;
-    result->ui64 = proccount;
+    SET_UI64_RESULT(result, proccount);
     return SYSINFO_RET_OK;
 #else
     return	SYSINFO_RET_FAIL;

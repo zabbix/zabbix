@@ -44,8 +44,7 @@ int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	
 	if(stat(filename,&buf) == 0)
 	{
-		result->type |= AR_UINT64;
-		result->ui64 = (zbx_uint64_t)buf.st_size;
+		SET_UI64_RESULT(result, buf.st_size);
 		return SYSINFO_RET_OK;
 	}
 	return	SYSINFO_RET_FAIL;
@@ -72,8 +71,7 @@ int	VFS_FILE_ATIME(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	
 	if(stat(filename,&buf) == 0)
 	{
-		result->type |= AR_UINT64;
-		result->ui64 = (zbx_uint64_t)buf.st_atime;
+		SET_UI64_RESULT(result, buf.st_atime);
 		return SYSINFO_RET_OK;
 	}
 	return	SYSINFO_RET_FAIL;
@@ -100,8 +98,7 @@ int	VFS_FILE_CTIME(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 	if(stat(filename,&buf) == 0)
 	{
-		result->type |= AR_UINT64;
-		result->ui64 = (zbx_uint64_t)buf.st_ctime;
+		SET_UI64_RESULT(result, buf.st_ctime);
 		return SYSINFO_RET_OK;
 	}
 	return	SYSINFO_RET_FAIL;
@@ -128,8 +125,7 @@ int	VFS_FILE_MTIME(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	
 	if(stat(filename,&buf) == 0)
 	{
-		result->type |= AR_UINT64;
-		result->ui64 = (zbx_uint64_t)buf.st_mtime;
+		SET_UI64_RESULT(result, buf.st_mtime);
 		return SYSINFO_RET_OK;
 	}
 	return	SYSINFO_RET_FAIL;
@@ -154,14 +150,14 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RE
                 return SYSINFO_RET_FAIL;
         }
 
-	result->type |= AR_UINT64;
+	SET_UI64_RESULT(result, 0);
 	/* File exists */
 	if(stat(filename,&buf) == 0)
 	{
 		/* Regular file */
 		if(S_ISREG(buf.st_mode))
 		{
-			result->ui64 = (zbx_uint64_t)1;
+			SET_UI64_RESULT(result, 1);
 		}
 	}
 	/* File does not exist or any other error */
@@ -245,8 +241,7 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 			strncpy(tmp,c,len);
 		}
 
-		result->type |= AR_STRING;
-		result->str = strdup(tmp);
+		SET_STR_RESULT(result, strdup(tmp));
 	}
 
 	if(buf != NULL)
@@ -324,13 +319,11 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 
 		if(c == NULL)
 		{
-			result->type |= AR_UINT64;
-			result->ui64 = 0;
+			SET_UI64_RESULT(result, 0);
 		}
 		else
 		{
-			result->type |= AR_UINT64;
-			result->ui64 = 1;
+			SET_UI64_RESULT(result, 1);
 		}
 	}
 

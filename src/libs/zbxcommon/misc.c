@@ -154,26 +154,20 @@ void	set_result_type(AGENT_RESULT *result, char *c)
 {
 	if(is_uint(c) == SUCCEED)
 	{
-		result->type |= AR_UINT64;
-		result->ui64 = (zbx_uint64_t)atoll(c);
+		SET_UI64_RESULT(result, atoll(c));
 
-		result->type |= AR_DOUBLE;
-		result->dbl = (double)atof(c);
+		SET_DBL_RESULT(result, atof(c));
 
-		result->type |= AR_STRING;
-		result->str = strdup(c);
+		SET_STR_RESULT(result, strdup(c));
 	}
 	else if(is_double(c) == SUCCEED)
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = (double)atof(c);
+		SET_DBL_RESULT(result, atof(c));
 
-		result->type |= AR_STRING;
-		result->str = strdup(c);
+		SET_STR_RESULT(result, strdup(c));
 	}
 	else
 	{
-		result->type |= AR_STRING;
-		result->str = strdup(c);
+		SET_STR_RESULT(result, strdup(c));
 	}
 }

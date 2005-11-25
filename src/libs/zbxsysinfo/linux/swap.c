@@ -34,11 +34,10 @@ static int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, 
 
 	if( 0 == sysinfo(&info))
 	{
-		result->type |= AR_UINT64;
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		result->ui64 = (zbx_uint64_t)info.freeswap * (zbx_uint64_t)info.mem_unit;
+		SET_UI64_RESULT(result, (zbx_uint64_t)info.freeswap * (zbx_uint64_t)info.mem_unit);
 #else
-		result->ui64 = (zbx_uint64_t)info.freeswap;
+		SET_UI64_RESULT(result, info.freeswap);
 #endif
 		return SYSINFO_RET_OK;
 	}
@@ -58,11 +57,10 @@ static int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags,
 
 	if( 0 == sysinfo(&info))
 	{
-		result->type |= AR_UINT64;
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		result->ui64 = (zbx_uint64_t)info.totalswap * (zbx_uint64_t)info.mem_unit;
+		SET_UI64_RESULT(result, (zbx_uint64_t)info.totalswap * (zbx_uint64_t)info.mem_unit);
 #else
-		result->ui64 = (zbx_uint64_t)info.totalswap;
+		SET_UI64_RESULT(result, info.totalswap);
 #endif
 		return SYSINFO_RET_OK;
 	}
