@@ -99,6 +99,22 @@ def GUI_Config_General_Mediatype_Script():
 	TestGUI('General->Media type->Delete (script)', "config.php", "mediatypeid="+str(mediatypeid)+"&config=1&register=delete", "Media type deleted")
 	TestDBCount("media_type","description='Zzz2'", 0)
 
+def GUI_Config_General_Autoregistration():
+	print "GUI_Config_Autoregistration"
+	TestGUI('Hosts->Add', "hosts.php", "host=regression&newgroup=&useip=on&ip=127.0.0.1&port=10050&status=0&host_templateid=0&register=add#form", "Host added")
+	TestDBCount("hosts","host='regression'", 1)
+	hostid = DBGetID("hosts","host='regression'", "hostid")
+
+	TestGUI('General->Autoregistration->Add', "config.php", "config=4&pattern=*&priority=10&hostid="+str(hostid)+"&register=add+autoregistration", "Autoregistration added")
+	TestDBCount("autoreg","priority=10 and pattern='*' and hostid="+str(hostid), 1)
+	id = DBGetID("autoreg","priority=10 and pattern='*' and hostid="+str(hostid), "id")
+
+	TestGUI('General->Autoregistration->Update', "config.php", "config=4&id=1&pattern=***&priority=12&hostid="+str(hostid)+"&register=update+autoregistration", "Autoregistration updated")
+	TestDBCount("autoreg","priority=12 and pattern='***' and hostid="+str(hostid), 1)
+
+	TestGUI('General->Autoregistration->Delete', "config.php", "config=4&id="+str(id)+"&register=delete+autoregistration", "Autoregistration deleted")
+	TestDBCount("autoreg","id="+str(id), 0)
+
 def GUI_Config_General_Mediatype():
 	print "GUI_Config_General_Mediatype"
 	GUI_Config_General_Mediatype_Email()
@@ -214,6 +230,7 @@ InitDB()
 GUI_Login()
 GUI_Config_General_Housekeeper()
 GUI_Config_General_Mediatype()
+GUI_Config_General_Autoregistration()
 GUI_Config_Users()
 GUI_Config_Media()
 GUI_Config_Hosts()

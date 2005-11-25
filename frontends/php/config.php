@@ -159,7 +159,7 @@
 			{
 				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_AUTOREGISTRATION,"Autoregistration [".addslashes($_REQUEST["pattern"])."]");
 			}
-			show_messages($result, S_AUTOREGISTRATION_ADDED, S_AUTOREGISTRATION_WAS_NOT_ADDED);
+			show_messages($result, S_AUTOREGISTRATION_ADDED, S_CANNOT_ADD_AUTOREGISTRATION);
 		}
 		if($_REQUEST["register"]=="update autoregistration")
 		{
