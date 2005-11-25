@@ -77,12 +77,32 @@ def GUI_Config_General_Housekeeper():
 	TestGUI('General->Housekeeper', "config.php", "alert_history=360&alarm_history=360&register=update", "Configuration updated")
 	TestDBCount("config","alert_history=360 and alarm_history=360", 1)
 
+def GUI_Config_General_Mediatype_Email():
+	TestGUI('General->Media type->Add (email)', "config.php", "config=1&description=Zzz&type=0&exec_path=&smtp_server=localhost&smtp_helo=localhost&smtp_email=zabbix%40localhost&register=add", "Added new media type")
+	TestDBCount("media_type","description='Zzz' and type=0", 1)
+	mediatypeid = DBGetID("media_type","description='Zzz'", "mediatypeid")
+
+	TestGUI('General->Media type->Update (email)', "config.php", "mediatypeid="+str(mediatypeid)+"&config=1&description=Zzz2&type=0&exec_path=&smtp_server=localhost&smtp_helo=localhost&smtp_email=zabbix%40localhost&register=update+media", "Media type updated")
+	TestDBCount("media_type","description='Zzz2' and mediatypeid="+str(mediatypeid), 1)
+
+	TestGUI('General->Media type->Delete (email)', "config.php", "mediatypeid="+str(mediatypeid)+"&config=1&description=Zzz2&type=0&exec_path=&smtp_server=localhost&smtp_helo=localhost&smtp_email=zabbix%40localhost&register=delete", "Media type deleted")
+	TestDBCount("media_type","description='Zzz2'", 0)
+
+def GUI_Config_General_Mediatype_Script():
+	TestGUI('General->Media type->Add (script)', "config.php", "config=1&description=SMS&type=1&smtp_server=localhost&smtp_helo=localhost&smtp_email=zabbix%40localhost&exec_path=sms.pl&register=add", "Added new media type")
+	TestDBCount("media_type","description='SMS' and type=1", 1)
+	mediatypeid = DBGetID("media_type","description='SMS'", "mediatypeid")
+
+	TestGUI('General->Media type->Update (script)', "config.php", "mediatypeid="+str(mediatypeid)+"&config=1&description=SMS2&type=1&smtp_server=localhost&smtp_helo=localhost&smtp_email=zabbix%40localhost&exec_path=sms2.pl&register=update+media", "Media type updated")
+	TestDBCount("media_type","description='SMS2' and exec_path='sms2.pl' and type=1 and mediatypeid="+str(mediatypeid), 1)
+
+	TestGUI('General->Media type->Delete (script)', "config.php", "mediatypeid="+str(mediatypeid)+"&config=1&register=delete", "Media type deleted")
+	TestDBCount("media_type","description='Zzz2'", 0)
+
 def GUI_Config_General_Mediatype():
 	print "GUI_Config_General_Mediatype"
-	TestGUI('General->Media type->Add', "config.php", "config=1&description=Zzz&type=0&exec_path=&smtp_server=localhost&smtp_helo=localhost&smtp_email=zabbix%40localhost&register=add", "Added new media type")
-	TestDBCount("media_type","description='Zzz' and type=0", 1)
-	TestGUI('General->Media type->Delete', "config.php", "mediatypeid=2&config=1&description=Zzz&type=0&exec_path=&smtp_server=localhost&smtp_helo=localhost&smtp_email=zabbix%40localhost&register=delete", "Media type deleted")
-	TestDBCount("media_type","description='Zzz'", 0)
+	GUI_Config_General_Mediatype_Email()
+	GUI_Config_General_Mediatype_Script()
 
 def GUI_Config_Users():
 	print "GUI_Config_Users"
