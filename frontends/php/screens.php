@@ -56,8 +56,8 @@
 
 		if(isset($_REQUEST["screenid"]))
 		{
-			$result=DBselect("select name from screens where screenid=".$_REQUEST["screenid"]);
-			$map=DBget_field($result,0,0);
+			$screen=get_screen_by_screenid($_REQUEST["screenid"]);
+			$map=$screen["name"];
 			$map=iif(isset($_REQUEST["fullscreen"]),
 				"<a href=\"screens.php?screenid=".$_REQUEST["screenid"]."\">".$map."</a>",
 				"<a href=\"screens.php?screenid=".$_REQUEST["screenid"]."&fullscreen=1\">".$map."</a>");

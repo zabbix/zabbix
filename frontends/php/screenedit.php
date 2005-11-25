@@ -171,11 +171,11 @@
 				$result=DBselect("select h.host,i.description,i.itemid,i.key_ from hosts h,items i where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 order by h.host,i.description");
 				echo "<select name=\"resourceid\" size=1>";
 				echo "<OPTION VALUE='0'>(none)";
-				for($i=0;$i<DBnum_rows($result);$i++)
+				while($row=DBfetch($result))
 				{
-					$host_=DBget_field($result,$i,0);
-					$description_=item_description(DBget_field($result,$i,1),DBget_field($result,$i,3));
-					$itemid_=DBget_field($result,$i,2);
+					$host_=$row["host"];
+					$description_=item_description($row["description"],$row["key_"]);
+					$itemid_=$row["itemid"];
 					echo "<OPTION VALUE='$itemid_' ".iif($resourceid==$itemid_,"selected","").">$host_: $description_";
 				}
 				echo "</SELECT>";
@@ -189,11 +189,11 @@
 				$result=DBselect("select h.host,i.description,i.itemid,i.key_ from hosts h,items i where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 order by h.host,i.description");
 				echo "<select name=\"resourceid\" size=1>";
 				echo "<OPTION VALUE='0'>(none)";
-				for($i=0;$i<DBnum_rows($result);$i++)
+				while($row=DBfetch($result))
 				{
-					$host_=DBget_field($result,$i,0);
-					$description_=item_description(DBget_field($result,$i,1),DBget_field($result,$i,3));
-					$itemid_=DBget_field($result,$i,2);
+					$host_=$row["host"];
+					$description_=item_description($row["description"],$row["key_"]);
+					$itemid_=$row["itemid"];
 					echo "<OPTION VALUE='$itemid_' ".iif($resourceid==$itemid_,"selected","").">$host_: $description_";
 				}
 				echo "</SELECT>";
@@ -207,10 +207,10 @@
 				$result=DBselect("select graphid,name from graphs order by name");
 				echo "<select name=\"resourceid\" size=1>";
 				echo "<OPTION VALUE='0'>(none)";
-				for($i=0;$i<DBnum_rows($result);$i++)
+				while($row=DBfetch($result))
 				{
-					$name_=DBget_field($result,$i,1);
-					$graphid_=DBget_field($result,$i,0);
+					$name_=$row["name"];
+					$graphid_=$row["graphid"];
 					echo "<OPTION VALUE='$graphid_' ".iif($resourceid==$graphid_,"selected","").">$name_";
 				}
 				echo "</SELECT>";
@@ -224,10 +224,10 @@
 				$result=DBselect("select sysmapid,name from sysmaps order by name");
 				echo "<select name=\"resourceid\" size=1>";
 				echo "<OPTION VALUE='0'>(none)";
-				for($i=0;$i<DBnum_rows($result);$i++)
+				while($row=DBfetch($result))
 				{
-					$name_=DBget_field($result,$i,1);
-					$sysmapid_=DBget_field($result,$i,0);
+					$name_=$row["name"];
+					$sysmapid_=$row["sysmapid"];
 					echo "<OPTION VALUE='$sysmapid_' ".iif($resourceid==$sysmapid_,"selected","").">$name_";
 				}
 				echo "</SELECT>";

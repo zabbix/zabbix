@@ -250,13 +250,13 @@
 <?php
 	if(isset($_REQUEST["serviceid"]))
 	{
-		$result=DBselect("select serviceid,triggerid,name,algorithm,showsla,goodsla,sortorder from services where serviceid=".$_REQUEST["serviceid"]);
-		$triggerid=DBget_field($result,0,1);
-		$name=DBget_field($result,0,2);
-		$algorithm=DBget_field($result,0,3);
-		$showsla=DBget_field($result,0,4);
-		$goodsla=DBget_field($result,0,5);
-		$sortorder=DBget_field($result,0,6);
+		$service=get_service_by_serviceid($_REQUEST["serviceid"]);
+		$triggerid=$service["triggerid"];
+		$name=$service["name"];
+		$algorithm=$service["algorithm"];
+		$showsla=$service["showsla"];
+		$goodsla=$service["goodsla"];
+		$sortorder=$service["sortorder"];
 	}
 	else
 	{
@@ -411,15 +411,10 @@
 		show_table2_h_delimiter();
 	        $result=DBselect("select t.triggerid,t.description from triggers t,functions f, hosts h, items i where h.hostid=i.hostid and f.itemid=i.itemid and t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]." order by t.description");
 	        echo "<select class=\"biginput\" name=\"triggerid\" size=1>";
-	        for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 	        {
-	                $triggerid_=DBget_field($result,$i,0);
-//                $description_=DBget_field($result,$i,1);
-//		if( strstr($description_,"%s"))
-//		{
-				$description_=expand_trigger_description($triggerid_);
-//		}
-//		if(isset($_REQUEST["triggerid"]) && ($_REQUEST["triggerid"]==$triggerid_))
+	                $triggerid_=$row["triggerid"];
+			$description_=expand_trigger_description($triggerid_);
 			if(isset($triggerid) && ($triggerid==$triggerid_))
 	                {
 	                        echo "<OPTION VALUE='$triggerid_' SELECTED>$description_";
@@ -455,9 +450,9 @@
 <?php
 	if(isset($_REQUEST["serviceid"]))
 	{
-		$result=DBselect("select serviceid,triggerid,name from services where serviceid=".$_REQUEST["serviceid"]);
-		$triggerid=DBget_field($result,0,1);
-		$name=DBget_field($result,0,2);
+		$service=get_service_by_serviceid($_REQUEST["serviceid"]);
+		$triggerid=$service["triggerid"];
+		$name=$service["name"];
 	}
 	else
 	{
@@ -480,21 +475,17 @@
 	show_table2_h_delimiter();
 	$result=DBselect("select serviceid,triggerid,name from services order by name");
         echo "<select class=\"biginput\" name=\"servicedownid\" size=1>";
-        for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=Dbfetch($result))
         {
-                $servicedownid_=DBget_field($result,$i,0);
-//                $name_=DBget_field($result,$i,2);
-//		if( strstr($name_,"%s"))
-//		{
-			if(DBget_field($result,$i,1)>0)
-			{
-				$name_=expand_trigger_description(DBget_field($result,$i,1));
-			}
-			else
-			{
-				$name_=DBget_field($result,$i,2);
-			}
-//		}
+                $servicedownid_=$row["serviceid"];
+		if($row["triggerid"]>0)
+		{
+			$name_=expand_trigger_description($row["triggerid"]);
+		}
+		else
+		{
+			$name_=$row["name"];
+		}
 		echo "<OPTION VALUE='$servicedownid_'>$name_";
         }
         echo "</SELECT>";
