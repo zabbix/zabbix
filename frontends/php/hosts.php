@@ -387,6 +387,7 @@
 //		$members=array("hide"=>1,"value"=>"");
 			$members=array("hide"=>0,"value"=>"");
 			$result1=DBselect("select distinct h.host from hosts h, hosts_groups hg where h.hostid=hg.hostid and hg.groupid=".$row["groupid"]." and h.status not in (".HOST_STATUS_DELETED.") order by host");
+			$i=0;
 			while($row1=DBfetch($result1))
 			{
 				$members["hide"]=0;
@@ -395,6 +396,7 @@
 				{
 					$members["value"]=$members["value"].", ";
 				}
+				$i++;
 			}
 			$members["value"]=$members["value"]."&nbsp;";
 			$actions="<A HREF=\"hosts.php?config=".$_REQUEST["config"]."&groupid=".$row["groupid"]."#form\">".S_CHANGE."</A>";
