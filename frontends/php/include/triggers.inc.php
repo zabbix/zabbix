@@ -131,9 +131,10 @@
 
 	function	delete_trigger($triggerid)
 	{
-		$sql="select count(*) from trigger_depends where triggerid_down=$triggerid or triggerid_up=$triggerid";
+		$sql="select count(*) as cnt from trigger_depends where triggerid_down=$triggerid or triggerid_up=$triggerid";
 		$result=DBexecute($sql);
-		if(DBget_field($result,0,0)>0)
+		$row=DBfetch($result);
+		if($row["cnt"]>0)
 		{
 			error("Delete dependencies first");
 			return	FALSE;
@@ -224,20 +225,12 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 	function	delete_trigger_dependency($triggerid_down,$triggerid_up)
 	{
-// Why this was here?
-//		$sql="select count(*) from trigger_depends where triggerid_down=$triggerid_up and triggerid_up=$triggerid_down";
-//		$result=DBexecute($sql);
-//		if(DBget_field($result,0,0)>0)
-//		{
-//			return	FALSE;
-//		}
-
 		$sql="select triggerid_down,triggerid_up from trigger_depends where triggerid_up=$triggerid_up and triggerid_down=$triggerid_down";
 		$result=DBexecute($sql);
-		for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 		{
-			$down=DBget_field($result,$i,0);
-			$up=DBget_field($result,$i,1);
+			$down=$row["triggerid_down"];
+			$up=$row["triggerid_up"];
 			$sql="update triggers set dep_level=dep_level-1 where triggerid=$up";
 			DBexecute($sql);
 		}
@@ -266,17 +259,17 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		$sql="select triggerid_down from trigger_depends where triggerid_up=$triggerid_down";
 		$result=DBselect($sql);
-		for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 		{
-			$triggerid=DBget_field($result,$i,0);
+			$triggerid=$row["triggerid_down"];
 			insert_dependency($triggerid,$triggerid_up);
 			add_additional_dependencies($triggerid,$triggerid_up);
 		}
 		$sql="select triggerid_up from trigger_depends where triggerid_down=$triggerid_up";
 		$result=DBselect($sql);
-		for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 		{
-			$triggerid=DBget_field($result,$i,0);
+			$triggerid=$row["triggerid_up"];
 			insert_dependency($triggerid_down,$triggerid);
 			add_additional_dependencies($triggerid_down,$triggerid);
 		}
@@ -304,9 +297,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		$sql="select triggerid from functions where itemid=$itemid";
 		$result=DBselect($sql);
-		for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 		{
-			if(!delete_trigger(DBget_field($result,$i,0)))
+			if(!delete_trigger($row["triggerid"]))
 			{
 				return FALSE;
 			}
@@ -321,9 +314,9 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	{
 		$sql="select serviceid from services where triggerid=$triggerid";
 		$result=DBselect($sql);
-		for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 		{
-			delete_service(DBget_field($result,$i,0));
+			delete_service($row["serviceid"]);
 		}
 		return	TRUE;
 	}

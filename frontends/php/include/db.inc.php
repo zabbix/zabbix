@@ -115,7 +115,7 @@
 		}
 	}
 
-	function	DBget_field($result,$rownum,$fieldnum)
+	function	get_field($result,$rownum,$fieldnum)
 	{
 		global $DB_TYPE;
 
@@ -166,7 +166,7 @@
 //			echo "OID:$oid<br>";
 			$sql="select $field from $table where oid=$oid";
 			$result=DBselect($sql);
-			return DBget_field($result,0,0);
+			return get_field($result,0,0);
 		}
 	}
 

@@ -81,9 +81,10 @@
 
 		$host=get_host_by_hostid($hostid);
 
-		$sql="select count(*) from items where hostid=$hostid and key_='$key'";
+		$sql="select count(*) as cnt from items where hostid=$hostid and key_='$key'";
 		$result=DBexecute($sql);
-		if(DBget_field($result,0,0)>0)
+		$row = DBfetch($result);
+		if($row["cnt"]>0)
 		{
 			error("An item with the same Key already exists for host ".$host["host"].". The key must be unique.");
 			return 0;

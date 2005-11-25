@@ -597,17 +597,15 @@
 		$priorities=0;
 		for($i=0;$i<=5;$i++)
 		{
-	        	$result=DBselect("select count(*) from triggers t,hosts h,items i,functions f  where t.value=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status=0 and t.priority=$i");
-//			$priorities+=(1000^$i)*DBget_field($result,0,0);
-			$priorities+=pow(100,$i)*DBget_field($result,0,0);
-//			echo "$i $priorities ",DBget_field($result,0,0),"<br>";
-//			echo pow(100,5)*13;
+	        	$result=DBselect("select count(*) as cnt from triggers t,hosts h,items i,functions f  where t.value=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status=0 and t.priority=$i");
+			$row=DBfetch($result);
+			$priorities+=pow(100,$i)*$row["cnt"];
 		}
 		$triggerids="";
 	       	$result=DBselect("select t.triggerid from triggers t,hosts h,items i,functions f  where t.value=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status=0");
-		for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 		{
-			$triggerids="$triggerids,".DBget_field($result,$i,0);
+			$triggerids="$triggerids,".$row["triggerid"];
 		}
 		$md5sum=md5($triggerids);
 
@@ -674,19 +672,12 @@
 
 	function	select_config()
 	{
-//		$sql="select smtp_server,smtp_helo,smtp_email,alarm_history,alert_history from config";
-		$sql="select alarm_history,alert_history from config";
+		$sql="select * from config";
 		$result=DBselect($sql);
 
 		if(DBnum_rows($result) == 1)
 		{
-			$config["alarm_history"]=DBget_field($result,0,0);
-			$config["alert_history"]=DBget_field($result,0,1);
-//			$config["smtp_server"]=DBget_field($result,0,0);
-//			$config["smtp_helo"]=DBget_field($result,0,1);
-//			$config["smtp_email"]=DBget_field($result,0,2);
-//			$config["alarm_history"]=DBget_field($result,0,3);
-//			$config["alert_history"]=DBget_field($result,0,4);
+			return DBfetch($result);
 		}
 		else
 		{
@@ -778,9 +769,10 @@
 //			echo $function,"<br>";
 //			echo $parameter,"<br>";
 
-			$sql="select count(*) from hosts h,items i where h.host='$host' and i.key_='$key' and h.hostid=i.hostid";
+			$sql="select count(*) as cnt from hosts h,items i where h.host='$host' and i.key_='$key' and h.hostid=i.hostid";
 			$result=DBselect($sql);
-			if(DBget_field($result,0,0)!=1)
+			$row=DBfetch($result);
+			if($row["cnt"]!=1)
 			{
 				error("No such host ($host) or monitored parameter ($key)");
 				return -1;
@@ -955,12 +947,7 @@
 				setcookie("sessionid",$sessionid);
 				$sql="update sessions set lastaccess=".time()." where sessionid='$sessionid'";
 				DBexecute($sql);
-				$USER_DETAILS["userid"]=DBget_field($result,0,0);
-				$USER_DETAILS["alias"]=DBget_field($result,0,1);
-				$USER_DETAILS["name"]=DBget_field($result,0,2);
-				$USER_DETAILS["surname"]=DBget_field($result,0,3);
-				$USER_DETAILS["lang"]=DBget_field($result,0,4);
-				$USER_DETAILS["refresh"]=DBget_field($result,0,5);
+				$USER_DETAILS=DBfetch($result);
 				return;
 			}
 			else
@@ -974,12 +961,7 @@
                 $result=DBselect($sql);
                 if(DBnum_rows($result)==1)
                 {
-                        $USER_DETAILS["userid"]=DBget_field($result,0,0);
-                        $USER_DETAILS["alias"]=DBget_field($result,0,1);
-                        $USER_DETAILS["name"]=DBget_field($result,0,2);
-                        $USER_DETAILS["surname"]=DBget_field($result,0,3);
-                        $USER_DETAILS["lang"]=DBget_field($result,0,4);
-                        $USER_DETAILS["refresh"]=DBget_field($result,0,5);
+			$USER_DETAILS=DBfetch($result);
 			return;
 		}
 
@@ -1282,10 +1264,10 @@ echo "</head>";
                 $result=DBselect($sql);
 
 		echo "<PRE>\n";
-		for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 		{
-			$clock=DBget_field($result,$i,0);
-			$value=DBget_field($result,$i,1);
+			$clock=$row["clock"];
+			$value=$row["value"];
 			echo date("Y-m-d H:i:s",$clock);
 			echo "\t$clock\t$value\n";
 		}
@@ -1314,20 +1296,21 @@ echo "</head>";
 				$state='';
 				$sql="select h.host,i.key_,f.function,f.parameter,i.itemid from items i,functions f,hosts h where functionid=$functionid and i.itemid=f.itemid and h.hostid=i.hostid";
 				$res1=DBselect($sql);
+				$row1=DBfetch($res1);
 				if($html == 0)
 				{
-					$exp=$exp."{".DBget_field($res1,0,0).":".DBget_field($res1,0,1).".".DBget_field($res1,0,2)."(".DBget_field($res1,0,3).")}";
+					$exp=$exp."{".$row1["host"].":".$row1["key_"].".".$row1["function"]."(".$row1["parameter"].")}";
 				}
 				else
 				{
-					$item=get_item_by_itemid(DBget_field($res1,0,4));
+					$item=get_item_by_itemid($row1["itemid"]);
 					if($item["value_type"] ==0) 
 					{
-						$exp=$exp."{<A HREF=\"history.php?action=showhistory&itemid=".DBget_field($res1,0,4)."\">".DBget_field($res1,0,0).":".DBget_field($res1,0,1)."</A>.<B>".DBget_field($res1,0,2)."(</B>".DBget_field($res1,0,3)."<B>)</B>}";
+						$exp=$exp."{<A HREF=\"history.php?action=showhistory&itemid=".$row1["itemid"]."\">".$row1["host"].":".$row1["key_"]."</A>.<B>".$row1["function"]."(</B>".$row1["parameter"]."<B>)</B>}";
 					}
 					else
 					{
-						$exp=$exp."{<A HREF=\"history.php?action=showvalues&period=3600&itemid=".DBget_field($res1,0,4)."\">".DBget_field($res1,0,0).":".DBget_field($res1,0,1)."</A>.<B>".DBget_field($res1,0,2)."(</B>".DBget_field($res1,0,3)."<B>)</B>}";
+						$exp=$exp."{<A HREF=\"history.php?action=showvalues&period=3600&itemid=".$row1["itemid"]."\">".$row1["host"].":".$row1["key_"]."</A>.<B>".$row1["function"]."(</B>".$row1["parameter"]."<B>)</B>}";
 					}
 				}
 				continue;
@@ -1375,31 +1358,20 @@ echo "</head>";
 				$sql="select i.itemid from items i,hosts h where i.key_='$key' and h.host='$host' and h.hostid=i.hostid";
 #				echo $sql,"<Br>";
 				$res=DBselect($sql);
+				$row=DBfetch($res);
 
-				$itemid=DBget_field($res,0,0);
+				$itemid=row["itemid"];
 #				echo "ITEMID:$itemid<BR>";
 	
-#				$sql="select functionid,count(functionid) from functions where function='$function' and parameter=$parameter group by 1";
+				$sql="insert into functions (itemid,triggerid,function,parameter) values ($itemid,$triggerid,'$function','$parameter')";
 #				echo $sql,"<Br>";
-#				$res=DBselect($sql);
-#
-#				if(DBget_field($res,0,1)>0)
-#				{
-#					$functionid=DBget_field($res,0,0);
-#				}
-#				else
-#				{
-					$sql="insert into functions (itemid,triggerid,function,parameter) values ($itemid,$triggerid,'$function','$parameter')";
-#					echo $sql,"<Br>";
-					$res=DBexecute($sql);
-					if(!$res)
-					{
-#						echo "ERROR<br>";
-						return	$res;
-					}
-					$functionid=DBinsert_id($res,"functions","functionid");
-#				}
-#				echo "FUNCTIONID:$functionid<BR>";
+				$res=DBexecute($sql);
+				if(!$res)
+				{
+#					echo "ERROR<br>";
+					return	$res;
+				}
+				$functionid=DBinsert_id($res,"functions","functionid");
 
 				$exp=$exp.'{'.$functionid.'}';
 
@@ -1585,10 +1557,9 @@ echo "</head>";
 	{
 		$sql="select itemid from functions where triggerid=$triggerid";
 		$result=DBselect($sql);
-		for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 		{
-			$itemid=DBget_field($result,$i,0);
-			$sql="update items set nextcheck=0 where itemid=$itemid";
+			$sql="update items set nextcheck=0 where itemid=".$row["itemid"];
 			DBexecute($sql);
 		}
 	}
@@ -2236,7 +2207,7 @@ echo "</head>";
 	{
 		$descr=array("January","February","March","April","May","June",
 			"July","August","September","October","November","December");
-		$sql="select min(clock),max(clock) from history where itemid=$itemid";
+		$sql="select min(clock) as minn,max(clock) as maxx from history where itemid=$itemid";
 		$result=DBselect($sql);
 
 		if(DBnum_rows($result) == 0)
@@ -2246,8 +2217,9 @@ echo "</head>";
 		}
 		else
 		{
-			$min=DBget_field($result,0,0);
-			$max=DBget_field($result,0,1);
+			$row=DBfetch($result);
+			$min=$row["minn"];
+			$max=$row["maxx"];
 		}
 
 		$now=time()-3600*$from-$period;
@@ -2523,68 +2495,87 @@ echo "</head>";
 	if ($DB_TYPE == "MYSQL")
 	{
 	        $result=DBselect("show table status like 'history'");
-		$stat["history_count"]=DBget_field($result,0,3);
+		$row=DBfetch($result);
+		$stat["history_count"]=$row["Rows"];
 
 	        $result=DBselect("show table status like 'trends'");
-		$stat["trends_count"]=DBget_field($result,0,3);
+		$row=DBfetch($result);
+		$stat["trends_count"]=$row["Rows"];
 	}
 	else
 	{
-	        $result=DBselect("select count(itemid) from history");
-		$stat["history_count"]=DBget_field($result,0,3);
+	        $result=DBselect("select count(itemid) as cnt from history");
+		$row=DBfetch($result);
+		$stat["history_count"]=$row["cnt"];
 
-	        $result=DBselect("select count(itemid) from trends");
-		$stat["trends_count"]=DBget_field($result,0,3);
+	        $result=DBselect("select count(itemid) as cnt from trends");
+		$row=DBfetch($result);
+		$stat["trends_count"]=$row["cnt"];
 	}
 
-	        $result=DBselect("select count(alarmid) from alarms");
-		$stat["alarms_count"]=DBget_field($result,0,0);
+	        $result=DBselect("select count(alarmid) as cnt from alarms");
+		$row=DBfetch($result);
+		$stat["alarms_count"]=$row["cnt"];
 
-	        $result=DBselect("select count(alertid) from alerts");
-		$stat["alerts_count"]=DBget_field($result,0,0);
+	        $result=DBselect("select count(alertid) as cnt from alerts");
+		$row=DBfetch($result);
+		$stat["alerts_count"]=$row["cnt"];
 
-	        $result=DBselect("select count(triggerid) from triggers");
-		$stat["triggers_count"]=DBget_field($result,0,0);
+	        $result=DBselect("select count(triggerid) as cnt from triggers");
+		$row=DBfetch($result);
+		$stat["triggers_count"]=$row["cnt"];
 
-	        $result=DBselect("select count(triggerid) from triggers where status=0");
-		$stat["triggers_count_enabled"]=DBget_field($result,0,0);
+	        $result=DBselect("select count(triggerid) as cnt from triggers where status=0");
+		$row=DBfetch($result);
+		$stat["triggers_count_enabled"]=$row["cnt"];
 
-	        $result=DBselect("select count(triggerid) from triggers where status=1");
-		$stat["triggers_count_disabled"]=DBget_field($result,0,0);
+	        $result=DBselect("select count(triggerid) as cnt from triggers where status=1");
+		$row=DBfetch($result);
+		$stat["triggers_count_disabled"]=$row["cnt"];
 
-	        $result=DBselect("select count(itemid) from items");
-		$stat["items_count"]=DBget_field($result,0,0);
+	        $result=DBselect("select count(itemid) as cnt from items");
+		$row=DBfetch($result);
+		$stat["items_count"]=$row["cnt"];
 
-	        $result=DBselect("select count(itemid) from items where status=0");
-		$stat["items_count_active"]=DBget_field($result,0,0);
+	        $result=DBselect("select count(itemid) as cnt from items where status=0");
+		$row=DBfetch($result);
+		$stat["items_count_active"]=$row["cnt"];
 
-	        $result=DBselect("select count(itemid) from items where status=1");
-		$stat["items_count_not_active"]=DBget_field($result,0,0);
+	        $result=DBselect("select count(itemid) as cnt from items where status=1");
+		$row=DBfetch($result);
+		$stat["items_count_not_active"]=$row["cnt"];
 
-	        $result=DBselect("select count(itemid) from items where status=3");
-		$stat["items_count_not_supported"]=DBget_field($result,0,0);
+	        $result=DBselect("select count(itemid) as cnt from items where status=3");
+		$row=DBfetch($result);
+		$stat["items_count_not_supported"]=$row["cnt"];
 
-	        $result=DBselect("select count(itemid) from items where type=2");
-		$stat["items_count_trapper"]=DBget_field($result,0,0);
+	        $result=DBselect("select count(itemid) as cnt from items where type=2");
+		$row=DBfetch($result);
+		$stat["items_count_trapper"]=$row["cnt"];
 
-	        $result=DBselect("select count(hostid) from hosts");
-		$stat["hosts_count"]=DBget_field($result,0,0);
+	        $result=DBselect("select count(hostid) as cnt from hosts");
+		$row=DBfetch($result);
+		$stat["hosts_count"]=$row["cnt"];
 
-	        $result=DBselect("select count(hostid) from hosts where status=".HOST_STATUS_MONITORED);
-		$stat["hosts_count_monitored"]=DBget_field($result,0,0);
+	        $result=DBselect("select count(hostid) as cnt from hosts where status=".HOST_STATUS_MONITORED);
+		$row=DBfetch($result);
+		$stat["hosts_count_monitored"]=$row["cnt"];
 
-	        $result=DBselect("select count(hostid) from hosts where status!=".HOST_STATUS_MONITORED);
-		$stat["hosts_count_not_monitored"]=DBget_field($result,0,0);
+	        $result=DBselect("select count(hostid) as cnt from hosts where status!=".HOST_STATUS_MONITORED);
+		$row=DBfetch($result);
+		$stat["hosts_count_not_monitored"]=$row["cnt"];
 
-	        $result=DBselect("select count(hostid) from hosts where status=".HOST_STATUS_TEMPLATE);
-		$stat["hosts_count_template"]=DBget_field($result,0,0);
+	        $result=DBselect("select count(hostid) as cnt from hosts where status=".HOST_STATUS_TEMPLATE);
+		$row=DBfetch($result);
+		$stat["hosts_count_template"]=$row["cnt"];
 
-	        $result=DBselect("select count(hostid) from hosts where status=".HOST_STATUS_DELETED);
-		$stat["hosts_count_deleted"]=DBget_field($result,0,0);
+	        $result=DBselect("select count(hostid) as cnt from hosts where status=".HOST_STATUS_DELETED);
+		$row=DBfetch($result);
+		$stat["hosts_count_deleted"]=$row["cnt"];
 
-	        $result=DBselect("select count(userid) from users");
-		$stat["users_count"]=DBget_field($result,0,0);
-
+	        $result=DBselect("select count(userid) as cnt from users");
+		$row=DBfetch($result);
+		$stat["users_count"]=$row["cnt"];
 
 		return $stat;
 	}
@@ -2594,20 +2585,21 @@ echo "</head>";
 	{
 		if(($period_start==0)&&($period_end==0))
 		{
-	        	$sql="select count(*),min(clock),max(clock) from alarms where triggerid=$triggerid";
+	        	$sql="select count(*) as cnt,min(clock) as minn,max(clock) as maxx from alarms where triggerid=$triggerid";
 		}
 		else
 		{
-	        	$sql="select count(*),min(clock),max(clock) from alarms where triggerid=$triggerid and clock>=$period_start and clock<=$period_end";
+	        	$sql="select count(*) as cnt,min(clock) as minn,max(clock) as maxx from alarms where triggerid=$triggerid and clock>=$period_start and clock<=$period_end";
 		}
 //		echo $sql,"<br>";
 
 		
 	        $result=DBselect($sql);
-		if(DBget_field($result,0,0)>0)
+		$row=DBfetch($result);
+		if($row["cnt"]>0)
 		{
-			$min=DBget_field($result,0,1);
-			$max=DBget_field($result,0,2);
+			$min=$row["minn"];
+			$max=$row["maxx"];
 		}
 		else
 		{
@@ -2644,10 +2636,10 @@ echo "</head>";
 		{
 			$max=time();
 		}
-		for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 		{
-			$clock=DBget_field($result,$i,0);
-			$value=DBget_field($result,$i,1);
+			$clock=$row["clock"];
+			$value=$row["value"];
 
 			$diff=$clock-$time;
 

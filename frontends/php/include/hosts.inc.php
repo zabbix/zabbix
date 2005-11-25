@@ -190,16 +190,11 @@
 
 	function	get_host_by_hostid($hostid)
 	{
-		$sql="select hostid,host,useip,ip,port,status from hosts where hostid=$hostid";
+		$sql="select * from hosts where hostid=$hostid";
 		$result=DBselect($sql);
 		if(DBnum_rows($result) == 1)
 		{
-			$host["hostid"]=DBget_field($result,0,0);
-			$host["host"]=DBget_field($result,0,1);
-			$host["useip"]=DBget_field($result,0,2);
-			$host["ip"]=DBget_field($result,0,3);
-			$host["port"]=DBget_field($result,0,4);
-			$host["status"]=DBget_field($result,0,5);
+			return DBfetch($result);
 		}
 		else
 		{
@@ -220,12 +215,13 @@
 
 		$sql="select status,host from hosts where hostid=$hostid";
 		$result=DBselect($sql);
-		$old_status=DBget_field($result,0,0);
+		$row=DBfetch($result);
+		$old_status=$row["status"];
 		if($status != $old_status)
 		{
 			update_trigger_value_to_unknown_by_hostid($hostid);
 			$sql="update hosts set status=$status where hostid=$hostid and status!=".HOST_STATUS_DELETED;
-			info("Updated status of host ".DBget_field($result,0,1));
+			info("Updated status of host ".$row["host"]);
 			return	DBexecute($sql);
 		}
 		else
