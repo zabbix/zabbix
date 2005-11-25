@@ -139,17 +139,17 @@
 	{
 		if(isset($userid))
 		{
+			$user=get_user_by_userid($userid);
 			$result=DBselect("select u.alias,u.name,u.surname,u.passwd,u.url,u.autologout,u.lang,u.refresh from users u where u.userid=$userid");
 	
-			$alias=DBget_field($result,0,0);
-			$name=DBget_field($result,0,1);
-			$surname=DBget_field($result,0,2);
-#			$password=DBget_field($result,0,3);
+			$alias=$user["alias"];
+			$name=$user["name"];
+			$surname=$user["surname"];
 			$password="";
-			$url=DBget_field($result,0,4);
-			$autologout=DBget_field($result,0,5);
-			$lang=DBget_field($result,0,6);
-			$refresh=DBget_field($result,0,7);
+			$url=$user["url"];
+			$autologout=$user["autologout"];
+			$lang=$user["lang"];
+			$refresh=$user["refresh"];
 		}
 		else
 		{
@@ -293,33 +293,34 @@
 		if(isset($_REQUEST["register"])&&($_REQUEST["register"] == "change"))
 		{
 			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.snmp_port,i.units,i.multiplier,h.hostid,i.delta,i.trends,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,i.logtimefmt from items i,hosts h where i.itemid=".$_REQUEST["itemid"]." and h.hostid=i.hostid");
+			$row=DBfetch($result);
 		
-			$description=DBget_field($result,0,0);
-			$key=DBget_field($result,0,1);
-			$host=DBget_field($result,0,2);
-			$port=DBget_field($result,0,3);
-			$delay=DBget_field($result,0,4);
-			$history=DBget_field($result,0,5);
-			$status=DBget_field($result,0,6);
-			$type=iif(isset($_REQUEST["type"]),isset($_REQUEST["type"]),DBget_field($result,0,7));
-			$snmp_community=DBget_field($result,0,8);
-			$snmp_oid=DBget_field($result,0,9);
-			$value_type=DBget_field($result,0,10);
-			$trapper_hosts=DBget_field($result,0,11);
-			$snmp_port=DBget_field($result,0,12);
-			$units=DBget_field($result,0,13);
-			$multiplier=DBget_field($result,0,14);
-			$hostid=DBget_field($result,0,15);
-			$delta=DBget_field($result,0,16);
-			$trends=DBget_field($result,0,17);
+			$description=$row["description"];
+			$key=$row["key_"];
+			$host=$row["host"];
+			$port=$row["port"];
+			$delay=$row["delay"];
+			$history=$row["history"];
+			$status=$row["status"];
+			$type=iif(isset($_REQUEST["type"]),isset($_REQUEST["type"]),$row["type"]);
+			$snmp_community=$row["snmp_community"];
+			$snmp_oid=$row["snmp_oid"];
+			$value_type=$row["value_type"];
+			$trapper_hosts=$row["trapper_hosts"];
+			$snmp_port=$row["snmp_port"];
+			$units=$row["units"];
+			$multiplier=$row["multiplier"];
+			$hostid=$row["hostid"];
+			$delta=$row["delta"];
+			$trends=$row["trends"];
 
-			$snmpv3_securityname=DBget_field($result,0,18);
-			$snmpv3_securitylevel=DBget_field($result,0,19);
-			$snmpv3_authpassphrase=DBget_field($result,0,20);
-			$snmpv3_privpassphrase=DBget_field($result,0,21);
+			$snmpv3_securityname=$row["snmpv3_securityname"];
+			$snmpv3_securitylevel=$row["snmpv3_securitylevel"];
+			$snmpv3_authpassphrase=$row["snmpv3_authpassphrase"];
+			$snmpv3_privpassphrase=$row["snmpv3_privpassphrase"];
 
-			$formula=DBget_field($result,0,22);
-			$logtimefmt=DBget_field($result,0,23);
+			$formula=$row["formula"];
+			$logtimefmt=$row["logtimefmt"];
 		}
 
 		show_form_begin("items.item");
@@ -341,10 +342,10 @@
 		show_table2_h_delimiter();
 		echo "<select class=\"biginput\" name=\"hostid\" value=\"3\">";
 	        $result=DBselect("select hostid,host from hosts where status not in (".HOST_STATUS_DELETED.")order by host");
-	        for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 	        {
-	                $hostid_=DBget_field($result,$i,0);
-	                $host_=DBget_field($result,$i,1);
+	                $hostid_=$row["hostid"];
+	                $host_=$row["host"];
 			if($hostid==$hostid_)
 			{
 	                	echo "<option value=\"$hostid_\" selected>$host_";
@@ -1048,14 +1049,10 @@
 			$sql="select t.triggerid,t.description from triggers t,trigger_depends d where t.triggerid=d.triggerid_up and d.triggerid_down=$triggerid";
 			$result1=DBselect($sql);
 			echo "<SELECT class=\"biginput\" NAME=\"dependency\" size=\"1\">";
-			for($i=0;$i<DBnum_rows($result1);$i++)
+			while($row1=DBfetch($result1))
 			{
-				$depid=DBget_field($result1,$i,0);
-//				$depdescr=DBget_field($result1,$i,1);
-//				if( strstr($depdescr,"%s"))
-//				{
-					$depdescr=expand_trigger_description($depid);
-//				}
+				$depid=$row1["triggerid"];
+				$depdescr=expand_trigger_description($depid);
 				echo "<OPTION VALUE=\"$depid\">$depdescr";
 			}
 			echo "</SELECT>";
@@ -1066,15 +1063,10 @@
 			$sql="select t.triggerid,t.description from triggers t where t.triggerid!=$triggerid order by t.description";
 			$result=DBselect($sql);
 			echo "<SELECT class=\"biginput\" NAME=\"depid\" size=\"1\">";
-			for($i=0;$i<DBnum_rows($result);$i++)
+			while($row1=DBfetch($result1))
 			{
-				$depid=DBget_field($result,$i,0);
-//				$depdescr=DBget_field($result,$i,1);
-
-//				if( strstr($depdescr,"%s"))
-//				{
-					$depdescr=expand_trigger_description($depid);
-//				}
+				$depid=$row1["triggerid"];
+				$depdescr=expand_trigger_description($depid);
 				echo "<OPTION VALUE=\"$depid\">$depdescr";
 			}
 			echo "</SELECT>";
