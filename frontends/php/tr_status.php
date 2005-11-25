@@ -379,18 +379,18 @@
 
 		if($onlytrue=='true')
 		{
-			$sql="select t.priority,count(*) from triggers t,hosts h,items i,functions f".$groupname."  where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and t.triggerid=f.triggerid and t.description $select_cond and i.status=0 $cond $groupcond group by 1";
+			$sql="select t.priority,count(*) as cnt from triggers t,hosts h,items i,functions f".$groupname."  where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and t.triggerid=f.triggerid and t.description $select_cond and i.status=0 $cond $groupcond group by 1";
 		}
 		else
 		{
-			$sql="select t.priority,count(*) from triggers t,hosts h,items i,functions f".$groupname." where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=0 and h.status=".HOST_STATUS_MONITORED." and t.description $select_cond and i.status=0 $cond $groupcond group by 1";
+			$sql="select t.priority,count(*) as cnt from triggers t,hosts h,items i,functions f".$groupname." where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=0 and h.status=".HOST_STATUS_MONITORED." and t.description $select_cond and i.status=0 $cond $groupcond group by 1";
 		}
 		$result=DBselect($sql);
 		$p0=$p1=$p2=$p3=$p4=$p5=0;
-		for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 		{
-			$priority=DBget_field($result,$i,0);
-			$count=DBget_field($result,$i,1);
+			$priority=$row["priority"];
+			$count=$row["cnt"];
 			if($priority==0) $p0=$count;
 			if($priority==1) $p1=$count;
 			if($priority==2) $p2=$count;
@@ -525,10 +525,11 @@
 
 // Check for dependencies
 
-		$sql="select count(*) from trigger_depends d, triggers t where d.triggerid_down=".$row["triggerid"]." and d.triggerid_up=t.triggerid and t.value=1";
+		$sql="select count(*) as cnt from trigger_depends d, triggers t where d.triggerid_down=".$row["triggerid"]." and d.triggerid_up=t.triggerid and t.value=1";
 		$result2=DBselect($sql);
+		$row2=DBfetch($result2);
 
-		if(DBget_field($result2,0,0)>0)
+		if($row2["cnt"]>0)
 		{
 			continue;
 		}

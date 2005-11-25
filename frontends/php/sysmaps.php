@@ -147,9 +147,9 @@
 	echo "<select class=\"biginput\" name=\"background\" size=1>";
 	$result=DBselect("select name from images where imagetype=2 order by name");
 	echo "<OPTION VALUE=''>No image...";
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
 	{
-		$name=DBget_field($result,$i,0);
+		$name=$row["name"];
 		if(isset($_REQUEST["sysmapid"]) && ($background==$name))
 		{
 			echo "<OPTION VALUE='".$name."' SELECTED>".$name;

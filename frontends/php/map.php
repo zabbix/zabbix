@@ -31,14 +31,13 @@
 
 	$grid=50;
 
-	$result=DBselect("select * from sysmaps where sysmapid=".$_REQUEST["sysmapid"]);
-	$row=DBfetch($result);
+	$map=get_map_by_sysmapid($_REQUEST["sysmapid"]);
 
-	$name=$row["name"];
-	$width=$row["width"];
-	$height=$row["height"];
-	$background=$row["background"];
-	$label_type=$row["label_type"];
+	$name=$map["name"];
+	$width=$map["width"];
+	$height=$map["height"];
+	$background=$map["background"];
+	$label_type=$map["label_type"];
 
 //	Header( "Content-type:  text/html"); 
 	if(MAP_OUTPUT_FORMAT == "JPG")	Header( "Content-type:  image/jpeg"); 
@@ -91,7 +90,8 @@
 		$result2=DBselect($sql);
 		if(DBnum_rows($result2)==1)
 		{
-			$back=ImageCreateFromString(DBget_field($result2,0,0));
+			$row2=DBfetch($result2);
+			$back=ImageCreateFromString($row2["image"]);
 			ImageCopy($im,$back,0,0,0,0,imagesx($back),imagesy($back));
 		}
 		else
@@ -145,25 +145,25 @@
 # Draw connectors 
 
 	$result=DBselect("select shostid1,shostid2,triggerid,color_off,drawtype_off,color_on,drawtype_on from sysmaps_links where sysmapid=".$_REQUEST["sysmapid"]);
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
 	{
-		$shostid1=DBget_field($result,$i,0);
-		$shostid2=DBget_field($result,$i,1);
-		$triggerid=DBget_field($result,$i,2);
-		$color_off=DBget_field($result,$i,3);
-		$drawtype_off=DBget_field($result,$i,4);
-		$color_on=DBget_field($result,$i,5);
-		$drawtype_on=DBget_field($result,$i,6);
+		$shostid1=$row["shostid1"];
+		$shostid2=$row["shostid2"];
+		$triggerid=$row["triggerid"];
+		$color_off=$row["color_off"];
+		$drawtype_off=$row["drawtype_off"];
+		$color_on=$row["color_on"];
+		$drawtype_on=$row["drawtype_on"];
 
-		$result1=DBselect("select x,y,icon from sysmaps_hosts where shostid=$shostid1");
-		$x1=DBget_field($result1,0,0);
-		$y1=DBget_field($result1,0,1);
-		$image1=get_image_by_name(1,DBget_field($result1,0,2));
+		$shost1=get_sysmaps_hosts_by_shostid($shostid1);
+		$x1=$shost1["x"];
+		$y1=$shost1["y"];
+		$image1=get_image_by_name(1,$shost1["icon"]);
 
-		$result1=DBselect("select x,y,icon from sysmaps_hosts where shostid=$shostid2");
-		$x2=DBget_field($result1,0,0);
-		$y2=DBget_field($result1,0,1);
-		$image2=get_image_by_name(1,DBget_field($result1,0,2));
+		$shost2=get_sysmaps_hosts_by_shostid($shostid2);
+		$x1=$shost2["x"];
+		$y1=$shost2["y"];
+		$image2=get_image_by_name(1,$shost2["icon"]);
 
 // Get image dimensions
 
@@ -236,23 +236,24 @@
 
 	$icons=array();
 	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status,sh.icon,sh.icon_on,h.ip from sysmaps_hosts sh,hosts h where sh.sysmapid=".$_REQUEST["sysmapid"]." and h.hostid=sh.hostid");
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($row))
 	{
-		$host=DBget_field($result,$i,0);
-		$shostid=DBget_field($result,$i,1);
-		$sysmapid=DBget_field($result,$i,2);
-		$hostid=DBget_field($result,$i,3);
-		$label=DBget_field($result,$i,4);
-		$x=DBget_field($result,$i,5);
-		$y=DBget_field($result,$i,6);
-		$status=DBget_field($result,$i,7);
-		$icon=DBget_field($result,$i,8);
-		$icon_on=DBget_field($result,$i,9);
-		$ip=DBget_field($result,$i,10);
+		$host=$row["host"];
+		$shostid=$row["shostid"];
+		$sysmapid=$row["sysmapid"];
+		$hostid=$row["hostid"];
+		$label=$row["label"];
+		$x=$row["x"];
+		$y=$row["y"];
+		$status=$row["status"];
+		$icon=$row["icon"];
+		$icon_on=$row["icon_on"];
+		$ip=$row["ip"];
 
 
-		$result1=DBselect("select count(distinct t.triggerid) from items i,functions f,triggers t,hosts h where h.hostid=i.hostid and i.hostid=$hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.value=1 and t.status=0 and h.status=".HOST_STATUS_MONITORED." and i.status=0");
-		$count=DBget_field($result1,0,0);
+		$result1=DBselect("select count(distinct t.triggerid) as cnt from items i,functions f,triggers t,hosts h where h.hostid=i.hostid and i.hostid=$hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.value=1 and t.status=0 and h.status=".HOST_STATUS_MONITORED." and i.status=0");
+		$row1=DBfetch($result1);
+		$count=$row1["cnt"];
 
 		if( ($status!=HOST_STATUS_NOT_MONITORED)&&($count>0))
 		{
@@ -279,7 +280,8 @@
 			}
 			else
 			{
-				$icons[$icon]=ImageCreateFromString(DBget_field($result2,0,0));
+				$row2=DBfetch($result2);
+				$icons[$icon]=ImageCreateFromString($row2["image"]);
 			}
 		}
 
@@ -323,13 +325,14 @@
 			if($count==1)
 			{
 				$result1=DBselect("select distinct t.description,t.triggerid, t.priority from items i,functions f,triggers t,hosts h where h.hostid=i.hostid and i.hostid=$hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.value=1 and t.status=0 and h.status=".HOST_STATUS_MONITORED."  and i.status=0");
-				$label=DBget_field($result1,0,0);
-				if (DBget_field($result1,0,2) > 3)
+				$row1=DBfetch($result1);
+				$label=$row1["description"];
+				if ($row1["priority"] > 3)
 					$color=$red;
 				else
 					$color=$darkyellow;
 
-					$label=expand_trigger_description_simple(DBget_field($result1,0,1));
+					$label=expand_trigger_description_simple($row1["triggerid"]);
 			}
 			else if($count>1)
 			{

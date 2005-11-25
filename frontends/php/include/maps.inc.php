@@ -34,6 +34,21 @@
 		return	$result;
 	}
 
+	function	get_sysmaps_hosts_by_shostid($shostid)
+	{
+		$sql="select * from sysmaps_hosts where shostid=$shostid"; 
+		$result=DBselect($sql);
+		if(DBnum_rows($result) == 1)
+		{
+			return	DBfetch($result);	
+		}
+		else
+		{
+			error("No sysmap host with shostid=[$shostid]");
+		}
+		return	$result;
+	}
+
 	# Delete System Map
 
 	function	delete_sysmap( $sysmapid )

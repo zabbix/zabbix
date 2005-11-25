@@ -240,9 +240,9 @@
 			if(DBnum_rows($result1)>0)
 			{
 				$description=$description."<p><strong>".S_DEPENDS_ON."</strong>:&nbsp;<br>";
-				for($i=0;$i<DBnum_rows($result1);$i++)
+				while($row1=DBfetch($result1))
 				{
-					$depid=DBget_field($result1,$i,0);
+					$depid=$row1["triggerid"];
 					$depdescr=expand_trigger_description($depid);
 					$description=$description."$depdescr<br>";
 				}
@@ -314,8 +314,9 @@
 ?>
 
 <?php
-	$result=DBselect("select count(*) from hosts");
-	if(DBget_field($result,0,0)>0)
+	$result=DBselect("select count(*) as cnt from hosts");
+	$row1=DBfetch($result1);
+	if($row1["cnt"]>0)
 	{
 		echo "<a name=\"form\"></a>";
 		@insert_trigger_form($_REQUEST["hostid"],$_REQUEST["triggerid"]);

@@ -127,13 +127,12 @@
 <?php
 	if(isset($_REQUEST["mediaid"]))
 	{
-		$sql="select m.severity,m.sendto,m.active,m.mediatypeid,m.period from media m where m.mediaid=".$_REQUEST["mediaid"];
-		$result=DBselect($sql);
-		$severity=DBget_field($result,0,0);
-		$sendto=DBget_field($result,0,1);
-		$active=DBget_field($result,0,2);
-		$mediatypeid=DBget_field($result,0,3);
-		$period=DBget_field($result,0,4);
+		$media=get_media_by_mediaid($_REQUEST["mediaid"]);
+		$severity=$media["severity"];
+		$sendto=$media["sendto"];
+		$active=$media["active"];
+		$mediatypeid=$media["mediatypeid"];
+		$period=$media["period"];
 	}
 	else
 	{

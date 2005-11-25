@@ -153,8 +153,8 @@
 //		echo "<br>";
 		if(!isset($_REQUEST["select"])||($_REQUEST["select"] == ""))
 		{
-			$result=DBselect("select host from hosts where hostid=".$_REQUEST["hostid"]);
-			$host=DBget_field($result,0,0);
+			$result=get_host_by_hostid($_REQUEST["hostid"]);
+			$host=$result["host"];
 //			show_table_header("<a href=\"latest.php?hostid=".$_REQUEST["hostid"]."\">$host</a>");
 		}
 		else

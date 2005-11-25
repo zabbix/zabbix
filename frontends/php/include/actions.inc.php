@@ -19,6 +19,21 @@
 **/
 ?>
 <?php
+	function	get_action_by_actionid($actionid)
+	{
+		$sql="select * from actions where actionid=$actionid"; 
+		$result=DBselect($sql);
+		if(DBnum_rows($result) == 1)
+		{
+			return	DBfetch($result);	
+		}
+		else
+		{
+			error("No action with actionid=[$actionid]");
+		}
+		return	$result;
+	}
+
 	# Update Action
 
 	function	update_action( $actionid, $triggerid, $userid, $good, $delay, $subject, $message, $scope, $severity, $recipient, $usrgrpid, $maxrepeats, $repeatdelay)

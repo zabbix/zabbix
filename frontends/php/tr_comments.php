@@ -47,8 +47,8 @@
 ?>
 
 <?php
-	$result=DBselect("select comments from triggers where triggerid=".$_REQUEST["triggerid"]);
-	$comments=stripslashes(DBget_field($result,0,0));
+	$trigger=get_troigger_by_triggerid($_REQUEST["triggerid"]);
+	$comments=stripslashes($trigger["comments"]);
 ?>
 
 <?php

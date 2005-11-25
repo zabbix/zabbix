@@ -26,15 +26,16 @@
 
 	$now=time();
 
-	$result=DBselect("select h.host,i.description,i.nextcheck-$now,h.hostid,i.key_ from items i,hosts h where i.itemid=".$_REQUEST["itemid"]." and h.hostid=i.hostid");
-	$host=DBget_field($result,0,0);
-	$description=item_description(DBget_field($result,0,1),DBget_field($result,0,4));
-	$beforenextcheck=DBget_field($result,0,2)+5;
+	$result=DBselect("select h.host,i.description,i.nextcheck-$now as nextcheck,h.hostid,i.key_ from items i,hosts h where i.itemid=".$_REQUEST["itemid"]." and h.hostid=i.hostid");
+	$row=DBfetch($result);
+	$host=$row["host"];
+	$description=item_description($row["description"],$row["key_"]);
+	$beforenextcheck=$row["nextcheck"]+5;
 	if($beforenextcheck<=0)
 	{
 		$beforenextcheck=5;
 	}
-	$hostid=DBget_field($result,0,3);
+	$hostid=$row["hostid"];
 
 	if($_REQUEST["action"]=="showhistory")
 	{
@@ -177,7 +178,7 @@
 		}
 		$result=DBselect($sql);
 		$col=0;
-		for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 		{
 			if($col==1)
 			{
@@ -188,15 +189,15 @@
 				echo "<TR BGCOLOR=#EEEEEE>";
 				$col=1;
 			}
-			$clock=DBget_field($result,$i,0);
-			$value=DBget_field($result,$i,1);
+			$clock=$row["clock"];
+			$value=$row["value"];
 			$clock=date("Y.M.d H:i:s",$clock);
 			echo "<TD>$clock</TD>";
 			if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
 			{
-				$local=DBget_field($result,$i,2);
-				$source=DBget_field($result,$i,3);
-				$severity=DBget_field($result,$i,4);
+				$local=$row["timestamp"];
+				$source=$row["source"];
+				$severity=$row["severity"];
 
 				if($local==0)
 				{

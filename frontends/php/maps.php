@@ -65,8 +65,8 @@
 
 		if(isset($_REQUEST["sysmapid"]))
 		{
-			$result=DBselect("select name from sysmaps where sysmapid=".$_REQUEST["sysmapid"]);
-			$h1=DBget_field($result,0,0);
+			$result=get_map_by_sysmapid($_REQUEST["sysmapid"]);
+			$h1=$result["name"];
 			$h1=iif(isset($_REQUEST["fullscreen"]),
 				"<a href=\"maps.php?sysmapid=".$_REQUEST["sysmapid"]."\">".$h1."</a>",
 				"<a href=\"maps.php?sysmapid=".$_REQUEST["sysmapid"]."&fullscreen=1\">".$h1."</a>");
@@ -109,22 +109,6 @@
 ?>
 
 <?php
-/*	if(isset($_REQUEST["sysmapid"]))
-	{
-		$result=DBselect("select name from sysmaps where sysmapid=".$_REQUEST["sysmapid"]);
-		$map=DBget_field($result,0,0);
-		$map=iif(isset($_REQUEST["fullscreen"]),
-			"<a href=\"maps.php?sysmapid=".$_REQUEST["sysmapid"]."\">".$map."</a>",
-			"<a href=\"maps.php?sysmapid=".$_REQUEST["sysmapid"]."&fullscreen=1\">".$map."</a>");
-	}
-	else
-	{
-		$map=S_SELECT_MAP_TO_DISPLAY;
-	}
-
-	show_table_header($map);
-*/
-
 	echo "<TABLE BORDER=0 align=center WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR BGCOLOR=\"#EEEEEE\">";
 	echo "<TR BGCOLOR=\"#DDDDDD\">";

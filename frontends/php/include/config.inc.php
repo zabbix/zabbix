@@ -43,6 +43,7 @@
 	include_once 	"include/profiles.inc.php";
 	include_once 	"include/services.inc.php";
 	include_once 	"include/maps.inc.php";
+	include_once 	"include/media.inc.php";
 
 	function info($msg)
 	{
@@ -624,21 +625,6 @@
 		else
 		{
 			error("No groups with groupid=[$groupid]");
-		}
-		return	$result;
-	}
-
-	function	get_action_by_actionid($actionid)
-	{
-		$sql="select * from actions where actionid=$actionid"; 
-		$result=DBselect($sql);
-		if(DBnum_rows($result) == 1)
-		{
-			return	DBfetch($result);	
-		}
-		else
-		{
-			error("No action with actionid=[$actionid]");
 		}
 		return	$result;
 	}
