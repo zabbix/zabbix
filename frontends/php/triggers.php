@@ -315,8 +315,8 @@
 
 <?php
 	$result=DBselect("select count(*) as cnt from hosts");
-	$row1=DBfetch($result1);
-	if($row1["cnt"]>0)
+	$row=DBfetch($result);
+	if($row["cnt"]>0)
 	{
 		echo "<a name=\"form\"></a>";
 		@insert_trigger_form($_REQUEST["hostid"],$_REQUEST["triggerid"]);
