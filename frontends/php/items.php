@@ -340,8 +340,9 @@
 ?>
 
 <?php
-	$result=DBselect("select count(*) from hosts");
-	if(DBget_field($result,0,0)>0)
+	$result=DBselect("select count(*) as cnt from hosts");
+	$row=DBfetch($result);
+	if($row["cnt"]>0)
 	{
 		echo "<a name=\"form\"></a>";
 		insert_item_form();

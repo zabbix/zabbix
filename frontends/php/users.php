@@ -174,9 +174,9 @@
 			}
 			$result1=DBselect("select distinct u.alias from users u,users_groups ug where u.userid=ug.userid and ug.usrgrpid=".$row["usrgrpid"]." order by alias");
 			$users="&nbsp;";
-			for($i=0;$i<DBnum_rows($result1);$i++)
+			while($row1=DBfetc($result1)))
 			{
-				$users=$users.DBget_field($result1,$i,0);
+				$users=$users.$row1["alias"];
 				if($i<DBnum_rows($result1)-1)
 				{
 					$users=$users.", ";

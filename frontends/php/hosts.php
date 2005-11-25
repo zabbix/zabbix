@@ -387,10 +387,10 @@
 //		$members=array("hide"=>1,"value"=>"");
 			$members=array("hide"=>0,"value"=>"");
 			$result1=DBselect("select distinct h.host from hosts h, hosts_groups hg where h.hostid=hg.hostid and hg.groupid=".$row["groupid"]." and h.status not in (".HOST_STATUS_DELETED.") order by host");
-			for($i=0;$i<DBnum_rows($result1);$i++)
+			while($row1=DBfetch($result1))
 			{
 				$members["hide"]=0;
-				$members["value"]=$members["value"].DBget_field($result1,$i,0);
+				$members["value"]=$members["value"].$row1["host"];
 				if($i<DBnum_rows($result1)-1)
 				{
 					$members["value"]=$members["value"].", ";
@@ -660,12 +660,12 @@
 
 	if(isset($_REQUEST["register"]) && ($_REQUEST["register"] == "change"))
 	{
-		$result=DBselect("select host,port,status,useip,ip from hosts where hostid=".$_REQUEST["hostid"]); 
-		$host=DBget_field($result,0,0);
-		$port=DBget_field($result,0,1);
-		$status=DBget_field($result,0,2);
-		$useip=DBget_field($result,0,3);
-		$ip=DBget_field($result,0,4);
+		$result=get_host_by_hostid($_REQUEST["hostid"]);
+		$host=$result["host"];
+		$port=$result["port"];
+		$status=$result["status"];
+		$useip=$result["useip"];
+		$ip=$result["ip"];
 
 		if($useip==0)
 		{

@@ -74,9 +74,8 @@
 ?>
 
 <?php
-	$result=DBselect("select name from sysmaps where sysmapid=".$_REQUEST["sysmapid"]);
-	$map=DBget_field($result,0,0);
-	show_table_header($map);
+	$map=get_map_by_sysmapid($_REQUEST["sysmapid"]);
+	show_table_header($map["name"]);
 	echo "<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR BGCOLOR=#DDDDDD>";
 	echo "<TD ALIGN=CENTER>";
@@ -84,16 +83,17 @@
 	{
 		$map="\n<map name=links".$_REQUEST["sysmapid"]."_".rand(0,100000).">";
 		$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status from sysmaps_hosts sh,hosts h where sh.sysmapid=".$_REQUEST["sysmapid"]." and h.status not in (".HOST_STATUS_DELETED.") and h.hostid=sh.hostid");
-		for($i=0;$i<DBnum_rows($result);$i++)
+
+		while($row=DBfetch($result))
 		{
-			$host_=DBget_field($result,$i,0);
-			$shostid_=DBget_field($result,$i,1);
-			$sysmapid_=DBget_field($result,$i,2);
-			$hostid_=DBget_field($result,$i,3);
-			$label_=DBget_field($result,$i,4);
-			$x_=DBget_field($result,$i,5);
-			$y_=DBget_field($result,$i,6);
-			$status_=DBget_field($result,$i,7);
+			$host_=$row["host"];
+			$shostid_=$row["shostid"];
+			$sysmapid_=$row["sysmapid"];
+			$hostid_=$row["hostid"];
+			$label_=$row["label"];
+			$x_=$row["x"];
+			$y_=$row["y"];
+			$status_=$row["status"];
 
 			if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
 			{
@@ -143,9 +143,11 @@
 	while($row=DBfetch($result))
 	{
 		$result1=DBselect("select label from sysmaps_hosts where shostid=".$row["shostid1"]);
-		$label1=DBget_field($result1,0,0);
+		$row1=DBfetch($result1);
+		$label1=$row1["label"];
 		$result1=DBselect("select label from sysmaps_hosts where shostid=".$row["shostid2"]);
-		$label2=DBget_field($result1,0,0);
+		$row1=DBfetch($result1);
+		$label2=$row1["label"];
 
 		if(isset($row["triggerid"]))
 		{
@@ -171,14 +173,14 @@
 
 	if(isset($_REQUEST["shostid"]))
 	{
-		$result=DBselect("select hostid,label,x,y,icon,url,icon_on from sysmaps_hosts where shostid=".$_REQUEST["shostid"]);
-		$hostid=DBget_field($result,0,0);
-		$label=DBget_field($result,0,1);
-		$x=DBget_field($result,0,2);
-		$y=DBget_field($result,0,3);
-		$icon=DBget_field($result,0,4);
-		$url=DBget_field($result,0,5);
-		$icon_on=DBget_field($result,0,6);
+		$shost=get_sysmaps_hosts_by_shostid($_REQUEST["shostid"]);
+		$hostid=$shost["hostid"];
+		$label=$shost["label"];
+		$x=$shost["x"];
+		$y=$shost["y"];
+		$icon=$shost["icon"];
+		$url=$shost["url"];
+		$icon_on=$shost["icon_on"];
 	}
 	else
 	{
@@ -208,10 +210,10 @@
 	show_table2_h_delimiter();
 	$result=DBselect("select hostid,host from hosts where status not in (".HOST_STATUS_DELETED.") order by host");
 	echo "<select class=\"biginput\" name=\"hostid\" size=1>";
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
 	{
-		$hostid_=DBget_field($result,$i,0);
-		$host_=DBget_field($result,$i,1);
+		$hostid_=$row["hostid"];
+		$host_=$row["host"];
 		if(isset($_REQUEST["shostid"]) && ($hostid==$hostid_))
 //		if(isset($_REQUEST["hostid"]) && ($_REQUEST["hostid"]==$hostid_))
 		{
@@ -229,9 +231,9 @@
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"icon\" size=1>";
 	$result=DBselect("select name from images where imagetype=1 order by name");
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
 	{
-		$name=DBget_field($result,$i,0);
+		$name=$row["name"];
 		if(isset($_REQUEST["shostid"]) && ($icon==$name))
 		{
 			echo "<OPTION VALUE='".$name."' SELECTED>".$name;
@@ -248,9 +250,9 @@
 	show_table2_h_delimiter();
 	echo "<select class=\"biginput\" name=\"icon_on\" size=1>";
 	$result=DBselect("select name from images where imagetype=1 order by name");
-	for($i=0;$i<DBnum_rows($result);$i++)
+	while($row=DBfetch($result))
 	{
-		$name=DBget_field($result,$i,0);
+		$name=$row["name"];
 		if(isset($_REQUEST["shostid"]) && ($icon_on==$name))
 		{
 			echo "<OPTION VALUE='".$name."' SELECTED>".$name;
@@ -306,11 +308,11 @@
 		show_table2_h_delimiter();
 //		$result=DBselect("select shostid,label from sysmaps_hosts where sysmapid=".$_REQUEST["sysmapid"]." order by label");
 		echo "<select class=\"biginput\" name=\"shostid1\" size=1>";
-		for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 		{
-			$shostid_=DBget_field($result,$i,0);
-			$label=DBget_field($result,$i,1);
-			$host=get_host_by_hostid(DBget_field($result,$i,2));
+			$shostid_=$row["shostid"];
+			$label=$row["label"];
+			$host=get_host_by_hostid($row["hostid"]);
 			if(isset($_REQUEST["shostid"])&&($_REQUEST["shostid"]==$shostid_))
 			{
 				echo "<OPTION VALUE='$shostid_' SELECTED>".$host["host"].":$label";
@@ -327,11 +329,11 @@
 		echo nbsp("Host 2");
 		show_table2_h_delimiter();
 		echo "<select class=\"biginput\" name=\"shostid2\" size=1>";
-		for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 		{
-			$shostid_=DBget_field($result,$i,0);
-			$label=DBget_field($result,$i,1);
-			$host=get_host_by_hostid(DBget_field($result,$i,2));
+			$shostid_=$row["shostid"];
+			$label=$row["label"];
+			$host=get_host_by_hostid($row["hostid"]);
 			echo "<OPTION VALUE='$shostid_'>".$host["host"].":$label";
 		}
 		echo "</SELECT>";
@@ -339,17 +341,13 @@
 		show_table2_v_delimiter($col++);
 		echo nbsp("Link status indicator");
 		show_table2_h_delimiter();
-	        $result=DBselect("select triggerid,description from triggers order by description");
+	        $result=DBselect("select triggerid from triggers order by description");
 	        echo "<select class=\"biginput\" name=\"triggerid\" size=1>";
 		echo "<OPTION VALUE='0' SELECTED>-";
-	        for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 	        {
-	                $triggerid_=DBget_field($result,$i,0);
-//	                $description_=DBget_field($result,$i,1);
-//			if( strstr($description_,"%s"))
-//			{
-				$description_=expand_trigger_description($triggerid_);
-//			}
+	                $triggerid_=$row["triggerid"];
+			$description_=expand_trigger_description($triggerid_);
 			echo "<OPTION VALUE='$triggerid_'>$description_";
 	        }
 	        echo "</SELECT>";

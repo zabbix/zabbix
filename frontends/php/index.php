@@ -82,12 +82,13 @@
 		$result=DBselect($sql);
 		if(DBnum_rows($result)==1)
 		{
-			$USER_DETAILS["userid"]=DBget_field($result,0,0);
-			$USER_DETAILS["alias"]=DBget_field($result,0,1);
-			$USER_DETAILS["name"]=DBget_field($result,0,2);
-			$USER_DETAILS["surname"]=DBget_field($result,0,3);
-			$USER_DETAILS["url"]=DBget_field($result,0,4);
-			$USER_DETAILS["refresh"]=DBget_field($result,0,5);
+			$row=DBfetch($result);
+			$USER_DETAILS["userid"]=$row["userid"];
+			$USER_DETAILS["alias"]=$row["alias"];
+			$USER_DETAILS["name"]=$row["name"];
+			$USER_DETAILS["surname"]=$row["surname"];
+			$USER_DETAILS["url"]=$row["url"];
+			$USER_DETAILS["refresh"]=$row["refresh"];
 			$sessionid=md5(time().$password.$name.rand(0,10000000));
 			setcookie("sessionid",$sessionid,time()+3600);
 // Required !
