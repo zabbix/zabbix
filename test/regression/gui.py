@@ -33,10 +33,10 @@ def TestGUI(name, page, gets, expect):
 	data = r1.read()
 	p = re.compile('.*'+expect+'.*', re.DOTALL)
 	m = p.match(data)
-	if m:
-		print '\tGUI: OK'
-	else:
+	if not m:
 		print '\tGUI: NOT OK'
+###	else:
+###		print '\tGUI: OK'
 	conn.close()
 
 def InitDB():
@@ -56,10 +56,10 @@ def TestDBCount(table, condition, num):
 #	print sql
 	row = cursor.fetchone()
 
-	if row[0]==num:
-		print '\tDB: OK'
-	else:
+	if row[0]!=num:
 		print '\tDB: NOT OK'
+###	else:
+###		print '\tDB: OK'
 
 def DBGetID(table, condition, column):
 	cursor = connection.cursor()
