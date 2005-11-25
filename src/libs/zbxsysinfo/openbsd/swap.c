@@ -72,8 +72,7 @@ static int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, 
 	if(ret != SYSINFO_RET_OK)
 		return ret;
 
-	result->type |= AR_DOUBLE;
-	result->dbl = value;
+	SET_UI64_RESULT(result, value);
 	return ret;
 }
 
@@ -91,8 +90,7 @@ static int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags,
 	if(ret != SYSINFO_RET_OK)
 		return ret;
 
-	result->type |= AR_DOUBLE;
-	result->dbl = value;
+	SET_UI64_RESULT(result, value);
 	return ret;
 }
 
@@ -292,8 +290,7 @@ int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RES
     if(ret != SYSINFO_RET_OK)
 	return ret;
 
-    result->type |= AR_DOUBLE;
-    result->dbl = value;
+	SET_UI64_RESULT(result, value);
     return ret;
 }
 
@@ -350,7 +347,6 @@ int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RE
     if(ret != SYSINFO_RET_OK)
 	return ret;
 
-    result->type |= AR_DOUBLE;
-    result->dbl = value;
+	SET_UI64_RESULT(result, value);
     return ret;
 }

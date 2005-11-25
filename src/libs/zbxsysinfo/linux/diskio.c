@@ -159,14 +159,12 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	{
 		if(strncmp(mode, "sectors", MAX_STRING_LEN)==0)
 		{
-			result->type |= AR_DOUBLE;
-			result->dbl = ds.wsect;
+			SET_UI64_RESULT(result, ds.wsect);
 			ret = SYSINFO_RET_OK;
 		}
 		else if(strncmp(mode, "operations", MAX_STRING_LEN)==0)
 		{
-			result->type |= AR_DOUBLE;
-			result->dbl = ds.wio;
+			SET_UI64_RESULT(result, ds.wio);
 			ret = SYSINFO_RET_OK;
 		}
 		else
@@ -216,14 +214,12 @@ int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	{
 		if(strncmp(mode, "sectors", MAX_STRING_LEN)==0)
 		{
-			result->type |= AR_DOUBLE;
-			result->dbl = ds.rsect;
+			SET_UI64_RESULT(result, ds.rsect);
 			ret = SYSINFO_RET_OK;
 		}
 		else if(strncmp(mode, "operations", MAX_STRING_LEN)==0)
 		{
-			result->type |= AR_DOUBLE;
-			result->dbl = ds.rio;
+			SET_UI64_RESULT(result, ds.rio);
 			ret = SYSINFO_RET_OK;
 		}
 		else

@@ -211,18 +211,15 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 
 	if(is_uint(c) == SUCCEED)
 	{
-		result->type |= AR_UINT64;
-		result->ui64 = (zbx_uint64_t)atoll(c);
+		SET_UI64_RESULT(result, atoll(c));
 	}
 	else if(is_double(c) == SUCCEED)
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = (double)atof(c);
+		SET_DBL_RESULT(result, atof(c));
 	}
 	else
 	{
-		result->type |= AR_STRING;
-		result->str = strdup(c);
+		SET_STR_RESULT(result, strdup(c));
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "RESULT_STR [%c]", c);

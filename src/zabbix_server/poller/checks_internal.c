@@ -90,7 +90,7 @@ int	get_value_internal(DB_ITEM *item, AGENT_RESULT *result)
 	{
 		snprintf(error,MAX_STRING_LEN-1,"Internal check [%s] is not supported", item->key);
 		zabbix_log( LOG_LEVEL_WARNING, error);
-		result->str=strdup(error);
+		SET_STR_RESULT(result, strdup(error));
 		return NOTSUPPORTED;
 	}
 

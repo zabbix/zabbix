@@ -42,8 +42,7 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return	SYSINFO_RET_FAIL;
 	}
 
-	result->type |= AR_DOUBLE;
-     	result->dbl = (double)(maxfiles);
+     	SET_UI64_RESULT(result, maxfiles);
 	return SYSINFO_RET_OK;
 #else
 	return	SYSINFO_RET_FAIL;
@@ -71,8 +70,8 @@ int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RES
 /*		printf("Errno [%m]");*/
 	}
 
-	result->type |= AR_DOUBLE;
-	result->dbl = (double)(maxproc);
+	
+     	SET_UI64_RESULT(result, maxproc);
 	return SYSINFO_RET_OK;
 #else
 	return	SYSINFO_RET_FAIL;

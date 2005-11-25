@@ -33,8 +33,7 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 	if( 0 == sysinfo(&info))
 	{
-		result->type |= AR_DOUBLE;
-		result->dbl = (double)info.uptime;
+		SET_UI64_RESULT(result, info.uptime);
 		return SYSINFO_RET_OK;
 	}
 	else
@@ -63,8 +62,8 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	}
 
 	now=time(NULL);
-	result->type |= AR_DOUBLE;
-	result->dbl = (double)(now-uptime.tv_sec);
+	
+	SET_UI64_RESULT(result, now-uptime.tv_sec);
 	return SYSINFO_RET_OK;
 #else
 /* Solaris */
@@ -107,8 +106,8 @@ int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 	/* close kstat */
 	kstat_close(kc);
-	result->type |= AR_DOUBLE;
-	result->dbl = (double)secs;
+
+	SET_UI64_RESULT(result, secs);
 	return SYSINFO_RET_OK;
 #else
         assert(result);

@@ -82,8 +82,7 @@ void zabbix_syslog(const char *fmt, ...)
 			va_end(ap);
 
 			init_result(&agent);
-			agent.type |= AR_STRING;
-			agent.str=strdup(value_str);
+			SET_STR_RESULT(&agent, strdup(value_str));
 			process_new_value(&item,&agent);
 			free_result(&agent);
 
