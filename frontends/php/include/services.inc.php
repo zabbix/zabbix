@@ -76,9 +76,10 @@
 
 	function	is_service_hardlinked($serviceid)
 	{
-		$sql="select count(*) from services_links where servicedownid=$serviceid and soft=0";
+		$sql="select count(*) as cnt from services_links where servicedownid=$serviceid and soft=0";
 		$result=DBselect($sql);
-		if(DBget_field($result,0,0)>0)
+		$row=DBfetch($result);
+		if($row["cnt"]>0)
 		{
 			return	TRUE;
 		}
@@ -138,9 +139,10 @@
 
 	function	service_has_parent($serviceid)
 	{
-		$sql="select count(*) from services_links where servicedownid=$serviceid";
+		$sql="select count(*) as cnt from services_links where servicedownid=$serviceid";
 		$result=DBselect($sql);
-		if(DBget_field($result,0,0)>0)
+		$row=DBfetch($result);
+		if($row["cnt"]>0)
 		{
 			return	TRUE;
 		}
@@ -149,9 +151,10 @@
 
 	function	service_has_no_this_parent($parentid,$serviceid)
 	{
-		$sql="select count(*) from services_links where serviceupid=$parentid and servicedownid=$serviceid";
+		$sql="select count(*) as cnt from services_links where serviceupid=$parentid and servicedownid=$serviceid";
 		$result=DBselect($sql);
-		if(DBget_field($result,0,0)>0)
+		$row=DBfetch($result);
+		if($row["cnt"]>0)
 		{
 			return	FALSE;
 		}
@@ -200,19 +203,20 @@
 
 	function	get_last_service_value($serviceid,$clock)
 	{
-	       	$sql="select count(*),max(clock) from service_alarms where serviceid=$serviceid and clock<=$clock";
+	       	$sql="select count(*) as cnt,max(clock) as maxx from service_alarms where serviceid=$serviceid and clock<=$clock";
 //		echo " $sql<br>";
 		
 	        $result=DBselect($sql);
-		if(DBget_field($result,0,0)>0)
+		$row=DBfetch($result);
+		if($row["cnt"]>0)
 		{
-	       		$sql="select value from service_alarms where serviceid=$serviceid and clock=".DBget_field($result,0,1);
+	       		$sql="select value from service_alarms where serviceid=$serviceid and clock=".$row["maxx"];
 		        $result2=DBselect($sql);
 // Assuring that we get very latest service value. There could be several with the same timestamp
 //			$value=DBget_field($result2,0,0);
-			for($i=0;$i<DBnum_rows($result2);$i++)
+			while($row2=DBfetch($result2))
 			{
-				$value=DBget_field($result2,$i,0);
+				$value=$row2["value"];
 			}
 		}
 		else
@@ -234,10 +238,10 @@
 		$problem_time=0;
 		$ok_time=0;
 		$time=$period_start;
-		for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 		{
-			$clock=DBget_field($result,$i,0);
-			$value=DBget_field($result,$i,1);
+			$clock=$row["clock"];
+			$value=$row["value"];
 
 			$diff=$clock-$time;
 
@@ -328,9 +332,10 @@
 
 	function	get_num_of_service_childs($serviceid)
 	{
-		$sql="select count(*) from services_links where serviceupid=$serviceid";
+		$sql="select count(*) as cnt from services_links where serviceupid=$serviceid";
 		$result=DBselect($sql);
-		return	DBget_field($result,0,0);
+		$row=DBfetch($result);
+		return	$row["cnt"];
 	}
 
 	function	get_service_by_serviceid($serviceid)

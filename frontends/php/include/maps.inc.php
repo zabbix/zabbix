@@ -161,18 +161,18 @@
 	{
 		$map="\n<map name=links$sysmapid>";
 		$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status,sh.icon,sh.url from sysmaps_hosts sh,hosts h where sh.sysmapid=$sysmapid and h.hostid=sh.hostid");
-		for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 		{
-			$host=DBget_field($result,$i,0);
-			$shostid=DBget_field($result,$i,1);
-			$sysmapid=DBget_field($result,$i,2);
-			$hostid=DBget_field($result,$i,3);
-			$label=DBget_field($result,$i,4);
-			$x=DBget_field($result,$i,5);
-			$y=DBget_field($result,$i,6);
-			$status=DBget_field($result,$i,7);
-			$icon=DBget_field($result,$i,8);
-			$url=DBget_field($result,$i,9);
+			$host=$row["host"];
+			$shostid=$row["shostid"];
+			$sysmapid=$row["sysmapid"];
+			$hostid=$row["hostid"];
+			$label=$row["label"];
+			$x=$row["x"];
+			$y=$row["y"];
+			$status=$row["status"];
+			$icon=$row["icon"];
+			$url=$row["url"];
 
 			if($status==HOST_STATUS_MONITORED)
 			{
@@ -180,7 +180,8 @@
 				$result2=DBselect($sql);
 				if(DBnum_rows($result2)==1)
 				{
-					$back=ImageCreateFromString(DBget_field($result2,0,0));
+					$row2=DBfetch($result2);
+					$back=ImageCreateFromString($row2["image"]);
 					$sizex = imagesx($back);
 					$sizey = imagesy($back);
 					if($url=="")

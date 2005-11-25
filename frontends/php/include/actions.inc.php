@@ -94,10 +94,9 @@
 	{
 		$sql="select actionid from actions where userid=$userid";
 		$result=DBexecute($sql);
-		for($i=0;$i<DBnum_rows($result);$i++)
+		while($row=DBfetch($result))
 		{
-			$actionid=DBget_field($result,$i,0);
-			delete_alert_by_actionid($actionid);
+			delete_alert_by_actionid($row["actionid"]);
 		}
 
 		$sql="delete from actions where userid=$userid";
