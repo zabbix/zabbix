@@ -26,6 +26,7 @@ def TestGUI(name, page, gets, expect):
 	conn = httplib.HTTPConnection("localhost")
 	print name
 	url = '/~test/'+page+'?'+gets
+#	print url
 	conn.request("GET", url)
 	r1 = conn.getresponse()
 	###print page, '\t\t', r1.status, r1.reason
@@ -50,7 +51,9 @@ def InitDB():
 
 def TestDBCount(table, condition, num):
 	cursor = connection.cursor()
-	cursor.execute("SELECT count(*) FROM "+table+" where "+condition)
+	sql = "SELECT count(*) FROM "+table+" where "+condition
+	cursor.execute(sql)
+#	print sql
 	row = cursor.fetchone()
 
 	if row[0]==num:
@@ -60,7 +63,9 @@ def TestDBCount(table, condition, num):
 
 def DBGetID(table, condition, column):
 	cursor = connection.cursor()
-	cursor.execute("SELECT " + column + " FROM "+table+" where "+condition)
+	sql="SELECT " + column + " FROM "+table+" where "+condition
+	cursor.execute(sql)
+#	print sql
 	row = cursor.fetchone()
 
 	return row[0]
@@ -115,6 +120,9 @@ def GUI_Config_General_Autoregistration():
 	TestGUI('General->Autoregistration->Delete', "config.php", "config=4&id="+str(id)+"&register=delete+autoregistration", "Autoregistration deleted")
 	TestDBCount("autoreg","id="+str(id), 0)
 
+	TestGUI('Hosts->Delete', "hosts.php", "register=delete&hostid="+str(hostid), "Host deleted")
+	TestDBCount("hosts","status=4 and hostid="+str(hostid), 1)
+
 def GUI_Config_General_Mediatype():
 ###	print "GUI_Config_General_Mediatype"
 	GUI_Config_General_Mediatype_Email()
@@ -152,13 +160,13 @@ def GUI_Config_Hosts():
 ###	print "GUI_Config_Hosts"
 	TestGUI('Hosts->Add', "hosts.php", "host=regression&newgroup=&useip=on&ip=127.0.0.1&port=10050&status=0&host_templateid=0&register=add#form", "Host added")
 	TestDBCount("hosts","host='regression'", 1)
-	id = DBGetID("hosts","host='regression'", "hostid")
+	hostid = DBGetID("hosts","host='regression'", "hostid")
 
 	TestGUI('Hosts->Add (duplicate)', "hosts.php", "host=regression&newgroup=&useip=on&ip=127.0.0.1&port=10050&status=0&host_templateid=0&register=add#form", "already exists")
 	TestDBCount("hosts","host='regression' and useip=1 and port=10050", 1)
 
-	TestGUI('Hosts->Delete', "hosts.php", "?host=regression&newgroup=&useip=on&ip=127.0.0.1&port=10050&status=0&host_templateid=0&register=delete&config=0&hostid="+str(id)+"&devicetype=&name=&os=&serialno=&tag=&macaddress=&hardware=&software=&contact=&location=&notes=#form", "Host deleted")
-	TestDBCount("hosts","host='regression'", 0)
+	TestGUI('Hosts->Delete', "hosts.php", "register=delete&hostid="+str(hostid), "Host deleted")
+	TestDBCount("hosts","status=4 and hostid="+str(hostid), 1)
 
 def GUI_Config_Hosts_Groups():
 ###	print "GUI_Config_Hosts_Groups"
@@ -171,6 +179,24 @@ def GUI_Config_Hosts_Groups():
 
 	TestGUI('Hosts->Host groups->Delete', "hosts.php", "groupid="+str(id)+"&name=Regression&register=delete+group", "Group deleted")
 	TestDBCount("groups","name='Regression'", 0)
+
+def GUI_Config_Hosts_Template_Linkage():
+	TestGUI('Hosts->Add', "hosts.php", "host=regression3&newgroup=&useip=on&ip=127.0.0.1&port=10050&status=0&host_templateid=0&register=add#form", "Host added")
+	TestDBCount("hosts","host='regression3'", 1)
+	hostid = DBGetID("hosts","host='regression3'", "hostid")
+
+	TestGUI('Hosts->Template linkage->Add', "hosts.php", "config=2&hostid="+str(hostid)+"&templateid=10001&items_add=on&items_update=on&items_delete=on&triggers_add=on&triggers_update=on&triggers_delete=on&actions_add=on&actions_update=on&actions_delete=on&graphs_add=on&graphs_update=on&graphs_delete=on&screens_add=on&screens_update=on&screens_delete=on&register=add+linkage", "Template linkage added")
+	TestDBCount("hosts_templates","items=7 and actions=7 and triggers=7 and graphs=7 and screens=7 and templateid=10001 and hostid="+str(hostid), 1)
+	hosttemplateid = DBGetID("hosts_templates","templateid=10001 and hostid="+str(hostid), "hosttemplateid")
+
+	TestGUI('Hosts->Template linkage->Update', "hosts.php", "config=2&hostid="+str(hostid)+"&hosttemplateid="+str(hosttemplateid)+"&templateid=10001&items_update=on&items_delete=on&triggers_add=on&triggers_delete=on&actions_add=on&actions_update=on&graphs_add=on&graphs_delete=on&screens_update=on&screens_delete=on&register=update+linkage", "Template linkage updated")
+	TestDBCount("hosts_templates","items=6 and actions=3 and triggers=5 and graphs=5 and screens=6 and templateid=10001 and hosttemplateid="+str(hosttemplateid)+" and hostid="+str(hostid), 1)
+
+	TestGUI('Hosts->Template linkage->Delete', "hosts.php", "hosttemplateid="+str(hosttemplateid)+"&register=delete+linkage", "Template linkage deleted")
+	TestDBCount("hosts_templates","hosttemplateid="+str(hosttemplateid), 0)
+
+	TestGUI('Hosts->Delete', "hosts.php", "register=delete&hostid="+str(hostid), "Host deleted")
+	TestDBCount("hosts","status=4 and hostid="+str(hostid), 1)
 
 def GUI_Config_Items():
 ###	print "GUI_Config_Items"
@@ -193,6 +219,9 @@ def GUI_Config_Items():
 
 	TestGUI('Items->Delete', "items.php", "itemid="+str(itemid)+"&register=delete", "Item deleted")
 	TestDBCount("items","itemid="+str(itemid), 0)
+
+	TestGUI('Hosts->Delete', "hosts.php", "register=delete&hostid="+str(hostid), "Host deleted")
+	TestDBCount("hosts","status=4 and hostid="+str(hostid), 1)
 
 def GUI_Config_Maps():
 ###	print "GUI_Config_Maps"
@@ -231,6 +260,31 @@ def GUI_Config_Services():
 	TestGUI('Service->Delete', "services.php", "serviceid="+str(id)+"&name=IT+Services+new&algorithm=1&showsla=on&goodsla=99.10&groupid=0&hostid=0&sortorder=33&register=delete&serviceupid=1&servicedownid=1&softlink=true&serviceid=1&serverid=10003", "Service deleted")
 	TestDBCount("services","serviceid="+str(id), 0)
 
+def GUI_Config_Triggers():
+###	print "GUI_Config_Triggers"
+	TestGUI('Hosts->Add', "hosts.php", "host=regression&newgroup=&useip=on&ip=127.0.0.1&port=10050&status=0&host_templateid=0&register=add#form", "Host added")
+	TestDBCount("hosts","host='regression'", 1)
+	hostid = DBGetID("hosts","host='regression'", "hostid")
+
+	TestGUI('Items->Add', "items.php", "description=Processor+load&hostid="+str(hostid)+"&type=0&snmp_community=public&snmp_oid=interfaces.ifTable.ifEntry.ifInOctets.1&snmp_port=161&snmpv3_securityname=&snmpv3_securitylevel=0&snmpv3_authpassphrase=&snmpv3_privpassphrase=&key=system.cpu.load%5Ball%2Cavg1%5D&units=&multiplier=0&formula=1&delay=5&history=90&trends=365&status=0&value_type=0&logtimefmt=&delta=0&trapper_hosts=&register=add&groupid=1&action=add+to+group#form", "Item added")
+	TestDBCount("items","key_='system.cpu.load[all,avg1]'", 1)
+	itemid = DBGetID("items","key_='system.cpu.load[all,avg1]'", "itemid")
+
+	TestGUI('Trigger->Add', "triggers.php", "description=Processor+load+is+too+high+on+%7BHOSTNAME%7D&expression=%7Bregression%3Asystem.cpu.load%5Ball%2Cavg1%5D.min%2860%29%7D%3E1&priority=1&comments=comment&url=http%3A%2F%2Fwww.zabbix.com&register=add", "Trigger added")
+	TestDBCount("triggers","description='Processor load is too high on {HOSTNAME}' and status=0 and url='http://www.zabbix.com' and comments='comment'", 1)
+	triggerid = DBGetID("triggers","description='Processor load is too high on {HOSTNAME}' and status=0 and url='http://www.zabbix.com' and comments='comment'", "triggerid")
+	TestDBCount("functions","itemid="+str(itemid)+" and lastvalue is NULL and function='min' and parameter='60' and  triggerid="+str(triggerid), 1)
+
+	TestGUI('Triggers->Delete', "triggers.php", "triggerid="+str(triggerid)+"&register=delete", "Trigger deleted")
+	TestDBCount("triggers","triggerid="+str(triggerid), 0)
+	TestDBCount("functions","triggerid="+str(triggerid), 0)
+
+	TestGUI('Items->Delete', "items.php", "itemid="+str(itemid)+"&register=delete", "Item deleted")
+	TestDBCount("items","itemid="+str(itemid), 0)
+
+	TestGUI('Hosts->Delete', "hosts.php", "register=delete&hostid="+str(hostid), "Host deleted")
+	TestDBCount("hosts","status=4 and hostid="+str(hostid), 1)
+
 InitDB()
 
 GUI_Login()
@@ -241,7 +295,9 @@ GUI_Config_Users()
 GUI_Config_Media()
 GUI_Config_Hosts()
 GUI_Config_Hosts_Groups()
+GUI_Config_Hosts_Template_Linkage()
 GUI_Config_Items()
+GUI_Config_Triggers()
 GUI_Config_Maps()
 GUI_Config_Screens()
 GUI_Config_Services()
