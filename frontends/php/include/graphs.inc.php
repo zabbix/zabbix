@@ -42,7 +42,7 @@
 
 	function	add_item_to_graph($graphid,$itemid,$color,$drawtype,$sortorder,$yaxisside)
 	{
-		$sql="insert into graphs_items (graphid,itemid,color,drawtype,sortorder) values ($graphid,$itemid,'$color',$drawtype,$sortorder,$yaxisside)";
+		$sql="insert into graphs_items (graphid,itemid,color,drawtype,sortorder,yaxisside) values ($graphid,$itemid,'$color',$drawtype,$sortorder,$yaxisside)";
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"graphs_items","gitemid");
 	}
