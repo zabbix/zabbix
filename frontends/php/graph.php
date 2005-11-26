@@ -184,7 +184,7 @@
 	while($row=DBfetch($result))
 	{
 		$host_=$row["host"];
-		$description_=item_description($row["itemid"],$row["key_"]);
+		$description_=item_description($row["description"],$row["key_"]);
 		$itemid_=$row["itemid"];
 		if(isset($itemid)&&($itemid==$itemid_))
 		{
