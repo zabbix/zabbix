@@ -5,25 +5,42 @@ copy="no"
 tgz="no"
 configure="no"
 domake="no"
-config_param="--enable-agent"
+config_param="--enable-agent --prefix=`pwd`"
 dotest="no"
 cleanwarnings="no"
+docat="yes"
 
 for cmd
 do
   case "$cmd" in
-    "copy" )    copy="yes" cleanwarnings="yes";;
-    "pre" ) premake="yes" cleanwarnings="yes";;
-    "premake" ) premake="yes" cleanwarnings="yes";;
-    "conf" )      configure="yes" cleanwarnings="yes";;
-    "config" )    configure="yes" cleanwarnings="yes";;
-    "configure" ) configure="yes" cleanwarnings="yes";;
-    "make" )    domake="yes" cleanwarnings="yes";;
-    "test" )    dotest="yes" cleanwarnings="yes";;
-    "tar" )     tgz="yes" cleanwarnings="yes";;
-    * ) config_param="$config_param %cmd" 
+    copy )    copy="yes";;
+    pre ) premake="yes";;
+    premake ) premake="yes";;
+    conf )      configure="yes";;
+    config )    configure="yes";;
+    configure ) configure="yes";;
+    make )    domake="yes";;
+    test )    dotest="yes";;
+    tar )     tgz="yes";;
+    nocat )   docat="no";;
+    --enable-* ) config_param="$config_param %cmd";; 
+    --with-* ) config_param="$config_param %cmd";;
+    * ) 
+        echo "$0: ERROR: uncnown parameter \"$cmd\""; 
+        echo
+        echo "Usage:"
+        echo "  $0 [copy] [premake|pre] [configure|config|conf] [make] [test] [tar] [nocat] [--enable-*] [--with-*]"
+        echo
+        exit 1;;
   esac
 done
+
+if [ "$copy" = "yes" ] || [ $premake = "yes" ] || 
+  [ $configure = "yes" ] || [ $domake = "yes" ] || 
+  [ $dotest = "yes" ] || [ $tgz = "yes" ]
+then
+  cleanwarnings="yes"
+fi
 
 if [ "$cleanwarnings" = "yes" ] 
 then
@@ -60,7 +77,7 @@ then
   echo "Configuring..." >> WARNINGS
   export CFLAGS="-Wall"
   #export CFLAGS="-Wall -pedantic"
-  ./configure "$config_param" --prefix=`pwd` 2>>WARNINGS 
+  ./configure $config_param 2>>WARNINGS 
 fi
 
 if [ "$domake" = "yes" ] 
@@ -91,8 +108,12 @@ then
   tar cvzf zabbix.tar.gz zabbix
 fi
 
-echo
-echo WARNINGS
-echo "-----------------------------------"
-cat WARNINGS
-echo "-----------------------------------"
+if [ "$docat" = "yes" ] 
+then
+  echo
+  echo WARNINGS
+  echo "-----------------------------------"
+  cat WARNINGS
+  echo "-----------------------------------"
+fi
+
