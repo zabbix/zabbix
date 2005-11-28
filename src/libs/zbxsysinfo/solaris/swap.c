@@ -25,9 +25,6 @@
 #include "md5.h"
 
 
-/* Solaris. */
-#ifndef HAVE_SYSINFO_FREESWAP
-#ifdef HAVE_SYS_SWAP_SWAPTABLE
 void get_swapinfo(double *total, double *fr)
 {
 	register int cnt, i, page_size;
@@ -88,34 +85,9 @@ point them all to the same buffer */
 	*fr = page_size*f;
 	free(swt);
 }
-#endif
-#endif
 
 int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_SYSINFO_FREESWAP
-	struct sysinfo info;
-
-	assert(result);
-
-        init_result(result);
-
-	if( 0 == sysinfo(&info))
-	{
-#ifdef HAVE_SYSINFO_MEM_UNIT
-		SET_UI64_RESULT(result, (zbx_uint64_t)info.freeswap * (zbx_uint64_t)info.mem_unit);
-#else
-		SET_UI64_RESILT(result, info.freeswap);
-#endif
-		return SYSINFO_RET_OK;
-	}
-	else
-	{
-		return SYSINFO_RET_FAIL;
-	}
-/* Solaris */
-#else
-#ifdef HAVE_SYS_SWAP_SWAPTABLE
 	double swaptotal,swapfree;
 
 	assert(result);
@@ -126,41 +98,10 @@ int	SYSTEM_SWAP_FREE(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	SET_UI64_RESULT(result, swapfree);
 	return SYSINFO_RET_OK;
-#else
-	assert(result);
-
-        init_result(result);
-
-	return	SYSINFO_RET_FAIL;
-#endif
-#endif
 }
 
 int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_SYSINFO_TOTALSWAP
-	struct sysinfo info;
-
-	assert(result);
-
-        init_result(result);
-
-	if( 0 == sysinfo(&info))
-	{
-#ifdef HAVE_SYSINFO_MEM_UNIT
-		SET_UI64_RESILT(result, (zbx_uint64_t)info.totalswap * (zbx_uint64_t)info.mem_unit);
-#else
-		SET_UI64_RESILT(result, info.totalswap);
-#endif
-		return SYSINFO_RET_OK;
-	}
-	else
-	{
-		return SYSINFO_RET_FAIL;
-	}
-/* Solaris */
-#else
-#ifdef HAVE_SYS_SWAP_SWAPTABLE
 	double swaptotal,swapfree;
 
 	assert(result);
@@ -171,14 +112,6 @@ int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_
 	
 	SET_UI64_RESULT(result, swaptotal);
 	return SYSINFO_RET_OK;
-#else
-	assert(result);
-
-        init_result(result);
-
-	return	SYSINFO_RET_FAIL;
-#endif
-#endif
 }
 
 int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)

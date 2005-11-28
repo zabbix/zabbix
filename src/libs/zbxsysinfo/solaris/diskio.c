@@ -438,95 +438,12 @@ DEV_FNCLIST
 	return SYSINFO_RET_FAIL;
 }
 
-int	DISK_IO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef	HAVE_PROC
-	return	getPROC("/proc/stat",2,2, flags, result);
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
-}
-
-static int	DISK_RIO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef	HAVE_PROC
-	return	getPROC("/proc/stat",3,2, flags, result);
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
-}
-
-static int	DISK_WIO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef	HAVE_PROC
-	return	getPROC("/proc/stat",4,2, flags, result);
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
-}
-
-static int	DISK_RBLK(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef	HAVE_PROC
-	return	getPROC("/proc/stat",5,2, flags, result);
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
-}
-
-static int	DISK_WBLK(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef	HAVE_PROC
-	return	getPROC("/proc/stat",6,2, flags, result);
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
-}
-
 int	OLD_IO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char    key[MAX_STRING_LEN];
-	int 	ret;
-
 	assert(result);
 
         init_result(result);
 
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-
-        if(get_param(param, 1, key, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-
-	if(strcmp(key,"disk_io") == 0)
-	{
-		ret = DISK_IO(cmd, param, flags, result);
-	}
-	else if(strcmp(key,"disk_rio") == 0)
-	{
-		ret = DISK_RIO(cmd, param, flags, result);
-	}
-	else if(strcmp(key,"disk_wio") == 0)
-	{
-		ret = DISK_WIO(cmd, param, flags, result);
-	}
-    	else if(strcmp(key,"disk_rblk") == 0)
-	{
-		ret = DISK_RBLK(cmd, param, flags, result);
-	}
-    	else if(strcmp(key,"disk_wblk") == 0)
-	{
-		ret = DISK_WBLK(cmd, param, flags, result);
-	}
-	else
-	{
-		ret = SYSINFO_RET_FAIL;
-	}
-    
-	return ret;
+        return SYSINFO_RET_FAIL;
 }
 
