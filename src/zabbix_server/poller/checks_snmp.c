@@ -263,7 +263,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 			else if(vars->type == ASN_COUNTER64)
 			{
 /*				*result=((long)(vars->val.counter64->high)<<32)+(long)(vars->val.counter64->low);*/
-				SET_UI64_RESULT(value, (zbx_uint64_t)(vars->val.counter64->high)<<32)+(zbx_uint64_t)(vars->val.counter64->low);
+				SET_UI64_RESULT(value, ((vars->val.counter64->high)<<32)+(vars->val.counter64->low));
 			}
 			else if(vars->type == ASN_INTEGER
 #define ASN_FLOAT           (ASN_APPLICATION | 8)
