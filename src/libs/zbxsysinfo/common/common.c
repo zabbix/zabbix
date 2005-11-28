@@ -1759,7 +1759,7 @@ int	CHECK_SERVICE(const char *cmd, const char *service_and_ip_and_port, unsigned
 		ret=SYSINFO_RET_FAIL;
 	}
 
-	SET_DBL_RESULT(result, value_int);
+	SET_UI64_RESULT(result, value_int);
 
 	return ret;
 }

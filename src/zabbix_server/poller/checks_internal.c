@@ -47,44 +47,37 @@ int	get_value_internal(DB_ITEM *item, AGENT_RESULT *result)
 	if(strcmp(item->key,"zabbix[triggers]")==0)
 	{
 		i = (zbx_uint64_t)DBget_triggers_count();
-		result->type |= AR_UINT64;
-		result->ui64 = i;
+		SET_UI64_RESULT(result, i);
 	}
 	else if(strcmp(item->key,"zabbix[items]")==0)
 	{
 		i = (zbx_uint64_t)DBget_items_count();
-		result->type |= AR_UINT64;
-		result->ui64 |= i;
+		SET_UI64_RESULT(result, i);
 	}
 	else if(strcmp(item->key,"zabbix[items_unsupported]")==0)
 	{
 		i=DBget_items_unsupported_count();
-		result->type |= AR_UINT64;
-		result->ui64 = i;
+		SET_UI64_RESULT(result, i);
 	}
 	else if(strcmp(item->key,"zabbix[history]")==0)
 	{
 		i=DBget_history_count();
-		result->type |= AR_UINT64;
-		result->ui64 = i;
+		SET_UI64_RESULT(result, i);
 	}
 	else if(strcmp(item->key,"zabbix[history_str]")==0)
 	{
 		i=DBget_history_str_count();
-		result->type |= AR_UINT64;
-		result->ui64 = i;
+		SET_UI64_RESULT(result, i);
 	}
 	else if(strcmp(item->key,"zabbix[trends]")==0)
 	{
 		i=DBget_trends_count();
-		result->type |= AR_UINT64;
-		result->ui64 = i;
+		SET_UI64_RESULT(result, i);
 	}
 	else if(strcmp(item->key,"zabbix[queue]")==0)
 	{
 		i=DBget_queue_count();
-		result->type |= AR_UINT64;
-		result->ui64 = i;
+		SET_UI64_RESULT(result, i);
 	}
 	else
 	{
