@@ -76,37 +76,21 @@ MEM_FNCLIST
 
 static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_UNISTD_SYSCONF
 	assert(result);
 
         init_result(result);
 		
 	SET_UI64_RESULT(result, sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGESIZE));
 	return SYSINFO_RET_OK;
-#else
-	assert(result);
-
-        init_result(result);
-		
-	return	SYSINFO_RET_FAIL;
-#endif
 }
 
 static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_UNISTD_SYSCONF
 	assert(result);
 
         init_result(result);
 		
 	SET_UI64_RESULT(result, sysconf(_SC_AVPHYS_PAGES)*sysconf(_SC_PAGESIZE));
 	return SYSINFO_RET_OK;
-#else
-	assert(result);
-
-        init_result(result);
-		
-	return	SYSINFO_RET_FAIL;
-#endif
 }
 
