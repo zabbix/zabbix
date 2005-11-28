@@ -58,29 +58,11 @@ int	KERNEL_MAXPROC(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
 int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXFILES
-	int	mib[2],len;
-	int	maxfiles;
-
 	assert(result);
 
         init_result(result);	
 
-	mib[0]=CTL_KERN;
-	mib[1]=KERN_MAXFILES;
-
-	len=sizeof(maxfiles);
-
-	if(sysctl(mib,2,&maxfiles,(size_t *)&len,NULL,0) != 0)
-	{
-		return	SYSINFO_RET_FAIL;
-	}
-
-	SET_UI64_RESULT(result, maxfiles);
-	return SYSINFO_RET_OK;
-#else
 	return	SYSINFO_RET_FAIL;
-#endif
 }
 
 int     OLD_KERNEL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)

@@ -26,36 +26,22 @@
 
 static int	get_fs_inodes_stat(char *fs, double *total, double *free, double *usage)
 {
-#ifdef HAVE_SYS_STATVFS_H
 	struct statvfs   s;
-#else
-	struct statfs   s;
-#endif
 	
 	assert(fs);
 	
-#ifdef HAVE_SYS_STATVFS_H
 	if ( statvfs( fs, &s) != 0 ) 
-#else
-	if ( statfs( fs, &s) != 0 ) 
-#endif
 	{
 		return	SYSINFO_RET_FAIL;
 	}
         
 	if(total)
 		(*total) = (double)(s.f_files);
-#ifdef HAVE_SYS_STATVFS_H
 	if(free)
 		(*free)  = (double)(s.f_favail);
 	if(usage)
 		(*usage) = (double)(s.f_files - s.f_favail);
-#else
-	if(free)
-		(*free)  = (double)(s.f_ffree);
-	if(usage)
-		(*usage) = (double)(s.f_files - s.f_ffree);
-#endif
+	
 	return SYSINFO_RET_OK;
 }
 

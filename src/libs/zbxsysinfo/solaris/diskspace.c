@@ -24,39 +24,23 @@
 
 int	get_fs_size_stat(char *fs, double *total, double *free, double *usage)
 {
-#ifdef HAVE_SYS_STATVFS_H
         struct statvfs   s;
-#else
-        struct statfs   s;
-#endif
 
         assert(fs);
 
-#ifdef HAVE_SYS_STATVFS_H
         if ( statvfs( fs, &s) != 0 )
-#else
-        if ( statfs( fs, &s) != 0 )
-#endif
         {
                 return  SYSINFO_RET_FAIL;
         }
 
-#ifdef HAVE_SYS_STATVFS_H
         if(total)
                 (*total) = (double)(s.f_blocks * (s.f_frsize / 1024.0));
         if(free)
                 (*free)  = (double)(s.f_bavail * (s.f_frsize / 1024.0));
         if(usage)
                 (*usage) = (double)((s.f_blocks - s.f_bavail) * (s.f_frsize / 1024.0));
-#else
-        if(total)
-                (*total) = (double)(s.f_blocks * (s.f_bsize / 1024.0));
-        if(free)
-                (*free)  = (double)(s.f_bfree * (s.f_bsize / 1024.0));
-        if(usage)
-                (*usage) = (double)((s.f_blocks - s.f_bfree) * (s.f_bsize / 1024.0));
-#endif
-        return SYSINFO_RET_OK;
+        
+	return SYSINFO_RET_OK;
 }
 
 int	VFS_FS_USED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
