@@ -33,9 +33,6 @@ TKOM:
  - alarm/trigger sounds
  - SNMP trap processing
  - SNMP trap sending
- - wider service testing possibilities
-
-TELECENTRS:
 
  - clickable map in map configuration
  - rus/lat characters for graphs
@@ -46,16 +43,12 @@ print_r($_POST);
 <input type="image" src="images/image.jpg" name="imgname">
 </form>
 
-END OF TELECENTRS
-
 4. SNMP traps. Make possible action definition for the SNMP trap-related
  events.
 
 7. snmp traps kak?
 
 dalee pozhelanija:
-
-10. threads.
 
 OTHER:
 
@@ -69,29 +62,6 @@ for instance "low disk space on {HOSTNAME}'s /usr"
 when submitting form, it dumps mysql error, due to non-
 escaped single quote. I believe all user input should be
 escaped before submitting to mysql.
-
-ESCALATION:
-
-Escalation (urovenj escaljacii, pravila izmenenija urovnja):
-* Nabor pravil izmenenija prioriteta triggera/... s techeniem vremeni.
-* Nabor pravil ustanavlivaetsja na sled.urovnjah: sistema, host, user,
-trigger.
-* Prioritetnostj nabrov pravil (naprimer)v porjadke ubivanija: user,
-trigger, host, sistema.
-* Nabor pravil ustanavlivaetsja dlja kazhdogo 'severity' otdeljno,
-** prichem trigger sleduet svoemu naboru v zavisimosti ot ego originaljnogo
-'severity'.
-
-! * Ponjatie: urovenj eskalacii - skoljkim urovnjam admin.ierarhii
-proishodit posil alerta - vishe originaljnogo.
-
-Variant pravil:
-* povtor alerta - zaderzhka vo vremeni: PA - proishodit povtor posilki
-alerta ispoljzuja tekuschee znachenie 'severity' i urovnja ;
-* izmenenie severity - zadaem kolichestvo PA, cherez kotoroe Severity++;
-** samo soboi vishe Disaster ne stanet :)
-* izmenenie urovnja eskalacii:  zadaem kolichestvo PA, cherez kotoroe
-urovenj eskalacii++;
 
 >  Atradu liekas, ka vienu bug: tad, ja updeito Host statusu zem Host, tad trigeris par "Host unreachable" pazuud, jo ir statusaa "unknown", bet pie alarms neparaadas
 >, ka tas buutu mainijis savu statusu.
@@ -141,7 +111,6 @@ trigger wihout actions, etc etc
  - zabbix thinks that host is unrechable if it receives string for numeric item
 
  - think about implementation of sinchronised items like cpu[usr], cpu[sys], cpu[idle]
- - check setproctitle() Lukas sent some time ago for Linux
 
  - implement complex SLA calculation (donwtimes, working/non-working hours), etc. See
 forum Open Discussion for more info.
@@ -157,9 +126,6 @@ forum Open Discussion for more info.
 
 LATER:
 
- - Oracle support
- - support for UDP-based checks (DNS, etc)
- - preserve selected host group between different screens (trigger maintenance, host maintenance)
  - add zabbix[unixtime] and lastupdate() and tick() to get rid of nodata()
  - check return code for alert scripts
  - zabbix_agentd to support processor load, swap[*] and memory[*] onder AIX
@@ -260,7 +226,6 @@ LS:
 TOP PRIORITY:
 
  - fix update of 'status'. When added it never gets updated, if server is already unreachable.
- - pay attention to Solaris agent
  - add more checks for forms (check all possible wrong values)
  - support of fetch_html[*]
  - zabbix_agentd to support swap[*] and memory[*] onder AIX
@@ -273,7 +238,6 @@ DIFFERENT TASKS:
 
  - SNMP trapping
  - distributed monitoring
- - backup/restore scripts for server. Backup all (DB, configs, etc).
  - personalisation (refresh rate, graph size, default graph period, etc)
  - SNMP-walk in WEB interface
  - add UserParameter without restart of an agent
