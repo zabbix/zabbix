@@ -776,13 +776,13 @@ AC_SUBST(LDAP_LFLAGS)
 AC_SUBST(LDAP_INCLUDE)
 
 if test "$have_db" = "no"; then
-	echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
-	echo "!! configure WARNING:                                     !!";
-	echo "!!     No database selected! Use --with-XXX, where XXX    !!";
-	echo "!!   is your preferred database type (mysql or pgsql)     !!";
-	echo "!!   Server processes (zabbix_suckerd and zabbix_trapper) !!";
-	echo "!!   will not be created!                                 !!";
-	echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+	echo "configure: WARNING: ## ------------------------------------------------------ ##" >&2
+	echo "configure: WARNING: ## configure WARNING:                                     ##" >&2
+	echo "configure: WARNING: ##     No database selected! Use --with-XXX, where XXX    ##" >&2
+	echo "configure: WARNING: ##   is your preferred database type (mysql or pgsql)     ##" >&2
+	echo "configure: WARNING: ##   Server processes (zabbix_suckerd and zabbix_trapper) ##" >&2
+	echo "configure: WARNING: ##   will not be created!                                 ##" >&2
+	echo "configure: WARNING: ## ------------------------------------------------------ ##" >&2
 
 #	SUBDIRS="src/zabbix_agent src/zabbix_sender"
 #else
@@ -796,6 +796,7 @@ AC_SUBST(RANLIB)
 
 dnl AC_CONFIG_HEADER(include/config.h)
 
+AC_MSG_CHECKING(for architecture)
 # Cheks for host_os 
 case "$host_os" in
 linux*)
@@ -908,6 +909,7 @@ Configuration:
   Compiler:         ${CC}
   Compiler flags:   ${CFLAGS}
   Linker flags:     ${LIBS}
+  Compilation arch: ${ARCH}
 
   Enable server:    ${server}
   With database:    ${have_db}
