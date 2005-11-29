@@ -23,28 +23,27 @@ SYNOPSIS
 	uninstall.bat [ "install dir" ]
 
 DESCRIPTION
-	install.bat - installation script, which copy executiable file to 
-	"install dir", create configureation file in "config dir" with 
-	default parameters, install ZABBIX Agent as service and start service.
+	install.bat - installation script, which copies executable file to 
+	"install dir", creates configuration file in "config dir" with 
+	default parameters, installs ZABBIX Agent as a service and starts the service.
 	
-	uninstall.bat - uninstallation script, which stop ZABBIX Agent service
-	and remove servise from system. uninstall.bat DON'T remove files, you
-	must manualy remove all files.
+	uninstall.bat - uninstallation script, which stops ZABBIX Agent service
+	and removes the service from the system. uninstall.bat DON'T remove files, you
+	must manualy remove them.
 
-	NOTE: For installation scrip using file 'ZabbixW32.exe' must bee 
-	accessiable from current '.' directory.
-	For example: You may copy 'install.bat' 'uninstall.bat' and 'ZabbixW32.exe'
+	NOTE: For installation script, file 'ZabbixW32.exe' must be accessable from current '.' directory.
+	For example: You may copy 'install.bat','uninstall.bat' and 'ZabbixW32.exe'
 	in to the one directory and start intallation.
 
 OPTIONS
 	"host name"
-		ZABBIX Agent hostname which be used for active checks.
+		ZABBIX Agent unique hostname which will be used for active checks.
 
 	"server IP"
-		ZABBIX Server ip address
+		ZABBIX Server IP address
 
 	"install dir"
-		installation directory for bynary files. 
+		installation directory for binary files. 
 		Default value is %PROGRAMFILES%/zabbix
 
 	"config dir"
@@ -62,4 +61,3 @@ AUTHOR
 	Eugene Grigorjev, Nov 2005
 	eugene.grigorjev@zabbix.com
 	http://www.zabbix.com
-
