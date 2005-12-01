@@ -62,17 +62,17 @@
 			if( ($this->yaxisleft == 1) && ($this->yaxisright == 1))
 			{
 				$this->shiftXleft = 60;
-				$this->shiftXright = 80;
+				$this->shiftXright = 60;
 			}
 			else if($this->yaxisleft == 1)
 			{
 				$this->shiftXleft = 60;
-				$this->shiftXright = 35;
+				$this->shiftXright = 20;
 			}
 			else if($this->yaxisright == 1)
 			{
 				$this->shiftXleft = 10;
-				$this->shiftXright = 80;
+				$this->shiftXright = 60;
 			}
 #			$this->sizeX = $this->sizeX - $this->shiftXleft-$this->shiftXright;
 		}
@@ -163,9 +163,9 @@
 			$this->items[$this->num]["color"]="Dark Green";
 			$this->items[$this->num]["drawtype"]=GRAPH_DRAW_TYPE_LINE;
 			$this->items[$this->num]["axisside"]=$axis;
-			if($axis==0)
+			if($axis==GRAPH_YAXIS_SIDE_LEFT)
 				$this->yaxisleft=1;
-			if($axis==1)
+			if($axis==GRAPH_YAXIS_SIDE_RIGHT)
 				$this->yaxisright=1;
 			$this->num++;
 		}
@@ -218,7 +218,7 @@
 // Avoid sizeX==0, to prevent division by zero later
 			if($width>0)
 			{
-				$this->sizeX=$width;
+				$this->sizeX=$width-20;
 			}
 		}
 
@@ -246,9 +246,9 @@
 		function drawSmallRectangle()
 		{
 			DashedLine($this->im,$this->shiftXleft+1,$this->shiftY,$this->shiftXleft+1,$this->sizeY+$this->shiftY,$this->colors["Black No Alpha"]);
-			DashedLine($this->im,$this->shiftXleft+1,$this->shiftY,$this->sizeX-$this->shiftXright,$this->shiftY,$this->colors["Black No Alpha"]);
-			DashedLine($this->im,$this->sizeX-$this->shiftXright,$this->shiftY,$this->sizeX-$this->shiftXright,$this->sizeY+$this->shiftY,$this->colors["Black No Alpha"]);
-			DashedLine($this->im,$this->shiftXleft+1,$this->shiftY+$this->sizeY,$this->sizeX-$this->shiftXright,$this->sizeY+$this->shiftY,$this->colors["Black No Alpha"]);
+			DashedLine($this->im,$this->shiftXleft+1,$this->shiftY,$this->sizeX+$this->shiftXleft,$this->shiftY,$this->colors["Black No Alpha"]);
+			DashedLine($this->im,$this->sizeX+$this->shiftXleft,$this->shiftY,$this->sizeX+$this->shiftXleft,$this->sizeY+$this->shiftY,$this->colors["Black No Alpha"]);
+			DashedLine($this->im,$this->shiftXleft+1,$this->shiftY+$this->sizeY,$this->sizeX+$this->shiftXleft,$this->sizeY+$this->shiftY,$this->colors["Black No Alpha"]);
 		}
 
 		function drawRectangle()
@@ -318,12 +318,12 @@
 			$this->drawSmallRectangle();
 			for($i=1;$i<=5;$i++)
 			{
-				DashedLine($this->im,$this->shiftXleft,$i*$this->sizeY/6+$this->shiftY,$this->sizeX-$this->shiftXright,$i*$this->sizeY/6+$this->shiftY,$this->colors["Gray"]);
+				DashedLine($this->im,$this->shiftXleft,$i*$this->sizeY/6+$this->shiftY,$this->sizeX+$this->shiftXleft,$i*$this->sizeY/6+$this->shiftY,$this->colors["Gray"]);
 			}
 		
 			for($i=1;$i<=23;$i++)
 			{
-				DashedLine($this->im,$i*($this->sizeX-$this->shiftXleft-$this->shiftXright)/24+$this->shiftXleft,$this->shiftY,$i*($this->sizeX-$this->shiftXleft-$this->shiftXright)/24+$this->shiftXleft,$this->sizeY+$this->shiftY,$this->colors["Gray"]);
+				DashedLine($this->im,$i*$this->sizeX/24+$this->shiftXleft,$this->shiftY,$i*$this->sizeX/24+$this->shiftXleft,$this->sizeY+$this->shiftY,$this->colors["Gray"]);
 			}
 
 			$old_day=-1;
@@ -595,11 +595,13 @@
 
 //			$this->im = imagecreate($this->sizeX+$this->shiftX+61,$this->sizeY+2*$this->shiftY+40);
 
-#			Header( "Content-type:  text/html"); 
+//		Header( "Content-type:  text/html"); 
 			Header( "Content-type:  image/png"); 
 			Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 
 			check_authorisation();
+
+			$this->updateShifts();
 		
 			if(function_exists("ImageColorExactAlpha")&&function_exists("ImageCreateTrueColor")&&@imagecreatetruecolor(1,1))
 			{
@@ -611,7 +613,6 @@
 			}
 
 			$this->initColors();
-			$this->updateShifts();
 			$this->drawRectangle();
 			$this->drawHeader();
 
@@ -625,6 +626,9 @@
 			$this->selectData();
 
 			$this->drawGrid();
+
+//			ImageString($this->im, 0, 100, 100, $this->shiftXright, $this->colors["Red"]);
+//			ImageString($this->im, 0, 120, 120, $this->sizeX, $this->colors["Red"]);
 		
 			$maxX=900;
 			$minX=0;
@@ -693,7 +697,7 @@
 				for($i=0;$i<=6;$i++)
 				{
 					$str = str_pad(convert_units($this->sizeY*$i/6*($maxYright-$minYright)/$this->sizeY+$minYright,$this->items[0]["units"]),10," ");
-					ImageString($this->im, 1, $this->sizeX+5+$this->shiftXleft, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, $str, $this->colors["Dark Red No Alpha"]);
+					ImageString($this->im, 1, $this->sizeX+$this->shiftXleft+2, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, $str, $this->colors["Dark Red No Alpha"]);
 				}
 
 			if($this->yaxisleft == 1)
