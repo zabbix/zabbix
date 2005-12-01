@@ -204,6 +204,8 @@
 
 	function	navigation_bar_calc()
 	{
+		$workingperiod = 3600;
+
 		if(!isset($_REQUEST["period"]))	$_REQUEST["period"]=3600;
 		if(!isset($_REQUEST["from"]))	$_REQUEST["from"]=0;
 

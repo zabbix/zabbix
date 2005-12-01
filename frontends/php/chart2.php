@@ -20,7 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	include "include/classes.inc.php";
+	include "include/classes/graph.inc.php";
 
 	$graph=new Graph();
 	if(isset($_REQUEST["period"]))
