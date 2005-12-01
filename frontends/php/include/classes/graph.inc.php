@@ -246,9 +246,9 @@
 		function drawSmallRectangle()
 		{
 			DashedLine($this->im,$this->shiftXleft+1,$this->shiftY,$this->shiftXleft+1,$this->sizeY+$this->shiftY,$this->colors["Black No Alpha"]);
-			DashedLine($this->im,$this->shiftXleft+1,$this->shiftY,$this->shiftXleft+$this->sizeX,$this->shiftY,$this->colors["Black No Alpha"]);
-			DashedLine($this->im,$this->shiftXleft+$this->sizeX,$this->shiftY,$this->shiftXleft+$this->sizeX,$this->sizeY+$this->shiftY,$this->colors["Black No Alpha"]);
-			DashedLine($this->im,$this->shiftXleft+1,$this->shiftY+$this->sizeY,$this->shiftXleft+$this->sizeX,$this->sizeY+$this->shiftY,$this->colors["Black No Alpha"]);
+			DashedLine($this->im,$this->shiftXleft+1,$this->shiftY,$this->sizeX-$this->shiftXright,$this->shiftY,$this->colors["Black No Alpha"]);
+			DashedLine($this->im,$this->sizeX-$this->shiftXright,$this->shiftY,$this->sizeX-$this->shiftXright,$this->sizeY+$this->shiftY,$this->colors["Black No Alpha"]);
+			DashedLine($this->im,$this->shiftXleft+1,$this->shiftY+$this->sizeY,$this->sizeX-$this->shiftXright,$this->sizeY+$this->shiftY,$this->colors["Black No Alpha"]);
 		}
 
 		function drawRectangle()
@@ -318,12 +318,12 @@
 			$this->drawSmallRectangle();
 			for($i=1;$i<=5;$i++)
 			{
-				DashedLine($this->im,$this->shiftXleft,$i*$this->sizeY/6+$this->shiftY,$this->sizeX+$this->shiftXleft,$i*$this->sizeY/6+$this->shiftY,$this->colors["Gray"]);
+				DashedLine($this->im,$this->shiftXleft,$i*$this->sizeY/6+$this->shiftY,$this->sizeX-$this->shiftXright,$i*$this->sizeY/6+$this->shiftY,$this->colors["Gray"]);
 			}
 		
 			for($i=1;$i<=23;$i++)
 			{
-				DashedLine($this->im,$i*$this->sizeX/24+$this->shiftXleft,$this->shiftY,$i*$this->sizeX/24+$this->shiftXleft,$this->sizeY+$this->shiftY,$this->colors["Gray"]);
+				DashedLine($this->im,$i*($this->sizeX-$this->shiftXleft-$this->shiftXright)/24+$this->shiftXleft,$this->shiftY,$i*($this->sizeX-$this->shiftXleft-$this->shiftXright)/24+$this->shiftXleft,$this->sizeY+$this->shiftY,$this->colors["Gray"]);
 			}
 
 			$old_day=-1;
