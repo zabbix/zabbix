@@ -82,6 +82,7 @@
 	define("ITEM_VALUE_TYPE_FLOAT",0);
 	define("ITEM_VALUE_TYPE_STR",1);
 	define("ITEM_VALUE_TYPE_LOG",2);
+	define("ITEM_VALUE_TYPE_UINT64",3);
 
 	define("ITEM_STATUS_ACTIVE",0);
 	define("ITEM_STATUS_DISABLED",1);
