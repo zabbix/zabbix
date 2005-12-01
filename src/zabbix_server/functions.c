@@ -573,40 +573,34 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 	char	sql[MAX_STRING_LEN];
 	int ret = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In add_history(%d,%X)", item->itemid, value->type);
+	zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,%X)", item->itemid, value->type);
 
 	if(value->type & AR_UINT64)
-		zabbix_log( LOG_LEVEL_WARNING, "In add_history(%d,UINT64:" ZBX_FS_UI64 ")", item->itemid, value->ui64);
+		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,UINT64:" ZBX_FS_UI64 ")", item->itemid, value->ui64);
 	if(value->type & AR_STRING)
-		zabbix_log( LOG_LEVEL_WARNING, "In add_history(%d,STRING:%s)", item->itemid, value->str);
+		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,STRING:%s)", item->itemid, value->str);
 	if(value->type & AR_DOUBLE)
-		zabbix_log( LOG_LEVEL_WARNING, "In add_history(%d,DOUBLE:" ZBX_FS_DBL ")", item->itemid, value->dbl);
+		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,DOUBLE:" ZBX_FS_DBL ")", item->itemid, value->dbl);
 
 	if(item->history>0)
 	{
-zabbix_log( LOG_LEVEL_WARNING, "history>0");
 		if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) || (item->value_type==ITEM_VALUE_TYPE_UINT64))
 		{
-zabbix_log( LOG_LEVEL_WARNING, "2");
 			/* Should we store delta or original value? */
 			if(item->delta == ITEM_STORE_AS_IS)
 			{
-zabbix_log( LOG_LEVEL_WARNING, "3");
 				if(value->type & AR_UINT64)
 				{
-zabbix_log( LOG_LEVEL_WARNING, "4");
 					DBadd_history_uint(item->itemid,value->ui64,now);
 				}
 				if(value->type & AR_DOUBLE)
 				{
-zabbix_log( LOG_LEVEL_WARNING, "5");
 					DBadd_history(item->itemid,value->dbl,now);
 				}
 			}
 			/* Delta as speed of change */
 			else if(item->delta == ITEM_STORE_SPEED_PER_SECOND)
 			{
-zabbix_log( LOG_LEVEL_WARNING, "6");
 				/* Save delta */
 				if(value->type & AR_DOUBLE)
 					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value->dbl))
@@ -643,13 +637,11 @@ zabbix_log( LOG_LEVEL_WARNING, "6");
 		}
 		else if(item->value_type==ITEM_VALUE_TYPE_STR)
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "7");
 			if(value->type & AR_STRING)
 				DBadd_history_str(item->itemid,value->str,now);
 		}
 		else if(item->value_type==ITEM_VALUE_TYPE_LOG)
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "8");
 			if(value->type & AR_STRING)
 				DBadd_history_log(item->itemid,value->str,now,item->timestamp,item->eventlog_source,item->eventlog_severity);
 			snprintf(sql,sizeof(sql)-1,"update items set lastlogsize=%d where itemid=%d",item->lastlogsize,item->itemid);
@@ -661,7 +653,7 @@ zabbix_log( LOG_LEVEL_WARNING, "6");
 		}
 	}
 
-	zabbix_log( LOG_LEVEL_WARNING, "End of add_history");
+	zabbix_log( LOG_LEVEL_DEBUG, "End of add_history");
 
 	return ret;
 }
