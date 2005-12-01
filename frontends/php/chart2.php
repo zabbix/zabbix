@@ -72,10 +72,9 @@
 
 	while($row=DBfetch($result))
 	{
-		$graph->addItem($row["itemid"]);
+		$graph->addItem($row["itemid"], $row["yaxisside"]);
 		$graph->setColor($row["itemid"], $row["color"]);
 		$graph->setDrawtype($row["itemid"], $row["drawtype"]);
-		$graph->setYAxisSide($row["itemid"], $row["yaxisside"]);
 	}
 
 	$graph->Draw();
