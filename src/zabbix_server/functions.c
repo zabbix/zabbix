@@ -589,11 +589,11 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 			/* Should we store delta or original value? */
 			if(item->delta == ITEM_STORE_AS_IS)
 			{
-				if(value->type & AR_UINT64)
+				if( (item->value_type==ITEM_VALUE_TYPE_UINT64) && (value->type & AR_UINT64))
 				{
 					DBadd_history_uint(item->itemid,value->ui64,now);
 				}
-				if(value->type & AR_DOUBLE)
+				if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_DOUBLE))
 				{
 					DBadd_history(item->itemid,value->dbl,now);
 				}
@@ -602,12 +602,12 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 			else if(item->delta == ITEM_STORE_SPEED_PER_SECOND)
 			{
 				/* Save delta */
-				if(value->type & AR_DOUBLE)
+				if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_DOUBLE))
 					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value->dbl))
 					{
 						DBadd_history(item->itemid, (value->dbl - item->prevorgvalue)/(now-item->lastclock), now);
 					}
-				if(value->type & AR_UINT64)
+				if((item->value_type==ITEM_VALUE_TYPE_UINT64) && (value->type & AR_UINT64))
 					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value->ui64))
 					{
 						DBadd_history_uint(item->itemid, (zbx_uint64_t)(value->ui64 - item->prevorgvalue)/(now-item->lastclock), now);
@@ -617,12 +617,12 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 			else if(item->delta == ITEM_STORE_SIMPLE_CHANGE)
 			{
 				/* Save delta */
-				if(value->type & AR_DOUBLE)
+				if((item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_DOUBLE))
 					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value->dbl) )
 					{
 						DBadd_history(item->itemid, (value->dbl - item->prevorgvalue), now);
 					}
-				if(value->type & AR_UINT64)
+				if((item->value_type==ITEM_VALUE_TYPE_UINT64) && (value->type & AR_UINT64))
 					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value->ui64) )
 					{
 						DBadd_history_uint(item->itemid, (value->ui64 - item->prevorgvalue), now);
