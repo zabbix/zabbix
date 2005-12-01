@@ -1,5 +1,6 @@
 Changes for 1.1beta3:
 
+ - double sided graphs (Alexei)
  - added "SET_<TYPE>_RESULT" macross (Eugene)
  - new W32 un/install floppy. (Eugene)
  - added script for GUI regression testing (Alexei)
