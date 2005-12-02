@@ -23,8 +23,8 @@ do
     test )    dotest="yes";;
     tar )     tgz="yes";;
     nocat )   docat="no";;
-    --enable-* ) config_param="$config_param %cmd";; 
-    --with-* ) config_param="$config_param %cmd";;
+    --enable-* ) config_param="$config_param $cmd";; 
+    --with-* ) config_param="$config_param $cmd";;
     * ) 
         echo "$0: ERROR: uncnown parameter \"$cmd\""; 
         echo
