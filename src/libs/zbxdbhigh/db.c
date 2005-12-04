@@ -1414,6 +1414,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_RESULT *result, int row)
 	item->snmpv3_privpassphrase = DBget_field(result,i,28);
 	item->formula = DBget_field(result,i,29);
 	item->host_available=atoi(DBget_field(result,i,30));
+	item->status=atoi(DBget_field(result,i,31));
 }
 
 int     DBget_default_escalation_id()

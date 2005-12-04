@@ -362,7 +362,7 @@ void	init_config(void)
 
 	DBconnect();
 
-	snprintf(sql,sizeof(sql)-1,"select refresh_usupported from config");
+	snprintf(sql,sizeof(sql)-1,"select refresh_unsupported from config");
 	result = DBselect(sql);
 
 	if(DBnum_rows(result)==1)
