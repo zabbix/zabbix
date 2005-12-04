@@ -450,8 +450,8 @@
 			}
 		}
 
-// Calculation of maximum Y right side
-		function calculateMaxYright()
+// Calculation of maximum Y of a side (left/right)
+		function calculateMaxY($side)
 		{
 			if($this->yaxistype==GRAPH_YAXIS_TYPE_FIXED)
 			{
@@ -462,62 +462,17 @@
 				unset($maxY);
 				for($i=0;$i<$this->num;$i++)
 				{
-					if($this->items[$i]["axisside"] != GRAPH_YAXIS_SIDE_RIGHT)	continue;
+					if($this->items[$i]["axisside"] != $side)	continue;
 					if(!isset($maxY)&&(isset($this->max[$i])))
 					{
 						if(count($this->max[$i])>0)
 						{
-							$maxY=max($this->max[$i]);
+							$maxY=max($this->avg[$i]);
 						}
 					}
 					else
 					{
-						$maxY=@iif($maxY<max($this->max[$i]),max($this->max[$i]),$maxY);
-					}
-				}
-	
-				if(isset($maxY)&&($maxY>0))
-				{
-					$exp = floor(log10($maxY));
-					$mant = $maxY/pow(10,$exp);
-				}
-				else
-				{
-					$exp=0;
-					$mant=0;
-				}
-	
-				$mant=(floor($mant*1.1*10/6)+1)*6/10;
-	
-				$maxY = $mant*pow(10,$exp);
-	
-				return $maxY;
-			}
-		}
-
-// Calculation of maximum Y left side
-		function calculateMaxYleft()
-		{
-			if($this->yaxistype==GRAPH_YAXIS_TYPE_FIXED)
-			{
-				return $this->yaxismax;
-			}
-			else
-			{
-				unset($maxY);
-				for($i=0;$i<$this->num;$i++)
-				{
-					if($this->items[$i]["axisside"] != GRAPH_YAXIS_SIDE_LEFT)	continue;
-					if(!isset($maxY)&&(isset($this->max[$i])))
-					{
-						if(count($this->max[$i])>0)
-						{
-							$maxY=max($this->max[$i]);
-						}
-					}
-					else
-					{
-						$maxY=@iif($maxY<max($this->max[$i]),max($this->max[$i]),$maxY);
+						$maxY=@iif($maxY<max($this->avg[$i]),max($this->avg[$i]),$maxY);
 					}
 				}
 	
@@ -637,8 +592,8 @@
 
 			$minYleft=$this->calculateMinYleft();
 			$minYright=$this->calculateMinYright();
-			$maxYleft=$this->calculateMaxYleft();
-			$maxYright=$this->calculateMaxYright();
+			$maxYleft=$this->calculateMaxY(GRAPH_YAXIS_SIDE_LEFT);
+			$maxYright=$this->calculateMaxY(GRAPH_YAXIS_SIDE_RIGHT);
 
 			// For each metric
 			for($item=0;$item<$this->num;$item++)
