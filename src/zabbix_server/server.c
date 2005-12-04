@@ -92,6 +92,9 @@ char	*CONFIG_DBPASSWORD		= NULL;
 char	*CONFIG_DBSOCKET		= NULL;
 int	CONFIG_DBPORT			= 3306;
 
+/* From table config */
+int	CONFIG_REFRESH_UNSUPPORTED	= 0;
+
 /******************************************************************************
  *                                                                            *
  * Function: uninit                                                           *
@@ -329,6 +332,9 @@ void	init_config(void)
 		{0}
 	};
 
+	char sql[MAX_STRING_LEN];
+	DB_RESULT	*result;
+
 	if(CONFIG_FILE == NULL)
 	{
 		CONFIG_FILE=strdup("/etc/zabbix/zabbix_server.conf");
@@ -352,6 +358,16 @@ void	init_config(void)
 	if(CONFIG_FPING_LOCATION == NULL)
 	{
 		CONFIG_FPING_LOCATION=strdup("/usr/sbin/fping");
+	}
+
+	DBconnect();
+
+	snprintf(sql,sizeof(sql)-1,"select refresh_usupported from config");
+	result = DBselect(sql);
+
+	if(DBnum_rows(result)==1)
+	{
+		CONFIG_REFRESH_UNSUPPORTED = atoi(DBget_field(result,0,0));
 	}
 }
 
@@ -498,7 +514,8 @@ int main(int argc, char **argv)
 	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABBIX %s.", ZABBIX_VERSION);
 
 /* Need to set trigger status to UNKNOWN since last run */
-	DBconnect();
+/* DBconnect() already made in init_config() */
+/*	DBconnect();*/
 	DBupdate_triggers_status_after_restart();
 
 /*#define CALC_TREND*/

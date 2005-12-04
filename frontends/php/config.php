@@ -87,7 +87,7 @@
 	{
 		if($_REQUEST["register"]=="update")
 		{
-			$result=update_config($_REQUEST["alarm_history"],$_REQUEST["alert_history"]);
+			$result=update_config($_REQUEST["alarm_history"],$_REQUEST["alert_history"],$_REQUEST["refresh_unsupported"]);
 			show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
 			if($result)
 			{
@@ -223,6 +223,7 @@
 	$h2=$h2.form_select("config",2,S_ESCALATION_RULES);
 	$h2=$h2.form_select("config",3,S_IMAGES);
 	$h2=$h2.form_select("config",4,S_AUTOREGISTRATION);
+	$h2=$h2.form_select("config",5,S_OTHER);
 	$h2=$h2."</select>";
 
 	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"config.php\">", "</form>");
@@ -241,6 +242,7 @@
 
 		show_table2_v_delimiter($col++);
 		echo "<form method=\"get\" action=\"config.php\">";
+		echo "<input type=\"hidden\" name=\"refresh_unsupported\" value=\"".$config["refresh_unsupported"]."\">";
 		echo nbsp(S_DO_NOT_KEEP_ACTIONS_OLDER_THAN);
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"alert_history\" value=\"".$config["alert_history"]."\" size=8>";
@@ -249,6 +251,31 @@
 		echo nbsp(S_DO_NOT_KEEP_EVENTS_OLDER_THAN);
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"alarm_history\" value=\"".$config["alarm_history"]."\" size=8>";
+
+		show_table2_v_delimiter2();
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
+
+		show_table2_header_end();
+	}
+?>
+
+<?php
+	if($_REQUEST["config"]==5)
+	{
+		$config=select_config();
+
+		$col=0;
+		show_form_begin("config.other");
+		echo S_OTHER_PARAMETERS;
+
+		show_table2_v_delimiter($col++);
+		echo "<form method=\"get\" action=\"config.php\">";
+		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"5\" size=8>";
+		echo "<input type=\"hidden\" name=\"alert_history\" value=\"".$config["alert_history"]."\">";
+		echo "<input type=\"hidden\" name=\"alarm_history\" value=\"".$config["alarm_history"]."\">";
+		echo nbsp(S_REFRESH_UNSUPPORTED_ITEMS);
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"refresh_unsupported\" value=\"".$config["refresh_unsupported"]."\" size=8>";
 
 		show_table2_v_delimiter2();
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";

@@ -4,6 +4,34 @@
 
 /******************************************************************************
  *                                                                            *
+ * Function: calculate_item_nextcheck                                         *
+ *                                                                            *
+ * Purpose: calculate nextcheck timespamp for item                            *
+ *                                                                            *
+ * Parameters: delay - item's refresh rate in sec                             *
+ *             now - current timestamp                                        *
+ *                                                                            *
+ * Return value: nextcheck value                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: Old algorithm: now+delay                                         *
+ *           New one: preserve period, if delay==5, nextcheck = 0,5,10,15,... *
+ *                                                                            *
+ ******************************************************************************/
+int	calculate_item_nextcheck(int delay, int now)
+{
+	int i;
+
+	i=delay*(int)(now/delay);
+
+	while(i<=now)	i+=delay;
+
+	return i;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: cmp_double                                                       *
  *                                                                            *
  * Purpose: compares two float values                                         *

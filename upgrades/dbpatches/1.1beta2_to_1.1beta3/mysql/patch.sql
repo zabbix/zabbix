@@ -13,3 +13,4 @@ CREATE TABLE history_uint (
 ) type=InnoDB;
 
 alter table graphs_items add  yaxisside		int(1)		DEFAULT '1' NOT NULL;
+alter table config add refresh_unsupported  int(4)          DEFAULT '600' NOT NULL;

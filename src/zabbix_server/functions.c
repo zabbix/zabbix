@@ -54,34 +54,6 @@ extern int autoregister(char *server);
 
 /******************************************************************************
  *                                                                            *
- * Function: calculate_item_nextcheck                                         *
- *                                                                            *
- * Purpose: calculate nextcheck timespamp for item                            *
- *                                                                            *
- * Parameters: delay - item's refresh rate in sec                             *
- *             now - current timestamp                                        *
- *                                                                            *
- * Return value: nextcheck value                                              *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: Old algorithm: now+delay                                         *
- *           New one: preserve period, if delay==5, nextcheck = 0,5,10,15,... *
- *                                                                            *
- ******************************************************************************/
-int	calculate_item_nextcheck(int delay, int now)
-{
-	int i;
-
-	i=delay*(int)(now/delay);
-
-	while(i<=now)	i+=delay;
-
-	return i;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: update_functions                                                 *
  *                                                                            *
  * Purpose: re-calculate and updates values of functions related to the item  *
@@ -760,6 +732,16 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, int now)
 		item->lastvalue_null=0;
 	}
 	DBexecute(sql);
+
+/* Update item status if required */
+	if(item->status == ITEM_STATUS_NOTSUPPORTED)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Parameter [%s] became supported by agent on host [%s]", item->key, item->host );
+		zabbix_syslog("Parameter [%s] became supported by agent on host [%s]", item->key, item->host );
+		item->status = ITEM_STATUS_ACTIVE;
+		snprintf(sql,sizeof(sql)-1,"update items set status=%d where itemid=%d", ITEM_STATUS_ACTIVE, item->itemid);
+		DBexecute(sql);
+	}
 
 	return ret;
 }

@@ -226,6 +226,9 @@
 	"S_AUTOREGISTRATION_WAS_NOT_UPDATED"=>	"Autoregistration was not updated",
 	"S_AUTOREGISTRATION_DELETED"=>		"Autoregistration deleted",
 	"S_AUTOREGISTRATION_WAS_NOT_DELETED"=>	"Autoregistration was not deleted",
+	"S_OTHER"=>				"Other",
+	"S_OTHER_PARAMETERS"=>			"Other parameters",
+	"S_REFRESH_UNSUPPORTED_ITEMS"=>		"Refresh unsupported items (in sec)",
 
 //	Latest values
 	"S_LATEST_VALUES"=>			"Latest values",
