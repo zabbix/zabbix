@@ -74,19 +74,26 @@ def DBGetID(table, condition, column):
 
 	return row[0]
 
+def header(msg):
+	print msg.ljust(80,"-")
+
 def GUI_Login():
-###	print "GUI_Login"
+	header("GUI_Login")
+
 	TestGUI('Logging in', "index.php", "name=Admin&register=Enter&password=", "disconnect")
 	TestDBCount("sessions","1=1", 1)
 	TestGUI('Logging out', "index.php", "reconnect=1", "Login name")
 	TestDBCount("sessions","1=1", 0)
 
 def GUI_Config_General_Housekeeper():
-###	print "GUI_Config_General_Mediatype"
+	header("GUI_Config_General_Mediatype")
+
 	TestGUI('General->Housekeeper', "config.php", "alert_history=33&alarm_history=44&refresh_unsupported=123&register=update", "Configuration updated")
 	TestDBCount("config","alert_history=33 and alarm_history=44 and refresh_unsupported=123", 1)
 
 def GUI_Config_General_Mediatype_Email():
+	header("GUI_Config_General_Mediatype_Email")
+
 	TestGUI('General->Media type->Add (email)', "config.php", "config=1&description=Zzz&type=0&exec_path=&smtp_server=localhost&smtp_helo=localhost&smtp_email=zabbix%40localhost&register=add", "Added new media type")
 	TestDBCount("media_type","description='Zzz' and type=0", 1)
 	mediatypeid = DBGetID("media_type","description='Zzz'", "mediatypeid")
@@ -98,6 +105,8 @@ def GUI_Config_General_Mediatype_Email():
 	TestDBCount("media_type","description='Zzz2'", 0)
 
 def GUI_Config_General_Mediatype_Script():
+	header("GUI_Config_General_Mediatype_Script")
+
 	TestGUI('General->Media type->Add (script)', "config.php", "config=1&description=SMS&type=1&smtp_server=localhost&smtp_helo=localhost&smtp_email=zabbix%40localhost&exec_path=sms.pl&register=add", "Added new media type")
 	TestDBCount("media_type","description='SMS' and type=1", 1)
 	mediatypeid = DBGetID("media_type","description='SMS'", "mediatypeid")
@@ -109,7 +118,8 @@ def GUI_Config_General_Mediatype_Script():
 	TestDBCount("media_type","description='Zzz2'", 0)
 
 def GUI_Config_General_Autoregistration():
-###	print "GUI_Config_Autoregistration"
+	header("GUI_Config_Autoregistration")
+
 	TestGUI('Hosts->Add', "hosts.php", "host=regression&newgroup=&useip=on&ip=127.0.0.1&port=10050&status=0&host_templateid=0&register=add#form", "Host added")
 	TestDBCount("hosts","host='regression'", 1)
 	hostid = DBGetID("hosts","host='regression'", "hostid")
@@ -128,12 +138,14 @@ def GUI_Config_General_Autoregistration():
 	TestDBCount("hosts","status=4 and hostid="+str(hostid), 1)
 
 def GUI_Config_General_Mediatype():
-###	print "GUI_Config_General_Mediatype"
+	header("GUI_Config_General_Mediatype")
+
 	GUI_Config_General_Mediatype_Email()
 	GUI_Config_General_Mediatype_Script()
 
 def GUI_Config_Users():
-###	print "GUI_Config_Users"
+	header("GUI_Config_Users")
+
 	TestGUI('Users->Add', "users.php", "config=0&alias=Regression&name=Name&surname=Surname&password1=password&password2=password&lang=en_gb&autologout=123&url=zabbix&refresh=34&register=add", "User added")
 	TestDBCount("users","alias='Regression' and name='Name' and surname='Surname' and passwd='5f4dcc3b5aa765d61d8327deb882cf99' and url='zabbix' and autologout=123 and lang='en_gb' and refresh=34", 1)
 	id = DBGetID("users","alias='Regression'", "userid")
@@ -145,7 +157,8 @@ def GUI_Config_Users():
 	TestDBCount("users","userid="+str(id), 0)
 
 def GUI_Config_Media():
-###	print "GUI_Config_Media"
+	header("GUI_Config_Media")
+
 	TestGUI('Users->Add', "users.php", "config=0&alias=Regression&name=Name&surname=Surname&password1=password&password2=password&lang=en_gb&autologout=123&url=zabbix&refresh=34&register=add", "User added")
 	TestDBCount("users","alias='Regression' and name='Name' and surname='Surname' and passwd='5f4dcc3b5aa765d61d8327deb882cf99' and url='zabbix' and autologout=123 and lang='en_gb' and refresh=34", 1)
 	userid = DBGetID("users","alias='Regression'", "userid")
@@ -161,7 +174,8 @@ def GUI_Config_Media():
 	TestDBCount("media","mediaid="+str(mediaid),0)
 
 def GUI_Config_Hosts():
-###	print "GUI_Config_Hosts"
+	header("GUI_Config_Hosts")
+
 	TestGUI('Hosts->Add', "hosts.php", "host=regression&newgroup=&useip=on&ip=127.0.0.1&port=10050&status=0&host_templateid=0&register=add#form", "Host added")
 	TestDBCount("hosts","host='regression'", 1)
 	hostid = DBGetID("hosts","host='regression'", "hostid")
@@ -173,7 +187,8 @@ def GUI_Config_Hosts():
 	TestDBCount("hosts","status=4 and hostid="+str(hostid), 1)
 
 def GUI_Config_Hosts_Groups():
-###	print "GUI_Config_Hosts_Groups"
+	header("GUI_Config_Hosts_Groups")
+
 	TestGUI('Hosts->Host groups->Add', "hosts.php", "name=Regression&register=add+group", "Group added")
 	TestDBCount("groups","name='Regression'", 1)
 	id = DBGetID("groups","name='regression'", "groupid")
@@ -185,6 +200,8 @@ def GUI_Config_Hosts_Groups():
 	TestDBCount("groups","name='Regression'", 0)
 
 def GUI_Config_Hosts_Template_Linkage():
+	header("GUI_Config_Hosts_Template_Linkage")
+
 	TestGUI('Hosts->Add', "hosts.php", "host=regression3&newgroup=&useip=on&ip=127.0.0.1&port=10050&status=0&host_templateid=0&register=add#form", "Host added")
 	TestDBCount("hosts","host='regression3'", 1)
 	hostid = DBGetID("hosts","host='regression3'", "hostid")
@@ -203,7 +220,8 @@ def GUI_Config_Hosts_Template_Linkage():
 	TestDBCount("hosts","status=4 and hostid="+str(hostid), 1)
 
 def GUI_Config_Items():
-###	print "GUI_Config_Items"
+	header("GUI_Config_Items")
+
 	TestGUI('Hosts->Add', "hosts.php", "host=regression&newgroup=&useip=on&ip=127.0.0.1&port=10050&status=0&host_templateid=0&register=add#form", "Host added")
 	TestDBCount("hosts","host='regression'", 1)
 	hostid = DBGetID("hosts","host='regression'", "hostid")
@@ -228,20 +246,25 @@ def GUI_Config_Items():
 	TestDBCount("hosts","status=4 and hostid="+str(hostid), 1)
 
 def GUI_Config_Maps():
-###	print "GUI_Config_Maps"
+	header("GUI_Config_Maps")
+
 	TestGUI('Configuration->Maps->Add', "sysmaps.php", "name=Regression&width=800&height=600&background=&label_type=0&register=add", "Network map added")
 	TestGUI('Maps->Add (duplicate)', "sysmaps.php", "name=Regression&width=800&height=600&background=&label_type=0&register=add", "Cannot add network map")
 	TestGUI('Maps->Delete', "sysmaps.php", "sysmapid=1&name=Regression&width=800&height=600&background=&label_type=0&register=delete", "Network map deleted")
 
-def GUI_Config_Maps():
-###	print "GUI_Config_Maps"
-	TestGUI('Maps->Add', "graphs.php", "name=Regression&width=900&height=200&yaxistype=0&yaxismin=0&yaxismax=100&register=add", "Graph added")
+def GUI_Config_Graphs():
+	header("GUI_Config_Graphs")
+
+	TestGUI('Graphs->Add', "graphs.php", "name=Regression&width=900&height=200&yaxistype=0&yaxismin=0&yaxismax=100&register=add", "Graph added")
 	TestDBCount("graphs","name='Regression'", 1)
-	TestGUI('Maps->Delete', "graphs.php", "graphid=1&name=Regression&width=900&height=200&yaxistype=0&yaxismin=0.0000&yaxismax=100.0000&register=delete", "Graph deleted")
-	TestDBCount("graphs","name='Regression'", 0)
+	graphid = DBGetID("graphs","name='Regression'", "graphid")
+
+	TestGUI('Graphs->Delete', "graphs.php", "graphid="+str(graphid)+"&register=delete", "Graph deleted")
+	TestDBCount("graphs","graphid="+str(graphid), 0)
 
 def GUI_Config_Screens():
-###	print "GUI_Config_Screens"
+	header("GUI_Config_Screens")
+
 	TestGUI('Screens->Add', "screenconf.php", "name=Regression&cols=2&rows=2&register=add", "Screen added")
 	TestDBCount("screens","name='Regression'", 1)
 	id = DBGetID("screens","name='Regression'", "screenid")
@@ -252,8 +275,23 @@ def GUI_Config_Screens():
 	TestGUI('Screens->Delete', "screenconf.php", "screenid="+str(id)+"&name=Regression&cols=2&rows=2&register=delete", "Screen deleted")
 	TestDBCount("screens","screenid="+str(id), 0)
 
+def GUI_Config_Screen_Elements():
+	header("GUI_Config_Screens")
+
+	TestGUI('Screens->Add', "screenconf.php", "name=Regression&cols=1&rows=1&register=add", "Screen added")
+	TestDBCount("screens","name='Regression'", 1)
+	screenid = DBGetID("screens","name='Regression'", "screenid")
+
+	TestGUI('Screens->Element->Show', "screenedit.php", "screenid="+str(screenid), "Empty")
+	TestGUI('Screens->Element->Screen cell configuration', "screenedit.php", "register=edit&screenid="+str(screenid)+"&x=0&y=0", "Screen cell configuration")
+	TestGUI('Screens->Element->Screen cell configuration', "screenedit.php", "resource=0&register=edit&screenid="+str(screenid)+"&x=0&y=0", "Graph&nbsp;name")
+	TestGUI('Screens->Element->Screen cell configuration', "screenedit.php", "resource=1&register=edit&screenid="+str(screenid)+"&x=0&y=0", "Parameter")
+	TestGUI('Screens->Element->Screen cell configuration', "screenedit.php", "resource=2&register=edit&screenid="+str(screenid)+"&x=0&y=0", "Map")
+	TestGUI('Screens->Element->Screen cell configuration', "screenedit.php", "resource=3&register=edit&screenid="+str(screenid)+"&x=0&y=0", "Parameter")
+
 def GUI_Config_Services():
-###	print "GUI_Config_Services"
+	header("GUI_Config_Services")
+
 	TestGUI('Service->Add', "services.php", "name=IT+Services&algorithm=1&showsla=on&goodsla=99.05&groupid=0&hostid=0&sortorder=0&register=add&softlink=true", "Service added")
 	TestDBCount("services","name='IT Services'", 1)
 	id = DBGetID("services","name='IT Services'", "serviceid")
@@ -265,7 +303,8 @@ def GUI_Config_Services():
 	TestDBCount("services","serviceid="+str(id), 0)
 
 def GUI_Config_Triggers():
-###	print "GUI_Config_Triggers"
+	header("GUI_Config_Triggers")
+
 	TestGUI('Hosts->Add', "hosts.php", "host=regression&newgroup=&useip=on&ip=127.0.0.1&port=10050&status=0&host_templateid=0&register=add#form", "Host added")
 	TestDBCount("hosts","host='regression'", 1)
 	hostid = DBGetID("hosts","host='regression'", "hostid")
@@ -303,5 +342,7 @@ GUI_Config_Hosts_Template_Linkage()
 GUI_Config_Items()
 GUI_Config_Triggers()
 GUI_Config_Maps()
+GUI_Config_Graphs()
 GUI_Config_Screens()
+GUI_Config_Screen_Elements()
 GUI_Config_Services()
