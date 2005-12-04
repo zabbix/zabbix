@@ -1915,7 +1915,7 @@ echo "</head>";
 	# Update configuration
 
 //	function	update_config($smtp_server,$smtp_helo,$smtp_email,$alarm_history,$alert_history)
-	function	update_config($alarm_history,$alert_history)
+	function	update_config($alarm_history,$alert_history,$refresh_unsupported)
 	{
 		if(!check_right("Configuration of Zabbix","U",0))
 		{
@@ -1925,7 +1925,7 @@ echo "</head>";
 
 
 //		$sql="update config set smtp_server='$smtp_server',smtp_helo='$smtp_helo',smtp_email='$smtp_email',alarm_history=$alarm_history,alert_history=$alert_history";
-		$sql="update config set alarm_history=$alarm_history,alert_history=$alert_history";
+		$sql="update config set alarm_history=$alarm_history,alert_history=$alert_history,refresh_unsupported=$refresh_unsupported";
 		return	DBexecute($sql);
 	}
 

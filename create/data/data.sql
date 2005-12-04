@@ -21,7 +21,7 @@
 -- Dumping data for table `config`
 --
 
-INSERT INTO config VALUES (365,365);
+INSERT INTO config VALUES (365,365,600);
 
 --
 -- Dumping data for table `media_type`
