@@ -96,7 +96,8 @@ CREATE TABLE config (
 --  smtp_email		varchar(255)	DEFAULT '' NOT NULL,
 --  password_required	int4		DEFAULT '0' NOT NULL,
   alert_history		int4		DEFAULT '0' NOT NULL,
-  alarm_history		int4		DEFAULT '0' NOT NULL
+  alarm_history		int4		DEFAULT '0' NOT NULL,
+  refresh_unsupported	int4		DEFAULT '0' NOT NULL
 );
 
 --

@@ -1,6 +1,8 @@
 Changes for 1.1beta3:
 
- - addeed housekeeping for history_uint (Alexei)
+ - automatic recovery of unsupported items (Alexei)
+ - added config.refresh_unsupported (Alexei)
+ - added housekeeping for history_uint (Alexei)
  - double sided graphs (Alexei)
  - added "SET_<TYPE>_RESULT" macross (Eugene)
  - new W32 un/install floppy. (Eugene)
