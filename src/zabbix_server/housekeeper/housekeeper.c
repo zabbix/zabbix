@@ -248,6 +248,14 @@ static int housekeeping_history_and_trends(int now)
 #endif
 		DBexecute(sql);
 
+/* Delete HISTORY_UINT */
+#ifdef HAVE_MYSQL
+		snprintf(sql,sizeof(sql)-1,"delete from history_uint where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
+#else
+		snprintf(sql,sizeof(sql)-1,"delete from history_uint where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
+#endif
+		DBexecute(sql);
+
 /* Delete HISTORY_STR */
 #ifdef HAVE_MYSQL
 		snprintf(sql,sizeof(sql)-1,"delete from history_str where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
