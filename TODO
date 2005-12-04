@@ -1,7 +1,6 @@
 1.1beta3:
 
  - fix undeleted warnings for host and trigger statuses
- - change DOUBLE to UINT64 where required
  - make agents return error message if not supported or not available
  - centralised management of agent configuration files
  - escalations
