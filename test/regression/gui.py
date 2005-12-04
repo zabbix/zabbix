@@ -37,6 +37,10 @@ def TestGUI(name, page, gets, expect):
 		print '\tGUI: NOT OK'
 ###	else:
 ###		print '\tGUI: OK'
+	p = re.compile('.*Undefined variable.*', re.DOTALL)
+	m = p.match(data)
+	if m:
+		print '\tWARNING: Undefined variable'
 	conn.close()
 
 def InitDB():
@@ -79,8 +83,8 @@ def GUI_Login():
 
 def GUI_Config_General_Housekeeper():
 ###	print "GUI_Config_General_Mediatype"
-	TestGUI('General->Housekeeper', "config.php", "alert_history=360&alarm_history=360&register=update", "Configuration updated")
-	TestDBCount("config","alert_history=360 and alarm_history=360", 1)
+	TestGUI('General->Housekeeper', "config.php", "alert_history=33&alarm_history=44&refresh_unsupported=123&register=update", "Configuration updated")
+	TestDBCount("config","alert_history=33 and alarm_history=44 and refresh_unsupported=123", 1)
 
 def GUI_Config_General_Mediatype_Email():
 	TestGUI('General->Media type->Add (email)', "config.php", "config=1&description=Zzz&type=0&exec_path=&smtp_server=localhost&smtp_helo=localhost&smtp_email=zabbix%40localhost&register=add", "Added new media type")
