@@ -1,5 +1,6 @@
 1.1beta3:
 
+ - When adding plain text into a screen, allow for the number of entries displayed to be set. For example, I do not need to see the past 25 records of my uptime, host information, or Zabbix agent version.
  - fix undeleted warnings for host and trigger statuses
  - make agents return error message if not supported or not available
  - centralised management of agent configuration files
