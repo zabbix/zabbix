@@ -1,5 +1,6 @@
 Changes for 1.1beta3:
 
+ - improved support vfs.file.time[filename,<access|modify|change>] (Eugene)
  - calculate MAX of Y axis based on average values (Alexei)
  - automatic recovery of unsupported items (Alexei)
  - added config.refresh_unsupported (Alexei)

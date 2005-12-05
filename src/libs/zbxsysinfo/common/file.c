@@ -50,16 +50,18 @@ int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	return	SYSINFO_RET_FAIL;
 }
 
-int	VFS_FILE_ATIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+int	VFS_FILE_TIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct stat	buf;
 	char    filename[MAX_STRING_LEN];
+	char    type[MAX_STRING_LEN];
+	int	ret = SYSINFO_RET_FAIL;
 
         assert(result);
 
         init_result(result);
 
-        if(num_param(param) > 1)
+        if(num_param(param) > 2)
         {
                 return SYSINFO_RET_FAIL;
         }
@@ -69,66 +71,35 @@ int	VFS_FILE_ATIME(const char *cmd, const char *param, unsigned flags, AGENT_RES
                 return SYSINFO_RET_FAIL;
         }
 	
-	if(stat(filename,&buf) == 0)
+        if(get_param(param, 2, type, MAX_STRING_LEN) != 0)
+        {
+                type[0] = '\0';
+        }
+
+	if(type[0] == '\0')
 	{
-		SET_UI64_RESULT(result, buf.st_atime);
-		return SYSINFO_RET_OK;
+		strscpy(type, "modify");
 	}
-	return	SYSINFO_RET_FAIL;
-}
-
-int	VFS_FILE_CTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	struct stat	buf;
-	char    filename[MAX_STRING_LEN];
-
-        assert(result);
-
-        init_result(result);
-
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-
-        if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-
-	if(stat(filename,&buf) == 0)
-	{
-		SET_UI64_RESULT(result, buf.st_ctime);
-		return SYSINFO_RET_OK;
-	}
-	return	SYSINFO_RET_FAIL;
-}
-
-int	VFS_FILE_MTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	struct stat	buf;
-	char    filename[MAX_STRING_LEN];
-
-        assert(result);
-
-        init_result(result);
-
-        if(num_param(param) > 1)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-
-        if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
 	
 	if(stat(filename,&buf) == 0)
 	{
-		SET_UI64_RESULT(result, buf.st_mtime);
-		return SYSINFO_RET_OK;
+		if(strcmp(type,"modify") == 0)
+		{
+			SET_UI64_RESULT(result, buf.st_mtime);
+			ret = SYSINFO_RET_OK;
+		}
+		else if(strcmp(type,"access") == 0)
+		{
+			SET_UI64_RESULT(result, buf.st_atime);
+			ret = SYSINFO_RET_OK;
+		}
+		else if(strcmp(type,"change") == 0)
+		{
+			SET_UI64_RESULT(result, buf.st_ctime);
+			ret = SYSINFO_RET_OK;
+		}
 	}
-	return	SYSINFO_RET_FAIL;
+	return	ret;
 }
 
 int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
