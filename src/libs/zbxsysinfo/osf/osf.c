@@ -217,12 +217,10 @@ ZBX_METRIC	parameters_specific[]=
 	{"kernel.maxfiles",	0,	KERNEL_MAXFILES,	0,	0},
 	{"kernel.maxproc",	0,	KERNEL_MAXPROC, 	0,	0},
 
-	{"vfs.file.atime",	CF_USEUPARAM,	VFS_FILE_ATIME,		0,	"/etc/passwd"},
+	{"vfs.file.time",       CF_USEUPARAM,   VFS_FILE_TIME,          0,      "/etc/passwd,modify"},
 	{"vfs.file.cksum",	CF_USEUPARAM,	VFS_FILE_CKSUM,		0,	"/etc/services"},
-	{"vfs.file.ctime",	CF_USEUPARAM,	VFS_FILE_CTIME,		0,	"/etc/passwd"},
 	{"vfs.file.exists",	CF_USEUPARAM,	VFS_FILE_EXISTS,	0,	"/etc/passwd"},
 	{"vfs.file.md5sum",	CF_USEUPARAM,	VFS_FILE_MD5SUM,	0,	"/etc/services"},
-	{"vfs.file.mtime",	CF_USEUPARAM,	VFS_FILE_MTIME,		0,	"/etc/passwd"},
 	{"vfs.file.regexp",	CF_USEUPARAM,	VFS_FILE_REGEXP,	0,	"/etc/passwd,root"},
 	{"vfs.file.regmatch",	CF_USEUPARAM,	VFS_FILE_REGMATCH, 	0,	"/etc/passwd,root"},
 	{"vfs.file.size",	CF_USEUPARAM,	VFS_FILE_SIZE, 		0,	"/etc/passwd"},

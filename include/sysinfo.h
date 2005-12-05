@@ -88,15 +88,13 @@ int     SYSTEM_UNUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 int     SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int     VFS_FILE_ATIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int     VFS_FILE_CTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-int     VFS_FILE_MTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int     VFS_FILE_TIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     VFS_FS_INODE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
