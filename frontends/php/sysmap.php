@@ -81,7 +81,8 @@
 	echo "<TD ALIGN=CENTER>";
 	if(isset($_REQUEST["sysmapid"]))
 	{
-		$map="\n<map name=links".$_REQUEST["sysmapid"]."_".rand(0,100000).">";
+		$map_name="links".$_REQUEST["sysmapid"]."_".rand(0,100000);
+		$map="\n<map name=".$map_name.">";
 		$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status from sysmaps_hosts sh,hosts h where sh.sysmapid=".$_REQUEST["sysmapid"]." and h.status not in (".HOST_STATUS_DELETED.") and h.hostid=sh.hostid");
 
 		while($row=DBfetch($result))
@@ -106,7 +107,7 @@
 		}
 		$map=$map."\n</map>";
 		echo $map;
-		echo "<IMG SRC=\"map.php?sysmapid=".$_REQUEST["sysmapid"]."\" border=0 usemap=#links>";
+		echo "<IMG SRC=\"map.php?sysmapid=".$_REQUEST["sysmapid"]."\" border=0 usemap=#$map_name>";
 	}
 
 	echo "</TD>";
@@ -307,7 +308,7 @@
 		echo nbsp("Host 1");
 		show_table2_h_delimiter();
 //		$result=DBselect("select shostid,label from sysmaps_hosts where sysmapid=".$_REQUEST["sysmapid"]." order by label");
-		echo "<select class=\"biginput\" name=\"shostid1\" size=1>";
+		echo "<SELECT class=\"biginput\" name=\"shostid1\" size=1>";
 		while($row=DBfetch($result))
 		{
 			$shostid_=$row["shostid"];
@@ -328,13 +329,23 @@
 //		echo "<form method=\"get\" action=\"sysmap.php?sysmapid=".$_REQUEST["sysmapid"].">";
 		echo nbsp("Host 2");
 		show_table2_h_delimiter();
-		echo "<select class=\"biginput\" name=\"shostid2\" size=1>";
+		$result=DBselect("select shostid,label,hostid from sysmaps_hosts where sysmapid=".$_REQUEST["sysmapid"]." order by label");
+		echo "<SELECT class=\"biginput\" name=\"shostid2\" size=1>";
+		$selected=0;
 		while($row=DBfetch($result))
 		{
 			$shostid_=$row["shostid"];
 			$label=$row["label"];
 			$host=get_host_by_hostid($row["hostid"]);
-			echo "<OPTION VALUE='$shostid_'>".$host["host"].":$label";
+			if(isset($_REQUEST["shostid"])&&($_REQUEST["shostid"]!=$shostid_)&&($selected==0))
+			{
+				echo "<OPTION VALUE='$shostid_' SELECTED>".$host["host"].":$label";
+				$selected=1;
+			}
+			else
+			{
+				echo "<OPTION VALUE='$shostid_'>".$host["host"].":$label";
+			}
 		}
 		echo "</SELECT>";
 
@@ -342,7 +353,7 @@
 		echo nbsp("Link status indicator");
 		show_table2_h_delimiter();
 	        $result=DBselect("select triggerid from triggers order by description");
-	        echo "<select class=\"biginput\" name=\"triggerid\" size=1>";
+	        echo "<SELECT class=\"biginput\" name=\"triggerid\" size=1>";
 		echo "<OPTION VALUE='0' SELECTED>-";
 		while($row=DBfetch($result))
 	        {
