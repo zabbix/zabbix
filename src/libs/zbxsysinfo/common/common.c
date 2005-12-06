@@ -32,6 +32,11 @@ ZBX_METRIC	parameters_common[]=
 /*      KEY                     FLAG    FUNCTION        ADD_PARAM       TEST_PARAM */
 	{
 	{"system.localtime",	0,	SYSTEM_LOCALTIME,	0,	0},
+	{"vfs.file.exists",	CF_USEUPARAM,	VFS_FILE_EXISTS,	0,	"/etc/passwd"},
+	{"vfs.file.time",       CF_USEUPARAM,   VFS_FILE_TIME,          0,      "/etc/passwd,modify"},
+	{"vfs.file.size",	CF_USEUPARAM,	VFS_FILE_SIZE, 		0,	"/etc/passwd"},
+	{"vfs.file.regexp",	CF_USEUPARAM,	VFS_FILE_REGEXP,	0,	"/etc/passwd,root"},
+	{"vfs.file.regmatch",	CF_USEUPARAM,	VFS_FILE_REGMATCH, 	0,	"/etc/passwd,root"},
 	{0}
 	};
 
@@ -1478,13 +1483,12 @@ int	check_ssh(char	*hostname, short port, int *value_int)
 
 /* Example check_service[ssh], check_service[smtp,29],check_service[ssh,127.0.0.1,22]*/
 /* check_service[ssh,127.0.0.1,ssh] */
-int	CHECK_SERVICE_PERF(const char *cmd, const char *service_and_ip_and_port, unsigned flags, AGENT_RESULT *result)
+int	CHECK_SERVICE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	*c,*c1;
 	int	port=0;
 	char	service[MAX_STRING_LEN];
 	char	ip[MAX_STRING_LEN];
-	char	port_str[MAX_STRING_LEN];
+	char	str_port[MAX_STRING_LEN];
 
 	struct timeval t1,t2;
 	struct timezone tz1,tz2;
@@ -1500,35 +1504,38 @@ int	CHECK_SERVICE_PERF(const char *cmd, const char *service_and_ip_and_port, uns
 
 	gettimeofday(&t1,&tz1);
 
-	c=strchr(service_and_ip_and_port,',');
-	strscpy(service,service_and_ip_and_port);
+        if(num_param(param) > 3)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+        
+	if(get_param(param, 1, service, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }
 
-	if(c != NULL)
+	if(get_param(param, 2, ip, MAX_STRING_LEN) != 0)
+        {
+                ip[0] = '\0';
+        }
+
+	if(ip[0] == '\0')
 	{
-		strscpy(ip,c+1);
-		service[c-service_and_ip_and_port]=0;
+		strscpy(ip, "127.0.0.1");
+	}
 
-		c1=strchr(ip,',');
-		
-		if(c1!=NULL)
-		{
-			strscpy(port_str,c1+1);
-			ip[c1-ip]=0;
-			port=atoi(port_str);
-		}
-		else
-		{
-			if(strchr(ip,'.')==NULL)
-			{
-				strscpy(port_str,ip);
-				port=atoi(port_str);
-				strcpy(ip,"127.0.0.1");
-			}
-		}
+	if(get_param(param, 3, str_port, MAX_STRING_LEN) != 0)
+        {
+                str_port[0] = '\0';
+        }
+	
+	if(str_port[0] != '\0')
+	{
+		port = atoi(str_port);
 	}
 	else
 	{
-		strcpy(ip,"127.0.0.1");
+		port = 0;
 	}
 
 /*	printf("IP:[%s]",ip);
@@ -1605,12 +1612,12 @@ int	CHECK_SERVICE_PERF(const char *cmd, const char *service_and_ip_and_port, uns
 
 /* Example check_service[ssh], check_service[smtp,29],check_service[ssh,127.0.0.1,22]*/
 /* check_service[ssh,127.0.0.1,ssh] */
-int	CHECK_SERVICE(const char *cmd, const char *service_and_ip_and_port, unsigned flags, AGENT_RESULT *result)
+int	CHECK_SERVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	int	port=0;
 	char	service[MAX_STRING_LEN];
 	char	ip[MAX_STRING_LEN];
-	char	port_str[MAX_STRING_LEN];
+	char	str_port[MAX_STRING_LEN];
 	char	tmp[MAX_STRING_LEN];
 	char	*s;
 
@@ -1621,80 +1628,39 @@ int	CHECK_SERVICE(const char *cmd, const char *service_and_ip_and_port, unsigned
 
         init_result(result);
 	
-	/* Default IP address */
-	strscpy(ip,"127.0.0.1");
+        if(num_param(param) > 3)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+        
+	if(get_param(param, 1, service, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }
 
-	strscpy(tmp,service_and_ip_and_port);
+	if(get_param(param, 2, ip, MAX_STRING_LEN) != 0)
+        {
+                ip[0] = '\0';
+        }
 
-	s=strtok(tmp,",");
-	if(s)
+	if(ip[0] == '\0')
 	{
-		strscpy(service,s);
-
-		s = strtok(NULL,",");
-	}
-	if(s)
-	{
-		if(strchr(s,'.')!=NULL)
-		{
-			strscpy(ip,s);
-		}
-		else
-		{
-			strscpy(port_str,s);
-			port=atoi(port_str);
-		}
-
-		s = strtok(NULL,",");
-	}
-	if(s)
-	{
-		if(strchr(s,'.')!=NULL)
-		{
-			strscpy(ip,s);
-		}
-		else
-		{
-			strscpy(port_str,s);
-			port=atoi(port_str);
-		}
-		s = strtok(NULL,",");
+		strscpy(ip, "127.0.0.1");
 	}
 
-/*	printf("IP:[%s]\n",ip);
-	printf("Service:[%s]\n",service);
-	printf("Port:[%d]\n\n",port);*/
-
-/*	c=strchr(service_and_ip_and_port,',');
-	strscpy(service,service_and_ip_and_port);
-
-	if(c != NULL)
+	if(get_param(param, 3, str_port, MAX_STRING_LEN) != 0)
+        {
+                str_port[0] = '\0';
+        }
+	
+	if(str_port[0] != '\0')
 	{
-		strscpy(ip,c+1);
-		service[c-service_and_ip_and_port]=0;
-
-		c1=strchr(ip,',');
-		
-		if(c1!=NULL)
-		{
-			strscpy(port_str,c1+1);
-			ip[c1-ip]=0;
-			port=atoi(port_str);
-		}
-		else
-		{
-			if(strchr(ip,'.')==NULL)
-			{
-				strscpy(port_str,ip);
-				port=atoi(port_str);
-				strcpy(ip,"127.0.0.1");
-			}
-		}
+		port = atoi(str_port);
 	}
 	else
 	{
-		strcpy(ip,"127.0.0.1");
-	}*/
+		port = 0;
+	}
 
 /*	printf("IP:[%s]",ip);
 	printf("Service:[%s]",service);
@@ -1756,7 +1722,7 @@ int	CHECK_SERVICE(const char *cmd, const char *service_and_ip_and_port, unsigned
 	}
 	else
 	{
-		ret=SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 	SET_UI64_RESULT(result, value_int);
@@ -1764,40 +1730,58 @@ int	CHECK_SERVICE(const char *cmd, const char *service_and_ip_and_port, unsigned
 	return ret;
 }
 
-int	CHECK_PORT(const char *cmd, const char *ip_and_port, unsigned flags, AGENT_RESULT *result)
+int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	*c;
 	int	port=0;
 	int	value_int;
 	int	ret;
 	char	ip[MAX_STRING_LEN];
+	char	port_str[MAX_STRING_LEN];
 
         assert(result);
 
 	init_result(result);
 	
-	c=strchr(ip_and_port,',');
-	strscpy(ip,ip_and_port);
+        if(num_param(param) > 2)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+        
+	if(get_param(param, 1, ip, MAX_STRING_LEN) != 0)
+        {
+               ip[0] = '\0';
+        }
+	
+	if(ip[0] == '\0')
+	{
+		strscpy(ip, "127.0.0.1");
+	}
 
-	if(c != NULL)
+	if(get_param(param, 2, port_str, MAX_STRING_LEN) != 0)
+        {
+                port_str[0] = '\0';
+        }
+
+	if(port_str[0] == '\0')
 	{
-		port=atoi(c+1);
-		ip[c-ip_and_port]=0;
+		return SYSINFO_RET_FAIL;
 	}
-	else
-	{
-		port=atoi(ip_and_port);
-		strcpy(ip,"127.0.0.1");
-	}
+
+	port=atoi(port_str);
 
 	ret = tcp_expect(ip,port,NULL,NULL,"",&value_int);
 	
-	SET_UI64_RESULT(result, value_int);
+	if(ret == SYSINFO_RET_OK)
+	{
+		SET_UI64_RESULT(result, value_int);
+	}
+	
 	return ret;
 }
 
 
-int	CHECK_DNS(const char *cmd, const char *ip_and_zone, unsigned flags, AGENT_RESULT *result)
+int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	*c;
 	int	res;
@@ -1813,36 +1797,29 @@ int	CHECK_DNS(const char *cmd, const char *ip_and_zone, unsigned flags, AGENT_RE
 
         init_result(result);
 	
-	memset(&ip, 0, MAX_STRING_LEN);
-	memset(&zone, 0, MAX_STRING_LEN);
-
-	c=strchr(ip_and_zone,',');
-	if(c != NULL)
+        if(num_param(param) > 2)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+        
+	if(get_param(param, 1, ip, MAX_STRING_LEN) != 0)
+        {
+               ip[0] = '\0';
+        }
+	
+	if(ip[0] == '\0')
 	{
-		strncpy(ip,ip_and_zone,c-ip_and_zone);
-		ip[c-ip_and_zone]=0;
-		strscpy(zone,c+1);
+		strscpy(ip, "127.0.0.1");
 	}
-	else
+
+	if(get_param(param, 2, zone, MAX_STRING_LEN) != 0)
+        {
+                zone[0] = '\0';
+        }
+
+	if(zone[0] == '\0')
 	{
-		if(strlen(ip_and_zone)>0)
-		{
-			if(isdigit((int)ip_and_zone[strlen(ip_and_zone)-1]))
-			{
-				strcpy(ip,ip_and_zone);
-				strcpy(zone,"localhost");
-			}
-			else
-			{
-				strcpy(ip,"127.0.0.1");
-				strcpy(zone,ip_and_zone);
-			}
-		}
-		else
-		{
-			strcpy(ip,"127.0.0.1");
-			strcpy(zone,"localhost");
-		}
+		strscpy(zone, "localhost");
 	}
 
 	res = inet_aton(ip, &in);
