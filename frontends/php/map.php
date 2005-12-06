@@ -161,8 +161,8 @@
 		$image1=get_image_by_name(1,$shost1["icon"]);
 
 		$shost2=get_sysmaps_hosts_by_shostid($shostid2);
-		$x1=$shost2["x"];
-		$y1=$shost2["y"];
+		$x2=$shost2["x"];
+		$y2=$shost2["y"];
 		$image2=get_image_by_name(1,$shost2["icon"]);
 
 // Get image dimensions
@@ -236,7 +236,7 @@
 
 	$icons=array();
 	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status,sh.icon,sh.icon_on,h.ip from sysmaps_hosts sh,hosts h where sh.sysmapid=".$_REQUEST["sysmapid"]." and h.hostid=sh.hostid");
-	while($row=DBfetch($row))
+	while($row=DBfetch($result))
 	{
 		$host=$row["host"];
 		$shostid=$row["shostid"];
