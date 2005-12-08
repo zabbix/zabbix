@@ -239,94 +239,8 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 
 static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-/* Solaris */
-#ifdef HAVE_UNISTD_SYSCONF
-	assert(result);
-
-        init_result(result);
-		
-	SET_UI64_RESULT(result, sysconf(_SC_AVPHYS_PAGES)*sysconf(_SC_PAGESIZE));
-	return SYSINFO_RET_OK;
-#elif defined(HAVE_SYS_PSTAT_H)
-	struct	pst_static pst;
-	struct	pst_dynamic dyn;
-	long	page;
-
-	assert(result);
-
-        init_result(result);
-		
-	if(pstat_getstatic(&pst, sizeof(pst), (size_t)1, 0) == -1)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-	else
-	{
-		/* Get page size */	
-		page = pst.page_size;
-/*		return pst.physical_memory;*/
-
-		if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
-		{
-			return SYSINFO_RET_FAIL;
-		}
-		else
-		{
-/*		cout<<"total virtual memory allocated is " << dyn.psd_vm << "
-		pages, " << dyn.psd_vm * page << " bytes" << endl;
-		cout<<"active virtual memory is " << dyn.psd_avm <<" pages, " <<
-		dyn.psd_avm * page << " bytes" << endl;
-		cout<<"total real memory is " << dyn.psd_rm << " pages, " <<
-		dyn.psd_rm * page << " bytes" << endl;
-		cout<<"active real memory is " << dyn.psd_arm << " pages, " <<
-		dyn.psd_arm * page << " bytes" << endl;
-		cout<<"free memory is " << dyn.psd_free << " pages, " <<
-*/
-		/* Free memory in bytes */
-
-			SET_UI64_RESULT(result, dyn.psd_free * page);
-			return SYSINFO_RET_OK;
-		}
-	}
-#elif defined(HAVE_SYSINFO_FREERAM)
-	struct sysinfo info;
-
-	assert(result);
-
-        init_result(result);
-		
-	if( 0 == sysinfo(&info))
-	{
-#ifdef HAVE_SYSINFO_MEM_UNIT
-		SET_UI64_RESULT(result, info.freeram * info.mem_unit);
-#else	
-		SET_UI64_RESULT(result, info.freeram);
-#endif
-		return SYSINFO_RET_OK;
-	}
-	else
-	{
-		return SYSINFO_RET_FAIL;
-	}
-#elif defined(HAVE_SYS_VMMETER_VMTOTAL)
-	int mib[2],len;
-	struct vmtotal v;
-
-	assert(result);
-
-        init_result(result);
-		
-	len=sizeof(struct vmtotal);
-	mib[0]=CTL_VM;
-	mib[1]=VM_METER;
-
-	sysctl(mib,2,&v,&len,NULL,0);
-
-	SET_UI64_RESULT(result, v.t_free<<2);
-	return SYSINFO_RET_OK;
-/* OS/X */
-#elif defined(HAVE_MACH_HOST_INFO_H)
-	vm_statistics_data_t page_info;
+/*
+	host_paging_info_data_t page_info;
 	vm_size_t pagesize;
 	mach_msg_type_number_t count;
 	kern_return_t kret;
@@ -361,13 +275,13 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 		ret = SYSINFO_RET_FAIL;
 	}
 	return ret;
-#else
+*/
 	assert(result);
 
         init_result(result);
 		
 	return	SYSINFO_RET_FAIL;
-#endif
+	
 }
 
 int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
