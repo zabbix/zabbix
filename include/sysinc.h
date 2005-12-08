@@ -55,6 +55,10 @@
 #	include <sys/time.h>
 #endif
 
+#ifdef HAVE_LINUX_KERNEL_H
+#	include <linux/kernel.h>
+#endif
+
 #ifdef HAVE_ARPA_NAMESER_H
 #	include <arpa/nameser.h>
 #endif

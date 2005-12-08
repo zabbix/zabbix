@@ -808,7 +808,7 @@ int	TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	FILE	*f;
 	char	c[MAX_STRING_LEN];
 	char	porthex[MAX_STRING_LEN];
-	char	pattern[MAX_STRING_LEN]="0050 00000000:0000 0A";
+	char	pattern[MAX_STRING_LEN];
 
         assert(result);
 

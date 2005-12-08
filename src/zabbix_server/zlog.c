@@ -78,7 +78,7 @@ void zabbix_syslog(const char *fmt, ...)
 	
 			va_start(ap,fmt);
 			vsprintf(value_str,fmt,ap);
-			value_str[MAX_STRING_LEN]=0;
+			value_str[MAX_STRING_LEN-1]=0;
 			va_end(ap);
 
 			init_result(&agent);
