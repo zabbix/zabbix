@@ -609,7 +609,7 @@ INIT_CHECK_MEMORY(main);
 //				{
 //					value[j]='0';
 //				}
-//				value[MAX_STRING_LEN]=0;
+//				value[MAX_STRING_LEN-1]=0;
 				LOG_DEBUG_INFO("s","pac: 2");
 				LOG_DEBUG_INFO("s",value);
 				if(send_value(server,port,confHostname,metrics[i].key, value, lastlogsize,timestamp,source,severity) == FAIL)
