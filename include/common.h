@@ -31,7 +31,7 @@
 #	ifdef _DEBUG
 #		define LOG_DEBUG_INFO(type, msg) \
 			WriteLog(MSG_GET_COMPUTER_NAME_FAILED,EVENTLOG_ERROR_TYPE, type , msg)
-//#		define ENABLE_CHECK_MEMOTY
+/*#		define ENABLE_CHECK_MEMOTY */
 #	else
 #		define LOG_DEBUG_INFO(a, b) ((void)0)
 #	endif
@@ -268,26 +268,26 @@
 #define strscpy(x,y) { strncpy(x,y,sizeof(x)); x[sizeof(x)-1]=0; }
 
 /* list structure as item of agent return vaile */					 
-#define LIST_ITEM struct list_item_s
-LIST_ITEM {
-	char name[MAX_STRING_LEN];
+#define ZBX_LIST_ITEM struct zbx_list_item_s
+ZBX_LIST_ITEM {
+	char text[MAX_STRING_LEN];
 };	
 
-#define LIST struct list_s
-LIST {
+#define ZBX_LIST struct zbx_list_s
+ZBX_LIST {
 	int 		cnt;
-	LIST_ITEM 	*item;
+	ZBX_LIST_ITEM 	*item;
 };	
 					   
 /* agent return value */					 
-#define AGENT_RESULT struct result_s
+#define AGENT_RESULT struct zbx_result_s
 AGENT_RESULT {
 	int	 	type;
 	zbx_uint64_t	ui64;
 	double		dbl;
 	char		*str;
 	char		*msg;
-	LIST		list;
+	ZBX_LIST	list;
 };
 
 /* agent result types */
@@ -321,8 +321,6 @@ AGENT_RESULT {
 	(res)->msg = (char*)(val); \
 	}
 
-int   	copy_list(LIST *src, LIST *dist);
-void 	free_list(LIST *list);
 void   	init_result(AGENT_RESULT *result);
 int    	copy_result(AGENT_RESULT *src, AGENT_RESULT *dist);
 void   	free_result(AGENT_RESULT *result);
