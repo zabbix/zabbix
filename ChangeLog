@@ -1,3 +1,7 @@
+Changes for 1.1beta4:
+
+ - fixed conflict with MySQL headers (Eugene)
+
 Changes for 1.1beta3:
 
  - improved support vfs.file.time[filename,<access|modify|change>] (Eugene)

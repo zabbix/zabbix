@@ -183,12 +183,18 @@ void    escape_string(char *from, char *to, int maxlen)
 	to[maxlen-1]=0;
 }
 
-void	free_list(LIST *list)
+static void	init_result_list(ZBX_LIST *list)
+{
+ /* don't use `free_result_list(list)`, dangerous recycling */
+
+	/* nothin to do */
+}
+static void	free_result_list(ZBX_LIST *list)
 {
 	/* nothin to do */
 }
 
-int	copy_list(LIST *src, LIST *dist)
+static int	copy_result_list(ZBX_LIST *src, ZBX_LIST *dist)
 {
 	/* nothin to do */
 	return 0;
@@ -214,7 +220,7 @@ int 	copy_result(AGENT_RESULT *src, AGENT_RESULT *dist)
 		if(!dist->msg)
 			return 1;
 	}
-	return copy_list(&(src->list), &(dist->list));
+	return copy_result_list(&(src->list), &(dist->list));
 }
 
 void	free_result(AGENT_RESULT *result)
@@ -230,18 +236,26 @@ void	free_result(AGENT_RESULT *result)
 		free(result->msg);
 	}
 
-	free_list(&(result->list));
+	if(result->type & AR_LIST)
+	{
+		free_result_list(&(result->list));
+	}
 
 	init_result(result);
 }
 
 void	init_result(AGENT_RESULT *result)
 {
+ /* don't use `free_result(result)`, dangerous recycling */
+
+	result->type = 0;
+	
+	result->ui64 = 0;
+	result->dbl = 0;	
 	result->str = NULL;
 	result->msg = NULL;
-	result->type = 0;
-	result->dbl = 0;	
-	result->ui64 = 0;	
+
+	init_result_list(&(result->list));
 }
 
 int parse_command( /* return value: 0 - error; 1 - command without parameters; 2 - command with parameters */
