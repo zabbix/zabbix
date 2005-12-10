@@ -600,11 +600,12 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 				snprintf(sql,sizeof(sql)-1,"update triggers set value=%d,lastchange=%d,error='%s' where triggerid=%d",new_value,now,reason, trigger->triggerid);
 			}
 			DBexecute(sql);
-			if(TRIGGER_VALUE_UNKNOWN == new_value)
+/* It is not required and is wrong! */
+/*			if(TRIGGER_VALUE_UNKNOWN == new_value)
 			{
 				snprintf(sql,sizeof(sql)-1,"update functions set lastvalue=NULL where triggerid=%d",trigger->triggerid);
 				DBexecute(sql);
-			}
+			}*/
 			if(	((trigger->value == TRIGGER_VALUE_TRUE) && (new_value == TRIGGER_VALUE_FALSE)) ||
 				((trigger->value == TRIGGER_VALUE_FALSE) && (new_value == TRIGGER_VALUE_TRUE)) ||
 				((trigger->prevvalue == TRIGGER_VALUE_FALSE) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_TRUE)) ||

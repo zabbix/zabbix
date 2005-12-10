@@ -155,7 +155,7 @@ static void update_key_status(int hostid,int host_status)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In update_key_status()");
 
-	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,h.available from items i,hosts h where h.hostid=i.hostid and h.hostid=%d and i.key_='%s'", hostid,SERVER_STATUS_KEY);
+	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,h.available,i.status from items i,hosts h where h.hostid=i.hostid and h.hostid=%d and i.key_='%s'", hostid,SERVER_STATUS_KEY);
 	result = DBselect(sql);
 
 	if( DBnum_rows(result) == 0)
@@ -165,16 +165,17 @@ static void update_key_status(int hostid,int host_status)
 	else
 	{
 		DBget_item_from_db(&item,result,0);
-	
-/*		snprintf(value_str,sizeof(value_str)-1,"%d",host_status);*/
 
-		init_result(&agent);
-		SET_UI64_RESULT(&agent, host_status);
-		process_new_value(&item,&agent);
-/*		process_new_value(&item,value_str);*/
-		free_result(&agent);
+/* Do not process new value for status, if previous status is the same */
+		if(cmp_double(item.lastvalue, (double)host_status) == 1)
+		{
+			init_result(&agent);
+			SET_UI64_RESULT(&agent, host_status);
+			process_new_value(&item,&agent);
+			free_result(&agent);
 
-		update_triggers(item.itemid);
+			update_triggers(item.itemid);
+		}
 	}
 
 	DBfree_result(result);
@@ -241,11 +242,11 @@ int get_values(void)
 /*			if(HOST_STATUS_UNREACHABLE == item.host_status)*/
 			if(HOST_AVAILABLE_TRUE != item.host_available)
 			{
-				item.host_available=HOST_AVAILABLE_TRUE;
 				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
 				zabbix_syslog("Enabling host [%s]", item.host );
 				DBupdate_host_availability(item.hostid,HOST_AVAILABLE_TRUE,now,agent.msg);
-				update_key_status(item.hostid,HOST_STATUS_MONITORED);
+				update_key_status(item.hostid, HOST_STATUS_MONITORED); /* 0 */
+				item.host_available=HOST_AVAILABLE_TRUE;
 
 /* Why this break??? Trigger needs to be updated anyway!
 				break;*/
@@ -267,11 +268,11 @@ int get_values(void)
 	/*			if(HOST_STATUS_UNREACHABLE == item.host_status)*/
 				if(HOST_AVAILABLE_TRUE != item.host_available)
 				{
-					item.host_available=HOST_AVAILABLE_TRUE;
 					zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
 					zabbix_syslog("Enabling host [%s]", item.host );
 					DBupdate_host_availability(item.hostid,HOST_AVAILABLE_TRUE,now,agent.msg);
-					update_key_status(item.hostid,HOST_STATUS_MONITORED);	
+					update_key_status(item.hostid, HOST_STATUS_MONITORED);	/* 0 */
+					item.host_available=HOST_AVAILABLE_TRUE;
 	
 					stop=1;
 				}
@@ -285,7 +286,8 @@ int get_values(void)
 				zabbix_log( LOG_LEVEL_WARNING, "Host [%s] will be checked after [%d] seconds", item.host, DELAY_ON_NETWORK_FAILURE );
 				zabbix_syslog("Host [%s] will be checked after [%d] seconds", item.host, DELAY_ON_NETWORK_FAILURE );
 				DBupdate_host_availability(item.hostid,HOST_AVAILABLE_FALSE,now,agent.msg);
-				update_key_status(item.hostid,HOST_AVAILABLE_FALSE);	
+				update_key_status(item.hostid,HOST_AVAILABLE_FALSE); /* 2 */
+				item.host_available=HOST_AVAILABLE_FALSE;
 
 				snprintf(sql,sizeof(sql)-1,"update hosts set network_errors=3 where hostid=%d", item.hostid);
 				DBexecute(sql);

@@ -1,5 +1,6 @@
 Changes for 1.1beta4:
 
+ - fixed nodata() processing when used with host 'status' (Alexei)
  - fixed conflict with MySQL headers (Eugene)
 
 Changes for 1.1beta3:
