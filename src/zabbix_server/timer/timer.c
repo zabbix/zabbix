@@ -43,7 +43,8 @@
 
 #include "common.h"
 
-extern void    update_triggers(int itemid);
+extern void	update_triggers(int itemid);
+extern void	update_functions(DB_ITEM *item);
 
 /******************************************************************************
  *                                                                            *
@@ -65,9 +66,11 @@ void main_timer_loop()
 	char	sql[MAX_STRING_LEN];
 	int	i,now;
 
-	int	itemid,functionid;
+/*	int	itemid,functionid;
 	char	*function;
-	char	*parameter;
+	char	*parameter;*/
+
+	DB_ITEM	item;
 
 	DB_RESULT	*result;
 
@@ -80,25 +83,28 @@ void main_timer_loop()
 		DBconnect();
 
 		now=time(NULL);
+/*
 #ifdef HAVE_PGSQL
 		snprintf(sql,sizeof(sql)-1,"select distinct f.itemid,f.functionid,f.parameter from functions f, items i,hosts h where h.hostid=i.hostid and h.status=%d and i.itemid=f.itemid and f.function in ('nodata','date','dayofweek','time','now') and i.lastclock+f.parameter::text::integer<=%d and i.status=%d", HOST_STATUS_MONITORED, now, ITEM_STATUS_ACTIVE);
 #else
 		snprintf(sql,sizeof(sql)-1,"select distinct f.itemid,f.functionid,f.parameter,f.function from functions f, items i,hosts h where h.hostid=i.hostid and h.status=%d and i.itemid=f.itemid and f.function in ('nodata','date','dayofweek','time','now') and i.lastclock+f.parameter<=%d and i.status=%d", HOST_STATUS_MONITORED, now, ITEM_STATUS_ACTIVE);
 #endif
+	*/
+
+		snprintf(sql,sizeof(sql)-1,"select distinct i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,h.available,i.status from items i,hosts h, functions f where h.hostid=i.hostid and h.status=%d and i.status=%d", HOST_STATUS_MONITORED, ITEM_STATUS_ACTIVE);
 
 		result = DBselect(sql);
 
 		for(i=0;i<DBnum_rows(result);i++)
 		{
-			itemid=atoi(DBget_field(result,i,0));
-			functionid=atoi(DBget_field(result,i,1));
-			parameter=DBget_field(result,i,2);
-			function=DBget_field(result,i,3);
+			DBget_item_from_db(&item,result, i);
 
-			snprintf(sql,sizeof(sql)-1,"update functions set lastvalue='1' where itemid=%d and function='%s' and parameter='%s'" , itemid, function, parameter );
-			DBexecute(sql);
+/* Update triggers will update value for NODATA */
+/*			snprintf(sql,sizeof(sql)-1,"update functions set lastvalue='1' where itemid=%d and function='%s' and parameter='%s'" , itemid, function, parameter );
+			DBexecute(sql);*/
 
-			update_triggers(itemid);
+			update_functions(&item);
+			update_triggers(item.itemid);
 		}
 
 		DBfree_result(result);

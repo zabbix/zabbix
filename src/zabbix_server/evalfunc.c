@@ -346,6 +346,42 @@ static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter)
 
 /******************************************************************************
  *                                                                            *
+ * Function: evaluate_NODATA                                                  *
+ *                                                                            *
+ * Purpose: evaluate function 'nodata' for the item                           *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameter - number of seconds                                  *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated succesfully, result is stored in 'value' *
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int evaluate_NODATA(char *value,DB_ITEM	*item,int parameter)
+{
+	int		now;
+	int		res = SUCCEED;
+
+	now = time(NULL);
+
+	if(item->lastclock + parameter > now)
+	{
+		strcpy(value,"0");
+	}
+	else
+	{
+		strcpy(value,"1");
+	}
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: evaluate_FUNCTION                                                *
  *                                                                            *
  * Purpose: evaluate function                                                 *
@@ -449,7 +485,7 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
 	}
 	else if(strcmp(function,"nodata")==0)
 	{
-		strcpy(value,"0");
+		ret = evaluate_NODATA(value,item,atoi(parameter));
 	}
 	else if(strcmp(function,"date")==0)
 	{
