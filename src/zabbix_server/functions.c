@@ -579,40 +579,52 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 			{
 				/* Save delta */
 				if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_DOUBLE))
+				{
 					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value->dbl))
 					{
 						DBadd_history(item->itemid, (value->dbl - item->prevorgvalue)/(now-item->lastclock), now);
 					}
+				}
 				else if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_UINT64))
+				{
 					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= (double)value->ui64))
 					{
 						DBadd_history(item->itemid, ((double)value->ui64 - item->prevorgvalue)/(now-item->lastclock), now);
 					}
+				}
 				else if((item->value_type==ITEM_VALUE_TYPE_UINT64) && (value->type & AR_UINT64))
+				{
 					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value->ui64))
 					{
 						DBadd_history_uint(item->itemid, (zbx_uint64_t)(value->ui64 - item->prevorgvalue)/(now-item->lastclock), now);
 					}
+				}
 			}
 			/* Real delta: simple difference between values */
 			else if(item->delta == ITEM_STORE_SIMPLE_CHANGE)
 			{
 				/* Save delta */
 				if((item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_DOUBLE))
+				{
 					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value->dbl) )
 					{
 						DBadd_history(item->itemid, (value->dbl - item->prevorgvalue), now);
 					}
+				}
 				else if((item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_UINT64))
+				{
 					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= (double)value->ui64) )
 					{
 						DBadd_history(item->itemid, ((double)value->ui64 - item->prevorgvalue), now);
 					}
+				}
 				else if((item->value_type==ITEM_VALUE_TYPE_UINT64) && (value->type & AR_UINT64))
+				{
 					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value->ui64) )
 					{
 						DBadd_history_uint(item->itemid, (value->ui64 - item->prevorgvalue), now);
 					}
+				}
 			}
 			else
 			{
