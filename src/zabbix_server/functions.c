@@ -561,13 +561,17 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 			/* Should we store delta or original value? */
 			if(item->delta == ITEM_STORE_AS_IS)
 			{
-				if( (item->value_type==ITEM_VALUE_TYPE_UINT64) && (value->type & AR_UINT64))
+				if(item->value_type==ITEM_VALUE_TYPE_UINT64)
 				{
-					DBadd_history_uint(item->itemid,value->ui64,now);
+					if(value->type & AR_UINT64)
+						DBadd_history_uint(item->itemid,value->ui64,now);
 				}
-				if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_DOUBLE))
+				else if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
 				{
-					DBadd_history(item->itemid,value->dbl,now);
+					if(value->type & AR_DOUBLE)
+						DBadd_history(item->itemid,value->dbl,now);
+					else if(value->type & AR_UINT64)
+						DBadd_history(item->itemid,(double)value->ui64,now);
 				}
 			}
 			/* Delta as speed of change */
@@ -579,7 +583,12 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 					{
 						DBadd_history(item->itemid, (value->dbl - item->prevorgvalue)/(now-item->lastclock), now);
 					}
-				if((item->value_type==ITEM_VALUE_TYPE_UINT64) && (value->type & AR_UINT64))
+				else if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_UINT64))
+					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= (double)value->ui64))
+					{
+						DBadd_history(item->itemid, ((double)value->ui64 - item->prevorgvalue)/(now-item->lastclock), now);
+					}
+				else if((item->value_type==ITEM_VALUE_TYPE_UINT64) && (value->type & AR_UINT64))
 					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value->ui64))
 					{
 						DBadd_history_uint(item->itemid, (zbx_uint64_t)(value->ui64 - item->prevorgvalue)/(now-item->lastclock), now);
@@ -594,7 +603,12 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 					{
 						DBadd_history(item->itemid, (value->dbl - item->prevorgvalue), now);
 					}
-				if((item->value_type==ITEM_VALUE_TYPE_UINT64) && (value->type & AR_UINT64))
+				else if((item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_UINT64))
+					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= (double)value->ui64) )
+					{
+						DBadd_history(item->itemid, ((double)value->ui64 - item->prevorgvalue), now);
+					}
+				else if((item->value_type==ITEM_VALUE_TYPE_UINT64) && (value->type & AR_UINT64))
 					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value->ui64) )
 					{
 						DBadd_history_uint(item->itemid, (value->ui64 - item->prevorgvalue), now);
