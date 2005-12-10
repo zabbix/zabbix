@@ -42,6 +42,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 
 	unsigned char *ip;
 	char 	*p;
+	double dbl;
 
 	char error[MAX_STRING_LEN];
 
@@ -297,7 +298,25 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 			{
 /*				memcpy(result_str,vars->val.string,vars->val_len);
 				result_str[vars->val_len] = '\0';*/
-				if(item->value_type != ITEM_VALUE_TYPE_STR)
+				if(item->value_type == ITEM_VALUE_TYPE_FLOAT)
+				{
+					p = malloc(vars->val_len+1);
+					if(p)
+					{
+						memcpy(p, vars->val.string, vars->val_len);
+						p[vars->val_len] = '\0';
+						dbl = strtod(p, NULL);
+
+						SET_DBL_RESULT(value, dbl);
+					}
+					else
+					{
+						snprintf(error,MAX_STRING_LEN-1,"Cannot allocate required memory");
+						zabbix_log( LOG_LEVEL_ERR, error);
+						SET_MSG_RESULT(value, strdup(error));
+					}
+				}
+				else if(item->value_type != ITEM_VALUE_TYPE_STR)
 				{
 					snprintf(error,MAX_STRING_LEN-1,"Cannot store SNMP string value (ASN_OCTET_STR) in item having numeric type");
 					zabbix_log( LOG_LEVEL_ERR, error);
@@ -313,7 +332,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 						memcpy(p, vars->val.string, vars->val_len);
 						p[vars->val_len] = '\0';
 
-						SET_MSG_RESULT(value, p);
+						SET_STR_RESULT(value, p);
 					}
 					else
 					{
@@ -345,7 +364,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 					{
 						snprintf(p,MAX_STRING_LEN-1,"%d.%d.%d.%d",ip[0],ip[1],ip[2],ip[3]);
 
-						SET_MSG_RESULT(value, p);
+						SET_STR_RESULT(value, p);
 					}
 					else
 					{
