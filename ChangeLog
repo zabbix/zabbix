@@ -1,5 +1,6 @@
 Changes for 1.1beta4:
 
+ - fixed compilation with --with-ldap (Alexei)
  - SNMP string values to be automatically converted to numeric (Alexei)
  - fixed nodata() processing when used with host 'status' (Alexei)
  - fixed conflict with MySQL headers (Eugene)
