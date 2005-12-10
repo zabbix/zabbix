@@ -425,7 +425,7 @@ status changes to TRUE for te first time */
 
 /* SUCCEED if latest alarm with triggerid has this status */
 /* Rewrite required to simplify logic ?*/
-int	latest_alarm(int triggerid, int status)
+static int	latest_alarm(int triggerid, int status)
 {
 	char	sql[MAX_STRING_LEN];
 	int	clock;
