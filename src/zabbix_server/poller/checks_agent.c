@@ -178,6 +178,7 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 	}
 
 	delete_reol(c);
+	lrtrim_spaces(c);
 
 /*	if(len>0)
 	{
