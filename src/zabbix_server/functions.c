@@ -545,7 +545,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 	char	sql[MAX_STRING_LEN];
 	int ret = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,%X)", item->itemid, value->type);
+	zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%s,,%X,%X)", item->key, item->value_type,value->type);
 
 	if(value->type & AR_UINT64)
 		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,UINT64:" ZBX_FS_UI64 ")", item->itemid, value->ui64);
