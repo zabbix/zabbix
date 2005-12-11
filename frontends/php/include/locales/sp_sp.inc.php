@@ -29,7 +29,7 @@
 
 //	about.php
 	"S_ABOUT_ZABBIX"=>			"Acerca de ZABBIX",
-	"S_INFORMATION_ABOUT_ZABBIX"=>		"Información acerca de ZABBIX (v1.1beta3)",
+	"S_INFORMATION_ABOUT_ZABBIX"=>		"Información acerca de ZABBIX (v1.1beta34",
 	"S_HOMEPAGE_OF_ZABBIX"=>		"Página home de ZABBIX",
 	"S_HOMEPAGE_OF_ZABBIX_DETAILS"=>	"Esta es la página principal de ZABBIX.",
 	"S_LATEST_ZABBIX_MANUAL"=>		"Ultima versión del Manual de ZABBIX",
