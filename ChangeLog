@@ -1,5 +1,9 @@
 Changes for 1.1beta4:
 
+ - added support of system.cpu.load for Tru64 (Eugene)
+ - added support of system.cpu.util for Tru64 (Eugene)
+ - added support of vm.memory.size for Tru64 (Eugene)
+ - added support of proc.num for Tru64 (Eugene)
  - fixed processing of UserParameters which are pre/postfixed with spaces (Alexei)
  - fixed processing of SNMP and simple checks (Alexei)
  - fixed compilation with --with-ldap (Alexei)
