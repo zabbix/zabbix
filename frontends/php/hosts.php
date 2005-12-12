@@ -58,32 +58,7 @@
 		if($_REQUEST["register"]=="add linkage")
 		{	
 			$items=0;
-			if(isset($_REQUEST["items_add"]))		$items=$items|1;
-			if(isset($_REQUEST["items_update"]))	$items=$items|2;
-			if(isset($_REQUEST["items_delete"]))	$items=$items|4;
-			$triggers=0;
-			if(isset($_REQUEST["triggers_add"]))	$triggers=$triggers|1;
-			if(isset($_REQUEST["triggers_update"]))	$triggers=$triggers|2;
-			if(isset($_REQUEST["triggers_delete"]))	$triggers=$triggers|4;
-			$actions=0;
-			if(isset($_REQUEST["actions_add"]))		$actions=$actions|1;
-			if(isset($_REQUEST["actions_update"]))	$actions=$actions|2;
-			if(isset($_REQUEST["actions_delete"]))	$actions=$actions|4;
-			$graphs=0;
-			if(isset($_REQUEST["graphs_add"]))		$graphs=$graphs|1;
-			if(isset($_REQUEST["graphs_update"]))	$graphs=$graphs|2;
-			if(isset($_REQUEST["graphs_delete"]))	$graphs=$graphs|4;
-			$screens=0;
-			if(isset($_REQUEST["screens_add"]))		$screens=$screens|1;
-			if(isset($_REQUEST["screens_update"]))	$screens=$screens|2;
-			if(isset($_REQUEST["screens_delete"]))	$screens=$screens|4;
-			$result=add_template_linkage($_REQUEST["hostid"],$_REQUEST["templateid"],$items,$triggers,$actions,$graphs,$screens);
-			show_messages($result, S_TEMPLATE_LINKAGE_ADDED, S_CANNOT_ADD_TEMPLATE_LINKAGE);
-		}
-		if($_REQUEST["register"]=="update linkage")
-		{	
-			$items=0;
-			if(isset($_REQUEST["items_add"]))		$items=$items|1;
+			if(isset($_REQUEST["items_add"]))	$items=$items|1;
 			if(isset($_REQUEST["items_update"]))	$items=$items|2;
 			if(isset($_REQUEST["items_delete"]))	$items=$items|4;
 			$triggers=0;
@@ -95,11 +70,36 @@
 			if(isset($_REQUEST["actions_update"]))	$actions=$actions|2;
 			if(isset($_REQUEST["actions_delete"]))	$actions=$actions|4;
 			$graphs=0;
-			if(isset($_REQUEST["graphs_add"]))		$graphs=$graphs|1;
+			if(isset($_REQUEST["graphs_add"]))	$graphs=$graphs|1;
 			if(isset($_REQUEST["graphs_update"]))	$graphs=$graphs|2;
 			if(isset($_REQUEST["graphs_delete"]))	$graphs=$graphs|4;
 			$screens=0;
-			if(isset($_REQUEST["screens_add"]))		$screens=$screens|1;
+			if(isset($_REQUEST["screens_add"]))	$screens=$screens|1;
+			if(isset($_REQUEST["screens_update"]))	$screens=$screens|2;
+			if(isset($_REQUEST["screens_delete"]))	$screens=$screens|4;
+			$result=add_template_linkage($_REQUEST["hostid"],$_REQUEST["templateid"],$items,$triggers,$actions,$graphs,$screens);
+			show_messages($result, S_TEMPLATE_LINKAGE_ADDED, S_CANNOT_ADD_TEMPLATE_LINKAGE);
+		}
+		if($_REQUEST["register"]=="update linkage")
+		{	
+			$items=0;
+			if(isset($_REQUEST["items_add"]))	$items=$items|1;
+			if(isset($_REQUEST["items_update"]))	$items=$items|2;
+			if(isset($_REQUEST["items_delete"]))	$items=$items|4;
+			$triggers=0;
+			if(isset($_REQUEST["triggers_add"]))	$triggers=$triggers|1;
+			if(isset($_REQUEST["triggers_update"]))	$triggers=$triggers|2;
+			if(isset($_REQUEST["triggers_delete"]))	$triggers=$triggers|4;
+			$actions=0;
+			if(isset($_REQUEST["actions_add"]))	$actions=$actions|1;
+			if(isset($_REQUEST["actions_update"]))	$actions=$actions|2;
+			if(isset($_REQUEST["actions_delete"]))	$actions=$actions|4;
+			$graphs=0;
+			if(isset($_REQUEST["graphs_add"]))	$graphs=$graphs|1;
+			if(isset($_REQUEST["graphs_update"]))	$graphs=$graphs|2;
+			if(isset($_REQUEST["graphs_delete"]))	$graphs=$graphs|4;
+			$screens=0;
+			if(isset($_REQUEST["screens_add"]))	$screens=$screens|1;
 			if(isset($_REQUEST["screens_update"]))	$screens=$screens|2;
 			if(isset($_REQUEST["screens_delete"]))	$screens=$screens|4;
 			$result=update_template_linkage($_REQUEST["hosttemplateid"],$_REQUEST["hostid"],$_REQUEST["templateid"],$items,$triggers,$actions,$graphs,$screens);

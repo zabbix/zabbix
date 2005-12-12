@@ -287,30 +287,12 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#if defined(HAVE_PROC_1_STATUS)
 
-    DIR     *dir;
-    struct  dirent *entries;
-    struct  stat buf;
-    char    filename[MAX_STRING_LEN];
     char    line[MAX_STRING_LEN];
-
-    char    name1[MAX_STRING_LEN];
-    char    name2[MAX_STRING_LEN];
 
     char    procname[MAX_STRING_LEN];
     char    usrname[MAX_STRING_LEN];
     char    procstat[MAX_STRING_LEN];
-
-    int     proc_ok = 0;
-    int     usr_ok = 0;
-    int     stat_ok = 0;
-
-    struct  passwd *usrinfo = NULL;
-    long int	lvalue = 0;
-
-    FILE    *f;
-	int	proccount = 0;
 
         assert(result);
 
@@ -322,27 +304,31 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                 return SYSINFO_RET_FAIL;
         }
     
-        if(get_param(param, 1, procname, MAX_STRING_LEN) != 0)
+        if(get_param(param, 1, line, MAX_STRING_LEN) != 0)
         {
-                return SYSINFO_RET_FAIL;
+                line[0] = '\0';
         }
+	if(line[0] == '\0')
+	{
+		procname[0] = '\0';
+	}
+	else
+	{
+		snprintf(procname,MAX_STRING_LEN-1,"if($(NF)!=\"%s\")continue;",line);
+	}
     
-        if(get_param(param, 2, usrname, MAX_STRING_LEN) != 0)
+        if(get_param(param, 2, line, MAX_STRING_LEN) != 0)
         {
-                usrname[0] = 0;
+                line[0] = '\0';
         }
-        else
-        {
-            if(usrname[0] != 0)
-            {
-                usrinfo = getpwnam(usrname);
-                if(usrinfo == NULL)
-                {
-                    /* incorrect user name */
-                    return SYSINFO_RET_FAIL;
-                }			        
-            }
-        }
+	if(line[0] == '\0')
+	{
+		usrname[0] = '\0';
+	}
+	else
+	{
+		snprintf(usrname,MAX_STRING_LEN-1,"if($(NF-1)!=\"%s\")continue;",line);
+	}
     
 	if(get_param(param, 3, procstat, MAX_STRING_LEN) != 0)
 	{
@@ -356,148 +342,29 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
     
         if(strcmp(procstat,"run") == 0)
         {
-            strscpy(procstat,"R");	
+            strscpy(procstat,"if(substr($1,1,1)!=\"R\")continue;");	
         }
         else if(strcmp(procstat,"sleep") == 0)
         {
-            strscpy(procstat,"S");	
+            strscpy(procstat,"st=substr($1,1,1);if(st!=\"U\"&&st!=\"I\"&&st!=\"S\")continue;");	
         }
         else if(strcmp(procstat,"zomb") == 0)
         {
-            strscpy(procstat,"Z");	
+            strscpy(procstat,"if(substr($1,1,1)!=\"T\")continue;");	
         }
         else if(strcmp(procstat,"all") == 0)
         {
-            procstat[0] = 0;
+            procstat[0] = '\0';
         }
         else
         {
             return SYSINFO_RET_FAIL;
         }
+
+	snprintf(line, MAX_STRING_LEN-1,"ps -eo state,user,ucomm | tail -n +3 | awk 'BEGIN{count=0}{%s%s%scount++;}END{printf count}'",procstat,usrname,procname);
+	
+	return EXECUTE(cmd, line, flags, result);
 		
-        dir=opendir("/proc");
-        if(NULL == dir)
-        {
-            return SYSINFO_RET_FAIL;
-        }
 
-        while((entries=readdir(dir))!=NULL)
-        {
-            proc_ok = 0;
-            stat_ok = 0;
-            usr_ok = 0;
-    
-/* Self is a symbolic link. It leads to incorrect results for proc_cnt[zabbix_agentd] */
-/* Better approach: check if /proc/x/ is symbolic link */
-            if(strncmp(entries->d_name,"self",MAX_STRING_LEN) == 0)
-            {
-                continue;
-            }
-
-            strscpy(filename,"/proc/");	
-            strncat(filename,entries->d_name,MAX_STRING_LEN);
-            strncat(filename,"/status",MAX_STRING_LEN);
-
-            if(stat(filename,&buf)==0)
-            {
-                f=fopen(filename,"r");
-                if(f==NULL)
-                {
-                    continue;
-                }
-    
-                if(procname[0] != 0)
-                {
-                    fgets(line,MAX_STRING_LEN,f);
-                    if(sscanf(line,"%s\t%s\n",name1,name2)==2)
-                    {
-                        if(strcmp(name1,"Name:") == 0)
-                        {
-                            if(strcmp(procname,name2)==0)
-                            {
-                                proc_ok = 1;
-                            }
-                        }
-                    }
-                
-                    if(proc_ok == 0) 
-                    {
-                        fclose(f);
-                        continue;
-                    }
-                }
-                else
-                {
-                    proc_ok = 1;
-                }
-
-                if(procstat[0] != 0)
-                {
-                    while(fgets(line, MAX_STRING_LEN, f) != NULL)
-                    {	
-                    
-                        if(sscanf(line, "%s\t%s\n", name1, name2) != 2)
-                        {
-                            continue;
-                        }
-                        
-                        if(strcmp(name1,"State:") != 0)
-                        {
-                            continue;
-                        }
-                        
-                        if(strcmp(name2, procstat))
-                        {
-                            stat_ok = 1;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    stat_ok = 1;
-                }
-                
-                if(usrinfo != NULL)
-                {
-                    while(fgets(line, MAX_STRING_LEN, f) != NULL)
-                    {	
-                    
-                        if(sscanf(line, "%s\t%li\n", name1, &lvalue) != 2)
-                        {
-                            continue;
-                        }
-                        
-                        if(strcmp(name1,"Uid:") != 0)
-                        {
-                            continue;
-                        }
-                        
-                        if(usrinfo->pw_uid == (uid_t)(lvalue))
-                        {
-                            usr_ok = 1;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    usr_ok = 1;
-                }
-                
-                if(proc_ok && stat_ok && usr_ok)
-                {
-                    proccount++;
-                }
-                
-                fclose(f);
-            }
-    }
-    closedir(dir);
-
-	SET_UI64_RESULT(result, proccount);
     return SYSINFO_RET_OK;
-#else
-    return	SYSINFO_RET_FAIL;
-#endif
 }
