@@ -80,7 +80,7 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 
         init_result(result);
 		
-	SET_UI64_RESULT(result, sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGESIZE));
+	SET_UI64_RESULT(result, (zbx_uint64_t)sysconf(_SC_PHYS_PAGES)*(zbx_uint64_t)sysconf(_SC_PAGESIZE));
 	return SYSINFO_RET_OK;
 }
 
@@ -90,7 +90,7 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 
         init_result(result);
 		
-	SET_UI64_RESULT(result, sysconf(_SC_AVPHYS_PAGES)*sysconf(_SC_PAGESIZE));
+	SET_UI64_RESULT(result, (zbx_uint64_t)sysconf(_SC_AVPHYS_PAGES)*(zbx_uint64_t)sysconf(_SC_PAGESIZE));
 	return SYSINFO_RET_OK;
 }
 

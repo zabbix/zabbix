@@ -1,5 +1,8 @@
 Changes for 1.1beta4:
 
+ - fixed system.swap.size (Eugene)
+ - fixed vm.memory.size (Eugene)
+ - fixed configuration file parsing for user specifed functions (Eugene)
  - added support of system.cpu.load for Tru64 (Eugene)
  - added support of system.cpu.util for Tru64 (Eugene)
  - added support of vm.memory.size for Tru64 (Eugene)

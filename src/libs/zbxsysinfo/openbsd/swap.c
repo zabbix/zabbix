@@ -106,8 +106,8 @@ SWP_FNCLIST
 
 	SWP_FNCLIST fl[] = 
 	{
-		{"total",	SYSTEM_SWAP_FREE},
-		{"free",	SYSTEM_SWAP_TOTAL},
+		{"total",	SYSTEM_SWAP_TOTAL},
+		{"free",	SYSTEM_SWAP_FREE},
 		{0,		0}
 	};
 

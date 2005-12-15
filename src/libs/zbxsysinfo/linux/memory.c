@@ -24,10 +24,6 @@
 
 static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-/* Get CACHED memory in bytes */
-/*	return getPROC("/proc/meminfo",8,2,msg,mlen_max);*/
-/* It does not work for both 2.4 and 2.6 */
-/*	return getPROC("/proc/meminfo",2,7,msg,mlen_max);*/
 	FILE	*f;
 	char	*t;
 	char	c[MAX_STRING_LEN];
@@ -49,6 +45,13 @@ static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, 
 			t=(char *)strtok(c," ");
 			t=(char *)strtok(NULL," ");
 			sscanf(t, ZBX_FS_UI64, &res );
+			t=(char *)strtok(NULL," ");
+			
+			if(strcasecmp(t,"kb"))		res <<= 10;
+			else if(strcasecmp(t, "mb")) 	res <<= 20;
+			else if(strcasecmp(t, "gb")) 	res <<= 30;
+			else if(strcasecmp(t, "tb")) 	res <<= 40;
+
 			break;
 		}
 	}
@@ -60,7 +63,6 @@ static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, 
 
 static int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_SYSINFO_BUFFERRAM
 	struct sysinfo info;
 
 	assert(result);
@@ -80,18 +82,10 @@ static int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags,
 	{
 		return SYSINFO_RET_FAIL;
 	}
-#else
-	assert(result);
-
-        init_result(result);
-		
-	return	SYSINFO_RET_FAIL;
-#endif
 }
 
 static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_SYSINFO_SHAREDRAM
 	struct sysinfo info;
 
 	assert(result);
@@ -111,64 +105,16 @@ static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, 
 	{
 		return SYSINFO_RET_FAIL;
 	}
-#elif defined(HAVE_SYS_VMMETER_VMTOTAL)
-	int mib[2],len;
-	struct vmtotal v;
-
-	assert(result);
-
-        init_result(result);
-		
-	len=sizeof(struct vmtotal);
-	mib[0]=CTL_VM;
-	mib[1]=VM_METER;
-
-	sysctl(mib,2,&v,&len,NULL,0);
-
-	SET_UI64_RESULT(result, v.t_armshr<<2); 
-	return SYSINFO_RET_OK;
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
 }
 
 static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-/* Solaris */
-#ifdef HAVE_UNISTD_SYSCONF
-	assert(result);
-
-        init_result(result);
-		
-	SET_UI64_RESULT(result, sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGESIZE));
-	return SYSINFO_RET_OK;
-#elif defined(HAVE_SYS_PSTAT_H)
-	struct	pst_static pst;
-	long	page;
-
-	assert(result);
-
-        init_result(result);
-		
-	if(pstat_getstatic(&pst, sizeof(pst), (size_t)1, 0) == -1)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-	else
-	{
-		/* Get page size */	
-		page = pst.page_size;
-		/* Total physical memory in bytes */	
-		SET_UI64_RESULT(result, page*pst.physical_memory);
-		return SYSINFO_RET_OK;
-	}
-#elif defined(HAVE_SYSINFO_TOTALRAM)
 	struct sysinfo info;
 
 	assert(result);
 
         init_result(result);
-		
+	
 	if( 0 == sysinfo(&info))
 	{
 #ifdef HAVE_SYSINFO_MEM_UNIT
@@ -182,34 +128,10 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 	{
 		return SYSINFO_RET_FAIL;
 	}
-#elif defined(HAVE_SYS_VMMETER_VMTOTAL)
-	int mib[2],len;
-	struct vmtotal v;
-
-	assert(result);
-
-        init_result(result);
-		
-	len=sizeof(struct vmtotal);
-	mib[0]=CTL_VM;
-	mib[1]=VM_METER;
-
-	sysctl(mib,2,&v,&len,NULL,0);
-
-	SET_UI64_RESULT(result, v.t_rm<<2);
-	return SYSINFO_RET_OK;
-#else
-	assert(result);
-
-        init_result(result);
-		
-	return	SYSINFO_RET_FAIL;
-#endif
 }
 
 static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_SYSINFO_FREERAM
 	struct sysinfo info;
 
 	assert(result);
@@ -229,13 +151,6 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 	{
 		return SYSINFO_RET_FAIL;
 	}
-#else
-	assert(result);
-
-        init_result(result);
-		
-	return	SYSINFO_RET_FAIL;
-#endif
 }
 
 int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
