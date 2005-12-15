@@ -42,6 +42,7 @@ int zabbix_open_log(int type,int level, const char *filename)
 	FILE *log_file = NULL;
 /* Just return if we do not want to write debug */
 	log_level = level;
+
 	if(level == LOG_LEVEL_EMPTY)
 	{
 		return	SUCCEED;
@@ -58,7 +59,7 @@ int zabbix_open_log(int type,int level, const char *filename)
 		log_file = fopen(filename,"a+");
 		if(log_file == NULL)
 		{
-			fprintf(stderr, "Unable to open debug file [%s] [%s]\n", filename, strerror(errno));
+			fprintf(stderr, "Unable to open log file [%s] [%s]\n", filename, strerror(errno));
 			return	FAIL;
 		}
 		log_type = LOG_TYPE_FILE;
@@ -91,7 +92,7 @@ void zabbix_log(int level, const char *fmt, ...)
 
 	struct stat	buf;
 	char	filename_old[MAX_STRING_LEN];
-
+	
 	if( (level>log_level) || (level == LOG_LEVEL_EMPTY))
 	{
 		return;
@@ -114,6 +115,7 @@ void zabbix_log(int level, const char *fmt, ...)
 
 		va_start(ap,fmt);
 		vsnprintf(str,MAX_STRING_LEN,fmt,ap);
+		va_end(ap);
 
 		log_file = fopen(log_filename,"a+");
 		if(log_file == NULL)
@@ -124,7 +126,6 @@ void zabbix_log(int level, const char *fmt, ...)
 		fprintf(log_file,"%s",str);
 		fprintf(log_file,"\n");
 		fclose(log_file);
-		va_end(ap);
 
 
 		if(stat(log_filename,&buf) == 0)
