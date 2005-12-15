@@ -73,7 +73,8 @@ void	collect_statistics()
 		file=fopen("/tmp/zabbix_agentd.tmp2","w");
 		if(NULL == file)
 		{
-			fprintf(stderr, "Cannot open file [%s] [%s]\n","/tmp/zabbix_agentd.tmp2", strerror(errno));
+			zabbix_log( LOG_LEVEL_CRIT, "Cannot open file [%s] [%s]\n","/tmp/zabbix_agentd.tmp2", strerror(errno));
+			exit(1);
 		}
 		else
 		{

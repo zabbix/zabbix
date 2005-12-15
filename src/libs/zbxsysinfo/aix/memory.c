@@ -25,38 +25,41 @@
 static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_PROC
-/* Get CACHED memory in bytes */
-/*	return getPROC("/proc/meminfo",8,2,msg,mlen_max);*/
-/* It does not work for both 2.4 and 2.6 */
-/*	return getPROC("/proc/meminfo",2,7,msg,mlen_max);*/
-	FILE	*f;
-	char	*t;
-	char	c[MAX_STRING_LEN];
-	double	res = 0;
+        FILE    *f;
+        char    *t;
+        char    c[MAX_STRING_LEN];
+        zbx_uint64_t    res = 0;
 
-	assert(result);
+        assert(result);
 
         init_result(result);
-		
-	f=fopen("/proc/meminfo","r");
-	if(NULL == f)
-	{
-		return	SYSINFO_RET_FAIL;
-	}
-	while(NULL!=fgets(c,MAX_STRING_LEN,f))
-	{
-		if(strncmp(c,"Cached:",7) == 0)
-		{
-			t=(char *)strtok(c," ");
-			t=(char *)strtok(NULL," ");
-			sscanf(t, "%lf", &res );
-			break;
-		}
-	}
-	fclose(f);
 
-	SET_UI64_RESULT(result, res);
-	return SYSINFO_RET_OK;
+        f=fopen("/proc/meminfo","r");
+        if(NULL == f)
+        {
+                return  SYSINFO_RET_FAIL;
+        }
+        while(NULL!=fgets(c,MAX_STRING_LEN,f))
+        {
+                if(strncmp(c,"Cached:",7) == 0)
+                {
+                        t=(char *)strtok(c," ");
+                        t=(char *)strtok(NULL," ");
+                        sscanf(t, ZBX_FS_UI64, &res );
+                        t=(char *)strtok(NULL," ");
+
+                        if(strcasecmp(t,"kb"))          res <<= 10;
+                        else if(strcasecmp(t, "mb"))    res <<= 20;
+                        else if(strcasecmp(t, "gb"))    res <<= 30;
+                        else if(strcasecmp(t, "tb"))    res <<= 40;
+
+                        break;
+                }
+        }
+        fclose(f);
+
+        SET_UI64_RESULT(result, res);
+        return SYSINFO_RET_OK;
 #else
 	assert(result);
 
@@ -78,7 +81,7 @@ static int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags,
 	if( 0 == sysinfo(&info))
 	{
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		SET_UI64_RESULT(result, info.bufferram * info.mem_unit);
+		SET_UI64_RESULT(result, (zbx_uint64_t)info.bufferram * (zbx_uint64_t)info.mem_unit);
 #else
 		SET_UI64_RESULT(result, info.bufferram);
 #endif
@@ -109,7 +112,7 @@ static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, 
 	if( 0 == sysinfo(&info))
 	{
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		SET_UI64_RESULT(result, info.sharedram * info.mem_unit);
+		SET_UI64_RESULT(result, (zbx_uint64_t)info.sharedram * (zbx_uint64_t)info.mem_unit);
 #else
 		SET_UI64_RESULT(result, info.sharedram);
 #endif
@@ -142,15 +145,7 @@ static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, 
 
 static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-/* Solaris */
-#ifdef HAVE_UNISTD_SYSCONF
-	assert(result);
-
-        init_result(result);
-		
-	SET_UI64_RESULT(result, sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGESIZE));
-	return SYSINFO_RET_OK;
-#elif defined(HAVE_SYS_PSTAT_H)
+#if defined(HAVE_SYS_PSTAT_H)
 	struct	pst_static pst;
 	long	page;
 
@@ -167,7 +162,7 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 		/* Get page size */	
 		page = pst.page_size;
 		/* Total physical memory in bytes */	
-		SET_UI64_RESULT(result, page*pst.physical_memory);
+		SET_UI64_RESULT(result, (zbx_uint64_t)page*(zbx_uint64_t)pst.physical_memory);
 		return SYSINFO_RET_OK;
 	}
 #elif defined(HAVE_SYSINFO_TOTALRAM)
@@ -180,7 +175,7 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 	if( 0 == sysinfo(&info))
 	{
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		SET_UI64_RESULT(result, info.totalram * info.mem_unit);
+		SET_UI64_RESULT(result, (zbx_uint64_t)info.totalram * (zbx_uint64_t)info.mem_unit);
 #else
 		SET_UI64_RESULT(result, info.totalram);
 #endif
@@ -239,15 +234,7 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 
 static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-/* Solaris */
-#ifdef HAVE_UNISTD_SYSCONF
-	assert(result);
-
-        init_result(result);
-		
-	SET_UI64_RESULT(result, sysconf(_SC_AVPHYS_PAGES)*sysconf(_SC_PAGESIZE));
-	return SYSINFO_RET_OK;
-#elif defined(HAVE_SYS_PSTAT_H)
+#if defined(HAVE_SYS_PSTAT_H)
 	struct	pst_static pst;
 	struct	pst_dynamic dyn;
 	long	page;
@@ -284,7 +271,7 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 */
 		/* Free memory in bytes */
 
-			SET_UI64_RESULT(result, dyn.psd_free * page);
+			SET_UI64_RESULT(result, (zbx_uint64_t)dyn.psd_free * (zbx_uint64_t)page);
 			return SYSINFO_RET_OK;
 		}
 	}
@@ -298,7 +285,7 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 	if( 0 == sysinfo(&info))
 	{
 #ifdef HAVE_SYSINFO_MEM_UNIT
-		SET_UI64_RESULT(result, info.freeram * info.mem_unit);
+		SET_UI64_RESULT(result, (zbx_uint64_t)info.freeram * (zbx_uint64_t)info.mem_unit);
 #else	
 		SET_UI64_RESULT(result, info.freeram);
 #endif

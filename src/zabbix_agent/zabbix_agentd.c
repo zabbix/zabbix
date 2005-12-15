@@ -229,14 +229,6 @@ void usage(char *prog)
 	exit(-1);
 }
 
-void	print_supported()
-{
-	init_metrics();
-	init_config();
-	test_parameters();
-	exit(-1);
-}
-
 void    init_config(void)
 {
 	struct cfg_line cfg[]=
@@ -257,7 +249,6 @@ void    init_config(void)
 		{"DebugLevel",&CONFIG_LOG_LEVEL,0,TYPE_INT,PARM_OPT,0,4},
 		{"StartAgents",&CONFIG_AGENTD_FORKS,0,TYPE_INT,PARM_OPT,1,16},
 		{"RefreshActiveChecks",&CONFIG_REFRESH_ACTIVE_CHECKS,0,TYPE_INT,PARM_OPT,60,3600},
-		{"UserParameter",0,&add_parameter,0,0,0,0},
 		{0}
 	};
 	AGENT_RESULT	result;	
@@ -278,14 +269,14 @@ void    init_config(void)
 
 	if(CONFIG_HOSTNAME == NULL)
 	{
-	  	if(SUCCEED == process("system[hostname]", 0, &result))
+	  	if(SUCCEED == process("system.hostname", 0, &result))
 		{
 	        	if(result.type & AR_STRING)
 			{
 				CONFIG_HOSTNAME=strdup(result.str);
 			}
-	        	free_result(&result);
 		}
+	        free_result(&result);
 
 		if(CONFIG_HOSTNAME == NULL)
 		{
@@ -298,6 +289,19 @@ void    init_config(void)
 	{
 		CONFIG_STAT_FILE=strdup("/tmp/zabbix_agentd.tmp");
 	}*/
+}
+
+void    load_user_parameters(void)
+{
+	struct cfg_line cfg[]=
+	{
+/*               PARAMETER      ,VAR    ,FUNC,  TYPE(0i,1s),MANDATORY,MIN,MAX
+*/
+		{"UserParameter",0,&add_parameter,0,0,0,0},
+		{0}
+	};
+	
+	parse_cfg_file(CONFIG_FILE,cfg);
 }
 
 void	process_child(int sockfd)
@@ -459,6 +463,10 @@ pid_t	child_passive_make(int i,int listenfd, int addrlen)
 	return 0;
 }
 
+#define ZBX_START_DAEMON	0
+#define ZBX_USAGE 		1
+#define ZBX_SUPPORTED 		2
+
 int	main(int argc, char **argv)
 {
 	int		listenfd;
@@ -468,29 +476,49 @@ int	main(int argc, char **argv)
 	char		host[128];
 	int		ch;
 	char		*s;
+	int		task = ZBX_START_DAEMON;
 
         static struct  sigaction phan;
 
 /* Parse the command-line. */
-	while ((ch = getopt(argc, argv, "c:h:p")) != EOF)
+	while ((ch = getopt(argc, argv, "c:hp")) != EOF)
 		switch ((char) ch) {
 		case 'c':
 			CONFIG_FILE = optarg;
 			break;
 		case 'h':
-			usage(argv[0]);
+			task = ZBX_USAGE;
 			break;
 		case 'p':
-			print_supported();
+			task = ZBX_SUPPORTED;
 			break;
 		default:
-			usage(argv[0]);
+			task = ZBX_USAGE;
 			break;
 	}
 
 /* Must be before init_config() */
 	init_metrics();
 	init_config();
+	
+	if(CONFIG_LOG_FILE == NULL)
+		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
+	else
+		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
+	
+	load_user_parameters();
+	
+	switch(task)
+	{
+		case ZBX_SUPPORTED:
+			test_parameters();
+			exit(-1);
+			break;
+		case ZBX_USAGE:
+			usage(argv[0]);
+			break;
+	}
+	
 	daemon_init();
 
 	phan.sa_handler = &signal_handler;
@@ -500,16 +528,6 @@ int	main(int argc, char **argv)
 	sigaction(SIGQUIT, &phan, NULL);
 	sigaction(SIGTERM, &phan, NULL);
 	sigaction(SIGPIPE, &phan, NULL);
-
-
-	if(CONFIG_LOG_FILE == NULL)
-	{
-		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
-	}
-	else
-	{
-		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
-	}
 
 	if( FAIL == create_pid_file(CONFIG_PID_FILE))
 	{

@@ -81,22 +81,22 @@ void	add_user_parameter(char *key,char *command)
 	char	usr_cmd[MAX_STRING_LEN];
 	char	usr_param[MAX_STRING_LEN];
 	unsigned	flag = 0;
-
+	
 	i = parse_command(key, usr_cmd, MAX_STRING_LEN, usr_param, MAX_STRING_LEN);
 	if(i == 0)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Can't add user specifed key \"%s\". Incorrect key!", key);
+		zabbix_log( LOG_LEVEL_WARNING, "Can't add user specifed key \"%s\". Can't parse key!", key);
 		return;
 	} 
 	else if(i == 2) /* with specifed parameters */
 	{
-		if(usr_param[0] != '\0'){ /* must be emprty parameters */
-			zabbix_log( LOG_LEVEL_WARNING, "Can't add user specifed key \"%s\". Incorrect key!", key);
+		if(strcmp(usr_param,"*")){ /* must be '*' parameters */
+			zabbix_log(LOG_LEVEL_WARNING, "Can't add user specifed key \"%s\". Incorrect key!", key);
 			return;
 		}
 		flag |= CF_USEUPARAM;
 	}
-		
+
 	for(i=0;;i++)
 	{
 		/* Add new parameters */
