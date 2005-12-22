@@ -47,7 +47,7 @@
 ?>
 
 <?php
-	$trigger=get_troigger_by_triggerid($_REQUEST["triggerid"]);
+	$trigger=get_trigger_by_triggerid($_REQUEST["triggerid"]);
 	$comments=stripslashes($trigger["comments"]);
 ?>
 
