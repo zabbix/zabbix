@@ -1,5 +1,11 @@
 1.1beta5:
 
+ - document UserParameters $1,...,$9
+ - make alternative to $1-$9: {1}-{9}
+ - remove escalations from GUI
+ - redefine constants to have prefix ZBX_* in common.h
+ - http://www.zabbix.com/forum/showthread.php?p=6360#post6360
+
  - When adding plain text into a screen, allow for the number of entries displayed to be set. For example, I do not need to see the past 25 records of my uptime, host information, or Zabbix agent version.
  - fix undeleted warnings for host and trigger statuses
  - make agents return error message if not supported or not available
