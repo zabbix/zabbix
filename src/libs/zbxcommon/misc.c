@@ -179,24 +179,32 @@ int	is_uint(char *c)
 	return SUCCEED;
 }
 
-void	set_result_type(AGENT_RESULT *result, char *c)
+int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 {
-	if(is_uint(c) == SUCCEED)
-	{
-		SET_UI64_RESULT(result, atoll(c));
+	int ret = FAIL;
 
-		SET_DBL_RESULT(result, atof(c));
-
-		SET_STR_RESULT(result, strdup(c));
-	}
-	else if(is_double(c) == SUCCEED)
+	if(value_type == ITEM_VALUE_TYPE_UINT64)
 	{
-		SET_DBL_RESULT(result, atof(c));
-
-		SET_STR_RESULT(result, strdup(c));
+		del_zeroes(c);
+		if(is_uint(c) == SUCCEED)
+		{
+			SET_UI64_RESULT(result, atoll(c));
+			ret = SUCCEED;
+		}
 	}
-	else
+	else if(value_type == ITEM_VALUE_TYPE_FLOAT)
+	{
+		if(is_double(c) == SUCCEED)
+		{
+			SET_DBL_RESULT(result, atof(c));
+			ret = SUCCEED;
+		}
+	}
+	else if(value_type == ITEM_VALUE_TYPE_STR)
 	{
 		SET_STR_RESULT(result, strdup(c));
+		ret = SUCCEED;
 	}
+
+	return ret;
 }

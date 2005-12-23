@@ -128,6 +128,7 @@ int	DBexecute(char *query)
 {
 /* Do not include any code here. Will break HAVE_PGSQL section */
 #ifdef	HAVE_MYSQL
+/*	if(strstr(query, "17828") != NULL)*/
 	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
 
 	while( mysql_query(&mysql,query) != 0)

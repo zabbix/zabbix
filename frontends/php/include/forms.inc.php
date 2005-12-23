@@ -483,7 +483,7 @@
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"key\" value=\"$key\" size=40>";
 
-		if($value_type==ITEM_VALUE_TYPE_FLOAT)
+		if( ($value_type==ITEM_VALUE_TYPE_FLOAT) || ($value_type==ITEM_VALUE_TYPE_UINT64))
 		{
 			show_table2_v_delimiter($col++);
 			echo S_UNITS;
@@ -561,13 +561,16 @@
 		show_table2_h_delimiter();
 		echo "<SELECT class=\"biginput\" NAME=\"value_type\" value=\"$value_type\" size=\"1\" onChange=\"submit()\">";
 		echo "<OPTION VALUE=\"0\"";
-		if($value_type==0) echo "SELECTED";
-		echo ">".S_NUMERIC;
+		if($value_type==ITEM_VALUE_TYPE_FLOAT) echo "SELECTED";
+		echo ">".S_NUMERIC_FLOAT;
+		echo "<OPTION VALUE=\"3\"";
+		if($value_type==ITEM_VALUE_TYPE_UINT64) echo "SELECTED";
+		echo ">".S_NUMERIC_UINT64;
 		echo "<OPTION VALUE=\"1\"";
-		if($value_type==1) echo "SELECTED";
+		if($value_type==ITEM_VALUE_TYPE_STR) echo "SELECTED";
 		echo ">".S_CHARACTER;
 		echo "<OPTION VALUE=\"2\"";
-		if($value_type==2) echo "SELECTED";
+		if($value_type==ITEM_VALUE_TYPE_LOG) echo "SELECTED";
 		echo ">".S_LOG;
 		echo "</SELECT>";
 
@@ -583,7 +586,7 @@
 			echo "<input class=\"biginput\" name=\"logtimefmt\" type=hidden value=\"$logtimefmt\">";
 		}
 
-		if($value_type==ITEM_VALUE_TYPE_FLOAT)
+		if( ($value_type==ITEM_VALUE_TYPE_FLOAT) || ($value_type==ITEM_VALUE_TYPE_UINT64))
 		{
 			show_table2_v_delimiter($col++);
 			echo nbsp(S_STORE_VALUE);

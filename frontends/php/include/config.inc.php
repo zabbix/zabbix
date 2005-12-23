@@ -1249,11 +1249,15 @@ echo "</head>";
 	function	show_plaintext($itemid, $from, $till)
 	{
 		$item=get_item_by_itemid($itemid);
-		if($item["value_type"]==0)
+		if($item["value_type"]==ITEM_VALUE_TYPE_FLOAT)
 		{
 			$sql="select clock,value from history where itemid=$itemid and clock>$from and clock<$till order by clock";
 		}
-		if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
+		else if($item["value_type"]==ITEM_VALUE_TYPE_UINT64)
+		{
+			$sql="select clock,value from history_uint where itemid=$itemid and clock>$from and clock<$till order by clock";
+		}
+		else if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
 		{
 			$sql="select clock,value from history_log where itemid=$itemid and clock>$from and clock<$till order by clock";
 		}

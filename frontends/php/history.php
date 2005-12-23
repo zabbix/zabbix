@@ -168,6 +168,10 @@
 		{
 			$sql="select clock,value from history where itemid=".$_REQUEST["itemid"]." and clock>$time and clock<$till order by clock desc";
 		}
+		else if($item["value_type"]==ITEM_VALUE_TYPE_UINT64)
+		{
+			$sql="select clock,value from history_uint where itemid=".$_REQUEST["itemid"]." and clock>$time and clock<$till order by clock desc";
+		}
 		else if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
 		{
 			$sql="select clock,value,timestamp,source,severity from history_log where itemid=".$_REQUEST["itemid"]." and clock>$time and clock<$till order by id desc, clock desc";
@@ -225,6 +229,10 @@
 			{
 				echo "<TD>$value</TD>";
 			}
+			else if($item["value_type"]==ITEM_VALUE_TYPE_UINT64)
+			{
+				echo "<TD>$value</TD>";
+			}
 			else
 			{
 				echo "<TD><pre>".htmlspecialchars($value)."</pre></TD>";
@@ -275,6 +283,10 @@
 		{
 			$sql="select clock,value from history where itemid=".$_REQUEST["itemid"]." order by clock desc limit 500";
 		}
+		else if($item["value_type"]==ITEM_VALUE_TYPE_UINT64)
+		{
+			$sql="select clock,value from history_uint where itemid=".$_REQUEST["itemid"]." order by clock desc limit 500";
+		}
 		else if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
 		{
 			$sql="select clock,value,timestamp,source,severity from history_log where itemid=".$_REQUEST["itemid"]." order by id desc, clock desc limit 500";
@@ -315,7 +327,7 @@
 		                elseif($severity==7)     $severity=S_AUDIT_FAILURE;
 
 			}
-			if($item["value_type"]!=ITEM_VALUE_TYPE_FLOAT)
+			if(($item["value_type"]!=ITEM_VALUE_TYPE_FLOAT) && ($item["value_type"]!=ITEM_VALUE_TYPE_UINT64))
 			{
 				$value="<pre>".htmlspecialchars($value)."</pre>";
 			}
