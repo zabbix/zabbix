@@ -321,6 +321,79 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		return	TRUE;
 	}
 
+	# Update triger from 
+	function	update_trigger_from_linked_hosts($triggerid)
+	{
+		if($triggerid<=0)
+		{
+			return;
+		}
+
+		$trigger=get_trigger_by_triggerid($triggerid);
+
+# get hostid by triggerid
+
+		$sql="select distinct h.hostid from hosts h,functions f, items i where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid=$triggerid";
+		$result=DBselect($sql);
+		if(DBnum_rows($result)!=1){ return; }
+		$row0=DBfetch($result);
+
+#get linked hosts
+		$sql="select hostid,templateid,triggers from hosts_templates where templateid=".$row0["hostid"];
+		$result=DBselect($sql);
+		// Loop: linked hosts
+		while($row=DBfetch($result))
+		{
+			if($row["triggers"]&3 == 0)	continue;
+#get triggers
+			$sql="select distinct f.triggerid from functions f,items i,triggers t where t.description='".addslashes($trigger["description"])."' and t.triggerid=f.triggerid and i.itemid=f.itemid and i.hostid=".$row["hostid"];
+			$result2=DBselect($sql);
+			// Loop: triggers
+			while($row2=DBfetch($result2))
+			{
+				delete_function_by_triggerid($row2["triggerid"]);
+				
+				$expression_old=$trigger["expression"];
+#get functions
+				$sql="select i.key_,f.parameter,f.function,f.functionid from functions f,items i where i.itemid=f.itemid and f.triggerid=".$trigger["triggerid"];
+				$result2=DBselect($sql);
+				// Loop: functions
+				while($row3=DBfetch($result2))
+				{
+
+					$sql="select itemid from items where key_=\"".$row3["key_"]."\" and hostid=".$row["hostid"];
+					$result3=DBselect($sql);
+					if(DBnum_rows($result3)!=1)
+					{
+						$sql="delete from triggers where triggerid=".$row2["triggerid"];
+						DBexecute($sql);
+						$sql="delete from functions where triggerid=".$row2["triggerid"];
+						DBexecute($sql);
+						break;
+					}
+					$row4=DBfetch($result3);
+	
+					$item=get_item_by_itemid($row4["itemid"]);
+	
+					$sql="insert into functions (itemid,triggerid,function,parameter) values (".$item["itemid"].",".$row2["triggerid"].",'".$row3["function"]."','".$row3["parameter"]."')";
+					$result5=DBexecute($sql);
+					$functionid=DBinsert_id($result5,"functions","functionid");
+	
+					$sql="update triggers set expression='$expression_old' where triggerid=".$row2["triggerid"];
+					DBexecute($sql);
+					$expression=str_replace("{".$row3["functionid"]."}","{".$functionid."}",$expression_old);
+					$expression_old=$expression;
+					$sql="update triggers set expression='$expression' where triggerid=".$row2["triggerid"];
+					DBexecute($sql);
+				}
+
+				$host=get_host_by_hostid($row["hostid"]);
+				info("Updated trigger from linked host ".$host["host"]);
+			}
+
+		}
+	}
+
 	# Add item to hardlinked hosts
 
 	function	add_trigger_to_linked_hosts($triggerid,$hostid=0)
