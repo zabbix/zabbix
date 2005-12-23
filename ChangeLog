@@ -1,5 +1,7 @@
 Changes for 1.1beta5:
 
+ - added configurable number of plain text elements for screens (Alexei)
+ - added screens_items.elements (Alexei)
  - escalations removed from GUI (Alexei)
  - fixed typo in tr_comments.php (Alexei)
 

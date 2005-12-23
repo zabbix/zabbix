@@ -602,6 +602,7 @@
 	"S_PLAIN_TEXT"=>			"Plain text",
 	"S_COLUMN_SPAN"=>			"Column span",
 	"S_ROW_SPAN"=>				"Row span",
+	"S_SHOW_LINES"=>			"Show lines",
 
 //	screens.php
 	"S_CUSTOM_SCREENS"=>			"Custom screens",

@@ -1218,21 +1218,21 @@ echo "</head>";
 	}
 
 	# Show screen cell containing plain text values
-	function	show_screen_plaintext($itemid)
+	function	show_screen_plaintext($itemid,$elements)
 	{
 		$item=get_item_by_itemid($itemid);
 		if($item["value_type"]==0)
 		{
-			$sql="select clock,value from history where itemid=$itemid order by clock desc limit 25";
+			$sql="select clock,value from history where itemid=$itemid order by clock desc limit $elements";
 		}
 		else
 		{
-			$sql="select clock,value from history_str where itemid=$itemid order by clock desc limit 25";
+			$sql="select clock,value from history_str where itemid=$itemid order by clock desc limit $elements";
 		}
                 $result=DBselect($sql);
 
 		table_begin();
-		table_header(array(S_CLOCK,$item["description"]));
+		table_header(array(S_TIMESTAMP,$item["description"]));
 		$col=0;
 		while($row=DBfetch($result))
 		{
