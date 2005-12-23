@@ -5,6 +5,7 @@
  - remove escalations from GUI
  - redefine constants to have prefix ZBX_* in common.h
  - http://www.zabbix.com/forum/showthread.php?p=6360#post6360
+ - http://www.zabbix.com/forum/showthread.php?t=1849
 
  - When adding plain text into a screen, allow for the number of entries displayed to be set. For example, I do not need to see the past 25 records of my uptime, host information, or Zabbix agent version.
  - fix undeleted warnings for host and trigger statuses
