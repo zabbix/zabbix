@@ -294,7 +294,7 @@
 
 			if(isset($row["lastvalue"]))
 			{
-				iif_echo($row["value_type"] == 0,
+				iif_echo( ($row["value_type"] == ITEM_VALUE_TYPE_FLOAT) || ($row["value_type"] == ITEM_VALUE_TYPE_UINT64),
 					"<td>".convert_units($row["lastvalue"],$row["units"])."</td>",
 					"<td>".nbsp(htmlspecialchars(substr($row["lastvalue"],0,20)." ..."))."</td>");
 			}
@@ -325,7 +325,7 @@
 			{
 				echo "<td align=center>-</td>";
 			}
-			iif_echo($row["value_type"]==0,
+			iif_echo(($row["value_type"]==ITEM_VALUE_TYPE_FLOAT) ||($row["value_type"]==ITEM_VALUE_TYPE_UINT64),
 				"<td align=center><a href=\"history.php?action=showhistory&itemid=".$row["itemid"]."\">".S_GRAPH."</a></td>",
 				"<td align=center><a href=\"history.php?action=showvalues&period=3600&itemid=".$row["itemid"]."\">".S_HISTORY."</a></td>");
 
