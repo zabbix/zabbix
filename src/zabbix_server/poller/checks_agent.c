@@ -184,7 +184,9 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 	{
 		c[len]=0;
 	}*/
-	zabbix_log(LOG_LEVEL_DEBUG, "Got string:[%d] [%s]", len, c);
+
+/*	if(item->itemid == 17828)
+		zabbix_log(LOG_LEVEL_WARNING, "Got string:[%d] [%s]", len, c);*/
 
 	if( strcmp(c,"ZBX_NOTSUPPORTED") == 0)
 	{
@@ -208,19 +210,13 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 		return	NETWORK_ERROR;
 	}
 
-	set_result_type(result, c);
-
-	if(is_uint(c) == SUCCEED)
+	if(set_result_type(result, item->value_type, c) == FAIL)
 	{
-		SET_UI64_RESULT(result, atoll(c));
-	}
-	else if(is_double(c) == SUCCEED)
-	{
-		SET_DBL_RESULT(result, atof(c));
-	}
-	else
-	{
-		SET_STR_RESULT(result, strdup(c));
+		snprintf(error,MAX_STRING_LEN-1, "Type of received value [%s] is not sutable for [%s@%s]", c, item->key, item->host);
+		zabbix_log( LOG_LEVEL_WARNING, error);
+		zabbix_log( LOG_LEVEL_WARNING, "Returning NOTSUPPORTED");
+		result->msg=strdup(error);
+		return NOTSUPPORTED;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "RESULT_STR [%c]", c);

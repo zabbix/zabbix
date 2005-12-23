@@ -226,8 +226,8 @@ int get_values(void)
 		DBget_item_from_db(&item,result, i);
 
 		init_result(&agent);
-		res = get_value(&item, &agent);
 		zabbix_log( LOG_LEVEL_DEBUG, "GOT VALUE TYPE [0x%X]", agent.type);
+		res = get_value(&item, &agent);
 		
 		if(res == SUCCEED )
 		{

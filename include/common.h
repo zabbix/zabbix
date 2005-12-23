@@ -338,7 +338,7 @@ int	get_param(const char *param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
 int	calculate_item_nextcheck(int delay, int now);
 
-void	set_result_type(AGENT_RESULT *result, char *c);
+int	set_result_type(AGENT_RESULT *result, int value_type, char *c);
 
 int	replace_param(const char *cmd, const char *param, char *out, int outlen);
 

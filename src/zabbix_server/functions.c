@@ -512,11 +512,16 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 		zabbix_log(LOG_LEVEL_DEBUG, "Value [%s] Lastlogsize [%s] Timestamp [%s]", value, lastlogsize, timestamp);
 	}
 
-	set_result_type(&agent, value);
-
-	process_new_value(&item,&agent);
-
-	update_triggers(item.itemid);
+	if(set_result_type(&agent, item.value_type, value) == SUCCEED)
+	{
+		process_new_value(&item,&agent);
+		update_triggers(item.itemid);
+	}
+	else
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Type of received value [%s] is not sutable for [%s@%s]", value, item.key, item.host );
+		zabbix_syslog("Type of received value [%s] is not sutable for [%s@%s]", value, item.key, item.host );
+	}
  
 	DBfree_result(result);
 
