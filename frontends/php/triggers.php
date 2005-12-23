@@ -119,6 +119,7 @@
 				else			{ $status=0; }
 	
 				$result=update_trigger($_REQUEST["triggerid"],$_REQUEST["expression"],$_REQUEST["description"],$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"]);
+				update_trigger_from_linked_hosts($_REQUEST["triggerid"]);
 				show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
 			}
 			else
