@@ -424,29 +424,55 @@
 			}
 		}
 
-// Calculation of maximum Y left axis side
-		function calculateMinYleft()
+// Calculation of maximum Y axis
+		function calculateMinY($side)
 		{
-			if($this->yaxistype==GRAPH_YAXIS_TYPE_FIXED)
-			{
-				return $this->yaxismin;
-			}
-			else
-			{
-				return 0;
-			}
-		}
+//			return 0;
 
-// Calculation of maximum Y right axis side
-		function calculateMinYright()
-		{
 			if($this->yaxistype==GRAPH_YAXIS_TYPE_FIXED)
 			{
 				return $this->yaxismin;
 			}
 			else
 			{
-				return 0;
+				unset($minY);
+				for($i=0;$i<$this->num;$i++)
+				{
+					if($this->items[$i]["axisside"] != $side)	continue;
+					if(!isset($minY)&&(isset($this->min[$i])))
+					{
+						if(count($this->max[$i])>0)
+						{
+							$minY=min($this->avg[$i]);
+						}
+					}
+					else
+					{
+						$minY=@iif($minY>min($this->avg[$i]),min($this->avg[$i]),$minY);
+					}
+				}
+	
+				if(isset($minY)&&($minY>0))
+				{
+					$exp = floor(log10($minY));
+					$mant = $minY/pow(10,$exp);
+				}
+				else
+				{
+					$exp=0;
+					$mant=0;
+				}
+	
+				$mant=(floor($mant*1.1*10/6)-1)*6/10;
+//				$mant=(floor($mant*1.1*10/6)+1)*6/10;
+	
+				$minY = $mant*pow(10,$exp);
+
+				// Do not allow <0. However we may allow it, no problem.
+				$minY = max(0,$minY);
+	
+				return $minY;
+//				return 0;
 			}
 		}
 
@@ -552,7 +578,7 @@
 
 //			$this->im = imagecreate($this->sizeX+$this->shiftX+61,$this->sizeY+2*$this->shiftY+40);
 
-//		Header( "Content-type:  text/html"); 
+//			Header( "Content-type:  text/html"); 
 			Header( "Content-type:  image/png"); 
 			Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 
@@ -590,8 +616,8 @@
 			$maxX=900;
 			$minX=0;
 
-			$minYleft=$this->calculateMinYleft();
-			$minYright=$this->calculateMinYright();
+			$minYleft=$this->calculateMinY(GRAPH_YAXIS_SIDE_LEFT);
+			$minYright=$this->calculateMinY(GRAPH_YAXIS_SIDE_RIGHT);
 			$maxYleft=$this->calculateMaxY(GRAPH_YAXIS_SIDE_LEFT);
 			$maxYright=$this->calculateMaxY(GRAPH_YAXIS_SIDE_RIGHT);
 
