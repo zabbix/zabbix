@@ -70,7 +70,9 @@
 				$_REQUEST["maxrepeats"]=0;
 				$_REQUEST["repeatdelay"]=600;
 			}
+			
 			$result=update_action( $_REQUEST["actionid"], $_REQUEST["triggerid"], $_REQUEST["userid"], $_REQUEST["good"], $_REQUEST["delay"], $_REQUEST["subject"], $_REQUEST["message"],$_REQUEST["scope"],$_REQUEST["severity"],$_REQUEST["recipient"],$_REQUEST["usrgrpid"],$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"]);
+			update_action_from_linked_hosts($_REQUEST["actionid"]);
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
 			if($result)
 			{
@@ -226,7 +228,7 @@
 		// Otherwise symbols like ",' will not be shown
 		$subject=htmlspecialchars($action["subject"]);
 		$message=$action["message"];
-		$uid=$action["uid"];
+		$uid=$action["userid"];
 		$scope=@iif(isset($_REQUEST["scope"]),$_REQUEST["scope"],$action["scope"]);
 		$severity=$action["severity"];
 		$recipient=@iif(isset($_REQUEST["recipient"]),$_REQUEST["recipient"],$action["recipient"]);
