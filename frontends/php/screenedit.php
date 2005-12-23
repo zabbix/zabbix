@@ -49,7 +49,7 @@
 //				delete_screen_item($_REQUEST["screenitemid"]);
 //				unset($_REQUEST["screenitemid"]);
 //			}
-			$result=add_screen_item($_REQUEST["resource"],$_REQUEST["screenid"],$_REQUEST["x"],$_REQUEST["y"],$_REQUEST["resourceid"],$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["colspan"],$_REQUEST["rowspan"]);
+			$result=add_screen_item($_REQUEST["resource"],$_REQUEST["screenid"],$_REQUEST["x"],$_REQUEST["y"],$_REQUEST["resourceid"],$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["colspan"],$_REQUEST["rowspan"],$_REQUEST["elements"]);
 			unset($_REQUEST["x"]);
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
@@ -61,7 +61,7 @@
 		}
                 if($_REQUEST["register"]=="update")
                 {
-                        $result=update_screen_item($_REQUEST["screenitemid"],$_REQUEST["resource"],$_REQUEST["resourceid"],$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["colspan"],$_REQUEST["rowspan"]);
+                        $result=update_screen_item($_REQUEST["screenitemid"],$_REQUEST["resource"],$_REQUEST["resourceid"],$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["colspan"],$_REQUEST["rowspan"],$_REQUEST["elements"]);
                         show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 			unset($_REQUEST["x"]);
                 }
@@ -92,6 +92,7 @@
 			$height=$irow["height"];
 			$colspan=$irow["colspan"];
 			$rowspan=$irow["rowspan"];
+			$elements=$irow["elements"];
         	}
 		else
 		{
@@ -102,6 +103,7 @@
 			$height=100;
 			$colspan=0;
 			$rowspan=0;
+			$elements=25;
 		}
 		$tmp="";
 		if($colspan>1)
@@ -141,6 +143,7 @@
 			$height=@iif(isset($_REQUEST["height"]),$_REQUEST["height"],$height);
 			$colspan=@iif(isset($_REQUEST["colspan"]),$_REQUEST["colspan"],$colspan);
 			$rowspan=@iif(isset($_REQUEST["rowspan"]),$_REQUEST["rowspan"],$rowspan);
+			$elements=@iif(isset($_REQUEST["elements"]),$_REQUEST["elements"],$elements);
 
         		show_form_begin("screenedit.cell");
         		echo S_SCREEN_CELL_CONFIGURATION;
@@ -197,6 +200,11 @@
 					echo "<OPTION VALUE='$itemid_' ".iif($resourceid==$itemid_,"selected","").">$host_: $description_";
 				}
 				echo "</SELECT>";
+
+				show_table2_v_delimiter();
+				echo nbsp(S_SHOW_LINES);
+				show_table2_h_delimiter();
+				echo "<input class=\"biginput\" name=\"elements\" size=2 value=\"$elements\">";
 			}
 // User-defined graph
 			else if($resource == 0)
@@ -288,7 +296,7 @@
 		}
 		else if( ($screenitemid!=0) && ($resource==3) )
 		{
-			show_screen_plaintext($resourceid);
+			show_screen_plaintext($resourceid,$elements);
 			echo "<p align=center>";
 			echo "<a href=screenedit.php?register=edit&screenid=$screenid&x=$c&y=$r>".S_CHANGE."</a>";
 		}
