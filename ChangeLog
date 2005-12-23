@@ -1,5 +1,6 @@
 Changes for 1.1beta5:
 
+ - calculated minimum Y in graphs (Alexei)
  - added configurable number of plain text elements for screens (Alexei)
  - added screens_items.elements (Alexei)
  - escalations removed from GUI (Alexei)
