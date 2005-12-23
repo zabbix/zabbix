@@ -55,17 +55,17 @@
                 return  DBexecute($sql);
         }
 
-        function add_screen_item($resource,$screenid,$x,$y,$resourceid,$width,$height,$colspan,$rowspan)
+        function add_screen_item($resource,$screenid,$x,$y,$resourceid,$width,$height,$colspan,$rowspan,$elements)
         {
                 $sql="delete from screens_items where screenid=$screenid and x=$x and y=$y";
                 DBexecute($sql);
-                $sql="insert into screens_items (resource,screenid,x,y,resourceid,width,height,colspan,rowspan) values ($resource,$screenid,$x,$y,$resourceid,$width,$height,$colspan,$rowspan)";
+                $sql="insert into screens_items (resource,screenid,x,y,resourceid,width,height,colspan,rowspan,elements) values ($resource,$screenid,$x,$y,$resourceid,$width,$height,$colspan,$rowspan,$elements)";
                 return  DBexecute($sql);
         }
 
-        function update_screen_item($screenitemid,$resource,$resourceid,$width,$height,$colspan,$rowspan)
+        function update_screen_item($screenitemid,$resource,$resourceid,$width,$height,$colspan,$rowspan,$elements)
         {
-                $sql="update screens_items set resource=$resource,resourceid=$resourceid,width=$width,height=$height,colspan=$colspan,rowspan=$rowspan where screenitemid=$screenitemid";
+                $sql="update screens_items set resource=$resource,resourceid=$resourceid,width=$width,height=$height,colspan=$colspan,rowspan=$rowspan,elements=$elements where screenitemid=$screenitemid";
                 return  DBexecute($sql);
         }
 

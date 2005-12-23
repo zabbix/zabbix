@@ -589,6 +589,7 @@ CREATE TABLE screens_items (
   y			int4		DEFAULT '0' NOT NULL,
   colspan		int4		DEFAULT '0' NOT NULL,
   rowspan		int4		DEFAULT '0' NOT NULL,
+  elements		int4		DEFAULT '25' NOT NULL,
   PRIMARY KEY  (screenitemid)
 );
 
