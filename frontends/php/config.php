@@ -94,6 +94,7 @@
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Alarm history [".$_REQUEST["alarm_history"]."] alert history [".$_REQUEST["alert_history"]."]");
 			}
 		}
+/*
 		if($_REQUEST["register"]=="add rule")
 		{
 			$result=add_escalation_rule($_REQUEST["escalationid"],$_REQUEST["level"],$_REQUEST["period"],$_REQUEST["delay"],$_REQUEST["actiontype"]);
@@ -152,6 +153,7 @@
 			unset($_REQUEST["escalationid"]);
 			show_messages($result, S_ESCALATION_DELETED, S_ESCALATION_WAS_NOT_DELETED);
 		}
+*/
 		if($_REQUEST["register"]=="add autoregistration")
 		{
 			$result=add_autoregistration($_REQUEST["pattern"],$_REQUEST["priority"],$_REQUEST["hostid"]);
@@ -220,7 +222,7 @@
 	$h2=$h2."<select class=\"biginput\" name=\"config\" onChange=\"submit()\">";
 	$h2=$h2.form_select("config",0,S_HOUSEKEEPER);
 	$h2=$h2.form_select("config",1,S_MEDIA_TYPES);
-	$h2=$h2.form_select("config",2,S_ESCALATION_RULES);
+//	$h2=$h2.form_select("config",2,S_ESCALATION_RULES);
 	$h2=$h2.form_select("config",3,S_IMAGES);
 	$h2=$h2.form_select("config",4,S_AUTOREGISTRATION);
 	$h2=$h2.form_select("config",5,S_OTHER);
@@ -533,7 +535,8 @@
 ?>
 
 <?php
-	if($_REQUEST["config"]==2)
+// Disabled
+	if($_REQUEST["config"]==20)
 	{
 		echo "<br>";
 		show_table_header(S_ESCALATION_RULES_BIG);
