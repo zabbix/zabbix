@@ -1,10 +1,12 @@
 1.1beta5:
 
+ - save UINT in history_uint
  - document UserParameters $1,...,$9
  - make alternative to $1-$9: {1}-{9}
  - redefine constants to have prefix ZBX_* in common.h
  - http://www.zabbix.com/forum/showthread.php?p=6360#post6360
  - http://www.zabbix.com/forum/showthread.php?t=1849
+ - http://www.zabbix.com/forum/showthread.php?t=1842
 
  - fix undeleted warnings for host and trigger statuses
  - make agents return error message if not supported or not available
