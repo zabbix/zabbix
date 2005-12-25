@@ -1,5 +1,7 @@
 1.1beta5:
 
+ - execution of commands on monitored hosts in case of pre-defined events
+ - centralized definition of actions 
  - save UINT in history_uint
  - document UserParameters $1,...,$9
  - make alternative to $1-$9: {1}-{9}
@@ -25,7 +27,6 @@ ZABBIX 1.1:
  graphs from this host button.... like the one that adds items.
  -Can u make possible to change the simple graph..... like changing it to
  bold....
- - execution of commands on monitored hosts in case of pre-defined events
  - anvanced SNMP trapper
  - add acknowledgements
 
