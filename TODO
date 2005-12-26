@@ -1,5 +1,6 @@
 1.1beta5:
 
+ - triggers on windows logs and file monitoring
  - execution of commands on monitored hosts in case of pre-defined events
  - centralized definition of actions 
  - save UINT in history_uint
