@@ -202,9 +202,7 @@ CREATE INDEX audit_clock on audit (clock);
 
 CREATE TABLE actions (
   actionid		serial,
-  triggerid		int4		DEFAULT '0' NOT NULL,
   userid		int4		DEFAULT '0' NOT NULL,
-  scope			int4		DEFAULT '0' NOT NULL,
   severity		int4		DEFAULT '0' NOT NULL,
   good			int4		DEFAULT '0' NOT NULL,
   delay			int4		DEFAULT '0' NOT NULL,
@@ -214,6 +212,12 @@ CREATE TABLE actions (
   recipient		int4		DEFAULT '0' NOT NULL,
   maxrepeats		int4		DEFAULT '0' NOT NULL,
   repeatdelay		int4		DEFAULT '600' NOT NULL,
+  source		int2		DEFAULT '0' NOT NULL,
+  actiontype		int2		DEFAULT '0' NOT NULL,
+  filter_triggerid	int4		DEFAULT '0' NOT NULL,
+  filter_hostid		int4		DEFAULT '0' NOT NULL,
+  filter_groupid	int4		DEFAULT '0' NOT NULL,
+  filter_trigger_name	varchar(255)	DEFAULT '' NOT NULL,
   PRIMARY KEY (actionid)
 --  depends on scope. Could be hostid or 0.
 --  FOREIGN KEY (triggerid) REFERENCES triggers

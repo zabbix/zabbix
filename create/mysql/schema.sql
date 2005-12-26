@@ -201,9 +201,7 @@ CREATE TABLE alerts (
 
 CREATE TABLE actions (
   actionid		int(4)		NOT NULL auto_increment,
-  triggerid		int(4)		DEFAULT '0' NOT NULL,
   userid		int(4)		DEFAULT '0' NOT NULL,
-  scope			int(4)		DEFAULT '0' NOT NULL,
   severity		int(4)		DEFAULT '0' NOT NULL,
   good			int(4)		DEFAULT '0' NOT NULL,
   delay			int(4)		DEFAULT '0' NOT NULL,
@@ -213,6 +211,12 @@ CREATE TABLE actions (
   recipient		int(1)		DEFAULT '0' NOT NULL,
   maxrepeats		int(4)		DEFAULT '0' NOT NULL,
   repeatdelay		int(4)		DEFAULT '600' NOT NULL,
+  source		int(1)		DEFAULT '0' NOT NULL,
+  actiontype		int(1)		DEFAULT '0' NOT NULL,
+  filter_triggerid	int(4)		DEFAULT '0' NOT NULL,
+  filter_hostid		int(4)		DEFAULT '0' NOT NULL,
+  filter_groupid	int(4)		DEFAULT '0' NOT NULL,
+  filter_trigger_name	varchar(255)	DEFAULT '' NOT NULL,
   PRIMARY KEY (actionid),
   KEY (triggerid)
 ) type=InnoDB;

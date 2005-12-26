@@ -105,7 +105,17 @@
 ?>
 
 <?php
-	show_table_header(S_ACTIONS);
+	$h1=S_ACTIONS;
+
+#	$h2=S_GROUP."&nbsp;";
+	$h2="";
+	$h2=$h2."<select class=\"biginput\" name=\"actiontype\" onChange=\"submit()\">";
+	$h2=$h2.form_select("actiontype",0,S_SEND_MESSAGE);
+	$h2=$h2.form_select("actiontype",1,S_REMOTE_COMMAND);
+	$h2=$h2."</select>";
+
+	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"actionconf.php\">", "</form>");
+
 ?>
 
 <?php
@@ -122,31 +132,21 @@
 		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.recipient,a.scope from actions a where (a.triggerid=".$_REQUEST["triggerid"]." and a.scope=0) or (a.scope=2 or a.scope=1) order by a.recipient desc";
 	}*/
 //	echo $sql;
-	$sql="select actionid,userid,delay,subject,message,scope,severity,recipient,good,triggerid,maxrepeats,repeatdelay from actions";
+	if(isset($_REQUEST["actiontype"])&&($_REQUEST["actiontype"]==1))
+	{
+		$sql="select * from actions where actiontype=1 order by actiontype, source";
+	}
+	else
+	{
+		$sql="select * from actions where actiontype=0 order by actiontype, source";
+	}
 	$result=DBselect($sql);
 
 	table_begin();
-	table_header(array(S_SCOPE,S_SEND_MESSAGE_TO,S_WHEN_TRIGGER,S_DELAY,S_SUBJECT,S_REPEATS,S_ACTIONS));
+	table_header(array(S_SOURCE,S_SEND_MESSAGE_TO,S_WHEN_TRIGGER,S_DELAY,S_SUBJECT,S_REPEATS,S_ACTIONS));
 	$col=0;
 	while($row=DBfetch($result))
 	{
-
-		if($row["scope"] == 1)
-		{
-			$sql="select h.hostid from triggers t,hosts h,functions f,items i where f.triggerid=t.triggerid and h.hostid=i.hostid and i.itemid=f.itemid and t.triggerid=".$_REQUEST["triggerid"];
-//			echo "$sql<br>";
-			$result2=DBselect($sql);
-			$found=0;
-			while($row2=DBfetch($result2))
-			{
-//				$sql="select * from actions a,triggers t,hosts h,functions f,items i where a.triggerid=t.triggerid and f.triggerid=t.triggerid and h.hostid=a.triggerid and i.hostid=h.hostid and a.actionid=".$row["actionid"]." and a.scope=1 and h.hostid=".$row2["hostid"];
-				$sql="select * from actions a where a.actionid=".$row["actionid"]." and a.scope=1 and a.triggerid=".$row2["hostid"];
-//				echo "$sql<br>";
-				$result3=DBselect($sql);
-				if(DBnum_rows($result3)>0)	$found=1;
-			}
-			if($found==0)	continue;
-		}
 
 		if($row["recipient"] == RECIPIENT_TYPE_USER)
 		{
@@ -187,7 +187,7 @@
 		$actions="<A HREF=\"actions.php?register=edit&actionid=".$row["actionid"]."#form\">Change</A>";
 
 		table_row(array(
-			get_scope_description($row["scope"]),
+			get_source_description($row["source"]),
 			$recipient,
 			$good,
 			htmlspecialchars($row["delay"]),

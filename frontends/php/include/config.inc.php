@@ -573,23 +573,6 @@
 	}
 */
 
-	function	get_scope_description($scope)
-	{
-		$desc="Unknown";
-		if($scope==2)
-		{
-			$desc="All";
-		}
-		elseif($scope==1)
-		{
-			$desc="Host";
-		}
-		elseif($scope==0)
-		{
-			$desc="Trigger";
-		}
-		return $desc;
-	}
 
 //	The hash has form <md5sum of triggerid>,<sum of priorities>
 	function	calc_trigger_hash()

@@ -53,6 +53,7 @@
 	"S_FILTER_TRIGGER_SEVERITY"=>		"Filter: Trigger severity",
 	"S_FILTER_WHEN_TRIGGER_BECOMES"=>	"Filter: When trigger becomes",
 	"S_ACTION_TYPE"=>			"Action type",
+	"S_SEND_MESSAGE"=>			"Send message",
 	"S_REMOTE_COMMAND"=>			"Remote command",
 
 //	actions.php

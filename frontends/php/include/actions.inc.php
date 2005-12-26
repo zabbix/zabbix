@@ -276,4 +276,18 @@
 			}
 		}
 	}
+
+	function	get_source_description($source)
+	{
+		$desc="Unknown";
+		if($source==1)
+		{
+			$desc="IT Service";
+		}
+		elseif($source==0)
+		{
+			$desc="Trigger";
+		}
+		return $desc;
+	}
 ?>
