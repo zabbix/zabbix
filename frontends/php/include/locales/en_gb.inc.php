@@ -50,6 +50,10 @@
 	"S_FILTER_HOST"=>			"Filter: Host",
 	"S_FILTER_TRIGGER"=>			"Filter: Trigger",
 	"S_FILTER_TRIGGER_NAME"=>		"Filter: Trigger name",
+	"S_FILTER_TRIGGER_SEVERITY"=>		"Filter: Trigger severity",
+	"S_FILTER_WHEN_TRIGGER_BECOMES"=>	"Filter: When trigger becomes",
+	"S_ACTION_TYPE"=>			"Action type",
+	"S_REMOTE_COMMAND"=>			"Remote command",
 
 //	actions.php
 	"S_ACTIONS"=>				"Actions",
@@ -72,7 +76,6 @@
 	"S_USER_GROUP"=>			"User group",
 	"S_GROUP"=>				"Group",
 	"S_USER"=>				"User",
-	"S_WHEN_TRIGGER_BECOMES"=>		"When trigger becomes",
 	"S_ON_OR_OFF"=>				"ON or OFF",
 	"S_DELAY_BETWEEN_MESSAGES_IN_SEC"=>	"Delay between messages (in sec)",
 	"S_MESSAGE"=>				"Message",

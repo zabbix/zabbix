@@ -1500,6 +1500,7 @@
 			$action=get_action_by_actionid($_REQUEST["actionid"]);
 
 			$actionid=$action["actionid"];
+			$actiontype=$action["actiontype"];
 			$triggerid=$action["triggerid"];
 			$source=$action["source"];
 			$filter_trigger_name=$action["filter_trigger_name"];
@@ -1530,9 +1531,9 @@
 		else
 		{
 			$source=0;
+			$actiontype=0;
 			$filter_trigger_name="";
-			$trigger=get_trigger_by_triggerid($_REQUEST["triggerid"]);
-			$description=htmlspecialchars(stripslashes($trigger["description"]));
+			$description="";
 
 	//		$delay=30;
 			$delay=@iif(isset($_REQUEST["delay"]),$_REQUEST["delay"],30);
@@ -1547,25 +1548,11 @@
 			$repeatdelay=@iif(isset($_REQUEST["repeatdelay"]),$_REQUEST["repeatdelay"],600);
 			$repeat=@iif(isset($_REQUEST["repeat"]),$_REQUEST["repeat"],0);
 
-			$sql="select i.description, h.host, i.key_ from hosts h, items i,functions f where f.triggerid=".$_REQUEST["triggerid"]." and h.hostid=i.hostid and f.itemid=i.itemid order by i.description";
-			$result=DBselect($sql);
 			if(isset($_REQUEST["message"]))
 			{
 				$message=$_REQUEST["message"];
 			}
-			else
-			{
-				$message="INSERT YOUR MESSAGE HERE\n\n------Latest data------\n\n";
-				while($row=DBfetch($result))
-				{
-					$message=$message.$row["description"].": {".$row["host"].":".$row["key_"].".last(0)}  (latest value)\n";
-					$message=$message.$row["description"].": {".$row["host"].":".$row["key_"].".max(300)} (maximum value for last 5 min)\n";
-					$message=$message.$row["description"].": {".$row["host"].":".$row["key_"].".min(300)} (minimum value for last 5 min)\n\n";
-				}
-				$message=$message."---------End--------\n";
-			}
 		}
-
 
 		show_form_begin("actions.action");
 		echo nbsp(S_NEW_ACTION);
@@ -1586,12 +1573,12 @@
 		show_table2_v_delimiter($col++);
 		echo nbsp(S_FILTER_HOST_GROUP);
 		show_table2_h_delimiter();
-		$h2="<select class=\"biginput\" name=\"groupid\">";
+		$h2="<select class=\"biginput\" name=\"filter_groupid\">";
 		$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
 		$result=DBselect("select groupid,name from groups order by name");
 		while($row=DBfetch($result))
 		{
-			$h2=$h2.form_select("groupid",$row["groupid"],$row["name"]);
+			$h2=$h2.form_select("filter_groupid",$row["groupid"],$row["name"]);
 		}
 		echo $h2;
 		echo "</SELECT>";
@@ -1599,12 +1586,12 @@
 		show_table2_v_delimiter($col++);
 		echo nbsp(S_FILTER_HOST);
 		show_table2_h_delimiter();
-		$h2="<select class=\"biginput\" name=\"hostid\">";
+		$h2="<select class=\"biginput\" name=\"filter_hostid\">";
 		$h2=$h2.form_select("hostid",0,S_ALL_SMALL);
 		$result=DBselect("select hostid,host from hosts where status<>".HOST_STATUS_DELETED." order by host");
 		while($row=DBfetch($result))
 		{
-			$h2=$h2.form_select("hostid",$row["hostid"],$row["host"]);
+			$h2=$h2.form_select("filter_hostid",$row["hostid"],$row["host"]);
 		}
 		echo $h2;
 		echo "</SELECT>";
@@ -1665,7 +1652,7 @@
 			echo "&nbsp;";
 			show_table2_h_delimiter();
 		        $result=DBselect("select t.triggerid,t.description from triggers t,functions f, hosts h, items i where h.hostid=i.hostid and f.itemid=i.itemid and t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]." order by t.description");
-		        echo "<select class=\"biginput\" name=\"triggerid\" size=1>";
+		        echo "<select class=\"biginput\" name=\"filter_triggerid\" size=1>";
 			while($row=DBfetch($result))
 		        {
 		                $triggerid_=$row["triggerid"];
@@ -1688,13 +1675,34 @@
 		echo "<input class=\"biginput\" name=\"filter_trigger_name\" value=\"$filter_trigger_name\" size=64>";
 
 		show_table2_v_delimiter($col++);
-		echo nbsp(S_WHEN_TRIGGER_BECOMES);
+		echo nbsp(S_FILTER_TRIGGER_SEVERITY);
+		show_table2_h_delimiter();
+		echo "<select class=\"biginput\" name=\"filter_trigger_severity\" size=1>";
+		echo "<OPTION VALUE=\"0\" "; if($severity==0) echo "SELECTED"; echo ">".S_NOT_CLASSIFIED;
+		echo "<OPTION VALUE=\"1\" "; if($severity==1) echo "SELECTED"; echo ">".S_INFORMATION;
+		echo "<OPTION VALUE=\"2\" "; if($severity==2) echo "SELECTED"; echo ">".S_WARNING;
+		echo "<OPTION VALUE=\"3\" "; if($severity==3) echo "SELECTED"; echo ">".S_AVERAGE;
+		echo "<OPTION VALUE=\"4\" "; if($severity==4) echo "SELECTED"; echo ">".S_HIGH;
+		echo "<OPTION VALUE=\"5\" "; if($severity==5) echo "SELECTED"; echo ">".S_DISASTER;
+		echo "</SELECT>";
+
+		show_table2_v_delimiter($col++);
+		echo nbsp(S_FILTER_WHEN_TRIGGER_BECOMES);
 		show_table2_h_delimiter();
 		echo "<select class=\"biginput\" name=\"good\" size=1>";
 		echo "<OPTION VALUE=\"1\""; if($good==1) echo "SELECTED"; echo ">".S_ON;
 		echo "<OPTION VALUE=\"0\""; if($good==0) echo "SELECTED"; echo ">".S_OFF;
 		echo "<OPTION VALUE=\"2\""; if($good==2) echo "SELECTED"; echo ">".S_ON_OR_OFF;
 		echo "</SELECT>";
+
+		show_table2_v_delimiter($col++);
+		echo nbsp(S_ACTION_TYPE);
+		show_table2_h_delimiter();
+		echo "<select class=\"biginput\" name=\"actiontype\" size=\"1\" onChange=\"submit()\">";
+		echo "<option value=\"0\""; if($actiontype==0) echo " selected"; echo ">".S_MESSAGE;
+		echo "<option value=\"1\""; if($actiontype==1) echo " selected"; echo ">".S_REMOTE_COMMAND;
+		echo "</select>";
+
 
 		show_table2_v_delimiter($col++);
 		echo nbsp(S_SEND_MESSAGE_TO);
@@ -1766,34 +1774,6 @@
 		echo S_MESSAGE;
 		show_table2_h_delimiter();
 	 	echo "<textarea class=\"biginput\" name=\"message\" cols=70 ROWS=\"7\" wrap=\"soft\">$message</TEXTAREA>";
-
-		show_table2_v_delimiter($col++);
-		echo S_SCOPE;
-		show_table2_h_delimiter();
-		echo "<select class=\"biginput\" name=\"scope\" size=1 onChange=\"submit()\">";
-		echo "<OPTION VALUE=\"0\""; if($scope==0) echo "SELECTED"; echo ">".S_THIS_TRIGGER_ONLY;
-		echo "<OPTION VALUE=\"1\""; if($scope==1) echo "SELECTED"; echo ">".S_ALL_TRIGGERS_OF_THIS_HOST;
-		echo "<OPTION VALUE=\"2\""; if($scope==2) echo "SELECTED"; echo ">".S_ALL_TRIGGERS;
-		echo "</SELECT>";
-
-		if($scope>0)
-		{
-			show_table2_v_delimiter($col++);
-			echo nbsp(S_USE_IF_TRIGGER_SEVERITY);
-			show_table2_h_delimiter();
-			echo "<select class=\"biginput\" name=\"severity\" size=1>";
-			echo "<OPTION VALUE=\"0\" "; if($severity==0) echo "SELECTED"; echo ">".S_NOT_CLASSIFIED;
-			echo "<OPTION VALUE=\"1\" "; if($severity==1) echo "SELECTED"; echo ">".S_INFORMATION;
-			echo "<OPTION VALUE=\"2\" "; if($severity==2) echo "SELECTED"; echo ">".S_WARNING;
-			echo "<OPTION VALUE=\"3\" "; if($severity==3) echo "SELECTED"; echo ">".S_AVERAGE;
-			echo "<OPTION VALUE=\"4\" "; if($severity==4) echo "SELECTED"; echo ">".S_HIGH;
-			echo "<OPTION VALUE=\"5\" "; if($severity==5) echo "SELECTED"; echo ">".S_DISASTER;
-			echo "</SELECT>";
-		}
-		else
-		{
-			echo "<input name=\"severity\" type=\"hidden\" value=$severity>";
-		}
 
 		show_table2_v_delimiter($col++);
 		echo nbsp(S_REPEAT);
