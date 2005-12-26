@@ -45,6 +45,12 @@
 	"S_MAILING_LISTS"=>			"Mailing lists",
 	"S_MAILING_LISTS_DETAILS"=>		"ZABBIX-related mailing lists.",
 	
+//	actionconf.php
+	"S_FILTER_HOST_GROUP"=>			"Filter: Host group",
+	"S_FILTER_HOST"=>			"Filter: Host",
+	"S_FILTER_TRIGGER"=>			"Filter: Trigger",
+	"S_FILTER_TRIGGER_NAME"=>		"Filter: Trigger name",
+
 //	actions.php
 	"S_ACTIONS"=>				"Actions",
 	"S_ACTION_ADDED"=>			"Action added",
