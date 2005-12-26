@@ -1490,4 +1490,341 @@
 
 		show_table2_header_end();
 	}
+
+	function	insert_action_form()
+	{
+		global  $_REQUEST;
+
+		if(isset($_REQUEST["actionid"]))
+		{
+			$action=get_action_by_actionid($_REQUEST["actionid"]);
+
+			$actionid=$action["actionid"];
+			$triggerid=$action["triggerid"];
+			$source=$action["source"];
+			$filter_trigger_name=$action["filter_trigger_name"];
+			$good=$action["good"];
+			$delay=$action["delay"];
+			// Otherwise symbols like ",' will not be shown
+			$subject=htmlspecialchars($action["subject"]);
+			$message=$action["message"];
+			$uid=$action["userid"];
+			$scope=@iif(isset($_REQUEST["scope"]),$_REQUEST["scope"],$action["scope"]);
+			$severity=$action["severity"];
+			$recipient=@iif(isset($_REQUEST["recipient"]),$_REQUEST["recipient"],$action["recipient"]);
+			$maxrepeats=$action["maxrepeats"];
+			$repeatdelay=$action["repeatdelay"];
+			if(isset($_REQUEST["repeat"]))
+			{
+				$repeat=$_REQUEST["repeat"];
+			}
+			else if($maxrepeats==0)
+			{
+				$repeat=0;
+			}
+			else
+			{
+				$repeat=1;
+			}
+		}
+		else
+		{
+			$source=0;
+			$filter_trigger_name="";
+			$trigger=get_trigger_by_triggerid($_REQUEST["triggerid"]);
+			$description=htmlspecialchars(stripslashes($trigger["description"]));
+
+	//		$delay=30;
+			$delay=@iif(isset($_REQUEST["delay"]),$_REQUEST["delay"],30);
+//		$subject=$description;
+			$subject=@iif(isset($_REQUEST["subject"]),$_REQUEST["subject"],$description);
+			$scope=@iif(isset($_REQUEST["scope"]),$_REQUEST["scope"],0);
+			$good=@iif(isset($_REQUEST["good"]),$_REQUEST["good"],1);
+			$recipient=@iif(isset($_REQUEST["recipient"]),$_REQUEST["recipient"],RECIPIENT_TYPE_GROUP);
+//		$severity=0;
+			$severity=@iif(isset($_REQUEST["severity"]),$_REQUEST["severity"],0);
+			$maxrepeats=@iif(isset($_REQUEST["maxrepeats"]),$_REQUEST["maxrepeats"],0);
+			$repeatdelay=@iif(isset($_REQUEST["repeatdelay"]),$_REQUEST["repeatdelay"],600);
+			$repeat=@iif(isset($_REQUEST["repeat"]),$_REQUEST["repeat"],0);
+
+			$sql="select i.description, h.host, i.key_ from hosts h, items i,functions f where f.triggerid=".$_REQUEST["triggerid"]." and h.hostid=i.hostid and f.itemid=i.itemid order by i.description";
+			$result=DBselect($sql);
+			if(isset($_REQUEST["message"]))
+			{
+				$message=$_REQUEST["message"];
+			}
+			else
+			{
+				$message="INSERT YOUR MESSAGE HERE\n\n------Latest data------\n\n";
+				while($row=DBfetch($result))
+				{
+					$message=$message.$row["description"].": {".$row["host"].":".$row["key_"].".last(0)}  (latest value)\n";
+					$message=$message.$row["description"].": {".$row["host"].":".$row["key_"].".max(300)} (maximum value for last 5 min)\n";
+					$message=$message.$row["description"].": {".$row["host"].":".$row["key_"].".min(300)} (minimum value for last 5 min)\n\n";
+				}
+				$message=$message."---------End--------\n";
+			}
+		}
+
+
+		show_form_begin("actions.action");
+		echo nbsp(S_NEW_ACTION);
+		$col=0;
+
+		show_table2_v_delimiter($col++);
+		echo "<form method=\"get\" action=\"actionconf.php\">";
+		if(isset($_REQUEST["actionid"]))
+		{
+			echo "<input name=\"actionid\" type=\"hidden\" value=".$_REQUEST["actionid"].">";
+		}
+		echo nbsp(S_SOURCE);
+		show_table2_h_delimiter();
+		echo "<select class=\"biginput\" name=\"good\" size=1>";
+		echo "<OPTION VALUE=\"0\""; if($source==0) echo "SELECTED"; echo ">".S_TRIGGER;
+		echo "</SELECT>";
+
+		show_table2_v_delimiter($col++);
+		echo nbsp(S_FILTER_HOST_GROUP);
+		show_table2_h_delimiter();
+		$h2="<select class=\"biginput\" name=\"groupid\">";
+		$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
+		$result=DBselect("select groupid,name from groups order by name");
+		while($row=DBfetch($result))
+		{
+			$h2=$h2.form_select("groupid",$row["groupid"],$row["name"]);
+		}
+		echo $h2;
+		echo "</SELECT>";
+
+		show_table2_v_delimiter($col++);
+		echo nbsp(S_FILTER_HOST);
+		show_table2_h_delimiter();
+		$h2="<select class=\"biginput\" name=\"hostid\">";
+		$h2=$h2.form_select("hostid",0,S_ALL_SMALL);
+		$result=DBselect("select hostid,host from hosts where status<>".HOST_STATUS_DELETED." order by host");
+		while($row=DBfetch($result))
+		{
+			$h2=$h2.form_select("hostid",$row["hostid"],$row["host"]);
+		}
+		echo $h2;
+		echo "</SELECT>";
+
+		show_table2_v_delimiter($col++);
+		echo S_FILTER_TRIGGER;
+		show_table2_h_delimiter();
+		$h2="<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
+		$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
+		$result=DBselect("select groupid,name from groups order by name");
+		while($row=DBfetch($result))
+		{
+// Check if at least one host with read permission exists for this group
+			$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
+			$cnt=0;
+			while($row2=DBfetch($result2))
+			{
+				if(!check_right("Host","R",$row2["hostid"]))
+				{
+					continue;
+				}
+				$cnt=1; break;
+			}
+			if($cnt!=0)
+			{
+				$h2=$h2.form_select("groupid",$row["groupid"],$row["name"]);
+			}
+		}
+		$h2=$h2."</select>&nbsp;";
+	
+		$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
+		$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
+	
+		if(isset($_REQUEST["groupid"]))
+		{
+			$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+		}
+		else
+		{
+			$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid group by h.hostid,h.host order by h.host";
+		}
+	
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			if(!check_right("Host","R",$row["hostid"]))
+			{
+				continue;
+			}
+			$h2=$h2.form_select("hostid",$row["hostid"],$row["host"]);
+		}
+		$h2=$h2."</select>&nbsp;";
+		echo $h2;
+
+		if(isset($_REQUEST["hostid"]))
+		{
+			show_table2_v_delimiter($col++);
+			echo "&nbsp;";
+			show_table2_h_delimiter();
+		        $result=DBselect("select t.triggerid,t.description from triggers t,functions f, hosts h, items i where h.hostid=i.hostid and f.itemid=i.itemid and t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]." order by t.description");
+		        echo "<select class=\"biginput\" name=\"triggerid\" size=1>";
+			while($row=DBfetch($result))
+		        {
+		                $triggerid_=$row["triggerid"];
+				$description_=expand_trigger_description($triggerid_);
+				if(isset($triggerid) && ($triggerid==$triggerid_))
+		                {
+		                        echo "<OPTION VALUE='$triggerid_' SELECTED>$description_";
+		                }
+		                else
+		                {
+		                        echo "<OPTION VALUE='$triggerid_'>$description_";
+		                }
+		        }
+		        echo "</SELECT>";
+		}
+
+		show_table2_v_delimiter($col++);
+		echo S_FILTER_TRIGGER_NAME;
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"filter_trigger_name\" value=\"$filter_trigger_name\" size=64>";
+
+		show_table2_v_delimiter($col++);
+		echo nbsp(S_WHEN_TRIGGER_BECOMES);
+		show_table2_h_delimiter();
+		echo "<select class=\"biginput\" name=\"good\" size=1>";
+		echo "<OPTION VALUE=\"1\""; if($good==1) echo "SELECTED"; echo ">".S_ON;
+		echo "<OPTION VALUE=\"0\""; if($good==0) echo "SELECTED"; echo ">".S_OFF;
+		echo "<OPTION VALUE=\"2\""; if($good==2) echo "SELECTED"; echo ">".S_ON_OR_OFF;
+		echo "</SELECT>";
+
+		show_table2_v_delimiter($col++);
+		echo nbsp(S_SEND_MESSAGE_TO);
+		show_table2_h_delimiter();
+		echo "<select class=\"biginput\" name=\"recipient\" size=\"1\" onChange=\"submit()\">";
+
+		echo "<option value=\"0\""; if($recipient==RECIPIENT_TYPE_USER) echo " selected"; echo ">".S_SINGLE_USER;
+		echo "<option value=\"1\""; if($recipient==RECIPIENT_TYPE_GROUP) echo " selected"; echo ">".S_USER_GROUP;
+		echo "</select>";
+
+		if($recipient==RECIPIENT_TYPE_GROUP)
+		{
+			show_table2_v_delimiter($col++);
+			echo nbsp(S_GROUP);
+			show_table2_h_delimiter();
+			echo "<select class=\"biginput\" name=\"usrgrpid\" size=\"1\">";
+	
+			$sql="select usrgrpid,name from usrgrp order by name";
+			$result=DBselect($sql);
+			while($row=DBfetch($result))
+			{
+//			if(isset($usrgrpid) && ($row["usrgrpid"] == $usrgrpid))
+				if(isset($uid) && ($row["usrgrpid"] == $uid))
+				{
+					echo "<option value=\"".$row["usrgrpid"]."\" selected>".$row["name"];
+				}
+				else
+				{
+					echo "<option value=\"".$row["usrgrpid"]."\">".$row["name"];
+				}
+			}
+			echo "</select>";
+		}
+		else
+		{
+			show_table2_v_delimiter($col++);
+			echo nbsp(S_USER);
+			show_table2_h_delimiter();
+			echo "<select class=\"biginput\" name=\"userid\" size=\"1\">";
+	
+			$sql="select userid,alias from users order by alias";
+			$result=DBselect($sql);
+			while($row=DBfetch($result))
+			{
+				if(isset($uid) && ($row["userid"] == $uid))
+				{
+					echo "<option value=\"".$row["userid"]."\" selected>".$row["alias"];
+				}
+				else
+				{
+					echo "<option value=\"".$row["userid"]."\">".$row["alias"];
+				}
+			}
+			echo "</select>";
+		}
+	
+
+		show_table2_v_delimiter($col++);
+		echo nbsp(S_DELAY_BETWEEN_MESSAGES_IN_SEC);
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"delay\" value=\"$delay\" size=5>";
+
+		show_table2_v_delimiter($col++);
+		echo S_SUBJECT;
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"subject\" value=\"$subject\" size=70>";
+
+		show_table2_v_delimiter($col++);
+		echo S_MESSAGE;
+		show_table2_h_delimiter();
+	 	echo "<textarea class=\"biginput\" name=\"message\" cols=70 ROWS=\"7\" wrap=\"soft\">$message</TEXTAREA>";
+
+		show_table2_v_delimiter($col++);
+		echo S_SCOPE;
+		show_table2_h_delimiter();
+		echo "<select class=\"biginput\" name=\"scope\" size=1 onChange=\"submit()\">";
+		echo "<OPTION VALUE=\"0\""; if($scope==0) echo "SELECTED"; echo ">".S_THIS_TRIGGER_ONLY;
+		echo "<OPTION VALUE=\"1\""; if($scope==1) echo "SELECTED"; echo ">".S_ALL_TRIGGERS_OF_THIS_HOST;
+		echo "<OPTION VALUE=\"2\""; if($scope==2) echo "SELECTED"; echo ">".S_ALL_TRIGGERS;
+		echo "</SELECT>";
+
+		if($scope>0)
+		{
+			show_table2_v_delimiter($col++);
+			echo nbsp(S_USE_IF_TRIGGER_SEVERITY);
+			show_table2_h_delimiter();
+			echo "<select class=\"biginput\" name=\"severity\" size=1>";
+			echo "<OPTION VALUE=\"0\" "; if($severity==0) echo "SELECTED"; echo ">".S_NOT_CLASSIFIED;
+			echo "<OPTION VALUE=\"1\" "; if($severity==1) echo "SELECTED"; echo ">".S_INFORMATION;
+			echo "<OPTION VALUE=\"2\" "; if($severity==2) echo "SELECTED"; echo ">".S_WARNING;
+			echo "<OPTION VALUE=\"3\" "; if($severity==3) echo "SELECTED"; echo ">".S_AVERAGE;
+			echo "<OPTION VALUE=\"4\" "; if($severity==4) echo "SELECTED"; echo ">".S_HIGH;
+			echo "<OPTION VALUE=\"5\" "; if($severity==5) echo "SELECTED"; echo ">".S_DISASTER;
+			echo "</SELECT>";
+		}
+		else
+		{
+			echo "<input name=\"severity\" type=\"hidden\" value=$severity>";
+		}
+
+		show_table2_v_delimiter($col++);
+		echo nbsp(S_REPEAT);
+		show_table2_h_delimiter();
+		echo "<select class=\"biginput\" name=\"repeat\" size=\"1\" onChange=\"submit()\">";
+	
+		echo "<option value=\"0\""; if($repeat==0) echo " selected"; echo ">".S_NO_REPEATS;
+		echo "<option value=\"1\""; if($repeat==1) echo " selected"; echo ">".S_REPEAT;
+		echo "</select>";
+
+		if($repeat>0)
+		{
+			show_table2_v_delimiter($col++);
+			echo S_NUMBER_OF_REPEATS;
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"maxrepeats\" value=\"$maxrepeats\" size=2>";
+	
+			show_table2_v_delimiter($col++);
+			echo S_DELAY_BETWEEN_REPEATS;
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"repeatdelay\" value=\"$repeatdelay\" size=2>";
+		}
+	
+		show_table2_v_delimiter2();
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
+		if(isset($actionid))
+		{
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected action?');\">";
+		}
+	
+		show_table2_header_end();
+	}
 ?>
