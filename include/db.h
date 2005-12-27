@@ -252,7 +252,6 @@ DB_ACTION
 {
 	int	actionid;
 	int	userid;
-	int	good;
 	int	delay;
 	int	lastcheck;
 	int	recipient;

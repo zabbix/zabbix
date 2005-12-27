@@ -176,10 +176,17 @@
 	$result=DBselect($sql);
 
 	table_begin();
-	table_header(array(S_SOURCE,S_SEND_MESSAGE_TO,S_DELAY,S_SUBJECT,S_REPEATS,S_ACTIONS));
+	table_header(array(S_SOURCE,S_CONDITIONS,S_SEND_MESSAGE_TO,S_DELAY,S_SUBJECT,S_REPEATS,S_ACTIONS));
 	$col=0;
 	while($row=DBfetch($result))
 	{
+		$sql="select * from conditions where actionid=".$row["actionid"];
+		$result2=DBselect($sql);
+		$conditions="";
+		while($condition=DBfetch($result2))
+		{
+			$conditions=$conditions.get_condition_desc($condition["conditiontype"],$condition["operator"],$condition["value"])."<br>";
+		}
 
 		if($row["recipient"] == RECIPIENT_TYPE_USER)
 		{
@@ -205,6 +212,7 @@
 
 		table_row(array(
 			get_source_description($row["source"]),
+			$conditions,
 			$recipient,
 			htmlspecialchars($row["delay"]),
 			htmlspecialchars($row["subject"]),

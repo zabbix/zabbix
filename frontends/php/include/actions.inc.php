@@ -314,6 +314,13 @@
 		{
 			$desc=S_TRIGGER_DESCRIPTION." $op "."\"".$value."\"";
 		}
+		else if($conditiontype==CONDITION_TYPE_TRIGGER_VALUE)
+		{
+			if($value==0)
+				$desc=S_TRIGGER_VALUE." $op "."\"OFF\"";
+			if($value==1)
+				$desc=S_TRIGGER_VALUE." $op "."\"ON\"";
+		}
 		else if($conditiontype==CONDITION_TYPE_TRIGGER_SEVERITY)
 		{
 			$desc=S_TRIGGER_SEVERITY." $op "."\"".get_severity_description($value)."\"";
