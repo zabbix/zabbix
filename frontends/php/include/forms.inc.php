@@ -1508,7 +1508,6 @@
 			$subject=htmlspecialchars($action["subject"]);
 			$message=$action["message"];
 			$uid=$action["userid"];
-			$scope=@iif(isset($_REQUEST["scope"]),$_REQUEST["scope"],$action["scope"]);
 			$recipient=@iif(isset($_REQUEST["recipient"]),$_REQUEST["recipient"],$action["recipient"]);
 			$maxrepeats=$action["maxrepeats"];
 			$repeatdelay=$action["repeatdelay"];
@@ -1523,6 +1522,16 @@
 			else
 			{
 				$repeat=1;
+			}
+			$sql="select conditiontype, operator, value from conditions where actionid=".$_REQUEST["actionid"];
+			$result=DBselect($sql);
+			$i=1;
+			while($condition=DBfetch($result))
+			{
+				$_REQUEST["conditiontype$i"]=$condition["conditiontype"];
+				$_REQUEST["conditionop$i"]=$condition["operator"];
+				$_REQUEST["conditionvalue$i"]=$condition["value"];
+				$i++;
 			}
 		}
 		else
@@ -1604,21 +1613,29 @@
 //		echo nbsp("                                        "."Condition");
 //		show_table2_h_delimiter();
 		$h2="<select class=\"biginput\" name=\"conditiontype\" onChange=\"submit()\">";
-		$h2=$h2.form_select("conditiontype",0,S_HOST_GROUP);
-		$h2=$h2.form_select("conditiontype",1,S_HOST);
-		$h2=$h2.form_select("conditiontype",2,S_TRIGGER);
-		$h2=$h2.form_select("conditiontype",3,S_TRIGGER_NAME);
-		$h2=$h2.form_select("conditiontype",4,S_TRIGGER_SEVERITY);
-		$h2=$h2.form_select("conditiontype",5,S_TRIGGER_VALUE);
-		$h2=$h2.form_select("conditiontype",6,S_TIME_PERIOD);
+		$h2=$h2.form_select("conditiontype",CONDITION_TYPE_GROUP,S_HOST_GROUP);
+		$h2=$h2.form_select("conditiontype",CONDITION_TYPE_HOST,S_HOST);
+		$h2=$h2.form_select("conditiontype",CONDITION_TYPE_TRIGGER,S_TRIGGER);
+		$h2=$h2.form_select("conditiontype",CONDITION_TYPE_TRIGGER_NAME,S_TRIGGER_NAME);
+		$h2=$h2.form_select("conditiontype",CONDITION_TYPE_TRIGGER_SEVERITY,S_TRIGGER_SEVERITY);
+		$h2=$h2.form_select("conditiontype",CONDITION_TYPE_TRIGGER_VALUE,S_TRIGGER_VALUE);
+		$h2=$h2.form_select("conditiontype",CONDITION_TYPE_TIME_PERIOD,S_TIME_PERIOD);
 		$h2=$h2."</SELECT>";
 //		echo $h2;
 
 		$h2=$h2."<select class=\"biginput\" name=\"operator\">";
-		$h2=$h2.form_select("operator",0,"=");
-		$h2=$h2.form_select("operator",1,"<>");
-		$h2=$h2.form_select("operator",2,"like");
-		$h2=$h2.form_select("operator",3,"not like");
+		if(in_array($conditiontype,array(CONDITION_TYPE_GROUP, CONDITION_TYPE_HOST,CONDITION_TYPE_TRIGGER,CONDITION_TYPE_TRIGGER_SEVERITY,CONDITION_TYPE_TRIGGER_VALUE)))
+			$h2=$h2.form_select("operator",CONDITION_OPERATOR_EQUAL,"=");
+		if(in_array($conditiontype,array(CONDITION_TYPE_GROUP, CONDITION_TYPE_HOST,CONDITION_TYPE_TRIGGER,CONDITION_TYPE_TRIGGER_SEVERITY,CONDITION_TYPE_TRIGGER_VALUE)))
+			$h2=$h2.form_select("operator",CONDITION_OPERATOR_NOT_EQUAL,"<>");
+		if(in_array($conditiontype,array(CONDITION_TYPE_TRIGGER_NAME)))
+			$h2=$h2.form_select("operator",CONDITION_OPERATOR_LIKE,"like");
+		if(in_array($conditiontype,array(CONDITION_TYPE_TRIGGER_NAME)))
+			$h2=$h2.form_select("operator",CONDITION_OPERATOR_NOT_LIKE,"not like");
+		if(in_array($conditiontype,array(CONDITION_TYPE_TIME_PERIOD)))
+			$h2=$h2.form_select("operator",CONDITION_OPERATOR_IN,"in");
+		if(in_array($conditiontype,array(CONDITION_TYPE_TRIGGER_VALUE)))
+			$h2=$h2.form_select("operator",CONDITION_OPERATOR_MORE_EQUAL,">=");
 		$h2=$h2."</SELECT>";
 //		echo $h2;
 
@@ -1640,6 +1657,28 @@
 		else if($conditiontype == CONDITION_TYPE_TRIGGER_NAME)
 		{
 			$h2=$h2."<input class=\"biginput\" name=\"value\" value=\"\" size=40>";
+		}
+		else if($conditiontype == CONDITION_TYPE_TRIGGER_VALUE)
+		{
+			$h2=$h2."<select class=\"biginput\" name=\"value\">";
+			$h2=$h2.form_select("value",0,"ON");
+			$h2=$h2.form_select("value",1,"OFF");
+			$h2=$h2."</SELECT>";
+		}
+		else if($conditiontype == CONDITION_TYPE_TIME_PERIOD)
+		{
+			$h2=$h2."<input class=\"biginput\" name=\"value\" value=\"1-7,00:00-23:59\" size=40>";
+		}
+		else if($conditiontype == CONDITION_TYPE_TRIGGER_SEVERITY)
+		{
+			$h2=$h2."<select class=\"biginput\" name=\"severity\" size=1>";
+			$h2=$h2."<OPTION VALUE=\"0\">".S_NOT_CLASSIFIED;
+			$h2=$h2."<OPTION VALUE=\"1\">".S_INFORMATION;
+			$h2=$h2."<OPTION VALUE=\"2\">".S_WARNING;
+			$h2=$h2."<OPTION VALUE=\"3\">".S_AVERAGE;
+			$h2=$h2."<OPTION VALUE=\"4\">".S_HIGH;
+			$h2=$h2."<OPTION VALUE=\"5\">".S_DISASTER;
+			$h2=$h2."</SELECT>";
 		}
 		else
 		{
