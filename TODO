@@ -1,6 +1,7 @@
 1.1beta5:
 
  - centralized definition of actions
+ - remembering of host names in various screens 
 
  - triggers on windows logs and file monitoring
  - execution of commands on monitored hosts in case of pre-defined events

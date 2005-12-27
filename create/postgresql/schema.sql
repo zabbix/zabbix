@@ -203,7 +203,6 @@ CREATE INDEX audit_clock on audit (clock);
 CREATE TABLE actions (
   actionid		serial,
   userid		int4		DEFAULT '0' NOT NULL,
-  severity		int4		DEFAULT '0' NOT NULL,
   good			int4		DEFAULT '0' NOT NULL,
   delay			int4		DEFAULT '0' NOT NULL,
   subject		varchar(255)	DEFAULT '' NOT NULL,
@@ -218,6 +217,7 @@ CREATE TABLE actions (
   filter_hostid		int4		DEFAULT '0' NOT NULL,
   filter_groupid	int4		DEFAULT '0' NOT NULL,
   filter_trigger_name	varchar(255)	DEFAULT '' NOT NULL,
+  filter_trigger_severity	int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (actionid)
 --  depends on scope. Could be hostid or 0.
 --  FOREIGN KEY (triggerid) REFERENCES triggers
