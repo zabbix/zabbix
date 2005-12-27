@@ -1501,7 +1501,9 @@
 
 			$actionid=$action["actionid"];
 			$actiontype=$action["actiontype"];
-			$triggerid=$action["triggerid"];
+			$filter_triggerid=$action["filter_triggerid"];
+			$filter_groupid=$action["filter_groupid"];
+			$filter_hostid=$action["filter_hostid"];
 			$source=$action["source"];
 			$filter_trigger_name=$action["filter_trigger_name"];
 			$good=$action["good"];
@@ -1533,6 +1535,9 @@
 			$source=0;
 			$actiontype=0;
 			$filter_trigger_name="";
+			$filter_triggerid=0;
+			$filter_groupid=0;
+			$filter_hostid=0;
 			$description="";
 
 	//		$delay=30;
@@ -1554,6 +1559,9 @@
 			}
 		}
 
+		$filtertype=@iif(isset($_REQUEST["filtertype"]),$_REQUEST["filtertype"],0);
+
+
 		show_form_begin("actions.action");
 		echo nbsp(S_NEW_ACTION);
 		$col=0;
@@ -1571,129 +1579,161 @@
 		echo "</SELECT>";
 
 		show_table2_v_delimiter($col++);
-		echo nbsp(S_FILTER_HOST_GROUP);
+		echo nbsp("Conditions");
 		show_table2_h_delimiter();
-		$h2="<select class=\"biginput\" name=\"filter_groupid\">";
-		$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
-		$result=DBselect("select groupid,name from groups order by name");
-		while($row=DBfetch($result))
-		{
-			$h2=$h2.form_select("filter_groupid",$row["groupid"],$row["name"]);
-		}
-		echo $h2;
-		echo "</SELECT>";
+		echo "<input type=checkbox name=\"zzz\" \">"."Host: zabbix.com";
+		echo "<br>";
+		echo "<input type=checkbox name=\"zzz\" \">"."Trigger: Processor load is too high on zabbix.com";
+		echo "<br>";
+		echo "<input type=checkbox name=\"zzz\" \">"."Trigger description like: \"Processor load is too high\"";
 
-		show_table2_v_delimiter($col++);
-		echo nbsp(S_FILTER_HOST);
-		show_table2_h_delimiter();
-		$h2="<select class=\"biginput\" name=\"filter_hostid\">";
-		$h2=$h2.form_select("hostid",0,S_ALL_SMALL);
-		$result=DBselect("select hostid,host from hosts where status<>".HOST_STATUS_DELETED." order by host");
-		while($row=DBfetch($result))
-		{
-			$h2=$h2.form_select("filter_hostid",$row["hostid"],$row["host"]);
-		}
-		echo $h2;
-		echo "</SELECT>";
+//		show_table2_v_delimiter($col);
+//		echo nbsp("                                        "."Condition");
+//		show_table2_h_delimiter();
+		$h2="<select class=\"biginput\" name=\"filtertype\" onChange=\"submit()\">>";
+		$h2=$h2.form_select("filtertype",0,S_HOST_GROUP);
+		$h2=$h2.form_select("filtertype",1,S_HOST);
+		$h2=$h2.form_select("filtertype",2,S_TRIGGER);
+		$h2=$h2.form_select("filtertype",3,S_TRIGGER_NAME);
+		$h2=$h2.form_select("filtertype",4,S_TRIGGER_SEVERITY);
+		$h2=$h2.form_select("filtertype",5,S_TRIGGER_VALUE);
+		$h2=$h2.form_select("filtertype",6,S_TIME_PERIOD);
+		$h2=$h2."</SELECT>";
+//		echo $h2;
 
-		show_table2_v_delimiter($col++);
-		echo S_FILTER_TRIGGER;
-		show_table2_h_delimiter();
-		$h2="<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
-		$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
-		$result=DBselect("select groupid,name from groups order by name");
-		while($row=DBfetch($result))
+		if($filtertype==0)
 		{
-// Check if at least one host with read permission exists for this group
-			$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
-			$cnt=0;
-			while($row2=DBfetch($result2))
+			show_table2_v_delimiter($col);
+			echo nbsp("                                      Condition");
+			show_table2_h_delimiter();
+			$h2=$h2." <b>=</b> "."<select class=\"biginput\" name=\"filter_groupid\">";
+			$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
+			$result=DBselect("select groupid,name from groups order by name");
+			while($row=DBfetch($result))
 			{
-				if(!check_right("Host","R",$row2["hostid"]))
-				{
-					continue;
-				}
-				$cnt=1; break;
+				$h2=$h2.form_select("filter_groupid",$row["groupid"],$row["name"]);
 			}
-			if($cnt!=0)
-			{
-				$h2=$h2.form_select("groupid",$row["groupid"],$row["name"]);
-			}
-		}
-		$h2=$h2."</select>&nbsp;";
-	
-		$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
-		$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
-	
-		if(isset($_REQUEST["groupid"]))
-		{
-			$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+			$h2=$h2."</SELECT>";
+			echo $h2;
 		}
 		else
 		{
-			$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid group by h.hostid,h.host order by h.host";
-		}
-	
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
-			if(!check_right("Host","R",$row["hostid"]))
-			{
-				continue;
-			}
-			$h2=$h2.form_select("hostid",$row["hostid"],$row["host"]);
-		}
-		$h2=$h2."</select>&nbsp;";
-		echo $h2;
-
-		if(isset($_REQUEST["hostid"]))
-		{
 			show_table2_v_delimiter($col++);
-			echo "&nbsp;";
+			echo nbsp(S_FILTER_HOST);
 			show_table2_h_delimiter();
-		        $result=DBselect("select t.triggerid,t.description from triggers t,functions f, hosts h, items i where h.hostid=i.hostid and f.itemid=i.itemid and t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]." order by t.description");
-		        echo "<select class=\"biginput\" name=\"filter_triggerid\" size=1>";
+			$h2="<select class=\"biginput\" name=\"filter_hostid\">";
+			$h2=$h2.form_select("hostid",0,S_ALL_SMALL);
+			$result=DBselect("select hostid,host from hosts where status<>".HOST_STATUS_DELETED." order by host");
 			while($row=DBfetch($result))
-		        {
-		                $triggerid_=$row["triggerid"];
-				$description_=expand_trigger_description($triggerid_);
-				if(isset($triggerid) && ($triggerid==$triggerid_))
-		                {
-		                        echo "<OPTION VALUE='$triggerid_' SELECTED>$description_";
-		                }
-		                else
-		                {
-		                        echo "<OPTION VALUE='$triggerid_'>$description_";
-		                }
-		        }
-		        echo "</SELECT>";
+			{
+				$h2=$h2.form_select("filter_hostid",$row["hostid"],$row["host"]);
+			}
+			echo $h2;
+			echo "</SELECT>";
+
+			show_table2_v_delimiter($col++);
+			echo S_FILTER_TRIGGER;
+			show_table2_h_delimiter();
+			$h2="<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
+			$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
+			$result=DBselect("select groupid,name from groups order by name");
+			while($row=DBfetch($result))
+			{
+// Check if at least one host with read permission exists for this group
+				$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
+				$cnt=0;
+				while($row2=DBfetch($result2))
+				{
+					if(!check_right("Host","R",$row2["hostid"]))
+					{
+						continue;
+					}
+					$cnt=1; break;
+				}
+				if($cnt!=0)
+				{
+					$h2=$h2.form_select("groupid",$row["groupid"],$row["name"]);
+				}
+			}
+			$h2=$h2."</select>&nbsp;";
+	
+			$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
+			$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
+		
+			if(isset($_REQUEST["groupid"]))
+			{
+				$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+			}
+			else
+			{
+				$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid group by h.hostid,h.host order by h.host";
+			}
+		
+			$result=DBselect($sql);
+			while($row=DBfetch($result))
+			{
+				if(!check_right("Host","R",$row["hostid"]))
+				{
+					continue;
+				}
+				$h2=$h2.form_select("hostid",$row["hostid"],$row["host"]);
+			}
+			$h2=$h2."</select>&nbsp;";
+			echo $h2;
+	
+			if(isset($_REQUEST["hostid"]))
+			{
+				show_table2_v_delimiter($col++);
+				echo "&nbsp;";
+				show_table2_h_delimiter();
+			        $result=DBselect("select t.triggerid,t.description from triggers t,functions f, hosts h, items i where h.hostid=i.hostid and f.itemid=i.itemid and t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]." order by t.description");
+			        echo "<select class=\"biginput\" name=\"filter_triggerid\" size=1>";
+				while($row=DBfetch($result))
+			        {
+			                $triggerid_=$row["triggerid"];
+					$description_=expand_trigger_description($triggerid_);
+					if(isset($triggerid) && ($triggerid==$triggerid_))
+			                {
+			                        echo "<OPTION VALUE='$triggerid_' SELECTED>$description_";
+			                }
+			                else
+			                {
+			                        echo "<OPTION VALUE='$triggerid_'>$description_";
+			                }
+			        }
+			        echo "</SELECT>";
+			}
+
+			show_table2_v_delimiter($col++);
+			echo S_FILTER_TRIGGER_NAME;
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"filter_trigger_name\" value=\"$filter_trigger_name\" size=64>";
+
+			show_table2_v_delimiter($col++);
+			echo nbsp(S_FILTER_TRIGGER_SEVERITY);
+			show_table2_h_delimiter();
+			echo "<select class=\"biginput\" name=\"filter_trigger_severity\" size=1>";
+			echo "<OPTION VALUE=\"0\" "; if($severity==0) echo "SELECTED"; echo ">".S_NOT_CLASSIFIED;
+			echo "<OPTION VALUE=\"1\" "; if($severity==1) echo "SELECTED"; echo ">".S_INFORMATION;
+			echo "<OPTION VALUE=\"2\" "; if($severity==2) echo "SELECTED"; echo ">".S_WARNING;
+			echo "<OPTION VALUE=\"3\" "; if($severity==3) echo "SELECTED"; echo ">".S_AVERAGE;
+			echo "<OPTION VALUE=\"4\" "; if($severity==4) echo "SELECTED"; echo ">".S_HIGH;
+			echo "<OPTION VALUE=\"5\" "; if($severity==5) echo "SELECTED"; echo ">".S_DISASTER;
+			echo "</SELECT>";
+
+			show_table2_v_delimiter($col++);
+			echo nbsp(S_FILTER_WHEN_TRIGGER_BECOMES);
+			show_table2_h_delimiter();
+			echo "<select class=\"biginput\" name=\"good\" size=1>";
+			echo "<OPTION VALUE=\"1\""; if($good==1) echo "SELECTED"; echo ">".S_ON;
+			echo "<OPTION VALUE=\"0\""; if($good==0) echo "SELECTED"; echo ">".S_OFF;
+			echo "<OPTION VALUE=\"2\""; if($good==2) echo "SELECTED"; echo ">".S_ON_OR_OFF;
+			echo "</SELECT>";
 		}
-
 		show_table2_v_delimiter($col++);
-		echo S_FILTER_TRIGGER_NAME;
+		echo nbsp(" ");
 		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"filter_trigger_name\" value=\"$filter_trigger_name\" size=64>";
-
-		show_table2_v_delimiter($col++);
-		echo nbsp(S_FILTER_TRIGGER_SEVERITY);
-		show_table2_h_delimiter();
-		echo "<select class=\"biginput\" name=\"filter_trigger_severity\" size=1>";
-		echo "<OPTION VALUE=\"0\" "; if($severity==0) echo "SELECTED"; echo ">".S_NOT_CLASSIFIED;
-		echo "<OPTION VALUE=\"1\" "; if($severity==1) echo "SELECTED"; echo ">".S_INFORMATION;
-		echo "<OPTION VALUE=\"2\" "; if($severity==2) echo "SELECTED"; echo ">".S_WARNING;
-		echo "<OPTION VALUE=\"3\" "; if($severity==3) echo "SELECTED"; echo ">".S_AVERAGE;
-		echo "<OPTION VALUE=\"4\" "; if($severity==4) echo "SELECTED"; echo ">".S_HIGH;
-		echo "<OPTION VALUE=\"5\" "; if($severity==5) echo "SELECTED"; echo ">".S_DISASTER;
-		echo "</SELECT>";
-
-		show_table2_v_delimiter($col++);
-		echo nbsp(S_FILTER_WHEN_TRIGGER_BECOMES);
-		show_table2_h_delimiter();
-		echo "<select class=\"biginput\" name=\"good\" size=1>";
-		echo "<OPTION VALUE=\"1\""; if($good==1) echo "SELECTED"; echo ">".S_ON;
-		echo "<OPTION VALUE=\"0\""; if($good==0) echo "SELECTED"; echo ">".S_OFF;
-		echo "<OPTION VALUE=\"2\""; if($good==2) echo "SELECTED"; echo ">".S_ON_OR_OFF;
-		echo "</SELECT>";
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add condition\">";
 
 		show_table2_v_delimiter($col++);
 		echo nbsp(S_ACTION_TYPE);

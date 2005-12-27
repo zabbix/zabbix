@@ -55,6 +55,12 @@
 	"S_ACTION_TYPE"=>			"Action type",
 	"S_SEND_MESSAGE"=>			"Send message",
 	"S_REMOTE_COMMAND"=>			"Remote command",
+	"S_FILTER"=>				"Filter",
+	"S_FILTER_TYPE"=>			"Filter type",
+	"S_TRIGGER_NAME"=>			"Trigger name",
+	"S_TRIGGER_SEVERITY"=>			"Trigger severity",
+	"S_TRIGGER_VALUE"=>			"Trigger value",
+	"S_TIME_PERIOD"=>			"Time period",
 
 //	actions.php
 	"S_ACTIONS"=>				"Actions",
