@@ -205,6 +205,7 @@ static	void	send_to_user(DB_TRIGGER *trigger,DB_ACTION *action)
 	}
 }
 
+/*
 void	apply_actions_new(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 {
 	int escalationid;
@@ -221,13 +222,14 @@ void	apply_actions_new(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "No default escalation defined");
 	}
-}
+}*/
 
 /*
  * Apply actions if any.
  */ 
 /*void	apply_actions(int triggerid,int good)*/
-void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
+/*
+void	apply_actions_original(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 {
 	DB_RESULT *result,*result2,*result3;
 	
@@ -262,7 +264,6 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 
 	now = time(NULL);
 
-/*	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,scope,severity,recipient,good from actions where (scope=%d and triggerid=%d and good=%d and nextcheck<=%d) or (scope=%d and good=%d) or (scope=%d and good=%d)",ACTION_SCOPE_TRIGGER,trigger->triggerid,trigger_value,now,ACTION_SCOPE_HOST,trigger_value,ACTION_SCOPE_HOSTS,trigger_value);*/
 	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,scope,severity,recipient,good,maxrepeats,repeatdelay from actions where (scope=%d and triggerid=%d and (good=%d or good=2) and nextcheck<=%d) or (scope=%d and (good=%d or good=2)) or (scope=%d and (good=%d or good=2))",ACTION_SCOPE_TRIGGER,trigger->triggerid,trigger_value,now,ACTION_SCOPE_HOST,trigger_value,ACTION_SCOPE_HOSTS,trigger_value);
 	result = DBselect(sql);
 	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
@@ -271,7 +272,6 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 	{
 
 		zabbix_log( LOG_LEVEL_DEBUG, "i=[%d]",i);
-/*		zabbix_log( LOG_LEVEL_ERR, "Fetched: ID [%s] %s %s %s %s\n",DBget_field(result,i,0),DBget_field(result,i,1),DBget_field(result,i,2),DBget_field(result,i,3),DBget_field(result,i,4));*/
 
 		action.actionid=atoi(DBget_field(result,i,0));
 		action.userid=atoi(DBget_field(result,i,1));
@@ -287,8 +287,6 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 
 		if(ACTION_SCOPE_TRIGGER==action.scope)
 		{
-/*			substitute_hostname(trigger->triggerid,action.message);
-			substitute_hostname(trigger->triggerid,action.subject);*/
 
 			substitute_macros(trigger, &action, action.message);
 			substitute_macros(trigger, &action, action.subject);
@@ -338,37 +336,14 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 			}
 			DBfree_result(result2);
 
-/*			snprintf(sql,sizeof(sql)-1,"select * from actions a,triggers t,hosts h,functions f where a.triggerid=t.triggerid and f.triggerid=t.triggerid and h.hostid=a.triggerid and t.triggerid=%d and a.scope=%d",trigger->triggerid,ACTION_SCOPE_HOST);
-			result2 = DBselect(sql);
-			if(DBnum_rows(result2)==0)
-			{
-				DBfree_result(result2);
-				continue;
-			}
-			DBfree_result(result2);
-
-			strscpy(action.subject,trigger->description);
-			if(TRIGGER_VALUE_TRUE == trigger_value)
-			{
-				strncat(action.subject," (ON)", MAX_STRING_LEN);
-			}
-			else
-			{
-				strncat(action.subject," (OFF)", MAX_STRING_LEN);
-			}
-			strscpy(action.message,action.subject);
-
-			substitute_macros(trigger, &action, action.message);
-			substitute_macros(trigger, &action, action.subject);*/
 		}
 		else if(ACTION_SCOPE_HOSTS==action.scope)
 		{
-/* Added in Zabbix 1.0beta10 */
 			if(trigger->priority<action.severity)
 			{
 				continue;
 			}
-/* -- */
+
 			strscpy(action.subject,trigger->description);
 			if(TRIGGER_VALUE_TRUE == trigger_value)
 			{
@@ -383,9 +358,6 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 			substitute_macros(trigger, &action, action.message);
 			substitute_macros(trigger, &action, action.subject);
 
-/*			substitute_hostname(trigger->triggerid,action.message);
-			substitute_hostname(trigger->triggerid,action.subject);*/
-
 			send_to_user(trigger,&action);
 			snprintf(sql,sizeof(sql)-1,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
 			DBexecute(sql);
@@ -396,6 +368,191 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 			zabbix_syslog("Unsupported scope [%d] for actionid [%d]", action.scope, action.actionid);
 		}
 
+	}
+	zabbix_log( LOG_LEVEL_DEBUG, "Actions applied for trigger %d %d", trigger->triggerid, trigger_value );
+	DBfree_result(result);
+}
+*/
+
+static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigger_value, DB_CONDITION *condition)
+{
+	int	ret = SUCCEED;
+
+	zabbix_log( LOG_LEVEL_WARNING, "In check_action_condition [actionid:%d,conditionid:%d:cond.value:%s]", condition->actionid, condition->conditionid, condition->value);
+
+	if(condition->conditiontype == CONDITION_TYPE_HOST_GROUP)
+	{
+		zabbix_log( LOG_LEVEL_ERR, "Condition type [CONDITION_TYPE_HOST_GROUP] is unsupported");
+		ret = FAIL;
+	}
+	else if(condition->conditiontype == CONDITION_TYPE_HOST)
+	{
+		zabbix_log( LOG_LEVEL_ERR, "Condition type [CONDITION_TYPE_HOST] is unsupported");
+		ret = FAIL;
+	}
+	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER)
+	{
+		zabbix_log( LOG_LEVEL_ERR, "Condition type [CONDITION_TYPE_TRIGGER] is supported");
+		if(trigger->triggerid != atoi(condition->value))
+		{
+			ret = FAIL;
+		}
+		ret = FAIL;
+	}
+	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_NAME)
+	{
+		zabbix_log( LOG_LEVEL_ERR, "Condition type [CONDITION_TYPE_TRIGGER_NAME] is supported");
+		if(strstr(trigger->description,condition->value)==NULL)
+		{
+			ret = FAIL;
+		}
+	}
+	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_SEVERITY)
+	{
+		zabbix_log( LOG_LEVEL_ERR, "Condition type [CONDITION_TYPE_TRIGGER_SEVERITY] is supported");
+		if(trigger->priority<atoi(condition->value))
+		{
+			ret = FAIL;
+		}
+	}
+	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_VALUE)
+	{
+		zabbix_log( LOG_LEVEL_ERR, "Condition type [CONDITION_TYPE_TRIGGER_VALUE] is supported");
+		if(new_trigger_value != atoi(condition->value))
+		{
+			ret = FAIL;
+		}
+	}
+	else if(condition->conditiontype == CONDITION_TYPE_TIME_PERIOD)
+	{
+		zabbix_log( LOG_LEVEL_ERR, "Condition type [CONDITION_TYPE_TRIGGER_VALUE] is supported");
+		if(check_time_period(condition->value)==0)
+		{
+			ret = FAIL;
+		}
+	}
+	else
+	{
+		zabbix_log( LOG_LEVEL_ERR, "Condition type [%d] is unknown for condition id [%d]", condition->conditiontype, condition->conditionid);
+		ret = FAIL;
+	}
+
+	return ret;
+}
+
+static int	check_action_conditions(DB_TRIGGER *trigger,int alarmid,int new_trigger_value, int actionid)
+{
+	DB_RESULT *result;
+	char sql[MAX_STRING_LEN];
+
+	DB_CONDITION	condition;
+	
+	int	ret = SUCCEED;
+	int	i;
+
+	zabbix_log( LOG_LEVEL_WARNING, "In check_action_conditions [actionid:%d]", actionid);
+
+	snprintf(sql,sizeof(sql)-1,"select conditionid,actionid,conditiontype,operator,value from conditions where actionid=%d order by conditiontype", actionid);
+	result = DBselect(sql);
+	zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
+
+	if(DBnum_rows(result) == 0)
+	{
+		ret = FAIL;
+	}
+	else
+	{
+		for(i=0;i<DBnum_rows(result);i++)
+		{
+			condition.conditionid=atoi(DBget_field(result,i,0));
+			condition.actionid=atoi(DBget_field(result,i,1));
+			condition.conditiontype=atoi(DBget_field(result,i,2));
+			condition.operator=atoi(DBget_field(result,i,3));
+			condition.value=DBget_field(result,i,4);
+
+			zabbix_log( LOG_LEVEL_WARNING, "ConditionID [%d]", condition.conditionid);
+			if(check_action_condition(trigger, alarmid, new_trigger_value, &condition) == FAIL)
+			{
+				ret = FAIL;
+				break;
+			}
+		}
+	}
+
+	DBfree_result(result);
+
+	return ret;
+}
+
+void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
+{
+	DB_RESULT *result;
+	
+	DB_ACTION action;
+
+	char sql[MAX_STRING_LEN];
+
+	int	i;
+	int	now;
+
+	zabbix_log( LOG_LEVEL_WARNING, "In apply_actions(triggerid:%d,alarmid:%d,trigger_value:%d)",trigger->triggerid, alarmid, trigger_value);
+
+	if(TRIGGER_VALUE_TRUE == trigger_value)
+	{
+		zabbix_log( LOG_LEVEL_DEBUG, "Check dependencies");
+
+		snprintf(sql,sizeof(sql)-1,"select count(*) from trigger_depends d,triggers t where d.triggerid_down=%d and d.triggerid_up=t.triggerid and t.value=%d",trigger->triggerid, TRIGGER_VALUE_TRUE);
+		result = DBselect(sql);
+		if(DBnum_rows(result) == 1)
+		{
+			if(atoi(DBget_field(result,0,0))>0)
+			{
+				zabbix_log( LOG_LEVEL_DEBUG, "Will not apply actions");
+				DBfree_result(result);
+				return;
+			}
+		}
+		DBfree_result(result);
+	}
+
+	zabbix_log( LOG_LEVEL_WARNING, "Applying actions");
+
+	now = time(NULL);
+
+/*	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,scope,severity,recipient,good from actions where (scope=%d and triggerid=%d and good=%d and nextcheck<=%d) or (scope=%d and good=%d) or (scope=%d and good=%d)",ACTION_SCOPE_TRIGGER,trigger->triggerid,trigger_value,now,ACTION_SCOPE_HOST,trigger_value,ACTION_SCOPE_HOSTS,trigger_value);*/
+	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,recipient,good,maxrepeats,repeatdelay from actions where nextcheck<=%d", now);
+	result = DBselect(sql);
+	zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
+
+	for(i=0;i<DBnum_rows(result);i++)
+	{
+		action.actionid=atoi(DBget_field(result,i,0));
+
+		if(check_action_conditions(trigger, alarmid, trigger_value, action.actionid) == SUCCEED)
+		{
+			zabbix_log( LOG_LEVEL_WARNING, "Before sending to users");
+
+			action.userid=atoi(DBget_field(result,i,1));
+			action.delay=atoi(DBget_field(result,i,2));
+			strscpy(action.subject,DBget_field(result,i,3));
+			strscpy(action.message,DBget_field(result,i,4));
+			action.recipient=atoi(DBget_field(result,i,5));
+			action.good=atoi(DBget_field(result,i,6));
+			action.maxrepeats=atoi(DBget_field(result,i,7));
+			action.repeatdelay=atoi(DBget_field(result,i,8));
+
+
+			substitute_macros(trigger, &action, action.message);
+			substitute_macros(trigger, &action, action.subject);
+
+			send_to_user(trigger,&action);
+			snprintf(sql,sizeof(sql)-1,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
+			DBexecute(sql);
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_WARNING, "Conditions do not match our trigger. Do not apply actions.");
+		}
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "Actions applied for trigger %d %d", trigger->triggerid, trigger_value );
 	DBfree_result(result);

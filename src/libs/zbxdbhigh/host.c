@@ -152,13 +152,13 @@ int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,i
 	DBfree_result(result);
 
 	/* Sync actions */
-	snprintf(sql,sizeof(sql)-1,"select distinct a.actionid from actions a,hosts h, items i,triggers t,functions f where h.hostid=%d and h.hostid=i.hostid and t.triggerid=f.triggerid and i.itemid=f.itemid", templateid);
+/*	snprintf(sql,sizeof(sql)-1,"select distinct a.actionid from actions a,hosts h, items i,triggers t,functions f where h.hostid=%d and h.hostid=i.hostid and t.triggerid=f.triggerid and i.itemid=f.itemid", templateid);
 	result = DBselect(sql);
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 		DBadd_action_to_linked_hosts(atoi(DBget_field(result,i,0)),hostid);
 	}
-	DBfree_result(result);
+	DBfree_result(result);*/
 
 	/* Sync graphs */
 	snprintf(sql,sizeof(sql)-1,"select distinct gi.gitemid from graphs g,graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=%d and g.graphid=gi.graphid", templateid);
