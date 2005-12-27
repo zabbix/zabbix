@@ -52,6 +52,7 @@ extern	int	CONFIG_DBPORT;
 #define DB_ITEM		struct item_type
 #define DB_TRIGGER	struct trigger_type
 #define DB_ACTION	struct action_type
+#define DB_CONDITION	struct condition_type
 #define DB_ALERT	struct alert_type
 #define DB_FUNCTION	struct function_type
 #define DB_MEDIA	struct media_type
@@ -87,6 +88,9 @@ extern	int	CONFIG_DBPORT;
 #define TRIGGER_URL_LEN_MAX		TRIGGER_URL_LEN+1
 #define TRIGGER_COMMENTS_LEN		4096
 #define TRIGGER_COMMENTS_LEN_MAX	TRIGGER_URL_LEN+1
+
+#define CONDITION_VALUE_LEN		255
+#define CONDITION_VALUE_LEN_MAX		CONDITION_VALUE_LEN+1
 
 #define HOST_HOST_LEN			64
 #define HOST_HOST_LEN_MAX		HOST_HOST_LEN+1
@@ -247,10 +251,7 @@ DB_TRIGGER
 DB_ACTION
 {
 	int	actionid;
-	int	triggerid;
 	int	userid;
-	int	scope;
-	int	severity;
 	int	good;
 	int	delay;
 	int	lastcheck;
@@ -259,6 +260,15 @@ DB_ACTION
 	char	message[MAX_STRING_LEN];
 	int	maxrepeats;
 	int	repeatdelay;
+};
+
+DB_CONDITION
+{
+	int	conditionid;
+	int	actionid;
+	int	conditiontype;
+	int	operator;
+	char	*value;
 };
 
 DB_ALERT

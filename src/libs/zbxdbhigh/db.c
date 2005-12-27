@@ -723,8 +723,8 @@ void  DBdelete_trigger(int triggerid)
 	DBexecute(sql);
 	snprintf(sql,sizeof(sql)-1,"delete from alarms where triggerid=%d", triggerid);
 	DBexecute(sql);
-	snprintf(sql,sizeof(sql)-1,"delete from actions where triggerid=%d and scope=%d", triggerid, ACTION_SCOPE_TRIGGER);
-	DBexecute(sql);
+/*	snprintf(sql,sizeof(sql)-1,"delete from actions where triggerid=%d and scope=%d", triggerid, ACTION_SCOPE_TRIGGER);
+	DBexecute(sql);*/
 
 	DBdelete_services_by_triggerid(triggerid);
 
