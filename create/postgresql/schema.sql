@@ -203,7 +203,6 @@ CREATE INDEX audit_clock on audit (clock);
 CREATE TABLE actions (
   actionid		serial,
   userid		int4		DEFAULT '0' NOT NULL,
-  good			int4		DEFAULT '0' NOT NULL,
   delay			int4		DEFAULT '0' NOT NULL,
   subject		varchar(255)	DEFAULT '' NOT NULL,
   message		text		DEFAULT '' NOT NULL,

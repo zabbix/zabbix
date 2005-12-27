@@ -62,7 +62,7 @@
 
 	# Add Action
 
-	function	add_action( $userid, $good, $delay, $subject, $message, $recipient, $usrgrpid, $maxrepeats, $repeatdelay)
+	function	add_action( $userid, $delay, $subject, $message, $recipient, $usrgrpid, $maxrepeats, $repeatdelay)
 	{
 //		if(!check_right_on_trigger("A",$triggerid))
 //		{
@@ -79,7 +79,7 @@
 			$id = $usrgrpid;
 		}
 
-		$sql="insert into actions (userid,good,delay,nextcheck,subject,message,recipient,maxrepeats,repeatdelay) values ($id,$good,$delay,0,'$subject','$message',$recipient,$maxrepeats,$repeatdelay)";
+		$sql="insert into actions (userid,delay,nextcheck,subject,message,recipient,maxrepeats,repeatdelay) values ($id,$delay,0,'$subject','$message',$recipient,$maxrepeats,$repeatdelay)";
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"actions","actionid");
 	}
@@ -99,14 +99,26 @@
 		return	DBexecute($sql);
 	}
 
+	# Delete Conditions associated with actionid
+
+	function	delete_conditions_by_actionid($actionid)
+	{
+		$sql="delete from conditions where actionid=$actionid";
+		return	DBexecute($sql);
+	}
+
 	# Delete Action
 
 	function	delete_action( $actionid )
 	{
+		delete_conditions_by_actionid($actionid);
+		delete_alert_by_actionid($actionid);
+
 		$sql="delete from actions where actionid=$actionid";
 		$result=DBexecute($sql);
 
-		return delete_alert_by_actionid($actionid);
+
+		return $result;
 	}
 
 	# Add action to hardlinked hosts
@@ -275,6 +287,22 @@
 		{
 			$op="<>";
 		}
+		else if($operator == CONDITION_OPERATOR_LIKE)
+		{
+			$op="like";
+		}
+		else if($operator == CONDITION_OPERATOR_NOT_LIKE)
+		{
+			$op="not like";
+		}
+		else if($operator == CONDITION_OPERATOR_IN)
+		{
+			$op="in";
+		}
+		else if($operator == CONDITION_OPERATOR_MORE_EQUAL)
+		{
+			$op=">=";
+		}
 
 		$desc=S_UNKNOWN;
 		if($conditiontype==CONDITION_TYPE_GROUP)
@@ -285,6 +313,14 @@
 		else if($conditiontype==CONDITION_TYPE_TRIGGER_NAME)
 		{
 			$desc=S_TRIGGER_DESCRIPTION." $op "."\"".$value."\"";
+		}
+		else if($conditiontype==CONDITION_TYPE_TRIGGER_SEVERITY)
+		{
+			$desc=S_TRIGGER_SEVERITY." $op "."\"".get_severity_description($value)."\"";
+		}
+		else if($conditiontype==CONDITION_TYPE_TIME_PERIOD)
+		{
+			$desc=S_TIME." $op "."\"".$value."\"";
 		}
 		else
 		{

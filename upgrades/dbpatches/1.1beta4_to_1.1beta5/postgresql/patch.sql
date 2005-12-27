@@ -9,3 +9,4 @@ update actions set filter_triggerid=triggerid where scope=0;
 update actions set filter_hostid=triggerid where scope=1;
 alter table actions drop triggerid;
 alter table actions drop scope;
+alter table actions drop good;
