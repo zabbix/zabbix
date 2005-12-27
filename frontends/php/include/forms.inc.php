@@ -1501,11 +1501,7 @@
 
 			$actionid=$action["actionid"];
 			$actiontype=$action["actiontype"];
-			$filter_triggerid=$action["filter_triggerid"];
-			$filter_groupid=$action["filter_groupid"];
-			$filter_hostid=$action["filter_hostid"];
 			$source=$action["source"];
-			$filter_trigger_name=$action["filter_trigger_name"];
 			$good=$action["good"];
 			$delay=$action["delay"];
 			// Otherwise symbols like ",' will not be shown
@@ -1513,7 +1509,6 @@
 			$message=$action["message"];
 			$uid=$action["userid"];
 			$scope=@iif(isset($_REQUEST["scope"]),$_REQUEST["scope"],$action["scope"]);
-			$severity=$action["severity"];
 			$recipient=@iif(isset($_REQUEST["recipient"]),$_REQUEST["recipient"],$action["recipient"]);
 			$maxrepeats=$action["maxrepeats"];
 			$repeatdelay=$action["repeatdelay"];
@@ -1559,7 +1554,7 @@
 			}
 		}
 
-		$filtertype=@iif(isset($_REQUEST["filtertype"]),$_REQUEST["filtertype"],0);
+		$conditiontype=@iif(isset($_REQUEST["conditiontype"]),$_REQUEST["conditiontype"],0);
 
 
 		show_form_begin("actions.action");
@@ -1578,43 +1573,73 @@
 		echo "<OPTION VALUE=\"0\""; if($source==0) echo "SELECTED"; echo ">".S_TRIGGER;
 		echo "</SELECT>";
 
-		show_table2_v_delimiter($col++);
+		show_table2_v_delimiter($col);
 		echo nbsp("Conditions");
 		show_table2_h_delimiter();
-		echo "<input type=checkbox name=\"zzz\" \">"."Host: zabbix.com";
-		echo "<br>";
-		echo "<input type=checkbox name=\"zzz\" \">"."Trigger: Processor load is too high on zabbix.com";
-		echo "<br>";
-		echo "<input type=checkbox name=\"zzz\" \">"."Trigger description like: \"Processor load is too high\"";
+		for($i=1;$i<=1000;$i++)
+		{
+			if(isset($_REQUEST["conditiontype$i"]))
+			{
+				echo "<input type=checkbox name=\"conditionchecked$i\">".get_condition_desc($_REQUEST["conditiontype$i"],$_REQUEST["conditionop$i"],$_REQUEST["conditionvalue$i"]);
+				echo "<br>";
+			}
+		}
+
+		for($i=1;$i<=1000;$i++)
+		{
+			if(isset($_REQUEST["conditiontype$i"]))
+			{
+				echo "<input name=\"conditiontype$i\" type=\"hidden\" value=\"".$_REQUEST["conditiontype$i"]."\">";
+				echo "<input name=\"conditionop$i\" type=\"hidden\" value=\"".$_REQUEST["conditionop$i"]."\">";
+				echo "<input name=\"conditionvalue$i\" type=\"hidden\" value=\"".$_REQUEST["conditionvalue$i"]."\">";
+			}
+		}
+
+		show_table2_v_delimiter($col++);
+		echo nbsp(" ");
+		show_table2_h_delimiter();
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete selected\">";
 
 //		show_table2_v_delimiter($col);
 //		echo nbsp("                                        "."Condition");
 //		show_table2_h_delimiter();
-		$h2="<select class=\"biginput\" name=\"filtertype\" onChange=\"submit()\">>";
-		$h2=$h2.form_select("filtertype",0,S_HOST_GROUP);
-		$h2=$h2.form_select("filtertype",1,S_HOST);
-		$h2=$h2.form_select("filtertype",2,S_TRIGGER);
-		$h2=$h2.form_select("filtertype",3,S_TRIGGER_NAME);
-		$h2=$h2.form_select("filtertype",4,S_TRIGGER_SEVERITY);
-		$h2=$h2.form_select("filtertype",5,S_TRIGGER_VALUE);
-		$h2=$h2.form_select("filtertype",6,S_TIME_PERIOD);
+		$h2="<select class=\"biginput\" name=\"conditiontype\" onChange=\"submit()\">";
+		$h2=$h2.form_select("conditiontype",0,S_HOST_GROUP);
+		$h2=$h2.form_select("conditiontype",1,S_HOST);
+		$h2=$h2.form_select("conditiontype",2,S_TRIGGER);
+		$h2=$h2.form_select("conditiontype",3,S_TRIGGER_NAME);
+		$h2=$h2.form_select("conditiontype",4,S_TRIGGER_SEVERITY);
+		$h2=$h2.form_select("conditiontype",5,S_TRIGGER_VALUE);
+		$h2=$h2.form_select("conditiontype",6,S_TIME_PERIOD);
 		$h2=$h2."</SELECT>";
 //		echo $h2;
 
-		if($filtertype==0)
+		$h2=$h2."<select class=\"biginput\" name=\"operator\">";
+		$h2=$h2.form_select("operator",0,"=");
+		$h2=$h2.form_select("operator",1,"<>");
+		$h2=$h2.form_select("operator",2,"like");
+		$h2=$h2.form_select("operator",3,"not like");
+		$h2=$h2."</SELECT>";
+//		echo $h2;
+
+
+		show_table2_v_delimiter($col);
+		echo nbsp("                                      Condition");
+		show_table2_h_delimiter();
+
+		if($conditiontype == CONDITION_TYPE_GROUP)
 		{
-			show_table2_v_delimiter($col);
-			echo nbsp("                                      Condition");
-			show_table2_h_delimiter();
-			$h2=$h2." <b>=</b> "."<select class=\"biginput\" name=\"filter_groupid\">";
-			$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
+			$h2=$h2."<select class=\"biginput\" name=\"value\">";
 			$result=DBselect("select groupid,name from groups order by name");
 			while($row=DBfetch($result))
 			{
-				$h2=$h2.form_select("filter_groupid",$row["groupid"],$row["name"]);
+				$h2=$h2.form_select("value",$row["groupid"],$row["name"]);
 			}
 			$h2=$h2."</SELECT>";
-			echo $h2;
+		}
+		else if($conditiontype == CONDITION_TYPE_TRIGGER_NAME)
+		{
+			$h2=$h2."<input class=\"biginput\" name=\"value\" value=\"\" size=40>";
 		}
 		else
 		{
@@ -1730,6 +1755,8 @@
 			echo "<OPTION VALUE=\"2\""; if($good==2) echo "SELECTED"; echo ">".S_ON_OR_OFF;
 			echo "</SELECT>";
 		}
+		echo $h2;
+
 		show_table2_v_delimiter($col++);
 		echo nbsp(" ");
 		show_table2_h_delimiter();
