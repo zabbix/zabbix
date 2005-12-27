@@ -47,8 +47,15 @@
 				$_REQUEST["repeatdelay"]=600;
 			}
 
-			$actionid=add_action( $_REQUEST["filter_triggerid"], $_REQUEST["userid"], $_REQUEST["good"], $_REQUEST["delay"], $_REQUEST["subject"], $_REQUEST["message"],$_REQUEST["severity"],$_REQUEST["recipient"],$_REQUEST["usrgrpid"],$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"]);
-			add_action_to_linked_hosts($actionid);
+			$actionid=add_action($_REQUEST["userid"], $_REQUEST["good"], $_REQUEST["delay"], $_REQUEST["subject"], $_REQUEST["message"],$_REQUEST["recipient"],$_REQUEST["usrgrpid"],$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"]);
+//			add_action_to_linked_hosts($actionid);
+			for($i=1;$i<=1000;$i++)
+			{
+				if(isset($_REQUEST["conditiontype$i"]))
+				{
+					add_action_condition($actionid,$_REQUEST["conditiontype$i"], $_REQUEST["conditionop$i"], $_REQUEST["conditionvalue$i"]);
+				}
+			}
 			show_messages($actionid,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
 			if($actionid)
 			{
@@ -100,6 +107,32 @@
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_ACTION,"When [".$_REQUEST["good"]."] subject [".$_REQUEST["subject"]."]");
 			}
 			unset($_REQUEST["actionid"]);
+		}
+		if($_REQUEST["register"]=="add condition")
+		{
+			for($i=1;$i<=1000;$i++)
+			{
+				if(!isset($_REQUEST["conditiontype$i"]))
+				{
+					$num=$i;
+					break;
+				}
+			}
+			$_REQUEST["conditionop$num"]=$_REQUEST["operator"];
+			$_REQUEST["conditiontype$num"]=$_REQUEST["conditiontype"];
+			$_REQUEST["conditionvalue$num"]=$_REQUEST["value"];
+		}
+		if($_REQUEST["register"]=="delete selected")
+		{
+			for($i=1;$i<=1000;$i++)
+			{
+				if(isset($_REQUEST["conditionchecked$i"]))
+				{
+					unset($_REQUEST["conditionop$i"]);
+					unset($_REQUEST["conditiontype$i"]);
+					unset($_REQUEST["conditionvalue$i"]);
+				}
+			}
 		}
 	}
 ?>

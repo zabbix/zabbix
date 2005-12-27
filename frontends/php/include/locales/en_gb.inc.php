@@ -61,6 +61,7 @@
 	"S_TRIGGER_SEVERITY"=>			"Trigger severity",
 	"S_TRIGGER_VALUE"=>			"Trigger value",
 	"S_TIME_PERIOD"=>			"Time period",
+	"S_TRIGGER_DESCRIPTION"=>		"Trigger description",
 
 //	actions.php
 	"S_ACTIONS"=>				"Actions",

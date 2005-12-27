@@ -212,13 +212,20 @@ CREATE TABLE actions (
   repeatdelay		int(4)		DEFAULT '600' NOT NULL,
   source		int(1)		DEFAULT '0' NOT NULL,
   actiontype		int(1)		DEFAULT '0' NOT NULL,
-  filter_triggerid	int(4)		DEFAULT '0' NOT NULL,
-  filter_hostid		int(4)		DEFAULT '0' NOT NULL,
-  filter_groupid	int(4)		DEFAULT '0' NOT NULL,
-  filter_trigger_name	varchar(255)	DEFAULT '' NOT NULL,
-  filter_trigger_severity	int(4)		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (actionid),
-  KEY (triggerid)
+  PRIMARY KEY (actionid)
+) type=InnoDB;
+
+--
+-- Table structure for table 'conditions'
+--
+
+CREATE TABLE conditions (
+  conditionid		int(4)		NOT NULL auto_increment,
+  actionid		int(4)		DEFAULT '0' NOT NULL,
+  conditiontype		int(4)		DEFAULT '0' NOT NULL,
+  operator		int(1)		DEFAULT '0' NOT NULL,
+  value			varchar(255)	DEFAULT '' NOT NULL,
+  PRIMARY KEY (conditionid)
 ) type=InnoDB;
 
 --

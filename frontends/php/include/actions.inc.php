@@ -62,13 +62,13 @@
 
 	# Add Action
 
-	function	add_action( $filter_triggerid, $userid, $good, $delay, $subject, $message, $scope, $severity, $recipient, $usrgrpid, $maxrepeats, $repeatdelay)
+	function	add_action( $userid, $good, $delay, $subject, $message, $recipient, $usrgrpid, $maxrepeats, $repeatdelay)
 	{
-		if(!check_right_on_trigger("A",$triggerid))
-		{
-                        error("Insufficient permissions");
-                        return 0;
-		}
+//		if(!check_right_on_trigger("A",$triggerid))
+//		{
+//                      error("Insufficient permissions");
+//                      return 0;
+//		}
 
 		if($recipient == RECIPIENT_TYPE_USER)
 		{
@@ -79,7 +79,7 @@
 			$id = $usrgrpid;
 		}
 
-		$sql="insert into actions (tilter_triggerid,userid,good,delay,nextcheck,subject,message,severity,recipient,maxrepeats,repeatdelay) values ($filter_triggerid,$id,$good,$delay,0,'$subject','$message',$severity,$recipient,$maxrepeats,$repeatdelay)";
+		$sql="insert into actions (userid,good,delay,nextcheck,subject,message,recipient,maxrepeats,repeatdelay) values ($id,$good,$delay,0,'$subject','$message',$recipient,$maxrepeats,$repeatdelay)";
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"actions","actionid");
 	}
@@ -263,5 +263,42 @@
 			$desc="Trigger";
 		}
 		return $desc;
+	}
+
+	function	get_condition_desc($conditiontype, $operator, $value)
+	{
+		if($operator == CONDITION_OPERATOR_EQUAL)
+		{
+			$op="=";
+		}
+		else if($operator == CONDITION_OPERATOR_NOT_EQUAL)
+		{
+			$op="<>";
+		}
+
+		$desc=S_UNKNOWN;
+		if($conditiontype==CONDITION_TYPE_GROUP)
+		{
+			$group=get_group_by_groupid($value);
+			if($group) $desc=S_HOST_GROUP." $op "."\"".$group["name"]."\"";
+		}
+		else if($conditiontype==CONDITION_TYPE_TRIGGER_NAME)
+		{
+			$desc=S_TRIGGER_DESCRIPTION." $op "."\"".$value."\"";
+		}
+		else
+		{
+		}
+		return $desc;
+	}
+
+	# Add Action's condition
+
+	function	add_action_condition($actionid, $conditiontype, $operator, $value)
+	{
+		$value=addslashes($value);
+		$sql="insert into conditions (actionid,conditiontype,operator,value) values ($actionid,$conditiontype,$operator,'$value')";
+		$result=DBexecute($sql);
+		return DBinsert_id($result,"conditions","conditionid");
 	}
 ?>
