@@ -36,7 +36,7 @@
 
 	# Update Action
 
-	function	update_action( $actionid, $triggerid, $userid, $good, $delay, $subject, $message, $scope, $severity, $recipient, $usrgrpid, $maxrepeats, $repeatdelay)
+	function	update_action( $actionid, $filter_triggerid, $userid, $good, $delay, $subject, $message, $severity, $recipient, $usrgrpid, $maxrepeats, $repeatdelay)
 	{
 		if(!check_right_on_trigger("A",$triggerid))
 		{
@@ -55,16 +55,14 @@
 		$subject=addslashes($subject);
 		$message=addslashes($message);
 
-		$sql="update actions set triggerid=$triggerid,userid=$id,good=$good,delay=$delay,nextcheck=0,subject='$subject',message='$message',scope=$scope,severity=$severity,recipient=$recipient,maxrepeats=$maxrepeats,repeatdelay=$repeatdelay where actionid=$actionid";
+		$sql="update actions set filter_triggerid=$filter_triggerid,userid=$id,good=$good,delay=$delay,nextcheck=0,subject='$subject',message='$message',severity=$severity,recipient=$recipient,maxrepeats=$maxrepeats,repeatdelay=$repeatdelay where actionid=$actionid";
 		$result=DBexecute($sql);
-		$trigger=get_trigger_by_triggerid($triggerid);
-		info("Action '$subject' for trigger '".$trigger["description"]."' updated");
 		return $result;
 	}
 
 	# Add Action
 
-	function	add_action( $triggerid, $userid, $good, $delay, $subject, $message, $scope, $severity, $recipient, $usrgrpid, $maxrepeats, $repeatdelay)
+	function	add_action( $filter_triggerid, $userid, $good, $delay, $subject, $message, $scope, $severity, $recipient, $usrgrpid, $maxrepeats, $repeatdelay)
 	{
 		if(!check_right_on_trigger("A",$triggerid))
 		{
@@ -81,33 +79,9 @@
 			$id = $usrgrpid;
 		}
 
-		if($scope==2)
-		{
-			$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message,scope,severity,recipient,maxrepeats,repeatdelay) values (0,$id,$good,$delay,0,'*Automatically generated*','*Automatically generated*',$scope,$severity,$recipient,$maxrepeats,$repeatdelay)";
-			$result=DBexecute($sql);
-			return DBinsert_id($result,"actions","actionid");
-		}
-		elseif($scope==1)
-		{
-			$sql="select h.hostid from triggers t,hosts h,functions f,items i where f.triggerid=t.triggerid and h.hostid=i.hostid and i.itemid=f.itemid and t.triggerid=$triggerid";
-//			echo "$sql<br>";
-			$result=DBselect($sql);
-			while($row=DBfetch($result))
-			{
-				$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message,scope,severity,recipient,maxrepeats,repeatdelay) values (".$row["hostid"].",$id,$good,$delay,0,'*Automatically generated*','*Automatically generated*',$scope,$severity,$recipient,$maxrepeats,$repeatdelay)";
-//				echo "$sql<br>";
-				DBexecute($sql);
-			}
-			return TRUE;
-		}
-		else
-		{
-			$sql="insert into actions (triggerid,userid,good,delay,nextcheck,subject,message,scope,severity,recipient,maxrepeats,repeatdelay) values ($triggerid,$id,$good,$delay,0,'$subject','$message',$scope,$severity,$recipient,$maxrepeats,$repeatdelay)";
-			$result=DBexecute($sql);
-			return DBinsert_id($result,"actions","actionid");
-		}
-		$trigger=get_trigger_by_triggerid($triggerid);
-		info("Action '$subject' for trigger '".$trigger["description"]."' added");
+		$sql="insert into actions (tilter_triggerid,userid,good,delay,nextcheck,subject,message,severity,recipient,maxrepeats,repeatdelay) values ($filter_triggerid,$id,$good,$delay,0,'$subject','$message',$severity,$recipient,$maxrepeats,$repeatdelay)";
+		$result=DBexecute($sql);
+		return DBinsert_id($result,"actions","actionid");
 	}
 
 	# Delete Action by userid

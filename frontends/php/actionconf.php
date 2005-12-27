@@ -47,7 +47,7 @@
 				$_REQUEST["repeatdelay"]=600;
 			}
 
-			$actionid=add_action( $_REQUEST["triggerid"], $_REQUEST["userid"], $_REQUEST["good"], $_REQUEST["delay"], $_REQUEST["subject"], $_REQUEST["message"],$_REQUEST["scope"],$_REQUEST["severity"],$_REQUEST["recipient"],$_REQUEST["usrgrpid"],$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"]);
+			$actionid=add_action( $_REQUEST["filter_triggerid"], $_REQUEST["userid"], $_REQUEST["good"], $_REQUEST["delay"], $_REQUEST["subject"], $_REQUEST["message"],$_REQUEST["severity"],$_REQUEST["recipient"],$_REQUEST["usrgrpid"],$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"]);
 			add_action_to_linked_hosts($actionid);
 			show_messages($actionid,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
 			if($actionid)
@@ -72,7 +72,7 @@
 				$_REQUEST["repeatdelay"]=600;
 			}
 			
-			$result=update_action( $_REQUEST["actionid"], $_REQUEST["triggerid"], $_REQUEST["userid"], $_REQUEST["good"], $_REQUEST["delay"], $_REQUEST["subject"], $_REQUEST["message"],$_REQUEST["scope"],$_REQUEST["severity"],$_REQUEST["recipient"],$_REQUEST["usrgrpid"],$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"]);
+			$result=update_action( $_REQUEST["actionid"], $_REQUEST["filter_triggerid"], $_REQUEST["userid"], $_REQUEST["good"], $_REQUEST["delay"], $_REQUEST["subject"], $_REQUEST["message"],$_REQUEST["scope"],$_REQUEST["severity"],$_REQUEST["recipient"],$_REQUEST["usrgrpid"],$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"]);
 			update_action_from_linked_hosts($_REQUEST["actionid"]);
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
 			if($result)
@@ -184,7 +184,7 @@
 			$maxrepeats=$row["maxrepeats"];
 		}
 
-		$actions="<A HREF=\"actions.php?register=edit&actionid=".$row["actionid"]."#form\">Change</A>";
+		$actions="<A HREF=\"actionconf.php?register=edit&actionid=".$row["actionid"]."#form\">".S_CHANGE."</A>";
 
 		table_row(array(
 			get_source_description($row["source"]),
