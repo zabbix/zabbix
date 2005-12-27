@@ -68,7 +68,7 @@ int	DBget_action_by_actionid(int actionid,DB_ACTION *action)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DBget_action_by_actionid(%d)", actionid);
 
-	snprintf(sql,sizeof(sql)-1,"select triggerid,userid,scope,severity,good,delay,recipient,subject,message from actions where actionid=%d", actionid);
+	snprintf(sql,sizeof(sql)-1,"select userid,good,delay,recipient,subject,message from actions where actionid=%d", actionid);
 	result=DBselect(sql);
 
 	if(DBnum_rows(result)==0)
@@ -78,15 +78,12 @@ int	DBget_action_by_actionid(int actionid,DB_ACTION *action)
 	else
 	{
 		action->actionid=actionid;
-		action->triggerid=atoi(DBget_field(result,0,0));
-		action->userid=atoi(DBget_field(result,0,1));
-		action->scope=atoi(DBget_field(result,0,2));
-		action->severity=atoi(DBget_field(result,0,3));
-		action->good=atoi(DBget_field(result,0,4));
-		action->delay=atoi(DBget_field(result,0,5));
-		action->recipient=atoi(DBget_field(result,0,6));
-		strscpy(action->subject,DBget_field(result,0,7));
-		strscpy(action->message,DBget_field(result,0,8));
+		action->userid=atoi(DBget_field(result,0,0));
+		action->good=atoi(DBget_field(result,0,1));
+		action->delay=atoi(DBget_field(result,0,2));
+		action->recipient=atoi(DBget_field(result,0,3));
+		strscpy(action->subject,DBget_field(result,0,4));
+		strscpy(action->message,DBget_field(result,0,5));
 	}
 
 	DBfree_result(result);
@@ -94,6 +91,7 @@ int	DBget_action_by_actionid(int actionid,DB_ACTION *action)
 	return ret;
 }
 
+/*
 int	DBadd_action_to_linked_hosts(int actionid,int hostid)
 {
 	DB_ACTION	action;
@@ -183,3 +181,4 @@ int	DBadd_action_to_linked_hosts(int actionid,int hostid)
 
 	return SUCCEED;
 }
+*/
