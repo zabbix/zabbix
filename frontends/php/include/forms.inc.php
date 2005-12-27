@@ -1626,7 +1626,7 @@
 		$h2=$h2."<select class=\"biginput\" name=\"operator\">";
 		if(in_array($conditiontype,array(CONDITION_TYPE_GROUP, CONDITION_TYPE_HOST,CONDITION_TYPE_TRIGGER,CONDITION_TYPE_TRIGGER_SEVERITY,CONDITION_TYPE_TRIGGER_VALUE)))
 			$h2=$h2.form_select("operator",CONDITION_OPERATOR_EQUAL,"=");
-		if(in_array($conditiontype,array(CONDITION_TYPE_GROUP, CONDITION_TYPE_HOST,CONDITION_TYPE_TRIGGER,CONDITION_TYPE_TRIGGER_SEVERITY,CONDITION_TYPE_TRIGGER_VALUE)))
+		if(in_array($conditiontype,array(CONDITION_TYPE_GROUP, CONDITION_TYPE_HOST,CONDITION_TYPE_TRIGGER,CONDITION_TYPE_TRIGGER_SEVERITY)))
 			$h2=$h2.form_select("operator",CONDITION_OPERATOR_NOT_EQUAL,"<>");
 		if(in_array($conditiontype,array(CONDITION_TYPE_TRIGGER_NAME)))
 			$h2=$h2.form_select("operator",CONDITION_OPERATOR_LIKE,"like");
@@ -1634,7 +1634,7 @@
 			$h2=$h2.form_select("operator",CONDITION_OPERATOR_NOT_LIKE,"not like");
 		if(in_array($conditiontype,array(CONDITION_TYPE_TIME_PERIOD)))
 			$h2=$h2.form_select("operator",CONDITION_OPERATOR_IN,"in");
-		if(in_array($conditiontype,array(CONDITION_TYPE_TRIGGER_VALUE)))
+		if(in_array($conditiontype,array(CONDITION_TYPE_TRIGGER_SEVERITY)))
 			$h2=$h2.form_select("operator",CONDITION_OPERATOR_MORE_EQUAL,">=");
 		$h2=$h2."</SELECT>";
 //		echo $h2;
@@ -1661,8 +1661,8 @@
 		else if($conditiontype == CONDITION_TYPE_TRIGGER_VALUE)
 		{
 			$h2=$h2."<select class=\"biginput\" name=\"value\">";
-			$h2=$h2.form_select("value",0,"ON");
-			$h2=$h2.form_select("value",1,"OFF");
+			$h2=$h2.form_select("value",0,"OFF");
+			$h2=$h2.form_select("value",1,"ON");
 			$h2=$h2."</SELECT>";
 		}
 		else if($conditiontype == CONDITION_TYPE_TIME_PERIOD)

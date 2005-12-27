@@ -62,6 +62,7 @@
 	"S_TRIGGER_VALUE"=>			"Trigger value",
 	"S_TIME_PERIOD"=>			"Time period",
 	"S_TRIGGER_DESCRIPTION"=>		"Trigger description",
+	"S_CONDITIONS"=>			"Conditions",
 
 //	actions.php
 	"S_ACTIONS"=>				"Actions",
