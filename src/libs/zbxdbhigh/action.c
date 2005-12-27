@@ -29,7 +29,7 @@
 #include "zlog.h"
 #include "common.h"
 
-int	DBadd_action(int triggerid, int userid, int good, int delay, char *subject, char *message, int scope, int severity, int recipient, int usrgrpid)
+int	DBadd_action(int triggerid, int userid, int delay, char *subject, char *message, int scope, int severity, int recipient, int usrgrpid)
 {
 	char	sql[MAX_STRING_LEN];
 	int	actionid;
@@ -44,7 +44,7 @@ int	DBadd_action(int triggerid, int userid, int good, int delay, char *subject, 
 		userid = usrgrpid;
 	}
 
-	snprintf(sql, sizeof(sql)-1,"insert into actions (triggerid, userid, good, delay, subject, message, scope, severity, recipient) values (%d, %d, %d, %d, '%s', '%s', %d, %d, %d)", triggerid, userid, good, delay, subject_esc, message_esc, scope, severity, recipient);
+	snprintf(sql, sizeof(sql)-1,"insert into actions (triggerid, userid, delay, subject, message, scope, severity, recipient) values (%d, %d, %d, '%s', '%s', %d, %d, %d)", triggerid, userid, delay, subject_esc, message_esc, scope, severity, recipient);
 	if(FAIL == DBexecute(sql))
 	{
 		return FAIL;
@@ -68,7 +68,7 @@ int	DBget_action_by_actionid(int actionid,DB_ACTION *action)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DBget_action_by_actionid(%d)", actionid);
 
-	snprintf(sql,sizeof(sql)-1,"select userid,good,delay,recipient,subject,message from actions where actionid=%d", actionid);
+	snprintf(sql,sizeof(sql)-1,"select userid,delay,recipient,subject,message from actions where actionid=%d", actionid);
 	result=DBselect(sql);
 
 	if(DBnum_rows(result)==0)
@@ -79,11 +79,10 @@ int	DBget_action_by_actionid(int actionid,DB_ACTION *action)
 	{
 		action->actionid=actionid;
 		action->userid=atoi(DBget_field(result,0,0));
-		action->good=atoi(DBget_field(result,0,1));
-		action->delay=atoi(DBget_field(result,0,2));
-		action->recipient=atoi(DBget_field(result,0,3));
-		strscpy(action->subject,DBget_field(result,0,4));
-		strscpy(action->message,DBget_field(result,0,5));
+		action->delay=atoi(DBget_field(result,0,1));
+		action->recipient=atoi(DBget_field(result,0,2));
+		strscpy(action->subject,DBget_field(result,0,3));
+		strscpy(action->message,DBget_field(result,0,4));
 	}
 
 	DBfree_result(result);
