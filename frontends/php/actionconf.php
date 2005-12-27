@@ -47,7 +47,7 @@
 				$_REQUEST["repeatdelay"]=600;
 			}
 
-			$actionid=add_action($_REQUEST["userid"], $_REQUEST["good"], $_REQUEST["delay"], $_REQUEST["subject"], $_REQUEST["message"],$_REQUEST["recipient"],$_REQUEST["usrgrpid"],$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"]);
+			$actionid=add_action($_REQUEST["userid"], $_REQUEST["delay"], $_REQUEST["subject"], $_REQUEST["message"],$_REQUEST["recipient"],$_REQUEST["usrgrpid"],$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"]);
 //			add_action_to_linked_hosts($actionid);
 			for($i=1;$i<=1000;$i++)
 			{
@@ -99,7 +99,7 @@
 		}
 		if($_REQUEST["register"]=="delete")
 		{
-			delete_action_from_templates($_REQUEST["actionid"]);
+//			delete_action_from_templates($_REQUEST["actionid"]);
 			$result=delete_action($_REQUEST["actionid"]);
 			show_messages($result,S_ACTION_DELETED,S_CANNOT_DELETE_ACTION);
 			if($result)
@@ -176,7 +176,7 @@
 	$result=DBselect($sql);
 
 	table_begin();
-	table_header(array(S_SOURCE,S_SEND_MESSAGE_TO,S_WHEN_TRIGGER,S_DELAY,S_SUBJECT,S_REPEATS,S_ACTIONS));
+	table_header(array(S_SOURCE,S_SEND_MESSAGE_TO,S_DELAY,S_SUBJECT,S_REPEATS,S_ACTIONS));
 	$col=0;
 	while($row=DBfetch($result))
 	{
@@ -192,22 +192,6 @@
 			$recipient=$groupd["name"];
 		}
   
-		if($row["good"] == 1)
-		{
-#			echo "<TD><FONT COLOR=\"#AA0000\">".S_ON."</FONT></TD>";
-			$good=array("value"=>S_ON,"class"=>"on");
-		}
-		else if($row["good"] == 0)
-		{
-#			echo "<TD><FONT COLOR=\"#00AA00\">".S_OFF."</FONT></TD>";
-			$good=array("value"=>S_OFF,"class"=>"off");
-		}
-		else if($row["good"] == 2)
-		{
-#			echo "<TD><FONT COLOR=\"#AA0000\">".S_ON."</FONT>/<FONT COLOR=\"#00AA00\">OFF</FONT></TD>";
-			$good=array("value"=>S_ON."/".S_OFF,"class"=>"on");
-		}
-
 		if($row["maxrepeats"] == 0)
 		{
 			$maxrepeats=S_NO_REPEATS;
@@ -222,7 +206,6 @@
 		table_row(array(
 			get_source_description($row["source"]),
 			$recipient,
-			$good,
 			htmlspecialchars($row["delay"]),
 			htmlspecialchars($row["subject"]),
 			$maxrepeats,

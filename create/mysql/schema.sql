@@ -202,7 +202,6 @@ CREATE TABLE alerts (
 CREATE TABLE actions (
   actionid		int(4)		NOT NULL auto_increment,
   userid		int(4)		DEFAULT '0' NOT NULL,
-  good			int(4)		DEFAULT '0' NOT NULL,
   delay			int(4)		DEFAULT '0' NOT NULL,
   subject		varchar(255)	DEFAULT '' NOT NULL,
   message		blob		DEFAULT '' NOT NULL,

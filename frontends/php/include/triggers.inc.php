@@ -510,4 +510,17 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 		}
 	}
+
+	function	get_severity_description($severity)
+	{
+		$desc="Unknown";
+
+		if($severity == 0)	$desc = S_NOT_CLASSIFIED;
+		else if($severity == 1)	$desc = S_INFORMATION;
+		else if($severity == 2)	$desc = S_WARNING;
+		else if($severity == 3)	$desc = S_AVERAGE;
+		else if($severity == 4)	$desc = S_HIGH;
+
+		return $desc;
+	}
 ?>
