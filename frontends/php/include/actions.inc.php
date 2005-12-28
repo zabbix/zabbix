@@ -310,6 +310,16 @@
 			$group=get_group_by_groupid($value);
 			if($group) $desc=S_HOST_GROUP." $op "."\"".$group["name"]."\"";
 		}
+		if($conditiontype==CONDITION_TYPE_TRIGGER)
+		{
+			$trigger=get_trigger_by_triggerid($value);
+			if($trigger) $desc=S_TRIGGER." $op "."\"".$trigger["description"]."\"";
+		}
+		else if($conditiontype==CONDITION_TYPE_HOST)
+		{
+			$host=get_host_by_hostid($value);
+			if($host) $desc=S_HOST." $op "."\"".$host["host"]."\"";
+		}
 		else if($conditiontype==CONDITION_TYPE_TRIGGER_NAME)
 		{
 			$desc=S_TRIGGER_DESCRIPTION." $op "."\"".$value."\"";
