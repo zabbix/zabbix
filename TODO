@@ -12,7 +12,6 @@
  - http://www.zabbix.com/forum/showthread.php?t=1842
  - http://www.zabbix.com/forum/showthread.php?t=1784
  - http://www.zabbix.com/forum/showthread.php?t=1837
- - http://www.zabbix.com/forum/showthread.php?t=1865
  - check if icmpping and icmppingsec works
 
  - fix undeleted warnings for host and trigger statuses
