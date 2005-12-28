@@ -403,7 +403,7 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 			}
 			else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
 			{
-				if(atoi(condition->value) == atoi(DBget_field(result,i,0)))
+				if(atoi(condition->value) != atoi(DBget_field(result,i,0)))
 				{
 					ret = SUCCEED;
 					break;
