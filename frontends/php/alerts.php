@@ -80,11 +80,11 @@
 
 	if(!isset($_REQUEST["start"]))
 	{
-		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries,ac.scope,a.error from alerts a,actions ac,media_type mt where a.actionid=ac.actionid and mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200 order by a.clock desc limit 200";
+		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error from alerts a,media_type mt where mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200 order by a.clock desc limit 200";
 	}
 	else
 	{
-		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,ac.triggerid,a.status,a.retries,ac.scope,a.error from alerts a,actions ac,media_type mt where a.actionid=ac.actionid and mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200-".$_REQUEST["start"]." order by a.clock desc limit ".($_REQUEST["start"]+500);
+		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error from alerts a,media_type mt where mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200-".$_REQUEST["start"]." order by a.clock desc limit ".($_REQUEST["start"]+500);
 	}
 	$result=DBselect($sql);
 
@@ -95,33 +95,15 @@
 	while($row=DBfetch($result))
 	{
 		$zzz++;	
-		if(isset($_REQUEST["start"])&&($zzz<$_REQUEST["start"]))
-		{
-			continue;
-		}
-		if(($row["scope"]==0)&&!check_right_on_trigger("R",$row["triggerid"]))
-                {
-			continue;
-		}
-		if(($row["scope"]==1)&&!check_right("Host","R",$row["triggerid"]))
-                {
-			continue;
-		}
-		if(($row["scope"]==2)&&!check_anyright("Default permission","R"))
+		if(!check_anyright("Default permission","R"))
                 {
 			continue;
 		}
 
 		if($col>100)	break;
 
-		if($row["scope"]==0)
-		{
-			$time="<a href=\"alarms.php?triggerid=".$row["triggerid"]."\">".date("Y.M.d H:i:s",$row["clock"])."</a>";
-		}
-		else
-		{
-			$time=date("Y.M.d H:i:s",$row["clock"]);
-		}
+		$time=date("Y.M.d H:i:s",$row["clock"]);
+
 		if($row["status"] == 1)
 		{
 			$status=array("value"=>S_SENT,"class"=>"off");

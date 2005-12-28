@@ -12,6 +12,7 @@
  - http://www.zabbix.com/forum/showthread.php?t=1842
  - http://www.zabbix.com/forum/showthread.php?t=1784
  - http://www.zabbix.com/forum/showthread.php?t=1837
+ - check if icmpping and icmppingsec works
 
  - fix undeleted warnings for host and trigger statuses
  - make agents return error message if not supported or not available
