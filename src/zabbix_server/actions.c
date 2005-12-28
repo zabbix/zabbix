@@ -382,7 +382,7 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 	int	i;
 	int	ret = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In check_action_condition [actionid:%d,conditionid:%d:cond.value:%s]", condition->actionid, condition->conditionid, condition->value);
+	zabbix_log( LOG_LEVEL_DEBUG, "In check_action_condition [actionid:%d,conditionid:%d:cond.value:%s]", condition->actionid, condition->conditionid, condition->value);
 
 	if(condition->conditiontype == CONDITION_TYPE_HOST_GROUP)
 	{
@@ -567,6 +567,15 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 		ret = FAIL;
 	}
 
+	if(FAIL==ret)
+	{
+		zabbix_log( LOG_LEVEL_ERR, "Condition is FALSE");
+	}
+	else
+	{
+		zabbix_log( LOG_LEVEL_ERR, "Condition is TRUE");
+	}
+
 	return ret;
 }
 
@@ -586,7 +595,6 @@ static int	check_action_conditions(DB_TRIGGER *trigger,int alarmid,int new_trigg
 
 	snprintf(sql,sizeof(sql)-1,"select conditionid,actionid,conditiontype,operator,value from conditions where actionid=%d order by conditiontype", actionid);
 	result = DBselect(sql);
-	zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
 
 	if(DBnum_rows(result) == 0)
 	{
@@ -602,8 +610,6 @@ static int	check_action_conditions(DB_TRIGGER *trigger,int alarmid,int new_trigg
 			condition.operator=atoi(DBget_field(result,i,3));
 			condition.value=DBget_field(result,i,4);
 
-			zabbix_log( LOG_LEVEL_WARNING, "ConditionID [%d]", condition.conditionid);
-
 			/* If old AND condition is FALSE */
 			if( (condition.conditiontype != old_type) && (ret_and == FAIL))
 			{
@@ -615,7 +621,7 @@ static int	check_action_conditions(DB_TRIGGER *trigger,int alarmid,int new_trigg
 			ret_and = check_action_condition(trigger, alarmid, new_trigger_value, &condition);
 
 			/* If last condition and AND condition is FALSE */
-			if( (ret_and == FAIL) && (i==DBnum_rows(result)-1) )
+			if( (condition.conditiontype != old_type) && (ret_and == FAIL) && (i==DBnum_rows(result)-1) )
 			{
 				zabbix_log( LOG_LEVEL_WARNING, "Last conditions is FALSE for [%d]", condition.conditionid);
 				ret = FAIL;
