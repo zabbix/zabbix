@@ -285,15 +285,15 @@
 			{
 				$actions="<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."#form\">".S_CHANGE."</A>";
 			}
-			$actions=$actions." :: ";
-			if(get_action_count_by_triggerid($row["triggerid"])>0)
-			{
-				$actions=$actions."<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\"><b>A</b>ctions</A>";
-			}
-			else
-			{
-				$actions=$actions."<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">".S_ACTIONS."</A>";
-			}
+//			$actions=$actions." :: ";
+//			if(get_action_count_by_triggerid($row["triggerid"])>0)
+//			{
+//				$actions=$actions."<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\"><b>A</b>ctions</A>";
+//			}
+//			else
+//			{
+//				$actions=$actions."<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">".S_ACTIONS."</A>";
+//			}
 			table_row(array(
 				$id,
 				$description,

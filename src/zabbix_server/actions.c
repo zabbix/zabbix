@@ -376,58 +376,186 @@ void	apply_actions_original(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 
 static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigger_value, DB_CONDITION *condition)
 {
+	DB_RESULT *result;
+	char sql[MAX_STRING_LEN];
+
+	int	i;
 	int	ret = SUCCEED;
 
 	zabbix_log( LOG_LEVEL_WARNING, "In check_action_condition [actionid:%d,conditionid:%d:cond.value:%s]", condition->actionid, condition->conditionid, condition->value);
 
 	if(condition->conditiontype == CONDITION_TYPE_HOST_GROUP)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Condition type [CONDITION_TYPE_HOST_GROUP] is unsupported");
-		ret = FAIL;
+		zabbix_log( LOG_LEVEL_ERR, "Condition type [CONDITION_TYPE_HOST_GROUP] is supported");
+
+		snprintf(sql,sizeof(sql)-1,"select distinct hg.groupid from hosts_groups hg,hosts h, items i, functions f, triggers t where hg.hostid=h.hostid and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid where t.triggerid=%d", trigger->triggerid);
+		result = DBselect(sql);
+		for(i=0;i<DBnum_rows(result);i++)
+		{
+			ret = FAIL;
+			if(condition->operator == CONDITION_OPERATOR_EQUAL)
+			{
+				if(atoi(condition->value) == atoi(DBget_field(result,i,0)))
+				{
+					ret = SUCCEED;
+					break;
+				}
+			}
+			else if(condition->operator != CONDITION_OPERATOR_NOT_EQUAL)
+			{
+				if(atoi(condition->value) == atoi(DBget_field(result,i,0)))
+				{
+					ret = SUCCEED;
+					break;
+				}
+			}
+			else
+			{
+				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [%d]", condition->operator, condition->conditionid);
+				ret = FAIL;
+			}
+		}
+		DBfree_result(result);
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_HOST)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Condition type [CONDITION_TYPE_HOST] is unsupported");
+		zabbix_log( LOG_LEVEL_ERR, "Condition type [CONDITION_TYPE_HOST] is supported");
+
 		ret = FAIL;
+
+		snprintf(sql,sizeof(sql)-1,"select distinct h.hostid from hosts h, items i, functions f, triggers t where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid where t.triggerid=%d", trigger->triggerid);
+		result = DBselect(sql);
+		for(i=0;i<DBnum_rows(result);i++)
+		{
+			if(condition->operator == CONDITION_OPERATOR_EQUAL)
+			{
+				if(atoi(condition->value) == atoi(DBget_field(result,i,0)))
+				{
+					ret = SUCCEED;
+					break;
+				}
+			}
+			else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+			{
+				if(atoi(condition->value) != atoi(DBget_field(result,i,0)))
+				{
+					ret = SUCCEED;
+					break;
+				}
+			}
+			else
+			{
+				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [%d]", condition->operator, condition->conditionid);
+				ret = FAIL;
+			}
+		}
+		DBfree_result(result);
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Condition type [CONDITION_TYPE_TRIGGER] is supported");
-		if(trigger->triggerid != atoi(condition->value))
+		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
+			if(trigger->triggerid != atoi(condition->value))
+			{
+				ret = FAIL;
+			}
+		}
+		else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+		{
+			if(trigger->triggerid == atoi(condition->value))
+			{
+				ret = FAIL;
+			}
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [%d]", condition->operator, condition->conditionid);
 			ret = FAIL;
 		}
-		ret = FAIL;
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_NAME)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Condition type [CONDITION_TYPE_TRIGGER_NAME] is supported");
-		if(strstr(trigger->description,condition->value)==NULL)
+		if(condition->operator == CONDITION_OPERATOR_LIKE)
 		{
+			if(strstr(trigger->description,condition->value) == NULL)
+			{
+				ret = FAIL;
+			}
+		}
+		else if(condition->operator == CONDITION_OPERATOR_NOT_LIKE)
+		{
+			if(strstr(trigger->description,condition->value) != NULL)
+			{
+				ret = FAIL;
+			}
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [%d]", condition->operator, condition->conditionid);
 			ret = FAIL;
 		}
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_SEVERITY)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Condition type [CONDITION_TYPE_TRIGGER_SEVERITY] is supported");
-		if(trigger->priority<atoi(condition->value))
+		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
+			if(trigger->priority != atoi(condition->value))
+			{
+				ret = FAIL;
+			}
+		}
+		else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+		{
+			if(trigger->priority == atoi(condition->value))
+			{
+				ret = FAIL;
+			}
+		}
+		else if(condition->operator == CONDITION_OPERATOR_MORE_EQUAL)
+		{
+			if(trigger->priority < atoi(condition->value))
+			{
+				ret = FAIL;
+			}
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [%d]", condition->operator, condition->conditionid);
 			ret = FAIL;
 		}
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_VALUE)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Condition type [CONDITION_TYPE_TRIGGER_VALUE] is supported");
-		if(new_trigger_value != atoi(condition->value))
+		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
+			if(new_trigger_value != atoi(condition->value))
+			{
+				ret = FAIL;
+			}
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [%d]", condition->operator, condition->conditionid);
 			ret = FAIL;
 		}
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TIME_PERIOD)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Condition type [CONDITION_TYPE_TRIGGER_VALUE] is supported");
-		if(check_time_period(condition->value)==0)
+		if(condition->operator == CONDITION_OPERATOR_IN)
 		{
+			if(check_time_period(condition->value)==0)
+			{
+				ret = FAIL;
+			}
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [%d]", condition->operator, condition->conditionid);
 			ret = FAIL;
 		}
 	}
@@ -449,6 +577,8 @@ static int	check_action_conditions(DB_TRIGGER *trigger,int alarmid,int new_trigg
 	
 	int	ret = SUCCEED;
 	int	i;
+	int	old_type = -1;
+	int	ret_and = SUCCEED;
 
 	zabbix_log( LOG_LEVEL_WARNING, "In check_action_conditions [actionid:%d]", actionid);
 
@@ -471,11 +601,26 @@ static int	check_action_conditions(DB_TRIGGER *trigger,int alarmid,int new_trigg
 			condition.value=DBget_field(result,i,4);
 
 			zabbix_log( LOG_LEVEL_WARNING, "ConditionID [%d]", condition.conditionid);
-			if(check_action_condition(trigger, alarmid, new_trigger_value, &condition) == FAIL)
+
+			/* If old AND condition is FALSE */
+			if( (condition.conditiontype != old_type) && (ret_and == FAIL))
 			{
+				zabbix_log( LOG_LEVEL_WARNING, "One of AND conditions is FALSE for [%d]", condition.conditionid);
 				ret = FAIL;
 				break;
 			}
+
+			ret_and = check_action_condition(trigger, alarmid, new_trigger_value, &condition);
+
+			/* If last condition and AND condition is FALSE */
+			if( (ret_and == FAIL) && (i==DBnum_rows(result)-1) )
+			{
+				zabbix_log( LOG_LEVEL_WARNING, "Last conditions is FALSE for [%d]", condition.conditionid);
+				ret = FAIL;
+				break;
+			}
+
+			old_type = condition.conditiontype;
 		}
 	}
 
