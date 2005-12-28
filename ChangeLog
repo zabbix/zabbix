@@ -1,5 +1,6 @@
 Changes for 1.1beta5:
 
+ - fixed processing of simple checks (Alexei)
  - new concept of defenition of actions, one screen (Alexei)
  - new fields for table 'actions' (Alexei)
  - new item value type: integer 64bit (Alexei)
