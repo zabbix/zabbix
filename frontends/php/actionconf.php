@@ -28,6 +28,7 @@
 ?>
 
 <?php
+	update_profile("web.menu.config.last",$page["file"]);
 //	if(($_REQUEST["triggerid"]!=0)&&!check_right_on_trigger("U",$_REQUEST["triggerid"]))
 //	{
 //		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
