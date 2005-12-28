@@ -2,6 +2,7 @@
 
  - remembering of host names in various screens 
  - uphgrade script for actions
+ - add support for graph gaps (on, off)
 
  - triggers on windows logs and file monitoring
  - execution of commands on monitored hosts in case of pre-defined events
@@ -12,6 +13,7 @@
  - http://www.zabbix.com/forum/showthread.php?t=1842
  - http://www.zabbix.com/forum/showthread.php?t=1784
  - http://www.zabbix.com/forum/showthread.php?t=1837
+ - http://www.zabbix.com/forum/showthread.php?t=1743&page=2&pp=10
  - check if icmpping and icmppingsec works
 
  - fix undeleted warnings for host and trigger statuses
