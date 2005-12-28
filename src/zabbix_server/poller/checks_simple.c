@@ -39,18 +39,18 @@ int	get_value_simple(DB_ITEM *item, AGENT_RESULT *result)
 		l=strstr(item->key,"[");
 		r=strstr(item->key,"]");
 		if(l==NULL || r==NULL)
-			snprintf(c,sizeof(c)-1,"check_service[%s]",item->key);
+			snprintf(c,sizeof(c)-1,"net.tcp.service[%s]",item->key);
 		else
 		{
 			strncpy( param,l+1, r-l-1);
 			param[r-l-1]=0;
 			if(item->useip==1)
 			{
-				snprintf(c,sizeof(c)-1,"check_service[%s,%s]",item->key,item->ip);
+				snprintf(c,sizeof(c)-1,"net.tcp.service[%s,%s]",item->key,item->ip);
 			}
 			else
 			{
-				snprintf(c,sizeof(c)-1,"check_service[%s,%s]",item->key,item->host);
+				snprintf(c,sizeof(c)-1,"net.tcp.service[%s,%s]",item->key,item->host);
 			}
 		}
 	}
@@ -82,11 +82,11 @@ int	get_value_simple(DB_ITEM *item, AGENT_RESULT *result)
 	{
 		if(item->useip==1)
 		{
-			snprintf(c,sizeof(c)-1,"check_service[%s,%s]",item->key,item->ip);
+			snprintf(c,sizeof(c)-1,"net.tcp.service[%s,%s]",item->key,item->ip);
 		}
 		else
 		{
-			snprintf(c,sizeof(c)-1,"check_service[%s,%s]",item->key,item->host);
+			snprintf(c,sizeof(c)-1,"net.tcp.service[%s,%s]",item->key,item->host);
 		}
 	}
 	else
@@ -97,14 +97,13 @@ int	get_value_simple(DB_ITEM *item, AGENT_RESULT *result)
 		
 		if(item->useip==1)
 		{
-			snprintf(c,sizeof(c)-1,"check_service_perf[%s,%s]",s,item->ip);
+			snprintf(c,sizeof(c)-1,"net.tcp.service.perf[%s,%s]",s,item->ip);
 		}
 		else
 		{
-			snprintf(c,sizeof(c)-1,"check_service_perf[%s,%s]",s,item->host);
+			snprintf(c,sizeof(c)-1,"net.tcp.service.perf[%s,%s]",s,item->host);
 		}
 	}
-
 
 	if(process(c, 0, result) == NOTSUPPORTED)
 	{
