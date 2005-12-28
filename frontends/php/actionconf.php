@@ -180,7 +180,7 @@
 	$col=0;
 	while($row=DBfetch($result))
 	{
-		$sql="select * from conditions where actionid=".$row["actionid"];
+		$sql="select * from conditions where actionid=".$row["actionid"]." order by conditiontype";
 		$result2=DBselect($sql);
 		$conditions="";
 		while($condition=DBfetch($result2))
