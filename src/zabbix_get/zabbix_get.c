@@ -175,6 +175,7 @@ static int	get_value(char *server,int port,char *key,char *value)
 	} 
 /*	i=sizeof(struct sockaddr_in);
 	i=recvfrom(s,value,1023,0,(struct sockaddr *)&servaddr_in,(socklen_t *)&i);*/
+	memset(value,0,MAX_STRING_LEN);
 	i=read(s,value, MAX_STRING_LEN-1);
 	if(i==-1)
 	{
