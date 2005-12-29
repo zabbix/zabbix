@@ -386,8 +386,6 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 
 	if(condition->conditiontype == CONDITION_TYPE_HOST_GROUP)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Condition type [CONDITION_TYPE_HOST_GROUP] is supported");
-
 		snprintf(sql,sizeof(sql)-1,"select distinct hg.groupid from hosts_groups hg,hosts h, items i, functions f, triggers t where hg.hostid=h.hostid and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=%d", trigger->triggerid);
 		result = DBselect(sql);
 		for(i=0;i<DBnum_rows(result);i++)
@@ -420,10 +418,6 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_HOST)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Condition type [CONDITION_TYPE_HOST] is supported");
-
-		ret = FAIL;
-
 		snprintf(sql,sizeof(sql)-1,"select distinct h.hostid from hosts h, items i, functions f, triggers t where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=%d", trigger->triggerid);
 		result = DBselect(sql);
 		for(i=0;i<DBnum_rows(result);i++)
@@ -455,7 +449,6 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Condition type [CONDITION_TYPE_TRIGGER] is supported");
 		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
 			if(trigger->triggerid != atoi(condition->value))
@@ -478,7 +471,6 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_NAME)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Condition type [CONDITION_TYPE_TRIGGER_NAME] is supported");
 		if(condition->operator == CONDITION_OPERATOR_LIKE)
 		{
 			if(strstr(trigger->description,condition->value) == NULL)
@@ -501,7 +493,6 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_SEVERITY)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Condition type [CONDITION_TYPE_TRIGGER_SEVERITY] is supported");
 		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
 			if(trigger->priority != atoi(condition->value))
@@ -531,7 +522,6 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_VALUE)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Condition type [CONDITION_TYPE_TRIGGER_VALUE] is supported");
 		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
 			if(new_trigger_value != atoi(condition->value))
@@ -569,11 +559,11 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 
 	if(FAIL==ret)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Condition is FALSE");
+		zabbix_log( LOG_LEVEL_DEBUG, "Condition is FALSE");
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Condition is TRUE");
+		zabbix_log( LOG_LEVEL_DEBUG, "Condition is TRUE");
 	}
 
 	return ret;
@@ -591,7 +581,7 @@ static int	check_action_conditions(DB_TRIGGER *trigger,int alarmid,int new_trigg
 	int	old_type = -1;
 	int	ret_and = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In check_action_conditions [actionid:%d]", actionid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In check_action_conditions [actionid:%d]", actionid);
 
 	snprintf(sql,sizeof(sql)-1,"select conditionid,actionid,conditiontype,operator,value from conditions where actionid=%d order by conditiontype", actionid);
 	result = DBselect(sql);
@@ -613,7 +603,7 @@ static int	check_action_conditions(DB_TRIGGER *trigger,int alarmid,int new_trigg
 			/* If old AND condition is FALSE */
 			if( (condition.conditiontype != old_type) && (ret_and == FAIL))
 			{
-				zabbix_log( LOG_LEVEL_WARNING, "One of AND conditions is FALSE for [%d]", condition.conditionid);
+				zabbix_log( LOG_LEVEL_DEBUG, "One of AND conditions is FALSE for [%d]", condition.conditionid);
 				ret = FAIL;
 				break;
 			}
@@ -623,7 +613,7 @@ static int	check_action_conditions(DB_TRIGGER *trigger,int alarmid,int new_trigg
 			/* If last condition and AND condition is FALSE */
 			if( (condition.conditiontype != old_type) && (ret_and == FAIL) && (i==DBnum_rows(result)-1) )
 			{
-				zabbix_log( LOG_LEVEL_WARNING, "Last conditions is FALSE for [%d]", condition.conditionid);
+				zabbix_log( LOG_LEVEL_DEBUG, "Last conditions is FALSE for [%d]", condition.conditionid);
 				ret = FAIL;
 				break;
 			}
@@ -648,7 +638,7 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 	int	i;
 	int	now;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In apply_actions(triggerid:%d,alarmid:%d,trigger_value:%d)",trigger->triggerid, alarmid, trigger_value);
+	zabbix_log( LOG_LEVEL_DEBUG, "In apply_actions(triggerid:%d,alarmid:%d,trigger_value:%d)",trigger->triggerid, alarmid, trigger_value);
 
 	if(TRIGGER_VALUE_TRUE == trigger_value)
 	{
@@ -668,14 +658,14 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 		DBfree_result(result);
 	}
 
-	zabbix_log( LOG_LEVEL_WARNING, "Applying actions");
+	zabbix_log( LOG_LEVEL_DEBUG, "Applying actions");
 
 	now = time(NULL);
 
 /*	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,scope,severity,recipient,good from actions where (scope=%d and triggerid=%d and good=%d and nextcheck<=%d) or (scope=%d and good=%d) or (scope=%d and good=%d)",ACTION_SCOPE_TRIGGER,trigger->triggerid,trigger_value,now,ACTION_SCOPE_HOST,trigger_value,ACTION_SCOPE_HOSTS,trigger_value);*/
 	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,recipient,maxrepeats,repeatdelay from actions where nextcheck<=%d", now);
 	result = DBselect(sql);
-	zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
+	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
@@ -683,8 +673,6 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 
 		if(check_action_conditions(trigger, alarmid, trigger_value, action.actionid) == SUCCEED)
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Before sending to users");
-
 			action.userid=atoi(DBget_field(result,i,1));
 			action.delay=atoi(DBget_field(result,i,2));
 			strscpy(action.subject,DBget_field(result,i,3));
