@@ -1,5 +1,7 @@
 Changes for 1.1beta5:
 
+ - use english translation if cannot find local phrase (Alexei)
+ - added Chinese translation. (Alexei)
  - updated German translation. Thanks to Julian. (Alexei)
  - fixed processing of icmpping and icmppingsec (Alexei)
  - seperartion of LDFLAGS and LIBS in all Makefile.am (Alexei)
