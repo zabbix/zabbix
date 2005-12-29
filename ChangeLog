@@ -1,5 +1,6 @@
 Changes for 1.1beta5:
 
+ - seperartion of LDFLAGS and LIBS in all Makefile.am (Alexei)
  - fixed MySQL-related configuration and making issues (Alexei)
  - fixed incorrect handling of retrieved values in zabbix_get (Alexei)
  - fixed processing of simple checks (Alexei)

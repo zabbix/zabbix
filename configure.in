@@ -516,28 +516,31 @@ What DBMS do you want to use (please select only one):
     		AC_MSG_ERROR(Invalid MySQL directory - unable to find mysql.h under $withval)
 		fi
    	fi
-    MYSQL_INCLUDE=-I$MYSQL_INCDIR
-dnl    MYSQL_LFLAGS="-L$MYSQL_LIBDIR -lmysqlclient_r"
-    MYSQL_LFLAGS="-L$MYSQL_LIBDIR -lmysqlclient"
+	MYSQL_INCLUDE=-I$MYSQL_INCDIR
+	MYSQL_LFLAGS="-L$MYSQL_LIBDIR"
+	MYSQL_LIBS="-lmysqlclient"
 
-    AC_DEFINE(HAVE_MYSQL,1,[Define to 1 if MySQL should be enabled.])
-    AC_MSG_RESULT(yes)
-    have_db="MySQL"
+	AC_DEFINE(HAVE_MYSQL,1,[Define to 1 if MySQL should be enabled.])
+	AC_MSG_RESULT(yes)
+	have_db="MySQL"
     dnl MySQL requires -lm sometime
-    AC_CHECK_FUNC(floor, , AC_CHECK_LIB(m, floor, MYSQL_LFLAGS="$MYSQL_LFLAGS -lm"))
+dnl	AC_CHECK_FUNC(floor, , AC_CHECK_LIB(m, floor, MYSQL_LFLAGS="$MYSQL_LFLAGS -lm"))
+	AC_CHECK_FUNC(floor, , AC_CHECK_LIB(m, floor, MYSQL_LIBS="$MYSQL_LIBS -lm"))
     dnl MySQL 3.23 requires -lz sometime
 dnl This does not work for some reason
 dnl    AC_CHECK_FUNC(compress, , AC_CHECK_LIB(z, compress, MYSQL_LFLAGS="$MYSQL_LFLAGS -lz"))
-AC_CHECK_LIB(z, compress, MYSQL_LFLAGS="$MYSQL_LFLAGS -lz")
+dnl	AC_CHECK_LIB(z, compress, MYSQL_LFLAGS="$MYSQL_LFLAGS -lz")
+	AC_CHECK_LIB(z, compress, MYSQL_LIBS="$MYSQL_LIBS -lz")
 
-  else
-  	AC_MSG_RESULT(no)
-  fi
+	else
+		AC_MSG_RESULT(no)
+	fi
 ],[
   AC_MSG_RESULT(no)
 ])
-AC_SUBST(MYSQL_LFLAGS)
 AC_SUBST(MYSQL_INCLUDE)
+AC_SUBST(MYSQL_LFLAGS)
+AC_SUBST(MYSQL_LIBS)
 
 
 AC_MSG_CHECKING(for PostgreSQL support)
@@ -576,10 +579,12 @@ AC_ARG_WITH(pgsql,
    		test -d $withval/lib/pgsql && PGSQL_LIBDIR=$withval/lib/pgsql
    	fi
     PGSQL_INCLUDE=-I$PGSQL_INCDIR
-    PGSQL_LFLAGS="-L$PGSQL_LIBDIR -lpq"
+    PGSQL_LFLAGS="-L$PGSQL_LIBDIR"
+    PGSQL_LIBS="-lpq"
 dnl To avoid linking of crypt with the agent
 dnl    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt, LIBS="-lcrypt $LIBS"))
-    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  PGSQL_LFLAGS="-lcrypt $PGSQL_LFLAGS"))
+dnl    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  PGSQL_LFLAGS="-lcrypt $PGSQL_LFLAGS"))
+    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  PGSQL_LIBS="-lcrypt"))
 
     AC_DEFINE(HAVE_PGSQL,1,[Define to 1 if PostgreSQL should be enabled.])
     AC_MSG_RESULT(yes)
@@ -590,8 +595,9 @@ dnl    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt, LIBS="-lcrypt $LIBS"))
 ],[
   AC_MSG_RESULT(no)
 ])
-AC_SUBST(PGSQL_LFLAGS)
 AC_SUBST(PGSQL_INCLUDE)
+AC_SUBST(PGSQL_LFLAGS)
+AC_SUBST(PGSQL_LIBS)
 
 AC_MSG_CHECKING(for NET-SNMP support)
 AC_ARG_WITH(net-snmp,
@@ -642,11 +648,12 @@ dnl   			SNMP_LIBDIR=$withval/lib/net-snmp
 		fi
    	fi
 
-    AC_CHECK_LIB(crypto, main,  SNMP_LFLAGS="-lcrypto $SNMP_LFLAGS")
+dnl    AC_CHECK_LIB(crypto, main,  SNMP_LFLAGS="-lcrypto $SNMP_LFLAGS")
+    AC_CHECK_LIB(crypto, main,  SNMP_LIBS="$SNMP_LIBS -lcrypto")
 
     SNMP_INCLUDE=-I$SNMP_INCDIR
-    SNMP_LFLAGS="-L$SNMP_LIBDIR -lnetsnmp $SNMP_LFLAGS"
-
+    SNMP_LFLAGS="-L$SNMP_LIBDIR $SNMP_LFLAGS"
+    SNMP_LIBS="$SNMP_LIBS -lnetsnmp"
 
     AC_DEFINE(HAVE_NETSNMP,1,[Define to 1 if NETSNMP should be enabled.])
     AC_DEFINE(HAVE_SNMP,1,[Define to 1 if SNMP should be enabled.])
@@ -658,8 +665,9 @@ dnl   			SNMP_LIBDIR=$withval/lib/net-snmp
 ],[
   AC_MSG_RESULT(no)
 ])
-AC_SUBST(SNMP_LFLAGS)
 AC_SUBST(SNMP_INCLUDE)
+AC_SUBST(SNMP_LFLAGS)
+AC_SUBST(SNMP_LIBS)
 
 AC_MSG_CHECKING(for UCD-SNMP support)
 AC_ARG_WITH(ucd-snmp,
@@ -707,10 +715,12 @@ dnl   			SNMP_LIBDIR=$withval/lib/ucd-snmp
     		AC_MSG_ERROR(Invalid UCD-SNMP directory - unable to find ucd-snmp-config.h under $withval)
 		fi
    	fi
-    AC_CHECK_LIB(crypto, main,  SNMP_LFLAGS="-lcrypto $SNMP_LFLAGS")
+dnl    AC_CHECK_LIB(crypto, main,  SNMP_LFLAGS="-lcrypto $SNMP_LFLAGS")
+    AC_CHECK_LIB(crypto, main,  SNMP_LIBS="$SNMP_LIBS -lcrypto")
 
     SNMP_INCLUDE=-I$SNMP_INCDIR
-    SNMP_LFLAGS="-L$SNMP_LIBDIR -lsnmp $SNMP_LFLAGS"
+    SNMP_LFLAGS="-L$SNMP_LIBDIR $SNMP_LFLAGS"
+    SNMP_LIBS="$SNMP_LIBS -lsnmp"
 
     AC_DEFINE(HAVE_UCDSNMP,1,[Define to 1 if UCDSNMP should be enabled.])
     AC_DEFINE(HAVE_SNMP,1,[Define to 1 if SNMP should be enabled.])
@@ -759,21 +769,22 @@ If you want to check LDAP servers:
                fi
        fi
 
-    LDAP_INCLUDE=-I$LDAP_INCDIR
-    LDAP_LFLAGS="-L$LDAP_LIBDIR -lldap $LDAP_LFLAGS"
+	LDAP_INCLUDE=-I$LDAP_INCDIR
+	LDAP_LFLAGS="-L$LDAP_LIBDIR $LDAP_LFLAGS"
+	LDAP_LIBS="-lldap"
 
+	AC_DEFINE(HAVE_LDAP,1,[Define to 1 if LDAP should be enabled.])
+	AC_MSG_RESULT(yes)
 
-    AC_DEFINE(HAVE_LDAP,1,[Define to 1 if LDAP should be enabled.])
-    AC_MSG_RESULT(yes)
-
-  else
-       AC_MSG_RESULT(no)
-  fi
+	else
+		AC_MSG_RESULT(no)
+	fi
 ],[
   AC_MSG_RESULT(no)
 ])
-AC_SUBST(LDAP_LFLAGS)
 AC_SUBST(LDAP_INCLUDE)
+AC_SUBST(LDAP_LFLAGS)
+AC_SUBST(LDAP_LIBS)
 
 if test "$have_db" = "no"; then
 	echo "configure: WARNING: ## ------------------------------------------------------ ##" >&2
