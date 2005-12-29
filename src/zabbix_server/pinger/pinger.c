@@ -128,7 +128,7 @@ static int process_value(char *key, char *host, AGENT_RESULT *value)
 	DB_ITEM	item;
 	char	*s;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In process_value()");
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_value(%s@%s)", key, host);
 
 	/* IP address? */
 	if(is_ip(host) == SUCCEED)
@@ -226,12 +226,12 @@ static int create_host_file(void)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In create_host_file()");
 
-	f = fopen("/tmp/zabbix_suckerd.pinger", "w");
+	f = fopen("/tmp/zabbix_server.pinger", "w");
 
 	if( f == NULL)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Cannot open file [%s] [%s]", "/tmp/zabbix_suckerd.pinger", strerror(errno));
-		zabbix_syslog("Cannot open file [%s] [%s]", "/tmp/zabbix_suckerd.pinger", strerror(errno));
+		zabbix_log( LOG_LEVEL_ERR, "Cannot open file [%s] [%s]", "/tmp/zabbix_server.pinger", strerror(errno));
+		zabbix_syslog("Cannot open file [%s] [%s]", "/tmp/zabbix_server.pinger", strerror(errno));
 		return FAIL;
 	}
 
@@ -300,7 +300,7 @@ static int do_ping(void)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In do_ping()");
 
-	snprintf(str,sizeof(str)-1,"cat /tmp/zabbix_suckerd.pinger | %s -e 2>/dev/null",CONFIG_FPING_LOCATION);
+	snprintf(str,sizeof(str)-1,"cat /tmp/zabbix_server.pinger | %s -e 2>/dev/null",CONFIG_FPING_LOCATION);
 	
 	f=popen(str,"r");
 	if(f==0)
@@ -336,16 +336,19 @@ static int do_ping(void)
 			if(0 == alive)
 			{
 				init_result(&value);
+				SET_UI64_RESULT(&value, 0);
 				process_value(SERVER_ICMPPING_KEY,ip,&value);
 				free_result(&value);
 				
 				init_result(&value);
+				SET_DBL_RESULT(&value, 0);
 				process_value(SERVER_ICMPPINGSEC_KEY,ip,&value);
 				free_result(&value);
 			}
 			else
 			{
 				init_result(&value);
+				SET_UI64_RESULT(&value, 1);
 				process_value(SERVER_ICMPPING_KEY,ip,&value);
 				free_result(&value);
 				
@@ -411,7 +414,7 @@ void main_pinger_loop()
 
 				ret = do_ping();
 			}
-			unlink("/tmp/zabbix_suckerd.pinger");
+			unlink("/tmp/zabbix_server.pinger");
 	
 /*	zabbix_set_log_level(LOG_LEVEL_WARNING); */
 
