@@ -206,6 +206,7 @@
 		echo "<input class=\"biginput\" type=\"password\" name=\"password2\" value=\"$password\" size=20>";
 
 		$languages=array(	"en_gb"=>S_ENGLISH_GB,
+					"cn_zh"=>S_CHINESE_CN,
 					"fr_fr"=>S_FRENCH_FR,
 					"de_de"=>S_GERMAN_DE,
 					"it_it"=>S_ITALIAN_IT,
