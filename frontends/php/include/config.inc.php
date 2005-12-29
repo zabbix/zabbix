@@ -972,16 +972,15 @@
 		global $page;
 		global $USER_DETAILS;
 
-		include_once "include/locales/en_gb.inc.php";
 
 		if($noauth!=1)
 		{
 			check_authorisation();
 			include_once "include/locales/".$USER_DETAILS["lang"].".inc.php";
+			process_locales();
 		}
-
+		include_once "include/locales/en_gb.inc.php";
 		process_locales();
-
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>

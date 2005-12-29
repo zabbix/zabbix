@@ -26,7 +26,7 @@
 
 		foreach($TRANSLATION as $const=>$label)
 		{
-			define($const,$label);
+			if(!defined($const)) define($const,$label);
 //			echo $const," ",$label,"<br>";
 		}
 	}
