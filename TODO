@@ -8,12 +8,12 @@
  - save UINT in history_uint
  - document UserParameters $1,...,$9
  - http://www.zabbix.com/forum/showthread.php?t=1842
- - http://www.zabbix.com/forum/showthread.php?t=1784
  - http://www.zabbix.com/forum/showthread.php?t=1837
  - http://www.zabbix.com/forum/showthread.php?t=1743&page=2&pp=10
  - http://www.zabbix.com/forum/showthread.php?t=1141&page=3&pp=10
  - check if icmpping and icmppingsec works
 
+ - improve housekeeper. check if it works correctly.
  - fix undeleted warnings for host and trigger statuses
  - make agents return error message if not supported or not available
  - centralised management of agent configuration files
