@@ -1,5 +1,6 @@
 Changes for 1.1beta5:
 
+ - fixed MySQL-related configuration and making issues (Alexei)
  - fixed incorrect handling of retrieved values in zabbix_get (Alexei)
  - fixed processing of simple checks (Alexei)
  - new concept of defenition of actions, one screen (Alexei)
