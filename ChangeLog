@@ -1,5 +1,6 @@
 Changes for 1.1beta5:
 
+ - updated German translation. Thanks to Julian. (Alexei)
  - fixed processing of icmpping and icmppingsec (Alexei)
  - seperartion of LDFLAGS and LIBS in all Makefile.am (Alexei)
  - fixed MySQL-related configuration and making issues (Alexei)
