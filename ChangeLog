@@ -1,5 +1,6 @@
 Changes for 1.1beta5:
 
+ - make possible combination of FLOAT and UINT history in a graph (Alexei)
  - use english translation if cannot find local phrase (Alexei)
  - added Chinese translation. (Alexei)
  - updated German translation. Thanks to Julian. (Alexei)
