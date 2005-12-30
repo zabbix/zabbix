@@ -413,7 +413,9 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 
 	init_result(&agent);
 
-	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta,i.units,i.multiplier,i.formula,i.logtimefmt from items i,hosts h where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type in (%d,%d)", HOST_STATUS_MONITORED, server, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE);
+/*	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta,i.units,i.multiplier,i.formula,i.logtimefmt from items i,hosts h where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type in (%d,%d)", HOST_STATUS_MONITORED, server, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE);*/
+	snprintf(sql,sizeof(sql)-1,"select %s where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type in (%d,%d)", ZBX_SQL_ITEM_SELECT, HOST_STATUS_MONITORED, server, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE);
+
 	result = DBselect(sql);
 
 	if(DBnum_rows(result) == 0)
@@ -438,11 +440,13 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 		}
 	}
 
-	item.itemid=atoi(DBget_field(result,0,0));
+	DBget_item_from_db(&item,result,0);
+
+/*	item.itemid=atoi(DBget_field(result,0,0));
 	strscpy(item.key,DBget_field(result,0,1));
 	item.host=DBget_field(result,0,2);
 	item.type=atoi(DBget_field(result,0,7));
-	item.trapper_hosts=DBget_field(result,0,16);
+	item.trapper_hosts=DBget_field(result,0,16);*/
 
 	if( (item.type==ITEM_TYPE_ZABBIX_ACTIVE) && (check_security(sockfd,item.trapper_hosts,1) == FAIL))
 	{
@@ -459,7 +463,7 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 			DBupdate_item_status_to_notsupported(item.itemid, "Not supported by agent");
 	}
 	
-	item.port=atoi(DBget_field(result,0,3));
+/*	item.port=atoi(DBget_field(result,0,3));
 	item.delay=atoi(DBget_field(result,0,4));
 	item.description=DBget_field(result,0,5);
 	item.nextcheck=atoi(DBget_field(result,0,6));
@@ -495,7 +499,7 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 	item.units=DBget_field(result,0,18);
 	item.multiplier=atoi(DBget_field(result,0,19));
 	item.formula=DBget_field(result,0,20);
-	item.logtimefmt=DBget_field(result,0,21);
+	item.logtimefmt=DBget_field(result,0,21);*/
 
 	s=value;
 	if(	(strncmp(item.key,"log[",4)==0) ||
@@ -582,6 +586,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 			/* Delta as speed of change */
 			else if(item->delta == ITEM_STORE_SPEED_PER_SECOND)
 			{
+				zabbix_log( LOG_LEVEL_WARNING, "ITEM_STORE_SPEED_PER_SECOND(%s,%f,%f)", item->key, item->prevorgvalue, value->dbl);
 				/* Save delta */
 				if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_DOUBLE))
 				{
