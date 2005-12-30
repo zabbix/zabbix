@@ -25,12 +25,10 @@
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();
 ?>
-
 <?php
 	show_table_header(S_CONFIGURATION_OF_GRAPH_BIG);
 	echo "<br>";
 ?>
-
 <?php
 	if(!check_right("Graph","R",$_REQUEST["graphid"]))
 	{
@@ -39,16 +37,17 @@
 		exit;
 	}
 ?>
-
 <?php
+
 	if(isset($_REQUEST["register"]))
 	{
 		if($_REQUEST["register"]=="add")
 		{
+			add_graph_item_to_templates($_REQUEST["graphid"],$_REQUEST["itemid"],$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"],$_REQUEST["yaxisside"]);
+
 			$gitemid=add_item_to_graph($_REQUEST["graphid"],$_REQUEST["itemid"],$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"],$_REQUEST["yaxisside"]);
 			if($gitemid)
 			{
-				add_graph_item_to_linked_hosts($gitemid);
 				$graph=get_graph_by_graphid($_REQUEST["graphid"]);
 				$item=get_item_by_itemid($_REQUEST["itemid"]);
 				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH_ELEMENT,"Graph ID [".$_REQUEST["graphid"]."] Name [".$graph["name"]."] Added [".$item["description"]."]");
@@ -57,6 +56,8 @@
 		}
 		if($_REQUEST["register"]=="update")
 		{
+			update_graph_item_from_templates($_REQUEST["gitemid"],$_REQUEST["itemid"],$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"],$_REQUEST["yaxisside"]);
+
 			$result=update_graph_item($_REQUEST["gitemid"],$_REQUEST["itemid"],$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"],$_REQUEST["yaxisside"]);
 			if($result)
 			{
@@ -83,22 +84,22 @@
 		}
 		if($_REQUEST["register"]=="up")
 		{
-			$sql="update graphs_items set sortorder=sortorder-1 where sortorder>0 and gitemid=".$_REQUEST["gitemid"];
-			$result=DBexecute($sql);
+			move_up_graph_item_from_templates($_REQUEST["gitemid"]);
+			$result = move_up_graph_item($_REQUEST["gitemid"]);
 			show_messages($result, S_SORT_ORDER_UPDATED, S_CANNOT_UPDATE_SORT_ORDER);
 			unset($_REQUEST["gitemid"]);
 		}
 		if($_REQUEST["register"]=="down")
 		{
-			$sql="update graphs_items set sortorder=sortorder+1 where sortorder<100 and gitemid=".$_REQUEST["gitemid"];
-			$result=DBexecute($sql);
+			move_down_graph_item_from_templates($_REQUEST["gitemid"]);
+			$result = move_down_graph_item($_REQUEST["gitemid"]);
 			show_messages($result, S_SORT_ORDER_UPDATED, S_CANNOT_UPDATE_SORT_ORDER);
 			unset($_REQUEST["gitemid"]);
 		}
 	}
 ?>
-
 <?php
+
 	$result=DBselect("select name from graphs where graphid=".$_REQUEST["graphid"]);
 	$row=DBfetch($result);
 	show_table_header($row["name"]);
@@ -144,7 +145,6 @@
 	}
 	echo "</TABLE>";
 ?>
-
 <?php
 	echo "<br>";
 	echo "<a name=\"form\"></a>";
@@ -247,7 +247,6 @@
 
 	show_table2_header_end();
 ?>
-
 <?php
 	show_footer();
 ?>

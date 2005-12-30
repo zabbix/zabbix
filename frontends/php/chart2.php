@@ -76,7 +76,5 @@
 		$graph->setColor($row["itemid"], $row["color"]);
 		$graph->setDrawtype($row["itemid"], $row["drawtype"]);
 	}
-
 	$graph->Draw();
 ?>
-

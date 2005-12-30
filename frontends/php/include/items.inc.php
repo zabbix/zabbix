@@ -310,6 +310,18 @@
 		return	DBexecute($sql);
 	}
 
+	function	get_items_by_hostid($hostid)
+	{
+		$sql="select * from items where hostid=$hostid"; 
+		$result=DBselect($sql);
+		if(DBnum_rows($result) != 0)
+		{
+			return	$result;
+		}
+		error("No items for hostid=[$hostid]");
+		return	FALSE;
+	}
+
 	function	get_item_by_itemid($itemid)
 	{
 		$sql="select * from items where itemid=$itemid"; 
@@ -318,11 +330,8 @@
 		{
 			return	DBfetch($result);	
 		}
-		else
-		{
-			error("No item with itemid=[$itemid]");
-		}
-		return	$item;
+		error("No item with itemid=[$itemid]");
+		return	FALSE;
 	}
 
 	# Delete Item definition
