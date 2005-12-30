@@ -63,7 +63,7 @@ void zabbix_syslog(const char *fmt, ...)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In zabbix_log()");
 
-	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.network_errors,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,h.available,i.status from items i,hosts h where h.hostid=i.hostid and i.key_='%s' and i.value_type=%d", SERVER_ZABBIXLOG_KEY,ITEM_VALUE_TYPE_STR);
+	snprintf(sql,sizeof(sql)-1,"select %s from items i,hosts h where h.hostid=i.hostid and i.key_='%s' and i.value_type=%d", ZBX_SQL_ITEM_SELECT, SERVER_ZABBIXLOG_KEY, ITEM_VALUE_TYPE_STR);
 	result = DBselect(sql);
 
 	if( DBnum_rows(result) == 0)
