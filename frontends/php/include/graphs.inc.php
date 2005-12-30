@@ -19,6 +19,51 @@
 **/
 ?>
 <?php
+	function 	get_graphs_by_hostid($hostid)
+	{
+		$sql="select distinct g.* from graphs g, graphs_items gi, items i where g.graphid=gi.graphid and gi.itemid=i.itemid and i.hostid=$hostid";
+		$graphs=DBselect($sql);
+		return $graphs;
+	}
+
+	function 	get_hosts_by_graphid($graphid)
+	{
+		$sql="select distinct h.* from graphs_items gi, items i, hosts h where h.hostid=i.hostid and gi.itemid=i.itemid and gi.graphid=$graphid";
+		$graphs=DBselect($sql);
+		return $graphs;
+	}
+
+	function	get_graphitems_by_graphid($graphid)
+	{
+		$sql="select * from graphs_items where graphid=$graphid order by itemid,drawtype,sortorder,color,yaxisside"; 
+		$result=DBselect($sql);
+		return	$result;
+	}
+
+	function	get_graphitem_by_gitemid($gitemid)
+	{
+		$sql="select * from graphs_items where gitemid=$gitemid"; 
+		$result=DBselect($sql);
+		if(DBnum_rows($result) == 1)
+		{
+			return	DBfetch($result);	
+		}
+		error("No graph item with gitemid=[$gitemid]");
+		return	$result;
+	}
+
+	function	get_graph_by_graphid($graphid)
+	{
+		$sql="select * from graphs where graphid=$graphid"; 
+		$result=DBselect($sql);
+		if(DBnum_rows($result) == 1)
+		{
+			return	DBfetch($result);	
+		}
+		error("No graph with graphid=[$graphid]");
+		return	$result;
+	}
+
 	# Add Graph
 
 	function	add_graph($name,$width,$height,$yaxistype,$yaxismin,$yaxismax)
@@ -34,19 +79,6 @@
 		return DBinsert_id($result,"graphs","graphid");
 	}
 
-	function	update_graph_item($gitemid,$itemid,$color,$drawtype,$sortorder,$yaxisside)
-	{
-		$sql="update graphs_items set itemid=$itemid,color='$color',drawtype=$drawtype,sortorder=$sortorder,yaxisside=$yaxisside where gitemid=$gitemid";
-		return	DBexecute($sql);
-	}
-
-	function	add_item_to_graph($graphid,$itemid,$color,$drawtype,$sortorder,$yaxisside)
-	{
-		$sql="insert into graphs_items (graphid,itemid,color,drawtype,sortorder,yaxisside) values ($graphid,$itemid,'$color',$drawtype,$sortorder,$yaxisside)";
-		$result=DBexecute($sql);
-		return DBinsert_id($result,"graphs_items","gitemid");
-	}
-
 	# Update Graph
 
 	function	update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax)
@@ -56,17 +88,10 @@
 			error("Insufficient permissions");
 			return 0;
 		}
-
 		$sql="update graphs set name='$name',width=$width,height=$height,yaxistype=$yaxistype,yaxismin=$yaxismin,yaxismax=$yaxismax where graphid=$graphid";
 		return	DBexecute($sql);
 	}
-
-	function	delete_graphs_item($gitemid)
-	{
-		$sql="delete from graphs_items where gitemid=$gitemid";
-		return	DBexecute($sql);
-	}
-
+	
 	# Delete Graph
 
 	function	delete_graph($graphid)
@@ -81,90 +106,298 @@
 		return	DBexecute($sql);
 	}
 
-	function	get_graphitem_by_gitemid($gitemid)
+	function 	update_graph_from_templates($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax)
 	{
-		$sql="select * from graphs_items where gitemid=$gitemid"; 
-		$result=DBselect($sql);
-		if(DBnum_rows($result) == 1)
+		if($graphid<=0)			return;
+		
+		$hosts = get_hosts_by_graphid($graphid);
+		if(!$hosts)			return;
+		if(DBnum_rows($hosts)!=1)	return;
+		$host=DBfetch($hosts);
+
+		$sql="select hostid,templateid,graphs from hosts_templates where templateid=".$host["hostid"];
+		$templates=DBselect($sql);
+		while($template=DBfetch($templates))
 		{
-			return	DBfetch($result);	
+			if($template["graphs"]&4 == 0)	continue;
+
+			$graphs=get_graphs_by_hostid($template["hostid"]);
+			while($graph=DBfetch($graphs))
+			{
+				if(!cmp_graphs($graphid,$graph["graphid"]))		continue;
+				if(!cmp_graph_by_item_key($graphid,$graph["graphid"]))	continue;
+				update_graph($graph["graphid"],$name,$width,$height,$yaxistype,$yaxismin,$yaxismax);
+				$template_host=get_host_by_hostid($template["hostid"]);
+				info("Updated graph '".$graph["name"]."' from linked host '".$template_host["host"]."'");
+			}
 		}
-		else
-		{
-			error("No graph item with gitemid=[$gitemid]");
-		}
-		return	$result;
 	}
 
-	function	get_graph_by_graphid($graphid)
+	function 	delete_graph_from_templates($graphid)
 	{
-		$sql="select * from graphs where graphid=$graphid"; 
-		$result=DBselect($sql);
-		if(DBnum_rows($result) == 1)
+		if($graphid<=0)			return;
+		
+		$hosts = get_hosts_by_graphid($graphid);
+		if(!$hosts)			return;
+		if(DBnum_rows($hosts)!=1)	return;
+		$host=DBfetch($hosts);
+
+		$sql="select hostid,templateid,graphs from hosts_templates where templateid=".$host["hostid"];
+		$templates=DBselect($sql);
+		while($template=DBfetch($templates))
 		{
-			return	DBfetch($result);	
+			if($template["graphs"]&4 == 0)	continue;
+
+			$graphs=get_graphs_by_hostid($template["hostid"]);
+			while($graph=DBfetch($graphs))
+			{
+				if(!cmp_graphs($graphid,$graph["graphid"]))		continue;
+				if(!cmp_graph_by_item_key($graphid,$graph["graphid"]))	continue;
+				delete_graph($graph["graphid"]);
+				$template_host=get_host_by_hostid($template["hostid"]);
+				info("Deleted graph '".$graph["name"]."' from linked host '".$template_host["host"]."'");
+			}
 		}
-		else
-		{
-			error("No graph with graphid=[$graphid]");
-		}
-		return	$result;
+	}
+	
+	function	add_item_to_graph($graphid,$itemid,$color,$drawtype,$sortorder,$yaxisside)
+	{
+		$sql="insert into graphs_items (graphid,itemid,color,drawtype,sortorder,yaxisside) values ($graphid,$itemid,'$color',$drawtype,$sortorder,$yaxisside)";
+		$result=DBexecute($sql);
+		return DBinsert_id($result,"graphs_items","gitemid");
+	}
+	
+	function	update_graph_item($gitemid,$itemid,$color,$drawtype,$sortorder,$yaxisside)
+	{
+		$sql="update graphs_items set itemid=$itemid,color='$color',drawtype=$drawtype,sortorder=$sortorder,yaxisside=$yaxisside where gitemid=$gitemid";
+		return	DBexecute($sql);
 	}
 
-	function		add_graph_item_to_linked_hosts($gitemid,$hostid=0)
+	function	delete_graphs_item($gitemid)
 	{
-		if($gitemid<=0)
-		{
-			return;
-		}
+		$sql="delete from graphs_items where gitemid=$gitemid";
+		return	DBexecute($sql);
+	}
 
+	function 	move_up_graph_item($gitemid)
+	{
+		if($gitemid<=0)		return;
+		$sql="update graphs_items set sortorder=sortorder-1 where sortorder>0 and gitemid=$gitemid";
+		return DBexecute($sql);
+
+	}
+	
+	function 	move_down_graph_item($gitemid)
+	{
+		if($gitemid<=0)		return;
+		$sql="update graphs_items set sortorder=sortorder+1 where sortorder<100 and gitemid=$gitemid";
+		return DBexecute($sql);
+
+	}
+
+	function	copy_graphitems_for_host($src_graphid,$dist_graphid,$hostid)
+	{
+		$ret_code=0;
+		$src_graphitems=get_graphitems_by_graphid($src_graphid);
+		while($src_graphitem=DBfetch($src_graphitems))
+		{
+			$src_item=get_item_by_itemid($src_graphitem["itemid"]);
+			$host_items=get_items_by_hostid($hostid);
+			$item_exist=0;
+			while($host_item=DBfetch($host_items))
+			{
+				if($src_item["key_"]==$host_item["key_"])
+				{
+					$item_exist=1;
+					$host_itemid=$host_item["itemid"];
+					break;
+				}
+			}
+			if($item_exist==0)
+			{
+				$ret_code|=1;
+				continue;
+			}
+			if(!add_item_to_graph($dist_graphid,$host_itemid,$src_graphitem["color"],$src_graphitem["drawtype"],$src_graphitem["sortorder"],$src_graphitem["yaxisside"]))
+			{
+				$ret_code|=2;
+			}
+		}
+		return $ret_code;
+	}
+
+	function	add_graph_item_to_templates($template_graphid,$template_itemid,$color,$drawtype,$sortorder,$yaxisside)
+	{
+		if($template_graphid<=0)		return;
+		$template_hosts = get_hosts_by_graphid($template_graphid);
+		if(!$template_hosts)			return;
+		$template_hosts_cnt=DBnum_rows($template_hosts);
+		if($template_hosts_cnt==0)
+		{
+			$template_host=get_host_by_itemid($template_itemid);
+			$template_hosts_cnt++;
+		}
+		else if($template_hosts_cnt==1)
+		{
+			$template_host=DBfetch($template_hosts);
+			$item_host=get_host_by_itemid($template_itemid);
+			if($template_host["hostid"]!=$item_host["hostid"])
+				$template_hosts_cnt++;
+		}
+		if($template_hosts_cnt!=1)		return;
+
+		$template_item=get_item_by_itemid($template_itemid);
+
+		$sql="select hostid,templateid,graphs from hosts_templates where templateid=".$template_host["hostid"];
+		$hosts=DBselect($sql);
+		while($host=DBfetch($hosts))
+		{
+			if($host["graphs"]&2 == 0)	continue;
+
+			$sql="select i.itemid from items i where i.key_='".$template_item["key_"]."' and i.hostid=".$host["hostid"];
+			$items=DBselect($sql);
+			if(DBnum_rows($items)==0)	continue;
+			$item=DBfetch($items);
+
+			$find_graph=0;
+			$graphs=get_graphs_by_hostid($host["hostid"]);
+			while($graph=DBfetch($graphs))
+			{
+				if(!cmp_graphs($template_graphid,$graph["graphid"]))		continue;
+				if(!cmp_graph_by_item_key($template_graphid,$graph["graphid"]))	continue;
+				add_item_to_graph($graph["graphid"],$item["itemid"],$color,$drawtype,$sortorder,$yaxisside);
+				$host_info=get_host_by_hostid($host["hostid"]);
+				info("Added item to graph '".$graph["name"]."' from linked host '".$host_info["host"]."'");
+				remove_durpblicated_graphs($graph["graphid"]);
+				$find_graph=1;
+			}
+
+			if($find_graph==0)
+			{
+# duplicate graph for new host
+				$template_graph=get_graph_by_graphid($template_graphid);
+				$new_graphid=add_graph($template_graph["name"],$template_graph["width"],$template_graph["height"],$template_graph["yaxistype"],$template_graph["yaxismin"],$template_graph["yaxismax"]);
+				if(copy_graphitems_for_host($template_graphid,$new_graphid,$host["hostid"])!=0)
+				{
+					delete_graph($new_graphid);
+				}
+				else
+				{
+					add_item_to_graph($new_graphid,$item["itemid"],$color,$drawtype,$sortorder,$yaxisside);
+					$new_graph=get_graph_by_graphid($new_graphid);
+					$host_info=get_host_by_hostid($host["hostid"]);
+					info("Graph ".$new_graph["name"]." coped for linked host ".$host_info["host"]);
+					remove_durpblicated_graphs($new_graphid);
+				}
+			}
+		}
+	}
+
+	function 	move_up_graph_item_from_templates($gitemid)
+	{
+		if($gitemid<=0)		return;
 		$graph_item=get_graphitem_by_gitemid($gitemid);
-		$graph=get_graph_by_graphid($graph_item["graphid"]);
-		$item=get_item_by_itemid($graph_item["itemid"]);
+                $graph=get_graph_by_graphid($graph_item["graphid"]);
+                $item=get_item_by_itemid($graph_item["itemid"]);
 
-		if($hostid==0)
+                $sql="select hostid,templateid,graphs from hosts_templates where templateid=".$item["hostid"];
+                $result=DBselect($sql);
+                while($row=DBfetch($result))
 		{
-			$sql="select hostid,templateid,graphs from hosts_templates where templateid=".$item["hostid"];
-		}
-		else
-		{
-			$sql="select hostid,templateid,graphs from hosts_templates where hostid=$hostid and templateid=".$item["hostid"];
-		}
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
-			if($row["graphs"]&1 == 0)	continue;
+			if($row["graphs"]&2 == 0)	continue;
 
 			$sql="select i.itemid from items i where i.key_='".$item["key_"]."' and i.hostid=".$row["hostid"];
 			$result2=DBselect($sql);
 			if(DBnum_rows($result2)==0)	continue;
 			$row2=DBfetch($result2);
-			$itemid=$row2["itemid"];
 
-			$sql="select distinct g.graphid from graphs g,graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and g.graphid=gi.graphid and g.name='".addslashes($graph["name"])."'";
-			$result2=DBselect($sql);
+			$sql="select distinct gi.gitemid,gi.graphid from graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and i.itemid=".$row2["itemid"]." and gi.drawtype=".$graph_item["drawtype"]." and gi.sortorder=".$graph_item["sortorder"]." and gi.color='".$graph_item["color"]."' and gi.yaxisside= ".$graph_item["yaxisside"];
+			$result3=DBselect($sql);
+			if(DBnum_rows($result3)==0)	continue; 
+			$row3=DBfetch($result3);
+
+			$graph2=get_graph_by_graphid($row3["graphid"]);
+			if(!cmp_graphs($graph["graphid"],$graph2["graphid"]))		continue;
+			if(!cmp_graph_by_item_key($graph["graphid"],$graph2["graphid"]))continue;
+
+			move_up_graph_item($row3["gitemid"]);
 			$host=get_host_by_hostid($row["hostid"]);
-			while($row2=DBfetch($result2))
-			{
-				add_item_to_graph($row2["graphid"],$itemid,$graph_item["color"],$graph_item["drawtype"],$graph_item["sortorder"],$graph_item["taxisside"]);
-				info("Added graph element to graph ".$graph["name"]." of linked host ".$host["host"]);
-			}
-			if(DBnum_rows($result2)==0)
-			{
-				$graphid=add_graph($graph["name"],$graph["width"],$graph["height"],$graph["yaxistype"],$graph["yaxismin"],$graph["yaxismax"]);
-				info("Added graph ".$graph["name"]." of linked host ".$host["host"]);
-				add_item_to_graph($graphid,$itemid,$graph_item["color"],$graph_item["drawtype"],$graph_item["sortorder"],$graph_item["yaxisside"]);
-				info("Added graph element to graph ".$graph["name"]." of linked host ".$host["host"]);
-			}
+			info("Updated graph element ".$item["key_"]." from linked host ".$host["host"]);
 		}
+	}
+
+	function 	move_down_graph_item_from_templates($gitemid)
+	{
+		if($gitemid<=0)		return;
+		$graph_item=get_graphitem_by_gitemid($gitemid);
+                $graph=get_graph_by_graphid($graph_item["graphid"]);
+                $item=get_item_by_itemid($graph_item["itemid"]);
+
+                $sql="select hostid,templateid,graphs from hosts_templates where templateid=".$item["hostid"];
+                $result=DBselect($sql);
+                while($row=DBfetch($result))
+		{
+			if($row["graphs"]&2 == 0)	continue;
+
+			$sql="select i.itemid from items i where i.key_='".$item["key_"]."' and i.hostid=".$row["hostid"];
+			$result2=DBselect($sql);
+			if(DBnum_rows($result2)==0)	continue;
+			$row2=DBfetch($result2);
+
+			$sql="select distinct gi.gitemid,gi.graphid from graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and i.itemid=".$row2["itemid"]." and gi.drawtype=".$graph_item["drawtype"]." and gi.sortorder=".$graph_item["sortorder"]." and gi.color='".$graph_item["color"]."' and gi.yaxisside= ".$graph_item["yaxisside"];
+			$result3=DBselect($sql);
+			if(DBnum_rows($result3)==0)	continue; 
+			$row3=DBfetch($result3);
+
+			$graph2=get_graph_by_graphid($row3["graphid"]);
+			if(!cmp_graphs($graph["graphid"],$graph2["graphid"]))		continue;
+			if(!cmp_graph_by_item_key($graph["graphid"],$graph2["graphid"]))continue;
+
+			move_down_graph_item($row3["gitemid"]);
+			$host=get_host_by_hostid($row["hostid"]);
+			info("Updated graph element ".$item["key_"]." from linked host ".$host["host"]);
+			
+		}
+	}
+
+	function 	update_graph_item_from_templates($gitemid,$itemid,$color,$drawtype,$sortorder,$yaxisside)
+	{
+		if($gitemid<=0)		return;
+		$graph_item=get_graphitem_by_gitemid($gitemid);
+                $graph=get_graph_by_graphid($graph_item["graphid"]);
+                $item=get_item_by_itemid($graph_item["itemid"]);
+
+                $sql="select hostid,templateid,graphs from hosts_templates where templateid=".$item["hostid"];
+                $result=DBselect($sql);
+                while($row=DBfetch($result))
+		{
+			if($row["graphs"]&2 == 0)	continue;
+
+			$sql="select i.itemid from items i where i.key_='".$item["key_"]."' and i.hostid=".$row["hostid"];
+			$result2=DBselect($sql);
+			if(DBnum_rows($result2)==0)	continue;
+			$row2=DBfetch($result2);
+
+			$sql="select distinct gi.gitemid,gi.graphid from graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and i.itemid=".$row2["itemid"]." and gi.drawtype=".$graph_item["drawtype"]." and gi.sortorder=".$graph_item["sortorder"]." and gi.color='".$graph_item["color"]."' and gi.yaxisside= ".$graph_item["yaxisside"];
+			$result3=DBselect($sql);
+			if(DBnum_rows($result3)==0)	continue; 
+			$row3=DBfetch($result3);
+
+			$graph2=get_graph_by_graphid($row3["graphid"]);
+			if(!cmp_graphs($graph["graphid"],$graph2["graphid"]))		continue;
+			if(!cmp_graph_by_item_key($graph["graphid"],$graph2["graphid"]))continue;
+
+			update_graph_item($row3["gitemid"],$row2["itemid"],$color,$drawtype,$sortorder,$yaxisside);
+			$host=get_host_by_hostid($row["hostid"]);
+			info("Updated graph element ".$item["key_"]." from linked host ".$host["host"]);
+			
+		}
+
 	}
 
 	function	delete_graph_item_from_templates($gitemid)
 	{
-		if($gitemid<=0)
-		{
-			return;
-		}
+		if($gitemid<=0)		return;
 
 		$graph_item=get_graphitem_by_gitemid($gitemid);
 		$graph=get_graph_by_graphid($graph_item["graphid"]);
@@ -174,7 +407,7 @@
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
-			if($row["graphs"]&4 == 0)	continue;
+			if($row["graphs"]&2 == 0)	continue;
 
 			$sql="select i.itemid from items i where i.key_='".$item["key_"]."' and i.hostid=".$row["hostid"];
 			$result2=DBselect($sql);
@@ -182,22 +415,27 @@
 			$row2=DBfetch($result2);
 			$itemid=$row2["itemid"];
 
-			$host=get_host_by_hostid($result["hostid"]);
+			$sql="select distinct gi.gitemid,gi.graphid from graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and i.itemid=".$row2["itemid"]." and gi.drawtype=".$graph_item["drawtype"]." and gi.sortorder=".$graph_item["sortorder"]." and gi.color='".$graph_item["color"]."' and gi.yaxisside= ".$graph_item["yaxisside"];
+			$result3=DBselect($sql);
+			if(DBnum_rows($result3)==0)	continue; 
+			$row3=DBfetch($result3);
 
-			$sql="select distinct gi.gitemid,gi.graphid from graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and i.itemid=$itemid";
-			$result2=DBselect($sql);
-			while($row2=DBfetch($result2))
+			$graph2=get_graph_by_graphid($row3["graphid"]);
+			if(!cmp_graphs($graph["graphid"],$graph2["graphid"]))		continue;
+			if(!cmp_graph_by_item_key($graph["graphid"],$graph2["graphid"]))continue;
+	
+			delete_graphs_item($row3["gitemid"]);
+			
+			$host=get_host_by_hostid($row["hostid"]);
+			info("Deleted graph element ".$item["key_"]." from linked host ".$host["host"]);
+
+			$sql="select count(*) as count from graphs_items where graphid=".$row3["graphid"];
+			$result4=DBselect($sql);
+			$row4=DBfetch($result4);
+			if($row4["count"]==0)
 			{
-				delete_graphs_item($row2["gitemid"]);
-				info("Deleted graph element ".$item["key_"]." from linked host ".$host["host"]);
-				$sql="select count(*) as count from graphs_items where graphid=".$row2["graphid"];
-				$result3=DBselect($sql);
-				$row3=DBfetch($result3);
-				if($row3["count"]==0)
-				{
-					delete_graph($row2["graphid"]);
-					info("Deleted graph from linked host ".$host["host"]);
-				}
+				delete_graph($row3["graphid"]);
+				info("Deleted graph from linked host ".$host["host"]);
 			}
 		}
 	}
@@ -453,4 +691,85 @@
 		echo "</TR>";
 		echo "</TABLE>";
 	}
+	
+	function cmp_graphs($graphid1, $graphid2)
+	{
+
+		$graph1 = get_graph_by_graphid($graphid1);
+		if($graph1==FALSE)	return FALSE;
+		
+		$graph2 =get_graph_by_graphid($graphid2);
+		if($graph2==FALSE)	return FALSE;
+
+		if($graph1["name"]	!=$graph2["name"]) 	return FALSE;
+		if($graph1["width"]	!=$graph2["width"]) 	return FALSE;
+		if($graph1["height"]	!=$graph2["height"])	return FALSE;
+		if($graph1["yaxistype"]	!=$graph2["yaxistype"])	return FALSE;
+		if($graph1["yaxismin"]	!=$graph2["yaxismin"]) 	return FALSE;
+		if($graph1["yaxismax"]	!=$graph2["yaxismax"]) 	return FALSE;
+
+		return TRUE;
+	}
+
+	function cmp_graph_by_graphs_items($graphid1, $graphid2)
+	{
+		$graph_items1 = get_graphitems_by_graphid($graphid1);
+		$graph_items2 = get_graphitems_by_graphid($graphid2);
+		if(DBnum_rows($graph_items1) != DBnum_rows($graph_items2))	return FALSE;
+
+		while(($graph_item1=DBfetch($graph_items1)) && ($graph_item2=DBfetch($graph_items2)))
+		{
+			if($graph_item1["itemid"] 	!= $graph_item2["itemid"])	return FALSE;
+			if($graph_item1["drawtype"] 	!= $graph_item2["drawtype"])	return FALSE;
+			if($graph_item1["sortorder"] 	!= $graph_item2["sortorder"])	return FALSE;
+			if($graph_item1["color"] 	!= $graph_item2["color"])	return FALSE;
+			if($graph_item1["yaxisside"] 	!= $graph_item2["yaxisside"])	return FALSE;
+		}
+
+		return TRUE;
+	}
+
+	function cmp_graph_by_item_key($graphid1, $graphid2)
+	{
+		$graph_items1 = get_graphitems_by_graphid($graphid1);
+		$graph_items2 = get_graphitems_by_graphid($graphid2);
+		if(DBnum_rows($graph_items1) != DBnum_rows($graph_items2))	return FALSE;
+
+		while(($graph_item1=DBfetch($graph_items1)) && ($graph_item2=DBfetch($graph_items2)))
+		{
+			$item1 = get_item_by_itemid($graph_item1["itemid"]);
+			$item2 = get_item_by_itemid($graph_item2["itemid"]);
+			if($item1["key_"] != $item2["key_"])	return FALSE;
+		}
+
+		return TRUE;
+	}
+	
+	function remove_durpblicated_graphs($graphid=0)
+	{
+		$sql="select graphid from graphs";
+		if($graphid!=0)
+		{
+			$sql.=" where graphid=$graphid";
+		}
+		$graphs = DBselect($sql);
+		if(DBnum_rows($graphs) == 0) return;
+
+		while($graphid=DBfetch($graphs))
+		{
+			$sql="select graphid from graphs";
+			$all_graphs = DBselect($sql);
+			if(DBnum_rows($all_graphs) == 0) return;
+			while($all_graphid=DBfetch($all_graphs))
+			{
+				if($graphid["graphid"] == $all_graphid["graphid"]) continue;
+				if(cmp_graphs($graphid["graphid"],$all_graphid["graphid"]) == FALSE) continue;
+				if(cmp_graph_by_graphs_items($graphid["graphid"],$all_graphid["graphid"]) == FALSE) continue;
+				$graph=get_graph_by_graphid($graphid["graphid"]);
+				delete_graph($graphid["graphid"]);
+				info("Deleted duplicated graph with name '".$graph["name"]."'");
+			}
+		}
+	}
+
 ?>

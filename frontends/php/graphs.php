@@ -26,11 +26,9 @@
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();
 ?>
-
 <?php
 	show_table_header(S_CONFIGURATION_OF_GRAPHS_BIG);
 ?>
-
 <?php
 	if(!check_anyright("Graph","U"))
 	{
@@ -42,7 +40,6 @@
 	update_profile("web.latest.hostid",$_REQUEST["hostid"]);
 	update_profile("web.menu.config.last",$page["file"]);
 ?>
-
 <?php
 	if(isset($_REQUEST["register"]))
 	{
@@ -57,6 +54,8 @@
 		}
 		if($_REQUEST["register"]=="update")
 		{
+			update_graph_from_templates($_REQUEST["graphid"],$_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"]);
+
 			$result=update_graph($_REQUEST["graphid"],$_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"]);
 			if($result)
 			{
@@ -66,6 +65,7 @@
 		}
 		if($_REQUEST["register"]=="delete")
 		{
+			delete_graph_from_templates($_REQUEST["graphid"]);
 			$graph=get_graph_by_graphid($_REQUEST["graphid"]);
 			$result=delete_graph($_REQUEST["graphid"]);
 			if($result)
@@ -77,7 +77,6 @@
 		}
 	}
 ?>
-
 <?php
 	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
 	{
@@ -155,7 +154,6 @@
 
 	show_header2($h1,$h2,"<form name=\"form2\" method=\"get\" action=\"graphs.php\">","</form>");
 ?>
-
 <?php
 	table_begin();
 	table_header(array(S_ID,S_NAME,S_WIDTH,S_HEIGHT,S_ACTIONS));
@@ -199,14 +197,12 @@
 	}
 	table_end();
 ?>
-
 <?php
 	echo "<a name=\"form\"></a>";
 
 	insert_graph_form();
 
 ?>
-
 <?php
 	show_footer();
 ?>

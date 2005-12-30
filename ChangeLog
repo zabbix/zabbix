@@ -1,5 +1,6 @@
 Changes for 1.1beta5:
 
+ - added Graphs synchronization for linked hosts (Eugene)
  - fixed processing of Delta (Alexei)
  - minor fixes for SNMP handling (Alexei)
  - make possible combination of FLOAT and UINT history in a graph (Alexei)
@@ -14,8 +15,8 @@ Changes for 1.1beta5:
  - new concept of defenition of actions, one screen (Alexei)
  - new fields for table 'actions' (Alexei)
  - new item value type: integer 64bit (Alexei)
- - added 'update' operation for triggers of template hosts (Eugene)
- - added 'update' operation for operations of template hosts (Eugene)
+ - improved Triggers synchronization for linked hosts (Eugene)
+ - added Actions synchronization for linked hosts (Eugene)
  - calculated minimum Y in graphs (Alexei)
  - added configurable number of plain text elements for screens (Alexei)
  - added screens_items.elements (Alexei)

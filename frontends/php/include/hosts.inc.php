@@ -188,6 +188,18 @@
 		return DBexecute($sql);
 	}
 
+	function	get_host_by_itemid($itemid)
+	{
+		$sql="select h.* from hosts h, items i where i.hostid=h.hostid and i.itemid=$itemid";
+		$result=DBselect($sql);
+		if(DBnum_rows($result) == 1)
+		{
+			return DBfetch($result);
+		}
+		error("No host with itemid=[$itemid]");
+		return	FALSE;
+	}
+
 	function	get_host_by_hostid($hostid)
 	{
 		$sql="select * from hosts where hostid=$hostid";
@@ -196,11 +208,8 @@
 		{
 			return DBfetch($result);
 		}
-		else
-		{
-			error("No host with hostid=[$hostid]");
-		}
-		return	$host;
+		error("No host with hostid=[$hostid]");
+		return	FALSE;
 	}
 
 	# Update Host status
