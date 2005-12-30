@@ -259,7 +259,8 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 				 */ 
 				/*sprintf(result_str,"%ld",(long)*vars->val.integer);*/
 /*				snprintf(result_str,MAX_STRING_LEN-1,"%lu",(long)*vars->val.integer);*/
-				SET_UI64_RESULT(value, *vars->val.integer);
+				SET_UI64_RESULT(value, (zbx_uint64_t)*vars->val.integer);
+				zabbix_log( LOG_LEVEL_DEBUG, "OID [%s] Type [%d] Value[" ZBX_FS_UI64 "]", item->snmp_oid, vars->type, (zbx_uint64_t)*vars->val.integer);
 			}
 			else if(vars->type == ASN_COUNTER64)
 			{
@@ -275,7 +276,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 #endif
 			)
 			{
-				SET_UI64_RESULT(value, *vars->val.integer);
+				SET_UI64_RESULT(value, (zbx_uint64_t)*vars->val.integer);
 /*				*result=(long)*vars->val.integer;
 				snprintf(result_str,MAX_STRING_LEN-1,"%ld",(long)*vars->val.integer);*/
 			}
