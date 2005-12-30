@@ -97,6 +97,7 @@
 			$result=pg_exec($DB,$query);
 			return $result;
 		}
+		return FALSE;
 	}
 
 	function	DBfetch($result)
@@ -113,6 +114,7 @@
 			$row=pg_fetch_array($result);
 			return $row;
 		}
+		return FALSE;
 	}
 
 	function	get_field($result,$rownum,$fieldnum)
@@ -149,6 +151,7 @@
 		{
 			return pg_numrows($result);
 		}
+		return 0;
 	}
 
 	function	DBinsert_id($result,$table,$field)
