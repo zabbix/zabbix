@@ -9,7 +9,6 @@
  - document UserParameters $1,...,$9
  - waiting: http://www.zabbix.com/forum/showthread.php?t=1837
  - waiting: http://www.zabbix.com/forum/showthread.php?t=1743&page=2&pp=10
- - check if Delta works
 
  - improve housekeeper. check if it works correctly.
  - fix undeleted warnings for host and trigger statuses
