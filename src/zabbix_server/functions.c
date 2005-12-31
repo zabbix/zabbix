@@ -586,7 +586,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 			/* Delta as speed of change */
 			else if(item->delta == ITEM_STORE_SPEED_PER_SECOND)
 			{
-				zabbix_log( LOG_LEVEL_WARNING, "ITEM_STORE_SPEED_PER_SECOND(%s,%f,%f)", item->key, item->prevorgvalue, value->dbl);
+				zabbix_log( LOG_LEVEL_DEBUG, "ITEM_STORE_SPEED_PER_SECOND(%s,%f,%f)", item->key, item->prevorgvalue, value->dbl);
 				/* Save delta */
 				if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_DOUBLE))
 				{
