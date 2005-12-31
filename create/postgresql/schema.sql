@@ -220,6 +220,21 @@ CREATE TABLE actions (
 );
 
 --
+-- Table structure for table 'conditions'
+--
+
+CREATE TABLE conditions (
+  conditionid		serial,
+  actionid		int4		DEFAULT '0' NOT NULL,
+  conditiontype		int4		DEFAULT '0' NOT NULL,
+  operator		int1		DEFAULT '0' NOT NULL,
+  value			varchar(255)	DEFAULT '' NOT NULL,
+  PRIMARY KEY (conditionid),
+  FOREIGN KEY (actionid) REFERENCES actions
+);
+
+
+--
 -- Table structure for table 'media_type'
 --
 
