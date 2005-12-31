@@ -579,8 +579,8 @@
 		$actions=array("hide"=>1);
 		if($noactions!='true')
 		{
-			$actions="<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">".S_SHOW_ACTIONS."</A> - ";
-			$actions=$actions."<A HREF=\"alarms.php?triggerid=".$row["triggerid"]."\">".S_HISTORY."</A> - ";
+//			$actions="<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">".S_SHOW_ACTIONS."</A> - ";
+			$actions="<A HREF=\"alarms.php?triggerid=".$row["triggerid"]."\">".S_HISTORY."</A> - ";
 			if(isset($_REQUEST["hostid"]))
 			{
 				$actions=$actions."<A HREF=\"triggers.php?hostid=".$_REQUEST["hostid"]."&triggerid=".$row["triggerid"]."#form\">".S_CHANGE."</A>";
