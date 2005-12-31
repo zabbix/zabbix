@@ -1,6 +1,6 @@
 1.1beta5:
 
- - upgrade script for actions
+ - add macros for actions: {TRIGGER.DESC}
  - add support for graph gaps (on, off)
 
  - triggers on windows logs and file monitoring
