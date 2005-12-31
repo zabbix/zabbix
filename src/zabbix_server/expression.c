@@ -621,7 +621,8 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: {DATE},{TIME},{HOSTNAME},{IPADDRESS},{STATUS}                    *
+ * Comments: {DATE},{TIME},{HOSTNAME},{IPADDRESS},{STATUS},                   *
+ *           {TRIGGER.DESCRIPTION}                                            *
  *                                                                            *
  ******************************************************************************/
 void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data)
@@ -644,7 +645,14 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 		strscpy(str, data);
 
 
-		if( (s = strstr(str,"{HOSTNAME}")) != NULL )
+		if( (s = strstr(str,"{TRIGGER.NAME}")) != NULL )
+		{
+			s[0]=0;
+			strcpy(data, str);
+			strncat(data, trigger->description, MAX_STRING_LEN);
+			strncat(data, s+strlen("{TRIGGER.NAME}"), MAX_STRING_LEN);
+		}
+		else if( (s = strstr(str,"{HOSTNAME}")) != NULL )
 		{
 /*			snprintf(sql,sizeof(sql)-1,"select distinct t.description,h.host from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid", trigger->triggerid);*/
 			snprintf(sql,sizeof(sql)-1,"select distinct h.host from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid", trigger->triggerid);
@@ -668,8 +676,6 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 			strcpy(data, str);
 			strncat(data, tmp, MAX_STRING_LEN);
 			strncat(data, s+strlen("{HOSTNAME}"), MAX_STRING_LEN);
-
-			found = SUCCEED;
 		}
 		else if( (s = strstr(str,"{IPADDRESS}")) != NULL )
 		{
@@ -694,8 +700,6 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 			strcpy(data, str);
 			strncat(data, tmp, MAX_STRING_LEN);
 			strncat(data, s+strlen("{IPADDRESS}"), MAX_STRING_LEN);
-
-			found = SUCCEED;
 		}
 		else if( (s = strstr(str,"{DATE}")) != NULL )
 		{
@@ -707,8 +711,6 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 			strcpy(data, str);
 			strncat(data, tmp, MAX_STRING_LEN);
 			strncat(data, s+strlen("{DATE}"), MAX_STRING_LEN);
-
-			found = SUCCEED;
 		}
 		else if( (s = strstr(str,"{TIME}")) != NULL )
 		{
@@ -720,8 +722,6 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 			strcpy(data, str);
 			strncat(data, tmp, MAX_STRING_LEN);
 			strncat(data, s+strlen("{TIME}"), MAX_STRING_LEN);
-
-			found = SUCCEED;
 		}
 		else if( (s = strstr(str,"{STATUS}")) != NULL )
 		{
@@ -739,8 +739,6 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 			strcpy(data, str);
 			strncat(data, tmp, MAX_STRING_LEN);
 			strncat(data, s+strlen("{STATUS}"), MAX_STRING_LEN);
-
-			found = SUCCEED;
 		}
 		else
 		{
