@@ -731,7 +731,7 @@ int evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *par
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In get_lastvalue()" );
 
-	snprintf(sql,sizeof(sql)-1,"select %s from items i,hosts h where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", ZBX_SQL_ITEM_SELECT, host, key );
+	snprintf(sql,sizeof(sql)-1,"select %s where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", ZBX_SQL_ITEM_SELECT, host, key );
 	result = DBselect(sql);
 
 	if(DBnum_rows(result) == 0)
