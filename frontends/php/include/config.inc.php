@@ -1053,7 +1053,7 @@ echo "</head>";
 				),
 		"configuration"=>array(
 				"label"=>S_CONFIGURATION,
-				"pages"=>array("config.php","users.php","audit.php","hosts.php","items.php","triggers.php","sysmaps.php","graphs.php","screenconf.php","services.php","sysmap.php","media.php","screenedit.php","actions.php","graph.php","actionconf.php"),
+				"pages"=>array("config.php","users.php","audit.php","hosts.php","items.php","triggers.php","sysmaps.php","graphs.php","screenconf.php","services.php","sysmap.php","media.php","screenedit.php","graph.php","actionconf.php"),
 				"level2"=>array(
 					array("label"=>S_GENERAL,"url"=>"config.php"),
 					array("label"=>S_USERS,"url"=>"users.php"),
@@ -1178,7 +1178,6 @@ echo "</head>";
 		if(($sub["url"]=="hosts.php")&&!check_anyright("Host","U"))							continue;
 		if(($sub["url"]=="items.php")&&!check_anyright("Host","U"))							continue;
 		if(($sub["url"]=="triggers.php")&&!check_anyright("Host","U"))							continue;
-		if(($sub["url"]=="actions.php")&&!check_anyright("Host","U"))							continue;
 		if(($sub["url"]=="sysmaps.php")&&!check_anyright("Network map","U"))						continue;
 		if(($sub["url"]=="sysmap.php")&&!check_anyright("Network map","U"))						continue;
 		if(($sub["url"]=="graphs.php")&&!check_anyright("Graph","U"))							continue;
