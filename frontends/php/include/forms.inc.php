@@ -998,17 +998,17 @@
 			echo "<form method=\"get\" action=\"triggers.php\">";
 		}
 		echo "<input class=\"biginput\" name=\"triggerid\" type=hidden value=$triggerid size=8>";
-		echo "Description";
+		echo S_NAME;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"description\" value=\"$description\" size=70>";
 
 		show_table2_v_delimiter($col++);
-		echo "Expression";
+		echo S_EXPRESSION;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"expression\" value=\"$expression\" size=70>";
 
 		show_table2_v_delimiter($col++);
-		echo "Severity";
+		echo S_SEVERITY;
 		show_table2_h_delimiter();
 		echo "<SELECT class=\"biginput\" NAME=\"priority\" size=\"1\">";
 		echo "<OPTION VALUE=\"0\" "; if($priority==0) echo "SELECTED"; echo ">Not classified";
@@ -1020,17 +1020,17 @@
 		echo "</SELECT>";
 
 		show_table2_v_delimiter($col++);
-		echo "Comments";
+		echo S_COMMENTS;
 		show_table2_h_delimiter();
  		echo "<TEXTAREA class=\"biginput\" NAME=\"comments\" COLS=70 ROWS=\"7\" WRAP=\"SOFT\">$comments</TEXTAREA>";
 
 		show_table2_v_delimiter($col++);
-		echo "URL";
+		echo S_URL;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"url\" value=\"$url\" size=70>";
 
 		show_table2_v_delimiter($col++);
-		echo "Disabled";
+		echo S_DISABLED;
 		show_table2_h_delimiter();
 		echo "<INPUT TYPE=\"CHECKBOX\" ";
 		if($status==1) { echo " CHECKED "; }

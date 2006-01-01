@@ -704,6 +704,7 @@
 	"S_TRIGGER_UPDATED"=>			"Trigger updated",
 	"S_CANNOT_UPDATE_TRIGGER"=>		"Cannot update trigger",
 	"S_DEPENDS_ON"=>			"Depends on",
+	"S_URL"=>				"URL",
 
 //	tr_comments.php
 	"S_TRIGGER_COMMENTS"=>			"Trigger comments",
@@ -724,7 +725,7 @@
 	"S_SELECT"=>				"Select",
 	"S_HIDE_SELECT"=>			"Hide select",
 	"S_TRIGGERS_BIG"=>			"TRIGGERS",
-	"S_DESCRIPTION_BIG"=>			"DESCRIPTION",
+	"S_NAME_BIG"=>				"NAME",
 	"S_SEVERITY_BIG"=>			"SEVERITY",
 	"S_LAST_CHANGE_BIG"=>			"LAST CHANGE",
 	"S_LAST_CHANGE"=>			"Last change",
