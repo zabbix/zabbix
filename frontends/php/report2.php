@@ -107,7 +107,7 @@
 
 		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.value from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.status=0 and t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]." and h.status=".HOST_STATUS_MONITORED." and i.status=0 order by h.host, t.description");
 		table_begin();
-		table_header(array(S_DESCRIPTION,S_TRUE,S_FALSE,S_UNKNOWN,S_GRAPH));
+		table_header(array(S_NAME,S_TRUE,S_FALSE,S_UNKNOWN,S_GRAPH));
 		$col=0;
 		while($row=DBfetch($result))
 		{

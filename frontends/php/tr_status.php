@@ -428,14 +428,14 @@
 	}
 	if(isset($sort) && $sort=="description")
 	{
-		$description=S_DESCRIPTION_BIG;
+		$description=S_NAME_BIG;
 	}
 	else
 	{
 		if($select=="TRUE")
-			$description="<A HREF=\"tr_status.php?sort=description&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">".S_DESCRIPTION;
+			$description="<A HREF=\"tr_status.php?sort=description&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">".S_NAME;
 		else
-			$description="<A HREF=\"tr_status.php?sort=description&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$fullscreen$cond\">".S_DESCRIPTION."</a>";
+			$description="<A HREF=\"tr_status.php?sort=description&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$fullscreen$cond\">".S_NAME."</a>";
 	}
 	if($compact!='true') {$description=$description."<BR><FONT SIZE=-1>".S_EXPRESSION."</FONT></B>";}
 	$header=array_merge($header,array($description));
