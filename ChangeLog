@@ -1,5 +1,6 @@
 Changes for 1.1beta5:
 
+ - terminology change: trigger's 'description' -> 'name' (Alexei)
  - new macro for actions {TRIGGER.NAME} (Alexei)
  - added Graphs synchronization for linked hosts (Eugene)
  - fixed processing of Delta (Alexei)

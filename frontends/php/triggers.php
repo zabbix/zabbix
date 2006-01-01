@@ -221,7 +221,7 @@
 	if(isset($_REQUEST["hostid"])&&!isset($_REQUEST["triggerid"]))
 	{
 		table_begin();
-		table_header(array(S_ID,S_DESCRIPTION,S_EXPRESSION, S_SEVERITY, S_STATUS, S_ERROR, S_ACTIONS));
+		table_header(array(S_ID,S_NAME,S_EXPRESSION, S_SEVERITY, S_STATUS, S_ERROR, S_ACTIONS));
 		echo "<form method=\"get\" action=\"triggers.php\">";
 		echo "<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_REQUEST["hostid"]." size=8>";
 
