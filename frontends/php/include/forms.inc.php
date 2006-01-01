@@ -986,7 +986,7 @@
 		}
 
 		show_form_begin("triggers.trigger");
-		echo "Trigger configuration";
+		echo S_TRIGGER;
  
 		show_table2_v_delimiter($col++);
 		if(isset($hostid))
@@ -1503,7 +1503,6 @@
 			$actionid=$action["actionid"];
 			$actiontype=$action["actiontype"];
 			$source=$action["source"];
-			$good=$action["good"];
 			$delay=$action["delay"];
 			// Otherwise symbols like ",' will not be shown
 			$subject=htmlspecialchars($action["subject"]);
@@ -1548,27 +1547,22 @@
 	//		$delay=30;
 			$delay=@iif(isset($_REQUEST["delay"]),$_REQUEST["delay"],30);
 //		$subject=$description;
-			$subject=@iif(isset($_REQUEST["subject"]),$_REQUEST["subject"],$description);
+			$subject=@iif(isset($_REQUEST["subject"]),$_REQUEST["subject"],"{TRIGGER.NAME}: {STATUS}");
+			$message=@iif(isset($_REQUEST["message"]),$_REQUEST["message"],"{TRIGGER.NAME}: {STATUS}");
 			$scope=@iif(isset($_REQUEST["scope"]),$_REQUEST["scope"],0);
-			$good=@iif(isset($_REQUEST["good"]),$_REQUEST["good"],1);
 			$recipient=@iif(isset($_REQUEST["recipient"]),$_REQUEST["recipient"],RECIPIENT_TYPE_GROUP);
 //		$severity=0;
 			$severity=@iif(isset($_REQUEST["severity"]),$_REQUEST["severity"],0);
 			$maxrepeats=@iif(isset($_REQUEST["maxrepeats"]),$_REQUEST["maxrepeats"],0);
 			$repeatdelay=@iif(isset($_REQUEST["repeatdelay"]),$_REQUEST["repeatdelay"],600);
 			$repeat=@iif(isset($_REQUEST["repeat"]),$_REQUEST["repeat"],0);
-
-			if(isset($_REQUEST["message"]))
-			{
-				$message=$_REQUEST["message"];
-			}
 		}
 
 		$conditiontype=@iif(isset($_REQUEST["conditiontype"]),$_REQUEST["conditiontype"],0);
 
 
 		show_form_begin("actions.action");
-		echo nbsp(S_NEW_ACTION);
+		echo nbsp(S_ACTION);
 		$col=0;
 
 		show_table2_v_delimiter($col++);
@@ -1579,19 +1573,21 @@
 		}
 		echo nbsp(S_SOURCE);
 		show_table2_h_delimiter();
-		echo "<select class=\"biginput\" name=\"good\" size=1>";
+		echo "<select class=\"biginput\" name=\"source\" size=1>";
 		echo "<OPTION VALUE=\"0\""; if($source==0) echo "SELECTED"; echo ">".S_TRIGGER;
 		echo "</SELECT>";
 
 		show_table2_v_delimiter($col);
-		echo nbsp("Conditions");
+		echo nbsp(S_CONDITIONS);
 		show_table2_h_delimiter();
+		$found=0;
 		for($i=1;$i<=1000;$i++)
 		{
 			if(isset($_REQUEST["conditiontype$i"]))
 			{
 				echo "<input type=checkbox name=\"conditionchecked$i\">".get_condition_desc($_REQUEST["conditiontype$i"],$_REQUEST["conditionop$i"],$_REQUEST["conditionvalue$i"]);
 				echo "<br>";
+				$found=1;
 			}
 		}
 
@@ -1604,6 +1600,7 @@
 				echo "<input name=\"conditionvalue$i\" type=\"hidden\" value=\"".$_REQUEST["conditionvalue$i"]."\">";
 			}
 		}
+		if($found==0) echo S_NO_CONDITIONS_DEFINED;
 
 		show_table2_v_delimiter($col++);
 		echo nbsp(" ");
@@ -1638,11 +1635,9 @@
 		if(in_array($conditiontype,array(CONDITION_TYPE_TRIGGER_SEVERITY)))
 			$h2=$h2.form_select("operator",CONDITION_OPERATOR_MORE_EQUAL,">=");
 		$h2=$h2."</SELECT>";
-//		echo $h2;
-
 
 		show_table2_v_delimiter($col);
-		echo nbsp("                                      Condition");
+		echo nbsp(S_CONDITION);
 		show_table2_h_delimiter();
 
 		if($conditiontype == CONDITION_TYPE_GROUP)

@@ -34,32 +34,6 @@
 		return	$result;
 	}
 
-	# Update Action
-
-	function	update_action( $actionid, $filter_triggerid, $userid, $good, $delay, $subject, $message, $severity, $recipient, $usrgrpid, $maxrepeats, $repeatdelay)
-	{
-		if(!check_right_on_trigger("A",$triggerid))
-		{
-                        error("Insufficient permissions");
-                        return 0;
-		}
-
-		if($recipient == RECIPIENT_TYPE_USER)
-		{
-			$id = $userid;
-		}
-		else
-		{
-			$id = $usrgrpid;
-		}
-		$subject=addslashes($subject);
-		$message=addslashes($message);
-
-		$sql="update actions set filter_triggerid=$filter_triggerid,userid=$id,good=$good,delay=$delay,nextcheck=0,subject='$subject',message='$message',severity=$severity,recipient=$recipient,maxrepeats=$maxrepeats,repeatdelay=$repeatdelay where actionid=$actionid";
-		$result=DBexecute($sql);
-		return $result;
-	}
-
 	# Add Action
 
 	function	add_action( $userid, $delay, $subject, $message, $recipient, $usrgrpid, $maxrepeats, $repeatdelay)
@@ -82,6 +56,30 @@
 		$sql="insert into actions (userid,delay,nextcheck,subject,message,recipient,maxrepeats,repeatdelay) values ($id,$delay,0,'$subject','$message',$recipient,$maxrepeats,$repeatdelay)";
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"actions","actionid");
+	}
+
+	# Update Action
+
+	function	update_action($actionid, $userid, $delay, $subject, $message, $recipient, $usrgrpid, $maxrepeats, $repeatdelay)
+	{
+//		if(!check_right_on_trigger("U",$triggerid))
+//		{
+//                      error("Insufficient permissions");
+//                      return 0;
+//		}
+
+		if($recipient == RECIPIENT_TYPE_USER)
+		{
+			$id = $userid;
+		}
+		else
+		{
+			$id = $usrgrpid;
+		}
+
+		$sql="update actions set userid=$id,delay=$delay,nextcheck=0,subject='$subject',message='$message',recipient=$recipient,maxrepeats=$maxrepeats, repeatdelay=$repeatdelay where actionid=$actionid";
+		$result=DBexecute($sql);
+		return $result;
 	}
 
 	# Delete Action by userid
