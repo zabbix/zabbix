@@ -63,12 +63,12 @@
 				if(isset($_REQUEST["userid"]))
 				{
 					$user=get_user_by_userid($_REQUEST["userid"]);
-					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ACTION,"User [".$user["alias"]."] when [".$_REQUEST["good"]."] subject [".$_REQUEST["subject"]."]");
+					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ACTION,"User [".$user["alias"]."] subject [".$_REQUEST["subject"]."]");
 				}
 				else
 				{
 					$group=get_group_by_groupid($_REQUEST["usrgrpid"]);
-					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ACTION,"User [".$group["name"]."] when [".$_REQUEST["good"]."] subject [".$_REQUEST["subject"]."]");
+					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ACTION,"User [".$group["name"]."] subject [".$_REQUEST["subject"]."]");
 				}
 			}
 		}
@@ -79,24 +79,33 @@
 				$_REQUEST["maxrepeats"]=0;
 				$_REQUEST["repeatdelay"]=600;
 			}
-			
-			$result=update_action( $_REQUEST["actionid"], $_REQUEST["filter_triggerid"], $_REQUEST["userid"], $_REQUEST["good"], $_REQUEST["delay"], $_REQUEST["subject"], $_REQUEST["message"],$_REQUEST["scope"],$_REQUEST["severity"],$_REQUEST["recipient"],$_REQUEST["usrgrpid"],$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"]);
-			update_action_from_linked_hosts($_REQUEST["actionid"]);
-			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
-			if($result)
+
+			$actionid=$_REQUEST["actionid"];
+
+			update_action($actionid, $_REQUEST["userid"], $_REQUEST["delay"], $_REQUEST["subject"], $_REQUEST["message"],$_REQUEST["recipient"],$_REQUEST["usrgrpid"],$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"]);
+			$sql="delete from conditions where actionid=$actionid";
+			DBexecute($sql);
+			for($i=1;$i<=1000;$i++)
+			{
+				if(isset($_REQUEST["conditiontype$i"]))
+				{
+					add_action_condition($actionid,$_REQUEST["conditiontype$i"], $_REQUEST["conditionop$i"], $_REQUEST["conditionvalue$i"]);
+				}
+			}
+			show_messages($actionid,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
+			if($actionid)
 			{
 				if(isset($_REQUEST["userid"]))
 				{
 					$user=get_user_by_userid($_REQUEST["userid"]);
-					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ACTION,"User [".$user["alias"]."] when [".$_REQUEST["good"]."] subject [".$_REQUEST["subject"]."]");
+					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ACTION,"User [".$user["alias"]."] subject [".$_REQUEST["subject"]."]");
 				}
 				else
 				{
 					$group=get_group_by_groupid($_REQUEST["usrgrpid"]);
-					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ACTION,"User [".$group["name"]."] when [".$_REQUEST["good"]."] subject [".$_REQUEST["subject"]."]");
+					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ACTION,"User [".$group["name"]."] subject [".$_REQUEST["subject"]."]");
 				}
 			}
-			unset($_REQUEST["actionid"]);
 		}
 		if($_REQUEST["register"]=="delete")
 		{
@@ -105,7 +114,7 @@
 			show_messages($result,S_ACTION_DELETED,S_CANNOT_DELETE_ACTION);
 			if($result)
 			{
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_ACTION,"When [".$_REQUEST["good"]."] subject [".$_REQUEST["subject"]."]");
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_ACTION,"Subject [".$_REQUEST["subject"]."]");
 			}
 			unset($_REQUEST["actionid"]);
 		}

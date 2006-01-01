@@ -63,6 +63,8 @@
 	"S_TIME_PERIOD"=>			"Time period",
 	"S_TRIGGER_DESCRIPTION"=>		"Trigger description",
 	"S_CONDITIONS"=>			"Conditions",
+	"S_CONDITION"=>				"Condition",
+	"S_NO_CONDITIONS_DEFINED"=>		"No conditions defined",
 
 //	actions.php
 	"S_ACTIONS"=>				"Actions",
@@ -80,7 +82,6 @@
 	"S_ON"=>				"ON",
 	"S_OFF"=>				"OFF",
 	"S_NO_ACTIONS_DEFINED"=>		"No actions defined",
-	"S_NEW_ACTION"=>			"New action",
 	"S_SINGLE_USER"=>			"Single user",
 	"S_USER_GROUP"=>			"User group",
 	"S_GROUP"=>				"Group",
