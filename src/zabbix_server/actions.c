@@ -690,7 +690,7 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Conditions do not match our trigger. Do not apply actions.");
+			zabbix_log( LOG_LEVEL_DEBUG, "Conditions do not match our trigger. Do not apply actions.");
 		}
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "Actions applied for trigger %d %d", trigger->triggerid, trigger_value );
