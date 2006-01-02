@@ -48,6 +48,8 @@ function SDI($msg) { echo "DEBUG INFO: $msg <br>"; } # DEBUG INFO!!!
 	include_once 	"include/maps.inc.php";
 	include_once 	"include/media.inc.php";
 
+	include_once 	"include/classes/table.inc.php";
+
 	function info($msg)
 	{
 		global $INFO_MSG;
