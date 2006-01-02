@@ -65,19 +65,11 @@
 			if(isset($_REQUEST["triggers_add"]))	$triggers=$triggers|1;
 			if(isset($_REQUEST["triggers_update"]))	$triggers=$triggers|2;
 			if(isset($_REQUEST["triggers_delete"]))	$triggers=$triggers|4;
-			$actions=0;
-			if(isset($_REQUEST["actions_add"]))	$actions=$actions|1;
-			if(isset($_REQUEST["actions_update"]))	$actions=$actions|2;
-			if(isset($_REQUEST["actions_delete"]))	$actions=$actions|4;
 			$graphs=0;
 			if(isset($_REQUEST["graphs_add"]))	$graphs=$graphs|1;
 			if(isset($_REQUEST["graphs_update"]))	$graphs=$graphs|2;
 			if(isset($_REQUEST["graphs_delete"]))	$graphs=$graphs|4;
-			$screens=0;
-			if(isset($_REQUEST["screens_add"]))	$screens=$screens|1;
-			if(isset($_REQUEST["screens_update"]))	$screens=$screens|2;
-			if(isset($_REQUEST["screens_delete"]))	$screens=$screens|4;
-			$result=add_template_linkage($_REQUEST["hostid"],$_REQUEST["templateid"],$items,$triggers,$actions,$graphs,$screens);
+			$result=add_template_linkage($_REQUEST["hostid"],$_REQUEST["templateid"],$items,$triggers,$graphs);
 			show_messages($result, S_TEMPLATE_LINKAGE_ADDED, S_CANNOT_ADD_TEMPLATE_LINKAGE);
 		}
 		if($_REQUEST["register"]=="update linkage")
@@ -90,19 +82,11 @@
 			if(isset($_REQUEST["triggers_add"]))	$triggers=$triggers|1;
 			if(isset($_REQUEST["triggers_update"]))	$triggers=$triggers|2;
 			if(isset($_REQUEST["triggers_delete"]))	$triggers=$triggers|4;
-			$actions=0;
-			if(isset($_REQUEST["actions_add"]))	$actions=$actions|1;
-			if(isset($_REQUEST["actions_update"]))	$actions=$actions|2;
-			if(isset($_REQUEST["actions_delete"]))	$actions=$actions|4;
 			$graphs=0;
 			if(isset($_REQUEST["graphs_add"]))	$graphs=$graphs|1;
 			if(isset($_REQUEST["graphs_update"]))	$graphs=$graphs|2;
 			if(isset($_REQUEST["graphs_delete"]))	$graphs=$graphs|4;
-			$screens=0;
-			if(isset($_REQUEST["screens_add"]))	$screens=$screens|1;
-			if(isset($_REQUEST["screens_update"]))	$screens=$screens|2;
-			if(isset($_REQUEST["screens_delete"]))	$screens=$screens|4;
-			$result=update_template_linkage($_REQUEST["hosttemplateid"],$_REQUEST["hostid"],$_REQUEST["templateid"],$items,$triggers,$actions,$graphs,$screens);
+			$result=update_template_linkage($_REQUEST["hosttemplateid"],$_REQUEST["hostid"],$_REQUEST["templateid"],$items,$triggers,$graphs);
 			show_messages($result, S_TEMPLATE_LINKAGE_UPDATED, S_CANNOT_UPDATE_TEMPLATE_LINKAGE);
 		}
 		if($_REQUEST["register"]=="delete linkage")
@@ -428,11 +412,10 @@
 <?php
 	if(isset($_REQUEST["hostid"])&&($_REQUEST["config"]==2))
 	{
-		table_begin();
-		table_header(array(S_HOST,S_TEMPLATE,S_ITEMS,S_TRIGGERS,S_ACTIONS,S_GRAPHS,S_SCREENS,S_ACTIONS));
+		$table = new Ctable(S_NO_LINKAGES_DEFINED);
+		$table->setHeader(array(S_HOST,S_TEMPLATE,S_ITEMS,S_TRIGGERS,S_GRAPHS,S_ACTIONS));
 
-		$result=DBselect("select hosttemplateid,hostid,templateid,items,triggers,actions,graphs,screens from hosts_templates where hostid=".$_REQUEST["hostid"]);
-		$col=0;
+		$result=DBselect("select * from hosts_templates where hostid=".$_REQUEST["hostid"]);
 		while($row=DBfetch($result))
 		{
 			$host=get_host_by_hostid($row["hostid"]);
@@ -441,24 +424,16 @@
 #			$actions="<A HREF=\"hosts.php?config=".$_REQUEST["config"]."&groupid=".$row["groupid"]."#form\">".S_CHANGE."</A>";
 			$actions="<a href=\"hosts.php?config=2&hostid=".$row["hostid"]."&hosttemplateid=".$row["hosttemplateid"]."\">".S_CHANGE."</a>";
 
-			table_row(array(
+			$table->addRow(array(
 				$host["host"],
 				$template["host"],
 				get_template_permission_str($row["items"]),
 				get_template_permission_str($row["triggers"]),
-				get_template_permission_str($row["actions"]),
 				get_template_permission_str($row["graphs"]),
-				get_template_permission_str($row["screens"]),
 				$actions
-				),$col++);
+				));
 		}
-		if(DBnum_rows($result)==0)
-		{
-				echo "<TR BGCOLOR=#EEEEEE>";
-				echo "<TD COLSPAN=8 ALIGN=CENTER>".S_NO_LINKAGES_DEFINED."</TD>";
-				echo "<TR>";
-		}
-		table_end();
+		$table->show();
 	}
 	if(isset($_REQUEST["hostid"])&&$_REQUEST["config"]==2)
 	{

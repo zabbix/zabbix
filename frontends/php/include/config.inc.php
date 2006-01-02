@@ -1559,16 +1559,16 @@ echo "</head>";
 	}
 
 	# Add host-template linkage
-	function add_template_linkage($hostid,$templateid,$items,$triggers,$actions,$graphs,$screens)
+	function add_template_linkage($hostid,$templateid,$items,$triggers,$graphs)
 	{
-		$sql="insert into hosts_templates (hostid,templateid,items,triggers,actions,graphs,screens) values ($hostid,$templateid,$items,$triggers,$actions,$graphs,$screens)";
+		$sql="insert into hosts_templates (hostid,templateid,items,triggers,graphs) values ($hostid,$templateid,$items,$triggers,$graphs)";
 		return	DBexecute($sql);
 	}
 
 	# Update host-template linkage
-	function update_template_linkage($hosttemplateid,$hostid,$templateid,$items,$triggers,$actions,$graphs,$screens)
+	function update_template_linkage($hosttemplateid,$hostid,$templateid,$items,$triggers,$graphs)
 	{
-		$sql="update hosts_templates set hostid=$hostid,templateid=$templateid,items=$items,triggers=$triggers,actions=$actions,graphs=$graphs,screens=$screens where hosttemplateid=$hosttemplateid";
+		$sql="update hosts_templates set hostid=$hostid,templateid=$templateid,items=$items,triggers=$triggers,graphs=$graphs where hosttemplateid=$hosttemplateid";
 		return	DBexecute($sql);
 	}
 
