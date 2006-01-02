@@ -1,5 +1,6 @@
 Changes for 1.1beta5:
 
+ - screens and actions will not be under control of templates (Alexei)
  - minor fix for enabling recovered hosts (Alexei)
  - new trigger function: regexp (Alexei)
  - support of function str() for item type 'log' (Alexei)
