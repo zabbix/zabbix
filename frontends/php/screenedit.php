@@ -77,12 +77,42 @@
 	$result=DBselect("select name,cols,rows from screens where screenid=$screenid");
 	$row=DBfetch($result);
 	show_table_header("<a href=\"screenedit.php?screenid=$screenid\">".$row["name"]."</a>");
+	for($r=0;$r<$row["rows"];$r++)
+	{
+		for($c=0;$c<$row["cols"];$c++)
+		{
+			$spancheck[$r][$c]=1;
+		}
+	}
+	for($r=0;$r<$row["rows"];$r++)
+	{
+		for($c=0;$c<$row["cols"];$c++)
+		{
+			$sql="select * from screens_items where screenid=$screenid and x=$c and y=$r";
+			$iresult=DBSelect($sql);
+			$colspan=0;
+			$rowspan=0;
+			if(DBnum_rows($iresult)>0)
+			{
+				$irow=DBfetch($iresult);
+				$colspan=$irow["colspan"];
+				$rowspan=$irow["rowspan"];
+			}
+			for($i=0;$i<$rowspan;$i++)
+				for($j=0;$j<$colspan;$j++)
+					if(($i!=0)||($j!=0))	$spancheck[$r+$i][$c+$j]=0;
+				
+		}
+	}
+
 	echo "<TABLE BORDER=1 COLS=".$row["cols"]." align=center WIDTH=100% BGCOLOR=\"#FFFFFF\">";
         for($r=0;$r<$row["rows"];$r++)
 	{
 	echo "<TR>";
 	for($c=0;$c<$row["cols"];$c++)
 	{
+		if($spancheck[$r][$c]==0)	continue;
+		
 		$iresult=DBSelect("select * from screens_items where screenid=$screenid and x=$c and y=$r");
         	if(DBnum_rows($iresult)>0)
         	{
