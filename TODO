@@ -1,4 +1,4 @@
-1.1beta5:
+1.1beta6:
 
  - execution of commands on monitored hosts in case of pre-defined events
  - document UserParameters $1,...,$9
