@@ -27,8 +27,6 @@
 	"S_DATE_FORMAT_YMD"=>			"Y M d",
 	"S_HTML_CHARSET"=>			"UTF-8",
 
-//	about.php
-	"S_ABOUT_ZABBIX"=>			"ZABBIXについて",
 	"S_INFORMATION_ABOUT_ZABBIX"=>		"ZABBIXの情報 (v1.1beta3)",
 	"S_HOMEPAGE_OF_ZABBIX"=>		"ZABBIXホームページ",
 	"S_HOMEPAGE_OF_ZABBIX_DETAILS"=>	"ZABBIX本家のホームページ",
