@@ -780,14 +780,17 @@ function SDI($msg) { echo "DEBUG INFO: $msg <br>"; } # DEBUG INFO!!!
 				($function!="dayofweek")&&
 				($function!="date")&&
 				($function!="now")&&
-				($function!="str"))
+				($function!="str")&&
+				($function!="fuzzytime")&&
+				($function!="regexp")
+			)
 			{
 				error("Unknown function [$function]");
 				return -1;
 			}
 
 
-			if(( $function!="str") && (validate_float($parameter)!=0) )
+			if(( $function!="str") && ( $function!="regexp") && (validate_float($parameter)!=0) )
 			{
 				error("[$parameter] is not a float");
 				return -1;

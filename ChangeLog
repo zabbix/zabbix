@@ -1,5 +1,7 @@
 Changes for 1.1beta5:
 
+ - new trigger function: regexp (Alexei)
+ - support of function str() for item type 'log' (Alexei)
  - terminology change: trigger's 'description' -> 'name' (Alexei)
  - new macro for actions {TRIGGER.NAME} (Alexei)
  - added Graphs synchronization for linked hosts (Eugene)
