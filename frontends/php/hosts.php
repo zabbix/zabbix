@@ -161,7 +161,7 @@
 			$result=delete_host($_REQUEST["hostid"]);
 			if($result)
 			{
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,"Host [".addslashes($host["name"])."]");
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,"Host [".addslashes($host["host"])."]");
 			}
 			show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 			unset($_REQUEST["hostid"]);

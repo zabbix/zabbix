@@ -49,6 +49,7 @@
 //				delete_screen_item($_REQUEST["screenitemid"]);
 //				unset($_REQUEST["screenitemid"]);
 //			}
+			if(!isset($_REQUEST["elements"]))	$_REQUEST["elements"]=0;
 			$result=add_screen_item($_REQUEST["resource"],$_REQUEST["screenid"],$_REQUEST["x"],$_REQUEST["y"],$_REQUEST["resourceid"],$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["colspan"],$_REQUEST["rowspan"],$_REQUEST["elements"]);
 			unset($_REQUEST["x"]);
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
@@ -61,6 +62,7 @@
 		}
                 if($_REQUEST["register"]=="update")
                 {
+			if(!isset($_REQUEST["elements"]))	$_REQUEST["elements"]=0;
                         $result=update_screen_item($_REQUEST["screenitemid"],$_REQUEST["resource"],$_REQUEST["resourceid"],$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["colspan"],$_REQUEST["rowspan"],$_REQUEST["elements"]);
                         show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 			unset($_REQUEST["x"]);
@@ -75,7 +77,7 @@
 	$result=DBselect("select name,cols,rows from screens where screenid=$screenid");
 	$row=DBfetch($result);
 	show_table_header("<a href=\"screenedit.php?screenid=$screenid\">".$row["name"]."</a>");
-	echo "<TABLE BORDER=1 COLS=".$row["cols"]." align=center WIDTH=100% BGCOLOR=\"#FFFFFF\"";
+	echo "<TABLE BORDER=1 COLS=".$row["cols"]." align=center WIDTH=100% BGCOLOR=\"#FFFFFF\">";
         for($r=0;$r<$row["rows"];$r++)
 	{
 	echo "<TR>";
@@ -105,31 +107,19 @@
 			$rowspan=0;
 			$elements=25;
 		}
+
 		$tmp="";
-		if($colspan>1)
-		//if($colspan!=0)
+		if($colspan!=0)
 		{
 			$tmp=$tmp." colspan=\"$colspan\" ";
-			if($rowspan>1)
-			{
-				 $spancheck[$c][$r]=1;
-                        }
-			/*if ($colspan=1)
-			{
-				$colspan=0;
-			}
-			$c=$c+$colspan;*/
 			$c=$c+$colspan-1;
 		}
-		if($rowspan>1)
-		//if($rowspan!=0)
+		if($rowspan!=0)
 		{
 			$tmp=$tmp." rowspan=\"$rowspan\" ";
-			$spancheck[$c][$r]=1;
 #			$r=$r+$rowspan-1;
 		}
-		if ($spancheck[$c][$r-1]!=1)
-		{
+
 		echo "<TD align=\"center\" valign=\"top\" $tmp>\n";
 		echo "<a name=\"form\"></a>";
 		echo "<form method=\"get\" action=\"screenedit.php\">";
@@ -307,8 +297,6 @@
 		echo "</form>\n";
         
 		echo "</TD>";
-		}	
-		
         }
         echo "</TR>\n";
         }

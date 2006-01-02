@@ -133,8 +133,8 @@
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
-			add_template_linkage($hostid,$row["templateid"],$row["items"],$row["triggers"],$row["actions"],
-						$row["graphs"],$row["screens"]);
+			add_template_linkage($hostid,$row["templateid"],$row["items"],$row["triggers"],
+						$row["graphs"]);
 		}
 	}
 

@@ -42,7 +42,7 @@
 	if(isset($_REQUEST["register"]) && ($_REQUEST["register"]=="update"))
 	{
 		$result=update_trigger_comments($_REQUEST["triggerid"],$_REQUEST["comments"]);
-		show_messages($result, S_COMMENT_UPDATED, S_CANNO_UPDATE_COMMENT);
+		show_messages($result, S_COMMENT_UPDATED, S_CANNOT_UPDATE_COMMENT);
 	}
 ?>
 

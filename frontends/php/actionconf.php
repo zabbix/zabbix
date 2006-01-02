@@ -154,7 +154,7 @@
 	$h2="";
 	$h2=$h2."<select class=\"biginput\" name=\"actiontype\" onChange=\"submit()\">";
 	$h2=$h2.form_select("actiontype",0,S_SEND_MESSAGE);
-	$h2=$h2.form_select("actiontype",1,S_REMOTE_COMMAND);
+//	$h2=$h2.form_select("actiontype",1,S_REMOTE_COMMAND);
 	$h2=$h2."</select>";
 
 	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"actionconf.php\">", "</form>");

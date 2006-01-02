@@ -108,7 +108,7 @@
 			$map="<a href=\"screens.php?screenid=".$_REQUEST["screenid"]."&fullscreen=1\">".$row["name"]."</a>";
 		}
 	show_table_header($map);*/
-          echo "<TABLE BORDER=1 COLS=".$row["cols"]." align=center WIDTH=100% BGCOLOR=\"#FFFFFF\"";
+          echo "<TABLE BORDER=1 COLS=".$row["cols"]." align=center WIDTH=100% BGCOLOR=\"#FFFFFF\">";
           for($r=0;$r<$row["rows"];$r++)
           {
           echo "<TR>";
@@ -129,27 +129,21 @@
 			$height=$irow["height"];
 			$colspan=$irow["colspan"];
 			$rowspan=$irow["rowspan"];
+			$elements=$irow["elements"];
 		}
+
 
 		$tmp="";
 		if($colspan!=0)
 		{
 			$tmp=$tmp." colspan=\"$colspan\" ";
-			if($rowspan!=0)
-                	{
-				$spancheck[$c][$r]=1;
-			}
 			$c=$c+$colspan-1;
 		}
 		if($rowspan!=0)
 		{
 			$tmp=$tmp." rowspan=\"$rowspan\" ";
-			$spancheck[$c][$r]=1;
-#			$r=$r+$rowspan-1;
 		}
 
-		if($spancheck[$c][$r-1]!=1)
-		{
                	echo "<TD align=\"center\" valign=\"top\" $tmp>\n";
 		if(DBnum_rows($iresult)>0)
 		{
@@ -170,7 +164,7 @@
 			}
 			else if($resource == 3)
 			{
-				show_screen_plaintext($resourceid);
+				show_screen_plaintext($resourceid,$elements);
 			}
 		}
 		else 
@@ -178,7 +172,6 @@
 			echo "&nbsp;";
 		}
 		echo "</TD>";
-		}
           }
           echo "</TR>\n";
           }
