@@ -59,7 +59,8 @@
 	$now=time();
 
 	$result=DBselect("select i.itemid, i.nextcheck, i.description, h.host,h.hostid from items i,hosts h where i.status=0 and i.type not in (2) and ((h.status=".HOST_STATUS_MONITORED." and h.available!=".HOST_AVAILABLE_FALSE.") or (h.status=".HOST_STATUS_MONITORED." and h.available=".HOST_AVAILABLE_FALSE." and h.disable_until<=$now)) and i.hostid=h.hostid and i.nextcheck<$now and i.key_ not in ('status','icmpping','icmppingsec','zabbix[log]') order by i.nextcheck");
-	table_begin();
+	$table=new Ctable(S_THE_QUEUE_IS_EMPTY);
+
 	if($_REQUEST["show"]==0)
 	{
 		$sec_5=0;
@@ -83,23 +84,23 @@
 
 		}
 		$col=0;
-		table_header(array(S_DELAY,S_COUNT));
+		$table->setHeader(array(S_DELAY,S_COUNT));
 		$elements=array(S_5_SECONDS,$sec_5);
-		table_row($elements,$col++);
+		$table->addRow($elements);
 		$elements=array(S_10_SECONDS,$sec_10);
-		table_row($elements,$col++);
+		$table->addRow($elements);
 		$elements=array(S_30_SECONDS,$sec_30);
-		table_row($elements,$col++);
+		$table->addRow($elements);
 		$elements=array(S_1_MINUTE,$sec_60);
-		table_row($elements,$col++);
+		$table->addRow($elements);
 		$elements=array(S_5_MINUTES,$sec_300);
-		table_row($elements,$col++);
+		$table->addRow($elements);
 		$elements=array(S_MORE_THAN_5_MINUTES,$sec_rest);
-		table_row($elements,$col++);
+		$table->addRow($elements);
 	}
 	else
 	{
-		table_header(array(S_NEXT_CHECK,S_HOST,S_DESCRIPTION));
+		$table->setHeader(array(S_NEXT_CHECK,S_HOST,S_DESCRIPTION));
 		$col=0;
 		while($row=DBfetch($result))
 		{
@@ -108,14 +109,12 @@
 				continue;
 			}
 			$elements=array(date("m.d.Y H:i:s",$row["nextcheck"]),$row["host"],$row["description"]);
-			table_row($elements,$col++);
+			$col++;
+			$table->addRow($elements);
 		}
-		iif_echo(DBnum_rows($result)==0,
-			"<TR BGCOLOR=#EEEEEE><TD COLSPAN=3 ALIGN=CENTER>".S_THE_QUEUE_IS_EMPTY."</TD><TR>",
-			"");
 	}
 
-	table_end();
+	$table->show();
 ?>
 <?php
 	show_table_header(S_TOTAL.":$col");
