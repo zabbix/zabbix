@@ -1747,13 +1747,13 @@ echo "</head>";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
-			sync_host_with_template($hostid,$row["templateid"],$row["items"],$row["triggers"],$row["actions"],
-                                                $row["graphs"],$row["screens"]);
+			sync_host_with_template($hostid,$row["templateid"],$row["items"],$row["triggers"],
+                                                $row["graphs"]);
 		}
 	}
 
 	# Sync host with hard-linked template
-	function	sync_host_with_template($hostid,$templateid,$items,$triggers,$actions,$graphs,$screens)
+	function	sync_host_with_template($hostid,$templateid,$items,$triggers,$graphs)
 	{
 		if(!isset($templateid)||($templateid==0))
 		{
@@ -1775,14 +1775,6 @@ echo "</head>";
 		while($row=DBfetch($result))
 		{	
 			add_trigger_to_linked_hosts($row["triggerid"],$hostid);
-		}
-
-		// Sync actions
-		$sql="select distinct a.actionid from actions a,hosts h, items i,triggers t,functions f where h.hostid=$templateid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.itemid=f.itemid";
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{	
-			add_action_to_linked_hosts($row["actionid"],$hostid);
 		}
 
 		// Sync graphs

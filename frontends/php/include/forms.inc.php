@@ -1690,7 +1690,7 @@
 		show_table2_h_delimiter();
 		echo "<select class=\"biginput\" name=\"actiontype\" size=\"1\" onChange=\"submit()\">";
 		echo "<option value=\"0\""; if($actiontype==0) echo " selected"; echo ">".S_SEND_MESSAGE;
-		echo "<option value=\"1\""; if($actiontype==1) echo " selected"; echo ">".S_REMOTE_COMMAND;
+		echo "<option value=\"1\" disabled "; if($actiontype==1) echo " selected"; echo ">".S_REMOTE_COMMAND;
 		echo "</select>";
 
 
