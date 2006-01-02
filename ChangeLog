@@ -1,5 +1,6 @@
 Changes for 1.1beta5:
 
+ - reverted original spancheck patch. No more warnings. (Alexei)
  - screens and actions will not be under control of templates (Alexei)
  - minor fix for enabling recovered hosts (Alexei)
  - new trigger function: regexp (Alexei)
