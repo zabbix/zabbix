@@ -161,8 +161,9 @@
 	{
 		echo "<br>";
 		show_table_header(S_USER_GROUPS_BIG);
-		table_begin();
-		table_header(array(S_ID,S_NAME,S_MEMBERS,S_ACTIONS));
+
+		$table = new cTable(S_NO_USER_GROUPS_DEFINED);
+		$table->setHeader(array(S_ID,S_NAME,S_MEMBERS,S_ACTIONS));
 	
 		$result=DBselect("select usrgrpid,name from usrgrp order by name");
 		$col=0;
@@ -174,6 +175,7 @@
 			}
 			$result1=DBselect("select distinct u.alias from users u,users_groups ug where u.userid=ug.userid and ug.usrgrpid=".$row["usrgrpid"]." order by alias");
 			$users="&nbsp;";
+			$i=0;
 			while($row1=DBfetch($result1))
 			{
 				$users=$users.$row1["alias"];
@@ -181,22 +183,17 @@
 				{
 					$users=$users.", ";
 				}
+				$i++;
 			}
 			$actions="<A HREF=\"users.php?config=".$_REQUEST["config"]."&usrgrpid=".$row["usrgrpid"]."#form\">".S_CHANGE."</A>";
-			table_row(array(
+			$table->addRow(array(
 				$row["usrgrpid"],
 				$row["name"],
 				$users,
 				$actions
-				),$col++);
+				));
 		}
-		if(DBnum_rows($result)==0)
-		{
-				echo "<TR BGCOLOR=#EEEEEE>";
-				echo "<TD COLSPAN=3 ALIGN=CENTER>".S_NO_USER_GROUPS_DEFINED."</TD>";
-				echo "<TR>";
-		}
-		table_end();
+		$table->show();
 	}
 ?>
 
@@ -205,8 +202,8 @@
 	{
 		echo "<br>";
 		show_table_header(S_USERS_BIG);
-		table_begin();
-		table_header(array(S_ID,S_ALIAS,S_NAME,S_SURNAME,S_IS_ONLINE_Q,S_ACTIONS));
+		$table=new Ctable(S_NO_USERS_DEFINED);
+		$table->setHeader(array(S_ID,S_ALIAS,S_NAME,S_SURNAME,S_IS_ONLINE_Q,S_ACTIONS));
 	
 		$result=DBselect("select u.userid,u.alias,u.name,u.surname from users u order by u.alias");
 		$col=0;
@@ -241,22 +238,16 @@
 				$actions=S_CHANGE." - ".S_MEDIA;
 			}
 	
-			table_row(array(
+			$table->addRow(array(
 				$row["userid"],
 				$row["alias"],
 				$row["name"],
 				$row["surname"],
 				$online,
 				$actions
-				),$col++);
+				));
 		}
-		if(DBnum_rows($result)==0)
-		{
-				echo "<TR BGCOLOR=#EEEEEE>";
-				echo "<TD COLSPAN=6 ALIGN=CENTER>".S_NO_USERS_DEFINED."</TD>";
-				echo "<TR>";
-		}
-		table_end();
+		$table->show();
 	}
 ?>
 
@@ -266,8 +257,8 @@
 	echo "<a name=\"form\"></a>";
 	show_table_header("USER PERMISSIONS");
 
-	table_begin();
-	table_header(array(S_PERMISSION,S_RIGHT,S_RESOURCE_NAME,S_ACTIONS));
+	$table  = new Ctable();
+	$table->setHeader(array(S_PERMISSION,S_RIGHT,S_RESOURCE_NAME,S_ACTIONS));
 	$result=DBselect("select rightid,name,permission,id from rights where userid=".$_REQUEST["userid"]." order by name,permission,id");
 	$col=0;
 	while($row=DBfetch($result))
@@ -293,14 +284,14 @@
 			$permission=$row["permission"];
 		}
 		$actions="<A HREF=users.php?userid=".$_REQUEST["userid"]."&rightid=".$row["rightid"]."&register=delete_permission>".S_DELETE."</A>";
-		table_row(array(
+		$table->addRow(array(
 			$row["name"],
 			$permission,
 			get_resource_name($row["name"],$row["id"]),
 			$actions
-		),$col++);
+		));
 	}
-	table_end();
+	$table->show();
 
 	insert_permissions_form($_REQUEST["userid"]);
 

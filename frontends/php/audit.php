@@ -87,9 +87,8 @@
 	}
 	$result=DBselect($sql);
 
-	table_begin();
-	table_header(array(S_TIME,S_USER,S_RESOURCE,S_ACTION,S_DETAILS));
-	$col=0;
+	$table = new Ctable();
+	$table->setHeader(array(S_TIME,S_USER,S_RESOURCE,S_ACTION,S_DETAILS));
 	$i=0;
 	while($row=DBfetch($result))
 	{
@@ -148,15 +147,15 @@
 		{
 			$action=S_UNKNOWN_ACTION;
 		}
-		table_row(array(
+		$table->addRow(array(
 			date("Y.M.d H:i:s",$row["clock"]),
 			$row["alias"],
 			$resource,
 			$action,
 			$row["details"]
-		),$col++);
+		));
 	}
-	table_end();
+	$table->show();
 ?>
 
 <?php
