@@ -25,7 +25,7 @@
 		var $header;
 		var $msg_empty;
 		
-		function Ctable($msg_empty="")
+		function Ctable($msg_empty="...")
 		{
 			$this->rows=array();
 			$this->header=array();
