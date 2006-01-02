@@ -413,6 +413,7 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
 	int	fuzlow, fuzhig;
 
 	int	day;
+	int	len;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() Function [%s] flag [%d]",function,flag);
 
@@ -595,7 +596,7 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
 	}
 	else if(strcmp(function,"str")==0)
 	{
-		if(item->value_type==ITEM_VALUE_TYPE_STR)
+		if( (item->value_type==ITEM_VALUE_TYPE_STR) || (item->value_type==ITEM_VALUE_TYPE_LOG))
 		{
 			if(strstr(item->lastvalue_str, parameter) == NULL)
 			{
@@ -606,6 +607,24 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
 				strcpy(value,"1");
 			}
 
+		}
+		else
+		{
+			ret = FAIL;
+		}
+	}
+	else if(strcmp(function,"regexp")==0)
+	{
+		if( (item->value_type==ITEM_VALUE_TYPE_STR) || (item->value_type==ITEM_VALUE_TYPE_LOG))
+		{
+			if(zbx_regexp_match(item->lastvalue_str, parameter, &len) != NULL)
+			{
+				strcpy(value,"1");
+			}
+			else
+			{
+				strcpy(value,"0");
+			}
 		}
 		else
 		{

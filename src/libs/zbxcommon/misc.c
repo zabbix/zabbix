@@ -205,6 +205,11 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 		SET_STR_RESULT(result, strdup(c));
 		ret = SUCCEED;
 	}
+	else if(value_type == ITEM_VALUE_TYPE_LOG)
+	{
+		SET_STR_RESULT(result, strdup(c));
+		ret = SUCCEED;
+	}
 
 	return ret;
 }
