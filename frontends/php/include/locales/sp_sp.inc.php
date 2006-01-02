@@ -27,24 +27,6 @@
 	"S_DATE_FORMAT_YMD"=>			"d M Y",
 	"S_HTML_CHARSET"=>			"iso-8859-1",
 
-//	about.php
-	"S_ABOUT_ZABBIX"=>			"Acerca de ZABBIX",
-	"S_INFORMATION_ABOUT_ZABBIX"=>		"Información acerca de ZABBIX (v1.1beta35)",
-	"S_HOMEPAGE_OF_ZABBIX"=>		"Página home de ZABBIX",
-	"S_HOMEPAGE_OF_ZABBIX_DETAILS"=>	"Esta es la página principal de ZABBIX.",
-	"S_LATEST_ZABBIX_MANUAL"=>		"Ultima versión del Manual de ZABBIX",
-	"S_LATEST_ZABBIX_MANUAL_DETAILS"=>	"Ultima versión del Manual.",
-	"S_DOWNLOADS"=>				"Descargas",
-	"S_DOWNLOADS_DETAILS"=>			"La ultima liberación de ZABBIX se puede encontrar aquí.",
-	"S_FEATURE_REQUESTS"=>			"Solicitudes de funcionalidades",
-	"S_FEATURE_REQUESTS_DETAILS"=>		"Si necesita una funcionalidad adicional=> vaya aquí.",
-	"S_FORUMS"=>				"Foros",
-	"S_FORUMS_DETAILS"=>			"Discusión ZABBIX-related.",
-	"S_BUG_REPORTS"=>			"Reporte de bugs",
-	"S_BUG_REPORTS_DETAILS"=>		"Bugs en ZABBIX? Por favor=> informelo.",
-	"S_MAILING_LISTS"=>			"Mailing lists",
-	"S_MAILING_LISTS_DETAILS"=>		"ZABBIX-related mailing lists.",
-	
 //	actions.php
 	"S_ACTIONS"=>				"Acciones",
 	"S_ACTION_ADDED"=>			"Acción agregada",

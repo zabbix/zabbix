@@ -1173,7 +1173,6 @@ echo "</head>";
 		if(($sub["url"]=="charts.php")&&!check_anyright("Graph","R"))							continue;
 		if(($sub["url"]=="screens.php")&&!check_anyright("Screen","R"))							continue;
 		if(($sub["url"]=="srv_status.php")&&!check_anyright("Service","R"))						continue;
-		if(($sub["url"]=="about.php")&&!check_anyright("Default permission","R"))					continue;
 		if(($sub["url"]=="report1.php")&&!check_anyright("Default permission","R"))					continue;
 		if(($sub["url"]=="report2.php")&&!check_anyright("Host","R"))							continue;
 		if(($sub["url"]=="config.php")&&!check_anyright("Configuration of Zabbix","U"))					continue;
