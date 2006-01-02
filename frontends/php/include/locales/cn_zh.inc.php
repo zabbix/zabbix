@@ -29,7 +29,7 @@
 
 //	about.php
 	"S_ABOUT_ZABBIX"=>			"关于ZABBIX",
-	"S_INFORMATION_ABOUT_ZABBIX"=>		"ZABBIX (v1.1beta4)的详细信息",
+	"S_INFORMATION_ABOUT_ZABBIX"=>		"ZABBIX (v1.1beta5)的详细信息",
 	"S_HOMEPAGE_OF_ZABBIX"=>		"ZABBIX的首页",
 	"S_HOMEPAGE_OF_ZABBIX_DETAILS"=>	"This is home page of ZABBIX.",
 	"S_LATEST_ZABBIX_MANUAL"=>		"Latest ZABBIX Manual",
@@ -242,10 +242,10 @@
 	"S_COMPARE"=>				"对比",
 
 //	Footer
-	"S_ZABBIX_VER"=>			"ZABBIX 1.1b4 Modified",
-	"S_COPYRIGHT_BY"=>			" ",
-	"S_CONNECTED_AS"=>			"用户",
-	"S_SIA_ZABBIX"=>			"Zabbix",
+	"S_ZABBIX_VER"=>			"ZABBIX 1.1beta5",
+	"S_COPYRIGHT_BY"=>			"Copyright 2001-2006 by ",
+	"S_CONNECTED_AS"=>			"Connected as",
+	"S_SIA_ZABBIX"=>			"SIA Zabbix",
 
 //	graph.php
 	"S_CONFIGURATION_OF_GRAPH"=>		"图表显示配置",
