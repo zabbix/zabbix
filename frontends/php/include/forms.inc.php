@@ -38,9 +38,7 @@
 			$template=get_host_by_hostid($templateid);
 			$items=$row["items"];
 			$triggers=$row["triggers"];
-			$actions=$row["actions"];
 			$graphs=$row["graphs"];
-			$screens=$row["screens"];
 		}
 		else
 		{
@@ -48,9 +46,7 @@
 			$templateid=0;
 			$items=7;
 			$triggers=7;
-			$actions=7;
 			$graphs=7;
-			$screens=7;
 		}
 
 		$col=0;
@@ -103,25 +99,11 @@
 		echo "<input type=checkbox ".iif((4&$triggers)==4,"checked","")." name=\"triggers_delete\" \">".S_DELETE;
 
 		show_table2_v_delimiter($col++);
-		echo S_ACTIONS;
-		show_table2_h_delimiter();
-		echo "<input type=checkbox ".iif((1&$actions)==1,"checked","")." name=\"actions_add\" \">".S_ADD;
-		echo "<input type=checkbox ".iif((2&$actions)==2,"checked","")." name=\"actions_update\" \">".S_UPDATE;
-		echo "<input type=checkbox ".iif((4&$actions)==4,"checked","")." name=\"actions_delete\" \">".S_DELETE;
-
-		show_table2_v_delimiter($col++);
 		echo S_GRAPHS;
 		show_table2_h_delimiter();
 		echo "<input type=checkbox ".iif((1&$graphs)==1,"checked","")." name=\"graphs_add\" \">".S_ADD;
 		echo "<input type=checkbox ".iif((2&$graphs)==2,"checked","")." name=\"graphs_update\" \">".S_UPDATE;
 		echo "<input type=checkbox ".iif((4&$graphs)==4,"checked","")." name=\"graphs_delete\" \">".S_DELETE;
-
-		show_table2_v_delimiter($col++);
-		echo S_SCREENS;
-		show_table2_h_delimiter();
-		echo "<input type=checkbox ".iif((1&$screens)==1,"checked","")." name=\"screens_add\" \">".S_ADD;
-		echo "<input type=checkbox ".iif((2&$screens)==2,"checked","")." name=\"screens_update\" \">".S_UPDATE;
-		echo "<input type=checkbox ".iif((4&$screens)==4,"checked","")." name=\"screens_delete\" \">".S_DELETE;
 
 		show_table2_v_delimiter2($col++);
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add linkage\">";

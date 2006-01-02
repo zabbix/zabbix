@@ -1,5 +1,8 @@
 alter table screens_items  add elements		int(4)		DEFAULT '25' NOT NULL;
 
+alter table hosts_templates drop screens;
+alter table hosts_templates drop actions;
+
 --
 -- Table structure for table 'conditions'
 --

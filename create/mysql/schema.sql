@@ -710,9 +710,7 @@ CREATE TABLE hosts_templates (
   templateid		int(4)		DEFAULT '0' NOT NULL,
   items			int(1)		DEFAULT '0' NOT NULL,
   triggers		int(1)		DEFAULT '0' NOT NULL,
-  actions		int(1)		DEFAULT '0' NOT NULL,
   graphs		int(1)		DEFAULT '0' NOT NULL,
-  screens		int(1)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (hosttemplateid),
   UNIQUE (hostid, templateid)
 ) type=InnoDB;
