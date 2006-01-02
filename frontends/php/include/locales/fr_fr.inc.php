@@ -27,24 +27,6 @@
 	"S_DATE_FORMAT_YMD"=>			"d M Y",
 	"S_HTML_CHARSET"=>			    "iso-8859-1",
 
-//	about.php
-	"S_ABOUT_ZABBIX"=>			        "A propos de ZABBIX",
-	"S_INFORMATION_ABOUT_ZABBIX"=>		"Informations à propos de ZABBIX (v1.1beta4)",
-	"S_HOMEPAGE_OF_ZABBIX"=>			"Page d'accueil de ZABBIX",
-	"S_HOMEPAGE_OF_ZABBIX_DETAILS"=>	"Ceci est la page d'accueil de ZABBIX.",
-	"S_LATEST_ZABBIX_MANUAL"=>			"Manuel de ZABBIX le plus récent",
-	"S_LATEST_ZABBIX_MANUAL_DETAILS"=>	"Version la plus récente du guide.",
-	"S_DOWNLOADS"=>						"Téléchargements",
-	"S_DOWNLOADS_DETAILS"=>				"La version la plus récente de ZABBIX est disponible ici.",
-	"S_FEATURE_REQUESTS"=>				"Demandes de fonctionnalités",
-	"S_FEATURE_REQUESTS_DETAILS"=>		"Si vous avez besoin de fonctionnalités supplémentaires=> cliquez ici.",
-	"S_FORUMS"=>						"Forums",
-	"S_FORUMS_DETAILS"=>				"Discussion à propos de ZABBIX.",
-	"S_BUG_REPORTS"=>					"Rapports de problèmes",
-	"S_BUG_REPORTS_DETAILS"=>			"Un problème dans ZABBIX? Svp => rapportez-le.",
-	"S_MAILING_LISTS"=>					"Listes de distribution",
-	"S_MAILING_LISTS_DETAILS"=>			"Listes de distribution sur ZABBIX.",
-
 //	actions.php
 	"S_ACTIONS"=>						"Actions",
 	"S_ACTION_ADDED"=>					"Action ajoutée",
@@ -218,8 +200,8 @@
 	"S_COMPARE"=>						"Compare",
 
 //	Footer
-	"S_ZABBIX_VER"=>					"ZABBIX 1.1beta4",
-	"S_COPYRIGHT_BY"=>					"Copyright 2001-2005 par ",
+	"S_ZABBIX_VER"=>					"ZABBIX 1.1beta5",
+	"S_COPYRIGHT_BY"=>					"Copyright 2001-2006 par ",
 	"S_CONNECTED_AS"=>					"Connecté au nom de",
 	"S_SIA_ZABBIX"=>					"SIA Zabbix",
 

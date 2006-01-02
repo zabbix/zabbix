@@ -27,24 +27,6 @@
 	"S_DATE_FORMAT_YMD"=>			"d M Y",
 	"S_HTML_CHARSET"=>			"GB2312",
 
-//	about.php
-	"S_ABOUT_ZABBIX"=>			"关于ZABBIX",
-	"S_INFORMATION_ABOUT_ZABBIX"=>		"ZABBIX (v1.1beta5)的详细信息",
-	"S_HOMEPAGE_OF_ZABBIX"=>		"ZABBIX的首页",
-	"S_HOMEPAGE_OF_ZABBIX_DETAILS"=>	"This is home page of ZABBIX.",
-	"S_LATEST_ZABBIX_MANUAL"=>		"Latest ZABBIX Manual",
-	"S_LATEST_ZABBIX_MANUAL_DETAILS"=>	"Latest version of the Manual.",
-	"S_DOWNLOADS"=>				"Downloads",
-	"S_DOWNLOADS_DETAILS"=>			"Latest ZABBIX release can be found here.",
-	"S_FEATURE_REQUESTS"=>			"Feature requests",
-	"S_FEATURE_REQUESTS_DETAILS"=>		"If you need additional functionality=> go here.",
-	"S_FORUMS"=>				"Forums",
-	"S_FORUMS_DETAILS"=>			"ZABBIX-related discussion.",
-	"S_BUG_REPORTS"=>			"Bug reports",
-	"S_BUG_REPORTS_DETAILS"=>		"Bug in ZABBIX ? Please=> report it.",
-	"S_MAILING_LISTS"=>			"Mailing lists",
-	"S_MAILING_LISTS_DETAILS"=>		"ZABBIX-related mailing lists.",
-	
 //	actions.php
 	"S_ACTIONS"=>				"报警",
 	"S_ACTION_ADDED"=>			"添加操作",
