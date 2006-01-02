@@ -248,8 +248,7 @@ int get_values(void)
 				update_key_status(item.hostid, HOST_STATUS_MONITORED); /* 0 */
 				item.host_available=HOST_AVAILABLE_TRUE;
 
-/* Why this break??? Trigger needs to be updated anyway!
-				break;*/
+				stop=1;
 			}
 		       	update_triggers(item.itemid);
 		}
