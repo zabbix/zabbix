@@ -267,16 +267,16 @@
 	if($_REQUEST["action"]=="showlatest")
 	{
 
-		table_begin();
+		$table = new Ctable();
 		$item=get_item_by_itemid($_REQUEST["itemid"]);
 
 		if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
 		{
-			table_header(array(S_TIMESTAMP, S_LOCAL, S_SOURCE, S_SEVERITY, S_VALUE));
+			$table->setHeader(array(S_TIMESTAMP, S_LOCAL, S_SOURCE, S_SEVERITY, S_VALUE));
 		}
 		else
 		{
-			table_header(array(S_TIMESTAMP, S_VALUE));
+			$table->setHeader(array(S_TIMESTAMP, S_VALUE));
 		}
 
 		if($item["value_type"]==ITEM_VALUE_TYPE_FLOAT)
@@ -296,7 +296,6 @@
 			$sql="select clock,value from history_str where itemid=".$_REQUEST["itemid"]." order by clock desc limit 500";
 		}
 		$result=DBselect($sql);
-		$col=0;
 		while($row=DBfetch($result))
 		{
 			$clock=$row["clock"];
@@ -333,25 +332,23 @@
 			}
 			if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
 			{
-				table_row(array(
+				$table->addRow(array(
 					$clock,
 					$local,
 					$source,
 					$severity,
 					$value
-		                        ),
-	                        $col++);
+		                        ));
 			}
 			else
 			{
-				table_row(array(
+				$table->addRow(array(
 					$clock,
 					$value
-		                        ),
-	                        $col++);
+		                        ));
 			}
 		}
-		table_end();
+		$table->show();
  
 		show_footer();
 		exit;
