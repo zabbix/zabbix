@@ -115,32 +115,30 @@
 	echo "</TABLE>";
 
 	show_table_header("DISPLAYED HOSTS");
-	table_begin();
-	table_header(array(S_HOST,S_LABEL,S_X,S_Y,S_ICON,S_ACTIONS));
+	$table = new Ctable();
+	$table->setHeader(array(S_HOST,S_LABEL,S_X,S_Y,S_ICON,S_ACTIONS));
 
 	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,sh.icon from sysmaps_hosts sh,hosts h where sh.sysmapid=".$_REQUEST["sysmapid"]." and h.status not in (".HOST_STATUS_DELETED.") and h.hostid=sh.hostid order by h.host");
-	$col=0;
 	while($row=DBfetch($result))
 	{
-		table_row(array(
+		$table->addRow(array(
 			$row["host"],
 			$row["label"],
 			$row["x"],
 			$row["y"],
 			nbsp($row["icon"]),
 			"<A HREF=\"sysmap.php?sysmapid=".$row["sysmapid"]."&shostid=".$row["shostid"]."#form\">Change</A> - <A HREF=\"sysmap.php?register=delete&sysmapid=".$row["sysmapid"]."&shostid=".$row["shostid"]."\">Delete</A>"
-			),$col++);
+			));
 	}
-	table_end();
+	$table->show();
 ?>
 
 <?php
 	show_table_header("CONNECTORS");
-	table_begin();
-	table_header(array(S_HOST_1,S_HOST_2,S_LINK_STATUS_INDICATOR,S_ACTIONS));
+	$table = new Ctable();
+	$table->setHeader(array(S_HOST_1,S_HOST_2,S_LINK_STATUS_INDICATOR,S_ACTIONS));
 
 	$result=DBselect("select linkid,shostid1,shostid2,triggerid from sysmaps_links where sysmapid=".$_REQUEST["sysmapid"]." order by linkid");
-	$col=0;
 	while($row=DBfetch($result))
 	{
 		$result1=DBselect("select label from sysmaps_hosts where shostid=".$row["shostid1"]);
@@ -159,14 +157,14 @@
 			$description="-";
 		}
 
-		table_row(array(
+		$table->addRow(array(
 			$label1,
 			$label2,
 			$description,
 			"<A HREF=\"sysmap.php?sysmapid=".$_REQUEST["sysmapid"]."&register=delete_link&linkid=".$row["linkid"]."\">Delete</A>"
-			),$col++);
+			));
 	}
-	table_end();
+	$table->show();
 ?>
 
 <?php

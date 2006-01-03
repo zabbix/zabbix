@@ -197,45 +197,6 @@
 
 		table_header($header);
 
-
-/*		cr();
-		echo "<TR BGCOLOR=\"CCCCCC\">";
-		cr();
-		if(isset($_REQUEST["select"]))
-		{
-			echo "<TD><B>Host</B></TD>";
-		}
-		if(!isset($_REQUEST["sort"])||(isset($_REQUEST["sort"])&&($_REQUEST["sort"]=="description")))
-		{
-			echo "<TD><B>".S_DESCRIPTION_LARGE."</B></TD>";
-		}
-		else
-		{
-			iif_echo(isset($_REQUEST["select"]),
-				"<TD><B><a href=\"latest.php?select=".$_REQUEST["select"]."&sort=description\">".S_DESCRIPTION_SMALL."</B></TD>",
-				"<TD><B><a href=\"latest.php?hostid=".$_REQUEST["hostid"]."&sort=description\">".S_DESCRIPTION_SMALL."</B></TD>");
-		}
-		if(isset($_REQUEST["sort"])&&($_REQUEST["sort"]=="lastcheck"))
-		{
-			echo "<TD WIDTH=12%><B>LAST CHECK</B></TD>";
-		}
-		else
-		{
-			if(isset($_REQUEST["select"]))
-				echo "<TD WIDTH=12%><B><a href=\"latest.php?select=".$_REQUEST["select"]."&sort=lastcheck\">Last check</B></TD>";
-			else
-				echo "<TD WIDTH=12%><B><a href=\"latest.php?hostid=".$_REQUEST["hostid"]."&sort=lastcheck\">Last check</B></TD>";
-		}
-		cr();
-		echo "<TD WIDTH=10%><B>Last value</B></TD>"; 
-		cr();
-		echo "<TD WIDTH=10%><B>Change</B></TD>"; 
-		cr();
-		echo "<TD WIDTH=5% align=center><B>History</B></TD>";
-		cr();
-		echo "</TR>";
-		cr();*/
-
 		$col=0;
 		if(isset($_REQUEST["sort"]))
 		{
