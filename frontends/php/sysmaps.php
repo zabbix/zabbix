@@ -65,8 +65,8 @@
 
 <?php
 	show_table_header("NETWORK MAPS");
-	table_begin();
-	table_header(array(S_ID,S_NAME,S_WIDTH,S_HEIGHT,S_ACTIONS));
+	$table = new Ctable(S_NO_MAPS_DEFINED);
+	$table->setHeader(array(S_ID,S_NAME,S_WIDTH,S_HEIGHT,S_ACTIONS));
 
 	$result=DBselect("select s.sysmapid,s.name,s.width,s.height from sysmaps s order by s.name");
 	$col=0;
@@ -77,21 +77,15 @@
 	                continue;
 	        }
 
-		table_row(array(
+		$table->addRow(array(
 			$row["sysmapid"],
 			"<a href=\"sysmap.php?sysmapid=".$row["sysmapid"]."\">".$row["name"]."</a>",
 			$row["width"],
 			$row["height"],
 			"<A HREF=\"sysmaps.php?sysmapid=".$row["sysmapid"]."#form\">Change</A>"
-			),$col++);
+			));
 	}
-	if(DBnum_rows($result)==0)
-	{
-			echo "<TR BGCOLOR=#EEEEEE>";
-			echo "<TD COLSPAN=5 ALIGN=CENTER>-No maps defined-</TD>";
-			echo "<TR>";
-	}
-	table_end();
+	$table->show();
 ?>
 
 <?php

@@ -116,13 +116,12 @@
 	}
 	else
 	{
-		table_begin();
+		$table = new Ctable();
 		$header=array();
 		$header=array_merge($header,array(S_HOST,S_NAME,S_OS,S_SERIALNO,S_TAG,S_MACADDRESS));
 
-		table_header($header);
+		$table->setHeader($header);
 
-		$col=0;
 		if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]!=0))
 		{
 			$sql="select h.hostid,h.host,p.name,p.os,p.serialno,p.tag,p.macaddress from hosts h,hosts_profiles p,hosts_groups hg where h.hostid=p.hostid and h.hostid=hg.hostid and hg.groupid=".$_REQUEST["groupid"]." order by h.host";
@@ -140,20 +139,16 @@
 				continue;
 			}
 
-			table_row(array(
+			$table->addRow(array(
 				$row["host"],
 				$row["name"],
 				$row["os"],
 				$row["serialno"],
 				$row["tag"],
 				$row["macaddress"]
-				),
-			$col++);
+				));
 		}
-
-
-		table_end();
-		show_table_header_end();
+		$table->show();
 	}
 ?>
 

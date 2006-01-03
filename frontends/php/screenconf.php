@@ -65,32 +65,25 @@
 
 <?php
 	show_table_header("SCREENS");
-	table_begin();
-	table_header(array(S_ID,S_NAME,S_COLUMNS,S_ROWS,S_ACTIONS));
+	$table = new Ctable(S_NO_SCREENS_DEFINED);
+	$table->setHeader(array(S_ID,S_NAME,S_COLUMNS,S_ROWS,S_ACTIONS));
 
 	$result=DBselect("select screenid,name,cols,rows from screens order by name");
-	$col=0;
 	while($row=DBfetch($result))
 	{
 		if(!check_right("Screen","R",$row["screenid"]))
 		{
 			continue;
 		}
-		table_row(array(
+		$table->addRow(array(
 			$row["screenid"],
 			"<a href=\"screenedit.php?screenid=".$row["screenid"]."\">".$row["name"]."</a>",
 			$row["cols"],
 			$row["rows"],
 			"<A HREF=\"screenconf.php?screenid=".$row["screenid"]."#form\">".S_CHANGE."</A>"
-			),$col++);
+			));
 	}
-	if(DBnum_rows($result)==0)
-	{
-			echo "<TR BGCOLOR=#EEEEEE>";
-			echo "<TD COLSPAN=5 ALIGN=CENTER>".S_NO_SCREENS_DEFINED."</TD>";
-			echo "<TR>";
-	}
-	table_end();
+	$table->show();
 ?>
 
 <?php
