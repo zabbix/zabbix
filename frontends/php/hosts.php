@@ -361,8 +361,8 @@
 	{
 		echo "<br>";
 		show_table_header(S_HOST_GROUPS_BIG);
-		table_begin();
-		table_header(array(S_ID,S_NAME,S_MEMBERS,S_ACTIONS));
+		$table = new Ctable(S_NO_HOST_GROUPS_DEFINED);
+		$table->setHeader(array(S_ID,S_NAME,S_MEMBERS,S_ACTIONS));
 
 		$result=DBselect("select groupid,name from groups order by name");
 		$col=0;
@@ -385,20 +385,14 @@
 			$members["value"]=$members["value"]."&nbsp;";
 			$actions="<A HREF=\"hosts.php?config=".$_REQUEST["config"]."&groupid=".$row["groupid"]."#form\">".S_CHANGE."</A>";
 
-			table_row(array(
+			$table->addRow(array(
 				$row["groupid"],
 				$row["name"],
 				$members,
 				$actions
-				),$col++);
+				));
 		}
-		if(DBnum_rows($result)==0)
-		{
-				echo "<TR BGCOLOR=#EEEEEE>";
-				echo "<TD COLSPAN=4 ALIGN=CENTER>".S_NO_HOST_GROUPS_DEFINED."</TD>";
-				echo "<TR>";
-		}
-		table_end();
+		$table->show();
 	}
 ?>
 

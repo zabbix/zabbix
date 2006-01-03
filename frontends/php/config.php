@@ -292,11 +292,10 @@
 		echo "<br>";
 		show_table_header(S_IMAGES_BIG);
 
-		table_begin();
-		table_header(array(S_ID,S_TYPE,S_NAME,S_ACTIONS));
+		$table=new Ctable(S_NO_IMAGES_DEFINED);
+		$table->setHeader(array(S_ID,S_TYPE,S_NAME,S_ACTIONS));
 
 		$result=DBselect("select imageid,imagetype,name,image from images order by name");
-		$col=0;
 		while($row=DBfetch($result))
 		{
 			if($row["imagetype"]==1)
@@ -313,20 +312,14 @@
 			}
 			$actions="<a href=\"image.php?imageid=".$row["imageid"]."\">".S_SHOW."</a>";
 			$actions=$actions." :: <a href=\"config.php?config=3&register=change&imageid=".$row["imageid"]."\">".S_CHANGE."</a>";
-			table_row(array(
+			$table->addRow(array(
 				$row["imageid"],
 				$imagetype,
 				$row["name"],
 //				"<img src=\"image.php?imageid=".$row["imageid"]."\">",
-				$actions),$col++);
+				$actions));
 		}
-		if(DBnum_rows($result)==0)
-		{
-				echo "<TR BGCOLOR=#EEEEEE>";
-				echo "<TD COLSPAN=4 ALIGN=CENTER>".S_NO_IMAGES_DEFINED."</TD>";
-				echo "<TR>";
-		}
-		table_end();
+		$table->show();
 
 		if(!isset($_REQUEST["imageid"]))
 		{
@@ -398,11 +391,10 @@
 		echo "<br>";
 		show_table_header(S_MEDIA_TYPES_BIG);
 
-		table_begin();
-		table_header(array(S_ID,S_TYPE,S_DESCRIPTION_SMALL,S_ACTIONS));
+		$table=new CTable(S_NO_MEDIA_TYPES_DEFINED);
+		$table->setHeader(array(S_ID,S_TYPE,S_DESCRIPTION_SMALL,S_ACTIONS));
 
 		$result=DBselect("select mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path from media_type mt order by mt.type");
-		$col=0;
 		while($row=DBfetch($result))
 		{
 			if($row["type"]==0)
@@ -418,19 +410,13 @@
 				$type=S_UNKNOWN;
 			}
 			$actions="<a href=\"config.php?config=1&register=change&mediatypeid=".$row["mediatypeid"]."\">".S_CHANGE."</a>";
-			table_row(array(
+			$table->addRow(array(
 				$row["mediatypeid"],
 				$type,
 				$row["description"],
-				$actions),$col++);
+				$actions));
 		}
-		if(DBnum_rows($result)==0)
-		{
-				echo "<TR BGCOLOR=#EEEEEE>";
-				echo "<TD COLSPAN=4 ALIGN=CENTER>".S_NO_MEDIA_TYPES_DEFINED."</TD>";
-				echo "<TR>";
-		}
-		table_end();
+		$table->show();
 ?>
 
 <?php
@@ -608,8 +594,8 @@
 		echo "<br>";
 		show_table_header(S_AUTOREGISTRATION_RULES_BIG);
 
-		table_begin();
-		table_header(array(S_ID,S_PRIORITY,S_PATTERN,S_HOST,S_ACTIONS));
+		$table=new Ctable(S_NO_AUTOREGISTRATION_RULES_DEFINED);
+		$table->setHeader(array(S_ID,S_PRIORITY,S_PATTERN,S_HOST,S_ACTIONS));
 
 		$result=DBselect("select * from autoreg order by priority");
 		$col=0;
@@ -625,20 +611,14 @@
 				$name=$host["host"];
 			}
 			$actions="<a href=\"config.php?config=4&register=change&id=".$row["id"]."\">".S_CHANGE."</a>";
-			table_row(array(
+			$table->addRow(array(
 				$row["id"],
 				$row["priority"],
 				$row["pattern"],
 				$name,
-				$actions),$col++);
+				$actions));
 		}
-		if(DBnum_rows($result)==0)
-		{
-				echo "<TR BGCOLOR=#EEEEEE>";
-				echo "<TD COLSPAN=5 ALIGN=CENTER>".S_NO_AUTOREGISTRATION_RULES_DEFINED."</TD>";
-				echo "<TR>";
-		}
-		table_end();
+		$table->show();
 
 		@insert_autoregistration_form($_REQUEST["id"]);
 	}
