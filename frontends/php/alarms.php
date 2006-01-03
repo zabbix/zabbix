@@ -69,13 +69,12 @@
 	$sql="select clock,value,triggerid from alarms where triggerid=".$_REQUEST["triggerid"]." order by clock desc $limit";
 	$result=DBselect($sql);
 
-	table_begin();
-	table_header(array(S_TIME,S_STATUS,S_DURATION,S_SUM,"%"));
+	$table = new Ctable();
+	$table->setHeader(array(S_TIME,S_STATUS,S_DURATION,S_SUM,"%"));
 	$truesum=0;
 	$falsesum=0;
 	$dissum=0;
 	$clock=mktime();
-	$col=0;
 	while($row=DBfetch($result))
 	{
 		$lclock=$clock;
@@ -161,15 +160,15 @@
 //		table_td($sum,"");
 //		table_td($proc,"");
 //		echo "</TR>";
-		table_row(array(
+		$table->addRow(array(
 			date("Y.M.d H:i:s",$row["clock"]),
 			$istrue,
 			$leng,
 			$sum,
 			$proc
-			),$col++);
+			));
 	}
-	table_end();
+	$table->show();
 ?>
 
 <?php
