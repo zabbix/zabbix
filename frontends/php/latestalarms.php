@@ -148,8 +148,8 @@
 
 	$result=DBselect($sql);
 
-	table_begin();
-	table_header(array(S_TIME, S_DESCRIPTION, S_VALUE, S_SEVERITY));
+	$table = new Ctable();
+	$table->setHeader(array(S_TIME, S_DESCRIPTION, S_VALUE, S_SEVERITY));
 	$col=0;
 	$i=0;
 	while($row=DBfetch($result))
@@ -188,17 +188,14 @@
 		elseif($row["priority"]==5)	$priority=array("value"=>S_DISASTER,"class"=>"disaster");
 		else				$priority=$row["priority"];
 
-		table_row(array(
+		$table->addRow(array(
 			date("Y.M.d H:i:s",$row["clock"]),
 			$description,
 			$value,
-			$priority),
-			$col++);
+			$priority));
 	}
-	table_end();
+	$table->show();
 ?>
-</TR>
-</TABLE>
 
 <?php
 	show_footer();
