@@ -78,10 +78,10 @@
 ?>
 
 <?php
-	table_begin();
+	$table = new Ctable();
 	if($_REQUEST["period"]=="yearly")
 	{
-		table_header(array(S_YEAR,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));
+		$table->setHeader(array(S_YEAR,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));
 		for($year=date("Y")-5;$year<=date("Y");$year++)
 		{
 			$start=mktime(0,0,0,1,1,$year);
@@ -112,18 +112,18 @@
 			{
 				$sla="-";
 			}
-			table_row(array(
+			$table->addRow(array(
 				$year,
 				$ok,
 				$problems,
 				$percentage,
 				$sla
-				),$col++);
+				));
 		}
 	}
 	else if($_REQUEST["period"]=="monthly")
 	{
-		table_header(array(S_MONTH,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));
+		$table->setHeader(array(S_MONTH,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));
 		for($month=1;$month<=12;$month++)
 		{
 			$start=mktime(0,0,0,$month,1,$_REQUEST["year"]);
@@ -157,18 +157,18 @@
 			{
 				$sla="-";
 			}
-			table_row(array(
+			$table->addRow(array(
 				date("M Y",$start),
 				$ok,
 				$problems,
 				$percentage,
 				$sla
-				),$col++);
+				));
 		}
 	}
 	else if($_REQUEST["period"]=="daily")
 	{
-		table_header(array(S_DAY,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));
+		$table->setHeader(array(S_DAY,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));
 		$s=mktime(0,0,0,1,1,$_REQUEST["year"]);
 		$e=mktime(0,0,0,1,1,$_REQUEST["year"]+1);
 		for($day=$s;$day<$e;$day+=24*3600)
@@ -204,19 +204,19 @@
 			{
 				$sla="-";
 			}
-			table_row(array(
+			$table->addRow(array(
 				date("d M Y",$start),
 				$ok,
 				$problems,
 				$percentage,
 				$sla
-				),$col++);
+				));
 		}
 	}
 	else
 	{
 	//--------Weekly-------------
-	table_header(array(S_FROM,S_TILL,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));
+	$table->setHeader(array(S_FROM,S_TILL,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));
 	$col=0;
 	$year=date("Y");
 	for($year=date("Y")-2;$year<=date("Y");$year++)
@@ -269,19 +269,19 @@
 				$sla="-";
 			}
 		
-			table_row(array(
+			$table->addRow(array(
 				$from,
 				$till,
 				$ok,
 				$problems,
 				$percentage,
 				$sla
-				),$col++);
+				));
 		}
 	}
 	//--------Weekly-------------
 	}
-	table_end();
+	$table->show();
 
 	show_footer();
 ?>

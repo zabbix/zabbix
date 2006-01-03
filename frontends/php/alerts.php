@@ -88,8 +88,8 @@
 	}
 	$result=DBselect($sql);
 
-	table_begin();
-	table_header(array(S_TIME, S_TYPE, S_STATUS, S_RECIPIENTS, S_SUBJECT, S_MESSAGE, S_ERROR));
+	$table = new Ctable(S_NO_ALERTS);
+	$table->setHeader(array(S_TIME, S_TYPE, S_STATUS, S_RECIPIENTS, S_SUBJECT, S_MESSAGE, S_ERROR));
 	$col=0;
 	$zzz=0;
 	while($row=DBfetch($result))
@@ -123,23 +123,16 @@
 		{
 			$error=array("value"=>$row["error"],"class"=>"on");
 		}
-		table_row(array(
+		$table->addRow(array(
 			$time,
 			$row["description"],
 			$status,
 			$sendto,
 			$subject,
 			$message,
-			$error),
-			$col++);
+			$error));
 	}
-	if(DBnum_rows($result)==0)
-	{
-			echo "<TR BGCOLOR=#EEEEEE>";
-			echo "<TD COLSPAN=7 ALIGN=CENTER>".S_NO_ALERTS."</TD>";
-			echo "<TR>";
-	}
-	table_end();
+	$table->show();
 ?>
 
 <?php
