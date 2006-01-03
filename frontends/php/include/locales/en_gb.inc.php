@@ -457,6 +457,9 @@
 	"S_LINK_STATUS_INDICATOR"=>		"Link status indicator",
 	"S_CONFIGURATION_OF_NETWORK_MAPS"=>	"Configuration of network maps",
 
+//	sysmaps.php
+	"S_NO_MAPS_DEFINED"=>			"No maps defined",
+
 //	map.php
 	"S_OK_BIG"=>				"OK",
 	"S_PROBLEMS_SMALL"=>			"problems",

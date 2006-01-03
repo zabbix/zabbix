@@ -106,9 +106,9 @@
 		show_table_header($row["host"]);
 
 		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.value from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.status=0 and t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]." and h.status=".HOST_STATUS_MONITORED." and i.status=0 order by h.host, t.description");
-		table_begin();
-		table_header(array(S_NAME,S_TRUE,S_FALSE,S_UNKNOWN,S_GRAPH));
-		$col=0;
+
+		$table = new Ctable();
+		$table->setHeader(array(S_NAME,S_TRUE,S_FALSE,S_UNKNOWN,S_GRAPH));
 		while($row=DBfetch($result))
 		{
 			if(!check_right_on_trigger("R",$row["triggerid"])) 
@@ -127,15 +127,15 @@
 			$unknown=array("value"=>sprintf("%.4f%%",$availability["unknown"]), "class"=>"unknown");
 			$actions="<a href=\"report2.php?hostid=".$_REQUEST["hostid"]."&triggerid=".$row["triggerid"]."\">".S_SHOW."</a>";
 
-			table_row(array(
+			$table->addRow(array(
 				$description,
 				$true,
 				$false,
 				$unknown,
 				$actions
-				),$col++);
+				));
 		}
-		table_end();
+		$table->show();
 	}
 ?>
 

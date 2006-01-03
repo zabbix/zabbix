@@ -155,8 +155,8 @@
 	show_header2($h1,$h2,"<form name=\"form2\" method=\"get\" action=\"graphs.php\">","</form>");
 ?>
 <?php
-	table_begin();
-	table_header(array(S_ID,S_NAME,S_WIDTH,S_HEIGHT,S_ACTIONS));
+	$table = new Ctable(S_NO_GRAPHS_DEFINED);
+	$table->setHeader(array(S_ID,S_NAME,S_WIDTH,S_HEIGHT,S_ACTIONS));
 
 	if(isset($_REQUEST["hostid"])&&($_REQUEST["hostid"]!=0))
 	{
@@ -166,7 +166,6 @@
 	{
 		$result=DBselect("select distinct g.graphid,g.name,g.width,g.height from graphs g order by g.name");
 	}
-	$col=0;
 	while($row=DBfetch($result))
 	{
 		if(!check_right("Graph","U",$row["graphid"]))
@@ -181,21 +180,15 @@
 			if(DBnum_rows($result2)>0)	continue;
 		}
 	
-		table_row(array(
+		$table->addRow(array(
 			$row["graphid"],
 			"<a href=\"graph.php?graphid=".$row["graphid"]."\">".$row["name"]."</a>",
 			$row["width"],
 			$row["height"],
 			"<A HREF=\"graphs.php?graphid=".$row["graphid"]."#form\">Change</A>"
-			),$col++);
+			));
 	}
-	if(DBnum_rows($result)==0)
-	{
-		echo "<TR BGCOLOR=#EEEEEE>";
-		echo "<TD COLSPAN=5 ALIGN=CENTER>".S_NO_GRAPHS_DEFINED."</TD>";
-		echo "<TR>";
-	}
-	table_end();
+	$table->show();
 ?>
 <?php
 	echo "<a name=\"form\"></a>";

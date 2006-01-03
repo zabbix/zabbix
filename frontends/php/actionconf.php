@@ -185,8 +185,8 @@
 	}
 	$result=DBselect($sql);
 
-	table_begin();
-	table_header(array(S_SOURCE,S_CONDITIONS,S_SEND_MESSAGE_TO,S_DELAY,S_SUBJECT,S_REPEATS,S_ACTIONS));
+	$table = new Ctable(S_NO_ACTIONS_DEFINED);
+	$table->setHeader(array(S_SOURCE,S_CONDITIONS,S_SEND_MESSAGE_TO,S_DELAY,S_SUBJECT,S_REPEATS,S_ACTIONS));
 	$col=0;
 	while($row=DBfetch($result))
 	{
@@ -220,7 +220,7 @@
 
 		$actions="<A HREF=\"actionconf.php?register=edit&actionid=".$row["actionid"]."#form\">".S_CHANGE."</A>";
 
-		table_row(array(
+		$table->addRow(array(
 			get_source_description($row["source"]),
 			$conditions,
 			$recipient,
@@ -228,19 +228,10 @@
 			htmlspecialchars($row["subject"]),
 			$maxrepeats,
 			$actions
-			),$col++);
+			));
 	}
-	if(DBnum_rows($result)==0)
-	{
-			echo "<TR BGCOLOR=#EEEEEE>";
-			echo "<TD COLSPAN=7 ALIGN=CENTER>".S_NO_ACTIONS_DEFINED."</TD>";
-			echo "<TR>";
-	}
-	table_end();
+	$table->show();
 ?>
-</font>
-</tr>
-</table>
 
 <?php
 	echo "<a name=\"form\"></a>";

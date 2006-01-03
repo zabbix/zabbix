@@ -32,9 +32,9 @@
 <?php
 	show_table_header(S_STATUS_OF_ZABBIX_BIG);
 
-	table_begin();
+	$table = new Ctable();
 
-	table_header(array(S_PARAMETER,S_VALUE));
+	$table->setHeader(array(S_PARAMETER,S_VALUE));
 
 	$stats=get_stats();
 
@@ -44,18 +44,18 @@
 	{
 		$str=array("value"=>S_YES,"class"=>"off");
 	}
-	table_row(array(S_ZABBIX_SERVER_IS_RUNNING,$str),$col++);
+	$table->addRow(array(S_ZABBIX_SERVER_IS_RUNNING,$str),$col++);
 
-	table_row(array(S_NUMBER_OF_VALUES_STORED,$stats["history_count"]),$col++);
-	table_row(array(S_NUMBER_OF_TRENDS_STORED,$stats["trends_count"]),$col++);
-	table_row(array(S_NUMBER_OF_ALARMS,$stats["alarms_count"]),$col++);
-	table_row(array(S_NUMBER_OF_ALERTS,$stats["alerts_count"]),$col++);
-	table_row(array(S_NUMBER_OF_TRIGGERS_ENABLED_DISABLED,$stats["triggers_count"]."(".$stats["triggers_count_enabled"]."/".$stats["triggers_count_disabled"].")"),$col++);
-	table_row(array(S_NUMBER_OF_ITEMS_ACTIVE_TRAPPER,$stats["items_count"]."(".$stats["items_count_active"]."/".$stats["items_count_trapper"]."/".$stats["items_count_not_active"]."/".$stats["items_count_not_supported"].")"),$col++);
-	table_row(array(S_NUMBER_OF_USERS,$stats["users_count"]),$col++);
-	table_row(array(S_NUMBER_OF_HOSTS_MONITORED,$stats["hosts_count"]."(".$stats["hosts_count_monitored"]."/".$stats["hosts_count_not_monitored"]."/".$stats["hosts_count_template"]."/".$stats["hosts_count_deleted"].")"),$col++);
+	$table->addRow(array(S_NUMBER_OF_VALUES_STORED,$stats["history_count"]),$col++);
+	$table->addRow(array(S_NUMBER_OF_TRENDS_STORED,$stats["trends_count"]),$col++);
+	$table->addRow(array(S_NUMBER_OF_ALARMS,$stats["alarms_count"]),$col++);
+	$table->addRow(array(S_NUMBER_OF_ALERTS,$stats["alerts_count"]),$col++);
+	$table->addRow(array(S_NUMBER_OF_TRIGGERS_ENABLED_DISABLED,$stats["triggers_count"]."(".$stats["triggers_count_enabled"]."/".$stats["triggers_count_disabled"].")"),$col++);
+	$table->addRow(array(S_NUMBER_OF_ITEMS_ACTIVE_TRAPPER,$stats["items_count"]."(".$stats["items_count_active"]."/".$stats["items_count_trapper"]."/".$stats["items_count_not_active"]."/".$stats["items_count_not_supported"].")"),$col++);
+	$table->addRow(array(S_NUMBER_OF_USERS,$stats["users_count"]),$col++);
+	$table->addRow(array(S_NUMBER_OF_HOSTS_MONITORED,$stats["hosts_count"]."(".$stats["hosts_count_monitored"]."/".$stats["hosts_count_not_monitored"]."/".$stats["hosts_count_template"]."/".$stats["hosts_count_deleted"].")"),$col++);
 
-	table_end();
+	$table->show();
 ?>
 
 <?php
