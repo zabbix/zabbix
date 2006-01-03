@@ -92,8 +92,8 @@
 	$sql="select m.mediaid,mt.description,m.sendto,m.active,m.period from media m,media_type mt where m.mediatypeid=mt.mediatypeid and m.userid=".$_REQUEST["userid"]." order by mt.type,m.sendto";
 	$result=DBselect($sql);
 
-	table_begin();
-	table_header(array(S_TYPE,S_SEND_TO,S_WHEN_ACTIVE,S_STATUS,S_ACTIONS));
+	$table = new Ctable(S_NO_MEDIA_DEFINED);
+	$table->setHeader(array(S_TYPE,S_SEND_TO,S_WHEN_ACTIVE,S_STATUS,S_ACTIONS));
 
 	$col=0;
 	while($row=DBfetch($result))
@@ -107,21 +107,15 @@
 			$status="<a href=\"media.php?register=enable&mediaid=".$row["mediaid"]."&userid=".$_REQUEST["userid"]."\"><font color=\"AA0000\">".S_DISABLED."</font></A>";
 		}
 		$actions="<A HREF=\"media.php?register=change&mediaid=".$row["mediaid"]."&userid=".$_REQUEST["userid"]."\">".S_CHANGE."</A>";
-		table_row(array(
+		$table->addRow(array(
 			$row["description"],
 			$row["sendto"],
 			$row["period"],
 			$status,
 			$actions
-			),$col++);
+			));
 	}
-	if(DBnum_rows($result)==0)
-	{
-		echo "<TR BGCOLOR=#EEEEEE>";
-		echo "<TD COLSPAN=5 ALIGN=CENTER>".S_NO_MEDIA_DEFINED."</TD>";
-		echo "<TR>";
-	}
-	table_end();
+	$table->show();
 ?>
 
 <?php
