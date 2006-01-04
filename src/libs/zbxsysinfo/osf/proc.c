@@ -290,6 +290,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
     char    line[MAX_STRING_LEN];
 
+    char    proccomm[MAX_STRING_LEN];
     char    procname[MAX_STRING_LEN];
     char    usrname[MAX_STRING_LEN];
     char    procstat[MAX_STRING_LEN];
@@ -299,7 +300,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
         init_result(result);
 	
     
-        if(num_param(param) > 3)
+        if(num_param(param) > 4)
         {
                 return SYSINFO_RET_FAIL;
         }
@@ -314,7 +315,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	}
 	else
 	{
-		snprintf(procname,MAX_STRING_LEN-1,"if($(NF)!=\"%s\")continue;",line);
+		snprintf(procname,MAX_STRING_LEN-1,"$3==\"%s\"",line);	
 	}
     
         if(get_param(param, 2, line, MAX_STRING_LEN) != 0)
@@ -327,7 +328,10 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	}
 	else
 	{
-		snprintf(usrname,MAX_STRING_LEN-1,"if($(NF-1)!=\"%s\")continue;",line);
+		if(procname[0]=='\0')
+			snprintf(usrname,MAX_STRING_LEN-1,"$2==\"%s\"",line);	
+		else
+			snprintf(usrname,MAX_STRING_LEN-1,"&&$2==\"%s\"",line);	
 	}
     
 	if(get_param(param, 3, procstat, MAX_STRING_LEN) != 0)
@@ -342,26 +346,60 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
     
         if(strcmp(procstat,"run") == 0)
         {
-            strscpy(procstat,"if(substr($1,1,1)!=\"R\")continue;");	
+		if(procname[0] == '\0' && usrname[0] == '\0')
+		{
+			strscpy(procstat,"$1==\"R\"");	
+		}
+		else
+		{
+			strscpy(procstat,"&&$1==\"R\"");
+		}
         }
         else if(strcmp(procstat,"sleep") == 0)
         {
-            strscpy(procstat,"st=substr($1,1,1);if(st!=\"U\"&&st!=\"I\"&&st!=\"S\")continue;");	
+		if(procname[0] == '\0' && usrname[0] == '\0')
+		{
+			strscpy(procstat,"($1==\"U\"||$1==\"I\"||$1==\"S\")");	
+		}
+		else
+		{
+			strscpy(procstat,"&&($1==\"U\"||$1==\"I\"||$1==\"S\")");
+		}	
         }
         else if(strcmp(procstat,"zomb") == 0)
         {
-            strscpy(procstat,"if(substr($1,1,1)!=\"T\")continue;");	
+		if(procname[0] == '\0' && usrname[0] == '\0')
+		{
+			strscpy(procstat,"$1==\"T\"");	
+		}
+		else
+		{
+			strscpy(procstat,"&&$1==\"T\"");	
+		}
         }
         else if(strcmp(procstat,"all") == 0)
         {
-            procstat[0] = '\0';
+		procstat[0] = '\0';
         }
         else
         {
-            return SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
         }
 
-	snprintf(line, MAX_STRING_LEN-1,"ps -eo state,user,ucomm | tail -n +3 | awk 'BEGIN{count=0}{%s%s%scount++;}END{printf count}'",procstat,usrname,procname);
+        if(get_param(param, 4, line, MAX_STRING_LEN) != 0)
+        {
+                line[0] = '\0';
+        }
+	if(line[0] == '\0')
+	{
+		proccomm[0] = '\0';
+	}
+	else
+	{
+		snprintf(proccomm,MAX_STRING_LEN-1,"c=$4;for(i=5;i<=NF;i++)c=c" "$i;if(match(c,\"%s\")==0)next;",line);
+	}
+    
+	snprintf(line, MAX_STRING_LEN-1,"ps -eostate,user,comm,args|tail -n+2|cut -b1,5-|awk 'BEGIN{j=0}%s%s%s{%sj++}END{print j}'",procname,usrname,procstat,proccomm);
 	
 	return EXECUTE(cmd, line, flags, result);
 		
