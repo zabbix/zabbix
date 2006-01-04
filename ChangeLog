@@ -2,6 +2,7 @@ Changes for 1.1beta6:
 
 Changes for 1.1beta5:
 
+ - improved proc.num for Tru64, added parameter 'comm' (Eugene)
  - fixed span handling for screens (Alexei)
  - dropped original spancheck patch. No more warnings. (Alexei)
  - screens and actions will not be under control of templates (Alexei)
