@@ -12,6 +12,8 @@
  - new function for item status to enable sending of notification in case if an item changes status to unknown (for example)
  - do zabbix_sender for windows
 
+ - http://www.zabbix.com/forum/showthread.php?t=1141&page=3&pp=10
+
 ZABBIX 1.1:
 
 > -Should the update linkage buttons synchronize the stuff between the host and
