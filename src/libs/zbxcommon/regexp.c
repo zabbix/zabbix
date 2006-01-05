@@ -22,7 +22,7 @@ char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
 	*len=0;
 
 
-	if (regcomp(&re, pattern, REG_EXTENDED | REG_ICASE | REG_NEWLINE) != 0)
+	if (regcomp(&re, pattern, REG_EXTENDED | /* REG_ICASE | */ REG_NEWLINE) != 0)
 	{
 		return(NULL);
 	}
