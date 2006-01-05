@@ -311,7 +311,7 @@
 
 		$col=0; 
 		show_table2_v_delimiter($col++);
-		echo "<form method=\"get\" action=\"items.php#form\">";
+		echo "<form name=\"item\" method=\"get\" action=\"items.php#form\">";
 		if(isset($_REQUEST["itemid"]))
 		{
 			echo "<input class=\"biginput\" name=\"itemid\" type=hidden value=".$_REQUEST["itemid"].">";
@@ -323,7 +323,7 @@
 		show_table2_v_delimiter($col++);
 		echo S_HOST;
 		show_table2_h_delimiter();
-		echo "<select class=\"biginput\" name=\"hostid\" value=\"3\">";
+/*		echo "<select class=\"biginput\" name=\"hostid\" value=\"3\">";
 	        $result=DBselect("select hostid,host from hosts where status not in (".HOST_STATUS_DELETED.")order by host");
 		while($row=DBfetch($result))
 	        {
@@ -338,7 +338,12 @@
 	                	echo "<option value=\"$hostid_\">$host_";
 			}
 	        }
-		echo "</select>";
+		echo "</select>";*/
+
+		echo "<input class=\"biginput\" readonly name=\"uniq\" value=\"\" size=30>";
+?>
+		<input title="Select [Alt+T]" accessKey="T" type="button" tabindex='1' class="button" value='Select' name="btn1" onclick="window.open('popup.php?form=item&field=uniq','new_win','width=450,height=450,resizable=1,scrollbars=1');">
+<?php
 
 		show_table2_v_delimiter($col++);
 		echo S_TYPE;

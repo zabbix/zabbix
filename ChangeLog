@@ -1,5 +1,6 @@
 Changes for 1.1beta6:
 
+ - new popup selections for forms (Alexei)
  - fixed rare server crash when processing log[<path>] (Alexei)
  - fix for compilation issues of SNMP support (Alexei)
  - fix of processing of item's multiplier (Alexei)
