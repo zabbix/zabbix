@@ -28,6 +28,7 @@
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();
 ?>
+<script type="text/javascript" src="popup.js">
 
 <?php
         if(!check_anyright("Host","U"))
