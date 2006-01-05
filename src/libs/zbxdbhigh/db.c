@@ -1307,6 +1307,7 @@ void	DBvacuum(void)
 #endif
 }
 
+/* Broken:
 void    DBescape_string(char *from, char *to, int maxlen)
 {
 	int	i,ptr;
@@ -1335,6 +1336,24 @@ void    DBescape_string(char *from, char *to, int maxlen)
 
 	to[ptr]=0;
 	to[maxlen-1]=0;
+}
+*/
+
+void    DBescape_string(char *from, char *to, int maxlen)
+{
+	int     i,ptr;
+
+	maxlen--;
+	for(i=0, ptr=0; from && from[i] && ptr < maxlen; i++)
+	{
+		if( (from[i] == '\'') || (from[i] == '\\'))
+		{
+			to[ptr++] = '\\';
+			if(ptr >= maxlen)       break;
+		}
+		to[ptr++] = from[i];
+	}
+	to[ptr]=0;
 }
 
 void	DBget_item_from_db(DB_ITEM *item,DB_RESULT *result, int row)

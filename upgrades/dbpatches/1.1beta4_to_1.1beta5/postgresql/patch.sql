@@ -39,3 +39,6 @@ alter table actions drop severity;
 
 alter table actions add  source			int2		DEFAULT '0' NOT NULL;
 alter table actions add  actiontype		int2		DEFAULT '0' NOT NULL;
+
+update actions set message="{TRIGGER.NAME}: {STATUS}" where message="*Automatically generated*";
+update actions set subject="{TRIGGER.NAME}: {STATUS}" where subject="*Automatically generated*";

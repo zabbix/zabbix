@@ -523,8 +523,8 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Type of received value [%s] is not sutable for [%s@%s]", value, item.key, item.host );
-		zabbix_syslog("Type of received value [%s] is not sutable for [%s@%s]", value, item.key, item.host );
+		zabbix_log( LOG_LEVEL_WARNING, "Type of received value [%s] is not suitable for [%s@%s]", value, item.key, item.host );
+		zabbix_syslog("Type of received value [%s] is not suitable for [%s@%s]", value, item.key, item.host );
 	}
  
 	DBfree_result(result);
@@ -819,9 +819,22 @@ void	process_new_value(DB_ITEM *item, AGENT_RESULT *value)
 			multiplier = strtod(item->formula,&e);
 			value->dbl = value->dbl * multiplier;
 		}
+		if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_UINT64))
+		{
+			multiplier = strtod(item->formula,&e);
+			value->dbl = (double)value->ui64 * multiplier;
+		}
 		if( (item->value_type==ITEM_VALUE_TYPE_UINT64) && (value->type & AR_UINT64))
 		{
-			value->ui64 = value->ui64 * (zbx_uint64_t)atoll(item->formula);
+			if(is_uint(item->formula))
+			{
+				value->ui64 = value->ui64 * (zbx_uint64_t)atoll(item->formula);
+			}
+			else
+			{
+				multiplier = strtod(item->formula,&e);
+				value->ui64 = (zbx_uint64_t)((double)value->ui64 * multiplier);
+			}
 		}
 	}
 
