@@ -653,7 +653,7 @@ dnl    AC_CHECK_LIB(crypto, main,  SNMP_LFLAGS="-lcrypto $SNMP_LFLAGS")
 
     SNMP_INCLUDE=-I$SNMP_INCDIR
     SNMP_LFLAGS="-L$SNMP_LIBDIR $SNMP_LFLAGS"
-    SNMP_LIBS="$SNMP_LIBS -lnetsnmp"
+    SNMP_LIBS="-lnetsnmp $SNMP_LIBS"
 
     AC_DEFINE(HAVE_NETSNMP,1,[Define to 1 if NETSNMP should be enabled.])
     AC_DEFINE(HAVE_SNMP,1,[Define to 1 if SNMP should be enabled.])
@@ -720,7 +720,7 @@ dnl    AC_CHECK_LIB(crypto, main,  SNMP_LFLAGS="-lcrypto $SNMP_LFLAGS")
 
     SNMP_INCLUDE=-I$SNMP_INCDIR
     SNMP_LFLAGS="-L$SNMP_LIBDIR $SNMP_LFLAGS"
-    SNMP_LIBS="$SNMP_LIBS -lsnmp"
+    SNMP_LIBS="-lsnmp $SNMP_LIBS"
 
     AC_DEFINE(HAVE_UCDSNMP,1,[Define to 1 if UCDSNMP should be enabled.])
     AC_DEFINE(HAVE_SNMP,1,[Define to 1 if SNMP should be enabled.])

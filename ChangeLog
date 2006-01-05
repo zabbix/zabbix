@@ -1,5 +1,9 @@
 Changes for 1.1beta6:
 
+ - fixed rare server crash when processing log[<path>] (Alexei)
+ - fix for compilation issues of SNMP support (Alexei)
+ - fix of processing of item's multiplier (Alexei)
+
 Changes for 1.1beta5:
 
  - improved proc.num for Tru64, added parameter 'comm' (Eugene)
