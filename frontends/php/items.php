@@ -28,7 +28,6 @@
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();
 ?>
-<script type="text/javascript" src="popup.js">
 
 <?php
         if(!check_anyright("Host","U"))
@@ -82,20 +81,20 @@
 				unset($_REQUEST["itemid"]);
 			}
 		}
-		if($_REQUEST["register"]=="update")
+		else if($_REQUEST["register"]=="update")
 		{
 			$result=update_item($_REQUEST["itemid"],$_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],$_REQUEST["logtimefmt"]);
 			update_item_in_templates($_REQUEST["itemid"]);
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 //			unset($itemid);
 		}
-		if($_REQUEST["register"]=="changestatus")
+		else if($_REQUEST["register"]=="changestatus")
 		{
 			$result=update_item_status($_REQUEST["itemid"],$_REQUEST["status"]);
 			show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 			unset($_REQUEST["itemid"]);
 		}
-		if($_REQUEST["register"]=="add")
+		else if($_REQUEST["register"]=="add")
 		{
 			$itemid=add_item($_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],$_REQUEST["logtimefmt"]);
 			add_item_to_linked_hosts($itemid);
@@ -103,7 +102,7 @@
 			unset($_REQUEST["itemid"]);
 			unset($itemid);
 		}
-		if($_REQUEST["register"]=="add to all hosts")
+		else if($_REQUEST["register"]=="add to all hosts")
 		{
 			$result=DBselect("select hostid,host from hosts order by host");
 			$hosts_ok="";
@@ -123,14 +122,14 @@
 			show_messages(TRUE,"Items added]<br>[Success for '$hosts_ok']<br>[Failed for '$hosts_notok'","Cannot add item");
 			unset($_REQUEST["itemid"]);
 		}
-		if($_REQUEST["register"]=="delete")
+		else if($_REQUEST["register"]=="delete")
 		{
 			delete_item_from_templates($_REQUEST["itemid"]);
 			$result=delete_item($_REQUEST["itemid"]);
 			show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
 			unset($_REQUEST["itemid"]);
 		}
-		if($_REQUEST["register"]=="Delete selected")
+		else if($_REQUEST["register"]=="Delete selected")
 		{
 			$result=DBselect("select itemid from items where hostid=".$_REQUEST["hostid"]);
 			while($row=DBfetch($result))
@@ -144,7 +143,7 @@
 			}
 			show_messages(TRUE, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
 		}
-		if($_REQUEST["register"]=="Activate selected")
+		else if($_REQUEST["register"]=="Activate selected")
 		{
 			$result=DBselect("select itemid from items where hostid=".$_REQUEST["hostid"]);
 			while($row=DBfetch($result))
@@ -174,6 +173,10 @@
 ?>
 
 <?php
+
+	if(!isset($_REQUEST["register"]))
+	{
+
 	$h1=S_CONFIGURATION_OF_ITEMS_BIG;
 
 	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
@@ -229,17 +232,19 @@
 		$h2=$h2.form_select("hostid",$row["hostid"],$row["host"]);
 	}
 	$h2=$h2."</select>";
+	$h2=$h2."&nbsp;|&nbsp;";
+	$h2=$h2."<input class=\"button\" type=\"submit\" name=\"register\" value=\"Create Item\">";
 
 	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"items.php\">", "</form>");
 ?>
 
+
 <?php
 
 	if(isset($_REQUEST["hostid"])) 
-//	if(isset($_REQUEST["hostid"])&&!isset($_REQUEST["type"])) 
 	{
 		table_begin();
-		table_header(array(S_ID,S_KEY,S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,S_ERROR,S_ACTIONS));
+		table_header(array(S_ID,S_KEY,S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,S_ERROR));
 		echo "<form method=\"get\" action=\"items.php\">";
 		echo "<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_REQUEST["hostid"]." size=8>";
 		$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.nextcheck,h.hostid,i.type,i.trends,i.error from hosts h,items i where h.hostid=i.hostid and h.hostid=".$_REQUEST["hostid"]." order by h.host,i.key_,i.description");
@@ -250,6 +255,9 @@
 			{
 				continue;
 			}
+
+			$key=iif(check_right("Item","U",$row["itemid"]),
+				"<A HREF=\"items.php?register=change&itemid=".$row["itemid"].url_param("hostid").url_param("groupid")."#form\">".$row["key_"]."</A>",$row["key_"]);
 
 			$input="<INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"".$row["itemid"]."\"> ".$row["itemid"];
 
@@ -300,10 +308,6 @@
 					$status=S_UNKNOWN;
 			}
 	
-        		$actions=iif(check_right("Item","U",$row["itemid"]),
-				"<A HREF=\"items.php?register=change&itemid=".$row["itemid"].url_param("hostid").url_param("groupid")."#form\">".S_CHANGE."</A>",
-				S_CHANGE);
-
 			if($row["error"] == "")
 			{
 				$error=array("value"=>"&nbsp;","class"=>"off");
@@ -314,39 +318,42 @@
 			}
 			table_row(array(
 				$input,
-				$row["key_"],
+				$key,
 				$row["description"],
 				$row["delay"],
 				$row["history"],
 				$row["trends"],
 				$type,
 				$status,
-				$error,
-				$actions
+				$error
 				),$col++);
 		}
 		table_end();
 
-		show_form_begin();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Activate selected\" onClick=\"return Confirm('".S_ACTIVATE_SELECTED_ITEMS_Q."');\">";
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Disable selected\" onClick=\"return Confirm('".S_DISABLE_SELECTED_ITEMS_Q."');\">";
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Delete selected\" onClick=\"return Confirm('".S_DELETE_SELECTED_ITEMS_Q."');\">";
-		show_table2_header_end();
-		echo "</form>";
+		$h="<input class=\"button\" type=\"submit\" name=\"register\" value=\"Activate selected\" onClick=\"return Confirm('".S_ACTIVATE_SELECTED_ITEMS_Q."');\">";
+		$h=$h."<input class=\"button\" type=\"submit\" name=\"register\" value=\"Disable selected\" onClick=\"return Confirm('".S_DISABLE_SELECTED_ITEMS_Q."');\">";
+		$h=$h."<input class=\"button\" type=\"submit\" name=\"register\" value=\"Delete selected\" onClick=\"return Confirm('".S_DELETE_SELECTED_ITEMS_Q."');\">";
+
+		show_table_header($h);
 	}
 	else
 	{
 //		echo "<center>Select Host</center>";
 	}
+
+	}
 ?>
 
 <?php
-	$result=DBselect("select count(*) as cnt from hosts");
-	$row=DBfetch($result);
-	if($row["cnt"]>0)
+//	if(isset($_REQUEST["register"])&&(in_array($_REQUEST["register"],array("Create Item","change"))))
 	{
-		echo "<a name=\"form\"></a>";
-		insert_item_form();
+		$result=DBselect("select count(*) as cnt from hosts");
+		$row=DBfetch($result);
+		if($row["cnt"]>0)
+		{
+			echo "<a name=\"form\"></a>";
+			insert_item_form();
+		}
 	}
 ?>
 

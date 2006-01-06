@@ -1,5 +1,6 @@
 1.1beta6:
 
+ - trigger functions for log severity, source, etc
  - execution of commands on monitored hosts in case of pre-defined events
 
  - improve housekeeper. check if it works correctly.
