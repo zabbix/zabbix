@@ -2,9 +2,10 @@
 
  - trigger functions for log severity, source, etc
  - execution of commands on monitored hosts in case of pre-defined events
+ - fix undeleted warnings for host and trigger statuses
+ - fix overview screen
 
  - improve housekeeper. check if it works correctly.
- - fix undeleted warnings for host and trigger statuses
  - make agents return error message if not supported or not available
  - centralised management of agent configuration files
  - add encryption between server and agents

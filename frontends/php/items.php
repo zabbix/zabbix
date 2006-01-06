@@ -243,10 +243,13 @@
 
 	if(isset($_REQUEST["hostid"])) 
 	{
-		table_begin();
-		table_header(array(S_ID,S_KEY,S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,S_ERROR));
-		echo "<form method=\"get\" action=\"items.php\">";
-		echo "<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_REQUEST["hostid"]." size=8>";
+		$table  = new Ctable();
+		$table->setHeader(array(S_ID,S_KEY,S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,S_ERROR));
+		$h="<form method=\"get\" action=\"items.php\">";
+		$h=$h."<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_REQUEST["hostid"]." size=8>";
+
+		$table->setAfterHeader($h);
+
 		$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.nextcheck,h.hostid,i.type,i.trends,i.error from hosts h,items i where h.hostid=i.hostid and h.hostid=".$_REQUEST["hostid"]." order by h.host,i.key_,i.description");
 		$col=0;
 		while($row=DBfetch($result))
@@ -316,7 +319,7 @@
 			{
 				$error=array("value"=>$row["error"],"class"=>"on");
 			}
-			table_row(array(
+			$table->AddRow(array(
 				$input,
 				$key,
 				$row["description"],
@@ -326,26 +329,23 @@
 				$type,
 				$status,
 				$error
-				),$col++);
+				));
 		}
-		table_end();
+		$table->show();
 
 		$h="<input class=\"button\" type=\"submit\" name=\"register\" value=\"Activate selected\" onClick=\"return Confirm('".S_ACTIVATE_SELECTED_ITEMS_Q."');\">";
 		$h=$h."<input class=\"button\" type=\"submit\" name=\"register\" value=\"Disable selected\" onClick=\"return Confirm('".S_DISABLE_SELECTED_ITEMS_Q."');\">";
 		$h=$h."<input class=\"button\" type=\"submit\" name=\"register\" value=\"Delete selected\" onClick=\"return Confirm('".S_DELETE_SELECTED_ITEMS_Q."');\">";
+		$h=$h."</form>";
 
 		show_table_header($h);
-	}
-	else
-	{
-//		echo "<center>Select Host</center>";
 	}
 
 	}
 ?>
 
 <?php
-//	if(isset($_REQUEST["register"])&&(in_array($_REQUEST["register"],array("Create Item","change"))))
+	if(isset($_REQUEST["register"])&&(in_array($_REQUEST["register"],array("Create Item","change"))))
 	{
 		$result=DBselect("select count(*) as cnt from hosts");
 		$row=DBfetch($result);
