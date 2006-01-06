@@ -473,9 +473,9 @@
 ?>
 
 <?php
-	table_begin();
-	table_header(array(S_ID,S_HOST,S_IP,S_PORT,S_STATUS,S_AVAILABILITY,S_ERROR,S_ACTIONS));
-	echo "<form method=\"get\" action=\"hosts.php\">";
+	$table = new Ctable(S_NO_HOSTS_DEFINED);
+	$table->setHeader(array(S_ID,S_HOST,S_IP,S_PORT,S_STATUS,S_AVAILABILITY,S_ERROR,S_ACTIONS));
+	$table->setAfterHeader("<form method=\"get\" action=\"hosts.php\">");
 
 	if(isset($_REQUEST["groupid"]))
 	{
@@ -487,7 +487,6 @@
 	}
 	$result=DBselect($sql);
 
-	$col=0;
 	while($row=DBfetch($result))
 	{
         	if(!check_right("Host","R",$row["hostid"]))
@@ -574,7 +573,7 @@
 		{
 			$actions=S_CHANGE;
 		}
-		table_row(array(
+		$table->addRow(array(
 			$id,
 			$host,
 			$ip,
@@ -582,16 +581,10 @@
 			$status,
 			$available,
 			$error,
-			$actions
-			),$col++);
+			$actions));
 	}
-	if(DBnum_rows($result)==0)
-	{
-			echo "<TR BGCOLOR=#EEEEEE>";
-			echo "<TD COLSPAN=8 ALIGN=CENTER>".S_NO_HOSTS_DEFINED."</TD>";
-			echo "<TR>";
-	}
-	table_end();
+	$table->show();
+
 	show_form_begin();
 	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Activate selected\" onClick=\"return Confirm('".S_ACTIVATE_SELECTED_HOSTS_Q."');\">";
 	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Disable selected\" onClick=\"return Confirm('".S_DISABLE_SELECTED_HOSTS_Q."');\">";
