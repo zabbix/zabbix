@@ -507,9 +507,9 @@
         	if(check_right("Host","U",$row["hostid"]))
 		{
 			if($row["status"] == HOST_STATUS_MONITORED)	
-				$status=array("value"=>"<a class=\"off\" href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=1\">".S_MONITORED."</a>","class"=>"off");
+				$status=array("value"=>"<a class=\"off\" href=\"hosts.php?hostid=".$row["hostid"]."&amp;register=changestatus&amp;status=1\">".S_MONITORED."</a>","class"=>"off");
 			else if($row["status"] == HOST_STATUS_NOT_MONITORED)
-				$status=array("value"=>"<a class=\"on\" href=\"hosts.php?hostid=".$row["hostid"]."&register=changestatus&status=0\">".S_NOT_MONITORED."</a>","class"=>"on");
+				$status=array("value"=>"<a class=\"on\" href=\"hosts.php?hostid=".$row["hostid"]."&amp;register=changestatus&amp;status=0\">".S_NOT_MONITORED."</a>","class"=>"on");
 //			else if($row["status"] == 2)
 //				$status=array("value"=>S_UNREACHABLE,"class"=>"unknown");
 			else if($row["status"] == HOST_STATUS_TEMPLATE)
@@ -554,7 +554,7 @@
 		{
 			if($row["status"] != HOST_STATUS_DELETED)
 			{
-					$actions="<A HREF=\"hosts.php?register=change&hostid=".$row["hostid"].url_param("groupid").url_param("config")."#form\">".S_CHANGE."</A>";
+					$actions="<A HREF=\"hosts.php?register=change&amp;hostid=".$row["hostid"].url_param("groupid").url_param("config")."#form\">".S_CHANGE."</A>";
 /*				if(isset($_REQUEST["groupid"]))
 				{
 					$actions="<A HREF=\"hosts.php?register=change&config=".$_REQUEST["config"]."&hostid=".$row["hostid"]."&groupid=".$_REQUEST["groupid"]."#form\">".S_CHANGE."</A>";

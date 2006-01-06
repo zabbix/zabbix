@@ -2370,7 +2370,7 @@ echo "</head>";
 		echo "<TR BGCOLOR=#DDDDDD>";
 		echo "<TD ALIGN=CENTER>";
 
-		echo "<script language=\"JavaScript\">";
+		echo "<script language=\"JavaScript\" type=\"text/javascript\">";
 		echo "if (navigator.appName == \"Microsoft Internet Explorer\")";
 		echo "{";
 		echo " document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&width=\"+(document.body.clientWidth-108)+\"'>\")";
@@ -2851,7 +2851,7 @@ echo "</head>";
 
 	function insert_confirm_javascript()
 	{
-		echo "<SCRIPT LANGUAGE=\"JavaScript\">";
+		echo "<script language=\"JavaScript\" type=\"text/javascript\">";
 
 		echo "function Confirm(msg)";
 		echo "{";
@@ -2864,7 +2864,7 @@ echo "</head>";
 		echo "		return false;";
 		echo "	}";
 		echo "}";
-		echo "</SCRIPT>";
+		echo "</script>";
 	}
 
 /* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
