@@ -309,6 +309,7 @@ AGENT_RESULT {
 #define AR_MESSAGE	8
 #define AR_LIST		16
 
+
 #define SET_DBL_RESULT(res, val) \
 	{ \
 	(res)->type |= AR_DOUBLE; \
@@ -331,6 +332,26 @@ AGENT_RESULT {
 	{ \
 	(res)->type |= AR_MESSAGE; \
 	(res)->msg = (char*)(val); \
+	}
+
+#define UNSET_DBL_RESULT(res) \
+	{ \
+	(res)->type &= ~AR_DOUBLE; \
+	}
+
+#define UNSET_UI64_RESULT(res) \
+	{ \
+	(res)->type &= ~AR_UINT64; \
+	}
+
+#define UNSET_STR_RESULT(res) \
+	{ \
+	(res)->type &= ~AR_STRING; \
+	}
+
+#define UNSET_MSG_RESULT(res) \
+	{ \
+	(res)->type &= ~AR_MESSAGE; \
 	}
 
 void   	init_result(AGENT_RESULT *result);
