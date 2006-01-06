@@ -340,9 +340,10 @@
 	        }
 		echo "</select>";*/
 
-		echo "<input class=\"biginput\" readonly name=\"uniq\" value=\"\" size=30>";
+		echo "<input class=\"biginput\" name=\"hostid\" type=hidden value=\"$hostid\">";
+		echo "<input class=\"biginput\" readonly name=\"host\" value=\"$host\" size=30>";
 ?>
-		<input title="Select [Alt+T]" accessKey="T" type="button" tabindex='1' class="button" value='Select' name="btn1" onclick="window.open('popup.php?form=item&field=uniq','new_win','width=450,height=450,resizable=1,scrollbars=1');">
+		<input title="Select [Alt+T]" accessKey="T" type="button" tabindex='1' class="button" value='Select' name="btn1" onclick="window.open('popup.php?form=item&field1=hostid&field2=host','new_win','width=450,height=450,resizable=1,scrollbars=1');">
 <?php
 
 		show_table2_v_delimiter($col++);
