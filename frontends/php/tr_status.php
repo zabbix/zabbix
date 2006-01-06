@@ -414,7 +414,7 @@
 //		show_table_header("<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&fullscreen=1&sort=$sort\">".S_TRIGGERS_BIG." $time</A>");
 	}
 
-	table_begin();
+	$table  = new Ctable();
 	$header=array();
   
 	echo "<TR ALIGN=CENTER BGCOLOR=\"#CCCCCC\">";
@@ -475,7 +475,7 @@
 		$header=array_merge($header,array(S_ACTIONS));
 	}
 	$header=array_merge($header,array(S_COMMENTS));
-	table_header($header);
+	$table->setHeader($header);
 	unset($header);
 
 	if(isset($_REQUEST["hostid"]))
@@ -515,6 +515,7 @@
 	{
 		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f".$groupname." where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=0 and t.description $select_cond and i.status in (0,2) and h.status=".HOST_STATUS_MONITORED." $cond $groupcond $sort");
 	}
+
 	$col=0;
 	while($row=DBfetch($result))
 	{
@@ -600,16 +601,17 @@
 			$comments="<A HREF=\"tr_comments.php?triggerid=".$row["triggerid"]."\">".S_ADD."</a>";
 		}
 
-		table_row(array(
+		$table->addRow(array(
 				$description,
 				$value,
 				$priority,
 				$lastchange,
 				$actions,
 				$comments
-				),$col++);
+				));
+		$col++;
 	}
-	table_end();
+	$table->show();
 
 	show_table_header(S_TOTAL.":$col");
 ?>

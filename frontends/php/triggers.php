@@ -220,13 +220,13 @@
 
 	if(isset($_REQUEST["hostid"])&&!isset($_REQUEST["triggerid"]))
 	{
-		table_begin();
-		table_header(array(S_ID,S_NAME,S_EXPRESSION, S_SEVERITY, S_STATUS, S_ERROR, S_ACTIONS));
-		echo "<form method=\"get\" action=\"triggers.php\">";
-		echo "<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_REQUEST["hostid"]." size=8>";
+		$table = new Ctable();
+		$table->setHeader(array(S_ID,S_NAME,S_EXPRESSION, S_SEVERITY, S_STATUS, S_ERROR, S_ACTIONS));
+		$h="<form method=\"get\" action=\"triggers.php\">";
+		$h=$h."<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_REQUEST["hostid"]." size=8>";
+		$table->setAfterHeader($h);
 
 		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.status,t.value,t.priority,t.error from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]." order by h.host,t.description");
-		$col=0;
 		while($row=DBfetch($result))
 		{
 			if(check_right_on_trigger("R",$row["triggerid"]) == 0)
@@ -294,7 +294,7 @@
 //			{
 //				$actions=$actions."<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">".S_ACTIONS."</A>";
 //			}
-			table_row(array(
+			$table->addRow(array(
 				$id,
 				$description,
 				explode_exp($row["expression"],1),
@@ -302,9 +302,10 @@
 				$status,
 				$row["error"],
 				$actions
-			),$col++);
+			));
 		}
-		table_end();
+		$table->show();
+
 		show_form_begin();
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"enable selected\" onClick=\"return Confirm('".S_ENABLE_SELECTED_TRIGGERS_Q."');\">";
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"disable selected\" onClick=\"return Confirm('Disable selected triggers?');\">";

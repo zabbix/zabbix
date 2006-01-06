@@ -21,15 +21,27 @@
 <?php
 	class	Ctable
 	{
-		var $rows;
-		var $header;
+		var $rows=array();
+		var $header=array();
 		var $msg_empty;
+		var $after_header_html;
+		var $before_footer_html;
 		
 		function Ctable($msg_empty="...")
 		{
-			$this->rows=array();
-			$this->header=array();
 			$this->msg_empty=$msg_empty;
+			$this->after_header_html="";
+			$this->before_footer_html="";
+		}
+
+		function setAfterHeader($html)
+		{
+			$this->after_header_html = $html;
+		}
+
+		function setBeforeFooter($html)
+		{
+			$this->before_footer_html = $html;
 		}
 
 		function addRow($row)
@@ -92,6 +104,7 @@
 		function show()
 		{
 			$this->showHeader();
+			echo $this->after_header_html."\n";
 			while (list($num,$row) = each($this->rows))
 			{
 				$this->showRow($row,$num);
@@ -100,6 +113,7 @@
 			{
 				echo "<tr bgcolor=#eeeeee><td colspan=".count($this->header)." align=center>".$this->msg_empty."</td></tr>\n";
 			}
+			echo $this->before_footer_html."\n";
 			$this->showFooter();
 		}
 	}

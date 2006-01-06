@@ -104,7 +104,7 @@
 
 	if(isset($_REQUEST["groupid"])&&isset($_REQUEST["type"])&&($_REQUEST["type"]==SHOW_DATA))
 	{
-		table_begin();
+		$table = new Ctable();
 		$header=array("&nbsp;");
 		$hosts=array();
 		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
@@ -114,9 +114,8 @@
 			$header=array_merge($header,array($row["host"]));
 			$hosts=array_merge($hosts,array($row["hostid"]));
 		}
-		table_header($header);
+		$table->setHeader($header);
 
-		$col=0;
 		if(isset($_REQUEST["sort"]))
 		{
 			switch ($_REQUEST["sort"])
@@ -177,13 +176,13 @@
 				$rows=array_merge($rows,array($value));
 			}
 
-			table_row($rows, $col++);
+			$table->addRow($rows);
 		}
-		table_end();
+		$table->show();
 	}
 	else if(isset($_REQUEST["groupid"])&&isset($_REQUEST["type"])&&($_REQUEST["type"]==SHOW_TRIGGERS))
 	{
-		table_begin();
+		$table  = new Ctable();
 		$header=array("&nbsp;");
 		$hosts=array();
 		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg,functions f,triggers t where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and t.triggerid=f.triggerid and f.itemid=i.itemid group by h.hostid,h.host order by h.host";
@@ -193,7 +192,7 @@
 			$header=array_merge($header,array($row["host"]));
 			$hosts=array_merge($hosts,array($row["hostid"]));
 		}
-		table_header($header);
+		$table->setHeader($header);
 
 		$col=0;
 		if(isset($_REQUEST["sort"]))
@@ -249,9 +248,9 @@
 				$rows=array_merge($rows,array($value));
 			}
 
-			table_row($rows, $col++);
+			$table->addRow($rows);
 		}
-		table_end();
+		$table->show();
 	}
 	else
 	{
