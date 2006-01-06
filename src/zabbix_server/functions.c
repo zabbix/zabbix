@@ -817,23 +817,24 @@ void	process_new_value(DB_ITEM *item, AGENT_RESULT *value)
 		if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_DOUBLE))
 		{
 			multiplier = strtod(item->formula,&e);
-			value->dbl = value->dbl * multiplier;
+			SET_DBL_RESULT(value, value->dbl * multiplier);
 		}
 		if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_UINT64))
 		{
 			multiplier = strtod(item->formula,&e);
-			value->dbl = (double)value->ui64 * multiplier;
+			UNSET_UI64_RESULT(value);
+			SET_DBL_RESULT(value, (double)value->ui64 * multiplier);
 		}
 		if( (item->value_type==ITEM_VALUE_TYPE_UINT64) && (value->type & AR_UINT64))
 		{
 			if(is_uint(item->formula))
 			{
-				value->ui64 = value->ui64 * (zbx_uint64_t)atoll(item->formula);
+				SET_UI64_RESULT(value, value->ui64 * (zbx_uint64_t)atoll(item->formula));
 			}
 			else
 			{
 				multiplier = strtod(item->formula,&e);
-				value->ui64 = (zbx_uint64_t)((double)value->ui64 * multiplier);
+				SET_UI64_RESULT(value, (zbx_uint64_t)((double)value->ui64 * multiplier));
 			}
 		}
 	}
