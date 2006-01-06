@@ -26,7 +26,6 @@
 	show_header($page["title"],0,1);
 	insert_confirm_javascript();
 ?>
-<script type="text/javascript" src="popup.js">
 
 <?php
 	if(!check_anyright("Host","R"))
@@ -46,7 +45,8 @@
 
 	$h2=S_GROUP."&nbsp;";
 	$h2=$h2."<input name=\"form\" type=\"hidden\" value=".$_REQUEST["form"].">";
-	$h2=$h2."<input name=\"field\" type=\"hidden\" value=".$_REQUEST["field"].">";
+	$h2=$h2."<input name=\"field1\" type=\"hidden\" value=".$_REQUEST["field1"].">";
+	$h2=$h2."<input name=\"field2\" type=\"hidden\" value=".$_REQUEST["field2"].">";
 	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
 	$result=DBselect("select groupid,name from groups order by name");
@@ -95,7 +95,7 @@
 		}
 //		$host ="<a href=\"#\" onclick='send_back('Accounts','9ca3e791-4bc9-7808-f70c-4374c24de0df');'>".$row["host"]."</a>";
 //		$host ="<a href=\"#\" onclick=\"zzz();\">".$row["host"]."</a>";
-		$host ="<a href=\"#\" onclick=\"window.opener.document.".$_REQUEST["form"].".".$_REQUEST["field"].".value='".$row["host"]."'; window.close();\">".$row["host"]."</a>";
+		$host ="<a href=\"#\" onclick=\"window.opener.document.".$_REQUEST["form"].".".$_REQUEST["field1"].".value='".$row["hostid"]."'; window.opener.document.".$_REQUEST["form"].".".$_REQUEST["field2"].".value='".$row["host"]."'; window.close();\">".$row["host"]."</a>";
 //		$host="<a href=\"popup.php?hostid=".$row["hostid"]."\">".$row["host"]."</a>";
 
 		if($row["useip"]==1)
