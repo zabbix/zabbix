@@ -148,94 +148,83 @@
 ?>
 
 <?php
-	$h1=S_ACTIONS;
+	if(!isset($_REQUEST["form"]))
+	{
+		$h1=S_ACTIONS;
 
 #	$h2=S_GROUP."&nbsp;";
-	$h2="";
-	$h2=$h2."<select class=\"biginput\" name=\"actiontype\" onChange=\"submit()\">";
-	$h2=$h2.form_select("actiontype",0,S_SEND_MESSAGE);
+		$h2="";
+		$h2=$h2."<select class=\"biginput\" name=\"actiontype\" onChange=\"submit()\">";
+		$h2=$h2.form_select("actiontype",0,S_SEND_MESSAGE);
 //	$h2=$h2.form_select("actiontype",1,S_REMOTE_COMMAND);
-	$h2=$h2."</select>";
+		$h2=$h2."</select>";
 
-	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"actionconf.php\">", "</form>");
+		$h2=$h2."&nbsp;|&nbsp;";
+		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"form\" value=\"".S_CREATE_ACTION."\">";
 
-?>
+		show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"actionconf.php\">", "</form>");
 
-<?php
-/*	if(isset($_REQUEST["scope"])&&($_REQUEST["scope"]==2))
-	{
-		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.recipient,a.scope from actions a order by a.scope desc";
-	}
-	elseif(isset($_REQUEST["scope"])&&($_REQUEST["scope"]==1))
-	{
-		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.recipient,a.scope from actions a where a.scope=2 or a.scope=1 order by a.recipient desc";
-	}
-	else
-	{
-		$sql="select a.actionid,a.triggerid,a.good,a.delay,a.subject,a.message,a.userid,a.recipient,a.scope from actions a where (a.triggerid=".$_REQUEST["triggerid"]." and a.scope=0) or (a.scope=2 or a.scope=1) order by a.recipient desc";
-	}*/
-//	echo $sql;
-	if(isset($_REQUEST["actiontype"])&&($_REQUEST["actiontype"]==1))
-	{
-		$sql="select * from actions where actiontype=1 order by actiontype, source";
-	}
-	else
-	{
-		$sql="select * from actions where actiontype=0 order by actiontype, source";
-	}
-	$result=DBselect($sql);
-
-	$table = new Ctable(S_NO_ACTIONS_DEFINED);
-	$table->setHeader(array(S_SOURCE,S_CONDITIONS,S_SEND_MESSAGE_TO,S_DELAY,S_SUBJECT,S_REPEATS,S_ACTIONS));
-	$col=0;
-	while($row=DBfetch($result))
-	{
-		$sql="select * from conditions where actionid=".$row["actionid"]." order by conditiontype";
-		$result2=DBselect($sql);
-		$conditions="";
-		while($condition=DBfetch($result2))
+		if(isset($_REQUEST["actiontype"])&&($_REQUEST["actiontype"]==1))
 		{
-			$conditions=$conditions.get_condition_desc($condition["conditiontype"],$condition["operator"],$condition["value"])."<br>";
-		}
-
-		if($row["recipient"] == RECIPIENT_TYPE_USER)
-		{
-			$user=get_user_by_userid($row["userid"]);
-			$recipient=$user["alias"];
+			$sql="select * from actions where actiontype=1 order by actiontype, source";
 		}
 		else
 		{
-			$groupd=get_usergroup_by_usrgrpid($row["userid"]);
-			$recipient=$groupd["name"];
+			$sql="select * from actions where actiontype=0 order by actiontype, source";
 		}
-  
-		if($row["maxrepeats"] == 0)
+		$result=DBselect($sql);
+	
+		$table = new Ctable(S_NO_ACTIONS_DEFINED);
+		$table->setHeader(array(S_SOURCE,S_CONDITIONS,S_SEND_MESSAGE_TO,S_DELAY,S_SUBJECT,S_REPEATS,S_ACTIONS));
+		$col=0;
+		while($row=DBfetch($result))
 		{
-			$maxrepeats=S_NO_REPEATS;
+			$sql="select * from conditions where actionid=".$row["actionid"]." order by conditiontype";
+			$result2=DBselect($sql);
+			$conditions="";
+			while($condition=DBfetch($result2))
+			{
+				$conditions=$conditions.get_condition_desc($condition["conditiontype"],$condition["operator"],$condition["value"])."<br>";
+			}
+	
+			if($row["recipient"] == RECIPIENT_TYPE_USER)
+			{
+				$user=get_user_by_userid($row["userid"]);
+				$recipient=$user["alias"];
+			}
+			else
+			{
+				$groupd=get_usergroup_by_usrgrpid($row["userid"]);
+				$recipient=$groupd["name"];
+			}
+	  
+			if($row["maxrepeats"] == 0)
+			{
+				$maxrepeats=S_NO_REPEATS;
+			}
+			else
+			{
+				$maxrepeats=$row["maxrepeats"];
+			}
+	
+			$actions="<A HREF=\"actionconf.php?register=edit&form=0&actionid=".$row["actionid"]."#form\">".S_CHANGE."</A>";
+	
+			$table->addRow(array(
+				get_source_description($row["source"]),
+				$conditions,
+				$recipient,
+				htmlspecialchars($row["delay"]),
+				htmlspecialchars($row["subject"]),
+				$maxrepeats,
+				$actions
+				));
 		}
-		else
-		{
-			$maxrepeats=$row["maxrepeats"];
-		}
-
-		$actions="<A HREF=\"actionconf.php?register=edit&actionid=".$row["actionid"]."#form\">".S_CHANGE."</A>";
-
-		$table->addRow(array(
-			get_source_description($row["source"]),
-			$conditions,
-			$recipient,
-			htmlspecialchars($row["delay"]),
-			htmlspecialchars($row["subject"]),
-			$maxrepeats,
-			$actions
-			));
+		$table->show();
 	}
-	$table->show();
-?>
-
-<?php
-	echo "<a name=\"form\"></a>";
-	insert_action_form();
+	else
+	{
+		insert_action_form();
+	}
 
 	show_footer();
 ?>

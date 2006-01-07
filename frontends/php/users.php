@@ -152,6 +152,16 @@
 	$h2=$h2.form_select("config",0,S_USERS);
 	$h2=$h2.form_select("config",1,S_USER_GROUPS);
 	$h2=$h2."</select>";
+	if($_REQUEST["config"] == 0)
+	{
+		$h2=$h2."&nbsp;|&nbsp;";
+		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"form\" value=\"".S_CREATE_USER."\">";
+	}
+	else if($_REQUEST["config"] == 1)
+	{
+		$h2=$h2."&nbsp;|&nbsp;";
+		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"form\" value=\"".S_CREATE_GROUP."\">";
+	}
 
 	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"users.php\">", "</form>");
 ?>
@@ -159,95 +169,110 @@
 <?php
 	if($_REQUEST["config"]==1)
 	{
-		echo "<br>";
-		show_table_header(S_USER_GROUPS_BIG);
-
-		$table = new cTable(S_NO_USER_GROUPS_DEFINED);
-		$table->setHeader(array(S_ID,S_NAME,S_MEMBERS,S_ACTIONS));
-	
-		$result=DBselect("select usrgrpid,name from usrgrp order by name");
-		$col=0;
-		while($row=DBfetch($result))
+		if(!isset($_REQUEST["form"]))
 		{
-			if(!check_right("User group","R",$row["usrgrpid"]))
+			echo "<br>";
+			show_table_header(S_USER_GROUPS_BIG);
+	
+			$table = new cTable(S_NO_USER_GROUPS_DEFINED);
+			$table->setHeader(array(S_ID,S_NAME,S_MEMBERS));
+		
+			$result=DBselect("select usrgrpid,name from usrgrp order by name");
+			$col=0;
+			while($row=DBfetch($result))
 			{
-				continue;
-			}
-			$result1=DBselect("select distinct u.alias from users u,users_groups ug where u.userid=ug.userid and ug.usrgrpid=".$row["usrgrpid"]." order by alias");
-			$users="&nbsp;";
-			$i=0;
-			while($row1=DBfetch($result1))
-			{
-				$users=$users.$row1["alias"];
-				if($i<DBnum_rows($result1)-1)
+				if(!check_right("User group","R",$row["usrgrpid"]))
 				{
-					$users=$users.", ";
+					continue;
 				}
-				$i++;
+				$name="<A HREF=\"users.php?config=".$_REQUEST["config"]."&form=0&usrgrpid=".$row["usrgrpid"]."#form\">".$row["name"]."</A>";
+				$result1=DBselect("select distinct u.alias from users u,users_groups ug where u.userid=ug.userid and ug.usrgrpid=".$row["usrgrpid"]." order by alias");
+				$users="&nbsp;";
+				$i=0;
+				while($row1=DBfetch($result1))
+				{
+					$users=$users.$row1["alias"];
+					if($i<DBnum_rows($result1)-1)
+					{
+						$users=$users.", ";
+					}
+					$i++;
+				}
+				$table->addRow(array(
+					$row["usrgrpid"],
+					$name,
+					$users
+					));
 			}
-			$actions="<A HREF=\"users.php?config=".$_REQUEST["config"]."&usrgrpid=".$row["usrgrpid"]."#form\">".S_CHANGE."</A>";
-			$table->addRow(array(
-				$row["usrgrpid"],
-				$row["name"],
-				$users,
-				$actions
-				));
+			$table->show();
 		}
-		$table->show();
+		else
+		{
+			@insert_usergroups_form($_REQUEST["usrgrpid"]);
+		}
 	}
 ?>
 
 <?php
 	if($_REQUEST["config"]==0)
 	{
-		echo "<br>";
-		show_table_header(S_USERS_BIG);
-		$table=new Ctable(S_NO_USERS_DEFINED);
-		$table->setHeader(array(S_ID,S_ALIAS,S_NAME,S_SURNAME,S_IS_ONLINE_Q,S_ACTIONS));
-	
-		$result=DBselect("select u.userid,u.alias,u.name,u.surname from users u order by u.alias");
-		$col=0;
-		while($row=DBfetch($result))
+		if(!isset($_REQUEST["form"]))
 		{
-			if(!check_right("User","R",$row["userid"]))
-			{
-				continue;
-			}
+			echo "<br>";
+			show_table_header(S_USERS_BIG);
+			$table=new Ctable(S_NO_USERS_DEFINED);
+			$table->setHeader(array(S_ID,S_ALIAS,S_NAME,S_SURNAME,S_IS_ONLINE_Q,S_ACTIONS));
 		
-			$sql="select count(*) as count from sessions where userid=".$row["userid"]." and lastaccess-600<".time();
-			$result2=DBselect($sql);
-			$row2=DBfetch($result2);
-			if($row2["count"]>0)
-				$online=array("value"=>S_YES,"class"=>"on");
-			else
-				$online=array("value"=>S_NO,"class"=>"off");
-	
-	        	if(check_right("User","U",$row["userid"]))
+			$result=DBselect("select u.userid,u.alias,u.name,u.surname from users u order by u.alias");
+			$col=0;
+			while($row=DBfetch($result))
 			{
-				if(get_media_count_by_userid($row["userid"])>0)
+				if(!check_right("User","R",$row["userid"]))
 				{
-					$actions="<A HREF=\"users.php?register=change&config=".$_REQUEST["config"]."&userid=".$row["userid"]."#form\">".S_CHANGE."</A> :: <A HREF=\"media.php?userid=".$row["userid"]."\"><b>M</b>edia</A>";
+					continue;
+				}
+
+				$alias="<A HREF=\"users.php?register=change&form=0&config=".$_REQUEST["config"]."&userid=".$row["userid"]."#form\">".$row["alias"]."</A>";
+			
+				$sql="select count(*) as count from sessions where userid=".$row["userid"]." and lastaccess-600<".time();
+				$result2=DBselect($sql);
+				$row2=DBfetch($result2);
+				if($row2["count"]>0)
+					$online=array("value"=>S_YES,"class"=>"on");
+				else
+					$online=array("value"=>S_NO,"class"=>"off");
+		
+		        	if(check_right("User","U",$row["userid"]))
+				{
+					if(get_media_count_by_userid($row["userid"])>0)
+					{
+						$actions="<A HREF=\"media.php?userid=".$row["userid"]."\"><b>M</b>edia</A>";
+					}
+					else
+					{
+						$actions="<A HREF=\"media.php?userid=".$row["userid"]."\">".S_MEDIA."</A>";
+					}
 				}
 				else
 				{
-					$actions="<A HREF=\"users.php?register=change&config=".$_REQUEST["config"]."&userid=".$row["userid"]."#form\">".S_CHANGE."</A> :: <A HREF=\"media.php?userid=".$row["userid"]."\">".S_MEDIA."</A>";
+					$actions=S_CHANGE." - ".S_MEDIA;
 				}
+		
+				$table->addRow(array(
+					$row["userid"],
+					$alias,
+					$row["name"],
+					$row["surname"],
+					$online,
+					$actions
+					));
 			}
-			else
-			{
-				$actions=S_CHANGE." - ".S_MEDIA;
-			}
-	
-			$table->addRow(array(
-				$row["userid"],
-				$row["alias"],
-				$row["name"],
-				$row["surname"],
-				$online,
-				$actions
-				));
+			$table->show();
 		}
-		$table->show();
+		else
+		{
+			@insert_user_form($_REQUEST["userid"]);
+		}
 	}
 ?>
 
@@ -295,18 +320,6 @@
 
 	insert_permissions_form($_REQUEST["userid"]);
 
-	}
-?>
-
-<?php
-	if($_REQUEST["config"]==1)
-	{
-		@insert_usergroups_form($_REQUEST["usrgrpid"]);
-	}
-
-	if($_REQUEST["config"]==0)
-	{
-		@insert_user_form($_REQUEST["userid"]);
 	}
 ?>
 

@@ -86,6 +86,7 @@
 	"S_NO_REPEATS"=>			"No repeats",
 	"S_NUMBER_OF_REPEATS"=>			"Number of repeats",
 	"S_DELAY_BETWEEN_REPEATS"=>		"Delay between repeats",
+	"S_CREATE_ACTION"=>			"Create Action",
 
 //	alarms.php
 	"S_ALARMS"=>				"Alarms",
@@ -230,6 +231,9 @@
 	"S_OTHER"=>				"Other",
 	"S_OTHER_PARAMETERS"=>			"Other parameters",
 	"S_REFRESH_UNSUPPORTED_ITEMS"=>		"Refresh unsupported items (in sec)",
+	"S_CREATE_MEDIA_TYPE"=>			"Create Media Type",
+	"S_CREATE_IMAGE"=>			"Create Image",
+	"S_CREATE_RULE"=>			"Create Rule",
 
 //	Latest values
 	"S_LATEST_VALUES"=>			"Latest values",
@@ -437,6 +441,7 @@
 	"S_USE_MULTIPLIER"=>			"Use multiplier",
 	"S_SELECT_HOST_DOT_DOT_DOT"=>		"Select host...",
 	"S_LOG_TIME_FORMAT"=>			"Log time format",
+	"S_CREATE_ITEM"=>			"Create Item",
 
 //	latestalarms.php
 	"S_LATEST_EVENTS"=>			"Latest events",
@@ -459,6 +464,8 @@
 
 //	sysmaps.php
 	"S_NO_MAPS_DEFINED"=>			"No maps defined",
+	"S_CONFIGURATION_OF_NETWORK_MAPS"=>	"CONFIGURATION OF NETWORK MAPS",
+	"S_CREATE_MAP"=>			"Create Map",
 
 //	map.php
 	"S_OK_BIG"=>				"OK",
@@ -691,6 +698,7 @@
 	"S_CANNOT_UPDATE_TRIGGER"=>		"Cannot update trigger",
 	"S_DEPENDS_ON"=>			"Depends on",
 	"S_URL"=>				"URL",
+	"S_CREATE_TRIGGER"=>			"Create Trigger",
 
 //	tr_comments.php
 	"S_TRIGGER_COMMENTS"=>			"Trigger comments",
@@ -763,6 +771,8 @@
 	"S_URL_AFTER_LOGIN"=>			"URL (after login)",
 	"S_AUTO_LOGOUT_IN_SEC"=>		"Auto-logout (in sec=>0 - disable)",
 	"S_SCREEN_REFRESH"=>                    "Refresh (in seconds)",
+	"S_CREATE_USER"=>			"Create User",
+	"S_CREATE_GROUP"=>			"Create Group",
 
 //	audit.php
 	"S_AUDIT_LOG"=>				"Audit log",
