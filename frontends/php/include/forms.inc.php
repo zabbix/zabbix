@@ -1970,4 +1970,58 @@ function	insert_image_form()
 
 		show_table2_header_end();
 	}
+
+	function insert_screen_form()
+	{
+		global $_REQUEST;
+
+		if(isset($_REQUEST["screenid"]))
+		{
+			$result=DBselect("select screenid,name,cols,rows from screens g where screenid=".$_REQUEST["screenid"]);
+			$row=DBfetch($result);
+			$name=$row["name"];
+			$cols=$row["cols"];
+			$rows=$row["rows"];
+		}
+		else
+		{
+			$name="";
+			$cols=1;
+			$rows=1;
+		}
+
+		show_form_begin("screenconf.screen");
+		echo S_SCREEN;
+		$col=0;
+
+		show_table2_v_delimiter($col++);
+		echo "<form method=\"get\" action=\"screenconf.php\">";
+		if(isset($_REQUEST["screenid"]))
+		{
+			echo "<input class=\"biginput\" name=\"screenid\" type=\"hidden\" value=".$_REQUEST["screenid"].">";
+		}
+		echo S_NAME;
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=32>";
+
+		show_table2_v_delimiter($col++);
+		echo S_COLUMNS;
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"cols\" size=5 value=\"$cols\">";
+
+		show_table2_v_delimiter($col++);
+		echo S_ROWS;
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"rows\" size=5 value=\"$rows\">";
+	
+		show_table2_v_delimiter2();
+		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
+		if(isset($_REQUEST["screenid"]))
+		{
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('".S_DELETE_SCREEN_Q."');\">";
+		}
+	
+		show_table2_header_end();
+	}
 ?>
