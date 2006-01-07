@@ -608,6 +608,7 @@
 	"S_WIDTH"=>				"Width",
 	"S_HEIGHT"=>				"Height",
 	"S_EMPTY"=>				"Empty",
+	"S_CREATE_SCREEN"=>			"Create Screen",
 
 //	screenedit.php
 	"S_MAP"=>				"Map",
