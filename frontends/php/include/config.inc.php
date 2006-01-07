@@ -1833,18 +1833,42 @@ echo "</head>";
 
 	function	update_mediatype($mediatypeid,$type,$description,$smtp_server,$smtp_helo,$smtp_email,$exec_path)
 	{
+		$ret = 0;
+
 		$description=addslashes($description);
-		$sql="update media_type set type=$type,description='$description',smtp_server='$smtp_server',smtp_helo='$smtp_helo',smtp_email='$smtp_email',exec_path='$exec_path' where mediatypeid=$mediatypeid";
-		return	DBexecute($sql);
+		$sql="select * from media_type where description='$description' and mediatypeid!=$mediatypeid";
+		$result=DBexecute($sql);
+		if(DBnum_rows($result)>0)
+		{
+			error("An action type with description '$description' already exists.");
+		}
+		else
+		{
+			$sql="update media_type set type=$type,description='$description',smtp_server='$smtp_server',smtp_helo='$smtp_helo',smtp_email='$smtp_email',exec_path='$exec_path' where mediatypeid=$mediatypeid";
+			$ret =	DBexecute($sql);
+		}
+		return $ret;
 	}
 
 	# Add Media type
 
 	function	add_mediatype($type,$description,$smtp_server,$smtp_helo,$smtp_email,$exec_path)
 	{
+		$ret = 0;
+
 		$description=addslashes($description);
-		$sql="insert into media_type (type,description,smtp_server,smtp_helo,smtp_email,exec_path) values ($type,'$description','$smtp_server','$smtp_helo','$smtp_email','$exec_path')";
-		return	DBexecute($sql);
+		$sql="select * from media_type where description='$description'";
+		$result=DBexecute($sql);
+		if(DBnum_rows($result)>0)
+		{
+			error("An action type with description '$description' already exists.");
+		}
+		else
+		{
+			$sql="insert into media_type (type,description,smtp_server,smtp_helo,smtp_email,exec_path) values ($type,'$description','$smtp_server','$smtp_helo','$smtp_email','$exec_path')";
+			$ret = DBexecute($sql);
+		}
+		return $ret;
 	}
 
 	# Add Media definition

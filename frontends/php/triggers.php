@@ -213,15 +213,18 @@
 	}
 	$h2=$h2."</select>";
 
+	$h2=$h2."&nbsp;|&nbsp;";
+	$h2=$h2."<input class=\"button\" type=\"submit\" name=\"form\" value=\"".S_CREATE_TRIGGER."\">";
+
 	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"triggers.php\">", "</form>");
 ?>
 
 <?php
 
-	if(isset($_REQUEST["hostid"])&&!isset($_REQUEST["triggerid"]))
+	if(!isset($_REQUEST["form"]))
 	{
 		$table = new Ctable();
-		$table->setHeader(array(S_ID,S_NAME,S_EXPRESSION, S_SEVERITY, S_STATUS, S_ERROR, S_ACTIONS));
+		$table->setHeader(array(S_ID,S_NAME,S_EXPRESSION, S_SEVERITY, S_STATUS, S_ERROR));
 		$h="<form method=\"get\" action=\"triggers.php\">";
 		$h=$h."<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_REQUEST["hostid"]." size=8>";
 		$table->setAfterHeader($h);
@@ -235,6 +238,15 @@
 			}
 	
 			$description=expand_trigger_description($row["triggerid"]);
+			if(isset($_REQUEST["hostid"]))
+			{
+				$description="<A HREF=\"triggers.php?form=0&triggerid=".$row["triggerid"]."&hostid=".$row["hostid"]."\">$description</A>";
+			}
+			else
+			{
+				$description="<A HREF=\"triggers.php?form=0&triggerid=".$row["triggerid"]."\">$description</A>";
+			}
+
 			$id="<INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"".$row["triggerid"]."\"> ".$row["triggerid"];
 			$sql="select t.triggerid,t.description from triggers t,trigger_depends d where t.triggerid=d.triggerid_up and d.triggerid_down=".$row["triggerid"];
 			$result1=DBselect($sql);
@@ -277,14 +289,6 @@
 				$row["error"]="&nbsp;";
 			}
 
-			if(isset($_REQUEST["hostid"]))
-			{
-				$actions="<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."&hostid=".$row["hostid"]."#form\">".S_CHANGE."</A>";
-			}
-			else
-			{
-				$actions="<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."#form\">".S_CHANGE."</A>";
-			}
 //			$actions=$actions." :: ";
 //			if(get_action_count_by_triggerid($row["triggerid"])>0)
 //			{
@@ -300,29 +304,27 @@
 				explode_exp($row["expression"],1),
 				$priority,
 				$status,
-				$row["error"],
-				$actions
+				$row["error"]
 			));
 		}
 		$table->show();
 
-		show_form_begin();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"enable selected\" onClick=\"return Confirm('".S_ENABLE_SELECTED_TRIGGERS_Q."');\">";
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"disable selected\" onClick=\"return Confirm('Disable selected triggers?');\">";
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete selected\" onClick=\"return Confirm('".S_DISABLE_SELECTED_TRIGGERS_Q."');\">";
-		show_table2_header_end();
-		echo "</form>";
+		$h="<input class=\"button\" type=\"submit\" name=\"register\" value=\"enable selected\" onClick=\"return Confirm('".S_ENABLE_SELECTED_TRIGGERS_Q."');\">";
+		$h=$h."<input class=\"button\" type=\"submit\" name=\"register\" value=\"disable selected\" onClick=\"return Confirm('Disable selected triggers?');\">";
+		$h=$h."<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete selected\" onClick=\"return Confirm('".S_DISABLE_SELECTED_TRIGGERS_Q."');\">";
+		$h=$h."</form>";
+		show_table_header($h);
 	}
-?>
-
-<?php
-	$result=DBselect("select count(*) as cnt from hosts");
-	$row=DBfetch($result);
-	if($row["cnt"]>0)
+	else
 	{
-		echo "<a name=\"form\"></a>";
-		@insert_trigger_form($_REQUEST["hostid"],$_REQUEST["triggerid"]);
-	} 
+		$result=DBselect("select count(*) as cnt from hosts");
+		$row=DBfetch($result);
+		if($row["cnt"]>0)
+		{
+			echo "<a name=\"form\"></a>";
+			@insert_trigger_form($_REQUEST["hostid"],$_REQUEST["triggerid"]);
+		} 
+	}
 ?>
 
 <?php

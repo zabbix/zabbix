@@ -227,6 +227,21 @@
 	$h2=$h2.form_select("config",4,S_AUTOREGISTRATION);
 	$h2=$h2.form_select("config",5,S_OTHER);
 	$h2=$h2."</select>";
+	if($_REQUEST["config"] == 1)
+	{
+		$h2=$h2."&nbsp;|&nbsp;";
+		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"form\" value=\"".S_CREATE_MEDIA_TYPE."\">";
+	}
+	else if($_REQUEST["config"] == 3)
+	{
+		$h2=$h2."&nbsp;|&nbsp;";
+		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"form\" value=\"".S_CREATE_IMAGE."\">";
+	}
+	else if($_REQUEST["config"] == 4)
+	{
+		$h2=$h2."&nbsp;|&nbsp;";
+		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"form\" value=\"".S_CREATE_RULE."\">";
+	}
 
 	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"config.php\">", "</form>");
 
@@ -289,234 +304,88 @@
 <?php
 	if($_REQUEST["config"]==3)
 	{
-		echo "<br>";
-		show_table_header(S_IMAGES_BIG);
-
-		$table=new Ctable(S_NO_IMAGES_DEFINED);
-		$table->setHeader(array(S_ID,S_TYPE,S_NAME,S_ACTIONS));
-
-		$result=DBselect("select imageid,imagetype,name,image from images order by name");
-		while($row=DBfetch($result))
+		if(!isset($_REQUEST["form"]))
 		{
-			if($row["imagetype"]==1)
-			{
-				$imagetype=S_ICON;
-			}
-			else if($row["imagetype"]==2)
-			{
-				$imagetype=S_BACKGROUND;
-			}
-			else
-			{
-				$imagetype=S_UNKNOWN;
-			}
-			$actions="<a href=\"image.php?imageid=".$row["imageid"]."\">".S_SHOW."</a>";
-			$actions=$actions." :: <a href=\"config.php?config=3&register=change&imageid=".$row["imageid"]."\">".S_CHANGE."</a>";
-			$table->addRow(array(
-				$row["imageid"],
-				$imagetype,
-				$row["name"],
-//				"<img src=\"image.php?imageid=".$row["imageid"]."\">",
-				$actions));
-		}
-		$table->show();
+			echo "<br>";
+			show_table_header(S_IMAGES_BIG);
 
-		if(!isset($_REQUEST["imageid"]))
-		{
-			$name="";
-			$imagetype=1;
+			$table=new Ctable(S_NO_IMAGES_DEFINED);
+			$table->setHeader(array(S_ID,S_TYPE,S_NAME,S_ACTIONS));
+	
+			$result=DBselect("select imageid,imagetype,name,image from images order by name");
+			while($row=DBfetch($result))
+			{
+				if($row["imagetype"]==1)
+				{
+					$imagetype=S_ICON;
+				}
+				else if($row["imagetype"]==2)
+				{
+					$imagetype=S_BACKGROUND;
+				}
+				else
+				{
+					$imagetype=S_UNKNOWN;
+				}
+				$name="<a href=\"config.php?config=3&form=0&register=change&imageid=".$row["imageid"]."\">".$row["name"]."</a>";
+				$actions="<a href=\"image.php?imageid=".$row["imageid"]."\">".S_SHOW."</a>";
+				$table->addRow(array(
+					$row["imageid"],
+					$imagetype,
+					$name,
+	//				"<img src=\"image.php?imageid=".$row["imageid"]."\">",
+					$actions));
+			}
+			$table->show();
 		}
 		else
 		{
-			$result=DBselect("select imageid,imagetype,name,image from images where imageid=".$_REQUEST["imageid"]);
-			$row=DBfetch($result);
-			$name=$row["name"];
-			$imagetype=$row["imagetype"];
-			$imageid=$row["imageid"];
+			insert_image_form();
 		}
-
-		$col=0;
-		show_form_begin("config.images");
-		echo S_IMAGE;
-
-		show_table2_v_delimiter($col++);
-#		echo "<form method=\"get\" action=\"config.php\">";
-		echo "<form enctype=\"multipart/form-data\" method=\"post\" action=\"config.php\">";
-		echo "<input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"".(1024*1024)."\">";
-		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"3\" size=8>";
-		if(isset($imageid))
-		{
-			echo "<input class=\"biginput\" name=\"imageid\" type=\"hidden\" value=\"$imageid\" size=8>";
-		}
-		echo nbsp(S_NAME);
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"name\" value=\"".$name."\" size=64>";
-
-		show_table2_v_delimiter($col++);
-		echo S_TYPE;
-		show_table2_h_delimiter();
-		echo "<select class=\"biginput\" name=\"imagetype\" size=\"1\">";
-		if($imagetype==1)
-		{
-			echo "<option value=\"1\" selected>".S_ICON;
-			echo "<option value=\"2\">".S_BACKGROUND;
-		}
-		else
-		{
-			echo "<option value=\"1\">".S_ICON;
-			echo "<option value=\"2\" selected>".S_BACKGROUND;
-		}
-		echo "</select>";
-
-		show_table2_v_delimiter($col++);
-		echo S_UPLOAD;
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"image\" type=\"file\">";
-
-		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add image\">";
-		if(isset($_REQUEST["imageid"]))
-		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update image\" onClick=\"return Confirm('".S_UPDATE_SELECTED_IMAGE."');\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete image\" onClick=\"return Confirm('".S_DELETE_SELECTED_IMAGE."');\">";
-		}
-
-		show_table2_header_end();
 	}
 ?>
 
 <?php
 	if($_REQUEST["config"]==1)
 	{
-		echo "<br>";
-		show_table_header(S_MEDIA_TYPES_BIG);
-
-		$table=new CTable(S_NO_MEDIA_TYPES_DEFINED);
-		$table->setHeader(array(S_ID,S_TYPE,S_DESCRIPTION_SMALL,S_ACTIONS));
-
-		$result=DBselect("select mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path from media_type mt order by mt.type");
-		while($row=DBfetch($result))
+		if(!isset($_REQUEST["form"]))
 		{
-			if($row["type"]==0)
+			echo "<br>";
+			show_table_header(S_MEDIA_TYPES_BIG);
+
+			$table=new CTable(S_NO_MEDIA_TYPES_DEFINED);
+			$table->setHeader(array(S_ID,S_DESCRIPTION,S_TYPE));
+
+			$result=DBselect("select mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path from media_type mt order by mt.type");
+			while($row=DBfetch($result))
 			{
-				$type=S_EMAIL;
+				$description="<a href=\"config.php?config=1&form=0&register=change&mediatypeid=".$row["mediatypeid"]."\">".$row["description"]."</a>";
+				if($row["type"]==0)
+				{
+					$type=S_EMAIL;
+				}
+				else if($row["type"]==1)
+				{
+					$type=S_SCRIPT;
+				}
+				else
+				{
+					$type=S_UNKNOWN;
+				}
+				$table->addRow(array(
+					$row["mediatypeid"],
+					$description,
+					$type));
 			}
-			else if($row["type"]==1)
-			{
-				$type=S_SCRIPT;
-			}
-			else
-			{
-				$type=S_UNKNOWN;
-			}
-			$actions="<a href=\"config.php?config=1&register=change&mediatypeid=".$row["mediatypeid"]."\">".S_CHANGE."</a>";
-			$table->addRow(array(
-				$row["mediatypeid"],
-				$type,
-				$row["description"],
-				$actions));
+			$table->show();
 		}
-		$table->show();
 ?>
 
 <?php
-		$type=@iif(isset($_REQUEST["type"]),$_REQUEST["type"],0);
-		$description=@iif(isset($_REQUEST["description"]),$_REQUEST["description"],"");
-		$smtp_server=@iif(isset($_REQUEST["smtp_server"]),$_REQUEST["smtp_server"],"localhost");
-		$smtp_helo=@iif(isset($_REQUEST["smtp_helo"]),$_REQUEST["smtp_helo"],"localhost");
-		$smtp_email=@iif(isset($_REQUEST["smtp_email"]),$_REQUEST["smtp_email"],"zabbix@localhost");
-		$exec_path=@iif(isset($_REQUEST["exec_path"]),$_REQUEST["exec_path"],"");
-
-		if(isset($_REQUEST["register"]) && ($_REQUEST["register"] == "change"))
+		if(isset($_REQUEST["form"]))
 		{
-			$result=DBselect("select mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path from media_type where mediatypeid=".$_REQUEST["mediatypeid"]);
-			$row=DBfetch($result);
-			$mediatypeid=$row["mediatypeid"];
-			$type=@iif(isset($_REQUEST["type"]),$_REQUEST["type"],$row["type"]);
-			$description=$row["description"];
-			$smtp_server=$row["smtp_server"];
-			$smtp_helo=$row["smtp_helo"];
-			$smtp_email=$row["smtp_email"];
-			$exec_path=$row["exec_path"];
+			insert_media_type_form();
 		}
-
-?>
-
-<?php
-		show_form_begin("config.medias");
-		echo S_MEDIA;
-
-		$col=0;
-
-		show_table2_v_delimiter($col++);
-		echo "<form name=\"selForm\" method=\"get\" action=\"config.php\">";
-		if(isset($_REQUEST["mediatypeid"]))
-		{
-			echo "<input class=\"biginput\" name=\"mediatypeid\" type=\"hidden\" value=\"".$_REQUEST["mediatypeid"]."\" size=8>";
-		}
-		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"1\" size=8>";
-
-		echo S_DESCRIPTION;
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"description\" value=\"".$description."\" size=30>";
-
-		show_table2_v_delimiter($col++);
-		echo S_TYPE;
-		show_table2_h_delimiter();
-		echo "<select class=\"biginput\" name=\"type\" size=\"1\" onChange=\"submit()\">";
-		if($type==0)
-		{
-			echo "<option value=\"0\" selected>".S_EMAIL;
-			echo "<option value=\"1\">".S_SCRIPT;
-		}
-		else
-		{
-			echo "<option value=\"0\">".S_EMAIL;
-			echo "<option value=\"1\" selected>".S_SCRIPT;
-		}
-		echo "</select>";
-
-		if($type==0)
-		{
-			echo "<input class=\"biginput\" name=\"exec_path\" type=\"hidden\" value=\"$exec_path\">";
-
-			show_table2_v_delimiter($col++);
-			echo nbsp(S_SMTP_SERVER);
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"smtp_server\" value=\"".$smtp_server."\" size=30>";
-
-			show_table2_v_delimiter($col++);
-			echo nbsp(S_SMTP_HELO);
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"smtp_helo\" value=\"".$smtp_helo."\" size=30>";
-
-			show_table2_v_delimiter($col++);
-			echo nbsp(S_SMTP_EMAIL);
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"smtp_email\" value=\"".$smtp_email."\" size=30>";
-		}
-		if($type==1)
-		{
-			echo "<input class=\"biginput\" name=\"smtp_server\" type=\"hidden\" value=\"$smtp_server\">";
-			echo "<input class=\"biginput\" name=\"smtp_helo\" type=\"hidden\" value=\"$smtp_helo\">";
-			echo "<input class=\"biginput\" name=\"smtp_email\" type=\"hidden\" value=\"$smtp_email\">";
-
-			show_table2_v_delimiter($col++);
-			echo S_SCRIPT_NAME;
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"exec_path\" value=\"".$exec_path."\" size=50>";
-		}
-
-		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
-
-		if(isset($_REQUEST["mediatypeid"]))
-		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update media\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('".S_DELETE_SELECTED_MEDIA."');\">";
-		}
-
-		show_table2_header_end();
 	}
 ?>
 
@@ -591,36 +460,40 @@
 <?php
 	if($_REQUEST["config"]==4)
 	{
-		echo "<br>";
-		show_table_header(S_AUTOREGISTRATION_RULES_BIG);
-
-		$table=new Ctable(S_NO_AUTOREGISTRATION_RULES_DEFINED);
-		$table->setHeader(array(S_ID,S_PRIORITY,S_PATTERN,S_HOST,S_ACTIONS));
-
-		$result=DBselect("select * from autoreg order by priority");
-		$col=0;
-		while($row=DBfetch($result))
+		if(!isset($_REQUEST["form"]))
 		{
-			if($row["hostid"]==0)
-			{
-				$name="&nbsp;";
-			}
-			else
-			{
-				$host=get_host_by_hostid($row["hostid"]);
-				$name=$host["host"];
-			}
-			$actions="<a href=\"config.php?config=4&register=change&id=".$row["id"]."\">".S_CHANGE."</a>";
-			$table->addRow(array(
-				$row["id"],
-				$row["priority"],
-				$row["pattern"],
-				$name,
-				$actions));
-		}
-		$table->show();
+			echo "<br>";
+			show_table_header(S_AUTOREGISTRATION_RULES_BIG);
 
-		@insert_autoregistration_form($_REQUEST["id"]);
+			$table=new Ctable(S_NO_AUTOREGISTRATION_RULES_DEFINED);
+			$table->setHeader(array(S_ID,S_PRIORITY,S_PATTERN,S_HOST));
+
+			$result=DBselect("select * from autoreg order by priority");
+			$col=0;
+			while($row=DBfetch($result))
+			{
+				if($row["hostid"]==0)
+				{
+					$name="&nbsp;";
+				}
+				else
+				{
+					$host=get_host_by_hostid($row["hostid"]);
+					$name=$host["host"];
+				}
+				$pattern="<a href=\"config.php?config=4&form=0&register=change&id=".$row["id"]."\">".$row["pattern"]."</a>";
+				$table->addRow(array(
+					$row["id"],
+					$row["priority"],
+					$pattern,
+					$name));
+			}
+			$table->show();
+		}
+		else
+		{
+			@insert_autoregistration_form($_REQUEST["id"]);
+		}
 	}
 ?>
 

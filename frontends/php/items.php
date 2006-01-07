@@ -233,7 +233,7 @@
 	}
 	$h2=$h2."</select>";
 	$h2=$h2."&nbsp;|&nbsp;";
-	$h2=$h2."<input class=\"button\" type=\"submit\" name=\"register\" value=\"Create Item\">";
+	$h2=$h2."<input class=\"button\" type=\"submit\" name=\"register\" value=\"".S_CREATE_ITEM."\">";
 
 	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"items.php\">", "</form>");
 ?>
@@ -345,13 +345,12 @@
 ?>
 
 <?php
-	if(isset($_REQUEST["register"])&&(in_array($_REQUEST["register"],array("Create Item","change"))))
+	if(isset($_REQUEST["register"])&&(in_array($_REQUEST["register"],array(S_CREATE_ITEM,"change"))))
 	{
 		$result=DBselect("select count(*) as cnt from hosts");
 		$row=DBfetch($result);
 		if($row["cnt"]>0)
 		{
-			echo "<a name=\"form\"></a>";
 			insert_item_form();
 		}
 	}

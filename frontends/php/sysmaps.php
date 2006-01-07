@@ -59,37 +59,38 @@
 ?>
 
 <?php
-	show_table_header("CONFIGURATION OF NETWORK MAPS");
-	echo "<br>";
+	$h1=S_CONFIGURATION_OF_NETWORK_MAPS;
+	$h2="<input class=\"button\" type=\"submit\" name=\"form\" value=\"".S_CREATE_MAP."\">";
+	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"sysmaps.php\">", "</form>");
 ?>
 
 <?php
-	show_table_header("NETWORK MAPS");
-	$table = new Ctable(S_NO_MAPS_DEFINED);
-	$table->setHeader(array(S_ID,S_NAME,S_WIDTH,S_HEIGHT,S_ACTIONS));
-
-	$result=DBselect("select s.sysmapid,s.name,s.width,s.height from sysmaps s order by s.name");
-	$col=0;
-	while($row=DBfetch($result))
+	if(!isset($_REQUEST["form"]))
 	{
-	        if(!check_right("Network map","U",$row["sysmapid"]))
-	        {
-	                continue;
-	        }
+		$table = new Ctable(S_NO_MAPS_DEFINED);
+		$table->setHeader(array(S_ID,S_NAME,S_WIDTH,S_HEIGHT,S_ACTIONS));
 
-		$table->addRow(array(
-			$row["sysmapid"],
-			"<a href=\"sysmap.php?sysmapid=".$row["sysmapid"]."\">".$row["name"]."</a>",
-			$row["width"],
-			$row["height"],
-			"<A HREF=\"sysmaps.php?sysmapid=".$row["sysmapid"]."#form\">Change</A>"
-			));
+		$result=DBselect("select s.sysmapid,s.name,s.width,s.height from sysmaps s order by s.name");
+		$col=0;
+		while($row=DBfetch($result))
+		{
+		        if(!check_right("Network map","U",$row["sysmapid"]))
+		        {
+		                continue;
+		        }
+	
+			$table->addRow(array(
+				$row["sysmapid"],
+				"<a href=\"sysmap.php?sysmapid=".$row["sysmapid"]."\">".$row["name"]."</a>",
+				$row["width"],
+				$row["height"],
+				"<A HREF=\"sysmaps.php?sysmapid=".$row["sysmapid"]."#form\">Change</A>"
+				));
+		}
+		$table->show();
 	}
-	$table->show();
-?>
-
-<?php
-	echo "<a name=\"form\"></a>";
+	else
+	{
 
 	if(isset($_REQUEST["sysmapid"]))
 	{
@@ -209,6 +210,7 @@
 		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete system map?');\">";
 	}
 
+	}
 	show_table2_header_end();
 ?>
 
