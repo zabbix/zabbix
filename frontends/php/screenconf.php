@@ -20,15 +20,12 @@
 ?>
 <?php
 	include "include/config.inc.php";
+	include "include/forms.inc.php";
+
 	$page["title"] = "S_SCREENS";
 	$page["file"] = "screenconf.php";
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();
-?>
-
-<?php
-	show_table_header(S_CONFIGURATION_OF_SCREENS_BIG);
-	echo "<br>";
 ?>
 
 <?php
@@ -40,6 +37,7 @@
 	}
 	update_profile("web.menu.config.last",$page["file"]);
 ?>
+
 
 <?php
 	if(isset($_REQUEST["register"]))
@@ -64,79 +62,38 @@
 ?>
 
 <?php
-	show_table_header("SCREENS");
-	$table = new Ctable(S_NO_SCREENS_DEFINED);
-	$table->setHeader(array(S_ID,S_NAME,S_COLUMNS,S_ROWS,S_ACTIONS));
-
-	$result=DBselect("select screenid,name,cols,rows from screens order by name");
-	while($row=DBfetch($result))
+	if(!isset($_REQUEST["form"]))
 	{
-		if(!check_right("Screen","R",$row["screenid"]))
+		$h1=S_CONFIGURATION_OF_SCREENS_BIG;
+
+		$h2="<input class=\"button\" type=\"submit\" name=\"form\" value=\"".S_CREATE_SCREEN."\">";
+
+		show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"screenconf.php\">", "</form>");
+
+		$table = new Ctable(S_NO_SCREENS_DEFINED);
+		$table->setHeader(array(S_ID,S_NAME,S_COLUMNS,S_ROWS,S_ACTIONS));
+
+		$result=DBselect("select screenid,name,cols,rows from screens order by name");
+		while($row=DBfetch($result))
 		{
-			continue;
+			if(!check_right("Screen","R",$row["screenid"]))
+			{
+				continue;
+			}
+			$table->addRow(array(
+				$row["screenid"],
+				"<a href=\"screenedit.php?screenid=".$row["screenid"]."\">".$row["name"]."</a>",
+				$row["cols"],
+				$row["rows"],
+				"<A HREF=\"screenconf.php?screenid=".$row["screenid"]."&form=0\">".S_CHANGE."</A>"
+				));
 		}
-		$table->addRow(array(
-			$row["screenid"],
-			"<a href=\"screenedit.php?screenid=".$row["screenid"]."\">".$row["name"]."</a>",
-			$row["cols"],
-			$row["rows"],
-			"<A HREF=\"screenconf.php?screenid=".$row["screenid"]."#form\">".S_CHANGE."</A>"
-			));
-	}
-	$table->show();
-?>
-
-<?php
-	echo "<a name=\"form\"></a>";
-
-	if(isset($_REQUEST["screenid"]))
-	{
-		$result=DBselect("select screenid,name,cols,rows from screens g where screenid=".$_REQUEST["screenid"]);
-		$row=DBfetch($result);
-		$name=$row["name"];
-		$cols=$row["cols"];
-		$rows=$row["rows"];
+		$table->show();
 	}
 	else
 	{
-		$name="";
-		$cols=1;
-		$rows=1;
+		insert_screen_form();
 	}
-
-	show_form_begin("screenconf.screen");
-	echo S_SCREEN;
-	$col=0;
-
-	show_table2_v_delimiter($col++);
-	echo "<form method=\"get\" action=\"screenconf.php\">";
-	if(isset($_REQUEST["screenid"]))
-	{
-		echo "<input class=\"biginput\" name=\"screenid\" type=\"hidden\" value=".$_REQUEST["screenid"].">";
-	}
-	echo S_NAME;
-	show_table2_h_delimiter();
-	echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=32>";
-
-	show_table2_v_delimiter($col++);
-	echo S_COLUMNS;
-	show_table2_h_delimiter();
-	echo "<input class=\"biginput\" name=\"cols\" size=5 value=\"$cols\">";
-
-	show_table2_v_delimiter($col++);
-	echo S_ROWS;
-	show_table2_h_delimiter();
-	echo "<input class=\"biginput\" name=\"rows\" size=5 value=\"$rows\">";
-
-	show_table2_v_delimiter2();
-	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
-	if(isset($_REQUEST["screenid"]))
-	{
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('".S_DELETE_SCREEN_Q."');\">";
-	}
-
-	show_table2_header_end();
 ?>
 
 <?php
