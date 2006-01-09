@@ -504,6 +504,7 @@
 	"S_NEW_MEDIA"=>				"New media",
 	"S_USE_IF_SEVERITY"=>			"Use if severity",
 	"S_DELETE_SELECTED_MEDIA_Q"=>		"Delete selected media?",
+	"S_CREATE_MEDIA"=>			"Create Media",
 
 //	Menu
 	"S_MENU_LATEST_VALUES"=>		"LATEST VALUES",
