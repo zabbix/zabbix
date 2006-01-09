@@ -6,6 +6,7 @@
  - fix undeleted warnings for host and trigger statuses
  - fix overview screen
 
+ - timout-immune poller
  - improve housekeeper. check if it works correctly.
  - make agents return error message if not supported or not available
  - centralised management of agent configuration files

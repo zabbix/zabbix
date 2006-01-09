@@ -185,7 +185,7 @@
 		$table  = new Ctable();
 		$header=array("&nbsp;");
 		$hosts=array();
-		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg,functions f,triggers t where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and t.triggerid=f.triggerid and f.itemid=i.itemid group by h.hostid,h.host order by h.host";
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg,functions f,triggers t where h.status=".HOST_STATUS_MONITORED." and t.status=".TRIGGER_STATUS_ENABLED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and t.triggerid=f.triggerid and f.itemid=i.itemid group by h.hostid,h.host order by h.host";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
@@ -215,14 +215,14 @@
 			$_REQUEST["sort"]="order by i.description";
 		}
 //		$sql="select distinct description from items order by 1;";
-		$sql="select distinct t.description from hosts h,items i,hosts_groups hg,triggers t,functions f where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and t.triggerid=f.triggerid and f.itemid=i.itemid order by 1";
+		$sql="select distinct t.description from hosts h,items i,hosts_groups hg,triggers t,functions f where h.status=".HOST_STATUS_MONITORED." and t.status=".TRIGGER_STATUS_ENABLED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and t.triggerid=f.triggerid and f.itemid=i.itemid order by 1";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
 			$rows=array(nbsp($row["description"]));
 			foreach($hosts as $hostid)
 			{
-				$sql="select t.status,t.value,t.lastchange from triggers t,functions f,items i where f.triggerid=t.triggerid and i.itemid=f.itemid and i.hostid=$hostid and t.description='".addslashes($row["description"])."'";
+				$sql="select t.status,t.value,t.lastchange from triggers t,functions f,items i where f.triggerid=t.triggerid and i.itemid=f.itemid and t.status=".TRIGGER_STATUS_ENABLED." and i.hostid=$hostid and t.description='".addslashes($row["description"])."'";
 				$result2=DBselect($sql);
 				if(DBnum_rows($result2)==1)
 				{
