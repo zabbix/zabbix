@@ -150,11 +150,6 @@
 		{
 			return	$result;
 		}
-		$result=delete_actions_by_triggerid($triggerid);
-		if(!$result)
-		{
-			return	$result;
-		}
 		$result=delete_services_by_triggerid($triggerid);
 		if(!$result)
 		{
@@ -278,12 +273,6 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	function	delete_function_by_triggerid($triggerid)
 	{
 		$sql="delete from functions where triggerid=$triggerid";
-		return	DBexecute($sql);
-	}
-
-	function	delete_actions_by_triggerid($triggerid)
-	{
-		$sql="delete from actions where triggerid=$triggerid and scope=0";
 		return	DBexecute($sql);
 	}
 

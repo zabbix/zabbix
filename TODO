@@ -1,5 +1,6 @@
 1.1beta6:
 
+ - explain how templates work in the documentation
  - trigger functions for log severity, source, etc
  - execution of commands on monitored hosts in case of pre-defined events
  - fix undeleted warnings for host and trigger statuses
