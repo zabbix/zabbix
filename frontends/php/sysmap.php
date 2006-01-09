@@ -196,7 +196,7 @@
 	$col=0;
 
 	show_table2_v_delimiter($col++);
-	echo "<form method=\"get\" action=\"sysmap.php\">";
+	echo "<form name=\"host\" method=\"get\" action=\"sysmap.php\">";
 	if(isset($_REQUEST["shostid"]))
 	{
 		echo "<input name=\"shostid\" type=\"hidden\" value=".$_REQUEST["shostid"].">";
@@ -207,23 +207,26 @@
 	}
 	echo "Host";
 	show_table2_h_delimiter();
-	$result=DBselect("select hostid,host from hosts where status not in (".HOST_STATUS_DELETED.") order by host");
-	echo "<select class=\"biginput\" name=\"hostid\" size=1>";
-	while($row=DBfetch($result))
-	{
-		$hostid_=$row["hostid"];
-		$host_=$row["host"];
-		if(isset($_REQUEST["shostid"]) && ($hostid==$hostid_))
-//		if(isset($_REQUEST["hostid"]) && ($_REQUEST["hostid"]==$hostid_))
-		{
-			echo "<OPTION VALUE='$hostid_' SELECTED>$host_";
-		}
-		else
-		{
-			echo "<OPTION VALUE='$hostid_'>$host_";
-		}
-	}
-	echo "</SELECT>";
+	echo "<input class=\"biginput\" readonly name=\"host\" size=32 value=\"\">";
+	echo "<input name=\"hostid\" type=\"hidden\" value =\"0\">";
+	echo "<input title=\"Select [Alt+T]\" accessKey=\"T\" type=\"button\" class=\"button\" value='Select' name=\"btn1\" onclick=\"window.open('popup.php?form=host&field1=hostid&field2=host','new_win','width=450,height=450,resizable=1,scrollbars=1');\">";
+//
+//	$result=DBselect("select hostid,host from hosts where status not in (".HOST_STATUS_DELETED.") order by host");
+//	echo "<select class=\"biginput\" name=\"hostid\" size=1>";
+//	while($row=DBfetch($result))
+//	{
+//		$hostid_=$row["hostid"];
+//		$host_=$row["host"];
+//		if(isset($_REQUEST["shostid"]) && ($hostid==$hostid_))
+//		{
+//			echo "<OPTION VALUE='$hostid_' SELECTED>$host_";
+//		}
+//		else
+//		{
+//			echo "<OPTION VALUE='$hostid_'>$host_";
+//		}
+//	}
+//	echo "</SELECT>";
 
 	show_table2_v_delimiter($col++);
 	echo "Icon (OFF)";
