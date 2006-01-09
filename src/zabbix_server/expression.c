@@ -622,7 +622,7 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: {DATE},{TIME},{HOSTNAME},{IPADDRESS},{STATUS},                   *
- *           {TRIGGER.DESCRIPTION}                                            *
+ *           {TRIGGER.DESCRIPTION}, {TRIGGER.KEY}                             *
  *                                                                            *
  ******************************************************************************/
 void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data)
@@ -676,6 +676,30 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 			strcpy(data, str);
 			strncat(data, tmp, MAX_STRING_LEN);
 			strncat(data, s+strlen("{HOSTNAME}"), MAX_STRING_LEN);
+		}
+		else if( (s = strstr(str,"{TRIGGER.KEY}")) != NULL )
+		{
+			snprintf(sql,sizeof(sql)-1,"select distinct i.key_ from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid order by i.key_", trigger->triggerid);
+			result = DBselect(sql);
+
+			if(DBnum_rows(result) == 0)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No TRIGGER.KEY in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				zabbix_syslog("No TRIGGER.KEY in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				strscpy(tmp, "");
+				DBfree_result(result);
+			}
+			else
+			{
+				strscpy(tmp,DBget_field(result,0,0));
+
+				DBfree_result(result);
+			}
+
+			s[0]=0;
+			strcpy(data, str);
+			strncat(data, tmp, MAX_STRING_LEN);
+			strncat(data, s+strlen("{TRIGGER.KEY}"), MAX_STRING_LEN);
 		}
 		else if( (s = strstr(str,"{IPADDRESS}")) != NULL )
 		{
