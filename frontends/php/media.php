@@ -20,6 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
+	include "include/forms.inc.php";
 	$page["title"] = "S_MEDIA";
 	$page["file"] = "media.php";
 
@@ -85,140 +86,50 @@
 ?>
 
 <?php
-	show_table_header(S_MEDIA_BIG);
+	$h1=S_MEDIA_BIG;
+	$h2="<input class=\"button\" type=\"submit\" name=\"form\" value=\"".S_CREATE_MEDIA."\">";
+	$h2=$h2."<input name=\"userid\" type=\"hidden\" value=".$_REQUEST["userid"].">";
+	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"media.php\">", "</form>");
 ?>
 
 <?php
-	$sql="select m.mediaid,mt.description,m.sendto,m.active,m.period from media m,media_type mt where m.mediatypeid=mt.mediatypeid and m.userid=".$_REQUEST["userid"]." order by mt.type,m.sendto";
-	$result=DBselect($sql);
 
-	$table = new Ctable(S_NO_MEDIA_DEFINED);
-	$table->setHeader(array(S_TYPE,S_SEND_TO,S_WHEN_ACTIVE,S_STATUS,S_ACTIONS));
-
-	$col=0;
-	while($row=DBfetch($result))
+	if(!isset($_REQUEST["form"]))
 	{
-		if($row["active"]==0) 
+		$sql="select m.mediaid,mt.description,m.sendto,m.active,m.period from media m,media_type mt where m.mediatypeid=mt.mediatypeid and m.userid=".$_REQUEST["userid"]." order by mt.type,m.sendto";
+		$result=DBselect($sql);
+
+		$table = new Ctable(S_NO_MEDIA_DEFINED);
+		$table->setHeader(array(S_TYPE,S_SEND_TO,S_WHEN_ACTIVE,S_STATUS,S_ACTIONS));
+
+		$col=0;
+		while($row=DBfetch($result))
 		{
-			$status="<a href=\"media.php?register=disable&mediaid=".$row["mediaid"]."&userid=".$_REQUEST["userid"]."\"><font color=\"00AA00\">".S_ENABLED."</font></A>";
+			if($row["active"]==0) 
+			{
+				$status="<a href=\"media.php?register=disable&mediaid=".$row["mediaid"]."&userid=".$_REQUEST["userid"]."\"><font color=\"00AA00\">".S_ENABLED."</font></A>";
+			}
+			else
+			{
+				$status="<a href=\"media.php?register=enable&mediaid=".$row["mediaid"]."&userid=".$_REQUEST["userid"]."\"><font color=\"AA0000\">".S_DISABLED."</font></A>";
+			}
+			$actions="<A HREF=\"media.php?register=change&mediaid=".$row["mediaid"]."&userid=".$_REQUEST["userid"]."\">".S_CHANGE."</A>";
+			$table->addRow(array(
+				$row["description"],
+				$row["sendto"],
+				$row["period"],
+				$status,
+				$actions
+				));
 		}
-		else
-		{
-			$status="<a href=\"media.php?register=enable&mediaid=".$row["mediaid"]."&userid=".$_REQUEST["userid"]."\"><font color=\"AA0000\">".S_DISABLED."</font></A>";
-		}
-		$actions="<A HREF=\"media.php?register=change&mediaid=".$row["mediaid"]."&userid=".$_REQUEST["userid"]."\">".S_CHANGE."</A>";
-		$table->addRow(array(
-			$row["description"],
-			$row["sendto"],
-			$row["period"],
-			$status,
-			$actions
-			));
+		$table->show();
 	}
-	$table->show();
+	else
+	{
+		insert_media_form();
+	}
 ?>
 
 <?php
-	if(isset($_REQUEST["mediaid"]))
-	{
-		$media=get_media_by_mediaid($_REQUEST["mediaid"]);
-		$severity=$media["severity"];
-		$sendto=$media["sendto"];
-		$active=$media["active"];
-		$mediatypeid=$media["mediatypeid"];
-		$period=$media["period"];
-	}
-	else
-	{
-		$sendto="";
-		$severity=63;
-		$mediatypeid=-1;
-		$active=0;
-		$period="1-7,00:00-23:59";
-	}
-
-	show_form_begin("media.media");
-	echo S_NEW_MEDIA;
-
-	$col=0;
-
-	show_table2_v_delimiter($col++);
-	echo "<form method=\"get\" action=\"media.php\">";
-	echo "<input name=\"userid\" type=\"hidden\" value=".$_REQUEST["userid"].">";
-	if(isset($_REQUEST["mediaid"]))
-	{
-		echo "<input name=\"mediaid\" type=\"hidden\" value=".$_REQUEST["mediaid"].">";
-	}
-	echo S_TYPE;
-	show_table2_h_delimiter();
-	echo "<select class=\"biginput\" name=\"mediatypeid\" size=1>";
-	$sql="select mediatypeid,description from media_type order by type";
-	$result=DBselect($sql);
-	while($row=DBfetch($result))
-	{
-		if($row["mediatypeid"] == $mediatypeid)
-		{
-			echo "<OPTION VALUE=\"".$row["mediatypeid"]."\" SELECTED>".$row["description"];
-		}
-		else
-		{
-			echo "<OPTION VALUE=\"".$row["mediatypeid"]."\">".$row["description"];
-		}
-		
-	}
-	echo "</SELECT>";
-
-	show_table2_v_delimiter($col++);
-	echo nbsp(S_SEND_TO);
-	show_table2_h_delimiter();
-	echo "<input class=\"biginput\" name=\"sendto\" size=20 value='$sendto'>";
-
-	show_table2_v_delimiter($col++);
-	echo nbsp(S_WHEN_ACTIVE);
-	show_table2_h_delimiter();
-	echo "<input class=\"biginput\" name=\"period\" size=48 value='$period'>";
-
-	show_table2_v_delimiter($col++);
-	echo nbsp(S_USE_IF_SEVERITY);
-	show_table2_h_delimiter();
-	$checked=iif( (1&$severity) == 1,"checked","");
-	echo "<input type=checkbox name=\"0\" value=\"0\" $checked>".S_NOT_CLASSIFIED."<br>";
-	$checked=iif( (2&$severity) == 2,"checked","");
-	echo "<input type=checkbox name=\"1\" value=\"1\" $checked>".S_INFORMATION."<br>";
-	$checked=iif( (4&$severity) == 4,"checked","");
-	echo "<input type=checkbox name=\"2\" value=\"2\" $checked>".S_WARNING."<br>";
-	$checked=iif( (8&$severity) == 8,"checked","");
-	echo "<input type=checkbox name=\"3\" value=\"3\" $checked>".S_AVERAGE."<br>";
-	$checked=iif( (16&$severity) ==16,"checked","");
-	echo "<input type=checkbox name=\"4\" value=\"4\" $checked>".S_HIGH."<br>";
-	$checked=iif( (32&$severity) ==32,"checked","");
-	echo "<input type=checkbox name=\"5\" value=\"5\" $checked>".S_DISASTER."<br>";
-
-	show_table2_v_delimiter($col++);
-	echo "Status";
-	show_table2_h_delimiter();
-	echo "<select class=\"biginput\" name=\"active\" size=1>";
-	if($active == 0)
-	{
-		echo "<OPTION VALUE=\"0\" SELECTED>".S_ENABLED;
-		echo "<OPTION VALUE=\"1\">".S_DISABLED;
-	}
-	else
-	{
-		echo "<OPTION VALUE=\"0\">".S_ENABLED;
-		echo "<OPTION VALUE=\"1\" SELECTED>".S_DISABLED;
-	}
-	echo "</select>";
-
-	show_table2_v_delimiter2($col++);
-	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
-	if(isset($_REQUEST["mediaid"]))
-	{
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('".S_DELETE_SELECTED_MEDIA_Q."');\">";
-	}
-
-	show_table2_header_end();
-
 	show_footer();
 ?>
