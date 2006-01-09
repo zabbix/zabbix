@@ -4,7 +4,6 @@
  - trigger functions for log severity, source, etc
  - execution of commands on monitored hosts in case of pre-defined events
  - fix undeleted warnings for host and trigger statuses
- - fix overview screen
 
  - timout-immune poller
  - improve housekeeper. check if it works correctly.
