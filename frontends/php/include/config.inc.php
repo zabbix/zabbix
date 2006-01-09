@@ -745,7 +745,7 @@ function SDI($msg) { echo "DEBUG INFO: $msg <br>"; } # DEBUG INFO!!!
 // Before str()
 // 		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.\,]+)\.((diff)|(min)|(max)|(last)|(prev))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
 //		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.\,]+)\.((diff)|(min)|(max)|(last)|(prev)|(str))\(([0-9a-zA-Z\.\_\/\,]+)\)\}$', $expression, &$arr)) 
- 		if (eregi('^\{([0-9a-zA-Z\_\.-]+)\:([]\[0-9a-zA-Z\_\/\.\,\:\(\) -]+)\.([a-z]{3,9})\(([0-9a-zA-Z\_\/\.\,]+)\)\}$', $expression, &$arr)) 
+ 		if (eregi('^\{([0-9a-zA-Z\_\.-]+)\:([]\[0-9a-zA-Z\_\/\.\,\:\(\) -]+)\.([a-z]{3,11})\(([0-9a-zA-Z\_\/\.\,]+)\)\}$', $expression, &$arr)) 
 		{
 			$host=$arr[1];
 			$key=$arr[2];
@@ -784,6 +784,8 @@ function SDI($msg) { echo "DEBUG INFO: $msg <br>"; } # DEBUG INFO!!!
 				($function!="now")&&
 				($function!="str")&&
 				($function!="fuzzytime")&&
+				($function!="logseverity")&&
+				($function!="logsource")&&
 				($function!="regexp")
 			)
 			{
@@ -792,7 +794,8 @@ function SDI($msg) { echo "DEBUG INFO: $msg <br>"; } # DEBUG INFO!!!
 			}
 
 
-			if(( $function!="str") && ( $function!="regexp") && (validate_float($parameter)!=0) )
+			if(( !in_array($function,array("str","regexp","logseverity","logsource"))
+				&& (validate_float($parameter)!=0) )
 			{
 				error("[$parameter] is not a float");
 				return -1;

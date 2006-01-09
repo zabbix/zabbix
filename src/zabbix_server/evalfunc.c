@@ -46,6 +46,112 @@
 
 #include "evalfunc.h"
 
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_LOGSOURCE                                               *
+ *                                                                            *
+ * Purpose: evaluate function 'logsource' for the item                        *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameter - ignored                                            *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated succesfully, result is stored in 'value' *
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int evaluate_LOGSOURCE(char *value, DB_ITEM *item, char *parameter)
+{
+	DB_RESULT	*result;
+
+	char		sql[MAX_STRING_LEN];
+	int		now;
+	int		res = SUCCEED;
+
+	if(item->value_type != ITEM_VALUE_TYPE_LOG)
+	{
+		return	FAIL;
+	}
+
+	now=time(NULL);
+
+	snprintf(sql,sizeof(sql)-1,"select source from history_log where itemid=%d order by clock desc limit 1",item->itemid);
+
+	result = DBselect(sql);
+	if(DBnum_rows(result) == 0)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGSOURCE is empty" );
+		res = FAIL;
+	}
+	else
+	{
+		if(strcmp(DBget_field(result,0,0), parameter) == 0)
+		{
+			strcpy(value,"1");
+		}
+		else
+		{
+			strcpy(value,"0");
+		}
+	}
+	DBfree_result(result);
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_LOGSEVERITY                                             *
+ *                                                                            *
+ * Purpose: evaluate function 'logseverity' for the item                      *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameter - ignored                                            *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated succesfully, result is stored in 'value' *
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int evaluate_LOGSEVERITY(char *value, DB_ITEM *item, char *parameter)
+{
+	DB_RESULT	*result;
+
+	char		sql[MAX_STRING_LEN];
+	int		now;
+	int		res = SUCCEED;
+
+	if(item->value_type != ITEM_VALUE_TYPE_LOG)
+	{
+		return	FAIL;
+	}
+
+	now=time(NULL);
+
+	snprintf(sql,sizeof(sql)-1,"select severity from history_log where itemid=%d order by clock desc limit 1",item->itemid);
+
+	result = DBselect(sql);
+	if(DBnum_rows(result) == 0)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGSEVERITY is empty" );
+		res = FAIL;
+	}
+	else
+	{
+		strcpy(value,DBget_field(result,0,0));
+	}
+	DBfree_result(result);
+
+	return res;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: evaluate_COUNT                                                   *
@@ -658,6 +764,14 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
 				strcpy(value,"0");
 			}
 		}
+	}
+	else if(strcmp(function,"logseverity")==0)
+	{
+		ret = evaluate_LOGSEVERITY(value,item,parameter);
+	}
+	else if(strcmp(function,"logsource")==0)
+	{
+		ret = evaluate_LOGSOURCE(value,item,parameter);
 	}
 	else
 	{

@@ -1,5 +1,6 @@
 Changes for 1.1beta6:
 
+ - new trigger functions: logseverity and logsource (Alexei)
  - Overview screen won't show disabled triggers (Alexei)
  - support of macro {TRIGGER.KEY} (Alexei)
  - fixed error when deleting a trigger (Alexei)
