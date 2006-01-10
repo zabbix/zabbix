@@ -40,24 +40,23 @@
 
 
 <?php
-	if(isset($_REQUEST["register"]))
+	if(isset($_REQUEST["save"])&&!isset($_REQUEST["screenid"]))
 	{
-		if($_REQUEST["register"]=="add")
-		{
-			$result=add_screen($_REQUEST["name"],$_REQUEST["cols"],$_REQUEST["rows"]);
-			show_messages($result,S_SCREEN_ADDED,S_CANNOT_ADD_SCREEN);
-		}
-		if($_REQUEST["register"]=="update")
-		{
-			$result=update_screen($_REQUEST["screenid"],$_REQUEST["name"],$_REQUEST["cols"],$_REQUEST["rows"]);
-			show_messages($result, S_SCREEN_UPDATED, S_CANNOT_UPDATE_SCREEN);
-		}
-		if($_REQUEST["register"]=="delete")
-		{
-			$result=delete_screen($_REQUEST["screenid"]);
-			show_messages($result, S_SCREEN_DELETED, S_CANNOT_DELETE_SCREEN);
-			unset($_REQUEST["screenid"]);
-		}
+		$result=add_screen($_REQUEST["name"],$_REQUEST["cols"],$_REQUEST["rows"]);
+		show_messages($result,S_SCREEN_ADDED,S_CANNOT_ADD_SCREEN);
+	}
+
+	if(isset($_REQUEST["save"])&&isset($_REQUEST["screenid"]))
+	{
+		$result=update_screen($_REQUEST["screenid"],$_REQUEST["name"],$_REQUEST["cols"],$_REQUEST["rows"]);
+		show_messages($result, S_SCREEN_UPDATED, S_CANNOT_UPDATE_SCREEN);
+	}
+
+	if(isset($_REQUEST["delete"]))
+	{
+		$result=delete_screen($_REQUEST["screenid"]);
+		show_messages($result, S_SCREEN_DELETED, S_CANNOT_DELETE_SCREEN);
+		unset($_REQUEST["screenid"]);
 	}
 ?>
 
