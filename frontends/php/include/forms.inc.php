@@ -226,17 +226,17 @@
 		show_table2_v_delimiter2($col++);
 		if($profile==0)
 		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"save\" value=\"".S_SAVE."\">";
 			if(isset($userid))
 			{
-				echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
-				echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected user?');\">";
+				echo "<input class=\"button\" type=\"submit\" name=\"delete\" value=\"".S_DELETE."\" onClick=\"return Confirm('Delete selected user?');\">";
 			}
 		}
 		else
 		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update profile\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"save\" value=\"".S_SAVE."\">";
 		}
+		echo "<input class=\"button\" type=\"submit\" name=\"cancel\" value=\"".S_CANCEL."\">";
 
 		show_table2_header_end();
 	}
@@ -815,12 +815,12 @@
 		}
 
 		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add group\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"save\" value=\"".S_SAVE."\">";
 		if(isset($_REQUEST["usrgrpid"]))
 		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update group\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete group\" onClick=\"return Confirm('Delete selected group?');\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"delete\" value=\"".S_DELETE."\" onClick=\"return Confirm('Delete selected group?');\">";
 		}
+		echo "<input class=\"button\" type=\"submit\" name=\"cancel\" value=\"".S_CANCEL."\">";
 		echo "</form>";
 		show_table2_header_end();
 	}

@@ -46,31 +46,85 @@
 ?>
 
 <?php
+	if(isset($_REQUEST["save"])&&!isset($_REQUEST["userid"])&&($_REQUEST["config"]==0))
+	{
+		if($_REQUEST["password1"]==$_REQUEST["password2"])
+		{
+			$result=add_user($_REQUEST["name"],$_REQUEST["surname"],$_REQUEST["alias"],$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],$_REQUEST["lang"],$_REQUEST["refresh"]);
+			show_messages($result, S_USER_ADDED, S_CANNOT_ADD_USER);
+			if($result)
+				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_USER,"User alias [".addslashes($_REQUEST["alias"])."] name [".addslashes($_REQUEST["name"])."] surname [".addslashes($_REQUEST["surname"])."]]");
+		}
+		else
+		{
+			show_error_message(S_CANNOT_ADD_USER_BOTH_PASSWORDS_MUST);
+		}
+	}
+
+	if(isset($_REQUEST["save"])&&isset($_REQUEST["userid"])&&($_REQUEST["config"]==0))
+	{
+		if($_REQUEST["password1"]==$_REQUEST["password2"])
+		{
+			$result=update_user($_REQUEST["userid"],$_REQUEST["name"],$_REQUEST["surname"],$_REQUEST["alias"],$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],$_REQUEST["lang"],$_REQUEST["refresh"]);
+			show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
+			if($result)
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,"User alias [".addslashes($_REQUEST["alias"])."] name [".addslashes($_REQUEST["name"])."] surname [".addslashes($_REQUEST["surname"])."]]");
+		}
+		else
+		{
+			show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
+		}
+	}
+
+	if(isset($_REQUEST["delete"])&&($_REQUEST["config"]==0))
+	{
+		$user=get_user_by_userid($_REQUEST["userid"]);
+		$result=delete_user($_REQUEST["userid"]);
+		show_messages($result, S_USER_DELETED, S_CANNOT_DELETE_USER);
+		if($result)
+			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,"User alias [".$user["alias"]."] name [".$user["name"]."] surname [".$user["surname"]."]");
+		unset($userid);
+	}
+
+	if(isset($_REQUEST["save"])&&!isset($_REQUEST["usrgrpid"])&&($_REQUEST["config"]==1))
+	{
+		$users=array();
+		$result=DBselect("select userid from users");
+		while($row=DBfetch($result))
+		{
+			if(isset($_REQUEST[$row["userid"]]))
+			{
+				$users=array_merge($users,array($row["userid"]));
+			}
+		}
+		$result=add_user_group($_REQUEST["name"], $users);
+		show_messages($result, S_GROUP_ADDED, S_CANNOT_ADD_GROUP);
+	}
+
+	if(isset($_REQUEST["save"])&&isset($_REQUEST["usrgrpid"])&&($_REQUEST["config"]==1))
+	{
+		$users=array();
+		$result=DBselect("select userid from users");
+		while($row=DBfetch($result))
+		{
+			if(isset($_REQUEST[$row["userid"]]))
+			{
+				$users=array_merge($users,array($row["userid"]));
+			}
+		}
+		$result=update_user_group($_REQUEST["usrgrpid"], $_REQUEST["name"], $users);
+		show_messages($result, S_GROUP_UPDATED, S_CANNOT_UPDATE_GROUP);
+	}
+
+	if(isset($_REQUEST["delete"])&&($_REQUEST["config"]==1))
+	{
+		$result=delete_user_group($_REQUEST["usrgrpid"]);
+		show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
+		unset($_REQUEST["usrgrpid"]);
+	}
+
 	if(isset($_REQUEST["register"]))
 	{
-		if($_REQUEST["register"]=="add")
-		{
-			if($_REQUEST["password1"]==$_REQUEST["password2"])
-			{
-				$result=add_user($_REQUEST["name"],$_REQUEST["surname"],$_REQUEST["alias"],$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],$_REQUEST["lang"],$_REQUEST["refresh"]);
-				show_messages($result, S_USER_ADDED, S_CANNOT_ADD_USER);
-				if($result)
-					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_USER,"User alias [".addslashes($_REQUEST["alias"])."] name [".addslashes($_REQUEST["name"])."] surname [".addslashes($_REQUEST["surname"])."]]");
-			}
-			else
-			{
-				show_error_message(S_CANNOT_ADD_USER_BOTH_PASSWORDS_MUST);
-			}
-		}
-		if($_REQUEST["register"]=="delete")
-		{
-			$user=get_user_by_userid($_REQUEST["userid"]);
-			$result=delete_user($_REQUEST["userid"]);
-			show_messages($result, S_USER_DELETED, S_CANNOT_DELETE_USER);
-			if($result)
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,"User alias [".$user["alias"]."] name [".$user["name"]."] surname [".$user["surname"]."]");
-			unset($userid);
-		}
 		if($_REQUEST["register"]=="delete_permission")
 		{
 			$result=delete_permission($_REQUEST["rightid"]);
@@ -81,56 +135,6 @@
 		{
 			$result=add_permission($_REQUEST["userid"],$_REQUEST["right"],$_REQUEST["permission"],$_REQUEST["id"]);
 			show_messages($result, S_PERMISSION_ADDED, S_CANNOT_ADD_PERMISSION);
-		}
-		if($_REQUEST["register"]=="update")
-		{
-			if($_REQUEST["password1"]==$_REQUEST["password2"])
-			{
-				$result=update_user($_REQUEST["userid"],$_REQUEST["name"],$_REQUEST["surname"],$_REQUEST["alias"],$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],$_REQUEST["lang"],$_REQUEST["refresh"]);
-				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
-				if($result)
-					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,"User alias [".addslashes($_REQUEST["alias"])."] name [".addslashes($_REQUEST["name"])."] surname [".addslashes($_REQUEST["surname"])."]]");
-			}
-			else
-			{
-				show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
-			}
-		}
-		if($_REQUEST["register"]=="add group")
-		{
-			$users=array();
-			$result=DBselect("select userid from users");
-			while($row=DBfetch($result))
-			{
-				if(isset($_REQUEST[$row["userid"]]))
-				{
-					$users=array_merge($users,array($row["userid"]));
-				}
-			}
-//			$result=add_user_group($_REQUEST["name"], $_REQUEST["users"]);
-			$result=add_user_group($_REQUEST["name"], $users);
-			show_messages($result, S_GROUP_ADDED, S_CANNOT_ADD_GROUP);
-		}
-		if($_REQUEST["register"]=="update group")
-		{
-			$users=array();
-			$result=DBselect("select userid from users");
-			while($row=DBfetch($result))
-			{
-				if(isset($_REQUEST[$row["userid"]]))
-				{
-					$users=array_merge($users,array($row["userid"]));
-				}
-			}
-//			$result=update_user_group($_REQUEST["usrgrpid"], $_REQUEST["name"], $_REQUEST["users"]);
-			$result=update_user_group($_REQUEST["usrgrpid"], $_REQUEST["name"], $users);
-			show_messages($result, S_GROUP_UPDATED, S_CANNOT_UPDATE_GROUP);
-		}
-		if($_REQUEST["register"]=="delete group")
-		{
-			$result=delete_user_group($_REQUEST["usrgrpid"]);
-			show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
-			unset($_REQUEST["usrgrpid"]);
 		}
 	}
 ?>
@@ -277,8 +281,9 @@
 ?>
 
 <?php
-	if(isset($_REQUEST["userid"])&&($_REQUEST["config"]==0))
+	if(isset($_REQUEST["userid"])&&isset($_REQUEST["form"])&&($_REQUEST["config"]==0))
 	{
+	echo "<br>";
 	echo "<a name=\"form\"></a>";
 	show_table_header("USER PERMISSIONS");
 
