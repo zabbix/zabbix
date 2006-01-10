@@ -977,15 +977,16 @@
 		echo S_TRIGGER;
  
 		show_table2_v_delimiter($col++);
+		echo "<form method=\"get\" action=\"triggers.php\">";
+
 		if(isset($hostid))
 		{
-			echo "<form method=\"get\" action=\"triggers.php?hostid=$hostid\">";
+			echo "<input class=\"biginput\" name=\"hostid\" type=\"hidden\" value=\"".$hostid."\">";
 		}
-		else
+		if(isset($triggerid))
 		{
-			echo "<form method=\"get\" action=\"triggers.php\">";
+			echo "<input class=\"biginput\" name=\"triggerid\" type=\"hidden\" value=\"".$triggerid."\">";
 		}
-		echo "<input class=\"biginput\" name=\"triggerid\" type=hidden value=$triggerid size=8>";
 		echo S_NAME;
 		show_table2_h_delimiter();
 		echo "<input class=\"biginput\" name=\"description\" value=\"$description\" size=70>";
@@ -1026,12 +1027,12 @@
 
  
 		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"save\" value=\"".S_SAVE."\">";
 		if(isset($triggerid))
 		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete trigger?');\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"delete\" value=\"".S_DELETE."\" onClick=\"return Confirm('Delete trigger?');\">";
 		}
+		echo "<input class=\"button\" type=\"submit\" name=\"cancel\" value=\"".S_CANCEL."\">";
 
 		if(isset($triggerid))
 		{
@@ -2008,12 +2009,12 @@ function	insert_image_form()
 		echo "<input class=\"biginput\" name=\"rows\" size=5 value=\"$rows\">";
 	
 		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"save\" value=\"".S_SAVE."\">";
 		if(isset($_REQUEST["screenid"]))
 		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('".S_DELETE_SCREEN_Q."');\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"delete\" value=\"".S_DELETE."\" onClick=\"return Confirm('".S_DELETE_SCREEN_Q."');\">";
 		}
+		echo "<input class=\"button\" type=\"submit\" name=\"calcel\" value=\"".S_CANCEL."\">";
 	
 		show_table2_header_end();
 	}

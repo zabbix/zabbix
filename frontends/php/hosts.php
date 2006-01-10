@@ -594,12 +594,12 @@
 			}
 			$table->show();
 
-			show_form_begin();
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Activate selected\" onClick=\"return Confirm('".S_ACTIVATE_SELECTED_HOSTS_Q."');\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Disable selected\" onClick=\"return Confirm('".S_DISABLE_SELECTED_HOSTS_Q."');\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Delete selected\" onClick=\"return Confirm('".S_DELETE_SELECTED_HOSTS_Q."');\">";
-			show_table2_header_end();
-			echo "</form>";
+//			show_form_begin();
+			$h="<input class=\"button\" type=\"submit\" name=\"register\" value=\"Activate selected\" onClick=\"return Confirm('".S_ACTIVATE_SELECTED_HOSTS_Q."');\">";
+			$h=$h."<input class=\"button\" type=\"submit\" name=\"register\" value=\"Disable selected\" onClick=\"return Confirm('".S_DISABLE_SELECTED_HOSTS_Q."');\">";
+			$h=$h."<input class=\"button\" type=\"submit\" name=\"register\" value=\"Delete selected\" onClick=\"return Confirm('".S_DELETE_SELECTED_HOSTS_Q."');\">";
+			$h=$h."</form>";
+			show_table_header($h);
 		}
 		else
 		{
@@ -617,7 +617,7 @@
 ?>
 
 <?php
-	if(isset($_REQUEST["hostid"]))
+	if(isset($_REQUEST["form"])&&isset($_REQUEST["hostid"]))
 	{
 		insert_host_profile_form($_REQUEST["hostid"]);
 	}
