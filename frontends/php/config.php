@@ -49,167 +49,108 @@
 	$_REQUEST["config"]=@iif(isset($_REQUEST["config"]),$_REQUEST["config"],get_profile("web.config.config",0));
 	update_profile("web.config.config",$_REQUEST["config"]);
 
-# For images
-	if(isset($_REQUEST["register"]))
+	if(isset($_REQUEST["save"])&&isset($_REQUEST["config"])&&(in_array($_REQUEST["config"],array(0,5))))
 	{
-		if($_REQUEST["register"]=="add image")
+		$result=update_config($_REQUEST["alarm_history"],$_REQUEST["alert_history"],$_REQUEST["refresh_unsupported"]);
+		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
+		if($result)
 		{
-			$result=add_image($_REQUEST["name"],$_REQUEST["imagetype"],$_FILES);
-			show_messages($result, S_IMAGE_ADDED, S_CANNOT_ADD_IMAGE);
-			if($result)
-			{
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Image deleted");
-			}
-			unset($_REQUEST["imageid"]);
-		}
-		if($_REQUEST["register"]=="delete image")
-		{
-			$result=delete_image($_REQUEST["imageid"]);
-			show_messages($result, S_IMAGE_DELETED, S_CANNOT_DELETE_IMAGE);
-			if($result)
-			{
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Image deleted");
-			}
-			unset($_REQUEST["imageid"]);
-		}
-		if($_REQUEST["register"]=="update image")
-		{
-			$result=update_image($_REQUEST["imageid"],$_REQUEST["name"],$_REQUEST["imagetype"],$_FILES);
-			show_messages($result, S_IMAGE_UPDATED, S_CANNOT_UPDATE_IMAGE);
-			if($result)
-			{
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Image updated");
-			}
-			unset($_REQUEST["imageid"]);
+			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Alarm history [".$_REQUEST["alarm_history"]."] alert history [".$_REQUEST["alert_history"]."]");
 		}
 	}
-	if(isset($_REQUEST["register"]))
+
+	if(isset($_REQUEST["delete"])&&($_REQUEST["config"]==1))
 	{
-		if($_REQUEST["register"]=="update")
+		$mediatype=get_mediatype_by_mediatypeid($_REQUEST["mediatypeid"]);
+		$result=delete_mediatype($_REQUEST["mediatypeid"]);
+		show_messages($result, S_MEDIA_TYPE_DELETED, S_MEDIA_TYPE_WAS_NOT_DELETED);
+		if($result)
 		{
-			$result=update_config($_REQUEST["alarm_history"],$_REQUEST["alert_history"],$_REQUEST["refresh_unsupported"]);
-			show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
-			if($result)
-			{
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Alarm history [".$_REQUEST["alarm_history"]."] alert history [".$_REQUEST["alert_history"]."]");
-			}
+			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MEDIA_TYPE,"Media type [".$mediatype["description"]."]");
 		}
-/*
-		if($_REQUEST["register"]=="add rule")
+	}
+
+	if(isset($_REQUEST["save"])&&!isset($_REQUEST["mediatypeid"])&&($_REQUEST["config"]==1))
+	{
+		$result=add_mediatype($_REQUEST["type"],$_REQUEST["description"],$_REQUEST["smtp_server"],$_REQUEST["smtp_helo"],$_REQUEST["smtp_email"],$_REQUEST["exec_path"]);
+		show_messages($result, S_ADDED_NEW_MEDIA_TYPE, S_NEW_MEDIA_TYPE_WAS_NOT_ADDED);
+		if($result)
 		{
-			$result=add_escalation_rule($_REQUEST["escalationid"],$_REQUEST["level"],$_REQUEST["period"],$_REQUEST["delay"],$_REQUEST["actiontype"]);
-			if($result)
-			{
-				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ESCALATION_RULE,"Escalation ID [".addslashes($_REQUEST["escalationid"])."]");
-			}
-			show_messages($result, S_ESCALATION_RULE_ADDED, S_ESCALATION_RULE_WAS_NOT_ADDED);
+			add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_MEDIA_TYPE,"Media type [".addslashes($_REQUEST["description"])."]");
 		}
-		if($_REQUEST["register"]=="update rule")
+	}
+
+	if(isset($_REQUEST["save"])&&isset($_REQUEST["mediatypeid"])&&($_REQUEST["config"]==1))
+	{
+		$result=update_mediatype($_REQUEST["mediatypeid"],$_REQUEST["type"],$_REQUEST["description"],$_REQUEST["smtp_server"],$_REQUEST["smtp_helo"],$_REQUEST["smtp_email"],$_REQUEST["exec_path"]);
+		if($result)
 		{
-			$result=update_escalation_rule($_REQUEST["escalationruleid"],$_REQUEST["level"],$_REQUEST["period"],$_REQUEST["delay"],$_REQUEST["actiontype"]);
-			if($result)
-			{
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ESCALATION_RULE,"Escalation rule ID [".addslashes($_REQUEST["escalationruleid"])."]");
-			}
-			show_messages($result, S_ESCALATION_RULE_UPDATED, S_ESCALATION_RULE_WAS_NOT_UPDATED);
+			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MEDIA_TYPE,"Media type [".addslashes($_REQUEST["description"])."]");
 		}
-		if($_REQUEST["register"]=="delete rule")
+		show_messages($result, S_MEDIA_TYPE_UPDATED, S_MEDIA_TYPE_WAS_NOT_UPDATED);
+	}
+
+	if(isset($_REQUEST["save"])&&!isset($_REQUEST["imageid"])&&($_REQUEST["config"]==3))
+	{
+		$result=add_image($_REQUEST["name"],$_REQUEST["imagetype"],$_FILES);
+		show_messages($result, S_IMAGE_ADDED, S_CANNOT_ADD_IMAGE);
+		if($result)
 		{
-			$result=delete_escalation_rule($_REQUEST["escalationruleid"]);
-			if($result)
-			{
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_ESCALATION_RULE,"Escalation rule ID [".addslashes($_REQUEST["escalationruleid"])."]");
-			}
-			unset($_REQUEST["escalationruleid"]);
-			show_messages($result, S_ESCALATION_RULE_DELETED, S_ESCALATION_RULE_WAS_NOT_DELETED);
+			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Image deleted");
 		}
-		if($_REQUEST["register"]=="add escalation")
+		unset($_REQUEST["imageid"]);
+	}
+
+	if(isset($_REQUEST["delete"])&&($_REQUEST["config"]==3))
+	{
+		$result=delete_image($_REQUEST["imageid"]);
+		show_messages($result, S_IMAGE_DELETED, S_CANNOT_DELETE_IMAGE);
+		if($result)
 		{
-			$dflt=iif(isset($_REQUEST["dflt"])&&($_REQUEST["dflt"]=="on"),1,0);
-			$result=add_escalation($_REQUEST["name"],$dflt);
-			if($result)
-			{
-				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ESCALATION,"Escalation [".addslashes($_REQUEST["name"])."]");
-			}
-			show_messages($result, S_ESCALATION_ADDED, S_ESCALATION_WAS_NOT_ADDED);
+			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Image deleted");
 		}
-		if($_REQUEST["register"]=="update escalation")
+		unset($_REQUEST["imageid"]);
+	}
+
+	if(isset($_REQUEST["save"])&&isset($_REQUEST["imageid"])&&($_REQUEST["config"]==3))
+	{
+		$result=update_image($_REQUEST["imageid"],$_REQUEST["name"],$_REQUEST["imagetype"],$_FILES);
+		show_messages($result, S_IMAGE_UPDATED, S_CANNOT_UPDATE_IMAGE);
+		if($result)
 		{
-			$dflt=iif(isset($_REQUEST["dflt"])&&($_REQUEST["dflt"]=="on"),1,0);
-			$result=update_escalation($_REQUEST["escalationid"],$_REQUEST["name"],$dflt);
-			if($result)
-			{
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ESCALATION,"Escalation [".addslashes($_REQUEST["name"])."]");
-			}
-			show_messages($result, S_ESCALATION_UPDATED, S_ESCALATION_WAS_NOT_UPDATED);
+			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Image updated");
 		}
-		if($_REQUEST["register"]=="delete escalation")
+		unset($_REQUEST["imageid"]);
+	}
+
+	if(isset($_REQUEST["delete"])&&($_REQUEST["config"]==4))
+	{
+		$result=delete_autoregistration($_REQUEST["id"]);
+		if($result)
 		{
-			$result=delete_escalation($_REQUEST["escalationid"]);
-			if($result)
-			{
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_ESCALATION,"Escalation ID [".addslashes($_REQUEST["$escalationid"])."]");
-			}
-			unset($_REQUEST["escalationid"]);
-			show_messages($result, S_ESCALATION_DELETED, S_ESCALATION_WAS_NOT_DELETED);
+			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_AUTOREGISTRATION,"Autoregistration [".addslashes($_REQUEST["pattern"])."]");
 		}
-*/
-		if($_REQUEST["register"]=="add autoregistration")
+		show_messages($result, S_AUTOREGISTRATION_DELETED, S_AUTOREGISTRATION_WAS_NOT_DELETED);
+	}
+
+	if(isset($_REQUEST["save"])&&!isset($_REQUEST["id"])&&($_REQUEST["config"]==4))
+	{
+		$result=add_autoregistration($_REQUEST["pattern"],$_REQUEST["priority"],$_REQUEST["hostid"]);
+		if($result)
 		{
-			$result=add_autoregistration($_REQUEST["pattern"],$_REQUEST["priority"],$_REQUEST["hostid"]);
-			if($result)
-			{
-				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_AUTOREGISTRATION,"Autoregistration [".addslashes($_REQUEST["pattern"])."]");
-			}
-			show_messages($result, S_AUTOREGISTRATION_ADDED, S_CANNOT_ADD_AUTOREGISTRATION);
+			add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_AUTOREGISTRATION,"Autoregistration [".addslashes($_REQUEST["pattern"])."]");
 		}
-		if($_REQUEST["register"]=="update autoregistration")
+		show_messages($result, S_AUTOREGISTRATION_ADDED, S_CANNOT_ADD_AUTOREGISTRATION);
+	}
+
+	if(isset($_REQUEST["save"])&&isset($_REQUEST["id"])&&($_REQUEST["config"]==4))
+	{
+		$result=update_autoregistration($_REQUEST["id"],$_REQUEST["pattern"],$_REQUEST["priority"],$_REQUEST["hostid"]);
+		if($result)
 		{
-			$result=update_autoregistration($_REQUEST["id"],$_REQUEST["pattern"],$_REQUEST["priority"],$_REQUEST["hostid"]);
-			if($result)
-			{
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_AUTOREGISTRATION,"Autoregistration [".addslashes($_REQUEST["pattern"])."]");
-			}
-			show_messages($result, S_AUTOREGISTRATION_UPDATED, S_AUTOREGISTRATION_WAS_NOT_UPDATED);
+			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_AUTOREGISTRATION,"Autoregistration [".addslashes($_REQUEST["pattern"])."]");
 		}
-		if($_REQUEST["register"]=="delete autoregistration")
-		{
-			$result=delete_autoregistration($_REQUEST["id"]);
-			if($result)
-			{
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_AUTOREGISTRATION,"Autoregistration [".addslashes($_REQUEST["pattern"])."]");
-			}
-			show_messages($result, S_AUTOREGISTRATION_DELETED, S_AUTOREGISTRATION_WAS_NOT_DELETED);
-		}
-		if($_REQUEST["register"]=="add")
-		{
-			$result=add_mediatype($_REQUEST["type"],$_REQUEST["description"],$_REQUEST["smtp_server"],$_REQUEST["smtp_helo"],$_REQUEST["smtp_email"],$_REQUEST["exec_path"]);
-			show_messages($result, S_ADDED_NEW_MEDIA_TYPE, S_NEW_MEDIA_TYPE_WAS_NOT_ADDED);
-			if($result)
-			{
-				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_MEDIA_TYPE,"Media type [".addslashes($_REQUEST["description"])."]");
-			}
-		}
-		if($_REQUEST["register"]=="update media")
-		{
-			$result=update_mediatype($_REQUEST["mediatypeid"],$_REQUEST["type"],$_REQUEST["description"],$_REQUEST["smtp_server"],$_REQUEST["smtp_helo"],$_REQUEST["smtp_email"],$_REQUEST["exec_path"]);
-			if($result)
-			{
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MEDIA_TYPE,"Media type [".addslashes($_REQUEST["description"])."]");
-			}
-			show_messages($result, S_MEDIA_TYPE_UPDATED, S_MEDIA_TYPE_WAS_NOT_UPDATED);
-		}
-		if($_REQUEST["register"]=="delete")
-		{
-			$mediatype=get_mediatype_by_mediatypeid($_REQUEST["mediatypeid"]);
-			$result=delete_mediatype($_REQUEST["mediatypeid"]);
-			show_messages($result, S_MEDIA_TYPE_DELETED, S_MEDIA_TYPE_WAS_NOT_DELETED);
-			if($result)
-			{
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MEDIA_TYPE,"Media type [".$mediatype["description"]."]");
-			}
-			unset($_REQUEST["mediatypeid"]);
-		}
+		show_messages($result, S_AUTOREGISTRATION_UPDATED, S_AUTOREGISTRATION_WAS_NOT_UPDATED);
 	}
 ?>
 
@@ -259,6 +200,7 @@
 
 		show_table2_v_delimiter($col++);
 		echo "<form method=\"get\" action=\"config.php\">";
+		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"0\" size=8>";
 		echo "<input type=\"hidden\" name=\"refresh_unsupported\" value=\"".$config["refresh_unsupported"]."\">";
 		echo nbsp(S_DO_NOT_KEEP_ACTIONS_OLDER_THAN);
 		show_table2_h_delimiter();
@@ -270,7 +212,7 @@
 		echo "<input class=\"biginput\" name=\"alarm_history\" value=\"".$config["alarm_history"]."\" size=8>";
 
 		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"save\" value=\"".S_SAVE."\">";
 
 		show_table2_header_end();
 	}
@@ -295,7 +237,7 @@
 		echo "<input class=\"biginput\" name=\"refresh_unsupported\" value=\"".$config["refresh_unsupported"]."\" size=8>";
 
 		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"save\" value=\"".S_SAVE."\">";
 
 		show_table2_header_end();
 	}

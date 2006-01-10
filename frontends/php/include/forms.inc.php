@@ -1422,13 +1422,16 @@
 	
 			$pattern=$row["pattern"];
 			$priority=$row["priority"];
-			$hopstid=$row["hostid"];
+			$hostid=$row["hostid"];
+			$h=get_host_by_hostid($hostid);
+			$host=$h["host"];
 		}
 		else
 		{
 			$pattern="*";
 			$priority=10;
 			$hostid=0;
+			$host="";
 		}
 
 		$col=0;
@@ -1437,7 +1440,7 @@
 		echo S_AUTOREGISTRATION;
 
 		show_table2_v_delimiter($col++);
-		echo "<form method=\"get\" action=\"config.php\">";
+		echo "<form method=\"get\" name=\"auto\" action=\"config.php\">";
 		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_REQUEST["config"]."\" size=8>";
 		if(isset($id))
 		{
@@ -1456,26 +1459,17 @@
 		show_table2_v_delimiter($col++);
 		echo S_HOST;
 		show_table2_h_delimiter();
-
-		echo "<select class=\"biginput\" name=\"hostid\">";
-		echo form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
-
-		$sql="select h.hostid,h.host from hosts h where h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host";
-
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
-			echo form_select("hostid",$row["hostid"],$row["host"]);
-		}
-		echo "</select>";
+		echo "<input class=\"biginput\" type=\"hidden\" name=\"hostid\" value=\"$hostid\">";
+		echo "<input class=\"biginput\" readonly name=\"host\" size=32 value=\"$host\">";
+		echo "<input title=\"Select [Alt+T]\" accessKey=\"T\" type=\"button\" class=\"button\" value='Select' name=\"btn1\" onclick=\"window.open('popup.php?form=auto&field1=hostid&field2=host','new_win','width=450,height=450,resizable=1,scrollbars=1');\">";
 
 		show_table2_v_delimiter2($col++);
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add autoregistration\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"save\" value=\"".S_SAVE."\">";
 		if(isset($id))
 		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update autoregistration\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete autoregistration\" onClick=\"return Confirm('Delete selected autoregistration rule?');\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"delete\" value=\"".S_DELETE."\" onClick=\"return Confirm('Delete selected autoregistration rule?');\">";
 		}
+		echo "<input class=\"button\" type=\"submit\" name=\"cancel\" value=\"".S_CANCEL."\">";
 
 		show_table2_header_end();
 	}
@@ -1895,13 +1889,12 @@
 		}
 
 		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
-
+		echo "<input class=\"button\" type=\"submit\" name=\"save\" value=\"".S_SAVE."\">";
 		if(isset($_REQUEST["mediatypeid"]))
 		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update media\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('".S_DELETE_SELECTED_MEDIA."');\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"delete\" value=\"".S_DELETE."\" onClick=\"return Confirm('".S_DELETE_SELECTED_MEDIA."');\">";
 		}
+		echo "<input class=\"button\" type=\"submit\" name=\"calcel\" value=\"".S_CANCEL."\">";
 
 		show_table2_header_end();
 	}
@@ -1961,12 +1954,12 @@ function	insert_image_form()
 		echo "<input class=\"biginput\" name=\"image\" type=\"file\">";
 
 		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add image\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"save\" value=\"".S_SAVE."\">";
 		if(isset($_REQUEST["imageid"]))
 		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update image\" onClick=\"return Confirm('".S_UPDATE_SELECTED_IMAGE."');\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete image\" onClick=\"return Confirm('".S_DELETE_SELECTED_IMAGE."');\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"delete\" value=\"".S_DELETE."\" onClick=\"return Confirm('".S_DELETE_SELECTED_IMAGE."');\">";
 		}
+		echo "<input class=\"button\" type=\"submit\" name=\"cancel\" value=\"".S_CANCEL."\">";
 
 		show_table2_header_end();
 	}
