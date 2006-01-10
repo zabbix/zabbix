@@ -794,7 +794,7 @@ function SDI($msg) { echo "DEBUG INFO: $msg <br>"; } # DEBUG INFO!!!
 			}
 
 
-			if(( !in_array($function,array("str","regexp","logseverity","logsource"))
+			if(!in_array($function,array("str","regexp","logseverity","logsource"))
 				&& (validate_float($parameter)!=0) )
 			{
 				error("[$parameter] is not a float");
