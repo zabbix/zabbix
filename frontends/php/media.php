@@ -38,50 +38,51 @@
         }
 ?>
 
-
 <?php
-	if(isset($_REQUEST["register"]))
+	if(isset($_REQUEST["save"])&&isset($_REQUEST["mediaid"]))
 	{
-		if($_REQUEST["register"]=="enable")
-		{
-			$result=activate_media( $_REQUEST["mediaid"] );
-			show_messages($result, S_MEDIA_ACTIVATED, S_CANNOT_ACTIVATE_MEDIA);
-		}
-		elseif($_REQUEST["register"]=="disable")
-		{
-			$result=disactivate_media( $_REQUEST["mediaid"] );
-			show_messages($result, S_MEDIA_DISABLED, S_CANNOT_DISABLE_MEDIA);
-		}
-		elseif($_REQUEST["register"]=="add")
-		{
-			$severity=array();
-			if(isset($_REQUEST["0"]))	$severity=array_merge($severity,array(0));
-			if(isset($_REQUEST["1"]))	$severity=array_merge($severity,array(1));
-			if(isset($_REQUEST["2"]))	$severity=array_merge($severity,array(2));
-			if(isset($_REQUEST["3"]))	$severity=array_merge($severity,array(3));
-			if(isset($_REQUEST["4"]))	$severity=array_merge($severity,array(4));
-			if(isset($_REQUEST["5"]))	$severity=array_merge($severity,array(5));
-			$result=add_media( $_REQUEST["userid"], $_REQUEST["mediatypeid"], $_REQUEST["sendto"],$severity,$_REQUEST["active"],$_REQUEST["period"]);
-			show_messages($result, S_MEDIA_ADDED, S_CANNOT_ADD_MEDIA);
-		}
-		elseif($_REQUEST["register"]=="update")
-		{
-			$severity=array();
-			if(isset($_REQUEST["0"]))	$severity=array_merge($severity,array(0));
-			if(isset($_REQUEST["1"]))	$severity=array_merge($severity,array(1));
-			if(isset($_REQUEST["2"]))	$severity=array_merge($severity,array(2));
-			if(isset($_REQUEST["3"]))	$severity=array_merge($severity,array(3));
-			if(isset($_REQUEST["4"]))	$severity=array_merge($severity,array(4));
-			if(isset($_REQUEST["5"]))	$severity=array_merge($severity,array(5));
-			$result=update_media($_REQUEST["mediaid"], $_REQUEST["userid"], $_REQUEST["mediatypeid"], $_REQUEST["sendto"],$severity,$_REQUEST["active"],$_REQUEST["period"]);
-			show_messages($result,S_MEDIA_UPDATED,S_CANNOT_UPDATE_MEDIA);
-		}
-		elseif($_REQUEST["register"]=="delete")
-		{
-			$result=delete_media( $_REQUEST["mediaid"] );
-			show_messages($result,S_MEDIA_DELETED, S_CANNOT_DELETE_MEDIA);
-			unset($_REQUEST["mediaid"]);
-		}
+		$severity=array();
+		if(isset($_REQUEST["0"]))	$severity=array_merge($severity,array(0));
+		if(isset($_REQUEST["1"]))	$severity=array_merge($severity,array(1));
+		if(isset($_REQUEST["2"]))	$severity=array_merge($severity,array(2));
+		if(isset($_REQUEST["3"]))	$severity=array_merge($severity,array(3));
+		if(isset($_REQUEST["4"]))	$severity=array_merge($severity,array(4));
+		if(isset($_REQUEST["5"]))	$severity=array_merge($severity,array(5));
+		$result=update_media($_REQUEST["mediaid"], $_REQUEST["userid"], $_REQUEST["mediatypeid"], $_REQUEST["sendto"],$severity,$_REQUEST["active"],$_REQUEST["period"]);
+		show_messages($result,S_MEDIA_UPDATED,S_CANNOT_UPDATE_MEDIA);
+	}
+
+	if(isset($_REQUEST["save"])&&!isset($_REQUEST["mediaid"]))
+	{
+		$severity=array();
+		if(isset($_REQUEST["0"]))	$severity=array_merge($severity,array(0));
+		if(isset($_REQUEST["1"]))	$severity=array_merge($severity,array(1));
+		if(isset($_REQUEST["2"]))	$severity=array_merge($severity,array(2));
+		if(isset($_REQUEST["3"]))	$severity=array_merge($severity,array(3));
+		if(isset($_REQUEST["4"]))	$severity=array_merge($severity,array(4));
+		if(isset($_REQUEST["5"]))	$severity=array_merge($severity,array(5));
+		$result=add_media( $_REQUEST["userid"], $_REQUEST["mediatypeid"], $_REQUEST["sendto"],$severity,$_REQUEST["active"],$_REQUEST["period"]);
+		show_messages($result, S_MEDIA_ADDED, S_CANNOT_ADD_MEDIA);
+	}
+
+	if(isset($_REQUEST["delete"]))
+	{
+		$result=delete_media( $_REQUEST["mediaid"] );
+		show_messages($result,S_MEDIA_DELETED, S_CANNOT_DELETE_MEDIA);
+		unset($_REQUEST["mediaid"]);
+	}
+
+	if(isset($_REQUEST["action"])&&($_REQUEST["action"]=="enable"))
+	{
+		$result=activate_media( $_REQUEST["mediaid"] );
+		show_messages($result, S_MEDIA_ACTIVATED, S_CANNOT_ACTIVATE_MEDIA);
+	}
+
+	
+	if(isset($_REQUEST["action"])&&($_REQUEST["action"]=="disable"))
+	{
+		$result=disactivate_media( $_REQUEST["mediaid"] );
+		show_messages($result, S_MEDIA_DISABLED, S_CANNOT_DISABLE_MEDIA);
 	}
 ?>
 
@@ -107,13 +108,13 @@
 		{
 			if($row["active"]==0) 
 			{
-				$status="<a href=\"media.php?register=disable&mediaid=".$row["mediaid"]."&userid=".$_REQUEST["userid"]."\"><font color=\"00AA00\">".S_ENABLED."</font></A>";
+				$status="<a href=\"media.php?action=disable&mediaid=".$row["mediaid"]."&userid=".$_REQUEST["userid"]."\"><font color=\"00AA00\">".S_ENABLED."</font></A>";
 			}
 			else
 			{
-				$status="<a href=\"media.php?register=enable&mediaid=".$row["mediaid"]."&userid=".$_REQUEST["userid"]."\"><font color=\"AA0000\">".S_DISABLED."</font></A>";
+				$status="<a href=\"media.php?action=enable&mediaid=".$row["mediaid"]."&userid=".$_REQUEST["userid"]."\"><font color=\"AA0000\">".S_DISABLED."</font></A>";
 			}
-			$actions="<A HREF=\"media.php?register=change&mediaid=".$row["mediaid"]."&userid=".$_REQUEST["userid"]."\">".S_CHANGE."</A>";
+			$actions="<A HREF=\"media.php?register=change&form=0&mediaid=".$row["mediaid"]."&userid=".$_REQUEST["userid"]."\">".S_CHANGE."</A>";
 			$table->addRow(array(
 				$row["description"],
 				$row["sendto"],
