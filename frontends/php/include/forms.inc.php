@@ -2124,5 +2124,183 @@ function	insert_image_form()
 
 		show_table2_header_end();
 	}
+
+	function	insert_host_form()
+	{
+
+		global $_REQUEST;
+
+		$host=@iif(isset($_REQUEST["host"]),$_REQUEST["host"],"");
+		$port=@iif(isset($_REQUEST["port"]),$_REQUEST["port"],get_profile("HOST_PORT",10050));
+		$status=@iif(isset($_REQUEST["status"]),$_REQUEST["status"],HOST_STATUS_MONITORED);
+		$useip=@iif(isset($_REQUEST["useip"]),$_REQUEST["useip"],"off");
+		$newgroup=@iif(isset($_REQUEST["newgroup"]),$_REQUEST["newgroup"],"");
+		$ip=@iif(isset($_REQUEST["ip"]),$_REQUEST["ip"],"");
+		$host_templateid=@iif(isset($_REQUEST["host_templateid"]),$_REQUEST["host_templateid"],"");
+
+		if($useip!="on")
+		{
+			$useip="";
+		}
+		else
+		{
+			$useip="checked";
+		}
+
+		if(isset($_REQUEST["register"]) && ($_REQUEST["register"] == "change"))
+		{
+			$result=get_host_by_hostid($_REQUEST["hostid"]);
+			$host=$result["host"];
+			$port=$result["port"];
+			$status=$result["status"];
+			$useip=$result["useip"];
+			$ip=$result["ip"];
 	
+			if($useip==0)
+			{
+				$useip="";
+			}
+			else
+			{
+				$useip="checked";
+			}
+		}
+		else
+		{
+		}
+
+
+		echo "<a name=\"form\"></a>";
+		show_form_begin("hosts.host");
+		echo S_HOST;
+		$col=0;
+
+		show_table2_v_delimiter($col++);
+		echo "<form method=\"get\" action=\"hosts.php#form\">";
+		if(isset($_REQUEST["hostid"]))
+		{
+			echo "<input class=\"biginput\" name=\"hostid\" type=\"hidden\" value=\"".$_REQUEST["hostid"]."\">";
+		}
+		if(isset($_REQUEST["groupid"]))
+		{
+			echo "<input class=\"biginput\" name=\"groupid\" type=\"hidden\" value=\"".$_REQUEST["groupid"]."\">";
+		}
+		echo S_HOST;
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"host\" value=\"$host\" size=20>";
+
+		show_table2_v_delimiter($col++);
+		echo S_GROUPS;
+		show_table2_h_delimiter();
+		$result=DBselect("select distinct groupid,name from groups order by name");
+		while($row=DBfetch($result))
+		{
+			if(isset($_REQUEST["hostid"]))
+			{
+				$sql="select count(*) as count from hosts_groups where hostid=".$_REQUEST["hostid"]." and groupid=".$row["groupid"];
+				$result2=DBselect($sql);
+				$row2=DBfetch($result2);
+				if($row2["count"]==0)
+				{
+					echo "<input type=checkbox name=\"".$row["groupid"]."\">".$row["name"];
+				}
+				else
+				{
+					echo "<input type=checkbox name=\"".$row["groupid"]."\" checked>".$row["name"];
+				}
+			}
+			else
+			{
+				echo "<input type=checkbox name=\"".$row["groupid"]."\">".$row["name"];
+			}
+			echo "<br>";
+		}
+		echo "</select>";
+
+		show_table2_v_delimiter($col++);
+		echo nbsp(S_NEW_GROUP);
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"newgroup\" size=20 value=\"$newgroup\">";
+
+		show_table2_v_delimiter($col++);
+		echo nbsp(S_USE_IP_ADDRESS);
+		show_table2_h_delimiter();
+// onChange does not work on some browsers: MacOS, KDE browser
+//	echo "<INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"useip\" $useip onChange=\"submit()\">";
+		echo "<INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"useip\" $useip onClick=\"submit()\">";
+
+		if($useip=="checked")
+		{
+			show_table2_v_delimiter($col++);
+			echo S_IP_ADDRESS;
+			show_table2_h_delimiter();
+			echo "<input class=\"biginput\" name=\"ip\" value=\"$ip\" size=15>";
+		}
+		else
+		{
+			echo "<input class=\"biginput\" type=\"hidden\"name=\"ip\" value=\"$ip\" size=15>";
+		}
+	
+		show_table2_v_delimiter($col++);
+		echo S_PORT;
+		show_table2_h_delimiter();
+		echo "<input class=\"biginput\" name=\"port\" size=6 value=\"$port\">";
+	
+		show_table2_v_delimiter($col++);
+		echo S_STATUS;
+		show_table2_h_delimiter();
+		echo "<select class=\"biginput\" name=\"status\" size=\"1\">";
+		if($status==HOST_STATUS_MONITORED)
+		{
+			echo "<option value=\"0\" selected>".S_MONITORED;
+			echo "<option value=\"1\">".S_NOT_MONITORED;
+			echo "<option value=\"3\">".S_TEMPLATE;
+		}
+		else if($status==HOST_STATUS_TEMPLATE)
+		{
+			echo "<option value=\"0\">".S_MONITORED;
+			echo "<option value=\"1\">".S_NOT_MONITORED;
+			echo "<option value=\"3\" selected>".S_TEMPLATE;
+		}
+		else
+		{
+			echo "<option value=\"0\">".S_MONITORED;
+			echo "<option value=\"1\" selected>".S_NOT_MONITORED;
+			echo "<option value=\"3\">".S_TEMPLATE;
+		}
+		echo "</select>";
+
+		show_table2_v_delimiter($col++);
+//	echo nbsp(S_USE_THE_HOST_AS_A_TEMPLATE);
+		echo nbsp(S_USE_TEMPLATES_OF_THIS_HOST);
+		show_table2_h_delimiter();
+		echo "<select class=\"biginput\" name=\"host_templateid\" size=\"1\">";
+		echo "<option value=\"0\" selected>...";
+//	$result=DBselect("select host,hostid from hosts where status=3 order by host");
+		$result=DBselect("select host,hostid from hosts where status not in (".HOST_STATUS_DELETED.") order by host");
+		while($row=DBfetch($result))
+		{
+			if($host_templateid == $row["hostid"])
+			{
+				echo "<option value=\"".$row["hostid"]."\" selected>".$row["host"];
+			}
+			else
+			{
+				echo "<option value=\"".$row["hostid"]."\">".$row["host"];
+			}
+			
+		}
+		echo "</select>";
+	
+		show_table2_v_delimiter2();
+		echo "<input class=\"button\" type=\"submit\" name=\"save\" value=\"".S_SAVE."\">";
+		if(isset($_REQUEST["hostid"]))
+		{
+			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add items from template\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"delete\" value=\"".S_DELETE."\" onClick=\"return Confirm('".S_DELETE_SELECTED_HOST_Q."');\">";
+		}
+		echo "<input class=\"button\" type=\"submit\" name=\"cancel\" value=\"".S_CANCEL."\">";
+
+		show_table2_header_end();
+	}
 ?>
