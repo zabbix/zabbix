@@ -2121,12 +2121,13 @@ function	insert_image_form()
 		echo "</select>";
 	
 		show_table2_v_delimiter2($col++);
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"save\" value=\"".S_SAVE."\">";
 		if(isset($_REQUEST["mediaid"]))
 		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('".S_DELETE_SELECTED_MEDIA_Q."');\">";
+//			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
+			echo "<input class=\"button\" type=\"submit\" name=\"delete\" value=\"".S_DELETE."\" onClick=\"return Confirm('".S_DELETE_SELECTED_MEDIA_Q."');\">";
 		}
+		echo "<input class=\"button\" type=\"submit\" name=\"cancel\" value=\"".S_CANCEL."\">";
 
 		show_table2_header_end();
 	}
