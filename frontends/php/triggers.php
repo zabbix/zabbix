@@ -56,6 +56,51 @@
 ?>
 
 <?php
+	if(isset($_REQUEST["save"])&&!isset($_REQUEST["triggerid"]))
+	{
+		if(validate_expression($_REQUEST["expression"])==0)
+		{
+			if(isset($_REQUEST["disabled"]))	{ $status=1; }
+			else			{ $status=0; }
+			
+			$triggerid=add_trigger($_REQUEST["expression"],$_REQUEST["description"],$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"]);
+			add_trigger_to_linked_hosts($triggerid);
+			show_messages($triggerid, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
+		}
+		else
+		{
+			show_error_message(S_INVALID_TRIGGER_EXPRESSION);
+		}
+		unset($_REQUEST["triggerid"]);
+	}
+
+	if(isset($_REQUEST["save"])&&isset($_REQUEST["triggerid"]))
+	{
+		if(validate_expression($_REQUEST["expression"])==0)
+		{
+			$now=mktime();
+			if(isset($_REQUEST["disabled"]))	{ $status=1; }
+			else			{ $status=0; }
+
+			$result=update_trigger($_REQUEST["triggerid"],$_REQUEST["expression"],$_REQUEST["description"],$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"]);
+			update_trigger_from_linked_hosts($_REQUEST["triggerid"]);
+			show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
+		}
+		else
+		{
+			show_error_message(S_INVALID_TRIGGER_EXPRESSION);
+		}
+		unset($_REQUEST["triggerid"]);
+	}
+
+	if(isset($_REQUEST["delete"]))
+	{
+		delete_trigger_from_templates($_REQUEST["triggerid"]);
+		$result=delete_trigger($_REQUEST["triggerid"]);
+		show_messages($result, S_TRIGGER_DELETED, S_CANNOT_DELETE_TRIGGER);
+		unset($_REQUEST["triggerid"]);
+	}
+
 	if(isset($_REQUEST["register"]))
 	{
 		if($_REQUEST["register"]=="add dependency")
@@ -110,47 +155,8 @@
 			}
 			show_messages(TRUE, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
 		}
-		if($_REQUEST["register"]=="update")
-		{
-			if(validate_expression($_REQUEST["expression"])==0)
-			{
-				$now=mktime();
-				if(isset($_REQUEST["disabled"]))	{ $status=1; }
-				else			{ $status=0; }
-	
-				$result=update_trigger($_REQUEST["triggerid"],$_REQUEST["expression"],$_REQUEST["description"],$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"]);
-				update_trigger_from_linked_hosts($_REQUEST["triggerid"]);
-				show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
-			}
-			else
-			{
-				show_error_message(S_INVALID_TRIGGER_EXPRESSION);
-			}
-			unset($_REQUEST["triggerid"]);
-		}
-		if($_REQUEST["register"]=="add")
-		{
-			if(validate_expression($_REQUEST["expression"])==0)
-			{
-				if(isset($_REQUEST["disabled"]))	{ $status=1; }
-				else			{ $status=0; }
-				
-				$triggerid=add_trigger($_REQUEST["expression"],$_REQUEST["description"],$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"]);
-				add_trigger_to_linked_hosts($triggerid);
-				show_messages($triggerid, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
-			}
-			else
-			{
-				show_error_message(S_INVALID_TRIGGER_EXPRESSION);
-			}
-			unset($_REQUEST["triggerid"]);
-		}
 		if($_REQUEST["register"]=="delete")
 		{
-			delete_trigger_from_templates($_REQUEST["triggerid"]);
-			$result=delete_trigger($_REQUEST["triggerid"]);
-			show_messages($result, S_TRIGGER_DELETED, S_CANNOT_DELETE_TRIGGER);
-			unset($_REQUEST["triggerid"]);
 		}
 	}
 ?>

@@ -37,24 +37,23 @@
 ?>
 
 <?php
-	if(isset($_REQUEST["register"]))
+	if(isset($_REQUEST["save"])&&!isset($_REQUEST["sysmapid"]))
 	{
-		if($_REQUEST["register"]=="add")
-		{
-			$result=add_sysmap($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["background"],$_REQUEST["label_type"]);
-			show_messages($result,"Network map added","Cannot add network map");
-		}
-		if($_REQUEST["register"]=="update")
-		{
-			$result=update_sysmap($_REQUEST["sysmapid"],$_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["background"],$_REQUEST["label_type"]);
-			show_messages($result,"Network map updated","Cannot update network map");
-		}
-		if($_REQUEST["register"]=="delete")
-		{
-			$result=delete_sysmap($_REQUEST["sysmapid"]);
-			show_messages($result,"Network map deleted","Cannot delete network map");
-			unset($_REQUEST["sysmapid"]);
-		}
+		$result=add_sysmap($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["background"],$_REQUEST["label_type"]);
+		show_messages($result,"Network map added","Cannot add network map");
+	}
+
+	if(isset($_REQUEST["save"])&&isset($_REQUEST["sysmapid"]))
+	{
+		$result=update_sysmap($_REQUEST["sysmapid"],$_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["background"],$_REQUEST["label_type"]);
+		show_messages($result,"Network map updated","Cannot update network map");
+	}
+
+	if(isset($_REQUEST["delete"]))
+	{
+		$result=delete_sysmap($_REQUEST["sysmapid"]);
+		show_messages($result,"Network map deleted","Cannot delete network map");
+		unset($_REQUEST["sysmapid"]);
 	}
 ?>
 
@@ -84,7 +83,7 @@
 				"<a href=\"sysmap.php?sysmapid=".$row["sysmapid"]."\">".$row["name"]."</a>",
 				$row["width"],
 				$row["height"],
-				"<A HREF=\"sysmaps.php?sysmapid=".$row["sysmapid"]."#form\">Change</A>"
+				"<A HREF=\"sysmaps.php?sysmapid=".$row["sysmapid"]."&amp;form=0#form\">Change</A>"
 				));
 		}
 		$table->show();
@@ -203,12 +202,12 @@
 	echo "</SELECT>";
 
 	show_table2_v_delimiter2();
-	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
+	echo "<input class=\"button\" type=\"submit\" name=\"save\" value=\"".S_SAVE."\">";
 	if(isset($_REQUEST["sysmapid"]))
 	{
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete system map?');\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"delete\" value=\"".S_DELETE."\" onClick=\"return Confirm('Delete system map?');\">";
 	}
+	echo "<input class=\"button\" type=\"submit\" name=\"cancel\" value=\"".S_CANCEL."\">";
 
 	}
 	show_table2_header_end();
