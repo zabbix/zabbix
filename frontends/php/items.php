@@ -245,10 +245,10 @@
 	{
 		$table  = new CTableInfo();
 		$table->setHeader(array(S_ID,S_KEY,S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,S_ERROR));
-		$h="<form method=\"get\" action=\"items.php\">";
-		$h=$h."<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_REQUEST["hostid"]." size=8>";
+//		$h="<form method=\"get\" action=\"items.php\">";
+//		$h=$h."<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_REQUEST["hostid"]." size=8>";
 
-		$table->setAfterHeader($h);
+//		$table->setAfterHeader($h);
 
 		$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.nextcheck,h.hostid,i.type,i.trends,i.error from hosts h,items i where h.hostid=i.hostid and h.hostid=".$_REQUEST["hostid"]." order by h.host,i.key_,i.description");
 		$col=0;
@@ -299,13 +299,13 @@
 			switch($row["status"])
 			{
 				case 0:
-					$status=array("value"=>"<a class=\"off\" href=\"items.php?itemid=".$row["itemid"]."&hostid=".$_REQUEST["hostid"]."&register=changestatus&status=1\">".S_ACTIVE."</a>","class"=>"off");
+					$status=new CCol(new CLink(S_ACTIVE, "items.php?itemid=".$row["itemid"]."&hostid=".$_REQUEST["hostid"]."&register=changestatus&status=1","off"),"off");
 					break;
 				case 1:
-					$status=array("value"=>"<a class=\"on\" href=\"items.php?itemid=".$row["itemid"]."&hostid=".$_REQUEST["hostid"]."&register=changestatus&status=0\">".S_NOT_ACTIVE."</a>","class"=>"on");
+					$status=new CCol(new CLink(S_ACTIVE, "items.php?itemid=".$row["itemid"]."&hostid=".$_REQUEST["hostid"]."&register=changestatus&status=0","on"),"on");
 					break;
 				case 3:
-					$status=array("value"=>S_NOT_SUPPORTED,"class"=>"unknown");
+					$status=new CCol(S_NOT_SUPPORTED,"unknown");
 					break;
 				default:
 					$status=S_UNKNOWN;
@@ -313,11 +313,11 @@
 	
 			if($row["error"] == "")
 			{
-				$error=array("value"=>"&nbsp;","class"=>"off");
+				$error=new CCol("&nbsp;","off");
 			}
 			else
 			{
-				$error=array("value"=>$row["error"],"class"=>"on");
+				$error=new CCol($row["error"],"on");
 			}
 			$table->AddRow(array(
 				$input,
@@ -331,14 +331,29 @@
 				$error
 				));
 		}
-		$table->show();
+//		$table->show();
 
-		$h="<input class=\"button\" type=\"submit\" name=\"register\" value=\"Activate selected\" onClick=\"return Confirm('".S_ACTIVATE_SELECTED_ITEMS_Q."');\">";
-		$h=$h."<input class=\"button\" type=\"submit\" name=\"register\" value=\"Disable selected\" onClick=\"return Confirm('".S_DISABLE_SELECTED_ITEMS_Q."');\">";
-		$h=$h."<input class=\"button\" type=\"submit\" name=\"register\" value=\"Delete selected\" onClick=\"return Confirm('".S_DELETE_SELECTED_ITEMS_Q."');\">";
-		$h=$h."</form>";
+		$footerButtons = array();
+		array_push($footerButtons, new CButton('register','Activate selected',
+			"return Confirm('".S_ACTIVATE_SELECTED_ITEMS_Q."');"));
+		array_push($footerButtons, new CButton('register','Disable selected',
+			"return Confirm('".S_DISABLE_SELECTED_ITEMS_Q."');"));
+		array_push($footerButtons, new CButton('register','Delete selected',
+			"return Confirm('".S_DELETE_SELECTED_ITEMS_Q."');"));
+		$table->SetFooter(new CCol($footerButtons),'table_footer');
 
-		show_table_header($h);
+		$form = new CForm('items.php');
+		$form->AddVar('hostid',$_REQUEST["hostid"]);
+		$form->AddItem($table);
+		$form->Show();
+
+
+//		$h="<input class=\"button\" type=\"submit\" name=\"register\" value=\"Activate selected\" onClick=\"return Confirm('".S_ACTIVATE_SELECTED_ITEMS_Q."');\">";
+//		$h=$h."<input class=\"button\" type=\"submit\" name=\"register\" value=\"Disable selected\" onClick=\"return Confirm('".S_DISABLE_SELECTED_ITEMS_Q."');\">";
+//		$h=$h."<input class=\"button\" type=\"submit\" name=\"register\" value=\"Delete selected\" onClick=\"return Confirm('".S_DELETE_SELECTED_ITEMS_Q."');\">";
+//		$h=$h."</form>";
+
+//		show_table_header($h);
 	}
 
 	}
