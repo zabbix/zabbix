@@ -48,7 +48,23 @@ function SDI($msg) { echo "DEBUG INFO: $msg <br>"; } # DEBUG INFO!!!
 	include_once 	"include/maps.inc.php";
 	include_once 	"include/media.inc.php";
 
-	include_once 	"include/classes/table.inc.php";
+// Include Classes
+	include_once("include/classes/ctag.inc.php");
+	include_once("include/classes/cvar.inc.php");
+	include_once("include/classes/cimg.inc.php");
+	include_once("include/classes/clink.inc.php");
+	include_once("include/classes/chelp.inc.php");
+	include_once("include/classes/cbutton.inc.php");
+	include_once("include/classes/ccombobox.inc.php");
+	include_once("include/classes/ctable.inc.php");
+	include_once("include/classes/ctableinfo.inc.php");
+	include_once("include/classes/ctextarea.inc.php");
+	include_once("include/classes/ctextbox.inc.php");
+	include_once("include/classes/cpassbox.inc.php");
+	include_once("include/classes/cform.inc.php");
+	include_once("include/classes/ccheckbox.inc.php");
+	include_once("include/classes/cform.inc.php");
+	include_once("include/classes/cformtable.inc.php");
 
 	function info($msg)
 	{
@@ -674,7 +690,7 @@ function SDI($msg) { echo "DEBUG INFO: $msg <br>"; } # DEBUG INFO!!!
 		return	$config;
 	}
 
-	function	show_messages($bool,$msg,$errmsg)
+	function	show_messages($bool=TRUE,$msg=NULL,$errmsg=NULL)
 	{
 		global	$ERROR_MSG;
 		global	$INFO_MSG;
@@ -690,7 +706,8 @@ function SDI($msg) { echo "DEBUG INFO: $msg <br>"; } # DEBUG INFO!!!
 		}
 		echo "<p align=center>";
 		echo "<font color='$color'>";
-		echo "<b>[$msg]</b>";
+		if(isset($msg))
+			echo "<b>[$msg]</b>";
 		echo "</font>";
 		echo "</p>";
 

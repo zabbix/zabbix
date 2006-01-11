@@ -874,30 +874,12 @@
 
 	function	insert_login_form()
 	{
-		global	$_REQUEST;
-
-		$col=0;
-
-		show_form_begin("index.login");
-		echo "Login";
-
-		show_table2_v_delimiter($col++);
-		echo "<form method=\"post\" action=\"index.php\">";
-
-		echo "Login name";
-		show_table2_h_delimiter();
-//		echo "<input name=\"name\" value=\"".$_REQUEST["name"]."\" size=20>";
-		echo "<input class=\"biginput\" name=\"name\" value=\"\" size=20>";
-
-		show_table2_v_delimiter($col++);
-		echo "Password";
-		show_table2_h_delimiter();
-//		echo "<input type=\"password\" name=\"password\" value=\"$password\" size=20>";
-		echo "<input class=\"biginput\" type=\"password\" name=\"password\" value=\"\" size=20>";
-
-		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"Enter\">";
-		show_table2_header_end();
+		$frmLogin = new CForm('Login','index.php');
+		$frmLogin->SetHelp('web.index.login');
+		$frmLogin->AddRow('Login name', new CTextBox('name'));
+		$frmLogin->AddRow('Password', new CPassBox('password'));
+		$frmLogin->AddBottomRow(new CButton('register','Enter'));
+		$frmLogin->Show();
 	}
 
 	# Insert form for Problem
@@ -1479,18 +1461,28 @@
 	{
 		global  $_REQUEST;
 
+		$uid=NULL;
+
+		$frmAction = new CFormTable(S_ACTION,'actionconf.php');
+		$frmAction->SetHelp('web.actions.action');
+		if(isset($_REQUEST['form']))
+			$frmAction->AddVar('form',$_REQUEST['form']);
+
+		$conditiontype=@iif(isset($_REQUEST["conditiontype"]),$_REQUEST["conditiontype"],0);
+
 		if(isset($_REQUEST["actionid"]))
 		{
 			$action=get_action_by_actionid($_REQUEST["actionid"]);
+			$frmAction->AddVar('actionid',$_REQUEST["actionid"]);
 
 			$actionid=$action["actionid"];
 			$actiontype=$action["actiontype"];
 			$source=$action["source"];
 			$delay=$action["delay"];
+			$uid=$action["userid"];
 			// Otherwise symbols like ",' will not be shown
 			$subject=htmlspecialchars($action["subject"]);
 			$message=$action["message"];
-			$uid=$action["userid"];
 			$recipient=@iif(isset($_REQUEST["recipient"]),$_REQUEST["recipient"],$action["recipient"]);
 			$maxrepeats=$action["maxrepeats"];
 			$repeatdelay=$action["repeatdelay"];
@@ -1519,288 +1511,240 @@
 		}
 		else
 		{
-			$source=0;
-			$actiontype=0;
-			$filter_trigger_name="";
-			$filter_triggerid=0;
-			$filter_groupid=0;
-			$filter_hostid=0;
-			$description="";
+			$source=@iif(isset($_REQUEST["source"]),$_REQUEST["source"],0);
+			$actiontype=@iif(isset($_REQUEST["actiontype"]),$_REQUEST["actiontype"],0);
 
-	//		$delay=30;
 			$delay=@iif(isset($_REQUEST["delay"]),$_REQUEST["delay"],30);
-//		$subject=$description;
 			$subject=@iif(isset($_REQUEST["subject"]),$_REQUEST["subject"],"{TRIGGER.NAME}: {STATUS}");
 			$message=@iif(isset($_REQUEST["message"]),$_REQUEST["message"],"{TRIGGER.NAME}: {STATUS}");
 			$scope=@iif(isset($_REQUEST["scope"]),$_REQUEST["scope"],0);
 			$recipient=@iif(isset($_REQUEST["recipient"]),$_REQUEST["recipient"],RECIPIENT_TYPE_GROUP);
-//		$severity=0;
 			$severity=@iif(isset($_REQUEST["severity"]),$_REQUEST["severity"],0);
 			$maxrepeats=@iif(isset($_REQUEST["maxrepeats"]),$_REQUEST["maxrepeats"],0);
 			$repeatdelay=@iif(isset($_REQUEST["repeatdelay"]),$_REQUEST["repeatdelay"],600);
 			$repeat=@iif(isset($_REQUEST["repeat"]),$_REQUEST["repeat"],0);
+
+			if($recipient==RECIPIENT_TYPE_GROUP)
+				$uid=@iif(isset($_REQUEST["usrgrpid"]),$_REQUEST["usrgrpid"],NULL);
+			else
+				$uid=@iif(isset($_REQUEST["userid"]),$_REQUEST["userid"],NULL);
 		}
 
-		$conditiontype=@iif(isset($_REQUEST["conditiontype"]),$_REQUEST["conditiontype"],0);
 
-
-		show_form_begin("actions.action");
-		echo nbsp(S_ACTION);
-		$col=0;
-
-		show_table2_v_delimiter($col++);
-		echo "<form name=\"action\" method=\"get\" action=\"actionconf.php\">";
-		echo "<input name=\"form\" type=\"hidden\" value=\"0\">";
-		if(isset($_REQUEST["actionid"]))
+// prepare condition list
+		$cond_el=array();
+		for($i=1; $i<=1000; $i++)
 		{
-			echo "<input name=\"actionid\" type=\"hidden\" value=".$_REQUEST["actionid"].">";
-		}
-		echo nbsp(S_SOURCE);
-		show_table2_h_delimiter();
-		echo "<select class=\"biginput\" name=\"source\" size=1>";
-		echo "<OPTION VALUE=\"0\""; if($source==0) echo "SELECTED"; echo ">".S_TRIGGER;
-		echo "</SELECT>";
-
-		show_table2_v_delimiter($col);
-		echo nbsp(S_CONDITIONS);
-		show_table2_h_delimiter();
-		$found=0;
-		for($i=1;$i<=1000;$i++)
-		{
-			if(isset($_REQUEST["conditiontype$i"]))
-			{
-				echo "<input type=checkbox name=\"conditionchecked$i\">".get_condition_desc($_REQUEST["conditiontype$i"],$_REQUEST["conditionop$i"],$_REQUEST["conditionvalue$i"]);
-				echo "<br>";
-				$found=1;
-			}
+			if(!isset($_REQUEST["conditiontype$i"])) continue;
+			array_push($cond_el, 
+				new CCheckBox(
+					"conditionchecked$i",
+					get_condition_desc(
+						$_REQUEST["conditiontype$i"],
+						$_REQUEST["conditionop$i"],
+						$_REQUEST["conditionvalue$i"]
+					)
+				),
+				BR
+			);
+			$frmAction->AddVar("conditiontype$i", $_REQUEST["conditiontype$i"]);
+			$frmAction->AddVar("conditionop$i", $_REQUEST["conditionop$i"]);
+			$frmAction->AddVar("conditionvalue$i", $_REQUEST["conditionvalue$i"]);
 		}
 
-		for($i=1;$i<=1000;$i++)
-		{
-			if(isset($_REQUEST["conditiontype$i"]))
-			{
-				echo "<input name=\"conditiontype$i\" type=\"hidden\" value=\"".$_REQUEST["conditiontype$i"]."\">";
-				echo "<input name=\"conditionop$i\" type=\"hidden\" value=\"".$_REQUEST["conditionop$i"]."\">";
-				echo "<input name=\"conditionvalue$i\" type=\"hidden\" value=\"".$_REQUEST["conditionvalue$i"]."\">";
-			}
-		}
-		if($found==0) echo S_NO_CONDITIONS_DEFINED;
+		if(count($cond_el)==0)
+			array_push($cond_el, S_NO_CONDITIONS_DEFINED);
+		else
+			array_push($cond_el, new CButton('register','delete selected'));
+// end of condition list preparation
 
-		show_table2_v_delimiter($col++);
-		echo nbsp(" ");
-		show_table2_h_delimiter();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete selected\">";
+		$cmbSource =  new CComboBox('source', $source);
+		$cmbSource->AddItem(0, S_TRIGGER);
+		$frmAction->AddRow(S_SOURCE, $cmbSource);
 
-//		show_table2_v_delimiter($col);
-//		echo nbsp("                                        "."Condition");
-//		show_table2_h_delimiter();
-		$h2="<select class=\"biginput\" name=\"conditiontype\" onChange=\"submit()\">";
-		$h2=$h2.form_select("conditiontype",CONDITION_TYPE_GROUP,S_HOST_GROUP);
-		$h2=$h2.form_select("conditiontype",CONDITION_TYPE_HOST,S_HOST);
-		$h2=$h2.form_select("conditiontype",CONDITION_TYPE_TRIGGER,S_TRIGGER);
-		$h2=$h2.form_select("conditiontype",CONDITION_TYPE_TRIGGER_NAME,S_TRIGGER_NAME);
-		$h2=$h2.form_select("conditiontype",CONDITION_TYPE_TRIGGER_SEVERITY,S_TRIGGER_SEVERITY);
-		$h2=$h2.form_select("conditiontype",CONDITION_TYPE_TRIGGER_VALUE,S_TRIGGER_VALUE);
-		$h2=$h2.form_select("conditiontype",CONDITION_TYPE_TIME_PERIOD,S_TIME_PERIOD);
-		$h2=$h2."</SELECT>";
-//		echo $h2;
+		$frmAction->AddRow(S_CONDITIONS, $cond_el); 
 
-		$h2=$h2."<select class=\"biginput\" name=\"operator\">";
-		if(in_array($conditiontype,array(CONDITION_TYPE_GROUP, CONDITION_TYPE_HOST,CONDITION_TYPE_TRIGGER,CONDITION_TYPE_TRIGGER_SEVERITY,CONDITION_TYPE_TRIGGER_VALUE)))
-			$h2=$h2.form_select("operator",CONDITION_OPERATOR_EQUAL,"=");
-		if(in_array($conditiontype,array(CONDITION_TYPE_GROUP, CONDITION_TYPE_HOST,CONDITION_TYPE_TRIGGER,CONDITION_TYPE_TRIGGER_SEVERITY)))
-			$h2=$h2.form_select("operator",CONDITION_OPERATOR_NOT_EQUAL,"<>");
+// prepare new condition
+		$rowCondition=array();
+
+// add condition type
+		$cmbCondType = new CComboBox('conditiontype',$conditiontype,'submit()');
+		$cmbCondType->AddItem(CONDITION_TYPE_GROUP,		S_HOST_GROUP);
+		$cmbCondType->AddItem(CONDITION_TYPE_HOST,		S_HOST);
+		$cmbCondType->AddItem(CONDITION_TYPE_TRIGGER,		S_TRIGGER);
+		$cmbCondType->AddItem(CONDITION_TYPE_TRIGGER_NAME,	S_TRIGGER_NAME);
+		$cmbCondType->AddItem(CONDITION_TYPE_TRIGGER_SEVERITY,	S_TRIGGER_SEVERITY);
+		$cmbCondType->AddItem(CONDITION_TYPE_TRIGGER_VALUE,	S_TRIGGER_VALUE);
+		$cmbCondType->AddItem(CONDITION_TYPE_TIME_PERIOD,	S_TIME_PERIOD);
+
+		array_push($rowCondition,$cmbCondType);
+
+// add condition operation
+		$cmbCondOp = new CComboBox('operator');
+		if(in_array($conditiontype, array(
+				CONDITION_TYPE_GROUP,
+				CONDITION_TYPE_HOST,
+				CONDITION_TYPE_TRIGGER,
+				CONDITION_TYPE_TRIGGER_SEVERITY,
+				CONDITION_TYPE_TRIGGER_VALUE)))
+			$cmbCondOp->AddItem(CONDITION_OPERATOR_EQUAL,		'=');
+		if(in_array($conditiontype,array(
+				CONDITION_TYPE_GROUP,
+				CONDITION_TYPE_HOST,
+				CONDITION_TYPE_TRIGGER,
+				CONDITION_TYPE_TRIGGER_SEVERITY)))
+			$cmbCondOp->AddItem(CONDITION_OPERATOR_NOT_EQUAL,	'<>');
 		if(in_array($conditiontype,array(CONDITION_TYPE_TRIGGER_NAME)))
-			$h2=$h2.form_select("operator",CONDITION_OPERATOR_LIKE,"like");
+			$cmbCondOp->AddItem(CONDITION_OPERATOR_LIKE,		'like');
 		if(in_array($conditiontype,array(CONDITION_TYPE_TRIGGER_NAME)))
-			$h2=$h2.form_select("operator",CONDITION_OPERATOR_NOT_LIKE,"not like");
+			$cmbCondOp->AddItem(CONDITION_OPERATOR_NOT_LIKE,	'not like');
 		if(in_array($conditiontype,array(CONDITION_TYPE_TIME_PERIOD)))
-			$h2=$h2.form_select("operator",CONDITION_OPERATOR_IN,"in");
+			$cmbCondOp->AddItem(CONDITION_OPERATOR_IN,		'in');
 		if(in_array($conditiontype,array(CONDITION_TYPE_TRIGGER_SEVERITY)))
-			$h2=$h2.form_select("operator",CONDITION_OPERATOR_MORE_EQUAL,">=");
-		$h2=$h2."</SELECT>";
+			$cmbCondOp->AddItem(CONDITION_OPERATOR_MORE_EQUAL,	'>=');
 
-		show_table2_v_delimiter($col);
-		echo nbsp(S_CONDITION);
-		show_table2_h_delimiter();
+		array_push($rowCondition,$cmbCondOp);
 
+
+// add condition value
 		if($conditiontype == CONDITION_TYPE_GROUP)
 		{
-			$h2=$h2."<select class=\"biginput\" name=\"value\">";
-			$result=DBselect("select groupid,name from groups order by name");
-			while($row=DBfetch($result))
+			$cmbCondVal = new CComboBox('value');
+			$groups = DBselect("select groupid,name from groups order by name");
+			while($group = DBfetch($groups))
 			{
-				$h2=$h2.form_select("value",$row["groupid"],$row["name"]);
+				$cmbCondVal->AddItem($group["groupid"],$group["name"]);
 			}
-			$h2=$h2."</SELECT>";
+			array_push($rowCondition,$cmbCondVal);
 		}
 		else if($conditiontype == CONDITION_TYPE_HOST)
 		{
-			echo "<input name=\"value\" type=\"hidden\" value=\"0\">";
-			$h2=$h2."<input class=\"biginput\" readonly name=\"host\" value=\"\" size=20>";
-			$h2=$h2."<input title=\"Select [Alt+T]\" accessKey=\"T\" type=\"button\" class=\"button\" value='Select' name=\"btn1\" onclick=\"window.open('popup.php?form=action&field1=value&field2=host','new_win','width=450,height=450,resizable=1,scrollbars=1');\">";
-//			$h2=$h2."<select class=\"biginput\" name=\"value\">";
-//			$result=DBselect("select hostid,host from hosts order by host");
-//			while($row=DBfetch($result))
+			$frmAction->AddVar('value','0');
+
+			$txtCondVal = new CTextBox('host','',20);
+			$txtCondVal->SetReadonly('yes');
+
+			$btnSelect = new CButton('btn1','Select',"window.open('popup.php?form=action&field1=value&field2=host','new_win','width=450,height=450,resizable=1,scrollbars=1');");
+			$btnSelect->SetAccessKey('T');
+
+			array_push($rowCondition, $txtCondVal, $btnSelect);
+//			$cmbCondVal = new CComboBox('value');
+//			$hosts = DBselect("select hostid,host from hosts order by host");
+//			while($host = DBfetch($hosts))
 //			{
-//				$h2=$h2.form_select("value",$row["hostid"],$row["host"]);
+//				$cmbCondVal->AddItem($host["hostid"],$host["host"]);
 //			}
-//			$h2=$h2."</SELECT>";
 		}
 		else if($conditiontype == CONDITION_TYPE_TRIGGER)
 		{
-			$h2=$h2."<select class=\"biginput\" name=\"value\">";
-			$result=DBselect("select distinct h.host,t.triggerid,t.description from triggers t, functions f,items i, hosts h where t.triggerid=f.triggerid and f.itemid=i.itemid and h.hostid=i.hostid order by h.host");
-			while($row=DBfetch($result))
+			$cmbCondVal = new CComboBox('value');
+			$triggers = DBselect("select distinct h.host,t.triggerid,t.description from triggers t, functions f,items i, hosts h where t.triggerid=f.triggerid and f.itemid=i.itemid and h.hostid=i.hostid order by h.host");
+			while($trigger = DBfetch($triggers))
 			{
-				$h2=$h2.form_select("value",$row["triggerid"],$row["host"].":&nbsp;".$row["description"]);
+				$cmbCondVal->AddItem($trigger["triggerid"],$trigger["host"].":&nbsp;".$trigger["description"]);
 			}
-			$h2=$h2."</SELECT>";
+			array_push($rowCondition,$cmbCondVal);
 		}
 		else if($conditiontype == CONDITION_TYPE_TRIGGER_NAME)
 		{
-			$h2=$h2."<input class=\"biginput\" name=\"value\" value=\"\" size=40>";
+			array_push($rowCondition, new CTextBox('value', "", 40));
 		}
 		else if($conditiontype == CONDITION_TYPE_TRIGGER_VALUE)
 		{
-			$h2=$h2."<select class=\"biginput\" name=\"value\">";
-			$h2=$h2.form_select("value",0,"OFF");
-			$h2=$h2.form_select("value",1,"ON");
-			$h2=$h2."</SELECT>";
+			$cmbCondVal = new CComboBox('value');
+			$cmbCondVal->AddItem(0,"OFF");
+			$cmbCondVal->AddItem(1,"ON");
+			array_push($rowCondition,$cmbCondVal);
 		}
 		else if($conditiontype == CONDITION_TYPE_TIME_PERIOD)
 		{
-			$h2=$h2."<input class=\"biginput\" name=\"value\" value=\"1-7,00:00-23:59\" size=40>";
+			array_push($rowCondition, new CTextBox('value', "1-7,00:00-23:59", 40));
 		}
 		else if($conditiontype == CONDITION_TYPE_TRIGGER_SEVERITY)
 		{
-			$h2=$h2."<select class=\"biginput\" name=\"severity\" size=1>";
-			$h2=$h2."<OPTION VALUE=\"0\">".S_NOT_CLASSIFIED;
-			$h2=$h2."<OPTION VALUE=\"1\">".S_INFORMATION;
-			$h2=$h2."<OPTION VALUE=\"2\">".S_WARNING;
-			$h2=$h2."<OPTION VALUE=\"3\">".S_AVERAGE;
-			$h2=$h2."<OPTION VALUE=\"4\">".S_HIGH;
-			$h2=$h2."<OPTION VALUE=\"5\">".S_DISASTER;
-			$h2=$h2."</SELECT>";
+			$cmbCondVal = new CComboBox('value');
+			$cmbCondVal->AddItem(0,S_NOT_CLASSIFIED);
+			$cmbCondVal->AddItem(1,S_INFORMATION);
+			$cmbCondVal->AddItem(2,S_WARNING);
+			$cmbCondVal->AddItem(3,S_AVERAGE);
+			$cmbCondVal->AddItem(4,S_HIGH);
+			$cmbCondVal->AddItem(5,S_DISASTER);
+			array_push($rowCondition,$cmbCondVal);
 		}
-		echo $h2;
+// add condition button
+		array_push($rowCondition,BR,new CButton('register','add condition'));
 
-		show_table2_v_delimiter($col++);
-		echo nbsp(" ");
-		show_table2_h_delimiter();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add condition\">";
+// end of new condition preparation
+		$frmAction->AddRow(S_CONDITION, $rowCondition);
 
-		show_table2_v_delimiter($col++);
-		echo nbsp(S_ACTION_TYPE);
-		show_table2_h_delimiter();
-		echo "<select class=\"biginput\" name=\"actiontype\" size=\"1\" onChange=\"submit()\">";
-		echo "<option value=\"0\""; if($actiontype==0) echo " selected"; echo ">".S_SEND_MESSAGE;
-		echo "<option value=\"1\" disabled "; if($actiontype==1) echo " selected"; echo ">".S_REMOTE_COMMAND;
-		echo "</select>";
+		$cmbActionType = new CComboBox('actiontype', $actiontype,'submit()');
+		$cmbActionType->AddItem(0,S_SEND_MESSAGE);
+		$cmbActionType->AddItem(1,S_REMOTE_COMMAND,'no');
 
+		$frmAction->AddRow(S_ACTION_TYPE, $cmbActionType);
 
-		show_table2_v_delimiter($col++);
-		echo nbsp(S_SEND_MESSAGE_TO);
-		show_table2_h_delimiter();
-		echo "<select class=\"biginput\" name=\"recipient\" size=\"1\" onChange=\"submit()\">";
+		$cmbRecipient = new CComboBox('recipient', $recipient,'submit()');
+		$cmbRecipient->AddItem(0,S_SINGLE_USER);
+		$cmbRecipient->AddItem(1,S_USER_GROUP);
 
-		echo "<option value=\"0\""; if($recipient==RECIPIENT_TYPE_USER) echo " selected"; echo ">".S_SINGLE_USER;
-		echo "<option value=\"1\""; if($recipient==RECIPIENT_TYPE_GROUP) echo " selected"; echo ">".S_USER_GROUP;
-		echo "</select>";
+		$frmAction->AddRow(S_SEND_MESSAGE_TO, $cmbRecipient);
 
 		if($recipient==RECIPIENT_TYPE_GROUP)
 		{
-			show_table2_v_delimiter($col++);
-			echo nbsp(S_GROUP);
-			show_table2_h_delimiter();
-			echo "<select class=\"biginput\" name=\"usrgrpid\" size=\"1\">";
+			
+			$cmbGroups = new CComboBox('usrgrpid', $uid);
 	
 			$sql="select usrgrpid,name from usrgrp order by name";
-			$result=DBselect($sql);
-			while($row=DBfetch($result))
+			$groups=DBselect($sql);
+			while($group=DBfetch($groups))
 			{
-//			if(isset($usrgrpid) && ($row["usrgrpid"] == $usrgrpid))
-				if(isset($uid) && ($row["usrgrpid"] == $uid))
-				{
-					echo "<option value=\"".$row["usrgrpid"]."\" selected>".$row["name"];
-				}
-				else
-				{
-					echo "<option value=\"".$row["usrgrpid"]."\">".$row["name"];
-				}
+				$cmbGroups->AddItem($group['usrgrpid'],$group['name']);
 			}
-			echo "</select>";
+
+			$frmAction->AddRow(S_GROUP, $cmbGroups);
 		}
 		else
 		{
-			show_table2_v_delimiter($col++);
-			echo nbsp(S_USER);
-			show_table2_h_delimiter();
-			echo "<select class=\"biginput\" name=\"userid\" size=\"1\">";
-	
+			$cmbUser = new CComboBox('userid', $uid);
+			
 			$sql="select userid,alias from users order by alias";
-			$result=DBselect($sql);
-			while($row=DBfetch($result))
+			$users=DBselect($sql);
+			while($user=DBfetch($users))
 			{
-				if(isset($uid) && ($row["userid"] == $uid))
-				{
-					echo "<option value=\"".$row["userid"]."\" selected>".$row["alias"];
-				}
-				else
-				{
-					echo "<option value=\"".$row["userid"]."\">".$row["alias"];
-				}
+				$cmbUser->AddItem($user['userid'],$user['alias']);
 			}
-			echo "</select>";
+
+			$frmAction->AddRow(S_USER, $cmbUser);
 		}
-	
 
-		show_table2_v_delimiter($col++);
-		echo nbsp(S_DELAY_BETWEEN_MESSAGES_IN_SEC);
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"delay\" value=\"$delay\" size=5>";
+		$frmAction->AddRow(S_DELAY_BETWEEN_MESSAGES_IN_SEC, new CTextBox('delay',$delay,5));
+		$frmAction->AddRow(S_SUBJECT, new CTextBox('subject',$subject,80));
+		$frmAction->AddRow(S_MESSAGE, new CTextArea('message',$message,77,7));
 
-		show_table2_v_delimiter($col++);
-		echo S_SUBJECT;
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"subject\" value=\"$subject\" size=80>";
-
-		show_table2_v_delimiter($col++);
-		echo S_MESSAGE;
-		show_table2_h_delimiter();
-	 	echo "<textarea class=\"biginput\" name=\"message\" cols=77 ROWS=\"7\" wrap=\"soft\">$message</TEXTAREA>";
-
-		show_table2_v_delimiter($col++);
-		echo nbsp(S_REPEAT);
-		show_table2_h_delimiter();
-		echo "<select class=\"biginput\" name=\"repeat\" size=\"1\" onChange=\"submit()\">";
-	
-		echo "<option value=\"0\""; if($repeat==0) echo " selected"; echo ">".S_NO_REPEATS;
-		echo "<option value=\"1\""; if($repeat==1) echo " selected"; echo ">".S_REPEAT;
-		echo "</select>";
+		$cmbRepeat = new CComboBox('repeat',$repeat,'submit()');
+		$cmbRepeat->AddItem(0,S_NO_REPEATS);
+		$cmbRepeat->AddItem(1,S_REPEAT);
+		$frmAction->AddRow(S_REPEAT, $cmbRepeat);
 
 		if($repeat>0)
 		{
-			show_table2_v_delimiter($col++);
-			echo S_NUMBER_OF_REPEATS;
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"maxrepeats\" value=\"$maxrepeats\" size=2>";
-	
-			show_table2_v_delimiter($col++);
-			echo S_DELAY_BETWEEN_REPEATS;
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"repeatdelay\" value=\"$repeatdelay\" size=2>";
+			$frmAction->AddRow(S_NUMBER_OF_REPEATS, new CTextBox('maxrepeats',$maxrepeats,2));
+			$frmAction->AddRow(S_DELAY_BETWEEN_REPEATS, new CTextBox('repeatdelay',$repeatdelay,2));
 		}
-	
-		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
+
+		$bottomRow = array();
 		if(isset($actionid))
 		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected action?');\">";
+			array_push($bottomRow,new CButton('register','update'));
+			array_push($bottomRow,SPACE,new CButton('register','delete','return Confirm("Delete selected action?");'));
+		} else {
+			array_push($bottomRow,new CButton('register','add'));
 		}
+		array_push($bottomRow,SPACE,new CButton('register','cancel'));
+
+		$frmAction->AddBottomRow($bottomRow);
 	
-		show_table2_header_end();
+		$frmAction->Show();
 	}
 
 	function	insert_media_type_form()
