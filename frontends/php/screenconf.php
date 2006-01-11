@@ -69,7 +69,7 @@
 
 		show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"screenconf.php\">", "</form>");
 
-		$table = new Ctable(S_NO_SCREENS_DEFINED);
+		$table = new CTableInfo(S_NO_SCREENS_DEFINED);
 		$table->setHeader(array(S_ID,S_NAME,S_COLUMNS,S_ROWS,S_ACTIONS));
 
 		$result=DBselect("select screenid,name,cols,rows from screens order by name");

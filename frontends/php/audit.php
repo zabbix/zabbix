@@ -87,7 +87,7 @@
 	}
 	$result=DBselect($sql);
 
-	$table = new Ctable();
+	$table = new CTableInfo();
 	$table->setHeader(array(S_TIME,S_USER,S_RESOURCE,S_ACTION,S_DETAILS));
 	$i=0;
 	while($row=DBfetch($result))

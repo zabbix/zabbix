@@ -78,7 +78,7 @@
 ?>
 
 <?php
-	$table = new Ctable();
+	$table = new CTableInfo();
 	if($_REQUEST["period"]=="yearly")
 	{
 		$table->setHeader(array(S_YEAR,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));

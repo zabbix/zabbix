@@ -66,7 +66,7 @@
 <?php
 	if(!isset($_REQUEST["form"]))
 	{
-		$table = new Ctable(S_NO_MAPS_DEFINED);
+		$table = new CTableInfo(S_NO_MAPS_DEFINED);
 		$table->setHeader(array(S_ID,S_NAME,S_WIDTH,S_HEIGHT,S_ACTIONS));
 
 		$result=DBselect("select s.sysmapid,s.name,s.width,s.height from sysmaps s order by s.name");

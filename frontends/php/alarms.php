@@ -69,7 +69,7 @@
 	$sql="select clock,value,triggerid from alarms where triggerid=".$_REQUEST["triggerid"]." order by clock desc $limit";
 	$result=DBselect($sql);
 
-	$table = new Ctable();
+	$table = new CTableInfo();
 	$table->setHeader(array(S_TIME,S_STATUS,S_DURATION,S_SUM,"%"));
 	$truesum=0;
 	$falsesum=0;
@@ -88,25 +88,25 @@
 //		table_td(date("Y.M.d H:i:s",$row["clock"]),"");
 		if($row["value"]==1)
 		{
-			$istrue=array("value"=>S_TRUE_BIG,"class"=>"on");
+			$istrue=new CCol(S_TRUE_BIG,"on");
 			$truesum=$truesum+$leng;
 			$sum=$truesum;
 		}
 		elseif($row["value"]==0)
 		{
-			$istrue=array("value"=>S_FALSE_BIG,"class"=>"off");
+			$istrue=new CCol(S_FALSE_BIG,"off");
 			$falsesum=$falsesum+$leng;
 			$sum=$falsesum;
 		}
 		elseif($row["value"]==3)
 		{
-			$istrue=array("value"=>S_DISABLED_BIG,"class"=>"unknown");
+			$istrue=new CCol(S_DISABLED_BIG,"unknown");
 			$dissum=$dissum+$leng;
 			$sum=$dissum;
 		}
 		elseif($row["value"]==2)
 		{
-			$istrue=array("value"=>S_UNKNOWN_BIG,"class"=>"unknown");
+			$istrue=new CCol(S_UNKNOWN_BIG,"unknown");
 			$dissum=$dissum+$leng;
 			$sum=$dissum;
 		}

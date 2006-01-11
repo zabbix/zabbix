@@ -178,7 +178,7 @@
 			echo "<br>";
 			show_table_header(S_USER_GROUPS_BIG);
 	
-			$table = new cTable(S_NO_USER_GROUPS_DEFINED);
+			$table = new CTableInfo(S_NO_USER_GROUPS_DEFINED);
 			$table->setHeader(array(S_ID,S_NAME,S_MEMBERS));
 		
 			$result=DBselect("select usrgrpid,name from usrgrp order by name");
@@ -224,7 +224,7 @@
 		{
 			echo "<br>";
 			show_table_header(S_USERS_BIG);
-			$table=new Ctable(S_NO_USERS_DEFINED);
+			$table=new CTableInfo(S_NO_USERS_DEFINED);
 			$table->setHeader(array(S_ID,S_ALIAS,S_NAME,S_SURNAME,S_IS_ONLINE_Q,S_ACTIONS));
 		
 			$result=DBselect("select u.userid,u.alias,u.name,u.surname from users u order by u.alias");
@@ -242,9 +242,9 @@
 				$result2=DBselect($sql);
 				$row2=DBfetch($result2);
 				if($row2["count"]>0)
-					$online=array("value"=>S_YES,"class"=>"on");
+					$online=new CCol(S_YES,"on");
 				else
-					$online=array("value"=>S_NO,"class"=>"off");
+					$online=new CCol(S_NO,"off");
 		
 		        	if(check_right("User","U",$row["userid"]))
 				{
@@ -287,7 +287,7 @@
 	echo "<a name=\"form\"></a>";
 	show_table_header("USER PERMISSIONS");
 
-	$table  = new Ctable();
+	$table  = new CTableInfo();
 	$table->setHeader(array(S_PERMISSION,S_RIGHT,S_RESOURCE_NAME,S_ACTIONS));
 	$result=DBselect("select rightid,name,permission,id from rights where userid=".$_REQUEST["userid"]." order by name,permission,id");
 	$col=0;

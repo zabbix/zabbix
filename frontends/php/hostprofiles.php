@@ -116,7 +116,7 @@
 	}
 	else
 	{
-		$table = new Ctable();
+		$table = new CTableInfo();
 		$header=array();
 		$header=array_merge($header,array(S_HOST,S_NAME,S_OS,S_SERIALNO,S_TAG,S_MACADDRESS));
 
