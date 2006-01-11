@@ -88,7 +88,7 @@
 	}
 	$result=DBselect($sql);
 
-	$table = new Ctable(S_NO_ALERTS);
+	$table = new CTableInfo(S_NO_ALERTS);
 	$table->setHeader(array(S_TIME, S_TYPE, S_STATUS, S_RECIPIENTS, S_SUBJECT, S_MESSAGE, S_ERROR));
 	$col=0;
 	$zzz=0;
@@ -106,11 +106,11 @@
 
 		if($row["status"] == 1)
 		{
-			$status=array("value"=>S_SENT,"class"=>"off");
+			$status=new CCol(S_SENT,"off");
 		}
 		else
 		{
-			$status=array("value"=>S_NOT_SENT,"class"=>"on");
+			$status=new CCol(S_NOT_SENT,"on");
 		}
 		$sendto=htmlspecialchars($row["sendto"]);
 		$subject="<pre>".htmlspecialchars($row["subject"])."</pre>";

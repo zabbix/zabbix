@@ -74,7 +74,7 @@
 ?>
 
 <?php
-	$table = new Ctable(S_NO_HOSTS_DEFINED);
+	$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 	$table->setHeader(array(S_HOST,S_IP,S_PORT,S_STATUS,S_AVAILABILITY));
 
 	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]!=0))

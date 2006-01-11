@@ -251,7 +251,7 @@
 			echo "<br>";
 			show_table_header(S_IMAGES_BIG);
 
-			$table=new Ctable(S_NO_IMAGES_DEFINED);
+			$table=new CTableInfo(S_NO_IMAGES_DEFINED);
 			$table->setHeader(array(S_ID,S_TYPE,S_NAME,S_ACTIONS));
 	
 			$result=DBselect("select imageid,imagetype,name,image from images order by name");
@@ -295,7 +295,7 @@
 			echo "<br>";
 			show_table_header(S_MEDIA_TYPES_BIG);
 
-			$table=new CTable(S_NO_MEDIA_TYPES_DEFINED);
+			$table=new CTableInfo(S_NO_MEDIA_TYPES_DEFINED);
 			$table->setHeader(array(S_ID,S_DESCRIPTION,S_TYPE));
 
 			$result=DBselect("select mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path from media_type mt order by mt.type");
@@ -407,7 +407,7 @@
 			echo "<br>";
 			show_table_header(S_AUTOREGISTRATION_RULES_BIG);
 
-			$table=new Ctable(S_NO_AUTOREGISTRATION_RULES_DEFINED);
+			$table=new CTableInfo(S_NO_AUTOREGISTRATION_RULES_DEFINED);
 			$table->setHeader(array(S_ID,S_PRIORITY,S_PATTERN,S_HOST));
 
 			$result=DBselect("select * from autoreg order by priority");

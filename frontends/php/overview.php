@@ -104,7 +104,7 @@
 
 	if(isset($_REQUEST["groupid"])&&isset($_REQUEST["type"])&&($_REQUEST["type"]==SHOW_DATA))
 	{
-		$table = new Ctable();
+		$table = new CTableInfo();
 		$header=array("&nbsp;");
 		$hosts=array();
 		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
@@ -156,9 +156,9 @@
 						if(DBnum_rows($result3)>0)
 						{
 							if($row2["value_type"] == 0)
-								$value=array("value"=>nbsp(convert_units($row2["lastvalue"],$row2["units"])),"class"=>"high");
+								$value=new CCol(nbsp(convert_units($row2["lastvalue"],$row2["units"])),"high");
 							else
-								$value=array("value"=>nbsp(htmlspecialchars(substr($row2["lastvalue"],0,20)." ...")),"class"=>"high");
+								$value=new CCol(nbsp(htmlspecialchars(substr($row2["lastvalue"],0,20)." ...")),"high");
 						}
 						else
 						{
@@ -182,7 +182,7 @@
 	}
 	else if(isset($_REQUEST["groupid"])&&isset($_REQUEST["type"])&&($_REQUEST["type"]==SHOW_TRIGGERS))
 	{
-		$table  = new Ctable();
+		$table  = new CTableInfo();
 		$header=array("&nbsp;");
 		$hosts=array();
 		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg,functions f,triggers t where h.status=".HOST_STATUS_MONITORED." and t.status=".TRIGGER_STATUS_ENABLED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and t.triggerid=f.triggerid and f.itemid=i.itemid group by h.hostid,h.host order by h.host";
@@ -230,11 +230,11 @@
 					if($row2["status"]==0)
 					{
 						if($row2["value"] == TRIGGER_VALUE_FALSE)
-							$value=array("value"=>"&nbsp;","class"=>"normal");
+							$value=new CCol("&nbsp;","normal");
 						else if($row2["value"] == TRIGGER_VALUE_UNKNOWN)
-							$value=array("value"=>"&nbsp;","class"=>"unknown_trigger");
+							$value=new CCol("&nbsp;","unknown_trigger");
 						else
-							$value=array("value"=>"&nbsp;","class"=>"high");
+							$value=new CCol("&nbsp;","high");
 					}
 					else
 					{

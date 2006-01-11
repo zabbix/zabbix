@@ -148,7 +148,7 @@
 
 	$result=DBselect($sql);
 
-	$table = new Ctable();
+	$table = new CTableInfo();
 	$table->setHeader(array(S_TIME, S_DESCRIPTION, S_VALUE, S_SEVERITY));
 	$col=0;
 	$i=0;
@@ -170,15 +170,15 @@
 
 		if($row["value"] == 0)
 		{
-			$value=array("value"=>S_OFF,"class"=>"off");
+			$value=new CCol(S_OFF,"off");
 		}
 		elseif($row["value"] == 1)
 		{
-			$value=array("value"=>S_ON,"class"=>"on");
+			$value=new CCol(S_ON,"on");
 		}
 		else
 		{
-			$value=array("value"=>S_UNKNOWN_BIG,"class"=>"unknown");
+			$value=new CCol(S_UNKNOWN_BIG,"unknown");
 		}
 		if($row["priority"]==0)		$priority=S_NOT_CLASSIFIED;
 		elseif($row["priority"]==1)	$priority=S_INFORMATION;
