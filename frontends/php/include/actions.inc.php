@@ -60,22 +60,13 @@
 
 	# Update Action
 
-	function	update_action($actionid, $userid, $delay, $subject, $message, $recipient, $usrgrpid, $maxrepeats, $repeatdelay)
+	function	update_action($actionid, $id, $delay, $subject, $message, $recipient, $maxrepeats, $repeatdelay)
 	{
 //		if(!check_right_on_trigger("U",$triggerid))
 //		{
 //                      error("Insufficient permissions");
 //                      return 0;
 //		}
-
-		if($recipient == RECIPIENT_TYPE_USER)
-		{
-			$id = $userid;
-		}
-		else
-		{
-			$id = $usrgrpid;
-		}
 
 		$sql="update actions set userid=$id,delay=$delay,nextcheck=0,subject='$subject',message='$message',recipient=$recipient,maxrepeats=$maxrepeats, repeatdelay=$repeatdelay where actionid=$actionid";
 		$result=DBexecute($sql);
@@ -254,7 +245,7 @@
 				{
 					$host=get_host_by_hostid($row["hostid"]);
 					$message=str_replace("{".$host_template["host"].":", "{".$host["host"].":", $action["message"]);
-					update_action($row3["actionid"], $row2["triggerid"], $action["userid"], $action["good"], $action["delay"], $action["subject"], $message, $action["scope"], $action["severity"], $action["recipient"], $action["userid"], $action["maxrepeats"],$action["repeatdelay"]);
+					update_action($row3["actionid"], $row2["triggerid"], $action["userid"], $action["good"], $action["delay"], $action["subject"], $message, $action["scope"], $action["severity"], $action["recipient"], $action["maxrepeats"],$action["repeatdelay"]);
 
 				}
 			}

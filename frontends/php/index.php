@@ -114,6 +114,7 @@
 	{
 //		echo "-",$_COOKIE["sessionid"],"-<br>";
 		insert_login_form();
+		show_messages();
 	}
 	else
 	{

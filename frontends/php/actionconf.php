@@ -40,7 +40,11 @@
 <?php
 	if(isset($_REQUEST["register"]))
 	{
-		if($_REQUEST["register"]=="add")
+		if($_REQUEST["register"]=="cancel")
+		{
+			unset($_REQUEST["form"]);
+		}
+		elseif($_REQUEST["register"]=="add")
 		{
 			if($_REQUEST["repeat"]==0)
 			{
@@ -71,6 +75,7 @@
 					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ACTION,"User [".$group["name"]."] subject [".$_REQUEST["subject"]."]");
 				}
 			}
+			unset($_REQUEST["form"]);
 		}
 		if($_REQUEST["register"]=="update")
 		{
@@ -82,7 +87,17 @@
 
 			$actionid=$_REQUEST["actionid"];
 
-			update_action($actionid, $_REQUEST["userid"], $_REQUEST["delay"], $_REQUEST["subject"], $_REQUEST["message"],$_REQUEST["recipient"],$_REQUEST["usrgrpid"],$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"]);
+			if($_REQUEST['recipient'] == RECIPIENT_TYPE_USER)
+			{
+				$id = $_REQUEST['userid'];
+			}
+			else
+			{
+				$id = $_REQUEST['usrgrpid'];
+			}
+			
+
+			update_action($actionid, $id, $_REQUEST["delay"], $_REQUEST["subject"], $_REQUEST["message"],$_REQUEST["recipient"],$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"]);
 			$sql="delete from conditions where actionid=$actionid";
 			DBexecute($sql);
 			for($i=1;$i<=1000;$i++)
@@ -106,6 +121,7 @@
 					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ACTION,"User [".$group["name"]."] subject [".$_REQUEST["subject"]."]");
 				}
 			}
+			unset($_REQUEST["form"]);
 		}
 		if($_REQUEST["register"]=="delete")
 		{
@@ -117,6 +133,7 @@
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_ACTION,"Subject [".$_REQUEST["subject"]."]");
 			}
 			unset($_REQUEST["actionid"]);
+			unset($_REQUEST["form"]);
 		}
 		if($_REQUEST["register"]=="add condition")
 		{
@@ -148,7 +165,11 @@
 ?>
 
 <?php
-	if(!isset($_REQUEST["form"]))
+	if(isset($_REQUEST["form"]))
+	{
+		insert_action_form();
+	}
+	else
 	{
 		$h1=S_ACTIONS;
 
@@ -163,6 +184,8 @@
 		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"form\" value=\"".S_CREATE_ACTION."\">";
 
 		show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"actionconf.php\">", "</form>");
+		$tblActions = new CTableInfo(S_NO_ACTIONS_DEFINED);
+		$tblActions->SetHeader(array(S_SOURCE,S_CONDITIONS,S_SEND_MESSAGE_TO,S_DELAY,S_SUBJECT,S_REPEATS,S_ACTIONS));
 
 		if(isset($_REQUEST["actiontype"])&&($_REQUEST["actiontype"]==1))
 		{
@@ -173,10 +196,6 @@
 			$sql="select * from actions where actiontype=0 order by actiontype, source";
 		}
 		$result=DBselect($sql);
-	
-		$table = new Ctable(S_NO_ACTIONS_DEFINED);
-		$table->setHeader(array(S_SOURCE,S_CONDITIONS,S_SEND_MESSAGE_TO,S_DELAY,S_SUBJECT,S_REPEATS,S_ACTIONS));
-		$col=0;
 		while($row=DBfetch($result))
 		{
 			$sql="select * from conditions where actionid=".$row["actionid"]." order by conditiontype";
@@ -197,34 +216,21 @@
 				$groupd=get_usergroup_by_usrgrpid($row["userid"]);
 				$recipient=$groupd["name"];
 			}
-	  
-			if($row["maxrepeats"] == 0)
-			{
-				$maxrepeats=S_NO_REPEATS;
-			}
-			else
-			{
-				$maxrepeats=$row["maxrepeats"];
-			}
-	
-			$actions="<A HREF=\"actionconf.php?register=edit&form=0&actionid=".$row["actionid"]."#form\">".S_CHANGE."</A>";
-	
-			$table->addRow(array(
+
+			$tblActions->AddRow(array(
 				get_source_description($row["source"]),
 				$conditions,
 				$recipient,
 				htmlspecialchars($row["delay"]),
 				htmlspecialchars($row["subject"]),
-				$maxrepeats,
-				$actions
-				));
+				$row["maxrepeats"] == 0 ? S_NO_REPEATS : $row["maxrepeats"],
+				new CLink(S_CHANGE,"actionconf.php?register=edit&amp;form=0&actionid=".$row['actionid']."#form")
+				));	
 		}
-		$table->show();
+		$tblActions->Show();
 	}
-	else
-	{
-		insert_action_form();
-	}
+
+	show_messages();
 
 	show_footer();
 ?>

@@ -19,6 +19,22 @@
 **/
 ?>
 <?php
+	define("BR","<br/>\n");
+	define("SPACE","&nbsp;");
+
+	function	bold($str)
+	{
+		if(is_array($str))
+		{
+			foreach($str as $key => $val)
+				if(is_string($val))
+					 $str[$key] = "<b>$val</b>";
+			return $str;
+		}
+		if(is_string($str))
+			return "<b>$str</b>";
+	}
+
 	function	nbsp($str)
 	{
 		return str_replace(" ","&nbsp;",$str);;
