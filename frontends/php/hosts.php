@@ -484,7 +484,7 @@
 <?php
 			$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 			$table->setHeader(array(S_ID,S_HOST,S_IP,S_PORT,S_STATUS,S_AVAILABILITY,S_ERROR,S_ACTIONS));
-			$table->setAfterHeader("<form method=\"get\" action=\"hosts.php\">");
+//			$table->setAfterHeader("<form method=\"get\" action=\"hosts.php\">");
 		
 			if(isset($_REQUEST["groupid"]))
 			{
@@ -516,48 +516,46 @@
 		        	if(check_right("Host","U",$row["hostid"]))
 				{
 					if($row["status"] == HOST_STATUS_MONITORED)	
-						$status=array("value"=>"<a class=\"off\" href=\"hosts.php?hostid=".$row["hostid"]."&amp;register=changestatus&amp;status=1\">".S_MONITORED."</a>","class"=>"off");
+						$status=new CCol(new CLink(S_MONITORED,"hosts.php?hostid=".$row["hostid"]."&amp;register=changestatus&amp;status=1","off"),"off");
 					else if($row["status"] == HOST_STATUS_NOT_MONITORED)
-						$status=array("value"=>"<a class=\"on\" href=\"hosts.php?hostid=".$row["hostid"]."&amp;register=changestatus&amp;status=0\">".S_NOT_MONITORED."</a>","class"=>"on");
-		//			else if($row["status"] == 2)
-		//				$status=array("value"=>S_UNREACHABLE,"class"=>"unknown");
+						$status=new CCol(new CLink(S_NOT_MONITORED,"hosts.php?hostid=".$row["hostid"]."&amp;register=changestatus&amp;status=0","on"),"on");
 					else if($row["status"] == HOST_STATUS_TEMPLATE)
-						$status=array("value"=>S_TEMPLATE,"class"=>"unknown");
+						$status=new CCol(S_TEMPLATE,"unknown");
 					else if($row["status"] == HOST_STATUS_DELETED)
-						$status=array("value"=>S_DELETED,"class"=>"unknown");
+						$status=new CCol(S_DELETED,"unknown");
 					else
 						$status=S_UNKNOWN;
 				}
 				else
 				{
 					if($row["status"] == HOST_STATUS_MONITORED)	
-						$status=array("value"=>S_MONITORED,"class"=>"off");
+						$status=new CCol(S_MONITORED,"off");
 					else if($row["status"] == HOST_STATUS_NOT_MONITORED)
-						$status=array("value"=>S_NOT_MONITORED,"class"=>"on");
+						$status=new CCol(S_NOT_MONITORED,"on");
 		//			else if($row["status"] == 2)
 		//				$status=array("value"=>S_UNREACHABLE,"class"=>"unknown");
 					else if($row["status"] == HOST_STATUS_TEMPLATE)
-						$status=array("value"=>S_TEMPLATE,"class"=>"unknown");
+						$status=new CCol(S_TEMPLATE,"unknown");
 					else if($row["status"] == HOST_STATUS_DELETED)
-						$status=array("value"=>S_DELETED,"class"=>"unknown");
+						$status=new CCol(S_DELETED,"unknown");
 					else
 						$status=S_UNKNOWN;
 				}
 		
 				if($row["available"] == HOST_AVAILABLE_TRUE)	
-					$available=array("value"=>S_AVAILABLE,"class"=>"off");
+					$available=new CCol(S_AVAILABLE,"off");
 				else if($row["available"] == HOST_AVAILABLE_FALSE)
-					$available=array("value"=>S_NOT_AVAILABLE,"class"=>"on");
+					$available=new CCol(S_NOT_AVAILABLE,"on");
 				else if($row["available"] == HOST_AVAILABLE_UNKNOWN)
-					$available=array("value"=>S_UNKNOWN,"class"=>"unknown");
+					$available=new CCol(S_UNKNOWN,"unknown");
 		
 				if($row["error"] == "")
 				{
-					$error=array("value"=>"&nbsp;","class"=>"off");
+					$error=new CCol("&nbsp;","off");
 				}
 				else
 				{
-					$error=array("value"=>$row["error"],"class"=>"on");
+					$error=new CCol($row["error"],"on");
 				}
 		        	if(check_right("Host","U",$row["hostid"]))
 				{
@@ -592,14 +590,28 @@
 					$error,
 					$actions));
 			}
-			$table->show();
+//			$table->show();
+
+			$footerButtons = array();
+			array_push($footerButtons, new CButton('register','Activate selected',
+				"return Confirm('".S_ACTIVATE_SELECTED_HOSTS_Q."');"));
+			array_push($footerButtons, new CButton('register','Disable selected',
+				"return Confirm('".S_DISABLE_SELECTED_HOSTS_Q."');"));
+			array_push($footerButtons, new CButton('register','Delete selected',
+				"return Confirm('".S_DELETE_SELECTED_HOSTS_Q."');"));
+			$table->SetFooter(new CCol($footerButtons),'table_footer');
+
+			$form = new CForm('hosts.php');
+			$form->AddItem($table);
+			$form->Show();
+
 
 //			show_form_begin();
-			$h="<input class=\"button\" type=\"submit\" name=\"register\" value=\"Activate selected\" onClick=\"return Confirm('".S_ACTIVATE_SELECTED_HOSTS_Q."');\">";
-			$h=$h."<input class=\"button\" type=\"submit\" name=\"register\" value=\"Disable selected\" onClick=\"return Confirm('".S_DISABLE_SELECTED_HOSTS_Q."');\">";
-			$h=$h."<input class=\"button\" type=\"submit\" name=\"register\" value=\"Delete selected\" onClick=\"return Confirm('".S_DELETE_SELECTED_HOSTS_Q."');\">";
-			$h=$h."</form>";
-			show_table_header($h);
+//			$h="<input class=\"button\" type=\"submit\" name=\"register\" value=\"Activate selected\" onClick=\"return Confirm('".S_ACTIVATE_SELECTED_HOSTS_Q."');\">";
+//			$h=$h."<input class=\"button\" type=\"submit\" name=\"register\" value=\"Disable selected\" onClick=\"return Confirm('".S_DISABLE_SELECTED_HOSTS_Q."');\">";
+//			$h=$h."<input class=\"button\" type=\"submit\" name=\"register\" value=\"Delete selected\" onClick=\"return Confirm('".S_DELETE_SELECTED_HOSTS_Q."');\">";
+//			$h=$h."</form>";
+//			show_table_header($h);
 		}
 		else
 		{
