@@ -229,11 +229,8 @@
 
 	if(!isset($_REQUEST["form"]))
 	{
-		$table = new Ctable();
-		$table->setHeader(array(S_ID,S_NAME,S_EXPRESSION, S_SEVERITY, S_STATUS, S_ERROR));
-		$h="<form method=\"get\" action=\"triggers.php\">";
-		$h=$h."<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_REQUEST["hostid"]." size=8>";
-		$table->setAfterHeader($h);
+		$table = new CTableInfo();
+		$table->SetHeader(array(S_ID,S_NAME,S_EXPRESSION, S_SEVERITY, S_STATUS, S_ERROR));
 
 		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.status,t.value,t.priority,t.error from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]." order by h.host,t.description");
 		while($row=DBfetch($result))
@@ -313,13 +310,20 @@
 				$row["error"]
 			));
 		}
-		$table->show();
+		
+		$footerButtons = array();
+		array_push($footerButtons, new CButton('register','enable selected',
+			"return Confirm('".S_ENABLE_SELECTED_TRIGGERS_Q."');"));
+		array_push($footerButtons, new CButton('register','disable selected',
+			"return Confirm('Disable selected triggers?');"));
+		array_push($footerButtons, new CButton('register','delete selected',
+			"return Confirm('".S_DISABLE_SELECTED_TRIGGERS_Q."');"));
+		$table->SetFooter(new CCol($footerButtons),'table_footer');
 
-		$h="<input class=\"button\" type=\"submit\" name=\"register\" value=\"enable selected\" onClick=\"return Confirm('".S_ENABLE_SELECTED_TRIGGERS_Q."');\">";
-		$h=$h."<input class=\"button\" type=\"submit\" name=\"register\" value=\"disable selected\" onClick=\"return Confirm('Disable selected triggers?');\">";
-		$h=$h."<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete selected\" onClick=\"return Confirm('".S_DISABLE_SELECTED_TRIGGERS_Q."');\">";
-		$h=$h."</form>";
-		show_table_header($h);
+		$form = new CForm('triggers.php');
+		$form->AddVar('hostid',$_REQUEST["hostid"]);
+		$form->AddItem($table);
+		$form->Show();
 	}
 	else
 	{
