@@ -414,7 +414,7 @@
 //		show_table_header("<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&fullscreen=1&sort=$sort\">".S_TRIGGERS_BIG." $time</A>");
 	}
 
-	$table  = new Ctable();
+	$table  = new CTableInfo();
 	$header=array();
   
 	echo "<TR ALIGN=CENTER BGCOLOR=\"#CCCCCC\">";

@@ -32,7 +32,7 @@
 <?php
 	show_table_header(S_STATUS_OF_ZABBIX_BIG);
 
-	$table = new Ctable();
+	$table = new CTableInfo();
 
 	$table->setHeader(array(S_PARAMETER,S_VALUE));
 

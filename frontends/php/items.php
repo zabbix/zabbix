@@ -243,7 +243,7 @@
 
 	if(isset($_REQUEST["hostid"])) 
 	{
-		$table  = new Ctable();
+		$table  = new CTableInfo();
 		$table->setHeader(array(S_ID,S_KEY,S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,S_ERROR));
 		$h="<form method=\"get\" action=\"items.php\">";
 		$h=$h."<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_REQUEST["hostid"]." size=8>";

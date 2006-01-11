@@ -368,7 +368,7 @@
 	{
 		echo "<br>";
 		show_table_header(S_HOST_GROUPS_BIG);
-		$table = new Ctable(S_NO_HOST_GROUPS_DEFINED);
+		$table = new CTableInfo(S_NO_HOST_GROUPS_DEFINED);
 		$table->setHeader(array(S_ID,S_NAME,S_MEMBERS,S_ACTIONS));
 
 		$result=DBselect("select groupid,name from groups order by name");
@@ -413,7 +413,7 @@
 <?php
 	if(isset($_REQUEST["hostid"])&&($_REQUEST["config"]==2))
 	{
-		$table = new Ctable(S_NO_LINKAGES_DEFINED);
+		$table = new CTableInfo(S_NO_LINKAGES_DEFINED);
 		$table->setHeader(array(S_HOST,S_TEMPLATE,S_ITEMS,S_TRIGGERS,S_GRAPHS,S_ACTIONS));
 
 		$result=DBselect("select * from hosts_templates where hostid=".$_REQUEST["hostid"]);
@@ -482,7 +482,7 @@
 ?>
 
 <?php
-			$table = new Ctable(S_NO_HOSTS_DEFINED);
+			$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 			$table->setHeader(array(S_ID,S_HOST,S_IP,S_PORT,S_STATUS,S_AVAILABILITY,S_ERROR,S_ACTIONS));
 			$table->setAfterHeader("<form method=\"get\" action=\"hosts.php\">");
 		

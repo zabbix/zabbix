@@ -267,7 +267,7 @@
 	if($_REQUEST["action"]=="showlatest")
 	{
 
-		$table = new Ctable();
+		$table = new CTableInfo();
 		$item=get_item_by_itemid($_REQUEST["itemid"]);
 
 		if($item["value_type"]==ITEM_VALUE_TYPE_LOG)

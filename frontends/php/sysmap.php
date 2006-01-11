@@ -115,7 +115,7 @@
 	echo "</TABLE>";
 
 	show_table_header("DISPLAYED HOSTS");
-	$table = new Ctable();
+	$table = new CTableInfo();
 	$table->setHeader(array(S_HOST,S_LABEL,S_X,S_Y,S_ICON,S_ACTIONS));
 
 	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,sh.icon from sysmaps_hosts sh,hosts h where sh.sysmapid=".$_REQUEST["sysmapid"]." and h.status not in (".HOST_STATUS_DELETED.") and h.hostid=sh.hostid order by h.host");
@@ -135,7 +135,7 @@
 
 <?php
 	show_table_header("CONNECTORS");
-	$table = new Ctable();
+	$table = new CTableInfo();
 	$table->setHeader(array(S_HOST_1,S_HOST_2,S_LINK_STATUS_INDICATOR,S_ACTIONS));
 
 	$result=DBselect("select linkid,shostid1,shostid2,triggerid from sysmaps_links where sysmapid=".$_REQUEST["sysmapid"]." order by linkid");

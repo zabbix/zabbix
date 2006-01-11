@@ -155,7 +155,7 @@
 	show_header2($h1,$h2,"<form name=\"form2\" method=\"get\" action=\"graphs.php\">","</form>");
 ?>
 <?php
-	$table = new Ctable(S_NO_GRAPHS_DEFINED);
+	$table = new CTableInfo(S_NO_GRAPHS_DEFINED);
 	$table->setHeader(array(S_ID,S_NAME,S_WIDTH,S_HEIGHT,S_ACTIONS));
 
 	if(isset($_REQUEST["hostid"])&&($_REQUEST["hostid"]!=0))

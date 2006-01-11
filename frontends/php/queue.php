@@ -59,7 +59,7 @@
 	$now=time();
 
 	$result=DBselect("select i.itemid, i.nextcheck, i.description, h.host,h.hostid from items i,hosts h where i.status=0 and i.type not in (2) and ((h.status=".HOST_STATUS_MONITORED." and h.available!=".HOST_AVAILABLE_FALSE.") or (h.status=".HOST_STATUS_MONITORED." and h.available=".HOST_AVAILABLE_FALSE." and h.disable_until<=$now)) and i.hostid=h.hostid and i.nextcheck<$now and i.key_ not in ('status','icmpping','icmppingsec','zabbix[log]') order by i.nextcheck");
-	$table=new Ctable(S_THE_QUEUE_IS_EMPTY);
+	$table=new CTableInfo(S_THE_QUEUE_IS_EMPTY);
 
 	if($_REQUEST["show"]==0)
 	{

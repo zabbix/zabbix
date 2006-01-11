@@ -100,7 +100,7 @@
 		$sql="select m.mediaid,mt.description,m.sendto,m.active,m.period from media m,media_type mt where m.mediatypeid=mt.mediatypeid and m.userid=".$_REQUEST["userid"]." order by mt.type,m.sendto";
 		$result=DBselect($sql);
 
-		$table = new Ctable(S_NO_MEDIA_DEFINED);
+		$table = new CTableInfo(S_NO_MEDIA_DEFINED);
 		$table->setHeader(array(S_TYPE,S_SEND_TO,S_WHEN_ACTIVE,S_STATUS,S_ACTIONS));
 
 		$col=0;
