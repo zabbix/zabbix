@@ -48,72 +48,51 @@
 			$triggers=7;
 			$graphs=7;
 		}
+# create form
+		$frmTemplate = new CFormTable(S_TEMPLATE,'hosts.php');
+		$frmTemplate->SetHelp('web.hosts.php');
+# init vars
+		$frmTemplate->AddVar('config',$_REQUEST["config"]);
+		if($hostid!=0)			$frmTemplate->AddVar('hostid',$hostid);
+		if(isset($hosttemplateid))	$frmTemplate->AddVar('hosttemplateid',$_REQUEST["hosttemplateid"]);
+# init rows
 
-		$col=0;
+		$cmbTemplate = new CComboBox('templateid',$templateid);
 
-		show_form_begin("hosts");
-		echo S_TEMPLATE;
+	        $hosts=DBselect("select hostid,host from hosts order by host");
+		while($host=DBfetch($hosts))
+			$cmbTemplate->AddItem($host["hostid"],$host["host"]);
 
-		show_table2_v_delimiter($col++);
-		echo "<form method=\"get\" action=\"hosts.php\">";
-		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_REQUEST["config"]."\" size=8>";
-		echo "<input class=\"biginput\" name=\"hostid\" type=\"hidden\" value=\"".$_REQUEST["hostid"]."\" size=8>";
+		$frmTemplate->AddRow(S_TEMPLATE,$cmbTemplate);
+
+		$frmTemplate->AddRow(S_ITEMS,array(
+			new CCheckBox('items_add',	S_ADD,		(1 & $items) ? "yes": "no"),
+			new CCheckBox('items_update',	S_UPDATE,	(2 & $items) ? "yes": "no"),
+			new CCheckBox('items_delete',	S_DELETE,	(4 & $items) ? "yes": "no")
+		));
+
+		$frmTemplate->AddRow(S_TRIGGERS,array(
+			new CCheckBox('triggers_add',	S_ADD,		(1 & $triggers) ? "yes": "no"),
+			new CCheckBox('triggers_update',S_UPDATE,	(2 & $triggers) ? "yes": "no"),
+			new CCheckBox('triggers_delete',S_DELETE,	(4 & $triggers) ? "yes": "no")
+		));
+
+		$frmTemplate->AddRow(S_GRAPHS,array(
+			new CCheckBox('graphs_add',	S_ADD,		(1 & $graphs) ? "yes": "no"),
+			new CCheckBox('graphs_update',	S_UPDATE,	(2 & $graphs) ? "yes": "no"),
+			new CCheckBox('graphs_delete',	S_DELETE,	(4 & $graphs) ? "yes": "no")
+		));
+
+		$frmTemplate->AddItemToBottomRow(new CButton('register','add linkage'));
 		if(isset($hosttemplateid))
 		{
-			echo "<input class=\"biginput\" name=\"hosttemplateid\" type=\"hidden\" value=\"$hosttemplateid\" size=8>";
-		}
-		if($hostid!=0)
-		{
-			echo "<input class=\"biginput\" name=\"hostid\" type=\"hidden\" value=\"$hostid\" size=8>";
-		}
-		echo S_TEMPLATE;
-		show_table2_h_delimiter();
-		echo "<select class=\"biginput\" name=\"templateid\" value=\"3\">";
-	        $result=DBselect("select hostid,host from hosts order by host");
-		while($row=DBfetch($result))
-	        {
-			if($templateid==$row["hostid"])
-			{
-	                	echo "<option value=\"".$row["hostid"]."\" selected>".$row["host"];
-			}
-			else
-			{
-	                	echo "<option value=\"".$row["hostid"]."\">".$row["host"];
-			}
-	        }
-		echo "</select>";
-
-
-		show_table2_v_delimiter($col++);
-		echo S_ITEMS;
-		show_table2_h_delimiter();
-		echo "<input type=checkbox ".iif((1&$items)==1,"checked","")." name=\"items_add\" \">".S_ADD;
-		echo "<input type=checkbox ".iif((2&$items)==2,"checked","")." name=\"items_update\" \">".S_UPDATE;
-		echo "<input type=checkbox ".iif((4&$items)==4,"checked","")." name=\"items_delete\" \">".S_DELETE;
-
-		show_table2_v_delimiter($col++);
-		echo S_TRIGGERS;
-		show_table2_h_delimiter();
-		echo "<input type=checkbox ".iif((1&$triggers)==1,"checked","")." name=\"triggers_add\" \">".S_ADD;
-		echo "<input type=checkbox ".iif((2&$triggers)==2,"checked","")." name=\"triggers_update\" \">".S_UPDATE;
-		echo "<input type=checkbox ".iif((4&$triggers)==4,"checked","")." name=\"triggers_delete\" \">".S_DELETE;
-
-		show_table2_v_delimiter($col++);
-		echo S_GRAPHS;
-		show_table2_h_delimiter();
-		echo "<input type=checkbox ".iif((1&$graphs)==1,"checked","")." name=\"graphs_add\" \">".S_ADD;
-		echo "<input type=checkbox ".iif((2&$graphs)==2,"checked","")." name=\"graphs_update\" \">".S_UPDATE;
-		echo "<input type=checkbox ".iif((4&$graphs)==4,"checked","")." name=\"graphs_delete\" \">".S_DELETE;
-
-		show_table2_v_delimiter2($col++);
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add linkage\">";
-		if(isset($hosttemplateid))
-		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update linkage\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete linkage\" onClick=\"return Confirm('Delete selected linkage?');\">";
+			$frmTemplate->AddItemToBottomRow(SPACE);
+			$frmTemplate->AddItemToBottomRow(new CButton('register','update linkage'));
+			$frmTemplate->AddItemToBottomRow(SPACE);
+			$frmTemplate->AddItemToBottomRow(new CButton('register','delete linkage',"return Confirm('Delete selected linkage?');"));
 		}
 
-		show_table2_header_end();
+		$frmTemplate->Show();
 	}
 
 	# Insert form for User
@@ -145,100 +124,54 @@
 			$refresh="30";
 		}
 
-		$col=0;
+		$frmUser = new CFormTable(S_USER);
+		$frmUser->SetHelp("web.users.users.php");
 
-		show_form_begin("users.users");
-		echo S_USER;
+		if($profile==0) 
+			$frmUser->SetAction("users.php");
+		else
+			$frmUser->SetAction("profile.php");
 
-		if($profile==0) echo "<form method=\"get\" action=\"users.php\">";
-		else echo "<form method=\"get\" action=\"profile.php\">";
+		$frmUser->AddVar("config",$_REQUEST["config"]);
+		if(isset($userid))	$frmUser->AddVar("userid",$userid);
 
-		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_REQUEST["config"]."\" size=8>";
+		if($profile==0)
+		{
+			$frmUser->AddRow(S_ALIAS,	new CTextBox("alias",$alias,20));
+			$frmUser->AddRow(S_NAME,	new CTextBox("name",$name,20));
+			$frmUser->AddRow(S_SURNAME,	new CTextBox("surname",$surname,20));
+		}
+
+		$frmUser->AddRow(S_PASSWORD,	new CPassBox("password",$password,20));
+		$frmUser->AddRow(S_PASSWORD_ONCE_AGAIN,	new CPassBox("password2",$password,20));
+
+		$cmbLang = new CcomboBox('lang',$lang);
+		$cmbLang->AddItem("en_gb",S_ENGLISH_GB);
+		$cmbLang->AddItem("cn_zh",S_CHINESE_CN);
+		$cmbLang->AddItem("fr_fr",S_FRENCH_FR);
+		$cmbLang->AddItem("de_de",S_GERMAN_DE);
+		$cmbLang->AddItem("it_it",S_ITALIAN_IT);
+		$cmbLang->AddItem("lv_lv",S_LATVIAN_LV);
+		$cmbLang->AddItem("ru_ru",S_RUSSIAN_RU);
+		$cmbLang->AddItem("sp_sp",S_SPANISH_SP);
+		$cmbLang->AddItem("ja_jp",S_JAPANESE_JP);
+
+		$frmUser->AddRow(S_LANGUAGE, $cmbLang);
+
+		$frmUser->AddRow(S_AUTO_LOGOUT_IN_SEC,	new CTextBox("autologout",$autologout,5));
+		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
+		$frmUser->AddRow(S_SCREEN_REFRESH,	new CTextBox("refresh",$refresh,5));
+
+		$frmUser->AddItemToBottomRow(new CButton('save',S_SAVE));
 		if(isset($userid))
 		{
-			echo "<input class=\"biginput\" name=\"userid\" type=\"hidden\" value=\"$userid\" size=8>";
+			$frmUser->AddItemToBottomRow(SPACE);
+			$frmUser->AddItemToBottomRow(new CButton('delete',S_DELETE,
+				"return Confirm('Delete selected user?');"));
 		}
-
-		if($profile==0)
-		{
-			show_table2_v_delimiter($col++);
-			echo S_ALIAS;
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"alias\" value=\"$alias\" size=20>";
-
-			show_table2_v_delimiter($col++);
-			echo S_NAME;
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"name\" value=\"$name\" size=20>";
-
-			show_table2_v_delimiter($col++);
-			echo S_SURNAME;
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"surname\" value=\"$surname\" size=20>";
-		}
-
-		show_table2_v_delimiter($col++);
-		echo S_PASSWORD;
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" type=\"password\" name=\"password1\" value=\"$password\" size=20>";
-
-		show_table2_v_delimiter($col++);
-		echo nbsp(S_PASSWORD_ONCE_AGAIN);
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" type=\"password\" name=\"password2\" value=\"$password\" size=20>";
-
-		$languages=array(	"en_gb"=>S_ENGLISH_GB,
-					"cn_zh"=>S_CHINESE_CN,
-					"fr_fr"=>S_FRENCH_FR,
-					"de_de"=>S_GERMAN_DE,
-					"it_it"=>S_ITALIAN_IT,
-					"lv_lv"=>S_LATVIAN_LV,
-					"ru_ru"=>S_RUSSIAN_RU,
-					"sp_sp"=>S_SPANISH_SP,
-					"ja_jp"=>S_JAPANESE_JP
-				);
-
-		show_table2_v_delimiter($col++);
-		echo S_LANGUAGE;
-		show_table2_h_delimiter();
-		echo "<SELECT class=\"biginput\" NAME=\"lang\" value=\"$lang\">";
-		foreach($languages as $l=>$language)
-		{
-			echo "<OPTION VALUE=\"$l\""; if($lang==$l) echo "SELECTED"; echo ">".$language;
-		}
-		echo "</SELECT>";
-
-		show_table2_v_delimiter($col++);
-		echo S_AUTO_LOGOUT_IN_SEC;
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"autologout\" value=\"$autologout\" size=5>";
-
-		show_table2_v_delimiter($col++);
-		echo S_URL_AFTER_LOGIN;
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"url\" value=\"$url\" size=50>";
-
-		show_table2_v_delimiter($col++);
-		echo S_SCREEN_REFRESH;
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"refresh\" value=\"$refresh\" size=5>";
-
-		show_table2_v_delimiter2($col++);
-		if($profile==0)
-		{
-			echo "<input class=\"button\" type=\"submit\" name=\"save\" value=\"".S_SAVE."\">";
-			if(isset($userid))
-			{
-				echo "<input class=\"button\" type=\"submit\" name=\"delete\" value=\"".S_DELETE."\" onClick=\"return Confirm('Delete selected user?');\">";
-			}
-		}
-		else
-		{
-			echo "<input class=\"button\" type=\"submit\" name=\"save\" value=\"".S_SAVE."\">";
-		}
-		echo "<input class=\"button\" type=\"submit\" name=\"cancel\" value=\"".S_CANCEL."\">";
-
-		show_table2_header_end();
+		$frmUser->AddItemToBottomRow(SPACE);
+		$frmUser->AddItemToBottomRow(new CButton('cancel',S_CANCEL));
+		$frmUser->Show();
 	}
 
 	# Insert form for Item information
@@ -272,6 +205,7 @@
 ;
 		$formula=@iif(isset($_REQUEST["formula"]),$_REQUEST["formula"],"1");
 		$logtimefmt=@iif(isset($_REQUEST["logtimefmt"]),$_REQUEST["logtimefmt"],"");
+		$groupid=@iif(isset($_REQUEST["groupid"]),$_REQUEST["groupid"],0);
 
 		if(isset($_REQUEST["register"])&&($_REQUEST["register"] == "change"))
 		{
@@ -306,353 +240,208 @@
 			$logtimefmt=$row["logtimefmt"];
 		}
 
-		show_form_begin("items.item");
-		echo S_ITEM;
+		$frmItem = new CFormTable(S_ITEM,"items.php#form");
+		$frmItem->SetHelp("web.items.item.php");
 
-		$col=0; 
-		show_table2_v_delimiter($col++);
-		echo "<form name=\"item\" method=\"get\" action=\"items.php#form\">";
+		$frmItem->AddVar("hostid",$hostid);
 		if(isset($_REQUEST["itemid"]))
-		{
-			echo "<input class=\"biginput\" name=\"itemid\" type=hidden value=".$_REQUEST["itemid"].">";
-		}
-		echo S_DESCRIPTION;
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"description\" value=\"$description\"size=40>";
+			$frmItem->AddVar("itemid",$_REQUEST["itemid"]);
 
-		show_table2_v_delimiter($col++);
-		echo S_HOST;
-		show_table2_h_delimiter();
-/*		echo "<select class=\"biginput\" name=\"hostid\" value=\"3\">";
-	        $result=DBselect("select hostid,host from hosts where status not in (".HOST_STATUS_DELETED.")order by host");
-		while($row=DBfetch($result))
+		$frmItem->AddRow(S_DESCRIPTION, new CTextBox("description",$description,40));
+		$frmItem->AddRow(S_HOST, array(
+			new CTextBox("host",$host,30,NULL,'yes'),
+			new CButton("btn1","Select","window.open('popup.php?form=item&field1=hostid&field2=host','new_win','width=450,height=450,resizable=1,scrollbars=1');","T")
+		));
+
+/*		
+		$cmbHosts = new CComboBox("hostid",$hostid);
+	        $hosts=DBselect("select hostid,host from hosts where status not in (".HOST_STATUS_DELETED.")order by host");
+		while($host=DBfetch($hosts))
 	        {
-	                $hostid_=$row["hostid"];
-	                $host_=$row["host"];
-			if($hostid==$hostid_)
-			{
-	                	echo "<option value=\"$hostid_\" selected>$host_";
-			}
-			else
-			{
-	                	echo "<option value=\"$hostid_\">$host_";
-			}
+			$cmbHosts->AddItem($host["hostid"],$host["host"]);
 	        }
-		echo "</select>";*/
+		$frmItem->AddRow(S_HOST, $cmbHosts);
+*/
 
-		echo "<input class=\"biginput\" name=\"hostid\" type=hidden value=\"$hostid\">";
-		echo "<input class=\"biginput\" readonly name=\"host\" value=\"$host\" size=30>";
-?>
-		<input title="Select [Alt+T]" accessKey="T" type="button" tabindex='1' class="button" value='Select' name="btn1" onclick="window.open('popup.php?form=item&field1=hostid&field2=host','new_win','width=450,height=450,resizable=1,scrollbars=1');">
-<?php
+		$cmbType = new CComboBox("type",$type,"submit()");
+		$cmbType->AddItem(ITEM_TYPE_ZABBIX,'Zabbix agent');
+		$cmbType->AddItem(ITEM_TYPE_ZABBIX_ACTIVE,'Zabbix agent (active)');
+		$cmbType->AddItem(ITEM_TYPE_SIMPLE,'Simple check');
+		$cmbType->AddItem(ITEM_TYPE_SNMPV1,'SNMPv1 agent');
+		$cmbType->AddItem(ITEM_TYPE_SNMPV2C,'SNMPv2 agent');
+		$cmbType->AddItem(ITEM_TYPE_SNMPV3,'SNMPv3 agent');
+		$cmbType->AddItem(ITEM_TYPE_TRAPPER,'Zabbix trapper');
+		$cmbType->AddItem(ITEM_TYPE_INTERNAL,'Zabbix internal');
+		$frmItem->AddRow(S_TYPE, $cmbType);
 
-		show_table2_v_delimiter($col++);
-		echo S_TYPE;
-		show_table2_h_delimiter();
-
-		echo "<SELECT class=\"biginput\" NAME=\"type\" value=\"$type\" size=\"1\" onChange=\"submit()\">";
-		echo "<OPTION VALUE=\"0\"";
-		if($type==ITEM_TYPE_ZABBIX) echo "SELECTED";
-		echo ">Zabbix agent";
-
-		echo "<OPTION VALUE=\"7\"";
-		if($type==ITEM_TYPE_ZABBIX_ACTIVE) echo "SELECTED";
-		echo ">Zabbix agent (active)";
-
-		echo "<OPTION VALUE=\"3\"";
-		if($type==ITEM_TYPE_SIMPLE) echo "SELECTED";
-		echo ">Simple check";
-
-		echo "<OPTION VALUE=\"1\"";
-		if($type==ITEM_TYPE_SNMPV1) echo "SELECTED";
-		echo ">SNMPv1 agent";
-
-		echo "<OPTION VALUE=\"4\"";
-		if($type==ITEM_TYPE_SNMPV2C) echo "SELECTED";
-		echo ">SNMPv2 agent";
-
-		echo "<OPTION VALUE=\"6\"";
-		if($type==ITEM_TYPE_SNMPV3) echo "SELECTED";
-		echo ">SNMPv3 agent";
-
-
-		echo "<OPTION VALUE=\"2\"";
-		if($type==ITEM_TYPE_TRAPPER) echo "SELECTED";
-		echo ">Zabbix trapper";
-
-		echo "<OPTION VALUE=\"5\"";
-		if($type==ITEM_TYPE_INTERNAL) echo "SELECTED";
-		echo ">Zabbix internal";
-
-		echo "</SELECT>";
 
 		if(($type==ITEM_TYPE_SNMPV1)||($type==ITEM_TYPE_SNMPV2C))
 		{ 
-			show_table2_v_delimiter($col++);
-			echo nbsp(S_SNMP_COMMUNITY);
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"snmp_community\" value=\"$snmp_community\" size=16>";
+			$frmItem->AddVar("snmpv3_securityname",$snmpv3_securityname);
+			$frmItem->AddVar("snmpv3_securitylevel",$snmpv3_securitylevel);
+			$frmItem->AddVar("snmpv3_authpassphrase",$snmpv3_authpassphrase);
+			$frmItem->AddVar("snmpv3_privpassphrase",$snmpv3_privpassphrase);
 
-			show_table2_v_delimiter($col++);
-			echo nbsp(S_SNMP_OID);
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"snmp_oid\" value=\"$snmp_oid\" size=40>";
-
-			show_table2_v_delimiter($col++);
-			echo nbsp(S_SNMP_PORT);
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"snmp_port\" value=\"$snmp_port\" size=5>";
-
-			echo "<input class=\"biginput\" name=\"snmpv3_securityname\" type=hidden value=\"$snmpv3_securityname\">";
-			echo "<input class=\"biginput\" name=\"snmpv3_securitylevel\" type=hidden value=\"$snmpv3_securitylevel\">";
-			echo "<input class=\"biginput\" name=\"snmpv3_authpassphrase\" type=hidden value=\"$snmpv3_authpassphrase\">";
-			echo "<input class=\"biginput\" name=\"snmpv3_privpassphrase\" type=hidden value=\"$snmpv3_privpassphrase\">";
+			$frmItem->AddRow(S_SNMP_COMMUNITY, new CTextBox("snmp_community",$snmp_community,16));
+			$frmItem->AddRow(S_SNMP_OID, new CTextBox("snmp_oid",$snmp_oid,40));
+			$frmItem->AddRow(S_SNMP_PORT, new CTextBox("snmp_port",$snmp_port,5));
 		}
 		else if($type==ITEM_TYPE_SNMPV3)
 		{
-			show_table2_v_delimiter($col++);
-			echo nbsp(S_SNMP_OID);
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"snmp_oid\" value=\"$snmp_oid\" size=40>";
+			$frmItem->AddRow(S_SNMP_OID, new CTextBox("snmp_oid",$snmp_oid,40));
+			$frmItem->AddRow(S_SNMPV3_SECURITY_NAME, new CTextBox("snmpv3_securityname",$snmpv3_securityname,64));
 
-			show_table2_v_delimiter($col++);
-			echo nbsp(S_SNMPV3_SECURITY_NAME);
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"snmpv3_securityname\" value=\"$snmpv3_securityname\" size=64>";
+			$cmbSecLevel = new CComboBox("snmpv3_securitylevel",$snmpv3_securitylevel);
+			$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,"NoAuthPriv");
+			$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,"AuthNoPriv");
+			$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,"AuthPriv");
+			$frmItem->AddRow(S_SNMPV3_SECURITY_LEVEL, $cmbSecLevel);
 
-			show_table2_v_delimiter($col++);
-			echo nbsp(S_SNMPV3_SECURITY_LEVEL);
-			show_table2_h_delimiter();
-			echo "<SELECT class=\"biginput\" NAME=\"snmpv3_securitylevel\" value=\"$snmpv3_securitylevel\" size=\"1\">";
-			echo "<OPTION VALUE=\"0\"";
-			if($snmpv3_securitylevel==ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) echo "SELECTED";
-			echo ">NoAuthPriv";
-
-			echo "<OPTION VALUE=\"1\"";
-			if($snmpv3_securitylevel==ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) echo "SELECTED";
-			echo ">AuthNoPriv";
-
-			echo "<OPTION VALUE=\"2\"";
-			if($snmpv3_securitylevel==ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) echo "SELECTED";
-			echo ">AuthPriv";
-
-			echo "</SELECT>";
-
-			show_table2_v_delimiter($col++);
-			echo nbsp(S_SNMPV3_AUTH_PASSPHRASE);
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"snmpv3_authpassphrase\" value=\"$snmpv3_authpassphrase\" size=64>";
-
-			show_table2_v_delimiter($col++);
-			echo nbsp(S_SNMPV3_PRIV_PASSPHRASE);
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"snmpv3_privpassphrase\" value=\"$snmpv3_privpassphrase\" size=64>";
-
-			show_table2_v_delimiter($col++);
-			echo nbsp(S_SNMP_PORT);
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"snmp_port\" value=\"$snmp_port\" size=5>";
-
-			echo "<input class=\"biginput\" name=\"snmp_community\" type=hidden value=\"$snmp_community\">";
+			$frmItem->AddRow(S_SNMPV3_AUTH_PASSPHRASE, new CTextBox("snmpv3_authpassphrase",$snmpv3_authpassphrase,64));
+			$frmItem->AddRow(S_SNMPV3_PRIV_PASSPHRASE, new CTextBox("snmpv3_privpassphrase",$snmpv3_privpassphrase,64));
+			$frmItem->AddRow(S_SNMP_PORT, new CTextBox("snmp_port",$snmp_port,5));
+			$frmItem->AddVar("snmp_community",$snmp_community);
 		}
 		else
 		{
-			echo "<input class=\"biginput\" name=\"snmp_community\" type=hidden value=\"$snmp_community\">";
-			echo "<input class=\"biginput\" name=\"snmp_oid\" type=hidden value=\"$snmp_oid\">";
-			echo "<input class=\"biginput\" name=\"snmp_port\" type=hidden value=\"$snmp_port\">";
-
-			echo "<input class=\"biginput\" name=\"snmpv3_securityname\" type=hidden value=\"$snmpv3_securityname\">";
-			echo "<input class=\"biginput\" name=\"snmpv3_securitylevel\" type=hidden value=\"$snmpv3_securitylevel\">";
-			echo "<input class=\"biginput\" name=\"snmpv3_authpassphrase\" type=hidden value=\"$snmpv3_authpassphrase\">";
-			echo "<input class=\"biginput\" name=\"snmpv3_privpassphrase\" type=hidden value=\"$snmpv3_privpassphrase\">";
+			$frmItem->AddVar("snmp_community",$snmp_community);
+			$frmItem->AddVar("snmp_oid",$snmp_oid);
+			$frmItem->AddVar("snmp_port",$snmp_port);
+			$frmItem->AddVar("snmpv3_securityname",$snmpv3_securityname);
+			$frmItem->AddVar("snmpv3_securitylevel",$snmpv3_securitylevel);
+			$frmItem->AddVar("snmpv3_authpassphrase",$snmpv3_authpassphrase);
+			$frmItem->AddVar("snmpv3_privpassphrase",$snmpv3_privpassphrase);
 		}
 
-		show_table2_v_delimiter($col++);
-		echo S_KEY;
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"key\" value=\"$key\" size=40>";
+		$frmItem->AddRow(S_KEY, new CTextBox("key",$key,40));
 
 		if( ($value_type==ITEM_VALUE_TYPE_FLOAT) || ($value_type==ITEM_VALUE_TYPE_UINT64))
 		{
-			show_table2_v_delimiter($col++);
-			echo S_UNITS;
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"units\" value=\"$units\" size=10>";
+			$frmItem->AddRow(S_UNITS, new CTextBox("units",$units,40));
 
-			show_table2_v_delimiter($col++);
-			echo S_USE_MULTIPLIER;
-			show_table2_h_delimiter();
-			echo "<SELECT class=\"biginput\" NAME=\"multiplier\" value=\"$multiplier\" size=\"1\" onChange=\"submit()\">";
-			echo "<OPTION VALUE=\"0\""; if($multiplier==0) echo "SELECTED"; echo ">".S_DO_NOT_USE;
-			echo "<OPTION VALUE=\"1\" "; if($multiplier==1) echo "SELECTED"; echo ">".S_CUSTOM_MULTIPLIER;
-			echo "</SELECT>";
+			$cmbMultipler = new CComboBox("multiplier",$multiplier,"submit()");
+			$cmbMultipler->AddItem(0,S_DO_NOT_USE);
+			$cmbMultipler->AddItem(1,S_CUSTOM_MULTIPLIER);
+			$frmItem->AddRow(S_USE_MULTIPLIER, $cmbMultipler);
 		}
 		else
 		{
-			echo "<input class=\"biginput\" name=\"units\" type=hidden value=\"$units\">";
-			echo "<input class=\"biginput\" name=\"multiplier\" type=hidden value=\"0\">";
+			$frmItem->AddVar("units",$units);
+			$frmItem->AddVar("multiplier",$multiplier);
 		}
 
-		if($multiplier == 1)
+		if($multiplier == S_CUSTOM_MULTIPLIER)
 		{
-			show_table2_v_delimiter($col++);
-			echo nbsp(S_CUSTOM_MULTIPLIER);
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"formula\" value=\"$formula\" size=40>";
+			$frmItem->AddRow(S_CUSTOM_MULTIPLIER, new CTextBox("formula",$formula,40));
 		}
 		else
 		{
-			echo "<input class=\"biginput\" name=\"formula\" type=hidden value=\"$formula\">";
+			$frmItem->AddVar("formula",$formula);
 		}
 
-		if($type!=2)
+		if($type != ITEM_TYPE_TRAPPER)
 		{
-			show_table2_v_delimiter($col++);
-			echo nbsp(S_UPDATE_INTERVAL_IN_SEC);
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"delay\" value=\"$delay\" size=5>";
+			$frmItem->AddRow(S_UPDATE_INTERVAL_IN_SEC, new CTextBox("delay",$delay,5));
 		}
 		else
 		{
-			echo "<input class=\"biginput\" name=\"delay\" type=hidden value=\"$delay\">";
+			$frmItem->AddVar("delay",$delay);
 		}
 
-		show_table2_v_delimiter($col++);
-		echo nbsp(S_KEEP_HISTORY_IN_DAYS);
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"history\" value=\"$history\" size=8>";
+		$frmItem->AddRow(S_KEEP_HISTORY_IN_DAYS, new CTextBox("history",$history,8));
+		$frmItem->AddRow(S_KEEP_TRENDS_IN_DAYS, new CTextBox("trends",$trends,8));
 
-		show_table2_v_delimiter($col++);
-		echo nbsp(S_KEEP_TRENDS_IN_DAYS);
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"trends\" value=\"$trends\" size=8>";
+		$cmbStatus = new CComboBox("status",$status);
+		$cmbStatus->AddItem(0,S_MONITORED);
+		$cmbStatus->AddItem(1,S_DISABLED);
+#		$cmbStatus->AddItem(2,"Trapper");
+		$cmbStatus->AddItem(3,S_NOT_SUPPORTED);
+		$frmItem->AddRow(S_STATUS,$cmbStatus);
 
-		show_table2_v_delimiter($col++);
-		echo S_STATUS;
-		show_table2_h_delimiter();
-		echo "<SELECT class=\"biginput\" NAME=\"status\" value=\"$status\" size=\"1\">";
-		echo "<OPTION VALUE=\"0\"";
-		if($status==0) echo "SELECTED";
-		echo ">".S_MONITORED;
-		echo "<OPTION VALUE=\"1\"";
-		if($status==1) echo "SELECTED";
-		echo ">".S_DISABLED;
-#		echo "<OPTION VALUE=\"2\"";
-#		if($status==2) echo "SELECTED";
-#		echo ">Trapper";
-		echo "<OPTION VALUE=\"3\"";
-		if($status==3) echo "SELECTED";
-		echo ">".S_NOT_SUPPORTED;
-		echo "</SELECT>";
-
-		show_table2_v_delimiter($col++);
-		echo nbsp(S_TYPE_OF_INFORMATION);
-		show_table2_h_delimiter();
-		echo "<SELECT class=\"biginput\" NAME=\"value_type\" value=\"$value_type\" size=\"1\" onChange=\"submit()\">";
-		echo "<OPTION VALUE=\"0\"";
-		if($value_type==ITEM_VALUE_TYPE_FLOAT) echo "SELECTED";
-		echo ">".S_NUMERIC_FLOAT;
-		echo "<OPTION VALUE=\"3\"";
-		if($value_type==ITEM_VALUE_TYPE_UINT64) echo "SELECTED";
-		echo ">".S_NUMERIC_UINT64;
-		echo "<OPTION VALUE=\"1\"";
-		if($value_type==ITEM_VALUE_TYPE_STR) echo "SELECTED";
-		echo ">".S_CHARACTER;
-		echo "<OPTION VALUE=\"2\"";
-		if($value_type==ITEM_VALUE_TYPE_LOG) echo "SELECTED";
-		echo ">".S_LOG;
-		echo "</SELECT>";
+		$cmbValType = new CComboBox("value_type",$value_type,"submit()");
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT, S_NUMERIC_FLOAT);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64, S_NUMERIC_UINT64);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, S_CHARACTER);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, S_LOG);
+		$frmItem->AddRow(S_TYPE_OF_INFORMATION,$cmbValType);
 
 		if($value_type==ITEM_VALUE_TYPE_LOG)
 		{
-			show_table2_v_delimiter($col++);
-			echo nbsp(S_LOG_TIME_FORMAT);
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"logtimefmt\" value=\"$logtimefmt\" size=16>";
+			$frmItem->AddRow(S_LOG_TIME_FORMAT, new CTextBox("logtimefmt",$logtimefmt,16));
 		}
 		else
 		{
-			echo "<input class=\"biginput\" name=\"logtimefmt\" type=hidden value=\"$logtimefmt\">";
+			$frmItem->AddVar("logtimefmt",$logtimefmt);
 		}
 
 		if( ($value_type==ITEM_VALUE_TYPE_FLOAT) || ($value_type==ITEM_VALUE_TYPE_UINT64))
 		{
-			show_table2_v_delimiter($col++);
-			echo nbsp(S_STORE_VALUE);
-			show_table2_h_delimiter();
-			echo "<SELECT class=\"biginput\" NAME=\"delta\" value=\"$delta\" size=\"1\">";
-			echo "<OPTION VALUE=\"0\" "; if($delta==0) echo "SELECTED"; echo ">".S_AS_IS;
-			echo "<OPTION VALUE=\"1\" "; if($delta==1) echo "SELECTED"; echo ">".S_DELTA_SPEED_PER_SECOND;
-			echo "<OPTION VALUE=\"2\" "; if($delta==2) echo "SELECTED"; echo ">".S_DELTA_SIMPLE_CHANGE;
-			echo "</SELECT>";
+			$cmbDelta= new CComboBox("delta",$delta);
+			$cmbDelta->AddItem(0,S_AS_IS);
+			$cmbDelta->AddItem(1,S_DELTA_SPEED_PER_SECOND);
+			$cmbDelta->AddItem(2,S_DELTA_SIMPLE_CHANGE);
+			$frmItem->AddRow(S_STORE_VALUE,$cmbDelta);
 		}
 		else
 		{
-			echo "<input class=\"biginput\" name=\"delta\" type=hidden value=\"1\">";
+			$frmItem->AddVar("delta",0);
 		}
 
 		if($type==2)
 		{
-			show_table2_v_delimiter($col++);
-			echo nbsp(S_ALLOWED_HOSTS);
-			show_table2_h_delimiter();
-			echo "<input class=\"biginput\" name=\"trapper_hosts\" value=\"$trapper_hosts\" size=40>";
+			$frmItem->AddRow(S_ALLOWED_HOSTS, new CTextBox("trapper_hosts",$trapper_hosts,40));
 		}
 		else
 		{
-			echo "<input class=\"biginput\" name=\"trapper_hosts\" type=hidden value=\"$trapper_hosts\">";
+			$frmItem->AddVar("trapper_hosts",$trapper_hosts);
 		}
 
- 
-		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add to all hosts\" onClick=\"return Confirm('Add item to all hosts?');\">";
+		$frmRow = array(
+			new CButton("register","add"),
+			SPACE,
+			new CButton("register","add to all hosts","return Confirm('Add item to all hosts?');")
+		);
 		if(isset($_REQUEST["itemid"]))
 		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\" onClick=\"return Confirm('Delete selected item?');\">";
+			array_push($frmRow,
+				SPACE,
+				new CButton("register","update"),
+				SPACE,
+				new CButton("register","delete","return Confirm('Delete selected item?');")
+			);
 		}
+		$frmItem->AddSpanRow($frmRow,"form_row_last");
 
-		show_table2_v_delimiter($col++);
-		echo S_GROUP;
-		show_table2_h_delimiter();
-		$h2="";
-	        $h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
+	        $cmbGroups = new CComboBox("groupid",$groupid,"submit()");		
 
-	        $result=DBselect("select groupid,name from groups order by name");
-	        while($row=DBfetch($result))
+	        $groups=DBselect("select groupid,name from groups order by name");
+	        while($group=DBfetch($groups))
 	        {
 // Check if at least one host with read permission exists for this group
-	                $result2=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg where hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid and h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host");
-	                $cnt=0;
-	                while($row2=DBfetch($result2))
+	                $hosts=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg where hg.groupid=".$group["groupid"]." and hg.hostid=h.hostid and h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host");
+	                while($host=DBfetch($hosts))
 	                {
-	                        if(!check_right("Host","U",$row2["hostid"]))
+	                        if(check_right("Host","U",$host["hostid"]))
 	                        {
-	                                continue;
+					$cmbGroups->AddItem($group["groupid"],$group["name"]);
+	                                break;
 	                        }
-	                        $cnt=1; break;
-	                }
-	                if($cnt!=0)
-       	         {
-	                        $h2=$h2.form_select("groupid",$row["groupid"],$row["name"]);
 	                }
 	        }
-		$h2=$h2."</select>";
-		echo $h2;
+		$frmItem->AddRow(S_GROUP,$cmbGroups);
 
-		show_table2_v_delimiter2();
-		echo "<select class=\"biginput\" name=\"action\">";
-		echo "<option value=\"add to group\">".S_ADD_TO_GROUP;
+		$cmbAction = new CComboBox("action");
+		$cmbAction->AddItem("add to group",S_ADD_TO_GROUP);
 		if(isset($_REQUEST["itemid"]))
 		{
-			echo "<option value=\"update in group\">".S_UPDATE_IN_GROUP;
-			echo "<option value=\"delete from group\">".S_DELETE_FROM_GROUP;
+			$cmbAction->AddItem("update in group",S_UPDATE_IN_GROUP);
+			$cmbAction->AddItem("delete from group",S_DELETE_FROM_GROUP);
 		}
-		echo "</select>";
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"do\">";
- 
-		show_table2_header_end();
+		$frmItem->AddItemToBottomRow($cmbAction);
+		$frmItem->AddItemToBottomRow(SPACE);
+		$frmItem->AddItemToBottomRow(new CButton("register","do"));
+
+		$frmItem->Show();
 	}
 
 	# Insert form for Host Groups
@@ -874,11 +663,11 @@
 
 	function	insert_login_form()
 	{
-		$frmLogin = new CForm('Login','index.php');
+		$frmLogin = new CFormTable('Login','index.php');
 		$frmLogin->SetHelp('web.index.login');
 		$frmLogin->AddRow('Login name', new CTextBox('name'));
 		$frmLogin->AddRow('Password', new CPassBox('password'));
-		$frmLogin->AddBottomRow(new CButton('register','Enter'));
+		$frmLogin->AddItemToBottomRow(new CButton('register','Enter'));
 		$frmLogin->Show();
 	}
 
@@ -1732,17 +1521,16 @@
 			$frmAction->AddRow(S_DELAY_BETWEEN_REPEATS, new CTextBox('repeatdelay',$repeatdelay,2));
 		}
 
-		$bottomRow = array();
 		if(isset($actionid))
 		{
-			array_push($bottomRow,new CButton('register','update'));
-			array_push($bottomRow,SPACE,new CButton('register','delete','return Confirm("Delete selected action?");'));
+			$frmAction->AddItemToBottomRow(new CButton('register','update'));
+			$frmAction->AddItemToBottomRow(SPACE);
+			$frmAction->AddItemToBottomRow(new CButton('register','delete','return Confirm("Delete selected action?");'));
 		} else {
-			array_push($bottomRow,new CButton('register','add'));
+			$frmAction->AddItemToBottomRow(new CButton('register','add'));
 		}
-		array_push($bottomRow,SPACE,new CButton('register','cancel'));
-
-		$frmAction->AddBottomRow($bottomRow);
+		$frmAction->AddItemToBottomRow(SPACE);
+		$frmAction->AddItemToBottomRow(new CButton('register','cancel'));
 	
 		$frmAction->Show();
 	}
