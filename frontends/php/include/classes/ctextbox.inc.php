@@ -24,7 +24,7 @@
 /* private */
 		var $caption;
 /* public */
-		function CTextBox($name='textbox',$value="",$size=20,$caption=NULL)
+		function CTextBox($name='textbox',$value="",$size=20,$caption=NULL,$readonly="no")
 		{
 			parent::CTag("input","no");
 			$this->SetClass("biginput");
@@ -32,6 +32,7 @@
 			$this->SetSize($size);
 			$this->SetCaption($caption);
 			$this->SetValue($value);
+			$this->SetReadonly($readonly);
 		}
 		function Show()
 		{

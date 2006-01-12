@@ -77,13 +77,13 @@
 		}
 		function AddVar($name, $value)
 		{
-			$this->AddTopRow(new CVar($name, $value));
+			$this->AddItemToTopRow(new CVar($name, $value));
 		}
-		function AddTopRow($value)
+		function AddItemToTopRow($value)
 		{
 			array_push($this->top_items, $value);
 		}
-		function AddRow($item1, $item2=NULL)
+		function AddRow($item1, $item2=NULL, $class=NULL)
 		{
 			if(is_string($item1))
 				$item1=nbsp($item1);
@@ -91,11 +91,18 @@
 			$row = new CRow(array(
 					new CCol($item1,'form_row_l'),
 					new CCol($item2,'form_row_r')
-					)
+					),
+					$class
 				);
 			array_push($this->center_items, $row);
 		}
-		function AddBottomRow($value)
+		function AddSpanRow($value, $class="form_row_last")
+		{
+			$col = new CCol($value,$class);
+		        $col->SetColSpan(2);
+			array_push($this->center_items,new CRow($col,$class));
+		}
+		function AddItemToBottomRow($value)
 		{
 			$this->bottom_items->AddItem($value);
 		}
