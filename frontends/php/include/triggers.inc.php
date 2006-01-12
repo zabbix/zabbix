@@ -54,13 +54,17 @@
 		$result=DBselect($sql);
 		$row=DBfetch($result);
 
-//		$description=str_replace("%s",$row["host"],$row["description"]);
-
-//		$search=array("{HOSTNAME}");
-//		$replace=array($row["host"]);
-//		$description = str_replace($search, $replace,$row["description"]);
-
-		$description = str_replace("{HOSTNAME}", $row["host"],$row["description"]);
+		if(DBnum_rows($result)>0)
+		{
+			$description = str_replace("{HOSTNAME}", $row["host"],$row["description"]);
+		}
+		else
+		{
+			$sql="select description from triggers where triggerid=$triggerid";
+			$result=DBselect($sql);
+			$row=DBfetch($result);
+			$description = $row["description"];
+		}
 
 		return $description;
 	}
