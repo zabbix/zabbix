@@ -22,7 +22,7 @@
 	class CButton extends CTag
 	{
 /* public */
-		function CButton($name="button", $caption="", $action=NULL)
+		function CButton($name="button", $caption="", $action=NULL, $accesskey=NULL)
 		{
 			parent::CTag("input","no");
 			$this->tag_body_start = "";
@@ -31,6 +31,7 @@
 			$this->SetName($name);
 			$this->SetCaption($caption);
 			$this->SetAction($action);
+			$this->SetAccessKey($accesskey);
 		}
 		function SetAction($value='submit()', $event='onClick')
 		{
@@ -52,7 +53,9 @@
 		}
 		function SetAccessKey($value='B')
 		{
-			if(!is_string($value))
+			if(is_null($value))
+				return 0;
+			elseif(!is_string($value))
 			{
 				return $this->error("Incorrect value for SetAccessKey [$value]");
 			}
