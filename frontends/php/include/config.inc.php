@@ -62,7 +62,9 @@ function SDI($msg) { echo "DEBUG INFO: $msg <br>"; } # DEBUG INFO!!!
 	include_once("include/classes/ctextbox.inc.php");
 	include_once("include/classes/cpassbox.inc.php");
 	include_once("include/classes/cform.inc.php");
+	include_once("include/classes/cfile.inc.php");
 	include_once("include/classes/ccheckbox.inc.php");
+	include_once("include/classes/clistbox.inc.php");
 	include_once("include/classes/cform.inc.php");
 	include_once("include/classes/cformtable.inc.php");
 

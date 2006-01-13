@@ -30,9 +30,9 @@
 		var $center_items = array();
 		var $bottom_items = array();
 /* public */
-		function CFormTable($title=NULL, $action=NULL, $method='get')
+		function CFormTable($title=NULL, $action=NULL, $method='get', $enctype=NULL)
 		{
-			parent::CForm($action,$method);
+			parent::CForm($action,$method,$enctype);
 			$this->SetTitle($title);
 			$this->SetAlign('center');
 			$this->SetHelp();
@@ -96,7 +96,7 @@
 				);
 			array_push($this->center_items, $row);
 		}
-		function AddSpanRow($value, $class="form_row_last")
+		function AddSpanRow($value, $class=NULL)
 		{
 			$col = new CCol($value,$class);
 		        $col->SetColSpan(2);

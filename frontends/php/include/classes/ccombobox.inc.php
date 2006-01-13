@@ -46,24 +46,18 @@
 		}
 		function SetEnable($value='yes')
 		{
-			if(is_string($value))
-			{
-				if($value == 'yes')
-					return $this->DelOption('disabled');
-				elseif($value == 'no')
-					return $this->AddOption('disabled','disabled');
-			}
+			if($value == 'yes' || $value == 'enabled' || $value=='on')
+				return $this->DelOption('disabled');
+			elseif($value == 'no' || $value == 'disabled' || $value=='off' || $value == NULL)
+				return $this->AddOption('disabled','disabled');
 			return $this->error("Incorrect value for SetEnable [$value]");
 		}
-		function SetSelected($value)
+		function SetSelected($value='yes')
 		{
-			if(is_string($value))
-			{
-				if($value == 'yes')
-					return $this->AddOption('selected','selected');
-				elseif($value == 'no')
-					return $this->DelOption('selected');
-			}
+			if($value == 'yes' || $value == "selected" || $value=='on')
+				return $this->AddOption('selected','selected');
+			elseif($value == 'no' || $value=='off' || $value == NULL)
+				return $this->DelOption('selected');
 			return $this->error("Incorrect value for SetSelected [$value]");
 		}
 	}
@@ -119,12 +113,15 @@
 		{
 			$this->value = $value;
 		}
-		function AddItem($value, $caption, $enabled='yes')
+		function AddItem($value, $caption, $selected=NULL, $enabled='yes')
 		{
-			$selected = 'no'; 
-			if(!is_null($this->value))
-				if($this->value==$value)
-					$selected = 'yes';
+			if(is_null($selected))
+			{
+				$selected = 'no'; 
+				if(!is_null($this->value))
+					if($this->value==$value)
+						$selected = 'yes';
+			}
 
 //			if($enabled=='no') return;	/* disable item method 1 */
 
