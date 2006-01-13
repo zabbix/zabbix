@@ -144,7 +144,7 @@
 
 			print ($this->tag_body_start);
 		}
-		function ShowTagItem($item)
+		function ShowTagItem(&$item)
 		{
 			if(is_null($item))	return;
 			elseif(is_object($item))$item->Show();

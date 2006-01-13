@@ -15,6 +15,8 @@ form {margin: 0px}
 
 td.form_row_l
 {
+	padding-left: 5px;
+	padding-right: 5px;
 	color: #000000;
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:11px;
@@ -27,6 +29,8 @@ td.form_row_l
 
 td.form_row_r
 {
+	padding-left: 5px;
+	padding-right: 5px;
 	color: #000000;
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:11px;
@@ -199,7 +203,7 @@ tr.table_odd_row:hover
 	font-family:verdana, arial, helvetica, sans-serif;
 	font-size:10pt;
 	text-decoration: none;
-	background-color:#DDDDED;
+	background-color:#DDDDEE;
 }
 
 tr.table_even_row

@@ -22,11 +22,12 @@
 	class CForm extends CTag
 	{
 /* public */
-		function CForm($action=NULL, $method='get')
+		function CForm($action=NULL, $method='get', $enctype=NULL)
 		{
 			parent::CTag("form","yes");
 			$this->SetMethod($method);
 			$this->SetAction($action);
+			$this->SetEnctype($enctype);
 		}
 		function SetMethod($value='post')
 		{
@@ -45,6 +46,15 @@
 				return $this->error("Incorrect value for SetAction [$value]");
 			}
 			return $this->AddOption("action",$value);
+		}
+		function SetEnctype($value=NULL)
+		{
+			if(is_null($value)){
+				return $this->DelOption("enctype");
+			}elseif(!is_string($value)){
+				return $this->error("Incorrect value for SetEnctype [$value]");
+			}
+			return $this->AddOption("enctype",$value);
 		}
 		function AddVar($name, $value)
 		{
