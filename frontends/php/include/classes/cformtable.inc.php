@@ -32,10 +32,19 @@
 /* public */
 		function CFormTable($title=NULL, $action=NULL, $method='get', $enctype=NULL)
 		{
+			global  $_REQUEST;
+
 			parent::CForm($action,$method,$enctype);
 			$this->SetTitle($title);
 			$this->SetAlign('center');
 			$this->SetHelp();
+
+			if(isset($_REQUEST["form"]) && is_string($_REQUEST["form"]))
+				$this->AddVar("form",$_REQUEST["form"]);
+			elseif(isset($title) && is_string($title))
+				$this->AddVar("form",$title);
+			else
+				$this->AddVar("form","form");
 
 			$this->bottom_items = new CCol(NULL,'form_row_last');
 		        $this->bottom_items->SetColSpan(2);

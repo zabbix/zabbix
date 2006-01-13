@@ -1070,8 +1070,6 @@
 
 		$frmAction = new CFormTable(S_ACTION,'actionconf.php');
 		$frmAction->SetHelp('web.actions.action');
-		if(isset($_REQUEST['form']))
-			$frmAction->AddVar('form',$_REQUEST['form']);
 
 		$conditiontype=@iif(isset($_REQUEST["conditiontype"]),$_REQUEST["conditiontype"],0);
 
