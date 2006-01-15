@@ -1,5 +1,6 @@
 1.1beta6:
 
+ - http://www.zabbix.com/forum/showthread.php?t=1971
  - zabbix_agent doesn't work: http://www.zabbix.com/forum/showthread.php?t=1970
  - make failed: http://www.zabbix.com/forum/showthread.php?t=1957
  - check if ZABBIX server accepts values returned by W32 agent
