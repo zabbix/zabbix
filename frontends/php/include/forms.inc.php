@@ -98,33 +98,36 @@
 	# Insert form for User
 	function	insert_user_form($userid,$profile=0)
 	{
+		$frm_title = "";
 		if(isset($userid))
 		{
 			$user=get_user_by_userid($userid);
 			$result=DBselect("select u.alias,u.name,u.surname,u.passwd,u.url,u.autologout,u.lang,u.refresh from users u where u.userid=$userid");
 	
-			$alias=$user["alias"];
-			$name=$user["name"];
-			$surname=$user["surname"];
-			$password="";
-			$url=$user["url"];
-			$autologout=$user["autologout"];
-			$lang=$user["lang"];
-			$refresh=$user["refresh"];
+			$alias		= get_request("alias",$user["alias"]);
+			$name		= get_request("name",$user["name"]);
+			$surname	= get_request("surname",$user["surname"]);
+			$password	= "";
+			$url		= get_request("url",$user["url"]);
+			$autologout	= get_request("autologout",$user["autologout"]);
+			$lang		= get_request("lang",$user["lang"]);
+			$refresh	= get_request("refresh",$user["refresh"]);
+
+			$frm_title = SPACE."\"".$user["alias"]."\"";
 		}
 		else
 		{
-			$alias="";
-			$name="";
-			$surname="";
-			$password="";
-			$url="";
-			$autologout="900";
-			$lang="en_gb";
-			$refresh="30";
+			$alias		= get_request("alias","");
+			$name		= get_request("name","");
+			$surname	= get_request("surname","");
+			$password	= "";
+			$url 		= get_request("url","");
+			$autologout	= get_request("autologout","900");
+			$lang		= get_request("lang","en_gb");
+			$refresh	= get_request("refresh","30");
 		}
 
-		$frmUser = new CFormTable(S_USER);
+		$frmUser = new CFormTable(S_USER.$frm_title);
 		$frmUser->SetHelp("web.users.users.php");
 
 		if($profile==0) 
@@ -142,7 +145,7 @@
 			$frmUser->AddRow(S_SURNAME,	new CTextBox("surname",$surname,20));
 		}
 
-		$frmUser->AddRow(S_PASSWORD,	new CPassBox("password",$password,20));
+		$frmUser->AddRow(S_PASSWORD,	new CPassBox("password1",$password,20));
 		$frmUser->AddRow(S_PASSWORD_ONCE_AGAIN,	new CPassBox("password2",$password,20));
 
 		$cmbLang = new CcomboBox('lang',$lang);
@@ -508,17 +511,19 @@
 	{
 		global  $_REQUEST;
 
+		$frm_title = "";
 		if(isset($usrgrpid))
 		{
 			$usrgrp=get_usergroup_by_usrgrpid($usrgrpid);
-			$name=$usrgrp["name"];
+			$name	= get_request("name",$usrgrp["name"]);
+			$frm_title = SPACE."\"".$usrgrp["name"]."\"";
 		}
 		else
 		{
-			$name="";
+			$name	= get_request("name","");
 		}
 
-		$frmUserG = new CFormTable(S_USER_GROUP,"users.php");
+		$frmUserG = new CFormTable(S_USER_GROUP.$frm_title,"users.php");
 		$frmUserG->SetHelp("web.users.groups.php");
 		if(isset($usrgrpid))
 		{
@@ -533,7 +538,8 @@
 		{
 			if(isset($_REQUEST["usrgrpid"]))
 			{
-				$sql="select count(*) as count from users_groups where userid=".$user["userid"]." and usrgrpid=".$_REQUEST["usrgrpid"];
+				$sql="select count(*) as count from users_groups where userid=".
+					$user["userid"]." and usrgrpid=".$_REQUEST["usrgrpid"];
 				$result=DBselect($sql);
 				$res_row=DBfetch($result);
 				array_push($form_row,
@@ -544,7 +550,8 @@
 			else
 			{
 				array_push($form_row,
-					new CCheckBox($user["userid"],$user["alias"]),
+					new CCheckBox($user["userid"],$user["alias"],
+					isset($_REQUEST[$user["userid"]]) ? 'yes' : 'no'),
 					BR);
 			}
 		}
