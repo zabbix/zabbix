@@ -28,8 +28,20 @@
 			error("Insufficient permissions");
 			return 0;
 		}
-		
 
+		if($alias==""){
+			error("Incorrect Alias name");
+			return 0;
+		}
+
+		$sql="select * from users where alias='$alias'";
+		$result=DBexecute($sql);
+		if(DBnum_rows($result)>0)
+		{
+			error("User '$alias' already exists");
+			return 0;
+		}
+		
 		$passwd=md5($passwd);
 		$sql="insert into users (name,surname,alias,passwd,url,autologout,lang,refresh) values ('$name','$surname','$alias','$passwd','$url',$autologout,'$lang',$refresh)";
 		return DBexecute($sql);
@@ -45,6 +57,19 @@
 			return 0;
 		}
 
+		if($alias==""){
+			error("incorrect alias name");
+			return 0;
+		}
+
+		$sql="select * from users where alias='$alias' and userid<>$userid";
+		$result=DBexecute($sql);
+		if(DBnum_rows($result)>0)
+		{
+			error("User '$alias' already exists");
+			return 0;
+		}
+		
 		if($passwd=="")
 		{
 			$sql="update users set name='$name',surname='$surname',alias='$alias',url='$url',autologout=$autologout,lang='$lang',refresh=$refresh where userid=$userid";
@@ -102,5 +127,95 @@
 			error("No user with itemid=[$userid]");
 		}
 		return	$result;
+	}
+
+	function	add_user_group($name,$users)
+	{
+		if(!check_right("Host","A",0))
+		{
+			error("Insufficient permissions");
+			return 0;
+		}
+		
+		if($name==""){
+			error("Incorrect group name");
+			return 0;
+		}
+
+		$sql="select * from usrgrp where name='$name'";
+		$result=DBexecute($sql);
+		if(DBnum_rows($result)>0)
+		{
+			error("Group '$name' already exists");
+			return 0;
+		}
+
+		$sql="insert into usrgrp (name) values ('$name')";
+		$result=DBexecute($sql);
+		if(!$result)
+		{
+			return	$result;
+		}
+		
+		$usrgrpid=DBinsert_id($result,"usrgrp","usrgrpid");
+
+		update_user_groups($usrgrpid,$users);
+
+		return $result;
+	}
+
+	function	update_user_group($usrgrpid,$name,$users)
+	{
+		if(!check_right("Host","U",0))
+		{
+			error("Insufficient permissions");
+			return 0;
+		}
+		
+		if($name==""){
+			error("Incorrect group name");
+			return 0;
+		}
+
+		$sql="select * from usrgrp where name='$name' and usrgrpid<>$usrgrpid";
+		$result=DBexecute($sql);
+		if(DBnum_rows($result)>0)
+		{
+			error("Group '$name' already exists");
+			return 0;
+		}
+
+		$sql="update usrgrp set name='$name' where usrgrpid=$usrgrpid";
+		$result=DBexecute($sql);
+		if(!$result)
+		{
+			return	$result;
+		}
+		
+		update_user_groups($usrgrpid,$users);
+
+		return $result;
+	}
+
+	function	delete_user_group($usrgrpid)
+	{
+		$sql="delete from users_groups where usrgrpid=$usrgrpid";
+		DBexecute($sql);
+		$sql="delete from usrgrp where usrgrpid=$usrgrpid";
+		return DBexecute($sql);
+	}
+
+	function	update_user_groups($usrgrpid,$users)
+	{
+		$count=count($users);
+
+		$sql="delete from users_groups where usrgrpid=$usrgrpid";
+		DBexecute($sql);
+
+		for($i=0;$i<$count;$i++)
+		{
+			$sql="insert into users_groups (usrgrpid,userid) values ($usrgrpid,".$users[$i].")";
+			DBexecute($sql);
+		}
 	}
 ?>

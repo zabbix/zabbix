@@ -46,33 +46,38 @@
 ?>
 
 <?php
-	if(isset($_REQUEST["save"])&&!isset($_REQUEST["userid"])&&($_REQUEST["config"]==0))
+	if(isset($_REQUEST["save"])&&($_REQUEST["config"]==0))
 	{
-		if($_REQUEST["password1"]==$_REQUEST["password2"])
-		{
-			$result=add_user($_REQUEST["name"],$_REQUEST["surname"],$_REQUEST["alias"],$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],$_REQUEST["lang"],$_REQUEST["refresh"]);
-			show_messages($result, S_USER_ADDED, S_CANNOT_ADD_USER);
-			if($result)
-				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_USER,"User alias [".addslashes($_REQUEST["alias"])."] name [".addslashes($_REQUEST["name"])."] surname [".addslashes($_REQUEST["surname"])."]]");
-		}
-		else
-		{
-			show_error_message(S_CANNOT_ADD_USER_BOTH_PASSWORDS_MUST);
-		}
-	}
+		if($_REQUEST["password1"]!=$_REQUEST["password2"]){
+			if(isset($_REQUEST["userid"]))
+				show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
+			else
+				show_error_message(S_CANNOT_ADD_USER_BOTH_PASSWORDS_MUST);
+		} else {
+			if(isset($_REQUEST["userid"])){
+				$action = AUDIT_ACTION_UPDATE;
+				$result=update_user($_REQUEST["userid"],
+					$_REQUEST["name"],$_REQUEST["surname"],$_REQUEST["alias"],
+					$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],
+					$_REQUEST["lang"],$_REQUEST["refresh"]);
 
-	if(isset($_REQUEST["save"])&&isset($_REQUEST["userid"])&&($_REQUEST["config"]==0))
-	{
-		if($_REQUEST["password1"]==$_REQUEST["password2"])
-		{
-			$result=update_user($_REQUEST["userid"],$_REQUEST["name"],$_REQUEST["surname"],$_REQUEST["alias"],$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],$_REQUEST["lang"],$_REQUEST["refresh"]);
-			show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
-			if($result)
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,"User alias [".addslashes($_REQUEST["alias"])."] name [".addslashes($_REQUEST["name"])."] surname [".addslashes($_REQUEST["surname"])."]]");
-		}
-		else
-		{
-			show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
+				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
+			} else {
+				$action = AUDIT_ACTION_ADD;
+				$result=add_user(
+					$_REQUEST["name"],$_REQUEST["surname"],$_REQUEST["alias"],
+					$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],
+					$_REQUEST["lang"],$_REQUEST["refresh"]);
+
+				show_messages($result, S_USER_ADDED, S_CANNOT_ADD_USER);
+			}
+			if($result){
+				add_audit($action,AUDIT_RESOURCE_USER,
+					"User alias [".addslashes($_REQUEST["alias"]).
+					"] name [".addslashes($_REQUEST["name"])."] surname [".
+					addslashes($_REQUEST["surname"])."]]");
+				unset($_REQUEST["form"]);
+			}
 		}
 	}
 
@@ -81,46 +86,46 @@
 		$user=get_user_by_userid($_REQUEST["userid"]);
 		$result=delete_user($_REQUEST["userid"]);
 		show_messages($result, S_USER_DELETED, S_CANNOT_DELETE_USER);
-		if($result)
-			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,"User alias [".$user["alias"]."] name [".$user["name"]."] surname [".$user["surname"]."]");
-		unset($userid);
+		if($result){
+			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,
+				"User alias [".$user["alias"]."] name [".$user["name"]."] surname [".
+				$user["surname"]."]");
+
+			unset($_REQUEST["userid"]);
+			unset($_REQUEST["form"]);
+		}
 	}
 
-	if(isset($_REQUEST["save"])&&!isset($_REQUEST["usrgrpid"])&&($_REQUEST["config"]==1))
+	if(isset($_REQUEST["save"])&&($_REQUEST["config"]==1))
 	{
 		$users=array();
-		$result=DBselect("select userid from users");
-		while($row=DBfetch($result))
-		{
-			if(isset($_REQUEST[$row["userid"]]))
-			{
-				$users=array_merge($users,array($row["userid"]));
-			}
+		$db_users=DBselect("select userid from users");
+		while($db_user=DBfetch($db_users)){
+			if(!isset($_REQUEST[$db_user["userid"]])) continue;
+			array_push($users,$db_user["userid"]);
 		}
-		$result=add_user_group($_REQUEST["name"], $users);
-		show_messages($result, S_GROUP_ADDED, S_CANNOT_ADD_GROUP);
-	}
 
-	if(isset($_REQUEST["save"])&&isset($_REQUEST["usrgrpid"])&&($_REQUEST["config"]==1))
-	{
-		$users=array();
-		$result=DBselect("select userid from users");
-		while($row=DBfetch($result))
-		{
-			if(isset($_REQUEST[$row["userid"]]))
-			{
-				$users=array_merge($users,array($row["userid"]));
-			}
+		if(isset($_REQUEST["usrgrpid"])){
+			$result=update_user_group($_REQUEST["usrgrpid"], $_REQUEST["name"], $users);
+			show_messages($result, S_GROUP_UPDATED, S_CANNOT_UPDATE_GROUP);
+		}else{
+			$result=add_user_group($_REQUEST["name"], $users);
+			show_messages($result, S_GROUP_ADDED, S_CANNOT_ADD_GROUP);
 		}
-		$result=update_user_group($_REQUEST["usrgrpid"], $_REQUEST["name"], $users);
-		show_messages($result, S_GROUP_UPDATED, S_CANNOT_UPDATE_GROUP);
+
+		if($result){
+			unset($_REQUEST["form"]);
+		}
 	}
 
 	if(isset($_REQUEST["delete"])&&($_REQUEST["config"]==1))
 	{
 		$result=delete_user_group($_REQUEST["usrgrpid"]);
 		show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
-		unset($_REQUEST["usrgrpid"]);
+		if($result){
+			unset($_REQUEST["usrgrpid"]);
+			unset($_REQUEST["form"]);
+		}
 	}
 
 	if(isset($_REQUEST["register"]))
@@ -136,6 +141,10 @@
 			$result=add_permission($_REQUEST["userid"],$_REQUEST["right"],$_REQUEST["permission"],$_REQUEST["id"]);
 			show_messages($result, S_PERMISSION_ADDED, S_CANNOT_ADD_PERMISSION);
 		}
+	}
+	
+	if(isset($_REQUEST["cancel"])){
+		unset($_REQUEST["form"]);
 	}
 ?>
 
@@ -168,6 +177,7 @@
 	}
 
 	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"users.php\">", "</form>");
+	echo BR; 
 ?>
 
 <?php
@@ -175,7 +185,6 @@
 	{
 		if(!isset($_REQUEST["form"]))
 		{
-			echo "<br>";
 			show_table_header(S_USER_GROUPS_BIG);
 	
 			$table = new CTableInfo(S_NO_USER_GROUPS_DEFINED);
@@ -212,17 +221,13 @@
 		}
 		else
 		{
-			@insert_usergroups_form($_REQUEST["usrgrpid"]);
+			insert_usergroups_form(isset($_REQUEST["usrgrpid"]) ? $_REQUEST["usrgrpid"] : NULL);
 		}
 	}
-?>
-
-<?php
-	if($_REQUEST["config"]==0)
+	elseif($_REQUEST["config"]==0)
 	{
 		if(!isset($_REQUEST["form"]))
 		{
-			echo "<br>";
 			show_table_header(S_USERS_BIG);
 			$table=new CTableInfo(S_NO_USERS_DEFINED);
 			$table->setHeader(array(S_ID,S_ALIAS,S_NAME,S_SURNAME,S_IS_ONLINE_Q,S_ACTIONS));
@@ -275,7 +280,7 @@
 		}
 		else
 		{
-			@insert_user_form($_REQUEST["userid"]);
+			insert_user_form(get_request("userid",NULL));
 		}
 	}
 ?>
@@ -283,48 +288,49 @@
 <?php
 	if(isset($_REQUEST["userid"])&&isset($_REQUEST["form"])&&($_REQUEST["config"]==0))
 	{
-	echo "<br>";
-	echo "<a name=\"form\"></a>";
-	show_table_header("USER PERMISSIONS");
+		echo BR;
+		echo "<a name=\"form\"></a>";
+		show_table_header("USER PERMISSIONS");
 
-	$table  = new CTableInfo();
-	$table->setHeader(array(S_PERMISSION,S_RIGHT,S_RESOURCE_NAME,S_ACTIONS));
-	$result=DBselect("select rightid,name,permission,id from rights where userid=".$_REQUEST["userid"]." order by name,permission,id");
-	$col=0;
-	while($row=DBfetch($result))
-	{
-		if($row["permission"]=="R")
+		$table  = new CTableInfo();
+		$table->setHeader(array(S_PERMISSION,S_RIGHT,S_RESOURCE_NAME,S_ACTIONS));
+		$result=DBselect("select rightid,name,permission,id from rights where userid=".$_REQUEST["userid"]." order by name,permission,id");
+		$col=0;
+		while($row=DBfetch($result))
 		{
-			$permission=S_READ_ONLY;
+			if($row["permission"]=="R")
+			{
+				$permission=S_READ_ONLY;
+			}
+			else if($row["permission"]=="U")
+			{
+				$permission=S_READ_WRITE;
+			}
+			else if($row["permission"]=="H")
+			{
+				$permission=S_HIDE;
+			}
+			else if($row["permission"]=="A")
+			{
+				$permission=S_ADD;
+			}
+			else
+			{
+				$permission=$row["permission"];
+			}
+			$actions="<A HREF=users.php?userid=".$_REQUEST["userid"]."&rightid=".$row["rightid"]."&register=delete_permission>".S_DELETE."</A>";
+			$table->addRow(array(
+				$row["name"],
+				$permission,
+				get_resource_name($row["name"],$row["id"]),
+				$actions
+			));
 		}
-		else if($row["permission"]=="U")
-		{
-			$permission=S_READ_WRITE;
-		}
-		else if($row["permission"]=="H")
-		{
-			$permission=S_HIDE;
-		}
-		else if($row["permission"]=="A")
-		{
-			$permission=S_ADD;
-		}
-		else
-		{
-			$permission=$row["permission"];
-		}
-		$actions="<A HREF=users.php?userid=".$_REQUEST["userid"]."&rightid=".$row["rightid"]."&register=delete_permission>".S_DELETE."</A>";
-		$table->addRow(array(
-			$row["name"],
-			$permission,
-			get_resource_name($row["name"],$row["id"]),
-			$actions
-		));
-	}
-	$table->show();
+		$table->show();
 
-	insert_permissions_form($_REQUEST["userid"]);
+		echo BR;
 
+		insert_permissions_form($_REQUEST["userid"]);
 	}
 ?>
 
