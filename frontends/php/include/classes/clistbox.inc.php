@@ -38,7 +38,7 @@
 		}
 		function AddItem($value, $caption, $selected='no', $enabled='yes')
 		{
-			parent::AddItem($value, $caption, $selected, $enabled);
+			return parent::AddItem($value, $caption, $selected, $enabled);
 		}
 	}
 ?>

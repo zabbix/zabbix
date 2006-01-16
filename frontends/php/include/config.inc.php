@@ -18,7 +18,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-function SDI($msg) { echo "DEBUG INFO: $msg <br>"; } # DEBUG INFO!!!
+function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 ?>
 <?php
@@ -67,6 +67,14 @@ function SDI($msg) { echo "DEBUG INFO: $msg <br>"; } # DEBUG INFO!!!
 	include_once("include/classes/clistbox.inc.php");
 	include_once("include/classes/cform.inc.php");
 	include_once("include/classes/cformtable.inc.php");
+
+	function get_request($name, $def){
+		global  $_REQUEST;
+		if(isset($_REQUEST[$name]))
+			return $_REQUEST[$name];
+		else
+			return $def;
+	}
 
 	function info($msg)
 	{
@@ -1675,36 +1683,6 @@ echo "</head>";
 		return $result;
 	}
 
-	function	add_user_group($name,$users)
-	{
-		if(!check_right("Host","A",0))
-		{
-			error("Insufficient permissions");
-			return 0;
-		}
-
-		$sql="select * from usrgrp where name='$name'";
-		$result=DBexecute($sql);
-		if(DBnum_rows($result)>0)
-		{
-			error("Group '$name' already exists");
-			return 0;
-		}
-
-		$sql="insert into usrgrp (name) values ('$name')";
-		$result=DBexecute($sql);
-		if(!$result)
-		{
-			return	$result;
-		}
-		
-		$usrgrpid=DBinsert_id($result,"usrgrp","usrgrpid");
-
-		update_user_groups($usrgrpid,$users);
-
-		return $result;
-	}
-
 	function	update_host_group($groupid,$name,$users)
 	{
 //		if(!check_right("Host","U",0))
@@ -1733,34 +1711,6 @@ echo "</head>";
 		return $result;
 	}
 
-	function	update_user_group($usrgrpid,$name,$users)
-	{
-		if(!check_right("Host","U",0))
-		{
-			error("Insufficient permissions");
-			return 0;
-		}
-
-		$sql="select * from usrgrp where name='$name' and usrgrpid<>$usrgrpid";
-		$result=DBexecute($sql);
-		if(DBnum_rows($result)>0)
-		{
-			error("Group '$name' already exists");
-			return 0;
-		}
-
-		$sql="update usrgrp set name='$name' where usrgrpid=$usrgrpid";
-		$result=DBexecute($sql);
-		if(!$result)
-		{
-			return	$result;
-		}
-		
-		update_user_groups($usrgrpid,$users);
-
-		return $result;
-	}
-		
 	# Sync host with hard-linked templates
 	function	sync_host_with_templates($hostid)
 	{
@@ -1982,14 +1932,6 @@ echo "</head>";
 	function	delete_permission($rightid)
 	{
 		$sql="delete from rights where rightid=$rightid";
-		return DBexecute($sql);
-	}
-
-	function	delete_user_group($usrgrpid)
-	{
-		$sql="delete from users_groups where usrgrpid=$usrgrpid";
-		DBexecute($sql);
-		$sql="delete from usrgrp where usrgrpid=$usrgrpid";
 		return DBexecute($sql);
 	}
 
@@ -3077,17 +3019,4 @@ echo "</head>";
 		ImagePNG($image);
 	}
 
-	function	update_user_groups($usrgrpid,$users)
-	{
-		$count=count($users);
-
-		$sql="delete from users_groups where usrgrpid=$usrgrpid";
-		DBexecute($sql);
-
-		for($i=0;$i<$count;$i++)
-		{
-			$sql="insert into users_groups (usrgrpid,userid) values ($usrgrpid,".$users[$i].")";
-			DBexecute($sql);
-		}
-	}
 ?>

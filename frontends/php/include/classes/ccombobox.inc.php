@@ -129,7 +129,7 @@
 
 			$cmbItem->SetEnable($enabled);	/* disable item method 2 */
 
-			parent::AddItem($cmbItem);
+			return parent::AddItem($cmbItem);
 		}
 		function Show()
 		{
