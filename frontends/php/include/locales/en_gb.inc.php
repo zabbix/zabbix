@@ -845,5 +845,8 @@
 	"S_AUDIT"=>				"Audit",
 	"S_LOGIN"=>				"Login",
 	"S_LATEST_DATA"=>			"Latest data",
+
+//	Errors
+	"S_INCORRECT_DESCRIPTION"=>		"Incorrect description"
 	);
 ?>

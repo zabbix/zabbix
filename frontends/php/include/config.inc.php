@@ -1828,6 +1828,11 @@ echo "</head>";
 	{
 		$ret = 0;
 
+		if($description==""){
+			error(S_INCORRECT_DESCRIPTION);
+			return 0;
+		}
+
 		$description=addslashes($description);
 		$sql="select * from media_type where description='$description'";
 		$result=DBexecute($sql);
