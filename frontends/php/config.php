@@ -68,26 +68,31 @@
 		{
 			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MEDIA_TYPE,"Media type [".$mediatype["description"]."]");
 		}
+		if($result)
+		{
+			unset($_REQUEST["form"]);
+		}
 	}
 
 	if(isset($_REQUEST["save"])&&!isset($_REQUEST["mediatypeid"])&&($_REQUEST["config"]==1))
 	{
-		$result=add_mediatype($_REQUEST["type"],$_REQUEST["description"],$_REQUEST["smtp_server"],$_REQUEST["smtp_helo"],$_REQUEST["smtp_email"],$_REQUEST["exec_path"]);
-		show_messages($result, S_ADDED_NEW_MEDIA_TYPE, S_NEW_MEDIA_TYPE_WAS_NOT_ADDED);
+		if(isset($_REQUEST["mediatypeid"]))
+		{
+			$action = AUDIT_ACTION_UPDATE;
+			$result=update_mediatype($_REQUEST["mediatypeid"],$_REQUEST["type"],$_REQUEST["description"],$_REQUEST["smtp_server"],$_REQUEST["smtp_helo"],$_REQUEST["smtp_email"],$_REQUEST["exec_path"]);
+			show_messages($result, S_MEDIA_TYPE_UPDATED, S_MEDIA_TYPE_WAS_NOT_UPDATED);
+		}
+		else
+		{
+			$action = AUDIT_ACTION_ADD;
+			$result=add_mediatype($_REQUEST["type"],$_REQUEST["description"],$_REQUEST["smtp_server"],$_REQUEST["smtp_helo"],$_REQUEST["smtp_email"],$_REQUEST["exec_path"]);
+			show_messages($result, S_ADDED_NEW_MEDIA_TYPE, S_NEW_MEDIA_TYPE_WAS_NOT_ADDED);
+		}
 		if($result)
 		{
-			add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_MEDIA_TYPE,"Media type [".addslashes($_REQUEST["description"])."]");
+			add_audit($action,AUDIT_RESOURCE_MEDIA_TYPE,"Media type [".addslashes($_REQUEST["description"])."]");
+			unset($_REQUEST["form"]);
 		}
-	}
-
-	if(isset($_REQUEST["save"])&&isset($_REQUEST["mediatypeid"])&&($_REQUEST["config"]==1))
-	{
-		$result=update_mediatype($_REQUEST["mediatypeid"],$_REQUEST["type"],$_REQUEST["description"],$_REQUEST["smtp_server"],$_REQUEST["smtp_helo"],$_REQUEST["smtp_email"],$_REQUEST["exec_path"]);
-		if($result)
-		{
-			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MEDIA_TYPE,"Media type [".addslashes($_REQUEST["description"])."]");
-		}
-		show_messages($result, S_MEDIA_TYPE_UPDATED, S_MEDIA_TYPE_WAS_NOT_UPDATED);
 	}
 
 	if(isset($_REQUEST["save"])&&!isset($_REQUEST["imageid"])&&($_REQUEST["config"]==3))
@@ -151,6 +156,10 @@
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_AUTOREGISTRATION,"Autoregistration [".addslashes($_REQUEST["pattern"])."]");
 		}
 		show_messages($result, S_AUTOREGISTRATION_UPDATED, S_AUTOREGISTRATION_WAS_NOT_UPDATED);
+	}
+
+	if(isset($_REQUEST["cancel"])){
+		unset($_REQUEST["form"]);
 	}
 ?>
 
@@ -326,6 +335,7 @@
 <?php
 		if(isset($_REQUEST["form"]))
 		{
+			echo "<br>";
 			insert_media_type_form();
 		}
 	}

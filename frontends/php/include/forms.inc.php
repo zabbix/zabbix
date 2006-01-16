@@ -1415,7 +1415,7 @@
 			$frmMeadia->AddItemToBottomRow(new CButton("delete",S_DELETE,"return Confirm('".S_DELETE_SELECTED_MEDIA."');"));
 		}
 		$frmMeadia->AddItemToBottomRow(SPACE);
-		$frmMeadia->AddItemToBottomRow(new CButton("calcel",S_CANCEL));
+		$frmMeadia->AddItemToBottomRow(new CButton("cancel",S_CANCEL));
 		$frmMeadia->Show();
 	}
 
@@ -1498,7 +1498,7 @@ function	insert_image_form()
 			$frmScr->AddItemToBottomRow(new CButton("delete",S_DELETE,"return Confirm('".S_DELETE_SCREEN_Q."');"));
 		}
 		$frmScr->AddItemToBottomRow(SPACE);
-		$frmScr->AddItemToBottomRow(new CButton("calcel",S_CANCEL));
+		$frmScr->AddItemToBottomRow(new CButton("cancel",S_CANCEL));
 		$frmScr->Show();	
 	}
 
