@@ -42,12 +42,12 @@
 
 	function	BETWEEN($min,$max)
 	{
-		return "({}=>$min&&{}<=$max)&&";
+		return "({}>=$min&&{}<=$max)&&";
 	}
 
 	function	GT($value)
 	{
-		return "({}=>$value)&&";
+		return "({}>=$value)&&";
 	}
 
 	function	IN($array)
@@ -84,10 +84,10 @@
 		"groupid"=>	array(T_ZBX_INT, O_MAND, "items", NULL,		BETWEEN(0,65535*65536),	NULL)
 	);
 
-	if(!check_fields($fields))
-	{
-		info("ZZZ");
-	}
+//	if(!check_fields($fields))
+//	{
+//		show_messages();
+//	}
 ?>
 
 <?php

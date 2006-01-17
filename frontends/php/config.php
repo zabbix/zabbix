@@ -44,6 +44,36 @@
 ?>
 
 <?php
+	function	BETWEEN($min,$max)
+	{
+		return "({}>=$min&&{}<=$max)&&";
+	}
+
+	function	GT($value)
+	{
+		return "({}>=$value)&&";
+	}
+
+	function	IN($array)
+	{
+		return "in_array({},array($array))&&";
+	}
+
+	define("NOT_EMPTY","({}!='')&&");
+
+//		VAR			TYPE	OPTIONAL TABLE	FIELD	OPTIONAL	VALIDATION	EXCEPTION
+	$fields=array(
+		"config"=>		array(T_ZBX_INT, O_OPT, NULL, NULL,		IN("0,1,3,4,5"),	NULL),
+		"refresh_unsupported"=>	array(T_ZBX_INT, O_MAND, "config", NULL,	BETWEEN(30,65535),	NULL)
+	);
+
+	if(!check_fields($fields))
+	{
+		show_messages();
+	}
+?>
+
+<?php
 /*	if(isset($_REQUEST["config"]))	$_REQUEST["config"]=$_REQUEST["config"]; */
 
 	$_REQUEST["config"]=@iif(isset($_REQUEST["config"]),$_REQUEST["config"],get_profile("web.config.config",0));
