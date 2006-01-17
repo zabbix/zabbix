@@ -64,7 +64,7 @@
 //		VAR			TYPE	OPTIONAL TABLE	FIELD	OPTIONAL	VALIDATION	EXCEPTION
 	$fields=array(
 		"config"=>		array(T_ZBX_INT, O_OPT, NULL, NULL,		IN("0,1,3,4,5"),	NULL),
-		"refresh_unsupported"=>	array(T_ZBX_INT, O_MAND, "config", NULL,	BETWEEN(30,65535),	NULL)
+		"refresh_unsupported"=>	array(T_ZBX_INT, O_NO, "config", NULL,	BETWEEN(30,65535),	'in_array($_REQUEST["config"],0,5)')
 	);
 
 	if(!check_fields($fields))
