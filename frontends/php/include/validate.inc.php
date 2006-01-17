@@ -104,6 +104,11 @@
 				else continue;
 			}
 
+			if($opt == O_OPT)
+			{
+				if(!isset($_REQUEST[$field]))	continue;
+			}
+
 
 			if( ($type == T_ZBX_INT) && !is_numeric($_REQUEST[$field])) {
 				info("Field [".$field."] is not integer"); $ret = 0; continue;
