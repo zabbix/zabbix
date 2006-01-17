@@ -19,6 +19,15 @@
 **/
 ?>
 <?php
+	define("T_ZBX_STR",			0);
+	define("T_ZBX_INT",			1);
+	define("T_ZBX_DBL",			2);
+	define("T_ZBX_PERIOD",			3);
+
+	define("O_MAND",			0);
+	define("O_OPT",				1);
+	define("O_NO",				2);
+
 //	MISC PARAMETERS
 	define("MAP_OUTPUT_FORMAT",		"DEFAULT");
 #	define("MAP_OUTPUT_FORMAT",		"JPG");
