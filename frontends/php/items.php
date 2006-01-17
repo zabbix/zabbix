@@ -32,11 +32,62 @@
 <?php
         if(!check_anyright("Host","U"))
         {
-                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font
->");
+                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
                 show_footer();
                 exit;
         }
+?>
+
+<?php
+
+	function	BETWEEN($min,$max)
+	{
+		return "({}=>$min&&{}<=$max)&&";
+	}
+
+	function	GT($value)
+	{
+		return "({}=>$value)&&";
+	}
+
+	function	IN($array)
+	{
+		return "({} in_array($array))&&";
+	}
+
+	define("NOT_EMPTY","({}!='')&&");
+
+//		VAR			TYPE	OPTIONAL TABLE	FIELD	OPTIONAL	VALIDATION	EXCEPTION
+	$fields=array(
+		"description"=>	array(T_ZBX_STR, O_MAND, "items", NULL,		NOT_EMPTY,		NULL),
+		"delay"=>	array(T_ZBX_INT, O_MAND, "items", NULL,		BETWEEN(0,65535*65536),	NULL),
+		"key"=>		array(T_ZBX_STR, O_MAND, "items", "key_",	NOT_EMPTY,		NULL),
+		"host"=>	array(T_ZBX_STR, O_MAND, "items", NULL,		NOT_EMPTY,		NULL),
+		"port"=>	array(T_ZBX_INT, O_MAND, "items", NULL,		BETWEEN(0,65535),	NULL),
+		"history"=>	array(T_ZBX_INT, O_MAND, "items", NULL,		BETWEEN(0,10000),	NULL),
+		"trends"=>	array(T_ZBX_INT, O_MAND, "items", NULL,		BETWEEN(0,10000),	NULL),
+		"trends"=>	array(T_ZBX_INT, O_MAND, "items", NULL,		IN("0,1,2"),		NULL),
+		"type"=>	array(T_ZBX_INT, O_MAND, "items", NULL,		IN("0,1,2"),		NULL),
+		"snmp_community"=>array(T_ZBX_STR, O_MAND, "items", NULL,	NOT_EMPTY,		NULL),
+		"snmp_oid"=>	array(T_ZBX_STR, O_MAND,   "items", NULL,	NOT_EMPTY,		NULL),
+		"value_type"=>	array(T_ZBX_INT, O_MAND, "items", NULL,		IN("0,1,2"),		NULL),
+		"trapper_hosts"=>array(T_ZBX_STR, O_MAND,  "items", NULL,	NULL,			NULL),
+		"snmp_port"=>	array(T_ZBX_INT, O_MAND, "items", NULL,		BETWEEN(0,65535),	NULL),
+		"units"=>	array(T_ZBX_STR, O_MAND,  "items", NULL,	NULL,			NULL),
+		"multiplier"=>	array(T_ZBX_DBL, O_MAND,  "items", NULL,	GT(0),			NULL),
+		"hostid"=>	array(T_ZBX_INT, O_MAND, "items", NULL,		BETWEEN(0,65535*65536),	NULL),
+		"snmpv3_securityname"=>array(T_ZBX_STR, O_MAND, "items", NULL,	NULL,			NULL),
+		"snmpv3_authpassphrase"=>array(T_ZBX_STR, O_MAND, "items", NULL,NULL,			NULL),
+		"snmpv3_privpassphrase"=>array(T_ZBX_STR, O_MAND, "items", NULL,NULL,			NULL),
+		"formula"=>	array(T_ZBX_STR, O_MAND, "items", NULL,		NULL,			NULL),
+		"logtimefmt"=>	array(T_ZBX_PERIOD, O_MAND, "items", NULL,	NULL,			NULL),
+		"groupid"=>	array(T_ZBX_INT, O_MAND, "items", NULL,		BETWEEN(0,65535*65536),	NULL)
+	);
+
+	if(!check_fields($fields))
+	{
+		info("ZZZ");
+	}
 ?>
 
 <?php
