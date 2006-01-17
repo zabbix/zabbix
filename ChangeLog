@@ -1,5 +1,6 @@
 Changes for 1.1beta6:
 
+ - minor fix for schema of table 'rights' (Alexei)
  - fixed trigger linkage form (Alexei)
  - possibly fixed processing of SNMP Counter32 metrics (Alexei)
  - added HTML classes into PHP framework (Eugene)
