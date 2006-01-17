@@ -147,39 +147,27 @@
 		unset($_REQUEST["form"]);
 	}
 ?>
-
-<?php
-?>
-
 <?php
 	if(!isset($_REQUEST["config"]))
 	{
 		$_REQUEST["config"]=0;
 	}
 
-	$h1=S_CONFIGURATION_OF_USERS_AND_USER_GROUPS;
-
-#	$h2=S_GROUP."&nbsp;";
-	$h2="";
-	$h2=$h2."<select class=\"biginput\" name=\"config\" onChange=\"submit()\">";
-	$h2=$h2.form_select("config",0,S_USERS);
-	$h2=$h2.form_select("config",1,S_USER_GROUPS);
-	$h2=$h2."</select>";
-	if($_REQUEST["config"] == 0)
-	{
-		$h2=$h2."&nbsp;|&nbsp;";
-		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"form\" value=\"".S_CREATE_USER."\">";
+	$cmbConf = new CComboBox("config",$_REQUEST["config"],"submit()");
+	$cmbConf->AddItem(0,S_USERS);
+	$cmbConf->AddItem(1,S_USER_GROUPS);
+	if($_REQUEST["config"] == 0){
+		$btnNew = new CButton("form",S_CREATE_USER);
+	}else if($_REQUEST["config"] == 1){
+		$btnNew = new CButton("form",S_CREATE_GROUP);
 	}
-	else if($_REQUEST["config"] == 1)
-	{
-		$h2=$h2."&nbsp;|&nbsp;";
-		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"form\" value=\"".S_CREATE_GROUP."\">";
-	}
-
-	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"users.php\">", "</form>");
+	$frmForm = new CForm("users.php");
+	$frmForm->AddItem($cmbConf);
+	$frmForm->AddItem(SPACE."|".SPACE);
+	$frmForm->AddItem($btnNew);
+	show_header2(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
 	echo BR; 
 ?>
-
 <?php
 	if($_REQUEST["config"]==1)
 	{
@@ -191,31 +179,22 @@
 			$table->setHeader(array(S_ID,S_NAME,S_MEMBERS));
 		
 			$result=DBselect("select usrgrpid,name from usrgrp order by name");
-			$col=0;
 			while($row=DBfetch($result))
 			{
-				if(!check_right("User group","R",$row["usrgrpid"]))
-				{
-					continue;
-				}
-				$name="<A HREF=\"users.php?config=".$_REQUEST["config"]."&form=0&usrgrpid=".$row["usrgrpid"]."#form\">".$row["name"]."</A>";
-				$result1=DBselect("select distinct u.alias from users u,users_groups ug where u.userid=ug.userid and ug.usrgrpid=".$row["usrgrpid"]." order by alias");
-				$users="&nbsp;";
-				$i=0;
-				while($row1=DBfetch($result1))
-				{
-					$users=$users.$row1["alias"];
-					if($i<DBnum_rows($result1)-1)
-					{
-						$users=$users.", ";
-					}
-					$i++;
-				}
-				$table->addRow(array(
-					$row["usrgrpid"],
-					$name,
-					$users
-					));
+				if(!check_right("User group","R",$row["usrgrpid"]))	continue;
+
+				$name = new CLink(
+					$row["name"],
+					"users.php?config=".$_REQUEST["config"]."&form=0&usrgrpid=".
+					$row["usrgrpid"]."#form");
+
+				$users=SPACE;
+
+				$db_users=DBselect("select distinct u.alias from users u,users_groups ug where u.userid=ug.userid and ug.usrgrpid=".$row["usrgrpid"]." order by alias");
+				if($db_user=DBfetch($db_users))		$users .=      $db_user["alias"];
+				while($db_user=DBfetch($db_users))	$users .= ", ".$db_user["alias"];
+
+				$table->addRow(array($row["usrgrpid"], $name, $users));
 			}
 			$table->show();
 		}
