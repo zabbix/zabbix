@@ -304,6 +304,37 @@ table.menu
 	border: 0px solid #000000;
 }
 
+table.header
+{
+	width: 100%;
+	color: #FFFFFF;
+	background: #5C7099 url(images/gradients/table_head2.gif) repeat-x top left;
+	background-color: #6d88ad;
+	border-color: #000000;
+	border-width:0px;
+	border-top-style: solid;
+	border-left-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	vertical-align: middle;
+	padding-right: 5px;
+	padding-left: 5px;
+}
+td.header_l
+{
+        font-family:verdana, arial, helvetica, sans-serif;
+        font-size:10px;
+	text-align: left;
+	height: 24px;
+}
+td.header_r
+{
+        font-family:verdana, arial, helvetica, sans-serif;
+        font-size:10px;
+	text-align: right;
+	height: 24px;
+}
+
 table.form
 {
 	background-color: #FFFFFF;

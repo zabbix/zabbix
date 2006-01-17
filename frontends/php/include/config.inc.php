@@ -994,7 +994,7 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		{
 			echo "<meta http-equiv=\"refresh\" content=\"0; url=index.php\">";
 		}
-		show_special_header("Login",0,1,1);
+		show_header("Login",0,1,1);
 		show_error_message("Login name or password is incorrect");
 		insert_login_form();
 		show_footer();
@@ -1003,19 +1003,12 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 	# Header for HTML pages
 
-	function	show_header($title,$dorefresh,$nomenu)
-	{
-		show_special_header($title,$dorefresh,$nomenu,0);
-	}
-
-
-	function	show_special_header($title,$dorefresh,$nomenu,$noauth)
+	function	show_header($title,$dorefresh,$nomenu=0,$noauth=0)
 	{
 		global $page;
 		global $USER_DETAILS;
 
-
-		if($noauth!=1)
+		if($noauth==0)
 		{
 			check_authorisation();
 			include_once "include/locales/".$USER_DETAILS["lang"].".inc.php";
@@ -1027,10 +1020,9 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=<?php echo S_HTML_CHARSET; ?>">
-<meta name="Author" content="Alexei Vladishev">
-<link rel="stylesheet" href="css.css">
-
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo S_HTML_CHARSET; ?>"/>
+	<meta name="Author" content="Alexei Vladishev"/>
+	<link rel="stylesheet" href="css.css"/>
 <?php
 //	if($USER_DETAILS['alias']=='guest')
 //	{
@@ -1039,24 +1031,22 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 	if(defined($title))	$title=constant($title);
 	if($dorefresh && $USER_DETAILS["refresh"])
 	{
-		echo "<meta http-equiv=\"refresh\" content=\"".$USER_DETAILS["refresh"]."\">\n";
-		echo "<title>$title [refreshed every ".$USER_DETAILS["refresh"]." sec]</title>\n";
+		echo "	<meta http-equiv=\"refresh\" content=\"".$USER_DETAILS["refresh"]."\"/>\n";
+		echo "	<title>$title [refreshed every ".$USER_DETAILS["refresh"]." sec]</title>\n";
 	}
 	else
 	{
-		echo "<title>$title</title>\n";
+		echo "	<title>$title</title>\n";
 	}
 
-echo "</head>";
 ?>
-
+</head>
 
 <body>
 <?php
 		if($nomenu == 0)
 		{
 ?>
-
 <?php
 	$menu=array(
 		"view"=>array(
@@ -1178,21 +1168,22 @@ echo "</head>";
 		if($url=="0")	$url=$sub["level2"][0]["url"];
 		if($active==1)
 		{
-			echo "<td class=\"horizontal_menu\" height=24 colspan=9><b><a href=\"$url\" class=\"highlight\">".$sub["label"]."</a></b></td>";
+			echo "<td class=\"horizontal_menu\" height=24 colspan=9><b><a href=\"$url\" class=\"highlight\">".$sub["label"]."</a></b></td>\n";
 		}
 		else
 		{
-			echo "<td class=\"horizontal_menu_n\" height=24 colspan=9><b><a href=\"$url\" class=\"highlight\">".$sub["label"]."</a></b></td>";
+			echo "<td class=\"horizontal_menu_n\" height=24 colspan=9><b><a href=\"$url\" class=\"highlight\">".$sub["label"]."</a></b></td>\n";
 		}
 		$i++;
 	}
 ?>
 </tr>
 </table>
+
 <table class="menu" width="100%" cellspacing=0 cellpadding=5>
 <tr><td class="horizontal_menu" height=24 colspan=9><b>
 <?php
-	$i=0;
+//	$i=0;
 	if(isset($active_level1))
 	foreach($menu[$active_level1]["level2"] as $label=>$sub)
 	{
@@ -1224,18 +1215,16 @@ echo "</head>";
 		if(($sub["url"]=="screenconf.php")&&!check_anyright("Screen","U"))						continue;
 		if(($sub["url"]=="services.php")&&!check_anyright("Service","U"))						continue;
 // End of check permissions
-		if($i==0)
-			echo "<a href=\"".$sub["url"]."\" class=\"highlight\">".$sub["label"]."</a><span class=\"divider\">&nbsp;&nbsp;|&nbsp;&nbsp;</span>";
-		else
-			echo "<a href=\"".$sub["url"]."\" class=\"highlight\">".$sub["label"]."</a><span class=\"divider\">&nbsp;&nbsp;|&nbsp;&nbsp;</span>";
-		$i++;
+//		if($i==0)
+		echo "<a href=\"".$sub["url"]."\" class=\"highlight\">".$sub["label"]."</a><span class=\"divider\">&nbsp;&nbsp;|&nbsp;</span>\n";
+//		else
+//			echo "<a href=\"".$sub["url"]."\" class=\"highlight\">".$sub["label"]."</a><span class=\"divider\">&nbsp;&nbsp;|&nbsp;&nbsp;</span>";
+//		$i++;
 	}
 ?>
-</b></td>
+</b></td></tr>
 </table>
 <p align=center>
-
-
 <?php
 		}
 	}
@@ -2114,22 +2103,11 @@ echo "</head>";
 		cr();
 	}
 
-	function	show_header2($h1, $h2, $h2_form1, $h2_form2)
+	function	show_header2($col1, $col2=SPACE, $before="", $after="")
 	{
-?>
-	<?php echo $h2_form1; ?>
-	<table class="menu" cellspacing=0 cellpadding=1 width="100%">
-	<tr>
-	<td class="sub_menu" height=24 align=left>
-	<?php echo $h1; ?>
-	</td>
-	<td class="sub_menu" height=24 align=right>
-	<?php echo $h2; ?>
-	</td>
-	</tr>
-	</table>
-	<?php echo $h2_form2; ?>
-<?php
+		echo $before; 
+		show_table_header($col1, $col2);
+		echo $after;
 	}
 
 	function	show_table3_header_begin()
@@ -2174,15 +2152,13 @@ echo "</head>";
 		echo "</table>";
 	}
 
-	function	show_table_header($title)
+	function	show_table_header($col1, $col2=SPACE)
 	{
-?>
-<table class="menu" width="100%" cellspacing=0 cellpadding=1>
-<tr>
-<td class="sub_menu" height=24 colspan=9><?php echo $title; ?></td>
-</tr>
-</table>
-<?php
+		$table = new CTable(NULL,"header");
+		$table->SetCellSpacing(0);
+		$table->SetCellPadding(1);
+		$table->AddRow(array(new CCol($col1,"header_l"), new CCol($col2,"header_r")));
+		$table->Show();
 	}
 
 	function	insert_time_navigator($itemid,$period,$from)
