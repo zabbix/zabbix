@@ -24,15 +24,22 @@
 
 	function	bold($str)
 	{
-		if(is_array($str))
-		{
+		if(is_array($str)){
 			foreach($str as $key => $val)
 				if(is_string($val))
 					 $str[$key] = "<b>$val</b>";
-			return $str;
+		} elseif(is_string($str)) {
+			$str = "<b>$str</b>";
 		}
-		if(is_string($str))
-			return "<b>$str</b>";
+		return $str;
+	}
+
+	function	bfirst($str) // mark first symbol of string as bold
+	{
+		$res = bold($str[0]);
+		for($i=1; $i<strlen($str); $i++) $res .= $str[$i];
+		$str = $res;
+		return $str;	
 	}
 
 	function	nbsp($str)

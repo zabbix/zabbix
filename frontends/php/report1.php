@@ -59,5 +59,5 @@
 ?>
 
 <?php
-	show_footer();
+	show_page_footer();
 ?>

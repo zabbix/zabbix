@@ -32,7 +32,7 @@
 //	if(($_REQUEST["triggerid"]!=0)&&!check_right_on_trigger("U",$_REQUEST["triggerid"]))
 //	{
 //		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-//		show_footer();
+//		show_page_footer();
 //		exit;
 //	}
 ?>
@@ -232,5 +232,5 @@
 
 	show_messages();
 
-	show_footer();
+	show_page_footer();
 ?>
