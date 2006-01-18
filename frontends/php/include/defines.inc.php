@@ -28,6 +28,11 @@
 	define("O_OPT",				1);
 	define("O_NO",				2);
 
+	define("P_SYS",				1);
+	define("P_USR",				2);
+	define("P_GET",				4);
+	define("P_POST",			8);
+
 //	MISC PARAMETERS
 	define("MAP_OUTPUT_FORMAT",		"DEFAULT");
 #	define("MAP_OUTPUT_FORMAT",		"JPG");
