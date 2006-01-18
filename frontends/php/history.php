@@ -73,7 +73,7 @@
 	if(!check_right("Item","R",$_REQUEST["itemid"]))
 	{
 		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		show_footer();
+		show_page_footer();
 		exit;
 	}
 
@@ -241,7 +241,7 @@
 		}
 		echo "</TABLE>";        
  
-		show_footer();
+		show_page_footer();
 		exit;
 	}
 
@@ -260,7 +260,7 @@
 			$_REQUEST["from"]=($now-mktime($_REQUEST["hour"], 0, 0, $_REQUEST["month"], $_REQUEST["day"],$_REQUEST["year"]))/3600;
 		}
 		@show_history($_REQUEST["itemid"],$_REQUEST["from"],$effectiveperiod);
-		show_footer();
+		show_page_footer();
 		exit;
 	}
 
@@ -350,7 +350,7 @@
 		}
 		$table->show();
  
-		show_footer();
+		show_page_footer();
 		exit;
 	}
 ?>

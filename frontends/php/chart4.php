@@ -91,7 +91,7 @@
 	if(!check_right_on_trigger("R",$_REQUEST["triggerid"]))
 	{
 //		show_table_header("<font color=\"AA0000\">No permissions !</font>");
-//		show_footer();
+//		show_page_footer();
 		ImageOut($im); 
 		ImageDestroy($im); 
 		exit;

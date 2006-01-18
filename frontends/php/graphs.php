@@ -33,7 +33,7 @@
 	if(!check_anyright("Graph","U"))
 	{
 		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		show_footer();
+		show_page_footer();
 		exit;
 	}
 	$_REQUEST["hostid"]=@iif(isset($_REQUEST["hostid"]),$_REQUEST["hostid"],get_profile("web.latest.hostid",0));
@@ -197,5 +197,5 @@
 
 ?>
 <?php
-	show_footer();
+	show_page_footer();
 ?>

@@ -35,7 +35,8 @@
 			{
 				return $this->error("Incorrect value for SetUrl [$value]");
 			}
-			$this->AddOption("href",$value);
+			
+			$this->AddOption("href",htmlspecialchars($value));
 		}
 	}
 ?>

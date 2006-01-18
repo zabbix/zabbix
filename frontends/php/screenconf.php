@@ -32,7 +32,7 @@
 	if(!check_right("Screen","U",0))
 	{
 //		show_table_header("<font color=\"AA0000\">No permissions !</font>");
-//		show_footer();
+//		show_page_footer();
 //		exit;
 	}
 	update_profile("web.menu.config.last",$page["file"]);
@@ -96,5 +96,5 @@
 ?>
 
 <?php
-	show_footer();
+	show_page_footer();
 ?>
