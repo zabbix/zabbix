@@ -28,23 +28,20 @@
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();
 ?>
-
 <?php
         if(!check_anyright("User","U"))
         {
                 show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-                show_footer();
+                show_page_footer();
                 exit;
         }
 
 	$_REQUEST["config"]=@iif(isset($_REQUEST["config"]),$_REQUEST["config"],get_profile("web.users.config",0));
 	update_profile("web.users.config",$_REQUEST["config"]);
 ?>
-
 <?php
 	update_profile("web.menu.config.last",$page["file"]);
 ?>
-
 <?php
 	if(isset($_REQUEST["save"])&&($_REQUEST["config"]==0))
 	{
@@ -194,7 +191,10 @@
 				if($db_user=DBfetch($db_users))		$users .=      $db_user["alias"];
 				while($db_user=DBfetch($db_users))	$users .= ", ".$db_user["alias"];
 
-				$table->addRow(array($row["usrgrpid"], $name, $users));
+				$table->addRow(array(
+					$row["usrgrpid"], 
+					$name, 
+					$users));
 			}
 			$table->show();
 		}
@@ -211,46 +211,42 @@
 			$table=new CTableInfo(S_NO_USERS_DEFINED);
 			$table->setHeader(array(S_ID,S_ALIAS,S_NAME,S_SURNAME,S_IS_ONLINE_Q,S_ACTIONS));
 		
-			$result=DBselect("select u.userid,u.alias,u.name,u.surname from users u order by u.alias");
-			$col=0;
-			while($row=DBfetch($result))
+			$db_users=DBselect("select u.userid,u.alias,u.name,u.surname from users u order by u.alias");
+			while($db_user=DBfetch($db_users))
 			{
-				if(!check_right("User","R",$row["userid"]))
-				{
-					continue;
-				}
+				if(!check_right("User","R",$db_user["userid"]))		continue;
 
-				$alias="<A HREF=\"users.php?register=change&form=0&config=".$_REQUEST["config"]."&userid=".$row["userid"]."#form\">".$row["alias"]."</A>";
+				$alias = new CLink($db_user["alias"],
+					"users.php?register=change&form=0&config=".$_REQUEST["config"].
+					"&userid=".$db_user["userid"]."#form");
 			
-				$sql="select count(*) as count from sessions where userid=".$row["userid"]." and lastaccess-600<".time();
-				$result2=DBselect($sql);
-				$row2=DBfetch($result2);
-				if($row2["count"]>0)
+				$db_sessions = DBselect("select count(*) as count from sessions ".
+						"where userid=".$db_user["userid"]." and lastaccess-600<".time());
+				$db_ses_cnt=DBfetch($db_sessions);
+				if($db_ses_cnt["count"]>0)
 					$online=new CCol(S_YES,"on");
 				else
 					$online=new CCol(S_NO,"off");
 		
-		        	if(check_right("User","U",$row["userid"]))
+		        	if(check_right("User","U",$db_user["userid"]))
 				{
-					if(get_media_count_by_userid($row["userid"])>0)
+					$actions = S_MEDIA;
+					if(get_media_count_by_userid($db_user["userid"])>0)
 					{
-						$actions="<A HREF=\"media.php?userid=".$row["userid"]."\"><b>M</b>edia</A>";
+						bfirst(&$actions);
 					}
-					else
-					{
-						$actions="<A HREF=\"media.php?userid=".$row["userid"]."\">".S_MEDIA."</A>";
-					}
+					$actions = new CLink($actions,"media.php?userid=".$db_user["userid"]);
 				}
 				else
 				{
-					$actions=S_CHANGE." - ".S_MEDIA;
+					$actions=S_CHANGE.SPACE."-".SPACE.S_MEDIA;
 				}
 		
 				$table->addRow(array(
-					$row["userid"],
+					$db_user["userid"],
 					$alias,
-					$row["name"],
-					$row["surname"],
+					$db_user["name"],
+					$db_user["surname"],
 					$online,
 					$actions
 					));
@@ -263,45 +259,34 @@
 		}
 	}
 ?>
-
 <?php
 	if(isset($_REQUEST["userid"])&&isset($_REQUEST["form"])&&($_REQUEST["config"]==0))
 	{
 		echo BR;
-		echo "<a name=\"form\"></a>";
 		show_table_header("USER PERMISSIONS");
 
 		$table  = new CTableInfo();
 		$table->setHeader(array(S_PERMISSION,S_RIGHT,S_RESOURCE_NAME,S_ACTIONS));
-		$result=DBselect("select rightid,name,permission,id from rights where userid=".$_REQUEST["userid"]." order by name,permission,id");
-		$col=0;
-		while($row=DBfetch($result))
+
+		$db_rights = DBselect("select rightid,name,permission,id from rights ".
+			"where userid=".$_REQUEST["userid"]." order by name,permission,id");
+		while($db_right = DBfetch($db_rights))
 		{
-			if($row["permission"]=="R")
-			{
-				$permission=S_READ_ONLY;
-			}
-			else if($row["permission"]=="U")
-			{
-				$permission=S_READ_WRITE;
-			}
-			else if($row["permission"]=="H")
-			{
-				$permission=S_HIDE;
-			}
-			else if($row["permission"]=="A")
-			{
-				$permission=S_ADD;
-			}
-			else
-			{
-				$permission=$row["permission"];
-			}
-			$actions="<A HREF=users.php?userid=".$_REQUEST["userid"]."&rightid=".$row["rightid"]."&register=delete_permission>".S_DELETE."</A>";
+			if($db_right["permission"]=="R")	$permission=S_READ_ONLY;
+			else if($db_right["permission"]=="U")	$permission=S_READ_WRITE;
+			else if($db_right["permission"]=="H")	$permission=S_HIDE;
+			else if($db_right["permission"]=="A")	$permission=S_ADD;
+			else					$permission=$db_right["permission"];
+
+			$actions= new CLink(
+				S_DELETE,
+				"users.php?userid=".$_REQUEST["userid"]."&rightid=".
+				$db_right["rightid"]."&register=delete_permission>");
+
 			$table->addRow(array(
-				$row["name"],
+				$db_right["name"],
 				$permission,
-				get_resource_name($row["name"],$row["id"]),
+				get_resource_name($db_right["name"],$db_right["id"]),
 				$actions
 			));
 		}
@@ -312,7 +297,6 @@
 		insert_permissions_form($_REQUEST["userid"]);
 	}
 ?>
-
 <?php
-	show_footer();
+	show_page_footer();
 ?>

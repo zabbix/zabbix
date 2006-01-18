@@ -33,7 +33,7 @@
 	if(!check_right("Graph","R",$_REQUEST["graphid"]))
 	{
 		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		show_footer();
+		show_page_footer();
 		exit;
 	}
 ?>
@@ -248,5 +248,5 @@
 	show_table2_header_end();
 ?>
 <?php
-	show_footer();
+	show_page_footer();
 ?>

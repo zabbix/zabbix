@@ -42,7 +42,7 @@
 		echo "</TD>";
 		echo "</TR>";
 		echo "</TABLE>";
-		show_footer();
+		show_page_footer();
 		exit;
 	}
 
@@ -210,5 +210,5 @@
 ?>
 
 <?php
-	show_footer();
+	show_page_footer();
 ?>

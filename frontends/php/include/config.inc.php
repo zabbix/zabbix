@@ -997,7 +997,7 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		show_header("Login",0,1,1);
 		show_error_message("Login name or password is incorrect");
 		insert_login_form();
-		show_footer();
+		show_page_footer();
 		exit;
 	}
 
@@ -1020,9 +1020,9 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo S_HTML_CHARSET; ?>"/>
-	<meta name="Author" content="Alexei Vladishev"/>
-	<link rel="stylesheet" href="css.css"/>
+	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo S_HTML_CHARSET; ?>">
+	<meta name="Author" content="Alexei Vladishev">
+	<link rel="stylesheet" href="css.css">
 <?php
 //	if($USER_DETAILS['alias']=='guest')
 //	{
@@ -1044,10 +1044,8 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 <body>
 <?php
-		if($nomenu == 0)
-		{
-?>
-<?php
+	if($nomenu == 0)
+	{
 	$menu=array(
 		"view"=>array(
 				"label"=>S_MONITORING,
@@ -1106,20 +1104,25 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 					)
 				),
 		);
-?>
 
-<table border=0 cellspacing=0 cellpadding=5 width="100%" bgcolor="#FFFFFF">
-<tr>
-<td width="118" height="31" class="top_header_left"><img width="118" height="31" src="images/general/zabbix.png" border="0" alt="ZABBIX"></td>
-<?php
-	if($USER_DETAILS["alias"]=="guest") {
+	$table = new CTable(NULL,"page_header");
+	$table->SetCellSpacing(0);
+	$table->SetCellPadding(5);
+
+	$col_r = array(new CLink(S_HELP, "http://www.zabbix.com/manual/v1.1/index.php", "small_font"));
+	if($USER_DETAILS["alias"]!="guest") {
+		array_push($col_r, "|");		
+		array_push($col_r, new CLink(S_PROFILE, "profile.php", "small_font"));
+	}
+
+	$table->AddRow(array(
+		new CCol(new CLink(new CImg("images/general/zabbix.png","ZABBIX")),
+			"page_header_l"),
+		new CCol($col_r,
+			"page_header_r")));
+
+	$table->Show();
 ?>
-<td width="662" class="top_header_right"><a href="http://www.zabbix.com/manual/v1.1/index.php" class="small_font"><?php echo S_HELP;?></a></td>
-<?php	} else { ?>
-<td width="662" class="top_header_right"><a href="http://www.zabbix.com/manual/v1.1/index.php" class="small_font"><?php echo S_HELP;?></a>&nbsp;|&nbsp;<a href="profile.php" class="small_font"><?php echo S_PROFILE;?></a></td>
-<?php } ?>
-</tr>
-</table>
 
 <table class="menu" cellspacing=0 cellpadding=5>
 <tr>
@@ -1166,14 +1169,12 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		else if($i==4)	$url="0";
 
 		if($url=="0")	$url=$sub["level2"][0]["url"];
-		if($active==1)
-		{
-			echo "<td class=\"horizontal_menu\" height=24 colspan=9><b><a href=\"$url\" class=\"highlight\">".$sub["label"]."</a></b></td>\n";
-		}
+		if($active==1) 
+			$class = "horizontal_menu";
 		else
-		{
-			echo "<td class=\"horizontal_menu_n\" height=24 colspan=9><b><a href=\"$url\" class=\"highlight\">".$sub["label"]."</a></b></td>\n";
-		}
+			$class = "horizontal_menu_n";
+
+		echo "<td class=\"$class\" height=24 colspan=9><b><a href=\"$url\" class=\"highlight\">".$sub["label"]."</a></b></td>\n";
 		$i++;
 	}
 ?>
@@ -1183,7 +1184,6 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 <table class="menu" width="100%" cellspacing=0 cellpadding=5>
 <tr><td class="horizontal_menu" height=24 colspan=9><b>
 <?php
-//	$i=0;
 	if(isset($active_level1))
 	foreach($menu[$active_level1]["level2"] as $label=>$sub)
 	{
@@ -1214,17 +1214,13 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		if(($sub["url"]=="screenedit.php")&&!check_anyright("Screen","U"))						continue;
 		if(($sub["url"]=="screenconf.php")&&!check_anyright("Screen","U"))						continue;
 		if(($sub["url"]=="services.php")&&!check_anyright("Service","U"))						continue;
-// End of check permissions
-//		if($i==0)
+
 		echo "<a href=\"".$sub["url"]."\" class=\"highlight\">".$sub["label"]."</a><span class=\"divider\">&nbsp;&nbsp;|&nbsp;</span>\n";
-//		else
-//			echo "<a href=\"".$sub["url"]."\" class=\"highlight\">".$sub["label"]."</a><span class=\"divider\">&nbsp;&nbsp;|&nbsp;&nbsp;</span>";
-//		$i++;
 	}
 ?>
 </b></td></tr>
 </table>
-<p align=center>
+<br/>
 <?php
 		}
 	}
@@ -2390,7 +2386,7 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 		show_table2_header_end();
 
-		show_footer();
+		show_page_footer();
 	}
 
 	# Show in plain text
@@ -2426,25 +2422,29 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 		show_table2_header_end();
 
-		show_footer();
+		show_page_footer();
 	}
 
-	function	show_footer()
+	function	show_page_footer()
 	{
 		global $USER_DETAILS;
 
-?>
-<p>
-<table class="menu" width="100%" cellspacing=0 cellpadding=5>
-<tr>
-<td class="horizontal_menu" height=24 colspan=9 align=center><b><?php echo "<a href=\"http://www.zabbix.com\" class=\"highlight\">".S_ZABBIX_VER."</a>&nbsp;".S_COPYRIGHT_BY."<a href=\"http://www.zabbix.com\" class=\"highlight\">".S_SIA_ZABBIX."</a>"; ?></b></td>
-<td class="horizontal_menu" height=24 colspan=9 align=right><b><span class="divider">&nbsp;&nbsp;|&nbsp;&nbsp;</span><?php echo " ".S_CONNECTED_AS."&nbsp;".$USER_DETAILS["alias"];?></b></td>
-</tr>
-</table>
-
-</body>
-</html>
-<?php
+		echo BR;
+		$table = new CTable(NULL,"page_footer");
+		$table->SetCellSpacing(0);
+		$table->SetCellPadding(1);
+		$table->AddRow(array(
+			new CCol(new CLink(
+				S_ZABBIX_VER.SPACE.S_COPYRIGHT_BY.SPACE.S_SIA_ZABBIX,
+				"http://www.zabbix.com", "highlight"),
+				"page_footer_l"),
+			new CCol("<span class='divider'>&nbsp;&nbsp;|&nbsp;&nbsp;</span>".
+				S_CONNECTED_AS."&nbsp;".$USER_DETAILS["alias"],
+				"page_footer_r")
+			));
+		$table->Show();
+		echo "</body>\n";
+		echo "</html>\n";
 	}
 
 	function	get_stats()
@@ -2824,20 +2824,19 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 	function insert_confirm_javascript()
 	{
-		echo "<script language=\"JavaScript\" type=\"text/javascript\">";
-
-		echo "function Confirm(msg)";
-		echo "{";
-		echo "	if(confirm( msg))";
-		echo "	{";
-		echo "		return true;";
-		echo "	}";
-		echo "	else";
-		echo "	{";
-		echo "		return false;";
-		echo "	}";
-		echo "}";
-		echo "</script>";
+		echo "<script language=\"JavaScript\" type=\"text/javascript\">\n";
+		echo "function Confirm(msg)\n";
+		echo "{\n";
+		echo "	if(confirm( msg))\n";
+		echo "	{\n";
+		echo "		return true;\n";
+		echo "	}\n";
+		echo "	else\n";
+		echo "	{\n";
+		echo "		return false;\n";
+		echo "	}\n";
+		echo "}\n";
+		echo "</script>\n";
 	}
 
 /* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */

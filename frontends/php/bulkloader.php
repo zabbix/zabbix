@@ -27,7 +27,7 @@
 	if(!check_anyright("Default permission","U"))
 		{
 			show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-			show_footer();
+			show_page_footer();
 			exit;
 		}
 	insert_confirm_javascript();
@@ -209,6 +209,6 @@
 		"</form>"
 		), 1);
 	table_end();
-	show_footer();
+	show_page_footer();
 
 ?>

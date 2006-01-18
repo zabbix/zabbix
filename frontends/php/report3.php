@@ -29,7 +29,7 @@
 //	if(!check_right("Host","R",0))
 //	{
 //		show_table_header("<font color=\"AA0000\">No permissions !</font>");
-//		show_footer();
+//		show_page_footer();
 //		exit;
 //	}
 ?>
@@ -38,7 +38,7 @@
 	if(!isset($_REQUEST["serviceid"]))
 	{
 		show_table_header("<font color=\"AA0000\">Undefined serviceid !</font>");
-		show_footer();
+		show_page_footer();
 		exit;
 	}
 	$service=get_service_by_serviceid($_REQUEST["serviceid"]);
@@ -283,5 +283,5 @@
 	}
 	$table->show();
 
-	show_footer();
+	show_page_footer();
 ?>

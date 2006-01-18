@@ -29,7 +29,7 @@
 	if(!check_anyright("Host","R"))
 	{
 		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		show_footer();
+		show_page_footer();
 		exit;
 	}
 ?>
@@ -155,5 +155,5 @@
 
 
 <?php
-	show_footer();
+	show_page_footer();
 ?>
