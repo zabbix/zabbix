@@ -61,16 +61,30 @@
 
 	define("NOT_EMPTY","({}!='')&&");
 
-//		VAR			TYPE	OPTIONAL TABLE	FIELD	OPTIONAL	VALIDATION	EXCEPTION
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"config"=>		array(T_ZBX_INT, O_OPT, NULL, NULL,		IN("0,1,3,4,5"),	NULL),
-		"refresh_unsupported"=>	array(T_ZBX_INT, O_NO, "config", NULL,	BETWEEN(30,65535),	'in_array($_REQUEST["config"],0,5)')
-	);
+		"config"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,3,4,5"),	NULL),
 
-	if(!check_fields($fields))
-	{
-		show_messages();
-	}
+		"alert_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),'in_array({config},array(0,5))&&({save}=="Save")'),
+		"alarm_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),'in_array({config},array(0,5))&&({save}=="Save")'),
+		"refresh_unsupported"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),'in_array({config},array(0,5))&&({save}=="Save")'),
+
+		"mediatypeid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),'({config}==1)&&(isset({form}))'),
+		"type"=>		array(T_ZBX_INT, O_NO,	NULL,	IN("0,1"),	'({config}==1)&&(isset({save}))'),
+		"description"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'({config}==1)&&(isset({save}))'),
+		"smtp_server"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==0)'),
+		"smtp_helo"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==0)'),
+		"smtp_email"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==0)'),
+		"exec_path"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==1)&&isset({save})'),
+//		"exec_path"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==1)'),
+
+		"imageid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),'{config}==3'),
+
+		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL)
+	);
 ?>
 
 <?php
@@ -78,6 +92,11 @@
 
 	$_REQUEST["config"]=@iif(isset($_REQUEST["config"]),$_REQUEST["config"],get_profile("web.config.config",0));
 	update_profile("web.config.config",$_REQUEST["config"]);
+
+	if(check_fields($fields)!=TRUE)
+	{
+		show_messages(FALSE, "", "Invalid URL");
+	}
 
 	if(isset($_REQUEST["save"])&&isset($_REQUEST["config"])&&(in_array($_REQUEST["config"],array(0,5))))
 	{
@@ -104,7 +123,7 @@
 		}
 	}
 
-	if(isset($_REQUEST["save"])&&!isset($_REQUEST["mediatypeid"])&&($_REQUEST["config"]==1))
+	if(isset($_REQUEST["save"])&&($_REQUEST["config"]==1))
 	{
 		if(isset($_REQUEST["mediatypeid"]))
 		{
@@ -340,7 +359,7 @@
 			$result=DBselect("select mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path from media_type mt order by mt.type");
 			while($row=DBfetch($result))
 			{
-				$description="<a href=\"config.php?config=1&form=0&register=change&mediatypeid=".$row["mediatypeid"]."\">".$row["description"]."</a>";
+				$description="<a href=\"config.php?config=1&form=0&mediatypeid=".$row["mediatypeid"]."\">".$row["description"]."</a>";
 				if($row["type"]==0)
 				{
 					$type=S_EMAIL;

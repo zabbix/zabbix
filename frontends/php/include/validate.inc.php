@@ -19,42 +19,7 @@
 **/
 ?>
 <?php
-	function	check_var($var,$checks)
-	{
-		global	$_REQUEST;
-
-		$ret = 1;
-
-		foreach($checks as $field=>$check)
-		{
-			if(is_int($key))
-			{
-				$op=$check[0];
-				$val=$check[$op];
-
-				echo "ZZZ";
-				echo isset($check["min"]);
-			}
-			else
-			{
-				if(isset($_REQUEST[$var]))
-				{
-					if(($check == T_ZBX_INT)&&(!is_int($_REQUEST[$var])))
-						break;
-					if( ($check == T_ZBX_FLOAT)&&(!is_float($_REQUEST[$var])))
-						break;
-					if($check == T_ZBX_PERIOD)
-						break;
-					if( ($check == V_NOT_EMPTY)&&($_REQUEST[$var]==""))
-						break;
-				}
-			}
-		}
-
-		return $ret;
-	}
-
-	function	calc_exp($field,$expression)
+	function	calc_exp($fields,$field,$expression)
 	{
 		global $_REQUEST;
 
@@ -62,36 +27,65 @@
 		{
 			if(!isset($_REQUEST[$field]))	return FALSE;
 		}
-		$exec = str_replace("{}",'$_REQUEST["'.$field.'"]',$expression);
-		$exec = "return ".$exec.'1;';
-//		echo $exec,"<br>";
+		$expression = str_replace("{}",'$_REQUEST["'.$field.'"]',$expression);
+		foreach($fields as $f => $checks)
+		{
+			// If an unset variable used in expression, return FALSE
+			if(strstr($expression,'{'.$f.'}')&&!isset($_REQUEST[$f]))
+			{
+//				info("Variable is not set. $expression is FALSE");
+				return FALSE;
+			}
+//			echo $f,":",$expression,"<br>";
+			$expression = str_replace('{'.$f.'}','$_REQUEST["'.$f.'"]',$expression);
+		}
+		$expression=rtrim($expression,"&");
+		if($expression[strlen($expression)-1]=='&')	$expression[strlen($expression)-1]=0;
+		if($expression[strlen($expression)-1]=='&')	$expression[strlen($expression)-1]=0;
+		$exec = "return ".$expression.";";
+//		info($exec);
 		return eval($exec);
 	}
 
-	function	check_fields($fields)
+	function	unset_all(&$fields)
+	{
+		foreach($_REQUEST as $key => $val)
+		{
+			if(!isset($fields[$key]))
+			{
+//				info("Unset:".$key);
+				unset($_REQUEST[$key]);
+			}
+		}
+	}
+
+	function	check_fields(&$fields)
 	{
 		global	$_REQUEST;
 
-		$ret = 1;
+		$ret = TRUE;
 
 		foreach($fields as $field => $checks)
 		{
-			list($type,$opt,$table,$column,$validation,$exception)=$checks;
+			list($type,$opt,$flags,$validation,$exception)=$checks;
 
+//			info("Field: $field");
 
 			if($exception==NULL)	$except=FALSE;
-			else			$except=calc_exp($field,$exception);
+			else			$except=calc_exp($fields,$field,$exception);
 
+			if($opt == O_MAND &&	$except)	$opt = O_NO;
+			else if($opt == O_OPT && $except)	$opt = O_MAND;
+			else if($opt == O_NO && $except)	$opt = O_MAND;
 
-			if($opt == O_MAND &&	$exception)	$opt = O_NO;
-			else if($opt == O_OPT && $exception)	$opt = O_MAND;
-			else if($opt == O_NO && $exception)	$opt = O_MAND;
 
 			if($opt == O_MAND)
 			{
 				if(!isset($_REQUEST[$field]))
 				{
-					info("Field [".$field."] is mandatory"); $ret = 0; continue;
+					info("Field [".$field."] is mandatory");
+					$ret = FALSE;
+					continue;
 				}
 			}
 
@@ -99,7 +93,9 @@
 			{
 				if(isset($_REQUEST[$field]))
 				{
-					info("Field [".$field."] must be missing"); $ret = 0; continue;
+					info("Field [".$field."] must be missing");
+					$ret = FALSE;
+					continue;
 				}
 				else continue;
 			}
@@ -111,21 +107,31 @@
 
 
 			if( ($type == T_ZBX_INT) && !is_numeric($_REQUEST[$field])) {
-				info("Field [".$field."] is not integer"); $ret = 0; continue;
+				info("Field [".$field."] is not integer");
+				$ret = FALSE;
+				continue;
 			}
 
 			if( ($type == T_ZBX_DBL) && !is_numeric($_REQUEST[$field])) {
-				info("Field [".$field."] is not double"); $ret = 0; continue;
+				info("Field [".$field."] is not double");
+				$ret = FALSE;
+				continue;
 			}
 
-			if($validation==NULL)	$valid=TRUE;
-			else			$valid=calc_exp($field,$validation);
-
-			if(!$valid)
+			if(($exception==NULL)||($except==TRUE))
 			{
-				info("Field [".$field."] is invalid"); $ret = 0; continue;
+				if(!$validation)	$valid=TRUE;
+				else			$valid=calc_exp($fields,$field,$validation);
+
+				if(!$valid)
+				{
+					info("Incorrect value for [".$field."]");
+					$ret = FALSE;
+					continue;
+				}
 			}
 		}
+		unset_all($fields);
 		return $ret;
 	}
 ?>
