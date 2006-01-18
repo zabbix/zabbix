@@ -23,10 +23,9 @@
 	include "include/forms.inc.php";
 	$page["title"] = "S_HOSTS";
 	$page["file"] = "hosts.php";
-	show_header($page["title"],0,0);
+	show_header($page["title"]);
 	insert_confirm_javascript();
 ?>
-
 <?php
 	if(!check_anyright("Host","U"))
 	{
@@ -35,58 +34,73 @@
 		exit;
 	}
 
-	$_REQUEST["config"]=@iif(isset($_REQUEST["config"]),$_REQUEST["config"],get_profile("web.hosts.config",0));
+	if(!isset($_REQUEST["config"]))	$_REQUEST["config"] = get_profile("web.hosts.config",0);
+
 	update_profile("web.hosts.config",$_REQUEST["config"]);
 	update_profile("web.menu.config.last",$page["file"]);
 ?>
-
 <?php
 	if(isset($_REQUEST["save"])&&!isset($_REQUEST["hostid"])&&($_REQUEST["config"]==0))
 	{
 		$groups=array();
-		$result=DBselect("select groupid from groups");
-		while($row=DBfetch($result))
+		$db_groups=DBselect("select groupid from groups");
+		while($db_group=DBfetch($db_groups))
 		{
-			if(isset($_REQUEST[$row["groupid"]]))
-			{
-				$groups=array_merge($groups,array($row["groupid"]));
-			}
+			if(!isset($_REQUEST[$db_group["groupid"]]))	continue;
+			array_push($groups,$db_group["groupid"]);
 		}
-		$result=add_host($_REQUEST["host"],$_REQUEST["port"],$_REQUEST["status"],$_REQUEST["useip"],$_REQUEST["ip"],$_REQUEST["host_templateid"],$_REQUEST["newgroup"],$groups);
+		$result=add_host(
+			$_REQUEST["host"],$_REQUEST["port"],$_REQUEST["status"],$_REQUEST["useip"],
+			$_REQUEST["ip"],$_REQUEST["host_templateid"],$_REQUEST["newgroup"],$groups);
+
 		show_messages($result, S_HOST_ADDED, S_CANNOT_ADD_HOST);
-		if($result)
-			add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_HOST,"Host [".addslashes($_REQUEST["host"])."] IP [".$_REQUEST["ip"]."] Status [".$_REQUEST["status"]."]");
-		unset($_REQUEST["hostid"]);
+		if($result){
+			add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_HOST,
+				"Host [".addslashes($_REQUEST["host"])."] IP [".$_REQUEST["ip"]."] ".
+				"Status [".$_REQUEST["status"]."]");
+
+			unset($_REQUEST["form"]);
+			unset($_REQUEST["hostid"]);
+		}
 	}
 
 	if(isset($_REQUEST["save"])&&isset($_REQUEST["hostid"])&&($_REQUEST["config"]==0))
 	{
 		$groups=array();
-		$result=DBselect("select groupid from groups");
-		while($row=DBfetch($result))
+		$db_groups=DBselect("select groupid from groups");
+		while($db_group=DBfetch($db_groups))
 		{
-			if(isset($_REQUEST[$row["groupid"]]))
-			{
-				$groups=array_merge($groups,array($row["groupid"]));
-			}
+			if(!isset($_REQUEST[$db_group["groupid"]]))	continue;
+			array_push($groups,$db_group["groupid"]);
 		}
-		$result=@update_host($_REQUEST["hostid"],$_REQUEST["host"],$_REQUEST["port"],$_REQUEST["status"],$_REQUEST["useip"],$_REQUEST["ip"],$_REQUEST["newgroup"],$groups);
+		$result=update_host(
+			$_REQUEST["hostid"],$_REQUEST["host"],$_REQUEST["port"],$_REQUEST["status"],
+			$_REQUEST["useip"],$_REQUEST["ip"],$_REQUEST["newgroup"],$groups);
+
 		show_messages($result, S_HOST_UPDATED, S_CANNOT_UPDATE_HOST);
-		if($result)
-			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,"Host [".addslashes($_REQUEST["host"])."] IP [".$_REQUEST["ip"]."] Status [".$_REQUEST["status"]."]");
-		unset($_REQUEST["hostid"]);
+		if($result){
+			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,
+				"Host [".addslashes($_REQUEST["host"])."] IP [".$_REQUEST["ip"]."] ".
+				"Status [".$_REQUEST["status"]."]");
+
+			unset($_REQUEST["form"]);
+			unset($_REQUEST["hostid"]);
+		}
 	}
 
 	if(isset($_REQUEST["delete"])&&($_REQUEST["config"]==0))
 	{
 		$host=get_host_by_hostid($_REQUEST["hostid"]);
 		$result=delete_host($_REQUEST["hostid"]);
+
+		show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 		if($result)
 		{
 			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,"Host [".addslashes($host["host"])."]");
+
+			unset($_REQUEST["form"]);
+			unset($_REQUEST["hostid"]);
 		}
-		show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
-		unset($_REQUEST["hostid"]);
 	}
 
 	if(isset($_REQUEST["register"]))
@@ -264,6 +278,11 @@
 			show_messages($result, S_HOST_DELETED, S_CANNOT_DELETE_HOST);
 		}
 	}
+
+	if(isset($_REQUEST["cancel"])){
+		unset($_REQUEST["form"]);
+	}
+
 ?>
 
 <?php
@@ -272,21 +291,22 @@
 		$_REQUEST["config"]=0;
 	}
 
-	$h1=S_CONFIGURATION_OF_HOSTS_AND_HOST_GROUPS;
+	$cmbConf = new CComboBox("config",$_REQUEST["config"],"submit()");
+	$cmbConf->AddItem(0,S_HOSTS);
+	$cmbConf->AddItem(1,S_HOST_GROUPS);
+//	$cmbConf->AddItem(2,S_HOSTS_TEMPLATES_LINKAGE);
 
-#	$h2=S_GROUP."&nbsp;";
-	$h2="";
-	$h2=$h2."<select class=\"biginput\" name=\"config\" onChange=\"submit()\">";
-	$h2=$h2.form_select("config",0,S_HOSTS);
-	$h2=$h2.form_select("config",1,S_HOST_GROUPS);
-	$h2=$h2.form_select("config",2,S_HOSTS_TEMPLATES_LINKAGE);
-	$h2=$h2."</select>";
-	
-	$h2=$h2."&nbsp;|&nbsp;";
-	if($_REQUEST["config"]==0)
-		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"form\" value=\"".S_CREATE_HOST."\">";
+	switch($_REQUEST["config"]){
+		case 0: $btnCaption = S_CREATE_HOST;	break;
+		case 1: $btnCaption = S_CREATE_GROUP;	break;
+	}
 
-	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"hosts.php\">", "</form>");
+	$frmForm = new CForm("hosts.php");
+	$frmForm->AddItem($cmbConf);
+	$frmForm->AddItem(SPACE."|".SPACE);
+	$frmForm->AddItem(new CButton("form",$btnCaption));
+	show_header2(S_CONFIGURATION_OF_HOSTS_AND_HOST_GROUPS, $frmForm);
+	echo BR;
 ?>
 
 
@@ -358,15 +378,12 @@
 	}
 	$h2=$h2."</select>";
 
-	echo "<br>";
 	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"hosts.php\">", "</form>");
 	}
 ?>
-
 <?php
 	if($_REQUEST["config"]==1)
 	{
-		echo "<br>";
 		show_table_header(S_HOST_GROUPS_BIG);
 		$table = new CTableInfo(S_NO_HOST_GROUPS_DEFINED);
 		$table->setHeader(array(S_ID,S_NAME,S_MEMBERS,S_ACTIONS));
@@ -477,7 +494,6 @@
 			}
 			$h2=$h2."</select>";
 
-			echo "<br>";
 			show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"hosts.php\">", "</form>");
 ?>
 
@@ -616,6 +632,11 @@
 		else
 		{
 			insert_host_form();
+			echo BR;
+			if(isset($_REQUEST["form"])&&isset($_REQUEST["hostid"]))
+			{
+				insert_host_profile_form($_REQUEST["hostid"]);
+			}
 		}
 
 	}
@@ -627,14 +648,6 @@
 		@insert_hostgroups_form($_REQUEST["groupid"]);
 	}
 ?>
-
-<?php
-	if(isset($_REQUEST["form"])&&isset($_REQUEST["hostid"]))
-	{
-		insert_host_profile_form($_REQUEST["hostid"]);
-	}
-?>
-
 <?php
 	show_page_footer();
 ?>

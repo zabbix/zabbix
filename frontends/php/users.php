@@ -25,7 +25,7 @@
 	$page["title"] = "S_USERS";
 	$page["file"] = "users.php";
 
-	show_header($page["title"],0,0);
+	show_header($page["title"]);
 	insert_confirm_javascript();
 ?>
 <?php
@@ -135,7 +135,9 @@
 		}
 		if($_REQUEST["register"]=="add permission")
 		{
-			$result=add_permission($_REQUEST["userid"],$_REQUEST["right"],$_REQUEST["permission"],$_REQUEST["id"]);
+			$result=add_permission($_REQUEST["userid"],$_REQUEST["right"],
+				$_REQUEST["permission"],$_REQUEST["id"]);
+
 			show_messages($result, S_PERMISSION_ADDED, S_CANNOT_ADD_PERMISSION);
 		}
 	}
@@ -166,44 +168,7 @@
 	echo BR; 
 ?>
 <?php
-	if($_REQUEST["config"]==1)
-	{
-		if(!isset($_REQUEST["form"]))
-		{
-			show_table_header(S_USER_GROUPS_BIG);
-	
-			$table = new CTableInfo(S_NO_USER_GROUPS_DEFINED);
-			$table->setHeader(array(S_ID,S_NAME,S_MEMBERS));
-		
-			$result=DBselect("select usrgrpid,name from usrgrp order by name");
-			while($row=DBfetch($result))
-			{
-				if(!check_right("User group","R",$row["usrgrpid"]))	continue;
-
-				$name = new CLink(
-					$row["name"],
-					"users.php?config=".$_REQUEST["config"]."&form=0&usrgrpid=".
-					$row["usrgrpid"]."#form");
-
-				$users=SPACE;
-
-				$db_users=DBselect("select distinct u.alias from users u,users_groups ug where u.userid=ug.userid and ug.usrgrpid=".$row["usrgrpid"]." order by alias");
-				if($db_user=DBfetch($db_users))		$users .=      $db_user["alias"];
-				while($db_user=DBfetch($db_users))	$users .= ", ".$db_user["alias"];
-
-				$table->addRow(array(
-					$row["usrgrpid"], 
-					$name, 
-					$users));
-			}
-			$table->show();
-		}
-		else
-		{
-			insert_usergroups_form(isset($_REQUEST["usrgrpid"]) ? $_REQUEST["usrgrpid"] : NULL);
-		}
-	}
-	elseif($_REQUEST["config"]==0)
+	if($_REQUEST["config"]==0)
 	{
 		if(!isset($_REQUEST["form"]))
 		{
@@ -211,7 +176,8 @@
 			$table=new CTableInfo(S_NO_USERS_DEFINED);
 			$table->setHeader(array(S_ID,S_ALIAS,S_NAME,S_SURNAME,S_IS_ONLINE_Q,S_ACTIONS));
 		
-			$db_users=DBselect("select u.userid,u.alias,u.name,u.surname from users u order by u.alias");
+			$db_users=DBselect("select u.userid,u.alias,u.name,u.surname ".
+				"from users u order by u.alias");
 			while($db_user=DBfetch($db_users))
 			{
 				if(!check_right("User","R",$db_user["userid"]))		continue;
@@ -256,45 +222,84 @@
 		else
 		{
 			insert_user_form(get_request("userid",NULL));
+
+			if(isset($_REQUEST["userid"])))
+			{
+				echo BR;
+				show_table_header("USER PERMISSIONS");
+
+				$table  = new CTableInfo();
+				$table->setHeader(array(S_PERMISSION,S_RIGHT,S_RESOURCE_NAME,S_ACTIONS));
+
+				$db_rights = DBselect("select rightid,name,permission,id from rights ".
+					"where userid=".$_REQUEST["userid"]." order by name,permission,id");
+				while($db_right = DBfetch($db_rights))
+				{
+					if($db_right["permission"]=="R")	$permission=S_READ_ONLY;
+					else if($db_right["permission"]=="U")	$permission=S_READ_WRITE;
+					else if($db_right["permission"]=="H")	$permission=S_HIDE;
+					else if($db_right["permission"]=="A")	$permission=S_ADD;
+					else					$permission=$db_right["permission"];
+
+					$actions= new CLink(
+						S_DELETE,
+						"users.php?userid=".$_REQUEST["userid"]."&rightid=".
+						$db_right["rightid"]."&register=delete_permission>");
+
+					$table->addRow(array(
+						$db_right["name"],
+						$permission,
+						get_resource_name($db_right["name"],$db_right["id"]),
+						$actions
+					));
+				}
+				$table->show();
+
+				echo BR;
+
+				insert_permissions_form($_REQUEST["userid"]);
+			}
 		}
 	}
-?>
-<?php
-	if(isset($_REQUEST["userid"])&&isset($_REQUEST["form"])&&($_REQUEST["config"]==0))
+	elseif($_REQUEST["config"]==1)
 	{
-		echo BR;
-		show_table_header("USER PERMISSIONS");
-
-		$table  = new CTableInfo();
-		$table->setHeader(array(S_PERMISSION,S_RIGHT,S_RESOURCE_NAME,S_ACTIONS));
-
-		$db_rights = DBselect("select rightid,name,permission,id from rights ".
-			"where userid=".$_REQUEST["userid"]." order by name,permission,id");
-		while($db_right = DBfetch($db_rights))
+		if(!isset($_REQUEST["form"]))
 		{
-			if($db_right["permission"]=="R")	$permission=S_READ_ONLY;
-			else if($db_right["permission"]=="U")	$permission=S_READ_WRITE;
-			else if($db_right["permission"]=="H")	$permission=S_HIDE;
-			else if($db_right["permission"]=="A")	$permission=S_ADD;
-			else					$permission=$db_right["permission"];
+			show_table_header(S_USER_GROUPS_BIG);
+	
+			$table = new CTableInfo(S_NO_USER_GROUPS_DEFINED);
+			$table->setHeader(array(S_ID,S_NAME,S_MEMBERS));
+		
+			$result=DBselect("select usrgrpid,name from usrgrp order by name");
+			while($row=DBfetch($result))
+			{
+				if(!check_right("User group","R",$row["usrgrpid"]))	continue;
 
-			$actions= new CLink(
-				S_DELETE,
-				"users.php?userid=".$_REQUEST["userid"]."&rightid=".
-				$db_right["rightid"]."&register=delete_permission>");
+				$name = new CLink(
+					$row["name"],
+					"users.php?config=".$_REQUEST["config"]."&form=0&usrgrpid=".
+					$row["usrgrpid"]."#form");
 
-			$table->addRow(array(
-				$db_right["name"],
-				$permission,
-				get_resource_name($db_right["name"],$db_right["id"]),
-				$actions
-			));
+				$users=SPACE;
+
+				$db_users=DBselect("select distinct u.alias from users u,users_groups ug ".
+					"where u.userid=ug.userid and ug.usrgrpid=".$row["usrgrpid"].
+					" order by alias");
+
+				if($db_user=DBfetch($db_users))		$users .=      $db_user["alias"];
+				while($db_user=DBfetch($db_users))	$users .= ", ".$db_user["alias"];
+
+				$table->addRow(array(
+					$row["usrgrpid"], 
+					$name, 
+					$users));
+			}
+			$table->show();
 		}
-		$table->show();
-
-		echo BR;
-
-		insert_permissions_form($_REQUEST["userid"]);
+		else
+		{
+			insert_usergroups_form(isset($_REQUEST["usrgrpid"]) ? $_REQUEST["usrgrpid"] : NULL);
+		}
 	}
 ?>
 <?php

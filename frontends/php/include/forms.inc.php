@@ -66,21 +66,21 @@
 		$frmTemplate->AddRow(S_TEMPLATE,$cmbTemplate);
 
 		$frmTemplate->AddRow(S_ITEMS,array(
-			new CCheckBox('items_add',	S_ADD,		(1 & $items) ? "yes": "no"),
-			new CCheckBox('items_update',	S_UPDATE,	(2 & $items) ? "yes": "no"),
-			new CCheckBox('items_delete',	S_DELETE,	(4 & $items) ? "yes": "no")
+			new CCheckBox('items_add',	1 & $items,	S_ADD),
+			new CCheckBox('items_update',	2 & $items,	S_UPDATE),
+			new CCheckBox('items_delete',	4 & $items,	S_DELETE)
 		));
 
 		$frmTemplate->AddRow(S_TRIGGERS,array(
-			new CCheckBox('triggers_add',	S_ADD,		(1 & $triggers) ? "yes": "no"),
-			new CCheckBox('triggers_update',S_UPDATE,	(2 & $triggers) ? "yes": "no"),
-			new CCheckBox('triggers_delete',S_DELETE,	(4 & $triggers) ? "yes": "no")
+			new CCheckBox('triggers_add',	1 & $triggers,	S_ADD),
+			new CCheckBox('triggers_update',2 & $triggers,	S_UPDATE),
+			new CCheckBox('triggers_delete',4 & $triggers,	S_DELETE),
 		));
 
 		$frmTemplate->AddRow(S_GRAPHS,array(
-			new CCheckBox('graphs_add',	S_ADD,		(1 & $graphs) ? "yes": "no"),
-			new CCheckBox('graphs_update',	S_UPDATE,	(2 & $graphs) ? "yes": "no"),
-			new CCheckBox('graphs_delete',	S_DELETE,	(4 & $graphs) ? "yes": "no")
+			new CCheckBox('graphs_add',	1 & $graphs,	S_ADD),
+			new CCheckBox('graphs_update',	2 & $graphs,	S_UPDATE),
+			new CCheckBox('graphs_delete',	4 & $graphs,	S_DELETE),
 		));
 
 		$frmTemplate->AddItemToBottomRow(new CButton('register','add linkage'));
@@ -543,15 +543,14 @@
 				$result=DBselect($sql);
 				$res_row=DBfetch($result);
 				array_push($form_row,
-					new CCheckBox($user["userid"],$user["alias"],
-						$res_row["count"] ? 'yes': 'no'),
+					new CCheckBox($user["userid"],$res_row["count"], $user["alias"]),
 					BR);
 			}
 			else
 			{
 				array_push($form_row,
-					new CCheckBox($user["userid"],$user["alias"],
-					isset($_REQUEST[$user["userid"]]) ? 'yes' : 'no'),
+					new CCheckBox($user["userid"],
+						isset($_REQUEST[$user["userid"]]),$user["alias"]),
 					BR);
 			}
 		}
@@ -676,6 +675,7 @@
 			array_push($dep_el, 
 				new CCheckBox(
 					$_REQUEST["dependence$i"],
+					'no',
 					expand_trigger_description($_REQUEST["dependence$i"])
 				),
 				BR
@@ -702,6 +702,7 @@
 				array_push($dep_el, 
 					new CCheckBox(
 						$trig["triggerid"],
+						'no',
 						expand_trigger_description($trig["triggerid"])
 					),
 					BR
@@ -761,7 +762,7 @@
 
 		$frmTrig->AddRow(S_COMMENTS,new CTextArea("comments",$comments,70,7));
 		$frmTrig->AddRow(S_URL,new CTextBox("url",$url,70));
-		$frmTrig->AddRow(S_DISABLED,new CCheckBox("disabled",NULL,$status==1 ? 'yes': 'no'));
+		$frmTrig->AddRow(S_DISABLED,new CCheckBox("disabled",$status));
  
 		$frmTrig->AddItemToBottomRow(new CButton("save",S_SAVE));
 		if(isset($triggerid))
@@ -866,7 +867,7 @@
 		}
 
 		$frmEscal->AddRow(S_NAME,new CTextBox("name",$name,32));
-		$frmEscal->AddRow(S_IS_DEFAULT,new CCheckBox("dflt",NULL,$dflt==1 ? 'yes':'no'));
+		$frmEscal->AddRow(S_IS_DEFAULT,new CCheckBox("dflt",$dflt));
 
 		$frmEscal->AddItemToBottomRow(new CButton("register","add escalation"));
 		if(isset($escalationid))
@@ -931,88 +932,6 @@
 			$frmEacalRul->AddItemToBottomRow(new CButton("register","delete rule","return Confirm('Delete selected escalation rule?');"));
 		}
 		$frmEacalRul->Show();
-	}
-
-	# Insert host profile form
-	function	insert_host_profile_form($hostid,$readonly=0)
-	{
-		$selected=0;
-
-		if(isset($hostid))
-		{
-			$result=DBselect("select * from hosts_profiles where hostid=$hostid");
-
-			if(DBnum_rows($result)==1)
-			{
-				$row=DBfetch($result);
-
-				$selected=1;
-				$devicetype=$row["devicetype"];
-				$name=$row["name"];
-				$os=$row["os"];
-				$serialno=$row["serialno"];
-				$tag=$row["tag"];
-				$macaddress=$row["macaddress"];
-				$hardware=$row["hardware"];
-				$software=$row["software"];
-				$contact=$row["contact"];
-				$location=$row["location"];
-				$notes=$row["notes"];
-			}
-		}
-		if($selected==0)
-		{
-			$devicetype="";
-			$name="";
-			$os="";
-			$serialno="";
-			$tag="";
-			$macaddress="";
-			$hardware="";
-			$software="";
-			$contact="";
-			$location="";
-			$notes="";
-		}
-
-		$frmHostP = new CFormTable(S_HOST_PROFILE,"hosts.php");
-		$frmHostP->SetHelp("web.host_profile.php");
-
-		if(isset($_REQUEST["config"]))
-		{
-			$frmHostP->AddVar("config",$_REQUEST["config"]);
-		}
-		$frmHostP->AddVar("hostid",$hostid);
-
-		$frmHostP->AddRow(S_DEVICE_TYPE,new CTextBox("devicetype",$devicetype,61));
-		$frmHostP->AddRow(S_NAME,new CTextBox("name",$name,61));
-		$frmHostP->AddRow(S_OS,new CTextBox("os",$os,61));
-		$frmHostP->AddRow(S_SERIALNO,new CTextBox("serialno",$serialno,61));
-		$frmHostP->AddRow(S_TAG,new CTextBox("tag",$tag,61));
-		$frmHostP->AddRow(S_MACADDRESS,new CTextBox("macaddress",$macaddress,61));
-		$frmHostP->AddRow(S_HARDWARE,new CTextArea("hardware",$hardware,60,4));
-		$frmHostP->AddRow(S_SOFTWARE,new CTextArea("software",$software,60,4));
-		$frmHostP->AddRow(S_CONTACT,new CTextArea("contact",$contact,60,4));
-		$frmHostP->AddRow(S_LOCATION,new CTextArea("location",$location,60,4));
-		$frmHostP->AddRow(S_NOTES,new CTextArea("notes",$notes,60,4));
-
-		if($readonly==1)
-		{
-			$frmHostP->AddItemToBottomRow(new CButton("register","add profile"));
-			if(isset($hostid))
-			{
-				$frmHostP->AddItemToBottomRow(SPACE);
-				$frmHostP->AddItemToBottomRow(new CButton("register","update profile"));
-				$frmHostP->AddItemToBottomRow(SPACE);
-				$frmHostP->AddItemToBottomRow(new CButton("register","delete profile",
-						"return Confirm('Delete selected profile?');"));
-			}
-		}
-		else
-		{
-			$frmHostP->AddItemToBottomRow(SPACE);
-		}
-		$frmHostP->Show();
 	}
 
 	# Insert autoregistration form
@@ -1149,6 +1068,7 @@
 			array_push($cond_el, 
 				new CCheckBox(
 					"conditionchecked$i",
+					'no',
 					get_condition_desc(
 						$_REQUEST["conditiontype$i"],
 						$_REQUEST["conditionop$i"],
@@ -1546,12 +1466,12 @@ function	insert_image_form()
 		$frmMedia->AddRow(S_WHEN_ACTIVE,new CTextBox("period",$period,48));	
 	
 		$frm_row = array();
-		array_push($frm_row, new CCheckBox(0,S_NOT_CLASSIFIED, 	 1 & $severity ? 'yes': 'no'), BR);
-		array_push($frm_row, new CCheckBox(1,S_INFORMATION, 	 2 & $severity ? 'yes': 'no'), BR);
-		array_push($frm_row, new CCheckBox(2,S_WARNING, 	 4 & $severity ? 'yes': 'no'), BR);
-		array_push($frm_row, new CCheckBox(3,S_AVERAGE, 	 8 & $severity ? 'yes': 'no'), BR);
-		array_push($frm_row, new CCheckBox(4,S_HIGH,		16 & $severity ? 'yes': 'no'), BR);
-		array_push($frm_row, new CCheckBox(5,S_DISASTER,	32 & $severity ? 'yes': 'no'), BR);
+		array_push($frm_row, new CCheckBox(0,	1 & $severity, S_NOT_CLASSIFIED),	BR);
+		array_push($frm_row, new CCheckBox(1,	2 & $severity, S_INFORMATION),	BR);
+		array_push($frm_row, new CCheckBox(2,	4 & $severity, S_WARNING),	BR);
+		array_push($frm_row, new CCheckBox(3,	8 & $severity, S_AVERAGE),	BR);
+		array_push($frm_row, new CCheckBox(4,	16 & $severity, S_HIGH),	BR);
+		array_push($frm_row, new CCheckBox(5,	32 & $severity, S_DISASTER),	BR);
 		$frmMedia->AddRow(S_USE_IF_SEVERITY,$frm_row);
 
 		$cmbStat = new CComboBox("active",$active);
@@ -1575,42 +1495,32 @@ function	insert_image_form()
 
 		global $_REQUEST;
 
-		$host=@iif(isset($_REQUEST["host"]),$_REQUEST["host"],"");
-		$port=@iif(isset($_REQUEST["port"]),$_REQUEST["port"],get_profile("HOST_PORT",10050));
-		$status=@iif(isset($_REQUEST["status"]),$_REQUEST["status"],HOST_STATUS_MONITORED);
-		$useip=@iif(isset($_REQUEST["useip"]),$_REQUEST["useip"],"off");
-		$newgroup=@iif(isset($_REQUEST["newgroup"]),$_REQUEST["newgroup"],"");
-		$ip=@iif(isset($_REQUEST["ip"]),$_REQUEST["ip"],"");
-		$host_templateid=@iif(isset($_REQUEST["host_templateid"]),$_REQUEST["host_templateid"],"");
-
-		if(isset($_REQUEST["hostid"]))
-		{
-			$result=get_host_by_hostid($_REQUEST["hostid"]);
-			$host=$result["host"];
-			$port=$result["port"];
-			$status=$result["status"];
-			if($result["useip"]==0)
-			{
-				$useip="off";
-			}
-			else
-			{
-				$useip="on";
-			}
-
-			$ip=$result["ip"];
-		}
-
 		$frmHost = new CFormTable(S_HOST,"hosts.php#form");
 		$frmHost->SetHelp("web.hosts.host.php");
-		if(isset($_REQUEST["hostid"]))
+
+		$newgroup	= get_request("newgroup","");
+		$host_templateid= get_request("host_templateid","");
+
+		if(isset($_REQUEST["hostid"]) && $_REQUEST["form"]!=1)
 		{
-			$frmHost->AddVar("hostid",$_REQUEST["hostid"]);
+			$db_host=get_host_by_hostid($_REQUEST["hostid"]);
+
+			$host	= $db_host["host"];
+			$port	= $db_host["port"];
+			$status	= $db_host["status"];
+			$useip	= $db_host["useip"]==1 ? 'on' : 'off';
+			$ip	= $db_host["ip"];
+		} else {
+			$host 	= get_request("host",	"");
+			$port 	= get_request("port",	get_profile("HOST_PORT",10050));
+			$status	= get_request("status",	HOST_STATUS_MONITORED);
+			$useip	= get_request("useip",	"off");
+			$ip	= get_request("ip",	"");
 		}
-		if(isset($_REQUEST["groupid"]))
-		{
-			$frmHost->AddVar("groupid",$_REQUEST["groupid"]);
-		}
+
+		if(isset($_REQUEST["hostid"]))		$frmHost->AddVar("hostid",$_REQUEST["hostid"]);
+		if(isset($_REQUEST["groupid"]))		$frmHost->AddVar("groupid",$_REQUEST["groupid"]);
+		
 		$frmHost->AddRow(S_HOST,new CTextBox("host",$host,20));
 
 		$frm_row = array();
@@ -1620,20 +1530,20 @@ function	insert_image_form()
 			$selected='no';
 			if(isset($_REQUEST["hostid"]))
 			{
-				$sql="select count(*) as count from hosts_groups where hostid=".$_REQUEST["hostid"]." and groupid=".$group["groupid"];
-				$result=DBselect($sql);
+				$result=DBselect("select count(*) as count from hosts_groups ".
+					"where hostid=".$_REQUEST["hostid"]." and groupid=".$group["groupid"]);
 				$res_row=DBfetch($result);
 				if($res_row["count"]==1) 
 					$selected = 'yes';
 			}
-			array_push($frm_row,new CCheckBox($group["groupid"],$group["name"],$selected),BR);
+			array_push($frm_row,new CCheckBox($group["groupid"],$selected, $group["name"]),BR);
 		}
 		$frmHost->AddRow(S_GROUPS,$frm_row);
 
 		$frmHost->AddRow(S_NEW_GROUP,new CTextBox("newgroup",$newgroup));
 
 // onChange does not work on some browsers: MacOS, KDE browser
-		$frmHost->AddRow(S_USE_IP_ADDRESS,new CCheckBox("useip",NULL,$useip,"submit()"));
+		$frmHost->AddRow(S_USE_IP_ADDRESS,new CCheckBox("useip",$useip,NULL,"submit()"));
 		if($useip=="on")
 		{
 			$frmHost->AddRow(S_IP_ADDRESS,new CTextBox("ip",$ip,"15"));
@@ -1671,4 +1581,87 @@ function	insert_image_form()
 		$frmHost->AddItemToBottomRow(new CButton("cancel",S_CANCEL));
 		$frmHost->Show();
 	}
+
+	# Insert host profile form
+	function	insert_host_profile_form($hostid,$readonly=0)
+	{
+		$selected=0;
+
+		if(isset($hostid))
+		{
+			$result=DBselect("select * from hosts_profiles where hostid=$hostid");
+
+			if(DBnum_rows($result)==1)
+			{
+				$row=DBfetch($result);
+
+				$selected=1;
+				$devicetype=$row["devicetype"];
+				$name=$row["name"];
+				$os=$row["os"];
+				$serialno=$row["serialno"];
+				$tag=$row["tag"];
+				$macaddress=$row["macaddress"];
+				$hardware=$row["hardware"];
+				$software=$row["software"];
+				$contact=$row["contact"];
+				$location=$row["location"];
+				$notes=$row["notes"];
+			}
+		}
+		if($selected==0)
+		{
+			$devicetype="";
+			$name="";
+			$os="";
+			$serialno="";
+			$tag="";
+			$macaddress="";
+			$hardware="";
+			$software="";
+			$contact="";
+			$location="";
+			$notes="";
+		}
+
+		$frmHostP = new CFormTable(S_HOST_PROFILE,"hosts.php");
+		$frmHostP->SetHelp("web.host_profile.php");
+
+		if(isset($_REQUEST["config"]))
+		{
+			$frmHostP->AddVar("config",$_REQUEST["config"]);
+		}
+		$frmHostP->AddVar("hostid",$hostid);
+
+		$frmHostP->AddRow(S_DEVICE_TYPE,new CTextBox("devicetype",$devicetype,61));
+		$frmHostP->AddRow(S_NAME,new CTextBox("name",$name,61));
+		$frmHostP->AddRow(S_OS,new CTextBox("os",$os,61));
+		$frmHostP->AddRow(S_SERIALNO,new CTextBox("serialno",$serialno,61));
+		$frmHostP->AddRow(S_TAG,new CTextBox("tag",$tag,61));
+		$frmHostP->AddRow(S_MACADDRESS,new CTextBox("macaddress",$macaddress,61));
+		$frmHostP->AddRow(S_HARDWARE,new CTextArea("hardware",$hardware,60,4));
+		$frmHostP->AddRow(S_SOFTWARE,new CTextArea("software",$software,60,4));
+		$frmHostP->AddRow(S_CONTACT,new CTextArea("contact",$contact,60,4));
+		$frmHostP->AddRow(S_LOCATION,new CTextArea("location",$location,60,4));
+		$frmHostP->AddRow(S_NOTES,new CTextArea("notes",$notes,60,4));
+
+		if($readonly==0)
+		{
+			$frmHostP->AddItemToBottomRow(new CButton("register","add profile"));
+			if(isset($hostid))
+			{
+				$frmHostP->AddItemToBottomRow(SPACE);
+				$frmHostP->AddItemToBottomRow(new CButton("register","update profile"));
+				$frmHostP->AddItemToBottomRow(SPACE);
+				$frmHostP->AddItemToBottomRow(new CButton("register","delete profile",
+						"return Confirm('Delete selected profile?');"));
+			}
+		}
+		else
+		{
+			$frmHostP->AddItemToBottomRow(SPACE);
+		}
+		$frmHostP->Show();
+	}
+
 ?>

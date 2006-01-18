@@ -1003,7 +1003,7 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 	# Header for HTML pages
 
-	function	show_header($title,$dorefresh,$nomenu=0,$noauth=0)
+	function	show_header($title,$dorefresh=0,$nomenu=0,$noauth=0)
 	{
 		global $page;
 		global $USER_DETAILS;
