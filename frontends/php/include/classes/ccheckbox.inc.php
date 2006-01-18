@@ -22,14 +22,14 @@
 	class CCheckBox extends CTag
 	{
 /* public */
-		function CCheckBox($name='checkbox',$value=NULL,$checked="no",$action=NULL)
+		function CCheckBox($name='checkbox',$value='no',$caption=NULL,$action=NULL)
 		{
 			parent::CTag("input","no");
 			$this->tag_body_start = "";
 			$this->AddOption('type','checkbox');
 			$this->SetName($name);
-			$this->SetCaption($value);
-			$this->SetChecked($checked);
+			$this->SetCaption($caption);
+			$this->SetChecked($value);
 			$this->SetAction($action);
 		}
 		function SetName($value='checkbox')
@@ -50,9 +50,9 @@
 		}
 		function SetChecked($value="yes")
 		{
-			if($value=="yes" || $value=="checked" || $value=="on")
+			if($value=="yes" || $value=="checked" || $value=="on" || $value==1)
 				return $this->AddOption("checked","checked");
-			elseif($value=="no" || $value=="unchecked" || $value=="off" || $value==NULL)
+			elseif($value=="no" || $value=="unchecked" || $value=="off" || $value==NULL || $value==0)
 				return $this->DelOption("checked");
 			return $this->error("Incorrect value for SetChacked [$value]");
 		}
