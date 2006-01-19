@@ -81,7 +81,7 @@
 		"imageid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),'{config}==3'),
 
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL)
 	);
@@ -95,7 +95,6 @@
 
 	if(check_fields($fields)!=TRUE)
 	{
-		show_messages(FALSE, "", "Invalid URL");
 	}
 
 	if(isset($_REQUEST["save"])&&isset($_REQUEST["config"])&&(in_array($_REQUEST["config"],array(0,5))))
