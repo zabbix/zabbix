@@ -468,6 +468,8 @@
 		{
 			$frmHostG->AddVar("groupid",$_REQUEST["groupid"]);
 		}
+		$frmHostG->AddVar("config",get_request("config",1));
+
 		$frmHostG->AddRow(S_GROUP_NAME,new CTextBox("name",$name,30));
 
 		$cmbHosts = new CListBox("hosts[]",5);
@@ -489,20 +491,15 @@
 		}
 		$frmHostG->AddRow(S_HOSTS,$cmbHosts);
 
-		$frmHostG->AddItemToBottomRow(new CButton("register","add group"));
+		$frmHostG->AddItemToBottomRow(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["groupid"]))
 		{
 			$frmHostG->AddItemToBottomRow(SPACE);
-			$frmHostG->AddItemToBottomRow(new CButton("register","add group"));
-			$frmHostG->AddItemToBottomRow(SPACE);
-			$frmHostG->AddItemToBottomRow(new CButton("register","update group"));
-			$frmHostG->AddItemToBottomRow(SPACE);
-			$frmHostG->AddItemToBottomRow(new CButton("register","delete group","return Confirm('Delete selected group?');"));
-			$frmHostG->AddItemToBottomRow(SPACE);
-			$frmHostG->AddItemToBottomRow(new CButton("register","start monitoring"));
-			$frmHostG->AddItemToBottomRow(SPACE);
-			$frmHostG->AddItemToBottomRow(new CButton("register","stop monitoring"));
+			$frmHostG->AddItemToBottomRow(new CButton("delete",S_DELETE,
+				"return Confirm('Delete selected group?');"));
 		}
+		$frmHostG->AddItemToBottomRow(SPACE);
+		$frmHostG->AddItemToBottomRow(new CButton("cancel",S_CANCEL));
 		$frmHostG->Show();
 	}
 
@@ -1495,48 +1492,85 @@ function	insert_image_form()
 
 		global $_REQUEST;
 
-		$frmHost = new CFormTable(S_HOST,"hosts.php#form");
-		$frmHost->SetHelp("web.hosts.host.php");
-
 		$newgroup	= get_request("newgroup","");
 		$host_templateid= get_request("host_templateid","");
 
+		$host 	= get_request("host",	"");
+		$port 	= get_request("port",	get_profile("HOST_PORT",10050));
+		$status	= get_request("status",	HOST_STATUS_MONITORED);
+		$useip	= get_request("useip",	"no");
+		$ip	= get_request("ip",	"");
+
+		$useprofile = get_request("useprofile","no");
+
+		$devicetype	= get_request("devicetype","");
+		$name		= get_request("name","");
+		$os		= get_request("os","");
+		$serialno	= get_request("serialno","");
+		$tag		= get_request("tag","");
+		$macaddress	= get_request("macaddress","");
+		$hardware	= get_request("hardware","");
+		$software	= get_request("software","");
+		$contact	= get_request("contact","");
+		$location	= get_request("location","");
+		$notes		= get_request("notes","");
+		$frm_title	= S_HOST;
+
+		if(isset($_REQUEST["hostid"])){
+			$db_host=get_host_by_hostid($_REQUEST["hostid"]);
+			$frm_title	= S_HOST.SPACE."\"".$db_host["host"]."\"";
+		}
+
 		if(isset($_REQUEST["hostid"]) && $_REQUEST["form"]!=1)
 		{
-			$db_host=get_host_by_hostid($_REQUEST["hostid"]);
 
 			$host	= $db_host["host"];
 			$port	= $db_host["port"];
 			$status	= $db_host["status"];
-			$useip	= $db_host["useip"]==1 ? 'on' : 'off';
+			$useip	= $db_host["useip"]==1 ? 'yes' : 'no';
 			$ip	= $db_host["ip"];
-		} else {
-			$host 	= get_request("host",	"");
-			$port 	= get_request("port",	get_profile("HOST_PORT",10050));
-			$status	= get_request("status",	HOST_STATUS_MONITORED);
-			$useip	= get_request("useip",	"off");
-			$ip	= get_request("ip",	"");
+// add groups
+			$db_groups=DBselect("select groupid from hosts_groups where hostid=".$_REQUEST["hostid"]);
+			while($db_group=DBfetch($db_groups))	$_REQUEST[$db_group["groupid"]]="yes";
+// read profile
+			$db_profiles = DBselect("select * from hosts_profiles where hostid=".$_REQUEST["hostid"]);
+
+			$useprofile = "no";
+			if(DBnum_rows($db_profiles)==1)
+			{
+				$useprofile = "yes";
+
+				$db_profile = DBfetch($db_profiles);
+
+				$devicetype	= $db_profile["devicetype"];
+				$name		= $db_profile["name"];
+				$os		= $db_profile["os"];
+				$serialno	= $db_profile["serialno"];
+				$tag		= $db_profile["tag"];
+				$macaddress	= $db_profile["macaddress"];
+				$hardware	= $db_profile["hardware"];
+				$software	= $db_profile["software"];
+				$contact	= $db_profile["contact"];
+				$location	= $db_profile["location"];
+				$notes		= $db_profile["notes"];
+			}
 		}
+
+		$frmHost = new CFormTable($frm_title,"hosts.php#form");
+		$frmHost->SetHelp("web.hosts.host.php");
 
 		if(isset($_REQUEST["hostid"]))		$frmHost->AddVar("hostid",$_REQUEST["hostid"]);
 		if(isset($_REQUEST["groupid"]))		$frmHost->AddVar("groupid",$_REQUEST["groupid"]);
+		$frmHost->AddVar("config",get_request("config",0));
 		
 		$frmHost->AddRow(S_HOST,new CTextBox("host",$host,20));
 
 		$frm_row = array();
-		$groups=DBselect("select distinct groupid,name from groups order by name");
-		while($group=DBfetch($groups))
+		$db_groups=DBselect("select distinct groupid,name from groups order by name");
+		while($db_group=DBfetch($db_groups))
 		{
-			$selected='no';
-			if(isset($_REQUEST["hostid"]))
-			{
-				$result=DBselect("select count(*) as count from hosts_groups ".
-					"where hostid=".$_REQUEST["hostid"]." and groupid=".$group["groupid"]);
-				$res_row=DBfetch($result);
-				if($res_row["count"]==1) 
-					$selected = 'yes';
-			}
-			array_push($frm_row,new CCheckBox($group["groupid"],$selected, $group["name"]),BR);
+			$selected = isset($_REQUEST[$db_group["groupid"]]) ? 'yes' : 'no';
+			array_push($frm_row,new CCheckBox($db_group["groupid"],$selected, $db_group["name"]),BR);
 		}
 		$frmHost->AddRow(S_GROUPS,$frm_row);
 
@@ -1544,7 +1578,7 @@ function	insert_image_form()
 
 // onChange does not work on some browsers: MacOS, KDE browser
 		$frmHost->AddRow(S_USE_IP_ADDRESS,new CCheckBox("useip",$useip,NULL,"submit()"));
-		if($useip=="on")
+		if($useip=="yes")
 		{
 			$frmHost->AddRow(S_IP_ADDRESS,new CTextBox("ip",$ip,"15"));
 		}
@@ -1567,13 +1601,43 @@ function	insert_image_form()
 		{
 			$cmbHosts->AddItem($host["hostid"],$host["host"]);
 		}
-		$frmHost->AddRow(S_USE_TEMPLATES_OF_THIS_HOST,$cmbHosts);
+		$frmHost->AddRow(S_LINK_WITH_HOST,$cmbHosts);
 	
+		$frmHost->AddRow(S_USE_PROFILE,new CCheckBox("useprofile",$useprofile,NULL,"submit()"));
+		if($useprofile=="yes")
+		{
+			$frmHost->AddRow(S_DEVICE_TYPE,new CTextBox("devicetype",$devicetype,61));
+			$frmHost->AddRow(S_NAME,new CTextBox("name",$name,61));
+			$frmHost->AddRow(S_OS,new CTextBox("os",$os,61));
+			$frmHost->AddRow(S_SERIALNO,new CTextBox("serialno",$serialno,61));
+			$frmHost->AddRow(S_TAG,new CTextBox("tag",$tag,61));
+			$frmHost->AddRow(S_MACADDRESS,new CTextBox("macaddress",$macaddress,61));
+			$frmHost->AddRow(S_HARDWARE,new CTextArea("hardware",$hardware,60,4));
+			$frmHost->AddRow(S_SOFTWARE,new CTextArea("software",$software,60,4));
+			$frmHost->AddRow(S_CONTACT,new CTextArea("contact",$contact,60,4));
+			$frmHost->AddRow(S_LOCATION,new CTextArea("location",$location,60,4));
+			$frmHost->AddRow(S_NOTES,new CTextArea("notes",$notes,60,4));
+		}
+		else
+		{
+			$frmHost->AddVar("devicetype",	$devicetype);
+			$frmHost->AddVar("name",	$name);
+			$frmHost->AddVar("os",		$os);
+			$frmHost->AddVar("serialno",	$serialno);
+			$frmHost->AddVar("tag",		$tag);
+			$frmHost->AddVar("macaddress",	$macaddress);
+			$frmHost->AddVar("hardware",	$hardware);
+			$frmHost->AddVar("software",	$software);
+			$frmHost->AddVar("contact",	$contact);
+			$frmHost->AddVar("location",	$location);
+			$frmHost->AddVar("notes	",	$notes);
+		}
+
 		$frmHost->AddItemToBottomRow(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["hostid"]))
 		{
-			$frmHost->AddItemToBottomRow(SPACE);
-			$frmHost->AddItemToBottomRow(new CButton("register","add items from template"));
+//			$frmHost->AddItemToBottomRow(SPACE);
+//			$frmHost->AddItemToBottomRow(new CButton("register","add items from template"));
 			$frmHost->AddItemToBottomRow(SPACE);
 			$frmHost->AddItemToBottomRow(new CButton("delete",S_DELETE,"return Confirm('".S_DELETE_SELECTED_HOST_Q."');"));
 		}
@@ -1581,7 +1645,7 @@ function	insert_image_form()
 		$frmHost->AddItemToBottomRow(new CButton("cancel",S_CANCEL));
 		$frmHost->Show();
 	}
-
+/*
 	# Insert host profile form
 	function	insert_host_profile_form($hostid,$readonly=0)
 	{
@@ -1663,5 +1727,5 @@ function	insert_image_form()
 		}
 		$frmHostP->Show();
 	}
-
+*/
 ?>
