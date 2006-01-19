@@ -42,6 +42,32 @@
 <?php
 	update_profile("web.menu.config.last",$page["file"]);
 ?>
+
+<?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"alias"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'({config}==0)&&isset({save})'),
+		"name"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'({config}==0)&&(isset({save}))'),
+		"surname"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'({config}==0)&&(isset({save}))'),
+		"password1"=>		array(T_ZBX_STR, O_NO,	NULL,	NULL,		'({config}==0)&&(isset({save}))'),
+		"password2"=>		array(T_ZBX_STR, O_NO,	NULL,	NULL,		'({config}==0)&&(isset({save}))'),
+		"lang"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'({config}==0)&&(isset({save}))'),
+		"autologout"=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,3600),'({config}==0)&&(isset({save}))'),
+		"url"=>			array(T_ZBX_STR, O_NO,	NULL,	NULL,		'({config}==0)&&(isset({save}))'),
+		"refresh"=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,3600),'({config}==0)&&(isset({save}))'),
+
+		"userid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535),	NULL),
+
+		"config"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,3,4,5"),	NULL),
+		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL)
+	);
+
+	check_fields($fields);
+?>
+
 <?php
 	if(isset($_REQUEST["save"])&&($_REQUEST["config"]==0))
 	{
