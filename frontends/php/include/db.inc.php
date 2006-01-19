@@ -75,7 +75,7 @@
 		}
 	}
 
-	function	DBexecute($query)
+	function	DBexecute($query, $skip_error_messages=0)
 	{
 		global $DB,$DB_TYPE;
 
@@ -85,7 +85,7 @@
 		{
 			$result=mysql_query($query,$DB);
 
-			if(!$result)
+			if(!$result && $skip_error_messages==0)
 			{
 				error("SQL error: ".mysql_error());
 				error("Query: $query");

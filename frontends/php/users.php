@@ -223,7 +223,7 @@
 		{
 			insert_user_form(get_request("userid",NULL));
 
-			if(isset($_REQUEST["userid"])))
+			if(isset($_REQUEST["userid"]))
 			{
 				echo BR;
 				show_table_header("USER PERMISSIONS");

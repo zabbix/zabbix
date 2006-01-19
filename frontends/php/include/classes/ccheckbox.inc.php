@@ -27,6 +27,7 @@
 			parent::CTag("input","no");
 			$this->tag_body_start = "";
 			$this->AddOption('type','checkbox');
+			$this->AddOption('value','yes');
 			$this->SetName($name);
 			$this->SetCaption($caption);
 			$this->SetChecked($value);
