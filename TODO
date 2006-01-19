@@ -1,5 +1,8 @@
 1.1beta6:
 
+ - http://www.zabbix.com/forum/showthread.php?t=1997
+ - dos style EOL: http://www.zabbix.com/forum/showthread.php?t=1993
+ - problem with autoreg: http://www.zabbix.com/forum/showthread.php?t=1999
  - unknown SNMP type: http://www.zabbix.com/forum/showthread.php?t=1990
  - http://www.zabbix.com/forum/showthread.php?t=1992
  - http://www.zabbix.com/forum/showthread.php?t=1657
@@ -11,6 +14,7 @@
  - check if ZABBIX server accepts values returned by W32 agent
  - simple check tcp,80 does not work: http://www.zabbix.com/forum/showthread.php?t=1933
 
+ - clear error message if user/name password are wrong for zabbix_server
  - configurable location (left,right,top, bottom) of label for icons
  - set host to unrechable if unreachable within N seconds
  - explain how templates work in the documentation
