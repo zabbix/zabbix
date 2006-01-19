@@ -19,6 +19,24 @@
 **/
 ?>
 <?php
+	function	BETWEEN($min,$max)
+	{
+		return "({}>=$min&&{}<=$max)&&";
+	}
+
+	function	GT($value)
+	{
+		return "({}>=$value)&&";
+	}
+
+	function	IN($array)
+	{
+		return "in_array({},array($array))&&";
+	}
+
+	define("NOT_EMPTY","({}!='')&&");
+
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	function	calc_exp($fields,$field,$expression)
 	{
 		global $_REQUEST;
@@ -67,7 +85,7 @@
 			
 			if(($flags&P_ACT)&&(isset($_REQUEST[$field])))
 			{
-				info("Unset:".$field);
+//				info("Unset:".$field);
 				unset($_REQUEST[$field]);
 			}
 		}
@@ -189,6 +207,10 @@
 					else	continue;
 				}
 			}
+
+			if(isset($_REQUEST[$field])&&!get_magic_quotes_gpc()) {
+				$_REQUEST[$field]=addslashes($_REQUEST[$field]);
+			}
 		}
 		unset_not_in_list($fields);
 		if($critical)
@@ -199,7 +221,6 @@
 		}
 		if(!$ret)
 		{
-			info("zzz");
 			unset_action_vars($fields);
 		}
 		show_messages();

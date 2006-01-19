@@ -44,24 +44,6 @@
 ?>
 
 <?php
-	function	BETWEEN($min,$max)
-	{
-		return "({}>=$min&&{}<=$max)&&";
-	}
-
-	function	GT($value)
-	{
-		return "({}>=$value)&&";
-	}
-
-	function	IN($array)
-	{
-		return "in_array({},array($array))&&";
-	}
-
-	define("NOT_EMPTY","({}!='')&&");
-
-//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"config"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,3,4,5"),	NULL),
 
@@ -93,9 +75,7 @@
 	$_REQUEST["config"]=@iif(isset($_REQUEST["config"]),$_REQUEST["config"],get_profile("web.config.config",0));
 	update_profile("web.config.config",$_REQUEST["config"]);
 
-	if(check_fields($fields)!=TRUE)
-	{
-	}
+	check_fields($fields);
 
 	if(isset($_REQUEST["save"])&&isset($_REQUEST["config"])&&(in_array($_REQUEST["config"],array(0,5))))
 	{
