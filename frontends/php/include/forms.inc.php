@@ -1285,7 +1285,7 @@
 		$smtp_email=@iif(isset($_REQUEST["smtp_email"]),$_REQUEST["smtp_email"],"zabbix@localhost");
 		$exec_path=@iif(isset($_REQUEST["exec_path"]),$_REQUEST["exec_path"],"");
 
-		if(isset($_REQUEST["mediatypeid"]))
+		if(isset($_REQUEST["mediatypeid"])&&$_REQUEST["form"]!=1)
 		{
 			$result=DBselect("select mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path from media_type where mediatypeid=".$_REQUEST["mediatypeid"]);
 			$row=DBfetch($result);
