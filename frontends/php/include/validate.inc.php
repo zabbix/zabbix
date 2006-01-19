@@ -47,7 +47,7 @@
 		return eval($exec);
 	}
 
-	function	unset_all(&$fields)
+	function	unset_not_in_list(&$fields)
 	{
 		foreach($_REQUEST as $key => $val)
 		{
@@ -59,11 +59,35 @@
 		}
 	}
 
+	function	unset_action_vars($fields)
+	{
+		foreach($fields as $field => $checks)
+		{
+			list($type,$opt,$flags,$validation,$exception)=$checks;
+			
+			if(($flags&P_ACT)&&(isset($_REQUEST[$field])))
+			{
+				info("Unset:".$field);
+				unset($_REQUEST[$field]);
+			}
+		}
+	}
+
+	function	unset_all()
+	{
+		foreach($_REQUEST as $key => $val)
+		{
+			unset($_REQUEST[$key]);
+		}
+	}
+
 	function	check_fields(&$fields)
 	{
 		global	$_REQUEST;
 
 		$ret = TRUE;
+
+		$critical = FALSE;
 
 		foreach($fields as $field => $checks)
 		{
@@ -83,9 +107,16 @@
 			{
 				if(!isset($_REQUEST[$field]))
 				{
-					info("Field [".$field."] is mandatory");
 					$ret = FALSE;
-					continue;
+					info("Warning. Field [".$field."] is mandatory");
+					if($flags&P_SYS)
+					{
+						info("Critical error. Field [".$field."] is mandatory");
+						unset_all();
+						$critical = TRUE;
+						break;
+					}
+					else	continue;
 				}
 			}
 
@@ -93,9 +124,16 @@
 			{
 				if(isset($_REQUEST[$field]))
 				{
-					info("Field [".$field."] must be missing");
 					$ret = FALSE;
-					continue;
+					info("Warning. Field [".$field."] must be missing");
+					if($flags&P_SYS)
+					{
+						info("Critical error. Field [".$field."] must be missing");
+						unset_all();
+						$critical = TRUE;
+						break;
+					}
+					else	continue;
 				}
 				else continue;
 			}
@@ -107,15 +145,29 @@
 
 
 			if( ($type == T_ZBX_INT) && !is_numeric($_REQUEST[$field])) {
-				info("Field [".$field."] is not integer");
 				$ret = FALSE;
-				continue;
+				info("Warning. Field [".$field."] is not integer");
+				if($flags&P_SYS)
+				{
+					info("Critical error. Field [".$field."] is not integer");
+					unset_all();
+					$critical = TRUE;
+					break;
+				}
+				else	continue;
 			}
 
 			if( ($type == T_ZBX_DBL) && !is_numeric($_REQUEST[$field])) {
-				info("Field [".$field."] is not double");
 				$ret = FALSE;
-				continue;
+				info("Warning. Field [".$field."] is not double");
+				if($flags&P_SYS)
+				{
+					info("Critical error. Field [".$field."] is not double");
+					unset_all();
+					$critical = TRUE;
+					break;
+				}
+				else	continue;
 			}
 
 			if(($exception==NULL)||($except==TRUE))
@@ -125,13 +177,32 @@
 
 				if(!$valid)
 				{
-					info("Incorrect value for [".$field."]");
 					$ret = FALSE;
-					continue;
+					info("Warning. Incorrect value for [".$field."]");
+					if($flags&P_SYS)
+					{
+						info("Critical error. Incorrect value for [".$field."]");
+						unset_all();
+						$critical = TRUE;
+						break;
+					}
+					else	continue;
 				}
 			}
 		}
-		unset_all($fields);
+		unset_not_in_list($fields);
+		if($critical)
+		{
+			show_messages(FALSE, "", "Invalid URL");
+			show_page_footer();
+			exit;
+		}
+		if(!$ret)
+		{
+			info("zzz");
+			unset_action_vars($fields);
+		}
+		show_messages();
 		return $ret;
 	}
 ?>

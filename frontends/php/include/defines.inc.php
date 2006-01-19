@@ -32,6 +32,7 @@
 	define("P_USR",				2);
 	define("P_GET",				4);
 	define("P_POST",			8);
+	define("P_ACT",				16);
 
 //	MISC PARAMETERS
 	define("MAP_OUTPUT_FORMAT",		"DEFAULT");
