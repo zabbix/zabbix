@@ -84,7 +84,7 @@
 	
 		if(isset($_REQUEST[$parameter]))
 		{
-			return "&amp;$parameter=".$_REQUEST[$parameter];
+			return "&$parameter=".$_REQUEST[$parameter];
 		}
 		else
 		{

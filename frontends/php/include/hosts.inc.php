@@ -43,7 +43,7 @@
 			return 0;
 		}
 
-		if( isset($useip) && ($useip=="on") )
+		if($useip=="on" || $useip=="yes" || $useip==1)
 		{
 			$useip=1;
 		}
@@ -51,7 +51,6 @@
 		{
 			$useip=0;
 		}
-
 
 		$sql="insert into hosts (host,port,status,useip,ip,disable_until,available) values ('$host',$port,$status,$useip,'$ip',0,".HOST_AVAILABLE_UNKNOWN.")";
 		$result=DBexecute($sql);
@@ -104,7 +103,7 @@
 		}
 
 
-		if($useip=="on")
+		if($useip=="on" || $useip=="yes" || $useip==1)
 		{
 			$useip=1;
 		}
@@ -112,6 +111,7 @@
 		{
 			$useip=0;
 		}
+
 		$sql="update hosts set host='$host',port=$port,useip=$useip,ip='$ip' where hostid=$hostid";
 		$result=DBexecute($sql);
 
@@ -175,7 +175,10 @@
 			{
 				$sql="update hosts set status=".HOST_STATUS_DELETED.",host=host||' [DEL$i]' where hostid=$hostid";
 			}
-			if($ret = DBexecute($sql))	break;
+			if($ret = DBexecute($sql,1))	break;
+		}
+		if($ret){
+			delete_host_profile($hostid);
 		}
 		return	$ret;
 	}
