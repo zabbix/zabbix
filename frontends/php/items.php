@@ -40,23 +40,6 @@
 
 <?php
 
-	function	BETWEEN($min,$max)
-	{
-		return "({}>=$min&&{}<=$max)&&";
-	}
-
-	function	GT($value)
-	{
-		return "({}>=$value)&&";
-	}
-
-	function	IN($array)
-	{
-		return "({} in_array($array))&&";
-	}
-
-	define("NOT_EMPTY","({}!='')&&");
-
 //		VAR			TYPE	OPTIONAL TABLE	FIELD	OPTIONAL	VALIDATION	EXCEPTION
 	$fields=array(
 		"description"=>	array(T_ZBX_STR, O_MAND, "items", NULL,		NOT_EMPTY,		NULL),
@@ -93,11 +76,11 @@
 <?php
 	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
 	{
-		unset($_REQUEST["groupid"]);
+//		unset($_REQUEST["groupid"]);
 	}
 	if(isset($_REQUEST["hostid"])&&($_REQUEST["hostid"]==0))
 	{
-		unset($_REQUEST["hostid"]);
+//		unset($_REQUEST["hostid"]);
 	}
 ?>
 
@@ -225,203 +208,189 @@
 
 <?php
 
-	if(!isset($_REQUEST["register"]))
+	$db_hosts=DBselect("select hostid from hosts");
+	if(isset($_REQUEST["form"])&&isset($_REQUEST["hostid"])&&DBnum_rows($db_hosts)>0)
 	{
+		insert_item_form();
+	} else {
+		$form = new CForm();
 
-	$h1=S_CONFIGURATION_OF_ITEMS_BIG;
-
-	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
-	{
-		unset($_REQUEST["groupid"]);
-	}
-
-	$h2=S_GROUP."&nbsp;";
-	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
-	$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
-
-	$result=DBselect("select groupid,name from groups order by name");
-	while($row=DBfetch($result))
-	{
-// Check if at least one host with read permission exists for this group
-		$result2=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg where hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid and h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host");
-		$cnt=0;
-		while($row2=DBfetch($result2))
-		{
-			if(!check_right("Host","U",$row2["hostid"]))
-			{
-				continue;
-			}
-			$cnt=1; break;
-		}
-		if($cnt!=0)
-		{
-			$h2=$h2.form_select("groupid",$row["groupid"],$row["name"]);
-		}
-	}
-	$h2=$h2."</select>";
-
-	$h2=$h2."&nbsp;".S_HOST."&nbsp;";
-	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
-	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
-
-	if(isset($_REQUEST["groupid"]))
-	{
-		$sql="select h.hostid,h.host from hosts h,hosts_groups hg where hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host";
-	}
-	else
-	{
-		$sql="select h.hostid,h.host from hosts h where h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host";
-	}
-
-	$result=DBselect($sql);
-	while($row=DBfetch($result))
-	{
-		if(!check_right("Host","U",$row["hostid"]))
-		{
-			continue;
-		}
-		$h2=$h2.form_select("hostid",$row["hostid"],$row["host"]);
-	}
-	$h2=$h2."</select>";
-	$h2=$h2."&nbsp;|&nbsp;";
-	$h2=$h2."<input class=\"button\" type=\"submit\" name=\"register\" value=\"".S_CREATE_ITEM."\">";
-
-	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"items.php\">", "</form>");
-?>
-
-
-<?php
-
-	if(isset($_REQUEST["hostid"])) 
-	{
-		$table  = new CTableInfo();
-		$table->setHeader(array(S_ID,S_KEY,S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,S_ERROR));
-//		$h="<form method=\"get\" action=\"items.php\">";
-//		$h=$h."<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_REQUEST["hostid"]." size=8>";
-
-//		$table->setAfterHeader($h);
-
-		$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.nextcheck,h.hostid,i.type,i.trends,i.error from hosts h,items i where h.hostid=i.hostid and h.hostid=".$_REQUEST["hostid"]." order by h.host,i.key_,i.description");
-		$col=0;
+		$_REQUEST["groupid"] = get_request("groupid",0);
+		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
+		$cmbGroup->AddItem(0,S_ALL_SMALL);
+		$result=DBselect("select groupid,name from groups order by name");
 		while($row=DBfetch($result))
 		{
-        		if(!check_right("Item","R",$row["itemid"]))
+	// Check if at least one host with read permission exists for this group
+			$result2=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg".
+				" where hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid and".
+				" h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host");
+			while($row2=DBfetch($result2))
 			{
-				continue;
+				if(!check_right("Host","U",$row2["hostid"]))	continue;
+				$cmbGroup->AddItem($row["groupid"],$row["name"]);
+				break;
 			}
-
-			$key=iif(check_right("Item","U",$row["itemid"]),
-				"<A HREF=\"items.php?register=change&itemid=".$row["itemid"].url_param("hostid").url_param("groupid")."#form\">".$row["key_"]."</A>",$row["key_"]);
-
-			$input="<INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"".$row["itemid"]."\"> ".$row["itemid"];
-
-			switch($row["type"])
-			{
-				case 0:
-					$type=S_ZABBIX_AGENT;
-					break;
-				case 7:
-					$type=S_ZABBIX_AGENT_ACTIVE;
-					break;
-				case 1:
-					$type=S_SNMPV1_AGENT;
-					break;
-				case 2:
-					$type=S_ZABBIX_TRAPPER;
-					break;
-				case 3:
-					$type=S_SIMPLE_CHECK;
-					break;
-				case 4:
-					$type=S_SNMPV2_AGENT;
-					break;
-				case 6:
-					$type=S_SNMPV3_AGENT;
-					break;
-				case 5:
-					$type=S_ZABBIX_INTERNAL;
-					break;
-				default:
-					$type=S_UNKNOWN;
-					break;
-			}
-
-			
-			switch($row["status"])
-			{
-				case 0:
-					$status=new CCol(new CLink(S_ACTIVE, "items.php?itemid=".$row["itemid"]."&hostid=".$_REQUEST["hostid"]."&register=changestatus&status=1","off"),"off");
-					break;
-				case 1:
-					$status=new CCol(new CLink(S_ACTIVE, "items.php?itemid=".$row["itemid"]."&hostid=".$_REQUEST["hostid"]."&register=changestatus&status=0","on"),"on");
-					break;
-				case 3:
-					$status=new CCol(S_NOT_SUPPORTED,"unknown");
-					break;
-				default:
-					$status=S_UNKNOWN;
-			}
-	
-			if($row["error"] == "")
-			{
-				$error=new CCol("&nbsp;","off");
-			}
-			else
-			{
-				$error=new CCol($row["error"],"on");
-			}
-			$table->AddRow(array(
-				$input,
-				$key,
-				$row["description"],
-				$row["delay"],
-				$row["history"],
-				$row["trends"],
-				$type,
-				$status,
-				$error
-				));
 		}
-//		$table->show();
+		$form->AddItem(S_GROUP.SPACE);
+		$form->AddItem($cmbGroup);
 
-		$footerButtons = array();
-		array_push($footerButtons, new CButton('register','Activate selected',
-			"return Confirm('".S_ACTIVATE_SELECTED_ITEMS_Q."');"));
-		array_push($footerButtons, new CButton('register','Disable selected',
-			"return Confirm('".S_DISABLE_SELECTED_ITEMS_Q."');"));
-		array_push($footerButtons, new CButton('register','Delete selected',
-			"return Confirm('".S_DELETE_SELECTED_ITEMS_Q."');"));
-		$table->SetFooter(new CCol($footerButtons),'table_footer');
-
-		$form = new CForm('items.php');
-		$form->AddVar('hostid',$_REQUEST["hostid"]);
-		$form->AddItem($table);
-		$form->Show();
-
-
-//		$h="<input class=\"button\" type=\"submit\" name=\"register\" value=\"Activate selected\" onClick=\"return Confirm('".S_ACTIVATE_SELECTED_ITEMS_Q."');\">";
-//		$h=$h."<input class=\"button\" type=\"submit\" name=\"register\" value=\"Disable selected\" onClick=\"return Confirm('".S_DISABLE_SELECTED_ITEMS_Q."');\">";
-//		$h=$h."<input class=\"button\" type=\"submit\" name=\"register\" value=\"Delete selected\" onClick=\"return Confirm('".S_DELETE_SELECTED_ITEMS_Q."');\">";
-//		$h=$h."</form>";
-
-//		show_table_header($h);
-	}
-
-	}
-?>
-
-<?php
-	if(isset($_REQUEST["register"])&&(in_array($_REQUEST["register"],array(S_CREATE_ITEM,"change"))))
-	{
-		$result=DBselect("select count(*) as cnt from hosts");
-		$row=DBfetch($result);
-		if($row["cnt"]>0)
+		if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]>0)
 		{
-			insert_item_form();
+			$sql="select h.hostid,h.host from hosts h,hosts_groups hg".
+				" where hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and".
+				" h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host";
 		}
+		else
+		{
+			$sql="select h.hostid,h.host from hosts h where h.status<>".HOST_STATUS_DELETED.
+				" group by h.hostid,h.host order by h.host";
+		}
+
+		$result=DBselect($sql);
+
+		$_REQUEST["hostid"] = get_request("hostid",0);
+		$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit();");
+
+		$correct_hostid='no';
+		$first_hostid = -1;
+		while($row=DBfetch($result))
+		{
+			if(!check_right("Host","U",$row["hostid"]))	continue;
+			$cmbHosts->AddItem($row["hostid"],$row["host"]);
+
+			if($_REQUEST["hostid"]!=0){
+				if($_REQUEST["hostid"]==$row["hostid"])
+					$correct_hostid = 'ok';
+			}
+			if($first_hostid <= 0)
+				$first_hostid = $row["hostid"];
+		}
+		if($correct_hostid!='ok')
+			$_REQUEST["hostid"] = $first_hostid;
+
+		$form->AddItem(SPACE.S_HOST.SPACE);
+		$form->AddItem($cmbHosts);
+		$form->AddItem(SPACE."|".SPACE);
+		$form->AddItem(new CButton("form",S_CREATE_ITEM));
+		
+		show_header2(S_CONFIGURATION_OF_ITEMS_BIG, $form);
+	?>
+
+
+	<?php
+
+		if(isset($_REQUEST["hostid"])) 
+		{
+			$table  = new CTableInfo();
+			$table->setHeader(array(S_ID,S_KEY,S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,S_ERROR));
+	//		$h="<form method=\"get\" action=\"items.php\">";
+	//		$h=$h."<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_REQUEST["hostid"]." size=8>";
+
+	//		$table->setAfterHeader($h);
+
+			$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.nextcheck,h.hostid,i.type,i.trends,i.error from hosts h,items i where h.hostid=i.hostid and h.hostid=".$_REQUEST["hostid"]." order by h.host,i.key_,i.description");
+			$col=0;
+			while($row=DBfetch($result))
+			{
+				if(!check_right("Item","R",$row["itemid"]))
+				{
+					continue;
+				}
+
+				$key=iif(check_right("Item","U",$row["itemid"]),
+					"<A HREF=\"items.php?form=0&itemid=".$row["itemid"].url_param("hostid").url_param("groupid")."\">".$row["key_"]."</A>",$row["key_"]);
+
+				$input="<INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"".$row["itemid"]."\"> ".$row["itemid"];
+
+				switch($row["type"])
+				{
+					case 0:
+						$type=S_ZABBIX_AGENT;
+						break;
+					case 7:
+						$type=S_ZABBIX_AGENT_ACTIVE;
+						break;
+					case 1:
+						$type=S_SNMPV1_AGENT;
+						break;
+					case 2:
+						$type=S_ZABBIX_TRAPPER;
+						break;
+					case 3:
+						$type=S_SIMPLE_CHECK;
+						break;
+					case 4:
+						$type=S_SNMPV2_AGENT;
+						break;
+					case 6:
+						$type=S_SNMPV3_AGENT;
+						break;
+					case 5:
+						$type=S_ZABBIX_INTERNAL;
+						break;
+					default:
+						$type=S_UNKNOWN;
+						break;
+				}
+
+				
+				switch($row["status"])
+				{
+					case 0:
+						$status=new CCol(new CLink(S_ACTIVE, "items.php?itemid=".$row["itemid"]."&hostid=".$_REQUEST["hostid"]."&register=changestatus&status=1","off"),"off");
+						break;
+					case 1:
+						$status=new CCol(new CLink(S_ACTIVE, "items.php?itemid=".$row["itemid"]."&hostid=".$_REQUEST["hostid"]."&register=changestatus&status=0","on"),"on");
+						break;
+					case 3:
+						$status=new CCol(S_NOT_SUPPORTED,"unknown");
+						break;
+					default:
+						$status=S_UNKNOWN;
+				}
+		
+				if($row["error"] == "")
+				{
+					$error=new CCol("&nbsp;","off");
+				}
+				else
+				{
+					$error=new CCol($row["error"],"on");
+				}
+				$table->AddRow(array(
+					$input,
+					$key,
+					$row["description"],
+					$row["delay"],
+					$row["history"],
+					$row["trends"],
+					$type,
+					$status,
+					$error
+					));
+			}
+	//		$table->show();
+
+			$footerButtons = array();
+			array_push($footerButtons, new CButton('register','Activate selected',
+				"return Confirm('".S_ACTIVATE_SELECTED_ITEMS_Q."');"));
+			array_push($footerButtons, SPACE);
+			array_push($footerButtons, new CButton('register','Disable selected',
+				"return Confirm('".S_DISABLE_SELECTED_ITEMS_Q."');"));
+			array_push($footerButtons, SPACE);
+			array_push($footerButtons, new CButton('register','Delete selected',
+				"return Confirm('".S_DELETE_SELECTED_ITEMS_Q."');"));
+			$table->SetFooter(new CCol($footerButtons),'table_footer');
+
+			$form = new CForm('items.php');
+			$form->AddVar('hostid',$_REQUEST["hostid"]);
+			$form->AddItem($table);
+			$form->Show();
+		}
+
 	}
 ?>
-
 <?php
 	show_page_footer();
 ?>

@@ -351,72 +351,98 @@
 <?php
 	if($_REQUEST["config"]==2)
 	{
-	$h1=S_CONFIGURATION_OF_TEMPLATES_LINKAGE;
-
-	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
-	{
-		unset($_REQUEST["groupid"]);
-	}
-	if(isset($_REQUEST["hostid"])&&($_REQUEST["hostid"]==0))
-	{
-		unset($_REQUEST["hostid"]);
-	}
-
-	$h2=S_GROUP."&nbsp;";
-	$h2=$h2."<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"".$_REQUEST["config"]."\">";
-	if(isset($_REQUEST["hostid"]))
-	{
-		$h2=$h2."<input class=\"biginput\" name=\"hostid\" type=\"hidden\" value=\"".$_REQUEST["hostid"]."\">";
-	}
-	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
-	$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
-
-	$result=DBselect("select groupid,name from groups order by name");
-	while($row=DBfetch($result))
-	{
-// Check if at least one host with read permission exists for this group
-		$result2=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg where hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid and h.status not in (".HOST_STATUS_DELETED.") group by h.hostid,h.host order by h.host");
-		$cnt=0;
-		while($row2=DBfetch($result2))
+		if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
 		{
-			if(!check_right("Host","U",$row2["hostid"]))
+			unset($_REQUEST["groupid"]);
+		}
+		if(isset($_REQUEST["hostid"])&&($_REQUEST["hostid"]==0))
+		{
+			unset($_REQUEST["hostid"]);
+		}
+
+		$form = new CForm("hosts.php");
+		$form->AddVar("config",$_REQUEST["config"]);
+		if(isset($_REQUEST["hostid"]))
+		{
+			$form->AddVar("hostid",$_REQUEST["hostid"]);
+		}
+		$cmbGroup = new CComboBox("groupid",get_request("groupid",0),"submit()");
+		$cmbGroup->AddItem(0,S_ALL_SMALL);
+
+		$result=DBselect("select groupid,name from groups order by name");
+		while($row=DBfetch($result))
+		{
+	// Check if at least one host with read permission exists for this group
+			$result2=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg".
+				" where hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid and".
+				" h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host");
+			while($row2=DBfetch($result2))
 			{
-				continue;
+				if(!check_right("Host","U",$row2["hostid"]))	continue;
+				$cmbGroup->AddItem($row["groupid"],$row["name"]);
+				break;
 			}
-			$cnt=1; break;
 		}
-		if($cnt!=0)
+		$form->AddItem(S_GROUP.SPACE);
+		$form->AddItem($cmbGroup);
+
+		$cmbHosts = new CComboBox("hostid",get_request("hostid",0),"submit()");
+		$cmbHosts->AddItem(0,S_SELECT_HOST_DOT_DOT_DOT);
+		if(isset($_REQUEST["groupid"])){
+			$sql="select h.hostid,h.host from hosts h,hosts_groups hg".
+				" where hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid".
+				" and h.status not in (".HOST_STATUS_DELETED.") group by h.hostid,h.host".
+				" order by h.host";
+		} else {
+			$sql="select h.hostid,h.host from hosts h where h.status<>".HOST_STATUS_DELETED.
+				" group by h.hostid,h.host order by h.host";
+		}
+
+		$correct_hostid = 'no';
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
 		{
-			$h2=$h2.form_select("groupid",$row["groupid"],$row["name"]);
+			if(!check_right("Host","U",$row["hostid"]))	continue;
+			$cmbHosts->AddItem($row["hostid"],$row["host"]);
+			if(isset($_REQUEST["hostid"]))
+				if($_REQUEST["hostid"]==$row["hostid"])
+					$correct_hostid = 'ok';
 		}
-	}
-	$h2=$h2."</select>";
+		if($correct_hostid!='ok')
+			unset($_REQUEST["hostid"]);
 
-	$h2=$h2."&nbsp;".S_HOST."&nbsp;";
-	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
-	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
+		$form->AddItem(SPACE.S_HOST.SPACE);
+		$form->AddItem($cmbHosts);
 
-	if(isset($_REQUEST["groupid"]))
-	{
-		$sql="select h.hostid,h.host from hosts h,hosts_groups hg where hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and h.status not in (".HOST_STATUS_DELETED.") group by h.hostid,h.host order by h.host";
-	}
-	else
-	{
-		$sql="select h.hostid,h.host from hosts h where h.status not in (".HOST_STATUS_DELETED.") group by h.hostid,h.host order by h.host";
-	}
+		show_header2(S_CONFIGURATION_OF_TEMPLATES_LINKAGE, $form);
 
-	$result=DBselect($sql);
-	while($row=DBfetch($result))
-	{
-		if(!check_right("Host","U",$row["hostid"]))
+		if(isset($_REQUEST["hostid"]))
 		{
-			continue;
-		}
-		$h2=$h2.form_select("hostid",$row["hostid"],$row["host"]);
-	}
-	$h2=$h2."</select>";
+			echo BR;
+			@insert_template_form($_REQUEST["hostid"], $_REQUEST["hosttemplateid"]);
+			echo BR;
 
-	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"hosts.php\">", "</form>");
+			$table = new CTableInfo(S_NO_LINKAGES_DEFINED);
+			$table->setHeader(array(S_HOST,S_TEMPLATE,S_ITEMS,S_TRIGGERS,S_GRAPHS,S_ACTIONS));
+
+			$result=DBselect("select * from hosts_templates where hostid=".$_REQUEST["hostid"]);
+			while($row=DBfetch($result))
+			{
+				$host=get_host_by_hostid($row["hostid"]);
+				$template=get_host_by_hostid($row["templateid"]);
+				$actions="<a href=\"hosts.php?config=2&hostid=".$row["hostid"]."&hosttemplateid=".$row["hosttemplateid"]."\">".S_CHANGE."</a>";
+
+				$table->addRow(array(
+					$host["host"],
+					$template["host"],
+					get_template_permission_str($row["items"]),
+					get_template_permission_str($row["triggers"]),
+					get_template_permission_str($row["graphs"]),
+					$actions
+					));
+			}
+			$table->show();
+		}
 	}
 ?>
 <?php
@@ -477,46 +503,6 @@
 		}
 	}
 ?>
-
-<?php
-	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
-	{
-		unset($_REQUEST["groupid"]);
-	}
-?>
-
-<?php
-	if(isset($_REQUEST["hostid"])&&$_REQUEST["config"]==2)
-	{
-		@insert_template_form($_REQUEST["hostid"], $_REQUEST["hosttemplateid"]);
-	}
-	if(isset($_REQUEST["hostid"])&&($_REQUEST["config"]==2))
-	{
-		$table = new CTableInfo(S_NO_LINKAGES_DEFINED);
-		$table->setHeader(array(S_HOST,S_TEMPLATE,S_ITEMS,S_TRIGGERS,S_GRAPHS,S_ACTIONS));
-
-		$result=DBselect("select * from hosts_templates where hostid=".$_REQUEST["hostid"]);
-		while($row=DBfetch($result))
-		{
-			$host=get_host_by_hostid($row["hostid"]);
-			$template=get_host_by_hostid($row["templateid"]);
-//		$members=array("hide"=>1,"value"=>"");
-#			$actions="<A HREF=\"hosts.php?config=".$_REQUEST["config"]."&groupid=".$row["groupid"]."#form\">".S_CHANGE."</A>";
-			$actions="<a href=\"hosts.php?config=2&hostid=".$row["hostid"]."&hosttemplateid=".$row["hosttemplateid"]."\">".S_CHANGE."</a>";
-
-			$table->addRow(array(
-				$host["host"],
-				$template["host"],
-				get_template_permission_str($row["items"]),
-				get_template_permission_str($row["triggers"]),
-				get_template_permission_str($row["graphs"]),
-				$actions
-				));
-		}
-		$table->show();
-	}
-?>
-
 <?php
 	if($_REQUEST["config"]==0)
 	{
@@ -645,9 +631,6 @@
 
 		}
 	}
-?>
-
-<?php
 ?>
 <?php
 	show_page_footer();
