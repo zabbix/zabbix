@@ -78,15 +78,22 @@ int	process_trap(int sockfd,char *s, int max_len)
 	{
 		line=strtok(s,"\n");
 		host=strtok(NULL,"\n");
-		if(autoregister(host) == SUCCEED)
+		if(host == NULL)
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "New host registered [%s]", host);
+			zabbix_log( LOG_LEVEL_WARNING, "ZBX_GET_ACTIVE_CHECKS: host is null. Ignoring.");
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Host already exists [%s]", host);
+			if(autoregister(host) == SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_DEBUG, "New host registered [%s]", host);
+			}
+			else
+			{
+				zabbix_log( LOG_LEVEL_DEBUG, "Host already exists [%s]", host);
+			}
+			ret=send_list_of_active_checks(sockfd, host);
 		}
-		ret=send_list_of_active_checks(sockfd, host);
 	}
 /* Process information sent by zabbix_sender */
 	else
