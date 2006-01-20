@@ -260,7 +260,7 @@ A.off:active 	{	color:#00AA00;	text-decoration: underline;}
 
 A.on:link	{	color:#AA0000;	text-decoration: none; }
 A.on:visited 	{	color:#AA0000;	text-decoration: none; }
-A.no:hover 	{	color:#AA0000;	text-decoration: underline; }
+A.on:hover 	{	color:#AA0000;	text-decoration: underline; }
 A.on:active 	{	color:#AA0000;	text-decoration: underline;}
 
 .on
