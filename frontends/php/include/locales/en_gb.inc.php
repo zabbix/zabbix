@@ -345,6 +345,8 @@
 	"S_LINK_WITH_HOST"=>			"Link with host",
 	"S_USE_PROFILE"=>			"Use profile",
 	"S_DELETE_SELECTED_HOST_Q"=>		"Delete selected host?",
+	"S_DELETE_SELECTED_GROUP_Q"=>		"Delete selected group?",
+	"S_DELETE_SELECTED_GROUPS_Q"=>		"Delete selected groups?",
 	"S_GROUP_NAME"=>			"Group name",
 	"S_HOST_GROUP"=>			"Host group",
 	"S_HOST_GROUPS"=>			"Host groups",

@@ -191,6 +191,17 @@
 		return DBexecute($sql);
 	}
 
+	function	get_group_by_groupid($groupid)
+	{
+		$result=DBselect("select * from groups where groupid=".$groupid);
+		if(DBnum_rows($result) == 1)
+		{
+			return DBfetch($result);
+		}
+		error("No groups with groupid=[$groupid]");
+		return  FALSE;
+	}
+
 	function	get_host_by_itemid($itemid)
 	{
 		$sql="select h.* from hosts h, items i where i.hostid=h.hostid and i.itemid=$itemid";

@@ -55,6 +55,7 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 // Include Classes
 	include_once("include/classes/ctag.inc.php");
 	include_once("include/classes/cvar.inc.php");
+	include_once("include/classes/cspan.inc.php");
 	include_once("include/classes/cimg.inc.php");
 	include_once("include/classes/clink.inc.php");
 	include_once("include/classes/chelp.inc.php");
@@ -630,21 +631,6 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		return	"$priorities,$md5sum";
 	}
 
-	function	get_group_by_groupid($groupid)
-	{
-		$sql="select * from groups where groupid=$groupid"; 
-		$result=DBselect($sql);
-		if(DBnum_rows($result) == 1)
-		{
-			return	DBfetch($result);	
-		}
-		else
-		{
-			error("No groups with groupid=[$groupid]");
-		}
-		return	$result;
-	}
-
 	function	get_usergroup_by_usrgrpid($usrgrpid)
 	{
 		$result=DBselect("select usrgrpid,name from usrgrp where usrgrpid=$usrgrpid"); 
@@ -711,11 +697,17 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 		if(!$bool)
 		{
+			if(is_null($errmsg))
+				return;
+
 			$msg="ERROR:".$errmsg;
 			$color="#AA0000";
 		}
 		else
 		{
+			if(is_null($msg))
+				return;
+
 			$color="#223344";
 		}
 		echo "<p align=center>";
@@ -2824,19 +2816,22 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 	function insert_confirm_javascript()
 	{
-		echo "<script language=\"JavaScript\" type=\"text/javascript\">\n";
-		echo "function Confirm(msg)\n";
-		echo "{\n";
-		echo "	if(confirm( msg))\n";
-		echo "	{\n";
-		echo "		return true;\n";
-		echo "	}\n";
-		echo "	else\n";
-		echo "	{\n";
-		echo "		return false;\n";
-		echo "	}\n";
-		echo "}\n";
-		echo "</script>\n";
+		echo "
+<script language=\"JavaScript\" type=\"text/javascript\">
+	function Confirm(msg)
+	{
+		if(confirm(msg,'title'))
+			return true;
+		else
+			return false;
+	}
+	function Redirect(url)
+	{
+		window.location = url;
+		return false;
+	}	
+</script>
+		";
 	}
 
 /* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
