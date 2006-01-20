@@ -249,9 +249,9 @@
 	{
 		global  $_REQUEST;
 
+		$hostid=@iif(isset($_REQUEST["hostid"]),$_REQUEST["hostid"],0);
 		$description=@iif(isset($_REQUEST["description"]),$_REQUEST["description"],"");
 		$key=@iif(isset($_REQUEST["key"]),$_REQUEST["key"],"");
-		$host=@iif(isset($_REQUEST["host"]),$_REQUEST["host"],"");
 		$port=@iif(isset($_REQUEST["port"]),$_REQUEST["port"],10050);
 		$delay=@iif(isset($_REQUEST["delay"]),$_REQUEST["delay"],30);
 		$history=@iif(isset($_REQUEST["history"]),$_REQUEST["history"],90);
@@ -265,7 +265,6 @@
 		$snmp_port=@iif(isset($_REQUEST["snmp_port"]),$_REQUEST["snmp_port"],161);
 		$units=@iif(isset($_REQUEST["units"]),$_REQUEST["units"],'');
 		$multiplier=@iif(isset($_REQUEST["multiplier"]),$_REQUEST["multiplier"],0);
-		$hostid=@iif(isset($_REQUEST["hostid"]),$_REQUEST["hostid"],0);
 		$delta=@iif(isset($_REQUEST["delta"]),$_REQUEST["delta"],0);
 
 		$snmpv3_securityname=@iif(isset($_REQUEST["snmpv3_securityname"]),$_REQUEST["snmpv3_securityname"],"");
@@ -277,7 +276,13 @@
 		$logtimefmt=@iif(isset($_REQUEST["logtimefmt"]),$_REQUEST["logtimefmt"],"");
 		$groupid=@iif(isset($_REQUEST["groupid"]),$_REQUEST["groupid"],0);
 
-		if(isset($_REQUEST["register"])&&($_REQUEST["register"] == "change"))
+		$host=@iif(isset($_REQUEST["host"]),$_REQUEST["host"],NULL);
+		if(is_null($host)&&$hostid>0){
+			$host_info = get_host_by_hostid($hostid);
+			$host = $host_info["host"];
+		}
+
+		if(isset($_REQUEST["itemid"])&&($_REQUEST["form"] != 1))
 		{
 			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.snmp_port,i.units,i.multiplier,h.hostid,i.delta,i.trends,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,i.logtimefmt from items i,hosts h where i.itemid=".$_REQUEST["itemid"]." and h.hostid=i.hostid");
 			$row=DBfetch($result);
@@ -480,6 +485,10 @@
 				new CButton("register","delete","return Confirm('Delete selected item?');")
 			);
 		}
+		array_push($frmRow,
+			SPACE,
+			new CButtonCancel(url_param("groupid").url_param("hostid")));
+
 		$frmItem->AddSpanRow($frmRow,"form_row_last");
 
 	        $cmbGroups = new CComboBox("groupid",$groupid,"submit()");		
@@ -491,11 +500,9 @@
 	                $hosts=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg where hg.groupid=".$group["groupid"]." and hg.hostid=h.hostid and h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host");
 	                while($host=DBfetch($hosts))
 	                {
-	                        if(check_right("Host","U",$host["hostid"]))
-	                        {
-					$cmbGroups->AddItem($group["groupid"],$group["name"]);
-	                                break;
-	                        }
+	                        if(!check_right("Host","U",$host["hostid"])) continue;
+				$cmbGroups->AddItem($group["groupid"],$group["name"]);
+				break;
 	                }
 	        }
 		$frmItem->AddRow(S_GROUP,$cmbGroups);
