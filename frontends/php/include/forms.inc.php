@@ -98,22 +98,22 @@
 	# Insert form for User
 	function	insert_user_form($userid,$profile=0)
 	{
-		$frm_title = "";
-		if(isset($userid))
+		$frm_title = S_USER;
+		if(isset($userid)&&$_REQUEST["form"]!=1)
 		{
 			$user=get_user_by_userid($userid);
-			$result=DBselect("select u.alias,u.name,u.surname,u.passwd,u.url,u.autologout,u.lang,u.refresh from users u where u.userid=$userid");
-	
-			$alias		= get_request("alias",$user["alias"]);
-			$name		= get_request("name",$user["name"]);
-			$surname	= get_request("surname",$user["surname"]);
+			$frm_title = S_USER." \"".$user["alias"]."\"";
+		}
+		if(isset($userid)&&$_REQUEST["form"]!=1)
+		{
+			$alias		= $user["alias"];
+			$name		= $user["name"];
+			$surname	= $user["surname"];
 			$password	= "";
-			$url		= get_request("url",$user["url"]);
-			$autologout	= get_request("autologout",$user["autologout"]);
-			$lang		= get_request("lang",$user["lang"]);
-			$refresh	= get_request("refresh",$user["refresh"]);
-
-			$frm_title = SPACE."\"".$user["alias"]."\"";
+			$url		= $user["url"];
+			$autologout	= $user["autologout"];
+			$lang		= $user["lang"];
+			$refresh	= $user["refresh"];
 		}
 		else
 		{
@@ -127,15 +127,15 @@
 			$refresh	= get_request("refresh","30");
 		}
 
-		$frmUser = new CFormTable(S_USER.$frm_title);
+		$frmUser = new CFormTable($frm_title);
 		$frmUser->SetHelp("web.users.users.php");
+		$frmUser->AddVar("config",get_request("config",0));
 
 		if($profile==0) 
 			$frmUser->SetAction("users.php");
 		else
 			$frmUser->SetAction("profile.php");
 
-		$frmUser->AddVar("config",$_REQUEST["config"]);
 		if(isset($userid))	$frmUser->AddVar("userid",$userid);
 
 		if($profile==0)
@@ -169,11 +169,11 @@
 		if(isset($userid))
 		{
 			$frmUser->AddItemToBottomRow(SPACE);
-			$frmUser->AddItemToBottomRow(new CButton('delete',S_DELETE,
-				"return Confirm('Delete selected user?');"));
+			$frmUser->AddItemToBottomRow(new CButtonDelete(
+				"Delete selected user?",url_param("config").url_param("userid")));
 		}
 		$frmUser->AddItemToBottomRow(SPACE);
-		$frmUser->AddItemToBottomRow(new CButton('cancel',S_CANCEL));
+		$frmUser->AddItemToBottomRow(new CButtonCancel(url_param("config")));
 		$frmUser->Show();
 	}
 
@@ -452,34 +452,38 @@
 	{
 		global  $_REQUEST;
 
+		$frm_title = S_HOST_GROUP;
 		if(isset($groupid))
 		{
 			$groupid=get_group_by_groupid($groupid);
-	
-			$name=$groupid["name"];
+			$frm_title = S_HOST_GROUP." \"".$groupid["name"]."\"";
+			if($_REQUEST["form"]!=1)
+				$name=$groupid["name"];
+			else
+				$name = get_request("name","");
 		}
 		else
 		{
-			$name="";
+			$name=get_request("name","");
 		}
-		$frmHostG = new CFormTable(S_HOST_GROUP,"hosts.php");
+		$frmHostG = new CFormTable($frm_title,"hosts.php");
 		$frmHostG->SetHelp("web.hosts.group.php");
+		$frmHostG->AddVar("config",get_request("config",1));
 		if(isset($_REQUEST["groupid"]))
 		{
 			$frmHostG->AddVar("groupid",$_REQUEST["groupid"]);
 		}
-		$frmHostG->AddVar("config",get_request("config",1));
 
 		$frmHostG->AddRow(S_GROUP_NAME,new CTextBox("name",$name,30));
 
 		$cmbHosts = new CListBox("hosts[]",5);
-		$hosts=DBselect("select distinct hostid,host from hosts order by host");
+		$hosts=DBselect("select distinct hostid,host from hosts where status<>".HOST_STATUS_DELETED." order by host");
 		while($host=DBfetch($hosts))
 		{
 			if(isset($_REQUEST["groupid"]))
 			{
-				$sql="select count(*) as count from hosts_groups where hostid=".$host["hostid"]." and groupid=".$_REQUEST["groupid"];
-				$result=DBselect($sql);
+				$result=DBselect("select count(*) as count from hosts_groups".
+					" where hostid=".$host["hostid"]." and groupid=".$_REQUEST["groupid"]);
 				$res_row=DBfetch($result);
 				$cmbHosts->AddItem($host["hostid"],$host["host"], 
 					($res_row["count"]==0) ? 'no' : 'yes');
@@ -495,11 +499,14 @@
 		if(isset($_REQUEST["groupid"]))
 		{
 			$frmHostG->AddItemToBottomRow(SPACE);
-			$frmHostG->AddItemToBottomRow(new CButton("delete",S_DELETE,
-				"return Confirm('Delete selected group?');"));
+			$frmHostG->AddItemToBottomRow(
+				new CButtonDelete("Delete selected group?",
+					url_param("config").url_param("groupid")
+				)
+			);
 		}
 		$frmHostG->AddItemToBottomRow(SPACE);
-		$frmHostG->AddItemToBottomRow(new CButton("cancel",S_CANCEL));
+		$frmHostG->AddItemToBottomRow(new CButtonCancel(url_param("config")));
 		$frmHostG->Show();
 	}
 
@@ -508,25 +515,29 @@
 	{
 		global  $_REQUEST;
 
-		$frm_title = "";
+		$frm_title = S_USER_GROUP;
 		if(isset($usrgrpid))
 		{
 			$usrgrp=get_usergroup_by_usrgrpid($usrgrpid);
-			$name	= get_request("name",$usrgrp["name"]);
-			$frm_title = SPACE."\"".$usrgrp["name"]."\"";
+			$frm_title = S_USER_GROUP." \"".$usrgrp["name"]."\"";
+		}
+
+		if(isset($usrgrpid)&&$_REQUEST["form"]!=1)
+		{
+			$name	= $usrgrp["name"];
 		}
 		else
 		{
 			$name	= get_request("name","");
 		}
 
-		$frmUserG = new CFormTable(S_USER_GROUP.$frm_title,"users.php");
+		$frmUserG = new CFormTable($frm_title,"users.php");
 		$frmUserG->SetHelp("web.users.groups.php");
+		$frmUserG->AddVar("config",get_request("config",2));
 		if(isset($usrgrpid))
 		{
 			$frmUserG->AddVar("usrgrpid",$usrgrpid);
 		}
-		$frmUserG->AddVar("config",1);
 		$frmUserG->AddRow(S_GROUP_NAME,new CTextBox("name",$name,30));
 
 		$form_row = array();
@@ -557,10 +568,11 @@
 		if(isset($_REQUEST["usrgrpid"]))
 		{
 			$frmUserG->AddItemToBottomRow(SPACE);
-			$frmUserG->AddItemToBottomRow(new CButton("delete",S_DELETE));
+			$frmUserG->AddItemToBottomRow(new CButtonDelete(
+				"Delete selected group?",url_param("config").url_param("usrgrpid")));
 		}
 		$frmUserG->AddItemToBottomRow(SPACE);
-		$frmUserG->AddItemToBottomRow(new CButton("cancel",S_CANCEL));
+		$frmUserG->AddItemToBottomRow(new CButtonCancel(url_param("config")));
 		$frmUserG->Show();
 	}
 
@@ -1514,12 +1526,12 @@ function	insert_image_form()
 		$contact	= get_request("contact","");
 		$location	= get_request("location","");
 		$notes		= get_request("notes","");
-		$frm_title	= S_HOST;
 
 		if(isset($_REQUEST["hostid"])){
 			$db_host=get_host_by_hostid($_REQUEST["hostid"]);
 			$frm_title	= S_HOST.SPACE."\"".$db_host["host"]."\"";
-		}
+		} else 
+			$frm_title	= S_HOST;
 
 		if(isset($_REQUEST["hostid"]) && $_REQUEST["form"]!=1)
 		{
@@ -1558,10 +1570,10 @@ function	insert_image_form()
 
 		$frmHost = new CFormTable($frm_title,"hosts.php#form");
 		$frmHost->SetHelp("web.hosts.host.php");
+		$frmHost->AddVar("config",get_request("config",0));
 
 		if(isset($_REQUEST["hostid"]))		$frmHost->AddVar("hostid",$_REQUEST["hostid"]);
 		if(isset($_REQUEST["groupid"]))		$frmHost->AddVar("groupid",$_REQUEST["groupid"]);
-		$frmHost->AddVar("config",get_request("config",0));
 		
 		$frmHost->AddRow(S_HOST,new CTextBox("host",$host,20));
 
@@ -1639,10 +1651,14 @@ function	insert_image_form()
 //			$frmHost->AddItemToBottomRow(SPACE);
 //			$frmHost->AddItemToBottomRow(new CButton("register","add items from template"));
 			$frmHost->AddItemToBottomRow(SPACE);
-			$frmHost->AddItemToBottomRow(new CButton("delete",S_DELETE,"return Confirm('".S_DELETE_SELECTED_HOST_Q."');"));
+			$frmHost->AddItemToBottomRow(
+				new CButtonDelete(S_DELETE_SELECTED_HOST_Q,
+					url_param("config").url_param("hostid")
+				)
+			);
 		}
 		$frmHost->AddItemToBottomRow(SPACE);
-		$frmHost->AddItemToBottomRow(new CButton("cancel",S_CANCEL));
+		$frmHost->AddItemToBottomRow(new CButtonCancel(url_param("config")));
 		$frmHost->Show();
 	}
 /*
