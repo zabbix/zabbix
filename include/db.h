@@ -353,10 +353,10 @@ int	DBadd_host(char *server, int port, int status, int useip, char *ip, int disa
 int	DBhost_exists(char *server);
 int	DBget_host_by_hostid(int hostid,DB_HOST *host);
 int	DBsync_host_with_templates(int hostid);
-int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,int actions,int graphs,int screens);
+int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,int graphs);
 int	DBadd_templates_to_host(int hostid,int host_templateid);
 
-int	DBadd_template_linkage(int hostid,int templateid,int items,int triggers,int actions,int graphs,int screens);
+int	DBadd_template_linkage(int hostid,int templateid,int items,int triggers,int graphs);
 
 int	DBget_item_by_itemid(int itemid,DB_ITEM *item);
 int	DBadd_item_to_linked_hosts(int itemid, int hostid);
