@@ -76,14 +76,13 @@ int	DBadd_templates_to_host(int hostid,int host_templateid)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DBadd_templates_to_host(%d,%d)", hostid, host_templateid);
 
-	snprintf(sql,sizeof(sql)-1,"select templateid,items,triggers,actions,graphs,screens from hosts_templates where hostid=%d", host_templateid);
+	snprintf(sql,sizeof(sql)-1,"select templateid,items,triggers,graphs from hosts_templates where hostid=%d", host_templateid);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 		DBadd_template_linkage(hostid,atoi(DBget_field(result,i,0)),atoi(DBget_field(result,i,1)),
-					atoi(DBget_field(result,i,2)), atoi(DBget_field(result,i,3)),
-					atoi(DBget_field(result,i,4)), atoi(DBget_field(result,i,5)));
+					atoi(DBget_field(result,i,2)), atoi(DBget_field(result,i,3)));
 	}
 
 	DBfree_result(result);
@@ -91,13 +90,13 @@ int	DBadd_templates_to_host(int hostid,int host_templateid)
 	return SUCCEED;
 }
 
-int	DBadd_template_linkage(int hostid,int templateid,int items,int triggers,int actions,int graphs,int screens)
+int	DBadd_template_linkage(int hostid,int templateid,int items,int triggers,int graphs)
 {
 	char	sql[MAX_STRING_LEN];
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DBadd_template_linkage(%d)", hostid);
 
-	snprintf(sql,sizeof(sql)-1,"insert into hosts_templates (hostid,templateid,items,triggers,actions,graphs,screens) values (%d,%d,%d,%d,%d,%d,%d)",hostid, templateid, items, triggers, actions, graphs, screens);
+	snprintf(sql,sizeof(sql)-1,"insert into hosts_templates (hostid,templateid,items,triggers,graphs) values (%d,%d,%d,%d,%d)",hostid, templateid, items, triggers, graphs);
 
 	return DBexecute(sql);
 }
@@ -110,14 +109,13 @@ int	DBsync_host_with_templates(int hostid)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DBsync_host_with_templates(%d)", hostid);
 
-	snprintf(sql,sizeof(sql)-1,"select templateid,items,triggers,actions,graphs,screens from hosts_templates where hostid=%d", hostid);
+	snprintf(sql,sizeof(sql)-1,"select templateid,items,triggers,graphs from hosts_templates where hostid=%d", hostid);
 	result = DBselect(sql);
 
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 		DBsync_host_with_template(hostid,atoi(DBget_field(result,i,0)),atoi(DBget_field(result,i,1)),
-					atoi(DBget_field(result,i,2)), atoi(DBget_field(result,i,3)),
-					atoi(DBget_field(result,i,4)), atoi(DBget_field(result,i,5)));
+					atoi(DBget_field(result,i,2)), atoi(DBget_field(result,i,3)));
 	}
 
 	DBfree_result(result);
@@ -125,7 +123,7 @@ int	DBsync_host_with_templates(int hostid)
 	return SUCCEED;
 }
 
-int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,int actions,int graphs,int screens)
+int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,int graphs)
 {
 	DB_RESULT	*result;
 	char	sql[MAX_STRING_LEN];
