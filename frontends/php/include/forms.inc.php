@@ -723,11 +723,11 @@
 		if(isset($triggerid))
 		{
 			$frmTrig->AddItemToBottomRow(SPACE);
-			$frmTrig->AddItemToBottomRow(new CButton("delete",S_DELETE,
-				"return Confirm('Delete trigger?');"));
+			$frmTrig->AddItemToBottomRow(new CButtonDelete("Delete trigger?",
+				url_param("groupid").url_param("hostid").url_param("triggerid")));
 		}
 		$frmTrig->AddItemToBottomRow(SPACE);
-		$frmTrig->AddItemToBottomRow(new CButton("cancel",S_CANCEL));
+		$frmTrig->AddItemToBottomRow(new CButtonCancel(url_param("groupid").url_param("hostid")));
 		$frmTrig->Show();
 	}
 

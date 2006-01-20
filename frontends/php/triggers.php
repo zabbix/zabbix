@@ -66,6 +66,9 @@
 			$triggerid=add_trigger($_REQUEST["expression"],$_REQUEST["description"],$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"]);
 			add_trigger_to_linked_hosts($triggerid);
 			show_messages($triggerid, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
+			if($triggerid){
+				unset($_REQUEST["form"]);
+			}
 		}
 		else
 		{
@@ -85,6 +88,10 @@
 			$result=update_trigger($_REQUEST["triggerid"],$_REQUEST["expression"],$_REQUEST["description"],$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"]);
 			update_trigger_from_linked_hosts($_REQUEST["triggerid"]);
 			show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
+			if($result)
+			{
+				unset($_REQUEST["form"]);
+			}
 		}
 		else
 		{
@@ -314,8 +321,10 @@
 		$footerButtons = array();
 		array_push($footerButtons, new CButton('register','enable selected',
 			"return Confirm('".S_ENABLE_SELECTED_TRIGGERS_Q."');"));
+		array_push($footerButtons, SPACE);
 		array_push($footerButtons, new CButton('register','disable selected',
 			"return Confirm('Disable selected triggers?');"));
+		array_push($footerButtons, SPACE);
 		array_push($footerButtons, new CButton('register','delete selected',
 			"return Confirm('".S_DISABLE_SELECTED_TRIGGERS_Q."');"));
 		$table->SetFooter(new CCol($footerButtons),'table_footer');
@@ -331,7 +340,7 @@
 		$row=DBfetch($result);
 		if($row["cnt"]>0)
 		{
-			echo "<a name=\"form\"></a>";
+			echo BR;
 			@insert_trigger_form($_REQUEST["hostid"],$_REQUEST["triggerid"]);
 		} 
 	}
