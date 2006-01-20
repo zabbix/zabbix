@@ -177,6 +177,73 @@
 		$frmUser->Show();
 	}
 
+	# Insert form for User Groups
+	function	insert_usergroups_form($usrgrpid)
+	{
+		global  $_REQUEST;
+
+		$frm_title = S_USER_GROUP;
+		if(isset($usrgrpid))
+		{
+			$usrgrp=get_usergroup_by_usrgrpid($usrgrpid);
+			$frm_title = S_USER_GROUP." \"".$usrgrp["name"]."\"";
+		}
+
+		if(isset($usrgrpid)&&$_REQUEST["form"]!=1)
+		{
+			$name	= $usrgrp["name"];
+		}
+		else
+		{
+			$name	= get_request("name","");
+		}
+
+		$frmUserG = new CFormTable($frm_title,"users.php");
+		$frmUserG->SetHelp("web.users.groups.php");
+		$frmUserG->AddVar("config",get_request("config",2));
+		if(isset($usrgrpid))
+		{
+			$frmUserG->AddVar("usrgrpid",$usrgrpid);
+		}
+		$frmUserG->AddRow(S_GROUP_NAME,new CTextBox("name",$name,30));
+
+		$form_row = array();
+		$users=DBselect("select distinct userid,alias from users order by alias");
+		while($user=DBfetch($users))
+		{
+			if(isset($_REQUEST["usrgrpid"]))
+			{
+				$sql="select count(*) as count from users_groups where userid=".
+					$user["userid"]." and usrgrpid=".$_REQUEST["usrgrpid"];
+				$result=DBselect($sql);
+				$res_row=DBfetch($result);
+				array_push($form_row,
+					new CCheckBox($user["userid"],$res_row["count"], $user["alias"]),
+					BR);
+			}
+			else
+			{
+				array_push($form_row,
+					new CCheckBox($user["userid"],
+						isset($_REQUEST[$user["userid"]]),$user["alias"]),
+					BR);
+			}
+		}
+		$frmUserG->AddRow(S_USERS,$form_row);
+	
+		$frmUserG->AddItemToBottomRow(new CButton("save",S_SAVE));
+		if(isset($_REQUEST["usrgrpid"]))
+		{
+			$frmUserG->AddItemToBottomRow(SPACE);
+			$frmUserG->AddItemToBottomRow(new CButtonDelete(
+				"Delete selected group?",url_param("config").url_param("usrgrpid")));
+		}
+		$frmUserG->AddItemToBottomRow(SPACE);
+		$frmUserG->AddItemToBottomRow(new CButtonCancel(url_param("config")));
+		$frmUserG->Show();
+	}
+
+
 	# Insert form for Item information
 	function	insert_item_form()
 	{
@@ -447,134 +514,6 @@
 		$frmItem->Show();
 	}
 
-	# Insert form for Host Groups
-	function	insert_hostgroups_form($groupid)
-	{
-		global  $_REQUEST;
-
-		$frm_title = S_HOST_GROUP;
-		if(isset($groupid))
-		{
-			$groupid=get_group_by_groupid($groupid);
-			$frm_title = S_HOST_GROUP." \"".$groupid["name"]."\"";
-			if($_REQUEST["form"]!=1)
-				$name=$groupid["name"];
-			else
-				$name = get_request("name","");
-		}
-		else
-		{
-			$name=get_request("name","");
-		}
-		$frmHostG = new CFormTable($frm_title,"hosts.php");
-		$frmHostG->SetHelp("web.hosts.group.php");
-		$frmHostG->AddVar("config",get_request("config",1));
-		if(isset($_REQUEST["groupid"]))
-		{
-			$frmHostG->AddVar("groupid",$_REQUEST["groupid"]);
-		}
-
-		$frmHostG->AddRow(S_GROUP_NAME,new CTextBox("name",$name,30));
-
-		$cmbHosts = new CListBox("hosts[]",5);
-		$hosts=DBselect("select distinct hostid,host from hosts where status<>".HOST_STATUS_DELETED." order by host");
-		while($host=DBfetch($hosts))
-		{
-			if(isset($_REQUEST["groupid"]))
-			{
-				$result=DBselect("select count(*) as count from hosts_groups".
-					" where hostid=".$host["hostid"]." and groupid=".$_REQUEST["groupid"]);
-				$res_row=DBfetch($result);
-				$cmbHosts->AddItem($host["hostid"],$host["host"], 
-					($res_row["count"]==0) ? 'no' : 'yes');
-			}
-			else
-			{
-				$cmbHosts->AddItem($host["hostid"],$host["host"]);
-			}
-		}
-		$frmHostG->AddRow(S_HOSTS,$cmbHosts);
-
-		$frmHostG->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["groupid"]))
-		{
-			$frmHostG->AddItemToBottomRow(SPACE);
-			$frmHostG->AddItemToBottomRow(
-				new CButtonDelete("Delete selected group?",
-					url_param("config").url_param("groupid")
-				)
-			);
-		}
-		$frmHostG->AddItemToBottomRow(SPACE);
-		$frmHostG->AddItemToBottomRow(new CButtonCancel(url_param("config")));
-		$frmHostG->Show();
-	}
-
-	# Insert form for User Groups
-	function	insert_usergroups_form($usrgrpid)
-	{
-		global  $_REQUEST;
-
-		$frm_title = S_USER_GROUP;
-		if(isset($usrgrpid))
-		{
-			$usrgrp=get_usergroup_by_usrgrpid($usrgrpid);
-			$frm_title = S_USER_GROUP." \"".$usrgrp["name"]."\"";
-		}
-
-		if(isset($usrgrpid)&&$_REQUEST["form"]!=1)
-		{
-			$name	= $usrgrp["name"];
-		}
-		else
-		{
-			$name	= get_request("name","");
-		}
-
-		$frmUserG = new CFormTable($frm_title,"users.php");
-		$frmUserG->SetHelp("web.users.groups.php");
-		$frmUserG->AddVar("config",get_request("config",2));
-		if(isset($usrgrpid))
-		{
-			$frmUserG->AddVar("usrgrpid",$usrgrpid);
-		}
-		$frmUserG->AddRow(S_GROUP_NAME,new CTextBox("name",$name,30));
-
-		$form_row = array();
-		$users=DBselect("select distinct userid,alias from users order by alias");
-		while($user=DBfetch($users))
-		{
-			if(isset($_REQUEST["usrgrpid"]))
-			{
-				$sql="select count(*) as count from users_groups where userid=".
-					$user["userid"]." and usrgrpid=".$_REQUEST["usrgrpid"];
-				$result=DBselect($sql);
-				$res_row=DBfetch($result);
-				array_push($form_row,
-					new CCheckBox($user["userid"],$res_row["count"], $user["alias"]),
-					BR);
-			}
-			else
-			{
-				array_push($form_row,
-					new CCheckBox($user["userid"],
-						isset($_REQUEST[$user["userid"]]),$user["alias"]),
-					BR);
-			}
-		}
-		$frmUserG->AddRow(S_USERS,$form_row);
-	
-		$frmUserG->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["usrgrpid"]))
-		{
-			$frmUserG->AddItemToBottomRow(SPACE);
-			$frmUserG->AddItemToBottomRow(new CButtonDelete(
-				"Delete selected group?",url_param("config").url_param("usrgrpid")));
-		}
-		$frmUserG->AddItemToBottomRow(SPACE);
-		$frmUserG->AddItemToBottomRow(new CButtonCancel(url_param("config")));
-		$frmUserG->Show();
-	}
 
 	# Insert form for User permissions
 	function	insert_permissions_form($userid)
@@ -1661,6 +1600,70 @@ function	insert_image_form()
 		$frmHost->AddItemToBottomRow(new CButtonCancel(url_param("config")));
 		$frmHost->Show();
 	}
+
+	# Insert form for Host Groups
+	function	insert_hostgroups_form($groupid)
+	{
+		global  $_REQUEST;
+
+		$frm_title = S_HOST_GROUP;
+		if(isset($groupid))
+		{
+			$groupid=get_group_by_groupid($groupid);
+			$frm_title = S_HOST_GROUP." \"".$groupid["name"]."\"";
+			if($_REQUEST["form"]!=1)
+				$name=$groupid["name"];
+			else
+				$name = get_request("name","");
+		}
+		else
+		{
+			$name=get_request("name","");
+		}
+		$frmHostG = new CFormTable($frm_title,"hosts.php");
+		$frmHostG->SetHelp("web.hosts.group.php");
+		$frmHostG->AddVar("config",get_request("config",1));
+		if(isset($_REQUEST["groupid"]))
+		{
+			$frmHostG->AddVar("groupid",$_REQUEST["groupid"]);
+		}
+
+		$frmHostG->AddRow(S_GROUP_NAME,new CTextBox("name",$name,30));
+
+		$cmbHosts = new CListBox("hosts[]",5);
+		$hosts=DBselect("select distinct hostid,host from hosts where status<>".HOST_STATUS_DELETED." order by host");
+		while($host=DBfetch($hosts))
+		{
+			if(isset($_REQUEST["groupid"]))
+			{
+				$result=DBselect("select count(*) as count from hosts_groups".
+					" where hostid=".$host["hostid"]." and groupid=".$_REQUEST["groupid"]);
+				$res_row=DBfetch($result);
+				$cmbHosts->AddItem($host["hostid"],$host["host"], 
+					($res_row["count"]==0) ? 'no' : 'yes');
+			}
+			else
+			{
+				$cmbHosts->AddItem($host["hostid"],$host["host"]);
+			}
+		}
+		$frmHostG->AddRow(S_HOSTS,$cmbHosts);
+
+		$frmHostG->AddItemToBottomRow(new CButton("save",S_SAVE));
+		if(isset($_REQUEST["groupid"]))
+		{
+			$frmHostG->AddItemToBottomRow(SPACE);
+			$frmHostG->AddItemToBottomRow(
+				new CButtonDelete("Delete selected group?",
+					url_param("config").url_param("groupid")
+				)
+			);
+		}
+		$frmHostG->AddItemToBottomRow(SPACE);
+		$frmHostG->AddItemToBottomRow(new CButtonCancel(url_param("config")));
+		$frmHostG->Show();
+	}
+
 /*
 	# Insert host profile form
 	function	insert_host_profile_form($hostid,$readonly=0)
