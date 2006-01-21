@@ -571,14 +571,54 @@
 			}
 		}
 
+		function DrawLeftSide($minYleft, $maxYleft)
+		{
+			if($this->yaxisleft == 1)
+			{
+				for($item=0;$item<$this->num;$item++)
+				{
+					if($this->items[$item]["axisside"] == GRAPH_YAXIS_SIDE_LEFT)
+					{
+						$units=$this->items[$item]["units"];
+						break;
+					}
+				}
+				for($i=0;$i<=6;$i++)
+				{
+					$str = str_pad(convert_units($this->sizeY*$i/6*($maxYleft-$minYleft)/$this->sizeY+$minYleft,$units),10," ", STR_PAD_LEFT);
+					ImageString($this->im, 1, 5, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, $str, $this->colors["Dark Red No Alpha"]);
+				}
+			}
+		}
+
+		function DrawRightSide($minYright, $maxYright)
+		{
+			if($this->yaxisright == 1)
+			{
+				for($item=0;$item<$this->num;$item++)
+				{
+					if($this->items[$item]["axisside"] == GRAPH_YAXIS_SIDE_RIGHT)
+					{
+						$units=$this->items[$item]["units"];
+						break;
+					}
+				}
+				for($i=0;$i<=6;$i++)
+				{
+					$str = str_pad(convert_units($this->sizeY*$i/6*($maxYright-$minYright)/$this->sizeY+$minYright,$units),10," ");
+					ImageString($this->im, 1, $this->sizeX+$this->shiftXleft+2, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, $str, $this->colors["Dark Red No Alpha"]);
+				}
+			}
+		}
+
 		function Draw()
 		{
 			$start_time=getmicrotime();
 
 //			$this->im = imagecreate($this->sizeX+$this->shiftX+61,$this->sizeY+2*$this->shiftY+40);
 
-//			Header( "Content-type:  text/html"); 
-			Header( "Content-type:  image/png"); 
+			Header( "Content-type:  text/html"); 
+//			Header( "Content-type:  image/png"); 
 			Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 
 			check_authorisation();
@@ -675,19 +715,9 @@
 				}
 			}
 	
-			if($this->yaxisright == 1)	
-				for($i=0;$i<=6;$i++)
-				{
-					$str = str_pad(convert_units($this->sizeY*$i/6*($maxYright-$minYright)/$this->sizeY+$minYright,$this->items[0]["units"]),10," ");
-					ImageString($this->im, 1, $this->sizeX+$this->shiftXleft+2, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, $str, $this->colors["Dark Red No Alpha"]);
-				}
 
-			if($this->yaxisleft == 1)
-				for($i=0;$i<=6;$i++)
-				{
-					$str = str_pad(convert_units($this->sizeY*$i/6*($maxYleft-$minYleft)/$this->sizeY+$minYleft,$this->items[0]["units"]),10," ", STR_PAD_LEFT);
-					ImageString($this->im, 1, 5, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, $str, $this->colors["Dark Red No Alpha"]);
-				}
+			$this->DrawLeftSide($minYleft, $maxYleft);
+			$this->DrawRightSide($minYright, $maxYright);
 
 			$this->drawLogo();
 
@@ -699,40 +729,6 @@
 
 			ImageOut($this->im); 
 			ImageDestroy($this->im); 
-		}
-	}
-
-	class	Item
-	{
-		var $data;
-		
-		function	Item($itemid=0)
-		{
-			if($itemid!=0)
-			{
-				$i=get_item_by_itemid($itemid);
-				if($i)
-				{
-					$data=$i;
-				}
-				else	unset($data);
-			}	
-		}
-		
-		function	GetData($element)
-		{
-			if(isset($this->data))
-			{
-				return $this->data[$element];
-			}
-			else
-			{
-				return false;
-			}
-		}
-
-		function	SetData($element)
-		{
 		}
 	}
 ?>

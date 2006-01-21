@@ -384,7 +384,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 /* count is not really used. Has to be removed */ 
 				count++;
 
-				snprintf(error,MAX_STRING_LEN-1,"value #%d has unknow type [%X]",count,vars->type);
+				snprintf(error,MAX_STRING_LEN-1,"OID [%s] value #%d has unknow type [%X]",item->snmp_oid, count,vars->type);
 
 				zabbix_log( LOG_LEVEL_ERR, error);
 				SET_MSG_RESULT(value, strdup(error));
