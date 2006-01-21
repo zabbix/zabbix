@@ -36,6 +36,15 @@
 ?>
 
 <?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"show"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),	NULL)
+	);
+
+	check_fields($fields);
+?>
+
+<?php
 	if(!isset($_REQUEST["show"]))
 	{
 		$_REQUEST["show"]=0;

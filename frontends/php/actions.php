@@ -21,16 +21,30 @@
 <?php
 	include "include/config.inc.php";
 	$page["title"] = "S_ALERT_HISTORY_SMALL";
-	$page["file"] = "alerts.php";
+	$page["file"] = "actions.php";
 	show_header($page["title"],1,0);
 ?>
 
 <?php
-	if(isset($_REQUEST["start"])&&isset($_REQUEST["do"])&&($_REQUEST["do"]=="<< Prev 100"))
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"groupid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	BETWEEN(0,65535),	NULL),
+		"hostid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	BETWEEN(0,65535),	NULL),
+		"start"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535),	NULL),
+		"next"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
+		"prev"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL)
+	);
+
+	check_fields($fields);
+?>
+
+<?php
+	if(isset($_REQUEST["start"])&&isset($_REQUEST["prev"]))
 	{
 		$_REQUEST["start"]-=100;
+		if($_REQUEST["start"]<=0)	unset($_REQUEST["start"]);
 	}
-	if(isset($_REQUEST["do"])&&($_REQUEST["do"]=="Next 100 >>"))
+	if(isset($_REQUEST["next"]))
 	{
 		if(isset($_REQUEST["start"]))
 		{
@@ -40,10 +54,6 @@
 		{
 			$_REQUEST["start"]=100;
 		}
-	}
-	if(isset($_REQUEST["start"])&&($_REQUEST["start"]<=0))
-	{
-		unset($_REQUEST["start"]);
 	}
 ?>
 
@@ -59,15 +69,15 @@
 	if(isset($_REQUEST["start"]))
 	{
 		$h2=$h2."<input class=\"biginput\" name=\"start\" type=hidden value=".$_REQUEST["start"]." size=8>";
-  		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"do\" value=\"<< Prev 100\">";
+  		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"prev\" value=\"<< Prev 100\">";
 	}
 	else
 	{
   		$h2=$h2."<input class=\"button\" type=\"submit\" disabled name=\"do\" value=\"<< Prev 100\">";
 	}
-  	$h2=$h2."<input class=\"button\" type=\"submit\" name=\"do\" value=\"Next 100 >>\">";
+  	$h2=$h2."<input class=\"button\" type=\"submit\" name=\"next\" value=\"Next 100 >>\">";
 
-	show_header2($h1,$h2,"<form name=\"form2\" method=\"get\" action=\"alerts.php\">","</form>");
+	show_header2($h1,$h2,"<form name=\"form2\" method=\"get\" action=\"actions.php\">","</form>");
 ?>
 
 
@@ -86,6 +96,7 @@
 	{
 		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error from alerts a,media_type mt where mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200-".$_REQUEST["start"]." order by a.clock desc limit ".($_REQUEST["start"]+500);
 	}
+	echo $sql,"<br>";
 	$result=DBselect($sql);
 
 	$table = new CTableInfo(S_NO_ALERTS);
