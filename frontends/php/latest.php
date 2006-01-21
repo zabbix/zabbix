@@ -32,6 +32,20 @@
                 show_page_footer();
                 exit;
         }
+?>
+
+<?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"groupid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535),	NULL),
+		"hostid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535),	NULL),
+		"select"=>		array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
+	);
+
+	check_fields($fields);
+?>
+
+<?php
 	if(isset($_REQUEST["select"])&&($_REQUEST["select"]!=""))
 	{
 		unset($_REQUEST["groupid"]);
@@ -133,11 +147,6 @@
 ?>
 
 <?php
-	if(!isset($_REQUEST["sort"]))
-	{
-		$_REQUEST["sort"]="description";
-	}
-
 	if(isset($_REQUEST["hostid"]))
 	{
 		$result=DBselect("select host from hosts where hostid=".$_REQUEST["hostid"]);
@@ -171,56 +180,15 @@
 		{
 			$header=array_merge($header,array(S_HOST));
 		}
-		if(!isset($_REQUEST["sort"])||(isset($_REQUEST["sort"])&&($_REQUEST["sort"]=="description")))
-		{
-			$header=array_merge($header,array(S_DESCRIPTION_LARGE));
-		}
-		else
-		{
-			if(isset($_REQUEST["select"]))
-				$header=array_merge($header,array("<a href=\"latest.php?select=".$_REQUEST["select"]."&sort=description\">".S_DESCRIPTION_SMALL));
-			else
-				$header=array_merge($header,array("<a href=\"latest.php?hostid=".$_REQUEST["hostid"]."&sort=description\">".S_DESCRIPTION_SMALL));
-		}
-		if(isset($_REQUEST["sort"])&&($_REQUEST["sort"]=="lastcheck"))
-		{
-			$header=array_merge($header,array(S_LAST_CHECK_BIG));
-		}
-		else
-		{
-			if(isset($_REQUEST["select"]))
-				$header=array_merge($header,array("<a href=\"latest.php?select=".$_REQUEST["select"]."&sort=lastcheck\">".S_LAST_CHECK));
-			else
-			$header=array_merge($header,array("<a href=\"latest.php?hostid=".$_REQUEST["hostid"]."&sort=lastcheck\">".S_LAST_CHECK));
-		}
-		$header=array_merge($header,array(S_LAST_VALUE,S_CHANGE,S_HISTORY));
+		$header=array_merge($header,array(S_DESCRIPTION, S_LAST_CHECK, S_LAST_VALUE,S_CHANGE,S_HISTORY));
 
 		table_header($header);
 
 		$col=0;
-		if(isset($_REQUEST["sort"]))
-		{
-			switch ($_REQUEST["sort"])
-			{
-				case "description":
-					$_REQUEST["sort"]="order by i.description";
-					break;
-				case "lastcheck":
-					$_REQUEST["sort"]="order by i.lastclock";
-					break;
-				default:
-					$_REQUEST["sort"]="order by i.description";
-					break;
-			}
-		}
-		else
-		{
-			$_REQUEST["sort"]="order by i.description";
-		}
 		if(isset($_REQUEST["select"]))
-			$sql="select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier,i.key_ from items i,hosts h where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 and i.description like '%".$_REQUEST["select"]."%' ".$_REQUEST["sort"];
+			$sql="select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier,i.key_ from items i,hosts h where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 and i.description like '%".$_REQUEST["select"]."%' order by i.description";
 		else
-			$sql="select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier,i.key_ from items i,hosts h where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 and h.hostid=".$_REQUEST["hostid"]." ".$_REQUEST["sort"];
+			$sql="select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier,i.key_ from items i,hosts h where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 and h.hostid=".$_REQUEST["hostid"]." order by i.description";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{

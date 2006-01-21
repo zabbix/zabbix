@@ -53,6 +53,16 @@
 ?>
 
 <?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"groupid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535),	NULL),
+		"type"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),		NULL)
+	);
+
+	check_fields($fields);
+?>
+
+<?php
 	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
 	{
 		unset($_REQUEST["groupid"]);
