@@ -39,6 +39,16 @@
 ?>
 
 <?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"sysmapid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	BETWEEN(0,65535),	NULL),
+		"fullscreen"=>		array(T_ZBX_INT, O_OPT,	P_SYS,		IN("1"),		NULL)
+	);
+
+	check_fields($fields);
+?>
+
+<?php
 	if(isset($_REQUEST["sysmapid"])&&!check_right("Network map","R",$_REQUEST["sysmapid"]))
 	{
 		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
@@ -57,11 +67,6 @@
 //	if(!isset($_REQUEST["fullscreen"]))
 	{
 		show_table3_header_begin();
-
-		if(isset($_REQUEST["sysmapid"])&&($_REQUEST["sysmapid"]==0))
-		{
-			unset($_REQUEST["sysmapid"]);
-		}
 
 		if(isset($_REQUEST["sysmapid"]))
 		{
