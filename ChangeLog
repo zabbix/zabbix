@@ -1,5 +1,6 @@
 Changes for 1.1beta6:
 
+ - fixed two different units in two graph axes (Alexei)
  - renamed latestalarms.php and alerts.php (Alexei)
  - fix crash in processing of autoregistration (Alexei)
  - added validate.inc.php (Alexei)
