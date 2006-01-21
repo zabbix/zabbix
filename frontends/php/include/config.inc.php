@@ -1733,8 +1733,9 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		$sql="select distinct gi.gitemid from graphs g,graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=$templateid and g.graphid=gi.graphid";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
-		{	
-			add_graph_item_to_linked_hosts($row["gitemid"],$hostid);
+		{
+// Hmm WHere is this function?	
+//			add_graph_item_to_linked_hosts($row["gitemid"],$hostid);
 		}
 
 		return TRUE;
