@@ -28,6 +28,16 @@
 <?php
 	update_profile("web.menu.view.last",$page["file"]);
 ?>
+
+<?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"serviceid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,			NULL),
+		"showgraph"=>		array(T_ZBX_INT, O_OPT,	P_SYS,		IN("1")."isset({serviceid})",NULL)
+	);
+
+	check_fields($fields);
+?>
  
 <?php
 	show_table_header(S_IT_SERVICES_BIG);

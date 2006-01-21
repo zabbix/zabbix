@@ -35,15 +35,21 @@
 ?>
 
 <?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"groupid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,			NULL),
+		"hostid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,			NULL),
+		"triggerid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,			NULL)
+	);
+
+	check_fields($fields);
+?>
+
+<?php
 	update_profile("web.menu.reports.last",$page["file"]);
 ?>
 
 <?php
-	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
-	{
-		unset($_REQUEST["groupid"]);
-	}
-
 	$h1="&nbsp;".S_AVAILABILITY_REPORT_BIG;
 
 	$h2=S_GROUP."&nbsp;";

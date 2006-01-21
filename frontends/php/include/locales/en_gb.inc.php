@@ -103,16 +103,16 @@
 	"S_DISABLED_BIG"=>			"DISABLED",
 	"S_UNKNOWN_BIG"=>			"UNKNOWN",
 
-//	alerts.php
-	"S_ALERT_HISTORY_SMALL"=>		"Alert history",
-	"S_ALERT_HISTORY_BIG"=>			"ALERT HISTORY",
+//	actions.php
+	"S_HISTORY_OF_ACTIONS_BIG"=>		"HISTORY OF ACTIONS",
+	"S_LATEST_ACTIONS"=>			"Latest actions",
 	"S_ALERTS_BIG"=>			"ALERTS",
 	"S_TYPE"=>				"Type",
 	"S_RECIPIENTS"=>			"Recipient(s)",
 	"S_ERROR"=>				"Error",
 	"S_SENT"=>				"sent",
 	"S_NOT_SENT"=>				"not sent",
-	"S_NO_ALERTS"=>				"No alerts",
+	"S_NO_ACTIONS_FOUND"=>			"No actions found",
 	"S_SHOW_NEXT_100"=>			"Show next 100",
 	"S_SHOW_PREVIOUS_100"=>			"Show previous 100",
 
@@ -450,9 +450,10 @@
 	"S_LOG_TIME_FORMAT"=>			"Log time format",
 	"S_CREATE_ITEM"=>			"Create Item",
 
-//	latestalarms.php
+//	events.php
 	"S_LATEST_EVENTS"=>			"Latest events",
 	"S_HISTORY_OF_EVENTS_BIG"=>		"HISTORY OF EVENTS",
+	"S_NO_EVENTS_FOUND"=>			"No events found",
 
 //	latest.php
 	"S_LAST_CHECK"=>			"Last check",
