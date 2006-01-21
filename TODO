@@ -1,22 +1,17 @@
 1.1beta6:
-
  - php: http://www.zabbix.com/forum/showthread.php?t=1825
  - graphs: http://www.zabbix.com/forum/showthread.php?t=2006
  - SCO: http://www.zabbix.com/forum/showthread.php?t=2010
  - http://www.zabbix.com/forum/showthread.php?p=7006#post7006
  - http://www.zabbix.com/forum/showthread.php?t=1997
  - dos style EOL: http://www.zabbix.com/forum/showthread.php?t=1993
- - problem with autoreg: http://www.zabbix.com/forum/showthread.php?t=1999
  - unknown SNMP type: http://www.zabbix.com/forum/showthread.php?t=1990
  - http://www.zabbix.com/forum/showthread.php?t=1992
  - http://www.zabbix.com/forum/showthread.php?t=1657
  - Graphs: http://www.zabbix.com/forum/showthread.php?t=1781
- - simple checks: http://www.zabbix.com/forum/showthread.php?t=1974
  - http://www.zabbix.com/forum/showthread.php?t=1971
- - zabbix_agent doesn't work: http://www.zabbix.com/forum/showthread.php?t=1970
  - make failed: http://www.zabbix.com/forum/showthread.php?t=1957
  - check if ZABBIX server accepts values returned by W32 agent
- - simple check tcp,80 does not work: http://www.zabbix.com/forum/showthread.php?t=1933
 
  - clear error message if user/name password are wrong for zabbix_server
  - configurable location (left,right,top, bottom) of label for icons
