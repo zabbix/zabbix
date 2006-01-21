@@ -30,6 +30,14 @@
 ?>
 
 <?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+	);
+
+	check_fields($fields);
+?>
+
+<?php
 	show_table_header(S_STATUS_OF_ZABBIX_BIG);
 
 	$table = new CTableInfo();

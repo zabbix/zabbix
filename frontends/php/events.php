@@ -30,10 +30,14 @@
 	$fields=array(
 		"groupid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	BETWEEN(0,65535),	NULL),
 		"hostid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	BETWEEN(0,65535),	NULL),
-		"start"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535),	NULL),
+		"start"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535)."({}%100==0)",	NULL),
 		"next"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
 		"prev"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL)
 	);
+
+	$_REQUEST["hostid"]=@iif(isset($_REQUEST["hostid"]),$_REQUEST["hostid"],get_profile("web.latest.hostid",0));
+	update_profile("web.latest.hostid",$_REQUEST["hostid"]);
+	update_profile("web.menu.view.last",$page["file"]);
 
 	check_fields($fields);
 ?>
@@ -58,11 +62,6 @@
 	}
 ?>
 
-<?php
-	$_REQUEST["hostid"]=@iif(isset($_REQUEST["hostid"]),$_REQUEST["hostid"],get_profile("web.latest.hostid",0));
-	update_profile("web.latest.hostid",$_REQUEST["hostid"]);
-	update_profile("web.menu.view.last",$page["file"]);
-?>
 
 <?php
 	$h1="&nbsp;".S_HISTORY_OF_EVENTS_BIG;
@@ -134,43 +133,33 @@
 	{
 		$_REQUEST["start"]=0;
 	}
-	if(isset($_REQUEST["hostid"])&&($_REQUEST["hostid"] == 0))
-	{
-		unset($_REQUEST["hostid"]);
-	}
-	$sql="select max(alarmid) as max from alarms";
-	$result=DBselect($sql);
-	$row=DBfetch($result);
-	$maxalarmid=@iif(DBnum_rows($result)>0,$row["max"],0);
 
-//	$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t where t.triggerid=a.triggerid and a.alarmid>$maxalarmid-".($_REQUEST["start"]+200)." order by clock desc limit ".($_REQUEST["start"]+200);
 	if(isset($_REQUEST["hostid"]))
 	{
-		$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t,hosts h,items i,functions f where t.triggerid=a.triggerid and f.triggerid=t.triggerid and f.itemid=i.itemid and i.hostid=h.hostid and h.hostid=".$_REQUEST["hostid"]." and a.alarmid>$maxalarmid-".($_REQUEST["start"]+200)." order by clock desc limit ".($_REQUEST["start"]+200);
+		$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t,hosts h,items i,functions f where t.triggerid=a.triggerid and f.triggerid=t.triggerid and f.itemid=i.itemid and i.hostid=h.hostid and h.hostid=".$_REQUEST["hostid"]." order by clock desc limit ".(10*($_REQUEST["start"]+100));
 	}
 	else
 	{
-		$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t,hosts h,items i,functions f where t.triggerid=a.triggerid and f.triggerid=t.triggerid and f.itemid=i.itemid and i.hostid=h.hostid and a.alarmid>$maxalarmid-".($_REQUEST["start"]+200)." order by clock desc limit ".($_REQUEST["start"]+200);
+		$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t,hosts h,items i,functions f where t.triggerid=a.triggerid and f.triggerid=t.triggerid and f.itemid=i.itemid and i.hostid=h.hostid order by clock desc limit ".(10*($_REQUEST["start"]+100));
 	}
 
 	$result=DBselect($sql);
 
-	$table = new CTableInfo();
+	$table = new CTableInfo(S_NO_EVENTS_FOUND);
 	$table->setHeader(array(S_TIME, S_DESCRIPTION, S_VALUE, S_SEVERITY));
 	$col=0;
-	$i=0;
-	while($row=DBfetch($result))
+	$skip=$_REQUEST["start"];
+	while(($row=DBfetch($result))&&($col<100))
 	{
-		$i++;
-		if(isset($_REQUEST["start"])&&($i<$_REQUEST["start"]))
-		{
-			continue;
-		}
 		if(!check_right_on_trigger("R",$row["triggerid"]))
 		{
 			continue;
 		}
-		if($col>100)	break;
+
+		if($skip > 0) {
+			$skip--;
+			continue;
+		}
 
 		$description=expand_trigger_description($row["triggerid"]);
 		$description="<a href=\"alarms.php?triggerid=".$row["triggerid"]."\">$description</a>";
@@ -200,6 +189,8 @@
 			$description,
 			$value,
 			$priority));
+
+		$col++;
 	}
 	$table->show();
 ?>

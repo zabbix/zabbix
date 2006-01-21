@@ -20,7 +20,7 @@
 ?>
 <?php
 	include "include/config.inc.php";
-	$page["title"] = "S_ALERT_HISTORY_SMALL";
+	$page["title"] = "S_LATEST_ACTIONS";
 	$page["file"] = "actions.php";
 	show_header($page["title"],1,0);
 ?>
@@ -30,7 +30,7 @@
 	$fields=array(
 		"groupid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	BETWEEN(0,65535),	NULL),
 		"hostid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	BETWEEN(0,65535),	NULL),
-		"start"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535),	NULL),
+		"start"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535)."({}%100==0)",	NULL),
 		"next"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
 		"prev"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL)
 	);
@@ -62,7 +62,7 @@
 ?>
 
 <?php
-	$h1="&nbsp;".S_ALERT_HISTORY_BIG;
+	$h1="&nbsp;".S_HISTORY_OF_ACTIONS_BIG;
 
 	$h2="";
 
@@ -73,7 +73,7 @@
 	}
 	else
 	{
-  		$h2=$h2."<input class=\"button\" type=\"submit\" disabled name=\"do\" value=\"<< Prev 100\">";
+  		$h2=$h2."<input class=\"button\" type=\"submit\" disabled name=\"prev\" value=\"<< Prev 100\">";
 	}
   	$h2=$h2."<input class=\"button\" type=\"submit\" name=\"next\" value=\"Next 100 >>\">";
 
@@ -83,35 +83,28 @@
 
 <FONT COLOR="#000000">
 <?php
-	$sql="select max(alertid) as max from alerts";
-	$result=DBselect($sql);
-	$row=DBfetch($result);
-	$maxalertid=@iif(DBnum_rows($result)>0,$row["max"],0);
-
 	if(!isset($_REQUEST["start"]))
 	{
-		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error from alerts a,media_type mt where mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200 order by a.clock desc limit 200";
+		$_REQUEST["start"]=0;
 	}
-	else
-	{
-		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error from alerts a,media_type mt where mt.mediatypeid=a.mediatypeid and a.alertid>$maxalertid-200-".$_REQUEST["start"]." order by a.clock desc limit ".($_REQUEST["start"]+500);
-	}
-	echo $sql,"<br>";
+	$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error from alerts a,media_type mt where mt.mediatypeid=a.mediatypeid order by a.clock desc limit ".(10*($_REQUEST["start"]+100));
 	$result=DBselect($sql);
 
-	$table = new CTableInfo(S_NO_ALERTS);
+	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 	$table->setHeader(array(S_TIME, S_TYPE, S_STATUS, S_RECIPIENTS, S_SUBJECT, S_MESSAGE, S_ERROR));
 	$col=0;
-	$zzz=0;
-	while($row=DBfetch($result))
+	$skip=$_REQUEST["start"];
+	while(($row=DBfetch($result))&&($col<100))
 	{
-		$zzz++;	
 		if(!check_anyright("Default permission","R"))
                 {
 			continue;
 		}
 
-		if($col>100)	break;
+		if($skip > 0) {
+			$skip--;
+			continue;
+		}
 
 		$time=date("Y.M.d H:i:s",$row["clock"]);
 
@@ -142,6 +135,7 @@
 			$subject,
 			$message,
 			$error));
+		$col++;
 	}
 	$table->show();
 ?>

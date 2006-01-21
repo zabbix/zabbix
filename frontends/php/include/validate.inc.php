@@ -35,6 +35,7 @@
 	}
 
 	define("NOT_EMPTY","({}!='')&&");
+	define("DB_ID","({}>=0&&{}<=4294967295)&&");
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	function	calc_exp($fields,$field,$expression)
