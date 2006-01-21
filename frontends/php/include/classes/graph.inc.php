@@ -617,8 +617,8 @@
 
 //			$this->im = imagecreate($this->sizeX+$this->shiftX+61,$this->sizeY+2*$this->shiftY+40);
 
-			Header( "Content-type:  text/html"); 
-//			Header( "Content-type:  image/png"); 
+//			Header( "Content-type:  text/html"); 
+			Header( "Content-type:  image/png"); 
 			Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 
 			check_authorisation();
