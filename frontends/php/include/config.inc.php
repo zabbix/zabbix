@@ -1041,14 +1041,14 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 	$menu=array(
 		"view"=>array(
 				"label"=>S_MONITORING,
-				"pages"=>array("overview.php","latest.php","tr_status.php","queue.php","latestalarms.php","alerts.php","maps.php","charts.php","screens.php","srv_status.php","alarms.php","history.php","tr_comments.php","report3.php","profile.php"),
+				"pages"=>array("overview.php","latest.php","tr_status.php","queue.php","events.php","actions.php","maps.php","charts.php","screens.php","srv_status.php","alarms.php","history.php","tr_comments.php","report3.php","profile.php"),
 				"level2"=>array(
 					array("label"=>S_OVERVIEW,"url"=>"overview.php"),
 					array("label"=>S_LATEST_DATA,"url"=>"latest.php"),
 					array("label"=>S_TRIGGERS,"url"=>"tr_status.php"),
 					array("label"=>S_QUEUE,"url"=>"queue.php"),
-					array("label"=>S_EVENTS,"url"=>"latestalarms.php"),
-					array("label"=>S_ACTIONS,"url"=>"alerts.php"),
+					array("label"=>S_EVENTS,"url"=>"events.php"),
+					array("label"=>S_ACTIONS,"url"=>"actions.php"),
 					array("label"=>S_MAPS,"url"=>"maps.php"),
 					array("label"=>S_GRAPHS,"url"=>"charts.php"),
 					array("label"=>S_SCREENS,"url"=>"screens.php"),
@@ -1184,8 +1184,8 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		if(($sub["url"]=="overview.php")&&!check_anyright("Host","R"))							continue;
 		if(($sub["url"]=="tr_status.php?onlytrue=true&noactions=true&compact=true")&&!check_anyright("Host","R"))	continue;
 		if(($sub["url"]=="queue.php")&&!check_anyright("Host","R"))							continue;
-		if(($sub["url"]=="latestalarms.php")&&!check_anyright("Default permission","R"))				continue;
-		if(($sub["url"]=="alerts.php")&&!check_anyright("Default permission","R"))					continue;
+		if(($sub["url"]=="events.php")&&!check_anyright("Default permission","R"))				continue;
+		if(($sub["url"]=="actions.php")&&!check_anyright("Default permission","R"))					continue;
 		if(($sub["url"]=="maps.php")&&!check_anyright("Network map","R"))						continue;
 		if(($sub["url"]=="charts.php")&&!check_anyright("Graph","R"))							continue;
 		if(($sub["url"]=="screens.php")&&!check_anyright("Screen","R"))							continue;
