@@ -22,12 +22,14 @@
 	class CImg extends CTag
 	{
 /* public */
-		function CImg($src,$alt_text)
+		function CImg($src,$alt_text=NULL,$width=NULL,$height=NULL)
 		{
 			parent::CTag("img","no");
 			$this->AddOption('border',0);
 			$this->SetAltText($alt_text);
 			$this->SetSrc($src);
+			$this->SetWidth($width);
+			$this->SetHeight($height);
 		}
 		function SetSrc($value)
 		{
@@ -37,13 +39,32 @@
 			}
 			return $this->AddOption("src",$value);
 		}
-		function SetAltText($value="picture")
+		function SetAltText($value=NULL)
 		{
+			if(is_null($value))
+				$value="image";
+
 			if(!is_string($value))
 			{
 				return $this->error("Incorrect value for SetText [$value]");
 			}
 			return $this->AddOption("alt",$value);
+		}
+		function SetWidth($value=NULL){
+			if(is_null($value))
+				return $this->DelOption("width");
+			elseif(is_numeric($value)||is_int($value))
+				return $this->AddOption("width",$value);
+			else
+				return $this->error("Incorrect value for SetWidth [$value]");
+		}
+		function SetHeight($value=NULL){
+			if(is_null($value))
+				return $this->DelOption("height");
+			elseif(is_numeric($value)||is_int($value))
+				return $this->AddOption("height",$value);
+			else
+				return $this->error("Incorrect value for SetHeight [$value]");
 		}
 	}
 ?>

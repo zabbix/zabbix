@@ -890,11 +890,16 @@
 	}
 
 	# Insert autoregistration form
-	function	insert_autoregistration_form($id)
+	function	insert_autoregistration_form()
 	{
-		if(isset($id))
+		$frmAutoReg = new CFormTable(S_AUTOREGISTRATION,"config.php");
+		$frmAutoReg->SetHelp("web.autoregistration.php");
+		$frmAutoReg->AddVar("config",$_REQUEST["config"]);
+
+		if(isset($_REQUEST["autoregid"]))
 		{
-			$result=DBselect("select * from autoreg  where id=$id");
+			$frmAutoReg->AddVar("autoregid",$_REQUEST["autoregid"]);
+			$result=DBselect("select * from autoreg  where id=".$_REQUEST["autoregid"]);
 
 			$row=DBfetch($result);
 	
@@ -914,32 +919,26 @@
 
 		$col=0;
 
-		$frmAutoReg = new CFormTable(S_AUTOREGISTRATION,"config.php");
-		$frmAutoReg->SetHelp("web.autoregistration.php");
-		$frmAutoReg->AddVar("config",$_REQUEST["config"]);
-		if(isset($id))
-		{
-			$frmAutoReg->AddVar("id",$id);
-		}
 		$frmAutoReg->AddRow(S_PATTERN,new CTextBox("pattern",$pattern,64));
 		$frmAutoReg->AddRow(S_PRIORITY,new CTextBox("priority",$priority,4));
 		$frmAutoReg->AddRow(S_HOST,array(
 			new CTextBox("host",$host,32,NULL,'yes'),
 			new CButton("btn1","Select",
-				"window.open('popup.php?form=auto&field1=hostid&field2=host','new_win','width=450,height=450,resizable=1,scrollbars=1');",
+				"window.open('popup.php?form=auto&field1=hostid&field2=host',".
+				"'new_win','width=450,height=450,resizable=1,scrollbars=1');",
 				'T')
 			));
 		$frmAutoReg->AddVar("hostid",$hostid);
 		
 		$frmAutoReg->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($id))
+		if(isset($_REQUEST["autoregid"]))
 		{
 			$frmAutoReg->AddItemToBottomRow(SPACE);
-			$frmAutoReg->AddItemToBottomRow(new CButton("delete",S_DELETE,
-				"return Confirm('Delete selected autoregistration rule?');"));
+			$frmAutoReg->AddItemToBottomRow(new CButtonDelete(
+				"Delete selected autoregistration rule?",url_param("config").url_param("autoregid")));
 		}
 		$frmAutoReg->AddItemToBottomRow(SPACE);
-		$frmAutoReg->AddItemToBottomRow(new CButton("cancel",S_CANCEL));
+		$frmAutoReg->AddItemToBottomRow(new CButtonCancel(url_param("config")));
 		$frmAutoReg->Show();
 	}
 
@@ -958,8 +957,10 @@
 		{
 			$action=get_action_by_actionid($_REQUEST["actionid"]);
 			$frmAction->AddVar('actionid',$_REQUEST["actionid"]);
-
-			$actionid=$action["actionid"];
+		}
+	
+		if(isset($_REQUEST["actionid"])&&$_REQUEST["form"]!=1)
+		{
 			$actiontype=$action["actiontype"];
 			$source=$action["source"];
 			$delay=$action["delay"];
@@ -982,8 +983,8 @@
 			{
 				$repeat=1;
 			}
-			$sql="select conditiontype, operator, value from conditions where actionid=".$_REQUEST["actionid"]." order by conditiontype";
-			$result=DBselect($sql);
+			$result=DBselect("select conditiontype, operator, value from conditions".
+				" where actionid=".$_REQUEST["actionid"]." order by conditiontype");
 			$i=1;
 			while($condition=DBfetch($result))
 			{
@@ -995,23 +996,23 @@
 		}
 		else
 		{
-			$source=@iif(isset($_REQUEST["source"]),$_REQUEST["source"],0);
-			$actiontype=@iif(isset($_REQUEST["actiontype"]),$_REQUEST["actiontype"],0);
+			$source=get_request("source",0);
+			$actiontype=get_request("actiontype",0);
 
-			$delay=@iif(isset($_REQUEST["delay"]),$_REQUEST["delay"],30);
-			$subject=@iif(isset($_REQUEST["subject"]),$_REQUEST["subject"],"{TRIGGER.NAME}: {STATUS}");
-			$message=@iif(isset($_REQUEST["message"]),$_REQUEST["message"],"{TRIGGER.NAME}: {STATUS}");
-			$scope=@iif(isset($_REQUEST["scope"]),$_REQUEST["scope"],0);
-			$recipient=@iif(isset($_REQUEST["recipient"]),$_REQUEST["recipient"],RECIPIENT_TYPE_GROUP);
-			$severity=@iif(isset($_REQUEST["severity"]),$_REQUEST["severity"],0);
-			$maxrepeats=@iif(isset($_REQUEST["maxrepeats"]),$_REQUEST["maxrepeats"],0);
-			$repeatdelay=@iif(isset($_REQUEST["repeatdelay"]),$_REQUEST["repeatdelay"],600);
-			$repeat=@iif(isset($_REQUEST["repeat"]),$_REQUEST["repeat"],0);
+			$delay=get_request("delay",30);
+			$subject=get_request("subject","{TRIGGER.NAME}: {STATUS}");
+			$message=get_request("message","{TRIGGER.NAME}: {STATUS}");
+			$scope=get_request("scope",0);
+			$recipient=get_request("recipient",RECIPIENT_TYPE_GROUP);
+			$severity=get_request("severity",0);
+			$maxrepeats=get_request("maxrepeats",0);
+			$repeatdelay=get_request("repeatdelay",600);
+			$repeat=get_request("repeat",0);
 
 			if($recipient==RECIPIENT_TYPE_GROUP)
-				$uid=@iif(isset($_REQUEST["usrgrpid"]),$_REQUEST["usrgrpid"],NULL);
+				$uid=get_request("usrgrpid",NULL);
 			else
-				$uid=@iif(isset($_REQUEST["userid"]),$_REQUEST["userid"],NULL);
+				$uid=get_request("userid",NULL);
 		}
 
 
@@ -1217,7 +1218,7 @@
 			$frmAction->AddRow(S_DELAY_BETWEEN_REPEATS, new CTextBox('repeatdelay',$repeatdelay,2));
 		}
 
-		if(isset($actionid))
+		if(isset($_REQUEST["actionid"]))
 		{
 			$frmAction->AddItemToBottomRow(new CButton('register','update'));
 			$frmAction->AddItemToBottomRow(SPACE);
@@ -1287,15 +1288,16 @@
 		if(isset($_REQUEST["mediatypeid"]))
 		{
 			$frmMeadia->AddItemToBottomRow(SPACE);
-			$frmMeadia->AddItemToBottomRow(new CButton("delete",S_DELETE,"return Confirm('".S_DELETE_SELECTED_MEDIA."');"));
+			$frmMeadia->AddItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_MEDIA,
+				url_param("config").url_param("mediatypeid")));
 		}
 		$frmMeadia->AddItemToBottomRow(SPACE);
-		$frmMeadia->AddItemToBottomRow(new CButton("cancel",S_CANCEL));
+		$frmMeadia->AddItemToBottomRow(new CButtonCancel(url_param("config")));
 		$frmMeadia->Show();
 	}
 
-function	insert_image_form()
-{
+	function	insert_image_form()
+	{
 		if(!isset($_REQUEST["imageid"]))
 		{
 			$name="";
@@ -1330,10 +1332,11 @@ function	insert_image_form()
 		if(isset($_REQUEST["imageid"]))
 		{
 			$frmImages->AddItemToBottomRow(SPACE);
-			$frmImages->AddItemToBottomRow(new CButton("delete",S_DELETE,"return Confirm('".S_DELETE_SELECTED_IMAGE."');"));
+			$frmImages->AddItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_IMAGE,
+				url_param("config").url_param("imageid")));
 		}
 		$frmImages->AddItemToBottomRow(SPACE);
-		$frmImages->AddItemToBottomRow(new CButton("cancel",S_CANCEL));
+		$frmImages->AddItemToBottomRow(new CButtonCancel(url_param("config")));
 		$frmImages->Show();
 	}
 
@@ -1445,6 +1448,37 @@ function	insert_image_form()
 		$frmMedia->Show();
 	}
 
+	function	insert_housekeeper_form()
+	{
+		$config=select_config();
+		
+		$frmHouseKeep = new CFormTable(S_HOUSEKEEPER,"config.php");
+		$frmHouseKeep->SetHelp("web.config.housekeeper.php");
+		$frmHouseKeep->AddVar("config",get_request("config",0));
+		$frmHouseKeep->AddVar("refresh_unsupported",$config["refresh_unsupported"]);
+		$frmHouseKeep->AddRow(S_DO_NOT_KEEP_ACTIONS_OLDER_THAN,
+			new CTextBox("alert_history",$config["alert_history"],8));
+		$frmHouseKeep->AddRow(S_DO_NOT_KEEP_EVENTS_OLDER_THAN,
+			new CTextBox("alarm_history",$config["alarm_history"],8));
+		$frmHouseKeep->AddItemToBottomRow(new CButton("save",S_SAVE));
+		$frmHouseKeep->Show();
+	}
+
+	function	insert_other_parameters_form()
+	{
+		$config=select_config();
+		
+		$frmHouseKeep = new CFormTable(S_OTHER_PARAMETERS,"config.php");
+		$frmHouseKeep->SetHelp("web.config.other.php");
+		$frmHouseKeep->AddVar("config",get_request("config",5));
+		$frmHouseKeep->AddVar("alert_history",$config["alert_history"]);
+		$frmHouseKeep->AddVar("alarm_history",$config["alarm_history"]);
+		$frmHouseKeep->AddRow(S_REFRESH_UNSUPPORTED_ITEMS,
+			new CTextBox("refresh_unsupported",$config["refresh_unsupported"],8));
+		$frmHouseKeep->AddItemToBottomRow(new CButton("save",S_SAVE));
+		$frmHouseKeep->Show();
+	}
+
 	function	insert_host_form()
 	{
 
@@ -1514,7 +1548,7 @@ function	insert_image_form()
 			}
 		}
 
-		$frmHost = new CFormTable($frm_title,"hosts.php#form");
+		$frmHost = new CFormTable($frm_title,"hosts.php");
 		$frmHost->SetHelp("web.hosts.host.php");
 		$frmHost->AddVar("config",get_request("config",0));
 

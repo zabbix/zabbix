@@ -60,7 +60,8 @@
 		"exec_path"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==1)&&isset({save})'),
 //		"exec_path"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==1)'),
 
-		"imageid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),'{config}==3'),
+		"imageid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535),'{config}==3&&(isset({form})'),
+		"autoregid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),'{config}==4&&(isset({form}))'),
 
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -70,287 +71,222 @@
 ?>
 
 <?php
-/*	if(isset($_REQUEST["config"]))	$_REQUEST["config"]=$_REQUEST["config"]; */
+	$_REQUEST["config"]=get_request("config",get_profile("web.config.config",0));
 
-	$_REQUEST["config"]=@iif(isset($_REQUEST["config"]),$_REQUEST["config"],get_profile("web.config.config",0));
 	update_profile("web.config.config",$_REQUEST["config"]);
 
 	check_fields($fields);
 
-	if(isset($_REQUEST["save"])&&isset($_REQUEST["config"])&&(in_array($_REQUEST["config"],array(0,5))))
+/* MEDIATYPE ACTIONS */
+	if($_REQUEST["config"]==1){
+		if(isset($_REQUEST["save"]))
+		{
+			if(isset($_REQUEST["mediatypeid"]))
+			{
+	/* UPDATE */
+				$action = AUDIT_ACTION_UPDATE;
+				$result=update_mediatype($_REQUEST["mediatypeid"],
+					$_REQUEST["type"],$_REQUEST["description"],$_REQUEST["smtp_server"],
+					$_REQUEST["smtp_helo"],$_REQUEST["smtp_email"],$_REQUEST["exec_path"]);
+
+				show_messages($result, S_MEDIA_TYPE_UPDATED, S_MEDIA_TYPE_WAS_NOT_UPDATED);
+			}
+			else
+			{
+	/* ADD */
+				$action = AUDIT_ACTION_ADD;
+				$result=add_mediatype(
+					$_REQUEST["type"],$_REQUEST["description"],$_REQUEST["smtp_server"],
+					$_REQUEST["smtp_helo"],$_REQUEST["smtp_email"],$_REQUEST["exec_path"]);
+
+				show_messages($result, S_ADDED_NEW_MEDIA_TYPE, S_NEW_MEDIA_TYPE_WAS_NOT_ADDED);
+			}
+			if($result)
+			{
+				add_audit($action,AUDIT_RESOURCE_MEDIA_TYPE,
+					"Media type [".addslashes($_REQUEST["description"])."]");
+
+				unset($_REQUEST["form"]);
+			}
+		} elseif(isset($_REQUEST["delete"])&&isset($_REQUEST["mediatypeid"])) {
+	/* DELETE */
+			$mediatype=get_mediatype_by_mediatypeid($_REQUEST["mediatypeid"]);
+			$result=delete_mediatype($_REQUEST["mediatypeid"]);
+			show_messages($result, S_MEDIA_TYPE_DELETED, S_MEDIA_TYPE_WAS_NOT_DELETED);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MEDIA_TYPE,
+					"Media type [".$mediatype["description"]."]");
+
+				unset($_REQUEST["form"]);
+			}
+		}
+	}
+	elseif($_REQUEST["config"]==3)
 	{
-		$result=update_config($_REQUEST["alarm_history"],$_REQUEST["alert_history"],$_REQUEST["refresh_unsupported"]);
+/* IMAGES ACTIONS */
+		if(isset($_REQUEST["save"]))
+		{
+			if(isset($_REQUEST["imageid"]))
+			{
+	/* UPDATE */
+				$result=update_image($_REQUEST["imageid"],$_REQUEST["name"],
+					$_REQUEST["imagetype"],$_FILES);
+
+				$msg_ok = S_IMAGE_UPDATED;
+				$msg_fail = S_CANNOT_UPDATE_IMAGE;
+				$audit_action = "Image updated";
+				unset($_REQUEST["imageid"]);
+			} else {
+	/* ADD */
+				$result=add_image($_REQUEST["name"],$_REQUEST["imagetype"],$_FILES);
+
+				$msg_ok = S_IMAGE_ADDED;
+				$msg_fail = S_CANNOT_ADD_IMAGE;
+				$audit_action = "Image added";
+			}
+			show_messages($result, $msg_ok, $msg_fail);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,$audit_action);
+				unset($_REQUEST["form"]);
+			}
+		} elseif(isset($_REQUEST["delete"])&&isset($_REQUEST["imageid"])) {
+	/* DELETE */
+			$result=delete_image($_REQUEST["imageid"]);
+			show_messages($result, S_IMAGE_DELETED, S_CANNOT_DELETE_IMAGE);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Image deleted");
+			}
+			unset($_REQUEST["imageid"]);
+		}
+	}
+	elseif($_REQUEST["config"]==4)
+	{
+/* AUTOREG ACTIONS */
+		if(isset($_REQUEST["save"]))
+		{
+			if(isset($_REQUEST["autoregid"]))
+			{
+	/* UPDATE */
+				$result=update_autoregistration($_REQUEST["autoregid"],
+					$_REQUEST["pattern"],$_REQUEST["priority"],$_REQUEST["hostid"]);
+
+				$msg_ok = S_AUTOREGISTRATION_UPDATED;
+				$msg_fail = S_AUTOREGISTRATION_WAS_NOT_UPDATED;
+				$audit_action = AUDIT_ACTION_UPDATE;
+			} else {
+	/* ADD */
+				$result=add_autoregistration(
+					$_REQUEST["pattern"],$_REQUEST["priority"],$_REQUEST["hostid"]);
+
+				$msg_ok = S_AUTOREGISTRATION_ADDED;
+				$msg_fail = S_CANNOT_ADD_AUTOREGISTRATION;
+				$audit_action = AUDIT_ACTION_ADD;
+			}
+
+			if($result)
+			{
+				add_audit($audit_action, AUDIT_RESOURCE_AUTOREGISTRATION,
+					"Autoregistration [".addslashes($_REQUEST["pattern"])."]");
+
+				unset($_REQUEST["form"]);
+			}
+			show_messages($result, $msg_ok, $msg_fail);
+
+		} elseif(isset($_REQUEST["delete"])&&isset($_REQUEST["autoregid"])) {
+	/* DELETE */
+			$result=delete_autoregistration($_REQUEST["autoregid"]);
+			if($result)
+			{
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_AUTOREGISTRATION,
+					"Autoregistration [".addslashes($_REQUEST["pattern"])."]");
+			}
+			show_messages($result, S_AUTOREGISTRATION_DELETED, S_AUTOREGISTRATION_WAS_NOT_DELETED);
+		}
+	}
+	elseif(isset($_REQUEST["save"])&&in_array($_REQUEST["config"],array(0,5)))
+	{
+/* OTHER ACTIONS */
+		$result=update_config($_REQUEST["alarm_history"],$_REQUEST["alert_history"],
+			$_REQUEST["refresh_unsupported"]);
+
 		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
 		if($result)
 		{
-			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Alarm history [".$_REQUEST["alarm_history"]."] alert history [".$_REQUEST["alert_history"]."]");
+			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,
+				"Alarm history [".$_REQUEST["alarm_history"]."] alert history".
+				" [".$_REQUEST["alert_history"]."]");
 		}
 	}
 
-	if(isset($_REQUEST["delete"])&&($_REQUEST["config"]==1))
-	{
-		$mediatype=get_mediatype_by_mediatypeid($_REQUEST["mediatypeid"]);
-		$result=delete_mediatype($_REQUEST["mediatypeid"]);
-		show_messages($result, S_MEDIA_TYPE_DELETED, S_MEDIA_TYPE_WAS_NOT_DELETED);
-		if($result)
-		{
-			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MEDIA_TYPE,"Media type [".$mediatype["description"]."]");
-		}
-		if($result)
-		{
-			unset($_REQUEST["form"]);
-		}
-	}
-
-	if(isset($_REQUEST["save"])&&($_REQUEST["config"]==1))
-	{
-		if(isset($_REQUEST["mediatypeid"]))
-		{
-			$action = AUDIT_ACTION_UPDATE;
-			$result=update_mediatype($_REQUEST["mediatypeid"],$_REQUEST["type"],$_REQUEST["description"],$_REQUEST["smtp_server"],$_REQUEST["smtp_helo"],$_REQUEST["smtp_email"],$_REQUEST["exec_path"]);
-			show_messages($result, S_MEDIA_TYPE_UPDATED, S_MEDIA_TYPE_WAS_NOT_UPDATED);
-		}
-		else
-		{
-			$action = AUDIT_ACTION_ADD;
-			$result=add_mediatype($_REQUEST["type"],$_REQUEST["description"],$_REQUEST["smtp_server"],$_REQUEST["smtp_helo"],$_REQUEST["smtp_email"],$_REQUEST["exec_path"]);
-			show_messages($result, S_ADDED_NEW_MEDIA_TYPE, S_NEW_MEDIA_TYPE_WAS_NOT_ADDED);
-		}
-		if($result)
-		{
-			add_audit($action,AUDIT_RESOURCE_MEDIA_TYPE,"Media type [".addslashes($_REQUEST["description"])."]");
-			unset($_REQUEST["form"]);
-		}
-	}
-
-	if(isset($_REQUEST["save"])&&!isset($_REQUEST["imageid"])&&($_REQUEST["config"]==3))
-	{
-		$result=add_image($_REQUEST["name"],$_REQUEST["imagetype"],$_FILES);
-		show_messages($result, S_IMAGE_ADDED, S_CANNOT_ADD_IMAGE);
-		if($result)
-		{
-			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Image deleted");
-		}
-		unset($_REQUEST["imageid"]);
-	}
-
-	if(isset($_REQUEST["delete"])&&($_REQUEST["config"]==3))
-	{
-		$result=delete_image($_REQUEST["imageid"]);
-		show_messages($result, S_IMAGE_DELETED, S_CANNOT_DELETE_IMAGE);
-		if($result)
-		{
-			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Image deleted");
-		}
-		unset($_REQUEST["imageid"]);
-	}
-
-	if(isset($_REQUEST["save"])&&isset($_REQUEST["imageid"])&&($_REQUEST["config"]==3))
-	{
-		$result=update_image($_REQUEST["imageid"],$_REQUEST["name"],$_REQUEST["imagetype"],$_FILES);
-		show_messages($result, S_IMAGE_UPDATED, S_CANNOT_UPDATE_IMAGE);
-		if($result)
-		{
-			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Image updated");
-		}
-		unset($_REQUEST["imageid"]);
-	}
-
-	if(isset($_REQUEST["delete"])&&($_REQUEST["config"]==4))
-	{
-		$result=delete_autoregistration($_REQUEST["id"]);
-		if($result)
-		{
-			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_AUTOREGISTRATION,"Autoregistration [".addslashes($_REQUEST["pattern"])."]");
-		}
-		show_messages($result, S_AUTOREGISTRATION_DELETED, S_AUTOREGISTRATION_WAS_NOT_DELETED);
-	}
-
-	if(isset($_REQUEST["save"])&&!isset($_REQUEST["id"])&&($_REQUEST["config"]==4))
-	{
-		$result=add_autoregistration($_REQUEST["pattern"],$_REQUEST["priority"],$_REQUEST["hostid"]);
-		if($result)
-		{
-			add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_AUTOREGISTRATION,"Autoregistration [".addslashes($_REQUEST["pattern"])."]");
-		}
-		show_messages($result, S_AUTOREGISTRATION_ADDED, S_CANNOT_ADD_AUTOREGISTRATION);
-	}
-
-	if(isset($_REQUEST["save"])&&isset($_REQUEST["id"])&&($_REQUEST["config"]==4))
-	{
-		$result=update_autoregistration($_REQUEST["id"],$_REQUEST["pattern"],$_REQUEST["priority"],$_REQUEST["hostid"]);
-		if($result)
-		{
-			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_AUTOREGISTRATION,"Autoregistration [".addslashes($_REQUEST["pattern"])."]");
-		}
-		show_messages($result, S_AUTOREGISTRATION_UPDATED, S_AUTOREGISTRATION_WAS_NOT_UPDATED);
-	}
-
-	if(isset($_REQUEST["cancel"])){
-		unset($_REQUEST["form"]);
-	}
 ?>
 
 <?php
 
-	$h1=S_CONFIGURATION_OF_ZABBIX_BIG;
-
-#	$h2=S_GROUP."&nbsp;";
-	$h2="";
-	$h2=$h2."<select class=\"biginput\" name=\"config\" onChange=\"submit()\">";
-	$h2=$h2.form_select("config",0,S_HOUSEKEEPER);
-	$h2=$h2.form_select("config",1,S_MEDIA_TYPES);
-//	$h2=$h2.form_select("config",2,S_ESCALATION_RULES);
-	$h2=$h2.form_select("config",3,S_IMAGES);
-	$h2=$h2.form_select("config",4,S_AUTOREGISTRATION);
-	$h2=$h2.form_select("config",5,S_OTHER);
-	$h2=$h2."</select>";
+	$form = new CForm("config.php");
+	$cmbConfig = new CCombobox("config",$_REQUEST["config"],"submit()");
+	$cmbConfig->AddItem(0,S_HOUSEKEEPER);
+	$cmbConfig->AddItem(1,S_MEDIA_TYPES);
+	$cmbConfig->AddItem(2,S_ESCALATION_RULES);
+	$cmbConfig->AddItem(3,S_IMAGES);
+	$cmbConfig->AddItem(4,S_AUTOREGISTRATION);
+	$cmbConfig->AddItem(5,S_OTHER);
+	$form->AddItem($cmbConfig);
 	if($_REQUEST["config"] == 1)
 	{
-		$h2=$h2."&nbsp;|&nbsp;";
-		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"form\" value=\"".S_CREATE_MEDIA_TYPE."\">";
+		$form->AddItem(SPACE."|".SPACE);
+		$form->AddItem(new CButton("form",S_CREATE_MEDIA_TYPE));
 	}
 	else if($_REQUEST["config"] == 3)
 	{
-		$h2=$h2."&nbsp;|&nbsp;";
-		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"form\" value=\"".S_CREATE_IMAGE."\">";
+		$form->AddItem(SPACE."|".SPACE);
+		$form->AddItem(new CButton("form",S_CREATE_IMAGE));
 	}
 	else if($_REQUEST["config"] == 4)
 	{
-		$h2=$h2."&nbsp;|&nbsp;";
-		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"form\" value=\"".S_CREATE_RULE."\">";
+		$form->AddItem(SPACE."|".SPACE);
+		$form->AddItem(new CButton("form",S_CREATE_RULE));
+		
 	}
-
-	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"config.php\">", "</form>");
-
-#	show_table_header(S_CONFIGURATION_OF_ZABBIX_BIG);
+	show_header2(S_CONFIGURATION_OF_ZABBIX_BIG, $form);
+	echo BR;
 ?>
 
 <?php
 	if($_REQUEST["config"]==0)
 	{
-		$config=select_config();
-
-		$col=0;
-		show_form_begin("config.housekeeper");
-		echo S_HOUSEKEEPER;
-
-		show_table2_v_delimiter($col++);
-		echo "<form method=\"get\" action=\"config.php\">";
-		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"0\" size=8>";
-		echo "<input type=\"hidden\" name=\"refresh_unsupported\" value=\"".$config["refresh_unsupported"]."\">";
-		echo nbsp(S_DO_NOT_KEEP_ACTIONS_OLDER_THAN);
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"alert_history\" value=\"".$config["alert_history"]."\" size=8>";
-
-		show_table2_v_delimiter($col++);
-		echo nbsp(S_DO_NOT_KEEP_EVENTS_OLDER_THAN);
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"alarm_history\" value=\"".$config["alarm_history"]."\" size=8>";
-
-		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"save\" value=\"".S_SAVE."\">";
-
-		show_table2_header_end();
+		insert_housekeeper_form();
 	}
-?>
-
-<?php
-	if($_REQUEST["config"]==5)
+	elseif($_REQUEST["config"]==5)
 	{
-		$config=select_config();
-
-		$col=0;
-		show_form_begin("config.other");
-		echo S_OTHER_PARAMETERS;
-
-		show_table2_v_delimiter($col++);
-		echo "<form method=\"get\" action=\"config.php\">";
-		echo "<input class=\"biginput\" name=\"config\" type=\"hidden\" value=\"5\" size=8>";
-		echo "<input type=\"hidden\" name=\"alert_history\" value=\"".$config["alert_history"]."\">";
-		echo "<input type=\"hidden\" name=\"alarm_history\" value=\"".$config["alarm_history"]."\">";
-		echo nbsp(S_REFRESH_UNSUPPORTED_ITEMS);
-		show_table2_h_delimiter();
-		echo "<input class=\"biginput\" name=\"refresh_unsupported\" value=\"".$config["refresh_unsupported"]."\" size=8>";
-
-		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"save\" value=\"".S_SAVE."\">";
-
-		show_table2_header_end();
+		insert_other_parameters_form();
 	}
-?>
-
-<?php
-	if($_REQUEST["config"]==3)
+	elseif($_REQUEST["config"]==1)
 	{
-		if(!isset($_REQUEST["form"]))
+		if(isset($_REQUEST["form"]))
 		{
-			echo "<br>";
-			show_table_header(S_IMAGES_BIG);
-
-			$table=new CTableInfo(S_NO_IMAGES_DEFINED);
-			$table->setHeader(array(S_ID,S_TYPE,S_NAME,S_ACTIONS));
-	
-			$result=DBselect("select imageid,imagetype,name,image from images order by name");
-			while($row=DBfetch($result))
-			{
-				if($row["imagetype"]==1)
-				{
-					$imagetype=S_ICON;
-				}
-				else if($row["imagetype"]==2)
-				{
-					$imagetype=S_BACKGROUND;
-				}
-				else
-				{
-					$imagetype=S_UNKNOWN;
-				}
-				$name="<a href=\"config.php?config=3&form=0&register=change&imageid=".$row["imageid"]."\">".$row["name"]."</a>";
-				$actions="<a href=\"image.php?imageid=".$row["imageid"]."\">".S_SHOW."</a>";
-				$table->addRow(array(
-					$row["imageid"],
-					$imagetype,
-					$name,
-	//				"<img src=\"image.php?imageid=".$row["imageid"]."\">",
-					$actions));
-			}
-			$table->show();
+			insert_media_type_form();
 		}
 		else
 		{
-			insert_image_form();
-		}
-	}
-?>
-
-<?php
-	if($_REQUEST["config"]==1)
-	{
-		if(!isset($_REQUEST["form"]))
-		{
-			echo "<br>";
 			show_table_header(S_MEDIA_TYPES_BIG);
 
 			$table=new CTableInfo(S_NO_MEDIA_TYPES_DEFINED);
 			$table->setHeader(array(S_ID,S_DESCRIPTION,S_TYPE));
 
-			$result=DBselect("select mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path from media_type mt order by mt.type");
+			$result=DBselect("select mt.mediatypeid,mt.type,mt.description,mt.smtp_server,".
+				"mt.smtp_helo,mt.smtp_email,mt.exec_path from media_type mt order by mt.type");
 			while($row=DBfetch($result))
 			{
-				$description="<a href=\"config.php?config=1&form=0&mediatypeid=".$row["mediatypeid"]."\">".$row["description"]."</a>";
-				if($row["type"]==0)
-				{
-					$type=S_EMAIL;
-				}
-				else if($row["type"]==1)
-				{
-					$type=S_SCRIPT;
-				}
-				else
-				{
-					$type=S_UNKNOWN;
-				}
+				$description=new CLink($row["description"],"config.php?&form=0".
+					url_param("config")."&mediatypeid=".$row["mediatypeid"]);
+
+				if($row["type"]==0)		$type=S_EMAIL;
+				else if($row["type"]==1)	$type=S_SCRIPT;
+				else				$type=S_UNKNOWN;
+
 				$table->addRow(array(
 					$row["mediatypeid"],
 					$description,
@@ -358,20 +294,10 @@
 			}
 			$table->show();
 		}
-?>
-
-<?php
-		if(isset($_REQUEST["form"]))
-		{
-			echo "<br>";
-			insert_media_type_form();
-		}
 	}
-?>
-
-<?php
+/*
 // Disabled
-	if($_REQUEST["config"]==20)
+	elseif($_REQUEST["config"]==2)
 	{
 		echo "<br>";
 		show_table_header(S_ESCALATION_RULES_BIG);
@@ -435,33 +361,70 @@
 			insert_escalation_rule_form($_REQUEST["escalationid"],$_REQUEST["escalationruleid"]);
 		}
 	}
-?>
-
-<?php
-	if($_REQUEST["config"]==4)
+*/
+	elseif($_REQUEST["config"]==3)
 	{
-		if(!isset($_REQUEST["form"]))
+		if(isset($_REQUEST["form"]))
 		{
-			echo "<br>";
+			insert_image_form();
+		}
+		else
+		{
+			show_table_header(S_IMAGES_BIG);
+
+			$table=new CTableInfo(S_NO_IMAGES_DEFINED);
+			$table->setHeader(array(S_ID,S_NAME,S_TYPE,S_IMAGE));
+	
+			$result=DBselect("select imageid,imagetype,name,image from images order by name");
+			while($row=DBfetch($result))
+			{
+				if($row["imagetype"]==1)	$imagetype=S_ICON;
+				else if($row["imagetype"]==2)	$imagetype=S_BACKGROUND;
+				else				$imagetype=S_UNKNOWN;
+
+				$name=new CLink($row["name"],"config.php?form=0".url_param("config").
+					"&imageid=".$row["imageid"]);
+
+				$table->addRow(array(
+					$row["imageid"],
+					$name,
+					$imagetype,
+					$actions=new CLink(
+						new CImg("image.php?imageid=".$row["imageid"],"no image",NULL,"24"),
+						"image.php?imageid=".$row["imageid"])
+					));
+			}
+			$table->show();
+		}
+	}
+	elseif($_REQUEST["config"]==4)
+	{
+		if(isset($_REQUEST["form"]))
+		{
+			insert_autoregistration_form();
+		}
+		else
+		{
 			show_table_header(S_AUTOREGISTRATION_RULES_BIG);
 
 			$table=new CTableInfo(S_NO_AUTOREGISTRATION_RULES_DEFINED);
 			$table->setHeader(array(S_ID,S_PRIORITY,S_PATTERN,S_HOST));
 
 			$result=DBselect("select * from autoreg order by priority");
-			$col=0;
 			while($row=DBfetch($result))
 			{
 				if($row["hostid"]==0)
 				{
-					$name="&nbsp;";
+					$name=SPACE;
 				}
 				else
 				{
 					$host=get_host_by_hostid($row["hostid"]);
 					$name=$host["host"];
 				}
-				$pattern="<a href=\"config.php?config=4&form=0&register=change&id=".$row["id"]."\">".$row["pattern"]."</a>";
+				$pattern=new CLink($row["pattern"],
+					"config.php?form=0".url_param("config")."&autoregid=".$row["id"]);
+
 				$table->addRow(array(
 					$row["id"],
 					$row["priority"],
@@ -469,10 +432,6 @@
 					$name));
 			}
 			$table->show();
-		}
-		else
-		{
-			@insert_autoregistration_form($_REQUEST["id"]);
 		}
 	}
 ?>

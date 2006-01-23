@@ -27,6 +27,7 @@
 			parent::CTag("span","yes");
 			$this->SetClass($class);
 			$this->AddItem($items);
+			$this->tag_body_start = "";
 		}
 	}
 ?>

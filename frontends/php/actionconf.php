@@ -224,7 +224,7 @@
 				htmlspecialchars($row["delay"]),
 				htmlspecialchars($row["subject"]),
 				$row["maxrepeats"] == 0 ? S_NO_REPEATS : $row["maxrepeats"],
-				new CLink(S_CHANGE,"actionconf.php?register=edit&amp;form=0&actionid=".$row['actionid']."#form")
+				new CLink(S_CHANGE,"actionconf.php?form=0&actionid=".$row['actionid'])
 				));	
 		}
 		$tblActions->Show();
