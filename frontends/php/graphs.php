@@ -28,6 +28,7 @@
 ?>
 <?php
 	show_table_header(S_CONFIGURATION_OF_GRAPHS_BIG);
+	echo BR;
 ?>
 <?php
 	if(!check_anyright("Graph","U"))
@@ -192,7 +193,7 @@
 ?>
 <?php
 	echo "<a name=\"form\"></a>";
-
+	echo BR;
 	insert_graph_form();
 
 ?>
