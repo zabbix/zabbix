@@ -9,31 +9,46 @@ config_param="--enable-agent --prefix=`pwd`"
 dotest="no"
 cleanwarnings="no"
 docat="yes"
+help="no"
+noparam=0;
 
 for cmd
 do
   case "$cmd" in
-    copy )    copy="yes";;
-    pre ) premake="yes";;
-    premake ) premake="yes";;
-    conf )      configure="yes";;
-    config )    configure="yes";;
-    configure ) configure="yes";;
-    make )    domake="yes";;
-    test )    dotest="yes";;
-    tar )     tgz="yes";;
-    nocat )   docat="no";;
+    copy )    copy="yes"; noparam=1;;
+    cpy )     copy="yes"; noparam=1;;
+    pre ) premake="yes"; noparam=1;;
+    premake ) premake="yes"; noparam=1;;
+    conf )      configure="yes"; noparam=1;;
+    config )    configure="yes"; noparam=1;;
+    configure ) configure="yes"; noparam=1;;
+    make )    domake="yes"; noparam=1;;
+    test )    dotest="yes"; noparam=1;;
+    tar )     tgz="yes"; noparam=1;;
+    nocat )   docat="no"; noparam=1;;
+    cat )   docat="yes"; noparam=1;;
     --enable-* ) config_param="$config_param $cmd";; 
     --with-* ) config_param="$config_param $cmd";;
+    help ) help="yes";;
+    h ) help="yes";;
     * ) 
         echo "$0: ERROR: uncnown parameter \"$cmd\""; 
-        echo
-        echo "Usage:"
-        echo "  $0 [copy] [premake|pre] [configure|config|conf] [make] [test] [tar] [nocat] [--enable-*] [--with-*]"
-        echo
-        exit 1;;
+	help="yes";
   esac
 done
+if [ "$help" = "yes" ] || [ $noparam = 0 ]
+then
+        echo
+        echo "Usage:"
+        echo "  $0 [copy|cpy] [premake|pre] [configure|config|conf] [make] [test] [tar] [cat] [nocat] [--enable-*] [--with-*]"
+        echo
+        echo "Examples:"
+        echo "  $0 conf make test            - compyle, test, and hsow report"
+        echo "  $0 cpy tar nocat             - make archive .tar.gz and don't show report"
+        echo "  $0 cat                       - cat last REPORT"
+        echo "  $0                           - show this help"
+        exit 1;
+fi
 
 if [ "$copy" = "yes" ] || [ $premake = "yes" ] || 
   [ $configure = "yes" ] || [ $domake = "yes" ] || 

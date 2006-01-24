@@ -19,7 +19,7 @@ char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
 	regex_t	re;
 	regmatch_t match;
 
-	*len=0;
+	if(len) *len = 0;
 
 
 	if (regcomp(&re, pattern, REG_EXTENDED | /* REG_ICASE | */ REG_NEWLINE) != 0)
@@ -38,7 +38,7 @@ char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
 	}
 
 	c=(char *)string+match.rm_so;
-	*len=match.rm_eo - match.rm_so;
+	if(len) *len = match.rm_eo - match.rm_so;
 	
 	regfree(&re);
 
