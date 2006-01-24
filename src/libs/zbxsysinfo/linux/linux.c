@@ -247,7 +247,7 @@ ZBX_METRIC	parameters_specific[]=
 
 	{"vm.memory.size",	CF_USEUPARAM,	VM_MEMORY_SIZE,	0,	"total"},
 
-	{"proc.num",		CF_USEUPARAM,	PROC_NUM,	0,	"inetd,,"},
+	{"proc.num",		CF_USEUPARAM,	PROC_NUM,	0,	"inetd,,,"},
 	{"proc.mem",		CF_USEUPARAM,	PROC_MEMORY,	0,	"inetd,,"},
 
 	{"system.cpu.util",	CF_USEUPARAM,	SYSTEM_CPU_UTIL,	0,	"all,user,avg1"},
