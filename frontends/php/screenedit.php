@@ -27,7 +27,7 @@
 
 <?php
 	show_table_header(S_CONFIGURATION_OF_SCREEN_BIG);
-	echo "<br>";
+	echo BR;
 ?>
 
 <?php

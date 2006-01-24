@@ -31,28 +31,31 @@
 <?php
 	if(!check_right("Screen","U",0))
 	{
-//		show_table_header("<font color=\"AA0000\">No permissions !</font>");
-//		show_page_footer();
-//		exit;
+		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+		show_page_footer();
+		exit;
 	}
 	update_profile("web.menu.config.last",$page["file"]);
 ?>
 
 
 <?php
-	if(isset($_REQUEST["save"])&&!isset($_REQUEST["screenid"]))
-	{
-		$result=add_screen($_REQUEST["name"],$_REQUEST["cols"],$_REQUEST["rows"]);
-		show_messages($result,S_SCREEN_ADDED,S_CANNOT_ADD_SCREEN);
+	if(isset($_REQUEST["save"])){
+		if(isset($_REQUEST["screenid"]))
+		{
+			$result=update_screen($_REQUEST["screenid"],
+				$_REQUEST["name"],$_REQUEST["cols"],$_REQUEST["rows"]);
+			show_messages($result, S_SCREEN_UPDATED, S_CANNOT_UPDATE_SCREEN);
+		} else {
+			$result=add_screen($_REQUEST["name"],$_REQUEST["cols"],$_REQUEST["rows"]);
+			show_messages($result,S_SCREEN_ADDED,S_CANNOT_ADD_SCREEN);
+		}
+		if($result){
+			unset($_REQUEST["form"]);
+			unset($_REQUEST["screenid"]);
+		}
 	}
-
-	if(isset($_REQUEST["save"])&&isset($_REQUEST["screenid"]))
-	{
-		$result=update_screen($_REQUEST["screenid"],$_REQUEST["name"],$_REQUEST["cols"],$_REQUEST["rows"]);
-		show_messages($result, S_SCREEN_UPDATED, S_CANNOT_UPDATE_SCREEN);
-	}
-
-	if(isset($_REQUEST["delete"]))
+	if(isset($_REQUEST["delete"])&&isset($_REQUEST["screenid"]))
 	{
 		$result=delete_screen($_REQUEST["screenid"]);
 		show_messages($result, S_SCREEN_DELETED, S_CANNOT_DELETE_SCREEN);
@@ -61,37 +64,33 @@
 ?>
 
 <?php
-	if(!isset($_REQUEST["form"]))
+	if(isset($_REQUEST["form"]))
 	{
-		$h1=S_CONFIGURATION_OF_SCREENS_BIG;
-
-		$h2="<input class=\"button\" type=\"submit\" name=\"form\" value=\"".S_CREATE_SCREEN."\">";
-
-		show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"screenconf.php\">", "</form>");
+		insert_screen_form();
+	}
+	else
+	{
+		$form = new CForm("screenconf.php");
+		$form->AddItem(new CButton("form",S_CREATE_SCREEN));
+		show_header2(S_CONFIGURATION_OF_SCREENS_BIG, $form);
 
 		$table = new CTableInfo(S_NO_SCREENS_DEFINED);
-		$table->setHeader(array(S_ID,S_NAME,S_COLUMNS,S_ROWS,S_ACTIONS));
+		$table->setHeader(array(S_ID,S_NAME,S_COLUMNS,S_ROWS,S_GRAPH));
 
 		$result=DBselect("select screenid,name,cols,rows from screens order by name");
 		while($row=DBfetch($result))
 		{
-			if(!check_right("Screen","R",$row["screenid"]))
-			{
-				continue;
-			}
+			if(!check_right("Screen","R",$row["screenid"]))		continue;
+
 			$table->addRow(array(
 				$row["screenid"],
-				"<a href=\"screenedit.php?screenid=".$row["screenid"]."\">".$row["name"]."</a>",
+				new CLink($row["name"],"screenconf.php?form=0&screenid=".$row["screenid"]),
 				$row["cols"],
 				$row["rows"],
-				"<A HREF=\"screenconf.php?screenid=".$row["screenid"]."&form=0\">".S_CHANGE."</A>"
+				new CLink(S_SHOW,"screenedit.php?screenid=".$row["screenid"])
 				));
 		}
 		$table->show();
-	}
-	else
-	{
-		insert_screen_form();
 	}
 ?>
 
