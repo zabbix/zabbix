@@ -1344,21 +1344,27 @@
 	{
 		global $_REQUEST;
 
+		$frm_title = S_SCREEN;
 		if(isset($_REQUEST["screenid"]))
 		{
-			$result=DBselect("select screenid,name,cols,rows from screens g where screenid=".$_REQUEST["screenid"]);
+			$result=DBselect("select screenid,name,cols,rows from screens g".
+				" where screenid=".$_REQUEST["screenid"]);
 			$row=DBfetch($result);
+			$frm_title = S_SCREEN." \"".$row["name"]."\"";
+		}
+		if(isset($_REQUEST["screenid"])&&$_REQUEST["form"]!=1)
+		{
 			$name=$row["name"];
 			$cols=$row["cols"];
 			$rows=$row["rows"];
 		}
 		else
 		{
-			$name="";
-			$cols=1;
-			$rows=1;
+			$name=get_request("name","");
+			$cols=get_request("cols",1);
+			$rows=get_request("rows",1);
 		}
-		$frmScr = new CFormTable(S_SCREEN,"screenconf.php");
+		$frmScr = new CFormTable($frm_title,"screenconf.php");
 		$frmScr->SetHelp("web.screenconf.screen.php");
 
 		if(isset($_REQUEST["screenid"]))
@@ -1373,10 +1379,11 @@
 		if(isset($_REQUEST["screenid"]))
 		{
 			$frmScr->AddItemToBottomRow(SPACE);
-			$frmScr->AddItemToBottomRow(new CButton("delete",S_DELETE,"return Confirm('".S_DELETE_SCREEN_Q."');"));
+			$frmScr->AddItemToBottomRow(new CButtonDelete(S_DELETE_SCREEN_Q,
+				url_param("screenid")));
 		}
 		$frmScr->AddItemToBottomRow(SPACE);
-		$frmScr->AddItemToBottomRow(new CButton("cancel",S_CANCEL));
+		$frmScr->AddItemToBottomRow(new CButtonCancel());
 		$frmScr->Show();	
 	}
 
