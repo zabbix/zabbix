@@ -93,6 +93,23 @@ td.form_row_last
 	padding-left: 5px;
 }
 
+/* SREEN TABLE */
+table.screen
+{
+	background-color: #FFFFFF;
+	width: 100%;
+	border: 1 outset #DDDDDD;
+}
+
+td.screen
+{
+	background-color: #FFFFFF;
+	border: 1 inset #DDDDDD;
+	text-align: center;
+	vertical-align: middle;
+}
+
+
 td.sub_menu
 {
 	color: #FFFFFF;
