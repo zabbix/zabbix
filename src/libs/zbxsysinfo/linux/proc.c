@@ -29,7 +29,6 @@
 				    
 int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#if defined(HAVE_PROC_1_STATUS)
 
     DIR     *dir;
     struct  dirent *entries;
@@ -281,44 +280,40 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	SET_UI64_RESULT(result, memsize);
     }
     return SYSINFO_RET_OK;
-#else
-	return	SYSINFO_RET_FAIL;
-#endif
 }
 
 int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#if defined(HAVE_PROC_1_STATUS)
+	DIR	*dir;
+	struct	dirent *entries;
+	struct	stat buf;
+	char	filename[MAX_STRING_LEN];
+	char	line[MAX_STRING_LEN];
 
-    DIR     *dir;
-    struct  dirent *entries;
-    struct  stat buf;
-    char    filename[MAX_STRING_LEN];
-    char    line[MAX_STRING_LEN];
+	char	name1[MAX_STRING_LEN];
+	char	name2[MAX_STRING_LEN];
 
-    char    name1[MAX_STRING_LEN];
-    char    name2[MAX_STRING_LEN];
+	char	proccomm[MAX_STRING_LEN];
+	char	procname[MAX_STRING_LEN];
+	char	usrname[MAX_STRING_LEN];
+	char	procstat[MAX_STRING_LEN];
 
-    char    procname[MAX_STRING_LEN];
-    char    usrname[MAX_STRING_LEN];
-    char    procstat[MAX_STRING_LEN];
+	int	proc_ok = 0;
+	int	usr_ok = 0;
+	int	stat_ok = 0;
+	int	comm_ok = 0;
 
-    int     proc_ok = 0;
-    int     usr_ok = 0;
-    int     stat_ok = 0;
+	struct	passwd *usrinfo = NULL;
+	long int	lvalue = 0;
 
-    struct  passwd *usrinfo = NULL;
-    long int	lvalue = 0;
-
-    FILE    *f;
+	FILE	*f;
 	zbx_uint64_t	proccount = 0;
 
         assert(result);
 
         init_result(result);
 	
-    
-        if(num_param(param) > 3)
+        if(num_param(param) > 4)
         {
                 return SYSINFO_RET_FAIL;
         }
@@ -328,6 +323,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                 return SYSINFO_RET_FAIL;
         }
     
+	usrinfo = NULL;
         if(get_param(param, 2, usrname, MAX_STRING_LEN) != 0)
         {
                 usrname[0] = 0;
@@ -375,7 +371,12 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
         {
             return SYSINFO_RET_FAIL;
         }
-		
+
+	if(get_param(param, 4, proccomm, MAX_STRING_LEN) != 0)
+	{
+		proccomm[0] = '\0';
+	}
+	
         dir=opendir("/proc");
         if(NULL == dir)
         {
@@ -384,29 +385,30 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
         while((entries=readdir(dir))!=NULL)
         {
-            proc_ok = 0;
-            stat_ok = 0;
-            usr_ok = 0;
-    
+
 /* Self is a symbolic link. It leads to incorrect results for proc_cnt[zabbix_agentd] */
 /* Better approach: check if /proc/x/ is symbolic link */
-            if(strncmp(entries->d_name,"self",MAX_STRING_LEN) == 0)
-            {
-                continue;
-            }
+		if(strncmp(entries->d_name,"self",MAX_STRING_LEN) == 0)
+		{
+			continue;
+		}
 
-            strscpy(filename,"/proc/");	
-            strncat(filename,entries->d_name,MAX_STRING_LEN);
-            strncat(filename,"/status",MAX_STRING_LEN);
+		strscpy(filename,"/proc/");	
+		strncat(filename,entries->d_name,MAX_STRING_LEN);
+		strncat(filename,"/status",MAX_STRING_LEN);
 
-            if(stat(filename,&buf)==0)
-            {
+		if(stat(filename,&buf)!=0)
+		{
+			continue;
+		}
+
                 f=fopen(filename,"r");
                 if(f==NULL)
                 {
-                    continue;
+			continue;
                 }
     
+		proc_ok = 0;
                 if(procname[0] != 0)
                 {
                     fgets(line,MAX_STRING_LEN,f);
@@ -432,6 +434,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                     proc_ok = 1;
                 }
 
+		stat_ok = 0;
                 if(procstat[0] != 0)
                 {
                     while(fgets(line, MAX_STRING_LEN, f) != NULL)
@@ -447,7 +450,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                             continue;
                         }
                         
-                        if(strcmp(name2, procstat))
+                        if(strcmp(name2, procstat) == 0)
                         {
                             stat_ok = 1;
                             break;
@@ -459,6 +462,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                     stat_ok = 1;
                 }
                 
+		usr_ok = 0;
                 if(usrinfo != NULL)
                 {
                     while(fgets(line, MAX_STRING_LEN, f) != NULL)
@@ -485,20 +489,37 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                 {
                     usr_ok = 1;
                 }
+                fclose(f);
+		
+		comm_ok = 0;
+		if(proccomm[0] != '\0')
+		{
+			strscpy(filename,"/proc/");	
+			strncat(filename,entries->d_name,MAX_STRING_LEN);
+			strncat(filename,"/cmdline",MAX_STRING_LEN);
+			
+			if(stat(filename,&buf)!=0)	continue;
+			
+			f=fopen(filename,"r");
+			if(f==NULL)			continue;
+			
+			if(fgets(line, MAX_STRING_LEN, f) != NULL)
+				if(zbx_regexp_match(line,proccomm,NULL) != NULL)
+					comm_ok = 1;
+
+			fclose(f);
+		} else {
+			comm_ok = 1;
+		}
                 
-                if(proc_ok && stat_ok && usr_ok)
+                if(proc_ok && stat_ok && usr_ok && comm_ok)
                 {
                     proccount++;
                 }
                 
-                fclose(f);
-            }
-    }
-    closedir(dir);
+	}
+	closedir(dir);
 
-    SET_UI64_RESULT(result, proccount);
-    return SYSINFO_RET_OK;
-#else
-    return	SYSINFO_RET_FAIL;
-#endif
+	SET_UI64_RESULT(result, proccount);
+	return SYSINFO_RET_OK;
 }
