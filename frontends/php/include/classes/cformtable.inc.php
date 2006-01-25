@@ -39,10 +39,20 @@
 			$this->SetAlign('center');
 			$this->SetHelp();
 
+			$this->AddItemToTopRow("<a name=\"form\"></a>");
+			
 			$this->AddVar("form","1");
 
 			$this->bottom_items = new CCol(NULL,'form_row_last');
 		        $this->bottom_items->SetColSpan(2);
+		}
+		function SetAction($value)
+		{
+			if(!is_string($value))
+			{
+				return $this->error("Incorrect value for SetAlign [$value]");
+			}
+			parent::SetAction($value."#form");
 		}
 		function SetAlign($value)
 		{

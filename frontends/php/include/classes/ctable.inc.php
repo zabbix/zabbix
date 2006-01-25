@@ -38,7 +38,7 @@
 		}
 		function SetRowSpan($value)
 		{
-			if(!is_int($value))
+			if(!is_int($value) && !is_numeric($value))
 			{
 				return $this->error("Incorrect value for SetRowSpan [$value]"); 
 				return 1;
@@ -47,7 +47,7 @@
 		}
 		function SetColSpan($value)
 		{
-			if(!is_int($value))
+			if(!is_int($value) && !is_numeric($value))
 			{
 				return $this->error("Incorrect value for SetColSpan[$value]"); 
 			}
@@ -174,7 +174,7 @@
 		}
 		function SetCellPadding($value)
 		{
-			if(!is_int($value))
+			if(!is_int($value) && !is_numeric($value))
 			{
 				return $this->error("Incorrect value for SetCellpadding [$value]"); 
 			}
@@ -182,7 +182,7 @@
 		}
 		function SetCellSpacing($value)
 		{
-			if(!is_int($value))
+			if(!is_int($value) && !is_numeric($value))
 			{
 				return $this->error("Incorrect value for SetCellSpacing [$value]"); 
 			}
