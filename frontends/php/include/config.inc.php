@@ -1218,30 +1218,39 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 	}
 
 	# Show screen cell containing plain text values
-	function	show_screen_plaintext($itemid,$elements)
+	function&	get_screen_plaintext($itemid,$elements)
 	{
 		$item=get_item_by_itemid($itemid);
 		if($item["value_type"]==0)
 		{
-			$sql="select clock,value from history where itemid=$itemid order by clock desc limit $elements";
+			$sql="select clock,value from history where itemid=$itemid".
+				" order by clock desc limit $elements";
 		}
 		else
 		{
-			$sql="select clock,value from history_str where itemid=$itemid order by clock desc limit $elements";
+			$sql="select clock,value from history_str where itemid=$itemid".
+				" order by clock desc limit $elements";
 		}
                 $result=DBselect($sql);
 
-		table_begin();
-		table_header(array(S_TIMESTAMP,$item["description"]));
-		$col=0;
+		$table = new CTableInfo();
+		$table->SetHeader(array(S_TIMESTAMP,$item["description"]));
+//		table_begin();
+//		table_header(array(S_TIMESTAMP,$item["description"]));
+//		$col=0;
 		while($row=DBfetch($result))
 		{
-			table_row(array(
+			$table->AddRow(array(
 				date(S_DATE_FORMAT_YMDHMS,$row["clock"]),
-				$row["value"],
-				),$col++);
+				$row["value"])
+				);
+//			table_row(array(
+//				date(S_DATE_FORMAT_YMDHMS,$row["clock"]),
+//				$row["value"],
+//				),$col++);
 		}
-		table_end();
+//		table_end();
+		return $table;
 	}
 
 	# Show values in plain text
