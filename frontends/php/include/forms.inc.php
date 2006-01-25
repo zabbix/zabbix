@@ -1387,6 +1387,156 @@
 		$frmScr->Show();	
 	}
 
+	function&	get_screen_item_form()
+	{
+		global $_REQUEST;
+
+		$form = new CFormTable(S_SCREEN_CELL_CONFIGURATION,"screenedit.php");
+		$form->SetHelp("web.screenedit.cell.php");
+
+		if(isset($_REQUEST["screenitemid"]))
+		{
+			$iresult=DBSelect("select * from screens_items".
+				" where screenid=".$_REQUEST["screenid"].
+				" and screenitemid=".$_REQUEST["screenitemid"]);
+
+			$form->AddVar("screenitemid",$_REQUEST["screenitemid"]);
+		} else {
+			$form->AddVar("x",$_REQUEST["x"]);
+			$form->AddVar("y",$_REQUEST["y"]);
+		}
+
+		if(isset($_REQUEST["screenitemid"]) && $_REQUEST["form"]!=1)
+		{
+			$irow = DBfetch($iresult);
+			$resource	= $irow["resource"];
+			$resourceid	= $irow["resourceid"];
+			$width		= $irow["width"];
+			$height		= $irow["height"];
+			$colspan	= $irow["colspan"];
+			$rowspan	= $irow["rowspan"];
+			$elements	= $irow["elements"];
+
+		}
+		else
+		{
+			$resource	= get_request("resource",	0);
+			$resourceid	= get_request("resourceid",	0);
+			$width		= get_request("width",		500);
+			$height		= get_request("height",		100);
+			$colspan	= get_request("colspan",	0);
+			$rowspan	= get_request("rowspan",	0);
+			$elements	= get_request("elements",	25);
+		}
+
+
+		$form->AddVar("screenid",$_REQUEST["screenid"]);
+
+		$cmbRes = new CCombobox("resource",$resource,"submit()");
+		$cmbRes->AddItem(0,S_GRAPH);
+		$cmbRes->AddItem(1,S_SIMPLE_GRAPH);
+		$cmbRes->AddItem(2,S_MAP);
+		$cmbRes->AddItem(3,S_PLAIN_TEXT);
+		$form->AddRow(S_RESOURCE,$cmbRes);
+
+		if($resource == 0)
+		{
+	// User-defined graph
+			$result=DBselect("select graphid,name from graphs order by name");
+
+			$cmbGraphs = new CComboBox("resourceid",$resourceid);
+			$cmbGraphs->AddItem(0,"(none)");
+			while($row=DBfetch($result))
+			{
+				$cmbGraphs->AddItem($row["graphid"],$row["name"]);
+			}
+
+			$form->AddRow(S_GRAPH_NAME,$cmbGraphs);
+		}
+		elseif($resource == 1)
+		{
+	// Simple graph
+			$result=DBselect("select h.host,i.description,i.itemid,i.key_".
+				" from hosts h,items i where h.hostid=i.hostid".
+				" and h.status=".HOST_STATUS_MONITORED." and i.status=0".
+				" order by h.host,i.description");
+
+
+			$cmbItems = new CCombobox("resourceid",$resourceid);
+			$cmbItems->AddItem(0,"(none)");
+			while($row=DBfetch($result))
+			{
+				$description_=item_description($row["description"],$row["key_"]);
+				$cmbItems->AddItem($row["itemid"],$row["host"].": ".$description_);
+
+			}
+			$form->AddRow(S_PARAMETER,$cmbItems);
+		}
+		else if($resource == 2)
+		{
+	// Map
+			$result=DBselect("select sysmapid,name from sysmaps order by name");
+
+			$cmbMaps = new CComboBox("resourceid",$resourceid);
+			$cmbMaps->AddItem(0,"(none)");
+			while($row=DBfetch($result))
+			{
+				$cmbMaps->AddItem($row["sysmapid"],$row["name"]);
+			}
+
+			$form->AddRow(S_MAP,$cmbMaps);
+		}
+		else if($resource == 3)
+		{
+	// Plain text
+			$result=DBselect("select h.host,i.description,i.itemid,i.key_".
+				" from hosts h,items i where h.hostid=i.hostid".
+				" and h.status=".HOST_STATUS_MONITORED." and i.status=0".
+				" order by h.host,i.description");
+
+			$cmbHosts = new CComboBox("resourceid",$resourceid);
+			$cmbHosts->AddItem(0,"(none)");
+			while($row=DBfetch($result))
+			{
+				$description_=item_description($row["description"],$row["key_"]);
+				$cmbHosts->AddItem($row["itemid"],$row["host"].": ".$description_);
+
+			}
+
+			$form->AddRow(S_PARAMETER,$cmbHosts);
+			$form->AddRow(S_SHOW_LINES, new CTextBox("elements",$elements,2));
+		}
+		else
+		{
+			$form->AddVar("resouceid",$resourceid);
+		}
+
+		if($resource!=2)
+		{
+			$form->AddRow(S_WIDTH,	new CTextBox("width",$width,5));
+			$form->AddRow(S_HEIGHT,	new CTextBox("height",$height,5));
+		}
+		else
+		{
+			$form->AddVar("width",	$width);
+			$form->AddVar("height",	$height);
+		}
+
+		$form->AddRow(S_COLUMN_SPAN,	new CTextBox("colspan",$colspan,2));
+		$form->AddRow(S_ROW_SPAN,	new CTextBox("rowspan",$rowspan,2));
+
+		$form->AddItemToBottomRow(new CButton("save",S_SAVE));
+		if(isset($_REQUEST["screenitemid"]))
+		{
+			$form->AddItemToBottomRow(SPACE);
+			$form->AddItemToBottomRow(new CButtonDelete(NULL,
+				url_param("screenid").url_param("screenitemid")));
+		}
+		$form->AddItemToBottomRow(SPACE);
+		$form->AddItemToBottomRow(new CButtonCancel(url_param("screenid")));
+		return $form;
+	}
+
 	function	insert_media_form()
 	{
 		global $_REQUEST;
