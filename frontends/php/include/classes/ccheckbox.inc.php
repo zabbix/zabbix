@@ -51,10 +51,15 @@
 		}
 		function SetChecked($value="yes")
 		{
-			if($value=="yes" || $value=="checked" || $value=="on" || $value==1)
+			if(is_null($value)){
+				return 0;
+			}elseif((is_string($value)&&($value=="yes" || $value=="checked" || $value=="on"))
+				|| (is_int($value)&&$value<>0)){
 				return $this->AddOption("checked","checked");
-			elseif($value=="no" || $value=="unchecked" || $value=="off" || $value==NULL || $value==0)
+			}elseif((is_string($value)&&($value=="no" || $value=="unchecked" || $value=="off"))
+				|| (is_int($value)&&$value==0)){
 				return $this->DelOption("checked");
+			}
 			return $this->error("Incorrect value for SetChacked [$value]");
 		}
 		function SetAction($value='submit()', $event='onClick')
