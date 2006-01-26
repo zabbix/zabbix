@@ -36,22 +36,13 @@
 
 	# Add Action
 
-	function	add_action( $userid, $delay, $subject, $message, $recipient, $usrgrpid, $maxrepeats, $repeatdelay)
+	function	add_action( $id, $delay, $subject, $message, $recipient, $maxrepeats, $repeatdelay)
 	{
 //		if(!check_right_on_trigger("A",$triggerid))
 //		{
 //                      error("Insufficient permissions");
 //                      return 0;
 //		}
-
-		if($recipient == RECIPIENT_TYPE_USER)
-		{
-			$id = $userid;
-		}
-		else
-		{
-			$id = $usrgrpid;
-		}
 
 		$sql="insert into actions (userid,delay,nextcheck,subject,message,recipient,maxrepeats,repeatdelay) values ($id,$delay,0,'$subject','$message',$recipient,$maxrepeats,$repeatdelay)";
 		$result=DBexecute($sql);
@@ -150,8 +141,13 @@
 			while($row2=DBfetch($result2))
 			{
 				$host=get_host_by_hostid($row["hostid"]);
-				$message=str_replace("{".$host_template["host"].":", "{".$host["host"].":", $action["message"]);
-				add_action($row2["triggerid"], $action["userid"], $action["good"], $action["delay"], $action["subject"], $message, $action["scope"], $action["severity"], $action["recipient"], $action["userid"], $action["maxrepeats"],$action["repeatdelay"]);
+				$message=str_replace("{".$host_template["host"].":", "{".$host["host"].":",
+					$action["message"]);
+
+				add_action($row2["triggerid"], $action["userid"], $action["good"], 
+					$action["delay"], $action["subject"], $message, $action["scope"],
+					$action["severity"], $action["recipient"], $action["maxrepeats"],
+					$action["repeatdelay"]);
 			}
 		}
 	}

@@ -46,17 +46,25 @@
 		}
 		function SetEnable($value='yes')
 		{
-			if($value == 'yes' || $value == 'enabled' || $value=='on')
+			if(is_null($value))
+				return 0;
+			elseif((is_string($value) && ($value == 'yes' || $value == 'enabled' || $value=='on'))
+				|| (is_int($value) && $value<>0))
 				return $this->DelOption('disabled');
-			elseif($value == 'no' || $value == 'disabled' || $value=='off' || $value == NULL)
+			elseif((is_string($value) && ($value == 'no' || $value == 'disabled' || $value=='off'))
+				|| (is_int($value) && $value==0))
 				return $this->AddOption('disabled','disabled');
 			return $this->error("Incorrect value for SetEnable [$value]");
 		}
 		function SetSelected($value='yes')
 		{
-			if($value == 'yes' || $value == "selected" || $value=='on')
+			if(is_null($value))
+				return 0;
+			elseif((is_string($value) && ($value == 'yes' || $value == "selected" || $value=='on'))
+				|| (is_int($value) && $value<>0))
 				return $this->AddOption('selected','selected');
-			elseif($value == 'no' || $value=='off' || $value == NULL)
+			elseif((is_string($value) && ($value == 'no' || $value=='off'))
+				|| (is_int($value) && $value==0))
 				return $this->DelOption('selected');
 			return $this->error("Incorrect value for SetSelected [$value]");
 		}
