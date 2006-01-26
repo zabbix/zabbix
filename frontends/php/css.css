@@ -269,6 +269,15 @@ tr.table_even_row:hover
 {
 	color: #00AA00;
 }
+A.enabled:link		{	color:#00AA00;	text-decoration: none; }
+A.enabled:visited 	{	color:#00AA00;	text-decoration: none; }
+A.enabled:hover 	{	color:#00AA00;	text-decoration: underline; }
+A.enabled:active 	{	color:#00AA00;	text-decoration: underline;}
+
+A.disabled:link		{	color:#AA0000;	text-decoration: none; }
+A.disabled:visited 	{	color:#AA0000;	text-decoration: none; }
+A.disabled:hover 	{	color:#AA0000;	text-decoration: underline; }
+A.disabled:active 	{	color:#AA0000;	text-decoration: underline;}
 
 A.off:link	{	color:#00AA00;	text-decoration: none; }
 A.off:visited 	{	color:#00AA00;	text-decoration: none; }

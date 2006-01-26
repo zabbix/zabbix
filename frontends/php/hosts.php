@@ -317,13 +317,13 @@
 			$result=update_template_linkage($_REQUEST["hosttemplateid"],$_REQUEST["hostid"],$_REQUEST["templateid"],$items,$triggers,$graphs);
 			show_messages($result, S_TEMPLATE_LINKAGE_UPDATED, S_CANNOT_UPDATE_TEMPLATE_LINKAGE);
 		}
-		if($_REQUEST["register"]=="delete linkage")
-		{
-			$result=delete_template_linkage($_REQUEST["hosttemplateid"]);
-			show_messages($result, S_TEMPLATE_LINKAGE_DELETED, S_CANNOT_DELETE_TEMPLATE_LINKAGE);
-			unset($_REQUEST["hosttemplateid"]);
-		}	
 	}
+	if($_REQUEST["config"]==2&&isset($_REQUEST["delete"])&&isset($_REQUEST["hosttemplateid"]))
+	{
+		$result=delete_template_linkage($_REQUEST["hosttemplateid"]);
+		show_messages($result, S_TEMPLATE_LINKAGE_DELETED, S_CANNOT_DELETE_TEMPLATE_LINKAGE);
+		unset($_REQUEST["hosttemplateid"]);
+	}	
 
 ?>
 
@@ -419,7 +419,7 @@
 		if(isset($_REQUEST["hostid"]))
 		{
 			echo BR;
-			@insert_template_form($_REQUEST["hostid"], $_REQUEST["hosttemplateid"]);
+			insert_template_form();
 			echo BR;
 
 			$table = new CTableInfo(S_NO_LINKAGES_DEFINED);
@@ -430,7 +430,6 @@
 			{
 				$host=get_host_by_hostid($row["hostid"]);
 				$template=get_host_by_hostid($row["templateid"]);
-				$actions="<a href=\"hosts.php?config=2&hostid=".$row["hostid"]."&hosttemplateid=".$row["hosttemplateid"]."\">".S_CHANGE."</a>";
 
 				$table->addRow(array(
 					$host["host"],
@@ -438,7 +437,9 @@
 					get_template_permission_str($row["items"]),
 					get_template_permission_str($row["triggers"]),
 					get_template_permission_str($row["graphs"]),
-					$actions
+					new CLink(S_CHANGE, "hosts.php?form=0".url_param("config").
+						"&hostid=".$row["hostid"].
+						"&hosttemplateid=".$row["hosttemplateid"])
 					));
 			}
 			$table->show();

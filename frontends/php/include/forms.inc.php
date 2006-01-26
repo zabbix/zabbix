@@ -24,41 +24,45 @@
 //	include_once 	"include/local_en.inc.php";
 
 	# Insert host template form
-	function	insert_template_form($hostid, $hosttemplateid)
+	function	insert_template_form()
 	{
-		if(isset($hosttemplateid))
-		{
-			$result=DBselect("select * from hosts_templates  where hosttemplateid=$hosttemplateid");
+		global $_REQUEST;
 
+		$frmTemplate = new CFormTable(S_TEMPLATE,'hosts.php');
+		$frmTemplate->SetHelp('web.hosts.php');
+		$frmTemplate->AddVar('config',$_REQUEST["config"]);
+
+		if(isset($_REQUEST["hosttemplateid"])&&$_REQUEST["form"]!=1)
+		{
+			$frmTemplate->AddVar('hosttemplateid',$_REQUEST["hosttemplateid"]);
+
+			$result=DBselect("select * from hosts_templates".
+				" where hosttemplateid=".$_REQUEST["hosttemplateid"]);
 			$row=DBfetch($result);
 	
-			$hostid=$row["hostid"];
-			$host=get_host_by_hostid($hostid);
-			$templateid=$row["templateid"];
-			$template=get_host_by_hostid($templateid);
-			$items=$row["items"];
-			$triggers=$row["triggers"];
-			$graphs=$row["graphs"];
+			$hostid		= $row["hostid"];
+			$templateid	= $row["templateid"];
+			$items		= $row["items"];
+			$triggers	= $row["triggers"];
+			$graphs		= $row["graphs"];
 		}
 		else
 		{
-			$hostid=0;
-			$templateid=0;
-			$items=7;
-			$triggers=7;
-			$graphs=7;
+			$hostid		= get_request("hostid",0);
+			$templateid	= get_request("templateid",0);
+			$items		= get_request("items",7);
+			$triggers	= get_request("triggers",7);
+			$graphs		= get_request("graphs",7);
 		}
-# create form
-		$frmTemplate = new CFormTable(S_TEMPLATE,'hosts.php');
-		$frmTemplate->SetHelp('web.hosts.php');
-# init vars
-		$frmTemplate->AddVar('config',$_REQUEST["config"]);
-		if($hostid!=0)			$frmTemplate->AddVar('hostid',$hostid);
-		if(isset($hosttemplateid))	$frmTemplate->AddVar('hosttemplateid',$_REQUEST["hosttemplateid"]);
-# init rows
+		if($hostid!=0){
+			$host	 = get_host_by_hostid($hostid);
+			$frmTemplate->AddVar('hostid',$hostid);
+		}
+
+		if($templateid!=0)
+			$template= get_host_by_hostid($templateid);
 
 		$cmbTemplate = new CComboBox('templateid',$templateid);
-
 	        $hosts=DBselect("select hostid,host from hosts order by host");
 		while($host=DBfetch($hosts))
 			$cmbTemplate->AddItem($host["hostid"],$host["host"]);
@@ -84,13 +88,16 @@
 		));
 
 		$frmTemplate->AddItemToBottomRow(new CButton('register','add linkage'));
-		if(isset($hosttemplateid))
+		if(isset($_REQUEST["hosttemplateid"]))
 		{
 			$frmTemplate->AddItemToBottomRow(SPACE);
 			$frmTemplate->AddItemToBottomRow(new CButton('register','update linkage'));
 			$frmTemplate->AddItemToBottomRow(SPACE);
-			$frmTemplate->AddItemToBottomRow(new CButton('register','delete linkage',"return Confirm('Delete selected linkage?');"));
+			$frmTemplate->AddItemToBottomRow(new CButtonDelete('Delete selected linkage?',
+				url_param("config").url_param("hostid").url_param("hosttemplateid")));
 		}
+		$frmTemplate->AddItemToBottomRow(SPACE);
+		$frmTemplate->AddItemToBottomRow(new CButtonCancel(url_param("config").url_param("hostid")));
 
 		$frmTemplate->Show();
 	}
@@ -951,7 +958,7 @@
 		$frmAction = new CFormTable(S_ACTION,'actionconf.php');
 		$frmAction->SetHelp('web.actions.action');
 
-		$conditiontype=@iif(isset($_REQUEST["conditiontype"]),$_REQUEST["conditiontype"],0);
+		$conditiontype = get_request("conditiontype",0);
 
 		if(isset($_REQUEST["actionid"]))
 		{
@@ -961,16 +968,16 @@
 	
 		if(isset($_REQUEST["actionid"])&&$_REQUEST["form"]!=1)
 		{
-			$actiontype=$action["actiontype"];
-			$source=$action["source"];
-			$delay=$action["delay"];
-			$uid=$action["userid"];
-			// Otherwise symbols like ",' will not be shown
-			$subject=htmlspecialchars($action["subject"]);
-			$message=$action["message"];
-			$recipient=@iif(isset($_REQUEST["recipient"]),$_REQUEST["recipient"],$action["recipient"]);
-			$maxrepeats=$action["maxrepeats"];
-			$repeatdelay=$action["repeatdelay"];
+			$actiontype	= $action["actiontype"];
+			$source		= $action["source"];
+			$delay		= $action["delay"];
+			$uid		= $action["userid"];
+			$subject	= $action["subject"];
+			$message	= $action["message"];
+			$recipient	= $action["recipient"];
+			$maxrepeats	= $action["maxrepeats"];
+			$repeatdelay	= $action["repeatdelay"];
+
 			if(isset($_REQUEST["repeat"]))
 			{
 				$repeat=$_REQUEST["repeat"];
@@ -996,23 +1003,23 @@
 		}
 		else
 		{
-			$source=get_request("source",0);
-			$actiontype=get_request("actiontype",0);
+			$source		= get_request("source",0);
+			$actiontype	= get_request("actiontype",0);
 
-			$delay=get_request("delay",30);
-			$subject=get_request("subject","{TRIGGER.NAME}: {STATUS}");
-			$message=get_request("message","{TRIGGER.NAME}: {STATUS}");
-			$scope=get_request("scope",0);
-			$recipient=get_request("recipient",RECIPIENT_TYPE_GROUP);
-			$severity=get_request("severity",0);
-			$maxrepeats=get_request("maxrepeats",0);
-			$repeatdelay=get_request("repeatdelay",600);
-			$repeat=get_request("repeat",0);
+			$delay		= get_request("delay",30);
+			$subject	= get_request("subject","{TRIGGER.NAME}: {STATUS}");
+			$message	= get_request("message","{TRIGGER.NAME}: {STATUS}");
+			$scope		= get_request("scope",0);
+			$recipient	= get_request("recipient",RECIPIENT_TYPE_GROUP);
+			$severity	= get_request("severity",0);
+			$maxrepeats	= get_request("maxrepeats",0);
+			$repeatdelay	= get_request("repeatdelay",600);
+			$repeat		= get_request("repeat",0);
 
 			if($recipient==RECIPIENT_TYPE_GROUP)
-				$uid=get_request("usrgrpid",NULL);
+				$uid = get_request("usrgrpid",NULL);
 			else
-				$uid=get_request("userid",NULL);
+				$uid = get_request("userid",NULL);
 		}
 
 
@@ -1021,18 +1028,14 @@
 		for($i=1; $i<=1000; $i++)
 		{
 			if(!isset($_REQUEST["conditiontype$i"])) continue;
-			array_push($cond_el, 
-				new CCheckBox(
-					"conditionchecked$i",
-					'no',
+			array_push($cond_el, new CCheckBox(
+					"conditionchecked$i", 'no',
 					get_condition_desc(
 						$_REQUEST["conditiontype$i"],
 						$_REQUEST["conditionop$i"],
 						$_REQUEST["conditionvalue$i"]
-					)
-				),
-				BR
-			);
+					)),BR
+				);
 			$frmAction->AddVar("conditiontype$i", $_REQUEST["conditiontype$i"]);
 			$frmAction->AddVar("conditionop$i", $_REQUEST["conditionop$i"]);
 			$frmAction->AddVar("conditionvalue$i", $_REQUEST["conditionvalue$i"]);
@@ -1110,24 +1113,24 @@
 			$txtCondVal = new CTextBox('host','',20);
 			$txtCondVal->SetReadonly('yes');
 
-			$btnSelect = new CButton('btn1','Select',"window.open('popup.php?form=action&field1=value&field2=host','new_win','width=450,height=450,resizable=1,scrollbars=1');");
+			$btnSelect = new CButton('btn1','Select',
+				"window.open('popup.php?form=action&field1=value&field2=host',".
+				"'new_win','width=450,height=450,resizable=1,scrollbars=1');");
 			$btnSelect->SetAccessKey('T');
 
 			array_push($rowCondition, $txtCondVal, $btnSelect);
-//			$cmbCondVal = new CComboBox('value');
-//			$hosts = DBselect("select hostid,host from hosts order by host");
-//			while($host = DBfetch($hosts))
-//			{
-//				$cmbCondVal->AddItem($host["hostid"],$host["host"]);
-//			}
 		}
 		else if($conditiontype == CONDITION_TYPE_TRIGGER)
 		{
 			$cmbCondVal = new CComboBox('value');
-			$triggers = DBselect("select distinct h.host,t.triggerid,t.description from triggers t, functions f,items i, hosts h where t.triggerid=f.triggerid and f.itemid=i.itemid and h.hostid=i.hostid order by h.host");
+			$triggers = DBselect("select distinct h.host,t.triggerid,t.description".
+				" from triggers t, functions f,items i, hosts h".
+				" where t.triggerid=f.triggerid and f.itemid=i.itemid".
+				" and h.hostid=i.hostid order by h.host");
 			while($trigger = DBfetch($triggers))
 			{
-				$cmbCondVal->AddItem($trigger["triggerid"],$trigger["host"].":&nbsp;".$trigger["description"]);
+				$cmbCondVal->AddItem($trigger["triggerid"],
+					$trigger["host"].":&nbsp;".$trigger["description"]);
 			}
 			array_push($rowCondition,$cmbCondVal);
 		}
@@ -1218,16 +1221,17 @@
 			$frmAction->AddRow(S_DELAY_BETWEEN_REPEATS, new CTextBox('repeatdelay',$repeatdelay,2));
 		}
 
+		$frmAction->AddItemToBottomRow(new CButton('save',S_SAVE));
 		if(isset($_REQUEST["actionid"]))
 		{
-			$frmAction->AddItemToBottomRow(new CButton('register','update'));
 			$frmAction->AddItemToBottomRow(SPACE);
-			$frmAction->AddItemToBottomRow(new CButton('register','delete','return Confirm("Delete selected action?");'));
+			$frmAction->AddItemToBottomRow(new CButtonDelete("Delete selected action?",
+				url_param("actiontype").url_param("actionid")."&subject=".$subject));
+				
 		} else {
-			$frmAction->AddItemToBottomRow(new CButton('register','add'));
 		}
 		$frmAction->AddItemToBottomRow(SPACE);
-		$frmAction->AddItemToBottomRow(new CButton('register','cancel'));
+		$frmAction->AddItemToBottomRow(new CButtonCancel(url_param("actiontype")));
 	
 		$frmAction->Show();
 	}
@@ -1511,7 +1515,7 @@
 			$form->AddVar("resouceid",$resourceid);
 		}
 
-		if($resource!=2)
+		if($resource!=3)
 		{
 			$form->AddRow(S_WIDTH,	new CTextBox("width",$width,5));
 			$form->AddRow(S_HEIGHT,	new CTextBox("height",$height,5));
@@ -1541,22 +1545,29 @@
 	{
 		global $_REQUEST;
 
-		if(isset($_REQUEST["mediaid"]))
+		if(isset($_REQUEST["mediaid"]) && $_REQUEST["form"]!=1)
 		{
 			$media=get_media_by_mediaid($_REQUEST["mediaid"]);
-			$severity=$media["severity"];
-			$sendto=$media["sendto"];
-			$active=$media["active"];
-			$mediatypeid=$media["mediatypeid"];
-			$period=$media["period"];
+
+			$severity	= $media["severity"];
+			$sendto		= $media["sendto"];
+			$mediatypeid	= $media["mediatypeid"];
+			$active		= $media["active"];
+			$period		= $media["period"];
+
+			if($severity & 1)	$_REQUEST["0"]='yes';
+			if($severity & 2)	$_REQUEST["1"]='yes';
+			if($severity & 4)	$_REQUEST["2"]='yes';
+			if($severity & 8)	$_REQUEST["3"]='yes';
+			if($severity & 16)	$_REQUEST["4"]='yes';
+			if($severity & 32)	$_REQUEST["5"]='yes';
 		}
 		else
 		{
-			$sendto="";
-			$severity=63;
-			$mediatypeid=-1;
-			$active=0;
-			$period="1-7,00:00-23:59";
+			$sendto		= get_request("sendto","");
+			$mediatypeid	= get_request("mediatypeid",0);
+			$active		= get_request("active",0);
+			$period		= get_request("period","1-7,00:00-23:59");
 		}
 
 		$frmMedia = new CFormTable(S_NEW_MEDIA,"media.php");
@@ -1569,8 +1580,7 @@
 		}
 
 		$cmbType = new CComboBox("mediatypeid",$mediatypeid);
-		$sql="select mediatypeid,description from media_type order by type";
-		$types=DBselect($sql);
+		$types=DBselect("select mediatypeid,description from media_type order by type");
 		while($type=DBfetch($types))
 		{
 			$cmbType->AddItem($type["mediatypeid"],$type["description"]);
@@ -1581,12 +1591,13 @@
 		$frmMedia->AddRow(S_WHEN_ACTIVE,new CTextBox("period",$period,48));	
 	
 		$frm_row = array();
-		array_push($frm_row, new CCheckBox(0,	1 & $severity, S_NOT_CLASSIFIED),	BR);
-		array_push($frm_row, new CCheckBox(1,	2 & $severity, S_INFORMATION),	BR);
-		array_push($frm_row, new CCheckBox(2,	4 & $severity, S_WARNING),	BR);
-		array_push($frm_row, new CCheckBox(3,	8 & $severity, S_AVERAGE),	BR);
-		array_push($frm_row, new CCheckBox(4,	16 & $severity, S_HIGH),	BR);
-		array_push($frm_row, new CCheckBox(5,	32 & $severity, S_DISASTER),	BR);
+
+		array_push($frm_row, new CCheckBox("0",	get_request("0", 'no'), S_NOT_CLASSIFIED),	BR);
+		array_push($frm_row, new CCheckBox("1",	get_request("1", 'no'), S_INFORMATION),		BR);
+		array_push($frm_row, new CCheckBox("2",	get_request("2", 'no'), S_WARNING),		BR);
+		array_push($frm_row, new CCheckBox("3",	get_request("3", 'no'), S_AVERAGE),		BR);
+		array_push($frm_row, new CCheckBox("4",	get_request("4", 'no'), S_HIGH),		BR);
+		array_push($frm_row, new CCheckBox("5",	get_request("5", 'no'), S_DISASTER),		BR);
 		$frmMedia->AddRow(S_USE_IF_SEVERITY,$frm_row);
 
 		$cmbStat = new CComboBox("active",$active);
@@ -1598,10 +1609,11 @@
 		if(isset($_REQUEST["mediaid"]))
 		{
 			$frmMedia->AddItemToBottomRow(SPACE);
-			$frmMedia->AddItemToBottomRow(new CButton("delete",S_DELETE,"return Confirm('".S_DELETE_SELECTED_MEDIA_Q."');"));
+			$frmMedia->AddItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_MEDIA_Q,
+				url_param("userid").url_param("mediaid")));
 		}
 		$frmMedia->AddItemToBottomRow(SPACE);
-		$frmMedia->AddItemToBottomRow(new CButton("cancel",S_CANCEL));
+		$frmMedia->AddItemToBottomRow(new CButtonCancel(url_param("userid")));
 		$frmMedia->Show();
 	}
 
