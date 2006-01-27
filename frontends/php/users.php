@@ -167,10 +167,6 @@
 			show_messages($result, S_PERMISSION_ADDED, S_CANNOT_ADD_PERMISSION);
 		}
 	}
-	
-	if(isset($_REQUEST["cancel"])){
-		unset($_REQUEST["form"]);
-	}
 ?>
 <?php
 	if(!isset($_REQUEST["config"]))
@@ -185,6 +181,8 @@
 		$btnNew = new CButton("form",S_CREATE_USER);
 	}else if($_REQUEST["config"] == 1){
 		$btnNew = new CButton("form",S_CREATE_GROUP);
+	}else{
+		$btnNew = SPACE;
 	}
 	$frmForm = new CForm("users.php");
 	$frmForm->AddItem($cmbConf);
@@ -209,11 +207,11 @@
 				if(!check_right("User","R",$db_user["userid"]))		continue;
 
 				$alias = new CLink($db_user["alias"],
-					"users.php?register=change&form=0&config=".$_REQUEST["config"].
+					"users.php?form=0".url_param("config").
 					"&userid=".$db_user["userid"]."#form");
 			
-				$db_sessions = DBselect("select count(*) as count from sessions ".
-						"where userid=".$db_user["userid"]." and lastaccess-600<".time());
+				$db_sessions = DBselect("select count(*) as count from sessions".
+					" where userid=".$db_user["userid"]." and lastaccess-600<".time());
 				$db_ses_cnt=DBfetch($db_sessions);
 				if($db_ses_cnt["count"]>0)
 					$online=new CCol(S_YES,"on");
@@ -283,7 +281,7 @@
 
 				echo BR;
 
-				insert_permissions_form($_REQUEST["userid"]);
+				insert_permissions_form();
 			}
 		}
 	}
