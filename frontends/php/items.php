@@ -91,7 +91,14 @@
 ?>
 
 <?php
-	if(isset($_REQUEST["register"]))
+	if(isset($_REQUEST["delete"])&&isset($_REQUEST["itemid"]))
+	{
+		delete_item_from_templates($_REQUEST["itemid"]);
+		$result=delete_item($_REQUEST["itemid"]);
+		show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
+		unset($_REQUEST["itemid"]);
+	}
+	elseif(isset($_REQUEST["register"]))
 	{
 		if($_REQUEST["register"]=="do")
 		{
@@ -154,13 +161,6 @@
 				}
 			}
 			show_messages(TRUE,"Items added]<br>[Success for '$hosts_ok']<br>[Failed for '$hosts_notok'","Cannot add item");
-			unset($_REQUEST["itemid"]);
-		}
-		else if($_REQUEST["register"]=="delete")
-		{
-			delete_item_from_templates($_REQUEST["itemid"]);
-			$result=delete_item($_REQUEST["itemid"]);
-			show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
 			unset($_REQUEST["itemid"]);
 		}
 		else if($_REQUEST["register"]=="Delete selected")
@@ -277,20 +277,18 @@
 		show_header2(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 	?>
 
-
 	<?php
 
 		if(isset($_REQUEST["hostid"])) 
 		{
 			$table  = new CTableInfo();
-			$table->setHeader(array(S_ID,S_KEY,S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,S_ERROR));
-	//		$h="<form method=\"get\" action=\"items.php\">";
-	//		$h=$h."<input class=\"biginput\" name=\"hostid\" type=hidden value=".$_REQUEST["hostid"]." size=8>";
+			$table->setHeader(array(S_ID,S_KEY,S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),
+				S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,S_ERROR));
 
-	//		$table->setAfterHeader($h);
-
-			$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,i.history,i.lastvalue,i.lastclock,i.status,i.nextcheck,h.hostid,i.type,i.trends,i.error from hosts h,items i where h.hostid=i.hostid and h.hostid=".$_REQUEST["hostid"]." order by h.host,i.key_,i.description");
-			$col=0;
+			$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,".
+				"i.history,i.lastvalue,i.lastclock,i.status,i.nextcheck,h.hostid,i.type,".
+				"i.trends,i.error from hosts h,items i where h.hostid=i.hostid and".
+				" h.hostid=".$_REQUEST["hostid"]." order by h.host,i.key_,i.description");
 			while($row=DBfetch($result))
 			{
 				if(!check_right("Item","R",$row["itemid"]))
@@ -298,56 +296,42 @@
 					continue;
 				}
 
-				$key=iif(check_right("Item","U",$row["itemid"]),
-					"<A HREF=\"items.php?form=0&itemid=".$row["itemid"].url_param("hostid").url_param("groupid")."\">".$row["key_"]."</A>",$row["key_"]);
+				$input= array(
+					new CCheckBox($row["itemid"]),
+					new CLink($row["itemid"],"items.php?form=0&itemid=".
+						$row["itemid"].	url_param("hostid").url_param("groupid"))
+					);
 
-				$input="<INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"".$row["itemid"]."\"> ".$row["itemid"];
+				$key = new CLink($row["key_"],"items.php?form=0&itemid=".
+					$row["itemid"].	url_param("hostid").url_param("groupid"));
 
-				switch($row["type"])
-				{
-					case 0:
-						$type=S_ZABBIX_AGENT;
-						break;
-					case 7:
-						$type=S_ZABBIX_AGENT_ACTIVE;
-						break;
-					case 1:
-						$type=S_SNMPV1_AGENT;
-						break;
-					case 2:
-						$type=S_ZABBIX_TRAPPER;
-						break;
-					case 3:
-						$type=S_SIMPLE_CHECK;
-						break;
-					case 4:
-						$type=S_SNMPV2_AGENT;
-						break;
-					case 6:
-						$type=S_SNMPV3_AGENT;
-						break;
-					case 5:
-						$type=S_ZABBIX_INTERNAL;
-						break;
-					default:
-						$type=S_UNKNOWN;
-						break;
+				$description = new CLink($row["description"],"items.php?form=0&itemid=".
+					$row["itemid"].url_param("hostid").url_param("groupid"));
+
+				switch($row["type"]){
+				case 0:	$type = S_ZABBIX_AGENT;			break;
+				case 7:	$type = S_ZABBIX_AGENT_ACTIVE;		break;
+				case 1:	$type = S_SNMPV1_AGENT;			break;
+				case 2:	$type = S_ZABBIX_TRAPPER;		break;
+				case 3:	$type = S_SIMPLE_CHECK;			break;
+				case 4:	$type = S_SNMPV2_AGENT;			break;
+				case 6:	$type = S_SNMPV3_AGENT;			break;
+				case 5:	$type = S_ZABBIX_INTERNAL;		break;
+				default:$type = S_UNKNOWN;			break;
 				}
 
-				
-				switch($row["status"])
-				{
-					case 0:
-						$status=new CCol(new CLink(S_ACTIVE, "items.php?itemid=".$row["itemid"]."&hostid=".$_REQUEST["hostid"]."&register=changestatus&status=1","off"),"off");
-						break;
-					case 1:
-						$status=new CCol(new CLink(S_ACTIVE, "items.php?itemid=".$row["itemid"]."&hostid=".$_REQUEST["hostid"]."&register=changestatus&status=0","on"),"on");
-						break;
-					case 3:
-						$status=new CCol(S_NOT_SUPPORTED,"unknown");
-						break;
-					default:
-						$status=S_UNKNOWN;
+				switch($row["status"]){
+				case 0:	$status=new CCol(new CLink(S_ACTIVE, "items.php?itemid=".$row["itemid"].
+						"&hostid=".$_REQUEST["hostid"]."&register=changestatus&status=1",
+						"off"),"off");
+					break;
+				case 1:	$status=new CCol(new CLink(S_ACTIVE, "items.php?itemid=".$row["itemid"].
+						"&hostid=".$_REQUEST["hostid"]."&register=changestatus&status=0",
+						"on"),"on");
+					break;
+				case 3:	$status=new CCol(S_NOT_SUPPORTED,"unknown");
+					break;
+				default:$status=S_UNKNOWN;
 				}
 		
 				if($row["error"] == "")
@@ -361,7 +345,7 @@
 				$table->AddRow(array(
 					$input,
 					$key,
-					$row["description"],
+					$description,
 					$row["delay"],
 					$row["history"],
 					$row["trends"],
@@ -370,7 +354,6 @@
 					$error
 					));
 			}
-	//		$table->show();
 
 			$footerButtons = array();
 			array_push($footerButtons, new CButton('register','Activate selected',

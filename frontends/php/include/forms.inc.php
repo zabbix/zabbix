@@ -184,6 +184,43 @@
 		$frmUser->Show();
 	}
 
+	# Insert form for User permissions
+	function	insert_permissions_form()
+	{
+		global  $_REQUEST;
+
+		$frmPerm = new CFormTable("New permission","users.php");
+		$frmPerm->SetHelp("web.users.users.php");
+
+		$frmPerm->AddVar("form",0); // for correct data loading of user form (redefine form=1)
+		$frmPerm->AddVar("userid",$_REQUEST["userid"]);
+		$frmPerm->AddVar("config",get_request("config",0));
+		
+		$cmbRes = new CComboBox("right");
+		$cmbRes->AddItem("Configuration of Zabbix","Configuration of Zabbix");
+		$cmbRes->AddItem("Default permission","Default permission");
+		$cmbRes->AddItem("Graph","Graph");
+		$cmbRes->AddItem("Host","Host");
+		$cmbRes->AddItem("Screen","Screen");
+		$cmbRes->AddItem("Service","IT Service");
+		$cmbRes->AddItem("Item","Item");
+		$cmbRes->AddItem("Network map","Network map");
+		$cmbRes->AddItem("Trigger comment","Trigger comment");
+		$cmbRes->AddItem("User","User");
+		$frmPerm->AddRow(S_RESOURCE,$cmbRes);
+
+		$cmbPerm = new CComboBox("permission");
+		$cmbPerm->AddItem("R","Read-only");
+		$cmbPerm->AddItem("U","Read-write");
+		$cmbPerm->AddItem("H","Hide");
+		$cmbPerm->AddItem("A","Add");
+		$frmPerm->AddRow(S_PERMISSION,$cmbPerm);
+
+		$frmPerm->AddRow("Resource ID (0 for all)",new CTextBox("id",0));
+		$frmPerm->AddItemToBottomRow(new CButton("register","add permission"));
+		$frmPerm->Show();
+	}
+
 	# Insert form for User Groups
 	function	insert_usergroups_form($usrgrpid)
 	{
@@ -256,34 +293,36 @@
 	{
 		global  $_REQUEST;
 
-		$hostid=@iif(isset($_REQUEST["hostid"]),$_REQUEST["hostid"],0);
-		$description=@iif(isset($_REQUEST["description"]),$_REQUEST["description"],"");
-		$key=@iif(isset($_REQUEST["key"]),$_REQUEST["key"],"");
-		$port=@iif(isset($_REQUEST["port"]),$_REQUEST["port"],10050);
-		$delay=@iif(isset($_REQUEST["delay"]),$_REQUEST["delay"],30);
-		$history=@iif(isset($_REQUEST["history"]),$_REQUEST["history"],90);
-		$trends=@iif(isset($_REQUEST["trends"]),$_REQUEST["trends"],365);
-		$status=@iif(isset($_REQUEST["status"]),$_REQUEST["status"],0);
-		$type=@iif(isset($_REQUEST["type"]),$_REQUEST["type"],0);
-		$snmp_community=@iif(isset($_REQUEST["snmp_community"]),$_REQUEST["snmp_community"],"public");
-		$snmp_oid=@iif(isset($_REQUEST["snmp_oid"]),$_REQUEST["snmp_oid"],"interfaces.ifTable.ifEntry.ifInOctets.1");
-		$value_type=@iif(isset($_REQUEST["value_type"]),$_REQUEST["value_type"],0);
-		$trapper_hosts=@iif(isset($_REQUEST["trapper_hosts"]),$_REQUEST["trapper_hosts"],"");
-		$snmp_port=@iif(isset($_REQUEST["snmp_port"]),$_REQUEST["snmp_port"],161);
-		$units=@iif(isset($_REQUEST["units"]),$_REQUEST["units"],'');
-		$multiplier=@iif(isset($_REQUEST["multiplier"]),$_REQUEST["multiplier"],0);
-		$delta=@iif(isset($_REQUEST["delta"]),$_REQUEST["delta"],0);
+		$hostid		= get_request("hostid"		,0);
+		$description	= get_request("description"	,"");
+		$key		= get_request("key"		,"");
+		$port		= get_request("port"		,10050);
+		$delay		= get_request("delay"		,30);
+		$history	= get_request("history"		,90);
+		$trends		= get_request("trends"		,365);
+		$status		= get_request("status"		,0);
+		$type		= get_request("type"		,0);
+		$snmp_community	= get_request("snmp_community"	,"public");
+		$snmp_oid	= get_request("snmp_oid"	,"interfaces.ifTable.ifEntry.ifInOctets.1");
 
-		$snmpv3_securityname=@iif(isset($_REQUEST["snmpv3_securityname"]),$_REQUEST["snmpv3_securityname"],"");
-		$snmpv3_securitylevel=@iif(isset($_REQUEST["snmpv3_securitylevel"]),$_REQUEST["snmpv3_securitylevel"],0);
-		$snmpv3_authpassphrase=@iif(isset($_REQUEST["snmpv3_authpassphrase"]),$_REQUEST["snmpv3_authpassphrase"],"");
-		$snmpv3_privpassphrase=@iif(isset($_REQUEST["snmpv3_privpassphrase"]),$_REQUEST["snmpv3_privpassphrase"],"")
-;
-		$formula=@iif(isset($_REQUEST["formula"]),$_REQUEST["formula"],"1");
-		$logtimefmt=@iif(isset($_REQUEST["logtimefmt"]),$_REQUEST["logtimefmt"],"");
-		$groupid=@iif(isset($_REQUEST["groupid"]),$_REQUEST["groupid"],0);
+		$value_type	= get_request("value_type"	,0);
+		$trapper_hosts	= get_request("trapper_hosts"	,"");
+		$snmp_port	= get_request("snmp_port"	,161);
+		$units		= get_request("units"		,'');
+		$multiplier	= get_request("multiplier"	,0);
+		$delta		= get_request("delta"		,0);
 
-		$host=@iif(isset($_REQUEST["host"]),$_REQUEST["host"],NULL);
+		$snmpv3_securityname	= get_request("snmpv3_securityname"	,"");
+		$snmpv3_securitylevel	= get_request("snmpv3_securitylevel"	,0);
+		$snmpv3_authpassphrase	= get_request("snmpv3_authpassphrase"	,"");
+		$snmpv3_privpassphrase	= get_request("snmpv3_privpassphrase"	,"");
+
+		$formula	= get_request("formula"		,"1");
+		$logtimefmt	= get_request("logtimefmt"	,"");
+		$groupid	= get_request("groupid"		,0);
+
+		$host		= get_request("host",	NULL);
+
 		if(is_null($host)&&$hostid>0){
 			$host_info = get_host_by_hostid($hostid);
 			$host = $host_info["host"];
@@ -291,35 +330,41 @@
 
 		if(isset($_REQUEST["itemid"])&&($_REQUEST["form"] != 1))
 		{
-			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay, i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,i.trapper_hosts,i.snmp_port,i.units,i.multiplier,h.hostid,i.delta,i.trends,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,i.logtimefmt from items i,hosts h where i.itemid=".$_REQUEST["itemid"]." and h.hostid=i.hostid");
+			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay,".
+				" i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,".
+				" i.trapper_hosts,i.snmp_port,i.units,i.multiplier,h.hostid,i.delta,".
+				" i.trends,i.snmpv3_securityname,i.snmpv3_securitylevel,".
+				" i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,i.logtimefmt".
+				" from items i,hosts h where i.itemid=".$_REQUEST["itemid"].
+				" and h.hostid=i.hostid");
 			$row=DBfetch($result);
 		
-			$description=$row["description"];
-			$key=$row["key_"];
-			$host=$row["host"];
-			$port=$row["port"];
-			$delay=$row["delay"];
-			$history=$row["history"];
-			$status=$row["status"];
-			$type=iif(isset($_REQUEST["type"]),isset($_REQUEST["type"]),$row["type"]);
-			$snmp_community=$row["snmp_community"];
-			$snmp_oid=$row["snmp_oid"];
-			$value_type=$row["value_type"];
-			$trapper_hosts=$row["trapper_hosts"];
-			$snmp_port=$row["snmp_port"];
-			$units=$row["units"];
-			$multiplier=$row["multiplier"];
-			$hostid=$row["hostid"];
-			$delta=$row["delta"];
-			$trends=$row["trends"];
+			$description	= $row["description"];
+			$key		= $row["key_"];
+			$host		= $row["host"];
+			$port		= $row["port"];
+			$delay		= $row["delay"];
+			$history	= $row["history"];
+			$status		= $row["status"];
+			$type		= $row["type"];
+			$snmp_community	= $row["snmp_community"];
+			$snmp_oid	= $row["snmp_oid"];
+			$value_type	= $row["value_type"];
+			$trapper_hosts	= $row["trapper_hosts"];
+			$snmp_port	= $row["snmp_port"];
+			$units		= $row["units"];
+			$multiplier	= $row["multiplier"];
+			$hostid		= $row["hostid"];
+			$delta		= $row["delta"];
+			$trends		= $row["trends"];
 
-			$snmpv3_securityname=$row["snmpv3_securityname"];
-			$snmpv3_securitylevel=$row["snmpv3_securitylevel"];
-			$snmpv3_authpassphrase=$row["snmpv3_authpassphrase"];
-			$snmpv3_privpassphrase=$row["snmpv3_privpassphrase"];
+			$snmpv3_securityname	= $row["snmpv3_securityname"];
+			$snmpv3_securitylevel	= $row["snmpv3_securitylevel"];
+			$snmpv3_authpassphrase	= $row["snmpv3_authpassphrase"];
+			$snmpv3_privpassphrase	= $row["snmpv3_privpassphrase"];
 
-			$formula=$row["formula"];
-			$logtimefmt=$row["logtimefmt"];
+			$formula	= $row["formula"];
+			$logtimefmt	= $row["logtimefmt"];
 		}
 
 		$frmItem = new CFormTable(S_ITEM,"items.php#form");
@@ -332,18 +377,9 @@
 		$frmItem->AddRow(S_DESCRIPTION, new CTextBox("description",$description,40));
 		$frmItem->AddRow(S_HOST, array(
 			new CTextBox("host",$host,30,NULL,'yes'),
-			new CButton("btn1","Select","window.open('popup.php?form=item&field1=hostid&field2=host','new_win','width=450,height=450,resizable=1,scrollbars=1');","T")
+			new CButton("btn1","Select","window.open('popup.php?form=item&field1=hostid".
+				"&field2=host','new_win','width=450,height=450,resizable=1,scrollbars=1');","T")
 		));
-
-/*		
-		$cmbHosts = new CComboBox("hostid",$hostid);
-	        $hosts=DBselect("select hostid,host from hosts where status not in (".HOST_STATUS_DELETED.")order by host");
-		while($host=DBfetch($hosts))
-	        {
-			$cmbHosts->AddItem($host["hostid"],$host["host"]);
-	        }
-		$frmItem->AddRow(S_HOST, $cmbHosts);
-*/
 
 		$cmbType = new CComboBox("type",$type,"submit()");
 		$cmbType->AddItem(ITEM_TYPE_ZABBIX,'Zabbix agent');
@@ -370,8 +406,12 @@
 		}
 		else if($type==ITEM_TYPE_SNMPV3)
 		{
+			$frmItem->AddVar("snmp_community",$snmp_community);
+
 			$frmItem->AddRow(S_SNMP_OID, new CTextBox("snmp_oid",$snmp_oid,40));
-			$frmItem->AddRow(S_SNMPV3_SECURITY_NAME, new CTextBox("snmpv3_securityname",$snmpv3_securityname,64));
+
+			$frmItem->AddRow(S_SNMPV3_SECURITY_NAME,
+				new CTextBox("snmpv3_securityname",$snmpv3_securityname,64));
 
 			$cmbSecLevel = new CComboBox("snmpv3_securitylevel",$snmpv3_securitylevel);
 			$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,"NoAuthPriv");
@@ -379,10 +419,13 @@
 			$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,"AuthPriv");
 			$frmItem->AddRow(S_SNMPV3_SECURITY_LEVEL, $cmbSecLevel);
 
-			$frmItem->AddRow(S_SNMPV3_AUTH_PASSPHRASE, new CTextBox("snmpv3_authpassphrase",$snmpv3_authpassphrase,64));
-			$frmItem->AddRow(S_SNMPV3_PRIV_PASSPHRASE, new CTextBox("snmpv3_privpassphrase",$snmpv3_privpassphrase,64));
+			$frmItem->AddRow(S_SNMPV3_AUTH_PASSPHRASE,
+				new CTextBox("snmpv3_authpassphrase",$snmpv3_authpassphrase,64));
+
+			$frmItem->AddRow(S_SNMPV3_PRIV_PASSPHRASE,
+				new CTextBox("snmpv3_privpassphrase",$snmpv3_privpassphrase,64));
+
 			$frmItem->AddRow(S_SNMP_PORT, new CTextBox("snmp_port",$snmp_port,5));
-			$frmItem->AddVar("snmp_community",$snmp_community);
 		}
 		else
 		{
@@ -489,7 +532,8 @@
 				SPACE,
 				new CButton("register","update"),
 				SPACE,
-				new CButton("register","delete","return Confirm('Delete selected item?');")
+				new CButtonDelete("Delete selected item?",
+					url_param("groupid").url_param("hostid").url_param("itemid"))
 			);
 		}
 		array_push($frmRow,
@@ -504,7 +548,10 @@
 	        while($group=DBfetch($groups))
 	        {
 // Check if at least one host with read permission exists for this group
-	                $hosts=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg where hg.groupid=".$group["groupid"]." and hg.hostid=h.hostid and h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host");
+	                $hosts=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg".
+				" where hg.groupid=".$group["groupid"]." and hg.hostid=h.hostid".
+				" and h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host".
+				" order by h.host");
 	                while($host=DBfetch($hosts))
 	                {
 	                        if(!check_right("Host","U",$host["hostid"])) continue;
@@ -529,45 +576,9 @@
 	}
 
 
-	# Insert form for User permissions
-	function	insert_permissions_form($userid)
-	{
-		$frmPerm = new CFormTable("New permission","users.php");
-		$frmPerm->SetHelp("web.users.users.php");
-
-		if(isset($userid))
-		{
-			$frmPerm->AddVar("userid",$userid);
-		}
-		
-		$cmbRes = new CComboBox("right");
-		$cmbRes->AddItem("Configuration of Zabbix","Configuration of Zabbix");
-		$cmbRes->AddItem("Default permission","Default permission");
-		$cmbRes->AddItem("Graph","Graph");
-		$cmbRes->AddItem("Host","Host");
-		$cmbRes->AddItem("Screen","Screen");
-		$cmbRes->AddItem("Service","IT Service");
-		$cmbRes->AddItem("Item","Item");
-		$cmbRes->AddItem("Network map","Network map");
-		$cmbRes->AddItem("Trigger comment","Trigger comment");
-		$cmbRes->AddItem("User","User");
-		$frmPerm->AddRow(S_RESOURCE,$cmbRes);
-
-		$cmbPerm = new CComboBox("permission");
-		$cmbPerm->AddItem("R","Read-only");
-		$cmbPerm->AddItem("U","Read-write");
-		$cmbPerm->AddItem("H","Hide");
-		$cmbPerm->AddItem("A","Add");
-		$frmPerm->AddRow(S_PERMISSION,$cmbPerm);
-
-		$frmPerm->AddRow("Resource ID (0 for all)",new CTextBox("id",0));
-		$frmPerm->AddItemToBottomRow(new CButton("register","add permission"));
-		$frmPerm->Show();
-	}
-
 	function	insert_login_form()
 	{
-		$frmLogin = new CFormTable('Login','index.php');
+		$frmLogin = new CFormTable('Login','index.php',"post","multipart/form-data");
 		$frmLogin->SetHelp('web.index.login');
 		$frmLogin->AddRow('Login name', new CTextBox('name'));
 		$frmLogin->AddRow('Password', new CPassBox('password'));
@@ -630,57 +641,45 @@
 		$frmTrig->SetHelp("web.triggers.trigger.php");
 
 		$dep_el=array();
-		$i=1;
-		for($i=1; $i<=1000; $i++)
+	
+		for($i=0; $i<=1000; $i++)
 		{
 			if(!isset($_REQUEST["dependence$i"])) continue;
-			array_push($dep_el, 
-				new CCheckBox(
-					$_REQUEST["dependence$i"],
-					'no',
-					expand_trigger_description($_REQUEST["dependence$i"])
-				),
-				BR
-			);
-			$frmTrig->AddVar("dependence$i", $_REQUEST["dependence$i"]);
+			$dependences[$_REQUEST["dependence$i"]] = 1;
 		}
 
-		if(isset($triggerid))
+		if(isset($triggerid) && $_REQUEST["form"]!=1)
 		{
 			$trigger=get_trigger_by_triggerid($triggerid);
 	
-			$expression=explode_exp($trigger["expression"],0);
-			$description=htmlspecialchars(stripslashes($trigger["description"]));
-			$priority=$trigger["priority"];
-			$status=$trigger["status"];
-			$comments=$trigger["comments"];
-			$url=$trigger["url"];
+			$expression	= explode_exp($trigger["expression"],0);
+			$description	= htmlspecialchars(stripslashes($trigger["description"]));
+			$priority	= $trigger["priority"];
+			$status		= $trigger["status"];
+			$comments	= $trigger["comments"];
+			$url		= $trigger["url"];
 
-			$sql="select t.triggerid,t.description from triggers t,trigger_depends d where t.triggerid=d.triggerid_up and d.triggerid_down=$triggerid";
-			$trigs=DBselect($sql);
-//			$i=1; // CONTINUE ITERATION !!! DONT UNHIDE THIS ROW!!!
+			$trigs=DBselect("select t.triggerid,t.description from triggers t,trigger_depends d".
+				" where t.triggerid=d.triggerid_up and d.triggerid_down=$triggerid");
 			while($trig=DBfetch($trigs))
 			{
-				array_push($dep_el, 
-					new CCheckBox(
-						$trig["triggerid"],
-						'no',
-						expand_trigger_description($trig["triggerid"])
-					),
-					BR
-				);
-				$frmTrig->AddVar("dependence$i", $trig["triggerid"]);
-				$i++;
+				$dependences[$trig["triggerid"]] = 1;
 			}
 		}
 		else
 		{
-			$expression="";
-			$description="";
-			$priority=0;
-			$status=0;
-			$comments="";
-			$url="";
+			$expression	= get_request("expression"	,"");
+			$description	= get_request("description"	,"");
+			$priority	= get_request("priority"	,0);
+			$status		= get_request("status"		,0);
+			$comments	= get_request("comments"	,"");
+			$url		= get_request("url"		,"");
+		}
+
+		$i=0;
+		foreach($dependences as $key => $val){
+			array_push($dep_el, new CCheckBox(strval($key),'no',expand_trigger_description($key)),BR);
+			$frmTrig->AddVar("dependence".$i++, $key);
 		}
 
 		if(isset($hostid))
@@ -700,7 +699,7 @@
 			array_push($dep_el, new CButton('register','delete selected'));
 		$frmTrig->AddRow("The trigger depends on",$dep_el);
 
-		$cmbDepID = new CComboBox("depid");
+		$cmbDepID = new CComboBox("new_dependence");
 		if(isset($triggerid))
 			$sql="select t.triggerid,t.description from triggers t where t.triggerid!=$triggerid order by t.description";
 		else
@@ -711,7 +710,7 @@
 		{
 			$cmbDepID->AddItem($trig["triggerid"],expand_trigger_description($trig["triggerid"]));
 		}
-		$frmTrig->AddRow("New dependency",array($cmbDepID,BR,new CButton("register","add dependency")));
+		$frmTrig->AddRow("New dependency",array($cmbDepID,SPACE,new CButton("register","add dependency")));
 
 		$cmbPrior = new CComboBox("priority");
 		$cmbPrior->AddItem(0,"Not classified");
@@ -1957,4 +1956,154 @@
 		$frmHostP->Show();
 	}
 */
+
+	function insert_map_form()
+	{
+		global $_REQUEST;
+
+		$frm_title = "New system map";
+
+		if(isset($_REQUEST["sysmapid"]))
+		{
+			$result=DBselect("select * from sysmaps where sysmapid=".$_REQUEST["sysmapid"]);
+			$row=DBfetch($result);
+			$frm_title = "System map: \"".$row["name"]."\"";
+		}
+		if(isset($_REQUEST["sysmapid"]) && $_REQUEST["form"]!=1)
+		{
+			$name		= $row["name"];
+			$width		= $row["width"];
+			$height		= $row["height"];
+			$background	= $row["background"];
+			$label_type	= $row["label_type"];
+		}
+		else
+		{
+			$name		= get_request("name","");
+			$width		= get_request("width",800);
+			$height		= get_request("height",600);
+			$background	= get_request("background","");
+			$label_type	= get_request("label_type",0);
+		}
+
+
+		$frmMap = new CFormTable($frm_title,"sysmaps.php");
+		$frmMap->SetHelp("web.sysmaps.map.php");
+
+		if(isset($_REQUEST["sysmapid"]))
+			$frmMap->AddVar("sysmapid",$_REQUEST["sysmapid"]);
+
+		$frmMap->AddRow(S_NAME,new CTextBox("name",$name,32));
+		$frmMap->AddRow(S_WIDTH,new CTextBox("width",$width,5));
+		$frmMap->AddRow(S_HEIGHT,new CTextBox("height",$height,5));
+
+		$cmbImg = new CComboBox("background",$background);
+		$cmbImg->AddItem('',"No image...");
+		$result=DBselect("select name from images where imagetype=2 order by name");
+		while($row=DBfetch($result))
+			$cmbImg->AddItem($row["name"],$row["name"]);
+		$frmMap->AddRow(S_BACKGROUND_IMAGE,$cmbImg);
+
+		$cmbLabel = new CComboBox("label_type",$label_type);
+		$cmbLabel->AddItem(0,S_HOST_LABEL);
+		$cmbLabel->AddItem(1,S_IP_ADDRESS);
+		$cmbLabel->AddItem(2,S_HOST_NAME);
+		$cmbLabel->AddItem(3,S_STATUS_ONLY);
+		$cmbLabel->AddItem(4,S_NOTHING);
+		$frmMap->AddRow(S_ICON_LABEL_TYPE,$cmbLabel);
+
+		$frmMap->AddItemToBottomRow(new CButton("save",S_SAVE));
+		if(isset($_REQUEST["sysmapid"]))
+		{
+			$frmMap->AddItemToBottomRow(SPACE);
+			$frmMap->AddItemToBottomRow(new CButtonDelete("Delete system map?",
+					url_param("sysmapid")));
+		}
+		$frmMap->AddItemToBottomRow(SPACE);
+		$frmMap->AddItemToBottomRow(new CButtonCancel());
+
+		$frmMap->Show();
+		
+	}
+
+	function insert_map_host_form()
+	{
+		if(isset($_REQUEST["shostid"]))
+		{
+			$shost=get_sysmaps_hosts_by_shostid($_REQUEST["shostid"]);
+
+			$hostid	= $shost["hostid"];
+			$label	= $shost["label"];
+			$x	= $shost["x"];
+			$y	= $shost["y"];
+			$icon	= $shost["icon"];
+			$url	= $shost["url"];
+			$icon_on= $shost["icon_on"];
+		}
+		else
+		{
+			$hostid	= 0;
+
+			$label	= "";
+			$x	= 0;
+			$y	= 0;
+			$icon	= "";
+			$url	= "";
+			$icon_on= "";
+		}
+		if($hostid) 
+		{
+			$host_info = get_host_by_hostid($hostid);
+			$host = $host_info["host"];
+		} else {
+			$host = "";
+		}
+
+		$frmHost = new CFormTable("New host to display","sysmap.php");
+		$frmHost->SetHelp("web.sysmap.host.php");
+		if(isset($_REQUEST["shostid"]))
+		{
+			$frmHost->AddVar("shostid",$_REQUEST["shostid"]);
+		}
+		if(isset($_REQUEST["sysmapid"]))
+		{
+			$frmHost->AddVar("sysmapid",$_REQUEST["sysmapid"]);
+		}
+
+		$frmHost->AddVar("hostid",$hostid);
+		$frmHost->AddRow("Host",array(
+			new CTextBox("host",$host,32,NULL,'yes'),
+			new CButton("btn1","Select","window.open('popup.php?form=host&field1=hostid&field2=host'".
+				",'new_win','width=450,height=450,resizable=1,scrollbars=1');","T")
+		));
+
+		$cmbIcon = new CComboBox("icon",$icon);
+		$result=DBselect("select name from images where imagetype=1 order by name");
+		while($row=DBfetch($result))
+			$cmbIcon->AddItem($row["name"],$row["name"]);
+		$frmHost->AddRow("Icon (OFF)",$cmbIcon);
+
+		$cmbIcon = new CComboBox("icon_on",$icon_on);
+		$result=DBselect("select name from images where imagetype=1 order by name");
+		while($row=DBfetch($result))
+			$cmbIcon->AddItem($row["name"],$row["name"]);
+		$frmHost->AddRow("Icon (ON)",$cmbIcon);
+
+		$frmHost->AddRow("Label", new CTextBox("label", $label, 32));
+
+		$frmHost->AddRow("Coordinate X", new CTextBox("x", $x, 5));
+		$frmHost->AddRow("Coordinate Y", new CTextBox("y", $y, 5));
+		$frmHost->AddRow("URL", new CTextBox("url", $url, 64));
+
+		$frmHost->AddItemToBottomRow(new CButton("register","add"));
+		if(isset($_REQUEST["shostid"]))
+		{
+			$frmHost->AddItemToBottomRow(SPACE);
+			$frmHost->AddItemToBottomRow(new CButton("register","update"));
+		}
+		$frmHost->AddItemToBottomRow(SPACE);
+		$frmHost->AddItemToBottomRow(new CButtonCancel(url_param("sysmapid")));
+
+		$frmHost->Show();
+	}
 ?>

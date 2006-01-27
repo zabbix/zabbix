@@ -27,6 +27,7 @@
 			parent::CTag("input","no");
 			$this->tag_body_start = "";
 			$this->AddOption("type","submit");
+//			$this->AddOption("type","button");
 			$this->SetClass("button");
 			$this->SetName($name);
 			$this->SetCaption($caption);

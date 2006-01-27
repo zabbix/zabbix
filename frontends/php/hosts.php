@@ -40,9 +40,6 @@
 	update_profile("web.menu.config.last",$page["file"]);
 ?>
 <?php
-	if(isset($_REQUEST["cancel"])){
-		unset($_REQUEST["form"]);
-	}
 
 /************ ACTIONS FOR HOSTS ****************/
 /* SAVE HOST */
@@ -334,15 +331,16 @@
 	$cmbConf->AddItem(2,S_HOSTS_TEMPLATES_LINKAGE);
 
 	switch($_REQUEST["config"]){
-		case 0: $btnCaption = S_CREATE_HOST;	break;
-		case 1: $btnCaption = S_CREATE_GROUP;	break;
-		case 2: $btnCaption = "S_CREATE_LINKAGE";	break;
+		case 0: $btn = new CButton("form",S_CREATE_HOST);	break;
+		case 1: $btn = new CButton("form",S_CREATE_GROUP);	break;
 	}
 
 	$frmForm = new CForm("hosts.php");
 	$frmForm->AddItem($cmbConf);
-	$frmForm->AddItem(SPACE."|".SPACE);
-	$frmForm->AddItem(new CButton("form",$btnCaption));
+	if(isset($btn)){
+		$frmForm->AddItem(SPACE."|".SPACE);
+		$frmForm->AddItem($btn);
+	}
 	show_header2(S_CONFIGURATION_OF_HOSTS_AND_HOST_GROUPS, $frmForm);
 	echo BR;
 ?>
@@ -360,15 +358,13 @@
 			unset($_REQUEST["hostid"]);
 		}
 
-		$form = new CForm("hosts.php");
+/* filter panel */
+		$form = new CForm();
 		$form->AddVar("config",$_REQUEST["config"]);
-		if(isset($_REQUEST["hostid"]))
-		{
-			$form->AddVar("hostid",$_REQUEST["hostid"]);
-		}
-		$cmbGroup = new CComboBox("groupid",get_request("groupid",0),"submit()");
-		$cmbGroup->AddItem(0,S_ALL_SMALL);
 
+		$_REQUEST["groupid"] = get_request("groupid",0);
+		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
+		$cmbGroup->AddItem(0,S_ALL_SMALL);
 		$result=DBselect("select groupid,name from groups order by name");
 		while($row=DBfetch($result))
 		{
@@ -386,36 +382,46 @@
 		$form->AddItem(S_GROUP.SPACE);
 		$form->AddItem($cmbGroup);
 
-		$cmbHosts = new CComboBox("hostid",get_request("hostid",0),"submit()");
-		$cmbHosts->AddItem(0,S_SELECT_HOST_DOT_DOT_DOT);
-		if(isset($_REQUEST["groupid"])){
+		if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]>0)
+		{
 			$sql="select h.hostid,h.host from hosts h,hosts_groups hg".
-				" where hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid".
-				" and h.status not in (".HOST_STATUS_DELETED.") group by h.hostid,h.host".
-				" order by h.host";
-		} else {
+				" where hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and".
+				" h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host";
+		}
+		else
+		{
 			$sql="select h.hostid,h.host from hosts h where h.status<>".HOST_STATUS_DELETED.
 				" group by h.hostid,h.host order by h.host";
 		}
 
-		$correct_hostid = 'no';
 		$result=DBselect($sql);
+
+		$_REQUEST["hostid"] = get_request("hostid",0);
+		$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit();");
+
+		$correct_hostid='no';
+		$first_hostid = -1;
 		while($row=DBfetch($result))
 		{
 			if(!check_right("Host","U",$row["hostid"]))	continue;
 			$cmbHosts->AddItem($row["hostid"],$row["host"]);
-			if(isset($_REQUEST["hostid"]))
+
+			if($_REQUEST["hostid"]!=0){
 				if($_REQUEST["hostid"]==$row["hostid"])
 					$correct_hostid = 'ok';
+			}
+			if($first_hostid <= 0)
+				$first_hostid = $row["hostid"];
 		}
 		if($correct_hostid!='ok')
-			unset($_REQUEST["hostid"]);
+			$_REQUEST["hostid"] = $first_hostid;
 
 		$form->AddItem(SPACE.S_HOST.SPACE);
 		$form->AddItem($cmbHosts);
+		
+		show_header2(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 
-		show_header2(S_CONFIGURATION_OF_TEMPLATES_LINKAGE, $form);
-
+/* table */
 		if(isset($_REQUEST["hostid"]))
 		{
 			echo BR;
