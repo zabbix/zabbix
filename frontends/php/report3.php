@@ -217,7 +217,6 @@
 	{
 	//--------Weekly-------------
 	$table->setHeader(array(S_FROM,S_TILL,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));
-	$col=0;
 	$year=date("Y");
 	for($year=date("Y")-2;$year<=date("Y");$year++)
 	{

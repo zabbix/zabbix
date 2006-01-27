@@ -204,7 +204,6 @@
 		}
 		$table->setHeader($header);
 
-		$col=0;
 		if(isset($_REQUEST["sort"]))
 		{
 			switch ($_REQUEST["sort"])
