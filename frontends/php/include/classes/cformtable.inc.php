@@ -92,10 +92,6 @@
 			}
 			return 0;
 		}
-		function GetName()
-		{
-			return $this->GetOption("name");
-		}
 		function AddVar($name, $value)
 		{
 			$this->AddItemToTopRow(new CVar($name, $value));

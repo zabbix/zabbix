@@ -2841,10 +2841,22 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		window.location = url;
 		return false;
 	}	
-	function PopUp(url,name,param)
+	function PopUp(url,form_name,param)
 	{
-		window.open(url,name,param);
+		window.open(url,form_name,param);
 		return false;
+	}
+
+	function CheckAll(form_name, chkMain)
+	{
+		var frmForm = document.forms[form_name];
+		var value = frmForm.elements[chkMain].checked;
+		for (var i=0; i < frmForm.length; i++)
+		{
+			if(frmForm.elements[i].type != 'checkbox') continue;
+			if(frmForm.elements[i].name == chkMain) continue;
+			frmForm.elements[i].checked = value;
+		}
 	}
 </script>
 		";

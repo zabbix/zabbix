@@ -460,8 +460,18 @@
 			insert_hostgroups_form(get_request("groupid",NULL));
 		} else {
 			show_table_header(S_HOST_GROUPS_BIG);
+
+			$form = new CForm('hosts.php');
+			$form->SetName('groups');
+			$form->AddVar("config",get_request("config",0));
+
 			$table = new CTableInfo(S_NO_HOST_GROUPS_DEFINED);
-			$table->setHeader(array(S_NAME,S_MEMBERS));
+
+			$table->setHeader(array(
+				array(	new CCheckBox("all_groups",NULL,NULL,
+						"CheckAll('".$form->GetName()."','all_groups');"),
+					S_NAME),
+				S_MEMBERS));
 
 			$db_groups=DBselect("select groupid,name from groups order by name");
 			while($db_group=DBfetch($db_groups))
@@ -503,8 +513,6 @@
 				"return Confirm('".S_DELETE_SELECTED_GROUPS_Q."');"));
 			$table->SetFooter(new CCol($footerButtons),'table_footer');
 
-			$form = new CForm('hosts.php');
-			$form->AddVar("config",get_request("config",0));
 			$form->AddItem($table);
 			$form->Show();
 		}
@@ -542,8 +550,17 @@
 			$frmForm->AddItem($cmbGroups);
 			show_header2(S_HOSTS_BIG, $frmForm);
 
+	/* table HOSTS */
+			$form = new CForm('hosts.php');
+			$form->SetName('hosts');
+			$form->AddVar("config",get_request("config",0));
+
 			$table = new CTableInfo(S_NO_HOSTS_DEFINED);
-			$table->setHeader(array(S_HOST,S_IP,S_PORT,S_STATUS,S_AVAILABILITY,S_ERROR,S_SHOW));
+			$table->setHeader(array(
+				array(	new CCheckBox("all_hosts",NULL,NULL,
+						"CheckAll('".$form->GetName()."','all_hosts');"),
+					S_HOST),
+				S_IP,S_PORT,S_STATUS,S_AVAILABILITY,S_ERROR,S_SHOW));
 		
 			$sql="select h.* from";
 			if(isset($_REQUEST["groupid"]))
@@ -631,8 +648,6 @@
 				"return Confirm('".S_DELETE_SELECTED_HOSTS_Q."');"));
 			$table->SetFooter(new CCol($footerButtons),'table_footer');
 
-			$form = new CForm('hosts.php');
-			$form->AddVar("config",get_request("config",0));
 			$form->AddItem($table);
 			$form->Show();
 

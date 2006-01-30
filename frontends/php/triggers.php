@@ -248,8 +248,16 @@
 		show_header2(S_CONFIGURATION_OF_TRIGGERS_BIG, $form);
 
 /* TABLE */
+		$form = new CForm('triggers.php');
+		$form->SetName('triggers');
+		$form->AddVar('hostid',$_REQUEST["hostid"]);
+
 		$table = new CTableInfo();
-		$table->SetHeader(array(S_ID,S_NAME,S_EXPRESSION, S_SEVERITY, S_STATUS, S_ERROR));
+		$table->setHeader(array(
+			array(	new CCheckBox("all_items",NULL,NULL,
+					"CheckAll('".$form->GetName()."','all_items');"),
+				S_ID),
+			S_NAME,S_EXPRESSION, S_SEVERITY, S_STATUS, S_ERROR));
 
 		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.status,t.value,t.priority,t.error from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]." order by h.host,t.description");
 		while($row=DBfetch($result))
@@ -269,7 +277,8 @@
 				$description="<A HREF=\"triggers.php?form=0&triggerid=".$row["triggerid"]."\">$description</A>";
 			}
 
-			$id="<INPUT TYPE=\"CHECKBOX\" class=\"biginput\" NAME=\"".$row["triggerid"]."\"> ".$row["triggerid"];
+			$id= array(new CCheckBox($row["triggerid"]), $row["triggerid"]);
+
 			$sql="select t.triggerid,t.description from triggers t,trigger_depends d where t.triggerid=d.triggerid_up and d.triggerid_down=".$row["triggerid"];
 			$result1=DBselect($sql);
 			if(DBnum_rows($result1)>0)
@@ -341,8 +350,6 @@
 			"return Confirm('".S_DISABLE_SELECTED_TRIGGERS_Q."');"));
 		$table->SetFooter(new CCol($footerButtons),'table_footer');
 
-		$form = new CForm('triggers.php');
-		$form->AddVar('hostid',$_REQUEST["hostid"]);
 		$form->AddItem($table);
 		$form->Show();
 	}
