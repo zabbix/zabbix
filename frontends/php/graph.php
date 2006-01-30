@@ -27,7 +27,7 @@
 ?>
 <?php
 	show_table_header(S_CONFIGURATION_OF_GRAPH_BIG);
-	echo "<br>";
+	echo BR;
 ?>
 <?php
 	if(!check_right("Graph","R",$_REQUEST["graphid"]))
@@ -43,28 +43,40 @@
 	{
 		if($_REQUEST["register"]=="add")
 		{
-			add_graph_item_to_templates($_REQUEST["graphid"],$_REQUEST["itemid"],$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"],$_REQUEST["yaxisside"]);
+			add_graph_item_to_templates($_REQUEST["graphid"],$_REQUEST["itemid"],
+				$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"],
+				$_REQUEST["yaxisside"]);
 
-			$gitemid=add_item_to_graph($_REQUEST["graphid"],$_REQUEST["itemid"],$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"],$_REQUEST["yaxisside"]);
+			$gitemid=add_item_to_graph($_REQUEST["graphid"],$_REQUEST["itemid"],
+				$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"],
+				$_REQUEST["yaxisside"]);
 			if($gitemid)
 			{
 				$graph=get_graph_by_graphid($_REQUEST["graphid"]);
 				$item=get_item_by_itemid($_REQUEST["itemid"]);
-				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH_ELEMENT,"Graph ID [".$_REQUEST["graphid"]."] Name [".$graph["name"]."] Added [".$item["description"]."]");
+				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH_ELEMENT,
+					"Graph ID [".$_REQUEST["graphid"]."] Name [".$graph["name"]."]".
+					" Added [".$item["description"]."]");
 			}
 			show_messages($gitemid,S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
 		if($_REQUEST["register"]=="update")
 		{
-			update_graph_item_from_templates($_REQUEST["gitemid"],$_REQUEST["itemid"],$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"],$_REQUEST["yaxisside"]);
+			update_graph_item_from_templates($_REQUEST["gitemid"],$_REQUEST["itemid"],
+				$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"],
+				$_REQUEST["yaxisside"]);
 
-			$result=update_graph_item($_REQUEST["gitemid"],$_REQUEST["itemid"],$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"],$_REQUEST["yaxisside"]);
+			$result=update_graph_item($_REQUEST["gitemid"],$_REQUEST["itemid"],
+				$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"],
+				$_REQUEST["yaxisside"]);
 			if($result)
 			{
 				$graphitem=get_graphitem_by_gitemid($_REQUEST["gitemid"]);
 				$graph=get_graph_by_graphid($graphitem["graphid"]);
 				$item=get_item_by_itemid($graphitem["itemid"]);
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_GRAPH_ELEMENT,"Graph ID [".$graphitem["graphid"]."] Name [".$graph["name"]."] Updated [".$item["description"]."]");
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_GRAPH_ELEMENT,
+					"Graph ID [".$graphitem["graphid"]."] Name [".$graph["name"]."]".
+					" Updated [".$item["description"]."]");
 			}
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
@@ -77,7 +89,9 @@
 			$result=delete_graphs_item($_REQUEST["gitemid"]);
 			if($result)
 			{
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH_ELEMENT,"Graph ID [".$graphitem["graphid"]."] Name [".$graph["name"]."] Deleted [".$item["description"]."]");
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH_ELEMENT,
+					"Graph ID [".$graphitem["graphid"]."] Name [".$graph["name"]."]".
+					" Deleted [".$item["description"]."]");
 			}
 			show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
 			unset($_REQUEST["gitemid"]);
@@ -121,7 +135,9 @@
 	echo "<TD WIDTH=10% NOSAVE><B>".S_ACTIONS."</B></TD>";
 	echo "</TR>";
 
-	$sql="select i.itemid,h.host,i.description,gi.gitemid,gi.color,gi.drawtype,gi.sortorder,i.key_ from hosts h,graphs_items gi,items i where i.itemid=gi.itemid and gi.graphid=".$_REQUEST["graphid"]." and h.hostid=i.hostid order by gi.sortorder";
+	$sql="select i.itemid,h.host,i.description,gi.gitemid,gi.color,gi.drawtype,gi.sortorder,i.key_".
+		" from hosts h,graphs_items gi,items i where i.itemid=gi.itemid".
+		" and gi.graphid=".$_REQUEST["graphid"]." and h.hostid=i.hostid order by gi.sortorder";
 	$result=DBselect($sql);
 	$col=0;
 	while($row=DBfetch($result))
@@ -151,7 +167,8 @@
 
 	if(isset($_REQUEST["gitemid"]))
 	{
-		$sql="select itemid,color,drawtype,sortorder,yaxisside from graphs_items where gitemid=".$_REQUEST["gitemid"];
+		$sql="select itemid,color,drawtype,sortorder,yaxisside from graphs_items".
+			" where gitemid=".$_REQUEST["gitemid"];
 		$result=DBselect($sql);
 		$row=DBfetch($result);
 		$itemid=$row["itemid"];
@@ -179,7 +196,9 @@
 
 	echo S_PARAMETER;
 	show_table2_h_delimiter();
-	$result=DBselect("select h.host,i.description,i.itemid,i.key_ from hosts h,items i where h.hostid=i.hostid and h.status in(".HOST_STATUS_MONITORED.",".HOST_STATUS_TEMPLATE.") and i.status=".ITEM_STATUS_ACTIVE." order by h.host,i.description");
+	$result=DBselect("select h.host,i.description,i.itemid,i.key_ from hosts h,items"
+		" where h.hostid=i.hostid and h.status in(".HOST_STATUS_MONITORED.",".HOST_STATUS_TEMPLATE.")".
+		" and i.status=".ITEM_STATUS_ACTIVE." order by h.host,i.description");
 	echo "<select name=\"itemid\" size=1>";
 	while($row=DBfetch($result))
 	{

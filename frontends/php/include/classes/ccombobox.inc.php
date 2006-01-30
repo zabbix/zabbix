@@ -44,18 +44,6 @@
 			}
 			return $this->error("Incorrect value for SetCaption [$value]");
 		}
-		function SetEnable($value='yes')
-		{
-			if(is_null($value))
-				return 0;
-			elseif((is_string($value) && ($value == 'yes' || $value == 'enabled' || $value=='on'))
-				|| (is_int($value) && $value<>0))
-				return $this->DelOption('disabled');
-			elseif((is_string($value) && ($value == 'no' || $value == 'disabled' || $value=='off'))
-				|| (is_int($value) && $value==0))
-				return $this->AddOption('disabled','disabled');
-			return $this->error("Incorrect value for SetEnable [$value]");
-		}
 		function SetSelected($value='yes')
 		{
 			if(is_null($value))

@@ -62,22 +62,20 @@
 ?>
 
 <?php
-	$h1="&nbsp;".S_HISTORY_OF_ACTIONS_BIG;
+	$form = new CForm();
 
-	$h2="";
-
+	$btnPrev = new CButton("prev","<< Prev 100");
 	if(isset($_REQUEST["start"]))
 	{
-		$h2=$h2."<input class=\"biginput\" name=\"start\" type=hidden value=".$_REQUEST["start"]." size=8>";
-  		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"prev\" value=\"<< Prev 100\">";
+		$form->AddVar("start",$_REQUEST["start"]);
+	} else {
+		$btnPrev->SetEnable('no');
 	}
-	else
-	{
-  		$h2=$h2."<input class=\"button\" type=\"submit\" disabled name=\"prev\" value=\"<< Prev 100\">";
-	}
-  	$h2=$h2."<input class=\"button\" type=\"submit\" name=\"next\" value=\"Next 100 >>\">";
+	$form->AddItem($btnPrev);
 
-	show_header2($h1,$h2,"<form name=\"form2\" method=\"get\" action=\"actions.php\">","</form>");
+	$form->AddItem(new CButton("next","Next 100 >>"));
+
+	show_header2(S_HISTORY_OF_ACTIONS_BIG,$form);
 ?>
 
 
@@ -87,7 +85,9 @@
 	{
 		$_REQUEST["start"]=0;
 	}
-	$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error from alerts a,media_type mt where mt.mediatypeid=a.mediatypeid order by a.clock desc limit ".(10*($_REQUEST["start"]+100));
+	$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,".
+		"a.error from alerts a,media_type mt where mt.mediatypeid=a.mediatypeid order by a.clock".
+		" desc limit ".(10*($_REQUEST["start"]+100));
 	$result=DBselect($sql);
 
 	$table = new CTableInfo(S_NO_ACTIONS_FOUND);

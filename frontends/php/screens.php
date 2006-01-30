@@ -43,7 +43,7 @@
 ?>
 
 <?php
-	$_REQUEST["screenid"]=@iif(isset($_REQUEST["screenid"]),$_REQUEST["screenid"],get_profile("web.screens.screenid",0));
+	$_REQUEST["screenid"]=get_request("screenid",get_profile("web.screens.screenid",0));
 	update_profile("web.screens.screenid",$_REQUEST["screenid"]);
 	update_profile("web.menu.view.last",$page["file"]);
 ?>
@@ -136,7 +136,7 @@
 		}
 	}
 
-          echo "<TABLE BORDER=1 COLS=".$row["cols"]." align=center WIDTH=100% BGCOLOR=\"#FFFFFF\">\n";
+          echo "<TABLE COLS=".$row["cols"]." align=center WIDTH=100% BGCOLOR=\"#FFFFFF\">\n";
           for($r=0;$r<$row["rows"];$r++)
           {
           echo "<TR>\n";
@@ -193,7 +193,8 @@
 			}
 			else if($resource == 3)
 			{
-				show_screen_plaintext($resourceid,$elements);
+				$ptext =& get_screen_plaintext($resourceid,$elements);
+				$ptext->Show();
 			}
 		}
 		else 

@@ -268,6 +268,7 @@ tr.table_even_row:hover
 {
 	color: #00AA00;
 }
+
 A.enabled:link		{	color:#00AA00;	text-decoration: none; }
 A.enabled:visited 	{	color:#00AA00;	text-decoration: none; }
 A.enabled:hover 	{	color:#00AA00;	text-decoration: underline; }
@@ -277,6 +278,11 @@ A.disabled:link		{	color:#AA0000;	text-decoration: none; }
 A.disabled:visited 	{	color:#AA0000;	text-decoration: none; }
 A.disabled:hover 	{	color:#AA0000;	text-decoration: underline; }
 A.disabled:active 	{	color:#AA0000;	text-decoration: underline;}
+
+A.uncnown:link		{	color:#AAAAAA;	text-decoration: none; }
+A.uncnown:visited 	{	color:#AAAAAA;	text-decoration: none; }
+A.uncnown:hover 	{	color:#AAAAAA;	text-decoration: underline; }
+A.uncnown:active 	{	color:#AAAAAA;	text-decoration: underline;}
 
 A.off:link	{	color:#00AA00;	text-decoration: none; }
 A.off:visited 	{	color:#00AA00;	text-decoration: none; }
