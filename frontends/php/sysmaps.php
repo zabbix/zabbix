@@ -43,12 +43,13 @@
 		if(isset($_REQUEST["sysmapid"]))
 		{
 			$result=update_sysmap($_REQUEST["sysmapid"],$_REQUEST["name"],$_REQUEST["width"],
-				$_REQUEST["height"],$_REQUEST["background"],$_REQUEST["label_type"]);
+				$_REQUEST["height"],$_REQUEST["background"],$_REQUEST["label_type"],
+				$_REQUEST["label_location"]);
 
 			show_messages($result,"Network map updated","Cannot update network map");
 		} else {
 			$result=add_sysmap($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
-				$_REQUEST["background"],$_REQUEST["label_type"]);
+				$_REQUEST["background"],$_REQUEST["label_type"],$_REQUEST["label_location"]);
 
 			show_messages($result,"Network map added","Cannot add network map");
 		}
