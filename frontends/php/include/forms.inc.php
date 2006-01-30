@@ -2106,4 +2106,73 @@
 
 		$frmHost->Show();
 	}
+
+	function insert_map_link_form()
+	{
+		$frmCnct = new CFormTable("New connector","sysmap.php");
+		$frmCnct->SetHelp("web.sysmap.connector.php");
+		$frmCnct->AddVar("sysmapid",$_REQUEST["sysmapid"]);
+
+		$cmbHosts = new CComboBox("shostid1");
+
+		$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,".
+			"sh.y,sh.icon from sysmaps_hosts sh,hosts h".
+			" where sh.sysmapid=".$_REQUEST["sysmapid"].
+			" and h.status not in (".HOST_STATUS_DELETED.") and h.hostid=sh.hostid".
+			" order by h.host");
+
+		while($row=DBfetch($result))
+		{
+			$host=get_host_by_hostid($row["hostid"]);
+			$cmbHosts->AddItem($row["shostid"],$host["host"].": ".$row["label"]);
+		}
+		$frmCnct->AddRow("Host 1",$cmbHosts);
+
+		$cmbHosts->SetName("shostid2");
+		$frmCnct->AddRow("Host 2",$cmbHosts);
+
+		$cmbIndic = new CComboBox("triggerid");
+		$cmbIndic->AddItem(0,"-");
+	        $result=DBselect("select triggerid from triggers order by description");
+		while($row=DBfetch($result))
+	        {
+			$cmbIndic->AddItem($row["triggerid"],expand_trigger_description($row["triggerid"]));
+	        }
+		$frmCnct->AddRow("Link status indicator",$cmbIndic);
+
+		$cmbType = new CComboBox("drawtype_off");
+		$cmbType->AddItem(0,get_drawtype_description(0));
+		$cmbType->AddItem(1,get_drawtype_description(1));
+		$cmbType->AddItem(2,get_drawtype_description(2));
+		$cmbType->AddItem(3,get_drawtype_description(3));
+		$cmbType->AddItem(4,get_drawtype_description(4));
+
+		$cmbColor = new CComboBox("color_off");
+		$cmbColor->AddItem('Black',"Black");
+		$cmbColor->AddItem('Blue',"Blue");
+		$cmbColor->AddItem('Cyan',"Cyan");
+		$cmbColor->AddItem('Dark Blue',"Dark Blue");
+		$cmbColor->AddItem('Dark Green',"Dark Green");
+		$cmbColor->AddItem('Dark Red',"Dark Red");
+		$cmbColor->AddItem('Dark Yellow',"Dark Yellow");
+		$cmbColor->AddItem('Green',"Green");
+		$cmbColor->AddItem('Red',"Red");
+		$cmbColor->AddItem('White',"White");
+		$cmbColor->AddItem('Yellow',"Yellow");
+
+		$frmCnct->AddRow("Type (OFF)",$cmbType);
+		$frmCnct->AddRow("Color (OFF)",$cmbColor);
+
+		$cmbType->SetName("drawtype_on");
+		$cmbColor->SetName("color_on");
+
+		$frmCnct->AddRow("Type (ON)",$cmbType);
+		$frmCnct->AddRow("Color (ON)",$cmbColor);
+
+		$frmCnct->AddItemToBottomRow(new CButton("register","add link"));
+		$frmCnct->AddItemToBottomRow(SPACE);
+		$frmCnct->AddItemToBottomRow(new CButtonCancel(url_param("sysmapid")));
+		
+		$frmCnct->Show();
+	}
 ?>
