@@ -104,14 +104,32 @@
 		{
 			if($_REQUEST["action"]=="add to group")
 			{
-				$itemid=add_item_to_group($_REQUEST["groupid"],$_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],$_REQUEST["logtimefmt"]);
+				$itemid=add_item_to_group(
+					$_REQUEST["groupid"],$_REQUEST["description"],$_REQUEST["key"],
+					$_REQUEST["hostid"],$_REQUEST["delay"],$_REQUEST["history"],
+					$_REQUEST["status"],$_REQUEST["type"],$_REQUEST["snmp_community"],
+					$_REQUEST["snmp_oid"],$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],
+					$_REQUEST["snmp_port"],$_REQUEST["units"],$_REQUEST["multiplier"],
+					$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],
+					$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
+					$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],
+					$_REQUEST["trends"],$_REQUEST["logtimefmt"]);
 				show_messages($itemid, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 				unset($_REQUEST["itemid"]);
 				unset($itemid);
 			}
 			if($_REQUEST["action"]=="update in group")
 			{
-				$result=update_item_in_group($_REQUEST["groupid"],$_REQUEST["itemid"],$_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],$_REQUEST["logtimefmt"]);
+				$result=update_item_in_group($_REQUEST["groupid"],
+					$_REQUEST["itemid"],$_REQUEST["description"],$_REQUEST["key"],
+					$_REQUEST["hostid"],$_REQUEST["delay"],$_REQUEST["history"],
+					$_REQUEST["status"],$_REQUEST["type"],$_REQUEST["snmp_community"],
+					$_REQUEST["snmp_oid"],$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],
+					$_REQUEST["snmp_port"],$_REQUEST["units"],$_REQUEST["multiplier"],
+					$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],
+					$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
+					$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],
+					$_REQUEST["trends"],$_REQUEST["logtimefmt"]);
 				show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 				unset($_REQUEST["itemid"]);
 			}
@@ -124,7 +142,15 @@
 		}
 		else if($_REQUEST["register"]=="update")
 		{
-			$result=update_item($_REQUEST["itemid"],$_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],$_REQUEST["logtimefmt"]);
+			$result=update_item($_REQUEST["itemid"],
+				$_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],
+				$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],
+				$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],
+				$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],
+				$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],
+				$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
+				$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],
+				$_REQUEST["logtimefmt"]);
 			update_item_in_templates($_REQUEST["itemid"]);
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 //			unset($itemid);
@@ -137,7 +163,15 @@
 		}
 		else if($_REQUEST["register"]=="add")
 		{
-			$itemid=add_item($_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],$_REQUEST["logtimefmt"]);
+			$itemid=add_item(
+				$_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],
+				$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],
+				$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],
+				$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],
+				$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],
+				$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
+				$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],
+				$_REQUEST["logtimefmt"]);
 			add_item_to_linked_hosts($itemid);
 			show_messages($itemid, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 			unset($_REQUEST["itemid"]);
@@ -150,7 +184,15 @@
 			$hosts_notok="";
 			while($row=DBfetch($result))
 			{
-				$result2=add_item($_REQUEST["description"],$_REQUEST["key"],$row["hostid"],$_REQUEST["delay"],$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],$_REQUEST["logtimefmt"]);
+				$result2=add_item(
+					$_REQUEST["description"],$_REQUEST["key"],$row["hostid"],
+					$_REQUEST["delay"],$_REQUEST["history"],$_REQUEST["status"],
+					$_REQUEST["type"],$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],
+					$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],
+					$_REQUEST["units"],$_REQUEST["multiplier"],$_REQUEST["delta"],
+					$_REQUEST["snmpv3_securityname"],$_REQUEST["snmpv3_securitylevel"],
+					$_REQUEST["snmpv3_authpassphrase"],$_REQUEST["snmpv3_privpassphrase"],
+					$_REQUEST["formula"],$_REQUEST["trends"],$_REQUEST["logtimefmt"]);
 				if($result2)
 				{
 					$hosts_ok=$hosts_ok." ".$row["host"];
@@ -160,7 +202,8 @@
 					$hosts_notok=$hosts_notok." ".$row["host"];
 				}
 			}
-			show_messages(TRUE,"Items added]<br>[Success for '$hosts_ok']<br>[Failed for '$hosts_notok'","Cannot add item");
+			show_messages(TRUE,"Items added]<br>[Success for '$hosts_ok']<br>".
+				"[Failed for '$hosts_notok'","Cannot add item");
 			unset($_REQUEST["itemid"]);
 		}
 		else if($_REQUEST["register"]=="Delete selected")
@@ -169,11 +212,9 @@
 			while($row=DBfetch($result))
 			{
 // $$ is correct here
-				if(isset($_REQUEST[$row["itemid"]]))
-				{
-					delete_item_from_templates($row["itemid"]);
-					$result2=delete_item($row["itemid"]);
-				}
+				if(!isset($_REQUEST[$row["itemid"]])) continue;
+				delete_item_from_templates($row["itemid"]);
+				$result2=delete_item($row["itemid"]);
 			}
 			show_messages(TRUE, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
 		}
@@ -183,10 +224,8 @@
 			while($row=DBfetch($result))
 			{
 // $$ is correct here
-				if(isset($_REQUEST[$row["itemid"]]))
-				{
-					$result2=activate_item($row["itemid"]);
-				}
+				if(!isset($_REQUEST[$row["itemid"]]))	continue;
+				$result2=activate_item($row["itemid"]);
 			}
 			show_messages(TRUE, S_ITEMS_ACTIVATED, S_CANNOT_ACTIVATE_ITEMS);
 		}
@@ -196,10 +235,8 @@
 			while($row=DBfetch($result))
 			{
 // $$ is correct here
-				if(isset($_REQUEST[$row["itemid"]]))
-				{
-					$result2=disable_item($row["itemid"]);
-				}
+				if(!isset($_REQUEST[$row["itemid"]]))	continue;
+				$result2=disable_item($row["itemid"]);
 			}
 			show_messages(TRUE, S_ITEMS_DISABLED, S_CANNOT_DISABLE_ITEMS);
 		}

@@ -46,18 +46,23 @@
 	{
 		if($_REQUEST["register"]=="add")
 		{
-			$result=add_host_to_sysmap($_REQUEST["sysmapid"],$_REQUEST["hostid"],$_REQUEST["label"],$_REQUEST["x"],$_REQUEST["y"],$_REQUEST["icon"],$_REQUEST["url"],$_REQUEST["icon_on"]);
+			$result=add_host_to_sysmap($_REQUEST["sysmapid"],$_REQUEST["hostid"],
+				$_REQUEST["label"],$_REQUEST["x"],$_REQUEST["y"],$_REQUEST["icon"],
+				$_REQUEST["url"],$_REQUEST["icon_on"]);
 			show_messages($result,"Host added","Cannot add host");
 		}
 		if($_REQUEST["register"]=="update")
 		{
-			$result=update_sysmap_host($_REQUEST["shostid"],$_REQUEST["sysmapid"],$_REQUEST["hostid"],$_REQUEST["label"],$_REQUEST["x"],$_REQUEST["y"],$_REQUEST["icon"],$_REQUEST["url"],$_REQUEST["icon_on"]);
+			$result=update_sysmap_host($_REQUEST["shostid"],$_REQUEST["sysmapid"],
+				$_REQUEST["hostid"],$_REQUEST["label"],$_REQUEST["x"],$_REQUEST["y"],
+				$_REQUEST["icon"],$_REQUEST["url"],$_REQUEST["icon_on"]);
 			show_messages($result,"Host updated","Cannot update host");
 		}
 		if($_REQUEST["register"]=="add link")
 		{
-			$result=add_link($_REQUEST["sysmapid"],$_REQUEST["shostid1"],$_REQUEST["shostid2"],$_REQUEST["triggerid"],
-					$_REQUEST["drawtype_off"],$_REQUEST["color_off"],$_REQUEST["drawtype_on"],$_REQUEST["color_on"]);
+			$result=add_link($_REQUEST["sysmapid"],$_REQUEST["shostid1"],$_REQUEST["shostid2"],
+				$_REQUEST["triggerid"],	$_REQUEST["drawtype_off"],$_REQUEST["color_off"],
+				$_REQUEST["drawtype_on"],$_REQUEST["color_on"]);
 			show_messages($result,"Link added","Cannot add link");
 		}
 		if($_REQUEST["register"]=="delete_link")

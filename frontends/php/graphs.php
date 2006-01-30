@@ -37,7 +37,9 @@
 		show_page_footer();
 		exit;
 	}
-	$_REQUEST["hostid"]=@iif(isset($_REQUEST["hostid"]),$_REQUEST["hostid"],get_profile("web.latest.hostid",0));
+
+	$_REQUEST["hostid"]=get_request("hostid",get_profile("web.latest.hostid",0));
+
 	update_profile("web.latest.hostid",$_REQUEST["hostid"]);
 	update_profile("web.menu.config.last",$page["file"]);
 ?>
@@ -46,21 +48,29 @@
 	{
 		if($_REQUEST["register"]=="add")
 		{
-			$result=add_graph($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"]);
+			$result=add_graph($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
+				$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"]);
 			if($result)
 			{
-				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,"Graph [".addslashes($_REQUEST["name"])."]");
+				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,
+					"Graph [".addslashes($_REQUEST["name"])."]");
 			}
 			show_messages($result, S_GRAPH_ADDED, S_CANNOT_ADD_GRAPH);
 		}
 		if($_REQUEST["register"]=="update")
 		{
-			update_graph_from_templates($_REQUEST["graphid"],$_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"]);
+			update_graph_from_templates($_REQUEST["graphid"],$_REQUEST["name"],
+				$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["yaxistype"],
+				$_REQUEST["yaxismin"],$_REQUEST["yaxismax"]);
 
-			$result=update_graph($_REQUEST["graphid"],$_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"]);
+			$result=update_graph($_REQUEST["graphid"],$_REQUEST["name"],$_REQUEST["width"],
+				$_REQUEST["height"],$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],
+				$_REQUEST["yaxismax"]);
 			if($result)
 			{
-				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,"Graph ID [".$_REQUEST["graphid"]."] Graph [".addslashes($_REQUEST["name"])."]");
+				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,
+					"Graph ID [".$_REQUEST["graphid"]."] Graph [".
+					addslashes($_REQUEST["name"])."]");
 			}
 			show_messages($result, S_GRAPH_UPDATED, S_CANNOT_UPDATE_GRAPH);
 		}
@@ -71,7 +81,8 @@
 			$result=delete_graph($_REQUEST["graphid"]);
 			if($result)
 			{
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,"Graph [".addslashes($graph["name"])."]");
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,
+					"Graph [".addslashes($graph["name"])."]");
 			}
 			show_messages($result, S_GRAPH_DELETED, S_CANNOT_DELETE_GRAPH);
 			unset($_REQUEST["graphid"]);
@@ -112,7 +123,10 @@
 	while($row=DBfetch($result))
 	{
 // Check if at least one host with read permission exists for this group
-		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.hostid=i.hostid and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid and h.status not in (".HOST_STATUS_DELETED.") group by h.hostid,h.host order by h.host");
+		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg".
+			" where h.hostid=i.hostid and hg.groupid=".$row["groupid"].
+			" and hg.hostid=h.hostid and h.status not in (".HOST_STATUS_DELETED.")".
+			" group by h.hostid,h.host order by h.host");
 		$cnt=0;
 		while($row2=DBfetch($result2))
 		{
@@ -135,20 +149,20 @@
 
 	if(isset($_REQUEST["groupid"]))
 	{
-		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and h.status not in (".HOST_STATUS_DELETED.") group by h.hostid,h.host order by h.host";
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg".
+			" where h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid".
+			" and h.status not in (".HOST_STATUS_DELETED.") group by h.hostid,h.host order by h.host";
 	}
 	else
 	{
-		$sql="select h.hostid,h.host from hosts h,items i where h.hostid=i.hostid and h.status not in (".HOST_STATUS_DELETED.") group by h.hostid,h.host order by h.host";
+		$sql="select h.hostid,h.host from hosts h,items i where h.hostid=i.hostid".
+			" and h.status not in (".HOST_STATUS_DELETED.") group by h.hostid,h.host order by h.host";
 	}
 
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
 	{
-		if(!check_right("Host","R",$row["hostid"]))
-		{
-			continue;
-		}
+		if(!check_right("Host","R",$row["hostid"]))	continue;
 		$h2=$h2.form_select("hostid",$row["hostid"],$row["host"]);
 	}
 	$h2=$h2."</select>";
@@ -161,18 +175,18 @@
 
 	if(isset($_REQUEST["hostid"])&&($_REQUEST["hostid"]!=0))
 	{
-		$result=DBselect("select distinct g.graphid,g.name,g.width,g.height from graphs g,items i,graphs_items gi where gi.itemid=i.itemid and g.graphid=gi.graphid and i.hostid=".$_REQUEST["hostid"]." order by g.name");
+		$result=DBselect("select distinct g.graphid,g.name,g.width,g.height from graphs g,items i".
+			",graphs_items gi where gi.itemid=i.itemid and g.graphid=gi.graphid".
+			" and i.hostid=".$_REQUEST["hostid"]." order by g.name");
 	}
 	else
 	{
-		$result=DBselect("select distinct g.graphid,g.name,g.width,g.height from graphs g order by g.name");
+		$result=DBselect("select distinct g.graphid,g.name,g.width,g.height".
+			" from graphs g order by g.name");
 	}
 	while($row=DBfetch($result))
 	{
-		if(!check_right("Graph","U",$row["graphid"]))
-		{
-			continue;
-		}
+		if(!check_right("Graph","U",$row["graphid"]))		continue;
 
 		if(!isset($_REQUEST["hostid"]))
 		{
@@ -183,16 +197,15 @@
 	
 		$table->addRow(array(
 			$row["graphid"],
-			"<a href=\"graph.php?graphid=".$row["graphid"]."\">".$row["name"]."</a>",
+			new CLink($row["name"],"graph.php?graphid=".$row["graphid"]),
 			$row["width"],
 			$row["height"],
-			"<A HREF=\"graphs.php?graphid=".$row["graphid"]."#form\">Change</A>"
+			new CLink("Change","graphs.php?graphid=".$row["graphid"])
 			));
 	}
 	$table->show();
 ?>
 <?php
-	echo "<a name=\"form\"></a>";
 	echo BR;
 	insert_graph_form();
 
