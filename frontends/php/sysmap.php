@@ -76,257 +76,148 @@
 ?>
 
 <?php
-	$map=get_map_by_sysmapid($_REQUEST["sysmapid"]);
-	show_table_header($map["name"]);
+	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,".
+		"sh.y,sh.icon from sysmaps_hosts sh,hosts h".
+		" where sh.sysmapid=".$_REQUEST["sysmapid"].
+		" and h.status not in (".HOST_STATUS_DELETED.") and h.hostid=sh.hostid".
+		" order by h.host");
 
-	echo "<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR BGCOLOR=#DDDDDD>";
-	echo "<TD ALIGN=CENTER>";
-	if(isset($_REQUEST["sysmapid"]))
+	if(isset($_REQUEST["form"]) && $_REQUEST["form"]=="Create Connection" && DBnum_rows($result)>1)
 	{
-		$map_name="links".$_REQUEST["sysmapid"]."_".rand(0,100000);
-		$map="\n<map name=".$map_name.">";
+		insert_map_link_form();
+	}
+	elseif(isset($_REQUEST["form"]) && $_REQUEST["form"]=="Add Host")
+	{
+		insert_map_host_form();
+	}
+	else
+	{
+		$map=get_map_by_sysmapid($_REQUEST["sysmapid"]);
+		show_table_header($map["name"]);
 
-		$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status".
-			" from sysmaps_hosts sh,hosts h where sh.sysmapid=".$_REQUEST["sysmapid"].
-			" and h.status not in (".HOST_STATUS_DELETED.") and h.hostid=sh.hostid");
-
-		while($row=DBfetch($result))
+		echo "<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
+		echo "<TR BGCOLOR=#DDDDDD>";
+		echo "<TD ALIGN=CENTER>";
+		if(isset($_REQUEST["sysmapid"]))
 		{
-			$host_		= $row["host"];
-			$shostid_	= $row["shostid"];
-			$sysmapid_	= $row["sysmapid"];
-			$hostid_	= $row["hostid"];
-			$label_		= $row["label"];
-			$x_		= $row["x"];
-			$y_		= $row["y"];
-			$status_	= $row["status"];
+			$map_name="links".$_REQUEST["sysmapid"]."_".rand(0,100000);
+			$map="\n<map name=".$map_name.">";
 
-			if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
+			$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,".
+				"sh.x,sh.y,h.status from sysmaps_hosts sh,hosts h".
+				" where sh.sysmapid=".$_REQUEST["sysmapid"].
+				" and h.status not in (".HOST_STATUS_DELETED.") and h.hostid=sh.hostid");
+
+			while($row=DBfetch($result))
 			{
-				$map .= "\n<area shape=rect coords=$x_,$y_,".($x_+48).",".($y_+48).
-					" href=\"sysmap.php?sysmapid=$sysmapid_&shostid=$shostid_#form\"".
-					" alt=\"$host_\">";
+				$host_		= $row["host"];
+				$shostid_	= $row["shostid"];
+				$sysmapid_	= $row["sysmapid"];
+				$hostid_	= $row["hostid"];
+				$label_		= $row["label"];
+				$x_		= $row["x"];
+				$y_		= $row["y"];
+				$status_	= $row["status"];
+
+				if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
+				{
+					$map .= "\n<area shape=rect coords=$x_,$y_,".($x_+48).",".($y_+48).
+						" href=\"sysmap.php?sysmapid=$sysmapid_&shostid=$shostid_#form\"".
+						" alt=\"$host_\">";
+				}
+				else
+				{
+					$map .= "\n<area shape=rect coords=$x_,$y_,".($x_+32).",".($y_+32).
+						" href=\"sysmap.php?sysmapid=$sysmapid_&shostid=$shostid_#form\"".
+						" alt=\"$host_\">";
+				}
 			}
-			else
-			{
-				$map .= "\n<area shape=rect coords=$x_,$y_,".($x_+32).",".($y_+32).
-					" href=\"sysmap.php?sysmapid=$sysmapid_&shostid=$shostid_#form\"".
-					" alt=\"$host_\">";
-			}
-		}
-		$map=$map."\n</map>";
-		echo $map;
-		echo "<IMG SRC=\"map.php?sysmapid=".$_REQUEST["sysmapid"]."\" border=0 usemap=#$map_name>";
-	}
-
-	echo "</TD>";
-	echo "</TR>";
-	echo "</TABLE>";
-
-	show_table_header("DISPLAYED HOSTS");
-
-	$table = new CTableInfo();
-	$table->setHeader(array(S_HOST,S_LABEL,S_X,S_Y,S_ICON,S_ACTIONS));
-
-	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,sh.icon".
-		" from sysmaps_hosts sh,hosts h where sh.sysmapid=".$_REQUEST["sysmapid"].
-		" and h.status not in (".HOST_STATUS_DELETED.") and h.hostid=sh.hostid order by h.host");
-	while($row=DBfetch($result))
-	{
-		$table->addRow(array(
-			$row["host"],
-			$row["label"],
-			$row["x"],
-			$row["y"],
-			nbsp($row["icon"]),
-			array(
-				new CLink("Change",
-					"sysmap.php?sysmapid=".$row["sysmapid"].
-						"&shostid=".$row["shostid"]."#form"),
-				SPACE."-".SPACE,
-				new CLink("Delete",
-					"sysmap.php?register=delete&sysmapid=".$row["sysmapid"].
-					"&shostid=".$row["shostid"])
-			)
-			));
-	}
-	$table->show();
-?>
-
-<?php
-	echo BR;
-	show_table_header("CONNECTORS");
-
-	$table = new CTableInfo();
-	$table->SetHeader(array(S_HOST_1,S_HOST_2,S_LINK_STATUS_INDICATOR,S_ACTIONS));
-
-	$result=DBselect("select linkid,shostid1,shostid2,triggerid from sysmaps_links".
-		" where sysmapid=".$_REQUEST["sysmapid"]." order by linkid");
-	while($row=DBfetch($result))
-	{
-		$result1=DBselect("select label from sysmaps_hosts where shostid=".$row["shostid1"]);
-		$row1=DBfetch($result1);
-		$label1=$row1["label"];
-		$result1=DBselect("select label from sysmaps_hosts where shostid=".$row["shostid2"]);
-		$row1=DBfetch($result1);
-		$label2=$row1["label"];
-
-		if(isset($row["triggerid"]))
-		{
-			$description=expand_trigger_description($row["triggerid"]);
-		}
-		else
-		{
-			$description="-";
+			$map=$map."\n</map>";
+			echo $map;
+			echo "<IMG SRC=\"map.php?sysmapid=".$_REQUEST["sysmapid"]."\" border=0 usemap=#$map_name>";
 		}
 
-		$table->addRow(array(
-			$label1,
-			$label2,
-			$description,
-			new CLink("Delete","sysmap.php?register=delete_link".url_param("sysmapid").
-				"&linkid=".$row["linkid"])
-			));
-	}
-	$table->show();
+		echo "</TD>";
+		echo "</TR>";
+		echo "</TABLE>";
 ?>
 
 <?php
 
-	echo BR;
+		$form = new CForm();
+		$form->AddVar("sysmapid",$_REQUEST["sysmapid"]);
+		$form->AddItem(new CButton("form","Add Host"));
+		show_table_header("DISPLAYED HOSTS",$form);
 
-	insert_map_host_form();
+		$table = new CTableInfo();
+		$table->setHeader(array(S_HOST,S_LABEL,S_X,S_Y,S_ICON,S_ACTIONS));
+
+		$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,".
+			"sh.y,sh.icon from sysmaps_hosts sh,hosts h".
+			" where sh.sysmapid=".$_REQUEST["sysmapid"].
+			" and h.status not in (".HOST_STATUS_DELETED.") and h.hostid=sh.hostid".
+			" order by h.host");
+		while($row=DBfetch($result))
+		{
+			$table->addRow(array(
+				$row["host"],
+				$row["label"],
+				$row["x"],
+				$row["y"],
+				nbsp($row["icon"]),
+				array(
+					new CLink("Change",
+						"sysmap.php?sysmapid=".$row["sysmapid"].
+						"&form=Add+Host&shostid=".$row["shostid"]."#form"),
+					SPACE."-".SPACE,
+					new CLink("Delete",
+						"sysmap.php?register=delete&sysmapid=".$row["sysmapid"].
+						"&shostid=".$row["shostid"])
+				)
+				));
+		}
+		$table->show();
 ?>
 
 <?php
-	$result=DBselect("select shostid,label,hostid from sysmaps_hosts".
-		" where sysmapid=".$_REQUEST["sysmapid"]." order by label");
-	if(DBnum_rows($result)>1)
-	{
-		show_form_begin("sysmap.connector");
-		echo "New connector";
-		$col=0;
+		echo BR;
+		$form = new CForm();
+		$form->AddVar("sysmapid",$_REQUEST["sysmapid"]);
+		$form->AddItem(new CButton("form","Create Connection"));
+		show_table_header("CONNECTORS",$form);
 
-		show_table2_v_delimiter($col++);
-		echo "<form method=\"post\" action=\"sysmap.php?sysmapid=".$_REQUEST["sysmapid"]."\">";
-		echo nbsp("Host 1");
-		show_table2_h_delimiter();
-//		$result=DBselect("select shostid,label from sysmaps_hosts where sysmapid=".$_REQUEST["sysmapid"]." order by label");
-		echo "<SELECT class=\"biginput\" name=\"shostid1\" size=1>";
+		$table = new CTableInfo();
+		$table->SetHeader(array(S_HOST_1,S_HOST_2,S_LINK_STATUS_INDICATOR,S_ACTIONS));
+
+		$result=DBselect("select linkid,shostid1,shostid2,triggerid from sysmaps_links".
+			" where sysmapid=".$_REQUEST["sysmapid"]." order by linkid");
 		while($row=DBfetch($result))
 		{
-			$shostid_=$row["shostid"];
-			$label=$row["label"];
-			$host=get_host_by_hostid($row["hostid"]);
-			if(isset($_REQUEST["shostid"])&&($_REQUEST["shostid"]==$shostid_))
+			$result1=DBselect("select label from sysmaps_hosts where shostid=".$row["shostid1"]);
+			$row1=DBfetch($result1);
+			$label1=$row1["label"];
+			$result1=DBselect("select label from sysmaps_hosts where shostid=".$row["shostid2"]);
+			$row1=DBfetch($result1);
+			$label2=$row1["label"];
+
+			if(isset($row["triggerid"]))
 			{
-				echo "<OPTION VALUE='$shostid_' SELECTED>".$host["host"].":$label";
+				$description=expand_trigger_description($row["triggerid"]);
 			}
 			else
 			{
-				echo "<OPTION VALUE='$shostid_'>".$host["host"].":$label";
+				$description="-";
 			}
+
+			$table->addRow(array(
+				$label1,
+				$label2,
+				$description,
+				new CLink("Delete","sysmap.php?register=delete_link".url_param("sysmapid").
+					"&linkid=".$row["linkid"])
+				));
 		}
-		echo "</SELECT>";
-
-		show_table2_v_delimiter($col++);
-//		echo "<form method=\"get\" action=\"sysmap.php?sysmapid=".$_REQUEST["sysmapid"].">";
-		echo nbsp("Host 2");
-		show_table2_h_delimiter();
-		$result=DBselect("select shostid,label,hostid from sysmaps_hosts where sysmapid=".$_REQUEST["sysmapid"]." order by label");
-		echo "<SELECT class=\"biginput\" name=\"shostid2\" size=1>";
-		$selected=0;
-		while($row=DBfetch($result))
-		{
-			$shostid_=$row["shostid"];
-			$label=$row["label"];
-			$host=get_host_by_hostid($row["hostid"]);
-			if(isset($_REQUEST["shostid"])&&($_REQUEST["shostid"]!=$shostid_)&&($selected==0))
-			{
-				echo "<OPTION VALUE='$shostid_' SELECTED>".$host["host"].":$label";
-				$selected=1;
-			}
-			else
-			{
-				echo "<OPTION VALUE='$shostid_'>".$host["host"].":$label";
-			}
-		}
-		echo "</SELECT>";
-
-		show_table2_v_delimiter($col++);
-		echo nbsp("Link status indicator");
-		show_table2_h_delimiter();
-	        $result=DBselect("select triggerid from triggers order by description");
-	        echo "<SELECT class=\"biginput\" name=\"triggerid\" size=1>";
-		echo "<OPTION VALUE='0' SELECTED>-";
-		while($row=DBfetch($result))
-	        {
-	                $triggerid_=$row["triggerid"];
-			$description_=expand_trigger_description($triggerid_);
-			echo "<OPTION VALUE='$triggerid_'>$description_";
-	        }
-	        echo "</SELECT>";
-
-		show_table2_v_delimiter($col++);
-		echo "Type (OFF)";
-		show_table2_h_delimiter();
-		echo "<select name=\"drawtype_off\" size=1>";
-		echo "<OPTION VALUE='0' ".iif(isset($drawtype_off)&&($drawtype_off==0),"SELECTED","").">".get_drawtype_description(0);
-//		echo "<OPTION VALUE='1' ".iif(isset($drawtype_off)&&($drawtype_off==1),"SELECTED","").">".get_drawtype_description(1);
-		echo "<OPTION VALUE='2' ".iif(isset($drawtype_off)&&($drawtype_off==2),"SELECTED","").">".get_drawtype_description(2);
-//		echo "<OPTION VALUE='3' ".iif(isset($drawtype_off)&&($drawtype_off==3),"SELECTED","").">".get_drawtype_description(3);
-		echo "<OPTION VALUE='4' ".iif(isset($drawtype_off)&&($drawtype_off==4),"SELECTED","").">".get_drawtype_description(4);
-		echo "</SELECT>";
-
-		show_table2_v_delimiter($col++);
-		echo "Color (OFF)";
-		show_table2_h_delimiter();
-		echo "<select name=\"color_off\" size=1>";
-		echo "<OPTION VALUE='Black' ".iif(isset($color_off)&&($color_off=="Black"),"SELECTED","").">Black";
-		echo "<OPTION VALUE='Blue' ".iif(isset($color_off)&&($color_off=="Blue"),"SELECTED","").">Blue";
-		echo "<OPTION VALUE='Cyan' ".iif(isset($color_off)&&($color_off=="Cyan"),"SELECTED","").">Cyan";
-		echo "<OPTION VALUE='Dark Blue' ".iif(isset($color_off)&&($color_off=="Dark Blue"),"SELECTED","").">Dark blue";
-		echo "<OPTION VALUE='Dark Green' ".iif(isset($color_off)&&($color_off=="Dark Green"),"SELECTED","").">Dark green";
-		echo "<OPTION VALUE='Dark Red' ".iif(isset($color_off)&&($color_off=="Dark Red"),"SELECTED","").">Dark red";
-		echo "<OPTION VALUE='Dark Yellow' ".iif(isset($color_off)&&($color_off=="Dark Yellow"),"SELECTED","").">Dark yellow";
-		echo "<OPTION VALUE='Green' ".iif(isset($color_off)&&($color_off=="Green"),"SELECTED","").">Green";
-		echo "<OPTION VALUE='Red' ".iif(isset($color_off)&&($color_off=="Red"),"SELECTED","").">Red";
-		echo "<OPTION VALUE='White' ".iif(isset($color_off)&&($color_off=="White"),"SELECTED","").">White";
-		echo "<OPTION VALUE='Yellow' ".iif(isset($color_off)&&($color_off=="Yellow"),"SELECTED","").">Yellow";
-		echo "</SELECT>";
-
-		show_table2_v_delimiter($col++);
-		echo "Type (ON)";
-		show_table2_h_delimiter();
-		echo "<select name=\"drawtype_on\" size=1>";
-		echo "<OPTION VALUE='0' ".iif(isset($drawtype_on)&&($drawtype_on==0),"SELECTED","").">".get_drawtype_description(0);
-//		echo "<OPTION VALUE='1' ".iif(isset($drawtype_on)&&($drawtype_on==1),"SELECTED","").">".get_drawtype_description(1);
-		echo "<OPTION VALUE='2' ".iif(isset($drawtype_on)&&($drawtype_on==2),"SELECTED","").">".get_drawtype_description(2);
-//		echo "<OPTION VALUE='3' ".iif(isset($drawtype_on)&&($drawtype_on==3),"SELECTED","").">".get_drawtype_description(3);
-		echo "<OPTION VALUE='4' ".iif(isset($drawtype_on)&&($drawtype_on==4),"SELECTED","").">".get_drawtype_description(4);
-		echo "</SELECT>";
-
-		show_table2_v_delimiter($col++);
-		echo "Color (ON)";
-		show_table2_h_delimiter();
-		echo "<select name=\"color_on\" size=1>";
-		echo "<OPTION VALUE='Red' ".iif(isset($color_on)&&($color_on=="Red"),"SELECTED","").">Red";
-		echo "<OPTION VALUE='Black' ".iif(isset($color_on)&&($color_on=="Black"),"SELECTED","").">Black";
-		echo "<OPTION VALUE='Blue' ".iif(isset($color_on)&&($color_on=="Blue"),"SELECTED","").">Blue";
-		echo "<OPTION VALUE='Cyan' ".iif(isset($color_on)&&($color_on=="Cyan"),"SELECTED","").">Cyan";
-		echo "<OPTION VALUE='Dark Blue' ".iif(isset($color_on)&&($color_on=="Dark Blue"),"SELECTED","").">Dark blue";
-		echo "<OPTION VALUE='Dark Green' ".iif(isset($color_on)&&($color_on=="Dark Green"),"SELECTED","").">Dark green";
-		echo "<OPTION VALUE='Dark Yellow' ".iif(isset($color_on)&&($color_on=="Dark Yellow"),"SELECTED","").">Dark yellow";
-		echo "<OPTION VALUE='Green' ".iif(isset($color_on)&&($color_on=="Green"),"SELECTED","").">Green";
-		echo "<OPTION VALUE='Dark Red' ".iif(isset($color_on)&&($color_on=="Dark Red"),"SELECTED","").">Dark red";
-		echo "<OPTION VALUE='White' ".iif(isset($color_on)&&($color_on=="White"),"SELECTED","").">White";
-		echo "<OPTION VALUE='Yellow' ".iif(isset($color_on)&&($color_on=="Yellow"),"SELECTED","").">Yellow";
-		echo "</SELECT>";
-
-		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add link\">";
-		show_table2_header_end();
+		$table->show();
 	}
 ?>
 
