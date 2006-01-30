@@ -1012,9 +1012,9 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=<?php echo S_HTML_CHARSET; ?>">
-	<meta name="Author" content="Alexei Vladishev">
-	<link rel="stylesheet" href="css.css">
+<meta http-equiv="Content-Type" content="text/html; charset=<?php echo S_HTML_CHARSET; ?>">
+<meta name="Author" content="Alexei Vladishev">
+<link rel="stylesheet" href="css.css">
 <?php
 //	if($USER_DETAILS['alias']=='guest')
 //	{
@@ -1033,7 +1033,6 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 ?>
 </head>
-
 <body>
 <?php
 	if($nomenu == 0)
@@ -2431,6 +2430,8 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 	{
 		global $USER_DETAILS;
 
+		show_messages();
+
 		echo BR;
 		$table = new CTable(NULL,"page_footer");
 		$table->SetCellSpacing(0);
@@ -2840,6 +2841,11 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		window.location = url;
 		return false;
 	}	
+	function PopUp(url,name,param)
+	{
+		window.open(url,name,param);
+		return false;
+	}
 </script>
 		";
 	}

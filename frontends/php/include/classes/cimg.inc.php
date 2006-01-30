@@ -22,14 +22,21 @@
 	class CImg extends CTag
 	{
 /* public */
-		function CImg($src,$alt_text=NULL,$width=NULL,$height=NULL)
+		function CImg($src,$alt_text=NULL,$width=NULL,$height=NULL,$class=NULL)
 		{
 			parent::CTag("img","no");
+
+			$this->tag_start= "";
+			$this->tag_end = "";
+			$this->tag_body_start = "";
+			$this->tag_body_end = "";
+
 			$this->AddOption('border',0);
 			$this->SetAltText($alt_text);
 			$this->SetSrc($src);
 			$this->SetWidth($width);
 			$this->SetHeight($height);
+			$this->SetClass($class);
 		}
 		function SetSrc($value)
 		{

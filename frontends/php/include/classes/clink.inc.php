@@ -25,6 +25,12 @@
 		function CLink($item="www.zabbix.com",$url="http://www.zabbix.com",$class=NULL)
 		{
 			parent::CTag("a","yes");
+
+			$this->tag_start= "";
+			$this->tag_end = "";
+			$this->tag_body_start = "";
+			$this->tag_body_end = "";
+
 			$this->SetClass($class);
 			$this->AddItem($item);
 			$this->SetUrl($url);
