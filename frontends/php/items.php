@@ -289,8 +289,8 @@
 			$table->setHeader(array(
 				array(	new CCheckBox("all_items",NULL,NULL,
 						"CheckAll('".$form->GetName()."','all_items');"),
-					S_KEY),
-				S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),
+					S_ID),
+				S_KEY, S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),
 				S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,S_ERROR));
 
 			$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,".
