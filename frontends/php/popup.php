@@ -93,10 +93,14 @@
 		{
 			continue;
 		}
-//		$host ="<a href=\"#\" onclick='send_back('Accounts','9ca3e791-4bc9-7808-f70c-4374c24de0df');'>".$row["host"]."</a>";
-//		$host ="<a href=\"#\" onclick=\"zzz();\">".$row["host"]."</a>";
-		$host ="<a href=\"#\" onclick=\"window.opener.document.".$_REQUEST["form"].".".$_REQUEST["field1"].".value='".$row["hostid"]."'; window.opener.document.".$_REQUEST["form"].".".$_REQUEST["field2"].".value='".$row["host"]."'; window.close();\">".$row["host"]."</a>";
-//		$host="<a href=\"popup.php?hostid=".$row["hostid"]."\">".$row["host"]."</a>";
+
+		$host ="<a href=\"#\" onclick='".
+			" window.opener.document.forms[\"".$_REQUEST["form"]."\"].".$_REQUEST["field1"].
+				".value=\"".$row["hostid"]."\";".
+			" window.opener.document.forms[\"".$_REQUEST["form"]."\"].".$_REQUEST["field2"].
+				".value=\"".$row["host"]."\";".
+			" window.close();".
+			"'>".$row["host"]."</a>";
 
 		if($row["useip"]==1)
 		{

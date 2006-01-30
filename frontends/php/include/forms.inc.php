@@ -377,8 +377,9 @@
 		$frmItem->AddRow(S_DESCRIPTION, new CTextBox("description",$description,40));
 		$frmItem->AddRow(S_HOST, array(
 			new CTextBox("host",$host,30,NULL,'yes'),
-			new CButton("btn1","Select","window.open('popup.php?form=item&field1=hostid".
-				"&field2=host','new_win','width=450,height=450,resizable=1,scrollbars=1');","T")
+			new CButton("btn1","Select","return PopUp('popup.php?form=".$frmItem->GetName().
+				"&field1=hostid&field2=host','host','width=450,height=450,".
+				"resizable=1,scrollbars=1');","T")
 		));
 
 		$cmbType = new CComboBox("type",$type,"submit()");
@@ -455,7 +456,7 @@
 			$frmItem->AddVar("multiplier",$multiplier);
 		}
 
-		if($multiplier == S_CUSTOM_MULTIPLIER)
+		if($multiplier == 1)
 		{
 			$frmItem->AddRow(S_CUSTOM_MULTIPLIER, new CTextBox("formula",$formula,40));
 		}
@@ -930,8 +931,9 @@
 		$frmAutoReg->AddRow(S_HOST,array(
 			new CTextBox("host",$host,32,NULL,'yes'),
 			new CButton("btn1","Select",
-				"window.open('popup.php?form=auto&field1=hostid&field2=host',".
-				"'new_win','width=450,height=450,resizable=1,scrollbars=1');",
+				"return PopUp('popup.php?form=".$frmAutoReg->GetName().
+				"&field1=hostid&field2=host','new_win',".
+				"'width=450,height=450,resizable=1,scrollbars=1');",
 				'T')
 			));
 		$frmAutoReg->AddVar("hostid",$hostid);
@@ -955,7 +957,7 @@
 		$uid=NULL;
 
 		$frmAction = new CFormTable(S_ACTION,'actionconf.php');
-		$frmAction->SetHelp('web.actions.action');
+		$frmAction->SetHelp('web.actions.action.php');
 
 		$conditiontype = get_request("conditiontype",0);
 
@@ -1113,8 +1115,9 @@
 			$txtCondVal->SetReadonly('yes');
 
 			$btnSelect = new CButton('btn1','Select',
-				"window.open('popup.php?form=action&field1=value&field2=host',".
-				"'new_win','width=450,height=450,resizable=1,scrollbars=1');");
+				"return PopUp('popup.php?form=".$frmAction->GetName().
+				"&field1=value&field2=host','new_win',".
+				"'width=450,height=450,resizable=1,scrollbars=1');");
 			$btnSelect->SetAccessKey('T');
 
 			array_push($rowCondition, $txtCondVal, $btnSelect);
@@ -1258,7 +1261,7 @@
 		}
 
 		$frmMeadia = new CFormTable(S_MEDIA,"config.php");
-		$frmMeadia->SetHelp("web.config.medias");
+		$frmMeadia->SetHelp("web.config.medias.php");
 
 		if(isset($_REQUEST["mediatypeid"]))
 		{
@@ -2083,8 +2086,9 @@
 		$frmHost->AddVar("hostid",$hostid);
 		$frmHost->AddRow("Host",array(
 			new CTextBox("host",$host,32,NULL,'yes'),
-			new CButton("btn1","Select","window.open('popup.php?form=host&field1=hostid&field2=host'".
-				",'new_win','width=450,height=450,resizable=1,scrollbars=1');","T")
+			new CButton("btn1","Select","return PopUp('popup.php?form=".$frmHost->GetName().
+				"&field1=hostid&field2=host','new_win',".
+				"'width=450,height=450,resizable=1,scrollbars=1');","T")
 		));
 
 		$cmbIcon = new CComboBox("icon",$icon);
