@@ -259,7 +259,10 @@
 				S_ID),
 			S_NAME,S_EXPRESSION, S_SEVERITY, S_STATUS, S_ERROR));
 
-		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.status,t.value,t.priority,t.error from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]." order by h.host,t.description");
+		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,".
+			"t.status,t.value,t.priority,t.error from triggers t,hosts h,items i,functions".
+			" f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid".
+			" and h.hostid=".$_REQUEST["hostid"]." order by h.host,t.description");
 		while($row=DBfetch($result))
 		{
 			if(check_right_on_trigger("R",$row["triggerid"]) == 0)
@@ -267,30 +270,22 @@
 				continue;
 			}
 	
-			$description=expand_trigger_description($row["triggerid"]);
-			if(isset($_REQUEST["hostid"]))
-			{
-				$description="<A HREF=\"triggers.php?form=0&triggerid=".$row["triggerid"]."&hostid=".$row["hostid"]."\">$description</A>";
-			}
-			else
-			{
-				$description="<A HREF=\"triggers.php?form=0&triggerid=".$row["triggerid"]."\">$description</A>";
-			}
+			$description = array(new CLink(expand_trigger_description($row["triggerid"]),
+				"triggers.php?form=0&triggerid=".$row["triggerid"]."&hostid=".$row["hostid"]));
 
 			$id= array(new CCheckBox($row["triggerid"]), $row["triggerid"]);
 
-			$sql="select t.triggerid,t.description from triggers t,trigger_depends d where t.triggerid=d.triggerid_up and d.triggerid_down=".$row["triggerid"];
+			$sql="select t.triggerid,t.description from triggers t,trigger_depends d".
+				" where t.triggerid=d.triggerid_up and d.triggerid_down=".$row["triggerid"];
 			$result1=DBselect($sql);
 			if(DBnum_rows($result1)>0)
 			{
-				$description=$description."<p><strong>".S_DEPENDS_ON."</strong>:&nbsp;<br>";
+				array_push($description,BR.BR."<strong>".S_DEPENDS_ON."</strong>:&nbsp;".BR);
 				while($row1=DBfetch($result1))
 				{
-					$depid=$row1["triggerid"];
-					$depdescr=expand_trigger_description($depid);
-					$description=$description."$depdescr<br>";
+					array_push($description,expand_trigger_description($row1["triggerid"]).BR);
 				}
-				$description=$description."</p>";
+				array_push($description,BR);
 			}
 	
 			if($row["priority"]==0)		$priority=S_NOT_CLASSIFIED;
@@ -303,32 +298,28 @@
 
 			if($row["status"] == 1)
 			{
-				$status="<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=0&hostid=".$row["hostid"]."\"><font color=\"AA0000\">".S_DISABLED."</font></a>";
+				$status= new CLink(S_DISABLED,
+					"triggers.php?register=changestatus&triggerid=".
+						$row["triggerid"]."&status=0&hostid=".$row["hostid"],
+					'disabled');
 			}
 			else if($row["status"] == 2)
 			{
-				$status="<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=1&hostid=".$row["hostid"]."\"><font color=\"AAAAAA\">".S_UNKNOWN."</font></a>";
+				$status= new CLink(S_UNCNOWN,
+					"triggers.php?register=changestatus&triggerid=".
+						$row["triggerid"]."&status=1&hostid=".$row["hostid"],
+					'uncnown');
 			}
 			else
 			{
-				$status="<a href=\"triggers.php?register=changestatus&triggerid=".$row["triggerid"]."&status=1&hostid=".$row["hostid"]."\"><font color=\"00AA00\">".S_ENABLED."</font></a>";
-			}
-//			$expression=rawurlencode($row["expression"]);
-
-			if($row["error"]=="")
-			{
-				$row["error"]="&nbsp;";
+				$status= new CLink(S_ENABLED,
+					"triggers.php?register=changestatus&triggerid=".
+						$row["triggerid"]."&status=1&hostid=".$row["hostid"],
+					'enabled');
 			}
 
-//			$actions=$actions." :: ";
-//			if(get_action_count_by_triggerid($row["triggerid"])>0)
-//			{
-//				$actions=$actions."<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\"><b>A</b>ctions</A>";
-//			}
-//			else
-//			{
-//				$actions=$actions."<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">".S_ACTIONS."</A>";
-//			}
+			if($row["error"]=="")		$row["error"]="&nbsp;";
+
 			$table->addRow(array(
 				$id,
 				$description,
