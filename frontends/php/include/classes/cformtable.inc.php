@@ -77,17 +77,24 @@
 		}
 		function SetHelp($value=NULL)
 		{
-			if(is_null($value))
+			if(is_null($value)) {
 				$this->help = new CHelp();
-			elseif(is_a($value,'chelp'))
+				$this->AddOption("name",'form');
+			} elseif(is_a($value,'chelp')) {
 				$this->help = $value;
-			elseif(is_string($value))
+				$this->AddOption("name",'form');
+			} elseif(is_string($value)) {
 				$this->help = new CHelp($value);
-			else
+				$this->AddOption("name",$value);
+			} else
 			{
 				return $this->error("Incorrect value for SetHelp [$value]");
 			}
 			return 0;
+		}
+		function GetName()
+		{
+			return $this->GetOption("name");
 		}
 		function AddVar($name, $value)
 		{

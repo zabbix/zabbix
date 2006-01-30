@@ -1,7 +1,6 @@
 body
 {
         background-color:#e5e5e5;
-        margin: 3px 3px 3px 3px;
         margin: 0px 0px 0px 0px;
         padding: 0px;
         color:black;
@@ -93,7 +92,7 @@ td.form_row_last
 	padding-left: 5px;
 }
 
-/* SREEN TABLE */
+/* SCREEN TABLE */
 table.screen
 {
 	background-color: #FFFFFF;
@@ -396,19 +395,15 @@ table.page_header
 }
 td.page_header_l
 {
-	background-color: #FFFFFF;
 	vertical-align: middle;
 	padding: 0;
 }
 td.page_header_r
 {
+	vertical-align: middle;
 	text-align: right;
-	background-color: #FFFFFF;
-	border-width:0px;
-	border-right-style: solid;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 8pt;
-	vertical-align: middle;
 }
 
 /**************** PAGE FOOTER ****************/
