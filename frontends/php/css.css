@@ -97,13 +97,13 @@ table.screen
 {
 	background-color: #FFFFFF;
 	width: 100%;
-	border: 1 outset #DDDDDD;
+	border: 1px outset #DDDDDD;
 }
 
 td.screen
 {
 	background-color: #FFFFFF;
-	border: 1 inset #DDDDDD;
+	border: 1px inset #DDDDDD;
 	text-align: center;
 	vertical-align: middle;
 }
@@ -396,7 +396,7 @@ table.page_header
 td.page_header_l
 {
 	vertical-align: middle;
-	padding: 0;
+	padding: 0px;
 }
 td.page_header_r
 {
@@ -551,6 +551,6 @@ img.bottom
 
 ul
 {
-	margin-left: 0;
+	margin-left: 0px;
 	padding-left: 1em;
 }
