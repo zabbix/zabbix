@@ -107,7 +107,7 @@
 
 		$table = new CTable(
 			new CLink("No rows in screen ".$row["name"],"screenconf.php?form=0&screenid=".$screenid),
-			"screen");
+			"screen_edit");
 	
 		for($r=0;$r<$row["rows"];$r++)
 		{
@@ -201,7 +201,7 @@
 					);
 			}
 			
-			$new_col = new CCol($item,"screen");
+			$new_col = new CCol($item,"screen_edit");
 
 			if($colspan) $new_col->SetColSpan($colspan);
 			if($rowspan) $new_col->SetRowSpan($rowspan);
