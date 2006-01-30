@@ -196,7 +196,7 @@
 
 	echo S_PARAMETER;
 	show_table2_h_delimiter();
-	$result=DBselect("select h.host,i.description,i.itemid,i.key_ from hosts h,items"
+	$result=DBselect("select h.host,i.description,i.itemid,i.key_ from hosts h,items i".
 		" where h.hostid=i.hostid and h.status in(".HOST_STATUS_MONITORED.",".HOST_STATUS_TEMPLATE.")".
 		" and i.status=".ITEM_STATUS_ACTIVE." order by h.host,i.description");
 	echo "<select name=\"itemid\" size=1>";
