@@ -1,5 +1,8 @@
 Changes for 1.1beta6:
 
+ - added support of icon label locations (Alexei)
+ - added new column sysmaps.label_location (Alexei)
+ - better processing of server startup/shutdown (Alexei)
  - improved proc.num for Linux, added parameter 'comm' (Eugene)
  - fixed two different units in two graph axes (Alexei)
  - renamed latestalarms.php and alerts.php (Alexei)

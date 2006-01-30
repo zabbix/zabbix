@@ -13,8 +13,6 @@
  - make failed: http://www.zabbix.com/forum/showthread.php?t=1957
  - check if ZABBIX server accepts values returned by W32 agent
 
- - clear error message if user/name password are wrong for zabbix_server
- - configurable location (left,right,top, bottom) of label for icons
  - set host to unrechable if unreachable within N seconds
  - explain how templates work in the documentation
  - execution of commands on monitored hosts in case of pre-defined events
@@ -211,20 +209,11 @@ graphs:
  - link items to show them in one graph (network in/out) 
 
  - snmp oid symbolic representation
- - periodically check unsupported items (NxInterval). Can be configurable.
  - Latest values->Host->[Show not monitored]
 
 HP:
 
  - add threshold,min,max line for user-defined graphs
- - 
-Vel viens wishlists ir pie "IT Services", pielikt pie 
-/~zabbix/report3.php?serviceid=1&year=2003
-
- Ka ir reziims, ka paraada visus downtime attieciigajaa meenesii (vai gadaa/nedeelaa).
-(Tipa  : time  - subservice/trigers - priority - ...)
-
-
 
  - [3] Windows event log checking.
  - [4] Latest values. Link to page which shows list of all triggers-related

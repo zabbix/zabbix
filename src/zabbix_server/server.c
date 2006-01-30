@@ -124,15 +124,21 @@ void	uninit(void)
 				{
 					zabbix_log( LOG_LEVEL_WARNING, "Cannot kill process. PID=[%d] [%s]", pids[i], strerror(errno));
 				}
+				else
+				{
+					zabbix_log( LOG_LEVEL_DEBUG, "%d. Killing PID=[%d]", i, pids[i]);
+				}
 			}
 		}
 
 		if(unlink(CONFIG_PID_FILE) != 0)
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Cannot remove PID file [%s] [%s]",
+			zabbix_log( LOG_LEVEL_DEBUG, "Cannot remove PID file [%s] [%s]",
 				CONFIG_PID_FILE, strerror(errno));
 		}
+		zabbix_log( LOG_LEVEL_CRIT, "ZABBIX server is down.");
 	}
+	exit(FAIL);
 }
 
 /******************************************************************************
@@ -160,15 +166,13 @@ void	signal_handler( int sig )
 	}
 	else if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig || SIGPIPE == sig )
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Got QUIT or INT or TERM or PIPE signal. Exiting..." );
+		zabbix_log( LOG_LEVEL_DEBUG, "Server [%d]. Got QUIT or INT or TERM or PIPE signal. Exiting...", server_num );
 		uninit();
-		exit( FAIL );
 	}
         else if( (SIGCHLD == sig) && (server_num == 0) )
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "One child process died. Exiting ...");
+		zabbix_log( LOG_LEVEL_CRIT, "One server process died. Shutting down...");
 		uninit();
-		exit( FAIL );
 	}
 /*	else if( SIGCHLD == sig )
 	{
@@ -332,8 +336,6 @@ void	init_config(void)
 		{0}
 	};
 
-	char sql[MAX_STRING_LEN];
-	DB_RESULT	*result;
 
 	if(CONFIG_FILE == NULL)
 	{
@@ -360,15 +362,6 @@ void	init_config(void)
 		CONFIG_FPING_LOCATION=strdup("/usr/sbin/fping");
 	}
 
-	DBconnect();
-
-	snprintf(sql,sizeof(sql)-1,"select refresh_unsupported from config");
-	result = DBselect(sql);
-
-	if(DBnum_rows(result)==1)
-	{
-		CONFIG_REFRESH_UNSUPPORTED = atoi(DBget_field(result,0,0));
-	}
 }
 
 void	trend(void)
@@ -425,14 +418,14 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 
 	if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "Cannot bind to port %d. Another zabbix_server running ?", port);
-		exit(1);
+		zabbix_log( LOG_LEVEL_CRIT, "Cannot bind to port %d. Another zabbix_server running? Shutting down...", port);
+		uninit();
 	}
 	
 	if(listen(sockfd, LISTENQ) !=0 )
 	{
 		zabbix_log( LOG_LEVEL_CRIT, "listen() failed");
-		exit(1);
+		uninit();
 	}
 
 	*addrlenp = sizeof(serv_addr);
@@ -467,6 +460,9 @@ int main(int argc, char **argv)
 	socklen_t	addrlen;
 
 	char		host[128];
+
+	char sql[MAX_STRING_LEN];
+	DB_RESULT	*result;
 
 
 /* Parse the command-line. */
@@ -508,10 +504,21 @@ int main(int argc, char **argv)
 
 	if( FAIL == create_pid_file(CONFIG_PID_FILE))
 	{
-		return -1;
+		exit(FAIL);
 	}
 
 	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABBIX %s.", ZABBIX_VERSION);
+
+	DBconnect();
+
+	snprintf(sql,sizeof(sql)-1,"select refresh_unsupported from config");
+	result = DBselect(sql);
+
+	if(DBnum_rows(result)==1)
+	{
+		CONFIG_REFRESH_UNSUPPORTED = atoi(DBget_field(result,0,0));
+	}
+	DBfree_result(result);
 
 /* Need to set trigger status to UNKNOWN since last run */
 /* DBconnect() already made in init_config() */
@@ -558,11 +565,18 @@ int main(int argc, char **argv)
 
 		for(i = CONFIG_SUCKERD_FORKS; i< CONFIG_SUCKERD_FORKS+CONFIG_TRAPPERD_FORKS; i++)
 		{
-			pids[i] = child_trapper_make(i, listenfd, addrlen);
+			pids[i-1] = child_trapper_make(i, listenfd, addrlen);
 		}
 
 /* First instance of zabbix_server performs housekeeping procedures */
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Housekeeper]",server_num);
+
+		for(i=0;i<CONFIG_SUCKERD_FORKS+CONFIG_TRAPPERD_FORKS-1;i++)
+		{
+				zabbix_log( LOG_LEVEL_WARNING, "%d. PID=[%d]", i, pids[i]);
+		}
+		zabbix_log( LOG_LEVEL_CRIT, "ZABBIX server is up.");
+
 		main_housekeeper_loop();
 	}
 	else if(server_num == 1)

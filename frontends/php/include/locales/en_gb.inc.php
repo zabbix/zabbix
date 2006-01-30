@@ -474,6 +474,9 @@
 	"S_NO_MAPS_DEFINED"=>			"No maps defined",
 	"S_CONFIGURATION_OF_NETWORK_MAPS"=>	"CONFIGURATION OF NETWORK MAPS",
 	"S_CREATE_MAP"=>			"Create Map",
+	"S_ICON_LABEL_LOCATION"=>		"Icon label location",
+	"S_BOTTOM"=>				"Bottom",
+	"S_TOP"=>				"Top",
 
 //	map.php
 	"S_OK_BIG"=>				"OK",
