@@ -416,6 +416,7 @@ CREATE TABLE sysmaps (
   height		int4		DEFAULT '0' NOT NULL,
   background		varchar(64)	DEFAULT '' NOT NULL,
   label_type		int4		DEFAULT '0' NOT NULL,
+  label_location	int2		DEFAULT '0' NOT NULL,
   PRIMARY KEY (sysmapid)
 );
 

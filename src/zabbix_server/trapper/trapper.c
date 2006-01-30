@@ -250,7 +250,7 @@ pid_t	child_trapper_make(int i,int listenfd, int addrlen)
 	}
 	else
 	{
-/*		server_num=i; */
+		server_num=i;
 	}
 
 	/* never returns */

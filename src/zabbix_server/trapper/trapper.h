@@ -20,6 +20,8 @@
 #ifndef ZABBIX_TRAPPER_H
 #define ZABBIX_TRAPPER_H
 
+extern	int	server_num;
+
 extern	int	CONFIG_TIMEOUT;
 
 extern	void	signal_handler( int sig );

@@ -54,70 +54,45 @@ void	DBclose(void)
 #endif
 }
 
-static int have_db_err = 0;
-
 /*
  * Connect to the database.
  * If fails, program terminates.
  */ 
 void    DBconnect(void)
 {
-	for(;;)
-	{
-		/*	zabbix_log(LOG_LEVEL_ERR, "[%s] [%s] [%s]\n",dbname, dbuser, dbpassword ); */
+	/*	zabbix_log(LOG_LEVEL_ERR, "[%s] [%s] [%s]\n",dbname, dbuser, dbpassword ); */
 #ifdef	HAVE_MYSQL
 	/* For MySQL >3.22.00 */
 	/*	if( ! mysql_connect( &mysql, NULL, dbuser, dbpassword ) )*/
 
-		mysql_init(&mysql);
+	mysql_init(&mysql);
 
-	    if( ! mysql_real_connect( &mysql, CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBPORT, CONFIG_DBSOCKET,0 ) )
+    if( ! mysql_real_connect( &mysql, CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBPORT, CONFIG_DBSOCKET,0 ) )
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Failed to connect to database: Error: %s",mysql_error(&mysql) );
+		exit(FAIL);
+	}
+	else
+	{
+		if( mysql_select_db( &mysql, CONFIG_DBNAME ) != 0 )
 		{
-            /* Don't print the log message EVERY loop */
-            if ( ! have_db_err)
-            {
-			    zabbix_log(LOG_LEVEL_ERR, "Failed to connect to database: Error: %s",mysql_error(&mysql) );
-		        zabbix_log(LOG_LEVEL_ERR, "Will retry to connect to the database every 30 seconds");
-                have_db_err = 1;
-            }
+			zabbix_log(LOG_LEVEL_ERR, "Failed to select database: Error: %s",mysql_error(&mysql) );
+			exit(FAIL);
 		}
-		else
-		{
-            mysql.reconnect = 1;
-
-			if( mysql_select_db( &mysql, CONFIG_DBNAME ) != 0 )
-			{
-				zabbix_log(LOG_LEVEL_ERR, "Failed to select database: Error: %s",mysql_error(&mysql) );
-				exit( FAIL );
-			}
-			else
-			{
-                have_db_err = 0;
-				break;
-			}
-		}
+	}
 #endif
 #ifdef	HAVE_PGSQL
 /*	conn = PQsetdb(pghost, pgport, pgoptions, pgtty, dbName); */
 /*	conn = PQsetdb(NULL, NULL, NULL, NULL, dbname);*/
-		conn = PQsetdbLogin(CONFIG_DBHOST, NULL, NULL, NULL, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD );
+	conn = PQsetdbLogin(CONFIG_DBHOST, NULL, NULL, NULL, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD );
 
 /* check to see that the backend connection was successfully made */
-		if (PQstatus(conn) != CONNECTION_OK && !have_db_err)
-		{
-			zabbix_log(LOG_LEVEL_ERR, "Connection to database '%s' failed.\n", CONFIG_DBNAME);
-			zabbix_log(LOG_LEVEL_ERR, "%s", PQerrorMessage(conn));
-	        zabbix_log(LOG_LEVEL_ERR, "Will retry to connect to the database every 30 seconds");
-            have_db_err = 1;
-		}
-		else
-		{
-            have_db_err = 0;
-			break;
-		}
-#endif
-		sleep(30);
+	if (PQstatus(conn) != CONNECTION_OK)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Connection to database '%s' failed.\n", CONFIG_DBNAME);
+		exit(FAIL);
 	}
+#endif
 }
 
 /*

@@ -101,6 +101,11 @@
 	define("MAP_LABEL_TYPE_STATUS",3);
 	define("MAP_LABEL_TYPE_NOTHING",4);
 
+	define("MAP_LABEL_LOC_BOTTOM",		0);
+	define("MAP_LABEL_LOC_LEFT",		1);
+	define("MAP_LABEL_LOC_RIGHT",		2);
+	define("MAP_LABEL_LOC_TOP",		3);
+
 	define("ITEM_TYPE_ZABBIX",0);
 	define("ITEM_TYPE_SNMPV1",1);
 	define("ITEM_TYPE_TRAPPER",2);
