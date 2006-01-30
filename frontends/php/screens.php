@@ -108,104 +108,115 @@
 			$map="<a href=\"screens.php?screenid=".$_REQUEST["screenid"]."&fullscreen=1\">".$row["name"]."</a>";
 		}
 	show_table_header($map);*/
-	for($r=0;$r<$row["rows"];$r++)
-	{
-		for($c=0;$c<$row["cols"];$c++)
+
+		for($r=0;$r<$row["rows"];$r++)
 		{
-			$spancheck[$r][$c]=1;
+			for($c=0;$c<$row["cols"];$c++)
+			{
+				if(isset($skip_field[$r][$c]))	continue;
+
+				$sql="select * from screens_items where screenid=$screenid and x=$c and y=$r";
+				$iresult=DBSelect($sql);
+				if(DBnum_rows($iresult)>0)
+				{
+					$irow=DBfetch($iresult);
+					$colspan=$irow["colspan"];
+					$rowspan=$irow["rowspan"];
+				} else {
+					$colspan=0;
+					$rowspan=0;
+				}
+				for($i=0; $i < $rowspan || $i==0; $i++){
+					for($j=0; $j < $colspan || $j==0; $j++){
+						if($i!=0 || $j!=0)
+							$skip_field[$r+$i][$c+$j]=1;
+					}
+				}
+			}
 		}
-	}
-	for($r=0;$r<$row["rows"];$r++)
-	{
+
+		$table = new CTable(
+			new CLink("No rows in screen ".$row["name"],"screenconf.php?form=0&screenid=".$screenid),
+			"screen_view");
+	
+		for($r=0;$r<$row["rows"];$r++)
+		{
+		$new_cols = array();
 		for($c=0;$c<$row["cols"];$c++)
 		{
-			$sql="select * from screens_items where screenid=$screenid and x=$c and y=$r";
-			$iresult=DBSelect($sql);
-			$colspan=0;
-			$rowspan=0;
+			if(isset($skip_field[$r][$c]))		continue;
+			
+			$iresult=DBSelect("select * from screens_items".
+				" where screenid=$screenid and x=$c and y=$r");
+
 			if(DBnum_rows($iresult)>0)
 			{
-				$irow=DBfetch($iresult);
-				$colspan=$irow["colspan"];
-				$rowspan=$irow["rowspan"];
+				$irow		= DBfetch($iresult);
+				$screenitemid	= $irow["screenitemid"];
+				$resource	= $irow["resource"];
+				$resourceid	= $irow["resourceid"];
+				$width		= $irow["width"];
+				$height		= $irow["height"];
+				$colspan	= $irow["colspan"];
+				$rowspan	= $irow["rowspan"];
+				$elements	= $irow["elements"];
 			}
-			for($i=0;$i<$rowspan;$i++)
-				for($j=0;$j<$colspan;$j++)
-					if(($i!=0)||($j!=0))	$spancheck[$r+$i][$c+$j]=0;
-				
-		}
-	}
-
-          echo "<TABLE COLS=".$row["cols"]." align=center WIDTH=100% BGCOLOR=\"#FFFFFF\">\n";
-          for($r=0;$r<$row["rows"];$r++)
-          {
-          echo "<TR>\n";
-          for($c=0;$c<$row["cols"];$c++)
-          {
-		if($spancheck[$r][$c]==0)	continue;
-
-		$sql="select * from screens_items where screenid=$screenid and x=$c and y=$r";
-		$iresult=DBSelect($sql);
-		$colspan=0;
-		$rowspan=0;
-		if(DBnum_rows($iresult)>0)
-		{
-			$irow=DBfetch($iresult);
-			$screenitemid=$irow["screenitemid"];
-			$resource=$irow["resource"];
-			$resourceid=$irow["resourceid"];
-			$width=$irow["width"];
-			$height=$irow["height"];
-			$colspan=$irow["colspan"];
-			$rowspan=$irow["rowspan"];
-			$elements=$irow["elements"];
-		}
-
-
-		$tmp="";
-		if($colspan!=0)
-		{
-			$tmp=$tmp." colspan=\"$colspan\" ";
-			$c=$c+$colspan-1;
-		}
-		if($rowspan!=0)
-		{
-			$tmp=$tmp." rowspan=\"$rowspan\" ";
-		}
-
-               	echo "<TD align=\"center\" valign=\"top\" $tmp>\n";
-		if(DBnum_rows($iresult)>0)
-		{
-			if($resource == 0)
+			else
 			{
-				echo "<a href=charts.php?graphid=$resourceid".url_param("period").url_param("inc").url_param("dec")."><img src='chart2.php?graphid=$resourceid&width=$width&height=$height&period=$effectiveperiod".url_param("from")."border=0' border=0></a>";
-				//echo "<a href=charts.php?graphid=$resourceid><img src='chart2.php?graphid=$resourceid&width=$width&height=$height&".url_param("period").url_param("from")."border=0' border=0></a>";
+				$screenitemid	= 0;
+				$screenitemid	= 0;
+				$resource	= 0;
+				$resourceid	= 0;
+				$width		= 0;
+				$height		= 0;
+				$colspan	= 0;
+				$rowspan	= 0;
+				$elements	= 0;
 			}
-			else if($resource == 1)
+
+			if( ($screenitemid!=0) && ($resource==0) )
 			{
-				echo "<a href=history.php?action=showhistory&itemid=$resourceid".url_param("period").url_param("inc").url_param("dec")."><img src='chart.php?itemid=$resourceid&width=$width&height=$height&period=$effectiveperiod".url_param("from")."border=0' border=0></a>";
-				//echo "<a href=history.php?action=showhistory&itemid=$resourceid><img src='chart.php?itemid=$resourceid&width=$width&height=$height&".url_param("period").url_param("from")."border=0' border=0></a>";
+				$item = new CLink(
+					new CImg("chart2.php?graphid=$resourceid&width=$width&height=$height".
+						"&period=3600' border=0"),
+					"charts.php?graphid=$resourceid".url_param("period").
+						url_param("inc").url_param("dec")
+					);
 			}
-			else if($resource == 2)
+			else if( ($screenitemid!=0) && ($resource==1) )
 			{
-				echo get_map_imagemap($resourceid);
-				echo "<img src='map.php?sysmapid=$resourceid&noedit=true&border=1' border=0 usemap=#links$resourceid>";
+				$item = new CLink(
+					new CImg("chart.php?itemid=$resourceid&width=$width&height=$height".
+                                        	"&period=3600"),
+					"history.php?action=showhistory&itemid=$resourceid".
+						url_param("period").url_param("inc").url_param("dec")
+					);
 			}
-			else if($resource == 3)
+			else if( ($screenitemid!=0) && ($resource==2) )
 			{
-				$ptext =& get_screen_plaintext($resourceid,$elements);
-				$ptext->Show();
+				$item = new CImg("map.php?noedit=1&sysmapid=$resourceid".
+	                                        "&width=$width&height=$height&period=3600");
 			}
+			else if( ($screenitemid!=0) && ($resource==3) )
+			{
+				$item = array(get_screen_plaintext($resourceid,$elements));
+			}
+			else
+			{
+				$item = SPACE;
+			}
+			$new_col = new CCol($item,"screen_view");
+
+			if($colspan) $new_col->SetColSpan($colspan);
+			if($rowspan) $new_col->SetRowSpan($rowspan);
+
+			array_push($new_cols, $new_col);
 		}
-		else 
-		{
-			echo "&nbsp;";
+		$table->AddRow(new CRow($new_cols));
 		}
-		echo "</TD>\n";
-          }
-          echo "</TR>\n";
-          }
-          echo "</TABLE>\n";
+
+		$table->Show();
+		
 		navigation_bar("screens.php");
 	}
 	else
@@ -222,5 +233,8 @@
 ?>
 
 <?php
-	show_page_footer();
+	if(!isset($_REQUEST["fullscreen"]))
+	{
+		show_page_footer();
+	}
 ?>
