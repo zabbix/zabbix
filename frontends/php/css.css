@@ -93,17 +93,32 @@ td.form_row_last
 }
 
 /* SCREEN TABLE */
-table.screen
+table.screen_edit
 {
 	background-color: #FFFFFF;
 	width: 100%;
 	border: 1px outset #DDDDDD;
 }
 
-td.screen
+td.screen_edit
 {
 	background-color: #FFFFFF;
 	border: 1px inset #DDDDDD;
+	text-align: center;
+	vertical-align: middle;
+}
+
+table.screen_view
+{
+	background-color: #FFFFFF;
+	width: 100%;
+	border: 1px #DDDDDD;
+}
+
+td.screen_view
+{
+	background-color: #FFFFFF;
+	border: 1px #DDDDDD;
 	text-align: center;
 	vertical-align: middle;
 }
