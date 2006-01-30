@@ -1976,6 +1976,7 @@
 			$height		= $row["height"];
 			$background	= $row["background"];
 			$label_type	= $row["label_type"];
+			$label_location	= $row["label_location"];
 		}
 		else
 		{
@@ -1984,6 +1985,7 @@
 			$height		= get_request("height",600);
 			$background	= get_request("background","");
 			$label_type	= get_request("label_type",0);
+			$label_location	= get_request("label_location",0);
 		}
 
 
@@ -2011,6 +2013,14 @@
 		$cmbLabel->AddItem(3,S_STATUS_ONLY);
 		$cmbLabel->AddItem(4,S_NOTHING);
 		$frmMap->AddRow(S_ICON_LABEL_TYPE,$cmbLabel);
+
+		$cmbLocation = new CComboBox("label_location",$label_location);
+
+		$cmbLocation->AddItem(0,S_BOTTOM);
+		$cmbLocation->AddItem(1,S_LEFT);
+		$cmbLocation->AddItem(2,S_RIGHT);
+		$cmbLocation->AddItem(3,S_TOP);
+		$frmMap->AddRow(S_ICON_LABEL_LOCATION,$cmbLocation);
 
 		$frmMap->AddItemToBottomRow(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["sysmapid"]))

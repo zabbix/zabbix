@@ -45,6 +45,7 @@
 
 <?php
 	$fields=array(
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 		"config"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,3,4,5"),	NULL),
 
 		"alert_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),'in_array({config},array(0,5))&&({save}=="Save")'),

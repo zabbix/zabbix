@@ -24,7 +24,19 @@
 
 	include "include/config.inc.php";
 	include "include/forms.inc.php";
-
+?>
+<?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+//	$fields=array(
+//		"password"=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,	NULL),
+//		"name"=>		array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL),
+//		"register"=>		array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL),
+//		"sessionid"=>		array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL),
+//		"reconnect"=>		array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
+//	);
+//	check_fields($fields);
+?>
+<?php
 	if(isset($_REQUEST["password"]))
 	{
 		$password=$_REQUEST["password"];

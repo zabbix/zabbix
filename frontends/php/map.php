@@ -305,20 +305,11 @@
 			$first_line=$ip;
 		}
 
-		if($first_line!="")
-		{
-
-			$x1=$x+ImageSX($img)/2-ImageFontWidth(2)*strlen($first_line)/2;
-			$y1=$y+ImageSY($img);
-			ImageFilledRectangle($im,$x1-2, $y1,$x1+ImageFontWidth(2)*strlen($first_line), $y1+ImageFontHeight(2),$white);
-			ImageString($im, 2, $x1, $y1, $first_line,$black);
-		}
-
 		if($status == HOST_STATUS_NOT_MONITORED)
 		{
 			$color=$darkred;
 #			$label="Not monitored";
-			$label="";
+			$second_line="";
 		}
 		else
 		{
@@ -326,35 +317,71 @@
 			{
 				$result1=DBselect("select distinct t.description,t.triggerid, t.priority from items i,functions f,triggers t,hosts h where h.hostid=i.hostid and i.hostid=$hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.value=1 and t.status=0 and h.status=".HOST_STATUS_MONITORED."  and i.status=0");
 				$row1=DBfetch($result1);
-				$label=$row1["description"];
+				$second_line=$row1["description"];
 				if ($row1["priority"] > 3)
 					$color=$red;
 				else
 					$color=$darkyellow;
 
-					$label=expand_trigger_description_simple($row1["triggerid"]);
+					$second_line=expand_trigger_description_simple($row1["triggerid"]);
 			}
 			else if($count>1)
 			{
 				$color=$red;
-				$label=$count." ".S_PROBLEMS_SMALL;
+				$second_line=$count." ".S_PROBLEMS_SMALL;
 			}
 			else
 			{
 				$color=$darkgreen;
-				$label=S_OK_BIG;
+				$second_line=S_OK_BIG;
 			}
 		}
-		$x1=$x+ImageSX($img)/2-ImageFontWidth(2)*strlen($label)/2;
-		$y1=$y+ImageSY($img);
+
+		if($map["label_location"] == MAP_LABEL_LOC_TOP)
+		{
+			$x_first=$x+ImageSX($img)/2-ImageFontWidth(2)*strlen($first_line)/2;
+			$y_first=$y-2*ImageFontHeight(2);
+
+			$x_second=$x+ImageSX($img)/2-ImageFontWidth(2)*strlen($second_line)/2;
+			$y_second=$y_first+ImageFontHeight(2);
+		}
+		else if($map["label_location"] == MAP_LABEL_LOC_LEFT)
+		{
+			$x_first=$x-ImageFontWidth(2)*strlen($first_line);
+			$y_first=$y+ImageSY($img)/2-ImageFontHeight(2)/2;
+
+			$x_second=$x-ImageFontWidth(2)*(strlen($first_line)+strlen($second_line))/2;
+			$y_second=$y_first+ImageFontHeight(2);
+			if($first_line=="")	$y_second=$y_first+ImageFontHeight(2)/4;
+		}
+		else if($map["label_location"] == MAP_LABEL_LOC_RIGHT)
+		{
+			$x_first=$x+ImageSX($img);
+			$y_first=$y+ImageSY($img)/2-ImageFontHeight(2)/2;
+
+			$x_second=$x_first+ImageFontWidth(2)*(strlen($first_line)-strlen($second_line))/2;
+			$y_second=$y_first+ImageFontHeight(2);
+			if($first_line=="")	$y_second=$y_first+ImageFontHeight(2)/4;
+		}
+		else
+		{
+			$x_first=$x+ImageSX($img)/2-ImageFontWidth(2)*strlen($first_line)/2;
+			$y_first=$y+ImageSY($img);
+
+			$x_second=$x+ImageSX($img)/2-ImageFontWidth(2)*strlen($second_line)/2;
+			$y_second=$y_first+ImageFontHeight(2);
+			if($first_line=="")	$y_second=$y_first;
+		}
+
 		if($first_line!="")
 		{
-			$y1=$y1+ImageFontHeight(2);
+			ImageFilledRectangle($im,$x_first-2, $y_first,$x_first+ImageFontWidth(2)*strlen($first_line), $y_first+ImageFontHeight(2),$white);
+			ImageString($im, 2, $x_first, $y_first, $first_line,$black);
 		}
 		if($label_type!=MAP_LABEL_TYPE_NOTHING)
 		{
-			ImageFilledRectangle($im,$x1-2, $y1,$x1+ImageFontWidth(2)*strlen($label), $y1+ImageFontHeight(2),$white);
-			ImageString($im, 2, $x1, $y1, $label,$color);
+			ImageFilledRectangle($im,$x_second-2, $y_second,$x_second+ImageFontWidth(2)*strlen($second_line), $y_second+ImageFontHeight(2),$white);
+			ImageString($im, 2, $x_second, $y_second, $second_line,$color);
 		}
 	}
 

@@ -71,7 +71,7 @@
 
 	# Update System Map
 
-	function	update_sysmap($sysmapid,$name,$width,$height,$background,$label_type)
+	function	update_sysmap($sysmapid,$name,$width,$height,$background,$label_type,$label_location)
 	{
 		if(!check_right("Network map","U",$sysmapid))
 		{
@@ -79,13 +79,13 @@
 			return 0;
 		}
 
-		$sql="update sysmaps set name='$name',width=$width,height=$height,background='$background',label_type=$label_type where sysmapid=$sysmapid";
+		$sql="update sysmaps set name='$name',width=$width,height=$height,background='$background',label_type=$label_type,label_location=$label_location where sysmapid=$sysmapid";
 		return	DBexecute($sql);
 	}
 
 	# Add System Map
 
-	function	add_sysmap($name,$width,$height,$background,$label_type)
+	function	add_sysmap($name,$width,$height,$background,$label_type,$label_location)
 	{
 		if(!check_right("Network map","A",0))
 		{
@@ -93,7 +93,7 @@
 			return 0;
 		}
 
-		$sql="insert into sysmaps (name,width,height,background,label_type) values ('$name',$width,$height,'$background',$label_type)";
+		$sql="insert into sysmaps (name,width,height,background,label_type,label_location) values ('$name',$width,$height,'$background',$label_type,$label_location)";
 		return	DBexecute($sql);
 	}
 
