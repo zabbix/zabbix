@@ -58,6 +58,21 @@
 			$this->name=$value; 
 			return 0;
 		}
+		function SetName($value=NULL)
+		{
+			if(is_null($value))
+				return $this->DelOption("name");;
+
+			if(!is_string($value))
+			{
+				return $this->error("Incorrect value for SetClass [$value]");
+			}
+			return $this->AddOption("name",$value);
+		}
+		function GetName()
+		{
+			return $this->GetOption("name");
+		}
 		function SetClass($value)		
 		{
 			if(is_null($value))

@@ -281,8 +281,16 @@
 
 		if(isset($_REQUEST["hostid"])) 
 		{
+			$form = new CForm('items.php');
+			$form->SetName('items');
+			$form->AddVar('hostid',$_REQUEST["hostid"]);
+
 			$table  = new CTableInfo();
-			$table->setHeader(array(S_ID,S_KEY,S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),
+			$table->setHeader(array(
+				array(	new CCheckBox("all_items",NULL,NULL,
+						"CheckAll('".$form->GetName()."','all_items');"),
+					S_KEY),
+				S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),
 				S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,S_ERROR));
 
 			$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,".
@@ -366,8 +374,6 @@
 				"return Confirm('".S_DELETE_SELECTED_ITEMS_Q."');"));
 			$table->SetFooter(new CCol($footerButtons),'table_footer');
 
-			$form = new CForm('items.php');
-			$form->AddVar('hostid',$_REQUEST["hostid"]);
 			$form->AddItem($table);
 			$form->Show();
 		}

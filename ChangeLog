@@ -1,5 +1,6 @@
 Changes for 1.1beta6:
 
+ - added Check All functionality (Eugene)
  - added support of icon label locations (Alexei)
  - added new column sysmaps.label_location (Alexei)
  - better processing of server startup/shutdown (Alexei)
