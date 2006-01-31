@@ -79,7 +79,7 @@
 	}
 
 
-	if(isset($reconnect))
+	if(isset($reconnect) && isset($sessionid))
 	{
 		$sql="delete from sessions where sessionid='$sessionid'";
 		DBexecute($sql);

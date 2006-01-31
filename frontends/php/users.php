@@ -223,7 +223,7 @@
 					$actions = S_MEDIA;
 					if(get_media_count_by_userid($db_user["userid"])>0)
 					{
-						bfirst(&$actions);
+						$actions = bfirst($actions);
 					}
 					$actions = new CLink($actions,"media.php?userid=".$db_user["userid"]);
 				}
