@@ -42,7 +42,7 @@
 //			{
 				$description=expand_trigger_description($triggerid);
 //			}
-			$description=addslashes($description);
+			$description=zbx_ads($description);
 			$sql="insert into services (name,triggerid,status,algorithm,showsla,goodsla,sortorder) values ('$description',$triggerid,0,$algorithm,$showsla,$goodsla,$sortorder)";
 		}
 		else

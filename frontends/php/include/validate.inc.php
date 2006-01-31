@@ -19,6 +19,12 @@
 **/
 ?>
 <?php
+	function	zbx_adds($var)
+	{
+		if(!get_magic_quotes_gpc()) return addslashes($var);
+		else return $var;
+	}
+
 	function	BETWEEN($min,$max)
 	{
 		return "({}>=$min&&{}<=$max)&&";
@@ -73,7 +79,7 @@
 		{
 			if(!isset($fields[$key]))
 			{
-////				echo "Unset: $key<br>";
+				echo "Unset: $key<br>";
 				unset($_REQUEST[$key]);
 			}
 		}
@@ -103,6 +109,7 @@
 			if(($flags&P_ACT)&&(isset($_REQUEST[$field])))
 			{
 //				info("Unset:".$field);
+				echo "Unset:".$field."<br>";
 				unset($_REQUEST[$field]);
 			}
 		}
@@ -112,6 +119,8 @@
 	{
 		foreach($_REQUEST as $key => $val)
 		{
+//			info("Unset:".$_REQUEST[$key]);
+			echo "Unset:".$_REQUEST[$key]."<br>";
 			unset($_REQUEST[$key]);
 		}
 	}
@@ -122,15 +131,13 @@
 
 		$ret = TRUE;
 
-		return $ret;
-
 		$critical = FALSE;
 
 		foreach($fields as $field => $checks)
 		{
 			list($type,$opt,$flags,$validation,$exception)=$checks;
 
-//			info("Field: $field");
+//			echo "Field: $field<br>";
 
 			if($exception==NULL)	$except=FALSE;
 			else			$except=calc_exp($fields,$field,$exception);
@@ -241,10 +248,6 @@
 					}
 				}
 			}
-
-			if(isset($_REQUEST[$field])&&!get_magic_quotes_gpc()) {
-				$_REQUEST[$field]=addslashes($_REQUEST[$field]);
-			}
 		}
 		unset_not_in_list($fields);
 		unset_if_zero($fields);
@@ -258,7 +261,7 @@
 		{
 			unset_action_vars($fields);
 		}
-		show_messages();
+		show_infomsg();
 		return $ret;
 	}
 ?>
