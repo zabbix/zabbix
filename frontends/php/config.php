@@ -61,8 +61,8 @@
 		"exec_path"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==1)&&isset({save})'),
 //		"exec_path"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==1)'),
 
-		"imageid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535),'{config}==3&&(isset({form})'),
-		"autoregid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),'{config}==4&&(isset({form}))'),
+		"imageid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535),'{config}==3&&isset({form})'),
+		"autoregid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),'{config}==4&&isset({form})'),
 
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -275,7 +275,7 @@
 			show_table_header(S_MEDIA_TYPES_BIG);
 
 			$table=new CTableInfo(S_NO_MEDIA_TYPES_DEFINED);
-			$table->setHeader(array(S_ID,S_DESCRIPTION,S_TYPE));
+			$table->setHeader(array(S_DESCRIPTION,S_TYPE));
 
 			$result=DBselect("select mt.mediatypeid,mt.type,mt.description,mt.smtp_server,".
 				"mt.smtp_helo,mt.smtp_email,mt.exec_path from media_type mt order by mt.type");
@@ -289,7 +289,7 @@
 				else				$type=S_UNKNOWN;
 
 				$table->addRow(array(
-					$row["mediatypeid"],
+//					$row["mediatypeid"],
 					$description,
 					$type));
 			}
