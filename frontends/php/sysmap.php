@@ -127,7 +127,8 @@
 				if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
 				{
 					$map .= "\n<area shape=rect coords=$x_,$y_,".($x_+48).",".($y_+48).
-						" href=\"sysmap.php?sysmapid=$sysmapid_&shostid=$shostid_#form\"".
+						" href=\"sysmap.php?form=Add+Host&sysmapid=$sysmapid_".
+						"&shostid=$shostid_#form\"".
 						" alt=\"$host_\">";
 				}
 				else
@@ -198,22 +199,45 @@
 			" where sysmapid=".$_REQUEST["sysmapid"]." order by linkid");
 		while($row=DBfetch($result))
 		{
+	/* prepare label 1 */
+			$db_hosts = DBselect("select h.*".
+				" from sysmaps_hosts sh,hosts h".
+				" where sh.sysmapid=".$_REQUEST["sysmapid"].
+				" and h.hostid=sh.hostid".
+				" and h.status not in (".HOST_STATUS_DELETED.")".
+				" and sh.shostid=".$row["shostid1"]);
+			if(DBnum_rows($db_hosts)==0) continue;
 			$result1=DBselect("select label from sysmaps_hosts where shostid=".$row["shostid1"]);
 			$row1=DBfetch($result1);
 			$label1=$row1["label"];
+			if($label1==""){
+				$db_host = DBfetch($db_hosts);
+				$label1 = $db_host['host'];
+			}
+
+	/* prepare label 2 */
+			$db_hosts = DBselect("select h.*".
+				" from sysmaps_hosts sh,hosts h".
+				" where sh.sysmapid=".$_REQUEST["sysmapid"].
+				" and h.hostid=sh.hostid".
+				" and h.status not in (".HOST_STATUS_DELETED.")".
+				" and sh.shostid=".$row["shostid2"]);
+			if(DBnum_rows($db_hosts)==0) continue;
 			$result1=DBselect("select label from sysmaps_hosts where shostid=".$row["shostid2"]);
 			$row1=DBfetch($result1);
 			$label2=$row1["label"];
+			if($label2==""){
+				$db_host = DBfetch($db_hosts);
+				$label2 = $db_host['host'];
+			}
 
+	/* prepare description */
 			if(isset($row["triggerid"]))
-			{
 				$description=expand_trigger_description($row["triggerid"]);
-			}
 			else
-			{
 				$description="-";
-			}
 
+	/* draw row */
 			$table->addRow(array(
 				$label1,
 				$label2,
