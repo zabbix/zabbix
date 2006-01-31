@@ -585,6 +585,8 @@
 		$frmLogin->AddRow('Password', new CPassBox('password'));
 		$frmLogin->AddItemToBottomRow(new CButton('register','Enter'));
 		$frmLogin->Show();
+
+		SetFocus($frmLogin->GetName(),"name");
 	}
 
 /*
