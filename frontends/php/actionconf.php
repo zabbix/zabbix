@@ -149,6 +149,7 @@
 	}
 	else
 	{
+/* table header */
 		$form = new CForm("actionconf.php");
 
 		$cmbType = new CComboBox("actiontype",$_REQUEST["actiontype"],"submit()");
@@ -161,7 +162,7 @@
 
 		show_header2(S_ACTIONS, $form);
 
-
+/* table */
 		$tblActions = new CTableInfo(S_NO_ACTIONS_DEFINED);
 		$tblActions->SetHeader(array(S_SOURCE,S_CONDITIONS,S_SEND_MESSAGE_TO,
 			S_DELAY,S_SUBJECT,S_REPEATS,S_ACTIONS));
@@ -209,8 +210,6 @@
 		}
 		$tblActions->Show();
 	}
-
-	show_messages();
 
 	show_page_footer();
 ?>

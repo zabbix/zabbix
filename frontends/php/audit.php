@@ -30,11 +30,13 @@
 ?>
 
 <?php
-	if(isset($_REQUEST["start"])&&isset($_REQUEST["do"])&&($_REQUEST["do"]=="<< Prev 100"))
+	if(isset($_REQUEST["start"])&&isset($_REQUEST["prev"]))
 	{
 		$_REQUEST["start"]-=100;
+		if($_REQUEST["start"]<=0)
+			unset($_REQUEST["start"]);
 	}
-	if(isset($_REQUEST["do"])&&($_REQUEST["do"]=="Next 100 >>"))
+	if(isset($_REQUEST["next"]))
 	{
 		if(isset($_REQUEST["start"]))
 		{
@@ -45,29 +47,23 @@
 			$_REQUEST["start"]=100;
 		}
 	}
-	if(isset($_REQUEST["start"])&&($_REQUEST["start"]<=0))
-	{
-		unset($_REQUEST["start"]);
-	}
 ?>
 
 <?php
-	show_table3_header_begin();
-	echo "&nbsp;".S_AUDIT_LOG_BIG;
-	show_table3_h_delimiter(20);
-	echo "<form name=\"form2\" method=\"get\" action=\"audit.php\">";
-	if(isset($_REQUEST["start"]))
-	{
-		echo "<input class=\"biginput\" name=\"start\" type=hidden value=".$_REQUEST["start"]." size=8>";
-  		echo "<input class=\"button\" type=\"submit\" name=\"do\" value=\"<< Prev 100\">";
+	$form = new CForm();
+
+	$btnPrev = new CButton("prev","<< Prev 100");
+	if(isset($_REQUEST["start"]))   {
+		$form->AddVar("start",$_REQUEST["start"]);
+	} else {
+		$btnPrev->SetEnable('no');
 	}
-	else
-	{
-  		echo "<input class=\"button\" type=\"submit\" disabled name=\"do\" value=\"<< Prev 100\">";
-	}
-  	echo "<input class=\"button\" type=\"submit\" name=\"do\" value=\"Next 100 >>\">";
-	echo "</form>";
-	show_table_header_end();
+	$form->AddItem($btnPrev);
+
+	$form->AddItem(new CButton("next","Next 100 >>"));
+
+	show_header2(S_AUDIT_LOG_BIG,$form);
+
 ?>
 
 <?php
@@ -78,11 +74,14 @@
 
 	if(!isset($_REQUEST["start"]))
 	{
-		$sql="select u.alias,a.clock,a.action,a.resource,a.details from audit a, users u where u.userid=a.userid and a.auditid>$maxauditid-200 order by clock desc limit 200";
+		$sql="select u.alias,a.clock,a.action,a.resource,a.details from audit a, users u".
+			" where u.userid=a.userid and a.auditid>$maxauditid-200 order by clock desc limit 200";
 	}
 	else
 	{
-		$sql="select u.alias,a.clock,a.action,a.resource,a.details from audit a, users u where u.userid=a.userid and a.auditid>$maxauditid-".($_REQUEST["start"]+200)." order by clock desc limit ".($_REQUEST["start"]+200);
+		$sql="select u.alias,a.clock,a.action,a.resource,a.details from audit a, users u".
+			" where u.userid=a.userid and a.auditid>$maxauditid-".($_REQUEST["start"]+200).
+			" order by clock desc limit ".($_REQUEST["start"]+200);
 
 	}
 	$result=DBselect($sql);
@@ -93,60 +92,31 @@
 	while($row=DBfetch($result))
 	{
 		$i++;
-		if(isset($_REQUEST["start"])&&($i<$_REQUEST["start"]))
-		{
-			continue;
-		}
+		if(isset($_REQUEST["start"])&&($i<$_REQUEST["start"]))	continue;
 		if($i>100)	break;
 
 		if($row["resource"]==AUDIT_RESOURCE_USER)
-		{
 			$resource=S_USER;
-		}
 		else if($row["resource"]==AUDIT_RESOURCE_ZABBIX_CONFIG)
-		{
 			$resource=S_CONFIGURATION_OF_ZABBIX;
-		}
 		else if($row["resource"]==AUDIT_RESOURCE_MEDIA_TYPE)
-		{
 			$resource=S_MEDIA_TYPE;
-		}
 		else if($row["resource"]==AUDIT_RESOURCE_HOST)
-		{
 			$resource=S_HOST;
-		}
 		else if($row["resource"]==AUDIT_RESOURCE_ACTION)
-		{
 			$resource=S_ACTION;
-		}
 		else if($row["resource"]==AUDIT_RESOURCE_GRAPH)
-		{
 			$resource=S_GRAPH;
-		}
 		else if($row["resource"]==AUDIT_RESOURCE_GRAPH_ELEMENT)
-		{
 			$resource=S_GRAPH_ELEMENT;
-		}
 		else
-		{
 			$resource=S_UNKNOWN_RESOURCE;
-		}
-		if($row["action"]==AUDIT_ACTION_ADD)
-		{
-			$action=S_ADDED;
-		}
-		else if($row["action"]==AUDIT_ACTION_UPDATE)
-		{
-			$action=S_UPDATED;
-		}
-		else if($row["action"]==AUDIT_ACTION_DELETE)
-		{
-			$action=S_DELETED;
-		}
-		else
-		{
-			$action=S_UNKNOWN_ACTION;
-		}
+
+		if($row["action"]==AUDIT_ACTION_ADD)			$action = S_ADDED;
+		else if($row["action"]==AUDIT_ACTION_UPDATE)		$action = S_UPDATED;
+		else if($row["action"]==AUDIT_ACTION_DELETE)		$action = S_DELETED;
+		else							$action = S_UNKNOWN_ACTION;
+
 		$table->addRow(array(
 			date("Y.M.d H:i:s",$row["clock"]),
 			$row["alias"],

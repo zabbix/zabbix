@@ -52,21 +52,19 @@
 	$expression=explode_exp($expression,1);
 	$description=expand_trigger_description($_REQUEST["triggerid"]);
 
-	$h1=S_ALARMS_BIG.":$description<br>$expression";
+	$form = new CForm();
+	$form->AddVar("triggerid",$_REQUEST["triggerid"]);
+	$cmbLimit = new CComboBox("limit",$_REQUEST["limit"],"submit()");
+	$cmbLimit->AddItem('NO',S_SHOW_ALL);
+	$cmbLimit->AddItem("100",S_SHOW_ONLY_LAST_100);
+	$form->AddItem($cmbLimit);
 
-	$h2="";
-	$h2=$h2."<input name=\"triggerid\" type=\"hidden\" value=".$_REQUEST["triggerid"].">";
-	$h2=$h2."<select class=\"biginput\" name=\"limit\" onChange=\"submit()\">";
-	$h2=$h2.form_select("limit","NO",S_SHOW_ALL);
-	$h2=$h2.form_select("limit","100",S_SHOW_ONLY_LAST_100);
-	$h2=$h2."</select>";
-
-	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"alarms.php\">", "</form>");
+	show_header2(S_ALARMS_BIG.":$description<br>$expression", $form);
 ?>
 
-<FONT COLOR="#000000">
 <?php
-	$sql="select clock,value,triggerid from alarms where triggerid=".$_REQUEST["triggerid"]." order by clock desc $limit";
+	$sql="select clock,value,triggerid from alarms where triggerid=".$_REQUEST["triggerid"].
+		" order by clock desc $limit";
 	$result=DBselect($sql);
 
 	$table = new CTableInfo();

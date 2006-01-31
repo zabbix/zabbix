@@ -25,11 +25,11 @@
 	$fileuploaded=0;
 	show_header($page["title"],0,0);
 	if(!check_anyright("Default permission","U"))
-		{
-			show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-			show_page_footer();
-			exit;
-		}
+	{
+		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
+		show_page_footer();
+		exit;
+	}
 	insert_confirm_javascript();
 	
 	if(isset($_FILES['uploadfile']))
