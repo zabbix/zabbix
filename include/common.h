@@ -25,6 +25,8 @@
 
 
 #if defined(WIN32)
+#	pragma warning (disable: 4100)
+
 #	define zbx_uint64_t __int64
 #	define ZBX_FS_UI64 "%llu"
 

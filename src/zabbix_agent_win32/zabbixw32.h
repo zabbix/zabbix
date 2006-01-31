@@ -249,7 +249,6 @@ extern USER_COUNTER *userCounterList;
 void	FreeUserCounterList(void);
 
 extern SUBAGENT *subagentList;
-void	FreeSubagentList(void);
 
 extern SUBAGENT_NAME *subagentNameList;
 void	FreeSubagentNameList(void);

@@ -25,8 +25,8 @@
 LONG H_Execute(char *cmd,char *arg,char **value)
 {
    char *ptr1,*ptr2;
-   STARTUPINFO si;
-   PROCESS_INFORMATION pi;
+   STARTUPINFO si = {0};
+   PROCESS_INFORMATION pi = {0};
    SECURITY_ATTRIBUTES sa;
    HANDLE hOutput;
    char szTempPath[MAX_PATH],szTempFile[MAX_PATH];
