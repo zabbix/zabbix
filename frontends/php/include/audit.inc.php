@@ -23,10 +23,9 @@
 	{
 		global $USER_DETAILS;
 
-		$details=addslashes($details);
 		$userid=$USER_DETAILS["userid"];
 		$clock=time();
-		$sql="insert into audit (userid,clock,action,resource,details) values ($userid,$clock,$action,$resource,'$details')";
+		$sql="insert into audit (userid,clock,action,resource,details) values ($userid,$clock,$action,$resource,'".zbx_ads($details)."')";
 		return DBexecute($sql);
 	}
 ?>

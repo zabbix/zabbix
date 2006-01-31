@@ -38,19 +38,7 @@
 			return 0;
 		}
 
-		$devicetype=addslashes($devicetype);
-		$name=addslashes($name);
-		$os=addslashes($os);
-		$serialno=addslashes($serialno);
-		$tag=addslashes($tag);
-		$macaddress=addslashes($macaddress);
-		$hardware=addslashes($hardware);
-		$software=addslashes($software);
-		$contact=addslashes($contact);
-		$location=addslashes($location);
-		$notes=addslashes($notes);
-
-		$sql="insert into hosts_profiles (hostid,devicetype,name,os,serialno,tag,macaddress,hardware,software,contact,location,notes) values ($hostid,'$devicetype','$name','$os','$serialno','$tag','$macaddress','$hardware','$software','$contact','$location','$notes')";
+		$sql="insert into hosts_profiles (hostid,devicetype,name,os,serialno,tag,macaddress,hardware,software,contact,location,notes) values (".zbx_ads($hostid).",'".zbx_ads($devicetype)."','".zbx_ads($name)."','".zbx_ads($os)."','".zbx_ads($serialno)."','".zbx_ads($tag)."','".zbx_ads($macaddress)."','".zbx_ads($hardware)."','".zbx_ads($software)."','".zbx_ads($contact)."','".zbx_ads($location)."','".zbx_ads($notes)."')";
 		$result=DBexecute($sql);
 		
 		return	$result;
@@ -75,19 +63,7 @@
 			return 0;
 		}
 
-		$devicetype=addslashes($devicetype);
-		$name=addslashes($name);
-		$os=addslashes($os);
-		$serialno=addslashes($serialno);
-		$tag=addslashes($tag);
-		$macaddress=addslashes($macaddress);
-		$hardware=addslashes($hardware);
-		$software=addslashes($software);
-		$contact=addslashes($contact);
-		$location=addslashes($location);
-		$notes=addslashes($notes);
-
-		$sql="update hosts_profiles set devicetype='$devicetype',name='$name',os='$os',serialno='$serialno',tag='$tag',macaddress='$macaddress',hardware='$hardware',software='$software',contact='$contact',location='$location',notes='$notes' where hostid=$hostid";
+		$sql="update hosts_profiles set devicetype='".zbx_ads($devicetype)."',name='".zbx_ads($name)."',os='".zbx_ads($os)."',serialno='".zbx_ads($serialno)."',tag='".zbx_ads($tag)."',macaddress='".zbx_ads($macaddress)."',hardware='".zbx_ads($hardware)."',software='".zbx_ads($software)."',contact='".zbx_ads($contact)."',location='".zbx_ads($location)."',notes='".zbx_ads($notes)."' where hostid=".zbx_ads($hostid);
 		$result=DBexecute($sql);
 		
 		return	$result;

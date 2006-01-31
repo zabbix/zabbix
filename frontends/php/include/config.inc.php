@@ -690,10 +690,24 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		return	$config;
 	}
 
+	function	show_infomsg()
+	{
+		global	$INFO_MSG;
+
+		if(is_array($INFO_MSG))
+		{
+			echo "<p align=center class=\"info\">";
+			while(list($key, $val)=each($INFO_MSG))
+			{
+				echo $val."<br>";
+			}
+			echo "</p>";
+		}
+	}
+
 	function	show_messages($bool=TRUE,$msg=NULL,$errmsg=NULL)
 	{
 		global	$ERROR_MSG;
-		global	$INFO_MSG;
 
 		if(!$bool)
 		{
@@ -710,22 +724,17 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 			$color="#223344";
 		}
-		echo "<p align=center>";
-		echo "<font color='$color'>";
-		if(isset($msg))
-			echo "<b>[$msg]</b>";
-		echo "</font>";
-		echo "</p>";
 
-		if(is_array($INFO_MSG))
+		if(isset($msg))
 		{
-			echo "<p align=center class=\"info\">";
-			while(list($key, $val)=each($INFO_MSG))
-			{
-				echo $val."<br>";
-			}
+			echo "<p align=center>";
+			echo "<font color='$color'>";
+			echo "<b>[$msg]</b>";
+			echo "</font>";
 			echo "</p>";
 		}
+
+		show_infomsg();
 
 		if(is_array($ERROR_MSG))
 		{
@@ -1458,7 +1467,7 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 			if($files["image"]["error"]==0)
 			if($files["image"]["size"]<1024*1024)
 			{
-				$image=addslashes(fread(fopen($files["image"]["tmp_name"],"r"),filesize($files["image"]["tmp_name"])));
+				$image=zbx_ads(fread(fopen($files["image"]["tmp_name"],"r"),filesize($files["image"]["tmp_name"])));
 				$sql="insert into images (name,imagetype,image) values ('$name',$imagetype,'$image')";
 				return	DBexecute($sql);
 			}
@@ -1482,7 +1491,7 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 			if($files["image"]["error"]==0)
 			if($files["image"]["size"]<1024*1024)
 			{
-				$image=addslashes(fread(fopen($files["image"]["tmp_name"],"r"),filesize($files["image"]["tmp_name"])));
+				$image=zbx_ads(fread(fopen($files["image"]["tmp_name"],"r"),filesize($files["image"]["tmp_name"])));
 				$sql="update images set name='$name',imagetype='$imagetype',image='$image' where imageid='$imageid'";
 				return	DBexecute($sql);
 			}
@@ -1797,7 +1806,7 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 	{
 		$ret = 0;
 
-		$description=addslashes($description);
+		$description=zbx_ads($description);
 		$sql="select * from media_type where description='$description' and mediatypeid!=$mediatypeid";
 		$result=DBexecute($sql);
 		if(DBnum_rows($result)>0)
@@ -1823,7 +1832,7 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 			return 0;
 		}
 
-		$description=addslashes($description);
+		$description=zbx_ads($description);
 		$sql="select * from media_type where description='$description'";
 		$result=DBexecute($sql);
 		if(DBnum_rows($result)>0)

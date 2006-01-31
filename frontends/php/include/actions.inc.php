@@ -136,7 +136,7 @@
 		{
 			if($row["actions"]&1 == 0)	continue;
 
-			$sql="select distinct f.triggerid from functions f,items i,triggers t where t.description='".addslashes($trigger["description"])."' and t.triggerid=f.triggerid and i.itemid=f.itemid and i.hostid=".$row["hostid"];
+			$sql="select distinct f.triggerid from functions f,items i,triggers t where t.description='".zbx_ads($trigger["description"])."' and t.triggerid=f.triggerid and i.itemid=f.itemid and i.hostid=".$row["hostid"];
 			$result2=DBselect($sql);
 			while($row2=DBfetch($result2))
 			{
@@ -182,12 +182,12 @@
 		{
 			if($row["actions"]&4 == 0)	continue;
 
-			$sql="select distinct f.triggerid from functions f,items i,triggers t where t.description='".addslashes($trigger["description"])."' and t.triggerid=f.triggerid and i.itemid=f.itemid and i.hostid=".$row["hostid"];
+			$sql="select distinct f.triggerid from functions f,items i,triggers t where t.description='".zbx_ads($trigger["description"])."' and t.triggerid=f.triggerid and i.itemid=f.itemid and i.hostid=".$row["hostid"];
 			$result2=dbselect($sql);
 			#enumerate triggers
 			while($row2=dbfetch($result2))
 			{
-				$sql="select actionid from actions where triggerid=".$row2["triggerid"]." and subject='".addslashes($action["subject"])."' and userid=".$action["userid"]." and good=".$action["good"]." and scope=".$action["scope"]." and recipient=".$action["recipient"]." and severity=".$action["severity"];
+				$sql="select actionid from actions where triggerid=".$row2["triggerid"]." and subject='".zbx_ads($action["subject"])."' and userid=".$action["userid"]." and good=".$action["good"]." and scope=".$action["scope"]." and recipient=".$action["recipient"]." and severity=".$action["severity"];
 				$result3=dbselect($sql);
 				#enumerate actions
 				while($row3=dbfetch($result3))
@@ -229,12 +229,12 @@
 		{
 			if($row["actions"]&2 == 0)	continue;
 
-			$sql="select distinct f.triggerid from functions f,items i,triggers t where t.description='".addslashes($trigger["description"])."' and t.triggerid=f.triggerid and i.itemid=f.itemid and i.hostid=".$row["hostid"];
+			$sql="select distinct f.triggerid from functions f,items i,triggers t where t.description='".zbx_ads($trigger["description"])."' and t.triggerid=f.triggerid and i.itemid=f.itemid and i.hostid=".$row["hostid"];
 			$result2=dbselect($sql);
 			#enumerate triggers
 			while($row2=dbfetch($result2))
 			{
-				$sql="select actionid from actions where triggerid=".$row2["triggerid"]." and subject='".addslashes($action["subject"])."'";
+				$sql="select actionid from actions where triggerid=".$row2["triggerid"]." and subject='".zbx_ads($action["subject"])."'";
 				$result3=dbselect($sql);
 				#enumerate actions
 				while($row3=dbfetch($result3))
@@ -334,8 +334,7 @@
 
 	function	add_action_condition($actionid, $conditiontype, $operator, $value)
 	{
-		$value=addslashes($value);
-		$sql="insert into conditions (actionid,conditiontype,operator,value) values ($actionid,$conditiontype,$operator,'$value')";
+		$sql="insert into conditions (actionid,conditiontype,operator,value) values ($actionid,$conditiontype,$operator,'".zbx_ads($value)."')";
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"conditions","conditionid");
 	}

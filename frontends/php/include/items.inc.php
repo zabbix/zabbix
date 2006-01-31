@@ -107,14 +107,7 @@
 			$delta=0;
 		}
 
-		$key=addslashes($key);
-		$description=addslashes($description);
-		$logtimefmt=addslashes($logtimefmt);
-		$snmpv3_securityname=addslashes($snmpv3_securityname);
-		$snmpv3_authpassphrase=addslashes($snmpv3_authpassphrase);
-		$snmpv3_privpassphrase=addslashes($snmpv3_privpassphrase);
-
-		$sql="insert into items (description,key_,hostid,delay,history,nextcheck,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula,trends,logtimefmt) values ('$description','$key',$hostid,$delay,$history,0,$status,$type,'$snmp_community','$snmp_oid',$value_type,'$trapper_hosts',$snmp_port,'$units',$multiplier,$delta,'$snmpv3_securityname',$snmpv3_securitylevel,'$snmpv3_authpassphrase','$snmpv3_privpassphrase','$formula',$trends,'$logtimefmt')";
+		$sql="insert into items (description,key_,hostid,delay,history,nextcheck,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula,trends,logtimefmt) values ('".zbx_ads($description)."','".zbx_ads($key)."',".zbx_ads($hostid).",".zbx_ads($delay).",".zbx_ads($history).",0,".zbx_ads($status).",".zbx_ads($type).",'".zbx_ads($snmp_community)."','".zbx_ads($snmp_oid)."',".zbx_ads($value_type).",'".zbx_ads($trapper_hosts)."',".zbx_ads($snmp_port).",'".zbx_ads($units)."',".zbx_ads($multiplier).",".zbx_ads($delta).",'".zbx_ads($snmpv3_securityname)."',".zbx_ads($snmpv3_securitylevel).",'".zbx_ads($snmpv3_authpassphrase)."','".zbx_ads($snmpv3_privpassphrase)."','".zbx_ads($formula)."',".zbx_ads($trends).",'".zbx_ads($logtimefmt)."')";
 		$result=DBexecute($sql);
 		if($result)
 		{
@@ -167,17 +160,10 @@
 			$delta=0;
 		}
 
-		$key=addslashes($key);
-		$description=addslashes($description);
-		$logtimefmt=addslashes($logtimefmt);
-		$snmpv3_securityname=addslashes($snmpv3_securityname);
-		$snmpv3_authpassphrase=addslashes($snmpv3_authpassphrase);
-		$snmpv3_privpassphrase=addslashes($snmpv3_privpassphrase);
-
-		$sql="update items set lastlogsize=0 where itemid=$itemid and key_<>'$key'";
+		$sql="update items set lastlogsize=0 where itemid=".zbx_ads($itemid)." and key_<>'".zbx_ads($key)."'";
 		DBexecute($sql);
 
-		$sql="update items set description='$description',key_='$key',hostid=$hostid,delay=$delay,history=$history,nextcheck=0,status=$status,type=$type,snmp_community='$snmp_community',snmp_oid='$snmp_oid',value_type=$value_type,trapper_hosts='$trapper_hosts',snmp_port=$snmp_port,units='$units',multiplier=$multiplier,delta=$delta,snmpv3_securityname='$snmpv3_securityname',snmpv3_securitylevel=$snmpv3_securitylevel,snmpv3_authpassphrase='$snmpv3_authpassphrase',snmpv3_privpassphrase='$snmpv3_privpassphrase',formula='$formula',trends=$trends,logtimefmt='$logtimefmt' where itemid=$itemid";
+		$sql="update items set description='".zbx_ads($description)."',key_='".zbx_ads($key)."',hostid=".zbx_ads($hostid).",delay=".zbx_ads($delay).",history=".zbx_ads($history).",nextcheck=0,status=".zbx_ads($status).",type=".zbx_ads($type).",snmp_community='".zbx_ads($snmp_community)."',snmp_oid='".zbx_ads($snmp_oid)."',value_type=".zbx_ads($value_type).",trapper_hosts='".zbx_ads($trapper_hosts)."',snmp_port=".zbx_ads($snmp_port).",units='".zbx_ads($units)."',multiplier=".zbx_ads($multiplier).",delta=".zbx_ads($delta).",snmpv3_securityname='".zbx_ads($snmpv3_securityname)."',snmpv3_securitylevel=".zbx_ads($snmpv3_securitylevel).",snmpv3_authpassphrase='".zbx_ads($snmpv3_authpassphrase)."',snmpv3_privpassphrase='".zbx_ads($snmpv3_privpassphrase)."',formula='".zbx_ads($formula)."',trends=".zbx_ads($trends).",logtimefmt='".zbx_ads($logtimefmt)."' where itemid=".zbx_ads($itemid);
 		$result=DBexecute($sql);
 		if($result)
 		{

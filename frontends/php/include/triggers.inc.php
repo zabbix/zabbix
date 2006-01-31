@@ -27,8 +27,7 @@
 			return	0;
 		}
 
-		$comments=addslashes($comments);
-		$sql="update triggers set comments='$comments' where triggerid=$triggerid";
+		$sql="update triggers set comments='".zbx_ads($comments)."' where triggerid=".zbx_ads($triggerid);
 		return	DBexecute($sql);
 	}
 
@@ -110,8 +109,7 @@
 //			return	0;
 //		}
 
-#		$description=addslashes($description);
-		$sql="insert into triggers  (description,priority,status,comments,url,value,error) values ('$description',$priority,$status,'$comments','$url',2,'Trigger just added. No status update so far.')";
+		$sql="insert into triggers  (description,priority,status,comments,url,value,error) values ('".zbx_ads($description)."',".zbx_ads($priority).",".zbx_ads($status).",'".zbx_ads($comments)."','".zbx_ads($url)."',2,'Trigger just added. No status update so far.')";
 #		echo $sql,"<br>";
 		$result=DBexecute($sql);
 		if(!$result)
@@ -124,7 +122,7 @@
 		add_alarm($triggerid,2);
  
 		$expression=implode_exp($expression,$triggerid);
-		$sql="update triggers set expression='$expression' where triggerid=$triggerid";
+		$sql="update triggers set expression='".zbx_ads($expression)."' where triggerid=".zbx_ads($triggerid);
 #		echo $sql,"<br>";
 		DBexecute($sql);
 		reset_items_nextcheck($triggerid);
@@ -339,7 +337,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 			if($row["triggers"]&3 == 0)	continue;
 #get triggers
-			$sql="select distinct f.triggerid from functions f,items i,triggers t where t.description='".addslashes($trigger["description"])."' and t.triggerid=f.triggerid and i.itemid=f.itemid and i.hostid=".$row["hostid"];
+			$sql="select distinct f.triggerid from functions f,items i,triggers t where t.description='".zbx_ads($trigger["description"])."' and t.triggerid=f.triggerid and i.itemid=f.itemid and i.hostid=".$row["hostid"];
 			$result2=DBselect($sql);
 			// Loop: triggers
 			while($row2=DBfetch($result2))
@@ -424,7 +422,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 			if($row["triggers"]&1 == 0)	continue;
 
-			$sql="insert into triggers  (description,priority,status,comments,url,value,expression) values ('".addslashes($trigger["description"])."',".$trigger["priority"].",".$trigger["status"].",'".addslashes($trigger["comments"])."','".addslashes($trigger["url"])."',2,'$expression_old')";
+			$sql="insert into triggers  (description,priority,status,comments,url,value,expression) values ('".zbx_ads($trigger["description"])."',".$trigger["priority"].",".$trigger["status"].",'".zbx_ads($trigger["comments"])."','".zbx_ads($trigger["url"])."',2,'$expression_old')";
 			$result4=DBexecute($sql);
 			$triggerid_new=DBinsert_id($result4,"triggers","triggerid");
 
@@ -491,7 +489,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 		{
 			if($row["triggers"]&4 == 0)	continue;
 
-			$sql="select distinct f.triggerid from functions f,items i,triggers t where t.description='".addslashes($trigger["description"])."' and t.triggerid=f.triggerid and i.itemid=f.itemid and i.hostid=".$row["hostid"];
+			$sql="select distinct f.triggerid from functions f,items i,triggers t where t.description='".zbx_ads($trigger["description"])."' and t.triggerid=f.triggerid and i.itemid=f.itemid and i.hostid=".$row["hostid"];
 			$result2=DBselect($sql);
 			while($row2=DBfetch($result2))
 			{
