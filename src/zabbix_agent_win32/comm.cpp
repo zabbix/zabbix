@@ -94,7 +94,7 @@ INIT_CHECK_MEMORY(main);
 
    // Wait for command from server
 	FD_ZERO(&rdfs);
-	FD_SET(sock,&rdfs); // ignore warrning
+	FD_SET(sock,&rdfs);							// ignore WARNING
 	timeout.tv_sec=COMMAND_TIMEOUT;
 	timeout.tv_usec=0;
 	if (select(sock+1,&rdfs,NULL,NULL,&timeout)==0)

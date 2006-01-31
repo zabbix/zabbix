@@ -115,7 +115,7 @@ CHECK_MEMORY(main, "MyClearEventLog", "end");
 DllExport   long    MyGetAEventLog(char *pAppName,HANDLE hAppLog,long
 which,double *pTime,char *pSource,char *pMessage,DWORD *pType,WORD *pCategory, DWORD *timestamp)
 {
-    EVENTLOGRECORD  *pELR;
+    EVENTLOGRECORD  *pELR = NULL;
     BYTE            bBuffer[1024];                      /* hold the event
 log record raw data */
     DWORD           dwRead, dwNeeded;
@@ -128,12 +128,11 @@ message DLL */
     DWORD           Type;
     HINSTANCE       hLib = NULL;                        /* handle to the
 messagetable DLL */
-    char            *pCh,*pFile,*pNextFile;
+    char            *pCh = NULL, *pFile = NULL, *pNextFile = NULL;
     char            *aInsertStrs[MAX_INSERT_STRS];      // array of pointers to insert
     long            i;
     LPTSTR          msgBuf = NULL;                       // hold text of the error message that we
     long            err = 0;
-	void *tmpp = NULL;
 
 INIT_CHECK_MEMORY(main);
 
@@ -205,7 +204,8 @@ INIT_CHECK_MEMORY(main);
 //LOG_DEBUG_INFO("s","MyGetAEventLog: for 1.1");
 
 
-	        if ((pNextFile = strchr(pFile,';')))
+			pNextFile = strchr(pFile,';');
+	        if (pNextFile)
 			{
 			    *pNextFile = 0;
 			}
@@ -218,7 +218,8 @@ INIT_CHECK_MEMORY(main);
 				break;
 			}
 //LOG_DEBUG_INFO("s","MyGetAEventLog: for 2.1");
-		    if (!(hLib = LoadLibraryEx(MsgDll, NULL, LOAD_LIBRARY_AS_DATAFILE)))
+			hLib = LoadLibraryEx(MsgDll, NULL, LOAD_LIBRARY_AS_DATAFILE);
+		    if (!hLib)
 			{
 				err = 1;
 				break;
@@ -277,7 +278,7 @@ INIT_CHECK_MEMORY(main);
 
 	if(err == 0)
 	{
-		strcpy(pMessage,msgBuf);                                // copy message
+		strcpy(pMessage,msgBuf);                            // copy message
 
 		*pTime = (double)pELR->TimeGenerated;
 
