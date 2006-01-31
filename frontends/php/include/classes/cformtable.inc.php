@@ -79,13 +79,12 @@
 		{
 			if(is_null($value)) {
 				$this->help = new CHelp();
-				$this->AddOption("name",'form');
 			} elseif(is_a($value,'chelp')) {
 				$this->help = $value;
-				$this->AddOption("name",'form');
 			} elseif(is_string($value)) {
 				$this->help = new CHelp($value);
-				$this->AddOption("name",$value);
+				if($this->GetName()==NULL)
+					$this->SetName($value);
 			} else
 			{
 				return $this->error("Incorrect value for SetHelp [$value]");

@@ -217,8 +217,9 @@
 		if($result)
 		{
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,
-				"Alarm history [".$_REQUEST["alarm_history"]."] alert history".
-				" [".$_REQUEST["alert_history"]."]");
+				"Alarm history [".$_REQUEST["alarm_history"]."]".
+				" alert history [".$_REQUEST["alert_history"]."]".
+				" refresh unsupported items [".$_REQUEST["refresh_unsupported"]."]");
 		}
 	}
 

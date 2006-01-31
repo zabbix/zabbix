@@ -29,7 +29,7 @@
 			return 0;
 		}
 
- 		if (!eregi('^([0-9a-zA-Z\_\.-]+)$', $host, &$arr)) 
+ 		if (!eregi('^([0-9a-zA-Z\_\.-]+)$', $host, $arr)) 
 		{
 			error("Hostname should contain 0-9a-zA-Z_.- characters only");
 			return 0;
@@ -88,7 +88,7 @@
 			return 0;
 		}
 
- 		if (!eregi('^([0-9a-zA-Z\_\.-]+)$', $host, &$arr)) 
+ 		if (!eregi('^([0-9a-zA-Z\_\.-]+)$', $host, $arr)) 
 		{
 			error("Hostname should contain 0-9a-zA-Z_.- characters only");
 			return 0;

@@ -751,7 +751,7 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 	function	validate_float($str)
 	{
 //		echo "Validating float:$str<br>";
-		if (eregi('^[ ]*([0-9]+)((\.)?)([0-9]*[KMG]{0,1})[ ]*$', $str, &$arr)) 
+		if (eregi('^[ ]*([0-9]+)((\.)?)([0-9]*[KMG]{0,1})[ ]*$', $str, $arr)) 
 		{
 			return 0;
 		}
@@ -766,9 +766,9 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 	{
 //		echo "Validating simple:$expression<br>";
 // Before str()
-// 		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.\,]+)\.((diff)|(min)|(max)|(last)|(prev))\(([0-9\.]+)\)\}$', $expression, &$arr)) 
-//		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.\,]+)\.((diff)|(min)|(max)|(last)|(prev)|(str))\(([0-9a-zA-Z\.\_\/\,]+)\)\}$', $expression, &$arr)) 
- 		if (eregi('^\{([0-9a-zA-Z\_\.-]+)\:([]\[0-9a-zA-Z\_\/\.\,\:\(\) -]+)\.([a-z]{3,11})\(([0-9a-zA-Z\_\/\.\,]+)\)\}$', $expression, &$arr)) 
+// 		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.\,]+)\.((diff)|(min)|(max)|(last)|(prev))\(([0-9\.]+)\)\}$', $expression, $arr)) 
+//		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.\,]+)\.((diff)|(min)|(max)|(last)|(prev)|(str))\(([0-9a-zA-Z\.\_\/\,]+)\)\}$', $expression, $arr)) 
+ 		if (eregi('^\{([0-9a-zA-Z\_\.-]+)\:([]\[0-9a-zA-Z\_\/\.\,\:\(\) -]+)\.([a-z]{3,11})\(([0-9a-zA-Z\_\/\.\,]+)\)\}$', $expression, $arr)) 
 		{
 			$host=$arr[1];
 			$key=$arr[2];
@@ -842,7 +842,7 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		{
 //			echo "Expression:$expression<br>";
 			$arr="";
-			if (eregi('^((.)*)[ ]*(\{((.)*)\})[ ]*((.)*)$', $expression, &$arr)) 
+			if (eregi('^((.)*)[ ]*(\{((.)*)\})[ ]*((.)*)$', $expression, $arr)) 
 			{
 //				for($i=0;$i<20;$i++)
 //				{
@@ -868,7 +868,7 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 // 	Replace all <float> <sign> <float> <K|M|G> with 0
 //			echo "Expression:$expression<br>";
 			$arr="";
-			if (eregi('^((.)*)([0-9\.]+[A-Z]{0,1})[ ]*([\&\|\>\<\=\+\-\*\/\#]{1})[ ]*([0-9\.]+[A-Z]{0,1})((.)*)$', $expression, &$arr)) 
+			if (eregi('^((.)*)([0-9\.]+[A-Z]{0,1})[ ]*([\&\|\>\<\=\+\-\*\/\#]{1})[ ]*([0-9\.]+[A-Z]{0,1})((.)*)$', $expression, $arr)) 
 			{
 //				echo "OK<br>";
 //				for($i=0;$i<50;$i++)
@@ -897,7 +897,7 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 // 	Replace all (float) with 0
 //			echo "Expression2:[$expression]<br>";
 			$arr="";
-			if (eregi('^((.)*)(\(([ 0-9\.]+)\))((.)*)$', $expression, &$arr)) 
+			if (eregi('^((.)*)(\(([ 0-9\.]+)\))((.)*)$', $expression, $arr)) 
 			{
 //				echo "OK<br>";
 //				for($i=0;$i<30;$i++)
@@ -2860,6 +2860,14 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 	}
 </script>
 		";
+	}
+
+	function	SetFocus($frm_name, $fld_name)
+	{
+		echo 
+		"<script language=\"JavaScript\" type=\"text/javascript\">\n".
+		"	document.forms['$frm_name'].elements['$fld_name'].focus();\n".
+		"</script>";
 	}
 
 /* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
