@@ -42,7 +42,8 @@
 	if(isset($_REQUEST["start"])&&isset($_REQUEST["prev"]))
 	{
 		$_REQUEST["start"]-=100;
-		if($_REQUEST["start"]<=0)	unset($_REQUEST["start"]);
+		if($_REQUEST["start"]<=0)
+			unset($_REQUEST["start"]);
 	}
 	if(isset($_REQUEST["next"]))
 	{
@@ -65,8 +66,7 @@
 	$form = new CForm();
 
 	$btnPrev = new CButton("prev","<< Prev 100");
-	if(isset($_REQUEST["start"]))
-	{
+	if(isset($_REQUEST["start"]))	{
 		$form->AddVar("start",$_REQUEST["start"]);
 	} else {
 		$btnPrev->SetEnable('no');
