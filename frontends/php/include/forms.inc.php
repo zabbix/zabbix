@@ -236,6 +236,14 @@
 		if(isset($usrgrpid)&&$_REQUEST["form"]!=1)
 		{
 			$name	= $usrgrp["name"];
+			$db_users=DBselect("select distinct u.userid from users u,users_groups ug ".
+				"where u.userid=ug.userid and ug.usrgrpid=".$usrgrpid.
+				" order by alias");
+
+			while($db_user=DBfetch($db_users))
+			{
+				$_REQUEST[$db_user["userid"]] = 'yes';
+			}
 		}
 		else
 		{
@@ -255,23 +263,11 @@
 		$users=DBselect("select distinct userid,alias from users order by alias");
 		while($user=DBfetch($users))
 		{
-			if(isset($_REQUEST["usrgrpid"]))
-			{
-				$sql="select count(*) as count from users_groups where userid=".
-					$user["userid"]." and usrgrpid=".$_REQUEST["usrgrpid"];
-				$result=DBselect($sql);
-				$res_row=DBfetch($result);
-				array_push($form_row,
-					new CCheckBox($user["userid"],$res_row["count"], $user["alias"]),
-					BR);
-			}
-			else
-			{
-				array_push($form_row,
-					new CCheckBox($user["userid"],
-						isset($_REQUEST[$user["userid"]]),$user["alias"]),
-					BR);
-			}
+			array_push($form_row,
+				new CCheckBox($user["userid"],
+					isset($_REQUEST[$user["userid"]]) ? 'yes' : 'no',
+					$user["alias"]),
+				BR);
 		}
 		$frmUserG->AddRow(S_USERS,$form_row);
 	
@@ -319,7 +315,7 @@
 
 		$formula	= get_request("formula"		,"1");
 		$logtimefmt	= get_request("logtimefmt"	,"");
-		$groupid	= get_request("groupid"		,0);
+		$add_groupid	= get_request("add_groupid"	,0);
 
 		$host		= get_request("host",	NULL);
 
@@ -370,11 +366,14 @@
 		$frmItem = new CFormTable(S_ITEM,"items.php#form");
 		$frmItem->SetHelp("web.items.item.php");
 
-		$frmItem->AddVar("hostid",$hostid);
 		if(isset($_REQUEST["itemid"]))
 			$frmItem->AddVar("itemid",$_REQUEST["itemid"]);
+		if(isset($_REQUEST["groupid"]))
+			$frmItem->AddVar("groupid",$_REQUEST["groupid"]);
 
 		$frmItem->AddRow(S_DESCRIPTION, new CTextBox("description",$description,40));
+
+		$frmItem->AddVar("hostid",$hostid);
 		$frmItem->AddRow(S_HOST, array(
 			new CTextBox("host",$host,30,NULL,'yes'),
 			new CButton("btn1","Select","return PopUp('popup.php?form=".$frmItem->GetName().
@@ -543,7 +542,7 @@
 
 		$frmItem->AddSpanRow($frmRow,"form_row_last");
 
-	        $cmbGroups = new CComboBox("groupid",$groupid,"submit()");		
+	        $cmbGroups = new CComboBox("add_groupid",$add_groupid,"submit()");		
 
 	        $groups=DBselect("select groupid,name from groups order by name");
 	        while($group=DBfetch($groups))
