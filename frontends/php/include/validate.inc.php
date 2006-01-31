@@ -63,6 +63,7 @@
 		if($expression[strlen($expression)-1]=='&')	$expression[strlen($expression)-1]=0;
 		$exec = "return ".$expression.";";
 //		info($exec);
+//		echo $exec,"<br>";
 		return eval($exec);
 	}
 
@@ -72,7 +73,7 @@
 		{
 			if(!isset($fields[$key]))
 			{
-				echo "Unset: $key<br>";
+////				echo "Unset: $key<br>";
 				unset($_REQUEST[$key]);
 			}
 		}
@@ -120,6 +121,8 @@
 		global	$_REQUEST;
 
 		$ret = TRUE;
+
+		return $ret;
 
 		$critical = FALSE;
 
