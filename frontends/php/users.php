@@ -96,9 +96,9 @@
 			}
 			if($result){
 				add_audit($action,AUDIT_RESOURCE_USER,
-					"User alias [".addslashes($_REQUEST["alias"]).
-					"] name [".addslashes($_REQUEST["name"])."] surname [".
-					addslashes($_REQUEST["surname"])."]]");
+					"User alias [".zbx_ads($_REQUEST["alias"]).
+					"] name [".zbx_ads($_REQUEST["name"])."] surname [".
+					zbx_ads($_REQUEST["surname"])."]]");
 				unset($_REQUEST["form"]);
 			}
 		}

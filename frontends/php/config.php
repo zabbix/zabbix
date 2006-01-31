@@ -105,7 +105,7 @@
 			if($result)
 			{
 				add_audit($action,AUDIT_RESOURCE_MEDIA_TYPE,
-					"Media type [".addslashes($_REQUEST["description"])."]");
+					"Media type [".zbx_ads($_REQUEST["description"])."]");
 
 				unset($_REQUEST["form"]);
 			}
@@ -190,7 +190,7 @@
 			if($result)
 			{
 				add_audit($audit_action, AUDIT_RESOURCE_AUTOREGISTRATION,
-					"Autoregistration [".addslashes($_REQUEST["pattern"])."]");
+					"Autoregistration [".zbx_ads($_REQUEST["pattern"])."]");
 
 				unset($_REQUEST["form"]);
 			}
@@ -202,7 +202,7 @@
 			if($result)
 			{
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_AUTOREGISTRATION,
-					"Autoregistration [".addslashes($_REQUEST["pattern"])."]");
+					"Autoregistration [".zbx_ads($_REQUEST["pattern"])."]");
 			}
 			show_messages($result, S_AUTOREGISTRATION_DELETED, S_AUTOREGISTRATION_WAS_NOT_DELETED);
 		}

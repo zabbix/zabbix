@@ -53,7 +53,7 @@
 			if($result)
 			{
 				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,
-					"Graph [".addslashes($_REQUEST["name"])."]");
+					"Graph [".zbx_ads($_REQUEST["name"])."]");
 			}
 			show_messages($result, S_GRAPH_ADDED, S_CANNOT_ADD_GRAPH);
 		}
@@ -70,7 +70,7 @@
 			{
 				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,
 					"Graph ID [".$_REQUEST["graphid"]."] Graph [".
-					addslashes($_REQUEST["name"])."]");
+					zbx_ads($_REQUEST["name"])."]");
 			}
 			show_messages($result, S_GRAPH_UPDATED, S_CANNOT_UPDATE_GRAPH);
 		}
@@ -82,7 +82,7 @@
 			if($result)
 			{
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,
-					"Graph [".addslashes($graph["name"])."]");
+					"Graph [".zbx_ads($graph["name"])."]");
 			}
 			show_messages($result, S_GRAPH_DELETED, S_CANNOT_DELETE_GRAPH);
 			unset($_REQUEST["graphid"]);
