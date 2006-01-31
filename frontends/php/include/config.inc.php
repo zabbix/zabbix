@@ -1071,7 +1071,7 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 				),
 		"configuration"=>array(
 				"label"=>S_CONFIGURATION,
-				"pages"=>array("config.php","users.php","audit.php","hosts.php","items.php","triggers.php","sysmaps.php","graphs.php","screenconf.php","services.php","sysmap.php","media.php","screenedit.php","graph.php","actionconf.php"),
+				"pages"=>array("config.php","users.php","audit.php","hosts.php","items.php","triggers.php","sysmaps.php","graphs.php","screenconf.php","services.php","sysmap.php","media.php","screenedit.php","graph.php","actionconf.php","bulkloader.php"),
 				"level2"=>array(
 					array("label"=>S_GENERAL,"url"=>"config.php"),
 					array("label"=>S_USERS,"url"=>"users.php"),
