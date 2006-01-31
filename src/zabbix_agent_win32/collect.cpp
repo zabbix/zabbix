@@ -182,7 +182,6 @@ LOG_DEBUG_INFO("s",counterPath);
       DWORD dwTicksStart,dwTicksElapsed;
 
 INIT_CHECK_MEMORY(do);
-LOG_DEBUG_INFO("s", "CollectorThread: loop 1");
 
       dwTicksStart=GetTickCount();
       if ((status=PdhCollectQueryData(query))!=ERROR_SUCCESS)

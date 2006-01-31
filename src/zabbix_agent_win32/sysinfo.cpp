@@ -507,9 +507,9 @@ static LONG H_MD5Hash(char *cmd,char *arg,char **value)
 static LONG H_CRC32(char *cmd,char *arg,double *value)
 {
    char fileName[MAX_PATH];
-   HANDLE hFile,hFileMapping;
+   HANDLE hFile = NULL, hFileMapping = NULL;
    DWORD dwSize,dwSizeHigh,crc;
-   unsigned char *data;
+   unsigned char *data = NULL;
 
 INIT_CHECK_MEMORY(main);
 
@@ -544,8 +544,6 @@ INIT_CHECK_MEMORY(main);
                   fileName,GetSystemErrorText(GetLastError()));
          CloseHandle(hFileMapping);
          CloseHandle(hFile);
-
-CHECK_MEMORY(main, "H_FileSize","data==NULL");
 
          return SYSINFO_RC_ERROR;
       }
