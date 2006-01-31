@@ -147,6 +147,16 @@
 	$result=DBselect("select shostid1,shostid2,triggerid,color_off,drawtype_off,color_on,drawtype_on from sysmaps_links where sysmapid=".$_REQUEST["sysmapid"]);
 	while($row=DBfetch($result))
 	{
+		/* skeep connections for deleted hosts */
+		$db_hosts = DBselect("select h.hostid".
+			" from sysmaps_hosts sh,hosts h".
+			" where sh.sysmapid=".$_REQUEST["sysmapid"].
+			" and h.hostid=sh.hostid".
+			" and h.status not in (".HOST_STATUS_DELETED.")".
+			" and (sh.shostid=".$row["shostid1"]." or sh.shostid=".$row["shostid2"].")");
+		if(DBnum_rows($db_hosts) < 2) continue;
+
+
 		$shostid1=$row["shostid1"];
 		$shostid2=$row["shostid2"];
 		$triggerid=$row["triggerid"];
@@ -235,7 +245,11 @@
 # Draw hosts
 
 	$icons=array();
-	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status,sh.icon,sh.icon_on,h.ip from sysmaps_hosts sh,hosts h where sh.sysmapid=".$_REQUEST["sysmapid"]." and h.hostid=sh.hostid");
+	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,".
+		"h.status,sh.icon,sh.icon_on,h.ip from sysmaps_hosts sh,hosts h".
+		" where sh.sysmapid=".$_REQUEST["sysmapid"]." and h.hostid=sh.hostid".
+		" and h.status<>".HOST_STATUS_DELETED);
+
 	while($row=DBfetch($result))
 	{
 		$host=$row["host"];
