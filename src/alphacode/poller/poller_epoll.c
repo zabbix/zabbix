@@ -3,7 +3,7 @@
 #include <fcntl.h> 
 #include <sys/types.h> 
 #include <sys/socket.h> 
-#include <sys/poll.h> 
+#include <sys/epoll.h> 
 #include <netdb.h> 
 #include <errno.h> 
 
@@ -26,7 +26,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#define NUM	256
+#define NUM	1
 
 #define ZBXPOOL struct zbxpool_type
 
@@ -42,7 +42,9 @@ ZBXPOOL	pool[NUM];
 
 int	s;
 
-struct pollfd poll_cli[NUM];
+int 	epfd;
+struct epoll_event ev; 
+struct epoll_event *events; 
 
 void	init_pool()
 {
@@ -75,78 +77,17 @@ void	wait_connect()
 //		}
 //		printf("-----------------------\n");
 		if(NUM-READ<=0) break;
-		retval = poll(poll_cli,NUM-READ,-1);
-
-		if(retval == 0)
-		{
-			printf("Poll timed out\n");
-			exit(-1);
-		}
+		retval = epoll_wait(epfd, events, NUM, 0);
 		if(retval == -1)
 		{
-			perror("Poll\n");
+			perror("epoll_wait");
+			printf("Retval [%d]\n", errno);
 			exit(-1);
 		}
 
-		for(i=0;i<NUM-READ;i++)
+		for(i=0;i<retval;i++)
 		{
-//			printf("[%d] remote socket [%X]\n",i,poll_cli[i].revents);
-			if ((poll_cli[i].revents&POLLHUP)==POLLHUP)
-			{
-				printf("[%d] remote socket has closed\n",i);
-				return;
-			} 
-			if ((poll_cli[i].revents&POLLNVAL)==POLLNVAL)
-			{
-				memmove(&poll_cli[i], &poll_cli[i+1],(NUM-READ-i-1)*sizeof(struct pollfd));
-				READ++;
-//				for(j=i;j<NUM-READ;j++)
-//				{
-//					memmove(&poll_cli[j], &poll_cli[j+1],sizeof(struct pollfd));
-//					poll_cli[j].fd=poll_cli[j+1].fd;
-//					poll_cli[j].events=poll_cli[j+1].events;
-//					poll_cli[j].revents=poll_cli[j+1].revents;
-//				}
-				break;
-			} 
-			if ((poll_cli[i].revents&POLLERR)==POLLERR)
-			{
-				printf("[%d] remote socket has error\n",i);
-				return;
-			} 
-			if ((poll_cli[i].revents&POLLIN)==POLLIN)
-			{
-				printf("[%d] remote socket has data\n",i);
-				memset(c,0,1024);
-				len=read(poll_cli[i].fd, c, 1024);
-				printf("RESULT_STR [%d] [%s]\n", len, c);
-				if(len == -1)
-				{
-					perror("read");
-					exit(-1);
-				}
-			
-				if(len == 0)
-				{
-					printf("Read 0 bytes\n");
-					exit(-1);
-				}
-				close(poll_cli[i].fd);
-				poll_cli[i].events=-1;
-				break;
-			}
-			if ((poll_cli[i].revents&POLLOUT)==POLLOUT)
-			{
-				printf("[%d] remote socket ready for writing\n",i);
-				snprintf(c, 1024 - 1, "%s\n", "system.uptime\n");
-				if( write(poll_cli[i].fd,c,strlen(c)) == -1 )
-				{
-					perror("write");
-					exit(-1);
-				} 
-				poll_cli[i].events=POLLIN;
-				break;
-			} 
+			printf("[%d] fd [%X]\n",i,events[i].data.fd);
 		}
 	}
 }
@@ -163,8 +104,15 @@ int	main()
 
 	struct sockaddr_in servaddr_in;
 
-	struct linger ling;
 	int	retval;
+
+
+	epfd = epoll_create(NUM); 
+	if(!epfd)
+	{
+		perror("epoll_create\n");
+		exit(1);
+	} 
 
 	for(i=0;i<NUM;i++)
 	{
@@ -210,8 +158,14 @@ int	main()
 				exit(-1);
 			}
 		}
-		poll_cli[i].fd = s;
-		poll_cli[i].events = POLLOUT;
+
+		ev.events = EPOLLIN | EPOLLERR | EPOLLHUP | EPOLLOUT;
+		ev.data.fd = s;
+		if(epoll_ctl(epfd, EPOLL_CTL_ADD, s, &ev) < 0)
+		{
+			perror("epoll_ctl, adding listenfd\n");
+			exit(1);
+		} 
 	}
 
 	wait_connect();
