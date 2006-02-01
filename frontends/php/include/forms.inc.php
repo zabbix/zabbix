@@ -584,7 +584,7 @@
 		$frmLogin->SetHelp('web.index.login');
 		$frmLogin->AddRow('Login name', new CTextBox('name'));
 		$frmLogin->AddRow('Password', new CPassBox('password'));
-		$frmLogin->AddItemToBottomRow(new CButton('register','Enter'));
+		$frmLogin->AddItemToBottomRow(new CButton('enter','Enter'));
 		$frmLogin->Show();
 
 		SetFocus($frmLogin->GetName(),"name");

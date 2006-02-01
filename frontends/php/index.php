@@ -27,14 +27,16 @@
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-//	$fields=array(
-//		"password"=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,	NULL),
-//		"name"=>		array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL),
-//		"register"=>		array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL),
-//		"sessionid"=>		array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL),
-//		"reconnect"=>		array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
-//	);
-//	check_fields($fields);
+	$fields=array(
+		"name"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'isset({enter})'),
+		"password"=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({enter})'),
+		"sessionid"=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'isset({reconnect})'),
+		"reconnect"=>		array(T_ZBX_INT, O_OPT,	P_ACT, BETWEEN(0,65535),NULL),
+                "enter"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,    NULL,   NULL),
+                "form"=>		array(T_ZBX_STR, O_OPT, P_SYS,  NULL,   	NULL),
+                "form_refresh"=>	array(T_ZBX_INT, O_OPT, NULL,   NULL,   	NULL)
+	);
+	check_fields($fields);
 ?>
 <?php
 	if(isset($_REQUEST["password"]))
@@ -53,13 +55,13 @@
 	{
 		unset($name);
 	}
-	if(isset($_REQUEST["register"]))
+	if(isset($_REQUEST["enter"]))
 	{
-		$register=$_REQUEST["register"];
+		$enter=$_REQUEST["enter"];
 	}
 	else
 	{
-		unset($register);
+		unset($enter);
 	}
 	if(isset($_REQUEST["reconnect"]))
 	{
@@ -87,7 +89,7 @@
 		unset($sessionid);
 	}
 
-	if(isset($register)&&($register=="Enter"))
+	if(isset($enter)&&($enter=="Enter"))
 	{
 		$password=md5($password);
 		$sql="select u.userid,u.alias,u.name,u.surname,u.url,u.refresh from users u where u.alias='$name' and u.passwd='$password'";
