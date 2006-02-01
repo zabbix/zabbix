@@ -46,13 +46,15 @@
 <?php
 	$fields=array(
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL),
+
 		"config"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,3,4,5"),	NULL),
 
 		"alert_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),'in_array({config},array(0,5))&&({save}=="Save")'),
 		"alarm_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),'in_array({config},array(0,5))&&({save}=="Save")'),
 		"refresh_unsupported"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),'in_array({config},array(0,5))&&({save}=="Save")'),
 
-		"mediatypeid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),'({config}==1)&&isset({form})'),
+		"mediatypeid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),'{config}==1&&{form}=="update"'),
 		"type"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	'({config}==1)&&(isset({save}))'),
 		"description"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&(isset({save}))'),
 		"smtp_server"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==0)'),
@@ -79,6 +81,7 @@
 	check_fields($fields);
 
 /* MEDIATYPE ACTIONS */
+	$result = 0;
 	if($_REQUEST["config"]==1){
 		if(isset($_REQUEST["save"]))
 		{
@@ -282,7 +285,7 @@
 				"mt.smtp_helo,mt.smtp_email,mt.exec_path from media_type mt order by mt.type");
 			while($row=DBfetch($result))
 			{
-				$description=new CLink($row["description"],"config.php?&form=0".
+				$description=new CLink($row["description"],"config.php?&form=update".
 					url_param("config")."&mediatypeid=".$row["mediatypeid"]);
 
 				if($row["type"]==0)		$type=S_EMAIL;
@@ -384,7 +387,7 @@
 				else if($row["imagetype"]==2)	$imagetype=S_BACKGROUND;
 				else				$imagetype=S_UNKNOWN;
 
-				$name=new CLink($row["name"],"config.php?form=0".url_param("config").
+				$name=new CLink($row["name"],"config.php?form=update".url_param("config").
 					"&imageid=".$row["imageid"]);
 
 				$table->addRow(array(
@@ -425,7 +428,7 @@
 					$name=$host["host"];
 				}
 				$pattern=new CLink($row["pattern"],
-					"config.php?form=0".url_param("config")."&autoregid=".$row["id"]);
+					"config.php?form=update".url_param("config")."&autoregid=".$row["id"]);
 
 				$table->addRow(array(
 					$row["id"],

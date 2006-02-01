@@ -351,14 +351,14 @@
 
 				$input= array(
 					new CCheckBox($row["itemid"]),
-					new CLink($row["itemid"],"items.php?form=0&itemid=".
+					new CLink($row["itemid"],"items.php?form=update&itemid=".
 						$row["itemid"].	url_param("hostid").url_param("groupid"))
 					);
 
-				$key = new CLink($row["key_"],"items.php?form=0&itemid=".
+				$key = new CLink($row["key_"],"items.php?form=update&itemid=".
 					$row["itemid"].	url_param("hostid").url_param("groupid"));
 
-				$description = new CLink($row["description"],"items.php?form=0&itemid=".
+				$description = new CLink($row["description"],"items.php?form=update&itemid=".
 					$row["itemid"].url_param("hostid").url_param("groupid"));
 
 				switch($row["type"]){

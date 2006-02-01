@@ -196,7 +196,8 @@
 	if($_REQUEST["config"]==1&&isset($_REQUEST["save"]))
 	{
 		$hosts = get_request("hosts",array());
-		if(isset($_REQUEST["groupid"])){
+		if(isset($_REQUEST["groupid"]))
+		{
 			$result = update_host_group($_REQUEST["groupid"], $_REQUEST["name"], $hosts);
 			$msg_ok		= S_GROUP_UPDATED;
 			$msg_fail	= S_CANNOT_UPDATE_GROUP;
@@ -443,7 +444,7 @@
 					get_template_permission_str($row["items"]),
 					get_template_permission_str($row["triggers"]),
 					get_template_permission_str($row["graphs"]),
-					new CLink(S_CHANGE, "hosts.php?form=0".url_param("config").
+					new CLink(S_CHANGE, "hosts.php?form=update".url_param("config").
 						"&hostid=".$row["hostid"].
 						"&hosttemplateid=".$row["hosttemplateid"])
 					));
@@ -496,7 +497,7 @@
 						new CCheckBox($db_group["groupid"]),
 						new CLink(
 							$db_group["name"],
-							"hosts.php?form=0&groupid=".$db_group["groupid"].
+							"hosts.php?form=update&groupid=".$db_group["groupid"].
 							url_param("config"))
 					),
 					$hosts
@@ -580,7 +581,7 @@
 
 				$host=new CCol(array(
 					new CCheckBox($row["hostid"]),
-					new CLink($row["host"],"hosts.php?register=change&form=0&hostid=".
+					new CLink($row["host"],"hosts.php?register=change&form=update&hostid=".
 						$row["hostid"].url_param("groupid").url_param("config"))
 					));
 		

@@ -53,7 +53,8 @@
 		else
 			$id = $_REQUEST['usrgrpid'];
 
-		if(isset($_REQUEST["actionid"])){
+		if(isset($_REQUEST["actionid"]))
+		{
 			$actionid=$_REQUEST["actionid"];
 			$result = update_action($actionid, $id, $_REQUEST["delay"], $_REQUEST["subject"],
 				$_REQUEST["message"],$_REQUEST["recipient"],$_REQUEST["maxrepeats"],
@@ -205,7 +206,7 @@
 				htmlspecialchars($row["delay"]),
 				htmlspecialchars($row["subject"]),
 				$row["maxrepeats"] == 0 ? S_NO_REPEATS : $row["maxrepeats"],
-				new CLink(S_CHANGE,"actionconf.php?form=0&actionid=".$row['actionid'])
+				new CLink(S_CHANGE,"actionconf.php?form=update&actionid=".$row['actionid'])
 				));	
 		}
 		$tblActions->Show();
