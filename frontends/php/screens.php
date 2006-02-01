@@ -136,7 +136,8 @@
 		}
 
 		$table = new CTable(
-			new CLink("No rows in screen ".$row["name"],"screenconf.php?form=0&screenid=".$screenid),
+			new CLink("No rows in screen ".$row["name"],"screenconf.php?".
+				"form=update&screenid=".$screenid),
 			"screen_view");
 	
 		for($r=0;$r<$row["rows"];$r++)

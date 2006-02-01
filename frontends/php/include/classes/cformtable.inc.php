@@ -41,7 +41,8 @@
 
 			$this->AddItemToTopRow("<a name=\"form\"></a>");
 			
-			$this->AddVar("form","1");
+			$this->AddVar("form",get_request("form",1));
+			$this->AddVar("form_refresh",get_request("form_refresh",0)+1);
 
 			$this->bottom_items = new CCol(NULL,'form_row_last');
 		        $this->bottom_items->SetColSpan(2);

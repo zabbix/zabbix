@@ -271,7 +271,8 @@
 			}
 	
 			$description = array(new CLink(expand_trigger_description($row["triggerid"]),
-				"triggers.php?form=0&triggerid=".$row["triggerid"]."&hostid=".$row["hostid"]));
+				"triggers.php?form=update&triggerid=".$row["triggerid"].
+					"&hostid=".$row["hostid"]));
 
 			$id= array(new CCheckBox($row["triggerid"]), $row["triggerid"]);
 

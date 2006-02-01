@@ -125,7 +125,7 @@
 				$row["period"],
 				$status,
 				new CLink(S_CHANGE,
-					"media.php?form=0&mediaid=".$row["mediaid"].
+					"media.php?form=update&mediaid=".$row["mediaid"].
 						"&userid=".$_REQUEST["userid"]
 					)
 				));

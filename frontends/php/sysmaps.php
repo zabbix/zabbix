@@ -87,7 +87,8 @@
 	
 			$table->addRow(array(
 				$row["sysmapid"],
-				new CLink($row["name"], "sysmaps.php?form=0&sysmapid=".$row["sysmapid"]."#form"),
+				new CLink($row["name"], "sysmaps.php?form=update".
+					"&sysmapid=".$row["sysmapid"]."#form"),
 				$row["width"],
 				$row["height"],
 				new CLink(S_SHOW,"sysmap.php?sysmapid=".$row["sysmapid"])
