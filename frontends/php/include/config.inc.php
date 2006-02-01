@@ -28,6 +28,14 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 	$INFO_MSG	="";
 // END OF GLOBALS
 
+// if magic quotes on then get rid of them
+	if (get_magic_quotes_gpc()) {
+		$_GET    = array_map('stripslashes', $_GET);
+		$_POST  = array_map('stripslashes', $_POST);
+		$_COOKIE = array_map('stripslashes', $_COOKIE);
+		$_REQUEST = array_map('stripslashes', $_REQUEST);
+	}
+
 	include_once 	"include/defines.inc.php";
 	include_once 	"include/db.inc.php";
 	include_once 	"include/html.inc.php";
@@ -1806,8 +1814,7 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 	{
 		$ret = 0;
 
-		$description=zbx_ads($description);
-		$sql="select * from media_type where description='$description' and mediatypeid!=$mediatypeid";
+		$sql="select * from media_type where description='".zbx_ads($description)."' and mediatypeid!=".zbx_ads($mediatypeid);
 		$result=DBexecute($sql);
 		if(DBnum_rows($result)>0)
 		{
@@ -1815,7 +1822,7 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		}
 		else
 		{
-			$sql="update media_type set type=$type,description='$description',smtp_server='$smtp_server',smtp_helo='$smtp_helo',smtp_email='$smtp_email',exec_path='$exec_path' where mediatypeid=$mediatypeid";
+			$sql="update media_type set type=".zbx_ads($type).",description='".zbx_ads($description)."',smtp_server='".zbx_ads($smtp_server)."',smtp_helo='".zbx_ads($smtp_helo)."',smtp_email='".zbx_ads($smtp_email)."',exec_path='".zbx_ads($exec_path)."' where mediatypeid=".zbx_ads($mediatypeid);
 			$ret =	DBexecute($sql);
 		}
 		return $ret;
