@@ -46,14 +46,15 @@
 <?php
 	$fields=array(
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL),
 
 		"config"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,3,4,5"),	NULL),
 
+// other form
 		"alert_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),'in_array({config},array(0,5))&&({save}=="Save")'),
 		"alarm_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),'in_array({config},array(0,5))&&({save}=="Save")'),
 		"refresh_unsupported"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),'in_array({config},array(0,5))&&({save}=="Save")'),
 
+// media form
 		"mediatypeid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),'{config}==1&&{form}=="update"'),
 		"type"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	'({config}==1)&&(isset({save}))'),
 		"description"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&(isset({save}))'),
@@ -61,15 +62,24 @@
 		"smtp_helo"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==0)'),
 		"smtp_email"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==0)'),
 		"exec_path"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==1)&&isset({save})'),
-//		"exec_path"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==1)'),
 
-		"imageid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535),'{config}==3&&isset({form})'),
-		"autoregid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),'{config}==4&&isset({form})'),
+// image form
+		"imageid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),'{config}==3&&{form}=="update"'),
+		"MAX_FILE_SIZE"=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,2097152),'{config}==3&&isset({save})'),
+		"name"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'{config}==3&&isset({save})'),
+		"imagetype"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("1,2"),	'({config}==3)&&(isset({save}))'),
+
+// autoregistration form
+		"autoregid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),'{config}==4&&{form}=="update"'),
+		"pattern"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'{config}==4&&isset({save})'),
+		"hostid"=>		array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(1,65535),'{config}==4&&isset({save})'),
+		"priority"=>		array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535),'{config}==4&&isset({save})'),
 
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL)
+		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 ?>
 
@@ -162,6 +172,7 @@
 			if($result)
 			{
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Image deleted");
+				unset($_REQUEST["form"]);
 			}
 			unset($_REQUEST["imageid"]);
 		}
@@ -206,6 +217,7 @@
 			{
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_AUTOREGISTRATION,
 					"Autoregistration [".zbx_ads($_REQUEST["pattern"])."]");
+				unset($_REQUEST["form"]);
 			}
 			show_messages($result, S_AUTOREGISTRATION_DELETED, S_AUTOREGISTRATION_WAS_NOT_DELETED);
 		}
