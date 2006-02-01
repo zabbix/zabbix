@@ -52,12 +52,12 @@
 		"alarm_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),'in_array({config},array(0,5))&&({save}=="Save")'),
 		"refresh_unsupported"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),'in_array({config},array(0,5))&&({save}=="Save")'),
 
-		"mediatypeid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),'({config}==1)&&(isset({form}))'),
-		"type"=>		array(T_ZBX_INT, O_NO,	NULL,	IN("0,1"),	'({config}==1)&&(isset({save}))'),
-		"description"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'({config}==1)&&(isset({save}))'),
-		"smtp_server"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==0)'),
-		"smtp_helo"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==0)'),
-		"smtp_email"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==0)'),
+		"mediatypeid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),'({config}==1)&&isset({form})'),
+		"type"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	'({config}==1)&&(isset({save}))'),
+		"description"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&(isset({save}))'),
+		"smtp_server"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==0)'),
+		"smtp_helo"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==0)'),
+		"smtp_email"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==0)'),
 		"exec_path"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==1)&&isset({save})'),
 //		"exec_path"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==1)'),
 

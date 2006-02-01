@@ -19,10 +19,9 @@
 **/
 ?>
 <?php
-	function	zbx_adds($var)
+	function	zbx_ads($var)
 	{
-		if(!get_magic_quotes_gpc()) return addslashes($var);
-		else return $var;
+		return addslashes($var);
 	}
 
 	function	BETWEEN($min,$max)
@@ -119,8 +118,8 @@
 	{
 		foreach($_REQUEST as $key => $val)
 		{
-//			info("Unset:".$_REQUEST[$key]);
-			echo "Unset:".$_REQUEST[$key]."<br>";
+//			info("Unset:".$key;
+			echo "Unset:".$key."<br>";
 			unset($_REQUEST[$key]);
 		}
 	}
