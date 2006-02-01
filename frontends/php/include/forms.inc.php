@@ -910,22 +910,27 @@
 		if(isset($_REQUEST["autoregid"]))
 		{
 			$frmAutoReg->AddVar("autoregid",$_REQUEST["autoregid"]);
-			$result=DBselect("select * from autoreg  where id=".$_REQUEST["autoregid"]);
+			$result	= DBselect("select * from autoreg  where id=".$_REQUEST["autoregid"]);
 
-			$row=DBfetch($result);
-	
-			$pattern=$row["pattern"];
-			$priority=$row["priority"];
-			$hostid=$row["hostid"];
-			$h=get_host_by_hostid($hostid);
-			$host=$h["host"];
+			$row	= DBfetch($result);
+			$pattern= $row["pattern"];
+
+			$frmAutoReg->SetTitle(S_AUTOREGISTRATION." \"".$pattern."\"");
+		}
+		
+		if(isset($_REQUEST["autoregid"]) && !isset($_REQUEST["form_refresh"]))
+		{
+			$priority	= $row["priority"];
+			$hostid		= $row["hostid"];
+			$h		= get_host_by_hostid($hostid);
+			$host		= $h["host"];
 		}
 		else
 		{
-			$pattern="*";
-			$priority=10;
-			$hostid=0;
-			$host="";
+			$pattern	= get_request("pattern", "*");
+			$priority	= get_request("priority", 10);
+			$hostid		= get_request("hostid", 0);
+			$host		= get_request("host", "");
 		}
 
 		$col=0;
@@ -948,7 +953,8 @@
 			$frmAutoReg->AddItemToBottomRow(SPACE);
 			$frmAutoReg->AddItemToBottomRow(new CButtonDelete(
 				"Delete selected autoregistration rule?",
-				url_param("form").url_param("config").url_param("autoregid")));
+				url_param("form").url_param("config").url_param("autoregid").
+				"&pattern=".$pattern));
 		}
 		$frmAutoReg->AddItemToBottomRow(SPACE);
 		$frmAutoReg->AddItemToBottomRow(new CButtonCancel(url_param("config")));
@@ -1310,28 +1316,33 @@
 
 	function	insert_image_form()
 	{
-		if(!isset($_REQUEST["imageid"]))
-		{
-			$name="";
-			$imagetype=1;
-		}
-		else
-		{
-			$result=DBselect("select imageid,imagetype,name,image from images where imageid=".$_REQUEST["imageid"]);
-			$row=DBfetch($result);
-			$name=$row["name"];
-			$imagetype=$row["imagetype"];
-			$imageid=$row["imageid"];
-		}
-
 		$frmImages = new CFormTable(S_IMAGE,"config.php","post","multipart/form-data");
 		$frmImages->SetHelp("web.config.images.php");
 		$frmImages->AddVar("MAX_FILE_SIZE",(1024*1024));	
-		$frmImages->AddVar("config",3);	
-		if(isset($imageid))
+		$frmImages->AddVar("config",get_request("config",3));
+
+		if(isset($_REQUEST["imageid"]))
 		{
-			$frmImages->AddVar("imageid",$imageid);	
+			$result=DBselect("select imageid,imagetype,name,image from images".
+				" where imageid=".$_REQUEST["imageid"]);
+
+			$row=DBfetch($result);
+			$frmImages->SetTitle(S_IMAGE." \"".$row["name"]."\"");
+			$frmImages->AddVar("imageid",$_REQUEST["imageid"]);
 		}
+
+		if(isset($_REQUEST["imageid"]) && !isset($_REQUEST["form_refresh"]))
+		{
+			$name		= $row["name"];
+			$imagetype	= $row["imagetype"];
+			$imageid	= $row["imageid"];
+		}
+		else
+		{
+			$name		= get_request("name","");
+			$imagetype	= get_request("imagetype",1);
+		}
+
 		$frmImages->AddRow(S_NAME,new CTextBox("name",$name,64));
 	
 		$cmbImg = new CComboBox("imagetype",$imagetype);
