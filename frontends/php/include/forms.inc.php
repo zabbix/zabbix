@@ -32,7 +32,7 @@
 		$frmTemplate->SetHelp('web.hosts.php');
 		$frmTemplate->AddVar('config',$_REQUEST["config"]);
 
-		if(isset($_REQUEST["hosttemplateid"])&&$_REQUEST["form"]!=1)
+		if(isset($_REQUEST["hosttemplateid"]) && !isset($_REQUEST["form_refresh"]))
 		{
 			$frmTemplate->AddVar('hosttemplateid',$_REQUEST["hosttemplateid"]);
 
@@ -94,7 +94,8 @@
 			$frmTemplate->AddItemToBottomRow(new CButton('register','update linkage'));
 			$frmTemplate->AddItemToBottomRow(SPACE);
 			$frmTemplate->AddItemToBottomRow(new CButtonDelete('Delete selected linkage?',
-				url_param("config").url_param("hostid").url_param("hosttemplateid")));
+				url_param("form").url_param("config").url_param("hostid").
+				url_param("hosttemplateid")));
 		}
 		$frmTemplate->AddItemToBottomRow(SPACE);
 		$frmTemplate->AddItemToBottomRow(new CButtonCancel(url_param("config").url_param("hostid")));
@@ -106,12 +107,12 @@
 	function	insert_user_form($userid,$profile=0)
 	{
 		$frm_title = S_USER;
-		if(isset($userid)&&$_REQUEST["form"]!=1)
+		if(isset($userid))
 		{
 			$user=get_user_by_userid($userid);
 			$frm_title = S_USER." \"".$user["alias"]."\"";
 		}
-		if(isset($userid)&&$_REQUEST["form"]!=1)
+		if(isset($userid) && !isset($_REQUEST["form_refresh"]))
 		{
 			$alias		= $user["alias"];
 			$name		= $user["name"];
@@ -176,8 +177,8 @@
 		if(isset($userid))
 		{
 			$frmUser->AddItemToBottomRow(SPACE);
-			$frmUser->AddItemToBottomRow(new CButtonDelete(
-				"Delete selected user?",url_param("config").url_param("userid")));
+			$frmUser->AddItemToBottomRow(new CButtonDelete("Delete selected user?",
+				url_param("form").url_param("config").url_param("userid")));
 		}
 		$frmUser->AddItemToBottomRow(SPACE);
 		$frmUser->AddItemToBottomRow(new CButtonCancel(url_param("config")));
@@ -233,7 +234,7 @@
 			$frm_title = S_USER_GROUP." \"".$usrgrp["name"]."\"";
 		}
 
-		if(isset($usrgrpid)&&$_REQUEST["form"]!=1)
+		if(isset($usrgrpid) && !isset($_REQUEST["form_refresh"]))
 		{
 			$name	= $usrgrp["name"];
 			$db_users=DBselect("select distinct u.userid from users u,users_groups ug ".
@@ -275,8 +276,8 @@
 		if(isset($_REQUEST["usrgrpid"]))
 		{
 			$frmUserG->AddItemToBottomRow(SPACE);
-			$frmUserG->AddItemToBottomRow(new CButtonDelete(
-				"Delete selected group?",url_param("config").url_param("usrgrpid")));
+			$frmUserG->AddItemToBottomRow(new CButtonDelete("Delete selected group?",
+				url_param("form").url_param("config").url_param("usrgrpid")));
 		}
 		$frmUserG->AddItemToBottomRow(SPACE);
 		$frmUserG->AddItemToBottomRow(new CButtonCancel(url_param("config")));
@@ -324,7 +325,7 @@
 			$host = $host_info["host"];
 		}
 
-		if(isset($_REQUEST["itemid"])&&($_REQUEST["form"] != 1))
+		if(isset($_REQUEST["itemid"]) && !isset($_REQUEST["form_refresh"]))
 		{
 			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay,".
 				" i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,".
@@ -533,7 +534,8 @@
 				new CButton("register","update"),
 				SPACE,
 				new CButtonDelete("Delete selected item?",
-					url_param("groupid").url_param("hostid").url_param("itemid"))
+					url_param("form").url_param("groupid").url_param("hostid").
+					url_param("itemid"))
 			);
 		}
 		array_push($frmRow,
@@ -650,7 +652,7 @@
 			$dependences[$_REQUEST["dependence$i"]] = 1;
 		}
 
-		if(isset($triggerid) && $_REQUEST["form"]!=1)
+		if(isset($triggerid) && !isset($_REQUEST["form_refresh"]))
 		{
 			$trigger=get_trigger_by_triggerid($triggerid);
 	
@@ -732,7 +734,8 @@
 		{
 			$frmTrig->AddItemToBottomRow(SPACE);
 			$frmTrig->AddItemToBottomRow(new CButtonDelete("Delete trigger?",
-				url_param("groupid").url_param("hostid").url_param("triggerid")));
+				url_param("form").url_param("groupid").url_param("hostid").
+				url_param("triggerid")));
 		}
 		$frmTrig->AddItemToBottomRow(SPACE);
 		$frmTrig->AddItemToBottomRow(new CButtonCancel(url_param("groupid").url_param("hostid")));
@@ -800,7 +803,7 @@
 		 $frmGraph->Show();
 
 	}
-
+/*
 	# Insert escalation form
 	function	insert_escalation_form($escalationid)
 	{
@@ -896,7 +899,7 @@
 		}
 		$frmEacalRul->Show();
 	}
-
+*/
 	# Insert autoregistration form
 	function	insert_autoregistration_form()
 	{
@@ -944,7 +947,8 @@
 		{
 			$frmAutoReg->AddItemToBottomRow(SPACE);
 			$frmAutoReg->AddItemToBottomRow(new CButtonDelete(
-				"Delete selected autoregistration rule?",url_param("config").url_param("autoregid")));
+				"Delete selected autoregistration rule?",
+				url_param("form").url_param("config").url_param("autoregid")));
 		}
 		$frmAutoReg->AddItemToBottomRow(SPACE);
 		$frmAutoReg->AddItemToBottomRow(new CButtonCancel(url_param("config")));
@@ -968,7 +972,7 @@
 			$frmAction->AddVar('actionid',$_REQUEST["actionid"]);
 		}
 	
-		if(isset($_REQUEST["actionid"])&&$_REQUEST["form"]!=1)
+		if(isset($_REQUEST["actionid"]) && !isset($_REQUEST["form_refresh"]))
 		{
 			$actiontype	= $action["actiontype"];
 			$source		= $action["source"];
@@ -1229,7 +1233,8 @@
 		{
 			$frmAction->AddItemToBottomRow(SPACE);
 			$frmAction->AddItemToBottomRow(new CButtonDelete("Delete selected action?",
-				url_param("actiontype").url_param("actionid")."&subject=".$subject));
+				url_param("form").url_param("actiontype").url_param("actionid").
+				"&subject=".$subject));
 				
 		} else {
 		}
@@ -1241,14 +1246,14 @@
 
 	function	insert_media_type_form()
 	{
-		$type=@iif(isset($_REQUEST["type"]),$_REQUEST["type"],0);
-		$description=@iif(isset($_REQUEST["description"]),$_REQUEST["description"],"");
-		$smtp_server=@iif(isset($_REQUEST["smtp_server"]),$_REQUEST["smtp_server"],"localhost");
-		$smtp_helo=@iif(isset($_REQUEST["smtp_helo"]),$_REQUEST["smtp_helo"],"localhost");
-		$smtp_email=@iif(isset($_REQUEST["smtp_email"]),$_REQUEST["smtp_email"],"zabbix@localhost");
-		$exec_path=@iif(isset($_REQUEST["exec_path"]),$_REQUEST["exec_path"],"");
+		$type		= get_request("type",0);
+		$description	= get_request("description","");
+		$smtp_server	= get_request("smtp_server","localhost");
+		$smtp_helo	= get_request("smtp_helo","localhost");
+		$smtp_email	= get_request("smtp_email","zabbix@localhost");
+		$exec_path	= get_request("exec_path","");
 
-		if(isset($_REQUEST["mediatypeid"])&&$_REQUEST["form"]!=1)
+		if(isset($_REQUEST["mediatypeid"]) && !isset($_REQUEST["form_refresh"]))
 		{
 			$result=DBselect("select mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path from media_type where mediatypeid=".$_REQUEST["mediatypeid"]);
 			$row=DBfetch($result);
@@ -1296,7 +1301,7 @@
 		{
 			$frmMeadia->AddItemToBottomRow(SPACE);
 			$frmMeadia->AddItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_MEDIA,
-				url_param("config").url_param("mediatypeid")));
+				url_param("form").url_param("config").url_param("mediatypeid")));
 		}
 		$frmMeadia->AddItemToBottomRow(SPACE);
 		$frmMeadia->AddItemToBottomRow(new CButtonCancel(url_param("config")));
@@ -1340,7 +1345,7 @@
 		{
 			$frmImages->AddItemToBottomRow(SPACE);
 			$frmImages->AddItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_IMAGE,
-				url_param("config").url_param("imageid")));
+				url_param("form").url_param("config").url_param("imageid")));
 		}
 		$frmImages->AddItemToBottomRow(SPACE);
 		$frmImages->AddItemToBottomRow(new CButtonCancel(url_param("config")));
@@ -1359,7 +1364,7 @@
 			$row=DBfetch($result);
 			$frm_title = S_SCREEN." \"".$row["name"]."\"";
 		}
-		if(isset($_REQUEST["screenid"])&&$_REQUEST["form"]!=1)
+		if(isset($_REQUEST["screenid"]) && !isset($_REQUEST["form_refresh"]))
 		{
 			$name=$row["name"];
 			$cols=$row["cols"];
@@ -1387,7 +1392,7 @@
 		{
 			$frmScr->AddItemToBottomRow(SPACE);
 			$frmScr->AddItemToBottomRow(new CButtonDelete(S_DELETE_SCREEN_Q,
-				url_param("screenid")));
+				url_param("form").url_param("screenid")));
 		}
 		$frmScr->AddItemToBottomRow(SPACE);
 		$frmScr->AddItemToBottomRow(new CButtonCancel());
@@ -1413,7 +1418,7 @@
 			$form->AddVar("y",$_REQUEST["y"]);
 		}
 
-		if(isset($_REQUEST["screenitemid"]) && $_REQUEST["form"]!=1)
+		if(isset($_REQUEST["screenitemid"]) && !isset($_REQUEST["form_refresh"]))
 		{
 			$irow = DBfetch($iresult);
 			$resource	= $irow["resource"];
@@ -1537,7 +1542,7 @@
 		{
 			$form->AddItemToBottomRow(SPACE);
 			$form->AddItemToBottomRow(new CButtonDelete(NULL,
-				url_param("screenid").url_param("screenitemid")));
+				url_param("form").url_param("screenid").url_param("screenitemid")));
 		}
 		$form->AddItemToBottomRow(SPACE);
 		$form->AddItemToBottomRow(new CButtonCancel(url_param("screenid")));
@@ -1548,7 +1553,7 @@
 	{
 		global $_REQUEST;
 
-		if(isset($_REQUEST["mediaid"]) && $_REQUEST["form"]!=1)
+		if(isset($_REQUEST["mediaid"]) && !isset($_REQUEST["form_refresh"]))
 		{
 			$media=get_media_by_mediaid($_REQUEST["mediaid"]);
 
@@ -1613,7 +1618,7 @@
 		{
 			$frmMedia->AddItemToBottomRow(SPACE);
 			$frmMedia->AddItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_MEDIA_Q,
-				url_param("userid").url_param("mediaid")));
+				url_param("form").url_param("userid").url_param("mediaid")));
 		}
 		$frmMedia->AddItemToBottomRow(SPACE);
 		$frmMedia->AddItemToBottomRow(new CButtonCancel(url_param("userid")));
@@ -1685,7 +1690,7 @@
 		} else 
 			$frm_title	= S_HOST;
 
-		if(isset($_REQUEST["hostid"]) && $_REQUEST["form"]!=1)
+		if(isset($_REQUEST["hostid"]) && !isset($_REQUEST["form_refresh"]))
 		{
 
 			$host	= $db_host["host"];
@@ -1805,7 +1810,7 @@
 			$frmHost->AddItemToBottomRow(SPACE);
 			$frmHost->AddItemToBottomRow(
 				new CButtonDelete(S_DELETE_SELECTED_HOST_Q,
-					url_param("config").url_param("hostid")
+					url_param("form").url_param("config").url_param("hostid")
 				)
 			);
 		}
@@ -1824,7 +1829,7 @@
 		{
 			$groupid=get_group_by_groupid($groupid);
 			$frm_title = S_HOST_GROUP." \"".$groupid["name"]."\"";
-			if($_REQUEST["form"]!=1)
+			if(!isset($_REQUEST["form_refresh"]))
 				$name=$groupid["name"];
 			else
 				$name = get_request("name","");
@@ -1868,7 +1873,7 @@
 			$frmHostG->AddItemToBottomRow(SPACE);
 			$frmHostG->AddItemToBottomRow(
 				new CButtonDelete("Delete selected group?",
-					url_param("config").url_param("groupid")
+					url_param("form").url_param("config").url_param("groupid")
 				)
 			);
 		}
@@ -1973,7 +1978,7 @@
 			$row=DBfetch($result);
 			$frm_title = "System map: \"".$row["name"]."\"";
 		}
-		if(isset($_REQUEST["sysmapid"]) && $_REQUEST["form"]!=1)
+		if(isset($_REQUEST["sysmapid"]) && !isset($_REQUEST["form_refresh"]))
 		{
 			$name		= $row["name"];
 			$width		= $row["width"];
@@ -2031,7 +2036,7 @@
 		{
 			$frmMap->AddItemToBottomRow(SPACE);
 			$frmMap->AddItemToBottomRow(new CButtonDelete("Delete system map?",
-					url_param("sysmapid")));
+					url_param("form").url_param("sysmapid")));
 		}
 		$frmMap->AddItemToBottomRow(SPACE);
 		$frmMap->AddItemToBottomRow(new CButtonCancel());

@@ -47,6 +47,8 @@
 	{
 		global $_REQUEST;
 
+//		echo $expression,"<br>";
+
 		if(strstr($expression,"{}"))
 		{
 			if(!isset($_REQUEST[$field]))	return FALSE;
@@ -57,7 +59,7 @@
 			// If an unset variable used in expression, return FALSE
 			if(strstr($expression,'{'.$f.'}')&&!isset($_REQUEST[$f]))
 			{
-//				info("Variable is not set. $expression is FALSE");
+//				info("Variable [$f] is not set. $expression is FALSE");
 				return FALSE;
 			}
 //			echo $f,":",$expression,"<br>";

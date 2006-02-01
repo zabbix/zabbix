@@ -106,7 +106,8 @@
 		}
 
 		$table = new CTable(
-			new CLink("No rows in screen ".$row["name"],"screenconf.php?form=0&screenid=".$screenid),
+			new CLink("No rows in screen ".$row["name"],"screenconf.php?".
+				"form=update&screenid=".$screenid),
 			"screen_edit");
 	
 		for($r=0;$r<$row["rows"];$r++)
@@ -161,7 +162,7 @@
 				$item = new CLink(
 					new CImg("chart2.php?graphid=$resourceid&width=$width&height=$height".
 						"&period=3600' border=0"),
-					"screenedit.php?form=0".url_param("screenid").
+					"screenedit.php?form=update".url_param("screenid").
 					"&screenitemid=$screenitemid#form"
 					);
 			}
@@ -171,7 +172,7 @@
 				$item = new CLink(
 					new CImg("chart.php?itemid=$resourceid&width=$width&height=$height".
                                         	"&period=3600"),
-					"screenedit.php?form=0".url_param("screenid").
+					"screenedit.php?form=update".url_param("screenid").
 					"&screenitemid=$screenitemid#form"
 					);
 			}
@@ -181,7 +182,7 @@
 				$item = new CLink(
 					new CImg("map.php?noedit=1&sysmapid=$resourceid".
 	                                        "&width=$width&height=$height&period=3600"),
-					"screenedit.php?form=0".url_param("screenid").
+					"screenedit.php?form=update".url_param("screenid").
 					"&screenitemid=$screenitemid#form"
 					);
 			}
@@ -189,7 +190,7 @@
 			{
 				$item = array(get_screen_plaintext($resourceid,$elements));
 				array_push($item, new CLink(S_CHANGE,
-					"screenedit.php?form=0".url_param("screenid").
+					"screenedit.php?form=update".url_param("screenid").
 					"&screenitemid=$screenitemid#form"
 					));
 			}
@@ -197,7 +198,7 @@
 			{
 				$item = new CLink(
 					S_EMPTY,
-					"screenedit.php?form=0".url_param("screenid")."&x=$c&y=$r#form"
+					"screenedit.php?form=update".url_param("screenid")."&x=$c&y=$r#form"
 					);
 			}
 			
