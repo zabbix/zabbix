@@ -79,6 +79,10 @@ LONG H_Execute(char *cmd,char *arg,char **value)
    // Read process output
    ReadFile(hOutput,*value,MAX_STRING_LEN-1,&dwBytes,NULL);
    (*value)[dwBytes]=0;
+
+   ptr1=strchr(*value,'\r');
+   if (ptr1!=NULL)
+      *ptr1=0;
    ptr1=strchr(*value,'\n');
    if (ptr1!=NULL)
       *ptr1=0;
