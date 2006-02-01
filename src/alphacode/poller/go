@@ -1,0 +1,1 @@
+gcc snmp.c -I/usr/include/net-snmp -lsnmp

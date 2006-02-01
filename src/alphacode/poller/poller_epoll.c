@@ -26,19 +26,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#define NUM	1
-
-#define ZBXPOOL struct zbxpool_type
-
-ZBXPOOL
-{
-	char    ip[128];
-	int     port;
-	int	socket;
-	int	status; // 0 - not connected, 1 - connected, 2 - wrote data
-};
-
-ZBXPOOL	pool[NUM];
+#define NUM	5
 
 int	s;
 
@@ -46,38 +34,20 @@ int 	epfd;
 struct epoll_event ev; 
 struct epoll_event *events; 
 
-void	init_pool()
-{
-	int i;
-
-	for(i=0;i<NUM;i++)
-	{
-		pool[i].status=0;
-	}
-}
-
 void	wait_connect()
 {
 	int len;
 	char c[1024];
 	int retval,i,j;
 
-	int READ=0;
-
 	printf("Waiting for connect\n");
-
 
 	for(;;)
 	{
-//		printf("To process [%d]\n", NUM-READ);
-//		printf("-----------------------\n");
-//		for(j=0;j<NUM-READ;j++)
-//		{
-//			printf("[%d] fd [%d] revents [%X]\n",j,poll_cli[j].fd,poll_cli[j].revents);
-//		}
-//		printf("-----------------------\n");
-		if(NUM-READ<=0) break;
-		retval = epoll_wait(epfd, events, NUM, 0);
+		
+		printf("epfd [%d]\n", epfd);
+		printf("NUM [%d]\n", NUM);
+		retval = epoll_wait(epfd, events, NUM, -1);
 		if(retval == -1)
 		{
 			perror("epoll_wait");
@@ -159,6 +129,12 @@ int	main()
 			}
 		}
 
+		if(fcntl(s, F_SETFL, O_NONBLOCK) == -1)
+		{
+			perror("fcntl() failed\n");
+			exit(-1);
+		}
+
 		ev.events = EPOLLIN | EPOLLERR | EPOLLHUP | EPOLLOUT;
 		ev.data.fd = s;
 		if(epoll_ctl(epfd, EPOLL_CTL_ADD, s, &ev) < 0)
@@ -166,6 +142,7 @@ int	main()
 			perror("epoll_ctl, adding listenfd\n");
 			exit(1);
 		} 
+		printf("epoll_ctl ok fd [%d]\n", s);
 	}
 
 	wait_connect();
