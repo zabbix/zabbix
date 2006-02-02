@@ -186,7 +186,7 @@
 
 		$col=0;
 		if(isset($_REQUEST["select"]))
-			$sql="select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier,i.key_ from items i,hosts h where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 and i.description like '%".$_REQUEST["select"]."%' order by i.description";
+			$sql="select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier,i.key_ from items i,hosts h where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 and i.description like '%".zbx_ads($_REQUEST["select"])."%' order by i.description";
 		else
 			$sql="select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier,i.key_ from items i,hosts h where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 and h.hostid=".$_REQUEST["hostid"]." order by i.description";
 		$result=DBselect($sql);
