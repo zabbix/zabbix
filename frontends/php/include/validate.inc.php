@@ -19,41 +19,37 @@
 **/
 ?>
 <?php
+	define('ZBX_VALID_OK',		0);
+	define('ZBX_VALID_ERROR',	1);
+	define('ZBX_VALID_WARNING',	2);
+
 	function	zbx_ads($var)
 	{
 		return addslashes($var);
 	}
 
-	function	BETWEEN($min,$max)
+	function	BETWEEN($min,$max,$var=NULL)
 	{
-		return "({}>=$min&&{}<=$max)&&";
+		return "({".$var."}>=".$min."&&{".$var."}<=".$max.")&&";
 	}
 
-	function	GT($value)
+	function	GT($value,$var='')
 	{
-		return "({}>=$value)&&";
+		return "({".$var."}>=".$value.")&&";
 	}
 
-	function	IN($array)
+	function	IN($array,$var='')
 	{
-		return "in_array({},array($array))&&";
+		return "in_array({".$var."},array(".$array."))&&";
 	}
 
 	define("NOT_EMPTY","({}!='')&&");
 	define("DB_ID","({}>=0&&{}<=4294967295)&&");
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-	function	calc_exp($fields,$field,$expression)
+
+	function	calc_exp2($fields,$field,$expression)
 	{
-		global $_REQUEST;
-
-//		echo $expression,"<br>";
-
-		if(strstr($expression,"{}"))
-		{
-			if(!isset($_REQUEST[$field]))	return FALSE;
-		}
-		$expression = str_replace("{}",'$_REQUEST["'.$field.'"]',$expression);
 		foreach($fields as $f => $checks)
 		{
 			// If an unset variable used in expression, return FALSE
@@ -68,10 +64,37 @@
 		$expression=rtrim($expression,"&");
 		if($expression[strlen($expression)-1]=='&')	$expression[strlen($expression)-1]=0;
 		if($expression[strlen($expression)-1]=='&')	$expression[strlen($expression)-1]=0;
-		$exec = "return ".$expression.";";
+		$exec = "return (".$expression.");";
+
 //		info($exec);
-//		echo $exec,"<br>";
+//		echo "$field - exec: ".$exec.BR.BR;
 		return eval($exec);
+	}
+
+	function	calc_exp($fields,$field,$expression)
+	{
+		global $_REQUEST;
+
+//		echo "$field - expression: ".$expression.BR;
+
+		if(strstr($expression,"{}") && !isset($_REQUEST[$field]))
+			return FALSE;
+
+		if(strstr($expression,"{}") && !is_array($_REQUEST[$field]))
+			$expression = str_replace("{}",'$_REQUEST["'.$field.'"]',$expression);
+
+		if(strstr($expression,"{}") && is_array($_REQUEST[$field]))
+		{
+			foreach($_REQUEST[$field] as $key => $val)
+			{
+				$expression = str_replace("{}",'$_REQUEST["'.$field.'"]['.$key.']',$expression);
+				if(calc_exp2($fields,$field,$expression)==FALSE)
+					return FALSE;
+			}	
+			return TRUE;
+		}
+		
+		return calc_exp2($fields,$field,$expression);
 	}
 
 	function	unset_not_in_list(&$fields)
@@ -126,143 +149,162 @@
 		}
 	}
 
-	function	check_fields(&$fields)
+	function 	check_type(&$field, $flags, &$var, $type)
 	{
-		global	$_REQUEST;
-
-		$ret = TRUE;
-
-		$critical = FALSE;
-
-		foreach($fields as $field => $checks)
+		if(is_array($var))
 		{
-			list($type,$opt,$flags,$validation,$exception)=$checks;
-
-//			echo "Field: $field<br>";
-
-			if($exception==NULL)	$except=FALSE;
-			else			$except=calc_exp($fields,$field,$exception);
-
-			if($opt == O_MAND &&	$except)	$opt = O_NO;
-			else if($opt == O_OPT && $except)	$opt = O_MAND;
-			else if($opt == O_NO && $except)	$opt = O_MAND;
-
-
-			if($opt == O_MAND)
+			$err = ZBX_VALID_OK;
+			foreach($var as $el)
 			{
-				if(!isset($_REQUEST[$field]))
-				{
-					$ret = FALSE;
-					if($flags&P_SYS)
-					{
-						info("Critical error. Field [".$field."] is mandatory");
-						unset_all();
-						$critical = TRUE;
-						break;
-					}
-					else
-					{
-						info("Warning. Field [".$field."] is mandatory");
-						continue;
-					}
-				}
+				$err |= check_type($field, $flags, $el, $type);
 			}
-
-			if($opt == O_NO)
+			return $err;
+		}
+ 
+		if(($type == T_ZBX_INT) && !is_numeric($var)) {
+			if($flags&P_SYS)
 			{
-				if(isset($_REQUEST[$field]))
-				{
-					$ret = FALSE;
-					if($flags&P_SYS)
-					{
-						info("Critical error. Field [".$field."] must be missing");
-						unset_all();
-						$critical = TRUE;
-						break;
-					}
-					else
-					{
-						info("Warning. Field [".$field."] must be missing");
-						continue;
-					}
-				}
-				else continue;
+				info("Critical error. Field [".$field."] is not integer");
+				return ZBX_VALID_ERROR;
 			}
-
-			if($opt == O_OPT)
+			else
 			{
-				if(!isset($_REQUEST[$field]))	continue;
+				info("Warning. Field [".$field."] is not integer");
+				return ZBX_VALID_WARNING;
 			}
+		}
 
+		if(($type == T_ZBX_DBL) && !is_numeric($var)) {
+			if($flags&P_SYS)
+			{
+				info("Critical error. Field [".$field."] is not double");
+				return ZBX_VALID_ERROR;
+			}
+			else
+			{
+				info("Warning. Field [".$field."] is not double");
+				return ZBX_VALID_WARNING;
+			}
+		}
 
-			if( ($type == T_ZBX_INT) && !is_numeric($_REQUEST[$field])) {
-				$ret = FALSE;
+		if(($type == T_ZBX_STR) && !is_string($var)) {
+			if($flags&P_SYS)
+			{
+				info("Critical error. Field [".$field."] is not string");
+				return ZBX_VALID_ERROR;
+			}
+			else
+			{
+				info("Warning. Field [".$field."] is not string");
+				return ZBX_VALID_WARNING;
+			}
+		}
+		return ZBX_VALID_OK;
+	}
+
+	function	check_field(&$fields, &$field, $checks)
+	{
+		list($type,$opt,$flags,$validation,$exception)=$checks;
+
+//		echo "Field: $field<br>";
+
+		if($exception==NULL)	$except=FALSE;
+		else			$except=calc_exp($fields,$field,$exception);
+
+		if($opt == O_MAND &&	$except)	$opt = O_NO;
+		else if($opt == O_OPT && $except)	$opt = O_MAND;
+		else if($opt == O_NO && $except)	$opt = O_MAND;
+
+		if($opt == O_MAND)
+		{
+			if(!isset($_REQUEST[$field]))
+			{
 				if($flags&P_SYS)
 				{
-					info("Critical error. Field [".$field."] is not integer");
-					unset_all();
-					$critical = TRUE;
-					break;
+					info("Critical error. Field [".$field."] is mandatory");
+					return ZBX_VALID_ERROR;
 				}
 				else
 				{
-					info("Warning. Field [".$field."] is not integer");
-					continue;
-				}
-			}
-
-			if( ($type == T_ZBX_DBL) && !is_numeric($_REQUEST[$field])) {
-				$ret = FALSE;
-				if($flags&P_SYS)
-				{
-					info("Critical error. Field [".$field."] is not double");
-					unset_all();
-					$critical = TRUE;
-					break;
-				}
-				else
-				{
-					info("Warning. Field [".$field."] is not double");
-					continue;
-				}
-			}
-
-			if(($exception==NULL)||($except==TRUE))
-			{
-				if(!$validation)	$valid=TRUE;
-				else			$valid=calc_exp($fields,$field,$validation);
-
-				if(!$valid)
-				{
-					$ret = FALSE;
-					if($flags&P_SYS)
-					{
-						info("Critical error. Incorrect value for [".$field."]");
-						unset_all();
-						$critical = TRUE;
-						break;
-					}
-					else
-					{
-						info("Warning. Incorrect value for [".$field."]");
-						continue;
-					}
+					info("Warning. Field [".$field."] is mandatory");
+					return ZBX_VALID_WARNING;
 				}
 			}
 		}
+		elseif($opt == O_NO)
+		{
+			if(!isset($_REQUEST[$field]))
+				return ZBX_VALID_OK;
+
+			if($flags&P_SYS)
+			{
+				info("Critical error. Field [".$field."] must be missing");
+				return ZBX_VALID_ERROR;
+			}
+			else
+			{
+				info("Warning. Field [".$field."] must be missing");
+				return ZBX_VALID_WARNING;
+			}
+		}
+		elseif($opt == O_OPT)
+		{
+			if(!isset($_REQUEST[$field]))
+				return ZBX_VALID_OK;
+		}
+
+		$err = check_type($field, $flags, $_REQUEST[$field], $type);
+		if($err != ZBX_VALID_OK)
+			return $err;
+
+		if(($exception==NULL)||($except==TRUE))
+		{
+			if(!$validation)	$valid=TRUE;
+			else			$valid=calc_exp($fields,$field,$validation);
+
+			if(!$valid)
+			{
+				if($flags&P_SYS)
+				{
+					info("Critical error. Incorrect value for [".$field."]");
+					return ZBX_VALID_ERROR;
+				}
+				else
+				{
+					info("Warning. Incorrect value for [".$field."]");
+					return ZBX_VALID_WARNING;
+				}
+			}
+		}
+		return ZBX_VALID_OK;
+	}
+
+	function	check_fields(&$fields)
+	{
+
+		global	$_REQUEST;
+
+		$err = ZBX_VALID_OK;
+
+		foreach($fields as $field => $checks)
+		{
+			$err |= check_field($fields, $field,$checks);
+		}
+
 		unset_not_in_list($fields);
 		unset_if_zero($fields);
-		if($critical)
+		if($err&ZBX_VALID_ERROR)
 		{
+			unset_all();
 			show_messages(FALSE, "", "Invalid URL");
 			show_page_footer();
 			exit;
 		}
-		if(!$ret)
+		if($err!=ZBX_VALID_OK)
 		{
 			unset_action_vars($fields);
 		}
 		show_infomsg();
-		return $ret;
+		return ($err==ZBX_VALID_OK ? 1 : 0);
 	}
 ?>
