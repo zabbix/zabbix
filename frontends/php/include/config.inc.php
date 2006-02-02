@@ -18,7 +18,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
+function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 ?>
 <?php
@@ -30,10 +30,10 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 // if magic quotes on then get rid of them
 	if (get_magic_quotes_gpc()) {
-		$_GET    = array_map('stripslashes', $_GET);
-		$_POST  = array_map('stripslashes', $_POST);
-		$_COOKIE = array_map('stripslashes', $_COOKIE);
-		$_REQUEST = array_map('stripslashes', $_REQUEST);
+		$_GET    = zbx_stripslashes($_GET);
+		$_POST	 = zbx_stripslashes($_POST);
+		$_COOKIE = zbx_stripslashes($_COOKIE);
+		$_REQUEST= zbx_stripslashes($_REQUEST);
 	}
 
 	include_once 	"include/defines.inc.php";
@@ -80,6 +80,15 @@ function SDI($msg) { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 	include_once("include/classes/clistbox.inc.php");
 	include_once("include/classes/cform.inc.php");
 	include_once("include/classes/cformtable.inc.php");
+
+	function zbx_stripslashes($value){
+		if(is_array($value)){
+			$value = array_map('zbx_stripslashes',$value);
+		} elseif (is_string($value)){
+			$value = stripslashes($value);
+		}
+		return $value;
+	}
 
 	function get_request($name, $def){
 		global  $_REQUEST;
