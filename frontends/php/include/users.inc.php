@@ -34,7 +34,7 @@
 			return 0;
 		}
 
-		$sql="select * from users where alias='$alias'";
+		$sql="select * from users where alias='".zbx_ads($alias)."'";
 		$result=DBexecute($sql);
 		if(DBnum_rows($result)>0)
 		{
@@ -43,7 +43,7 @@
 		}
 		
 		$passwd=md5($passwd);
-		$sql="insert into users (name,surname,alias,passwd,url,autologout,lang,refresh) values ('$name','$surname','$alias','$passwd','$url',$autologout,'$lang',$refresh)";
+		$sql="insert into users (name,surname,alias,passwd,url,autologout,lang,refresh) values ('".zbx_ads($name)."','".zbx_ads($surname)."','".zbx_ads($alias)."','".zbx_ads($passwd)."','".zbx_ads($url)."',$autologout,'".zbx_ads($lang)."',$refresh)";
 		return DBexecute($sql);
 	}
 
@@ -62,7 +62,7 @@
 			return 0;
 		}
 
-		$sql="select * from users where alias='$alias' and userid<>$userid";
+		$sql="select * from users where alias='".zbx_ads($alias)."' and userid<>$userid";
 		$result=DBexecute($sql);
 		if(DBnum_rows($result)>0)
 		{
@@ -72,12 +72,12 @@
 		
 		if($passwd=="")
 		{
-			$sql="update users set name='$name',surname='$surname',alias='$alias',url='$url',autologout=$autologout,lang='$lang',refresh=$refresh where userid=$userid";
+			$sql="update users set name='".zbx_ads($name)."',surname='".zbx_ads($surname)."',alias='".zbx_ads($alias)."',url='".zbx_ads($url)."',autologout=$autologout,lang='".zbx_ads($lang)."',refresh=$refresh where userid=$userid";
 		}
 		else
 		{
 			$passwd=md5($passwd);
-			$sql="update users set name='$name',surname='$surname',alias='$alias',passwd='$passwd',url='$url',autologout=$autologout,lang='$lang',refresh=$refresh where userid=$userid";
+			$sql="update users set name='".zbx_ads($name)."',surname='".zbx_ads($surname)."',alias='".zbx_ads($alias)."',passwd='".zbx_ads($passwd)."',url='".zbx_ads($url)."',autologout=$autologout,lang='".zbx_ads($lang)."',refresh=$refresh where userid=$userid";
 		}
 		return DBexecute($sql);
 	}
@@ -96,12 +96,12 @@
 
 		if($passwd=="")
 		{
-			$sql="update users set url='$url',autologout=$autologout,lang='$lang',refresh=$refresh where userid=$userid";
+			$sql="update users set url='".zbx_ads($url)."',autologout=$autologout,lang='".zbx_ads($lang)."',refresh=$refresh where userid=$userid";
 		}
 		else
 		{
 			$passwd=md5($passwd);
-			$sql="update users set passwd='$passwd',url='$url',autologout=$autologout,lang='$lang',refresh=$refresh where userid=$userid";
+			$sql="update users set passwd='".zbx_ads($passwd)."',url='".zbx_ads($url)."',autologout=$autologout,lang='".zbx_ads($lang)."',refresh=$refresh where userid=$userid";
 		}
 		return DBexecute($sql);
 	}
@@ -110,7 +110,7 @@
 
 	function	add_permission($userid,$right,$permission,$id)
 	{
-		$sql="insert into rights (userid,name,permission,id) values ($userid,'$right','$permission',$id)";
+		$sql="insert into rights (userid,name,permission,id) values ($userid,'".zbx_ads($right)."','".zbx_ads($permission)."',$id)";
 		return DBexecute($sql);
 	}
 
@@ -142,7 +142,7 @@
 			return 0;
 		}
 
-		$sql="select * from usrgrp where name='$name'";
+		$sql="select * from usrgrp where name='".zbx_ads($name)."'";
 		$result=DBexecute($sql);
 		if(DBnum_rows($result)>0)
 		{
@@ -150,7 +150,7 @@
 			return 0;
 		}
 
-		$sql="insert into usrgrp (name) values ('$name')";
+		$sql="insert into usrgrp (name) values ('".zbx_ads($name)."')";
 		$result=DBexecute($sql);
 		if(!$result)
 		{
@@ -177,7 +177,7 @@
 			return 0;
 		}
 
-		$sql="select * from usrgrp where name='$name' and usrgrpid<>$usrgrpid";
+		$sql="select * from usrgrp where name='".zbx_ads($name)."' and usrgrpid<>$usrgrpid";
 		$result=DBexecute($sql);
 		if(DBnum_rows($result)>0)
 		{
@@ -185,7 +185,7 @@
 			return 0;
 		}
 
-		$sql="update usrgrp set name='$name' where usrgrpid=$usrgrpid";
+		$sql="update usrgrp set name='".zbx_ads($name)."' where usrgrpid=$usrgrpid";
 		$result=DBexecute($sql);
 		if(!$result)
 		{

@@ -28,14 +28,14 @@ include_once    "include/config.inc.php";
 	//  Returns: 0 if unable to create, otherwise it returns the groupID
 	function        create_Host_Group($group)
 	{
-		$result=DBselect("select distinct(groupid) from groups where name='$group'");
+		$result=DBselect("select distinct(groupid) from groups where name='".zbx_ads($group)."'");
 		if(DBnum_rows($result)>0)
 		{
 			$row=DBfetch($result);
 			return $row["groupid"];
 		}
 
-		$result=DBexecute("insert into groups (name) values ('$group')");
+		$result=DBexecute("insert into groups (name) values ('".zbx_ads($group)."')");
 		if($result)
 		{
 			return DBinsert_id($result,"groups","name");

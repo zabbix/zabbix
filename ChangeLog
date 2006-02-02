@@ -1,5 +1,6 @@
 Changes for 1.1beta6:
 
+ - GUI made immune to SQL injection attacks (Alexei)
  - added Check All functionality (Eugene)
  - added support of icon label locations (Alexei)
  - added new column sysmaps.label_location (Alexei)

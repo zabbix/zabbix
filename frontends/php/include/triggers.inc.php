@@ -27,7 +27,7 @@
 			return	0;
 		}
 
-		$sql="update triggers set comments='".zbx_ads($comments)."' where triggerid=".zbx_ads($triggerid);
+		$sql="update triggers set comments='".zbx_ads($comments)."' where triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
 
@@ -109,7 +109,7 @@
 //			return	0;
 //		}
 
-		$sql="insert into triggers  (description,priority,status,comments,url,value,error) values ('".zbx_ads($description)."',".zbx_ads($priority).",".zbx_ads($status).",'".zbx_ads($comments)."','".zbx_ads($url)."',2,'Trigger just added. No status update so far.')";
+		$sql="insert into triggers  (description,priority,status,comments,url,value,error) values ('".zbx_ads($description)."',$priority,$status,'".zbx_ads($comments)."','".zbx_ads($url)."',2,'Trigger just added. No status update so far.')";
 #		echo $sql,"<br>";
 		$result=DBexecute($sql);
 		if(!$result)
@@ -122,7 +122,7 @@
 		add_alarm($triggerid,2);
  
 		$expression=implode_exp($expression,$triggerid);
-		$sql="update triggers set expression='".zbx_ads($expression)."' where triggerid=".zbx_ads($triggerid);
+		$sql="update triggers set expression='".zbx_ads($expression)."' where triggerid=$triggerid";
 #		echo $sql,"<br>";
 		DBexecute($sql);
 		reset_items_nextcheck($triggerid);
@@ -185,14 +185,13 @@
 		add_alarm($triggerid,2);
 //		$sql="update triggers set expression='$expression',description='$description',priority=$priority,status=$status,comments='$comments',url='$url' where triggerid=$triggerid";
 		reset_items_nextcheck($triggerid);
-		$sql="update triggers set expression='$expression',description='$description',priority=$priority,status=$status,comments='$comments',url='$url',value=2 where triggerid=$triggerid";
+		$sql="update triggers set expression='".zbx_ads($expression)."',description='".zbx_ads($description)."',priority=$priority,status=$status,comments='".zbx_ads($comments)."',url='".zbx_ads($url)."',value=2 where triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
 
 	function	check_right_on_trigger($permission,$triggerid)
 	{
-                $sql="select distinct h.hostid from functions f,items i,hosts h
-where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
+                $sql="select distinct h.hostid from functions f,items i,hosts h where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
                 $result=DBselect($sql);
                 $ok=0;
 		while($row=DBfetch($result))
@@ -352,7 +351,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 				while($row3=DBfetch($result2))
 				{
 
-					$sql="select itemid from items where key_=\"".$row3["key_"]."\" and hostid=".$row["hostid"];
+					$sql="select itemid from items where key_='".zbx_ads($row3["key_"])."' and hostid=".$row["hostid"];
 					$result3=DBselect($sql);
 					if(DBnum_rows($result3)!=1)
 					{
@@ -366,15 +365,15 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 	
 					$item=get_item_by_itemid($row4["itemid"]);
 	
-					$sql="insert into functions (itemid,triggerid,function,parameter) values (".$item["itemid"].",".$row2["triggerid"].",'".$row3["function"]."','".$row3["parameter"]."')";
+					$sql="insert into functions (itemid,triggerid,function,parameter) values (".$item["itemid"].",".$row2["triggerid"].",'".zbx_ads($row3["function"])."','".zbx_ads($row3["parameter"])."')";
 					$result5=DBexecute($sql);
 					$functionid=DBinsert_id($result5,"functions","functionid");
 	
-					$sql="update triggers set expression='$expression_old' where triggerid=".$row2["triggerid"];
+					$sql="update triggers set expression='".zbx_ads($expression_old)."' where triggerid=".$row2["triggerid"];
 					DBexecute($sql);
 					$expression=str_replace("{".$row3["functionid"]."}","{".$functionid."}",$expression_old);
 					$expression_old=$expression;
-					$sql="update triggers set expression='$expression' where triggerid=".$row2["triggerid"];
+					$sql="update triggers set expression='".zbx_ads($expression)."' where triggerid=".$row2["triggerid"];
 					DBexecute($sql);
 				}
 
@@ -422,7 +421,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 			if($row["triggers"]&1 == 0)	continue;
 
-			$sql="insert into triggers  (description,priority,status,comments,url,value,expression) values ('".zbx_ads($trigger["description"])."',".$trigger["priority"].",".$trigger["status"].",'".zbx_ads($trigger["comments"])."','".zbx_ads($trigger["url"])."',2,'$expression_old')";
+			$sql="insert into triggers  (description,priority,status,comments,url,value,expression) values ('".zbx_ads($trigger["description"])."',".$trigger["priority"].",".$trigger["status"].",'".zbx_ads($trigger["comments"])."','".zbx_ads($trigger["url"])."',2,'".zbx_ads($expression_old)."')";
 			$result4=DBexecute($sql);
 			$triggerid_new=DBinsert_id($result4,"triggers","triggerid");
 
@@ -432,7 +431,7 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 			// Loop: functions
 			while($row2=DBfetch($result2))
 			{
-				$sql="select itemid from items where key_=\"".$row2["key_"]."\" and hostid=".$row["hostid"];
+				$sql="select itemid from items where key_='".zbx_ads($row2["key_"])."' and hostid=".$row["hostid"];
 				$result3=DBselect($sql);
 				if(DBnum_rows($result3)!=1)
 				{
@@ -446,15 +445,15 @@ where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid";
 
 				$item=get_item_by_itemid($row3["itemid"]);
 
-				$sql="insert into functions (itemid,triggerid,function,parameter) values (".$item["itemid"].",$triggerid_new,'".$row2["function"]."','".$row2["parameter"]."')";
+				$sql="insert into functions (itemid,triggerid,function,parameter) values (".$item["itemid"].",$triggerid_new,'".zbx_ads($row2["function"])."','".zbx_ads($row2["parameter"])."')";
 				$result5=DBexecute($sql);
 				$functionid=DBinsert_id($result5,"functions","functionid");
 
-				$sql="update triggers set expression='$expression_old' where triggerid=$triggerid_new";
+				$sql="update triggers set expression='".zbx_ads($expression_old)."' where triggerid=$triggerid_new";
 				DBexecute($sql);
 				$expression=str_replace("{".$row2["functionid"]."}","{".$functionid."}",$expression_old);
 				$expression_old=$expression;
-				$sql="update triggers set expression='$expression' where triggerid=$triggerid_new";
+				$sql="update triggers set expression='".zbx_ads($expression)."' where triggerid=$triggerid_new";
 				DBexecute($sql);
 
 				$host=get_host_by_hostid($row["hostid"]);

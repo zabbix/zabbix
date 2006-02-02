@@ -23,7 +23,7 @@
 
 	function	update_item_in_group($groupid,$itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt)
 	{
-		$sql="select i.itemid,i.hostid from hosts_groups hg,items i where hg.groupid=$groupid and i.key_=\"$key\" and hg.hostid=i.hostid";
+		$sql="select i.itemid,i.hostid from hosts_groups hg,items i where hg.groupid=$groupid and i.key_='".zbx_ads($key)."' and hg.hostid=i.hostid";
 		$result=DBexecute($sql);
 		while($row=DBfetch($result))
 		{
@@ -47,7 +47,7 @@
 			return 0;
 		}
 
-		$sql="select i.itemid from hosts_groups hg,items i where hg.groupid=$groupid and i.key_=\"".$item["key_"]."\" and hg.hostid=i.hostid";
+		$sql="select i.itemid from hosts_groups hg,items i where hg.groupid=$groupid and i.key_='".zbx_ads($item["key_"])."' and hg.hostid=i.hostid";
 		$result=DBexecute($sql);
 		while($row=DBfetch($result))
 		{
@@ -81,7 +81,7 @@
 
 		$host=get_host_by_hostid($hostid);
 
-		$sql="select count(*) as cnt from items where hostid=$hostid and key_='$key'";
+		$sql="select count(*) as cnt from items where hostid=$hostid and key_='".zbx_ads($key)."'";
 		$result=DBexecute($sql);
 		$row = DBfetch($result);
 		if($row["cnt"]>0)
@@ -107,7 +107,7 @@
 			$delta=0;
 		}
 
-		$sql="insert into items (description,key_,hostid,delay,history,nextcheck,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula,trends,logtimefmt) values ('".zbx_ads($description)."','".zbx_ads($key)."',".zbx_ads($hostid).",".zbx_ads($delay).",".zbx_ads($history).",0,".zbx_ads($status).",".zbx_ads($type).",'".zbx_ads($snmp_community)."','".zbx_ads($snmp_oid)."',".zbx_ads($value_type).",'".zbx_ads($trapper_hosts)."',".zbx_ads($snmp_port).",'".zbx_ads($units)."',".zbx_ads($multiplier).",".zbx_ads($delta).",'".zbx_ads($snmpv3_securityname)."',".zbx_ads($snmpv3_securitylevel).",'".zbx_ads($snmpv3_authpassphrase)."','".zbx_ads($snmpv3_privpassphrase)."','".zbx_ads($formula)."',".zbx_ads($trends).",'".zbx_ads($logtimefmt)."')";
+		$sql="insert into items (description,key_,hostid,delay,history,nextcheck,status,type,snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,formula,trends,logtimefmt) values ('".zbx_ads($description)."','".zbx_ads($key)."',$hostid,$delay,$history,0,$status,$type,'".zbx_ads($snmp_community)."','".zbx_ads($snmp_oid)."',$value_type,'".zbx_ads($trapper_hosts)."',".zbx_ads($snmp_port).",'".zbx_ads($units)."',$multiplier,$delta,'".zbx_ads($snmpv3_securityname)."',".zbx_ads($snmpv3_securitylevel).",'".zbx_ads($snmpv3_authpassphrase)."','".zbx_ads($snmpv3_privpassphrase)."','".zbx_ads($formula)."',$trends,'".zbx_ads($logtimefmt)."')";
 		$result=DBexecute($sql);
 		if($result)
 		{
@@ -127,7 +127,7 @@
                         return 0;
 		}
 		if($status==ITEM_STATUS_ACTIVE)
-			$sql="update items set status=$status,error=\"\" where itemid=$itemid";
+			$sql="update items set status=$status,error='' where itemid=$itemid";
 		else
 			$sql="update items set status=$status where itemid=$itemid";
 
@@ -160,10 +160,10 @@
 			$delta=0;
 		}
 
-		$sql="update items set lastlogsize=0 where itemid=".zbx_ads($itemid)." and key_<>'".zbx_ads($key)."'";
+		$sql="update items set lastlogsize=0 where itemid=$itemid and key_<>'".zbx_ads($key)."'";
 		DBexecute($sql);
 
-		$sql="update items set description='".zbx_ads($description)."',key_='".zbx_ads($key)."',hostid=".zbx_ads($hostid).",delay=".zbx_ads($delay).",history=".zbx_ads($history).",nextcheck=0,status=".zbx_ads($status).",type=".zbx_ads($type).",snmp_community='".zbx_ads($snmp_community)."',snmp_oid='".zbx_ads($snmp_oid)."',value_type=".zbx_ads($value_type).",trapper_hosts='".zbx_ads($trapper_hosts)."',snmp_port=".zbx_ads($snmp_port).",units='".zbx_ads($units)."',multiplier=".zbx_ads($multiplier).",delta=".zbx_ads($delta).",snmpv3_securityname='".zbx_ads($snmpv3_securityname)."',snmpv3_securitylevel=".zbx_ads($snmpv3_securitylevel).",snmpv3_authpassphrase='".zbx_ads($snmpv3_authpassphrase)."',snmpv3_privpassphrase='".zbx_ads($snmpv3_privpassphrase)."',formula='".zbx_ads($formula)."',trends=".zbx_ads($trends).",logtimefmt='".zbx_ads($logtimefmt)."' where itemid=".zbx_ads($itemid);
+		$sql="update items set description='".zbx_ads($description)."',key_='".zbx_ads($key)."',hostid=$hostid,delay=$delay,history=$history,nextcheck=0,status=$status,type=$type,snmp_community='".zbx_ads($snmp_community)."',snmp_oid='".zbx_ads($snmp_oid)."',value_type=$value_type,trapper_hosts='".zbx_ads($trapper_hosts)."',snmp_port=$snmp_port,units='".zbx_ads($units)."',multiplier=$multiplier,delta=$delta,snmpv3_securityname='".zbx_ads($snmpv3_securityname)."',snmpv3_securitylevel=".zbx_ads($snmpv3_securitylevel).",snmpv3_authpassphrase='".zbx_ads($snmpv3_authpassphrase)."',snmpv3_privpassphrase='".zbx_ads($snmpv3_privpassphrase)."',formula='".zbx_ads($formula)."',trends=$trends,logtimefmt='".zbx_ads($logtimefmt)."' where itemid=$itemid";
 		$result=DBexecute($sql);
 		if($result)
 		{
@@ -181,7 +181,7 @@
 		{
 			$item=get_item_by_itemid($row["itemid"]);
 
-			$sql="select itemid from items where key_=\"".$item["key_"]."\" and hostid=$hostid";
+			$sql="select itemid from items where key_=\"".zbx_ads($item["key_"])."\" and hostid=$hostid";
 			$result2=DBselect($sql);
 			if(DBnum_rows($result2)==0)
 			{
@@ -241,7 +241,7 @@
 		while($row=DBfetch($result))
 		{
 			if($row["items"]&4 == 0)	continue;
-			$sql="select itemid from items where key_=\"".$item["key_"]."\" and hostid=".$row["hostid"];
+			$sql="select itemid from items where key_='".zbx_ads($item["key_"])."' and hostid=".$row["hostid"];
 			$result2=DBselect($sql);
 			while($row2=DBfetch($result2))
 			{
@@ -268,7 +268,7 @@
 		while($row=DBfetch($result))
 		{
 			if($row["items"]&2 == 0)	continue;
-			$sql="select itemid from items where key_=\"".$item["key_"]."\" and hostid=".$row["hostid"];
+			$sql="select itemid from items where key_=\"".zbx_ads($item["key_"])."\" and hostid=".$row["hostid"];
 			$result2=DBselect($sql);
 			if(DBnum_rows($result2)==1)
 			{

@@ -27,7 +27,7 @@
                         return 0;
                 }
 
-                $sql="insert into screens (name,cols,rows) values ('$name',$cols,$rows)";
+                $sql="insert into screens (name,cols,rows) values ('".zbx_ads($name)."',$cols,$rows)";
                 return  DBexecute($sql);
         }
 
@@ -39,7 +39,7 @@
                         return 0;
                 }
 
-                $sql="update screens set name='$name',cols=$cols,rows=$rows where screenid=$screenid";
+                $sql="update screens set name='".zbx_ads($name)."',cols=$cols,rows=$rows where screenid=$screenid";
                 return  DBexecute($sql);
         }
 
