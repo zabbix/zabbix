@@ -290,24 +290,23 @@
 	{
 		global  $_REQUEST;
 
-		$hostid		= get_request("hostid"		,0);
 		$description	= get_request("description"	,"");
 		$key		= get_request("key"		,"");
-		$port		= get_request("port"		,10050);
+		$host		= get_request("host",		NULL);
 		$delay		= get_request("delay"		,30);
 		$history	= get_request("history"		,90);
-		$trends		= get_request("trends"		,365);
 		$status		= get_request("status"		,0);
 		$type		= get_request("type"		,0);
 		$snmp_community	= get_request("snmp_community"	,"public");
 		$snmp_oid	= get_request("snmp_oid"	,"interfaces.ifTable.ifEntry.ifInOctets.1");
-
+		$snmp_port	= get_request("snmp_port"	,161);
 		$value_type	= get_request("value_type"	,0);
 		$trapper_hosts	= get_request("trapper_hosts"	,"");
-		$snmp_port	= get_request("snmp_port"	,161);
 		$units		= get_request("units"		,'');
 		$multiplier	= get_request("multiplier"	,0);
+		$hostid		= get_request("hostid"		,0);
 		$delta		= get_request("delta"		,0);
+		$trends		= get_request("trends"		,365);
 
 		$snmpv3_securityname	= get_request("snmpv3_securityname"	,"");
 		$snmpv3_securitylevel	= get_request("snmpv3_securitylevel"	,0);
@@ -316,9 +315,9 @@
 
 		$formula	= get_request("formula"		,"1");
 		$logtimefmt	= get_request("logtimefmt"	,"");
-		$add_groupid	= get_request("add_groupid"	,0);
 
-		$host		= get_request("host",	NULL);
+		$add_groupid	= get_request("add_groupid"	,get_request("groupid",0));
+
 
 		if(is_null($host)&&$hostid>0){
 			$host_info = get_host_by_hostid($hostid);
@@ -327,7 +326,7 @@
 
 		if(isset($_REQUEST["itemid"]) && !isset($_REQUEST["form_refresh"]))
 		{
-			$result=DBselect("select i.description, i.key_, h.host, h.port, i.delay,".
+			$result=DBselect("select i.description, i.key_, h.host, i.delay,".
 				" i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,".
 				" i.trapper_hosts,i.snmp_port,i.units,i.multiplier,h.hostid,i.delta,".
 				" i.trends,i.snmpv3_securityname,i.snmpv3_securitylevel,".
@@ -339,16 +338,15 @@
 			$description	= $row["description"];
 			$key		= $row["key_"];
 			$host		= $row["host"];
-			$port		= $row["port"];
 			$delay		= $row["delay"];
 			$history	= $row["history"];
 			$status		= $row["status"];
 			$type		= $row["type"];
 			$snmp_community	= $row["snmp_community"];
 			$snmp_oid	= $row["snmp_oid"];
+			$snmp_port	= $row["snmp_port"];
 			$value_type	= $row["value_type"];
 			$trapper_hosts	= $row["trapper_hosts"];
-			$snmp_port	= $row["snmp_port"];
 			$units		= $row["units"];
 			$multiplier	= $row["multiplier"];
 			$hostid		= $row["hostid"];
@@ -464,7 +462,6 @@
 		{
 			$frmItem->AddVar("formula",$formula);
 		}
-
 		if($type != ITEM_TYPE_TRAPPER)
 		{
 			$frmItem->AddRow(S_UPDATE_INTERVAL_IN_SEC, new CTextBox("delay",$delay,5));
@@ -522,16 +519,10 @@
 			$frmItem->AddVar("trapper_hosts",$trapper_hosts);
 		}
 
-		$frmRow = array(
-			new CButton("register","add"),
-			SPACE,
-			new CButton("register","add to all hosts","return Confirm('Add item to all hosts?');")
-		);
+		$frmRow = array(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["itemid"]))
 		{
 			array_push($frmRow,
-				SPACE,
-				new CButton("register","update"),
 				SPACE,
 				new CButtonDelete("Delete selected item?",
 					url_param("form").url_param("groupid").url_param("hostid").
@@ -544,7 +535,7 @@
 
 		$frmItem->AddSpanRow($frmRow,"form_row_last");
 
-	        $cmbGroups = new CComboBox("add_groupid",$add_groupid,"submit()");		
+	        $cmbGroups = new CComboBox("add_groupid",$add_groupid);		
 
 	        $groups=DBselect("select groupid,name from groups order by name");
 	        while($group=DBfetch($groups))
@@ -1859,7 +1850,7 @@
 
 		$frmHostG->AddRow(S_GROUP_NAME,new CTextBox("name",$name,30));
 
-		$cmbHosts = new CListBox("hosts[]",5);
+		$cmbHosts = new CListBox("hosts[]",10);
 		$hosts=DBselect("select distinct hostid,host from hosts where status<>".HOST_STATUS_DELETED." order by host");
 		while($host=DBfetch($hosts))
 		{

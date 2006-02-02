@@ -42,46 +42,52 @@
 
 //		VAR			TYPE	OPTIONAL TABLE	FIELD	OPTIONAL	VALIDATION	EXCEPTION
 	$fields=array(
-		"description"=>	array(T_ZBX_STR, O_MAND, "items", NULL,		NOT_EMPTY,		NULL),
-		"delay"=>	array(T_ZBX_INT, O_MAND, "items", NULL,		BETWEEN(0,65535*65536),	NULL),
-		"key"=>		array(T_ZBX_STR, O_MAND, "items", "key_",	NOT_EMPTY,		NULL),
-		"host"=>	array(T_ZBX_STR, O_MAND, "items", NULL,		NOT_EMPTY,		NULL),
-		"port"=>	array(T_ZBX_INT, O_MAND, "items", NULL,		BETWEEN(0,65535),	NULL),
-		"history"=>	array(T_ZBX_INT, O_MAND, "items", NULL,		BETWEEN(0,10000),	NULL),
-		"trends"=>	array(T_ZBX_INT, O_MAND, "items", NULL,		BETWEEN(0,10000),	NULL),
-		"trends"=>	array(T_ZBX_INT, O_MAND, "items", NULL,		IN("0,1,2"),		NULL),
-		"type"=>	array(T_ZBX_INT, O_MAND, "items", NULL,		IN("0,1,2"),		NULL),
-		"snmp_community"=>array(T_ZBX_STR, O_MAND, "items", NULL,	NOT_EMPTY,		NULL),
-		"snmp_oid"=>	array(T_ZBX_STR, O_MAND,   "items", NULL,	NOT_EMPTY,		NULL),
-		"value_type"=>	array(T_ZBX_INT, O_MAND, "items", NULL,		IN("0,1,2"),		NULL),
-		"trapper_hosts"=>array(T_ZBX_STR, O_MAND,  "items", NULL,	NULL,			NULL),
-		"snmp_port"=>	array(T_ZBX_INT, O_MAND, "items", NULL,		BETWEEN(0,65535),	NULL),
-		"units"=>	array(T_ZBX_STR, O_MAND,  "items", NULL,	NULL,			NULL),
-		"multiplier"=>	array(T_ZBX_DBL, O_MAND,  "items", NULL,	GT(0),			NULL),
-		"hostid"=>	array(T_ZBX_INT, O_MAND, "items", NULL,		BETWEEN(0,65535*65536),	NULL),
-		"snmpv3_securityname"=>array(T_ZBX_STR, O_MAND, "items", NULL,	NULL,			NULL),
-		"snmpv3_authpassphrase"=>array(T_ZBX_STR, O_MAND, "items", NULL,NULL,			NULL),
-		"snmpv3_privpassphrase"=>array(T_ZBX_STR, O_MAND, "items", NULL,NULL,			NULL),
-		"formula"=>	array(T_ZBX_STR, O_MAND, "items", NULL,		NULL,			NULL),
-		"logtimefmt"=>	array(T_ZBX_PERIOD, O_MAND, "items", NULL,	NULL,			NULL),
-		"groupid"=>	array(T_ZBX_INT, O_MAND, "items", NULL,		BETWEEN(0,65535*65536),	NULL)
+		"groupid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
+		"hostid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'isset({save})'),
+
+		"add_groupid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,'{register}=="go"'),
+		"action"=>	array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,'{register}=="go"'),
+
+		"itemid"=>	array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,'{form}=="update"'),
+		"description"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
+		"key"=>		array(T_ZBX_STR, O_OPT,  NULL,  NOT_EMPTY,'isset({save})'),
+		"host"=>	array(T_ZBX_STR, O_OPT,  NULL,  NOT_EMPTY,'isset({save})'),
+		"delay"=>	array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})&&{type}!=2'),
+		"history"=>	array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
+		"status"=>	array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
+		"type"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2,3,4,5,6,7"),'isset({save})'),
+		"trends"=>	array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
+		"value_type"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2,3"),'isset({save})'),
+
+		"snmp_community"=>array(T_ZBX_STR, O_OPT,  NULL,  NOT_EMPTY,'isset({save})&&'.IN("1,4","type")),
+		"snmp_oid"=>	array(T_ZBX_STR, O_OPT,  NULL,  NOT_EMPTY,'isset({save})&&'.IN("1,4,6","type")),
+		"snmp_port"=>	array(T_ZBX_STR, O_OPT,  NULL,  NOT_EMPTY,'isset({save})&&'.IN("1,4,6","type")),
+
+		"snmpv3_securitylevel"=>array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2"),'isset({save})&&{type}==6'),
+		"snmpv3_securityname"=>array(T_ZBX_STR, O_OPT,  NULL,  NULL,'isset({save})&&{type}==6'),
+		"snmpv3_authpassphrase"=>array(T_ZBX_STR, O_OPT,  NULL,  NULL,'isset({save})&&{type}==6'),
+		"snmpv3_privpassphrase"=>array(T_ZBX_STR, O_OPT,  NULL,  NULL,'isset({save})&&{type}==6'),
+
+		"trapper_hosts"=>array(T_ZBX_STR, O_OPT,  NULL,  NULL,'isset({save})&&{type}==2'),
+		"units"=>	array(T_ZBX_STR, O_OPT,  NULL,  NULL,'isset({save})&&'.IN("0,3","type")),
+		"multiplier"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1"),'isset({save})&&'.IN("0,3","type")),
+		"delta"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2"),'isset({save})&&'.IN("0,3","type")),
+
+		"formula"=>	array(T_ZBX_DBL, O_OPT,  NULL,  NULL,'isset({save})&&{multiplier}==1'),
+		"logtimefmt"=>	array(T_ZBX_STR, O_OPT,  NULL,  NOT_EMPTY,'isset({save})&&{value_type}==2'),
+                 
+		"group_itemid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID, NULL),
+
+		"register"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"group_task"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 
-//	if(!check_fields($fields))
-//	{
-//		show_messages();
-//	}
-?>
-
-<?php
-	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
-	{
-//		unset($_REQUEST["groupid"]);
-	}
-	if(isset($_REQUEST["hostid"])&&($_REQUEST["hostid"]==0))
-	{
-//		unset($_REQUEST["hostid"]);
-	}
+	check_fields($fields);
 ?>
 
 <?php
@@ -92,12 +98,52 @@
 ?>
 
 <?php
+	$result = 0;
 	if(isset($_REQUEST["delete"])&&isset($_REQUEST["itemid"]))
 	{
 		delete_item_from_templates($_REQUEST["itemid"]);
 		$result=delete_item($_REQUEST["itemid"]);
 		show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
-		unset($_REQUEST["itemid"]);
+		if($result){
+			unset($_REQUEST["itemid"]);
+			unset($_REQUEST["form"]);
+		}
+	}
+	else if(isset($_REQUEST["save"]))
+	{
+		if(isset($_REQUEST["itemid"]))
+		{
+			$result=update_item($_REQUEST["itemid"],
+				$_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],
+				$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],
+				$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],
+				$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],
+				$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],
+				$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
+				$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],
+				$_REQUEST["logtimefmt"]);
+			update_item_in_templates($_REQUEST["itemid"]);
+			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
+		}
+		else
+		{
+			$itemid=add_item(
+				$_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],
+				$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],
+				$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],
+				$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],
+				$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],
+				$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
+				$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],
+				$_REQUEST["logtimefmt"]);
+			add_item_to_linked_hosts($itemid);
+			$result = $itemid;
+			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
+		}
+		if($result){	
+			unset($_REQUEST["itemid"]);
+			unset($_REQUEST["form"]);
+		}
 	}
 	elseif(isset($_REQUEST["register"]))
 	{
@@ -116,8 +162,11 @@
 					$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],
 					$_REQUEST["trends"],$_REQUEST["logtimefmt"]);
 				show_messages($itemid, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
-				unset($_REQUEST["itemid"]);
-				unset($itemid);
+				if($itemid){
+					unset($_REQUEST["form"]);
+					unset($_REQUEST["itemid"]);
+					unset($itemid);
+				}
 			}
 			if($_REQUEST["action"]=="update in group")
 			{
@@ -132,59 +181,30 @@
 					$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],
 					$_REQUEST["trends"],$_REQUEST["logtimefmt"]);
 				show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
-				unset($_REQUEST["itemid"]);
+				if($result){
+					unset($_REQUEST["form"]);
+					unset($_REQUEST["itemid"]);
+				}
 			}
 			if($_REQUEST["action"]=="delete from group")
 			{
 				$result=delete_item_from_group($_REQUEST["add_groupid"],$_REQUEST["itemid"]);
 				show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
-				unset($_REQUEST["itemid"]);
+				if($result){
+					unset($_REQUEST["form"]);
+					unset($_REQUEST["itemid"]);
+				}
 			}
 		}
-		else if($_REQUEST["register"]=="update")
-		{
-			$result=update_item($_REQUEST["itemid"],
-				$_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],
-				$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],
-				$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],
-				$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],
-				$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],
-				$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
-				$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],
-				$_REQUEST["logtimefmt"]);
-			update_item_in_templates($_REQUEST["itemid"]);
-			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
-//			unset($itemid);
-			if($result){	
-				unset($_REQUEST["itemid"]);
-				unset($_REQUEST["form"]);
-			}
-		}
+/*
 		else if($_REQUEST["register"]=="changestatus")
 		{
 			$result=update_item_status($_REQUEST["itemid"],$_REQUEST["status"]);
 			show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 			unset($_REQUEST["itemid"]);
 		}
-		else if($_REQUEST["register"]=="add")
-		{
-			$itemid=add_item(
-				$_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],
-				$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],
-				$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],
-				$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],
-				$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],
-				$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
-				$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],
-				$_REQUEST["logtimefmt"]);
-			add_item_to_linked_hosts($itemid);
-			show_messages($itemid, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
-			if($itemid){	
-				unset($_REQUEST["itemid"]);
-				unset($_REQUEST["form"]);
-			}
-			unset($itemid);
-		}
+*/
+/*
 		else if($_REQUEST["register"]=="add to all hosts")
 		{
 			$result=DBselect("select hostid,host from hosts order by host");
@@ -214,37 +234,35 @@
 				"[Failed for '$hosts_notok'","Cannot add item");
 			unset($_REQUEST["itemid"]);
 		}
-		else if($_REQUEST["register"]=="Delete selected")
+*/
+	}
+	elseif(isset($_REQUEST["group_task"])&&isset($_REQUEST["group_itemid"]))
+	{
+		if($_REQUEST["group_task"]=="Delete selected")
 		{
-			$result=DBselect("select itemid from items where hostid=".$_REQUEST["hostid"]);
-			while($row=DBfetch($result))
+			$group_itemid = $_REQUEST["group_itemid"];
+			foreach($group_itemid as $id)
 			{
-// $$ is correct here
-				if(!isset($_REQUEST[$row["itemid"]])) continue;
-				delete_item_from_templates($row["itemid"]);
-				$result2=delete_item($row["itemid"]);
+				delete_item_from_templates($id);
+				$result2=delete_item($id);
 			}
 			show_messages(TRUE, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
 		}
-		else if($_REQUEST["register"]=="Activate selected")
+		else if($_REQUEST["group_task"]=="Activate selected")
 		{
-			$result=DBselect("select itemid from items where hostid=".$_REQUEST["hostid"]);
-			while($row=DBfetch($result))
+			$group_itemid = $_REQUEST["group_itemid"];
+			foreach($group_itemid as $id)
 			{
-// $$ is correct here
-				if(!isset($_REQUEST[$row["itemid"]]))	continue;
-				$result2=activate_item($row["itemid"]);
+				$result2=activate_item($id);
 			}
 			show_messages(TRUE, S_ITEMS_ACTIVATED, S_CANNOT_ACTIVATE_ITEMS);
 		}
-		if($_REQUEST["register"]=="Disable selected")
+		if($_REQUEST["group_task"]=="Disable selected")
 		{
-			$result=DBselect("select itemid from items where hostid=".$_REQUEST["hostid"]);
-			while($row=DBfetch($result))
+			$group_itemid = $_REQUEST["group_itemid"];
+			foreach($group_itemid as $id)
 			{
-// $$ is correct here
-				if(!isset($_REQUEST[$row["itemid"]]))	continue;
-				$result2=disable_item($row["itemid"]);
+				$result2=disable_item($id);
 			}
 			show_messages(TRUE, S_ITEMS_DISABLED, S_CANNOT_DISABLE_ITEMS);
 		}
@@ -338,7 +356,7 @@
 				S_KEY, S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),
 				S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,S_ERROR));
 
-			$result=DBselect("select h.host,i.key_,i.itemid,i.description,h.port,i.delay,".
+			$result=DBselect("select h.host,i.key_,i.itemid,i.description,i.delay,".
 				"i.history,i.lastvalue,i.lastclock,i.status,i.nextcheck,h.hostid,i.type,".
 				"i.trends,i.error from hosts h,items i where h.hostid=i.hostid and".
 				" h.hostid=".$_REQUEST["hostid"]." order by h.host,i.key_,i.description");
@@ -350,7 +368,7 @@
 				}
 
 				$input= array(
-					new CCheckBox($row["itemid"]),
+					new CCheckBox("group_itemid[]",NULL,NULL,NULL,$row["itemid"]),
 					new CLink($row["itemid"],"items.php?form=update&itemid=".
 						$row["itemid"].	url_param("hostid").url_param("groupid"))
 					);
@@ -374,12 +392,16 @@
 				}
 
 				switch($row["status"]){
-				case 0:	$status=new CCol(new CLink(S_ACTIVE, "items.php?itemid=".$row["itemid"].
-						"&hostid=".$_REQUEST["hostid"]."&register=changestatus&status=1",
+				case 0:	$status=new CCol(new CLink(S_ACTIVE, 
+						"items.php?group_itemid%5B%5D=".$row["itemid"].
+						"&hostid=".$_REQUEST["hostid"].
+						"&group_task=Disable+selected",
 						"off"),"off");
 					break;
-				case 1:	$status=new CCol(new CLink(S_ACTIVE, "items.php?itemid=".$row["itemid"].
-						"&hostid=".$_REQUEST["hostid"]."&register=changestatus&status=0",
+				case 1:	$status=new CCol(new CLink(S_ACTIVE,
+						"items.php?group_itemid%5B%5D=".$row["itemid"].
+						"&hostid=".$_REQUEST["hostid"].
+						"&group_task=Activate+selected",
 						"on"),"on");
 					break;
 				case 3:	$status=new CCol(S_NOT_SUPPORTED,"unknown");
@@ -409,13 +431,13 @@
 			}
 
 			$footerButtons = array();
-			array_push($footerButtons, new CButton('register','Activate selected',
+			array_push($footerButtons, new CButton('group_task','Activate selected',
 				"return Confirm('".S_ACTIVATE_SELECTED_ITEMS_Q."');"));
 			array_push($footerButtons, SPACE);
-			array_push($footerButtons, new CButton('register','Disable selected',
+			array_push($footerButtons, new CButton('group_task','Disable selected',
 				"return Confirm('".S_DISABLE_SELECTED_ITEMS_Q."');"));
 			array_push($footerButtons, SPACE);
-			array_push($footerButtons, new CButton('register','Delete selected',
+			array_push($footerButtons, new CButton('group_task','Delete selected',
 				"return Confirm('".S_DELETE_SELECTED_ITEMS_Q."');"));
 			$table->SetFooter(new CCol($footerButtons),'table_footer');
 

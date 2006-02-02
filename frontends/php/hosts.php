@@ -492,7 +492,7 @@
 					array_push($hosts,", ",new CSpan($db_host["host"],$style));
 				}
 
-				$table->addRow(array(
+				$table->AddRow(array(
 					array(
 						new CCheckBox($db_group["groupid"]),
 						new CLink(

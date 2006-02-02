@@ -50,30 +50,48 @@
 		"config"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,3,4,5"),	NULL),
 
 // other form
-		"alert_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),'in_array({config},array(0,5))&&({save}=="Save")'),
-		"alarm_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),'in_array({config},array(0,5))&&({save}=="Save")'),
-		"refresh_unsupported"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),'in_array({config},array(0,5))&&({save}=="Save")'),
+		"alert_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),
+						'in_array({config},array(0,5))&&({save}=="Save")'),
+		"alarm_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),
+						'in_array({config},array(0,5))&&({save}=="Save")'),
+		"refresh_unsupported"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),
+						'in_array({config},array(0,5))&&({save}=="Save")'),
 
 // media form
-		"mediatypeid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),'{config}==1&&{form}=="update"'),
-		"type"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	'({config}==1)&&(isset({save}))'),
-		"description"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&(isset({save}))'),
-		"smtp_server"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==0)'),
-		"smtp_helo"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==0)'),
-		"smtp_email"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==0)'),
-		"exec_path"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'({config}==1)&&({type}==1)&&isset({save})'),
+		"mediatypeid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),
+						'{config}==1&&{form}=="update"'),
+		"type"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),
+						'({config}==1)&&(isset({save}))'),
+		"description"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
+						'({config}==1)&&(isset({save}))'),
+		"smtp_server"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
+						'({config}==1)&&({type}==0)'),
+		"smtp_helo"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
+						'({config}==1)&&({type}==0)'),
+		"smtp_email"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
+						'({config}==1)&&({type}==0)'),
+		"exec_path"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
+						'({config}==1)&&({type}==1)&&isset({save})'),
 
 // image form
-		"imageid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),'{config}==3&&{form}=="update"'),
-		"MAX_FILE_SIZE"=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,2097152),'{config}==3&&isset({save})'),
-		"name"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'{config}==3&&isset({save})'),
-		"imagetype"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("1,2"),	'({config}==3)&&(isset({save}))'),
+		"imageid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),
+						'{config}==3&&{form}=="update"'),
+		"MAX_FILE_SIZE"=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,2097152),
+						'{config}==3&&isset({save})'),
+		"name"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
+						'{config}==3&&isset({save})'),
+		"imagetype"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("1,2"),
+						'({config}==3)&&(isset({save}))'),
 
 // autoregistration form
-		"autoregid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),'{config}==4&&{form}=="update"'),
-		"pattern"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'{config}==4&&isset({save})'),
-		"hostid"=>		array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(1,65535),'{config}==4&&isset({save})'),
-		"priority"=>		array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535),'{config}==4&&isset({save})'),
+		"autoregid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),
+						'{config}==4&&{form}=="update"'),
+		"pattern"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
+						'{config}==4&&isset({save})'),
+		"hostid"=>		array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(1,65535),
+						'{config}==4&&isset({save})'),
+		"priority"=>		array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535),
+						'{config}==4&&isset({save})'),
 
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -86,13 +104,17 @@
 <?php
 	$_REQUEST["config"]=get_request("config",get_profile("web.config.config",0));
 
-	update_profile("web.config.config",$_REQUEST["config"]);
-
 	check_fields($fields);
 
-/* MEDIATYPE ACTIONS */
+	update_profile("web.config.config",$_REQUEST["config"]);
+
 	$result = 0;
-	if($_REQUEST["config"]==1){
+	if($_REQUEST["config"]==1)
+	{
+
+
+
+/* MEDIATYPE ACTIONS */
 		if(isset($_REQUEST["save"]))
 		{
 			if(isset($_REQUEST["mediatypeid"]))
@@ -138,6 +160,9 @@
 	}
 	elseif($_REQUEST["config"]==3)
 	{
+
+
+
 /* IMAGES ACTIONS */
 		if(isset($_REQUEST["save"]))
 		{
@@ -179,6 +204,9 @@
 	}
 	elseif($_REQUEST["config"]==4)
 	{
+
+
+
 /* AUTOREG ACTIONS */
 		if(isset($_REQUEST["save"]))
 		{
@@ -224,6 +252,9 @@
 	}
 	elseif(isset($_REQUEST["save"])&&in_array($_REQUEST["config"],array(0,5)))
 	{
+
+
+
 /* OTHER ACTIONS */
 		$result=update_config($_REQUEST["alarm_history"],$_REQUEST["alert_history"],
 			$_REQUEST["refresh_unsupported"]);
