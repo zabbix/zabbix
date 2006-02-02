@@ -83,7 +83,7 @@
 
 	if(isset($reconnect) && isset($sessionid))
 	{
-		$sql="delete from sessions where sessionid='$sessionid'";
+		$sql="delete from sessions where sessionid='".zbx_ads($sessionid)."'";
 		DBexecute($sql);
 		setcookie("sessionid",$sessionid,time()-3600);
 		unset($sessionid);
@@ -92,7 +92,7 @@
 	if(isset($enter)&&($enter=="Enter"))
 	{
 		$password=md5($password);
-		$sql="select u.userid,u.alias,u.name,u.surname,u.url,u.refresh from users u where u.alias='$name' and u.passwd='$password'";
+		$sql="select u.userid,u.alias,u.name,u.surname,u.url,u.refresh from users u where u.alias='".zbx_ads($name)."' and u.passwd='".zbx_ads($password)."'";
 		$result=DBselect($sql);
 		if(DBnum_rows($result)==1)
 		{
@@ -107,7 +107,7 @@
 			setcookie("sessionid",$sessionid,time()+3600);
 // Required !
 			$_COOKIE["sessionid"]=$sessionid;
-			$sql="insert into sessions (sessionid,userid,lastaccess) values ('$sessionid',".$USER_DETAILS["userid"].",".time().")";
+			$sql="insert into sessions (sessionid,userid,lastaccess) values ('".zbx_ads($sessionid)."',".$USER_DETAILS["userid"].",".time().")";
 			DBexecute($sql);
 
 			if($USER_DETAILS["url"] != '')

@@ -86,7 +86,7 @@
 #	ImageFilledRectangle($im,0,0,$width,$height,$black);
 	if($background!="")
 	{
-		$sql="select image from images where imagetype=2 and name='$background'";
+		$sql="select image from images where imagetype=2 and name='".zbx_ads($background)."'";
 		$result2=DBselect($sql);
 		if(DBnum_rows($result2)==1)
 		{
@@ -286,7 +286,7 @@
 				$icons[$icon]=ImageCreateFromPNG("images/sysmaps/old/$icon.png");
 			}
 */
-			$sql="select image from images where imagetype=1 and name='$icon'";
+			$sql="select image from images where imagetype=1 and name='".zbx_ads($icon)."'";
 			$result2=DBselect($sql);
 			if(DBnum_rows($result2)!=1)
 			{

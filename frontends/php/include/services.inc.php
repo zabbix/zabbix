@@ -43,11 +43,11 @@
 				$description=expand_trigger_description($triggerid);
 //			}
 			$description=zbx_ads($description);
-			$sql="insert into services (name,triggerid,status,algorithm,showsla,goodsla,sortorder) values ('$description',$triggerid,0,$algorithm,$showsla,$goodsla,$sortorder)";
+			$sql="insert into services (name,triggerid,status,algorithm,showsla,goodsla,sortorder) values ('".zbx_ads($description)."',$triggerid,0,$algorithm,$showsla,$goodsla,$sortorder)";
 		}
 		else
 		{
-			$sql="insert into services (name,status,algorithm,showsla,goodsla,sortorder) values ('$name',0,$algorithm,$showsla,$goodsla,$sortorder)";
+			$sql="insert into services (name,status,algorithm,showsla,goodsla,sortorder) values ('".zbx_ads($name)."',0,$algorithm,$showsla,$goodsla,$sortorder)";
 		}
 		$result=DBexecute($sql);
 		if(!$result)
@@ -180,7 +180,7 @@
 		{
 			$showsla=0;
 		}
-		$sql="update services set name='$name',triggerid=$triggerid,status=0,algorithm=$algorithm,showsla=$showsla,goodsla=$goodsla,sortorder=$sortorder where serviceid=$serviceid";
+		$sql="update services set name='".zbx_ads($name)."',triggerid=$triggerid,status=0,algorithm=$algorithm,showsla=$showsla,goodsla=$goodsla,sortorder=$sortorder where serviceid=$serviceid";
 		return	DBexecute($sql);
 	}
 

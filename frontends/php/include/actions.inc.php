@@ -44,7 +44,7 @@
 //                      return 0;
 //		}
 
-		$sql="insert into actions (userid,delay,nextcheck,subject,message,recipient,maxrepeats,repeatdelay) values ($id,$delay,0,'$subject','$message',$recipient,$maxrepeats,$repeatdelay)";
+		$sql="insert into actions (userid,delay,nextcheck,subject,message,recipient,maxrepeats,repeatdelay) values ($id,$delay,0,'".zbx_ads($subject)."','".zbx_ads($message)."',$recipient,$maxrepeats,$repeatdelay)";
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"actions","actionid");
 	}
@@ -59,7 +59,7 @@
 //                      return 0;
 //		}
 
-		$sql="update actions set userid=$id,delay=$delay,nextcheck=0,subject='$subject',message='$message',recipient=$recipient,maxrepeats=$maxrepeats, repeatdelay=$repeatdelay where actionid=$actionid";
+		$sql="update actions set userid=$id,delay=$delay,nextcheck=0,subject='".zbx_ads($subject)."',message='".zbx_ads($message)."',recipient=$recipient,maxrepeats=$maxrepeats, repeatdelay=$repeatdelay where actionid=$actionid";
 		$result=DBexecute($sql);
 		return $result;
 	}

@@ -38,7 +38,7 @@
 			return 0;
 		}
 
-		$sql="insert into hosts_profiles (hostid,devicetype,name,os,serialno,tag,macaddress,hardware,software,contact,location,notes) values (".zbx_ads($hostid).",'".zbx_ads($devicetype)."','".zbx_ads($name)."','".zbx_ads($os)."','".zbx_ads($serialno)."','".zbx_ads($tag)."','".zbx_ads($macaddress)."','".zbx_ads($hardware)."','".zbx_ads($software)."','".zbx_ads($contact)."','".zbx_ads($location)."','".zbx_ads($notes)."')";
+		$sql="insert into hosts_profiles (hostid,devicetype,name,os,serialno,tag,macaddress,hardware,software,contact,location,notes) values ($hostid,'".zbx_ads($devicetype)."','".zbx_ads($name)."','".zbx_ads($os)."','".zbx_ads($serialno)."','".zbx_ads($tag)."','".zbx_ads($macaddress)."','".zbx_ads($hardware)."','".zbx_ads($software)."','".zbx_ads($contact)."','".zbx_ads($location)."','".zbx_ads($notes)."')";
 		$result=DBexecute($sql);
 		
 		return	$result;
@@ -63,7 +63,7 @@
 			return 0;
 		}
 
-		$sql="update hosts_profiles set devicetype='".zbx_ads($devicetype)."',name='".zbx_ads($name)."',os='".zbx_ads($os)."',serialno='".zbx_ads($serialno)."',tag='".zbx_ads($tag)."',macaddress='".zbx_ads($macaddress)."',hardware='".zbx_ads($hardware)."',software='".zbx_ads($software)."',contact='".zbx_ads($contact)."',location='".zbx_ads($location)."',notes='".zbx_ads($notes)."' where hostid=".zbx_ads($hostid);
+		$sql="update hosts_profiles set devicetype='".zbx_ads($devicetype)."',name='".zbx_ads($name)."',os='".zbx_ads($os)."',serialno='".zbx_ads($serialno)."',tag='".zbx_ads($tag)."',macaddress='".zbx_ads($macaddress)."',hardware='".zbx_ads($hardware)."',software='".zbx_ads($software)."',contact='".zbx_ads($contact)."',location='".zbx_ads($location)."',notes='".zbx_ads($notes)."' where hostid=$hostid";
 		$result=DBexecute($sql);
 		
 		return	$result;
