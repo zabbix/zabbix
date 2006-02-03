@@ -36,7 +36,7 @@
                 exit;
         }
 
-	$_REQUEST["config"]=@iif(isset($_REQUEST["config"]),$_REQUEST["config"],get_profile("web.users.config",0));
+	$_REQUEST["config"]=get_request("config",get_profile("web.users.config",0));
 	update_profile("web.users.config",$_REQUEST["config"]);
 ?>
 <?php
@@ -46,23 +46,44 @@
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"alias"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'({config}==0)&&isset({save})'),
-		"name"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'({config}==0)&&(isset({save}))'),
-		"surname"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'({config}==0)&&(isset({save}))'),
-		"password1"=>		array(T_ZBX_STR, O_NO,	NULL,	NULL,		'({config}==0)&&(isset({save}))'),
-		"password2"=>		array(T_ZBX_STR, O_NO,	NULL,	NULL,		'({config}==0)&&(isset({save}))'),
-		"lang"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'({config}==0)&&(isset({save}))'),
-		"autologout"=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,3600),'({config}==0)&&(isset({save}))'),
-		"url"=>			array(T_ZBX_STR, O_NO,	NULL,	NULL,		'({config}==0)&&(isset({save}))'),
-		"refresh"=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,3600),'({config}==0)&&(isset({save}))'),
+		"config"=>	array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	NULL),
+/* user */
+		"userid"=>	array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,'{config}==0&&{form}=="update"'),
 
-		"userid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535),	NULL),
+		"alias"=>	array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'{config}==0&&isset({save})'),
+		"name"=>	array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'{config}==0&&isset({save})'),
+		"surname"=>	array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'{config}==0&&isset({save})'),
+		"password1"=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'{config}==0&&isset({save})'),
+		"password2"=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'{config}==0&&isset({save})'),
+		"lang"=>	array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'{config}==0&&isset({save})'),
+		"autologout"=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,3600),'{config}==0&&isset({save})'),
+		"url"=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'{config}==0&&isset({save})'),
+		"refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,3600),'{config}==0&&isset({save})'),
 
-		"config"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,3,4,5"),	NULL),
-		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL)
+		"right"=>	array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,
+					'{register}=="add permission"&&isset({userid})'),
+		"permission"=>	array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,
+					'{register}=="add permission"&&isset({userid})'),
+		"id"=>		array(T_ZBX_INT, O_NO,	NULL,	DB_ID,
+					'{register}=="add permission"&&isset({userid})'),
+		"rightid"=>	array(T_ZBX_INT, O_NO,  NULL,   DB_ID,
+                                        '{register}=="delete permission"&&isset({userid})'),
+/* group */
+		"usrgrpid"=>	array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,'{config}==1&&{form}=="update"'),
+
+		"gname"=>	array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'{config}==1&&isset({save})'),
+		"users"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+
+/* actions */
+		"register"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	
+					IN('"add permission","delete permission"'), NULL),
+
+		"save"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"delete"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"cancel"=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+/* other */
+		"form"=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		"form_refresh"=>array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
 	);
 
 	check_fields($fields);
@@ -121,18 +142,13 @@
 
 	if(isset($_REQUEST["save"])&&($_REQUEST["config"]==1))
 	{
-		$users=array();
-		$db_users=DBselect("select userid from users");
-		while($db_user=DBfetch($db_users)){
-			if(!isset($_REQUEST[$db_user["userid"]])) continue;
-			array_push($users,$db_user["userid"]);
-		}
+		$users=$_REQUEST["users"];
 
 		if(isset($_REQUEST["usrgrpid"])){
-			$result=update_user_group($_REQUEST["usrgrpid"], $_REQUEST["name"], $users);
+			$result=update_user_group($_REQUEST["usrgrpid"], $_REQUEST["gname"], $users);
 			show_messages($result, S_GROUP_UPDATED, S_CANNOT_UPDATE_GROUP);
 		}else{
-			$result=add_user_group($_REQUEST["name"], $users);
+			$result=add_user_group($_REQUEST["gname"], $users);
 			show_messages($result, S_GROUP_ADDED, S_CANNOT_ADD_GROUP);
 		}
 
@@ -153,7 +169,7 @@
 
 	if(isset($_REQUEST["register"]))
 	{
-		if($_REQUEST["register"]=="delete_permission")
+		if($_REQUEST["register"]=="delete permission")
 		{
 			$result=delete_permission($_REQUEST["rightid"]);
 			show_messages($result, S_PERMISSION_DELETED, S_CANNOT_DELETE_PERMISSION);
@@ -169,11 +185,6 @@
 	}
 ?>
 <?php
-	if(!isset($_REQUEST["config"]))
-	{
-		$_REQUEST["config"]=0;
-	}
-
 	$cmbConf = new CComboBox("config",$_REQUEST["config"],"submit()");
 	$cmbConf->AddItem(0,S_USERS);
 	$cmbConf->AddItem(1,S_USER_GROUPS);
@@ -207,8 +218,8 @@
 				if(!check_right("User","R",$db_user["userid"]))		continue;
 
 				$alias = new CLink($db_user["alias"],
-					"users.php?form=0".url_param("config").
-					"&userid=".$db_user["userid"]."#form");
+					"users.php?form=update".url_param("config").
+					"&userid=".$db_user["userid"]."#form", 'action');
 			
 				$db_sessions = DBselect("select count(*) as count from sessions".
 					" where userid=".$db_user["userid"]." and lastaccess-600<".time());
@@ -263,12 +274,13 @@
 					else if($db_right["permission"]=="U")	$permission=S_READ_WRITE;
 					else if($db_right["permission"]=="H")	$permission=S_HIDE;
 					else if($db_right["permission"]=="A")	$permission=S_ADD;
-					else					$permission=$db_right["permission"];
+					else	$permission=$db_right["permission"];
 
 					$actions= new CLink(
 						S_DELETE,
-						"users.php?userid=".$_REQUEST["userid"]."&rightid=".
-						$db_right["rightid"]."&register=delete_permission>");
+						"users.php?".url_param("userid")."&rightid=".$db_right["rightid"].
+						"&register=delete+permission".url_param("form").
+						url_param("config")."#form");
 
 					$table->addRow(array(
 						$db_right["name"],
@@ -301,8 +313,8 @@
 
 				$name = new CLink(
 					$row["name"],
-					"users.php?config=".$_REQUEST["config"]."&form=0&usrgrpid=".
-					$row["usrgrpid"]."#form");
+					"users.php?".url_param("config")."&form=update".
+					"&usrgrpid=".$row["usrgrpid"]."#form", 'action');
 
 				$users=SPACE;
 

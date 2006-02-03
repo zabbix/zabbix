@@ -32,27 +32,43 @@
 		$frmTemplate->SetHelp('web.hosts.php');
 		$frmTemplate->AddVar('config',$_REQUEST["config"]);
 
-		if(isset($_REQUEST["hosttemplateid"]) && !isset($_REQUEST["form_refresh"]))
+		if(isset($_REQUEST["hosttemplateid"]))
 		{
 			$frmTemplate->AddVar('hosttemplateid',$_REQUEST["hosttemplateid"]);
+		}
 
+		if(isset($_REQUEST["hosttemplateid"]) && !isset($_REQUEST["form_refresh"]))
+		{
 			$result=DBselect("select * from hosts_templates".
 				" where hosttemplateid=".$_REQUEST["hosttemplateid"]);
 			$row=DBfetch($result);
 	
 			$hostid		= $row["hostid"];
 			$templateid	= $row["templateid"];
-			$items		= $row["items"];
-			$triggers	= $row["triggers"];
-			$graphs		= $row["graphs"];
+		
+			$items = array();	
+			if(1 & $row["items"])	array_push($items,1);
+			if(2 & $row["items"])	array_push($items,2);
+			if(4 & $row["items"])	array_push($items,4);
+
+			$triggers= array();	
+			if(1 & $row["triggers"])	array_push($triggers,1);
+			if(2 & $row["triggers"])	array_push($triggers,2);
+			if(4 & $row["triggers"])	array_push($triggers,4);
+
+			$graphs= array();	
+			if(1 & $row["graphs"])	array_push($graphs,1);
+			if(2 & $row["graphs"])	array_push($graphs,2);
+			if(4 & $row["graphs"])	array_push($graphs,4);
 		}
 		else
 		{
 			$hostid		= get_request("hostid",0);
 			$templateid	= get_request("templateid",0);
-			$items		= get_request("items",7);
-			$triggers	= get_request("triggers",7);
-			$graphs		= get_request("graphs",7);
+
+			$items		= get_request("items",array(1,2,4));
+			$triggers 	= get_request("triggers",array(1,2,4));
+			$graphs 	= get_request("graphs",array(1,2,4));
 		}
 		if($hostid!=0){
 			$host	 = get_host_by_hostid($hostid);
@@ -70,32 +86,31 @@
 		$frmTemplate->AddRow(S_TEMPLATE,$cmbTemplate);
 
 		$frmTemplate->AddRow(S_ITEMS,array(
-			new CCheckBox('items_add',	1 & $items,	S_ADD),
-			new CCheckBox('items_update',	2 & $items,	S_UPDATE),
-			new CCheckBox('items_delete',	4 & $items,	S_DELETE)
+			new CCheckBox('items[]',	in_array(1,$items)?'yes':'no',	S_ADD,	NULL,	1),
+			new CCheckBox('items[]',	in_array(2,$items)?'yes':'no',	S_UPDATE,NULL,	2),
+			new CCheckBox('items[]',	in_array(4,$items)?'yes':'no',	S_DELETE,NULL,	4)
 		));
 
 		$frmTemplate->AddRow(S_TRIGGERS,array(
-			new CCheckBox('triggers_add',	1 & $triggers,	S_ADD),
-			new CCheckBox('triggers_update',2 & $triggers,	S_UPDATE),
-			new CCheckBox('triggers_delete',4 & $triggers,	S_DELETE),
+			new CCheckBox('triggers[]',	in_array(1,$triggers)?'yes':'no',S_ADD,	NULL,	1),
+			new CCheckBox('triggers[]',	in_array(2,$triggers)?'yes':'no',S_UPDATE,NULL,	2),
+			new CCheckBox('triggers[]',	in_array(4,$triggers)?'yes':'no',S_DELETE,NULL,	4),
 		));
 
 		$frmTemplate->AddRow(S_GRAPHS,array(
-			new CCheckBox('graphs_add',	1 & $graphs,	S_ADD),
-			new CCheckBox('graphs_update',	2 & $graphs,	S_UPDATE),
-			new CCheckBox('graphs_delete',	4 & $graphs,	S_DELETE),
+			new CCheckBox('graphs[]',	in_array(1,$graphs)?'yes':'no',	S_ADD,	NULL,	1),
+			new CCheckBox('graphs[]',	in_array(2,$graphs)?'yes':'no',	S_UPDATE,NULL,	2),
+			new CCheckBox('graphs[]',	in_array(4,$graphs)?'yes':'no',	S_DELETE,NULL,	4),
 		));
 
-		$frmTemplate->AddItemToBottomRow(new CButton('register','add linkage'));
+		$frmTemplate->AddItemToBottomRow(new CButton('save',S_SAVE));
 		if(isset($_REQUEST["hosttemplateid"]))
 		{
-			$frmTemplate->AddItemToBottomRow(SPACE);
-			$frmTemplate->AddItemToBottomRow(new CButton('register','update linkage'));
 			$frmTemplate->AddItemToBottomRow(SPACE);
 			$frmTemplate->AddItemToBottomRow(new CButtonDelete('Delete selected linkage?',
 				url_param("form").url_param("config").url_param("hostid").
 				url_param("hosttemplateid")));
+		} else {
 		}
 		$frmTemplate->AddItemToBottomRow(SPACE);
 		$frmTemplate->AddItemToBottomRow(new CButtonCancel(url_param("config").url_param("hostid")));
@@ -112,7 +127,11 @@
 			$user=get_user_by_userid($userid);
 			$frm_title = S_USER." \"".$user["alias"]."\"";
 		}
-		if(isset($userid) && !isset($_REQUEST["form_refresh"]))
+// TMP!!!
+//    isset($_REQUEST["register"]) mus be deleted
+//    needed rewrite permisions to delete id
+// TMP!!!
+		if(isset($userid) && (!isset($_REQUEST["form_refresh"]) || isset($_REQUEST["register"])))
 		{
 			$alias		= $user["alias"];
 			$name		= $user["name"];
@@ -193,10 +212,9 @@
 		$frmPerm = new CFormTable("New permission","users.php");
 		$frmPerm->SetHelp("web.users.users.php");
 
-		$frmPerm->AddVar("form",0); // for correct data loading of user form (redefine form=1)
 		$frmPerm->AddVar("userid",$_REQUEST["userid"]);
 		$frmPerm->AddVar("config",get_request("config",0));
-		
+
 		$cmbRes = new CComboBox("right");
 		$cmbRes->AddItem("Configuration of Zabbix","Configuration of Zabbix");
 		$cmbRes->AddItem("Default permission","Default permission");
@@ -234,6 +252,7 @@
 			$frm_title = S_USER_GROUP." \"".$usrgrp["name"]."\"";
 		}
 
+		$users = get_request("users",array());
 		if(isset($usrgrpid) && !isset($_REQUEST["form_refresh"]))
 		{
 			$name	= $usrgrp["name"];
@@ -243,12 +262,13 @@
 
 			while($db_user=DBfetch($db_users))
 			{
-				$_REQUEST[$db_user["userid"]] = 'yes';
+				if(in_array($db_user["userid"], $users)) continue;
+				array_push($users,$db_user["userid"]);
 			}
 		}
 		else
 		{
-			$name	= get_request("name","");
+			$name	= get_request("gname","");
 		}
 
 		$frmUserG = new CFormTable($frm_title,"users.php");
@@ -258,16 +278,18 @@
 		{
 			$frmUserG->AddVar("usrgrpid",$usrgrpid);
 		}
-		$frmUserG->AddRow(S_GROUP_NAME,new CTextBox("name",$name,30));
+		$frmUserG->AddRow(S_GROUP_NAME,new CTextBox("gname",$name,30));
 
 		$form_row = array();
-		$users=DBselect("select distinct userid,alias from users order by alias");
-		while($user=DBfetch($users))
+		$db_users=DBselect("select distinct userid,alias from users order by alias");
+		while($db_user=DBfetch($db_users))
 		{
 			array_push($form_row,
-				new CCheckBox($user["userid"],
-					isset($_REQUEST[$user["userid"]]) ? 'yes' : 'no',
-					$user["alias"]),
+				new CCheckBox("users[]",
+					in_array($db_user["userid"],$users) ? 'yes' : 'no',
+					$db_user["alias"],	/* caption */
+					NULL,			/* action */
+					$db_user["userid"]),	/* value */
 				BR);
 		}
 		$frmUserG->AddRow(S_USERS,$form_row);
@@ -1555,22 +1577,23 @@
 	{
 		global $_REQUEST;
 
+		$severity = get_request("severity",array());
+
 		if(isset($_REQUEST["mediaid"]) && !isset($_REQUEST["form_refresh"]))
 		{
 			$media=get_media_by_mediaid($_REQUEST["mediaid"]);
 
-			$severity	= $media["severity"];
 			$sendto		= $media["sendto"];
 			$mediatypeid	= $media["mediatypeid"];
 			$active		= $media["active"];
 			$period		= $media["period"];
 
-			if($severity & 1)	$_REQUEST["0"]='yes';
-			if($severity & 2)	$_REQUEST["1"]='yes';
-			if($severity & 4)	$_REQUEST["2"]='yes';
-			if($severity & 8)	$_REQUEST["3"]='yes';
-			if($severity & 16)	$_REQUEST["4"]='yes';
-			if($severity & 32)	$_REQUEST["5"]='yes';
+			if($media["severity"] & 1)	array_push($severity,0);
+			if($media["severity"] & 2)	array_push($severity,1);
+			if($media["severity"] & 4)	array_push($severity,2);
+			if($media["severity"] & 8)	array_push($severity,3);
+			if($media["severity"] & 16)	array_push($severity,4);
+			if($media["severity"] & 32)	array_push($severity,5);
 		}
 		else
 		{
@@ -1600,14 +1623,25 @@
 		$frmMedia->AddRow(S_SEND_TO,new CTextBox("sendto",$sendto,20));	
 		$frmMedia->AddRow(S_WHEN_ACTIVE,new CTextBox("period",$period,48));	
 	
-		$frm_row = array();
 
-		array_push($frm_row, new CCheckBox("0",	get_request("0", 'no'), S_NOT_CLASSIFIED),	BR);
-		array_push($frm_row, new CCheckBox("1",	get_request("1", 'no'), S_INFORMATION),		BR);
-		array_push($frm_row, new CCheckBox("2",	get_request("2", 'no'), S_WARNING),		BR);
-		array_push($frm_row, new CCheckBox("3",	get_request("3", 'no'), S_AVERAGE),		BR);
-		array_push($frm_row, new CCheckBox("4",	get_request("4", 'no'), S_HIGH),		BR);
-		array_push($frm_row, new CCheckBox("5",	get_request("5", 'no'), S_DISASTER),		BR);
+		$label[0] = S_NOT_CLASSIFIED;
+		$label[1] = S_INFORMATION;
+		$label[2] = S_WARNING;
+		$label[3] = S_AVERAGE;
+		$label[4] = S_HIGH;
+		$label[5] = S_DISASTER;
+
+		$frm_row = array();
+		for($i=0; $i<=5; $i++){
+			array_push($frm_row, 
+				new CCheckBox(
+					"severity[]",
+					in_array($i,$severity)?'yes':'no', 
+					$label[$i],	/* label */
+					NULL,		/* action */
+					$i),		/* value */
+				BR);
+		}
 		$frmMedia->AddRow(S_USE_IF_SEVERITY,$frm_row);
 
 		$cmbStat = new CComboBox("active",$active);
@@ -1663,6 +1697,8 @@
 
 		global $_REQUEST;
 
+		$groups= get_request("groups",array());
+
 		$newgroup	= get_request("newgroup","");
 		$host_templateid= get_request("host_templateid","");
 
@@ -1702,7 +1738,10 @@
 			$ip	= $db_host["ip"];
 // add groups
 			$db_groups=DBselect("select groupid from hosts_groups where hostid=".$_REQUEST["hostid"]);
-			while($db_group=DBfetch($db_groups))	$_REQUEST[$db_group["groupid"]]="yes";
+			while($db_group=DBfetch($db_groups)){
+				if(in_array($db_group["groupid"],$groups)) continue;
+				array_push($groups, $db_group["groupid"]);
+			}
 // read profile
 			$db_profiles = DBselect("select * from hosts_profiles where hostid=".$_REQUEST["hostid"]);
 
@@ -1740,8 +1779,14 @@
 		$db_groups=DBselect("select distinct groupid,name from groups order by name");
 		while($db_group=DBfetch($db_groups))
 		{
-			$selected = isset($_REQUEST[$db_group["groupid"]]) ? 'yes' : 'no';
-			array_push($frm_row,new CCheckBox($db_group["groupid"],$selected, $db_group["name"]),BR);
+			array_push($frm_row,
+				new CCheckBox("groups[]",
+					in_array($db_group["groupid"],$groups) ? 'yes' : 'no', 
+					$db_group["name"],
+					NULL,
+					$db_group["groupid"]
+					),
+				BR);
 		}
 		$frmHost->AddRow(S_GROUPS,$frm_row);
 
@@ -1801,7 +1846,7 @@
 			$frmHost->AddVar("software",	$software);
 			$frmHost->AddVar("contact",	$contact);
 			$frmHost->AddVar("location",	$location);
-			$frmHost->AddVar("notes	",	$notes);
+			$frmHost->AddVar("notes",	$notes);
 		}
 
 		$frmHost->AddItemToBottomRow(new CButton("save",S_SAVE));
@@ -1822,23 +1867,34 @@
 	}
 
 	# Insert form for Host Groups
-	function	insert_hostgroups_form($groupid)
+	function	insert_hostgroups_form()
 	{
 		global  $_REQUEST;
 
+		$hosts = get_request("hosts",array());
 		$frm_title = S_HOST_GROUP;
-		if(isset($groupid))
+		if(isset($_REQUEST["groupid"]))
 		{
-			$groupid=get_group_by_groupid($groupid);
-			$frm_title = S_HOST_GROUP." \"".$groupid["name"]."\"";
-			if(!isset($_REQUEST["form_refresh"]))
-				$name=$groupid["name"];
-			else
-				$name = get_request("name","");
+			$group=get_group_by_groupid($_REQUEST["groupid"]);
+			$frm_title = S_HOST_GROUP." \"".$group["name"]."\"";
+		}
+		if(isset($_REQUEST["groupid"]) && !isset($_REQUEST["form_refresh"]))
+		{
+			$name=$group["name"];
+			$db_hosts=DBselect("select distinct h.hostid from hosts h, hosts_groups hg".
+				" where h.status<>".HOST_STATUS_DELETED.
+				" and h.hostid=hg.hostid".
+				" and hg.groupid=".$_REQUEST["groupid"].
+				" order by host");
+			while($db_host=DBfetch($db_hosts))
+			{
+				if(in_array($db_host["hostid"],$hosts)) continue;
+				array_push($hosts, $db_host["hostid"]);
+			}
 		}
 		else
 		{
-			$name=get_request("name","");
+			$name=get_request("gname","");
 		}
 		$frmHostG = new CFormTable($frm_title,"hosts.php");
 		$frmHostG->SetHelp("web.hosts.group.php");
@@ -1848,24 +1904,15 @@
 			$frmHostG->AddVar("groupid",$_REQUEST["groupid"]);
 		}
 
-		$frmHostG->AddRow(S_GROUP_NAME,new CTextBox("name",$name,30));
+		$frmHostG->AddRow(S_GROUP_NAME,new CTextBox("gname",$name,30));
 
 		$cmbHosts = new CListBox("hosts[]",10);
-		$hosts=DBselect("select distinct hostid,host from hosts where status<>".HOST_STATUS_DELETED." order by host");
-		while($host=DBfetch($hosts))
+		$db_hosts=DBselect("select distinct hostid,host from hosts".
+			" where status<>".HOST_STATUS_DELETED." order by host");
+		while($db_host=DBfetch($db_hosts))
 		{
-			if(isset($_REQUEST["groupid"]))
-			{
-				$result=DBselect("select count(*) as count from hosts_groups".
-					" where hostid=".$host["hostid"]." and groupid=".$_REQUEST["groupid"]);
-				$res_row=DBfetch($result);
-				$cmbHosts->AddItem($host["hostid"],$host["host"], 
-					($res_row["count"]==0) ? 'no' : 'yes');
-			}
-			else
-			{
-				$cmbHosts->AddItem($host["hostid"],$host["host"]);
-			}
+			$cmbHosts->AddItem($db_host["hostid"],$db_host["host"],
+				in_array($db_host["hostid"],$hosts) ? 'yes' : 'no');
 		}
 		$frmHostG->AddRow(S_HOSTS,$cmbHosts);
 

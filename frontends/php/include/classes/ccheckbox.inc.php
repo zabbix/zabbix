@@ -54,7 +54,7 @@
 		{
 			if(is_null($value))
 				return $this->DelOption("value");
-			elseif(is_string($value))	
+			elseif(is_string($value) || is_numeric($value))	
 				return $this->AddOption('value',$value);
 			return $this->error("Incorrect value for SetValue [$value]");
 		}

@@ -71,8 +71,10 @@
 			}
 			return 0;
 		}
-		function SetValue($value="")
+		function SetValue($value=NULL)
 		{
+			if(is_null($value)) $value="";
+
 			if(is_int($value))
 			{
 				return $this->AddOption("value",strval($value));
@@ -85,7 +87,7 @@
 		}
 		function SetSize($value)
 		{
-			if(!is_int($value))
+			if(!is_numeric($value))
 			{
 				return $this->error("Incorrect value for SetSize [$value]");
 			}

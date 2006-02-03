@@ -39,15 +39,37 @@
 ?>
 
 <?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"userid"=>	array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,		NULL),
+		"mediaid"=>	array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'{form}=="update"'),
+		"mediatypeid"=>	array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'isset({save})'),
+		"sendto"=>	array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'isset({save})'),
+		"period"=>	array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'isset({save})'),
+		"active"=>	array(T_ZBX_INT, O_NO,	NULL,	IN(0,1),	'isset({save})'),
+
+		"severity"=>	array(T_ZBX_INT, O_OPT,	NULL,	NOT_EMPTY,	NULL),
+
+		"medias"=>	array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'isset({new_status})'),
+/* actions */
+		"new_status"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"enable"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+
+		"save"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"delete"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"cancel"=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+/* other */
+		"form"=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		"form_refresh"=>array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
+	);
+
+	check_fields($fields);
+?>
+
+<?php
 	if(isset($_REQUEST["save"]))
 	{
-		$severity=array();
-		if(isset($_REQUEST["0"]))	$severity=array_merge($severity,array(0));
-		if(isset($_REQUEST["1"]))	$severity=array_merge($severity,array(1));
-		if(isset($_REQUEST["2"]))	$severity=array_merge($severity,array(2));
-		if(isset($_REQUEST["3"]))	$severity=array_merge($severity,array(3));
-		if(isset($_REQUEST["4"]))	$severity=array_merge($severity,array(4));
-		if(isset($_REQUEST["5"]))	$severity=array_merge($severity,array(5));
+		$severity=get_request("severity",array());
 
 		if(isset($_REQUEST["mediaid"]))
 		{
@@ -70,16 +92,25 @@
 	{
 		$result=delete_media( $_REQUEST["mediaid"] );
 		show_messages($result,S_MEDIA_DELETED, S_CANNOT_DELETE_MEDIA);
+		if($result){
+			unset($_REQUEST["form"]);
+		}
 	}
-	elseif(isset($_REQUEST["enable"])&&isset($_REQUEST["mediaid"]))
+	elseif(isset($_REQUEST["new_status"])&&isset($_REQUEST["medias"]))
 	{
-		$result=activate_media($_REQUEST["mediaid"] );
-		show_messages($result, S_MEDIA_ACTIVATED, S_CANNOT_ACTIVATE_MEDIA);
-	}
-	elseif(isset($_REQUEST["disable"])&&isset($_REQUEST["mediaid"]))
-	{
-		$result=disactivate_media( $_REQUEST["mediaid"] );
-		show_messages($result, S_MEDIA_DISABLED, S_CANNOT_DISABLE_MEDIA);
+		foreach($_REQUEST["medias"] as $mediaid)
+		{
+			if($_REQUEST["new_status"]!=0)
+			{
+				$result = activate_media($mediaid);
+				show_messages($result, S_MEDIA_ACTIVATED, S_CANNOT_ACTIVATE_MEDIA);
+			}
+			else
+			{
+				$result = disactivate_media($mediaid);
+				show_messages($result, S_MEDIA_DISABLED, S_CANNOT_DISABLE_MEDIA);
+			}
+		}
 	}
 ?>
 <?php
@@ -98,7 +129,7 @@
 	else
 	{
 		$table = new CTableInfo(S_NO_MEDIA_DEFINED);
-		$table->setHeader(array(S_TYPE,S_SEND_TO,S_WHEN_ACTIVE,S_STATUS,S_ACTIONS));
+		$table->setHeader(array(S_TYPE,S_SEND_TO,S_WHEN_ACTIVE,S_STATUS));
 
 		$result=DBselect("select m.mediaid,mt.description,m.sendto,m.active,m.period".
 			" from media m,media_type mt where m.mediatypeid=mt.mediatypeid".
@@ -109,25 +140,25 @@
 			if($row["active"]==0) 
 			{
 				$status=new CLink(S_ENABLED,
-					"media.php?disable=1&mediaid=".$row["mediaid"].url_param("userid"),
+					"media.php?new_status=0&medias%5B%5D=".$row["mediaid"].url_param("userid"),
 					"enabled");
 			}
 			else
 			{
 				$status=new CLink(S_DISABLED,
-					"media.php?enable=1&mediaid=".$row["mediaid"].url_param("userid"),
+					"media.php?new_status=1&medias%5B%5D=".$row["mediaid"].url_param("userid"),
 					"disabled");
 			}
 
 			$table->addRow(array(
-				$row["description"],
+				new CLink($row["description"],
+					"media.php?form=update&mediaid=".$row["mediaid"].
+						url_param("userid"),
+					'action'
+					),
 				$row["sendto"],
 				$row["period"],
-				$status,
-				new CLink(S_CHANGE,
-					"media.php?form=update&mediaid=".$row["mediaid"].
-						"&userid=".$_REQUEST["userid"]
-					)
+				$status
 				));
 		}
 		$table->show();
