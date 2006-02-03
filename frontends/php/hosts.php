@@ -34,10 +34,65 @@
 		exit;
 	}
 
-	if(!isset($_REQUEST["config"]))	$_REQUEST["config"] = get_profile("web.hosts.config",0);
+	$_REQUEST["config"] = get_request("config",get_profile("web.hosts.config",0));
 
 	update_profile("web.hosts.config",$_REQUEST["config"]);
 	update_profile("web.menu.config.last",$page["file"]);
+?>
+<?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"config"=>	array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,2"),	NULL),
+
+		"hosts"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		"groups"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+/* host */
+		"hostid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,  DB_ID,		'{config}==0&&{form}=="update"'),
+		"host"=>	array(T_ZBX_STR, O_OPT,  NULL,   NOT_EMPTY,	'{config}==0&&isset({save})'),
+		"useip"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
+		"ip"=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,			'isset({useip})'),
+		"port"=>	array(T_ZBX_INT, O_OPT,  NULL,   BETWEEN(0,65535),'{config}==0&&isset({save})'),
+		"status"=>	array(T_ZBX_INT, O_OPT,  NULL,   IN("0,1,2"),	'{config}==0&&isset({save})'),
+
+		"newgroup"=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
+		"host_templateid"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,	NULL),
+
+		"useprofile"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
+		"devicetype"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		"name"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		"os"=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		"serialno"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		"tag"=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		"macaddress"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		"hardware"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		"software"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		"contact"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		"location"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+		"notes"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
+/* group */
+		"groupid"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'{config}==1&&{form}=="update"'),
+		"gname"=>	array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'{config}==1&&isset({save})'),
+/* linkages */
+		"hosttemplateid"=>	array(T_ZBX_INT, O_OPT, P_SYS,  DB_ID,	'{config}==3&&{form}=="update"'),
+		"templateid"=>	array(T_ZBX_INT, O_OPT, P_SYS,  DB_ID,	NULL),
+		"items"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("1,2,4"), NULL),
+		"triggers"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("1,2,4"), NULL),
+		"graphs"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("1,2,4"), NULL),
+
+/* actions */
+		"activate"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),	
+		"disable"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),	
+
+//		"register"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"save"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"delete"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"cancel"=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+/* other */
+		"form"=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		"form_refresh"=>array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
+	);
+
+	check_fields($fields);
 ?>
 <?php
 
@@ -47,13 +102,7 @@
 	{
 		$useip = get_request("useip","no");
 
-		$groups=array();
-		$db_groups=DBselect("select groupid from groups");
-		while($db_group=DBfetch($db_groups))
-		{
-			if(!isset($_REQUEST[$db_group["groupid"]]))	continue;
-			array_push($groups,$db_group["groupid"]);
-		}
+		$groups=get_request("groups",array());
 
 		if(isset($_REQUEST["hostid"]))
 		{
@@ -126,7 +175,7 @@
 	}
 
 /* DELETE HOST */ 
-	if(($_REQUEST["config"]==0)&&isset($_REQUEST["delete"])){
+	elseif(($_REQUEST["config"]==0)&&isset($_REQUEST["delete"])){
 		if(isset($_REQUEST["hostid"])){
 			$host=get_host_by_hostid($_REQUEST["hostid"]);
 			$result=delete_host($_REQUEST["hostid"]);
@@ -143,14 +192,14 @@
 		} else {
 /* group operations */
 			$result = 0;
+			$hosts = get_request("hosts",array());
 			$db_hosts=DBselect("select hostid from hosts");
 			while($db_host=DBfetch($db_hosts))
 			{
-				if(!isset($_REQUEST[$db_host["hostid"]])) continue;
+				if(!in_array($db_host["hostid"],$hosts)) continue;
+				if(!delete_host($db_host["hostid"]))	continue;
 				$result = 1;
-				$res=delete_host($db_host["hostid"]);
 
-				if(!$res) continue;	
 				$host=get_host_by_hostid($db_host["hostid"]);
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,
 					"Host [".zbx_ads($host["host"])."]");
@@ -159,18 +208,20 @@
 		}
 		unset($_REQUEST["delete"]);
 	}
-	if($_REQUEST["config"]==0&&(isset($_REQUEST["activate"])||isset($_REQUEST["disable"]))){
+/* ACTIVATE / DISABLE HOSTS */
+	elseif($_REQUEST["config"]==0&&(isset($_REQUEST["activate"])||isset($_REQUEST["disable"]))){
 		$result = 0;
 		$status = isset($_REQUEST["activate"]) ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
+		$hosts = get_request("hosts",array());
+
 		$db_hosts=DBselect("select hostid from hosts");
 		while($db_host=DBfetch($db_hosts))
 		{
-			if(!isset($_REQUEST[$db_host["hostid"]])) continue;
-			$result = 1;
+			if(!in_array($db_host["hostid"],$hosts)) continue;
+			$host=get_host_by_hostid($db_host["hostid"]);
 			$res=update_host_status($db_host["hostid"],$status);
 
-			if(!$res) continue;
-			$host=get_host_by_hostid($db_host["hostid"]);
+			$result = 1;
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,
 				"Old status [".$host["status"]."] "."New status [".$status."]");
 		}
@@ -178,7 +229,7 @@
 		unset($_REQUEST["activate"]);
 	}
 
-	if($_REQUEST["config"]==0&&isset($_REQUEST["chstatus"])&&isset($_REQUEST["hostid"]))
+	elseif($_REQUEST["config"]==0&&isset($_REQUEST["chstatus"])&&isset($_REQUEST["hostid"]))
 	{
 		$host=get_host_by_hostid($_REQUEST["hostid"]);
 		$result=update_host_status($_REQUEST["hostid"],$_REQUEST["chstatus"]);
@@ -198,11 +249,11 @@
 		$hosts = get_request("hosts",array());
 		if(isset($_REQUEST["groupid"]))
 		{
-			$result = update_host_group($_REQUEST["groupid"], $_REQUEST["name"], $hosts);
+			$result = update_host_group($_REQUEST["groupid"], $_REQUEST["gname"], $hosts);
 			$msg_ok		= S_GROUP_UPDATED;
 			$msg_fail	= S_CANNOT_UPDATE_GROUP;
 		} else {
-			$result = add_host_group($_REQUEST["name"], $hosts);
+			$result = add_host_group($_REQUEST["gname"], $hosts);
 			$msg_ok		= S_GROUP_ADDED;
 			$msg_fail	= S_CANNOT_ADD_GROUP;
 		}
@@ -228,16 +279,19 @@
 		} else {
 /* group operations */
 			$result = 0;
+			$groups = get_request("groups",array());
 
 			$db_groups=DBselect("select groupid, name from groups");
 			while($db_group=DBfetch($db_groups))
 			{
-				if(!isset($_REQUEST[$db_group["groupid"]])) continue;
-				$result = 1;
+				if(!in_array($db_group["groupid"],$groups)) continue;
 				if(!delete_host_group($db_group["groupid"])) continue
 
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GROUP,
-					"Group [".$db_group["name"]."]");
+				$result = 1;
+
+//				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GROUP,
+//					"Group [".$db_group["name"]."]");
+
 			}
 			show_messages($result, S_GROUP_DELETED, NULL);
 		}
@@ -247,27 +301,68 @@
 	if($_REQUEST["config"]==1&&(isset($_REQUEST["activate"])||isset($_REQUEST["disable"]))){
 		$result = 0;
 		$status = isset($_REQUEST["activate"]) ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
+		$groups = get_request("groups",array());
 
 		$db_hosts=DBselect("select h.hostid, hg.groupid from hosts_groups hg, hosts h".
 			" where h.hostid=hg.hostid and h.status<>".HOST_STATUS_DELETED);
 		while($db_host=DBfetch($db_hosts))
 		{
-			if(!isset($_REQUEST[$db_host["groupid"]])) continue;
-			$result = 1;
-			$res=update_host_status($db_host["hostid"],$status);
-
-			if(!$res) continue;
+			if(!in_array($db_host["groupid"],$groups)) continue;
 			$host=get_host_by_hostid($db_host["hostid"]);
+			if(!update_host_status($db_host["hostid"],$status))	continue;
+
+			$result = 1;
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_HOST,
 				"Old status [".$host["status"]."] "."New status [".$status."]");
 		}
 		show_messages($result, S_HOST_STATUS_UPDATED, NULL);
 		unset($_REQUEST["activate"]);
 	}
+/****** ACTIONS FOR LINKS **********/
+	elseif($_REQUEST["config"]==2&&isset($_REQUEST["save"]))
+	{
+		$items = 0;
+		$arr_items = get_request("items",array());
+		foreach($arr_items as $el) $items |= $el;
+
+		$triggers=0;
+		$arr_triggers= get_request("triggers",array());
+		foreach($arr_triggers as $el) $triggers |= $el;
+
+		$graphs=0;
+		$arr_graphs = get_request("graphs",array());
+		foreach($arr_graphs as $el) $graphs |= $el;
+
+		if(isset($_REQUEST["hosttemplateid"]))
+		{	
+			$result=update_template_linkage($_REQUEST["hosttemplateid"],
+				$_REQUEST["hostid"],$_REQUEST["templateid"],$items,$triggers,$graphs);
+			show_messages($result, S_TEMPLATE_LINKAGE_UPDATED, S_CANNOT_UPDATE_TEMPLATE_LINKAGE);
+		}
+		else
+		{	
+			$result=add_template_linkage(
+				$_REQUEST["hostid"],$_REQUEST["templateid"],$items,$triggers,$graphs);
+
+			show_messages($result, S_TEMPLATE_LINKAGE_ADDED, S_CANNOT_ADD_TEMPLATE_LINKAGE);
+		}
+		if($result){
+			unset($_REQUEST["form"]);
+		}
+	}
+	elseif($_REQUEST["config"]==2&&isset($_REQUEST["delete"])&&isset($_REQUEST["hosttemplateid"]))
+	{
+		$result=delete_template_linkage($_REQUEST["hosttemplateid"]);
+		show_messages($result, S_TEMPLATE_LINKAGE_DELETED, S_CANNOT_DELETE_TEMPLATE_LINKAGE);
+		unset($_REQUEST["hosttemplateid"]);
+		if($result){
+			unset($_REQUEST["form"]);
+		}
+	}	
 
 /************* OLD ACTIONS ***************/
-
-	if(isset($_REQUEST["register"]))
+/*
+	elseif(isset($_REQUEST["register"]))
 	{
 		if($_REQUEST["register"]=="add items from template")
 		{
@@ -281,48 +376,8 @@
 				show_messages(FALSE,"",S_SELECT_HOST_TEMPLATE_FIRST);
 			}
 		}	
-		if($_REQUEST["register"]=="add linkage")
-		{	
-			$items=0;
-			if(isset($_REQUEST["items_add"]))	$items=$items|1;
-			if(isset($_REQUEST["items_update"]))	$items=$items|2;
-			if(isset($_REQUEST["items_delete"]))	$items=$items|4;
-			$triggers=0;
-			if(isset($_REQUEST["triggers_add"]))	$triggers=$triggers|1;
-			if(isset($_REQUEST["triggers_update"]))	$triggers=$triggers|2;
-			if(isset($_REQUEST["triggers_delete"]))	$triggers=$triggers|4;
-			$graphs=0;
-			if(isset($_REQUEST["graphs_add"]))	$graphs=$graphs|1;
-			if(isset($_REQUEST["graphs_update"]))	$graphs=$graphs|2;
-			if(isset($_REQUEST["graphs_delete"]))	$graphs=$graphs|4;
-			$result=add_template_linkage($_REQUEST["hostid"],$_REQUEST["templateid"],$items,$triggers,$graphs);
-			show_messages($result, S_TEMPLATE_LINKAGE_ADDED, S_CANNOT_ADD_TEMPLATE_LINKAGE);
-		}
-		if($_REQUEST["register"]=="update linkage")
-		{	
-			$items=0;
-			if(isset($_REQUEST["items_add"]))	$items=$items|1;
-			if(isset($_REQUEST["items_update"]))	$items=$items|2;
-			if(isset($_REQUEST["items_delete"]))	$items=$items|4;
-			$triggers=0;
-			if(isset($_REQUEST["triggers_add"]))	$triggers=$triggers|1;
-			if(isset($_REQUEST["triggers_update"]))	$triggers=$triggers|2;
-			if(isset($_REQUEST["triggers_delete"]))	$triggers=$triggers|4;
-			$graphs=0;
-			if(isset($_REQUEST["graphs_add"]))	$graphs=$graphs|1;
-			if(isset($_REQUEST["graphs_update"]))	$graphs=$graphs|2;
-			if(isset($_REQUEST["graphs_delete"]))	$graphs=$graphs|4;
-			$result=update_template_linkage($_REQUEST["hosttemplateid"],$_REQUEST["hostid"],$_REQUEST["templateid"],$items,$triggers,$graphs);
-			show_messages($result, S_TEMPLATE_LINKAGE_UPDATED, S_CANNOT_UPDATE_TEMPLATE_LINKAGE);
-		}
 	}
-	if($_REQUEST["config"]==2&&isset($_REQUEST["delete"])&&isset($_REQUEST["hosttemplateid"]))
-	{
-		$result=delete_template_linkage($_REQUEST["hosttemplateid"]);
-		show_messages($result, S_TEMPLATE_LINKAGE_DELETED, S_CANNOT_DELETE_TEMPLATE_LINKAGE);
-		unset($_REQUEST["hosttemplateid"]);
-	}	
-
+*/
 ?>
 
 <?php
@@ -334,6 +389,7 @@
 	switch($_REQUEST["config"]){
 		case 0: $btn = new CButton("form",S_CREATE_HOST);	break;
 		case 1: $btn = new CButton("form",S_CREATE_GROUP);	break;
+		case 2: $btn = new CButton("form",S_CREATE_LINKAGE);	break;
 	}
 
 	$frmForm = new CForm("hosts.php");
@@ -423,14 +479,13 @@
 		show_header2(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 
 /* table */
-		if(isset($_REQUEST["hostid"]))
+		echo BR;
+		if(isset($_REQUEST["form"]))
 		{
-			echo BR;
 			insert_template_form();
-			echo BR;
-
+		} else {
 			$table = new CTableInfo(S_NO_LINKAGES_DEFINED);
-			$table->setHeader(array(S_HOST,S_TEMPLATE,S_ITEMS,S_TRIGGERS,S_GRAPHS,S_ACTIONS));
+			$table->setHeader(array(S_HOST,S_TEMPLATE,S_ITEMS,S_TRIGGERS,S_GRAPHS));
 
 			$result=DBselect("select * from hosts_templates where hostid=".$_REQUEST["hostid"]);
 			while($row=DBfetch($result))
@@ -439,14 +494,21 @@
 				$template=get_host_by_hostid($row["templateid"]);
 
 				$table->addRow(array(
-					$host["host"],
-					$template["host"],
+					new CLink(
+						$host["host"],
+						"hosts.php?form=update".url_param("config").
+						"&hostid=".$row["hostid"].
+						"&hosttemplateid=".$row["hosttemplateid"],
+						'action'),
+					new CLink(
+						$template["host"],
+						"hosts.php?form=update".url_param("config").
+						"&hostid=".$row["hostid"].
+						"&hosttemplateid=".$row["hosttemplateid"],
+						'action'),
 					get_template_permission_str($row["items"]),
 					get_template_permission_str($row["triggers"]),
-					get_template_permission_str($row["graphs"]),
-					new CLink(S_CHANGE, "hosts.php?form=update".url_param("config").
-						"&hostid=".$row["hostid"].
-						"&hosttemplateid=".$row["hosttemplateid"])
+					get_template_permission_str($row["graphs"])
 					));
 			}
 			$table->show();
@@ -494,11 +556,11 @@
 
 				$table->AddRow(array(
 					array(
-						new CCheckBox($db_group["groupid"]),
+						new CCheckBox("groups[]",NULL,NULL,NULL,$db_group["groupid"]),
 						new CLink(
 							$db_group["name"],
 							"hosts.php?form=update&groupid=".$db_group["groupid"].
-							url_param("config"))
+							url_param("config"),'action')
 					),
 					$hosts
 					));
@@ -547,11 +609,14 @@
 				$cmbGroups->AddItem($row["groupid"],$row["name"]);
 			}
 			$frmForm = new CForm("hosts.php");
+			$frmForm->AddVar("config",$_REQUEST["config"]);
 			$frmForm->AddItem(S_GROUP.SPACE);
 			$frmForm->AddItem($cmbGroups);
 			show_header2(S_HOSTS_BIG, $frmForm);
 
 	/* table HOSTS */
+			if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]==0) unset($_REQUEST["groupid"]);
+
 			$form = new CForm('hosts.php');
 			$form->SetName('hosts');
 			$form->AddVar("config",get_request("config",0));
@@ -580,9 +645,9 @@
 				}
 
 				$host=new CCol(array(
-					new CCheckBox($row["hostid"]),
-					new CLink($row["host"],"hosts.php?register=change&form=update&hostid=".
-						$row["hostid"].url_param("groupid").url_param("config"))
+					new CCheckBox("hosts[]",NULL,NULL,NULL,$row["hostid"]),
+					new CLink($row["host"],"hosts.php?form=update&hostid=".
+						$row["hostid"].url_param("groupid").url_param("config"), 'action')
 					));
 		
 				$ip=$row["useip"]==1 ? $row["ip"] : "-";
@@ -591,8 +656,8 @@
 					$text = S_MONITORED;
 					if(check_right("Host","U",$row["hostid"]))
 					{
-						$text=new CLink($text,"hosts.php?hostid=".$row["hostid"].
-							"&chstatus=".HOST_STATUS_NOT_MONITORED.url_param("config"),
+						$text=new CLink($text,"hosts.php?hosts%5B%5D=".$row["hostid"].
+							"&disable=1".url_param("config"),
 							"off");
 					}
 					$status=new CCol($text,"off");
@@ -600,8 +665,8 @@
 					$text = S_NOT_MONITORED;
 					if(check_right("Host","U",$row["hostid"]))
 					{
-						$text=new CLink($text,"hosts.php?hostid=".$row["hostid"].
-							"&chstatus=".HOST_STATUS_MONITORED.url_param("config"),
+						$text=new CLink($text,"hosts.php?hosts%5B%5D=".$row["hostid"].
+							"&activate=1".url_param("config"),
 							"on");
 					}
 					$status=new CCol($text,"on");

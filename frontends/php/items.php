@@ -353,13 +353,13 @@
 				array(	new CCheckBox("all_items",NULL,NULL,
 						"CheckAll('".$form->GetName()."','all_items');"),
 					S_ID),
-				S_KEY, S_DESCRIPTION,nbsp(S_UPDATE_INTERVAL),
+				S_DESCRIPTION,S_KEY,nbsp(S_UPDATE_INTERVAL),
 				S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,S_ERROR));
 
 			$result=DBselect("select h.host,i.key_,i.itemid,i.description,i.delay,".
 				"i.history,i.lastvalue,i.lastclock,i.status,i.nextcheck,h.hostid,i.type,".
 				"i.trends,i.error from hosts h,items i where h.hostid=i.hostid and".
-				" h.hostid=".$_REQUEST["hostid"]." order by h.host,i.key_,i.description");
+				" h.hostid=".$_REQUEST["hostid"]." order by i.description, i.key_");
 			while($row=DBfetch($result))
 			{
 				if(!check_right("Item","R",$row["itemid"]))
@@ -367,17 +367,6 @@
 					continue;
 				}
 
-				$input= array(
-					new CCheckBox("group_itemid[]",NULL,NULL,NULL,$row["itemid"]),
-					new CLink($row["itemid"],"items.php?form=update&itemid=".
-						$row["itemid"].	url_param("hostid").url_param("groupid"))
-					);
-
-				$key = new CLink($row["key_"],"items.php?form=update&itemid=".
-					$row["itemid"].	url_param("hostid").url_param("groupid"));
-
-				$description = new CLink($row["description"],"items.php?form=update&itemid=".
-					$row["itemid"].url_param("hostid").url_param("groupid"));
 
 				switch($row["type"]){
 				case 0:	$type = S_ZABBIX_AGENT;			break;
@@ -418,9 +407,14 @@
 					$error=new CCol($row["error"],"on");
 				}
 				$table->AddRow(array(
-					$input,
-					$key,
-					$description,
+					array(
+						new CCheckBox("group_itemid[]",NULL,NULL,NULL,$row["itemid"]),
+						$row["itemid"]
+					),
+					new CLink($row["description"],"items.php?form=update&itemid=".
+						$row["itemid"].url_param("hostid").url_param("groupid"),
+						'action'),
+					$row["key_"],
 					$row["delay"],
 					$row["history"],
 					$row["trends"],

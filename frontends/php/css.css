@@ -331,6 +331,11 @@ A.on:visited 	{	color:#AA0000;	text-decoration: none; }
 A.on:hover 	{	color:#AA0000;	text-decoration: underline; }
 A.on:active 	{	color:#AA0000;	text-decoration: underline;}
 
+A.action:link		{	color:#000088;	text-decoration: none; }
+A.action:visited 	{	color:#000088;	text-decoration: none; }
+A.action:hover 		{	color:#000088;	text-decoration: underline; }
+A.action:active 	{	color:#000088;	text-decoration: underline;}
+
 .on
 {
 	color: #AA0000;
