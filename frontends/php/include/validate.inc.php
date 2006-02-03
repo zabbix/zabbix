@@ -55,27 +55,29 @@
 			// If an unset variable used in expression, return FALSE
 			if(strstr($expression,'{'.$f.'}')&&!isset($_REQUEST[$f]))
 			{
-//				info("Variable [$f] is not set. $expression is FALSE");
+//info("Variable [$f] is not set. $expression is FALSE");
 				return FALSE;
 			}
-//			echo $f,":",$expression,"<br>";
+//echo $f,":",$expression,"<br>";
 			$expression = str_replace('{'.$f.'}','$_REQUEST["'.$f.'"]',$expression);
+//$debug .= $f." = ".$_REQUEST[$f].BR;
 		}
 		$expression=rtrim($expression,"&");
 		if($expression[strlen($expression)-1]=='&')	$expression[strlen($expression)-1]=0;
 		if($expression[strlen($expression)-1]=='&')	$expression[strlen($expression)-1]=0;
-		$exec = "return (".$expression.");";
+		$exec = "return (".$expression.") ? 1 : 0;";
 
-//		info($exec);
-//		echo "$field - exec: ".$exec.BR.BR;
-		return eval($exec);
+		$ret = eval($exec);
+//echo $debug;
+//echo "$field - result: ".$ret." exec: $exec".BR.BR;
+		return $ret;
 	}
 
 	function	calc_exp($fields,$field,$expression)
 	{
 		global $_REQUEST;
 
-//		echo "$field - expression: ".$expression.BR;
+//echo "$field - expression: ".$expression.BR;
 
 		if(strstr($expression,"{}") && !isset($_REQUEST[$field]))
 			return FALSE;
@@ -103,7 +105,7 @@
 		{
 			if(!isset($fields[$key]))
 			{
-				echo "Unset: $key<br>";
+echo "Unset: $key<br>";
 				unset($_REQUEST[$key]);
 			}
 		}
@@ -117,7 +119,7 @@
 
 			if(($flags&P_NZERO)&&(isset($_REQUEST[$field]))&&($_REQUEST[$field]==0))
 			{
-				echo "Unset: $field<br>";
+echo "Unset: $field<br>";
 				unset($_REQUEST[$field]);
 			}
 		}
@@ -132,8 +134,7 @@
 			
 			if(($flags&P_ACT)&&(isset($_REQUEST[$field])))
 			{
-//				info("Unset:".$field);
-				echo "Unset:".$field."<br>";
+echo "Unset:".$field."<br>";
 				unset($_REQUEST[$field]);
 			}
 		}
@@ -143,8 +144,7 @@
 	{
 		foreach($_REQUEST as $key => $val)
 		{
-//			info("Unset:".$key;
-			echo "Unset:".$key."<br>";
+echo "Unset:".$key."<br>";
 			unset($_REQUEST[$key]);
 		}
 	}
@@ -206,7 +206,7 @@
 	{
 		list($type,$opt,$flags,$validation,$exception)=$checks;
 
-//		echo "Field: $field<br>";
+//echo "Field: $field<br>";
 
 		if($exception==NULL)	$except=FALSE;
 		else			$except=calc_exp($fields,$field,$exception);
@@ -235,6 +235,9 @@
 		{
 			if(!isset($_REQUEST[$field]))
 				return ZBX_VALID_OK;
+
+echo "Unset:".$field."<br>";
+			unset($_REQUEST[$field]);
 
 			if($flags&P_SYS)
 			{

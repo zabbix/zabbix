@@ -49,11 +49,13 @@
 		}
 		function SetAction($value)
 		{
-			if(!is_string($value))
-			{
-				return $this->error("Incorrect value for SetAlign [$value]");
-			}
-			parent::SetAction($value."#form");
+			
+			if(is_string($value))
+				return parent::SetAction($value."#form");
+			elseif(is_null($value))
+				return parent::SetAction($value);
+			else
+				return $this->error("Incorrect value for SetAction [$value]");
 		}
 		function SetAlign($value)
 		{

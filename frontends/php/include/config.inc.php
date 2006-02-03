@@ -115,7 +115,6 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 	function error($msg)
 	{
 		global $ERROR_MSG;
-
 		if(is_array($ERROR_MSG))
 		{
 			array_push($ERROR_MSG,$msg);
@@ -710,6 +709,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 	function	show_infomsg()
 	{
 		global	$INFO_MSG;
+		global	$ERROR_MSG;
 
 		if(is_array($INFO_MSG))
 		{
@@ -728,17 +728,13 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 		if(!$bool)
 		{
-			if(is_null($errmsg))
-				return;
+			if(!is_null($errmsg))
+				$msg="ERROR:".$errmsg;
 
-			$msg="ERROR:".$errmsg;
 			$color="#AA0000";
 		}
 		else
 		{
-			if(is_null($msg))
-				return;
-
 			$color="#223344";
 		}
 

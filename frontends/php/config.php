@@ -60,9 +60,9 @@
 // media form
 		"mediatypeid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),
 						'{config}==1&&{form}=="update"'),
-		"type"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),
+		"type"=>		array(T_ZBX_INT, O_NO,	NULL,	IN("0,1"),
 						'({config}==1)&&(isset({save}))'),
-		"description"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
+		"description"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,
 						'({config}==1)&&(isset({save}))'),
 		"smtp_server"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
 						'({config}==1)&&({type}==0)'),
@@ -76,9 +76,9 @@
 // image form
 		"imageid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),
 						'{config}==3&&{form}=="update"'),
-		"MAX_FILE_SIZE"=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,2097152),
+		"MAX_FILE_SIZE"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,2097152),
 						'{config}==3&&isset({save})'),
-		"name"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
+		"name"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,
 						'{config}==3&&isset({save})'),
 		"imagetype"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("1,2"),
 						'({config}==3)&&(isset({save}))'),
@@ -86,16 +86,17 @@
 // autoregistration form
 		"autoregid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),
 						'{config}==4&&{form}=="update"'),
-		"pattern"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
+		"pattern"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,
 						'{config}==4&&isset({save})'),
-		"hostid"=>		array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(1,65535),
+		"hostid"=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(1,65535),
 						'{config}==4&&isset({save})'),
-		"priority"=>		array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535),
+		"priority"=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),
 						'{config}==4&&isset({save})'),
-
+/* actions */
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+/* other */
 		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
@@ -329,7 +330,7 @@
 			while($row=DBfetch($result))
 			{
 				$description=new CLink($row["description"],"config.php?&form=update".
-					url_param("config")."&mediatypeid=".$row["mediatypeid"]);
+					url_param("config")."&mediatypeid=".$row["mediatypeid"],'action');
 
 				if($row["type"]==0)		$type=S_EMAIL;
 				else if($row["type"]==1)	$type=S_SCRIPT;
@@ -431,7 +432,7 @@
 				else				$imagetype=S_UNKNOWN;
 
 				$name=new CLink($row["name"],"config.php?form=update".url_param("config").
-					"&imageid=".$row["imageid"]);
+					"&imageid=".$row["imageid"],'action');
 
 				$table->addRow(array(
 					$row["imageid"],
@@ -471,7 +472,8 @@
 					$name=$host["host"];
 				}
 				$pattern=new CLink($row["pattern"],
-					"config.php?form=update".url_param("config")."&autoregid=".$row["id"]);
+					"config.php?form=update".url_param("config")."&autoregid=".$row["id"],
+					'action');
 
 				$table->addRow(array(
 					$row["id"],
