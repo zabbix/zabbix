@@ -24,7 +24,7 @@
 /* private */
 		var $caption;
 /* public */
-		function CTextArea($name='textarea',$value="",$cols=77,$rows=7,$caption=NULL)
+		function CTextArea($name='textarea',$value="",$cols=77,$rows=7,$caption=NULL,$readonly='no')
 		{
 			parent::CTag("textarea","yes");
 			$this->SetClass("biginput");
@@ -34,6 +34,7 @@
 			$this->SetRows($rows);
 			$this->SetCaption($caption);
 			$this->SetValue($value);
+			$this->SetReadonly($readonly);
 		}
 		function Show()
 		{
@@ -60,6 +61,17 @@
 				return $this->error("Incorrect value for SetCaption [$value]");
 			}
 			return 0;
+		}
+		function SetReadonly($value='yes')
+		{
+			if(is_string($value))
+			{
+				if($value=='no')
+					return $this->DelOption("readonly");
+				elseif($value=='yes')
+					return $this->AddOption("readonly",'readonly');
+			}
+			return $this->error("Incorrect value for SetReadonly [$value]");
 		}
 		function SetValue($value="")
 		{
