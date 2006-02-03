@@ -13,6 +13,14 @@ body
 /********** FORM *************/
 form {margin: 0px}
 
+table.form
+{
+	background-color: #FFFFFF;
+	color: #000000;
+	border: 0px solid #000000;
+	width: 50%;
+}
+
 td.form_row_l
 {
 	padding-left: 5px;
@@ -27,6 +35,20 @@ td.form_row_l
 	text-align: left;
 }
 
+td.form_row_c
+{
+	padding-left: 5px;
+	padding-right: 5px;
+	color: #000000;
+        font-family:verdana, arial, helvetica, sans-serif;
+        font-size:11px;
+	border-color: #222255;
+	border-width:1px;
+	border-right-style: solid;
+	border-left-style: solid;
+	height: 24px;
+	text-align: center;
+}
 td.form_row_r
 {
 	padding-left: 5px;
@@ -382,14 +404,6 @@ td.header_r
         font-size:10px;
 	text-align: right;
 	height: 24px;
-}
-
-table.form
-{
-	background-color: #FFFFFF;
-	color: #000000;
-	border: 0px solid #000000;
-	width: 50%;
 }
 
 .tborder

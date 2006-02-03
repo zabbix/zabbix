@@ -1884,89 +1884,48 @@
 		$frmHostG->Show();
 	}
 
-/*
-	# Insert host profile form
-	function	insert_host_profile_form($hostid,$readonly=0)
+	# Insert host profile ReadOnly form
+	function	insert_host_profile_form()
 	{
-		$selected=0;
-
-		if(isset($hostid))
-		{
-			$result=DBselect("select * from hosts_profiles where hostid=$hostid");
-
-			if(DBnum_rows($result)==1)
-			{
-				$row=DBfetch($result);
-
-				$selected=1;
-				$devicetype=$row["devicetype"];
-				$name=$row["name"];
-				$os=$row["os"];
-				$serialno=$row["serialno"];
-				$tag=$row["tag"];
-				$macaddress=$row["macaddress"];
-				$hardware=$row["hardware"];
-				$software=$row["software"];
-				$contact=$row["contact"];
-				$location=$row["location"];
-				$notes=$row["notes"];
-			}
-		}
-		if($selected==0)
-		{
-			$devicetype="";
-			$name="";
-			$os="";
-			$serialno="";
-			$tag="";
-			$macaddress="";
-			$hardware="";
-			$software="";
-			$contact="";
-			$location="";
-			$notes="";
-		}
-
 		$frmHostP = new CFormTable(S_HOST_PROFILE,"hosts.php");
 		$frmHostP->SetHelp("web.host_profile.php");
 
-		if(isset($_REQUEST["config"]))
-		{
-			$frmHostP->AddVar("config",$_REQUEST["config"]);
-		}
-		$frmHostP->AddVar("hostid",$hostid);
+		$result=DBselect("select * from hosts_profiles where hostid=".$_REQUEST["hostid"]);
 
-		$frmHostP->AddRow(S_DEVICE_TYPE,new CTextBox("devicetype",$devicetype,61));
-		$frmHostP->AddRow(S_NAME,new CTextBox("name",$name,61));
-		$frmHostP->AddRow(S_OS,new CTextBox("os",$os,61));
-		$frmHostP->AddRow(S_SERIALNO,new CTextBox("serialno",$serialno,61));
-		$frmHostP->AddRow(S_TAG,new CTextBox("tag",$tag,61));
-		$frmHostP->AddRow(S_MACADDRESS,new CTextBox("macaddress",$macaddress,61));
-		$frmHostP->AddRow(S_HARDWARE,new CTextArea("hardware",$hardware,60,4));
-		$frmHostP->AddRow(S_SOFTWARE,new CTextArea("software",$software,60,4));
-		$frmHostP->AddRow(S_CONTACT,new CTextArea("contact",$contact,60,4));
-		$frmHostP->AddRow(S_LOCATION,new CTextArea("location",$location,60,4));
-		$frmHostP->AddRow(S_NOTES,new CTextArea("notes",$notes,60,4));
-
-		if($readonly==0)
+		if(DBnum_rows($result)==1)
 		{
-			$frmHostP->AddItemToBottomRow(new CButton("register","add profile"));
-			if(isset($hostid))
-			{
-				$frmHostP->AddItemToBottomRow(SPACE);
-				$frmHostP->AddItemToBottomRow(new CButton("register","update profile"));
-				$frmHostP->AddItemToBottomRow(SPACE);
-				$frmHostP->AddItemToBottomRow(new CButton("register","delete profile",
-						"return Confirm('Delete selected profile?');"));
-			}
+			$row=DBfetch($result);
+
+			$devicetype=$row["devicetype"];
+			$name=$row["name"];
+			$os=$row["os"];
+			$serialno=$row["serialno"];
+			$tag=$row["tag"];
+			$macaddress=$row["macaddress"];
+			$hardware=$row["hardware"];
+			$software=$row["software"];
+			$contact=$row["contact"];
+			$location=$row["location"];
+			$notes=$row["notes"];
+
+			$frmHostP->AddRow(S_DEVICE_TYPE,new CTextBox("devicetype",$devicetype,61,NULL,'yes'));
+			$frmHostP->AddRow(S_NAME,new CTextBox("name",$name,61,NULL,'yes'));
+			$frmHostP->AddRow(S_OS,new CTextBox("os",$os,61,NULL,'yes'));
+			$frmHostP->AddRow(S_SERIALNO,new CTextBox("serialno",$serialno,61,NULL,'yes'));
+			$frmHostP->AddRow(S_TAG,new CTextBox("tag",$tag,61,NULL,'yes'));
+			$frmHostP->AddRow(S_MACADDRESS,new CTextBox("macaddress",$macaddress,61,NULL,'yes'));
+			$frmHostP->AddRow(S_HARDWARE,new CTextArea("hardware",$hardware,60,4,NULL,'yes'));
+			$frmHostP->AddRow(S_SOFTWARE,new CTextArea("software",$software,60,4,NULL,'yes'));
+			$frmHostP->AddRow(S_CONTACT,new CTextArea("contact",$contact,60,4,NULL,'yes'));
+			$frmHostP->AddRow(S_LOCATION,new CTextArea("location",$location,60,4,NULL,'yes'));
+			$frmHostP->AddRow(S_NOTES,new CTextArea("notes",$notes,60,4,NULL,'yes'));
 		}
 		else
 		{
-			$frmHostP->AddItemToBottomRow(SPACE);
+			$frmHostP->AddSpanRow("Profile for this host is missing","form_row_c");
 		}
 		$frmHostP->Show();
 	}
-*/
 
 	function insert_map_form()
 	{
