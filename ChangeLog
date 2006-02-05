@@ -1,5 +1,8 @@
 Changes for 1.1beta6:
 
+ - added new server parameter UnavailablePeriod (Alexei)
+ - dropped column hosts.network_errors (Alexei)
+ - added column hosts.errors_from (Alexei)
  - GUI made immune to SQL injection attacks (Alexei)
  - added Check All functionality (Eugene)
  - added support of icon label locations (Alexei)

@@ -870,7 +870,7 @@ void DBupdate_host_availability(int hostid,int available,int clock, char *error)
 	if(available == atoi(DBget_field(result,0,0)))
 	{
 		if((available==HOST_AVAILABLE_FALSE) 
-		&&(clock+DELAY_ON_NETWORK_FAILURE>disable_until) )
+		&&(clock+SLEEP_ON_UNREACHABLE>disable_until) )
 		{
 		}
 		else
@@ -885,19 +885,19 @@ void DBupdate_host_availability(int hostid,int available,int clock, char *error)
 
 	if(available==HOST_AVAILABLE_TRUE)
 	{
-		snprintf(sql,sizeof(sql)-1,"update hosts set available=%d where hostid=%d",HOST_AVAILABLE_TRUE,hostid);
+		snprintf(sql,sizeof(sql)-1,"update hosts set available=%d,error='',errors_from=0 where hostid=%d",HOST_AVAILABLE_TRUE,hostid);
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		DBexecute(sql);
 	}
 	else if(available==HOST_AVAILABLE_FALSE)
 	{
-		if(disable_until+DELAY_ON_NETWORK_FAILURE>clock)
+		if(disable_until+SLEEP_ON_UNREACHABLE>clock)
 		{
-			snprintf(sql,sizeof(sql)-1,"update hosts set available=%d,disable_until=disable_until+%d,error='%s' where hostid=%d",HOST_AVAILABLE_FALSE,DELAY_ON_NETWORK_FAILURE,error_esc,hostid);
+			snprintf(sql,sizeof(sql)-1,"update hosts set available=%d,disable_until=disable_until+%d,error='%s' where hostid=%d",HOST_AVAILABLE_FALSE,SLEEP_ON_UNREACHABLE,error_esc,hostid);
 		}
 		else
 		{
-			snprintf(sql,sizeof(sql)-1,"update hosts set available=%d,disable_until=%d,error='%s' where hostid=%d",HOST_AVAILABLE_FALSE,clock+DELAY_ON_NETWORK_FAILURE,error_esc,hostid);
+			snprintf(sql,sizeof(sql)-1,"update hosts set available=%d,disable_until=%d,error='%s' where hostid=%d",HOST_AVAILABLE_FALSE,clock+SLEEP_ON_UNREACHABLE,error_esc,hostid);
 		}
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		DBexecute(sql);
@@ -1377,7 +1377,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_RESULT *result, int row)
 	item->host_status=atoi(DBget_field(result,i,16));
 	item->value_type=atoi(DBget_field(result,i,17));
 
-	item->host_network_errors=atoi(DBget_field(result,i,18));
+	item->host_errors_from=atoi(DBget_field(result,i,18));
 	item->snmp_port=atoi(DBget_field(result,i,19));
 	item->delta=atoi(DBget_field(result,i,20));
 
