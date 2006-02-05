@@ -28,8 +28,8 @@ cp /usr/share/automake-1.9/missing	missing
 echo Configuring...
 export CFLAGS="-Wall"
 #export CFLAGS="-Wall -pedantic"
-#./configure --with-ldap --enable-agent --enable-server --with-mysql --with-net-snmp --prefix=`pwd` 2>>WARNINGS >/dev/null
-./configure --enable-agent --enable-server --with-mysql --with-net-snmp --prefix=`pwd` 2>>WARNINGS >/dev/null
+./configure --with-ldap --enable-agent --enable-server --with-mysql --with-net-snmp --prefix=`pwd` 2>>WARNINGS >/dev/null
+#./configure --enable-agent --enable-server --with-mysql --with-net-snmp --prefix=`pwd` 2>>WARNINGS >/dev/null
 echo Cleaning...
 make clean 2>>WARNINGS >/dev/null
 echo Making...
