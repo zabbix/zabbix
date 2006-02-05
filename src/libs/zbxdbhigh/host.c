@@ -178,7 +178,7 @@ int	DBget_host_by_hostid(int hostid,DB_HOST *host)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DBget_host_by_hostid(%d)", hostid);
 
-	snprintf(sql,sizeof(sql)-1,"select hostid,host,useip,ip,port,status,disable_until,network_errors,error,available from hosts where hostid=%d", hostid);
+	snprintf(sql,sizeof(sql)-1,"select hostid,host,useip,ip,port,status,disable_until,errors_from,error,available from hosts where hostid=%d", hostid);
 	result=DBselect(sql);
 
 	if(DBnum_rows(result)==0)
@@ -194,7 +194,7 @@ int	DBget_host_by_hostid(int hostid,DB_HOST *host)
 		host->port=atoi(DBget_field(result,0,4));
 		host->status=atoi(DBget_field(result,0,5));
 		host->disable_until=atoi(DBget_field(result,0,6));
-		host->network_errors=atoi(DBget_field(result,0,7));
+		host->errors_from=atoi(DBget_field(result,0,7));
 		strscpy(host->error,DBget_field(result,0,8));
 		host->available=atoi(DBget_field(result,0,9));
 	}

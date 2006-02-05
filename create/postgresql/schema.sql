@@ -31,9 +31,9 @@ CREATE TABLE hosts (
   port			int4		DEFAULT '0'		NOT NULL,
   status		int4		DEFAULT '0'		NOT NULL,
   disable_until		int4		DEFAULT '0'		NOT NULL,
-  network_errors	int4		DEFAULT '0'		NOT NULL,
   error			varchar(128)	DEFAULT ''		NOT NULL,
   available		int4		DEFAULT '0'		NOT NULL,
+  errors_from		int4		DEFAULT '0'		NOT NULL,
   PRIMARY KEY (hostid)
 );
 

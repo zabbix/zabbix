@@ -256,13 +256,14 @@
 #define	AGENTD_FORKS	5
 
 #define	TRAPPERD_FORKS	5
-
 #define	SUCKER_FORKS	11
-#define	SUCKER_DELAY	60
+
+#define	POLLER_DELAY	1
 
 #define	SUCKER_TIMEOUT	5
-/* Delay on network failure*/
-#define DELAY_ON_NETWORK_FAILURE 60
+/* Do not perform more than this number of checks during unavailability period */
+#define SLEEP_ON_UNREACHABLE		60
+#define CHECKS_PER_UNAVAILABLE_PERIOD	4
 
 #define	AGENT_TIMEOUT	3
 

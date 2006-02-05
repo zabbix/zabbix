@@ -26,7 +26,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#define NUM	5
+#define NUM	1000
 
 int	s;
 
@@ -47,6 +47,7 @@ void	wait_connect()
 		
 		printf("epfd [%d]\n", epfd);
 		printf("NUM [%d]\n", NUM);
+		events=malloc(NUM*sizeof(struct epoll_event));
 		retval = epoll_wait(epfd, events, NUM, -1);
 		if(retval == -1)
 		{
@@ -54,6 +55,9 @@ void	wait_connect()
 			printf("Retval [%d]\n", errno);
 			exit(-1);
 		}
+		printf("Retval [%d]\n", retval);
+		sleep(1);
+		continue;
 
 		for(i=0;i<retval;i++)
 		{
@@ -120,7 +124,7 @@ int	main()
 		{
 			if(errno == EINPROGRESS)
 			{
-				printf("Connection in progress\n");
+//				printf("Connection in progress\n");
 			}
 			else
 			{
@@ -129,11 +133,11 @@ int	main()
 			}
 		}
 
-		if(fcntl(s, F_SETFL, O_NONBLOCK) == -1)
-		{
-			perror("fcntl() failed\n");
-			exit(-1);
-		}
+//		if(fcntl(s, F_SETFL, O_NONBLOCK) == -1)
+//		{
+//			perror("fcntl() failed\n");
+//			exit(-1);
+//		}
 
 		ev.events = EPOLLIN | EPOLLERR | EPOLLHUP | EPOLLOUT;
 		ev.data.fd = s;
@@ -142,7 +146,7 @@ int	main()
 			perror("epoll_ctl, adding listenfd\n");
 			exit(1);
 		} 
-		printf("epoll_ctl ok fd [%d]\n", s);
+//		printf("epoll_ctl ok fd [%d]\n", s);
 	}
 
 	wait_connect();

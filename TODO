@@ -1,12 +1,5 @@
 1.1beta6:
  - http://www.zabbix.com/forum/showthread.php?t=2073
- - E: http://www.zabbix.com/forum/showthread.php?t=2074
- - E: http://www.zabbix.com/forum/showthread.php?t=2072
- - E: php: http://www.zabbix.com/forum/showthread.php?t=1825
- - E: http://www.zabbix.com/forum/showthread.php?t=1997
- - E: dos style EOL: http://www.zabbix.com/forum/showthread.php?t=1993
- - E: http://www.zabbix.com/forum/showthread.php?t=1992
- - E: select all: http://www.zabbix.com/forum/showthread.php?t=2051
  - http://www.zabbix.com/forum/showthread.php?t=2070
  - moltiplier: http://www.zabbix.com/forum/showthread.php?t=2004
  - actions: http://www.zabbix.com/forum/showthread.php?t=2063
@@ -15,7 +8,6 @@
  - http://www.zabbix.com/forum/showthread.php?t=1657
  - http://www.zabbix.com/forum/showthread.php?t=1971
  - make failed: http://www.zabbix.com/forum/showthread.php?t=1957
- - check if ZABBIX server accepts values returned by W32 agent
 
  - set host to unrechable if unreachable within N seconds
  - explain how templates work in the documentation
