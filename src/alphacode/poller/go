@@ -1,1 +1,2 @@
-gcc snmp.c -I/usr/include/net-snmp -lsnmp
+#gcc snmp.c -I/usr/include/net-snmp -lsnmp
+gcc poller_epoll.c -o poller_epoll

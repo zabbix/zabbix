@@ -79,6 +79,7 @@ int	CONFIG_SENDER_FREQUENCY		= 30;
 int	CONFIG_PINGER_FREQUENCY		= 60;
 int	CONFIG_DISABLE_PINGER		= 0;
 int	CONFIG_DISABLE_HOUSEKEEPING	= 0;
+int	CONFIG_UNAVAILABLE_PERIOD	= 20;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 char	*CONFIG_FILE			= NULL;
 char	*CONFIG_PID_FILE		= NULL;
@@ -319,6 +320,7 @@ void	init_config(void)
 		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
 		{"StartTrappers",&CONFIG_TRAPPERD_FORKS,0,TYPE_INT,PARM_OPT,2,255},
 		{"TrapperTimeout",&CONFIG_TRAPPER_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
+		{"UnavailablePeriod",&CONFIG_UNAVAILABLE_PERIOD,0,TYPE_INT,PARM_OPT,1,3600},
 		{"ListenPort",&CONFIG_LISTEN_PORT,0,TYPE_INT,PARM_OPT,1024,32768},
 		{"NoTimeWait",&CONFIG_NOTIMEWAIT,0,TYPE_INT,PARM_OPT,0,1},
 		{"DisablePinger",&CONFIG_DISABLE_PINGER,0,TYPE_INT,PARM_OPT,0,1},
@@ -573,7 +575,7 @@ int main(int argc, char **argv)
 
 		for(i=0;i<CONFIG_SUCKERD_FORKS+CONFIG_TRAPPERD_FORKS-1;i++)
 		{
-				zabbix_log( LOG_LEVEL_WARNING, "%d. PID=[%d]", i, pids[i]);
+				zabbix_log( LOG_LEVEL_DEBUG, "%d. PID=[%d]", i, pids[i]);
 		}
 		zabbix_log( LOG_LEVEL_CRIT, "ZABBIX server is up.");
 

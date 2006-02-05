@@ -42,7 +42,7 @@
 		"select"=>		array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
 	);
 
-	check_fields($fields);
+//	check_fields($fields);
 ?>
 
 <?php
