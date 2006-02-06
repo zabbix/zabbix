@@ -123,7 +123,7 @@
 			$table->addRow(array(
 				$row["sysmapid"],
 				new CLink($row["name"], "sysmaps.php?form=update".
-					"&sysmapid=".$row["sysmapid"]."#form"),
+					"&sysmapid=".$row["sysmapid"]."#form",'action'),
 				$row["width"],
 				$row["height"],
 				new CLink(S_EDIT,"sysmap.php?sysmapid=".$row["sysmapid"])
