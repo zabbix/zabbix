@@ -652,35 +652,42 @@
 	}
 */
 	# Insert form for Trigger
-	function	insert_trigger_form($hostid,$triggerid)
+	function	insert_trigger_form()
 	{
 		$frmTrig = new CFormTable(S_TRIGGER,"triggers.php");
 		$frmTrig->SetHelp("web.triggers.trigger.php");
 
-		$dep_el=array();
-	
-		for($i=0; $i<=1000; $i++)
+		if(isset($_REQUEST["hostid"]))
 		{
-			if(!isset($_REQUEST["dependence$i"])) continue;
-			$dependences[$_REQUEST["dependence$i"]] = 1;
+			$frmTrig->AddVar("hostid",$_REQUEST["hostid"]);
 		}
 
-		if(isset($triggerid) && !isset($_REQUEST["form_refresh"]))
-		{
-			$trigger=get_trigger_by_triggerid($triggerid);
+		$dep_el=array();
+		$dependences = get_request("dependences",array());
 	
-			$expression	= explode_exp($trigger["expression"],0);
+		if(isset($_REQUEST["triggerid"]))
+		{
+			$frmTrig->AddVar("triggerid",$_REQUEST["triggerid"]);
+			$trigger=get_trigger_by_triggerid($_REQUEST["triggerid"]);
 			$description	= htmlspecialchars(stripslashes($trigger["description"]));
+
+			$frmTrig->SetTitle(S_TRIGGER." \"".$description."\"");
+		}
+
+		if(isset($_REQUEST["triggerid"]) && !isset($_REQUEST["form_refresh"]))
+		{
+			$expression	= explode_exp($trigger["expression"],0);
 			$priority	= $trigger["priority"];
 			$status		= $trigger["status"];
 			$comments	= $trigger["comments"];
 			$url		= $trigger["url"];
 
 			$trigs=DBselect("select t.triggerid,t.description from triggers t,trigger_depends d".
-				" where t.triggerid=d.triggerid_up and d.triggerid_down=$triggerid");
+				" where t.triggerid=d.triggerid_up and d.triggerid_down=".$_REQUEST["triggerid"]);
 			while($trig=DBfetch($trigs))
 			{
-				$dependences[$trig["triggerid"]] = 1;
+				if(in_array($trig["triggerid"],$dependences))	continue;
+				array_push($dependences,$trig["triggerid"]);
 			}
 		}
 		else
@@ -693,41 +700,46 @@
 			$url		= get_request("url"		,"");
 		}
 
-		$i=0;
-		foreach($dependences as $key => $val){
-			array_push($dep_el, new CCheckBox(strval($key),'no',expand_trigger_description($key)),BR);
-			$frmTrig->AddVar("dependence".$i++, $key);
-		}
-
-		if(isset($hostid))
-		{
-			$frmTrig->AddVar("hostid",$hostid);
-		}
-		if(isset($triggerid))
-		{
-			$frmTrig->AddVar("triggerid",$triggerid);
-		}
 		$frmTrig->AddRow(S_NAME, new CTextBox("description",$description,70));
 		$frmTrig->AddRow(S_EXPRESSION,new CTextBox("expression",$expression,70));
+
+	/* dependences */
+		foreach($dependences as $val){
+			array_push($dep_el,
+				new CCheckBox("rem_dependence[]",
+					'no'
+					,expand_trigger_description($val),
+					NULL,
+					strval($val)),
+				BR);
+			$frmTrig->AddVar("dependences[]",strval($val));
+		}
 
 		if(count($dep_el)==0)
 			array_push($dep_el, "No dependences defined");
 		else
-			array_push($dep_el, new CButton('register','delete selected'));
+			array_push($dep_el, new CButton('del_dependence','delete selected'));
 		$frmTrig->AddRow("The trigger depends on",$dep_el);
+	/* end dependences */
 
+	/* new dependence */
 		$cmbDepID = new CComboBox("new_dependence");
-		if(isset($triggerid))
-			$sql="select t.triggerid,t.description from triggers t where t.triggerid!=$triggerid order by t.description";
+		if(isset($_REQUEST["triggerid"]))
+			$sql="select t.triggerid,t.description from triggers t".
+				" where t.triggerid!=".$_REQUEST["triggerid"]." order by t.description";
 		else
 			$sql="select t.triggerid,t.description from triggers t order by t.description";
 
-		$trigs=DBselect($sql);
-		while($trig=DBfetch($trigs))
+		$db_trigs=DBselect($sql);
+		while($db_trig=DBfetch($db_trigs))
 		{
-			$cmbDepID->AddItem($trig["triggerid"],expand_trigger_description($trig["triggerid"]));
+			$cmbDepID->AddItem($db_trig["triggerid"],
+				expand_trigger_description($db_trig["triggerid"]));
 		}
-		$frmTrig->AddRow("New dependency",array($cmbDepID,SPACE,new CButton("register","add dependency")));
+		$frmTrig->AddRow("New dependency",array(
+			$cmbDepID,SPACE,
+			new CButton("add_dependence","add")));
+	/* end new dwpendence */
 
 		$cmbPrior = new CComboBox("priority");
 		$cmbPrior->AddItem(0,"Not classified");
@@ -743,7 +755,7 @@
 		$frmTrig->AddRow(S_DISABLED,new CCheckBox("disabled",$status));
  
 		$frmTrig->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($triggerid))
+		if(isset($_REQUEST["triggerid"]))
 		{
 			$frmTrig->AddItemToBottomRow(SPACE);
 			$frmTrig->AddItemToBottomRow(new CButtonDelete("Delete trigger?",
