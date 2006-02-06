@@ -46,6 +46,7 @@
 	);
 
 	check_fields($fields);
+
 ?>
 
 <?php
@@ -61,6 +62,7 @@
 	$_REQUEST["sysmapid"]=@iif(isset($_REQUEST["sysmapid"]),$_REQUEST["sysmapid"],get_profile("web.maps.sysmapid",0));
 	update_profile("web.maps.sysmapid",$_REQUEST["sysmapid"]);
 	update_profile("web.menu.view.last",$page["file"]);
+	if($_REQUEST["sysmapid"] == 0)	unset($_REQUEST["sysmapid"]);
 ?>
 
 <?php

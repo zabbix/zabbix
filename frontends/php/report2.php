@@ -128,9 +128,9 @@
 	
 			$availability=calculate_availability($row["triggerid"],0,0);
 
-			$true=array("value"=>sprintf("%.4f%%",$availability["true"]), "class"=>"on");
-			$false=array("value"=>sprintf("%.4f%%",$availability["false"]), "class"=>"off");
-			$unknown=array("value"=>sprintf("%.4f%%",$availability["unknown"]), "class"=>"unknown");
+			$true=new CSpan(sprintf("%.4f%%",$availability["true"]), "on");
+			$false=new CSpan(sprintf("%.4f%%",$availability["false"]), "off");
+			$unknown=new CSpan(sprintf("%.4f%%",$availability["unknown"]), "unknown");
 			$actions="<a href=\"report2.php?hostid=".$_REQUEST["hostid"]."&triggerid=".$row["triggerid"]."\">".S_SHOW."</a>";
 
 			$table->addRow(array(

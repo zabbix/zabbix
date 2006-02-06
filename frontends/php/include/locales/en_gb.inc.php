@@ -622,8 +622,9 @@
 	"S_GRAPH_NAME"=>			"Graph name",
 	"S_WIDTH"=>				"Width",
 	"S_HEIGHT"=>				"Height",
-	"S_EMPTY"=>				"Empty",
 	"S_CREATE_SCREEN"=>			"Create Screen",
+	"S_EDIT"=>				"Edit",
+	"S_DIMENSION_COLS_ROWS"=>		"Dimension (cols x rows)",
 
 //	screenedit.php
 	"S_MAP"=>				"Map",
