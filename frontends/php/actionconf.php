@@ -38,6 +38,50 @@
 //		exit;
 //	}
 ?>
+<?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"actiontype"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"),	NULL),
+
+		"actionid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,		NULL),
+		"source"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0"),	'isset({save})'),
+		"recipient"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"), 	'isset({save})'),
+		"userid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID, 		'isset({save})'),
+		"delay"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),'isset({save})'),
+		"subject"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'isset({save})'),
+		"message"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'isset({save})'),
+		"repeat"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"), 	'isset({save})'),
+
+		"maxrepeats"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),'{repeat}==1&&isset({save})'),
+		"repeatdelay"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),'{repeat}==1&&isset({save})'),
+
+		"conditions"=>	array(NULL, O_OPT, NULL, NULL, NULL),
+//		"conditions[i][type]"=>		array(T_ZBX_INT, O_OPT,  NULL,	NULL,	NULL),
+//		"conditions[i][operator]"=>	array(T_ZBX_INT, O_OPT,  NULL,	NULL,	NULL),
+//		"conditions[i][value]"=>	array(NULL, 	 O_OPT,  NULL,	NULL,	NULL),
+
+		"rem_condition"=> array(NULL, O_OPT, NULL, NULL, NULL),
+//		"rem_condition[i][type]"=>	array(T_ZBX_INT, O_OPT,  NULL,	NULL, NULL);	
+//		"rem_condition[i][operator]"=>	array(T_ZBX_INT, O_OPT,  NULL,	NULL, NULL);
+//		"rem_condition[i][value]"=>	array(NULL, 	 O_OPT,  NULL,	NULL, NULL);
+
+		"new_condition_type"=>		array(T_ZBX_INT, O_OPT,  NULL,	NULL,	'isset({add_condition})'),
+		"new_condition_operator"=>	array(T_ZBX_INT, O_OPT,  NULL,	NULL,	'isset({add_condition})'),
+		"new_condition_value"=>		array(NULL, 	 O_OPT,  NULL,	NULL,	'isset({add_condition})'),
+
+/* actions */
+		"add_condition"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"del_condition"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+/* other */
+		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
+	);
+
+	check_fields($fields);
+?>
 
 <?php
 	if(isset($_REQUEST["save"]))
@@ -48,23 +92,18 @@
 			$_REQUEST["repeatdelay"]=600;
 		}
 
-		if($_REQUEST['recipient'] == RECIPIENT_TYPE_USER)
-			$id = $_REQUEST['userid'];
-		else
-			$id = $_REQUEST['usrgrpid'];
-
 		if(isset($_REQUEST["actionid"]))
 		{
 			$actionid=$_REQUEST["actionid"];
-			$result = update_action($actionid, $id, $_REQUEST["delay"], $_REQUEST["subject"],
-				$_REQUEST["message"],$_REQUEST["recipient"],$_REQUEST["maxrepeats"],
-				$_REQUEST["repeatdelay"]);
+			$result = update_action($actionid, $_REQUEST['userid'], $_REQUEST["delay"],
+				$_REQUEST["subject"], $_REQUEST["message"],$_REQUEST["recipient"],
+				$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"]);
 
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
 		} else {
-			$actionid=add_action($id, $_REQUEST["delay"], $_REQUEST["subject"],
-				$_REQUEST["message"],$_REQUEST["recipient"],$_REQUEST["maxrepeats"],
-				$_REQUEST["repeatdelay"]);
+			$actionid=add_action($_REQUEST['userid'], $_REQUEST["delay"], 
+				$_REQUEST["subject"],$_REQUEST["message"],$_REQUEST["recipient"],
+				$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"]);
 			$result=$actionid;
 
 			show_messages($result,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
@@ -76,12 +115,8 @@
 		{
 
 			DBexecute("delete from conditions where actionid=$actionid");
-			for($i=1;$i<=1000;$i++)
-			{
-				if(!isset($_REQUEST["conditiontype$i"])) continue;
-				add_action_condition($actionid,$_REQUEST["conditiontype$i"],
-					$_REQUEST["conditionop$i"], $_REQUEST["conditionvalue$i"]);
-			}
+			if(isset($_REQUEST["conditions"])) foreach($_REQUEST["conditions"] as $val)
+				add_action_condition($actionid,$val["type"],$val["operator"],$val["value"]);
 
 			if(isset($_REQUEST["userid"]))
 			{
@@ -108,37 +143,26 @@
 		{
 			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_ACTION,
 				"Subject [".$_REQUEST["subject"]."]");
+			unset($_REQUEST["form"]);
+			unset($_REQUEST["actionid"]);
 		}
-		unset($_REQUEST["actionid"]);
-		unset($_REQUEST["form"]);
 	}
-	elseif(isset($_REQUEST["register"]))
+	elseif(isset($_REQUEST["add_condition"]))
 	{
-		if($_REQUEST["register"]=="add condition")
-		{
-			for($i=1;$i<=1000;$i++)
-			{
-				if(!isset($_REQUEST["conditiontype$i"]))
-				{
-					$num=$i;
-					break;
-				}
-			}
-			$_REQUEST["conditionop$num"]=$_REQUEST["operator"];
-			$_REQUEST["conditiontype$num"]=$_REQUEST["conditiontype"];
-			$_REQUEST["conditionvalue$num"]=$_REQUEST["value"];
-		}
-		elseif($_REQUEST["register"]=="delete selected")
-		{
-			for($i=1;$i<=1000;$i++)
-			{
-				if(isset($_REQUEST["conditionchecked$i"]))
-				{
-					unset($_REQUEST["conditionop$i"]);
-					unset($_REQUEST["conditiontype$i"]);
-					unset($_REQUEST["conditionvalue$i"]);
-				}
-			}
+		$new_condition = array(
+			"type"=>	$_REQUEST["new_condition_type"], 
+			"operator"=>	$_REQUEST["new_condition_operator"],
+			"value"=>	$_REQUEST["new_condition_value"]);
+
+		$_REQUEST["conditions"] = get_request("conditions",array());
+		if(!in_array($new_condition,$_REQUEST["conditions"]))
+			array_push($_REQUEST["conditions"],$new_condition);
+	}
+	elseif(isset($_REQUEST["del_condition"])&&isset($_REQUEST["rem_condition"]))
+	{
+		$_REQUEST["conditions"] = get_request("conditions",array());
+		foreach($_REQUEST["rem_condition"] as $val){
+			unset($_REQUEST["conditions"][$val]);
 		}
 	}
 ?>
@@ -166,7 +190,7 @@
 /* table */
 		$tblActions = new CTableInfo(S_NO_ACTIONS_DEFINED);
 		$tblActions->SetHeader(array(S_SOURCE,S_CONDITIONS,S_SEND_MESSAGE_TO,
-			S_DELAY,S_SUBJECT,S_REPEATS,S_ACTIONS));
+			S_DELAY,S_SUBJECT,S_REPEATS));
 
 		if(isset($_REQUEST["actiontype"])&&($_REQUEST["actiontype"]==1))
 		{
@@ -200,13 +224,14 @@
 			}
 
 			$tblActions->AddRow(array(
-				get_source_description($row["source"]),
+				new CLink(
+					get_source_description($row["source"]),
+					"actionconf.php?form=update&actionid=".$row['actionid'],'action'),
 				$conditions,
 				$recipient,
 				htmlspecialchars($row["delay"]),
 				htmlspecialchars($row["subject"]),
-				$row["maxrepeats"] == 0 ? S_NO_REPEATS : $row["maxrepeats"],
-				new CLink(S_CHANGE,"actionconf.php?form=update&actionid=".$row['actionid'])
+				$row["maxrepeats"] == 0 ? S_NO_REPEATS : $row["maxrepeats"]
 				));	
 		}
 		$tblActions->Show();
