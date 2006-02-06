@@ -75,7 +75,7 @@
 		{
 			if(is_null($value))	$value="";
 
-			if(is_int($value))	$value = strval($value);
+			if(is_numeric($value))	$value = strval($value);
 
 			if(is_string($value))
 			{

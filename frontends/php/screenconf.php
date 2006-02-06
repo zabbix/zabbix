@@ -84,7 +84,8 @@
 
 			$table->addRow(array(
 				$row["screenid"],
-				new CLink($row["name"],"screenconf.php?form=update&screenid=".$row["screenid"]),
+				new CLink($row["name"],"screenconf.php?form=update&screenid=".$row["screenid"],
+					'action'),
 				$row["cols"]." x ".$row["rows"],
 				new CLink(S_EDIT,"screenedit.php?screenid=".$row["screenid"])
 				));
