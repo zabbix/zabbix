@@ -287,6 +287,7 @@
 	"S_YAXIS_MAX_VALUE"=>			"Y axis MAX value",
 	"S_CALCULATED"=>			"Calculated",
 	"S_FIXED"=>				"Fixed",
+	"S_CREATE_GRAPH"=>			"Create Graph",
 
 //	history.php
 	"S_LAST_HOUR_GRAPH"=>			"Last hour graph",

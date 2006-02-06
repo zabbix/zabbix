@@ -771,32 +771,36 @@
 	{
 		global  $_REQUEST;
 
-		$name=@iif(isset($_REQUEST["name"]),$_REQUEST["name"],"");
-		$width=@iif(isset($_REQUEST["width"]),$_REQUEST["width"],900);
-		$height=@iif(isset($_REQUEST["height"]),$_REQUEST["height"],200);
-		$yaxistype=@iif(isset($_REQUEST["yaxistype"]),$_REQUEST["yaxistype"],GRAPH_YAXIS_TYPE_CALCULATED);
-		$yaxismin=@iif(isset($_REQUEST["yaxismin"]),$_REQUEST["yaxismin"],0.00);
-		$yaxismax=@iif(isset($_REQUEST["yaxismax"]),$_REQUEST["yaxismax"],100.00);
-
-		if(isset($_REQUEST["graphid"])&&!isset($_REQUEST["name"]))
-		{
-			$result=DBselect("select g.graphid,g.name,g.width,g.height,g.yaxistype,g.yaxismin,g.yaxismax from graphs g where graphid=".$_REQUEST["graphid"]);
-			$row=DBfetch($result);
-			$name=$row["name"];
-			$width=$row["width"];
-			$height=$row["height"];
-			$yaxistype=$row["yaxistype"];
-			$yaxismin=$row["yaxismin"];
-			$yaxismax=$row["yaxismax"];
-		}
-	
 		$frmGraph = new CFormTable(S_GRAPH,"graphs.php");
 		$frmGraph->SetHelp("web.graphs.graph.php");
 
 		if(isset($_REQUEST["graphid"]))
 		{
 			$frmGraph->AddVar("graphid",$_REQUEST["graphid"]);
+
+			$result=DBselect("select g.graphid,g.name,g.width,g.height,g.yaxistype,".
+				"g.yaxismin,g.yaxismax from graphs g where graphid=".$_REQUEST["graphid"]);
+			$row=DBfetch($result);
+			$frmGraph->SetTitle(S_GRAPH." \"".$row["name"]."\"");
 		}
+
+		if(isset($_REQUEST["graphid"])&&!isset($_REQUEST["name"]))
+		{
+			$name		=$row["name"];
+			$width		=$row["width"];
+			$height		=$row["height"];
+			$yaxistype	=$row["yaxistype"];
+			$yaxismin	=$row["yaxismin"];
+			$yaxismax	=$row["yaxismax"];
+		} else {
+			$name		=get_request("name"	,"");
+			$width		=get_request("width"	,900);
+			$height		=get_request("height"	,200);
+			$yaxistype	=get_request("yaxistype",GRAPH_YAXIS_TYPE_CALCULATED);
+			$yaxismin	=get_request("yaxismin"	,0.00);
+			$yaxismax	=get_request("yaxismax"	,100.00);
+		}
+	
 		$frmGraph->AddRow(S_NAME,new CTextBox("name",$name,32));
 		$frmGraph->AddRow(S_WIDTH,new CTextBox("width",$width,5));
 		$frmGraph->AddRow(S_HEIGHT,new CTextBox("height",$height,5));
@@ -808,8 +812,8 @@
 
 		if($yaxistype == GRAPH_YAXIS_TYPE_FIXED)
 		{
-			$frmGraph->AddRow(S_YAXIS_MIN_VALUE,new CTextBox("yaxismin",$yaxismin,5));
-			$frmGraph->AddRow(S_YAXIS_MAX_VALUE,new CTextBox("yaxismax",$yaxismax,5));
+			$frmGraph->AddRow(S_YAXIS_MIN_VALUE,new CTextBox("yaxismin",$yaxismin,9));
+			$frmGraph->AddRow(S_YAXIS_MAX_VALUE,new CTextBox("yaxismax",$yaxismax,9));
 		}
 		else
 		{
@@ -817,15 +821,17 @@
 			$frmGraph->AddVar("yaxismax",$yaxismax);
 		}
 
-		$frmGraph->AddItemToBottomRow(new CButton("register","add"));
+		$frmGraph->AddItemToBottomRow(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["graphid"]))
 		{
 			$frmGraph->AddItemToBottomRow(SPACE);
-			$frmGraph->AddItemToBottomRow(new CButton("register","update"));
-			$frmGraph->AddItemToBottomRow(SPACE);
-			$frmGraph->AddItemToBottomRow(new CButton("register","delete","return Confirm('".S_DELETE_GRAPH_Q."');"));
+			$frmGraph->AddItemToBottomRow(new CButtonDelete(S_DELETE_GRAPH_Q,url_param("graphid").
+				url_param("groupid").url_param("hostid")));
 		}
-		 $frmGraph->Show();
+		$frmGraph->AddItemToBottomRow(SPACE);
+		$frmGraph->AddItemToBottomRow(new CButtonCancel(url_param("groupid").url_param("hostid")));
+
+		$frmGraph->Show();
 
 	}
 /*
