@@ -60,9 +60,9 @@
 // media form
 		"mediatypeid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),
 						'{config}==1&&{form}=="update"'),
-		"type"=>		array(T_ZBX_INT, O_NO,	NULL,	IN("0,1"),
+		"type"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),
 						'({config}==1)&&(isset({save}))'),
-		"description"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,
+		"description"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
 						'({config}==1)&&(isset({save}))'),
 		"smtp_server"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
 						'({config}==1)&&({type}==0)'),
@@ -86,7 +86,7 @@
 // autoregistration form
 		"autoregid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),
 						'{config}==4&&{form}=="update"'),
-		"pattern"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,
+		"pattern"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
 						'{config}==4&&isset({save})'),
 		"hostid"=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(1,65535),
 						'{config}==4&&isset({save})'),

@@ -73,13 +73,11 @@
 		}
 		function SetValue($value=NULL)
 		{
-			if(is_null($value)) $value="";
+			if(is_null($value))	$value="";
 
-			if(is_int($value))
-			{
-				return $this->AddOption("value",strval($value));
-			}
-			elseif(is_string($value))
+			if(is_int($value))	$value = strval($value);
+
+			if(is_string($value))
 			{
 				return $this->AddOption("value",$value);
 			}

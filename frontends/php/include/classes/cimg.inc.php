@@ -44,7 +44,7 @@
 			{
 				return $this->error("Incorrect value for SetSrc [$value]");
 			}
-			return $this->AddOption("src",htmlspecialchars($value));
+			return $this->AddOption("src",$value);
 		}
 		function SetAltText($value=NULL)
 		{
