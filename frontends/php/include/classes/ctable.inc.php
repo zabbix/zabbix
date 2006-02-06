@@ -22,11 +22,11 @@
 	class CCol extends CTag
 	{
 /* public */
-		function CCol($item=NULL,$calss=NULL)
+		function CCol($item=NULL,$class=NULL)
 		{
 			parent::CTag("td","yes");
 			$this->AddItem($item);
-			$this->SetClass($calss);
+			$this->SetClass($class);
 		}
 		function SetAlign($value)
 		{
@@ -88,7 +88,7 @@
                         		if(is_a($el,'ccol'))
 					{
                 		        	$ret |= parent::AddItem($el);
-					} else {
+					} elseif(!is_null($el)) {
 						$ret |= parent::AddItem(new CCol($el));
 					}
 				}
