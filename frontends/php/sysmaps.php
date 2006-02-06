@@ -38,6 +38,39 @@
 ?>
 
 <?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"sysmapid"=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
+
+		"name"=>		array(T_ZBX_STR, O_OPT,	 NULL,	NOT_EMPTY,"isset({save})"),
+		"width"=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),"isset({save})"),
+		"height"=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),"isset({save})"),
+		"background"=>		array(T_ZBX_STR, O_OPT,	 NULL,	NULL,"isset({save})"),
+		"label_type"=>		array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,4),"isset({save})"),
+		"label_location"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,3),"isset({save})"),
+
+		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
+
+//		"triggerid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'{form}=="update"'),
+
+//		"description"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
+//		"expression"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
+//		"priority"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2,3,4,5"),'isset({save})'),
+//		"comments"=>	array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
+//		"url"=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
+//		"disabled"=>	array(T_ZBX_STR, O_OPT,  NULL,	NULL,NULL)
+	);
+	check_fields($fields);
+?>
+
+
+
+
+<?php
 	if(isset($_REQUEST["save"]))
 	{
 		if(isset($_REQUEST["sysmapid"]))
@@ -61,7 +94,9 @@
 	{
 		$result=delete_sysmap($_REQUEST["sysmapid"]);
 		show_messages($result,"Network map deleted","Cannot delete network map");
-		unset($_REQUEST["sysmapid"]);
+		if($result){
+			unset($_REQUEST["form"]);
+		}
 	}
 ?>
 
@@ -91,7 +126,7 @@
 					"&sysmapid=".$row["sysmapid"]."#form"),
 				$row["width"],
 				$row["height"],
-				new CLink(S_SHOW,"sysmap.php?sysmapid=".$row["sysmapid"])
+				new CLink(S_EDIT,"sysmap.php?sysmapid=".$row["sysmapid"])
 				));
 		}
 		$table->show();

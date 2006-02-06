@@ -112,8 +112,7 @@
 
 			if($result)
 			{
-				DBexecute("delete from trigger_depends".
-					" where triggerid_down=".$triggerid);
+				delete_dependencis_by_triggerid($triggerid);
 
 				if(isset($_REQUEST["dependences"])) foreach($_REQUEST["dependences"] as $val)
 				{
