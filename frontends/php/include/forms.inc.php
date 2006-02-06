@@ -995,7 +995,11 @@
 		$frmAction = new CFormTable(S_ACTION,'actionconf.php');
 		$frmAction->SetHelp('web.actions.action.php');
 
-		$conditiontype = get_request("conditiontype",0);
+		$conditions = get_request("conditions",array());
+
+		$new_condition_type	= get_request("new_condition_type", 0);
+		$new_condition_operator	= get_request("new_condition_operator", 0);
+		$new_condition_value	= get_request("new_condition_value", 0);
 
 		if(isset($_REQUEST["actionid"]))
 		{
@@ -1029,13 +1033,16 @@
 			}
 			$result=DBselect("select conditiontype, operator, value from conditions".
 				" where actionid=".$_REQUEST["actionid"]." order by conditiontype");
-			$i=1;
+
 			while($condition=DBfetch($result))
 			{
-				$_REQUEST["conditiontype$i"]=$condition["conditiontype"];
-				$_REQUEST["conditionop$i"]=$condition["operator"];
-				$_REQUEST["conditionvalue$i"]=$condition["value"];
-				$i++;
+				$condition = array(
+					"type" =>		$condition["conditiontype"],
+					"operator" =>		$condition["operator"],
+					"value" =>		$condition["value"]);
+
+				if(in_array($condition, $conditions)) continue;
+				array_push($conditions, $condition);
 			}
 		}
 		else
@@ -1057,31 +1064,33 @@
 				$uid = get_request("usrgrpid",NULL);
 			else
 				$uid = get_request("userid",NULL);
-		}
 
+		}
 
 // prepare condition list
 		$cond_el=array();
-		for($i=1; $i<=1000; $i++)
+		$i=0;
+		foreach($conditions as $val)
 		{
-			if(!isset($_REQUEST["conditiontype$i"])) continue;
 			array_push($cond_el, new CCheckBox(
-					"conditionchecked$i", 'no',
+					"rem_condition[]", 'no',
 					get_condition_desc(
-						$_REQUEST["conditiontype$i"],
-						$_REQUEST["conditionop$i"],
-						$_REQUEST["conditionvalue$i"]
-					)),BR
+						$val["type"],
+						$val["operator"],
+						$val["value"]
+					),
+					NULL,$i),BR
 				);
-			$frmAction->AddVar("conditiontype$i", $_REQUEST["conditiontype$i"]);
-			$frmAction->AddVar("conditionop$i", $_REQUEST["conditionop$i"]);
-			$frmAction->AddVar("conditionvalue$i", $_REQUEST["conditionvalue$i"]);
+			$frmAction->AddVar("conditions[$i][type]", 	$val["type"]);
+			$frmAction->AddVar("conditions[$i][operator]", 	$val["operator"]);
+			$frmAction->AddVar("conditions[$i][value]", 	$val["value"]);
+			$i++;
 		}
 
 		if(count($cond_el)==0)
 			array_push($cond_el, S_NO_CONDITIONS_DEFINED);
 		else
-			array_push($cond_el, new CButton('register','delete selected'));
+			array_push($cond_el, new CButton('del_condition','delete selected'));
 // end of condition list preparation
 
 		$cmbSource =  new CComboBox('source', $source);
@@ -1094,7 +1103,7 @@
 		$rowCondition=array();
 
 // add condition type
-		$cmbCondType = new CComboBox('conditiontype',$conditiontype,'submit()');
+		$cmbCondType = new CComboBox('new_condition_type',$new_condition_type,'submit()');
 		$cmbCondType->AddItem(CONDITION_TYPE_GROUP,		S_HOST_GROUP);
 		$cmbCondType->AddItem(CONDITION_TYPE_HOST,		S_HOST);
 		$cmbCondType->AddItem(CONDITION_TYPE_TRIGGER,		S_TRIGGER);
@@ -1106,36 +1115,36 @@
 		array_push($rowCondition,$cmbCondType);
 
 // add condition operation
-		$cmbCondOp = new CComboBox('operator');
-		if(in_array($conditiontype, array(
+		$cmbCondOp = new CComboBox('new_condition_operator');
+		if(in_array($new_condition_type, array(
 				CONDITION_TYPE_GROUP,
 				CONDITION_TYPE_HOST,
 				CONDITION_TYPE_TRIGGER,
 				CONDITION_TYPE_TRIGGER_SEVERITY,
 				CONDITION_TYPE_TRIGGER_VALUE)))
 			$cmbCondOp->AddItem(CONDITION_OPERATOR_EQUAL,		'=');
-		if(in_array($conditiontype,array(
+		if(in_array($new_condition_type,array(
 				CONDITION_TYPE_GROUP,
 				CONDITION_TYPE_HOST,
 				CONDITION_TYPE_TRIGGER,
 				CONDITION_TYPE_TRIGGER_SEVERITY)))
 			$cmbCondOp->AddItem(CONDITION_OPERATOR_NOT_EQUAL,	'<>');
-		if(in_array($conditiontype,array(CONDITION_TYPE_TRIGGER_NAME)))
+		if(in_array($new_condition_type,array(CONDITION_TYPE_TRIGGER_NAME)))
 			$cmbCondOp->AddItem(CONDITION_OPERATOR_LIKE,		'like');
-		if(in_array($conditiontype,array(CONDITION_TYPE_TRIGGER_NAME)))
+		if(in_array($new_condition_type,array(CONDITION_TYPE_TRIGGER_NAME)))
 			$cmbCondOp->AddItem(CONDITION_OPERATOR_NOT_LIKE,	'not like');
-		if(in_array($conditiontype,array(CONDITION_TYPE_TIME_PERIOD)))
+		if(in_array($new_condition_type,array(CONDITION_TYPE_TIME_PERIOD)))
 			$cmbCondOp->AddItem(CONDITION_OPERATOR_IN,		'in');
-		if(in_array($conditiontype,array(CONDITION_TYPE_TRIGGER_SEVERITY)))
+		if(in_array($new_condition_type,array(CONDITION_TYPE_TRIGGER_SEVERITY)))
 			$cmbCondOp->AddItem(CONDITION_OPERATOR_MORE_EQUAL,	'>=');
 
 		array_push($rowCondition,$cmbCondOp);
 
 
 // add condition value
-		if($conditiontype == CONDITION_TYPE_GROUP)
+		if($new_condition_type == CONDITION_TYPE_GROUP)
 		{
-			$cmbCondVal = new CComboBox('value');
+			$cmbCondVal = new CComboBox('new_condition_value');
 			$groups = DBselect("select groupid,name from groups order by name");
 			while($group = DBfetch($groups))
 			{
@@ -1143,24 +1152,24 @@
 			}
 			array_push($rowCondition,$cmbCondVal);
 		}
-		else if($conditiontype == CONDITION_TYPE_HOST)
+		else if($new_condition_type == CONDITION_TYPE_HOST)
 		{
-			$frmAction->AddVar('value','0');
+			$frmAction->AddVar('new_condition_value','0');
 
 			$txtCondVal = new CTextBox('host','',20);
 			$txtCondVal->SetReadonly('yes');
 
 			$btnSelect = new CButton('btn1','Select',
 				"return PopUp('popup.php?form=".$frmAction->GetName().
-				"&field1=value&field2=host','new_win',".
+				"&field1=new_condition_value&field2=host','new_win',".
 				"'width=450,height=450,resizable=1,scrollbars=1');");
 			$btnSelect->SetAccessKey('T');
 
 			array_push($rowCondition, $txtCondVal, $btnSelect);
 		}
-		else if($conditiontype == CONDITION_TYPE_TRIGGER)
+		else if($new_condition_type == CONDITION_TYPE_TRIGGER)
 		{
-			$cmbCondVal = new CComboBox('value');
+			$cmbCondVal = new CComboBox('new_condition_value');
 			$triggers = DBselect("select distinct h.host,t.triggerid,t.description".
 				" from triggers t, functions f,items i, hosts h".
 				" where t.triggerid=f.triggerid and f.itemid=i.itemid".
@@ -1172,24 +1181,24 @@
 			}
 			array_push($rowCondition,$cmbCondVal);
 		}
-		else if($conditiontype == CONDITION_TYPE_TRIGGER_NAME)
+		else if($new_condition_type == CONDITION_TYPE_TRIGGER_NAME)
 		{
-			array_push($rowCondition, new CTextBox('value', "", 40));
+			array_push($rowCondition, new CTextBox('new_condition_value', "", 40));
 		}
-		else if($conditiontype == CONDITION_TYPE_TRIGGER_VALUE)
+		else if($new_condition_type == CONDITION_TYPE_TRIGGER_VALUE)
 		{
-			$cmbCondVal = new CComboBox('value');
+			$cmbCondVal = new CComboBox('new_condition_value');
 			$cmbCondVal->AddItem(0,"OFF");
 			$cmbCondVal->AddItem(1,"ON");
 			array_push($rowCondition,$cmbCondVal);
 		}
-		else if($conditiontype == CONDITION_TYPE_TIME_PERIOD)
+		else if($new_condition_type == CONDITION_TYPE_TIME_PERIOD)
 		{
-			array_push($rowCondition, new CTextBox('value', "1-7,00:00-23:59", 40));
+			array_push($rowCondition, new CTextBox('new_condition_value', "1-7,00:00-23:59", 40));
 		}
-		else if($conditiontype == CONDITION_TYPE_TRIGGER_SEVERITY)
+		else if($new_condition_type == CONDITION_TYPE_TRIGGER_SEVERITY)
 		{
-			$cmbCondVal = new CComboBox('value');
+			$cmbCondVal = new CComboBox('new_condition_value');
 			$cmbCondVal->AddItem(0,S_NOT_CLASSIFIED);
 			$cmbCondVal->AddItem(1,S_INFORMATION);
 			$cmbCondVal->AddItem(2,S_WARNING);
@@ -1199,7 +1208,7 @@
 			array_push($rowCondition,$cmbCondVal);
 		}
 // add condition button
-		array_push($rowCondition,BR,new CButton('register','add condition'));
+		array_push($rowCondition,BR,new CButton('add_condition','add'));
 
 // end of new condition preparation
 		$frmAction->AddRow(S_CONDITION, $rowCondition);
@@ -1219,7 +1228,7 @@
 		if($recipient==RECIPIENT_TYPE_GROUP)
 		{
 			
-			$cmbGroups = new CComboBox('usrgrpid', $uid);
+			$cmbGroups = new CComboBox('userid', $uid);
 	
 			$sql="select usrgrpid,name from usrgrp order by name";
 			$groups=DBselect($sql);
@@ -1257,6 +1266,9 @@
 		{
 			$frmAction->AddRow(S_NUMBER_OF_REPEATS, new CTextBox('maxrepeats',$maxrepeats,2));
 			$frmAction->AddRow(S_DELAY_BETWEEN_REPEATS, new CTextBox('repeatdelay',$repeatdelay,2));
+		} else {
+			$frmAction->AddVar("maxrepeats",$maxrepeats);
+			$frmAction->AddVar("repeatdelay",$repeatdelay);
 		}
 
 		$frmAction->AddItemToBottomRow(new CButton('save',S_SAVE));
