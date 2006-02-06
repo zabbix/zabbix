@@ -75,7 +75,7 @@
 		show_header2(S_CONFIGURATION_OF_SCREENS_BIG, $form);
 
 		$table = new CTableInfo(S_NO_SCREENS_DEFINED);
-		$table->setHeader(array(S_ID,S_NAME,S_COLUMNS,S_ROWS,S_GRAPH));
+		$table->setHeader(array(S_ID,S_NAME,S_DIMENSION_COLS_ROWS,S_SCREEN));
 
 		$result=DBselect("select screenid,name,cols,rows from screens order by name");
 		while($row=DBfetch($result))
@@ -85,9 +85,8 @@
 			$table->addRow(array(
 				$row["screenid"],
 				new CLink($row["name"],"screenconf.php?form=update&screenid=".$row["screenid"]),
-				$row["cols"],
-				$row["rows"],
-				new CLink(S_SHOW,"screenedit.php?screenid=".$row["screenid"])
+				$row["cols"]." x ".$row["rows"],
+				new CLink(S_EDIT,"screenedit.php?screenid=".$row["screenid"])
 				));
 		}
 		$table->show();

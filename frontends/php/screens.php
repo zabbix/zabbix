@@ -43,6 +43,23 @@
 ?>
 
 <?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"screenid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,NULL),
+		"dec"=>			array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
+		"inc"=>			array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
+		"from"=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
+		"period"=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
+		"stime"=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	NULL,NULL),
+		"action"=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'go'"),NULL),
+		"reset"=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'reset'"),NULL),
+		"fullscreen"=>		array(T_ZBX_INT, O_OPT,	P_SYS,		IN("1"),		NULL)
+	);
+
+	check_fields($fields);
+?>
+
+<?php
 	$_REQUEST["screenid"]=get_request("screenid",get_profile("web.screens.screenid",0));
 	update_profile("web.screens.screenid",$_REQUEST["screenid"]);
 	update_profile("web.menu.view.last",$page["file"]);
@@ -232,7 +249,6 @@
 		echo "</TABLE>";
 	}
 ?>
-
 <?php
 	if(!isset($_REQUEST["fullscreen"]))
 	{

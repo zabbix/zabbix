@@ -93,19 +93,19 @@
 			$f=sprintf("%2.2f%%",$stat["ok"]);
 			$f_time=sprintf("%dd %dh %dm",$stat["ok_time"]/(24*3600),($stat["ok_time"]%(24*3600))/3600,($stat["ok_time"]%(3600))/(60));
 
-			$ok=array("value"=>$f_time,"class"=>"off");
-			$problems=array("value"=>$t_time,"class"=>"on");
-			$percentage=array("value"=>$f,"class"=>"off");
+			$ok=new CSpan($f_time,"off");
+			$problems=new CSpan($t_time,"on");
+			$percentage=new CSpan($f,"off");
 
 			if($service["showsla"]==1)
 			{
 				if($stat["ok"]>=$service["goodsla"])
 				{
-					$sla=array("value"=>$service["goodsla"],"class"=>"off");
+					$sla=new CSpan($service["goodsla"],"off");
 				}
 				else
 				{
-					$sla=array("value"=>$service["goodsla"],"class"=>"on");
+					$sla=new CSpan($service["goodsla"],"on");
 				}
 			}
 			else
@@ -138,19 +138,19 @@
 			$f=sprintf("%2.2f%%",$stat["ok"]);
 			$f_time=sprintf("%dd %dh %dm",$stat["ok_time"]/(24*3600),($stat["ok_time"]%(24*3600))/3600,($stat["ok_time"]%(3600))/(60));
 
-			$ok=array("value"=>$f_time,"class"=>"off");
-			$problems=array("value"=>$t_time,"class"=>"on");
-			$percentage=array("value"=>$f,"class"=>"off");
+			$ok=new CSpan($f_time,"off");
+			$problems=new CSpan($t_time,"on");
+			$percentage=new CSpan($f,"off");
 
 			if($service["showsla"]==1)
 			{
 				if($stat["ok"]>=$service["goodsla"])
 				{
-					$sla=array("value"=>$service["goodsla"],"class"=>"off");
+					$sla=new CSpan($service["goodsla"],"off");
 				}
 				else
 				{
-					$sla=array("value"=>$service["goodsla"],"class"=>"on");
+					$sla=new CSpan($service["goodsla"],"on");
 				}
 			}
 			else
@@ -185,19 +185,19 @@
 			$f=sprintf("%2.2f%%",$stat["ok"]);
 			$f_time=sprintf("%dd %dh %dm",$stat["ok_time"]/(24*3600),($stat["ok_time"]%(24*3600))/3600,($stat["ok_time"]%(3600))/(60));
 
-			$ok=array("value"=>$f_time,"class"=>"off");
-			$problems=array("value"=>$t_time,"class"=>"on");
-			$percentage=array("value"=>$f,"class"=>"off");
+			$ok=new CSpan($f_time,"off");
+			$problems=new CSpan($t_time,"on");
+			$percentage=new CSpan($f,"off");
 
 			if($service["showsla"]==1)
 			{
 				if($stat["ok"]>=$service["goodsla"])
 				{
-					$sla=array("value"=>$service["goodsla"],"class"=>"off");
+					$sla=new CSpan($service["goodsla"],"off");
 				}
 				else
 				{
-					$sla=array("value"=>$service["goodsla"],"class"=>"on");
+					$sla=new CSpan($service["goodsla"],"on");
 				}
 			}
 			else
@@ -248,19 +248,19 @@
 			$f=sprintf("%2.2f%%",$stat["ok"]);
 			$f_time=sprintf("%dd %dh %dm",$stat["ok_time"]/(24*3600),($stat["ok_time"]%(24*3600))/3600,($stat["ok_time"]%(3600))/(60));
 
-			$ok=array("value"=>$f_time,"class"=>"off");
-			$problems=array("value"=>$t_time,"class"=>"on");
-			$percentage=array("value"=>$f,"class"=>"off");
+			$ok=new CSpan($f_time,"off");
+			$problems=new CSpan($t_time,"on");
+			$percentage=new CSpan($f,"off");
 
 			if($service["showsla"]==1)
 			{
 				if($stat["ok"]>=$service["goodsla"])
 				{
-					$sla=array("value"=>$service["goodsla"],"class"=>"off");
+					$sla=new CSpan($service["goodsla"],"off");
 				}
 				else
 				{
-					$sla=array("value"=>$service["goodsla"],"class"=>"on");
+					$sla=new CSpan($service["goodsla"],"on");
 				}
 			}
 			else

@@ -297,27 +297,29 @@
 			elseif($row["priority"]==5)	$priority=array("value"=>S_DISASTER,"class"=>"disaster");
 			else				$priority=$row["priority"];
 
-			if($row["status"] == 1)
+			if($row["status"] == TRIGGER_STATUS_DISABLED)
 			{
 				$status= new CLink(S_DISABLED,
 					"triggers.php?register=changestatus&triggerid=".
 						$row["triggerid"]."&status=0&hostid=".$row["hostid"],
 					'disabled');
 			}
-			else if($row["status"] == 2)
+			else if($row["status"] == TRIGGER_STATUS_UNKNOWN)
 			{
-				$status= new CLink(S_UNCNOWN,
+				$status= new CLink(S_UNKNOWN,
 					"triggers.php?register=changestatus&triggerid=".
 						$row["triggerid"]."&status=1&hostid=".$row["hostid"],
 					'uncnown');
 			}
-			else
+			else if($row["status"] == TRIGGER_STATUS_ENABLED)
 			{
 				$status= new CLink(S_ENABLED,
 					"triggers.php?register=changestatus&triggerid=".
 						$row["triggerid"]."&status=1&hostid=".$row["hostid"],
 					'enabled');
 			}
+
+			if($row["status"] != TRIGGER_STATUS_UNKNOWN)	$row["error"]="&nbsp;";
 
 			if($row["error"]=="")		$row["error"]="&nbsp;";
 

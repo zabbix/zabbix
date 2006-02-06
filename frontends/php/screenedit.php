@@ -197,7 +197,7 @@
 			else
 			{
 				$item = new CLink(
-					S_EMPTY,
+					S_EDIT,
 					"screenedit.php?form=update".url_param("screenid")."&x=$c&y=$r#form"
 					);
 			}
