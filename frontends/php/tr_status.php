@@ -474,7 +474,7 @@
 	{
 		$header=array_merge($header,array(S_ACTIONS));
 	}
-	$header=array_merge($header,array(S_COMMENTS));
+	array_push($header,S_COMMENTS);
 	$table->setHeader($header);
 	unset($header);
 
@@ -561,23 +561,23 @@
 			$blink2="";
 		}
 		if($row["value"]==0)
-				$value=array("value"=>"$blink1".S_FALSE_BIG."$blink2","class"=>"off");
+				$value=new CSpan("$blink1".S_FALSE_BIG."$blink2","off");
 		else if($row["value"]==2)
-				$value=array("value"=>"$blink1".S_UNKNOWN_BIG."$blink2","class"=>"unknown");
+				$value=new CSpan("$blink1".S_UNKNOWN_BIG."$blink2","unknown");
 		else
-				$value=array("value"=>S_TRUE_BIG,"class"=>"on");
+				$value=new CSpan(S_TRUE_BIG,"on");
 
 		if($row["priority"]==0)		$priority=S_NOT_CLASSIFIED;
 		elseif($row["priority"]==1)	$priority=S_INFORMATION;
 		elseif($row["priority"]==2)	$priority=S_WARNING;
-		elseif($row["priority"]==3)	$priority=array("value"=>S_AVERAGE,"class"=>"average");
-		elseif($row["priority"]==4)	$priority=array("value"=>S_HIGH,"class"=>"high");
-		elseif($row["priority"]==5)	$priority=array("value"=>S_DISASTER,"class"=>"disaster");
+		elseif($row["priority"]==3)	$priority=new CSpan(S_AVERAGE,"average");
+		elseif($row["priority"]==4)	$priority=new CSpan(S_HIGH,"high");
+		elseif($row["priority"]==5)	$priority=new CSpan(S_DISASTER,"disaster");
 		else				$priority=$row["priority"];
 
 		$lastchange="<A HREF=\"alarms.php?triggerid=".$row["triggerid"]."\">".date(S_DATE_FORMAT_YMDHMS,$row["lastchange"])."</a>";
 
-		$actions=array("hide"=>1);
+		$actions=NULL;
 		if($noactions!='true')
 		{
 //			$actions="<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">".S_SHOW_ACTIONS."</A> - ";
@@ -591,7 +591,7 @@
 				$actions=$actions."<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."#form\">".S_CHANGE."</A>";
 			}
 		}
-		$comments=array("hide"=>1);;
+		$comments=NULL;
 		if($row["comments"] != "")
 		{
 			$comments="<A HREF=\"tr_comments.php?triggerid=".$row["triggerid"]."\">".S_SHOW."</a>";
@@ -601,7 +601,7 @@
 			$comments="<A HREF=\"tr_comments.php?triggerid=".$row["triggerid"]."\">".S_ADD."</a>";
 		}
 
-		$table->addRow(array(
+		$table->AddRow(array(
 				$description,
 				$value,
 				$priority,

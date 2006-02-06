@@ -105,7 +105,7 @@
 		{
 			if(!isset($fields[$key]))
 			{
-echo "Unset: $key<br>";
+//echo "Unset: $key<br>";
 				unset($_REQUEST[$key]);
 			}
 		}
@@ -119,7 +119,7 @@ echo "Unset: $key<br>";
 
 			if(($flags&P_NZERO)&&(isset($_REQUEST[$field]))&&($_REQUEST[$field]==0))
 			{
-echo "Unset: $field<br>";
+//echo "Unset: $field<br>";
 				unset($_REQUEST[$field]);
 			}
 		}
@@ -134,7 +134,7 @@ echo "Unset: $field<br>";
 			
 			if(($flags&P_ACT)&&(isset($_REQUEST[$field])))
 			{
-echo "Unset:".$field."<br>";
+//echo "Unset:".$field."<br>";
 				unset($_REQUEST[$field]);
 			}
 		}
@@ -144,7 +144,7 @@ echo "Unset:".$field."<br>";
 	{
 		foreach($_REQUEST as $key => $val)
 		{
-echo "Unset:".$key."<br>";
+//echo "Unset:".$key."<br>";
 			unset($_REQUEST[$key]);
 		}
 	}
@@ -236,7 +236,7 @@ echo "Unset:".$key."<br>";
 			if(!isset($_REQUEST[$field]))
 				return ZBX_VALID_OK;
 
-echo "Unset:".$field."<br>";
+//echo "Unset:".$field."<br>";
 			unset($_REQUEST[$field]);
 
 			if($flags&P_SYS)
