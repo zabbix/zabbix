@@ -710,13 +710,12 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 	{
 		global	$INFO_MSG;
 		global	$ERROR_MSG;
-
-		if(is_array($INFO_MSG))
+		if(is_array($INFO_MSG) && count($INFO_MSG)>0)
 		{
 			echo "<p align=center class=\"info\">";
-			while(list($key, $val)=each($INFO_MSG))
+			while($val = array_shift($INFO_MSG))
 			{
-				echo $val."<br>";
+				echo $val.BR;
 			}
 			echo "</p>";
 		}
@@ -749,12 +748,12 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 		show_infomsg();
 
-		if(is_array($ERROR_MSG))
+		if(is_array($ERROR_MSG) && count($ERROR_MSG)>0)
 		{
 			echo "<p align=center class=\"error\">";
-			while(list($key, $val)=each($ERROR_MSG))
+			while($val = array_shift($ERROR_MSG))
 			{
-				echo $val."<br>";
+				echo $val.BR;
 			}
 			echo "</p>";
 		}
