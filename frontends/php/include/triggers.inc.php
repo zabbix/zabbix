@@ -129,11 +129,22 @@
 		return $triggerid;
 	}
 
+	function	delete_dependencies_by_triggerid($triggerid)
+	{
+		return DBexecute("delete from trigger_depends".
+					" where triggerid_down=".$triggerid);
+	}
+
 	# Delete Trigger definition
 
 	function	delete_trigger($triggerid)
 	{
-		$sql="select count(*) as cnt from trigger_depends where triggerid_down=$triggerid or triggerid_up=$triggerid";
+		$result=delete_function_by_triggerid($triggerid);
+		if(!$result)
+		{
+			return	$result;
+		}
+		$sql="select count(*) as cnt from trigger_depends where triggerid_up=$triggerid";
 		$result=DBexecute($sql);
 		$row=DBfetch($result);
 		if($row["cnt"]>0)

@@ -122,7 +122,7 @@
 				return $this->error("Incorrect value for AddOption [$value]");
 			}
 			
-			$this->options[$name] = strval($value); 
+			$this->options[$name] = htmlspecialchars(strval($value)); 
 			return 0;
 		}
 		function AddItem($value)

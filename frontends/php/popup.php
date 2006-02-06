@@ -94,7 +94,7 @@
 			continue;
 		}
 
-		$host ="<a href=\"#\" onclick='".
+		$host ="<a href=\"#\" class=\"action\" onclick='".
 			" window.opener.document.forms[\"".$_REQUEST["form"]."\"].".$_REQUEST["field1"].
 				".value=\"".$row["hostid"]."\";".
 			" window.opener.document.forms[\"".$_REQUEST["form"]."\"].".$_REQUEST["field2"].
@@ -113,38 +113,38 @@
         	if(check_right("Host","U",$row["hostid"]))
 		{
 			if($row["status"] == HOST_STATUS_MONITORED)	
-				$status=array("value"=>S_MONITORED,"class"=>"off");
+				$status=new CSpan(S_MONITORED,"off");
 			else if($row["status"] == HOST_STATUS_NOT_MONITORED)
-				$status=array("value"=>S_NOT_MONITORED,"class"=>"on");
+				$status=new CSpan(S_NOT_MONITORED,"on");
 			else if($row["status"] == HOST_STATUS_TEMPLATE)
-				$status=array("value"=>S_TEMPLATE,"class"=>"unknown");
+				$status=new CSpan(S_TEMPLATE,"unknown");
 			else if($row["status"] == HOST_STATUS_DELETED)
-				$status=array("value"=>S_DELETED,"class"=>"unknown");
+				$status=new CSpan(S_DELETED,"unknown");
 			else
 				$status=S_UNKNOWN;
 		}
 		else
 		{
 			if($row["status"] == HOST_STATUS_MONITORED)	
-				$status=array("value"=>S_MONITORED,"class"=>"off");
+				$status=new CSpan(S_MONITORED,"off");
 			else if($row["status"] == HOST_STATUS_NOT_MONITORED)
-				$status=array("value"=>S_NOT_MONITORED,"class"=>"on");
+				$status=new CSpan(S_NOT_MONITORED,"on");
 //			else if($row["status"] == 2)
 //				$status=array("value"=>S_UNREACHABLE,"class"=>"unknown");
 			else if($row["status"] == HOST_STATUS_TEMPLATE)
-				$status=array("value"=>S_TEMPLATE,"class"=>"unknown");
+				$status=new CSpan(S_TEMPLATE,"unknown");
 			else if($row["status"] == HOST_STATUS_DELETED)
-				$status=array("value"=>S_DELETED,"class"=>"unknown");
+				$status=new CSpan(S_DELETED,"unknown");
 			else
 				$status=S_UNKNOWN;
 		}
 
 		if($row["available"] == HOST_AVAILABLE_TRUE)	
-			$available=array("value"=>S_AVAILABLE,"class"=>"off");
+			$available=new CSpan(S_AVAILABLE,"off");
 		else if($row["available"] == HOST_AVAILABLE_FALSE)
-			$available=array("value"=>S_NOT_AVAILABLE,"class"=>"on");
+			$available=new CSpan(S_NOT_AVAILABLE,"on");
 		else if($row["available"] == HOST_AVAILABLE_UNKNOWN)
-			$available=array("value"=>S_UNKNOWN,"class"=>"unknown");
+			$available=new CSpan(S_UNKNOWN,"unknown");
 
 		$table->addRow(array(
 			$host,

@@ -387,7 +387,7 @@
 						"&group_task=Disable+selected",
 						"off"),"off");
 					break;
-				case 1:	$status=new CCol(new CLink(S_ACTIVE,
+				case 1:	$status=new CCol(new CLink(S_DISABLED,
 						"items.php?group_itemid%5B%5D=".$row["itemid"].
 						"&hostid=".$_REQUEST["hostid"].
 						"&group_task=Activate+selected",

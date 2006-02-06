@@ -46,7 +46,7 @@
 		"mediatypeid"=>	array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'isset({save})'),
 		"sendto"=>	array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'isset({save})'),
 		"period"=>	array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'isset({save})'),
-		"active"=>	array(T_ZBX_INT, O_NO,	NULL,	IN(0,1),	'isset({save})'),
+		"active"=>	array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'isset({save})'),
 
 		"severity"=>	array(T_ZBX_INT, O_OPT,	NULL,	NOT_EMPTY,	NULL),
 

@@ -50,6 +50,7 @@
 				$_REQUEST["label"],$_REQUEST["x"],$_REQUEST["y"],$_REQUEST["icon"],
 				$_REQUEST["url"],$_REQUEST["icon_on"]);
 			show_messages($result,"Host added","Cannot add host");
+			if($result)	unset($_REQUEST["form"]);
 		}
 		if($_REQUEST["register"]=="update")
 		{
@@ -57,6 +58,7 @@
 				$_REQUEST["hostid"],$_REQUEST["label"],$_REQUEST["x"],$_REQUEST["y"],
 				$_REQUEST["icon"],$_REQUEST["url"],$_REQUEST["icon_on"]);
 			show_messages($result,"Host updated","Cannot update host");
+			if($result)	unset($_REQUEST["form"]);
 		}
 		if($_REQUEST["register"]=="add link")
 		{
@@ -64,6 +66,7 @@
 				$_REQUEST["triggerid"],	$_REQUEST["drawtype_off"],$_REQUEST["color_off"],
 				$_REQUEST["drawtype_on"],$_REQUEST["color_on"]);
 			show_messages($result,"Link added","Cannot add link");
+			if($result)	unset($_REQUEST["form"]);
 		}
 		if($_REQUEST["register"]=="delete_link")
 		{
@@ -75,7 +78,7 @@
 		{
 			$result=delete_sysmaps_host($_REQUEST["shostid"]);
 			show_messages($result,"Host deleted","Cannot delete host");
-			unset($_REQUEST["shostid"]);
+			if($result)	unset($_REQUEST["form"]);
 		}
 	}
 ?>
