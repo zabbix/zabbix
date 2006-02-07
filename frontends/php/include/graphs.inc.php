@@ -268,7 +268,7 @@
 				add_item_to_graph($graph["graphid"],$item["itemid"],$color,$drawtype,$sortorder,$yaxisside);
 				$host_info=get_host_by_hostid($host["hostid"]);
 				info("Added item to graph '".$graph["name"]."' from linked host '".$host_info["host"]."'");
-				remove_durpblicated_graphs($graph["graphid"]);
+				remove_duplicated_graphs($graph["graphid"]);
 				$find_graph=1;
 			}
 
@@ -287,7 +287,7 @@
 					$new_graph=get_graph_by_graphid($new_graphid);
 					$host_info=get_host_by_hostid($host["hostid"]);
 					info("Graph ".$new_graph["name"]." coped for linked host ".$host_info["host"]);
-					remove_durpblicated_graphs($new_graphid);
+					remove_duplicated_graphs($new_graphid);
 				}
 			}
 		}
@@ -745,7 +745,7 @@
 		return TRUE;
 	}
 	
-	function remove_durpblicated_graphs($graphid=0)
+	function remove_duplicated_graphs($graphid=0)
 	{
 		$sql="select graphid from graphs";
 		if($graphid!=0)
@@ -772,4 +772,51 @@
 		}
 	}
 
+	function		add_graph_item_to_linked_hosts($gitemid,$hostid=0)
+	{
+		if($gitemid<=0)
+		{
+			return;
+		}
+
+		$graph_item=get_graphitem_by_gitemid($gitemid);
+		$graph=get_graph_by_graphid($graph_item["graphid"]);
+		$item=get_item_by_itemid($graph_item["itemid"]);
+
+		if($hostid==0)
+		{
+			$sql="select hostid,templateid,graphs from hosts_templates where templateid=".$item["hostid"];
+		}
+		else
+		{
+			$sql="select hostid,templateid,graphs from hosts_templates where hostid=$hostid and templateid=".$item["hostid"];
+		}
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			if($row["graphs"]&1 == 0)	continue;
+
+			$sql="select i.itemid from items i where i.key_='".zbx_ads($item["key_"])."' and i.hostid=".$row["hostid"];
+			$result2=DBselect($sql);
+			if(DBnum_rows($result2)==0)	continue;
+			$row2=DBfetch($result2);
+			$itemid=$row2["itemid"];
+
+			$sql="select distinct g.graphid from graphs g,graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and g.graphid=gi.graphid and g.name='".zbx_ads($graph["name"])."'";
+			$result2=DBselect($sql);
+			$host=get_host_by_hostid($row["hostid"]);
+			while($row2=DBfetch($result2))
+			{
+				add_item_to_graph($row2["graphid"],$itemid,$graph_item["color"],$graph_item["drawtype"],$graph_item["sortorder"],$graph_item["yaxisside"]);
+				info("Added graph element to graph ".$graph["name"]." of linked host ".$host["host"]);
+			}
+			if(DBnum_rows($result2)==0)
+			{
+				$graphid=add_graph($graph["name"],$graph["width"],$graph["height"],$graph["yaxistype"],$graph["yaxismin"],$graph["yaxismax"]);
+				info("Added graph ".$graph["name"]." of linked host ".$host["host"]);
+				add_item_to_graph($graphid,$itemid,$graph_item["color"],$graph_item["drawtype"],$graph_item["sortorder"],$graph_item["yaxisside"]);
+				info("Added graph element to graph ".$graph["name"]." of linked host ".$host["host"]);
+			}
+		}
+	}
 ?>

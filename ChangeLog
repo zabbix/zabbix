@@ -1,5 +1,6 @@
 Changes for 1.1beta6:
 
+ - fixed synchronisation of template graphs when using a template (Alexei)
  - added new server parameter UnavailablePeriod (Alexei)
  - dropped column hosts.network_errors (Alexei)
  - added column hosts.errors_from (Alexei)
