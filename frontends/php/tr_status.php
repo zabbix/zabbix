@@ -575,30 +575,31 @@
 		elseif($row["priority"]==5)	$priority=new CSpan(S_DISASTER,"disaster");
 		else				$priority=$row["priority"];
 
-		$lastchange="<A HREF=\"alarms.php?triggerid=".$row["triggerid"]."\">".date(S_DATE_FORMAT_YMDHMS,$row["lastchange"])."</a>";
+		$lastchange=new CLink(date(S_DATE_FORMAT_YMDHMS,$row["lastchange"]),"alarms.php?triggerid=".$row["triggerid"],"action");
 
 		$actions=NULL;
 		if($noactions!='true')
 		{
 //			$actions="<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">".S_SHOW_ACTIONS."</A> - ";
-			$actions="<A HREF=\"alarms.php?triggerid=".$row["triggerid"]."\">".S_HISTORY."</A> - ";
+			$actions=array(new CLink(S_HISTORY,"alarms.php?triggerid=".$row["triggerid"],"action"));
+			array_push($actions, " - ");
 			if(isset($_REQUEST["hostid"]))
 			{
-				$actions=$actions."<A HREF=\"triggers.php?hostid=".$_REQUEST["hostid"]."&triggerid=".$row["triggerid"]."#form\">".S_CHANGE."</A>";
+				array_push($actions, new CLink(S_CHANGE,"triggers.php?hostid=".$_REQUEST["hostid"]."&triggerid=".$row["triggerid"]."#form","action"));
 			}
 			else
 			{
-				$actions=$actions."<A HREF=\"triggers.php?triggerid=".$row["triggerid"]."#form\">".S_CHANGE."</A>";
+				array_push($actions, new CLink(S_CHANGE,"triggers.php?triggerid=".$row["triggerid"]."#form","action"));
 			}
 		}
 		$comments=NULL;
 		if($row["comments"] != "")
 		{
-			$comments="<A HREF=\"tr_comments.php?triggerid=".$row["triggerid"]."\">".S_SHOW."</a>";
+			$comments=new CLink(S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action");
 		}
 		else
 		{
-			$comments="<A HREF=\"tr_comments.php?triggerid=".$row["triggerid"]."\">".S_ADD."</a>";
+			$comments=new CLink(S_ADD,"tr_comments.php?triggerid=".$row["triggerid"],"action");
 		}
 
 		$table->AddRow(array(

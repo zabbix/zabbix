@@ -121,11 +121,11 @@
 		$message="<pre>".htmlspecialchars($row["message"])."</pre>";
 		if($row["error"] == "")
 		{
-			$error=array("value"=>"&nbsp;","class"=>"off");
+			$error=new CSpan("&nbsp;","off");
 		}
 		else
 		{
-			$error=array("value"=>$row["error"],"class"=>"on");
+			$error=new CSpan($row["error"],"on");
 		}
 		$table->addRow(array(
 			$time,
