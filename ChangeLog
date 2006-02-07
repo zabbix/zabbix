@@ -1,3 +1,7 @@
+Changes for 1.1beta7:
+
+ - added hosts.templateid and items.templateid (Alexei)
+
 Changes for 1.1beta6:
 
  - fixed synchronisation of template graphs when using a template (Alexei)

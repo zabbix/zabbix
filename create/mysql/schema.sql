@@ -311,6 +311,7 @@ CREATE TABLE hosts (
 	error		varchar(128)	DEFAULT '' NOT NULL,
 	available	int(4)		DEFAULT '0' NOT NULL,
 	errors_from	int(4)		DEFAULT '0' NOT NULL,
+	templateid	int(4)		DEFAULT '0' NOT NULL,
 	PRIMARY KEY	(hostid),
 	UNIQUE		(host),
 	KEY		(status)
@@ -355,6 +356,7 @@ CREATE TABLE items (
 
 	lastlogsize	int(4) DEFAULT '0' NOT NULL,
 	logtimefmt	varchar(64) DEFAULT '' NOT NULL,
+	templateid	int(4) DEFAULT '0' NOT NULL,
 
 	PRIMARY KEY	(itemid),
 	UNIQUE		shortname (hostid,key_),
