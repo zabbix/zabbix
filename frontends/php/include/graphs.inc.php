@@ -226,12 +226,21 @@
 		return $ret_code;
 	}
 
-	function	add_graph_item_to_templates($template_graphid,$template_itemid,$color,$drawtype,$sortorder,$yaxisside)
+	function	add_graph_item_to_templates(
+		$template_graphid,$template_itemid,
+		$color,$drawtype,$sortorder,$yaxisside)
 	{
-		if($template_graphid<=0)		return;
+		if($template_graphid<=0)
+			return;
+
+// get host count by graph
 		$template_hosts = get_hosts_by_graphid($template_graphid);
-		if(!$template_hosts)			return;
+
+		if(!$template_hosts)
+			return;
+
 		$template_hosts_cnt=DBnum_rows($template_hosts);
+
 		if($template_hosts_cnt==0)
 		{
 			$template_host=get_host_by_itemid($template_itemid);
@@ -245,17 +254,19 @@
 				$template_hosts_cnt++;
 		}
 		if($template_hosts_cnt!=1)		return;
+// end host counting
 
 		$template_item=get_item_by_itemid($template_itemid);
 
-		$sql="select hostid,templateid,graphs from hosts_templates where templateid=".$template_host["hostid"];
-		$hosts=DBselect($sql);
+		$hosts=DBselect("select hostid,templateid,graphs from hosts_templates".
+			" where templateid=".$template_host["hostid"]);
 		while($host=DBfetch($hosts))
 		{
 			if($host["graphs"]&2 == 0)	continue;
 
-			$sql="select i.itemid from items i where i.key_='".zbx_ads($template_item["key_"])."' and i.hostid=".$host["hostid"];
-			$items=DBselect($sql);
+			$items=DBselect("select i.itemid from items i".
+				" where i.key_='".zbx_ads($template_item["key_"])."'".
+				" and i.hostid=".$host["hostid"]);
 			if(DBnum_rows($items)==0)	continue;
 			$item=DBfetch($items);
 
@@ -265,9 +276,14 @@
 			{
 				if(!cmp_graphs($template_graphid,$graph["graphid"]))		continue;
 				if(!cmp_graph_by_item_key($template_graphid,$graph["graphid"]))	continue;
-				add_item_to_graph($graph["graphid"],$item["itemid"],$color,$drawtype,$sortorder,$yaxisside);
+
+				add_item_to_graph($graph["graphid"],$item["itemid"],
+					$color,$drawtype,$sortorder,$yaxisside);
+
 				$host_info=get_host_by_hostid($host["hostid"]);
-				info("Added item to graph '".$graph["name"]."' from linked host '".$host_info["host"]."'");
+				info("Added item to graph '".$graph["name"]."'".
+					" from linked host '".$host_info["host"]."'");
+
 				remove_duplicated_graphs($graph["graphid"]);
 				$find_graph=1;
 			}
@@ -276,7 +292,11 @@
 			{
 # duplicate graph for new host
 				$template_graph=get_graph_by_graphid($template_graphid);
-				$new_graphid=add_graph($template_graph["name"],$template_graph["width"],$template_graph["height"],$template_graph["yaxistype"],$template_graph["yaxismin"],$template_graph["yaxismax"]);
+
+				$new_graphid=add_graph($template_graph["name"],$template_graph["width"],
+					$template_graph["height"],$template_graph["yaxistype"],
+					$template_graph["yaxismin"],$template_graph["yaxismax"]);
+
 				if(copy_graphitems_for_host($template_graphid,$new_graphid,$host["hostid"])!=0)
 				{
 					delete_graph($new_graphid);
