@@ -1852,7 +1852,7 @@
 		{
 			$cmbHosts->AddItem($host["hostid"],$host["host"]);
 		}
-		$frmHost->AddRow(S_LINK_WITH_HOST,$cmbHosts);
+		$frmHost->AddRow(S_USE_TEMPLATES_OF_THIS_HOST,$cmbHosts);
 	
 		$frmHost->AddRow(S_USE_PROFILE,new CCheckBox("useprofile",$useprofile,NULL,"submit()"));
 		if($useprofile=="yes")

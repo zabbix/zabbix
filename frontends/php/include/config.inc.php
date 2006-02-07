@@ -1763,8 +1763,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
-// Hmm WHere is this function?	
-//			add_graph_item_to_linked_hosts($row["gitemid"],$hostid);
+			add_graph_item_to_linked_hosts($row["gitemid"],$hostid);
 		}
 
 		return TRUE;
