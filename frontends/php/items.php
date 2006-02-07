@@ -102,6 +102,7 @@
 	if(isset($_REQUEST["delete"])&&isset($_REQUEST["itemid"]))
 	{
 		delete_item_from_templates($_REQUEST["itemid"]);
+
 		$result=delete_item($_REQUEST["itemid"]);
 		show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
 		if($result){
@@ -113,6 +114,16 @@
 	{
 		if(isset($_REQUEST["itemid"]))
 		{
+			$result=update_item_in_templates($_REQUEST["itemid"],
+				$_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],
+				$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],
+				$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],
+				$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],$_REQUEST["units"],
+				$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],
+				$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
+				$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],
+				$_REQUEST["logtimefmt"]);
+
 			$result=update_item($_REQUEST["itemid"],
 				$_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],
 				$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],
@@ -122,7 +133,7 @@
 				$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
 				$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],
 				$_REQUEST["logtimefmt"]);
-			update_item_in_templates($_REQUEST["itemid"]);
+
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
 		else
@@ -136,6 +147,7 @@
 				$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
 				$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],
 				$_REQUEST["logtimefmt"]);
+
 			add_item_to_linked_hosts($itemid);
 			$result = $itemid;
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
@@ -196,14 +208,6 @@
 				}
 			}
 		}
-/*
-		else if($_REQUEST["register"]=="changestatus")
-		{
-			$result=update_item_status($_REQUEST["itemid"],$_REQUEST["status"]);
-			show_messages($result, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
-			unset($_REQUEST["itemid"]);
-		}
-*/
 /*
 		else if($_REQUEST["register"]=="add to all hosts")
 		{

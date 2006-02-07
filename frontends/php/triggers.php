@@ -95,31 +95,36 @@
 			if(isset($_REQUEST["disabled"]))	{ $status=1; }
 			else			{ $status=0; }
 
+			$deps = get_request("dependences",array());
+
 			if(isset($_REQUEST["triggerid"])){
+				update_trigger_from_linked_hosts($_REQUEST["triggerid"],
+					$_REQUEST["expression"],$_REQUEST["description"],
+					$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],
+					$deps);
+
 				$result=update_trigger($_REQUEST["triggerid"],
 					$_REQUEST["expression"],$_REQUEST["description"],
-					$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"]);
+					$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],
+					$deps);
 
 				$triggerid = $_REQUEST["triggerid"];
 				show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
 			} else {
 				$triggerid=add_trigger($_REQUEST["expression"],$_REQUEST["description"],
-					$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"]);
+					$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],
+					$deps);
 
 				$result = $triggerid;
+
+				if($triggerid)
+					add_trigger_to_linked_hosts($triggerid);
+
 				show_messages($triggerid, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 			}
 
 			if($result)
 			{
-				delete_dependencis_by_triggerid($triggerid);
-
-				if(isset($_REQUEST["dependences"])) foreach($_REQUEST["dependences"] as $val)
-				{
-					$result=add_trigger_dependency(	$triggerid, $val);
-				}
-
-//				update_trigger_from_linked_hosts($_REQUEST["triggerid"]);
 				unset($_REQUEST["form"]);
 			}
 		}
@@ -131,6 +136,7 @@
 	elseif(isset($_REQUEST["delete"])&&isset($_REQUEST["triggerid"]))
 	{
 		delete_trigger_from_templates($_REQUEST["triggerid"]);
+
 		$result=delete_trigger($_REQUEST["triggerid"]);
 		show_messages($result, S_TRIGGER_DELETED, S_CANNOT_DELETE_TRIGGER);
 		if($result){
@@ -190,6 +196,8 @@
 		while($row=DBfetch($result))
 		{
 			if(!in_array($row["triggerid"], $_REQUEST["g_triggerid"]))	continue;
+
+			delete_trigger_from_templates($row["triggerid"]);
 			$result2=delete_trigger($row["triggerid"]);
 		}
 		show_messages(TRUE, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);

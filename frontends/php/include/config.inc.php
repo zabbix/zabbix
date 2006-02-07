@@ -1388,7 +1388,8 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 //				echo "PARAMETER:$parameter<BR>";
 				$state='';
 		
-				$sql="select i.itemid from items i,hosts h where i.key_='".zbx_ads($key)."' and h.host='".zbx_ads($host)."' and h.hostid=i.hostid";
+				$sql="select i.itemid from items i,hosts h where i.key_='".zbx_ads($key)."'".
+					" and h.host='".zbx_ads($host)."' and h.hostid=i.hostid";
 #				echo $sql,"<Br>";
 				$res=DBselect($sql);
 				$row=DBfetch($res);
@@ -1396,7 +1397,9 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 				$itemid=$row["itemid"];
 #				echo "ITEMID:$itemid<BR>";
 	
-				$sql="insert into functions (itemid,triggerid,function,parameter) values ($itemid,$triggerid,'".zbx_ads($function)."','".zbx_ads($parameter)."')";
+				$sql="insert into functions (itemid,triggerid,function,parameter)".
+					" values ($itemid,$triggerid,'".zbx_ads($function)."',".
+					"'".zbx_ads($parameter)."')";
 #				echo $sql,"<Br>";
 				$res=DBexecute($sql);
 				if(!$res)
