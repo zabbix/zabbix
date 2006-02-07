@@ -3,7 +3,7 @@
  - execution of commands on monitored hosts in case of pre-defined events
  - fix undeleted warnings for host and trigger statuses
  - new implementation for templates
-
+ - server side checks (new type of check)
  - timout-immune poller
  - improve housekeeper. check if it works correctly.
  - make agents return error message if not supported or not available
