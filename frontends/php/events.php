@@ -162,7 +162,7 @@
 		}
 
 		$description=expand_trigger_description($row["triggerid"]);
-		$description="<a href=\"alarms.php?triggerid=".$row["triggerid"]."\">$description</a>";
+		$description=new CLink($description,"alarms.php?triggerid=".$row["triggerid"],"action");
 
 		if($row["value"] == 0)
 		{

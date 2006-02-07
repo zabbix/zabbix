@@ -174,7 +174,7 @@
 #		echo "<a href=\"latest.php?hostid=".$_REQUEST["hostid"]."\">$host</a>";
 #		show_table3_v_delimiter();
 
-		table_begin();
+//		table_begin();
 		$header=array();
 		if(isset($_REQUEST["select"]))
 		{
@@ -182,7 +182,10 @@
 		}
 		$header=array_merge($header,array(S_DESCRIPTION, S_LAST_CHECK, S_LAST_VALUE,S_CHANGE,S_HISTORY));
 
-		table_header($header);
+		$table=new CTableInfo();
+		$table->setHeader($header);
+
+//		table_header($header);
 
 		$col=0;
 		if(isset($_REQUEST["select"]))
@@ -200,73 +203,78 @@
 			{
 				continue;
 			}
-			iif_echo($col++%2 == 1,
-				"<tr bgcolor=#DDDDDD>",
-				"<tr bgcolor=#EEEEEE>");
+//			iif_echo($col++%2 == 1,
+//				"<tr bgcolor=#DDDDDD>",
+//				"<tr bgcolor=#EEEEEE>");
 
+			$host=NULL;
 			if(isset($_REQUEST["select"]))
 			{
-				table_td($row["host"],"");
+				$host=$row["host"];
 			}
-			table_td(item_description($row["description"],$row["key_"]),"");
+			$description = item_description($row["description"],$row["key_"]);
 
-			echo "<td>";
-			if($row["status"] == 2)
+			if(isset($row["lastclock"]))
 			{
-				echo "<font color=\"#FF6666\">";
-			}
-
-			iif_echo(!isset($row["lastclock"]),
-				"<div align=center>-</div>",
-				date(S_DATE_FORMAT_YMDHMS,$row["lastclock"]));
-			echo "</font></td>";
-
-			if(isset($row["lastvalue"]))
-			{
-				iif_echo( ($row["value_type"] == ITEM_VALUE_TYPE_FLOAT) || ($row["value_type"] == ITEM_VALUE_TYPE_UINT64),
-					"<td>".convert_units($row["lastvalue"],$row["units"])."</td>",
-					"<td>".nbsp(htmlspecialchars(substr($row["lastvalue"],0,20)." ..."))."</td>");
+				$lastclock=date(S_DATE_FORMAT_YMDHMS,$row["lastclock"]);
 			}
 			else
 			{
-				table_td("-","align=center");
+				$lastclock="-";
+			}
+
+			if(isset($row["lastvalue"]))
+			{
+				if(($row["value_type"] == ITEM_VALUE_TYPE_FLOAT) || ($row["value_type"] == ITEM_VALUE_TYPE_UINT64))
+				{
+					$lastvalue=convert_units($row["lastvalue"],$row["units"]);
+				}
+				else
+				{
+					$lastvalue=nbsp(htmlspecialchars(substr($row["lastvalue"],0,20)." ..."));
+				}
+			}
+			else
+			{
+				$lastvalue=new CCol("-","center");
 			}
 			if( isset($row["lastvalue"]) && isset($row["prevvalue"]) &&
 				($row["value_type"] == 0) && ($row["lastvalue"]-$row["prevvalue"] != 0) )
 			{
-//				echo "<td>"; echo $row["lastvalue"]-$row["prevvalue"]; echo "</td>";
-//	sprintf("%+0.2f"); does not work
 				if($row["lastvalue"]-$row["prevvalue"]<0)
 				{
-					$str=convert_units($row["lastvalue"]-$row["prevvalue"],$row["units"]);
-					$str=nbsp($str);
-					table_td($str,"");
+					$change=convert_units($row["lastvalue"]-$row["prevvalue"],$row["units"]);
+					$change=nbsp($change);
 				}
 				else
 				{
-					$str="+".convert_units($row["lastvalue"]-$row["prevvalue"],$row["units"]);
-					$str=nbsp($str);
-					table_td($str,"");
-//					printf("<td>+%0.2f</td>",$row["lastvalue"]-$row["prevvalue"]);
+					$change="+".convert_units($row["lastvalue"]-$row["prevvalue"],$row["units"]);
+					$change=nbsp($change);
 				}
 			}
 			else
 			{
-				echo "<td align=center>-</td>";
+				$change=new CCol("-","center");
 			}
-			iif_echo(($row["value_type"]==ITEM_VALUE_TYPE_FLOAT) ||($row["value_type"]==ITEM_VALUE_TYPE_UINT64),
-				"<td align=center><a href=\"history.php?action=showhistory&itemid=".$row["itemid"]."\">".S_GRAPH."</a></td>",
-				"<td align=center><a href=\"history.php?action=showvalues&period=3600&itemid=".$row["itemid"]."\">".S_HISTORY."</a></td>");
+			if(($row["value_type"]==ITEM_VALUE_TYPE_FLOAT) ||($row["value_type"]==ITEM_VALUE_TYPE_UINT64))
+			{
+				$actions=new CLink(S_GRAPH,"history.php?action=showhistory&itemid=".$row["itemid"],"action");
+			}
+			else
+			{
+				$actions=new CLink(S_HISTORY,"history.php?action=showvalues&period=3600&itemid=".$row["itemid"],"action");
+			}
 
-			echo "</tr>";
-			cr();
+			$table->addRow(array(
+				$host,
+				$description,
+				$lastclock,
+				$lastvalue,
+				$change,
+				$actions
+			));
 		}
-		table_end();
-		show_table_header_end();
-	}
-	else
-	{
-		table_nodata();
+		$table->show();
 	}
 ?>
 
