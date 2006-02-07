@@ -51,6 +51,7 @@
 		$result=DBexecute($sql);
 		while($row=DBfetch($result))
 		{
+			delete_item_from_templates($row["itemid"]);
 			delete_item($row["itemid"]);
 		}
 		return 1;
@@ -136,7 +137,10 @@
 
 	# Update Item definition
 
-	function	update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt)
+	function	update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,
+		$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,
+		$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,
+		$formula,$trends,$logtimefmt)
 	{
 		if(!check_right("Item","U",$itemid))
 		{
@@ -160,10 +164,19 @@
 			$delta=0;
 		}
 
-		$sql="update items set lastlogsize=0 where itemid=$itemid and key_<>'".zbx_ads($key)."'";
-		DBexecute($sql);
+		DBexecute("update items set lastlogsize=0 where itemid=$itemid and key_<>'".zbx_ads($key)."'");
 
-		$sql="update items set description='".zbx_ads($description)."',key_='".zbx_ads($key)."',hostid=$hostid,delay=$delay,history=$history,nextcheck=0,status=$status,type=$type,snmp_community='".zbx_ads($snmp_community)."',snmp_oid='".zbx_ads($snmp_oid)."',value_type=$value_type,trapper_hosts='".zbx_ads($trapper_hosts)."',snmp_port=$snmp_port,units='".zbx_ads($units)."',multiplier=$multiplier,delta=$delta,snmpv3_securityname='".zbx_ads($snmpv3_securityname)."',snmpv3_securitylevel=".zbx_ads($snmpv3_securitylevel).",snmpv3_authpassphrase='".zbx_ads($snmpv3_authpassphrase)."',snmpv3_privpassphrase='".zbx_ads($snmpv3_privpassphrase)."',formula='".zbx_ads($formula)."',trends=$trends,logtimefmt='".zbx_ads($logtimefmt)."' where itemid=$itemid";
+		$sql="update items set description='".zbx_ads($description)."',key_='".zbx_ads($key)."',".
+			"hostid=$hostid,delay=$delay,history=$history,nextcheck=0,status=$status,type=$type,".
+			"snmp_community='".zbx_ads($snmp_community)."',snmp_oid='".zbx_ads($snmp_oid)."',".
+			"value_type=$value_type,trapper_hosts='".zbx_ads($trapper_hosts)."',".
+			"snmp_port=$snmp_port,units='".zbx_ads($units)."',multiplier=$multiplier,delta=$delta,".
+			"snmpv3_securityname='".zbx_ads($snmpv3_securityname)."',".
+			"snmpv3_securitylevel=".zbx_ads($snmpv3_securitylevel).",".
+			"snmpv3_authpassphrase='".zbx_ads($snmpv3_authpassphrase)."',".
+			"snmpv3_privpassphrase='".zbx_ads($snmpv3_privpassphrase)."',".
+			"formula='".zbx_ads($formula)."',trends=$trends,logtimefmt='".zbx_ads($logtimefmt)."'".
+			" where itemid=$itemid";
 		$result=DBexecute($sql);
 		if($result)
 		{
@@ -204,23 +217,30 @@
 		// Link with one host only
 		if($hostid!=0)
 		{
-			$sql="select hostid,templateid,items from hosts_templates where hostid=$hostid and templateid=".$item["hostid"];
+			$sql="select hostid,templateid,items from hosts_templates".
+				" where hostid=$hostid and templateid=".$item["hostid"];
 		}
 		else
 		{
-			$sql="select hostid,templateid,items from hosts_templates where templateid=".$item["hostid"];
+			$sql="select hostid,templateid,items from hosts_templates".
+				" where templateid=".$item["hostid"];
 		}
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
 			if($row["items"]&1 == 0)	continue;
-			$sql="select itemid from items where key_=\"".$item["key_"]."\" and hostid=".$row["hostid"];
+			$sql="select itemid from items where key_=\"".$item["key_"]."\"".
+				" and hostid=".$row["hostid"];
 			$result2=DBselect($sql);
 			if(DBnum_rows($result2)==0)
 			{
-				add_item($item["description"],$item["key_"],$row["hostid"],$item["delay"],$item["history"],$item["status"],$item["type"],$item["snmp_community"],$item["snmp_oid"],$item["value_type"],$item["trapper_hosts"],$item["snmp_port"],$item["units"],$item["multiplier"],$item["delta"],$item["snmpv3_securityname"],$item["snmpv3_securitylevel"],$item["snmpv3_authpassphrase"],$item["snmpv3_privpassphrase"],$item["formula"],$item["trends"],$item["logtimefmt"]);
-				$host=get_host_by_hostid($row["hostid"]);
-				info("Added to linked host ".$host["host"]);
+				add_item($item["description"],$item["key_"],$row["hostid"],$item["delay"],
+					$item["history"],$item["status"],$item["type"],$item["snmp_community"],
+					$item["snmp_oid"],$item["value_type"],$item["trapper_hosts"],
+					$item["snmp_port"],$item["units"],$item["multiplier"],$item["delta"],
+					$item["snmpv3_securityname"],$item["snmpv3_securitylevel"],
+					$item["snmpv3_authpassphrase"],$item["snmpv3_privpassphrase"],
+					$item["formula"],$item["trends"],$item["logtimefmt"]);
 			}
 		}
 	}
@@ -241,41 +261,46 @@
 		while($row=DBfetch($result))
 		{
 			if($row["items"]&4 == 0)	continue;
-			$sql="select itemid from items where key_='".zbx_ads($item["key_"])."' and hostid=".$row["hostid"];
+			$sql="select itemid from items where key_='".zbx_ads($item["key_"])."'".
+				" and hostid=".$row["hostid"];
 			$result2=DBselect($sql);
 			while($row2=DBfetch($result2))
 			{
 				delete_item($row2["itemid"]);
-				$host=get_host_by_hostid($row["hostid"]);
-				info("Deleted from linked host ".$host["host"]);
 			}
 		}
 	}
 
 	# Update item in hardlinked hosts
 
-	function	update_item_in_templates($itemid)
+	function	update_item_in_templates($itemid,$description,$key,$hostid,$delay,$history,$status,$type,
+		$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,
+		$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,
+		$formula,$trends,$logtimefmt)
 	{
 		if($itemid<=0)
 		{
 			return;
 		}
-
-		$item=get_item_by_itemid($itemid);
-
-		$sql="select hostid,templateid,items from hosts_templates where templateid=".$item["hostid"];
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
+		$item = get_item_by_itemid($itemid);
+		$db_child_hosts = DBselect("select hostid,templateid,items from hosts_templates".
+			" where templateid=".$item["hostid"]);
+		while($db_child_host=DBfetch($db_child_hosts))
 		{
-			if($row["items"]&2 == 0)	continue;
-			$sql="select itemid from items where key_=\"".zbx_ads($item["key_"])."\" and hostid=".$row["hostid"];
-			$result2=DBselect($sql);
-			if(DBnum_rows($result2)==1)
+			if($db_child_host["items"]&2 == 0)	continue;
+			$db_items = DBselect("select itemid from items where key_=\"".zbx_ads($item["key_"])."\"".
+				" and hostid=".$db_child_host["hostid"]);
+			if(DBnum_rows($db_items)==1)
 			{
-				$row2=DBfetch($result2);
-				update_item($row2["itemid"],$item["description"],$item["key_"],$row["hostid"],$item["delay"],$item["history"],$item["status"],$item["type"],$item["snmp_community"],$item["snmp_oid"],$item["value_type"],$item["trapper_hosts"],$item["snmp_port"],$item["units"],$item["multiplier"],$item["delta"],$item["snmpv3_securityname"],$item["snmpv3_securitylevel"],$item["snmpv3_authpassphrase"],$item["snmpv3_privpassphrase"],$item["formula"],$item["trends"],$item["logtimefmt"]);
-				$host=get_host_by_hostid($row["hostid"]);
-				info("Updated for linked host ".$host["host"]);
+				$db_item = DBfetch($db_items);
+				update_item($db_item["itemid"],$description,$key,
+					$db_child_host["hostid"],$delay,$history,$status,
+					$type,$snmp_community,$snmp_oid,
+					$value_type,$trapper_hosts,$snmp_port,
+					$units,$multiplier,$delta,
+					$snmpv3_securityname,$snmpv3_securitylevel,
+					$snmpv3_authpassphrase,$snmpv3_privpassphrase,
+					$formula,$trends,$logtimefmt);
 			}
 		}
 	}

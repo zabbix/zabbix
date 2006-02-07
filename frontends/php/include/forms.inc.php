@@ -746,7 +746,7 @@
 			new CButton("add_dependence","add")));
 	/* end new dwpendence */
 
-		$cmbPrior = new CComboBox("priority");
+		$cmbPrior = new CComboBox("priority",$priority);
 		$cmbPrior->AddItem(0,"Not classified");
 		$cmbPrior->AddItem(1,"Information");
 		$cmbPrior->AddItem(2,"Warning");

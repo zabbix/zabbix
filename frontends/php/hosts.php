@@ -381,18 +381,28 @@
 ?>
 
 <?php
+	$frmForm = new CForm();
+
 	$cmbConf = new CComboBox("config",$_REQUEST["config"],"submit()");
 	$cmbConf->AddItem(0,S_HOSTS);
 	$cmbConf->AddItem(1,S_HOST_GROUPS);
 	$cmbConf->AddItem(2,S_HOSTS_TEMPLATES_LINKAGE);
 
 	switch($_REQUEST["config"]){
-		case 0: $btn = new CButton("form",S_CREATE_HOST);	break;
-		case 1: $btn = new CButton("form",S_CREATE_GROUP);	break;
-		case 2: $btn = new CButton("form",S_CREATE_LINKAGE);	break;
+		case 0:
+			$frmForm->AddVar("groupid",get_request("groupid",0));
+			$btn = new CButton("form",S_CREATE_HOST);
+			break;
+		case 1: 
+			$btn = new CButton("form",S_CREATE_GROUP);
+			break;
+		case 2: 
+			$frmForm->AddVar("groupid",get_request("groupid",0));
+			$frmForm->AddVar("hostid",get_request("hostid",0));
+			$btn = new CButton("form",S_CREATE_LINKAGE);
+			break;
 	}
 
-	$frmForm = new CForm("hosts.php");
 	$frmForm->AddItem($cmbConf);
 	if(isset($btn)){
 		$frmForm->AddItem(SPACE."|".SPACE);
