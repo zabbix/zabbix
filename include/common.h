@@ -100,7 +100,7 @@
 
 #define	ZBX_FS_DBL	"%f"
 
-#define	ZABBIX_VERSION	"1.1beta5"
+#define	ZABBIX_VERSION	"1.1beta6"
 
 #define MAX_LOG_FILE_LEN (1024*1024)
 
