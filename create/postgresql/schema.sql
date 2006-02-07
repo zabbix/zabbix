@@ -34,6 +34,7 @@ CREATE TABLE hosts (
   error			varchar(128)	DEFAULT ''		NOT NULL,
   available		int4		DEFAULT '0'		NOT NULL,
   errors_from		int4		DEFAULT '0'		NOT NULL,
+  templateid		int4		DEFAULT '0'		NOT NULL,
   PRIMARY KEY (hostid)
 );
 
@@ -77,6 +78,7 @@ CREATE TABLE items (
   error			varchar(128)	DEFAULT '' NOT NULL,
   lastlogsize		int4		DEFAULT '0' NOT NULL,
   logtimefmt		varchar(64)	DEFAULT '' NOT NULL,
+  templateid		int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (itemid),
   FOREIGN KEY (hostid) REFERENCES hosts
 );
