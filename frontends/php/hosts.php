@@ -52,7 +52,7 @@
 		"useip"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
 		"ip"=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,			'isset({useip})'),
 		"port"=>	array(T_ZBX_INT, O_OPT,  NULL,   BETWEEN(0,65535),'{config}==0&&isset({save})'),
-		"status"=>	array(T_ZBX_INT, O_OPT,  NULL,   IN("0,1,2"),	'{config}==0&&isset({save})'),
+		"status"=>	array(T_ZBX_INT, O_OPT,  NULL,   IN("0,1,3"),	'{config}==0&&isset({save})'),
 
 		"newgroup"=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
 		"host_templateid"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,	NULL),
