@@ -39,22 +39,23 @@
 ?>
 
 <?php
-	if(isset($_REQUEST["register"]))
+	if(isset($_REQUEST["save"]))
 	{
-		if($_REQUEST["register"]=="update profile")
+		if($_REQUEST["password1"]==$_REQUEST["password2"])
 		{
-			if($_REQUEST["password1"]==$_REQUEST["password2"])
-			{
-				$result=update_user_profile($_REQUEST["userid"],$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],$_REQUEST["lang"],$_REQUEST["refresh"]);
-				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
-				if($result)
-					add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,"User ID [".$_REQUEST["userid"]."]");
-			}
-			else
-			{
-				show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
-			}
+			$result=update_user_profile($_REQUEST["userid"],$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],$_REQUEST["lang"],$_REQUEST["refresh"]);
+			show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
+			if($result)
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,"User ID [".$_REQUEST["userid"]."]");
 		}
+		else
+		{
+			show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
+		}
+	}
+	if(isset($_REQUEST["save"]))
+	{
+		unset($_REQUEST["userid"]);
 	}
 ?>
 
