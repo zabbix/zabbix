@@ -124,14 +124,14 @@
 			$lasthost=$row["host"];
 
 			$description=expand_trigger_description($row["triggerid"]);
-			$description="<a href=\"alarms.php?triggerid=".$row["triggerid"]."\">$description</a>";
+			$description=new CLink($description,"alarms.php?triggerid=".$row["triggerid"],"action");
 	
 			$availability=calculate_availability($row["triggerid"],0,0);
 
 			$true=new CSpan(sprintf("%.4f%%",$availability["true"]), "on");
 			$false=new CSpan(sprintf("%.4f%%",$availability["false"]), "off");
 			$unknown=new CSpan(sprintf("%.4f%%",$availability["unknown"]), "unknown");
-			$actions="<a href=\"report2.php?hostid=".$_REQUEST["hostid"]."&triggerid=".$row["triggerid"]."\">".S_SHOW."</a>";
+			$actions=new CLink(S_SHOW,"report2.php?hostid=".$_REQUEST["hostid"]."&triggerid=".$row["triggerid"],"action");
 
 			$table->addRow(array(
 				$description,

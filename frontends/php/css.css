@@ -237,6 +237,10 @@ td,tr
 	text-decoration: none;
 }
 
+td.center
+{
+	text-align: center;
+}
 td.table_message
 {
 	text-align: center;
