@@ -1,12 +1,9 @@
 1.1beta7:
- - explain how templates work in the documentation
+
  - execution of commands on monitored hosts in case of pre-defined events
- - fix undeleted warnings for host and trigger statuses
- - new implementation for templates
  - server side checks (new type of check)
  - timeout-immune poller
  - improve housekeeper. check if it works correctly.
- - make agents return error message if not supported or not available
  - centralised management of agent configuration files
  - add encryption between server and agents
  - how to disable unreachable hosts
@@ -16,20 +13,8 @@
 
  - http://www.zabbix.com/forum/showthread.php?t=1141&page=3&pp=10
 
-ZABBIX 1.1:
-
-> -Should the update linkage buttons synchronize the stuff between the host and
- his templates....... this is very usefull?
- -Did you know what is very very very bad..... not having a add triggers and
- graphs from this host button.... like the one that adds items.
- -Can u make possible to change the simple graph..... like changing it to
- bold....
- - anvanced SNMP trapper
  - add acknowledgements
-
- - add HTML block to the screen cell (to see external data, images, etc)
- - centralised agent upgrade
- - take advantage of 'make dist'
+ - update trigger value immediately after add or update
 
 TKOM:
 
@@ -50,22 +35,12 @@ print_r($_POST);
 4. SNMP traps. Make possible action definition for the SNMP trap-related
  events.
 
-7. snmp traps kak?
-
-dalee pozhelanija:
-
 OTHER:
 
  - multi-institution support
 
  - improve removal of item related data from history
 '-' doesn't work in trigger expressions (a-b=0)
-
- When editing trigger actions in subject it says something
-for instance "low disk space on {HOSTNAME}'s /usr"
-when submitting form, it dumps mysql error, due to non-
-escaped single quote. I believe all user input should be
-escaped before submitting to mysql.
 
 >  Atradu liekas, ka vienu bug: tad, ja updeito Host statusu zem Host, tad trigeris par "Host unreachable" pazuud, jo ir statusaa "unknown", bet pie alarms neparaadas
 >, ka tas buutu mainijis savu statusu.
@@ -78,23 +53,12 @@ escaped before submitting to mysql.
 
  - add icons to a map by clicking mouse
  - optionally support map generation in JPEG. PNG images are huge!
- - security-related issues
-
-There are still quite a few strcpy calls made against non-const user, database, or remote supplied data, in both the src/* and include/* directories.
 
 printf calls w/o static format specifiers...
 in src and include:
 grep -R printf * | grep -v "\%\|Makefile\|Binary"
 
-extensive use of atoi rather than something w/ bounds checking like strtol.
-
-Most of the signal handlers all need to delay or block signals to avoid signal race conditions, as they call non-reentrant functions.
-
  - in user administration, add many resources from a list (not by one ID)
- - availability report for day/week/month/etc
- - check if items delay works
- - review PHP code for simplifying (urls, iif() )
- - fix screenedit.php permissions
 
  Kak naschet dopolnenij k time & date:
  * tipa month, day, year, hour, minute, ...
@@ -119,23 +83,11 @@ trigger wihout actions, etc etc
  - implement complex SLA calculation (donwtimes, working/non-working hours), etc. See
 forum Open Discussion for more info.
  - add selection of MIN/MAX/AVG for graphs
- - rewrite validation and evaluation of expressions (i.e. make >-1 work)
- - support for 'Clone' (graphs and screens)
- - add support of interface statistics under Solaris and FreeBSD
- - calculate MIN value for graphs (do not use '0')
- - infrastructure for reports
  - stacked graphs
-
- - check if alert and service alert is added after host become reachable again
 
 LATER:
 
- - add zabbix[unixtime] and lastupdate() and tick() to get rid of nodata()
  - check return code for alert scripts
- - zabbix_agentd to support processor load, swap[*] and memory[*] onder AIX
- - make session expiration time configurable in config.php
- - mess with user groups when running under root
- - support for PREFIX/zabbix/etc (configuration files)
  - trapper item. Source->Alarms do not grow when last status is unknown for
 latest trigger (item type  = TRAPPER)
  - SNMP traps. Condition to switch expression off. New function which would return
@@ -146,9 +98,6 @@ latest trigger (item type  = TRAPPER)
 
  - links to Zabbix frontend in alert emails
  - strings items for graphs
- - ability to add a library of  userwritten c-functions with dlopen/dlsym to
-the agent with a predefined API that can return values to suckerd (for both 
-suckerd and agentd)
  - zabbix_trapperd does not start if PostgreSQL and DBConnectOnEach=1
 
  - [10] Refresh stop ability. At least for graphs and triggers being selected.
@@ -159,7 +108,6 @@ suckerd and agentd)
 
 LS:
 
- - update trigger value immediately after add or update
  - graphs. Dobavljatj item so smescheniem vo vremeni
  - check permissions for zabbix_agentd when started under root
  - add item to group (not to all)
@@ -267,39 +215,17 @@ I made changes to the PHP frontend and zabbix_sucker.c to enable the user to spe
 
 HB:
 
- - BUG. history graph goes left
- - personalisation (refresh rate, graph size, default graph period, etc)
-
  - LDAP authorisation (should work with MSWindows LDAP)
-
-WIN32 Agent:
-
-* API for sub-agents
-* Support for check_port[] parameter
-* Support for check_service[] parameter
-* Installation program
-* Possibility to store configuration in registry
-* Configuration tool (may be through MMC?)
 
  OTHER:
 
- - support for netload under other platforms
- - make kstat structure local (instead of static)
  - collect network and other statistics using kstat()
- - apply Mariusz's patches
  - support for complex reports
- - support for check_service[samba]
- - ability to execute command on server monitored
- - support for OS X (network loads, disk loads)
- - check for function parameters in evaluate_simple_expression
  - update trigger status to UNKNOWN if cannot evaluate function 
 
  LATER:
 
  - setup demo site
- - different sound files for different severity
- - think about service node types (some nodes will automatically register
-  problem)
 
  POSTGRESQL:
 
@@ -343,28 +269,6 @@ WIN32 Agent:
 > (This mail was send to limo - Lukas Macura)
 > Bye Mike
 >
->
-> New for rel ....10
->
-> Changelog:
-> - added column items.lastlogsize (Alexei)
-> - added column screens_items.colspan (Alexei)
-> - added column media.period (Alexei)
-> - minor modifications of DB schema. Unnecessary indexes dropped. (Alexei)
->
-> This changes are not included in patch.sql
->
-> I can contribute with this things.
->
-> Bye Mike
->
-> --
-> Michal K?ivka
->
-> m.krivka@vlp.cz
-> ICQ: 295 942 520
->
-
 > --
 > -- Zabbix
 > -- Copyright (C) 2000,2001,2002,2003,2004 Alexei Vladishev
