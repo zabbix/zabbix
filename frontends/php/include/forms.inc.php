@@ -312,6 +312,12 @@
 	{
 		global  $_REQUEST;
 
+		$frmItem = new CFormTable(S_ITEM,"items.php#form");
+		$frmItem->SetHelp("web.items.item.php");
+
+		if(isset($_REQUEST["groupid"]))
+			$frmItem->AddVar("groupid",$_REQUEST["groupid"]);
+
 		$description	= get_request("description"	,"");
 		$key		= get_request("key"		,"");
 		$host		= get_request("host",		NULL);
@@ -346,8 +352,10 @@
 			$host = $host_info["host"];
 		}
 
-		if(isset($_REQUEST["itemid"]) && !isset($_REQUEST["form_refresh"]))
+		if(isset($_REQUEST["itemid"]))
 		{
+			$frmItem->AddVar("itemid",$_REQUEST["itemid"]);
+
 			$result=DBselect("select i.description, i.key_, h.host, i.delay,".
 				" i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,".
 				" i.trapper_hosts,i.snmp_port,i.units,i.multiplier,h.hostid,i.delta,".
@@ -356,7 +364,12 @@
 				" from items i,hosts h where i.itemid=".$_REQUEST["itemid"].
 				" and h.hostid=i.hostid");
 			$row=DBfetch($result);
-		
+
+			$frmItem->SetTitle(S_ITEM." \"". $row["description"]."\"");
+		}
+
+		if(isset($_REQUEST["itemid"]) && !isset($_REQUEST["form_refresh"]))
+		{
 			$description	= $row["description"];
 			$key		= $row["key_"];
 			$host		= $row["host"];
@@ -383,14 +396,6 @@
 			$formula	= $row["formula"];
 			$logtimefmt	= $row["logtimefmt"];
 		}
-
-		$frmItem = new CFormTable(S_ITEM,"items.php#form");
-		$frmItem->SetHelp("web.items.item.php");
-
-		if(isset($_REQUEST["itemid"]))
-			$frmItem->AddVar("itemid",$_REQUEST["itemid"]);
-		if(isset($_REQUEST["groupid"]))
-			$frmItem->AddVar("groupid",$_REQUEST["groupid"]);
 
 		$frmItem->AddRow(S_DESCRIPTION, new CTextBox("description",$description,40));
 
