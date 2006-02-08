@@ -29,7 +29,7 @@
 			return 0;
 		}
 
-		$sql="insert into autoreg (pattern,priority,hostid) values ('".zbx_ads($pattern)."',$priority,$hostid)";
+		$sql="insert into autoreg (pattern,priority,hostid) values (".zbx_dbstr($pattern).",$priority,$hostid)";
 		$result=DBexecute($sql);
 		if($result)
 		{
@@ -49,7 +49,7 @@
                         return 0;
 		}
 
-		$sql="update autoreg set pattern='".zbx_ads($pattern)."',priority=$priority,hostid=$hostid where id=$id";
+		$sql="update autoreg set pattern=".zbx_dbstr($pattern).",priority=$priority,hostid=$hostid where id=$id";
 
 		return	DBexecute($sql);
 	}

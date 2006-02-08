@@ -153,7 +153,7 @@
 			$rows=array(nbsp($row["description"]));
 			foreach($hosts as $hostid)
 			{
-				$sql="select itemid,value_type,lastvalue,units from items where hostid=$hostid and description='".zbx_ads($row["description"])."'";
+				$sql="select itemid,value_type,lastvalue,units from items where hostid=$hostid and description=".zbx_dbstr($row["description"]);
 				$result2=DBselect($sql);
 				if(DBnum_rows($result2)==1)
 				{
@@ -231,7 +231,7 @@
 			$rows=array(nbsp($row["description"]));
 			foreach($hosts as $hostid)
 			{
-				$sql="select t.status,t.value,t.lastchange from triggers t,functions f,items i where f.triggerid=t.triggerid and i.itemid=f.itemid and t.status=".TRIGGER_STATUS_ENABLED." and i.hostid=$hostid and t.description='".zbx_ads($row["description"])."'";
+				$sql="select t.status,t.value,t.lastchange from triggers t,functions f,items i where f.triggerid=t.triggerid and i.itemid=f.itemid and t.status=".TRIGGER_STATUS_ENABLED." and i.hostid=$hostid and t.description=".zbx_dbstr($row["description"]);
 				$result2=DBselect($sql);
 				if(DBnum_rows($result2)==1)
 				{

@@ -87,7 +87,7 @@
 			{
 				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,
 					"Graph ID [".$_REQUEST["graphid"]."] Graph [".
-					zbx_ads($_REQUEST["name"])."]");
+					$_REQUEST["name"]."]");
 			}
 			show_messages($result, S_GRAPH_UPDATED, S_CANNOT_UPDATE_GRAPH);
 		}
@@ -98,7 +98,7 @@
 			if($result)
 			{
 				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,
-					"Graph [".zbx_ads($_REQUEST["name"])."]");
+					"Graph [".$_REQUEST["name"]."]");
 			}
 			show_messages($result, S_GRAPH_ADDED, S_CANNOT_ADD_GRAPH);
 		}
@@ -114,7 +114,7 @@
 		if($result)
 		{
 			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,
-				"Graph [".zbx_ads($graph["name"])."]");
+				"Graph [".$graph["name"]."]");
 			unset($_REQUEST["form"]);
 		}
 		show_messages($result, S_GRAPH_DELETED, S_CANNOT_DELETE_GRAPH);

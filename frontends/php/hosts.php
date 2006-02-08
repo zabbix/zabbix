@@ -165,7 +165,7 @@
 		show_messages($result, $msg_ok, $msg_fail);
 		if($result){
 			add_audit($audit_action,AUDIT_RESOURCE_HOST,
-				"Host [".zbx_ads($_REQUEST["host"])."] IP [".$_REQUEST["ip"]."] ".
+				"Host [".$_REQUEST["host"]."] IP [".$_REQUEST["ip"]."] ".
 				"Status [".$_REQUEST["status"]."]");
 
 			unset($_REQUEST["form"]);
@@ -184,7 +184,7 @@
 			if($result)
 			{
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,
-				"Host [".zbx_ads($host["host"])."]");
+				"Host [".$host["host"]."]");
 
 				unset($_REQUEST["form"]);
 				unset($_REQUEST["hostid"]);
@@ -202,7 +202,7 @@
 
 				$host=get_host_by_hostid($db_host["hostid"]);
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,
-					"Host [".zbx_ads($host["host"])."]");
+					"Host [".$host["host"]."]");
 			}
 			show_messages($result, S_HOST_DELETED, NULL);
 		}
