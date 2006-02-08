@@ -44,37 +44,33 @@
 
 	if(isset($_REQUEST["serviceid"])&&isset($_REQUEST["showgraph"]))
 	{
-		echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-		echo "<TR BGCOLOR=#EEEEEE>";
-		echo "<TR BGCOLOR=#DDDDDD>";
-		echo "<TD ALIGN=CENTER>";
-		echo "<IMG SRC=\"chart5.php?serviceid=".$_REQUEST["serviceid"]."\" border=0>";
-		echo "</TD>";
-		echo "</TR>";
-		echo "</TABLE>";
+		$table  = new CTableInfo();
+		$table->AddRow("<IMG SRC=\"chart5.php?serviceid=".$_REQUEST["serviceid"]."\" border=0>");
+		$table->Show();
 		show_page_footer();
 		exit;
 	}
 
 	$now=time();
 	$result=DBselect("select serviceid,name,triggerid,status,showsla,goodsla from services order by sortorder,name");
-	table_begin();
-	table_header(array(S_SERVICE,S_STATUS,S_REASON,S_SLA_LAST_7_DAYS,nbsp(S_PLANNED_CURRENT_SLA),S_GRAPH));
-	$col=0;
+//	table_begin();
+	$table  = new CTableInfo();
+	$table->SetHeader(array(S_SERVICE,S_STATUS,S_REASON,S_SLA_LAST_7_DAYS,nbsp(S_PLANNED_CURRENT_SLA),S_GRAPH));
 	if(isset($_REQUEST["serviceid"]))
 	{
-		echo "<tr bgcolor=#EEEEEE>";
 		$service=get_service_by_serviceid($_REQUEST["serviceid"]);
-		echo "<td><b><a href=\"srv_status.php?serviceid=".$service["serviceid"]."\">".$service["name"]."</a></b></td>";
-		echo "<td>".get_service_status_description($service["status"])."</td>";
-		echo "<td>&nbsp;</td>";
+		$service=new CLink($service["name"],"srv_status.php?serviceid=".$service["serviceid"],"action");
+
+		$status=get_service_status_description($service["status"]);
+
+		$reason="&nbsp;";
 		if($service["showsla"]==1)
 		{
-			echo "<td><img src=\"chart_sla.php?serviceid=".$service["serviceid"]."\"></td>";
+			$sla="<img src=\"chart_sla.php?serviceid=".$service["serviceid"]."\">";
 		}
 		else
 		{
-			echo "<td>-</td>";
+			$sla=new CSpan("-","center");
 		}
 		if($service["showsla"]==1)
 		{
@@ -91,15 +87,21 @@
 			{
 				$color="00AA00";
 			}
-			printf ("<td><font color=\"00AA00\">%.2f%%</font><b>/</b><font color=\"%s\">%.2f%%</font></td>",$service["goodsla"],$color,$stat["ok"]);
+			$sla2=sprintf("<font color=\"00AA00\">%.2f%%</font><b>/</b><font color=\"%s\">%.2f%%</font>",$service["goodsla"],$color,$stat["ok"]);
 		}
 		else
 		{
-			echo "<td>-</td>";
+			$sla2="-";
 		}
-		echo "<td><a href=\"srv_status.php?serviceid=".$service["serviceid"]."&showgraph=1\">Show</a></td>";
-		echo "</tr>"; 
-		$col++;
+		$actions=new CLink(S_SHOW,"srv_status.php?serviceid=".$service["serviceid"]."&showgraph=1","action");
+		$table->addRow(array(
+			$service,
+			$status,
+			$reason,
+			$sla,
+			$sla2,
+			$actions
+			));
 	}
 	while($row=DBfetch($result))
 	{
@@ -114,15 +116,6 @@
 		if(isset($row["triggerid"])&&!check_right_on_trigger("R",$row["triggerid"]))
 		{
 			continue;
-		}
-		if(isset($_REQUEST["serviceid"])&&($_REQUEST["serviceid"]==$row["serviceid"]))
-		{
-			echo "<tr bgcolor=#99AABB>";
-		}
-		else
-		{
-			if($col++%2==0)	{ echo "<tr bgcolor=#EEEEEE>"; }
-			else		{ echo "<tr bgcolor=#DDDDDD>"; }
 		}
 		$childs=get_num_of_service_childs($row["serviceid"]);
 		if(isset($row["triggerid"]))
@@ -139,33 +132,32 @@
 		{
 			if($childs == 0)
 			{
-				echo "<td> - $description</td>";
+				$service="$description";
 			}
 			else
 			{
-				echo "<td> - <a href=\"srv_status.php?serviceid=".$row["serviceid"]."\">$description</a></td>";
+				$service=new CLink($description,"srv_status.php?serviceid=".$row["serviceid"],"action");
 			}
 		}
 		else
 		{
 			if($childs == 0)
 			{
-				echo "<td>$description</td>";
+				$service="$description";
 			}
 			else
 			{
-				echo "<td><a href=\"srv_status.php?serviceid=".$row["serviceid"]."\"> $description</a></td>";
+				$service=new CLink($description,"srv_status.php?serviceid=".$row["serviceid"],"action");
 			}
 		}
-		echo "<td>".get_service_status_description($row["status"])."</td>";
+		$status=get_service_status_description($row["status"]);
 		if($row["status"]==0)
 		{
-			echo "<td>-</td>";
+			$reason="-";
 		}
 		else
 		{
-			echo "<td>";
-			echo "<ul>";
+			$reason="<ul>";
 			$sql="select s.triggerid,s.serviceid from services s, triggers t where s.status>0 and s.triggerid is not NULL and t.triggerid=s.triggerid order by s.status desc,t.description";
 			$result2=DBselect($sql);
 			while($row2=DBfetch($result2))
@@ -173,20 +165,19 @@
 				if(does_service_depend_on_the_service($row["serviceid"],$row2["serviceid"]))
 				{
 					$description=nbsp(expand_trigger_description($row2["triggerid"]));
-					echo "<li class=\"itservices\"><a href=\"alarms.php?triggerid=".$row2["triggerid"]."\">$description</a></li>";
+					$reason=$reason."<li class=\"itservices\"><a href=\"alarms.php?triggerid=".$row2["triggerid"]."\">$description</a></li>";
 				}
 			}
-			echo "</ul>";
-			echo "</td>";
+			$reason=$reason."</ul>";
 		}
 
 		if($row["showsla"]==1)
 		{
-			echo "<td><a href=\"report3.php?serviceid=".$row["serviceid"]."&year=".date("Y")."\"><img src=\"chart_sla.php?serviceid=".$row["serviceid"]."\" border=0></td>";
+			$sla="<a href=\"report3.php?serviceid=".$row["serviceid"]."&year=".date("Y")."\"><img src=\"chart_sla.php?serviceid=".$row["serviceid"]."\" border=0>";
 		}
 		else
 		{
-			echo "<td>-</td>";
+			$sla="-";
 		}
 
 		if($row["showsla"]==1)
@@ -204,19 +195,24 @@
 			{
 				$color="00AA00";
 			}
-			printf ("<td><font color=\"00AA00\">%.2f%%</font><b>/</b><font color=\"%s\">%.2f%%</font></td>",$row["goodsla"],$color,$stat["ok"]);
+			$sla2=sprintf("<font color=\"00AA00\">%.2f%%</font><b>/</b><font color=\"%s\">%.2f%%</font>",$row["goodsla"],$color,$stat["ok"]);
 		}
 		else
 		{
-			echo "<td>-</td>";
+			$sla2="-";
 		}
 
-
-
-		echo "<td><a href=\"srv_status.php?serviceid=".$row["serviceid"]."&showgraph=1\">Show</a></td>";
-		echo "</tr>"; 
+		$actions=new CLink(S_SHOW,"srv_status.php?serviceid=".$row["serviceid"]."&showgraph=1","action");
+		$table->addRow(array(
+			$service,
+			$status,
+			$reason,
+			$sla,
+			$sla2,
+			$actions
+			));
 	}
-	table_end();
+	$table->Show();
 ?>
 
 <?php
