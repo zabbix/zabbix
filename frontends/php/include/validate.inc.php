@@ -23,11 +23,6 @@
 	define('ZBX_VALID_ERROR',	1);
 	define('ZBX_VALID_WARNING',	2);
 
-	function	zbx_ads($var)
-	{
-		return addslashes($var);
-	}
-
 	function	BETWEEN($min,$max,$var=NULL)
 	{
 		return "({".$var."}>=".$min."&&{".$var."}<=".$max.")&&";

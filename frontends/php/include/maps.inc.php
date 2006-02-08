@@ -79,7 +79,7 @@
 			return 0;
 		}
 
-		$sql="update sysmaps set name='".zbx_ads($name)."',width=$width,height=$height,background='".zbx_ads($background)."',label_type=$label_type,label_location=$label_location where sysmapid=$sysmapid";
+		$sql="update sysmaps set name=".zbx_dbstr($name).",width=$width,height=$height,background=".zbx_dbstr($background).",label_type=$label_type,label_location=$label_location where sysmapid=$sysmapid";
 		return	DBexecute($sql);
 	}
 
@@ -93,7 +93,7 @@
 			return 0;
 		}
 
-		$sql="insert into sysmaps (name,width,height,background,label_type,label_location) values ('".zbx_ads($name)."',$width,$height,'".zbx_ads($background)."',$label_type,$label_location)";
+		$sql="insert into sysmaps (name,width,height,background,label_type,label_location) values (".zbx_dbstr($name).",$width,$height,".zbx_dbstr($background).",$label_type,$label_location)";
 		return	DBexecute($sql);
 	}
 
@@ -101,11 +101,11 @@
 	{
 		if($triggerid == 0)
 		{
-			$sql="insert into sysmaps_links (sysmapid,shostid1,shostid2,triggerid,drawtype_off,color_off,drawtype_on,color_on) values ($sysmapid,$shostid1,$shostid2,NULL,$drawtype_off,'".zbx_ads($color_off)."',$drawtype_on,'".zbx_ads($color_on)."')";
+			$sql="insert into sysmaps_links (sysmapid,shostid1,shostid2,triggerid,drawtype_off,color_off,drawtype_on,color_on) values ($sysmapid,$shostid1,$shostid2,NULL,$drawtype_off,".zbx_dbstr($color_off).",$drawtype_on,".zbx_dbstr($color_on).")";
 		}
 		else
 		{
-			$sql="insert into sysmaps_links (sysmapid,shostid1,shostid2,triggerid,drawtype_off,color_off,drawtype_on,color_on) values ($sysmapid,$shostid1,$shostid2,$triggerid,$drawtype_off,'".zbx_ads($color_off)."',$drawtype_on,'".zbx_ads($color_on)."')";
+			$sql="insert into sysmaps_links (sysmapid,shostid1,shostid2,triggerid,drawtype_off,color_off,drawtype_on,color_on) values ($sysmapid,$shostid1,$shostid2,$triggerid,$drawtype_off,".zbx_dbstr($color_off).",$drawtype_on,".zbx_dbstr($color_on).")";
 		}
 		return	DBexecute($sql);
 	}
@@ -120,13 +120,13 @@
 
 	function add_host_to_sysmap($sysmapid,$hostid,$label,$x,$y,$icon,$url,$icon_on)
 	{
-		$sql="insert into sysmaps_hosts (sysmapid,hostid,label,x,y,icon,url,icon_on) values ($sysmapid,$hostid,'".zbx_ads($label)."',$x,$y,'".zbx_ads($icon)."','".zbx_ads($url)."','".zbx_ads($icon_on)."')";
+		$sql="insert into sysmaps_hosts (sysmapid,hostid,label,x,y,icon,url,icon_on) values ($sysmapid,$hostid,".zbx_dbstr($label).",$x,$y,".zbx_dbstr($icon).",".zbx_dbstr($url).",".zbx_dbstr($icon_on).")";
 		return	DBexecute($sql);
 	}
 
 	function	update_sysmap_host($shostid,$sysmapid,$hostid,$label,$x,$y,$icon,$url,$icon_on)
 	{
-		$sql="update sysmaps_hosts set hostid=$hostid,label='".zbx_ads($label)."',x=$x,y=$y,icon='".zbx_ads($icon)."',url='".zbx_ads($url)."',icon_on='".zbx_ads($icon_on)."' where shostid=$shostid";
+		$sql="update sysmaps_hosts set hostid=$hostid,label=".zbx_dbstr($label).",x=$x,y=$y,icon=".zbx_dbstr($icon).",url=".zbx_dbstr($url).",icon_on=".zbx_dbstr($icon_on)." where shostid=$shostid";
 		return	DBexecute($sql);
 	}
 
@@ -176,7 +176,7 @@
 
 			if($status==HOST_STATUS_MONITORED)
 			{
-				$sql="select image from images where imagetype=1 and name='".zbx_ads($icon)."'";
+				$sql="select image from images where imagetype=1 and name=".zbx_dbstr($icon);
 				$result2=DBselect($sql);
 				if(DBnum_rows($result2)==1)
 				{
