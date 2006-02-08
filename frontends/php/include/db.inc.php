@@ -173,4 +173,8 @@
 		}
 	}
 
+	function	zbx_dbstr($var)
+	{
+		return "'".addslashes($var)."'";
+	}
 ?>
