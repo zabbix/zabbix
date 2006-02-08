@@ -340,7 +340,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		}
 # default_permission
 
-		$sql="select permission from rights where name='".zbx_ads($right)."' and id!=0 and userid=".$USER_DETAILS["userid"];
+		$sql="select permission from rights where name=".zbx_dbstr($right)." and id!=0 and userid=".$USER_DETAILS["userid"];
 		$result=DBselect($sql);
 
 		$all_permissions="";
@@ -430,7 +430,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		}
 # default_permission
 
-		$sql="select permission from rights where name='".zbx_ads($right)."' and id=0 and userid=".$USER_DETAILS["userid"];
+		$sql="select permission from rights where name=".zbx_dbstr($right)." and id=0 and userid=".$USER_DETAILS["userid"];
 		$result=DBselect($sql);
 
 		$group_permission="";
@@ -446,7 +446,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		$id_permission="";
 		if($id!=0)
 		{
-			$sql="select permission from rights where name='".zbx_ads($right)."' and id=$id and userid=".$USER_DETAILS["userid"];
+			$sql="select permission from rights where name=".zbx_dbstr($right)." and id=$id and userid=".$USER_DETAILS["userid"];
 			$result=DBselect($sql);
 			if(DBnum_rows($result)>0)
 			{
@@ -663,7 +663,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 	function	get_image_by_name($imagetype,$name)
 	{
-		$sql="select * from images where imagetype=$imagetype and name='".zbx_ads($name)."'"; 
+		$sql="select * from images where imagetype=$imagetype and name=".zbx_dbstr($name); 
 		$result=DBselect($sql);
 		if(DBnum_rows($result) == 1)
 		{
@@ -801,7 +801,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 //			echo $function,"<br>";
 //			echo $parameter,"<br>";
 
-			$sql="select count(*) as cnt from hosts h,items i where h.host='".zbx_ads($host)."' and i.key_='".zbx_ads($key)."' and h.hostid=i.hostid";
+			$sql="select count(*) as cnt from hosts h,items i where h.host=".zbx_dbstr($host)." and i.key_=".zbx_dbstr($key)." and h.hostid=i.hostid";
 			$result=DBselect($sql);
 			$row=DBfetch($result);
 			if($row["cnt"]!=1)
@@ -977,13 +977,13 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 		if(isset($sessionid))
 		{
-			$sql="select u.userid,u.alias,u.name,u.surname,u.lang,u.refresh from sessions s,users u where s.sessionid='".zbx_ads($sessionid)."' and s.userid=u.userid and ((s.lastaccess+u.autologout>".time().") or (u.autologout=0))";
+			$sql="select u.userid,u.alias,u.name,u.surname,u.lang,u.refresh from sessions s,users u where s.sessionid=".zbx_dbstr($sessionid)." and s.userid=u.userid and ((s.lastaccess+u.autologout>".time().") or (u.autologout=0))";
 			$result=DBselect($sql);
 			if(DBnum_rows($result)==1)
 			{
 //				setcookie("sessionid",$sessionid,time()+3600);
 				setcookie("sessionid",$sessionid);
-				$sql="update sessions set lastaccess=".time()." where sessionid='".zbx_ads($sessionid)."'";
+				$sql="update sessions set lastaccess=".time()." where sessionid=".zbx_dbstr($sessionid);
 				DBexecute($sql);
 				$USER_DETAILS=DBfetch($result);
 				return;
@@ -1388,8 +1388,8 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 //				echo "PARAMETER:$parameter<BR>";
 				$state='';
 		
-				$sql="select i.itemid from items i,hosts h where i.key_='".zbx_ads($key)."'".
-					" and h.host='".zbx_ads($host)."' and h.hostid=i.hostid";
+				$sql="select i.itemid from items i,hosts h where i.key_=".zbx_dbstr($key).
+					" and h.host=".zbx_dbstr($host)." and h.hostid=i.hostid";
 #				echo $sql,"<Br>";
 				$res=DBselect($sql);
 				$row=DBfetch($res);
@@ -1398,8 +1398,8 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 #				echo "ITEMID:$itemid<BR>";
 	
 				$sql="insert into functions (itemid,triggerid,function,parameter)".
-					" values ($itemid,$triggerid,'".zbx_ads($function)."',".
-					"'".zbx_ads($parameter)."')";
+					" values ($itemid,$triggerid,".zbx_dbstr($function).",".
+					zbx_dbstr($parameter).")";
 #				echo $sql,"<Br>";
 				$res=DBexecute($sql);
 				if(!$res)
@@ -1483,7 +1483,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 			if($files["image"]["size"]<1024*1024)
 			{
 				$image=fread(fopen($files["image"]["tmp_name"],"r"),filesize($files["image"]["tmp_name"]));
-				$sql="insert into images (name,imagetype,image) values ('".zbx_ads($name)."',$imagetype,'".zbx_ads($image)."')";
+				$sql="insert into images (name,imagetype,image) values (".zbx_dbstr($name).",$imagetype,".zbx_dbstr($image).")";
 				return	DBexecute($sql);
 			}
 			else
@@ -1507,7 +1507,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 			if($files["image"]["size"]<1024*1024)
 			{
 				$image=fread(fopen($files["image"]["tmp_name"],"r"),filesize($files["image"]["tmp_name"]));
-				$sql="update images set name='".zbx_ads($name)."',imagetype='".zbx_ads($imagetype)."',image='".zbx_ads($image)."' where imageid=$imageid";
+				$sql="update images set name=".zbx_dbstr($name).",imagetype=".zbx_dbstr($imagetype).",image=".zbx_dbstr($image)." where imageid=$imageid";
 				return	DBexecute($sql);
 			}
 			else
@@ -1623,7 +1623,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 	function	add_group_to_host($hostid,$newgroup)
 	{
-		$sql="insert into groups (groupid,name) values (NULL,'".zbx_ads($newgroup)."')";
+		$sql="insert into groups (groupid,name) values (NULL,".zbx_dbstr($newgroup).")";
 		$result=DBexecute($sql);
 		if(!$result)
 		{
@@ -1674,7 +1674,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 //			return 0;
 //		}
 
-		$sql="select * from groups where name='".zbx_ads($name)."'";
+		$sql="select * from groups where name=".zbx_dbstr($name);
 		$result=DBexecute($sql);
 		if(DBnum_rows($result)>0)
 		{
@@ -1682,7 +1682,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 			return 0;
 		}
 
-		$sql="insert into groups (name) values ('".zbx_ads($name)."')";
+		$sql="insert into groups (name) values (".zbx_dbstr($name).")";
 		$result=DBexecute($sql);
 		if(!$result)
 		{
@@ -1704,7 +1704,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 //			return 0;
 //		}
 
-		$sql="select * from groups where name='".zbx_ads($name)."' and groupid<>$groupid";
+		$sql="select * from groups where name=".zbx_dbstr($name)." and groupid<>$groupid";
 		$result=DBexecute($sql);
 		if(DBnum_rows($result)>0)
 		{
@@ -1712,7 +1712,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 			return 0;
 		}
 
-		$sql="update groups set name='".zbx_ads($name)."' where groupid=$groupid";
+		$sql="update groups set name=".zbx_dbstr($name)." where groupid=$groupid";
 		$result=DBexecute($sql);
 		if(!$result)
 		{
@@ -1820,7 +1820,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 	{
 		$ret = 0;
 
-		$sql="select * from media_type where description='".zbx_ads($description)."' and mediatypeid!=$mediatypeid";
+		$sql="select * from media_type where description=".zbx_dbstr($description)." and mediatypeid!=$mediatypeid";
 		$result=DBexecute($sql);
 		if(DBnum_rows($result)>0)
 		{
@@ -1828,7 +1828,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		}
 		else
 		{
-			$sql="update media_type set type=$type,description='".zbx_ads($description)."',smtp_server='".zbx_ads($smtp_server)."',smtp_helo='".zbx_ads($smtp_helo)."',smtp_email='".zbx_ads($smtp_email)."',exec_path='".zbx_ads($exec_path)."' where mediatypeid=$mediatypeid";
+			$sql="update media_type set type=$type,description=".zbx_dbstr($description).",smtp_server=".zbx_dbstr($smtp_server).",smtp_helo=".zbx_dbstr($smtp_helo).",smtp_email=".zbx_dbstr($smtp_email).",exec_path=".zbx_dbstr($exec_path)." where mediatypeid=$mediatypeid";
 			$ret =	DBexecute($sql);
 		}
 		return $ret;
@@ -1845,7 +1845,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 			return 0;
 		}
 
-		$sql="select * from media_type where description='".zbx_ads($description)."'";
+		$sql="select * from media_type where description=".zbx_dbstr($description);
 		$result=DBexecute($sql);
 		if(DBnum_rows($result)>0)
 		{
@@ -1853,7 +1853,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		}
 		else
 		{
-			$sql="insert into media_type (type,description,smtp_server,smtp_helo,smtp_email,exec_path) values ($type,'".zbx_ads($description)."','".zbx_ads($smtp_server)."','".zbx_ads($smtp_helo)."','".zbx_ads($smtp_email)."','".zbx_ads($exec_path)."')";
+			$sql="insert into media_type (type,description,smtp_server,smtp_helo,smtp_email,exec_path) values ($type,".zbx_dbstr($description).",".zbx_dbstr($smtp_server).",".zbx_dbstr($smtp_helo).",".zbx_dbstr($smtp_email).",".zbx_dbstr($exec_path).")";
 			$ret = DBexecute($sql);
 		}
 		return $ret;
@@ -1869,7 +1869,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		{
 			$s=$s|pow(2,(int)$severity[$i]);
 		}
-		$sql="insert into media (userid,mediatypeid,sendto,active,severity,period) values ($userid,'".zbx_ads($mediatypeid)."','".zbx_ads($sendto)."',$active,$s,'".zbx_ads($period)."')";
+		$sql="insert into media (userid,mediatypeid,sendto,active,severity,period) values ($userid,".zbx_dbstr($mediatypeid).",".zbx_dbstr($sendto).",$active,$s,".zbx_dbstr($period).")";
 		return	DBexecute($sql);
 	}
 
@@ -1883,7 +1883,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		{
 			$s=$s|pow(2,(int)$severity[$i]);
 		}
-		$sql="update media set userid=$userid, mediatypeid=$mediatypeid, sendto='".zbx_ads($sendto)."', active=$active,severity=$s,period='".zbx_ads($period)."' where mediaid=$mediaid";
+		$sql="update media set userid=$userid, mediatypeid=$mediatypeid, sendto=".zbx_dbstr($sendto).", active=$active,severity=$s,period=".zbx_dbstr($period)." where mediaid=$mediaid";
 		return	DBexecute($sql);
 	}
 
@@ -2792,7 +2792,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 			return $default_value;
 		}
 
-		$sql="select value from profiles where userid=".$USER_DETAILS["userid"]." and idx='".zbx_ads($idx)."'";
+		$sql="select value from profiles where userid=".$USER_DETAILS["userid"]." and idx=".zbx_dbstr($idx);
 		$result=DBselect($sql);
 
 		if(DBnum_rows($result)==0)
@@ -2815,18 +2815,18 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 			return;
 		}
 
-		$sql="select value from profiles where userid=".$USER_DETAILS["userid"]." and idx='".zbx_ads($idx)."'";
+		$sql="select value from profiles where userid=".$USER_DETAILS["userid"]." and idx=".zbx_dbstr($idx);
 		$result=DBselect($sql);
 
 		if(DBnum_rows($result)==0)
 		{
-			$sql="insert into profiles (userid,idx,value) values (".$USER_DETAILS["userid"].",'".zbx_ads($idx)."','".zbx_ads($value)."')";
+			$sql="insert into profiles (userid,idx,value) values (".$USER_DETAILS["userid"].",".zbx_dbstr($idx).",".zbx_dbstr($value).")";
 			DBexecute($sql);
 		}
 		else
 		{
 			$row=DBfetch($result);
-			$sql="update profiles set value='".zbx_ads($value)."' where userid=".$USER_DETAILS["userid"]." and idx='".zbx_ads($idx)."'";
+			$sql="update profiles set value=".zbx_dbstr($value)." where userid=".$USER_DETAILS["userid"]." and idx=".zbx_dbstr($idx);
 			DBexecute($sql);
 		}
 	}

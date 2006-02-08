@@ -27,7 +27,7 @@
 			return	0;
 		}
 
-		$sql="update triggers set comments='".zbx_ads($comments)."' where triggerid=$triggerid";
+		$sql="update triggers set comments=".zbx_dbstr($comments)." where triggerid=$triggerid";
 		return	DBexecute($sql);
 	}
 
@@ -110,8 +110,8 @@
 //		}
 
 		$sql="insert into triggers  (description,priority,status,comments,url,value,error)".
-			" values ('".zbx_ads($description)."',$priority,$status,'".zbx_ads($comments)."',".
-			"'".zbx_ads($url)."',2,'Trigger just added. No status update so far.')";
+			" values (".zbx_dbstr($description).",$priority,$status,".zbx_dbstr($comments).",".
+			"".zbx_dbstr($url).",2,'Trigger just added. No status update so far.')";
 #		echo $sql,"<br>";
 		$result=DBexecute($sql);
 		if(!$result)
@@ -124,7 +124,7 @@
 		add_alarm($triggerid,2);
  
 		$expression=implode_exp($expression,$triggerid);
-		$sql="update triggers set expression='".zbx_ads($expression)."' where triggerid=$triggerid";
+		$sql="update triggers set expression=".zbx_dbstr($expression)." where triggerid=$triggerid";
 #		echo $sql,"<br>";
 		DBexecute($sql);
 		reset_items_nextcheck($triggerid);
@@ -203,9 +203,9 @@
 		$expression=implode_exp($expression,$triggerid);
 		add_alarm($triggerid,2);
 		reset_items_nextcheck($triggerid);
-		$sql="update triggers set expression='".zbx_ads($expression)."',".
-			"description='".zbx_ads($description)."',priority=$priority,status=$status,".
-			"comments='".zbx_ads($comments)."',url='".zbx_ads($url)."',value=2".
+		$sql="update triggers set expression=".zbx_dbstr($expression).",".
+			"description=".zbx_dbstr($description).",priority=$priority,status=$status,".
+			"comments=".zbx_dbstr($comments).",url=".zbx_dbstr($url).",value=2".
 			" where triggerid=$triggerid";
 
 		$result = DBexecute($sql);
@@ -461,9 +461,9 @@
 
 			$result4=DBexecute("insert into triggers".
 				" (description,priority,status,comments,url,value,expression)".
-				" values ('".zbx_ads($trigger["description"])."',".$trigger["priority"].","
-				.$trigger["status"].",'".zbx_ads($trigger["comments"])."',".
-				"'".zbx_ads($trigger["url"])."',2,'".zbx_ads($expression_old)."')");
+				" values (".zbx_dbstr($trigger["description"]).",".$trigger["priority"].","
+				.$trigger["status"].",".zbx_dbstr($trigger["comments"]).",".
+				zbx_dbstr($trigger["url"]).",2,".zbx_dbstr($expression_old).")");
 			$triggerid_new=DBinsert_id($result4,"triggers","triggerid");
 
 			$result2=DBselect("select i.key_,f.parameter,f.function,f.functionid".
@@ -473,7 +473,7 @@
 			while($row2=DBfetch($result2))
 			{
 				$result3=DBselect("select itemid from items".
-					" where key_='".zbx_ads($row2["key_"])."'".
+					" where key_=".zbx_dbstr($row2["key_"]).
 					" and hostid=".$row["hostid"]);
 				if(DBnum_rows($result3)!=1)
 				{
@@ -489,10 +489,10 @@
 
 				$result5=DBexecute("insert into functions (itemid,triggerid,function,parameter)".
 					" values (".$item["itemid"].",$triggerid_new,".
-					"'".zbx_ads($row2["function"])."','".zbx_ads($row2["parameter"])."')");
+					zbx_dbstr($row2["function"]).",".zbx_dbstr($row2["parameter"]).")");
 				$functionid=DBinsert_id($result5,"functions","functionid");
 
-				DBexecute("update triggers set expression='".zbx_ads($expression_old)."'".
+				DBexecute("update triggers set expression=".zbx_dbstr($expression_old).
 					" where triggerid=$triggerid_new");
 
 				$expression = str_replace(
@@ -501,7 +501,7 @@
 					$expression_old);
 				$expression_old=$expression;
 
-				DBexecute("update triggers set expression='".zbx_ads($expression)."'".
+				DBexecute("update triggers set expression=".zbx_dbstr($expression).
 					" where triggerid=$triggerid_new");
 // copy dependences
 				delete_dependencies_by_triggerid($triggerid_new);

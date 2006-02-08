@@ -74,7 +74,7 @@
 			return 0;
 		}
 
-		$sql="insert into graphs (name,width,height,yaxistype,yaxismin,yaxismax) values ('".zbx_ads($name)."',$width,$height,$yaxistype,$yaxismin,$yaxismax)";
+		$sql="insert into graphs (name,width,height,yaxistype,yaxismin,yaxismax) values (".zbx_dbstr($name).",$width,$height,$yaxistype,$yaxismin,$yaxismax)";
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"graphs","graphid");
 	}
@@ -88,7 +88,7 @@
 			error("Insufficient permissions");
 			return 0;
 		}
-		$sql="update graphs set name='".zbx_ads($name)."',width=$width,height=$height,yaxistype=$yaxistype,yaxismin=$yaxismin,yaxismax=$yaxismax where graphid=$graphid";
+		$sql="update graphs set name=".zbx_dbstr($name).",width=$width,height=$height,yaxistype=$yaxistype,yaxismin=$yaxismin,yaxismax=$yaxismax where graphid=$graphid";
 		return	DBexecute($sql);
 	}
 	
@@ -162,14 +162,14 @@
 	
 	function	add_item_to_graph($graphid,$itemid,$color,$drawtype,$sortorder,$yaxisside)
 	{
-		$sql="insert into graphs_items (graphid,itemid,color,drawtype,sortorder,yaxisside) values ($graphid,$itemid,'".zbx_ads($color)."',$drawtype,$sortorder,$yaxisside)";
+		$sql="insert into graphs_items (graphid,itemid,color,drawtype,sortorder,yaxisside) values ($graphid,$itemid,".zbx_dbstr($color).",$drawtype,$sortorder,$yaxisside)";
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"graphs_items","gitemid");
 	}
 	
 	function	update_graph_item($gitemid,$itemid,$color,$drawtype,$sortorder,$yaxisside)
 	{
-		$sql="update graphs_items set itemid=$itemid,color='".zbx_ads($color)."',drawtype=$drawtype,sortorder=$sortorder,yaxisside=$yaxisside where gitemid=$gitemid";
+		$sql="update graphs_items set itemid=$itemid,color=".zbx_dbstr($color).",drawtype=$drawtype,sortorder=$sortorder,yaxisside=$yaxisside where gitemid=$gitemid";
 		return	DBexecute($sql);
 	}
 
@@ -265,7 +265,7 @@
 			if($host["graphs"]&2 == 0)	continue;
 
 			$items=DBselect("select i.itemid from items i".
-				" where i.key_='".zbx_ads($template_item["key_"])."'".
+				" where i.key_=".zbx_dbstr($template_item["key_"]).
 				" and i.hostid=".$host["hostid"]);
 			if(DBnum_rows($items)==0)	continue;
 			$item=DBfetch($items);
@@ -326,12 +326,12 @@
 		{
 			if($row["graphs"]&2 == 0)	continue;
 
-			$sql="select i.itemid from items i where i.key_='".zbx_ads($item["key_"])."' and i.hostid=".$row["hostid"];
+			$sql="select i.itemid from items i where i.key_=".zbx_dbstr($item["key_"])." and i.hostid=".$row["hostid"];
 			$result2=DBselect($sql);
 			if(DBnum_rows($result2)==0)	continue;
 			$row2=DBfetch($result2);
 
-			$sql="select distinct gi.gitemid,gi.graphid from graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and i.itemid=".$row2["itemid"]." and gi.drawtype=".$graph_item["drawtype"]." and gi.sortorder=".$graph_item["sortorder"]." and gi.color='".zbx_ads($graph_item["color"])."' and gi.yaxisside= ".$graph_item["yaxisside"];
+			$sql="select distinct gi.gitemid,gi.graphid from graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and i.itemid=".$row2["itemid"]." and gi.drawtype=".$graph_item["drawtype"]." and gi.sortorder=".$graph_item["sortorder"]." and gi.color=".zbx_dbstr($graph_item["color"])." and gi.yaxisside= ".$graph_item["yaxisside"];
 			$result3=DBselect($sql);
 			if(DBnum_rows($result3)==0)	continue; 
 			$row3=DBfetch($result3);
@@ -359,12 +359,12 @@
 		{
 			if($row["graphs"]&2 == 0)	continue;
 
-			$sql="select i.itemid from items i where i.key_='".zbx_ads($item["key_"])."' and i.hostid=".$row["hostid"];
+			$sql="select i.itemid from items i where i.key_=".zbx_dbstr($item["key_"])." and i.hostid=".$row["hostid"];
 			$result2=DBselect($sql);
 			if(DBnum_rows($result2)==0)	continue;
 			$row2=DBfetch($result2);
 
-			$sql="select distinct gi.gitemid,gi.graphid from graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and i.itemid=".$row2["itemid"]." and gi.drawtype=".$graph_item["drawtype"]." and gi.sortorder=".$graph_item["sortorder"]." and gi.color='".zbx_ads($graph_item["color"])."' and gi.yaxisside= ".$graph_item["yaxisside"];
+			$sql="select distinct gi.gitemid,gi.graphid from graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and i.itemid=".$row2["itemid"]." and gi.drawtype=".$graph_item["drawtype"]." and gi.sortorder=".$graph_item["sortorder"]." and gi.color=".zbx_dbstr($graph_item["color"])." and gi.yaxisside= ".$graph_item["yaxisside"];
 			$result3=DBselect($sql);
 			if(DBnum_rows($result3)==0)	continue; 
 			$row3=DBfetch($result3);
@@ -393,12 +393,12 @@
 		{
 			if($row["graphs"]&2 == 0)	continue;
 
-			$sql="select i.itemid from items i where i.key_='".zbx_ads($item["key_"])."' and i.hostid=".$row["hostid"];
+			$sql="select i.itemid from items i where i.key_=".zbx_dbstr($item["key_"])." and i.hostid=".$row["hostid"];
 			$result2=DBselect($sql);
 			if(DBnum_rows($result2)==0)	continue;
 			$row2=DBfetch($result2);
 
-			$sql="select distinct gi.gitemid,gi.graphid from graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and i.itemid=".$row2["itemid"]." and gi.drawtype=".$graph_item["drawtype"]." and gi.sortorder=".$graph_item["sortorder"]." and gi.color='".zbx_ads($graph_item["color"])."' and gi.yaxisside= ".$graph_item["yaxisside"];
+			$sql="select distinct gi.gitemid,gi.graphid from graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and i.itemid=".$row2["itemid"]." and gi.drawtype=".$graph_item["drawtype"]." and gi.sortorder=".$graph_item["sortorder"]." and gi.color=".zbx_dbstr($graph_item["color"])." and gi.yaxisside= ".$graph_item["yaxisside"];
 			$result3=DBselect($sql);
 			if(DBnum_rows($result3)==0)	continue; 
 			$row3=DBfetch($result3);
@@ -429,13 +429,13 @@
 		{
 			if($row["graphs"]&2 == 0)	continue;
 
-			$sql="select i.itemid from items i where i.key_='".zbx_ads($item["key_"])."' and i.hostid=".$row["hostid"];
+			$sql="select i.itemid from items i where i.key_=".zbx_dbstr($item["key_"])." and i.hostid=".$row["hostid"];
 			$result2=DBselect($sql);
 			if(DBnum_rows($result2)==0)	continue;
 			$row2=DBfetch($result2);
 			$itemid=$row2["itemid"];
 
-			$sql="select distinct gi.gitemid,gi.graphid from graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and i.itemid=".$row2["itemid"]." and gi.drawtype=".$graph_item["drawtype"]." and gi.sortorder=".$graph_item["sortorder"]." and gi.color='".zbx_ads($graph_item["color"])."' and gi.yaxisside= ".$graph_item["yaxisside"];
+			$sql="select distinct gi.gitemid,gi.graphid from graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and i.itemid=".$row2["itemid"]." and gi.drawtype=".$graph_item["drawtype"]." and gi.sortorder=".$graph_item["sortorder"]." and gi.color=".zbx_dbstr($graph_item["color"])." and gi.yaxisside= ".$graph_item["yaxisside"];
 			$result3=DBselect($sql);
 			if(DBnum_rows($result3)==0)	continue; 
 			$row3=DBfetch($result3);
@@ -816,13 +816,13 @@
 		{
 			if($row["graphs"]&1 == 0)	continue;
 
-			$sql="select i.itemid from items i where i.key_='".zbx_ads($item["key_"])."' and i.hostid=".$row["hostid"];
+			$sql="select i.itemid from items i where i.key_=".zbx_dbstr($item["key_"])." and i.hostid=".$row["hostid"];
 			$result2=DBselect($sql);
 			if(DBnum_rows($result2)==0)	continue;
 			$row2=DBfetch($result2);
 			$itemid=$row2["itemid"];
 
-			$sql="select distinct g.graphid from graphs g,graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and g.graphid=gi.graphid and g.name='".zbx_ads($graph["name"])."'";
+			$sql="select distinct g.graphid from graphs g,graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=".$row["hostid"]." and g.graphid=gi.graphid and g.name=".zbx_dbstr($graph["name"]);
 			$result2=DBselect($sql);
 			$host=get_host_by_hostid($row["hostid"]);
 			while($row2=DBfetch($result2))

@@ -84,7 +84,7 @@
 				}
 
 				//  Determine which template, if any this host is linked to
-				$sql="select distinct(hostid) from hosts where status<>". HOST_STATUS_DELETED ." and host='".zbx_ads($tmpHostTemplate)."'";
+				$sql="select distinct(hostid) from hosts where status<>". HOST_STATUS_DELETED ." and host=".zbx_dbstr($tmpHostTemplate);
 				$sqlResult=DBselect($sql);
 				if(DBnum_rows($sqlResult)==1)
 				{

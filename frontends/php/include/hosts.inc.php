@@ -35,7 +35,7 @@
 			return 0;
 		}
 
-		$sql="select * from hosts where host='".zbx_ads($host)."'";
+		$sql="select * from hosts where host=".zbx_dbstr($host);
 		$result=DBexecute($sql);
 		if(DBnum_rows($result)>0)
 		{
@@ -52,7 +52,7 @@
 			$useip=0;
 		}
 
-		$sql="insert into hosts (host,port,status,useip,ip,disable_until,available) values ('".zbx_ads($host)."',$port,$status,$useip,'".zbx_ads($ip)."',0,".HOST_AVAILABLE_UNKNOWN.")";
+		$sql="insert into hosts (host,port,status,useip,ip,disable_until,available) values (".zbx_dbstr($host).",$port,$status,$useip,".zbx_dbstr($ip).",0,".HOST_AVAILABLE_UNKNOWN.")";
 		$result=DBexecute($sql);
 		if(!$result)
 		{
@@ -94,7 +94,7 @@
 			return 0;
 		}
 
-		$sql="select * from hosts where host='".zbx_ads($host)."' and hostid<>$hostid";
+		$sql="select * from hosts where host=".zbx_dbstr($host)." and hostid<>$hostid";
 		$result=DBexecute($sql);
 		if(DBnum_rows($result)>0)
 		{
@@ -112,7 +112,7 @@
 			$useip=0;
 		}
 
-		$sql="update hosts set host='".zbx_ads($host)."',port=$port,useip=$useip,ip='".zbx_ads($ip)."' where hostid=$hostid";
+		$sql="update hosts set host=".zbx_dbstr($host).",port=$port,useip=$useip,ip=".zbx_dbstr($ip)." where hostid=$hostid";
 		$result=DBexecute($sql);
 
 
