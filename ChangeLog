@@ -1,5 +1,6 @@
 Changes for 1.1beta7:
 
+ - fixed evaluation of {IPADDRESS} (Alexei)
  - added hosts.templateid and items.templateid (Alexei)
 
 Changes for 1.1beta6:
