@@ -337,9 +337,9 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 			return SYSINFO_RET_FAIL;
 		}
 		if(procname[0]=='\0')
-			snprintf(usrname,MAX_STRING_LEN-1,"$2==\"%u\"",usrinfo->uid_t);	
+			snprintf(usrname,MAX_STRING_LEN-1,"$2==\"%u\"",usrinfo->pw_uid);	
 		else
-			snprintf(usrname,MAX_STRING_LEN-1,"&&$2==\"%u\"",usrinfo->uid_t);	
+			snprintf(usrname,MAX_STRING_LEN-1,"&&$2==\"%u\"",usrinfo->pw_uid);	
 	}
     
 	if(get_param(param, 3, procstat, MAX_STRING_LEN) != 0)
