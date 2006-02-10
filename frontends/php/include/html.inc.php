@@ -44,7 +44,7 @@
 
 	function	nbsp($str)
 	{
-		return str_replace(" ","&nbsp;",$str);;
+		return str_replace(" ",SPACE,$str);;
 	}
 
 	function form_select($var, $value, $label)

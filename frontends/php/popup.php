@@ -38,12 +38,12 @@
 
 <?php
 
-	$h1="&nbsp;".S_HOSTS_BIG;
+	$h1=SPACE.S_HOSTS_BIG;
 
 //	$h2_form1="<form name=\"form2\" method=\"get\" action=\"popup.php\">";
 
 
-	$h2=S_GROUP."&nbsp;";
+	$h2=S_GROUP.SPACE;
 	$h2=$h2."<input name=\"form\" type=\"hidden\" value=".$_REQUEST["form"].">";
 	$h2=$h2."<input name=\"field1\" type=\"hidden\" value=".$_REQUEST["field1"].">";
 	$h2=$h2."<input name=\"field2\" type=\"hidden\" value=".$_REQUEST["field2"].">";

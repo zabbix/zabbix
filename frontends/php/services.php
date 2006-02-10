@@ -378,7 +378,7 @@
 			$h2=$h2.form_select("groupid",$row["groupid"],$row["name"]);
 		}
 	}
-	$h2=$h2."</select>&nbsp;";
+	$h2=$h2."</select>".SPACE;
 
 	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
@@ -401,13 +401,13 @@
 		}
 		$h2=$h2.form_select("hostid",$row["hostid"],$row["host"]);
 	}
-	$h2=$h2."</select>&nbsp;";
+	$h2=$h2."</select>".SPACE;
 	echo $h2;
 
 	if(isset($_REQUEST["hostid"]))
 	{
 		show_table2_v_delimiter($col++);
-		echo "&nbsp;";
+		echo SPACE;
 		show_table2_h_delimiter();
 	        $result=DBselect("select t.triggerid,t.description from triggers t,functions f, hosts h, items i where h.hostid=i.hostid and f.itemid=i.itemid and t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]." order by t.description");
 	        echo "<select class=\"biginput\" name=\"triggerid\" size=1>";

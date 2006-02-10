@@ -64,9 +64,9 @@
 
 
 <?php
-	$h1="&nbsp;".S_HISTORY_OF_EVENTS_BIG;
+	$h1=SPACE.S_HISTORY_OF_EVENTS_BIG;
 
-	$h2=S_GROUP."&nbsp;";
+	$h2=S_GROUP.SAPCE;
 	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
 	$result=DBselect("select groupid,name from groups order by name");
@@ -90,7 +90,7 @@
 	}
 	$h2=$h2."</select>";
 
-	$h2=$h2."&nbsp;".S_HOST."&nbsp;";
+	$h2=$h2.SPACE.S_HOST.SPACE;
 	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
 
@@ -112,7 +112,7 @@
 		}
 		$h2=$h2.form_select("hostid",$row["hostid"],$row["host"]);
 	}
-	$h2=$h2."</select>&nbsp;";
+	$h2=$h2."</select>".SPACE;
 
 	if(isset($_REQUEST["start"]))
 	{

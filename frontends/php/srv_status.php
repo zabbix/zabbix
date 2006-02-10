@@ -63,7 +63,7 @@
 
 		$status=get_service_status_description($service["status"]);
 
-		$reason="&nbsp;";
+		$reason=SPACE;
 		if($service["showsla"]==1)
 		{
 			$sla="<img src=\"chart_sla.php?serviceid=".$service["serviceid"]."\">";

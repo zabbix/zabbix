@@ -71,9 +71,9 @@
 ?>
 
 <?php
-	$h1="&nbsp;".S_OVERVIEW_BIG;
+	$h1=SPACE.S_OVERVIEW_BIG;
 
-	$h2=S_GROUP."&nbsp;";
+	$h2=S_GROUP.SPACE;
 	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("groupid",0,S_SELECT_GROUP_DOT_DOT_DOT);
 	$result=DBselect("select groupid,name from groups order by name");
@@ -97,7 +97,7 @@
 	}
 	$h2=$h2."</select>";
 
-	$h2=$h2."&nbsp;".S_TYPE."&nbsp;";
+	$h2=$h2.SPACE.S_TYPE.SPACE;
 	$h2=$h2."<select class=\"biginput\" name=\"type\" onChange=\"submit()\">";
 	$h2=$h2.form_select("type",0,S_TRIGGERS);
 	$h2=$h2.form_select("type",1,S_DATA);
@@ -115,7 +115,7 @@
 	if(isset($_REQUEST["groupid"])&&isset($_REQUEST["type"])&&($_REQUEST["type"]==SHOW_DATA))
 	{
 		$table = new CTableInfo();
-		$header=array("&nbsp;");
+		$header=array(SPACE);
 		$hosts=array();
 		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
 		$result=DBselect($sql);
@@ -193,7 +193,7 @@
 	else if(isset($_REQUEST["groupid"])&&isset($_REQUEST["type"])&&($_REQUEST["type"]==SHOW_TRIGGERS))
 	{
 		$table  = new CTableInfo();
-		$header=array("&nbsp;");
+		$header=array(SPACE);
 		$hosts=array();
 		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg,functions f,triggers t where h.status=".HOST_STATUS_MONITORED." and t.status=".TRIGGER_STATUS_ENABLED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and t.triggerid=f.triggerid and f.itemid=i.itemid group by h.hostid,h.host order by h.host";
 		$result=DBselect($sql);
@@ -233,26 +233,19 @@
 			{
 				$sql="select t.status,t.value,t.lastchange from triggers t,functions f,items i where f.triggerid=t.triggerid and i.itemid=f.itemid and t.status=".TRIGGER_STATUS_ENABLED." and i.hostid=$hostid and t.description=".zbx_dbstr($row["description"]);
 				$result2=DBselect($sql);
+				$value=SPACE;
 				if(DBnum_rows($result2)==1)
 				{
 					$row2=DBfetch($result2);
 					if($row2["status"]==0)
 					{
 						if($row2["value"] == TRIGGER_VALUE_FALSE)
-							$value=new CCol("&nbsp;","normal");
+							$value=new CCol(SPACE,"normal");
 						else if($row2["value"] == TRIGGER_VALUE_UNKNOWN)
-							$value=new CCol("&nbsp;","unknown_trigger");
+							$value=new CCol(SPACE,"unknown_trigger");
 						else
-							$value=new CCol("&nbsp;","high");
+							$value=new CCol(SPACE,"high");
 					}
-					else
-					{
-						$value="&nbsp;";
-					}
-				}
-				else
-				{
-					$value="&nbsp;";
 				}
 				$rows=array_merge($rows,array($value));
 			}

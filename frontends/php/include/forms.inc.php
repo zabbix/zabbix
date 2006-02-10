@@ -318,7 +318,9 @@
 		if(isset($_REQUEST["groupid"]))
 			$frmItem->AddVar("groupid",$_REQUEST["groupid"]);
 
-		$description	= get_request("description"	,"");
+		$frmItem->AddVar("hostid",$_REQUEST["hostid"]);
+
+		$description	= get_request("description"	,"new");
 		$key		= get_request("key"		,"");
 		$host		= get_request("host",		NULL);
 		$delay		= get_request("delay"		,30);
@@ -332,7 +334,6 @@
 		$trapper_hosts	= get_request("trapper_hosts"	,"");
 		$units		= get_request("units"		,'');
 		$multiplier	= get_request("multiplier"	,0);
-		$hostid		= get_request("hostid"		,0);
 		$delta		= get_request("delta"		,0);
 		$trends		= get_request("trends"		,365);
 
@@ -347,8 +348,8 @@
 		$add_groupid	= get_request("add_groupid"	,get_request("groupid",0));
 
 
-		if(is_null($host)&&$hostid>0){
-			$host_info = get_host_by_hostid($hostid);
+		if(is_null($host)){
+			$host_info = get_host_by_hostid($_REQUEST["hostid"]);
 			$host = $host_info["host"];
 		}
 
@@ -364,8 +365,6 @@
 				" from items i,hosts h where i.itemid=".$_REQUEST["itemid"].
 				" and h.hostid=i.hostid");
 			$row=DBfetch($result);
-
-			$frmItem->SetTitle(S_ITEM." \"". $row["description"]."\"");
 		}
 
 		if(isset($_REQUEST["itemid"]) && !isset($_REQUEST["form_refresh"]))
@@ -396,16 +395,14 @@
 			$formula	= $row["formula"];
 			$logtimefmt	= $row["logtimefmt"];
 		}
+		if(isset($_REQUEST["itemid"])) {
+			$frmItem->SetTitle(S_ITEM." '$host:".$row["description"]."'");
+		} else {
+			$frmItem->SetTitle(S_ITEM." '$host:$description'");
+		}
 
 		$frmItem->AddRow(S_DESCRIPTION, new CTextBox("description",$description,40));
 
-		$frmItem->AddVar("hostid",$hostid);
-		$frmItem->AddRow(S_HOST, array(
-			new CTextBox("host",$host,30,NULL,'yes'),
-			new CButton("btn1","Select","return PopUp('popup.php?form=".$frmItem->GetName().
-				"&field1=hostid&field2=host','host','width=450,height=450,".
-				"resizable=1,scrollbars=1');","T")
-		));
 
 		$cmbType = new CComboBox("type",$type,"submit()");
 		$cmbType->AddItem(ITEM_TYPE_ZABBIX,'Zabbix agent');
@@ -1188,7 +1185,7 @@
 			while($trigger = DBfetch($triggers))
 			{
 				$cmbCondVal->AddItem($trigger["triggerid"],
-					$trigger["host"].":&nbsp;".$trigger["description"]);
+					$trigger["host"].":".SPACE.$trigger["description"]);
 			}
 			array_push($rowCondition,$cmbCondVal);
 		}
@@ -1735,7 +1732,6 @@
 		$groups= get_request("groups",array());
 
 		$newgroup	= get_request("newgroup","");
-		$host_templateid= get_request("host_templateid","");
 
 		$host 	= get_request("host",	"");
 		$port 	= get_request("port",	get_profile("HOST_PORT",10050));
@@ -1757,6 +1753,8 @@
 		$location	= get_request("location","");
 		$notes		= get_request("notes","");
 
+		$templateid= get_request("templateid",0);
+
 		if(isset($_REQUEST["hostid"])){
 			$db_host=get_host_by_hostid($_REQUEST["hostid"]);
 			$frm_title	= S_HOST.SPACE."\"".$db_host["host"]."\"";
@@ -1771,6 +1769,8 @@
 			$status	= $db_host["status"];
 			$useip	= $db_host["useip"]==1 ? 'yes' : 'no';
 			$ip	= $db_host["ip"];
+
+			$templateid = $db_host["templateid"];
 // add groups
 			$db_groups=DBselect("select groupid from hosts_groups where hostid=".$_REQUEST["hostid"]);
 			while($db_group=DBfetch($db_groups)){
@@ -1845,14 +1845,15 @@
 		$cmbStatus->AddItem(HOST_STATUS_NOT_MONITORED,	S_NOT_MONITORED);
 		$frmHost->AddRow(S_STATUS,$cmbStatus);	
 
-		$cmbHosts = new CComboBox("host_templateid",$host_templateid);
+		$cmbHosts = new CComboBox("templateid",$templateid);
 		$cmbHosts->AddItem(0,"...");
-		$hosts=DBselect("select host,hostid from hosts where status not in (".HOST_STATUS_DELETED.") order by host");
+		$hosts=DBselect("select host,hostid from hosts where status not in (".HOST_STATUS_DELETED.")".
+			" order by host");
 		while($host=DBfetch($hosts))
 		{
 			$cmbHosts->AddItem($host["hostid"],$host["host"]);
 		}
-		$frmHost->AddRow(S_USE_TEMPLATES_OF_THIS_HOST,$cmbHosts);
+		$frmHost->AddRow(S_LINK_WITH_HOST,$cmbHosts);
 	
 		$frmHost->AddRow(S_USE_PROFILE,new CCheckBox("useprofile",$useprofile,NULL,"submit()"));
 		if($useprofile=="yes")
@@ -1892,12 +1893,13 @@
 			$frmHost->AddItemToBottomRow(SPACE);
 			$frmHost->AddItemToBottomRow(
 				new CButtonDelete(S_DELETE_SELECTED_HOST_Q,
-					url_param("form").url_param("config").url_param("hostid")
+					url_param("form").url_param("config").url_param("hostid").
+					url_param("groupid")
 				)
 			);
 		}
 		$frmHost->AddItemToBottomRow(SPACE);
-		$frmHost->AddItemToBottomRow(new CButtonCancel(url_param("config")));
+		$frmHost->AddItemToBottomRow(new CButtonCancel(url_param("config").url_param("groupid")));
 		$frmHost->Show();
 	}
 

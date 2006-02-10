@@ -495,7 +495,7 @@
 	function	navigation_bar($url)
 	{
 		$h1=S_NAVIGATE;
-		$h2=S_PERIOD."&nbsp;";
+		$h2=S_PERIOD.SPACE;
 		$h2=$h2."<select class=\"biginput\" name=\"period\" onChange=\"submit()\">";
 		$h2=$h2.form_select("period",3600,"1h");
 		$h2=$h2.form_select("period",2*3600,"2h");
@@ -525,7 +525,7 @@
 		$h2=$h2.form_select("inc",31*24*3600,"+month");
 		$h2=$h2.form_select("inc",365*24*3600,"+year");
 		$h2=$h2."</select>";
-		$h2=$h2."&nbsp;".S_MOVE."&nbsp;";
+		$h2=$h2.SPACE.S_MOVE.SPACE;
 		$h2=$h2."<select class=\"biginput\" name=\"left\" onChange=\"submit()\">";
 		$h2=$h2.form_select("left",0,S_LEFT_DIR);
 		$h2=$h2.form_select("left",1,"-1h");
@@ -544,9 +544,9 @@
 		$h2=$h2.form_select("right",31*24,"+month");
 		$h2=$h2.form_select("right",365*24,"+year");
 		$h2=$h2."</select>";
-		$h2=$h2."&nbsp;";
+		$h2=$h2.SPACE;
 		$h2=$h2."<input name=\"stime\" size=18 class=\"biginput\" value=\"yyyymmddhhmm\" size=12>";
-		$h2=$h2."&nbsp;";
+		$h2=$h2.SPACE;
 		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"action\" value=\"go\">";
 		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"reset\" value=\"reset\">";
 
@@ -584,7 +584,7 @@
 		echo "<TD ALIGN=LEFT>";
 
 		echo "<div align=left>";
-		echo "<b>".S_PERIOD.":</b>&nbsp;";
+		echo "<b>".S_PERIOD.":</b>".SPACE;
 
 		$hour=3600;
 		
@@ -609,14 +609,14 @@
 			$tmp=$_REQUEST["period"]+$sec;
 			echo("<A HREF=\"$url?period=$tmp".url_param("graphid").url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">+</A>");
 
-			echo "]&nbsp;";
+			echo "]".SPACE;
 		}
 
 		echo("</div>");
 
 		echo "</TD>";
 		echo "<TD BGCOLOR=#FFFFFF WIDTH=15% ALIGN=RIGHT>";
-		echo "<b>".nbsp(S_KEEP_PERIOD).":</b>&nbsp;";
+		echo "<b>".nbsp(S_KEEP_PERIOD).":</b>".SPACE;
 		if($_REQUEST["keep"] == 1)
 		{
 			echo("[<A HREF=\"$url?keep=0".url_param("graphid").url_param("from").url_param("period").url_param("fullscreen")."\">".S_ON_C."</a>]");
@@ -632,7 +632,7 @@
 		if(isset($_REQUEST["stime"]))
 		{
 			echo "<div align=left>" ;
-			echo "<b>".S_MOVE.":</b>&nbsp;" ;
+			echo "<b>".S_MOVE.":</b>".SPACE;
 
 			$day=24;
 // $a already defined
@@ -656,14 +656,14 @@
 				$tmp=date("YmdHi",$tmp);
 				echo("<A HREF=\"$url?stime=$tmp".url_param("graphid").url_param("period").url_param("keep").url_param("fullscreen")."\">+</A>");
 	
-				echo "]&nbsp;";
+				echo "]".SPACE;
 			}
 			echo("</div>");
 		}
 		else
 		{
 			echo "<div align=left>";
-			echo "<b>".S_MOVE.":</b>&nbsp;";
+			echo "<b>".S_MOVE.":</b>".SPACE;
 	
 			$day=24;
 // $a already defined
@@ -687,7 +687,7 @@
 					echo "+";
 				}
 
-				echo "]&nbsp;";
+				echo "]".SPACE;
 			}
 			echo("</div>");
 		}
@@ -704,7 +704,7 @@
 		{
 			echo "<input name=\"stime\" class=\"biginput\" value=\"yyyymmddhhmm\" size=12>";
 		}
-		echo "&nbsp;";
+		echo SPACE;
 		echo "<input class=\"button\" type=\"submit\" name=\"action\" value=\"go\">";
 		echo "</form>";
 		echo "</TD>";

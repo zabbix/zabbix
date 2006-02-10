@@ -1,5 +1,7 @@
 Changes for 1.1beta7:
 
+ - improved Templates logic (Eugene)
+ - speed improvement for proc.num of Tru64 (Eugene)
  - fixed evaluation of {IPADDRESS} (Alexei)
  - added hosts.templateid and items.templateid (Alexei)
 

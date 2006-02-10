@@ -312,15 +312,15 @@
 		}
 		elseif($status==4)
 		{
-			$desc="<font color=\"#FF8888\">Serious&nbsp;problem</a>";
+			$desc="<font color=\"#FF8888\">Serious".SPACE."problem</a>";
 		}
 		elseif($status==3)
 		{
-			$desc="<font color=\"#AA0000\">Average&nbsp;problem</a>";
+			$desc="<font color=\"#AA0000\">Average".SPACE."problem</a>";
 		}
 		elseif($status==2)
 		{
-			$desc="<font color=\"#AA5555\">Minor&nbsp;problem</a>";
+			$desc="<font color=\"#AA5555\">Minor".SPACE."problem</a>";
 		}
 		elseif($status==1)
 		{

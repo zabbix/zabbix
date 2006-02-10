@@ -107,7 +107,7 @@
 
 	$h1=S_GRAPHS_BIG.nbsp(" / ").$h1;
 
-	$h2=S_GROUP."&nbsp;";
+	$h2=S_GROUP.SPACE;
 	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
 	$result=DBselect("select groupid,name from groups order by name");
@@ -131,7 +131,7 @@
 	}
 	$h2=$h2."</select>";
 
-	$h2=$h2."&nbsp;".S_HOST."&nbsp;";
+	$h2=$h2.SPACE.S_HOST.SPACE;
 	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
 
@@ -165,7 +165,7 @@
 		unset($_REQUEST["graphid"]);
 	}
 
-	$h2=$h2."&nbsp;".S_GRAPH."&nbsp;";
+	$h2=$h2.SPACE.S_GRAPH.SPACE;
 	$h2=$h2."<select class=\"biginput\" name=\"graphid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("graphid",0,S_SELECT_GRAPH_DOT_DOT_DOT);
 
