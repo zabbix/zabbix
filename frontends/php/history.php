@@ -105,7 +105,7 @@
 
 	$h1="<A HREF='latest.php?hostid=$hostid'>$host</A> : $description";
 
-#	$h2=S_GROUP."&nbsp;";
+#	$h2=S_GROUP.SPACE
 	$h2="<input class=\"biginput\" name=\"itemid\" type=\"hidden\" value=\"".$_REQUEST["itemid"]."\">";
 	$h2=$h2."<select class=\"biginput\" name=\"action\" onChange=\"submit()\">";
 	$h2=$h2.form_select("action","showhistory",S_LAST_HOUR_GRAPH);
@@ -205,7 +205,7 @@
 
 				if($local==0)
 				{
-					echo "<TD>&nbsp;</TD>";
+					echo "<TD>".SPACE."</TD>";
 				}
 				else
 				{
@@ -310,7 +310,7 @@
 
 				if($local==0)
 				{
-					$local="&nbsp";
+					$local=SPACE;
 				}
 				{
 					$local=date("Y.M.d H:i:s",$local);

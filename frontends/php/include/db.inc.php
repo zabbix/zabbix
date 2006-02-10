@@ -79,7 +79,7 @@
 	{
 		global $DB,$DB_TYPE;
 
-#		echo $query."<br>";
+		$result = FALSE;
 
 		if($DB_TYPE == "MYSQL")
 		{
@@ -90,14 +90,15 @@
 				error("SQL error: ".mysql_error());
 				error("Query: $query");
 			}
-			return $result;
 		}
 		if($DB_TYPE == "POSTGRESQL")
 		{
 			$result=pg_exec($DB,$query);
-			return $result;
 		}
-		return FALSE;
+
+//SDI("DBexecute($query) = '".$result."'");
+
+		return $result;
 	}
 
 	function	DBfetch($result)

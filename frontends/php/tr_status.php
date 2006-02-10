@@ -186,12 +186,12 @@
 ?>
 
 <?php
-	$h1="&nbsp;".S_STATUS_OF_TRIGGERS_BIG;
+	$h1=SPACE.S_STATUS_OF_TRIGGERS_BIG;
 
 	$h2="";
 	$h2=$h2."<input name=\"onlytrue\" type=\"hidden\" value=\"".$_REQUEST["onlytrue"]."\">";
 	$h2=$h2."<input name=\"noactions\" type=\"hidden\" value=\"".$_REQUEST["noactions"]."\">";
-	$h2=$h2.S_GROUP."&nbsp;";
+	$h2=$h2.S_GROUP.SPACE;
 	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
 
@@ -216,7 +216,7 @@
 	}
 	$h2=$h2."</select>";
 
-	$h2=$h2."&nbsp;".S_HOST."&nbsp;";
+	$h2=$h2.SPACE.S_HOST.SPACE;
 	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
 

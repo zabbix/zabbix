@@ -182,7 +182,7 @@
 		$cmbType->AddItem(1,S_REMOTE_COMMAND,NULL,'no');
 		$form->AddItem($cmbType);
 
-		$form->AddItem("&nbsp;|&nbsp;");
+		$form->AddItem(SPACE."|".SPACE);
 		$form->AddItem(new CButton("form",S_CREATE_ACTION));
 
 		show_header2(S_ACTIONS, $form);

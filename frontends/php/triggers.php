@@ -315,7 +315,7 @@
 			$result1=DBselect($sql);
 			if(DBnum_rows($result1)>0)
 			{
-				array_push($description,BR.BR."<strong>".S_DEPENDS_ON."</strong>:&nbsp;".BR);
+				array_push($description,BR.BR."<strong>".S_DEPENDS_ON."</strong>".SPACE.BR);
 				while($row1=DBfetch($result1))
 				{
 					array_push($description,expand_trigger_description($row1["triggerid"]).BR);
@@ -353,9 +353,9 @@
 					'enabled');
 			}
 
-			if($row["status"] != TRIGGER_STATUS_UNKNOWN)	$row["error"]="&nbsp;";
+			if($row["status"] != TRIGGER_STATUS_UNKNOWN)	$row["error"]=SPACE;
 
-			if($row["error"]=="")		$row["error"]="&nbsp;";
+			if($row["error"]=="")		$row["error"]=SPACE;
 
 			$table->addRow(array(
 				$id,
