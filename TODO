@@ -1,5 +1,6 @@
 1.1beta7:
 
+ - a button to flush item history
  - execution of commands on monitored hosts in case of pre-defined events
  - server side checks (new type of check)
  - timeout-immune poller
