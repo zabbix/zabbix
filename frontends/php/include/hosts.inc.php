@@ -19,122 +19,234 @@
 **/
 ?>
 <?php
-	# Add Host definition
 
-	function	add_host($host,$port,$status,$useip,$ip,$host_templateid,$newgroup,$groups)
+/* HOST GROUP functions */
+	function	add_host_to_group($hostid, $groupid)
+	{
+		if(!is_numeric($hostid) || !is_numeric($groupid)){
+			error("incorrect parameters for 'add_host_to_group'");
+			return FALSE;
+		}
+		return DBexecute("insert into hosts_groups (hostid,groupid) values ($hostid,$groupid)");
+	}
+	function	db_save_group($name,$groupid=NULL)
+	{
+		if(!is_string($name)){
+			error("incorrect parameters for 'db_save_group'");
+			return FALSE;
+		}
+	
+		if($groupid==NULL)
+			$result = DBexecute("select * from groups where name=".zbx_dbstr($name));
+		else
+			$result = DBexecute("select * from groups where name=".zbx_dbstr($name).
+				" and groupid<>$groupid");
+		
+		if(DBnum_rows($result)>0)
+		{
+			error("Group '$name' already exists");
+			return FALSE;
+		}
+		if($groupid==NULL)
+			return DBexecute("insert into groups (name) values (".zbx_dbstr($name).")");
+		else
+			return DBexecute("update groups set name=".zbx_dbstr($name)." where groupid=$groupid");
+	}
+
+	function	add_group_to_host($hostid,$newgroup="")
+	{
+		if($newgroup == "" || $newgroup == NULL)
+			 return TRUE;
+
+		$result = db_save_group($newgroup);
+		if(!$result)
+			return	$result;
+		
+		$groupid = DBinsert_id($result,"groupd","groupid");
+
+		return add_host_to_group($hostid, $groupid);
+	}
+
+	function	update_host_groups_by_groupid($groupid,$hosts=array())
+	{
+		DBexecute("delete from hosts_groups where groupid=$groupid");
+
+		foreach($hosts as $hostid)
+		{
+			add_host_to_group($hostid, $groupid);
+		}
+	}
+
+	function	update_host_groups($hostid,$groups=array())
+	{
+		DBexecute("delete from hosts_groups where hostid=$hostid");
+
+		foreach($groups as $groupid)
+		{
+			add_host_to_group($hostid, $groupid);
+		}
+	}
+
+	function	add_host_group($name,$hosts)
+	{
+//		if(!check_right("Host","A",0))
+//		{
+//			error("Insufficient permissions");
+//			return FLASE;
+//		}
+
+		$result = db_save_group($name);
+		if(!$result)
+			return	$result;
+		
+		$groupid = DBinsert_id($result,"groups","groupid");
+
+		update_host_groups_by_groupid($groupid,$hosts);
+
+		return $groupid;
+	}
+
+	function	update_host_group($groupid,$name,$hosts)
+	{
+//		if(!check_right("Host","U",0))
+//		{
+//			error("Insufficient permissions");
+//			return 0;
+//		}
+
+
+		$result = db_save_group($name,$groupid);
+		if(!$result)
+			return	$result;
+		
+		update_host_groups_by_groupid($groupid,$hosts);
+
+		return $result;
+	}
+
+/* HOST finction */
+	function 	check_circle_host_link($hostid, $templateid)
+	{
+		if($templateid <= 0)		return FALSE;
+		if($hostid == $templateid)	return TRUE;
+		$template = get_host_by_hostid($templateid);
+		if($template["templateid"] > 0)
+			return check_circle_host_link($hostid, $template["templateid"]);
+
+		return FALSE;
+	}
+
+	function	db_save_host($host,$port,$status,$useip,$ip,$templateid,$hostid=NULL)
+	{
+ 		if (!eregi('^([0-9a-zA-Z\_\.-]+)$', $host)) 
+		{
+			error("Hostname should contain 0-9a-zA-Z_.- characters only");
+			return FALSE;
+		}
+
+		if($hostid==NULL)
+			$result=DBexecute("select * from hosts where host=".zbx_dbstr($host));
+		else
+			$result=DBexecute("select * from hosts where host=".zbx_dbstr($host).
+				" and hostid<>$hostid");
+
+		if(DBnum_rows($result)>0)
+		{
+			error("Host '$host' already exists");
+			return FALSE;
+		}
+
+		if($useip=="on" || $useip=="yes" || $useip==1)		$useip=1;
+		else							$useip=0;
+
+		if($hostid==NULL)
+		{
+			$result = DBexecute("insert into hosts".
+				" (host,port,status,useip,ip,disable_until,available,templateid)".
+				" values (".zbx_dbstr($host).",$port,$status,$useip,".zbx_dbstr($ip).",0,"
+				.HOST_AVAILABLE_UNKNOWN.",$templateid)");
+		}
+		else
+		{
+			if(check_circle_host_link($hostid, $templateid))
+			{
+				error("Circle link can't be created");
+				return FALSE;
+			}
+
+			$result = DBexecute("update hosts set host=".zbx_dbstr($host).",".
+				"port=$port,useip=$useip,ip=".zbx_dbstr($ip).",templateid=$templateid".
+				" where hostid=$hostid");
+
+			update_host_status($hostid, $status);
+		}
+		return $result;
+	}
+
+	function	add_host($host,$port,$status,$useip,$ip,$templateid,$newgroup,$groups)
 	{
 		if(!check_right("Host","A",0))
 		{
 			error("Insufficient permissions");
-			return 0;
+			return FALSE;
 		}
 
- 		if (!eregi('^([0-9a-zA-Z\_\.-]+)$', $host, $arr)) 
-		{
-			error("Hostname should contain 0-9a-zA-Z_.- characters only");
-			return 0;
-		}
-
-		$sql="select * from hosts where host=".zbx_dbstr($host);
-		$result=DBexecute($sql);
-		if(DBnum_rows($result)>0)
-		{
-			error("Host '$host' already exists");
-			return 0;
-		}
-
-		if($useip=="on" || $useip=="yes" || $useip==1)
-		{
-			$useip=1;
-		}
-		else
-		{
-			$useip=0;
-		}
-
-		$sql="insert into hosts (host,port,status,useip,ip,disable_until,available) values (".zbx_dbstr($host).",$port,$status,$useip,".zbx_dbstr($ip).",0,".HOST_AVAILABLE_UNKNOWN.")";
-		$result=DBexecute($sql);
+		$result = db_save_host($host,$port,$status,$useip,$ip,$templateid);
 		if(!$result)
-		{
-			return	$result;
-		}
-		
-		$hostid=DBinsert_id($result,"hosts","hostid");
+			return $result;
+	
+		$hostid = DBinsert_id($result,"hosts","hostid");
 
-		if($host_templateid != 0)
-		{
-			add_templates_to_host($hostid,$host_templateid);
-			sync_host_with_templates($hostid);
-		}
-		if($groups != "")
-		{
-			update_host_groups($hostid,$groups);
-		}
-		if($newgroup != "")
-		{
-			add_group_to_host($hostid,$newgroup);
-		}
+		update_host_groups($hostid,$groups);
+
+		add_group_to_host($hostid,$newgroup);
+
+		sync_host_with_templates($hostid);
 
 		update_profile("HOST_PORT",$port);
 		
-		return	$result;
+		return	$hostid;
 	}
 
-	function	update_host($hostid,$host,$port,$status,$useip,$ip,$newgroup,$groups)
+	function	update_host($hostid,$host,$port,$status,$useip,$ip,$templateid,$newgroup,$groups)
 	{
 		if(!check_right("Host","U",$hostid))
 		{
 			error("Insufficient permissions");
-			return 0;
+			return FALSE;
 		}
 
- 		if (!eregi('^([0-9a-zA-Z\_\.-]+)$', $host, $arr)) 
-		{
-			error("Hostname should contain 0-9a-zA-Z_.- characters only");
-			return 0;
-		}
+		$old_host = get_host_by_hostid($hostid);
 
-		$sql="select * from hosts where host=".zbx_dbstr($host)." and hostid<>$hostid";
-		$result=DBexecute($sql);
-		if(DBnum_rows($result)>0)
-		{
-			error("Host '$host' already exists");
-			return 0;
-		}
+		$result = db_save_host($host,$port,$status,$useip,$ip,$templateid,$hostid);
+		if(!$result)
+			return $result;
 
+		update_host_groups($hostid, $groups);
 
-		if($useip=="on" || $useip=="yes" || $useip==1)
-		{
-			$useip=1;
-		}
-		else
-		{
-			$useip=0;
-		}
+		add_group_to_host($hostid,$newgroup);
 
-		$sql="update hosts set host=".zbx_dbstr($host).",port=$port,useip=$useip,ip=".zbx_dbstr($ip)." where hostid=$hostid";
-		$result=DBexecute($sql);
+		if($old_host["templateid"] != $templateid)
+			sync_host_with_templates($hostid);
 
-
-		update_host_status($hostid, $status);
-		update_host_groups($hostid,$groups);
-		if($newgroup != "")
-		{
-			add_group_to_host($hostid,$newgroup);
-		}
 		return	$result;
 	}
 
-	# Add templates linked to template host to the host
-
-	function	add_templates_to_host($hostid,$host_templateid)
+# Sync host with linked template
+	function	sync_host_with_templates($hostid)
 	{
-		$sql="select * from hosts_templates where hostid=$host_templateid";
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
+		$host = get_host_by_hostid($hostid);
+		delete_template_items_by_hostid($hostid);
+// TODO		delete_template_triggers_by_hostid($hostid);
+// TODO		delete_template_hosts_by_hostid($hostid);
+		
+		if($host["templateid"] > 0)
 		{
-			add_template_linkage($hostid,$row["templateid"],$row["items"],$row["triggers"],
-						$row["graphs"]);
+// start host syncing
+			sync_items_with_template($hostid);
+// TODO			sync_triggers_with_template($hostid);
+// TODO			sync_hosts_with_teplates($hostid);
+// end host syncing
 		}
 	}
 
@@ -243,13 +355,24 @@
 		if($status != $old_status)
 		{
 			update_trigger_value_to_unknown_by_hostid($hostid);
-			$sql="update hosts set status=$status where hostid=$hostid and status!=".HOST_STATUS_DELETED;
 			info("Updated status of host ".$row["host"]);
-			return	DBexecute($sql);
+			return	DBexecute("update hosts set status=$status".
+				" where hostid=$hostid and status!=".HOST_STATUS_DELETED);
 		}
 		else
 		{
 			return 1;
 		}
+	}
+	
+	function	get_template_path($hostid)
+	{
+		$host = get_host_by_hostid($hostid);
+
+		if ($host["templateid"]==0)
+			return "/";
+
+		$tmp_host = get_host_by_hostid($host["templateid"]);	
+		return get_template_path($tmp_host["hostid"]).$tmp_host["host"]."/";
 	}
 ?>

@@ -52,7 +52,7 @@
 
 	$h1=S_QUEUE_OF_ITEMS_TO_BE_UPDATED_BIG;
 
-#	$h2=S_GROUP."&nbsp;";
+#	$h2=S_GROUP.SPACE;
 	$h2="";
 	$h2=$h2."<select class=\"biginput\" name=\"show\" onChange=\"submit()\">";
 	$h2=$h2.form_select("show",0,S_OVERVIEW);

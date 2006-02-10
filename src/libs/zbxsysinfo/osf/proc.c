@@ -295,6 +295,8 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
     char    usrname[MAX_STRING_LEN];
     char    procstat[MAX_STRING_LEN];
 
+    struct  passwd *usrinfo = NULL;
+
         assert(result);
 
         init_result(result);
@@ -328,10 +330,16 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	}
 	else
 	{
+		usrinfo = getpwnam(line);
+		if(usrinfo == NULL)
+		{
+			/* incorrect user name */
+			return SYSINFO_RET_FAIL;
+		}
 		if(procname[0]=='\0')
-			snprintf(usrname,MAX_STRING_LEN-1,"$2==\"%s\"",line);	
+			snprintf(usrname,MAX_STRING_LEN-1,"$2==\"%u\"",usrinfo->uid_t);	
 		else
-			snprintf(usrname,MAX_STRING_LEN-1,"&&$2==\"%s\"",line);	
+			snprintf(usrname,MAX_STRING_LEN-1,"&&$2==\"%u\"",usrinfo->uid_t);	
 	}
     
 	if(get_param(param, 3, procstat, MAX_STRING_LEN) != 0)
@@ -399,7 +407,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		snprintf(proccomm,MAX_STRING_LEN-1,"c=$4;for(i=5;i<=NF;i++)c=c" "$i;if(match(c,\"%s\")==0)next;",line);
 	}
     
-	snprintf(line, MAX_STRING_LEN-1,"ps -eostate,user,comm,args|tail -n+2|cut -b1,5-|awk 'BEGIN{j=0}%s%s%s{%sj++}END{print j}'",procname,usrname,procstat,proccomm);
+	snprintf(line, MAX_STRING_LEN-1,"ps -eostate,uid,comm,args|tail -n+2|cut -b1,5-|awk 'BEGIN{j=0}%s%s%s{%sj++}END{print j}'",procname,usrname,procstat,proccomm);
 	
 	return EXECUTE(cmd, line, flags, result);
 		

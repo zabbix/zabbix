@@ -278,10 +278,10 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 	function	get_template_permission_str($num)
 	{
-		$str="&nbsp;";
-		if(($num&1)==1)	$str=$str.S_ADD."&nbsp;";
-		if(($num&2)==2)	$str=$str.S_UPDATE."&nbsp;";
-		if(($num&4)==4)	$str=$str.S_DELETE."&nbsp;";
+		$str=SPACE;
+		if(($num&1)==1)	$str=$str.S_ADD.SPACE;
+		if(($num&2)==2)	$str=$str.S_UPDATE.SPACE;
+		if(($num&4)==4)	$str=$str.S_DELETE.SPACE;
 		return $str;
 	}
 	
@@ -1227,7 +1227,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		if(($sub["url"]=="screenconf.php")&&!check_anyright("Screen","U"))						continue;
 		if(($sub["url"]=="services.php")&&!check_anyright("Service","U"))						continue;
 
-		echo "<a href=\"".$sub["url"]."\" class=\"highlight\">".$sub["label"]."</a><span class=\"divider\">&nbsp;&nbsp;|&nbsp;</span>\n";
+		echo "<a href=\"".$sub["url"]."\" class=\"highlight\">".$sub["label"]."</a><span class=\"divider\">".SPACE.SPACE."|".SPACE."</span>\n";
 	}
 ?>
 </b></td></tr>
@@ -1598,178 +1598,6 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 			$sql="update items set nextcheck=0 where itemid=".$row["itemid"];
 			DBexecute($sql);
 		}
-	}
-
-	# Add host-template linkage
-	function add_template_linkage($hostid,$templateid,$items,$triggers,$graphs)
-	{
-		$sql="insert into hosts_templates (hostid,templateid,items,triggers,graphs) values ($hostid,$templateid,$items,$triggers,$graphs)";
-		return	DBexecute($sql);
-	}
-
-	# Update host-template linkage
-	function update_template_linkage($hosttemplateid,$hostid,$templateid,$items,$triggers,$graphs)
-	{
-		$sql="update hosts_templates set hostid=$hostid,templateid=$templateid,items=$items,triggers=$triggers,graphs=$graphs where hosttemplateid=$hosttemplateid";
-		return	DBexecute($sql);
-	}
-
-	# Delete host-template linkage
-	function delete_template_linkage($hosttemplateid)
-	{
-		$sql="delete from hosts_templates where hosttemplateid=$hosttemplateid";
-		return	DBexecute($sql);
-	}
-
-	function	add_group_to_host($hostid,$newgroup)
-	{
-		$sql="insert into groups (groupid,name) values (NULL,".zbx_dbstr($newgroup).")";
-		$result=DBexecute($sql);
-		if(!$result)
-		{
-			return	$result;
-		}
-		
-		$groupid=DBinsert_id($result,"groupd","groupid");
-
-		$sql="insert into hosts_groups (hostid,groupid) values ($hostid,$groupid)";
-		$result=DBexecute($sql);
-
-		return $result;
-	}
-
-	function	update_host_groups_by_groupid($groupid,$hosts)
-	{
-		$count=count($hosts);
-
-		$sql="delete from hosts_groups where groupid=$groupid";
-		DBexecute($sql);
-
-		for($i=0;$i<$count;$i++)
-		{
-			$sql="insert into hosts_groups (hostid,groupid) values (".$hosts[$i].",$groupid)";
-			DBexecute($sql);
-		}
-	}
-
-	function	update_host_groups($hostid,$groups)
-	{
-		$count=count($groups);
-
-		$sql="delete from hosts_groups where hostid=$hostid";
-		DBexecute($sql);
-
-		for($i=0;$i<$count;$i++)
-		{
-			$sql="insert into hosts_groups (hostid,groupid) values ($hostid,".$groups[$i].")";
-			DBexecute($sql);
-		}
-	}
-
-	function	add_host_group($name,$hosts)
-	{
-//		if(!check_right("Host","A",0))
-//		{
-//			error("Insufficient permissions");
-//			return 0;
-//		}
-
-		$sql="select * from groups where name=".zbx_dbstr($name);
-		$result=DBexecute($sql);
-		if(DBnum_rows($result)>0)
-		{
-			error("Group '$name' already exists");
-			return 0;
-		}
-
-		$sql="insert into groups (name) values (".zbx_dbstr($name).")";
-		$result=DBexecute($sql);
-		if(!$result)
-		{
-			return	$result;
-		}
-		
-		$groupid=DBinsert_id($result,"groups","groupid");
-
-		update_host_groups_by_groupid($groupid,$hosts);
-
-		return $result;
-	}
-
-	function	update_host_group($groupid,$name,$users)
-	{
-//		if(!check_right("Host","U",0))
-//		{
-//			error("Insufficient permissions");
-//			return 0;
-//		}
-
-		$sql="select * from groups where name=".zbx_dbstr($name)." and groupid<>$groupid";
-		$result=DBexecute($sql);
-		if(DBnum_rows($result)>0)
-		{
-			error("Group '$name' already exists");
-			return 0;
-		}
-
-		$sql="update groups set name=".zbx_dbstr($name)." where groupid=$groupid";
-		$result=DBexecute($sql);
-		if(!$result)
-		{
-			return	$result;
-		}
-		
-		update_host_groups_by_groupid($groupid,$users);
-
-		return $result;
-	}
-
-	# Sync host with hard-linked templates
-	function	sync_host_with_templates($hostid)
-	{
-		$sql="select * from hosts_templates where hostid=$hostid";
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
-			sync_host_with_template($hostid,$row["templateid"],$row["items"],$row["triggers"],
-                                                $row["graphs"]);
-		}
-	}
-
-	# Sync host with hard-linked template
-	function	sync_host_with_template($hostid,$templateid,$items,$triggers,$graphs)
-	{
-		if(!isset($templateid)||($templateid==0))
-		{
-			error("Select template first");
-			return 0;
-		}
-
-		// Sync items
-		$sql="select itemid from items where hostid=$templateid";
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{	
-			add_item_to_linked_hosts($row["itemid"],$hostid);
-		}
-
-		// Sync triggers
-		$sql="select distinct t.triggerid from hosts h, items i,triggers t,functions f where h.hostid=$templateid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.itemid=f.itemid";
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{	
-			add_trigger_to_linked_hosts($row["triggerid"],$hostid);
-		}
-
-		// Sync graphs
-		$sql="select distinct gi.gitemid from graphs g,graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=$templateid and g.graphid=gi.graphid";
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
-			add_graph_item_to_linked_hosts($row["gitemid"],$hostid);
-		}
-
-		return TRUE;
 	}
 
 	# Delete Media definition by mediatypeid
@@ -2462,8 +2290,10 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 				S_ZABBIX_VER.SPACE.S_COPYRIGHT_BY.SPACE.S_SIA_ZABBIX,
 				"http://www.zabbix.com", "highlight"),
 				"page_footer_l"),
-			new CCol("<span class='divider'>&nbsp;&nbsp;|&nbsp;&nbsp;</span>".
-				S_CONNECTED_AS."&nbsp;".$USER_DETAILS["alias"],
+			new CCol(array(
+					new CSpan(SPACE.SPACE."|".SPACE.SPACE,"divider"),
+					S_CONNECTED_AS.SPACE.$USER_DETAILS["alias"]
+				),
 				"page_footer_r")
 			));
 		$table->Show();
@@ -2919,7 +2749,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 	echo "<TD ALIGN=LEFT>";
 
 	echo "<div align=left>";
-	echo "<b>".S_PERIOD.":</b>&nbsp;";
+	echo "<b>".S_PERIOD.":</b>".SPACE;
 
 	$hour=3600;
 		
@@ -2944,14 +2774,14 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 			$tmp=$_REQUEST["period"]+$sec;
 			echo("<A HREF=\"charts.php?period=$tmp".url_param($resource).url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">+</A>");
 
-			echo "]&nbsp;";
+			echo "]".SPACE;
 		}
 
 		echo("</div>");
 
 	echo "</TD>";
 	echo "<TD BGCOLOR=#FFFFFF WIDTH=15% ALIGN=RIGHT>";
-	echo "<b>".nbsp(S_KEEP_PERIOD).":</b>&nbsp;";
+	echo "<b>".nbsp(S_KEEP_PERIOD).":</b>".SPACE;
 		if($_REQUEST["keep"] == 1)
 		{
 			echo("[<A HREF=\"charts.php?keep=0".url_param($resource).url_param("from").url_param("period").url_param("fullscreen")."\">".S_ON_C."</a>]");
@@ -2967,7 +2797,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 	if(isset($_REQUEST["stime"]))
 	{
 		echo "<div align=left>" ;
-		echo "<b>".S_MOVE.":</b>&nbsp;" ;
+		echo "<b>".S_MOVE.":</b>".SPACE;
 
 		$day=24;
 // $a already defined
@@ -2991,14 +2821,14 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 			$tmp=date("YmdHi",$tmp);
 			echo("<A HREF=\"charts.php?stime=$tmp".url_param($resource).url_param("period").url_param("keep").url_param("fullscreen")."\">+</A>");
 
-			echo "]&nbsp;";
+			echo "]".SPACE;
 		}
 		echo("</div>");
 	}
 	else
 	{
 		echo "<div align=left>";
-		echo "<b>".S_MOVE.":</b>&nbsp;";
+		echo "<b>".S_MOVE.":</b>".SPACE;
 
 		$day=24;
 // $a already defined
@@ -3022,7 +2852,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 				echo "+";
 			}
 
-			echo "]&nbsp;";
+			echo "]".SPACE;
 		}
 		echo("</div>");
 	}
@@ -3040,7 +2870,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		{
 			echo "<input name=\"stime\" class=\"biginput\" value=\"yyyymmddhhmm\" size=12>";
 		}
-		echo "&nbsp;";
+		echo SPACE;
 		echo "<input class=\"button\" type=\"submit\" name=\"action\" value=\"go\">";
 		echo "</form>";
 //		echo("</div>");

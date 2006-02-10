@@ -53,8 +53,8 @@
 	$h1=S_IT_SERVICES_AVAILABILITY_REPORT_BIG;
 	$h1=$h1.":"."<a href=\"srv_status.php?serviceid=".$service["serviceid"]."\">".$service["name"]."</a>";
 
-#	$h2=S_GROUP."&nbsp;";
-	$h2=S_YEAR."&nbsp;";
+#	$h2=S_GROUP.SPACE;
+	$h2=S_YEAR.SPACE;
 	$h2=$h2."<input name=\"serviceid\" type=\"hidden\" value=".$_REQUEST["serviceid"].">";
 	$h2=$h2."<select class=\"biginput\" name=\"year\" onChange=\"submit()\">";
 	$result=DBselect("select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid group by h.hostid,h.host order by h.host");
@@ -66,7 +66,7 @@
 	}
 	$h2=$h2."</select>";
 
-	$h2=$h2."&nbsp;".S_PERIOD."&nbsp;";
+	$h2=$h2.SPACE.S_PERIOD.SPACE;
 	$h2=$h2."<select class=\"biginput\" name=\"period\" onChange=\"submit()\">";
 	$h2=$h2.form_select("period","daily",S_DAILY);
 	$h2=$h2.form_select("period","weekly",S_WEEKLY);

@@ -121,7 +121,7 @@
 		$message="<pre>".htmlspecialchars($row["message"])."</pre>";
 		if($row["error"] == "")
 		{
-			$error=new CSpan("&nbsp;","off");
+			$error=new CSpan(SPACE,"off");
 		}
 		else
 		{

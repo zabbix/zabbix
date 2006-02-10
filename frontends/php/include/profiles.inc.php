@@ -21,7 +21,9 @@
 <?php
 	# Add Host Profile
 
-	function	add_host_profile($hostid,$devicetype,$name,$os,$serialno,$tag,$macaddress,$hardware,$software,$contact,$location,$notes)
+	function	add_host_profile(
+		$hostid,$devicetype,$name,$os,$serialno,$tag,$macaddress,
+		$hardware,$software,$contact,$location,$notes)
 	{
 		// If user has update permission then ok
 		if(!check_right("Host","U",0))
@@ -30,41 +32,19 @@
 			return 0;
 		}
 
-		$sql="select * from hosts_profiles where hostid=$hostid";
-		$result=DBexecute($sql);
+		$result=DBexecute("select * from hosts_profiles where hostid=$hostid");
 		if(DBnum_rows($result)>0)
 		{
 			error("Host profile already exists");
 			return 0;
 		}
 
-		$sql="insert into hosts_profiles (hostid,devicetype,name,os,serialno,tag,macaddress,hardware,software,contact,location,notes) values ($hostid,".zbx_dbstr($devicetype).",".zbx_dbstr($name).",".zbx_dbstr($os).",".zbx_dbstr($serialno).",".zbx_dbstr($tag).",".zbx_dbstr($macaddress).",".zbx_dbstr($hardware).",".zbx_dbstr($software).",".zbx_dbstr($contact).",".zbx_dbstr($location).",".zbx_dbstr($notes).")";
-		$result=DBexecute($sql);
-		
-		return	$result;
-	}
-
-	# Update Host Profile
-
-	function	update_host_profile($hostid,$devicetype,$name,$os,$serialno,$tag,$macaddress,$hardware,$software,$contact,$location,$notes)
-	{
-		// If user has update permission then ok
-		if(!check_right("Host","U",0))
-		{
-			error("Insufficient permissions");
-			return 0;
-		}
-
-		$sql="select * from hosts_profiles where hostid=$hostid";
-		$result=DBexecute($sql);
-		if(DBnum_rows($result)==0)
-		{
-			error("Host profile does not exist");
-			return 0;
-		}
-
-		$sql="update hosts_profiles set devicetype=".zbx_dbstr($devicetype).",name=".zbx_dbstr($name).",os=".zbx_dbstr($os).",serialno=".zbx_dbstr($serialno).",tag=".zbx_dbstr($tag).",macaddress=".zbx_dbstr($macaddress).",hardware=".zbx_dbstr($hardware).",software=".zbx_dbstr($software).",contact=".zbx_dbstr($contact).",location=".zbx_dbstr($location).",notes=".zbx_dbstr($notes)." where hostid=$hostid";
-		$result=DBexecute($sql);
+		$result=DBexecute("insert into hosts_profiles".
+			" (hostid,devicetype,name,os,serialno,tag,macaddress,hardware,software,contact,".
+			"location,notes) values ($hostid,".zbx_dbstr($devicetype).",".zbx_dbstr($name).",".
+			zbx_dbstr($os).",".zbx_dbstr($serialno).",".zbx_dbstr($tag).",".zbx_dbstr($macaddress).
+			",".zbx_dbstr($hardware).",".zbx_dbstr($software).",".zbx_dbstr($contact).",".
+			zbx_dbstr($location).",".zbx_dbstr($notes).")");
 		
 		return	$result;
 	}
@@ -78,8 +58,7 @@
 			error("Insufficient permissions");
 			return 0;
 		}
-		$sql="delete from hosts_profiles where hostid=$hostid";
-		$result=DBexecute($sql);
+		$result=DBexecute("delete from hosts_profiles where hostid=$hostid");
 
 		return $result;
 	}
