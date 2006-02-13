@@ -50,8 +50,14 @@
 	function form_select($var, $value, $label)
 	{
 		global $_REQUEST;
-	
-		return "<option value=\"$value\" ".iif(isset($_REQUEST[$var])&&$_REQUEST[$var]==$value,"selected","").">$label";
+
+		$selected = "";
+		if(!is_null($var))
+		{
+			if(isset($_REQUEST[$var])&&$_REQUEST[$var]==$value)
+				$selected = "selected";
+		}
+		return "<option value=\"$value\" $selected>$label";
 	}
 
 	function form_input($name, $value, $size)

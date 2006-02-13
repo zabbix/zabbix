@@ -19,6 +19,13 @@
 **/
 ?>
 <?php
+
+	function unset_request($key)
+	{
+//		SDI("unset: $key");
+		unset($_REQUEST[$key]);
+	}
+
 	define('ZBX_VALID_OK',		0);
 	define('ZBX_VALID_ERROR',	1);
 	define('ZBX_VALID_WARNING',	2);
@@ -100,8 +107,7 @@
 		{
 			if(!isset($fields[$key]))
 			{
-//echo "Unset: $key<br>";
-				unset($_REQUEST[$key]);
+				unset_request($key);
 			}
 		}
 	}
@@ -114,8 +120,7 @@
 
 			if(($flags&P_NZERO)&&(isset($_REQUEST[$field]))&&($_REQUEST[$field]==0))
 			{
-//echo "Unset: $field<br>";
-				unset($_REQUEST[$field]);
+				unset_request($field);
 			}
 		}
 	}
@@ -129,8 +134,7 @@
 			
 			if(($flags&P_ACT)&&(isset($_REQUEST[$field])))
 			{
-//echo "Unset:".$field."<br>";
-				unset($_REQUEST[$field]);
+				unset_request($field);
 			}
 		}
 	}
@@ -139,8 +143,7 @@
 	{
 		foreach($_REQUEST as $key => $val)
 		{
-//echo "Unset:".$key."<br>";
-			unset($_REQUEST[$key]);
+			unset_request($key);
 		}
 	}
 
@@ -231,8 +234,7 @@
 			if(!isset($_REQUEST[$field]))
 				return ZBX_VALID_OK;
 
-//echo "Unset:".$field."<br>";
-			unset($_REQUEST[$field]);
+			unset_request($field);
 
 			if($flags&P_SYS)
 			{

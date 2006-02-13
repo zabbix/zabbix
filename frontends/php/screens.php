@@ -20,6 +20,8 @@
 ?>
 <?php
 	include "include/config.inc.php";
+
+
 	$page["title"] = "S_CUSTOM_SCREENS";
 	$page["file"] = "screens.php";
 
@@ -39,16 +41,14 @@
 ?>
 
 <?php
-	$effectiveperiod=navigation_bar_calc();
-?>
-
-<?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"screenid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,NULL),
 		"dec"=>			array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
 		"inc"=>			array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
 		"from"=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
+		"left"=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
+		"right"=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
 		"period"=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
 		"stime"=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	NULL,NULL),
 		"action"=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'go'"),NULL),
@@ -57,6 +57,10 @@
 	);
 
 	check_fields($fields);
+?>
+
+<?php
+	$effectiveperiod=navigation_bar_calc();
 ?>
 
 <?php
@@ -196,7 +200,7 @@
 			{
 				$item = new CLink(
 					new CImg("chart2.php?graphid=$resourceid&width=$width&height=$height".
-						"&period=3600' border=0"),
+						"&period=$effectiveperiod".url_param("stime").url_param("from")),
 					"charts.php?graphid=$resourceid".url_param("period").
 						url_param("inc").url_param("dec")
 					);
@@ -205,7 +209,7 @@
 			{
 				$item = new CLink(
 					new CImg("chart.php?itemid=$resourceid&width=$width&height=$height".
-                                        	"&period=3600"),
+                                        	"&period=$effectiveperiod".url_param("stime").url_param("from")),
 					"history.php?action=showhistory&itemid=$resourceid".
 						url_param("period").url_param("inc").url_param("dec")
 					);
@@ -213,7 +217,7 @@
 			else if( ($screenitemid!=0) && ($resource==2) )
 			{
 				$item = new CImg("map.php?noedit=1&sysmapid=$resourceid".
-	                                        "&width=$width&height=$height&period=3600");
+	                                        "&width=$width&height=$height");
 			}
 			else if( ($screenitemid!=0) && ($resource==3) )
 			{
