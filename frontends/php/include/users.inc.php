@@ -114,6 +114,17 @@
 		return DBexecute($sql);
 	}
 
+	function	get_usergroup_by_groupid($groupid)
+	{
+		$result=DBselect("select * from usrgrp where usrgrpid=".$groupid);
+		if(DBnum_rows($result) == 1)
+		{
+			return DBfetch($result);
+		}
+		error("No user groups with usrgrpid=[$groupid]");
+		return  FALSE;
+	}
+
 	function	get_user_by_userid($userid)
 	{
 		$sql="select * from users where userid=$userid"; 

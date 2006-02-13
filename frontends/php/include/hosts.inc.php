@@ -303,14 +303,14 @@
 		return DBexecute($sql);
 	}
 
-	function	get_group_by_groupid($groupid)
+	function	get_hostgroup_by_groupid($groupid)
 	{
 		$result=DBselect("select * from groups where groupid=".$groupid);
 		if(DBnum_rows($result) == 1)
 		{
 			return DBfetch($result);
 		}
-		error("No groups with groupid=[$groupid]");
+		error("No host groups with groupid=[$groupid]");
 		return  FALSE;
 	}
 

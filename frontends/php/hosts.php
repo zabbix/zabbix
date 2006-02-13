@@ -240,7 +240,7 @@
 		if(isset($_REQUEST["groupid"])){
 			$result=delete_host_group($_REQUEST["groupid"]);
 			if($result){
-//				$group = get_group_by_groupid($_REQUEST["groupid"]);
+//				$group = get_hostgroup_by_groupid($_REQUEST["groupid"]);
 //				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GROUP,
 //					"Group [".$group["name"]."]");
 
