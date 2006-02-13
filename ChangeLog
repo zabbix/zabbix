@@ -1,5 +1,6 @@
 Changes for 1.1beta7:
 
+ - fixed navigation bar for Sreens (Eugene)
  - fixed incorrect groupid error for actions (Eugene)
  - improved Templates logic (Eugene)
  - speed improvement for proc.num of Tru64 (Eugene)
