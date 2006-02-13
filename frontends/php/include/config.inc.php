@@ -647,20 +647,6 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		return	"$priorities,$md5sum";
 	}
 
-	function	get_usergroup_by_usrgrpid($usrgrpid)
-	{
-		$result=DBselect("select usrgrpid,name from usrgrp where usrgrpid=$usrgrpid"); 
-		if(DBnum_rows($result) == 1)
-		{
-			return	DBfetch($result);	
-		}
-		else
-		{
-			error("No user group with usrgrpid=[$usrgrpid]");
-		}
-		return	$result;
-	}
-
 	function	get_image_by_name($imagetype,$name)
 	{
 		$sql="select * from images where imagetype=$imagetype and name=".zbx_dbstr($name); 

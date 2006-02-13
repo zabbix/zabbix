@@ -118,7 +118,7 @@
 			if(isset($_REQUEST["conditions"])) foreach($_REQUEST["conditions"] as $val)
 				add_action_condition($actionid,$val["type"],$val["operator"],$val["value"]);
 
-			if(isset($_REQUEST["userid"]))
+			if($_REQUEST["recipient"] == RECIPIENT_TYPE_USER)
 			{
 				$user=get_user_by_userid($_REQUEST["userid"]);
 				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ACTION,
@@ -126,7 +126,7 @@
 			}
 			else
 			{
-				$group=get_group_by_groupid($_REQUEST["usrgrpid"]);
+				$group=get_usergroup_by_groupid($_REQUEST["userid"]);
 				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ACTION,
 					"User [".$group["name"]."] subject [".$_REQUEST["subject"]."]");
 			}
@@ -219,7 +219,7 @@
 			}
 			else
 			{
-				$groupd=get_usergroup_by_usrgrpid($row["userid"]);
+				$groupd=get_usergroup_by_groupid($row["userid"]);
 				$recipient=$groupd["name"];
 			}
 
