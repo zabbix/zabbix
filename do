@@ -90,7 +90,7 @@ if [ "$configure" = "yes" ]
 then
   echo "Configuring..."
   echo "Configuring..." >> WARNINGS
-  export CFLAGS="-Wall"
+  #export CFLAGS="-Wall"
   #export CFLAGS="-Wall -pedantic"
   ./configure $config_param 2>>WARNINGS 
 fi
