@@ -1,5 +1,6 @@
 1.1beta7:
 
+ - filters in action defninition form (host)
  - autodiscovery: http://www.zabbix.com/forum/showthread.php?t=2137
  - aggregate statistics: http://www.zabbix.com/forum/showthread.php?t=2151
  - overview screen: http://www.zabbix.com/forum/showthread.php?t=2078
