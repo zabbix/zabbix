@@ -1,5 +1,8 @@
 1.1beta7:
 
+ - autodiscovery: http://www.zabbix.com/forum/showthread.php?t=2137
+ - aggregate statistics: http://www.zabbix.com/forum/showthread.php?t=2151
+ - overview screen: http://www.zabbix.com/forum/showthread.php?t=2078
  - a button to flush item history
  - execution of commands on monitored hosts in case of pre-defined events
  - server side checks (new type of check)
