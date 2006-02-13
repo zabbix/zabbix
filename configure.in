@@ -475,129 +475,139 @@ AM_CONDITIONAL(AGENT, test x$agent = xyes)
     
 have_db="no"
 
-AC_MSG_CHECKING(for MySQL support)
-AC_ARG_WITH(mysql,
-[
-What DBMS do you want to use (please select only one):
-  --with-mysql[=DIR]       Include MySQL support.  DIR is the MySQL base
-                         install directory, default is to search through
-                         a number of common places for the MySQL files.],
-[
-  if test "$withval" != "no"; then
-  	if test "$withval" = "yes"; then
-		if test -f /usr/local/mysql/include/mysql/mysql.h; then
-			MYSQL_INCDIR=/usr/local/mysql/include/mysql
-			MYSQL_LIBDIR=/usr/local/mysql/lib/mysql
-		elif test -f /usr/include/mysql/mysql.h; then
-			MYSQL_INCDIR=/usr/include/mysql
-			MYSQL_LIBDIR=/usr/lib/mysql
-		elif test -f /usr/include/mysql.h; then
-			MYSQL_INCDIR=/usr/include
-			MYSQL_LIBDIR=/usr/lib
-		elif test -f /usr/local/include/mysql/mysql.h; then
-			MYSQL_INCDIR=/usr/local/include/mysql
-			MYSQL_LIBDIR=/usr/local/lib/mysql
-		elif test -f /usr/local/include/mysql.h; then
-			MYSQL_INCDIR=/usr/local/include
-			MYSQL_LIBDIR=/usr/local/lib
+if test "$server" = "yes"; then
+	AC_MSG_CHECKING(for MySQL support)
+	AC_ARG_WITH(mysql,
+	[
+	What DBMS do you want to use (please select only one):
+	  --with-mysql[=DIR]       Include MySQL support.  DIR is the MySQL base
+				 install directory, default is to search through
+				 a number of common places for the MySQL files.],
+	[
+	  if test "$withval" != "no"; then
+		if test "$withval" = "yes"; then
+			if test -f /usr/local/mysql/include/mysql/mysql.h; then
+				MYSQL_INCDIR=/usr/local/mysql/include/mysql
+				MYSQL_LIBDIR=/usr/local/mysql/lib/mysql
+			elif test -f /usr/include/mysql/mysql.h; then
+				MYSQL_INCDIR=/usr/include/mysql
+				MYSQL_LIBDIR=/usr/lib/mysql
+			elif test -f /usr/include/mysql.h; then
+				MYSQL_INCDIR=/usr/include
+				MYSQL_LIBDIR=/usr/lib
+			elif test -f /usr/local/include/mysql/mysql.h; then
+				MYSQL_INCDIR=/usr/local/include/mysql
+				MYSQL_LIBDIR=/usr/local/lib/mysql
+			elif test -f /usr/local/include/mysql.h; then
+				MYSQL_INCDIR=/usr/local/include
+				MYSQL_LIBDIR=/usr/local/lib
+			else
+			AC_MSG_RESULT(no)
+			AC_MSG_ERROR(Invalid MySQL directory - unable to find mysql.h)
+			fi
 		else
-    		AC_MSG_RESULT(no)
-    		AC_MSG_ERROR(Invalid MySQL directory - unable to find mysql.h)
+			if test -f $withval/include/mysql/mysql.h; then
+				MYSQL_INCDIR=$withval/include/mysql
+				MYSQL_LIBDIR=$withval/lib/mysql
+			elif test -f $withval/include/mysql.h; then
+				MYSQL_INCDIR=$withval/include
+				MYSQL_LIBDIR=$withval/lib
+			else
+			AC_MSG_RESULT(no)
+			AC_MSG_ERROR(Invalid MySQL directory - unable to find mysql.h under $withval)
+			fi
 		fi
-   	else
-		if test -f $withval/include/mysql/mysql.h; then
-   			MYSQL_INCDIR=$withval/include/mysql
-   			MYSQL_LIBDIR=$withval/lib/mysql
-		elif test -f $withval/include/mysql.h; then
-   			MYSQL_INCDIR=$withval/include
-   			MYSQL_LIBDIR=$withval/lib
+		MYSQL_INCLUDE=-I$MYSQL_INCDIR
+		MYSQL_LFLAGS="-L$MYSQL_LIBDIR"
+		MYSQL_LIBS="-lmysqlclient"
+
+		AC_DEFINE(HAVE_MYSQL,1,[Define to 1 if MySQL should be enabled.])
+		AC_MSG_RESULT(yes)
+		have_db="MySQL"
+	    dnl MySQL requires -lm sometime
+	dnl	AC_CHECK_FUNC(floor, , AC_CHECK_LIB(m, floor, MYSQL_LFLAGS="$MYSQL_LFLAGS -lm"))
+		AC_CHECK_FUNC(floor, , AC_CHECK_LIB(m, floor, MYSQL_LIBS="$MYSQL_LIBS -lm"))
+	    dnl MySQL 3.23 requires -lz sometime
+	dnl This does not work for some reason
+	dnl    AC_CHECK_FUNC(compress, , AC_CHECK_LIB(z, compress, MYSQL_LFLAGS="$MYSQL_LFLAGS -lz"))
+	dnl	AC_CHECK_LIB(z, compress, MYSQL_LFLAGS="$MYSQL_LFLAGS -lz")
+		AC_CHECK_LIB(z, compress, MYSQL_LIBS="$MYSQL_LIBS -lz")
+
 		else
-    		AC_MSG_RESULT(no)
-    		AC_MSG_ERROR(Invalid MySQL directory - unable to find mysql.h under $withval)
+			AC_MSG_RESULT(no)
 		fi
-   	fi
-	MYSQL_INCLUDE=-I$MYSQL_INCDIR
-	MYSQL_LFLAGS="-L$MYSQL_LIBDIR"
-	MYSQL_LIBS="-lmysqlclient"
+	],[
+	  AC_MSG_RESULT(no)
+	])
+	AC_SUBST(MYSQL_INCLUDE)
+	AC_SUBST(MYSQL_LFLAGS)
+	AC_SUBST(MYSQL_LIBS)
 
-	AC_DEFINE(HAVE_MYSQL,1,[Define to 1 if MySQL should be enabled.])
-	AC_MSG_RESULT(yes)
-	have_db="MySQL"
-    dnl MySQL requires -lm sometime
-dnl	AC_CHECK_FUNC(floor, , AC_CHECK_LIB(m, floor, MYSQL_LFLAGS="$MYSQL_LFLAGS -lm"))
-	AC_CHECK_FUNC(floor, , AC_CHECK_LIB(m, floor, MYSQL_LIBS="$MYSQL_LIBS -lm"))
-    dnl MySQL 3.23 requires -lz sometime
-dnl This does not work for some reason
-dnl    AC_CHECK_FUNC(compress, , AC_CHECK_LIB(z, compress, MYSQL_LFLAGS="$MYSQL_LFLAGS -lz"))
-dnl	AC_CHECK_LIB(z, compress, MYSQL_LFLAGS="$MYSQL_LFLAGS -lz")
-	AC_CHECK_LIB(z, compress, MYSQL_LIBS="$MYSQL_LIBS -lz")
 
+	AC_MSG_CHECKING(for PostgreSQL support)
+	AC_ARG_WITH(pgsql,
+	[  --with-pgsql[=DIR]       Include PostgreSQL support.  DIR is the PostgreSQL
+				 base install directory, defaults to /usr/local/pgsql.],
+	[
+	  if test "$withval" != "no"; then
+	      if test "$have_db" != "no"; then
+		  AC_MSG_RESULT(error)
+		  AC_MSG_ERROR("You can configure for only one database.");
+	      fi
+		if test "$withval" = "yes"; then
+			if test -f /usr/include/pgsql/libpq-fe.h; then
+				PGSQL_INCDIR=/usr/include/pgsql
+			elif test -f /usr/include/postgresql/libpq-fe.h; then
+				PGSQL_INCDIR=/usr/include/postgresql
+			elif test -f /usr/local/include/libpq-fe.h; then
+				PGSQL_INCDIR=/usr/local/include
+			elif test -f /usr/local/include/pgsql/libpq-fe.h; then
+				PGSQL_INCDIR=/usr/local/include/pgsql
+			else
+				PGSQL_INCDIR=/usr/local/pgsql/include
+			fi
+			if test -f /usr/lib/libpq.a; then
+				PGSQL_LIBDIR=/usr/lib
+			elif test -f /usr/local/lib/libpq.a; then
+				PGSQL_LIBDIR=/usr/local/lib
+			else
+				PGSQL_LIBDIR=/usr/local/pgsql/lib
+			fi
+		else
+			PGSQL_INCDIR=$withval/include
+			test -d $withval/include/pgsql && PGSQL_INCDIR=$withval/include/pgsql
+			PGSQL_LIBDIR=$withval/lib
+			test -d $withval/lib/pgsql && PGSQL_LIBDIR=$withval/lib/pgsql
+		fi
+	    PGSQL_INCLUDE=-I$PGSQL_INCDIR
+	    PGSQL_LFLAGS="-L$PGSQL_LIBDIR"
+	    PGSQL_LIBS="-lpq"
+	dnl To avoid linking of crypt with the agent
+	dnl    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt, LIBS="-lcrypt $LIBS"))
+	dnl    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  PGSQL_LFLAGS="-lcrypt $PGSQL_LFLAGS"))
+	    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  PGSQL_LIBS="-lcrypt"))
+
+	    AC_DEFINE(HAVE_PGSQL,1,[Define to 1 if PostgreSQL should be enabled.])
+	    AC_MSG_RESULT(yes)
+	    have_db="PostagreSQL"
+	  else
+	    AC_MSG_RESULT(no)
+	  fi
+	],[
+	  AC_MSG_RESULT(no)
+	])
+	AC_SUBST(PGSQL_INCLUDE)
+	AC_SUBST(PGSQL_LFLAGS)
+	AC_SUBST(PGSQL_LIBS)
+
+	AC_MSG_CHECKING(for ZABBIX server database selection)
+	if test "$have_db" = "no"; then
+		AC_MSG_RESULT(error)
+		AC_MSG_ERROR(No database selected for ZABBIX server. Use --with-mysql or --with-pgsql.)
 	else
-		AC_MSG_RESULT(no)
+		AC_MSG_RESULT(ok)
 	fi
-],[
-  AC_MSG_RESULT(no)
-])
-AC_SUBST(MYSQL_INCLUDE)
-AC_SUBST(MYSQL_LFLAGS)
-AC_SUBST(MYSQL_LIBS)
-
-
-AC_MSG_CHECKING(for PostgreSQL support)
-AC_ARG_WITH(pgsql,
-[  --with-pgsql[=DIR]       Include PostgreSQL support.  DIR is the PostgreSQL
-                         base install directory, defaults to /usr/local/pgsql.],
-[
-  if test "$withval" != "no"; then
-      if test "$have_db" != "no"; then
-          AC_MSG_RESULT(error)
-          AC_MSG_ERROR("You can configure for only one database.");
-      fi
-  	if test "$withval" = "yes"; then
-		if test -f /usr/include/pgsql/libpq-fe.h; then
-			PGSQL_INCDIR=/usr/include/pgsql
-		elif test -f /usr/include/postgresql/libpq-fe.h; then
-			PGSQL_INCDIR=/usr/include/postgresql
-		elif test -f /usr/local/include/libpq-fe.h; then
-			PGSQL_INCDIR=/usr/local/include
-		elif test -f /usr/local/include/pgsql/libpq-fe.h; then
-			PGSQL_INCDIR=/usr/local/include/pgsql
-		else
-			PGSQL_INCDIR=/usr/local/pgsql/include
-		fi
-		if test -f /usr/lib/libpq.a; then
-			PGSQL_LIBDIR=/usr/lib
-		elif test -f /usr/local/lib/libpq.a; then
-			PGSQL_LIBDIR=/usr/local/lib
-		else
-			PGSQL_LIBDIR=/usr/local/pgsql/lib
-		fi
-   	else
-   		PGSQL_INCDIR=$withval/include
-   		test -d $withval/include/pgsql && PGSQL_INCDIR=$withval/include/pgsql
-   		PGSQL_LIBDIR=$withval/lib
-   		test -d $withval/lib/pgsql && PGSQL_LIBDIR=$withval/lib/pgsql
-   	fi
-    PGSQL_INCLUDE=-I$PGSQL_INCDIR
-    PGSQL_LFLAGS="-L$PGSQL_LIBDIR"
-    PGSQL_LIBS="-lpq"
-dnl To avoid linking of crypt with the agent
-dnl    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt, LIBS="-lcrypt $LIBS"))
-dnl    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  PGSQL_LFLAGS="-lcrypt $PGSQL_LFLAGS"))
-    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  PGSQL_LIBS="-lcrypt"))
-
-    AC_DEFINE(HAVE_PGSQL,1,[Define to 1 if PostgreSQL should be enabled.])
-    AC_MSG_RESULT(yes)
-    have_db="PostagreSQL"
-  else
-    AC_MSG_RESULT(no)
-  fi
-],[
-  AC_MSG_RESULT(no)
-])
-AC_SUBST(PGSQL_INCLUDE)
-AC_SUBST(PGSQL_LFLAGS)
-AC_SUBST(PGSQL_LIBS)
+fi
 
 AC_MSG_CHECKING(for NET-SNMP support)
 AC_ARG_WITH(net-snmp,
@@ -785,20 +795,6 @@ If you want to check LDAP servers:
 AC_SUBST(LDAP_INCLUDE)
 AC_SUBST(LDAP_LFLAGS)
 AC_SUBST(LDAP_LIBS)
-
-if test "$have_db" = "no"; then
-	echo "configure: WARNING: ## ------------------------------------------------------ ##" >&2
-	echo "configure: WARNING: ## configure WARNING:                                     ##" >&2
-	echo "configure: WARNING: ##     No database selected! Use --with-XXX, where XXX    ##" >&2
-	echo "configure: WARNING: ##   is your preferred database type (mysql or pgsql)     ##" >&2
-	echo "configure: WARNING: ##   Server processes (zabbix_suckerd and zabbix_trapper) ##" >&2
-	echo "configure: WARNING: ##   will not be created!                                 ##" >&2
-	echo "configure: WARNING: ## ------------------------------------------------------ ##" >&2
-
-#	SUBDIRS="src/zabbix_agent src/zabbix_sender"
-#else
-#	SUBDIRS="src/zabbix_agent src/zabbix_sender src/zabbix_server"
-fi
 
 #AC_SUBST(SUBDIRS)
 
