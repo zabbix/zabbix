@@ -414,6 +414,7 @@ CREATE TABLE triggers (
 	dep_level	int(2) DEFAULT '0' NOT NULL,
 	comments	blob,
 	error		varchar(128) DEFAULT '' NOT NULL,
+	templateid	int(4) DEFAULT '0' NOT NULL,
 	PRIMARY KEY	(triggerid),
 	KEY		(status),
 	KEY		(value)
