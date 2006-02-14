@@ -1,5 +1,8 @@
 1.1beta7:
 
+ - windows agent $1-$9: http://www.zabbix.com/forum/showthread.php?t=2163
+ - screen period: http://www.zabbix.com/forum/showthread.php?t=2162
+ - Macros: http://www.zabbix.com/forum/showthread.php?t=2164
  - nested maps with overall status
  - http://www.zabbix.com/forum/showthread.php?p=7611#post7611
  - filters in action defninition form (host)
