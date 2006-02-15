@@ -89,54 +89,38 @@
 /* FORM ACTIONS */
 	if(isset($_REQUEST["save"]))
 	{
-		if(validate_expression($_REQUEST["expression"])==0)
-		{
-			$now=mktime();
-			if(isset($_REQUEST["disabled"]))	{ $status=1; }
-			else			{ $status=0; }
+		$now=mktime();
+		if(isset($_REQUEST["disabled"]))	{ $status=1; }
+		else			{ $status=0; }
 
-			$deps = get_request("dependences",array());
+		$deps = get_request("dependences",array());
 
-			if(isset($_REQUEST["triggerid"])){
-				update_trigger_from_linked_hosts($_REQUEST["triggerid"],
-					$_REQUEST["expression"],$_REQUEST["description"],
-					$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],
-					$deps);
+		if(isset($_REQUEST["triggerid"])){
 
-				$result=update_trigger($_REQUEST["triggerid"],
-					$_REQUEST["expression"],$_REQUEST["description"],
-					$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],
-					$deps);
+			$result=update_trigger($_REQUEST["triggerid"],
+				$_REQUEST["expression"],$_REQUEST["description"],
+				$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],
+				$deps);
 
-				$triggerid = $_REQUEST["triggerid"];
-				show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
-			} else {
-				$triggerid=add_trigger($_REQUEST["expression"],$_REQUEST["description"],
-					$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],
-					$deps);
+			$triggerid = $_REQUEST["triggerid"];
+			show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
+		} else {
+			$triggerid=add_trigger($_REQUEST["expression"],$_REQUEST["description"],
+				$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],
+				$deps);
 
-				$result = $triggerid;
+			$result = $triggerid;
 
-				if($triggerid)
-					add_trigger_to_linked_hosts($triggerid);
-
-				show_messages($triggerid, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
-			}
-
-			if($result)
-			{
-				unset($_REQUEST["form"]);
-			}
+			show_messages($triggerid, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 		}
-		else
+
+		if($result)
 		{
-			show_error_message(S_INVALID_TRIGGER_EXPRESSION);
+			unset($_REQUEST["form"]);
 		}
 	}
 	elseif(isset($_REQUEST["delete"])&&isset($_REQUEST["triggerid"]))
 	{
-		delete_trigger_from_templates($_REQUEST["triggerid"]);
-
 		$result=delete_trigger($_REQUEST["triggerid"]);
 		show_messages($result, S_TRIGGER_DELETED, S_CANNOT_DELETE_TRIGGER);
 		if($result){
@@ -190,17 +174,17 @@
 	}
 	elseif(isset($_REQUEST["group_delete"])&&isset($_REQUEST["g_triggerid"]))
 	{
-		$result=DBselect("select distinct t.triggerid from triggers t,hosts h,items i,".
+		$result=DBselect("select distinct t.* from triggers t,hosts h,items i,".
 			" functions f where f.itemid=i.itemid and h.hostid=i.hostid and".
 			" t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]);
 		while($row=DBfetch($result))
 		{
-			if(!in_array($row["triggerid"], $_REQUEST["g_triggerid"]))	continue;
-
-			delete_trigger_from_templates($row["triggerid"]);
-			$result2=delete_trigger($row["triggerid"]);
+			if(!in_array($row["triggerid"], $_REQUEST["g_triggerid"])) continue;
+			if($row["templateid"] <> 0)	continue;
+			$del_res = delete_trigger($row["triggerid"]);
 		}
-		show_messages(TRUE, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
+		if(isset($del_res))
+			show_messages(TRUE, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
 	}
 ?>
 
@@ -250,6 +234,7 @@
 
 		$_REQUEST["hostid"] = get_request("hostid",0);
 		$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit();");
+		if($_REQUEST["groupid"]==0) $cmbHosts->AddItem(0,S_ALL_SMALL);
 
 		$correct_hostid='no';
 		$first_hostid = -1;
@@ -266,7 +251,10 @@
 				$first_hostid = $row["hostid"];
 		}
 		if($correct_hostid!='ok')
-			$_REQUEST["hostid"] = $first_hostid;
+			if($_REQUEST["groupid"]==0)
+				$_REQUEST["hostid"] = 0;
+			else
+				$_REQUEST["hostid"] = $first_hostid;
 
 		$form->AddItem(SPACE.S_HOST.SPACE);
 		$form->AddItem($cmbHosts);
@@ -282,37 +270,85 @@
 
 		$table = new CTableInfo();
 		$table->setHeader(array(
+//			array(	new CCheckBox("all_items",NULL,NULL,
+//					"CheckAll('".$form->GetName()."','all_items');")
+//				,S_ID
+//			),
 			array(	new CCheckBox("all_items",NULL,NULL,
-					"CheckAll('".$form->GetName()."','all_items');"),
-				S_ID),
-			S_NAME,S_EXPRESSION, S_SEVERITY, S_STATUS, S_ERROR));
+					"CheckAll('".$form->GetName()."','all_items');")
+				,S_NAME
+			),
+			S_EXPRESSION, S_SEVERITY, S_STATUS, S_ERROR));
 
-		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,".
-			"t.status,t.value,t.priority,t.error from triggers t,hosts h,items i,functions".
-			" f where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid".
-			" and h.hostid=".$_REQUEST["hostid"]." order by h.host,t.description");
+		$sql = "select distinct h.hostid,h.host,t.*".
+			" from triggers t,hosts h,items i,functions f".
+			" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid";
+
+		if($_REQUEST["hostid"] > 0) 
+			$sql .= " and h.hostid=".$_REQUEST["hostid"];
+
+		$sql .= " order by h.host,t.description";
+
+		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
 			if(check_right_on_trigger("R",$row["triggerid"]) == 0)
 			{
 				continue;
 			}
-	
-			$description = array(new CLink(expand_trigger_description($row["triggerid"]),
-				"triggers.php?form=update&triggerid=".$row["triggerid"].
-					"&hostid=".$row["hostid"], 'action'));
 
-			$id= array(new CCheckBox(
+//			$id= array(
+//				new CCheckBox(
+//					"g_triggerid[]",	/* name */
+//					NULL,			/* checked */
+//					NULL,			/* caption */
+//					NULL,			/* action */
+//					$row["triggerid"])	/* value */
+//				, $row["triggerid"]
+//				);
+
+			$description = array(
+				new CCheckBox(
 					"g_triggerid[]",	/* name */
 					NULL,			/* checked */
 					NULL,			/* caption */
 					NULL,			/* action */
 					$row["triggerid"]),	/* value */
-				$row["triggerid"]);
+				SPACE
+				);
 
-			$sql="select t.triggerid,t.description from triggers t,trigger_depends d".
-				" where t.triggerid=d.triggerid_up and d.triggerid_down=".$row["triggerid"];
-			$result1=DBselect($sql);
+			if($row["templateid"] == 0)
+			{
+				array_push($description,
+					new CLink(expand_trigger_description($row["triggerid"]),
+					"triggers.php?form=update&triggerid=".$row["triggerid"].
+						"&hostid=".$row["hostid"], 'action')
+					);
+			} else {
+				$real_hosts = get_realhosts_by_triggerid($row["triggerid"]);
+				if(DBnum_rows($real_hosts) == 1)
+				{
+					$real_host = DBfetch($real_hosts);
+					array_push($description,
+						new CLink($real_host["host"],
+							"triggers.php?&hostid=".$real_host["hostid"], 'action'),
+						":",
+						expand_trigger_description($row["triggerid"])
+						);
+				}
+				else
+				{
+					array_push($description,
+						new CSpan("error","on"),
+						":",
+						expand_trigger_description($row["triggerid"])
+						);
+				}
+			}
+
+			//add dependences
+			$result1=DBselect("select t.triggerid,t.description from triggers t,trigger_depends d".
+				" where t.triggerid=d.triggerid_up and d.triggerid_down=".$row["triggerid"]);
 			if(DBnum_rows($result1)>0)
 			{
 				array_push($description,BR.BR."<strong>".S_DEPENDS_ON."</strong>".SPACE.BR);
@@ -326,9 +362,9 @@
 			if($row["priority"]==0)		$priority=S_NOT_CLASSIFIED;
 			elseif($row["priority"]==1)	$priority=S_INFORMATION;
 			elseif($row["priority"]==2)	$priority=S_WARNING;
-			elseif($row["priority"]==3)	$priority=new CSPan(S_AVERAGE,"average");
-			elseif($row["priority"]==4)	$priority=new CSPan(S_HIGH,"high");
-			elseif($row["priority"]==5)	$priority=new CSPan(S_DISASTER,"disaster");
+			elseif($row["priority"]==3)	$priority=new CCol(S_AVERAGE,"average");
+			elseif($row["priority"]==4)	$priority=new CCol(S_HIGH,"high");
+			elseif($row["priority"]==5)	$priority=new CCol(S_DISASTER,"disaster");
 			else				$priority=$row["priority"];
 
 			if($row["status"] == TRIGGER_STATUS_DISABLED)
@@ -358,7 +394,7 @@
 			if($row["error"]=="")		$row["error"]=SPACE;
 
 			$table->addRow(array(
-				$id,
+//				$id,
 				$description,
 				explode_exp($row["expression"],1),
 				$priority,

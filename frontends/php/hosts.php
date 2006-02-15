@@ -360,6 +360,7 @@
 			$table->setHeader(array(
 				array(	new CCheckBox("all_hosts",NULL,NULL,
 						"CheckAll('".$form->GetName()."','all_hosts');"),
+					SPACE,
 					S_HOST),
 				S_IP,S_PORT,S_STATUS,S_AVAILABILITY,S_ERROR,S_SHOW));
 		
@@ -384,7 +385,8 @@
 				
 				$host=new CCol(array(
 					new CCheckBox("hosts[]",NULL,NULL,NULL,$row["hostid"]),
-					$template,
+					SPACE,
+					new CSpan($template,"unknown"),
 					new CLink($row["host"],"hosts.php?form=update&hostid=".
 						$row["hostid"].url_param("groupid").url_param("config"), 'action')
 					));
@@ -427,9 +429,13 @@
 				else			$error=new CCol($row["error"],"on");
 
 				if(check_right("Host","U",$row["hostid"])) {
-					$items=new CLink(S_ITEMS,"items.php?hostid=".$row["hostid"]);
+					$show = array(
+						new CLink(S_ITEMS,"items.php?hostid=".$row["hostid"]),
+						SPACE.":".SPACE,
+						new CLink(S_TRIGGERS,"triggers.php?hostid=".$row["hostid"])
+						);
 				} else {
-					$items=S_CHANGE;
+					$show = SPACE;
 				}
 
 				$table->addRow(array(
@@ -439,7 +445,7 @@
 					$status,
 					$available,
 					$error,
-					$items));
+					$show));
 			}
 
 			$footerButtons = array();
@@ -475,6 +481,7 @@
 			$table->setHeader(array(
 				array(	new CCheckBox("all_groups",NULL,NULL,
 						"CheckAll('".$form->GetName()."','all_groups');"),
+					SPACE,
 					S_NAME),
 				S_MEMBERS));
 
@@ -505,6 +512,7 @@
 				$table->AddRow(array(
 					array(
 						new CCheckBox("groups[]",NULL,NULL,NULL,$db_group["groupid"]),
+						SPACE,
 						new CLink(
 							$db_group["name"],
 							"hosts.php?form=update&groupid=".$db_group["groupid"].

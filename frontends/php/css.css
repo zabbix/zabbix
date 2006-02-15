@@ -598,3 +598,9 @@ ul
 	margin-left: 0px;
 	padding-left: 1em;
 }
+
+.vert
+{
+	width:1px;
+	writing-mode: tb-rl;
+}

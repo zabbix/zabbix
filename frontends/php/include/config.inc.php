@@ -838,7 +838,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		}
 		return 0;
 	}
-
+/*
 	function	validate_expression($expression)
 	{
 //		echo "Validating expression: $expression<br>";
@@ -937,6 +937,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 		return 1;
 	}
+/**/
 
 	function	cr()
 	{
@@ -1347,7 +1348,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 	# Translate localhost:procload.last(0)>10 to {12}>10
 
-	function	implode_exp ($expression, $triggerid)
+	/*function	implode_exp ($expression, $triggerid)
 	{
 //		echo "Expression:$expression<br>";
 		$exp='';
@@ -1459,7 +1460,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 			$exp=$exp.$expression[$i];
 		}
 		return $exp;
-	}
+	}*/
 
 	function	add_image($name,$imagetype,$files)
 	{
