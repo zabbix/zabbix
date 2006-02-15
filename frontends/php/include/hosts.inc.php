@@ -236,16 +236,16 @@
 	function	sync_host_with_templates($hostid)
 	{
 		$host = get_host_by_hostid($hostid);
+// TODO		delete_template_graphs_by_hostid($hostid);
+		delete_template_triggers_by_hostid($hostid);
 		delete_template_items_by_hostid($hostid);
-// TODO		delete_template_triggers_by_hostid($hostid);
-// TODO		delete_template_hosts_by_hostid($hostid);
 		
 		if($host["templateid"] > 0)
 		{
 // start host syncing
 			sync_items_with_template($hostid);
-// TODO			sync_triggers_with_template($hostid);
-// TODO			sync_hosts_with_teplates($hostid);
+			sync_triggers_with_template($hostid);
+// TODO			sync_graphs_with_teplates($hostid);
 // end host syncing
 		}
 	}
@@ -336,6 +336,11 @@
 		}
 		error("No host with hostid=[$hostid]");
 		return	FALSE;
+	}
+
+	function	get_hosts_by_templateid($templateid)
+	{
+		return DBselect("select * from hosts where templateid=$templateid");
 	}
 
 	# Update Host status
