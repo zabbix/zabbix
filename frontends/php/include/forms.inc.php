@@ -1847,13 +1847,13 @@
 
 		$cmbHosts = new CComboBox("templateid",$templateid);
 		$cmbHosts->AddItem(0,"...");
-		$hosts=DBselect("select host,hostid from hosts where status not in (".HOST_STATUS_DELETED.")".
+		$hosts=DBselect("select host,hostid from hosts where status in (".HOST_STATUS_TEMPLATE.")".
 			" order by host");
 		while($host=DBfetch($hosts))
 		{
 			$cmbHosts->AddItem($host["hostid"],$host["host"]);
 		}
-		$frmHost->AddRow(S_LINK_WITH_HOST,$cmbHosts);
+		$frmHost->AddRow(S_LINK_WITH_TEMPLATE,$cmbHosts);
 	
 		$frmHost->AddRow(S_USE_PROFILE,new CCheckBox("useprofile",$useprofile,NULL,"submit()"));
 		if($useprofile=="yes")
