@@ -248,7 +248,7 @@
 		$frm_title = S_USER_GROUP;
 		if(isset($usrgrpid))
 		{
-			$usrgrp=get_usergroup_by_usrgrpid($usrgrpid);
+			$usrgrp=get_usergroup_by_groupid($usrgrpid);
 			$frm_title = S_USER_GROUP." \"".$usrgrp["name"]."\"";
 		}
 
