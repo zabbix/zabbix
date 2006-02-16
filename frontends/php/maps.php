@@ -68,7 +68,6 @@
 <?php
 //	if(!isset($_REQUEST["fullscreen"]))
 	{
-		show_table3_header_begin();
 
 		if(isset($_REQUEST["sysmapid"]))
 		{
