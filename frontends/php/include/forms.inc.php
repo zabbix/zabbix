@@ -836,6 +836,96 @@
 		$frmGraph->Show();
 
 	}
+
+	function	insert_graphitem_form()
+	{
+		$frmGItem = new CFormTable(S_NEW_ITEM_FOR_THE_GRAPH,"graph.php");
+		$frmGItem->SetHelp("web.graph.item.php");
+		
+		if(isset($_REQUEST["gitemid"]))
+		{
+			$result=DBselect("select itemid,color,drawtype,sortorder,yaxisside from graphs_items".
+				" where gitemid=".$_REQUEST["gitemid"]);
+			$row=DBfetch($result);
+		}
+
+		if(isset($_REQUEST["gitemid"]) && !isset($_REQUEST["form_refresh"]))
+		{
+			$itemid		= $row["itemid"];
+			$color		= $row["color"];
+			$drawtype	= $row["drawtype"];
+			$sortorder	= $row["sortorder"];
+			$yaxisside	= $row["yaxisside"];
+		}
+		else
+		{
+			$itemid		= get_request("itemid", 	0);
+			$color		= get_request("color", 		0);
+			$drawtype	= get_request("drawtype",	0);
+			$sortorder	= get_request("sortorder",	0);
+			$yaxisside	= get_request("yaxisside",	1);
+		}
+
+
+		show_table2_v_delimiter();
+		echo "<form method=\"get\" action=\"graph.php\">";
+		$frmGItem->AddVar("graphid",$_REQUEST["graphid"]);
+		if(isset($_REQUEST["gitemid"]))
+		{
+			$frmGItem->AddVar("gitemid",$_REQUEST["gitemid"]);
+		}
+
+		$cmbItems = new CComboBox("itemid", $itemid);
+		$result=DBselect("select h.host,i.description,i.itemid,i.key_ from hosts h,items i".
+			" where h.hostid=i.hostid".
+			" and h.status in(".HOST_STATUS_MONITORED.",".HOST_STATUS_TEMPLATE.")".
+			" and i.status=".ITEM_STATUS_ACTIVE." order by h.host,i.description");
+		while($row=DBfetch($result))
+		{
+			$cmbItems->AddItem($row["itemid"],
+				$row["host"].":".SPACE.item_description($row["description"],$row["key_"]));
+		}
+		$frmGItem->AddRow(S_PARAMETER, $cmbItems);
+
+		$cmbType = new CComboBox("drawtype",$drawtype);
+		$cmbType->AddItem(0,get_drawtype_description(0));
+		$cmbType->AddItem(1,get_drawtype_description(1));
+		$cmbType->AddItem(2,get_drawtype_description(2));
+		$cmbType->AddItem(3,get_drawtype_description(3));
+		$frmGItem->AddRow(S_TYPE, $cmbType);
+
+		$cmbYax = new CComboBox("yaxisside",$yaxisside);
+		$cmbYax->AddItem(GRAPH_YAXIS_SIDE_RIGHT, S_RIGHT);
+		$cmbYax->AddItem(GRAPH_YAXIS_SIDE_LEFT,	S_LEFT);
+		$frmGItem->AddRow(S_YAXIS_SIDE, $cmbYax);
+
+		$cmbColor = new CComboBox("color",$color);
+		$cmbColor->AddItem("Black",		S_BLACK);
+		$cmbColor->AddItem("Blue",		S_BLUE);
+		$cmbColor->AddItem("Cyan",		S_CYAN);
+		$cmbColor->AddItem("Dark Blue",		S_DARK_BLUE);
+		$cmbColor->AddItem("Dark Green",	S_DARK_GREEN);
+		$cmbColor->AddItem("Dark Red",		S_DARK_RED);
+		$cmbColor->AddItem("Dark Yellow",	S_DARK_YELLOW);
+		$cmbColor->AddItem("Green",		S_GREEN);
+		$cmbColor->AddItem("Red",		S_RED);
+		$cmbColor->AddItem("White",		S_WHITE);
+		$cmbColor->AddItem("Yellow",		S_YELLOW);
+		$frmGItem->AddRow(S_COLOR, $cmbColor);
+
+		$frmGItem->AddRow(S_SORT_ORDER_1_100, new CTextBox("sortorder",$sortorder,3));
+
+		$frmGItem->AddItemToBottomRow(new CButton("save",S_SAVE));
+		$frmGItem->AddItemToBottomRow(SPACE);
+		if(isset($itemid))
+		{
+			$frmGItem->AddItemToBottomRow(new CButtonDelete("Delete graph element?",
+				url_param("gitemid").url_param("graphid")));
+			$frmGItem->AddItemToBottomRow(SPACE);
+		}
+		$frmGItem->AddItemToBottomRow(new CButtonCancel(url_param("graphid")));
+		$frmGItem->Show();
+	}
 /*
 	# Insert escalation form
 	function	insert_escalation_form($escalationid)

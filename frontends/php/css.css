@@ -342,6 +342,14 @@ td.header_r
 	width: 100%;
 }
 
+/**************** GRAPH ****************/
+
+table.graph
+{
+	width: 100%;
+	text-align: center;
+}
+
 /**************** PAGE HEADER ****************/
 table.page_header
 {
@@ -448,6 +456,7 @@ table.home
 img.top		{	vertical-align:text-top		}
 img.bottom	{	vertical-align:text-bottom	}
 
+/**************** FORM ELEMENTS ****************/
 .biginput
 {
 	font-family: Verdana, Helvetica, Geneva;
@@ -471,6 +480,8 @@ img.bottom	{	vertical-align:text-bottom	}
 /*	margin-right:5px; */
 }
 .button:hover	{	text-decoration: underline;	border-color: black;	}
+
+/**************** OTHERS ****************/
 
 ul
 {

@@ -451,6 +451,7 @@
 	"S_SELECT_HOST_DOT_DOT_DOT"=>		"Select host...",
 	"S_LOG_TIME_FORMAT"=>			"Log time format",
 	"S_CREATE_ITEM"=>			"Create Item",
+	"S_ADD_ITEM"=>				"Add Item",
 
 //	events.php
 	"S_LATEST_EVENTS"=>			"Latest events",
