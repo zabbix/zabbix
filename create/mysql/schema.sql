@@ -76,6 +76,7 @@ CREATE TABLE graphs (
   yaxistype		int(1)		DEFAULT '0' NOT NULL,
   yaxismin		double(16,4)	DEFAULT '0' NOT NULL,
   yaxismax		double(16,4)	DEFAULT '0' NOT NULL,
+  templateid		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (graphid),
   KEY (name)
 ) type=InnoDB;

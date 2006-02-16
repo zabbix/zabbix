@@ -1,5 +1,6 @@
 Changes for 1.1beta7:
 
+ - added graphs.templateid (Alexei)
  - added triggers.templateid (Alexei)
  - fixed navigation bar for Sreens (Eugene)
  - fixed incorrect groupid error for actions (Eugene)
