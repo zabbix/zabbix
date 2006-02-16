@@ -66,7 +66,7 @@
 <?php
 	$h1=SPACE.S_HISTORY_OF_EVENTS_BIG;
 
-	$h2=S_GROUP.SAPCE;
+	$h2=S_GROUP.SPACE;
 	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
 	$result=DBselect("select groupid,name from groups order by name");
