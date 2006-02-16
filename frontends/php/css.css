@@ -27,7 +27,7 @@ td.form_row_l
 	padding-right: 5px;
 	color: #000000;
         font-family:verdana, arial, helvetica, sans-serif;
-        font-size:11px;
+        font-size:10px;
 	border-color: #222255;
 	border-width:1px;
 	border-left-style: solid;
@@ -41,7 +41,7 @@ td.form_row_c
 	padding-right: 5px;
 	color: #000000;
         font-family:verdana, arial, helvetica, sans-serif;
-        font-size:11px;
+        font-size:10px;
 	border-color: #222255;
 	border-width:1px;
 	border-right-style: solid;
@@ -55,7 +55,7 @@ td.form_row_r
 	padding-right: 5px;
 	color: #000000;
         font-family:verdana, arial, helvetica, sans-serif;
-        font-size:11px;
+        font-size:10px;
 	border-color: #222255;
 	border-width:1px;
 	border-right-style: solid;
@@ -100,7 +100,7 @@ td.form_row_last
 {
 	color: #FFFFFF;
         font-family:verdana, arial, helvetica, sans-serif;
-        font-size:11px;
+        font-size:10px;
 	background: #5C7099 url(images/gradients/table_head2.gif) repeat-x top left;
 	border-color: #222255;
 	border-width:1px;
@@ -192,63 +192,28 @@ td.horizontal_menu_n
 	padding-left: 5px;
 }
 
-span.divider
-{
-	color: #000000;
-	font-family: Verdana, Arial, sans-serif;
-	font-size: 10px;
-	font-weight: normal;
-}
+span.divider{	color: #000000;	font-family: Verdana, Arial, sans-serif; font-size: 10px; font-weight: normal;}
 
-a.highlight:link	
-{ 
-	text-decoration: none; 
-	color: #ffffff; 
-	font-family: Verdana, Arial, sans-serif; 
-	font-size: 10px; 
-	font-weight: bold; 
-}
-a.highlight:visited
-{
-	text-decoration: none;
-	color: #ffffff;
-	font-family: Verdana, Arial, sans-serif;
-	font-size: 10px;
-	font-weight: bold;
-}
-a.highlight:hover
-{
-	text-decoration: underline;
-	color: #ffcc00;
-	font-family: Verdana, Arial, sans-serif;
-	font-size: 10px;
-	font-weight: bold;
-}
+a.highlight { font-family: Verdana, Arial, sans-serif;	font-size:10px; 	font-weight: bold; }
+a.highlight:link 	{ 	text-decoration: none;		color: #ffffff; }
+a.highlight:visited 	{	text-decoration: none;		color: #ffffff; }
+a.highlight:hover	{	text-decoration: underline;	color: #ffcc00; }
 
-.footer
-{
-	color:#CCCCCC;
-}
+.footer { color:#CCCCCC; }
 
 td,tr
 {
 	font-family:Verdana, Arial, Helvetica, sans-serif;
-	font-size:10pt;
+	font-size:8pt;
 	text-decoration: none;
 }
 
-td.center
-{
-	text-align: center;
-}
-td.table_message
-{
-	text-align: center;
-}
+td.center 		{	text-align: center;	}
+td.table_message	{	text-align: center;	}
 tr.table_header
 {
 	font-family:verdana, arial, helvetica, sans-serif;
-	font-size:10pt;
+	font-size:8pt;
 	font-weight: bold; 
 	text-decoration: none;
 	background-color:#CCCCCC;
@@ -257,7 +222,7 @@ tr.table_footer
 {
 	color: #FFFFFF;
         font-family:verdana, arial, helvetica, sans-serif;
-        font-size:10px;
+        font-size:8px;
 	background: #5C7099 url(images/gradients/table_head2.gif) repeat-x top left;
 	background-color: #6d88ad;
 	border-color: #000000;
@@ -272,43 +237,17 @@ tr.table_footer
 }
 tr.table_odd_row
 {
-	font-family:verdana, arial, helvetica, sans-serif;
-	font-size:10pt;
-	text-decoration: none;
-	background-color:#DDDDDD;
+	font-family:verdana, arial, helvetica, sans-serif;	font-size:8pt;
+	text-decoration: none;	background-color:#DDDDDD;
 }
-tr.table_odd_row:hover
-{
-	font-family:verdana, arial, helvetica, sans-serif;
-	font-size:10pt;
-	text-decoration: none;
-	background-color:#DDDDEE;
-}
+tr.table_odd_row:hover	{	background-color:#DDDDEE;	}
 
 tr.table_even_row
 {
-	font-family:Verdana, Arial, Helvetica, sans-serif;
-	font-size:10pt;
-	text-decoration: none;
-	background-color:#EEEEEE;
+	font-family:Verdana, Arial, Helvetica, sans-serif;	font-size:8pt;
+	text-decoration: none;	background-color:#EEEEEE;
 }
-tr.table_even_row:hover
-{
-	font-family:Verdana, Arial, Helvetica, sans-serif;
-	font-size:10pt;
-	text-decoration: none;
-	background-color:#EEEEFE;
-}
-
-.unknown
-{
-	color: #AAAAAA;
-}
-
-.off
-{
-	color: #00AA00;
-}
+tr.table_even_row:hover	{	background-color:#EEEEFE;	}
 
 A.enabled:link		{	color:#00AA00;	text-decoration: none; }
 A.enabled:visited 	{	color:#00AA00;	text-decoration: none; }
@@ -340,41 +279,21 @@ A.action:visited 	{	color:#3C3089;	text-decoration: none; }
 A.action:hover 		{	color:#3C3089;	text-decoration: underline; }
 A.action:active 	{	color:#3C3089;	text-decoration: underline;}
 
-.on
-{
-	color: #AA0000;
-}
+.on		{	color: #AA0000;	}
+.off		{	color: #00AA00;	}
+.unknown	{	color: #AAAAAA;	}
 
-.disaster
-{
-	background-color: #FF0000;
-}
-
-.high
-{
-	background-color: #FF8888;
-}
-
-.average
-{
-	background-color: #DDAAAA;
-}
-
-.unknown_trigger
-{
-	background-color: #BCBCBC;
-}
-
-.normal
-{
-	background-color: #AADDAA;
-}
+.disaster	{	background-color: #FF0000;	}
+.high		{	background-color: #FF8888;	}
+.average	{	background-color: #DDAAAA;	}
+.unknown_trigger{	background-color: #BCBCBC;	}
+.normal		{	background-color: #AADDAA;	}
 
 a.small_font
 {
 	color: #000000;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 9pt;
+	font-size: 8pt;
 }
 
 table.menu
@@ -447,7 +366,7 @@ td.page_header_r
 	vertical-align: middle;
 	text-align: right;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 8pt;
+	font-size: 10pt;
 }
 
 /**************** PAGE FOOTER ****************/
@@ -485,20 +404,20 @@ A.footer
 	color:#CCCCCC;
 }
 
-A {font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10pt}
-A:link {color:black; text-decoration: none; }
-A:visited {color:black; text-decoration: none; }
-A:hover {color:black; text-decoration: underline; }
-A:active {color:black; text-decoration: underline;}
+A 		{font-family:Verdana, Arial, Helvetica, sans-serif;font-size:8pt}
+A:link 		{color:black; text-decoration: none; }
+A:visited 	{color:black; text-decoration: none; }
+A:hover 	{color:black; text-decoration: underline; }
+A:active 	{color:black; text-decoration: underline;}
 
-P {font-family:Verdana, Arial, Helvetica, sans-serif;font-size:8pt; }
-P:link {color:black; text-decoration: underline; }
-P:visited {color:black; text-decoration: none; }
-P:hover {color:black; text-decoration: none;}
-P:active {color:black; text-decoration: none;}
-p.uppercase {text-transform: uppercase}
-p.margin {margin-left: 10pt}
-	
+P 		{font-family:Verdana, Arial, Helvetica, sans-serif;font-size:8pt; }
+P:link 		{color:black; text-decoration: underline; }
+P:visited 	{color:black; text-decoration: none; }
+P:hover 	{color:black; text-decoration: none;}
+P:active 	{color:black; text-decoration: none;}
+
+p.uppercase	{text-transform: uppercase}
+p.margin	{margin-left: 10pt}
 	
 p.info
 {
@@ -524,74 +443,34 @@ table.home
 	font-size: 8pt;
 }
     
-.img
-{
-	border-color:black;
-	border-width:1px;
-}
+.img {	border-color:black;	border-width:1px;	}
 
-img.top
-{
-	vertical-align:text-top
-}
-
-img.bottom
-{
-	vertical-align:text-bottom
-}
+img.top		{	vertical-align:text-top		}
+img.bottom	{	vertical-align:text-bottom	}
 
 .biginput
 {
 	font-family: Verdana, Helvetica, Geneva;
-	font-size: 11px;
+	font-size: 10px;
 	border: solid;
 	border-width: 1px;
 	border-color: gray;
 	background-color: white;
 }
-
-.biginput:focus
-{
-	font-family: Verdana, Helvetica, Geneva;
-	font-size: 11px;
-	border: solid;
-	border-width: 1px;
-	border-color: black;
-	background-color: white;
-}
-
-.biginput:hover
-{
-	font-family: Verdana, Helvetica, Geneva;
-	font-size: 11px;
-	border: solid;
-	border-width: 1px;
-	border-color: black;
-	background-color: white;
-}
+.biginput:focus	{	border-color: black;	}
+.biginput:hover	{	border-color: black;	}
 
 .button
 {
 	font-family: Verdana, Helvetica, Geneva;
-	font-size: 11px;
+	font-size: 10px;
 	border: solid;
 	border-width: 1px;
 	border-color: gray;
 	background: gray url(images/gradients/button.gif) repeat-x top left;
 /*	margin-right:5px; */
 }
-
-.button:hover
-{
-	font-family: Verdana, Helvetica, Geneva;
-	font-size: 11px;
-	text-decoration: underline;
-	border: solid;
-	border-width: 1px;
-	border-color: black;
-	background-color: white;
-/*	margin-right:5px; */
-}
+.button:hover	{	text-decoration: underline;	border-color: black;	}
 
 ul
 {
