@@ -68,10 +68,6 @@
 	{
 		if(isset($_REQUEST["gitemid"]))
 		{
-			update_graph_item_from_templates($_REQUEST["gitemid"],$_REQUEST["itemid"],
-				$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"],
-				$_REQUEST["yaxisside"]);
-
 			$result=update_graph_item($_REQUEST["gitemid"],$_REQUEST["itemid"],
 				$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"],
 				$_REQUEST["yaxisside"]);
@@ -84,10 +80,6 @@
 		}
 		else
 		{
-			add_graph_item_to_templates($_REQUEST["graphid"],$_REQUEST["itemid"],
-				$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"],
-				$_REQUEST["yaxisside"]);
-
 			$gitemid=add_item_to_graph($_REQUEST["graphid"],$_REQUEST["itemid"],
 				$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"],
 				$_REQUEST["yaxisside"]);
@@ -116,8 +108,7 @@
 		$graph=get_graph_by_graphid($graphitem["graphid"]);
 		$item=get_item_by_itemid($graphitem["itemid"]);
 
-		delete_graph_item_from_templates($_REQUEST["gitemid"]);
-		$result=delete_graphs_item($_REQUEST["gitemid"]);
+		$result=delete_graph_item($_REQUEST["gitemid"]);
 		if($result)
 		{
 			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH_ELEMENT,
@@ -131,14 +122,12 @@
 	{
 		if($_REQUEST["register"]=="up")
 		{
-			move_up_graph_item_from_templates($_REQUEST["gitemid"]);
 			$result = move_up_graph_item($_REQUEST["gitemid"]);
 			show_messages($result, S_SORT_ORDER_UPDATED, S_CANNOT_UPDATE_SORT_ORDER);
 			unset($_REQUEST["gitemid"]);
 		}
 		if($_REQUEST["register"]=="down")
 		{
-			move_down_graph_item_from_templates($_REQUEST["gitemid"]);
 			$result = move_down_graph_item($_REQUEST["gitemid"]);
 			show_messages($result, S_SORT_ORDER_UPDATED, S_CANNOT_UPDATE_SORT_ORDER);
 			unset($_REQUEST["gitemid"]);
@@ -150,7 +139,7 @@
 
 	$db_graphs = DBselect("select name from graphs where graphid=".$_REQUEST["graphid"]);
 	$db_graph = DBfetch($db_graphs);
-	show_table_header($db_graph["name"]);
+	show_table_header($db_graph["name"]);//,new CButton("cancel",S_CANCEL,"return Redirect('graphs.php');"));
 
 	$table = new CTable(NULL,"graph");
 	$table->AddRow(new CImg("chart2.php?graphid=".$_REQUEST["graphid"]."&period=3600&from=0"));

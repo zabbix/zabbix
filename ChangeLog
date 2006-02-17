@@ -1,10 +1,12 @@
 Changes for 1.1beta7:
 
+ - improved templates logic for graphs (Eugene)
+ - improved templates logic for triggers (Eugene)
  - added graphs.templateid (Alexei)
  - added triggers.templateid (Alexei)
  - fixed navigation bar for Sreens (Eugene)
  - fixed incorrect groupid error for actions (Eugene)
- - improved Templates logic (Eugene)
+ - improved templates logic for items (Eugene)
  - speed improvement for proc.num of Tru64 (Eugene)
  - fixed evaluation of {IPADDRESS} (Alexei)
  - added hosts.templateid and items.templateid (Alexei)
