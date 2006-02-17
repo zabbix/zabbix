@@ -842,11 +842,32 @@
 		$frmGItem = new CFormTable(S_NEW_ITEM_FOR_THE_GRAPH,"graph.php");
 		$frmGItem->SetHelp("web.graph.item.php");
 		
+
+		$db_hosts = get_hosts_by_graphid($_REQUEST["graphid"]);
+		if(DBnum_rows($db_hosts)==0)
+		{
+			// empty graph, can contain any item
+			$host_condition = " and h.status in(".HOST_STATUS_MONITORED.",".HOST_STATUS_TEMPLATE.")";
+		}
+		else
+		{
+			$db_host = DBfetch($db_hosts);
+			if($db_host["status"]==HOST_STATUS_TEMPLATE)
+			{// graph for template must use only one host
+				$host_condition = " and h.hostid=".$db_host["hostid"];
+			}
+			else
+			{
+				$host_condition = " and h.status in(".HOST_STATUS_MONITORED.")";
+			}
+		}
+
 		if(isset($_REQUEST["gitemid"]))
 		{
 			$result=DBselect("select itemid,color,drawtype,sortorder,yaxisside from graphs_items".
 				" where gitemid=".$_REQUEST["gitemid"]);
 			$row=DBfetch($result);
+
 		}
 
 		if(isset($_REQUEST["gitemid"]) && !isset($_REQUEST["form_refresh"]))
@@ -878,7 +899,7 @@
 		$cmbItems = new CComboBox("itemid", $itemid);
 		$result=DBselect("select h.host,i.description,i.itemid,i.key_ from hosts h,items i".
 			" where h.hostid=i.hostid".
-			" and h.status in(".HOST_STATUS_MONITORED.",".HOST_STATUS_TEMPLATE.")".
+			$host_condition.
 			" and i.status=".ITEM_STATUS_ACTIVE." order by h.host,i.description");
 		while($row=DBfetch($result))
 		{

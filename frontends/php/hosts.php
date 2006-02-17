@@ -432,7 +432,9 @@
 					$show = array(
 						new CLink(S_ITEMS,"items.php?hostid=".$row["hostid"]),
 						SPACE.":".SPACE,
-						new CLink(S_TRIGGERS,"triggers.php?hostid=".$row["hostid"])
+						new CLink(S_TRIGGERS,"triggers.php?hostid=".$row["hostid"]),
+						SPACE.":".SPACE,
+						new CLink(S_GRAPHS,"graphs.php?hostid=".$row["hostid"])
 						);
 				} else {
 					$show = SPACE;

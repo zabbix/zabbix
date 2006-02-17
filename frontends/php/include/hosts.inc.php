@@ -29,6 +29,7 @@
 		}
 		return DBexecute("insert into hosts_groups (hostid,groupid) values ($hostid,$groupid)");
 	}
+
 	function	db_save_group($name,$groupid=NULL)
 	{
 		if(!is_string($name)){
@@ -236,7 +237,7 @@
 	function	sync_host_with_templates($hostid)
 	{
 		$host = get_host_by_hostid($hostid);
-// TODO		delete_template_graphs_by_hostid($hostid);
+		delete_template_graphs_by_hostid($hostid);
 		delete_template_triggers_by_hostid($hostid);
 		delete_template_items_by_hostid($hostid);
 		
@@ -245,7 +246,7 @@
 // start host syncing
 			sync_items_with_template($hostid);
 			sync_triggers_with_template($hostid);
-// TODO			sync_graphs_with_teplates($hostid);
+			sync_graphs_with_templates($hostid);
 // end host syncing
 		}
 	}
