@@ -60,11 +60,11 @@ INSERT INTO rights VALUES (3,2,'Default permission','R',0);
 -- Dumping data for table `hosts`
 --
 
-INSERT INTO hosts VALUES (10001,'Host.Unix',0,'',10000,3,0,0,'',0,0);
-INSERT INTO hosts VALUES (10002,'Host.Win32',0,'',10000,3,0,0,'',0,0);
-INSERT INTO hosts VALUES (10004,'Host.Standalone',0,'',10000,3,0,0,'',0,0);
-INSERT INTO hosts VALUES (10003,'Application.MySQL',0,'',10000,3,0,0,'',0,0);
-INSERT INTO hosts VALUES (10007,'Host.SNMP',0,'',161,3,0,0,'',0,0);
+INSERT INTO hosts VALUES (10001,'Host.Unix',0,'',10000,3,0,'',0,0,0);
+INSERT INTO hosts VALUES (10002,'Host.Win32',0,'',10000,3,0,'',0,0,0);
+INSERT INTO hosts VALUES (10004,'Host.Standalone',0,'',10000,3,0,'',0,0,0);
+INSERT INTO hosts VALUES (10003,'Application.MySQL',0,'',10000,3,0,'',0,0,0);
+INSERT INTO hosts VALUES (10007,'Host.SNMP',0,'',161,3,0,'',0,0,0);
 
 --
 -- Dumping data for table `groups`
