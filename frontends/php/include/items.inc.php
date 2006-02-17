@@ -120,7 +120,7 @@
 				$value_type, $trapper_hosts, $snmp_port, $units, $multiplier,
 				$delta, $snmpv3_securityname, $snmpv3_securitylevel,
 				$snmpv3_authpassphrase, $snmpv3_privpassphrase, $formula,
-				$trends, $logtimefmt, $itemid);
+				$trends, $logtimefmt, $templateid);
 
 			return $result;
 		}
@@ -284,9 +284,10 @@
 
 	function	delete_template_items_by_hostid($hostid)
 	{
-		$db_items = DBselect("select itemid from items where hostid=$hostid and templateid<>0");
+		$db_items = get_items_by_hostid($hostid);
 		while($db_item = DBfetch($db_items))
 		{
+			if($db_item["templateid"] == 0)	continue;
 			delete_item($db_item["itemid"]);
 		}
 	}
@@ -297,7 +298,7 @@
 
 //SDI("sync host: ".$host['host']);
 
-		$db_tmp_items = DBselect("select * from items where hostid=".$host["templateid"]);
+		$db_tmp_items = get_items_by_hostid($host["templateid"]);
 
 		while($db_tmp_item = DBfetch($db_tmp_items))
 		{
@@ -328,140 +329,28 @@
 		}
 	}
 
-	# Add item to hardlinked hosts
-/*
-	function	add_item_to_linked_hosts($itemid,$hostid=0)
-	{
-		if($itemid<=0)
-		{
-			return;
-		}
-
-		$item=get_item_by_itemid($itemid);
-
-		// Link with one host only
-		if($hostid!=0)
-		{
-			$sql="select hostid,templateid,items from hosts_templates".
-				" where hostid=$hostid and templateid=".$item["hostid"];
-		}
-		else
-		{
-			$sql="select hostid,templateid,items from hosts_templates".
-				" where templateid=".$item["hostid"];
-		}
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
-			if($row["items"]&1 == 0)	continue;
-			$sql="select itemid from items where key_=\"".$item["key_"]."\"".
-				" and hostid=".$row["hostid"];
-			$result2=DBselect($sql);
-			if(DBnum_rows($result2)==0)
-			{
-				add_item($item["description"],$item["key_"],$row["hostid"],$item["delay"],
-					$item["history"],$item["status"],$item["type"],$item["snmp_community"],
-					$item["snmp_oid"],$item["value_type"],$item["trapper_hosts"],
-					$item["snmp_port"],$item["units"],$item["multiplier"],$item["delta"],
-					$item["snmpv3_securityname"],$item["snmpv3_securitylevel"],
-					$item["snmpv3_authpassphrase"],$item["snmpv3_privpassphrase"],
-					$item["formula"],$item["trends"],$item["logtimefmt"]);
-			}
-		}
-	}
-*/
-	# Add item to hardlinked hosts
-/*
-	function	delete_item_from_templates($itemid)
-	{
-		if($itemid<=0)
-		{
-			return;
-		}
-
-		$item=get_item_by_itemid($itemid);
-
-		$sql="select hostid,templateid,items from hosts_templates where templateid=".$item["hostid"];
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
-			if($row["items"]&4 == 0)	continue;
-			$sql="select itemid from items where key_=".zbx_dbstr($item["key_"]).
-				" and hostid=".$row["hostid"];
-			$result2=DBselect($sql);
-			while($row2=DBfetch($result2))
-			{
-				delete_item($row2["itemid"]);
-			}
-		}
-	}
-*/
-	# Update item in hardlinked hosts
-/*
-	function	update_item_in_templates($itemid,$description,$key,$hostid,$delay,$history,$status,$type,
-		$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,
-		$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,
-		$formula,$trends,$logtimefmt)
-	{
-		if($itemid<=0)
-		{
-			return;
-		}
-		$item = get_item_by_itemid($itemid);
-		$db_child_hosts = DBselect("select hostid,templateid,items from hosts_templates".
-			" where templateid=".$item["hostid"]);
-		while($db_child_host=DBfetch($db_child_hosts))
-		{
-			if($db_child_host["items"]&2 == 0)	continue;
-			$db_items = DBselect("select itemid from items where key_=".zbx_dbstr($item["key_"]).
-				" and hostid=".$db_child_host["hostid"]);
-			if(DBnum_rows($db_items)==1)
-			{
-				$db_item = DBfetch($db_items);
-				update_item($db_item["itemid"],$description,$key,
-					$db_child_host["hostid"],$delay,$history,$status,
-					$type,$snmp_community,$snmp_oid,
-					$value_type,$trapper_hosts,$snmp_port,
-					$units,$multiplier,$delta,
-					$snmpv3_securityname,$snmpv3_securitylevel,
-					$snmpv3_authpassphrase,$snmpv3_privpassphrase,
-					$formula,$trends,$logtimefmt);
-			}
-		}
-	}
-*/
 	# Activate Item
 
 	function	activate_item($itemid)
 	{
-		$sql="update items set status=".ITEM_STATUS_ACTIVE." where itemid=$itemid";
-		return	DBexecute($sql);
+		return	DBexecute("update items set status=".ITEM_STATUS_ACTIVE." where itemid=$itemid");
 	}
 
 	# Disable Item
 
 	function	disable_item($itemid)
 	{
-		$sql="update items set status=".ITEM_STATUS_DISABLED." where itemid=$itemid";
-		return	DBexecute($sql);
+		return	DBexecute("update items set status=".ITEM_STATUS_DISABLED." where itemid=$itemid");
 	}
 
 	function	get_items_by_hostid($hostid)
 	{
-		$sql="select * from items where hostid=$hostid"; 
-		$result=DBselect($sql);
-		if(DBnum_rows($result) != 0)
-		{
-			return	$result;
-		}
-		error("No items for hostid=[$hostid]");
-		return	FALSE;
+		return DBselect("select * from items where hostid=$hostid"); 
 	}
 
 	function	get_item_by_itemid($itemid)
 	{
-		$sql="select * from items where itemid=$itemid"; 
-		$result=DBselect($sql);
+		$result=DBselect("select * from items where itemid=$itemid"); 
 		if(DBnum_rows($result) == 1)
 		{
 			return	DBfetch($result);	

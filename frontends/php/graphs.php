@@ -75,10 +75,6 @@
 	{
 		if(isset($_REQUEST["graphid"]))
 		{
-			update_graph_from_templates($_REQUEST["graphid"],
-				$_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
-				$_REQUEST["yaxistype"],	$_REQUEST["yaxismin"],$_REQUEST["yaxismax"]);
-
 			$result=update_graph($_REQUEST["graphid"],
 				$_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
 				$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"]);
@@ -108,7 +104,6 @@
 	}
 	elseif(isset($_REQUEST["delete"])&&isset($_REQUEST["graphid"]))
 	{
-		delete_graph_from_templates($_REQUEST["graphid"]);
 		$graph=get_graph_by_graphid($_REQUEST["graphid"]);
 		$result=delete_graph($_REQUEST["graphid"]);
 		if($result)
@@ -205,14 +200,13 @@
 
 		if(isset($_REQUEST["hostid"])&&($_REQUEST["hostid"]!=0))
 		{
-			$result=DBselect("select distinct g.graphid,g.name,g.width,g.height from graphs g,items i".
+			$result=DBselect("select distinct g.* from graphs g,items i".
 				",graphs_items gi where gi.itemid=i.itemid and g.graphid=gi.graphid".
 				" and i.hostid=".$_REQUEST["hostid"]." order by g.name");
 		}
 		else
 		{
-			$result=DBselect("select distinct g.graphid,g.name,g.width,g.height".
-				" from graphs g order by g.name");
+			$result=DBselect("select * from graphs g order by g.name");
 		}
 		while($row=DBfetch($result))
 		{
@@ -224,16 +218,44 @@
 				$result2=DBselect($sql);
 				if(DBnum_rows($result2)>0)	continue;
 			}
-		
+	
+			if($row["templateid"]==0)
+			{
+				$name = new CLink($row["name"],
+					"graphs.php?graphid=".$row["graphid"]."&form=update".
+					url_param("groupid").url_param("hostid"),'action');
+				$edit = new CLink("Edit",
+					"graph.php?graphid=".$row["graphid"]);
+			} else {
+				$real_hosts = get_realhosts_by_graphid($row["templateid"]);
+				if(DBnum_rows($real_hosts) == 1)
+				{
+					$real_host = DBfetch($real_hosts);
+					$name = array(
+						new CLink($real_host["host"],"graphs.php?".
+							"hostid=".$real_host["hostid"],
+							'action'),
+						":",
+						$row["name"]
+						);
+				}
+				else
+				{
+					array_push($description,
+						new CSpan("error","on"),
+						":",
+						expand_trigger_description($row["triggerid"])
+						);
+				}
+				$edit = SPACE;
+			}
+
 			$table->AddRow(array(
 				$row["graphid"],
-				new CLink($row["name"],
-					"graphs.php?graphid=".$row["graphid"]."&form=update".
-					url_param("groupid").url_param("hostid"),'action'),
+				$name,
 				$row["width"],
 				$row["height"],
-				new CLink("Edit",
-					"graph.php?graphid=".$row["graphid"])
+				$edit
 				));
 		}
 		$table->show();

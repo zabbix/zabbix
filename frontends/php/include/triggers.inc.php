@@ -922,7 +922,10 @@
 	{
 		$triggers = get_triggers_by_hostid($hostid);
 		while($trigger = DBfetch($triggers))
+		{
+			if($trigger["templateid"]==0)	continue;
 			delete_trigger($trigger["triggerid"]);
+		}
 
 		return TRUE;
 	}
