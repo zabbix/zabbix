@@ -567,12 +567,25 @@
 		else
 				$value=new CSpan(S_TRUE_BIG,"on");
 
+		$priority_style=NULL;
 		if($row["priority"]==0)		$priority=S_NOT_CLASSIFIED;
 		elseif($row["priority"]==1)	$priority=S_INFORMATION;
 		elseif($row["priority"]==2)	$priority=S_WARNING;
-		elseif($row["priority"]==3)	$priority=new CSpan(S_AVERAGE,"average");
-		elseif($row["priority"]==4)	$priority=new CSpan(S_HIGH,"high");
-		elseif($row["priority"]==5)	$priority=new CSpan(S_DISASTER,"disaster");
+		elseif($row["priority"]==3)
+		{
+			$priority=S_AVERAGE;
+			$priority_style="average";
+		}
+		elseif($row["priority"]==4)
+		{
+			$priority=S_HIGH;
+			$priority_style="high";
+		}
+		elseif($row["priority"]==5)
+		{
+			$priority=S_DISASTER;
+			$priority_style="disaster";
+		}
 		else				$priority=$row["priority"];
 
 		$lastchange=new CLink(date(S_DATE_FORMAT_YMDHMS,$row["lastchange"]),"alarms.php?triggerid=".$row["triggerid"],"action");
@@ -605,7 +618,7 @@
 		$table->AddRow(array(
 				$description,
 				$value,
-				$priority,
+				new CSpan($priority,$priority_style),
 				$lastchange,
 				$actions,
 				$comments
