@@ -618,7 +618,7 @@
 		$table->AddRow(array(
 				$description,
 				$value,
-				new CSpan($priority,$priority_style),
+				new CCol($priority,$priority_style),
 				$lastchange,
 				$actions,
 				$comments
