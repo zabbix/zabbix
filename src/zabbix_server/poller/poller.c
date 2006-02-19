@@ -155,9 +155,10 @@ static void update_key_status(int hostid,int host_status)
 	DB_ITEM		item;
 	DB_RESULT	*result;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In update_key_status()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In update_key_status(%d,%d)",hostid,host_status);
 
 	snprintf(sql,sizeof(sql)-1,"select %s where h.hostid=i.hostid and h.hostid=%d and i.key_='%s'", ZBX_SQL_ITEM_SELECT, hostid,SERVER_STATUS_KEY);
+	zabbix_log(LOG_LEVEL_DEBUG, "SQL [%s]", sql);
 	result = DBselect(sql);
 
 	if( DBnum_rows(result) == 0)
@@ -169,7 +170,8 @@ static void update_key_status(int hostid,int host_status)
 		DBget_item_from_db(&item,result,0);
 
 /* Do not process new value for status, if previous status is the same */
-		if(cmp_double(item.lastvalue, (double)host_status) == 1)
+		zabbix_log( LOG_LEVEL_DEBUG, "item.lastvalue[%f] new host status[%d]",item.lastvalue,host_status);
+		if( (item.lastvalue_null==1) || (cmp_double(item.lastvalue, (double)host_status) == 1))
 		{
 			init_result(&agent);
 			SET_UI64_RESULT(&agent, host_status);
