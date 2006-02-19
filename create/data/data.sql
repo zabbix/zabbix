@@ -116,13 +116,13 @@ INSERT INTO items VALUES (10027,0,'','',161,10001,'Shared memory','vm.memory.siz
 INSERT INTO items VALUES (10028,0,'','',161,10001,'Buffers memory','vm.memory.size[buffers]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',0,0,NULL,'',0,'','',0,'',0,'',0);
 INSERT INTO items VALUES (10029,0,'','',161,10001,'Cached memory','vm.memory.size[cached]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',0,0,NULL,'',0,'','',0,'',0,'',0);
 INSERT INTO items VALUES (10030,0,'','',161,10001,'Total swap space','system.swap.size[,total]',1800,7,365,0,NULL,NULL,NULL,0,0,'','B',0,0,NULL,'',0,'','',0,'',0,'',0);
-INSERT INTO items VALUES (10031,0,'','',161,10001,'Email (SMTP) server is running','check_service[smtp]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
-INSERT INTO items VALUES (10032,0,'','',161,10001,'FTP server is running','check_service[ftp]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
-INSERT INTO items VALUES (10033,0,'','',161,10001,'SSH server is running','check_service[ssh]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
+INSERT INTO items VALUES (10031,0,'','',161,10001,'Email (SMTP) server is running','net.tcp.service[smtp]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
+INSERT INTO items VALUES (10032,0,'','',161,10001,'FTP server is running','net.tcp.service[ftp]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
+INSERT INTO items VALUES (10033,0,'','',161,10001,'SSH server is running','net.tcp.service[ssh]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
 INSERT INTO items VALUES (10034,0,'','',161,10001,'Telnet server is running','net[listen_23]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
 INSERT INTO items VALUES (10035,0,'','',161,10001,'WEB server is running','net[listen_80]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
-INSERT INTO items VALUES (10036,0,'','',161,10001,'POP3 server is running','check_service[pop]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
-INSERT INTO items VALUES (10037,0,'','',161,10001,'IMAP server is running','check_service[imap]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
+INSERT INTO items VALUES (10036,0,'','',161,10001,'POP3 server is running','net.tcp.service[pop]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
+INSERT INTO items VALUES (10037,0,'','',161,10001,'IMAP server is running','net.tcp.service[imap]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
 INSERT INTO items VALUES (10038,0,'','',161,10001,'Checksum of $1','vfs.file.cksum[/usr/sbin/sshd]',600,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
 INSERT INTO items VALUES (10039,0,'','',161,10001,'Checksum of $1','vfs.file.cksum[/usr/bin/ssh]',600,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
 INSERT INTO items VALUES (10040,0,'','',161,10001,'Checksum of $1','vfs.file.cksum[/etc/services]',600,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
@@ -131,7 +131,7 @@ INSERT INTO items VALUES (10042,0,'','',161,10001,'Number of disks read operatio
 INSERT INTO items VALUES (10043,0,'','',161,10001,'Number of disks write operations','io[disk_wio]',30,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
 INSERT INTO items VALUES (10044,0,'','',161,10001,'Number of block read from disks','io[disk_rblk]',30,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
 INSERT INTO items VALUES (10045,0,'','',161,10001,'Number of block written to disks','io[disk_wblk]',30,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
-INSERT INTO items VALUES (10046,0,'','',161,10001,'News (NNTP) server is running','check_service[nntp]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
+INSERT INTO items VALUES (10046,0,'','',161,10001,'News (NNTP) server is running','net.tcp.service[nntp]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
 INSERT INTO items VALUES (10047,0,'','',161,10001,'Number of running processes inetd','proc_cnt[inetd]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
 INSERT INTO items VALUES (10048,0,'','',161,10001,'Number of running processes apache','proc_cnt[httpd]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
 INSERT INTO items VALUES (10049,0,'','',161,10001,'Number of running processes mysqld','proc_cnt[mysqld]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
@@ -145,7 +145,7 @@ INSERT INTO items VALUES (10056,0,'','',161,10001,'Maximum number of opened file
 INSERT INTO items VALUES (10057,0,'','',161,10001,'Host name','system.hostname',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
 INSERT INTO items VALUES (10058,0,'','',161,10001,'Host information','system.uname',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
 INSERT INTO items VALUES (10059,0,'','',161,10001,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
-INSERT INTO items VALUES (10060,0,'','',161,10001,'WEB (HTTP) server is running','check_service[http]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
+INSERT INTO items VALUES (10060,0,'','',161,10001,'WEB (HTTP) server is running','net.tcp.service[http]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
 INSERT INTO items VALUES (10061,0,'','',161,10001,'Host status','status',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
 INSERT INTO items VALUES (10062,0,'','',161,10001,'Total number of inodes on $1','vfs.fs.inode[/,total]',3600,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
 INSERT INTO items VALUES (10063,0,'','',161,10001,'Total number of inodes on $1','vfs.fs.inode[/opt,total]',3600,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','',0,'',0,'',0);
