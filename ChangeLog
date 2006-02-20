@@ -1,5 +1,6 @@
 Changes for 1.1beta7:
 
+ - added tables valuemaps and mappings (Alexei)
  - fix for initial update of host statuses (Alexei)
  - improved templates logic for graphs (Eugene)
  - improved templates logic for triggers (Eugene)
