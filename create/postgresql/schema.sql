@@ -760,4 +760,28 @@ CREATE TABLE autoreg (
   PRIMARY KEY (id)
 );
 
+--
+-- Table structure for table 'valuemaps'
+--
+
+CREATE TABLE valuemaps (
+  valuemapid		serial,
+  name			varchar(64)	DEFAULT '' NOT NULL,
+  PRIMARY KEY (valuemapid)
+);
+
+--
+-- Table structure for table 'mapping'
+--
+
+CREATE TABLE mappings (
+  mappingid		serial,
+  valuemapid		int4		DEFAULT '0' NOT NULL,
+  value			varchar(64)	DEFAULT '' NOT NULL,
+  newvalue		varchar(64)	DEFAULT '' NOT NULL,
+  PRIMARY KEY (mappingid),
+);
+
+CREATE INDEX mappings_valuemapid on mappings (valuemapid);
+
 VACUUM ANALYZE;
