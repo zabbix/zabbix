@@ -1835,7 +1835,7 @@
 		$frmHouseKeep->Show();
 	}
 
-	function	insert_host_form()
+	function	insert_host_form($show_only_tmp=0)
 	{
 
 		global $_REQUEST;
@@ -1866,11 +1866,11 @@
 
 		$templateid= get_request("templateid",0);
 
+		$frm_title	= $show_only_tmp ? S_TEMPLATE : S_HOST;
 		if(isset($_REQUEST["hostid"])){
 			$db_host=get_host_by_hostid($_REQUEST["hostid"]);
-			$frm_title	= S_HOST.SPACE."\"".$db_host["host"]."\"";
-		} else 
-			$frm_title	= S_HOST;
+			$frm_title	.= SPACE."\"".$db_host["host"]."\"";
+		}
 
 		if(isset($_REQUEST["hostid"]) && !isset($_REQUEST["form_refresh"]))
 		{
@@ -1911,6 +1911,9 @@
 				$notes		= $db_profile["notes"];
 			}
 		}
+		if($show_only_tmp){
+			$useip = "no";
+		}
 
 		$frmHost = new CFormTable($frm_title,"hosts.php");
 		$frmHost->SetHelp("web.hosts.host.php");
@@ -1919,7 +1922,7 @@
 		if(isset($_REQUEST["hostid"]))		$frmHost->AddVar("hostid",$_REQUEST["hostid"]);
 		if(isset($_REQUEST["groupid"]))		$frmHost->AddVar("groupid",$_REQUEST["groupid"]);
 		
-		$frmHost->AddRow(S_HOST,new CTextBox("host",$host,20));
+		$frmHost->AddRow(S_NAME,new CTextBox("host",$host,20));
 
 		$frm_row = array();
 		$db_groups=DBselect("select distinct groupid,name from groups order by name");
@@ -1939,7 +1942,16 @@
 		$frmHost->AddRow(S_NEW_GROUP,new CTextBox("newgroup",$newgroup));
 
 // onChange does not work on some browsers: MacOS, KDE browser
-		$frmHost->AddRow(S_USE_IP_ADDRESS,new CCheckBox("useip",$useip,NULL,"submit()"));
+		if($show_only_tmp)
+		{
+			$useip = "no";
+			$frmHost->AddVar("useip",$useip);
+		}
+		else
+		{
+			$frmHost->AddRow(S_USE_IP_ADDRESS,new CCheckBox("useip",$useip,NULL,"submit()"));
+		}
+
 		if($useip=="yes")
 		{
 			$frmHost->AddRow(S_IP_ADDRESS,new CTextBox("ip",$ip,"15"));
@@ -1949,12 +1961,24 @@
 			$frmHost->AddVar("ip",$ip);
 		}
 
-		$frmHost->AddRow(S_PORT,new CTextBox("port",$port,6));	
-		$cmbStatus = new CComboBox("status",$status);
-		$cmbStatus->AddItem(HOST_STATUS_MONITORED,	S_MONITORED);
-		$cmbStatus->AddItem(HOST_STATUS_TEMPLATE,	S_TEMPLATE);
-		$cmbStatus->AddItem(HOST_STATUS_NOT_MONITORED,	S_NOT_MONITORED);
-		$frmHost->AddRow(S_STATUS,$cmbStatus);	
+		if($show_only_tmp)
+		{
+			$port = "10050";
+			$status = HOST_STATUS_TEMPLATE;
+
+			$frmHost->AddVar("port",$port);
+			$frmHost->AddVar("status",$status);
+		}
+		else
+		{
+			$frmHost->AddRow(S_PORT,new CTextBox("port",$port,6));	
+
+			$cmbStatus = new CComboBox("status",$status);
+			$cmbStatus->AddItem(HOST_STATUS_MONITORED,	S_MONITORED);
+			$cmbStatus->AddItem(HOST_STATUS_TEMPLATE,	S_TEMPLATE);
+			$cmbStatus->AddItem(HOST_STATUS_NOT_MONITORED,	S_NOT_MONITORED);
+			$frmHost->AddRow(S_STATUS,$cmbStatus);	
+		}
 
 		$cmbHosts = new CComboBox("templateid",$templateid);
 		$cmbHosts->AddItem(0,"...");
@@ -1966,7 +1990,15 @@
 		}
 		$frmHost->AddRow(S_LINK_WITH_TEMPLATE,$cmbHosts);
 	
-		$frmHost->AddRow(S_USE_PROFILE,new CCheckBox("useprofile",$useprofile,NULL,"submit()"));
+		if($show_only_tmp)
+		{
+			$useprofile = "no";
+			$frmHost->AddVar("useprofile",$useprofile);
+		}
+		else
+		{
+			$frmHost->AddRow(S_USE_PROFILE,new CCheckBox("useprofile",$useprofile,NULL,"submit()"));
+		}
 		if($useprofile=="yes")
 		{
 			$frmHost->AddRow(S_DEVICE_TYPE,new CTextBox("devicetype",$devicetype,61));
@@ -2023,7 +2055,7 @@
 		$frm_title = S_HOST_GROUP;
 		if(isset($_REQUEST["groupid"]))
 		{
-			$group=get_group_by_groupid($_REQUEST["groupid"]);
+			$group = get_hostgroup_by_groupid($_REQUEST["groupid"]);
 			$frm_title = S_HOST_GROUP." \"".$group["name"]."\"";
 		}
 		if(isset($_REQUEST["groupid"]) && !isset($_REQUEST["form_refresh"]))

@@ -42,7 +42,7 @@
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"config"=>	array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	NULL),
+		"config"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1,2,3"),	NULL),
 
 		"hosts"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		"groups"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
@@ -91,7 +91,7 @@
 
 /************ ACTIONS FOR HOSTS ****************/
 /* SAVE HOST */
-	if($_REQUEST["config"]==0&&isset($_REQUEST["save"]))
+	if(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && isset($_REQUEST["save"]))
 	{
 		$useip = get_request("useip","no");
 
@@ -145,7 +145,8 @@
 	}
 
 /* DELETE HOST */ 
-	elseif(($_REQUEST["config"]==0)&&isset($_REQUEST["delete"])){
+	elseif(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && isset($_REQUEST["delete"]))
+	{
 		if(isset($_REQUEST["hostid"])){
 			$host=get_host_by_hostid($_REQUEST["hostid"]);
 			$result=delete_host($_REQUEST["hostid"]);
@@ -179,7 +180,9 @@
 		unset($_REQUEST["delete"]);
 	}
 /* ACTIVATE / DISABLE HOSTS */
-	elseif($_REQUEST["config"]==0&&(isset($_REQUEST["activate"])||isset($_REQUEST["disable"]))){
+	elseif(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && 
+		(isset($_REQUEST["activate"])||isset($_REQUEST["disable"])))
+	{
 		$result = 0;
 		$status = isset($_REQUEST["activate"]) ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
 		$hosts = get_request("hosts",array());
@@ -199,7 +202,8 @@
 		unset($_REQUEST["activate"]);
 	}
 
-	elseif($_REQUEST["config"]==0&&isset($_REQUEST["chstatus"])&&isset($_REQUEST["hostid"]))
+	elseif(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && isset($_REQUEST["chstatus"])
+		&& isset($_REQUEST["hostid"]))
 	{
 		$host=get_host_by_hostid($_REQUEST["hostid"]);
 		$result=update_host_status($_REQUEST["hostid"],$_REQUEST["chstatus"]);
@@ -297,15 +301,23 @@
 
 	$cmbConf = new CComboBox("config",$_REQUEST["config"],"submit()");
 	$cmbConf->AddItem(0,S_HOSTS);
+	$cmbConf->AddItem(3,S_TEMPLATES);
 	$cmbConf->AddItem(1,S_HOST_GROUPS);
+	$cmbConf->AddItem(2,S_TEMPLATE_LINKAGE);
 
 	switch($_REQUEST["config"]){
 		case 0:
 			$btn = new CButton("form",S_CREATE_HOST);
 			$frmForm->AddVar("groupid",get_request("groupid",0));
 			break;
+		case 3:
+			$btn = new CButton("form",S_CREATE_TEMPLATE);
+			$frmForm->AddVar("groupid",get_request("groupid",0));
+			break;
 		case 1: 
 			$btn = new CButton("form",S_CREATE_GROUP);
+			break;
+		case 2: 
 			break;
 	}
 
@@ -314,17 +326,25 @@
 		$frmForm->AddItem(SPACE."|".SPACE);
 		$frmForm->AddItem($btn);
 	}
-	show_header2(S_CONFIGURATION_OF_HOSTS_AND_HOST_GROUPS, $frmForm);
+	show_header2(S_CONFIGURATION_OF_HOSTS_GROUPS_AND_TEMPLATES, $frmForm);
 	echo BR;
 ?>
 
 <?php
-	if($_REQUEST["config"]==0)
+	if($_REQUEST["config"]==0 || $_REQUEST["config"]==3)
 	{
+		$show_only_tmp = 0;
+		if($_REQUEST["config"]==3)
+			$show_only_tmp = 1;
+
 		if(isset($_REQUEST["form"]))
 		{
-			insert_host_form();
+			insert_host_form($show_only_tmp);
 		} else {
+			$status_filter = "h.status not in (".HOST_STATUS_DELETED.",".HOST_STATUS_TEMPLATE.")";
+			if($show_only_tmp==1)
+				$status_filter = "h.status in (".HOST_STATUS_TEMPLATE.")";
+
 			$cmbGroups = new CComboBox("groupid",get_request("groupid",0),"submit()");
 			$cmbGroups->AddItem(0,S_ALL_SMALL);
 			$result=DBselect("select groupid,name from groups order by name");
@@ -333,7 +353,8 @@
 // Check if at least one host with read permission exists for this group
 				$result2=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg".
 					" where hg.groupid=".$row["groupid"].
-					" and hg.hostid=h.hostid and h.status not in (".HOST_STATUS_DELETED.")".
+					" and hg.hostid=h.hostid".
+					" and  $status_filter".
 					" group by h.hostid,h.host order by h.host");
 
 				while($row2=DBfetch($result2))
@@ -347,7 +368,7 @@
 			$frmForm->AddVar("config",$_REQUEST["config"]);
 			$frmForm->AddItem(S_GROUP.SPACE);
 			$frmForm->AddItem($cmbGroups);
-			show_header2(S_HOSTS_BIG, $frmForm);
+			show_header2($show_only_tmp ? S_TEMPLATES_BIG : S_HOSTS_BIG, $frmForm);
 
 	/* table HOSTS */
 			if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]==0) unset($_REQUEST["groupid"]);
@@ -358,11 +379,16 @@
 
 			$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 			$table->setHeader(array(
-				array(	new CCheckBox("all_hosts",NULL,NULL,
-						"CheckAll('".$form->GetName()."','all_hosts');"),
-					SPACE,
-					S_HOST),
-				S_IP,S_PORT,S_STATUS,S_AVAILABILITY,S_ERROR,S_SHOW));
+				array(new CCheckBox("all_hosts",NULL,NULL,
+					"CheckAll('".$form->GetName()."','all_hosts');"),
+					SPACE.S_NAME),
+				$show_only_tmp ? NULL : S_IP,
+				$show_only_tmp ? NULL : S_PORT,
+				$show_only_tmp ? NULL : S_STATUS,
+				$show_only_tmp ? NULL : S_AVAILABILITY,
+				$show_only_tmp ? NULL : S_ERROR,
+				S_SHOW
+				));
 		
 			$sql="select h.* from";
 			if(isset($_REQUEST["groupid"]))
@@ -370,7 +396,8 @@
 				$sql .= " hosts h,hosts_groups hg where";
 				$sql .= " hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and";
 			} else  $sql .= " hosts h where";
-			$sql .= " h.status<>".HOST_STATUS_DELETED." order by h.host";
+			$sql .=	" $status_filter order by h.host";
+
 			$result=DBselect($sql);
 		
 			while($row=DBfetch($result))
@@ -391,14 +418,20 @@
 						$row["hostid"].url_param("groupid").url_param("config"), 'action')
 					));
 		
-				$ip=$row["useip"]==1 ? $row["ip"] : "-";
+				
+				if($show_only_tmp)	$ip = NULL;
+				else			$ip=$row["useip"]==1 ? $row["ip"] : "-";
 
-				if($row["status"] == HOST_STATUS_MONITORED){
+				if($show_only_tmp)	$port = NULL;
+				else			$port = $row["port"];
+
+				if($show_only_tmp)	$status = NULL;
+				elseif($row["status"] == HOST_STATUS_MONITORED){
 					$text = S_MONITORED;
 					if(check_right("Host","U",$row["hostid"]))
 					{
 						$text=new CLink($text,"hosts.php?hosts%5B%5D=".$row["hostid"].
-							"&disable=1".url_param("config"),
+							"&disable=1".url_param("config").url_param("groupid"),
 							"off");
 					}
 					$status=new CCol($text,"off");
@@ -407,7 +440,7 @@
 					if(check_right("Host","U",$row["hostid"]))
 					{
 						$text=new CLink($text,"hosts.php?hosts%5B%5D=".$row["hostid"].
-							"&activate=1".url_param("config"),
+							"&activate=1".url_param("config").url_param("groupid"),
 							"on");
 					}
 					$status=new CCol($text,"on");
@@ -418,15 +451,17 @@
 				else
 					$status=S_UNKNOWN;
 		
-				if($row["available"] == HOST_AVAILABLE_TRUE)	
+				if($show_only_tmp)	$available = NULL;
+				elseif($row["available"] == HOST_AVAILABLE_TRUE)	
 					$available=new CCol(S_AVAILABLE,"off");
 				else if($row["available"] == HOST_AVAILABLE_FALSE)
 					$available=new CCol(S_NOT_AVAILABLE,"on");
 				else if($row["available"] == HOST_AVAILABLE_UNKNOWN)
 					$available=new CCol(S_UNKNOWN,"unknown");
 		
-				if($row["error"] == "")	$error=new CCol(SPACE,"off");
-				else			$error=new CCol($row["error"],"on");
+				if($show_only_tmp)		$error = NULL;
+				elseif($row["error"] == "")	$error = new CCol(SPACE,"off");
+				else				$error = new CCol($row["error"],"on");
 
 				if(check_right("Host","U",$row["hostid"])) {
 					$show = array(
@@ -443,22 +478,22 @@
 				$table->addRow(array(
 					$host,
 					$ip,
-					$row["port"],
+					$port,
 					$status,
 					$available,
 					$error,
 					$show));
 			}
 
-			$footerButtons = array();
-			array_push($footerButtons, new CButton('activate','Activate selected',
-				"return Confirm('".S_ACTIVATE_SELECTED_HOSTS_Q."');"));
-			array_push($footerButtons, SPACE);
-			array_push($footerButtons, new CButton('disable','Disable selected',
-				"return Confirm('".S_DISABLE_SELECTED_HOSTS_Q."');"));
-			array_push($footerButtons, SPACE);
-			array_push($footerButtons, new CButton('delete','Delete selected',
-				"return Confirm('".S_DELETE_SELECTED_HOSTS_Q."');"));
+			$footerButtons = array(
+				$show_only_tmp ? NULL : new CButton('activate','Activate selected',
+					"return Confirm('".S_ACTIVATE_SELECTED_HOSTS_Q."');"),
+				$show_only_tmp ? NULL : SPACE,
+				$show_only_tmp ? NULL : new CButton('disable','Disable selected',
+					"return Confirm('".S_DISABLE_SELECTED_HOSTS_Q."');"),
+				$show_only_tmp ? NULL : SPACE,
+				new CButton('delete','Delete selected',
+					"return Confirm('".S_DELETE_SELECTED_HOSTS_Q."');"));
 			$table->SetFooter(new CCol($footerButtons),'table_footer');
 
 			$form->AddItem($table);
@@ -537,6 +572,43 @@
 			$form->AddItem($table);
 			$form->Show();
 		}
+	}
+	elseif($_REQUEST["config"]==2)
+	{
+		show_table_header(S_TEMPLATE_LINKAGE_BIG);
+
+		$table = new CTableInfo(S_NO_LINKAGES);
+		$table->SetHeader(array(S_TEMPLATES,S_HOSTS));
+
+		$templates = DBSelect("select * from hosts where status=".HOST_STATUS_TEMPLATE.
+			" order by host");
+		while($template = DBfetch($templates))
+		{
+			$hosts = DBSelect("select * from hosts where templateid=".$template["hostid"].
+				" and status in (".HOST_STATUS_MONITORED.",".HOST_STATUS_NOT_MONITORED.")".
+				" order by host");
+//			if(DBnum_rows($hosts) <= 0)	continue;
+			$host_list = array();
+			while($host = DBfetch($hosts))
+			{
+				if($host["status"] == HOST_STATUS_NOT_MONITORED)
+				{
+					array_push($host_list, new CSpan($host["host"],"on"));
+				}
+				else
+				{
+					array_push($host_list, $host["host"]);
+				}
+				array_push($host_list,", ");
+			}
+			array_pop($host_list); // remove last ','
+			$table->AddRow(array(
+				new CSpan(get_template_path($template["hostid"]).$template["host"],"unknown"),
+				$host_list)
+				);
+		}
+
+		$table->Show();
 	}
 ?>
 <?php
