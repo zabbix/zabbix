@@ -320,7 +320,7 @@
 	"S_CANNOT_UPDATE_TEMPLATE_LINKAGE"=>	"Cannot update template linkage",
 	"S_TEMPLATE_LINKAGE_DELETED"=>		"Template linkage deleted",
 	"S_CANNOT_DELETE_TEMPLATE_LINKAGE"=>	"Cannot delete template linkage",
-	"S_CONFIGURATION_OF_HOSTS_AND_HOST_GROUPS"=>"CONFIGURATION OF HOSTS AND HOST GROUPS",
+	"S_CONFIGURATION_OF_HOSTS_GROUPS_AND_TEMPLATES"=>"CONFIGURATION OF HOSTS, GROUPS AND TEMPLATES",
 	"S_HOST_GROUPS_BIG"=>			"HOST GROUPS",
 	"S_START"=>				"Start",
 	"S_STOP"=>				"Stop",
@@ -381,7 +381,13 @@
 	"S_ACTIVATE_SELECTED_HOSTS_Q"=>		"Activate selected hosts?",
 	"S_SELECT_HOST_TEMPLATE_FIRST"=>	"Select host template first",
 	"S_CREATE_HOST"=>			"Create Host",
-	"S_CREATE_LINKAGE"=>			"Create Linkage",
+	"S_CREATE_TEMPLATE"=>			"Create Template",
+	"S_TEMPLATE_LINKAGE"=>			"Template linkage",
+	"S_TEMPLATE_LINKAGE_BIG"=>		"TEMPLATE LINKAGE",
+	"S_NO_LINKAGES"=>			"No Linkages",
+	"S_TEMPLATES"=>				"Templates",
+	"S_TEMPLATES_BIG"=>			"TEMPLATES",
+	"S_HOSTS"=>				"Hosts",
 
 //	items.php
 	"S_CONFIGURATION_OF_ITEMS"=>		"Configuration of items",
