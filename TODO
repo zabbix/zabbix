@@ -1,5 +1,7 @@
 1.1beta7:
 
+ - add support of max(#10), where #10 number of values
+ - separate templates from hosts
  - mapping betwwen 0,1 and OK, NOT AVAILABLE, etc
  - action code: http://www.zabbix.com/forum/showthread.php?t=2171
  - windows agent $1-$9: http://www.zabbix.com/forum/showthread.php?t=2163
