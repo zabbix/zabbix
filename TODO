@@ -1,4 +1,10 @@
 1.1beta7:
+ - add acknowledgements
+ - timeout-immune poller
+ - autodiscovery: http://www.zabbix.com/forum/showthread.php?t=2137
+ - execution of commands on monitored hosts in case of pre-defined events
+ - server side checks (new type of check)
+ - aggregate statistics: http://www.zabbix.com/forum/showthread.php?t=2151
 
  - action code: http://www.zabbix.com/forum/showthread.php?t=2171
  - windows agent $1-$9: http://www.zabbix.com/forum/showthread.php?t=2163
@@ -7,13 +13,8 @@
  - nested maps with overall status
  - http://www.zabbix.com/forum/showthread.php?p=7611#post7611
  - filters in action defninition form (host)
- - autodiscovery: http://www.zabbix.com/forum/showthread.php?t=2137
- - aggregate statistics: http://www.zabbix.com/forum/showthread.php?t=2151
  - overview screen: http://www.zabbix.com/forum/showthread.php?t=2078
  - a button to flush item history
- - execution of commands on monitored hosts in case of pre-defined events
- - server side checks (new type of check)
- - timeout-immune poller
  - improve housekeeper. check if it works correctly.
  - centralised management of agent configuration files
  - add encryption between server and agents
@@ -21,10 +22,7 @@
  - new item status: not available. If agent doesn't accept parameter.
  - new function for item status to enable sending of notification in case if an item changes status to unknown (for example)
  - do zabbix_sender for windows
-
  - http://www.zabbix.com/forum/showthread.php?t=1141&page=3&pp=10
-
- - add acknowledgements
  - update trigger value immediately after add or update
 
 TKOM:
