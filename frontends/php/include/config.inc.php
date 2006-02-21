@@ -768,6 +768,17 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		}
 	}
 
+// Check if str has format #<float> or <float>
+	function	validate_ticks($str)
+	{
+//		echo "Validating float:$str<br>";
+		if (eregi('^[ ]*#([0-9]+)((\.)?)([0-9]*)[ ]*$', $str, $arr)) 
+		{
+			return 0;
+		}
+		else return validate_float($str);
+	}
+
 // Does expression match server:key.function(param) ?
 	function	validate_simple_expression($expression)
 	{
@@ -775,7 +786,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 // Before str()
 // 		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.\,]+)\.((diff)|(min)|(max)|(last)|(prev))\(([0-9\.]+)\)\}$', $expression, $arr)) 
 //		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.\,]+)\.((diff)|(min)|(max)|(last)|(prev)|(str))\(([0-9a-zA-Z\.\_\/\,]+)\)\}$', $expression, $arr)) 
- 		if (eregi('^\{([0-9a-zA-Z\_\.-]+)\:([]\[0-9a-zA-Z\_\/\.\,\:\(\) -]+)\.([a-z]{3,11})\(([0-9a-zA-Z\_\/\.\,]+)\)\}$', $expression, $arr)) 
+ 		if (eregi('^\{([0-9a-zA-Z\_\.-]+)\:([]\[0-9a-zA-Z\_\/\.\,\:\(\) -]+)\.([a-z]{3,11})\(([#0-9a-zA-Z\_\/\.\,]+)\)\}$', $expression, $arr)) 
 		{
 			$host=$arr[1];
 			$key=$arr[2];
@@ -824,8 +835,18 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 			}
 
 
-			if(!in_array($function,array("str","regexp","logseverity","logsource"))
+			if(in_array($function,array("last","diff","count",
+						"prev","change","abschange","nodata","time","dayofweek",
+						"date","now","fuzzytime"))
 				&& (validate_float($parameter)!=0) )
+			{
+				error("[$parameter] is not a float");
+				return -1;
+			}
+
+			if(in_array($function,array("min","max","avg","sum",
+						"delta"))
+				&& (validate_ticks($parameter)!=0) )
 			{
 				error("[$parameter] is not a float");
 				return -1;

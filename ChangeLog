@@ -1,6 +1,8 @@
 Changes for 1.1beta7:
 
- - Added value mapping for items (Eugene)
+ - support of max(#N) for sum,min,max,delta and avg (Alexei)
+ - added value mapping for items (Eugene)
+ - added column items.valuemapid (Alexei)
  - added tables valuemaps and mappings (Alexei)
  - fix for initial update of host statuses (Alexei)
  - improved templates logic for graphs (Eugene)

@@ -79,6 +79,7 @@ CREATE TABLE items (
   lastlogsize		int4		DEFAULT '0' NOT NULL,
   logtimefmt		varchar(64)	DEFAULT '' NOT NULL,
   templateid		int4		DEFAULT '0' NOT NULL,
+  valuemapid		int4		 DEFAULT '0' NOT NULL,
   PRIMARY KEY (itemid),
   FOREIGN KEY (hostid) REFERENCES hosts
 );

@@ -218,13 +218,15 @@ static int evaluate_COUNT(char *value, DB_ITEM *item, int parameter)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int evaluate_SUM(char *value,DB_ITEM	*item,int parameter)
+static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 {
 	DB_RESULT	*result;
 
 	char		sql[MAX_STRING_LEN];
 	int		now;
 	int		res = SUCCEED;
+	int		i;
+	double		sum=0;
 
 	if(item->value_type != ITEM_VALUE_TYPE_FLOAT)
 	{
@@ -233,18 +235,45 @@ static int evaluate_SUM(char *value,DB_ITEM	*item,int parameter)
 
 	now=time(NULL);
 
-	snprintf(sql,sizeof(sql)-1,"select sum(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
-
-	result = DBselect(sql);
-	if(DBnum_rows(result) == 0)
+	if(flag == ZBX_FLAG_SEC)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Result for SUM is empty" );
-		res = FAIL;
+		snprintf(sql,sizeof(sql)-1,"select sum(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+
+		result = DBselect(sql);
+		if(DBnum_rows(result) == 0)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Result for SUM is empty" );
+			res = FAIL;
+		}
+		else
+		{
+			strcpy(value,DBget_field(result,0,0));
+		}
+	}
+	else if(flag == ZBX_FLAG_VALUES)
+	{
+		snprintf(sql,sizeof(sql)-1,"select value from history where itemid=%d order by clock desc limit %d",item->itemid, parameter);
+		result = DBselect(sql);
+		if(DBnum_rows(result) == 0)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Result for SUM is empty" );
+			res = FAIL;
+		}
+		else
+		{
+			for(i=0;i<DBnum_rows(result);i++)
+			{
+				sum+=atof(DBget_field(result,i,0));
+			}
+			snprintf(value,MAX_STRING_LEN-1,"%f", sum);
+		}
 	}
 	else
 	{
-		strcpy(value,DBget_field(result,0,0));
+		zabbix_log(LOG_LEVEL_WARNING, "Unknown flag [%d] Expected [%d] or [%d]", flag, ZBX_FLAG_SEC, ZBX_FLAG_VALUES);
+		return	FAIL;
 	}
+
 	DBfree_result(result);
 
 	return res;
@@ -267,13 +296,15 @@ static int evaluate_SUM(char *value,DB_ITEM	*item,int parameter)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter)
+static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 {
 	DB_RESULT	*result;
 
 	char		sql[MAX_STRING_LEN];
 	int		now;
 	int		res = SUCCEED;
+	int		i;
+	double		sum=0;
 
 	if(item->value_type != ITEM_VALUE_TYPE_FLOAT)
 	{
@@ -282,19 +313,46 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter)
 
 	now=time(NULL);
 
-	snprintf(sql,sizeof(sql)-1,"select avg(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
-
-	result = DBselect(sql);
-	if(DBnum_rows(result) == 0)
+	if(flag == ZBX_FLAG_SEC)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Result for AVG is empty" );
-		res = FAIL;
+		snprintf(sql,sizeof(sql)-1,"select avg(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+
+		result = DBselect(sql);
+		if(DBnum_rows(result) == 0)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Result for AVG is empty" );
+			res = FAIL;
+		}
+		else
+		{
+			strcpy(value,DBget_field(result,0,0));
+			del_zeroes(value);
+		}
+	}
+	else if(flag == ZBX_FLAG_VALUES)
+	{
+		snprintf(sql,sizeof(sql)-1,"select value from history where itemid=%d order by clock desc limit %d",item->itemid, parameter);
+		result = DBselect(sql);
+		if(DBnum_rows(result) == 0)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Result for AVG is empty" );
+			res = FAIL;
+		}
+		else
+		{
+			for(i=0;i<DBnum_rows(result);i++)
+			{
+				sum+=atof(DBget_field(result,i,0));
+			}
+			snprintf(value,MAX_STRING_LEN-1,"%f", sum/(double)DBnum_rows(result));
+		}
 	}
 	else
 	{
-		strcpy(value,DBget_field(result,0,0));
-		del_zeroes(value);
+		zabbix_log(LOG_LEVEL_WARNING, "Unknown flag [%d] Expected [%d] or [%d]", flag, ZBX_FLAG_SEC, ZBX_FLAG_VALUES);
+		return	FAIL;
 	}
+
 	DBfree_result(result);
 
 	return res;
@@ -317,13 +375,17 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter)
+static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 {
 	DB_RESULT	*result;
 
 	char		sql[MAX_STRING_LEN];
 	int		now;
+	int		i;
 	int		res = SUCCEED;
+
+	double		min=0;
+	double		f;
 
 	if(item->value_type != ITEM_VALUE_TYPE_FLOAT)
 	{
@@ -332,19 +394,47 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter)
 
 	now=time(NULL);
 
-	snprintf(sql,sizeof(sql)-1,"select min(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
-
-	result = DBselect(sql);
-	if(DBnum_rows(result) == 0)
+	if(flag == ZBX_FLAG_SEC)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Result for MIN is empty" );
-		res = FAIL;
+		snprintf(sql,sizeof(sql)-1,"select min(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+		result = DBselect(sql);
+		if(DBnum_rows(result) == 0)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Result for MIN is empty" );
+			res = FAIL;
+		}
+		else
+		{
+			strcpy(value,DBget_field(result,0,0));
+			del_zeroes(value);
+		}
+	}
+	else if(flag == ZBX_FLAG_VALUES)
+	{
+		snprintf(sql,sizeof(sql)-1,"select value from history where itemid=%d order by clock desc limit %d",item->itemid, parameter);
+		result = DBselect(sql);
+		if(DBnum_rows(result) == 0)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Result for MIN is empty" );
+			res = FAIL;
+		}
+		else
+		{
+			for(i=0;i<DBnum_rows(result);i++)
+			{
+				f=atof(DBget_field(result,i,0));
+				if(i==0)	min = f;
+				else if(f<min)	min=f;
+			}
+			snprintf(value,MAX_STRING_LEN-1,"%f", min);
+		}
 	}
 	else
 	{
-		strcpy(value,DBget_field(result,0,0));
-		del_zeroes(value);
+		zabbix_log(LOG_LEVEL_WARNING, "Unknown flag [%d] Expected [%d] or [%d]", flag, ZBX_FLAG_SEC, ZBX_FLAG_VALUES);
+		return	FAIL;
 	}
+
 	DBfree_result(result);
 
 	return res;
@@ -367,13 +457,16 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int evaluate_MAX(char *value,DB_ITEM *item,int parameter)
+static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 {
 	DB_RESULT	*result;
 
 	char		sql[MAX_STRING_LEN];
 	int		now;
 	int		res = SUCCEED;
+	int		i;
+	double		f;
+	double		max;
 
 	if(item->value_type != ITEM_VALUE_TYPE_FLOAT)
 	{
@@ -382,19 +475,48 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter)
 
 	now=time(NULL);
 
-	snprintf(sql,sizeof(sql)-1,"select max(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
-
-	result = DBselect(sql);
-	if(DBnum_rows(result) == 0)
+	if(flag == ZBX_FLAG_SEC)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
-		res = FAIL;
+		snprintf(sql,sizeof(sql)-1,"select max(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+
+		result = DBselect(sql);
+		if(DBnum_rows(result) == 0)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
+			res = FAIL;
+		}
+		else
+		{
+			strcpy(value,DBget_field(result,0,0));
+			del_zeroes(value);
+		}
+	}
+	else if(flag == ZBX_FLAG_VALUES)
+	{
+		snprintf(sql,sizeof(sql)-1,"select value from history where itemid=%d order by clock desc limit %d",item->itemid, parameter);
+		result = DBselect(sql);
+		if(DBnum_rows(result) == 0)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
+			res = FAIL;
+		}
+		else
+		{
+			for(i=0;i<DBnum_rows(result);i++)
+			{
+				f=atof(DBget_field(result,i,0));
+				if(i==0)	max=f;
+				else if(f>max)	max=f;
+			}
+			snprintf(value,MAX_STRING_LEN-1,"%f", max);
+		}
 	}
 	else
 	{
-		strcpy(value,DBget_field(result,0,0));
-		del_zeroes(value);
+		zabbix_log(LOG_LEVEL_WARNING, "Unknown flag [%d] Expected [%d] or [%d]", flag, ZBX_FLAG_SEC, ZBX_FLAG_VALUES);
+		return	FAIL;
 	}
+
 	DBfree_result(result);
 
 	return res;
@@ -417,13 +539,16 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter)
+static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter, int flag)
 {
 	DB_RESULT	*result;
 
 	char		sql[MAX_STRING_LEN];
 	int		now;
 	int		res = SUCCEED;
+	int		i;
+	double		f;
+	double		min,max;
 
 	if(item->value_type != ITEM_VALUE_TYPE_FLOAT)
 	{
@@ -432,19 +557,56 @@ static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter)
 
 	now=time(NULL);
 
-	snprintf(sql,sizeof(sql)-1,"select max(value)-min(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
-
-	result = DBselect(sql);
-	if(DBnum_rows(result) == 0)
+	if(flag == ZBX_FLAG_SEC)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Result for DELTA is empty" );
-		res = FAIL;
+		snprintf(sql,sizeof(sql)-1,"select max(value)-min(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+
+		result = DBselect(sql);
+		if(DBnum_rows(result) == 0)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Result for DELTA is empty" );
+			res = FAIL;
+		}
+		else
+		{
+			strcpy(value,DBget_field(result,0,0));
+			del_zeroes(value);
+		}
+	}
+	else if(flag == ZBX_FLAG_VALUES)
+	{
+		snprintf(sql,sizeof(sql)-1,"select value from history where itemid=%d order by clock desc limit %d",item->itemid, parameter);
+		result = DBselect(sql);
+		if(DBnum_rows(result) == 0)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Result for DELTA is empty" );
+			res = FAIL;
+		}
+		else
+		{
+			for(i=0;i<DBnum_rows(result);i++)
+			{
+				f=atof(DBget_field(result,i,0));
+				if(i==0)
+				{
+					min=f;
+					max=f;
+				}
+				else
+				{
+					if(f>max)	max=f;
+					if(f<min)	min=f;
+				}
+			}
+			snprintf(value,MAX_STRING_LEN-1,"%f", max-min);
+		}
 	}
 	else
 	{
-		strcpy(value,DBget_field(result,0,0));
-		del_zeroes(value);
+		zabbix_log(LOG_LEVEL_WARNING, "Unknown flag [%d] Expected [%d] or [%d]", flag, ZBX_FLAG_SEC, ZBX_FLAG_VALUES);
+		return	FAIL;
 	}
+
 	DBfree_result(result);
 
 	return res;
@@ -506,7 +668,7 @@ static int evaluate_NODATA(char *value,DB_ITEM	*item,int parameter)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, int flag)
+int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter,int flag)
 {
 	int	ret  = SUCCEED;
 	time_t  now;
@@ -568,19 +730,31 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
 	}
 	else if(strcmp(function,"min")==0)
 	{
-		ret = evaluate_MIN(value,item,atoi(parameter));
+		if(parameter[0]=='#')
+			ret = evaluate_MIN(value,item,atoi(parameter+1),ZBX_FLAG_VALUES);
+		else
+			ret = evaluate_MIN(value,item,atoi(parameter),ZBX_FLAG_SEC);
 	}
 	else if(strcmp(function,"max")==0)
 	{
-		ret = evaluate_MAX(value,item,atoi(parameter));
+		if(parameter[0]=='#')
+			ret = evaluate_MAX(value,item,atoi(parameter+1),ZBX_FLAG_VALUES);
+		else
+			ret = evaluate_MAX(value,item,atoi(parameter),ZBX_FLAG_SEC);
 	}
 	else if(strcmp(function,"avg")==0)
 	{
-		ret = evaluate_AVG(value,item,atoi(parameter));
+		if(parameter[0]=='#')
+			ret = evaluate_AVG(value,item,atoi(parameter+1),ZBX_FLAG_VALUES);
+		else
+			ret = evaluate_AVG(value,item,atoi(parameter),ZBX_FLAG_SEC);
 	}
 	else if(strcmp(function,"sum")==0)
 	{
-		ret = evaluate_SUM(value,item,atoi(parameter));
+		if(parameter[0]=='#')
+			ret = evaluate_SUM(value,item,atoi(parameter+1),ZBX_FLAG_VALUES);
+		else
+			ret = evaluate_SUM(value,item,atoi(parameter),ZBX_FLAG_SEC);
 	}
 	else if(strcmp(function,"count")==0)
 	{
@@ -588,7 +762,10 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, 
 	}
 	else if(strcmp(function,"delta")==0)
 	{
-		ret = evaluate_DELTA(value,item,atoi(parameter));
+		if(parameter[0]=='#')
+			ret = evaluate_DELTA(value,item,atoi(parameter+1),ZBX_FLAG_VALUES);
+		else
+			ret = evaluate_DELTA(value,item,atoi(parameter),ZBX_FLAG_SEC);
 	}
 	else if(strcmp(function,"nodata")==0)
 	{
