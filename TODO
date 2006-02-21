@@ -1,6 +1,5 @@
 1.1beta7:
 
- - add support of max(#10), where #10 number of values
  - action code: http://www.zabbix.com/forum/showthread.php?t=2171
  - windows agent $1-$9: http://www.zabbix.com/forum/showthread.php?t=2163
  - screen period: http://www.zabbix.com/forum/showthread.php?t=2162
