@@ -770,6 +770,8 @@ CREATE TABLE valuemaps (
   PRIMARY KEY (valuemapid)
 );
 
+CREATE UNIQUE INDEX valuemaps_name on valuemaps (name);
+
 --
 -- Table structure for table 'mapping'
 --
