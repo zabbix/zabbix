@@ -47,7 +47,7 @@
 	$fields=array(
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
-		"config"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,3,4,5"),	NULL),
+		"config"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,3,4,5,6"),	NULL),
 
 // other form
 		"alert_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),
@@ -82,6 +82,13 @@
 						'{config}==3&&isset({save})'),
 		"imagetype"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("1,2"),
 						'({config}==3)&&(isset({save}))'),
+//value mapping
+		"valuemapid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,	'{form}=="update"'),
+		"mapname"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY, 'isset({save})'),
+		"valuemap"=>		array(T_ZBX_STR, O_OPT, NULL,	NULL, 	NULL),
+		"rem_value"=>		array(T_ZBX_INT, O_OPT, NULL,	BETWEEN(0,65535), NULL),
+		"add_value"=>		array(T_ZBX_STR, O_OPT, NULL,	NOT_EMPTY, 'isset({add_map})'),
+		"add_newvalue"=>	array(T_ZBX_STR, O_OPT, NULL,	NOT_EMPTY, 'isset({add_map})'),
 
 // autoregistration form
 		"autoregid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),
@@ -93,9 +100,11 @@
 		"priority"=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),
 						'{config}==4&&isset({save})'),
 /* actions */
+		"add_map"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"del_map"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 /* other */
 		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
@@ -269,6 +278,64 @@
 				" refresh unsupported items [".$_REQUEST["refresh_unsupported"]."]");
 		}
 	}
+	elseif($_REQUEST["config"]==6)
+	{
+		$_REQUEST["valuemap"] = get_request("valuemap",array());
+		if(isset($_REQUEST["add_map"]))
+		{
+			$added = 0;
+			$cnt = count($_REQUEST["valuemap"]);
+			for($i=0; $i < $cnt; $i++)
+			{
+				if($_REQUEST["valuemap"][$i]["value"] != $_REQUEST["add_value"])	continue;
+				$_REQUEST["valuemap"][$i]["newvalue"] = $_REQUEST["add_newvalue"];
+				$added = 1;
+				break;
+			}
+			if($added == 0)
+			{
+				array_push($_REQUEST["valuemap"],array(
+					"value"		=> $_REQUEST["add_value"],
+					"newvalue"	=> $_REQUEST["add_newvalue"]));
+			}
+		}
+		elseif(isset($_REQUEST["del_map"])&&isset($_REQUEST["rem_value"]))
+		{
+			$_REQUEST["valuemap"] = get_request("valuemap",array());
+			foreach($_REQUEST["rem_value"] as $val)
+				unset($_REQUEST["valuemap"][$val]);
+		}
+		elseif(isset($_REQUEST["save"]))
+		{
+			$mapping = get_request("valuemap",array());
+			if(isset($_REQUEST["valuemapid"]))
+			{
+				$result = update_valuemap($_REQUEST["valuemapid"],$_REQUEST["mapname"], $mapping);
+				$msg_ok = S_VALUE_MAP_UPDATED;
+				$msg_fail = S_CANNNOT_UPDATE_VALUE_MAP;
+			}
+			else
+			{
+				$result = add_valuemap($_REQUEST["mapname"], $mapping);
+				$msg_ok = S_VALUE_MAP_ADDED;
+				$msg_fail = S_CANNNOT_ADD_VALUE_MAP;
+			}
+			if($result)
+			{
+				unset($_REQUEST["form"]);
+			}
+			show_messages($result,$msg_ok, $msg_fail);
+		}
+		elseif(isset($_REQUEST["delete"]) && isset($_REQUEST["valuemapid"]))
+		{
+			$result = delete_valuemap($_REQUEST["valuemapid"]);
+			if($result)
+			{
+				unset($_REQUEST["form"]);
+			}
+			show_messages($result, S_VALUE_MAP_DELETED, S_CANNNOT_DELETE_VALUE_MAP);
+		}
+	}
 
 ?>
 
@@ -281,23 +348,27 @@
 //	$cmbConfig->AddItem(2,S_ESCALATION_RULES);
 	$cmbConfig->AddItem(3,S_IMAGES);
 	$cmbConfig->AddItem(4,S_AUTOREGISTRATION);
+	$cmbConfig->AddItem(6,S_VALUE_MAPPING);
 	$cmbConfig->AddItem(5,S_OTHER);
 	$form->AddItem($cmbConfig);
-	if($_REQUEST["config"] == 1)
+	switch($_REQUEST["config"])
 	{
+	case 1:
 		$form->AddItem(SPACE."|".SPACE);
 		$form->AddItem(new CButton("form",S_CREATE_MEDIA_TYPE));
-	}
-	else if($_REQUEST["config"] == 3)
-	{
+		break;
+	case 3:
 		$form->AddItem(SPACE."|".SPACE);
 		$form->AddItem(new CButton("form",S_CREATE_IMAGE));
-	}
-	else if($_REQUEST["config"] == 4)
-	{
+		break;
+	case 4:
 		$form->AddItem(SPACE."|".SPACE);
 		$form->AddItem(new CButton("form",S_CREATE_RULE));
-		
+		break;
+	case 6:
+		$form->AddItem(SPACE."|".SPACE);
+		$form->AddItem(new CButton("form",S_CREATE_VALUE_MAP));
+		break;
 	}
 	show_header2(S_CONFIGURATION_OF_ZABBIX_BIG, $form);
 	echo BR;
@@ -482,6 +553,42 @@
 					$name));
 			}
 			$table->show();
+		}
+	}
+	elseif($_REQUEST["config"]==6)
+	{
+		if(isset($_REQUEST["form"]))
+		{
+			insert_value_mapping_form();
+		}
+		else
+		{
+			show_table_header(S_VALUE_MAPPING_BIG);
+			$table = new CTableInfo();
+			$table->SetHeader(array(S_NAME, S_VALUE_MAP));
+
+			$db_valuemaps = DBselect("select * from valuemaps");
+			while($db_valuemap = DBfetch($db_valuemaps))
+			{
+				$mappings_row = array();
+				$db_maps = DBselect("select * from mappings".
+					" where valuemapid=".$db_valuemap["valuemapid"]);
+				while($db_map = DBfetch($db_maps))
+				{
+					array_push($mappings_row, 
+						$db_map["value"],
+						SPACE.RARR.SPACE,
+						$db_map["newvalue"],
+						BR);
+				}
+				$table->AddRow(array(
+					new CLink($db_valuemap["name"],"config.php?form=update&".
+						"valuemapid=".$db_valuemap["valuemapid"].url_param("config"),
+						"action"),
+					$mappings_row));
+			}
+			
+			$table->Show();
 		}
 	}
 ?>

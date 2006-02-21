@@ -21,6 +21,7 @@
 <?php
 	define("BR","<br/>\n");
 	define("SPACE","&nbsp;");
+	define("RARR","&rArr;");
 
 	function	bold($str)
 	{
