@@ -333,6 +333,7 @@
 		$value_type	= get_request("value_type"	,0);
 		$trapper_hosts	= get_request("trapper_hosts"	,"");
 		$units		= get_request("units"		,'');
+		$valuemapid	= get_request("valuemapid"	,0);
 		$multiplier	= get_request("multiplier"	,0);
 		$delta		= get_request("delta"		,0);
 		$trends		= get_request("trends"		,365);
@@ -357,11 +358,7 @@
 		{
 			$frmItem->AddVar("itemid",$_REQUEST["itemid"]);
 
-			$result=DBselect("select i.description, i.key_, h.host, i.delay,".
-				" i.history, i.status, i.type, i.snmp_community,i.snmp_oid,i.value_type,".
-				" i.trapper_hosts,i.snmp_port,i.units,i.multiplier,h.hostid,i.delta,".
-				" i.trends,i.snmpv3_securityname,i.snmpv3_securitylevel,".
-				" i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,i.logtimefmt".
+			$result=DBselect("select i.*, h.host, h.hostid".
 				" from items i,hosts h where i.itemid=".$_REQUEST["itemid"].
 				" and h.hostid=i.hostid");
 			$row=DBfetch($result);
@@ -382,6 +379,7 @@
 			$value_type	= $row["value_type"];
 			$trapper_hosts	= $row["trapper_hosts"];
 			$units		= $row["units"];
+			$valuemapid	= $row["valuemapid"];
 			$multiplier	= $row["multiplier"];
 			$hostid		= $row["hostid"];
 			$delta		= $row["delta"];
@@ -532,6 +530,21 @@
 		else
 		{
 			$frmItem->AddVar("delta",0);
+		}
+		
+		if(($value_type==ITEM_VALUE_TYPE_UINT64) || ($value_type == ITEM_VALUE_TYPE_STR))
+		{
+			$cmbMap = new CComboBox("valuemapid",$valuemapid);
+			$cmbMap->AddItem(0,S_AS_IS);
+			$db_valuemaps = DBselect("select * from valuemaps");
+			while($db_valuemap = DBfetch($db_valuemaps))
+				$cmbMap->AddItem($db_valuemap["valuemapid"],$db_valuemap["name"]);
+			$frmItem->AddRow(S_SHOW_VALUE,$cmbMap);
+			
+		}
+		else
+		{
+			$frmItem->AddVar("valuemapid",0);
 		}
 
 		if($type==2)
@@ -1103,6 +1116,88 @@
 		$frmAutoReg->AddItemToBottomRow(SPACE);
 		$frmAutoReg->AddItemToBottomRow(new CButtonCancel(url_param("config")));
 		$frmAutoReg->Show();
+	}
+
+	function	insert_value_mapping_form()
+	{
+		$frmValmap = new CFormTable(S_VALUE_MAP);
+		$frmValmap->SetHelp("web.mapping.php");
+		$frmValmap->AddVar("config",get_request("config",6));
+
+		if(isset($_REQUEST["valuemapid"]))
+		{
+			$frmValmap->AddVar("valuemapid",$_REQUEST["valuemapid"]);
+			$db_valuemaps = DBselect("select * from valuemaps".
+				" where valuemapid=".$_REQUEST["valuemapid"]);
+
+			$db_valuemap = DBfetch($db_valuemaps);
+
+			$frmValmap->SetTitle(S_VALUE_MAP." \"".$db_valuemap["name"]."\"");
+		}
+
+		if(isset($_REQUEST["valuemapid"]) && !isset($_REQUEST["form_refresh"]))
+		{
+			$valuemap = array();
+			$mapname = $db_valuemap["name"];
+			$mappings = DBselect("select * from mappings where valuemapid=".$_REQUEST["valuemapid"]);
+			while($mapping = DBfetch($mappings))
+			{
+				$value = array(
+					"value" => $mapping["value"],
+					"newvalue" => $mapping["newvalue"]);
+
+				array_push($valuemap, $value);
+			}				
+		}
+		else
+		{
+			$mapname = get_request("mapname","");
+			$valuemap = get_request("valuemap",array());
+		}
+
+		$frmValmap->AddRow(S_NAME, new CTextBox("mapname",$mapname,40));
+
+		$i = 0;
+		$valuemap_el = array();
+		foreach($valuemap as $value)
+		{
+			array_push($valuemap_el,
+				new CCheckBox("rem_value[]", 'no',
+					$value["value"].SPACE.RARR.SPACE.$value["newvalue"],
+					NULL,
+					$i),
+				BR);
+			$frmValmap->AddVar("valuemap[$i][value]",$value["value"]);
+			$frmValmap->AddVar("valuemap[$i][newvalue]",$value["newvalue"]);
+			$i++;
+		}
+		if(count($valuemap_el)==0)
+			array_push($valuemap_el, S_NO_MAPPING_DEFINED);
+		else
+			array_push($valuemap_el, new CButton('del_map','delete selected'));
+
+		$frmValmap->AddRow(S_MAPPING, $valuemap_el);
+		$frmValmap->AddRow(S_NEW_MAPPING, array(
+			new CTextBox("add_value","",10),
+			new CSpan(RARR,"rarr"),
+			new CTextBox("add_newvalue","",10),
+			SPACE,
+			new CButton("add_map",S_ADD)
+			));
+
+		$frmValmap->AddItemToBottomRow(new CButton('save',S_SAVE));
+		if(isset($_REQUEST["valuemapid"]))
+		{
+			$frmValmap->AddItemToBottomRow(SPACE);
+			$frmValmap->AddItemToBottomRow(new CButtonDelete("Delete selected value mapping?",
+				url_param("form").url_param("valuemapid").url_param("config")));
+				
+		} else {
+		}
+		$frmValmap->AddItemToBottomRow(SPACE);
+		$frmValmap->AddItemToBottomRow(new CButtonCancel(url_param("config")));
+	
+		$frmValmap->Show();
 	}
 
 	function	insert_action_form()

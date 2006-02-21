@@ -2872,4 +2872,72 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		ImagePNG($image);
 	}
 
+	function	add_mapping_to_valuemap($valuemapid, $mappings)
+	{
+		DBexecute("delete from mappings where valuemapid=$valuemapid");
+
+		foreach($mappings as $map)
+		{
+			$result = DBexecute("insert into mappings (valuemapid, value, newvalue)".
+				" values (".$valuemapid.",".zbx_dbstr($map["value"]).",".
+				zbx_dbstr($map["newvalue"]).")");
+
+			if(!$result)
+				return $result;
+		}
+		return TRUE;
+	}
+
+	function	add_valuemap($name, $mappings)
+	{
+		if(!is_array($mappings))	return FALSE;
+		
+		$result = DBexecute("insert into valuemaps (name) values (".zbx_dbstr($name).")");
+		if(!$result)
+			return $result;
+
+		$valuemapid =  DBinsert_id($result,"valuemaps","valuemapid");
+		
+		$result = add_mapping_to_valuemap($valuemapid, $mappings);
+		if(!$result){
+			delete_valuemap($valuemapid);
+		}
+		return $result;
+	}
+
+	function	update_valuemap($valuemapid, $name, $mappings)
+	{
+		if(!is_array($mappings))	return FALSE;
+
+		$result = DBexecute("update valuemaps set name=".zbx_dbstr($name).
+			" where valuemapid=$valuemapid");
+
+		if(!$result)
+			return $result;
+
+		$result = add_mapping_to_valuemap($valuemapid, $mappings);
+		if(!$result){
+			delete_valuemap($valuemapid);
+		}
+		return $result;
+	}
+
+	function	delete_valuemap($valuemapid)
+	{
+		DBexecute("delete from mappings where valuemapid=$valuemapid");
+		DBexecute("delete from valuemaps where valuemapid=$valuemapid");
+		return TRUE;
+	}
+
+	function	replace_value_by_map($value, $valuemapid)
+	{
+		$result = DBselect("select newvalue from mappings".
+			" where valuemapid=".zbx_dbstr($valuemapid)." and value=".zbx_dbstr($value));
+		if(DBnum_rows($result))
+		{
+			$result = DBfetch($result);
+			return $result["newvalue"].SPACE."($value)";
+		}
+		return $value;
+	}
 ?>

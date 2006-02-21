@@ -166,19 +166,28 @@
 		$item=get_item_by_itemid($_REQUEST["itemid"]);
 		if($item["value_type"]==ITEM_VALUE_TYPE_FLOAT)
 		{
-			$sql="select clock,value from history where itemid=".$_REQUEST["itemid"]." and clock>$time and clock<$till order by clock desc";
+			$sql="select h.clock,h.value,i.valuemapid from history h, items i".
+				" where h.itemid=i.itemid and i.itemid=".$_REQUEST["itemid"].
+				" and h.clock>$time and h.clock<$till order by clock desc";
 		}
 		else if($item["value_type"]==ITEM_VALUE_TYPE_UINT64)
 		{
-			$sql="select clock,value from history_uint where itemid=".$_REQUEST["itemid"]." and clock>$time and clock<$till order by clock desc";
+			$sql="select h.clock,h.value,i.valuemapid from history_uint h, items i".
+				" where h.itemid=i.itemid and i.itemid=".$_REQUEST["itemid"].
+				" and h.clock>$time and h.clock<$till order by clock desc";
 		}
 		else if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
 		{
-			$sql="select clock,value,timestamp,source,severity from history_log where itemid=".$_REQUEST["itemid"]." and clock>$time and clock<$till order by id desc, clock desc";
+			$sql="select h.clock,h.value,h.timestamp,h.source,h.severity,i.valuemapid".
+				" from history_log h, items i".
+				" where h.itemid=i.itemid and itemid=".$_REQUEST["itemid"].
+				" and h.clock>$time and h.clock<$till order by id desc, clock desc";
 		}
 		else
 		{
-			$sql="select clock,value from history_str where itemid=".$_REQUEST["itemid"]." and clock>$time and clock<$till order by clock desc";
+			$sql="select h.clock,h.value,i.valuemapid from history_str h, items i".
+				" where h.itemid=i.itemid and i.itemid=".$_REQUEST["itemid"].
+				" and h.clock>$time and h.clock<$till order by clock desc";
 		}
 		$result=DBselect($sql);
 		$col=0;
@@ -194,7 +203,7 @@
 				$col=1;
 			}
 			$clock=$row["clock"];
-			$value=$row["value"];
+			$value=replace_value_by_map($row["value"],$row["valuemapid"]);
 			$clock=date("Y.M.d H:i:s",$clock);
 			echo "<TD>$clock</TD>";
 			if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
@@ -281,26 +290,35 @@
 
 		if($item["value_type"]==ITEM_VALUE_TYPE_FLOAT)
 		{
-			$sql="select clock,value from history where itemid=".$_REQUEST["itemid"]." order by clock desc limit 500";
+			$sql="select h.clock, h.value, i.valuemapid from history h, item i".
+				" where h.itemid=i.itemid and i.itemid=".$_REQUEST["itemid"].
+				" order by clock desc limit 500";
 		}
 		else if($item["value_type"]==ITEM_VALUE_TYPE_UINT64)
 		{
-			$sql="select clock,value from history_uint where itemid=".$_REQUEST["itemid"]." order by clock desc limit 500";
+			$sql="select h.clock, h.value, i.valuemapid from history_uint h, items i".
+				" where h.itemid=i.itemid and i.itemid=".$_REQUEST["itemid"].
+				" order by clock desc limit 500";
 		}
 		else if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
 		{
-			$sql="select clock,value,timestamp,source,severity from history_log where itemid=".$_REQUEST["itemid"]." order by id desc, clock desc limit 500";
+			$sql="select h.clock,h.value,h.timestamp,h.source,h.severity,i.valuemapid".
+				" from history_log h, items i".
+				" where h.itemid=i.itemid and itemid=".$_REQUEST["itemid"].
+				" order by id desc, clock desc limit 500";
 		}
 		else
 		{
-			$sql="select clock,value from history_str where itemid=".$_REQUEST["itemid"]." order by clock desc limit 500";
+			$sql="select h.clock,h.value,i.valuemapid from history_str h, items i".
+				" where h.itemid=i.itemid and i.itemid=".$_REQUEST["itemid"].
+				" order by clock desc limit 500";
 		}
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
-			$clock=$row["clock"];
-			$clock=date("Y.M.d H:i:s",$row["clock"]);
-			$value=$row["value"];
+			$clock = $row["clock"];
+			$clock = date("Y.M.d H:i:s",$row["clock"]);
+			$value = replace_value_by_map($row["value"], $row["valuemapid"]);
 
 			if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
 			{
