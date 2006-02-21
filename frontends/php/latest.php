@@ -189,9 +189,15 @@
 
 		$col=0;
 		if(isset($_REQUEST["select"]))
-			$sql="select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier,i.key_ from items i,hosts h where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 and i.description like ".zbx_dbstr("%",$_REQUEST["select"]."%")." order by i.description";
+			$sql="select h.host,i.*,h.hostid from items i,hosts h".
+				" where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED.
+				" and i.status=0 and i.description like ".zbx_dbstr("%",$_REQUEST["select"]."%").
+				" order by i.description";
 		else
-			$sql="select h.host,i.itemid,i.description,i.lastvalue,i.prevvalue,i.lastclock,i.status,h.hostid,i.value_type,i.units,i.multiplier,i.key_ from items i,hosts h where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=0 and h.hostid=".$_REQUEST["hostid"]." order by i.description";
+			$sql="select h.host,i.*,h.hostid from items i,hosts h".
+				" where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED.
+				" and i.status=0 and h.hostid=".$_REQUEST["hostid"]." order by i.description";
+
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
@@ -203,6 +209,7 @@
 			{
 				continue;
 			}
+
 //			iif_echo($col++%2 == 1,
 //				"<tr bgcolor=#DDDDDD>",
 //				"<tr bgcolor=#EEEEEE>");
@@ -225,7 +232,8 @@
 
 			if(isset($row["lastvalue"]))
 			{
-				if(($row["value_type"] == ITEM_VALUE_TYPE_FLOAT) || ($row["value_type"] == ITEM_VALUE_TYPE_UINT64))
+				if(($row["value_type"] == ITEM_VALUE_TYPE_FLOAT) ||
+					($row["value_type"] == ITEM_VALUE_TYPE_UINT64))
 				{
 					$lastvalue=convert_units($row["lastvalue"],$row["units"]);
 				}
@@ -233,6 +241,7 @@
 				{
 					$lastvalue=nbsp(htmlspecialchars(substr($row["lastvalue"],0,20)." ..."));
 				}
+				$lastvalue = replace_value_by_map($lastvalue, $row["valuemapid"]);
 			}
 			else
 			{

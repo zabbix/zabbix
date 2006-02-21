@@ -292,7 +292,7 @@
 		$desc=S_UNKNOWN;
 		if($conditiontype==CONDITION_TYPE_GROUP)
 		{
-			$group=get_group_by_groupid($value);
+			$group=get_hostgroup_by_groupid($value);
 			if($group) $desc=S_HOST_GROUP." $op "."\"".$group["name"]."\"";
 		}
 		if($conditiontype==CONDITION_TYPE_TRIGGER)
