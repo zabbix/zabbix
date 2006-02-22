@@ -26,6 +26,7 @@
 	$DB_TYPE	="MYSQL";
 	$DB_SERVER	="localhost";
 	$DB_DATABASE	="zabbix";
+//	$DB_DATABASE	="osmiy";
 	$DB_USER	="root";
 	$DB_PASSWORD	="";
 // END OF DATABASE CONFIGURATION

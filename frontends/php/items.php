@@ -74,7 +74,7 @@
 		"delta"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2"),'isset({save})&&'.IN("0,3","type")),
 
 		"formula"=>	array(T_ZBX_DBL, O_OPT,  NULL,  NULL,'isset({save})&&{multiplier}==1'),
-		"logtimefmt"=>	array(T_ZBX_STR, O_OPT,  NULL,  NOT_EMPTY,'isset({save})&&{value_type}==2'),
+		"logtimefmt"=>	array(T_ZBX_STR, O_OPT,  NULL,  NULL,'isset({save})&&{value_type}==2'),
                  
 		"group_itemid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID, NULL),
 

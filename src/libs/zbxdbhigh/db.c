@@ -1413,6 +1413,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_RESULT *result, int row)
 	item->status=atoi(DBget_field(result,i,31));
 	item->trapper_hosts=DBget_field(result,i,32);
 	item->logtimefmt=DBget_field(result,i,33);
+	item->valuemapid=atoi(DBget_field(result,i,34));
 }
 
 int     DBget_default_escalation_id()
