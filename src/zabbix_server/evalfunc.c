@@ -668,22 +668,18 @@ static int evaluate_NODATA(char *value,DB_ITEM	*item,int parameter)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter,int flag)
+int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 {
 	int	ret  = SUCCEED;
 	time_t  now;
 	struct  tm      *tm;
 	
-	float	value_float;
-	float	value_float_abs;
-	char	suffix[MAX_STRING_LEN];
-
 	int	fuzlow, fuzhig;
 
 	int	day;
 	int	len;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() Function [%s] flag [%d]",function,flag);
+	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() Function [%s]",function);
 
 	if(strcmp(function,"last")==0)
 	{
@@ -963,53 +959,131 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter,i
 	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 7 Units [%s]", item->units);
 	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 7 Value [%s] Units [%s] Formula [%s]", value, item->units, item->formula);
 
-	/* Add suffix: 1000000 -> 1 MB */
-	if( (EVALUATE_FUNCTION_SUFFIX == flag) && (ITEM_VALUE_TYPE_FLOAT == item->value_type) &&
-		(SUCCEED == ret) && strlen(item->units)>0)
-	{
-		value_float=atof(value);
-		/* Custom multiplier? */
-/*
-		if(item->multiplier == 1)
-		{
-			value_float=value_float*atof(item->formula);
-		}*/
-
-		value_float_abs=abs(value_float);
-
-		if(value_float_abs<1024)
-		{
-			strscpy(suffix,"");
-		}
-		else if(value_float_abs<1024*1024)
-		{
-			strscpy(suffix,"K");
-			value_float=value_float/1024;
-		}
-		else if(value_float_abs<1024*1024*1024)
-		{
-			strscpy(suffix,"M");
-			value_float=value_float/(1024*1024);
-		}
-		else
-		{
-			strscpy(suffix,"G");
-			value_float=value_float/(1024*1024*1024);
-		}
-		zabbix_log( LOG_LEVEL_DEBUG, "Value [%s] [%f] Suffix [%s] Units [%s]",value,value_float,suffix,item->units);
-//		if(cmp_double((double)round(value_float), value_float) == 0)
-		if(cmp_double((int)(value_float+0.5), value_float) == 0)
-		{
-                	snprintf(value, MAX_STRING_LEN-1, "%.0f %s%s", value_float, suffix, item->units);
-		}
-		else
-		{
-                	snprintf(value, MAX_STRING_LEN-1, "%.2f %s%s", value_float, suffix, item->units);
-		}
-	}
-
 	zabbix_log( LOG_LEVEL_DEBUG, "End of evaluate_FUNCTION. Result [%s]",value);
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: add_value_suffix                                                 *
+ *                                                                            *
+ * Purpose: Add suffix for value                                              *
+ *                                                                            *
+ * Parameters: value - value to replacing                                     *
+ *             valuemapid - index of value map                                *
+ *                                                                            *
+ * Return value: SUCCEED - suffix added succesfully, value contains new value *
+ *               FAIL - adding failed, value contains old value               *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	add_value_suffix(char *value, DB_ITEM *item)
+{
+	float	value_float;
+	float	value_float_abs;
+
+	char	suffix[MAX_STRING_LEN];
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In add_value_suffix() Value [%s]",value);
+	
+	/* Add suffix: 1000000 -> 1 MB */
+	if(!(
+		(ITEM_VALUE_TYPE_FLOAT == item->value_type) &&
+		(strlen(item->units)>0))
+	)	return FAIL;
+		
+	value_float=atof(value);
+	/* Custom multiplier? */
+/*
+	if(item->multiplier == 1)
+	{
+		value_float=value_float*atof(item->formula);
+	}*/
+
+	value_float_abs=abs(value_float);
+
+	if(value_float_abs<1024)
+	{
+		strscpy(suffix,"");
+	}
+	else if(value_float_abs<1024*1024)
+	{
+		strscpy(suffix,"K");
+		value_float=value_float/1024;
+	}
+	else if(value_float_abs<1024*1024*1024)
+	{
+		strscpy(suffix,"M");
+		value_float=value_float/(1024*1024);
+	}
+	else
+	{
+		strscpy(suffix,"G");
+		value_float=value_float/(1024*1024*1024);
+	}
+//		if(cmp_double((double)round(value_float), value_float) == 0)
+	if(cmp_double((int)(value_float+0.5), value_float) == 0)
+	{
+		snprintf(value, MAX_STRING_LEN-1, "%.0f %s%s", value_float, suffix, item->units);
+	}
+	else
+	{
+		snprintf(value, MAX_STRING_LEN-1, "%.2f %s%s", value_float, suffix, item->units);
+	}
+	
+	zabbix_log(LOG_LEVEL_DEBUG, "Value [%s] [%f] Suffix [%s] Units [%s]",value,value_float,suffix,item->units);
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: replace_value_by_map                                             *
+ *                                                                            *
+ * Purpose: replace value by mapping value                                    *
+ *                                                                            *
+ * Parameters: value - value to replacing                                     *
+ *             valuemapid - index of value map                                *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated succesfully, value contains new value    *
+ *               FAIL - evaluation failed, value contains old value           *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	replace_value_by_map(char *value, int valuemapid)
+{
+	DB_RESULT	*result;
+
+	char new_value[MAX_STRING_LEN];
+	char sql[MAX_STRING_LEN];
+	char *or_value;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In replace_value_by_map()" );
+	
+	if(valuemapid == 0)	return FAIL;
+	
+	snprintf(sql,sizeof(sql)-1,"select newvalue from mappings where valuemapid=%d and value='%s'",
+			valuemapid, value);
+	result = DBselect(sql);
+
+	if(DBnum_rows(result) == 0)	return FAIL;
+
+	strcpy(new_value,DBget_field(result,0,0));
+	DBfree_result(result);
+
+	del_zeroes(new_value);
+	or_value = sql;	// sql variarbvle used as tmp - original value
+	strncpy(sql,value,MAX_STRING_LEN);
+	
+	snprintf(value, MAX_STRING_LEN-1, "%s (%s)", new_value, or_value);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "Value: $s", value);
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -1039,7 +1113,7 @@ int evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *par
         char	sql[MAX_STRING_LEN];
 	int	res;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In get_lastvalue()" );
+	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_FUNCTION2()" );
 
 	snprintf(sql,sizeof(sql)-1,"select %s where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", ZBX_SQL_ITEM_SELECT, host, key );
 	result = DBselect(sql);
@@ -1058,7 +1132,13 @@ int evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *par
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Before evaluate_FUNCTION()" );
 
-	res = evaluate_FUNCTION(value,&item,function,parameter, EVALUATE_FUNCTION_SUFFIX);
+//	res = evaluate_FUNCTION(value,&item,function,parameter, EVALUATE_FUNCTION_SUFFIX);
+	res = evaluate_FUNCTION(value,&item,function,parameter);
+
+	if(replace_value_by_map(value, item.valuemapid) != SUCCEED)
+	{
+		add_value_suffix(value, &item);
+	}
 
 /* Cannot call DBfree_result until evaluate_FUNC */
 	DBfree_result(result);

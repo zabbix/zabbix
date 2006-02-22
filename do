@@ -29,6 +29,7 @@ do
     cat )   docat="yes"; noparam=1;;
     --enable-* ) config_param="$config_param $cmd";; 
     --with-* ) config_param="$config_param $cmd";;
+    --prefix=* ) config_param="$config_param $cmd";;
     help ) help="yes";;
     h ) help="yes";;
     * ) 

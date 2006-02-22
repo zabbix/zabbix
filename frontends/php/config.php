@@ -83,8 +83,8 @@
 		"imagetype"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("1,2"),
 						'({config}==3)&&(isset({save}))'),
 //value mapping
-		"valuemapid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,	'{form}=="update"'),
-		"mapname"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY, 'isset({save})'),
+		"valuemapid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,	'{config}==6&&{form}=="update"'),
+		"mapname"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY, '{config}==6&&isset({save})'),
 		"valuemap"=>		array(T_ZBX_STR, O_OPT, NULL,	NULL, 	NULL),
 		"rem_value"=>		array(T_ZBX_INT, O_OPT, NULL,	BETWEEN(0,65535), NULL),
 		"add_value"=>		array(T_ZBX_STR, O_OPT, NULL,	NOT_EMPTY, 'isset({add_map})'),
