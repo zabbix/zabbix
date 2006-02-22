@@ -39,5 +39,6 @@ CREATE TABLE housekeeper (
   housekeeperid		serial,
   tablename		varchar(64)	DEFAULT '' NOT NULL,
   field			varchar(64)	DEFAULT '' NOT NULL,
+  value			int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (housekeeperid)
 );
