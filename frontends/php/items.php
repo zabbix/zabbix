@@ -78,6 +78,8 @@
                  
 		"group_itemid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID, NULL),
 
+		"del_history"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+
 		"register"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"group_task"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -143,6 +145,17 @@
 			unset($_REQUEST["itemid"]);
 			unset($_REQUEST["form"]);
 		}
+	}
+	elseif(isset($_REQUEST["del_history"])&&isset($_REQUEST["itemid"]))
+	{
+		$result = delete_history_by_itemid($_REQUEST["itemid"]);
+		if($result)
+		{
+			DBexecute("update items set nextcheck=null,lastvalue=null,".
+				"lastclock=null,prevvalue=null where itemid=".$_REQUEST["itemid"]);
+		}
+		show_messages($result, S_HISTORY_CLEANED, S_CANNOT_CLEAN_HISTORY);
+		
 	}
 	elseif(isset($_REQUEST["register"]))
 	{
@@ -249,7 +262,7 @@
 			}
 			show_messages(TRUE, S_ITEMS_ACTIVATED, S_CANNOT_ACTIVATE_ITEMS);
 		}
-		if($_REQUEST["group_task"]=="Disable selected")
+		elseif($_REQUEST["group_task"]=="Disable selected")
 		{
 			$group_itemid = $_REQUEST["group_itemid"];
 			foreach($group_itemid as $id)
@@ -257,6 +270,17 @@
 				$result2=disable_item($id);
 			}
 			show_messages(TRUE, S_ITEMS_DISABLED, S_CANNOT_DISABLE_ITEMS);
+		}
+		elseif($_REQUEST["group_task"]=="Clean history")
+		{
+			$group_itemid = $_REQUEST["group_itemid"];
+			foreach($group_itemid as $id)
+			{
+				delete_history_by_itemid($id);
+				DBexecute("update items set nextcheck=null,lastvalue=null,".
+					"lastclock=null,prevvalue=null where itemid=$id");
+			}
+			show_messages(TRUE, S_HISTORY_CLEANED, S_CANNOT_CLEAN_HISTORY);
 		}
 	}
 ?>
@@ -432,6 +456,9 @@
 		array_push($footerButtons, SPACE);
 		array_push($footerButtons, new CButton('group_task','Disable selected',
 			"return Confirm('".S_DISABLE_SELECTED_ITEMS_Q."');"));
+		array_push($footerButtons, SPACE);
+		array_push($footerButtons, new CButton('group_task','Clean history',
+			"return Confirm('History cleaning can take a long time. Continue?');"));
 		array_push($footerButtons, SPACE);
 		array_push($footerButtons, new CButton('group_task','Delete selected',
 			"return Confirm('".S_DELETE_SELECTED_ITEMS_Q."');"));

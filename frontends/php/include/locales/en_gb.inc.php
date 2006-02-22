@@ -403,6 +403,8 @@
 	"S_HOSTS"=>				"Hosts",
 
 //	items.php
+	"S_HISTORY_CLEANED"=>			"History cleaned",
+	"S_CANNOT_CLEAN_HISTORY"=>		"Cannot clean history",
 	"S_CONFIGURATION_OF_ITEMS"=>		"Configuration of items",
 	"S_CONFIGURATION_OF_ITEMS_BIG"=>	"CONFIGURATION OF ITEMS",
 	"S_CANNOT_UPDATE_ITEM"=>		"Cannot update item",
