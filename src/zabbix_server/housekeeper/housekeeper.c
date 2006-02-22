@@ -54,6 +54,8 @@ static int delete_history(int itemid)
 {
 	char	sql[MAX_STRING_LEN];
 
+	zabbix_log(LOG_LEVEL_WARNING,"In delete_history(%d)", itemid);
+
 	snprintf(sql,sizeof(sql)-1,"delete from history where itemid=%d limit 500", itemid);
 	DBexecute(sql);
 
@@ -63,6 +65,8 @@ static int delete_history(int itemid)
 static int delete_trends(int itemid)
 {
 	char	sql[MAX_STRING_LEN];
+
+	zabbix_log(LOG_LEVEL_WARNING,"In delete_trends(%d)", itemid);
 
 	snprintf(sql,sizeof(sql)-1,"delete from trends where itemid=%d limit 500", itemid);
 	DBexecute(sql);
@@ -75,7 +79,7 @@ static int delete_item(int itemid)
 	char	sql[MAX_STRING_LEN];
 	int	res = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In delete_item(%d)", itemid);
+	zabbix_log(LOG_LEVEL_WARNING,"In delete_item(%d)", itemid);
 
 	res = delete_history(itemid);
 
@@ -104,7 +108,8 @@ static int delete_host(int hostid)
 	DB_RESULT	*result;
 	int	res = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In delete_host(%d)", hostid);
+	zabbix_log(LOG_LEVEL_WARNING,"In delete_host(%d)", hostid);
+
 	snprintf(sql,sizeof(sql)-1,"select itemid from items where hostid=%d", hostid);
 	result = DBselect(sql);
 
@@ -156,6 +161,8 @@ static int housekeeping_items(void)
 	DB_RESULT	*result;
 	int		i,itemid;
 
+	zabbix_log( LOG_LEVEL_WARNING, "In housekeeping_items()");
+
 	snprintf(sql,sizeof(sql)-1,"select itemid from items where status=%d", ITEM_STATUS_DELETED);
 	result = DBselect(sql);
 	for(i=0;i<DBnum_rows(result);i++)
@@ -188,6 +195,8 @@ static int housekeeping_hosts(void)
 	char		sql[MAX_STRING_LEN];
 	DB_RESULT	*result;
 	int		i,hostid;
+	
+	zabbix_log( LOG_LEVEL_WARNING, "In housekeeping_hosts()");
 
 	snprintf(sql,sizeof(sql)-1,"select hostid from hosts where status=%d", HOST_STATUS_DELETED);
 	result = DBselect(sql);
@@ -224,6 +233,8 @@ static int housekeeping_history_and_trends(int now)
 	DB_RESULT	*result;
 
 	int		i;
+
+	zabbix_log( LOG_LEVEL_WARNING, "In housekeeping_history_and_trends(%d)", now);
 
 	snprintf(sql,sizeof(sql)-1,"select itemid,history,delay,trends from items");
 	result = DBselect(sql);
@@ -288,6 +299,8 @@ static int housekeeping_sessions(int now)
 {
 	char	sql[MAX_STRING_LEN];
 
+	zabbix_log( LOG_LEVEL_WARNING, "In housekeeping_sessions(%d)", now);
+
 	snprintf(sql,sizeof(sql)-1,"delete from sessions where lastaccess<%d",now-24*3600);
 	DBexecute(sql);
 
@@ -300,6 +313,8 @@ static int housekeeping_alerts(int now)
 	int		alert_history;
 	DB_RESULT	*result;
 	int		res = SUCCEED;
+
+	zabbix_log( LOG_LEVEL_WARNING, "In housekeeping_alarms(%d)", now);
 
 	snprintf(sql,sizeof(sql)-1,"select alert_history from config");
 	result = DBselect(sql);
@@ -328,6 +343,8 @@ static int housekeeping_alarms(int now)
 	DB_RESULT	*result;
 	int		res = SUCCEED;
 
+	zabbix_log( LOG_LEVEL_WARNING, "In housekeeping_alarms(%d)", now);
+
 	snprintf(sql,sizeof(sql)-1,"select alarm_history from config");
 	result = DBselect(sql);
 	if(DBnum_rows(result) == 0)
@@ -340,6 +357,7 @@ static int housekeeping_alarms(int now)
 		alarm_history=atoi(DBget_field(result,0,0));
 
 		snprintf(sql,sizeof(sql)-1,"delete from alarms where clock<%d",now-24*3600*alarm_history);
+		zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
 		DBexecute(sql);
 	}
 	
@@ -350,6 +368,8 @@ static int housekeeping_alarms(int now)
 int main_housekeeper_loop()
 {
 	int	now;
+
+	zabbix_set_log_level(LOG_LEVEL_DEBUG);
 
 	if(CONFIG_DISABLE_HOUSEKEEPING == 1)
 	{
