@@ -787,4 +787,15 @@ CREATE TABLE mappings (
 
 CREATE INDEX mappings_valuemapid on mappings (valuemapid);
 
+--
+-- Table structure for table 'housekeeper'
+--
+
+CREATE TABLE housekeeper (
+  housekeeperid		serial,
+  tablename		varchar(64)	DEFAULT '' NOT NULL,
+  field			varchar(64)	DEFAULT '' NOT NULL,
+  PRIMARY KEY (housekeeperid)
+);
+
 VACUUM ANALYZE;
