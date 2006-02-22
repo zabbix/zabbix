@@ -278,22 +278,32 @@
 
 		$ret = FALSE;
 
-		for($i=0;$i<100;$i++)
+	// delete items -> triggers -> graphs
+		$db_items = get_items_by_hostid($hostid);
+		while($db_item = DBfetch($db_items))
 		{
-			if($DB_TYPE=="MYSQL")
-			{
-				$sql="update hosts set status=".HOST_STATUS_DELETED.",host=concat(host,\" [DEL$i]\") where hostid=$hostid";
-			}
-			else
-			{
-				$sql="update hosts set status=".HOST_STATUS_DELETED.",host=host||' [DEL$i]' where hostid=$hostid";
-			}
-			if($ret = DBexecute($sql,1))	break;
+			delete_item($db_item["itemid"]);
 		}
-		if($ret){
-			delete_host_profile($hostid);
+
+	// delete host from maps
+		delete_sysmaps_host_by_hostid($hostid);
+		
+	// delete host from group
+		DBexecute("delete from hosts_groups where hostid=$hostid");
+
+	// unlink child hosts
+		$db_childs = get_hosts_by_templateid($hostid);
+		while($db_child = DBfetch($db_childs))
+		{
+			DBexecute("update hosts set templateid=0 where hostid=".$db_child["hostid"]);
+			sync_host_with_templates($hostid);
 		}
-		return	$ret;
+
+	// delete host profile
+		delete_host_profile($hostid);
+
+	// delete host
+		return DBexecute("delete from hosts where hostid=$hostid");
 	}
 
 	function	delete_host_group($groupid)

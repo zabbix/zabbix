@@ -23,101 +23,6 @@
 	include_once 	"include/db.inc.php";
 //	include_once 	"include/local_en.inc.php";
 
-	# Insert host template form
-	function	insert_template_form()
-	{
-		global $_REQUEST;
-
-		$frmTemplate = new CFormTable(S_TEMPLATE,'hosts.php');
-		$frmTemplate->SetHelp('web.hosts.php');
-		$frmTemplate->AddVar('config',$_REQUEST["config"]);
-
-		if(isset($_REQUEST["hosttemplateid"]))
-		{
-			$frmTemplate->AddVar('hosttemplateid',$_REQUEST["hosttemplateid"]);
-		}
-
-		if(isset($_REQUEST["hosttemplateid"]) && !isset($_REQUEST["form_refresh"]))
-		{
-			$result=DBselect("select * from hosts_templates".
-				" where hosttemplateid=".$_REQUEST["hosttemplateid"]);
-			$row=DBfetch($result);
-	
-			$hostid		= $row["hostid"];
-			$templateid	= $row["templateid"];
-		
-			$items = array();	
-			if(1 & $row["items"])	array_push($items,1);
-			if(2 & $row["items"])	array_push($items,2);
-			if(4 & $row["items"])	array_push($items,4);
-
-			$triggers= array();	
-			if(1 & $row["triggers"])	array_push($triggers,1);
-			if(2 & $row["triggers"])	array_push($triggers,2);
-			if(4 & $row["triggers"])	array_push($triggers,4);
-
-			$graphs= array();	
-			if(1 & $row["graphs"])	array_push($graphs,1);
-			if(2 & $row["graphs"])	array_push($graphs,2);
-			if(4 & $row["graphs"])	array_push($graphs,4);
-		}
-		else
-		{
-			$hostid		= get_request("hostid",0);
-			$templateid	= get_request("templateid",0);
-
-			$items		= get_request("items",array(1,2,4));
-			$triggers 	= get_request("triggers",array(1,2,4));
-			$graphs 	= get_request("graphs",array(1,2,4));
-		}
-		if($hostid!=0){
-			$host	 = get_host_by_hostid($hostid);
-			$frmTemplate->AddVar('hostid',$hostid);
-		}
-
-		if($templateid!=0)
-			$template= get_host_by_hostid($templateid);
-
-		$cmbTemplate = new CComboBox('templateid',$templateid);
-	        $hosts=DBselect("select hostid,host from hosts order by host");
-		while($host=DBfetch($hosts))
-			$cmbTemplate->AddItem($host["hostid"],$host["host"]);
-
-		$frmTemplate->AddRow(S_TEMPLATE,$cmbTemplate);
-
-		$frmTemplate->AddRow(S_ITEMS,array(
-			new CCheckBox('items[]',	in_array(1,$items)?'yes':'no',	S_ADD,	NULL,	1),
-			new CCheckBox('items[]',	in_array(2,$items)?'yes':'no',	S_UPDATE,NULL,	2),
-			new CCheckBox('items[]',	in_array(4,$items)?'yes':'no',	S_DELETE,NULL,	4)
-		));
-
-		$frmTemplate->AddRow(S_TRIGGERS,array(
-			new CCheckBox('triggers[]',	in_array(1,$triggers)?'yes':'no',S_ADD,	NULL,	1),
-			new CCheckBox('triggers[]',	in_array(2,$triggers)?'yes':'no',S_UPDATE,NULL,	2),
-			new CCheckBox('triggers[]',	in_array(4,$triggers)?'yes':'no',S_DELETE,NULL,	4),
-		));
-
-		$frmTemplate->AddRow(S_GRAPHS,array(
-			new CCheckBox('graphs[]',	in_array(1,$graphs)?'yes':'no',	S_ADD,	NULL,	1),
-			new CCheckBox('graphs[]',	in_array(2,$graphs)?'yes':'no',	S_UPDATE,NULL,	2),
-			new CCheckBox('graphs[]',	in_array(4,$graphs)?'yes':'no',	S_DELETE,NULL,	4),
-		));
-
-		$frmTemplate->AddItemToBottomRow(new CButton('save',S_SAVE));
-		if(isset($_REQUEST["hosttemplateid"]))
-		{
-			$frmTemplate->AddItemToBottomRow(SPACE);
-			$frmTemplate->AddItemToBottomRow(new CButtonDelete('Delete selected linkage?',
-				url_param("form").url_param("config").url_param("hostid").
-				url_param("hosttemplateid")));
-		} else {
-		}
-		$frmTemplate->AddItemToBottomRow(SPACE);
-		$frmTemplate->AddItemToBottomRow(new CButtonCancel(url_param("config").url_param("hostid")));
-
-		$frmTemplate->Show();
-	}
-
 	# Insert form for User
 	function	insert_user_form($userid,$profile=0)
 	{
@@ -330,7 +235,7 @@
 		$snmp_community	= get_request("snmp_community"	,"public");
 		$snmp_oid	= get_request("snmp_oid"	,"interfaces.ifTable.ifEntry.ifInOctets.1");
 		$snmp_port	= get_request("snmp_port"	,161);
-		$value_type	= get_request("value_type"	,0);
+		$value_type	= get_request("value_type"	,ITEM_VALUE_TYPE_UINT64);
 		$trapper_hosts	= get_request("trapper_hosts"	,"");
 		$units		= get_request("units"		,'');
 		$valuemapid	= get_request("valuemapid"	,0);
@@ -461,6 +366,13 @@
 
 		$frmItem->AddRow(S_KEY, new CTextBox("key",$key,40));
 
+		$cmbValType = new CComboBox("value_type",$value_type,"submit()");
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64, S_NUMERIC_UINT64);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT, S_NUMERIC_FLOAT);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, S_CHARACTER);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, S_LOG);
+		$frmItem->AddRow(S_TYPE_OF_INFORMATION,$cmbValType);
+
 		if( ($value_type==ITEM_VALUE_TYPE_FLOAT) || ($value_type==ITEM_VALUE_TYPE_UINT64))
 		{
 			$frmItem->AddRow(S_UNITS, new CTextBox("units",$units,40));
@@ -493,7 +405,13 @@
 			$frmItem->AddVar("delay",$delay);
 		}
 
-		$frmItem->AddRow(S_KEEP_HISTORY_IN_DAYS, new CTextBox("history",$history,8));
+		$frmItem->AddRow(S_KEEP_HISTORY_IN_DAYS, array(
+			new CTextBox("history",$history,8),
+			(!isset($_REQUEST["itemid"])) ? NULL :
+				new CButton("del_history",
+					"Clean history",
+					"return Confirm('History cleaning can take a long time. Continue?');")
+			));
 		$frmItem->AddRow(S_KEEP_TRENDS_IN_DAYS, new CTextBox("trends",$trends,8));
 
 		$cmbStatus = new CComboBox("status",$status);
@@ -502,13 +420,6 @@
 #		$cmbStatus->AddItem(2,"Trapper");
 		$cmbStatus->AddItem(3,S_NOT_SUPPORTED);
 		$frmItem->AddRow(S_STATUS,$cmbStatus);
-
-		$cmbValType = new CComboBox("value_type",$value_type,"submit()");
-		$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT, S_NUMERIC_FLOAT);
-		$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64, S_NUMERIC_UINT64);
-		$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, S_CHARACTER);
-		$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, S_LOG);
-		$frmItem->AddRow(S_TYPE_OF_INFORMATION,$cmbValType);
 
 		if($value_type==ITEM_VALUE_TYPE_LOG)
 		{
@@ -2070,7 +1981,7 @@
 
 			$cmbStatus = new CComboBox("status",$status);
 			$cmbStatus->AddItem(HOST_STATUS_MONITORED,	S_MONITORED);
-			$cmbStatus->AddItem(HOST_STATUS_TEMPLATE,	S_TEMPLATE);
+//			$cmbStatus->AddItem(HOST_STATUS_TEMPLATE,	S_TEMPLATE);
 			$cmbStatus->AddItem(HOST_STATUS_NOT_MONITORED,	S_NOT_MONITORED);
 			$frmHost->AddRow(S_STATUS,$cmbStatus);	
 		}

@@ -65,6 +65,16 @@
 		return	$result;
 	}
 
+	function	get_graphitem_by_itemid($itemid)
+	{
+		$result=DBselect("select * from graphs_items where itemid=$itemid");
+		if(DBnum_rows($result) == 1)
+		{
+			return	DBfetch($result);	
+		}
+		return	$result;
+	}
+
 	function	get_graph_by_graphid($graphid)
 	{
 

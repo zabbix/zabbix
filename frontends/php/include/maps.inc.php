@@ -136,7 +136,7 @@
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
-			$sql="delete from sysmaps_links where shostid1=".$row["shostid"]." or shostid2".$row["shostid"];
+			$sql="delete from sysmaps_links where shostid1=".$row["shostid"]." or shostid2=".$row["shostid"];
 			DBexecute($sql);
 		}
 		$sql="delete from sysmaps_hosts where hostid=$hostid";

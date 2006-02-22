@@ -378,14 +378,16 @@
 		$result = delete_triggers_by_itemid($itemid);
 		if(!$result)	return	$result;
 
-		$result = delete_trends_by_itemid($itemid);
+		$db_gitems = get_graphitem_by_itemid($itemid);
+		while($db_gitem = DBfetch($db_gitems))
+		{
+			$result = delete_graph_by_itemid($db_gitem["graphid"]);
+			if(!$result)	return	$result;
+		}
+
+		$result = delete_history_by_itemid($itemid, 1 /* use housekeeper */);
 		if(!$result)	return	$result;
 
-		$result = delete_history_by_itemid($itemid);
-		if(!$result)	return	$result;
-
-		$result = DBexecute("delete from graphs_items where itemid=$itemid");
-		if(!$result)	return	$result;
 
 		$result = DBexecute("delete from items where itemid=$itemid");
 		if($result)
