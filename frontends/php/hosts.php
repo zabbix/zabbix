@@ -167,11 +167,12 @@
 			$db_hosts=DBselect("select hostid from hosts");
 			while($db_host=DBfetch($db_hosts))
 			{
+				$host=get_host_by_hostid($db_host["hostid"]);
+
 				if(!in_array($db_host["hostid"],$hosts)) continue;
 				if(!delete_host($db_host["hostid"]))	continue;
 				$result = 1;
 
-				$host=get_host_by_hostid($db_host["hostid"]);
 				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_HOST,
 					"Host [".$host["host"]."]");
 			}

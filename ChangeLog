@@ -1,5 +1,6 @@
 Changes for 1.1beta7:
 
+ - added hosekeeper support for frontend (Eugene)
  - added table housekeeper (Alexei)
  - added value mapping for e-mail content (Eugene)
  - support of max(#N) for sum,min,max,delta and avg (Alexei)

@@ -1553,20 +1553,39 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 	# Delete from History
 
-	function	delete_history_by_itemid( $itemid )
+	function	delete_history_by_itemid($itemid, $use_housekeeper=0)
 	{
-		$sql="delete from history_str where itemid=$itemid";
-		DBexecute($sql);
-		$sql="delete from history where itemid=$itemid";
-		return	DBexecute($sql);
+		$result = delete_trends_by_itemid($itemid,$use_housekeeper);
+		if(!$result)	return $result;
+
+		if($use_housekeeper)
+		{
+			DBexecute("insert into housekeeper (tablename,field,value)".
+				" values ('history_uint','itemid',$itemid)");
+			DBexecute("insert into housekeeper (tablename,field,value)".
+				" values ('history_str','itemid',$itemid)");
+			DBexecute("insert into housekeeper (tablename,field,value)".
+				" values ('history','itemid',$itemid)");
+			return TRUE;
+		}
+
+		DBexecute("delete from history_uint where itemid=$itemid");
+		DBexecute("delete from history_str where itemid=$itemid");
+		DBexecute("delete from history where itemid=$itemid");
+		return TRUE;
 	}
 
 	# Delete from Trends
 
-	function	delete_trends_by_itemid( $itemid )
+	function	delete_trends_by_itemid($itemid, $use_housekeeper=0)
 	{
-		$sql="delete from trends where itemid=$itemid";
-		return	DBexecute($sql);
+		if($use_housekeeper)
+		{
+			DBexecute("insert into housekeeper (tablename,field,value)".
+				" values ('trends','itemid',$itemid)");
+			return TRUE;
+		}
+		return	DBexecute("delete from trends where itemid=$itemid");
 	}
 
 	# Add alarm
@@ -2960,5 +2979,12 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 			return $result["newvalue"].SPACE."($value)";
 		}
 		return $value;
+	}
+
+	function	Alert($msg)
+	{
+		echo "<script language=\"JavaScript\" type=\"text/javascript\">";
+		echo "alert('$msg');";
+		echo "</script>";
 	}
 ?>
