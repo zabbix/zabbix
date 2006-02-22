@@ -1,7 +1,8 @@
 Changes for 1.1beta7:
 
+ - added value mapping for e-mail content (Eugene)
  - support of max(#N) for sum,min,max,delta and avg (Alexei)
- - added value mapping for items (Eugene)
+ - developed value mapping (Eugene)
  - added column items.valuemapid (Alexei)
  - added tables valuemaps and mappings (Alexei)
  - fix for initial update of host statuses (Alexei)
@@ -11,7 +12,7 @@ Changes for 1.1beta7:
  - added triggers.templateid (Alexei)
  - fixed navigation bar for Sreens (Eugene)
  - fixed incorrect groupid error for actions (Eugene)
- - improved templates logic for items (Eugene)
+ - developed new templates logic for items (Eugene)
  - speed improvement for proc.num of Tru64 (Eugene)
  - fixed evaluation of {IPADDRESS} (Alexei)
  - added hosts.templateid and items.templateid (Alexei)

@@ -31,7 +31,7 @@
 #define ZBX_FLAG_VALUES			1
 
 
-int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter, int flag);
+int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter);
 int	evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *parameter);
 
 #endif

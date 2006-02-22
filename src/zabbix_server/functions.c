@@ -93,7 +93,7 @@ void	update_functions(DB_ITEM *item)
 
 		zabbix_log( LOG_LEVEL_DEBUG, "ItemId:%d Evaluating %s(%d)\n",function.itemid,function.function,function.parameter);
 
-		ret = evaluate_FUNCTION(value,item,function.function,function.parameter, EVALUATE_FUNCTION_NORMAL);
+		ret = evaluate_FUNCTION(value,item,function.function,function.parameter);
 		if( FAIL == ret)	
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "Evaluation failed for function:%s\n",function.function);

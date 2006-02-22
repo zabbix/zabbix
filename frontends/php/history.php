@@ -180,7 +180,7 @@
 		{
 			$sql="select h.clock,h.value,h.timestamp,h.source,h.severity,i.valuemapid".
 				" from history_log h, items i".
-				" where h.itemid=i.itemid and itemid=".$_REQUEST["itemid"].
+				" where h.itemid=i.itemid and i.itemid=".$_REQUEST["itemid"].
 				" and h.clock>$time and h.clock<$till order by id desc, clock desc";
 		}
 		else
@@ -304,7 +304,7 @@
 		{
 			$sql="select h.clock,h.value,h.timestamp,h.source,h.severity,i.valuemapid".
 				" from history_log h, items i".
-				" where h.itemid=i.itemid and itemid=".$_REQUEST["itemid"].
+				" where h.itemid=i.itemid and i.itemid=".$_REQUEST["itemid"].
 				" order by id desc, clock desc limit 500";
 		}
 		else
