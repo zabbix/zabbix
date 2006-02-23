@@ -404,13 +404,13 @@
 		}
 		
 		$footerButtons = array();
-		array_push($footerButtons, new CButton('group_enable','enable selected',
+		array_push($footerButtons, new CButton('group_enable','Enable selected',
 			"return Confirm('".S_ENABLE_SELECTED_TRIGGERS_Q."');"));
 		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButton('group_disable','disable selected',
+		array_push($footerButtons, new CButton('group_disable','Disable selected',
 			"return Confirm('Disable selected triggers?');"));
 		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButton('group_delete','delete selected',
+		array_push($footerButtons, new CButton('group_delete','Delete selected',
 			"return Confirm('Delete selected triggers?');"));
 		$table->SetFooter(new CCol($footerButtons),'table_footer');
 
