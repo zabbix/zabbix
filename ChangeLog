@@ -1,5 +1,6 @@
 Changes for 1.1beta7:
 
+ - added column actions.status (Alexei)
  - added Hostname for graphs displaying (Eugene)
  - added hosekeeper support for frontend (Eugene)
  - added table housekeeper (Alexei)
