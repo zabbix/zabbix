@@ -457,7 +457,7 @@
 		array_push($footerButtons, new CButton('group_task','Disable selected',
 			"return Confirm('".S_DISABLE_SELECTED_ITEMS_Q."');"));
 		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButton('group_task','Clean history',
+		array_push($footerButtons, new CButton('group_task','Clean history selected items',
 			"return Confirm('History cleaning can take a long time. Continue?');"));
 		array_push($footerButtons, SPACE);
 		array_push($footerButtons, new CButton('group_task','Delete selected',

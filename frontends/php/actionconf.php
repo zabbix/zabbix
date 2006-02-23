@@ -306,13 +306,13 @@
 				));	
 		}
 		$footerButtons = array();
-		array_push($footerButtons, new CButton('group_enable','enable selected',
+		array_push($footerButtons, new CButton('group_enable','Enable selected',
 			"return Confirm('Enable selected actions?');"));
 		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButton('group_disable','disable selected',
+		array_push($footerButtons, new CButton('group_disable','Disable selected',
 			"return Confirm('Disable selected actions?');"));
 		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButton('group_delete','delete selected',
+		array_push($footerButtons, new CButton('group_delete','Delete selected',
 			"return Confirm('Delete selected action?');"));
 		$tblActions->SetFooter(new CCol($footerButtons),'table_footer');
 
