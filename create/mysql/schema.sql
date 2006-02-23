@@ -213,6 +213,7 @@ CREATE TABLE actions (
   repeatdelay		int(4)		DEFAULT '600' NOT NULL,
   source		int(1)		DEFAULT '0' NOT NULL,
   actiontype		int(1)		DEFAULT '0' NOT NULL,
+  status		int(1)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (actionid)
 ) type=InnoDB;
 

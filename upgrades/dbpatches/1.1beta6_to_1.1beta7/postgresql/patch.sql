@@ -4,6 +4,7 @@ alter table triggers add	templateid	int4 DEFAULT '0' NOT NULL;
 alter table graphs add	templateid	int4 DEFAULT '0' NOT NULL;
 
 alter table items add	valuemapid	int4 DEFAULT '0' NOT NULL;
+alter table actions add	status	int2 DEFAULT '0' NOT NULL;
 
 --
 -- Table structure for table 'valuemaps'
