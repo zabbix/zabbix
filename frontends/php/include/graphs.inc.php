@@ -223,7 +223,7 @@
 						break;
 					}
 					$db_items = DBselect("select itemid from items".
-						" where key_=".$item["key_"].
+						" where key_=".zbx_dbstr($item["key_"]).
 						" and hostid=".$chd_host["hostid"]);
 					if(DBnum_rows($db_items)==0)
 					{
@@ -248,7 +248,7 @@
 					$chd_hosts = get_hosts_by_graphid($child["graphid"]);
 					$chd_host = DBfetch($chd_hosts);
 					$db_items = DBselect("select itemid from items".
-						" where key_=".$item["key_"].
+						" where key_=".zbx_dbstr($item["key_"]).
 						" and hostid=".$chd_host["hostid"]);
 					if(DBnum_rows($db_items)==0)
 					{
@@ -291,7 +291,7 @@
 			$chd_hosts = get_hosts_by_graphid($child["graphid"]);
 			$chd_host = DBfetch($chd_hosts);
 			$db_items = DBselect("select itemid from items".
-				" where key_=".$item["key_"].
+				" where key_=".zbx_dbstr($item["key_"]).
 				" and hostid=".$chd_host["hostid"]);
 			if(DBnum_rows($db_items)==0)
 				return FALSE;

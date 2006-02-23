@@ -179,9 +179,9 @@
 		if($row["priority"]==0)		$priority=S_NOT_CLASSIFIED;
 		elseif($row["priority"]==1)	$priority=S_INFORMATION;
 		elseif($row["priority"]==2)	$priority=S_WARNING;
-		elseif($row["priority"]==3)	$priority=array("value"=>S_AVERAGE,"class"=>"average");
-		elseif($row["priority"]==4)	$priority=array("value"=>S_HIGH,"class"=>"high");
-		elseif($row["priority"]==5)	$priority=array("value"=>S_DISASTER,"class"=>"disaster");
+		elseif($row["priority"]==3)	$priority=new CCol(S_AVERAGE,"average");
+		elseif($row["priority"]==4)	$priority=new CCol(S_HIGH,"high");
+		elseif($row["priority"]==5)	$priority=new CCol(S_DISASTER,"disaster");
 		else				$priority=$row["priority"];
 
 		$table->addRow(array(
