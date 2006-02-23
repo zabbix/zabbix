@@ -50,6 +50,7 @@
 
 #include "housekeeper.h"
 
+/*
 static int delete_history(int itemid)
 {
 	char	sql[MAX_STRING_LEN];
@@ -60,8 +61,9 @@ static int delete_history(int itemid)
 	DBexecute(sql);
 
 	return DBaffected_rows();
-}
+}*/
 
+/*
 static int delete_trends(int itemid)
 {
 	char	sql[MAX_STRING_LEN];
@@ -73,7 +75,9 @@ static int delete_trends(int itemid)
 
 	return DBaffected_rows();
 }
+*/
 
+/*
 static int delete_item(int itemid)
 {
 	char	sql[MAX_STRING_LEN];
@@ -100,7 +104,9 @@ static int delete_item(int itemid)
 
 	return res;	
 }
+*/
 
+/*
 static int delete_host(int hostid)
 {
 	int	i, itemid;
@@ -124,9 +130,6 @@ static int delete_host(int hostid)
 	{
 		DBdelete_sysmaps_hosts_by_hostid(hostid);
 
-/*		snprintf(sql,sizeof(sql)-1,"delete from actions where triggerid=%d and scope=%d", hostid, ACTION_SCOPE_HOST);
-		DBexecute(sql);*/
-
 		snprintf(sql,sizeof(sql)-1,"delete from hosts_groups where hostid=%d", hostid);
 		DBexecute(sql);
 
@@ -138,6 +141,7 @@ static int delete_host(int hostid)
 
 	return res;
 }
+*/
 
 /******************************************************************************
  *                                                                            *
@@ -155,6 +159,7 @@ static int delete_host(int hostid)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
+/*
 static int housekeeping_items(void)
 {
 	char		sql[MAX_STRING_LEN];
@@ -173,6 +178,7 @@ static int housekeeping_items(void)
 	DBfree_result(result);
 	return SUCCEED;
 }
+*/
 
 /******************************************************************************
  *                                                                            *
@@ -190,7 +196,7 @@ static int housekeeping_items(void)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int housekeeping_hosts(void)
+/*static int housekeeping_hosts(void)
 {
 	char		sql[MAX_STRING_LEN];
 	DB_RESULT	*result;
@@ -207,7 +213,7 @@ static int housekeeping_hosts(void)
 	}
 	DBfree_result(result);
 	return SUCCEED;
-}
+}*/
 
 /******************************************************************************
  *                                                                            *
@@ -225,6 +231,7 @@ static int housekeeping_hosts(void)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
+/*
 static int housekeeping_history_and_trends(int now)
 {
 	char		sql[MAX_STRING_LEN];
@@ -251,7 +258,6 @@ static int housekeeping_history_and_trends(int now)
 			item.delay=1;
 		}
 
-/* Delete HISTORY */
 #ifdef HAVE_MYSQL
 		snprintf(sql,sizeof(sql)-1,"delete from history where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
 #else
@@ -259,7 +265,6 @@ static int housekeeping_history_and_trends(int now)
 #endif
 		DBexecute(sql);
 
-/* Delete HISTORY_UINT */
 #ifdef HAVE_MYSQL
 		snprintf(sql,sizeof(sql)-1,"delete from history_uint where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
 #else
@@ -267,7 +272,6 @@ static int housekeeping_history_and_trends(int now)
 #endif
 		DBexecute(sql);
 
-/* Delete HISTORY_STR */
 #ifdef HAVE_MYSQL
 		snprintf(sql,sizeof(sql)-1,"delete from history_str where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
 #else
@@ -275,7 +279,6 @@ static int housekeeping_history_and_trends(int now)
 #endif
 		DBexecute(sql);
 
-/* Delete HISTORY_LOG */
 #ifdef HAVE_MYSQL
 		snprintf(sql,sizeof(sql)-1,"delete from history_log where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
 #else
@@ -283,7 +286,6 @@ static int housekeeping_history_and_trends(int now)
 #endif
 		DBexecute(sql);
 
-/* Delete HISTORY_TRENDS */
 #ifdef HAVE_MYSQL
 		snprintf(sql,sizeof(sql)-1,"delete from trends where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.trends,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
 #else
@@ -294,15 +296,77 @@ static int housekeeping_history_and_trends(int now)
 	DBfree_result(result);
 	return SUCCEED;
 }
+*/
+
+/******************************************************************************
+ *                                                                            *
+ * Function: housekeeping_process_log                                         *
+ *                                                                            *
+ * Purpose: process table 'housekeeper' and remove data if required           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: SUCCEED - information removed succesfully                    *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int housekeeping_process_log()
+{
+	char		sql[MAX_STRING_LEN];
+	DB_HOUSEKEEPER	housekeeper;
+
+	DB_RESULT	*result;
+	int		res = SUCCEED;
+
+	int		i;
+	long		deleted;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_process_log()");
+
+	/* order by tablename to effectively use DB cache */
+	snprintf(sql,sizeof(sql)-1,"select housekeeperid, tablename, field, value from housekeeper order by tablename");
+	result = DBselect(sql);
+
+	for(i=0;i<DBnum_rows(result);i++)
+	{
+		housekeeper.housekeeperid=atoi(DBget_field(result,i,0));
+		housekeeper.tablename=DBget_field(result,i,1);
+		housekeeper.field=DBget_field(result,i,2);
+		housekeeper.value=atoi(DBget_field(result,i,3));
+
+		snprintf(sql,sizeof(sql)-1,"delete from %s where %s=%d limit 500",housekeeper.tablename, housekeeper.field,housekeeper.value);
+		DBexecute(sql);
+
+		if(( deleted = DBaffected_rows()) == 0)
+		{
+			snprintf(sql,sizeof(sql)-1,"delete from housekeeper where housekeeperid=%d",housekeeper.housekeeperid);
+			DBexecute(sql);
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [%s]", deleted, housekeeper.tablename);
+		}
+	}
+	DBfree_result(result);
+
+	return res;
+}
+
 
 static int housekeeping_sessions(int now)
 {
 	char	sql[MAX_STRING_LEN];
 
-	zabbix_log( LOG_LEVEL_WARNING, "In housekeeping_sessions(%d)", now);
+	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_sessions(%d)", now);
 
 	snprintf(sql,sizeof(sql)-1,"delete from sessions where lastaccess<%d",now-24*3600);
 	DBexecute(sql);
+
+	zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [sessions]", DBaffected_rows());
 
 	return SUCCEED;
 }
@@ -314,7 +378,7 @@ static int housekeeping_alerts(int now)
 	DB_RESULT	*result;
 	int		res = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In housekeeping_alarms(%d)", now);
+	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_alarms(%d)", now);
 
 	snprintf(sql,sizeof(sql)-1,"select alert_history from config");
 	result = DBselect(sql);
@@ -330,6 +394,7 @@ static int housekeeping_alerts(int now)
 
 		snprintf(sql,sizeof(sql)-1,"delete from alerts where clock<%d",now-24*3600*alert_history);
 		DBexecute(sql);
+		zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [alerts]", DBaffected_rows());
 	}
 
 	DBfree_result(result);
@@ -343,7 +408,7 @@ static int housekeeping_alarms(int now)
 	DB_RESULT	*result;
 	int		res = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In housekeeping_alarms(%d)", now);
+	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_alarms(%d)", now);
 
 	snprintf(sql,sizeof(sql)-1,"select alarm_history from config");
 	result = DBselect(sql);
@@ -357,8 +422,8 @@ static int housekeeping_alarms(int now)
 		alarm_history=atoi(DBget_field(result,0,0));
 
 		snprintf(sql,sizeof(sql)-1,"delete from alarms where clock<%d",now-24*3600*alarm_history);
-		zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
 		DBexecute(sql);
+		zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [alarms]", DBaffected_rows());
 	}
 	
 	DBfree_result(result);
@@ -368,8 +433,6 @@ static int housekeeping_alarms(int now)
 int main_housekeeper_loop()
 {
 	int	now;
-
-	zabbix_set_log_level(LOG_LEVEL_DEBUG);
 
 	if(CONFIG_DISABLE_HOUSEKEEPING == 1)
 	{
@@ -392,21 +455,27 @@ int main_housekeeper_loop()
 		DBconnect();
 
 #ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("housekeeper [removing deleted hosts]");
+/*		setproctitle("housekeeper [removing deleted hosts]");*/
 #endif
-		housekeeping_hosts();
+/*		housekeeping_hosts();*/
 
 #ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("housekeeper [removing deleted items]");
+/*		setproctitle("housekeeper [removing deleted items]");*/
 #endif
 
-		housekeeping_items();
+/*		housekeeping_items();*/
 
 #ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("housekeeper [removing old values]");
+/*		setproctitle("housekeeper [removing old history]");*/
 #endif
 
-		housekeeping_history_and_trends(now);
+/*		housekeeping_history_and_trends(now);*/
+
+#ifdef HAVE_FUNCTION_SETPROCTITLE
+		setproctitle("housekeeper [removing old history]");
+#endif
+
+		housekeeping_process_log(now);
 
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("housekeeper [removing old alarms]");
