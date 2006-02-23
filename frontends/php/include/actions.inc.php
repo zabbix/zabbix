@@ -61,7 +61,7 @@
 //                      return 0;
 //		}
 
-		$result=DBexecute("update actions set userid=$id,delay=$delay,nextcheck=0,subject=".zbx_dbstr($subject).",message=".zbx_dbstr($message).",recipient=$recipient,maxrepeats=$maxrepeats, repeatdelay=$repeatdelay where actionid=$actionid,status=$status");
+		$result=DBexecute("update actions set userid=$id,delay=$delay,nextcheck=0,subject=".zbx_dbstr($subject).",message=".zbx_dbstr($message).",recipient=$recipient,maxrepeats=$maxrepeats, repeatdelay=$repeatdelay,status=$status where actionid=$actionid");
 		return $result;
 	}
 
