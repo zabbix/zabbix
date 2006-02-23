@@ -42,8 +42,14 @@
 
 	$result=DBselect("select name,width,height,yaxistype,yaxismin,yaxismax from graphs where graphid=".$_REQUEST["graphid"]);
 	$row=DBfetch($result);
-
+	$db_hosts = get_hosts_by_graphid($_REQUEST["graphid"]);
 	$name=$row["name"];
+
+	if(DBnum_rows($db_hosts)==1)
+	{
+		$db_host = DBfetch($db_hosts);
+		$name = $db_host["host"].":".$name;
+	}
 	if(isset($_REQUEST["width"])&&$_REQUEST["width"]>0)
 	{
 		$width=$_REQUEST["width"];
@@ -63,7 +69,7 @@
 
 	$graph->setWidth($width);
 	$graph->setHeight($height);
-	$graph->setHeader($row["name"]);
+	$graph->setHeader($name);
 	$graph->setYAxisType($row["yaxistype"]);
 	$graph->setYAxisMin($row["yaxismin"]);
 	$graph->setYAxisMax($row["yaxismax"]);
