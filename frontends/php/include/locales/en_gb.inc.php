@@ -736,6 +736,7 @@
 	"S_ENABLED"=>				"Enabled",
 	"S_ENABLE_SELECTED_TRIGGERS_Q"=>	"Enable selected triggers?",
 	"S_DISABLE_SELECTED_TRIGGERS_Q"=>	"Disable selected triggers?",
+	"S_DELETE_SELECTED_TRIGGERS_Q"=>	"Delete selected triggers?",
 	"S_CHANGE"=>				"Change",
 	"S_TRIGGER_UPDATED"=>			"Trigger updated",
 	"S_CANNOT_UPDATE_TRIGGER"=>		"Cannot update trigger",

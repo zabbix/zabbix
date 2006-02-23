@@ -408,10 +408,10 @@
 			"return Confirm('".S_ENABLE_SELECTED_TRIGGERS_Q."');"));
 		array_push($footerButtons, SPACE);
 		array_push($footerButtons, new CButton('group_disable','Disable selected',
-			"return Confirm('Disable selected triggers?');"));
+			"return Confirm('".S_DISABLE_SELECTED_TRIGGERS_Q."');"));
 		array_push($footerButtons, SPACE);
 		array_push($footerButtons, new CButton('group_delete','Delete selected',
-			"return Confirm('Delete selected triggers?');"));
+			"return Confirm('".S_DELETE_SELECTED_TRIGGERS_Q."');"));
 		$table->SetFooter(new CCol($footerButtons),'table_footer');
 
 		$form->AddItem($table);
