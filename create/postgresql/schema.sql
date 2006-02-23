@@ -216,6 +216,7 @@ CREATE TABLE actions (
   repeatdelay		int4		DEFAULT '600' NOT NULL,
   source		int2		DEFAULT '0' NOT NULL,
   actiontype		int2		DEFAULT '0' NOT NULL,
+  status		int2		DEFAULT '0' NOT NULL,
   PRIMARY KEY (actionid)
 --  depends on scope. Could be hostid or 0.
 --  FOREIGN KEY (triggerid) REFERENCES triggers

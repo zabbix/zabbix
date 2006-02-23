@@ -5,6 +5,8 @@ alter table graphs add	templateid	int(4) DEFAULT '0' NOT NULL;
 
 alter table items add	valuemapid	int(4) DEFAULT '0' NOT NULL;
 
+alter table actions add	status	int(1) DEFAULT '0' NOT NULL;
+
 --
 -- Table structure for table 'valuemaps'
 --
