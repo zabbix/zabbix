@@ -663,7 +663,7 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 	now = time(NULL);
 
 /*	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,scope,severity,recipient,good from actions where (scope=%d and triggerid=%d and good=%d and nextcheck<=%d) or (scope=%d and good=%d) or (scope=%d and good=%d)",ACTION_SCOPE_TRIGGER,trigger->triggerid,trigger_value,now,ACTION_SCOPE_HOST,trigger_value,ACTION_SCOPE_HOSTS,trigger_value);*/
-	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,recipient,maxrepeats,repeatdelay from actions where nextcheck<=%d", now);
+	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,recipient,maxrepeats,repeatdelay from actions where nextcheck<=%d and status=%d", now, ACTION_STATUS_ACTIVE);
 	result = DBselect(sql);
 	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
 
