@@ -167,7 +167,9 @@
 		$form->AddItem(SPACE.S_HOST.SPACE);
 			
 		$cmbHosts = new CComboBox("hostid", $_REQUEST["hostid"], "submit()");
-		$cmbHosts->AddItem(0,S_ALL_SMALL);
+		if($_REQUEST["groupid"]==0)
+			$cmbHosts->AddItem(0,S_ALL_SMALL);
+
 		if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"] > 0)
 		{
 			$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg".
@@ -181,13 +183,20 @@
 				" and h.status not in (".HOST_STATUS_DELETED.") group by h.hostid,h.host".
 				" order by h.host";
 		}
+
 		$result=DBselect($sql);
+		$host_ok = 0;
+		$first_host = 0;
 		while($row=DBfetch($result))
 		{
 			if(!check_right("Host","R",$row["hostid"]))	continue;
 			$cmbHosts->AddItem($row["hostid"],$row["host"]);
+			if($first_host == 0) $first_host = $row["hostid"];
+			if($_REQUEST["hostid"] == $row["hostid"]) $host_ok = 1;
 		}
 		$form->AddItem($cmbHosts);
+		if(!$host_ok && $_REQUEST["hostid"]!=0)
+			$_REQUEST["hostid"] = $first_host;
 
 		$form->AddItem(SPACE."|".SPACE);
 		$form->AddItem(new CButton("form",S_CREATE_GRAPH));
@@ -196,7 +205,8 @@
 
 /* TABLE */
 		$table = new CTableInfo(S_NO_GRAPHS_DEFINED);
-		$table->setHeader(array(S_ID,S_NAME,S_WIDTH,S_HEIGHT,S_GRAPH));
+		$table->setHeader(array(S_ID,
+			$_REQUEST["hostid"] != 0 ? NULL : S_HOSTS, S_NAME,S_WIDTH,S_HEIGHT,S_GRAPH));
 
 		if(isset($_REQUEST["hostid"])&&($_REQUEST["hostid"]!=0))
 		{
@@ -212,11 +222,28 @@
 		{
 			if(!check_right("Graph","U",$row["graphid"]))		continue;
 
+/*
 			if(!isset($_REQUEST["hostid"]))
 			{
 				$sql="select * from graphs_items where graphid=".$row["graphid"];
 				$result2=DBselect($sql);
 				if(DBnum_rows($result2)>0)	continue;
+			}
+*/
+
+			if($_REQUEST["hostid"] != 0)
+			{
+				$host_list = NULL;
+			}
+			else
+			{
+				$host_list = "";
+				$db_hosts = get_hosts_by_graphid($row["graphid"]);
+				while($db_host = DBfetch($db_hosts))
+				{
+					$host_list .= $db_host["host"].",";
+				}
+				$host_list = trim($host_list,',');
 			}
 	
 			if($row["templateid"]==0)
@@ -252,6 +279,7 @@
 
 			$table->AddRow(array(
 				$row["graphid"],
+				$host_list,
 				$name,
 				$row["width"],
 				$row["height"],

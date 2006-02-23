@@ -812,8 +812,6 @@
 		}
 
 
-		show_table2_v_delimiter();
-		echo "<form method=\"get\" action=\"graph.php\">";
 		$frmGItem->AddVar("graphid",$_REQUEST["graphid"]);
 		if(isset($_REQUEST["gitemid"]))
 		{
@@ -1633,7 +1631,17 @@
 			$cmbGraphs->AddItem(0,"(none)");
 			while($row=DBfetch($result))
 			{
-				$cmbGraphs->AddItem($row["graphid"],$row["name"]);
+				$db_hosts = get_hosts_by_graphid($row["graphid"]);
+				if(DBnum_rows($db_hosts)==1)
+				{
+					$db_host = DBfetch($db_hosts);
+					$name = $db_host["host"].":".$row["name"];
+				}
+				else
+				{
+					$name = $row["name"];
+				}
+				$cmbGraphs->AddItem($row["graphid"],$name);
 			}
 
 			$form->AddRow(S_GRAPH_NAME,$cmbGraphs);
