@@ -61,6 +61,7 @@ extern	int	CONFIG_DBPORT;
 #define DB_ESCALATION_LOG	struct escalation_log_type
 #define DB_GRAPH	struct graph_type
 #define DB_GRAPH_ITEM	struct graph_item_type
+#define DB_HOUSEKEEPER	struct housekeeper_type
 
 #ifdef HAVE_MYSQL
 	#define	DB_RESULT	MYSQL_RES
@@ -309,6 +310,15 @@ DB_ESCALATION_LOG
 	int	nextcheck;
 	int	status;
 };
+
+DB_HOUSEKEEPER
+{
+	int	housekeeperid;
+	char	*tablename;
+	char	*field;
+	int	value;
+};
+
 
 void    DBconnect(void);
 

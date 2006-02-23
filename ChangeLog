@@ -1,5 +1,6 @@
 Changes for 1.1beta7:
 
+ - improved housekeeper (Alexei)
  - added group operations for actions (Eugene)
  - frontend support for action status (Eugene)
  - support for action statuses: enable and disabled (Alexei)
