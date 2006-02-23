@@ -1,5 +1,7 @@
 Changes for 1.1beta7:
 
+ - added group operations for actions (Eugene)
+ - frontend support for action status (Eugene)
  - support for action statuses: enable and disabled (Alexei)
  - added column actions.status (Alexei)
  - added Hostname for graphs displaying (Eugene)

@@ -1141,6 +1141,7 @@
 			$recipient	= $action["recipient"];
 			$maxrepeats	= $action["maxrepeats"];
 			$repeatdelay	= $action["repeatdelay"];
+			$status 	= $action["status"];
 
 			if(isset($_REQUEST["repeat"]))
 			{
@@ -1182,6 +1183,7 @@
 			$maxrepeats	= get_request("maxrepeats",0);
 			$repeatdelay	= get_request("repeatdelay",600);
 			$repeat		= get_request("repeat",0);
+			$status		= get_request("status",ACTION_STATUS_ENABLED);
 
 			if($recipient==RECIPIENT_TYPE_GROUP)
 				$uid = get_request("usrgrpid",NULL);
@@ -1393,6 +1395,11 @@
 			$frmAction->AddVar("maxrepeats",$maxrepeats);
 			$frmAction->AddVar("repeatdelay",$repeatdelay);
 		}
+
+		$cmbStatus = new CComboBox('status',$status);
+		$cmbStatus->AddItem(0,S_ENABLED);
+		$cmbStatus->AddItem(1,S_DISABLED);
+		$frmAction->AddRow(S_STATUS, $cmbStatus);
 
 		$frmAction->AddItemToBottomRow(new CButton('save',S_SAVE));
 		if(isset($_REQUEST["actionid"]))

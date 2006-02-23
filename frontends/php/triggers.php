@@ -411,7 +411,7 @@
 			"return Confirm('Disable selected triggers?');"));
 		array_push($footerButtons, SPACE);
 		array_push($footerButtons, new CButton('group_delete','delete selected',
-			"return Confirm('".S_DISABLE_SELECTED_TRIGGERS_Q."');"));
+			"return Confirm('Delete selected triggers?');"));
 		$table->SetFooter(new CCol($footerButtons),'table_footer');
 
 		$form->AddItem($table);
