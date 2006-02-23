@@ -36,7 +36,7 @@
 
 	# Add Action
 
-	function	add_action( $id, $delay, $subject, $message, $recipient, $maxrepeats, $repeatdelay)
+	function	add_action($id,$delay,$subject,$message,$recipient,$maxrepeats,$repeatdelay,$status)
 	{
 //		if(!check_right_on_trigger("A",$triggerid))
 //		{
@@ -44,14 +44,16 @@
 //                      return 0;
 //		}
 
-		$sql="insert into actions (userid,delay,nextcheck,subject,message,recipient,maxrepeats,repeatdelay) values ($id,$delay,0,".zbx_dbstr($subject).",".zbx_dbstr($message).",$recipient,$maxrepeats,$repeatdelay)";
+		$sql="insert into actions (userid,delay,nextcheck,subject,message,recipient,".
+			"maxrepeats,repeatdelay,status) values ($id,$delay,0,".zbx_dbstr($subject).",".
+			zbx_dbstr($message).",$recipient,$maxrepeats,$repeatdelay,$status)";
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"actions","actionid");
 	}
 
 	# Update Action
 
-	function	update_action($actionid, $id, $delay, $subject, $message, $recipient, $maxrepeats, $repeatdelay)
+	function	update_action($actionid, $id, $delay, $subject, $message, $recipient, $maxrepeats, $repeatdelay, $status)
 	{
 //		if(!check_right_on_trigger("U",$triggerid))
 //		{
@@ -59,8 +61,7 @@
 //                      return 0;
 //		}
 
-		$sql="update actions set userid=$id,delay=$delay,nextcheck=0,subject=".zbx_dbstr($subject).",message=".zbx_dbstr($message).",recipient=$recipient,maxrepeats=$maxrepeats, repeatdelay=$repeatdelay where actionid=$actionid";
-		$result=DBexecute($sql);
+		$result=DBexecute("update actions set userid=$id,delay=$delay,nextcheck=0,subject=".zbx_dbstr($subject).",message=".zbx_dbstr($message).",recipient=$recipient,maxrepeats=$maxrepeats, repeatdelay=$repeatdelay where actionid=$actionid,status=$status");
 		return $result;
 	}
 
@@ -337,5 +338,10 @@
 		$sql="insert into conditions (actionid,conditiontype,operator,value) values ($actionid,$conditiontype,$operator,".zbx_dbstr($value).")";
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"conditions","conditionid");
+	}
+
+	function	update_action_status($actionid, $status)
+	{
+		return DBexecute("update actions set status=$status where actionid=$actionid");
 	}
 ?>

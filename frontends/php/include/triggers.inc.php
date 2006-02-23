@@ -647,6 +647,8 @@
                 {
                         return  $result;
                 }
+		DBexecute("delete from trigger_depends where triggerid_up=$triggerid");
+
 		$result=delete_function_by_triggerid($triggerid);
 		if(!$result)
 		{
@@ -663,9 +665,18 @@
 			return	$result;
 		}
 
-		DBexecute("delete from trigger_depends where triggerid_up=$triggerid");
+		DBexecute("delete from alerts where triggerid=$triggerid");
 
 		DBexecute("update sysmaps_links set triggerid=NULL where triggerid=$triggerid");
+		
+		$db_actions = DBselect("select distinct c.actionid from conditions c, triggers t".
+			" where c.conditiontype=CONDITION_TYPE_TRIGGER".
+			" and c.value=t.triggerid");
+		while($db_action = DBfetch($db_actions))
+		{
+			DBexecute("update actions set status=".ACTION_STATUS_DISABLED.
+				" where actionid=".$db_action["actionid"]);
+		}
 
 		$trigger = get_trigger_by_triggerid($triggerid);
 

@@ -51,6 +51,7 @@
 		"subject"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'isset({save})'),
 		"message"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'isset({save})'),
 		"repeat"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"), 	'isset({save})'),
+		"status"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"), 	'isset({save})'),
 
 		"maxrepeats"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),'{repeat}==1&&isset({save})'),
 		"repeatdelay"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),'{repeat}==1&&isset({save})'),
@@ -65,11 +66,16 @@
 //		"rem_condition[i][operator]"=>	array(T_ZBX_INT, O_OPT,  NULL,	NULL, NULL);
 //		"rem_condition[i][value]"=>	array(NULL, 	 O_OPT,  NULL,	NULL, NULL);
 
+		"g_actionid"=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID,		NULL),
+
 		"new_condition_type"=>		array(T_ZBX_INT, O_OPT,  NULL,	NULL,	'isset({add_condition})'),
 		"new_condition_operator"=>	array(T_ZBX_INT, O_OPT,  NULL,	NULL,	'isset({add_condition})'),
 		"new_condition_value"=>		array(NULL, 	 O_OPT,  NULL,	NULL,	'isset({add_condition})'),
 
 /* actions */
+		"group_delete"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"group_enable"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"group_disable"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"add_condition"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"del_condition"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -97,13 +103,13 @@
 			$actionid=$_REQUEST["actionid"];
 			$result = update_action($actionid, $_REQUEST['userid'], $_REQUEST["delay"],
 				$_REQUEST["subject"], $_REQUEST["message"],$_REQUEST["recipient"],
-				$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"]);
+				$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"],$_REQUEST["status"]);
 
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
 		} else {
 			$actionid=add_action($_REQUEST['userid'], $_REQUEST["delay"], 
 				$_REQUEST["subject"],$_REQUEST["message"],$_REQUEST["recipient"],
-				$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"]);
+				$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"],$_REQUEST["status"]);
 			$result=$actionid;
 
 			show_messages($result,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
@@ -165,6 +171,40 @@
 			unset($_REQUEST["conditions"][$val]);
 		}
 	}
+/* GROUP ACTIONS */
+	elseif(isset($_REQUEST["group_enable"])&&isset($_REQUEST["g_actionid"]))
+	{
+		$result=DBselect("select distinct actionid from actions");
+		while($row=DBfetch($result))
+		{
+			if(!in_array($row["actionid"], $_REQUEST["g_actionid"]))	continue;
+			$res=update_action_status($row["actionid"],0);
+		}
+		if(isset($res))
+			show_messages(true, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
+	}
+	elseif(isset($_REQUEST["group_disable"])&&isset($_REQUEST["g_actionid"]))
+	{
+		$result=DBselect("select distinct actionid from actions");
+		while($row=DBfetch($result))
+		{
+			if(!in_array($row["actionid"], $_REQUEST["g_actionid"]))	continue;
+			$res=update_action_status($row["actionid"],1);
+		}
+		if(isset($res))
+			show_messages(true, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
+	}
+	elseif(isset($_REQUEST["group_delete"])&&isset($_REQUEST["g_actionid"]))
+	{
+		$result=DBselect("select distinct actionid from actions");
+		while($row=DBfetch($result))
+		{
+			if(!in_array($row["actionid"], $_REQUEST["g_actionid"])) continue;
+			$del_res = delete_action($row["actionid"]);
+		}
+		if(isset($del_res))
+			show_messages(TRUE, S_ACTIONS_DELETED, S_CANNOT_DELETE_ACTIONS);
+	}
 ?>
 
 <?php
@@ -175,7 +215,7 @@
 	else
 	{
 /* table header */
-		$form = new CForm("actionconf.php");
+		$form = new CForm();
 
 		$cmbType = new CComboBox("actiontype",$_REQUEST["actiontype"],"submit()");
 		$cmbType->AddItem(0,S_SEND_MESSAGE);
@@ -188,9 +228,17 @@
 		show_header2(S_ACTIONS, $form);
 
 /* table */
+		$form = new CForm();
+		$form->SetName('actions');
+
 		$tblActions = new CTableInfo(S_NO_ACTIONS_DEFINED);
-		$tblActions->SetHeader(array(S_SOURCE,S_CONDITIONS,S_SEND_MESSAGE_TO,
-			S_DELAY,S_SUBJECT,S_REPEATS));
+		$tblActions->SetHeader(array(
+			array(	new CCheckBox("all_items",NULL,NULL,
+					"CheckAll('".$form->GetName()."','all_items');"),
+				S_SOURCE
+			),
+			S_CONDITIONS,S_SEND_MESSAGE_TO,
+			S_DELAY,S_SUBJECT,S_REPEATS,S_STATUS));
 
 		if(isset($_REQUEST["actiontype"])&&($_REQUEST["actiontype"]==1))
 		{
@@ -223,18 +271,53 @@
 				$recipient=$groupd["name"];
 			}
 
+			if($row["status"] == ACTION_STATUS_DISABLED)
+			{
+				$status= new CLink(S_DISABLED,
+					"actionconf.php?group_enable=1&g_actionid%5B%5D=".$row["actionid"],
+					'disabled');
+			}
+			else if($row["status"] == ACTION_STATUS_ENABLED)
+			{
+				$status= new CLink(S_ENABLED,
+					"actionconf.php?group_disable=1&g_actionid%5B%5D=".$row["actionid"],
+					'enabled');
+			}
+
 			$tblActions->AddRow(array(
-				new CLink(
-					get_source_description($row["source"]),
-					"actionconf.php?form=update&actionid=".$row['actionid'],'action'),
+				array(
+					new CCheckBox(
+						"g_actionid[]",	/* name */
+						NULL,			/* checked */
+						NULL,			/* caption */
+						NULL,			/* action */
+						$row["actionid"]),	/* value */
+					SPACE,
+					new CLink(
+						get_source_description($row["source"]),
+						"actionconf.php?form=update&actionid=".$row['actionid'],'action'),
+					),
 				$conditions,
 				$recipient,
 				htmlspecialchars($row["delay"]),
 				htmlspecialchars($row["subject"]),
-				$row["maxrepeats"] == 0 ? S_NO_REPEATS : $row["maxrepeats"]
+				$row["maxrepeats"] == 0 ? S_NO_REPEATS : $row["maxrepeats"],
+				$status
 				));	
 		}
-		$tblActions->Show();
+		$footerButtons = array();
+		array_push($footerButtons, new CButton('group_enable','enable selected',
+			"return Confirm('Enable selected actions?');"));
+		array_push($footerButtons, SPACE);
+		array_push($footerButtons, new CButton('group_disable','disable selected',
+			"return Confirm('Disable selected actions?');"));
+		array_push($footerButtons, SPACE);
+		array_push($footerButtons, new CButton('group_delete','delete selected',
+			"return Confirm('Delete selected action?');"));
+		$tblActions->SetFooter(new CCol($footerButtons),'table_footer');
+
+		$form->AddItem($tblActions);
+		$form->Show();
 	}
 
 	show_page_footer();

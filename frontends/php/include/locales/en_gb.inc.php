@@ -47,6 +47,8 @@
 	"S_CONDITIONS"=>			"Conditions",
 	"S_CONDITION"=>				"Condition",
 	"S_NO_CONDITIONS_DEFINED"=>		"No conditions defined",
+	"S_ACTIONS_DELETED"=>			"Actions deleted",
+	"S_CANNOT_DELETE_ACTIONS"=>		"Cannot delete actions",
 
 //	actions.php
 	"S_ACTIONS"=>				"Actions",
