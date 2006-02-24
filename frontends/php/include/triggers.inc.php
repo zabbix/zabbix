@@ -670,6 +670,7 @@
 		DBexecute("update sysmaps_links set triggerid=NULL where triggerid=$triggerid");
 		
 		$db_actions = DBselect("select distinct c.actionid from conditions c, triggers t".
+			" where c.conditiontype=".CONDITION_TYPE_TRIGGER.
 			" where c.conditiontype=CONDITION_TYPE_TRIGGER".
 			" and c.value=t.triggerid");
 		while($db_action = DBfetch($db_actions))
