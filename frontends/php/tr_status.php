@@ -474,6 +474,7 @@
 	{
 		$header=array_merge($header,array(S_ACTIONS));
 	}
+	array_push($header,S_ACKNOWLEDGED);
 	array_push($header,S_COMMENTS);
 	$table->setHeader($header);
 	unset($header);
@@ -621,6 +622,7 @@
 				new CCol($priority,$priority_style),
 				$lastchange,
 				$actions,
+				S_NO,
 				$comments
 				));
 		$col++;

@@ -768,6 +768,7 @@
 	"S_LAST_CHANGE_BIG"=>			"LAST CHANGE",
 	"S_LAST_CHANGE"=>			"Last change",
 	"S_COMMENTS"=>				"Comments",
+	"S_ACKNOWLEDGED"=>			"Acknowledged",
 
 //	users.php
 	"S_USERS"=>				"Users",
