@@ -7,6 +7,7 @@
  - server side checks (new type of check)
  - aggregate statistics: http://www.zabbix.com/forum/showthread.php?t=2151
 
+ - agregate function work only float data type.
  - action code: http://www.zabbix.com/forum/showthread.php?t=2171
  - windows agent $1-$9: http://www.zabbix.com/forum/showthread.php?t=2163
  - screen period: http://www.zabbix.com/forum/showthread.php?t=2162
