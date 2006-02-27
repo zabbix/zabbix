@@ -616,13 +616,15 @@
 			$comments=new CLink(S_ADD,"tr_comments.php?triggerid=".$row["triggerid"],"action");
 		}
 
+		$ack=S_NO;
+
 		$table->AddRow(array(
 				$description,
 				$value,
 				new CCol($priority,$priority_style),
 				$lastchange,
 				$actions,
-				S_NO,
+				$ack,
 				$comments
 				));
 		$col++;
