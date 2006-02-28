@@ -23,7 +23,7 @@
 MYSQL	mysql;
 
 #define CONFIG_DBHOST ""
-#define CONFIG_DBNAME "zabbix"
+#define CONFIG_DBNAME "demo"
 #define CONFIG_DBUSER "root"
 #define CONFIG_DBPASSWORD ""
 
@@ -31,11 +31,10 @@ MYSQL	mysql;
  * a list of hosts to query
  */
 struct host {
-  const char *hostname;
-  const char *community;
-} hosts[] = {
-  { "192.168.1.5",		"public" },
-  { "192.168.1.60",		"public" },
+  char *hostname;
+  char *community;
+} hosts[10000] = {
+//  { "192.168.1.60",		"public" },
   { NULL }
 };
 
@@ -47,16 +46,135 @@ struct oid {
   const char *Name;
   oid Oid[MAX_OID_LEN];
   int OidLen;
-} oids[] = {
-  { "192.168.1.5", ".1.3.6.1.2.1.1.6.5" },
-  { "192.168.1.60", ".1.3.6.1.2.1.1.6.0" },
+} oids[10000] = {
+//  { "192.168.1.5", ".1.3.6.1.2.1.1.6.5" },
   { NULL }
 };
+
+char	*DBget_field(MYSQL_RES *result, int rownum, int fieldnum)
+{
+	MYSQL_ROW	row;
+
+	mysql_data_seek(result, rownum);
+	row=mysql_fetch_row(result);
+	if(row == NULL)
+	{
+		printf("Error while mysql_fetch_row():Error [%s] Rownum [%d] Fieldnum [%d]\n", mysql_error(&mysql), rownum, fieldnum );
+		exit(-1);
+	}
+	return row[fieldnum];
+}
+
+int	DBnum_rows(MYSQL_RES *result)
+{
+	int rows;
+
+	if(result == NULL)
+	{
+		return	0;
+	}
+/* Order is important ! */
+	rows = mysql_num_rows(result);
+	if(rows == 0)
+	{
+		return	0;
+	}
+	
+/* This is necessary to exclude situations like
+ * atoi(DBget_field(result,0,0). This leads to coredump.
+ */
+/* This is required for empty results for count(*), etc */
+	if(DBget_field(result,0,0) == 0)
+	{
+		return	0;
+	}
+	return rows;
+}
+
+MYSQL_RES *DBselect(char *query)
+{
+	while(mysql_query(&mysql,query) != 0)
+	{
+		printf("Query:%s\n",query);
+		printf("Query failed:%s [%d]\n", mysql_error(&mysql), mysql_errno(&mysql) );
+
+		if( (ER_SERVER_SHUTDOWN   != mysql_errno(&mysql)) && 
+            (CR_SERVER_GONE_ERROR != mysql_errno(&mysql)) &&
+            (CR_CONNECTION_ERROR  != mysql_errno(&mysql)))
+		{
+			exit(-1);
+		}
+	}
+
+	return	mysql_store_result(&mysql);
+}
 
 void load_oids(void)
 {
 	char sql[1024];
+	char *hostname;
+	char *community;
+	char *oid;
 	MYSQL_RES       *result;
+	int i;
+
+	struct host *h;
+	struct oid *o;
+
+	sprintf(sql,"select h.ip,i.snmp_community,i.snmp_oid from hosts h,items i where i.hostid=h.hostid and i.type=1 and i.status=0 and h.status=0 and h.useip=1");
+
+	result=DBselect(sql);
+
+	for(i=0;i<DBnum_rows(result);i++)
+	{
+//		printf("[%s] [%s] [%s]\n",DBget_field(result,i,0),DBget_field(result,i,1),DBget_field(result,i,2));
+
+		hostname = DBget_field(result,i,0);
+		community = DBget_field(result,i,1);
+		oid = DBget_field(result,i,2);
+
+		h = hosts;
+		while(h->hostname)
+		{
+			if(strcmp(h->hostname,hostname)==0)	break;
+			h++;
+		}
+
+		if(!h->hostname)
+		{
+			h->hostname=strdup(hostname);
+			h->community=strdup(community);
+			h++;
+			h->hostname = NULL;
+		}
+
+		o = oids;
+		while(o->hostname)
+		{
+			o++;
+		}
+		o->hostname=strdup(hostname);
+		o->Name=strdup(oid);
+		o++;
+		o->hostname = NULL;
+	}
+
+	h = hosts;
+	i = 0;
+	while(h->hostname)
+	{
+		i++;
+		h++;
+	}
+	printf("Loaded [%d] hosts\n", i);
+	o = oids;
+	i = 0;
+	while(o->hostname)
+	{
+		i++;
+		o++;
+	}
+	printf("Loaded [%d] OIDs\n", i);
 }
 
 /*
@@ -64,12 +182,16 @@ void load_oids(void)
  */
 void initialize (void)
 {
-	struct oid *op = oids;
+	struct oid *op;
   
 	init_snmp("asynchapp");
 
+	load_oids();
+
 /* parse the oids */
+	op = oids;
 	while (op->hostname) {
+//		printf("[%s]\n",op->hostname);
 		op->OidLen = sizeof(op->Oid)/sizeof(op->Oid[0]);
 		if (!read_objid(op->Name, op->Oid, &op->OidLen)) {
 			snmp_perror("read_objid");
@@ -77,6 +199,8 @@ void initialize (void)
 		}
 		op++;
 	}
+	printf("Press Enter to start polling");
+	getc(stdin);
 }
 
 /*
@@ -304,23 +428,6 @@ int	DBexecute(char *query)
 	}
 }
 
-MYSQL_RES *DBselect(char *query)
-{
-	while(mysql_query(&mysql,query) != 0)
-	{
-		printf("Query:%s\n",query);
-		printf("Query failed:%s [%d]\n", mysql_error(&mysql), mysql_errno(&mysql) );
-
-		if( (ER_SERVER_SHUTDOWN   != mysql_errno(&mysql)) && 
-            (CR_SERVER_GONE_ERROR != mysql_errno(&mysql)) &&
-            (CR_CONNECTION_ERROR  != mysql_errno(&mysql)))
-		{
-			exit(-1);
-		}
-	}
-
-	return	mysql_store_result(&mysql);
-}
 
 
 /*****************************************************************************/
