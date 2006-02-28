@@ -11,56 +11,31 @@
  * Niels Baggesen (Niels.Baggesen@uni-c.dk), 1999.
  */
 
+#include <string.h>
+#include <stdio.h>
 #include <net-snmp/net-snmp-config.h>
 #include <net-snmp/net-snmp-includes.h>
+
+#include "mysql.h"
+#include "errmsg.h"
+#include "mysqld_error.h"
+
+MYSQL	mysql;
+
+#define CONFIG_DBHOST ""
+#define CONFIG_DBNAME "zabbix"
+#define CONFIG_DBUSER "root"
+#define CONFIG_DBPASSWORD ""
 
 /*
  * a list of hosts to query
  */
 struct host {
-  const char *name;
+  const char *hostname;
   const char *community;
 } hosts[] = {
   { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
-  { "192.168.1.5",		"public" },
+  { "192.168.1.60",		"public" },
   { NULL }
 };
 
@@ -68,67 +43,21 @@ struct host {
  * a list of variables to query for
  */
 struct oid {
+  const char *hostname;
   const char *Name;
   oid Oid[MAX_OID_LEN];
   int OidLen;
 } oids[] = {
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
-  { ".1.3.6.1.2.1.1.6.0" },
+  { "192.168.1.5", ".1.3.6.1.2.1.1.6.5" },
+  { "192.168.1.60", ".1.3.6.1.2.1.1.6.0" },
   { NULL }
 };
+
+void load_oids(void)
+{
+	char sql[1024];
+	MYSQL_RES       *result;
+}
 
 /*
  * initialize
@@ -140,7 +69,7 @@ void initialize (void)
 	init_snmp("asynchapp");
 
 /* parse the oids */
-	while (op->Name) {
+	while (op->hostname) {
 		op->OidLen = sizeof(op->Oid)/sizeof(op->Oid[0]);
 		if (!read_objid(op->Name, op->Oid, &op->OidLen)) {
 			snmp_perror("read_objid");
@@ -201,8 +130,8 @@ int print_result (int status, struct snmp_session *sp, struct snmp_pdu *pdu)
  * poll all hosts in parallel
  */
 struct session {
-  struct snmp_session *sess;		/* SNMP session data */
-  struct oid *current_oid;		/* How far in our poll are we */
+	struct snmp_session *sess;		/* SNMP session data */
+	struct oid *current_oid;		/* How far in our poll are we */
 } sessions[sizeof(hosts)/sizeof(hosts[0])];
 
 int active_hosts;			/* hosts that we have not completed */
@@ -215,11 +144,24 @@ int asynch_response(int operation, struct snmp_session *sp, int reqid,
 {
 	struct session *host = (struct session *)magic;
 	struct snmp_pdu *req;
+	struct oid *op;
 
 	if (operation == NETSNMP_CALLBACK_OP_RECEIVED_MESSAGE) {
 		if (print_result(STAT_SUCCESS, host->sess, pdu)) {
-			host->current_oid++;			/* send next GET (if any) */
-			if (host->current_oid->Name) {
+//			host->current_oid++;			/* send next GET (if any) */
+			op = host->current_oid;
+			op++;
+			while(op->hostname)
+			{
+//				printf("[%s] [%s]\n",op->hostname, host->current_oid->hostname);
+				if(strcmp(op->hostname,host->current_oid->hostname)==0) {
+					host->current_oid = op;
+					break;
+				}
+				op++;
+			}
+
+			if (op->hostname && host->current_oid->Name) {
 				req = snmp_pdu_create(SNMP_MSG_GET);
 				snmp_add_null_var(req, host->current_oid->Oid, host->current_oid->OidLen);
 				if (snmp_send(host->sess, req))
@@ -228,6 +170,10 @@ int asynch_response(int operation, struct snmp_session *sp, int reqid,
 					snmp_perror("snmp_send");
 					snmp_free_pdu(req);
 				}
+			}
+			else
+			{
+//				printf("No more OIDs for [%s]\n", host->current_oid->hostname);
 			}
 		}
 	}
@@ -245,16 +191,17 @@ void asynchronous(void)
 {
 	struct session *hs;
 	struct host *hp;
+	struct oid *op;
 
 /* startup all hosts */
 
-	for (hs = sessions, hp = hosts; hp->name; hs++, hp++) {
+	for (hs = sessions, hp = hosts; hp->hostname; hs++, hp++) {
 		struct snmp_pdu *req;
 		struct snmp_session sess;
 		snmp_sess_init(&sess);			/* initialize session */
 		sess.version = SNMP_VERSION_1;
 		//    sess.version = SNMP_VERSION_2c;
-		sess.peername = strdup(hp->name);
+		sess.peername = strdup(hp->hostname);
 		sess.community = strdup(hp->community);
 		sess.community_len = strlen(sess.community);
 		sess.callback = asynch_response;		/* default callback */
@@ -263,7 +210,20 @@ void asynchronous(void)
 			snmp_perror("snmp_open");
 			continue;
 		}
-		hs->current_oid = oids;
+		op = oids;
+		while(op->hostname)
+		{
+			if(strcmp(op->hostname,hp->hostname)==0) {
+				hs->current_oid = op;
+				break;
+			}
+			op++;
+		}
+		if(!op->Name) {
+			printf("No OIDs for [%s]\n", hp->hostname);
+			continue;
+		}
+//		printf("Sending request [%s] [%s]\n",hp->hostname, hs->current_oid->Name);
 		req = snmp_pdu_create(SNMP_MSG_GET);	/* send the first GET */
 		snmp_add_null_var(req, hs->current_oid->Oid, hs->current_oid->OidLen);
 		if (snmp_send(hs->sess, req))
@@ -296,15 +256,78 @@ void asynchronous(void)
 
 /* cleanup */
 
-	for (hp = hosts, hs = sessions; hp->name; hs++, hp++) {
+	for (hp = hosts, hs = sessions; hp->hostname; hs++, hp++) {
 		if (hs->sess) snmp_close(hs->sess);
 	}
 }
+
+void	DBclose(void)
+{
+	mysql_close(&mysql);
+}
+
+void    DBconnect(void)
+{
+	mysql_init(&mysql);
+
+    if( ! mysql_real_connect( &mysql, CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, NULL, NULL,0 ) )
+	{
+		printf("Failed to connect to database: Error: %s\n",mysql_error(&mysql));
+		exit(-1);
+	}
+	else
+	{
+		if( mysql_select_db( &mysql, CONFIG_DBNAME ) != 0 )
+		{
+			printf("Failed to select database: Error: %s\n",mysql_error(&mysql) );
+			exit(-1);
+		}
+	}
+}
+
+int	DBexecute(char *query)
+{
+	while( mysql_query(&mysql,query) != 0)
+	{
+		printf("Query::%s\n",query);
+		printf("Query failed:%s [%d]\n", mysql_error(&mysql), mysql_errno(&mysql) );
+
+		if( (ER_SERVER_SHUTDOWN   != mysql_errno(&mysql)) && 
+            (CR_SERVER_GONE_ERROR != mysql_errno(&mysql)) &&
+            (CR_CONNECTION_ERROR  != mysql_errno(&mysql)))
+		{
+			return -1;
+		}
+
+        	DBclose();
+        	DBconnect();
+	}
+}
+
+MYSQL_RES *DBselect(char *query)
+{
+	while(mysql_query(&mysql,query) != 0)
+	{
+		printf("Query:%s\n",query);
+		printf("Query failed:%s [%d]\n", mysql_error(&mysql), mysql_errno(&mysql) );
+
+		if( (ER_SERVER_SHUTDOWN   != mysql_errno(&mysql)) && 
+            (CR_SERVER_GONE_ERROR != mysql_errno(&mysql)) &&
+            (CR_CONNECTION_ERROR  != mysql_errno(&mysql)))
+		{
+			exit(-1);
+		}
+	}
+
+	return	mysql_store_result(&mysql);
+}
+
 
 /*****************************************************************************/
 
 int main (int argc, char **argv)
 {
+	DBconnect();
 	initialize();
 
 	printf("---------- asynchronous -----------\n");
