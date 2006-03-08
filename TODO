@@ -1,6 +1,7 @@
 1.1beta8:
  - execution of commands on monitored hosts in case of pre-defined events
  - tactical overview screen
+ - better loading of images.sql
 
  - add acknowledgements
  - timeout-immune poller
