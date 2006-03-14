@@ -286,7 +286,7 @@
 		}
 
 	// delete host from maps
-		delete_sysmaps_host_by_hostid($hostid);
+		delete_sysmaps_elements_with_hostid($hostid);
 		
 	// delete host from group
 		DBexecute("delete from hosts_groups where hostid=$hostid");

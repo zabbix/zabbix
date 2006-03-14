@@ -19,7 +19,6 @@
 **/
 ?>
 <?php
-
 	function unset_request($key)
 	{
 //		SDI("unset: $key");
@@ -43,6 +42,10 @@
 	function	IN($array,$var='')
 	{
 		return "in_array({".$var."},array(".$array."))&&";
+	}
+	function	HEX($var=NULL)
+	{
+		return "ereg(\"^[a-zA-Z0-9]{1,}$\",{".$var."})";
 	}
 
 	define("NOT_EMPTY","({}!='')&&");
@@ -279,12 +282,21 @@
 		return ZBX_VALID_OK;
 	}
 
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$system_fields=array(
+		"sessionid"=>		array(T_ZBX_STR, O_OPT,	 P_SYS,	HEX(),NULL),
+		"triggers_hash"=>	array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,NULL)
+	);
+
 	function	check_fields(&$fields)
 	{
 
 		global	$_REQUEST;
+		global	$system_fields;
 
 		$err = ZBX_VALID_OK;
+
+		$fields = array_merge($fields, $system_fields);
 
 		foreach($fields as $field => $checks)
 		{

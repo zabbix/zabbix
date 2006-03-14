@@ -63,12 +63,12 @@
 ?>
 
 <?php
-	$sql="select clock,value,triggerid from alarms where triggerid=".$_REQUEST["triggerid"].
+	$sql="select * from alarms where triggerid=".$_REQUEST["triggerid"].
 		" order by clock desc $limit";
 	$result=DBselect($sql);
 
 	$table = new CTableInfo();
-	$table->setHeader(array(S_TIME,S_STATUS,S_DURATION,S_SUM,"%"));
+	$table->setHeader(array(S_TIME,S_STATUS,S_ACKNOWLEDGED,S_DURATION,S_SUM,"%"));
 	$truesum=0;
 	$falsesum=0;
 	$dissum=0;
@@ -158,9 +158,23 @@
 //		table_td($sum,"");
 //		table_td($proc,"");
 //		echo "</TR>";
+		$ack = "-";
+		if($row["value"] == 1 && $row["acknowledged"] == 1)
+		{
+			$db_acks = get_acknowledges_by_alarmid($row["alarmid"]);
+			$ack=array(
+				new CSpan(S_YES,"off"),
+				SPACE."(".DBnum_rows($db_acks).SPACE,
+				new CLink(S_SHOW,
+					"acknow.php?alarmid=".$row["alarmid"],"action"),
+				")"
+				);
+		}
+
 		$table->addRow(array(
 			date("Y.M.d H:i:s",$row["clock"]),
 			$istrue,
+			$ack,
 			$leng,
 			$sum,
 			$proc

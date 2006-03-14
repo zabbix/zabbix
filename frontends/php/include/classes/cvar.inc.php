@@ -29,14 +29,6 @@
 			$this->SetName($name);
 			$this->SetValue($value);
 		}
-		function SetName($value)
-		{ 
-			if(!is_string($value))
-			{
-				return $this->error("Incorrect value for SetName [$value]");
-			}
-			return $this->AddOption("name",$value); 
-		}
 		function SetValue($value)
 		{ 
 			return $this->AddOption("value",$value); 

@@ -42,27 +42,37 @@
 
 	$table = new CTableInfo();
 
-	$table->setHeader(array(S_PARAMETER,S_VALUE));
+	$table->SetHeader(array(S_PARAMETER,S_VALUE));
 
-	$stats=get_stats();
+	$status=get_status();
 
-	$str=new CSpan(S_NO,"on");
-	if( (exec("ps -ef|grep zabbix_server|grep -v grep|wc -l")>0) || (exec("ps -ax|grep zabbix_server|grep -v grep|wc -l")>0) )
-	{
-		$str=new CSpan(S_YES,"off");
-	}
-	$table->addRow(array(S_ZABBIX_SERVER_IS_RUNNING,$str));
+	if($status["zabbix_server"] == S_YES)
+		$style = "off";
+	else
+		$style = "on";
 
-	$table->addRow(array(S_NUMBER_OF_VALUES_STORED,$stats["history_count"]));
-	$table->addRow(array(S_NUMBER_OF_TRENDS_STORED,$stats["trends_count"]));
-	$table->addRow(array(S_NUMBER_OF_ALARMS,$stats["alarms_count"]));
-	$table->addRow(array(S_NUMBER_OF_ALERTS,$stats["alerts_count"]));
-	$table->addRow(array(S_NUMBER_OF_TRIGGERS_ENABLED_DISABLED,$stats["triggers_count"]."(".$stats["triggers_count_enabled"]."/".$stats["triggers_count_disabled"].")"));
-	$table->addRow(array(S_NUMBER_OF_ITEMS_ACTIVE_TRAPPER,$stats["items_count"]."(".$stats["items_count_active"]."/".$stats["items_count_trapper"]."/".$stats["items_count_not_active"]."/".$stats["items_count_not_supported"].")"));
-	$table->addRow(array(S_NUMBER_OF_USERS,$stats["users_count"]));
-	$table->addRow(array(S_NUMBER_OF_HOSTS_MONITORED,$stats["hosts_count"]."(".$stats["hosts_count_monitored"]."/".$stats["hosts_count_not_monitored"]."/".$stats["hosts_count_template"]."/".$stats["hosts_count_deleted"].")"));
-
-	$table->show();
+	$table->AddRow(array(S_ZABBIX_SERVER_IS_RUNNING,new CSpan($status["zabbix_server"],$style)));
+	$table->AddRow(array(S_VALUES_STORED,$status["history_count"]));
+	$table->AddRow(array(S_TRENDS_STORED,$status["trends_count"]));
+	$table->AddRow(array(S_NUMBER_OF_HOSTS,array($status["hosts_count"]."(",
+		new CSpan($status["hosts_count_monitored"],"off"),"/",
+		new CSpan($status["hosts_count_not_monitored"],"on"),"/",
+		new CSpan($status["hosts_count_template"],"unknown"),"/",
+		$status["hosts_count_deleted"].")")));
+	$table->AddRow(array(S_NUMBER_OF_ITEMS,array($status["items_count"]."(",
+		new CSpan($status["items_count_monitored"],"off"),"/",
+		new CSpan($status["items_count_disabled"],"on"),"/",
+		new CSpan($status["items_count_not_supported"],"unknown"),
+		")[".$status["items_count_trapper"]."]")));
+	$table->AddRow(array(S_NUMBER_OF_TRIGGERS,array($status["triggers_count"].
+		"(".$status["triggers_count_enabled"]."/".$status["triggers_count_disabled"].")"."[",
+		new CSpan($status["triggers_count_on"],"on"),"/",
+		new CSpan($status["triggers_count_unknown"],"unknown"),"/",
+		new CSpan($status["triggers_count_off"],"off"),"]"
+		)));
+	$table->AddRow(array(S_NUMBER_OF_ALARMS,$status["alarms_count"]));
+	$table->AddRow(array(S_NUMBER_OF_ALERTS,$status["alerts_count"]));
+	$table->Show();
 ?>
 
 <?php

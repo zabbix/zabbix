@@ -88,8 +88,8 @@ CREATE TABLE graphs (
 CREATE TABLE sysmaps_links (
   linkid		int(4)		NOT NULL auto_increment,
   sysmapid		int(4)		DEFAULT '0' NOT NULL,
-  shostid1		int(4)		DEFAULT '0' NOT NULL,
-  shostid2		int(4)		DEFAULT '0' NOT NULL,
+  selementid1		int(4)		DEFAULT '0' NOT NULL,
+  selementid2		int(4)		DEFAULT '0' NOT NULL,
  -- may be NULL 
   triggerid		int(4),
   drawtype_off		int(4)		DEFAULT '0' NOT NULL,
@@ -100,16 +100,18 @@ CREATE TABLE sysmaps_links (
 ) type=InnoDB;
 
 --
--- Table structure for table 'sysmaps_hosts'
+-- Table structure for table 'sysmaps_elements'
 --
 
-CREATE TABLE sysmaps_hosts (
-  shostid		int(4)		NOT NULL auto_increment,
+CREATE TABLE sysmaps_elements (
+  elementid		int(4)		NOT NULL auto_increment,
   sysmapid		int(4)		DEFAULT '0' NOT NULL,
-  hostid		int(4)		DEFAULT '0' NOT NULL,
+  elementid		int(4)		DEFAULT '0' NOT NULL,
+  elementtype		int(4)		DEFAULT '0' NOT NULL,
   icon			varchar(32)	DEFAULT 'Server' NOT NULL,
   icon_on		varchar(32)	DEFAULT 'Server' NOT NULL,
   label			varchar(128)	DEFAULT '' NOT NULL,
+  label_location	int(1)		DEFAULT NULL,
   x			int(4)		DEFAULT '0' NOT NULL,
   y			int(4)		DEFAULT '0' NOT NULL,
   url			varchar(255)	DEFAULT '' NOT NULL,
@@ -240,6 +242,7 @@ CREATE TABLE alarms (
   triggerid		int(4)		DEFAULT '0' NOT NULL,
   clock			int(4)		DEFAULT '0' NOT NULL,
   value			int(4)		DEFAULT '0' NOT NULL,
+  acknowledged		int(1)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (alarmid),
   KEY (triggerid,clock),
   KEY (clock)
@@ -583,18 +586,21 @@ CREATE TABLE screens (
 --
 
 CREATE TABLE screens_items (
-  screenitemid		int(4)		NOT NULL auto_increment,
-  screenid		int(4)		DEFAULT '0' NOT NULL,
-  resource		int(4)		DEFAULT '0' NOT NULL,
-  resourceid		int(4)		DEFAULT '0' NOT NULL,
-  width			int(4)		DEFAULT '320' NOT NULL,
-  height		int(4)		DEFAULT '200' NOT NULL,
-  x			int(4)		DEFAULT '0' NOT NULL,
-  y			int(4)		DEFAULT '0' NOT NULL,
-  colspan		int(4)		DEFAULT '0' NOT NULL,
-  rowspan		int(4)		DEFAULT '0' NOT NULL,
-  elements		int(4)		DEFAULT '25' NOT NULL,
-  PRIMARY KEY  (screenitemid)
+	screenitemid	int(4)		NOT NULL auto_increment,
+	screenid	int(4)		DEFAULT '0' NOT NULL,
+	resource	int(4)		DEFAULT '0' NOT NULL,
+	resourceid	int(4)		DEFAULT '0' NOT NULL,
+	width		int(4)		DEFAULT '320' NOT NULL,
+	height		int(4)		DEFAULT '200' NOT NULL,
+	x		int(4)		DEFAULT '0' NOT NULL,
+	y		int(4)		DEFAULT '0' NOT NULL,
+	colspan		int(4)		DEFAULT '0' NOT NULL,
+	rowspan		int(4)		DEFAULT '0' NOT NULL,
+	elements	int(4)		DEFAULT '25' NOT NULL,
+	valign		int(2)		DEFAULT '0' NOT NULL,
+	halign		int(2)		DEFAULT '0' NOT NULL,
+	style		int(4)		DEFAULT '0' NOT NULL,
+	  PRIMARY KEY  (screenitemid)
 ) TYPE=InnoDB;
 
 --
@@ -804,4 +810,20 @@ CREATE TABLE housekeeper (
   field			varchar(64)	DEFAULT '' NOT NULL,
   value			int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (housekeeperid)
+) type=InnoDB;
+
+--
+-- Table structure for table 'acknowledges'
+--
+
+CREATE TABLE acknowledges (
+	acknowledgeid		int(4)		NOT NULL auto_increment,
+	userid			int(4)		DEFAULT '0' NOT NULL,
+	alarmid			int(4)		DEFAULT '0' NOT NULL,
+	clock			int(4)		DEFAULT '0' NOT NULL,
+	message			varchar(255)	DEFAULT '' NOT NULL,
+	PRIMARY KEY (acknowledgeid),
+	KEY userid (userid),
+	KEY alarmid (alarmid),
+	KEY clock (clock)
 ) type=InnoDB;

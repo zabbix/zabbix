@@ -22,7 +22,7 @@
 	include "include/config.inc.php";
 	$page["title"] = "S_OVERVIEW";
 	$page["file"] = "overview.php";
-	show_header($page["title"],0,0);
+	show_header($page["title"],1,0);
 ?>
 
 <?php
@@ -63,200 +63,53 @@
 ?>
 
 <?php
-	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
-	{
-		unset($_REQUEST["groupid"]);
-	}
+	$_REQUEST["groupid"] = get_request("groupid",get_profile("web.overview.groupid",0));
+	$_REQUEST["type"] = get_request("type",get_profile("web.overview.type",0));
+
 	update_profile("web.menu.view.last",$page["file"]);
+	update_profile("web.overview.groupid",$_REQUEST["groupid"]);
+	update_profile("web.overview.type",$_REQUEST["type"]);
 ?>
 
 <?php
-	$h1=SPACE.S_OVERVIEW_BIG;
 
-	$h2=S_GROUP.SPACE;
-	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
-	$h2=$h2.form_select("groupid",0,S_SELECT_GROUP_DOT_DOT_DOT);
+	$form = new CForm();
+	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
+	
+	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	$result=DBselect("select groupid,name from groups order by name");
 	while($row=DBfetch($result))
 	{
-// Check if at least one host with read permission exists for this group
-		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
-		$cnt=0;
+		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where".
+			" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$row["groupid"].
+			" and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
 		while($row2=DBfetch($result2))
 		{
-			if(!check_right("Host","R",$row2["hostid"]))
-			{
-				continue;
-			}
-			$cnt=1; break;
-		}
-		if($cnt!=0)
-		{
-			$h2=$h2.form_select("groupid",$row["groupid"],$row["name"]);
+			if(!check_right("Host","R",$row2["hostid"]))	continue;
+			$cmbGroup->AddItem($row["groupid"],$row["name"]);
+			break;
 		}
 	}
-	$h2=$h2."</select>";
+	$form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 
-	$h2=$h2.SPACE.S_TYPE.SPACE;
-	$h2=$h2."<select class=\"biginput\" name=\"type\" onChange=\"submit()\">";
-	$h2=$h2.form_select("type",0,S_TRIGGERS);
-	$h2=$h2.form_select("type",1,S_DATA);
-	$h2=$h2."</select>";
+	$cmbType = new CComboBox("type",$_REQUEST["type"],"submit()");
+	$cmbType->AddItem(0,S_TRIGGERS);
+	$cmbType->AddItem(1,S_DATA);
+	$form->AddItem(array(S_TYPE.SPACE,$cmbType));
 
-	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"overview.php\">", "</form>");
+	show_header2(S_OVERVIEW_BIG, $form);
 ?>
 
 <?php
-	if(!isset($_REQUEST["sort"]))
+	if($_REQUEST["type"]==SHOW_DATA)
 	{
-		$_REQUEST["sort"]="description";
+		$table = get_items_data_overview($_REQUEST["groupid"]);
+		$table->Show();
 	}
-
-	if(isset($_REQUEST["groupid"])&&isset($_REQUEST["type"])&&($_REQUEST["type"]==SHOW_DATA))
+	elseif($_REQUEST["type"]==SHOW_TRIGGERS)
 	{
-		$table = new CTableInfo();
-		$header=array(SPACE);
-		$hosts=array();
-		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
-			$header=array_merge($header,array($row["host"]));
-			$hosts=array_merge($hosts,array($row["hostid"]));
-		}
-		$table->setHeader($header);
-
-		if(isset($_REQUEST["sort"]))
-		{
-			switch ($_REQUEST["sort"])
-			{
-				case "description":
-					$_REQUEST["sort"]="order by i.description";
-					break;
-				case "lastcheck":
-					$_REQUEST["sort"]="order by i.lastclock";
-					break;
-				default:
-					$_REQUEST["sort"]="order by i.description";
-					break;
-			}
-		}
-		else
-		{
-			$_REQUEST["sort"]="order by i.description";
-		}
-//		$sql="select distinct description from items order by 1;";
-		$sql="select distinct i.description from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid order by 1";
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
-			$rows=array(nbsp($row["description"]));
-			foreach($hosts as $hostid)
-			{
-				$sql="select itemid,value_type,lastvalue,units from items where hostid=$hostid and description=".zbx_dbstr($row["description"]);
-				$result2=DBselect($sql);
-				if(DBnum_rows($result2)==1)
-				{
-					$row2=DBfetch($result2);
-					if(!isset($row2["lastvalue"]))	$value="-";
-					else
-					{
-						$sql="select t.triggerid from triggers t, items i, functions f where i.hostid=$hostid and i.itemid=".$row2["itemid"]." and i.itemid=f.itemid and t.priority>1 and t.triggerid=f.triggerid and t.value=".TRIGGER_VALUE_TRUE;
-						$result3=DBselect($sql);
-						if(DBnum_rows($result3)>0)
-						{
-							if($row2["value_type"] == 0)
-								$value=new CCol(nbsp(convert_units($row2["lastvalue"],$row2["units"])),"high");
-							else
-								$value=new CCol(nbsp(htmlspecialchars(substr($row2["lastvalue"],0,20)." ...")),"high");
-						}
-						else
-						{
-							if($row2["value_type"] == 0)
-								$value=nbsp(convert_units($row2["lastvalue"],$row2["units"]));
-							else
-								$value=nbsp(htmlspecialchars(substr($row2["lastvalue"],0,20)." ..."));
-						}
-					}
-				}
-				else
-				{
-					$value="-";
-				}
-				$rows=array_merge($rows,array($value));
-			}
-
-			$table->addRow($rows);
-		}
-		$table->show();
-	}
-	else if(isset($_REQUEST["groupid"])&&isset($_REQUEST["type"])&&($_REQUEST["type"]==SHOW_TRIGGERS))
-	{
-		$table  = new CTableInfo();
-		$header=array(SPACE);
-		$hosts=array();
-		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg,functions f,triggers t where h.status=".HOST_STATUS_MONITORED." and t.status=".TRIGGER_STATUS_ENABLED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and t.triggerid=f.triggerid and f.itemid=i.itemid group by h.hostid,h.host order by h.host";
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
-			$header=array_merge($header,array($row["host"]));
-			$hosts=array_merge($hosts,array($row["hostid"]));
-		}
-		$table->setHeader($header);
-
-		if(isset($_REQUEST["sort"]))
-		{
-			switch ($_REQUEST["sort"])
-			{
-				case "description":
-					$_REQUEST["sort"]="order by i.description";
-					break;
-				case "lastcheck":
-					$_REQUEST["sort"]="order by i.lastclock";
-					break;
-				default:
-					$_REQUEST["sort"]="order by i.description";
-					break;
-			}
-		}
-		else
-		{
-			$_REQUEST["sort"]="order by i.description";
-		}
-//		$sql="select distinct description from items order by 1;";
-		$sql="select distinct t.description from hosts h,items i,hosts_groups hg,triggers t,functions f where h.status=".HOST_STATUS_MONITORED." and t.status=".TRIGGER_STATUS_ENABLED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and t.triggerid=f.triggerid and f.itemid=i.itemid order by 1";
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
-			$rows=array(nbsp($row["description"]));
-			foreach($hosts as $hostid)
-			{
-				$sql="select t.status,t.value,t.lastchange from triggers t,functions f,items i where f.triggerid=t.triggerid and i.itemid=f.itemid and t.status=".TRIGGER_STATUS_ENABLED." and i.hostid=$hostid and t.description=".zbx_dbstr($row["description"]);
-				$result2=DBselect($sql);
-				$value=SPACE;
-				if(DBnum_rows($result2)==1)
-				{
-					$row2=DBfetch($result2);
-					if($row2["status"]==0)
-					{
-						if($row2["value"] == TRIGGER_VALUE_FALSE)
-							$value=new CCol(SPACE,"normal");
-						else if($row2["value"] == TRIGGER_VALUE_UNKNOWN)
-							$value=new CCol(SPACE,"unknown_trigger");
-						else
-							$value=new CCol(SPACE,"high");
-					}
-				}
-				$rows=array_merge($rows,array($value));
-			}
-
-			$table->addRow($rows);
-		}
-		$table->show();
-	}
-	else
-	{
-		table_nodata();
+		$table = get_triggers_overview($_REQUEST["groupid"]);
+		$table->Show();
 	}
 ?>
 

@@ -35,6 +35,44 @@
 		exit;
 	}
 ?>
+<?php
+
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"sysmapid"=>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,NULL),
+
+		"selementid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,		NULL),
+		"elementid"=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID,		'isset({save})'),
+		"elementtype"=>	array(T_ZBX_INT, O_OPT,  NULL, IN("0,1,2"),	'isset({save})'),
+		"label"=>	array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,	'isset({save})'),
+		"x"=>		array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
+		"y"=>           array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
+		"icon"=>	array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,	'isset({save})'),
+		"icon_on"=>	array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,	'isset({save})'),
+		"url"=>		array(T_ZBX_STR, O_OPT,  NULL, NULL,		'isset({save})'),
+		"label_location"=>array(T_ZBX_INT, O_OPT, NULL,	IN("-1,0,1,2,3"),'isset({save})'),
+
+		"linkid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
+		"selementid1"=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID,'isset({save_link})'),
+		"selementid2"=> array(T_ZBX_INT, O_OPT,  NULL, DB_ID,'isset({save_link})'),
+		"triggerid"=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID,'isset({save_link})'),
+		"drawtype_off"=>array(T_ZBX_INT, O_OPT,  NULL, IN("0,1,2,3,4"),'isset({save_link})'),
+		"drawtype_on"=>	array(T_ZBX_INT, O_OPT,  NULL, IN("0,1,2,3,4"),'isset({save_link})'),
+		"color_off"=>	array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,'isset({save_link})'),
+		"color_on"=>	array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,'isset({save_link})'),
+
+/* actions */
+		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"save_link"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+/* other */
+		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
+	);
+
+	check_fields($fields);
+?>
 
 <?php
 	show_table_header("CONFIGURATION OF NETWORK MAP");
@@ -42,197 +80,154 @@
 ?>
 
 <?php
-	if(isset($_REQUEST["register"]))
+	if(isset($_REQUEST["save"]))
 	{
-		if($_REQUEST["register"]=="add")
-		{
-			$result=add_host_to_sysmap($_REQUEST["sysmapid"],$_REQUEST["hostid"],
-				$_REQUEST["label"],$_REQUEST["x"],$_REQUEST["y"],$_REQUEST["icon"],
-				$_REQUEST["url"],$_REQUEST["icon_on"]);
-			show_messages($result,"Host added","Cannot add host");
-			if($result)	unset($_REQUEST["form"]);
+		if(isset($_REQUEST["selementid"]))
+		{ // update element
+			$result=update_sysmap_element($_REQUEST["selementid"],
+				$_REQUEST["sysmapid"],$_REQUEST["elementid"],$_REQUEST["elementtype"],
+				$_REQUEST["label"],$_REQUEST["x"],$_REQUEST["y"],
+				$_REQUEST["icon"],$_REQUEST["url"],$_REQUEST["icon_on"],
+				$_REQUEST["label_location"]);
+			show_messages($result,"Element updated","Cannot update element");
 		}
-		if($_REQUEST["register"]=="update")
-		{
-			$result=update_sysmap_host($_REQUEST["shostid"],$_REQUEST["sysmapid"],
-				$_REQUEST["hostid"],$_REQUEST["label"],$_REQUEST["x"],$_REQUEST["y"],
-				$_REQUEST["icon"],$_REQUEST["url"],$_REQUEST["icon_on"]);
-			show_messages($result,"Host updated","Cannot update host");
-			if($result)	unset($_REQUEST["form"]);
+		else
+		{ // add element
+			$result=add_element_to_sysmap($_REQUEST["sysmapid"],$_REQUEST["elementid"],
+				$_REQUEST["elementtype"],$_REQUEST["label"],$_REQUEST["x"],$_REQUEST["y"],
+				$_REQUEST["icon"],$_REQUEST["url"],$_REQUEST["icon_on"],
+				$_REQUEST["label_location"]);
+
+			show_messages($result,"Element added","Cannot add element");
 		}
-		if($_REQUEST["register"]=="add link")
-		{
-			$result=add_link($_REQUEST["sysmapid"],$_REQUEST["shostid1"],$_REQUEST["shostid2"],
+		if($result)	unset($_REQUEST["form"]);
+	}
+	if(isset($_REQUEST["save_link"]))
+	{
+		if(isset($_REQUEST["linkid"]))
+		{ // update link
+			$result=update_link($_REQUEST["linkid"],
+				$_REQUEST["sysmapid"],$_REQUEST["selementid1"],$_REQUEST["selementid2"],
 				$_REQUEST["triggerid"],	$_REQUEST["drawtype_off"],$_REQUEST["color_off"],
 				$_REQUEST["drawtype_on"],$_REQUEST["color_on"]);
-			show_messages($result,"Link added","Cannot add link");
-			if($result)	unset($_REQUEST["form"]);
+
+			show_messages($result,"Link updated","Cannot update link");
 		}
-		if($_REQUEST["register"]=="delete_link")
+		else
+		{ // add link
+			$result=add_link($_REQUEST["sysmapid"],$_REQUEST["selementid1"],$_REQUEST["selementid2"],
+				$_REQUEST["triggerid"],	$_REQUEST["drawtype_off"],$_REQUEST["color_off"],
+				$_REQUEST["drawtype_on"],$_REQUEST["color_on"]);
+
+			show_messages($result,"Link added","Cannot add link");
+		}
+		if($result)	unset($_REQUEST["form"]);
+	}
+	elseif(isset($_REQUEST["delete"]))
+	{
+		if(isset($_REQUEST["linkid"]))
 		{
 			$result=delete_link($_REQUEST["linkid"]);
 			show_messages($result,"Link deleted","Cannot delete link");
-			unset($_REQUEST["linkid"]);
+			if($result)
+			{
+				unset($_REQUEST["linkid"]);
+				unset($_REQUEST["form"]);
+			}
 		}
-		if($_REQUEST["register"]=="delete")
+		elseif(isset($_REQUEST["selementid"]))
 		{
-			$result=delete_sysmaps_host($_REQUEST["shostid"]);
-			show_messages($result,"Host deleted","Cannot delete host");
-			if($result)	unset($_REQUEST["form"]);
+			$result=delete_sysmaps_element($_REQUEST["selementid"]);
+			show_messages($result,"Element deleted","Cannot delete element");
+			if($result)
+			{
+				unset($_REQUEST["selementid"]);
+				unset($_REQUEST["form"]);
+			}
 		}
 	}
 ?>
 
 <?php
-	$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,".
-		"sh.y,sh.icon from sysmaps_hosts sh,hosts h".
-		" where sh.sysmapid=".$_REQUEST["sysmapid"].
-		" and h.status not in (".HOST_STATUS_DELETED.") and h.hostid=sh.hostid".
-		" order by h.host");
-
-	if(isset($_REQUEST["form"]) && $_REQUEST["form"]=="Create Connection" && DBnum_rows($result)>1)
+	if(isset($_REQUEST["form"]) && ($_REQUEST["form"]=="add_element" ||
+		($_REQUEST["form"]=="update" && isset($_REQUEST["selementid"]))))
 	{
-		insert_map_link_form();
+		show_table_header("DISPLAYED ELEMENTS");
+		echo BR;
+		insert_map_element_form();
 	}
-	elseif(isset($_REQUEST["form"]) && $_REQUEST["form"]=="Add Host")
+	elseif(isset($_REQUEST["form"]) && ($_REQUEST["form"]=="add_link" || 
+		($_REQUEST["form"]=="update" && isset($_REQUEST["linkid"]))))
 	{
-		insert_map_host_form();
+		$result=DBselect("select * from sysmaps_elements where sysmapid=".$_REQUEST["sysmapid"]);
+		if(DBnum_rows($result)>1)
+		{
+			show_table_header("CONNECTORS");
+			echo BR;
+			insert_map_link_form();
+		}
+		else
+		{
+			info("No elements in this map");
+		}
 	}
 	else
 	{
-		$map=get_map_by_sysmapid($_REQUEST["sysmapid"]);
-		show_table_header($map["name"]);
-
-		echo "<TABLE BORDER=0 COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-		echo "<TR BGCOLOR=#DDDDDD>";
-		echo "<TD ALIGN=CENTER>";
-		if(isset($_REQUEST["sysmapid"]))
-		{
-			$map_name="links".$_REQUEST["sysmapid"]."_".rand(0,100000);
-			$map="\n<map name=".$map_name.">";
-
-			$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,".
-				"sh.x,sh.y,h.status from sysmaps_hosts sh,hosts h".
-				" where sh.sysmapid=".$_REQUEST["sysmapid"].
-				" and h.status not in (".HOST_STATUS_DELETED.") and h.hostid=sh.hostid");
-
-			while($row=DBfetch($result))
-			{
-				$host_		= $row["host"];
-				$shostid_	= $row["shostid"];
-				$sysmapid_	= $row["sysmapid"];
-				$hostid_	= $row["hostid"];
-				$label_		= $row["label"];
-				$x_		= $row["x"];
-				$y_		= $row["y"];
-				$status_	= $row["status"];
-
-				if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
-				{
-					$map .= "\n<area shape=rect coords=$x_,$y_,".($x_+48).",".($y_+48).
-						" href=\"sysmap.php?form=Add+Host&sysmapid=$sysmapid_".
-						"&shostid=$shostid_#form\"".
-						" alt=\"$host_\">";
-				}
-				else
-				{
-					$map .= "\n<area shape=rect coords=$x_,$y_,".($x_+32).",".($y_+32).
-						" href=\"sysmap.php?sysmapid=$sysmapid_&shostid=$shostid_#form\"".
-						" alt=\"$host_\">";
-				}
-			}
-			$map=$map."\n</map>";
-			echo $map;
-			echo "<IMG SRC=\"map.php?sysmapid=".$_REQUEST["sysmapid"]."\" border=0 usemap=#$map_name>";
-		}
-
-		echo "</TD>";
-		echo "</TR>";
-		echo "</TABLE>";
-?>
-
-<?php
-
-		$form = new CForm();
-		$form->AddVar("sysmapid",$_REQUEST["sysmapid"]);
-		$form->AddItem(new CButton("form","Add Host"));
-		show_table_header("DISPLAYED HOSTS",$form);
+		show_table_header("DISPLAYED ELEMENTS", new CButton("form","Add element",
+			"return Redirect('".$page["file"]."?form=add_element".url_param("sysmapid")."');"));
 
 		$table = new CTableInfo();
-		$table->setHeader(array(S_HOST,S_LABEL,S_X,S_Y,S_ICON,S_ACTIONS));
+		$table->setHeader(array(S_LABEL,S_TYPE,S_X,S_Y,S_ICON_ON,S_ICON_OFF));
 
-		$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,".
-			"sh.y,sh.icon from sysmaps_hosts sh,hosts h".
-			" where sh.sysmapid=".$_REQUEST["sysmapid"].
-			" and h.status not in (".HOST_STATUS_DELETED.") and h.hostid=sh.hostid".
-			" order by h.host");
-		while($row=DBfetch($result))
+		$db_elements = DBselect("select * from sysmaps_elements where sysmapid=".$_REQUEST["sysmapid"].
+			" order by label");
+		while($db_element = DBfetch($db_elements))
 		{
+
+			if(    $db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST)	$type = "Host";
+			elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_MAP)	$type = "Map";
+			elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_IMAGE)	$type = "Image";
+			else $type = "Map element";
+
 			$table->addRow(array(
-				$row["host"],
-				$row["label"],
-				$row["x"],
-				$row["y"],
-				nbsp($row["icon"]),
-				array(
-					new CLink("Change",
-						"sysmap.php?sysmapid=".$row["sysmapid"].
-						"&form=Add+Host&shostid=".$row["shostid"]."#form"),
-					SPACE."-".SPACE,
-					new CLink("Delete",
-						"sysmap.php?register=delete&sysmapid=".$row["sysmapid"].
-						"&shostid=".$row["shostid"])
-				)
+				new CLink(
+					$db_element["label"],
+					"sysmap.php?sysmapid=".$db_element["sysmapid"].
+					"&form=update&selementid=".$db_element["selementid"],
+					"action"),
+				nbsp($type),
+				$db_element["x"],
+				$db_element["y"],
+				nbsp($db_element["icon_on"]),
+				nbsp($db_element["icon"])
 				));
 		}
 		$table->show();
-?>
 
-<?php
 		echo BR;
-		$form = new CForm();
-		$form->AddVar("sysmapid",$_REQUEST["sysmapid"]);
-		$form->AddItem(new CButton("form","Create Connection"));
-		show_table_header("CONNECTORS",$form);
+		show_table_header("CONNECTORS", new CButton("form","Create connection",
+			"return Redirect('".$page["file"]."?form=add_link".
+			url_param("sysmapid")."');"));
 
 		$table = new CTableInfo();
-		$table->SetHeader(array(S_HOST_1,S_HOST_2,S_LINK_STATUS_INDICATOR,S_ACTIONS));
+		$table->SetHeader(array(S_LINK,S_ELEMENT_1,S_ELEMENT_2,S_LINK_STATUS_INDICATOR));
 
-		$result=DBselect("select linkid,shostid1,shostid2,triggerid from sysmaps_links".
+		$i = 1;
+		$result=DBselect("select linkid,selementid1,selementid2,triggerid from sysmaps_links".
 			" where sysmapid=".$_REQUEST["sysmapid"]." order by linkid");
 		while($row=DBfetch($result))
 		{
 	/* prepare label 1 */
-			$db_hosts = DBselect("select h.*".
-				" from sysmaps_hosts sh,hosts h".
-				" where sh.sysmapid=".$_REQUEST["sysmapid"].
-				" and h.hostid=sh.hostid".
-				" and h.status not in (".HOST_STATUS_DELETED.")".
-				" and sh.shostid=".$row["shostid1"]);
-			if(DBnum_rows($db_hosts)==0) continue;
-			$result1=DBselect("select label from sysmaps_hosts where shostid=".$row["shostid1"]);
+			$result1=DBselect("select label from sysmaps_elements".
+				" where selementid=".$row["selementid1"]);
 			$row1=DBfetch($result1);
 			$label1=$row1["label"];
-			if($label1==""){
-				$db_host = DBfetch($db_hosts);
-				$label1 = $db_host['host'];
-			}
 
 	/* prepare label 2 */
-			$db_hosts = DBselect("select h.*".
-				" from sysmaps_hosts sh,hosts h".
-				" where sh.sysmapid=".$_REQUEST["sysmapid"].
-				" and h.hostid=sh.hostid".
-				" and h.status not in (".HOST_STATUS_DELETED.")".
-				" and sh.shostid=".$row["shostid2"]);
-			if(DBnum_rows($db_hosts)==0) continue;
-			$result1=DBselect("select label from sysmaps_hosts where shostid=".$row["shostid2"]);
+			$result1=DBselect("select label from sysmaps_elements".
+				" where selementid=".$row["selementid2"]);
 			$row1=DBfetch($result1);
 			$label2=$row1["label"];
-			if($label2==""){
-				$db_host = DBfetch($db_hosts);
-				$label2 = $db_host['host'];
-			}
 
 	/* prepare description */
 			if(isset($row["triggerid"]))
@@ -242,17 +237,51 @@
 
 	/* draw row */
 			$table->addRow(array(
+				new CLink("link ".$i++,
+					"sysmap.php?sysmapid=".$_REQUEST["sysmapid"].
+					"&form=update&linkid=".$row["linkid"],
+					"action"),
 				$label1,
 				$label2,
-				$description,
-				new CLink("Delete","sysmap.php?register=delete_link".url_param("sysmapid").
-					"&linkid=".$row["linkid"])
+				$description
 				));
 		}
 		$table->show();
 	}
-?>
 
+	echo BR;
+	$map=get_sysmap_by_sysmapid($_REQUEST["sysmapid"]);
+	show_table_header($map["name"]);
+
+	$table = new CTable(NULL,"map");
+	if(isset($_REQUEST["sysmapid"]))
+	{
+		$linkMap = new CMap("links".$_REQUEST["sysmapid"]."_".rand(0,100000));
+
+		$db_elements = DBselect("select * from sysmaps_elements where sysmapid=".$_REQUEST["sysmapid"]);
+		while($db_element = DBfetch($db_elements))
+		{
+			$tmp_img = get_png_by_selementid($db_element["selementid"]);
+			if(!$tmp_img) continue;
+
+			$x1_		= $db_element["x"];
+			$y1_		= $db_element["y"];
+			$x2_		= $db_element["x"] + imagesx($tmp_img);
+			$y2_		= $db_element["y"] + imagesy($tmp_img);
+
+			$linkMap->AddRectArea($x1_,$y1_,$x2_,$y2_,
+				"sysmap.php?form=update&sysmapid=".$_REQUEST["sysmapid"].
+				"&selementid=".$db_element["selementid"],
+				$db_element["label"]);
+
+		}
+		$imgMap = new CImg("map.php?sysmapid=".$_REQUEST["sysmapid"]);
+		$imgMap->SetMap($linkMap->GetName());
+		$table->AddRow($linkMap);
+		$table->AddRow($imgMap);
+	}
+	$table->Show();
+?>
 <?php
 	show_page_footer();
 ?>

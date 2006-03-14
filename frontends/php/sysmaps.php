@@ -107,7 +107,12 @@
 ?>
 
 <?php
-	if(!isset($_REQUEST["form"]))
+	if(isset($_REQUEST["form"]))
+	{
+		echo BR;
+		insert_map_form();
+	}
+	else
 	{
 		$table = new CTableInfo(S_NO_MAPS_DEFINED);
 		$table->setHeader(array(S_ID,S_NAME,S_WIDTH,S_HEIGHT,S_MAP));
@@ -130,11 +135,6 @@
 				));
 		}
 		$table->show();
-	}
-	else
-	{
-		echo BR;
-		insert_map_form();
 	}
 ?>
 
