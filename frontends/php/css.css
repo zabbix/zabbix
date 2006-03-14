@@ -273,27 +273,38 @@ table.tableinfo tr.even_row td		{	background-color: #EEEEEE; }
 table.tableinfo tr.even_row:hover td 	{	background-color: #EEEEFE; }
 
 table.tableinfo tr td.high		{	background-color: #FF8888; 	}
-table.tableinfo tr td.high_blink1	{	background: #FF8888 url(images/gradients/blink1.gif) repeat top left;	}
-table.tableinfo tr td.high_blink2	{	background: #FF8888 url(images/gradients/blink2.gif) repeat top left;	}
 table.tableinfo tr:hover td.high	{	background-color: #FF8888;	}
+table.tableinfo tr td.high_blink1	{	background: #FF8888 url(images/gradients/blink1.gif) repeat top left;	}
 table.tableinfo tr:hover td.high_blink1	{	background: #FF8888 url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr td.high_blink2	{	background: #FF8888 url(images/gradients/blink2.gif) repeat top left;	}
 table.tableinfo tr:hover td.high_blink2	{	background: #FF8888 url(images/gradients/blink2.gif) repeat top left;	}
 
 table.tableinfo tr td.unknown_trigger	{	background-color: #BCBCBC;	}
-table.tableinfo tr td.unknown_trigger_blink1 {	background: #BCBCBC url(images/gradients/blink1.gif) repeat top left;	}
-table.tableinfo tr td.unknown_trigger_blink2 {	background: #BCBCBC url(images/gradients/blink2.gif) repeat top left;	}
 table.tableinfo tr:hover td.unknown_trigger {	background-color: #BCBCBC;	}
+table.tableinfo tr td.unknown_trigger_blink1 {	background: #BCBCBC url(images/gradients/blink1.gif) repeat top left;	}
 table.tableinfo tr:hover td.unknown_trigger_blink1 {	background: #BCBCBC url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr td.unknown_trigger_blink2 {	background: #BCBCBC url(images/gradients/blink2.gif) repeat top left;	}
 table.tableinfo tr:hover td.unknown_trigger_blink2 {	background: #BCBCBC url(images/gradients/blink2.gif) repeat top left;	}
 
 table.tableinfo tr td.normal		{	background-color: #AADDAA;	}
-table.tableinfo tr td.normal_blink1	{	background: #AADDAA url(images/gradients/blink1.gif) repeat top left;	}
-table.tableinfo tr td.normal_blink2	{	background: #AADDAA url(images/gradients/blink2.gif) repeat top left;	}
 table.tableinfo tr:hover td.normal	{	background-color: #AADDAA;	}
+table.tableinfo tr td.normal_blink1	{	background: #AADDAA url(images/gradients/blink1.gif) repeat top left;	}
 table.tableinfo tr:hover td.normal_blink1	{	background: #AADDAA url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr td.normal_blink2	{	background: #AADDAA url(images/gradients/blink2.gif) repeat top left;	}
 table.tableinfo tr:hover td.normal_blink2	{	background: #AADDAA url(images/gradients/blink2.gif) repeat top left;	}
 
 table.tableinfo tr td.center		{vertical-align: middle; text-align: center; }
+
+table.tableinfo tr td.disaster		{	background-color: #FF0000;	}
+table.tableinfo tr:hover td.disaster	{	background-color: #FF0000;	}
+table.tableinfo tr td.high		{	background-color: #FF8888;	}
+table.tableinfo tr:hover td.high	{	background-color: #FF8888;	}
+table.tableinfo tr td.average		{	background-color: #DDAAAA;	}
+table.tableinfo tr:hover td.average	{	background-color: #DDAAAA;	}
+table.tableinfo tr td.unknown_trigger	{	background-color: #BCBCBC;	}
+table.tableinfo tr:hover td.unknown_trigger{	background-color: #BCBCBC;	}
+table.tableinfo tr td.normal		{	background-color: #AADDAA;	}
+table.tableinfo tr:hover td.normal	{	background-color: #AADDAA;	}
 
 /****** HEADER *********/
 
