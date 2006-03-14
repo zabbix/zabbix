@@ -378,7 +378,7 @@ static int housekeeping_alerts(int now)
 	DB_RESULT	*result;
 	int		res = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_alarms(%d)", now);
+	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_alerts(%d)", now);
 
 	snprintf(sql,sizeof(sql)-1,"select alert_history from config");
 	result = DBselect(sql);
@@ -405,7 +405,8 @@ static int housekeeping_alarms(int now)
 {
 	char		sql[MAX_STRING_LEN];
 	int		alarm_history;
-	DB_RESULT	*result;
+	DB_RESULT	*result, *result2;
+	int 		i, alarmid;
 	int		res = SUCCEED;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_alarms(%d)", now);
@@ -421,8 +422,20 @@ static int housekeeping_alarms(int now)
 	{
 		alarm_history=atoi(DBget_field(result,0,0));
 
-		snprintf(sql,sizeof(sql)-1,"delete from alarms where clock<%d",now-24*3600*alarm_history);
-		DBexecute(sql);
+		snprintf(sql,sizeof(sql)-1,"select alarmid from alarms where clock<%d", now-24*3600*alarm_history);
+		result2 = DBselect(sql);
+		for(i=0;i<DBnum_rows(result2);i++)
+		{
+			alarmid=atoi(DBget_field(result2,i,0));
+			
+			snprintf(sql,sizeof(sql)-1,"delete from acknowledges where alarmid=%d",alarmid);
+			DBexecute(sql);
+			
+			snprintf(sql,sizeof(sql)-1,"delete from alarms where alarmid=%d",alarmid);
+			DBexecute(sql);
+		}
+		DBfree_result(result2);
+
 		zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [alarms]", DBaffected_rows());
 	}
 	

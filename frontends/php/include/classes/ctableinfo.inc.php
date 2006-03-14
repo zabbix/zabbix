@@ -22,20 +22,20 @@
 	class CTableInfo extends CTable
 	{
 /* public */
-		function CTableInfo($message='...',$class='tborder')
+		function CTableInfo($message='...',$class='tableinfo')
 		{
 			parent::CTable($message,$class);
-			$this->SetOddRowClass('table_odd_row');
-			$this->SetEvenRowClass('table_even_row');
+			$this->SetOddRowClass('odd_row');
+			$this->SetEvenRowClass('even_row');
 			$this->SetCellSpacing(1);
 			$this->SetCellPadding(3);
 			$this->SetHeader();
 		}
-		function SetHeader($value=NULL,$class='table_header')
+		function SetHeader($value=NULL,$class='header')
 		{
 			parent::SetHeader($value,$class);
 		}
-		function SetFooter($value=NULL,$class='table_header')
+		function SetFooter($value=NULL,$class='footer')
 		{
 			parent::SetFooter($value,$class);
 		}

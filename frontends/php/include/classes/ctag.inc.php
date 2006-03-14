@@ -125,6 +125,10 @@
 			$this->options[$name] = htmlspecialchars(strval($value)); 
 			return 0;
 		}
+		function CleanItems()
+		{
+			$this->items = array();
+		}
 		function AddItem($value)
 		{
 			if(is_null($value))
@@ -180,7 +184,7 @@
 				print ($this->tag_end);
 			}
 		}
-		function SetEnable($value='yes')
+		function SetEnabled($value='yes')
 		{
 			if(is_null($value))
 				return 0;
@@ -192,7 +196,7 @@
 					($value == 'no' || $value == 'disabled' || $value=='off') || $value=='0')
 				|| (is_int($value) && $value==0))
 				return $this->AddOption('disabled','disabled');
-			return $this->error("Incorrect value for SetEnable [$value]");
+			return $this->error("Incorrect value for SetEnabled [$value]");
 		}
 		function error($value)
 		{

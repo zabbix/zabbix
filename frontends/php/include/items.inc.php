@@ -434,4 +434,68 @@
 
 		return get_host_by_itemid($itemid);
 	}
+
+	function get_items_data_overview($groupid)
+	{
+		$table = new CTableInfo();
+
+		if($groupid > 0)
+		{
+			$group_where = ",hosts_groups hg where hg.groupid=$groupid and hg.hostid=h.hostid and";
+		} else {
+			$group_where = " where";
+		}
+
+		$header=array(new CCol(S_ITEMS,"center"));
+
+		$hosts=array();
+		$result=DBselect("select h.hostid,h.host from hosts h,items i $group_where".
+			" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid".
+			" group by h.host,h.hostid order by h.host");
+		while($row=DBfetch($result))
+		{
+			$header=array_merge($header,array(do_vertival_text($row["host"])));
+			$hosts=array_merge($hosts,array($row["hostid"]));
+		}
+		$table->SetHeader($header,"vertical_header");
+		
+
+		$db_items = DBselect("select distinct i.description from hosts h,items i $group_where".
+			" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid order by 1");
+		while($item = DBfetch($db_items))
+		{
+			$table_row = array(nbsp($item["description"]));
+			foreach($hosts as $hostid)
+			{
+				$db_host_items = DBselect("select itemid,value_type,lastvalue,units from items where".
+					" hostid=$hostid and description=".zbx_dbstr($item["description"]));
+				if(DBnum_rows($db_host_items)!=1)
+				{
+					array_push($table_row,"-");
+					continue;
+				}
+				$host_item = DBfetch($db_host_items);
+				if(!isset($host_item["lastvalue"]))
+				{
+					array_push($table_row,"-");
+					continue;
+				}
+				$db_item_triggers = DBselect("select t.triggerid from triggers t, items i, functions f where".
+					" i.hostid=$hostid and i.itemid=".$host_item["itemid"]." and i.itemid=f.itemid".
+					" and t.priority>1 and t.triggerid=f.triggerid and t.value=".TRIGGER_VALUE_TRUE);
+				if(DBnum_rows($db_item_triggers) > 0)		$style = "high";
+				else						$style = NULL;
+
+				if($host_item["value_type"] == 0)
+					$value = convert_units($host_item["lastvalue"],$host_item["units"]);
+				else
+					$value = htmlspecialchars(substr($host_item["lastvalue"],0,20)." ...");
+
+				array_push($table_row,new CCol(nbsp($value),$style));
+			}
+
+			$table->AddRow($table_row);
+		}
+		return $table;
+	}
 ?>

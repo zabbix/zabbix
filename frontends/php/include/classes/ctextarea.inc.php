@@ -83,7 +83,7 @@
 		}
 		function SetRows($value)
 		{
-			if(!is_int($value))
+			if(!is_numeric($value))
 			{
 				return $this->error("Incorrect value for SetRows [$value]");
 			}
@@ -92,7 +92,7 @@
 		}
 		function SetCols($value)
 		{
-			if(!is_int($value))
+			if(!is_numeric($value))
 			{
 				return $this->error("Incorrect value for SetCols [$value]");
 			}

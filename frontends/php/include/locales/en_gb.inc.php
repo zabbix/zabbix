@@ -27,6 +27,15 @@
 	"S_DATE_FORMAT_YMD"=>			"d M Y",
 	"S_HTML_CHARSET"=>			"iso-8859-1",
 
+//	acknow.php
+	"S_ACKNOWLEDGES"=>			"Acknowledges",
+	"S_ACKNOWLEDGE"=>			"Acknowledge",
+	"S_ACKNOWLEDGE_ALARM_BY"=>		"Acknowledge alarm by",
+	"S_ADD_COMMENT_BY"=>			"Add comment by",
+	"S_COMMENT_ADDED"=>			"Comment added",
+	"S_CANNOT_ADD_COMMENT"=>		"Cannot add coment",
+	"S_ALARM_ACKNOWLEDGES_BIG"=>		"ALARM ACKNOWLEDGES",
+
 //	actionconf.php
 	"S_FILTER_HOST_GROUP"=>			"Filter: Host group",
 	"S_FILTER_HOST"=>			"Filter: Host",
@@ -222,6 +231,7 @@
 	"S_IMAGES"=>				"Images",
 	"S_IMAGE"=>				"Image",
 	"S_IMAGES_BIG"=>			"IMAGES",
+	"S_ICON"=>				"Icon",
 	"S_NO_IMAGES_DEFINED"=>			"No images defined",
 	"S_BACKGROUND"=>			"Background",
 	"S_UPLOAD"=>				"Upload",
@@ -317,6 +327,7 @@
 //	hosts.php
 	"S_HOSTS"=>				"Hosts",
 	"S_ITEMS"=>				"Items",
+	"S_ITEMS_BIG"=>				"ITEMS",
 	"S_TRIGGERS"=>				"Triggers",
 	"S_GRAPHS"=>				"Graphs",
 	"S_HOST_ADDED"=>			"Host added",
@@ -488,12 +499,14 @@
 	"S_LAST_VALUE"=>			"Last value",
 
 //	sysmap.php
+	"S_LINK"=>				"Link",
 	"S_LABEL"=>				"Label",
 	"S_X"=>					"X",
 	"S_Y"=>					"Y",
-	"S_ICON"=>				"Icon",
-	"S_HOST_1"=>				"Host 1",
-	"S_HOST_2"=>				"Host 2",
+	"S_ICON_ON"=>				"Icon (on)",
+	"S_ICON_OFF"=>				"Icon (off)",
+	"S_ELEMENT_1"=>				"Element 1",
+	"S_ELEMENT_2"=>				"Element 2",
 	"S_LINK_STATUS_INDICATOR"=>		"Link status indicator",
 	"S_CONFIGURATION_OF_NETWORK_MAPS"=>	"Configuration of network maps",
 
@@ -518,8 +531,9 @@
 	"S_SELECT_MAP_DOT_DOT_DOT"=>		"Select map...",
 	"S_BACKGROUND_IMAGE"=>			"Background image",
 	"S_ICON_LABEL_TYPE"=>			"Icon label type",
-	"S_HOST_LABEL"=>			"Host label",
-	"S_HOST_NAME"=>				"Host name",
+	"S_LABEL"=>				"Label",
+	"S_LABEL_LOCATION"=>			"Label location",
+	"S_ELEMENT_NAME"=>			"Element name",
 	"S_STATUS_ONLY"=>			"Status only",
 	"S_NOTHING"=>				"Nothing",
 
@@ -593,15 +607,23 @@
 	"S_VALUE"=>				"Value",
 	"S_ZABBIX_SERVER_IS_RUNNING"=>		"ZABBIX server is running",
 	"S_NUMBER_OF_VALUES_STORED"=>		"Number of values stored",
+	"S_VALUES_STORED"=>			"Values stored",
 	"S_NUMBER_OF_TRENDS_STORED"=>		"Number of trends stored",
+	"S_TRENDS_STORED"=>			"Trends stored",
 	"S_NUMBER_OF_ALARMS"=>			"Number of alarms",
 	"S_NUMBER_OF_ALERTS"=>			"Number of alerts",
-	"S_NUMBER_OF_TRIGGERS_ENABLED_DISABLED"=>"Number of triggers (enabled/disabled)",
-	"S_NUMBER_OF_ITEMS_ACTIVE_TRAPPER"=>	"Number of items (active/trapper/not active/not supported)",
-	"S_NUMBER_OF_USERS"=>			"Number of users",
-	"S_NUMBER_OF_HOSTS_MONITORED"=>		"Number of hosts (monitored/not monitored/templates/deleted)",
+	"S_NUMBER_OF_TRIGGERS"=>		"Number of triggers (enabled/disabled)[true/unknown/false]",
+	"S_NUMBER_OF_TRIGGERS_SHORT"=>		"Triggers (e/d)[t/u/f]",
+	"S_NUMBER_OF_ITEMS"=>			"Number of items (monitored/disabled/not supported)[trapper]",
+	"S_NUMBER_OF_ITEMS_SHORT"=>		"Items (m/d/n)[t]",
+	"S_NUMBER_OF_USERS"=>			"Number of users (online)",
+	"S_NUMBER_OF_USERS_SHORT"=>		"Users (online)",
+	"S_NUMBER_OF_HOSTS"=>			"Number of hosts (monitored/not monitored/templates/deleted)",
+	"S_NUMBER_OF_HOSTS_SHORT"=>		"Hosts (m/n/t/d)",
 	"S_YES"=>				"Yes",
 	"S_NO"=>				"No",
+	"S_RUNNING"=>				"running",
+	"S_NOT_RUNNING"=>			"not running",
 
 //	report2.php
 	"S_AVAILABILITY_REPORT"=>		"Availability report",
@@ -658,6 +680,30 @@
 	"S_COLUMN_SPAN"=>			"Column span",
 	"S_ROW_SPAN"=>				"Row span",
 	"S_SHOW_LINES"=>			"Show lines",
+	"S_HOSTS_INFO"=>			"Hosts info",
+	"S_TRIGGERS_INFO"=>			"Triggers info",
+	"S_SERVER_INFO"=>			"Server info",
+	"S_CLOCK"=>				"Clock",
+	"S_TRIGGERS_OVERVIEW"=>			"Triggers overview",
+	"S_DATA_OVERVIEW"=>			"Data overview",
+
+	"S_TIME_TYPE"=>				"Time type",
+	"S_SERVER_TIME"=>			"Server time",
+	"S_LOCAL_TIME"=>			"Local time",
+
+	"S_STYLE"=>				"Style",
+	"S_VERTICAL"=>				"Vertical",
+	"S_HORISONTAL"=>			"Horisontal",
+
+	"S_HORISONTAL_ALIGN"=>			"Horisontal align",
+	"S_LEFT"=>				"Left",
+	"S_CENTER"=>				"Center",
+	"S_RIGHT"=>				"Right",
+
+	"S_VERTICAL_ALIGN"=>			"Vertical align",
+	"S_TOP"=>				"Top",
+	"S_MIDDLE"=>				"Middle",
+	"S_BOTTOM"=>				"Buttom",
 
 //	screens.php
 	"S_CUSTOM_SCREENS"=>			"Custom screens",
@@ -769,6 +815,7 @@
 	"S_LAST_CHANGE"=>			"Last change",
 	"S_COMMENTS"=>				"Comments",
 	"S_ACKNOWLEDGED"=>			"Acknowledged",
+	"S_ACK"=>				"Ack",
 
 //	users.php
 	"S_USERS"=>				"Users",

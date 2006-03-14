@@ -296,6 +296,7 @@ CREATE TABLE alarms (
   clock			int4		DEFAULT '0' NOT NULL,
   istrue		int4		DEFAULT '0' NOT NULL,
   value			int4		DEFAULT '0' NOT NULL,
+  acknowledged		int2		DEFAULT '0' NOT NULL,
   PRIMARY KEY (alarmid),
   FOREIGN KEY (triggerid) REFERENCES triggers
 );
@@ -431,13 +432,15 @@ CREATE UNIQUE INDEX sysmaps_name on sysmaps (name);
 -- Table structure for table 'sysmaps_hosts'
 --
 
-CREATE TABLE sysmaps_hosts (
-  shostid		serial,
+CREATE TABLE sysmaps_elements (
+  iselementid		serial,
   sysmapid		int4		DEFAULT '0' NOT NULL,
-  hostid		int4		DEFAULT '0' NOT NULL,
+  elementid		int4		DEFAULT '0' NOT NULL,
+  elementtype		int4		DEFAULT '0' NOT NULL,
   icon			varchar(32)	DEFAULT 'Server' NOT NULL,
   icon_on		varchar(32)	DEFAULT 'Server' NOT NULL,
   label			varchar(128)	DEFAULT '' NOT NULL,
+  label_location	int2		DEFAULT '0' NOT NULL,
   x			int4		DEFAULT '0' NOT NULL,
   y			int4		DEFAULT '0' NOT NULL,
   url			varchar(255)	DEFAULT '' NOT NULL,
@@ -453,8 +456,8 @@ CREATE TABLE sysmaps_hosts (
 CREATE TABLE sysmaps_links (
   linkid		serial,
   sysmapid		int4		DEFAULT '0' NOT NULL,
-  shostid1		int4		DEFAULT '0' NOT NULL,
-  shostid2		int4		DEFAULT '0' NOT NULL,
+  selementid1		int4		DEFAULT '0' NOT NULL,
+  selementid2		int4		DEFAULT '0' NOT NULL
 -- may be NULL 
   triggerid		int4,
   drawtype_off		int4		DEFAULT '0' NOT NULL,
@@ -599,17 +602,20 @@ CREATE TABLE screens (
 --
 
 CREATE TABLE screens_items (
-  screenitemid		serial,
-  screenid		int4		DEFAULT '0' NOT NULL,
-  resource		int4		DEFAULT '0' NOT NULL,
-  resourceid		int4		DEFAULT '0' NOT NULL,
-  width			int4		DEFAULT '320' NOT NULL,
-  height		int4		DEFAULT '200' NOT NULL,
-  x			int4		DEFAULT '0' NOT NULL,
-  y			int4		DEFAULT '0' NOT NULL,
-  colspan		int4		DEFAULT '0' NOT NULL,
-  rowspan		int4		DEFAULT '0' NOT NULL,
-  elements		int4		DEFAULT '25' NOT NULL,
+	screenitemid	serial,
+	screenid	int4		DEFAULT '0' NOT NULL,
+	resource	int4		DEFAULT '0' NOT NULL,
+	resourceid	int4		DEFAULT '0' NOT NULL,
+	width		int4		DEFAULT '320' NOT NULL,
+	height		int4		DEFAULT '200' NOT NULL,
+	x		int4		DEFAULT '0' NOT NULL,
+	y		int4		DEFAULT '0' NOT NULL,
+	colspan		int4		DEFAULT '0' NOT NULL,
+	rowspan		int4		DEFAULT '0' NOT NULL,
+	elements	int4		DEFAULT '25' NOT NULL,
+	valign		int2		DEFAULT '0' NOT NULL,
+	halign		int2		DEFAULT '0' NOT NULL,
+	style		int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY  (screenitemid)
 );
 
@@ -799,5 +805,22 @@ CREATE TABLE housekeeper (
   value			int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (housekeeperid)
 );
+
+--
+-- Table structure for table 'acknowledges'
+--
+
+CREATE TABLE acknowledges (
+	acknowledgeid		serial,
+	userid			int4		DEFAULT '0' NOT NULL,
+	alarmid			int4		DEFAULT '0' NOT NULL,
+	clock			int4		DEFAULT '0' NOT NULL,
+	message			varchar(255)	DEFAULT '' NOT NULL,
+	PRIMARY KEY (acknowledgeid),
+	FOREIGN KEY (alarmid) REFERENCES alarms,
+	FOREIGN KEY (userid) REFERENCES users
+);
+
+CREATE INDEX acknowledges_alarmid on acknowledgeid (alarmid);
 
 VACUUM ANALYZE;

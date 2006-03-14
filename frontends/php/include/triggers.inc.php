@@ -643,27 +643,21 @@
 		$trig_hosts = get_hosts_by_triggerid($triggerid);
 
 		$result = delete_dependencies_by_triggerid($triggerid);
-		if(!$result)
-                {
-                        return  $result;
-                }
+		if(!$result)	return	$result;
+
 		DBexecute("delete from trigger_depends where triggerid_up=$triggerid");
 
 		$result=delete_function_by_triggerid($triggerid);
-		if(!$result)
-		{
-			return	$result;
-		}
+		if(!$result)	return	$result;
+
 		$result=delete_alarms_by_triggerid($triggerid);
-		if(!$result)
-		{
-			return	$result;
-		}
+		if(!$result)	return	$result;
+
 		$result=delete_services_by_triggerid($triggerid);
-		if(!$result)
-		{
-			return	$result;
-		}
+		if(!$result)	return	$result;
+
+		$result=delete_sysmaps_elements_with_triggerid($triggerid);
+		if(!$result)	return	$result;
 
 		DBexecute("delete from alerts where triggerid=$triggerid");
 
@@ -950,5 +944,61 @@
 		{
 			copy_trigger_to_host($trigger["triggerid"], $hostid);
 		}
+	}
+
+	function	get_triggers_overview($groupid)
+	{
+		$table = new CTableInfo();
+
+		if($groupid > 0)
+		{
+			$group_where = ",hosts_groups hg where hg.groupid=$groupid and hg.hostid=h.hostid and";
+		} else {
+			$group_where = " where";
+		}
+
+		$header=array(new CCol(S_TRIGGERS,"center"));
+
+		$hosts=array();
+		$result=DBselect("select h.hostid,h.host from hosts h,items i,triggers t, functions f $group_where".
+			" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid".
+			" group by h.host,h.hostid order by h.host");
+		while($row=DBfetch($result))
+		{
+			$header=array_merge($header,array(do_vertival_text($row["host"])));
+			$hosts=array_merge($hosts,array($row["hostid"]));
+		}
+		$table->SetHeader($header,"vertical_header");
+	
+
+		$db_triggers = DBselect("select distinct t.description from hosts h,items i,triggers t,functions f $group_where".
+			" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid".
+			" group by 1");
+		while($triggers = DBfetch($db_triggers))
+		{
+			$table_row = array(nbsp($triggers["description"]));
+			foreach($hosts as $hostid)
+			{
+				$style = NULL;
+				$db_host_triggers = DBselect("select t.value,t.lastchange from triggers t,functions f,items i".
+					" where f.triggerid=t.triggerid and i.itemid=f.itemid and t.status=".TRIGGER_STATUS_ENABLED.
+					" and i.hostid=$hostid and t.description=".zbx_dbstr($triggers["description"]));
+				if(DBnum_rows($db_host_triggers)==1)
+				{
+					$host_trigger = DBfetch($db_host_triggers);
+
+					if($host_trigger["value"] == TRIGGER_VALUE_FALSE)	$style = "normal";
+					elseif($host_trigger["value"] == TRIGGER_VALUE_UNKNOWN)	$style = "unknown_trigger";
+					else							$style = "high";
+
+					if((time(NULL)-$host_trigger["lastchange"])<300) 	$style .= "_blink1";
+					elseif((time(NULL)-$host_trigger["lastchange"])<900) 	$style .= "_blink3";
+				}
+				array_push($table_row,new CCol(SPACE,$style));
+			}
+
+			$table->AddRow($table_row);
+		}
+		return $table;
 	}
 ?>

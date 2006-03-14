@@ -39,7 +39,9 @@
 			$this->SetAlign('center');
 			$this->SetHelp();
 
-			$this->AddItemToTopRow("<a name=\"form\"></a>");
+			$frm_link = new CLink();
+			$frm_link->SetName("formtable");
+			$this->AddItemToTopRow($frm_link);
 			
 			$this->AddVar("form",get_request("form",1));
 			$this->AddVar("form_refresh",get_request("form_refresh",0)+1);
@@ -51,7 +53,7 @@
 		{
 			
 			if(is_string($value))
-				return parent::SetAction($value."#form");
+				return parent::SetAction($value);
 			elseif(is_null($value))
 				return parent::SetAction($value);
 			else
@@ -130,7 +132,7 @@
 		{
 			parent::ShowTagBody();
 
-			$tbl = new CTable(NULL,'form');
+			$tbl = new CTable(NULL,'formtable');
 			$tbl->SetOddRowClass('form_odd_row');
 			$tbl->SetEvenRowClass('form_even_row');
 			$tbl->SetCellSpacing(0);

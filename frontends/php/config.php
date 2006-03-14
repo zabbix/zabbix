@@ -76,8 +76,6 @@
 // image form
 		"imageid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),
 						'{config}==3&&{form}=="update"'),
-		"MAX_FILE_SIZE"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,2097152),
-						'{config}==3&&isset({save})'),
 		"name"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,
 						'{config}==3&&isset({save})'),
 		"imagetype"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("1,2"),
@@ -176,19 +174,19 @@
 /* IMAGES ACTIONS */
 		if(isset($_REQUEST["save"]))
 		{
+			$file = isset($_FILES["image"]) && $_FILES["image"]["name"] != "" ? $_FILES["image"] : NULL;
 			if(isset($_REQUEST["imageid"]))
 			{
 	/* UPDATE */
 				$result=update_image($_REQUEST["imageid"],$_REQUEST["name"],
-					$_REQUEST["imagetype"],$_FILES);
+					$_REQUEST["imagetype"],$file);
 
 				$msg_ok = S_IMAGE_UPDATED;
 				$msg_fail = S_CANNOT_UPDATE_IMAGE;
 				$audit_action = "Image updated";
-				unset($_REQUEST["imageid"]);
 			} else {
 	/* ADD */
-				$result=add_image($_REQUEST["name"],$_REQUEST["imagetype"],$_FILES);
+				$result=add_image($_REQUEST["name"],$_REQUEST["imagetype"],$file);
 
 				$msg_ok = S_IMAGE_ADDED;
 				$msg_fail = S_CANNOT_ADD_IMAGE;
@@ -510,7 +508,7 @@
 					$name,
 					$imagetype,
 					$actions=new CLink(
-						new CImg("image.php?imageid=".$row["imageid"],"no image",NULL,"24"),
+						new CImg("image.php?height=24&imageid=".$row["imageid"],"no image",NULL),
 						"image.php?imageid=".$row["imageid"])
 					));
 			}

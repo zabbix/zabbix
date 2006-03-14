@@ -57,6 +57,19 @@
 			}
 			return $this->AddOption("alt",$value);
 		}
+		function SetMap($value=NULL)
+		{
+			if(is_null($value))
+				$this->DeleteOption("usemup");
+
+			if(!is_string($value))
+			{
+				return $this->error("Incorrect value for SetMap [$value]");
+			}
+			
+			$value = '#'.ltrim($value,'#');
+			return $this->AddOption("usemap",$value);
+		}
 		function SetWidth($value=NULL){
 			if(is_null($value))
 				return $this->DelOption("width");

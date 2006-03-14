@@ -41,7 +41,6 @@
 			if(!is_int($value) && !is_numeric($value))
 			{
 				return $this->error("Incorrect value for SetRowSpan [$value]"); 
-				return 1;
 			}
 			return $this->AddOption("rowspan",strval($value));
 		}
@@ -217,7 +216,7 @@
 			if(count($this->items)==0)
 			{
 				if(isset($this->message)) 
-					$this->AddRow(new CCol($this->message,'table_message'),$this->evenRowClass);
+					$this->AddRow(new CCol($this->message,'message'),$this->evenRowClass);
 			} 
 
 			parent::ShowTagBody();
